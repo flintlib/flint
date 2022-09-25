@@ -72,7 +72,7 @@ Bit sizes and norms
 .. function:: slong _fmpz_vec_height_index(const fmpz * vec, slong len)
 
     Returns the index of an entry of maximum absolute value in the vector.
-    The the length must be at least 1.
+    The length must be at least 1.
 
 
 Input and output
@@ -424,4 +424,4 @@ Dot product
 .. function:: void _fmpz_vec_dot_ptr(fmpz_t res, const fmpz * vec1, fmpz ** const vec2, slong offset, slong len)
 
     Sets ``res`` to the dot product of ``len`` values at ``vec1`` and the
-    ``len`` values ``vec2[i] + offset`` for ``0 \leq i < len``.
+    ``len`` values ``vec2[i] + offset`` for `0 \leq i < len`.

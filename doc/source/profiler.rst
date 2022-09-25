@@ -108,7 +108,7 @@ Framework for repeatedly sampling a single target
         
         flint_printf("Min time is %lf.3s, max time is %lf.3s\n", min, max);
 
-    If either of the first two parameters to ``prof_repeat`` are 
+    If either of the first two parameters to ``prof_repeat`` is 
     ``NULL``, that value is not stored.
 
     One may set the minimum time in microseconds for a timing run by 

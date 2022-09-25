@@ -114,7 +114,7 @@ tree simply type:
 
 GNU make or CMake is required to build FLINT. For GNU make, this is simply
 ``make`` on Linux, Darwin, MinGW and Cygwin systems. However, on some unixes
-the command is ``gmake``. For CMake, this is ``cmake``, which which may need
+the command is ``gmake``. For CMake, this is ``cmake``, which may need
 to be installed with your package manager.
 
 If you wish to install FLINT with GNU make, simply type:
@@ -172,7 +172,7 @@ The FLINT custom make system responds to the standard commands
     make distclean
     make install
 
-If your system supports parallel builds, FLINT will build in parallel, e.g:
+If your system supports parallel builds, FLINT will build in parallel, e.g.:
 
 .. code-block:: bash
 
@@ -185,7 +185,7 @@ Testing a single module or file
 
 If you wish to simply check a single module of FLINT you can pass the option
 ``MOD=modname`` to ``make check``. You can also pass a list of module names in
-inverted commas, e.g:
+inverted commas, e.g.:
 
 .. code-block:: bash
 
@@ -235,7 +235,7 @@ Visual Studio 2015 Community (or higher version) and:
 - an installed version of Python Tools for Visual Studio
   <https://github.com/Microsoft/PTVS>
 
-Obtain FLINT2 by cloning it using GIT from Brian Gladman's repository:
+Obtain FLINT2 by cloning it using Git from Brian Gladman's repository:
 
   ``git@github.com:BrianGladman/flint.git``
 

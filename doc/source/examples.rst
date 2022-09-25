@@ -41,7 +41,7 @@ The current example programs are:
   ``build/examples/stirling_matrix 10`` does this with 10 by 10 matrices.
 
 - ``fmpz_poly_factor_zassenhaus`` Demonstrates the factorisation of a small
-  polynomial. A larger polynomials is also provided on disk and a small
+  polynomial. A larger polynomial is also provided on disk and a small
   (obvious) change to the example program will read this file instead of
   using the hard coded polynomial.
 

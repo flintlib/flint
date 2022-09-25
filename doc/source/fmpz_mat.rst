@@ -178,9 +178,9 @@ Random matrix generation
     Sets a square matrix ``mat`` to a random *ajtai* matrix. 
     The diagonal entries `(i, i)` are set to a random entry in the range 
     `[1, 2^{b-1}]` inclusive where `b = \lfloor(2 r - i)^\alpha\rfloor` for some 
-    double parameter~`\alpha`. The entries below the diagonal in column~`i` 
+    double parameter `\alpha`. The entries below the diagonal in column `i` 
     are set to a random entry in the range `(-2^b + 1, 2^b - 1)` whilst the 
-    entries to the right of the diagonal in row~`i` are set to zero. 
+    entries to the right of the diagonal in row `i` are set to zero. 
 
 .. function:: int fmpz_mat_randpermdiag(fmpz_mat_t mat, flint_rand_t state, const fmpz * diag, slong n)
 
@@ -237,7 +237,7 @@ Input and output
 .. function:: int fmpz_mat_fprint_pretty(FILE * file, const fmpz_mat_t mat)
 
     Prints the given matrix to the stream ``file``.  The format is an 
-    opening square bracket then on each line a row of the matrix, followed 
+    opening square bracket, then on each line a row of the matrix, followed 
     by a closing square bracket. Each row is written as an opening square 
     bracket followed by a space separated list of coefficients followed 
     by a closing square bracket.
@@ -337,14 +337,14 @@ Concatenate
 .. function:: void fmpz_mat_concat_vertical(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2)
 
     Sets ``res`` to vertical concatenation of (``mat1``, ``mat2``)
-    in that order. Matrix dimensions : ``mat1`` : `m \times n`,
-    ``mat2`` : `k \times n`, ``res`` : `(m + k) \times n`.
+    in that order. Matrix dimensions: ``mat1``: `m \times n`,
+    ``mat2``: `k \times n`, ``res``: `(m + k) \times n`.
 
 .. function:: void fmpz_mat_concat_horizontal(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2)
 
     Sets ``res`` to horizontal concatenation of (``mat1``, ``mat2``)
-    in that order. Matrix dimensions : ``mat1`` : `m \times n`,
-    ``mat2`` : `m \times k`, ``res``  : `m \times (n + k)`.
+    in that order. Matrix dimensions: ``mat1``: `m \times n`,
+    ``mat2``: `m \times k`, ``res``: `m \times (n + k)`.
 
 
 Modular reduction and reconstruction
@@ -386,7 +386,7 @@ Modular reduction and reconstruction
 
     This function is provided for convenience purposes.
     For reducing or reconstructing multiple integer matrices over the same
-    set of moduli, it is faster to use\\ ``fmpz_mat_multi_mod_precomp``.
+    set of moduli, it is faster to use ``fmpz_mat_multi_mod_precomp``.
 
 .. function:: void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat, nmod_mat_t * const residues, slong nres, fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign)
 
@@ -555,9 +555,9 @@ Matrix multiplication
 
     Sets ``B`` to the square of the matrix ``A``, which must be
     a square matrix. Aliasing is allowed.
-    The bodrato algorithm is described in [Bodrato2010]_.
+    The Bodrato algorithm is described in [Bodrato2010]_.
     It is highly efficient for squaring matrices which satisfy both the 
-    following conditions  : (a) large elements  (b) dimensions less than 150.
+    following conditions: (a) large elements,  (b) dimensions less than 150.
 
 
 .. function:: void fmpz_mat_pow(fmpz_mat_t B, const fmpz_mat_t A, ulong e)
@@ -570,27 +570,27 @@ Matrix multiplication
 
     This internal function sets `C` to the matrix product `C = A B` computed
     using classical matrix algorithm assuming that all entries of `A` and `B`
-    are small, that is, have bits ` \le FLINT\_BITS - 2`. No aliasing is allowed.
+    are small, that is, have bits `\le FLINT\_BITS - 2`. No aliasing is allowed.
 
 .. function:: void _fmpz_mat_mul_double_word(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     This function is only for internal use and assumes that either:
-        - the entries of `A` and `B` are all nonnegative and strictly less than `2^{2*FLINT_BITS}`, or
-        - the entries of `A` and `B` are all strictly less than `2^{2*FLINT_BITS - 1}` in absolute value.
+        - the entries of `A` and `B` are all nonnegative and strictly less than `2^{2*FLINT\_BITS}`, or
+        - the entries of `A` and `B` are all strictly less than `2^{2*FLINT\_BITS - 1}` in absolute value.
 
 .. function:: void fmpz_mat_mul_fmpz_vec(fmpz * c, const fmpz_mat_t A, const fmpz * b, slong blen)
               void fmpz_mat_mul_fmpz_vec_ptr(fmpz * const * c, const fmpz_mat_t A, const fmpz * const * b, slong blen)
 
     Compute a matrix-vector product of ``A`` and ``(b, blen)`` and store the result in ``c``.
     The vector ``(b, blen)`` is either truncated or zero-extended to the number of columns of ``A``.
-    The number entries written to ``c`` is always equal to the number of rows of ``A``.
+    The number of entries written to ``c`` is always equal to the number of rows of ``A``.
 
 .. function:: void fmpz_mat_fmpz_vec_mul(fmpz * c, const fmpz * a, slong alen, const fmpz_mat_t B)
               void fmpz_mat_fmpz_vec_mul_ptr(fmpz * const * c, const fmpz * const * a, slong alen, const fmpz_mat_t B)
 
-    Compute a vector-matrix product of ``(a, alen)`` and ``B`` and and store the result in ``c``.
+    Compute a vector-matrix product of ``(a, alen)`` and ``B`` and store the result in ``c``.
     The vector ``(a, alen)`` is either truncated or zero-extended to the number of rows of ``B``.
-    The number entries written to ``c`` is always equal to the number of columns of ``B``.
+    The number of entries written to ``c`` is always equal to the number of columns of ``B``.
 
 
 Inverse
@@ -718,7 +718,8 @@ Determinant
     `|\det(A)| \le \prod \|a_i\|_2` where the product is taken
     over the rows `a_i` of `A`.
 
-void fmpz_mat_det_bound_nonzero(fmpz_t bound, const fmpz_mat_t A)
+.. function:: void fmpz_mat_det_bound_nonzero(fmpz_t bound, const fmpz_mat_t A)
+
     As per ``fmpz_mat_det_bound()`` but excludes zero columns. For use with
     non-square matrices.
 
@@ -799,7 +800,7 @@ Minimal polynomial
 .. function:: void fmpz_mat_minpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat)
 
     Computes the minimal polynomial of an `n \times n` square matrix.
-    Uses a modular method based on an average time `O~(n^3)`, worst case
+    Uses a modular method based on an average time `O(n^3)`, worst case
     `O(n^4)` method over `\mathbb{Z}/n\mathbb{Z}`.
 
 .. function:: slong _fmpz_mat_minpoly(fmpz * cp, const fmpz_mat_t mat)
@@ -997,7 +998,7 @@ Row reduction
     ``stop_row`` (exclusive) such that column `c` in ``mat`` has
     a nonzero entry on row `r`, or returns -1 if no such entry exists.
 
-    This implementation simply chooses the first nonzero entry from
+    This implementation simply chooses the first nonzero entry
     it encounters. This is likely to be a nearly optimal choice if all
     entries in the matrix have roughly the same size, but can lead to
     unnecessary coefficient growth if the entries vary in size.
@@ -1125,7 +1126,7 @@ Nullspace
     In general, the entries in `B` will not be minimal: in particular,
     the pivot entries in `B` will generally differ from unity.
     `B` must be allocated with sufficient space to represent the result
-    (at most `n \times n` where `n` is the number of column of `A`).
+    (at most `n \times n` where `n` is the number of columns of `A`).
 
 
 
@@ -1384,7 +1385,7 @@ Classical LLL
 .. function:: void fmpz_mat_lll_original(fmpz_mat_t A, const fmpq_t delta, const fmpq_t eta)
 
     Takes a basis `x_1, x_2, \ldots, x_m` of the lattice `L \subset R^n` (as
-    the rows of a `m \times n` matrix ``A``). The output is an (``delta``,
+    the rows of a `m \times n` matrix ``A``). The output is a (``delta``,
     ``eta``)-reduced basis `y_1, y_2, \ldots, y_m` of the lattice `L` (as
     the rows of the same `m \times n` matrix ``A``).
 

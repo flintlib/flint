@@ -134,11 +134,11 @@ Basic arithmetic with precomputed inverses
 
         invxl = (B^2 - B*x - 1)/x = (B^2 - 1)/x - B
 
-    Note that `x` must be normalised, i.e.\ with msb set. This inverse 
+    Note that `x` must be normalised, i.e. with msb set. This inverse 
     makes use of the following theorem of Torbjorn Granlund and Peter 
     Montgomery~[Lemma~8.1][GraMon1994]_:
 
-    Let `d` be normalised, `d < B`, i.e.\ it fits in a word, and suppose 
+    Let `d` be normalised, `d < B`, i.e. it fits in a word, and suppose 
     that `m d < B^2 \leq (m+1) d`. Let `0 \leq n \leq B d - 1`.  Write 
     `n = n_2 B + n_1 B/2 + n_0` with `n_1 = 0` or `1` and `n_0 < B/2`. 
     Suppose `q_1 B + q_0 = n_2 B + (n_2 + n_1) (m - B) + n_1 (d-B/2) + n_0`
@@ -153,7 +153,7 @@ Basic arithmetic with precomputed inverses
     all these terms contributes at most `1` to `q_1`. We are left with 
     `n_2 B + n_2 (m-B)`. But note that `(m-B)` is precisely our precomputed 
     inverse ``invxl``. If we write `q_1 B + q_0 = n_2 B + n_2 (m-B)`, 
-    then from the theorem, we have `0 \leq n - q_1 d < 3 d`, i.e.\ the 
+    then from the theorem, we have `0 \leq n - q_1 d < 3 d`, i.e. the 
     quotient is out by at most `2` and is always either correct or too small.
 
 .. function:: ulong n_preinvert_limb(ulong n)
@@ -193,7 +193,7 @@ Basic arithmetic with precomputed inverses
     exact quotient, we have rounded down by less than `1` plus half a 
     place. But as the product is less than `n` and `n` is less than `2^{53}`,
     half a place is less than `1`, thus we are out by less than `2` from 
-    the exact quotient, i.e.\ the quotient we have computed is the 
+    the exact quotient, i.e. the quotient we have computed is the 
     quotient we are after or one too small. That leaves only the case 
     where we had to round up to the nearest place which happened to 
     be an integer, so that truncating to an integer didn't change 
@@ -225,7 +225,7 @@ Basic arithmetic with precomputed inverses
     no restrictions on `a` and the only restriction on `n` is that it be
     nonzero. 
 
-    This uses the algorithm of Granlund and M\"oller [GraMol2010]_. First
+    This uses the algorithm of Granlund and Möller [GraMol2010]_. First
     `n` is normalised and `a` is shifted into two limbs to compensate. Then
     their algorithm is applied verbatim and the remainder shifted back.
 
@@ -235,7 +235,7 @@ Basic arithmetic with precomputed inverses
     `n` computed by :func:`n_preinvert_limb`. There are no restrictions on `a`
     and the only restriction on `n` is that it be nonzero. 
 
-    This uses the algorithm of Granlund and M\"oller [GraMol2010]_. First
+    This uses the algorithm of Granlund and Möller [GraMol2010]_. First
     `n` is normalised and `a` is shifted into two limbs to compensate. Then
     their algorithm is applied verbatim.
 
@@ -245,7 +245,7 @@ Basic arithmetic with precomputed inverses
     :func:`n_preinvert_limb()`. There are no restrictions on `a` and the only
     restriction on `n` is that it be nonzero. 
 
-    This uses the algorithm of Granlund and M\"oller [GraMol2010]_. First
+    This uses the algorithm of Granlund and Möller [GraMol2010]_. First
     `n` is normalised and `a` is shifted into two limbs to compensate. Then
     their algorithm is applied verbatim and the result shifted back.
 
@@ -272,7 +272,7 @@ Basic arithmetic with precomputed inverses
 
     The new version reduces the top limb modulo `n` as per 
     :func:`n_mod2_preinv` and then the algorithm of Granlund and 
-    M\"oller [GraMol2010]_ is used again to reduce modulo `n`.
+    Möller [GraMol2010]_ is used again to reduce modulo `n`.
 
 .. function:: ulong n_lll_mod_preinv(ulong a_hi, ulong a_mi, ulong a_lo, ulong n, ulong ninv)
 
@@ -282,7 +282,7 @@ Basic arithmetic with precomputed inverses
     restrictions on `n`.
 
     This function uses the algorithm of Granlund and 
-    M\"oller [GraMol2010]_ to first reduce the top two limbs 
+    Möller [GraMol2010]_ to first reduce the top two limbs 
     modulo `n`, then does the same on the bottom two limbs.
 
 
@@ -336,7 +336,7 @@ Basic arithmetic with precomputed inverses
     ``norm`` will shift the product right by this many bits before
     reducing it.
 
-    The algorithm use is that of Granlund and M\"oller [GraMol2010]_.
+    The algorithm used is that of Granlund and Möller [GraMol2010]_.
 
 
 
@@ -398,7 +398,7 @@ Jacobi and Kronecker symbols
 
 .. function:: int n_jacobi(mp_limb_signed_t x, ulong y)
 
-    Computes the Jacobi symbol `\left(\frac{x}{y}\right)` for any x and odd `y`.
+    Computes the Jacobi symbol `\left(\frac{x}{y}\right)` for any `x` and odd `y`.
 
 .. function:: int n_jacobi_unsigned(ulong x, ulong y)
 
@@ -448,7 +448,7 @@ Modular Arithmetic
 .. function:: ulong n_powmod(ulong a, mp_limb_signed_t exp, ulong n)
 
     Returns ``a^exp`` modulo `n`. We require ``n < 2^FLINT_D_BITS`` 
-    and `0 \leq a < n`. There are no restrictions on ``exp``, i.e.\ 
+    and `0 \leq a < n`. There are no restrictions on ``exp``, i.e. 
     it can be negative.
 
     This is implemented by precomputing an inverse and calling the 
@@ -458,7 +458,7 @@ Modular Arithmetic
 
     Returns ``(a^exp) % n`` given a precomputed inverse of `n` computed 
     by :func:`n_preinvert_limb`. We require `0 \leq a < n`, but there are no 
-    restrictions on `n` or on ``exp``, i.e.\ it can be negative.
+    restrictions on `n` or on ``exp``, i.e. it can be negative.
 
     This is implemented as a standard binary powering algorithm using
     repeated squaring and reducing modulo `n` at each step.
@@ -469,7 +469,7 @@ Modular Arithmetic
 .. function:: ulong n_powmod2(ulong a, mp_limb_signed_t exp, ulong n)
 
     Returns ``(a^exp) % n``. We require `0 \leq a < n`, but there are 
-    no restrictions on `n` or on ``exp``, i.e.\ it can be negative.
+    no restrictions on `n` or on ``exp``, i.e. it can be negative.
 
     This is implemented by precomputing an inverse limb and calling the 
     ``preinv`` version of this function.
@@ -551,7 +551,7 @@ Modular Arithmetic
 .. function:: mp_limb_t n_mulmod_precomp_shoup(mp_limb_t w, mp_limb_t p)
 
     Returns `w'`, scaled approximation of `w / p`. `w'`  is equal to the integer 
-    part of `w * 2^{\mathtt{FLINT\_BITS}} / p`.
+    part of `w \cdot 2^{\mathtt{FLINT\_BITS}} / p`.
 
 
 Divisibility testing
@@ -560,7 +560,7 @@ Divisibility testing
 .. function:: int n_divides(mp_limb_t * q, mp_limb_t n, mp_limb_t p)
 
    Returns ``1`` if ``p`` divides ``n`` and sets ``q`` to the quotient,
-   otherwise return ``0`` and sets ``q`` to ``0``.
+   otherwise returns ``0`` and sets ``q`` to ``0``.
 
 Prime number generation and counting
 --------------------------------------------------------------------------------
@@ -631,12 +631,12 @@ Prime number generation and counting
 .. function:: ulong n_nextprime(ulong n, int proved)
 
     Returns the next prime after `n`. Assumes the result will fit in an
-    ``ulong``. If proved is `0`, i.e.\ false, the prime is not 
+    ``ulong``. If proved is `0`, i.e. false, the prime is not 
     proven prime, otherwise it is.
 
 .. function:: ulong n_prime_pi(ulong n)
 
-    Returns the value of the prime counting function `\pi(n)`, i.e.\ the
+    Returns the value of the prime counting function `\pi(n)`, i.e. the
     number of primes less than or equal to `n`. The invariant
     ``n_prime_pi(n_nth_prime(n)) == n``.
 
@@ -670,7 +670,7 @@ Prime number generation and counting
 
 .. function:: void n_nth_prime_bounds(ulong *lo, ulong *hi, ulong n)
 
-    Calculates lower and upper bounds for the  `n` th prime number `p_n` ,
+    Calculates lower and upper bounds for the  `n`th prime number `p_n` ,
     ``lo <= p_n <= hi``. If ``lo`` and ``hi`` point to the same 
     location, the high value will be stored. Note that this function will 
     overflow for sufficiently large `n`.
@@ -795,7 +795,7 @@ Primality testing
     `a` to be reduced modulo `n` and not `0` and `n` to be odd.
 
     If we write `n - 1 = 2^s d` where `d` is odd then `n` is a strong 
-    probable prime to the base `a`, i.e.\ an `a`-SPRP, if either 
+    probable prime to the base `a`, i.e. an `a`-SPRP, if either 
     `a^d = 1 \pmod n` or `(a^d)^{2^r} = -1 \pmod n` for some `r` less 
     than `s`.
 
@@ -844,8 +844,8 @@ Primality testing
 
     This implementation makes use of a weakening of the usual Baillie-PSW
     test given in  [Chen2003]_, namely replacing the Lucas test with a
-    Fibonacci test when `n \equiv 2, 3 \pmod{5}`, (see also the comment on 
-    page 143 of [CraPom2005]_) regarding Fibonacci pseudoprimes.
+    Fibonacci test when `n \equiv 2, 3 \pmod{5}` (see also the comment on 
+    page 143 of [CraPom2005]_), regarding Fibonacci pseudoprimes.
 
     There are no known counterexamples to this being a primality test.
 
@@ -885,7 +885,7 @@ Chinese remaindering
 
 .. function:: ulong n_CRT(ulong r1, ulong m1, ulong r2, ulong m2)
 
-    Use the Chinese Remainder Theorem to set return the unique value
+    Use the Chinese Remainder Theorem to return the unique value
     `0 \le x < M` congruent to `r_1` modulo `m_1` and `r_2` modulo `m_2`,
     where `M = m_1 \times m_2` is assumed to fit a ulong.
 
@@ -910,7 +910,7 @@ Square root and perfect power testing
     We also have to be careful when the square of this too large 
     value causes an overflow. The same assumptions hold for a single 
     precision float provided the square root itself can be represented 
-    in a single float, i.e.\ for `a < 281474976710656 = 2^{46}`.
+    in a single float, i.e. for `a < 281474976710656 = 2^{46}`.
 
 .. function:: ulong n_sqrtrem(ulong * r, ulong a)
 
@@ -966,7 +966,7 @@ Square root and perfect power testing
     This function uses the Newton iteration method to calculate the nth root of
     a number.
     First approximation is calculated by an algorithm mentioned in this 
-    article :  https://en.wikipedia.org/wiki/Fast_inverse_square_root . 
+    article:  https://en.wikipedia.org/wiki/Fast_inverse_square_root . 
     Instead of the inverse square root, the nth root is calculated.
     
     Returns the integer part of ``n ^ 1/root``. Remainder is set as
@@ -976,12 +976,12 @@ Square root and perfect power testing
     
     This function returns the integer truncation of the cube root of `n`.
     First approximation is calculated by an algorithm mentioned in this 
-    article : https://en.wikipedia.org/wiki/Fast_inverse_square_root .
+    article: https://en.wikipedia.org/wiki/Fast_inverse_square_root .
     Instead of the inverse sqare root, the cube root is calculated.
     This functions uses different algorithms to calculate the cube root,
-    depending upon the size of `n`. For numbers greater than `2^46`, it uses
+    depending upon the size of `n`. For numbers greater than `2^{46}`, it uses
     :func:`n_cbrt_chebyshev_approx`. Otherwise, it makes use of the iteration, 
-    `x \leftarrow x - (x*x*x - a)*x/(2*x*x*x + a)` for getting a good estimate, 
+    `x \leftarrow x - (x\cdot x\cdot x - a)\cdot x/(2\cdot x\cdot x\cdot x + a)` for getting a good estimate, 
     as mentioned in the paper by W. Kahan [Kahan1991]_ .
 
 .. function:: ulong n_cbrt_newton_iteration(ulong n)
@@ -1000,8 +1000,8 @@ Square root and perfect power testing
     This function returns the integer truncation of the cube root of `n`.
     The number is first expressed in the form ``x * 2^exp``. This ensures
     `x` is in the range [0.5, 1]. Cube root of x is calculated using
-    Chebyshev's approximation polynomial for the function `y = x^1/3`. The
-    values of the coefficient are calculated from the python module mpmath, 
+    Chebyshev's approximation polynomial for the function `y = x^{1/3}`. The
+    values of the coefficient are calculated from the Python module mpmath, 
     http://mpmath.org, using the function chebyfit. x is multiplied 
     by ``2^exp`` and the cube root of 1, 2 or 4 (according to ``exp%3``).
 
@@ -1018,7 +1018,7 @@ Factorisation
 .. function:: int n_remove(ulong * n, ulong p)
 
     Removes the highest possible power of `p` from `n`, replacing
-    `n` with the quotient. The return value is that highest 
+    `n` with the quotient. The return value is the highest 
     power of `p` that divided `n`. Assumes `n` is not `0`.
 
     For `p = 2` trailing zeroes are counted. For other primes
@@ -1031,7 +1031,7 @@ Factorisation
 .. function:: int n_remove2_precomp(ulong * n, ulong p, double ppre)
 
     Removes the highest possible power of `p` from `n`, replacing
-    `n` with the quotient. The return value is that highest 
+    `n` with the quotient. The return value is the highest 
     power of `p` that divided `n`. Assumes `n` is not `0`. We require
     ``ppre`` to be set to a precomputed inverse of `p` computed 
     with :func:`n_precompute_inverse`.
@@ -1065,7 +1065,7 @@ Factorisation
     initialisation has not already been completed on factors.
 
     Once completed, ``num`` will contain the number of distinct 
-    prime factors found. The field `p` is an array of ``ulong``'s 
+    prime factors found. The field `p` is an array of ``ulong``s 
     containing the distinct prime factors, ``exp`` an array 
     containing the corresponding exponents.
 
@@ -1123,7 +1123,7 @@ Factorisation
 .. function:: ulong n_factor_SQUFOF(ulong n, ulong iters)
 
     Attempts to split `n` using the given number of iterations
-    of SQUFOF. Simply set ``iters`` to `` WORD(0)`` for maximum 
+    of SQUFOF. Simply set ``iters`` to ``WORD(0)`` for maximum 
     persistence.
 
     The version of SQUFOF implemented here is as described by Gower 
@@ -1145,7 +1145,7 @@ Factorisation
     Factors `n` with no restrictions on `n`. If the prime factors are 
     required to be checked with a primality test, one may set 
     ``proved`` to `1`, otherwise set it to `0`, and they will only be 
-    probable primes. N.B: at the present there is no difference because 
+    probable primes. NB: at the present there is no difference because 
     the probable prime tests have been exhaustively tested up to `2^{64}`.
 
     However, in future, this flag may produce and separately check
@@ -1183,7 +1183,7 @@ Factorisation
     initialisation has not already been completed on ``factors``.
 
     Once completed, ``num`` will contain the number of distinct 
-    prime factors found. The field `p` is an array of ``ulong``'s 
+    prime factors found. The field `p` is an array of ``ulong``s 
     containing the distinct prime factors, ``exp`` an array 
     containing the corresponding exponents.
 
@@ -1213,7 +1213,7 @@ Factorisation
     initialisation has not already been completed on ``factors``.
 
     On exit, ``num`` will contain the number of distinct prime factors 
-    found. The field `p` is an array of ``ulong``'s containing the 
+    found. The field `p` is an array of ``ulong``s containing the 
     distinct prime factors, ``exp`` an array containing the corresponding 
     exponents.
 
@@ -1249,13 +1249,13 @@ Factorisation
     Assumes that the `n` is not prime. `factor` is set as the factor if found. 
     It is not assured that the factor found will be prime. Does not compute the complete 
     factorization, just one factor. Returns 1 if factorization is successful 
-    (non trivial factor is found), else returns 0. Assumes `n` is normalized,
+    (non trivial factor is found), else returns 0. Assumes `n` is normalized
     (shifted by normbits bits), and takes as input a precomputed inverse of `n` as 
     computed by :func:`n_preinvert_limb`. `ai` and `xi` should also be shifted
     left by `normbits`.
 
     `ai` is the constant of the polynomial used, `xi` is the initial value. 
-    `max_iters` is the number of iterations tried in process of finding the 
+    `max\_iters` is the number of iterations tried in process of finding the 
     cycle.
 
     The algorithm used is a modification of the original Pollard Rho algorithm,
@@ -1270,7 +1270,7 @@ Factorisation
 
     If the algorithm fails to find a non trivial factor in one call, it tries again 
     (this time with a different set of random values). This process is repeated a 
-    maximum of `max_tries` times. 
+    maximum of `max\_tries` times. 
 
     Assumes `n` is not prime. `factor` is set as the factor found, if factorization
     is successful. In such a case, 1 is returned. Otherwise, 0 is returned. Factor
@@ -1356,8 +1356,8 @@ Primitive Roots and Discrete Logarithms
 
     Returns the discrete logarithm of `b` with  respect to `a` in the
     multiplicative subgroup of `\mathbb{Z}/n\mathbb{Z}` when `\mathbb{Z}/n\mathbb{Z}`
-    is cyclic That is,
-    it returns an number `x` such that `a^x = b \bmod n`.  The
+    is cyclic. That is,
+    it returns a number `x` such that `a^x = b \bmod n`.  The
     multiplicative subgroup is only cyclic when `n` is `2`, `4`,
     `p^k`, or `2p^k` where `p` is an odd prime and `k` is a positive
     integer.
@@ -1373,9 +1373,9 @@ Elliptic curve method for factorization of ``mp_limb_t``
     Sets the point `(x : z)` to two times `(x_0 : z_0)` modulo `n` according
     to the formula
 
-    ``x = (x_0 + z_0)^2 \cdot (x_0 - z_0)^2 \mod n,``
+    `x = (x_0 + z_0)^2 \cdot (x_0 - z_0)^2 \mod n,`
 
-    ``z = 4 x_0 z_0 \left((x_0 - z_0)^2 + 4a_{24}x_0z_0\right) \mod n.``
+    `z = 4 x_0 z_0 \left((x_0 - z_0)^2 + 4a_{24}x_0z_0\right) \mod n.`
 
     This group doubling is valid only for points expressed in
     Montgomery projective coordinates.
@@ -1405,7 +1405,7 @@ Elliptic curve method for factorization of ``mp_limb_t``
 
     Also selects the initial point `x_0`, and the value of `(a + 2)/4`, where `a`
     is a curve parameter. Sets `z_0` as `1` (shifted left by
-    ``n_ecm_inf->normbits``. All these are stored in the
+    ``n_ecm_inf->normbits``). All these are stored in the
     ``n_ecm_t`` struct.
 
     The curve selected is of Montgomery form, the points selected satisfy the
@@ -1413,7 +1413,7 @@ Elliptic curve method for factorization of ``mp_limb_t``
 
 .. function:: int n_factor_ecm_stage_I(mp_limb_t *f, const mp_limb_t *prime_array, mp_limb_t num, mp_limb_t B1, mp_limb_t n, n_ecm_t n_ecm_inf)
 
-    Stage\ I implementation of the ECM algorithm.
+    Stage I implementation of the ECM algorithm.
 
     ``f`` is set as the factor if found. ``num`` is number of prime numbers
     `<=` the bound ``B1``. ``prime_array`` is an array of first ``B1``
@@ -1423,7 +1423,7 @@ Elliptic curve method for factorization of ``mp_limb_t``
 
 .. function:: int n_factor_ecm_stage_II(mp_limb_t *f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P, mp_limb_t n, n_ecm_t n_ecm_inf)
 
-    Stage\ II implementation of the ECM algorithm.
+    Stage II implementation of the ECM algorithm.
 
     ``f`` is set as the factor if found. ``B1``, ``B2`` are the two
     bounds. ``P`` is the primorial (approximately equal to `\sqrt{B2}`).
@@ -1436,16 +1436,16 @@ Elliptic curve method for factorization of ``mp_limb_t``
     Outer wrapper function for the ECM algorithm. It factors `n` which
     must fit into a ``mp_limb_t``.
 
-    The function calls stage\ I and\ II, and
-    the precomputations (builds ``prime_array`` for stage\ I,
-    ``GCD_table`` and ``prime_table`` for stage\ II).
+    The function calls stage I and II, and
+    the precomputations (builds ``prime_array`` for stage I,
+    ``GCD_table`` and ``prime_table`` for stage II).
 
     ``f`` is set as the factor if found. ``curves`` is the number of
     random curves being tried. ``B1``, ``B2`` are the two bounds or
-    stage\ I and stage\ II. `n` is the number being factored.
+    stage I and stage II. `n` is the number being factored.
 
-    If a factor is found in stage\ I, `1` is returned.
-    If a factor is found in stage\ II, `2` is returned.
+    If a factor is found in stage I, `1` is returned.
+    If a factor is found in stage II, `2` is returned.
     If a factor is found while selecting the curve, `-1` is returned.
     Otherwise `0` is returned.
 
