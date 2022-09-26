@@ -43,7 +43,7 @@ Basic manipulation
 
 .. function:: void fq_nmod_mpoly_factor_get_constant_fq_nmod(fq_nmod_t c, const fq_nmod_mpoly_factor_t f, const fq_nmod_mpoly_ctx_t ctx)
 
-    Set `c` to the the constant of *f*.
+    Set `c` to the constant of *f*.
 
 .. function:: void fq_nmod_mpoly_factor_get_base(fq_nmod_mpoly_t p, const fq_nmod_mpoly_factor_t f, slong i, const fq_nmod_mpoly_ctx_t ctx)
               void fq_nmod_mpoly_factor_swap_base(fq_nmod_mpoly_t p, fq_nmod_mpoly_factor_t f, slong i, const fq_nmod_mpoly_ctx_t ctx)
