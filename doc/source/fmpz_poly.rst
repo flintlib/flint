@@ -2762,7 +2762,7 @@ Hensel lifting
 .. function:: void fmpz_poly_hensel_build_tree(slong * link, fmpz_poly_t *v, fmpz_poly_t *w, const nmod_poly_factor_t fac)
 
     Initialises and builds a Hensel tree consisting of two arrays `v`, `w` 
-    of polynomials an array of links, called ``link``.
+    of polynomials and an array of links, called ``link``.
 
     The caller supplies a set of `r` local factors (in the factor structure 
     ``fac``) of some polynomial `F` over `\mathbf{Z}`. They also supply 
