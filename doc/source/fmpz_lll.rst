@@ -313,8 +313,8 @@ Main LLL functions
     currently calls the ULLL algorithm (without removals). The ULLL function
     in turn calls a LLL wrapper which tries to choose an optimal LLL algorithm,
     starting with a version using just doubles (ULLL tries to maximise usage
-    of this), then a heuristic LLL a full precision floating point LLL if
-    required.
+    of this), then a heuristic LLL followed by a full precision floating point
+    LLL if required.
 
     ``U`` is the matrix used to capture the unimodular
     transformations if it is not `NULL`. An exception is raised if `U` != `NULL`
