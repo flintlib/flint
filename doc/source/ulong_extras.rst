@@ -1065,7 +1065,7 @@ Factorisation
     initialisation has not already been completed on factors.
 
     Once completed, ``num`` will contain the number of distinct 
-    prime factors found. The field `p` is an array of ``ulong``s 
+    prime factors found. The field `p` is an array of ``ulong``\s 
     containing the distinct prime factors, ``exp`` an array 
     containing the corresponding exponents.
 
@@ -1183,7 +1183,7 @@ Factorisation
     initialisation has not already been completed on ``factors``.
 
     Once completed, ``num`` will contain the number of distinct 
-    prime factors found. The field `p` is an array of ``ulong``s 
+    prime factors found. The field `p` is an array of ``ulong``\s 
     containing the distinct prime factors, ``exp`` an array 
     containing the corresponding exponents.
 
@@ -1213,7 +1213,7 @@ Factorisation
     initialisation has not already been completed on ``factors``.
 
     On exit, ``num`` will contain the number of distinct prime factors 
-    found. The field `p` is an array of ``ulong``s containing the 
+    found. The field `p` is an array of ``ulong``\s containing the 
     distinct prime factors, ``exp`` an array containing the corresponding 
     exponents.
 
