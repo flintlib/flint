@@ -2779,7 +2779,7 @@ Hensel lifting
     form `F` itself.  Since `v` will be rearranging the original factors we 
     will need to be able to recover the original order. For this we use the 
     array ``link`` which has nonnegative even numbers and negative numbers. 
-    It is an array of ``slong``s which aligns with `V` and `v` if 
+    It is an array of ``slong``\s which aligns with `V` and `v` if 
     ``link`` has a negative number in spot `j` that means `V_j` is an 
     original modular factor which has been lifted, if ``link[j]`` is a 
     nonnegative even number then `V_j` stores a product of the two entries 
