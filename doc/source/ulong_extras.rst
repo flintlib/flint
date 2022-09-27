@@ -662,7 +662,7 @@ Prime number generation and counting
 
 .. function:: ulong n_nth_prime(ulong n)
 
-    Returns the `n`th prime number `p_n`, using the mathematical indexing
+    Returns the `n`\th prime number `p_n`, using the mathematical indexing
     convention `p_1 = 2, p_2 = 3, \dotsc`.
 
     This function simply ensures that the table of cached primes is large
@@ -670,7 +670,7 @@ Prime number generation and counting
 
 .. function:: void n_nth_prime_bounds(ulong *lo, ulong *hi, ulong n)
 
-    Calculates lower and upper bounds for the  `n`th prime number `p_n` ,
+    Calculates lower and upper bounds for the  `n`\th prime number `p_n` ,
     ``lo <= p_n <= hi``. If ``lo`` and ``hi`` point to the same 
     location, the high value will be stored. Note that this function will 
     overflow for sufficiently large `n`.
@@ -826,7 +826,7 @@ Primality testing
 
 .. function:: int n_is_probabprime_fibonacci(ulong n)
 
-    Let `F_j` be the `j`th element of the Fibonacci sequence 
+    Let `F_j` be the `j`\th element of the Fibonacci sequence 
     `0, 1, 1, 2, 3, 5, \dotsc`, starting at `j = 0`. Then if `n` is prime
     we have `F_{n - (n/5)} = 0 \pmod n`, where `(n/5)` is the Jacobi
     symbol.
