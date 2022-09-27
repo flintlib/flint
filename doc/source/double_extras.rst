@@ -19,7 +19,7 @@ Random functions
 .. function:: double d_randtest_special(flint_rand_t state, slong minexp, slong maxexp)
 
     Returns a random signed number with exponent between ``minexp`` and
-    ``maxexp``, zero, ``D_NAN`` or \pm``D_INF``.
+    ``maxexp``, zero, ``D_NAN`` or `\pm`\ ``D_INF``.
 
 
 
@@ -29,7 +29,7 @@ Arithmetic
 
 .. function:: double d_polyval(const double * poly, int len, double x)
 
-    Uses Horner's rule to evaluate the the polynomial defined by the given
+    Uses Horner's rule to evaluate the polynomial defined by the given
     ``len`` coefficients. Requires that ``len`` is nonzero.
 
 
