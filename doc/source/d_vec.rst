@@ -10,7 +10,7 @@ Memory management
 
 .. function:: double * _d_vec_init(slong len)
 
-    Returns an initialised vector of ``double``'s of given length. The
+    Returns an initialised vector of ``double``\s of given length. The
     entries are not zeroed.
 
 .. function:: void _d_vec_clear(double * vec)
@@ -109,4 +109,4 @@ Dot product and norm
     operation will be stored.
 
     This implements the algorithm of Ogita-Rump-Oishi. See
-    \url{http://www.ti3.tuhh.de/paper/rump/OgRuOi05.pdf}.
+    http://www.ti3.tuhh.de/paper/rump/OgRuOi05.pdf.
