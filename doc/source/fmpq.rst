@@ -405,7 +405,7 @@ Arithmetic
               void fmpq_add_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c)
               void fmpq_sub_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c)
 
-   Sets ``res`` to the sum or difference respectively, of the fraction 
+   Sets ``res`` to the sum or difference respectively of the fraction 
    ``op1`` and the integer `c`.
 
 .. function:: void _fmpq_mul_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, slong r)
@@ -448,13 +448,13 @@ Arithmetic
 .. function:: void _fmpq_pow_si(fmpz_t rnum, fmpz_t rden, const fmpz_t opnum, const fmpz_t opden, slong e)
               void fmpq_pow_si(fmpq_t res, const fmpq_t op, slong e)
 
-    Sets ``res`` to ``op`` raised to the power~`e`, where~`e` 
+    Sets ``res`` to ``op`` raised to the power `e`, where `e` 
     is a ``slong``.  If `e` is `0` and ``op`` is `0`, then 
     ``res`` will be set to `1`.
 
 .. function:: int fmpq_pow_fmpz(fmpq_t a, const fmpq_t b, const fmpz_t e)
 
-    Set ``res`` to ``op`` raised to the power~`e`.
+    Set ``res`` to ``op`` raised to the power `e`.
     Return `1` for success and `0` for failure.
 
 .. function:: void fmpq_mul_fmpz(fmpq_t res, const fmpq_t op, const fmpz_t x)
@@ -478,8 +478,8 @@ Arithmetic
 .. function:: void _fmpq_gcd(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, const fmpz_t r, const fmpz_t s)
 
     Set ``(rnum, rden)`` to the gcd of ``(p, q)`` and ``(r, s)``
-    which we define to be the canonicalisation of gcd`(ps, qr)/(qs)`. (This is
-    apparently Euclid's original definition and is stable under scaling of
+    which we define to be the canonicalisation of `\operatorname{gcd}(ps, qr)/(qs)`.
+    (This is apparently Euclid's original definition and is stable under scaling of
     numerator and denominator. It also agrees with the gcd on the integers.
     Note that it does not agree with gcd as defined in ``fmpq_poly``.)
     This definition agrees with the result as output by Sage and Pari/GP.
@@ -614,7 +614,7 @@ Rational enumeration
 
     Set `x` to the simplest fraction in the closed interval `[l, r]`. The underscore version makes the additional assumption that `l \le r`.
     The endpoints `l` and `r` do not need to be reduced, but their denominators do need to be positive.
-    `x` will be always be returned in canonical form. A canonical fraction `a_1/b_1` is defined to be simpler than `a_2/b_2` iff `b_1<b_2` or `b_1=b_2` and `a_1<a_2`.
+    `x` will always be returned in canonical form. A canonical fraction `a_1/b_1` is defined to be simpler than `a_2/b_2` iff `b_1<b_2` or `b_1=b_2` and `a_1<a_2`.
 
 
 Continued fractions
@@ -648,11 +648,11 @@ Continued fractions
     The behaviour of this function in corner cases is as follows:
         - if `x` is infinite (anything over 0), ``rem`` will be zero and the return is `k=0` regardless of `n`.
         - else (if `x` is finite),
-            - if `n <= 0`, ``rem`` will be `1/x` (allowing for infinite in the case `x=0`) and the return is `k=0`
+            - if `n \le 0`, ``rem`` will be `1/x` (allowing for infinite in the case `x=0`) and the return is `k=0`
             - else (if `n > 0`), ``rem`` will finite and the return is `0 < k \le n`.
 
     Essentially, if this function is called with canonical `x` and `n > 0`, then ``rem`` will be canonical.
-    Therefore, applications relying on canonical ``fmpq_t``'s should not call this function with `n <= 0`.
+    Therefore, applications relying on canonical ``fmpq_t``'s should not call this function with `n \le 0`.
 
 .. function:: void fmpq_set_cfrac(fmpq_t x, const fmpz * c, slong n)
 
@@ -733,7 +733,7 @@ computing GCD of `h` and `k`,
     (-1)^i \left(\frac{1+r_i^2+r_{i-1}^2}{r_i r_{i-1}}\right).
 
 Writing `s(h,k) = p/q`, some useful properties employed are
-`|s| < k / 12`, `q | 6k` and `2|p| < k^2`.
+`|s| < k / 12`, `q \mid 6k` and `2|p| < k^2`.
 
 .. function:: void fmpq_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k)
               void fmpq_dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k)
