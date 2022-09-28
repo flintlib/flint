@@ -26,7 +26,7 @@ Memory management
 .. function:: void fmpq_poly_init2(fmpq_poly_t poly, slong alloc)
 
     Initialises the polynomial with space for at least ``alloc`` 
-    coefficients and set the length to zero. The ``alloc`` coefficients 
+    coefficients and sets the length to zero. The ``alloc`` coefficients 
     are all set to zero.
 
 .. function:: void fmpq_poly_realloc(fmpq_poly_t poly, slong alloc)
@@ -130,7 +130,7 @@ Accessing the numerator and denominator
 .. function:: void fmpq_poly_get_numerator(fmpz_poly_t res, const fmpq_poly_t poly)
 
     Sets ``res`` to the numerator of ``poly``, e.g. the primitive part
-    as an ``fmpz_poly_t`` if it is in canonical form .
+    as an ``fmpz_poly_t`` if it is in canonical form.
 
 .. function:: void fmpq_poly_get_denominator(fmpz_t den, const fmpq_poly_t poly)
 
@@ -214,7 +214,7 @@ Assignment, swap, negation
 
 .. function:: void fmpq_poly_get_nmod_poly(nmod_poly_t rop, const fmpq_poly_t op)
 
-    Sets the coefficients of ``rop`` to the coefficients in the denominator of``op``,
+    Sets the coefficients of ``rop`` to the coefficients in the denominator of ``op``,
     reduced by the modulus of ``rop``. The result is multiplied by the inverse of the
     denominator of ``op``. It is assumed that the reduction of the denominator of ``op``
     is invertible.
@@ -332,39 +332,39 @@ Getting and setting coefficients
 
 .. function:: void fmpq_poly_get_coeff_fmpz(fmpz_t x, const fmpq_poly_t poly, slong n)
 
-    Retrieves the `n`th coefficient of the numerator of ``poly``.
+    Retrieves the `n`\th coefficient of the numerator of ``poly``.
 
 .. function:: void fmpq_poly_get_coeff_fmpq(fmpq_t x, const fmpq_poly_t poly, slong n)
 
-    Retrieves the `n`th coefficient of ``poly``, in lowest terms.
+    Retrieves the `n`\th coefficient of ``poly``, in lowest terms.
 
 .. function:: void fmpq_poly_get_coeff_mpq(mpq_t x, const fmpq_poly_t poly, slong n)
 
-    Retrieves the `n`th coefficient of ``poly``, in lowest terms.
+    Retrieves the `n`\th coefficient of ``poly``, in lowest terms.
 
 .. function:: void fmpq_poly_set_coeff_si(fmpq_poly_t poly, slong n, slong x)
 
-    Sets the `n`th coefficient in ``poly`` to the integer `x`.
+    Sets the `n`\th coefficient in ``poly`` to the integer `x`.
 
 .. function:: void fmpq_poly_set_coeff_ui(fmpq_poly_t poly, slong n, ulong x)
 
-    Sets the `n`th coefficient in ``poly`` to the integer `x`.
+    Sets the `n`\th coefficient in ``poly`` to the integer `x`.
 
 .. function:: void fmpq_poly_set_coeff_fmpz(fmpq_poly_t poly, slong n, const fmpz_t x)
 
-    Sets the `n`th coefficient in ``poly`` to the integer `x`.
+    Sets the `n`\th coefficient in ``poly`` to the integer `x`.
 
 .. function:: void fmpq_poly_set_coeff_fmpq(fmpq_poly_t poly, slong n, const fmpq_t x)
 
-    Sets the `n`th coefficient in ``poly`` to the rational `x`.
+    Sets the `n`\th coefficient in ``poly`` to the rational `x`.
 
 .. function:: void fmpq_poly_set_coeff_mpz(fmpq_poly_t rop, slong n, const mpz_t x)
 
-    Sets the `n`th coefficient in ``poly`` to the integer `x`.
+    Sets the `n`\th coefficient in ``poly`` to the integer `x`.
 
 .. function:: void fmpq_poly_set_coeff_mpq(fmpq_poly_t rop, slong n, const mpq_t x)
 
-    Sets the `n`th coefficient in ``poly`` to the rational~`x`, 
+    Sets the `n`\th coefficient in ``poly`` to the rational `x`, 
     which is expected to be provided in lowest terms.
 
 
@@ -375,17 +375,17 @@ Comparison
 .. function:: int fmpq_poly_equal(const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
     Returns `1` if ``poly1`` is equal to ``poly2``, 
-    otherwise returns~`0`.
+    otherwise returns `0`.
 
 .. function:: int _fmpq_poly_equal_trunc(const fmpz * poly1, const fmpz_t den1, slong len1, const fmpz * poly2, const fmpz_t den2, slong len2, slong n)
 
-    Return `1` if ``poly1`` and ``poly2`` notionally truncated to length
-    `n` are equal, otherwise returns~`0`.
+    Returns `1` if ``poly1`` and ``poly2`` notionally truncated to length
+    `n` are equal, otherwise returns `0`.
 
 .. function:: int fmpq_poly_equal_trunc(const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n)
 
-    Return `1` if ``poly1`` and ``poly2`` notionally truncated to length
-    `n` are equal, otherwise returns~`0`.
+    Returns `1` if ``poly1`` and ``poly2`` notionally truncated to length
+    `n` are equal, otherwise returns `0`.
 
 .. function:: int _fmpq_poly_cmp(const fmpz * lpoly, const fmpz_t lden, const fmpz * rpoly, const fmpz_t rden, slong len)
 
@@ -406,7 +406,7 @@ Comparison
 
 .. function:: int fmpq_poly_is_one(const fmpq_poly_t poly)
 
-    Returns `1` if ``poly`` is the constant polynomial~`1`, otherwise 
+    Returns `1` if ``poly`` is the constant polynomial `1`, otherwise 
     returns `0`.
 
 .. function:: int fmpq_poly_is_zero(const fmpq_poly_t poly)
@@ -429,7 +429,7 @@ Addition and subtraction
     
     Assumes that ``rpoly`` is an array of length the maximum of 
     ``len1`` and ``len2``.  The input operands are assumed to 
-    be in canonical form and are also allowed to be of length~`0`.
+    be in canonical form and are also allowed to be of length `0`.
     
     ``(rpoly, rden)`` and ``(poly1, den1)`` may be aliased, 
     but ``(rpoly, rden)`` and ``(poly2, den2)`` may *not* 
@@ -484,7 +484,7 @@ Addition and subtraction
     
     Assumes that ``rpoly`` is an array of length the maximum of 
     ``len1`` and ``len2``.  The input operands are assumed to be in 
-    canonical form and are also allowed to be of length~`0`.
+    canonical form and are also allowed to be of length `0`.
     
     ``(rpoly, rden)`` and ``(poly1, den1, len1)`` may be aliased, 
     but ``(rpoly, rden)`` and ``(poly2, den2, len2)`` may *not* be 
@@ -685,7 +685,7 @@ Multiplication
 .. function:: void fmpq_poly_mullow(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n)
 
     Sets ``res`` to the product of ``poly1`` and ``poly2``, 
-    truncated to length~`n`.
+    truncated to length `n`.
 
 .. function:: void fmpq_poly_addmul(fmpq_poly_t rop, const fmpq_poly_t op1, const fmpq_poly_t op2)
 
@@ -808,7 +808,7 @@ Powering
 
 .. function:: void fmpq_poly_powers_precompute(fmpq_poly_powers_precomp_t pinv, fmpq_poly_t poly)
 
-    Computes ``2*len - 1`` powers of $x$ modulo the polynomial $B$ of the given length. This is used as a kind of precomputed inverse in the remainder routine below.
+    Computes ``2*len - 1`` powers of `x` modulo the polynomial `B` of the given length. This is used as a kind of precomputed inverse in the remainder routine below.
 
 .. function:: void _fmpq_poly_powers_clear(fmpq_poly_struct * powers, slong len)
 
@@ -825,7 +825,7 @@ Powering
     Set `A` to the remainder of `A` divide `B` given precomputed powers mod `B`
     provided by ``_fmpq_poly_powers_precompute``. No aliasing is allowed.
 
-    This function is only faster if `m \leq 2*n - 1`.
+    This function is only faster if `m \leq 2\cdot n - 1`.
 
     The output of this function is *not* canonicalised.
 
@@ -911,7 +911,7 @@ Power series division
 .. function:: void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A, const fmpq_poly_t B, slong n)
 
     Performs power series division in `\mathbb{Q}[[x]] / (x^n)`.  The function 
-    considers the polynomials `A` and `B` as power series of length~`n` 
+    considers the polynomials `A` and `B` as power series of length `n` 
     starting with the constant terms.  The function assumes that `B` has 
     non-zero constant term and `n \geq 1`.
 
@@ -935,7 +935,7 @@ Greatest common divisor
 
     Computes the monic greatest common divisor `G` of `A` and `B`.
 
-    In the the special case when `A = B = 0`, sets `G = 0`.
+    In the special case when `A = B = 0`, sets `G = 0`.
 
 .. function:: void _fmpq_poly_xgcd(fmpz *G, fmpz_t denG, fmpz *S, fmpz_t denS, fmpz *T, fmpz_t denT, const fmpz *A, const fmpz_t denA, slong lenA, const fmpz *B, const fmpz_t denB, slong lenB)
 
@@ -1727,7 +1727,7 @@ Input and output
     the null-terminated string ``var`` not equal to ``"\0"`` as the 
     variable name.
 
-    In the current implementation always returns~`1`.
+    In the current implementation always returns `1`.
 
 .. function:: int _fmpq_poly_fprint(FILE * file, const fmpz * poly, const fmpz_t den, slong len)
 
@@ -1751,7 +1751,7 @@ Input and output
     the null-terminated string ``var`` not equal to ``"\0"`` as the 
     variable name.
 
-    In the current implementation, always returns~`1`.
+    In the current implementation, always returns `1`.
 
 .. function:: int fmpq_poly_read(fmpq_poly_t poly)
 
