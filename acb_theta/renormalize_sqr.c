@@ -6,13 +6,11 @@ void acb_theta_renormalize_sqr(acb_t scal_z, acb_t scal_0, acb_srcptr th2_z,
 {
     slong g = acb_mat_nrows(tau);
     slong lowprec = ACB_THETA_AGM_LOWPREC;
-    slong nb_bad = 1 + acb_theta_agm_ext_nb_bad_steps(z, tau, lowprec);
-    slong nb_good;
+    slong nb_bad = acb_theta_agm_ext_nb_bad_steps(z, tau, lowprec);
     acb_ptr a;
     acb_ptr th2;
     acb_ptr roots;
     acb_t scal;
-    arf_t c, c_ext, e;
     slong n = 1<<g;
     slong k;
 
@@ -20,9 +18,6 @@ void acb_theta_renormalize_sqr(acb_t scal_z, acb_t scal_0, acb_srcptr th2_z,
     th2 = _acb_vec_init(2*n);
     roots = _acb_vec_init(2*n*nb_bad);
     acb_init(scal);
-    arf_init(c);
-    arf_init(c_ext);
-    arf_init(e);
 
     _acb_vec_set(th2, th2_z, n);
     _acb_vec_set(th2+n, th2_0, n);
@@ -44,16 +39,8 @@ void acb_theta_renormalize_sqr(acb_t scal_z, acb_t scal_0, acb_srcptr th2_z,
         acb_sqrt(scal, scal, lowprec);
     }
 
-    /* Set convergence rate */
-    for (k = 0; k < 2*n; k++)
-    {
-        acb_sqr(&a[k], &roots[2*(nb_bad-1) + k], lowprec);
-    }
-    acb_theta_agm_ext_conv_rate(c_ext, c, e, a, g, lowprec);
-    nb_good = acb_theta_agm_nb_good_steps(c, e, prec);
-    
-    acb_theta_agm_ext(scal_z, scal_0, th2, roots, c_ext, e, nb_bad, nb_good, g,
-            prec);
+    /* Inverse agm */
+    acb_theta_agm_ext(scal_z, scal_0, th2, roots, nb_bad, g, prec);
     acb_mul(scal_z, scal_z, scal_0, prec);
     acb_inv(scal_z, scal_z, prec);
     acb_inv(scal_0, scal_0, prec);
@@ -62,7 +49,4 @@ void acb_theta_renormalize_sqr(acb_t scal_z, acb_t scal_0, acb_srcptr th2_z,
     _acb_vec_clear(th2, 2*n);
     _acb_vec_clear(roots, 2*n*nb_bad);
     acb_clear(scal);
-    arf_clear(c);
-    arf_clear(c_ext);
-    arf_clear(e);
 }

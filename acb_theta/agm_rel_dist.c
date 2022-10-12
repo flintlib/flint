@@ -5,7 +5,6 @@ void acb_theta_agm_rel_dist(arb_t eps, acb_srcptr a, slong nb, slong lowprec,
         slong prec)
 {
     arb_t abs;
-    slong k;
     
     arb_init(abs);
 

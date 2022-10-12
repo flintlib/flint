@@ -159,7 +159,7 @@ void acb_theta_agm_conv_rate(arf_t c, arf_t r, const arf_t eps, slong prec);
 slong acb_theta_agm_nb_good_steps(const arf_t c, const arf_t r, slong prec);
 
 void acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr roots, slong nb_bad,
-        slong nb_good, slong g, slong prec);
+        slong g, slong prec);
 
 
 void acb_theta_agm_ext_conv_rate(arf_t c1, arf_t c2, arf_t r, const arf_t eps,
@@ -181,7 +181,7 @@ void acb_theta_agm_roots(acb_ptr roots, const acb_mat_t tau, slong nb_bad,
         slong prec);
 
 void acb_theta_agm_ext_roots(acb_ptr roots, acb_srcptr z, const acb_mat_t tau,
-        slong prec);
+        slong nb_bad, slong prec);
 
 
 /* Transformation formulas */
@@ -404,11 +404,6 @@ typedef struct
     fmpz* eps;
     slong* nb_bad;
     acb_ptr* roots;
-
-    arf_struct* rad;
-    arf_struct* c_ext;
-    arf_struct* c;
-    arf_struct* e;
     
     slong log_th;
     slong log_rho;
@@ -436,11 +431,6 @@ typedef acb_theta_agm_ctx_struct acb_theta_agm_ctx_t[1];
 #define acb_theta_agm_ctx_nb_bad(ctx, k) ((ctx)->nb_bad[(k)])
 #define acb_theta_agm_ctx_roots(ctx, k) ((ctx)->roots[(k)])
 
-#define acb_theta_agm_ctx_rad(ctx, k) (&(ctx)->rad[(k)])
-#define acb_theta_agm_ctx_c(ctx, k) (&(ctx)->c[(k)])
-#define acb_theta_agm_ctx_c_ext(ctx, k) (&(ctx)->c_ext[(k)])
-#define acb_theta_agm_ctx_e(ctx, k) (&(ctx)->e[(k)])
-
 #define acb_theta_agm_ctx_log_th(ctx) ((ctx)->log_th)
 #define acb_theta_agm_ctx_log_rho(ctx) ((ctx)->log_rho)
 #define acb_theta_agm_ctx_log_M(ctx) ((ctx)->log_M)
@@ -460,9 +450,7 @@ void acb_theta_agm_ctx_clear(acb_theta_agm_ctx_t ctx);
 
 void acb_theta_agm_ctx_reset_steps(acb_theta_agm_ctx_t ctx, slong k, slong m);
 
-void acb_theta_agm_ctx_set(acb_theta_agm_ctx_t ctx, slong prec);
-
-int acb_theta_agm_ctx_is_valid(const acb_theta_agm_ctx_t ctx);
+int acb_theta_agm_ctx_set(acb_theta_agm_ctx_t ctx, slong prec);
 
 void acb_theta_newton_eval(acb_ptr r, acb_srcptr th,
         const acb_theta_agm_ctx_t ctx, slong prec);

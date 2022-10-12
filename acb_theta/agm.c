@@ -17,7 +17,7 @@ agm_get_conv_rates(arf_t c, arf_t r, acb_srcptr v, slong n, slong prec)
 }
 
 void
-acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr roots, slong nb_bad,
+acb_theta_agm(acb_t res, acb_srcptr a, acb_srcptr roots, slong nb_bad,
         slong g, slong prec)
 {
     acb_ptr v;
@@ -42,7 +42,7 @@ acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr roots, slong nb_bad,
     }
     
     /* Get convergence rate */
-    agm_get_conv_rate(c, r, v, n, prec);
+    agm_get_conv_rates(c, r, v, n, prec);
     nb_good = acb_theta_agm_nb_good_steps(c, r, prec);
 
     /* Perform half the steps */
@@ -62,7 +62,7 @@ acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr roots, slong nb_bad,
     }
 
     /* Readjust convergence rate */
-    agm_get_conv_rate(c, r, v, n, prec);
+    agm_get_conv_rates(c, r, v, n, prec);
     nb_good = acb_theta_agm_nb_good_steps(c, r, prec);
 
     /* Perform remaining steps */
@@ -72,23 +72,22 @@ acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr roots, slong nb_bad,
         acb_theta_agm_step_good(v, v, g, prec);
     }    
     
-    if (nb_good > 0) acb_theta_agm_step_last(r, v, g, prec);
-    else acb_set(r, &v[0]);
+    if (nb_good > 0) acb_theta_agm_step_last(res, v, g, prec);
+    else acb_set(res, &v[0]);
 
     /* Rescale, add relative error */
-    acb_mul(r, r, scal, prec);    
+    acb_mul(res, res, scal, prec);    
     arf_one(err);
     arf_mul_2exp_si(err, err, -prec);
     acb_one(scal);
     acb_add_error_arf(scal, err);
-    acb_mul(r, r, scal, prec);
+    acb_mul(res, res, scal, prec);
     
     flint_printf("(agm) Reached agm\n");
-    acb_printd(r, 10); flint_printf("\n");
+    acb_printd(res, 10); flint_printf("\n");
 
     _acb_vec_clear(v, n);
     acb_clear(scal);
-    arb_clear(eps);
     arf_clear(c);
     arf_clear(r);
     arf_clear(err);

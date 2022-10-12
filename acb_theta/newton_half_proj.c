@@ -23,8 +23,8 @@ acb_theta_newton_half_proj(acb_ptr th, acb_srcptr z, const acb_mat_t tau,
     /* Attempt to set up newton context */
     while (!stop)
     {
-        acb_theta_agm_ctx_set(ctx, baseprec);
-        if (!acb_theta_agm_ctx_is_valid(ctx))
+        stop = acb_theta_agm_ctx_set(ctx, baseprec);
+        if (!stop)
 	{
             baseprec *=2;
             if (baseprec > prec / ACB_THETA_AGM_BASEPREC_MAXQ)
@@ -33,7 +33,6 @@ acb_theta_newton_half_proj(acb_ptr th, acb_srcptr z, const acb_mat_t tau,
                 naive = 1;
 	    }
 	}
-        else stop = 1;
     }
 
     if (naive)

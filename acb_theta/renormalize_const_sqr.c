@@ -10,7 +10,6 @@ void acb_theta_renormalize_const_sqr(acb_t scal, acb_srcptr th2,
     acb_ptr roots;
     acb_ptr a;
     slong n = 1<<g;
-    slong k;
 
     roots = _acb_vec_init(n * nb_bad);
     a = _acb_vec_init(n);

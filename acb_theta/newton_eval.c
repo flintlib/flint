@@ -13,7 +13,6 @@ acb_theta_newton_eval(acb_ptr r, acb_srcptr th,
     acb_ptr agm;
     acb_t scal, scal2;
     arf_t err;
-    slong nb_good;
     slong k;
 
     if (is_ext)
@@ -47,11 +46,11 @@ acb_theta_newton_eval(acb_ptr r, acb_srcptr th,
     {
         /* Transform theta values */
         acb_theta_transform_sqr_proj(transf, dupl,
-            acb_theta_agm_ctx_matrix(ctx, k), prec);
+            acb_theta_agm_ctx_mat(ctx, k), prec);
         if (is_ext)
         {
             acb_theta_transform_sqr_proj(&transf[1<<g], &dupl[1<<(2*g)],
-                    acb_theta_agm_ctx_matrix(ctx, k), prec);
+                    acb_theta_agm_ctx_mat(ctx, k), prec);
         }
 
         /* Projectivize */
@@ -67,20 +66,16 @@ acb_theta_newton_eval(acb_ptr r, acb_srcptr th,
         }
 
         /* Get agm */
-        nb_good = acb_theta_agm_nb_good_steps(acb_theta_agm_ctx_c(ctx, k),
-                acb_theta_agm_ctx_e(ctx, k), prec);
         if (is_ext)
         {            
             acb_theta_agm_ext(&agm[k], &agm[n+k], transf,
                     acb_theta_agm_ctx_roots(ctx, k),
-                    acb_theta_agm_ctx_c_ext(ctx, k),
-                    acb_theta_agm_ctx_e(ctx, k),
-                    acb_theta_agm_ctx_nb_bad_steps(ctx, k), nb_good, g, prec);
+                    acb_theta_agm_ctx_nb_bad(ctx, k), g, prec);
         }
         else
         {
             acb_theta_agm(&agm[k], transf, acb_theta_agm_ctx_roots(ctx, k),
-                    acb_theta_agm_ctx_nb_bad_steps(ctx, k), nb_good, g, prec);
+                    acb_theta_agm_ctx_nb_bad(ctx, k), g, prec);
         }
     }
     

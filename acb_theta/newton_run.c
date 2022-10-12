@@ -27,7 +27,7 @@ acb_theta_newton_target(acb_ptr im, const acb_theta_agm_ctx_t ctx, slong prec)
             acb_theta_transform_scal(&im[k], &im[k+n-1],
                     acb_theta_agm_ctx_z(ctx),
                     acb_theta_agm_ctx_tau(ctx),
-                    acb_theta_agm_ctx_matrix(ctx, k+1),
+                    acb_theta_agm_ctx_mat(ctx, k+1),
                     acb_theta_agm_ctx_k2(ctx, k+1), prec);
             acb_mul(&im[k], &im[k], zeta, prec);
             acb_mul(&im[k+n-1], &im[k+n-1], zeta, prec);
@@ -35,7 +35,7 @@ acb_theta_newton_target(acb_ptr im, const acb_theta_agm_ctx_t ctx, slong prec)
         else
         {            
             acb_theta_transform_scal_const(&im[k], acb_theta_agm_ctx_tau(ctx),
-                    acb_theta_agm_ctx_matrix(ctx, k+1),
+                    acb_theta_agm_ctx_mat(ctx, k+1),
                     acb_theta_agm_ctx_k2(ctx, k+1), prec);
             acb_mul(&im[k], &im[k], zeta, prec);
         }

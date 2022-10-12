@@ -13,9 +13,9 @@ agm_ext_get_conv_rate(arf_t c1, arf_t c2, arf_t r, acb_srcptr a,
     acb_theta_agm_max_abs(eps, a, 2*n, lowprec);
     arb_get_ubound_arf(c1, eps, lowprec);
     acb_theta_agm_min_abs(eps, a, 2*n, lowprec);
-    arb_get_ulbound_arf(c2, eps, lowprec);
+    arb_get_lbound_arf(c2, eps, lowprec);
     acb_theta_agm_rel_dist(eps, a+n, n, lowprec, prec);
-    acb_get_ubound_arf(r, eps, lowprec);
+    arb_get_ubound_arf(r, eps, lowprec);
 
     acb_theta_agm_ext_conv_rate(c1, c2, r, r, c2, c1, lowprec);    
 
@@ -29,11 +29,10 @@ acb_theta_agm_ext(acb_t r, acb_t s, acb_srcptr a, acb_srcptr roots,
     acb_ptr v;
     acb_t scal;
     acb_t rel;
-    arf_t c1, c2, r;
+    arf_t c1, c2, u;
     arf_t err;
     fmpz_t exp;
     slong n = 1<<g;
-    slong lowprec = ACB_THETA_AGM_LOWPREC;
     slong nb1, nb2;
     slong k;
 
@@ -42,7 +41,7 @@ acb_theta_agm_ext(acb_t r, acb_t s, acb_srcptr a, acb_srcptr roots,
     acb_init(rel);
     arf_init(c1);
     arf_init(c2);
-    arf_init(r);
+    arf_init(u);
     arf_init(err);
     fmpz_init(exp);
 
@@ -54,8 +53,8 @@ acb_theta_agm_ext(acb_t r, acb_t s, acb_srcptr a, acb_srcptr roots,
     }
     
     /* Get convergence rate */
-    agm_ext_get_conv_rates(c1, c2, r, v, n, prec);
-    nb1 = acb_theta_agm_nb_good_steps(c1, r, prec);
+    agm_ext_get_conv_rate(c1, c2, u, v, n, prec);
+    nb1 = acb_theta_agm_nb_good_steps(c1, u, prec);
     
     /* Perform half the steps */
     flint_printf("(agm_ext) %wd of %wd good steps with starting values\n",
@@ -74,8 +73,8 @@ acb_theta_agm_ext(acb_t r, acb_t s, acb_srcptr a, acb_srcptr roots,
     }
     
     /* Readjust convergence rate */
-    agm_ext_get_conv_rate(c1, c2, r, v, n, prec);
-    nb2 = acb_theta_agm_nb_good_steps(c1, r, prec);
+    agm_ext_get_conv_rate(c1, c2, u, v, n, prec);
+    nb2 = acb_theta_agm_nb_good_steps(c1, u, prec);
     nb2 = FLINT_MAX(1, nb2);
 
     /* Perform remaining steps, at least 1 */
@@ -95,7 +94,7 @@ acb_theta_agm_ext(acb_t r, acb_t s, acb_srcptr a, acb_srcptr roots,
     
     /* Set extended Borchardt */
     acb_theta_agm_ext_step_last(r, s, v, g, prec);
-    acb_theta_agm_ext_rel_err(err, c, e, nb2 + 1, prec);
+    acb_theta_agm_ext_rel_err(err, c2, u, nb2 + 1, prec);
     acb_one(rel);
     acb_add_error_arf(rel, err);
     acb_mul(r, r, rel, prec);
@@ -115,7 +114,7 @@ acb_theta_agm_ext(acb_t r, acb_t s, acb_srcptr a, acb_srcptr roots,
     acb_clear(rel);
     arf_clear(c1);
     arf_clear(c2);
-    arf_clear(r);
+    arf_clear(u);
     arf_clear(err);
     fmpz_clear(exp);
 }

@@ -2,14 +2,12 @@
 #include "acb_theta.h"
 
 void
-acb_theta_agm_ext_conv_rate(arf_t c2, arf_t c1, arf_t r, const arf_t eps,
+acb_theta_agm_ext_conv_rate(arf_t c1, arf_t c2, arf_t r, const arf_t eps,
         const arf_t m, const arf_t M, slong prec)
 {
     arb_t M_arb, m_arb;
     arb_t temp;
     arb_t res;
-    slong n = 1<<g;
-    slong k;
 
     arb_init(M_arb);
     arb_init(m_arb);
@@ -23,7 +21,7 @@ acb_theta_agm_ext_conv_rate(arf_t c2, arf_t c1, arf_t r, const arf_t eps,
     arb_div(res, M_arb, m_arb, prec);
     arb_sqrt(res, res, prec);
     arb_one(temp);
-    arf_add_arf(temp, temp, r, prec);
+    arb_add_arf(temp, temp, r, prec);
     arb_mul(res, res, temp, prec);
     
     arb_mul_arf(res, res, c1, prec);
