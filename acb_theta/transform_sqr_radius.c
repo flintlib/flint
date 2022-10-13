@@ -6,7 +6,7 @@ void acb_theta_transform_sqr_radius(arf_t rho, const arf_t r, acb_srcptr th2,
 {    
     ulong ab_0, ab;
     fmpz_t eps;
-    arb_t abs_0, abs;
+    arb_t abs_0, abs, t;
     arf_t bound, max, res;
     slong g = fmpz_mat_nrows(mat)/2;
     slong n = 1<<g;
@@ -15,6 +15,7 @@ void acb_theta_transform_sqr_radius(arf_t rho, const arf_t r, acb_srcptr th2,
     fmpz_init(eps);
     arb_init(abs_0);
     arb_init(abs);
+    arb_init(t);
     arf_init(bound);
     arf_init(max);
     arf_init(res);
@@ -29,14 +30,20 @@ void acb_theta_transform_sqr_radius(arf_t rho, const arf_t r, acb_srcptr th2,
     {
         ab = acb_theta_transform_image_char(eps, k, mat);
         acb_abs(abs, &th2[ab], prec);
-        arb_add(abs, abs, abs_0, prec);
-        arb_div(abs, abs_0, abs, prec);
-        arb_mul(abs, abs, abs_0, prec);
-        arb_mul_arf(abs, abs, r, prec);
+
+        flint_printf("(transform_radius) abs, abs_0:\n");
+        arb_printd(abs, 10); flint_printf("\n");
+        arb_printd(abs_0, 10); flint_printf("\n");
         
-        arb_min(abs, abs, abs_0, prec);
-        arb_mul_2exp_si(abs, abs, -1);
-        arb_get_lbound_arf(bound, abs, prec);
+        arb_one(t);
+        arb_add_arf(t, t, r, prec);
+        arb_mul(t, t, abs_0, prec);
+        arb_add(t, t, abs, prec);
+        arb_div(t, abs_0, t, prec);
+        arb_mul(t, t, abs_0, prec);
+        arb_mul_arf(t, t, r, prec);
+
+        arb_get_lbound_arf(bound, t, prec);
         arf_min(res, res, bound);
     }
 
@@ -45,6 +52,7 @@ void acb_theta_transform_sqr_radius(arf_t rho, const arf_t r, acb_srcptr th2,
     fmpz_clear(eps);
     arb_clear(abs_0);
     arb_clear(abs);
+    arb_clear(t);
     arf_clear(bound);
     arf_clear(max);
     arf_clear(res);    

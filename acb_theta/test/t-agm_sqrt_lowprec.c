@@ -6,7 +6,7 @@ int main()
   slong iter;
   flint_rand_t state;
   
-  flint_printf("bound_const....");
+  flint_printf("agm_sqrt_lowprec....");
   fflush(stdout);
   
   flint_randinit(state);

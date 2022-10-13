@@ -13,7 +13,14 @@ acb_theta_dupl_transform_radius_const(arf_t rho, const arf_t r, acb_srcptr th,
 
     acb_theta_dupl_all_const(th_dupl, th, g, prec);
     acb_theta_transform_sqr_radius(rho, r, th_dupl, mat, prec);
+    
+    flint_printf("(dupl_transf_radius_const) after dupl: "); 
+    arf_printd(rho, 10); flint_printf("\n");
+
     acb_theta_dupl_radius(rho, rho, th, n, prec);
+
+    flint_printf("(dupl_transf_radius_const) before dupl: "); 
+    arf_printd(rho, 10); flint_printf("\n");
 
     _acb_vec_clear(th_dupl, n*n);
 }

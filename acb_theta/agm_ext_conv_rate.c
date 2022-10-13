@@ -13,6 +13,9 @@ acb_theta_agm_ext_conv_rate(arf_t c1, arf_t c2, arf_t r, const arf_t eps,
     arb_init(m_arb);
     arb_init(temp);
     arb_init(res);
+
+    arb_set_arf(M_arb, M);
+    arb_set_arf(m_arb, m);
     
     /* Get convergence rate of regular Borchardt */
     acb_theta_agm_conv_rate(c1, r, eps, prec);

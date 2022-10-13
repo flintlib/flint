@@ -12,7 +12,7 @@ int main()
     flint_randinit(state);
 
     /* Test: after scalar multiplication, theta values must be close to 1 */
-    for (iter = 0; iter < 200 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * arb_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 5);
         slong prec = ACB_THETA_AGM_BASEPREC + n_randint(state, 1000);

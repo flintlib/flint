@@ -65,8 +65,8 @@ int main()
             /* Get predicted error */
             arb_set_arf(abs, r);
             arb_pow_ui(abs, abs, 1<<j, prec);
-            arb_mul_arf(abs, abs, c, prec);   
-          
+            arb_mul_arf(abs, abs, c, prec);
+
             if (arb_lt(abs, eps))
             {
                 flint_printf("FAIL (error bound)\n");

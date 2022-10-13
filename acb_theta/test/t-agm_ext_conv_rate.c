@@ -71,6 +71,13 @@ int main()
         acb_theta_agm_ext_conv_rate(c1, c2, r, rad, m, M, prec);
         acb_theta_agm(mu, a+n, NULL, 0, g, prec);
 
+        arf_printd(rad, 10); flint_printf("\n");
+        arf_printd(m, 10); flint_printf("\n");
+        arf_printd(M, 10); flint_printf("\n");
+        arf_printd(c1, 10); flint_printf("\n");
+        arf_printd(c2, 10); flint_printf("\n");
+        arf_printd(r, 10); flint_printf("\n");
+
         acb_theta_agm_ext_step_good(a, a, g, prec);
 
         for (j = 1; j < 5; j++)
@@ -87,7 +94,11 @@ int main()
             /* Get predicted error */
             arb_set_arf(abs, r);
             arb_pow_ui(abs, abs, 1<<(j-1), prec);
-            arb_mul_arf(abs, abs, c2, prec);
+            arb_mul_arf(abs, abs, c2, prec);      
+
+                flint_printf("At step %wd, predicted and real error \n", j);
+                arb_printd(abs, 10); flint_printf("\n");
+                arb_printd(eps, 10); flint_printf("\n");                      
             
             if (arb_lt(abs, eps))
             {

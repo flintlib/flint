@@ -72,9 +72,6 @@ int main()
         
         acb_theta_agm_radius(test, mi, Mi, rad, nb_good, prec);
 
-        flint_printf("Chosen radius: ");
-        arf_printd(rad, 10); flint_printf("\n");
-
         /* Generate perturbed data, compute steps, check distance */
         for (k = 0; k < n; k++) acb_randtest_disk(&b[k], x, test, state, prec);
         _acb_vec_add(b, b, a, n, prec);

@@ -218,14 +218,16 @@ agm_ctx_set_roots(acb_theta_agm_ctx_t ctx, slong k, slong prec)
         acb_theta_agm_roots(roots, Ntau, nb1, lowprec);
     }
 
-    /* Find out how many bad steps we exactly have */
+    /* Find out how many bad steps we exactly have (min: 1) */
     nb2 = nb1;
-    while (nb2 > 0 &&
+    while (nb2 > 1 &&
             agm_ctx_is_good_step(&roots[(nb2-1) * nb_th],
                     n, is_ext, lowprec, prec))
     {
         nb2 = nb2 - 1;
     }
+
+    flint_printf("Matrix number %wd: %wd bad steps\n", k, nb2);
 
     /* Set bad steps and roots */
     acb_theta_agm_ctx_reset_steps(ctx, k, nb2);
@@ -286,17 +288,26 @@ agm_ctx_deform_good(arf_t rad, arf_t min, arf_t max,
     acb_theta_agm_step_sqrt(a, acb_theta_agm_ctx_roots(ctx, k)
             + (nb_bad - 1) * n, g, prec);
 
-    /* Get absolute dist; accept that as deformation; compute new min, max */
-    acb_theta_agm_abs_dist(eps, a, n, prec, prec);
-    arb_get_lbound_arf(rad, eps, prec);
-    
+    /* Choose deformation; compute new min, max */
     acb_abs(abs, &a[0], prec);
-    arb_mul_si(eps, eps, 2, prec);
-    arb_add(m, abs, eps, prec);
+    arb_get_lbound_arf(rad, abs, prec);
+    arf_mul_2exp_si(rad, rad, -2);
+    
+    acb_theta_agm_max_abs(m, a, n, prec);
+    arb_add_arf(m, m, rad, prec);
     arb_get_ubound_arf(max, m, prec);
-
+    
+    acb_theta_agm_abs_dist(eps, a, n, prec, prec);
+    arb_add_arf(eps, eps, rad, prec);
     arb_sub(m, abs, eps, prec);
     arb_get_lbound_arf(min, m, prec);
+
+    flint_printf("(agm_ctx_deform_good) value 0:\n");
+    acb_printd(&a[0], 10); flint_printf("\n");
+    flint_printf("(agm_ctx_deform_good) rad, min, max:\n");
+    arf_printd(rad, 10); flint_printf("\n");
+    arf_printd(min, 10); flint_printf("\n");
+    arf_printd(max, 10); flint_printf("\n");
 
     _acb_vec_clear(a, n);
     arb_clear(eps);
@@ -436,8 +447,8 @@ agm_ctx_get_bounds(arf_t rad, arf_t min, arf_t max,
     Mi = flint_malloc(nb_bad * sizeof(arf_struct));
     for (i = 0; i < nb_bad; i++)
     {
-        arf_init(&mi[k]);
-        arf_init(&Mi[k]);
+        arf_init(&mi[i]);
+        arf_init(&Mi[i]);
     }
     
     /* Get mi, Mi */
@@ -449,6 +460,8 @@ agm_ctx_get_bounds(arf_t rad, arf_t min, arf_t max,
     
     /* Propagate radius back to projectivized theta values */
     acb_theta_agm_radius(rad, mi, Mi, rad, nb_bad, lowprec);
+
+    flint_printf("Matrix number %wd: radius ", k); arf_printd(rad, 10); flint_printf("\n");
     
     /* Propagate radius back to projective theta(tau/2) */
     if (is_ext)
@@ -464,8 +477,8 @@ agm_ctx_get_bounds(arf_t rad, arf_t min, arf_t max,
 
     for (i = 0; i < nb_bad; i++)
     {
-        arf_clear(&mi[k]);
-        arf_clear(&Mi[k]);
+        arf_clear(&mi[i]);
+        arf_clear(&Mi[i]);
     }
     flint_free(mi);
     flint_free(Mi);
