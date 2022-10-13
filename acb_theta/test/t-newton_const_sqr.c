@@ -12,7 +12,7 @@ int main()
     flint_randinit(state);
 
     /* Test: agrees with naive algorithm */
-    for (iter = 0; iter < 1 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10 * arb_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
         slong nb = 1<<g;
@@ -26,7 +26,7 @@ int main()
 
         acb_mat_init(tau, g, g);
         th2 = _acb_vec_init(nb);
-        th2_test = _acb_vec_init(nb);
+        th2_test = _acb_vec_init(nb); 
         
         acb_siegel_randtest_fund(tau, state, prec);
         

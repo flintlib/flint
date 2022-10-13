@@ -51,7 +51,7 @@ acb_theta_agm_nb_good_steps(const arf_t c, const arf_t r, slong prec)
     arf_frexp(b, exp, b);
     nb = fmpz_get_si(exp);
 
-    flint_printf("(agm_nb_good_steps) Make %wd good steps\n", nb);
+    /* flint_printf("(agm_nb_good_steps) Make %wd good steps\n", nb);*/
     
     arb_clear(x);
     arb_clear(temp);

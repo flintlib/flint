@@ -31,7 +31,6 @@ void acb_theta_renormalize_sqr(acb_t scal_z, acb_t scal_0, acb_srcptr th2_z,
     _acb_vec_scalar_mul(roots, roots, 2*n*nb_bad, scal, lowprec);
     
     acb_sqrt(scal, &th2[0], 2*lowprec);
-    acb_div(scal, scal, &roots[n], lowprec);
     acb_div(scal, scal, &roots[0], lowprec);
     for (k = 0; k < nb_bad; k++)
     {

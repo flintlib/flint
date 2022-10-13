@@ -130,7 +130,7 @@ agm_ctx_is_good_step(acb_srcptr roots, slong n, int is_ext, slong lowprec,
         acb_theta_agm_rel_dist(eps2, roots+n, n, lowprec, prec);
         arb_max(eps1, eps1, eps2, lowprec);
     }
-    arb_mul_2exp_si(eps1, eps1, 3);
+    arb_mul_2exp_si(eps1, eps1, 5);
     arb_sub_si(eps1, eps1, 1, prec);
     res = arb_is_negative(eps1);
 
@@ -199,6 +199,7 @@ agm_ctx_set_roots(acb_theta_agm_ctx_t ctx, slong k, slong prec)
         acb_siegel_transform_ext(Nz, Ntau, acb_theta_agm_ctx_mat(ctx, k),
                 acb_theta_agm_ctx_z(ctx), acb_theta_agm_ctx_tau(ctx), prec);
         nb1 = acb_theta_agm_ext_nb_bad_steps(Nz, Ntau, prec);
+        flint_printf("(set_roots) Initial nb_bad[%wd]: %wd\n", k, nb1);
     }
     else
     {
@@ -355,6 +356,12 @@ agm_ctx_deform_good_ext(arf_t rad, arf_t min, arf_t max,
     arb_min(abs, abs, x, prec);
     arb_get_lbound_arf(rad, abs, prec);
 
+    flint_printf("(agm_ctx_deform_good_ext) value 0:\n");
+    acb_printd(&a[0], 10); flint_printf("\n");
+    acb_printd(&a[n], 10); flint_printf("\n");
+    flint_printf("(agm_ctx_deform_good_ext) rad, eps, mu, Mu, min, max:\n");
+    arf_printd(rad, 10); flint_printf("\n");
+
     /* Compute new min, max for extended and Borchardt parts, and relative
        distance for Borchardt part */
 
@@ -376,14 +383,17 @@ agm_ctx_deform_good_ext(arf_t rad, arf_t min, arf_t max,
     arb_add_arf(y, y, rad, prec);
     arb_get_ubound_arf(Ms, y, prec);
 
-    arb_add_si(x, abs, 1, prec);
-    arb_set_arf(abs, rad);
-    arb_addmul_si(x, abs, 2, prec);
-    arb_one(y);
-    arb_sub(y, y, abs, prec);
+    acb_theta_agm_abs_dist(x, a+n, n, lowprec, prec);
+    arb_add_arf(x, x, rad, prec);
+    arb_add_arf(x, x, rad, prec);
+    acb_theta_agm_min_abs(y, a+n, n, prec);
+    arb_sub_arf(y, y, rad, prec);
     arb_div(x, x, y, prec);
-    arb_sub_si(x, x, 1, prec);
     arb_get_ubound_arf(eps, x, prec);
+
+    arf_printd(eps, 10); flint_printf("\n");
+    arf_printd(mu, 10); flint_printf("\n");
+    arf_printd(Mu, 10); flint_printf("\n");
 
     /* Compute minimal convergence rates on whole disk */
     acb_theta_agm_ext_conv_rate(c1, c2, r, eps, mu, Mu, prec);
@@ -393,6 +403,7 @@ agm_ctx_deform_good_ext(arf_t rad, arf_t min, arf_t max,
     arf_mul(eps, eps, eps, prec, ARF_RND_CEIL);
 
     arb_set_arf(x, Mu);
+    arb_mul_arf(x, x, Ms, prec);
     arb_mul_arf(x, x, Ms, prec);
     arb_set_arf(y, ms);
     arb_sqr(y, y, prec);
@@ -404,6 +415,7 @@ agm_ctx_deform_good_ext(arf_t rad, arf_t min, arf_t max,
     arb_get_ubound_arf(max, x, prec);
     
     arb_set_arf(x, mu);
+    arb_mul_arf(x, x, ms, prec);
     arb_mul_arf(x, x, ms, prec);
     arb_set_arf(y, Ms);
     arb_sqr(y, y, prec);
@@ -417,6 +429,9 @@ agm_ctx_deform_good_ext(arf_t rad, arf_t min, arf_t max,
     /* Compare with maximal, minimal values for regular Borchardt */
     arf_max(max, max, Ms);
     arf_min(min, min, ms);
+
+    arf_printd(min, 10); flint_printf("\n");
+    arf_printd(max, 10); flint_printf("\n");
     
     _acb_vec_clear(a, 2*n);
     arb_clear(abs);

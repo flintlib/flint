@@ -12,7 +12,7 @@ int main()
     flint_randinit(state);
 
     /* Test: agrees with naive algorithm */
-    for (iter = 0; iter < 1 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10 * arb_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
         slong nb = 1<<g;

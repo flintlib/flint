@@ -71,6 +71,7 @@ acb_theta_newton_eval(acb_ptr r, acb_srcptr th,
             acb_theta_agm_ext(&agm[k], &agm[n+k], transf,
                     acb_theta_agm_ctx_roots(ctx, k),
                     acb_theta_agm_ctx_nb_bad(ctx, k), g, prec);
+            acb_mul(&agm[k], &agm[k], &agm[n+k], prec);
         }
         else
         {

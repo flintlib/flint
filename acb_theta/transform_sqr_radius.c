@@ -31,10 +31,6 @@ void acb_theta_transform_sqr_radius(arf_t rho, const arf_t r, acb_srcptr th2,
         ab = acb_theta_transform_image_char(eps, k, mat);
         acb_abs(abs, &th2[ab], prec);
 
-        flint_printf("(transform_radius) abs, abs_0:\n");
-        arb_printd(abs, 10); flint_printf("\n");
-        arb_printd(abs_0, 10); flint_printf("\n");
-        
         arb_one(t);
         arb_add_arf(t, t, r, prec);
         arb_mul(t, t, abs_0, prec);

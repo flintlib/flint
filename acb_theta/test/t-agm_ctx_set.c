@@ -17,13 +17,25 @@ int main()
         slong g = 1 + n_randint(state, 2);
         slong prec = ACB_THETA_AGM_BASEPREC + n_randint(state, 1000);
         acb_mat_t tau;
+        acb_ptr z;
+        arf_t rad;
         acb_theta_agm_ctx_t ctx;
         int res;
+        slong k;
 
         acb_mat_init(tau, g, g);
+        z = _acb_vec_init(g);
+        arf_init(rad);
 
         acb_siegel_randtest_fund(tau, state, prec);
-        acb_theta_agm_ctx_init(ctx, tau);
+
+        _acb_vec_zero(z, g);
+        arf_one(rad);
+        arf_mul_2exp_si(rad, rad, -4);
+        for (k = 0; k < g; k++) acb_randtest_disk(&z[k], &z[k], rad, state, prec);
+        
+        if (iter%2 == 0) acb_theta_agm_ctx_init(ctx, tau);
+        else acb_theta_agm_ctx_init_ext(ctx, z, tau);
         
         res = acb_theta_agm_ctx_set(ctx, prec);
 
@@ -43,6 +55,8 @@ int main()
                 acb_theta_agm_ctx_log_B3(ctx));
       
         acb_mat_clear(tau);
+        _acb_vec_clear(z, g);
+        arf_clear(rad);
         acb_theta_agm_ctx_clear(ctx);
     }
   

@@ -23,7 +23,7 @@ void acb_theta_agm_ext_rel_err(arf_t err, const arf_t c2, const arf_t r,
     arb_sub_si(x, x, 1, prec);
     if (!arb_is_negative(x))
     {
-        flint_printf("acb_theta_agm_ext_rel_err: Error (error is too large)\n");
+        flint_printf("acb_theta_agm_ext_rel_err: Error (decay too slow)\n");
         arf_printd(r, 10); flint_printf("\n");
         fflush(stdout);
         flint_abort();

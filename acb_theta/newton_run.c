@@ -280,8 +280,16 @@ acb_theta_newton_run(acb_ptr r, const acb_theta_agm_ctx_t ctx, slong prec)
     flint_printf("(newton_run) Before error\n");
     for (k = 0; k < n; k++)
     {
-        acb_printd(&r[k], 10); flint_printf("\n");
+        acb_printd(&r[k], 10); flint_printf("\n");        
     }
+    if (is_ext)
+    {
+        for (k = 0; k < n; k++)
+        {
+            acb_printd(&r[k+n], 10); flint_printf("\n");        
+        }
+    }
+        
 
     flint_printf("(newton_run) Additional error\n");
     arf_printd(err, 10); flint_printf("\n");
@@ -293,7 +301,7 @@ acb_theta_newton_run(acb_ptr r, const acb_theta_agm_ctx_t ctx, slong prec)
     }
     arf_one(err);
     arf_mul_2exp_si(err, err, -prec);
-    for (k = 1; k < dim; k++)
+    for (k = 1; k < n; k++)
     {
         acb_add_error_arf(&r[k], err);
         if (is_ext) acb_add_error_arf(&r[k+n], err);

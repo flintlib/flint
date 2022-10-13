@@ -29,4 +29,5 @@ acb_theta_cauchy(arf_t bound_der, const arf_t rad, const arf_t bound,
     fmpz_clear(fac);
     fmpz_clear(bin);
     arb_clear(r);
+    arb_clear(m);
 }

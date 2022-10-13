@@ -46,13 +46,15 @@ acb_theta_agm(acb_t res, acb_srcptr a, acb_srcptr roots, slong nb_bad,
     nb_good = acb_theta_agm_nb_good_steps(c, r, prec);
 
     /* Perform half the steps */
+    /*
     flint_printf("(agm) %wd of %wd good steps with starting values\n",
             nb_good/2, nb_good);
     for (k = 0; k < n; k++)
     {
         acb_printd(&v[k], 10); flint_printf("\n");
     }
-    
+    */
+
     acb_set(scal, &v[0]);
     _acb_vec_scalar_div(v, v, n, scal, prec);
         
@@ -66,7 +68,7 @@ acb_theta_agm(acb_t res, acb_srcptr a, acb_srcptr roots, slong nb_bad,
     nb_good = acb_theta_agm_nb_good_steps(c, r, prec);
 
     /* Perform remaining steps */
-    flint_printf("(agm) %wd good steps remain\n", nb_good);
+    /* flint_printf("(agm) %wd good steps remain\n", nb_good); */
     for (k = 0; k < nb_good-1; k++)
     {
         acb_theta_agm_step_good(v, v, g, prec);
@@ -83,7 +85,7 @@ acb_theta_agm(acb_t res, acb_srcptr a, acb_srcptr roots, slong nb_bad,
     acb_add_error_arf(scal, err);
     acb_mul(res, res, scal, prec);
     
-    flint_printf("(agm) Reached agm\n");
+    flint_printf("(agm) Reached agm ");
     acb_printd(res, 10); flint_printf("\n");
 
     _acb_vec_clear(v, n);
