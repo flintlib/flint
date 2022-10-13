@@ -53,6 +53,30 @@ fmpz_mat_Nij(fmpz_mat_t N, slong i, slong j)
 }
 
 static void
+fmpz_mat_Dn(fmpz_mat_t N, slong n)
+{
+    slong g = fmpz_mat_nrows(N)/2;
+    slong k;
+
+    fmpz_mat_zero(N);
+    for (k = 0; k < g; k++)
+    {
+        if (n%2 == 0)
+        {
+            fmpz_one(fmpz_mat_entry(N, k, k));
+            fmpz_one(fmpz_mat_entry(N, k+g, k+g));
+        }
+        else
+        {
+            fmpz_one(fmpz_mat_entry(N, k, k+g));
+            fmpz_set_si(fmpz_mat_entry(N, k+g, k), -1);
+        }
+        n = n>>1;
+    }
+    
+}
+
+static void
 agm_ctx_candidates(fmpz_mat_struct* Ni, slong try, slong g)
 {
     slong j, u, v, c;
@@ -72,11 +96,12 @@ agm_ctx_candidates(fmpz_mat_struct* Ni, slong try, slong g)
     {
         fmpz_mat_J(&Ni[1]);
     }
-    else if (g == 2 && try == 0)
+    else if (try == 0)
     {
-        fmpz_mat_Mi(&Ni[1], 0);
-        fmpz_mat_Mi(&Ni[2], 1);
-        fmpz_mat_Nij(&Ni[3], 0, 1);
+        for (j = 1; j < (1<<g); j++)
+        {
+            fmpz_mat_Dn(&Ni[j], j);
+        }
     }
     else
     {
@@ -102,7 +127,7 @@ agm_ctx_candidates(fmpz_mat_struct* Ni, slong try, slong g)
 }
 
 /* Collect data for a single matrix. We only keep bad steps for which relative
-   distance between roots is > 1/8 */
+   distance between roots is > 1/32 */
 
 static void
 agm_ctx_set_k2_ab(acb_theta_agm_ctx_t ctx, slong k)

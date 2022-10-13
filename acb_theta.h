@@ -477,17 +477,6 @@ void acb_theta_newton_sqr(acb_ptr th, acb_srcptr z, const acb_mat_t tau,
 void acb_theta_newton_all_sqr(acb_ptr th, acb_srcptr z, const acb_mat_t tau,
         slong prec);
 
-
-/* Mixed naive-AGM algorithms */
-
-void acb_theta_all_sqr(acb_ptr th, const acb_mat_t tau, acb_srcptr z, slong prec);
-
-void acb_theta_all_const_sqr(acb_ptr th, const acb_mat_t tau, slong prec);
-
-
-
-/* Finite difference algorithms */
-
   
 #ifdef __cplusplus
 }
