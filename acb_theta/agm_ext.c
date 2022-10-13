@@ -102,7 +102,7 @@ acb_theta_agm_ext(acb_t r, acb_t s, acb_srcptr a, acb_srcptr roots,
     /* Renormalize */
     acb_mul(s, s, scal, prec);
     fmpz_one(exp);
-    fmpz_mul_2exp(exp, exp, nb_bad + nb1/2 + nb2);
+    fmpz_mul_2exp(exp, exp, nb_bad + nb1/2 + nb2 + 1);
     acb_pow_fmpz(r, r, exp, prec);
         
     flint_printf("(agm_ext) Reached agms\n");

@@ -314,15 +314,17 @@ agm_ctx_deform_good_ext(arf_t rad, arf_t min, arf_t max,
     slong lowprec = ACB_THETA_AGM_LOWPREC;
     acb_ptr a;
     arb_t abs, x, y;
-    arf_t m, M, eps;
+    arf_t mu, Mu, ms, Ms, eps;
     arf_t c1, c2, r;
 
     a = _acb_vec_init(2*n);
     arb_init(abs);
     arb_init(x);
     arb_init(y);
-    arf_init(m);
-    arf_init(M);
+    arf_init(mu);
+    arf_init(Mu);
+    arf_init(ms);
+    arf_init(Ms);
     arf_init(eps);
     arf_init(c1);
     arf_init(c2);
@@ -342,19 +344,28 @@ agm_ctx_deform_good_ext(arf_t rad, arf_t min, arf_t max,
     arb_min(abs, abs, x, prec);
     arb_get_lbound_arf(rad, abs, prec);
 
-    /* Compute new min, max for extended part, and relative distance for
-       Borchardt part */
+    /* Compute new min, max for extended and Borchardt parts, and relative
+       distance for Borchardt part */
 
     acb_theta_agm_min_abs(x, a, n, prec);
     arb_sub_arf(x, x, rad, prec);
-    arb_get_lbound_arf(m, x, prec);
+    arb_get_lbound_arf(mu, x, prec);
 
     acb_theta_agm_max_abs(x, a, n, prec);
     arb_add_arf(x, x, rad, prec);
-    arb_get_ubound_arf(M, x, prec);
+    arb_get_ubound_arf(Mu, x, prec);
 
-    acb_theta_agm_abs_dist(x, a+n, n, lowprec, prec);
-    arb_add_si(x, x, 1, prec);
+    acb_theta_agm_abs_dist(abs, a+n, n, lowprec, prec);    
+    acb_abs(x, &a[0], prec);
+    arb_sub(y, x, abs, prec);
+    arb_sub_arf(y, y, rad, prec);
+    arb_get_lbound_arf(ms, y, prec);
+
+    arb_add(y, x, abs, prec);
+    arb_add_arf(y, y, rad, prec);
+    arb_get_ubound_arf(Ms, y, prec);
+
+    arb_add_si(x, abs, 1, prec);
     arb_set_arf(abs, rad);
     arb_addmul_si(x, abs, 2, prec);
     arb_one(y);
@@ -364,32 +375,46 @@ agm_ctx_deform_good_ext(arf_t rad, arf_t min, arf_t max,
     arb_get_ubound_arf(eps, x, prec);
 
     /* Compute minimal convergence rates on whole disk */
-    acb_theta_agm_ext_conv_rate(c1, c2, r, eps, m, M, prec);
+    acb_theta_agm_ext_conv_rate(c1, c2, r, eps, mu, Mu, prec);
 
     /* Deduce maximal, minimal values for extended Borchardt */
-    flint_printf("TODO: bounds for ext Borchardt\n");
-    flint_abort();
+    acb_theta_agm_ext_rel_err(eps, c2, r, 1, prec);
+    arf_mul(eps, eps, eps, prec, ARF_RND_CEIL);
+
+    arb_set_arf(x, Mu);
+    arb_mul_arf(x, x, Ms, prec);
+    arb_set_arf(y, ms);
+    arb_sqr(y, y, prec);
+    arb_div(x, x, y, prec);
+    arb_one(y);
+    arb_add_arf(y, y, eps, prec);
+    arb_mul(x, x, y, prec);
+    arb_pow_ui(x, x, nb_bad, prec);
+    arb_get_ubound_arf(max, x, prec);
+    
+    arb_set_arf(x, mu);
+    arb_mul_arf(x, x, ms, prec);
+    arb_set_arf(y, Ms);
+    arb_sqr(y, y, prec);
+    arb_div(x, x, y, prec);
+    arb_one(y);
+    arb_sub_arf(y, y, eps, prec);
+    arb_mul(x, x, y, prec);
+    arb_pow_ui(x, x, nb_bad, prec);
+    arb_get_lbound_arf(min, x, prec);
 
     /* Compare with maximal, minimal values for regular Borchardt */
-    acb_theta_agm_abs_dist(abs, a + n, n, lowprec, prec);
-    
-    acb_abs(x, &a[0], prec);
-    arb_add(y, x, abs, prec);
-    arb_add_arf(y, y, rad, prec);
-    arb_get_ubound_arf(r, y, prec);
-    arf_max(max, max, r);
-
-    arb_sub(y, x, abs, prec);
-    arb_sub_arf(y, y, rad, prec);
-    arb_get_lbound_arf(r, y, prec);
-    arf_min(min, min, r);    
+    arf_max(max, max, Ms);
+    arf_min(min, min, ms);
     
     _acb_vec_clear(a, 2*n);
     arb_clear(abs);
     arb_clear(x);
     arb_clear(y);
-    arf_clear(m);
-    arf_clear(M);
+    arf_clear(mu);
+    arf_clear(Mu);
+    arf_clear(ms);
+    arf_clear(Ms);
     arf_clear(eps);
     arf_clear(c1);
     arf_clear(c2);
@@ -451,26 +476,61 @@ agm_ctx_get_bounds(arf_t rad, arf_t min, arf_t max,
 static void
 agm_ctx_get_rho_M(arf_t rho, arf_t M, const acb_theta_agm_ctx_t ctx, slong prec)
 {
+    slong g = acb_theta_agm_ctx_g(ctx);
+    slong is_ext = acb_theta_agm_ctx_is_ext(ctx);
+    acb_ptr dupl;
+    arb_t abs0, abs1, abs;
     arf_t m0, rad, min, max;
     slong k;
     slong nb = acb_theta_agm_ctx_nb(ctx);
 
+    if (is_ext) dupl = _acb_vec_init(1<<(2*g+1));
+    else dupl = _acb_vec_init(1<<(2*g));
+    arb_init(abs0);
+    arb_init(abs1);
+    arb_init(abs);
     arf_init(m0);
     arf_init(rad);
     arf_init(min);
     arf_init(max);
-
+    
+    if (is_ext) acb_theta_dupl_all(dupl, acb_theta_agm_ctx_th(ctx), g, prec);
+    else acb_theta_dupl_all_const(dupl, acb_theta_agm_ctx_th(ctx), g, prec);
+    
     agm_ctx_get_bounds(rho, m0, max, ctx, 0, prec);
     arf_zero(M);
+    acb_abs(abs0, &dupl[0], prec);
+    if (is_ext) acb_abs(abs1, &dupl[1<<(2*g)], prec);
     
     for (k = 1; k < nb; k++)
     {
-        agm_ctx_get_bounds(rad, min, max, ctx, k, prec);
+        agm_ctx_get_bounds(rad, min, max, ctx, k, prec);        
         arf_min(rho, rho, rad);
+
+        acb_abs(abs, &dupl[acb_theta_agm_ctx_ab(ctx, k)], prec);
+        arb_mul_arf(abs, abs, max, prec);
+        arb_div_arf(abs, abs, min, prec);
+        arb_div(abs, abs, abs0, prec);
+        arb_get_ubound_arf(max, abs, prec);
         arf_max(M, M, max);
+
+        if (is_ext)
+        {
+            acb_abs(abs, &dupl[acb_theta_agm_ctx_ab(ctx, k) + (1<<(2*g))], prec);
+            arb_mul_arf(abs, abs, max, prec);
+            arb_div_arf(abs, abs, min, prec);
+            arb_div(abs, abs, abs1, prec);
+            arb_get_ubound_arf(max, abs, prec);
+            arf_max(M, M, max);
+        }
     }
     arf_div(M, M, m0, prec, ARF_RND_CEIL);    
 
+    if (is_ext) _acb_vec_clear(dupl, 1<<(2*g+1));
+    else _acb_vec_clear(dupl, 1<<(2*g));
+    arb_clear(abs0);
+    arb_clear(abs1);
+    arb_clear(abs);
     arf_clear(m0);
     arf_clear(rad);
     arf_clear(min);
