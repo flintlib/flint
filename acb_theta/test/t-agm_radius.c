@@ -68,9 +68,9 @@ int main()
         /* Choose epsilon, compute rad */
         acb_theta_agm_abs_dist(abs, a, n, lowprec, prec);
         arb_div_si(abs, abs, quo, lowprec);
-        arb_get_ubound_arf(rad, rad, abs, lowprec);
+        arb_get_ubound_arf(rad, abs, lowprec);
         
-        acb_theta_agm_radius(test, mi, Mi, rad, nb, prec);
+        acb_theta_agm_radius(test, mi, Mi, rad, nb_good, prec);
 
         flint_printf("Chosen radius: ");
         arf_printd(rad, 10); flint_printf("\n");

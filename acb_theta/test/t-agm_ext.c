@@ -21,16 +21,11 @@ int main()
       slong n = 1<<g;
       acb_ptr a;
       arf_t rad;
-      arf_t c_ext, c, e;
-      slong nb_good;
       acb_t x, y, z, t;
       slong k;
       
       a = _acb_vec_init(2*n);
       arf_init(rad);
-      arf_init(c_ext);
-      arf_init(c);
-      arf_init(e);
       acb_init(x);
       acb_init(y);
       acb_init(z);
@@ -52,17 +47,13 @@ int main()
       arb_randtest_pos(acb_realref(x), state, prec, mag_bits);
       _acb_vec_scalar_mul(a+n, a+n, n, x, prec);
       
-      acb_theta_agm_ext_conv_rate(c_ext, c, e, a, g, prec);
-      
-      nb_good = acb_theta_agm_nb_good_steps(c, e, test_prec);
-      acb_theta_agm_ext(x, y, a, NULL, c, e, 0, nb_good, g, test_prec);
-      nb_good = acb_theta_agm_nb_good_steps(c, e, prec);
-      acb_theta_agm_ext(z, t, a, NULL, c, e, 0, nb_good, g, prec);
+      acb_theta_agm_ext(x, y, a, NULL, 0, g, test_prec);
+      acb_theta_agm_ext(z, t, a, NULL, 0, g, prec);
       
       if (!acb_overlaps(x, z) || !acb_overlaps(y, t))
 	{
 	  flint_printf("FAIL (overlap)\n");          
-          flint_printf("g = %wd, test_prec = %wd, nb_good = %wd\n", g, test_prec, nb_good);
+          flint_printf("g = %wd, test_prec = %wd\n", g, test_prec);
           for (k = 0; k < 2*n; k++)
           {
               acb_printd(&a[k], 10); flint_printf("\n");
@@ -78,9 +69,6 @@ int main()
 
       _acb_vec_clear(a, 2*n);
       arf_clear(rad);
-      arf_clear(c_ext);
-      arf_clear(c);
-      arf_clear(e);
       acb_clear(x);
       acb_clear(y);
       acb_clear(z);

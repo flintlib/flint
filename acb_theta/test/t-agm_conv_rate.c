@@ -21,7 +21,7 @@ int main()
         acb_ptr a;
         acb_t x;
         arf_t rad;
-        arf_t c, e;
+        arf_t c, r;
         arb_t abs;
         arb_t eps;
         arf_t err;
@@ -31,7 +31,7 @@ int main()
         acb_init(x);
         arf_init(rad);
         arf_init(c);
-        arf_init(e);
+        arf_init(r);
         arb_init(abs);
         arb_init(eps);
         arf_init(err);
@@ -46,7 +46,9 @@ int main()
         _acb_vec_scalar_mul(a, a, n, x, prec);
 
         acb_theta_agm_step_good(a, a, g, prec);
-        acb_theta_agm_conv_rate(c, e, a, g, prec);
+        acb_theta_agm_rel_dist(eps, a, n, prec, prec);
+        arb_get_lbound_arf(rad, eps, prec);
+        acb_theta_agm_conv_rate(c, r, rad, prec);
         for (j = 0; j < 5; j++)
         {
             /* Get current relative error */
@@ -61,7 +63,7 @@ int main()
             arb_div(eps, eps, abs, prec);
 
             /* Get predicted error */
-            arb_set_arf(abs, e);
+            arb_set_arf(abs, r);
             arb_pow_ui(abs, abs, 1<<j, prec);
             arb_mul_arf(abs, abs, c, prec);   
           
@@ -82,7 +84,7 @@ int main()
         acb_clear(x);
         arf_clear(rad);
         arf_clear(c);
-        arf_clear(e);
+        arf_clear(r);
         arb_clear(abs);
         arb_clear(eps);
         arf_clear(err);
