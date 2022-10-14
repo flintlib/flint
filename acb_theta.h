@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include "flint/fmpz_mat.h"
+#include "flint/fmpz_lll.h"
 #include "arb.h"
 #include "acb.h"
 #include "arb_mat.h"
@@ -43,7 +44,7 @@ void arb_mat_pos_lambda(arb_t lambda, const arb_mat_t mat, slong prec);
 
 void arb_mat_pos_radius(arf_t rad, const arb_mat_t mat, slong prec);
 
-void arb_mat_reduce(arb_mat_t R, fmpz_mat_t U, const arb_mat_t M, slong prec);
+void arb_mat_reduce(fmpz_mat_t U, const arb_mat_t M, slong prec);
 
 void acb_mat_ninf(arb_t norm, const acb_mat_t mat, slong prec);
 
@@ -75,6 +76,8 @@ void fmpz_mat_trig_sp(fmpz_mat_t mat, const fmpz_mat_t S);
 
 void fmpz_mat_randtest_sp(fmpz_mat_t mat, flint_rand_t state, slong bits);
 
+slong fmpz_mat_nb_siegel_fund(slong g);
+
 void fmpz_mat_siegel_fund(fmpz_mat_t mat, slong j);
 
 
@@ -86,6 +89,9 @@ void acb_siegel_randtest(acb_mat_t tau, flint_rand_t state, slong prec,
 void acb_siegel_randtest_fund(acb_mat_t tau, flint_rand_t state,
 	slong prec);
 
+void acb_siegel_randtest_reduced(acb_mat_t tau, flint_rand_t state, slong prec,
+    slong mag_bits);
+
 void acb_siegel_cocycle(acb_mat_t res, const fmpz_mat_t mat,
 	const acb_mat_t tau, slong prec);
 
@@ -95,24 +101,17 @@ void acb_siegel_transform(acb_mat_t res, const fmpz_mat_t mat,
 void acb_siegel_transform_ext(acb_ptr r, acb_mat_t w, const fmpz_mat_t mat,
         acb_srcptr z, const acb_mat_t tau, slong prec);
 
-int acb_siegel_is_real_reduced(const acb_mat_t tau, const arf_t eps,
-	slong prec);
+void acb_siegel_reduce_imag(fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 
-int acb_siegel_not_real_reduced(const acb_mat_t tau, slong prec);
-
-void acb_siegel_reduce_real(acb_mat_t res, fmpz_mat_t mat, const acb_mat_t tau,
-	slong prec);
+void acb_siegel_reduce_real(fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 
 void acb_siegel_reduce(acb_mat_t res, fmpz_mat_t mat, const acb_mat_t tau,
 	slong prec);
-
-int acb_siegel_is_reduced(const acb_mat_t tau, const arf_t eps, slong prec);
 
 
 /* AGM sequences */
 
 #define ACB_THETA_AGM_LOWPREC 50
-
 
 void acb_theta_agm_hadamard(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
@@ -201,9 +200,15 @@ void acb_theta_dupl_all(acb_ptr th2, acb_srcptr th, slong g, slong prec);
 ulong acb_theta_transform_image_char(fmpz_t eps, ulong ab,
 	const fmpz_mat_t mat);
 
+void acb_theta_transform_proj(acb_ptr res, acb_srcptr th,
+        const fmpz_mat_t mat, slong prec);
+
 void acb_theta_transform_sqr_proj(acb_ptr res, acb_srcptr th2,
         const fmpz_mat_t mat, slong prec);
 
+void acb_theta_transform_all_sqr_proj(acb_ptr res, acb_srcptr th2,
+	const fmpz_mat_t mat, slong prec);
+    
 void acb_theta_transform_scal_const(acb_t scal, const acb_mat_t tau,
         const fmpz_mat_t mat, slong k2, slong prec);
 
@@ -471,11 +476,18 @@ void acb_theta_newton_all_const_sqr(acb_ptr th2, const acb_mat_t tau,
 void acb_theta_newton_half_proj(acb_ptr th, acb_srcptr z, const acb_mat_t tau,
         slong prec);
 
-void acb_theta_newton_sqr(acb_ptr th, acb_srcptr z, const acb_mat_t tau,
+void acb_theta_newton_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau,
         slong prec);
 
-void acb_theta_newton_all_sqr(acb_ptr th, acb_srcptr z, const acb_mat_t tau,
+void acb_theta_newton_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau,
         slong prec);
+
+
+/* Mixed Newton/naive algorithms */
+
+#define ACB_THETA_NAIVE_CMP 500
+
+void acb_theta_all_const_sqr(acb_ptr th2, const acb_mat_t tau, slong prec);
 
   
 #ifdef __cplusplus

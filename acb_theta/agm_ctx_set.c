@@ -234,7 +234,9 @@ agm_ctx_set_roots(acb_theta_agm_ctx_t ctx, slong k, slong prec)
     }
 
     /* Compute all roots to low precision */
+    nb1 = FLINT_MAX(nb1, 1);
     roots = _acb_vec_init(nb1 * nb_th);
+    
     if (is_ext)
     {
         acb_theta_agm_ext_roots(roots, Nz, Ntau, nb1, lowprec);

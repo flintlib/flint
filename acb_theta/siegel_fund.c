@@ -2,20 +2,6 @@
 #include "acb_theta.h"
 
 static
-void fmpz_mat_siegel_fund_g1(fmpz_mat_t mat, slong j)
-{
-    switch(j)
-    {
-    case 0:
-	fmpz_mat_J(mat);
-	break;
-    default:
-	flint_printf("fmpz_mat_siegel_fund: Error (invalid index: %d)\n", j);
-	flint_abort();
-    }
-}
-
-static
 void fmpz_mat_siegel_fund_g2(fmpz_mat_t mat, slong j)
 {
     slong g = 2;
@@ -140,16 +126,21 @@ void
 fmpz_mat_siegel_fund(fmpz_mat_t mat, slong j)
 {
     slong g = fmpz_mat_nrows(mat)/2;
-    switch(g)
+
+    if (g == 1)
     {
-    case 1:
-	fmpz_mat_siegel_fund_g1(mat, j);
-	break;
-    case 2:
+	fmpz_mat_J(mat);	
+    }
+    else if (g == 2)
+    {
 	fmpz_mat_siegel_fund_g2(mat, j);
-	break;
-    default:
-	flint_printf("fmpz_mat_siegel_fund: Error (not implemented for g = %d)\n", g);
-	flint_abort();
+    }
+    else
+    {
+	fmpz_mat_one(mat);
+	fmpz_zero(fmpz_mat_entry(mat, 0, 0));
+	fmpz_zero(fmpz_mat_entry(mat, g, g));
+	fmpz_one(fmpz_mat_entry(mat, g, 0));
+	fmpz_set_si(fmpz_mat_entry(mat, 0, g), -1);
     }
 }
