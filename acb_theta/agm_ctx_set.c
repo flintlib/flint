@@ -28,31 +28,6 @@ agm_ctx_set_th(acb_theta_agm_ctx_t ctx, slong prec)
 /* Candidates for symplectic matrices */
 
 static void
-fmpz_mat_Mi(fmpz_mat_t N, slong i)
-{
-    slong g = fmpz_mat_nrows(N)/2;
-
-    fmpz_mat_one(N);
-    fmpz_one(fmpz_mat_entry(N, i, i+g));
-    fmpz_set_si(fmpz_mat_entry(N, i+g, i), -1);
-    fmpz_zero(fmpz_mat_entry(N, i+g, i+g));
-}
-
-static void
-fmpz_mat_Nij(fmpz_mat_t N, slong i, slong j)
-{  
-    slong g = fmpz_mat_nrows(N)/2;
-
-    fmpz_mat_one(N);
-    fmpz_one(fmpz_mat_entry(N, i, j+g));
-    fmpz_one(fmpz_mat_entry(N, j, i+g));
-    fmpz_set_si(fmpz_mat_entry(N, i+g, j), -1);
-    fmpz_set_si(fmpz_mat_entry(N, j+g, i), -1);
-    fmpz_zero(fmpz_mat_entry(N, i+g, i+g));
-    fmpz_zero(fmpz_mat_entry(N, j+g, j+g));
-}
-
-static void
 fmpz_mat_Dn(fmpz_mat_t N, slong n)
 {
     slong g = fmpz_mat_nrows(N)/2;

@@ -485,7 +485,8 @@ void acb_theta_newton_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau,
 
 /* Mixed Newton/naive algorithms */
 
-#define ACB_THETA_NAIVE_CMP 500
+#define ACB_THETA_MIXED_CMP 500
+#define ACB_THETA_MIXED_SQRT 10
 
 void acb_theta_all_const_sqr(acb_ptr th2, const acb_mat_t tau, slong prec);
 

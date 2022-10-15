@@ -45,7 +45,7 @@ acb_mat_balance(acb_mat_t res, const acb_mat_t tau, slong j)
 }
 
 static int
-is_balanced(acb_mat_t res, fmpz_mat_t D, const acb_mat_t tau, slong prec)
+is_balanced(slong* j0, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     arb_t test;
@@ -58,12 +58,9 @@ is_balanced(acb_mat_t res, fmpz_mat_t D, const acb_mat_t tau, slong prec)
     {
 	arb_mul_2exp_si(test, acb_imagref(arb_mat_entry(tau, j, j)), 2);
 	if (arb_lt(test, acb_imagref(arb_mat_entry(tau, j+1, j+1))))
-	{
-	    flint_printf("(is_balanced) Found unbalanced at j=%wd\n", j);
-	    
+	{	    
 	    r = 0;
-	    fmpz_mat_balance(D, j);
-	    acb_mat_balance(res, tau, j);
+	    *j0 = j;
 	    break;
 	}
     }
@@ -81,7 +78,7 @@ accept_naive(const acb_mat_t tau, slong prec)
     arb_init(test);
 
     arb_set(test, acb_imagref(acb_mat_entry(tau, 0, 0)));
-    arb_mul_si(test, test, ACB_THETA_NAIVE_CMP, prec);
+    arb_mul_si(test, test, ACB_THETA_MIXED_CMP, prec);
     arb_sub_si(test, test, prec, prec);
 
     res = arb_is_positive(test);
@@ -147,8 +144,8 @@ acb_theta_all_const_sqr(acb_ptr th2, const acb_mat_t tau, slong prec)
     acb_ptr roots;
     fmpz_t den;
     int res;
-    slong k;
-    slong lowprec = ACB_THETA_AGM_LOWPREC;
+    slong j0, k;
+    slong lowprec = ACB_THETA_MIXED_SQRT * n_sqrt(prec);
 
     fmpz_mat_init(D, 2*g, 2*g);
     fmpz_mat_init(R, 2*g, 2*g);
@@ -164,13 +161,19 @@ acb_theta_all_const_sqr(acb_ptr th2, const acb_mat_t tau, slong prec)
 	goto exit;
     }
     
-    res = is_balanced(aux, D, tau, prec);
+    res = is_balanced(&j0, tau, prec);
+
     if (res)
     {
 	flint_printf("(all_const_sqr) Fall back to newton.\n");
 	acb_theta_newton_all_const_sqr(th2, tau, prec);
 	goto exit;
     }
+
+    flint_printf("(is_balanced) Found unbalanced at j=%wd\n", j0);
+    
+    fmpz_mat_balance(D, j0);
+    acb_mat_balance(aux, tau, j0);
 
     flint_printf("Before real reduction:\n"); acb_mat_printd(aux, 10);
     
@@ -244,7 +247,7 @@ acb_theta_all_const_sqr(acb_ptr th2, const acb_mat_t tau, slong prec)
     /* Act by inverse of D and x2 */
     fmpz_mat_inv(D, den, D);
     acb_theta_transform_all_sqr_proj(th2, th2, D, prec);
-    _acb_vec_scalar_mul_2exp_si(th2, th2, n*n, 1);
+    _acb_vec_scalar_mul_2exp_si(th2, th2, n*n, j0+1);
 
     
     flint_printf("After final transformation:\n");

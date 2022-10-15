@@ -6,7 +6,7 @@ int main()
     slong iter;
     flint_rand_t state;
 
-    flint_printf("reduce....");
+    flint_printf("all_const_sqr....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -14,7 +14,7 @@ int main()
     /* Test: agrees with naive algorithm */
     for (iter = 0; iter < 5 * arb_test_multiplier(); iter++)
     {
-	slong g = 2;
+	slong g = 2 + n_randint(state, 2);
 	slong n = 1<<(2*g);
 	slong prec = 2000 + n_randint(state, 2000);
 	slong mag_bits = 1 + n_randint(state, 3);
