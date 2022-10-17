@@ -1,74 +1,6 @@
 
 #include "acb_theta.h"
 
-static void
-fmpz_mat_balance(fmpz_mat_t D, slong j)
-{
-    slong g = acb_mat_nrows(D)/2;
-    slong k;
-
-    fmpz_mat_one(D);
-    
-    for (k = 0; k <= j; k++)
-    {
-	fmpz_zero(fmpz_mat_entry(D, k, k));
-	fmpz_zero(fmpz_mat_entry(D, k+g, k+g));
-	fmpz_one(fmpz_mat_entry(D, k+g, k));
-	fmpz_set_si(fmpz_mat_entry(D, k, k+g), -1);
-    }
-}
-
-static void
-acb_mat_balance(acb_mat_t res, const acb_mat_t tau, slong j)
-{
-    slong g = acb_mat_nrows(tau);
-    slong k, l;
-
-    acb_mat_set(res, tau);
-    
-    for (k = 0; k <= j; k++)
-    {
-	for (l = 0; l <= j; l++)
-	{
-	    acb_mul_2exp_si(acb_mat_entry(res, k, l),
-		    acb_mat_entry(res, k, l), 1);
-	}
-    }
-    for (k = j+1; k < g; k++)
-    {
-	for (l = j+1; l < g; l++)
-	{
-	    acb_mul_2exp_si(acb_mat_entry(res, k, l),
-		    acb_mat_entry(res, k, l), -1);
-	}
-    }
-}
-
-static int
-is_balanced(slong* j0, const acb_mat_t tau, slong prec)
-{
-    slong g = acb_mat_nrows(tau);
-    arb_t test;
-    slong j;
-    int r = 1;
-
-    arb_init(test);
-    
-    for (j = 0; j < g-1; j++)
-    {
-	arb_mul_2exp_si(test, acb_imagref(arb_mat_entry(tau, j, j)), 2);
-	if (arb_lt(test, acb_imagref(arb_mat_entry(tau, j+1, j+1))))
-	{	    
-	    r = 0;
-	    *j0 = j;
-	    break;
-	}
-    }
-
-    arb_clear(test);
-    return r;
-}
-
 static int
 accept_naive(const acb_mat_t tau, slong prec)
 {
@@ -78,7 +10,7 @@ accept_naive(const acb_mat_t tau, slong prec)
     arb_init(test);
 
     arb_set(test, acb_imagref(acb_mat_entry(tau, 0, 0)));
-    arb_mul_si(test, test, ACB_THETA_MIXED_CMP, prec);
+    arb_mul_si(test, test, ACB_THETA_NAIVE_CONST_THRESHOLD, prec);
     arb_sub_si(test, test, prec, prec);
 
     res = arb_is_positive(test);
@@ -141,15 +73,17 @@ acb_theta_all_const_sqr(acb_ptr th2, const acb_mat_t tau, slong prec)
     slong n = 1<<g;
     fmpz_mat_t D, R;
     acb_mat_t aux;
+    acb_ptr z;
     acb_ptr roots;
     fmpz_t den;
     int res;
     slong j0, k;
-    slong lowprec = ACB_THETA_MIXED_SQRT * n_sqrt(prec);
+    slong lowprec = acb_theta_balance_lowprec(g, prec);
 
     fmpz_mat_init(D, 2*g, 2*g);
     fmpz_mat_init(R, 2*g, 2*g);
     acb_mat_init(aux, g, g);
+    z = _acb_vec_init(g);
     roots = _acb_vec_init(n);
     fmpz_init(den);
 
@@ -161,7 +95,7 @@ acb_theta_all_const_sqr(acb_ptr th2, const acb_mat_t tau, slong prec)
 	goto exit;
     }
     
-    res = is_balanced(&j0, tau, prec);
+    res = acb_theta_is_balanced(&j0, tau, prec);
 
     if (res)
     {
@@ -170,10 +104,7 @@ acb_theta_all_const_sqr(acb_ptr th2, const acb_mat_t tau, slong prec)
 	goto exit;
     }
 
-    flint_printf("(is_balanced) Found unbalanced at j=%wd\n", j0);
-    
-    fmpz_mat_balance(D, j0);
-    acb_mat_balance(aux, tau, j0);
+    acb_theta_balance(z, aux, D, z, tau, j0);
 
     flint_printf("Before real reduction:\n"); acb_mat_printd(aux, 10);
     
@@ -198,7 +129,7 @@ acb_theta_all_const_sqr(acb_ptr th2, const acb_mat_t tau, slong prec)
     acb_siegel_transform(aux, R, aux, prec);
     
     flint_printf("After reverse real reduction:\n");
-    for (k = 0; k < n; k++)
+    for (k = 0; k < n*n; k++)
     {
 	acb_printd(&th2[k], 10); flint_printf("\n");
     }
@@ -264,6 +195,7 @@ exit:
 	fmpz_mat_clear(D);
 	fmpz_mat_clear(R);
 	acb_mat_clear(aux);
+	_acb_vec_clear(z, g);
 	_acb_vec_clear(roots, n);
 	fmpz_clear(den);
     }

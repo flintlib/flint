@@ -51,21 +51,11 @@ acb_theta_naive_red_z(arb_ptr offset, arf_struct* eps, acb_ptr new_z,
         arb_get_ubound_arf(&eps[k], bound, prec);
 
         /* Round to nearest even integer vector v */
-        for (j = 0; j < g; j++)
-        {
-            if (!arb_is_finite(arb_mat_entry(vec, j, 0))
-                    || arf_cmpabs_ui(arb_midref(arb_mat_entry(vec, j, 0)), WORD_MAX) > 0)
-            {
-                flint_printf("acb_theta_naive_red_z: Error (impossible rounding)\n");
-                fflush(stdout);
-                flint_abort();
-            }
-            arb_mat_scalar_mul_2exp_si(vec, vec, -1);
-            v[j] = 2*arf_get_si(arb_midref(arb_mat_entry(vec, j, 0)),
-                    ARF_RND_NEAR);
-            arb_mat_scalar_mul_2exp_si(vec, vec, 1);
-        }
-        
+	arb_mat_scalar_mul_2exp_si(vec, vec, -1);
+	acb_theta_eld_round(v, vec);
+	for (j = 0; j < g; j++) v[j] *= 2;
+	arb_mat_scalar_mul_2exp_si(vec, vec, 1);
+	
         /* Get r and uniform offset */
         for (j = 0; j < g; j++)
         {

@@ -189,6 +189,8 @@ slong acb_theta_char_dot(ulong a, ulong b, slong g);
 
 slong acb_theta_dot(ulong a, slong* n, slong g);
 
+void acb_theta_vecsqr(acb_ptr th2, acb_srcptr th, slong n, slong prec);
+
 void acb_theta_dupl_const(acb_ptr th2, acb_srcptr th, slong g, slong prec);
 
 void acb_theta_dupl_all_const(acb_ptr th2, acb_srcptr th, slong g, slong prec);
@@ -196,6 +198,8 @@ void acb_theta_dupl_all_const(acb_ptr th2, acb_srcptr th, slong g, slong prec);
 void acb_theta_dupl(acb_ptr th2, acb_srcptr th, slong g, slong prec);
 
 void acb_theta_dupl_all(acb_ptr th2, acb_srcptr th, slong g, slong prec);
+
+void acb_theta_dupl_z(acb_ptr r, acb_srcptr th, slong g, slong prec);
 
 ulong acb_theta_transform_image_char(fmpz_t eps, ulong ab,
 	const fmpz_mat_t mat);
@@ -264,6 +268,8 @@ void acb_theta_eld_clear(acb_theta_eld_t E);
 
 void acb_theta_eld_interval(slong* min, slong* mid, slong* max,
         const arb_t ctr, const arf_t rad, int a, slong prec);
+
+void acb_theta_eld_round(slong* r, const arb_mat_t v);
 
 void acb_theta_eld_fill(acb_theta_eld_t E, const arb_mat_t Y, const arf_t R2,
         arb_srcptr offset, slong* last_coords, ulong a, slong prec);
@@ -485,10 +491,23 @@ void acb_theta_newton_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau,
 
 /* Mixed Newton/naive algorithms */
 
-#define ACB_THETA_MIXED_CMP 500
-#define ACB_THETA_MIXED_SQRT 10
+#define ACB_THETA_NAIVE_CONST_THRESHOLD 500
+#define ACB_THETA_NAIVE_THRESHOLD 500
+#define ACB_THETA_BALANCE_LOWPREC_MUL 10
+#define ACB_THETA_BALANCE_THRESHOLD 4
+#define ACB_THETA_REDUCE_Z 4
+
+void acb_theta_balance(acb_ptr z2, acb_mat_t tau2, fmpz_mat_t mat,
+	acb_srcptr z, const acb_mat_t tau, slong j);
+
+int acb_theta_is_balanced(slong* j0, const acb_mat_t tau, slong prec);
+
+slong acb_theta_balance_lowprec(slong g, slong prec);
 
 void acb_theta_all_const_sqr(acb_ptr th2, const acb_mat_t tau, slong prec);
+
+void acb_theta_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau,
+	slong prec);
 
   
 #ifdef __cplusplus
