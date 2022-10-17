@@ -12,7 +12,7 @@ int main()
     flint_randinit(state);
 
     /* Test: agrees with naive algorithm */
-    for (iter = 0; iter < 10 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 5 * arb_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
         slong nb = 1<<g;
@@ -29,14 +29,7 @@ int main()
         th2_test = _acb_vec_init(nb); 
         
         acb_siegel_randtest_fund(tau, state, prec);
-        
-        flint_printf("g = %wd, prec = %wd, tau:\n", g, prec);
-        acb_mat_printd(tau, 10); flint_printf("\n");
-
-        flint_printf("Naive...\n");
         acb_theta_naive_const(th2_test, tau, prec);
-        flint_printf("Done.\n");
-        
         acb_theta_newton_const_sqr(th2, tau, prec);
         
         res = 1;

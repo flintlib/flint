@@ -45,14 +45,6 @@ int main()
             fflush(stdout);
             flint_abort();
 	}
-
-        flint_printf("Logs: %wd %wd %wd %wd %wd %wd\n",
-                acb_theta_agm_ctx_log_th(ctx),
-                acb_theta_agm_ctx_log_rho(ctx),
-                acb_theta_agm_ctx_log_M(ctx),
-                acb_theta_agm_ctx_log_B1(ctx),
-                acb_theta_agm_ctx_log_B2(ctx),
-                acb_theta_agm_ctx_log_B3(ctx));
       
         acb_mat_clear(tau);
         _acb_vec_clear(z, g);

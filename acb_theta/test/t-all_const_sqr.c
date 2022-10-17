@@ -41,9 +41,6 @@ int main()
 	    }
 	}
 
-	flint_printf("\nNew matrix:\n");
-	acb_mat_printd(tau, 10);
-
 	acb_theta_all_const_sqr(th2, tau, prec);
 	acb_theta_naive_all_const(test, tau, prec);
 	for (k = 0; k < n; k++) acb_sqr(&test[k], &test[k], prec);

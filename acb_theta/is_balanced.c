@@ -19,7 +19,6 @@ acb_theta_is_balanced(slong* j0, const acb_mat_t tau, slong prec)
 	{	    
 	    r = 0;
 	    *j0 = j;
-	    flint_printf("(is_balanced) Found unbalanced at j=%wd\n", *j0);
 	    break;
 	}
     }

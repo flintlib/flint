@@ -199,7 +199,6 @@ agm_ctx_set_roots(acb_theta_agm_ctx_t ctx, slong k, slong prec)
         acb_siegel_transform_ext(Nz, Ntau, acb_theta_agm_ctx_mat(ctx, k),
                 acb_theta_agm_ctx_z(ctx), acb_theta_agm_ctx_tau(ctx), prec);
         nb1 = acb_theta_agm_ext_nb_bad_steps(Nz, Ntau, prec);
-        flint_printf("(set_roots) Initial nb_bad[%wd]: %wd\n", k, nb1);
     }
     else
     {
@@ -229,8 +228,6 @@ agm_ctx_set_roots(acb_theta_agm_ctx_t ctx, slong k, slong prec)
     {
         nb2 = nb2 - 1;
     }
-
-    flint_printf("Matrix number %wd: %wd bad steps\n", k, nb2);
 
     /* Set bad steps and roots */
     acb_theta_agm_ctx_reset_steps(ctx, k, nb2);
@@ -305,13 +302,6 @@ agm_ctx_deform_good(arf_t rad, arf_t min, arf_t max,
     arb_sub(m, abs, eps, prec);
     arb_get_lbound_arf(min, m, prec);
 
-    flint_printf("(agm_ctx_deform_good) value 0:\n");
-    acb_printd(&a[0], 10); flint_printf("\n");
-    flint_printf("(agm_ctx_deform_good) rad, min, max:\n");
-    arf_printd(rad, 10); flint_printf("\n");
-    arf_printd(min, 10); flint_printf("\n");
-    arf_printd(max, 10); flint_printf("\n");
-
     _acb_vec_clear(a, n);
     arb_clear(eps);
     arb_clear(abs);
@@ -358,12 +348,6 @@ agm_ctx_deform_good_ext(arf_t rad, arf_t min, arf_t max,
     arb_min(abs, abs, x, prec);
     arb_get_lbound_arf(rad, abs, prec);
 
-    flint_printf("(agm_ctx_deform_good_ext) value 0:\n");
-    acb_printd(&a[0], 10); flint_printf("\n");
-    acb_printd(&a[n], 10); flint_printf("\n");
-    flint_printf("(agm_ctx_deform_good_ext) rad, eps, mu, Mu, min, max:\n");
-    arf_printd(rad, 10); flint_printf("\n");
-
     /* Compute new min, max for extended and Borchardt parts, and relative
        distance for Borchardt part */
 
@@ -392,10 +376,6 @@ agm_ctx_deform_good_ext(arf_t rad, arf_t min, arf_t max,
     arb_sub_arf(y, y, rad, prec);
     arb_div(x, x, y, prec);
     arb_get_ubound_arf(eps, x, prec);
-
-    arf_printd(eps, 10); flint_printf("\n");
-    arf_printd(mu, 10); flint_printf("\n");
-    arf_printd(Mu, 10); flint_printf("\n");
 
     /* Compute minimal convergence rates on whole disk */
     acb_theta_agm_ext_conv_rate(c1, c2, r, eps, mu, Mu, prec);
@@ -432,9 +412,6 @@ agm_ctx_deform_good_ext(arf_t rad, arf_t min, arf_t max,
     arf_max(max, max, Ms);
     arf_min(min, min, ms);
 
-    arf_printd(min, 10); flint_printf("\n");
-    arf_printd(max, 10); flint_printf("\n");
-    
     _acb_vec_clear(a, 2*n);
     arb_clear(abs);
     arb_clear(x);
@@ -477,8 +454,6 @@ agm_ctx_get_bounds(arf_t rad, arf_t min, arf_t max,
     
     /* Propagate radius back to projectivized theta values */
     acb_theta_agm_radius(rad, mi, Mi, rad, nb_bad, lowprec);
-
-    flint_printf("Matrix number %wd: radius ", k); arf_printd(rad, 10); flint_printf("\n");
     
     /* Propagate radius back to projective theta(tau/2) */
     if (is_ext)
@@ -601,17 +576,10 @@ agm_ctx_get_B3(arf_t B3, const arf_t rho, const arf_t M,
     arb_one(eta);
     arb_mul_2exp_si(eta, eta, FLINT_MIN(- exp - n_clog(dim, 2), - prec/2));
     acb_theta_newton_fd(r, fd, acb_theta_agm_ctx_th(ctx), eta, ctx, prec);
-
-    flint_printf("Finite diff:\n");
-    acb_mat_printd(fd, 10); flint_printf("\n");    
+    
     res = acb_mat_inv(fd, fd, prec);
-
     if (!res) arb_pos_inf(norm);
     else acb_mat_ninf(norm, fd, lowprec);
-    
-    flint_printf("Inv, norm:\n");
-    acb_mat_printd(fd, 10); flint_printf("\n");
-    arb_printd(norm, 10); flint_printf("\n");
       
     /* Is ||FD^-1||*n*B2*eta less than 1? If yes, deduce bound on dF^(-1) */
     arb_mul_arf(bound, norm, B2, lowprec);

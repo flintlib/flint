@@ -101,12 +101,6 @@ acb_theta_newton_eval(acb_ptr r, acb_srcptr th,
         }
     }
 
-    flint_printf("newton_eval result:\n");    
-    for (k = 0; k < acb_theta_agm_ctx_dim(ctx); k++)
-    {
-        acb_printd(&r[k], 10); flint_printf("\n");
-    }
-
     /* Clear */
     if (is_ext)
     {        
