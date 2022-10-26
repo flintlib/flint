@@ -46,6 +46,7 @@ void fmpz_submul_si(fmpz_t f, const fmpz_t g, slong x)
             mpz_ptr pF = COEFF_TO_PTR(F);
             sub_ddmmss(p1, p0, UWORD(0), UWORD(0), p1, p0);
             flint_mpz_add_signed_uiui(pF, pF, p1, p0);
+            _fmpz_demote_val(f);
         }
     }
     else
