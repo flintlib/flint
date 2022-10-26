@@ -45,6 +45,9 @@ main(void)
         fmpz_randtest(b, state, 200);
         fmpz_randtest(c, state, 200);
 
+        if (n_randint(state, 10) == 0)
+            fmpz_addmul(c, a, b);
+
         fmpz_get_mpz(d, a);
         fmpz_get_mpz(e, b);
         fmpz_get_mpz(f, c);
