@@ -14,45 +14,8 @@
 
 int _fmpq_cmp_fmpz(const fmpz_t p, const fmpz_t q, const fmpz_t r)
 {
-    int s1, s2, res;
-    flint_bitcnt_t bp, bq, br, bs;
-    fmpz_t u;
-
-    if (fmpz_is_one(q))
-        return fmpz_cmp(p, r);
-
-    s1 = fmpz_sgn(p);
-    s2 = fmpz_sgn(r);
-
-    if (s1 != s2)
-        return s1 < s2 ? -1 : 1;
-
-    if (s1 == 0)
-        return -s2;
-
-    if (s2 == 0)
-        return -s1;
-
-    bp = fmpz_bits(p);
-    bq = fmpz_bits(q);
-    br = fmpz_bits(r);
-    bs = 1;
-
-    if (bp + bs + 1 < br + bq)
-        return -s1;
-
-    if (bp + bs > br + bq + 1)
-        return s1;
-
-    fmpz_init(u);
-
-    fmpz_mul(u, q, r);
-
-    res = fmpz_cmp(p, u);
-
-    fmpz_clear(u);
-
-    return res;
+    fmpz one = 1;
+    return _fmpq_cmp(p, q, r, &one);
 }
 
 
