@@ -101,9 +101,9 @@ set(HEADERS
 )
 
 foreach (build_dir IN LISTS BUILD_DIRS TEMPLATE_DIRS)
-    file(GLOB TEMP RELATIVE "${CMAKE_SOURCE_DIR}" "${build_dir}/*.c")
+    file(GLOB TEMP RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${build_dir}/*.c")
     list(APPEND SOURCES ${TEMP})
-    file(GLOB TEMP RELATIVE "${CMAKE_SOURCE_DIR}" "${build_dir}/*.h")
+    file(GLOB TEMP RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${build_dir}/*.h")
     list(APPEND HEADERS ${TEMP})
 endforeach ()
 
@@ -112,8 +112,8 @@ execute_process(
 "
 from os.path import join
 
-with open(join('${CMAKE_SOURCE_DIR}','qadic', 'CPimport.txt')) as fin:
-    with open('CPimport.h.in', 'w+') as fout:
+with open(join('${CMAKE_CURRENT_SOURCE_DIR}','qadic', 'CPimport.txt')) as fin:
+    with open(join('${CMAKE_CURRENT_BINARY_DIR}','CPimport.h.in'), 'w+') as fout:
         while True:
             l = fin.readline()
             if not l:
@@ -122,9 +122,9 @@ with open(join('${CMAKE_SOURCE_DIR}','qadic', 'CPimport.txt')) as fin:
             l = l.replace('\\n', ',\\n')
             fout.writelines([l])
 "
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
-configure_file(${CMAKE_BINARY_DIR}/CPimport.h.in ${CMAKE_BINARY_DIR}/CPimport.h COPYONLY)
+configure_file(${CMAKE_CURRENT_BINARY_DIR}/CPimport.h.in ${CMAKE_CURRENT_BINARY_DIR}/CPimport.h COPYONLY)
 
 # Setup for flint-config.h
 check_c_compiler_flag("-mpopcnt" HAS_FLAG_MPOPCNT)
@@ -212,14 +212,14 @@ endif()
 set(TEMP ${HEADERS})
 set(HEADERS )
 foreach(header IN LISTS TEMP)
-    if(EXISTS ${CMAKE_SOURCE_DIR}/${header})
+    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${header})
         list(APPEND HEADERS ${header})
     else()
-        list(APPEND HEADERS ${CMAKE_BINARY_DIR}/${header})  
+        list(APPEND HEADERS ${CMAKE_CURRENT_BINARY_DIR}/${header})  
     endif()
 endforeach()
 
-file(GLOB TEMP "${CMAKE_SOURCE_DIR}/*.h")
+file(GLOB TEMP "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 list(APPEND HEADERS ${TEMP})
 
 add_library(flint ${SOURCES})
@@ -310,9 +310,9 @@ install(FILES ${HEADERS} DESTINATION include/flint)
 
 set_target_properties(flint
     PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin"
 )
 
 if(BUILD_TESTING)
@@ -320,10 +320,10 @@ if(BUILD_TESTING)
     add_library(test_helpers STATIC test_helpers.c)
     target_link_libraries(test_helpers flint)
 
-    foreach (build_dir IN LISTS BUILD_DIRS CMAKE_SOURCE_DIR)
+    foreach (build_dir IN LISTS BUILD_DIRS CMAKE_CURRENT_SOURCE_DIR)
         file(GLOB TEST_FILES "${build_dir}/test/*.c")
         foreach(test_file IN LISTS TEST_FILES)
-            file(RELATIVE_PATH test_name ${CMAKE_SOURCE_DIR} ${test_file})
+            file(RELATIVE_PATH test_name ${CMAKE_CURRENT_SOURCE_DIR} ${test_file})
             string(REPLACE "/" "-" test_name ${test_name})
             get_filename_component(test_name ${test_name} NAME_WE)
             add_executable(${test_name} ${test_file})
@@ -338,9 +338,9 @@ if(BUILD_TESTING)
 
             set_target_properties(${test_name}
                 PROPERTIES
-                ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-                LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-                RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+                ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
+                LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
+                RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin"
             )
         endforeach()
     endforeach ()
@@ -351,10 +351,10 @@ if(BUILD_DOCS)
     find_package(Sphinx REQUIRED)
     file(GLOB DOC_SOURCES doc/source/*.rst)
     add_custom_target(html
-        COMMAND ${SPHINX_EXECUTABLE} -b html "${CMAKE_SOURCE_DIR}/doc/source" "${CMAKE_BINARY_DIR}/html"
+        COMMAND ${SPHINX_EXECUTABLE} -b html "${CMAKE_CURRENT_SOURCE_DIR}/doc/source" "${CMAKE_CURRENT_BINARY_DIR}/html"
         SOURCES ${DOC_SOURCES})  
     add_custom_target(latex
-        COMMAND ${SPHINX_EXECUTABLE} -b latex "${CMAKE_SOURCE_DIR}/doc/source" "${CMAKE_BINARY_DIR}/latex"
+        COMMAND ${SPHINX_EXECUTABLE} -b latex "${CMAKE_CURRENT_SOURCE_DIR}/doc/source" "${CMAKE_CURRENT_BINARY_DIR}/latex"
         SOURCES ${DOC_SOURCES})  
-    add_custom_target(pdf DEPENDS latex COMMAND make WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/latex") 
+    add_custom_target(pdf DEPENDS latex COMMAND make WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/latex") 
 endif()
