@@ -159,29 +159,58 @@ _flint_mpz_addmul_large(mpz_ptr z, mpz_srcptr x, mpz_srcptr y, int negate)
 
 void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 {
-    fmpz c1, c2;
+    fmpz c1, c2, c3;
     __mpz_struct * mf;
 	
     c1 = *g;
-	
-	if (!COEFF_IS_MPZ(c1))  /* g is small */
-	{
-		if (c1 < WORD(0)) fmpz_submul_ui(f, h, -c1);
-		else fmpz_addmul_ui(f, h, c1);
-		return;
-	} 
-
 	c2 = *h;
-   
-	if (!COEFF_IS_MPZ(c2))  /* h is small */
-	{
-		if (c2 < WORD(0)) fmpz_submul_ui(f, g, -c2);
-		else fmpz_addmul_ui(f, g, c2);
-		return;
-	}
+    c3 = *f;
 
-	/* both g and h are large */
-    mf = _fmpz_promote_val(f);
-    _flint_mpz_addmul_large(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2), 0);
-    _fmpz_demote_val(f);  /* cancellation may have occurred	*/
+    /* todo: are the zero checks worth it for small input? */
+
+    if (c1 == 0 || c2 == 0)
+        return;
+
+    if (c3 == 0)
+    {
+        fmpz_mul(f, g, h);
+        return;
+    }
+
+    if (!COEFF_IS_MPZ(c1))  /* g is small */
+    {
+        if (!COEFF_IS_MPZ(c2))  /* both are small */
+        {
+            ulong p1, p0;
+            smul_ppmm(p1, p0, c1, c2);
+
+            if (!COEFF_IS_MPZ(c3))
+            {
+                ulong F1 = FLINT_SIGN_EXT(c3);
+                add_ssaaaa(p1, p0, p1, p0, F1, c3);
+
+                fmpz_set_signed_uiui(f, p1, p0);
+            }
+            else
+            {
+                mpz_ptr pF = COEFF_TO_PTR(c3);
+                flint_mpz_add_signed_uiui(pF, pF, p1, p0);
+                _fmpz_demote_val(f);  /* cancellation may have occurred	*/
+            }
+        }
+        else
+        {
+            fmpz_addmul_si(f, h, c1);
+        }
+    }
+    else if (!COEFF_IS_MPZ(c2))  /* h is small */
+	{
+		fmpz_addmul_si(f, g, c2);
+	}
+    else
+    {
+        mf = _fmpz_promote_val(f);
+        _flint_mpz_addmul_large(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2), 0);
+        _fmpz_demote_val(f);  /* cancellation may have occurred	*/
+    }
 }

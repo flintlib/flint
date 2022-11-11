@@ -22,6 +22,22 @@ _fmpq_cmp_ui(const fmpz_t p, const fmpz_t q, ulong c)
     if (fmpz_is_one(q))
         return fmpz_cmp_ui(p, c);
 
+    if (!COEFF_IS_MPZ(*p) && !COEFF_IS_MPZ(*q) && c <= WORD_MAX)
+    {
+        slong a1, a0, b1, b0;
+
+        a0 = *p;
+        a1 = FLINT_SIGN_EXT(a0);
+        smul_ppmm(b1, b0, *q, c);
+        sub_ddmmss(a1, a0, a1, a0, b1, b0);
+
+        if (a1 < 0)
+            return -1;
+        if (a1 > 0)
+            return 1;
+        return a0 != 0;
+    }
+
     s1 = fmpz_sgn(p);
     s2 = (c > 0);
 

@@ -1,5 +1,7 @@
 /*
     Copyright (C) 2009 William Hart
+    Copyright (C) 2021 Daniel Schultz
+    Copyright (C) 2022 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -14,70 +16,59 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-void
-fmpz_submul_ui(fmpz_t f, const fmpz_t g, ulong x)
+void fmpz_submul_ui(fmpz_t f, const fmpz_t g, ulong x)
 {
-    fmpz c1 = *g, r;
-    if ((x == 0) || (c1 == 0))
-        return;                 /* product is zero */
+    fmpz F, G;
 
-    r = *f;
-    if (r == 0)
+    G = *g;
+    if (x == 0 || G == 0)
+        return;
+
+    F = *f;
+    if (F == 0)
     {
-        fmpz_mul_ui(f, g, x);   /* we are subtracting product from 0 */
+        fmpz_mul_ui(f, g, x);
         fmpz_neg(f, f);
         return;
     }
 
-    if (!COEFF_IS_MPZ(c1))      /* c1 is small */
+    if (!COEFF_IS_MPZ(G))
     {
-        mp_limb_t prod[2];
-        ulong uc1 = FLINT_ABS(c1);
+        ulong p1, p0;
 
-        __mpz_struct * mf;
-        mpz_t temp;
-
-        umul_ppmm(prod[1], prod[0], uc1, x);    /* compute product */
-
-        if (prod[1] == 0)       /* product fits in one limb */
+        if (x <= WORD_MAX)
         {
-            if (c1 < WORD(0))
-                fmpz_add_ui(f, f, prod[0]);
-            else
-                fmpz_sub_ui(f, f, prod[0]);
-            return;
+            smul_ppmm(p1, p0, -G, x);
         }
-        else if ((prod[1] == 1) && (!COEFF_IS_MPZ(r)) && ((r ^ c1) >= WORD(0)))
+        else
         {
-            /*
-               only chance at cancellation is if product is one bit past 
-               a limb and f is small and same sign as this product
-             */
-            ulong ur = FLINT_ABS(r);
-            if (ur > prod[0])   /* cancellation will occur */
+            umul_ppmm(p1, p0, FLINT_ABS(G), x);
+            if (G > 0)
             {
-                fmpz_set_ui(f, prod[0] - ur);
-                if (r > WORD(0))
-                    fmpz_neg(f, f);
-                return;
+                p1 = -p1 - (p0 != 0);
+                p0 = -p0;
             }
         }
 
-        /*
-           in all remaining cases res is either big already, 
-           or will be big in the end
-         */
-        mf = _fmpz_promote_val(f);
-        /* set up a temporary, cheap mpz_t to contain prod */
-        temp->_mp_d = prod;
-        temp->_mp_size = (c1 < WORD(0) ? -2 : 2);
-        mpz_sub(mf, mf, temp);
-        _fmpz_demote_val(f);    /* cancellation may have occurred */
+        if (!COEFF_IS_MPZ(F))
+        {
+            ulong F1 = FLINT_SIGN_EXT(F);
+            add_ssaaaa(p1, p0, p1, p0, F1, F);
+            fmpz_set_signed_uiui(f, p1, p0);
+        }
+        else
+        {
+            mpz_ptr pF = COEFF_TO_PTR(F);
+            flint_mpz_add_signed_uiui(pF, pF, p1, p0);
+            _fmpz_demote_val(f);
+        }
     }
-    else                        /* c1 is large */
+    else
     {
-        __mpz_struct * mf = _fmpz_promote_val(f);
-        flint_mpz_submul_ui(mf, COEFF_TO_PTR(c1), x);
-        _fmpz_demote_val(f);    /* cancellation may have occurred */
+        mpz_ptr pG = COEFF_TO_PTR(G);
+        mpz_ptr pF = _fmpz_promote_val(f);
+
+        flint_mpz_submul_ui(pF, pG, x);
+        _fmpz_demote_val(f);
     }
 }

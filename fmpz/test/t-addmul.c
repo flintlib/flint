@@ -45,6 +45,9 @@ main(void)
         fmpz_randtest(b, state, 200);
         fmpz_randtest(c, state, 200);
 
+        if (n_randint(state, 10) == 0)
+            fmpz_submul(c, a, b);
+
         fmpz_get_mpz(d, a);
         fmpz_get_mpz(e, b);
         fmpz_get_mpz(f, c);
@@ -55,6 +58,14 @@ main(void)
         fmpz_get_mpz(g, c);
 
         result = (mpz_cmp(f, g) == 0);
+
+        if (COEFF_IS_MPZ(*c))
+        {
+            fmpz x = *c;
+            _fmpz_demote_val(c);
+            if (*c != x)
+                result = 0;
+        }
 
         if (!result)
         {
