@@ -15,7 +15,7 @@
 /*
     only E and alphas are shifted by "var"
     so output is in E[0]
-    and first relevent alpha is alphas[0]
+    and first relevant alpha is alphas[0]
 */
 int _fmpz_mpoly_evaluate_rest_fmpz(
     fmpz * E,

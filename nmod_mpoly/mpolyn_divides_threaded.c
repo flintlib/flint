@@ -293,7 +293,7 @@ typedef struct
 typedef divides_heap_base_struct divides_heap_base_t[1];
 
 /*
-    the worker stuct has a big chunk of memory in the stripe_t
+    the worker struct has a big chunk of memory in the stripe_t
     and two polys for work space
 */
 typedef struct _worker_arg_struct

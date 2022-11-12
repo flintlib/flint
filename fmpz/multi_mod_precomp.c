@@ -30,7 +30,7 @@ void _fmpz_multi_mod_precomp(
     TMP_START;
 
     /*
-        Efficiently propogate small inputs without copying:
+        Efficiently propagate small inputs without copying:
         ord[i] = 1 means T[i] should be read from input
     */
     org = TMP_ARRAY_ALLOC(P->localsize, unsigned char);

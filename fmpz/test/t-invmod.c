@@ -16,7 +16,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-/* Use the definiton of GMP versions >= 6.0 */
+/* Use the definition of GMP versions >= 6.0 */
 int
 mpz_invert2(mpz_t a, const mpz_t b, const mpz_t c)
 {

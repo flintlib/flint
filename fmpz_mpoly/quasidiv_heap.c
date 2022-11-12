@@ -64,7 +64,7 @@ slong _fmpz_mpoly_quasidiv_heap1(fmpz_t scale,
     chain = (mpoly_heap_t *) TMP_ALLOC(len3*sizeof(mpoly_heap_t));
     store = store_base = (slong *) TMP_ALLOC(2*len3*sizeof(slong));
 
-    /* space for flagged heap indicies */
+    /* space for flagged heap indices */
     hind = (slong *) TMP_ALLOC(len3*sizeof(slong));
     for (i = 0; i < len3; i++)
         hind[i] = 1;
@@ -78,7 +78,7 @@ slong _fmpz_mpoly_quasidiv_heap1(fmpz_t scale,
     x->next = NULL;
     HEAP_ASSIGN(heap[1], exp2[0], x);
 
-    /* precompute leading cofficient info */
+    /* precompute leading coefficient info */
     fmpz_abs(lc_abs_lg, poly3 + 0);
     if (small)
     {
@@ -113,7 +113,7 @@ slong _fmpz_mpoly_quasidiv_heap1(fmpz_t scale,
 
         if (!lt_divides)
         {
-            /* optimation: coeff arithmetic not needed */
+            /* optimization: coeff arithmetic not needed */
 
             if (mpoly_monomial_gt1(exp3[0], exp, maskhi))
             {
@@ -441,7 +441,7 @@ slong _fmpz_mpoly_quasidiv_heap(fmpz_t scale,
     for (i = 0; i < len3; i++)
         exp_list[i] = exps + i*N;
 
-    /* space for flagged heap indicies */
+    /* space for flagged heap indices */
     hind = (slong *) TMP_ALLOC(len3*sizeof(slong));
     for (i = 0; i < len3; i++)
         hind[i] = 1;
@@ -459,7 +459,7 @@ slong _fmpz_mpoly_quasidiv_heap(fmpz_t scale,
 
     mpoly_monomial_set(heap[1].exp, exp2, N);
 
-    /* precompute leading cofficient info */
+    /* precompute leading coefficient info */
     fmpz_abs(lc_abs_lg, poly3 + 0);
     if (small)
     {
@@ -504,7 +504,7 @@ slong _fmpz_mpoly_quasidiv_heap(fmpz_t scale,
 
         if (!lt_divides)
         {
-            /* optimation: coeff arithmetic not needed */
+            /* optimization: coeff arithmetic not needed */
 
             if (mpoly_monomial_gt(exp3 + 0, exp, N, cmpmask))
             {

@@ -87,7 +87,7 @@ struct ltuple_get_traits<n, Underlying, Operation, Data, Expr,
 };
 
 // Instances of this can be passed to ltuple[ref]() and will be replaced by
-// temporaries of the right type before assigment.
+// temporaries of the right type before assignment.
 struct IGNORED_TYPE { };
 template<class Ltuple, class To, class Enable = void>
 struct ltuple_instantiate_ignored_types;

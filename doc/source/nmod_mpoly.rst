@@ -89,7 +89,7 @@ Memory management
 Input/Output
 --------------------------------------------------------------------------------
 
-    The variable strings in *x* start with the variable of most significance at index `0`. If *x* is ``NULL``, the variables are named ``x1``, ``x2``, ect.
+    The variable strings in *x* start with the variable of most significance at index `0`. If *x* is ``NULL``, the variables are named ``x1``, ``x2``, etc.
 
 .. function:: char * nmod_mpoly_get_str_pretty(const nmod_mpoly_t A, const char ** x, const nmod_mpoly_ctx_t ctx)
 
@@ -216,12 +216,12 @@ Coefficients
 .. function:: ulong nmod_mpoly_get_coeff_ui_monomial(const nmod_mpoly_t A, const nmod_mpoly_t M, const nmod_mpoly_ctx_t ctx)
 
     Assuming that *M* is a monomial, return the coefficient of the corresponding monomial in *A*.
-    This function thows if *M* is not a monomial.
+    This function throws if *M* is not a monomial.
 
 .. function:: void nmod_mpoly_set_coeff_ui_monomial(nmod_mpoly_t A, ulong c, const nmod_mpoly_t M, const nmod_mpoly_ctx_t ctx)
 
     Assuming that *M* is a monomial, set the coefficient of the corresponding monomial in *A* to *c*.
-    This function thows if *M* is not a monomial.
+    This function throws if *M* is not a monomial.
 
 .. function:: ulong nmod_mpoly_get_coeff_ui_fmpz(const nmod_mpoly_t A, fmpz * const * exp, const nmod_mpoly_ctx_t ctx)
               ulong nmod_mpoly_get_coeff_ui_ui(const nmod_mpoly_t A, ulong const * exp, const nmod_mpoly_ctx_t ctx)
@@ -533,8 +533,8 @@ The greatest common divisor functions assume that the modulus is prime.
 
 .. function:: int nmod_mpoly_content_vars(nmod_mpoly_t g, const nmod_mpoly_t A, slong * vars, slong vars_length, const nmod_mpoly_ctx_t ctx)
 
-    Set *g* to the GCD of the cofficients of *A* when viewed as a polynomial in the variables *vars*.
-    Return `1` for success and `0` for failure. Upon succcess, *g* will be independent of the variables *vars*.
+    Set *g* to the GCD of the coefficients of *A* when viewed as a polynomial in the variables *vars*.
+    Return `1` for success and `0` for failure. Upon success, *g* will be independent of the variables *vars*.
 
 .. function:: int nmod_mpoly_gcd(nmod_mpoly_t G, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
 
@@ -584,7 +584,7 @@ Univariate Functions
     with ``nmod_mpoly_t`` coefficients in the remaining variables. These functions
     are useful when one wants to rewrite an element of `\mathbb{Z}/n\mathbb{Z}[x_1, \dots, x_m]`
     as an element of `(\mathbb{Z}/n\mathbb{Z}[x_1, \dots, x_{v-1}, x_{v+1}, \dots, x_m])[x_v]`
-    and vise versa.
+    and vice versa.
 
 .. function:: void nmod_mpoly_univar_init(nmod_mpoly_univar_t A, const nmod_mpoly_ctx_t ctx)
 

@@ -333,7 +333,7 @@ void _reduce_crt_worker(void * arg_ptr)
             u = v[0] + v[1]*p_0 + v[2]*p_0*p_1 + ... + v[crtnum-1]*p_0*...*p_{crtnum-1}
         then evaluate this dot product modulo ctx.n to find u mod ctx.n.
 
-        The lower triangular matrix pmodinv is used for calculting the v[i].
+        The lower triangular matrix pmodinv is used for calculating the v[i].
     */
 
     for (pi = 0; pi < crtnum; pi++)

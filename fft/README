@@ -258,7 +258,7 @@ We need to take care to perform the right pointwise mults because we do not tran
 
 4. Negacyclic convolution
 
-The pointwise multiplications mod p are somtimes large enough to make use of an FFT. For this purpose we use a negacyclic convolution which naturally performs integer multiplication mod p.
+The pointwise multiplications mod p are sometimes large enough to make use of an FFT. For this purpose we use a negacyclic convolution which naturally performs integer multiplication mod p.
 
 If we do this naively we break up into coefficients whose sizes are multiples of half the negacyclic FFT lengths. This becomes inefficient.
 

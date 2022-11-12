@@ -572,7 +572,7 @@ cleanup_less:
 
 
 /*
-    for each factor A in f, assume A satifies _factor_irred requirements:
+    for each factor A in f, assume A satisfies _factor_irred requirements:
         A is primitive w.r.t to any variable appearing in A.
         A is squarefree with positive lead coeff.
 

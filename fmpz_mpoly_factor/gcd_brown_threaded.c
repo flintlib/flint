@@ -656,7 +656,7 @@ static void _finaljoinworker(void * varg)
 
 /*
     Set 1 <= l <= min(n, m) and fractions v + 0, ..., v + l - 1
-    More comments in useage
+    More comments in usage
 
     example operation on input n = 10, m = 16
 

@@ -174,7 +174,7 @@ static int _fq_nmod_mpoly_sqrt_heap(
 
     Qlen = 1;
 
-    /* precompute leading cofficient info */
+    /* precompute leading coefficient info */
     _n_fq_add(t2, Qcoeffs + d*0, Qcoeffs + d*0, d, fqctx->mod);
     _n_fq_inv(lc_inv, t2, fqctx, t);
 

@@ -72,7 +72,7 @@ fmpz_vec
 
 * add test code for numerous mpfr_vec functions and mpfr_poly_mul_classical
 
-* make use of mpfr type througout LLL, mpfr_vec and mpfr_mat modules
+* make use of mpfr type throughout LLL, mpfr_vec and mpfr_mat modules
 
 
 fmpz_factor
@@ -402,5 +402,5 @@ d_mat
 blocks and optimise for sequential reading/writing. It could also handle 
 in-place much more efficiently.
 
-* d_mat_is_reduced doesn't seem to make any guarantees about reducedness, just approximately checks the Lovasz conditions in double arithmetic. I think this is superceded now and can be removed. It is not used anywhere.
+* d_mat_is_reduced doesn't seem to make any guarantees about reducedness, just approximately checks the Lovasz conditions in double arithmetic. I think this is superseded now and can be removed. It is not used anywhere.
 

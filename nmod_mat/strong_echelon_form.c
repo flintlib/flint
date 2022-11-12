@@ -85,7 +85,7 @@ _n_unit(mp_limb_t a, nmod_t N)
     }
 }
 
-/* test wether q*a = b mod N has a solution */
+/* test whether q*a = b mod N has a solution */
 static int
 _n_is_divisible(mp_ptr q, mp_limb_t b, mp_limb_t a, nmod_t N)
 {

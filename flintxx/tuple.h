@@ -241,7 +241,7 @@ struct tuple_get<Tuple, 0>
 // and instead feed it in separately. I.e. if Return is A*, then type
 // will be just <B*, C*, D*>.
 //
-// The static member init(to, from, ret) can be used to initalize the tuple
+// The static member init(to, from, ret) can be used to initialize the tuple
 // of pointers "to" to point to its backing in "from" and "ret".
 template<class Tuple, class Return = void>
 struct back_tuple;

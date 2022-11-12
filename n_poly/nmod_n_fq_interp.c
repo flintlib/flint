@@ -13,7 +13,7 @@
 
 /*
     conversion between polynomials in coefficient form and point-value form
-    and artihmetic in point-value form
+    and arithmetic in point-value form
 */
 
 #define MAC(h, m, l, a, b)                          \

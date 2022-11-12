@@ -1398,7 +1398,7 @@ typedef struct
     slong alloc;  /* alloc of prog */
     slong localsize; /* length of outputs required in nmod_poly_multi_crt_run */
     slong temp1loc; /* index of temporary used in run */
-    slong temp2loc; /* index of another tempory used in run */
+    slong temp2loc; /* index of another temporary used in run */
     int good;   /* the moduli are good for CRT, essentially relatively prime */
 } nmod_poly_multi_crt_struct;
 

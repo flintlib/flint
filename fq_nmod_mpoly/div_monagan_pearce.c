@@ -78,7 +78,7 @@ static int _fq_nmod_mpoly_div_monagan_pearce(
     heap[1].exp = exp_list[exp_next++];
     mpoly_monomial_set(heap[1].exp, Aexps, N);
 
-    /* precompute leading cofficient info */
+    /* precompute leading coefficient info */
     n_fq_inv(lc_minus_inv, Bcoeffs + d*0, fqctx);
     _n_fq_neg(lc_minus_inv, lc_minus_inv, d, fqctx->mod);
 
@@ -191,7 +191,7 @@ static int _fq_nmod_mpoly_div_monagan_pearce(
 
         n_fq_mul(Qcoeffs + d*Qlen, Qcoeffs + d*Qlen, lc_minus_inv, fqctx);
 
-        /* put newly generated quotient term back into the heap if neccesary */
+        /* put newly generated quotient term back into the heap if necessary */
         if (s > 1)
         {
             i = 1;

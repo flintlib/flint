@@ -79,7 +79,7 @@ int nmod_mpolyu_gcdm_zippel_bivar(
     while (1)
     {
         /* TODO:
-            instead of simply increasing the degree everytime, try to find more
+            instead of simply increasing the degree every time, try to find more
             irreducibles of the same degree
         */
         deg++;

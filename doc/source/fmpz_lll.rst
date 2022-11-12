@@ -108,7 +108,7 @@ The various Babai's
     an index which LLL has reached. ``cur_kappa`` is the index behind which
     we can assume ``B`` is LLL reduced, while ``kappa`` is the vector to
     be reduced. This procedure only size reduces the ``kappa``-th row by
-    vectors upto ``cur_kappa``, \textbf{not} ``kappa - 1``.
+    vectors up to ``cur_kappa``, \textbf{not} ``kappa - 1``.
 
 .. function:: int fmpz_lll_advance_check_babai_heuristic_d(int cur_kappa, int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s, d_mat_t appB, int *expo, fmpz_gram_t A, int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
 

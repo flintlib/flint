@@ -66,7 +66,7 @@ static mp_limb_t fft_combine_bits_signed(
 
         /*
             t[0] ... t[limbs] is now the twos complement signed version of a[i]
-            and the shift occures without overflow
+            and the shift occurs without overflow
         */
 
         if (r != 0)

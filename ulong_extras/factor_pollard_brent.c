@@ -45,7 +45,7 @@ n_factor_pollard_brent_single(mp_limb_t *factor, mp_limb_t n, mp_limb_t ninv,
     if (n < 4)
         return 0;
 
-    /* one shifted by normbits, used for comparisions */
+    /* one shifted by normbits, used for comparisons */
     one_shift_norm = UWORD(1) << normbits;
     q = one_shift_norm;
     (*factor) = one_shift_norm;

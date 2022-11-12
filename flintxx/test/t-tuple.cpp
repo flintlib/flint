@@ -239,7 +239,7 @@ test_merge()
     typedef type_n<4, true> E;
 
     // Test that merging tuples <T1, T2, T3> and <U1, U2>
-    // yields something of length n, and that the constitutents can be
+    // yields something of length n, and that the constituents can be
     // recovered. Also do other order.
 #define TEST32n(T1, T2, T3, U1, U2, n) \
     { \

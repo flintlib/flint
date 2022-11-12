@@ -977,7 +977,7 @@ Square root and perfect power testing
     This function returns the integer truncation of the cube root of `n`.
     First approximation is calculated by an algorithm mentioned in this 
     article: https://en.wikipedia.org/wiki/Fast_inverse_square_root .
-    Instead of the inverse sqare root, the cube root is calculated.
+    Instead of the inverse square root, the cube root is calculated.
     This functions uses different algorithms to calculate the cube root,
     depending upon the size of `n`. For numbers greater than `2^{46}`, it uses
     :func:`n_cbrt_chebyshev_approx`. Otherwise, it makes use of the iteration, 

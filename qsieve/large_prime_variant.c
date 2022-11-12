@@ -176,7 +176,7 @@ hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime)
 }
 
 /*
-   add prime to hashtable, increase size of table if neccessary
+   add prime to hashtable, increase size of table if necessary
    and increment count for the added prime
 */
 void qsieve_add_to_hashtable(qs_t qs_inf, mp_limb_t prime)

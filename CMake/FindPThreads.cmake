@@ -1,4 +1,4 @@
-# Try to find the PThreads librairies
+# Try to find the PThreads libraries
 # PThreads_FOUND - system has PThreads lib
 # PThreads_INCLUDE_DIRS - the PThreads include directory
 # PThreads_LIBRARIES - Libraries needed to use PThreads

@@ -1426,7 +1426,7 @@ int main(int argc, char *argv[])
     
     test_submul("1  1/2  0 2", "2  3 1/1  4", "3  1 0 1/4  -2 0 0 1", "5  -4 -3 -1 -1 -1/5  0 -8 0 0 4");
     
-    /* Scalar multiplication and devision ************************************/
+    /* Scalar multiplication and division ************************************/
     
     flint_mpz_init_set_si(mpzzero, 0);
     flint_mpz_init_set_si(mpzone, 1);
