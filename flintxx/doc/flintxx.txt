@@ -4370,7 +4370,7 @@ bool Padic_mat_src::is_empty() const
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Basic assignment
 
-    Overloaded \code{operatior=} can be used for assignment.
+    Overloaded \code{operator=} can be used for assignment.
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 void Padic_mat_target::set_zero()

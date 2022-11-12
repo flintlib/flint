@@ -520,7 +520,7 @@ static void fmpz_mod_mpoly_set_eval_helper3(
 /*
     for each term Y^y*X^x*Z^z * pol(x1,...) in B with j < deg
     set Y^0*X^x*Z^z in H as the monomials with the monomial evals as coeffs
-        merge monomial sets comming from different y's (shouldn't happen)
+        merge monomial sets coming from different y's (shouldn't happen)
 */
 static slong fmpz_mod_mpoly_set_eval_helper_and_zip_form3(
     ulong * deg_,       /* deg_X(B), output */

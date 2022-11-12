@@ -131,7 +131,7 @@ void fmpz_mpoly_consume_fmpz_mpolyd_clear(fmpz_mpoly_t A, fmpz_mpolyd_t B,
     TMP_START;
     exps = (ulong *) TMP_ALLOC(nvars*sizeof(ulong));
 
-    /* clear all irrelevent coefficients */
+    /* clear all irrelevant coefficients */
     for (i = B->coeff_alloc - 1; i >= B->length; i--)
         fmpz_clear(B->coeffs + i);
 

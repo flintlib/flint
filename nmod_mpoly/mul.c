@@ -89,7 +89,7 @@ static int _try_array_DEG(slong Btotaldeg, slong Ctotaldeg,
     if (total_degree <= 0)
         return 0;
 
-    /* the relevent portion of the array has approx size d^nvars/nvars!*/
+    /* the relevant portion of the array has approx size d^nvars/nvars!*/
     dense_size = WORD(1);
     for (i = 0; i < nvars; i++)
     {

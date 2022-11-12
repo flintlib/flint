@@ -289,7 +289,7 @@ FQ_DEFAULT_INLINE void fq_default_ctx_print(const fq_default_ctx_t ctx)
 }
 
 
-/* Memory managment  *********************************************************/
+/* Memory management  *********************************************************/
 
 FQ_DEFAULT_INLINE void fq_default_init(fq_default_t rop,
 		                                    const fq_default_ctx_t ctx)

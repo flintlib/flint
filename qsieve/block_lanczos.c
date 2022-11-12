@@ -555,7 +555,7 @@ void mul_trans_MxN_Nx64(slong dense_rows, slong ncols,
 /*-----------------------------------------------------------------------*/
 static void transpose_vector(slong ncols, uint64_t *v, uint64_t **trans) {
 
-	/* Hideously inefficent routine to transpose a
+	/* Hideously inefficient routine to transpose a
 	   vector v[] of 64-bit words into a 2-D array
 	   trans[][] of 64-bit words */
 

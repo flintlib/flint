@@ -66,7 +66,7 @@ int nmod_mpolyn_divides(
     for (i = 0; i < B->length; i++)
         exp_list[i] = exps + i*N;
 
-    /* space for flagged heap indicies */
+    /* space for flagged heap indices */
     hind = (slong *) TMP_ALLOC(B->length*sizeof(slong));
     for (i = 0; i < B->length; i++)
         hind[i] = 1;
@@ -283,7 +283,7 @@ int _nmod_mpolyn_divides(
     for (i = 0; i < B->length; i++)
         exp_list[i] = exps + i*N;
 
-    /* space for flagged heap indicies */
+    /* space for flagged heap indices */
     hind = (slong *) TMP_ALLOC(B->length*sizeof(slong));
     for (i = 0; i < B->length; i++)
         hind[i] = 1;
@@ -766,7 +766,7 @@ int nmod_mpolyun_divides(
     chain = (mpoly_heap_t *) flint_malloc(Blen*sizeof(mpoly_heap_t));
     store = store_base = (slong *) flint_malloc(2*Blen*sizeof(mpoly_heap_t *));
 
-    /* space for flagged heap indicies */
+    /* space for flagged heap indices */
     hind = (slong *) flint_malloc(Blen*sizeof(slong));
     for (i = 0; i < B->length; i++)
         hind[i] = 1;
@@ -903,7 +903,7 @@ int nmod_mpolyun_divides(
             goto not_exact_division;
         }
 
-        /* put newly generated quotient term back into the heap if neccesary */
+        /* put newly generated quotient term back into the heap if necessary */
         if (s > 1)
         {
             i = 1;

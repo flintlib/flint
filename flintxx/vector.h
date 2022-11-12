@@ -111,7 +111,7 @@ protected:
 namespace vectors {
 // Similar to matrices, the size of a vector expression has to be known in
 // order to allocate temporary objects. In this case, the generic
-// implementation looks for any vector immediate subexpression and returs its
+// implementation looks for any vector immediate subexpression and returns its
 // size. This makes sense since mixing vectors of differing sizes usually makes
 // no sense.
 // Thus specialisation is usually only necessary in constructor-like operations,

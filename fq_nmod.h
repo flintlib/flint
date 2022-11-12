@@ -153,7 +153,7 @@ FQ_NMOD_INLINE void fq_nmod_ctx_print(const fq_nmod_ctx_t ctx)
     fq_nmod_ctx_fprint(stdout, ctx);
 }
 
-/* Memory managment  *********************************************************/
+/* Memory management  *********************************************************/
 
 FQ_NMOD_INLINE void fq_nmod_init(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
 {

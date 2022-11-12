@@ -791,7 +791,7 @@ cleanup_less:
 
 
 /*
-    Assum each factor in f is sep.
+    Assume each factor in f is sep.
     Replace f by an irreducible factorization.
 */
 int fq_nmod_mpoly_factor_irred(

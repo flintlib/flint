@@ -74,7 +74,7 @@ slong _fmpz_mpoly_quasidivrem_heap1(fmpz_t scale, slong * lenr,
     chain = (mpoly_heap_t *) TMP_ALLOC(len3*sizeof(mpoly_heap_t));
     store = store_base = (slong *) TMP_ALLOC(2*len3*sizeof(slong));
 
-    /* space for flagged heap indicies */
+    /* space for flagged heap indices */
     hind = (slong *) TMP_ALLOC(len3*sizeof(slong));
     for (i = 0; i < len3; i++)
         hind[i] = 1;
@@ -88,7 +88,7 @@ slong _fmpz_mpoly_quasidivrem_heap1(fmpz_t scale, slong * lenr,
     x->next = NULL;
     HEAP_ASSIGN(heap[1], exp2[0], x);
 
-    /* precompute leading cofficient info */
+    /* precompute leading coefficient info */
     fmpz_abs(lc_abs_lg, poly3 + 0);
     if (small)
     {
@@ -432,7 +432,7 @@ slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
     for (i = 0; i < len3; i++)
         exp_list[i] = exps + i*N;
 
-    /* space for flagged heap indicies */
+    /* space for flagged heap indices */
     hind = (slong *) TMP_ALLOC(len3*sizeof(slong));
     for (i = 0; i < len3; i++)
         hind[i] = 1;
@@ -450,7 +450,7 @@ slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
 
     mpoly_monomial_set(heap[1].exp, exp2, N);
 
-    /* precompute leading cofficient info */
+    /* precompute leading coefficient info */
     fmpz_abs(lc_abs_lg, poly3 + 0);
     if (small)
     {

@@ -86,7 +86,7 @@ int fmpz_is_perfect_power(fmpz_t root, const fmpz_t f)
  
       int exp = n_is_perfect_power(&r, n);
 
-      /* get higest exponent */
+      /* get highest exponent */
       while (r > 1 && (exp2 = n_is_perfect_power(&r2, r)) != 0)
       {
          exp *= exp2;

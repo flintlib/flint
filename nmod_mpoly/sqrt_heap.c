@@ -201,7 +201,7 @@ static int _nmod_mpoly_sqrt_heap1(
 
     Qlen = 1;
 
-    /* precompute leading cofficient info */
+    /* precompute leading coefficient info */
     lc_minus_inv = mod.n - nmod_inv(nmod_add(Qcoeffs[0], Qcoeffs[0], mod), mod);
 
     if (!mpoly_monomial_halves1(Qexps + 0, Aexps[0], mask))
@@ -444,7 +444,7 @@ static int _nmod_mpoly_sqrt_heap(
 
     Qlen = 1;
 
-    /* precompute leading cofficient info */
+    /* precompute leading coefficient info */
     lc_minus_inv = mod.n - nmod_inv(nmod_add(Qcoeffs[0], Qcoeffs[0], mod), mod);
 
     if (bits <= FLINT_BITS)

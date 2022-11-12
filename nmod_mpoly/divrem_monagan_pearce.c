@@ -167,7 +167,7 @@ static int _nmod_mpoly_divrem_monagan_pearce1(
     chain = (mpoly_heap_t *) TMP_ALLOC(Blen*sizeof(mpoly_heap_t));
     store = store_base = (slong *) TMP_ALLOC(2*Blen*sizeof(slong));
 
-    /* space for flagged heap indicies */
+    /* space for flagged heap indices */
     hind = (slong *) TMP_ALLOC(Blen*sizeof(slong));
     for (i = 0; i < Blen; i++)
         hind[i] = 1;
@@ -188,7 +188,7 @@ static int _nmod_mpoly_divrem_monagan_pearce1(
     x->next = NULL;
     HEAP_ASSIGN(heap[1], Aexps[0], x);
 
-    /* precompute leading cofficient info */
+    /* precompute leading coefficient info */
     lc_minus_inv = fctx.n - nmod_inv(Bcoeffs[0], fctx);
 
     while (heap_len > 1)
@@ -296,7 +296,7 @@ static int _nmod_mpoly_divrem_monagan_pearce1(
 
         Qcoeffs[Qlen] = nmod_mul(acc0, lc_minus_inv, fctx);
 
-        /* put newly generated quotient term back into the heap if neccesary */
+        /* put newly generated quotient term back into the heap if necessary */
         if (s > 1)
         {
             i = 1;
@@ -400,7 +400,7 @@ static int _nmod_mpoly_divrem_monagan_pearce(
     for (i = 0; i < Blen; i++)
         exp_list[i] = exps + i*N;
 
-    /* space for flagged heap indicies */
+    /* space for flagged heap indices */
     hind = (slong *) TMP_ALLOC(Blen*sizeof(slong));
     for (i = 0; i < Blen; i++)
         hind[i] = 1;
@@ -422,7 +422,7 @@ static int _nmod_mpoly_divrem_monagan_pearce(
     heap[1].exp = exp_list[exp_next++];
     mpoly_monomial_set(heap[1].exp, Aexps, N);
 
-    /* precompute leading cofficient info */
+    /* precompute leading coefficient info */
     lc_minus_inv = fctx.n - nmod_inv(Bcoeffs[0], fctx);
    
     while (heap_len > 1)
@@ -545,7 +545,7 @@ static int _nmod_mpoly_divrem_monagan_pearce(
 
         Qcoeffs[Qlen] = nmod_mul(acc0, lc_minus_inv, fctx);
 
-        /* put newly generated quotient term back into the heap if neccesary */
+        /* put newly generated quotient term back into the heap if necessary */
         if (s > 1)
         {
             i = 1;

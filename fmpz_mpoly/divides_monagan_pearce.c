@@ -62,7 +62,7 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
     chain = (mpoly_heap_t *) TMP_ALLOC(len3*sizeof(mpoly_heap_t));
     store = store_base = (slong *) TMP_ALLOC(2*len3*sizeof(slong));
 
-    /* space for flagged heap indicies */
+    /* space for flagged heap indices */
     hind = (slong *) TMP_ALLOC(len3*sizeof(slong));
     for (i = 0; i < len3; i++)
         hind[i] = 1;
@@ -255,7 +255,7 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
         if (!lt_divides || (exp^maskhi) < (maxexp^maskhi))
             goto not_exact_division;
 
-        /* put newly generated quotient term back into the heap if neccesary */
+        /* put newly generated quotient term back into the heap if necessary */
         if (s > 1)
         {
             i = 1;
@@ -352,7 +352,7 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
     for (i = 0; i < len3; i++)
         exp_list[i] = exps + i*N;
 
-    /* space for flagged heap indicies */
+    /* space for flagged heap indices */
     hind = (slong *) TMP_ALLOC(len3*sizeof(slong));
     for (i = 0; i < len3; i++)
         hind[i] = 1;

@@ -340,7 +340,7 @@ int _nmod_mpoly_mul_array_LEX(
     /* compute maximum exponents for each variable */
     mults = (ulong *) TMP_ALLOC(ctx->minfo->nfields*sizeof(ulong));
 
-    /* the field of index n-1 is the one that wil be pulled out */
+    /* the field of index n-1 is the one that will be pulled out */
     i = ctx->minfo->nfields - 1;
     FLINT_ASSERT(fmpz_fits_si(maxBfields + i));
     FLINT_ASSERT(fmpz_fits_si(maxCfields + i));
@@ -804,7 +804,7 @@ int _nmod_mpoly_mul_array_DEG(
     FLINT_ASSERT(1 == mpoly_words_per_exp(C->bits, ctx->minfo));
 
 
-    /* the field of index n-1 is the one that wil be pulled out */
+    /* the field of index n-1 is the one that will be pulled out */
     i = ctx->minfo->nfields - 1;
     FLINT_ASSERT(fmpz_fits_si(maxBfields + i));
     FLINT_ASSERT(fmpz_fits_si(maxCfields + i));

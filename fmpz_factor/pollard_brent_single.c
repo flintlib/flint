@@ -45,7 +45,7 @@ flint_mpn_factor_pollard_brent_single(mp_ptr factor, mp_ptr n, mp_ptr ninv, mp_p
                      mp_limb_t n_size, mp_limb_t normbits, mp_limb_t max_iters)
 {     
     /* n_size >= 2, one limb fmpz_t's are passed on to 
-       n_factor_pollard_brent in outer funtion      */
+       n_factor_pollard_brent in outer function      */
 
     mp_ptr x, q, ys, subval;
     mp_limb_t iter, i, k, minval, m, one_shift_norm, gcdlimbs;
@@ -95,7 +95,7 @@ flint_mpn_factor_pollard_brent_single(mp_ptr factor, mp_ptr n, mp_ptr ninv, mp_p
             }
 
             /* if q is 0, then gcd is n (gcd(0, a) = a). Not passing through
-               flint_mpn_gcd_full due to input paramete restrictions. */
+               flint_mpn_gcd_full due to input parameter restrictions. */
             if (flint_mpn_zero_p(q, n_size) == 0)
                 gcdlimbs = flint_mpn_gcd_full(factor, q, n_size, n, n_size);
             else

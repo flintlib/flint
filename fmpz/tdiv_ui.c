@@ -28,7 +28,7 @@ fmpz_tdiv_ui(const fmpz_t g, ulong h)
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */
     {
-		/* We need the absolut value of the remainder and
+		/* We need the absolute value of the remainder and
 		   C 90 guarantees truncation towards zero. */
 		if (c1 < WORD(0))
 			return -c1 % h;

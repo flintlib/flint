@@ -87,7 +87,7 @@ Memory management
 Input/Output
 --------------------------------------------------------------------------------
 
-    The variable strings in *x* start with the variable of most significance at index `0`. If *x* is ``NULL``, the variables are named ``x1``, ``x2``, ect.
+    The variable strings in *x* start with the variable of most significance at index `0`. If *x* is ``NULL``, the variables are named ``x1``, ``x2``, etc.
 
 .. function:: char * fmpz_mpoly_get_str_pretty(const fmpz_mpoly_t A, const char ** x, const fmpz_mpoly_ctx_t ctx)
 
@@ -231,12 +231,12 @@ Coefficients
 .. function:: void fmpz_mpoly_get_coeff_fmpz_monomial(fmpz_t c, const fmpz_mpoly_t A, const fmpz_mpoly_t M, const fmpz_mpoly_ctx_t ctx)
 
     Assuming that *M* is a monomial, set *c* to the coefficient of the corresponding monomial in *A*.
-    This function thows if *M* is not a monomial.
+    This function throws if *M* is not a monomial.
 
 .. function:: void fmpz_mpoly_set_coeff_fmpz_monomial(fmpz_mpoly_t poly, const fmpz_t c, const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
 
     Assuming that *M* is a monomial, set the coefficient of the corresponding monomial in *A* to *c*.
-    This function thows if *M* is not a monomial.
+    This function throws if *M* is not a monomial.
 
 .. function:: void fmpz_mpoly_get_coeff_fmpz_fmpz(fmpz_t c, const fmpz_mpoly_t A, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
               ulong fmpz_mpoly_get_coeff_ui_fmpz(const fmpz_mpoly_t A, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
@@ -591,8 +591,8 @@ Greatest Common Divisor
 
 .. function:: int fmpz_mpoly_content_vars(fmpz_mpoly_t g, const fmpz_mpoly_t A, slong * vars, slong vars_length, const fmpz_mpoly_ctx_t ctx)
 
-    Set *g* to the GCD of the cofficients of *A* when viewed as a polynomial in the variables *vars*.
-    Return `1` for success and `0` for failure. Upon succcess, *g* will be independent of the variables *vars*.
+    Set *g* to the GCD of the coefficients of *A* when viewed as a polynomial in the variables *vars*.
+    Return `1` for success and `0` for failure. Upon success, *g* will be independent of the variables *vars*.
 
 .. function:: int fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
@@ -648,7 +648,7 @@ Univariate Functions
     with ``fmpz_mpoly_t`` coefficients in the remaining variables. These functions
     are useful when one wants to rewrite an element of `\mathbb{Z}[x_1, \dots, x_m]`
     as an element of `(\mathbb{Z}[x_1, \dots, x_{v-1}, x_{v+1}, \dots, x_m])[x_v]`
-    and vise versa.
+    and vice versa.
 
 .. function:: void fmpz_mpoly_univar_init(fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t ctx)
 

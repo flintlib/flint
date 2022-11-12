@@ -192,7 +192,7 @@ next_alpha:
 
 got_alpha:
 
-	/* ensure degrees do not drop under evalutaion */
+	/* ensure degrees do not drop under evaluation */
     for (i = n - 1; i >= 0; i--)
     {
     	fq_nmod_mpoly_evaluate_one_fq_nmod(Aevals + i, i == n - 1 ? A :

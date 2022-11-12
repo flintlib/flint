@@ -17,7 +17,7 @@
     The return is non zero in this case.
 
     This function is used by {fmpz|nmod}_mpoly_divides_heap_threaded, and
-    must be placed in the fmpz_mpoly module becuase it uses an fmpz_mpoly_t
+    must be placed in the fmpz_mpoly module because it uses an fmpz_mpoly_t
     to accumulate and sort the exponents.
 */
 int mpoly_divides_select_exps(fmpz_mpoly_t S, fmpz_mpoly_ctx_t zctx,

@@ -13,7 +13,7 @@
 #include "fmpz.h"
 
 const char * const manual_tests[] = {
-    /* anyting <= 1 should produce 2 */
+    /* anything <= 1 should produce 2 */
     "1", "2",
     "0", "2",
     "-13842090335966649306", "2",

@@ -22,7 +22,7 @@ main(void)
     flint_printf("factor_split_single....");
     fflush(stdout);
 
-    /* Compute a random spliting polynomial then check factorization */
+    /* Compute a random splitting polynomial then check factorization */
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         int len;

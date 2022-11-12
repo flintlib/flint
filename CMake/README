@@ -1,4 +1,4 @@
-Quick cmake configuring/building/testing instuctions for Unix (Linux/OSX/*BSD)
+Quick cmake configuring/building/testing instructions for Unix (Linux/OSX/*BSD)
 
 Parameters:
 
@@ -22,7 +22,7 @@ main Flint directory, i.e. you would have to
 
     make -j4    # builds Flint in lib/
 
-    # creates a realease build of Flint with NTL support and tests
+    # creates a release build of Flint with NTL support and tests
     cmake -G"Unix Makefiles" -DWITH_NTL=yes -DBUILD_TESTING=yes -DCMAKE_BUILD_TYPE=Release ..
     make -j4    # builds Flint in lib/
     make test   # runs Flint tests  - this takes a while
