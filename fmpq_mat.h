@@ -298,11 +298,11 @@ void fmpq_mat_invert_cols(fmpq_mat_t mat, slong * perm)
 
         if (perm)
         {
-            for (i =0; i < k; i++)
+            for (i = 0; i < k; i++)
             {
                 t = perm[i];
-                perm[i] = perm[c - i];
-                perm[c - i] = t;
+                perm[i] = perm[c - i - 1];
+                perm[c - i - 1] = t;
             }
         }
 
