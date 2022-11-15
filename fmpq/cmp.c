@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2012, 2022 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -17,6 +17,21 @@ _fmpq_cmp(const fmpz_t p, const fmpz_t q, const fmpz_t r, const fmpz_t s)
     int s1, s2, res;
     flint_bitcnt_t bp, bq, br, bs;
     fmpz_t t, u;
+
+    if (!COEFF_IS_MPZ(*p) && !COEFF_IS_MPZ(*q) && !COEFF_IS_MPZ(*r) && !COEFF_IS_MPZ(*s))
+    {
+        slong a1, a0, b1, b0;
+
+        smul_ppmm(a1, a0, *p, *s);
+        smul_ppmm(b1, b0, *q, *r);
+        sub_ddmmss(a1, a0, a1, a0, b1, b0);
+
+        if (a1 < 0)
+            return -1;
+        if (a1 > 0)
+            return 1;
+        return a0 != 0;
+    }
 
     if (fmpz_equal(q, s))
         return fmpz_cmp(p, r);
@@ -44,16 +59,35 @@ _fmpq_cmp(const fmpz_t p, const fmpz_t q, const fmpz_t r, const fmpz_t s)
     if (bp + bs > br + bq + 1)
         return s1;
 
-    fmpz_init(t);
-    fmpz_init(u);
+    if (fmpz_is_one(q))
+    {
+        fmpz_init(t);
+        fmpz_mul(t, p, s);
+        res = fmpz_cmp(t, r);
+        fmpz_clear(t);
+    }
+    else if (fmpz_is_one(s))
+    {
+        fmpz_init(u);
+        fmpz_mul(u, q, r);
 
-    fmpz_mul(t, p, s);
-    fmpz_mul(u, q, r);
+        res = fmpz_cmp(p, u);
 
-    res = fmpz_cmp(t, u);
+        fmpz_clear(u);
+    }
+    else
+    {
+        fmpz_init(t);
+        fmpz_init(u);
 
-    fmpz_clear(t);
-    fmpz_clear(u);
+        fmpz_mul(t, p, s);
+        fmpz_mul(u, q, r);
+
+        res = fmpz_cmp(t, u);
+
+        fmpz_clear(t);
+        fmpz_clear(u);
+    }
 
     return res;
 }

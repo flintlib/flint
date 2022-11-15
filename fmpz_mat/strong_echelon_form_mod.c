@@ -123,7 +123,7 @@ _fmpz_unit(fmpz_t u, fmpz_t a, const fmpz_t N)
     fmpz_clear(k);
 }
 
-/* test wether q*a = b mod N has a solution */
+/* test whether q*a = b mod N has a solution */
 static int
 _fmpz_is_divisible_mod(fmpz_t q, fmpz_t b, fmpz_t a, const fmpz_t N)
 {

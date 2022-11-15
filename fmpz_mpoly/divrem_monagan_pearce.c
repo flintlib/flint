@@ -76,7 +76,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
     chain = (mpoly_heap_t *) TMP_ALLOC(len3*sizeof(mpoly_heap_t));
     store = store_base = (slong *) TMP_ALLOC(2*len3*sizeof(slong));
 
-    /* space for flagged heap indicies */
+    /* space for flagged heap indices */
     hind = (slong *) TMP_ALLOC(len3*sizeof(slong));
     for (i = 0; i < len3; i++)
         hind[i] = 1;
@@ -97,7 +97,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
     x->next = NULL;
     HEAP_ASSIGN(heap[1], exp2[0], x);
 
-    /* precompute leading cofficient info in "small" case */
+    /* precompute leading coefficient info in "small" case */
     if (small)
     {
         lc_abs = FLINT_ABS(poly3[0]);
@@ -303,7 +303,7 @@ large_lt_divides:
             }
         }
 
-        /* put newly generated quotient term back into the heap if neccesary */
+        /* put newly generated quotient term back into the heap if necessary */
         if (s > 1)
         {
             i = 1;
@@ -413,7 +413,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
     for (i = 0; i < len3; i++)
         exp_list[i] = exps + i*N;
 
-    /* space for flagged heap indicies */
+    /* space for flagged heap indices */
     hind = (slong *) TMP_ALLOC(len3*sizeof(slong));
     for (i = 0; i < len3; i++)
         hind[i] = 1;
@@ -436,7 +436,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
     heap[1].exp = exp_list[exp_next++];
     mpoly_monomial_set(heap[1].exp, exp2, N);
 
-    /* precompute leading cofficient info in "small" case */
+    /* precompute leading coefficient info in "small" case */
     if (small)
     {
         lc_abs = FLINT_ABS(poly3[0]);
@@ -673,7 +673,7 @@ large_lt_divides:
             }
         }
 
-        /* put newly generated quotient term back into the heap if neccesary */
+        /* put newly generated quotient term back into the heap if necessary */
         if (s > 1)
         {
             i = 1;

@@ -140,7 +140,7 @@ static int _fmpz_mod_mpoly_sqrt_heap1(
 
     Qlen = 1;
 
-    /* precompute leading cofficient info */
+    /* precompute leading coefficient info */
     fmpz_mod_add(lc_inv, Qcoeffs + 0, Qcoeffs + 0, fctx);
     fmpz_mod_inv(lc_inv, lc_inv, fctx);
 
@@ -421,7 +421,7 @@ FLINT_ASSERT(fmpz_mod_is_canonical(Acoeffs + 0, fctx));
 
     Qlen = 1;
 
-    /* precompute leading cofficient info */
+    /* precompute leading coefficient info */
     fmpz_mod_add(lc_inv, Qcoeffs + 0, Qcoeffs + 0, fctx);
     fmpz_mod_inv(lc_inv, lc_inv, fctx);
 

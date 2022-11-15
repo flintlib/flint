@@ -19,7 +19,7 @@
     set [Astart, Astop) and [Bstart, Bstop) to be the ranges of jobs for
     A and B respectively.
 
-    The code is simpler than this explaination.
+    The code is simpler than this explanation.
 */
 void _thread_pool_distribute_work_2(
     slong start, slong stop,

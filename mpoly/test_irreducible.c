@@ -935,7 +935,7 @@ again:
             goto again;
     }
 
-    /* check indecomposability with a bound on the memory useage */
+    /* check indecomposability with a bound on the memory usage */
     success = convex_hull_is_indecomposable(hull_points, hull_len,
                                    memory_bound, T1, T2, T3, T4, points, dups);
     if (success < 1)

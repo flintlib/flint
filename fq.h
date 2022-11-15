@@ -128,7 +128,7 @@ FQ_INLINE void fq_ctx_print(const fq_ctx_t ctx)
 }
 
 
-/* Memory managment  *********************************************************/
+/* Memory management  *********************************************************/
 
 FQ_INLINE void fq_init(fq_t rop, const fq_ctx_t ctx)
 {

@@ -40,7 +40,7 @@ Scalar Multiplication
 
     Set `(A, len)` to `(A, len) + (B, len)*c`.
 
-.. function:: void _fmpz_mod_vec_scalar_mul_fmpz_mod(fmpz * A, const fmpz * B, slong len, const fmpz_t c, const fmpz_mod_ctx_t ctx)
+.. function:: void _fmpz_mod_vec_scalar_div_fmpz_mod(fmpz * A, const fmpz * B, slong len, const fmpz_t c, const fmpz_mod_ctx_t ctx)
 
     Set `(A, len)` to `(B, len)/c` assuming `c` is nonzero.
 
@@ -48,11 +48,11 @@ Scalar Multiplication
 Dot Product
 --------------------------------------------------------------------------------
 
-.. function:: void _fmpz_vec_dot(fmpz_t d, const fmpz * A, const fmpz * B, slong len, const fmpz_mod_ctx_t ctx)
+.. function:: void _fmpz_mod_vec_dot(fmpz_t d, const fmpz * A, const fmpz * B, slong len, const fmpz_mod_ctx_t ctx)
 
     Set `d` to the dot product of `(A, len)` with `(B, len)`.
 
-.. function:: void _fmpz_vec_dot_rev(fmpz_t d, const fmpz * A, const fmpz * B, slong len, const fmpz_mod_ctx_t ctx)
+.. function:: void _fmpz_mod_vec_dot_rev(fmpz_t d, const fmpz * A, const fmpz * B, slong len, const fmpz_mod_ctx_t ctx)
 
     Set `d` to the dot product of `(A, len)` with the reverse of the vector `(B, len)`.
 

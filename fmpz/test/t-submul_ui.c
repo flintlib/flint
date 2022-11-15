@@ -53,6 +53,15 @@ main(void)
         fmpz_get_mpz(f, b);
 
         result = (mpz_cmp(e, f) == 0);
+
+        if (COEFF_IS_MPZ(*b))
+        {
+            fmpz c = *b;
+            _fmpz_demote_val(b);
+            if (*b != c)
+                result = 0;
+        }
+
         if (!result)
         {
             flint_printf("FAIL:\n");

@@ -666,7 +666,7 @@ void _fmpz_mpoly_mul_heap_threaded(
     }
 
     base->nthreads = num_handles + 1;
-    base->ndivs = base->nthreads*4;  /* number of divisons */
+    base->ndivs = base->nthreads*4;  /* number of divisions */
     base->Bcoeff = Bcoeff;
     base->Bexp = Bexp;
     base->Blen = Blen;

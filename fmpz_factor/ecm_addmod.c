@@ -16,7 +16,7 @@
 
 /* a = (b + c) mod n 
 
-    Not a normal add mod function, assumes n is normalized (higest bit set)
+    Not a normal add mod function, assumes n is normalized (highest bit set)
     and b and c are reduced modulo n
 
 */

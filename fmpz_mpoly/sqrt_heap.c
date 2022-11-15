@@ -87,7 +87,7 @@ cleanup:
    is nonzero. Implements "Heap based multivariate square root" by William
    Hart. Square root is from left to right with a
    heap with largest exponent at the head. Output poly is written in order.
-   A never explictly goes into the heap and is only scanned once.
+   A never explicitly goes into the heap and is only scanned once.
    TODO: copy this strategy for the "small" case (i.e. no fmpz arithmetic)
          to the other fmpz mpoly mul/div functions.
 */

@@ -231,7 +231,7 @@ tdetail::fill_tmps_helper<Expr> temporaries_filler(const Expr& e)
 }
 
 
-// A helper to "evaluate" a single term, independend of whether or not it is
+// A helper to "evaluate" a single term, independent of whether or not it is
 // actually an expression template
 template<class T, class Enable = void>
 struct evaluation_helper

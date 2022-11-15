@@ -157,7 +157,7 @@ typedef nmod_mpolyun_struct nmod_mpolyun_t[1];
 
 /*
     nmod_mpolyd_t
-    A dense mpoly is stored as a flat array of coeffcients.
+    A dense mpoly is stored as a flat array of coefficients.
     Suppose deg_bounds = {r0, r1, r2}. The coefficient of the monomial with 
     exponents {e0, e1, e2} is stored at the coefficient of index
         e2 + r2*(e1 + r1*(e0 + r0*0))    

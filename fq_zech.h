@@ -121,7 +121,7 @@ fq_zech_ctx_print(const fq_zech_ctx_t ctx)
     fq_zech_ctx_fprint(stdout, ctx);
 }
 
-/* Memory managment  *********************************************************/
+/* Memory management  *********************************************************/
 
 FQ_ZECH_INLINE void
 fq_zech_init(fq_zech_t rop, const fq_zech_ctx_t ctx)

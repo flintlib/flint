@@ -55,7 +55,7 @@ static slong _fq_zech_mpoly_divides_monagan_pearce(
     for (i = 0; i < len3; i++)
         exp_list[i] = exps + i*N;
 
-    /* space for flagged heap indicies */
+    /* space for flagged heap indices */
     hind = (slong *) TMP_ALLOC(len3*sizeof(slong));
     for (i = 0; i < len3; i++)
         hind[i] = 1;
@@ -77,7 +77,7 @@ static slong _fq_zech_mpoly_divides_monagan_pearce(
     heap[1].exp = exp_list[exp_next++];
     mpoly_monomial_set(heap[1].exp, exp2, N);
 
-    /* precompute leading cofficient info */
+    /* precompute leading coefficient info */
     fq_zech_inv(lc_minus_inv, coeff3 + 0, fqctx);
     fq_zech_neg(lc_minus_inv, lc_minus_inv, fqctx);
 

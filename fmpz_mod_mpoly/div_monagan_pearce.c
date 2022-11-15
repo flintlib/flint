@@ -58,7 +58,7 @@ static int _fmpz_mod_mpoly_div_monagan_pearce(
     for (i = 0; i < Blen; i++)
         exp_list[i] = exps + i*N;
 
-    /* space for flagged heap indicies */
+    /* space for flagged heap indices */
     hind = (slong *) TMP_ALLOC(Blen*sizeof(slong));
     for (i = 0; i < Blen; i++)
         hind[i] = 1;
@@ -79,7 +79,7 @@ static int _fmpz_mod_mpoly_div_monagan_pearce(
     heap[1].exp = exp_list[exp_next++];
     mpoly_monomial_set(heap[1].exp, Aexps, N);
 
-    /* precompute leading cofficient info */
+    /* precompute leading coefficient info */
     fmpz_mod_inv(lc_inv, Bcoeffs + 0, fctx);
    
     while (heap_len > 1)
@@ -108,7 +108,7 @@ static int _fmpz_mod_mpoly_div_monagan_pearce(
 
         if (!lt_divides)
         {
-            /* optimation: coeff arithmetic not needed */
+            /* optimization: coeff arithmetic not needed */
 
             if (mpoly_monomial_gt(Bexps + 0, exp, N, cmpmask))
             {
@@ -224,7 +224,7 @@ static int _fmpz_mod_mpoly_div_monagan_pearce(
 
         fmpz_mod_mul(Qcoeffs + q_len, acc, lc_inv, fctx);
 
-        /* put newly generated quotient term back into the heap if neccesary */
+        /* put newly generated quotient term back into the heap if necessary */
         if (s > 1)
         {
             i = 1;

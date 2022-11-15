@@ -591,7 +591,7 @@ Greatest Common Divisor
 
 .. function:: int fmpz_mpoly_content_vars(fmpz_mpoly_t g, const fmpz_mpoly_t A, slong * vars, slong vars_length, const fmpz_mpoly_ctx_t ctx)
 
-    Set *g* to the GCD of the cofficients of *A* when viewed as a polynomial in the variables *vars*.
+    Set *g* to the GCD of the coefficients of *A* when viewed as a polynomial in the variables *vars*.
     Return `1` for success and `0` for failure. Upon success, *g* will be independent of the variables *vars*.
 
 .. function:: int fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)

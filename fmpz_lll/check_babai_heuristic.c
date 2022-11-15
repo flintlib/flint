@@ -59,7 +59,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                          (mpf_mat_entry(A->appSP2, kappa, j),
                           appB->rows[kappa], appB->rows[j], n, prec)))
                     {
-/* In this case a heuristic told us that some cancelation probably happened so we just compute the scalar product at full precision */
+/* In this case a heuristic told us that some cancellation probably happened so we just compute the scalar product at full precision */
                         _fmpz_vec_dot(ztmp, B->rows[kappa], B->rows[j], n);
                         fmpz_get_mpf(mpf_mat_entry(A->appSP2, kappa, j), ztmp);
                     }

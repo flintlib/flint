@@ -55,7 +55,7 @@ n_factor_ecm_stage_II(mp_limb_t *f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
     for (j = 2; j <= (maxj >> 1); j += 1)
     {
         /* jQ0 = (j - 2)Q0 + 2Q0 
-           Differnce is (j - 4)Q0 */
+           Difference is (j - 4)Q0 */
 
         n_factor_ecm_add(arrx + j, arrz + j, arrx[j - 1], arrz[j - 1], Q0x2,
                          Q0z2, arrx[j - 2], arrz[j - 2], n, n_ecm_inf);

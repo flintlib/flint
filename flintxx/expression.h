@@ -340,7 +340,7 @@ struct derived_wrapper
 };
 
 // If your expression template is of the form
-//   template<class Extra, class Opeartion, class Data>
+//   template<class Extra, class Operation, class Data>
 //   class my_expression2 ...
 // where Extra is some extra information which should be passed on unchanged,
 // then derived_wrapper2<my_expression2, Extra> is a valid argument for Derived

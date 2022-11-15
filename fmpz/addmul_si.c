@@ -44,6 +44,7 @@ void fmpz_addmul_si(fmpz_t f, const fmpz_t g, slong x)
         {
             mpz_ptr pF = COEFF_TO_PTR(F);
             flint_mpz_add_signed_uiui(pF, pF, p1, p0);
+            _fmpz_demote_val(f);
         }
     }
     else

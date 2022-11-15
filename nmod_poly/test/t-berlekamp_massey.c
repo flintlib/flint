@@ -95,7 +95,7 @@ main(void)
             }
 
             /*
-                Check berlekamp-massey does its job - 2k coeffcients of
+                Check berlekamp-massey does its job - 2k coefficients of
 
                     u     a1    a2          a(2k)
                    --- = --- + --- + ... + ------ + ...

@@ -1316,7 +1316,7 @@ try_zas:
     if (success)
         goto cleanup;
 
-    /* first attemp failed, try subsets of size 1 or 2 from now on */
+    /* first attempt failed, try subsets of size 1 or 2 from now on */
     zas_limit = 2;
 
 more:

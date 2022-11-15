@@ -36,7 +36,7 @@ _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, slong len, flint_bitcnt_t bits)
         {
             if (current_bit > boundary_limit_bit)
             {
-                /* the coefficient will be added accross a limb boundary */
+                /* the coefficient will be added across a limb boundary */
                 temp_lower = (poly[i] << current_bit);
                 temp_upper = (poly[i] >> (FLINT_BITS - current_bit));
 
@@ -82,7 +82,7 @@ _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, slong len, flint_bitcnt_t bits)
     {
         for (i = 0; i < len; i++)
         {
-            /* the coefficient will be added accross a limb boundary */
+            /* the coefficient will be added across a limb boundary */
             temp_lower = poly[i] << current_bit;
             temp_upper = r_shift(poly[i], FLINT_BITS - current_bit);
 

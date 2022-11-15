@@ -422,7 +422,7 @@ int nmod_mpolyuu_divides(
     chain = (mpoly_heap_t *) TMP_ALLOC(Blen*sizeof(mpoly_heap_t));
     store = store_base = (slong *) TMP_ALLOC(2*Blen*sizeof(slong));
 
-    /* space for flagged heap indicies */
+    /* space for flagged heap indices */
     hind = (slong *) TMP_ALLOC(Blen*sizeof(slong));
     for (i = 0; i < B->length; i++)
         hind[i] = 1;
@@ -575,7 +575,7 @@ int nmod_mpolyuu_divides(
             goto not_exact_division;
         }
 
-        /* put newly generated quotient term back into the heap if neccesary */
+        /* put newly generated quotient term back into the heap if necessary */
         if (s > 1)
         {
             i = 1;

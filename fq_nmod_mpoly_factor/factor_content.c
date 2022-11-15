@@ -17,7 +17,7 @@
 
     return:
         1: split a = f*g
-        0: a is primitve wrt all variables (f & g undefined)
+        0: a is primitive wrt all variables (f & g undefined)
        -1: failed
 */
 static int _split(
