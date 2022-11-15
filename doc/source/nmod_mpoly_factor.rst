@@ -35,7 +35,7 @@ Basic manipulation
 
 .. function:: void nmod_mpoly_factor_swap(nmod_mpoly_factor_t f, nmod_mpoly_factor_t g, const nmod_mpoly_ctx_t ctx)
 
-    Efficiently swap *f* and `*g*`.
+    Efficiently swap *f* and *g*.
 
 .. function:: slong nmod_mpoly_factor_length(const nmod_mpoly_factor_t f, const nmod_mpoly_ctx_t ctx)
 
@@ -71,7 +71,7 @@ Factorisation
 
     Set *f* to a factorization of *A* where the bases are primitive and
     pairwise relatively prime. If the product of all irreducible factors with
-    a given exponent is desired, it is recommend to call :func:`nmod_mpoly_factor_sort`
+    a given exponent is desired, it is recommended to call :func:`nmod_mpoly_factor_sort`
     and then multiply the bases with the desired exponent.
 
 .. function:: int nmod_mpoly_factor(nmod_mpoly_factor_t f, const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)

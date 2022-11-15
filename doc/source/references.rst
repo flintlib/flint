@@ -1,7 +1,7 @@
 References
 ------------
 
-.. [AbbottBronsteinMulders1999] Fast deterministic computation of determinants of dense matrices ACM International Symposium on Symbolic and Algebraic Computation 1999
+.. [AbbottBronsteinMulders1999] Fast deterministic computation of determinants of dense matrices, ACM International Symposium on Symbolic and Algebraic Computation (1999)
 
 .. [Apostol1997] Apostol, Tom : Modular functions and Dirichlet series in number theory, Springer (1997)
 
@@ -10,13 +10,13 @@ References
 .. [BaiWag1980] Robert Baillie; Samuel S. Wagstaff, Jr. (October 1980). "Lucas Pseudoprimes". Mathematics of Computation. 35 (152): 1391–1417. 
 
 .. [BerTas2010] D. Berend and T. Tassa : Improved bounds on Bell numbers and on moments of sums of random variables, Probability and Mathematical Statistics vol. 30 (2010) 185--205
-.. [Bodrato2010] Bodrato, Marco A Strassen-like Matrix Multiplication Suited for Squaring and Higher Power Computation. Proceedings of the ISSAC 2010 München, Germany, 25-28 July, 2010
+.. [Bodrato2010] Bodrato, Marco : A Strassen-like Matrix Multiplication Suited for Squaring and Higher Power Computation. Proceedings of the ISSAC 2010 München, Germany, 25-28 July, 2010
 
 .. [BrentKung1978] Brent, R. P. and Kung, H. T. : Fast Algorithms for Manipulating Formal Power Series, J. ACM 25:4 (1978) 581--595
 
 .. [BuhlerCrandallSompolski1992] Buhler, J.P. and Crandall, R.E. and Sompolski, R.W. : Irregular primes to one million : Math. Comp. 59:2000 (1992) 717--722
 
-.. [Chen2003] Zhuo Chen and John Greene : Some Comments on {Baillie--PSW} Pseudoprimes, The Fibonacci Quaterly 41:4 (2003) 334--344
+.. [Chen2003] Zhuo Chen and John Greene : Some Comments on Baillie--PSW Pseudoprimes, The Fibonacci Quarterly 41:4 (2003) 334--344
 
 .. [Coh1996] Cohen, Henri : A course in computational algebraic number theory, Springer, 1996 
 
@@ -24,11 +24,11 @@ References
 
 .. [CraPom2005] Richard Crandall and Carl Pomerance: Prime numbers: a computational perspective. 2005.
 
-.. [DelegliseNicolasZimmermann2009] Deleglise, Marc and Niclas, Jean-Louis and Zimmermann, Paul : Landau's function for one million billions, J. Th\'eor. Nombres Bordeaux 20:3 (2009) 625--671
+.. [DelegliseNicolasZimmermann2009] Deleglise, Marc and Niclas, Jean-Louis and Zimmermann, Paul : Landau's function for one million billions, J. Théor. Nombres Bordeaux 20:3 (2009) 625--671
 
 .. [DomKanTro1987] Domich, P. D. and Kannan, R. and Trotter, L. E. Jr. : Hermite Normal Form Computation Using Modulo Determinant Arithmetic, Math. Operations Res. (12) 1987 50-59
 
-.. [Dus1999] P. Dusart, "The kth prime is greater than k(ln k+ln ln k-1) for k> 2," Math. Comp., 68:225 (January 1999) 411--415.
+.. [Dus1999] P. Dusart, "The `k^{th}` prime is greater than `k(\ln k+\ln \ln k-1)` for `k \ge 2`," Math. Comp., 68:225 (January 1999) 411--415.
 
 .. [FieHof2014] Fieker C. and Hofmann T.: "Computing in quotients of rings of integers" LMS Journal of Computation and Mathematics, 17(A), 349-365
 
@@ -64,17 +64,17 @@ References
 
 .. [SorWeb2016] Sorenson, Jonathan and Webster, Jonathan : Strong pseudoprimes to twelve prime bases. Math. Comp. 86 (2017), 985-1003, https://doi.org/10.1090/mcom/3134 
 
-.. [Stehle2010] Stehl\'e, Damien : Floating-Point LLL: Theoretical and Practical Aspects, in Nguyen, Phong Q. and Vall\'ee, Brigitte : The LLL Algorithm: Survey and Applications (2010) 179--213
+.. [Stehle2010] Stehlé, Damien : Floating-Point LLL: Theoretical and Practical Aspects, in Nguyen, Phong Q. and Vallée, Brigitte : The LLL Algorithm: Survey and Applications (2010) 179--213
 
 .. [Stein2007] Stein, William A.: Modular forms, a computational approach. American Mathematical Society. 2007
 
 .. [StoMul1998] Storjohann, Arne and Mulders, Thom : Fast algorithms for linear algebra modulo :math:`N` : Algorithms---{ESA} '98 (Venice), Lecture Notes in Comput. Sci. 1461 139--150
 
-.. [ThullYap1990] Thull, K. and Yap, C. : A Unified Approach to {HGCD} Algorithms for Polynomials and Integers, (1990)
+.. [ThullYap1990] Thull, K. and Yap, C. : A Unified Approach to HGCD Algorithms for Polynomials and Integers, (1990)
 
 .. [Villard2007] Villard, Gilles :  Certification of the QR Factor R and of Lattice Basis Reducedness, In proceedings of ACM International Symposium on Symbolic and Algebraic Computation (2007) 361--368 ACM Press. 
 
-.. [WaktinsZeitlin1993] Watkins, W. and Zeitlin, J. : The minimal polynomial of $\cos(2\pi/n)$ The American Mathematical Monthly 100:5 (1993) 471--474
+.. [WaktinsZeitlin1993] Watkins, W. and Zeitlin, J. : The minimal polynomial of `\cos(2\pi/n)` The American Mathematical Monthly 100:5 (1993) 471--474
 
 .. [Whiteman1956] Whiteman, A. L. : A sum connected with the series for the partition function, Pacific Journal of Mathematics 6:1 (1956) 159--176
 

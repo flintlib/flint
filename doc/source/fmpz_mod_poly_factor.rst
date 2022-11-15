@@ -38,7 +38,7 @@ Factorisation
 
     Ensures that the factor structure has space for at
     least ``len`` factors.  This function takes care
-    of the case of repeated calls by always, at least
+    of the case of repeated calls by always at least
     doubling the number of factors the structure can hold.
 
 .. function:: void fmpz_mod_poly_factor_set(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_factor_t fac, const fmpz_mod_ctx_t ctx)
@@ -86,11 +86,11 @@ Factorisation
 
 .. function:: int fmpz_mod_poly_is_irreducible_rabin_f(fmpz_t r, const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx)
 
-    Either sets `r` to `1` and return 1 if the polynomial ``f`` is 
-    irreducible or `0` otherwise, or set `r` to a nontrivial factor of
+    Either sets `r` to `1` and returns 1 if the polynomial ``f`` is 
+    irreducible or `0` otherwise, or sets `r` to a nontrivial factor of
     `p`.
 
-    This algorithm correctly determines whether `f` to is irreducible over 
+    This algorithm correctly determines whether `f` is irreducible over 
     `\mathbb{Z}/p\mathbb{Z}`, even for composite `f`, or it finds a factor
     of `p`.
 
@@ -135,7 +135,7 @@ Factorisation
 .. function:: void fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_t poly, slong * const *degs, const fmpz_mod_ctx_t ctx)
 
     Factorises a monic non-constant squarefree polynomial ``poly``
-    of degree n into factors `f[d]` such that for `1 \leq d \leq n`
+    of degree `n` into factors `f[d]` such that for `1 \leq d \leq n`
     `f[d]` is the product of the monic irreducible factors of ``poly``
     of degree `d`. Factors `f[d]` are stored in ``res``, and the degree `d`
     of the irreducible factors is stored in ``degs`` in the same order
@@ -190,14 +190,14 @@ Root Finding
 
     Fill `r` with factors of the form `x - r_i` where the `r_i` are the distinct roots of a nonzero `f` in `Z/pZ`.
     It is expected and not checked that the modulus of `ctx` is prime.
-    If `with_multiplicity` is zero, the exponent `e_i` of the factor `x - r_i` is `1`. Otherwise, it is the largest `e_i` such that `(x-r_i)^e_i` divides `f`.
+    If `with\_multiplicity` is zero, the exponent `e_i` of the factor `x - r_i` is `1`. Otherwise, it is the largest `e_i` such that `(x-r_i)^e_i` divides `f`.
     This function throws if `f` is zero, but is otherwise always successful.
 
 .. function:: int fmpz_mod_poly_roots_factored(fmpz_mod_poly_factor_t r, const fmpz_mod_poly_t f, int with_multiplicity, const fmpz_factor_t n, const fmpz_mod_ctx_t ctx)
 
     Fill `r` with factors of the form `x - r_i` where the `r_i` are the distinct roots of a nonzero `f` in `Z/nZ`.
     It is expected and not checked that `n` is a prime factorization of the modulus of `ctx`.
-    If `with_multiplicity` is zero, the exponent `e_i` of the factor `x - r_i` is `1`. Otherwise, it is the largest `e_i` such that `(x-r_i)^e_i` divides `f`.
+    If `with\_multiplicity` is zero, the exponent `e_i` of the factor `x - r_i` is `1`. Otherwise, it is the largest `e_i` such that `(x-r_i)^e_i` divides `f`.
     The roots are first found modulo the primes in `n`, then lifted to the corresponding prime powers, then combined into roots of the original polynomial `f`.
     A return of `1` indicates the function was successful. A return of `0` indicates the function was not able to find the roots, possibly because there are too many of them.
     This function throws if `f` is zero.

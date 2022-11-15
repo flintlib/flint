@@ -8,20 +8,20 @@ Auxiliary asm macros
 --------------------------------------------------------------------------------
 
 
-.. macro:: umul_ppmm(high_prod, low_prod, multipler, multiplicand)
+.. macro:: umul_ppmm(high_prod, low_prod, multiplier, multiplicand)
 
-    Multiplies two single limb integers ``MULTIPLER`` and 
+    Multiplies two single limb integers ``MULTIPLIER`` and 
     ``MULTIPLICAND``, and generates a two limb product in 
     ``HIGH_PROD`` and ``LOW_PROD``.
 
-.. macro:: smul_ppmm(high_prod, low_prod, multipler, multiplicand)
+.. macro:: smul_ppmm(high_prod, low_prod, multiplier, multiplicand)
 
     As for ``umul_ppmm()`` but the numbers are signed.
 
 .. macro:: udiv_qrnnd(quotient, remainder, high_numerator, low_numerator, denominator)
 
     Divides an unsigned integer, composed by the limb integers 
-    ``HIGH_NUMERATOR`` and\\ ``LOW_NUMERATOR``, by ``DENOMINATOR`` 
+    ``HIGH_NUMERATOR`` and ``LOW_NUMERATOR``, by ``DENOMINATOR`` 
     and places the quotient in ``QUOTIENT`` and the remainder in 
     ``REMAINDER``.  ``HIGH_NUMERATOR`` must be less than 
     ``DENOMINATOR`` for correct operation. 
@@ -47,9 +47,9 @@ Auxiliary asm macros
 .. macro:: add_ssaaaa(high_sum, low_sum, high_addend_1, low_addend_1, high_addend_2, low_addend_2)
 
     Adds two limb integers, composed by ``HIGH_ADDEND_1`` and 
-    ``LOW_ADDEND_1``, and\\ ``HIGH_ADDEND_2`` and ``LOW_ADDEND_2``, 
+    ``LOW_ADDEND_1``, and ``HIGH_ADDEND_2`` and ``LOW_ADDEND_2``, 
     respectively.  The result is placed in ``HIGH_SUM`` and 
-    ``LOW_SUM``.  Overflow, i.e.\ carry out, is not stored anywhere, 
+    ``LOW_SUM``.  Overflow, i.e. carry out, is not stored anywhere, 
     and is lost.
 
 .. macro:: add_sssaaaaaa(high_sum, mid_sum, low_sum, high_addend_1, mid_addend_1, low_addend_1, high_addend_2, mid_addend_2, low_addend_2)
@@ -60,8 +60,8 @@ Auxiliary asm macros
 
     Subtracts two limb integers, composed by ``HIGH_MINUEND_1`` and 
     ``LOW_MINUEND_1``, and ``HIGH_SUBTRAHEND_2`` and 
-    ``LOW_SUBTRAHEND_2``, respectively.  The result is placed in\\ 
-    ``HIGH_DIFFERENCE`` and ``LOW_DIFFERENCE``.  Overflow, i.e.\ 
+    ``LOW_SUBTRAHEND_2``, respectively.  The result is placed in 
+    ``HIGH_DIFFERENCE`` and ``LOW_DIFFERENCE``.  Overflow, i.e. 
     carry out is not stored anywhere, and is lost.
 
 .. macro:: sub_dddmmmsss(high_diff, mid_diff, low_diff, high_minuend_1, mid_minuend_1, low_minuend_1, high_subtrahend_2, mid_subtrahend_2, low_subtrahend_2)

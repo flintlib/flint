@@ -217,11 +217,11 @@ Concatenate
 
 .. function:: void fmpq_mat_concat_vertical(fmpq_mat_t res, const fmpq_mat_t mat1, const fmpq_mat_t mat2)
 
-    Sets ``res`` to vertical concatenation of (``mat1``, ``mat2``) in that order. Matrix dimensions : ``mat1`` : `m \times n`, ``mat2`` : `k \times n`, ``res`` : `(m + k) \times n`.
+    Sets ``res`` to vertical concatenation of (``mat1``, ``mat2``) in that order. Matrix dimensions: ``mat1``: `m \times n`, ``mat2``: `k \times n`, ``res``: `(m + k) \times n`.
 
 .. function:: void fmpq_mat_concat_horizontal(fmpq_mat_t res, const fmpq_mat_t mat1, const fmpq_mat_t mat2)
 
-    Sets ``res`` to horizontal concatenation of (``mat1``, ``mat2``) in that order. Matrix dimensions : ``mat1`` : `m \times n`, ``mat2`` : `m \times k`, ``res``  : `m \times (n + k)`.
+    Sets ``res`` to horizontal concatenation of (``mat1``, ``mat2``) in that order. Matrix dimensions: ``mat1``: `m \times n`, ``mat2``: `m \times k`, ``res``: `m \times (n + k)`.
 
 
 Special matrices
@@ -344,7 +344,7 @@ Modular reduction and rational reconstruction
 
 .. function:: int fmpq_mat_set_fmpz_mat_mod_fmpz(fmpq_mat_t X, const fmpz_mat_t Xmod, const fmpz_t mod)
 
-    Set ``X`` to the entrywise rational reconstruction integer matrix
+    Sets ``X`` to the entrywise rational reconstruction integer matrix
     ``Xmod`` modulo ``mod``, and returns nonzero if the reconstruction
     is successful. If rational reconstruction fails for any element,
     returns zero and sets the entries in ``X`` to undefined values.

@@ -56,16 +56,16 @@ Memory management
 
 .. function:: void fmpq_mpoly_init(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
-    Initialise *A* for use with the given an initialised context object. Its value is set to zero.
+    Initialise *A* for use with the given and initialised context object. Its value is set to zero.
 
 .. function:: void fmpq_mpoly_init2(fmpq_mpoly_t A, slong alloc, const fmpq_mpoly_ctx_t ctx)
 
-    Initialise *A* for use with the given an initialised context object. Its value is set to zero.
+    Initialise *A* for use with the given and initialised context object. Its value is set to zero.
     It is allocated with space for *alloc* terms and at least ``MPOLY_MIN_BITS`` bits for the exponents.
 
 .. function:: void fmpq_mpoly_init3(fmpq_mpoly_t A, slong alloc, flint_bitcnt_t bits, const fmpq_mpoly_ctx_t ctx)
 
-    Initialise *A* for use with the given an initialised context object. Its value is set to zero.
+    Initialise *A* for use with the given and initialised context object. Its value is set to zero.
     It is allocated with space for *alloc* terms and *bits* bits for the exponents.
 
 .. function:: void fmpq_mpoly_fit_length(fmpq_mpoly_t A, slong len, const fmpq_mpoly_ctx_t ctx)
@@ -262,7 +262,7 @@ Comparison
 Container operations
 --------------------------------------------------------------------------------
 
-    These function try to deal efficiently with violations of the internal canonical representation.
+    These functions try to deal efficiently with violations of the internal canonical representation.
     If a term index is negative or not strictly less than the length of the polynomial, the function will throw.
     The mutating functions here are not guaranteed to leave the polynomial in reduced form (see :func:`fmpq_mpoly_is_canonical` for a definition of reduced).
     This means that even if nonzero terms with distinct exponents have been constructed in the correct order, a call to :func:`fmpq_mpoly_reduce` is necessary to ensure that the polynomial is in canonical form.
@@ -468,7 +468,7 @@ Evaluation
 
 .. function:: int fmpq_mpoly_evaluate_all_fmpq(fmpq_t ev, const fmpq_mpoly_t A, fmpq * const * vals, const fmpq_mpoly_ctx_t ctx)
 
-    Set ``ev`` the evaluation of *A* where the variables are replaced by the corresponding elements of the array ``vals``.
+    Set ``ev`` to the evaluation of *A* where the variables are replaced by the corresponding elements of the array ``vals``.
     Return `1` for success and `0` for failure.
 
 .. function:: int fmpq_mpoly_evaluate_one_fmpq(fmpq_mpoly_t A, const fmpq_mpoly_t B, slong var, const fmpq_t val, const fmpq_mpoly_ctx_t ctx)
@@ -541,7 +541,7 @@ Division
 .. function:: void fmpq_mpoly_divrem_ideal(fmpq_mpoly_struct ** Q, fmpq_mpoly_t R, const fmpq_mpoly_t A, fmpq_mpoly_struct * const * B, slong len, const fmpq_mpoly_ctx_t ctx)
 
     This function is as per :func:`fmpq_mpoly_divrem` except that it takes an array of divisor polynomials *B* and it returns an array of quotient polynomials *Q*.
-    The number of divisor (and hence quotient) polynomials, is given by *len*.
+    The number of divisor (and hence quotient) polynomials is given by *len*.
 
 
 Greatest Common Divisor

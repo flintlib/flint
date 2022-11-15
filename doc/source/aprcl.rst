@@ -20,7 +20,7 @@ Primality test functions
 
 .. function:: int aprcl_is_prime_jacobi(const fmpz_t n)
 
-    If `n` prime returns 1; otherwise returns 0. The algorithm is well described
+    If `n` is prime returns 1; otherwise returns 0. The algorithm is well described
     in "Implementation of a New Primality Test" by H. Cohen and A.K. Lenstra and
     "A Course in Computational Algebraic Number Theory" by H. Cohen.
 
@@ -32,7 +32,7 @@ Primality test functions
 .. function:: int aprcl_is_prime_gauss(const fmpz_t n)
 
     If `n` is prime returns 1; otherwise returns 0.
-    Uses the Cyclotomic primality testing algorithm described in
+    Uses the cyclotomic primality testing algorithm described in
     "Four primality testing algorithms" by Rene Schoof.
     The minimum required numbers `s` and `R` are computed automatically.
 
@@ -61,7 +61,7 @@ Primality test functions
 .. function:: int aprcl_is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r)
 
     Returns 0 if for some `a = n^k \bmod s`, where `k \in [1, r - 1]`, 
-    we have that `a | n`; otherwise returns 1.
+    we have that `a \mid n`; otherwise returns 1.
 
 Configuration functions
 --------------------------------------------------------------------------------
@@ -75,13 +75,13 @@ Configuration functions
 .. function:: void aprcl_config_gauss_init(aprcl_config conf, const fmpz_t n)
 
     Computes the `s` and `R` values used in the cyclotomic primality test,
-    `s^2 > n` and `s=\prod\limits_{\substack{q-1|R \\ q \text{ prime}}}q`.
+    `s^2 > n` and `s=\prod\limits_{\substack{q-1\mid R \\ q \text{ prime}}}q`.
     Also stores factors of `R` and `s`.
 
 .. function:: void aprcl_config_gauss_init_min_R(aprcl_config conf, const fmpz_t n, ulong R)
 
     Computes the `s` with fixed minimum `R` such that `a^R \equiv 1 \mod{s}`
-    for all integer `a` coprime to `s`. 
+    for all integers `a` coprime to `s`. 
 
 .. function:: void aprcl_config_gauss_clear(aprcl_config conf)
 
@@ -354,7 +354,7 @@ Extended rings
 
 .. function:: ulong unity_zpq_p_unity(const unity_zpq f)
 
-    If `f = \zeta_p^x` returns `x in [0, p - 1]`; otherwise returns `p`.
+    If `f = \zeta_p^x` returns `x \in [0, p - 1]`; otherwise returns `p`.
 
 .. function:: int unity_zpq_is_p_unity(const unity_zpq f)
 
@@ -362,7 +362,7 @@ Extended rings
 
 .. function:: int unity_zpq_is_p_unity_generator(const unity_zpq f)
 
-    Returns nonzero if `f` is a generator of the cyclic group `<\zeta_p>`.
+    Returns nonzero if `f` is a generator of the cyclic group `\langle\zeta_p\rangle`.
 
 .. function:: void unity_zpq_coeff_set_fmpz(unity_zpq f, ulong i, ulong j, const fmpz_t x)
 

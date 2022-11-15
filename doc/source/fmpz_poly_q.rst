@@ -224,7 +224,7 @@ Evaluation
 Input and output
 --------------------------------------------------------------------------------
 
-The following three methods enable users to construct elements of type\\ 
+The following three methods enable users to construct elements of type 
 ``fmpz_poly_q_t`` from strings or to obtain string representations of 
 such elements.
 The format used is based on the FLINT format for integer polynomials of 

@@ -37,7 +37,7 @@ Factorisation
 .. function:: void nmod_poly_factor_fit_length(nmod_poly_factor_t fac, slong len)
 
     Ensures that the factor structure has space for at 
-    least ``len`` factors.  This functions takes care 
+    least ``len`` factors.  This function takes care 
     of the case of repeated calls by always at least 
     doubling the number of factors the structure can hold.
 

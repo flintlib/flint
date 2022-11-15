@@ -46,12 +46,12 @@ Tuples
     Construct an ltuple of references, binding to the arguments ``t1``,
     \dots, ``tn``. Instances of ``flint::detail::IGNORED_TYPE`` can be
     used as placeholders.
-    Currently $n \le 4$.
+    Currently `n \le 4`.
 
 .. cpp:function:: Ltuple<T1, ..., Tn> ltuple(const T1& t1, ..., const Tn& tn)
 
-    Construct an ltuple containing copies of ``t1``, \dots, ``tn``.
-    Currently \code{n \le 4}.
+    Construct an ltuple containing copies of ``t1``, `\dots`, ``tn``.
+    Currently `n \le 4`.
 
 .. cpp:function:: Tk_expr Ltuple<T1, ..., Tn>_expr::get<k>() const
 
@@ -79,23 +79,23 @@ Permutations
 .. cpp:function:: permxx::permxx(slong n)
 .. cpp:function:: static permxx permxx::one(slong n)
 
-    Initialize an identity permutation on the set $[n] = \{0, 1, \dots, n-1\}$.
+    Initialize an identity permutation on the set `[n] = \{0, 1, \dots, n-1\}`.
 
 .. cpp:function:: static permxx permxx::randtest(slong n)
 
-    Generate a random permutation on $[n]$. See ``_perm_randtest``.
+    Generate a random permutation on `[n]`. See ``_perm_randtest``.
 
 .. cpp:function:: bool permxx::operator==(const permxx&)
 .. cpp:function:: bool permxx::operator!=(const permxx&)
 
 .. cpp:function:: slong permxx::size() const
 
-    Return the size of the set being permuted ($n$ in the constructors).
+    Return the size of the set being permuted (`n` in the constructors).
 
 .. cpp:function:: slong& operator[](slong i)
 .. cpp:function:: slong operator[](slong i) const
 
-    Return the image of $i$ under the permutation.
+    Return the image of `i` under the permutation.
 
 .. cpp:function:: permxx permxx::operator*(const permxx&)
 .. cpp:function:: permxx compose(const permxx& p1, const permxx& p2)
@@ -251,7 +251,7 @@ See ``fmpz_cmp``, ``fmpz_cmp_si`` and ``fmpz_cmp_ui``.
 
 .. cpp:function:: bool Fmpz_expr::is_pm1() const
 
-    Return if this expression evaluates to $\pm 1$.
+    Return if this expression evaluates to `\pm 1`.
 
 .. cpp:function:: bool Fmpz_expr::is_even() const
 
@@ -306,7 +306,7 @@ The division operators use ``fmpz_fdiv``.
 .. cpp:function:: bool divisible(Fmpz_expr n, Fmpz_expr d)
 .. cpp:function:: bool divisible(Fmpz_expr n, T:fits_into_slong d)
 
-    Return if $d$ divides $n$. See ``fmpz_divisible``.
+    Return if `d` divides `n`. See ``fmpz_divisible``.
 
 .. cpp:function:: Fmpz_expr powm(Fmpz_expr g, ulong e, Fmpz_expr m)
 .. cpp:function:: Fmpz_expr powm(Fmpz_expr g, Fmpz_expr e, Fmpz_expr m)
@@ -496,7 +496,7 @@ Integer matrices (``fmpz_mat``)
 .. type:: fmpz_matxx
 
 The class ``fmpz_matxx`` wraps ``fmpz_mat_t``, and so represents matrices
-with coefficients in $\mathbf{Z}$.
+with coefficients in `\mathbf{Z}`.
 
 Owing to the design of ``fmpz_mat_t``, the use of ``fmpz_matxx`` has a
 number of peculiarities.
@@ -547,7 +547,7 @@ C++ particulars
     The following bina.. cpp:functions are made available as member functions:
     ``det_modular``, ``det_modular_accelerated``, ``divexact``,
     ``mul_classical``, ``mul_multi_mod``, ``pow``, 
-    code{solve}, ``solve_bound``,
+    ``solve``, ``solve_bound``,
     ``solve_cramer``, ``solve_dixon``, ``solve_fflu``.
 
 Memory management
@@ -555,7 +555,7 @@ Memory management
 
 .. cpp:function:: fmpz_matxx::fmpz_matxx(slong i, slong j)
 
-    Allocate a matrix of size $i \times j$.
+    Allocate a matrix of size `i \times j`.
 
 Basic assignment and manipulation
 -------------------------------------------------------------------------------
@@ -908,7 +908,7 @@ Getting and setting coefficients
 
 .. cpp:function:: Fmpz_expr Fmpz_poly_expr::get_coeff(slong n)
 
-    Obtain coefficient $n$ of the polynomial. It is valid to call this with $n$
+    Obtain coefficient `n` of the polynomial. It is valid to call this with `n`
     greater than the degree, in which case zero is returned.
 
 .. cpp:function:: void Fmpz_poly_target::set_coeff(slong n, Fmpz_expr)
@@ -916,8 +916,8 @@ Getting and setting coefficients
 
 .. cpp:function:: ?? Fmpz_poly_expr::coeff(slong n) const
 
-    Unified coefficient access for coefficient $n$.
-    The result is undefined if $n$ is
+    Unified coefficient access for coefficient `n`.
+    The result is undefined if `n` is
     greater than the degree of the polynomial (or negative).
 
     If the leading coefficient of the polynomial is set to zero in this way, a
@@ -952,7 +952,7 @@ Scalar multiplication and division
 -------------------------------------------------------------------------------
 
 The overloaded operators ``* /`` can be used for scalar multiplication and
-division, and the operator \code{\%} for remaindering. For finer control, the
+division, and the operator ``%`` for remaindering. For finer control, the
 followi.. cpp:functions are provided.
 
 .. cpp:function:: Fmpz_poly_expr mul_2exp(Fmpz_poly_expr, T:is_unsigned_integer)
@@ -1106,13 +1106,13 @@ Pseudo division
 .. cpp:function:: Ltuple<fmpz_polyxx, fmpz_polyxx, ulong>_expr pseudo_divrem_basecase(Fmpz_poly_expr A, Fmpz_poly_expr B)
 .. cpp:function:: Ltuple<fmpz_polyxx, fmpz_polyxx, ulong>_expr pseudo_divrem_divconquer(Fmpz_poly_expr A, Fmpz_poly_expr B)
 
-    ``ltupleref(Q, R, d) = pseudo_divrem(A, B)`` has the same effect as\\
+    ``ltupleref(Q, R, d) = pseudo_divrem(A, B)`` has the same effect as
     ``fmpz_poly_pseudo_divrem(q, r, &d, a, b)``, where ``q, r, a, b`` are
     the underlying ``fmpz_poly_t`` corresponding to ``Q, R, A, B``.
 
 .. cpp:function:: Ltuple<fmpz_polyxx, fmpz_polyxx>_expr pseudo_divrem_cohen(Fmpz_poly_expr A, Fmpz_poly_expr B)
 
-    ``ltupleref(Q, R) = pseudo_divrem_cohen(A, B)`` has the same effect as\\
+    ``ltupleref(Q, R) = pseudo_divrem_cohen(A, B)`` has the same effect as
     ``fmpz_poly_pseudo_divrem_cohen(q, r, a, b)``, where ``q, r, a, b``
     are the underlying ``fmpz_poly_t`` corresponding to ``Q, R, A, B``.
 
@@ -1150,7 +1150,7 @@ Interpolation
 
     See ``fmpz_poly_interpolate_fmpz_vec``.
 
-Composition.
+Composition
 -------------------------------------------------------------------------------
 
 The overloaded ``operator()`` can be used for composition. Additionally, the
@@ -1621,15 +1621,15 @@ Nonsingular solving
 .. cpp:function:: Fmpq_mat_expr solve_fraction_free(Fmpq_mat_expr B, Fmpq_mat_expr X)
 
     See ``fmpq_mat_solve_dixon`` and ``fmpq_mat_solve_fraction_free``.
-    Raises ``flint_exception`` if $B$ is singular.
+    Raises ``flint_exception`` if `B` is singular.
 
 Inverse
 -------------------------------------------------------------------------------
 
 .. cpp:function:: Fmpq_mat_expr inv(Fmpq_mat_expr A)
 
-    Compute the inverse of the square matrix $A$. Raises ``flint_exception``
-    if $A$ is singular. The modulus is required to be prime.
+    Compute the inverse of the square matrix `A`. Raises ``flint_exception``
+    if `A` is singular. The modulus is required to be prime.
 
 Echelon form
 -------------------------------------------------------------------------------
@@ -1671,7 +1671,7 @@ C++ particulars
     ``reverse``, ``revert_series``, ``revert_series_lagrange``,
     ``revert_series_lagrange_fast``, ``revert_series_newton``,
     ``sinh_series``, ``tanh_series``, ``tan_series``, ``xgcd``,
-    ``rescale``,\\
+    ``rescale``,
     ``shift_left``, ``shift_right``.
 
 .. cpp:function:: Fmpq_poly_expr::ternary operation(??, ??) const
@@ -1712,8 +1712,8 @@ Accessing the numerator and denominator
 .. cpp:function:: fmpqxx_ref Fmpq_poly_target::get_coeff_numref(slong n)
 .. cpp:function:: fmpqxx_srcref Fmpq_poly_src::get_coeff_numref(slong n) const
 
-    Obtain a reference to the numerator of coefficient $n$.
-    The result is undefined if $n$ is
+    Obtain a reference to the numerator of coefficient `n`.
+    The result is undefined if `n` is
     greater than the degree of the polynomial (or negative).
     If this is used to modify the object, a call to ``canonicalise()`` may
     be necessary.
@@ -2011,7 +2011,7 @@ Matrices of polynomials over the integers (``fmpz_poly_mat``)
 ===============================================================================
 
 The class ``fmpz_poly_matxx`` wraps ``fmpz_poly_mat_t``, and so
-represents matrices with coefficients in $\mathbf{Z}[X]$. Its usage is similar
+represents matrices with coefficients in `\mathbf{Z}[X]`. Its usage is similar
 to ``fmpz_matxx`` in most regards.
 
 .. cpp:function:: Fmpz_poly_mat_expr::unary operation() const
@@ -2173,7 +2173,7 @@ Nullspace
 
 .. cpp:function:: Ltuple<slong, fmpz_poly_matxx>_expr nullspace(Fmpz_poly_mat_expr A)
 
-    ``ltupleref(n, B) = nullspace(A)`` has the same effect as\\
+    ``ltupleref(n, B) = nullspace(A)`` has the same effect as
     ``n = fmpz_poly_mat_nullspace(b, a)``, where ``b, a`` are the underlying
     ``fmpz_poly_mat_t`` corresponding to ``B, A``.
 
@@ -2184,7 +2184,7 @@ Solving
 .. cpp:function:: Ltuple<bool, fmpz_poly_matxx, fmpz_polyxx>_expr solve_fflu(Fmpz_poly_mat_expr B, Fmpz_poly_mat_expr X)
 .. cpp:function:: Ltuple<bool, fmpz_poly_matxx, fmpz_polyxx>_expr solve_fflu_precomp(const permxx&, Fmpz_poly_mat_expr B, Fmpz_poly_mat_expr FFLU, Fmpz_poly_mat_expr X)
 
-    ``ltupleref(w, M, D) = solve(B, X)`` has the same effect as\\
+    ``ltupleref(w, M, D) = solve(B, X)`` has the same effect as
     ``w = fmpz_poly_mat_solve(m, d, b, x)``, where ``m, d, b, x`` are the
     underlying C objects corresponding to ``M, D, B, X``.
     Similarly for the oth.. cpp:functions.
@@ -2220,7 +2220,7 @@ Miscellaneous
 
 .. cpp:function:: explicit nmodxx_ctx::nmodxx_ctx(mp_limb_t n)
 
-    Initialise a new context for operations modulo $n$.
+    Initialise a new context for operations modulo `n`.
 
 .. cpp:function:: nmodxx_ctx_srcref::nmodxx_ctx_srcref(const nmodxx_ctx&)
 
@@ -2246,13 +2246,13 @@ Miscellaneous
 
 .. cpp:function:: static nmodxx nmodxx::make_nored(mp_limb_t n, nmodxx_ctx_srcref ctx)
 
-    Initialise an ``nmodxx`` to $n$, performing no reductions.
+    Initialise an ``nmodxx`` to `n`, performing no reductions.
 
 .. cpp:function:: static nmodxx nmodxx::red(mp_limb_t n, nmodxx_ctx_srcref ctx)
 .. cpp:function:: static nmodxx nmodxx::red(Fmpz_expr n, nmodxx_ctx_srcref ctx)
 .. cpp:function:: static nmodxx nmodxx::red(Fmpq_expr n, nmodxx_ctx_srcref ctx)
 
-    Initialise an ``nmodxx`` to the reduction of $n$.
+    Initialise an ``nmodxx`` to the reduction of `n`.
 
 .. cpp:function:: static nmodxx_ref nmodxx_ref::make(mp_limb_t& l, nmodxx_ctx_srcref c)
 .. cpp:function:: static nmodxx_srcref nmodxx_srcref::make(const mp_limb_t&, nmodxx_ctx_srcref)
@@ -2266,7 +2266,7 @@ Miscellaneous
 
 .. cpp:function:: void Nmod_target::set_nored(mp_limb_t n)
 
-    Set the stored limb to $n$.
+    Set the stored limb to `n`.
 
 .. cpp:function:: std::string Nmod_expr::to_string() const
 
@@ -2316,24 +2316,24 @@ In order to reduce convert a ``fmpz_polyxx`` or ``fmpq_polyxx`` to
 
 .. cpp:function:: Nmod_poly_expr::binary operation() const
 
-    The following bina.. cpp:functions are made available as member functions:\\
-    ``compose_divconquer``, ``compose_horner``, ``div_basecase``,\\
-    ``div_divconquer``, ``div_newton``, ``divrem``,\\
-    ``divrem_basecase``, ``divrem_divconquer``,\\
-    ``divrem_newton``, ``div_root``, ``evaluate_fast``,\\
-    ``evaluate_iter``, ``gcd``, ``gcd_euclidean``, ``gcd_hgcd``,\\
-    ``inv_series``, ``inv_series_basecase``, ``inv_series_newton``,\\
-    ``invsqrt_series``, ``mul_classical``, ``mul_KS``,\\
-    ``shift_left``, ``shift_right``, ``pow``,\\
-    ``pow_binexp``, ``rem_basecase``, ``resultant``,\\
-    ``resultant_euclidean``, ``reverse``, ``revert_series``,\\
-    ``revert_series_lagrange``, ``revert_series_lagrange_fast``,\\
-    ``revert_series_newton``, ``sqrt_series``, ``taylor_shift``,\\
-    ``taylor_shift_convolution``, ``taylor_shift_horner``, ``xgcd``,\\
-    ``xgcd_euclidean``, ``xgcd_hgcd``, ``log_series``,\\
-    ``exp_series``, ``exp_series_basecase``, ``atan_series``,\\
-    ``atanh_series``, ``asin_series``, ``asinh_series``,\\
-    ``sin_series``, ``cos_series``, ``tan_series``,\\
+    The following bina.. cpp:functions are made available as member functions:
+    ``compose_divconquer``, ``compose_horner``, ``div_basecase``,
+    ``div_divconquer``, ``div_newton``, ``divrem``,
+    ``divrem_basecase``, ``divrem_divconquer``,
+    ``divrem_newton``, ``div_root``, ``evaluate_fast``,
+    ``evaluate_iter``, ``gcd``, ``gcd_euclidean``, ``gcd_hgcd``,
+    ``inv_series``, ``inv_series_basecase``, ``inv_series_newton``,
+    ``invsqrt_series``, ``mul_classical``, ``mul_KS``,
+    ``shift_left``, ``shift_right``, ``pow``,
+    ``pow_binexp``, ``rem_basecase``, ``resultant``,
+    ``resultant_euclidean``, ``reverse``, ``revert_series``,
+    ``revert_series_lagrange``, ``revert_series_lagrange_fast``,
+    ``revert_series_newton``, ``sqrt_series``, ``taylor_shift``,
+    ``taylor_shift_convolution``, ``taylor_shift_horner``, ``xgcd``,
+    ``xgcd_euclidean``, ``xgcd_hgcd``, ``log_series``,
+    ``exp_series``, ``exp_series_basecase``, ``atan_series``,
+    ``atanh_series``, ``asin_series``, ``asinh_series``,
+    ``sin_series``, ``cos_series``, ``tan_series``,
     ``sinh_series``, ``cosh_series``, ``tanh_series``.
 
 .. cpp:function:: Nmod_poly_expr Nmod_poly_expr::inflate(T:is_unsigned_integer) const
@@ -2346,14 +2346,14 @@ In order to reduce convert a ``fmpz_polyxx`` or ``fmpq_polyxx`` to
 
 .. cpp:function:: Nmod_poly_expr::ternary operation(??, ??) const
 
-    The following terna.. cpp:functions are made available as member functions:\\
-    ``compose_mod``, ``compose_mod_horner``,\\
-    ``compose_series_brent_kung``, ``compose_series``,\\
-    ``compose_series_brent_kung``, ``compose_series_divconquer``,\\
-    ``compose_series_horner``, ``div_newton_n_preinv``,\\
-    ``divrem_newton_n_preinv``, ``div_series``, ``mulhigh``,\\
-    ``mulhigh_classical``, ``mullow``, ``mullow_classical``,\\
-    ``mullow_KS``, ``mulmod``, ``powmod_binexp``, ``pow_trunc``,\\
+    The following terna.. cpp:functions are made available as member functions:
+    ``compose_mod``, ``compose_mod_horner``,
+    ``compose_series_brent_kung``, ``compose_series``,
+    ``compose_series_brent_kung``, ``compose_series_divconquer``,
+    ``compose_series_horner``, ``div_newton_n_preinv``,
+    ``divrem_newton_n_preinv``, ``div_series``, ``mulhigh``,
+    ``mulhigh_classical``, ``mullow``, ``mullow_classical``,
+    ``mullow_KS``, ``mulmod``, ``powmod_binexp``, ``pow_trunc``,
     ``pow_trunc_binexp``.
 
 .. cpp:function:: Nmod_poly_expr::fourary operation(??, ??, ??) const
@@ -2397,8 +2397,8 @@ Conversion
 .. cpp:function:: static nmod_polyxx nmod_polyxx::from_ground(Nmod_expr e)
 .. cpp:function:: static nmod_polyxx nmod_polyxx::from_ground(mp_limb_t e, nmodxx_ctx_srcref c)
 
-    Consider $e \in \mathbf{Z}/n\mathbf{Z}$ as an element of
-    $\mathbf{Z}/n\mathbf{Z}[X]$.
+    Consider `e \in \mathbf{Z}/n\mathbf{Z}` as an element of
+    `\mathbf{Z}/n\mathbf{Z}[X]`.
 
 Input and output
 -------------------------------------------------------------------------------
@@ -2642,7 +2642,7 @@ Square roots
 
 .. cpp:function:: Nmod_poly_expr sqrt_series(Nmod_poly_expr p)
 
-    Compute the square root of $p$. Raises ``flint_exception`` if $p$ is not
+    Compute the square root of `p`. Raises ``flint_exception`` if `p` is not
     a perfect square.
 
 Transcendent.. cpp:functions
@@ -2895,8 +2895,8 @@ Inverse
 
 .. cpp:function:: Nmod_mat_expr inv(Nmod_mat_expr A)
 
-    Compute the inverse of the square matrix $A$. Raises ``flint_exception``
-    if $A$ is singular. The modulus is required to be prime.
+    Compute the inverse of the square matrix `A`. Raises ``flint_exception``
+    if `A` is singular. The modulus is required to be prime.
 
 Triangular solving
 -------------------------------------------------------------------------------
@@ -2915,7 +2915,7 @@ Non-singular square solving
 .. cpp:function:: Nmod_vec_expr solve(Nmod_mat_expr B, Nmod_vec_expr X)
 
     See ``nmod_mat_solve`` and ``nmod_mat_solve_vec``.
-    Raises ``flint_exception`` if $B$ is singular.
+    Raises ``flint_exception`` if `B` is singular.
 
 LU decomposition
 -------------------------------------------------------------------------------
@@ -3080,7 +3080,7 @@ Transpose
 
 .. cpp:function:: Nmod_poly_mat_expr transpose(Nmod_poly_mat_expr A)
 
-    Compute the transpose of $A$.
+    Compute the transpose of `A`.
 
 Trace
 -------------------------------------------------------------------------------
@@ -3310,8 +3310,8 @@ Greatest common divisor
 
 .. cpp:function:: Fmpz_mod_poly_expr invmod(Fmpz_mod_poly_expr f, Fmpz_mod_poly_expr g)
 
-    See ``fmpz_mod_poly_invmod``. Raises ``flint_exception`` if $f$ and
-    $g$ are not coprime.
+    See ``fmpz_mod_poly_invmod``. Raises ``flint_exception`` if `f` and
+    `g` are not coprime.
 
 Derivative
 -------------------------------------------------------------------------------
@@ -3526,7 +3526,7 @@ Memory management
 
 .. cpp:function:: padicxx::padicxx(padicxx_ctx_srcref c, slong N)
 
-    Initialize padic number to precision $N$. See ``padic_init2``.
+    Initialize padic number to precision `N`. See ``padic_init2``.
 
 .. cpp:function:: void Padic_target::reduce()
 
@@ -3785,7 +3785,7 @@ Testing
 .. cpp:function:: bool Padic_poly_src::is_canonical() const
 .. cpp:function:: bool Padic_poly_src::is_reduced() const
 
-Matrices of $p$-adics (``padic_mat``)
+Matrices of `p`-adics (``padic_mat``)
 ===============================================================================
 
 The type ``padic_matxx`` wraps ``padic_mat``. Like ``padicxx``,
@@ -3986,7 +3986,7 @@ Memory management
 
 .. cpp:function:: qadicxx::qadicxx(const qadicxx_ctx& c, slong N)
 
-    Initialize qadic number to precision $N$. See ``qadic_init2``.
+    Initialize qadic number to precision `N`. See ``qadic_init2``.
 
 .. cpp:function:: void Qadic_target::reduce()
 
@@ -4102,8 +4102,8 @@ Stirling numbers
 .. cpp:function:: Fmpz_vec_expr stirling_number_1_vec_next(Fmpz_vec_expr v, T:fits_into_slong n)
 .. cpp:function:: Fmpz_vec_expr stirling_number_2_vec_next(Fmpz_vec_expr v, T:fits_into_slong n)
 
-    Given the vector $v$ of length $k$, compute the next vector of Stirling
-    numbers. The size of the new vector is $k + 1$ if $k = n$, and else $k$.
+    Given the vector `v` of length `k`, compute the next vector of Stirling
+    numbers. The size of the new vector is `k + 1` if `k = n`, and else `k`.
 
     See ``arith_stirling_number_1u_vec_next`` etc.
 
@@ -4111,7 +4111,7 @@ Stirling numbers
 .. cpp:function:: Fmpz_mat_expr stirling_matrix_1(T:fits_into_slong m, T:fits_into_slong)
 .. cpp:function:: Fmpz_mat_expr stirling_matrix_2(T:fits_into_slong m, T:fits_into_slong)
 
-    Compute an $m \times n$ Stirling matrix.
+    Compute an `m \times n` Stirling matrix.
 
     See ``arith_stirling_matrix_1u`` etc.
 

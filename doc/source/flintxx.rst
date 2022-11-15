@@ -27,7 +27,7 @@ We begin with a simple example:
     y = x*x;
     std::cout << x << "^2 = " << y << std::endl; 
 
-As can be seen, if a FLINT C interface is called ``foo``and resides in
+As can be seen, if a FLINT C interface is called ``foo`` and resides in
 ``foo.h``, then the C++ version is called ``fooxx`` and resides in
 ``fooxx.h``. All flintxx classes live inside ``namespace flint``.
 
@@ -82,11 +82,11 @@ is ``divrem``. The underlying C function is
 ``void fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)``.
 
 Mapping this directly to C++ would yield something like
-``void divrem(fmpz_polyxx& Q, fmpz_polyxx& R, const fmpz_polyxx& A, const fmpz_polyxx& B)}``.
+``void divrem(fmpz_polyxx& Q, fmpz_polyxx& R, const fmpz_polyxx& A, const fmpz_polyxx& B)``.
 
 While functional, this is not particularly nice; the syntax
 ``divrem(Q, R, A, B)``, where the first two arguments are modified, is just
-very reminiscent of C. We prefer an expression closer to the python analogue
+very reminiscent of C. We prefer an expression closer to the Python analogue
 ``(Q, R) = divrem(A, B)``.
 
 For this purpose, flintxx uses lazy tuples and the following is a valid
@@ -144,8 +144,8 @@ numerator and denominator. In C, these are accessible via macros
 ``fmpq_numref`` and ``fmpq_denref``, which yield ``fmpz*``, which can be used
 essentially interchangeably with ``fmpz_t``. In particular, any library
 function which operates on ``fmpz_t`` can operate on the numerator or
-denominator of an ``fmpq_t``. In C++, we would like to have a member functions
-``den` and ``num`` which return an object of type ``fmpzxx&`` (i.e.
+denominator of an ``fmpq_t``. In C++, we would like to have member functions
+``den`` and ``num`` which return an object of type ``fmpzxx&`` (i.e.
 a reference to ``fmpzxx``).
 
 However, this is not possible, since ``fmpqxx`` is not implemented as a pair
@@ -174,7 +174,7 @@ left hand side, just like ``fooxx``.
 
 The class ``fooxx_srcref`` behaves like a reference to a constant object of
 type ``fooxx``, and so cannot be used as a left hand side. These objects are
-created by flintxx automatically,`for example upon calling
+created by flintxx automatically, for example upon calling
 ``fmpqxx::num()``.
 
 Unified coefficient access

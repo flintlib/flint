@@ -54,16 +54,16 @@ Memory management
 
 .. function:: void fmpz_mpoly_init(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 
-    Initialise *A* for use with the given an initialised context object. Its value is set to zero.
+    Initialise *A* for use with the given and initialised context object. Its value is set to zero.
 
 .. function:: void fmpz_mpoly_init2(fmpz_mpoly_t A, slong alloc, const fmpz_mpoly_ctx_t ctx)
 
-    Initialise *A* for use with the given an initialised context object. Its value is set to zero.
+    Initialise *A* for use with the given and initialised context object. Its value is set to zero.
     It is allocated with space for *alloc* terms and at least ``MPOLY_MIN_BITS`` bits for the exponents.
 
 .. function:: void fmpz_mpoly_init3(fmpz_mpoly_t A, slong alloc, flint_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx)
 
-    Initialise *A* for use with the given an initialised context object. Its value is set to zero.
+    Initialise *A* for use with the given and initialised context object. Its value is set to zero.
     It is allocated with space for *alloc* terms and *bits* bits for the exponents.
 
 .. function:: void fmpz_mpoly_fit_length(fmpz_mpoly_t A, slong len, const fmpz_mpoly_ctx_t ctx)
@@ -294,7 +294,7 @@ Container operations
 
 .. function:: void fmpz_mpoly_resize(fmpz_mpoly_t A, slong new_length, const fmpz_mpoly_ctx_t ctx)
 
-    Set the length of *A* to `new_length`.
+    Set the length of *A* to `new\_length`.
     Terms are either deleted from the end, or new zero terms are appended.
 
 .. function:: void fmpz_mpoly_get_term_coeff_fmpz(fmpz_t c, const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx)
@@ -572,13 +572,13 @@ Division
 .. function:: void fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** Q, fmpz_mpoly_t R, const fmpz_mpoly_t A, fmpz_mpoly_struct * const * B, slong len, const fmpz_mpoly_ctx_t ctx)
 
     This function is as per :func:`fmpz_mpoly_divrem` except that it takes an array of divisor polynomials *B* and it returns an array of quotient polynomials *Q*.
-    The number of divisor (and hence quotient) polynomials, is given by *len*.
+    The number of divisor (and hence quotient) polynomials is given by *len*.
     Note that this function is not very useful if there is no unit among the leading coefficients in the array *B*.
 
 .. function:: void fmpz_mpoly_quasidivrem_ideal(fmpz_t scale, fmpz_mpoly_struct ** Q, fmpz_mpoly_t R, const fmpz_mpoly_t A, fmpz_mpoly_struct * const * B, slong len, const fmpz_mpoly_ctx_t ctx)
 
     This function is as per :func:`fmpz_mpoly_quasidivrem` except that it takes an array of divisor polynomials *B* and it returns an array of quotient polynomials *Q*.
-    The number of divisor (and hence quotient) polynomials, is given by *len*.
+    The number of divisor (and hence quotient) polynomials is given by *len*.
 
 
 Greatest Common Divisor
@@ -724,14 +724,14 @@ Internal Functions
     and a number of bits for the fields of the exponents of the result. The
     array "mults" is a list of bases to be used in encoding the array indices
     from the exponents. The function reallocates its output, hence the double
-    indirection and returns the length of its output if the quotient is exact,
+    indirection, and returns the length of its output if the quotient is exact,
     or zero if not. It is assumed that ``poly2`` is not zero. No aliasing is
     allowed.
 
 .. function:: int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 
     Set ``poly1`` to ``poly2`` divided by ``poly3``, using a big dense
-    array to accumulate coefficients and return 1 if the quotient is exact.
+    array to accumulate coefficients, and return 1 if the quotient is exact.
     Otherwise, return 0 if the quotient is not exact. If the array will be
     larger than some internally set parameter, the function fails silently and
     returns `-1` so that some other method may be called. This function is most
@@ -799,7 +799,7 @@ Internal Functions
 .. function:: void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r, const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 
     Set ``polyq`` and ``polyr`` to the quotient and remainder of
-    ``poly2`` divided by ``poly3``, (with remainder coefficients reduced
+    ``poly2`` divided by ``poly3`` (with remainder coefficients reduced
     modulo the leading coefficient of ``poly3``). Implements "Polynomial
     division using dynamic arrays, heaps and packed exponents" by Michael
     Monagan and Roman Pearce.
@@ -820,7 +820,7 @@ Internal Functions
 .. function:: int fmpz_mpoly_divrem_array(fmpz_mpoly_t q, fmpz_mpoly_t r, const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 
     Set ``polyq`` and ``polyr`` to the quotient and remainder of
-    ``poly2`` divided by ``poly3``, (with remainder coefficients reduced
+    ``poly2`` divided by ``poly3`` (with remainder coefficients reduced
     modulo the leading coefficient of ``poly3``). The function is
     implemented using dense arrays, and is efficient when the inputs are fairly
     dense. If the array will be larger than some internally set parameter, the
@@ -842,7 +842,7 @@ Internal Functions
     that it takes an array of divisor polynomials ``poly3`` and an array of
     repacked exponent arrays ``exp3``, which may alias the exponent arrays
     of ``poly3``, and it returns an array of quotient polynomials
-    ``polyq``. The number of divisor (and hence quotient) polynomials, is
+    ``polyq``. The number of divisor (and hence quotient) polynomials is
     given by ``len``. The function computes polynomials `q_i` such that
     `r = a - \sum_{i=0}^{\mbox{len - 1}} q_ib_i`, where the `q_i` are the
     quotient polynomials and the `b_i` are the divisor polynomials.
@@ -852,7 +852,7 @@ Internal Functions
     This function is as per ``fmpz_mpoly_divrem_monagan_pearce`` except
     that it takes an array of divisor polynomials ``poly3``, and it returns
     an array of quotient polynomials ``q``. The number of divisor (and hence
-    quotient) polynomials, is given by ``len``. The function computes
+    quotient) polynomials is given by ``len``. The function computes
     polynomials `q_i = q[i]` such that ``poly2`` is
     `r + \sum_{i=0}^{\mbox{len - 1}} q_ib_i`, where `b_i =` ``poly3[i]``.
 

@@ -25,7 +25,7 @@ matrix to be used during L^2 (approximate or exact).
     ``delta``, ``eta``, ``rt`` and ``gt`` (given as input)
     respectively. ``delta`` and ``eta`` are the L^2 parameters.
     ``delta`` and ``eta`` must lie in the intervals `(0.25, 1)` and
-    (0.5, \sqrt{``delta``}) respectively. The representation type is input
+    `(0.5, \sqrt{\mathtt{delta}})` respectively. The representation type is input
     using ``rt`` and can have the values `Z\_BASIS` for a lattice basis and
     `GRAM` for a Gram matrix. The Gram type to be used during computation can
     be specified using ``gt`` which can assume the values `APPROX` and
@@ -39,7 +39,7 @@ Random parameter generation
 .. function:: void fmpz_lll_randtest(fmpz_lll_t fl, flint_rand_t state)
 
     Sets ``fl->delta`` and ``fl->eta`` to random values in the interval
-    `(0.25, 1)` and (0.5, \sqrt{``delta``}) respectively. ``fl->rt`` is
+    `(0.25, 1)` and `(0.5, \sqrt{\mathtt{delta}})` respectively. ``fl->rt`` is
     set to `GRAM` or `Z\_BASIS` and ``fl->gt`` is set to `APPROX` or `EXACT`
     in a pseudo random way.
 
@@ -56,13 +56,13 @@ Heuristic dot product
     matrix ``B``. If massive cancellation is detected an exact computation
     is made.
 
-    The exact computation is scaled by ``2^{-exp_adj``}, where
+    The exact computation is scaled by `2^{-\mathtt{exp_adj}}`, where
     ``exp_adj = r2 + r1`` where `r2` is the exponent for row ``j`` and
     `r1` is the exponent for row ``k`` (i.e. row ``j`` is notionally
     thought of as being multiplied by `2^{r2}`, etc.).
 
     The final dot product computed by this function is then notionally the
-    return value times ``2^{exp_adj``}.
+    return value times `2^{\mathtt{exp_adj}}`.
 
 
 The various Babai's
@@ -108,7 +108,7 @@ The various Babai's
     an index which LLL has reached. ``cur_kappa`` is the index behind which
     we can assume ``B`` is LLL reduced, while ``kappa`` is the vector to
     be reduced. This procedure only size reduces the ``kappa``-th row by
-    vectors up to ``cur_kappa``, \textbf{not} ``kappa - 1``.
+    vectors up to ``cur_kappa``, **not** ``kappa - 1``.
 
 .. function:: int fmpz_lll_advance_check_babai_heuristic_d(int cur_kappa, int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s, d_mat_t appB, int *expo, fmpz_gram_t A, int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
 
@@ -147,8 +147,8 @@ unreduced - that is to say, not do their job - includes (but is not necessarily 
     heuristic version (:func:`fmpz_lll_check_babai_heuristic_d`) for only one
     loop and switches right back to the fast version. It reduces ``B`` in
     place. ``U`` is the matrix used to capture the unimodular
-    transformations if it is not `NULL`. An exception is raised if `U != NULL`
-    and `U->r != d`, where `d` is the lattice dimension. ``fl`` is the
+    transformations if it is not `NULL`. An exception is raised if `U` != `NULL`
+    and ``U->r`` != `d`, where `d` is the lattice dimension. ``fl`` is the
     context object containing information containing the LLL parameters \delta
     and \eta. The function can perform reduction on both the lattice basis as
     well as its Gram matrix. The type of lattice representation can be
@@ -172,7 +172,7 @@ unreduced - that is to say, not do their job - includes (but is not necessarily 
 .. function:: int fmpz_lll_mpf(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
 
     A wrapper of :func:`fmpz_lll_mpf2`. This currently begins with
-    `prec == D_BITS`, then for the first 20 loops, increases the precision one
+    `prec == D\_BITS`, then for the first 20 loops, increases the precision one
     limb at a time. After 20 loops, it doubles the precision each time. There
     is a proof that this will eventually work. The return value of this
     function is 0 if the LLL is successful or -1 if the precision maxes out
@@ -182,13 +182,13 @@ unreduced - that is to say, not do their job - includes (but is not necessarily 
 
     A wrapper of the above procedures. It begins with the greediest version
     (:func:`fmpz_lll_d`), then adapts to the version using heuristic inner
-    products only (:func:`fmpz_lll_d_heuristic`) if `fl->rt == Z\_BASIS` and
-    `fl->gt == APPROX`, and finally to the mpf version (:func:`fmpz_lll_mpf`)
+    products only (:func:`fmpz_lll_d_heuristic`) if ``fl->rt`` == `Z\_BASIS` and
+    ``fl->gt`` == `APPROX`, and finally to the mpf version (:func:`fmpz_lll_mpf`)
     if needed.
 
     ``U`` is the matrix used to capture the unimodular
-    transformations if it is not `NULL`. An exception is raised if `U != NULL`
-    and `U->r != d`, where `d` is the lattice dimension. ``fl`` is the
+    transformations if it is not `NULL`. An exception is raised if `U` != `NULL`
+    and ``U->r`` != `d`, where `d` is the lattice dimension. ``fl`` is the
     context object containing information containing the LLL parameters \delta
     and \eta. The function can perform reduction on both the lattice basis as
     well as its Gram matrix. The type of lattice representation can be
@@ -228,7 +228,7 @@ unreduced - that is to say, not do their job - includes (but is not necessarily 
     addition of the removal boundary. It begins with the greediest version
     (:func:`fmpz_lll_d_with_removal`), then adapts to the version using
     heuristic inner products only (:func:`fmpz_lll_d_heuristic_with_removal`)
-    if `fl->rt == Z\_BASIS` and `fl->gt == APPROX`, and finally to the mpf
+    if ``fl->rt`` == `Z\_BASIS` and ``fl->gt`` == `APPROX`, and finally to the mpf
     version (:func:`fmpz_lll_mpf_with_removal`) if needed.
 
 .. function:: int fmpz_lll_d_with_removal_knapsack(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz_lll_t fl)
@@ -244,8 +244,8 @@ unreduced - that is to say, not do their job - includes (but is not necessarily 
     knapsack-type lattices. It begins with the greediest version and the engine
     of this version, (:func:`fmpz_lll_d_with_removal_knapsack`), then adapts
     to the version using heuristic inner products only
-    (:func:`fmpz_lll_d_heuristic_with_removal`) if `fl->rt == Z\_BASIS` and
-    `fl->gt == APPROX`, and finally to the mpf version
+    (:func:`fmpz_lll_d_heuristic_with_removal`) if ``fl->rt`` == `Z\_BASIS` and
+    ``fl->gt`` == `APPROX`, and finally to the mpf version
     (:func:`fmpz_lll_mpf_with_removal`) if needed.
 
 
@@ -255,7 +255,7 @@ ULLL
 
 .. function:: int fmpz_lll_with_removal_ulll(fmpz_mat_t FM, fmpz_mat_t UM, slong new_size, const fmpz_t gs_B, const fmpz_lll_t fl)
 
-    ULLL is a new style of LLL which does adjoins an identity matrix to the
+    ULLL is a new style of LLL which adjoins an identity matrix to the
     input lattice ``FM``, then scales the lattice down to ``new_size``
     bits and reduces this augmented lattice. This tends to be more stable
     numerically than traditional LLL which means higher dimensions can be
@@ -313,12 +313,12 @@ Main LLL functions
     currently calls the ULLL algorithm (without removals). The ULLL function
     in turn calls a LLL wrapper which tries to choose an optimal LLL algorithm,
     starting with a version using just doubles (ULLL tries to maximise usage
-    of this), then a heuristic LLL a full precision floating point LLL if
-    required.
+    of this), then a heuristic LLL followed by a full precision floating point
+    LLL if required.
 
     ``U`` is the matrix used to capture the unimodular
-    transformations if it is not `NULL`. An exception is raised if `U != NULL`
-    and `U->r != d`, where `d` is the lattice dimension. ``fl`` is the
+    transformations if it is not `NULL`. An exception is raised if `U` != `NULL`
+    and ``U->r`` != `d`, where `d` is the lattice dimension. ``fl`` is the
     context object containing information containing the LLL parameters \delta
     and \eta. The function can perform reduction on both the lattice basis as
     well as its Gram matrix. The type of lattice representation can be

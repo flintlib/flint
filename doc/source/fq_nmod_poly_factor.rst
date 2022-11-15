@@ -37,7 +37,7 @@ Memory Management
 .. function:: void fq_nmod_poly_factor_fit_length(fq_nmod_poly_factor_t fac, slong len, const fq_nmod_ctx_t ctx)
 
     Ensures that the factor structure has space for at least
-    ``len`` factors.  This functions takes care of the case of
+    ``len`` factors.  This function takes care of the case of
     repeated calls by always at least doubling the number of factors
     the structure can hold.
 
@@ -144,7 +144,7 @@ Factorisation
 .. function:: void fq_nmod_poly_factor_distinct_deg(fq_nmod_poly_factor_t res, const fq_nmod_poly_t poly, slong * const *degs, const fq_nmod_ctx_t ctx)
 
     Factorises a monic non-constant squarefree polynomial ``poly``
-    of degree n into factors `f[d]` such that for `1 \leq d \leq n`
+    of degree `n` into factors `f[d]` such that for `1 \leq d \leq n`
     `f[d]` is the product of the monic irreducible factors of
     ``poly`` of degree `d`. Factors are stored in ``res``,
     associated powers of irreducible polynomials are stored in
@@ -217,7 +217,7 @@ Factorisation
 
 .. function:: void fq_nmod_poly_iterated_frobenius_preinv(fq_nmod_poly_t *rop, slong n, const fq_nmod_poly_t v, const fq_nmod_poly_t vinv, const fq_nmod_ctx_t ctx)
 
-    Sets ``rop[i]`` to be `x^{q^i} mod v` for `0 <= i < n`.
+    Sets ``rop[i]`` to be `x^{q^i} \bmod v` for `0 \le i < n`.
 
     It is required that ``vinv`` is the inverse of the reverse of
     ``v`` mod ``x^lenv``.
@@ -228,5 +228,5 @@ Root Finding
 .. function:: void fq_nmod_poly_roots(fq_nmod_poly_factor_t r, const fq_nmod_poly_t f, int with_multiplicity, const fq_nmod_ctx_t ctx)
 
     Fill `r` with factors of the form `x - r_i` where the `r_i` are the distinct roots of a nonzero `f` in `F_q`.
-    If `with_multiplicity` is zero, the exponent `e_i` of the factor `x - r_i` is `1`. Otherwise, it is the largest `e_i` such that `(x-r_i)^e_i` divides `f`.
+    If `with\_multiplicity` is zero, the exponent `e_i` of the factor `x - r_i` is `1`. Otherwise, it is the largest `e_i` such that `(x-r_i)^e_i` divides `f`.
     This function throws if `f` is zero, but is otherwise always successful.

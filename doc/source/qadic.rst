@@ -284,7 +284,7 @@ Basic arithmetic
     Assumes that `e \geq 0` and that ``len`` is positive and at most `d`.
 
     Although we require that ``rop`` provides space for 
-    `2d - 1` coefficients, the output will be reduces modulo 
+    `2d - 1` coefficients, the output will be reduced modulo 
     `f(X)`, which is a polynomial of degree `d`.
 
     Does not support aliasing.
@@ -465,7 +465,7 @@ Special functions
     `\mathbf{Q}_q \cong \mathbf{Q}_p[X]/(f(X))`.
 
     Assumes that the precision `N` is at least `2` and that the 
-    extension is non-trivial, i.e.\ `d \geq 2`.
+    extension is non-trivial, i.e. `d \geq 2`.
 
     Assumes that `0 < e < d`.
 
@@ -497,17 +497,17 @@ Special functions
 
 .. function:: void _qadic_teichmuller(fmpz *rop, const fmpz *op, slong len, const fmpz *a, const slong *j, slong lena, const fmpz_t p, slong N)
 
-    Sets ``(rop, d)`` to the Teichm\"uller lift of ``(op, len)`` 
+    Sets ``(rop, d)`` to the Teichmüller lift of ``(op, len)`` 
     modulo `p^N`.
 
     Does not support aliasing.
 
 .. function:: void qadic_teichmuller(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 
-    Sets ``rop`` to the Teichm\"uller lift of ``op`` to the 
+    Sets ``rop`` to the Teichmüller lift of ``op`` to the 
     precision given in the context.
 
-    For a unit ``op``, this is the unique `(q-1)`th root of unity 
+    For a unit ``op``, this is the unique `(q-1)`\th root of unity 
     which is congruent to ``op`` modulo `p`.
 
     Sets ``rop`` to zero if ``op`` is zero in the given context.
@@ -574,7 +574,7 @@ Special functions
 
 
     where `\mathbf{Q}_q \cong \mathbf{Q}_p[X] / (f(X))`, `\ell(f)` is the 
-    leading coefficient of `f(X)`, and `a(X) \in mathbf{Q}_p[X]` denotes 
+    leading coefficient of `f(X)`, and `a(X) \in \mathbf{Q}_p[X]` denotes 
     the same polynomial as `x`.
 
     The complexity of the current implementation is given by 

@@ -72,7 +72,7 @@ Factorisation
 
     Set *f* to a factorization of *A* where the bases are primitive and
     pairwise relatively prime. If the product of all irreducible factors with
-    a given exponent is desired, it is recommend to call :func:`fmpz_mpoly_factor_sort`
+    a given exponent is desired, it is recommended to call :func:`fmpz_mpoly_factor_sort`
     and then multiply the bases with the desired exponent.
 
 .. function:: int fmpz_mpoly_factor(fmpz_mpoly_factor_t f, const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)

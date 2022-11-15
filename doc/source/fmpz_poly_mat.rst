@@ -136,7 +136,7 @@ Basic comparison and properties
 
 .. function:: int fmpz_poly_mat_is_one(const fmpz_poly_mat_t mat)
 
-    Returns nonzero if all entry of ``mat`` on the main diagonal
+    Returns nonzero if all entries of ``mat`` on the main diagonal
     are the constant polynomial 1 and all remaining entries are zero,
     and returns zero otherwise. The matrix need not be square.
 
@@ -296,7 +296,7 @@ Row reduction
     ``stop_row`` (exclusive) such that column `c` in ``mat`` has
     a nonzero entry on row `r`, or returns -1 if no such entry exists.
 
-    This implementation simply chooses the first nonzero entry from
+    This implementation simply chooses the first nonzero entry
     it encounters. This is likely to be a nearly optimal choice if all
     entries in the matrix have roughly the same size, but can lead to
     unnecessary coefficient growth if the entries vary in size.

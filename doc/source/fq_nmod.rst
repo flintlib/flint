@@ -102,7 +102,7 @@ Context Management
 
 .. function:: void fq_nmod_ctx_print(const fq_nmod_ctx_t ctx)
 
-    Prints the context information to {``stdout``.
+    Prints the context information to ``stdout``.
 
 .. function:: void fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx)
 
@@ -114,7 +114,7 @@ Context Management
 
     Initializes ``ctx`` to a random extension of a word-sized prime
     field.  The modulus may or may not be irreducible.  Assumes that
-    ``fq_nmod_ctx_init`` as not been called on ``ctx`` already.
+    ``fq_nmod_ctx_init`` has not been called on ``ctx`` already.
 
 
 Memory management
@@ -231,7 +231,7 @@ Basic arithmetic
 
 .. function:: void fq_nmod_pow(fq_nmod_t rop, const fq_nmod_t op, const fmpz_t e, const fq_nmod_ctx_t ctx)
 
-    Sets ``rop`` the ``op`` raised to the power `e`.
+    Sets ``rop`` to ``op`` raised to the power `e`.
 
     Currently assumes that `e \geq 0`.
 
@@ -259,7 +259,7 @@ Roots
 
 .. function:: void fq_nmod_pth_root(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx)
 
-    Sets ``rop`` to a `p^{th}` root root of ``op1``.  Currently,
+    Sets ``rop`` to a `p^{\textrm{th}}` root of ``op1``.  Currently,
     this computes the root by raising ``op1`` to `p^{d-1}` where
     `d` is the degree of the extension.
 
@@ -424,7 +424,7 @@ Comparison
 .. function:: int fq_nmod_is_invertible_f(fq_nmod_t f, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 
     Returns whether ``op`` is an invertible element.  If it is not,
-    then ``f`` is set of a factor of the modulus.
+    then ``f`` is set to a factor of the modulus.
 
 .. function:: int fq_nmod_cmp(const fq_nmod_t a, const fq_nmod_t b, const fq_nmod_ctx_t ctx)
 

@@ -1572,6 +1572,6 @@ Special functions
 .. function:: void fmpz_factor_divisor_sigma(fmpz_t res, ulong k, const fmpz_factor_t fac)
               void fmpz_divisor_sigma(fmpz_t res, ulong k, const fmpz_t n)
 
-    Sets ``res`` to `\sigma_k(n)`, the sum of `k`th powers of all 
+    Sets ``res`` to `\sigma_k(n)`, the sum of `k`\th powers of all 
     divisors of `n`. The factor version takes a precomputed
     factorisation of `n`.

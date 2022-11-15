@@ -194,7 +194,7 @@ Bell numbers
 
     Returns `b` such that `B_n < 2^{\lfloor b \rfloor}`. A previous
     version of this function used the inequality
-    ``B_n < \left(\frac{0.792n}{\log(n+1)}\right)^n`` which is given
+    `B_n < \left(\frac{0.792n}{\log(n+1)}\right)^n` which is given
     in [BerTas2010]_; we now use a slightly better bound
     based on an asymptotic expansion.
 
@@ -206,12 +206,12 @@ Bernoulli numbers and polynomials
 
     Sets ``(num, den)`` to the reduced numerator and denominator
     of the `n`-th Bernoulli number. As presently implemented,
-    this function simply calls\\ ``_arith_bernoulli_number_zeta``.
+    this function simply calls ``_arith_bernoulli_number_zeta``.
 
 .. function:: void arith_bernoulli_number(fmpq_t x, ulong n)
 
     Sets ``x`` to the `n`-th Bernoulli number. This function is
-    equivalent to\\ ``_arith_bernoulli_number`` apart from the output
+    equivalent to ``_arith_bernoulli_number`` apart from the output
     being a single ``fmpq_t`` variable.
 
     Warning: this function does not use proven precision bounds, and
@@ -246,7 +246,7 @@ Bernoulli numbers and polynomials
 .. function:: double arith_bernoulli_number_size(ulong n)
 
     Returns `b` such that `|B_n| < 2^{\lfloor b \rfloor}`, using the inequality
-    ``|B_n| < \frac{4 n!}{(2\pi)^n}`` and `n! \le (n+1)^{n+1} e^{-n}`.
+    `|B_n| < \frac{4 n!}{(2\pi)^n}` and `n! \le (n+1)^{n+1} e^{-n}`.
     No special treatment is given to odd `n`. Accuracy is not guaranteed
     if `n > 10^{14}`.
 
@@ -290,14 +290,13 @@ Bernoulli numbers and polynomials
     say `n < 1000`. The common denominator is calculated directly
     as the primorial of `n + 1`.
 
-    %[1] https://en.wikipedia.org/w/index.php?
-    %    title=Bernoulli_number&oldid=405938876
+    %[1] https://en.wikipedia.org/w/index.php?title=Bernoulli_number&oldid=405938876
 
 .. function:: void _arith_bernoulli_number_vec_zeta(fmpz * num, fmpz * den, slong n)
 
     Sets the elements of ``num`` and ``den`` to the reduced
     numerators and denominators of `B_0, B_1, B_2, \ldots, B_{n-1}`
-    inclusive. Uses repeated direct calls to\\
+    inclusive. Uses repeated direct calls to
     ``_arith_bernoulli_number_zeta``.
 
 .. function:: void _arith_bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, slong n)

@@ -86,17 +86,17 @@ Comparison of elements against each other or against zero can be accomplished wi
 
 .. function:: void fmpz_mod_mul(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx)
 
-    Set `a` to `b*c` modulo `n`.
+    Set `a` to `b\cdot c` modulo `n`.
 
 .. function:: void fmpz_mod_inv(fmpz_t a, const fmpz_t b, const fmpz_mod_ctx_t ctx)
 
     Set `a` to `b^{-1}` modulo `n`.
     This function expects that `b` is invertible modulo `n` and throws if this not the case.
-    Invertibility maybe tested with func:`fmpz_mod_pow_fmpz` or func:`fmpz_mod_divides`.
+    Invertibility may be tested with :func:`fmpz_mod_pow_fmpz` or :func:`fmpz_mod_divides`.
 
 .. function:: int fmpz_mod_divides(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx)
 
-    If `a*c = b \mod n` has a solution for `a` return `1` and set `a` to such a solution. Otherwise return `0` and leave `a` undefined.
+    If `a\cdot c = b \mod n` has a solution for `a` return `1` and set `a` to such a solution. Otherwise return `0` and leave `a` undefined.
 
 .. function:: void fmpz_mod_pow_ui(fmpz_t a, const fmpz_t b, ulong e, const fmpz_mod_ctx_t ctx)
 

@@ -48,4 +48,4 @@ Arithmetic
 .. function:: void _mpfr_vec_scalar_product(mpfr_t res, mpfr_srcptr vec1, mpfr_srcptr vec2, slong len)
 
    Sets ``res`` to the scalar product of ``(vec1, len)`` with 
-    ``(vec2, len)``. Assumes ``len > 0``.
+   ``(vec2, len)``. Assumes ``len > 0``.
