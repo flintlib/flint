@@ -4680,7 +4680,7 @@ Fmpz_mat_expr stirling_matrix_2(T:fits_into_slong m, T:fits_into_slong)
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 Fmpz_expr bell_number(T:is_unsigned_integer)
-Fmpz_expr bell_number_bsplit(T:is_unsigned_integer)
+Fmpz_expr bell_number_dobinski(T:is_unsigned_integer)
 Fmpz_expr bell_number_multi_mod(T:is_unsigned_integer)
 Fmpz_vec_expr bell_number_vec(T:is_unsigned_integer)
 Fmpz_vec_expr bell_number_vec_recursive(T:is_unsigned_integer)
@@ -4727,7 +4727,7 @@ Fmpz_poly_expr chebyshev_u_polynomial(T:is_unsigned_integer)
 
 Fmpz_expr euler_phi(Fmpz_expr)
 int moebius_mu(Fmpz_expr)
-Fmpz_expr divisor_sigma(Fmpz_expr, ulong)
+Fmpz_expr divisor_sigma(ulong, Fmpz_expr)
 Fmpz_poly_expr divisors(Fmpz_expr)
 Fmpz_expr ramanujan_tau(Fmpz_expr)
 Fmpz_poly_expr ramanujan_tau_series(T:fits_into_slong)

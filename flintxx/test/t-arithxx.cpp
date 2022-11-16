@@ -55,7 +55,7 @@ test_bell()
     tassert(v == bell_number_vec_multi_mod(10));
     for(slong i = 0;i < v.size();++i)
         tassert(v[i] == bell_number(static_cast<unsigned>(i)));
-    tassert(bell_number(10u) == bell_number_bsplit(10u));
+    tassert(bell_number(10u) == bell_number_dobinski(10u));
     tassert(bell_number(10u) == bell_number_multi_mod(10u));
 
     nmodxx_ctx p(1031);
@@ -131,7 +131,7 @@ test_multiplicative()
     fmpzxx p(1031);
     tassert(euler_phi(p) == p-1u);
     tassert(moebius_mu(p) == -1);
-    tassert(divisor_sigma(p, 4u) == 1u + p.pow(4u));
+    tassert(divisor_sigma(4u, p) == 1u + p.pow(4u));
     tassert(divisors(p).to_string() == "2  1 " + p.to_string());
 
     fmpz_polyxx q, one;
