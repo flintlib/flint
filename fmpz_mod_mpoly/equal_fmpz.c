@@ -60,7 +60,7 @@ int fmpz_mod_mpoly_equal_si(
         ulong uc;
 
         if (c == 0)
-            return 0;
+            return 1;
 
         if (!fmpz_abs_fits_ui(fmpz_mod_mpoly_ctx_modulus(ctx)))
             return 0;
