@@ -20,13 +20,37 @@ fmpz_lll_is_reduced_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
     if (gs_B == NULL)
         return fmpz_lll_is_reduced(B, fl, prec);
 
-    if (fmpz_lll_is_reduced_d_with_removal(B, fl, gs_B, newd))
-        return 1;
+    if (fl->rt == Z_BASIS)
+    {
+        int res;
+        fmpz_mat_t BB;
 
-    if (fmpz_lll_is_reduced_mpfr_with_removal(B, fl, gs_B, newd, prec))
-        return 1;
+        _fmpz_mat_read_only_window_init_strip_initial_zero_rows(BB, B);
 
-    return (fl->rt == Z_BASIS) ?
-        fmpz_mat_is_reduced_with_removal(B, fl->delta, fl->eta, gs_B, newd) :
-        fmpz_mat_is_reduced_gram_with_removal(B, fl->delta, fl->eta, gs_B, newd);
+        if (fmpz_lll_is_reduced_d_with_removal(BB, fl, gs_B, newd))
+        {
+            res = 1;
+        }
+        else if (fmpz_lll_is_reduced_mpfr_with_removal(BB, fl, gs_B, newd, prec))
+        {
+            res = 1;
+        }
+        else
+        {
+            res = fmpz_mat_is_reduced_with_removal(BB, fl->delta, fl->eta, gs_B, newd);
+        }
+
+        _fmpz_mat_read_only_window_clear(BB);
+        return res;
+    }
+    else
+    {
+        if (fmpz_lll_is_reduced_d_with_removal(B, fl, gs_B, newd))
+            return 1;
+
+        if (fmpz_lll_is_reduced_mpfr_with_removal(B, fl, gs_B, newd, prec))
+            return 1;
+
+        return fmpz_mat_is_reduced_gram_with_removal(B, fl->delta, fl->eta, gs_B, newd);
+    }
 }
