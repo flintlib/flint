@@ -22,7 +22,7 @@
    splitting 0.5 to 1 into 8 equal intervals 
 
    Values of these coefficients of Chebyshev's approximation polynomial have been
-   calculated from the python module, "mpmath" - http://mpmath.org/   
+   calculated from the python module, "mpmath" - https://mpmath.org/   
    function call:
    mpmath.chebyfit(lambda x: mpmath.root(x,3), [i, j], 3, error=True)
    where (i, j) is the  range                                                           */

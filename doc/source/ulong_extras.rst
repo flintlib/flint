@@ -1002,7 +1002,7 @@ Square root and perfect power testing
     `x` is in the range [0.5, 1]. Cube root of x is calculated using
     Chebyshev's approximation polynomial for the function `y = x^{1/3}`. The
     values of the coefficient are calculated from the Python module mpmath, 
-    http://mpmath.org, using the function chebyfit. x is multiplied 
+    https://mpmath.org, using the function chebyfit. x is multiplied 
     by ``2^exp`` and the cube root of 1, 2 or 4 (according to ``exp%3``).
 
 .. function:: ulong n_cbrtrem(ulong* remainder, ulong n)
