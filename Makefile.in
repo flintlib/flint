@@ -40,8 +40,9 @@ BUILD_DIRS= thread_pool                     thread_support                  \
             fmpz_mod_mpoly_factor           fmpq_mpoly_factor               \
             fq_nmod_mpoly_factor            fq_zech_mpoly_factor            \
                                                                             \
-            fft             fmpz_poly_q     fmpz_lll        n_poly          \
-            arith           qsieve          aprcl           $(EXTRA_BUILD_DIRS)
+            fft             fft_small       fmpz_poly_q     fmpz_lll        \
+            n_poly          arith           qsieve          aprcl           \
+            $(EXTRA_BUILD_DIRS)
 
 TEMPLATE_DIRS = fq_vec_templates fq_mat_templates fq_poly_templates \
    fq_poly_factor_templates fq_embed_templates fq_templates

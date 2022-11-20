@@ -641,8 +641,8 @@ if [ -z "$CFLAGS" ]; then
       ANSI_FLAG=""
       CXXFLAGS="-std=c++11 -pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
    else
-      ANSI_FLAG="-ansi"
-      CFLAGS="-pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
+      ANSI_FLAG=""
+      CFLAGS="-pedantic -fmax-errors=3 -Wall -O3 -fno-stack-protector -march=native $POPCNT_FLAG $ABI_FLAG"
    fi
 fi
 

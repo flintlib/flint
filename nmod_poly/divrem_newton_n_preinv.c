@@ -79,7 +79,7 @@ void nmod_poly_divrem_newton_n_preinv(nmod_poly_t Q, nmod_poly_t R,
         return;
     }
 
-    if (lenA > 2 * lenB - 2)
+    if (lenA > 2 * lenB - 1)
     {
         flint_printf ("Exception (nmod_poly_divrem_newton_n_preinv).\n");
     }

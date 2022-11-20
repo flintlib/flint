@@ -324,6 +324,13 @@ void flint_rand_free(flint_rand_s * state)
         B = __t_m_p_;        \
     } while (0)
 
+#define PTR_SWAP(T, A, B)    \
+    do {                    \
+        T* __t_m_p_ = A; \
+        A = B;              \
+        B = __t_m_p_;       \
+    } while (0)
+
 #define r_shift(in, shift) \
     ((shift == FLINT_BITS) ? WORD(0) : ((in) >> (shift)))
 
