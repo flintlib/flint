@@ -98,13 +98,6 @@ _gr_fmpq_set_fmpz(fmpq_t res, const fmpz_t v, const gr_ctx_t ctx)
 }
 
 int
-_gr_fmpq_set_fmpq(fmpq_t res, const fmpq_t v, const gr_ctx_t ctx)
-{
-    fmpq_set(res, v);
-    return GR_SUCCESS;
-}
-
-int
 _gr_fmpq_set_other(fmpq_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
 {
     switch (x_ctx->which_ring)
@@ -116,18 +109,9 @@ _gr_fmpq_set_other(fmpq_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
         case GR_CTX_FMPQ:
             fmpq_set(res, x);
             return GR_SUCCESS;
-
-        case GR_CTX_REAL_ALGEBRAIC_QQBAR:
-        case GR_CTX_COMPLEX_ALGEBRAIC_QQBAR:
-            if (qqbar_is_rational(x))
-            {
-                qqbar_get_fmpq(res, x);
-                return GR_SUCCESS;
-            }
-            return GR_DOMAIN;
     }
 
-    return GR_UNABLE;
+    return gr_get_fmpq(res, x, x_ctx);
 }
 
 int
@@ -740,11 +724,12 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_SET_SI,          (gr_funcptr) _gr_fmpq_set_si},
     {GR_METHOD_SET_UI,          (gr_funcptr) _gr_fmpq_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_fmpq_set_fmpz},
-    {GR_METHOD_SET_FMPQ,        (gr_funcptr) _gr_fmpq_set_fmpq},
+    {GR_METHOD_SET_FMPQ,        (gr_funcptr) _gr_fmpq_set},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_fmpq_set_other},
     {GR_METHOD_GET_SI,          (gr_funcptr) _gr_fmpq_get_si},
     {GR_METHOD_GET_UI,          (gr_funcptr) _gr_fmpq_get_ui},
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_fmpq_get_fmpz},
+    {GR_METHOD_GET_FMPQ,        (gr_funcptr) _gr_fmpq_set},
     {GR_METHOD_GET_D,           (gr_funcptr) _gr_fmpq_get_d},
     {GR_METHOD_NEG,             (gr_funcptr) _gr_fmpq_neg},
     {GR_METHOD_ADD,             (gr_funcptr) _gr_fmpq_add},

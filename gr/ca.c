@@ -369,6 +369,22 @@ _gr_ca_get_d(double * res, gr_srcptr x, gr_ctx_t ctx)
     return status;
 }
 
+int
+_gr_ca_get_fmpq(fmpq_t res, const ca_t x, gr_ctx_t ctx)
+{
+    truth_t rational;
+
+    /* todo: avoid duplicate computation */
+    rational = ca_check_is_rational(x, GR_CA_CTX(ctx));
+
+    if (rational == T_TRUE)
+        return ca_get_fmpq(res, x, GR_CA_CTX(ctx)) ? GR_SUCCESS : GR_UNABLE;
+    else if (rational == T_FALSE)
+        return GR_DOMAIN;
+    else
+        return GR_UNABLE;
+}
+
 truth_t
 _gr_ca_is_zero(const ca_t x, gr_ctx_t ctx)
 {

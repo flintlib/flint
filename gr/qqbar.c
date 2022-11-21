@@ -302,6 +302,16 @@ _gr_qqbar_get_si(slong * res, const qqbar_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_qqbar_get_fmpq(fmpq_t res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    if (!qqbar_is_rational(x))
+        return GR_DOMAIN;
+
+    qqbar_get_fmpq(res, x);
+    return GR_SUCCESS;
+}
+
+int
 _gr_qqbar_get_d(double * res, const qqbar_t x, const gr_ctx_t ctx)
 {
     arb_t t;
@@ -963,6 +973,7 @@ gr_method_tab_input _qqbar_methods_input[] =
     {GR_METHOD_GET_SI,          (gr_funcptr) _gr_qqbar_get_si},
     {GR_METHOD_GET_UI,          (gr_funcptr) _gr_qqbar_get_ui},
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_qqbar_get_fmpz},
+    {GR_METHOD_GET_FMPQ,        (gr_funcptr) _gr_qqbar_get_fmpq},
     {GR_METHOD_GET_D,           (gr_funcptr) _gr_qqbar_get_d},
 
     {GR_METHOD_NEG,             (gr_funcptr) _gr_qqbar_neg},

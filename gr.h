@@ -386,6 +386,7 @@ typedef enum
     GR_CTX_FMPQ,
 
     GR_CTX_FMPZ_MOD,
+    GR_CTX_NMOD,
     GR_CTX_NMOD8,
 
     GR_CTX_FQ,
@@ -999,6 +1000,7 @@ void gr_ctx_init_fmpq(gr_ctx_t ctx);
 void gr_ctx_init_fmpz_mod(gr_ctx_t ctx, const fmpz_t n);
 void gr_ctx_fmpz_mod_set_primality(gr_ctx_t ctx, truth_t is_prime);
 
+void gr_ctx_init_nmod(gr_ctx_t ctx, ulong n);
 void gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n);
 
 void gr_ctx_init_real_qqbar(gr_ctx_t ctx);
