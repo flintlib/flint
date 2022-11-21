@@ -20,7 +20,7 @@ jobs:
       CFLAGS: "-Wall"
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: "Setup"
         run: |
@@ -63,7 +63,7 @@ jobs:
       EXTRA_OPTIONS: "--disable-static --enable-shared"
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: "Setup"
         run: |
@@ -113,7 +113,7 @@ jobs:
       EXTRA_OPTIONS: "--enable-static --disable-shared"
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: "Set up Cygwin"
         uses: gap-actions/setup-cygwin@v1
@@ -161,7 +161,7 @@ jobs:
       EXTRA_OPTIONS: "--disable-static --enable-shared"
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: "Setup"
         run: |
@@ -203,7 +203,7 @@ jobs:
       CFLAGS: "-Wall"
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: "Setup"
         run: |
@@ -240,7 +240,7 @@ jobs:
     runs-on: windows-2019
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: "Setup"
         run: |
@@ -287,7 +287,7 @@ jobs:
       EXTRA_OPTIONS: "--disable-static --enable-shared"
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: "Setup"
         run: |
