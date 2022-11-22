@@ -460,7 +460,7 @@ void sd_fft_main_block(
         ulong l2 = n_pow2(k2);
 
         /* column ffts */
-        if (UNLIKELY(j_bits == 0))
+        if (UNLIKELY(j == 0))
         {
             _RADIX_4_FORWARD_PARAM_J_IS_Z(VECND, Q)
             ulong a = 0; do {
