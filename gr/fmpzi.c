@@ -146,6 +146,43 @@ _gr_fmpzi_set(fmpzi_t res, const fmpzi_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+/* todo: move */
+int
+fmpzi_set_qqbar(fmpzi_t res, const qqbar_t x)
+{
+    if (qqbar_is_integer(x))
+    {
+        qqbar_get_fmpz(fmpzi_realref(res), x);
+        fmpz_zero(fmpzi_imagref(res));
+        return 1;
+    }
+    else
+    {
+        /* a + bi ==>  X^2 - 2aX + (a^2+b^2) */
+        if (qqbar_is_algebraic_integer(x) && qqbar_degree(x) == 2 &&
+            fmpz_is_even(QQBAR_COEFFS(x) + 1) && fmpz_sgn(QQBAR_COEFFS(x)) > 0)
+        {
+            fmpz_tdiv_q_2exp(fmpzi_realref(res), QQBAR_COEFFS(x) + 1, 1);
+            fmpz_neg(fmpzi_realref(res), fmpzi_realref(res));
+
+            fmpz_mul(fmpzi_imagref(res), fmpzi_realref(res), fmpzi_realref(res));
+            fmpz_sub(fmpzi_imagref(res), QQBAR_COEFFS(x), fmpzi_imagref(res));
+
+            /* todo: combined square root / check */
+            if (fmpz_is_square(fmpzi_imagref(res)))
+            {
+                fmpz_sqrt(fmpzi_imagref(res), fmpzi_imagref(res));
+                if (qqbar_sgn_im(x) < 0)
+                    fmpz_neg(fmpzi_imagref(res), fmpzi_imagref(res));
+
+                return 1;
+            }
+        }
+
+        return 0;
+    }
+}
+
 int
 _gr_fmpzi_set_other(fmpzi_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
 {
@@ -162,39 +199,7 @@ _gr_fmpzi_set_other(fmpzi_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx
 
         case GR_CTX_REAL_ALGEBRAIC_QQBAR:
         case GR_CTX_COMPLEX_ALGEBRAIC_QQBAR:
-            if (qqbar_is_integer(x))
-            {
-                qqbar_get_fmpz(fmpzi_realref(res), x);
-                fmpz_zero(fmpzi_imagref(res));
-                return GR_SUCCESS;
-            }
-            else
-            {
-                const qqbar_struct * t = x;
-
-                /* a + bi ==>  X^2 - 2aX + (a^2+b^2) */
-                if (qqbar_is_algebraic_integer(x) && qqbar_degree(x) == 2 &&
-                    fmpz_is_even(QQBAR_COEFFS(t) + 1) && fmpz_sgn(QQBAR_COEFFS(t)) > 0)
-                {
-                    fmpz_tdiv_q_2exp(fmpzi_realref(res), QQBAR_COEFFS(t) + 1, 1);
-                    fmpz_neg(fmpzi_realref(res), fmpzi_realref(res));
-
-                    fmpz_mul(fmpzi_imagref(res), fmpzi_realref(res), fmpzi_realref(res));
-                    fmpz_sub(fmpzi_imagref(res), QQBAR_COEFFS(t), fmpzi_imagref(res));
-
-                    /* todo: combined square root / check */
-                    if (fmpz_is_square(fmpzi_imagref(res)))
-                    {
-                        fmpz_sqrt(fmpzi_imagref(res), fmpzi_imagref(res));
-                        if (qqbar_sgn_im(x) < 0)
-                            fmpz_neg(fmpzi_imagref(res), fmpzi_imagref(res));
-
-                        return GR_SUCCESS;
-                    }
-                }
-
-                return GR_DOMAIN;
-            }
+            return fmpzi_set_qqbar(res, x) ? GR_SUCCESS : GR_DOMAIN;
     }
 
     return GR_UNABLE;
@@ -631,6 +636,30 @@ _gr_fmpzi_pow(fmpzi_t res, const fmpzi_t x, const fmpzi_t exp, const gr_ctx_t ct
     }
 }
 
+/*
+int
+_gr_fmpzi_pow_fmpq(fmpzi_t res, const fmpzi_t x, const fmpq_t exp, const gr_ctx_t ctx)
+{
+    if (fmpz_is_one(fmpq_denref(exp)))
+    {
+        return _gr_fmpzi_pow_fmpz(res, x, fmpq_numref(exp), ctx);
+    }
+    else
+    {
+        qqbar_t t;
+        int status;
+        fmpzi_get_qqbar(t, x);
+
+        if (qqbar_pow_fmpq(t, t, exp) && fmpzi_set_qqbar(res, t))
+            status = GR_SUCCESS;
+        else
+            status = GR_UNABLE;
+
+        qqbar_clear(t);
+        return status;
+    }
+}
+*/
 
 /*
 truth_t
@@ -782,6 +811,7 @@ gr_method_tab_input _fmpzi_methods_input[] =
     {GR_METHOD_POW_UI,          (gr_funcptr) _gr_fmpzi_pow_ui},
     {GR_METHOD_POW_SI,          (gr_funcptr) _gr_fmpzi_pow_si},
     {GR_METHOD_POW_FMPZ,        (gr_funcptr) _gr_fmpzi_pow_fmpz},
+/*    {GR_METHOD_POW_FMPQ,        (gr_funcptr) _gr_fmpzi_pow_fmpq}, */
     {GR_METHOD_POW,             (gr_funcptr) _gr_fmpzi_pow},
 /*
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpzi_is_square},

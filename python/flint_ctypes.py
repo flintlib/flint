@@ -1696,7 +1696,9 @@ ZZ = IntegerRing_fmpz()
 QQ = RationalField_fmpq()
 ZZi = GaussianIntegerRing_fmpzi()
 AA = RealAlgebraicField_qqbar()
+AA_ca = RealAlgebraicField_ca()
 QQbar = ComplexAlgebraicField_qqbar()
+QQbar_ca = ComplexAlgebraicField_ca()
 RR = RR_arb = RealField_arb()
 CC = CC_acb = ComplexField_acb()
 RR_ca = RealField_ca()
@@ -1797,7 +1799,7 @@ def test_floor_ceil_trunc_nint():
     assert QQ(3).trunc() == 3
     assert QQ(3).nint() == 3
 
-    for R in [QQ, QQbar, RR, RR_ca, CC, CC_ca, RF]:
+    for R in [QQ, QQbar, QQbar_ca, AA, AA_ca, RR, RR_ca, CC, CC_ca, RF]:
         x = R(3) / 2
         assert x.floor() == 1
         assert x.ceil() == 2
@@ -1810,7 +1812,7 @@ def test_floor_ceil_trunc_nint():
         assert (x+1).nint() == 2
         assert (x+2).nint() == 4
 
-    for R in [QQbar, CC, CC_ca]:
+    for R in [QQbar, QQbar_ca, CC, CC_ca]:
         x = R(3) / 2 + R().i()
         assert x.floor() == 1
         assert x.ceil() == 2

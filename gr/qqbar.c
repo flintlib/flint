@@ -1,3 +1,4 @@
+#include "fmpzi.h"
 #include "qqbar.h"
 #include "fexpr.h"
 #include "gr.h"
@@ -215,6 +216,26 @@ _gr_qqbar_set(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+/* todo: move */
+void
+qqbar_set_fmpzi(qqbar_t res, const fmpzi_t x)
+{
+    if (fmpz_is_zero(fmpzi_imagref(x)))
+    {
+        qqbar_set_fmpz(res, fmpzi_realref(x));
+    }
+    else
+    {
+        fmpz_poly_fit_length(QQBAR_POLY(res), 3);
+        _fmpz_poly_set_length(QQBAR_POLY(res), 3);
+        fmpz_one(QQBAR_COEFFS(res));
+        fmpz_mul_si(QQBAR_COEFFS(res) + 1, fmpzi_realref(x), -2);
+        fmpzi_norm(QQBAR_COEFFS(res) + 2, x);
+        arb_set_round_fmpz(acb_realref(QQBAR_ENCLOSURE(res)), fmpzi_realref(x), QQBAR_DEFAULT_PREC);
+        arb_set_round_fmpz(acb_imagref(QQBAR_ENCLOSURE(res)), fmpzi_imagref(x), QQBAR_DEFAULT_PREC);
+    }
+}
+
 int
 _gr_qqbar_set_other(qqbar_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
 {
@@ -226,6 +247,12 @@ _gr_qqbar_set_other(qqbar_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx
 
         case GR_CTX_FMPQ:
             qqbar_set_fmpq(res, x);
+            return GR_SUCCESS;
+
+        case GR_CTX_FMPZI:
+            if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_QQBAR && !fmpz_is_zero(fmpzi_imagref((const fmpzi_struct *) x)))
+                return GR_DOMAIN;
+            qqbar_set_fmpzi(res, x);
             return GR_SUCCESS;
 
         case GR_CTX_REAL_ALGEBRAIC_QQBAR:

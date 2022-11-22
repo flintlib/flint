@@ -1,3 +1,4 @@
+#include "fmpzi.h"
 #include "ca.h"
 #include "ca_mat.h"
 #include "ca_poly.h"
@@ -136,6 +137,21 @@ _gr_ca_set_fmpq(ca_t res, const fmpq_t v, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+void
+ca_set_fmpzi(ca_t res, const fmpzi_t x, ca_ctx_t ctx)
+{
+    if (fmpz_is_zero(fmpzi_imagref(x)))
+    {
+        ca_set_fmpz(res, fmpzi_realref(x), ctx);
+    }
+    else
+    {
+        ca_i(res, ctx);
+        ca_mul_fmpz(res, res, fmpzi_imagref(x), ctx);
+        ca_add_fmpz(res, res, fmpzi_realref(x), ctx);
+    }
+}
+
 int
 _gr_ca_set_other(ca_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 {
@@ -150,6 +166,17 @@ _gr_ca_set_other(ca_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
         case GR_CTX_FMPQ:
             ca_set_fmpq(res, x, GR_CA_CTX(ctx));
             return GR_SUCCESS;
+
+        case GR_CTX_FMPZI:
+            if (target == GR_CTX_CC_CA || target == GR_CTX_COMPLEX_ALGEBRAIC_CA || fmpz_is_zero(fmpzi_imagref((const fmpzi_struct *) x)))
+            {
+                ca_set_fmpzi(res, x, GR_CA_CTX(ctx));
+                return GR_SUCCESS;
+            }
+            else
+            {
+                return GR_DOMAIN;
+            }
 
         case GR_CTX_REAL_ALGEBRAIC_QQBAR:
             ca_set_qqbar(res, x, GR_CA_CTX(ctx));
