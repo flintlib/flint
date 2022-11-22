@@ -807,7 +807,7 @@ _gr_arf_gamma(arf_t res, const arf_t x, const gr_ctx_t ctx)
     {
         if (arf_is_zero(x))
             arf_pos_inf(res);
-        else if (arf_is_inf(x))
+        else if (arf_is_pos_inf(x))
             arf_pos_inf(res);
         else
             arf_nan(res);
@@ -824,6 +824,27 @@ _gr_arf_gamma(arf_t res, const arf_t x, const gr_ctx_t ctx)
     }
 }
 
+int
+_gr_arf_zeta(arf_t res, const arf_t x, const gr_ctx_t ctx)
+{
+    if (!arf_is_finite(x))
+    {
+        if (arf_is_pos_inf(x))
+            arf_one(res);
+        else
+            arf_nan(res);
+        return GR_SUCCESS;
+    }
+    else if (arf_is_one(x))
+    {
+        arf_nan(res);
+        return GR_SUCCESS;
+    }
+    else
+    {
+        ARF_FUNC_VIA_ARB(res, arb_zeta, x)
+    }
+}
 
 int
 _gr_arf_vec_dot(arf_t res, const arf_t initial, int subtract, arf_srcptr vec1, arf_srcptr vec2, slong len, gr_ctx_t ctx)
@@ -1091,7 +1112,7 @@ gr_method_tab_input _arf_methods_input[] =
     {GR_METHOD_ATAN,            (gr_funcptr) _gr_arf_atan},
 
     {GR_METHOD_GAMMA,            (gr_funcptr) _gr_arf_gamma},
-
+    {GR_METHOD_ZETA,            (gr_funcptr) _gr_arf_zeta},
 
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_arf_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_arf_vec_dot_rev},

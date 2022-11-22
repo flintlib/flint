@@ -329,6 +329,68 @@ _gr_fmpz_is_invertible(const fmpz_t x, const gr_ctx_t ctx)
     return fmpz_is_pm1(x) ? T_TRUE : T_FALSE;
 }
 
+truth_t
+_gr_fmpz_divides(const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    return fmpz_divisible(y, x) ? T_TRUE : T_FALSE;
+}
+
+int
+_gr_fmpz_euclidean_div(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    if (fmpz_is_zero(y))
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        fmpz_fdiv_q(res, x, y);
+        return GR_SUCCESS;
+    }
+}
+
+int
+_gr_fmpz_euclidean_rem(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    if (fmpz_is_zero(y))
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        fmpz_fdiv_r(res, x, y);
+        return GR_SUCCESS;
+    }
+}
+
+int
+_gr_fmpz_euclidean_divrem(fmpz_t res1, fmpz_t res2, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    if (fmpz_is_zero(y))
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        fmpz_fdiv_qr(res1, res2, x, y);
+        return GR_SUCCESS;
+    }
+}
+
+int
+_gr_fmpz_gcd(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    fmpz_gcd(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_lcm(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    fmpz_lcm(res, x, y);
+    return GR_SUCCESS;
+}
+
 int
 _gr_fmpz_pow_ui(fmpz_t res, const fmpz_t x, ulong exp, const gr_ctx_t ctx)
 {
@@ -348,9 +410,13 @@ _gr_fmpz_pow_si(fmpz_t res, const fmpz_t x, slong exp, const gr_ctx_t ctx)
 {
     if (exp < 0)
     {
-        if (exp == -1 && fmpz_is_pm1(x))
+        if (fmpz_is_pm1(x))
         {
-            fmpz_set(res, x);
+            if (fmpz_is_one(x) || exp % 2 == 0)
+                fmpz_one(res);
+            else
+                fmpz_set_si(res, -1);
+
             return GR_SUCCESS;
         }
 
@@ -382,9 +448,13 @@ _gr_fmpz_pow_fmpz(fmpz_t res, const fmpz_t x, const fmpz_t exp, const gr_ctx_t c
         fmpz_zero(res);
         return GR_SUCCESS;
     }
-    else
+    else if (fmpz_sgn(exp) < 0)
     {
         return GR_DOMAIN;
+    }
+    else
+    {
+        return GR_UNABLE;
     }
 }
 
@@ -616,7 +686,6 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_GET_SI,          (gr_funcptr) _gr_fmpz_get_si},
     {GR_METHOD_GET_D,           (gr_funcptr) _gr_fmpz_get_d},
     {GR_METHOD_NEG,             (gr_funcptr) _gr_fmpz_neg},
-    {GR_METHOD_NEG,             (gr_funcptr) _gr_fmpz_neg},
     {GR_METHOD_ADD,             (gr_funcptr) _gr_fmpz_add},
     {GR_METHOD_ADD_UI,          (gr_funcptr) _gr_fmpz_add_ui},
     {GR_METHOD_ADD_SI,          (gr_funcptr) _gr_fmpz_add_si},
@@ -631,11 +700,18 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_MUL_FMPZ,        (gr_funcptr) _gr_fmpz_mul},
     {GR_METHOD_ADDMUL,          (gr_funcptr) _gr_fmpz_addmul},
     {GR_METHOD_SUBMUL,          (gr_funcptr) _gr_fmpz_submul},
+    /* todo: addmul, submul variants */
     {GR_METHOD_MUL_TWO,         (gr_funcptr) _gr_fmpz_mul_two},
     {GR_METHOD_SQR,             (gr_funcptr) _gr_fmpz_sqr},
     {GR_METHOD_DIV,             (gr_funcptr) _gr_fmpz_div},
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_fmpz_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) _gr_fmpz_inv},
+    {GR_METHOD_DIVIDES,         (gr_funcptr) _gr_fmpz_divides},
+    {GR_METHOD_EUCLIDEAN_DIV,   (gr_funcptr) _gr_fmpz_euclidean_div},
+    {GR_METHOD_EUCLIDEAN_REM,   (gr_funcptr) _gr_fmpz_euclidean_rem},
+    {GR_METHOD_EUCLIDEAN_DIVREM,(gr_funcptr) _gr_fmpz_euclidean_divrem},
+    {GR_METHOD_GCD,             (gr_funcptr) _gr_fmpz_gcd},
+    {GR_METHOD_LCM,             (gr_funcptr) _gr_fmpz_lcm},
     {GR_METHOD_POW_UI,          (gr_funcptr) _gr_fmpz_pow_ui},
     {GR_METHOD_POW_SI,          (gr_funcptr) _gr_fmpz_pow_si},
     {GR_METHOD_POW_FMPZ,        (gr_funcptr) _gr_fmpz_pow_fmpz},

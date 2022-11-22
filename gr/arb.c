@@ -1,6 +1,7 @@
 #include "arb.h"
 #include "arb_poly.h"
 #include "arb_mat.h"
+#include "arb_hypgeom.h"
 #include "qqbar.h"
 #include "gr.h"
 
@@ -872,10 +873,115 @@ _gr_arb_cos(arb_t res, const arb_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_arb_tan(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    arb_tan(res, x, ARB_CTX_PREC(ctx));
+    return arb_is_finite(res) ? GR_SUCCESS : GR_DOMAIN;
+}
+
+int
 _gr_arb_atan(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     arb_atan(res, x, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
+}
+
+int
+_gr_arb_erf(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    arb_hypgeom_erf(res, x, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_arb_erfc(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    arb_hypgeom_erfc(res, x, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_arb_erfi(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    arb_hypgeom_erfi(res, x, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_arb_gamma(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    if (arb_is_positive(x))
+    {
+        arb_gamma(res, x, ARB_CTX_PREC(ctx));
+        return GR_SUCCESS;
+    }
+    else if (arb_is_nonpositive(x) && arb_is_int(x))
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        arb_gamma(res, x, ARB_CTX_PREC(ctx));
+        return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+    }
+}
+
+int
+_gr_arb_rgamma(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    arb_rgamma(res, x, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_arb_lgamma(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    if (arb_is_positive(x))
+    {
+        arb_lgamma(res, x, ARB_CTX_PREC(ctx));
+        return GR_SUCCESS;
+    }
+
+    if (arb_is_nonpositive(x))
+        return GR_DOMAIN;
+
+    return GR_UNABLE;
+}
+
+int
+_gr_arb_digamma(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    if (arb_is_positive(x))
+    {
+        arb_digamma(res, x, ARB_CTX_PREC(ctx));
+        return GR_SUCCESS;
+    }
+    else if (arb_is_nonpositive(x) && arb_is_int(x))
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        arb_digamma(res, x, ARB_CTX_PREC(ctx));
+        return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+    }
+}
+
+int
+_gr_arb_zeta(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    if (arb_contains_si(x, 1))
+    {
+        if (arb_is_one(x))
+            return GR_DOMAIN;
+        else
+            return GR_UNABLE;
+    }
+    else
+    {
+        arb_zeta(res, x, ARB_CTX_PREC(ctx));
+        return GR_SUCCESS;
+    }
 }
 
 int
@@ -1010,7 +1116,16 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_LOG,             (gr_funcptr) _gr_arb_log},
     {GR_METHOD_SIN,             (gr_funcptr) _gr_arb_sin},
     {GR_METHOD_COS,             (gr_funcptr) _gr_arb_cos},
+    {GR_METHOD_TAN,             (gr_funcptr) _gr_arb_tan},
     {GR_METHOD_ATAN,            (gr_funcptr) _gr_arb_atan},
+    {GR_METHOD_ERF,             (gr_funcptr) _gr_arb_erf},
+    {GR_METHOD_ERFI,            (gr_funcptr) _gr_arb_erfi},
+    {GR_METHOD_ERFC,            (gr_funcptr) _gr_arb_erfc},
+    {GR_METHOD_GAMMA,           (gr_funcptr) _gr_arb_gamma},
+    {GR_METHOD_RGAMMA,          (gr_funcptr) _gr_arb_rgamma},
+    {GR_METHOD_LGAMMA,          (gr_funcptr) _gr_arb_lgamma},
+    {GR_METHOD_DIGAMMA,         (gr_funcptr) _gr_arb_digamma},
+    {GR_METHOD_ZETA,            (gr_funcptr) _gr_arb_zeta},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_arb_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_arb_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_arb_poly_mullow},

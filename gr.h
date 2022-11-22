@@ -239,6 +239,13 @@ typedef enum
     GR_METHOD_SQRT,
     GR_METHOD_RSQRT,
 
+    GR_METHOD_DIVIDES,
+    GR_METHOD_EUCLIDEAN_DIV,
+    GR_METHOD_EUCLIDEAN_REM,
+    GR_METHOD_EUCLIDEAN_DIVREM,
+    GR_METHOD_GCD,
+    GR_METHOD_LCM,
+
     GR_METHOD_FLOOR,
     GR_METHOD_CEIL,
     GR_METHOD_TRUNC,
@@ -384,6 +391,7 @@ typedef enum
 {
     GR_CTX_FMPZ,
     GR_CTX_FMPQ,
+    GR_CTX_FMPZI,
 
     GR_CTX_FMPZ_MOD,
     GR_CTX_NMOD,
@@ -474,7 +482,7 @@ typedef int ((*gr_method_unary_op_get_si)(slong *, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_get_fmpz)(fmpz_t, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_get_fmpq)(fmpq_t, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_get_d)(double *, gr_srcptr, gr_ctx_ptr));
-typedef int ((*gr_method_unary_unary_op)(gr_ptr, gr_ptr, gr_srcptr, gr_ctx_ptr));
+typedef int ((*gr_method_binary_unary_op)(gr_ptr, gr_ptr, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_binary_op)(gr_ptr, gr_srcptr, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_binary_op_si)(gr_ptr, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_binary_op_ui)(gr_ptr, gr_srcptr, ulong, gr_ctx_ptr));
@@ -484,6 +492,7 @@ typedef int ((*gr_method_binary_op_other)(gr_ptr, gr_srcptr, gr_srcptr, gr_ctx_p
 typedef int ((*gr_method_other_binary_op)(gr_ptr, gr_srcptr, gr_ctx_ptr, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_binary_op_get_int)(int *, gr_srcptr, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_binary_op_other_get_int)(int *, gr_srcptr, gr_srcptr, gr_ctx_ptr, gr_ctx_ptr));
+typedef int ((*gr_method_binary_binary_op)(gr_ptr, gr_ptr, gr_srcptr, gr_srcptr, gr_ctx_ptr));
 typedef truth_t ((*gr_method_unary_predicate)(gr_srcptr, gr_ctx_ptr));
 typedef truth_t ((*gr_method_binary_predicate)(gr_srcptr, gr_srcptr, gr_ctx_ptr));
 
@@ -529,7 +538,7 @@ typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcp
 #define GR_UNARY_OP_GET_FMPZ(ctx, NAME) (((gr_method_unary_op_get_fmpz *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_OP_GET_FMPQ(ctx, NAME) (((gr_method_unary_op_get_fmpq *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_OP_GET_D(ctx, NAME) (((gr_method_unary_op_get_d *) ctx->methods)[GR_METHOD_ ## NAME])
-#define GR_UNARY_UNARY_OP(ctx, NAME) (((gr_method_unary_unary_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_BINARY_UNARY_OP(ctx, NAME) (((gr_method_binary_unary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_OP(ctx, NAME) (((gr_method_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_OP_SI(ctx, NAME) (((gr_method_binary_op_si *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_OP_UI(ctx, NAME) (((gr_method_binary_op_ui *) ctx->methods)[GR_METHOD_ ## NAME])
@@ -539,6 +548,7 @@ typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcp
 #define GR_OTHER_BINARY_OP(ctx, NAME) (((gr_method_other_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_OP_GET_INT(ctx, NAME) (((gr_method_binary_op_get_int *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_OP_OTHER_GET_INT(ctx, NAME) (((gr_method_binary_op_other_get_int *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_BINARY_BINARY_OP(ctx, NAME) (((gr_method_binary_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_PREDICATE(ctx, NAME) (((gr_method_unary_predicate *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_PREDICATE(ctx, NAME) (((gr_method_binary_predicate *) ctx->methods)[GR_METHOD_ ## NAME])
 
@@ -666,6 +676,13 @@ GR_INLINE WARN_UNUSED_RESULT int gr_other_div(gr_ptr res, gr_srcptr x, gr_ctx_t 
 GR_INLINE WARN_UNUSED_RESULT int gr_inv(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, INV)(res, x, ctx); }
 GR_INLINE truth_t gr_is_invertible(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_INVERTIBLE)(x, ctx); }
 
+GR_INLINE truth_t gr_divides(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_PREDICATE(ctx, DIVIDES)(x, y, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_euclidean_div(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, EUCLIDEAN_DIV)(res, x, y, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_euclidean_rem(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, EUCLIDEAN_REM)(res, x, y, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_euclidean_divrem(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_BINARY_OP(ctx, EUCLIDEAN_DIVREM)(res1, res2, x, y, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_gcd(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, GCD)(res, x, y, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_lcm(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, LCM)(res, x, y, ctx); }
+
 GR_INLINE WARN_UNUSED_RESULT int gr_pow(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, POW)(res, x, y, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_pow_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, POW_UI)(res, x, y, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_pow_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, POW_SI)(res, x, y, ctx); }
@@ -705,7 +722,7 @@ GR_INLINE WARN_UNUSED_RESULT int gr_log1p(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 GR_INLINE WARN_UNUSED_RESULT int gr_log_pi_i(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, LOG_PI_I)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_sin(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SIN)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_cos(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, COS)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_sin_cos(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_UNARY_OP(ctx, SIN_COS)(res1, res2, x, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_sin_cos(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_ctx_t ctx) { return GR_BINARY_UNARY_OP(ctx, SIN_COS)(res1, res2, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_tan(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, TAN)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_cot(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, COT)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_sec(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SEC)(res, x, ctx); }
@@ -713,7 +730,7 @@ GR_INLINE WARN_UNUSED_RESULT int gr_csc(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) {
 
 GR_INLINE WARN_UNUSED_RESULT int gr_sin_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SIN_PI)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_cos_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, COS_PI)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_sin_cos_pi(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_UNARY_OP(ctx, SIN_COS_PI)(res1, res2, x, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_sin_cos_pi(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_ctx_t ctx) { return GR_BINARY_UNARY_OP(ctx, SIN_COS_PI)(res1, res2, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_tan_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, TAN_PI)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_cot_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, COT_PI)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_sec_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SEC_PI)(res, x, ctx); }
@@ -724,7 +741,7 @@ GR_INLINE WARN_UNUSED_RESULT int gr_sinc_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ct
 
 GR_INLINE WARN_UNUSED_RESULT int gr_sinh(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SINH)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_cosh(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, COSH)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_sinh_cosh(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_UNARY_OP(ctx, SINH_COSH)(res1, res2, x, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_sinh_cosh(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_ctx_t ctx) { return GR_BINARY_UNARY_OP(ctx, SINH_COSH)(res1, res2, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_tanh(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, TANH)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_coth(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, COTH)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_sech(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SECH)(res, x, ctx); }
@@ -996,6 +1013,7 @@ void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state);
 
 void gr_ctx_init_fmpz(gr_ctx_t ctx);
 void gr_ctx_init_fmpq(gr_ctx_t ctx);
+void gr_ctx_init_fmpzi(gr_ctx_t ctx);
 
 void gr_ctx_init_fmpz_mod(gr_ctx_t ctx, const fmpz_t n);
 void gr_ctx_fmpz_mod_set_primality(gr_ctx_t ctx, truth_t is_prime);

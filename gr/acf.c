@@ -699,6 +699,18 @@ _gr_acf_log(acf_t res, const acf_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_acf_sin(acf_t res, const acf_t x, const gr_ctx_t ctx)
+{
+    ACF_FUNC_VIA_ACB(res, acb_sin, x)
+}
+
+int
+_gr_acf_cos(acf_t res, const acf_t x, const gr_ctx_t ctx)
+{
+    ACF_FUNC_VIA_ACB(res, acb_cos, x)
+}
+
+int
 _gr_acf_vec_dot(acf_t res, const acf_t initial, int subtract, acf_srcptr vec1, acf_srcptr vec2, slong len, gr_ctx_t ctx)
 {
     acf_approx_dot(res, initial, subtract, vec1, 1, vec2, 1, len, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
@@ -992,6 +1004,8 @@ gr_method_tab_input _acf_methods_input[] =
     {GR_METHOD_PI,              (gr_funcptr) _gr_acf_pi},
     {GR_METHOD_EXP,             (gr_funcptr) _gr_acf_exp},
     {GR_METHOD_LOG,             (gr_funcptr) _gr_acf_log},
+    {GR_METHOD_SIN,             (gr_funcptr) _gr_acf_sin},
+    {GR_METHOD_COS,             (gr_funcptr) _gr_acf_cos},
 
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_acf_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_acf_vec_dot_rev},

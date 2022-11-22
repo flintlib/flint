@@ -53,6 +53,10 @@ class fmpq_struct(ctypes.Structure):
     _fields_ = [('num', c_slong),
                 ('den', c_slong)]
 
+class fmpzi_struct(ctypes.Structure):
+    _fields_ = [('real', c_slong),
+                ('imag', c_slong)]
+
 class fmpz_poly_struct(ctypes.Structure):
     _fields_ = [('coeffs', ctypes.c_void_p),
                 ('alloc', c_slong),
@@ -568,6 +572,18 @@ class gr_elem:
     def __rpow__(self, other):
         return self._binary_op2(other, self, _pow_methods, "x ** y")
 
+    def __floordiv__(self, other):
+        return self._binary_op(self, other, libgr.gr_euclidean_div, "x // y")
+
+    def __rfloordiv__(self, other):
+        return self._binary_op(self, other, libgr.gr_euclidean_div, "x // y")
+
+    def __mod__(self, other):
+        return self._binary_op(self, other, libgr.gr_euclidean_rem, "x % y")
+
+    def __rmod__(self, other):
+        return self._binary_op(self, other, libgr.gr_euclidean_rem, "x % y")
+
     def is_invertible(self):
         """
         Return whether self has a multiplicative inverse in its domain.
@@ -579,6 +595,35 @@ class gr_elem:
             True
         """
         return self._unary_predicate(self, libgr.gr_is_invertible, "is_invertible")
+
+    def divides(self, other):
+        """
+        Return whether self divides other.
+
+            >>> ZZ(5).divides(10)
+            True
+            >>> ZZ(5).divides(12)
+            False
+        """
+        return self._binary_predicate(self, other, libgr.gr_divides, "divides")
+
+    def gcd(self, other):
+        """
+        Greatest common divisor.
+
+            >>> ZZ(24).gcd(30)
+            6
+        """
+        return self._binary_op(self, other, libgr.gr_gcd, "gcd")
+
+    def lcm(self, other):
+        """
+        Least common multiple.
+
+            >>> ZZ(24).lcm(30)
+            120
+        """
+        return self._binary_op(self, other, libgr.gr_lcm, "lcm")
 
     def is_square(self):
         """
@@ -935,9 +980,29 @@ class gr_elem:
     def acsc_pi(self):
         return self._unary_op(self, libgr.gr_acsc_pi, "acsc_pi(x)")
 
+    def erf(self):
+        return self._unary_op(self, libgr.gr_erf, "erf(x)")
+
+    def erfi(self):
+        return self._unary_op(self, libgr.gr_erfi, "erfi(x)")
+
+    def erfc(self):
+        return self._unary_op(self, libgr.gr_erfc, "erfc(x)")
 
     def gamma(self):
         return self._unary_op(self, libgr.gr_gamma, "gamma(x)")
+
+    def lgamma(self):
+        return self._unary_op(self, libgr.gr_lgamma, "lgamma(x)")
+
+    def rgamma(self):
+        return self._unary_op(self, libgr.gr_rgamma, "lgamma(x)")
+
+    def digamma(self):
+        return self._unary_op(self, libgr.gr_digamma, "digamma(x)")
+
+    def zeta(self):
+        return self._unary_op(self, libgr.gr_zeta, "zeta(x)")
 
 
 class IntegerRing_fmpz(gr_ctx):
@@ -951,6 +1016,12 @@ class RationalField_fmpq(gr_ctx):
         gr_ctx.__init__(self)
         libgr.gr_ctx_init_fmpq(self._ref)
         self._elem_type = fmpq
+
+class GaussianIntegerRing_fmpzi(gr_ctx):
+    def __init__(self):
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_fmpzi(self._ref)
+        self._elem_type = fmpzi
 
 class ComplexAlgebraicField_qqbar(gr_ctx):
     def __init__(self):
@@ -1074,6 +1145,9 @@ class fmpz(gr_elem):
 
 class fmpq(gr_elem):
     _struct_type = fmpq_struct
+
+class fmpzi(gr_elem):
+    _struct_type = fmpzi_struct
 
 class qqbar(gr_elem):
     _struct_type = qqbar_struct
@@ -1620,6 +1694,7 @@ PolynomialRing = PolynomialRing_gr_poly
 
 ZZ = IntegerRing_fmpz()
 QQ = RationalField_fmpq()
+ZZi = GaussianIntegerRing_fmpzi()
 AA = RealAlgebraicField_qqbar()
 QQbar = ComplexAlgebraicField_qqbar()
 RR = RR_arb = RealField_arb()

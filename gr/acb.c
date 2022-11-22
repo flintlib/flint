@@ -1,6 +1,7 @@
 #include "acb.h"
 #include "acb_poly.h"
 #include "acb_mat.h"
+#include "acb_hypgeom.h"
 #include "acf.h"
 #include "qqbar.h"
 #include "gr.h"
@@ -773,6 +774,13 @@ _gr_acb_cos(acb_t res, const acb_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_acb_tan(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_tan(res, x, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_DOMAIN;
+}
+
+int
 _gr_acb_atan(acb_t res, const acb_t x, const gr_ctx_t ctx)
 {
     if (!arb_is_zero(acb_imagref(x)) && arb_contains_zero(acb_realref(x)))
@@ -786,6 +794,93 @@ _gr_acb_atan(acb_t res, const acb_t x, const gr_ctx_t ctx)
 
     acb_atan(res, x, ACB_CTX_PREC(ctx));
     return GR_SUCCESS;
+}
+
+int
+_gr_acb_erf(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_hypgeom_erf(res, x, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_erfc(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_hypgeom_erfc(res, x, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_erfi(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_hypgeom_erfi(res, x, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_gamma(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    if (acb_is_int(x) && arb_is_nonpositive(acb_realref(x)))
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        acb_gamma(res, x, ACB_CTX_PREC(ctx));
+        return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+    }
+}
+
+int
+_gr_acb_rgamma(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_rgamma(res, x, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_lgamma(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    if (acb_is_int(x) && arb_is_nonpositive(acb_realref(x)))
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        acb_lgamma(res, x, ACB_CTX_PREC(ctx));
+        return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+    }
+}
+
+int
+_gr_acb_digamma(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    if (acb_is_int(x) && arb_is_nonpositive(acb_realref(x)))
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        acb_digamma(res, x, ACB_CTX_PREC(ctx));
+        return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+    }
+}
+
+int
+_gr_acb_zeta(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    if (arb_contains_si(acb_realref(x), 1) && arb_contains_zero(acb_imagref(x)))
+    {
+        if (acb_is_one(x))
+            return GR_DOMAIN;
+        else
+            return GR_UNABLE;
+    }
+    else
+    {
+        acb_zeta(res, x, ACB_CTX_PREC(ctx));
+        return GR_SUCCESS;
+    }
 }
 
 int
@@ -919,7 +1014,16 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_LOG,             (gr_funcptr) _gr_acb_log},
     {GR_METHOD_SIN,             (gr_funcptr) _gr_acb_sin},
     {GR_METHOD_COS,             (gr_funcptr) _gr_acb_cos},
+    {GR_METHOD_TAN,             (gr_funcptr) _gr_acb_tan},
     {GR_METHOD_ATAN,            (gr_funcptr) _gr_acb_atan},
+    {GR_METHOD_ERF,             (gr_funcptr) _gr_acb_erf},
+    {GR_METHOD_ERFI,            (gr_funcptr) _gr_acb_erfi},
+    {GR_METHOD_ERFC,            (gr_funcptr) _gr_acb_erfc},
+    {GR_METHOD_GAMMA,           (gr_funcptr) _gr_acb_gamma},
+    {GR_METHOD_RGAMMA,          (gr_funcptr) _gr_acb_rgamma},
+    {GR_METHOD_LGAMMA,          (gr_funcptr) _gr_acb_lgamma},
+    {GR_METHOD_DIGAMMA,         (gr_funcptr) _gr_acb_digamma},
+    {GR_METHOD_ZETA,            (gr_funcptr) _gr_acb_zeta},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_acb_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_acb_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_acb_poly_mullow},

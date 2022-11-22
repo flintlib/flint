@@ -268,11 +268,22 @@ Base rings and fields
     Initializes *ctx* to the field of rational numbers
     `\mathbb{Q}` with elements of type :type:`fmpq`.
 
+.. function:: void gr_ctx_init_fmpzi(gr_ctx_t ctx)
+
+    Initializes *ctx* to the ring of Gaussian integers
+    `\mathbb{Z}[i]` with elements of type :type:`fmpzi_t`.
+
 .. function:: void gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n)
 
     Initializes *ctx* to the ring `\mathbb{Z}/n\mathbb{Z}`
     of integers modulo *n* where
     elements have type :type:`uint8`. We require `1 \le n \le 255`.
+
+.. function:: void gr_ctx_init_nmod(gr_ctx_t ctx, ulong n)
+
+    Initializes *ctx* to the ring `\mathbb{Z}/n\mathbb{Z}`
+    of integers modulo *n* where
+    elements have type :type:`ulong`. We require `n \ne 0`.
 
 .. function:: void gr_ctx_init_fmpz_mod(gr_ctx_t ctx, const fmpz_t n)
 
@@ -756,6 +767,38 @@ to detect inverses and compute quotients: ``fmpz``, ``fmpq``, ``qqbar``, ``nmod8
     Returns the flag ``GR_DOMAIN`` if *x* is not invertible, or
     ``GR_UNABLE`` if the implementation is unable to perform
     the computation.
+
+Divisibility
+........................................................................
+
+.. function:: truth_t gr_divides(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+
+    Returns whether *x* divides *y*.
+
+.. function:: int gr_euclidean_div(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_euclidean_rem(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_euclidean_divrem(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+
+    In a Euclidean ring, these functions perform some version of Euclidean
+    division with remainder, where the choice of quotient is
+    implementation-defined. For example, it is standard to use
+    the round-to-floor quotient in `\mathbb{Z}` and a round-to-nearest quotient in `\mathbb{Z}[i]`.
+    In non-Euclidean rings, these functions may implement some generalization of
+    Euclidean division with remainder.
+
+.. function:: int gr_gcd(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+
+    Sets *res* to the greatest common divisor (GCD) of *x* and *y*.
+
+    Since the GCD is only defined uniquely up to multiplication by a unit,
+    an implementation-defined representative is chosen.
+
+.. function:: int gr_lcm(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+
+    Sets *res* to the least common multiple (LCM) of *x* and *y*.
+
+    Since the LCM is only defined uniquely up to multiplication by a unit,
+    an implementation-defined representative is chosen.
 
 Powering
 ........................................................................
