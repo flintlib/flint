@@ -208,7 +208,13 @@ typedef struct {
 
 typedef sd_fft_lctx_struct sd_fft_lctx_t[1];
 
-
+/*
+    Points are blocked into blocks of size BLK_SZ. The blocks are mapped into
+    memory with some extra padding for potential cache issues. The 4* keeps
+    things aligned for 4-wide vectors. If this alignment is broken, the load
+    and stores in the fft (unspecified vec4d_load) need to support unaligned
+    addresses.
+*/
 FLINT_INLINE ulong sd_fft_ctx_blk_offset(ulong I)
 {
     return (I << LG_BLK_SZ) + 4*(I >> (BLK_SHIFT+2));
@@ -216,6 +222,7 @@ FLINT_INLINE ulong sd_fft_ctx_blk_offset(ulong I)
 
 FLINT_INLINE ulong sd_fft_ctx_data_size(ulong depth)
 {
+    FLINT_ASSERT(depth >= LG_BLK_SZ);
     return sd_fft_ctx_blk_offset(n_pow2(depth - LG_BLK_SZ));
 }
 
@@ -239,7 +246,7 @@ FLINT_INLINE double sd_fft_ctx_get_index(double* d, ulong i)
     return sd_fft_ctx_blk_index(d, i/BLK_SZ)[i%BLK_SZ];
 }
 
-/* slightly-worse-than-bit-reversed order */
+/* slightly-worse-than-bit-reversed order of sd_{i}fft_basecase_4 */
 FLINT_INLINE double sd_fft_ctx_get_fft_index(double* d, ulong i)
 {
     ulong j = i&(BLK_SZ-16);
@@ -320,16 +327,16 @@ FLINT_INLINE void sd_fft_ctx_ifft_trunc(sd_fft_ctx_t Q, double* d, ulong depth, 
 /* look up w[2*j] */
 FLINT_INLINE double sd_fft_lctx_w2(const sd_fft_lctx_t Q, ulong j)
 {
-    ulong j_bits = n_nbits(j);
-    ulong j_r = j & (n_pow2(j_bits)/2 - 1);
+    ulong j_bits, j_r;
+    SET_J_BITS_AND_J_R(j_bits, j_r, j);
     return Q->w2tab[j_bits][j_r];
 }
 
 /* look up -w[2*j]^-1 */
 FLINT_INLINE double sd_fft_lctx_w2inv(const sd_fft_lctx_t Q, ulong j)
 {
-    ulong j_bits = n_nbits(j);
-    ulong j_mr = n_pow2(j_bits) - 1 - j;
+    ulong j_bits, j_mr;
+    SET_J_BITS_AND_J_MR(j_bits, j_mr, j);
     if (j == 0)
         return -1.0;
     else
@@ -339,11 +346,9 @@ FLINT_INLINE double sd_fft_lctx_w2inv(const sd_fft_lctx_t Q, ulong j)
 /* look up w[jj] */
 FLINT_INLINE double sd_fft_ctx_w(const sd_fft_ctx_t Q, ulong jj)
 {
-    ulong j = jj/2;
-    double s = (jj&1) ? -1.0 : 1.0;
-    ulong j_bits = n_nbits(j);
-    ulong j_r = j & (n_pow2(j_bits)/2 - 1);
-    return s*Q->w2tab[j_bits][j_r];
+    ulong j = jj/2, j_bits, j_r;
+    SET_J_BITS_AND_J_R(j_bits, j_r, j);
+    return (jj&1) ? -Q->w2tab[j_bits][j_r] : Q->w2tab[j_bits][j_r];
 }
 
 typedef struct {
