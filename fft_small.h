@@ -21,6 +21,7 @@
 #include <gmp.h>
 #define ulong mp_limb_t
 #include "flint.h"
+#include "longlong.h"
 #include "mpn_extras.h"
 #include "machine_vectors.h"
 #include "nmod.h"
@@ -51,6 +52,7 @@ FLINT_INLINE ulong n_max(ulong a, ulong b)
 
 FLINT_INLINE ulong n_cdiv(ulong a, ulong b)
 {
+    /* not technically correct because the addition can overflow */
     return (a + b - 1)/b;
 }
 
@@ -78,36 +80,46 @@ FLINT_INLINE ulong n_next_pow2m1(ulong a)
     return a;
 }
 
-#if 0
-FLINT_INLINE ulong n_clog2(ulong x) {
-    if (x <= 2)
-        return x == 2;
-
-   ulong zeros = FLINT_BITS;
-   count_leading_zeros(zeros, x - 1);
-   return FLINT_BITS - zeros;
-}
-#endif
-
-
 FLINT_INLINE ulong n_leading_zeros(ulong x) {
-    return __builtin_clzll(x);
+    return x == 0 ? FLINT_BITS : __builtin_clzll(x);
 }
 
 FLINT_INLINE ulong n_trailing_zeros(ulong x) {
-    return __builtin_ctzll(x);
+    return x == 0 ? FLINT_BITS : __builtin_ctzll(x);
 }
 
+/*
+    nbits is a mess
+
+    without assuming x != 0:
+        on x86 we want 64 - LZCNT
+        on arm we want 64 - CLZ
+
+        the problem is gcc decided that __builtin_clz is undefined on zero
+        input even though both instructions LZCNT and CLZ are defined
+
+    assuming x != 0:
+        on x86 we want BSR + 1
+*/
 FLINT_INLINE ulong n_nbits(ulong x) {
-    return 64 - n_leading_zeros(x);
+    if (x == 0)
+        return 0;
+    return FLINT_BITS - __builtin_clzll(x);
+}
+
+FLINT_INLINE ulong n_nbits_nz(ulong x) {
+    FLINT_ASSERT(x != 0);
+    ulong count;
+    count_leading_zeros(count, x);
+    return (count^(FLINT_BITS-1)) + 1;
 }
 
 FLINT_INLINE ulong n_clog2(ulong x) {
-    return (x <= 2) ? (x == 2) : 64 - __builtin_clzll(x - 1);
+    return (x <= 2) ? (x == 2) : FLINT_BITS - __builtin_clzll(x - 1);
 }
 
 FLINT_INLINE ulong n_flog2(ulong x) {
-    return (x <= 2) ? (x == 2) : 63 - __builtin_clzll(x);
+    return (x <= 2) ? (x == 2) : FLINT_BITS - __builtin_clzll(x);
 }
 
 FLINT_INLINE slong z_min(slong a, slong b) {return FLINT_MIN(a, b);}
@@ -139,6 +151,37 @@ FLINT_DLL void flint_aligned_free(void* p);
     The first SD_FFT_CTX_INIT_DEPTH tables are stored consecutively to ease the
     lookup of small indices, which must currently be at least 4.
 */
+
+/* for the fft look up of powers of w */
+#define SET_J_BITS_AND_J_R(j_bits, j_r, j) \
+do { \
+    if (j == 0) \
+    { \
+        j_bits = 0; \
+        j_r = 0; \
+    } \
+    else \
+    { \
+        j_bits = n_nbits_nz(j); \
+        j_r = j - n_pow2(j_bits - 1); \
+    } \
+} while (0)
+
+/* for the ifft look up of powers of w^-1: the remainder has to be flipped */
+#define SET_J_BITS_AND_J_MR(j_bits, j_mr, j) \
+do { \
+    if (j == 0) \
+    { \
+        j_bits = 0; \
+        j_mr = 0; \
+    } \
+    else \
+    { \
+        j_bits = n_nbits_nz(j); \
+        j_mr = n_pow2(j_bits) - 1 - j; \
+    } \
+} while (0)
+
 
 #define SD_FFT_CTX_INIT_DEPTH 12
 
