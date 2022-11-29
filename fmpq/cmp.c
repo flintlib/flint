@@ -20,15 +20,15 @@ _fmpq_cmp(const fmpz_t p, const fmpz_t q, const fmpz_t r, const fmpz_t s)
 
     if (!COEFF_IS_MPZ(*p) && !COEFF_IS_MPZ(*q) && !COEFF_IS_MPZ(*r) && !COEFF_IS_MPZ(*s))
     {
-        slong a1, a0, b1, b0;
+        ulong a1, a0, b1, b0;
 
         smul_ppmm(a1, a0, *p, *s);
         smul_ppmm(b1, b0, *q, *r);
         sub_ddmmss(a1, a0, a1, a0, b1, b0);
 
-        if (a1 < 0)
+        if ((slong) a1 < 0)
             return -1;
-        if (a1 > 0)
+        if ((slong) a1 > 0)
             return 1;
         return a0 != 0;
     }

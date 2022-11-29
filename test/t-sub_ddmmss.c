@@ -32,8 +32,11 @@ int main(void)
       ml = n_randtest(state);
       sh = n_randtest(state);
       sl = n_randtest(state);
-      
-      sub_ddmmss(dh1, dl1, mh, ml, sh, sl);
+
+      if (n_randint(state, 10) == 0)
+          sub_ddmmss(dh1, dl1, (slong) mh, (slong) ml, (slong) sh, (slong) sl);
+      else
+          sub_ddmmss(dh1, dl1, mh, ml, sh, sl);
       
       dl2 = ml - sl;
       dh2 = -(sl > ml);
