@@ -32,8 +32,11 @@ int main(void)
       al1 = n_randtest(state);
       ah2 = n_randtest(state);
       al2 = n_randtest(state);
-      
-      add_ssaaaa(sh1, sl1, ah1, al1, ah2, al2);
+
+      if (n_randint(state, 10) == 0)
+         add_ssaaaa(sh1, sl1, (slong) ah1, (slong) al1, (slong) ah2, (slong) al2);
+      else
+         add_ssaaaa(sh1, sl1, ah1, al1, ah2, al2);
       
       sl2 = al1 + al2;
       sh2 = (sl1 < al1);

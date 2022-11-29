@@ -218,7 +218,7 @@
   do {                                          \
     mp_limb_t __x;                              \
     __x = (al) - (bl);                          \
-    if ((al) < (bl))                            \
+    if ((mp_limb_t) (al) < (mp_limb_t) (bl))    \
       (sh) = (ah) - (bh) - 1;                   \
     else                                        \
       (sh) = (ah) - (bh);                       \
@@ -451,7 +451,7 @@
   do {									          \
     mp_limb_t __x;								 \
     __x = (al) - (bl);							 \
-    (sh) = (ah) - (bh) - ((al) < (bl));    \
+    (sh) = (ah) - (bh) - ((mp_limb_t) (al) < (mp_limb_t) (bl));    \
     (sl) = __x;								    \
   } while (0)
 
