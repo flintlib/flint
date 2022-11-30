@@ -755,6 +755,19 @@ to detect inverses and compute quotients: ``fmpz``, ``fmpq``, ``qqbar``, ``nmod8
     `q y = x` (which, for example, gives the usual exact
     division in `\mathbb{Z}`).
 
+.. function:: int gr_divexact(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_divexact_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
+              int gr_divexact_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
+              int gr_divexact_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
+              int gr_divexact_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
+
+    Sets *res* to the quotient `x / y`, assuming that this quotient
+    is exact in the present ring.
+    Rings may optimize this operation by not verifying that the
+    division is possible. If the division is not actually exact, the
+    implementation may set *res* to a nonsense value and still
+    return the ``GR_SUCCESS`` flag.
+
 .. function:: truth_t gr_is_invertible(gr_srcptr x, gr_ctx_t ctx)
 
     Returns whether *x* has a multiplicative inverse in the present ring,

@@ -1752,6 +1752,13 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_DIV_OTHER,               (gr_funcptr) gr_generic_div_other},
     {GR_METHOD_OTHER_DIV,               (gr_funcptr) gr_generic_other_div},
 
+    {GR_METHOD_DIVEXACT_UI,             (gr_funcptr) gr_generic_div_ui},
+    {GR_METHOD_DIVEXACT_SI,             (gr_funcptr) gr_generic_div_si},
+    {GR_METHOD_DIVEXACT_FMPZ,           (gr_funcptr) gr_generic_div_fmpz},
+    {GR_METHOD_DIVEXACT_FMPQ,           (gr_funcptr) gr_generic_div_fmpq},
+    {GR_METHOD_DIVEXACT_OTHER,          (gr_funcptr) gr_generic_div_other},
+    {GR_METHOD_OTHER_DIVEXACT,          (gr_funcptr) gr_generic_other_div},
+
     {GR_METHOD_IS_INVERTIBLE,           (gr_funcptr) gr_generic_is_invertible},
     {GR_METHOD_INV,                     (gr_funcptr) gr_generic_inv},
 

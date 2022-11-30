@@ -128,8 +128,7 @@ gr_mat_fflu(slong * res_rank, slong * P, gr_mat_t LU, gr_ptr den, const gr_mat_t
 
                 if (row > 0)
                 {
-                    /* todo: should be divexact */
-                    status |= gr_div(ENTRY(j, k), ENTRY(j, k), den, ctx);
+                    status |= gr_divexact(ENTRY(j, k), ENTRY(j, k), den, ctx);
 
                     if (status != GR_SUCCESS)
                         goto cleanup;

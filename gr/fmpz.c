@@ -323,6 +323,48 @@ _gr_fmpz_div(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
     }
 }
 
+int
+_gr_fmpz_divexact(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    if (fmpz_is_zero(y))
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        fmpz_divexact(res, x, y);
+        return GR_SUCCESS;
+    }
+}
+
+int
+_gr_fmpz_divexact_ui(fmpz_t res, const fmpz_t x, ulong y, const gr_ctx_t ctx)
+{
+    if (y == 0)
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        fmpz_divexact_ui(res, x, y);
+        return GR_SUCCESS;
+    }
+}
+
+int
+_gr_fmpz_divexact_si(fmpz_t res, const fmpz_t x, slong y, const gr_ctx_t ctx)
+{
+    if (y == 0)
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        fmpz_divexact_si(res, x, y);
+        return GR_SUCCESS;
+    }
+}
+
 truth_t
 _gr_fmpz_is_invertible(const fmpz_t x, const gr_ctx_t ctx)
 {
@@ -704,6 +746,10 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_MUL_TWO,         (gr_funcptr) _gr_fmpz_mul_two},
     {GR_METHOD_SQR,             (gr_funcptr) _gr_fmpz_sqr},
     {GR_METHOD_DIV,             (gr_funcptr) _gr_fmpz_div},
+    {GR_METHOD_DIVEXACT,        (gr_funcptr) _gr_fmpz_divexact},
+    {GR_METHOD_DIVEXACT_UI,     (gr_funcptr) _gr_fmpz_divexact_ui},
+    {GR_METHOD_DIVEXACT_SI,     (gr_funcptr) _gr_fmpz_divexact_si},
+    {GR_METHOD_DIVEXACT_FMPZ,   (gr_funcptr) _gr_fmpz_divexact},
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_fmpz_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) _gr_fmpz_inv},
     {GR_METHOD_DIVIDES,         (gr_funcptr) _gr_fmpz_divides},
