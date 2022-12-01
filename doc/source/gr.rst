@@ -759,7 +759,6 @@ to detect inverses and compute quotients: ``fmpz``, ``fmpq``, ``qqbar``, ``nmod8
               int gr_divexact_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
               int gr_divexact_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
               int gr_divexact_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
-              int gr_divexact_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
 
     Sets *res* to the quotient `x / y`, assuming that this quotient
     is exact in the present ring.

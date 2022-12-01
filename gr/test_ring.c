@@ -1135,6 +1135,159 @@ gr_test_mul_then_div(gr_ctx_t R, flint_rand_t state, int test_flags)
 }
 
 int
+gr_test_divexact(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status;
+    int aliasing;
+    gr_ptr x, y, xy, q;
+
+    GR_TMP_INIT4(x, y, xy, q, R);
+
+    GR_MUST_SUCCEED(gr_randtest(x, state, R));
+    GR_MUST_SUCCEED(gr_randtest(y, state, R));
+
+    aliasing = n_randint(state, 3);
+
+    status = GR_SUCCESS;
+    status |= gr_mul(xy, x, y, R);
+
+    if (aliasing == 0)
+    {
+        status |= gr_divexact(q, xy, y, R);
+    }
+    else if (aliasing == 1)
+    {
+        status |= gr_set(q, xy, R);
+        status |= gr_divexact(q, q, y, R);
+    }
+    else
+    {
+        status |= gr_set(q, y, R);
+        status |= gr_divexact(q, xy, q, R);
+    }
+
+    if (status == GR_SUCCESS && gr_equal(q, x, R) == T_FALSE)
+    {
+        status = GR_TEST_FAIL;
+    }
+
+    if ((test_flags & GR_TEST_ALWAYS_ABLE) && (status & GR_UNABLE))
+        status = GR_TEST_FAIL;
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        printf("\n");
+        printf("aliasing = %d\n", aliasing);
+        printf("x = \n"); gr_println(x, R);
+        printf("y = \n"); gr_println(y, R);
+        printf("xy = \n"); gr_println(xy, R);
+        printf("q = \n"); gr_println(q, R);
+        printf("\n");
+    }
+
+    GR_TMP_CLEAR4(x, y, xy, q, R);
+
+    return status;
+}
+
+int
+gr_test_divexact_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status, alias, which;
+    gr_ptr x, xy, q;
+    ulong uy;
+    slong sy;
+    fmpz_t zy;
+
+    GR_TMP_INIT3(x, xy, q, R);
+    fmpz_init(zy);
+
+    which = 0;
+
+    uy = n_randtest(state);
+    sy = (slong) n_randtest(state);
+    fmpz_randtest(zy, state, 100);
+
+    for (which = 0; which < 4; which++)
+    {
+        GR_MUST_SUCCEED(gr_randtest(x, state, R));
+        GR_MUST_SUCCEED(gr_randtest(q, state, R));
+
+        status = GR_SUCCESS;
+        alias = n_randint(state, 2);
+
+        if (which == 0)
+        {
+            status |= gr_mul_ui(xy, x, uy, R);
+
+            if (alias)
+            {
+                status |= gr_set(q, xy, R);
+                status |= gr_divexact_ui(q, q, uy, R);
+            }
+            else
+            {
+                status |= gr_divexact_ui(q, xy, uy, R);
+            }
+        }
+        else if (which == 1)
+        {
+            status |= gr_mul_si(xy, x, sy, R);
+
+            if (alias)
+            {
+                status |= gr_set(q, xy, R);
+                status |= gr_divexact_si(q, q, sy, R);
+            }
+            else
+            {
+                status |= gr_divexact_si(q, xy, sy, R);
+            }
+        }
+        else
+        {
+            status |= gr_mul_fmpz(xy, x, zy, R);
+
+            if (alias)
+            {
+                status |= gr_set(q, xy, R);
+                status |= gr_divexact_fmpz(q, q, zy, R);
+            }
+            else
+            {
+                status |= gr_divexact_fmpz(q, xy, zy, R);
+            }
+        }
+
+        if (status == GR_SUCCESS && gr_equal(q, x, R) == T_FALSE)
+        {
+            status = GR_TEST_FAIL;
+            break;
+        }
+    }
+
+    if ((test_flags & GR_TEST_ALWAYS_ABLE) && (status & GR_UNABLE))
+        status = GR_TEST_FAIL;
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        printf("\n");
+        printf("which: %d\n", which);
+        printf("alias: %d\n", alias);
+        printf("x = "); gr_println(x, R);
+        printf("xy = "); gr_println(xy, R);
+        printf("q = "); gr_println(q, R);
+        printf("\n");
+    }
+
+    GR_TMP_CLEAR3(x, xy, q, R);
+
+    fmpz_clear(zy);
+
+    return status;
+}
+
+int
 gr_test_pow_ui_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -1957,6 +2110,9 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
 
     gr_test_iter(R, state, "inv: multiplication", gr_test_inv_multiplication, iters, test_flags);
     gr_test_iter(R, state, "inv: involution", gr_test_inv_involution, iters, test_flags);
+
+    gr_test_iter(R, state, "divexact", gr_test_divexact, iters, test_flags);
+    gr_test_iter(R, state, "divexact: ui/si/fmpz", gr_test_divexact_type_variants, iters, test_flags);
 
     gr_test_iter(R, state, "pow_ui: exponent addition", gr_test_pow_ui_exponent_addition, iters, test_flags);
     gr_test_iter(R, state, "pow_ui: base scalar multiplication", gr_test_pow_ui_base_scalar_multiplication, iters, test_flags);

@@ -736,6 +736,11 @@ int gr_generic_other_div(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, g
     return status;
 }
 
+int gr_generic_divexact(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+{
+    return gr_div(res, x, y, ctx);
+}
+
 
 /* Generic powering */
 
@@ -1752,10 +1757,10 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_DIV_OTHER,               (gr_funcptr) gr_generic_div_other},
     {GR_METHOD_OTHER_DIV,               (gr_funcptr) gr_generic_other_div},
 
+    {GR_METHOD_DIVEXACT,                (gr_funcptr) gr_generic_divexact},
     {GR_METHOD_DIVEXACT_UI,             (gr_funcptr) gr_generic_div_ui},
     {GR_METHOD_DIVEXACT_SI,             (gr_funcptr) gr_generic_div_si},
     {GR_METHOD_DIVEXACT_FMPZ,           (gr_funcptr) gr_generic_div_fmpz},
-    {GR_METHOD_DIVEXACT_FMPQ,           (gr_funcptr) gr_generic_div_fmpq},
     {GR_METHOD_DIVEXACT_OTHER,          (gr_funcptr) gr_generic_div_other},
     {GR_METHOD_OTHER_DIVEXACT,          (gr_funcptr) gr_generic_other_div},
 
