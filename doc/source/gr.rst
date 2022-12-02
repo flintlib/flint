@@ -550,15 +550,18 @@ or allocate the memory on the heap if needed.
 
     Corresponding macros to clear temporary variables.
 
-Basic functions
+Random elements
 ................................................................................
 
 .. function:: int gr_randtest(gr_ptr res, flint_rand_t state, gr_ctx_t ctx)
 
-    Sets *res* to a random element of the ring.
-    The distribution is determined by the ring implementation.
-    This normally generates elements non-uniformly to trigger
-    corner cases in test code with increased probability.
+    Sets *res* to a random element of the domain *ctx*.
+    The distribution is determined by the implementation.
+    Typically the distribution is non-uniform in order to
+    find corner cases more easily in test code.
+
+Input, output and string conversion
+................................................................................
 
 .. function:: int gr_write(gr_stream_t out, gr_srcptr x, gr_ctx_t ctx)
               int gr_print(gr_srcptr x, gr_ctx_t ctx)
@@ -571,25 +574,30 @@ Basic functions
     the string with ``flint_free``). The *println* version prints a
     trailing newline.
 
+.. function:: int gr_set_str(gr_ptr res, const char * x, gr_ctx_t ctx)
+
+    Sets *res* to the string description in *x*.
+
+Assignment and conversions
+................................................................................
+
 .. function:: int gr_zero(gr_ptr res, gr_ctx_t ctx)
               int gr_one(gr_ptr res, gr_ctx_t ctx)
               int gr_neg_one(gr_ptr res, gr_ctx_t ctx)
 
-    Sets *res* to the element 0, 1 or -1 of the ring.
+    Sets *res* to the ring element 0, 1 or -1.
 
 .. function:: int gr_set(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 
     Sets *res* to a copy of the element *x*.
 
-.. function:: int gr_set_si(gr_ptr res, slong x, gr_ctx_t ctx)
-              int gr_set_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
+.. function:: int gr_set_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
+              int gr_set_si(gr_ptr res, slong x, gr_ctx_t ctx)
               int gr_set_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx)
               int gr_set_fmpq(gr_ptr res, const fmpq_t x, gr_ctx_t ctx)
 
-    Sets *res* to the image of the integer or rational number *x*
-    in the ring *ctx*.
-    The *fmpq* method may return the flag ``GR_DOMAIN`` if the
-    denominator of *x* is not invertible.
+    Sets *res* to the value *x*. If no reasonable conversion to the
+    domain *ctx* is possible, returns ``GR_DOMAIN``.
 
 .. function:: int gr_set_other(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 
@@ -598,10 +606,6 @@ Basic functions
     if *x* is not an element of *ctx* or cannot be converted
     unambiguously to *ctx*.  The ``GR_UNABLE`` flag is returned
     if the conversion is not implemented.
-
-.. function:: int gr_set_str(gr_ptr res, const char * x, gr_ctx_t ctx)
-
-    Sets *res* to the string description in *x*.
 
 .. function:: int gr_get_si(slong * res, gr_srcptr x, gr_ctx_t ctx)
               int gr_get_ui(ulong * res, gr_srcptr x, gr_ctx_t ctx)
@@ -625,16 +629,27 @@ Basic functions
     Returns a floating-point approximation of *x*. The interpretation
     of this conversion depends on the ring.
 
+Basic properties
+........................................................................
+
 .. function:: truth_t gr_is_zero(gr_srcptr x, gr_ctx_t ctx)
               truth_t gr_is_one(gr_srcptr x, gr_ctx_t ctx)
               truth_t gr_is_neg_one(gr_srcptr x, gr_ctx_t ctx)
 
-    Returns whether *x* is equal to the element 0, 1 or -1 of the
-    ring, respectively.
+    Returns whether *x* is equal to the ring element 0, 1 or -1,
+    respectively.
 
 .. function:: truth_t gr_equal(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 
     Returns whether the elements *x* and *y* are equal.
+
+.. function:: truth_t gr_is_integer(gr_srcptr x, gr_ctx_t ctx)
+
+    Returns whether *x* represents an integer.
+
+.. function:: truth_t gr_is_rational(gr_srcptr x, gr_ctx_t ctx)
+
+    Returns whether *x* represents a rational number.
 
 Arithmetic
 ........................................................................
@@ -644,6 +659,8 @@ and ``mul`` methods; the variants with other operand types
 have generic fallbacks that may be overridden for performance.
 The ``fmpq`` versions may return ``GR_DOMAIN`` if the denominator
 is not invertible.
+The *other* versions accept operands belonging to a different domain,
+attempting to perform a coercion into the target domain.
 
 .. function:: int gr_neg(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 
@@ -654,6 +671,8 @@ is not invertible.
               int gr_add_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
               int gr_add_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
               int gr_add_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
+              int gr_add_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
+              int gr_other_add(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx)
 
     Sets *res* to `x + y`.
 
@@ -662,6 +681,8 @@ is not invertible.
               int gr_sub_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
               int gr_sub_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
               int gr_sub_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
+              int gr_sub_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
+              int gr_other_sub(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx)
 
     Sets *res* to `x - y`.
 
@@ -670,6 +691,8 @@ is not invertible.
               int gr_mul_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
               int gr_mul_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
               int gr_mul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
+              int gr_mul_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
+              int gr_other_mul(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx)
 
     Sets *res* to `x \cdot y`.
 
@@ -678,6 +701,7 @@ is not invertible.
               int gr_addmul_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
               int gr_addmul_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
               int gr_addmul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
+              int gr_addmul_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
 
     Sets *res* to `\mathrm{res } + x \cdot y`.
     Rings may override the default
@@ -689,6 +713,7 @@ is not invertible.
               int gr_submul_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
               int gr_submul_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
               int gr_submul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
+              int gr_submul_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
 
     Sets *res* to `\mathrm{res } - x \cdot y`.
     Rings may override the default
@@ -732,15 +757,14 @@ The default implementations of the following methods check for divisors
 0, 1, -1 and otherwise return ``GR_UNABLE``.
 Particular rings should override the methods when an inversion
 or division algorithm is available.
-The base rings corresponding to
-the following types have complete algorithms
-to detect inverses and compute quotients: ``fmpz``, ``fmpq``, ``qqbar``, ``nmod8``.
 
 .. function:: int gr_div(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
               int gr_div_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
               int gr_div_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
               int gr_div_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
               int gr_div_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
+              int gr_div_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
+              int gr_other_div(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx)
 
     Sets *res* to the quotient `x / y` if such an element exists
     in the present ring. Returns the flag ``GR_DOMAIN`` if no such
@@ -759,6 +783,8 @@ to detect inverses and compute quotients: ``fmpz``, ``fmpq``, ``qqbar``, ``nmod8
               int gr_divexact_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
               int gr_divexact_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
               int gr_divexact_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
+              int gr_divexact_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
+              int gr_other_divexact(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx)
 
     Sets *res* to the quotient `x / y`, assuming that this quotient
     is exact in the present ring.
@@ -820,6 +846,8 @@ Powering
               int gr_pow_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
               int gr_pow_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
               int gr_pow_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
+              int gr_pow_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
+              int gr_other_pow(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx)
 
     Sets *res* to the power `x ^ y`, the interpretation of which
     depends on the ring when `y \not \in \mathbb{Z}`.
@@ -843,9 +871,6 @@ The default implementations of the following methods check for the
 elements 0 and 1 and otherwise return ``GR_UNABLE``.
 Particular rings should override the methods when a square
 root algorithm is available.
-The base rings corresponding to
-the following types have complete algorithms
-to detect squares and compute square roots: ``fmpz``, ``fmpq``, ``qqbar``.
 
 In subrings of `\mathbb{C}`, it is implied that the principal
 square root is computed; in other cases (e.g. in finite fields),
@@ -899,12 +924,14 @@ Ordering methods
 ........................................................................
 
 .. function:: int gr_cmp(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_cmp_other(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
 
     Sets *res* to -1, 0 or 1 according to whether *x* is less than,
     equal or greater than the absolute value of *y*.
     This may return ``GR_DOMAIN`` if the ring is not an ordered ring.
 
 .. function:: int gr_cmpabs(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_cmpabs_other(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
 
     Sets *res* to -1, 0 or 1 according to whether the absolute value
     of *x* is less than, equal or greater than the absolute value of *y*.
