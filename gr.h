@@ -415,6 +415,8 @@ typedef enum
     GR_CTX_REAL_FLOAT_ARF,
     GR_CTX_COMPLEX_FLOAT_ACF,
 
+    GR_CTX_FMPZ_POLY,
+
     GR_CTX_GR_POLY,
     GR_CTX_GR_MPOLY,
     GR_CTX_GR_MAT,
@@ -1048,6 +1050,9 @@ void gr_ctx_init_complex_algebraic_ca(gr_ctx_t ctx);
 void gr_ctx_init_fq(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var);
 void gr_ctx_init_fq_nmod(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var);
 void gr_ctx_init_fq_zech(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var);
+
+void gr_ctx_init_fmpz_poly(gr_ctx_t ctx);
+
 
 /* Groups */
 

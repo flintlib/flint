@@ -307,12 +307,16 @@ class gr_elem:
     Base class for elements.
     """
 
+    @staticmethod
+    def _default_context():
+        return None
+
     def __init__(self, val=None, context=None, random=False):
-        assert context is not None
         if context is None:
-            raise ValueError("a context object is needed")
-        else:
-            self._ctx_python = context
+            context = self._default_context()
+            if context is None:
+                raise ValueError("a context object is needed")
+        self._ctx_python = context
         self._ctx = self._ctx_python._ref
         self._data = self._struct_type()
         self._ref = ctypes.byref(self._data)
@@ -1132,7 +1136,12 @@ class PolynomialRing_gr_poly(gr_ctx):
         self._coefficient_ring._decrement_refcount()
 
 class fmpz(gr_elem):
+
     _struct_type = fmpz_struct
+
+    @staticmethod
+    def _default_context():
+        return ZZ
 
     def __index__(self):
         return fmpz_to_python_int(self._ref)
@@ -1146,20 +1155,44 @@ class fmpz(gr_elem):
 class fmpq(gr_elem):
     _struct_type = fmpq_struct
 
+    @staticmethod
+    def _default_context():
+        return QQ
+
 class fmpzi(gr_elem):
     _struct_type = fmpzi_struct
+
+    @staticmethod
+    def _default_context():
+        return ZZi
 
 class qqbar(gr_elem):
     _struct_type = qqbar_struct
 
+    @staticmethod
+    def _default_context():
+        return QQbar
+
 class ca(gr_elem):
     _struct_type = ca_struct
+
+    @staticmethod
+    def _default_context():
+        return CC_ca
 
 class arb(gr_elem):
     _struct_type = arb_struct
 
+    @staticmethod
+    def _default_context():
+        return RR_arb
+
 class acb(gr_elem):
     _struct_type = acb_struct
+
+    @staticmethod
+    def _default_context():
+        return CC_acb
 
 class gr_arf_ctx(gr_ctx):
 
@@ -1187,11 +1220,17 @@ class ComplexFloat_acf(gr_arf_ctx):
 class arf(gr_elem):
     _struct_type = arf_struct
 
+    def _default_context():
+        return RF
+
     def __hash__(self):
         return hash(float(str(self)))
 
 class acf(gr_elem):
     _struct_type = acf_struct
+
+    def _default_context():
+        return CF
 
 
 
@@ -1825,7 +1864,9 @@ def test_floor_ceil_trunc_nint():
         assert (x+1).nint() == 2
         assert (x+2).nint() == 4
 
-
+def test_qqbar():
+    a = (-23 + 5*ZZi.i())
+    assert ZZi(QQbar(a**2).sqrt()) == -a
 
 def test_all():
 

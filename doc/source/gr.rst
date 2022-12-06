@@ -392,6 +392,11 @@ Matrices
 Polynomial rings
 ...............................................................................
 
+.. function:: void gr_ctx_init_fmpz_poly(gr_ctx_t ctx)
+
+    Initializes *ctx* to a ring of integer polynomials of
+    type :type:`fmpz_poly_struct`.
+
 .. function:: void gr_ctx_init_polynomial(gr_ctx_t ctx, gr_ctx_t base_ring)
 
     Initializes *ctx* to a ring of densely represented univariate polynomials
@@ -591,14 +596,6 @@ Assignment and conversions
 
     Sets *res* to a copy of the element *x*.
 
-.. function:: int gr_set_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
-              int gr_set_si(gr_ptr res, slong x, gr_ctx_t ctx)
-              int gr_set_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx)
-              int gr_set_fmpq(gr_ptr res, const fmpq_t x, gr_ctx_t ctx)
-
-    Sets *res* to the value *x*. If no reasonable conversion to the
-    domain *ctx* is possible, returns ``GR_DOMAIN``.
-
 .. function:: int gr_set_other(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 
     Sets *res* to the element *x* of the structure *x_ctx* which
@@ -607,27 +604,24 @@ Assignment and conversions
     unambiguously to *ctx*.  The ``GR_UNABLE`` flag is returned
     if the conversion is not implemented.
 
+.. function:: int gr_set_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
+              int gr_set_si(gr_ptr res, slong x, gr_ctx_t ctx)
+              int gr_set_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx)
+              int gr_set_fmpq(gr_ptr res, const fmpq_t x, gr_ctx_t ctx)
+              int gr_set_d(gr_ptr res, double x, gr_ctx_t ctx)
+
+    Sets *res* to the value *x*. If no reasonable conversion to the
+    domain *ctx* is possible, returns ``GR_DOMAIN``.
+
 .. function:: int gr_get_si(slong * res, gr_srcptr x, gr_ctx_t ctx)
               int gr_get_ui(ulong * res, gr_srcptr x, gr_ctx_t ctx)
               int gr_get_fmpz(fmpz_t res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_get_fmpq(fmpq_t res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_get_d(double * res, gr_srcptr x, gr_ctx_t ctx)
 
-    Sets *res* to the integer *x*. This returns the ``GR_DOMAIN`` flag
-    if *x* is not an integer.
-
-.. function:: int gr_get_fmpq(fmpq_t res, gr_srcptr x, gr_ctx_t ctx)
-
-    Sets *res* to the rational number *x*. This returns the ``GR_DOMAIN``
-    flag if *x* is not a rational number.
-
-.. function:: int gr_set_d(gr_ptr res, double x, gr_ctx_t ctx)
-
-    Sets *res* to the value of the floating-point number *x*.
-    The interpretation of this conversion depends on the ring.
-
-.. function:: int gr_get_d(double * res, gr_srcptr x, gr_ctx_t ctx)
-
-    Returns a floating-point approximation of *x*. The interpretation
-    of this conversion depends on the ring.
+    Sets *res* to the value *x*. This returns the ``GR_DOMAIN`` flag
+    if *x* cannot be converted to the target type.
+    For floating-point output types, the output may be rounded.
 
 Basic properties
 ........................................................................
@@ -779,6 +773,23 @@ or division algorithm is available.
     `q y = x` (which, for example, gives the usual exact
     division in `\mathbb{Z}`).
 
+.. function:: truth_t gr_is_invertible(gr_srcptr x, gr_ctx_t ctx)
+
+    Returns whether *x* has a multiplicative inverse in the present ring,
+    i.e. whether *x* is a unit.
+
+.. function:: int gr_inv(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+    Sets *res* to the multiplicative inverse of *x* in the present ring,
+    if such an element exists.
+    Returns the flag ``GR_DOMAIN`` if *x* is not invertible, or
+    ``GR_UNABLE`` if the implementation is unable to perform
+    the computation.
+
+.. function:: truth_t gr_divides(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+
+    Returns whether *x* divides *y*.
+
 .. function:: int gr_divexact(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
               int gr_divexact_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
               int gr_divexact_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
@@ -793,26 +804,6 @@ or division algorithm is available.
     implementation may set *res* to a nonsense value and still
     return the ``GR_SUCCESS`` flag.
 
-.. function:: truth_t gr_is_invertible(gr_srcptr x, gr_ctx_t ctx)
-
-    Returns whether *x* has a multiplicative inverse in the present ring,
-    i.e. whether *x* is a unit.
-
-.. function:: int gr_inv(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
-
-    Sets *res* to the multiplicative inverse of *x* in the present ring,
-    if such an element exists.
-    Returns the flag ``GR_DOMAIN`` if *x* is not invertible, or
-    ``GR_UNABLE`` if the implementation is unable to perform
-    the computation.
-
-Divisibility
-........................................................................
-
-.. function:: truth_t gr_divides(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
-
-    Returns whether *x* divides *y*.
-
 .. function:: int gr_euclidean_div(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
               int gr_euclidean_rem(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
               int gr_euclidean_divrem(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
@@ -823,20 +814,6 @@ Divisibility
     the round-to-floor quotient in `\mathbb{Z}` and a round-to-nearest quotient in `\mathbb{Z}[i]`.
     In non-Euclidean rings, these functions may implement some generalization of
     Euclidean division with remainder.
-
-.. function:: int gr_gcd(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
-
-    Sets *res* to the greatest common divisor (GCD) of *x* and *y*.
-
-    Since the GCD is only defined uniquely up to multiplication by a unit,
-    an implementation-defined representative is chosen.
-
-.. function:: int gr_lcm(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
-
-    Sets *res* to the least common multiple (LCM) of *x* and *y*.
-
-    Since the LCM is only defined uniquely up to multiplication by a unit,
-    an implementation-defined representative is chosen.
 
 Powering
 ........................................................................
@@ -889,6 +866,23 @@ the choice of root is implementation-dependent.
     (also for zero, when computing the reciprocal square root), or
     ``GR_UNABLE`` if the implementation is unable to perform
     the computation.
+
+Greatest common divisors
+........................................................................
+
+.. function:: int gr_gcd(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+
+    Sets *res* to the greatest common divisor (GCD) of *x* and *y*.
+
+    Since the GCD is only defined uniquely up to multiplication by a unit,
+    an implementation-defined representative is chosen.
+
+.. function:: int gr_lcm(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+
+    Sets *res* to the least common multiple (LCM) of *x* and *y*.
+
+    Since the LCM is only defined uniquely up to multiplication by a unit,
+    an implementation-defined representative is chosen.
 
 Integer and complex parts
 ........................................................................

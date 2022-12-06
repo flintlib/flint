@@ -570,7 +570,6 @@ _gr_fmpzi_gcd(fmpzi_t res, const fmpzi_t x, const fmpzi_t y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-/* todo: divexact; real opts */
 int
 _gr_fmpzi_lcm(fmpzi_t res, const fmpzi_t x, const fmpzi_t y, const gr_ctx_t ctx)
 {
@@ -581,13 +580,7 @@ _gr_fmpzi_lcm(fmpzi_t res, const fmpzi_t x, const fmpzi_t y, const gr_ctx_t ctx)
     fmpzi_mul(res, x, y);
 
     if (!fmpzi_is_one(g))
-    {
-        fmpzi_t t;
-        fmpzi_init(t);
-        fmpzi_divrem_approx(res, t, res, g);
-        FLINT_ASSERT(fmpz_is_zero(t));
-        fmpzi_clear(t);
-    }
+        fmpzi_divexact(res, res, g);
 
     /* is this what we want? */
     fmpzi_canonicalise_unit(res, res);

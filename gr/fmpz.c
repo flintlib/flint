@@ -273,9 +273,37 @@ _gr_fmpz_addmul(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 }
 
 int
+_gr_fmpz_addmul_ui(fmpz_t res, const fmpz_t x, ulong y, const gr_ctx_t ctx)
+{
+    fmpz_addmul_ui(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_addmul_si(fmpz_t res, const fmpz_t x, slong y, const gr_ctx_t ctx)
+{
+    fmpz_addmul_si(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
 _gr_fmpz_submul(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     fmpz_submul(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_submul_ui(fmpz_t res, const fmpz_t x, ulong y, const gr_ctx_t ctx)
+{
+    fmpz_submul_ui(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_submul_si(fmpz_t res, const fmpz_t x, slong y, const gr_ctx_t ctx)
+{
+    fmpz_submul_si(res, x, y);
     return GR_SUCCESS;
 }
 
@@ -741,8 +769,13 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_MUL_SI,          (gr_funcptr) _gr_fmpz_mul_si},
     {GR_METHOD_MUL_FMPZ,        (gr_funcptr) _gr_fmpz_mul},
     {GR_METHOD_ADDMUL,          (gr_funcptr) _gr_fmpz_addmul},
+    {GR_METHOD_ADDMUL_UI,       (gr_funcptr) _gr_fmpz_addmul_ui},
+    {GR_METHOD_ADDMUL_SI,       (gr_funcptr) _gr_fmpz_addmul_si},
+    {GR_METHOD_ADDMUL_FMPZ,     (gr_funcptr) _gr_fmpz_addmul},
     {GR_METHOD_SUBMUL,          (gr_funcptr) _gr_fmpz_submul},
-    /* todo: addmul, submul variants */
+    {GR_METHOD_SUBMUL_UI,       (gr_funcptr) _gr_fmpz_submul_ui},
+    {GR_METHOD_SUBMUL_SI,       (gr_funcptr) _gr_fmpz_submul_si},
+    {GR_METHOD_SUBMUL_FMPZ,     (gr_funcptr) _gr_fmpz_submul},
     {GR_METHOD_MUL_TWO,         (gr_funcptr) _gr_fmpz_mul_two},
     {GR_METHOD_SQR,             (gr_funcptr) _gr_fmpz_sqr},
     {GR_METHOD_DIV,             (gr_funcptr) _gr_fmpz_div},
