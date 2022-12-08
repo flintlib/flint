@@ -185,6 +185,15 @@ _gr_qqbar_set_fmpq(qqbar_t res, const fmpq_t v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_qqbar_set_d(qqbar_t res, double v, const gr_ctx_t ctx)
+{
+    if (qqbar_set_d(res, v))
+        return GR_SUCCESS;
+    else
+        return GR_DOMAIN;
+}
+
 truth_t
 _gr_qqbar_is_zero(const qqbar_t x, const gr_ctx_t ctx)
 {
@@ -995,6 +1004,7 @@ gr_method_tab_input _qqbar_methods_input[] =
     {GR_METHOD_SET_UI,          (gr_funcptr) _gr_qqbar_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_qqbar_set_fmpz},
     {GR_METHOD_SET_FMPQ,        (gr_funcptr) _gr_qqbar_set_fmpq},
+    {GR_METHOD_SET_D,           (gr_funcptr) _gr_qqbar_set_d},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_qqbar_set_other},
 
     {GR_METHOD_GET_SI,          (gr_funcptr) _gr_qqbar_get_si},

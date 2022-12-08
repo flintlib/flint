@@ -1220,15 +1220,18 @@ class ComplexFloat_acf(gr_arf_ctx):
 class arf(gr_elem):
     _struct_type = arf_struct
 
+    @staticmethod
     def _default_context():
         return RF
 
     def __hash__(self):
+        # todo
         return hash(float(str(self)))
 
 class acf(gr_elem):
     _struct_type = acf_struct
 
+    @staticmethod
     def _default_context():
         return CF
 
@@ -1300,7 +1303,7 @@ class fq_elem(gr_elem):
         return self._constant(self, libgr.gr_fq_gen, "gen")
 
     #def frobenius(self):
-    #    return self._binary_op_si(self, libgr.gr_fq_frobenius, "gen")
+    #    return self._binary_op_si(self, libgr.gr_fq_frobenius, "frobenius")
 
     def multiplicative_order(self):
         return self._unary_op_get_fmpz(self, libgr.gr_fq_multiplicative_order, "multiplicative_order")

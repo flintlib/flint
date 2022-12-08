@@ -104,6 +104,19 @@ _gr_fmpz_set_fmpq(fmpz_t res, const fmpq_t v, const gr_ctx_t ctx)
 }
 
 int
+_gr_fmpz_set_d(fmpz_t res, double x, const gr_ctx_t ctx)
+{
+    if (x != x || x == HUGE_VAL || x == -HUGE_VAL)
+        return GR_DOMAIN;
+
+    if (x != floor(x))
+        return GR_DOMAIN;
+
+    fmpz_set_d(res, x);
+    return GR_SUCCESS;
+}
+
+int
 _gr_fmpz_set_other(fmpz_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
 {
     switch (x_ctx->which_ring)
@@ -750,6 +763,7 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_fmpz_set_fmpz},
     {GR_METHOD_SET_FMPQ,        (gr_funcptr) _gr_fmpz_set_fmpq},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_fmpz_set_other},
+    {GR_METHOD_SET_D,           (gr_funcptr) _gr_fmpz_set_d},
     {GR_METHOD_SET_STR,         (gr_funcptr) _gr_fmpz_set_str},
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_fmpz_set},
     {GR_METHOD_GET_UI,          (gr_funcptr) _gr_fmpz_get_ui},

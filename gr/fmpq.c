@@ -97,6 +97,27 @@ _gr_fmpq_set_fmpz(fmpq_t res, const fmpz_t v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+#include "arf.h"
+
+int
+_gr_fmpq_set_d(fmpq_t res, double x, const gr_ctx_t ctx)
+{
+    arf_t t;
+
+    if (x != x || x == HUGE_VAL || x == -HUGE_VAL)
+        return GR_DOMAIN;
+
+    /*
+    todo - direct impl
+    */
+    arf_init(t);
+    arf_set_d(t, x);
+    arf_get_fmpq(res, t);
+    arf_clear(t);
+
+    return GR_SUCCESS;
+}
+
 int
 _gr_fmpq_set_other(fmpq_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
 {
@@ -725,6 +746,7 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_SET_UI,          (gr_funcptr) _gr_fmpq_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_fmpq_set_fmpz},
     {GR_METHOD_SET_FMPQ,        (gr_funcptr) _gr_fmpq_set},
+    {GR_METHOD_SET_D,           (gr_funcptr) _gr_fmpq_set_d},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_fmpq_set_other},
     {GR_METHOD_GET_SI,          (gr_funcptr) _gr_fmpq_get_si},
     {GR_METHOD_GET_UI,          (gr_funcptr) _gr_fmpq_get_ui},
