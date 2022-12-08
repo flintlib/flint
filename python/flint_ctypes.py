@@ -1310,7 +1310,7 @@ class fq_elem(gr_elem):
 
     def norm(self):
         return self._unary_op_get_fmpz(self, libgr.gr_fq_norm, "norm")
-    
+
     def trace(self):
         return self._unary_op_get_fmpz(self, libgr.gr_fq_trace, "trace")
 
@@ -1870,6 +1870,15 @@ def test_floor_ceil_trunc_nint():
 def test_qqbar():
     a = (-23 + 5*ZZi.i())
     assert ZZi(QQbar(a**2).sqrt()) == -a
+
+def test_arb():
+    a = arb(2.5)
+    assert a  == arb("2.5")
+    b = acb(2.5)
+    assert a == b
+    c = acb(2.5+1j)
+    assert c == b + 1j
+    assert raises(lambda: arb(2.5+1j), ValueError)
 
 def test_all():
 

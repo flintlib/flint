@@ -139,6 +139,18 @@ _gr_acb_set_fmpq(acb_t res, const fmpq_t v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_acb_set_d(acb_t res, double x, const gr_ctx_t ctx)
+{
+    acb_set_d(res, x);
+    arb_set_round(acb_realref(res), acb_realref(res), ACB_CTX_PREC(ctx));
+
+    if (!arb_is_finite(acb_realref(res)))
+        return GR_DOMAIN;
+
+    return GR_SUCCESS;
+}
+
 int 
 _gr_ca_get_acb_with_prec(acb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec);
 
@@ -963,6 +975,7 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_acb_set_fmpz},
     {GR_METHOD_SET_FMPQ,        (gr_funcptr) _gr_acb_set_fmpq},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_acb_set_other},
+    {GR_METHOD_SET_D,           (gr_funcptr) _gr_acb_set_d},
     {GR_METHOD_GET_SI,          (gr_funcptr) _gr_acb_get_si},
     {GR_METHOD_GET_UI,          (gr_funcptr) _gr_acb_get_ui},
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_acb_get_fmpz},

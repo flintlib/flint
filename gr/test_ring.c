@@ -1754,6 +1754,70 @@ gr_test_ordered_ring_cmpabs(gr_ctx_t R, flint_rand_t state, int test_flags)
 }
 
 int
+gr_test_complex_parts(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status = GR_SUCCESS;
+    gr_ptr x, a, b, ab, i;
+
+    GR_TMP_INIT5(x, a, b, ab, i, R);
+
+    status = gr_i(i, R);
+
+    if (status == GR_SUCCESS)
+    {
+        int which_test = n_randint(state, 3);
+
+        GR_MUST_SUCCEED(gr_randtest(x, state, R));
+
+        if (which_test == 0)
+        {
+            /* check x == re(x) + im(x)*i */
+            status |= gr_re(a, x, R);
+            status |= gr_im(b, x, R);
+            status |= gr_mul(ab, b, i, R);
+            status |= gr_add(ab, a, ab, R);
+        }
+        else if (which_test == 1)
+        {
+            /* check x == abs(x) * sgn(x) */
+            status |= gr_abs(a, x, R);
+            status |= gr_sgn(b, x, R);
+            status |= gr_mul(ab, a, b, R);
+        }
+        else
+        {
+            /* check x == re(conj(x)) - im(conj(x))*i */
+            status |= gr_conj(a, x, R);
+            status |= gr_re(a, a, R);
+            status |= gr_conj(b, x, R);
+            status |= gr_im(b, b, R);
+            status |= gr_mul(ab, b, i, R);
+            status |= gr_sub(ab, a, ab, R);
+        }
+
+        if (status == GR_SUCCESS && gr_equal(x, ab, R) == T_FALSE)
+        {
+            status = GR_TEST_FAIL;
+        }
+    }
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        printf("\n");
+        gr_ctx_println(R);
+        printf("x = \n"); gr_println(x, R);
+        printf("a = \n"); gr_println(a, R);
+        printf("b = \n"); gr_println(b, R);
+        printf("ab = \n"); gr_println(ab, R);
+        printf("\n");
+    }
+
+    GR_TMP_CLEAR5(x, a, b, ab, i, R);
+
+    return status;
+}
+
+int 
 gr_test_vec_add(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status, aliasing;
@@ -2130,6 +2194,8 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
         gr_test_iter(R, state, "ordered_ring_cmp", gr_test_ordered_ring_cmp, iters, test_flags);
         gr_test_iter(R, state, "ordered_ring_cmpabs", gr_test_ordered_ring_cmpabs, iters, test_flags);
     }
+
+    gr_test_iter(R, state, "complex_parts", gr_test_complex_parts, iters, test_flags);
 
     gr_test_iter(R, state, "vec_add", gr_test_vec_add, iters, test_flags);
 

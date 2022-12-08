@@ -125,6 +125,18 @@ _gr_arb_set_str(arb_t res, const char * x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_arb_set_d(arb_t res, double x, const gr_ctx_t ctx)
+{
+    arb_set_d(res, x);
+    arb_set_round(res, res, ARB_CTX_PREC(ctx));
+
+    if (!arb_is_finite(res))
+        return GR_DOMAIN;
+
+    return GR_SUCCESS;
+}
+
 int 
 _gr_ca_get_arb_with_prec(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec);
 
@@ -1062,6 +1074,7 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_arb_set_fmpz},
     {GR_METHOD_SET_FMPQ,        (gr_funcptr) _gr_arb_set_fmpq},
     {GR_METHOD_SET_STR,         (gr_funcptr) _gr_arb_set_str},
+    {GR_METHOD_SET_D,           (gr_funcptr) _gr_arb_set_d},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_arb_set_other},
     {GR_METHOD_GET_SI,          (gr_funcptr) _gr_arb_get_si},
     {GR_METHOD_GET_UI,          (gr_funcptr) _gr_arb_get_ui},
