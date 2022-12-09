@@ -914,7 +914,7 @@ Factorization
     sign `-1`, `0` or `+1` in `\mathbb{Z}`, or a sign multiplied
     by the coefficient content in `\mathbb{Z}[x]`.
     Note that this function outputs `c` as an element of the
-    same ring as the output: for example, for polynomial rings,
+    same ring as the input: for example, in `\mathbb{Z}[x]`,
     `c` will be a constant polynomial rather than an
     element of the coefficient ring.
     The exponents `e_k` are output as a vector of ``fmpz`` elements.
