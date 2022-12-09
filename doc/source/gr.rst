@@ -368,6 +368,21 @@ return false.
     Initializes *ctx* to the complex floating-point arithmetic with elements
     of type :type:`acf_t` and a default precision of *prec* bits.
 
+Vectors
+...............................................................................
+
+.. function:: void gr_ctx_init_vector_gr_vec(gr_ctx_t ctx, gr_ctx_t base_type)
+
+    Initializes *ctx* to the domain of all vectors (of any length)
+    over the given *base_type*.
+    Elements have type :type:`gr_vec_struct`.
+
+.. function:: void gr_ctx_init_vector_space_gr_vec(gr_ctx_t ctx, gr_ctx_t base_type, slong n)
+
+    Initializes *ctx* to the space of all vectors of length *n*
+    over the given *base_type*.
+    Elements have type :type:`gr_vec_struct`.
+
 Matrices
 ...............................................................................
 
@@ -883,6 +898,30 @@ Greatest common divisors
 
     Since the LCM is only defined uniquely up to multiplication by a unit,
     an implementation-defined representative is chosen.
+
+Factorization
+........................................................................
+
+.. function:: int gr_factor(gr_ptr c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx)
+
+    Given `x \in R`, computes a factorization
+
+        `x = c {f_1}^{e_1} \ldots {f_n}^{e_n}`
+
+    where `f_k` will be irreducible or prime (depending on `R`).
+
+    The prefactor `c` stores a unit or sign, e.g.\ the
+    sign `-1`, `0` or `+1` in `\mathbb{Z}`, or a sign multiplied
+    by the coefficient content in `\mathbb{Z}[x]`.
+    Note that this function outputs `c` as an element of the
+    same ring as the output: for example, for polynomial rings,
+    `c` will be a constant polynomial rather than an
+    element of the coefficient ring.
+    The exponents `e_k` are output as a vector of ``fmpz`` elements.
+
+    The factors `f_k` are guaranteed to be distinct,
+    but they are not guaranteed to be sorted in any particular
+    order.
 
 Integer and complex parts
 ........................................................................

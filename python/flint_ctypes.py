@@ -117,6 +117,11 @@ class fq_nmod_struct(ctypes.Structure):
 class fq_zech_struct(ctypes.Structure):
     _fields_ = [('n', ctypes.c_ulong)]
 
+class gr_vec_struct(ctypes.Structure):
+    _fields_ = [('entries', ctypes.c_void_p),
+                ('alloc', c_slong),
+                ('length', c_slong)]
+
 class gr_poly_struct(ctypes.Structure):
     _fields_ = [('coeffs', ctypes.c_void_p),
                 ('alloc', c_slong),
@@ -628,6 +633,27 @@ class gr_elem:
             120
         """
         return self._binary_op(self, other, libgr.gr_lcm, "lcm")
+
+    def factor(self):
+        """
+        Returns a factorization of self as a tuple (prefactor, factors, exponents).
+
+            >>> ZZ(-120).factor()
+            (-1, [2, 3, 5], [3, 1, 1])
+
+        """
+        elem_type = type(self)
+        c = elem_type(context=self._ctx_python)
+        factors = Vec(self._ctx_python)()
+        exponents = ZZ_vec()
+        # print("c", c)
+        # print("factors", factors)
+        # print("c", exponents)
+        status = libgr.gr_factor(c._ref, factors._ref, exponents._ref, self._ref, 0, self._ctx)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return (c, factors, exponents)
 
     def is_square(self):
         """
@@ -1530,7 +1556,7 @@ class gr_mat(gr_elem):
                             for j in range(n):
                                 x = element_ring(row[j])
                                 ijptr = libgr.gr_mat_entry_ptr(self._ref, i, j, x._ctx)
-                                status = libgr.gr_set(ijptr, x._ref, x._ctx)
+                                status |= libgr.gr_set(ijptr, x._ref, x._ctx)
                 elif libgr.gr_ctx_matrix_is_fixed_size(self._ctx) == T_TRUE:
                     if not isinstance(val, gr_elem):
                         val = element_ring(val)
@@ -1730,6 +1756,97 @@ class gr_mat(gr_elem):
 libgr.gr_mat_entry_ptr.argtypes = (ctypes.c_void_p, c_slong, c_slong, ctypes.POINTER(gr_ctx_struct))
 libgr.gr_mat_entry_ptr.restype = ctypes.POINTER(ctypes.c_char)
 
+libgr.gr_vec_entry_ptr.restype = ctypes.POINTER(ctypes.c_char)
+
+
+class Vec(gr_ctx):
+    """
+    Parent class for vector domains.
+    """
+
+    def __init__(self, element_domain, n=None):
+        assert isinstance(element_domain, gr_ctx)
+        assert (n is None) or (0 <= n <= WORD_MAX)
+        gr_ctx.__init__(self)
+        if n is None:
+            libgr.gr_ctx_init_vector_gr_vec(self._ref, element_domain._ref)
+        else:
+            libgr.gr_ctx_init_vector_space_gr_vec(self._ref, element_domain._ref, n)
+        self._element_ring = element_domain
+        self._elem_type = gr_vec
+        self._element_ring._refcount += 1
+
+    def __del__(self):
+        self._element_ring._decrement_refcount()
+
+
+
+class gr_vec(gr_elem):
+
+    _struct_type = gr_vec_struct
+
+    def __init__(self, *args, **kwargs):
+        context = kwargs['context']
+        gr_elem.__init__(self, None, context)
+        element_ring = context._element_ring
+        if kwargs.get('random'):
+            libgr.gr_randtest(self._ref, ctypes.byref(_flint_rand), self._ctx)
+            return
+
+        if len(args) == 1:
+            val = args[0]
+            if val is not None:
+                status = GR_UNABLE
+                if isinstance(val, (list, tuple)):
+                    n = len(val)
+                    status = libgr._gr_vec_check_resize(self._ref, n, self._ctx)
+                    if not status:
+                        for i in range(n):
+                            x = element_ring(val[i])
+                            iptr = libgr.gr_vec_entry_ptr(self._ref, i, x._ctx)
+                            status |= libgr.gr_set(iptr, x._ref, x._ctx)
+                elif isinstance(val, gr_elem):
+                    status = libgr.gr_set_other(self._ref, val._ref, val._ctx, self._ctx)
+                if status:
+                    if status & GR_UNABLE: raise NotImplementedError
+                    if status & GR_DOMAIN: raise ValueError
+
+    def __len__(self):
+        return self._data.length
+
+    '''
+    def __getitem__(self, ij):
+        i, j = ij
+        i = int(i)
+        j = int(j)
+        assert 0 <= i < self.nrows()
+        assert 0 <= j < self.ncols()
+        element_ring = self.parent()._element_ring
+        res = element_ring()
+        ijptr = libgr.gr_mat_entry_ptr(self._ref, i, j, res._ctx)
+        status = libgr.gr_set(res._ref, ijptr, res._ctx)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
+    def __setitem__(self, ij, v):
+        i, j = ij
+        i = int(i)
+        j = int(j)
+        assert 0 <= i < self.nrows()
+        assert 0 <= j < self.ncols()
+        element_ring = self.parent()._element_ring
+        # todo: avoid copy
+        x = element_ring(v)
+        ijptr = libgr.gr_mat_entry_ptr(self._ref, i, j, x._ctx)
+        status = libgr.gr_set(ijptr, x._ref, x._ctx)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return x
+    '''
+
 
 
 PolynomialRing = PolynomialRing_gr_poly
@@ -1748,6 +1865,8 @@ CC_ca = ComplexField_ca()
 
 RF = RealFloat_arf()
 CF = ComplexFloat_acf()
+
+ZZ_vec = Vec(ZZ)
 
 ZZx = PolynomialRing_gr_poly(ZZ)
 QQx = PolynomialRing_gr_poly(QQ)
@@ -1866,6 +1985,16 @@ def test_floor_ceil_trunc_nint():
         assert (-x).nint() == -2
         assert (x+1).nint() == 2
         assert (x+2).nint() == 4
+
+def test_zz():
+    assert ZZ(1).factor() == (1, [], [])
+    assert ZZ(0).factor() == (0, [], [])
+    assert (-ZZ(12)).factor() == (-1, [2, 3], [2, 1])
+
+def test_qq():
+    assert QQ(1).factor() == (1, [], [])
+    assert QQ(0).factor() == (0, [], [])
+    assert (-QQ(12)/175).factor() == (-1, [2, 3, 5, 7], [2, 1, -2, -1])
 
 def test_qqbar():
     a = (-23 + 5*ZZi.i())

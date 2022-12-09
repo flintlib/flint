@@ -103,6 +103,16 @@ typedef void * gr_ctx_ptr;
 
 #define GR_ENTRY(vec, i, size) ((void *) (((char *) (vec)) + ((i) * (size))))
 
+typedef struct
+{
+    gr_ptr entries;
+    slong length;
+    slong alloc;
+}
+gr_vec_struct;
+
+typedef gr_vec_struct gr_vec_t[1];
+
 GR_INLINE int gr_not_implemented(void) { return GR_UNABLE; }
 GR_INLINE int gr_not_in_domain(void) { return GR_DOMAIN; }
 
@@ -244,6 +254,8 @@ typedef enum
     GR_METHOD_EUCLIDEAN_DIVREM,
     GR_METHOD_GCD,
     GR_METHOD_LCM,
+
+    GR_METHOD_FACTOR,
 
     GR_METHOD_FLOOR,
     GR_METHOD_CEIL,
@@ -421,6 +433,8 @@ typedef enum
     GR_CTX_GR_MPOLY,
     GR_CTX_GR_MAT,
 
+    GR_CTX_GR_VEC,
+
     GR_CTX_PSL2Z,
     GR_CTX_DIRICHLET_GROUP,
     GR_CTX_PERM,
@@ -511,6 +525,8 @@ typedef int ((*gr_method_vec_dot_si_op)(gr_ptr, gr_srcptr, int, gr_srcptr, const
 typedef int ((*gr_method_vec_dot_ui_op)(gr_ptr, gr_srcptr, int, gr_srcptr, const ulong *, slong, gr_ctx_ptr));
 typedef int ((*gr_method_vec_dot_fmpz_op)(gr_ptr, gr_srcptr, int, gr_srcptr, const fmpz *, slong, gr_ctx_ptr));
 
+typedef int ((*gr_method_factor_op)(gr_ptr, gr_vec_t, gr_vec_t, gr_srcptr, int, gr_ctx_ptr));
+
 typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, slong, slong, gr_ctx_ptr));
 
 
@@ -566,6 +582,8 @@ typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcp
 #define GR_VEC_DOT_SI_OP(ctx, NAME) (((gr_method_vec_dot_si_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_DOT_UI_OP(ctx, NAME) (((gr_method_vec_dot_ui_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_DOT_FMPZ_OP(ctx, NAME) (((gr_method_vec_dot_fmpz_op *) ctx->methods)[GR_METHOD_ ## NAME])
+
+#define GR_FACTOR_OP(ctx, NAME) (((gr_method_factor_op *) ctx->methods)[GR_METHOD_ ## NAME])
 
 #define GR_POLY_BINARY_TRUNC_OP(ctx, NAME) (((gr_method_poly_binary_trunc_op *) ctx->methods)[GR_METHOD_ ## NAME])
 
@@ -690,6 +708,8 @@ GR_INLINE WARN_UNUSED_RESULT int gr_euclidean_rem(gr_ptr res, gr_srcptr x, gr_sr
 GR_INLINE WARN_UNUSED_RESULT int gr_euclidean_divrem(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_BINARY_OP(ctx, EUCLIDEAN_DIVREM)(res1, res2, x, y, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_gcd(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, GCD)(res, x, y, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_lcm(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, LCM)(res, x, y, ctx); }
+
+GR_INLINE WARN_UNUSED_RESULT int gr_factor(gr_ptr c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx) { return GR_FACTOR_OP(ctx, FACTOR)(c, factors, exponents, x, flags, ctx); }
 
 GR_INLINE WARN_UNUSED_RESULT int gr_pow(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, POW)(res, x, y, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_pow_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, POW_UI)(res, x, y, ctx); }
@@ -1074,6 +1094,21 @@ polynomial_ctx_t;
 #define POLYNOMIAL_ELEM_CTX(ring_ctx) (POLYNOMIAL_CTX(ring_ctx)->base_ring)
 
 void gr_ctx_init_polynomial(gr_ctx_t ctx, gr_ctx_t base_ring);
+
+/* Generic vectors */
+
+typedef struct
+{
+    gr_ctx_struct * base_ring;
+    int all_sizes;
+    slong n;
+}
+vector_ctx_t;
+
+#define VECTOR_CTX(ring_ctx) ((vector_ctx_t *)((ring_ctx)))
+
+void gr_ctx_init_vector_gr_vec(gr_ctx_t ctx, gr_ctx_t base_ring);
+void gr_ctx_init_vector_space_gr_vec(gr_ctx_t ctx, gr_ctx_t base_ring, slong n);
 
 /* Generic matrix ring */
 

@@ -13,16 +13,6 @@
  extern "C" {
 #endif
 
-typedef struct
-{
-    gr_ptr entries;
-    slong length;
-    slong alloc;
-}
-gr_vec_struct;
-
-typedef gr_vec_struct gr_vec_t[1];
-
 void gr_vec_init(gr_vec_t vec, slong len, gr_ctx_t ctx);
 void gr_vec_clear(gr_vec_t vec, gr_ctx_t ctx);
 

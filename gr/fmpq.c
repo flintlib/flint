@@ -2,6 +2,7 @@
 #include "flint/fmpq_poly.h"
 #include "flint/fmpq_mat.h"
 #include "gr.h"
+#include "gr_vec.h"
 
 int
 _gr_fmpq_ctx_write(gr_stream_t out, gr_ctx_t ctx)
@@ -469,6 +470,49 @@ _gr_fmpq_rsqrt(fmpq_t res, const fmpq_t x, const gr_ctx_t ctx)
     }
 }
 
+int _gr_fmpq_factor(gr_ptr c, gr_vec_t factors, gr_vec_t exponents, const fmpq_t x, int flags, gr_ctx_t ctx)
+{
+    fmpz_factor_t nfac, dfac;
+    slong i, n, num_num, num_den;
+    fmpq * fmpq_factors;
+
+    fmpz_factor_init(nfac);
+    fmpz_factor_init(dfac);
+    fmpz_factor(nfac, fmpq_numref(x));
+    fmpz_factor(dfac, fmpq_denref(x));
+
+    num_num = nfac->num;
+    num_den = dfac->num;
+
+    fmpq_set_si(c, nfac->sign, 1);
+
+    n = num_num + num_den;
+
+    gr_vec_set_length(factors, n, ctx);
+    gr_vec_set_length(exponents, n, ctx);
+
+    fmpq_factors = factors->entries;
+
+    for (i = 0; i < num_num; i++)
+    {
+        fmpz_swap(fmpq_numref(fmpq_factors + i), nfac->p + i);
+        fmpz_one(fmpq_denref(fmpq_factors + i));
+        fmpz_set_ui((fmpz *) (exponents->entries) + i, nfac->exp[i]);
+    }
+
+    for (i = 0; i < dfac->num; i++)
+    {
+        fmpz_swap(fmpq_numref(fmpq_factors + num_num + i), dfac->p + i);
+        fmpz_one(fmpq_denref(fmpq_factors + num_num + i));
+        fmpz_neg_ui((fmpz *) (exponents->entries) + nfac->num + i, nfac->exp[i]);
+    }
+
+    fmpz_factor_clear(nfac);
+    fmpz_factor_clear(dfac);
+
+    return GR_SUCCESS;
+}
+
 int
 _gr_fmpq_floor(fmpq_t res, const fmpq_t x, const gr_ctx_t ctx)
 {
@@ -705,7 +749,6 @@ _gr_fmpq_mat_det(fmpq_t res, const fmpq_mat_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-
 int _fmpq_methods_initialized = 0;
 
 gr_static_method_table _fmpq_methods;
@@ -771,6 +814,7 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpq_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_fmpq_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_fmpq_rsqrt},
+    {GR_METHOD_FACTOR,          (gr_funcptr) _gr_fmpq_factor},
     {GR_METHOD_FLOOR,           (gr_funcptr) _gr_fmpq_floor},
     {GR_METHOD_CEIL,            (gr_funcptr) _gr_fmpq_ceil},
     {GR_METHOD_TRUNC,           (gr_funcptr) _gr_fmpq_trunc},

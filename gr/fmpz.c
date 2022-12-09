@@ -1,5 +1,7 @@
 #include "qqbar.h"
 #include "gr.h"
+#include "gr_vec.h"
+#include "flint/fmpz_factor.h"
 #include "flint/fmpz_poly.h"
 #include "flint/fmpz_mat.h"
 
@@ -474,6 +476,30 @@ _gr_fmpz_lcm(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int _gr_fmpz_factor(gr_ptr c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx)
+{
+    fmpz_factor_t fac;
+    slong i;
+
+    fmpz_factor_init(fac);
+    fmpz_factor(fac, x);
+
+    fmpz_set_si(c, fac->sign);
+
+    gr_vec_set_length(factors, fac->num, ctx);
+    gr_vec_set_length(exponents, fac->num, ctx);
+
+    for (i = 0; i < fac->num; i++)
+    {
+        fmpz_swap((fmpz *) (factors->entries) + i, fac->p + i);
+        fmpz_set_ui((fmpz *) (exponents->entries) + i, fac->exp[i]);
+    }
+
+    fmpz_factor_clear(fac);
+
+    return GR_SUCCESS;
+}
+
 int
 _gr_fmpz_pow_ui(fmpz_t res, const fmpz_t x, ulong exp, const gr_ctx_t ctx)
 {
@@ -805,6 +831,7 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_EUCLIDEAN_DIVREM,(gr_funcptr) _gr_fmpz_euclidean_divrem},
     {GR_METHOD_GCD,             (gr_funcptr) _gr_fmpz_gcd},
     {GR_METHOD_LCM,             (gr_funcptr) _gr_fmpz_lcm},
+    {GR_METHOD_FACTOR,          (gr_funcptr) _gr_fmpz_factor},
     {GR_METHOD_POW_UI,          (gr_funcptr) _gr_fmpz_pow_ui},
     {GR_METHOD_POW_SI,          (gr_funcptr) _gr_fmpz_pow_si},
     {GR_METHOD_POW_FMPZ,        (gr_funcptr) _gr_fmpz_pow_fmpz},
