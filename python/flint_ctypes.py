@@ -1411,6 +1411,49 @@ class gr_poly(gr_elem):
             raise NotImplementedError
         return res
 
+    def is_monic(self):
+        """
+            >>> RRx([2,3,4]).is_monic()
+            False
+            >>> RRx([2,3,1]).is_monic()
+            True
+            >>> RRx([]).is_monic()
+            False
+
+        """
+        R = self.parent()._coefficient_ring
+        truth = libgr.gr_poly_is_monic(self._ref, R._ref)
+        def op(*args):
+            return truth
+        return gr_elem._unary_predicate(self, op, "is_monic")
+
+    def monic(self):
+        """
+        Return self rescaled to a monic polynomial.
+
+            >>> f = RRx([1,RR.pi()])
+            >>> f.monic()
+            [[0.318309886183791 +/- 4.43e-16], 1.000000000000000]
+            >>> RRx([]).monic()   # the zero polynomial cannot be made monic
+            Traceback (most recent call last):
+              ...
+            ValueError
+            >>> (f - f).monic()   # unknown whether it is the zero polynomial
+            Traceback (most recent call last):
+              ...
+            NotImplementedError
+
+        """
+        Rx = self.parent()
+        R = Rx._coefficient_ring
+        res = Rx()
+        status = libgr.gr_poly_make_monic(res._ref, self._ref, R._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
+
 
 class ModularGroup_psl2z(gr_ctx_ca):
     def __init__(self, **kwargs):
@@ -1814,39 +1857,32 @@ class gr_vec(gr_elem):
     def __len__(self):
         return self._data.length
 
-    '''
-    def __getitem__(self, ij):
-        i, j = ij
+    def __getitem__(self, i):
         i = int(i)
-        j = int(j)
-        assert 0 <= i < self.nrows()
-        assert 0 <= j < self.ncols()
+        if not 0 <= i < len(self):
+            raise IndexError
         element_ring = self.parent()._element_ring
         res = element_ring()
-        ijptr = libgr.gr_mat_entry_ptr(self._ref, i, j, res._ctx)
-        status = libgr.gr_set(res._ref, ijptr, res._ctx)
+        iptr = libgr.gr_vec_entry_ptr(self._ref, i, res._ctx)
+        status = libgr.gr_set(res._ref, iptr, res._ctx)
         if status:
             if status & GR_UNABLE: raise NotImplementedError
             if status & GR_DOMAIN: raise ValueError
         return res
 
-    def __setitem__(self, ij, v):
-        i, j = ij
+    def __setitem__(self, i, v):
         i = int(i)
-        j = int(j)
-        assert 0 <= i < self.nrows()
-        assert 0 <= j < self.ncols()
+        if not 0 <= i < len(self):
+            raise IndexError
         element_ring = self.parent()._element_ring
         # todo: avoid copy
         x = element_ring(v)
-        ijptr = libgr.gr_mat_entry_ptr(self._ref, i, j, x._ctx)
-        status = libgr.gr_set(ijptr, x._ref, x._ctx)
+        iptr = libgr.gr_vec_entry_ptr(self._ref, i, x._ctx)
+        status = libgr.gr_set(iptr, x._ref, x._ctx)
         if status:
             if status & GR_UNABLE: raise NotImplementedError
             if status & GR_DOMAIN: raise ValueError
         return x
-    '''
-
 
 
 PolynomialRing = PolynomialRing_gr_poly
@@ -2008,6 +2044,13 @@ def test_arb():
     c = acb(2.5+1j)
     assert c == b + 1j
     assert raises(lambda: arb(2.5+1j), ValueError)
+
+def test_vec():
+    a = Vec(ZZ)([1,2,3])
+    assert a[0] == 1
+    assert a[2] == 3
+    assert raises(lambda: a[-1], IndexError)
+    assert raises(lambda: a[3], IndexError)
 
 def test_all():
 

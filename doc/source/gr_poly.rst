@@ -188,7 +188,14 @@ Derivative and integral
 .. function:: int _gr_poly_integral(gr_ptr res, gr_srcptr poly, slong len, gr_ctx_t ctx)
               int gr_poly_integral(gr_poly_t res, const gr_poly_t poly, gr_ctx_t ctx)
 
+Monic polynomials
+-------------------------------------------------------------------------------
 
+.. function:: int _gr_poly_make_monic(gr_ptr res, gr_srcptr poly, slong len, gr_ctx_t ctx)
+              int gr_poly_make_monic(gr_poly_t res, const gr_poly_t src, gr_ctx_t ctx)
+
+.. function:: truth_t _gr_poly_is_monic(gr_srcptr poly, slong len, gr_ctx_t ctx)
+              truth_t gr_poly_is_monic(const gr_poly_t res, gr_ctx_t ctx)
 
 .. raw:: latex
 
