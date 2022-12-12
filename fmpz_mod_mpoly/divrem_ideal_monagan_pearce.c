@@ -268,7 +268,7 @@ exp_overflow:
     for (i = 0; i < Blen; i++)
         Q[i]->length = 0;
 
-    success = 1;
+    success = 0;
     goto cleanup;
 }
 
@@ -293,7 +293,7 @@ void fmpz_mod_mpoly_divrem_ideal_monagan_pearce(
     TMP_INIT;
 
     for (i = 0; i < Blen; i++)
-    {  
+    {
         len3 = FLINT_MAX(len3, B[i]->length);
         if (fmpz_mod_mpoly_is_zero(B[i], ctx))
             flint_throw(FLINT_DIVZERO,
