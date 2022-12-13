@@ -68,6 +68,7 @@ _gr_poly_inv_series(gr_ptr Qinv,
             Wlen = FLINT_MIN(Qnlen + m - 1, n);
             W2len = Wlen - m;
             status |= _gr_poly_mullow(W, Q, Qnlen, Qinv, m, Wlen, ctx);
+            /* todo: use mulmid */
             status |= _gr_poly_mullow(GR_ENTRY(Qinv, m, sz), Qinv, m, GR_ENTRY(W, m, sz), W2len, n - m, ctx);
             status |= _gr_vec_neg(GR_ENTRY(Qinv, m, sz), GR_ENTRY(Qinv, m, sz), n - m, ctx);
 

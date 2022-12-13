@@ -74,6 +74,8 @@ int gr_poly_randtest(gr_poly_t poly, flint_rand_t state, slong len, gr_ctx_t ctx
 truth_t _gr_poly_equal(gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx);
 truth_t gr_poly_equal(const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx);
 
+truth_t gr_poly_is_one(const gr_poly_t poly, gr_ctx_t ctx);
+
 WARN_UNUSED_RESULT int gr_poly_set_scalar(gr_poly_t poly, gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_set_si(gr_poly_t poly, slong x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_set_ui(gr_poly_t poly, slong x, gr_ctx_t ctx);
@@ -107,6 +109,16 @@ WARN_UNUSED_RESULT int _gr_poly_mullow_generic(gr_ptr res, gr_srcptr poly1, slon
 WARN_UNUSED_RESULT int gr_poly_mullow(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_poly_mul_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int _gr_poly_divrem_basecase_preinv(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_srcptr invB, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_divrem_basecase_noinv(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_divrem_basecase(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_divrem_basecase(gr_poly_t Q, gr_poly_t R, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int _gr_poly_divrem(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_divrem(gr_poly_t Q, gr_poly_t R, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx);
+
+/* todo: div with fast divisibility checking; rem; divexact */
 
 WARN_UNUSED_RESULT int _gr_poly_inv_series(gr_ptr Qinv, gr_srcptr Q, slong Qlen, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_inv_series(gr_poly_t Qinv, const gr_poly_t Q, slong len, gr_ctx_t ctx);
@@ -156,6 +168,11 @@ WARN_UNUSED_RESULT int gr_poly_make_monic(gr_poly_t res, const gr_poly_t src, gr
 
 WARN_UNUSED_RESULT truth_t _gr_poly_is_monic(gr_srcptr poly, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT truth_t gr_poly_is_monic(const gr_poly_t res, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int _gr_poly_gcd_euclidean(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_gcd_euclidean(gr_poly_t G, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_gcd(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_gcd(gr_poly_t G, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx);
 
 #ifdef __cplusplus
 }

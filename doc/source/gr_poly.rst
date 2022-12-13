@@ -102,6 +102,8 @@ Basic manipulation
 .. function:: truth_t _gr_poly_equal(gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
               truth_t gr_poly_equal(const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx)
 
+.. function:: truth_t gr_poly_is_one(const gr_poly_t poly, gr_ctx_t ctx)
+
 .. function:: int gr_poly_set_scalar(gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
               int gr_poly_set_si(gr_poly_t poly, slong c, gr_ctx_t ctx)
               int gr_poly_set_ui(gr_poly_t poly, slong c, gr_ctx_t ctx)
@@ -134,6 +136,38 @@ Arithmetic
               int gr_poly_mullow(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong len, gr_ctx_t ctx)
 
 .. function:: int gr_poly_mul_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
+
+Division
+--------------------------------------------------------------------------------
+
+.. function:: int _gr_poly_divrem_basecase_preinv(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_srcptr invB, gr_ctx_t ctx)
+              int _gr_poly_divrem_basecase_noinv(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
+              int _gr_poly_divrem_basecase(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
+              int gr_poly_divrem_basecase(gr_poly_t Q, gr_poly_t R, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
+              int _gr_poly_divrem(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
+              int gr_poly_divrem(gr_poly_t Q, gr_poly_t R, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
+
+    Polynomial division with remainder. ``GR_DOMAIN`` is returned when
+    *B* is provably zero or when encountering an impossible division
+    in the polynomial division algorithm.
+
+    The underscore methods make the following assumptions:
+
+    * *Q* has room for ``lenA - lenB + 1`` coefficients.
+    * *R* has room for ``lenA`` coefficients.
+    * ``lenA >= lenB >= 1``.
+    * *Q* is not aliased with either *A* or *B*.
+    * *R* is not aliased with *B*.
+    * The divisor *B* is normalized to have nonzero leading coefficient.
+      (The non-underscore methods check for leading coefficients that
+      are not provably nonzero and return ``GR_UNABLE``)
+
+    The ``preinv`` functions take a precomputed inverse of the
+    leading coefficient as input.
+
+
+Power series division
+--------------------------------------------------------------------------------
 
 .. function:: int _gr_poly_inv_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx)
               int gr_poly_inv_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx)
@@ -196,6 +230,20 @@ Monic polynomials
 
 .. function:: truth_t _gr_poly_is_monic(gr_srcptr poly, slong len, gr_ctx_t ctx)
               truth_t gr_poly_is_monic(const gr_poly_t res, gr_ctx_t ctx)
+
+GCD
+-------------------------------------------------------------------------------
+
+.. function:: int _gr_poly_gcd_euclidean(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
+              int gr_poly_gcd_euclidean(gr_poly_t G, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
+              int _gr_poly_gcd(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
+              int gr_poly_gcd(gr_poly_t G, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
+
+    Polynomial GCD. Currently only useful over fields.
+
+    The underscore methods assume ``lenA >= lenB >= 1`` and that both
+    *A* and *B* have nonzero leading coefficient.
+
 
 .. raw:: latex
 
