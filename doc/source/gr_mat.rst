@@ -55,9 +55,6 @@ Types, macros and constants
     ``gr_mat_struct``, permitting a ``gr_mat_t`` to
     be passed by reference.
 
-Basic operations
--------------------------------------------------------------------------------
-
 .. macro:: GR_MAT_ENTRY(mat, i, j, sz)
 
     Macro to access the entry at row *i* and column *j* of the
@@ -76,14 +73,33 @@ Basic operations
 
     Macro accessing the number of columns of *mat*.
 
+Memory management
+-------------------------------------------------------------------------------
+
 .. function:: void gr_mat_init(gr_mat_t mat, slong rows, slong cols, gr_ctx_t ctx)
 
     Initializes *mat* to a matrix with the given number of rows and
     columns.
 
+.. function:: void gr_mat_init_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Initializes *res* to a copy of the matrix *mat*.
+
 .. function:: void gr_mat_clear(gr_mat_t mat, gr_ctx_t ctx)
 
     Clears the matrix.
+
+.. function:: void gr_mat_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t ctx)
+
+    Swaps *mat1* and *mat12* efficiently.
+
+.. function:: int gr_mat_swap_entrywise(gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
+
+    Performs a deep swap of *mat1* and *mat2*, swapping the individual
+    entries rather than the top-level structures.
+
+Window matrices
+-------------------------------------------------------------------------------
 
 .. function:: void gr_mat_window_init(gr_mat_t window, const gr_mat_t mat, slong r1, slong c1, slong r2, slong c2, gr_ctx_t ctx)
 
@@ -96,14 +112,8 @@ Basic operations
 
     Frees the window matrix.
 
-.. function:: void gr_mat_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t ctx)
-
-    Swaps *mat1* and *mat12* efficiently.
-
-.. function:: int gr_mat_swap_entrywise(gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
-
-    Performs a deep swap of *mat1* and *mat2*, swapping the individual
-    entries rather than the top-level structures.
+Input and output
+-------------------------------------------------------------------------------
 
 .. function:: int gr_mat_write(gr_stream_t out, const gr_mat_t mat, gr_ctx_t ctx)
 
@@ -113,23 +123,15 @@ Basic operations
 
     Prints *mat* to standard output.
 
-.. function:: truth_t gr_mat_is_empty(const gr_mat_t mat, gr_ctx_t ctx)
-
-    Returns whether *mat* is an empty matrix, having either zero
-    rows or zero column. This predicate is always decidable (even if
-    the underlying ring is not computable), returning
-    ``T_TRUE`` or ``T_FALSE``.
-
-.. function:: truth_t gr_mat_is_square(const gr_mat_t mat, gr_ctx_t ctx)
-
-    Returns whether *mat* is a square matrix, having the same number
-    of rows as columns (not the same thing as being a perfect square!).
-    This predicate is always decidable (even if the underlying ring
-    is not computable), returning ``T_TRUE`` or ``T_FALSE``.
+Comparisons
+-------------------------------------------------------------------------------
 
 .. function:: truth_t gr_mat_equal(const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 
     Returns whether *mat1* and *mat2* are equal.
+
+Assignment and special values
+-------------------------------------------------------------------------------
 
 .. function:: truth_t gr_mat_is_zero(const gr_mat_t mat, gr_ctx_t ctx)
               truth_t gr_mat_is_one(const gr_mat_t mat, gr_ctx_t ctx)
@@ -162,7 +164,48 @@ Basic operations
     Set *res* to the scalar matrix with *c* on the main diagonal
     and zero elsewhere.
 
+Basic row, column and entry operations
+-------------------------------------------------------------------------------
+
 .. function:: int gr_mat_transpose(gr_mat_t B, const gr_mat_t A, gr_ctx_t ctx)
+
+    Sets *B* to the transpose of *A*.
+
+.. function:: int gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
+
+    Swaps rows ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
+    permutation of the rows will also be applied to ``perm``.
+
+.. function:: int gr_mat_swap_cols(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
+
+    Swaps columns ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
+    permutation of the columns will also be applied to ``perm``.
+
+.. function:: int gr_mat_invert_rows(gr_mat_t mat, slong * perm, gr_ctx_t ctx)
+
+    Swaps rows ``i`` and ``r - i`` of ``mat`` for ``0 <= i < r/2``, where
+    ``r`` is the number of rows of ``mat``. If ``perm`` is non-``NULL``, the
+    permutation of the rows will also be applied to ``perm``.
+
+.. function:: int gr_mat_invert_cols(gr_mat_t mat, slong * perm, gr_ctx_t ctx)
+
+    Swaps columns ``i`` and ``c - i`` of ``mat`` for ``0 <= i < c/2``, where
+    ``c`` is the number of columns of ``mat``. If ``perm`` is non-``NULL``, the
+    permutation of the columns will also be applied to ``perm``.
+
+.. function:: truth_t gr_mat_is_empty(const gr_mat_t mat, gr_ctx_t ctx)
+
+    Returns whether *mat* is an empty matrix, having either zero
+    rows or zero column. This predicate is always decidable (even if
+    the underlying ring is not computable), returning
+    ``T_TRUE`` or ``T_FALSE``.
+
+.. function:: truth_t gr_mat_is_square(const gr_mat_t mat, gr_ctx_t ctx)
+
+    Returns whether *mat* is a square matrix, having the same number
+    of rows as columns (not the same thing as being a perfect square!).
+    This predicate is always decidable (even if the underlying ring
+    is not computable), returning ``T_TRUE`` or ``T_FALSE``.
 
 Arithmetic
 -------------------------------------------------------------------------------
@@ -531,6 +574,9 @@ Random matrices
 
 Special matrices
 -------------------------------------------------------------------------------
+
+For the following functions, the user supplies an output matrix
+with the intended number of rows and columns.
 
 .. function:: int gr_mat_ones(gr_mat_t res, gr_ctx_t ctx)
 

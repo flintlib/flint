@@ -46,6 +46,7 @@ typedef int ((*gr_method_mat_pivot_op)(slong *, gr_mat_t, slong, slong, slong, g
 #define GR_MAT_PIVOT_OP(ctx, NAME) (((gr_method_mat_pivot_op *) ctx->methods)[GR_METHOD_ ## NAME])
 
 void gr_mat_init(gr_mat_t mat, slong rows, slong cols, gr_ctx_t ctx);
+int gr_mat_init_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
 void gr_mat_clear(gr_mat_t mat, gr_ctx_t ctx);
 
 GR_MAT_INLINE void
@@ -59,6 +60,11 @@ gr_mat_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t ctx)
         *mat2 = *tmp;
     }
 }
+
+int gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx);
+int gr_mat_invert_rows(gr_mat_t mat, slong * perm, gr_ctx_t ctx);
+int gr_mat_swap_cols(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx);
+int gr_mat_invert_cols(gr_mat_t mat, slong * perm, gr_ctx_t ctx);
 
 void gr_mat_window_init(gr_mat_t window, const gr_mat_t mat, slong r1, slong c1, slong r2, slong c2, gr_ctx_t ctx);
 
