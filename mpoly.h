@@ -579,21 +579,16 @@ MPOLY_INLINE
 int mpoly_monomial_halves(ulong * exp_ptr, const ulong * exp2,
 		                                           slong N, ulong mask)
 {
-   slong i;
-   ulong bw;
-
-   bw = mpn_rshift(exp_ptr, exp2, N, 1);
-
-   if (bw != 0)
-      return 0;
-
-   for (i = 0; i < N; i++)
-   {
-      if ((exp_ptr[i] & mask) != 0)
-         return 0;
-   }
-
-   return 1;
+    slong i;
+    for (i = 0; i < N; i++)
+    {
+        if (exp2[i] & 1)
+            return 0;
+        exp_ptr[i] = exp2[i] >> 1;
+        if (exp_ptr[i] & mask)
+            return 0;
+    }
+    return 1;
 }
 
 MPOLY_INLINE
