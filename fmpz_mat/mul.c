@@ -111,6 +111,10 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
     slong i, j, dim, limit;
     int sign;
 
+    FLINT_ASSERT(C->r == A->r);
+    FLINT_ASSERT(C->c == B->c);
+    FLINT_ASSERT(A->c == B->r);
+
     ar = fmpz_mat_nrows(A);
     br = fmpz_mat_nrows(B);
     bc = fmpz_mat_ncols(B);

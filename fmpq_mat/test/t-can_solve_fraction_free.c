@@ -55,7 +55,6 @@ main(void)
         if (i % 2)
             fmpz_mat_randops(M, state, n_randint(state, 2*n*k + 1));
         fmpz_randtest_not_zero(den, state, bits);
-        fmpq_mat_init(A, n, k);
         fmpq_mat_set_fmpz_mat_div_fmpz(A, M, den);
         
         fmpq_mat_randtest(B, state, bits);
@@ -116,7 +115,6 @@ main(void)
         if (i % 2)
             fmpz_mat_randops(M, state, n_randint(state, 2*m*n + 1));
         fmpz_randtest_not_zero(den, state, bits);
-        fmpq_mat_init(A, n, k);
         fmpq_mat_set_fmpz_mat_div_fmpz(A, M, den);
         
         fmpq_mat_randtest(X, state, bits);

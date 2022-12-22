@@ -29,6 +29,12 @@ nmod_mat_can_solve_inner(slong * rank, slong * prm, slong * piv,
     if (rank == NULL)
         rank = & rnk;
 
+    if (A->r != B->r || A->c != X->r || X->c != B->c)
+    {
+        *rank = 0;
+        return 0;
+    }
+
     if (A->r == 0 || B->c == 0)
     {
         nmod_mat_zero(X);
@@ -95,6 +101,7 @@ nmod_mat_can_solve_inner(slong * rank, slong * prm, slong * piv,
         
         LU->rows += *rank;
         LU->r = A->r - *rank;
+        X->r = LU->c;
 
         nmod_mat_init(P, LU->r, B->c, A->mod.n);
 
@@ -112,6 +119,7 @@ nmod_mat_can_solve_inner(slong * rank, slong * prm, slong * piv,
 
         if (!result)
         {
+            X->r = A->c;
             nmod_mat_zero(X);
             goto cleanup;
         }
@@ -144,6 +152,7 @@ cleanup:
     PB->r = B->r;
     nmod_mat_window_clear(PB);
 
+    LU->r = A->r;
     nmod_mat_clear(LU);
     if (prm == NULL)
         flint_free(perm);
