@@ -16,8 +16,8 @@ gr_mat_init_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     slong r, c;
 
-    r = gr_mat_nrows(res, ctx);
-    c = gr_mat_ncols(res, ctx);
+    r = gr_mat_nrows(mat, ctx);
+    c = gr_mat_ncols(mat, ctx);
 
     gr_mat_init(res, r, c, ctx);
     return gr_mat_set(res, mat, ctx);

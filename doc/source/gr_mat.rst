@@ -342,6 +342,13 @@ Solving
     If *A* is not invertible over the fraction field, returns
     ``GR_DOMAIN`` even if the system has a solution.
 
+.. function:: int gr_mat_solve_field(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+
+    Solves `AX = B` where *A* is not necessarily square and not necessarily
+    invertible. Assuming that the ring is a field, a return value of
+    ``GR_DOMAIN`` indicates that the system has no solution.
+    If there are multiple solutions, an arbitrary solution is returned.
+
 Determinant and trace
 -------------------------------------------------------------------------------
 

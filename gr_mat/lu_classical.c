@@ -61,9 +61,6 @@ gr_mat_lu_classical(slong * res_rank, slong * P, gr_mat_t LU, const gr_mat_t A, 
     for (i = 0; i < m; i++)
         P[i] = i;
 
-    gr_init(d, ctx);
-    gr_init(e, ctx);
-
     while (row < m && col < n)
     {
         pivot_status = gr_mat_find_nonzero_pivot(&r, LU, row, m, col, ctx);
