@@ -74,6 +74,9 @@ gr_mat_window_clear(gr_mat_t window, gr_ctx_t ctx)
     flint_free(window->rows);
 }
 
+int gr_mat_concat_horizontal(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx);
+int gr_mat_concat_vertical(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx);
+
 int gr_mat_write(gr_stream_t out, const gr_mat_t mat, gr_ctx_t ctx);
 
 GR_INLINE int

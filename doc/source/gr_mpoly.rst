@@ -55,7 +55,7 @@ Basic manipulation
 
     Swaps *A* and *B* efficiently.
 
-.. function:: int gr_mpoly_set(gr_mpoly_t A, const gr_mpoly_t B, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+.. function:: int gr_mpoly_set(gr_mpoly_t A, const gr_mpoly_t B, const mpoly_ctx_t mctx, gr_ctx_t cctx)
 
     Sets *A* to *B*.
 
@@ -160,7 +160,7 @@ Mostly intended for internal use.
 
 .. function:: void _gr_mpoly_fit_length(gr_ptr * coeffs, slong * coeffs_alloc, ulong ** exps, slong * exps_alloc, slong N, slong length, gr_ctx_t cctx)
 
-.. function:: void gr_mpoly_fit_length(gr_mpoly_t A, slong len, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+.. function:: void gr_mpoly_fit_length(gr_mpoly_t A, slong len, const mpoly_ctx_t mctx, gr_ctx_t cctx)
 
     Ensures that *A* has space for *len* coefficients and exponents.
 
