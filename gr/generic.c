@@ -56,6 +56,40 @@ truth_t gr_generic_ctx_predicate_false(gr_ctx_t ctx)
     return T_FALSE;
 }
 
+int gr_generic_randtest_not_zero(gr_ptr x, flint_rand_t state, gr_ctx_t ctx)
+{
+    slong i;
+    truth_t is_zero;
+    int status = GR_SUCCESS;
+
+    for (i = 0; i < 5; i++)
+    {
+        status |= gr_randtest(x, state, ctx);
+
+        is_zero = gr_is_zero(x, ctx);
+        if (is_zero == T_FALSE)
+            return GR_SUCCESS;
+    }
+
+    if (n_randint(state, 2))
+        status |= gr_one(x, ctx);
+    else
+        status |= gr_neg_one(x, ctx);
+
+    /* unused */
+    status = status;
+
+    is_zero = gr_is_zero(x, ctx);
+    if (is_zero == T_FALSE)
+        return GR_SUCCESS;
+
+    /* We are in the zero ring */
+    if (is_zero == T_TRUE)
+        return GR_DOMAIN;
+
+    return GR_UNABLE;
+}
+
 /* Generic arithmetic functions */
 
 truth_t gr_generic_is_zero(gr_srcptr x, gr_ctx_t ctx)
@@ -1720,8 +1754,10 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_INIT,                    (gr_funcptr) gr_generic_init},
     {GR_METHOD_CLEAR,                   (gr_funcptr) gr_generic_clear},
     {GR_METHOD_SWAP,                    (gr_funcptr) gr_generic_swap},
-    {GR_METHOD_RANDTEST,                (gr_funcptr) gr_generic_randtest},
     {GR_METHOD_WRITE,                   (gr_funcptr) gr_generic_write},
+
+    {GR_METHOD_RANDTEST,                (gr_funcptr) gr_generic_randtest},
+    {GR_METHOD_RANDTEST_NOT_ZERO,       (gr_funcptr) gr_generic_randtest_not_zero},
 
     {GR_METHOD_ZERO,                    (gr_funcptr) gr_generic_zero},
     {GR_METHOD_ONE,                     (gr_funcptr) gr_generic_one},

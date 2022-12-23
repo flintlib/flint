@@ -42,8 +42,8 @@ int main()
         gr_mat_init(A, r, c, ctx);
         gr_mat_window_init(B, A, r1, c1, r2, c2, ctx);
 
-        gr_mat_randtest(A, state, ctx);
-        gr_mat_randtest(B, state, ctx);
+        GR_MUST_SUCCEED(gr_mat_randtest(A, state, ctx));
+        GR_MUST_SUCCEED(gr_mat_randtest(B, state, ctx));
 
         gr_mat_window_init(C, A, r1, c1, r2, c2, ctx);
 

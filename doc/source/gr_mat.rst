@@ -583,6 +583,21 @@ Random matrices
     operations. More precisely, at most *count* random additions or
     subtractions of distinct rows and columns will be performed.
 
+.. function:: int gr_mat_randpermdiag(int * parity, gr_mat_t mat, flint_rand_t state, gr_ptr diag, slong n, gr_ctx_t ctx)
+
+    Sets mat to a random permutation of the diagonal matrix with *n* leading entries given by
+    the vector ``diag``. Returns ``GR_DOMAIN`` if the main diagonal of ``mat``
+    does not have room for at least *n* entries.
+    The parity (0 or 1) of the permutation is written to ``parity``.
+
+.. function:: int gr_mat_randrank(gr_mat_t mat, flint_rand_t state, slong rank, gr_ctx_t ctx)
+
+    Sets ``mat`` to a random sparse matrix with the given rank, having exactly as many
+    non-zero elements as the rank. The matrix can be transformed into a dense matrix
+    with unchanged rank by subsequently calling :func:`gr_mat_randops`.
+
+    This operation only makes sense over integral domains (currently not checked).
+
 Special matrices
 -------------------------------------------------------------------------------
 

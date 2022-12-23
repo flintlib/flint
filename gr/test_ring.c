@@ -750,6 +750,33 @@ gr_test_zero_one(gr_ctx_t R, flint_rand_t state, int test_flags)
 }
 
 int
+gr_test_randtest_not_zero(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status;
+    gr_ptr a;
+    truth_t is_zero;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(a, R);
+
+    status |= gr_randtest_not_zero(a, state, R);
+
+    if (status == GR_SUCCESS)
+    {
+        is_zero = gr_is_zero(a, R);
+
+        if (status == GR_SUCCESS && is_zero == T_TRUE)
+            status = GR_TEST_FAIL;
+    }
+
+    GR_TMP_CLEAR(a, R);
+
+    return status;
+}
+
+
+int
 gr_test_one(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -2137,6 +2164,7 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
     gr_test_iter(R, state, "init/clear", gr_test_init_clear, iters, test_flags);
     gr_test_iter(R, state, "swap", gr_test_swap, iters, test_flags);
     gr_test_iter(R, state, "zero_one", gr_test_zero_one, iters, test_flags);
+    gr_test_iter(R, state, "randtest_not_zero", gr_test_randtest_not_zero, iters, test_flags);
     gr_test_iter(R, state, "neg", gr_test_neg, iters, test_flags);
 
     gr_test_iter(R, state, "set_ui", gr_test_set_ui, iters, test_flags);

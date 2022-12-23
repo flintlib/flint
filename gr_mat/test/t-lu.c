@@ -76,7 +76,7 @@ void check(slong * P, gr_mat_t LU, const gr_mat_t A, slong rank, gr_ctx_t ctx)
 }
 
 void
-gr_mat_randrank(gr_mat_t mat, flint_rand_t state, slong rank, slong bits, gr_ctx_t ctx)
+_gr_mat_randrank(gr_mat_t mat, flint_rand_t state, slong rank, slong bits, gr_ctx_t ctx)
 {
     fmpz_mat_t A;
     fmpz_mat_init(A, mat->r, mat->c);
@@ -116,12 +116,12 @@ int main()
             gr_mat_init(A, m, n, ctx);
             gr_mat_init(LU, m, n, ctx);
 
-            gr_mat_randrank(A, state, r, 5, ctx);
+            _gr_mat_randrank(A, state, r, 5, ctx);
 
             if (n_randint(state, 2))
             {
                 d = n_randint(state, 2*m*n + 1);
-                gr_mat_randops(A, state, d, ctx);
+                GR_MUST_SUCCEED(gr_mat_randops(A, state, d, ctx));
             }
 
             P = flint_malloc(sizeof(slong) * m);
@@ -170,12 +170,12 @@ int main()
             gr_mat_init(A, m, n, ctx);
             gr_mat_init(LU, m, n, ctx);
 
-            gr_mat_randrank(A, state, r, 5, ctx);
+            _gr_mat_randrank(A, state, r, 5, ctx);
 
             if (n_randint(state, 2))
             {
                 d = n_randint(state, 2*m*n + 1);
-                gr_mat_randops(A, state, d, ctx);
+                GR_MUST_SUCCEED(gr_mat_randops(A, state, d, ctx));
             }
 
             P = flint_malloc(sizeof(slong) * m);
@@ -227,12 +227,12 @@ int main()
             gr_mat_init(A, n, n, ctx);
             gr_mat_init(LU, n, n, ctx);
 
-            gr_mat_randrank(A, state, r, 5, ctx);
+            _gr_mat_randrank(A, state, r, 5, ctx);
 
             if (n_randint(state, 2))
             {
                 d = n_randint(state, 2*n*n + 1);
-                gr_mat_randops(A, state, d, ctx);
+                GR_MUST_SUCCEED(gr_mat_randops(A, state, d, ctx));
             }
 
             P = flint_malloc(sizeof(slong) * n);

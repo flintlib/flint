@@ -29,7 +29,7 @@ int main()
         gr_mat_init(A, r, c, ctx);
         gr_mat_init(X, 0, 0, ctx);
 
-        gr_mat_randtest(A, state, ctx);
+        GR_MUST_SUCCEED(gr_mat_randtest(A, state, ctx));
 
         status = gr_mat_nullspace(X, A, ctx);
 

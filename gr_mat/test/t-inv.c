@@ -46,8 +46,8 @@ int main()
         gr_mat_init(B, n, n, ctx);
         gr_mat_init(AB, n, n, ctx);
 
-        gr_mat_randtest(A, state, ctx);
-        gr_mat_randtest(B, state, ctx);
+        GR_MUST_SUCCEED(gr_mat_randtest(A, state, ctx));
+        GR_MUST_SUCCEED(gr_mat_randtest(B, state, ctx));
 
         status = gr_mat_inv(B, A, ctx);
 

@@ -580,6 +580,11 @@ Random elements
     Typically the distribution is non-uniform in order to
     find corner cases more easily in test code.
 
+.. function:: int gr_randtest_not_zero(gr_ptr res, flint_rand_t state, gr_ctx_t ctx)
+
+    Sets *res* to a random nonzero element of the domain *ctx*.
+    This operation will fail and return ``GR_DOMAIN`` in the zero ring.
+
 Input, output and string conversion
 ................................................................................
 

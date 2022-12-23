@@ -49,7 +49,7 @@ int main()
 
         GR_TMP_INIT2(d, e, ctx);
 
-        gr_mat_randtest(A, state, ctx);
+        GR_MUST_SUCCEED(gr_mat_randtest(A, state, ctx));
 
         status |= gr_mat_adjugate_cofactor(B, d, A, ctx);
         status |= gr_mat_adjugate_charpoly(C, e, A, ctx);
