@@ -102,7 +102,8 @@ Basic manipulation
 .. function:: truth_t _gr_poly_equal(gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
               truth_t gr_poly_equal(const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx)
 
-.. function:: truth_t gr_poly_is_one(const gr_poly_t poly, gr_ctx_t ctx)
+.. function:: truth_t gr_poly_is_zero(const gr_poly_t poly, gr_ctx_t ctx)
+              truth_t gr_poly_is_one(const gr_poly_t poly, gr_ctx_t ctx)
 
 .. function:: int gr_poly_set_scalar(gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
               int gr_poly_set_si(gr_poly_t poly, slong c, gr_ctx_t ctx)

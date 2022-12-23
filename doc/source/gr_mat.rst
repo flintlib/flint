@@ -549,6 +549,29 @@ Characteristic polynomial
     *mat*, which is assumed to be in Hessenberg form (this is
     currently not checked).
 
+Minimal polynomial
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_minpoly_field(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Compute the minimal polynomial of the matrix *mat*.
+    The algorithm assumes that the coefficient ring is a field.
+
+Similarity transformations
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_apply_row_similarity(gr_mat_t M, slong r, gr_ptr d, gr_ctx_t ctx)
+
+    Applies an elementary similarity transform to the `n\times n` matrix `M`
+    in-place.
+
+    If `P` is the `n\times n` identity matrix the zero entries of whose row
+    `r` (`0`-indexed) have been replaced by `d`, this transform is equivalent
+    to `M = P^{-1}MP`.
+
+    Similarity transforms preserve the determinant, characteristic polynomial
+    and minimal polynomial.
+
 Hessenberg form
 -------------------------------------------------------------------------------
 
@@ -648,6 +671,23 @@ with the intended number of rows and columns.
     *q* is an odd prime power. Orders *n* for which Hadamard matrices are
     known to exist but for which this construction fails are
     92, 116, 156, ... (OEIS A046116).
+
+Helper functions for reduction
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_reduce_row(slong * column, gr_mat_t A, slong * P, slong * L, slong m, gr_ctx_t ctx)
+
+    Reduce row n of the matrix `A`, assuming the prior rows are in Gauss
+    form. However those rows may not be in order. The entry `i` of the array
+    `P` is the row of `A` which has a pivot in the `i`-th column. If no such
+    row exists, the entry of `P` will be `-1`. The function sets *column* to the column
+    in which the `n`-th row has a pivot after reduction. This will always be
+    chosen to be the first available column for a pivot from the left. This
+    information is also updated in `P`. Entry `i` of the array `L` contains the
+    number of possibly nonzero columns of `A` row `i`. This speeds up reduction
+    in the case that `A` is chambered on the right. Otherwise the entries of
+    `L` can all be set to the number of columns of `A`. We require the entries
+    of `L` to be monotonic increasing.
 
 
 .. raw:: latex
