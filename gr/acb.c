@@ -444,6 +444,41 @@ _gr_acb_sqr(acb_t res, const acb_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_acb_mul_2exp_si(acb_t res, const acb_t x, slong y, const gr_ctx_t ctx)
+{
+    acb_mul_2exp_si(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_mul_2exp_fmpz(acb_t res, const acb_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    acb_mul_2exp_fmpz(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_set_fmpz_2exp_fmpz(acb_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    arb_set_fmpz_2exp(acb_realref(res), x, y);
+    arb_zero(acb_imagref(res));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, const acb_t x, const gr_ctx_t ctx)
+{
+    if (!acb_is_exact(x) || !acb_is_real(x))
+        return GR_UNABLE;
+
+    if (!acb_is_finite(x))
+        return GR_DOMAIN;
+
+    arf_get_fmpz_2exp(res1, res2, arb_midref(acb_realref(x)));
+    return GR_SUCCESS;
+}
+
+int
 _gr_acb_inv(acb_t res, const acb_t x, const gr_ctx_t ctx)
 {
     if (acb_is_zero(x))
@@ -997,6 +1032,10 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_SUBMUL,          (gr_funcptr) _gr_acb_submul},
     {GR_METHOD_MUL_TWO,         (gr_funcptr) _gr_acb_mul_two},
     {GR_METHOD_SQR,             (gr_funcptr) _gr_acb_sqr},
+    {GR_METHOD_MUL_2EXP_SI,        (gr_funcptr) _gr_acb_mul_2exp_si},
+    {GR_METHOD_MUL_2EXP_FMPZ,      (gr_funcptr) _gr_acb_mul_2exp_fmpz},
+    {GR_METHOD_SET_FMPZ_2EXP_FMPZ, (gr_funcptr) _gr_acb_set_fmpz_2exp_fmpz},
+    {GR_METHOD_GET_FMPZ_2EXP_FMPZ, (gr_funcptr) _gr_acb_get_fmpz_2exp_fmpz},
     {GR_METHOD_DIV,             (gr_funcptr) _gr_acb_div},
     {GR_METHOD_DIV_UI,          (gr_funcptr) _gr_acb_div_ui},
     {GR_METHOD_DIV_SI,          (gr_funcptr) _gr_acb_div_si},

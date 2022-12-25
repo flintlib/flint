@@ -643,6 +643,11 @@ Assignment and conversions
     if *x* cannot be converted to the target type.
     For floating-point output types, the output may be rounded.
 
+.. function:: int gr_set_fmpz_2exp_fmpz(gr_ptr res, const fmpz_t x, const fmpz_t y, gr_ctx_t ctx)
+              int gr_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, gr_srcptr x, gr_ctx_t ctx)
+
+    Set or retrieve a dyadic number.
+
 Basic properties
 ........................................................................
 
@@ -743,6 +748,13 @@ attempting to perform a coercion into the target domain.
 
     Sets *res* to `x ^ 2`. The default implementation multiplies *x*
     with itself.
+
+.. function:: int gr_mul_2exp_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
+              int gr_mul_2exp_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
+
+    Sets *res* to `x \cdot 2^y`. This may perform `x \cdot 2^{-y}`
+    when *y* is negative, allowing exact division by powers of two
+    even if `2^{y}` is not representable.
 
 Iterated arithmetic operations are best performed using vector
 functions.

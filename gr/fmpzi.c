@@ -230,6 +230,17 @@ _gr_fmpzi_get_fmpz(fmpz_t res, const fmpzi_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_fmpzi_get_fmpq(fmpq_t res, const fmpzi_t x, const gr_ctx_t ctx)
+{
+    if (!fmpz_is_zero(fmpzi_imagref(x)))
+        return GR_DOMAIN;
+
+    fmpq_set_fmpz(res, fmpzi_realref(x));
+    return GR_SUCCESS;
+}
+
+
+int
 _gr_fmpzi_get_ui(ulong * res, const fmpzi_t x, const gr_ctx_t ctx)
 {
     if (!fmpz_is_zero(fmpzi_imagref(x)))
@@ -405,6 +416,60 @@ _gr_fmpzi_sqr(fmpzi_t res, const fmpzi_t x, const gr_ctx_t ctx)
 {
     fmpzi_mul(res, x, x);
     return GR_SUCCESS;
+}
+
+int
+_gr_fmpzi_mul_2exp_si(fmpzi_t res, const fmpzi_t x, slong y, const gr_ctx_t ctx)
+{
+    if (y >= 0)
+    {
+        fmpz_mul_2exp(fmpzi_realref(res), fmpzi_realref(x), y);
+        fmpz_mul_2exp(fmpzi_imagref(res), fmpzi_imagref(x), y);
+        return GR_SUCCESS;
+    }
+    else if (fmpzi_is_zero(x))
+    {
+        fmpzi_zero(res);
+        return GR_SUCCESS;
+    }
+    else
+    {
+        ulong val;
+        ulong v = -(ulong) y;
+
+        if (!fmpz_is_zero(fmpzi_realref(x)))
+        {
+            val = fmpz_val2(fmpzi_realref(x));
+            if (val < v)
+                return GR_DOMAIN;
+        }
+
+        if (!fmpz_is_zero(fmpzi_imagref(x)))
+        {
+            val = fmpz_val2(fmpzi_imagref(x));
+            if (val < v)
+                return GR_DOMAIN;
+        }
+
+        fmpz_tdiv_q_2exp(fmpzi_realref(res), fmpzi_realref(x), v);
+        fmpz_tdiv_q_2exp(fmpzi_imagref(res), fmpzi_imagref(x), v);
+        return GR_SUCCESS;
+    }
+}
+
+int
+_gr_fmpzi_mul_2exp_fmpz(fmpzi_t res, const fmpzi_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    if (fmpzi_is_zero(x))
+    {
+        fmpzi_zero(res);
+        return GR_SUCCESS;
+    }
+
+    if (COEFF_IS_MPZ(*y))
+        return GR_UNABLE;
+
+    return _gr_fmpzi_mul_2exp_si(res, x, *y, ctx);
 }
 
 int
@@ -844,6 +909,7 @@ gr_method_tab_input _fmpzi_methods_input[] =
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_fmpzi_set_other},
 /*    {GR_METHOD_SET_STR,         (gr_funcptr) _gr_fmpzi_set_str}, */
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_fmpzi_get_fmpz},
+    {GR_METHOD_GET_FMPQ,        (gr_funcptr) _gr_fmpzi_get_fmpq},
     {GR_METHOD_GET_UI,          (gr_funcptr) _gr_fmpzi_get_ui},
     {GR_METHOD_GET_SI,          (gr_funcptr) _gr_fmpzi_get_si},
     {GR_METHOD_GET_D,           (gr_funcptr) _gr_fmpzi_get_d},
@@ -866,6 +932,8 @@ gr_method_tab_input _fmpzi_methods_input[] =
 */
     {GR_METHOD_MUL_TWO,         (gr_funcptr) _gr_fmpzi_mul_two},
     {GR_METHOD_SQR,             (gr_funcptr) _gr_fmpzi_sqr},
+    {GR_METHOD_MUL_2EXP_SI,     (gr_funcptr) _gr_fmpzi_mul_2exp_si},
+    {GR_METHOD_MUL_2EXP_FMPZ,   (gr_funcptr) _gr_fmpzi_mul_2exp_fmpz},
     {GR_METHOD_DIV,             (gr_funcptr) _gr_fmpzi_div},
     {GR_METHOD_DIVEXACT,        (gr_funcptr) _gr_fmpzi_divexact},
     {GR_METHOD_DIVEXACT_UI,     (gr_funcptr) _gr_fmpzi_divexact_ui},

@@ -241,6 +241,20 @@ _gr_arf_get_d(double * res, const arf_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_arf_get_fmpq(fmpq_t res, const arf_t x, const gr_ctx_t ctx)
+{
+    if (!arf_is_finite(x))
+        return GR_DOMAIN;
+
+    if (!ARF_IS_LAGOM(x))
+        return GR_UNABLE;
+
+    arf_get_fmpq(res, x);
+    return GR_SUCCESS;
+}
+
+
 truth_t
 _gr_arf_is_zero(const arf_t x, const gr_ctx_t ctx)
 {
@@ -385,6 +399,37 @@ int
 _gr_arf_sqr(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     arf_mul(res, x, x, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_arf_mul_2exp_si(arf_t res, const arf_t x, slong y, const gr_ctx_t ctx)
+{
+    arf_mul_2exp_si(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_arf_mul_2exp_fmpz(arf_t res, const arf_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    arf_mul_2exp_fmpz(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_arf_set_fmpz_2exp_fmpz(arf_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    arf_set_fmpz_2exp(res, x, y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_arf_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, const arf_t x, const gr_ctx_t ctx)
+{
+    if (!arf_is_finite(x))
+        return GR_DOMAIN;
+
+    arf_get_fmpz_2exp(res1, res2, x);
     return GR_SUCCESS;
 }
 
@@ -1046,6 +1091,7 @@ gr_method_tab_input _arf_methods_input[] =
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_arf_set_other},
 
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_arf_get_fmpz},
+    {GR_METHOD_GET_FMPQ,        (gr_funcptr) _gr_arf_get_fmpq},
     {GR_METHOD_GET_UI,          (gr_funcptr) _gr_arf_get_ui},
     {GR_METHOD_GET_SI,          (gr_funcptr) _gr_arf_get_si},
     {GR_METHOD_GET_D,           (gr_funcptr) _gr_arf_get_d},
@@ -1072,6 +1118,11 @@ gr_method_tab_input _arf_methods_input[] =
     {GR_METHOD_DIV_SI,          (gr_funcptr) _gr_arf_div_si},
     {GR_METHOD_DIV_FMPZ,        (gr_funcptr) _gr_arf_div_fmpz},
     {GR_METHOD_INV,             (gr_funcptr) _gr_arf_inv},
+
+    {GR_METHOD_MUL_2EXP_SI,        (gr_funcptr) _gr_arf_mul_2exp_si},
+    {GR_METHOD_MUL_2EXP_FMPZ,      (gr_funcptr) _gr_arf_mul_2exp_fmpz},
+    {GR_METHOD_SET_FMPZ_2EXP_FMPZ, (gr_funcptr) _gr_arf_set_fmpz_2exp_fmpz},
+    {GR_METHOD_GET_FMPZ_2EXP_FMPZ, (gr_funcptr) _gr_arf_get_fmpz_2exp_fmpz},
 
     {GR_METHOD_POW,             (gr_funcptr) _gr_arf_pow},
 /*

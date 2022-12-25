@@ -444,6 +444,40 @@ _gr_acf_sqr(acf_t res, const acf_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_acf_mul_2exp_si(acf_t res, const acf_t x, slong y, const gr_ctx_t ctx)
+{
+    arf_mul_2exp_si(acf_realref(res), acf_realref(x), y);
+    arf_mul_2exp_si(acf_imagref(res), acf_imagref(x), y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_acf_mul_2exp_fmpz(acf_t res, const acf_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    arf_mul_2exp_fmpz(acf_realref(res), acf_realref(x), y);
+    arf_mul_2exp_fmpz(acf_imagref(res), acf_imagref(x), y);
+    return GR_SUCCESS;
+}
+
+int
+_gr_acf_set_fmpz_2exp_fmpz(acf_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    arf_set_fmpz_2exp(acf_realref(res), x, y);
+    arf_zero(acf_imagref(res));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acf_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, const acf_t x, const gr_ctx_t ctx)
+{
+    if (!arf_is_zero(acf_imagref(x)) || !arf_is_finite(acf_realref(x)))
+        return GR_DOMAIN;
+
+    arf_get_fmpz_2exp(res1, res2, acf_realref(x));
+    return GR_SUCCESS;
+}
+
+int
 _gr_acf_inv(acf_t res, const acf_t x, const gr_ctx_t ctx)
 {
     acf_approx_inv(res, x, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
@@ -966,6 +1000,12 @@ gr_method_tab_input _acf_methods_input[] =
     {GR_METHOD_SUBMUL,          (gr_funcptr) _gr_acf_submul},
 */
     {GR_METHOD_SQR,             (gr_funcptr) _gr_acf_sqr},
+
+    {GR_METHOD_MUL_2EXP_SI,        (gr_funcptr) _gr_acf_mul_2exp_si},
+    {GR_METHOD_MUL_2EXP_FMPZ,      (gr_funcptr) _gr_acf_mul_2exp_fmpz},
+    {GR_METHOD_SET_FMPZ_2EXP_FMPZ, (gr_funcptr) _gr_acf_set_fmpz_2exp_fmpz},
+    {GR_METHOD_GET_FMPZ_2EXP_FMPZ, (gr_funcptr) _gr_acf_get_fmpz_2exp_fmpz},
+
     {GR_METHOD_DIV,             (gr_funcptr) _gr_acf_div},
     {GR_METHOD_DIV_UI,          (gr_funcptr) _gr_acf_div_ui},
     {GR_METHOD_DIV_SI,          (gr_funcptr) _gr_acf_div_si},

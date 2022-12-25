@@ -1,18 +1,19 @@
 # just for fun
 
 from mpmath.ctx_base import StandardBaseContext
-import flint
+import flint2
 
 import mpmath.libmp
 from mpmath.libmp import prec_to_dps, dps_to_prec
 
 class RFContext(StandardBaseContext):
 
-    def __init__(ctx, RR, CC, QQ):
+    def __init__(ctx, RR, CC, QQ, ZZ):
         ctx.R = RR
         ctx.RR = RR
         ctx.CC = CC
         ctx.QQ = QQ
+        ctx.ZZ = ZZ
         ctx._type = ctx.R()
         ctx.R.prec = 53
         ctx._dps = prec_to_dps(53)
@@ -91,9 +92,10 @@ class RFContext(StandardBaseContext):
     def _is_real_type(ctx, x):
         return True
 
-    # todo:
     def ldexp(ctx, x, n):
-        return x * ctx.R(2) ** n
+        if not (type(x) is ctx._type and x.parent() is ctx.R):
+            x = ctx.R(x)
+        return x.mul_2exp(n)
 
     def sqrt(ctx, x, prec=0):
         if not (type(x) is ctx._type and x.parent() is ctx.R):
@@ -309,7 +311,7 @@ class RFContext(StandardBaseContext):
     '''
 
 
-mp = RFContext(flint.RF, flint.CF, flint.QQ)
+mp = RFContext(flint2.RF, flint2.CF, flint2.QQ, flint2.ZZ)
 
 sqrt = mp.sqrt
 log = mp.log

@@ -306,6 +306,17 @@ class gr_ctx:
     def pi(self):
         return self().pi()
 
+def _gr_set_int(self, val):
+    if WORD_MIN <= val <= WORD_MAX:
+        status = libgr.gr_set_si(self._ref, val, self._ctx)
+    else:
+        n = fmpz_struct()
+        nref = ctypes.byref(n)
+        libflint.fmpz_init(nref)
+        libflint.fmpz_set_str(nref, ctypes.c_char_p(str(val).encode('ascii')), 10)
+        status = libgr.gr_set_fmpz(self._ref, nref, self._ctx)
+        libflint.fmpz_clear(nref)
+    return status
 
 class gr_elem:
     """
@@ -331,15 +342,7 @@ class gr_elem:
             typ = type(val)
             status = GR_UNABLE
             if typ is int:
-                if WORD_MIN <= val <= WORD_MAX:
-                    status = libgr.gr_set_si(self._ref, val, self._ctx)
-                else:
-                    n = fmpz_struct()
-                    nref = ctypes.byref(n)
-                    libflint.fmpz_init(nref)
-                    libflint.fmpz_set_str(nref, ctypes.c_char_p(str(val).encode('ascii')), 10)
-                    status = libgr.gr_set_fmpz(self._ref, nref, self._ctx)
-                    libflint.fmpz_clear(nref)
+                status = _gr_set_int(self, val)
             elif isinstance(val, gr_elem):
                 status = libgr.gr_set_other(self._ref, val._ref, val._ctx, self._ctx)
             elif typ is str:
@@ -354,6 +357,8 @@ class gr_elem:
                 val = val._gr_elem_(context)
                 assert val.parent() is context
                 status = libgr.gr_set_other(self._ref, val._ref, val._ctx, self._ctx)
+            elif typ.__name__ == "mpz":
+                status = _gr_set_int(self, int(val))
             else:
                 status = GR_UNABLE
             if status:
@@ -503,6 +508,17 @@ class gr_elem:
         if status:
             if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for x = {self} over {self.parent()}")
             if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined for x = {self} over {self.parent()}")
+        return res
+
+    @staticmethod
+    def _binary_op_fmpz(self, other, op, rstr):
+        other = ZZ(other)
+        elem_type = type(self)
+        res = elem_type(context=self._ctx_python)
+        status = op(res._ref, self._ref, other._ref, self._ctx)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for x = {self}, y = {other} over {self.parent()}")
+            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined for x = {self}, y = {other} over {self.parent()}")
         return res
 
     @staticmethod
@@ -856,6 +872,23 @@ class gr_elem:
             -1
         """
         return self._unary_op(self, libgr.gr_csgn, "csgn(x)")
+
+    def mul_2exp(self, other):
+        """
+        Exact multiplication of a dyadic number `2^y`.
+
+            >>> QQ(3).mul_2exp(5)
+            96
+            >>> QQ(3).mul_2exp(-5)
+            3/32
+            >>> ZZ(100).mul_2exp(-2)
+            25
+            >>> ZZ(100).mul_2exp(-3)
+            Traceback (most recent call last):
+              ...
+            ValueError: mul_2exp is not defined for x = 100, y = -3 over Integer ring (fmpz)
+        """
+        return self._binary_op_fmpz(self, other, libgr.gr_mul_2exp_fmpz, "mul_2exp")
 
     def pi(self):
         """
@@ -2123,6 +2156,10 @@ def test_all():
     assert B.parent() is A.parent()
 
     assert CF(2+3j) * (1+1j) == CF((2+3j) * (1+1j))
+
+def test_float():
+    assert RF(5).mul_2exp(-1) == RF(2.5)
+    assert CF(2+3j).mul_2exp(-1) == CF(1+1.5j)
 
 if __name__ == "__main__":
     from time import time

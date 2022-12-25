@@ -636,6 +636,127 @@ int gr_generic_sqr(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
     return gr_mul(res, x, x, ctx);
 }
 
+int gr_generic_mul_2exp_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
+{
+    if (y == 0)
+    {
+        return gr_set(res, x, ctx);
+    }
+    else
+    {
+        gr_ptr t;
+        int status;
+
+        GR_TMP_INIT(t, ctx);
+
+        status = gr_set_ui(t, 2, ctx);
+
+        if (y >= 0)
+        {
+            status |= gr_pow_ui(t, t, y, ctx);
+            status |= gr_mul(res, x, t, ctx);
+        }
+        else
+        {
+            status |= gr_pow_ui(t, t, -y, ctx);
+            status |= gr_div(res, x, t, ctx);
+        }
+
+        GR_TMP_CLEAR(t, ctx);
+
+        return status;
+    }
+}
+
+int gr_generic_mul_2exp_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
+{
+    if (fmpz_is_zero(y))
+    {
+        return gr_set(res, x, ctx);
+    }
+    else
+    {
+        gr_ptr t;
+        int status = GR_SUCCESS;
+
+        GR_TMP_INIT(t, ctx);
+
+        status = gr_set_ui(t, 2, ctx);
+
+        if (fmpz_sgn(y) > 0)
+        {
+            status |= gr_pow_fmpz(t, t, y, ctx);
+            status |= gr_mul(res, x, t, ctx);
+        }
+        else
+        {
+            fmpz_t u;
+            fmpz_init(u);
+            fmpz_neg(u, y);
+            status |= gr_pow_fmpz(t, t, u, ctx);
+            status |= gr_div(res, x, t, ctx);
+            fmpz_clear(u);
+        }
+
+        GR_TMP_CLEAR(t, ctx);
+
+        return status;
+    }
+}
+
+int gr_generic_set_fmpz_2exp_fmpz(gr_ptr res, const fmpz_t x, const fmpz_t y, gr_ctx_t ctx)
+{
+    if (fmpz_is_zero(y))
+    {
+        return gr_set_fmpz(res, x, ctx);
+    }
+    else
+    {
+        int status;
+
+        status = gr_set_ui(res, 2, ctx);
+        status |= gr_pow_fmpz(res, res, y, ctx);
+        status |= gr_mul_fmpz(res, res, x, ctx);
+
+        return status;
+    }
+}
+
+int gr_generic_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, gr_ptr x, gr_ctx_t ctx)
+{
+    int status;
+
+    fmpq_t v;
+    fmpq_init(v);
+
+    status = gr_get_fmpq(v, x, ctx);
+
+    if (status == GR_SUCCESS)
+    {
+        slong nbits, dbits;
+
+        dbits = fmpz_val2(fmpq_denref(v));
+        fmpz_tdiv_q_2exp(fmpq_denref(v), fmpq_denref(v), dbits);
+
+        if (fmpz_is_one(fmpq_denref(v)))
+        {
+            nbits = fmpz_val2(fmpq_numref(v));
+            fmpz_tdiv_q_2exp(fmpq_numref(v), fmpq_numref(v), nbits);
+
+            fmpz_swap(res1, fmpq_numref(v));
+            fmpz_set_si(res2, nbits - dbits);
+        }
+        else
+        {
+            status = GR_DOMAIN;
+        }
+    }
+
+    fmpq_clear(v);
+
+    return status;
+}
+
 int gr_generic_inv(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 {
     if (gr_is_one(x, ctx) == T_TRUE)
@@ -1817,6 +1938,11 @@ const gr_method_tab_input _gr_generic_methods[] =
 
     {GR_METHOD_MUL_TWO,                 (gr_funcptr) gr_generic_mul_two},
     {GR_METHOD_SQR,                     (gr_funcptr) gr_generic_sqr},
+
+    {GR_METHOD_MUL_2EXP_SI,             (gr_funcptr) gr_generic_mul_2exp_si},
+    {GR_METHOD_MUL_2EXP_FMPZ,           (gr_funcptr) gr_generic_mul_2exp_fmpz},
+    {GR_METHOD_SET_FMPZ_2EXP_FMPZ,      (gr_funcptr) gr_generic_set_fmpz_2exp_fmpz},
+    {GR_METHOD_GET_FMPZ_2EXP_FMPZ,      (gr_funcptr) gr_generic_get_fmpz_2exp_fmpz},
 
     {GR_METHOD_DIV_UI,                  (gr_funcptr) gr_generic_div_ui},
     {GR_METHOD_DIV_SI,                  (gr_funcptr) gr_generic_div_si},

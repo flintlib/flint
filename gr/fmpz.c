@@ -179,6 +179,14 @@ _gr_fmpz_get_d(double * res, const fmpz_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_fmpz_get_fmpq(fmpq_t res, const fmpz_t x, const gr_ctx_t ctx)
+{
+    fmpq_set_fmpz(res, x);
+    return GR_SUCCESS;
+}
+
+
 truth_t
 _gr_fmpz_is_zero(const fmpz_t x, const gr_ctx_t ctx)
 {
@@ -334,6 +342,53 @@ _gr_fmpz_sqr(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
     fmpz_mul(res, x, x);
     return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_mul_2exp_si(fmpz_t res, const fmpz_t x, slong y, const gr_ctx_t ctx)
+{
+    if (y >= 0)
+    {
+        fmpz_mul_2exp(res, x, y);
+        return GR_SUCCESS;
+    }
+    else if (fmpz_is_zero(x))
+    {
+        fmpz_zero(res);
+        return GR_SUCCESS;
+    }
+    else
+    {
+        ulong val;
+        ulong v = -(ulong) y;
+
+        val = fmpz_val2(x);
+
+        if (val >= v)
+        {
+            fmpz_tdiv_q_2exp(res, x, v);
+            return GR_SUCCESS;
+        }
+        else
+        {
+            return GR_DOMAIN;
+        }
+    }
+}
+
+int
+_gr_fmpz_mul_2exp_fmpz(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    if (fmpz_is_zero(x))
+    {
+        fmpz_zero(res);
+        return GR_SUCCESS;
+    }
+
+    if (COEFF_IS_MPZ(*y))
+        return GR_UNABLE;
+
+    return _gr_fmpz_mul_2exp_si(res, x, *y, ctx);
 }
 
 int
@@ -792,6 +847,7 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_SET_D,           (gr_funcptr) _gr_fmpz_set_d},
     {GR_METHOD_SET_STR,         (gr_funcptr) _gr_fmpz_set_str},
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_fmpz_set},
+    {GR_METHOD_GET_FMPQ,        (gr_funcptr) _gr_fmpz_get_fmpq},
     {GR_METHOD_GET_UI,          (gr_funcptr) _gr_fmpz_get_ui},
     {GR_METHOD_GET_SI,          (gr_funcptr) _gr_fmpz_get_si},
     {GR_METHOD_GET_D,           (gr_funcptr) _gr_fmpz_get_d},
@@ -818,6 +874,8 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_SUBMUL_FMPZ,     (gr_funcptr) _gr_fmpz_submul},
     {GR_METHOD_MUL_TWO,         (gr_funcptr) _gr_fmpz_mul_two},
     {GR_METHOD_SQR,             (gr_funcptr) _gr_fmpz_sqr},
+    {GR_METHOD_MUL_2EXP_SI,     (gr_funcptr) _gr_fmpz_mul_2exp_si},
+    {GR_METHOD_MUL_2EXP_FMPZ,   (gr_funcptr) _gr_fmpz_mul_2exp_fmpz},
     {GR_METHOD_DIV,             (gr_funcptr) _gr_fmpz_div},
     {GR_METHOD_DIVEXACT,        (gr_funcptr) _gr_fmpz_divexact},
     {GR_METHOD_DIVEXACT_UI,     (gr_funcptr) _gr_fmpz_divexact_ui},
