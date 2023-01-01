@@ -1,6 +1,9 @@
 #include "acf.h"
 #include "acb.h"
+#include "arb_fmpz_poly.h"
 #include "gr.h"
+#include "gr_vec.h"
+#include "gr_poly.h"
 
 typedef struct
 {
@@ -839,6 +842,63 @@ _gr_acf_poly_mullow(acf_ptr res,
     }
 }
 
+int
+_gr_acf_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
+{
+    if (poly->length == 0)
+        return GR_DOMAIN;
+
+    if (other_ctx->which_ring == GR_CTX_FMPZ)
+    {
+        gr_ctx_t ZZ;
+        slong i, j, deg, deg2;
+        acb_ptr croots;
+        int status = GR_SUCCESS;
+
+        deg = poly->length - 1;
+
+        gr_ctx_init_fmpz(ZZ);
+
+        gr_vec_set_length(roots, 0, ctx);
+        gr_vec_set_length(mult, 0, ZZ);
+
+        if (deg != 0)
+        {
+            fmpz_poly_factor_t fac;
+            fmpz_poly_factor_init(fac);
+            fmpz_poly_factor_squarefree(fac, (const fmpz_poly_struct *) poly);
+
+            for (i = 0; i < fac->num; i++)
+            {
+                deg2 = fmpz_poly_degree(fac->p + i);
+
+                croots = _acb_vec_init(deg2);
+                arb_fmpz_poly_complex_roots(croots, fac->p + i, 0, ACF_CTX_PREC(ctx));
+
+                for (j = 0; j < deg2; j++)
+                {
+                    acf_t t;
+                    fmpz m2 = fac->exp[i];
+                    *acf_realref(t) = *arb_midref(acb_realref(croots + j));
+                    *acf_imagref(t) = *arb_midref(acb_imagref(croots + j));
+                    GR_MUST_SUCCEED(gr_vec_append(roots, t, ctx));
+                    GR_MUST_SUCCEED(gr_vec_append(mult, &m2, ZZ));
+                }
+
+                _acb_vec_clear(croots, deg2);
+            }
+
+            fmpz_poly_factor_clear(fac);
+        }
+
+        gr_ctx_clear(ZZ);
+
+        return status;
+    }
+
+    return GR_UNABLE;
+}
+
 #include "gr_mat.h"
 #include "acb_mat.h"
 
@@ -1050,6 +1110,7 @@ gr_method_tab_input _acf_methods_input[] =
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_acf_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_acf_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_acf_poly_mullow},
+    {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_acf_poly_roots_other},
 
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_acf_mat_mul},
     {GR_METHOD_MAT_DET,         (gr_funcptr) gr_mat_det_generic_field},

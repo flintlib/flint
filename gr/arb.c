@@ -1,9 +1,12 @@
 #include "arb.h"
 #include "arb_poly.h"
 #include "arb_mat.h"
+#include "arb_fmpz_poly.h"
 #include "arb_hypgeom.h"
 #include "qqbar.h"
 #include "gr.h"
+#include "gr_vec.h"
+#include "gr_poly.h"
 
 typedef struct
 {
@@ -1054,6 +1057,64 @@ _gr_arb_poly_mullow(arb_ptr res,
     return GR_SUCCESS;
 }
 
+/* todo: real-only roots in arb */
+int
+_gr_arb_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
+{
+    if (poly->length == 0)
+        return GR_DOMAIN;
+
+    if (other_ctx->which_ring == GR_CTX_FMPZ)
+    {
+        gr_ctx_t ZZ;
+        slong i, j, deg, deg2;
+        acb_ptr croots;
+        int status = GR_SUCCESS;
+
+        deg = poly->length - 1;
+
+        gr_ctx_init_fmpz(ZZ);
+
+        gr_vec_set_length(roots, 0, ctx);
+        gr_vec_set_length(mult, 0, ZZ);
+
+        if (deg != 0)
+        {
+            fmpz_poly_factor_t fac;
+            fmpz_poly_factor_init(fac);
+            fmpz_poly_factor_squarefree(fac, (const fmpz_poly_struct *) poly);
+
+            for (i = 0; i < fac->num; i++)
+            {
+                deg2 = fmpz_poly_degree(fac->p + i);
+
+                croots = _acb_vec_init(deg2);
+                arb_fmpz_poly_complex_roots(croots, fac->p + i, 0, ARB_CTX_PREC(ctx));
+
+                for (j = 0; j < deg2; j++)
+                {
+                    if (acb_is_real(croots + j))
+                    {
+                        fmpz m2 = fac->exp[i];
+                        GR_MUST_SUCCEED(gr_vec_append(roots, acb_realref(croots + j), ctx));
+                        GR_MUST_SUCCEED(gr_vec_append(mult, &m2, ZZ));
+                    }
+                }
+
+                _acb_vec_clear(croots, deg2);
+            }
+
+            fmpz_poly_factor_clear(fac);
+        }
+
+        gr_ctx_clear(ZZ);
+
+        return status;
+    }
+
+    return GR_UNABLE;
+}
+
 int
 _gr_arb_mat_mul(arb_mat_t res, const arb_mat_t x, const arb_mat_t y, gr_ctx_t ctx)
 {
@@ -1181,6 +1242,7 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_arb_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_arb_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_arb_poly_mullow},
+    {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_arb_poly_roots_other},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_arb_mat_mul},
     {GR_METHOD_MAT_DET,         (gr_funcptr) _gr_arb_mat_det},
     {0,                         (gr_funcptr) NULL},

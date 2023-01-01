@@ -245,6 +245,32 @@ GCD
     The underscore methods assume ``lenA >= lenB >= 1`` and that both
     *A* and *B* have nonzero leading coefficient.
 
+Roots
+-------------------------------------------------------------------------------
+
+.. function:: int gr_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
+              int gr_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr_ctx_t poly_ctx, int flags, gr_ctx_t ctx)
+
+    Finds all roots of the given polynomial in the ring defined by *ctx*,
+    storing the roots without duplication in *roots* (a vector with
+    elements of type ``ctx``) and the corresponding multiplicities in
+    *mult* (a vector with elements of type ``fmpz``).
+
+    If the target ring is not an algebraically closed field, then
+    the sum of multiplicities can be smaller than the degree of the
+    polynomial. For example, with ``fmpz`` coefficients, we only
+    find integer roots.
+    The *other* version of this function takes as input a polynomial
+    with entries in a different ring ``poly_ctx``. For example,
+    we can compute ``qqbar`` or ``arb`` roots for a polynomial
+    with ``fmpz`` coefficients.
+
+    Whether the roots are sorted in any particular order is
+    ring-dependent (and possibly undefined for a given ring).
+
+    We consider roots of the zero polynomial to be ill-defined and return
+    ``GR_DOMAIN`` in that case.
+
 
 .. raw:: latex
 

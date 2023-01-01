@@ -2,6 +2,8 @@
 #include "qqbar.h"
 #include "fexpr.h"
 #include "gr.h"
+#include "gr_vec.h"
+#include "gr_poly.h"
 
 typedef struct
 {
@@ -949,6 +951,68 @@ TRIG3(acsc_pi)
 /* todo: root of unity / is_root_of_unity */
 /* todo: exploit when we know that the field is real */
 
+
+/* todo: quickly skip nonreal roots over the real algebraic numbers */
+int
+_gr_qqbar_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
+{
+    if (poly->length == 0)
+        return GR_DOMAIN;
+
+    if (other_ctx->which_ring == GR_CTX_FMPZ)
+    {
+        gr_ctx_t ZZ;
+        slong i, j, deg, deg2;
+        qqbar_struct * croots;
+        int status = GR_SUCCESS;
+
+        deg = poly->length - 1;
+
+        gr_ctx_init_fmpz(ZZ);
+
+        gr_vec_set_length(roots, 0, ctx);
+        gr_vec_set_length(mult, 0, ZZ);
+
+        if (deg != 0)
+        {
+            fmpz_poly_factor_t fac;
+            fmpz_poly_factor_init(fac);
+            fmpz_poly_factor(fac, (const fmpz_poly_struct *) poly);
+
+            for (i = 0; i < fac->num; i++)
+            {
+                deg2 = fmpz_poly_degree(fac->p + i);
+
+                croots = _qqbar_vec_init(deg2);
+                qqbar_roots_fmpz_poly(croots, fac->p + i, QQBAR_ROOTS_IRREDUCIBLE);
+
+                for (j = 0; j < deg2; j++)
+                {
+                    fmpz m2 = fac->exp[i];
+
+                    if (QQBAR_CTX(ctx)->real_only && !qqbar_is_real(croots + j))
+                        continue;
+
+                    GR_MUST_SUCCEED(gr_vec_append(roots, croots + j, ctx));
+                    GR_MUST_SUCCEED(gr_vec_append(mult, &m2, ZZ));
+                }
+
+                _qqbar_vec_clear(croots, deg2);
+            }
+
+            fmpz_poly_factor_clear(fac);
+        }
+
+        /* todo: qqbar_cmp_root_order, but must sort exponents as well */
+
+        gr_ctx_clear(ZZ);
+
+        return status;
+    }
+
+    return GR_UNABLE;
+}
+
 truth_t
 _gr_qqbar_ctx_is_algebraically_closed(gr_ctx_t ctx)
 {
@@ -1086,6 +1150,7 @@ gr_method_tab_input _qqbar_methods_input[] =
     {GR_METHOD_ASEC_PI,          (gr_funcptr) _gr_qqbar_asec_pi},
     {GR_METHOD_ACSC_PI,          (gr_funcptr) _gr_qqbar_acsc_pi},
 
+    {GR_METHOD_POLY_ROOTS_OTHER, (gr_funcptr) _gr_qqbar_poly_roots_other},
 
     {0,                         (gr_funcptr) NULL},
 };

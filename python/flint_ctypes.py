@@ -1486,6 +1486,63 @@ class gr_poly(gr_elem):
             if status & GR_DOMAIN: raise ValueError
         return res
 
+    def roots(self, domain=None):
+        """
+        Computes the roots in the coefficient ring of this polynomial,
+        returning a tuple (``roots``, ``multiplicities``).
+        If the ring is not algebraically closed, the sum of multiplicities
+        can be smaller than the degree of the polynomial.
+        If ``domain`` is given, returns roots in that ring instead.
+
+            >>> (ZZx([3,2]) * ZZx([15,1])**2 * ZZx([-10,1])).roots()
+            ([10, -15], [1, 2])
+            >>> ZZx([1]).roots()
+            ([], [])
+
+        We consider roots of the zero polynomial to be ill-defined:
+
+            >>> ZZx([]).roots()
+            Traceback (most recent call last):
+              ...
+            ValueError
+
+        We construct an integer polynomial with rational, real algebraic
+        and complex algebraic roots and extract its roots over
+        different domains:
+
+            >>> f = ZZx([-2,0,1]) * ZZx([1, 0, 1]) * ZZx([3, 2])**2
+            >>> f.roots()   # integer roots (there are none)
+            ([], [])
+            >>> f.roots(domain=QQ)    # rational roots
+            ([-3/2], [2])
+            >>> f.roots(domain=AA)     # real algebraic roots
+            ([Root a = 1.41421 of a^2-2, Root a = -1.41421 of a^2-2, -3/2], [1, 1, 2])
+            >>> f.roots(domain=QQbar)     # complex algebraic roots
+            ([Root a = 1.00000*I of a^2+1, Root a = -1.00000*I of a^2+1, Root a = 1.41421 of a^2-2, Root a = -1.41421 of a^2-2, -3/2], [1, 1, 1, 1, 2])
+            >>> f.roots(domain=RR)      # real ball roots
+            ([[-1.414213562373095 +/- 4.89e-17], [1.414213562373095 +/- 4.89e-17], -1.500000000000000], [1, 1, 2])
+            >>> f.roots(domain=CC)      # complex ball roots
+            ([[-1.414213562373095 +/- 4.89e-17], [1.414213562373095 +/- 4.89e-17], 1.000000000000000*I, -1.000000000000000*I, -1.500000000000000], [1, 1, 1, 1, 2])
+            >>> f.roots(RF)     # real floating-point roots
+            ([-1.414213562373095, 1.414213562373095, -1.500000000000000], [1, 1, 2])
+            >>> f.roots(CF)     # complex floating-point roots
+            ([-1.414213562373095, 1.414213562373095, 1.000000000000000*I, -1.000000000000000*I, -1.500000000000000], [1, 1, 1, 1, 2])
+
+        """
+        Rx = self.parent()
+        R = Rx._coefficient_ring
+        mult = ZZ_vec()
+        if domain is None:
+            roots = Vec(R)()
+            status = libgr.gr_poly_roots(roots._ref, mult._ref, self._ref, 0, R._ref)
+        else:
+            C = domain
+            roots = Vec(C)()
+            status = libgr.gr_poly_roots_other(roots._ref, mult._ref, self._ref, R._ref, 0, C._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return (roots, mult)
 
 
 class ModularGroup_psl2z(gr_ctx_ca):
@@ -1518,7 +1575,7 @@ class DirichletGroup_dirichlet_char(gr_ctx_ca):
             raise NotImplementedError(f"only word-size moduli are supported")
         gr_ctx.__init__(self)
         status = libgr.gr_ctx_init_dirichlet_group(self._ref, q)
-        if status & GR_UNABLE: raise NotImplementedError(f"modulus with prime factor p > 10^12 is not currently supported")
+        if status & GR_UNABLE: raise NotImplementedError(f"modulus with prime factor p > 10^16 is not currently supported")
         if status & GR_DOMAIN: raise ValueError(f"modulus must not be zero")
         self._elem_type = dirichlet_char
 
