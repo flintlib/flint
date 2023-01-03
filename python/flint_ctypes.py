@@ -2154,7 +2154,10 @@ def test_vec():
     assert a + b == VecQQ([3,5,7])
     assert b + a == VecQQ([3,5,7])
     assert a + ZZ(1) == VecZZ([2,3,4])
+    assert ZZ(1) + a == VecZZ([2,3,4])
     assert b + ZZ(1) == VecQQ([3,4,5])
+    assert ZZ(1) + b == VecQQ([3,4,5])
+
 
 def test_all():
 

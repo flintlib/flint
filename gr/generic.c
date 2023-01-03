@@ -339,7 +339,6 @@ int gr_generic_other_sub(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, g
     return status;
 }
 
-
 int gr_generic_mul_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
 {
     gr_ptr t;
@@ -1345,149 +1344,126 @@ gr_generic_vec_neg(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx)
     return status;
 }
 
-int
-gr_generic_vec_add(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx)
-{
-    gr_method_binary_op add = GR_BINARY_OP(ctx, ADD);
-    int status;
-    slong i, sz;
+#define BINARY_OP(OP, op) \
+int \
+gr_generic_vec_ ## op(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx) \
+{ \
+    gr_method_binary_op op = GR_BINARY_OP(ctx, OP); \
+    int status; \
+    slong i, sz; \
+ \
+    sz = ctx->sizeof_elem; \
+    status = GR_SUCCESS; \
+ \
+    for (i = 0; i < len; i++) \
+        status |= op(GR_ENTRY(res, i, sz), GR_ENTRY(src1, i, sz), GR_ENTRY(src2, i, sz), ctx); \
+ \
+    return status; \
+} \
+ \
+int \
+gr_generic_vec_ ## op ## _scalar(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx) \
+{ \
+    gr_method_binary_op op = GR_BINARY_OP(ctx, OP); \
+    int status; \
+    slong i, sz; \
+ \
+    sz = ctx->sizeof_elem; \
+    status = GR_SUCCESS; \
+ \
+    for (i = 0; i < len; i++) \
+        status |= op(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, i, sz), c, ctx); \
+ \
+    return status; \
+} \
+ \
+int \
+gr_generic_scalar_ ## op ## _vec(gr_ptr vec1, gr_srcptr c, gr_srcptr vec2, slong len, gr_ctx_t ctx) \
+{ \
+    gr_method_binary_op op = GR_BINARY_OP(ctx, OP); \
+    int status; \
+    slong i, sz; \
+ \
+    sz = ctx->sizeof_elem; \
+    status = GR_SUCCESS; \
+ \
+    for (i = 0; i < len; i++) \
+        status |= op(GR_ENTRY(vec1, i, sz), c, GR_ENTRY(vec2, i, sz), ctx); \
+ \
+    return status; \
+} \
+int \
+gr_generic_vec_ ## op ## _other(gr_ptr res, gr_srcptr src1, gr_srcptr src2, gr_ctx_t src2_ctx, slong len, gr_ctx_t ctx) \
+{ \
+    gr_method_binary_op_other op = GR_BINARY_OP_OTHER(ctx, OP ## _OTHER); \
+    int status; \
+    slong i, sz, sz2; \
+ \
+    sz = ctx->sizeof_elem; \
+    sz2 = src2_ctx->sizeof_elem; \
+    status = GR_SUCCESS; \
+ \
+    for (i = 0; i < len; i++) \
+        status |= op(GR_ENTRY(res, i, sz), GR_ENTRY(src1, i, sz), GR_ENTRY(src2, i, sz2), src2_ctx, ctx); \
+ \
+    return status; \
+} \
+ \
+int \
+gr_generic_other_ ## op ## _vec(gr_ptr res, gr_srcptr src1, gr_ctx_t src1_ctx, gr_srcptr src2, slong len, gr_ctx_t ctx) \
+{ \
+    gr_method_other_binary_op op = GR_OTHER_BINARY_OP(ctx, OTHER_ ## OP); \
+    int status; \
+    slong i, sz, sz1; \
+ \
+    sz = ctx->sizeof_elem; \
+    sz1 = src1_ctx->sizeof_elem; \
+    status = GR_SUCCESS; \
+ \
+    for (i = 0; i < len; i++) \
+        status |= op(GR_ENTRY(res, i, sz), GR_ENTRY(src1, i, sz1), src1_ctx, GR_ENTRY(src2, i, sz), ctx); \
+ \
+    return status; \
+} \
+ \
+int \
+gr_generic_vec_ ## op ## _scalar_other(gr_ptr res, gr_srcptr src1, slong len, gr_srcptr c, gr_ctx_t cctx, gr_ctx_t ctx) \
+{ \
+    gr_method_binary_op_other op = GR_BINARY_OP_OTHER(ctx, OP ## _OTHER); \
+    int status; \
+    slong i, sz; \
+ \
+    sz = ctx->sizeof_elem; \
+    status = GR_SUCCESS; \
+ \
+    for (i = 0; i < len; i++) \
+        status |= op(GR_ENTRY(res, i, sz), GR_ENTRY(src1, i, sz), c, cctx, ctx); \
+ \
+    return status; \
+} \
+int \
+gr_generic_scalar_other_ ## op ## _vec(gr_ptr res, gr_srcptr c, gr_ctx_t cctx, gr_srcptr src1, slong len, gr_ctx_t ctx) \
+{ \
+    gr_method_other_binary_op op = GR_OTHER_BINARY_OP(ctx, OTHER_ ## OP); \
+    int status; \
+    slong i, sz; \
+ \
+    sz = ctx->sizeof_elem; \
+    status = GR_SUCCESS; \
+ \
+    for (i = 0; i < len; i++) \
+        status |= op(GR_ENTRY(res, i, sz), c, cctx, GR_ENTRY(src1, i, sz), ctx); \
+ \
+    return status; \
+} \
 
-    sz = ctx->sizeof_elem;
-    status = GR_SUCCESS;
 
-    for (i = 0; i < len; i++)
-        status |= add(GR_ENTRY(res, i, sz), GR_ENTRY(src1, i, sz), GR_ENTRY(src2, i, sz), ctx);
-
-    return status;
-}
-
-int
-gr_generic_vec_sub(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx)
-{
-    gr_method_binary_op sub = GR_BINARY_OP(ctx, SUB);
-    int status;
-    slong i, sz;
-
-    sz = ctx->sizeof_elem;
-    status = GR_SUCCESS;
-
-    for (i = 0; i < len; i++)
-        status |= sub(GR_ENTRY(res, i, sz), GR_ENTRY(src1, i, sz), GR_ENTRY(src2, i, sz), ctx);
-
-    return status;
-}
-
-int
-gr_generic_vec_mul(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx)
-{
-    gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
-    int status;
-    slong i, sz;
-
-    sz = ctx->sizeof_elem;
-    status = GR_SUCCESS;
-
-    for (i = 0; i < len; i++)
-        status |= mul(GR_ENTRY(res, i, sz), GR_ENTRY(src1, i, sz), GR_ENTRY(src2, i, sz), ctx);
-
-    return status;
-}
-
-int
-gr_generic_vec_div(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx)
-{
-    gr_method_binary_op div = GR_BINARY_OP(ctx, DIV);
-    int status;
-    slong i, sz;
-
-    sz = ctx->sizeof_elem;
-    status = GR_SUCCESS;
-
-    for (i = 0; i < len; i++)
-        status |= div(GR_ENTRY(res, i, sz), GR_ENTRY(src1, i, sz), GR_ENTRY(src2, i, sz), ctx);
-
-    return status;
-}
-
-int
-gr_generic_vec_divexact(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx)
-{
-    gr_method_binary_op divexact = GR_BINARY_OP(ctx, DIVEXACT);
-    int status;
-    slong i, sz;
-
-    sz = ctx->sizeof_elem;
-    status = GR_SUCCESS;
-
-    for (i = 0; i < len; i++)
-        status |= divexact(GR_ENTRY(res, i, sz), GR_ENTRY(src1, i, sz), GR_ENTRY(src2, i, sz), ctx);
-
-    return status;
-}
-
-int
-gr_generic_vec_pow(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx)
-{
-    gr_method_binary_op pow = GR_BINARY_OP(ctx, POW);
-    int status;
-    slong i, sz;
-
-    sz = ctx->sizeof_elem;
-    status = GR_SUCCESS;
-
-    for (i = 0; i < len; i++)
-        status |= pow(GR_ENTRY(res, i, sz), GR_ENTRY(src1, i, sz), GR_ENTRY(src2, i, sz), ctx);
-
-    return status;
-}
-
-int
-gr_generic_vec_scalar_add(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx)
-{
-    gr_method_binary_op add = GR_BINARY_OP(ctx, ADD);
-    int status;
-    slong i, sz;
-
-    sz = ctx->sizeof_elem;
-    status = GR_SUCCESS;
-
-    for (i = 0; i < len; i++)
-        status |= add(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, i, sz), c, ctx);
-
-    return status;
-}
-
-int
-gr_generic_vec_scalar_sub(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx)
-{
-    gr_method_binary_op sub = GR_BINARY_OP(ctx, SUB);
-    int status;
-    slong i, sz;
-
-    sz = ctx->sizeof_elem;
-    status = GR_SUCCESS;
-
-    for (i = 0; i < len; i++)
-        status |= sub(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, i, sz), c, ctx);
-
-    return status;
-}
-
-int
-gr_generic_vec_scalar_mul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx)
-{
-    gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
-    int status;
-    slong i, sz;
-
-    sz = ctx->sizeof_elem;
-    status = GR_SUCCESS;
-
-    for (i = 0; i < len; i++)
-        status |= mul(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, i, sz), c, ctx);
-
-    return status;
-}
+BINARY_OP(ADD, add)
+BINARY_OP(SUB, sub)
+BINARY_OP(MUL, mul)
+BINARY_OP(DIV, div)
+BINARY_OP(DIVEXACT, divexact)
+BINARY_OP(POW, pow)
 
 int
 gr_generic_vec_scalar_addmul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx)
@@ -1582,54 +1558,6 @@ gr_generic_vec_scalar_submul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c,
     }
 
     GR_TMP_CLEAR(t, ctx);
-    return status;
-}
-
-int
-gr_generic_vec_scalar_div(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx)
-{
-    gr_method_binary_op div = GR_BINARY_OP(ctx, DIV);
-    int status;
-    slong i, sz;
-
-    sz = ctx->sizeof_elem;
-    status = GR_SUCCESS;
-
-    for (i = 0; i < len && status == GR_SUCCESS; i++)
-        status |= div(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, i, sz), c, ctx);
-
-    return status;
-}
-
-int
-gr_generic_vec_scalar_divexact(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx)
-{
-    gr_method_binary_op divexact = GR_BINARY_OP(ctx, DIVEXACT);
-    int status;
-    slong i, sz;
-
-    sz = ctx->sizeof_elem;
-    status = GR_SUCCESS;
-
-    for (i = 0; i < len && status == GR_SUCCESS; i++)
-        status |= divexact(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, i, sz), c, ctx);
-
-    return status;
-}
-
-int
-gr_generic_vec_scalar_pow(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx)
-{
-    gr_method_binary_op pow = GR_BINARY_OP(ctx, POW);
-    int status;
-    slong i, sz;
-
-    sz = ctx->sizeof_elem;
-    status = GR_SUCCESS;
-
-    for (i = 0; i < len; i++)
-        status |= pow(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, i, sz), c, ctx);
-
     return status;
 }
 
@@ -2100,22 +2028,59 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_VEC_ZERO,                (gr_funcptr) gr_generic_vec_zero},
     {GR_METHOD_VEC_SET,                 (gr_funcptr) gr_generic_vec_set},
     {GR_METHOD_VEC_NEG,                 (gr_funcptr) gr_generic_vec_neg},
+
     {GR_METHOD_VEC_ADD,                 (gr_funcptr) gr_generic_vec_add},
     {GR_METHOD_VEC_SUB,                 (gr_funcptr) gr_generic_vec_sub},
-    {GR_METHOD_VEC_MUL,                 (gr_funcptr) gr_generic_vec_sub},
+    {GR_METHOD_VEC_MUL,                 (gr_funcptr) gr_generic_vec_mul},
     {GR_METHOD_VEC_DIV,                 (gr_funcptr) gr_generic_vec_div},
     {GR_METHOD_VEC_DIVEXACT,            (gr_funcptr) gr_generic_vec_divexact},
     {GR_METHOD_VEC_POW,                 (gr_funcptr) gr_generic_vec_pow},
-    {GR_METHOD_VEC_SCALAR_ADD,          (gr_funcptr) gr_generic_vec_scalar_add},
-    {GR_METHOD_VEC_SCALAR_SUB,          (gr_funcptr) gr_generic_vec_scalar_sub},
-    {GR_METHOD_VEC_SCALAR_MUL,          (gr_funcptr) gr_generic_vec_scalar_mul},
-    {GR_METHOD_VEC_SCALAR_ADDMUL,       (gr_funcptr) gr_generic_vec_scalar_addmul},
-    {GR_METHOD_VEC_SCALAR_SUBMUL,       (gr_funcptr) gr_generic_vec_scalar_submul},
-    {GR_METHOD_VEC_SCALAR_ADDMUL_SI,    (gr_funcptr) gr_generic_vec_scalar_addmul_si},
-    {GR_METHOD_VEC_SCALAR_SUBMUL_SI,    (gr_funcptr) gr_generic_vec_scalar_submul_si},
-    {GR_METHOD_VEC_SCALAR_DIV,          (gr_funcptr) gr_generic_vec_scalar_div},
-    {GR_METHOD_VEC_SCALAR_DIVEXACT,     (gr_funcptr) gr_generic_vec_scalar_divexact},
-    {GR_METHOD_VEC_SCALAR_POW,          (gr_funcptr) gr_generic_vec_scalar_pow},
+
+    {GR_METHOD_VEC_ADD_SCALAR,          (gr_funcptr) gr_generic_vec_add_scalar},
+    {GR_METHOD_VEC_SUB_SCALAR,          (gr_funcptr) gr_generic_vec_sub_scalar},
+    {GR_METHOD_VEC_MUL_SCALAR,          (gr_funcptr) gr_generic_vec_mul_scalar},
+    {GR_METHOD_VEC_DIV_SCALAR,          (gr_funcptr) gr_generic_vec_div_scalar},
+    {GR_METHOD_VEC_DIVEXACT_SCALAR,     (gr_funcptr) gr_generic_vec_divexact_scalar},
+    {GR_METHOD_VEC_POW_SCALAR,          (gr_funcptr) gr_generic_vec_pow_scalar},
+
+    {GR_METHOD_SCALAR_ADD_VEC,          (gr_funcptr) gr_generic_scalar_add_vec},
+    {GR_METHOD_SCALAR_SUB_VEC,          (gr_funcptr) gr_generic_scalar_sub_vec},
+    {GR_METHOD_SCALAR_MUL_VEC,          (gr_funcptr) gr_generic_scalar_mul_vec},
+    {GR_METHOD_SCALAR_DIV_VEC,          (gr_funcptr) gr_generic_scalar_div_vec},
+    {GR_METHOD_SCALAR_DIVEXACT_VEC,     (gr_funcptr) gr_generic_scalar_divexact_vec},
+    {GR_METHOD_SCALAR_POW_VEC,     (gr_funcptr) gr_generic_scalar_pow_vec},
+
+    {GR_METHOD_VEC_ADD_OTHER,          (gr_funcptr) gr_generic_vec_add_other},
+    {GR_METHOD_VEC_SUB_OTHER,          (gr_funcptr) gr_generic_vec_sub_other},
+    {GR_METHOD_VEC_MUL_OTHER,          (gr_funcptr) gr_generic_vec_mul_other},
+    {GR_METHOD_VEC_DIV_OTHER,          (gr_funcptr) gr_generic_vec_div_other},
+    {GR_METHOD_VEC_DIVEXACT_OTHER,     (gr_funcptr) gr_generic_vec_divexact_other},
+    {GR_METHOD_VEC_POW_OTHER,          (gr_funcptr) gr_generic_vec_pow_other},
+
+    {GR_METHOD_OTHER_ADD_VEC,          (gr_funcptr) gr_generic_other_add_vec},
+    {GR_METHOD_OTHER_SUB_VEC,          (gr_funcptr) gr_generic_other_sub_vec},
+    {GR_METHOD_OTHER_MUL_VEC,          (gr_funcptr) gr_generic_other_mul_vec},
+    {GR_METHOD_OTHER_DIV_VEC,          (gr_funcptr) gr_generic_other_div_vec},
+    {GR_METHOD_OTHER_DIVEXACT_VEC,     (gr_funcptr) gr_generic_other_divexact_vec},
+    {GR_METHOD_OTHER_POW_VEC,          (gr_funcptr) gr_generic_other_pow_vec},
+
+    {GR_METHOD_VEC_ADD_SCALAR_OTHER,          (gr_funcptr) gr_generic_vec_add_scalar_other},
+    {GR_METHOD_VEC_SUB_SCALAR_OTHER,          (gr_funcptr) gr_generic_vec_sub_scalar_other},
+    {GR_METHOD_VEC_MUL_SCALAR_OTHER,          (gr_funcptr) gr_generic_vec_mul_scalar_other},
+    {GR_METHOD_VEC_DIV_SCALAR_OTHER,          (gr_funcptr) gr_generic_vec_div_scalar_other},
+    {GR_METHOD_VEC_DIVEXACT_SCALAR_OTHER,     (gr_funcptr) gr_generic_vec_divexact_scalar_other},
+    {GR_METHOD_VEC_POW_SCALAR_OTHER,          (gr_funcptr) gr_generic_vec_pow_scalar_other},
+
+    {GR_METHOD_SCALAR_OTHER_ADD_VEC,          (gr_funcptr) gr_generic_scalar_other_add_vec},
+    {GR_METHOD_SCALAR_OTHER_SUB_VEC,          (gr_funcptr) gr_generic_scalar_other_sub_vec},
+    {GR_METHOD_SCALAR_OTHER_MUL_VEC,          (gr_funcptr) gr_generic_scalar_other_mul_vec},
+    {GR_METHOD_SCALAR_OTHER_DIV_VEC,          (gr_funcptr) gr_generic_scalar_other_div_vec},
+    {GR_METHOD_SCALAR_OTHER_DIVEXACT_VEC,     (gr_funcptr) gr_generic_scalar_other_divexact_vec},
+
+    {GR_METHOD_VEC_ADDMUL_SCALAR,       (gr_funcptr) gr_generic_vec_scalar_addmul},
+    {GR_METHOD_VEC_SUBMUL_SCALAR,       (gr_funcptr) gr_generic_vec_scalar_submul},
+    {GR_METHOD_VEC_ADDMUL_SCALAR_SI,    (gr_funcptr) gr_generic_vec_scalar_addmul_si},
+    {GR_METHOD_VEC_SUBMUL_SCALAR_SI,    (gr_funcptr) gr_generic_vec_scalar_submul_si},
 
     {GR_METHOD_VEC_EQUAL,               (gr_funcptr) gr_generic_vec_equal},
     {GR_METHOD_VEC_IS_ZERO,             (gr_funcptr) gr_generic_vec_is_zero},

@@ -45,12 +45,12 @@ _gr_poly_make_monic(gr_ptr res, gr_srcptr poly, slong len, gr_ctx_t ctx)
 
         if (status == GR_SUCCESS)
         {
-            status = _gr_vec_scalar_mul(res, poly, len - 1, inv, ctx);
+            status = _gr_vec_mul_scalar(res, poly, len - 1, inv, ctx);
         }
         else
         {
             /* otherwise try dividing */
-            status = _gr_vec_scalar_div(res, poly, len - 1, lead, ctx);
+            status = _gr_vec_div_scalar(res, poly, len - 1, lead, ctx);
         }
 
         GR_TMP_CLEAR(inv, ctx);

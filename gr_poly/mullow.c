@@ -14,10 +14,10 @@ _gr_poly_mullow_generic(gr_ptr res,
         return gr_mul(res, poly1, poly2, ctx);
 
     if (len1 == 1)
-        return _gr_vec_scalar_mul(res, poly2, n, poly1, ctx);
+        return _gr_vec_mul_scalar(res, poly2, n, poly1, ctx);
 
     if (len2 == 1)
-        return _gr_vec_scalar_mul(res, poly1, n, poly2, ctx);
+        return _gr_vec_mul_scalar(res, poly1, n, poly2, ctx);
 
     /* Squaring */
     if (poly1 == poly2 && len1 == len2)

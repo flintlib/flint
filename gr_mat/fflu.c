@@ -114,7 +114,7 @@ gr_mat_fflu(slong * res_rank, slong * P, gr_mat_t LU, gr_ptr den, const gr_mat_t
 /*
             status |= gr_mul(e, ENTRY(j, col), d, ctx);
             status |= gr_neg(e, e, ctx);
-            status |= _gr_vec_scalar_addmul(ENTRY(j, col + 1), ENTRY(row, col + 1), n - col - 1, e, ctx);
+            status |= _gr_vec_addmul_scalar(ENTRY(j, col + 1), ENTRY(row, col + 1), n - col - 1, e, ctx);
             status |= gr_zero(ENTRY(j, col), ctx);
             status |= gr_neg(ENTRY(j, rank - 1), e, ctx);
 */

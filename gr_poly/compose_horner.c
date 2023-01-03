@@ -31,7 +31,7 @@ _gr_poly_compose_horner(gr_ptr res,
     else if (len1 == 2)
     {
         slong sz = ctx->sizeof_elem;
-        status |= _gr_vec_scalar_mul(res, poly2, len2, GR_ENTRY(poly1, 1, sz), ctx);
+        status |= _gr_vec_mul_scalar(res, poly2, len2, GR_ENTRY(poly1, 1, sz), ctx);
         status |= gr_add(res, res, poly1, ctx);
         return status;
     }
@@ -57,7 +57,7 @@ _gr_poly_compose_horner(gr_ptr res,
 
         /* Perform the first two steps as one,
             "res = a(m) * poly2 + a(m-1)". */
-        status |= _gr_vec_scalar_mul(t1, poly2, len2, GR_ENTRY(poly1, i, sz), ctx);
+        status |= _gr_vec_mul_scalar(t1, poly2, len2, GR_ENTRY(poly1, i, sz), ctx);
         i--;
         status |= gr_add(t1, t1, GR_ENTRY(poly1, i, sz), ctx);
 

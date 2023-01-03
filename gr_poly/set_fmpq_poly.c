@@ -29,7 +29,7 @@ gr_poly_set_fmpq_poly(gr_poly_t res, const fmpq_poly_t src, gr_ctx_t ctx)
         status |= gr_inv(t, t, ctx);
 
         if (status == GR_SUCCESS)
-            status |= _gr_vec_scalar_mul(res_coeffs, res_coeffs, len, t, ctx);
+            status |= _gr_vec_mul_scalar(res_coeffs, res_coeffs, len, t, ctx);
 
         GR_TMP_CLEAR(t, ctx);
     }

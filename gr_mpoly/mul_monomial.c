@@ -111,7 +111,7 @@ int gr_mpoly_mul_monomial(
 
 /* todo: when we can verify (quickly) that C is invertible */
 #if 0
-    status |= _gr_vec_scalar_mul(A->coeffs, B->coeffs, Blen, Ccoeff0, cctx);
+    status |= _gr_vec_mul_scalar(A->coeffs, B->coeffs, Blen, Ccoeff0, cctx);
     _gr_mpoly_set_length(A, Blen, mctx, cctx);
 #else
     {

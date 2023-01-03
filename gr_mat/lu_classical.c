@@ -104,7 +104,7 @@ gr_mat_lu_classical(slong * res_rank, slong * P, gr_mat_t LU, const gr_mat_t A, 
         {
             status |= gr_mul(e, GR_ENTRY(a[j], col, sz), d, ctx);
             status |= gr_neg(e, e, ctx);
-            status |= _gr_vec_scalar_addmul(GR_ENTRY(a[j], col + 1, sz), GR_ENTRY(a[row], col + 1, sz), n - col - 1, e, ctx);
+            status |= _gr_vec_addmul_scalar(GR_ENTRY(a[j], col + 1, sz), GR_ENTRY(a[row], col + 1, sz), n - col - 1, e, ctx);
             status |= gr_zero(GR_ENTRY(a[j], col, sz), ctx);
             status |= gr_neg(GR_ENTRY(a[j], rank - 1, sz), e, ctx);
         }

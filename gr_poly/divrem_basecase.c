@@ -32,7 +32,7 @@ _gr_poly_divrem_basecase_preinv(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_
         else
         {
             status |= gr_mul(GR_ENTRY(Q, iQ, sz), GR_ENTRY(R, iR, sz), invB, ctx);
-            status |= _gr_vec_scalar_submul(GR_ENTRY(R, iQ, sz), B, lenB, GR_ENTRY(Q, iQ, sz), ctx);
+            status |= _gr_vec_submul_scalar(GR_ENTRY(R, iQ, sz), B, lenB, GR_ENTRY(Q, iQ, sz), ctx);
         }
     }
 
@@ -60,7 +60,7 @@ _gr_poly_divrem_basecase_noinv(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_s
             status |= gr_div(GR_ENTRY(Q, iQ, sz), GR_ENTRY(R, iR, sz), GR_ENTRY(B, lenB - 1, sz), ctx);
             if (status != GR_SUCCESS)
                 break;
-            status |= _gr_vec_scalar_submul(GR_ENTRY(R, iQ, sz), B, lenB, GR_ENTRY(Q, iQ, sz), ctx);
+            status |= _gr_vec_submul_scalar(GR_ENTRY(R, iQ, sz), B, lenB, GR_ENTRY(Q, iQ, sz), ctx);
         }
     }
 

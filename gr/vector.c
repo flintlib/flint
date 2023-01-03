@@ -183,78 +183,117 @@ vector_gr_vec_ ## op(gr_vec_t res, const gr_vec_t x, const gr_vec_t y, gr_ctx_t 
  \
     return _gr_vec_## op(res->entries, x->entries, y->entries, xlen, ENTRY_CTX(ctx)); \
 } \
+int \
+vector_gr_vec_ ## op ## _other(gr_vec_t res, const gr_vec_t x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) \
+{ \
+    slong xlen = x->length; \
+ \
+    if (y_ctx == ctx) \
+    { \
+        return vector_gr_vec_ ## op(res, x, y, ctx); \
+    } \
+    else if (y_ctx == ENTRY_CTX(ctx)) \
+    { \
+        if (res->length != xlen) \
+            gr_vec_set_length(res, xlen, y_ctx); \
+ \
+        return _gr_vec_ ## op ## _scalar(res->entries, x->entries, xlen, y, y_ctx); \
+    } \
+    else if (y_ctx->which_ring == GR_CTX_GR_VEC) \
+    { \
+        const gr_vec_struct * yvec = y; \
+        gr_ctx_struct * entry_ctx = ENTRY_CTX(ctx); \
+        gr_ctx_struct * y_entry_ctx = ENTRY_CTX(y_ctx); \
+ \
+        if (xlen != yvec->length) \
+            return GR_DOMAIN; \
+ \
+        if (res->length != xlen) \
+            gr_vec_set_length(res, xlen, entry_ctx); \
+ \
+        return _gr_vec_ ## op ## _other(res->entries, x->entries, yvec->entries, y_entry_ctx, xlen, entry_ctx); \
+    } \
+    else \
+    { \
+        gr_ctx_struct * entry_ctx = ENTRY_CTX(ctx); \
+ \
+        if (res->length != xlen) \
+            gr_vec_set_length(res, xlen, entry_ctx); \
+ \
+        return _gr_vec_ ## op ## _scalar_other(res->entries, x->entries, xlen, y, y_ctx, entry_ctx); \
+    } \
+} \
+int \
+vector_gr_vec_other_ ## op(gr_vec_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_vec_t y, gr_ctx_t ctx) \
+{ \
+    slong ylen = y->length; \
+ \
+    if (x_ctx == ctx) \
+    { \
+        return vector_gr_vec_ ## op(res, x, y, ctx); \
+    } \
+    else if (x_ctx == ENTRY_CTX(ctx)) \
+    { \
+        if (res->length != ylen) \
+            gr_vec_set_length(res, ylen, x_ctx); \
+ \
+        return _gr_scalar_ ## op ## _vec(res->entries, x, y->entries, ylen, x_ctx); \
+    } \
+    else if (x_ctx->which_ring == GR_CTX_GR_VEC) \
+    { \
+        const gr_vec_struct * xvec = x; \
+        gr_ctx_struct * entry_ctx = ENTRY_CTX(ctx); \
+        gr_ctx_struct * x_entry_ctx = ENTRY_CTX(x_ctx); \
+ \
+        if (ylen != xvec->length) \
+            return GR_DOMAIN; \
+ \
+        if (res->length != ylen) \
+            gr_vec_set_length(res, ylen, entry_ctx); \
+ \
+        return _gr_other_ ## op ## _vec(res->entries, xvec->entries, x_entry_ctx, y->entries, ylen, entry_ctx); \
+    } \
+    else \
+    { \
+        gr_ctx_struct * entry_ctx = ENTRY_CTX(ctx); \
+ \
+        if (res->length != ylen) \
+            gr_vec_set_length(res, ylen, entry_ctx); \
+ \
+  printf("sommes\n"); \
+  printf("len alloc %ld %ld\n", res->alloc, res->length); \
+  gr_println(x, x_ctx); \
+  gr_println(y->entries, entry_ctx); \
+  printf("length %ld %ld\n", res->length, ylen); \
+\
+        int status = _gr_scalar_other_ ## op ## _vec(res->entries, x, x_ctx, y->entries, ylen, entry_ctx); \
+printf("didit\n"); \
+        return status; \
+    } \
+} \
 
 DEF_BINARY_OP(add)
 DEF_BINARY_OP(sub)
 DEF_BINARY_OP(mul)
 DEF_BINARY_OP(div)
 DEF_BINARY_OP(divexact)
+DEF_BINARY_OP(pow)
 
-int
-vector_gr_vec_add_other(gr_vec_t res, const gr_vec_t x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) \
+
+/* todo: all versions */
+
+int gr_generic_mul_ui_via_ZZ(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
 {
-    slong xlen = x->length;
+    gr_ctx_t ZZ;
+    fmpz_t t;
+    int status;
 
-    if (y_ctx == ctx)
-    {
-        return vector_gr_vec_add(res, x, y, ctx);
-    }
-    else if (y_ctx == ENTRY_CTX(ctx))   /* vector (op) scalar */
-    {
-        if (res->length != xlen)
-            gr_vec_set_length(res, xlen, y_ctx);
+    gr_ctx_init_fmpz(ZZ); /* no need to clear */
 
-        return _gr_vec_scalar_add(res->entries, x->entries, xlen, y, y_ctx);
-    }
-    else if (y_ctx->which_ring == GR_CTX_GR_VEC)  /* vector (op) different vector */
-    {
-        slong i, sz, y_sz;
-        int status = GR_SUCCESS;
-        gr_ptr res_ptr;
-        gr_srcptr x_ptr;
-        gr_srcptr y_ptr;
-        gr_ctx_struct * entry_ctx = ENTRY_CTX(ctx);
-        gr_ctx_struct * y_entry_ctx = ENTRY_CTX(y_ctx);
-        gr_method_binary_op_other add_other = GR_BINARY_OP_OTHER(entry_ctx, ADD_OTHER);
-        sz = entry_ctx->sizeof_elem;
-        y_sz = y_entry_ctx->sizeof_elem;
-
-        if (x->length != ((const gr_vec_struct *) y)->length)
-            return GR_DOMAIN;
-
-        if (res->length != xlen)
-            gr_vec_set_length(res, xlen, entry_ctx);
-
-        res_ptr = res->entries;
-        x_ptr = x->entries;
-        y_ptr = ((const gr_vec_struct *) y)->entries;
-
-        for (i = 0; i < xlen; i++)
-            status |= add_other(GR_ENTRY(res_ptr, i, sz), GR_ENTRY(x_ptr, i, sz), GR_ENTRY(y_ptr, i, y_sz), y_entry_ctx, entry_ctx);
-
-        return status;
-    }
-    else    /* vector (op) different scalar */
-    {
-        slong i, sz;
-        int status = GR_SUCCESS;
-        gr_ptr res_ptr;
-        gr_srcptr x_ptr;
-        gr_ctx_struct * entry_ctx = ENTRY_CTX(ctx);
-        gr_method_binary_op_other add_other = GR_BINARY_OP_OTHER(entry_ctx, ADD_OTHER);
-        sz = entry_ctx->sizeof_elem;
-
-        if (res->length != xlen)
-            gr_vec_set_length(res, xlen, entry_ctx);
-
-        res_ptr = res->entries;
-        x_ptr = x->entries;
-
-        for (i = 0; i < xlen; i++)
-            status |= add_other(GR_ENTRY(res_ptr, i, sz), GR_ENTRY(x_ptr, i, sz), y, y_ctx, entry_ctx);
-
-        return status;
-    }
+    fmpz_init_set_ui(t, y);
+    status = gr_mul_other(res, x, t, ZZ, ctx);
+    fmpz_clear(t);
+    return status;
 }
 
 
@@ -276,10 +315,13 @@ gr_method_tab_input _gr_vec_methods_input[] =
     {GR_METHOD_NEG,         (gr_funcptr) vector_gr_vec_neg},
     {GR_METHOD_ADD,         (gr_funcptr) vector_gr_vec_add},
     {GR_METHOD_ADD_OTHER,   (gr_funcptr) vector_gr_vec_add_other},
+    {GR_METHOD_OTHER_ADD,   (gr_funcptr) vector_gr_vec_other_add},
     {GR_METHOD_SUB,         (gr_funcptr) vector_gr_vec_sub},
     {GR_METHOD_MUL,         (gr_funcptr) vector_gr_vec_mul},
     {GR_METHOD_DIV,         (gr_funcptr) vector_gr_vec_div},
     {GR_METHOD_DIVEXACT,    (gr_funcptr) vector_gr_vec_divexact},
+    {GR_METHOD_POW,         (gr_funcptr) vector_gr_vec_pow},
+    {GR_METHOD_POW_OTHER,   (gr_funcptr) vector_gr_vec_pow_other},
     {0,                     (gr_funcptr) NULL},
 };
 

@@ -22,7 +22,7 @@ gr_mat_submul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx
 
     if (c != 0)
         for (i = 0; i < r; i++)
-            status |= _gr_vec_scalar_submul(res->rows[i], mat->rows[i], c, x, ctx);
+            status |= _gr_vec_submul_scalar(res->rows[i], mat->rows[i], c, x, ctx);
 
     return status;
 }
