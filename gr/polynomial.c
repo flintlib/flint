@@ -125,25 +125,7 @@ polynomial_set_other(gr_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
     }
     else if (x_ctx->which_ring == GR_CTX_GR_POLY && !strcmp(POLYNOMIAL_CTX(x_ctx)->var, POLYNOMIAL_CTX(ctx)->var))
     {
-        int status = GR_SUCCESS;
-        slong x_sz = POLYNOMIAL_ELEM_CTX(x_ctx)->sizeof_elem;
-        slong sz = POLYNOMIAL_ELEM_CTX(ctx)->sizeof_elem;
-        slong i, len = gr_poly_length(x, POLYNOMIAL_ELEM_CTX(x_ctx));
-
-        gr_poly_fit_length(res, len, POLYNOMIAL_ELEM_CTX(ctx));
-        _gr_poly_set_length(res, len, POLYNOMIAL_ELEM_CTX(ctx));
-
-        for (i = 0; i < len; i++)
-        {
-            status |= gr_set_other(GR_ENTRY(res->coeffs, i, sz), GR_ENTRY(((const gr_poly_struct *) x)->coeffs, i, x_sz), POLYNOMIAL_ELEM_CTX(x_ctx), POLYNOMIAL_ELEM_CTX(ctx));
-        }
-
-        if (status == GR_SUCCESS)
-            _gr_poly_normalise(res, POLYNOMIAL_ELEM_CTX(ctx));
-        else
-            _gr_poly_set_length(res, 0, POLYNOMIAL_ELEM_CTX(ctx));
-
-        return status;
+        return gr_poly_set_gr_poly_other(res, x, POLYNOMIAL_ELEM_CTX(x_ctx), POLYNOMIAL_ELEM_CTX(ctx));
     }
     else
     {

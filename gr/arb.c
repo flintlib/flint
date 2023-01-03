@@ -3,6 +3,7 @@
 #include "arb_mat.h"
 #include "arb_fmpz_poly.h"
 #include "arb_hypgeom.h"
+#include "fmpzi.h"
 #include "qqbar.h"
 #include "gr.h"
 #include "gr_vec.h"
@@ -153,6 +154,12 @@ _gr_arb_set_other(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
 
         case GR_CTX_FMPQ:
             return _gr_arb_set_fmpq(res, x, ctx);
+
+        case GR_CTX_FMPZI:
+            if (!fmpz_is_zero(fmpzi_imagref((const fmpzi_struct *) x)))
+                return GR_DOMAIN;
+            arb_set_round_fmpz(res, fmpzi_realref((const fmpzi_struct *) x), ARB_CTX_PREC(ctx));
+            return GR_SUCCESS;
 
         case GR_CTX_REAL_ALGEBRAIC_QQBAR:
             qqbar_get_arb(res, x, ARB_CTX_PREC(ctx));
@@ -1057,12 +1064,36 @@ _gr_arb_poly_mullow(arb_ptr res,
     return GR_SUCCESS;
 }
 
-/* todo: real-only roots in arb */
+/* hidden feature: also works with arb ctx */
+int
+_gr_acb_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx);
+
+int
+_gr_arb_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
+{
+    int status;
+    slong i;
+    acb_poly_t tmp;
+    acb_poly_init(tmp);
+    acb_poly_fit_length(tmp, poly->length);
+    for (i = 0; i < poly->length; i++)
+        acb_set_arb(tmp->coeffs + i, ((arb_srcptr) poly->coeffs) + i);
+    _acb_poly_set_length(tmp, poly->length);
+    status = _gr_acb_poly_roots(roots, mult, tmp, flags, ctx);
+    acb_poly_clear(tmp);
+    return status;
+}
+
 int
 _gr_arb_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
 {
     if (poly->length == 0)
         return GR_DOMAIN;
+
+    if (other_ctx->which_ring == GR_CTX_RR_ARB)
+    {
+        return _gr_arb_poly_roots(roots, mult, poly, flags, ctx);
+    }
 
     if (other_ctx->which_ring == GR_CTX_FMPZ)
     {
@@ -1242,6 +1273,7 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_arb_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_arb_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_arb_poly_mullow},
+    {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_arb_poly_roots},
     {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_arb_poly_roots_other},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_arb_mat_mul},
     {GR_METHOD_MAT_DET,         (gr_funcptr) _gr_arb_mat_det},

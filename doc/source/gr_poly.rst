@@ -86,6 +86,9 @@ Basic manipulation
 .. function:: void _gr_poly_normalise(gr_poly_t poly, gr_ctx_t ctx)
 
 .. function:: int gr_poly_set(gr_poly_t res, const gr_poly_t src, gr_ctx_t ctx)
+              int gr_poly_get_fmpz_poly(gr_poly_t res, const fmpz_poly_t src, gr_ctx_t ctx)
+              int gr_poly_set_fmpq_poly(gr_poly_t res, const fmpq_poly_t src, gr_ctx_t ctx)
+              int gr_poly_set_gr_poly_other(gr_poly_t res, const gr_poly_t x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 
 .. function:: int _gr_poly_reverse(gr_ptr res, gr_srcptr poly, slong len, slong n, gr_ctx_t ctx)
               int gr_poly_reverse(gr_poly_t res, const gr_poly_t poly, slong n, gr_ctx_t ctx)

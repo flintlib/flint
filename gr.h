@@ -525,6 +525,12 @@ typedef enum
     GR_METHOD_VEC_NEG,
     GR_METHOD_VEC_ADD,
     GR_METHOD_VEC_SUB,
+    GR_METHOD_VEC_MUL,
+    GR_METHOD_VEC_DIV,
+    GR_METHOD_VEC_DIVEXACT,
+    GR_METHOD_VEC_POW,
+    GR_METHOD_VEC_SCALAR_ADD,
+    GR_METHOD_VEC_SCALAR_SUB,
     GR_METHOD_VEC_SCALAR_MUL,
     GR_METHOD_VEC_SCALAR_ADDMUL,
     GR_METHOD_VEC_SCALAR_SUBMUL,
@@ -532,6 +538,7 @@ typedef enum
     GR_METHOD_VEC_SCALAR_SUBMUL_SI,
     GR_METHOD_VEC_SCALAR_DIV,
     GR_METHOD_VEC_SCALAR_DIVEXACT,
+    GR_METHOD_VEC_SCALAR_POW,
     GR_METHOD_VEC_DOT,
     GR_METHOD_VEC_DOT_REV,
     GR_METHOD_VEC_DOT_UI,
@@ -1001,6 +1008,12 @@ GR_INLINE WARN_UNUSED_RESULT int _gr_vec_set(gr_ptr res, gr_srcptr src, slong le
 GR_INLINE WARN_UNUSED_RESULT int _gr_vec_neg(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx) { return GR_VEC_OP(ctx, VEC_NEG)(res, src, len, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int _gr_vec_add(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx) { return GR_VEC_VEC_OP(ctx, VEC_ADD)(res, src1, src2, len, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int _gr_vec_sub(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx) { return GR_VEC_VEC_OP(ctx, VEC_SUB)(res, src1, src2, len, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_mul(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx) { return GR_VEC_VEC_OP(ctx, VEC_MUL)(res, src1, src2, len, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_div(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx) { return GR_VEC_VEC_OP(ctx, VEC_DIV)(res, src1, src2, len, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_divexact(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx) { return GR_VEC_VEC_OP(ctx, VEC_DIVEXACT)(res, src1, src2, len, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_pow(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx) { return GR_VEC_VEC_OP(ctx, VEC_POW)(res, src1, src2, len, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_scalar_add(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP(ctx, VEC_SCALAR_ADD)(vec1, vec2, len, c, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_scalar_sub(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP(ctx, VEC_SCALAR_SUB)(vec1, vec2, len, c, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int _gr_vec_scalar_mul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP(ctx, VEC_SCALAR_MUL)(vec1, vec2, len, c, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int _gr_vec_scalar_addmul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP(ctx, VEC_SCALAR_ADDMUL)(vec1, vec2, len, c, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int _gr_vec_scalar_submul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP(ctx, VEC_SCALAR_SUBMUL)(vec1, vec2, len, c, ctx); }
@@ -1008,6 +1021,7 @@ GR_INLINE WARN_UNUSED_RESULT int _gr_vec_scalar_addmul_si(gr_ptr vec1, gr_srcptr
 GR_INLINE WARN_UNUSED_RESULT int _gr_vec_scalar_submul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_SI(ctx, VEC_SCALAR_SUBMUL_SI)(vec1, vec2, len, c, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int _gr_vec_scalar_div(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP(ctx, VEC_SCALAR_DIV)(vec1, vec2, len, c, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int _gr_vec_scalar_divexact(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP(ctx, VEC_SCALAR_DIVEXACT)(vec1, vec2, len, c, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_scalar_pow(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP(ctx, VEC_SCALAR_POW)(vec1, vec2, len, c, ctx); }
 
 GR_INLINE truth_t _gr_vec_equal(gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx) { return GR_VEC_VEC_PREDICATE(ctx, VEC_EQUAL)(vec1, vec2, len, ctx); }
 GR_INLINE truth_t _gr_vec_is_zero(gr_srcptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_PREDICATE(ctx, VEC_IS_ZERO)(vec, len, ctx); }

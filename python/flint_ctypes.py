@@ -661,7 +661,7 @@ class gr_elem:
         elem_type = type(self)
         c = elem_type(context=self._ctx_python)
         factors = Vec(self._ctx_python)()
-        exponents = ZZ_vec()
+        exponents = VecZZ()
         # print("c", c)
         # print("factors", factors)
         # print("c", exponents)
@@ -1531,7 +1531,7 @@ class gr_poly(gr_elem):
         """
         Rx = self.parent()
         R = Rx._coefficient_ring
-        mult = ZZ_vec()
+        mult = VecZZ()
         if domain is None:
             roots = Vec(R)()
             status = libgr.gr_poly_roots(roots._ref, mult._ref, self._ref, 0, R._ref)
@@ -1992,7 +1992,12 @@ CC_ca = ComplexField_ca()
 RF = RealFloat_arf()
 CF = ComplexFloat_acf()
 
-ZZ_vec = Vec(ZZ)
+VecZZ = Vec(ZZ)
+VecQQ = Vec(QQ)
+VecRR = Vec(RR)
+VecCC = Vec(CC)
+VecRF = Vec(RF)
+VecCF = Vec(CF)
 
 ZZx = PolynomialRing_gr_poly(ZZ)
 QQx = PolynomialRing_gr_poly(QQ)
@@ -2134,13 +2139,22 @@ def test_arb():
     c = acb(2.5+1j)
     assert c == b + 1j
     assert raises(lambda: arb(2.5+1j), ValueError)
+    assert acb(3+1j) == acb(ZZi(3+1j))
+    assert arb(ZZi(3)) == 3
+    assert raises(lambda: arb(ZZi(2.5+1j)), ValueError)
 
 def test_vec():
-    a = Vec(ZZ)([1,2,3])
+    a = VecZZ([1,2,3])
+    b = VecQQ([2,3,4])
     assert a[0] == 1
     assert a[2] == 3
     assert raises(lambda: a[-1], IndexError)
     assert raises(lambda: a[3], IndexError)
+    assert a + a == VecZZ([2,4,6])
+    assert a + b == VecQQ([3,5,7])
+    assert b + a == VecQQ([3,5,7])
+    assert a + ZZ(1) == VecZZ([2,3,4])
+    assert b + ZZ(1) == VecQQ([3,4,5])
 
 def test_all():
 

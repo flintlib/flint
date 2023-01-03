@@ -87,6 +87,7 @@ WARN_UNUSED_RESULT int gr_poly_set_fmpq(gr_poly_t poly, const fmpq_t x, gr_ctx_t
 /* todo: document/test */
 WARN_UNUSED_RESULT int gr_poly_get_fmpz_poly(gr_poly_t res, const fmpz_poly_t src, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_set_fmpq_poly(gr_poly_t res, const fmpq_poly_t src, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_set_gr_poly_other(gr_poly_t res, const gr_poly_t x, gr_ctx_t x_ctx, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_poly_set_coeff_scalar(gr_poly_t poly, slong n, gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_set_coeff_si(gr_poly_t poly, slong n, slong x, gr_ctx_t ctx);
