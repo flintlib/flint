@@ -73,12 +73,12 @@ set(BUILD_DIRS
     mpoly fmpz_mpoly fmpq_mpoly nmod_mpoly fq_nmod_mpoly fmpz_mod_mpoly 
     fmpz_mpoly_factor fmpq_mpoly_factor nmod_mpoly_factor fmpz_mod_mpoly_factor 
     fq_nmod_mpoly_factor fq_zech_mpoly fq_zech_mpoly_factor 
-    flintxx
+    fq_embed fq_nmod_embed fq_zech_embed nmod
 )
 
 set(TEMPLATE_DIRS
     fq_vec_templates fq_mat_templates fq_poly_templates
-    fq_poly_factor_templates fq_templates
+    fq_poly_factor_templates fq_embed_templates fq_templates
 )
 
 set(SOURCES
@@ -103,7 +103,7 @@ set(HEADERS
 foreach (build_dir IN LISTS BUILD_DIRS TEMPLATE_DIRS)
     file(GLOB TEMP RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${build_dir}/*.c")
     list(APPEND SOURCES ${TEMP})
-    file(GLOB TEMP RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${build_dir}/*.h")
+    file(GLOB TEMP RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${build_dir}.h")
     list(APPEND HEADERS ${TEMP})
 endforeach ()
 
@@ -219,9 +219,6 @@ foreach(header IN LISTS TEMP)
     endif()
 endforeach()
 
-file(GLOB TEMP "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-list(APPEND HEADERS ${TEMP})
-
 add_library(flint ${SOURCES})
 target_link_libraries(flint PUBLIC
     ${NTL_LIBRARY} ${MPFR_LIBRARIES} ${GMP_LIBRARIES} ${PThreads_LIBRARIES}
@@ -307,6 +304,12 @@ install(TARGETS flint
         )
 
 install(FILES ${HEADERS} DESTINATION include/flint)
+
+file(GLOB TEMP "flintxx/*.h")
+install(FILES ${TEMP} DESTINATION include/flint/flintxx)
+
+file(GLOB TEMP "*xx.h")
+install(FILES ${TEMP} DESTINATION include/flint)
 
 set_target_properties(flint
     PROPERTIES
