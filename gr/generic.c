@@ -1378,6 +1378,70 @@ gr_generic_vec_ ## op ## _scalar(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcp
 } \
  \
 int \
+gr_generic_vec_ ## op ## _scalar_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx) \
+{ \
+    gr_method_binary_op_si op = GR_BINARY_OP_SI(ctx, OP ## _SI); \
+    int status; \
+    slong i, sz; \
+ \
+    sz = ctx->sizeof_elem; \
+    status = GR_SUCCESS; \
+ \
+    for (i = 0; i < len; i++) \
+        status |= op(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, i, sz), c, ctx); \
+ \
+    return status; \
+} \
+ \
+int \
+gr_generic_vec_ ## op ## _scalar_ui(gr_ptr vec1, gr_srcptr vec2, slong len, ulong c, gr_ctx_t ctx) \
+{ \
+    gr_method_binary_op_ui op = GR_BINARY_OP_UI(ctx, OP ## _UI); \
+    int status; \
+    slong i, sz; \
+ \
+    sz = ctx->sizeof_elem; \
+    status = GR_SUCCESS; \
+ \
+    for (i = 0; i < len; i++) \
+        status |= op(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, i, sz), c, ctx); \
+ \
+    return status; \
+} \
+ \
+int \
+gr_generic_vec_ ## op ## _scalar_fmpz(gr_ptr vec1, gr_srcptr vec2, slong len, const fmpz_t c, gr_ctx_t ctx) \
+{ \
+    gr_method_binary_op_fmpz op = GR_BINARY_OP_FMPZ(ctx, OP ## _FMPZ); \
+    int status; \
+    slong i, sz; \
+ \
+    sz = ctx->sizeof_elem; \
+    status = GR_SUCCESS; \
+ \
+    for (i = 0; i < len; i++) \
+        status |= op(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, i, sz), c, ctx); \
+ \
+    return status; \
+} \
+ \
+int \
+gr_generic_vec_ ## op ## _scalar_fmpq(gr_ptr vec1, gr_srcptr vec2, slong len, const fmpq_t c, gr_ctx_t ctx) \
+{ \
+    gr_method_binary_op_fmpq op = GR_BINARY_OP_FMPQ(ctx, OP ## _FMPQ); \
+    int status; \
+    slong i, sz; \
+ \
+    sz = ctx->sizeof_elem; \
+    status = GR_SUCCESS; \
+ \
+    for (i = 0; i < len; i++) \
+        status |= op(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, i, sz), c, ctx); \
+ \
+    return status; \
+} \
+ \
+int \
 gr_generic_scalar_ ## op ## _vec(gr_ptr vec1, gr_srcptr c, gr_srcptr vec2, slong len, gr_ctx_t ctx) \
 { \
     gr_method_binary_op op = GR_BINARY_OP(ctx, OP); \
@@ -1995,6 +2059,7 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_DIVEXACT_UI,             (gr_funcptr) gr_generic_div_ui},
     {GR_METHOD_DIVEXACT_SI,             (gr_funcptr) gr_generic_div_si},
     {GR_METHOD_DIVEXACT_FMPZ,           (gr_funcptr) gr_generic_div_fmpz},
+    {GR_METHOD_DIVEXACT_FMPQ,           (gr_funcptr) gr_generic_div_fmpq},
     {GR_METHOD_DIVEXACT_OTHER,          (gr_funcptr) gr_generic_div_other},
     {GR_METHOD_OTHER_DIVEXACT,          (gr_funcptr) gr_generic_other_div},
 
@@ -2043,12 +2108,40 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_VEC_DIVEXACT_SCALAR,     (gr_funcptr) gr_generic_vec_divexact_scalar},
     {GR_METHOD_VEC_POW_SCALAR,          (gr_funcptr) gr_generic_vec_pow_scalar},
 
+    {GR_METHOD_VEC_ADD_SCALAR_SI,       (gr_funcptr) gr_generic_vec_add_scalar_si},
+    {GR_METHOD_VEC_SUB_SCALAR_SI,       (gr_funcptr) gr_generic_vec_sub_scalar_si},
+    {GR_METHOD_VEC_MUL_SCALAR_SI,       (gr_funcptr) gr_generic_vec_mul_scalar_si},
+    {GR_METHOD_VEC_DIV_SCALAR_SI,       (gr_funcptr) gr_generic_vec_div_scalar_si},
+    {GR_METHOD_VEC_DIVEXACT_SCALAR_SI,  (gr_funcptr) gr_generic_vec_divexact_scalar_si},
+    {GR_METHOD_VEC_POW_SCALAR_SI,       (gr_funcptr) gr_generic_vec_pow_scalar_si},
+
+    {GR_METHOD_VEC_ADD_SCALAR_UI,       (gr_funcptr) gr_generic_vec_add_scalar_ui},
+    {GR_METHOD_VEC_SUB_SCALAR_UI,       (gr_funcptr) gr_generic_vec_sub_scalar_ui},
+    {GR_METHOD_VEC_MUL_SCALAR_UI,       (gr_funcptr) gr_generic_vec_mul_scalar_ui},
+    {GR_METHOD_VEC_DIV_SCALAR_UI,       (gr_funcptr) gr_generic_vec_div_scalar_ui},
+    {GR_METHOD_VEC_DIVEXACT_SCALAR_UI,  (gr_funcptr) gr_generic_vec_divexact_scalar_ui},
+    {GR_METHOD_VEC_POW_SCALAR_UI,       (gr_funcptr) gr_generic_vec_pow_scalar_ui},
+
+    {GR_METHOD_VEC_ADD_SCALAR_FMPZ,     (gr_funcptr) gr_generic_vec_add_scalar_fmpz},
+    {GR_METHOD_VEC_SUB_SCALAR_FMPZ,     (gr_funcptr) gr_generic_vec_sub_scalar_fmpz},
+    {GR_METHOD_VEC_MUL_SCALAR_FMPZ,     (gr_funcptr) gr_generic_vec_mul_scalar_fmpz},
+    {GR_METHOD_VEC_DIV_SCALAR_FMPZ,     (gr_funcptr) gr_generic_vec_div_scalar_fmpz},
+    {GR_METHOD_VEC_DIVEXACT_SCALAR_FMPZ,(gr_funcptr) gr_generic_vec_divexact_scalar_fmpz},
+    {GR_METHOD_VEC_POW_SCALAR_FMPZ,     (gr_funcptr) gr_generic_vec_pow_scalar_fmpz},
+
+    {GR_METHOD_VEC_ADD_SCALAR_FMPQ,     (gr_funcptr) gr_generic_vec_add_scalar_fmpq},
+    {GR_METHOD_VEC_SUB_SCALAR_FMPQ,     (gr_funcptr) gr_generic_vec_sub_scalar_fmpq},
+    {GR_METHOD_VEC_MUL_SCALAR_FMPQ,     (gr_funcptr) gr_generic_vec_mul_scalar_fmpq},
+    {GR_METHOD_VEC_DIV_SCALAR_FMPQ,     (gr_funcptr) gr_generic_vec_div_scalar_fmpq},
+    {GR_METHOD_VEC_DIVEXACT_SCALAR_FMPQ,(gr_funcptr) gr_generic_vec_divexact_scalar_fmpq},
+    {GR_METHOD_VEC_POW_SCALAR_FMPQ,     (gr_funcptr) gr_generic_vec_pow_scalar_fmpq},
+
     {GR_METHOD_SCALAR_ADD_VEC,          (gr_funcptr) gr_generic_scalar_add_vec},
     {GR_METHOD_SCALAR_SUB_VEC,          (gr_funcptr) gr_generic_scalar_sub_vec},
     {GR_METHOD_SCALAR_MUL_VEC,          (gr_funcptr) gr_generic_scalar_mul_vec},
     {GR_METHOD_SCALAR_DIV_VEC,          (gr_funcptr) gr_generic_scalar_div_vec},
     {GR_METHOD_SCALAR_DIVEXACT_VEC,     (gr_funcptr) gr_generic_scalar_divexact_vec},
-    {GR_METHOD_SCALAR_POW_VEC,     (gr_funcptr) gr_generic_scalar_pow_vec},
+    {GR_METHOD_SCALAR_POW_VEC,          (gr_funcptr) gr_generic_scalar_pow_vec},
 
     {GR_METHOD_VEC_ADD_OTHER,          (gr_funcptr) gr_generic_vec_add_other},
     {GR_METHOD_VEC_SUB_OTHER,          (gr_funcptr) gr_generic_vec_sub_other},

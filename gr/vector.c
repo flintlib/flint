@@ -183,6 +183,51 @@ vector_gr_vec_ ## op(gr_vec_t res, const gr_vec_t x, const gr_vec_t y, gr_ctx_t 
  \
     return _gr_vec_## op(res->entries, x->entries, y->entries, xlen, ENTRY_CTX(ctx)); \
 } \
+ \
+int \
+vector_gr_vec_ ## op ## _si(gr_vec_t res, const gr_vec_t x, slong c, gr_ctx_t ctx) \
+{ \
+    slong xlen = x->length; \
+ \
+    if (res->length != xlen) \
+        gr_vec_set_length(res, xlen, ENTRY_CTX(ctx)); \
+ \
+    return _gr_vec_ ## op ## _scalar_si(res->entries, x->entries, xlen, c, ENTRY_CTX(ctx)); \
+} \
+ \
+int \
+vector_gr_vec_ ## op ## _ui(gr_vec_t res, const gr_vec_t x, ulong c, gr_ctx_t ctx) \
+{ \
+    slong xlen = x->length; \
+ \
+    if (res->length != xlen) \
+        gr_vec_set_length(res, xlen, ENTRY_CTX(ctx)); \
+ \
+    return _gr_vec_ ## op ## _scalar_ui(res->entries, x->entries, xlen, c, ENTRY_CTX(ctx)); \
+} \
+ \
+int \
+vector_gr_vec_ ## op ## _fmpz(gr_vec_t res, const gr_vec_t x, const fmpz_t c, gr_ctx_t ctx) \
+{ \
+    slong xlen = x->length; \
+ \
+    if (res->length != xlen) \
+        gr_vec_set_length(res, xlen, ENTRY_CTX(ctx)); \
+ \
+    return _gr_vec_ ## op ## _scalar_fmpz(res->entries, x->entries, xlen, c, ENTRY_CTX(ctx)); \
+} \
+ \
+int \
+vector_gr_vec_ ## op ## _fmpq(gr_vec_t res, const gr_vec_t x, const fmpq_t c, gr_ctx_t ctx) \
+{ \
+    slong xlen = x->length; \
+ \
+    if (res->length != xlen) \
+        gr_vec_set_length(res, xlen, ENTRY_CTX(ctx)); \
+ \
+    return _gr_vec_ ## op ## _scalar_fmpq(res->entries, x->entries, xlen, c, ENTRY_CTX(ctx)); \
+} \
+ \
 int \
 vector_gr_vec_ ## op ## _other(gr_vec_t res, const gr_vec_t x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) \
 { \
@@ -260,15 +305,7 @@ vector_gr_vec_other_ ## op(gr_vec_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_v
         if (res->length != ylen) \
             gr_vec_set_length(res, ylen, entry_ctx); \
  \
-  printf("sommes\n"); \
-  printf("len alloc %ld %ld\n", res->alloc, res->length); \
-  gr_println(x, x_ctx); \
-  gr_println(y->entries, entry_ctx); \
-  printf("length %ld %ld\n", res->length, ylen); \
-\
-        int status = _gr_scalar_other_ ## op ## _vec(res->entries, x, x_ctx, y->entries, ylen, entry_ctx); \
-printf("didit\n"); \
-        return status; \
+        return _gr_scalar_other_ ## op ## _vec(res->entries, x, x_ctx, y->entries, ylen, entry_ctx); \
     } \
 } \
 
@@ -313,15 +350,55 @@ gr_method_tab_input _gr_vec_methods_input[] =
     {GR_METHOD_SET,         (gr_funcptr) vector_gr_vec_set},
     {GR_METHOD_SET_OTHER,   (gr_funcptr) vector_gr_vec_set_other},
     {GR_METHOD_NEG,         (gr_funcptr) vector_gr_vec_neg},
+
     {GR_METHOD_ADD,         (gr_funcptr) vector_gr_vec_add},
+    {GR_METHOD_ADD_UI,      (gr_funcptr) vector_gr_vec_add_ui},
+    {GR_METHOD_ADD_SI,      (gr_funcptr) vector_gr_vec_add_si},
+    {GR_METHOD_ADD_FMPZ,    (gr_funcptr) vector_gr_vec_add_fmpz},
+    {GR_METHOD_ADD_FMPQ,    (gr_funcptr) vector_gr_vec_add_fmpq},
     {GR_METHOD_ADD_OTHER,   (gr_funcptr) vector_gr_vec_add_other},
     {GR_METHOD_OTHER_ADD,   (gr_funcptr) vector_gr_vec_other_add},
+
     {GR_METHOD_SUB,         (gr_funcptr) vector_gr_vec_sub},
+    {GR_METHOD_SUB_UI,      (gr_funcptr) vector_gr_vec_sub_ui},
+    {GR_METHOD_SUB_SI,      (gr_funcptr) vector_gr_vec_sub_si},
+    {GR_METHOD_SUB_FMPZ,    (gr_funcptr) vector_gr_vec_sub_fmpz},
+    {GR_METHOD_SUB_FMPQ,    (gr_funcptr) vector_gr_vec_sub_fmpq},
+    {GR_METHOD_SUB_OTHER,   (gr_funcptr) vector_gr_vec_sub_other},
+    {GR_METHOD_OTHER_SUB,   (gr_funcptr) vector_gr_vec_other_sub},
+
     {GR_METHOD_MUL,         (gr_funcptr) vector_gr_vec_mul},
+    {GR_METHOD_MUL_UI,      (gr_funcptr) vector_gr_vec_mul_ui},
+    {GR_METHOD_MUL_SI,      (gr_funcptr) vector_gr_vec_mul_si},
+    {GR_METHOD_MUL_FMPZ,    (gr_funcptr) vector_gr_vec_mul_fmpz},
+    {GR_METHOD_MUL_FMPQ,    (gr_funcptr) vector_gr_vec_mul_fmpq},
+    {GR_METHOD_MUL_OTHER,   (gr_funcptr) vector_gr_vec_mul_other},
+    {GR_METHOD_OTHER_MUL,   (gr_funcptr) vector_gr_vec_other_mul},
+
     {GR_METHOD_DIV,         (gr_funcptr) vector_gr_vec_div},
-    {GR_METHOD_DIVEXACT,    (gr_funcptr) vector_gr_vec_divexact},
+    {GR_METHOD_DIV_UI,      (gr_funcptr) vector_gr_vec_div_ui},
+    {GR_METHOD_DIV_SI,      (gr_funcptr) vector_gr_vec_div_si},
+    {GR_METHOD_DIV_FMPZ,    (gr_funcptr) vector_gr_vec_div_fmpz},
+    {GR_METHOD_DIV_FMPQ,    (gr_funcptr) vector_gr_vec_div_fmpq},
+    {GR_METHOD_DIV_OTHER,   (gr_funcptr) vector_gr_vec_div_other},
+    {GR_METHOD_OTHER_DIV,   (gr_funcptr) vector_gr_vec_other_div},
+
+    {GR_METHOD_DIVEXACT,        (gr_funcptr) vector_gr_vec_divexact},
+    {GR_METHOD_DIVEXACT_UI,     (gr_funcptr) vector_gr_vec_divexact_ui},
+    {GR_METHOD_DIVEXACT_SI,     (gr_funcptr) vector_gr_vec_divexact_si},
+    {GR_METHOD_DIVEXACT_FMPZ,   (gr_funcptr) vector_gr_vec_divexact_fmpz},
+    {GR_METHOD_DIVEXACT_FMPQ,   (gr_funcptr) vector_gr_vec_divexact_fmpq},
+    {GR_METHOD_DIVEXACT_OTHER,  (gr_funcptr) vector_gr_vec_divexact_other},
+    {GR_METHOD_OTHER_DIVEXACT,  (gr_funcptr) vector_gr_vec_other_divexact},
+
     {GR_METHOD_POW,         (gr_funcptr) vector_gr_vec_pow},
+    {GR_METHOD_POW_UI,      (gr_funcptr) vector_gr_vec_pow_ui},
+    {GR_METHOD_POW_SI,      (gr_funcptr) vector_gr_vec_pow_si},
+    {GR_METHOD_POW_FMPZ,    (gr_funcptr) vector_gr_vec_pow_fmpz},
+    {GR_METHOD_POW_FMPQ,    (gr_funcptr) vector_gr_vec_pow_fmpq},
     {GR_METHOD_POW_OTHER,   (gr_funcptr) vector_gr_vec_pow_other},
+    {GR_METHOD_OTHER_POW,   (gr_funcptr) vector_gr_vec_other_pow},
+
     {0,                     (gr_funcptr) NULL},
 };
 

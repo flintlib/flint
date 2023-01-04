@@ -956,7 +956,7 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_fmpq_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) _gr_fmpq_inv},
     {GR_METHOD_POW_UI,          (gr_funcptr) _gr_fmpq_pow_ui},
-    {GR_METHOD_POW_SI,          (gr_funcptr) _gr_fmpq_pow_ui},
+    {GR_METHOD_POW_SI,          (gr_funcptr) _gr_fmpq_pow_si},
     {GR_METHOD_POW_FMPZ,        (gr_funcptr) _gr_fmpq_pow_fmpz},
     {GR_METHOD_POW_FMPQ,        (gr_funcptr) _gr_fmpq_pow_fmpq},
     {GR_METHOD_POW,             (gr_funcptr) _gr_fmpq_pow_fmpq},

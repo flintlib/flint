@@ -894,6 +894,37 @@ _gr_arf_zeta(arf_t res, const arf_t x, const gr_ctx_t ctx)
     }
 }
 
+/*
+for benchmarking
+
+int
+_gr_arf_vec_add(arf_ptr res, arf_srcptr vec1, arf_srcptr vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    slong prec = ARF_CTX_PREC(ctx);
+    arf_rnd_t rnd = ARF_CTX_RND(ctx);
+
+    for (i = 0; i < len; i++)
+        arf_add(res + i, vec1 + i, vec2 + i, prec, rnd);
+
+    return GR_SUCCESS;
+}
+
+int
+_gr_arf_vec_sub(arf_ptr res, arf_srcptr vec1, arf_srcptr vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    slong prec = ARF_CTX_PREC(ctx);
+    arf_rnd_t rnd = ARF_CTX_RND(ctx);
+
+    for (i = 0; i < len; i++)
+        arf_sub(res + i, vec1 + i, vec2 + i, prec, rnd);
+
+    return GR_SUCCESS;
+}
+*/
+
+
 int
 _gr_arf_vec_dot(arf_t res, const arf_t initial, int subtract, arf_srcptr vec1, arf_srcptr vec2, slong len, gr_ctx_t ctx)
 {
@@ -1225,6 +1256,11 @@ gr_method_tab_input _arf_methods_input[] =
 
     {GR_METHOD_GAMMA,            (gr_funcptr) _gr_arf_gamma},
     {GR_METHOD_ZETA,            (gr_funcptr) _gr_arf_zeta},
+
+/*
+    {GR_METHOD_VEC_ADD,                 (gr_funcptr) _gr_arf_vec_add},
+    {GR_METHOD_VEC_SUB,                 (gr_funcptr) _gr_arf_vec_sub},
+*/
 
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_arf_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_arf_vec_dot_rev},

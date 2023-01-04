@@ -3,6 +3,7 @@
 int
 _gr_mat_charpoly_berkowitz(gr_ptr cp, const gr_mat_t mat, gr_ctx_t ctx)
 {
+    slong sz = ctx->sizeof_elem;
     slong n = mat->r;
     int status;
 
@@ -15,23 +16,19 @@ _gr_mat_charpoly_berkowitz(gr_ptr cp, const gr_mat_t mat, gr_ctx_t ctx)
     else if (n == 1)
     {
         status |= gr_neg(cp, mat->rows[0], ctx);
-        status |= gr_one(GR_ENTRY(cp, 1, ctx->sizeof_elem), ctx);
+        status |= gr_one(GR_ENTRY(cp, 1, sz), ctx);
     }
-/*
     else if (n == 2)
     {
         status |= gr_mat_det_cofactor(cp, mat, ctx);
-        status |= gr_add(cp + 1, gr_mat_entry(mat, 0, 0), gr_mat_entry(mat, 1, 1), ctx);
-        status |= gr_neg(cp + 1, cp + 1, ctx);
-        status |= gr_one(cp + 2, ctx);
+        status |= gr_add(GR_ENTRY(cp, 1, sz), GR_MAT_ENTRY(mat, 0, 0, sz), GR_MAT_ENTRY(mat, 1, 1, sz), ctx);
+        status |= gr_neg(GR_ENTRY(cp, 1, sz), GR_ENTRY(cp, 1, sz), ctx);
+        status |= gr_one(GR_ENTRY(cp, 2, sz), ctx);
     }
-*/
     else
     {
-        slong i, k, t, sz;
+        slong i, k, t;
         gr_ptr a, A, s;
-
-        sz = ctx->sizeof_elem;
 
         GR_TMP_INIT_VEC(a, n * n, ctx);
         A = GR_ENTRY(a, (n - 1) * n, sz);

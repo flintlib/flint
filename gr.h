@@ -242,6 +242,7 @@ typedef enum
     GR_METHOD_DIVEXACT_UI,
     GR_METHOD_DIVEXACT_SI,
     GR_METHOD_DIVEXACT_FMPZ,
+    GR_METHOD_DIVEXACT_FMPQ,
     GR_METHOD_DIVEXACT_OTHER,
     GR_METHOD_OTHER_DIVEXACT,
 
@@ -532,6 +533,13 @@ typedef enum
     GR_METHOD_VEC_ADD_SCALAR_OTHER, GR_METHOD_VEC_SUB_SCALAR_OTHER, GR_METHOD_VEC_MUL_SCALAR_OTHER, GR_METHOD_VEC_DIV_SCALAR_OTHER, GR_METHOD_VEC_DIVEXACT_SCALAR_OTHER, GR_METHOD_VEC_POW_SCALAR_OTHER,
     GR_METHOD_SCALAR_OTHER_ADD_VEC, GR_METHOD_SCALAR_OTHER_SUB_VEC, GR_METHOD_SCALAR_OTHER_MUL_VEC, GR_METHOD_SCALAR_OTHER_DIV_VEC, GR_METHOD_SCALAR_OTHER_DIVEXACT_VEC, GR_METHOD_SCALAR_OTHER_POW_VEC,
 
+    GR_METHOD_VEC_ADD_SCALAR_SI, GR_METHOD_VEC_ADD_SCALAR_UI, GR_METHOD_VEC_ADD_SCALAR_FMPZ, GR_METHOD_VEC_ADD_SCALAR_FMPQ,
+    GR_METHOD_VEC_SUB_SCALAR_SI, GR_METHOD_VEC_SUB_SCALAR_UI, GR_METHOD_VEC_SUB_SCALAR_FMPZ, GR_METHOD_VEC_SUB_SCALAR_FMPQ,
+    GR_METHOD_VEC_MUL_SCALAR_SI, GR_METHOD_VEC_MUL_SCALAR_UI, GR_METHOD_VEC_MUL_SCALAR_FMPZ, GR_METHOD_VEC_MUL_SCALAR_FMPQ,
+    GR_METHOD_VEC_DIV_SCALAR_SI, GR_METHOD_VEC_DIV_SCALAR_UI, GR_METHOD_VEC_DIV_SCALAR_FMPZ, GR_METHOD_VEC_DIV_SCALAR_FMPQ,
+    GR_METHOD_VEC_DIVEXACT_SCALAR_SI, GR_METHOD_VEC_DIVEXACT_SCALAR_UI, GR_METHOD_VEC_DIVEXACT_SCALAR_FMPZ, GR_METHOD_VEC_DIVEXACT_SCALAR_FMPQ,
+    GR_METHOD_VEC_POW_SCALAR_SI, GR_METHOD_VEC_POW_SCALAR_UI, GR_METHOD_VEC_POW_SCALAR_FMPZ, GR_METHOD_VEC_POW_SCALAR_FMPQ,
+
     GR_METHOD_VEC_ADDMUL_SCALAR,
     GR_METHOD_VEC_SUBMUL_SCALAR,
     GR_METHOD_VEC_ADDMUL_SCALAR_SI,
@@ -697,6 +705,9 @@ typedef int ((*gr_method_other_op_vec)(gr_ptr, gr_srcptr, gr_ctx_ptr, gr_srcptr,
 typedef int ((*gr_method_vec_op_scalar_other)(gr_ptr, gr_srcptr, slong, gr_srcptr, gr_ctx_ptr, gr_ctx_ptr));
 typedef int ((*gr_method_scalar_other_op_vec)(gr_ptr, gr_srcptr, gr_ctx_ptr, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_vec_scalar_op_si)(gr_ptr, gr_srcptr, slong, slong, gr_ctx_ptr));
+typedef int ((*gr_method_vec_scalar_op_ui)(gr_ptr, gr_srcptr, slong, ulong, gr_ctx_ptr));
+typedef int ((*gr_method_vec_scalar_op_fmpz)(gr_ptr, gr_srcptr, slong, const fmpz_t, gr_ctx_ptr));
+typedef int ((*gr_method_vec_scalar_op_fmpq)(gr_ptr, gr_srcptr, slong, const fmpq_t, gr_ctx_ptr));
 typedef truth_t ((*gr_method_vec_predicate)(gr_srcptr, slong, gr_ctx_ptr));
 typedef truth_t ((*gr_method_vec_vec_predicate)(gr_srcptr, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_vec_dot_op)(gr_ptr, gr_srcptr, int, gr_srcptr, gr_srcptr, slong, gr_ctx_ptr));
@@ -759,6 +770,9 @@ typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcp
 #define GR_VEC_OP_SCALAR_OTHER(ctx, NAME) (((gr_method_vec_op_scalar_other *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_SCALAR_OTHER_OP_VEC(ctx, NAME) (((gr_method_scalar_other_op_vec *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_SCALAR_OP_SI(ctx, NAME) (((gr_method_vec_scalar_op_si *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_VEC_SCALAR_OP_UI(ctx, NAME) (((gr_method_vec_scalar_op_ui *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_VEC_SCALAR_OP_FMPZ(ctx, NAME) (((gr_method_vec_scalar_op_fmpz *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_VEC_SCALAR_OP_FMPQ(ctx, NAME) (((gr_method_vec_scalar_op_fmpq *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_PREDICATE(ctx, NAME) (((gr_method_vec_predicate *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_VEC_PREDICATE(ctx, NAME) (((gr_method_vec_vec_predicate *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_DOT_OP(ctx, NAME) (((gr_method_vec_dot_op *) ctx->methods)[GR_METHOD_ ## NAME])
@@ -883,6 +897,7 @@ GR_INLINE WARN_UNUSED_RESULT int gr_divexact(gr_ptr res, gr_srcptr x, gr_srcptr 
 GR_INLINE WARN_UNUSED_RESULT int gr_divexact_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, DIVEXACT_UI)(res, x, y, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_divexact_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, DIVEXACT_SI)(res, x, y, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_divexact_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, DIVEXACT_FMPZ)(res, x, y, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_divexact_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPQ(ctx, DIVEXACT_FMPQ)(res, x, y, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_divexact_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER(ctx, DIVEXACT_OTHER)(res, x, y, y_ctx, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_other_divexact(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx) { return GR_OTHER_BINARY_OP(ctx, OTHER_DIVEXACT)(res, x, x_ctx, y, ctx); }
 
@@ -1027,6 +1042,34 @@ GR_INLINE WARN_UNUSED_RESULT int _gr_vec_mul_scalar(gr_ptr vec1, gr_srcptr vec2,
 GR_INLINE WARN_UNUSED_RESULT int _gr_vec_div_scalar(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP(ctx, VEC_DIV_SCALAR)(vec1, vec2, len, c, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int _gr_vec_divexact_scalar(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP(ctx, VEC_DIVEXACT_SCALAR)(vec1, vec2, len, c, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int _gr_vec_pow_scalar(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP(ctx, VEC_POW_SCALAR)(vec1, vec2, len, c, ctx); }
+
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_add_scalar_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_SI(ctx, VEC_ADD_SCALAR_SI)(vec1, vec2, len, c, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_sub_scalar_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_SI(ctx, VEC_SUB_SCALAR_SI)(vec1, vec2, len, c, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_mul_scalar_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_SI(ctx, VEC_MUL_SCALAR_SI)(vec1, vec2, len, c, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_div_scalar_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_SI(ctx, VEC_DIV_SCALAR_SI)(vec1, vec2, len, c, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_divexact_scalar_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_SI(ctx, VEC_DIVEXACT_SCALAR_SI)(vec1, vec2, len, c, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_pow_scalar_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_SI(ctx, VEC_POW_SCALAR_SI)(vec1, vec2, len, c, ctx); }
+
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_add_scalar_ui(gr_ptr vec1, gr_srcptr vec2, slong len, ulong c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_UI(ctx, VEC_ADD_SCALAR_UI)(vec1, vec2, len, c, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_sub_scalar_ui(gr_ptr vec1, gr_srcptr vec2, slong len, ulong c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_UI(ctx, VEC_SUB_SCALAR_UI)(vec1, vec2, len, c, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_mul_scalar_ui(gr_ptr vec1, gr_srcptr vec2, slong len, ulong c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_UI(ctx, VEC_MUL_SCALAR_UI)(vec1, vec2, len, c, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_div_scalar_ui(gr_ptr vec1, gr_srcptr vec2, slong len, ulong c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_UI(ctx, VEC_DIV_SCALAR_UI)(vec1, vec2, len, c, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_divexact_scalar_ui(gr_ptr vec1, gr_srcptr vec2, slong len, ulong c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_UI(ctx, VEC_DIVEXACT_SCALAR_UI)(vec1, vec2, len, c, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_pow_scalar_ui(gr_ptr vec1, gr_srcptr vec2, slong len, ulong c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_UI(ctx, VEC_POW_SCALAR_UI)(vec1, vec2, len, c, ctx); }
+
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_add_scalar_fmpz(gr_ptr vec1, gr_srcptr vec2, slong len, const fmpz_t c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_FMPZ(ctx, VEC_ADD_SCALAR_FMPZ)(vec1, vec2, len, c, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_sub_scalar_fmpz(gr_ptr vec1, gr_srcptr vec2, slong len, const fmpz_t c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_FMPZ(ctx, VEC_SUB_SCALAR_FMPZ)(vec1, vec2, len, c, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_mul_scalar_fmpz(gr_ptr vec1, gr_srcptr vec2, slong len, const fmpz_t c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_FMPZ(ctx, VEC_MUL_SCALAR_FMPZ)(vec1, vec2, len, c, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_div_scalar_fmpz(gr_ptr vec1, gr_srcptr vec2, slong len, const fmpz_t c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_FMPZ(ctx, VEC_DIV_SCALAR_FMPZ)(vec1, vec2, len, c, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_divexact_scalar_fmpz(gr_ptr vec1, gr_srcptr vec2, slong len, const fmpz_t c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_FMPZ(ctx, VEC_DIVEXACT_SCALAR_FMPZ)(vec1, vec2, len, c, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_pow_scalar_fmpz(gr_ptr vec1, gr_srcptr vec2, slong len, const fmpz_t c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_FMPZ(ctx, VEC_POW_SCALAR_FMPZ)(vec1, vec2, len, c, ctx); }
+
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_add_scalar_fmpq(gr_ptr vec1, gr_srcptr vec2, slong len, const fmpq_t c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_FMPQ(ctx, VEC_ADD_SCALAR_FMPQ)(vec1, vec2, len, c, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_sub_scalar_fmpq(gr_ptr vec1, gr_srcptr vec2, slong len, const fmpq_t c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_FMPQ(ctx, VEC_SUB_SCALAR_FMPQ)(vec1, vec2, len, c, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_mul_scalar_fmpq(gr_ptr vec1, gr_srcptr vec2, slong len, const fmpq_t c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_FMPQ(ctx, VEC_MUL_SCALAR_FMPQ)(vec1, vec2, len, c, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_div_scalar_fmpq(gr_ptr vec1, gr_srcptr vec2, slong len, const fmpq_t c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_FMPQ(ctx, VEC_DIV_SCALAR_FMPQ)(vec1, vec2, len, c, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_divexact_scalar_fmpq(gr_ptr vec1, gr_srcptr vec2, slong len, const fmpq_t c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_FMPQ(ctx, VEC_DIVEXACT_SCALAR_FMPQ)(vec1, vec2, len, c, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int _gr_vec_pow_scalar_fmpq(gr_ptr vec1, gr_srcptr vec2, slong len, const fmpq_t c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_FMPQ(ctx, VEC_POW_SCALAR_FMPQ)(vec1, vec2, len, c, ctx); }
 
 GR_INLINE WARN_UNUSED_RESULT int _gr_scalar_add_vec(gr_ptr vec1, gr_srcptr c, gr_srcptr vec2, slong len, gr_ctx_t ctx) { return GR_SCALAR_VEC_OP(ctx, SCALAR_ADD_VEC)(vec1, c, vec2, len, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int _gr_scalar_sub_vec(gr_ptr vec1, gr_srcptr c, gr_srcptr vec2, slong len, gr_ctx_t ctx) { return GR_SCALAR_VEC_OP(ctx, SCALAR_SUB_VEC)(vec1, c, vec2, len, ctx); }
