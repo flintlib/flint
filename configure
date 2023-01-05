@@ -559,7 +559,7 @@ fi
 CONFIG_PTHREAD="#define HAVE_PTHREAD ${PTHREAD}"
 
 
-#pocess external modules
+#process external modules
 
 EXTRA_INC_DIRS="${EXTRA_INC_DIRS} ${EXTENSIONS}"
 

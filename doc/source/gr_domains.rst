@@ -24,7 +24,7 @@ Groups
     with elements of type :type:`dirichlet_char_t`.
     Fails and returns ``GR_DOMAIN`` if *q* is zero.
     Fails and returns ``GR_UNABLE`` if *q* has a prime factor
-    larger than `10^{16}`, which is currently unspported
+    larger than `10^{16}`, which is currently unsupported
     by the implementation.
 
 Base rings and fields
