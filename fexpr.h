@@ -71,8 +71,8 @@ typedef const fexpr_struct * fexpr_srcptr;
 typedef struct
 {
     fexpr_struct * entries;
-    slong length;
     slong alloc;
+    slong length;
 }
 fexpr_vec_struct;
 

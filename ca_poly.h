@@ -38,8 +38,8 @@ extern "C" {
 typedef struct
 {
     ca_struct * coeffs;
-    slong length;
     slong alloc;
+    slong length;
 }
 ca_poly_struct;
 

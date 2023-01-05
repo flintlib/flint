@@ -39,8 +39,8 @@ void fmpz_mpoly_spoly(fmpz_mpoly_t res, const fmpz_mpoly_t f, const fmpz_mpoly_t
 typedef struct
 {
     fmpz_mpoly_struct * p;
-    slong length;
     slong alloc;
+    slong length;
 }
 fmpz_mpoly_vec_struct;
 

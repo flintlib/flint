@@ -37,8 +37,8 @@ extern "C" {
 typedef struct
 {
     ca_ptr entries;
-    slong length;
     slong alloc;
+    slong length;
 }
 ca_vec_struct;
 
