@@ -701,6 +701,59 @@ _gr_fmpz_cmpabs(int * res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+/* experimental: inlining for small values */
+
+static void
+_fmpz_add_inline(fmpz_t z, const fmpz_t x, const fmpz_t y)
+{
+    fmpz f, g;
+
+    f = *x;
+    g = *y;
+
+    if (!COEFF_IS_MPZ(f) && !COEFF_IS_MPZ(g))
+        fmpz_set_si(z, f + g);
+    else
+        fmpz_add(z, x, y);
+}
+
+static void
+_fmpz_sub_inline(fmpz_t z, const fmpz_t x, const fmpz_t y)
+{
+    fmpz f, g;
+
+    f = *x;
+    g = *y;
+
+    if (!COEFF_IS_MPZ(f) && !COEFF_IS_MPZ(g))
+        fmpz_set_si(z, f - g);
+    else
+        fmpz_sub(z, x, y);
+}
+
+int
+_gr_fmpz_vec_add(fmpz * res, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        _fmpz_add_inline(res + i, vec1 + i, vec2 + i);
+
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_vec_sub(fmpz * res, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        _fmpz_sub_inline(res + i, vec1 + i, vec2 + i);
+
+    return GR_SUCCESS;
+}
+
+
 int
 _gr_fmpz_vec_dot(fmpz_t res, const fmpz_t initial, int subtract, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
 {
@@ -820,6 +873,7 @@ _gr_fmpz_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const fmpz_poly_t poly, in
             gr_vec_set_length(roots, 0, ctx);
             gr_vec_set_length(mult, 0, ctx);
         }
+        fmpz_clear(t);
     }
     else
     {
@@ -988,6 +1042,8 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_CSGN,            (gr_funcptr) _gr_fmpz_sgn},
     {GR_METHOD_CMP,             (gr_funcptr) _gr_fmpz_cmp},
     {GR_METHOD_CMPABS,          (gr_funcptr) _gr_fmpz_cmpabs},
+    {GR_METHOD_VEC_ADD,         (gr_funcptr) _gr_fmpz_vec_add},
+    {GR_METHOD_VEC_SUB,         (gr_funcptr) _gr_fmpz_vec_sub},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_fmpz_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_fmpz_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpz_poly_mullow},

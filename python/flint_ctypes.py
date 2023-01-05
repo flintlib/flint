@@ -875,7 +875,7 @@ class gr_elem:
 
     def mul_2exp(self, other):
         """
-        Exact multiplication of a dyadic number `2^y`.
+        Exact multiplication by a dyadic number `2^y`.
 
             >>> QQ(3).mul_2exp(5)
             96

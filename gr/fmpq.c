@@ -674,7 +674,7 @@ _fmpq_vec_set_fmpz_vec_div_fmpz(fmpq * res, const fmpz * v, const fmpz_t den, sl
     }
 }
 
-void
+int
 _gr_fmpq_poly_mullow(fmpq * res,
     const fmpq * poly1, slong len1,
     const fmpq * poly2, slong len2, slong n, gr_ctx_t ctx)
@@ -688,7 +688,7 @@ _gr_fmpq_poly_mullow(fmpq * res,
     {
         slong i;
 
-        z1 = _fmpz_vec_init(len1 + len2 + n);
+        z1 = flint_malloc((len1 + len2 + n) * sizeof(fmpz));
         z2 = z1 + len1;
         z3 = z2 + len2;
 
@@ -696,6 +696,8 @@ _gr_fmpq_poly_mullow(fmpq * res,
             z1[i] = *fmpq_numref(poly1 + i);
         for (i = 0; i < len2; i++)
             z2[i] = *fmpq_numref(poly2 + i);
+        for (i = 0; i < n; i++)
+            z3[i] = *fmpq_numref(res + i);
 
         if (len1 >= len2)
             _fmpz_poly_mullow(z3, z1, len1, z2, len2, n);
@@ -704,9 +706,8 @@ _gr_fmpq_poly_mullow(fmpq * res,
 
         for (i = 0; i < n; i++)
         {
-            fmpz_one(fmpq_denref(res + i));
-            fmpz_clear(fmpq_numref(res + i));
             *fmpq_numref(res + i) = z3[i];
+            fmpz_one(fmpq_denref(res + i));
         }
 
         flint_free(z1);
@@ -734,6 +735,8 @@ _gr_fmpq_poly_mullow(fmpq * res,
         fmpz_clear(den1);
         fmpz_clear(den2);
     }
+
+    return GR_SUCCESS;
 }
 
 int

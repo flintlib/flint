@@ -19,7 +19,7 @@ void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)
         gr_ctx_init_fmpz_mod(ctx, t);
         fmpz_clear(t);
     }
-    else if (which < 65)
+    else if (which < 55)
     {
         fmpz_t t;
         fmpz_init(t);

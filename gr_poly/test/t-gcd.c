@@ -36,9 +36,38 @@ int main()
         status |= gr_poly_randtest(B, state, n, ctx);
         status |= gr_poly_gcd(G, A, B, ctx);
 
+        if (status == GR_SUCCESS)
+        {
+            if (gr_poly_is_zero(G, ctx) == T_FALSE)
+            {
+                status |= gr_poly_divrem(AC, BC, A, G, ctx);
+
+                if (status == GR_SUCCESS && gr_poly_is_zero(BC, ctx) == T_FALSE)
+                {
+                    flint_printf("FAIL: gcd does not divide A\n\n");
+                    flint_printf("A = "); gr_poly_print(A, ctx); flint_printf("\n");
+                    flint_printf("B = "); gr_poly_print(B, ctx); flint_printf("\n");
+                    flint_printf("G = "); gr_poly_print(G, ctx); flint_printf("\n");
+                    flint_abort();
+                }
+
+                status |= gr_poly_divrem(AC, BC, B, G, ctx);
+
+                if (status == GR_SUCCESS && gr_poly_is_zero(BC, ctx) == T_FALSE)
+                {
+                    flint_printf("FAIL: gcd does not divide B\n\n");
+                    flint_printf("A = "); gr_poly_print(A, ctx); flint_printf("\n");
+                    flint_printf("B = "); gr_poly_print(B, ctx); flint_printf("\n");
+                    flint_printf("G = "); gr_poly_print(G, ctx); flint_printf("\n");
+                    flint_abort();
+                }
+            }
+        }
+
         if (status == GR_SUCCESS && gr_poly_is_one(G, ctx) == T_TRUE)
         {
             status |= gr_poly_randtest(C, state, n, ctx);
+
             status |= gr_poly_mul(AC, A, C, ctx);
             status |= gr_poly_mul(BC, B, C, ctx);
 
@@ -59,16 +88,19 @@ int main()
 
             if (status == GR_SUCCESS)
             {
-                status |= gr_poly_make_monic(MC, C, ctx);
-
-                if (status == GR_SUCCESS && gr_poly_equal(MC, G, ctx) == T_FALSE)
+                if (gr_poly_is_zero(C, ctx) == T_FALSE)
                 {
-                    flint_printf("FAIL\n\n");
-                    flint_printf("A = "); gr_poly_print(A, ctx); flint_printf("\n");
-                    flint_printf("B = "); gr_poly_print(B, ctx); flint_printf("\n");
-                    flint_printf("C = "); gr_poly_print(C, ctx); flint_printf("\n");
-                    flint_printf("G = "); gr_poly_print(G, ctx); flint_printf("\n");
-                    flint_abort();
+                    status |= gr_poly_make_monic(MC, C, ctx);
+
+                    if (status == GR_SUCCESS && gr_poly_equal(MC, G, ctx) == T_FALSE)
+                    {
+                        flint_printf("FAIL\n\n");
+                        flint_printf("A = "); gr_poly_print(A, ctx); flint_printf("\n");
+                        flint_printf("B = "); gr_poly_print(B, ctx); flint_printf("\n");
+                        flint_printf("C = "); gr_poly_print(C, ctx); flint_printf("\n");
+                        flint_printf("G = "); gr_poly_print(G, ctx); flint_printf("\n");
+                        flint_abort();
+                    }
                 }
             }
         }
