@@ -1648,6 +1648,7 @@ class Mat(gr_ctx):
     def __del__(self):
         self._element_ring._decrement_refcount()
 
+
 def MatrixRing(element_ring, n):
     assert isinstance(element_ring, gr_ctx)
     assert 0 <= n <= WORD_MAX
@@ -1879,6 +1880,46 @@ class gr_mat(gr_elem):
             if status & GR_UNABLE: raise NotImplementedError
             if status & GR_DOMAIN: raise ValueError
         return res
+
+    def eigenvalues(self, domain=None):
+        """
+        Computes the eigenvalues in the coefficient ring of this matrix,
+        returning a tuple (``eigenvalues``, ``multiplicities``).
+        If the ring is not algebraically closed, the sum of multiplicities
+        can be smaller than the dimension of the matrix.
+        If ``domain`` is given, returns eigenvalues in that ring instead.
+
+            >>> Mat(ZZ)([[1,2],[3,4]]).eigenvalues()
+            ([], [])
+            >>> Mat(ZZ)([[1,2],[3,-4]]).eigenvalues()
+            ([2, -5], [1, 1])
+            >>> Mat(ZZ)([[1,2],[3,4]]).eigenvalues(domain=QQbar)
+            ([Root a = 5.37228 of a^2-5*a-2, Root a = -0.372281 of a^2-5*a-2], [1, 1])
+            >>> Mat(ZZ)([[1,2],[3,4]]).eigenvalues(domain=RR)
+            ([[-0.3722813232690143 +/- 3.01e-17], [5.372281323269014 +/- 3.31e-16]], [1, 1])
+
+        The matrix must be square:
+
+            >>> Mat(ZZ)([[1,2,3],[4,5,6]]).eigenvalues()
+            Traceback (most recent call last):
+              ...
+            ValueError
+
+        """
+        Rmat = self.parent()
+        R = Rmat._element_ring
+        mult = VecZZ()
+        if domain is None:
+            roots = Vec(R)()
+            status = libgr.gr_mat_eigenvalues(roots._ref, mult._ref, self._ref, 0, R._ref)
+        else:
+            C = domain
+            roots = Vec(C)()
+            status = libgr.gr_mat_eigenvalues_other(roots._ref, mult._ref, self._ref, R._ref, 0, C._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return (roots, mult)
 
 
     #def __getitem__(self, i):

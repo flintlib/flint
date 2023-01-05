@@ -251,6 +251,9 @@ int gr_mat_reduce_row(slong * column, gr_mat_t A, slong * P, slong * L, slong m,
 int gr_mat_apply_row_similarity(gr_mat_t A, slong r, gr_ptr d, gr_ctx_t ctx);
 int gr_mat_minpoly_field(gr_poly_t p, const gr_mat_t X, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int gr_mat_eigenvalues(gr_vec_t lambda, gr_vec_t mult, const gr_mat_t mat, int flags, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_eigenvalues_other(gr_vec_t lambda, gr_vec_t mult, const gr_mat_t mat, gr_ctx_t mat_ctx, int flags, gr_ctx_t ctx);
+
 
 #ifdef __cplusplus
 }

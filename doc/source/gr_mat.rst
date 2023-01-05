@@ -572,6 +572,20 @@ Similarity transformations
     Similarity transforms preserve the determinant, characteristic polynomial
     and minimal polynomial.
 
+Eigenvalues
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_eigenvalues(gr_vec_t lambda, gr_vec_t mult, const gr_mat_t mat, int flags, gr_ctx_t ctx)
+              int gr_mat_eigenvalues_other(gr_vec_t lambda, gr_vec_t mult, const gr_mat_t mat, gr_ctx_t mat_ctx, int flags, gr_ctx_t ctx)
+
+    Finds all eigenvalues of the given matrix in the ring defined by *ctx*,
+    storing the eigenvalues without duplication in *lambda* (a vector with
+    elements of type ``ctx``) and the corresponding multiplicities in
+    *mult* (a vector with elements of type ``fmpz``).
+
+    The interface is essentially the same as that of
+    :func:`gr_poly_roots`; see its documentation for details.
+
 Hessenberg form
 -------------------------------------------------------------------------------
 
