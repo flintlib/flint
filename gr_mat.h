@@ -254,6 +254,15 @@ int gr_mat_minpoly_field(gr_poly_t p, const gr_mat_t X, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_eigenvalues(gr_vec_t lambda, gr_vec_t mult, const gr_mat_t mat, int flags, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_eigenvalues_other(gr_vec_t lambda, gr_vec_t mult, const gr_mat_t mat, gr_ctx_t mat_ctx, int flags, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int gr_mat_diagonalization_precomp(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A, const gr_vec_t eigenvalues, const gr_vec_t mult, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_diagonalization(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A, int flags, gr_ctx_t ctx);
+
+truth_t gr_mat_is_diagonal(const gr_mat_t mat, gr_ctx_t ctx);
+truth_t gr_mat_is_lower_triangular(const gr_mat_t mat, gr_ctx_t ctx);
+truth_t gr_mat_is_upper_triangular(const gr_mat_t mat, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_mat_mul_diag(gr_mat_t C, const gr_mat_t A, const gr_vec_t D, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_diag_mul(gr_mat_t C, const gr_vec_t D, const gr_mat_t A, gr_ctx_t ctx);
 
 #ifdef __cplusplus
 }

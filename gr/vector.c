@@ -70,17 +70,7 @@ vector_gr_vec_swap(gr_vec_t vec1, gr_vec_t vec2, gr_ctx_t ctx)
 int
 vector_gr_vec_write(gr_stream_t out, gr_vec_t vec, gr_ctx_t ctx)
 {
-    slong i;
-
-    gr_stream_write(out, "[");
-    for (i = 0; i < vec->length; i++)
-    {
-        gr_write(out, gr_vec_entry_ptr(vec, i, ENTRY_CTX(ctx)), ENTRY_CTX(ctx));
-        if (i < vec->length - 1)
-            gr_stream_write(out, ", ");
-    }
-    gr_stream_write(out, "]");
-    return GR_SUCCESS;
+    return gr_vec_write(out, vec, ENTRY_CTX(ctx));
 }
 
 int

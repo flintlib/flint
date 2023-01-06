@@ -1032,6 +1032,12 @@ Memory-managed vectors
 
     Clears the vector *vec*.
 
+.. macro:: GR_VEC_ENTRY(vec, i, sz)
+
+    Macro to access the *i*-th element in the vector *vec*,
+    indexed from zero, assuming that entries have size ``sz``.
+    The index must be in bounds.
+
 .. function:: gr_ptr gr_vec_entry_ptr(gr_vec_t vec, slong i, gr_ctx_t ctx)
 
     Returns a pointer to the *i*-th element in the vector *vec*,
@@ -1058,6 +1064,10 @@ Memory-managed vectors
 .. function:: int gr_vec_append(gr_vec_t vec, gr_srcptr x, gr_ctx_t ctx)
 
     Appends the element *x* to the end of vector *vec*.
+
+.. function:: int _gr_vec_write(gr_stream_t out, gr_srcptr vec, slong len, gr_ctx_t ctx);
+              int gr_vec_write(gr_stream_t out, const gr_vec_t vec, gr_ctx_t ctx);
+              int gr_vec_print(const gr_vec_t vec, gr_ctx_t ctx);
 
 Implementing rings
 --------------------------------------------------------------------------------

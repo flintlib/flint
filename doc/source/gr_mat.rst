@@ -6,20 +6,17 @@
 A :type:`gr_mat_t` represents a matrix implemented as a dense
 array of entries in a generic ring *R*.
 
-In this module, the context object ``ctx`` always represents the
-coefficient ring *R* unless otherwise stated.
-Creating a context object representing a matrix
-space only becomes necessary when one
-wants to manipulate matrices using generic ring methods
-like ``gr_add`` instead of the designated matrix
-methods like ``gr_mat_add``.
-
-Warnings
--------------------------------------------------------------------------------
-
+* In this module, the context object ``ctx`` always represents the
+  coefficient ring *R* unless otherwise stated.
+  Creating a context object representing a matrix
+  space only becomes necessary when one
+  wants to manipulate matrices using generic ring methods
+  like ``gr_add`` instead of the designated matrix
+  methods like ``gr_mat_add``.
 * Matrix functions generally assume that input as well
   as output operands have compatible shapes.
-  Shape errors are not usually handled (this may change).
+  Some functions return ``GR_DOMAIN`` for matrices with the
+  wrong shape, but this is not always consistent.
 * Some operations (like rank, LU factorization) generally only make
   sense when the base ring is an integral domain.
   Typically the algorithms designed for integral domains also work
@@ -37,8 +34,8 @@ Methods in this module can therefore be mixed freely with
 methods in the corresponding Flint, Arb and Calcium modules
 when the underlying coefficient type is the same.
 
-It is not directly compatible with the ``nmod_mat`` type
-(modulus data is stored as part of the matrix object).
+It is not directly compatible with the ``nmod_mat`` type,
+which stores modulus data as part of the matrix object.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -211,6 +208,7 @@ Basic row, column and entry operations
     This predicate is always decidable (even if the underlying ring
     is not computable), returning ``T_TRUE`` or ``T_FALSE``.
 
+
 Arithmetic
 -------------------------------------------------------------------------------
 
@@ -242,6 +240,28 @@ Arithmetic
 
     Sets *res* to the matrix obtained by evaluating the
     scalar polynomial *poly* with matrix argument *mat*.
+
+Diagonal and triangular matrices
+-------------------------------------------------------------------------------
+
+.. function:: truth_t gr_mat_is_upper_triangular(const gr_mat_t mat, gr_ctx_t ctx)
+              truth_t gr_mat_is_lower_triangular(const gr_mat_t mat, gr_ctx_t ctx)
+
+    Returns whether *mat* is upper (respectively lower) triangular, having
+    zeros everywhere below (respectively above) the main diagonal.
+    The matrix need not be square.
+
+.. function:: truth_t gr_mat_is_diagonal(const gr_mat_t mat, gr_ctx_t ctx)
+
+    Returns whether *mat* is a diagonal matrix, having zeros everywhere
+    except on the main diagonal.
+    The matrix need not be square.
+
+.. function:: int gr_mat_mul_diag(gr_mat_t res, const gr_mat_t A, const gr_vec_t D, gr_ctx_t ctx)
+              int gr_mat_diag_mul(gr_mat_t res, const gr_vec_t D, const gr_mat_t A, gr_ctx_t ctx)
+
+    Set *res* to the product `AD` or `DA` respectively, where `D` is
+    a diagonal matrix represented as a vector of entries.
 
 Gaussian elimination
 -------------------------------------------------------------------------------
@@ -585,6 +605,27 @@ Eigenvalues
 
     The interface is essentially the same as that of
     :func:`gr_poly_roots`; see its documentation for details.
+
+.. function:: int gr_mat_diagonalization_precomp(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A, const gr_vec_t eigenvalues, const gr_vec_t mult, gr_ctx_t ctx)
+              int gr_mat_diagonalization(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A, int flags, gr_ctx_t ctx)
+
+    Computes a diagonalization `LAR = D` given a square matrix `A`,
+    where `D` is a diagonal matrix (returned as a vector) of the eigenvalues
+    repeated according to their multiplicities,
+    `L` is a matrix of left eigenvectors,
+    and `R` is a matrix of right eigenvectors,
+    normalized such that `L = R^{-1}`.
+    This implies that `A = RDL = RDR^{-1}`.
+    Either `L` or `R` (or both) can be set to ``NULL`` to omit computing
+    the respective matrix.
+
+    If the matrix has entries in a field then a return flag
+    of ``GR_DOMAIN`` indicates that the matrix is non-diagonalizable
+    over this field.
+
+    The *precomp* version requires as input a precomputed set of eigenvalues
+    with corresponding multiplicites, which can be computed
+    with :func:`gr_mat_eigenvalues`.
 
 Hessenberg form
 -------------------------------------------------------------------------------

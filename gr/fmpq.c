@@ -740,10 +740,42 @@ _gr_fmpq_poly_mullow(fmpq * res,
 }
 
 int
+_gr_fmpq_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
+{
+    gr_ctx_t ZZ;
+    gr_poly_t f;
+    fmpz_t den;
+    slong len = poly->length;
+
+    if (len == 0)
+        return GR_DOMAIN;
+
+    gr_ctx_init_fmpz(ZZ);
+
+    f->coeffs = _fmpz_vec_init(len);
+    fmpz_init(den);
+
+    _fmpq_vec_get_fmpz_vec_den(f->coeffs, den, poly->coeffs, len);
+    f->length = f->alloc = poly->length;
+
+    GR_MUST_SUCCEED(gr_poly_roots_other(roots, mult, f, ZZ, flags, ctx));
+
+    _fmpz_vec_clear(f->coeffs, len);
+    fmpz_clear(den);
+
+    gr_ctx_clear(ZZ);
+
+    return GR_SUCCESS;
+}
+
+int
 _gr_fmpq_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
 {
     if (poly->length == 0)
         return GR_DOMAIN;
+
+    if (other_ctx->which_ring == GR_CTX_FMPQ)
+        return _gr_fmpq_poly_roots(roots, mult, poly, flags, ctx);
 
     if (other_ctx->which_ring == GR_CTX_FMPZ)
     {
@@ -807,85 +839,6 @@ _gr_fmpq_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, g
 
     return GR_UNABLE;
 }
-
-
-#if 0
-/* integer roots of integer polynomial */
-int
-_gr_fmpz_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const fmpz_poly_t poly, int flags, gr_ctx_t ctx)
-{
-    if (poly->length == 0)
-        return GR_DOMAIN;
-
-    /* normally we need a separate context object for the exponents here,
-       but since the coefficient ring is fmpz, we can use the same object */
-
-    if (poly->length == 1)
-    {
-        gr_vec_set_length(roots, 0, ctx);
-        gr_vec_set_length(mult, 0, ctx);
-    }
-    else if (poly->length == 2)
-    {
-        fmpz_t t;
-        fmpz_init(t);
-        if (fmpz_divides(t, poly->coeffs + 0, poly->coeffs + 1))
-        {
-            gr_vec_set_length(roots, 1, ctx);
-            gr_vec_set_length(mult, 1, ctx);
-
-            fmpz_neg(roots->entries, t);
-            fmpz_one(mult->entries);
-        }
-        else
-        {
-            gr_vec_set_length(roots, 0, ctx);
-            gr_vec_set_length(mult, 0, ctx);
-        }
-    }
-    else
-    {
-        /* todo: better algorithm */
-        fmpz_poly_factor_t fac;
-        slong i, j, num;
-
-        fmpz_poly_factor_init(fac);
-        fmpz_poly_factor(fac, poly);
-
-        num = 0;
-        for (i = 0; i < fac->num; i++)
-            if (fac->p[i].length == 2 && fmpz_is_one(fac->p[i].coeffs + 1))
-                num++;
-
-        gr_vec_set_length(roots, num, ctx);
-        gr_vec_set_length(mult, num, ctx);
-
-        for (i = j = 0; i < fac->num; i++)
-        {
-            if (fac->p[i].length == 2 && fmpz_is_one(fac->p[i].coeffs + 1))
-            {
-                fmpz_swap(((fmpz *) roots->entries) + j, fac->p[i].coeffs);
-                fmpz_set_ui(((fmpz *) mult->entries) + j, fac->exp[i]);
-                j++;
-            }
-        }
-
-        fmpz_poly_factor_clear(fac);
-    }
-
-    return GR_SUCCESS;
-}
-
-int
-_gr_fmpz_roots_gr_poly_other(gr_vec_t roots, gr_vec_t mult, /* const gr_poly_t */ const void * poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
-{
-    if (other_ctx->which_ring == GR_CTX_FMPZ)
-        return _gr_fmpz_roots_gr_poly(roots, mult, poly, flags, ctx);
-
-    return GR_UNABLE;
-}
-
-#endif
 
 int
 _gr_fmpq_mat_mul(fmpq_mat_t res, const fmpq_mat_t x, const fmpq_mat_t y, gr_ctx_t ctx)
@@ -982,6 +935,7 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_CMP,             (gr_funcptr) _gr_fmpq_cmp},
     {GR_METHOD_CMPABS,          (gr_funcptr) _gr_fmpq_cmpabs},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpq_poly_mullow},
+    {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fmpq_poly_roots},
     {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_fmpq_poly_roots_other},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fmpq_mat_mul},
     {GR_METHOD_MAT_DET,         (gr_funcptr) _gr_fmpq_mat_det},

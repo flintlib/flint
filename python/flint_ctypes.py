@@ -1852,6 +1852,47 @@ class gr_mat(gr_elem):
             if status & GR_DOMAIN: raise ValueError
         return res
 
+    def transpose(self):
+        r = self.nrows()
+        c = self.ncols()
+        element_ring = self.parent()._element_ring
+        res = gr_mat(c, r, context=self.parent())
+        status = libgr.gr_mat_transpose(res._ref, self._ref, element_ring._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
+    def is_diagonal(self):
+        """
+        Return whether this matrix is a diagonal matrix.
+        """
+        R = self.parent()._element_ring
+        truth = libgr.gr_mat_is_diagonal(self._ref, R._ref)
+        def op(*args):
+            return truth
+        return gr_elem._unary_predicate(self, op, "is_diagonal")
+
+    def is_upper_triangular(self):
+        """
+        Return whether this matrix is upper triangular.
+        """
+        R = self.parent()._element_ring
+        truth = libgr.gr_mat_is_upper_triangular(self._ref, R._ref)
+        def op(*args):
+            return truth
+        return gr_elem._unary_predicate(self, op, "is_upper_triangular")
+
+    def is_lower_triangular(self):
+        """
+        Return whether this matrix is lower triangular.
+        """
+        R = self.parent()._element_ring
+        truth = libgr.gr_mat_is_lower_triangular(self._ref, R._ref)
+        def op(*args):
+            return truth
+        return gr_elem._unary_predicate(self, op, "is_lower_triangular")
+
     def hessenberg(self, algorithm=None):
         """
         Return this matrix reduced to upper Hessenberg form::
@@ -1880,6 +1921,16 @@ class gr_mat(gr_elem):
             if status & GR_UNABLE: raise NotImplementedError
             if status & GR_DOMAIN: raise ValueError
         return res
+
+    def is_hessenberg(self):
+        """
+        Return whether this matrix is in upper Hessenberg form.
+        """
+        R = self.parent()._element_ring
+        truth = libgr.gr_mat_is_hessenberg(self._ref, R._ref)
+        def op(*args):
+            return truth
+        return gr_elem._unary_predicate(self, op, "is_hessenberg")
 
     def eigenvalues(self, domain=None):
         """
@@ -2109,6 +2160,18 @@ def test_matrix():
     assert A[0,1] == 2
     assert raises(lambda: A[3,4], Exception)
     assert raises(lambda: A.__setitem__((3, 4), 1), Exception)
+
+    MatZZ = Mat(ZZ)
+    A = MatZZ([[1, 2, 3], [0, 4, 5], [0, 0, 6]])
+    assert A.is_upper_triangular()
+    assert not A.is_lower_triangular()
+    assert A.transpose().is_lower_triangular()
+    assert not A.transpose().is_upper_triangular()
+    A = MatZZ([[1, 2, 3], [1, 4, 5], [0, 5, 6]])
+    assert A.is_hessenberg()
+    assert not A.transpose().is_hessenberg()
+    assert not A.is_diagonal()
+    assert MatZZ([[1, 0, 0], [0, 2, 0], [0, 0, 3]]).is_diagonal()
 
 def test_fq():
     Fq = FiniteField_fq(3, 5)
