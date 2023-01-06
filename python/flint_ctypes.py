@@ -1863,6 +1863,16 @@ class gr_mat(gr_elem):
             if status & GR_DOMAIN: raise ValueError
         return res
 
+    def is_scalar(self):
+        """
+        Return whether this matrix is a scalar matrix.
+        """
+        R = self.parent()._element_ring
+        truth = libgr.gr_mat_is_scalar(self._ref, R._ref)
+        def op(*args):
+            return truth
+        return gr_elem._unary_predicate(self, op, "is_scalar")
+
     def is_diagonal(self):
         """
         Return whether this matrix is a diagonal matrix.
@@ -2172,6 +2182,10 @@ def test_matrix():
     assert not A.transpose().is_hessenberg()
     assert not A.is_diagonal()
     assert MatZZ([[1, 0, 0], [0, 2, 0], [0, 0, 3]]).is_diagonal()
+
+    assert not A.is_scalar()
+    assert not MatZZ([[1,0],[0,2]]).is_scalar()
+    assert MatZZ([[1,0],[0,1]]).is_scalar()
 
 def test_fq():
     Fq = FiniteField_fq(3, 5)
