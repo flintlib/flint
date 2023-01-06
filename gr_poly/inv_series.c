@@ -1,4 +1,5 @@
 #include "arb_poly.h"
+#include "gr_vec.h"
 #include "gr_poly.h"
 
 int

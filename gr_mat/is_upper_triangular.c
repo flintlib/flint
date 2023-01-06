@@ -25,18 +25,15 @@ truth_t gr_mat_is_upper_triangular(const gr_mat_t mat, gr_ctx_t ctx)
 
     eq = T_TRUE;
 
-    for (i = 0; i < ar; i++)
+    for (i = 1; i < ar; i++)
     {
-        if (i - 1 > 0)
-        {
-            this_eq = is_zero(GR_MAT_ENTRY(mat, i, 0, sz), i - 1, ctx);
+        this_eq = is_zero(GR_MAT_ENTRY(mat, i, 0, sz), FLINT_MIN(i, ac), ctx);
 
-            if (this_eq == T_FALSE)
-                return T_FALSE;
+        if (this_eq == T_FALSE)
+            return T_FALSE;
 
-            if (this_eq == T_UNKNOWN)
-                eq = T_UNKNOWN;
-        }
+        if (this_eq == T_UNKNOWN)
+            eq = T_UNKNOWN;
     }
 
     return eq;

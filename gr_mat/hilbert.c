@@ -21,6 +21,7 @@ gr_mat_hilbert(gr_mat_t mat, gr_ctx_t ctx)
     R = gr_mat_nrows(mat, ctx);
     C = gr_mat_ncols(mat, ctx);
 
+    /* todo: exploit symmetry */
     for (i = 0; i < R; i++)
     {
         for (j = 0; j < C; j++)

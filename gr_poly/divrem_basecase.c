@@ -11,6 +11,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "gr_vec.h"
 #include "gr_poly.h"
 
 int

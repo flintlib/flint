@@ -137,6 +137,11 @@ Assignment and special values
     Returns whether *mat* respectively is the zero matrix or
     the scalar matrix with 1 or -1 on the main diagonal.
 
+.. function:: truth_t gr_mat_is_scalar(const gr_mat_t mat, gr_ctx_t ctx)
+
+    Returns whether *mat* is a scalar matrix, being a diagonal matrix
+    with identical elements on the main diagonal.
+
 .. function:: int gr_mat_zero(gr_mat_t res, gr_ctx_t ctx)
 
     Sets *res* to the zero matrix.

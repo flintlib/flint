@@ -21,7 +21,6 @@
 #include "flint/fmpz_poly.h"
 #include "flint/fmpq_poly.h"
 #include "gr.h"
-#include "gr_vec.h"
 
 #ifdef __cplusplus
  extern "C" {

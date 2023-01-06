@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "gr_vec.h"
 #include "gr_poly.h"
 
 /* fixme: might return GR_DOMAIN where GR_UNABLE might be more

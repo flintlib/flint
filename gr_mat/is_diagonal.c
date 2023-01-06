@@ -20,16 +20,17 @@ truth_t gr_mat_is_diagonal(const gr_mat_t mat, gr_ctx_t ctx)
     ar = gr_mat_nrows(mat, ctx);
     ac = gr_mat_ncols(mat, ctx);
 
-    if (ar == 0 || ac == 0)
+    if (ar == 0 || ac == 0 || (ar == 1 && ac == 1))
         return T_TRUE;
 
     eq = T_TRUE;
 
     for (i = 0; i < ar; i++)
     {
-        if (i - 1 > 0)
+        /* upper triangular */
+        if (i >= 1)
         {
-            this_eq = is_zero(GR_MAT_ENTRY(mat, i, 0, sz), i - 1, ctx);
+            this_eq = is_zero(GR_MAT_ENTRY(mat, i, 0, sz), FLINT_MIN(i, ac), ctx);
 
             if (this_eq == T_FALSE)
                 return T_FALSE;
@@ -38,7 +39,8 @@ truth_t gr_mat_is_diagonal(const gr_mat_t mat, gr_ctx_t ctx)
                 eq = T_UNKNOWN;
         }
 
-        if (ac - i - 1 > 0)
+        /* lower triangular */
+        if (i < ac - 1)
         {
             this_eq = is_zero(GR_MAT_ENTRY(mat, i, i + 1, sz), ac - i - 1, ctx);
 

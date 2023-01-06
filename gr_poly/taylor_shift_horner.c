@@ -1,3 +1,4 @@
+#include "gr_vec.h"
 #include "gr_poly.h"
 
 /* todo: use vector functions when overlap behavior is guaranteed? */

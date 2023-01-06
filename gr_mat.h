@@ -21,7 +21,6 @@
 #include "flint/fmpz_mat.h"
 #include "flint/fmpq_mat.h"
 #include "gr.h"
-#include "gr_vec.h"
 #include "gr_poly.h"
 
 #ifdef __cplusplus
@@ -269,6 +268,7 @@ WARN_UNUSED_RESULT int gr_mat_eigenvalues_other(gr_vec_t lambda, gr_vec_t mult, 
 WARN_UNUSED_RESULT int gr_mat_diagonalization_precomp(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A, const gr_vec_t eigenvalues, const gr_vec_t mult, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_diagonalization(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A, int flags, gr_ctx_t ctx);
 
+truth_t gr_mat_is_scalar(const gr_mat_t mat, gr_ctx_t ctx);
 truth_t gr_mat_is_diagonal(const gr_mat_t mat, gr_ctx_t ctx);
 truth_t gr_mat_is_lower_triangular(const gr_mat_t mat, gr_ctx_t ctx);
 truth_t gr_mat_is_upper_triangular(const gr_mat_t mat, gr_ctx_t ctx);

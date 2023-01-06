@@ -12,29 +12,30 @@
 #include "gr_mat.h"
 
 truth_t
-gr_mat_is_hessenberg(const gr_mat_t mat, gr_ctx_t ctx)
+gr_mat_is_scalar(const gr_mat_t mat, gr_ctx_t ctx)
 {
-    gr_method_vec_predicate is_zero = GR_VEC_PREDICATE(ctx, VEC_IS_ZERO);
-    slong ar, ac, i, sz = ctx->sizeof_elem;
     truth_t eq, this_eq;
+    slong i, ar, ac, sz;
 
     ar = gr_mat_nrows(mat, ctx);
     ac = gr_mat_ncols(mat, ctx);
 
-    if (ar <= 2 || ac == 0)
-        return T_TRUE;
+    sz = ctx->sizeof_elem;
 
-    eq = T_TRUE;
+    eq = gr_mat_is_diagonal(mat, ctx);
 
-    for (i = 2; i < ar; i++)
+    if (eq != T_FALSE)
     {
-        this_eq = is_zero(GR_MAT_ENTRY(mat, i, 0, sz), FLINT_MIN(i - 1, ac), ctx);
+        for (i = 1; i < FLINT_MIN(ar, ac); i++)
+        {
+            this_eq = gr_equal(GR_MAT_ENTRY(mat, i, i, sz), GR_MAT_ENTRY(mat, 0, 0, sz), ctx);
 
-        if (this_eq == T_FALSE)
-            return T_FALSE;
+            if (this_eq == T_FALSE)
+                return T_FALSE;
 
-        if (this_eq == T_UNKNOWN)
-            eq = T_UNKNOWN;
+            if (this_eq == T_UNKNOWN)
+                eq = T_UNKNOWN;
+        }
     }
 
     return eq;

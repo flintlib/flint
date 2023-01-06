@@ -9,8 +9,10 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "gr_vec.h"
 #include "gr_poly.h"
 
+/* todo: move me */
 int
 gr_dot_other(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx2, gr_ctx_t ctx)
 {

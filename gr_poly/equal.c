@@ -1,3 +1,4 @@
+#include "gr_vec.h"
 #include "gr_poly.h"
 
 truth_t
