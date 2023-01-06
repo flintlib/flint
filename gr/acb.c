@@ -1190,6 +1190,31 @@ _gr_acb_mat_det(acb_t res, const acb_mat_t x, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_acb_mat_diagonalization(gr_vec_t D, acb_mat_t L, acb_mat_t R, const acb_mat_t A, int flags, gr_ctx_t ctx)
+{
+    int status;
+    slong n;
+    acb_mat_t R_approx;
+
+    n = acb_mat_nrows(A);
+
+    if (n != acb_mat_ncols(A))
+        return GR_DOMAIN;
+
+    acb_mat_init(R_approx, n, n);
+
+    gr_vec_fit_length(D, n, ctx);
+
+    acb_mat_approx_eig_qr(D->entries, NULL, R_approx, A, NULL, 0, ACB_CTX_PREC(ctx));
+    status = acb_mat_eig_simple(D->entries, L, R, A, D->entries, R_approx, ACB_CTX_PREC(ctx)) ? GR_SUCCESS : GR_UNABLE;
+
+    acb_mat_clear(R_approx);
+
+    return status;
+}
+
+
 int _acb_methods_initialized = 0;
 
 gr_static_method_table _acb_methods;
@@ -1306,6 +1331,7 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_acb_poly_roots_other},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_acb_mat_mul},
     {GR_METHOD_MAT_DET,         (gr_funcptr) _gr_acb_mat_det},
+    {GR_METHOD_MAT_DIAGONALIZATION,     (gr_funcptr) _gr_acb_mat_diagonalization},
     {0,                         (gr_funcptr) NULL},
 };
 

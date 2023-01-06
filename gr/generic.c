@@ -2202,6 +2202,7 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_MAT_MUL,                 (gr_funcptr) gr_mat_mul_generic},
     {GR_METHOD_MAT_DET,                 (gr_funcptr) gr_mat_det_generic},
     {GR_METHOD_MAT_FIND_NONZERO_PIVOT,  (gr_funcptr) gr_mat_find_nonzero_pivot_generic},
+    {GR_METHOD_MAT_DIAGONALIZATION,     (gr_funcptr) gr_mat_diagonalization_generic},
 
     {0,                                 (gr_funcptr) NULL},
 };

@@ -97,7 +97,7 @@ gr_mat_diagonalization_precomp(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_
 }
 
 int
-gr_mat_diagonalization(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A, int flags, gr_ctx_t ctx)
+gr_mat_diagonalization_generic(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A, int flags, gr_ctx_t ctx)
 {
     int status;
     gr_ctx_t ZZ;
@@ -124,4 +124,10 @@ gr_mat_diagonalization(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A, int
     gr_ctx_clear(ZZ);
 
     return status;
+}
+
+int
+gr_mat_diagonalization(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A, int flags, gr_ctx_t ctx)
+{
+    return GR_MAT_DIAGONALIZATION_OP(ctx, MAT_DIAGONALIZATION)(D, L, R, A, flags, ctx);
 }
