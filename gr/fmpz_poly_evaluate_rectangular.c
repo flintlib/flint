@@ -11,6 +11,7 @@
 
 #include "flint/fmpz_poly.h"
 #include "gr.h"
+#include "gr_vec.h"
 
 int
 _gr_fmpz_poly_evaluate_rectangular(gr_ptr res, const fmpz * poly, slong len, gr_srcptr x, gr_ctx_t ctx)

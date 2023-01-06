@@ -1,4 +1,5 @@
 #include "flint/perm.h"
+#include "flint/fmpz_mat.h"
 #include "gr.h"
 
 #define PERM_N(ctx) (*((ulong *) (ctx)))

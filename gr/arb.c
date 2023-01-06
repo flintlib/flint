@@ -1079,7 +1079,7 @@ _gr_arb_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flag
     for (i = 0; i < poly->length; i++)
         acb_set_arb(tmp->coeffs + i, ((arb_srcptr) poly->coeffs) + i);
     _acb_poly_set_length(tmp, poly->length);
-    status = _gr_acb_poly_roots(roots, mult, tmp, flags, ctx);
+    status = _gr_acb_poly_roots(roots, mult, (gr_poly_struct *) tmp, flags, ctx);
     acb_poly_clear(tmp);
     return status;
 }

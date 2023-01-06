@@ -732,6 +732,40 @@ _fmpz_sub_inline(fmpz_t z, const fmpz_t x, const fmpz_t y)
 }
 
 int
+_gr_fmpz_vec_is_zero(const fmpz * vec, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        if (!fmpz_is_zero(vec + i))
+            return T_FALSE;
+
+    return T_TRUE;
+}
+
+int
+_gr_fmpz_vec_equal(const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+    {
+        fmpz a, b;
+
+        a = vec1[i];
+        b = vec2[i];
+
+        if (a != b)
+        {
+            if (!COEFF_IS_MPZ(a) || !COEFF_IS_MPZ(b) || mpz_cmp(COEFF_TO_PTR(a), COEFF_TO_PTR(b)) != 0)
+                return T_FALSE;
+        }
+    }
+
+    return T_TRUE;
+}
+
+int
 _gr_fmpz_vec_add(fmpz * res, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
@@ -1042,6 +1076,8 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_CSGN,            (gr_funcptr) _gr_fmpz_sgn},
     {GR_METHOD_CMP,             (gr_funcptr) _gr_fmpz_cmp},
     {GR_METHOD_CMPABS,          (gr_funcptr) _gr_fmpz_cmpabs},
+    {GR_METHOD_VEC_IS_ZERO,     (gr_funcptr) _gr_fmpz_vec_is_zero},
+    {GR_METHOD_VEC_EQUAL,       (gr_funcptr) _gr_fmpz_vec_equal},
     {GR_METHOD_VEC_ADD,         (gr_funcptr) _gr_fmpz_vec_add},
     {GR_METHOD_VEC_SUB,         (gr_funcptr) _gr_fmpz_vec_sub},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_fmpz_vec_dot},

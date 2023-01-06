@@ -10,6 +10,7 @@
 #include "flint/fmpz_mat.h"
 #include "flint/fmpq_mat.h"
 #include "gr.h"
+#include "gr_vec.h"
 #include "gr_poly.h"
 
 #ifdef __cplusplus

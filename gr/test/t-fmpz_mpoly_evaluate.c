@@ -11,6 +11,7 @@
 
 #include "flint/fmpz_mpoly.h"
 #include "gr.h"
+#include "gr_vec.h"
 
 int main()
 {

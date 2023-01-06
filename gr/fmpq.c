@@ -619,6 +619,30 @@ _gr_fmpq_cmpabs(int * res, const fmpq_t x, const fmpq_t y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_fmpq_vec_is_zero(const fmpq * vec, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        if (!fmpq_is_zero(vec + i))
+            return T_FALSE;
+
+    return T_TRUE;
+}
+
+int
+_gr_fmpq_vec_equal(const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        if (!fmpz_equal(vec1 + i, vec2 + i))
+            return T_FALSE;
+
+    return T_TRUE;
+}
+
 static int
 _fmpq_vec_is_fmpz_vec(const fmpq * vec, slong len)
 {
@@ -934,6 +958,8 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_CSGN,            (gr_funcptr) _gr_fmpq_sgn},
     {GR_METHOD_CMP,             (gr_funcptr) _gr_fmpq_cmp},
     {GR_METHOD_CMPABS,          (gr_funcptr) _gr_fmpq_cmpabs},
+    {GR_METHOD_VEC_IS_ZERO,     (gr_funcptr) _gr_fmpq_vec_is_zero},
+    {GR_METHOD_VEC_EQUAL,       (gr_funcptr) _gr_fmpq_vec_equal},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpq_poly_mullow},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fmpq_poly_roots},
     {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_fmpq_poly_roots_other},
