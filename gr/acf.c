@@ -1002,6 +1002,93 @@ _gr_acf_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
     }
 }
 
+/* todo: port the qr algorithm to generics; test */
+int
+_gr_acf_mat_diagonalization(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A, int flags, gr_ctx_t ctx)
+{
+    int status;
+    slong n, i, j;
+    acb_mat_t A_acb, /* L_acb, */ R_acb;
+    acb_ptr D_acb;
+
+    n = gr_mat_nrows(A, ctx);
+
+    if (n != gr_mat_ncols(A, ctx))
+        return GR_DOMAIN;
+
+    acb_mat_init(A_acb, n, n);
+
+    for (i = 0; i < n; i++)
+    {
+        for (j = 0; j < n; j++)
+        {
+            arf_set(arb_midref(acb_realref(acb_mat_entry(A_acb, i, j))), acf_realref(((acf_srcptr) A->rows[i]) + j));
+            arf_set(arb_midref(acb_imagref(acb_mat_entry(A_acb, i, j))), acf_imagref(((acf_srcptr) A->rows[i]) + j));
+        }
+    }
+
+    acb_mat_init(R_acb, n, n);
+
+    D_acb = _acb_vec_init(n);
+
+/*
+    if (L != NULL)
+        acb_mat_init(L_acb, n, n);
+*/
+
+    gr_vec_set_length(D, n, ctx);
+
+    status = acb_mat_approx_eig_qr(D_acb, /* L ? L_acb : */ NULL, R_acb, A_acb, NULL, 0, ACF_CTX_PREC(ctx)) ? GR_SUCCESS : GR_UNABLE;
+
+    if (status == GR_SUCCESS)
+    {
+        if (R != NULL)
+        {
+            for (i = 0; i < n; i++)
+            {
+                for (j = 0; j < n; j++)
+                {
+                    arf_set(acf_realref(((acf_ptr) R->rows[i]) + j), arb_midref(acb_realref(acb_mat_entry(R_acb, i, j))));
+                    arf_set(acf_imagref(((acf_ptr) R->rows[i]) + j), arb_midref(acb_imagref(acb_mat_entry(R_acb, i, j))));
+                }
+            }
+        }
+
+/* todo: acb_mat_approx_eig_qr gives us the eigenvectors directly, but they are not scaled to give LR = 1. */
+/*
+        if (L != NULL)
+        {
+            for (i = 0; i < n; i++)
+            {
+                for (j = 0; j < n; j++)
+                {
+                    arf_set(acf_realref(((acf_ptr) L->rows[i]) + j), arb_midref(acb_realref(acb_mat_entry(L_acb, i, j))));
+                    arf_set(acf_imagref(((acf_ptr) L->rows[i]) + j), arb_midref(acb_imagref(acb_mat_entry(L_acb, i, j))));
+                }
+            }
+        }
+*/
+        if (L != NULL)
+        {
+            status = gr_mat_inv(L, R, ctx);
+        }
+
+        for (i = 0; i < n; i++)
+        {
+            arf_set(acb_realref(((acf_ptr) D->entries) + i), arb_midref(acb_realref(D_acb + i)));
+            arf_set(acb_imagref(((acf_ptr) D->entries) + i), arb_midref(acb_imagref(D_acb + i)));
+        }
+    }
+
+    acb_mat_clear(R_acb);
+    acb_mat_clear(A_acb);
+/*
+    if (L != NULL)
+        acb_mat_clear(L_acb);
+*/
+
+    return status;
+}
 
 int _acf_methods_initialized = 0;
 
@@ -1127,6 +1214,8 @@ gr_method_tab_input _acf_methods_input[] =
     {GR_METHOD_MAT_DET,         (gr_funcptr) gr_mat_det_generic_field},
     /* todo */
     {GR_METHOD_MAT_FIND_NONZERO_PIVOT,     (gr_funcptr) gr_mat_find_nonzero_pivot_large_abs},
+
+    {GR_METHOD_MAT_DIAGONALIZATION,     (gr_funcptr) _gr_acf_mat_diagonalization},
 
     {0,                         (gr_funcptr) NULL},
 };

@@ -1824,10 +1824,12 @@ class gr_mat(gr_elem):
             if status & GR_DOMAIN: raise ValueError
         return res
 
-    def charpoly(self, R, algorithm=None):
+    def charpoly(self, R=None, algorithm=None):
         mat_ring = self.parent()
-        poly_ring = R
         element_ring = mat_ring._element_ring
+        poly_ring = R
+        if poly_ring is None:
+            poly_ring = PolynomialRing_gr_poly(element_ring)
         poly_element_ring = poly_ring._coefficient_ring
         assert element_ring is poly_element_ring
         res = poly_ring()
@@ -1982,6 +1984,56 @@ class gr_mat(gr_elem):
             if status & GR_DOMAIN: raise ValueError
         return (roots, mult)
 
+    def diagonalization(self):
+        """
+        Matrix diagonalization: returns (D, L, R) where D is a vector
+        of eigenvalues, LAR = diag(D) and LR = 1.
+
+            >>> A = Mat(QQ)([[1,2],[-1,4]])
+            >>> D, L, R = A.diagonalization()
+            >>> L*A*R
+            [[3, 0],
+            [0, 2]]
+            >>> D
+            [3, 2]
+            >>> L*R
+            [[1, 0],
+            [0, 1]]
+
+            >>> A = Mat(CC)([[1,2],[-1,4]])
+            >>> D, L, R = A.diagonalization()
+            >>> D
+            [([2.00000000000000 +/- 1.86e-15] + [+/- 1.86e-15]*I), ([3.00000000000000 +/- 2.90e-15] + [+/- 1.86e-15]*I)]
+            >>> L*A*R
+            [[([2.00000000000 +/- 1.10e-12] + [+/- 1.08e-12]*I), ([+/- 1.44e-12] + [+/- 1.42e-12]*I)],
+            [([+/- 9.76e-13] + [+/- 9.63e-13]*I), ([3.00000000000 +/- 1.27e-12] + [+/- 1.25e-12]*I)]]
+            >>> L*R
+            [[([1.00000000000 +/- 3.26e-13] + [+/- 3.20e-13]*I), ([+/- 3.72e-13] + [+/- 3.67e-13]*I)],
+            [([+/- 2.77e-13] + [+/- 2.73e-13]*I), ([1.00000000000 +/- 3.17e-13] + [+/- 3.13e-13]*I)]]
+
+            >>> A = Mat(CF)([[1,2],[-1,4]])
+            >>> D, L, R = A.diagonalization()
+            >>> D
+            [2.000000000000000, 3.000000000000000]
+            >>> L*A*R
+            [[2.000000000000000, -8.275113827716402e-16],
+            [0, 3.000000000000000]]
+            >>> L*R
+            [[1.000000000000000, -8.275113803054639e-17],
+            [0, 1.000000000000000]]
+
+        """
+        Rmat = self.parent()
+        C = Rmat._element_ring
+        D = Vec(C)()
+        n = self.nrows()
+        L = gr_mat(n, n, context=self.parent())
+        R = gr_mat(n, n, context=self.parent())
+        status = libgr.gr_mat_diagonalization(D._ref, L._ref, R._ref, self._ref, 0, C._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return (D, L, R)
 
     #def __getitem__(self, i):
     #    pass

@@ -1204,7 +1204,7 @@ _gr_acb_mat_diagonalization(gr_vec_t D, acb_mat_t L, acb_mat_t R, const acb_mat_
 
     acb_mat_init(R_approx, n, n);
 
-    gr_vec_fit_length(D, n, ctx);
+    gr_vec_set_length(D, n, ctx);
 
     acb_mat_approx_eig_qr(D->entries, NULL, R_approx, A, NULL, 0, ACB_CTX_PREC(ctx));
     status = acb_mat_eig_simple(D->entries, L, R, A, D->entries, R_approx, ACB_CTX_PREC(ctx)) ? GR_SUCCESS : GR_UNABLE;

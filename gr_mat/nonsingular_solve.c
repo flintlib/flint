@@ -16,7 +16,7 @@
 int
 gr_mat_nonsingular_solve(gr_mat_t X, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
-    if (gr_ctx_is_field(ctx) == T_TRUE)
+    if (gr_ctx_is_field(ctx) == T_TRUE || gr_ctx_is_exact(ctx) == T_FALSE)
         return gr_mat_nonsingular_solve_lu(X, A, B, ctx);
     else
         return gr_mat_nonsingular_solve_fflu(X, A, B, ctx);
