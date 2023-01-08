@@ -34,8 +34,22 @@ void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)
     {
         fmpz_t t;
         fmpz_init(t);
-        fmpz_randprime(t, state, 2 + n_randint(state, 100), 0);
-        gr_ctx_init_fq(ctx, t, 1 + n_randint(state, 4), NULL);
+
+        switch (n_randint(state, 3))
+        {
+            case 0:
+                fmpz_set_ui(t, n_randtest_prime(state, 0));
+                gr_ctx_init_fq_nmod(ctx, t, 1 + n_randint(state, 4), NULL);
+                break;
+            case 1:
+                fmpz_set_ui(t, n_randprime(state, 4, 0));
+                gr_ctx_init_fq_zech(ctx, t, 1 + n_randint(state, 3), NULL);
+                break;
+            default:
+                fmpz_randprime(t, state, 2 + n_randint(state, 100), 0);
+                gr_ctx_init_fq(ctx, t, 1 + n_randint(state, 4), NULL);
+        }
+
         fmpz_clear(t);
     }
     else if (which < 60)

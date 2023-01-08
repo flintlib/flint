@@ -10,8 +10,10 @@
 */
 
 #include "gr.h"
+#include "gr_vec.h"
 #include "flint/fq.h"
 #include "flint/fq_zech_poly.h"
+#include "flint/fq_zech_poly_factor.h"
 #include "flint/fq_zech_mat.h"
 
 #define FQ_CTX(ring_ctx) ((fq_zech_ctx_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
@@ -320,6 +322,47 @@ _gr_fq_zech_poly_mullow(fq_zech_struct * res,
     return GR_SUCCESS;
 }
 
+/* todo: also need the _other version ... ? */
+/* todo: implement generically */
+
+int
+_gr_fq_zech_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const fq_zech_poly_t poly, int flags, gr_ctx_t ctx)
+{
+    if (poly->length == 0)
+        return GR_DOMAIN;
+
+    {
+        gr_ctx_t ZZ;
+        fq_zech_poly_factor_t fac;
+        slong i, num;
+
+        gr_ctx_init_fmpz(ZZ);
+        fq_zech_poly_factor_init(fac, FQ_CTX(ctx));
+        fq_zech_poly_roots(fac, poly, 1, FQ_CTX(ctx));
+
+        num = fac->num;
+
+        gr_vec_set_length(roots, num, ctx);
+        gr_vec_set_length(mult, num, ZZ);
+
+        for (i = 0; i < num; i++)
+        {
+            fq_zech_neg(gr_vec_entry_ptr(roots, i, ctx), fac->poly[i].coeffs, FQ_CTX(ctx));
+
+            /* work around flint bug: factors can be non-monic */
+            if (!fq_zech_is_one(fac->poly[i].coeffs + 1, FQ_CTX(ctx)))
+                fq_zech_div(gr_vec_entry_ptr(roots, i, ctx), gr_vec_entry_ptr(roots, i, ctx), fac->poly[i].coeffs + 1, FQ_CTX(ctx));
+
+            fmpz_set_ui(((fmpz *) mult->entries) + i, fac->exp[i]);
+        }
+
+        fq_zech_poly_factor_clear(fac, FQ_CTX(ctx));
+        gr_ctx_clear(ZZ);
+    }
+
+    return GR_SUCCESS;
+}
+
 int
 _gr_fq_zech_mat_mul(fq_zech_mat_t res, const fq_zech_mat_t x, const fq_zech_mat_t y, gr_ctx_t ctx)
 {
@@ -391,6 +434,8 @@ gr_method_tab_input _fq_zech_methods_input[] =
     {GR_METHOD_FQ_PTH_ROOT,             (gr_funcptr) _gr_fq_zech_pth_root},
 
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fq_zech_poly_mullow},
+    {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fq_zech_roots_gr_poly},
+
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fq_zech_mat_mul},
     {0,                         (gr_funcptr) NULL},
 };
