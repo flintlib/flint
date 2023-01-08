@@ -82,33 +82,56 @@ int main()
 
             status |= gr_poly_one(g, ctx);
 
-            for (i = 0; i < roots->length; i++)
+            if (gr_ctx_is_integral_domain(ctx) == T_TRUE)
             {
-                /* (x-r) */
-                status |= gr_poly_set_scalar(h, gr_vec_entry_ptr(roots, i, ctx), ctx);
-                status |= gr_poly_neg(h, h, ctx);
-                status |= gr_poly_set_coeff_si(h, 1, 1, ctx);
+                for (i = 0; i < roots->length; i++)
+                {
+                    /* (x-r) */
+                    status |= gr_poly_set_scalar(h, gr_vec_entry_ptr(roots, i, ctx), ctx);
+                    status |= gr_poly_neg(h, h, ctx);
+                    status |= gr_poly_set_coeff_si(h, 1, 1, ctx);
 
-                for (j = 0; j < fmpz_get_si(gr_vec_entry_ptr(mult, i, ZZ)); j++)
-                    status |= gr_poly_mul(g, g, h, ctx);
+                    for (j = 0; j < fmpz_get_si(gr_vec_entry_ptr(mult, i, ZZ)); j++)
+                        status |= gr_poly_mul(g, g, h, ctx);
+                }
+
+                status |= gr_poly_divrem(q, r, f, g, ctx);
+
+                if (status == GR_SUCCESS && gr_poly_is_zero(r, ctx) == T_FALSE)
+                {
+                    flint_printf("FAIL: product of factors does not divide polynomial\n\n");
+                    flint_printf("f = "); gr_poly_print(f, ctx); flint_printf("\n");
+                    flint_printf("g = "); gr_poly_print(g, ctx); flint_printf("\n");
+                    flint_abort();
+                }
+
+                if (status == GR_SUCCESS && init_from_roots && g->length != f->length)
+                {
+                    flint_printf("FAIL: wrong multiplicity for polynomial that splits\n\n");
+                    flint_printf("f = "); gr_poly_print(f, ctx); flint_printf("\n");
+                    flint_printf("g = "); gr_poly_print(g, ctx); flint_printf("\n");
+                    flint_abort();
+                }
             }
-
-            status |= gr_poly_divrem(q, r, f, g, ctx);
-
-            if (status == GR_SUCCESS && gr_poly_is_zero(r, ctx) == T_FALSE)
+            else
             {
-                flint_printf("FAIL: product of factors does not divide polynomial\n\n");
-                flint_printf("f = "); gr_poly_print(f, ctx); flint_printf("\n");
-                flint_printf("g = "); gr_poly_print(g, ctx); flint_printf("\n");
-                flint_abort();
-            }
+                for (i = 0; i < roots->length; i++)
+                {
+                    gr_ptr c = gr_heap_init(ctx);
 
-            if (status == GR_SUCCESS && init_from_roots && g->length != f->length)
-            {
-                flint_printf("FAIL: wrong multiplicity for polynomial that splits\n\n");
-                flint_printf("f = "); gr_poly_print(f, ctx); flint_printf("\n");
-                flint_printf("g = "); gr_poly_print(g, ctx); flint_printf("\n");
-                flint_abort();
+                    status |= gr_poly_evaluate(c, f, gr_vec_entry_ptr(roots, i, ctx), ctx);
+
+                    if (status == GR_SUCCESS && gr_is_zero(c, ctx) == T_FALSE)
+                    {
+                        flint_printf("FAIL: f(r) != 0\n\n");
+                        flint_printf("f = "); gr_poly_print(f, ctx); flint_printf("\n");
+                        flint_printf("r = "); gr_print(gr_vec_entry_ptr(roots, i, ctx), ctx); flint_printf("\n");
+                        flint_printf("r = "); gr_print(c, ctx); flint_printf("\n");
+                        flint_abort();
+                    }
+
+                    gr_heap_clear(c, ctx);
+                }
             }
 
             gr_poly_clear(g, ctx);

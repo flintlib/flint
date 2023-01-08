@@ -10,6 +10,8 @@
 */
 
 #include "gr.h"
+#include "gr_vec.h"
+#include "gr_poly.h"
 
 #define NMOD_CTX_REF(ring_ctx) (((nmod_t *)((ring_ctx))))
 #define NMOD_CTX(ring_ctx) (*NMOD_CTX_REF(ring_ctx))
@@ -107,6 +109,43 @@ _gr_nmod_set_fmpz(ulong * res, const fmpz_t v, const gr_ctx_t ctx)
     nmod_t mod = NMOD_CTX(ctx);
     res[0] = fmpz_get_nmod(v, mod);
     return GR_SUCCESS;
+}
+
+#include "flint/fmpz_mod.h"
+
+/* todo: public interface */
+
+typedef struct
+{
+    fmpz_mod_ctx_struct ctx;
+    truth_t is_prime;
+}
+fmpz_mod_ctx_extended_struct;
+
+#define FMPZ_MOD_CTX(ring_ctx) (&(((fmpz_mod_ctx_extended_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))->ctx))
+
+int
+_gr_nmod_set_other(ulong * res, gr_ptr v, gr_ctx_t v_ctx, const gr_ctx_t ctx)
+{
+    if (v_ctx->which_ring == GR_CTX_NMOD)
+    {
+        if (NMOD_CTX(ctx).n != NMOD_CTX(v_ctx).n)
+            return GR_DOMAIN;
+
+        *res = *((ulong *) v);
+        return GR_SUCCESS;
+    }
+
+    if (v_ctx->which_ring == GR_CTX_FMPZ_MOD)
+    {
+        if (!fmpz_equal_ui(FMPZ_MOD_CTX(v_ctx)->n, NMOD_CTX(ctx).n))
+            return GR_DOMAIN;
+
+        res[0] = fmpz_get_ui(v);
+        return GR_SUCCESS;
+    }
+
+    return GR_UNABLE;
 }
 
 truth_t
@@ -349,6 +388,48 @@ __gr_nmod_vec_dot_rev(ulong * res, const ulong * initial, int subtract, const ul
     return GR_SUCCESS;
 }
 
+int
+_gr_nmod_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
+{
+    if (poly->length == 0)
+        return GR_DOMAIN;
+
+    {
+        gr_poly_t z_poly;
+        gr_vec_t z_roots;
+        gr_ctx_t z_ctx;
+        slong i;
+        int status = GR_SUCCESS;
+
+        fmpz_t t;
+        fmpz_init(t);
+
+        fmpz_set_ui(t, NMOD_CTX(ctx).n);
+
+        gr_ctx_init_fmpz_mod(z_ctx, t);
+        gr_poly_init(z_poly, z_ctx);
+        gr_vec_init(z_roots, 0, z_ctx);
+
+        status |= gr_poly_set_gr_poly_other(z_poly, poly, ctx, z_ctx);
+        status |= gr_poly_roots(z_roots, mult, z_poly, flags, z_ctx);
+
+        if (status == GR_SUCCESS)
+        {
+            gr_vec_set_length(roots, z_roots->length, ctx);
+            for (i = 0; i < z_roots->length; i++)
+                status |= gr_set_other(gr_vec_entry_ptr(roots, i, ctx), gr_vec_entry_ptr(z_roots, i, z_ctx), z_ctx, ctx);
+        }
+
+        gr_poly_clear(z_poly, z_ctx);
+        gr_vec_clear(z_roots, z_ctx);
+        gr_ctx_clear(z_ctx);
+        fmpz_clear(t);
+
+        return status;
+    }
+
+}
+
 int __gr_nmod_methods_initialized = 0;
 
 gr_static_method_table __gr_nmod_methods;
@@ -382,6 +463,7 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_SET_SI,          (gr_funcptr) _gr_nmod_set_si},
     {GR_METHOD_SET_UI,          (gr_funcptr) _gr_nmod_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_nmod_set_fmpz},
+    {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_nmod_set_other},
     {GR_METHOD_NEG,             (gr_funcptr) _gr_nmod_neg},
     {GR_METHOD_ADD,             (gr_funcptr) _gr_nmod_add},
     {GR_METHOD_ADD_SI,          (gr_funcptr) _gr_nmod_add_si},
@@ -398,6 +480,7 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_INV,             (gr_funcptr) _gr_nmod_inv},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) __gr_nmod_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) __gr_nmod_vec_dot_rev},
+    {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_nmod_roots_gr_poly},
     {0,                         (gr_funcptr) NULL},
 };
 

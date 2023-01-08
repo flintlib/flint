@@ -10,8 +10,10 @@
 */
 
 #include "gr.h"
+#include "gr_vec.h"
 #include "flint/fmpz_mod.h"
 #include "flint/fmpz_mod_poly.h"
+#include "flint/fmpz_mod_poly_factor.h"
 #include "flint/fmpz_mod_mat.h"
 
 typedef struct
@@ -117,6 +119,34 @@ _gr_fmpz_mod_set_ui(fmpz_t res, ulong v, const gr_ctx_t ctx)
 {
     fmpz_mod_set_ui(res, v, FMPZ_MOD_CTX(ctx));
     return GR_SUCCESS;
+}
+
+/* todo: public interface */
+#define NMOD_CTX_REF(ring_ctx) (((nmod_t *)((ring_ctx))))
+#define NMOD_CTX(ring_ctx) (*NMOD_CTX_REF(ring_ctx))
+
+int
+_gr_fmpz_mod_set_other(fmpz_t res, gr_ptr v, gr_ctx_t v_ctx, const gr_ctx_t ctx)
+{
+    if (v_ctx->which_ring == GR_CTX_FMPZ_MOD)
+    {
+        if (!fmpz_equal(FMPZ_MOD_CTX(ctx)->n, FMPZ_MOD_CTX(v_ctx)->n))
+            return GR_DOMAIN;
+
+        fmpz_set(res, v);
+        return GR_SUCCESS;
+    }
+
+    if (v_ctx->which_ring == GR_CTX_NMOD)
+    {
+        if (!fmpz_equal_ui(FMPZ_MOD_CTX(ctx)->n, NMOD_CTX(v_ctx).n))
+            return GR_DOMAIN;
+
+        fmpz_set_ui(res, * (ulong *) v);
+        return GR_SUCCESS;
+    }
+
+    return GR_UNABLE;
 }
 
 int
@@ -415,6 +445,79 @@ _gr_fmpz_mod_poly_mullow(fmpz * res,
     return GR_SUCCESS;
 }
 
+/* todo: also need the _other version ... ? */
+/* todo: implement generically */
+
+int
+_gr_fmpz_mod_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const fmpz_mod_poly_t poly, int flags, gr_ctx_t ctx)
+{
+    if (poly->length == 0)
+        return GR_DOMAIN;
+
+    {
+        gr_ctx_t ZZ;
+        fmpz_mod_poly_factor_t fac;
+        slong i, num;
+        int status = GR_SUCCESS;
+
+        gr_ctx_init_fmpz(ZZ);
+
+        fmpz_mod_poly_factor_init(fac, FMPZ_MOD_CTX(ctx));
+
+        if (gr_ctx_is_field(ctx) == T_TRUE)
+        {
+            fmpz_mod_poly_roots(fac, poly, 1, FMPZ_MOD_CTX(ctx));
+        }
+        else
+        {
+            fmpz_factor_t nfac;
+            fmpz_factor_init(nfac);
+            fmpz_factor(nfac, FMPZ_MOD_CTX(ctx)->n);
+
+            /* xxx: be able to pass reasonable limits to fmpz_mod_poly_roots_factored */
+            num = 0;
+            for (i = 0; i < nfac->num; i++)
+                num += nfac->exp[i];
+
+            if (num > 20)
+            {
+                status = GR_UNABLE;
+            }
+            else
+            {
+                if (!fmpz_mod_poly_roots_factored(fac, poly, 1, nfac, FMPZ_MOD_CTX(ctx)))
+                    status = GR_UNABLE;
+            }
+
+            fmpz_factor_clear(nfac);
+        }
+
+        if (status == GR_SUCCESS)
+        {
+            num = fac->num;
+
+            gr_vec_set_length(roots, num, ctx);
+            gr_vec_set_length(mult, num, ZZ);
+
+            for (i = 0; i < num; i++)
+            {
+                fmpz_mod_neg(gr_vec_entry_ptr(roots, i, ctx), fac->poly[i].coeffs, FMPZ_MOD_CTX(ctx));
+
+                /* work around flint bug: factors can be non-monic */
+                if (!fmpz_mod_is_one(fac->poly[i].coeffs + 1, FMPZ_MOD_CTX(ctx)))
+                    status |= _gr_fmpz_mod_div(gr_vec_entry_ptr(roots, i, ctx), gr_vec_entry_ptr(roots, i, ctx), fac->poly[i].coeffs + 1, ctx);
+
+                fmpz_set_ui(((fmpz *) mult->entries) + i, fac->exp[i]);
+            }
+        }
+
+        fmpz_mod_poly_factor_clear(fac, FMPZ_MOD_CTX(ctx));
+        gr_ctx_clear(ZZ);
+
+        return status;
+    }
+}
+
 int
 _gr_fmpz_mod_mat_mul(fmpz_mat_t res, const fmpz_mat_t x, const fmpz_mat_t y, gr_ctx_t ctx)
 {
@@ -466,6 +569,7 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
     {GR_METHOD_SET_SI,          (gr_funcptr) _gr_fmpz_mod_set_si},
     {GR_METHOD_SET_UI,          (gr_funcptr) _gr_fmpz_mod_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_fmpz_mod_set_fmpz},
+    {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_fmpz_mod_set_other},
     {GR_METHOD_NEG,             (gr_funcptr) _gr_fmpz_mod_neg},
     {GR_METHOD_ADD,             (gr_funcptr) _gr_fmpz_mod_add},
     {GR_METHOD_ADD_UI,          (gr_funcptr) _gr_fmpz_mod_add_ui},
@@ -485,6 +589,7 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_fmpz_mod_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_fmpz_mod_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpz_mod_poly_mullow},
+    {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fmpz_mod_roots_gr_poly},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fmpz_mod_mat_mul},
     {0,                         (gr_funcptr) NULL},
 };
