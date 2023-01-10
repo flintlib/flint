@@ -124,6 +124,16 @@ class RFContext(StandardBaseContext):
             x = ctx.R(x)
         return x.gamma()
 
+    # todo:
+    def factorial(ctx, x, prec=0):
+        if not (type(x) is ctx._type and x.parent() is ctx.R):
+            x = ctx.R(x)
+        return (x+1).gamma()
+
+    fac = factorial
+
+    def bernoulli(ctx, n):
+        return ctx.zero.bernoulli(n)
 
     '''
     # Called by SpecialFunctions.__init__()
@@ -138,13 +148,6 @@ class RFContext(StandardBaseContext):
             f_wrapped = f
         f_wrapped.__doc__ = function_docs.__dict__.get(name, f.__doc__)
         setattr(cls, name, f_wrapped)
-
-    def bernoulli(ctx, n):
-        cache = ctx._bernoulli_cache
-        if n in cache:
-            return cache[n]
-        cache[n] = to_float(mpf_bernoulli(n, 53, 'n'), strict=True)
-        return cache[n]
 
     pi = math2.pi
     e = math2.e
@@ -330,6 +333,7 @@ nsum = mp.nsum
 from mpmath2 import *
 mp.dps = 100
 nsum(lambda n: 1/n**2, [1, inf])
+nsum(lambda n: 1/n**2, [1, inf], method='e')
 diff(lambda x: gamma(x), 1)
 quadosc(lambda x: sin(x)/x, [0, inf], omega=1)
 

@@ -26,17 +26,19 @@ gr_acf_ctx;
 #define ACF_CTX_PREC(ring_ctx) (((gr_acf_ctx *)((ring_ctx)))->prec)
 #define ACF_CTX_RND(ring_ctx) (((gr_acf_ctx *)((ring_ctx)))->rnd)
 
-void gr_ctx_acf_set_prec(gr_ctx_t ctx, slong prec)
+int _gr_acf_ctx_set_real_prec(gr_ctx_t ctx, slong prec)
 {
     prec = FLINT_MAX(prec, 2);
     prec = FLINT_MIN(prec, WORD_MAX / 8);
 
     ACF_CTX_PREC(ctx) = prec;
+    return GR_SUCCESS;
 }
 
-slong gr_ctx_acf_get_prec(gr_ctx_t ctx)
+int _gr_acf_ctx_get_real_prec(slong * res, gr_ctx_t ctx)
 {
-    return ACF_CTX_PREC(ctx);
+    *res = ACF_CTX_PREC(ctx);
+    return GR_SUCCESS;
 }
 
 int
@@ -1114,6 +1116,10 @@ gr_method_tab_input _acf_methods_input[] =
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_CANONICAL,
                                 (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_HAS_REAL_PREC, (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_SET_REAL_PREC, (gr_funcptr) _gr_acf_ctx_set_real_prec},
+    {GR_METHOD_CTX_GET_REAL_PREC, (gr_funcptr) _gr_acf_ctx_get_real_prec},
+
     {GR_METHOD_INIT,            (gr_funcptr) _gr_acf_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_acf_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) _gr_acf_swap},
@@ -1227,7 +1233,7 @@ gr_ctx_init_complex_float_acf(gr_ctx_t ctx, slong prec)
     ctx->sizeof_elem = sizeof(acf_struct);
     ctx->size_limit = WORD_MAX;
 
-    gr_ctx_acf_set_prec(ctx, prec);
+    ACF_CTX_PREC(ctx) = FLINT_MAX(2, FLINT_MIN(prec, WORD_MAX / 8));
     ACF_CTX_RND(ctx) = ARF_RND_NEAR;
 
     ctx->methods = _acf_methods;

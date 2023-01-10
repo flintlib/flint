@@ -28,17 +28,19 @@ gr_arb_ctx;
 
 #define ARB_CTX_PREC(ring_ctx) (((gr_arb_ctx *)((ring_ctx)))->prec)
 
-void gr_ctx_arb_set_prec(gr_ctx_t ctx, slong prec)
+int _gr_arb_ctx_set_real_prec(gr_ctx_t ctx, slong prec)
 {
     prec = FLINT_MAX(prec, 2);
     prec = FLINT_MIN(prec, WORD_MAX / 8);
 
     ARB_CTX_PREC(ctx) = prec;
+    return GR_SUCCESS;
 }
 
-slong gr_ctx_arb_get_prec(gr_ctx_t ctx)
+int _gr_arb_ctx_get_real_prec(slong * res, gr_ctx_t ctx)
 {
-    return ARB_CTX_PREC(ctx);
+    *res = ARB_CTX_PREC(ctx);
+    return GR_SUCCESS;
 }
 
 int
@@ -981,6 +983,24 @@ _gr_arb_atan(arb_t res, const arb_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+#include "bernoulli.h"
+
+/* todo: caching, e.g. if (x <= 1000) bernoulli_cache_compute(x + 1); */
+
+int
+_gr_arb_bernoulli_ui(arb_t res, ulong x, const gr_ctx_t ctx)
+{
+    arb_bernoulli_ui(res, x, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_arb_bernoulli_fmpz(arb_t res, const fmpz_t x, const gr_ctx_t ctx)
+{
+    arb_bernoulli_fmpz(res, x, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
 int
 _gr_arb_erf(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
@@ -1222,6 +1242,10 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_CANONICAL,
                                 (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_HAS_REAL_PREC, (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_SET_REAL_PREC, (gr_funcptr) _gr_arb_ctx_set_real_prec},
+    {GR_METHOD_CTX_GET_REAL_PREC, (gr_funcptr) _gr_arb_ctx_get_real_prec},
+
     {GR_METHOD_INIT,            (gr_funcptr) _gr_arb_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_arb_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) _gr_arb_swap},
@@ -1304,6 +1328,8 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_COS,             (gr_funcptr) _gr_arb_cos},
     {GR_METHOD_TAN,             (gr_funcptr) _gr_arb_tan},
     {GR_METHOD_ATAN,            (gr_funcptr) _gr_arb_atan},
+    {GR_METHOD_BERNOULLI_UI,    (gr_funcptr) _gr_arb_bernoulli_ui},
+    {GR_METHOD_BERNOULLI_FMPZ,  (gr_funcptr) _gr_arb_bernoulli_fmpz},
     {GR_METHOD_ERF,             (gr_funcptr) _gr_arb_erf},
     {GR_METHOD_ERFI,            (gr_funcptr) _gr_arb_erfi},
     {GR_METHOD_ERFC,            (gr_funcptr) _gr_arb_erfc},
@@ -1329,8 +1355,7 @@ gr_ctx_init_real_arb(gr_ctx_t ctx, slong prec)
     ctx->sizeof_elem = sizeof(arb_struct);
     ctx->size_limit = WORD_MAX;
 
-    gr_ctx_arb_set_prec(ctx, prec);
-
+    ARB_CTX_PREC(ctx) = FLINT_MAX(2, FLINT_MIN(prec, WORD_MAX / 8));
     ctx->methods = _arb_methods;
 
     if (!_arb_methods_initialized)

@@ -29,6 +29,21 @@ gr_acb_ctx;
 
 #define ACB_CTX_PREC(ring_ctx) (((gr_acb_ctx *)((ring_ctx)))->prec)
 
+int _gr_acb_ctx_set_real_prec(gr_ctx_t ctx, slong prec)
+{
+    prec = FLINT_MAX(prec, 2);
+    prec = FLINT_MIN(prec, WORD_MAX / 8);
+
+    ACB_CTX_PREC(ctx) = prec;
+    return GR_SUCCESS;
+}
+
+int _gr_acb_ctx_get_real_prec(slong * res, gr_ctx_t ctx)
+{
+    *res = ACB_CTX_PREC(ctx);
+    return GR_SUCCESS;
+}
+
 int
 _gr_acb_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
@@ -1241,6 +1256,10 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_CANONICAL,
                                 (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_HAS_REAL_PREC, (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_SET_REAL_PREC, (gr_funcptr) _gr_acb_ctx_set_real_prec},
+    {GR_METHOD_CTX_GET_REAL_PREC, (gr_funcptr) _gr_acb_ctx_get_real_prec},
+
     {GR_METHOD_INIT,            (gr_funcptr) _gr_acb_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_acb_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) _gr_acb_swap},
@@ -1342,8 +1361,7 @@ gr_ctx_init_complex_acb(gr_ctx_t ctx, slong prec)
     ctx->sizeof_elem = sizeof(acb_struct);
     ctx->size_limit = WORD_MAX;
 
-    gr_ctx_arb_set_prec(ctx, prec);
-
+    ACB_CTX_PREC(ctx) = FLINT_MAX(2, FLINT_MIN(prec, WORD_MAX / 8));
     ACB_CTX_PREC(ctx) = prec;
 
     ctx->methods = _acb_methods;

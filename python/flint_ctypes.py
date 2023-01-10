@@ -298,6 +298,18 @@ class gr_ctx:
         if not self._refcount:
             libgr.gr_ctx_clear(self._ref)
 
+    @property
+    def prec(self):
+        p = c_slong()
+        status = libgr.gr_ctx_get_real_prec(ctypes.byref(p), self._ref)
+        assert not status
+        return p.value
+
+    @prec.setter
+    def prec(self, prec):
+        status = libgr.gr_ctx_set_real_prec(self._ref, prec)
+        assert not status
+
     # todo
     def i(self):
         return self().i()
@@ -499,8 +511,8 @@ class gr_elem:
         assert 0 <= y <= UWORD_MAX
         status = op(res._ref, x, y, self._ctx)
         if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for x = {self} over {self.parent()}")
-            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined for x = {self} over {self.parent()}")
+            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for over {self.parent()} for input {x}, {y}")
+            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined over {self.parent()} for input {x}, {y}")
         return res
 
     @staticmethod
@@ -513,8 +525,44 @@ class gr_elem:
         assert not libgr.gr_vec_set_length(res._ref, n, self._ctx)
         status = op(libgr.gr_vec_entry_ptr(res._ref, 0, self._ctx), x, n, self._ctx)
         if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for x = {self} over {self.parent()}")
-            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined for x = {self} over {self.parent()}")
+            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} over {self.parent()} for input {x}, {n}")
+            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined over {self.parent()} for input {x}, {n}")
+        return res
+
+    @staticmethod
+    def _static_op_ui(self, x, op, rstr):
+        elem_type = type(self)
+        res = elem_type(context=self._ctx_python)
+        op.argtypes = (ctypes.c_void_p, c_ulong, ctypes.POINTER(gr_ctx_struct))
+        assert 0 <= x <= UWORD_MAX
+        status = op(res._ref, x, self._ctx)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for over {self.parent()} for input {x}")
+            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined over {self.parent()} for input {x}")
+        return res
+
+    @staticmethod
+    def _static_op_fmpz(self, x, op, rstr):
+        elem_type = type(self)
+        res = elem_type(context=self._ctx_python)
+        status = op(res._ref, x._ref, self._ctx)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for over {self.parent()} for input {x}")
+            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined over {self.parent()} for input {x}")
+        return res
+
+
+    @staticmethod
+    def _static_op_vec_len(self, n, op, rstr):
+        elem_type = type(self)
+        op.argtypes = (ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
+        assert 0 <= n <= WORD_MAX
+        res = Vec(self.parent())()
+        assert not libgr.gr_vec_set_length(res._ref, n, self._ctx)
+        status = op(libgr.gr_vec_entry_ptr(res._ref, 0, self._ctx), n, self._ctx)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} over {self.parent()} for input {n}")
+            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined over {self.parent()} for input {n}")
         return res
 
     @staticmethod
@@ -1114,6 +1162,54 @@ class gr_elem:
     def erfc(self):
         return self._unary_op(self, libgr.gr_erfc, "erfc(x)")
 
+    def bernoulli(self, n):
+        """
+        Bernoulli number.
+
+            >>> QQ().bernoulli(10)
+            5/66
+            >>> RR().bernoulli(10)
+            [0.0757575757575757 +/- 5.97e-17]
+
+            >>> ZZ().bernoulli(0)
+            1
+            >>> ZZ().bernoulli(1)
+            Traceback (most recent call last):
+              ...
+            ValueError: bernoulli(n) is not defined over Integer ring (fmpz) for input 1
+
+        Huge Bernoulli numbers can be computed numerically:
+
+            >>> RR().bernoulli(10**20)
+            [-1.220421181609039e+1876752564973863312289 +/- 4.69e+1876752564973863312273]
+            >>> RF().bernoulli(10**20)
+            -1.220421181609039e+1876752564973863312289
+            >>> QQ().bernoulli(10**20)
+            Traceback (most recent call last):
+              ...
+            NotImplementedError: unable to compute bernoulli(n) for over Rational field (fmpq) for input 100000000000000000000
+
+        """
+        return self._static_op_fmpz(self, ZZ(n), libgr.gr_bernoulli_fmpz, "bernoulli(n)")
+
+    def bernoulli_vec(self, length):
+        """
+        Vector of Bernoulli numbers.
+
+            >>> QQ().bernoulli_vec(12)
+            [1, -1/2, 1/6, 0, -1/30, 0, 1/42, 0, -1/30, 0, 5/66, 0]
+            >>> ca().bernoulli_vec(5)
+            [1, -0.500000 {-1/2}, 0.166667 {1/6}, 0, -0.0333333 {-1/30}]
+            >>> sum(RR().bernoulli_vec(100))
+            [1.127124216595034e+76 +/- 6.74e+60]
+            >>> sum(RF().bernoulli_vec(100))
+            1.127124216595034e+76
+            >>> sum(CC().bernoulli_vec(100))
+            [1.127124216595034e+76 +/- 6.74e+60]
+
+        """
+        return self._static_op_vec_len(self, length, libgr.gr_bernoulli_vec, "bernoulli_vec(length)")
+
     def stirling_s1u(self, n, k):
         """
         Unsigned Stirling number of the first kind.
@@ -1252,14 +1348,7 @@ class RealAlgebraicField_qqbar(gr_ctx):
         self._elem_type = qqbar
 
 class gr_arb_ctx(gr_ctx):
-
-    @property
-    def prec(self):
-        return libgr.gr_ctx_arb_get_prec(self._ref)
-
-    @prec.setter
-    def prec(self, prec):
-        libgr.gr_ctx_arb_set_prec(self._ref, prec)
+    pass
 
 
 class RealField_arb(gr_arb_ctx):
@@ -1407,15 +1496,7 @@ class acb(gr_elem):
         return CC_acb
 
 class gr_arf_ctx(gr_ctx):
-
-    @property
-    def prec(self):
-        return libgr.gr_ctx_arf_get_prec(self._ref)
-
-    @prec.setter
-    def prec(self, prec):
-        libgr.gr_ctx_arf_set_prec(self._ref, prec)
-
+    pass
 
 class RealFloat_arf(gr_arf_ctx):
     def __init__(self, prec=53):

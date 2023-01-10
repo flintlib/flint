@@ -10,9 +10,11 @@
 */
 
 #include "flint/arith.h"
+#include "bernoulli.h"
 #include "gr.h"
 #include "gr_mat.h"
 #include "gr_poly.h"
+#include "gr_special.h"
 
 #define DEBUG_RINGS 0
 
@@ -1270,6 +1272,157 @@ gr_generic_atan(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 }
 
 int
+gr_generic_bernoulli_ui(gr_ptr res, ulong n, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_FMPQ)
+    {
+        if (0 && n <= 1000)
+            bernoulli_cache_compute(n + 1);
+
+        bernoulli_fmpq_ui(res, n);
+        return GR_SUCCESS;
+    }
+    else if (gr_ctx_has_real_prec(ctx) == T_TRUE)  /* compute via arb */
+    {
+        gr_ctx_t RR;
+        arb_t t;
+        slong prec;
+        int status = GR_SUCCESS;
+        GR_MUST_SUCCEED(gr_ctx_get_real_prec(&prec, ctx));
+        gr_ctx_init_real_arb(RR, prec);
+        arb_init(t);
+        status |= gr_bernoulli_ui(t, n, RR);
+        status |= gr_set_other(res, t, RR, ctx);
+        arb_clear(t);
+        gr_ctx_clear(RR);
+        return status;
+    }
+    else        /* compute via fmpq */
+    {
+        int status;
+        fmpq_t t;
+        fmpq_init(t);
+
+        if (0 && n <= 1000)
+            bernoulli_cache_compute(n + 1);
+        bernoulli_fmpq_ui(t, n);
+
+        status = gr_set_fmpq(res, t, ctx);
+        fmpq_clear(t);
+        return status;
+    }
+}
+
+int
+gr_generic_bernoulli_fmpz(gr_ptr res, const fmpz_t n, gr_ctx_t ctx)
+{
+    if (!COEFF_IS_MPZ(*n) && *n >= 0)
+    {
+        return gr_bernoulli_ui(res, *n, ctx);
+    }
+    else if (gr_ctx_has_real_prec(ctx) == T_TRUE)  /* compute via arb */
+    {
+        gr_ctx_t RR;
+        arb_t t;
+        slong prec;
+        int status = GR_SUCCESS;
+        GR_MUST_SUCCEED(gr_ctx_get_real_prec(&prec, ctx));
+        gr_ctx_init_real_arb(RR, prec);
+        arb_init(t);
+        status |= gr_bernoulli_fmpz(t, n, RR);
+        status |= gr_set_other(res, t, RR, ctx);
+        arb_clear(t);
+        gr_ctx_clear(RR);
+        return status;
+    }
+    else
+    {
+        return GR_UNABLE;
+    }
+}
+
+int
+gr_generic_bernoulli_vec(gr_ptr res, slong len, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_FMPQ)
+    {
+        if (0 && len <= 3000)
+        {
+            slong i;
+            bernoulli_cache_compute(len);
+            for (i = 0; i < len; i++)
+                bernoulli_fmpq_ui(((fmpq *) res) + i, i);
+        }
+        else
+        {
+            /* todo: read as many as already cached ... */
+            bernoulli_fmpq_vec_no_cache(res, 0, len);
+        }
+
+        return GR_SUCCESS;
+    }
+
+    if (gr_ctx_has_real_prec(ctx) == T_TRUE)  /* compute numerically via arb */
+    {
+        slong prec;
+        GR_MUST_SUCCEED(gr_ctx_get_real_prec(&prec, ctx));
+
+        if (len > prec)
+        {
+            slong i, sz = ctx->sizeof_elem;
+            int status = GR_SUCCESS;
+            gr_ctx_t RR;
+            arb_t t;
+
+            gr_ctx_init_real_arb(RR, prec);
+
+            arb_init(t);
+            for (i = 0; i < len; i++)
+            {
+                arb_bernoulli_ui(t, i, prec);
+                status |= gr_set_other(GR_ENTRY(res, i, sz), t, RR, ctx);
+            }
+
+            arb_clear(t);
+            gr_ctx_clear(RR);
+
+            return GR_SUCCESS;
+        }
+    }
+
+    /* compute exactly via Q */
+    {
+        int status = GR_SUCCESS;
+        slong i, sz = ctx->sizeof_elem;
+        gr_ctx_t QQ;
+        fmpq * t;
+        gr_ctx_init_fmpq(QQ);
+        GR_TMP_INIT_VEC(t, len, QQ);
+
+        if (0 && len <= 3000)
+        {
+            slong i;
+            bernoulli_cache_compute(len);
+            for (i = 0; i < len; i++)
+                bernoulli_fmpq_ui(t + i, i);
+        }
+        else
+        {
+            /* todo: read as many as already cached ... */
+            bernoulli_fmpq_vec_no_cache(t, 0, len);
+        }
+
+        for (i = 0; i < len && status == GR_SUCCESS; i++)
+            status |= gr_set_fmpq(GR_ENTRY(res, i, sz), t + i, ctx);
+
+        GR_TMP_CLEAR_VEC(t, len, QQ);
+        gr_ctx_clear(QQ);
+        return status;
+    }
+}
+
+
+int
 gr_generic_stirling_s1u_uiui(gr_ptr res, ulong x, ulong y, gr_ctx_t ctx)
 {
     if (ctx->which_ring == GR_CTX_FMPZ)
@@ -2239,6 +2392,10 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_SIN,                     (gr_funcptr) gr_generic_sin},
     {GR_METHOD_COS,                     (gr_funcptr) gr_generic_cos},
     {GR_METHOD_ATAN,                    (gr_funcptr) gr_generic_atan},
+
+    {GR_METHOD_BERNOULLI_UI,            (gr_funcptr) gr_generic_bernoulli_ui},
+    {GR_METHOD_BERNOULLI_FMPZ,          (gr_funcptr) gr_generic_bernoulli_fmpz},
+    {GR_METHOD_BERNOULLI_VEC,           (gr_funcptr) gr_generic_bernoulli_vec},
 
     {GR_METHOD_STIRLING_S1U_UIUI,       (gr_funcptr) gr_generic_stirling_s1u_uiui},
     {GR_METHOD_STIRLING_S1_UIUI,        (gr_funcptr) gr_generic_stirling_s1_uiui},

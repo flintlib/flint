@@ -281,6 +281,18 @@ Domain properties
 
     Returns whether the representation of elements is always canonical.
 
+.. function:: truth_t gr_ctx_has_real_prec(gr_ctx_t ctx)
+
+    Returns whether *ctx* or a base field thereof represents real or complex
+    numbers using finite-precision approximations.
+    This returns ``T_TRUE`` both for floating-point approximate
+    fields and for rigorous fields based on ball or interval arithmetic.
+
+.. function:: int gr_ctx_set_real_prec(gr_ctx_t ctx, slong prec)
+              int gr_ctx_get_real_prec(slong * prec, gr_ctx_t ctx)
+
+    Sets or retrieves the floating-point precision in bits.
+
 Coercions
 ...............................................................................
 

@@ -160,10 +160,14 @@ Combinatorial numbers
 .. function:: int gr_stirling_s1u_uiui(gr_ptr res, ulong x, ulong y, gr_ctx_t ctx)
               int gr_stirling_s1_uiui(gr_ptr res, ulong x, ulong y, gr_ctx_t ctx)
               int gr_stirling_s2_uiui(gr_ptr res, ulong x, ulong y, gr_ctx_t ctx)
+              int gr_stirling_s1u_ui_vec(gr_ptr res, ulong x, slong len, gr_ctx_t ctx)
+              int gr_stirling_s1_ui_vec(gr_ptr res, ulong x, slong len, gr_ctx_t ctx)
+              int gr_stirling_s2_ui_vec(gr_ptr res, ulong x, slong len, gr_ctx_t ctx)
 
     Stirling numbers `S(x,y)`: unsigned of the first kind,
-    signed of the first kind, and second kind.
-
+    signed of the first kind, and second kind. The *vec* versions
+    write the *len* consecutive values `S(x,0), S(x,1), \ldots, S(x, len-1)`
+    to the preallocated vector *res*.
     See also: :func:`gr_mat_stirling` for constructing a matrix
     containing Stirling numbers.
 

@@ -109,6 +109,7 @@ void gr_stream_write_fmpz(gr_stream_t out, const fmpz_t x);
 #define WARN_UNUSED_RESULT __attribute__((warn_unused_result))
 
 #define GR_MUST_SUCCEED(expr) do { if ((expr) != GR_SUCCESS) { flint_printf("GR_MUST_SUCCEED failure: %s", __FILE__); flint_abort(); } } while (0)
+#define GR_IGNORE(expr) do { (void) (expr); } while (0)
 
 typedef void * gr_ptr;
 typedef const void * gr_srcptr;
@@ -153,6 +154,10 @@ typedef enum
     /* context properties represented to the representation */
     GR_METHOD_CTX_IS_EXACT,            /* we have no inexact elements */
     GR_METHOD_CTX_IS_CANONICAL,        /* we have no non-canonical representations */
+
+    GR_METHOD_CTX_HAS_REAL_PREC,
+    GR_METHOD_CTX_SET_REAL_PREC,
+    GR_METHOD_CTX_GET_REAL_PREC,
 
     GR_METHOD_INIT,
     GR_METHOD_CLEAR,
@@ -679,6 +684,8 @@ typedef void ((*gr_method_init_clear_op)(gr_ptr, gr_ctx_ptr));
 typedef void ((*gr_method_swap_op)(gr_ptr, gr_ptr, gr_ctx_ptr));
 typedef int ((*gr_method_ctx)(gr_ctx_ptr));
 typedef truth_t ((*gr_method_ctx_predicate)(gr_ctx_ptr));
+typedef int ((*gr_method_ctx_set_si)(gr_ctx_ptr, slong));
+typedef int ((*gr_method_ctx_get_si)(slong *, gr_ctx_ptr));
 typedef int ((*gr_method_ctx_stream)(gr_stream_t, gr_ctx_ptr));
 typedef int ((*gr_method_stream_in)(gr_stream_t, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_randtest)(gr_ptr, flint_rand_t state, gr_ctx_ptr));
@@ -752,6 +759,8 @@ typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcp
 #define GR_CTX_OP(ctx, NAME) (((gr_method_ctx *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_CTX_STREAM(ctx, NAME) (((gr_method_ctx_stream *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_CTX_PREDICATE(ctx, NAME) (((gr_method_ctx_predicate *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_CTX_SET_SI(ctx, NAME) (((gr_method_ctx_set_si *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_CTX_GET_SI(ctx, NAME) (((gr_method_ctx_get_si *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_STREAM_IN(ctx, NAME) (((gr_method_stream_in *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_RANDTEST(ctx, NAME) (((gr_method_randtest *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_INIT_CLEAR_OP(ctx, NAME) (((gr_method_init_clear_op *) ctx->methods)[GR_METHOD_ ## NAME])
@@ -838,6 +847,10 @@ GR_INLINE truth_t gr_ctx_is_multiplicative_group(gr_ctx_t ctx) { return GR_CTX_P
 
 GR_INLINE truth_t gr_ctx_is_exact(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_EXACT)(ctx); }
 GR_INLINE truth_t gr_ctx_is_canonical(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_CANONICAL)(ctx); }
+
+GR_INLINE truth_t gr_ctx_has_real_prec(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_HAS_REAL_PREC)(ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_ctx_set_real_prec(gr_ctx_t ctx, slong prec) { return GR_CTX_SET_SI(ctx, CTX_SET_REAL_PREC)(ctx, prec); }
+GR_INLINE WARN_UNUSED_RESULT int gr_ctx_get_real_prec(slong * prec, gr_ctx_t ctx) { return GR_CTX_GET_SI(ctx, CTX_GET_REAL_PREC)(prec, ctx); }
 
 GR_INLINE void gr_init(gr_ptr res, gr_ctx_t ctx) { GR_INIT_CLEAR_OP(ctx, INIT)(res, ctx); }
 GR_INLINE void gr_clear(gr_ptr res, gr_ctx_t ctx) { GR_INIT_CLEAR_OP(ctx, CLEAR)(res, ctx); }
@@ -1185,9 +1198,6 @@ void gr_ctx_init_complex_qqbar(gr_ctx_t ctx);
 
 void gr_ctx_init_real_arb(gr_ctx_t ctx, slong prec);
 void gr_ctx_init_complex_acb(gr_ctx_t ctx, slong prec);
-
-void gr_ctx_arb_set_prec(gr_ctx_t ctx, slong prec);
-slong gr_ctx_arb_get_prec(gr_ctx_t ctx);
 
 void gr_ctx_init_real_float_arf(gr_ctx_t ctx, slong prec);
 void gr_ctx_init_complex_float_acf(gr_ctx_t ctx, slong prec);
