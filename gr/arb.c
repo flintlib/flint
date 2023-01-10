@@ -905,6 +905,34 @@ _gr_arb_pi(arb_t res, const gr_ctx_t ctx)
 }
 
 int
+_gr_arb_euler(arb_t res, const gr_ctx_t ctx)
+{
+    arb_const_euler(res, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_arb_catalan(arb_t res, const gr_ctx_t ctx)
+{
+    arb_const_catalan(res, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_arb_khinchin(arb_t res, const gr_ctx_t ctx)
+{
+    arb_const_khinchin(res, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_arb_glaisher(arb_t res, const gr_ctx_t ctx)
+{
+    arb_const_glaisher(res, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
 _gr_arb_exp(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     arb_exp(res, x, ARB_CTX_PREC(ctx));
@@ -926,8 +954,7 @@ _gr_arb_log(arb_t res, const arb_t x, const gr_ctx_t ctx)
     return GR_UNABLE;
 }
 
-int
-_gr_arb_sin(arb_t res, const arb_t x, const gr_ctx_t ctx)
+int _gr_arb_sin(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     arb_sin(res, x, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
@@ -1267,6 +1294,10 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_CMPABS,          (gr_funcptr) _gr_arb_cmpabs},
     {GR_METHOD_I,               (gr_funcptr) gr_not_in_domain},
     {GR_METHOD_PI,              (gr_funcptr) _gr_arb_pi},
+    {GR_METHOD_EULER,           (gr_funcptr) _gr_arb_euler},
+    {GR_METHOD_CATALAN,         (gr_funcptr) _gr_arb_catalan},
+    {GR_METHOD_KHINCHIN,        (gr_funcptr) _gr_arb_khinchin},
+    {GR_METHOD_GLAISHER,        (gr_funcptr) _gr_arb_glaisher},
     {GR_METHOD_EXP,             (gr_funcptr) _gr_arb_exp},
     {GR_METHOD_LOG,             (gr_funcptr) _gr_arb_log},
     {GR_METHOD_SIN,             (gr_funcptr) _gr_arb_sin},

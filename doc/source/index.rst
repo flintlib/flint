@@ -23,6 +23,7 @@ Contents
 
    gr.rst
    gr_domains.rst
+   gr_special.rst
    gr_mat.rst
    gr_poly.rst
    gr_mpoly.rst

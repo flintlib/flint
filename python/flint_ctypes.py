@@ -189,7 +189,6 @@ libgr.gr_get_str.argtypes = (ctypes.POINTER(ctypes.c_char_p), ctypes.c_void_p, c
 libgr.gr_cmp.argtypes = (ctypes.POINTER(ctypes.c_int), ctypes.c_void_p, ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
 libgr.gr_cmpabs.argtypes = (ctypes.POINTER(ctypes.c_int), ctypes.c_void_p, ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
 
-
 libgr.gr_heap_clear.argtypes = (ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
 
 libgr.gr_ctx_init_dirichlet_group.argtypes = (ctypes.POINTER(gr_ctx_struct), c_ulong)
@@ -490,6 +489,33 @@ class gr_elem:
         if _gr_logic == -1: return False
         if _gr_logic == 2: return None
         raise Undecidable(f"unable to decide {rstr} for x = {self}, y = {other} over {self.parent()}")
+
+    @staticmethod
+    def _static_op_uiui(self, x, y, op, rstr):
+        elem_type = type(self)
+        res = elem_type(context=self._ctx_python)
+        op.argtypes = (ctypes.c_void_p, c_ulong, c_ulong, ctypes.POINTER(gr_ctx_struct))
+        assert 0 <= x <= UWORD_MAX
+        assert 0 <= y <= UWORD_MAX
+        status = op(res._ref, x, y, self._ctx)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for x = {self} over {self.parent()}")
+            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined for x = {self} over {self.parent()}")
+        return res
+
+    @staticmethod
+    def _static_op_vec_ui_len(self, x, n, op, rstr):
+        elem_type = type(self)
+        op.argtypes = (ctypes.c_void_p, c_ulong, c_slong, ctypes.POINTER(gr_ctx_struct))
+        assert 0 <= x <= UWORD_MAX
+        assert 0 <= n <= WORD_MAX
+        res = Vec(self.parent())()
+        assert not libgr.gr_vec_set_length(res._ref, n, self._ctx)
+        status = op(libgr.gr_vec_entry_ptr(res._ref, 0, self._ctx), x, n, self._ctx)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for x = {self} over {self.parent()}")
+            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined for x = {self} over {self.parent()}")
+        return res
 
     @staticmethod
     def _unary_op(self, op, rstr):
@@ -903,6 +929,42 @@ class gr_elem:
         """
         return self._constant(self, libgr.gr_pi, "pi")
 
+    def euler(self):
+        """
+        Euler's constant as an element of the same domain as self.
+
+            >>> RR().euler()
+            [0.5772156649015329 +/- 9.00e-17]
+        """
+        return self._constant(self, libgr.gr_euler, "euler")
+
+    def catalan(self):
+        """
+        Catalan's constant as an element of the same domain as self.
+
+            >>> RR().catalan()
+            [0.915965594177219 +/- 1.23e-16]
+        """
+        return self._constant(self, libgr.gr_catalan, "catalan")
+
+    def khinchin(self):
+        """
+        Khinchin's constant as an element of the same domain as self.
+
+            >>> RR().khinchin()
+            [2.685452001065306 +/- 6.82e-16]
+        """
+        return self._constant(self, libgr.gr_khinchin, "khinchin")
+
+    def glaisher(self):
+        """
+        Khinchin's constant as an element of the same domain as self.
+
+            >>> RR().glaisher()
+            [1.282427129100623 +/- 6.02e-16]
+        """
+        return self._constant(self, libgr.gr_glaisher, "glaisher")
+
     def exp(self):
         """
         Exponential function.
@@ -1051,6 +1113,97 @@ class gr_elem:
 
     def erfc(self):
         return self._unary_op(self, libgr.gr_erfc, "erfc(x)")
+
+    def stirling_s1u(self, n, k):
+        """
+        Unsigned Stirling number of the first kind.
+
+            >>> ZZ().stirling_s1u(5, 2)
+            50
+            >>> QQ().stirling_s1u(5, 2)
+            50
+            >>> ZZ().stirling_s1u(50, 21)
+            33187391298039120738041153829116024033357291261862000
+            >>> RR().stirling_s1u(50, 21)
+            [3.318739129803912e+52 +/- 8.66e+36]
+        """
+        return self._static_op_uiui(self, n, k, libgr.gr_stirling_s1u_uiui, "stirling_s1u(n, k)")
+
+    def stirling_s1(self, n, k):
+        """
+        Signed Stirling number of the first kind.
+
+            >>> ZZ().stirling_s1(5, 2)
+            -50
+            >>> QQ().stirling_s1(5, 2)
+            -50
+            >>> RR().stirling_s1(5, 2)
+            -50.00000000000000
+        """
+        return self._static_op_uiui(self, n, k, libgr.gr_stirling_s1_uiui, "stirling_s1(n, k)")
+
+    def stirling_s2(self, n, k):
+        """
+        Stirling number of the second kind.
+
+            >>> ZZ().stirling_s2(5, 2)
+            15
+            >>> QQ().stirling_s2(5, 2)
+            15
+            >>> RR().stirling_s2(5, 2)
+            15.00000000000000
+            >>> RR().stirling_s2(50, 20)
+            [7.59792160686099e+45 +/- 5.27e+30]
+        """
+        return self._static_op_uiui(self, n, k, libgr.gr_stirling_s2_uiui, "stirling_s2(n, k)")
+
+    def stirling_s1u_vec(self, n, length=None):
+        """
+        Vector of unsigned Stirling numbers of the first kind,
+        optionally truncated to specified length.
+
+            >>> ZZ().stirling_s1u_vec(5)
+            [0, 24, 50, 35, 10, 1]
+            >>> QQ().stirling_s1u_vec(5) / 3
+            [0, 8, 50/3, 35/3, 10/3, 1/3]
+            >>> RR().stirling_s1u_vec(5, 3)
+            [0, 24.00000000000000, 50.00000000000000]
+        """
+        if length is None:
+            length = n + 1
+        return self._static_op_vec_ui_len(self, n, length, libgr.gr_stirling_s1u_ui_vec, "stirling_s1u_vec(n, length)")
+
+    def stirling_s1_vec(self, n, length=None):
+        """
+        Vector of signed Stirling numbers of the first kind,
+        optionally truncated to specified length.
+
+            >>> ZZ().stirling_s1_vec(5)
+            [0, 24, -50, 35, -10, 1]
+            >>> QQ().stirling_s1_vec(5) / 3
+            [0, 8, -50/3, 35/3, -10/3, 1/3]
+            >>> RR().stirling_s1_vec(5, 3)
+            [0, 24.00000000000000, -50.00000000000000]
+        """
+        if length is None:
+            length = n + 1
+        return self._static_op_vec_ui_len(self, n, length, libgr.gr_stirling_s1_ui_vec, "stirling_s1_vec(n, length)")
+
+    def stirling_s2_vec(self, n, length=None):
+        """
+        Vector of Stirling numbers of the second kind,
+        optionally truncated to specified length.
+
+            >>> ZZ().stirling_s2_vec(5)
+            [0, 1, 15, 25, 10, 1]
+            >>> QQ().stirling_s2_vec(5) / 3
+            [0, 1/3, 5, 25/3, 10/3, 1/3]
+            >>> RR().stirling_s2_vec(5, 3)
+            [0, 1.000000000000000, 15.00000000000000]
+        """
+        if length is None:
+            length = n + 1
+        return self._static_op_vec_ui_len(self, n, length, libgr.gr_stirling_s2_ui_vec, "stirling_s2_vec(n, length)")
 
     def gamma(self):
         return self._unary_op(self, libgr.gr_gamma, "gamma(x)")

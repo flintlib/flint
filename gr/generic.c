@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "flint/arith.h"
 #include "gr.h"
 #include "gr_mat.h"
 #include "gr_poly.h"
@@ -1268,6 +1269,147 @@ gr_generic_atan(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
     return GR_UNABLE;
 }
 
+int
+gr_generic_stirling_s1u_uiui(gr_ptr res, ulong x, ulong y, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_FMPZ)
+    {
+        arith_stirling_number_1u(res, x, y);
+        return GR_SUCCESS;
+    }
+    else
+    {
+        int status;
+        fmpz_t t;
+        fmpz_init(t);
+        arith_stirling_number_1u(t, x, y);
+        status = gr_set_fmpz(res, t, ctx);
+        fmpz_clear(t);
+        return status;
+    }
+}
+
+int
+gr_generic_stirling_s1_uiui(gr_ptr res, ulong x, ulong y, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_FMPZ)
+    {
+        arith_stirling_number_1(res, x, y);
+        return GR_SUCCESS;
+    }
+    else
+    {
+        int status;
+        fmpz_t t;
+        fmpz_init(t);
+        arith_stirling_number_1(t, x, y);
+        status = gr_set_fmpz(res, t, ctx);
+        fmpz_clear(t);
+        return status;
+    }
+}
+
+int
+gr_generic_stirling_s2_uiui(gr_ptr res, ulong x, ulong y, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_FMPZ)
+    {
+        arith_stirling_number_2(res, x, y);
+        return GR_SUCCESS;
+    }
+    else
+    {
+        int status;
+        fmpz_t t;
+        fmpz_init(t);
+        arith_stirling_number_2(t, x, y);
+        status = gr_set_fmpz(res, t, ctx);
+        fmpz_clear(t);
+        return status;
+    }
+}
+
+int
+gr_generic_stirling_s1u_ui_vec(gr_ptr res, ulong x, slong len, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_FMPZ)
+    {
+        arith_stirling_number_1u_vec(res, x, len);
+        return GR_SUCCESS;
+    }
+    else
+    {
+        int status = GR_SUCCESS;
+        slong i, sz = ctx->sizeof_elem;
+        gr_ctx_t ZZ;
+        fmpz * t;
+        gr_ctx_init_fmpz(ZZ);
+        GR_TMP_INIT_VEC(t, len, ZZ);
+        arith_stirling_number_1u_vec(t, x, len);
+        /* todo: vector method */
+        for (i = 0; i < len; i++)
+            status |= gr_set_fmpz(GR_ENTRY(res, i, sz), t + i, ctx);
+        GR_TMP_CLEAR_VEC(t, len, ZZ);
+        gr_ctx_clear(ZZ);
+        return status;
+    }
+}
+
+int
+gr_generic_stirling_s1_ui_vec(gr_ptr res, ulong x, slong len, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_FMPZ)
+    {
+        arith_stirling_number_1_vec(res, x, len);
+        return GR_SUCCESS;
+    }
+    else
+    {
+        int status = GR_SUCCESS;
+        slong i, sz = ctx->sizeof_elem;
+        gr_ctx_t ZZ;
+        fmpz * t;
+        gr_ctx_init_fmpz(ZZ);
+        GR_TMP_INIT_VEC(t, len, ZZ);
+        arith_stirling_number_1_vec(t, x, len);
+        /* todo: vector method */
+        for (i = 0; i < len; i++)
+            status |= gr_set_fmpz(GR_ENTRY(res, i, sz), t + i, ctx);
+        GR_TMP_CLEAR_VEC(t, len, ZZ);
+        gr_ctx_clear(ZZ);
+        return status;
+    }
+}
+
+int
+gr_generic_stirling_s2_ui_vec(gr_ptr res, ulong x, slong len, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_FMPZ)
+    {
+        arith_stirling_number_2_vec(res, x, len);
+        return GR_SUCCESS;
+    }
+    else
+    {
+        int status = GR_SUCCESS;
+        slong i, sz = ctx->sizeof_elem;
+        gr_ctx_t ZZ;
+        fmpz * t;
+        gr_ctx_init_fmpz(ZZ);
+        GR_TMP_INIT_VEC(t, len, ZZ);
+        arith_stirling_number_2_vec(t, x, len);
+        /* todo: vector method */
+        for (i = 0; i < len; i++)
+            status |= gr_set_fmpz(GR_ENTRY(res, i, sz), t + i, ctx);
+        GR_TMP_CLEAR_VEC(t, len, ZZ);
+        gr_ctx_clear(ZZ);
+        return status;
+    }
+}
+
+
+
+
 
 /* Generic vector functions */
 
@@ -2097,6 +2239,13 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_SIN,                     (gr_funcptr) gr_generic_sin},
     {GR_METHOD_COS,                     (gr_funcptr) gr_generic_cos},
     {GR_METHOD_ATAN,                    (gr_funcptr) gr_generic_atan},
+
+    {GR_METHOD_STIRLING_S1U_UIUI,       (gr_funcptr) gr_generic_stirling_s1u_uiui},
+    {GR_METHOD_STIRLING_S1_UIUI,        (gr_funcptr) gr_generic_stirling_s1_uiui},
+    {GR_METHOD_STIRLING_S2_UIUI,        (gr_funcptr) gr_generic_stirling_s2_uiui},
+    {GR_METHOD_STIRLING_S1U_UI_VEC,     (gr_funcptr) gr_generic_stirling_s1u_ui_vec},
+    {GR_METHOD_STIRLING_S1_UI_VEC,      (gr_funcptr) gr_generic_stirling_s1_ui_vec},
+    {GR_METHOD_STIRLING_S2_UI_VEC,      (gr_funcptr) gr_generic_stirling_s2_ui_vec},
  
     {GR_METHOD_VEC_INIT,                (gr_funcptr) gr_generic_vec_init},
     {GR_METHOD_VEC_CLEAR,               (gr_funcptr) gr_generic_vec_clear},

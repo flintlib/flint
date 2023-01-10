@@ -1,0 +1,234 @@
+.. _gr-special:
+
+**gr_special.h** -- special arithmetic and transcendental functions
+===============================================================================
+
+Mathematical constants
+--------------------------------------------------------------------------------
+
+.. function:: int gr_pi(gr_ptr res, gr_ctx_t ctx)
+              int gr_euler(gr_ptr res, gr_ctx_t ctx)
+              int gr_catalan(gr_ptr res, gr_ctx_t ctx)
+              int gr_khinchin(gr_ptr res, gr_ctx_t ctx)
+              int gr_glaisher(gr_ptr res, gr_ctx_t ctx)
+
+    Standard real constants: `\pi`, Euler's constant `\gamma`,
+    Catalan's constant, Khinchin's constant, Glaisher's constant.
+
+Elementary functions
+--------------------------------------------------------------------------------
+
+.. function:: int gr_exp(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_expm1(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_exp2(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_exp10(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_exp_pi_i(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_log(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_log1p(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_log2(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_log10(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_log_pi_i(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_sin(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_cos(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_sin_cos(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_ctx_t ctx)
+              int gr_tan(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_cot(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_sec(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_csc(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_sin_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_cos_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_sin_cos_pi(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_ctx_t ctx)
+              int gr_tan_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_cot_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_sec_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_csc_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_sinc(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_sinc_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_sinh(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_cosh(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_sinh_cosh(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_ctx_t ctx)
+              int gr_tanh(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_coth(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_sech(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_csch(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_asin(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_acos(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_atan(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_atan2(gr_ptr res, gr_srcptr y, gr_srcptr x, gr_ctx_t ctx)
+              int gr_acot(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_asec(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_acsc(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_asin_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_acos_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_atan_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_acot_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_asec_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_acsc_pi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_asinh(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_acosh(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_atanh(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_acoth(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_asech(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_acsch(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+Factorials and gamma functions
+--------------------------------------------------------------------------------
+
+.. function:: int gr_fac(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_fac_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
+              int gr_fac_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx)
+              int gr_fac_vec(gr_ptr res, slong len, gr_ctx_t ctx)
+
+    Factorial `x!`. The *vec* version writes the first *len*
+    consecutive values `1, 1, 2, 6, \ldots, (len-1)!`
+    to the preallocated vector *res*.
+
+.. function:: int gr_rfac_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
+              int gr_rfac_vec(gr_ptr res, slong len, gr_ctx_t ctx)
+
+    Reciprocal factorial. The *vec* version writes the first *len*
+    consecutive values `1, 1, 1/2, 1/6, \ldots, 1/(len-1)!`
+    to the preallocated vector *res*.
+
+.. function:: int gr_bin(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_bin_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
+              int gr_bin_uiui(gr_ptr res, ulong x, ulong y, gr_ctx_t ctx)
+              int gr_bin_ui_vec(gr_ptr res, ulong x, slong len, gr_ctx_t ctx)
+
+    Binomial coefficient `{x \choose y}`. The *vec* version writes the
+    first *len* consecutive values `{x \choose 0}, {x \choose 1}, \ldots, {x \choose len-1}`
+    to the preallocated vector *res*.
+
+    See also: :func:`gr_mat_pascal` for constructing a matrix
+    containing Pascal's triangle.
+
+.. function:: int gr_rising(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_rising_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
+              int gr_falling(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_falling_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
+
+    Rising and falling factorials `x (x+1) \cdots (x+y-1)`
+    and `x (x-1) \cdots (x-y+1)`, or their generalizations
+    to non-integer `y` via the gamma function.
+
+.. function:: int gr_doublefac_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
+
+    Double factorial `x!!`.
+
+.. function:: int gr_gamma(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_gamma_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx)
+              int gr_gamma_fmpq(gr_ptr res, const fmpq_t x, gr_ctx_t ctx)
+              int gr_rgamma(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_lgamma(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_digamma(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+    Gamma function `\Gamma(x)`, its reciprocal `1 / \Gamma(x)`,
+    the log-gamma function `\log \Gamma(x)`, and the digamma function
+    `\psi(x)`.
+
+.. function:: int gr_beta(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+
+    Beta function `B(x,y)`.
+
+.. function:: int gr_harmonic_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
+
+    Harmonic number `H_x`.
+
+Combinatorial numbers
+--------------------------------------------------------------------------------
+
+
+.. function:: int gr_bernoulli_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
+              int gr_bernoulli_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx)
+              int gr_bernoulli_vec(gr_ptr res, slong len, gr_ctx_t ctx)
+
+.. function:: int gr_fib_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
+              int gr_fib_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx)
+              int gr_fib_vec(gr_ptr res, slong len, gr_ctx_t ctx)
+
+.. function:: int gr_eulernum_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
+              int gr_eulernum_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx)
+              int gr_eulernum_vec(gr_ptr res, slong len, gr_ctx_t ctx)
+
+.. function:: int gr_stirling_s1u_uiui(gr_ptr res, ulong x, ulong y, gr_ctx_t ctx)
+              int gr_stirling_s1_uiui(gr_ptr res, ulong x, ulong y, gr_ctx_t ctx)
+              int gr_stirling_s2_uiui(gr_ptr res, ulong x, ulong y, gr_ctx_t ctx)
+
+    Stirling numbers `S(x,y)`: unsigned of the first kind,
+    signed of the first kind, and second kind.
+
+    See also: :func:`gr_mat_stirling` for constructing a matrix
+    containing Stirling numbers.
+
+.. function:: int gr_bellnum_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
+              int gr_bellnum_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx)
+              int gr_bellnum_vec(gr_ptr res, slong len, gr_ctx_t ctx)
+
+.. function:: int gr_partitions_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
+              int gr_partitions_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx)
+              int gr_partitions_vec(gr_ptr res, slong len, gr_ctx_t ctx)
+
+Error function and exponential integrals
+--------------------------------------------------------------------------------
+
+.. function:: int gr_erf(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_erfc(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_erfcx(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_erfi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_erfinv(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_erfcinv(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_fresnel_s(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_fresnel_c(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_fresnel(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_gamma_upper(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_gamma_lower(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_beta_lower(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_ctx_t ctx)
+
+.. function:: int gr_exp_integral(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_exp_integral_ei(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_sin_integral(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_cos_integral(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_sinh_integral(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_cosh_integral(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_log_integral(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_dilog(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+Orthogonal polynomials
+--------------------------------------------------------------------------------
+
+Bessel and Airy functions
+--------------------------------------------------------------------------------
+
+Hypergeometric functions
+--------------------------------------------------------------------------------
+
+Riemann zeta, polylogarithms and Dirichlet L-functions
+--------------------------------------------------------------------------------
+
+.. function:: int gr_zeta(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_zeta_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
+              int gr_hurwitz_zeta(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_lerch_phi(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_ctx_t ctx)
+              int gr_stieltjes(gr_ptr res, const fmpz_t x, gr_srcptr y, gr_ctx_t ctx)
+
+Elliptic integrals
+--------------------------------------------------------------------------------
+
+Elliptic and modular functions
+--------------------------------------------------------------------------------
+
+
+
+.. raw:: latex
+
+    \newpage
+
