@@ -1002,6 +1002,21 @@ _gr_arb_bernoulli_fmpz(arb_t res, const fmpz_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_arb_eulernum_ui(arb_t res, ulong x, const gr_ctx_t ctx)
+{
+    arb_euler_number_ui(res, x, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_arb_eulernum_fmpz(arb_t res, const fmpz_t x, const gr_ctx_t ctx)
+{
+    arb_euler_number_fmpz(res, x, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+
+int
 _gr_arb_erf(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     arb_hypgeom_erf(res, x, ARB_CTX_PREC(ctx));
@@ -1330,6 +1345,8 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_ATAN,            (gr_funcptr) _gr_arb_atan},
     {GR_METHOD_BERNOULLI_UI,    (gr_funcptr) _gr_arb_bernoulli_ui},
     {GR_METHOD_BERNOULLI_FMPZ,  (gr_funcptr) _gr_arb_bernoulli_fmpz},
+    {GR_METHOD_EULERNUM_UI,     (gr_funcptr) _gr_arb_eulernum_ui},
+    {GR_METHOD_EULERNUM_FMPZ,   (gr_funcptr) _gr_arb_eulernum_fmpz},
     {GR_METHOD_ERF,             (gr_funcptr) _gr_arb_erf},
     {GR_METHOD_ERFI,            (gr_funcptr) _gr_arb_erfi},
     {GR_METHOD_ERFC,            (gr_funcptr) _gr_arb_erfc},

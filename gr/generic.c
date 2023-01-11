@@ -1421,6 +1421,135 @@ gr_generic_bernoulli_vec(gr_ptr res, slong len, gr_ctx_t ctx)
     }
 }
 
+void arb_fmpz_euler_number_ui(fmpz_t res, ulong n);
+
+int
+gr_generic_eulernum_ui(gr_ptr res, ulong n, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_FMPZ)
+    {
+        arb_fmpz_euler_number_ui(res, n);
+        return GR_SUCCESS;
+    }
+    else if (gr_ctx_has_real_prec(ctx) == T_TRUE)  /* compute via arb */
+    {
+        gr_ctx_t RR;
+        arb_t t;
+        slong prec;
+        int status = GR_SUCCESS;
+        GR_MUST_SUCCEED(gr_ctx_get_real_prec(&prec, ctx));
+        gr_ctx_init_real_arb(RR, prec);
+        arb_init(t);
+        status |= gr_eulernum_ui(t, n, RR);
+        status |= gr_set_other(res, t, RR, ctx);
+        arb_clear(t);
+        gr_ctx_clear(RR);
+        return status;
+    }
+    else        /* compute via fmpz */
+    {
+        int status;
+        fmpz_t t;
+        fmpz_init(t);
+        arb_fmpz_euler_number_ui(t, n);
+        status = gr_set_fmpz(res, t, ctx);
+        fmpz_clear(t);
+        return status;
+    }
+}
+
+int
+gr_generic_eulernum_fmpz(gr_ptr res, const fmpz_t n, gr_ctx_t ctx)
+{
+    if (!COEFF_IS_MPZ(*n) && *n >= 0)
+    {
+        return gr_eulernum_ui(res, *n, ctx);
+    }
+    else if (fmpz_sgn(n) < 0)
+    {
+        return GR_DOMAIN;
+    }
+    else if (fmpz_is_odd(n))
+    {
+        return gr_zero(res, ctx);
+    }
+    else if (gr_ctx_has_real_prec(ctx) == T_TRUE)  /* compute via arb */
+    {
+        gr_ctx_t RR;
+        arb_t t;
+        slong prec;
+        int status = GR_SUCCESS;
+        GR_MUST_SUCCEED(gr_ctx_get_real_prec(&prec, ctx));
+        gr_ctx_init_real_arb(RR, prec);
+        arb_init(t);
+        status |= gr_eulernum_fmpz(t, n, RR);
+        status |= gr_set_other(res, t, RR, ctx);
+        arb_clear(t);
+        gr_ctx_clear(RR);
+        return status;
+    }
+    else
+    {
+        return GR_UNABLE;
+    }
+}
+
+int
+gr_generic_eulernum_vec(gr_ptr res, slong len, gr_ctx_t ctx)
+{
+    /* todo: arb based fmpz algorithm similar to bernoulli */
+    if (ctx->which_ring == GR_CTX_FMPZ)
+    {
+        arith_euler_number_vec(res, len);
+        return GR_SUCCESS;
+    }
+
+    if (gr_ctx_has_real_prec(ctx) == T_TRUE)  /* compute numerically via arb */
+    {
+        slong prec;
+        GR_MUST_SUCCEED(gr_ctx_get_real_prec(&prec, ctx));
+
+        if (len > prec)
+        {
+            slong i, sz = ctx->sizeof_elem;
+            int status = GR_SUCCESS;
+            gr_ctx_t RR;
+            arb_t t;
+
+            gr_ctx_init_real_arb(RR, prec);
+
+            arb_init(t);
+            for (i = 0; i < len; i++)
+            {
+                arb_euler_number_ui(t, i, prec);
+                status |= gr_set_other(GR_ENTRY(res, i, sz), t, RR, ctx);
+            }
+
+            arb_clear(t);
+            gr_ctx_clear(RR);
+
+            return GR_SUCCESS;
+        }
+    }
+
+    /* compute exactly via Z */
+    {
+        int status = GR_SUCCESS;
+        slong i, sz = ctx->sizeof_elem;
+        gr_ctx_t ZZ;
+        fmpz * t;
+        gr_ctx_init_fmpq(ZZ);
+        GR_TMP_INIT_VEC(t, len, ZZ);
+
+        arith_euler_number_vec(t, len);
+        for (i = 0; i < len && status == GR_SUCCESS; i++)
+            status |= gr_set_fmpz(GR_ENTRY(res, i, sz), t + i, ctx);
+
+        GR_TMP_CLEAR_VEC(t, len, ZZ);
+        gr_ctx_clear(ZZ);
+        return status;
+    }
+}
 
 int
 gr_generic_stirling_s1u_uiui(gr_ptr res, ulong x, ulong y, gr_ctx_t ctx)
@@ -2396,6 +2525,10 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_BERNOULLI_UI,            (gr_funcptr) gr_generic_bernoulli_ui},
     {GR_METHOD_BERNOULLI_FMPZ,          (gr_funcptr) gr_generic_bernoulli_fmpz},
     {GR_METHOD_BERNOULLI_VEC,           (gr_funcptr) gr_generic_bernoulli_vec},
+
+    {GR_METHOD_EULERNUM_UI,            (gr_funcptr) gr_generic_eulernum_ui},
+    {GR_METHOD_EULERNUM_FMPZ,          (gr_funcptr) gr_generic_eulernum_fmpz},
+    {GR_METHOD_EULERNUM_VEC,           (gr_funcptr) gr_generic_eulernum_vec},
 
     {GR_METHOD_STIRLING_S1U_UIUI,       (gr_funcptr) gr_generic_stirling_s1u_uiui},
     {GR_METHOD_STIRLING_S1_UIUI,        (gr_funcptr) gr_generic_stirling_s1_uiui},

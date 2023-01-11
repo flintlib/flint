@@ -513,6 +513,44 @@ class gr_ctx:
         """
         return ctx._op_vec_len(length, libgr.gr_bernoulli_vec, "bernoulli_vec(length)")
 
+    def eulernum(ctx, n):
+        """
+        Euler number `E_n` as an element of this domain.
+
+            >>> ZZ.eulernum(10)
+            -50521
+            >>> RR.eulernum(10)
+            -50521.00000000000
+
+        Huge Euler numbers can be computed numerically:
+
+            >>> RR.eulernum(10**20)
+            [4.346791453661149e+1936958564106659551331 +/- 8.35e+1936958564106659551315]
+            >>> RF.eulernum(10**20)
+            4.346791453661149e+1936958564106659551331
+            >>> ZZ.eulernum(10**20)
+            Traceback (most recent call last):
+              ...
+            NotImplementedError: unable to compute eulernum(n) for over Integer ring (fmpz) for input 100000000000000000000
+
+        """
+        return ctx._op_fmpz(n, libgr.gr_eulernum_fmpz, "eulernum(n)")
+
+    def eulernum_vec(ctx, length):
+        """
+        Vector of Euler numbers.
+
+            >>> ZZ.eulernum_vec(12)
+            [1, 0, -1, 0, 5, 0, -61, 0, 1385, 0, -50521, 0]
+            >>> QQ.eulernum_vec(12) / 3
+            [1/3, 0, -1/3, 0, 5/3, 0, -61/3, 0, 1385/3, 0, -50521/3, 0]
+            >>> sum(RR.eulernum_vec(100))
+            [-7.23465655613392e+134 +/- 3.20e+119]
+            >>> sum(RF.eulernum_vec(100))
+            -7.234656556133921e+134
+        """
+        return ctx._op_vec_len(length, libgr.gr_eulernum_vec, "eulernum_vec(length)")
+
     def stirling_s1u(ctx, n, k):
         """
         Unsigned Stirling number of the first kind.
