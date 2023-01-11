@@ -310,12 +310,300 @@ class gr_ctx:
         status = libgr.gr_ctx_set_real_prec(self._ref, prec)
         assert not status
 
-    # todo
-    def i(self):
-        return self().i()
+    # constants, sequences etc. with elements in this parent
+    # todo: element shortcuts to allow both RR.pi() and RR().pi()
 
-    def pi(self):
-        return self().pi()
+    @staticmethod
+    def _constant(ctx, op, rstr):
+        res = ctx._elem_type(context=ctx)
+        status = op(res._ref, ctx._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} in {ctx}")
+            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined in {ctx}")
+        return res
+
+    @staticmethod
+    def _as_ui(x):
+        type_x = type(x)
+        if type_x is not int:
+            if type_x is not fmpz:
+                x = ZZ(x)
+            x = int(x)
+        assert 0 <= x <= UWORD_MAX
+        return x
+
+    @staticmethod
+    def _as_si(x):
+        type_x = type(x)
+        if type_x is not int:
+            if type_x is not fmpz:
+                x = ZZ(x)
+            x = int(x)
+        assert WORD_MIN <= x <= WORD_MAX
+        return x
+
+    @staticmethod
+    def _as_fmpz(x):
+        if type(x) is not fmpz:
+            x = ZZ(x)
+        return x
+
+    def _op_fmpz(ctx, x, op, rstr):
+        x = ctx._as_fmpz(x)
+        res = ctx._elem_type(context=ctx)
+        status = op(res._ref, x._ref, ctx._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for over {ctx} for input {x}")
+            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined over {ctx} for input {x}")
+        return res
+
+    def _op_ui(ctx, x, op, rstr):
+        x = ctx._as_ui(x)
+        res = ctx._elem_type(context=ctx)
+        op.argtypes = (ctypes.c_void_p, c_ulong, ctypes.c_void_p)
+        status = op(res._ref, x, ctx._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for over {ctx} for input {x}")
+            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined over {ctx} for input {x}")
+        return res
+
+    def _op_uiui(ctx, x, y, op, rstr):
+        x = ctx._as_ui(x)
+        y = ctx._as_ui(y)
+        res = ctx._elem_type(context=ctx)
+        op.argtypes = (ctypes.c_void_p, c_ulong, c_ulong, ctypes.c_void_p)
+        status = op(res._ref, x, y, ctx._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for over {ctx} for input {x}, {y}")
+            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined over {ctx} for input {x}, {y}")
+        return res
+
+    def _op_vec_len(ctx, n, op, rstr):
+        n = ctx._as_si(n)
+        op.argtypes = (ctypes.c_void_p, c_slong, ctypes.c_void_p)
+        res = Vec(ctx)()
+        assert not libgr.gr_vec_set_length(res._ref, n, ctx._ref)
+        status = op(libgr.gr_vec_entry_ptr(res._ref, 0, ctx._ref), n, ctx._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} over {ctx} for input {n}")
+            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined over {ctx} for input {n}")
+        return res
+
+    def _op_vec_ui_len(ctx, x, n, op, rstr):
+        x = ctx._as_ui(x)
+        n = ctx._as_si(n)
+        op.argtypes = (ctypes.c_void_p, c_ulong, c_slong, ctypes.c_void_p)
+        res = Vec(ctx)()
+        assert not libgr.gr_vec_set_length(res._ref, n, ctx._ref)
+        status = op(libgr.gr_vec_entry_ptr(res._ref, 0, ctx._ref), x, n, ctx._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} over {ctx} for input {x}, {n}")
+            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined over {ctx} for input {x}, {n}")
+        return res
+
+
+    def i(ctx):
+        """
+        Imaginary unit as an element of this domain.
+
+            >>> QQbar.i()
+            Root a = 1.00000*I of a^2+1
+            >>> QQ.i()
+            Traceback (most recent call last):
+              ...
+            ValueError: i is not defined in Rational field (fmpq)
+
+        """
+        return ctx._constant(ctx, libgr.gr_i, "i")
+
+    def pi(ctx):
+        """
+        The number pi as an element of this domain.
+
+            >>> RR.pi()
+            [3.141592653589793 +/- 3.39e-16]
+            >>> QQbar.pi()
+            Traceback (most recent call last):
+              ...
+            ValueError: pi is not defined in Complex algebraic numbers (qqbar)
+        """
+        return ctx._constant(ctx, libgr.gr_pi, "pi")
+
+    def euler(ctx):
+        """
+        Euler's constant as an element of this domain.
+
+            >>> RR.euler()
+            [0.5772156649015329 +/- 9.00e-17]
+        """
+        return ctx._constant(ctx, libgr.gr_euler, "euler")
+
+    def catalan(ctx):
+        """
+        Catalan's constant as an element of this domain.
+
+            >>> RR.catalan()
+            [0.915965594177219 +/- 1.23e-16]
+        """
+        return ctx._constant(ctx, libgr.gr_catalan, "catalan")
+
+    def khinchin(ctx):
+        """
+        Khinchin's constant as an element of this domain.
+
+            >>> RR.khinchin()
+            [2.685452001065306 +/- 6.82e-16]
+        """
+        return ctx._constant(ctx, libgr.gr_khinchin, "khinchin")
+
+    def glaisher(ctx):
+        """
+        Khinchin's constant as an element of this domain.
+
+            >>> RR.glaisher()
+            [1.282427129100623 +/- 6.02e-16]
+        """
+        return ctx._constant(ctx, libgr.gr_glaisher, "glaisher")
+
+    def bernoulli(ctx, n):
+        """
+        Bernoulli number `B_n` as an element of this domain.
+
+            >>> QQ.bernoulli(10)
+            5/66
+            >>> RR.bernoulli(10)
+            [0.0757575757575757 +/- 5.97e-17]
+
+            >>> ZZ.bernoulli(0)
+            1
+            >>> ZZ.bernoulli(1)
+            Traceback (most recent call last):
+              ...
+            ValueError: bernoulli(n) is not defined over Integer ring (fmpz) for input 1
+
+        Huge Bernoulli numbers can be computed numerically:
+
+            >>> RR.bernoulli(10**20)
+            [-1.220421181609039e+1876752564973863312289 +/- 4.69e+1876752564973863312273]
+            >>> RF.bernoulli(10**20)
+            -1.220421181609039e+1876752564973863312289
+            >>> QQ.bernoulli(10**20)
+            Traceback (most recent call last):
+              ...
+            NotImplementedError: unable to compute bernoulli(n) for over Rational field (fmpq) for input 100000000000000000000
+
+        """
+        return ctx._op_fmpz(n, libgr.gr_bernoulli_fmpz, "bernoulli(n)")
+
+    def bernoulli_vec(ctx, length):
+        """
+        Vector of Bernoulli numbers.
+
+            >>> QQ.bernoulli_vec(12)
+            [1, -1/2, 1/6, 0, -1/30, 0, 1/42, 0, -1/30, 0, 5/66, 0]
+            >>> CC_ca.bernoulli_vec(5)
+            [1, -0.500000 {-1/2}, 0.166667 {1/6}, 0, -0.0333333 {-1/30}]
+            >>> sum(RR.bernoulli_vec(100))
+            [1.127124216595034e+76 +/- 6.74e+60]
+            >>> sum(RF.bernoulli_vec(100))
+            1.127124216595034e+76
+            >>> sum(CC.bernoulli_vec(100))
+            [1.127124216595034e+76 +/- 6.74e+60]
+
+        """
+        return ctx._op_vec_len(length, libgr.gr_bernoulli_vec, "bernoulli_vec(length)")
+
+    def stirling_s1u(ctx, n, k):
+        """
+        Unsigned Stirling number of the first kind.
+
+            >>> ZZ.stirling_s1u(5, 2)
+            50
+            >>> QQ.stirling_s1u(5, 2)
+            50
+            >>> ZZ.stirling_s1u(50, 21)
+            33187391298039120738041153829116024033357291261862000
+            >>> RR.stirling_s1u(50, 21)
+            [3.318739129803912e+52 +/- 8.66e+36]
+        """
+        return ctx._op_uiui(n, k, libgr.gr_stirling_s1u_uiui, "stirling_s1u(n, k)")
+
+    def stirling_s1(ctx, n, k):
+        """
+        Signed Stirling number of the first kind.
+
+            >>> ZZ.stirling_s1(5, 2)
+            -50
+            >>> QQ.stirling_s1(5, 2)
+            -50
+            >>> RR.stirling_s1(5, 2)
+            -50.00000000000000
+        """
+        return ctx._op_uiui(n, k, libgr.gr_stirling_s1_uiui, "stirling_s1(n, k)")
+
+    def stirling_s2(ctx, n, k):
+        """
+        Stirling number of the second kind.
+
+            >>> ZZ.stirling_s2(5, 2)
+            15
+            >>> QQ.stirling_s2(5, 2)
+            15
+            >>> RR.stirling_s2(5, 2)
+            15.00000000000000
+            >>> RR.stirling_s2(50, 20)
+            [7.59792160686099e+45 +/- 5.27e+30]
+        """
+        return ctx._op_uiui(n, k, libgr.gr_stirling_s2_uiui, "stirling_s2(n, k)")
+
+    def stirling_s1u_vec(ctx, n, length=None):
+        """
+        Vector of unsigned Stirling numbers of the first kind,
+        optionally truncated to specified length.
+
+            >>> ZZ.stirling_s1u_vec(5)
+            [0, 24, 50, 35, 10, 1]
+            >>> QQ.stirling_s1u_vec(5) / 3
+            [0, 8, 50/3, 35/3, 10/3, 1/3]
+            >>> RR.stirling_s1u_vec(5, 3)
+            [0, 24.00000000000000, 50.00000000000000]
+        """
+        if length is None:
+            length = n + 1
+        return ctx._op_vec_ui_len(n, length, libgr.gr_stirling_s1u_ui_vec, "stirling_s1u_vec(n, length)")
+
+    def stirling_s1_vec(ctx, n, length=None):
+        """
+        Vector of signed Stirling numbers of the first kind,
+        optionally truncated to specified length.
+
+            >>> ZZ.stirling_s1_vec(5)
+            [0, 24, -50, 35, -10, 1]
+            >>> QQ.stirling_s1_vec(5) / 3
+            [0, 8, -50/3, 35/3, -10/3, 1/3]
+            >>> RR.stirling_s1_vec(5, 3)
+            [0, 24.00000000000000, -50.00000000000000]
+        """
+        if length is None:
+            length = n + 1
+        return ctx._op_vec_ui_len(n, length, libgr.gr_stirling_s1_ui_vec, "stirling_s1_vec(n, length)")
+
+    def stirling_s2_vec(ctx, n, length=None):
+        """
+        Vector of Stirling numbers of the second kind,
+        optionally truncated to specified length.
+
+            >>> ZZ.stirling_s2_vec(5)
+            [0, 1, 15, 25, 10, 1]
+            >>> QQ.stirling_s2_vec(5) / 3
+            [0, 1/3, 5, 25/3, 10/3, 1/3]
+            >>> RR.stirling_s2_vec(5, 3)
+            [0, 1.000000000000000, 15.00000000000000]
+        """
+        if length is None:
+            length = n + 1
+        return ctx._op_vec_ui_len(n, length, libgr.gr_stirling_s2_ui_vec, "stirling_s2_vec(n, length)")
+
 
 def _gr_set_int(self, val):
     if WORD_MIN <= val <= WORD_MAX:
@@ -501,69 +789,6 @@ class gr_elem:
         if _gr_logic == -1: return False
         if _gr_logic == 2: return None
         raise Undecidable(f"unable to decide {rstr} for x = {self}, y = {other} over {self.parent()}")
-
-    @staticmethod
-    def _static_op_uiui(self, x, y, op, rstr):
-        elem_type = type(self)
-        res = elem_type(context=self._ctx_python)
-        op.argtypes = (ctypes.c_void_p, c_ulong, c_ulong, ctypes.POINTER(gr_ctx_struct))
-        assert 0 <= x <= UWORD_MAX
-        assert 0 <= y <= UWORD_MAX
-        status = op(res._ref, x, y, self._ctx)
-        if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for over {self.parent()} for input {x}, {y}")
-            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined over {self.parent()} for input {x}, {y}")
-        return res
-
-    @staticmethod
-    def _static_op_vec_ui_len(self, x, n, op, rstr):
-        elem_type = type(self)
-        op.argtypes = (ctypes.c_void_p, c_ulong, c_slong, ctypes.POINTER(gr_ctx_struct))
-        assert 0 <= x <= UWORD_MAX
-        assert 0 <= n <= WORD_MAX
-        res = Vec(self.parent())()
-        assert not libgr.gr_vec_set_length(res._ref, n, self._ctx)
-        status = op(libgr.gr_vec_entry_ptr(res._ref, 0, self._ctx), x, n, self._ctx)
-        if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} over {self.parent()} for input {x}, {n}")
-            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined over {self.parent()} for input {x}, {n}")
-        return res
-
-    @staticmethod
-    def _static_op_ui(self, x, op, rstr):
-        elem_type = type(self)
-        res = elem_type(context=self._ctx_python)
-        op.argtypes = (ctypes.c_void_p, c_ulong, ctypes.POINTER(gr_ctx_struct))
-        assert 0 <= x <= UWORD_MAX
-        status = op(res._ref, x, self._ctx)
-        if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for over {self.parent()} for input {x}")
-            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined over {self.parent()} for input {x}")
-        return res
-
-    @staticmethod
-    def _static_op_fmpz(self, x, op, rstr):
-        elem_type = type(self)
-        res = elem_type(context=self._ctx_python)
-        status = op(res._ref, x._ref, self._ctx)
-        if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for over {self.parent()} for input {x}")
-            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined over {self.parent()} for input {x}")
-        return res
-
-
-    @staticmethod
-    def _static_op_vec_len(self, n, op, rstr):
-        elem_type = type(self)
-        op.argtypes = (ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
-        assert 0 <= n <= WORD_MAX
-        res = Vec(self.parent())()
-        assert not libgr.gr_vec_set_length(res._ref, n, self._ctx)
-        status = op(libgr.gr_vec_entry_ptr(res._ref, 0, self._ctx), n, self._ctx)
-        if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} over {self.parent()} for input {n}")
-            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined over {self.parent()} for input {n}")
-        return res
 
     @staticmethod
     def _unary_op(self, op, rstr):
@@ -874,25 +1099,11 @@ class gr_elem:
     def abs(self):
         return self._unary_op(self, libgr.gr_abs, "abs(x)")
 
-    def i(self):
-        """
-        Imaginary unit as an element of the same domain as self.
-
-            >>> QQbar().i()
-            Root a = 1.00000*I of a^2+1
-            >>> QQ().i()
-            Traceback (most recent call last):
-              ...
-            ValueError: i is not defined in Rational field (fmpq)
-
-        """
-        return self._constant(self, libgr.gr_i, "i")
-
     def conj(self):
         """
         Complex conjugate.
 
-            >>> QQbar().i().conj()
+            >>> QQbar.i().conj()
             Root a = -1.00000*I of a^2+1
             >>> CC(-2).log().conj()
             ([0.693147180559945 +/- 4.12e-16] + [-3.141592653589793 +/- 3.39e-16]*I)
@@ -963,55 +1174,6 @@ class gr_elem:
             ValueError: mul_2exp is not defined for x = 100, y = -3 over Integer ring (fmpz)
         """
         return self._binary_op_fmpz(self, other, libgr.gr_mul_2exp_fmpz, "mul_2exp")
-
-    def pi(self):
-        """
-        The number pi as an element of the same domain as self.
-
-            >>> RR().pi()
-            [3.141592653589793 +/- 3.39e-16]
-            >>> QQbar().pi()
-            Traceback (most recent call last):
-              ...
-            ValueError: pi is not defined in Complex algebraic numbers (qqbar)
-        """
-        return self._constant(self, libgr.gr_pi, "pi")
-
-    def euler(self):
-        """
-        Euler's constant as an element of the same domain as self.
-
-            >>> RR().euler()
-            [0.5772156649015329 +/- 9.00e-17]
-        """
-        return self._constant(self, libgr.gr_euler, "euler")
-
-    def catalan(self):
-        """
-        Catalan's constant as an element of the same domain as self.
-
-            >>> RR().catalan()
-            [0.915965594177219 +/- 1.23e-16]
-        """
-        return self._constant(self, libgr.gr_catalan, "catalan")
-
-    def khinchin(self):
-        """
-        Khinchin's constant as an element of the same domain as self.
-
-            >>> RR().khinchin()
-            [2.685452001065306 +/- 6.82e-16]
-        """
-        return self._constant(self, libgr.gr_khinchin, "khinchin")
-
-    def glaisher(self):
-        """
-        Khinchin's constant as an element of the same domain as self.
-
-            >>> RR().glaisher()
-            [1.282427129100623 +/- 6.02e-16]
-        """
-        return self._constant(self, libgr.gr_glaisher, "glaisher")
 
     def exp(self):
         """
@@ -1161,145 +1323,6 @@ class gr_elem:
 
     def erfc(self):
         return self._unary_op(self, libgr.gr_erfc, "erfc(x)")
-
-    def bernoulli(self, n):
-        """
-        Bernoulli number.
-
-            >>> QQ().bernoulli(10)
-            5/66
-            >>> RR().bernoulli(10)
-            [0.0757575757575757 +/- 5.97e-17]
-
-            >>> ZZ().bernoulli(0)
-            1
-            >>> ZZ().bernoulli(1)
-            Traceback (most recent call last):
-              ...
-            ValueError: bernoulli(n) is not defined over Integer ring (fmpz) for input 1
-
-        Huge Bernoulli numbers can be computed numerically:
-
-            >>> RR().bernoulli(10**20)
-            [-1.220421181609039e+1876752564973863312289 +/- 4.69e+1876752564973863312273]
-            >>> RF().bernoulli(10**20)
-            -1.220421181609039e+1876752564973863312289
-            >>> QQ().bernoulli(10**20)
-            Traceback (most recent call last):
-              ...
-            NotImplementedError: unable to compute bernoulli(n) for over Rational field (fmpq) for input 100000000000000000000
-
-        """
-        return self._static_op_fmpz(self, ZZ(n), libgr.gr_bernoulli_fmpz, "bernoulli(n)")
-
-    def bernoulli_vec(self, length):
-        """
-        Vector of Bernoulli numbers.
-
-            >>> QQ().bernoulli_vec(12)
-            [1, -1/2, 1/6, 0, -1/30, 0, 1/42, 0, -1/30, 0, 5/66, 0]
-            >>> ca().bernoulli_vec(5)
-            [1, -0.500000 {-1/2}, 0.166667 {1/6}, 0, -0.0333333 {-1/30}]
-            >>> sum(RR().bernoulli_vec(100))
-            [1.127124216595034e+76 +/- 6.74e+60]
-            >>> sum(RF().bernoulli_vec(100))
-            1.127124216595034e+76
-            >>> sum(CC().bernoulli_vec(100))
-            [1.127124216595034e+76 +/- 6.74e+60]
-
-        """
-        return self._static_op_vec_len(self, length, libgr.gr_bernoulli_vec, "bernoulli_vec(length)")
-
-    def stirling_s1u(self, n, k):
-        """
-        Unsigned Stirling number of the first kind.
-
-            >>> ZZ().stirling_s1u(5, 2)
-            50
-            >>> QQ().stirling_s1u(5, 2)
-            50
-            >>> ZZ().stirling_s1u(50, 21)
-            33187391298039120738041153829116024033357291261862000
-            >>> RR().stirling_s1u(50, 21)
-            [3.318739129803912e+52 +/- 8.66e+36]
-        """
-        return self._static_op_uiui(self, n, k, libgr.gr_stirling_s1u_uiui, "stirling_s1u(n, k)")
-
-    def stirling_s1(self, n, k):
-        """
-        Signed Stirling number of the first kind.
-
-            >>> ZZ().stirling_s1(5, 2)
-            -50
-            >>> QQ().stirling_s1(5, 2)
-            -50
-            >>> RR().stirling_s1(5, 2)
-            -50.00000000000000
-        """
-        return self._static_op_uiui(self, n, k, libgr.gr_stirling_s1_uiui, "stirling_s1(n, k)")
-
-    def stirling_s2(self, n, k):
-        """
-        Stirling number of the second kind.
-
-            >>> ZZ().stirling_s2(5, 2)
-            15
-            >>> QQ().stirling_s2(5, 2)
-            15
-            >>> RR().stirling_s2(5, 2)
-            15.00000000000000
-            >>> RR().stirling_s2(50, 20)
-            [7.59792160686099e+45 +/- 5.27e+30]
-        """
-        return self._static_op_uiui(self, n, k, libgr.gr_stirling_s2_uiui, "stirling_s2(n, k)")
-
-    def stirling_s1u_vec(self, n, length=None):
-        """
-        Vector of unsigned Stirling numbers of the first kind,
-        optionally truncated to specified length.
-
-            >>> ZZ().stirling_s1u_vec(5)
-            [0, 24, 50, 35, 10, 1]
-            >>> QQ().stirling_s1u_vec(5) / 3
-            [0, 8, 50/3, 35/3, 10/3, 1/3]
-            >>> RR().stirling_s1u_vec(5, 3)
-            [0, 24.00000000000000, 50.00000000000000]
-        """
-        if length is None:
-            length = n + 1
-        return self._static_op_vec_ui_len(self, n, length, libgr.gr_stirling_s1u_ui_vec, "stirling_s1u_vec(n, length)")
-
-    def stirling_s1_vec(self, n, length=None):
-        """
-        Vector of signed Stirling numbers of the first kind,
-        optionally truncated to specified length.
-
-            >>> ZZ().stirling_s1_vec(5)
-            [0, 24, -50, 35, -10, 1]
-            >>> QQ().stirling_s1_vec(5) / 3
-            [0, 8, -50/3, 35/3, -10/3, 1/3]
-            >>> RR().stirling_s1_vec(5, 3)
-            [0, 24.00000000000000, -50.00000000000000]
-        """
-        if length is None:
-            length = n + 1
-        return self._static_op_vec_ui_len(self, n, length, libgr.gr_stirling_s1_ui_vec, "stirling_s1_vec(n, length)")
-
-    def stirling_s2_vec(self, n, length=None):
-        """
-        Vector of Stirling numbers of the second kind,
-        optionally truncated to specified length.
-
-            >>> ZZ().stirling_s2_vec(5)
-            [0, 1, 15, 25, 10, 1]
-            >>> QQ().stirling_s2_vec(5) / 3
-            [0, 1/3, 5, 25/3, 10/3, 1/3]
-            >>> RR().stirling_s2_vec(5, 3)
-            [0, 1.000000000000000, 15.00000000000000]
-        """
-        if length is None:
-            length = n + 1
-        return self._static_op_vec_ui_len(self, n, length, libgr.gr_stirling_s2_ui_vec, "stirling_s2_vec(n, length)")
 
     def gamma(self):
         return self._unary_op(self, libgr.gr_gamma, "gamma(x)")
@@ -2280,6 +2303,7 @@ libgr.gr_mat_entry_ptr.restype = ctypes.POINTER(ctypes.c_char)
 libgr.gr_vec_entry_ptr.restype = ctypes.POINTER(ctypes.c_char)
 
 
+# todo singleton/cached domains (also for matrices, etc...)
 class Vec(gr_ctx):
     """
     Parent class for vector domains.
@@ -2509,7 +2533,7 @@ def test_floor_ceil_trunc_nint():
         assert (x+2).nint() == 4
 
     for R in [QQbar, QQbar_ca, CC, CC_ca]:
-        x = R(3) / 2 + R().i()
+        x = R(3) / 2 + R.i()
         assert x.floor() == 1
         assert x.ceil() == 2
         assert x.trunc() == 1

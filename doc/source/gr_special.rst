@@ -105,9 +105,9 @@ Factorials and gamma functions
     Binomial coefficient `{x \choose y}`. The *vec* version writes the
     first *len* consecutive values `{x \choose 0}, {x \choose 1}, \ldots, {x \choose len-1}`
     to the preallocated vector *res*.
-
-    See also: :func:`gr_mat_pascal` for constructing a matrix
-    containing Pascal's triangle.
+    For constructing a two-dimensional array of binomial
+    coefficients (Pascal's triangle), it is more efficient to
+    call :func:`gr_mat_pascal` than to call these functions repeatedly.
 
 .. function:: int gr_rising(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
               int gr_rising_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
@@ -144,18 +144,27 @@ Factorials and gamma functions
 Combinatorial numbers
 --------------------------------------------------------------------------------
 
+The *vec* version of functions for number sequences `c_n` write the *len*
+consecutive values `c_0, c_1, \ldots, c_{len-1}` to the preallocated
+vector *res*.
 
-.. function:: int gr_bernoulli_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
-              int gr_bernoulli_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx)
+.. function:: int gr_bernoulli_ui(gr_ptr res, ulong n, gr_ctx_t ctx)
+              int gr_bernoulli_fmpz(gr_ptr res, const fmpz_t n, gr_ctx_t ctx)
               int gr_bernoulli_vec(gr_ptr res, slong len, gr_ctx_t ctx)
 
-.. function:: int gr_fib_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
-              int gr_fib_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx)
-              int gr_fib_vec(gr_ptr res, slong len, gr_ctx_t ctx)
+    Bernoulli numbers `B_n`.
 
 .. function:: int gr_eulernum_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
               int gr_eulernum_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx)
               int gr_eulernum_vec(gr_ptr res, slong len, gr_ctx_t ctx)
+
+    Euler numbers `E_n`.
+
+.. function:: int gr_fib_ui(gr_ptr res, ulong n, gr_ctx_t ctx)
+              int gr_fib_fmpz(gr_ptr res, const fmpz_t n, gr_ctx_t ctx)
+              int gr_fib_vec(gr_ptr res, slong len, gr_ctx_t ctx)
+
+    Fibonacci numbers `F_n`.
 
 .. function:: int gr_stirling_s1u_uiui(gr_ptr res, ulong x, ulong y, gr_ctx_t ctx)
               int gr_stirling_s1_uiui(gr_ptr res, ulong x, ulong y, gr_ctx_t ctx)
@@ -168,16 +177,21 @@ Combinatorial numbers
     signed of the first kind, and second kind. The *vec* versions
     write the *len* consecutive values `S(x,0), S(x,1), \ldots, S(x, len-1)`
     to the preallocated vector *res*.
-    See also: :func:`gr_mat_stirling` for constructing a matrix
-    containing Stirling numbers.
+    For constructing a two-dimensional array of Stirling numbers,
+    it is more efficient to
+    call :func:`gr_mat_stirling` than to call these functions repeatedly.
 
 .. function:: int gr_bellnum_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
               int gr_bellnum_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx)
               int gr_bellnum_vec(gr_ptr res, slong len, gr_ctx_t ctx)
 
+    Bell numbers `B_n`.
+
 .. function:: int gr_partitions_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
               int gr_partitions_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx)
               int gr_partitions_vec(gr_ptr res, slong len, gr_ctx_t ctx)
+
+    Partition numbers `p(n)`.
 
 Error function and exponential integrals
 --------------------------------------------------------------------------------
