@@ -360,6 +360,27 @@ class gr_ctx:
             x = ZZ(x)
         return x
 
+    def _unary_op(ctx, x, op, rstr):
+        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
+            x = ctx(x)
+        res = ctx._elem_type(context=ctx)
+        status = op(res._ref, x._ref, ctx._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} over {ctx} for input {x}")
+            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined {ctx} for input {x}")
+        return res
+
+    def _binary_op_fmpz(ctx, x, y, op, rstr):
+        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
+            x = ctx(x)
+        y = ctx._as_fmpz(y)
+        res = ctx._elem_type(context=ctx)
+        status = op(res._ref, x._ref, y._ref, ctx._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for over {ctx} for input {x}, {y}")
+            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined over {ctx} for input {x}, {y}")
+        return res
+
     def _op_fmpz(ctx, x, op, rstr):
         x = ctx._as_fmpz(x)
         res = ctx._elem_type(context=ctx)
@@ -412,7 +433,6 @@ class gr_ctx:
             if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} over {ctx} for input {x}, {n}")
             if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined over {ctx} for input {x}, {n}")
         return res
-
 
     def i(ctx):
         """
@@ -476,6 +496,141 @@ class gr_ctx:
             [1.282427129100623 +/- 6.02e-16]
         """
         return ctx._constant(ctx, libgr.gr_glaisher, "glaisher")
+
+    def inv(ctx, x):
+        return ctx._unary_op(x, libgr.gr_inv, "inv(x)")
+
+    def sqrt(ctx, x):
+        return ctx._unary_op(x, libgr.gr_sqrt, "sqrt(x)")
+
+    def rsqrt(ctx, x):
+        return ctx._unary_op(x, libgr.gr_rsqrt, "rsqrt(x)")
+
+    def floor(ctx, x):
+        return ctx._unary_op(x, libgr.gr_floor, "floor(x)")
+
+    def ceil(ctx, x):
+        return ctx._unary_op(x, libgr.gr_ceil, "ceil(x)")
+
+    def trunc(ctx, x):
+        return ctx._unary_op(x, libgr.gr_trunc, "trunc(x)")
+
+    def nint(ctx, x):
+        return ctx._unary_op(x, libgr.gr_nint, "nint(x)")
+
+    def abs(ctx, x):
+        return ctx._unary_op(x, libgr.gr_abs, "abs(x)")
+
+    def conj(ctx, x):
+        return ctx._unary_op(x, libgr.gr_conj, "conj(x)")
+
+    def re(ctx, x):
+        return ctx._unary_op(x, libgr.gr_re, "re(x)")
+
+    def im(ctx, x):
+        return ctx._unary_op(x, libgr.gr_im, "im(x)")
+
+    def sgn(ctx, x):
+        return ctx._unary_op(x, libgr.gr_sgn, "sgn(x)")
+
+    def csgn(ctx, x):
+        return ctx._unary_op(x, libgr.gr_csgn, "csgn(x)")
+
+    def mul_2exp(ctx, x, y):
+        return ctx._binary_op_fmpz(x, y, libgr.gr_mul_2exp_fmpz, "mul_2exp(x, y)")
+
+    def exp(ctx, x):
+        return ctx._unary_op(x, libgr.gr_exp, "exp(x)")
+
+    def log(ctx, x):
+        return ctx._unary_op(x, libgr.gr_log, "log(x)")
+
+    def sin(ctx, x):
+        return ctx._unary_op(x, libgr.gr_sin, "sin(x)")
+
+    def cos(ctx, x):
+        return ctx._unary_op(x, libgr.gr_cos, "cos(x)")
+
+    def tan(ctx, x):
+        return ctx._unary_op(x, libgr.gr_tan, "tan(x)")
+
+    def sinh(ctx, x):
+        return ctx._unary_op(x, libgr.gr_sinh, "sinh(x)")
+
+    def cosh(ctx, x):
+        return ctx._unary_op(x, libgr.gr_cosh, "cosh(x)")
+
+    def tanh(ctx, x):
+        return ctx._unary_op(x, libgr.gr_tanh, "tanh(x)")
+
+    def atan(ctx, x):
+        return ctx._unary_op(x, libgr.gr_atan, "atan(x)")
+
+    def exp_pi_i(ctx, x):
+        return ctx._unary_op(x, libgr.gr_exp_pi_i, "exp_pi_i(x)")
+
+    def log_pi_i(ctx, x):
+        return ctx._unary_op(x, libgr.gr_log_pi_i, "log_pi_i(x)")
+
+    def sin_pi(ctx, x):
+        return ctx._unary_op(x, libgr.gr_sin_pi, "sin_pi(x)")
+
+    def cos_pi(ctx, x):
+        return ctx._unary_op(x, libgr.gr_cos_pi, "cos_pi(x)")
+
+    def tan_pi(ctx, x):
+        return ctx._unary_op(x, libgr.gr_tan_pi, "tan_pi(x)")
+
+    def cot_pi(ctx, x):
+        return ctx._unary_op(x, libgr.gr_cot_pi, "cot_pi(x)")
+
+    def sec_pi(ctx, x):
+        return ctx._unary_op(x, libgr.gr_sec_pi, "sec_pi(x)")
+
+    def csc_pi(ctx, x):
+        return ctx._unary_op(x, libgr.gr_csc_pi, "csc_pi(x)")
+
+    def asin_pi(ctx, x):
+        return ctx._unary_op(x, libgr.gr_asin_pi, "asin_pi(x)")
+
+    def acos_pi(ctx, x):
+        return ctx._unary_op(x, libgr.gr_acos_pi, "acos_pi(x)")
+
+    def atan_pi(ctx, x):
+        return ctx._unary_op(x, libgr.gr_atan_pi, "atan_pi(x)")
+
+    def acot_pi(ctx, x):
+        return ctx._unary_op(x, libgr.gr_acot_pi, "acot_pi(x)")
+
+    def asec_pi(ctx, x):
+        return ctx._unary_op(x, libgr.gr_asec_pi, "asec_pi(x)")
+
+    def acsc_pi(ctx, x):
+        return ctx._unary_op(x, libgr.gr_acsc_pi, "acsc_pi(x)")
+
+    def erf(ctx, x):
+        return ctx._unary_op(x, libgr.gr_erf, "erf(x)")
+
+    def erfi(ctx, x):
+        return ctx._unary_op(x, libgr.gr_erfi, "erfi(x)")
+
+    def erfc(ctx, x):
+        return ctx._unary_op(x, libgr.gr_erfc, "erfc(x)")
+
+    def gamma(ctx, x):
+        return ctx._unary_op(x, libgr.gr_gamma, "gamma(x)")
+
+    def lgamma(ctx, x):
+        return ctx._unary_op(x, libgr.gr_lgamma, "lgamma(x)")
+
+    def rgamma(ctx, x):
+        return ctx._unary_op(x, libgr.gr_rgamma, "lgamma(x)")
+
+    def digamma(ctx, x):
+        return ctx._unary_op(x, libgr.gr_digamma, "digamma(x)")
+
+    def zeta(ctx, x):
+        return ctx._unary_op(x, libgr.gr_zeta, "zeta(x)")
 
     def bernoulli(ctx, n):
         """
@@ -694,6 +849,72 @@ class gr_ctx:
             length = n + 1
         return ctx._op_vec_ui_len(n, length, libgr.gr_stirling_s2_ui_vec, "stirling_s2_vec(n, length)")
 
+    def bellnum(ctx, n):
+        """
+        Bell number `E_n` as an element of this domain.
+
+            >>> ZZ.bellnum(10)
+            115975
+            >>> RR.bellnum(10)
+            115975.0000000000
+
+        Huge Bell numbers can be computed numerically:
+
+            >>> RR.bellnum(10**20)
+            [5.38270113176282e+1794956117137290721328 +/- 5.44e+1794956117137290721313]
+            >>> ZZ.bellnum(10**20)
+            Traceback (most recent call last):
+              ...
+            NotImplementedError: unable to compute bellnum(n) for over Integer ring (fmpz) for input 100000000000000000000
+        """
+        return ctx._op_fmpz(n, libgr.gr_bellnum_fmpz, "bellnum(n)")
+
+    def bellnum_vec(ctx, length):
+        """
+        Vector of Bell numbers.
+
+            >>> ZZ.bellnum_vec(10)
+            [1, 1, 2, 5, 15, 52, 203, 877, 4140, 21147]
+            >>> QQ.bellnum_vec(10) / 3
+            [1/3, 1/3, 2/3, 5/3, 5, 52/3, 203/3, 877/3, 1380, 7049]
+            >>> sum(RR.bellnum_vec(100))
+            [1.67618752079292e+114 +/- 4.30e+99]
+            >>> sum(RF.bellnum_vec(100))
+            1.676187520792924e+114
+        """
+        return ctx._op_vec_len(length, libgr.gr_bellnum_vec, "bellnum_vec(length)")
+
+    def partitions(ctx, n):
+        """
+        Partition function `p(n)` as an element of this domain.
+
+            >>> ZZ.partitions(10)
+            42
+            >>> QQ.partitions(10) / 5
+            42/5
+            >>> RR.partitions(10)
+            42.00000000000000
+            >>> RR.partitions(10**20)
+            [1.838176508344883e+11140086259 +/- 8.18e+11140086243]
+        """
+        return ctx._op_fmpz(n, libgr.gr_partitions_fmpz, "partitions(n)")
+
+    def partitions_vec(ctx, length):
+        """
+        Vector of partition numbers.
+
+            >>> ZZ.partitions_vec(10)
+            [1, 1, 2, 3, 5, 7, 11, 15, 22, 30]
+            >>> QQ.partitions_vec(10) / 3
+            [1/3, 1/3, 2/3, 1, 5/3, 7/3, 11/3, 5, 22/3, 10]
+            >>> ZZmod(10).partitions_vec(10)
+            [1, 1, 2, 3, 5, 7, 1, 5, 2, 0]
+            >>> sum(ZZmod(10).partitions_vec(100))
+            6
+            >>> sum(RR.partitions_vec(100))
+            1452423276.000000
+        """
+        return ctx._op_vec_len(length, libgr.gr_partitions_vec, "partitions(length)")
 
 def _gr_set_int(self, val):
     if WORD_MIN <= val <= WORD_MAX:
@@ -2509,6 +2730,10 @@ CC_ca = ComplexField_ca()
 RF = RealFloat_arf()
 CF = ComplexFloat_acf()
 
+def ZZmod(n):
+    # todo: selection
+    return IntegersMod_nmod(n)
+
 VecZZ = Vec(ZZ)
 VecQQ = Vec(QQ)
 VecRR = Vec(RR)
@@ -2529,6 +2754,30 @@ DirichletGroup = DirichletGroup_dirichlet_char
 PSL2Z = ModularGroup()
 SymmetricGroup = SymmetricGroup_perm
 
+def timing(f, *args, **kwargs):
+    once = kwargs.get('once')
+    if 'once' in kwargs:
+        del kwargs['once']
+    if args or kwargs:
+        if len(args) == 1 and not kwargs:
+            arg = args[0]
+            g = lambda: f(arg)
+        else:
+            g = lambda: f(*args, **kwargs)
+    else:
+        g = f
+    from timeit import default_timer as clock
+    t1=clock(); v=g(); t2=clock(); t=t2-t1
+    if t > 0.05 or once:
+        return t
+    for i in range(3):
+        t1=clock();
+        # Evaluate multiple times because the timer function
+        # has a significant overhead
+        g();g();g();g();g();g();g();g();g();g()
+        t2=clock()
+        t=min(t,(t2-t1)/10)
+    return t
 
 def raises(f, exception):
     try:

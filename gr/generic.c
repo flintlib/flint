@@ -2534,6 +2534,14 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_FIB_FMPZ,                (gr_funcptr) gr_generic_fib_fmpz},
     {GR_METHOD_FIB_VEC,                 (gr_funcptr) gr_generic_fib_vec},
 
+    {GR_METHOD_BELLNUM_UI,              (gr_funcptr) gr_generic_bellnum_ui},
+    {GR_METHOD_BELLNUM_FMPZ,            (gr_funcptr) gr_generic_bellnum_fmpz},
+    {GR_METHOD_BELLNUM_VEC,             (gr_funcptr) gr_generic_bellnum_vec},
+
+    {GR_METHOD_PARTITIONS_UI,           (gr_funcptr) gr_generic_partitions_ui},
+    {GR_METHOD_PARTITIONS_FMPZ,         (gr_funcptr) gr_generic_partitions_fmpz},
+    {GR_METHOD_PARTITIONS_VEC,          (gr_funcptr) gr_generic_partitions_vec},
+
     {GR_METHOD_STIRLING_S1U_UIUI,       (gr_funcptr) gr_generic_stirling_s1u_uiui},
     {GR_METHOD_STIRLING_S1_UIUI,        (gr_funcptr) gr_generic_stirling_s1_uiui},
     {GR_METHOD_STIRLING_S2_UIUI,        (gr_funcptr) gr_generic_stirling_s2_uiui},

@@ -257,6 +257,13 @@ int gr_generic_fib_fmpz(gr_ptr res, const fmpz_t n, gr_ctx_t ctx);
 int gr_generic_fib_ui(gr_ptr res, ulong n, gr_ctx_t ctx);
 int gr_generic_fib_vec(gr_ptr res, slong len, gr_ctx_t ctx);
 
+int gr_generic_bellnum_fmpz(gr_ptr res, const fmpz_t n, gr_ctx_t ctx);
+int gr_generic_bellnum_ui(gr_ptr res, ulong n, gr_ctx_t ctx);
+int gr_generic_bellnum_vec(gr_ptr res, slong len, gr_ctx_t ctx);
+
+int gr_generic_partitions_fmpz(gr_ptr res, const fmpz_t n, gr_ctx_t ctx);
+int gr_generic_partitions_ui(gr_ptr res, ulong n, gr_ctx_t ctx);
+int gr_generic_partitions_vec(gr_ptr res, slong len, gr_ctx_t ctx);
 
 #ifdef __cplusplus
 }

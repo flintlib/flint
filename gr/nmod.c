@@ -136,6 +136,12 @@ _gr_nmod_set_other(ulong * res, gr_ptr v, gr_ctx_t v_ctx, const gr_ctx_t ctx)
         return GR_SUCCESS;
     }
 
+    if (v_ctx->which_ring == GR_CTX_FMPZ)
+    {
+        res[0] = fmpz_get_nmod(v, NMOD_CTX(ctx));
+        return GR_SUCCESS;
+    }
+
     return GR_UNABLE;
 }
 

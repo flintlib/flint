@@ -728,7 +728,7 @@ _gr_fmpz_fib_ui(fmpz_t res, ulong n, gr_ctx_t ctx)
 }
 
 int
-_gr_fmpz_fib_fmpz(fmpz_t res, const fmpz_t n, const gr_ctx_t ctx)
+_gr_fmpz_fib_fmpz(fmpz_t res, const fmpz_t n, gr_ctx_t ctx)
 {
     if (!COEFF_IS_MPZ(*n))
     {
@@ -736,16 +736,15 @@ _gr_fmpz_fib_fmpz(fmpz_t res, const fmpz_t n, const gr_ctx_t ctx)
 
         if (i >= 0)
         {
-            fmpz_fib_ui(res, i);
+            return _gr_fmpz_fib_ui(res, i, ctx);
         }
         else
         {
-            fmpz_fib_ui(res, -i);
+            int status = _gr_fmpz_fib_ui(res, -i, ctx);
             if (!(i & 1))
                 fmpz_neg(res, res);
+            return status;
         }
-
-        return GR_SUCCESS;
     }
 
     return GR_UNABLE;

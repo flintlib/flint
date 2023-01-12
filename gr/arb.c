@@ -1015,6 +1015,33 @@ _gr_arb_eulernum_fmpz(arb_t res, const fmpz_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_arb_bellnum_ui(arb_t res, ulong x, const gr_ctx_t ctx)
+{
+    arb_bell_ui(res, x, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_arb_bellnum_fmpz(arb_t res, const fmpz_t x, const gr_ctx_t ctx)
+{
+    arb_bell_fmpz(res, x, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_arb_partitions_ui(arb_t res, ulong x, const gr_ctx_t ctx)
+{
+    arb_partitions_ui(res, x, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_arb_partitions_fmpz(arb_t res, const fmpz_t x, const gr_ctx_t ctx)
+{
+    arb_partitions_fmpz(res, x, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
 
 int
 _gr_arb_erf(arb_t res, const arb_t x, const gr_ctx_t ctx)
@@ -1057,10 +1084,57 @@ _gr_arb_gamma(arb_t res, const arb_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_arb_gamma_fmpz(arb_t res, const fmpz_t x, const gr_ctx_t ctx)
+{
+    if (fmpz_sgn(x) > 0)
+    {
+        arb_gamma_fmpz(res, x, ARB_CTX_PREC(ctx));
+        return GR_SUCCESS;
+    }
+    else
+    {
+        return GR_DOMAIN;
+    }
+}
+
+int
+_gr_arb_gamma_fmpq(arb_t res, const fmpq_t x, const gr_ctx_t ctx)
+{
+    if (!fmpz_is_one(fmpq_denref(x)) || fmpz_sgn(fmpq_numref(x)) > 0)
+    {
+        arb_gamma_fmpq(res, x, ARB_CTX_PREC(ctx));
+        return GR_SUCCESS;
+    }
+    else
+    {
+        return GR_DOMAIN;
+    }
+}
+
+int
 _gr_arb_rgamma(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     arb_rgamma(res, x, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
+}
+
+int
+_gr_arb_fac_ui(arb_t res, ulong x, const gr_ctx_t ctx)
+{
+    arb_fac_ui(res, x, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_arb_fac_fmpz(arb_t res, const fmpz_t x, const gr_ctx_t ctx)
+{
+    int status;
+    fmpz_t t;
+    fmpz_init(t);
+    fmpz_add_ui(t, x, 1);
+    status = _gr_arb_gamma_fmpz(res, t, ctx);
+    fmpz_clear(t);
+    return status;
 }
 
 int
@@ -1343,14 +1417,22 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_COS,             (gr_funcptr) _gr_arb_cos},
     {GR_METHOD_TAN,             (gr_funcptr) _gr_arb_tan},
     {GR_METHOD_ATAN,            (gr_funcptr) _gr_arb_atan},
+    {GR_METHOD_FAC_UI,          (gr_funcptr) _gr_arb_fac_ui},
+    {GR_METHOD_FAC_FMPZ,        (gr_funcptr) _gr_arb_fac_fmpz},
     {GR_METHOD_BERNOULLI_UI,    (gr_funcptr) _gr_arb_bernoulli_ui},
     {GR_METHOD_BERNOULLI_FMPZ,  (gr_funcptr) _gr_arb_bernoulli_fmpz},
     {GR_METHOD_EULERNUM_UI,     (gr_funcptr) _gr_arb_eulernum_ui},
     {GR_METHOD_EULERNUM_FMPZ,   (gr_funcptr) _gr_arb_eulernum_fmpz},
+    {GR_METHOD_BELLNUM_UI,      (gr_funcptr) _gr_arb_bellnum_ui},
+    {GR_METHOD_BELLNUM_FMPZ,    (gr_funcptr) _gr_arb_bellnum_fmpz},
+    {GR_METHOD_PARTITIONS_UI,   (gr_funcptr) _gr_arb_partitions_ui},
+    {GR_METHOD_PARTITIONS_FMPZ, (gr_funcptr) _gr_arb_partitions_fmpz},
     {GR_METHOD_ERF,             (gr_funcptr) _gr_arb_erf},
     {GR_METHOD_ERFI,            (gr_funcptr) _gr_arb_erfi},
     {GR_METHOD_ERFC,            (gr_funcptr) _gr_arb_erfc},
     {GR_METHOD_GAMMA,           (gr_funcptr) _gr_arb_gamma},
+    {GR_METHOD_GAMMA_FMPZ,      (gr_funcptr) _gr_arb_gamma_fmpz},
+    {GR_METHOD_GAMMA_FMPQ,      (gr_funcptr) _gr_arb_gamma_fmpq},
     {GR_METHOD_RGAMMA,          (gr_funcptr) _gr_arb_rgamma},
     {GR_METHOD_LGAMMA,          (gr_funcptr) _gr_arb_lgamma},
     {GR_METHOD_DIGAMMA,         (gr_funcptr) _gr_arb_digamma},

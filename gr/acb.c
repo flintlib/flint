@@ -914,6 +914,37 @@ _gr_acb_gamma(acb_t res, const acb_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_acb_gamma_fmpz(acb_t res, const fmpz_t x, const gr_ctx_t ctx)
+{
+    if (fmpz_sgn(x) > 0)
+    {
+        arb_gamma_fmpz(acb_realref(res), x, ACB_CTX_PREC(ctx));
+        arb_zero(acb_imagref(res));
+        return GR_SUCCESS;
+    }
+    else
+    {
+        return GR_DOMAIN;
+    }
+}
+
+int
+_gr_acb_gamma_fmpq(acb_t res, const fmpq_t x, const gr_ctx_t ctx)
+{
+    if (!fmpz_is_one(fmpq_denref(x)) || fmpz_sgn(fmpq_numref(x)) > 0)
+    {
+        arb_gamma_fmpq(acb_realref(res), x, ACB_CTX_PREC(ctx));
+        arb_zero(acb_imagref(res));
+        return GR_SUCCESS;
+    }
+    else
+    {
+        return GR_DOMAIN;
+    }
+}
+
+
+int
 _gr_acb_rgamma(acb_t res, const acb_t x, const gr_ctx_t ctx)
 {
     acb_rgamma(res, x, ACB_CTX_PREC(ctx));
@@ -946,6 +977,26 @@ _gr_acb_digamma(acb_t res, const acb_t x, const gr_ctx_t ctx)
         acb_digamma(res, x, ACB_CTX_PREC(ctx));
         return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
     }
+}
+
+int
+_gr_acb_fac_ui(acb_t res, ulong x, const gr_ctx_t ctx)
+{
+    arb_fac_ui(acb_realref(res), x, ACB_CTX_PREC(ctx));
+    arb_zero(acb_imagref(res));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_fac_fmpz(acb_t res, const fmpz_t x, const gr_ctx_t ctx)
+{
+    int status;
+    fmpz_t t;
+    fmpz_init(t);
+    fmpz_add_ui(t, x, 1);
+    status = _gr_acb_gamma_fmpz(res, t, ctx);
+    fmpz_clear(t);
+    return status;
 }
 
 int
@@ -1338,7 +1389,11 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_ERF,             (gr_funcptr) _gr_acb_erf},
     {GR_METHOD_ERFI,            (gr_funcptr) _gr_acb_erfi},
     {GR_METHOD_ERFC,            (gr_funcptr) _gr_acb_erfc},
+    {GR_METHOD_FAC_UI,          (gr_funcptr) _gr_acb_fac_ui},
+    {GR_METHOD_FAC_FMPZ,        (gr_funcptr) _gr_acb_fac_fmpz},
     {GR_METHOD_GAMMA,           (gr_funcptr) _gr_acb_gamma},
+    {GR_METHOD_GAMMA_FMPZ,      (gr_funcptr) _gr_acb_gamma_fmpz},
+    {GR_METHOD_GAMMA_FMPQ,      (gr_funcptr) _gr_acb_gamma_fmpq},
     {GR_METHOD_RGAMMA,          (gr_funcptr) _gr_acb_rgamma},
     {GR_METHOD_LGAMMA,          (gr_funcptr) _gr_acb_lgamma},
     {GR_METHOD_DIGAMMA,         (gr_funcptr) _gr_acb_digamma},
