@@ -39,6 +39,15 @@ UWORD_MAX = (1<<FLINT_BITS)-1
 WORD_MAX = (1<<(FLINT_BITS-1))-1
 WORD_MIN = -(1<<(FLINT_BITS-1))
 
+def set_num_threads(n):
+    assert n >= 1
+    assert n <= 65536
+    libflint.flint_set_num_threads(n)
+
+def get_num_threads():
+    return libflint.flint_get_num_threads()
+
+
 class flint_rand_struct(ctypes.Structure):
     # todo: use the real size
     _fields_ = [('data', c_slong * 16)]
@@ -92,6 +101,9 @@ class qqbar_struct(ctypes.Structure):
 
 class ca_struct(ctypes.Structure):
     _fields_ = [('data', c_slong * 5)]
+
+class nmod_struct(ctypes.Structure):
+    _fields_ = [('val', c_ulong)]
 
 class nmod_poly_struct(ctypes.Structure):
     _fields_ = [('coeffs', ctypes.c_void_p),
@@ -550,6 +562,46 @@ class gr_ctx:
             -7.234656556133921e+134
         """
         return ctx._op_vec_len(length, libgr.gr_eulernum_vec, "eulernum_vec(length)")
+
+    def fib(ctx, n):
+        """
+        Fibonacci number `F_n` as an element of this domain.
+
+            >>> ZZ.fib(10)
+            55
+            >>> RR.fib(10)
+            55.00000000000000
+            >>> ZZ.fib(-10)
+            -55
+
+        Huge Fibonacci numbers can be computed numerically and in modular arithmetic:
+
+            >>> RR.fib(10**20)
+            [3.78202087472056e+20898764024997873376 +/- 4.02e+20898764024997873361]
+            >>> RF.fib(10**20)
+            3.782020874720557e+20898764024997873376
+            >>> F = FiniteField_fq(17, 1)
+            >>> n = 10**20; F.fib(n); F.fib(n-1) + F.fib(n-2)
+            13
+            13
+
+        """
+        return ctx._op_fmpz(n, libgr.gr_fib_fmpz, "fib(n)")
+
+    def fib_vec(ctx, length):
+        """
+        Vector of Fibonacci numbers.
+
+            >>> ZZ.fib_vec(10)
+            [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+            >>> QQ.fib_vec(10) / 3
+            [0, 1/3, 1/3, 2/3, 1, 5/3, 8/3, 13/3, 7, 34/3]
+            >>> sum(RR.fib_vec(100))
+            [5.7314784401382e+20 +/- 4.20e+6]
+            >>> sum(RF.fib_vec(100))
+            5.731478440138172e+20
+        """
+        return ctx._op_vec_len(length, libgr.gr_fib_vec, "fib(length)")
 
     def stirling_s1u(ctx, n, k):
         """
@@ -1590,12 +1642,27 @@ class acf(gr_elem):
         return CF
 
 
+class IntegersMod_nmod(gr_ctx):
+    def __init__(self, n):
+        gr_ctx.__init__(self)
+        n = self._as_ui(n)
+        assert n >= 1
+        libgr.gr_ctx_init_nmod(self._ref, n, None)
+        self._elem_type = nmod
+
+class nmod(gr_elem):
+    _struct_type = nmod_struct
+
+
 
 """
 .. function:: int gr_ctx_fq_prime(fmpz_t p, gr_ctx_t ctx)
 .. function:: int gr_ctx_fq_degree(slong * deg, gr_ctx_t ctx)
 .. function:: int gr_ctx_fq_order(fmpz_t q, gr_ctx_t ctx)
 """
+
+
+
 
 class FiniteField_base(gr_ctx):
 
@@ -2700,6 +2767,15 @@ def test_all():
 def test_float():
     assert RF(5).mul_2exp(-1) == RF(2.5)
     assert CF(2+3j).mul_2exp(-1) == CF(1+1.5j)
+
+def test_special():
+    a = ZZ.fib_vec(100)
+    for i in range(100):
+        assert ZZ.fib(i) == a[i]
+    F = FiniteField_fq(17, 1)
+    for i in range(-10,10):
+        assert QQ.fib(i) == QQ.fib(i-1) + QQ.fib(i-2)
+        assert F.fib(i) == F.fib(i-1) + F.fib(i-2)
 
 if __name__ == "__main__":
     from time import time

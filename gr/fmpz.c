@@ -12,6 +12,7 @@
 #include "qqbar.h"
 #include "gr.h"
 #include "gr_vec.h"
+#include "gr_special.h"
 #include "flint/fmpz_factor.h"
 #include "flint/fmpz_poly.h"
 #include "flint/fmpz_mat.h"
@@ -712,6 +713,45 @@ _gr_fmpz_cmpabs(int * res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_fmpz_fib_ui(fmpz_t res, ulong n, gr_ctx_t ctx)
+{
+    if (n <= 1000000)
+    {
+        fmpz_fib_ui(res, n);
+        return GR_SUCCESS;
+    }
+    else
+    {
+        return gr_generic_fib_ui(res, n, ctx);
+    }
+}
+
+int
+_gr_fmpz_fib_fmpz(fmpz_t res, const fmpz_t n, const gr_ctx_t ctx)
+{
+    if (!COEFF_IS_MPZ(*n))
+    {
+        slong i = *n;
+
+        if (i >= 0)
+        {
+            fmpz_fib_ui(res, i);
+        }
+        else
+        {
+            fmpz_fib_ui(res, -i);
+            if (!(i & 1))
+                fmpz_neg(res, res);
+        }
+
+        return GR_SUCCESS;
+    }
+
+    return GR_UNABLE;
+}
+
+
 /* experimental: inlining for small values */
 
 static void
@@ -1087,6 +1127,8 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_CSGN,            (gr_funcptr) _gr_fmpz_sgn},
     {GR_METHOD_CMP,             (gr_funcptr) _gr_fmpz_cmp},
     {GR_METHOD_CMPABS,          (gr_funcptr) _gr_fmpz_cmpabs},
+    {GR_METHOD_FIB_UI,          (gr_funcptr) _gr_fmpz_fib_ui},
+    {GR_METHOD_FIB_FMPZ,        (gr_funcptr) _gr_fmpz_fib_fmpz},
     {GR_METHOD_VEC_IS_ZERO,     (gr_funcptr) _gr_fmpz_vec_is_zero},
     {GR_METHOD_VEC_EQUAL,       (gr_funcptr) _gr_fmpz_vec_equal},
     {GR_METHOD_VEC_ADD,         (gr_funcptr) _gr_fmpz_vec_add},

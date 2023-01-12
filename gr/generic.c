@@ -2526,9 +2526,13 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_BERNOULLI_FMPZ,          (gr_funcptr) gr_generic_bernoulli_fmpz},
     {GR_METHOD_BERNOULLI_VEC,           (gr_funcptr) gr_generic_bernoulli_vec},
 
-    {GR_METHOD_EULERNUM_UI,            (gr_funcptr) gr_generic_eulernum_ui},
-    {GR_METHOD_EULERNUM_FMPZ,          (gr_funcptr) gr_generic_eulernum_fmpz},
-    {GR_METHOD_EULERNUM_VEC,           (gr_funcptr) gr_generic_eulernum_vec},
+    {GR_METHOD_EULERNUM_UI,             (gr_funcptr) gr_generic_eulernum_ui},
+    {GR_METHOD_EULERNUM_FMPZ,           (gr_funcptr) gr_generic_eulernum_fmpz},
+    {GR_METHOD_EULERNUM_VEC,            (gr_funcptr) gr_generic_eulernum_vec},
+
+    {GR_METHOD_FIB_UI,                  (gr_funcptr) gr_generic_fib_ui},
+    {GR_METHOD_FIB_FMPZ,                (gr_funcptr) gr_generic_fib_fmpz},
+    {GR_METHOD_FIB_VEC,                 (gr_funcptr) gr_generic_fib_vec},
 
     {GR_METHOD_STIRLING_S1U_UIUI,       (gr_funcptr) gr_generic_stirling_s1u_uiui},
     {GR_METHOD_STIRLING_S1_UIUI,        (gr_funcptr) gr_generic_stirling_s1_uiui},

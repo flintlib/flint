@@ -83,23 +83,14 @@ _gr_nmod_one(ulong * x, const gr_ctx_t ctx)
 int
 _gr_nmod_set_si(ulong * res, slong v, const gr_ctx_t ctx)
 {
-    ulong t;
-    nmod_t mod = NMOD_CTX(ctx);
-    t = FLINT_ABS(v);
-    NMOD_RED(t, t, mod);
-    if (v < 0)
-        t = nmod_neg(t, mod);
-    res[0] = t;
+    res[0] = nmod_set_si(v, NMOD_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
 _gr_nmod_set_ui(ulong * res, ulong v, const gr_ctx_t ctx)
 {
-    ulong t;
-    nmod_t mod = NMOD_CTX(ctx);
-    NMOD_RED(t, v, mod);
-    res[0] = t;
+    res[0] = nmod_set_ui(v, NMOD_CTX(ctx));
     return GR_SUCCESS;
 }
 
@@ -194,17 +185,37 @@ _gr_nmod_add(ulong * res, const ulong * x, const ulong * y, const gr_ctx_t ctx)
 }
 
 int
+_gr_nmod_add_ui(ulong * res, const ulong * x, ulong y, const gr_ctx_t ctx)
+{
+    res[0] = nmod_add(x[0], nmod_set_ui(y, NMOD_CTX(ctx)), NMOD_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
 _gr_nmod_add_si(ulong * res, const ulong * x, slong y, const gr_ctx_t ctx)
 {
-    ulong t;
-    _gr_nmod_set_si(&t, y, ctx);
-    return _gr_nmod_add(res, x, &t, ctx);
+    res[0] = nmod_add(x[0], nmod_set_si(y, NMOD_CTX(ctx)), NMOD_CTX(ctx));
+    return GR_SUCCESS;
 }
 
 int
 _gr_nmod_sub(ulong * res, const ulong * x, const ulong * y, const gr_ctx_t ctx)
 {
     res[0] = nmod_sub(x[0], y[0], NMOD_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_nmod_sub_ui(ulong * res, const ulong * x, ulong y, const gr_ctx_t ctx)
+{
+    res[0] = nmod_sub(x[0], nmod_set_ui(y, NMOD_CTX(ctx)), NMOD_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_nmod_sub_si(ulong * res, const ulong * x, slong y, const gr_ctx_t ctx)
+{
+    res[0] = nmod_sub(x[0], nmod_set_si(y, NMOD_CTX(ctx)), NMOD_CTX(ctx));
     return GR_SUCCESS;
 }
 
@@ -216,11 +227,17 @@ _gr_nmod_mul(ulong * res, const ulong * x, const ulong * y, const gr_ctx_t ctx)
 }
 
 int
+_gr_nmod_mul_ui(ulong * res, const ulong * x, ulong y, const gr_ctx_t ctx)
+{
+    res[0] = nmod_mul(x[0], nmod_set_ui(y, NMOD_CTX(ctx)), NMOD_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
 _gr_nmod_mul_si(ulong * res, const ulong * x, slong y, const gr_ctx_t ctx)
 {
-    ulong t;
-    _gr_nmod_set_si(&t, y, ctx);
-    return _gr_nmod_mul(res, x, &t, ctx);
+    res[0] = nmod_mul(x[0], nmod_set_si(y, NMOD_CTX(ctx)), NMOD_CTX(ctx));
+    return GR_SUCCESS;
 }
 
 int
@@ -305,6 +322,41 @@ _gr_nmod_is_invertible(const ulong * x, const gr_ctx_t ctx)
     g = n_gcdinv(&r, x[0], NMOD_CTX(ctx).n);
     return (g == 1) ? T_TRUE : T_FALSE;
 }
+
+int
+_gr_nmod_mul_2exp_si(ulong * res, ulong * x, slong y, const gr_ctx_t ctx)
+{
+    ulong c;
+
+    if (y >= 0)
+    {
+        if (y < FLINT_BITS)
+        {
+            c = UWORD(1) << y;
+            if (c >= NMOD_CTX(ctx).n)
+                NMOD_RED(c, c, NMOD_CTX(ctx));
+        }
+        else
+        {
+            /* accidentally also works when mod <= 2 */
+            c = nmod_pow_ui(2, y, NMOD_CTX(ctx));
+        }
+    }
+    else
+    {
+        /* accidentally also works when mod <= 2 */
+        c = 2;
+        if (_gr_nmod_inv(&c, &c, ctx) != GR_SUCCESS)
+            return GR_DOMAIN;
+
+        c = nmod_pow_ui(c, -y, NMOD_CTX(ctx));
+    }
+
+    res[0] = nmod_mul(x[0], c, NMOD_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+/* todo: pow_ui, ... */
 
 int
 __gr_nmod_vec_dot(ulong * res, const ulong * initial, int subtract, const ulong * vec1, const ulong * vec2, slong len, gr_ctx_t ctx)
@@ -467,12 +519,17 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_NEG,             (gr_funcptr) _gr_nmod_neg},
     {GR_METHOD_ADD,             (gr_funcptr) _gr_nmod_add},
     {GR_METHOD_ADD_SI,          (gr_funcptr) _gr_nmod_add_si},
+    {GR_METHOD_ADD_UI,          (gr_funcptr) _gr_nmod_add_ui},
     {GR_METHOD_SUB,             (gr_funcptr) _gr_nmod_sub},
+    {GR_METHOD_SUB_SI,          (gr_funcptr) _gr_nmod_sub_si},
+    {GR_METHOD_SUB_UI,          (gr_funcptr) _gr_nmod_sub_ui},
     {GR_METHOD_MUL,             (gr_funcptr) _gr_nmod_mul},
     {GR_METHOD_MUL_SI,          (gr_funcptr) _gr_nmod_mul_si},
+    {GR_METHOD_MUL_UI,          (gr_funcptr) _gr_nmod_mul_ui},
     {GR_METHOD_ADDMUL,          (gr_funcptr) _gr_nmod_addmul},
     {GR_METHOD_SUBMUL,          (gr_funcptr) _gr_nmod_submul},
     {GR_METHOD_MUL_TWO,         (gr_funcptr) _gr_nmod_mul_two},
+    {GR_METHOD_MUL_2EXP_SI,     (gr_funcptr) _gr_nmod_mul_2exp_si},
     {GR_METHOD_SQR,             (gr_funcptr) _gr_nmod_sqr},
     {GR_METHOD_DIV,             (gr_funcptr) _gr_nmod_div},
     {GR_METHOD_DIV_SI,          (gr_funcptr) _gr_nmod_div_si},

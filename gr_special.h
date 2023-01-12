@@ -250,6 +250,13 @@ GR_SPECIAL_DEF int gr_stieltjes(gr_ptr res, const fmpz_t x, gr_srcptr y, gr_ctx_
 /* todo: elliptic, modular */
 
 
+/* generic implementations */
+
+int gr_generic_fib2_fmpz(gr_ptr v, gr_ptr u, const fmpz_t n, gr_ctx_t ctx);
+int gr_generic_fib_fmpz(gr_ptr res, const fmpz_t n, gr_ctx_t ctx);
+int gr_generic_fib_ui(gr_ptr res, ulong n, gr_ctx_t ctx);
+int gr_generic_fib_vec(gr_ptr res, slong len, gr_ctx_t ctx);
+
 
 #ifdef __cplusplus
 }

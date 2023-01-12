@@ -109,7 +109,7 @@ void gr_stream_write_fmpz(gr_stream_t out, const fmpz_t x);
 #define WARN_UNUSED_RESULT __attribute__((warn_unused_result))
 
 #define GR_MUST_SUCCEED(expr) do { if ((expr) != GR_SUCCESS) { flint_printf("GR_MUST_SUCCEED failure: %s", __FILE__); flint_abort(); } } while (0)
-#define GR_IGNORE(expr) do { (void) (expr); } while (0)
+#define GR_IGNORE(expr) do { int ___unused = (expr); (void) ___unused; } while (0)
 
 typedef void * gr_ptr;
 typedef const void * gr_srcptr;
