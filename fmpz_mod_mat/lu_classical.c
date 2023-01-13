@@ -107,6 +107,8 @@ cleanup:
     fmpz_clear(e);
     fmpz_clear(neg_e);
 
+    fmpz_mod_ctx_clear(ctx);
+
     return rank;
 }
 
