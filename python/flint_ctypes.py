@@ -370,6 +370,27 @@ class gr_ctx:
             if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined {ctx} for input {x}")
         return res
 
+    def _unary_op_with_fmpz_fmpq_overloads(ctx, x, op, op_ui=None, op_fmpz=None, op_fmpq=None, rstr=None):
+        type_x = type(x)
+        res = ctx._elem_type(context=ctx)
+        if type_x is not ctx._elem_type or x._ctx_python is not ctx:
+            if type_x is fmpq and op_fmpq is not None:
+                status = op_fmpq(res._ref, x._ref, ctx._ref)
+            elif type_x is fmpz and op_fmpz is not None:
+                status = op_fmpz(res._ref, x._ref, ctx._ref)
+            elif type_x is int and op_fmpz is not None:
+                x = ZZ(x)
+                status = op_fmpz(res._ref, x._ref, ctx._ref)
+            else:
+                x = ctx(x)
+                status = op(res._ref, x._ref, ctx._ref)
+        else:
+            status = op(res._ref, x._ref, ctx._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} over {ctx} for input {x}")
+            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined over {ctx} for input {x}")
+        return res
+
     def _binary_op_fmpz(ctx, x, y, op, rstr):
         if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
             x = ctx(x)
@@ -617,8 +638,86 @@ class gr_ctx:
     def erfc(ctx, x):
         return ctx._unary_op(x, libgr.gr_erfc, "erfc(x)")
 
+    def fac(ctx, x):
+        """
+        Factorial.
+
+            >>> ZZ.fac(10)
+            3628800
+            >>> ZZ.fac(-1)
+            Traceback (most recent call last):
+              ...
+            ValueError: fac(x) is not defined over Integer ring (fmpz) for input -1
+
+        Real and complex factorials extend using the gamma function:
+
+            >>> RR.fac(10**20)
+            [1.93284951431010e+1956570551809674817245 +/- 3.03e+1956570551809674817230]
+            >>> RR.fac(0.5)
+            [0.886226925452758 +/- 1.78e-16]
+            >>> CC.fac(1+1j)
+            ([0.652965496420167 +/- 6.21e-16] + [0.343065839816545 +/- 5.38e-16]*I)
+
+        Factorials mod N:
+
+            >>> ZZmod(10**7 + 19).fac(10**7)
+            2343096
+        """
+        return ctx._unary_op_with_fmpz_fmpq_overloads(x, libgr.gr_fac, op_fmpz=libgr.gr_fac_fmpz, rstr="fac(x)")
+
+    def fac_vec(ctx, length):
+        """
+        Vector of factorials.
+
+            >>> ZZ.fac_vec(10)
+            [1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880]
+            >>> QQ.fac_vec(10) / 3
+            [1/3, 1/3, 2/3, 2, 8, 40, 240, 1680, 13440, 120960]
+            >>> ZZmod(7).fac_vec(10)
+            [1, 1, 2, 6, 3, 1, 6, 0, 0, 0]
+            >>> sum(RR.fac_vec(100))
+            [9.427862397658e+155 +/- 3.19e+142]
+
+        """
+        return ctx._op_vec_len(length, libgr.gr_fac_vec, "fac_vec(length)")
+
+    def rfac(ctx, x):
+        """
+        Reciprocal factorial.
+
+            >>> QQ.rfac(5)
+            1/120
+            >>> ZZ.rfac(-2)
+            0
+            >>> ZZ.rfac(2)
+            Traceback (most recent call last):
+              ...
+            ValueError: fac(x) is not defined over Integer ring (fmpz) for input 2
+            >>> RR.rfac(0.5)
+            [1.128379167095513 +/- 7.02e-16]
+
+        """
+        return ctx._unary_op_with_fmpz_fmpq_overloads(x, libgr.gr_rfac, op_fmpz=libgr.gr_rfac_fmpz, rstr="fac(x)")
+
+    def rfac_vec(ctx, length):
+        """
+        Vector of reciprocal factorials.
+
+            >>> QQ.rfac_vec(8)
+            [1, 1, 1/2, 1/6, 1/24, 1/120, 1/720, 1/5040]
+            >>> ZZmod(7).rfac_vec(7)
+            [1, 1, 4, 6, 5, 1, 6]
+            >>> ZZmod(7).rfac_vec(8)
+            Traceback (most recent call last):
+              ...
+            ValueError: rfac_vec(length) is not defined over Integers mod 7 (_gr_nmod) for input 8
+            >>> sum(RR.rfac_vec(20))
+            [2.71828182845904 +/- 8.66e-15]
+        """
+        return ctx._op_vec_len(length, libgr.gr_rfac_vec, "rfac_vec(length)")
+
     def gamma(ctx, x):
-        return ctx._unary_op(x, libgr.gr_gamma, "gamma(x)")
+        return ctx._unary_op_with_fmpz_fmpq_overloads(x, libgr.gr_gamma, op_fmpz=libgr.gr_gamma_fmpz, op_fmpq=libgr.gr_gamma_fmpq, rstr="gamma(x)")
 
     def lgamma(ctx, x):
         return ctx._unary_op(x, libgr.gr_lgamma, "lgamma(x)")
@@ -751,8 +850,8 @@ class gr_ctx:
             [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
             >>> QQ.fib_vec(10) / 3
             [0, 1/3, 1/3, 2/3, 1, 5/3, 8/3, 13/3, 7, 34/3]
-            >>> sum(RR.fib_vec(100))
-            [5.7314784401382e+20 +/- 4.20e+6]
+            >>> sum(RR.fib_vec(100))            # doctest: +ELLIPSIS
+            [5.7314784401...e+20 +/- ...]
             >>> sum(RF.fib_vec(100))
             5.731478440138172e+20
         """
@@ -3040,6 +3139,6 @@ if __name__ == "__main__":
             print("%.2f" % (t2-t1))
     print("----------------------------------------------------------")
     import doctest
-    doctest.testmod(optionflags=doctest.FAIL_FAST, verbose=True)
+    doctest.testmod(optionflags=(doctest.FAIL_FAST | doctest.ELLIPSIS), verbose=True)
     print("----------------------------------------------------------")
 

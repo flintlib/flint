@@ -2522,6 +2522,16 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_COS,                     (gr_funcptr) gr_generic_cos},
     {GR_METHOD_ATAN,                    (gr_funcptr) gr_generic_atan},
 
+    {GR_METHOD_FAC,                     (gr_funcptr) gr_generic_fac},
+    {GR_METHOD_FAC_UI,                  (gr_funcptr) gr_generic_fac_ui},
+    {GR_METHOD_FAC_FMPZ,                (gr_funcptr) gr_generic_fac_fmpz},
+    {GR_METHOD_FAC_VEC,                 (gr_funcptr) gr_generic_fac_vec},
+
+    {GR_METHOD_RFAC,                    (gr_funcptr) gr_generic_rfac},
+    {GR_METHOD_RFAC_UI,                 (gr_funcptr) gr_generic_rfac_ui},
+    {GR_METHOD_RFAC_FMPZ,               (gr_funcptr) gr_generic_rfac_fmpz},
+    {GR_METHOD_RFAC_VEC,                (gr_funcptr) gr_generic_rfac_vec},
+
     {GR_METHOD_BERNOULLI_UI,            (gr_funcptr) gr_generic_bernoulli_ui},
     {GR_METHOD_BERNOULLI_FMPZ,          (gr_funcptr) gr_generic_bernoulli_fmpz},
     {GR_METHOD_BERNOULLI_VEC,           (gr_funcptr) gr_generic_bernoulli_vec},

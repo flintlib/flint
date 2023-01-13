@@ -11,34 +11,31 @@
 
 #include "gr_special.h"
 
+/* TODO: Binet formula + exp/log should be faster for huge
+   numerical Fibonacci values */
+
+/* TODO: single iteration applied directly to table; see fmpz_fib_ui */
+
 /* TODO: for exact infinite rings, it is worth calling
    mpz_fib_ui instead of using generic code for n < 10000 or so.
    fmpz currently overrides the generic code, but would also
    help over QQ, etc. */
 
-/*
-Avoid for now to maintain bitwise compatibility between 32-bit
-and 64-bit systems in numerical domains.
-
 #if FLINT_BITS == 64
 #define FIBTAB_NUM 94
 #define FIBTAB_BITS 6
 #else
-*/
 #define FIBTAB_NUM 48
 #define FIBTAB_BITS 5
-/*
 #endif
-*/
 
-static const unsigned int fibtab[] = {
+static const ulong fibtab[] = {
     0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987,
     1597, 2584, 4181, 6765, 10946, 17711, 28657, 46368, 75025, 121393,
     196418, 317811, 514229, 832040, 1346269, 2178309, 3524578, 5702887,
     9227465, 14930352, 24157817, 39088169, 63245986, 102334155,
     165580141, 267914296, 433494437, 701408733, 1134903170, 1836311903,
     UWORD(2971215073),
-/*
 #if FLINT_BITS == 64
     UWORD(4807526976), UWORD(7778742049), UWORD(12586269025), UWORD(20365011074), UWORD(32951280099),
     UWORD(53316291173), UWORD(86267571272), UWORD(139583862445), UWORD(225851433717),
@@ -54,7 +51,6 @@ static const unsigned int fibtab[] = {
     UWORD(1100087778366101931), UWORD(1779979416004714189), UWORD(2880067194370816120),
     UWORD(4660046610375530309), UWORD(7540113804746346429), UWORD(12200160415121876738)
 #endif
-*/
 };
 
 /* Essentially the same algorithm as
