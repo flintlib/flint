@@ -11,6 +11,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+/* try to get fdopen, mkstemp declared */
+#if defined __STRICT_ANSI__
+#undef __STRICT_ANSI__
+#endif
+
 #include "qsieve.h"
 #include "fmpz_factor.h"
 #include "thread_support.h"
