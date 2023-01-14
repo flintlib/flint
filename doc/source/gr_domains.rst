@@ -1,7 +1,56 @@
 .. _gr-domains:
 
-**gr.h** -- builtin domains and types
+**gr.h (continued)** -- builtin domains and types
 ===============================================================================
+
+Coercions
+-------------------------------------------------------------------------------
+
+.. function:: int gr_ctx_cmp_coercion(gr_ctx_t ctx1, gr_ctx_t ctx2)
+
+    Returns 1 if coercing elements into *ctx1* is more meaningful,
+    and returns -1 otherwise.
+
+
+
+Domain properties
+-------------------------------------------------------------------------------
+
+.. function:: truth_t gr_ctx_is_finite(gr_ctx_t ctx)
+              truth_t gr_ctx_is_multiplicative_group(gr_ctx_t ctx)
+              truth_t gr_ctx_is_ring(gr_ctx_t ctx)
+              truth_t gr_ctx_is_commutative_ring(gr_ctx_t ctx)
+              truth_t gr_ctx_is_integral_domain(gr_ctx_t ctx)
+              truth_t gr_ctx_is_unique_factorization_domain(gr_ctx_t ctx)
+              truth_t gr_ctx_is_field(gr_ctx_t ctx)
+              truth_t gr_ctx_is_algebraically_closed(gr_ctx_t ctx)
+              truth_t gr_ctx_is_finite_characteristic(gr_ctx_t ctx)
+              truth_t gr_ctx_is_ordered_ring(gr_ctx_t ctx)
+
+    Returns whether the structure satisfies the respective
+    mathematical property.
+    The result can be ``T_UNKNOWN``.
+
+.. function:: truth_t gr_ctx_is_exact(gr_ctx_t ctx)
+
+    Returns whether the representation of elements is always exact.
+
+.. function:: truth_t gr_ctx_is_canonical(gr_ctx_t ctx)
+
+    Returns whether the representation of elements is always canonical.
+
+.. function:: truth_t gr_ctx_has_real_prec(gr_ctx_t ctx)
+
+    Returns whether *ctx* or a base field thereof represents real or complex
+    numbers using finite-precision approximations.
+    This returns ``T_TRUE`` both for floating-point approximate
+    fields and for rigorous fields based on ball or interval arithmetic.
+
+.. function:: int gr_ctx_set_real_prec(gr_ctx_t ctx, slong prec)
+              int gr_ctx_get_real_prec(slong * prec, gr_ctx_t ctx)
+
+    Sets or retrieves the floating-point precision in bits.
+
 
 Groups
 -------------------------------------------------------------------------------

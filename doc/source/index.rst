@@ -19,14 +19,22 @@ Contents
 -------------------------------------------------------------------------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    gr.rst
    gr_domains.rst
    gr_special.rst
+   gr_vec.rst
    gr_mat.rst
    gr_poly.rst
    gr_mpoly.rst
+
+Python interface (python-flint)
+-------------------------------------------------------------------------------
+
+.. toctree::
+   :maxdepth: 3
+
    python_flint.rst
 
 Design

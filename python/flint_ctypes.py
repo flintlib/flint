@@ -47,6 +47,67 @@ def set_num_threads(n):
 def get_num_threads():
     return libflint.flint_get_num_threads()
 
+class FlintException(Exception):
+
+    __module__ = Exception.__module__
+
+    def __str__(self):
+        if isinstance(self.args[0], str):
+            return self.args[0]
+        ctx, status, rstr, args = self.args[0]
+        rstr2 = rstr.replace("$", "")
+        argnames = []
+        for i, c in enumerate(rstr):
+            if c == "$":
+                argname = ""
+                for j in range(i + 1, len(rstr)):
+                    if rstr[j].isalnum():
+                        argname += rstr[j]
+                    else:
+                        break
+                argnames.append(argname)
+        if status & GR_UNABLE:
+            s = "failed to compute " + rstr2 + " in " + "{" + str(ctx) + "}"
+        else:
+            s = rstr2 + " is not an element of " + "{" + str(ctx) + "}"
+        if args:
+            s += " for "
+            for i, arg in enumerate(args):
+                s += "{"
+                if argnames:
+                    s += argnames[i] + " = "
+                else:
+                    s += "input "
+                argstr = str(arg)
+                if len(argstr) > 200:
+                    argstr = argstr[:80] + ("{{{...}}}") + argstr[-80:]
+                s += argstr
+                s += "}"
+                if i < len(args) - 1:
+                    s += ", "
+        return s
+
+class FlintDomainError(ValueError, FlintException):
+    """
+    Raised when an operation does not have a well-defined result in the target domain.
+    """
+    __module__ = Exception.__module__
+
+class FlintUnableError(NotImplementedError, FlintException):
+    """
+    Raised when an operation cannot be performed because the algorithm is not implemented
+    or there is insufficient precision, memory, etc.
+    """
+    __module__ = Exception.__module__
+
+
+def _handle_error(ctx, status, rstr, *args):
+    if status & GR_UNABLE:
+        raise FlintUnableError((ctx, status, rstr, args))
+    else:
+        raise FlintDomainError((ctx, status, rstr, args))
+
+
 
 class flint_rand_struct(ctypes.Structure):
     # todo: use the real size
@@ -330,8 +391,7 @@ class gr_ctx:
         res = ctx._elem_type(context=ctx)
         status = op(res._ref, ctx._ref)
         if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} in {ctx}")
-            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined in {ctx}")
+            _handle_error(ctx, status, rstr)
         return res
 
     @staticmethod
@@ -366,8 +426,7 @@ class gr_ctx:
         res = ctx._elem_type(context=ctx)
         status = op(res._ref, x._ref, ctx._ref)
         if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} over {ctx} for input {x}")
-            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined {ctx} for input {x}")
+            _handle_error(ctx, status, rstr, x=x)
         return res
 
     def _unary_op_with_fmpz_fmpq_overloads(ctx, x, op, op_ui=None, op_fmpz=None, op_fmpq=None, rstr=None):
@@ -387,8 +446,7 @@ class gr_ctx:
         else:
             status = op(res._ref, x._ref, ctx._ref)
         if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} over {ctx} for input {x}")
-            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined over {ctx} for input {x}")
+            _handle_error(ctx, status, rstr, x)
         return res
 
     def _binary_op_fmpz(ctx, x, y, op, rstr):
@@ -398,8 +456,7 @@ class gr_ctx:
         res = ctx._elem_type(context=ctx)
         status = op(res._ref, x._ref, y._ref, ctx._ref)
         if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for over {ctx} for input {x}, {y}")
-            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined over {ctx} for input {x}, {y}")
+            _handle_error(ctx, status, rstr, x, y)
         return res
 
     def _op_fmpz(ctx, x, op, rstr):
@@ -407,8 +464,7 @@ class gr_ctx:
         res = ctx._elem_type(context=ctx)
         status = op(res._ref, x._ref, ctx._ref)
         if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for over {ctx} for input {x}")
-            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined over {ctx} for input {x}")
+            _handle_error(ctx, status, rstr, x)
         return res
 
     def _op_ui(ctx, x, op, rstr):
@@ -417,8 +473,7 @@ class gr_ctx:
         op.argtypes = (ctypes.c_void_p, c_ulong, ctypes.c_void_p)
         status = op(res._ref, x, ctx._ref)
         if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for over {ctx} for input {x}")
-            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined over {ctx} for input {x}")
+            _handle_error(ctx, status, rstr, x)
         return res
 
     def _op_uiui(ctx, x, y, op, rstr):
@@ -428,8 +483,7 @@ class gr_ctx:
         op.argtypes = (ctypes.c_void_p, c_ulong, c_ulong, ctypes.c_void_p)
         status = op(res._ref, x, y, ctx._ref)
         if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for over {ctx} for input {x}, {y}")
-            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined over {ctx} for input {x}, {y}")
+            _handle_error(ctx, status, rstr, x, y)
         return res
 
     def _op_vec_len(ctx, n, op, rstr):
@@ -439,8 +493,7 @@ class gr_ctx:
         assert not libgr.gr_vec_set_length(res._ref, n, ctx._ref)
         status = op(libgr.gr_vec_entry_ptr(res._ref, 0, ctx._ref), n, ctx._ref)
         if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} over {ctx} for input {n}")
-            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined over {ctx} for input {n}")
+            _handle_error(ctx, status, rstr, n)
         return res
 
     def _op_vec_ui_len(ctx, x, n, op, rstr):
@@ -451,8 +504,7 @@ class gr_ctx:
         assert not libgr.gr_vec_set_length(res._ref, n, ctx._ref)
         status = op(libgr.gr_vec_entry_ptr(res._ref, 0, ctx._ref), x, n, ctx._ref)
         if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} over {ctx} for input {x}, {n}")
-            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined over {ctx} for input {x}, {n}")
+            _handle_error(ctx, status, rstr, x, n)
         return res
 
     def i(ctx):
@@ -464,8 +516,7 @@ class gr_ctx:
             >>> QQ.i()
             Traceback (most recent call last):
               ...
-            ValueError: i is not defined in Rational field (fmpq)
-
+            FlintDomainError: i is not an element of {Rational field (fmpq)}
         """
         return ctx._constant(ctx, libgr.gr_i, "i")
 
@@ -478,7 +529,7 @@ class gr_ctx:
             >>> QQbar.pi()
             Traceback (most recent call last):
               ...
-            ValueError: pi is not defined in Complex algebraic numbers (qqbar)
+            FlintDomainError: pi is not an element of {Complex algebraic numbers (qqbar)}
         """
         return ctx._constant(ctx, libgr.gr_pi, "pi")
 
@@ -488,6 +539,13 @@ class gr_ctx:
 
             >>> RR.euler()
             [0.5772156649015329 +/- 9.00e-17]
+
+        We do not know whether Euler's constant is rational:
+
+            >>> QQ.euler()
+            Traceback (most recent call last):
+              ...
+            FlintUnableError: failed to compute euler in {Rational field (fmpq)}
         """
         return ctx._constant(ctx, libgr.gr_euler, "euler")
 
@@ -519,124 +577,124 @@ class gr_ctx:
         return ctx._constant(ctx, libgr.gr_glaisher, "glaisher")
 
     def inv(ctx, x):
-        return ctx._unary_op(x, libgr.gr_inv, "inv(x)")
+        return ctx._unary_op(x, libgr.gr_inv, "inv($x)")
 
     def sqrt(ctx, x):
-        return ctx._unary_op(x, libgr.gr_sqrt, "sqrt(x)")
+        return ctx._unary_op(x, libgr.gr_sqrt, "sqrt($x)")
 
     def rsqrt(ctx, x):
-        return ctx._unary_op(x, libgr.gr_rsqrt, "rsqrt(x)")
+        return ctx._unary_op(x, libgr.gr_rsqrt, "rsqrt($x)")
 
     def floor(ctx, x):
-        return ctx._unary_op(x, libgr.gr_floor, "floor(x)")
+        return ctx._unary_op(x, libgr.gr_floor, "floor($x)")
 
     def ceil(ctx, x):
-        return ctx._unary_op(x, libgr.gr_ceil, "ceil(x)")
+        return ctx._unary_op(x, libgr.gr_ceil, "ceil($x)")
 
     def trunc(ctx, x):
-        return ctx._unary_op(x, libgr.gr_trunc, "trunc(x)")
+        return ctx._unary_op(x, libgr.gr_trunc, "trunc($x)")
 
     def nint(ctx, x):
-        return ctx._unary_op(x, libgr.gr_nint, "nint(x)")
+        return ctx._unary_op(x, libgr.gr_nint, "nint($x)")
 
     def abs(ctx, x):
-        return ctx._unary_op(x, libgr.gr_abs, "abs(x)")
+        return ctx._unary_op(x, libgr.gr_abs, "abs($x)")
 
     def conj(ctx, x):
-        return ctx._unary_op(x, libgr.gr_conj, "conj(x)")
+        return ctx._unary_op(x, libgr.gr_conj, "conj($x)")
 
     def re(ctx, x):
-        return ctx._unary_op(x, libgr.gr_re, "re(x)")
+        return ctx._unary_op(x, libgr.gr_re, "re($x)")
 
     def im(ctx, x):
-        return ctx._unary_op(x, libgr.gr_im, "im(x)")
+        return ctx._unary_op(x, libgr.gr_im, "im($x)")
 
     def sgn(ctx, x):
-        return ctx._unary_op(x, libgr.gr_sgn, "sgn(x)")
+        return ctx._unary_op(x, libgr.gr_sgn, "sgn($x)")
 
     def csgn(ctx, x):
-        return ctx._unary_op(x, libgr.gr_csgn, "csgn(x)")
+        return ctx._unary_op(x, libgr.gr_csgn, "csgn($x)")
 
     def mul_2exp(ctx, x, y):
-        return ctx._binary_op_fmpz(x, y, libgr.gr_mul_2exp_fmpz, "mul_2exp(x, y)")
+        return ctx._binary_op_fmpz(x, y, libgr.gr_mul_2exp_fmpz, "mul_2exp($x, $y)")
 
     def exp(ctx, x):
-        return ctx._unary_op(x, libgr.gr_exp, "exp(x)")
+        return ctx._unary_op(x, libgr.gr_exp, "exp($x)")
 
     def log(ctx, x):
-        return ctx._unary_op(x, libgr.gr_log, "log(x)")
+        return ctx._unary_op(x, libgr.gr_log, "log($x)")
 
     def sin(ctx, x):
-        return ctx._unary_op(x, libgr.gr_sin, "sin(x)")
+        return ctx._unary_op(x, libgr.gr_sin, "sin($x)")
 
     def cos(ctx, x):
-        return ctx._unary_op(x, libgr.gr_cos, "cos(x)")
+        return ctx._unary_op(x, libgr.gr_cos, "cos($x)")
 
     def tan(ctx, x):
-        return ctx._unary_op(x, libgr.gr_tan, "tan(x)")
+        return ctx._unary_op(x, libgr.gr_tan, "tan($x)")
 
     def sinh(ctx, x):
-        return ctx._unary_op(x, libgr.gr_sinh, "sinh(x)")
+        return ctx._unary_op(x, libgr.gr_sinh, "sinh($x)")
 
     def cosh(ctx, x):
-        return ctx._unary_op(x, libgr.gr_cosh, "cosh(x)")
+        return ctx._unary_op(x, libgr.gr_cosh, "cosh($x)")
 
     def tanh(ctx, x):
-        return ctx._unary_op(x, libgr.gr_tanh, "tanh(x)")
+        return ctx._unary_op(x, libgr.gr_tanh, "tanh($x)")
 
     def atan(ctx, x):
-        return ctx._unary_op(x, libgr.gr_atan, "atan(x)")
+        return ctx._unary_op(x, libgr.gr_atan, "atan($x)")
 
     def exp_pi_i(ctx, x):
-        return ctx._unary_op(x, libgr.gr_exp_pi_i, "exp_pi_i(x)")
+        return ctx._unary_op(x, libgr.gr_exp_pi_i, "exp_pi_i($x)")
 
     def log_pi_i(ctx, x):
-        return ctx._unary_op(x, libgr.gr_log_pi_i, "log_pi_i(x)")
+        return ctx._unary_op(x, libgr.gr_log_pi_i, "log_pi_i($x)")
 
     def sin_pi(ctx, x):
-        return ctx._unary_op(x, libgr.gr_sin_pi, "sin_pi(x)")
+        return ctx._unary_op(x, libgr.gr_sin_pi, "sin_pi($x)")
 
     def cos_pi(ctx, x):
-        return ctx._unary_op(x, libgr.gr_cos_pi, "cos_pi(x)")
+        return ctx._unary_op(x, libgr.gr_cos_pi, "cos_pi($x)")
 
     def tan_pi(ctx, x):
-        return ctx._unary_op(x, libgr.gr_tan_pi, "tan_pi(x)")
+        return ctx._unary_op(x, libgr.gr_tan_pi, "tan_pi($x)")
 
     def cot_pi(ctx, x):
-        return ctx._unary_op(x, libgr.gr_cot_pi, "cot_pi(x)")
+        return ctx._unary_op(x, libgr.gr_cot_pi, "cot_pi($x)")
 
     def sec_pi(ctx, x):
-        return ctx._unary_op(x, libgr.gr_sec_pi, "sec_pi(x)")
+        return ctx._unary_op(x, libgr.gr_sec_pi, "sec_pi($x)")
 
     def csc_pi(ctx, x):
-        return ctx._unary_op(x, libgr.gr_csc_pi, "csc_pi(x)")
+        return ctx._unary_op(x, libgr.gr_csc_pi, "csc_pi($x)")
 
     def asin_pi(ctx, x):
-        return ctx._unary_op(x, libgr.gr_asin_pi, "asin_pi(x)")
+        return ctx._unary_op(x, libgr.gr_asin_pi, "asin_pi($x)")
 
     def acos_pi(ctx, x):
-        return ctx._unary_op(x, libgr.gr_acos_pi, "acos_pi(x)")
+        return ctx._unary_op(x, libgr.gr_acos_pi, "acos_pi($x)")
 
     def atan_pi(ctx, x):
-        return ctx._unary_op(x, libgr.gr_atan_pi, "atan_pi(x)")
+        return ctx._unary_op(x, libgr.gr_atan_pi, "atan_pi($x)")
 
     def acot_pi(ctx, x):
-        return ctx._unary_op(x, libgr.gr_acot_pi, "acot_pi(x)")
+        return ctx._unary_op(x, libgr.gr_acot_pi, "acot_pi($x)")
 
     def asec_pi(ctx, x):
-        return ctx._unary_op(x, libgr.gr_asec_pi, "asec_pi(x)")
+        return ctx._unary_op(x, libgr.gr_asec_pi, "asec_pi($x)")
 
     def acsc_pi(ctx, x):
-        return ctx._unary_op(x, libgr.gr_acsc_pi, "acsc_pi(x)")
+        return ctx._unary_op(x, libgr.gr_acsc_pi, "acsc_pi($x)")
 
     def erf(ctx, x):
-        return ctx._unary_op(x, libgr.gr_erf, "erf(x)")
+        return ctx._unary_op(x, libgr.gr_erf, "erf($x)")
 
     def erfi(ctx, x):
-        return ctx._unary_op(x, libgr.gr_erfi, "erfi(x)")
+        return ctx._unary_op(x, libgr.gr_erfi, "erfi($x)")
 
     def erfc(ctx, x):
-        return ctx._unary_op(x, libgr.gr_erfc, "erfc(x)")
+        return ctx._unary_op(x, libgr.gr_erfc, "erfc($x)")
 
     def fac(ctx, x):
         """
@@ -647,7 +705,7 @@ class gr_ctx:
             >>> ZZ.fac(-1)
             Traceback (most recent call last):
               ...
-            ValueError: fac(x) is not defined over Integer ring (fmpz) for input -1
+            FlintDomainError: fac(x) is not an element of {Integer ring (fmpz)} for {x = -1}
 
         Real and complex factorials extend using the gamma function:
 
@@ -663,7 +721,7 @@ class gr_ctx:
             >>> ZZmod(10**7 + 19).fac(10**7)
             2343096
         """
-        return ctx._unary_op_with_fmpz_fmpq_overloads(x, libgr.gr_fac, op_fmpz=libgr.gr_fac_fmpz, rstr="fac(x)")
+        return ctx._unary_op_with_fmpz_fmpq_overloads(x, libgr.gr_fac, op_fmpz=libgr.gr_fac_fmpz, rstr="fac($x)")
 
     def fac_vec(ctx, length):
         """
@@ -679,7 +737,7 @@ class gr_ctx:
             [9.427862397658e+155 +/- 3.19e+142]
 
         """
-        return ctx._op_vec_len(length, libgr.gr_fac_vec, "fac_vec(length)")
+        return ctx._op_vec_len(length, libgr.gr_fac_vec, "fac_vec($length)")
 
     def rfac(ctx, x):
         """
@@ -692,12 +750,12 @@ class gr_ctx:
             >>> ZZ.rfac(2)
             Traceback (most recent call last):
               ...
-            ValueError: fac(x) is not defined over Integer ring (fmpz) for input 2
+            FlintDomainError: rfac(x) is not an element of {Integer ring (fmpz)} for {x = 2}
             >>> RR.rfac(0.5)
             [1.128379167095513 +/- 7.02e-16]
 
         """
-        return ctx._unary_op_with_fmpz_fmpq_overloads(x, libgr.gr_rfac, op_fmpz=libgr.gr_rfac_fmpz, rstr="fac(x)")
+        return ctx._unary_op_with_fmpz_fmpq_overloads(x, libgr.gr_rfac, op_fmpz=libgr.gr_rfac_fmpz, rstr="rfac($x)")
 
     def rfac_vec(ctx, length):
         """
@@ -710,26 +768,26 @@ class gr_ctx:
             >>> ZZmod(7).rfac_vec(8)
             Traceback (most recent call last):
               ...
-            ValueError: rfac_vec(length) is not defined over Integers mod 7 (_gr_nmod) for input 8
+            FlintDomainError: rfac_vec(length) is not an element of {Integers mod 7 (_gr_nmod)} for {length = 8}
             >>> sum(RR.rfac_vec(20))
             [2.71828182845904 +/- 8.66e-15]
         """
-        return ctx._op_vec_len(length, libgr.gr_rfac_vec, "rfac_vec(length)")
+        return ctx._op_vec_len(length, libgr.gr_rfac_vec, "rfac_vec($length)")
 
     def gamma(ctx, x):
-        return ctx._unary_op_with_fmpz_fmpq_overloads(x, libgr.gr_gamma, op_fmpz=libgr.gr_gamma_fmpz, op_fmpq=libgr.gr_gamma_fmpq, rstr="gamma(x)")
+        return ctx._unary_op_with_fmpz_fmpq_overloads(x, libgr.gr_gamma, op_fmpz=libgr.gr_gamma_fmpz, op_fmpq=libgr.gr_gamma_fmpq, rstr="gamma($x)")
 
     def lgamma(ctx, x):
-        return ctx._unary_op(x, libgr.gr_lgamma, "lgamma(x)")
+        return ctx._unary_op(x, libgr.gr_lgamma, "lgamma($x)")
 
     def rgamma(ctx, x):
-        return ctx._unary_op(x, libgr.gr_rgamma, "lgamma(x)")
+        return ctx._unary_op(x, libgr.gr_rgamma, "lgamma($x)")
 
     def digamma(ctx, x):
-        return ctx._unary_op(x, libgr.gr_digamma, "digamma(x)")
+        return ctx._unary_op(x, libgr.gr_digamma, "digamma($x)")
 
     def zeta(ctx, x):
-        return ctx._unary_op(x, libgr.gr_zeta, "zeta(x)")
+        return ctx._unary_op(x, libgr.gr_zeta, "zeta($x)")
 
     def bernoulli(ctx, n):
         """
@@ -745,7 +803,7 @@ class gr_ctx:
             >>> ZZ.bernoulli(1)
             Traceback (most recent call last):
               ...
-            ValueError: bernoulli(n) is not defined over Integer ring (fmpz) for input 1
+            FlintDomainError: bernoulli(n) is not an element of {Integer ring (fmpz)} for {n = 1}
 
         Huge Bernoulli numbers can be computed numerically:
 
@@ -756,10 +814,10 @@ class gr_ctx:
             >>> QQ.bernoulli(10**20)
             Traceback (most recent call last):
               ...
-            NotImplementedError: unable to compute bernoulli(n) for over Rational field (fmpq) for input 100000000000000000000
+            FlintUnableError: failed to compute bernoulli(n) in {Rational field (fmpq)} for {n = 100000000000000000000}
 
         """
-        return ctx._op_fmpz(n, libgr.gr_bernoulli_fmpz, "bernoulli(n)")
+        return ctx._op_fmpz(n, libgr.gr_bernoulli_fmpz, "bernoulli($n)")
 
     def bernoulli_vec(ctx, length):
         """
@@ -777,7 +835,7 @@ class gr_ctx:
             [1.127124216595034e+76 +/- 6.74e+60]
 
         """
-        return ctx._op_vec_len(length, libgr.gr_bernoulli_vec, "bernoulli_vec(length)")
+        return ctx._op_vec_len(length, libgr.gr_bernoulli_vec, "bernoulli_vec($length)")
 
     def eulernum(ctx, n):
         """
@@ -797,10 +855,10 @@ class gr_ctx:
             >>> ZZ.eulernum(10**20)
             Traceback (most recent call last):
               ...
-            NotImplementedError: unable to compute eulernum(n) for over Integer ring (fmpz) for input 100000000000000000000
+            FlintUnableError: failed to compute eulernum(n) in {Integer ring (fmpz)} for {n = 100000000000000000000}
 
         """
-        return ctx._op_fmpz(n, libgr.gr_eulernum_fmpz, "eulernum(n)")
+        return ctx._op_fmpz(n, libgr.gr_eulernum_fmpz, "eulernum($n)")
 
     def eulernum_vec(ctx, length):
         """
@@ -815,7 +873,7 @@ class gr_ctx:
             >>> sum(RF.eulernum_vec(100))
             -7.234656556133921e+134
         """
-        return ctx._op_vec_len(length, libgr.gr_eulernum_vec, "eulernum_vec(length)")
+        return ctx._op_vec_len(length, libgr.gr_eulernum_vec, "eulernum_vec($length)")
 
     def fib(ctx, n):
         """
@@ -840,7 +898,7 @@ class gr_ctx:
             13
 
         """
-        return ctx._op_fmpz(n, libgr.gr_fib_fmpz, "fib(n)")
+        return ctx._op_fmpz(n, libgr.gr_fib_fmpz, "fib($n)")
 
     def fib_vec(ctx, length):
         """
@@ -855,7 +913,7 @@ class gr_ctx:
             >>> sum(RF.fib_vec(100))
             5.731478440138172e+20
         """
-        return ctx._op_vec_len(length, libgr.gr_fib_vec, "fib(length)")
+        return ctx._op_vec_len(length, libgr.gr_fib_vec, "fib($length)")
 
     def stirling_s1u(ctx, n, k):
         """
@@ -870,7 +928,7 @@ class gr_ctx:
             >>> RR.stirling_s1u(50, 21)
             [3.318739129803912e+52 +/- 8.66e+36]
         """
-        return ctx._op_uiui(n, k, libgr.gr_stirling_s1u_uiui, "stirling_s1u(n, k)")
+        return ctx._op_uiui(n, k, libgr.gr_stirling_s1u_uiui, "stirling_s1u($n, $k)")
 
     def stirling_s1(ctx, n, k):
         """
@@ -883,7 +941,7 @@ class gr_ctx:
             >>> RR.stirling_s1(5, 2)
             -50.00000000000000
         """
-        return ctx._op_uiui(n, k, libgr.gr_stirling_s1_uiui, "stirling_s1(n, k)")
+        return ctx._op_uiui(n, k, libgr.gr_stirling_s1_uiui, "stirling_s1($n, $k)")
 
     def stirling_s2(ctx, n, k):
         """
@@ -898,7 +956,7 @@ class gr_ctx:
             >>> RR.stirling_s2(50, 20)
             [7.59792160686099e+45 +/- 5.27e+30]
         """
-        return ctx._op_uiui(n, k, libgr.gr_stirling_s2_uiui, "stirling_s2(n, k)")
+        return ctx._op_uiui(n, k, libgr.gr_stirling_s2_uiui, "stirling_s2($n, $k)")
 
     def stirling_s1u_vec(ctx, n, length=None):
         """
@@ -914,7 +972,7 @@ class gr_ctx:
         """
         if length is None:
             length = n + 1
-        return ctx._op_vec_ui_len(n, length, libgr.gr_stirling_s1u_ui_vec, "stirling_s1u_vec(n, length)")
+        return ctx._op_vec_ui_len(n, length, libgr.gr_stirling_s1u_ui_vec, "stirling_s1u_vec($n, $length)")
 
     def stirling_s1_vec(ctx, n, length=None):
         """
@@ -930,7 +988,7 @@ class gr_ctx:
         """
         if length is None:
             length = n + 1
-        return ctx._op_vec_ui_len(n, length, libgr.gr_stirling_s1_ui_vec, "stirling_s1_vec(n, length)")
+        return ctx._op_vec_ui_len(n, length, libgr.gr_stirling_s1_ui_vec, "stirling_s1_vec($n, $length)")
 
     def stirling_s2_vec(ctx, n, length=None):
         """
@@ -946,7 +1004,7 @@ class gr_ctx:
         """
         if length is None:
             length = n + 1
-        return ctx._op_vec_ui_len(n, length, libgr.gr_stirling_s2_ui_vec, "stirling_s2_vec(n, length)")
+        return ctx._op_vec_ui_len(n, length, libgr.gr_stirling_s2_ui_vec, "stirling_s2_vec($n, $length)")
 
     def bellnum(ctx, n):
         """
@@ -964,9 +1022,9 @@ class gr_ctx:
             >>> ZZ.bellnum(10**20)
             Traceback (most recent call last):
               ...
-            NotImplementedError: unable to compute bellnum(n) for over Integer ring (fmpz) for input 100000000000000000000
+            FlintUnableError: failed to compute bellnum(n) in {Integer ring (fmpz)} for {n = 100000000000000000000}
         """
-        return ctx._op_fmpz(n, libgr.gr_bellnum_fmpz, "bellnum(n)")
+        return ctx._op_fmpz(n, libgr.gr_bellnum_fmpz, "bellnum($n)")
 
     def bellnum_vec(ctx, length):
         """
@@ -1037,6 +1095,14 @@ class gr_elem:
         return None
 
     def __init__(self, val=None, context=None, random=False):
+        """
+            >>> ZZ(QQ(1))
+            1
+            >>> ZZ(QQ(1) / 3)
+            Traceback (most recent call last):
+              ...
+            FlintDomainError: 1/3 is not defined in Integer ring (fmpz)
+        """
         if context is None:
             context = self._default_context()
             if context is None:
@@ -1071,8 +1137,8 @@ class gr_elem:
             else:
                 status = GR_UNABLE
             if status:
-                if status & GR_UNABLE: raise NotImplementedError(f"unable to create element of {self.parent()} from {val} of type {type(val)}")
-                if status & GR_DOMAIN: raise ValueError(f"{val} is not defined in {self.parent()}")
+                if status & GR_UNABLE: raise FlintUnableError(f"unable to create element of {self.parent()} from {val} of type {type(val)}")
+                if status & GR_DOMAIN: raise FlintDomainError(f"{val} is not defined in {self.parent()}")
         elif random:
             libgr.gr_randtest(self._ref, ctypes.byref(_flint_rand), self._ctx)
 
@@ -1123,8 +1189,7 @@ class gr_elem:
         res = type(self)(context=self._ctx_python)
         status = op(res._ref, self._ref, other._ref, self._ctx)
         if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for x = {self}, y = {other} over {self.parent()}")
-            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined for x = {self}, y = {other} over {self.parent()}")
+            _handle_error(self.parent(), status, rstr, self, other)
         return res
 
     @staticmethod
@@ -1171,8 +1236,9 @@ class gr_elem:
                 self = other.parent()(self)
             return self._binary_op2(self, other, ops, rstr)
         if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for x = {self}, y = {other} over {self.parent()}")
-            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined for x = {self}, y = {other} over {self.parent()}")
+            _handle_error(self.parent(), status, rstr, self, other)
+            # if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for x = {self}, y = {other} over {self.parent()}")
+            # if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined for x = {self}, y = {other} over {self.parent()}")
         return res
 
     @staticmethod
@@ -1206,8 +1272,7 @@ class gr_elem:
         res = elem_type(context=self._ctx_python)
         status = op(res._ref, self._ref, self._ctx)
         if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for x = {self} over {self.parent()}")
-            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined for x = {self} over {self.parent()}")
+            _handle_error(self.parent(), status, rstr, self)
         return res
 
     @staticmethod
@@ -1215,8 +1280,7 @@ class gr_elem:
         res = ZZ()
         status = op(res._ref, self._ref, self._ctx)
         if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for x = {self} over {self.parent()}")
-            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined for x = {self} over {self.parent()}")
+            _handle_error(self.parent(), status, rstr, self)
         return res
 
     @staticmethod
@@ -1226,8 +1290,7 @@ class gr_elem:
         res = elem_type(context=self._ctx_python)
         status = op(res._ref, self._ref, other._ref, self._ctx)
         if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} for x = {self}, y = {other} over {self.parent()}")
-            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined for x = {self}, y = {other} over {self.parent()}")
+            _handle_error(self.parent(), status, rstr, self, other)
         return res
 
     @staticmethod
@@ -1236,8 +1299,7 @@ class gr_elem:
         res = elem_type(context=self._ctx_python)
         status = op(res._ref, self._ctx)
         if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"unable to compute {rstr} in {self.parent()}")
-            if status & GR_DOMAIN: raise ValueError(f"{rstr} is not defined in {self.parent()}")
+            _handle_error(self.parent(), status, rstr)
         return res
 
     def __eq__(self, other):
@@ -1277,46 +1339,46 @@ class gr_elem:
         return self._unary_op(self, libgr.gr_abs, "abs(x)")
 
     def __add__(self, other):
-        return self._binary_op2(self, other, _add_methods, "x + y")
+        return self._binary_op2(self, other, _add_methods, "$x + $y")
 
     def __radd__(self, other):
-        return self._binary_op2(other, self, _add_methods, "x + y")
+        return self._binary_op2(other, self, _add_methods, "$x + $y")
 
     def __sub__(self, other):
-        return self._binary_op2(self, other, _sub_methods, "x - y")
+        return self._binary_op2(self, other, _sub_methods, "$x - $y")
 
     def __rsub__(self, other):
-        return self._binary_op2(other, self, _sub_methods, "x - y")
+        return self._binary_op2(other, self, _sub_methods, "$x - $y")
 
     def __mul__(self, other):
-        return self._binary_op2(self, other, _mul_methods, "x * y")
+        return self._binary_op2(self, other, _mul_methods, "$x * $y")
 
     def __rmul__(self, other):
-        return self._binary_op2(other, self, _mul_methods, "x * y")
+        return self._binary_op2(other, self, _mul_methods, "$x * $y")
 
     def __truediv__(self, other):
-        return self._binary_op2(self, other, _div_methods, "x / y")
+        return self._binary_op2(self, other, _div_methods, "$x / $y")
 
     def __rtruediv__(self, other):
-        return self._binary_op2(other, self, _div_methods, "x / y")
+        return self._binary_op2(other, self, _div_methods, "$x / $y")
 
     def __pow__(self, other):
-        return self._binary_op2(self, other, _pow_methods, "x ** y")
+        return self._binary_op2(self, other, _pow_methods, "$x ** $y")
 
     def __rpow__(self, other):
-        return self._binary_op2(other, self, _pow_methods, "x ** y")
+        return self._binary_op2(other, self, _pow_methods, "$x ** $y")
 
     def __floordiv__(self, other):
-        return self._binary_op(self, other, libgr.gr_euclidean_div, "x // y")
+        return self._binary_op(self, other, libgr.gr_euclidean_div, "$x // $y")
 
     def __rfloordiv__(self, other):
-        return self._binary_op(self, other, libgr.gr_euclidean_div, "x // y")
+        return self._binary_op(self, other, libgr.gr_euclidean_div, "$x // $y")
 
     def __mod__(self, other):
-        return self._binary_op(self, other, libgr.gr_euclidean_rem, "x % y")
+        return self._binary_op(self, other, libgr.gr_euclidean_rem, "$x % $y")
 
     def __rmod__(self, other):
-        return self._binary_op(self, other, libgr.gr_euclidean_rem, "x % y")
+        return self._binary_op(self, other, libgr.gr_euclidean_rem, "$x % $y")
 
     def is_invertible(self):
         """
@@ -1423,10 +1485,9 @@ class gr_elem:
             >>> QQ(0).inv()
             Traceback (most recent call last):
               ...
-            ValueError: inv(x) is not defined for x = 0 over Rational field (fmpq)
-
+            FlintDomainError: inv(x) is not an element of {Rational field (fmpq)} for {x = 0}
         """
-        return self._unary_op(self, libgr.gr_inv, "inv(x)")
+        return self._unary_op(self, libgr.gr_inv, "inv($x)")
 
     def sqrt(self):
         """
@@ -1437,7 +1498,7 @@ class gr_elem:
             >>> ZZ(2).sqrt()
             Traceback (most recent call last):
               ...
-            ValueError: sqrt(x) is not defined for x = 2 over Integer ring (fmpz)
+            FlintDomainError: sqrt(x) is not an element of {Integer ring (fmpz)} for {x = 2}
             >>> QQbar(2).sqrt()
             Root a = 1.41421 of a^2-2
             >>> (QQ(25)/16).sqrt()
@@ -1447,12 +1508,12 @@ class gr_elem:
             >>> RR(-1).sqrt()
             Traceback (most recent call last):
               ...
-            ValueError: sqrt(x) is not defined for x = -1.000000000000000 over Real numbers (arb, prec = 53)
+            FlintDomainError: sqrt(x) is not an element of {Real numbers (arb, prec = 53)} for {x = -1.000000000000000}
             >>> RF(-1).sqrt()
             nan
 
         """
-        return self._unary_op(self, libgr.gr_sqrt, "sqrt(x)")
+        return self._unary_op(self, libgr.gr_sqrt, "sqrt($x)")
 
     def rsqrt(self):
         """
@@ -1461,7 +1522,7 @@ class gr_elem:
             >>> QQ(25).rsqrt()
             1/5
         """
-        return self._unary_op(self, libgr.gr_rsqrt, "rsqrt(x)")
+        return self._unary_op(self, libgr.gr_rsqrt, "rsqrt($x)")
 
     def floor(self):
         r"""
@@ -1476,7 +1537,7 @@ class gr_elem:
             >>> (QQ(3) / 2).trunc()
             1
         """
-        return self._unary_op(self, libgr.gr_floor, "floor(x)")
+        return self._unary_op(self, libgr.gr_floor, "floor($x)")
 
     def ceil(self):
         r"""
@@ -1485,7 +1546,7 @@ class gr_elem:
             >>> (QQ(3) / 2).ceil()
             2
         """
-        return self._unary_op(self, libgr.gr_ceil, "ceil(x)")
+        return self._unary_op(self, libgr.gr_ceil, "ceil($x)")
 
     def trunc(self):
         r"""
@@ -1494,7 +1555,7 @@ class gr_elem:
             >>> (QQ(3) / 2).trunc()
             1
         """
-        return self._unary_op(self, libgr.gr_trunc, "trunc(x)")
+        return self._unary_op(self, libgr.gr_trunc, "trunc($x)")
 
     def nint(self):
         r"""
@@ -1504,10 +1565,10 @@ class gr_elem:
             >>> (QQ(3) / 2).nint()
             2
         """
-        return self._unary_op(self, libgr.gr_nint, "nint(x)")
+        return self._unary_op(self, libgr.gr_nint, "nint($x)")
 
     def abs(self):
-        return self._unary_op(self, libgr.gr_abs, "abs(x)")
+        return self._unary_op(self, libgr.gr_abs, "abs($x)")
 
     def conj(self):
         """
@@ -1520,7 +1581,7 @@ class gr_elem:
             >>> QQ(3).conj()
             3
         """
-        return self._unary_op(self, libgr.gr_conj, "conj(x)")
+        return self._unary_op(self, libgr.gr_conj, "conj($x)")
 
     def re(self):
         """
@@ -1531,7 +1592,7 @@ class gr_elem:
             >>> (QQbar(-1) ** (QQ(1) / 3)).re()
             1/2
         """
-        return self._unary_op(self, libgr.gr_re, "re(x)")
+        return self._unary_op(self, libgr.gr_re, "re($x)")
 
     def im(self):
         """
@@ -1542,7 +1603,7 @@ class gr_elem:
             >>> (QQbar(-1) ** (QQ(1) / 3)).im()
             Root a = 0.866025 of 4*a^2-3
         """
-        return self._unary_op(self, libgr.gr_im, "im(x)")
+        return self._unary_op(self, libgr.gr_im, "im($x)")
 
     def sgn(self):
         """
@@ -1553,7 +1614,7 @@ class gr_elem:
             >>> CC(-10).sqrt().sgn()
             1.000000000000000*I
         """
-        return self._unary_op(self, libgr.gr_sgn, "sgn(x)")
+        return self._unary_op(self, libgr.gr_sgn, "sgn($x)")
 
     def csgn(self):
         """
@@ -1566,7 +1627,7 @@ class gr_elem:
             >>> (-QQbar(-10).sqrt()).csgn()
             -1
         """
-        return self._unary_op(self, libgr.gr_csgn, "csgn(x)")
+        return self._unary_op(self, libgr.gr_csgn, "csgn($x)")
 
     def mul_2exp(self, other):
         """
@@ -1581,9 +1642,9 @@ class gr_elem:
             >>> ZZ(100).mul_2exp(-3)
             Traceback (most recent call last):
               ...
-            ValueError: mul_2exp is not defined for x = 100, y = -3 over Integer ring (fmpz)
+            FlintDomainError: mul_2exp(x, y) is not an element of {Integer ring (fmpz)} for {x = 100}, {y = -3}
         """
-        return self._binary_op_fmpz(self, other, libgr.gr_mul_2exp_fmpz, "mul_2exp")
+        return self._binary_op_fmpz(self, other, libgr.gr_mul_2exp_fmpz, "mul_2exp($x, $y)")
 
     def exp(self):
         """
@@ -1598,34 +1659,33 @@ class gr_elem:
             >>> QQ(1).exp()
             Traceback (most recent call last):
               ...
-            NotImplementedError: unable to compute exp(x) for x = 1 over Rational field (fmpq)
-
+            FlintUnableError: failed to compute exp(x) in {Rational field (fmpq)} for {x = 1}
         """
-        return self._unary_op(self, libgr.gr_exp, "exp(x)")
+        return self._unary_op(self, libgr.gr_exp, "exp($x)")
 
     def log(self):
-        return self._unary_op(self, libgr.gr_log, "log(x)")
+        return self._unary_op(self, libgr.gr_log, "log($x)")
 
     def sin(self):
-        return self._unary_op(self, libgr.gr_sin, "sin(x)")
+        return self._unary_op(self, libgr.gr_sin, "sin($x)")
 
     def cos(self):
-        return self._unary_op(self, libgr.gr_cos, "cos(x)")
+        return self._unary_op(self, libgr.gr_cos, "cos($x)")
 
     def tan(self):
-        return self._unary_op(self, libgr.gr_tan, "tan(x)")
+        return self._unary_op(self, libgr.gr_tan, "tan($x)")
 
     def sinh(self):
-        return self._unary_op(self, libgr.gr_sinh, "sinh(x)")
+        return self._unary_op(self, libgr.gr_sinh, "sinh($x)")
 
     def cosh(self):
-        return self._unary_op(self, libgr.gr_cosh, "cosh(x)")
+        return self._unary_op(self, libgr.gr_cosh, "cosh($x)")
 
     def tanh(self):
-        return self._unary_op(self, libgr.gr_tanh, "tanh(x)")
+        return self._unary_op(self, libgr.gr_tanh, "tanh($x)")
 
     def atan(self):
-        return self._unary_op(self, libgr.gr_atan, "atan(x)")
+        return self._unary_op(self, libgr.gr_atan, "atan($x)")
 
     def exp_pi_i(self):
         r"""
@@ -1636,9 +1696,9 @@ class gr_elem:
             >>> (QQbar(2).sqrt()).exp_pi_i()
             Traceback (most recent call last):
               ...
-            ValueError: exp_pi_i(x) is not defined for x = Root a = 1.41421 of a^2-2 over Complex algebraic numbers (qqbar)
+            FlintDomainError: exp_pi_i(x) is not an element of {Complex algebraic numbers (qqbar)} for {x = Root a = 1.41421 of a^2-2}
         """
-        return self._unary_op(self, libgr.gr_exp_pi_i, "exp_pi_i(x)")
+        return self._unary_op(self, libgr.gr_exp_pi_i, "exp_pi_i($x)")
 
     def log_pi_i(self):
         r"""
@@ -1649,9 +1709,9 @@ class gr_elem:
             >>> (QQbar(1) / 2).log_pi_i()
             Traceback (most recent call last):
               ...
-            ValueError: log_pi_i(x) is not defined for x = 1/2 over Complex algebraic numbers (qqbar)
+            FlintDomainError: log_pi_i(x) is not an element of {Complex algebraic numbers (qqbar)} for {x = 1/2}
         """
-        return self._unary_op(self, libgr.gr_log_pi_i, "log_pi_i(x)")
+        return self._unary_op(self, libgr.gr_log_pi_i, "log_pi_i($x)")
 
     def sin_pi(self):
         r"""
@@ -1660,7 +1720,7 @@ class gr_elem:
             >>> (QQbar(1) / 3).sin_pi()
             Root a = 0.866025 of 4*a^2-3
         """
-        return self._unary_op(self, libgr.gr_sin_pi, "sin_pi(x)")
+        return self._unary_op(self, libgr.gr_sin_pi, "sin_pi($x)")
 
     def cos_pi(self):
         r"""
@@ -1669,7 +1729,7 @@ class gr_elem:
             >>> (QQbar(1) / 3).cos_pi()
             1/2
         """
-        return self._unary_op(self, libgr.gr_cos_pi, "cos_pi(x)")
+        return self._unary_op(self, libgr.gr_cos_pi, "cos_pi($x)")
 
     def tan_pi(self):
         r"""
@@ -1678,7 +1738,7 @@ class gr_elem:
             >>> (QQbar(1) / 3).tan_pi()
             Root a = 1.73205 of a^2-3
         """
-        return self._unary_op(self, libgr.gr_tan_pi, "tan_pi(x)")
+        return self._unary_op(self, libgr.gr_tan_pi, "tan_pi($x)")
 
     def cot_pi(self):
         r"""
@@ -1687,7 +1747,7 @@ class gr_elem:
             >>> (QQbar(1) / 3).cot_pi()
             Root a = 0.577350 of 3*a^2-1
         """
-        return self._unary_op(self, libgr.gr_cot_pi, "cot_pi(x)")
+        return self._unary_op(self, libgr.gr_cot_pi, "cot_pi($x)")
 
     def sec_pi(self):
         r"""
@@ -1696,7 +1756,7 @@ class gr_elem:
             >>> (QQbar(1) / 3).sec_pi()
             2
         """
-        return self._unary_op(self, libgr.gr_sec_pi, "sec_pi(x)")
+        return self._unary_op(self, libgr.gr_sec_pi, "sec_pi($x)")
 
     def csc_pi(self):
         r"""
@@ -1705,49 +1765,49 @@ class gr_elem:
             >>> (QQbar(1) / 3).csc_pi()
             Root a = 1.15470 of 3*a^2-4
         """
-        return self._unary_op(self, libgr.gr_csc_pi, "csc_pi(x)")
+        return self._unary_op(self, libgr.gr_csc_pi, "csc_pi($x)")
 
     def asin_pi(self):
-        return self._unary_op(self, libgr.gr_asin_pi, "asin_pi(x)")
+        return self._unary_op(self, libgr.gr_asin_pi, "asin_pi($x)")
 
     def acos_pi(self):
-        return self._unary_op(self, libgr.gr_acos_pi, "acos_pi(x)")
+        return self._unary_op(self, libgr.gr_acos_pi, "acos_pi($x)")
 
     def atan_pi(self):
-        return self._unary_op(self, libgr.gr_atan_pi, "atan_pi(x)")
+        return self._unary_op(self, libgr.gr_atan_pi, "atan_pi($x)")
 
     def acot_pi(self):
-        return self._unary_op(self, libgr.gr_acot_pi, "acot_pi(x)")
+        return self._unary_op(self, libgr.gr_acot_pi, "acot_pi($x)")
 
     def asec_pi(self):
-        return self._unary_op(self, libgr.gr_asec_pi, "asec_pi(x)")
+        return self._unary_op(self, libgr.gr_asec_pi, "asec_pi($x)")
 
     def acsc_pi(self):
-        return self._unary_op(self, libgr.gr_acsc_pi, "acsc_pi(x)")
+        return self._unary_op(self, libgr.gr_acsc_pi, "acsc_pi($x)")
 
     def erf(self):
-        return self._unary_op(self, libgr.gr_erf, "erf(x)")
+        return self._unary_op(self, libgr.gr_erf, "erf($x)")
 
     def erfi(self):
-        return self._unary_op(self, libgr.gr_erfi, "erfi(x)")
+        return self._unary_op(self, libgr.gr_erfi, "erfi($x)")
 
     def erfc(self):
-        return self._unary_op(self, libgr.gr_erfc, "erfc(x)")
+        return self._unary_op(self, libgr.gr_erfc, "erfc($x)")
 
     def gamma(self):
-        return self._unary_op(self, libgr.gr_gamma, "gamma(x)")
+        return self._unary_op(self, libgr.gr_gamma, "gamma($x)")
 
     def lgamma(self):
-        return self._unary_op(self, libgr.gr_lgamma, "lgamma(x)")
+        return self._unary_op(self, libgr.gr_lgamma, "lgamma($x)")
 
     def rgamma(self):
-        return self._unary_op(self, libgr.gr_rgamma, "lgamma(x)")
+        return self._unary_op(self, libgr.gr_rgamma, "lgamma($x)")
 
     def digamma(self):
-        return self._unary_op(self, libgr.gr_digamma, "digamma(x)")
+        return self._unary_op(self, libgr.gr_digamma, "digamma($x)")
 
     def zeta(self):
-        return self._unary_op(self, libgr.gr_zeta, "zeta(x)")
+        return self._unary_op(self, libgr.gr_zeta, "zeta($x)")
 
 
 class IntegerRing_fmpz(gr_ctx):
@@ -1964,9 +2024,9 @@ class acf(gr_elem):
 
 class IntegersMod_nmod(gr_ctx):
     def __init__(self, n):
-        gr_ctx.__init__(self)
         n = self._as_ui(n)
         assert n >= 1
+        gr_ctx.__init__(self)
         libgr.gr_ctx_init_nmod(self._ref, n, None)
         self._elem_type = nmod
 
@@ -2811,6 +2871,30 @@ class gr_vec(gr_elem):
             if status & GR_DOMAIN: raise ValueError
         return x
 
+    def sum(self, initial=None, subtract=False):
+        if initial or subtract:
+            raise NotImplementedError
+        element_ring = self.parent()._element_ring
+        res = element_ring()
+        ptr = libgr.gr_vec_entry_ptr(self._ref, 0, res._ctx)
+        status = libgr._gr_vec_sum(res._ref, None, 0, ptr, len(self), res._ctx)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
+    def product(self, initial=None, divide=False):
+        if initial or divide:
+            raise NotImplementedError
+        element_ring = self.parent()._element_ring
+        res = element_ring()
+        ptr = libgr.gr_vec_entry_ptr(self._ref, 0, res._ctx)
+        status = libgr._gr_vec_product(res._ref, None, 0, ptr, len(self), res._ctx)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
 
 PolynomialRing = PolynomialRing_gr_poly
 
@@ -2839,6 +2923,13 @@ VecRR = Vec(RR)
 VecCC = Vec(CC)
 VecRF = Vec(RF)
 VecCF = Vec(CF)
+
+MatZZ = Mat(ZZ)
+MatQQ = Mat(QQ)
+MatRR = Mat(RR)
+MatCC = Mat(CC)
+MatRF = Mat(RF)
+MatCF = Mat(CF)
 
 ZZx = PolynomialRing_gr_poly(ZZ)
 QQx = PolynomialRing_gr_poly(QQ)
@@ -3007,6 +3098,9 @@ def test_qq():
     assert QQ(1).factor() == (1, [], [])
     assert QQ(0).factor() == (0, [], [])
     assert (-QQ(12)/175).factor() == (-1, [2, 3, 5, 7], [2, 1, -2, -1])
+    x = QQ.bernoulli(50)
+    sign, primes, exponents = x.factor()
+    assert (sign * (primes ** exponents)).product() == x
 
 def test_qqbar():
     a = (-23 + 5*ZZi.i())
@@ -3125,6 +3219,7 @@ def test_special():
         assert QQ.fib(i) == QQ.fib(i-1) + QQ.fib(i-2)
         assert F.fib(i) == F.fib(i-1) + F.fib(i-2)
 
+
 if __name__ == "__main__":
     from time import time
     print("Testing flint_ctypes")
@@ -3139,6 +3234,8 @@ if __name__ == "__main__":
             print("%.2f" % (t2-t1))
     print("----------------------------------------------------------")
     import doctest
-    doctest.testmod(optionflags=(doctest.FAIL_FAST | doctest.ELLIPSIS), verbose=True)
+    __r = doctest.testmod(optionflags=(doctest.FAIL_FAST | doctest.ELLIPSIS), verbose=False)[0]
+    if __r:
+        sys.exit(__r)
     print("----------------------------------------------------------")
 

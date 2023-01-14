@@ -487,6 +487,7 @@ int _gr_fmpq_factor(gr_ptr c, gr_vec_t factors, gr_vec_t exponents, const fmpq_t
     fmpz_factor_t nfac, dfac;
     slong i, n, num_num, num_den;
     fmpq * fmpq_factors;
+    gr_ctx_t ZZ;
 
     fmpz_factor_init(nfac);
     fmpz_factor_init(dfac);
@@ -500,8 +501,9 @@ int _gr_fmpq_factor(gr_ptr c, gr_vec_t factors, gr_vec_t exponents, const fmpq_t
 
     n = num_num + num_den;
 
+    gr_ctx_init_fmpz(ZZ);
     gr_vec_set_length(factors, n, ctx);
-    gr_vec_set_length(exponents, n, ctx);
+    gr_vec_set_length(exponents, n, ZZ);
 
     fmpq_factors = factors->entries;
 
@@ -516,11 +518,12 @@ int _gr_fmpq_factor(gr_ptr c, gr_vec_t factors, gr_vec_t exponents, const fmpq_t
     {
         fmpz_swap(fmpq_numref(fmpq_factors + num_num + i), dfac->p + i);
         fmpz_one(fmpq_denref(fmpq_factors + num_num + i));
-        fmpz_neg_ui((fmpz *) (exponents->entries) + nfac->num + i, nfac->exp[i]);
+        fmpz_neg_ui((fmpz *) (exponents->entries) + dfac->num + i, dfac->exp[i]);
     }
 
     fmpz_factor_clear(nfac);
     fmpz_factor_clear(dfac);
+    gr_ctx_clear(ZZ);
 
     return GR_SUCCESS;
 }
