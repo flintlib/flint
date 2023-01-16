@@ -70,6 +70,12 @@ mpolynomial_ctx_is_field(gr_ctx_t ctx)
     return T_FALSE;
 }
 
+truth_t
+mpolynomial_ctx_is_threadsafe(gr_ctx_t ctx)
+{
+    return gr_ctx_is_threadsafe(MPOLYNOMIAL_ELEM_CTX(ctx));
+}
+
 void
 mpolynomial_init(gr_mpoly_t res, gr_ctx_t ctx)
 {
@@ -206,6 +212,7 @@ gr_method_tab_input _gr_mpolynomial_methods_input[] =
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) mpolynomial_ctx_is_commutative_ring},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) mpolynomial_ctx_is_integral_domain},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) mpolynomial_ctx_is_field},
+    {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr) mpolynomial_ctx_is_threadsafe},
     {GR_METHOD_INIT,        (gr_funcptr) mpolynomial_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) mpolynomial_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) mpolynomial_swap},

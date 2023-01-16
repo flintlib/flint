@@ -2817,6 +2817,10 @@ class gr_vec(gr_elem):
     _struct_type = gr_vec_struct
 
     def __init__(self, *args, **kwargs):
+        """
+            >>> VecZZ(range(3, 20, 3))
+            [3, 6, 9, 12, 15, 18]
+        """
         context = kwargs['context']
         gr_elem.__init__(self, None, context)
         element_ring = context._element_ring
@@ -2838,6 +2842,17 @@ class gr_vec(gr_elem):
                             status |= libgr.gr_set(iptr, x._ref, x._ctx)
                 elif isinstance(val, gr_elem):
                     status = libgr.gr_set_other(self._ref, val._ref, val._ctx, self._ctx)
+                elif isinstance(val, range):
+                    start = val.start
+                    step = val.step
+                    n = len(val)
+                    # todo: watch for slong -> int
+                    status = libgr._gr_vec_check_resize(self._ref, n, self._ctx)
+                    if not status:
+                        start = element_ring(start)
+                        step = element_ring(step)
+                        iptr = libgr.gr_vec_entry_ptr(self._ref, 0, element_ring._ref)
+                        status = libgr._gr_vec_step(iptr, start._ref, step._ref, n, element_ring._ref)
                 if status:
                     if status & GR_UNABLE: raise NotImplementedError
                     if status & GR_DOMAIN: raise ValueError

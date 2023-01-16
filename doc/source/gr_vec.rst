@@ -202,4 +202,6 @@ Dot products
 Other functions
 --------------------------------------------------------------------------------
 
+.. function:: int _gr_vec_step(gr_ptr vec, gr_srcptr start, gr_srcptr step, slong len, gr_ctx_t ctx)
+
 .. function:: int _gr_vec_set_powers(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx)

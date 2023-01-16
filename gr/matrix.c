@@ -95,6 +95,12 @@ truth_t gr_ctx_matrix_is_fixed_size(gr_ctx_t ctx)
     return (MATRIX_CTX(ctx)->all_sizes) ? T_FALSE : T_TRUE;
 }
 
+truth_t
+matrix_ctx_is_threadsafe(gr_ctx_t ctx)
+{
+    return gr_ctx_is_threadsafe(MATRIX_CTX(ctx)->base_ring);
+}
+
 void
 matrix_clear(gr_mat_t res, gr_ctx_t ctx)
 {
@@ -462,6 +468,7 @@ gr_method_tab_input _gr_mat_methods_input[] =
 {
     {GR_METHOD_CTX_WRITE,   (gr_funcptr) matrix_ctx_write},
     {GR_METHOD_CTX_IS_RING, (gr_funcptr) matrix_ctx_is_ring},
+    {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr) matrix_ctx_is_threadsafe},
     {GR_METHOD_INIT,        (gr_funcptr) matrix_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) matrix_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) matrix_swap},

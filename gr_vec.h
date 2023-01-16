@@ -198,6 +198,7 @@ WARN_UNUSED_RESULT int _gr_vec_product_parallel(gr_ptr res, gr_srcptr vec, slong
 WARN_UNUSED_RESULT int _gr_vec_product_serial(gr_ptr res, gr_srcptr vec, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_vec_product_generic(gr_ptr res, gr_srcptr vec, slong len, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int _gr_vec_step(gr_ptr vec, gr_srcptr start, gr_srcptr step, slong len, gr_ctx_t ctx);
 
 #ifdef __cplusplus
 }

@@ -66,6 +66,12 @@ truth_t gr_ctx_vector_gr_vec_is_fixed_size(gr_ctx_t ctx)
     return (VECTOR_CTX(ctx)->all_sizes) ? T_FALSE : T_TRUE;
 }
 
+truth_t
+vector_ctx_is_threadsafe(gr_ctx_t ctx)
+{
+    return gr_ctx_is_threadsafe(ENTRY_CTX(ctx));
+}
+
 void
 vector_gr_vec_clear(gr_vec_t res, gr_ctx_t ctx)
 {
@@ -338,6 +344,8 @@ gr_static_method_table _gr_vec_methods;
 
 gr_method_tab_input _gr_vec_methods_input[] =
 {
+    {GR_METHOD_CTX_IS_THREADSAFE,    (gr_funcptr) vector_ctx_is_threadsafe},
+
     {GR_METHOD_CTX_WRITE,   (gr_funcptr) vector_gr_vec_ctx_write},
     {GR_METHOD_INIT,        (gr_funcptr) vector_gr_vec_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) vector_gr_vec_clear},
