@@ -1197,6 +1197,10 @@ gr_method_tab_input _ca_methods_input[] =
                                 (gr_funcptr) _gr_ca_ctx_is_algebraically_closed},
     {GR_METHOD_CTX_IS_ORDERED_RING,
                                 (gr_funcptr) _gr_ca_ctx_is_ordered_ring},
+
+    /* important */
+    {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr) gr_generic_ctx_predicate_false},
+
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_CANONICAL,
                                 (gr_funcptr) gr_generic_ctx_predicate_false},

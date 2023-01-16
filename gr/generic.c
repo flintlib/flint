@@ -12,6 +12,7 @@
 #include "flint/arith.h"
 #include "bernoulli.h"
 #include "gr.h"
+#include "gr_vec.h"
 #include "gr_mat.h"
 #include "gr_poly.h"
 #include "gr_special.h"
@@ -2111,147 +2112,6 @@ gr_generic_vec_is_zero(gr_srcptr vec, slong len, gr_ctx_t ctx)
 }
 
 int
-gr_generic_vec_sum(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec, slong len, gr_ctx_t ctx)
-{
-    gr_method_binary_op add = GR_BINARY_OP(ctx, ADD);
-    gr_method_binary_op sub = GR_BINARY_OP(ctx, SUB);
-    int status;
-    slong i, sz;
-
-    if (len <= 1)
-    {
-        if (len == 0)
-        {
-            if (initial == NULL)
-                return gr_zero(res, ctx);
-            else
-                return gr_set(res, initial, ctx);
-        }
-        else
-        {
-            if (initial == NULL)
-                if (subtract)
-                    return gr_neg(res, vec, ctx);
-                else
-                    return gr_set(res, vec, ctx);
-            else
-                if (subtract)
-                    return sub(res, initial, vec, ctx);
-                else
-                    return add(res, initial, vec, ctx);
-        }
-    }
-
-    sz = ctx->sizeof_elem;
-    status = GR_SUCCESS;
-
-    if (initial == NULL)
-    {
-        if (subtract)
-        {
-            status |= add(res, GR_ENTRY(vec, 0, sz), GR_ENTRY(vec, 1, sz), ctx);
-            for (i = 2; i < len; i++)
-                status |= add(res, res, GR_ENTRY(vec, i, sz), ctx);
-            status |= gr_neg(res, res, ctx);
-        }
-        else
-        {
-            status |= add(res, GR_ENTRY(vec, 0, sz), GR_ENTRY(vec, 1, sz), ctx);
-            for (i = 2; i < len; i++)
-                status |= add(res, res, GR_ENTRY(vec, i, sz), ctx);
-        }
-    }
-    else
-    {
-        if (subtract)
-        {
-            status |= sub(res, initial, GR_ENTRY(vec, 0, sz), ctx);
-            for (i = 1; i < len; i++)
-                status |= sub(res, res, GR_ENTRY(vec, i, sz), ctx);
-        }
-        else
-        {
-            status |= add(res, initial, GR_ENTRY(vec, 0, sz), ctx);
-            for (i = 1; i < len; i++)
-                status |= add(res, res, GR_ENTRY(vec, i, sz), ctx);
-        }
-    }
-
-    return status;
-}
-
-int
-gr_generic_vec_product(gr_ptr res, gr_srcptr initial, int invert, gr_srcptr vec, slong len, gr_ctx_t ctx)
-{
-    gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
-    gr_method_binary_op div = GR_BINARY_OP(ctx, DIV);
-    int status;
-    slong i, sz;
-
-    if (len <= 1)
-    {
-        if (len == 0)
-        {
-            if (initial == NULL)
-                return gr_one(res, ctx);
-            else
-                return gr_set(res, initial, ctx);
-        }
-        else
-        {
-            if (initial == NULL)
-                if (invert)
-                    return gr_inv(res, vec, ctx);
-                else
-                    return gr_set(res, vec, ctx);
-            else
-                if (invert)
-                    return gr_div(res, initial, vec, ctx);
-                else
-                    return mul(res, initial, vec, ctx);
-        }
-    }
-
-    sz = ctx->sizeof_elem;
-    status = GR_SUCCESS;
-
-    if (initial == NULL)
-    {
-        if (invert)
-        {
-            status |= mul(res, GR_ENTRY(vec, 0, sz), GR_ENTRY(vec, 1, sz), ctx);
-            for (i = 2; i < len; i++)
-                status |= mul(res, res, GR_ENTRY(vec, i, sz), ctx);
-            status |= gr_inv(res, res, ctx);
-        }
-        else
-        {
-            status |= mul(res, GR_ENTRY(vec, 0, sz), GR_ENTRY(vec, 1, sz), ctx);
-            for (i = 2; i < len; i++)
-                status |= mul(res, res, GR_ENTRY(vec, i, sz), ctx);
-        }
-    }
-    else
-    {
-        if (invert)
-        {
-            /* todo: avoid repeated divisions */
-            status |= div(res, initial, GR_ENTRY(vec, 0, sz), ctx);
-            for (i = 1; i < len; i++)
-                status |= div(res, res, GR_ENTRY(vec, i, sz), ctx);
-        }
-        else
-        {
-            status |= mul(res, initial, GR_ENTRY(vec, 0, sz), ctx);
-            for (i = 1; i < len; i++)
-                status |= mul(res, res, GR_ENTRY(vec, i, sz), ctx);
-        }
-    }
-
-    return status;
-}
-
-int
 gr_generic_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
 {
     gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
@@ -2549,6 +2409,9 @@ const gr_method_tab_input _gr_generic_methods[] =
 
     {GR_METHOD_CTX_IS_ORDERED_RING,     (gr_funcptr) gr_generic_ctx_predicate},
 
+    /* should be true for most rings */
+    {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr) gr_generic_ctx_predicate_true},
+
     {GR_METHOD_CTX_IS_EXACT,            (gr_funcptr) gr_generic_ctx_predicate},
     {GR_METHOD_CTX_IS_CANONICAL,        (gr_funcptr) gr_generic_ctx_predicate},
 
@@ -2791,8 +2654,8 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_VEC_EQUAL,               (gr_funcptr) gr_generic_vec_equal},
     {GR_METHOD_VEC_IS_ZERO,             (gr_funcptr) gr_generic_vec_is_zero},
 
-    {GR_METHOD_VEC_SUM,                 (gr_funcptr) gr_generic_vec_sum},
-    {GR_METHOD_VEC_PRODUCT,             (gr_funcptr) gr_generic_vec_product},
+    {GR_METHOD_VEC_SUM,                 (gr_funcptr) _gr_vec_sum_generic},
+    {GR_METHOD_VEC_PRODUCT,             (gr_funcptr) _gr_vec_product_generic},
 
     {GR_METHOD_VEC_DOT,                 (gr_funcptr) gr_generic_vec_dot},
     {GR_METHOD_VEC_DOT_REV,             (gr_funcptr) gr_generic_vec_dot_rev},

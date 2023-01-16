@@ -129,7 +129,7 @@ vector_gr_vec_set_other(gr_vec_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
     else if (x_ctx->which_ring == GR_CTX_GR_VEC)
     {
         const gr_vec_struct * xvec = x;
-        slong i, j;
+        slong i;
         int status = GR_SUCCESS;
         slong sz, xsz;
 
@@ -146,16 +146,13 @@ vector_gr_vec_set_other(gr_vec_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 
         for (i = 0; i < res->length; i++)
         {
-            for (j = 0; j < xvec->length; j++)
-            {
-                status = gr_set_other(GR_ENTRY(res->entries, i, sz),
-                            GR_ENTRY(xvec->entries, i, xsz),
-                            ENTRY_CTX(x_ctx),
-                            ENTRY_CTX(ctx));
+            status = gr_set_other(GR_ENTRY(res->entries, i, sz),
+                        GR_ENTRY(xvec->entries, i, xsz),
+                        ENTRY_CTX(x_ctx),
+                        ENTRY_CTX(ctx));
 
-                if (status != GR_SUCCESS)
-                    return status;
-            }
+            if (status != GR_SUCCESS)
+                return status;
         }
 
         return GR_SUCCESS;

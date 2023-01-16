@@ -14,7 +14,7 @@ Examples::
     >>> QQ.bernoulli(50)
     495057205241079648212477525/66
     >>> _.factor()
-    (1, [5, 417202699, 47464429777438199, 2, 3, 11], [2, 1, 1, -2, -1, -1])
+    (1, [5, 417202699, 47464429777438199, 2, 3, 11], [2, 1, 1, -1, -1, -1])
     >>> sign * (primes ** exponents).product()
     495057205241079648212477525/66
 
@@ -32,11 +32,11 @@ Types, parents and coercions
     >>> ZZ(10) / ZZ(6)
     Traceback (most recent call last):
       ...
-    ValueError: x / y is not defined for x = 10, y = 6 over Integer ring (fmpz)
+    FlintDomainError: x / y is not an element of {Integer ring (fmpz)} for {x = 10}, {y = 6}
     >>> x = QQ(1) / 2; x ** x
     Traceback (most recent call last):
       ...
-    ValueError: x ** y is not defined for x = 1/2, y = 1/2 over Rational field (fmpq)
+    FlintDomainError: x ** y is not an element of {Rational field (fmpq)} for {x = 1/2}, {y = 1/2}
 
     >>> ZZ(10) / QQ(6)
     5/3

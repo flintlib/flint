@@ -47,6 +47,7 @@ WARN_UNUSED_RESULT int gr_vec_append(gr_vec_t vec, gr_srcptr f, gr_ctx_t ctx);
 
 int _gr_vec_write(gr_stream_t out, gr_srcptr vec, slong len, gr_ctx_t ctx);
 int gr_vec_write(gr_stream_t out, const gr_vec_t vec, gr_ctx_t ctx);
+int _gr_vec_print(gr_srcptr vec, slong len, gr_ctx_t ctx);
 int gr_vec_print(const gr_vec_t vec, gr_ctx_t ctx);
 
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_zero(gr_ptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_CONSTANT_OP(ctx, VEC_ZERO)(vec, len, ctx); }
@@ -138,20 +139,21 @@ GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_submul_scalar_si(gr_ptr vec1, gr_sr
 GR_VEC_INLINE truth_t _gr_vec_equal(gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx) { return GR_VEC_VEC_PREDICATE(ctx, VEC_EQUAL)(vec1, vec2, len, ctx); }
 GR_VEC_INLINE truth_t _gr_vec_is_zero(gr_srcptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_PREDICATE(ctx, VEC_IS_ZERO)(vec, len, ctx); }
 
-typedef int ((*gr_method_vec_sum_op)(gr_ptr, gr_srcptr, int, gr_srcptr, slong, gr_ctx_ptr));
+typedef int ((*gr_method_vec_reduce_op)(gr_ptr, gr_srcptr, slong, gr_ctx_ptr));
+
 typedef int ((*gr_method_vec_dot_op)(gr_ptr, gr_srcptr, int, gr_srcptr, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_vec_dot_si_op)(gr_ptr, gr_srcptr, int, gr_srcptr, const slong *, slong, gr_ctx_ptr));
 typedef int ((*gr_method_vec_dot_ui_op)(gr_ptr, gr_srcptr, int, gr_srcptr, const ulong *, slong, gr_ctx_ptr));
 typedef int ((*gr_method_vec_dot_fmpz_op)(gr_ptr, gr_srcptr, int, gr_srcptr, const fmpz *, slong, gr_ctx_ptr));
 
-#define GR_VEC_SUM_OP(ctx, NAME) (((gr_method_vec_sum_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_VEC_REDUCE_OP(ctx, NAME) (((gr_method_vec_reduce_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_DOT_OP(ctx, NAME) (((gr_method_vec_dot_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_DOT_SI_OP(ctx, NAME) (((gr_method_vec_dot_si_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_DOT_UI_OP(ctx, NAME) (((gr_method_vec_dot_ui_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_DOT_FMPZ_OP(ctx, NAME) (((gr_method_vec_dot_fmpz_op *) ctx->methods)[GR_METHOD_ ## NAME])
 
-GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_sum(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_SUM_OP(ctx, VEC_SUM)(res, initial, subtract, vec, len, ctx); }
-GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_product(gr_ptr res, gr_srcptr initial, int invert, gr_srcptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_SUM_OP(ctx, VEC_PRODUCT)(res, initial, invert, vec, len, ctx); }
+GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_sum(gr_ptr res, gr_srcptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_REDUCE_OP(ctx, VEC_SUM)(res, vec, len, ctx); }
+GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_product(gr_ptr res, gr_srcptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_REDUCE_OP(ctx, VEC_PRODUCT)(res, vec, len, ctx); }
 
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx) { return GR_VEC_DOT_OP(ctx, VEC_DOT)(res, initial, subtract, vec1, vec2, len, ctx); }
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx) { return GR_VEC_DOT_OP(ctx, VEC_DOT_REV)(res, initial, subtract, vec1, vec2, len, ctx); }
@@ -183,6 +185,19 @@ _gr_vec_randtest(gr_ptr res, flint_rand_t state, slong len, gr_ctx_t ctx)
 
     return status;
 }
+
+WARN_UNUSED_RESULT int _gr_vec_sum_bsplit_parallel(gr_ptr res, gr_srcptr vec, slong len, slong basecase_cutoff, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_vec_sum_bsplit(gr_ptr res, gr_srcptr vec, slong len, slong basecase_cutoff, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_vec_sum_parallel(gr_ptr res, gr_srcptr vec, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_vec_sum_serial(gr_ptr res, gr_srcptr vec, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_vec_sum_generic(gr_ptr res, gr_srcptr vec, slong len, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int _gr_vec_product_bsplit_parallel(gr_ptr res, gr_srcptr vec, slong len, slong basecase_cutoff, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_vec_product_bsplit(gr_ptr res, gr_srcptr vec, slong len, slong basecase_cutoff, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_vec_product_parallel(gr_ptr res, gr_srcptr vec, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_vec_product_serial(gr_ptr res, gr_srcptr vec, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_vec_product_generic(gr_ptr res, gr_srcptr vec, slong len, gr_ctx_t ctx);
+
 
 #ifdef __cplusplus
 }

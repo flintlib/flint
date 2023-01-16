@@ -667,6 +667,88 @@ _fmpq_vec_is_fmpz_vec(const fmpq * vec, slong len)
     return 1;
 }
 
+int
+_gr_fmpq_vec_sum(fmpq_t res, const fmpq * vec, slong len, gr_ctx_t ctx)
+{
+    if (len <= 2)
+    {
+        if (len == 2)
+            fmpq_add(res, vec + 0, vec + 1);
+        else if (len == 1)
+            fmpq_set(res, vec);
+        else
+            fmpq_zero(res);
+    }
+    else if (_fmpq_vec_is_fmpz_vec(vec, len))
+    {
+        ulong hi, lo;
+        slong i;
+        fmpz f;
+        __mpz_struct * f_mpz;
+        __mpz_struct * res_mpz = NULL;
+
+        hi = lo = 0;
+
+        for (i = 0; i < len; i++)
+        {
+            f = *fmpq_numref(vec + i);
+
+            if (!COEFF_IS_MPZ(f))
+            {
+                if (f >= 0)
+                    add_ssaaaa(hi, lo, hi, lo, 0, f);
+                else
+                    sub_ddmmss(hi, lo, hi, lo, 0, -f);
+            }
+            else
+            {
+                f_mpz = COEFF_TO_PTR(f);
+
+                if (res_mpz == NULL)
+                {
+                    res_mpz = _fmpz_promote(fmpq_numref(res));
+                    mpz_set(res_mpz, f_mpz);
+                }
+                else
+                {
+                    mpz_add(res_mpz, res_mpz, f_mpz);
+                }
+            }
+        }
+
+        if (res_mpz == NULL)
+        {
+            fmpz_set_signed_uiui(fmpq_numref(res), hi, lo);
+        }
+        else
+        {
+            if (hi != 0 || lo != 0)
+                flint_mpz_add_signed_uiui(res_mpz, res_mpz, hi, lo);
+
+            _fmpz_demote_val(fmpq_numref(res));
+        }
+
+        fmpz_one(fmpq_denref(res));
+    }
+    else
+    {
+        slong i;
+
+        if (len > 500)
+            return _gr_vec_sum_bsplit_parallel(res, vec, len, 100, ctx);
+
+        if (len > 20)
+            return _gr_vec_sum_bsplit(res, vec, len, 20, ctx);
+
+        fmpq_add(res, vec, vec + 1);
+
+        for (i = 2; i < len; i++)
+            fmpq_add(res, res, vec + i);
+    }
+
+    return GR_SUCCESS;
+}
+
 static void
 _fmpq_vec_get_fmpz_vec_den(fmpz * c, fmpz_t den, const fmpq * vec, slong len)
 {
@@ -974,6 +1056,7 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_CMPABS,          (gr_funcptr) _gr_fmpq_cmpabs},
     {GR_METHOD_VEC_IS_ZERO,     (gr_funcptr) _gr_fmpq_vec_is_zero},
     {GR_METHOD_VEC_EQUAL,       (gr_funcptr) _gr_fmpq_vec_equal},
+    {GR_METHOD_VEC_SUM,         (gr_funcptr) _gr_fmpq_vec_sum},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpq_poly_mullow},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fmpq_poly_roots},
     {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_fmpq_poly_roots_other},

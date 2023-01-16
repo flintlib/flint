@@ -837,6 +837,70 @@ _gr_fmpz_vec_sub(fmpz * res, const fmpz * vec1, const fmpz * vec2, slong len, gr
     return GR_SUCCESS;
 }
 
+int
+_gr_fmpz_vec_sum(fmpz_t res, const fmpz * vec, slong len, gr_ctx_t ctx)
+{
+    if (len <= 2)
+    {
+        if (len == 2)
+            fmpz_add(res, vec + 0, vec + 1);
+        else if (len == 1)
+            fmpz_set(res, vec);
+        else
+            fmpz_zero(res);
+    }
+    else
+    {
+        ulong hi, lo;
+        slong i;
+        fmpz f;
+        __mpz_struct * f_mpz;
+        __mpz_struct * res_mpz = NULL;
+
+        hi = lo = 0;
+
+        for (i = 0; i < len; i++)
+        {
+            f = vec[i];
+
+            if (!COEFF_IS_MPZ(f))
+            {
+                if (f >= 0)
+                    add_ssaaaa(hi, lo, hi, lo, 0, f);
+                else
+                    sub_ddmmss(hi, lo, hi, lo, 0, -f);
+            }
+            else
+            {
+                f_mpz = COEFF_TO_PTR(f);
+
+                if (res_mpz == NULL)
+                {
+                    res_mpz = _fmpz_promote(res);
+                    mpz_set(res_mpz, f_mpz);
+                }
+                else
+                {
+                    mpz_add(res_mpz, res_mpz, f_mpz);
+                }
+            }
+        }
+
+        if (res_mpz == NULL)
+        {
+            fmpz_set_signed_uiui(res, hi, lo);
+        }
+        else
+        {
+            if (hi != 0 || lo != 0)
+                flint_mpz_add_signed_uiui(res_mpz, res_mpz, hi, lo);
+
+            _fmpz_demote_val(res);
+        }
+    }
+
+    return GR_SUCCESS;
+}
 
 int
 _gr_fmpz_vec_dot(fmpz_t res, const fmpz_t initial, int subtract, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
@@ -1132,6 +1196,7 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_VEC_EQUAL,       (gr_funcptr) _gr_fmpz_vec_equal},
     {GR_METHOD_VEC_ADD,         (gr_funcptr) _gr_fmpz_vec_add},
     {GR_METHOD_VEC_SUB,         (gr_funcptr) _gr_fmpz_vec_sub},
+    {GR_METHOD_VEC_SUM,         (gr_funcptr) _gr_fmpz_vec_sum},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_fmpz_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_fmpz_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpz_poly_mullow},

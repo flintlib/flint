@@ -308,6 +308,7 @@ _gr_nmod_div(ulong * res, const ulong * x, const ulong * y, const gr_ctx_t ctx)
     ulong t;
     int status;
 
+
     status = _gr_nmod_inv(&t, y, ctx);
     _gr_nmod_mul(res, x, &t, ctx);
     return status;
@@ -363,6 +364,88 @@ _gr_nmod_mul_2exp_si(ulong * res, ulong * x, slong y, const gr_ctx_t ctx)
 }
 
 /* todo: pow_ui, ... */
+
+int
+_gr_nmod_vec_sum(ulong * res, const ulong * vec, slong len, gr_ctx_t ctx)
+{
+    ulong hi, lo;
+    slong i;
+    nmod_t mod = NMOD_CTX(ctx);
+
+    if (len < 10)
+    {
+        lo = 0;
+        for (i = 0; i < len; i++)
+            lo = nmod_add(lo, vec[i], mod);
+    }
+    else
+    {
+        umul_ppmm(hi, lo, mod.n, len);
+
+        if (hi == 0)
+        {
+            lo = vec[0];
+            for (i = 1; i < len; i++)
+                lo += vec[i];
+
+            NMOD_RED(lo, lo, mod);
+        }
+        else
+        {
+            lo = vec[0];
+            hi = 0;
+
+            for (i = 1; i < len; i++)
+                add_ssaaaa(hi, lo, hi, lo, 0, vec[i]);
+
+            NMOD2_RED2(lo, hi, lo, mod);
+        }
+    }
+
+    res[0] = lo;
+    return GR_SUCCESS;
+}
+
+int
+_gr_nmod_vec_product(ulong * res, const ulong * vec, slong len, gr_ctx_t ctx)
+{
+    nmod_t mod = NMOD_CTX(ctx);
+
+    if (len <= 2)
+    {
+        if (len == 2)
+            res[0] = nmod_mul(vec[0], vec[1], mod);
+        else if (len == 1)
+            res[0] = vec[0];
+        else
+            res[0] = (mod.n != 1);
+    }
+    else
+    {
+        ulong p;
+        slong i;
+
+        if (mod.norm == 0)
+        {
+            p = _nmod_mul_fullword(vec[0], vec[1], mod);
+
+            for (i = 2; i < len; i++)
+                p = _nmod_mul_fullword(p, vec[i], mod);
+        }
+        else
+        {
+            p = nmod_mul(vec[0], vec[1], mod);
+
+            for (i = 2; i < len; i++)
+                p = nmod_mul(p, vec[i], mod);
+        }
+
+        res[0] = p;
+    }
+
+    return GR_SUCCESS;
+}
+
 
 int
 __gr_nmod_vec_dot(ulong * res, const ulong * initial, int subtract, const ulong * vec1, const ulong * vec2, slong len, gr_ctx_t ctx)
@@ -541,6 +624,8 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_DIV_SI,          (gr_funcptr) _gr_nmod_div_si},
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_nmod_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) _gr_nmod_inv},
+    {GR_METHOD_VEC_SUM,         (gr_funcptr) _gr_nmod_vec_sum},
+    {GR_METHOD_VEC_PRODUCT,     (gr_funcptr) _gr_nmod_vec_product},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) __gr_nmod_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) __gr_nmod_vec_dot_rev},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_nmod_roots_gr_poly},

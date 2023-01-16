@@ -264,6 +264,7 @@ libgr.gr_cmpabs.argtypes = (ctypes.POINTER(ctypes.c_int), ctypes.c_void_p, ctype
 
 libgr.gr_heap_clear.argtypes = (ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
 
+libgr.gr_ctx_init_nmod.argtypes = (ctypes.POINTER(gr_ctx_struct), c_ulong)
 libgr.gr_ctx_init_dirichlet_group.argtypes = (ctypes.POINTER(gr_ctx_struct), c_ulong)
 
 _add_methods = [libgr.gr_add, libgr.gr_add_si, libgr.gr_add_fmpz, libgr.gr_add_other, libgr.gr_other_add]
@@ -2027,7 +2028,7 @@ class IntegersMod_nmod(gr_ctx):
         n = self._as_ui(n)
         assert n >= 1
         gr_ctx.__init__(self)
-        libgr.gr_ctx_init_nmod(self._ref, n, None)
+        libgr.gr_ctx_init_nmod(self._ref, n)
         self._elem_type = nmod
 
 class nmod(gr_elem):
@@ -2871,25 +2872,42 @@ class gr_vec(gr_elem):
             if status & GR_DOMAIN: raise ValueError
         return x
 
-    def sum(self, initial=None, subtract=False):
-        if initial or subtract:
-            raise NotImplementedError
+    def sum(self):
+        """
+        Sum of the elements in this vector.
+
+            >>> VecZZ(list(range(1,101))).sum()
+            5050
+            >>> VecZZ([]).sum()
+            0
+            >>> Vec(ZZmod(100))(list(range(1,101))).sum()
+            50
+        """
         element_ring = self.parent()._element_ring
         res = element_ring()
         ptr = libgr.gr_vec_entry_ptr(self._ref, 0, res._ctx)
-        status = libgr._gr_vec_sum(res._ref, None, 0, ptr, len(self), res._ctx)
+        status = libgr._gr_vec_sum(res._ref, ptr, len(self), res._ctx)
         if status:
             if status & GR_UNABLE: raise NotImplementedError
             if status & GR_DOMAIN: raise ValueError
         return res
 
-    def product(self, initial=None, divide=False):
-        if initial or divide:
-            raise NotImplementedError
+    def product(self):
+        """
+        Product of the elements in this vector.
+
+            >>> VecZZ(list(range(1,11))).product()
+            3628800
+            >>> VecZZ([]).product()
+            1
+            >>> Vec(ZZmod(103))(list(range(1,101))).product()
+            51
+
+        """
         element_ring = self.parent()._element_ring
         res = element_ring()
         ptr = libgr.gr_vec_entry_ptr(self._ref, 0, res._ctx)
-        status = libgr._gr_vec_product(res._ref, None, 0, ptr, len(self), res._ctx)
+        status = libgr._gr_vec_product(res._ref, ptr, len(self), res._ctx)
         if status:
             if status & GR_UNABLE: raise NotImplementedError
             if status & GR_DOMAIN: raise ValueError
@@ -2916,6 +2934,11 @@ CF = ComplexFloat_acf()
 def ZZmod(n):
     # todo: selection
     return IntegersMod_nmod(n)
+
+ZZp16 = ZZmod((1 << 15) + 3)
+ZZp32 = ZZmod((1 << 31) + 11)
+ZZp63 = ZZmod((1 << 62) + 135)
+ZZp64 = ZZmod((1 << 63) + 29)
 
 VecZZ = Vec(ZZ)
 VecQQ = Vec(QQ)

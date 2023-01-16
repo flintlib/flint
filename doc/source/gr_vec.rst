@@ -181,13 +181,9 @@ Arithmetic
 Sums and products
 --------------------------------------------------------------------------------
 
-TODO
+.. function:: int _gr_vec_sum(gr_ptr res, gr_srcptr vec, slong len, gr_ctx_t ctx)
 
-.. function:: int _gr_vec_sum(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec, slong len, gr_ctx_t ctx)
-
-.. function:: int _gr_vec_product(gr_ptr res, gr_srcptr initial, int invert, gr_srcptr vec, slong len, gr_ctx_t ctx)
-
-.. function:: int _gr_vec_product_exponents(gr_ptr res, gr_srcptr vec, gr_srcptr exp_vec, gr_ctx_t exp_ctx, slong len, gr_ctx_t ctx)
+.. function:: int _gr_vec_product(gr_ptr res, gr_srcptr vec, slong len, gr_ctx_t ctx)
 
 Dot products
 --------------------------------------------------------------------------------

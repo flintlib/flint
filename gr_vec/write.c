@@ -35,6 +35,15 @@ gr_vec_write(gr_stream_t out, const gr_vec_t vec, gr_ctx_t ctx)
 }
 
 int
+_gr_vec_print(gr_srcptr vec, slong len, gr_ctx_t ctx)
+{
+    gr_stream_t out;
+    gr_stream_init_file(out, stdout);
+    return _gr_vec_write(out, vec, len, ctx);
+}
+
+
+int
 gr_vec_print(const gr_vec_t vec, gr_ctx_t ctx)
 {
     gr_stream_t out;

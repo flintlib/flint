@@ -155,6 +155,8 @@ typedef enum
     GR_METHOD_CTX_IS_EXACT,            /* we have no inexact elements */
     GR_METHOD_CTX_IS_CANONICAL,        /* we have no non-canonical representations */
 
+    GR_METHOD_CTX_IS_THREADSAFE,
+
     GR_METHOD_CTX_HAS_REAL_PREC,
     GR_METHOD_CTX_SET_REAL_PREC,
     GR_METHOD_CTX_GET_REAL_PREC,
@@ -845,6 +847,8 @@ GR_INLINE truth_t gr_ctx_is_multiplicative_group(gr_ctx_t ctx) { return GR_CTX_P
 
 GR_INLINE truth_t gr_ctx_is_exact(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_EXACT)(ctx); }
 GR_INLINE truth_t gr_ctx_is_canonical(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_CANONICAL)(ctx); }
+
+GR_INLINE truth_t gr_ctx_is_threadsafe(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_THREADSAFE)(ctx); }
 
 GR_INLINE truth_t gr_ctx_has_real_prec(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_HAS_REAL_PREC)(ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_ctx_set_real_prec(gr_ctx_t ctx, slong prec) { return GR_CTX_SET_SI(ctx, CTX_SET_REAL_PREC)(ctx, prec); }
