@@ -69,6 +69,8 @@ WARN_UNUSED_RESULT int gr_poly_set(gr_poly_t res, const gr_poly_t src, gr_ctx_t 
 WARN_UNUSED_RESULT int _gr_poly_reverse(gr_ptr res, gr_srcptr poly, slong len, slong n, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_reverse(gr_poly_t res, const gr_poly_t poly, slong n, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int gr_poly_truncate(gr_poly_t poly, slong newlen, gr_ctx_t ctx);
+
 GR_POLY_INLINE WARN_UNUSED_RESULT int
 gr_poly_zero(gr_poly_t poly, gr_ctx_t ctx)
 {
@@ -135,6 +137,10 @@ WARN_UNUSED_RESULT int gr_poly_divrem(gr_poly_t Q, gr_poly_t R, const gr_poly_t 
 
 /* todo: div with fast divisibility checking; rem; divexact */
 
+WARN_UNUSED_RESULT int _gr_poly_inv_series_newton(gr_ptr Qinv, gr_srcptr Q, slong Qlen, slong len, slong cutoff, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_inv_series_newton(gr_poly_t Qinv, const gr_poly_t Q, slong len, slong cutoff, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_inv_series_basecase(gr_ptr Qinv, gr_srcptr Q, slong Qlen, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_inv_series_basecase(gr_poly_t Qinv, const gr_poly_t Q, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_poly_inv_series(gr_ptr Qinv, gr_srcptr Q, slong Qlen, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_inv_series(gr_poly_t Qinv, const gr_poly_t Q, slong len, gr_ctx_t ctx);
 

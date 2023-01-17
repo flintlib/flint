@@ -145,6 +145,14 @@ polynomial_set_other(gr_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
     {
         return gr_poly_set_gr_poly_other(res, x, POLYNOMIAL_ELEM_CTX(x_ctx), POLYNOMIAL_ELEM_CTX(ctx));
     }
+    else if (x_ctx->which_ring == GR_CTX_GR_VEC)
+    {
+        gr_poly_t tmp;
+        tmp->coeffs = ((gr_vec_struct *) x)->entries;
+        tmp->length = ((gr_vec_struct *) x)->length;
+
+        return gr_poly_set_gr_poly_other(res, tmp, VECTOR_CTX(x_ctx)->base_ring, POLYNOMIAL_ELEM_CTX(ctx));
+    }
     else
     {
         int status = GR_SUCCESS;
@@ -231,6 +239,57 @@ polynomial_mul(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_c
     return gr_poly_mul(res, poly1, poly2, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
+/* todo */
+int
+polynomial_div(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, const gr_ctx_t ctx)
+{
+    gr_poly_t r;
+    int status;
+    gr_poly_init(r, POLYNOMIAL_ELEM_CTX(ctx));
+    status = gr_poly_divrem(res, r, x, y, POLYNOMIAL_ELEM_CTX(ctx));
+
+    if (status == GR_SUCCESS)
+    {
+        truth_t is_zero = gr_poly_is_zero(r, POLYNOMIAL_ELEM_CTX(ctx));
+
+        if (is_zero == T_FALSE)
+            status = GR_DOMAIN;
+        if (is_zero == T_UNKNOWN)
+            status = GR_UNABLE;
+    }
+
+    gr_poly_clear(r, POLYNOMIAL_ELEM_CTX(ctx));
+    return status;
+}
+
+int
+polynomial_euclidean_div(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, const gr_ctx_t ctx)
+{
+    gr_poly_t r;
+    int status;
+    gr_poly_init(r, POLYNOMIAL_ELEM_CTX(ctx));
+    status = gr_poly_divrem(res, r, x, y, POLYNOMIAL_ELEM_CTX(ctx));
+    gr_poly_clear(r, POLYNOMIAL_ELEM_CTX(ctx));
+    return status;
+}
+
+int
+polynomial_euclidean_rem(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, const gr_ctx_t ctx)
+{
+    gr_poly_t q;
+    int status;
+    gr_poly_init(q, POLYNOMIAL_ELEM_CTX(ctx));
+    status = gr_poly_divrem(q, res, x, y, POLYNOMIAL_ELEM_CTX(ctx));
+    gr_poly_clear(q, POLYNOMIAL_ELEM_CTX(ctx));
+    return status;
+}
+
+int
+polynomial_euclidean_divrem(gr_poly_t res1, gr_poly_t res2, const gr_poly_t x, const gr_poly_t y, const gr_ctx_t ctx)
+{
+    return gr_poly_divrem(res1, res2, x, y, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
 int _gr_poly_methods_initialized = 0;
 
 gr_static_method_table _gr_poly_methods;
@@ -270,6 +329,12 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_ADD,         (gr_funcptr) polynomial_add},
     {GR_METHOD_SUB,         (gr_funcptr) polynomial_sub},
     {GR_METHOD_MUL,         (gr_funcptr) polynomial_mul},
+    {GR_METHOD_DIV,         (gr_funcptr) polynomial_div},
+
+    {GR_METHOD_EUCLIDEAN_DIV,         (gr_funcptr) polynomial_euclidean_div},
+    {GR_METHOD_EUCLIDEAN_REM,         (gr_funcptr) polynomial_euclidean_rem},
+    {GR_METHOD_EUCLIDEAN_DIVREM,         (gr_funcptr) polynomial_euclidean_divrem},
+
     {0,                     (gr_funcptr) NULL},
 };
 

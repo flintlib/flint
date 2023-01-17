@@ -62,7 +62,7 @@ _gr_nmod_randtest(ulong * res, flint_rand_t state, const gr_ctx_t ctx)
 int
 _gr_nmod_write(gr_stream_t out, const ulong * x, const gr_ctx_t ctx)
 {
-    gr_stream_write_si(out, x[0]);
+    gr_stream_write_ui(out, x[0]);
     return GR_SUCCESS;
 }
 
@@ -530,6 +530,19 @@ __gr_nmod_vec_dot_rev(ulong * res, const ulong * initial, int subtract, const ul
 }
 
 int
+_gr_nmod_poly_mullow(ulong * res,
+    const ulong * poly1, slong len1,
+    const ulong * poly2, slong len2, slong n, gr_ctx_t ctx)
+{
+    if (len1 >= len2)
+        _nmod_poly_mullow(res, poly1, len1, poly2, len2, n, NMOD_CTX(ctx));
+    else
+        _nmod_poly_mullow(res, poly2, len2, poly1, len1, n, NMOD_CTX(ctx));
+
+    return GR_SUCCESS;
+}
+
+int
 _gr_nmod_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
 {
     if (poly->length == 0)
@@ -628,6 +641,7 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_VEC_PRODUCT,     (gr_funcptr) _gr_nmod_vec_product},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) __gr_nmod_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) __gr_nmod_vec_dot_rev},
+    {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_nmod_poly_mullow},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_nmod_roots_gr_poly},
     {0,                         (gr_funcptr) NULL},
 };

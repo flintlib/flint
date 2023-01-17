@@ -2287,6 +2287,29 @@ class gr_poly(gr_elem):
             if status & GR_DOMAIN: raise ValueError
         return (roots, mult)
 
+    def inv_series(self, n):
+        """
+        Reciprocal of this polynomial viewed as a power series,
+        truncated to length n.
+
+            >>> ZZx([1,2,3]).inv_series(10)
+            [1, -2, 1, 4, -11, 10, 13, -56, 73, 22]
+            >>> ZZx([2,3,4]).inv_series(5)
+            Traceback (most recent call last):
+              ...
+            FlintDomainError: f.inv_series(n) is not an element of {Ring of polynomials over Integer ring (fmpz)} for {f = [2, 3, 4]}, {n = 5}
+            >>> QQx([2,3,4]).inv_series(5)
+            [1/2, -3/4, 1/8, 21/16, -71/32]
+        """
+        Rx = self.parent()
+        R = Rx._coefficient_ring
+        res = Rx()
+        n = int(n)
+        status = libgr.gr_poly_inv_series(res._ref, self._ref, n, R._ref)
+        if status:
+            return _handle_error(Rx, status, "$f.inv_series($n)", self, n)
+        return res
+
 
 class ModularGroup_psl2z(gr_ctx_ca):
     def __init__(self, **kwargs):

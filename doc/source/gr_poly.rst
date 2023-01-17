@@ -93,6 +93,8 @@ Basic manipulation
 .. function:: int _gr_poly_reverse(gr_ptr res, gr_srcptr poly, slong len, slong n, gr_ctx_t ctx)
               int gr_poly_reverse(gr_poly_t res, const gr_poly_t poly, slong n, gr_ctx_t ctx)
 
+.. function:: int gr_poly_truncate(gr_poly_t poly, slong newlen, gr_ctx_t ctx)
+
 .. function:: int gr_poly_zero(gr_poly_t poly, gr_ctx_t ctx)
               int gr_poly_one(gr_poly_t poly, gr_ctx_t ctx)
               int gr_poly_neg_one(gr_poly_t poly, gr_ctx_t ctx)
@@ -173,8 +175,12 @@ Division
 Power series division
 --------------------------------------------------------------------------------
 
-.. function:: int _gr_poly_inv_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx)
-              int gr_poly_inv_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx)
+.. function:: int _gr_poly_inv_series_newton(gr_ptr Qinv, gr_srcptr Q, slong Qlen, slong len, slong cutoff, gr_ctx_t ctx)
+              int gr_poly_inv_series_newton(gr_poly_t Qinv, const gr_poly_t Q, slong len, slong cutoff, gr_ctx_t ctx)
+              int _gr_poly_inv_series_basecase(gr_ptr Qinv, gr_srcptr Q, slong Qlen, slong len, gr_ctx_t ctx)
+              int gr_poly_inv_series_basecase(gr_poly_t Qinv, const gr_poly_t Q, slong len, gr_ctx_t ctx)
+              int _gr_poly_inv_series(gr_ptr Qinv, gr_srcptr Q, slong Qlen, slong len, gr_ctx_t ctx)
+              int gr_poly_inv_series(gr_poly_t Qinv, const gr_poly_t Q, slong len, gr_ctx_t ctx)
 
 Evaluation
 -------------------------------------------------------------------------------

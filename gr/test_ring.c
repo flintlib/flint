@@ -1510,7 +1510,7 @@ gr_test_mul_then_div(gr_ctx_t R, flint_rand_t state, int test_flags)
     status |= gr_mul(xy, x, y, R);
     status |= gr_div(xyy, xy, y, R);
 
-    if (status == GR_SUCCESS && gr_equal(x, xyy, R) == T_FALSE)
+    if (status == GR_SUCCESS && gr_equal(x, xyy, R) == T_FALSE && gr_ctx_is_integral_domain(R) == T_TRUE)
     {
         status = GR_TEST_FAIL;
     }
@@ -1521,6 +1521,7 @@ gr_test_mul_then_div(gr_ctx_t R, flint_rand_t state, int test_flags)
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
         printf("\n");
+        gr_ctx_println(R);
         printf("x = \n"); gr_println(x, R);
         printf("y = \n"); gr_println(y, R);
         printf("x * y = \n"); gr_println(xy, R);
@@ -1565,7 +1566,7 @@ gr_test_divexact(gr_ctx_t R, flint_rand_t state, int test_flags)
         status |= gr_divexact(q, xy, q, R);
     }
 
-    if (status == GR_SUCCESS && gr_equal(q, x, R) == T_FALSE)
+    if (status == GR_SUCCESS && gr_equal(q, x, R) == T_FALSE && gr_ctx_is_integral_domain(R) == T_TRUE)
     {
         status = GR_TEST_FAIL;
     }
@@ -1576,6 +1577,7 @@ gr_test_divexact(gr_ctx_t R, flint_rand_t state, int test_flags)
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
         printf("\n");
+        gr_ctx_println(R);
         printf("aliasing = %d\n", aliasing);
         printf("x = \n"); gr_println(x, R);
         printf("y = \n"); gr_println(y, R);
@@ -1658,7 +1660,7 @@ gr_test_divexact_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
             }
         }
 
-        if (status == GR_SUCCESS && gr_equal(q, x, R) == T_FALSE)
+        if (status == GR_SUCCESS && gr_equal(q, x, R) == T_FALSE && gr_ctx_is_integral_domain(R) == T_TRUE)
         {
             status = GR_TEST_FAIL;
             break;
