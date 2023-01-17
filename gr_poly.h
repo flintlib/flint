@@ -217,6 +217,9 @@ WARN_UNUSED_RESULT int gr_poly_atan_series(gr_poly_t res, const gr_poly_t A, slo
 WARN_UNUSED_RESULT int _gr_poly_atanh_series(gr_ptr res, gr_srcptr A, slong Alen, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_atanh_series(gr_poly_t res, const gr_poly_t A, slong len, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int _gr_poly_log_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_log_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx);
+
 
 #ifdef __cplusplus
 }

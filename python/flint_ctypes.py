@@ -2233,8 +2233,7 @@ class fq_elem(gr_elem):
     def is_primitive(self):
         return self._unary_predicate(self, libgr.gr_fq_is_primitive, "is_primitive")
 
-    def pth_root(self):
-        return self._unary_op(self, libgr.gr_fq_pth_root, "pth_root")
+    def pth_root(self):        return self._unary_op(self, libgr.gr_fq_pth_root, "pth_root")
 
 
 class fq(fq_elem):
@@ -2401,6 +2400,16 @@ class gr_poly(gr_elem):
             if status & GR_DOMAIN: raise ValueError
         return (roots, mult)
 
+    def _series_op(self, n, op, rstr):
+        Rx = self.parent()
+        R = Rx._coefficient_ring
+        res = Rx()
+        n = int(n)
+        status = op(res._ref, self._ref, n, R._ref)
+        if status:
+            return _handle_error(Rx, status, rstr, self, n)
+        return res
+
     def inv_series(self, n):
         """
         Reciprocal of this polynomial viewed as a power series,
@@ -2415,34 +2424,30 @@ class gr_poly(gr_elem):
             >>> QQx([2,3,4]).inv_series(5)
             [1/2, -3/4, 1/8, 21/16, -71/32]
         """
-        Rx = self.parent()
-        R = Rx._coefficient_ring
-        res = Rx()
-        n = int(n)
-        status = libgr.gr_poly_inv_series(res._ref, self._ref, n, R._ref)
-        if status:
-            return _handle_error(Rx, status, "$f.inv_series($n)", self, n)
-        return res
+        return self._series_op(n, libgr.gr_poly_inv_series, "$f.inv_series($n)")
+
+    def log_series(self, n):
+        """
+        Logarithm of this polynomial viewed as a power series,
+        truncated to length n.
+
+            >>> QQx([1,1]).log_series(8)
+            [0, 1, -1/2, 1/3, -1/4, 1/5, -1/6, 1/7]
+            >>> RRx([2,1]).log_series(3)
+            [[0.693147180559945 +/- 4.12e-16], 0.5000000000000000, -0.1250000000000000]
+            >>> RRx([0,0]).log_series(3)
+            Traceback (most recent call last):
+              ...
+            FlintDomainError: f.log_series(n) is not an element of {Ring of polynomials over Real numbers (arb, prec = 53)} for {f = 0}, {n = 3}
+        """
+        return self._series_op(n, libgr.gr_poly_log_series, "$f.log_series($n)")
 
     def atan_series(self, n):
-        Rx = self.parent()
-        R = Rx._coefficient_ring
-        res = Rx()
-        n = int(n)
-        status = libgr.gr_poly_atan_series(res._ref, self._ref, n, R._ref)
-        if status:
-            return _handle_error(Rx, status, "$f.atan_series($n)", self, n)
-        return res
+        return self._series_op(n, libgr.gr_poly_atan_series, "$f.atan_series($n)")
 
     def atanh_series(self, n):
-        Rx = self.parent()
-        R = Rx._coefficient_ring
-        res = Rx()
-        n = int(n)
-        status = libgr.gr_poly_atanh_series(res._ref, self._ref, n, R._ref)
-        if status:
-            return _handle_error(Rx, status, "$f.atanh_series($n)", self, n)
-        return res
+        return self._series_op(n, libgr.gr_poly_atanh_series, "$f.atanh_series($n)")
+
 
 
 class ModularGroup_psl2z(gr_ctx_ca):

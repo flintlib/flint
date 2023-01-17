@@ -41,7 +41,7 @@ _gr_poly_inv_series_basecase(gr_ptr Qinv, gr_srcptr Q, slong Qlen, slong len, gr
         status |= gr_mul(GR_ENTRY(Qinv, 1, sz), GR_ENTRY(Qinv, 1, sz), GR_ENTRY(Q, 1, sz), ctx);
         status |= gr_neg(GR_ENTRY(Qinv, 1, sz), GR_ENTRY(Qinv, 1, sz), ctx);
     }
-    else if ((Qlen == 2 || _gr_vec_is_zero(GR_ENTRY(Q, 1, sz), Qlen - 2, ctx) == T_TRUE))
+    else if (Qlen == 2 || _gr_vec_is_zero(GR_ENTRY(Q, 1, sz), Qlen - 2, ctx) == T_TRUE)
     {
         /* Special-case binomials */
         /* todo: implement using vector functions (geometric series + inflate) */
