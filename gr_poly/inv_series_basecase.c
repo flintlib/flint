@@ -53,13 +53,13 @@ _gr_poly_inv_series_basecase(gr_ptr Qinv, gr_srcptr Q, slong Qlen, slong len, gr
         {
             status |= gr_neg(GR_ENTRY(Qinv, step, sz), GR_ENTRY(Q, step, sz), ctx);
             for (i = 2 * step; i < len; i += step)
-                status |= gr_mul(GR_ENTRY(Qinv, i, sz), GR_ENTRY(Qinv, i - step, sz), GR_ENTRY(Q, step, sz), ctx);
+                status |= gr_mul(GR_ENTRY(Qinv, i, sz), GR_ENTRY(Qinv, i - step, sz), GR_ENTRY(Qinv, step, sz), ctx);
         }
         else if (gr_is_neg_one(Qinv, ctx) == T_TRUE)
         {
             status |= gr_neg(GR_ENTRY(Qinv, step, sz), GR_ENTRY(Q, step, sz), ctx);
             for (i = 2 * step; i < len; i += step)
-                status |= gr_mul(GR_ENTRY(Qinv, i, sz), GR_ENTRY(Qinv, i - step, sz), GR_ENTRY(Qinv, step, sz), ctx);
+                status |= gr_mul(GR_ENTRY(Qinv, i, sz), GR_ENTRY(Qinv, i - step, sz), GR_ENTRY(Q, step, sz), ctx);
         }
         else
         {
