@@ -934,12 +934,50 @@ _gr_arb_glaisher(arb_t res, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
-_gr_arb_exp(arb_t res, const arb_t x, const gr_ctx_t ctx)
-{
-    arb_exp(res, x, ARB_CTX_PREC(ctx));
-    return GR_SUCCESS;
-}
+#define DEF_FUNC(fname) \
+int \
+_gr_arb_ ## fname(arb_t res, const arb_t x, const gr_ctx_t ctx) \
+{ \
+    arb_ ## fname(res, x, ARB_CTX_PREC(ctx)); \
+    return GR_SUCCESS; \
+} \
+
+#define DEF_2FUNC(fname) \
+int \
+_gr_arb_ ## fname(arb_t res1, arb_t res2, const arb_t x, const gr_ctx_t ctx) \
+{ \
+    arb_ ## fname(res1, res2, x, ARB_CTX_PREC(ctx)); \
+    return GR_SUCCESS; \
+} \
+
+#define DEF_FUNC2(fname) \
+int \
+_gr_arb_ ## fname(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) \
+{ \
+    arb_ ## fname(res, x, y, ARB_CTX_PREC(ctx)); \
+    return GR_SUCCESS; \
+} \
+
+#define DEF_FUNC_SING(fname) \
+int \
+_gr_arb_ ## fname(arb_t res, const arb_t x, const gr_ctx_t ctx) \
+{ \
+    arb_ ## fname(res, x, ARB_CTX_PREC(ctx)); \
+    return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; \
+} \
+
+#define DEF_FUNC2_SING(fname) \
+int \
+_gr_arb_ ## fname(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) \
+{ \
+    arb_ ## fname(res, x, y, ARB_CTX_PREC(ctx)); \
+    return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; \
+} \
+
+
+DEF_FUNC(exp)
+DEF_FUNC(expm1)
+DEF_FUNC_SING(log1p)
 
 int
 _gr_arb_log(arb_t res, const arb_t x, const gr_ctx_t ctx)
@@ -956,32 +994,62 @@ _gr_arb_log(arb_t res, const arb_t x, const gr_ctx_t ctx)
     return GR_UNABLE;
 }
 
-int _gr_arb_sin(arb_t res, const arb_t x, const gr_ctx_t ctx)
+DEF_FUNC(sin)
+DEF_FUNC(cos)
+DEF_2FUNC(sin_cos)
+DEF_FUNC_SING(tan)
+DEF_FUNC_SING(cot)
+DEF_FUNC_SING(sec)
+DEF_FUNC_SING(csc)
+
+DEF_FUNC(sin_pi)
+DEF_FUNC(cos_pi)
+DEF_2FUNC(sin_cos_pi)
+/* todo: detect exact singularities */
+DEF_FUNC_SING(tan_pi)
+DEF_FUNC_SING(cot_pi)
+DEF_FUNC_SING(csc_pi)
+
+DEF_FUNC(sinc)
+DEF_FUNC(sinc_pi)
+
+DEF_FUNC(sinh)
+DEF_FUNC(cosh)
+DEF_2FUNC(sinh_cosh)
+DEF_FUNC(tanh)
+DEF_FUNC_SING(coth)
+DEF_FUNC(sech)
+DEF_FUNC_SING(csch)
+
+DEF_FUNC_SING(asin)
+DEF_FUNC_SING(acos)
+DEF_FUNC(atan)
+DEF_FUNC2(atan2)
+
+DEF_FUNC(asinh)
+DEF_FUNC_SING(acosh)
+DEF_FUNC_SING(atanh)
+
+int
+_gr_arb_lambertw(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
-    arb_sin(res, x, ARB_CTX_PREC(ctx));
-    return GR_SUCCESS;
+    arb_lambertw(res, x, 0, ARB_CTX_PREC(ctx));
+    return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
 int
-_gr_arb_cos(arb_t res, const arb_t x, const gr_ctx_t ctx)
+_gr_arb_lambertw_fmpz(arb_t res, const arb_t x, const fmpz_t k, const gr_ctx_t ctx)
 {
-    arb_cos(res, x, ARB_CTX_PREC(ctx));
-    return GR_SUCCESS;
+    if (fmpz_is_zero(k))
+        arb_lambertw(res, x, 0, ARB_CTX_PREC(ctx));
+    else if (fmpz_equal_si(k, -1))
+        arb_lambertw(res, x, 1, ARB_CTX_PREC(ctx));
+    else
+        return GR_DOMAIN;
+
+    return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int
-_gr_arb_tan(arb_t res, const arb_t x, const gr_ctx_t ctx)
-{
-    arb_tan(res, x, ARB_CTX_PREC(ctx));
-    return arb_is_finite(res) ? GR_SUCCESS : GR_DOMAIN;
-}
-
-int
-_gr_arb_atan(arb_t res, const arb_t x, const gr_ctx_t ctx)
-{
-    arb_atan(res, x, ARB_CTX_PREC(ctx));
-    return GR_SUCCESS;
-}
 
 #include "bernoulli.h"
 
@@ -1187,6 +1255,23 @@ _gr_arb_zeta(arb_t res, const arb_t x, const gr_ctx_t ctx)
         return GR_SUCCESS;
     }
 }
+
+DEF_FUNC2_SING(hurwitz_zeta)
+DEF_FUNC2_SING(polylog)
+
+DEF_FUNC2_SING(agm)
+
+static void
+arb_agm1(arb_t res, const arb_t x, slong prec)
+{
+    arb_t t;
+    arb_init(t);
+    arb_one(t); 
+    arb_agm(res, t, x, prec);
+    arb_clear(t);
+}
+
+DEF_FUNC_SING(agm1)
 
 int
 _gr_arb_vec_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr vec1, arb_srcptr vec2, slong len, gr_ctx_t ctx)
@@ -1412,11 +1497,38 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_KHINCHIN,        (gr_funcptr) _gr_arb_khinchin},
     {GR_METHOD_GLAISHER,        (gr_funcptr) _gr_arb_glaisher},
     {GR_METHOD_EXP,             (gr_funcptr) _gr_arb_exp},
+    {GR_METHOD_EXPM1,           (gr_funcptr) _gr_arb_expm1},
     {GR_METHOD_LOG,             (gr_funcptr) _gr_arb_log},
+    {GR_METHOD_LOG1P,           (gr_funcptr) _gr_arb_log1p},
     {GR_METHOD_SIN,             (gr_funcptr) _gr_arb_sin},
     {GR_METHOD_COS,             (gr_funcptr) _gr_arb_cos},
+    {GR_METHOD_SIN_COS,         (gr_funcptr) _gr_arb_sin_cos},
     {GR_METHOD_TAN,             (gr_funcptr) _gr_arb_tan},
+    {GR_METHOD_COT,             (gr_funcptr) _gr_arb_cot},
+    {GR_METHOD_SEC,             (gr_funcptr) _gr_arb_sec},
+    {GR_METHOD_CSC,             (gr_funcptr) _gr_arb_csc},
+    {GR_METHOD_SIN_PI,          (gr_funcptr) _gr_arb_sin_pi},
+    {GR_METHOD_COS_PI,          (gr_funcptr) _gr_arb_cos_pi},
+    {GR_METHOD_SIN_COS_PI,      (gr_funcptr) _gr_arb_sin_cos_pi},
+    {GR_METHOD_TAN_PI,          (gr_funcptr) _gr_arb_tan_pi},
+    {GR_METHOD_COT_PI,          (gr_funcptr) _gr_arb_cot_pi},
+    {GR_METHOD_CSC_PI,          (gr_funcptr) _gr_arb_csc_pi},
+    {GR_METHOD_ASIN,            (gr_funcptr) _gr_arb_asin},
+    {GR_METHOD_ACOS,            (gr_funcptr) _gr_arb_acos},
     {GR_METHOD_ATAN,            (gr_funcptr) _gr_arb_atan},
+    {GR_METHOD_ATAN2,           (gr_funcptr) _gr_arb_atan2},
+    {GR_METHOD_SINH,            (gr_funcptr) _gr_arb_sinh},
+    {GR_METHOD_COSH,            (gr_funcptr) _gr_arb_cosh},
+    {GR_METHOD_SINH_COSH,       (gr_funcptr) _gr_arb_sinh_cosh},
+    {GR_METHOD_TANH,            (gr_funcptr) _gr_arb_tanh},
+    {GR_METHOD_COTH,            (gr_funcptr) _gr_arb_coth},
+    {GR_METHOD_SECH,            (gr_funcptr) _gr_arb_sech},
+    {GR_METHOD_CSCH,            (gr_funcptr) _gr_arb_csch},
+    {GR_METHOD_ATANH,           (gr_funcptr) _gr_arb_atanh},
+    {GR_METHOD_ASINH,           (gr_funcptr) _gr_arb_asinh},
+    {GR_METHOD_ACOSH,           (gr_funcptr) _gr_arb_acosh},
+    {GR_METHOD_LAMBERTW,        (gr_funcptr) _gr_arb_lambertw},
+    {GR_METHOD_LAMBERTW_FMPZ,   (gr_funcptr) _gr_arb_lambertw_fmpz},
     {GR_METHOD_FAC_UI,          (gr_funcptr) _gr_arb_fac_ui},
     {GR_METHOD_FAC_FMPZ,        (gr_funcptr) _gr_arb_fac_fmpz},
     {GR_METHOD_BERNOULLI_UI,    (gr_funcptr) _gr_arb_bernoulli_ui},
@@ -1437,6 +1549,10 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_LGAMMA,          (gr_funcptr) _gr_arb_lgamma},
     {GR_METHOD_DIGAMMA,         (gr_funcptr) _gr_arb_digamma},
     {GR_METHOD_ZETA,            (gr_funcptr) _gr_arb_zeta},
+    {GR_METHOD_POLYLOG,         (gr_funcptr) _gr_arb_polylog},
+    {GR_METHOD_HURWITZ_ZETA,    (gr_funcptr) _gr_arb_hurwitz_zeta},
+    {GR_METHOD_AGM,             (gr_funcptr) _gr_arb_agm},
+    {GR_METHOD_AGM1,            (gr_funcptr) _gr_arb_agm1},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_arb_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_arb_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_arb_poly_mullow},

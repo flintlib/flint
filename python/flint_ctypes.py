@@ -427,7 +427,17 @@ class gr_ctx:
         res = ctx._elem_type(context=ctx)
         status = op(res._ref, x._ref, ctx._ref)
         if status:
-            _handle_error(ctx, status, rstr, x=x)
+            _handle_error(ctx, status, rstr, x)
+        return res
+
+    def _unary_unary_op(ctx, x, op, rstr):
+        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
+            x = ctx(x)
+        res1 = ctx._elem_type(context=ctx)
+        res2 = ctx._elem_type(context=ctx)
+        status = op(res1._ref, res2._ref, x._ref, ctx._ref)
+        if status:
+            _handle_error(ctx, status, rstr, x)
         return res
 
     def _unary_op_with_fmpz_fmpq_overloads(ctx, x, op, op_ui=None, op_fmpz=None, op_fmpq=None, rstr=None):
@@ -448,6 +458,17 @@ class gr_ctx:
             status = op(res._ref, x._ref, ctx._ref)
         if status:
             _handle_error(ctx, status, rstr, x)
+        return res
+
+    def _binary_op(ctx, x, y, op, rstr):
+        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
+            x = ctx(x)
+        if type(y) is not ctx._elem_type or y._ctx_python is not ctx:
+            y = ctx(y)
+        res = ctx._elem_type(context=ctx)
+        status = op(res._ref, x._ref, y._ref, ctx._ref)
+        if status:
+            _handle_error(ctx, status, rstr, x, y)
         return res
 
     def _binary_op_fmpz(ctx, x, y, op, rstr):
@@ -622,8 +643,20 @@ class gr_ctx:
     def exp(ctx, x):
         return ctx._unary_op(x, libgr.gr_exp, "exp($x)")
 
+    def expm1(ctx, x):
+        return ctx._unary_op(x, libgr.gr_expm1, "expm1($x)")
+
+    def exp_pi_i(ctx, x):
+        return ctx._unary_op(x, libgr.gr_exp_pi_i, "exp_pi_i($x)")
+
     def log(ctx, x):
         return ctx._unary_op(x, libgr.gr_log, "log($x)")
+
+    def log1p(ctx, x):
+        return ctx._unary_op(x, libgr.gr_log1p, "log1p($x)")
+
+    def log_pi_i(ctx, x):
+        return ctx._unary_op(x, libgr.gr_log_pi_i, "log_pi_i($x)")
 
     def sin(ctx, x):
         return ctx._unary_op(x, libgr.gr_sin, "sin($x)")
@@ -631,32 +664,29 @@ class gr_ctx:
     def cos(ctx, x):
         return ctx._unary_op(x, libgr.gr_cos, "cos($x)")
 
+    def sin_cos(ctx, x):
+        return ctx._unary_unary_op(x, libgr.gr_sin_cos, "sin_cos($x)")
+
     def tan(ctx, x):
         return ctx._unary_op(x, libgr.gr_tan, "tan($x)")
 
-    def sinh(ctx, x):
-        return ctx._unary_op(x, libgr.gr_sinh, "sinh($x)")
+    def cot(ctx, x):
+        return ctx._unary_op(x, libgr.gr_cot, "cot($x)")
 
-    def cosh(ctx, x):
-        return ctx._unary_op(x, libgr.gr_cosh, "cosh($x)")
+    def sec(ctx, x):
+        return ctx._unary_op(x, libgr.gr_sec, "sec($x)")
 
-    def tanh(ctx, x):
-        return ctx._unary_op(x, libgr.gr_tanh, "tanh($x)")
-
-    def atan(ctx, x):
-        return ctx._unary_op(x, libgr.gr_atan, "atan($x)")
-
-    def exp_pi_i(ctx, x):
-        return ctx._unary_op(x, libgr.gr_exp_pi_i, "exp_pi_i($x)")
-
-    def log_pi_i(ctx, x):
-        return ctx._unary_op(x, libgr.gr_log_pi_i, "log_pi_i($x)")
+    def csc(ctx, x):
+        return ctx._unary_op(x, libgr.gr_csc, "csc($x)")
 
     def sin_pi(ctx, x):
         return ctx._unary_op(x, libgr.gr_sin_pi, "sin_pi($x)")
 
     def cos_pi(ctx, x):
         return ctx._unary_op(x, libgr.gr_cos_pi, "cos_pi($x)")
+
+    def sin_cos_pi(ctx, x):
+        return ctx._unary_unary_op(x, libgr.gr_sin_cos_pi, "sin_cos_pi($x)")
 
     def tan_pi(ctx, x):
         return ctx._unary_op(x, libgr.gr_tan_pi, "tan_pi($x)")
@@ -669,6 +699,54 @@ class gr_ctx:
 
     def csc_pi(ctx, x):
         return ctx._unary_op(x, libgr.gr_csc_pi, "csc_pi($x)")
+
+    def sinc(ctx, x):
+        return ctx._unary_op(x, libgr.gr_sinc, "sinc($x)")
+
+    def sinc_pi(ctx, x):
+        return ctx._unary_op(x, libgr.gr_sinc_pi, "sinc_pi($x)")
+
+    def sinh(ctx, x):
+        return ctx._unary_op(x, libgr.gr_sinh, "sinh($x)")
+
+    def cosh(ctx, x):
+        return ctx._unary_op(x, libgr.gr_cosh, "cosh($x)")
+
+    def sinh_cosh(ctx, x):
+        return ctx._unary_unary_op(x, libgr.gr_sinh_cosh, "sinh_cos($x)")
+
+    def tanh(ctx, x):
+        return ctx._unary_op(x, libgr.gr_tanh, "tanh($x)")
+
+    def coth(ctx, x):
+        return ctx._unary_op(x, libgr.gr_coth, "coth($x)")
+
+    def sech(ctx, x):
+        return ctx._unary_op(x, libgr.gr_sech, "sech($x)")
+
+    def csch(ctx, x):
+        return ctx._unary_op(x, libgr.gr_csch, "csch($x)")
+
+    def asin(ctx, x):
+        return ctx._unary_op(x, libgr.gr_asin, "asin($x)")
+
+    def acos(ctx, x):
+        return ctx._unary_op(x, libgr.gr_acos, "acos($x)")
+
+    def atan(ctx, x):
+        return ctx._unary_op(x, libgr.gr_atan, "atan($x)")
+
+    def atan2(ctx, y, x):
+        return ctx._binary_op(x, libgr.gr_atan2, "atan2($y, $x)")
+
+    def acot(ctx, x):
+        return ctx._unary_op(x, libgr.gr_acot, "acot($x)")
+
+    def asec(ctx, x):
+        return ctx._unary_op(x, libgr.gr_asec, "asec($x)")
+
+    def acsc(ctx, x):
+        return ctx._unary_op(x, libgr.gr_acsc, "acsc($x)")
 
     def asin_pi(ctx, x):
         return ctx._unary_op(x, libgr.gr_asin_pi, "asin_pi($x)")
@@ -687,6 +765,24 @@ class gr_ctx:
 
     def acsc_pi(ctx, x):
         return ctx._unary_op(x, libgr.gr_acsc_pi, "acsc_pi($x)")
+
+    def asinh(ctx, x):
+        return ctx._unary_op(x, libgr.gr_asinh, "asinh($x)")
+
+    def acosh(ctx, x):
+        return ctx._unary_op(x, libgr.gr_acosh, "acosh($x)")
+
+    def atanh(ctx, x):
+        return ctx._unary_op(x, libgr.gr_atanh, "atanh($x)")
+
+    def acoth(ctx, x):
+        return ctx._unary_op(x, libgr.gr_acoth, "acoth($x)")
+
+    def asech(ctx, x):
+        return ctx._unary_op(x, libgr.gr_asech, "asech($x)")
+
+    def acsch(ctx, x):
+        return ctx._unary_op(x, libgr.gr_acsch, "acsch($x)")
 
     def erf(ctx, x):
         return ctx._unary_op(x, libgr.gr_erf, "erf($x)")
@@ -789,6 +885,24 @@ class gr_ctx:
 
     def zeta(ctx, x):
         return ctx._unary_op(x, libgr.gr_zeta, "zeta($x)")
+
+    def hurwitz_zeta(ctx, x, y):
+        return ctx._binary_op(x, y, libgr.gr_hurwitz_zeta, "hurwitz_zeta($x, $y)")
+
+    def polylog(ctx, x, y):
+        return ctx._binary_op(x, y, libgr.gr_polylog, "polylog($x, $y)")
+
+    def lambertw(ctx, x, k=None):
+        if k is None:
+            return ctx._unary_op(x, libgr.gr_lambertw, "lambertw($x)")
+        else:
+            return ctx._binary_op_fmpz(x, k, libgr.gr_lambertw_fmpz, "lambertw($x, $k)")
+
+    def agm(ctx, x, y=None):
+        if y is None:
+            return ctx._unary_op(x, libgr.gr_agm1, "agm1($x)")
+        else:
+            return ctx._binary_op(x, y, libgr.gr_agm, "agm($x, $y)")
 
     def bernoulli(ctx, n):
         """
@@ -2308,6 +2422,26 @@ class gr_poly(gr_elem):
         status = libgr.gr_poly_inv_series(res._ref, self._ref, n, R._ref)
         if status:
             return _handle_error(Rx, status, "$f.inv_series($n)", self, n)
+        return res
+
+    def atan_series(self, n):
+        Rx = self.parent()
+        R = Rx._coefficient_ring
+        res = Rx()
+        n = int(n)
+        status = libgr.gr_poly_atan_series(res._ref, self._ref, n, R._ref)
+        if status:
+            return _handle_error(Rx, status, "$f.atan_series($n)", self, n)
+        return res
+
+    def atanh_series(self, n):
+        Rx = self.parent()
+        R = Rx._coefficient_ring
+        res = Rx()
+        n = int(n)
+        status = libgr.gr_poly_atanh_series(res._ref, self._ref, n, R._ref)
+        if status:
+            return _handle_error(Rx, status, "$f.atanh_series($n)", self, n)
         return res
 
 

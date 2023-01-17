@@ -92,6 +92,9 @@ GR_SPECIAL_DEF int gr_acoth(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_U
 GR_SPECIAL_DEF int gr_asech(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ASECH)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_acsch(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ACSCH)(res, x, ctx); }
 
+GR_SPECIAL_DEF int gr_lambertw(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, LAMBERTW)(res, x, ctx); }
+GR_SPECIAL_DEF int gr_lambertw_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t k, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, LAMBERTW_FMPZ)(res, x, k, ctx); }
+
 GR_SPECIAL_DEF int gr_fac(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, FAC)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_fac_ui(gr_ptr res, ulong x, gr_ctx_t ctx) { return GR_UNARY_OP_UI(ctx, FAC_UI)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_fac_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx) { return GR_UNARY_OP_FMPZ(ctx, FAC_FMPZ)(res, x, ctx); }
@@ -179,8 +182,12 @@ GR_SPECIAL_DEF int gr_dilog(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_U
 GR_SPECIAL_DEF int gr_zeta(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ZETA)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_zeta_ui(gr_ptr res, ulong x, gr_ctx_t ctx) { return GR_UNARY_OP_UI(ctx, ZETA_UI)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_hurwitz_zeta(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, HURWITZ_ZETA)(res, x, y, ctx); }
+GR_SPECIAL_DEF int gr_polylog(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, POLYLOG)(res, x, y, ctx); }
 GR_SPECIAL_DEF int gr_lerch_phi(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_ctx_t ctx) { return GR_TERNARY_OP(ctx, LERCH_PHI)(res, x, y, z, ctx); }
 GR_SPECIAL_DEF int gr_stieltjes(gr_ptr res, const fmpz_t x, gr_srcptr y, gr_ctx_t ctx) { return GR_FMPZ_BINARY_OP(ctx, STIELTJES)(res, x, y, ctx); }
+
+GR_SPECIAL_DEF int gr_agm1(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, AGM1)(res, x, ctx); }
+GR_SPECIAL_DEF int gr_agm(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, AGM)(res, x, y, ctx); }
 
 
 
@@ -200,9 +207,6 @@ GR_SPECIAL_DEF int gr_stieltjes(gr_ptr res, const fmpz_t x, gr_srcptr y, gr_ctx_
     GR_METHOD_LEGENDRE_Q,
     GR_METHOD_GAUSS_LEGENDRE_NODE,
     GR_METHOD_SPHERICAL_Y_SI,
-
-    GR_METHOD_LAMBERTW,
-    GR_METHOD_LAMBERTW_FMPZ,
 
     GR_METHOD_BESSEL_J,
     GR_METHOD_BESSEL_Y,
@@ -231,7 +235,6 @@ GR_SPECIAL_DEF int gr_stieltjes(gr_ptr res, const fmpz_t x, gr_srcptr y, gr_ctx_
 
     GR_METHOD_BERNPOLY_UI,
     GR_METHOD_EULERPOLY_UI,
-    GR_METHOD_POLYLOG,
     GR_METHOD_POLYLOG_SI,
     GR_METHOD_BARNESG,
     GR_METHOD_LOG_BARNESG,
@@ -244,8 +247,6 @@ GR_SPECIAL_DEF int gr_stieltjes(gr_ptr res, const fmpz_t x, gr_srcptr y, gr_ctx_
     GR_METHOD_HYPGEOM_U,
     GR_METHOD_HYPGEOM_PFQ,
 
-    GR_METHOD_AGM,
-    GR_METHOD_AGM1,
 
 */
 

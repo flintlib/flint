@@ -287,6 +287,13 @@ Roots
     We consider roots of the zero polynomial to be ill-defined and return
     ``GR_DOMAIN`` in that case.
 
+Power series special functions
+--------------------------------------------------------------------------------
+
+.. function:: int _gr_poly_atan_series(gr_ptr res, gr_srcptr A, slong Alen, slong len, gr_ctx_t ctx)
+              int gr_poly_atan_series(gr_poly_t res, const gr_poly_t A, slong len, gr_ctx_t ctx)
+              int _gr_poly_atanh_series(gr_ptr res, gr_srcptr A, slong Alen, slong len, gr_ctx_t ctx)
+              int gr_poly_atanh_series(gr_poly_t res, const gr_poly_t A, slong len, gr_ctx_t ctx)
 
 .. raw:: latex
 

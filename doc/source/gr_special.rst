@@ -78,6 +78,9 @@ Elementary functions
               int gr_asech(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
               int gr_acsch(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 
+.. function:: int gr_lambertw(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_lambertw_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t k, gr_ctx_t ctx)
+
 Factorials and gamma functions
 --------------------------------------------------------------------------------
 
@@ -235,11 +238,15 @@ Riemann zeta, polylogarithms and Dirichlet L-functions
 .. function:: int gr_zeta(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
               int gr_zeta_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
               int gr_hurwitz_zeta(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_polylog(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
               int gr_lerch_phi(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_ctx_t ctx)
               int gr_stieltjes(gr_ptr res, const fmpz_t x, gr_srcptr y, gr_ctx_t ctx)
 
 Elliptic integrals
 --------------------------------------------------------------------------------
+
+.. function:: int gr_agm1(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_agm(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 
 Elliptic and modular functions
 --------------------------------------------------------------------------------

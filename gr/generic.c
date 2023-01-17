@@ -1264,6 +1264,15 @@ gr_generic_cos(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 }
 
 int
+gr_generic_tan(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    if (gr_is_zero(x, ctx) == T_TRUE)
+        return gr_zero(res, ctx);
+
+    return GR_UNABLE;
+}
+
+int
 gr_generic_atan(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 {
     if (gr_is_zero(x, ctx) == T_TRUE)
@@ -1271,6 +1280,16 @@ gr_generic_atan(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 
     return GR_UNABLE;
 }
+
+int
+gr_generic_atanh(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    if (gr_is_zero(x, ctx) == T_TRUE)
+        return gr_zero(res, ctx);
+
+    return GR_UNABLE;
+}
+
 
 int
 gr_generic_bernoulli_ui(gr_ptr res, ulong n, gr_ctx_t ctx)
@@ -2524,7 +2543,9 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_LOG,                     (gr_funcptr) gr_generic_log},
     {GR_METHOD_SIN,                     (gr_funcptr) gr_generic_sin},
     {GR_METHOD_COS,                     (gr_funcptr) gr_generic_cos},
+    {GR_METHOD_TAN,                     (gr_funcptr) gr_generic_tan},
     {GR_METHOD_ATAN,                    (gr_funcptr) gr_generic_atan},
+    {GR_METHOD_ATANH,                   (gr_funcptr) gr_generic_atanh},
 
     {GR_METHOD_FAC,                     (gr_funcptr) gr_generic_fac},
     {GR_METHOD_FAC_UI,                  (gr_funcptr) gr_generic_fac_ui},
