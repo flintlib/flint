@@ -333,14 +333,14 @@ _gr_nmod_is_invertible(const ulong * x, const gr_ctx_t ctx)
 int
 _gr_nmod_mul_2exp_si(ulong * res, ulong * x, slong y, const gr_ctx_t ctx)
 {
-    ulong c;
+    ulong c, m = NMOD_CTX(ctx).n;
 
     if (y >= 0)
     {
         if (y < FLINT_BITS)
         {
             c = UWORD(1) << y;
-            if (c >= NMOD_CTX(ctx).n)
+            if (c >= m)
                 NMOD_RED(c, c, NMOD_CTX(ctx));
         }
         else
@@ -351,10 +351,19 @@ _gr_nmod_mul_2exp_si(ulong * res, ulong * x, slong y, const gr_ctx_t ctx)
     }
     else
     {
-        /* accidentally also works when mod <= 2 */
-        c = 2;
-        if (_gr_nmod_inv(&c, &c, ctx) != GR_SUCCESS)
+        if (m % 2 == 0)
+        {
+            if (m == 1)
+            {
+                res[0] = 0;
+                return GR_SUCCESS;
+            }
+
             return GR_DOMAIN;
+        }
+
+        /* quickly construct 1/2 */
+        c = (m - 1) / 2 + 1;
 
         c = nmod_pow_ui(c, -y, NMOD_CTX(ctx));
     }
