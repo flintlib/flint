@@ -11,15 +11,17 @@
 
 #include "gr_poly.h"
 
+/* todo: overloadable function */
 int
 _gr_poly_derivative(gr_ptr res, gr_srcptr poly, slong len, gr_ctx_t ctx)
 {
+    gr_method_binary_op_ui mul_ui = GR_BINARY_OP_UI(ctx, MUL_UI);
     slong i;
     slong sz = ctx->sizeof_elem;
     int status = GR_SUCCESS;
 
     for (i = 1; i < len; i++)
-        status |= gr_mul_ui(GR_ENTRY(res, i - 1, sz), GR_ENTRY(poly, i, sz), i, ctx);
+        status |= mul_ui(GR_ENTRY(res, i - 1, sz), GR_ENTRY(poly, i, sz), i, ctx);
 
     return status;
 }

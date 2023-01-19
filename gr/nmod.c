@@ -420,6 +420,105 @@ _gr_nmod_sqrt(ulong * res, const ulong * x, gr_ctx_t ctx)
 /* todo: pow_ui, ... */
 
 int
+_gr_nmod_vec_set(ulong * res, const ulong * vec, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        res[i] = vec[i];
+
+    return GR_SUCCESS;
+}
+
+int
+_gr_nmod_vec_neg(ulong * res, const ulong * vec, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    nmod_t mod = NMOD_CTX(ctx);
+
+    for (i = 0; i < len; i++)
+        res[i] = nmod_neg(vec[i], mod);
+
+    return GR_SUCCESS;
+}
+
+int
+_gr_nmod_vec_add(ulong * res, const ulong * vec1, const ulong * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    nmod_t mod = NMOD_CTX(ctx);
+
+    for (i = 0; i < len; i++)
+        res[i] = nmod_add(vec1[i], vec2[i], mod);
+
+    return GR_SUCCESS;
+}
+
+int
+_gr_nmod_vec_sub(ulong * res, const ulong * vec1, const ulong * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    nmod_t mod = NMOD_CTX(ctx);
+
+    for (i = 0; i < len; i++)
+        res[i] = nmod_sub(vec1[i], vec2[i], mod);
+
+    return GR_SUCCESS;
+}
+
+int
+_gr_nmod_vec_mul_scalar(ulong * res, const ulong * vec1, slong len, const ulong * c, gr_ctx_t ctx)
+{
+    slong i;
+    nmod_t mod = NMOD_CTX(ctx);
+    ulong d = c[0];
+
+    for (i = 0; i < len; i++)
+        res[i] = nmod_mul(vec1[i], d, mod);
+
+    return GR_SUCCESS;
+}
+
+int
+_gr_nmod_vec_mul_scalar_si(ulong * res, const ulong * vec1, slong len, slong c, gr_ctx_t ctx)
+{
+    slong i;
+    nmod_t mod = NMOD_CTX(ctx);
+    ulong d = nmod_set_si(c, mod);
+
+    for (i = 0; i < len; i++)
+        res[i] = nmod_mul(vec1[i], d, mod);
+
+    return GR_SUCCESS;
+}
+
+int
+_gr_nmod_vec_mul_scalar_ui(ulong * res, const ulong * vec1, slong len, ulong c, gr_ctx_t ctx)
+{
+    slong i;
+    nmod_t mod = NMOD_CTX(ctx);
+    ulong d = nmod_set_ui(c, mod);
+
+    for (i = 0; i < len; i++)
+        res[i] = nmod_mul(vec1[i], d, mod);
+
+    return GR_SUCCESS;
+}
+
+int
+_gr_nmod_vec_mul_scalar_fmpz(ulong * res, const ulong * vec1, slong len, const fmpz_t c, gr_ctx_t ctx)
+{
+    slong i;
+    nmod_t mod = NMOD_CTX(ctx);
+    ulong d = fmpz_get_nmod(c, mod);
+
+    for (i = 0; i < len; i++)
+        res[i] = nmod_mul(vec1[i], d, mod);
+
+    return GR_SUCCESS;
+}
+
+int
 _gr_nmod_vec_sum(ulong * res, const ulong * vec, slong len, gr_ctx_t ctx)
 {
     ulong hi, lo;
@@ -692,6 +791,15 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_nmod_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) _gr_nmod_inv},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_nmod_sqrt},
+    {GR_METHOD_VEC_SET,         (gr_funcptr) _gr_nmod_vec_set},
+    {GR_METHOD_VEC_NEG,         (gr_funcptr) _gr_nmod_vec_neg},
+    {GR_METHOD_VEC_ADD,         (gr_funcptr) _gr_nmod_vec_add},
+    {GR_METHOD_VEC_SUB,         (gr_funcptr) _gr_nmod_vec_sub},
+    {GR_METHOD_VEC_MUL_SCALAR,      (gr_funcptr) _gr_nmod_vec_mul_scalar},
+    {GR_METHOD_VEC_MUL_SCALAR_SI,   (gr_funcptr) _gr_nmod_vec_mul_scalar_si},
+    {GR_METHOD_VEC_MUL_SCALAR_UI,   (gr_funcptr) _gr_nmod_vec_mul_scalar_ui},
+    {GR_METHOD_VEC_MUL_SCALAR_FMPZ, (gr_funcptr) _gr_nmod_vec_mul_scalar_fmpz},
+    {GR_METHOD_VEC_SUB,         (gr_funcptr) _gr_nmod_vec_sub},
     {GR_METHOD_VEC_SUM,         (gr_funcptr) _gr_nmod_vec_sum},
     {GR_METHOD_VEC_PRODUCT,     (gr_funcptr) _gr_nmod_vec_product},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) __gr_nmod_vec_dot},

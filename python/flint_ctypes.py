@@ -2410,6 +2410,18 @@ class gr_poly(gr_elem):
             return _handle_error(Rx, status, rstr, self, n)
         return res
 
+    def _series_op_fmpz_fmpq_overloads(self, other, n, op, op_fmpz, op_fmpq, rstr):
+        Rx = self.parent()
+        R = Rx._coefficient_ring
+        res = Rx()
+        n = int(n)
+        # todo: variants
+        other = QQ(other)
+        status = op_fmpq(res._ref, self._ref, other._ref, n, R._ref)
+        if status:
+            return _handle_error(Rx, status, rstr, self, other, n)
+        return res
+
     def inv_series(self, n):
         """
         Reciprocal of this polynomial viewed as a power series,
@@ -2441,6 +2453,19 @@ class gr_poly(gr_elem):
             FlintDomainError: f.log_series(n) is not an element of {Ring of polynomials over Real numbers (arb, prec = 53)} for {f = 0}, {n = 3}
         """
         return self._series_op(n, libgr.gr_poly_log_series, "$f.log_series($n)")
+
+    def pow_series(self, other, n):
+        """
+        Power of this polynomial viewed as a power series,
+        truncated to length n.
+
+            >>> QQx([4,3,2]).pow_series(QQ(1) / 2, 6)
+            [2, 3/4, 23/64, -69/512, 299/16384, 2277/131072]
+            >>> (QQx([4,3,2]) ** 2).pow_series(QQ(1) / 2, 6)
+            [4, 3, 2]
+        """
+        # todo
+        return self._series_op_fmpz_fmpq_overloads(other, n, None, None, libgr.gr_poly_pow_series_fmpq_recurrence, "$f.pow_series($g, $n)")
 
     def atan_series(self, n):
         return self._series_op(n, libgr.gr_poly_atan_series, "$f.atan_series($n)")
