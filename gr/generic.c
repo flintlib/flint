@@ -161,6 +161,26 @@ int gr_generic_neg_one(gr_ptr res, gr_ctx_t ctx)
     return status;
 }
 
+int gr_generic_set_other(gr_ptr res, gr_srcptr x, gr_ctx_t xctx, gr_ctx_t ctx)
+{
+    if (xctx == ctx)
+    {
+        return gr_set(res, x, ctx);
+    }
+    else if (xctx->which_ring == GR_CTX_FMPZ)
+    {
+        return gr_set_fmpz(res, x, ctx);
+    }
+    else if (xctx->which_ring == GR_CTX_FMPQ)
+    {
+        return gr_set_fmpq(res, x, ctx);
+    }
+    else
+    {
+        return GR_UNABLE;
+    }
+}
+
 int gr_generic_set_fmpq(gr_ptr res, const fmpq_t y, gr_ctx_t ctx)
 {
     gr_ptr t, u;
@@ -1107,21 +1127,96 @@ gr_generic_pow_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t e, gr_ctx_t ctx)
         return gr_generic_pow_fmpz_binexp(res, x, e, ctx);
 }
 
+/* at least catch square roots -- todo: generalize to nth roots */
+int
+gr_generic_pow_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
+{
+    if (fmpz_is_one(fmpq_denref(y)))
+    {
+        return gr_pow_fmpz(res, x, fmpq_numref(y), ctx);
+    }
+    else if (*fmpq_denref(y) == 2)
+    {
+        gr_ptr t;
+        int status = GR_SUCCESS;
+
+        GR_TMP_INIT(t, ctx);
+
+        if (fmpz_sgn(fmpq_numref(y)) > 0)
+        {
+            status |= gr_sqrt(t, x, ctx);
+
+            if (status == GR_SUCCESS)
+                status |= gr_pow_fmpz(res, t, fmpq_numref(y), ctx);
+        }
+        else
+        {
+            status |= gr_rsqrt(t, x, ctx);
+
+            if (status == GR_SUCCESS)
+            {
+                fmpz_t e;
+                fmpz_init(e);
+                fmpz_neg(e, fmpq_numref(y));
+                status |= gr_pow_fmpz(res, t, e, ctx);
+                fmpz_clear(e);
+            }
+        }
+
+        if (status != GR_SUCCESS)
+            status = GR_UNABLE;
+
+        GR_TMP_CLEAR(t, ctx);
+        return status;
+    }
+    else
+    {
+        gr_ptr t;
+        int status;
+
+        status = GR_SUCCESS;
+
+        GR_TMP_INIT(t, ctx);
+
+        status |= gr_set_fmpq(t, y, ctx);
+        if (status == GR_SUCCESS)
+            status = gr_pow(res, x, t, ctx);
+        else
+            status = GR_UNABLE;
+
+        GR_TMP_CLEAR(t, ctx);
+        return status;
+    }
+}
+
 int gr_generic_pow_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
 {
-    gr_ptr t;
-    int status;
+    if (y_ctx->which_ring == GR_CTX_FMPZ)
+    {
+        return gr_pow_fmpz(res, x, y, ctx);
+    }
+    else if (y_ctx->which_ring == GR_CTX_FMPQ)
+    {
+        return gr_pow_fmpq(res, x, y, ctx);
+    }
+    else
+    {
+        gr_ptr t;
+        int status;
 
-    status = GR_SUCCESS;
+        status = GR_SUCCESS;
 
-    GR_TMP_INIT(t, ctx);
+        GR_TMP_INIT(t, ctx);
 
-    status |= gr_set_other(t, y, y_ctx, ctx);
-    if (status == GR_SUCCESS)
-        status = gr_pow(res, x, t, ctx);
+        status |= gr_set_other(t, y, y_ctx, ctx);
+        if (status == GR_SUCCESS)
+            status = gr_pow(res, x, t, ctx);
+        else
+            status = GR_UNABLE;
 
-    GR_TMP_CLEAR(t, ctx);
-    return status;
+        GR_TMP_CLEAR(t, ctx);
+        return status;
+    }
 }
 
 int gr_generic_other_pow(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx)
@@ -1174,6 +1269,18 @@ gr_generic_rsqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 
     if (gr_is_one(x, ctx) == T_TRUE)
         return gr_one(res, ctx);
+
+    {
+        int status;
+
+        status = gr_sqrt(res, x, ctx);
+        if (status == GR_SUCCESS)
+        {
+            status = gr_inv(res, res, ctx);
+            if (status == GR_SUCCESS)
+                return status;
+        }
+    }
 
     return GR_UNABLE;
 }
@@ -2458,6 +2565,8 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_SET_FMPZ,                (gr_funcptr) gr_generic_set_fmpz},
     {GR_METHOD_SET_FMPQ,                (gr_funcptr) gr_generic_set_fmpq},
 
+    {GR_METHOD_SET_OTHER,               (gr_funcptr) gr_generic_set_other},
+
     {GR_METHOD_NEG,                     (gr_funcptr) gr_generic_neg},
 
     {GR_METHOD_ADD,                     (gr_funcptr) gr_generic_add},
@@ -2528,6 +2637,7 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_POW_UI,                  (gr_funcptr) gr_generic_pow_ui},
     {GR_METHOD_POW_FMPZ,                (gr_funcptr) gr_generic_pow_fmpz},
     {GR_METHOD_POW_OTHER,               (gr_funcptr) gr_generic_pow_other},
+    {GR_METHOD_POW_FMPQ,                (gr_funcptr) gr_generic_pow_fmpq},
     {GR_METHOD_OTHER_POW,               (gr_funcptr) gr_generic_other_pow},
 
     {GR_METHOD_IS_SQUARE,               (gr_funcptr) gr_generic_is_square},

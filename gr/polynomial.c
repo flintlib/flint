@@ -290,6 +290,37 @@ polynomial_euclidean_divrem(gr_poly_t res1, gr_poly_t res2, const gr_poly_t x, c
     return gr_poly_divrem(res1, res2, x, y, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
+int
+polynomial_inv(gr_poly_t res, const gr_poly_t poly, gr_ctx_t ctx)
+{
+    return gr_poly_inv(res, poly, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+int
+polynomial_pow_ui(gr_poly_t res, const gr_poly_t poly, ulong exp, gr_ctx_t ctx)
+{
+    return gr_poly_pow_ui(res, poly, exp, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+int
+polynomial_pow_fmpz(gr_poly_t res, const gr_poly_t poly, const fmpz_t exp, gr_ctx_t ctx)
+{
+    return gr_poly_pow_fmpz(res, poly, exp, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+int
+polynomial_pow_si(gr_poly_t res, const gr_poly_t poly, slong exp, gr_ctx_t ctx)
+{
+    int status;
+    fmpz_t t;
+    fmpz_init_set_si(t, exp);
+    status = gr_poly_pow_fmpz(res, poly, t, POLYNOMIAL_ELEM_CTX(ctx));
+    fmpz_clear(t);
+    return status;
+}
+
+
+
 int _gr_poly_methods_initialized = 0;
 
 gr_static_method_table _gr_poly_methods;
@@ -329,7 +360,11 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_ADD,         (gr_funcptr) polynomial_add},
     {GR_METHOD_SUB,         (gr_funcptr) polynomial_sub},
     {GR_METHOD_MUL,         (gr_funcptr) polynomial_mul},
+    {GR_METHOD_POW_UI,      (gr_funcptr) polynomial_pow_ui},
+    {GR_METHOD_POW_SI,      (gr_funcptr) polynomial_pow_si},
+    {GR_METHOD_POW_FMPZ,    (gr_funcptr) polynomial_pow_fmpz},
     {GR_METHOD_DIV,         (gr_funcptr) polynomial_div},
+    {GR_METHOD_INV,         (gr_funcptr) polynomial_inv},
 
     {GR_METHOD_EUCLIDEAN_DIV,         (gr_funcptr) polynomial_euclidean_div},
     {GR_METHOD_EUCLIDEAN_REM,         (gr_funcptr) polynomial_euclidean_rem},

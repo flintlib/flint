@@ -102,6 +102,31 @@ _gr_nmod_set_fmpz(ulong * res, const fmpz_t v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_nmod_inv(ulong * res, const ulong * x, const gr_ctx_t ctx)
+{
+    ulong r, g;
+
+    /* todo: also handle -1 fast? */
+    if (x[0] == 1)
+    {
+        res[0] = x[0];
+        return GR_SUCCESS;
+    }
+
+    g = n_gcdinv(&r, x[0], NMOD_CTX(ctx).n);
+    if (g == 1)
+    {
+        res[0] = r;
+        return GR_SUCCESS;
+    }
+    else
+    {
+        res[0] = 0;
+        return GR_DOMAIN;
+    }
+}
+
 #include "flint/fmpz_mod.h"
 
 /* todo: public interface */
@@ -139,6 +164,30 @@ _gr_nmod_set_other(ulong * res, gr_ptr v, gr_ctx_t v_ctx, const gr_ctx_t ctx)
     if (v_ctx->which_ring == GR_CTX_FMPZ)
     {
         res[0] = fmpz_get_nmod(v, NMOD_CTX(ctx));
+        return GR_SUCCESS;
+    }
+
+    if (v_ctx->which_ring == GR_CTX_FMPQ)
+    {
+        ulong a, b;
+        int status;
+        const fmpq * q = v;
+
+        if (fmpz_is_one(fmpq_denref(q)))
+        {
+            res[0] = fmpz_get_nmod(fmpq_numref(q), NMOD_CTX(ctx));
+        }
+        else
+        {
+            b = fmpz_get_nmod(fmpq_denref(q), NMOD_CTX(ctx));
+            status = _gr_nmod_inv(&b, &b, ctx);
+            if (status != GR_SUCCESS)
+                return status;
+
+            a = fmpz_get_nmod(fmpq_numref(q), NMOD_CTX(ctx));
+            res[0] = nmod_mul(a, b, NMOD_CTX(ctx));
+        }
+
         return GR_SUCCESS;
     }
 
@@ -278,36 +327,10 @@ _gr_nmod_sqr(ulong * res, const ulong * x, const gr_ctx_t ctx)
 }
 
 int
-_gr_nmod_inv(ulong * res, const ulong * x, const gr_ctx_t ctx)
-{
-    ulong r, g;
-
-    /* todo: also handle -1 fast? */
-    if (x[0] == 1)
-    {
-        res[0] = x[0];
-        return GR_SUCCESS;
-    }
-
-    g = n_gcdinv(&r, x[0], NMOD_CTX(ctx).n);
-    if (g == 1)
-    {
-        res[0] = r;
-        return GR_SUCCESS;
-    }
-    else
-    {
-        res[0] = 0;
-        return GR_DOMAIN;
-    }
-}
-
-int
 _gr_nmod_div(ulong * res, const ulong * x, const ulong * y, const gr_ctx_t ctx)
 {
     ulong t;
     int status;
-
 
     status = _gr_nmod_inv(&t, y, ctx);
     _gr_nmod_mul(res, x, &t, ctx);
@@ -370,6 +393,28 @@ _gr_nmod_mul_2exp_si(ulong * res, ulong * x, slong y, const gr_ctx_t ctx)
 
     res[0] = nmod_mul(x[0], c, NMOD_CTX(ctx));
     return GR_SUCCESS;
+}
+
+int
+_gr_nmod_sqrt(ulong * res, const ulong * x, gr_ctx_t ctx)
+{
+    if (x[0] <= 1)
+    {
+        res[0] = x[0];
+        return GR_SUCCESS;
+    }
+
+    /* todo: caching prime status */
+    /* todo: handle non-primes */
+    if (!n_is_prime(NMOD_CTX(ctx).n))
+        return GR_UNABLE;
+
+    res[0] = n_sqrtmod(x[0], NMOD_CTX(ctx).n);
+
+    if (res[0] == 0)
+        return GR_DOMAIN;
+    else
+        return GR_SUCCESS;
 }
 
 /* todo: pow_ui, ... */
@@ -646,6 +691,7 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_DIV_SI,          (gr_funcptr) _gr_nmod_div_si},
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_nmod_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) _gr_nmod_inv},
+    {GR_METHOD_SQRT,            (gr_funcptr) _gr_nmod_sqrt},
     {GR_METHOD_VEC_SUM,         (gr_funcptr) _gr_nmod_vec_sum},
     {GR_METHOD_VEC_PRODUCT,     (gr_funcptr) _gr_nmod_vec_product},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) __gr_nmod_vec_dot},
