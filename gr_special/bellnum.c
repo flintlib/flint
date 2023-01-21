@@ -13,6 +13,10 @@
 #include "arb.h"
 #include "gr_special.h"
 
+/* xxx: don't define here */
+#define NMOD_CTX_REF(ring_ctx) (((nmod_t *)((ring_ctx))))
+#define NMOD_CTX(ring_ctx) (*NMOD_CTX_REF(ring_ctx))
+
 int
 gr_generic_bellnum_ui(gr_ptr res, ulong n, gr_ctx_t ctx)
 {
@@ -35,6 +39,11 @@ gr_generic_bellnum_ui(gr_ptr res, ulong n, gr_ctx_t ctx)
         arb_clear(t);
         gr_ctx_clear(RR);
         return status;
+    }
+    else if (ctx->which_ring == GR_CTX_NMOD)  /* todo: also others in same characteristic */
+    {
+        ((ulong *) res)[0] = arith_bell_number_nmod(n, NMOD_CTX(ctx));
+        return GR_SUCCESS;
     }
     else        /* compute via fmpz */
     {
@@ -111,6 +120,12 @@ gr_generic_bellnum_vec(gr_ptr res, slong len, gr_ctx_t ctx)
 
             return GR_SUCCESS;
         }
+    }
+
+    if (ctx->which_ring == GR_CTX_NMOD)  /* todo: also others in same characteristic */
+    {
+        arith_bell_number_nmod_vec(res, len, NMOD_CTX(ctx));
+        return GR_SUCCESS;
     }
 
     /* compute exactly via Z */

@@ -1129,6 +1129,10 @@ class gr_ctx:
             115975
             >>> RR.bellnum(10)
             115975.0000000000
+            >>> ZZp64.bellnum(10000)
+            355901145009109239
+            >>> ZZmod(1000).bellnum(10000)
+            635
 
         Huge Bell numbers can be computed numerically:
 
@@ -1149,10 +1153,13 @@ class gr_ctx:
             [1, 1, 2, 5, 15, 52, 203, 877, 4140, 21147]
             >>> QQ.bellnum_vec(10) / 3
             [1/3, 1/3, 2/3, 5/3, 5, 52/3, 203/3, 877/3, 1380, 7049]
-            >>> sum(RR.bellnum_vec(100))
+            >>> RR.bellnum_vec(100).sum()
             [1.67618752079292e+114 +/- 4.30e+99]
-            >>> sum(RF.bellnum_vec(100))
+            >>> RF.bellnum_vec(100).sum()
             1.676187520792924e+114
+            >>> ZZmod(10000).bellnum_vec(10000).sum()
+            7337
+
         """
         return ctx._op_vec_len(length, libgr.gr_bellnum_vec, "bellnum_vec(length)")
 
