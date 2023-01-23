@@ -28,6 +28,7 @@
 #define ulong mp_limb_t
 
 #include "flint.h"
+#include "perm.h"
 #include "longlong.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
@@ -349,6 +350,33 @@ void nmod_mat_invert_cols(nmod_mat_t mat, slong * perm)
         }
     }
 }
+
+/** Permute rows of a matrix `mat` according to `perm_act`, and propagate the
+ * action on `perm_store`.
+ * That is, performs for each appropriate index `i`, the operations
+ * `perm_store[i] <- perm_store[perm_act[i]]`
+ * `rows[i] <- rows[perm_act[i]]` */
+NMOD_MAT_INLINE void
+nmod_mat_permute_rows(nmod_mat_t mat,
+                      const slong * perm_act,
+                      slong * perm_store)
+{
+		slong i;
+    mp_limb_t ** mat_tmp = flint_malloc(mat->r * sizeof(mp_limb_t *));
+
+    /* perm_store[i] <- perm_store[perm_act[i]] */
+    if (perm_store)
+        _perm_compose(perm_store, perm_store, perm_act, mat->r);
+
+    /* rows[i] <- rows[perm_act[i]]  */
+    for (i = 0; i < mat->r; i++)
+        mat_tmp[i] = mat->rows[perm_act[i]];
+    for (i = 0; i < mat->r; i++)
+        mat->rows[i] = mat_tmp[i];
+
+    flint_free(mat_tmp);
+}
+
 
 /* Triangular solving */
 

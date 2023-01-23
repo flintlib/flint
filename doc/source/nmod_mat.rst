@@ -210,7 +210,7 @@ Comparison
     Returns a non-zero value if row `i` of ``mat`` is zero.
 
 
-Transpose
+Transposition and permutations
 --------------------------------------------------------------------------------
 
 
@@ -240,6 +240,12 @@ Transpose
     Swaps columns ``i`` and ``c - i`` of ``mat`` for ``0 <= i < c/2``, where
     ``c`` is the number of columns of ``mat``. If ``perm`` is non-``NULL``, the
     permutation of the columns will also be applied to ``perm``.
+
+.. function:: void nmod_mat_permute_rows(nmod_mat_t mat, const slong * perm_act, slong * perm_store)
+
+    Permutes rows of the matrix `mat` according to permutation `perm_act` and,
+    if ``perm_store`` is not ``NULL``, apply the same permutation to it.
+
 
 Addition and subtraction
 --------------------------------------------------------------------------------
