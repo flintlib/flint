@@ -191,7 +191,17 @@ Random matrix generation
     Sets the elements of ``mat`` to random elements of
     `\mathbf{F}_{q}`, given by ``ctx``.
 
-.. function:: void fq_default_mat_randrank(fq_default_mat_t mat, slong rank, flint_rand_t state, const fq_default_ctx_t ctx)
+.. function:: int fq_default_mat_randpermdiag(fq_mat_t mat, flint_rand_t state, fq_struct * diag, slong n, const fq_ctx_t ctx)
+
+    Sets ``mat`` to a random permutation of the diagonal matrix
+    with `n` leading entries given by the vector ``diag``. It is
+    assumed that the main diagonal of ``mat`` has room for at
+    least `n` entries.
+
+    Returns `0` or `1`, depending on whether the permutation is even
+    or odd respectively.
+
+.. function:: void fq_default_mat_randrank(fq_default_mat_t mat, flint_rand_t state, slong rank, const fq_default_ctx_t ctx)
 
     Sets ``mat`` to a random sparse matrix with the given rank,
     having exactly as many non-zero elements as the rank, with the
