@@ -12,23 +12,27 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
+/* todo: use _gr_poly_pow_series_fmpq_recurrence if possible, when flen is short */
 int
 _gr_poly_rsqrt_series_basecase(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;
     slong sz = ctx->sizeof_elem;
-    fmpq_t q;
-
-    status |= gr_rsqrt(res, f, ctx);
-    if (status != GR_SUCCESS)
-        return status;
 
     if (flen == 1)
     {
+        status |= gr_rsqrt(res, f, ctx);
+        if (status != GR_SUCCESS)
+            return status;
+
         status |= _gr_vec_zero(GR_ENTRY(res, 1, sz), len - 1, ctx);
     }
     else if (len == 2)
     {
+        status |= gr_rsqrt(res, f, ctx);
+        if (status != GR_SUCCESS)
+            return status;
+
         status |= gr_mul(GR_ENTRY(res, 1, sz), res, GR_ENTRY(f, 1, sz), ctx);
         status |= gr_div(GR_ENTRY(res, 1, sz), GR_ENTRY(res, 1, sz), GR_ENTRY(f, 0, sz), ctx);
         status |= gr_mul_2exp_si(GR_ENTRY(res, 1, sz), GR_ENTRY(res, 1, sz), -1, ctx);
@@ -36,31 +40,16 @@ _gr_poly_rsqrt_series_basecase(gr_ptr res, gr_srcptr f, slong flen, slong len, g
     }
     else
     {
-        *fmpq_numref(q) = -1;
-        *fmpq_denref(q) = 2;
+        gr_ptr t;
+        GR_TMP_INIT_VEC(t, len, ctx);
 
-        if (gr_ctx_is_finite_characteristic(ctx) == T_TRUE)
-        {
-            status |= _gr_vec_reciprocals(GR_ENTRY(res, 1, sz), len - 1, ctx);
+        /* todo: when is it better and valid to invert first? */
+        /* todo: somehow use gr_rsqrt() for the constant term? */
 
-            if (status == GR_SUCCESS)
-            {
-                status |= _gr_poly_pow_series_fmpq_recurrence(res, f, flen, q, len, 3, ctx);
-            }
-            else
-            {
-                /* todo: this currently recomputes the square root */
-                gr_ptr t;
-                GR_TMP_INIT_VEC(t, len, ctx);
-                status = _gr_poly_sqrt_series_basecase(t, f, flen, len, ctx);
-                status |= _gr_poly_inv_series_basecase(res, t, len, len, ctx);
-                GR_TMP_CLEAR_VEC(t, len, ctx);
-            }
-        }
-        else
-        {
-            status = _gr_poly_pow_series_fmpq_recurrence(res, f, flen, q, len, 1, ctx);
-        }
+        status |= _gr_poly_sqrt_series_basecase(t, f, flen, len, ctx);
+        status |= _gr_poly_inv_series_basecase(res, t, len, len, ctx);
+
+        GR_TMP_CLEAR_VEC(t, len, ctx);
     }
 
     return status;

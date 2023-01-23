@@ -12,6 +12,8 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
+/* todo: with a slight rewrite, could allow aliasing */
+/* todo: use _gr_poly_pow_series_fmpq_recurrence if possible, when flen is short */
 int
 _gr_poly_sqrt_series_basecase(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx)
 {

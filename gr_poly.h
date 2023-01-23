@@ -176,18 +176,22 @@ WARN_UNUSED_RESULT int _gr_poly_div_series(gr_ptr Q, gr_srcptr A, slong Alen, gr
 WARN_UNUSED_RESULT int gr_poly_div_series(gr_poly_t Q, const gr_poly_t A, const gr_poly_t B, slong len, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int _gr_poly_sqrt_series_newton(gr_ptr res, gr_srcptr f, slong flen, slong len, slong cutoff, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_poly_sqrt_series_newton(gr_poly_t res, const gr_poly_t h, slong len, slong cutoff, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_sqrt_series_newton(gr_poly_t res, const gr_poly_t f, slong len, slong cutoff, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_poly_sqrt_series_basecase(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_poly_sqrt_series_basecase(gr_poly_t res, const gr_poly_t h, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_sqrt_series_basecase(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_sqrt_series_miller(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_sqrt_series_miller(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_poly_sqrt_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_poly_sqrt_series(gr_poly_t res, const gr_poly_t h, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_sqrt_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int _gr_poly_rsqrt_series_newton(gr_ptr res, gr_srcptr f, slong flen, slong len, slong cutoff, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_poly_rsqrt_series_newton(gr_poly_t res, const gr_poly_t h, slong len, slong cutoff, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_rsqrt_series_newton(gr_poly_t res, const gr_poly_t f, slong len, slong cutoff, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_poly_rsqrt_series_basecase(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_poly_rsqrt_series_basecase(gr_poly_t res, const gr_poly_t h, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_rsqrt_series_basecase(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_rsqrt_series_miller(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_rsqrt_series_miller(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_poly_rsqrt_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_poly_rsqrt_series(gr_poly_t res, const gr_poly_t h, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_rsqrt_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int _gr_poly_evaluate_rectangular(gr_ptr res, gr_srcptr poly, slong len, gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_evaluate_rectangular(gr_ptr res, const gr_poly_t poly, gr_srcptr x, gr_ctx_t ctx);

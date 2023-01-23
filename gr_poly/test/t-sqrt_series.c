@@ -61,6 +61,13 @@ test_sqrt_series(flint_rand_t state, int which)
             status |= gr_poly_set(B, A, ctx);
             status |= gr_poly_sqrt_series_newton(B, B, n, n_randint(state, 20), ctx);
             break;
+        case 6:
+            status |= gr_poly_sqrt_series_miller(B, A, n, ctx);
+            break;
+        case 7:
+            status |= gr_poly_set(B, A, ctx);
+            status |= gr_poly_sqrt_series_miller(B, B, n, ctx);
+            break;
         default:
             abort();
     }
@@ -102,7 +109,7 @@ int main()
 
     for (iter = 0; iter < 1000; iter++)
     {
-        test_sqrt_series(state, n_randint(state, 6));
+        test_sqrt_series(state, n_randint(state, 8));
     }
 
     flint_randclear(state);
