@@ -350,8 +350,6 @@ void nmod_mat_invert_cols(nmod_mat_t mat, slong * perm)
     }
 }
 
-FLINT_DLL void nmod_mat_apply_permutation(nmod_mat_t A, slong * P, slong n);
-
 /* Triangular solving */
 
 FLINT_DLL void nmod_mat_solve_tril(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit);
