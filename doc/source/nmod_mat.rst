@@ -243,8 +243,8 @@ Transposition and permutations
 
 .. function:: void nmod_mat_permute_rows(nmod_mat_t mat, const slong * perm_act, slong * perm_store)
 
-    Permutes rows of the matrix `mat` according to permutation `perm_act` and,
-    if ``perm_store`` is not ``NULL``, apply the same permutation to it.
+    Permutes rows of the matrix ``mat`` according to permutation ``perm_act``
+    and, if ``perm_store`` is not ``NULL``, apply the same permutation to it.
 
 
 Addition and subtraction
