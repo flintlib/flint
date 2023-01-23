@@ -39,6 +39,8 @@ main(void)
         nmod_mat_init(A, m, n, mod);
         nmod_mat_init(B, m, n, mod);
 
+        nmod_mat_randtest(A, state);
+
         nmod_mat_set(B, A);
 
         nmod_mat_invert_rows(A, NULL);
