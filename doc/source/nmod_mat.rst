@@ -154,7 +154,7 @@ Random matrix generation
     Sets the element to random numbers likely to be close to the modulus
     of the matrix. This is used to test potential overflow-related bugs.
 
-.. function:: int nmod_mat_randpermdiag(nmod_mat_t mat, mp_limb_t * diag, slong n, flint_rand_t state)
+.. function:: int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state, mp_srcptr * diag, slong n)
 
     Sets ``mat`` to a random permutation of the diagonal matrix 
     with `n` leading entries given by the vector ``diag``. It is 
@@ -164,7 +164,7 @@ Random matrix generation
     Returns `0` or `1`, depending on whether the permutation is even 
     or odd respectively.
 
-.. function:: void nmod_mat_randrank(nmod_mat_t mat, slong rank, flint_rand_t state)
+.. function:: void nmod_mat_randrank(nmod_mat_t mat, flint_rand_t state, slong rank)
 
     Sets ``mat`` to a random sparse matrix with the given rank, 
     having exactly as many non-zero elements as the rank, with the 
