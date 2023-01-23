@@ -24,7 +24,7 @@ _gr_poly_div_series(gr_ptr Q,
     }
     else
     {
-        return _gr_poly_div_series_newton(Q, A, Alen, B, Blen, len, ctx);
+        return _gr_poly_div_series_newton(Q, A, Alen, B, Blen, len, 8, ctx);
     }
 }
 

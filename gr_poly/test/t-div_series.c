@@ -55,15 +55,15 @@ test_div_series(flint_rand_t state, int which)
             break;
 
         case 3:
-            status |= gr_poly_div_series_newton(C, A, B, n, ctx);
+            status |= gr_poly_div_series_newton(C, A, B, n, n_randint(state, 20), ctx);
             break;
         case 4:
             status |= gr_poly_set(C, A, ctx);
-            status |= gr_poly_div_series_newton(C, C, B, n, ctx);
+            status |= gr_poly_div_series_newton(C, C, B, n, n_randint(state, 20), ctx);
             break;
         case 5:
             status |= gr_poly_set(C, B, ctx);
-            status |= gr_poly_div_series_newton(C, A, C, n, ctx);
+            status |= gr_poly_div_series_newton(C, A, C, n, n_randint(state, 20), ctx);
             break;
 
         case 6:

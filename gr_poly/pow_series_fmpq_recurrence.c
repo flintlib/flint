@@ -19,20 +19,28 @@ https://en.wikipedia.org/wiki/Formal_power_series#Operations_on_formal_power_ser
 */
 
 int
-_gr_poly_pow_series_fmpq_recurrence(gr_ptr h, gr_srcptr f, slong flen, const fmpq_t g, slong len, gr_ctx_t ctx)
+_gr_poly_pow_series_fmpq_recurrence(gr_ptr h, gr_srcptr f, slong flen, const fmpq_t g, slong len, int precomp, gr_ctx_t ctx)
 {
     gr_ptr a, b, s, t;
     slong i, l, alloc;
     slong sz = ctx->sizeof_elem;
     int use_divexact;
+    int precomp_constant_term;
+    int precomp_reciprocals;
     int status = GR_SUCCESS;
 
     flen = FLINT_MIN(flen, len);
 
-    status |= gr_pow_fmpq(h, f, g, ctx);
+    precomp_constant_term = ((precomp & 1) != 0);
+    precomp_reciprocals   = ((precomp & 2) != 0);
 
-    if (status != GR_SUCCESS)
-        return status;
+    if (!precomp_constant_term)
+    {
+        status |= gr_pow_fmpq(h, f, g, ctx);
+
+        if (status != GR_SUCCESS)
+            return status;
+    }
 
     if (flen == 1)
         return _gr_vec_zero(GR_ENTRY(h, 1, sz), len - 1, ctx);
@@ -67,24 +75,32 @@ _gr_poly_pow_series_fmpq_recurrence(gr_ptr h, gr_srcptr f, slong flen, const fmp
             status |= _gr_vec_mul_scalar_fmpz(a, a, flen - 1, fmpq_numref(g), ctx);
     }
 
+    if (precomp_reciprocals)
+        status |= gr_inv(b, b, ctx);
+
     for (i = 1; i < len && status == GR_SUCCESS; i++)
     {
         l = FLINT_MIN(i, flen - 1);
 
         status |= _gr_vec_sub(GR_ENTRY(a, 0, sz), GR_ENTRY(a, 0, sz), GR_ENTRY(b, 1, sz), FLINT_MIN(i, flen) - 1, ctx);
-        /* alternative with slightly better numerical stability */
-        /* for (k = 0; k < l; k++)
-            status |= gr_mul_si(GR_ENTRY(a, k, sz), GR_ENTRY(f, 1 + k, sz), (k + 1) * p - i * q + (k + 1) * q, ctx); */
-
         status |= _gr_vec_dot_rev(s, NULL, 0, GR_ENTRY(a, 0, sz), GR_ENTRY(h, i - l, sz), l, ctx);
 
-        /* h[i] = s / (i * q * f[0]) */
-        status |= gr_mul_ui(t, b, i, ctx);
+        /* h[i] = s / (i * (q * f[0])) */
+        if (!precomp_reciprocals)
+        {
+            status |= gr_mul_ui(t, b, i, ctx);
 
-        if (use_divexact)
-            status |= gr_divexact(GR_ENTRY(h, i, sz), s, t, ctx);
+            if (use_divexact)
+                status |= gr_divexact(GR_ENTRY(h, i, sz), s, t, ctx);
+            else
+                status |= gr_div(GR_ENTRY(h, i, sz), s, t, ctx);
+        }
         else
-            status |= gr_div(GR_ENTRY(h, i, sz), s, t, ctx);
+        {
+            /* h[i] = s * (i^(-1) * (q * f[0])^(-1)) */
+            status |= gr_mul(t, b, GR_ENTRY(h, i, sz), ctx);
+            status |= gr_mul(GR_ENTRY(h, i, sz), s, t, ctx);
+        }
     }
 
     GR_TMP_CLEAR_VEC(a, alloc, ctx);
@@ -127,7 +143,7 @@ gr_poly_pow_series_fmpq_recurrence(gr_poly_t res,
         if (res != poly)
         {
             gr_poly_fit_length(res, len, ctx);
-            status |= _gr_poly_pow_series_fmpq_recurrence(res->coeffs, poly->coeffs, flen, exp, len, ctx);
+            status |= _gr_poly_pow_series_fmpq_recurrence(res->coeffs, poly->coeffs, flen, exp, len, 0, ctx);
             _gr_poly_set_length(res, len, ctx);
             _gr_poly_normalise(res, ctx);
         }
@@ -135,7 +151,7 @@ gr_poly_pow_series_fmpq_recurrence(gr_poly_t res,
         {
             gr_poly_t t;
             gr_poly_init2(t, len, ctx);
-            status |= _gr_poly_pow_series_fmpq_recurrence(t->coeffs, poly->coeffs, flen, exp, len, ctx);
+            status |= _gr_poly_pow_series_fmpq_recurrence(t->coeffs, poly->coeffs, flen, exp, len, 0, ctx);
             _gr_poly_set_length(t, len, ctx);
             _gr_poly_normalise(t, ctx);
             gr_poly_swap(res, t, ctx);

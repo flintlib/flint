@@ -51,6 +51,7 @@ _gr_poly_inv_series_newton(gr_ptr Qinv, gr_srcptr Q, slong Qlen, slong len, slon
         Wlen = FLINT_MIN(Qnlen + m - 1, n);
         W2len = Wlen - m;
         status |= _gr_poly_mullow(W, Q, Qnlen, Qinv, m, Wlen, ctx);
+        /* should be mulmid */
         status |= _gr_poly_mullow(GR_ENTRY(Qinv, m, sz), Qinv, m, GR_ENTRY(W, m, sz), W2len, n - m, ctx);
         status |= _gr_vec_neg(GR_ENTRY(Qinv, m, sz), GR_ENTRY(Qinv, m, sz), n - m, ctx);
     }

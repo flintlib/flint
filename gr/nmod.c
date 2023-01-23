@@ -284,14 +284,42 @@ _gr_nmod_mul(ulong * res, const ulong * x, const ulong * y, const gr_ctx_t ctx)
 int
 _gr_nmod_mul_ui(ulong * res, const ulong * x, ulong y, const gr_ctx_t ctx)
 {
+/*
     res[0] = nmod_mul(x[0], nmod_set_ui(y, NMOD_CTX(ctx)), NMOD_CTX(ctx));
+*/
+    res[0] = n_mulmod2_preinv(x[0], y, NMOD_CTX(ctx).n, NMOD_CTX(ctx).ninv);
     return GR_SUCCESS;
 }
 
 int
 _gr_nmod_mul_si(ulong * res, const ulong * x, slong y, const gr_ctx_t ctx)
 {
+/*
     res[0] = nmod_mul(x[0], nmod_set_si(y, NMOD_CTX(ctx)), NMOD_CTX(ctx));
+*/
+    if (y >= 0)
+        res[0] = n_mulmod2_preinv(x[0], y, NMOD_CTX(ctx).n, NMOD_CTX(ctx).ninv);
+    else
+        res[0] = nmod_neg(n_mulmod2_preinv(x[0], -y, NMOD_CTX(ctx).n, NMOD_CTX(ctx).ninv), NMOD_CTX(ctx));
+
+    return GR_SUCCESS;
+}
+
+int
+_gr_nmod_mul_fmpz(ulong * res, const ulong * x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    if (!COEFF_IS_MPZ(*y))
+    {
+        if (*y >= 0)
+            res[0] = n_mulmod2_preinv(x[0], *y, NMOD_CTX(ctx).n, NMOD_CTX(ctx).ninv);
+        else
+            res[0] = nmod_neg(n_mulmod2_preinv(x[0], -*y, NMOD_CTX(ctx).n, NMOD_CTX(ctx).ninv), NMOD_CTX(ctx));
+    }
+    else
+    {
+        res[0] = nmod_mul(x[0], fmpz_get_nmod(y, NMOD_CTX(ctx)), NMOD_CTX(ctx));
+    }
+
     return GR_SUCCESS;
 }
 
@@ -466,56 +494,81 @@ _gr_nmod_vec_sub(ulong * res, const ulong * vec1, const ulong * vec2, slong len,
     return GR_SUCCESS;
 }
 
+
+static __inline__ void _nmod_vec_scalar_mul_nmod_fullword_inline(mp_ptr res, mp_srcptr vec, 
+                               slong len, mp_limb_t c, nmod_t mod)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        NMOD_MUL_FULLWORD(res[i], vec[i], c, mod);
+}
+
+static __inline__ void _nmod_vec_scalar_mul_nmod_generic_inline(mp_ptr res, mp_srcptr vec, 
+                               slong len, mp_limb_t c, nmod_t mod)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        NMOD_MUL_PRENORM(res[i], vec[i], c << mod.norm, mod);
+}
+
+static __inline__ void _nmod_vec_scalar_mul_nmod_inline(mp_ptr res, mp_srcptr vec, 
+                               slong len, mp_limb_t c, nmod_t mod)
+{
+    if (NMOD_BITS(mod) == FLINT_BITS)
+        _nmod_vec_scalar_mul_nmod_fullword_inline(res, vec, len, c, mod);
+    else if (len > 10)
+        _nmod_vec_scalar_mul_nmod_shoup(res, vec, len, c, mod);
+    else 
+        _nmod_vec_scalar_mul_nmod_generic_inline(res, vec, len, c, mod);
+}
+
 int
 _gr_nmod_vec_mul_scalar(ulong * res, const ulong * vec1, slong len, const ulong * c, gr_ctx_t ctx)
 {
-    slong i;
     nmod_t mod = NMOD_CTX(ctx);
-    ulong d = c[0];
-
-    for (i = 0; i < len; i++)
-        res[i] = nmod_mul(vec1[i], d, mod);
-
+    _nmod_vec_scalar_mul_nmod_inline(res, vec1, len, c[0], mod);
     return GR_SUCCESS;
 }
 
 int
 _gr_nmod_vec_mul_scalar_si(ulong * res, const ulong * vec1, slong len, slong c, gr_ctx_t ctx)
 {
-    slong i;
     nmod_t mod = NMOD_CTX(ctx);
-    ulong d = nmod_set_si(c, mod);
-
-    for (i = 0; i < len; i++)
-        res[i] = nmod_mul(vec1[i], d, mod);
-
+    _nmod_vec_scalar_mul_nmod_inline(res, vec1, len, nmod_set_si(c, mod), NMOD_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
 _gr_nmod_vec_mul_scalar_ui(ulong * res, const ulong * vec1, slong len, ulong c, gr_ctx_t ctx)
 {
-    slong i;
     nmod_t mod = NMOD_CTX(ctx);
-    ulong d = nmod_set_ui(c, mod);
-
-    for (i = 0; i < len; i++)
-        res[i] = nmod_mul(vec1[i], d, mod);
-
+    _nmod_vec_scalar_mul_nmod_inline(res, vec1, len, nmod_set_ui(c, mod), NMOD_CTX(ctx));
     return GR_SUCCESS;
 }
 
 int
 _gr_nmod_vec_mul_scalar_fmpz(ulong * res, const ulong * vec1, slong len, const fmpz_t c, gr_ctx_t ctx)
 {
-    slong i;
     nmod_t mod = NMOD_CTX(ctx);
-    ulong d = fmpz_get_nmod(c, mod);
-
-    for (i = 0; i < len; i++)
-        res[i] = nmod_mul(vec1[i], d, mod);
-
+    _nmod_vec_scalar_mul_nmod(res, vec1, len, fmpz_get_nmod(c, mod), NMOD_CTX(ctx));
     return GR_SUCCESS;
+}
+
+int
+_gr_nmod_vec_mul_scalar_2exp_si(ulong * res, const ulong * vec1, slong len, slong c, gr_ctx_t ctx)
+{
+    ulong t[1];
+    int status = GR_SUCCESS;
+
+    if (c == 1)
+        return _gr_nmod_vec_add(res, vec1, vec1, len, ctx);
+
+    status |= _gr_nmod_one(t, ctx);
+    status |= _gr_nmod_mul_2exp_si(t, t, c, ctx);
+    status |= _gr_nmod_vec_mul_scalar(res, vec1, len, t, ctx);
+    return status;
 }
 
 int
@@ -682,6 +735,38 @@ __gr_nmod_vec_dot_rev(ulong * res, const ulong * initial, int subtract, const ul
     return GR_SUCCESS;
 }
 
+/* todo: better algorithms for large len */
+int
+_gr_nmod_vec_reciprocals(ulong * res, slong len, gr_ctx_t ctx)
+{
+    nmod_t mod = NMOD_CTX(ctx);
+    slong k;
+    ulong c2;
+
+    if (len <= 1)
+    {
+        res[0] = (mod.n != 1);
+        return GR_SUCCESS;
+    }
+
+    if (mod.n <= len || mod.n % 2 == 0)
+        return GR_DOMAIN;
+
+    res[0] = 1;
+    res[1] = c2 = (mod.n - 1) / 2 + 1;;
+
+    for (k = 3; k <= len; k += 2)
+    {
+        if (n_gcdinv(res + k - 1, k, mod.n) != 1)
+            return GR_DOMAIN;
+    }
+
+    for (k = 4; k <= len; k += 2)
+        res[k - 1] = nmod_mul(res[k / 2 - 1], c2, mod);
+
+    return GR_SUCCESS;
+}
+
 int
 _gr_nmod_poly_mullow(ulong * res,
     const ulong * poly1, slong len1,
@@ -781,6 +866,7 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_MUL,             (gr_funcptr) _gr_nmod_mul},
     {GR_METHOD_MUL_SI,          (gr_funcptr) _gr_nmod_mul_si},
     {GR_METHOD_MUL_UI,          (gr_funcptr) _gr_nmod_mul_ui},
+    {GR_METHOD_MUL_FMPZ,        (gr_funcptr) _gr_nmod_mul_fmpz},
     {GR_METHOD_ADDMUL,          (gr_funcptr) _gr_nmod_addmul},
     {GR_METHOD_SUBMUL,          (gr_funcptr) _gr_nmod_submul},
     {GR_METHOD_MUL_TWO,         (gr_funcptr) _gr_nmod_mul_two},
@@ -799,11 +885,13 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_VEC_MUL_SCALAR_SI,   (gr_funcptr) _gr_nmod_vec_mul_scalar_si},
     {GR_METHOD_VEC_MUL_SCALAR_UI,   (gr_funcptr) _gr_nmod_vec_mul_scalar_ui},
     {GR_METHOD_VEC_MUL_SCALAR_FMPZ, (gr_funcptr) _gr_nmod_vec_mul_scalar_fmpz},
+    {GR_METHOD_VEC_MUL_SCALAR_2EXP_SI,   (gr_funcptr) _gr_nmod_vec_mul_scalar_2exp_si},
     {GR_METHOD_VEC_SUB,         (gr_funcptr) _gr_nmod_vec_sub},
     {GR_METHOD_VEC_SUM,         (gr_funcptr) _gr_nmod_vec_sum},
     {GR_METHOD_VEC_PRODUCT,     (gr_funcptr) _gr_nmod_vec_product},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) __gr_nmod_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) __gr_nmod_vec_dot_rev},
+    {GR_METHOD_VEC_RECIPROCALS, (gr_funcptr) _gr_nmod_vec_reciprocals},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_nmod_poly_mullow},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_nmod_roots_gr_poly},
     {0,                         (gr_funcptr) NULL},

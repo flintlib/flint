@@ -2092,6 +2092,22 @@ BINARY_OP(DIVEXACT, divexact)
 BINARY_OP(POW, pow)
 
 int
+gr_generic_vec_mul_scalar_2exp_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx)
+{
+    gr_method_binary_op_si op = GR_BINARY_OP_SI(ctx, MUL_2EXP_SI);
+    int status;
+    slong i, sz;
+
+    sz = ctx->sizeof_elem;
+    status = GR_SUCCESS;
+
+    for (i = 0; i < len; i++)
+        status |= op(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec2, i, sz), c, ctx);
+
+    return status;
+}
+
+int
 gr_generic_vec_scalar_addmul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx)
 {
     gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
@@ -2514,6 +2530,23 @@ gr_generic_vec_set_powers(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx)
 }
 
 int
+gr_generic_vec_reciprocals(gr_ptr res, slong len, gr_ctx_t ctx)
+{
+    int status = GR_SUCCESS;
+    slong i;
+    slong sz = ctx->sizeof_elem;;
+
+    for (i = 0; i < len && status == GR_SUCCESS; i++)
+    {
+        status |= gr_set_ui(GR_ENTRY(res, i, sz), i + 1, ctx);
+        status |= gr_inv(GR_ENTRY(res, i, sz), GR_ENTRY(res, i, sz), ctx);
+    }
+
+    return status;
+}
+
+
+int
 gr_generic_ctx_clear(gr_ctx_t ctx)
 {
     return GR_SUCCESS;
@@ -2777,6 +2810,8 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_SCALAR_OTHER_DIV_VEC,          (gr_funcptr) gr_generic_scalar_other_div_vec},
     {GR_METHOD_SCALAR_OTHER_DIVEXACT_VEC,     (gr_funcptr) gr_generic_scalar_other_divexact_vec},
 
+    {GR_METHOD_VEC_MUL_SCALAR_2EXP_SI,       (gr_funcptr) gr_generic_vec_mul_scalar_2exp_si},
+
     {GR_METHOD_VEC_ADDMUL_SCALAR,       (gr_funcptr) gr_generic_vec_scalar_addmul},
     {GR_METHOD_VEC_SUBMUL_SCALAR,       (gr_funcptr) gr_generic_vec_scalar_submul},
     {GR_METHOD_VEC_ADDMUL_SCALAR_SI,    (gr_funcptr) gr_generic_vec_scalar_addmul_si},
@@ -2794,6 +2829,7 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_VEC_DOT_SI,              (gr_funcptr) gr_generic_vec_dot_si},
     {GR_METHOD_VEC_DOT_FMPZ,            (gr_funcptr) gr_generic_vec_dot_fmpz},
 
+    {GR_METHOD_VEC_RECIPROCALS,         (gr_funcptr) gr_generic_vec_reciprocals},
     {GR_METHOD_VEC_SET_POWERS,          (gr_funcptr) gr_generic_vec_set_powers},
 
     {GR_METHOD_POLY_MULLOW,             (gr_funcptr) _gr_poly_mullow_generic},

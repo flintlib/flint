@@ -177,6 +177,7 @@ Arithmetic
               int _gr_vec_addmul_scalar_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx)
               int _gr_vec_submul_scalar_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx)
 
+.. function:: int _gr_vec_mul_scalar_2exp_si(gr_ptr res, gr_srcptr vec, slong len, slong c, gr_ctx_t ctx)
 
 Sums and products
 --------------------------------------------------------------------------------
@@ -203,5 +204,9 @@ Other functions
 --------------------------------------------------------------------------------
 
 .. function:: int _gr_vec_step(gr_ptr vec, gr_srcptr start, gr_srcptr step, slong len, gr_ctx_t ctx)
+
+.. function:: int _gr_vec_reciprocals(gr_ptr res, slong len, gr_ctx_t ctx)
+
+    Sets *res* to the vector of reciprocals of the positive integers 1, 2, ... up to *len* inclusive.
 
 .. function:: int _gr_vec_set_powers(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx)
