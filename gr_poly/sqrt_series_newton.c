@@ -12,20 +12,68 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
-/* todo: Karp-Markstein */
 int
-_gr_poly_sqrt_series_newton(gr_ptr res, gr_srcptr f, slong flen, slong len, slong cutoff, gr_ctx_t ctx)
+_gr_poly_sqrt_series_newton(gr_ptr g,
+    gr_srcptr h, slong hlen, slong len, slong cutoff, gr_ctx_t ctx)
 {
+    slong sz = ctx->sizeof_elem;
     int status = GR_SUCCESS;
-    gr_ptr t;
+    slong a[FLINT_BITS];
+    slong i, m, n, alloc;
+    gr_ptr t, u, v;
+    slong tlen;
 
-    GR_TMP_INIT_VEC(t, len, ctx);
+    hlen = FLINT_MIN(hlen, len);
 
-    status = _gr_poly_rsqrt_series_newton(t, f, flen, len, cutoff, ctx);
-    if (status == GR_SUCCESS)
-        status |= _gr_poly_mullow(res, t, len, f, flen, len, ctx);
+    if (len == 0)
+        return GR_SUCCESS;
 
-    GR_TMP_CLEAR_VEC(t, len, ctx);
+    if (len < cutoff)
+        return _gr_poly_sqrt_series_basecase(g, h, hlen, len, ctx);
+
+    cutoff = FLINT_MAX(cutoff, 2);
+    a[i = 0] = n = len;
+    while (n >= cutoff)
+        a[++i] = (n = (n + 1) / 2);
+
+    status |= _gr_poly_rsqrt_series_basecase(g, h, FLINT_MIN(hlen, n), n, ctx);
+
+    if (status != GR_SUCCESS)
+        return status;
+
+    alloc = 2 * len + (len + 1) / 2;
+
+    GR_TMP_INIT_VEC(t, alloc, ctx);
+    u = GR_ENTRY(t, len, sz);
+    v = GR_ENTRY(u, len, sz);
+
+    for (i--; i >= 1; i--)
+    {
+        m = n;
+        n = a[i];
+
+        tlen = FLINT_MIN(2 * m - 1, n);
+        status |= _gr_poly_mullow(t, g, m, g, m, tlen, ctx);
+        status |= _gr_poly_mullow(u, g, m, t, tlen, n, ctx);
+        status |= _gr_poly_mullow(t, u, n, h, FLINT_MIN(hlen, n), n, ctx);   /* should be mulmid */
+        status |= _gr_vec_mul_scalar_2exp_si(GR_ENTRY(g, m, sz), GR_ENTRY(t, m, sz), n - m, -1, ctx);
+        status |= _gr_vec_neg(GR_ENTRY(g, m, sz), GR_ENTRY(g, m, sz), n - m, ctx);
+    }
+
+    m = (len + 1) / 2;
+    n = len;
+
+    /* Karp-Markstein */
+    /* todo: cleanup; improve allocations? */
+    tlen = FLINT_MIN(2 * m - 1, n);
+    status |= _gr_poly_mullow(v, g, m, h, hlen, m, ctx);
+    status |= _gr_poly_mullow(t, v, m, v, m, tlen, ctx);
+    status |= _gr_poly_sub(GR_ENTRY(u, m, sz), GR_ENTRY(h, m, sz), FLINT_MAX(0, FLINT_MIN(hlen - m, n - m)), GR_ENTRY(t, m, sz), FLINT_MAX(0, FLINT_MIN(tlen - m, n - m)), ctx);
+    status |= _gr_poly_mullow(t, g, m, GR_ENTRY(u, m, sz), n - m, n - m, ctx);
+    status |= _gr_vec_mul_scalar_2exp_si(GR_ENTRY(g, m, sz), t, n - m, -1, ctx);
+    _gr_vec_swap(g, v, m, ctx);
+
+    GR_TMP_CLEAR_VEC(t, alloc, ctx);
 
     return status;
 }

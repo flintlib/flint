@@ -45,7 +45,8 @@ _gr_poly_rsqrt_series_basecase(gr_ptr res, gr_srcptr f, slong flen, slong len, g
 
         /* todo: when is it better and valid to invert first? */
         /* todo: somehow use gr_rsqrt() for the constant term? */
-
+        /* todo: might want to call inv_series rather than inv_series_basecase here;
+                 the cutoff could be much lower than that for sqrt */
         status |= _gr_poly_sqrt_series_basecase(t, f, flen, len, ctx);
         status |= _gr_poly_inv_series_basecase(res, t, len, len, ctx);
 

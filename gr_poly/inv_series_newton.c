@@ -29,6 +29,9 @@ _gr_poly_inv_series_newton(gr_ptr Qinv, gr_srcptr Q, slong Qlen, slong len, slon
 
     Qlen = FLINT_MIN(Qlen, len);
 
+    if (len < cutoff)
+        return _gr_poly_inv_series_basecase(Qinv, Q, Qlen, len, ctx);
+
     cutoff = FLINT_MAX(cutoff, 2);
 
     a[i = 0] = n = len;
