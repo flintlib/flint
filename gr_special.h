@@ -107,7 +107,8 @@ GR_SPECIAL_DEF int gr_rfac_vec(gr_ptr res, slong len, gr_ctx_t ctx) { return GR_
 
 GR_SPECIAL_DEF int gr_bin(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, BIN)(res, x, y, ctx); }
 GR_SPECIAL_DEF int gr_bin_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, BIN_UI)(res, x, y, ctx); }
-GR_SPECIAL_DEF int gr_bin_uiui(gr_ptr res, ulong x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI_UI(ctx, BIN_UI_UI)(res, x, y, ctx); }
+GR_SPECIAL_DEF int gr_bin_uiui(gr_ptr res, ulong x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI_UI(ctx, BIN_UIUI)(res, x, y, ctx); }
+GR_SPECIAL_DEF int gr_bin_vec(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, BIN_VEC)(res, x, len, ctx); }
 GR_SPECIAL_DEF int gr_bin_ui_vec(gr_ptr res, ulong x, slong len, gr_ctx_t ctx) { return GR_BINARY_OP_UI_SI(ctx, BIN_UI_VEC)(res, x, len, ctx); }
 
 GR_SPECIAL_DEF int gr_rising(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, RISING)(res, x, y, ctx); }
@@ -270,7 +271,11 @@ int gr_generic_rising_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx);
 int gr_generic_falling(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx);
 int gr_generic_falling_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx);
 
-int gr_generic_bin_ui_vec(gr_ptr res, ulong n, slong len, gr_ctx_t ctx);
+int gr_generic_bin(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx);
+int gr_generic_bin_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx);
+int gr_generic_bin_uiui(gr_ptr res, ulong x, ulong y, gr_ctx_t ctx);
+int gr_generic_bin_vec(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx);
+int gr_generic_bin_ui_vec(gr_ptr res, ulong x, slong len, gr_ctx_t ctx);
 
 int gr_generic_fib2_fmpz(gr_ptr v, gr_ptr u, const fmpz_t n, gr_ctx_t ctx);
 int gr_generic_fib_fmpz(gr_ptr res, const fmpz_t n, gr_ctx_t ctx);

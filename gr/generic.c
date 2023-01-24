@@ -2704,6 +2704,11 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_RISING_UI,               (gr_funcptr) gr_generic_rising_ui},
     {GR_METHOD_FALLING,                 (gr_funcptr) gr_generic_falling},
     {GR_METHOD_FALLING_UI,              (gr_funcptr) gr_generic_falling_ui},
+
+    {GR_METHOD_BIN,                     (gr_funcptr) gr_generic_bin},
+    {GR_METHOD_BIN_UI,                  (gr_funcptr) gr_generic_bin_ui},
+    {GR_METHOD_BIN_UIUI,                (gr_funcptr) gr_generic_bin_uiui},
+    {GR_METHOD_BIN_VEC,                 (gr_funcptr) gr_generic_bin_vec},
     {GR_METHOD_BIN_UI_VEC,              (gr_funcptr) gr_generic_bin_ui_vec},
 
     {GR_METHOD_BERNOULLI_UI,            (gr_funcptr) gr_generic_bernoulli_ui},

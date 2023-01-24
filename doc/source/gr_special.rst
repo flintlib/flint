@@ -103,9 +103,10 @@ Factorials and gamma functions
 .. function:: int gr_bin(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
               int gr_bin_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
               int gr_bin_uiui(gr_ptr res, ulong x, ulong y, gr_ctx_t ctx)
+              int gr_bin_vec(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx)
               int gr_bin_ui_vec(gr_ptr res, ulong x, slong len, gr_ctx_t ctx)
 
-    Binomial coefficient `{x \choose y}`. The *vec* version writes the
+    Binomial coefficient `{x \choose y}`. The *vec* versions write the
     first *len* consecutive values `{x \choose 0}, {x \choose 1}, \ldots, {x \choose len-1}`
     to the preallocated vector *res*.
     For constructing a two-dimensional array of binomial

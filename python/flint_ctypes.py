@@ -22,6 +22,8 @@ GR_SUCCESS = 0
 GR_DOMAIN = 1
 GR_UNABLE = 2
 
+HUGE_LENGTH = 2**40
+
 c_slong = ctypes.c_long
 c_ulong = ctypes.c_ulong
 
@@ -536,6 +538,8 @@ class gr_ctx:
 
     def _op_vec_len(ctx, n, op, rstr):
         n = ctx._as_si(n)
+        assert n >= 0
+        assert n <= HUGE_LENGTH
         op.argtypes = (ctypes.c_void_p, c_slong, ctypes.c_void_p)
         res = Vec(ctx)()
         assert not libgr.gr_vec_set_length(res._ref, n, ctx._ref)
@@ -544,9 +548,25 @@ class gr_ctx:
             _handle_error(ctx, status, rstr, n)
         return res
 
+    def _op_vec_arg_len(ctx, x, n, op, rstr):
+        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
+            x = ctx(x)
+        n = ctx._as_si(n)
+        assert n >= 0
+        assert n <= HUGE_LENGTH
+        op.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.c_void_p)
+        res = Vec(ctx)()
+        assert not libgr.gr_vec_set_length(res._ref, n, ctx._ref)
+        status = op(libgr.gr_vec_entry_ptr(res._ref, 0, ctx._ref), x._ref, n, ctx._ref)
+        if status:
+            _handle_error(ctx, status, rstr, n)
+        return res
+
     def _op_vec_ui_len(ctx, x, n, op, rstr):
         x = ctx._as_ui(x)
         n = ctx._as_si(n)
+        assert n >= 0
+        assert n <= HUGE_LENGTH
         op.argtypes = (ctypes.c_void_p, c_ulong, c_slong, ctypes.c_void_p)
         res = Vec(ctx)()
         assert not libgr.gr_vec_set_length(res._ref, n, ctx._ref)
@@ -927,6 +947,28 @@ class gr_ctx:
         """
         return ctx._binary_op_with_overloads(x, n, libgr.gr_falling, op_ui=libgr.gr_falling_ui, rstr="falling($x, $n)")
 
+    def bin(ctx, x, y):
+        """
+        Binomial coefficient.
+
+            >>> [ZZ.bin(5, k) for k in range(7)]
+            [1, 5, 10, 10, 5, 1, 0]
+            >>> RR.bin(100000, 50000)
+            [2.52060836892200e+30100 +/- 5.36e+30085]
+            >>> ZZmod(1000).bin(10000, 3000)
+            200
+            >>> ZZp64.bin(100000, 50000)
+            5763493550349629692
+            >>> ZZp64.bin(10**30, 2)
+            998763921924463582
+        """
+        try:
+            x = ctx._as_ui(x)
+            y = ctx._as_ui(y)
+            return ctx._op_uiui(x, y, libgr.gr_bin_uiui, "bin($x, $y)")
+        except:
+            return ctx._binary_op_with_overloads(x, y, libgr.gr_bin, op_ui=libgr.gr_bin_ui, rstr="bin($x, $y)")
+
     def bin_vec(ctx, n, length=None):
         """
         Vector of binomial coefficients, optionally truncated to specified length.
@@ -941,8 +983,14 @@ class gr_ctx:
             [1, 1000, 499500]
             >>> ZZ.bin_vec(4, 8)
             [1, 4, 6, 4, 1, 0, 0, 0]
+            >>> QQ.bin_vec(QQ(1)/2, 5)
+            [1, 1/2, -1/8, 1/16, -5/128]
 
         """
+        try:
+            n = ctx._as_ui(n)
+        except:
+            return ctx._op_vec_arg_len(n, length, libgr.gr_bin_vec, "bin_vec($n, $length)")
         if length is None:
             length = n + 1
         return ctx._op_vec_ui_len(n, length, libgr.gr_bin_ui_vec, "bin_vec($n, $length)")
