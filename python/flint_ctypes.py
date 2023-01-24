@@ -460,6 +460,32 @@ class gr_ctx:
             _handle_error(ctx, status, rstr, x)
         return res
 
+    def _binary_op_with_overloads(ctx, x, y, op, op_ui=None, op_fmpz=None, op_fmpq=None, rstr=None):
+        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
+            x = ctx(x)
+        type_y = type(y)
+        res = ctx._elem_type(context=ctx)
+        if type_y is not ctx._elem_type or y._ctx_python is not ctx:
+            if type_y is fmpq and op_fmpq is not None:
+                status = op_fmpq(res._ref, x._ref, y._ref, ctx._ref)
+            elif type_y is fmpz and op_fmpz is not None:
+                status = op_fmpz(res._ref, x._ref, y._ref, ctx._ref)
+            elif type_y is int and op_fmpz is not None:
+                y = ZZ(y)
+                status = op_fmpz(res._ref, x._ref, y._ref, ctx._ref)
+            elif type_y in (fmpz, int) and op_ui is not None:
+                y = ctx._as_ui(y)
+                op_ui.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_ulong, ctypes.c_void_p)
+                status = op_ui(res._ref, x._ref, y, ctx._ref)
+            else:
+                y = ctx(y)
+                status = op(res._ref, x._ref, ctx._ref)
+        else:
+            status = op(res._ref, x._ref, y._ref, ctx._ref)
+        if status:
+            _handle_error(ctx, status, rstr, x)
+        return res
+
     def _binary_op(ctx, x, y, op, rstr):
         if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
             x = ctx(x)
@@ -737,7 +763,11 @@ class gr_ctx:
         return ctx._unary_op(x, libgr.gr_atan, "atan($x)")
 
     def atan2(ctx, y, x):
-        return ctx._binary_op(x, libgr.gr_atan2, "atan2($y, $x)")
+        """
+            >>> RR.atan2(1,2)
+            [0.4636476090008061 +/- 6.22e-17]
+        """
+        return ctx._binary_op(y, x, libgr.gr_atan2, "atan2($y, $x)")
 
     def acot(ctx, x):
         return ctx._unary_op(x, libgr.gr_acot, "acot($x)")
@@ -870,6 +900,53 @@ class gr_ctx:
             [2.71828182845904 +/- 8.66e-15]
         """
         return ctx._op_vec_len(length, libgr.gr_rfac_vec, "rfac_vec($length)")
+
+    def rising(ctx, x, n):
+        """
+        Rising factorial.
+
+            >>> [ZZ.rising(3, k) for k in range(5)]
+            [1, 3, 12, 60, 360]
+            >>> ZZx.rising(ZZx([0,1]), 5)
+            [0, 24, 50, 35, 10, 1]
+            >>> RR.rising(1, 10**7)
+            [1.202423400515903e+65657059 +/- 5.57e+65657043]
+        """
+        return ctx._binary_op_with_overloads(x, n, libgr.gr_rising, op_ui=libgr.gr_rising_ui, rstr="rising($x, $n)")
+
+    def falling(ctx, x, n):
+        """
+        Falling factorial.
+
+            >>> [ZZ.falling(3, k) for k in range(5)]
+            [1, 3, 6, 6, 0]
+            >>> ZZx.falling(ZZx([0,1]), 5)
+            [0, 24, -50, 35, -10, 1]
+            >>> RR.log(RR.falling(RR.pi(), 10**7))
+            [151180898.7174084 +/- 9.72e-8]
+        """
+        return ctx._binary_op_with_overloads(x, n, libgr.gr_falling, op_ui=libgr.gr_falling_ui, rstr="falling($x, $n)")
+
+    def bin_vec(ctx, n, length=None):
+        """
+        Vector of binomial coefficients, optionally truncated to specified length.
+
+            >>> ZZ.bin_vec(8)
+            [1, 8, 28, 56, 70, 56, 28, 8, 1]
+            >>> ZZmod(5).bin_vec(8)
+            [1, 3, 3, 1, 0, 1, 3, 3, 1]
+            >>> ZZ.bin_vec(0)
+            [1]
+            >>> ZZ.bin_vec(1000, 3)
+            [1, 1000, 499500]
+            >>> ZZ.bin_vec(4, 8)
+            [1, 4, 6, 4, 1, 0, 0, 0]
+
+        """
+        if length is None:
+            length = n + 1
+        return ctx._op_vec_ui_len(n, length, libgr.gr_bin_ui_vec, "bin_vec($n, $length)")
+
 
     def gamma(ctx, x):
         return ctx._unary_op_with_fmpz_fmpq_overloads(x, libgr.gr_gamma, op_fmpz=libgr.gr_gamma_fmpz, op_fmpq=libgr.gr_gamma_fmpq, rstr="gamma($x)")
@@ -1572,6 +1649,9 @@ class gr_elem:
             False
             >>> ZZ(4).is_square()
             True
+            >>> QQbar(3).is_square()
+            True
+
         """
         return self._unary_predicate(self, libgr.gr_is_square, "is_square")
 

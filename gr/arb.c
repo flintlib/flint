@@ -1206,6 +1206,24 @@ _gr_arb_fac_fmpz(arb_t res, const fmpz_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_arb_rising_ui(arb_t res, const arb_t x, ulong y, const gr_ctx_t ctx)
+{
+    arb_rising_ui(res, x, y, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_arb_rising(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx)
+{
+    arb_rising(res, x, y, ARB_CTX_PREC(ctx));
+
+    if (arb_is_finite(res))
+        return GR_SUCCESS;
+    else
+        return GR_UNABLE;
+}
+
+int
 _gr_arb_lgamma(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     if (arb_is_positive(x))
@@ -1531,6 +1549,8 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_LAMBERTW_FMPZ,   (gr_funcptr) _gr_arb_lambertw_fmpz},
     {GR_METHOD_FAC_UI,          (gr_funcptr) _gr_arb_fac_ui},
     {GR_METHOD_FAC_FMPZ,        (gr_funcptr) _gr_arb_fac_fmpz},
+    {GR_METHOD_RISING_UI,       (gr_funcptr) _gr_arb_rising_ui},
+    {GR_METHOD_RISING,          (gr_funcptr) _gr_arb_rising},
     {GR_METHOD_BERNOULLI_UI,    (gr_funcptr) _gr_arb_bernoulli_ui},
     {GR_METHOD_BERNOULLI_FMPZ,  (gr_funcptr) _gr_arb_bernoulli_fmpz},
     {GR_METHOD_EULERNUM_UI,     (gr_funcptr) _gr_arb_eulernum_ui},

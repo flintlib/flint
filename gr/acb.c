@@ -1000,6 +1000,24 @@ _gr_acb_fac_fmpz(acb_t res, const fmpz_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_acb_rising_ui(acb_t res, const acb_t x, ulong y, const gr_ctx_t ctx)
+{
+    acb_rising_ui(res, x, y, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_rising(acb_t res, const acb_t x, const acb_t y, const gr_ctx_t ctx)
+{
+    acb_rising(res, x, y, ACB_CTX_PREC(ctx));
+
+    if (acb_is_finite(res))
+        return GR_SUCCESS;
+    else
+        return GR_UNABLE;
+}
+
+int
 _gr_acb_zeta(acb_t res, const acb_t x, const gr_ctx_t ctx)
 {
     if (arb_contains_si(acb_realref(x), 1) && arb_contains_zero(acb_imagref(x)))
@@ -1391,6 +1409,8 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_ERFC,            (gr_funcptr) _gr_acb_erfc},
     {GR_METHOD_FAC_UI,          (gr_funcptr) _gr_acb_fac_ui},
     {GR_METHOD_FAC_FMPZ,        (gr_funcptr) _gr_acb_fac_fmpz},
+    {GR_METHOD_RISING_UI,       (gr_funcptr) _gr_acb_rising_ui},
+    {GR_METHOD_RISING,          (gr_funcptr) _gr_acb_rising},
     {GR_METHOD_GAMMA,           (gr_funcptr) _gr_acb_gamma},
     {GR_METHOD_GAMMA_FMPZ,      (gr_funcptr) _gr_acb_gamma_fmpz},
     {GR_METHOD_GAMMA_FMPQ,      (gr_funcptr) _gr_acb_gamma_fmpq},
