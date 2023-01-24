@@ -1258,6 +1258,51 @@ _gr_arb_digamma(arb_t res, const arb_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_arb_barnes_g(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    if (arb_is_int(x) && arb_is_nonpositive(x))
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        acb_t t;
+        int status;
+        acb_init(t);
+        acb_set_arb(t, x);
+        acb_barnes_g(t, t, ARB_CTX_PREC(ctx));
+        arb_swap(res, acb_realref(t));
+        status = acb_is_finite(t) ? GR_SUCCESS : GR_UNABLE;
+        acb_clear(t);
+        return status;
+    }
+}
+
+int
+_gr_arb_log_barnes_g(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    if (arb_is_positive(x))
+    {
+        acb_t t;
+        acb_init(t);
+        acb_set_arb(t, x);
+        acb_log_barnes_g(t, t, ARB_CTX_PREC(ctx));
+        arb_swap(res, acb_realref(t));
+        acb_clear(t);
+        return GR_SUCCESS;
+    }
+    else if (arb_is_nonpositive(x))
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        return GR_UNABLE;
+    }
+}
+
+
+int
 _gr_arb_zeta(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     if (arb_contains_si(x, 1))
@@ -1568,6 +1613,8 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_RGAMMA,          (gr_funcptr) _gr_arb_rgamma},
     {GR_METHOD_LGAMMA,          (gr_funcptr) _gr_arb_lgamma},
     {GR_METHOD_DIGAMMA,         (gr_funcptr) _gr_arb_digamma},
+    {GR_METHOD_BARNES_G,        (gr_funcptr) _gr_arb_barnes_g},
+    {GR_METHOD_LOG_BARNES_G,    (gr_funcptr) _gr_arb_log_barnes_g},
     {GR_METHOD_ZETA,            (gr_funcptr) _gr_arb_zeta},
     {GR_METHOD_POLYLOG,         (gr_funcptr) _gr_arb_polylog},
     {GR_METHOD_HURWITZ_ZETA,    (gr_funcptr) _gr_arb_hurwitz_zeta},

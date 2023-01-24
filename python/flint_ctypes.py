@@ -453,6 +453,10 @@ class gr_ctx:
             elif type_x is int and op_fmpz is not None:
                 x = ZZ(x)
                 status = op_fmpz(res._ref, x._ref, ctx._ref)
+            elif type_x in (fmpz, int) and op_ui is not None:
+                x = ctx._as_ui(x)
+                op_ui.argtypes = (ctypes.c_void_p, c_ulong, ctypes.c_void_p)
+                status = op_ui(res._ref, x, ctx._ref)
             else:
                 x = ctx(x)
                 status = op(res._ref, x._ref, ctx._ref)
@@ -1007,6 +1011,65 @@ class gr_ctx:
 
     def digamma(ctx, x):
         return ctx._unary_op(x, libgr.gr_digamma, "digamma($x)")
+
+    def doublefac(ctx, x):
+        """
+        Double factorial (semifactorial).
+
+            >>> [ZZ.doublefac(n) for n in range(10)]
+            [1, 1, 2, 3, 8, 15, 48, 105, 384, 945]
+            >>> RR.doublefac(2.5)
+            [2.40706945611604 +/- 5.54e-15]
+            >>> CC.doublefac(1+1j)
+            ([0.250650779545753 +/- 7.56e-16] + [0.100474421235437 +/- 4.14e-16]*I)
+        """
+        return ctx._unary_op_with_fmpz_fmpq_overloads(x, libgr.gr_doublefac, op_ui=libgr.gr_doublefac_ui, rstr="doublefac($x)")
+
+    def harmonic(ctx, x):
+        """
+        Harmonic numbers.
+
+            >>> [QQ.harmonic(n) for n in range(6)]
+            [0, 1, 3/2, 11/6, 25/12, 137/60]
+            >>> RR.harmonic(10**9)
+            [21.30048150234794 +/- 8.48e-15]
+            >>> ZZp64.harmonic(1000)
+            6514760847963681162
+        """
+        return ctx._unary_op_with_fmpz_fmpq_overloads(x, libgr.gr_harmonic, op_ui=libgr.gr_harmonic_ui, rstr="harmonic($x)")
+
+    def beta(ctx, x, y):
+        """
+        Beta function.
+
+            >>> RR.beta(3, 4.5)
+            [0.01243201243201243 +/- 6.93e-18]
+            >>> CC.beta(1j, 1+1j)
+            ([-1.18807306241087 +/- 5.32e-15] + [-1.31978426013907 +/- 4.09e-15]*I)
+        """
+        return ctx._binary_op(y, x, libgr.gr_beta, "beta($x, $y)")
+
+    def barnes_g(ctx, x):
+        """
+        Barnes G-function.
+
+            >>> RR.barnes_g(7)
+            34560.00000000000
+            >>> CC.barnes_g(1+2j)
+            ([0.54596949228965 +/- 7.69e-15] + [-3.98421873125106 +/- 8.76e-15]*I)
+        """
+        return ctx._unary_op(x, libgr.gr_barnes_g, "barnes_g($x)")
+
+    def log_barnes_g(ctx, x):
+        """
+        Logarithmic Barnes G-function.
+
+            >>> RR.log_barnes_g(100)
+            [15258.0613921488 +/- 3.87e-11]
+            >>> CC.log_barnes_g(10+20j)
+            ([-452.057343313397 +/- 6.85e-13] + [121.014356688943 +/- 2.52e-13]*I)
+        """
+        return ctx._unary_op(x, libgr.gr_log_barnes_g, "log_barnes_g($x)")
 
     def zeta(ctx, x):
         return ctx._unary_op(x, libgr.gr_zeta, "zeta($x)")

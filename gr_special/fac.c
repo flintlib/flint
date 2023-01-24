@@ -250,3 +250,172 @@ gr_generic_rfac_vec(gr_ptr res, slong len, gr_ctx_t ctx)
 
     return status;
 }
+
+/* todo: specializations (fmpz) */
+/* todo: finite characteristic */
+int
+gr_generic_doublefac_ui(gr_ptr res, ulong n, gr_ctx_t ctx)
+{
+    int status = GR_SUCCESS;
+
+    if (n % 2 == 0)
+    {
+        status |= gr_fac_ui(res, n / 2, ctx);
+        status |= gr_mul_2exp_si(res, res, n / 2, ctx);
+    }
+    else
+    {
+        gr_ptr t;
+        GR_TMP_INIT(t, ctx);
+        status |= gr_doublefac_ui(t, n - 1, ctx);
+        status |= gr_fac_ui(res, n, ctx);
+        status |= gr_div(res, res, t, ctx);
+        GR_TMP_CLEAR(t, ctx);
+
+        if (status != GR_SUCCESS)
+            status = GR_UNABLE;
+    }
+
+    return status;
+}
+
+int
+gr_generic_doublefac(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    int status = GR_SUCCESS;
+    gr_ptr t, u, v;
+
+    ulong n;
+
+    if (gr_get_ui(&n, x, ctx) == GR_SUCCESS)
+        return gr_doublefac_ui(res, n, ctx);
+
+    /* 2^(x/2) (pi/2)^((cospi(x)-1)/4) gamma(1+x/2) */
+
+    GR_TMP_INIT3(t, u, v, ctx);
+
+    status |= gr_cos_pi(t, x, ctx);
+    status |= gr_sub_ui(t, t, 1, ctx);
+    status |= gr_mul_2exp_si(t, t, -2, ctx);
+    status |= gr_pi(u, ctx);
+    status |= gr_mul_2exp_si(u, u, -1, ctx);
+    status |= gr_pow(u, u, t, ctx);
+
+    status |= gr_mul_2exp_si(t, x, -1, ctx);
+    status |= gr_set_ui(v, 2, ctx);
+    status |= gr_pow(t, v, t, ctx);
+    status |= gr_mul(t, t, u, ctx);
+
+    status |= gr_mul_2exp_si(u, x, -1, ctx);
+    status |= gr_add_ui(u, u, 1, ctx);
+    status |= gr_gamma(u, u, ctx);
+
+    status |= gr_mul(res, t, u, ctx);
+
+    GR_TMP_CLEAR3(t, u, v, ctx);
+
+    if (status != GR_SUCCESS)
+        status = GR_UNABLE;
+
+    return status;
+}
+
+/* todo: any non-stupid algorithm; at least use rising2 if nothing else */
+/* todo: specializations */
+int
+gr_generic_harmonic_ui(gr_ptr res, ulong n, gr_ctx_t ctx)
+{
+    gr_ptr s, t;
+    ulong i;
+    int status = GR_SUCCESS;
+
+    if (n <= 1)
+        return gr_set_ui(res, n, ctx);
+
+    if (n > 100 && gr_ctx_has_real_prec(ctx) == T_TRUE)
+    {
+        gr_ptr t;
+        GR_TMP_INIT(t, ctx);
+        status |= gr_set_ui(t, n, ctx);
+        status |= gr_add_ui(t, t, 1, ctx);
+        status |= gr_digamma(t, t, ctx);
+        status |= gr_euler(res, ctx);
+        status |= gr_add(res, res, t, ctx);
+        GR_TMP_CLEAR(t, ctx);
+        return status;
+    }
+
+    if (n <= 100 || gr_ctx_is_finite_characteristic(ctx) == T_FALSE)
+    {
+        fmpq_t t;
+        fmpq_init(t);
+        fmpq_harmonic_ui(t, n);
+        status = gr_set_fmpq(res, t, ctx);
+        fmpq_clear(t);
+        return status;
+    }
+
+    GR_TMP_INIT2(s, t, ctx);
+
+    for (i = n; i >= 1 && status == GR_SUCCESS; i--)
+    {
+        status |= gr_set_ui(t, i, ctx);
+        status |= gr_inv(t, t, ctx);
+        status |= gr_add(s, s, t, ctx);
+    }
+
+    gr_swap(res, s, ctx);
+
+    GR_TMP_CLEAR2(s, t, ctx);
+
+    return status;
+}
+
+int
+gr_generic_harmonic(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    ulong n;
+
+    if (gr_get_ui(&n, x, ctx) == GR_SUCCESS)
+    {
+        return gr_harmonic_ui(res, n, ctx);
+    }
+    else
+    {
+        gr_ptr t;
+        int status = GR_SUCCESS;
+        GR_TMP_INIT(t, ctx);
+        status |= gr_add_ui(t, x, 1, ctx);
+        status |= gr_digamma(t, t, ctx);
+        status |= gr_euler(res, ctx);
+        status |= gr_add(res, res, t, ctx);
+        GR_TMP_CLEAR(t, ctx);
+
+        if (status != GR_SUCCESS)
+            status = GR_UNABLE;
+
+        return status;
+    }
+}
+
+/* todo */
+int
+gr_generic_beta(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+{
+    gr_ptr t, u, v;
+    int status = GR_SUCCESS;
+
+    GR_TMP_INIT3(t, u, v, ctx);
+    status |= gr_gamma(t, x, ctx);
+    status |= gr_gamma(u, y, ctx);
+    status |= gr_add(v, x, y, ctx);
+    status |= gr_rgamma(v, v, ctx);
+    status |= gr_mul(res, t, u, ctx);
+    status |= gr_mul(res, res, v, ctx);
+    GR_TMP_CLEAR3(t, u, v, ctx);
+
+    if (status != GR_SUCCESS)
+        status = GR_UNABLE;
+
+    return status;
+}

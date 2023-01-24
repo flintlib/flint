@@ -856,6 +856,21 @@ _gr_acb_cos(acb_t res, const acb_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_acb_sin_pi(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_sin_pi(res, x, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_cos_pi(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_cos_pi(res, x, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+
+int
 _gr_acb_tan(acb_t res, const acb_t x, const gr_ctx_t ctx)
 {
     acb_tan(res, x, ACB_CTX_PREC(ctx));
@@ -1015,6 +1030,34 @@ _gr_acb_rising(acb_t res, const acb_t x, const acb_t y, const gr_ctx_t ctx)
         return GR_SUCCESS;
     else
         return GR_UNABLE;
+}
+
+int
+_gr_acb_barnes_g(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    if (acb_is_int(x) && arb_is_nonpositive(acb_realref(x)))
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        acb_barnes_g(res, x, ACB_CTX_PREC(ctx));
+        return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+    }
+}
+
+int
+_gr_acb_log_barnes_g(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    if (acb_is_int(x) && arb_is_nonpositive(acb_realref(x)))
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        acb_log_barnes_g(res, x, ACB_CTX_PREC(ctx));
+        return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+    }
 }
 
 int
@@ -1402,6 +1445,8 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_LOG,             (gr_funcptr) _gr_acb_log},
     {GR_METHOD_SIN,             (gr_funcptr) _gr_acb_sin},
     {GR_METHOD_COS,             (gr_funcptr) _gr_acb_cos},
+    {GR_METHOD_SIN_PI,          (gr_funcptr) _gr_acb_sin_pi},
+    {GR_METHOD_COS_PI,          (gr_funcptr) _gr_acb_cos_pi},
     {GR_METHOD_TAN,             (gr_funcptr) _gr_acb_tan},
     {GR_METHOD_ATAN,            (gr_funcptr) _gr_acb_atan},
     {GR_METHOD_ERF,             (gr_funcptr) _gr_acb_erf},
@@ -1417,6 +1462,8 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_RGAMMA,          (gr_funcptr) _gr_acb_rgamma},
     {GR_METHOD_LGAMMA,          (gr_funcptr) _gr_acb_lgamma},
     {GR_METHOD_DIGAMMA,         (gr_funcptr) _gr_acb_digamma},
+    {GR_METHOD_BARNES_G,        (gr_funcptr) _gr_acb_barnes_g},
+    {GR_METHOD_LOG_BARNES_G,    (gr_funcptr) _gr_acb_log_barnes_g},
     {GR_METHOD_ZETA,            (gr_funcptr) _gr_acb_zeta},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_acb_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_acb_vec_dot_rev},

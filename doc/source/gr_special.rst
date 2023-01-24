@@ -93,7 +93,9 @@ Factorials and gamma functions
     consecutive values `1, 1, 2, 6, \ldots, (len-1)!`
     to the preallocated vector *res*.
 
-.. function:: int gr_rfac_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
+.. function:: int gr_rfac(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_rfac_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
+              int gr_rfac_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx)
               int gr_rfac_vec(gr_ptr res, slong len, gr_ctx_t ctx)
 
     Reciprocal factorial. The *vec* version writes the first *len*
@@ -122,10 +124,6 @@ Factorials and gamma functions
     and `x (x-1) \cdots (x-y+1)`, or their generalizations
     to non-integer `y` via the gamma function.
 
-.. function:: int gr_doublefac_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
-
-    Double factorial `x!!`.
-
 .. function:: int gr_gamma(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
               int gr_gamma_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx)
               int gr_gamma_fmpq(gr_ptr res, const fmpq_t x, gr_ctx_t ctx)
@@ -137,11 +135,22 @@ Factorials and gamma functions
     the log-gamma function `\log \Gamma(x)`, and the digamma function
     `\psi(x)`.
 
+.. function:: int gr_barnes_g(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_log_barnes_g(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+    Barnes G-function.
+
 .. function:: int gr_beta(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 
     Beta function `B(x,y)`.
 
-.. function:: int gr_harmonic_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
+.. function:: int gr_doublefac(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_doublefac_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
+
+    Double factorial `x!!`.
+
+.. function:: int gr_harmonic(gr_ptr res, ulong x, gr_ctx_t ctx)
+              int gr_harmonic_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
 
     Harmonic number `H_x`.
 

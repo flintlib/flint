@@ -124,11 +124,18 @@ GR_SPECIAL_DEF int gr_lgamma(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_
 GR_SPECIAL_DEF int gr_digamma(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, DIGAMMA)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_beta(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, BETA)(res, x, y, ctx); }
 
+GR_SPECIAL_DEF int gr_barnes_g(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, BARNES_G)(res, x, ctx); }
+GR_SPECIAL_DEF int gr_log_barnes_g(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, LOG_BARNES_G)(res, x, ctx); }
+
+GR_SPECIAL_DEF int gr_doublefac(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, DOUBLEFAC)(res, x, ctx); }
+GR_SPECIAL_DEF int gr_doublefac_ui(gr_ptr res, ulong x, gr_ctx_t ctx) { return GR_UNARY_OP_UI(ctx, DOUBLEFAC_UI)(res, x, ctx); }
+
+GR_SPECIAL_DEF int gr_harmonic(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, HARMONIC)(res, x, ctx); }
+GR_SPECIAL_DEF int gr_harmonic_ui(gr_ptr res, ulong x, gr_ctx_t ctx) { return GR_UNARY_OP_UI(ctx, HARMONIC_UI)(res, x, ctx); }
+
 GR_SPECIAL_DEF int gr_bernoulli_ui(gr_ptr res, ulong x, gr_ctx_t ctx) { return GR_UNARY_OP_UI(ctx, BERNOULLI_UI)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_bernoulli_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx) { return GR_UNARY_OP_FMPZ(ctx, BERNOULLI_FMPZ)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_bernoulli_vec(gr_ptr res, slong len, gr_ctx_t ctx) { return GR_UNARY_OP_SI(ctx, BERNOULLI_VEC)(res, len, ctx); }
-
-GR_SPECIAL_DEF int gr_harmonic_ui(gr_ptr res, ulong x, gr_ctx_t ctx) { return GR_UNARY_OP_UI(ctx, HARMONIC_UI)(res, x, ctx); }
 
 GR_SPECIAL_DEF int gr_fib_ui(gr_ptr res, ulong x, gr_ctx_t ctx) { return GR_UNARY_OP_UI(ctx, FIB_UI)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_fib_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx) { return GR_UNARY_OP_FMPZ(ctx, FIB_FMPZ)(res, x, ctx); }
@@ -141,8 +148,6 @@ GR_SPECIAL_DEF int gr_eulernum_vec(gr_ptr res, slong len, gr_ctx_t ctx) { return
 GR_SPECIAL_DEF int gr_bellnum_ui(gr_ptr res, ulong x, gr_ctx_t ctx) { return GR_UNARY_OP_UI(ctx, BELLNUM_UI)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_bellnum_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx) { return GR_UNARY_OP_FMPZ(ctx, BELLNUM_FMPZ)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_bellnum_vec(gr_ptr res, slong len, gr_ctx_t ctx) { return GR_UNARY_OP_SI(ctx, BELLNUM_VEC)(res, len, ctx); }
-
-GR_SPECIAL_DEF int gr_doublefac_ui(gr_ptr res, ulong x, gr_ctx_t ctx) { return GR_UNARY_OP_UI(ctx, DOUBLEFAC_UI)(res, x, ctx); }
 
 GR_SPECIAL_DEF int gr_stirling_s1u_uiui(gr_ptr res, ulong x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI_UI(ctx, STIRLING_S1U_UIUI)(res, x, y, ctx); }
 GR_SPECIAL_DEF int gr_stirling_s1_uiui(gr_ptr res, ulong x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI_UI(ctx, STIRLING_S1_UIUI)(res, x, y, ctx); }
@@ -237,8 +242,6 @@ GR_SPECIAL_DEF int gr_agm(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { 
     GR_METHOD_BERNPOLY_UI,
     GR_METHOD_EULERPOLY_UI,
     GR_METHOD_POLYLOG_SI,
-    GR_METHOD_BARNESG,
-    GR_METHOD_LOG_BARNESG,
     GR_METHOD_POLYGAMMA,
 
     GR_METHOD_HYPGEOM_0F1,
@@ -276,6 +279,14 @@ int gr_generic_bin_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx);
 int gr_generic_bin_uiui(gr_ptr res, ulong x, ulong y, gr_ctx_t ctx);
 int gr_generic_bin_vec(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx);
 int gr_generic_bin_ui_vec(gr_ptr res, ulong x, slong len, gr_ctx_t ctx);
+
+int gr_generic_doublefac(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+int gr_generic_doublefac_ui(gr_ptr res, ulong n, gr_ctx_t ctx);
+
+int gr_generic_harmonic(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+int gr_generic_harmonic_ui(gr_ptr res, ulong n, gr_ctx_t ctx);
+
+int gr_generic_beta(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx);
 
 int gr_generic_fib2_fmpz(gr_ptr v, gr_ptr u, const fmpz_t n, gr_ctx_t ctx);
 int gr_generic_fib_fmpz(gr_ptr res, const fmpz_t n, gr_ctx_t ctx);

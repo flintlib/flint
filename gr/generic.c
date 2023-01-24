@@ -2711,6 +2711,14 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_BIN_VEC,                 (gr_funcptr) gr_generic_bin_vec},
     {GR_METHOD_BIN_UI_VEC,              (gr_funcptr) gr_generic_bin_ui_vec},
 
+    {GR_METHOD_DOUBLEFAC,               (gr_funcptr) gr_generic_doublefac},
+    {GR_METHOD_DOUBLEFAC_UI,            (gr_funcptr) gr_generic_doublefac_ui},
+
+    {GR_METHOD_HARMONIC,                (gr_funcptr) gr_generic_harmonic},
+    {GR_METHOD_HARMONIC_UI,             (gr_funcptr) gr_generic_harmonic_ui},
+
+    {GR_METHOD_BETA,                    (gr_funcptr) gr_generic_beta},
+
     {GR_METHOD_BERNOULLI_UI,            (gr_funcptr) gr_generic_bernoulli_ui},
     {GR_METHOD_BERNOULLI_FMPZ,          (gr_funcptr) gr_generic_bernoulli_fmpz},
     {GR_METHOD_BERNOULLI_VEC,           (gr_funcptr) gr_generic_bernoulli_vec},
