@@ -1087,6 +1087,14 @@ class gr_ctx:
             return ctx._binary_op_fmpz(x, k, libgr.gr_lambertw_fmpz, "lambertw($x, $k)")
 
     def agm(ctx, x, y=None):
+        """
+        Arithmetic-geometric mean.
+
+            >>> RR.agm(2)
+            [1.45679103104691 +/- 3.98e-15]
+            >>> RR.agm(2, 3)
+            [2.47468043623630 +/- 4.68e-15]
+        """
         if y is None:
             return ctx._unary_op(x, libgr.gr_agm1, "agm1($x)")
         else:
@@ -2540,6 +2548,27 @@ class gr_poly(gr_elem):
             if status & GR_DOMAIN: raise ValueError
         return res
 
+    def derivative(self):
+        Rx = self.parent()
+        R = Rx._coefficient_ring
+        res = Rx()
+        status = libgr.gr_poly_derivative(res._ref, self._ref, R._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
+    def integral(self):
+        Rx = self.parent()
+        R = Rx._coefficient_ring
+        res = Rx()
+        status = libgr.gr_poly_integral(res._ref, self._ref, R._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
+
     def roots(self, domain=None):
         """
         Computes the roots in the coefficient ring of this polynomial,
@@ -2620,6 +2649,18 @@ class gr_poly(gr_elem):
             return _handle_error(Rx, status, rstr, self, other, n)
         return res
 
+    def _series_binary_op(self, other, n, op, rstr):
+        Rx = self.parent()
+        R = Rx._coefficient_ring
+        # fixme
+        other = Rx(other)
+        res = Rx()
+        n = int(n)
+        status = op(res._ref, self._ref, other._ref, n, R._ref)
+        if status:
+            return _handle_error(Rx, status, rstr, self, n)
+        return res
+
     def inv_series(self, n):
         """
         Reciprocal of this polynomial viewed as a power series,
@@ -2635,6 +2676,9 @@ class gr_poly(gr_elem):
             [1/2, -3/4, 1/8, 21/16, -71/32]
         """
         return self._series_op(n, libgr.gr_poly_inv_series, "$f.inv_series($n)")
+
+    def div_series(self, other, n):
+        return self._series_binary_op(other, n, libgr.gr_poly_div_series, "$f.div_series(%g, $n)")
 
     def log_series(self, n):
         """
@@ -2670,6 +2714,12 @@ class gr_poly(gr_elem):
 
     def atanh_series(self, n):
         return self._series_op(n, libgr.gr_poly_atanh_series, "$f.atanh_series($n)")
+
+    def sqrt_series(self, n):
+        return self._series_op(n, libgr.gr_poly_sqrt_series, "$f.sqrt_series($n)")
+
+    def rsqrt_series(self, n):
+        return self._series_op(n, libgr.gr_poly_rsqrt_series, "$f.rsqrt_series($n)")
 
 
 

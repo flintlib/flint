@@ -74,9 +74,8 @@ _gr_poly_log_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx
         if (status == GR_SUCCESS)
         {
             status |= _gr_poly_derivative(f_diff, f, flen, ctx);
-            status |= _gr_poly_inv_series(f_inv, f, flen, len, ctx);
-            status |= _gr_poly_mullow(res, f_inv, len - 1, f_diff, flen - 1, len - 1, ctx);
-            status |= _gr_poly_integral(res, res, len, ctx);
+            status |= _gr_poly_div_series(f_inv, f_diff, flen - 1, f, flen, len, ctx);
+            status |= _gr_poly_integral(res, f_inv, len, ctx);
             gr_swap(res, a, ctx);
         }
 

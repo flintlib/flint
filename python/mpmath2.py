@@ -127,6 +127,10 @@ class RFContext(StandardBaseContext):
     def bernoulli(ctx, n):
         return ctx.R.bernoulli(n)
 
+    # todo:
+    def nstr(ctx, x, n=6, **kwargs):
+        return str(x)
+
     '''
     # Called by SpecialFunctions.__init__()
     @classmethod
