@@ -29,8 +29,20 @@
         (twall) = __timer->wall*0.001 / __reps; \
     } while (0);
 
+#if 0
 #define CASE_A GR_IGNORE(gr_poly_inv_series_basecase(B, A, len, ctx));
 #define CASE_B GR_IGNORE(gr_poly_inv_series_newton(B, A, len, len, ctx));
+#endif
+
+#if 0
+#define CASE_A GR_IGNORE(gr_poly_rsqrt_series_basecase(B, A, len, ctx));
+#define CASE_B GR_IGNORE(gr_poly_rsqrt_series_newton(B, A, len, len, ctx));
+#endif
+
+#if 1
+#define CASE_A GR_IGNORE(gr_poly_sqrt_series_basecase(B, A, len, ctx));
+#define CASE_B GR_IGNORE(gr_poly_sqrt_series_newton(B, A, len, len, ctx));
+#endif
 
 double
 get_profile(gr_ctx_t ctx, slong len)
@@ -84,7 +96,7 @@ get_tuning(gr_ctx_t ctx, slong from)
 
     do
     {
-        for (len = from; ; len = FLINT_MAX(len+1, len*1.01))
+        for (len = from; len <= 32767; len = FLINT_MAX(len+1, len*1.01))
         {
             speedup = get_profile(ctx, len);
 
@@ -115,10 +127,10 @@ int main()
     slong i, results[64];
     slong bits, cutoff, prev_cutoff = 0;
 
-    for (bits = 1; bits <= 64; bits++)
+    for (bits = 2; bits <= 64; bits++)
     {
         gr_ctx_init_nmod(ctx, n_nextprime(UWORD(1) << (bits - 1), 0));
-        cutoff = get_tuning(ctx, prev_cutoff * 0.75);
+        cutoff = get_tuning(ctx, FLINT_MAX(prev_cutoff * 0.75, 2));
         results[bits - 1] = cutoff;
         prev_cutoff = cutoff;
         flint_printf("bits = %wd  cutoff = %wd  accuracy = %f\n", bits, cutoff, get_profile(ctx, cutoff));

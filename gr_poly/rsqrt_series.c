@@ -12,10 +12,12 @@
 #include "gr_poly.h"
 
 int
-_gr_poly_rsqrt_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx)
+_gr_poly_rsqrt_series_generic(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx)
 {
-    /* todo */
-    return _gr_poly_rsqrt_series_newton(res, f, flen, len, 2, ctx);
+    if (flen <= 8 || ctx->methods[GR_METHOD_POLY_MULLOW] == (gr_funcptr) _gr_poly_mullow_generic)
+        return _gr_poly_rsqrt_series_basecase(res, f, flen, len, ctx);
+    else
+        return _gr_poly_rsqrt_series_newton(res, f, flen, len, FLINT_MIN(10, len / 2), ctx);
 }
 
 int

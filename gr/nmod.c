@@ -826,6 +826,7 @@ _gr_nmod_poly_mullow(ulong * res,
     return GR_SUCCESS;
 }
 
+/* todo: unbalanced cutoffs */
 static const short inv_series_cutoff_tab[64] = {38, 36, 38, 36, 41, 48, 49, 54, 60,
   102, 112, 150, 165, 172, 210, 272, 339, 378, 385, 442, 468, 557, 596,
   621, 710, 746, 756, 978, 768, 679, 700, 696, 620, 619, 642, 766, 901,
@@ -850,6 +851,60 @@ _gr_nmod_poly_inv_series(ulong * res,
         return _gr_poly_inv_series_basecase(res, f, flen, n, ctx);
     else
         return _gr_poly_inv_series_newton(res, f, flen, n, cutoff, ctx);
+}
+
+/* todo: unbalanced cutoffs */
+static const short rsqrt_series_cutoff_tab[64] = {6, 22, 22, 24, 27, 28, 28, 58,
+  77, 96, 116, 160, 232, 270, 315, 387, 402, 472, 502, 580, 627, 760, 824, 940,
+  988, 1018, 1155, 1182, 938, 932, 925, 1016, 836, 891, 915, 960, 1038, 1101,
+  1203, 1236, 1255, 1311, 1386, 1422, 1489, 1592, 1624, 1879, 1828, 2055, 2227,
+  2369, 2156, 2361, 2415, 2472, 2581, 2719, 2679, 2302, 2199, 2455, 2440, 2356, };
+
+int
+_gr_nmod_poly_rsqrt_series(ulong * res,
+    const ulong * f, slong flen, slong n, gr_ctx_t ctx)
+{
+    slong cutoff;
+
+    flen = FLINT_MIN(flen, n);
+
+    if (flen <= 20)
+        return _gr_poly_rsqrt_series_basecase(res, f, flen, n, ctx);
+
+    cutoff = rsqrt_series_cutoff_tab[NMOD_BITS(NMOD_CTX(ctx)) - 1];
+
+    if (flen < cutoff)
+        return _gr_poly_rsqrt_series_basecase(res, f, flen, n, ctx);
+    else
+        return _gr_poly_rsqrt_series_newton(res, f, flen, n, cutoff, ctx);
+}
+
+static const short sqrt_series_cutoff_tab[] = { 32767, 632, 732, 928, 1443,
+  1731, 2364, 2490, 2893, 3173, 5316, 5412, 5727, 6123, 6613, 7290, 7572,
+  8023, 9114, 9105, 8656, 10645, 11290, 13223, 11507, 15489, 12328, 9338,
+  9517, 9795, 9596, 13162, 10168, 8013, 9949, 10654, 9932, 12222, 11287,
+  11623, 11971, 12577, 12207, 13886, 14160, 12200, 13207, 15943, 15320,
+  14290, 15933, 15463, 14281, 15457, 15302, 17929, 18106, 17058, 14844,
+  17740, 17916, 18640, 18093, 18638, };
+
+/* todo: unbalanced cutoffs */
+int
+_gr_nmod_poly_sqrt_series(ulong * res,
+    const ulong * f, slong flen, slong n, gr_ctx_t ctx)
+{
+    slong cutoff;
+
+    flen = FLINT_MIN(flen, n);
+
+    if (flen <= 20 || NMOD_CTX(ctx).n == 2)
+        return _gr_poly_rsqrt_series_basecase(res, f, flen, n, ctx);
+
+    cutoff = sqrt_series_cutoff_tab[NMOD_BITS(NMOD_CTX(ctx)) - 1];
+
+    if (flen < cutoff)
+        return _gr_poly_sqrt_series_basecase(res, f, flen, n, ctx);
+    else
+        return _gr_poly_sqrt_series_newton(res, f, flen, n, cutoff, ctx);
 }
 
 int
@@ -969,6 +1024,8 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_VEC_RECIPROCALS, (gr_funcptr) _gr_nmod_vec_reciprocals},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_nmod_poly_mullow},
     {GR_METHOD_POLY_INV_SERIES, (gr_funcptr) _gr_nmod_poly_inv_series},
+    {GR_METHOD_POLY_RSQRT_SERIES, (gr_funcptr) _gr_nmod_poly_rsqrt_series},
+    {GR_METHOD_POLY_SQRT_SERIES,  (gr_funcptr) _gr_nmod_poly_sqrt_series},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_nmod_roots_gr_poly},
     {0,                         (gr_funcptr) NULL},
 };

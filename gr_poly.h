@@ -182,7 +182,8 @@ WARN_UNUSED_RESULT int _gr_poly_sqrt_series_basecase(gr_ptr res, gr_srcptr f, sl
 WARN_UNUSED_RESULT int gr_poly_sqrt_series_basecase(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_poly_sqrt_series_miller(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_sqrt_series_miller(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int _gr_poly_sqrt_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx);
+GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_poly_sqrt_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx) { return GR_POLY_UNARY_TRUNC_OP(ctx, POLY_SQRT_SERIES)(res, f, flen, len, ctx); }
+WARN_UNUSED_RESULT int _gr_poly_sqrt_series_generic(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_sqrt_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int _gr_poly_rsqrt_series_newton(gr_ptr res, gr_srcptr f, slong flen, slong len, slong cutoff, gr_ctx_t ctx);
@@ -191,7 +192,8 @@ WARN_UNUSED_RESULT int _gr_poly_rsqrt_series_basecase(gr_ptr res, gr_srcptr f, s
 WARN_UNUSED_RESULT int gr_poly_rsqrt_series_basecase(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_poly_rsqrt_series_miller(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_rsqrt_series_miller(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int _gr_poly_rsqrt_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx);
+GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_poly_rsqrt_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx) { return GR_POLY_UNARY_TRUNC_OP(ctx, POLY_RSQRT_SERIES)(res, f, flen, len, ctx); }
+WARN_UNUSED_RESULT int _gr_poly_rsqrt_series_generic(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_rsqrt_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int _gr_poly_evaluate_rectangular(gr_ptr res, gr_srcptr poly, slong len, gr_srcptr x, gr_ctx_t ctx);

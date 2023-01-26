@@ -14,7 +14,7 @@
 /* todo: characteristic 2 */
 
 int
-_gr_poly_sqrt_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx)
+_gr_poly_sqrt_series_generic(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx)
 {
     return _gr_poly_sqrt_series_newton(res, f, flen, len, 2, ctx);
 }

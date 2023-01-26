@@ -195,6 +195,15 @@ Division
 Power series division
 --------------------------------------------------------------------------------
 
+For divide-and-conquer (including Newton-like) algorithms, *cutoff* has the
+following meaning: we use the basecase algorithm for lengths `n < \operatorname{cutoff}`
+and the divide-and-conquer algorithm for `n \ge \operatorname{cutoff}`.
+Using `\operatorname{cutoff} = n` thus results in exactly one divide-and-conquer
+step with a basecase length of `\lceil n / 2 \rceil`.
+One should **avoid** calling the Newton methods with `n < \operatorname{cutoff}`
+as this may result in much worse performance if those methods
+do not have a specific escape check for that case.
+
 The *newton* versions uses Newton iteration, switching to a basecase
 algorithm when the length is smaller than the specified *cutoff*.
 Division uses the Karp-Markstein algorithm.
