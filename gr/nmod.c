@@ -354,6 +354,7 @@ _gr_nmod_sqr(ulong * res, const ulong * x, const gr_ctx_t ctx)
     return _gr_nmod_mul(res, x, x, ctx);
 }
 
+/* optimize */
 int
 _gr_nmod_div(ulong * res, const ulong * x, const ulong * y, const gr_ctx_t ctx)
 {
@@ -365,12 +366,43 @@ _gr_nmod_div(ulong * res, const ulong * x, const ulong * y, const gr_ctx_t ctx)
     return status;
 }
 
+/* optimize */
 int
 _gr_nmod_div_si(ulong * res, const ulong * x, slong y, const gr_ctx_t ctx)
 {
     ulong t;
-    _gr_nmod_set_si(&t, y, ctx);
-    return _gr_nmod_div(res, x, &t, ctx);
+
+    y = nmod_set_si(y, NMOD_CTX(ctx));
+
+    if (n_gcdinv(&t, y, NMOD_CTX(ctx).n) == 1)
+    {
+        res[0] = nmod_mul(x[0], t, NMOD_CTX(ctx));
+        return GR_SUCCESS;
+    }
+    else
+    {
+        res[0] = 0;
+        return GR_DOMAIN;
+    }
+}
+
+int
+_gr_nmod_div_ui(ulong * res, const ulong * x, ulong y, const gr_ctx_t ctx)
+{
+    ulong t;
+
+    y = nmod_set_ui(y, NMOD_CTX(ctx));
+
+    if (n_gcdinv(&t, y, NMOD_CTX(ctx).n) == 1)
+    {
+        res[0] = nmod_mul(x[0], t, NMOD_CTX(ctx));
+        return GR_SUCCESS;
+    }
+    else
+    {
+        res[0] = 0;
+        return GR_DOMAIN;
+    }
 }
 
 truth_t
@@ -446,6 +478,20 @@ _gr_nmod_sqrt(ulong * res, const ulong * x, gr_ctx_t ctx)
 }
 
 /* todo: pow_ui, ... */
+
+void
+_gr_nmod_vec_init(ulong * res, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        res[i] = 0;
+}
+
+void
+_gr_nmod_vec_clear(ulong * res, slong len, gr_ctx_t ctx)
+{
+}
 
 int
 _gr_nmod_vec_set(ulong * res, const ulong * vec, slong len, gr_ctx_t ctx)
@@ -780,6 +826,32 @@ _gr_nmod_poly_mullow(ulong * res,
     return GR_SUCCESS;
 }
 
+static const short inv_series_cutoff_tab[64] = {38, 36, 38, 36, 41, 48, 49, 54, 60,
+  102, 112, 150, 165, 172, 210, 272, 339, 378, 385, 442, 468, 557, 596,
+  621, 710, 746, 756, 978, 768, 679, 700, 696, 620, 619, 642, 766, 901,
+  883, 924, 997, 979, 1028, 1101, 1094, 1152, 1169, 1279, 1311, 1284,
+  1381, 1418, 1513, 1540, 1598, 1692, 1846, 1883, 1942, 1963, 1803,
+  1788, 1861, 1881, 1920, };
+
+int
+_gr_nmod_poly_inv_series(ulong * res,
+    const ulong * f, slong flen, slong n, gr_ctx_t ctx)
+{
+    slong cutoff;
+
+    flen = FLINT_MIN(flen, n);
+
+    if (flen <= 30)
+        return _gr_poly_inv_series_basecase(res, f, flen, n, ctx);
+
+    cutoff = inv_series_cutoff_tab[NMOD_BITS(NMOD_CTX(ctx)) - 1];
+
+    if (flen < cutoff)
+        return _gr_poly_inv_series_basecase(res, f, flen, n, ctx);
+    else
+        return _gr_poly_inv_series_newton(res, f, flen, n, cutoff, ctx);
+}
+
 int
 _gr_nmod_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
 {
@@ -874,9 +946,12 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_SQR,             (gr_funcptr) _gr_nmod_sqr},
     {GR_METHOD_DIV,             (gr_funcptr) _gr_nmod_div},
     {GR_METHOD_DIV_SI,          (gr_funcptr) _gr_nmod_div_si},
+    {GR_METHOD_DIV_UI,          (gr_funcptr) _gr_nmod_div_ui},
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_nmod_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) _gr_nmod_inv},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_nmod_sqrt},
+    {GR_METHOD_VEC_INIT,        (gr_funcptr) _gr_nmod_vec_init},
+    {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _gr_nmod_vec_clear},
     {GR_METHOD_VEC_SET,         (gr_funcptr) _gr_nmod_vec_set},
     {GR_METHOD_VEC_NEG,         (gr_funcptr) _gr_nmod_vec_neg},
     {GR_METHOD_VEC_ADD,         (gr_funcptr) _gr_nmod_vec_add},
@@ -893,6 +968,7 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) __gr_nmod_vec_dot_rev},
     {GR_METHOD_VEC_RECIPROCALS, (gr_funcptr) _gr_nmod_vec_reciprocals},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_nmod_poly_mullow},
+    {GR_METHOD_POLY_INV_SERIES, (gr_funcptr) _gr_nmod_poly_inv_series},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_nmod_roots_gr_poly},
     {0,                         (gr_funcptr) NULL},
 };
