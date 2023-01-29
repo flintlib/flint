@@ -52,6 +52,12 @@ _gr_nmod_swap(ulong * x, ulong * y, const gr_ctx_t ctx)
     *y = t;
 }
 
+void
+_gr_nmod_set_shallow(ulong * res, const ulong * x, const gr_ctx_t ctx)
+{
+    *res = *x;
+}
+
 int
 _gr_nmod_randtest(ulong * res, flint_rand_t state, const gr_ctx_t ctx)
 {
@@ -987,6 +993,7 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_INIT,            (gr_funcptr) _gr_nmod_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_nmod_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) _gr_nmod_swap},
+    {GR_METHOD_SET_SHALLOW,     (gr_funcptr) _gr_nmod_set_shallow},
     {GR_METHOD_RANDTEST,        (gr_funcptr) _gr_nmod_randtest},
     {GR_METHOD_WRITE,           (gr_funcptr) _gr_nmod_write},
     {GR_METHOD_ZERO,            (gr_funcptr) _gr_nmod_zero},

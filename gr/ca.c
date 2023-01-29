@@ -65,6 +65,12 @@ _gr_ca_swap(ca_t x, ca_t y, gr_ctx_t ctx)
     *y = *t;
 }
 
+void
+_gr_ca_set_shallow(ca_t res, const ca_t x, const gr_ctx_t ctx)
+{
+    *res = *x;
+}
+
 /* todo: limits */
 /* todo: faster real/algebraic constructions */
 int
@@ -1209,6 +1215,7 @@ gr_method_tab_input _ca_methods_input[] =
 
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_ca_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) _gr_ca_swap},
+    {GR_METHOD_SET_SHALLOW,     (gr_funcptr) _gr_ca_set_shallow},
     {GR_METHOD_RANDTEST,        (gr_funcptr) _gr_ca_randtest},
     {GR_METHOD_WRITE,           (gr_funcptr) _gr_ca_write},
 

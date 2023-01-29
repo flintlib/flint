@@ -71,6 +71,13 @@ truth_t gr_generic_ctx_predicate_false(gr_ctx_t ctx)
     return T_FALSE;
 }
 
+void
+gr_generic_set_shallow(gr_ptr res, gr_srcptr x, const gr_ctx_t ctx)
+{
+    memcpy(res, x, ctx->sizeof_elem);
+}
+
+
 int gr_generic_randtest_not_zero(gr_ptr x, flint_rand_t state, gr_ctx_t ctx)
 {
     slong i;

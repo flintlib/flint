@@ -44,6 +44,12 @@ _gr_fmpq_swap(fmpq_t x, fmpq_t y, const gr_ctx_t ctx)
     *y = *t;
 }
 
+void
+_gr_fmpq_set_shallow(fmpq_t res, const fmpq_t x, const gr_ctx_t ctx)
+{
+    *res = *x;
+}
+
 /* todo: limits */
 int
 _gr_fmpq_randtest(fmpq_t res, flint_rand_t state, const gr_ctx_t ctx)
@@ -1001,6 +1007,7 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_INIT,            (gr_funcptr) _gr_fmpq_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_fmpq_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) _gr_fmpq_swap},
+    {GR_METHOD_SET_SHALLOW,     (gr_funcptr) _gr_fmpq_set_shallow},
     {GR_METHOD_RANDTEST,        (gr_funcptr) _gr_fmpq_randtest},
     {GR_METHOD_WRITE,           (gr_funcptr) _gr_fmpq_write},
     {GR_METHOD_ZERO,            (gr_funcptr) _gr_fmpq_zero},

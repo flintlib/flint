@@ -53,6 +53,12 @@ _gr_fq_zech_swap(fq_zech_t x, fq_zech_t y, const gr_ctx_t ctx)
     *y = *t;
 }
 
+void
+_gr_fq_zech_set_shallow(fq_zech_t res, const fq_zech_t x, const gr_ctx_t ctx)
+{
+    *res = *x;
+}
+
 int
 _gr_fq_zech_randtest(fq_zech_t res, flint_rand_t state, const gr_ctx_t ctx)
 {
@@ -398,6 +404,7 @@ gr_method_tab_input _fq_zech_methods_input[] =
     {GR_METHOD_INIT,            (gr_funcptr) _gr_fq_zech_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_fq_zech_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) _gr_fq_zech_swap},
+    {GR_METHOD_SET_SHALLOW,     (gr_funcptr) _gr_fq_zech_set_shallow},
     {GR_METHOD_RANDTEST,        (gr_funcptr) _gr_fq_zech_randtest},
     {GR_METHOD_WRITE,           (gr_funcptr) _gr_fq_zech_write},
     {GR_METHOD_ZERO,            (gr_funcptr) _gr_fq_zech_zero},

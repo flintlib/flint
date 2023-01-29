@@ -25,14 +25,15 @@ gr_mat_nonsingular_solve_lu_precomp(gr_mat_t X, const slong * perm,
 
     if (X == B)
     {
+        gr_method_void_unary_op set_shallow = GR_VOID_UNARY_OP(ctx, SET_SHALLOW);
         gr_ptr tmp = flint_malloc(sz * n);
 
         for (c = 0; c < m; c++)
         {
             for (i = 0; i < n; i++)
-                memcpy(GR_ENTRY(tmp, i, sz), GR_MAT_ENTRY(B, perm[i], c, sz), sz);
+                set_shallow(GR_ENTRY(tmp, i, sz), GR_MAT_ENTRY(B, perm[i], c, sz), ctx);
             for (i = 0; i < n; i++)
-                memcpy(GR_MAT_ENTRY(X, i, c, sz), GR_ENTRY(tmp, i, sz), sz);
+                set_shallow(GR_MAT_ENTRY(X, i, c, sz), GR_ENTRY(tmp, i, sz), ctx);
         }
 
         flint_free(tmp);

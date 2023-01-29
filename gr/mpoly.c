@@ -94,6 +94,12 @@ mpolynomial_swap(gr_mpoly_t poly1, gr_mpoly_t poly2, gr_ctx_t ctx)
     gr_mpoly_swap(poly1, poly2, MPOLYNOMIAL_MCTX(ctx), MPOLYNOMIAL_ELEM_CTX(ctx));
 }
 
+void
+mpolynomial_set_shallow(gr_mpoly_t res, const gr_mpoly_t poly, gr_ctx_t ctx)
+{
+    *res = *poly;
+}
+
 int
 mpolynomial_randtest(gr_mpoly_t res, flint_rand_t state, gr_ctx_t ctx)
 {
@@ -216,6 +222,7 @@ gr_method_tab_input _gr_mpolynomial_methods_input[] =
     {GR_METHOD_INIT,        (gr_funcptr) mpolynomial_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) mpolynomial_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) mpolynomial_swap},
+    {GR_METHOD_SET_SHALLOW, (gr_funcptr) mpolynomial_set_shallow},
     {GR_METHOD_RANDTEST,    (gr_funcptr) mpolynomial_randtest},
     {GR_METHOD_WRITE,       (gr_funcptr) mpolynomial_write},
     {GR_METHOD_ZERO,        (gr_funcptr) mpolynomial_zero},

@@ -71,6 +71,12 @@ _gr_acf_swap(acf_t x, acf_t y, const gr_ctx_t ctx)
     *y = *t;
 }
 
+void
+_gr_acf_set_shallow(acf_t res, const acf_t x, const gr_ctx_t ctx)
+{
+    *res = *x;
+}
+
 /* todo: limits */
 int
 _gr_acf_randtest(acf_t res, flint_rand_t state, const gr_ctx_t ctx)
@@ -1123,6 +1129,7 @@ gr_method_tab_input _acf_methods_input[] =
     {GR_METHOD_INIT,            (gr_funcptr) _gr_acf_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_acf_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) _gr_acf_swap},
+    {GR_METHOD_SET_SHALLOW,     (gr_funcptr) _gr_acf_set_shallow},
     {GR_METHOD_RANDTEST,        (gr_funcptr) _gr_acf_randtest},
     {GR_METHOD_WRITE,           (gr_funcptr) _gr_acf_write},
     {GR_METHOD_ZERO,            (gr_funcptr) _gr_acf_zero},

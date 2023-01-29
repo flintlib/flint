@@ -71,6 +71,12 @@ _gr_arf_swap(arf_t x, arf_t y, const gr_ctx_t ctx)
     *y = *t;
 }
 
+void
+_gr_arf_set_shallow(arf_t res, const arf_t x, const gr_ctx_t ctx)
+{
+    *res = *x;
+}
+
 /* todo: limits */
 int
 _gr_arf_randtest(arf_t res, flint_rand_t state, const gr_ctx_t ctx)
@@ -1183,6 +1189,7 @@ gr_method_tab_input _arf_methods_input[] =
     {GR_METHOD_INIT,            (gr_funcptr) _gr_arf_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_arf_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) _gr_arf_swap},
+    {GR_METHOD_SET_SHALLOW,     (gr_funcptr) _gr_arf_set_shallow},
     {GR_METHOD_RANDTEST,        (gr_funcptr) _gr_arf_randtest},
     {GR_METHOD_WRITE,           (gr_funcptr) _gr_arf_write},
     {GR_METHOD_ZERO,            (gr_funcptr) _gr_arf_zero},

@@ -164,6 +164,7 @@ typedef enum
     GR_METHOD_INIT,
     GR_METHOD_CLEAR,
     GR_METHOD_SWAP,
+    GR_METHOD_SET_SHALLOW,
     GR_METHOD_WRITE,
 
     GR_METHOD_RANDTEST,
@@ -712,6 +713,7 @@ typedef int ((*gr_method_randtest)(gr_ptr, flint_rand_t state, gr_ctx_ptr));
 typedef int ((*gr_method_constant_op)(gr_ptr, gr_ctx_ptr));
 typedef int ((*gr_method_constant_op_get_si)(slong *, gr_ctx_ptr));
 typedef int ((*gr_method_constant_op_get_fmpz)(fmpz_t, gr_ctx_ptr));
+typedef void ((*gr_method_void_unary_op)(gr_ptr, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op)(gr_ptr, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_si)(gr_ptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_ui)(gr_ptr, ulong, gr_ctx_ptr));
@@ -785,6 +787,7 @@ typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcp
 #define GR_CONSTANT_OP(ctx, NAME) (((gr_method_constant_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_CONSTANT_OP_GET_SI(ctx, NAME) (((gr_method_constant_op_get_si *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_CONSTANT_OP_GET_FMPZ(ctx, NAME) (((gr_method_constant_op_get_fmpz *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_VOID_UNARY_OP(ctx, NAME) (((gr_method_void_unary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_OP(ctx, NAME) (((gr_method_unary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_OP_SI(ctx, NAME) (((gr_method_unary_op_si *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_OP_UI(ctx, NAME) (((gr_method_unary_op_ui *) ctx->methods)[GR_METHOD_ ## NAME])
@@ -871,6 +874,7 @@ GR_INLINE WARN_UNUSED_RESULT int gr_ctx_get_real_prec(slong * prec, gr_ctx_t ctx
 GR_INLINE void gr_init(gr_ptr res, gr_ctx_t ctx) { GR_INIT_CLEAR_OP(ctx, INIT)(res, ctx); }
 GR_INLINE void gr_clear(gr_ptr res, gr_ctx_t ctx) { GR_INIT_CLEAR_OP(ctx, CLEAR)(res, ctx); }
 GR_INLINE void gr_swap(gr_ptr x, gr_ptr y, gr_ctx_t ctx) { GR_SWAP_OP(ctx, SWAP)(x, y, ctx); }
+GR_INLINE void gr_set_shallow(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { GR_VOID_UNARY_OP(ctx, SET_SHALLOW)(res, x, ctx); }
 
 GR_INLINE WARN_UNUSED_RESULT int gr_randtest(gr_ptr x, flint_rand_t state, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST)(x, state, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_randtest_not_zero(gr_ptr x, flint_rand_t state, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST_NOT_ZERO)(x, state, ctx); }

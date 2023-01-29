@@ -58,6 +58,12 @@ _gr_qqbar_swap(qqbar_t x, qqbar_t y, const gr_ctx_t ctx)
     *y = *t;
 }
 
+void
+_gr_qqbar_set_shallow(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    *res = *x;
+}
+
 /* todo: limits */
 int
 _gr_qqbar_randtest(qqbar_t res, flint_rand_t state, const gr_ctx_t ctx)
@@ -1064,6 +1070,7 @@ gr_method_tab_input _qqbar_methods_input[] =
 
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_qqbar_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) _gr_qqbar_swap},
+    {GR_METHOD_SET_SHALLOW,     (gr_funcptr) _gr_qqbar_set_shallow},
     {GR_METHOD_RANDTEST,        (gr_funcptr) _gr_qqbar_randtest},
     {GR_METHOD_WRITE,           (gr_funcptr) _gr_qqbar_write},
 

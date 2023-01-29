@@ -60,6 +60,7 @@ gr_mat_mul_classical(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ct
     else
     {
         gr_ptr tmp;
+        gr_method_void_unary_op set_shallow = GR_VOID_UNARY_OP(ctx, SET_SHALLOW);
         TMP_INIT;
 
         TMP_START;
@@ -67,7 +68,7 @@ gr_mat_mul_classical(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ct
 
         for (i = 0; i < br; i++)
             for (j = 0; j < bc; j++)
-                memcpy(GR_ENTRY(tmp, j * br + i, sz), GR_MAT_ENTRY(B, i, j, sz), sz);
+                set_shallow(GR_ENTRY(tmp, j * br + i, sz), GR_MAT_ENTRY(B, i, j, sz), ctx);
 
         for (i = 0; i < ar; i++)
         {

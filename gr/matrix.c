@@ -113,6 +113,12 @@ matrix_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t ctx)
     gr_mat_swap(mat1, mat2, MATRIX_CTX(ctx)->base_ring);
 }
 
+void
+matrix_set_shallow(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    *res = *mat;
+}
+
 int
 matrix_write(gr_stream_t out, gr_mat_t mat, gr_ctx_t ctx)
 {
@@ -472,6 +478,7 @@ gr_method_tab_input _gr_mat_methods_input[] =
     {GR_METHOD_INIT,        (gr_funcptr) matrix_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) matrix_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) matrix_swap},
+    {GR_METHOD_SET_SHALLOW, (gr_funcptr) matrix_set_shallow},
     {GR_METHOD_RANDTEST,    (gr_funcptr) matrix_randtest},
     {GR_METHOD_WRITE,       (gr_funcptr) matrix_write},
     {GR_METHOD_ZERO,        (gr_funcptr) matrix_zero},

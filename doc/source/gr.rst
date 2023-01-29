@@ -274,6 +274,10 @@ Memory management
 
     Swaps *x* and *y* efficiently.
 
+.. function:: void gr_set_shallow(gr_ptr res, gr_ptr x, gr_ctx_t ctx)
+
+    Sets *res* to a shallow copy of *x*, copying the struct data.
+
 .. function:: gr_ptr gr_heap_init(gr_ctx_t ctx)
 
     Return a pointer to a single new heap-allocated element of *ctx*

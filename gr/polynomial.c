@@ -75,6 +75,12 @@ polynomial_swap(gr_poly_t poly1, gr_poly_t poly2, gr_ctx_t ctx)
     gr_poly_swap(poly1, poly2, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
+void
+polynomial_set_shallow(gr_poly_t res, const gr_poly_t x, const gr_ctx_t ctx)
+{
+    *res = *x;
+}
+
 int
 polynomial_write(gr_stream_t out, gr_poly_t poly, gr_ctx_t ctx)
 {
@@ -339,6 +345,7 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_INIT,        (gr_funcptr) polynomial_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) polynomial_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) polynomial_swap},
+    {GR_METHOD_SET_SHALLOW, (gr_funcptr) polynomial_set_shallow},
     {GR_METHOD_RANDTEST,    (gr_funcptr) polynomial_randtest},
     {GR_METHOD_WRITE,       (gr_funcptr) polynomial_write},
     {GR_METHOD_ZERO,        (gr_funcptr) polynomial_zero},

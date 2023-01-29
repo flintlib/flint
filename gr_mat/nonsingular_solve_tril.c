@@ -23,6 +23,7 @@ gr_mat_nonsingular_solve_tril_classical(gr_mat_t X,
     int use_division = 0;
     int status = GR_SUCCESS;
     slong sz = ctx->sizeof_elem;
+    gr_method_void_unary_op set_shallow = GR_VOID_UNARY_OP(ctx, SET_SHALLOW);
 
     n = L->r;
     m = B->c;
@@ -48,7 +49,7 @@ gr_mat_nonsingular_solve_tril_classical(gr_mat_t X,
     for (i = 0; i < m; i++)
     {
         for (j = 0; j < n; j++)
-            memcpy(GR_ENTRY(tmp, j, sz), GR_MAT_ENTRY(X, j, i, sz), sz);
+            set_shallow(GR_ENTRY(tmp, j, sz), GR_MAT_ENTRY(X, j, i, sz), ctx);
 
         for (j = 0; j < n; j++)
         {
@@ -67,13 +68,13 @@ gr_mat_nonsingular_solve_tril_classical(gr_mat_t X,
             if (status != GR_SUCCESS)
             {
                 for (j = 0; j < n; j++)
-                    memcpy(GR_MAT_ENTRY(X, j, i, sz), GR_ENTRY(tmp, j, sz), sz);
+                    set_shallow(GR_MAT_ENTRY(X, j, i, sz), GR_ENTRY(tmp, j, sz), ctx);
                 goto cleanup;
             }
         }
 
         for (j = 0; j < n; j++)
-            memcpy(GR_MAT_ENTRY(X, j, i, sz), GR_ENTRY(tmp, j, sz), sz);
+            set_shallow(GR_MAT_ENTRY(X, j, i, sz), GR_ENTRY(tmp, j, sz), ctx);
     }
 
 cleanup:

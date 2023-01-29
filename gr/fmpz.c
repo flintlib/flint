@@ -45,6 +45,12 @@ _gr_fmpz_swap(fmpz_t x, fmpz_t y, const gr_ctx_t ctx)
     *y = *t;
 }
 
+void
+_gr_fmpz_set_shallow(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
+{
+    *res = *x;
+}
+
 /* todo: limits */
 int
 _gr_fmpz_randtest(fmpz_t res, flint_rand_t state, const gr_ctx_t ctx)
@@ -1109,6 +1115,7 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_INIT,            (gr_funcptr) _gr_fmpz_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_fmpz_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) _gr_fmpz_swap},
+    {GR_METHOD_SET_SHALLOW,     (gr_funcptr) _gr_fmpz_set_shallow},
     {GR_METHOD_RANDTEST,        (gr_funcptr) _gr_fmpz_randtest},
     {GR_METHOD_WRITE,           (gr_funcptr) _gr_fmpz_write},
     {GR_METHOD_ZERO,            (gr_funcptr) _gr_fmpz_zero},
