@@ -842,9 +842,6 @@ _gr_nmod_poly_inv_series(ulong * res,
 
     flen = FLINT_MIN(flen, n);
 
-    if (flen <= 30)
-        return _gr_poly_inv_series_basecase(res, f, flen, n, ctx);
-
     cutoff = inv_series_cutoff_tab[NMOD_BITS(NMOD_CTX(ctx)) - 1];
 
     if (flen < cutoff)
@@ -852,6 +849,32 @@ _gr_nmod_poly_inv_series(ulong * res,
     else
         return _gr_poly_inv_series_newton(res, f, flen, n, cutoff, ctx);
 }
+
+/* todo: unbalanced cutoffs */
+static const short div_series_cutoff_tab[64] = {
+  64, 64, 63, 65, 77, 84, 140, 158, 197, 208, 276, 243, 348, 358, 450, 560, 585, 692,
+  749, 787, 864, 922, 914, 1239, 1454, 1424, 1449, 1327, 1115, 1174, 1250, 1282, 961,
+  981, 1000, 1091, 1138, 1222, 1205, 1374, 1397, 1420, 1446, 1486, 1513, 1763, 1782,
+  1890, 2047, 2071, 2075, 2271, 2192, 2307, 2407, 2324, 2308, 2958, 3001, 2816,
+  2747, 2985, 2970, 2871, };
+
+int
+_gr_nmod_poly_div_series(ulong * res,
+    const ulong * f, slong flen, const ulong * g, slong glen, slong n, gr_ctx_t ctx)
+{
+    slong cutoff;
+
+    flen = FLINT_MIN(flen, n);
+    glen = FLINT_MIN(glen, n);
+
+    cutoff = div_series_cutoff_tab[NMOD_BITS(NMOD_CTX(ctx)) - 1];
+
+    if (glen < cutoff)
+        return _gr_poly_div_series_basecase(res, f, flen, g, glen, n, ctx);
+    else
+        return _gr_poly_div_series_newton(res, f, flen, g, glen, n, cutoff, ctx);
+}
+
 
 /* todo: unbalanced cutoffs */
 static const short rsqrt_series_cutoff_tab[64] = {6, 22, 22, 24, 27, 28, 28, 58,
@@ -867,9 +890,6 @@ _gr_nmod_poly_rsqrt_series(ulong * res,
     slong cutoff;
 
     flen = FLINT_MIN(flen, n);
-
-    if (flen <= 20)
-        return _gr_poly_rsqrt_series_basecase(res, f, flen, n, ctx);
 
     cutoff = rsqrt_series_cutoff_tab[NMOD_BITS(NMOD_CTX(ctx)) - 1];
 
@@ -895,9 +915,6 @@ _gr_nmod_poly_sqrt_series(ulong * res,
     slong cutoff;
 
     flen = FLINT_MIN(flen, n);
-
-    if (flen <= 20 || NMOD_CTX(ctx).n == 2)
-        return _gr_poly_rsqrt_series_basecase(res, f, flen, n, ctx);
 
     cutoff = sqrt_series_cutoff_tab[NMOD_BITS(NMOD_CTX(ctx)) - 1];
 
@@ -1024,6 +1041,7 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_VEC_RECIPROCALS, (gr_funcptr) _gr_nmod_vec_reciprocals},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_nmod_poly_mullow},
     {GR_METHOD_POLY_INV_SERIES, (gr_funcptr) _gr_nmod_poly_inv_series},
+    {GR_METHOD_POLY_DIV_SERIES, (gr_funcptr) _gr_nmod_poly_div_series},
     {GR_METHOD_POLY_RSQRT_SERIES, (gr_funcptr) _gr_nmod_poly_rsqrt_series},
     {GR_METHOD_POLY_SQRT_SERIES,  (gr_funcptr) _gr_nmod_poly_sqrt_series},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_nmod_roots_gr_poly},

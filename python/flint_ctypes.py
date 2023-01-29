@@ -2484,6 +2484,10 @@ class gr_poly(gr_elem):
             raise NotImplementedError
         return c
 
+    def __iter__(self):
+        for i in range(len(self)):
+            yield self[i]
+
     def __call__(self, x, algorithm=None):
         f_R = self.parent()._coefficient_ring
         x_R = x.parent()

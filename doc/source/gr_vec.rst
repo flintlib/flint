@@ -210,3 +210,8 @@ Other functions
     Sets *res* to the vector of reciprocals of the positive integers 1, 2, ... up to *len* inclusive.
 
 .. function:: int _gr_vec_set_powers(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx)
+
+
+.. raw:: latex
+
+    \newpage

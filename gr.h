@@ -594,6 +594,7 @@ typedef enum
     /* Polynomial methods (todo: rename -> GR_POLY) */
     GR_METHOD_POLY_MULLOW,
     GR_METHOD_POLY_INV_SERIES,
+    GR_METHOD_POLY_DIV_SERIES,
     GR_METHOD_POLY_RSQRT_SERIES,
     GR_METHOD_POLY_SQRT_SERIES,
     GR_METHOD_POLY_FACTOR,

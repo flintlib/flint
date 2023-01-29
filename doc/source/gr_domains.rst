@@ -250,3 +250,8 @@ Polynomial rings
     polynomials in *nvars* variables over the given *base_ring*,
     with monomial ordering *ord*.
     Elements have type :type:`gr_mpoly_struct`.
+
+
+.. raw:: latex
+
+    \newpage

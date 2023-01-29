@@ -33,8 +33,10 @@ _gr_poly_div_series_basecase(gr_ptr Q,
     {
         status |= _gr_vec_div_scalar(Q, A, Alen, B, ctx);
         status |= _gr_vec_zero(GR_ENTRY(Q, Alen, sz), len - Alen, ctx);
+        return status;
     }
-    else if (len == 2)
+
+    if (len == 2)
     {
         /* todo: in appropriate cases, don't do a division */
         if (Alen == 1)
@@ -51,8 +53,29 @@ _gr_poly_div_series_basecase(gr_ptr Q,
             status |= gr_sub(GR_ENTRY(Q, 1, sz), GR_ENTRY(A, 1, sz), GR_ENTRY(Q, 1, sz), ctx);
             status |= gr_div(GR_ENTRY(Q, 1, sz), GR_ENTRY(Q, 1, sz), B, ctx);
         }
+
+        return status;
     }
-    else
+
+    /* useful to detect?  monomial / series */
+#if 0
+    if (_gr_vec_is_zero(A, Alen - 1, ctx) == T_TRUE)
+    {
+        status = _gr_poly_inv_series(GR_ENTRY(Q, Alen - 1, sz), B, Blen, len - (Alen - 1), ctx);
+
+        if (status == GR_SUCCESS)
+        {
+            status |= _gr_vec_mul_scalar(GR_ENTRY(Q, Alen - 1, sz), GR_ENTRY(Q, Alen - 1, sz), len - (Alen - 1), GR_ENTRY(A, Alen - 1, sz), ctx);
+            status |= _gr_vec_zero(Q, Alen - 1, ctx);
+            return status;
+        }
+        else
+        {
+            status = GR_SUCCESS;
+        }
+    }
+#endif
+
     {
         gr_ptr q;
         int is_one;

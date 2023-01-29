@@ -13,7 +13,7 @@
 #include "gr_poly.h"
 
 int
-_gr_poly_div_series(gr_ptr Q,
+_gr_poly_div_series_generic(gr_ptr Q,
     gr_srcptr A, slong Alen,
     gr_srcptr B, slong Blen, slong len, gr_ctx_t ctx)
 {
