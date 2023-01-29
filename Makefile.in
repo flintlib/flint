@@ -16,6 +16,9 @@ BUILD_DIRS= thread_pool                     thread_support                  \
             fmpz            fmpz_vec        fmpz_mat        fmpz_poly       \
             fmpz_mod        fmpz_mod_vec    fmpz_mod_mat    fmpz_mod_poly   \
             fmpq            fmpq_vec        fmpq_mat        fmpq_poly       \
+                                                                            \
+            nf nf_elem qfb                                                  \
+                                                                            \
             fq              fq_vec          fq_mat          fq_poly         \
             fq_nmod         fq_nmod_vec     fq_nmod_mat     fq_nmod_poly    \
             fq_zech         fq_zech_vec     fq_zech_mat     fq_zech_poly    \

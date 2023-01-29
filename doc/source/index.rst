@@ -41,7 +41,6 @@ General utilities
    flint.rst
    profiler.rst
    thread_pool.rst
-   perm.rst
    mpoly.rst
 
 Integers
@@ -104,6 +103,24 @@ Integers mod n
    fmpz_mod_poly_factor.rst
    fmpz_mod_mpoly.rst
    fmpz_mod_mpoly_factor.rst
+
+Groups
+---------------
+
+.. toctree::
+   :maxdepth: 1
+
+   perm.rst
+   qfb.rst
+
+Number fields
+----------------
+
+.. toctree::
+   :maxdepth: 1
+
+   nf.rst
+   nf_elem.rst
 
 Finite fields
 ---------------
