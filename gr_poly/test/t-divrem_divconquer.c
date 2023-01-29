@@ -5,7 +5,7 @@ int main()
     slong iter;
     flint_rand_t state;
 
-    flint_printf("divrem_basecase....");
+    flint_printf("divrem_divconquer....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -26,10 +26,10 @@ int main()
 
         status = GR_SUCCESS;
 
-        status |= gr_poly_randtest(A, state, 1 + n_randint(state, 6), ctx);
-        status |= gr_poly_randtest(B, state, 1 + n_randint(state, 6), ctx);
-        status |= gr_poly_randtest(Q, state, 1 + n_randint(state, 6), ctx);
-        status |= gr_poly_randtest(R, state, 1 + n_randint(state, 6), ctx);
+        status |= gr_poly_randtest(A, state, 1 + n_randint(state, 20), ctx);
+        status |= gr_poly_randtest(B, state, 1 + n_randint(state, 20), ctx);
+        status |= gr_poly_randtest(Q, state, 1 + n_randint(state, 20), ctx);
+        status |= gr_poly_randtest(R, state, 1 + n_randint(state, 20), ctx);
 
         if (n_randint(state, 3) == 0)
         {
@@ -42,22 +42,22 @@ int main()
         {
             case 0:
                 status |= gr_poly_set(Q, A, ctx);
-                status |= gr_poly_divrem_basecase(Q, R, Q, B, ctx);
+                status |= gr_poly_divrem_divconquer(Q, R, Q, B, 1 + n_randint(state, 10), ctx);
                 break;
             case 1:
                 status |= gr_poly_set(R, A, ctx);
-                status |= gr_poly_divrem_basecase(Q, R, R, B, ctx);
+                status |= gr_poly_divrem_divconquer(Q, R, R, B, 1 + n_randint(state, 10), ctx);
                 break;
             case 2:
                 status |= gr_poly_set(Q, B, ctx);
-                status |= gr_poly_divrem_basecase(Q, R, A, Q, ctx);
+                status |= gr_poly_divrem_divconquer(Q, R, A, Q, 1 + n_randint(state, 10), ctx);
                 break;
             case 3:
                 status |= gr_poly_set(R, B, ctx);
-                status |= gr_poly_divrem_basecase(Q, R, A, R, ctx);
+                status |= gr_poly_divrem_divconquer(Q, R, A, R, 1 + n_randint(state, 10), ctx);
                 break;
             default:
-                status |= gr_poly_divrem_basecase(Q, R, A, B, ctx);
+                status |= gr_poly_divrem_divconquer(Q, R, A, B, 1 + n_randint(state, 10), ctx);
                 break;
         }
 
