@@ -112,16 +112,8 @@ void _nf_elem_add_qf(nf_elem_t a, const nf_elem_t b,
 
       if (can && !fmpz_is_one(aden))
       {
-#if (                                                           \
-         (__FLINT_VERSION > 2)                                   \
-         ||                                                      \
-         (__FLINT_VERSION >= 2 && __FLINT_VERSION_MINOR >= 8)    \
-    )
          fmpz_gcd3(d, anum + 0, anum + 1, anum + 2);
-#else
-         fmpz_gcd(d, anum + 0, anum + 1);
-         fmpz_gcd(d, d, anum + 2);
-#endif
+
          if (!fmpz_is_one(d))
          {
             fmpz_gcd(d, d, aden);
@@ -180,17 +172,8 @@ void _nf_elem_add_qf(nf_elem_t a, const nf_elem_t b,
             fmpz_t e;
             
             fmpz_init(e);
-              
-#if (                                                            \
-         (__FLINT_VERSION > 2)                                   \
-         ||                                                      \
-         (__FLINT_VERSION >= 2 && __FLINT_VERSION_MINOR >= 8)    \
-    )
             fmpz_gcd3(e, anum + 0, anum + 1, anum + 2);
-#else
-            fmpz_gcd(e, anum + 0, anum + 1);
-            fmpz_gcd(e, e, anum + 2);
-#endif
+
             if (!fmpz_is_one(e))
                fmpz_gcd(e, e, d);
             

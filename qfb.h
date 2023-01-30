@@ -188,20 +188,10 @@ int qfb_is_primitive(qfb_t f)
    int res;
 
    fmpz_init(g);
-
-#if (                                                           \
-        (__FLINT_VERSION > 2)                                   \
-        ||                                                      \
-        (__FLINT_VERSION >= 2 && __FLINT_VERSION_MINOR >= 8)    \
-    )
    fmpz_gcd3(g, f->a, f->b, f->c);
-#else
-   fmpz_gcd(g, f->a, f->b);
-   fmpz_gcd(g, g, f->c);
-#endif
    res = fmpz_is_pm1(g);
-
    fmpz_clear(g);
+
    return res;
 }
 

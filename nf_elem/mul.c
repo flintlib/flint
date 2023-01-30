@@ -56,16 +56,8 @@ void _nf_elem_mul_gaussian(fmpz * anum, fmpz * aden,
    fmpz_mul(aden, bden, cden);
    if (!fmpz_is_one(aden))
    {
-#if (                                                           \
-        (__FLINT_VERSION > 2)                                   \
-        ||                                                      \
-        (__FLINT_VERSION >= 2 && __FLINT_VERSION_MINOR >= 8)    \
-    )
       fmpz_gcd3(t, anum + 0, anum + 1, aden);
-#else
-      fmpz_gcd(t, anum + 0, anum + 1);
-      fmpz_gcd(t, t, aden);
-#endif
+
       if (!fmpz_is_one(t))
       {
          fmpz_divexact(anum + 0, anum + 0, t);
