@@ -17,6 +17,12 @@
 #ifndef QFB_H
 #define QFB_H
 
+#ifdef QFB_INLINES_C
+#define QFB_INLINE FLINT_DLL
+#else
+#define QFB_INLINE static __inline__
+#endif
+
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -41,7 +47,7 @@ typedef struct
    slong iter;
 } qfb_hash_t;
 
-static __inline__
+QFB_INLINE
 void qfb_init(qfb_t q)
 {
    fmpz_init(q->a);
@@ -49,7 +55,7 @@ void qfb_init(qfb_t q)
    fmpz_init(q->c);
 }
 
-static __inline__
+QFB_INLINE
 void qfb_clear(qfb_t q)
 {
    fmpz_clear(q->a);
@@ -57,7 +63,7 @@ void qfb_clear(qfb_t q)
    fmpz_clear(q->c);
 }
 
-static __inline__
+QFB_INLINE
 int qfb_equal(qfb_t f, qfb_t g)
 {
    return (fmpz_equal(f->a, g->a) 
@@ -65,7 +71,7 @@ int qfb_equal(qfb_t f, qfb_t g)
         && fmpz_equal(f->c, g->c));
 }
 
-static __inline__
+QFB_INLINE
 void qfb_set(qfb_t f, qfb_t g)
 {
    fmpz_set(f->a, g->a); 
@@ -73,7 +79,7 @@ void qfb_set(qfb_t f, qfb_t g)
    fmpz_set(f->c, g->c);
 }
 
-static __inline__
+QFB_INLINE
 void qfb_discriminant(fmpz_t D, qfb_t f)
 {
    fmpz_t t;
@@ -87,7 +93,7 @@ void qfb_discriminant(fmpz_t D, qfb_t f)
    fmpz_clear(t);
 }
 
-static __inline__
+QFB_INLINE
 void qfb_print(qfb_t q)
 {
    printf("(");
@@ -96,7 +102,7 @@ void qfb_print(qfb_t q)
    fmpz_print(q->c); printf(")");
 }
 
-static __inline__
+QFB_INLINE
 void qfb_array_clear(qfb ** forms, slong num)
 {
    slong k;
@@ -110,34 +116,34 @@ void qfb_array_clear(qfb ** forms, slong num)
    flint_free(*forms);
 }
 
-qfb_hash_t * qfb_hash_init(slong depth);
+FLINT_DLL qfb_hash_t * qfb_hash_init(slong depth);
 
-void qfb_hash_clear(qfb_hash_t * qhash, slong depth);
+FLINT_DLL void qfb_hash_clear(qfb_hash_t * qhash, slong depth);
 
-void qfb_hash_insert(qfb_hash_t * qhash, qfb_t q, 
+FLINT_DLL void qfb_hash_insert(qfb_hash_t * qhash, qfb_t q, 
                      qfb_t q2, slong iter, slong depth);
 
-slong qfb_hash_find(qfb_hash_t * qhash, qfb_t q, slong depth);
+FLINT_DLL slong qfb_hash_find(qfb_hash_t * qhash, qfb_t q, slong depth);
 
-void qfb_reduce(qfb_t r, qfb_t f, fmpz_t D);
+FLINT_DLL void qfb_reduce(qfb_t r, qfb_t f, fmpz_t D);
 
-int qfb_is_reduced(qfb_t r);
+FLINT_DLL int qfb_is_reduced(qfb_t r);
 
-slong qfb_reduced_forms(qfb ** forms, slong d);
+FLINT_DLL slong qfb_reduced_forms(qfb ** forms, slong d);
 
-slong qfb_reduced_forms_large(qfb ** forms, slong d);
+FLINT_DLL slong qfb_reduced_forms_large(qfb ** forms, slong d);
 
-void qfb_nucomp(qfb_t r, const qfb_t f, const qfb_t g, fmpz_t D, fmpz_t L);
+FLINT_DLL void qfb_nucomp(qfb_t r, const qfb_t f, const qfb_t g, fmpz_t D, fmpz_t L);
 
-void qfb_nudupl(qfb_t r, const qfb_t f, fmpz_t D, fmpz_t L);
+FLINT_DLL void qfb_nudupl(qfb_t r, const qfb_t f, fmpz_t D, fmpz_t L);
 
-void qfb_pow_ui(qfb_t r, qfb_t f, fmpz_t D, ulong exp);
+FLINT_DLL void qfb_pow_ui(qfb_t r, qfb_t f, fmpz_t D, ulong exp);
 
-void qfb_pow(qfb_t r, qfb_t f, fmpz_t D, fmpz_t exp);
+FLINT_DLL void qfb_pow(qfb_t r, qfb_t f, fmpz_t D, fmpz_t exp);
 
-void qfb_pow_with_root(qfb_t r, qfb_t f, fmpz_t D, fmpz_t e, fmpz_t L);
+FLINT_DLL void qfb_pow_with_root(qfb_t r, qfb_t f, fmpz_t D, fmpz_t e, fmpz_t L);
 
-static __inline__
+QFB_INLINE
 void qfb_inverse(qfb_t r, qfb_t f)
 {
    qfb_set(r, f);
@@ -149,7 +155,7 @@ void qfb_inverse(qfb_t r, qfb_t f)
    fmpz_neg(r->b, r->b);
 }
 
-static __inline__
+QFB_INLINE
 int qfb_is_principal_form(qfb_t f, fmpz_t D)
 {
    if (!fmpz_is_one(f->a))
@@ -161,7 +167,7 @@ int qfb_is_principal_form(qfb_t f, fmpz_t D)
    return fmpz_is_zero(f->b); /* D = 0 mod 4 */
 }
 
-static __inline__
+QFB_INLINE
 void qfb_principal_form(qfb_t f, fmpz_t D)
 {
    fmpz_set_ui(f->a, 1);
@@ -175,7 +181,7 @@ void qfb_principal_form(qfb_t f, fmpz_t D)
    fmpz_fdiv_q_2exp(f->c, f->c, 2);
 }
 
-static __inline__
+QFB_INLINE
 int qfb_is_primitive(qfb_t f)
 {
    fmpz_t g;
@@ -199,14 +205,14 @@ int qfb_is_primitive(qfb_t f)
    return res;
 }
 
-void qfb_prime_form(qfb_t r, fmpz_t D, fmpz_t p);
+FLINT_DLL void qfb_prime_form(qfb_t r, fmpz_t D, fmpz_t p);
 
-int qfb_exponent_element(fmpz_t exponent, qfb_t f, 
+FLINT_DLL int qfb_exponent_element(fmpz_t exponent, qfb_t f, 
                                           fmpz_t n, ulong B1, ulong B2_sqrt);
 
-int qfb_exponent(fmpz_t exponent, fmpz_t n, ulong B1, ulong B2_sqrt, slong c);
+FLINT_DLL int qfb_exponent(fmpz_t exponent, fmpz_t n, ulong B1, ulong B2_sqrt, slong c);
 
-int qfb_exponent_grh(fmpz_t exponent, fmpz_t n, ulong B1, ulong B2_sqrt);
+FLINT_DLL int qfb_exponent_grh(fmpz_t exponent, fmpz_t n, ulong B1, ulong B2_sqrt);
 
 #ifdef __cplusplus
 }
