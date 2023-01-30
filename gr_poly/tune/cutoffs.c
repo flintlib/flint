@@ -44,22 +44,40 @@
 #define CASE_B GR_IGNORE(gr_poly_sqrt_series_newton(B, A, len, len, ctx));
 #endif
 
+#if 0
+#define DIVREM 1
+#define CASE_A GR_IGNORE(gr_poly_divrem_basecase(C, D, B, A, ctx));
+#define CASE_B GR_IGNORE(gr_poly_divrem_newton(C, D, B, A, ctx));
+#else
+#define DIVREM 0
+#endif
+
 double
 get_profile(gr_ctx_t ctx, slong len)
 {
-    gr_poly_t A, B;
+    gr_poly_t A, B, C, D;
     slong i;
     double tcpu, twall, tbase, tnew;
     flint_rand_t state;
 
     gr_poly_init(A, ctx);
     gr_poly_init(B, ctx);
+    gr_poly_init(C, ctx);
+    gr_poly_init(D, ctx);
 
     flint_randinit(state);
 
+#if DIVREM
+    for (i = 0; i < 2 * len; i++)
+        GR_IGNORE(gr_poly_set_coeff_si(B, i, n_randlimb(state), ctx));
     for (i = 0; i < len; i++)
         GR_IGNORE(gr_poly_set_coeff_si(A, i, n_randlimb(state), ctx));
     GR_IGNORE(gr_poly_set_coeff_si(A, 0, 1, ctx));
+#else
+    for (i = 0; i < len; i++)
+        GR_IGNORE(gr_poly_set_coeff_si(A, i, n_randlimb(state), ctx));
+    GR_IGNORE(gr_poly_set_coeff_si(A, 0, 1, ctx));
+#endif
 
     TIMEIT_START
     CASE_A
@@ -79,6 +97,8 @@ get_profile(gr_ctx_t ctx, slong len)
 
     gr_poly_clear(A, ctx);
     gr_poly_clear(B, ctx);
+    gr_poly_clear(C, ctx);
+    gr_poly_clear(D, ctx);
 
     return tbase / tnew;
 }
@@ -116,7 +136,7 @@ get_tuning(gr_ctx_t ctx, slong from)
             }
         }
     }
-    while (!ok(get_profile(ctx, len)));
+    while (0 /*!ok(get_profile(ctx, len))*/);
 
     return cutoff;
 }

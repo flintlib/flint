@@ -1,7 +1,6 @@
 /*
     Copyright (C) 2012 Sebastian Pancratz
-    Copyright (C) 2013 Mike Hansen
-    Copyright (C) 2022 Fredrik Johansson
+    Copyright (C) 2023 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -11,32 +10,74 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "gr_vec.h"
 #include "gr_poly.h"
 
+/* todo: public vec function */
+void
+_gr_vec_reverse_shallow(gr_ptr res, gr_srcptr vec, slong len, gr_ctx_t ctx)
+{
+    gr_method_void_unary_op set_shallow = GR_VOID_UNARY_OP(ctx, SET_SHALLOW);
+    slong sz = ctx->sizeof_elem;
+    slong i;
+
+    for (i = 0; i < len; i++)
+        set_shallow(GR_ENTRY(res, i, sz), GR_ENTRY(vec, len - 1 - i, sz), ctx);
+}
+
 int
-_gr_poly_divrem(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
+_gr_poly_div_newton(gr_ptr Q, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
 {
     slong sz = ctx->sizeof_elem;
-    int status;
-    gr_ptr T;
+    int status = GR_SUCCESS;
+    slong lenQ, lenB2, alloc;
+    gr_ptr Arev, Brev;
 
-    status = _gr_poly_divrem_newton(Q, R, A, lenA, B, lenB, ctx);
+    lenQ = lenA - lenB + 1;
 
-    if (status != GR_SUCCESS)
+    alloc = lenQ + FLINT_MIN(lenB, lenQ);
+    Arev = GR_TMP_ALLOC(alloc * sz);
+    Brev = GR_ENTRY(Arev, lenQ, sz);
+
+    _gr_vec_reverse_shallow(Arev, GR_ENTRY(A, lenA - lenQ, sz), lenQ, ctx);
+
+    if (lenB >= lenQ)
     {
-        GR_TMP_INIT_VEC(T, lenA, ctx);
+        _gr_vec_reverse_shallow(Brev, GR_ENTRY(B, lenB - lenQ, sz), lenQ, ctx);
+        lenB2 = lenQ;
+    }
+    else
+    {
+        _gr_vec_reverse_shallow(Brev, B, lenB, ctx);
+        lenB2 = lenB;
+    }
 
-        status = _gr_poly_divrem_basecase(Q, T, A, lenA, B, lenB, ctx);
-        _gr_vec_swap(R, T, lenB - 1, ctx);
+    status |= _gr_poly_div_series(Q, Arev, lenQ, Brev, lenB2, lenQ, ctx);
+    status |= _gr_poly_reverse(Q, Q, lenQ, lenQ, ctx);
 
-        GR_TMP_CLEAR_VEC(T, lenA, ctx);
+    GR_TMP_FREE(Arev, alloc * sz);
+
+    return status;
+}
+
+int _gr_poly_divrem_newton(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
+{
+    int status = GR_SUCCESS;
+    const slong lenQ = lenA - lenB + 1;
+
+    status |= _gr_poly_div_newton(Q, A, lenA, B, lenB, ctx);
+
+    if (lenB > 1 && status == GR_SUCCESS)
+    {
+        status |= _gr_poly_mullow(R, Q, lenQ, B, lenB - 1, lenB - 1, ctx);
+        status |= _gr_vec_sub(R, A, R, lenB - 1, ctx);
     }
 
     return status;
 }
 
 int
-gr_poly_divrem(gr_poly_t Q, gr_poly_t R,
+gr_poly_divrem_newton(gr_poly_t Q, gr_poly_t R,
     const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
 {
     slong lenA = A->length, lenB = B->length, lenQ = lenA - lenB + 1;
@@ -79,7 +120,7 @@ gr_poly_divrem(gr_poly_t Q, gr_poly_t R,
         r = R->coeffs;
     }
 
-    status |= _gr_poly_divrem(q, r, A->coeffs, lenA, B->coeffs, lenB, ctx);
+    status |= _gr_poly_divrem_newton(q, r, A->coeffs, lenA, B->coeffs, lenB, ctx);
 
     if (Q == A || Q == B)
     {

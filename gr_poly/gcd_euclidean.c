@@ -91,7 +91,7 @@ _gr_poly_gcd_euclidean(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA,
     {
         status |= _gr_poly_divrem(Q, R1, R2, lenR2, R3, lenR3, ctx);
 
-        lenR2 = lenR3;
+        lenR2 = lenR3--;
         GR_VEC_NORM(status, R1, lenR3, sz, ctx);
 
         if (status != GR_SUCCESS)

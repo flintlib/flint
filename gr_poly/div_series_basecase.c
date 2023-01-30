@@ -83,6 +83,7 @@ _gr_poly_div_series_basecase(gr_ptr Q,
 
         GR_TMP_INIT(q, ctx);
 
+        /* todo: we sometimes want to keep dividing, e.g. over RR with small coefficient */
         status = gr_inv(q, B, ctx);
 
         /* constant is a unit; can multiply by inverse */

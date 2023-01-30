@@ -5,7 +5,7 @@ int main()
     slong iter;
     flint_rand_t state;
 
-    flint_printf("divrem....");
+    flint_printf("divrem_newton....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -26,10 +26,10 @@ int main()
 
         status = GR_SUCCESS;
 
-        status |= gr_poly_randtest(A, state, 1 + n_randint(state, 6), ctx);
-        status |= gr_poly_randtest(B, state, 1 + n_randint(state, 6), ctx);
-        status |= gr_poly_randtest(Q, state, 1 + n_randint(state, 6), ctx);
-        status |= gr_poly_randtest(R, state, 1 + n_randint(state, 6), ctx);
+        status |= gr_poly_randtest(A, state, 1 + n_randint(state, 20), ctx);
+        status |= gr_poly_randtest(B, state, 1 + n_randint(state, 20), ctx);
+        status |= gr_poly_randtest(Q, state, 1 + n_randint(state, 20), ctx);
+        status |= gr_poly_randtest(R, state, 1 + n_randint(state, 20), ctx);
 
         if (n_randint(state, 3) == 0)
         {
@@ -42,22 +42,22 @@ int main()
         {
             case 0:
                 status |= gr_poly_set(Q, A, ctx);
-                status |= gr_poly_divrem(Q, R, Q, B, ctx);
+                status |= gr_poly_divrem_newton(Q, R, Q, B, ctx);
                 break;
             case 1:
                 status |= gr_poly_set(R, A, ctx);
-                status |= gr_poly_divrem(Q, R, R, B, ctx);
+                status |= gr_poly_divrem_newton(Q, R, R, B, ctx);
                 break;
             case 2:
                 status |= gr_poly_set(Q, B, ctx);
-                status |= gr_poly_divrem(Q, R, A, Q, ctx);
+                status |= gr_poly_divrem_newton(Q, R, A, Q, ctx);
                 break;
             case 3:
                 status |= gr_poly_set(R, B, ctx);
-                status |= gr_poly_divrem(Q, R, A, R, ctx);
+                status |= gr_poly_divrem_newton(Q, R, A, R, ctx);
                 break;
             default:
-                status |= gr_poly_divrem(Q, R, A, B, ctx);
+                status |= gr_poly_divrem_newton(Q, R, A, B, ctx);
                 break;
         }
 
@@ -88,7 +88,7 @@ int main()
     }
 
     flint_randclear(state);
-    flint_cleanup();
+    flint_cleanup_master();
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }

@@ -279,7 +279,7 @@ gr_poly_divrem_divconquer(gr_poly_t Q, gr_poly_t R,
         q = Q->coeffs;
     }
 
-    if (R == B)
+    if (R == A || R == B)
     {
         r = flint_malloc(lenA * sz);
         _gr_vec_init(r, lenA, ctx);
@@ -305,7 +305,7 @@ gr_poly_divrem_divconquer(gr_poly_t Q, gr_poly_t R,
         _gr_poly_set_length(Q, lenQ, ctx);
     }
 
-    if (R == B)
+    if (R == A || R == B)
     {
         _gr_vec_clear(R->coeffs, R->alloc, ctx);
         flint_free(R->coeffs);

@@ -308,6 +308,9 @@ _gr_arb_is_one(const arb_t x, const gr_ctx_t ctx)
     if (arb_is_one(x))
         return T_TRUE;
 
+    if (mag_is_zero(arb_radref(x)))
+        return T_FALSE;
+
     if (arb_contains_si(x, 1))
         return T_UNKNOWN;
 

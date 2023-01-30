@@ -12,19 +12,21 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
+#define DEFAULT_CUTOFF 8
+
 int
 _gr_poly_div_series_generic(gr_ptr Q,
     gr_srcptr A, slong Alen,
     gr_srcptr B, slong Blen, slong len, gr_ctx_t ctx)
 {
     /* todo */
-    if (FLINT_MIN(Blen, len) <= 8 || ctx->methods[GR_METHOD_POLY_MULLOW] == (gr_funcptr) _gr_poly_mullow_generic)
+    if (FLINT_MIN(Blen, len) <= DEFAULT_CUTOFF || ctx->methods[GR_METHOD_POLY_MULLOW] == (gr_funcptr) _gr_poly_mullow_generic)
     {
         return _gr_poly_div_series_basecase(Q, A, Alen, B, Blen, len, ctx);
     }
     else
     {
-        return _gr_poly_div_series_newton(Q, A, Alen, B, Blen, len, 8, ctx);
+        return _gr_poly_div_series_newton(Q, A, Alen, B, Blen, len, DEFAULT_CUTOFF, ctx);
     }
 }
 

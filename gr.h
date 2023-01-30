@@ -1053,8 +1053,8 @@ int gr_get_str(char ** s, gr_srcptr x, gr_ctx_t ctx);
 /* todo: use vector init/clear functions when provided */
 
 #define GR_TMP_VEC_ALLOC_MAX_STACK 1024
-#define GR_TMP_ALLOC(size) ((size <= GR_TMP_VEC_ALLOC_MAX_STACK) ? alloca(size) : flint_malloc(size))
-#define GR_TMP_FREE(ptr, size) do { if (size > GR_TMP_VEC_ALLOC_MAX_STACK) flint_free(ptr); } while (0)
+#define GR_TMP_ALLOC(size) (((size) <= GR_TMP_VEC_ALLOC_MAX_STACK) ? alloca(size) : flint_malloc(size))
+#define GR_TMP_FREE(ptr, size) do { if ((size) > GR_TMP_VEC_ALLOC_MAX_STACK) flint_free(ptr); } while (0)
 #define GR_TMP_ALLOC_SMALL(size) alloca(size)
 
 #define GR_TMP_INIT_VEC(vec, len, ctx) \
