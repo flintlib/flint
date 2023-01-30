@@ -276,6 +276,26 @@ Evaluation
     Set *res* to *poly* evaluated at *x*, where the coefficients of *f*
     belong to *ctx* while both *x* and *res* belong to *x_ctx*.
 
+Multipoint evaluation and interpolation
+-------------------------------------------------------------------------------
+
+.. function:: gr_ptr * _gr_poly_tree_alloc(slong len, gr_ctx_t ctx)
+
+.. function:: void _gr_poly_tree_free(gr_ptr * tree, slong len, gr_ctx_t ctx)
+
+.. function:: int _gr_poly_tree_build(gr_ptr * tree, gr_srcptr roots, slong len, gr_ctx_t ctx)
+
+.. function:: int _gr_poly_evaluate_vec_fast_precomp(gr_ptr vs, gr_srcptr poly, slong plen, gr_ptr * tree, slong len, gr_ctx_t ctx)
+
+.. function:: int _gr_poly_evaluate_vec_fast(gr_ptr ys, gr_srcptr poly, slong plen, gr_srcptr xs, slong n, gr_ctx_t ctx)
+
+.. function:: int gr_poly_evaluate_vec_fast(gr_vec_t ys, const gr_poly_t poly, const gr_vec_t xs, gr_ctx_t ctx)
+
+.. function:: int _gr_poly_evaluate_vec_iter(gr_ptr ys, gr_srcptr poly, slong plen, gr_srcptr xs, slong n, gr_ctx_t ctx)
+
+.. function:: int gr_poly_evaluate_vec_iter(gr_vec_t ys, const gr_poly_t poly, const gr_vec_t xs, gr_ctx_t ctx)
+
+
 Composition
 -------------------------------------------------------------------------------
 
