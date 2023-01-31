@@ -9,20 +9,18 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb_theta.h"
+#include "acb_mat.h"
 
 void
-acb_mat_get_imag(arb_mat_t re, const acb_mat_t mat)
+acb_mat_get_imag(arb_mat_t im, const acb_mat_t mat)
 {
-    slong nrows = acb_mat_nrows(mat);
-    slong ncols = acb_mat_ncols(mat);
     slong i, j;
 
-    for (i = 0; i < nrows; i++)
+    for (i = 0; i < acb_mat_nrows(mat); i++)
     {
-        for (j = 0; j < ncols; j++)
+        for (j = 0; j < acb_mat_ncols(mat); j++)
         {
-            acb_get_imag(arb_mat_entry(re, i, j), acb_mat_entry(mat, i, j));
+            acb_get_real(arb_mat_entry(re, i, j), acb_mat_entry(mat, i, j));
         }
     }
 }

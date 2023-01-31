@@ -9,15 +9,23 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb_theta.h"
+#include "arb_mat.h"
 
 void
-arb_randtest_pos(arb_t x, flint_rand_t state, slong prec, slong mag_bits)
+arb_mat_max_norm(arb_t res, const arb_mat_t A, slong prec)
 {
-    int pos = 0;
-    while (!pos)
+    slong i, j;
+    arb_t abs;
+
+    arb_init(abs);
+    arb_zero(res);
+    for (i = 0; i < arb_mat_nrows(A); i++)
     {
-        arb_randtest_precise(x, state, prec, mag_bits);
-        pos = arb_is_positive(x);
+        for (j = 0; j < arb_mat_ncols(A); j++)
+        {
+            arb_abs(abs, arb_mat_entry(mat, i, j));
+            arb_max(res, res, abs, prec);
+        }
     }
+    arb_clear(abs);
 }

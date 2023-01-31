@@ -24,38 +24,6 @@
 extern "C" {
 #endif
 
-/* Extras for arb_mat's and acb_mat's */
-
-void arb_randtest_pos(arb_t x, flint_rand_t state, slong prec, slong mag_bits);
-
-void acb_randtest_disk(acb_t x, const acb_t ctr, const arf_t rad,
-    flint_rand_t state, slong prec);
-
-void acb_mat_get_real(arb_mat_t re, const acb_mat_t mat);
-
-void acb_mat_get_imag(arb_mat_t im, const acb_mat_t mat);
-
-void acb_mat_set_arb_arb(acb_mat_t mat, const arb_mat_t re,
-    const arb_mat_t im);
-
-void arb_mat_add_error_arf(arb_mat_t mat, const arf_t err);
-
-void arb_mat_randtest_cho(arb_mat_t mat, flint_rand_t state, slong prec,
-    slong mag_bits);
-
-void arb_mat_randtest_sym_pos(arb_mat_t mat, flint_rand_t state, slong prec,
-    slong mag_bits);
-
-int arb_mat_is_nonsymmetric(const arb_mat_t mat);
-
-void arb_mat_pos_lambda(arb_t lambda, const arb_mat_t mat, slong prec);
-
-void arb_mat_pos_radius(arf_t rad, const arb_mat_t mat, slong prec);
-
-void arb_mat_reduce(fmpz_mat_t U, const arb_mat_t M, slong prec);
-
-void acb_mat_ninf(arb_t norm, const acb_mat_t mat, slong prec);
-
 /* Extras for fmpz_mat's */
 
 void fmpz_mat_get_a(fmpz_mat_t res, const fmpz_mat_t mat);

@@ -9,22 +9,18 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb_theta.h"
+#include "arb_mat.h"
 
-int
-arb_mat_is_nonsymmetric(const arb_mat_t mat)
+void
+arb_mat_randtest_spd(arb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits)
 {
+    slong g = arb_mat_nrows(mat);
     arb_mat_t tp;
-    slong nrows = arb_mat_nrows(mat);
-    int res;
 
-    if (nrows != arb_mat_ncols(mat))
-        return 1;
-
-    arb_mat_init(tp, nrows, nrows);
+    arb_mat_init(tp, g, g);
+    arb_mat_randtest_cho(mat, state, prec, mag_bits);
     arb_mat_transpose(tp, mat);
-    res = !arb_mat_overlaps(tp, mat);
-    arb_mat_clear(tp);
+    arb_mat_mul(mat, mat, tp, prec);
 
-    return res;
+    arb_mat_clear(tp);
 }

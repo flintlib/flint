@@ -9,19 +9,18 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb_theta.h"
+#include "acb_mat.h"
 
 void
-arb_mat_add_error_arf(arb_mat_t mat, const arf_t err)
+acb_mat_get_real(arb_mat_t re, const acb_mat_t mat)
 {
-    slong k = acb_mat_nrows(mat);
-    slong n = acb_mat_ncols(mat);
     slong i, j;
-    for (i = 0; i < k; i++)
+
+    for (i = 0; i < acb_mat_nrows(mat); i++)
     {
-        for (j = 0; j < n; j++)
+        for (j = 0; j < acb_mat_ncols(mat); j++)
         {
-            arb_add_error_arf(arb_mat_entry(mat, i, j), err);
+            acb_get_real(arb_mat_entry(re, i, j), acb_mat_entry(mat, i, j));
         }
     }
 }

@@ -9,29 +9,27 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb_theta.h"
+#include "acb_mat.h"
 
 void
-acb_mat_ninf(arb_t norm, const acb_mat_t mat, slong prec)
+acb_mat_inf_norm(arb_t res, const acb_mat_t A, slong prec)
 {
-    slong n = acb_mat_nrows(mat);
-    slong k = acb_mat_ncols(mat);
     arb_t abs, sum;
     slong i, j;
 
     arb_init(abs);
     arb_init(sum);
 
-    arb_zero(norm);
-    for (i = 0; i < n; i++)
+    arb_zero(res);
+    for (i = 0; i < acb_mat_nrows(A); i++)
     {
         arb_zero(sum);
-        for (j = 0; j < k; j++)
+        for (j = 0; j < acb_mat_ncols(A); j++)
         {
-            acb_abs(abs, acb_mat_entry(mat, i, j), prec);
+            acb_abs(abs, acb_mat_entry(A, i, j), prec);
             arb_add(sum, sum, abs, prec);
         }
-        arb_max(norm, norm, sum, prec);
+        arb_max(res, res, sum, prec);
     }
 
     arb_clear(abs);

@@ -100,6 +100,12 @@ void acb_mat_set_arb_mat(acb_mat_t dest, const arb_mat_t src);
 
 void acb_mat_set_round_arb_mat(acb_mat_t dest, const arb_mat_t src, slong prec);
 
+void acb_mat_get_real(arb_mat_t re, const acb_mat_t mat);
+
+void acb_mat_get_imag(arb_mat_t im, const acb_mat_t mat);
+
+void acb_mat_set_real_imag(acb_mat_t mat, const arb_mat_t re, const arb_mat_t im);
+
 /* Random generation */
 
 void acb_mat_randtest(acb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits);
@@ -210,6 +216,10 @@ acb_mat_conjugate_transpose(acb_mat_t mat1, const acb_mat_t mat2)
 }
 
 /* Norms */
+
+void acb_mat_max_norm(arb_t res, const acb_mat_t A, slong prec);
+
+void acb_mat_inf_norm(arb_t res, const acb_mat_t A, slong prec);
 
 void acb_mat_bound_inf_norm(mag_t b, const acb_mat_t A);
 

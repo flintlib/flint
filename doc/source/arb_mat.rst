@@ -100,6 +100,17 @@ Random generation
     Sets *mat* to a random matrix with up to *prec* bits of precision
     and with exponents of width up to *mag_bits*.
 
+.. function:: void arb_mat_randtest_cho(arb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits)
+
+    Sets *mat* to a random lower-triangular matrix with precise entries
+    and positive diagonal entries. Requires that *mat* is square.
+
+.. function:: void arb_mat_randtest_spd(arb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits)
+
+    Sets *mat* to a random symmetric positive definite matrix, obtained as a
+    product `L * L^T` where `L` is a random Cholesky matrix. Requires that
+    *mat* is square.
+
 Input and output
 -------------------------------------------------------------------------------
 
@@ -178,6 +189,14 @@ Predicate methods return 1 if the property certainly holds and 0 otherwise.
 
     Returns whether *mat* is a diagonal matrix; that is, all entries
     off the main diagonal are exactly zero.
+
+.. function:: int arb_mat_is_symmetric(const arb_mat_t mat)
+
+    Returns whether *mat* is certainly symmetric (in particular square).
+
+.. function:: int arb_mat_is_nonsymmetric(const arb_mat_t mat)
+
+    Returns whether *mat* is certainly not a symmetric matrix.
 
 Special matrices
 -------------------------------------------------------------------------------
@@ -258,10 +277,18 @@ Transpose
 Norms
 -------------------------------------------------------------------------------
 
+.. function:: void arb_mat_max_norm(arb_t res, const arb_mat_t A, slong prec)
+
+    Sets *res* to the maximum absolute value of the entries of *A*.
+
+.. function:: void arb_mat_inf_norm(arb_t res, const arb_mat_t A, slong prec)
+
+    Sets *res* to the infinity norm (i.e. the largest row sum of absolute
+    values) of *A*.
+
 .. function:: void arb_mat_bound_inf_norm(mag_t b, const arb_mat_t A)
 
-    Sets *b* to an upper bound for the infinity norm (i.e. the largest
-    absolute value row sum) of *A*.
+    Sets *b* to an upper bound for the infinity norm of *A*.
 
 .. function:: void arb_mat_frobenius_norm(arb_t res, const arb_mat_t A, slong prec)
 
@@ -749,11 +776,33 @@ Component and error operations
 
 .. function:: void arb_mat_add_error_mag(arb_mat_t mat, const mag_t err)
 
-    Adds *err* in-place to the radii of the entries of *mat*.
+.. function:: void arb_mat_add_error_arf(arb_mat_t mat, const arf_t err)
+
+    Adds the absolute value of *err* in-place to the radii of the entries of *mat*.
 
 Eigenvalues and eigenvectors
 -------------------------------------------------------------------------------
 
+.. function:: void arb_mat_spd_eig_lbound_arf(arf_t b, const arb_mat_t mat, slong prec)
+
+    Given a symmetric positive definite matrix *mat*, computes a crude lower
+    bound for its smallest eigenvalue.
+
+.. function:: void arb_mat_spd_neighborhood(arf_t r, const arb_mat_t mat, slong prec)
+
+    Given a symmetric positive definite matrix *mat*, returns a nonnegative *r*
+    (possibly zero) so that any symmetric matrix obtained from *mat* by adding
+    an error of at most *r* to each coefficient is still positive definite.
+
 To compute eigenvalues and eigenvectors, one can convert to an
 :type:`acb_mat_t` and use the functions in :ref:`acb_mat.h: Eigenvalues and eigenvectors<acb-mat-eigenvalues>`.
-In the future dedicated methods for real matrices will be added here.
+In the future, further dedicated methods for real matrices will be added here.
+
+LLL reduction
+-------------------------------------------------------------------------------
+
+.. function:: arb_mat_spd_lll_reduce(fmpz_mat_t U, const arb_mat_t A, slong prec)
+
+    Given a symmetric positive definite matrix *A*, compute a unimodular
+    transformation *U* such that *U^T A U* is close to being LLL-reduced. This
+    relies on FLINT's implementation of the LLL algorithm.

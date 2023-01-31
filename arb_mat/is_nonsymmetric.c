@@ -9,19 +9,24 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb_theta.h"
+#include "arb_mat.h"
 
-void
-arb_mat_pos_lambda(arb_t lambda, const arb_mat_t mat, slong prec)
+int
+arb_mat_is_nonsymmetric(const arb_mat_t mat)
 {
-    arb_poly_t poly;
+    arb_mat_t tp;
+    slong nrows = arb_mat_nrows(mat);
+    int res;
 
-    arb_poly_init(poly);
+    if (nrows != arb_mat_ncols(mat))
+    {
+        return 1;
+    }
 
-    arb_mat_charpoly(poly, mat, prec);
-    arb_div(lambda, arb_poly_get_coeff_ptr(poly, 0),
-            arb_poly_get_coeff_ptr(poly, 1), prec);
-    arb_neg(lambda, lambda);
+    arb_mat_init(tp, nrows, nrows);
+    arb_mat_transpose(tp, mat);
+    res = !arb_mat_overlaps(tp, mat);
+    arb_mat_clear(tp);
 
-    arb_poly_clear(poly);
+    return res;
 }

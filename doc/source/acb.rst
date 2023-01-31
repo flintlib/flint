@@ -210,6 +210,11 @@ Random number generation
     Generates a random complex number, with very high probability of
     generating integers and half-integers.
 
+.. function:: void acb_urandom(acb_t z, flint_rand_t state, slong prec)
+
+    Generates a random complex number with precise real and imaginary parts,
+    uniformly chosen in the unit disk.
+
 Precision and comparisons
 -------------------------------------------------------------------------------
 

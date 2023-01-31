@@ -349,6 +349,10 @@ Random number generation
     Generates a random number with radius around `2^{-\text{prec}}`
     the magnitude of the midpoint.
 
+.. function:: void arb_randtest_positive(arb_t x, flint_rand_t state, slong prec, slong mag_bits)
+
+    Generates a random precise number which is guaranteed to be positive.
+
 .. function:: void arb_randtest_wide(arb_t x, flint_rand_t state, slong prec, slong mag_bits)
 
     Generates a random number with midpoint and radius chosen independently,

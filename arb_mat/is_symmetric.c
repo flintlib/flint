@@ -9,20 +9,24 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb_theta.h"
+#include "arb_mat.h"
 
-void
-acb_mat_get_real(arb_mat_t re, const acb_mat_t mat)
+int
+arb_mat_is_symmetric(const arb_mat_t mat)
 {
-    slong nrows = acb_mat_nrows(mat);
-    slong ncols = acb_mat_ncols(mat);
-    slong i, j;
+    arb_mat_t tp;
+    slong nrows = arb_mat_nrows(mat);
+    int res;
 
-    for (i = 0; i < nrows; i++)
+    if (nrows != arb_mat_ncols(mat))
     {
-        for (j = 0; j < ncols; j++)
-        {
-            acb_get_real(arb_mat_entry(re, i, j), acb_mat_entry(mat, i, j));
-        }
+        return 0;
     }
+
+    arb_mat_init(tp, nrows, nrows);
+    arb_mat_transpose(tp, mat);
+    res = arb_mat_eq(tp, mat);
+    arb_mat_clear(tp);
+
+    return res;
 }

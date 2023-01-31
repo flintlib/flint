@@ -39,6 +39,7 @@ The following authors have developed major new features.
 * Pascal Molin - discrete Fourier transform (DFT), Dirichlet characters, Dirichlet L-functions, discrete logarithm computation
 * Alex Griffing - sinc function, matrix trace, improved matrix squaring, boolean matrices, improved structured matrix exponentials, Cholesky decomposition, miscellaneous patches
 * Marc Mezzarobba - fast evaluation of Legendre polynomials, work on Arb interface in Sage, bug reports, feedback
+* Jean Kieffer - Riemann theta functions in higher dimensions
 
 Several people have contributed patches, bug reports, or substantial feedback.
 This list (ordered by time of first contribution) is probably incomplete.

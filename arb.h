@@ -330,6 +330,8 @@ void arb_randtest_wide(arb_t x, flint_rand_t state, slong prec, slong mag_bits);
 
 void arb_randtest_precise(arb_t x, flint_rand_t state, slong prec, slong mag_bits);
 
+void arb_randtest_positive(arb_t x, flint_rand_t state, slong prec, slong mag_bits);
+
 void arb_randtest(arb_t x, flint_rand_t state, slong prec, slong mag_bits);
 
 void arb_randtest_special(arb_t x, flint_rand_t state, slong prec, slong mag_bits);

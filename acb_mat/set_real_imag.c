@@ -9,19 +9,19 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb_theta.h"
+#include "acb_mat.h"
 
 void
-arb_mat_randtest_sym_pos(arb_mat_t mat, flint_rand_t state, slong prec,
-                         slong mag_bits)
+acb_mat_set_real_imag(acb_mat_t mat, const arb_mat_t re, const arb_mat_t im)
 {
-    slong g = arb_mat_nrows(mat);
-    arb_mat_t tp;
+    slong i, j;
 
-    arb_mat_init(tp, g, g);
-    arb_mat_randtest_cho(mat, state, prec, mag_bits);
-    arb_mat_transpose(tp, mat);
-    arb_mat_mul(mat, tp, mat, prec);
-
-    arb_mat_clear(tp);
+    for (i = 0; i < acb_mat_nrows(re); i++)
+    {
+        for (j = 0; j < acb_mat_ncols(re); j++)
+        {
+            acb_set_arb_arb(acb_mat_entry(mat, i, j),
+                            arb_mat_entry(re, i, j), arb_mat_entry(im, i, j));
+        }
+    }
 }
