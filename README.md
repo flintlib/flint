@@ -152,7 +152,7 @@ and contains a high-level Python interface. See the SageMath documentation
 for RealBallField (http://doc.sagemath.org/html/en/reference/rings_numerical/sage/rings/real_arb.html)
 and ComplexBallField (http://doc.sagemath.org/html/en/reference/rings_numerical/sage/rings/complex_arb.html).
 
-Nemo (<http://nemocas.org/>) is a computer algebra package for
+Nemo (<https://github.com/Nemocas/Nemo.jl/>) is a computer algebra package for
 the Julia programming language which includes a high-level
 Julia interface to Arb. The Nemo installation script will
 create a local installation of Arb along with other dependencies.

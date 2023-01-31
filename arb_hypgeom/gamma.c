@@ -294,14 +294,27 @@ void
 arb_hypgeom_gamma_stirling(arb_t y, const arb_t x, int reciprocal, slong prec)
 {
     int reflect;
-    slong r, n, wp;
+    slong r, n, wp, ebits;
     arb_t t, u, v;
     double acc;
 
-    /* todo: for large x (if exact or accurate enough), increase precision */
+    /* for large x (if exact or accurate enough), increase precision */
+    if (arf_cmpabs_2exp_si(arb_midref(x), 3) > 0)
+    {
+        ebits = ARF_EXP(arb_midref(x));
+
+        if (COEFF_IS_MPZ(ebits) || ebits > 10 * prec + 4096)
+        {
+            arb_indeterminate(y);
+            return;
+        }
+    }
+    else
+        ebits = 0;
+
     acc = arb_rel_accuracy_bits(x);
     acc = FLINT_MAX(acc, 0);
-    wp = FLINT_MIN(prec, acc + 20);
+    wp = FLINT_MIN(prec + ebits, acc + 20);
     wp = FLINT_MAX(wp, 2);
     wp = wp + FLINT_BIT_COUNT(wp);
 
@@ -372,14 +385,14 @@ arb_hypgeom_gamma_stirling(arb_t y, const arb_t x, int reciprocal, slong prec)
         {
             /* rgamma(x) = rf(x,r) rgamma(x+r) */
             arb_neg(u, u);
-            arb_exp(u, u, prec);
+            arb_exp(u, u, wp);
             arb_hypgeom_rising_ui_rec(v, x, r, wp);
             arb_mul(y, v, u, prec);
         }
         else
         {
             /* gamma(x) = gamma(x+r) / rf(x,r) */
-            arb_exp(u, u, prec);
+            arb_exp(u, u, wp);
             arb_hypgeom_rising_ui_rec(v, x, r, wp);
             arb_div(y, u, v, prec);
         }

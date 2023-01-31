@@ -31,13 +31,15 @@ fmpzi_divrem(fmpzi_t q, fmpzi_t r, const fmpzi_t x, const fmpzi_t y)
     if (xbits == 0)
     {
         fmpzi_zero(q);
-        fmpzi_zero(r);
+        if (r != NULL)
+            fmpzi_zero(r);
         return;
     }
 
     if (xbits < ybits - 2)
     {
-        fmpzi_set(r, x);
+        if (r != NULL)
+            fmpzi_set(r, x);
         fmpzi_zero(q);
         return;
     }

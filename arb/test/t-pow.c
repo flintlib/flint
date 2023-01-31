@@ -10,6 +10,7 @@
 */
 
 #include "arb.h"
+#include "flint/double_extras.h"
 
 int main()
 {
@@ -107,6 +108,78 @@ int main()
         arb_clear(d);
         arb_clear(e);
         arb_clear(f);
+    }
+
+    for (iter = 0; iter < 1000 * arb_test_multiplier(); iter++)
+    {
+        ulong n, prec;
+        double epsilon, delta;
+        arb_t a, b, c, d;
+
+        arb_init(a);
+        arb_init(b);
+        arb_init(c);
+        arb_init(d);
+
+        prec = 2 + n_randint(state, 100);
+
+        mag_randtest(arb_radref(a), state, 1 + n_randint(state, 1000));
+        arf_set_mag(arb_midref(a), arb_radref(a));
+
+        n = 1 + n_randint(state, 100);
+        epsilon = d_randtest(state) / 16; /* 1/32 <= epsilon < 1/16 */
+        if (n_randint(state, 2))
+            epsilon = -epsilon;
+        delta = d_randtest(state) / 4; /* 1/8 <= delta < 1/4 */
+        arf_set_d(arb_midref(b), n + epsilon);
+        mag_set_d(arb_radref(b), delta);
+
+        arb_pow(c, a, b, prec);
+        arb_pow_ui(d, a, n, prec);
+
+        if (!arb_overlaps(c, d))
+        {
+            flint_printf("FAIL: interval from zero\n\n");
+            flint_printf("a = "); arb_print(a); flint_printf("\n\n");
+            flint_printf("n = %d\n\n", n);
+            flint_printf("b = "); arb_print(b); flint_printf("\n\n");
+            flint_printf("c = "); arb_print(c); flint_printf("\n\n");
+            flint_printf("d = "); arb_print(d); flint_printf("\n\n");
+            flint_abort();
+        }
+
+        arb_set(c, a);
+        arb_pow(c, c, b, prec);
+
+        if (!arb_overlaps(c, d))
+        {
+            flint_printf("FAIL: interval from zero; alias 1\n\n");
+            flint_printf("a = "); arb_print(a); flint_printf("\n\n");
+            flint_printf("n = %d\n\n", n);
+            flint_printf("b = "); arb_print(b); flint_printf("\n\n");
+            flint_printf("c = "); arb_print(c); flint_printf("\n\n");
+            flint_printf("d = "); arb_print(d); flint_printf("\n\n");
+            flint_abort();
+        }
+
+        arb_set(c, b);
+        arb_pow(c, a, c, prec);
+        
+        if (!arb_overlaps(c, d))
+        {
+            flint_printf("FAIL: interval from zero; alias 2\n\n");
+            flint_printf("a = "); arb_print(a); flint_printf("\n\n");
+            flint_printf("n = %d\n\n", n);
+            flint_printf("b = "); arb_print(b); flint_printf("\n\n");
+            flint_printf("c = "); arb_print(c); flint_printf("\n\n");
+            flint_printf("d = "); arb_print(d); flint_printf("\n\n");
+            flint_abort();
+        }
+
+        arb_clear(d);
+        arb_clear(c);
+        arb_clear(b);
+        arb_clear(a);
     }
 
     flint_randclear(state);

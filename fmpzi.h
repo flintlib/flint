@@ -193,6 +193,8 @@ fmpzi_canonicalise_unit(fmpzi_t res, const fmpzi_t x)
 void fmpzi_divrem(fmpzi_t q, fmpzi_t r, const fmpzi_t x, const fmpzi_t y);
 void fmpzi_divrem_approx(fmpzi_t q, fmpzi_t r, const fmpzi_t x, const fmpzi_t y);
 
+void fmpzi_divexact(fmpzi_t q, const fmpzi_t x, const fmpzi_t y);
+
 slong fmpzi_remove_one_plus_i(fmpzi_t res, const fmpzi_t x);
 
 /* GCD */

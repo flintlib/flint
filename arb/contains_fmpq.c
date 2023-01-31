@@ -37,7 +37,7 @@ arb_contains_fmpq(const arb_t x, const fmpq_t y)
 
         /* y >= xm - xr  <=>  0 >= xm - xr - y */
         arf_init_set_shallow(tmp + 0, xm);
-        arf_init_neg_shallow(tmp + 1,  xr);
+        arf_init_neg_shallow(tmp + 1, xr);
         arf_init_neg_shallow(tmp + 2, ym);
 
         arf_sum(t, tmp, 3, 30, ARF_RND_DOWN);

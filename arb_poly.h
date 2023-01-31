@@ -31,8 +31,8 @@ extern "C" {
 typedef struct
 {
     arb_ptr coeffs;
-    slong length;
     slong alloc;
+    slong length;
 }
 arb_poly_struct;
 

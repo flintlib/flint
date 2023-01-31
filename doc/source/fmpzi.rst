@@ -98,6 +98,11 @@ Arithmetic
 Division
 -------------------------------------------------------------------------------
 
+.. function:: void fmpzi_divexact(fmpzi_t q, const fmpzi_t x, const fmpzi_t y)
+
+    Sets *q* to the quotient of *x* and *y*, assuming that the
+    division is exact.
+
 .. function:: void fmpzi_divrem(fmpzi_t q, fmpzi_t r, const fmpzi_t x, const fmpzi_t y)
 
     Computes a quotient and remainder satisfying

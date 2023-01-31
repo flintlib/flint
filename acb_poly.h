@@ -29,8 +29,8 @@ extern "C" {
 typedef struct
 {
     acb_ptr coeffs;
-    slong length;
     slong alloc;
+    slong length;
 }
 acb_poly_struct;
 

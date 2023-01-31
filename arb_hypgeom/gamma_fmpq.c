@@ -91,7 +91,9 @@ arb_hypgeom_gamma_fmpq_stirling(arb_t y, const fmpq_t a, slong prec)
     slong r, n, wp;
     arb_t x, t, u, v;
 
-    wp = prec + FLINT_BIT_COUNT(prec);
+    wp = (slong) fmpz_bits(fmpq_numref(a)) - (slong) fmpz_bits(fmpq_denref(a));
+    wp = FLINT_MAX(wp, 0);
+    wp += prec + FLINT_BIT_COUNT(prec);
 
     arb_init(x);
     arb_init(t);
@@ -684,7 +686,7 @@ arb_hypgeom_gamma_fmpq(arb_t y, const fmpq_t x, slong prec)
 
         wp = (slong) fmpz_bits(fmpq_numref(x)) - (slong) fmpz_bits(fmpq_denref(x));
         wp = FLINT_MAX(wp, 0);
-        wp = FLINT_MIN(wp, 4 * prec);
+        wp = FLINT_MIN(wp, 10 * prec);
         wp += prec + 4;
 
         arb_set_fmpq(y, x, wp);
