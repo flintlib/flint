@@ -3,17 +3,23 @@
 
 static slong
 get_power_of_i(const acb_t x)
-{    
-    if (arb_is_positive(acb_realref(x))) return 0;
-    else if (arb_is_positive(acb_imagref(x))) return 1;
-    else if (arb_is_negative(acb_realref(x))) return 2;
-    else if (arb_is_negative(acb_imagref(x))) return 3;
-    else return -1;
+{
+    if (arb_is_positive(acb_realref(x)))
+        return 0;
+    else if (arb_is_positive(acb_imagref(x)))
+        return 1;
+    else if (arb_is_negative(acb_realref(x)))
+        return 2;
+    else if (arb_is_negative(acb_imagref(x)))
+        return 3;
+    else
+        return -1;
 }
 
-slong acb_theta_k2(const fmpz_mat_t mat)
+slong
+acb_theta_k2(const fmpz_mat_t mat)
 {
-    slong g = acb_mat_nrows(mat)/2;
+    slong g = acb_mat_nrows(mat) / 2;
     fmpz_mat_t inv;
     acb_mat_t tau;
     acb_mat_t w;
@@ -25,7 +31,7 @@ slong acb_theta_k2(const fmpz_mat_t mat)
     slong prec = 50;
     int stop = 0;
 
-    fmpz_mat_init(inv, 2*g, 2*g);
+    fmpz_mat_init(inv, 2 * g, 2 * g);
     acb_mat_init(tau, g, g);
     acb_mat_init(w, g, g);
     fmpz_init(eps);
@@ -46,7 +52,7 @@ slong acb_theta_k2(const fmpz_mat_t mat)
         }
         acb_theta_naive_ind_const(scal1, 0, tau, prec);
         acb_sqr(scal1, scal1, prec);
-        
+
         acb_siegel_cocycle(w, mat, tau, prec);
         acb_siegel_transform(tau, mat, tau, prec);
         acb_theta_naive_ind_const(scal2, ab, tau, prec);

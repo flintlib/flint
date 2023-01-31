@@ -9,13 +9,13 @@ acb_theta_bound_const(arf_t rad, arf_t bound, const acb_mat_t tau, slong prec)
     acb_mat_t pert;
     arb_t lambda;
     slong j, k;
-  
+
     arb_mat_init(im, g, g);
     acb_mat_init(pert, g, g);
     arb_init(lambda);
 
     acb_mat_get_imag(im, tau);
-  
+
     /* Get lower bound on radius around tau */
     arb_mat_pos_radius(rad, im, prec);
     arf_mul_2exp_si(rad, rad, -1);
@@ -24,7 +24,8 @@ acb_theta_bound_const(arf_t rad, arf_t bound, const acb_mat_t tau, slong prec)
     acb_mat_set(pert, tau);
     for (j = 0; j < g; j++)
     {
-        for (k = 0; k < g; k++) acb_add_error_arf(acb_mat_entry(pert,j,k), rad);
+        for (k = 0; k < g; k++)
+            acb_add_error_arf(acb_mat_entry(pert, j, k), rad);
     }
     acb_mat_get_imag(im, pert);
     arb_mat_pos_lambda(lambda, im, prec);

@@ -3,7 +3,7 @@
 
 void
 acb_randtest_disk(acb_t x, const acb_t ctr, const arf_t rad,
-	flint_rand_t state, slong prec)
+                  flint_rand_t state, slong prec)
 {
     arb_t half;
     arb_t err;
@@ -27,7 +27,7 @@ acb_randtest_disk(acb_t x, const acb_t ctr, const arf_t rad,
     arb_sub(err, err, half, prec);
     arb_mul_arf(err, err, rad, prec);
     arb_add(acb_imagref(x), acb_imagref(x), err, prec);
-  
+
     arb_clear(half);
     arb_clear(err);
     acb_clear(diff);

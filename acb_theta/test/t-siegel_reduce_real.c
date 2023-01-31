@@ -1,7 +1,8 @@
 
 #include "acb_theta.h"
 
-int main()
+int
+main()
 {
     slong iter;
     flint_rand_t state;
@@ -13,42 +14,42 @@ int main()
 
     /* Test: real part <= 1 in large precision */
     for (iter = 0; iter < 500 * arb_test_multiplier(); iter++)
-    {	
-	slong g = 1 + n_randint(state, 4);
-	slong prec = 100 + n_randint(state, 500);
-	slong mag_bits = 1 + n_randint(state, 5);
+    {
+        slong g = 1 + n_randint(state, 4);
+        slong prec = 100 + n_randint(state, 500);
+        slong mag_bits = 1 + n_randint(state, 5);
 
-	acb_mat_t tau;
-	fmpz_mat_t m;
-	arb_t test;
+        acb_mat_t tau;
+        fmpz_mat_t m;
+        arb_t test;
 
-	acb_mat_init(tau, g, g);
-	fmpz_mat_init(m, 2*g, 2*g);
-	arb_init(test);
+        acb_mat_init(tau, g, g);
+        fmpz_mat_init(m, 2 * g, 2 * g);
+        arb_init(test);
 
-	acb_siegel_randtest(tau, state, prec, mag_bits);
-	acb_siegel_reduce_real(m, tau, prec);
-	acb_siegel_transform(tau, m, tau, prec);
+        acb_siegel_randtest(tau, state, prec, mag_bits);
+        acb_siegel_reduce_real(m, tau, prec);
+        acb_siegel_transform(tau, m, tau, prec);
 
-	arb_abs(test, acb_realref(acb_mat_entry(tau, 0, 0)));
-	arb_sub_si(test, test, 1, prec);
-	if (arb_is_positive(test))
-	{
-	    flint_printf("FAIL (not reduced)\n");
-	    acb_mat_printd(tau, 10);
-	    fmpz_mat_print_pretty(m); flint_printf("\n");
-	    fflush(stdout);
-	    flint_abort();
-	}
-		
-	acb_mat_clear(tau);
-	fmpz_mat_clear(m);
-	arb_clear(test);
-	
+        arb_abs(test, acb_realref(acb_mat_entry(tau, 0, 0)));
+        arb_sub_si(test, test, 1, prec);
+        if (arb_is_positive(test))
+        {
+            flint_printf("FAIL (not reduced)\n");
+            acb_mat_printd(tau, 10);
+            fmpz_mat_print_pretty(m);
+            flint_printf("\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        acb_mat_clear(tau);
+        fmpz_mat_clear(m);
+        arb_clear(test);
+
     }
     flint_randclear(state);
     flint_cleanup();
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
-

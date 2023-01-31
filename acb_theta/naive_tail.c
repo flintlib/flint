@@ -3,7 +3,7 @@
 
 void
 acb_theta_naive_tail(arf_t bound, const arf_t R2, const arb_mat_t Y, slong ord,
-        slong prec)
+                     slong prec)
 {
     arb_t res, temp;
     arb_t Rmod;
@@ -13,18 +13,18 @@ acb_theta_naive_tail(arf_t bound, const arf_t R2, const arb_mat_t Y, slong ord,
     arb_init(res);
     arb_init(temp);
     arb_init(Rmod);
-  
+
     /* Ensure assumptions R2\geq 4, R2\geq 2*ord are satisfied */
     arb_set_arf(Rmod, R2);
-    arb_set_si(temp, FLINT_MAX(4, 2*ord));
+    arb_set_si(temp, FLINT_MAX(4, 2 * ord));
     arb_max(Rmod, Rmod, temp, prec);
-  
+
     /* Evaluate upper bound on tail */
     arb_one(res);
-    arb_mul_2exp_si(res, res, 2*g+2);
+    arb_mul_2exp_si(res, res, 2 * g + 2);
 
     arb_sqrt(temp, Rmod, prec);
-    arb_pow_ui(temp, temp, g-1+2*ord, prec);
+    arb_pow_ui(temp, temp, g - 1 + 2 * ord, prec);
     arb_mul(res, res, temp, prec);
 
     arb_neg(temp, Rmod);
@@ -38,7 +38,7 @@ acb_theta_naive_tail(arf_t bound, const arf_t R2, const arb_mat_t Y, slong ord,
         arb_mul(res, res, temp, prec);
     }
     arb_get_ubound_arf(bound, res, prec);
-  
+
     arb_clear(res);
     arb_clear(temp);
     arb_clear(Rmod);

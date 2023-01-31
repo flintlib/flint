@@ -15,7 +15,7 @@ acb_theta_agm_nb_good_steps(const arf_t c, const arf_t r, slong prec)
     arb_init(temp);
     arf_init(b);
     fmpz_init(exp);
-    
+
     /* Solve for c * e^(2^k) * (1+cr)/(1-cr) * 1/(1-r) <= 2^(-prec) */
     arb_one(x);
     arb_mul_2exp_si(x, x, -prec);
@@ -29,7 +29,7 @@ acb_theta_agm_nb_good_steps(const arf_t c, const arf_t r, slong prec)
     arb_set_arf(temp, r);
     arb_sub_si(temp, temp, 1, lowprec);
     arb_mul(x, x, temp, lowprec);
-    
+
     arb_set_arf(temp, r);
     arb_mul_arf(temp, temp, c, lowprec);
     arb_add_si(temp, temp, 1, lowprec);
@@ -40,7 +40,7 @@ acb_theta_agm_nb_good_steps(const arf_t c, const arf_t r, slong prec)
     arb_log(temp, temp, lowprec);
     arb_div(x, x, temp, lowprec);
     arb_get_ubound_arf(b, x, lowprec);
-    
+
     if (!arf_is_finite(b))
     {
         flint_printf("agm_nb_good_steps: Error (infinite value)\n");
@@ -51,8 +51,8 @@ acb_theta_agm_nb_good_steps(const arf_t c, const arf_t r, slong prec)
     arf_frexp(b, exp, b);
     nb = fmpz_get_si(exp);
 
-    /* flint_printf("(agm_nb_good_steps) Make %wd good steps\n", nb);*/
-    
+    /* flint_printf("(agm_nb_good_steps) Make %wd good steps\n", nb); */
+
     arb_clear(x);
     arb_clear(temp);
     arf_clear(b);

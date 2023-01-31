@@ -1,14 +1,15 @@
 
 #include "acb_theta.h"
 
-int main()
+int
+main()
 {
     slong iter;
     flint_rand_t state;
-  
+
     flint_printf("agm_ctx_set....");
     fflush(stdout);
-  
+
     flint_randinit(state);
 
     /* Test: agm context must be valid for g=1, 2 and tau in fundamental domain */
@@ -32,30 +33,31 @@ int main()
         _acb_vec_zero(z, g);
         arf_one(rad);
         arf_mul_2exp_si(rad, rad, -4);
-        for (k = 0; k < g; k++) acb_randtest_disk(&z[k], &z[k], rad, state, prec);
-        
-        if (iter%2 == 0) acb_theta_agm_ctx_init(ctx, tau);
-        else acb_theta_agm_ctx_init_ext(ctx, z, tau);
-        
+        for (k = 0; k < g; k++)
+            acb_randtest_disk(&z[k], &z[k], rad, state, prec);
+
+        if (iter % 2 == 0)
+            acb_theta_agm_ctx_init(ctx, tau);
+        else
+            acb_theta_agm_ctx_init_ext(ctx, z, tau);
+
         res = acb_theta_agm_ctx_set(ctx, prec);
 
         if (!res)
-	{
+        {
             flint_printf("FAIL\n");
             fflush(stdout);
             flint_abort();
-	}
-      
+        }
+
         acb_mat_clear(tau);
         _acb_vec_clear(z, g);
         arf_clear(rad);
         acb_theta_agm_ctx_clear(ctx);
     }
-  
+
     flint_randclear(state);
     flint_cleanup();
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
-      
-  

@@ -3,7 +3,7 @@
 
 void
 acb_theta_dupl_radius(arf_t rho, const arf_t r, acb_srcptr th, slong nb,
-        slong prec)
+                      slong prec)
 {
     arb_t abs;
     arf_t bound, max;
@@ -12,7 +12,7 @@ acb_theta_dupl_radius(arf_t rho, const arf_t r, acb_srcptr th, slong nb,
     arb_init(abs);
     arf_init(bound);
     arf_init(max);
-    
+
     arf_zero(max);
     for (k = 0; k < nb; k++)
     {

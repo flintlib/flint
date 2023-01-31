@@ -1,7 +1,8 @@
 
 #include "acb_theta.h"
 
-int main()
+int
+main()
 {
     slong iter;
     flint_rand_t state;
@@ -21,13 +22,14 @@ int main()
         slong bits = 1 + n_randint(state, 10);
 
         fmpz_mat_init(U, g, g);
-        fmpz_mat_init(mat, 2*g, 2*g);
+        fmpz_mat_init(mat, 2 * g, 2 * g);
         fmpz_init(det);
 
         fmpz_mat_one(U);
-        if (iter%2 == 0) fmpz_set_si(fmpz_mat_entry(U, 0, 0), -1);
-        
-        fmpz_mat_randops(U, state, 2*bits);
+        if (iter % 2 == 0)
+            fmpz_set_si(fmpz_mat_entry(U, 0, 0), -1);
+
+        fmpz_mat_randops(U, state, 2 * bits);
         fmpz_mat_diag_sp(mat, U);
         fmpz_mat_det(det, U);
         k2 = acb_theta_k2(mat);
@@ -36,7 +38,8 @@ int main()
         if (k2 != 1 - fmpz_get_si(det))
         {
             flint_printf("FAIL\n");
-            fmpz_mat_print_pretty(mat); flint_printf("\n");
+            fmpz_mat_print_pretty(mat);
+            flint_printf("\n");
             flint_printf("k2: %wd\n", k2);
             fflush(stdout);
             flint_abort();
@@ -44,7 +47,7 @@ int main()
 
         fmpz_mat_clear(U);
         fmpz_mat_clear(mat);
-        fmpz_clear(det);        
+        fmpz_clear(det);
     }
 
     flint_randclear(state);

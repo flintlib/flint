@@ -3,7 +3,7 @@
 
 void
 acb_theta_agm_ext_conv_rate(arf_t c1, arf_t c2, arf_t r, const arf_t eps,
-        const arf_t m, const arf_t M, slong prec)
+                            const arf_t m, const arf_t M, slong prec)
 {
     arb_t M_arb, m_arb;
     arb_t temp;
@@ -16,17 +16,17 @@ acb_theta_agm_ext_conv_rate(arf_t c1, arf_t c2, arf_t r, const arf_t eps,
 
     arb_set_arf(M_arb, M);
     arb_set_arf(m_arb, m);
-    
+
     /* Get convergence rate of regular Borchardt */
     acb_theta_agm_conv_rate(c1, r, eps, prec);
-        
+
     /* Get lambda s.t. |u_0^(n+1) - v_0^n t_0^n| <= x_n:= lambda e^(2^(n-1)) */
     arb_div(res, M_arb, m_arb, prec);
     arb_sqrt(res, res, prec);
     arb_one(temp);
     arb_add_arf(temp, temp, r, prec);
     arb_mul(res, res, temp, prec);
-    
+
     arb_mul_arf(res, res, c1, prec);
     arb_mul_2exp_si(res, res, -1);
     arb_mul(res, res, M_arb, prec);
@@ -51,9 +51,9 @@ acb_theta_agm_ext_conv_rate(arf_t c1, arf_t c2, arf_t r, const arf_t eps,
     arb_div(res, res, temp, prec);
 
     arb_get_ubound_arf(c2, res, prec);
-    
+
     arb_clear(M_arb);
     arb_clear(m_arb);
     arb_clear(temp);
-    arb_clear(res);    
+    arb_clear(res);
 }

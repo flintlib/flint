@@ -1,9 +1,10 @@
 
 #include "acb_theta.h"
 
-void fmpz_mat_diag_sp(fmpz_mat_t mat, const fmpz_mat_t U)
+void
+fmpz_mat_diag_sp(fmpz_mat_t mat, const fmpz_mat_t U)
 {
-    slong g = fmpz_mat_nrows(mat)/2;
+    slong g = fmpz_mat_nrows(mat) / 2;
     fmpz_mat_t D, zero;
     fmpz_t den;
 
@@ -15,13 +16,13 @@ void fmpz_mat_diag_sp(fmpz_mat_t mat, const fmpz_mat_t U)
     fmpz_mat_transpose(D, D);
     if (!fmpz_is_one(den))
     {
-	fmpz_neg(den, den);
-	fmpz_mat_neg(D, D);
+        fmpz_neg(den, den);
+        fmpz_mat_neg(D, D);
     }
     if (!fmpz_is_one(den))
     {
-	flint_fprintf(stderr, "fmpz_mat_diag_sp: Error (not invertible)\n");
-	flint_abort();
+        flint_fprintf(stderr, "fmpz_mat_diag_sp: Error (not invertible)\n");
+        flint_abort();
     }
 
     fmpz_mat_set_abcd(mat, U, zero, zero, D);

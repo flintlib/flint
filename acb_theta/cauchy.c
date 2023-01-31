@@ -3,7 +3,7 @@
 
 void
 acb_theta_cauchy(arf_t bound_der, const arf_t rad, const arf_t bound,
-        slong ord, slong dim, slong prec)
+                 slong ord, slong dim, slong prec)
 {
     fmpz_t fac, bin;
     arb_t r, m;
@@ -16,11 +16,11 @@ acb_theta_cauchy(arf_t bound_der, const arf_t rad, const arf_t bound,
     arb_set_arf(r, rad);
     arb_set_arf(m, bound);
 
-    fmpz_bin_uiui(bin, ord+dim, dim);
+    fmpz_bin_uiui(bin, ord + dim, dim);
     fmpz_fac_ui(fac, ord);
     fmpz_mul(fac, fac, bin);
     fmpz_mul_2exp(fac, fac, ord);
-  
+
     arb_pow_ui(r, r, ord, prec);
     arb_div(r, m, r, prec);
     arb_mul_fmpz(r, r, fac, prec);

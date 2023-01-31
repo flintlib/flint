@@ -1,7 +1,8 @@
 
 #include "acb_theta.h"
 
-void acb_theta_agm_max_abs(arb_t max, acb_srcptr a, slong nb, slong prec)
+void
+acb_theta_agm_max_abs(arb_t max, acb_srcptr a, slong nb, slong prec)
 {
     arb_t abs;
     slong k;

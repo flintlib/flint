@@ -1,14 +1,15 @@
 
 #include "acb_theta.h"
 
-int main()
+int
+main()
 {
     slong iter;
     flint_rand_t state;
-  
+
     flint_printf("agm_conv_rate....");
     fflush(stdout);
-  
+
     flint_randinit(state);
 
     /* Test: convergence rate works for first few steps */
@@ -17,7 +18,7 @@ int main()
         slong g = 1 + n_randint(state, 4);
         slong prec = 500 + n_randint(state, 1000);
         slong mag_bits = 1 + n_randint(state, 4);
-        slong n = 1<<g;
+        slong n = 1 << g;
         acb_ptr a;
         acb_t x;
         arf_t rad;
@@ -41,7 +42,8 @@ int main()
         arb_get_lbound_arf(rad, eps, prec);
 
         acb_one(x);
-        for (k = 0; k < n; k++) acb_randtest_disk(&a[k], x, rad, state, prec);
+        for (k = 0; k < n; k++)
+            acb_randtest_disk(&a[k], x, rad, state, prec);
         arb_randtest_pos(acb_realref(x), state, prec, mag_bits);
         _acb_vec_scalar_mul(a, a, n, x, prec);
 
@@ -64,22 +66,24 @@ int main()
 
             /* Get predicted error */
             arb_set_arf(abs, r);
-            arb_pow_ui(abs, abs, 1<<j, prec);
+            arb_pow_ui(abs, abs, 1 << j, prec);
             arb_mul_arf(abs, abs, c, prec);
 
             if (arb_lt(abs, eps))
             {
                 flint_printf("FAIL (error bound)\n");
                 flint_printf("At step %wd, predicted and real error \n", j);
-                arb_printd(abs, 10); flint_printf("\n");
-                arb_printd(eps, 10); flint_printf("\n");   
+                arb_printd(abs, 10);
+                flint_printf("\n");
+                arb_printd(eps, 10);
+                flint_printf("\n");
                 fflush(stdout);
                 flint_abort();
             }
-          
+
             acb_theta_agm_step_good(a, a, g, prec);
         }
-      
+
         _acb_vec_clear(a, n);
         acb_clear(x);
         arf_clear(rad);
@@ -94,7 +98,3 @@ int main()
     flint_printf("PASS\n");
     return EXIT_SUCCESS;
 }
-              
-
-      
-              

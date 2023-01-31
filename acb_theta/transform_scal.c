@@ -1,9 +1,11 @@
 
 #include "acb_theta.h"
 
-void acb_theta_transform_scal(acb_t scal_z, acb_t scal_0, acb_srcptr z,
-        const acb_mat_t tau, const fmpz_mat_t mat, slong k2, slong prec)
-{    
+void
+acb_theta_transform_scal(acb_t scal_z, acb_t scal_0, acb_srcptr z,
+                         const acb_mat_t tau, const fmpz_mat_t mat, slong k2,
+                         slong prec)
+{
     slong g = acb_mat_nrows(tau);
     fmpz_mat_t c;
     acb_mat_t w;
@@ -12,20 +14,20 @@ void acb_theta_transform_scal(acb_t scal_z, acb_t scal_0, acb_srcptr z,
     acb_t mu;
     acb_t det;
     slong k;
-    
+
     fmpz_mat_init(c, g, g);
     acb_mat_init(w, g, g);
     acb_mat_init(vec, g, 1);
     Nz = _acb_vec_init(g);
     acb_init(mu);
     acb_init(det);
-    
-    acb_onei(mu);    
-    acb_pow_si(mu, mu, k2, prec);    
+
+    acb_onei(mu);
+    acb_pow_si(mu, mu, k2, prec);
     acb_siegel_cocycle(w, mat, tau, prec);
     acb_mat_det(det, w, prec);
     acb_mul(scal_0, det, mu, prec);
-    
+
     acb_siegel_transform_ext(Nz, w, mat, z, tau, prec);
     fmpz_mat_get_c(c, mat);
     acb_mat_set_fmpz_mat(w, c);
@@ -41,8 +43,8 @@ void acb_theta_transform_scal(acb_t scal_z, acb_t scal_0, acb_srcptr z,
     }
     acb_mul_2exp_si(det, det, 1);
     acb_exp_pi_i(det, det, prec);
-    acb_mul(scal_z, scal_0, det, prec);    
-    
+    acb_mul(scal_z, scal_0, det, prec);
+
     fmpz_mat_clear(c);
     acb_mat_clear(w);
     acb_mat_clear(vec);

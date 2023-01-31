@@ -1,7 +1,8 @@
 
 #include "acb_theta.h"
 
-void acb_siegel_reduce_imag(fmpz_mat_t mat, const acb_mat_t tau, slong prec)
+void
+acb_siegel_reduce_imag(fmpz_mat_t mat, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     arb_mat_t im;

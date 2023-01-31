@@ -1,10 +1,11 @@
 
 #include "acb_theta.h"
 
-void acb_theta_agm_ext_step_last(acb_t r, const acb_t s, acb_srcptr a, slong g,
-        slong prec)
+void
+acb_theta_agm_ext_step_last(acb_t r, const acb_t s, acb_srcptr a, slong g,
+                            slong prec)
 {
-    slong n = 1<<g;
+    slong n = 1 << g;
     slong k;
     acb_t res;
     acb_t temp;

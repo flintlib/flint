@@ -1,8 +1,8 @@
 
 #include "acb_theta.h"
 
-slong acb_theta_agm_ext_nb_bad_steps(acb_srcptr z, const acb_mat_t tau,
-        slong prec)
+slong
+acb_theta_agm_ext_nb_bad_steps(acb_srcptr z, const acb_mat_t tau, slong prec)
 {
     arb_mat_t im;
     arb_t lambda;
@@ -14,7 +14,7 @@ slong acb_theta_agm_ext_nb_bad_steps(acb_srcptr z, const acb_mat_t tau,
     slong g = acb_mat_nrows(tau);
     slong k;
     slong res;
-  
+
     arb_mat_init(im, g, g);
     arb_init(lambda);
     arb_init(lambda0);
@@ -31,7 +31,7 @@ slong acb_theta_agm_ext_nb_bad_steps(acb_srcptr z, const acb_mat_t tau,
 
     /* Set lambda0 such that 3g exp(-lambda0) = 1/50 */
     arb_one(lambda0);
-    arb_div_si(lambda0, lambda0, 150*g, prec);
+    arb_div_si(lambda0, lambda0, 150 * g, prec);
     arb_log(lambda0, lambda0, prec);
     arb_neg(lambda0, lambda0);
 
@@ -48,7 +48,7 @@ slong acb_theta_agm_ext_nb_bad_steps(acb_srcptr z, const acb_mat_t tau,
     arb_max(lambda0, lambda0, norm, prec);
 
     /* Compute n, minimal s.t. 2^n lambda > 2lambda0 */
-    arb_div(lambda, lambda0, lambda, prec);  
+    arb_div(lambda, lambda0, lambda, prec);
     arb_get_ubound_arf(up, lambda, prec);
 
     if (!arf_is_finite(up))
@@ -57,10 +57,10 @@ slong acb_theta_agm_ext_nb_bad_steps(acb_srcptr z, const acb_mat_t tau,
         fflush(stdout);
         flint_abort();
     }
-    
+
     arf_frexp(up, e, up);
     res = fmpz_get_si(e) + 1;
-    
+
     arb_mat_clear(im);
     arb_clear(lambda);
     arb_clear(lambda0);
@@ -68,5 +68,5 @@ slong acb_theta_agm_ext_nb_bad_steps(acb_srcptr z, const acb_mat_t tau,
     arb_clear(temp);
     arf_clear(up);
     fmpz_clear(e);
-    return res;    
+    return res;
 }

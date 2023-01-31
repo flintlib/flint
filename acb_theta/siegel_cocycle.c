@@ -3,9 +3,9 @@
 
 void
 acb_siegel_cocycle(acb_mat_t res, const fmpz_mat_t mat, const acb_mat_t tau,
-	slong prec)
+                   slong prec)
 {
-    slong g = fmpz_mat_nrows(mat)/2;
+    slong g = fmpz_mat_nrows(mat) / 2;
     fmpz_mat_t cd;
     acb_mat_t r, s;
 

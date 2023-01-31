@@ -4,7 +4,7 @@
 int
 fmpz_mat_is_sp(const fmpz_mat_t mat)
 {
-    slong g = fmpz_mat_nrows(mat)/2;
+    slong g = fmpz_mat_nrows(mat) / 2;
     fmpz_mat_t a, b, c, d;
     fmpz_mat_t prod1, prod2;
     int res;
@@ -48,6 +48,6 @@ fmpz_mat_is_sp(const fmpz_mat_t mat)
     fmpz_mat_clear(d);
     fmpz_mat_clear(prod1);
     fmpz_mat_clear(prod2);
-  
+
     return res;
 }

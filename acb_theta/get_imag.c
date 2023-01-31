@@ -10,9 +10,9 @@ acb_mat_get_imag(arb_mat_t re, const acb_mat_t mat)
 
     for (i = 0; i < nrows; i++)
     {
-	for (j = 0; j < ncols; j++)
-	{
-	    acb_get_imag(arb_mat_entry(re, i, j), acb_mat_entry(mat, i, j));
-	}
+        for (j = 0; j < ncols; j++)
+        {
+            acb_get_imag(arb_mat_entry(re, i, j), acb_mat_entry(mat, i, j));
+        }
     }
 }

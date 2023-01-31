@@ -1,8 +1,9 @@
 
 #include "acb_theta.h"
 
-slong acb_theta_agm_nb_bad_steps(const acb_mat_t tau, slong prec)
-{  
+slong
+acb_theta_agm_nb_bad_steps(const acb_mat_t tau, slong prec)
+{
     arb_mat_t im;
     arb_t lambda;
     arb_t lambda0;
@@ -10,7 +11,7 @@ slong acb_theta_agm_nb_bad_steps(const acb_mat_t tau, slong prec)
     fmpz_t e;
     slong g = acb_mat_nrows(tau);
     slong res;
-  
+
     arb_mat_init(im, g, g);
     arb_init(lambda);
     arb_init(lambda0);
@@ -25,24 +26,24 @@ slong acb_theta_agm_nb_bad_steps(const acb_mat_t tau, slong prec)
 
     /* Set lambda0 such that 3g exp(-lambda0) = 1/50 */
     arb_one(lambda0);
-    arb_div_si(lambda0, lambda0, 150*g, prec);
+    arb_div_si(lambda0, lambda0, 150 * g, prec);
     arb_log(lambda0, lambda0, prec);
     arb_neg(lambda0, lambda0);
 
     /* Compute n, minimal s.t. 2^n lambda > lambda0 */
-    arb_div(lambda, lambda0, lambda, prec);  
+    arb_div(lambda, lambda0, lambda, prec);
     arb_get_ubound_arf(up, lambda, prec);
-    
+
     if (!arf_is_finite(up))
     {
         flint_printf("agm_nb_bad_steps: Error (infinite value)\n");
         fflush(stdout);
         flint_abort();
     }
-    
+
     arf_frexp(up, e, up);
     res = fmpz_get_si(e);
-    
+
     arb_mat_clear(im);
     arb_clear(lambda);
     arb_clear(lambda0);

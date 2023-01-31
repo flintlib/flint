@@ -10,33 +10,31 @@
 #include "arb_mat.h"
 #include "acb_mat.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 /* Extras for arb_mat's and acb_mat's */
 
 void arb_randtest_pos(arb_t x, flint_rand_t state, slong prec, slong mag_bits);
 
 void acb_randtest_disk(acb_t x, const acb_t ctr, const arf_t rad,
-	flint_rand_t state, slong prec);
+    flint_rand_t state, slong prec);
 
 void acb_mat_get_real(arb_mat_t re, const acb_mat_t mat);
 
 void acb_mat_get_imag(arb_mat_t im, const acb_mat_t mat);
 
 void acb_mat_set_arb_arb(acb_mat_t mat, const arb_mat_t re,
-	const arb_mat_t im);
+    const arb_mat_t im);
 
 void arb_mat_add_error_arf(arb_mat_t mat, const arf_t err);
 
 void arb_mat_randtest_cho(arb_mat_t mat, flint_rand_t state, slong prec,
-	slong mag_bits);
+    slong mag_bits);
 
 void arb_mat_randtest_sym_pos(arb_mat_t mat, flint_rand_t state, slong prec,
-	slong mag_bits);
+    slong mag_bits);
 
 int arb_mat_is_nonsymmetric(const arb_mat_t mat);
 
@@ -47,7 +45,6 @@ void arb_mat_pos_radius(arf_t rad, const arb_mat_t mat, slong prec);
 void arb_mat_reduce(fmpz_mat_t U, const arb_mat_t M, slong prec);
 
 void acb_mat_ninf(arb_t norm, const acb_mat_t mat, slong prec);
-
 
 /* Extras for fmpz_mat's */
 
@@ -60,7 +57,7 @@ void fmpz_mat_get_c(fmpz_mat_t res, const fmpz_mat_t mat);
 void fmpz_mat_get_d(fmpz_mat_t res, const fmpz_mat_t mat);
 
 void fmpz_mat_set_abcd(fmpz_mat_t mat, const fmpz_mat_t a, const fmpz_mat_t b,
-	const fmpz_mat_t c, const fmpz_mat_t d);
+    const fmpz_mat_t c, const fmpz_mat_t d);
 
 void fmpz_mat_J(fmpz_mat_t mat);
 
@@ -80,34 +77,32 @@ slong fmpz_mat_nb_siegel_fund(slong g);
 
 void fmpz_mat_siegel_fund(fmpz_mat_t mat, slong j);
 
-
 /* Siegel space */
 
 void acb_siegel_randtest(acb_mat_t tau, flint_rand_t state, slong prec,
-	slong mag_bits);
+    slong mag_bits);
 
 void acb_siegel_randtest_fund(acb_mat_t tau, flint_rand_t state,
-	slong prec);
+    slong prec);
 
 void acb_siegel_randtest_reduced(acb_mat_t tau, flint_rand_t state, slong prec,
     slong mag_bits);
 
 void acb_siegel_cocycle(acb_mat_t res, const fmpz_mat_t mat,
-	const acb_mat_t tau, slong prec);
+    const acb_mat_t tau, slong prec);
 
 void acb_siegel_transform(acb_mat_t res, const fmpz_mat_t mat,
-	const acb_mat_t tau, slong prec);
+    const acb_mat_t tau, slong prec);
 
 void acb_siegel_transform_ext(acb_ptr r, acb_mat_t w, const fmpz_mat_t mat,
-        acb_srcptr z, const acb_mat_t tau, slong prec);
+    acb_srcptr z, const acb_mat_t tau, slong prec);
 
 void acb_siegel_reduce_imag(fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 
 void acb_siegel_reduce_real(fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 
 void acb_siegel_reduce(acb_mat_t res, fmpz_mat_t mat, const acb_mat_t tau,
-	slong prec);
-
+    slong prec);
 
 /* AGM sequences */
 
@@ -116,72 +111,66 @@ void acb_siegel_reduce(acb_mat_t res, fmpz_mat_t mat, const acb_mat_t tau,
 void acb_theta_agm_hadamard(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
 void acb_theta_agm_sqrt_lowprec(acb_t r, const acb_t a, const acb_t root,
-	slong prec);
+    slong prec);
 
 void acb_theta_agm_step_sqrt(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
 void acb_theta_agm_step_bad(acb_ptr r, acb_srcptr a, acb_srcptr roots, slong g,
-	slong prec);
+    slong prec);
 
 void acb_theta_agm_step_good(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
 void acb_theta_agm_step_last(acb_t r, acb_srcptr a, slong g, slong prec);
 
-
 void acb_theta_agm_ext_step_sqrt(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
 void acb_theta_agm_ext_step_bad(acb_ptr r, acb_srcptr a, acb_srcptr roots,
-        slong g, slong prec);
+    slong g, slong prec);
 
 void acb_theta_agm_ext_step_good(acb_ptr r, acb_srcptr a, slong g, slong prec);
 
 void acb_theta_agm_ext_step_last(acb_t r, const acb_t s, acb_srcptr a, slong g,
-        slong prec);
-
+    slong prec);
 
 void acb_theta_agm_max_abs(arb_t max, acb_srcptr a, slong nb, slong prec);
 
 void acb_theta_agm_min_abs(arb_t min, acb_srcptr a, slong nb, slong prec);
 
 void acb_theta_agm_abs_dist(arb_t eps, acb_srcptr a, slong nb, slong lowprec,
-        slong prec);
+    slong prec);
 
 void acb_theta_agm_rel_dist(arb_t eps, acb_srcptr a, slong nb, slong lowprec,
-        slong prec);
+    slong prec);
 
 void acb_theta_agm_radius(arf_t rad, const arf_struct* mi, const arf_struct* Mi,
-        const arf_t abs_dist, slong nb, slong prec);
-
+    const arf_t abs_dist, slong nb, slong prec);
 
 void acb_theta_agm_conv_rate(arf_t c, arf_t r, const arf_t eps, slong prec);
 
 slong acb_theta_agm_nb_good_steps(const arf_t c, const arf_t r, slong prec);
 
 void acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr roots, slong nb_bad,
-        slong g, slong prec);
-
+    slong g, slong prec);
 
 void acb_theta_agm_ext_conv_rate(arf_t c1, arf_t c2, arf_t r, const arf_t eps,
-        const arf_t m, const arf_t M, slong prec);
+    const arf_t m, const arf_t M, slong prec);
 
 void acb_theta_agm_ext_rel_err(arf_t err, const arf_t c2, const arf_t r,
-        slong nb_good, slong prec);
+    slong nb_good, slong prec);
 
 void acb_theta_agm_ext(acb_t r, acb_t s, acb_srcptr a, acb_srcptr roots,
-        slong nb_bad, slong g, slong prec);
-
+    slong nb_bad, slong g, slong prec);
 
 slong acb_theta_agm_nb_bad_steps(const acb_mat_t tau, slong prec);
 
 slong acb_theta_agm_ext_nb_bad_steps(acb_srcptr z, const acb_mat_t tau,
-        slong prec);
+    slong prec);
 
 void acb_theta_agm_roots(acb_ptr roots, const acb_mat_t tau, slong nb_bad,
-        slong prec);
+    slong prec);
 
 void acb_theta_agm_ext_roots(acb_ptr roots, acb_srcptr z, const acb_mat_t tau,
-        slong nb_bad, slong prec);
-
+    slong nb_bad, slong prec);
 
 /* Transformation formulas */
 
@@ -202,7 +191,7 @@ void acb_theta_dupl_all(acb_ptr th2, acb_srcptr th, slong g, slong prec);
 void acb_theta_dupl_z(acb_ptr r, acb_srcptr th, slong g, slong prec);
 
 ulong acb_theta_transform_image_char(fmpz_t eps, ulong ab,
-	const fmpz_mat_t mat);
+    const fmpz_mat_t mat);
 
 void acb_theta_transform_proj(acb_ptr res, acb_srcptr th,
         const fmpz_mat_t mat, slong prec);
@@ -211,7 +200,7 @@ void acb_theta_transform_sqr_proj(acb_ptr res, acb_srcptr th2,
         const fmpz_mat_t mat, slong prec);
 
 void acb_theta_transform_all_sqr_proj(acb_ptr res, acb_srcptr th2,
-	const fmpz_mat_t mat, slong prec);
+    const fmpz_mat_t mat, slong prec);
     
 void acb_theta_transform_scal_const(acb_t scal, const acb_mat_t tau,
         const fmpz_mat_t mat, slong k2, slong prec);
@@ -383,7 +372,6 @@ void acb_theta_renormalize_sqr(acb_t scal_z, acb_t scal_0, acb_srcptr th2_z,
 
 slong acb_theta_k2(const fmpz_mat_t mat);
 
-
 /* Newton iterations */
 
 void acb_theta_bound(arf_t rad, arf_t bound, acb_srcptr z, const acb_mat_t tau,
@@ -488,7 +476,6 @@ void acb_theta_newton_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau,
 void acb_theta_newton_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau,
         slong prec);
 
-
 /* Mixed Newton/naive algorithms */
 
 #define ACB_THETA_NAIVE_CONST_THRESHOLD 500
@@ -498,7 +485,7 @@ void acb_theta_newton_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau,
 #define ACB_THETA_REDUCE_Z 4
 
 void acb_theta_balance(acb_ptr z2, acb_mat_t tau2, fmpz_mat_t mat,
-	acb_srcptr z, const acb_mat_t tau, slong j);
+    acb_srcptr z, const acb_mat_t tau, slong j);
 
 int acb_theta_is_balanced(slong* j0, const acb_mat_t tau, slong prec);
 
@@ -507,9 +494,8 @@ slong acb_theta_balance_lowprec(slong g, slong prec);
 void acb_theta_all_const_sqr(acb_ptr th2, const acb_mat_t tau, slong prec);
 
 void acb_theta_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau,
-	slong prec);
+    slong prec);
 
-  
 #ifdef __cplusplus
 }
 #endif

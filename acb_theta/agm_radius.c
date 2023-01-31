@@ -2,14 +2,14 @@
 #include "acb_theta.h"
 
 void
-acb_theta_agm_radius(arf_t rad, const arf_struct* mi, const arf_struct* Mi,
-        const arf_t abs_dist, slong nb, slong prec)
+acb_theta_agm_radius(arf_t rad, const arf_struct * mi, const arf_struct * Mi,
+                     const arf_t abs_dist, slong nb, slong prec)
 {
     arb_t rho;
     arb_t next;
     arb_t t1, t2;
     slong k;
-    
+
     arb_init(rho);
     arb_init(next);
     arb_init(t1);
@@ -19,11 +19,11 @@ acb_theta_agm_radius(arf_t rad, const arf_struct* mi, const arf_struct* Mi,
     for (k = 0; k < nb; k++)
     {
         /* Set rho to solution of sqrt((M+rho')/(m-rho')) * rho' <= rho */
-        arb_set_arf(next, &mi[nb-1-k]);
+        arb_set_arf(next, &mi[nb - 1 - k]);
         arb_mul_2exp_si(next, next, -1);
         arb_min(next, next, rho, prec);
-        arb_add_arf(t1, next, &Mi[nb-1-k], prec);
-        arb_sub_arf(t2, next, &mi[nb-1-k], prec);
+        arb_add_arf(t1, next, &Mi[nb - 1 - k], prec);
+        arb_sub_arf(t2, next, &mi[nb - 1 - k], prec);
         arb_neg(t2, t2);
         arb_div(t1, t1, t2, prec);
         arb_sqrt(t1, t1, prec);
