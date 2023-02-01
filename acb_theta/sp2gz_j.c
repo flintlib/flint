@@ -12,16 +12,20 @@
 #include "acb_theta.h"
 
 void
-fmpz_mat_get_c(fmpz_mat_t res, const fmpz_mat_t mat)
+sp2gz_j(fmpz_mat_t mat)
 {
-    slong g = fmpz_mat_nrows(mat) / 2;
-    slong j, k;
+    slong g = sp2gz_dim(mat);
+    fmpz_mat_t zero, one, minus_one;
 
-    for (j = 0; j < g; j++)
-    {
-        for (k = 0; k < g; k++)
-        {
-            fmpz_set(fmpz_mat_entry(res, j, k), fmpz_mat_entry(mat, j + g, k));
-        }
-    }
+    fmpz_mat_init(zero, g, g);
+    fmpz_mat_init(one, g, g);
+    fmpz_mat_init(minus_one, g, g);
+
+    fmpz_mat_one(one);
+    fmpz_mat_neg(minus_one, one);
+    sp2gz_set_abcd(mat, zero, one, minus_one, zero);
+
+    fmpz_mat_clear(zero);
+    fmpz_mat_clear(one);
+    fmpz_mat_clear(minus_one);
 }

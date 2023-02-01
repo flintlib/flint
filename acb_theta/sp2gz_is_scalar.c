@@ -12,13 +12,15 @@
 #include "acb_theta.h"
 
 int
-fmpz_mat_is_scalar(const fmpz_mat_t mat)
+sp2gz_is_scalar(const fmpz_mat_t mat)
 {
     slong n = fmpz_mat_nrows(mat);
     slong j, k;
 
     if (n != fmpz_mat_ncols(mat))
+    {
         return 0;
+    }
     for (j = 0; j < n; j++)
     {
         for (k = 0; k < n; k++)

@@ -11,11 +11,17 @@
 
 #include "acb_theta.h"
 
-slong
-fmpz_mat_nb_siegel_fund(slong g)
+void
+sp2gz_get_a(fmpz_mat_t res, const fmpz_mat_t mat)
 {
-    if (g == 2)
-        return 19;
-    else
-        return 1;
+    slong g = sp2gz_dim(mat);
+    slong j, k;
+
+    for (j = 0; j < g; j++)
+    {
+        for (k = 0; k < g; k++)
+        {
+            fmpz_set(fmpz_mat_entry(res, j, k), fmpz_mat_entry(mat, j, k));
+        }
+    }
 }

@@ -1,12 +1,11 @@
 .. _acb-theta:
 
-**acb_theta.h** -- theta functions and modular forms in genus 2 and above
+**acb_theta.h** -- Theta functions in any dimension
 ===============================================================================
 
-This module provides methods for numerical evaluation of theta functions and
-modular forms in genus `g=2` and above. All methods also accept `g=1`,
-duplicating functionality from :ref:`acb_modular.h <acb-modular>` (without the
-specific speed-ups).
+This module provides methods for numerical evaluation of theta functions in any
+dimension `g`. All methods also accept `g=1`, duplicating functionality from
+:ref:`acb_modular.h <acb-modular>` (without the specific speed-ups).
 
 In the context of this module, *tau* or `\tau` always denotes an element of the
 Siegel complex upper half-space `\mathbb{H}_g = \{\tau \in
@@ -15,151 +14,78 @@ Siegel complex upper half-space `\mathbb{H}_g = \{\tau \in
 
 As usual, the numerical functions in this module compute strict error bounds:
 if *tau* is represented by an :type:`acb_mat_t` which is not certainly positive
-definite, the output will have an infinite radius, or an error will be thrown.
+definite, the output will have an infinite radius.
 
-Helper functions for real/complex scalars and matrices
+The Siegel modular group
 -------------------------------------------------------------------------------
 
-.. function:: void arb_randtest_pos(arb_t x, flint_rand_t state, slong prec,
-              slong mag_bits)
+We use the type `fmpz_mat_t` directly for matrices in `\operatorname{Sp}_{2g}(\mathbb{Z})`
+or `\operatorname{GSp}_{2g}(\mathbb{Z})`. We always assume that the input
+matrix *mat* is square of even size `2g`.
 
-    Generates a random positive number with radius around `2^{-\text{prec}}`
-    the magnitude of the midpoint.
-    
-.. function:: void acb_randtest_disk(acb_t x, const acb_t ctr, const arf_t rad,
-              flint_rand_t state, slong prec)
+.. function:: void sp2gz_dim(const fmpz_mat_t mat)
 
-    Generates a random complex number with radius around `2^{-\text{prec}}` the
-    magnitude of the midpoint, that is guaranteed to lie in a disk of radius
-    *rad* centered at the midpoint of *ctr*.
+    Returns the dimension `g`, which is half the number of rows (or columns)
+    of *mat*.
 
-.. function:: void acb_mat_get_real(arb_mat_t re, const acb_mat_t mat)
+.. function:: void sp2gz_get_a(fmpz_mat_t res, const fmpz_mat_t mat)
 
-    Sets *re* to the real part of *mat*.
+.. function:: void sp2gz_get_b(fmpz_mat_t res, const fmpz_mat_t mat)
 
-.. function:: void acb_mat_get_imag(arb_mat_t im, const acb_mat_t mat)
+.. function:: void sp2gz_get_c(fmpz_mat_t res, const fmpz_mat_t mat)
 
-    Sets *im* to the imaginary part of *mat*.
+.. function:: void sp2gz_get_d(fmpz_mat_t res, const fmpz_mat_t mat)
 
-.. function:: void arb_mat_add_error_arf(arb_mat_t mat, const arf_t err)
-    
-    Add *err* to the radius of all entries of *mat* in-place.
+    Sets *res* to the corresponding block of *mat*, written as `\left(\begin{textmatrix} a&b\\c&d \end{textmatrix}\right)`.
 
-.. function:: void acb_mat_set_arb_arb(acb_mat_t mat, const arb_mat_t re, const
-              arb_mat_t im)
-
-    Sets *mat* to the complex matrix with real and imaginary parts *re*, *im*.
-
-.. function:: void arb_mat_randtest_cho(arb_mat_t mat, flint_rand_t state,
-              slong prec, slong mag_bits)
-    
-    Sets the square matrix *mat* to a random upper triangular real matrix with
-    positive diagonal entries, calling :func:`arb_randtest_precise` or
-    :func:`arb_randtest_pos` on each relevant entry.
-
-.. function:: void arb_mat_randtest_sym_pos(arb_mat_t mat, flint_rand_t state,
-              slong prec, slong mag_bits)
-
-    Sets *mat* to a random symmetric, positive definite real matrix with
-    precise entries.
-
-.. function:: int arb_mat_is_nonsymmetric(const arb_mat_t mat)
-
-    Returns nonzero iff *mat* is certainly not symmetric.
-
-.. function:: void arb_mat_pos_lambda(arb_t lambda, const arb_mat_t mat, slong
-              prec)
-
-    Given a symmetric, positive definite real matrix *mat*, sets *lambda* to a
-    lower bound for the smallest eigenvalue of *mat*.
-
-.. function:: void arb_mat_pos_radius(arf_t rad, const arb_mat_t mat, slong prec)
-
-    Given a symmetric, positive definite real matrix *m*, computes a
-    nonnegative *rad* such that any symmetric matrix obtained from *m* by
-    adding an error of at most *rad* to each coefficient will still be positive
-    definite.
-
-.. function:: void arb_mat_reduce(arb_mat_t R, fmpz_mat_t U, const arb_mat_t M,
-              slong prec)
-
-    Given a symmetric, positive definite `g\times g` real matrix *M*, look for
-    `U \in \operatorname{GL}_g(\mathbb{Z})` such that `R = U^T M U` is "more
-    reduced" than *M*.
-
-    If `g=2`, uses the Minkowski reduction algorithm; otherwise, relies on
-    Flint's implementation of the LLL algorithm.
-
-.. function:: void acb_mat_ninf(arb_t norm, const acb_mat_t mat, slong prec)
-
-    Returns the infinity-operator norm of *mat*, defined as the maximum sum of
-    absolute values of all entries on any line of *mat*.
-
-Helper functions for integral matrices
--------------------------------------------------------------------------------
-
-We implement matrices in `\operatorname{GSp}_{2g}(\mathbb{Z})` acting on the Siegel
-upper half space as elements of type :type:`fmpz_mat_t`. As is usual in that
-context, we allow single lowercase letters as matrix names when convenient.
-
-.. function:: void fmpz_mat_get_a(fmpz_mat_t res, const fmpz_mat_t mat)
-
-.. function:: void fmpz_mat_get_b(fmpz_mat_t res, const fmpz_mat_t mat)
-
-.. function:: void fmpz_mat_get_c(fmpz_mat_t res, const fmpz_mat_t mat)
-
-.. function:: void fmpz_mat_get_d(fmpz_mat_t res, const fmpz_mat_t mat)
-
-    Sets *res* to the corresponding block of the `2g\times 2g` square matrix `m
-    = \left(\begin{textmatrix} a&b\\c&d \end{textmatrix}\right)`.
-
-.. function:: void fmpz_mat_set_abcd(fmpz_mat_t m, const fmpz_mat_t a, const
+.. function:: void sp2gz_set_abcd(fmpz_mat_t m, const fmpz_mat_t a, const
               fmpz_mat_t b, const fmpz_mat_t c, const fmpz_mat_t d)
 
-    Sets the `2g\times 2g` matrix *mat* to `\left(\begin{textmatrix} a&b\\c&d
-    \end{textmatrix}\right)`, where `a,b,c,d` are `g\times g` blocks.
+    Sets *mat* to `\left(\begin{textmatrix} a&b\\c&d \end{textmatrix}\right)`,
+    where `a,b,c,d` are `g\times g` blocks.
 
-.. function:: void fmpz_mat_J(fmpz_mat_t mat)
+.. function:: int sp2gz_is_correct(const fmpz_mat_t mat)
 
-    Sets the `2g\times 2g` matrix *mat* to the symplectic matrix
-    `\left(\begin{textmatrix} 0&I_g\\-I_g&0 \end{textmatrix}\right)`.
+.. function:: int sp2gz_is_gsp(const fmpz_mat_t mat)
 
-.. function:: int fmpz_mat_is_scalar(const fmpz_mat_t mat)
+    Returns whether *mat* is an element of `\operatorname{Sp}_{2g}(\mathbb{Z})`
+    or `\operatorname{GSp}_{2g}(\mathbb{Z})`, respectively.
 
-    Returns nonzero iff *m* is a square scalar matrix.
+.. function:: int sp2gz_is_scalar(const fmpz_mat_t mat)
 
-.. function:: int fmpz_mat_is_sp(const fmpz_mat_t mat)
+    Returns whether *mat* is a scalar matrix, i.e. diagonal with equal entries.
+    
+.. function:: void sp2gz_j(fmpz_mat_t mat)
 
-.. function:: int fmpz_mat_is_gsp(const fmpz_mat_t mat)
+    Sets *mat* to the symplectic matrix
+    `J = \left(\begin{textmatrix} 0&I_g\\-I_g&0 \end{textmatrix}\right)`.
 
-    Returns nonzero iff the `2g\times 2g` matrix *m* is symplectic,
-    resp. general symplectic.
+.. function:: void sp2gz_block_diag(fmpz_mat_t mat, const fmpz_mat_t U)
 
-.. function:: void fmpz_mat_diag_sp(fmpz_mat_t mat, const fmpz_mat_t U)
+    Sets *mat* to the symplectic matrix
+    `\left(\begin{textmatrix} U&0\\0&U^{-T} \end{textmatrix}\right)`.
+    Requires that `U\in \operatorname{GL}_g(\mathbb{Z})`.
 
-    Sets the `2g\times 2g` matrix *mat* to the symplectic matrix
-    `\left(\begin{textmatrix} U&0\\0&U^{-T} \end{textmatrix}\right)`. We
-    require `U\in \operatorname{GL}_g(\mathbb{Z})`.
+.. function:: void sp2gz_trig(fmpz_mat_t mat, const fmpz_mat_t S)
 
-.. function:: void fmpz_mat_trig_sp(fmpz_mat_t mat, const fmpz_mat_t S)
+    Sets *mat* to `\left(\begin{textmatrix} I_g&S\\0&I_g \end{textmatrix}\right)`,
+    which is symplectic if and only if *S* is symmetric.
 
-    Sets the `2g\times 2g` matrix *mat* to `\left(\begin{textmatrix}
-    I_g&S\\0&I_g \end{textmatrix}\right)`, which is symplectic iff *S* is
-    symmetric.
-
-.. function:: void fmpz_mat_randtest_sp(fmpz_mat_t mat, flint_rand_t state,
-              slong bits)
+.. function:: void sp2gz_randtest(fmpz_mat_t mat, flint_rand_t state, slong bits)
 
     Sets *mat* to a random symplectic matrix whose coefficients have length
-    around *bits*.
+    approximately *bits*.
 
-.. function:: void fmpz_mat_siegel_fund(fmpz_mat_t mat, slong j)
+.. function:: sp2gz_nb_fundamental(slong g)
 
-    Sets the `2g\times 2g` matrix *mat* to the `j^{\text{th}}` matrix defining
-    the boundary of the Siegel fundamental domain (in an arbitrary
-    numbering). For `g=1`, we require `j=0`; for `g=2`, we require `0\leq j\leq
-    18`; results in an error for `g\geq 3` where such a set of matrices is not
-    explicitly known.
+    Returns the number of fundamental symplectic matrices used in the reduction
+    algorithm on `\mathbb{H}_g`. This number is currently `19` when `g=2` and
+    `1` otherwise.
+
+.. function:: void sp2gz_fundamental(fmpz_mat_t mat, slong j)
+
+    Sets *mat* to the `j^{\text{th}}` fundamental symplectic matrix as defined
+    above.
 
 The Siegel upper half space
 -------------------------------------------------------------------------------

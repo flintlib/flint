@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 static void
-fmpz_mat_siegel_fund_g2(fmpz_mat_t mat, slong j)
+sp2gz_fundamental_g2(fmpz_mat_t mat, slong j)
 {
     slong g = 2;
     fmpz_mat_t a, b, c, d;
@@ -114,18 +114,13 @@ fmpz_mat_siegel_fund_g2(fmpz_mat_t mat, slong j)
             fmpz_mat_one(a);
             fmpz_mat_one(d);
             break;
-        case 18:
+        default: //case 18:
             fmpz_mat_one(a);
             fmpz_mat_neg(a, a);
             fmpz_mat_set(d, a);
-            break;
-        default:
-            flint_printf("fmpz_mat_siegel_fund: Error (invalid index: %d)\n",
-                         j);
-            flint_abort();
     }
 
-    fmpz_mat_set_abcd(mat, a, b, c, d);
+    sp2gz_set_abcd(mat, a, b, c, d);
 
     fmpz_mat_clear(a);
     fmpz_mat_clear(b);
@@ -134,17 +129,17 @@ fmpz_mat_siegel_fund_g2(fmpz_mat_t mat, slong j)
 }
 
 void
-fmpz_mat_siegel_fund(fmpz_mat_t mat, slong j)
+sp2gz_fundamental(fmpz_mat_t mat, slong j)
 {
-    slong g = fmpz_mat_nrows(mat) / 2;
+    slong g = sp2gz_dim(mat);
 
     if (g == 1)
     {
-        fmpz_mat_J(mat);
+        sp2gz_j(mat);
     }
     else if (g == 2)
     {
-        fmpz_mat_siegel_fund_g2(mat, j);
+        sp2gz_fundamental_g2(mat, j);
     }
     else
     {

@@ -12,9 +12,9 @@
 #include "acb_theta.h"
 
 static void
-randtest_trig_sp(fmpz_mat_t mat, flint_rand_t state, slong bits)
+sp2gz_randtest_trig(fmpz_mat_t mat, flint_rand_t state, slong bits)
 {
-    slong g = fmpz_mat_nrows(mat) / 2;
+    slong g = sp2gz_dim(mat);
     fmpz_mat_t b, bt;
 
     fmpz_mat_init(b, g, g);
@@ -25,16 +25,16 @@ randtest_trig_sp(fmpz_mat_t mat, flint_rand_t state, slong bits)
     fmpz_mat_transpose(bt, b);
     fmpz_mat_add(b, b, bt);
     fmpz_mat_scalar_tdiv_q_2exp(b, b, 1);
-    fmpz_mat_trig_sp(mat, b);
+    sp2gz_trig(mat, b);
 
     fmpz_mat_clear(b);
     fmpz_mat_clear(bt);
 }
 
 static void
-randtest_diag_sp(fmpz_mat_t mat, flint_rand_t state, slong bits)
+sp2gz_randtest_block_diag(fmpz_mat_t mat, flint_rand_t state, slong bits)
 {
-    slong g = fmpz_mat_nrows(mat) / 2;
+    slong g = sp2gz_dim(mat);
     fmpz_mat_t u;
 
     fmpz_mat_init(u, g, g);
@@ -42,33 +42,33 @@ randtest_diag_sp(fmpz_mat_t mat, flint_rand_t state, slong bits)
 
     fmpz_mat_one(u);
     fmpz_mat_randops(u, state, 2 * bits * g);
-    fmpz_mat_diag_sp(mat, u);
+    sp2gz_block_diag(mat, u);
 
     fmpz_mat_clear(u);
 }
 
 void
-fmpz_mat_randtest_sp(fmpz_mat_t mat, flint_rand_t state, slong bits)
+sp2gz_randtest(fmpz_mat_t mat, flint_rand_t state, slong bits)
 {
-    slong g = fmpz_mat_nrows(mat) / 2;
+    slong g = sp2gz_dim(mat);
     fmpz_mat_t aux;
 
     fmpz_mat_init(aux, 2 * g, 2 * g);
 
-    randtest_trig_sp(mat, state, bits);
-    randtest_diag_sp(aux, state, bits);
+    sp2gz_randtest_trig(mat, state, bits);
+    sp2gz_randtest_block_diag(aux, state, bits);
     fmpz_mat_mul(mat, mat, aux);
-    fmpz_mat_J(aux);
+    sp2gz_j(aux);
     fmpz_mat_mul(mat, mat, aux);
-    randtest_trig_sp(aux, state, bits);
+    sp2gz_randtest_trig(aux, state, bits);
     fmpz_mat_mul(mat, mat, aux);
-    fmpz_mat_J(aux);
+    sp2gz_j(aux);
     fmpz_mat_mul(mat, mat, aux);
-    randtest_diag_sp(aux, state, bits);
+    sp2gz_randtest_block_diag(aux, state, bits);
     fmpz_mat_mul(mat, mat, aux);
-    fmpz_mat_J(aux);
+    sp2gz_j(aux);
     fmpz_mat_mul(mat, mat, aux);
-    randtest_trig_sp(aux, state, bits);
+    sp2gz_randtest_trig(aux, state, bits);
     fmpz_mat_mul(mat, mat, aux);
 
     fmpz_mat_clear(aux);

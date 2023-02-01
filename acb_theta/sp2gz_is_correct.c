@@ -12,9 +12,9 @@
 #include "acb_theta.h"
 
 int
-fmpz_mat_is_sp(const fmpz_mat_t mat)
+sp2gz_is_correct(const fmpz_mat_t mat)
 {
-    slong g = fmpz_mat_nrows(mat) / 2;
+    slong g = sp2gz_dim(mat);
     fmpz_mat_t a, b, c, d;
     fmpz_mat_t prod1, prod2;
     int res;
@@ -26,10 +26,10 @@ fmpz_mat_is_sp(const fmpz_mat_t mat)
     fmpz_mat_init(prod1, g, g);
     fmpz_mat_init(prod2, g, g);
 
-    fmpz_mat_get_a(a, mat);
-    fmpz_mat_get_b(b, mat);
-    fmpz_mat_get_c(c, mat);
-    fmpz_mat_get_d(d, mat);
+    sp2gz_get_a(a, mat);
+    sp2gz_get_b(b, mat);
+    sp2gz_get_c(c, mat);
+    sp2gz_get_d(d, mat);
 
     fmpz_mat_transpose(prod1, a);
     fmpz_mat_mul(prod1, prod1, c);

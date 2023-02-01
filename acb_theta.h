@@ -24,36 +24,32 @@
 extern "C" {
 #endif
 
-/* Extras for fmpz_mat's */
+/* The Siegel modular group */
 
-void fmpz_mat_get_a(fmpz_mat_t res, const fmpz_mat_t mat);
+static __inline__ void
+sp2gz_dim(const fmpz_mat_t mat)
+{
+    return fmpz_mat_nrows(mat) / 2;
+}
 
-void fmpz_mat_get_b(fmpz_mat_t res, const fmpz_mat_t mat);
-
-void fmpz_mat_get_c(fmpz_mat_t res, const fmpz_mat_t mat);
-
-void fmpz_mat_get_d(fmpz_mat_t res, const fmpz_mat_t mat);
-
-void fmpz_mat_set_abcd(fmpz_mat_t mat, const fmpz_mat_t a, const fmpz_mat_t b,
+void sp2gz_get_a(fmpz_mat_t res, const fmpz_mat_t mat);
+void sp2gz_get_b(fmpz_mat_t res, const fmpz_mat_t mat);
+void sp2gz_get_c(fmpz_mat_t res, const fmpz_mat_t mat);
+void sp2gz_get_d(fmpz_mat_t res, const fmpz_mat_t mat);
+void sp2gz_set_abcd(fmpz_mat_t mat, const fmpz_mat_t a, const fmpz_mat_t b,
     const fmpz_mat_t c, const fmpz_mat_t d);
 
-void fmpz_mat_J(fmpz_mat_t mat);
+int sp2gz_is_correct(const fmpz_mat_t mat);
+int sp2gz_is_gsp(const fmpz_mat_t mat);
+int sp2gz_is_scalar(const fmpz_mat_t mat);
 
-int fmpz_mat_is_scalar(const fmpz_mat_t mat);
+void sp2gz_j(fmpz_mat_t mat);
+void sp2gz_block_diag(fmpz_mat_t mat, const fmpz_mat_t U);
+void sp2gz_trig(fmpz_mat_t mat, const fmpz_mat_t S);
+slong sp2gz_nb_fundamental(slong g);
+void sp2gz_fundamental(fmpz_mat_t mat, slong j);
 
-int fmpz_mat_is_sp(const fmpz_mat_t mat);
-
-int fmpz_mat_is_gsp(const fmpz_mat_t mat);
-
-void fmpz_mat_diag_sp(fmpz_mat_t mat, const fmpz_mat_t U);
-
-void fmpz_mat_trig_sp(fmpz_mat_t mat, const fmpz_mat_t S);
-
-void fmpz_mat_randtest_sp(fmpz_mat_t mat, flint_rand_t state, slong bits);
-
-slong fmpz_mat_nb_siegel_fund(slong g);
-
-void fmpz_mat_siegel_fund(fmpz_mat_t mat, slong j);
+void sp2gz_randtest(fmpz_mat_t mat, flint_rand_t state, slong bits);
 
 /* Siegel space */
 
