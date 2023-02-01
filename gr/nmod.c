@@ -930,6 +930,44 @@ _gr_nmod_poly_sqrt_series(ulong * res,
         return _gr_poly_sqrt_series_newton(res, f, flen, n, cutoff, ctx);
 }
 
+static const short exp_series_mul_cutoff_tab[] = {
+    4, 4, 6, 12, 18, 38, 56, 57, 97, 121, 144, 145, 187, 228, 216, 286,
+    315, 426, 505, 547, 620, 631, 649, 781, 931, 810, 950, 1066, 838, 714,
+    880, 931, 698, 598, 590, 620, 731, 782, 780, 848, 976, 1005, 978, 1006,
+    1046, 1040, 1203, 1296, 1342, 1327, 1389, 1555, 1568, 1644, 1676, 1725,
+    1692, 1793, 2014, 1904, 2021, 2086, 2030, 2198,
+};
+
+static const short exp_series_newton_cutoff_tab[64] = {
+    4, 4, 6, 12, 18, 38, 68, 132, 258, 522, 1033, 1288, 1322, 1494, 1775,
+    2074, 2404, 2534, 2887, 3017, 3343, 3234, 3550, 4263, 3813, 4534,
+    5398, 4048, 3381, 3607, 3811, 3724, 2962, 3095, 3268, 3253, 3469, 3664,
+    4108, 4219, 4043, 4402, 4434, 4377, 4583, 4802, 5030, 5430, 5366, 5407,
+    5341, 6363, 6415, 6343, 6395, 6444, 6433, 6358, 6939, 6794, 6782, 6837,
+    6758, 6680,
+};
+
+int
+_gr_nmod_poly_exp_series(ulong * res,
+    const ulong * f, slong flen, slong n, gr_ctx_t ctx)
+{
+    slong cutoff1, cutoff2;
+
+    flen = FLINT_MIN(flen, n);
+
+    cutoff1 = exp_series_mul_cutoff_tab[NMOD_BITS(NMOD_CTX(ctx)) - 1];
+
+    if (flen < cutoff1)
+        return _gr_poly_exp_series_basecase(res, f, flen, n, ctx);
+
+    cutoff2 = exp_series_newton_cutoff_tab[NMOD_BITS(NMOD_CTX(ctx)) - 1];
+
+    if (flen < cutoff2)
+        return _gr_poly_exp_series_basecase_mul(res, f, flen, n, ctx);
+
+    return _gr_poly_exp_series_newton(res, NULL, f, flen, n, cutoff2, ctx);
+}
+
 int
 _gr_nmod_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
 {
@@ -1051,6 +1089,7 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_POLY_DIV_SERIES, (gr_funcptr) _gr_nmod_poly_div_series},
     {GR_METHOD_POLY_RSQRT_SERIES, (gr_funcptr) _gr_nmod_poly_rsqrt_series},
     {GR_METHOD_POLY_SQRT_SERIES,  (gr_funcptr) _gr_nmod_poly_sqrt_series},
+    {GR_METHOD_POLY_EXP_SERIES,  (gr_funcptr) _gr_nmod_poly_exp_series},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_nmod_roots_gr_poly},
     {0,                         (gr_funcptr) NULL},
 };

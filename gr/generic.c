@@ -2863,6 +2863,7 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_POLY_DIV_SERIES,         (gr_funcptr) _gr_poly_div_series_generic},
     {GR_METHOD_POLY_RSQRT_SERIES,       (gr_funcptr) _gr_poly_rsqrt_series_generic},
     {GR_METHOD_POLY_SQRT_SERIES,        (gr_funcptr) _gr_poly_sqrt_series_generic},
+    {GR_METHOD_POLY_EXP_SERIES,         (gr_funcptr) _gr_poly_exp_series_generic},
 
     {GR_METHOD_MAT_MUL,                 (gr_funcptr) gr_mat_mul_generic},
     {GR_METHOD_MAT_DET,                 (gr_funcptr) gr_mat_det_generic},

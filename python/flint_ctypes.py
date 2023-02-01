@@ -2700,6 +2700,24 @@ class gr_poly(gr_elem):
         """
         return self._series_op(n, libgr.gr_poly_log_series, "$f.log_series($n)")
 
+    def exp_series(self, n):
+        """
+        Exponential of this polynomial viewed as a power series,
+        truncated to length n.
+
+            >>> QQx([0,1]).exp_series(8)
+            [1, 1, 1/2, 1/6, 1/24, 1/120, 1/720, 1/5040]
+            >>> QQx([1,1]).exp_series(2)
+            Traceback (most recent call last):
+              ...
+            FlintUnableError: failed to compute f.exp_series(n) in {Ring of polynomials over Rational field (fmpq)} for {f = [1, 1]}, {n = 2}
+            >>> RRx([1,1]).exp_series(2)
+            [[2.718281828459045 +/- 5.41e-16], [2.718281828459045 +/- 5.41e-16]]
+            >>> RRx([2,3]).log_series(3).exp_series(3)
+            [[2.000000000000000 +/- 6.97e-16], [3.00000000000000 +/- 1.61e-15], [+/- 1.49e-15]]
+        """
+        return self._series_op(n, libgr.gr_poly_exp_series, "$f.exp_series($n)")
+
     def pow_series(self, other, n):
         """
         Power of this polynomial viewed as a power series,
