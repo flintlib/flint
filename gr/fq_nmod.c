@@ -11,6 +11,7 @@
 
 #include "gr.h"
 #include "gr_vec.h"
+#include "gr_poly.h"
 #include "flint/fq.h"
 #include "flint/fq_nmod_poly.h"
 #include "flint/fq_nmod_mat.h"
@@ -315,15 +316,213 @@ _gr_fq_nmod_pth_root(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+/* todo: basecase multiplication without reductions */
+int
+__gr_fq_nmod_vec_dot(fq_nmod_struct * res, const fq_nmod_struct * initial, int subtract, const fq_nmod_struct * vec1, const fq_nmod_struct * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    mp_ptr s, t;
+    slong slen, tlen, len1, len2;
+    slong plen;
+    nmod_t mod;
+
+    if (len <= 0)
+    {
+        if (initial == NULL)
+            fq_nmod_zero(res, FQ_CTX(ctx));
+        else
+            fq_nmod_set(res, initial, FQ_CTX(ctx));
+        return GR_SUCCESS;
+    }
+
+    plen = FQ_CTX(ctx)->modulus->length;
+
+    t = GR_TMP_ALLOC((4 * plen) * sizeof(mp_limb_t));
+    s = t + 2 * plen;
+
+    mod = FQ_CTX(ctx)->mod;
+
+    len1 = vec1[0].length;
+    len2 = vec2[0].length;
+
+    if (len1 == 0 || len2 == 0)
+    {
+        slen = 0;
+    }
+    else
+    {
+        slen = len1 + len2 - 1;
+        if (len1 >= len2)
+            _nmod_poly_mul(s, vec1[0].coeffs, len1, vec2[0].coeffs, len2, mod);
+        else
+            _nmod_poly_mul(s, vec2[0].coeffs, len2, vec1[0].coeffs, len1, mod);
+    }
+
+    for (i = 1; i < len; i++)
+    {
+        len1 = vec1[i].length;
+        len2 = vec2[i].length;
+
+        if (len1 != 0 && len2 != 0)
+        {
+            tlen = len1 + len2 - 1;
+            if (len1 >= len2)
+                _nmod_poly_mul(t, vec1[i].coeffs, len1, vec2[i].coeffs, len2, mod);
+            else
+                _nmod_poly_mul(t, vec2[i].coeffs, len2, vec1[i].coeffs, len1, mod);
+
+            _nmod_poly_add(s, s, slen, t, tlen, mod);
+            slen = FLINT_MAX(slen, tlen);
+        }
+    }
+
+    if (initial == NULL)
+    {
+        if (subtract)
+            _nmod_vec_neg(s, s, slen, mod);
+    }
+    else
+    {
+        len2 = initial->length;
+
+        if (subtract)
+            _nmod_poly_sub(s, initial->coeffs, len2, s, slen, mod);
+        else
+            _nmod_poly_add(s, initial->coeffs, len2, s, slen, mod);
+
+        slen = FLINT_MAX(slen, len2);
+    }
+
+    while (slen > 0 && s[slen - 1] == 0)
+        slen--;
+
+    _fq_nmod_reduce(s, slen, FQ_CTX(ctx));
+
+    while (slen > 0 && s[slen - 1] == 0)
+        slen--;
+
+    nmod_poly_fit_length(res, slen);
+    _nmod_vec_set(res->coeffs, s, slen);
+    _nmod_poly_set_length(res, slen);
+
+    GR_TMP_FREE(t, 4 * plen);
+
+    return GR_SUCCESS;
+}
+
+/* todo: basecase multiplication without reductions */
+int
+__gr_fq_nmod_vec_dot_rev(fq_nmod_struct * res, const fq_nmod_struct * initial, int subtract, const fq_nmod_struct * vec1, const fq_nmod_struct * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    mp_ptr s, t;
+    slong slen, tlen, len1, len2;
+    slong plen;
+    nmod_t mod;
+
+    if (len <= 0)
+    {
+        if (initial == NULL)
+            fq_nmod_zero(res, FQ_CTX(ctx));
+        else
+            fq_nmod_set(res, initial, FQ_CTX(ctx));
+        return GR_SUCCESS;
+    }
+
+    plen = FQ_CTX(ctx)->modulus->length;
+
+    t = GR_TMP_ALLOC((4 * plen) * sizeof(mp_limb_t));
+    s = t + 2 * plen;
+
+    mod = FQ_CTX(ctx)->mod;
+
+    len1 = vec1[0].length;
+    len2 = vec2[len - 1].length;
+
+    if (len1 == 0 || len2 == 0)
+    {
+        slen = 0;
+    }
+    else
+    {
+        slen = len1 + len2 - 1;
+        if (len1 >= len2)
+            _nmod_poly_mul(s, vec1[0].coeffs, len1, vec2[len - 1].coeffs, len2, mod);
+        else
+            _nmod_poly_mul(s, vec2[len - 1].coeffs, len2, vec1[0].coeffs, len1, mod);
+    }
+
+    for (i = 1; i < len; i++)
+    {
+        len1 = vec1[i].length;
+        len2 = vec2[len - 1 - i].length;
+
+        if (len1 != 0 && len2 != 0)
+        {
+            tlen = len1 + len2 - 1;
+            if (len1 >= len2)
+                _nmod_poly_mul(t, vec1[i].coeffs, len1, vec2[len - 1 - i].coeffs, len2, mod);
+            else
+                _nmod_poly_mul(t, vec2[len - 1 - i].coeffs, len2, vec1[i].coeffs, len1, mod);
+
+            _nmod_poly_add(s, s, slen, t, tlen, mod);
+            slen = FLINT_MAX(slen, tlen);
+        }
+    }
+
+    if (initial == NULL)
+    {
+        if (subtract)
+            _nmod_vec_neg(s, s, slen, mod);
+    }
+    else
+    {
+        len2 = initial->length;
+
+        if (subtract)
+            _nmod_poly_sub(s, initial->coeffs, len2, s, slen, mod);
+        else
+            _nmod_poly_add(s, initial->coeffs, len2, s, slen, mod);
+
+        slen = FLINT_MAX(slen, len2);
+    }
+
+    while (slen > 0 && s[slen - 1] == 0)
+        slen--;
+
+    _fq_nmod_reduce(s, slen, FQ_CTX(ctx));
+
+    while (slen > 0 && s[slen - 1] == 0)
+        slen--;
+
+    nmod_poly_fit_length(res, slen);
+    _nmod_vec_set(res->coeffs, s, slen);
+    _nmod_poly_set_length(res, slen);
+
+    GR_TMP_FREE(t, 4 * plen);
+
+    return GR_SUCCESS;
+}
+
 int
 _gr_fq_nmod_poly_mullow(fq_nmod_struct * res,
     const fq_nmod_struct * poly1, slong len1,
     const fq_nmod_struct * poly2, slong len2, slong n, gr_ctx_t ctx)
 {
-    if (len1 >= len2)
-        _fq_nmod_poly_mullow(res, poly1, len1, poly2, len2, n, FQ_CTX(ctx));
+    if (n == len1 + len2 - 1)
+    {
+        if (len1 >= len2)
+            _fq_nmod_poly_mul(res, poly1, len1, poly2, len2, FQ_CTX(ctx));
+        else
+            _fq_nmod_poly_mul(res, poly2, len2, poly1, len1, FQ_CTX(ctx));
+    }
     else
-        _fq_nmod_poly_mullow(res, poly2, len2, poly1, len1, n, FQ_CTX(ctx));
+    {
+        if (len1 >= len2)
+            _fq_nmod_poly_mullow(res, poly1, len1, poly2, len2, n, FQ_CTX(ctx));
+        else
+            _fq_nmod_poly_mullow(res, poly2, len2, poly1, len1, n, FQ_CTX(ctx));
+    }
 
     return GR_SUCCESS;
 }
@@ -439,6 +638,9 @@ gr_method_tab_input _fq_nmod_methods_input[] =
     {GR_METHOD_FQ_TRACE,                (gr_funcptr) _gr_fq_nmod_trace},
     {GR_METHOD_FQ_IS_PRIMITIVE,         (gr_funcptr) _gr_fq_nmod_is_primitive},
     {GR_METHOD_FQ_PTH_ROOT,             (gr_funcptr) _gr_fq_nmod_pth_root},
+
+    {GR_METHOD_VEC_DOT,         (gr_funcptr) __gr_fq_nmod_vec_dot},
+    {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) __gr_fq_nmod_vec_dot_rev},
 
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fq_nmod_poly_mullow},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fq_nmod_roots_gr_poly},
