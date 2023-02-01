@@ -309,12 +309,13 @@ EXTEND_BASECASE(6, 8)
 /* parameter 1: j can be zero */
 static void sd_fft_base_1(const sd_fft_lctx_t Q, ulong I, ulong j)
 {
-    ulong j_bits = n_nbits(j);
-    ulong j_r = j & (n_pow2(j_bits)/2 - 1);
+    ulong j_bits, j_r;
     double* x = sd_fft_lctx_blk_index(Q, I);
 
     FLINT_ASSERT(8 == LG_BLK_SZ);
     FLINT_ASSERT(256 == BLK_SZ);
+
+    SET_J_BITS_AND_J_R(j_bits, j_r, j);
 
     if (UNLIKELY(j == 0))
         sd_fft_basecase_8_1(Q, x, j_r, j_bits);
@@ -325,13 +326,14 @@ static void sd_fft_base_1(const sd_fft_lctx_t Q, ulong I, ulong j)
 /* parameter 0: j cannot be zero */
 static void sd_fft_base_0(const sd_fft_lctx_t Q, ulong I, ulong j)
 {
-    ulong j_bits = n_nbits(j);
-    ulong j_r = j & (n_pow2(j_bits)/2 - 1);
+    ulong j_bits, j_r;
     double* x = sd_fft_lctx_blk_index(Q, I);
 
     FLINT_ASSERT(j != 0);
     FLINT_ASSERT(8 == LG_BLK_SZ);
     FLINT_ASSERT(256 == BLK_SZ);
+
+    SET_J_BITS_AND_J_R(j_bits, j_r, j);
 
     sd_fft_basecase_8_0(Q, x, j_r, j_bits);
 }
@@ -431,6 +433,8 @@ void sd_fft_main_block(
     ulong k, /* BLK_SZ transforms each of length 2^k */
     ulong j)
 {
+    ulong j_bits, j_r;
+
     if (k > 4)
     {
         ulong k1 = k/2;
@@ -450,8 +454,7 @@ void sd_fft_main_block(
         return;
     }
 
-    ulong j_bits = n_nbits(j);
-    ulong j_r = j & (n_pow2(j_bits)/2 - 1);
+    SET_J_BITS_AND_J_R(j_bits, j_r, j);
 
     if (k >= 2)
     {
@@ -578,6 +581,8 @@ void sd_fft_trunc_block(
     ulong itrunc,
     ulong otrunc)
 {
+    ulong j_bits, j_r;
+
     FLINT_ASSERT(itrunc <= n_pow2(k));
     FLINT_ASSERT(otrunc <= n_pow2(k));
 
@@ -647,8 +652,7 @@ void sd_fft_trunc_block(
         return;
     }
 
-    ulong j_bits = n_nbits(j);
-    ulong j_r = j & (n_pow2(j_bits)/2 - 1);
+    SET_J_BITS_AND_J_R(j_bits, j_r, j);
 
     if (k == 2)
     {

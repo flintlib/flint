@@ -442,9 +442,11 @@ EXTEND_BASECASE(6, 8)
 /* parameter 1: j can be zero */
 void sd_ifft_base_1(const sd_fft_lctx_t Q, ulong I, ulong j)
 {
-    ulong j_bits = n_nbits(j);
-    ulong j_mr = n_pow2(j_bits) - 1 - j;
+    ulong j_bits, j_mr;
     double* x = sd_fft_lctx_blk_index(Q, I);
+
+    SET_J_BITS_AND_J_MR(j_bits, j_mr, j);
+
     if (j == 0)
         sd_ifft_basecase_8_1(Q, x, j_mr, j_bits);
     else
@@ -454,10 +456,13 @@ void sd_ifft_base_1(const sd_fft_lctx_t Q, ulong I, ulong j)
 /* parameter 0: j cannot be zero */
 void sd_ifft_base_0(const sd_fft_lctx_t Q, ulong I, ulong j)
 {
-    ulong j_bits = n_nbits(j);
-    ulong j_mr = n_pow2(j_bits) - 1 - j;
+    ulong j_bits, j_mr;
     double* x = sd_fft_lctx_blk_index(Q, I);
+
     FLINT_ASSERT(j != 0);
+
+    SET_J_BITS_AND_J_MR(j_bits, j_mr, j);
+
     sd_ifft_basecase_8_0(Q, x, j_mr, j_bits);
 }
 
@@ -1023,6 +1028,8 @@ void sd_ifft_main_block(
     ulong k, /* BLK_SZ transforms each of length 2^k */
     ulong j)
 {
+    ulong j_bits, j_mr;
+
     if (k > 2)
     {
         ulong k1 = k/2;
@@ -1043,8 +1050,7 @@ void sd_ifft_main_block(
         return;
     }
 
-    ulong j_bits = n_nbits(j);
-    ulong j_mr = n_pow2(j_bits) - 1 - j;
+    SET_J_BITS_AND_J_MR(j_bits, j_mr, j);
 
     if (k == 2)
     {
@@ -1052,7 +1058,7 @@ void sd_ifft_main_block(
         double* X1 = sd_fft_lctx_blk_index(Q, I + S*1);
         double* X2 = sd_fft_lctx_blk_index(Q, I + S*2);
         double* X3 = sd_fft_lctx_blk_index(Q, I + S*3);
-        if (UNLIKELY(j == 0))
+        if (UNLIKELY(j_bits == 0))
         {
             _RADIX_4_REVERSE_PARAM_J_IS_Z(VECND, Q)
             ulong i = 0; do {
@@ -1071,7 +1077,7 @@ void sd_ifft_main_block(
     {
         double* X0 = sd_fft_lctx_blk_index(Q, I + S*0);
         double* X1 = sd_fft_lctx_blk_index(Q, I + S*1);
-        if (UNLIKELY(j == 0))
+        if (UNLIKELY(j_bits == 0))
         {
             _RADIX_2_REVERSE_PARAM_J_IS_Z(VECND, Q)
             ulong i = 0; do {

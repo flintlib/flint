@@ -21,6 +21,7 @@
 #include <gmp.h>
 #define ulong mp_limb_t
 #include "flint.h"
+#include "longlong.h"
 #include "mpn_extras.h"
 #include "machine_vectors.h"
 #include "nmod.h"
@@ -51,6 +52,7 @@ FLINT_INLINE ulong n_max(ulong a, ulong b)
 
 FLINT_INLINE ulong n_cdiv(ulong a, ulong b)
 {
+    /* not technically correct because the addition can overflow */
     return (a + b - 1)/b;
 }
 
@@ -78,36 +80,46 @@ FLINT_INLINE ulong n_next_pow2m1(ulong a)
     return a;
 }
 
-#if 0
-FLINT_INLINE ulong n_clog2(ulong x) {
-    if (x <= 2)
-        return x == 2;
-
-   ulong zeros = FLINT_BITS;
-   count_leading_zeros(zeros, x - 1);
-   return FLINT_BITS - zeros;
-}
-#endif
-
-
 FLINT_INLINE ulong n_leading_zeros(ulong x) {
-    return __builtin_clzll(x);
+    return x == 0 ? FLINT_BITS : __builtin_clzll(x);
 }
 
 FLINT_INLINE ulong n_trailing_zeros(ulong x) {
-    return __builtin_ctzll(x);
+    return x == 0 ? FLINT_BITS : __builtin_ctzll(x);
 }
 
+/*
+    nbits is a mess
+
+    without assuming x != 0:
+        on x86 we want 64 - LZCNT
+        on arm we want 64 - CLZ
+
+        the problem is gcc decided that __builtin_clz is undefined on zero
+        input even though both instructions LZCNT and CLZ are defined
+
+    assuming x != 0:
+        on x86 we want BSR + 1
+*/
 FLINT_INLINE ulong n_nbits(ulong x) {
-    return 64 - n_leading_zeros(x);
+    if (x == 0)
+        return 0;
+    return FLINT_BITS - __builtin_clzll(x);
+}
+
+FLINT_INLINE ulong n_nbits_nz(ulong x) {
+    FLINT_ASSERT(x != 0);
+    ulong count;
+    count_leading_zeros(count, x);
+    return (count^(FLINT_BITS-1)) + 1;
 }
 
 FLINT_INLINE ulong n_clog2(ulong x) {
-    return (x <= 2) ? (x == 2) : 64 - __builtin_clzll(x - 1);
+    return (x <= 2) ? (x == 2) : FLINT_BITS - __builtin_clzll(x - 1);
 }
 
 FLINT_INLINE ulong n_flog2(ulong x) {
-    return (x <= 2) ? (x == 2) : 63 - __builtin_clzll(x);
+    return (x <= 2) ? (x == 2) : FLINT_BITS - __builtin_clzll(x);
 }
 
 FLINT_INLINE slong z_min(slong a, slong b) {return FLINT_MIN(a, b);}
@@ -140,6 +152,37 @@ FLINT_DLL void flint_aligned_free(void* p);
     lookup of small indices, which must currently be at least 4.
 */
 
+/* for the fft look up of powers of w */
+#define SET_J_BITS_AND_J_R(j_bits, j_r, j) \
+do { \
+    if (j == 0) \
+    { \
+        j_bits = 0; \
+        j_r = 0; \
+    } \
+    else \
+    { \
+        j_bits = n_nbits_nz(j); \
+        j_r = j - n_pow2(j_bits - 1); \
+    } \
+} while (0)
+
+/* for the ifft look up of powers of w^-1: the remainder has to be flipped */
+#define SET_J_BITS_AND_J_MR(j_bits, j_mr, j) \
+do { \
+    if (j == 0) \
+    { \
+        j_bits = 0; \
+        j_mr = 0; \
+    } \
+    else \
+    { \
+        j_bits = n_nbits_nz(j); \
+        j_mr = n_pow2(j_bits) - 1 - j; \
+    } \
+} while (0)
+
+
 #define SD_FFT_CTX_INIT_DEPTH 12
 
 /* This context is the one expected to sit in a global position */
@@ -165,7 +208,13 @@ typedef struct {
 
 typedef sd_fft_lctx_struct sd_fft_lctx_t[1];
 
-
+/*
+    Points are blocked into blocks of size BLK_SZ. The blocks are mapped into
+    memory with some extra padding for potential cache issues. The 4* keeps
+    things aligned for 4-wide vectors. If this alignment is broken, the load
+    and stores in the fft (unspecified vec4d_load) need to support unaligned
+    addresses.
+*/
 FLINT_INLINE ulong sd_fft_ctx_blk_offset(ulong I)
 {
     return (I << LG_BLK_SZ) + 4*(I >> (BLK_SHIFT+2));
@@ -173,6 +222,7 @@ FLINT_INLINE ulong sd_fft_ctx_blk_offset(ulong I)
 
 FLINT_INLINE ulong sd_fft_ctx_data_size(ulong depth)
 {
+    FLINT_ASSERT(depth >= LG_BLK_SZ);
     return sd_fft_ctx_blk_offset(n_pow2(depth - LG_BLK_SZ));
 }
 
@@ -196,7 +246,7 @@ FLINT_INLINE double sd_fft_ctx_get_index(double* d, ulong i)
     return sd_fft_ctx_blk_index(d, i/BLK_SZ)[i%BLK_SZ];
 }
 
-/* slightly-worse-than-bit-reversed order */
+/* slightly-worse-than-bit-reversed order of sd_{i}fft_basecase_4 */
 FLINT_INLINE double sd_fft_ctx_get_fft_index(double* d, ulong i)
 {
     ulong j = i&(BLK_SZ-16);
@@ -277,16 +327,16 @@ FLINT_INLINE void sd_fft_ctx_ifft_trunc(sd_fft_ctx_t Q, double* d, ulong depth, 
 /* look up w[2*j] */
 FLINT_INLINE double sd_fft_lctx_w2(const sd_fft_lctx_t Q, ulong j)
 {
-    ulong j_bits = n_nbits(j);
-    ulong j_r = j & (n_pow2(j_bits)/2 - 1);
+    ulong j_bits, j_r;
+    SET_J_BITS_AND_J_R(j_bits, j_r, j);
     return Q->w2tab[j_bits][j_r];
 }
 
 /* look up -w[2*j]^-1 */
 FLINT_INLINE double sd_fft_lctx_w2inv(const sd_fft_lctx_t Q, ulong j)
 {
-    ulong j_bits = n_nbits(j);
-    ulong j_mr = n_pow2(j_bits) - 1 - j;
+    ulong j_bits, j_mr;
+    SET_J_BITS_AND_J_MR(j_bits, j_mr, j);
     if (j == 0)
         return -1.0;
     else
@@ -296,11 +346,9 @@ FLINT_INLINE double sd_fft_lctx_w2inv(const sd_fft_lctx_t Q, ulong j)
 /* look up w[jj] */
 FLINT_INLINE double sd_fft_ctx_w(const sd_fft_ctx_t Q, ulong jj)
 {
-    ulong j = jj/2;
-    double s = (jj&1) ? -1.0 : 1.0;
-    ulong j_bits = n_nbits(j);
-    ulong j_r = j & (n_pow2(j_bits)/2 - 1);
-    return s*Q->w2tab[j_bits][j_r];
+    ulong j = jj/2, j_bits, j_r;
+    SET_J_BITS_AND_J_R(j_bits, j_r, j);
+    return (jj&1) ? -Q->w2tab[j_bits][j_r] : Q->w2tab[j_bits][j_r];
 }
 
 typedef struct {
