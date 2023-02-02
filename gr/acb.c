@@ -12,6 +12,7 @@
 #include "acb.h"
 #include "acb_poly.h"
 #include "acb_mat.h"
+#include "arb_hypgeom.h"
 #include "acb_hypgeom.h"
 #include "acf.h"
 #include "fmpzi.h"
@@ -942,6 +943,134 @@ _gr_acb_erfi(acb_t res, const acb_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_acb_erfinv(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    if (acb_is_real(x))
+    {
+        arb_hypgeom_erfinv(acb_realref(res), acb_realref(x), ACB_CTX_PREC(ctx));
+        arb_zero(acb_imagref(res));
+    }
+    else
+    {
+        acb_indeterminate(res);
+    }
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int
+_gr_acb_erfcinv(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    if (acb_is_real(x))
+    {
+        arb_hypgeom_erfcinv(acb_realref(res), acb_realref(x), ACB_CTX_PREC(ctx));
+        arb_zero(acb_imagref(res));
+    }
+    else
+    {
+        acb_indeterminate(res);
+    }
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int
+_gr_acb_fresnel_s(acb_t res, const acb_t x, int normalized, const gr_ctx_t ctx)
+{
+    acb_hypgeom_fresnel(res, NULL, x, normalized, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_fresnel_c(acb_t res, const acb_t x, int normalized, const gr_ctx_t ctx)
+{
+    acb_hypgeom_fresnel(NULL, res, x, normalized, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_fresnel(acb_t res1, acb_t res2, const acb_t x, int normalized, const gr_ctx_t ctx)
+{
+    acb_hypgeom_fresnel(res1, res2, x, normalized, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_gamma_upper(acb_t res, const acb_t x, const acb_t y, int regularized, const gr_ctx_t ctx)
+{
+    acb_hypgeom_gamma_upper(res, x, y, regularized, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int
+_gr_acb_gamma_lower(acb_t res, const acb_t x, const acb_t y, int regularized, const gr_ctx_t ctx)
+{
+    acb_hypgeom_gamma_lower(res, x, y, regularized, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int
+_gr_acb_beta_lower(acb_t res, const acb_t x, const acb_t y, const acb_t z, int regularized, const gr_ctx_t ctx)
+{
+    acb_hypgeom_beta_lower(res, x, y, z, regularized, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int
+_gr_acb_exp_integral(acb_t res, const acb_t x, const acb_t y, const gr_ctx_t ctx)
+{
+    acb_hypgeom_expint(res, x, y, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int
+_gr_acb_exp_integral_ei(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_hypgeom_ei(res, x, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int
+_gr_acb_sin_integral(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_hypgeom_si(res, x, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int
+_gr_acb_cos_integral(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_hypgeom_ci(res, x, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int
+_gr_acb_sinh_integral(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_hypgeom_shi(res, x, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int
+_gr_acb_cosh_integral(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_hypgeom_chi(res, x, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int
+_gr_acb_log_integral(acb_t res, const acb_t x, int offset, const gr_ctx_t ctx)
+{
+    acb_hypgeom_li(res, x, offset, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int
+_gr_acb_dilog(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_hypgeom_dilog(res, x, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int
 _gr_acb_gamma(acb_t res, const acb_t x, const gr_ctx_t ctx)
 {
     if (acb_is_int(x) && arb_is_nonpositive(acb_realref(x)))
@@ -1482,6 +1611,22 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_ERF,             (gr_funcptr) _gr_acb_erf},
     {GR_METHOD_ERFI,            (gr_funcptr) _gr_acb_erfi},
     {GR_METHOD_ERFC,            (gr_funcptr) _gr_acb_erfc},
+    {GR_METHOD_ERFINV,          (gr_funcptr) _gr_acb_erfinv},
+    {GR_METHOD_ERFCINV,         (gr_funcptr) _gr_acb_erfcinv},
+    {GR_METHOD_FRESNEL_C,       (gr_funcptr) _gr_acb_fresnel_c},
+    {GR_METHOD_FRESNEL_S,       (gr_funcptr) _gr_acb_fresnel_s},
+    {GR_METHOD_FRESNEL,         (gr_funcptr) _gr_acb_fresnel},
+    {GR_METHOD_GAMMA_UPPER,     (gr_funcptr) _gr_acb_gamma_upper},
+    {GR_METHOD_GAMMA_LOWER,     (gr_funcptr) _gr_acb_gamma_lower},
+    {GR_METHOD_BETA_LOWER,      (gr_funcptr) _gr_acb_beta_lower},
+    {GR_METHOD_EXP_INTEGRAL,    (gr_funcptr) _gr_acb_exp_integral},
+    {GR_METHOD_EXP_INTEGRAL_EI, (gr_funcptr) _gr_acb_exp_integral_ei},
+    {GR_METHOD_SIN_INTEGRAL,    (gr_funcptr) _gr_acb_sin_integral},
+    {GR_METHOD_COS_INTEGRAL,    (gr_funcptr) _gr_acb_cos_integral},
+    {GR_METHOD_SINH_INTEGRAL,   (gr_funcptr) _gr_acb_sinh_integral},
+    {GR_METHOD_COSH_INTEGRAL,   (gr_funcptr) _gr_acb_cosh_integral},
+    {GR_METHOD_LOG_INTEGRAL,    (gr_funcptr) _gr_acb_log_integral},
+    {GR_METHOD_DILOG,           (gr_funcptr) _gr_acb_dilog},
     {GR_METHOD_FAC_UI,          (gr_funcptr) _gr_acb_fac_ui},
     {GR_METHOD_FAC_FMPZ,        (gr_funcptr) _gr_acb_fac_fmpz},
     {GR_METHOD_RISING_UI,       (gr_funcptr) _gr_acb_rising_ui},

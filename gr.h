@@ -729,7 +729,9 @@ typedef int ((*gr_method_unary_op_get_fmpz)(fmpz_t, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_get_fmpq)(fmpq_t, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_get_d)(double *, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_get_fmpz_fmpz)(fmpz_t, fmpz_t, gr_srcptr, gr_ctx_ptr));
+typedef int ((*gr_method_unary_op_with_flag)(gr_ptr, gr_srcptr, int, gr_ctx_ptr));
 typedef int ((*gr_method_binary_unary_op)(gr_ptr, gr_ptr, gr_srcptr, gr_ctx_ptr));
+typedef int ((*gr_method_binary_unary_op_with_flag)(gr_ptr, gr_ptr, gr_srcptr, int, gr_ctx_ptr));
 typedef int ((*gr_method_binary_op)(gr_ptr, gr_srcptr, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_binary_op_si)(gr_ptr, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_binary_op_ui)(gr_ptr, gr_srcptr, ulong, gr_ctx_ptr));
@@ -803,7 +805,9 @@ typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcp
 #define GR_UNARY_OP_GET_FMPQ(ctx, NAME) (((gr_method_unary_op_get_fmpq *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_OP_GET_D(ctx, NAME) (((gr_method_unary_op_get_d *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_OP_GET_FMPZ_FMPZ(ctx, NAME) (((gr_method_unary_op_get_fmpz_fmpz *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_UNARY_OP_WITH_FLAG(ctx, NAME) (((gr_method_unary_op_with_flag *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_UNARY_OP(ctx, NAME) (((gr_method_binary_unary_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_BINARY_UNARY_OP_WITH_FLAG(ctx, NAME) (((gr_method_binary_unary_op_with_flag *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_OP(ctx, NAME) (((gr_method_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_OP_SI(ctx, NAME) (((gr_method_binary_op_si *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_OP_UI(ctx, NAME) (((gr_method_binary_op_ui *) ctx->methods)[GR_METHOD_ ## NAME])

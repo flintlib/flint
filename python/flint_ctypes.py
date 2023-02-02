@@ -440,7 +440,26 @@ class gr_ctx:
         status = op(res1._ref, res2._ref, x._ref, ctx._ref)
         if status:
             _handle_error(ctx, status, rstr, x)
+        return res1, res2
+
+    def _unary_op_with_flag(ctx, x, flag, op, rstr):
+        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
+            x = ctx(x)
+        res = ctx._elem_type(context=ctx)
+        status = op(res._ref, x._ref, flag, ctx._ref)
+        if status:
+            _handle_error(ctx, status, rstr, x)
         return res
+
+    def _unary_unary_op_with_flag(ctx, x, flag, op, rstr):
+        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
+            x = ctx(x)
+        res1 = ctx._elem_type(context=ctx)
+        res2 = ctx._elem_type(context=ctx)
+        status = op(res1._ref, res2._ref, x._ref, flag, ctx._ref)
+        if status:
+            _handle_error(ctx, status, rstr, x)
+        return res1, res2
 
     def _unary_op_with_fmpz_fmpq_overloads(ctx, x, op, op_ui=None, op_fmpz=None, op_fmpq=None, rstr=None):
         type_x = type(x)
@@ -501,6 +520,30 @@ class gr_ctx:
         status = op(res._ref, x._ref, y._ref, ctx._ref)
         if status:
             _handle_error(ctx, status, rstr, x, y)
+        return res
+
+    def _binary_op_with_flag(ctx, x, y, flag, op, rstr):
+        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
+            x = ctx(x)
+        if type(y) is not ctx._elem_type or y._ctx_python is not ctx:
+            y = ctx(y)
+        res = ctx._elem_type(context=ctx)
+        status = op(res._ref, x._ref, y._ref, flag, ctx._ref)
+        if status:
+            _handle_error(ctx, status, rstr, x, y)
+        return res
+
+    def _ternary_op_with_flag(ctx, x, y, z, flag, op, rstr):
+        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
+            x = ctx(x)
+        if type(y) is not ctx._elem_type or y._ctx_python is not ctx:
+            y = ctx(y)
+        if type(z) is not ctx._elem_type or z._ctx_python is not ctx:
+            z = ctx(z)
+        res = ctx._elem_type(context=ctx)
+        status = op(res._ref, x._ref, y._ref, z._ref, flag, ctx._ref)
+        if status:
+            _handle_error(ctx, status, rstr, x, y, z)
         return res
 
     def _binary_op_fmpz(ctx, x, y, op, rstr):
@@ -845,13 +888,154 @@ class gr_ctx:
         return ctx._unary_op(x, libgr.gr_acsch, "acsch($x)")
 
     def erf(ctx, x):
+        """
+            >>> RR.erf(1)
+            [0.842700792949715 +/- 3.28e-16]
+        """
         return ctx._unary_op(x, libgr.gr_erf, "erf($x)")
 
+    def erfc(ctx, x):
+        """
+            >>> RR.erfc(1)
+            [0.1572992070502851 +/- 3.71e-17]
+        """
+        return ctx._unary_op(x, libgr.gr_erfc, "erfc($x)")
+
     def erfi(ctx, x):
+        """
+            >>> RR.erfi(1)
+            [1.650425758797543 +/- 4.58e-16]
+        """
         return ctx._unary_op(x, libgr.gr_erfi, "erfi($x)")
 
-    def erfc(ctx, x):
-        return ctx._unary_op(x, libgr.gr_erfc, "erfc($x)")
+    def erfcx(ctx, x):
+        return ctx._unary_op(x, libgr.gr_erfcx, "erfcx($x)")
+
+    def erfinv(ctx, x):
+        """
+            >>> RR.erfinv(0.5)
+            [0.4769362762044698 +/- 7.79e-17]
+        """
+        return ctx._unary_op(x, libgr.gr_erfinv, "erfinv($x)")
+
+    def erfcinv(ctx, x):
+        """
+            >>> RR.erfc(RR.erfcinv(0.25))
+            [0.250000000000000 +/- 1.24e-16]
+        """
+        return ctx._unary_op(x, libgr.gr_erfcinv, "erfcinv($x)")
+
+    def fresnel_s(ctx, x, normalized=False):
+        """
+            >>> RR.fresnel_s(1)
+            [0.3102683017233811 +/- 2.67e-18]
+            >>> RR.fresnel_s(1, normalized=True)
+            [0.4382591473903548 +/- 9.24e-17]
+        """
+        return ctx._unary_op_with_flag(x, normalized, libgr.gr_fresnel_s, "fresnel_s($x)")
+
+    def fresnel_c(ctx, x, normalized=False):
+        """
+            >>> RR.fresnel_c(1)
+            [0.904524237900272 +/- 1.46e-16]
+            >>> RR.fresnel_c(1, normalized=True)
+            [0.779893400376823 +/- 3.59e-16]
+        """
+        return ctx._unary_op_with_flag(x, normalized, libgr.gr_fresnel_c, "fresnel_c($x)")
+
+    def fresnel(ctx, x, normalized=False):
+        """
+            >>> RR.fresnel(1)
+            ([0.3102683017233811 +/- 2.67e-18], [0.904524237900272 +/- 1.46e-16])
+            >>> RR.fresnel(1, normalized=True)
+            ([0.4382591473903548 +/- 9.24e-17], [0.779893400376823 +/- 3.59e-16])
+        """
+        return ctx._unary_unary_op_with_flag(x, normalized, libgr.gr_fresnel, "fresnel($x)")
+
+    def gamma_upper(ctx, x, y, regularized=0):
+        """
+            >>> RR.gamma_upper(3, 4)
+            [0.476206611107089 +/- 5.30e-16]
+            >>> RR.gamma_upper(3, 4, regularized=True)
+            [0.2381033055535443 +/- 8.24e-17]
+        """
+        return ctx._binary_op_with_flag(x, y, regularized, libgr.gr_gamma_upper, "gamma_upper($x, $y)")
+
+    def gamma_lower(ctx, x, y, regularized=0):
+        """
+            >>> RR.gamma_lower(3, 4)
+            [1.52379338889291 +/- 2.89e-15]
+            >>> RR.gamma_lower(3, 4, regularized=True)
+            [0.76189669444646 +/- 6.52e-15]
+        """
+        return ctx._binary_op_with_flag(x, y, regularized, libgr.gr_gamma_lower, "gamma_lower($x, $y)")
+
+    def beta_lower(ctx, a, b, x, regularized=0):
+        """
+            >>> RR.beta_lower(2, 3, 0.5)
+            [0.0572916666666667 +/- 6.08e-17]
+            >>> RR.beta_lower(2, 3, 0.5, regularized=True)
+            [0.687500000000000 +/- 5.24e-16]
+        """
+        return ctx._ternary_op_with_flag(a, b, x, regularized, libgr.gr_beta_lower, "beta_lower($a, $b, $x)")
+
+    def exp_integral(ctx, x, y):
+        """
+            >>> RR.exp_integral(1, 2)
+            [0.04890051070806 +/- 2.63e-15]
+        """
+        return ctx._binary_op(x, y, libgr.gr_exp_integral, "exp_integral($x, $y)")
+
+    def exp_integral_ei(ctx, x):
+        """
+            >>> RR.exp_integral_ei(1)
+            [1.89511781635594 +/- 5.11e-15]
+        """
+        return ctx._unary_op(x, libgr.gr_exp_integral_ei, "exp_integral_ei($x)")
+
+    def sin_integral(ctx, x):
+        """
+            >>> RR.sin_integral(1)
+            [0.946083070367183 +/- 1.35e-16]
+        """
+        return ctx._unary_op(x, libgr.gr_sin_integral, "sin_integral($x)")
+
+    def cos_integral(ctx, x):
+        """
+            >>> RR.cos_integral(1)
+            [0.3374039229009681 +/- 5.63e-17]
+        """
+        return ctx._unary_op(x, libgr.gr_cos_integral, "cos_integral($x)")
+
+    def sinh_integral(ctx, x):
+        """
+            >>> RR.sinh_integral(1)
+            [1.05725087537573 +/- 2.77e-15]
+        """
+        return ctx._unary_op(x, libgr.gr_sinh_integral, "sinh_integral($x)")
+
+    def cosh_integral(ctx, x):
+        """
+            >>> RR.cosh_integral(1)
+            [0.837866940980208 +/- 4.78e-16]
+        """
+        return ctx._unary_op(x, libgr.gr_cosh_integral, "cosh_integral($x)")
+
+    def log_integral(ctx, x, offset=False):
+        """
+            >>> RR.log_integral(2)
+            [1.04516378011749 +/- 4.01e-15]
+            >>> RR.log_integral(2, offset=True)
+            0
+        """
+        return ctx._unary_op_with_flag(x, offset, libgr.gr_log_integral, "log_integral($x)")
+
+    def dilog(ctx, x):
+        """
+            >>> RR.dilog(1)
+            [1.644934066848226 +/- 6.45e-16]
+        """
+        return ctx._unary_op(x, libgr.gr_dilog, "dilog($x)")
 
     def fac(ctx, x):
         """

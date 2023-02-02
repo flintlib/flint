@@ -781,7 +781,9 @@ _gr_arf_log1p(arf_t res, const arf_t x, const gr_ctx_t ctx)
         return GR_SUCCESS;
     }
 
-    ARF_FUNC_VIA_ARB(res, arb_log1p, x)
+    {
+        ARF_FUNC_VIA_ARB(res, arb_log1p, x)
+    }
 }
 
 int

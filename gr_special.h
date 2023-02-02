@@ -167,22 +167,19 @@ GR_SPECIAL_DEF int gr_erfcx(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_U
 GR_SPECIAL_DEF int gr_erfi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ERFI)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_erfinv(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ERFINV)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_erfcinv(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ERFCINV)(res, x, ctx); }
-
-/* todo: normalized flags */
-GR_SPECIAL_DEF int gr_fresnel_s(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, FRESNEL_S)(res, x, ctx); }
-GR_SPECIAL_DEF int gr_fresnel_c(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, FRESNEL_C)(res, x, ctx); }
-GR_SPECIAL_DEF int gr_fresnel(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_ctx_t ctx) { return GR_BINARY_UNARY_OP(ctx, FRESNEL)(res1, res2, x, ctx); }
-GR_SPECIAL_DEF int gr_gamma_upper(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, GAMMA_UPPER)(res, x, y, ctx); }
-GR_SPECIAL_DEF int gr_gamma_lower(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, GAMMA_LOWER)(res, x, y, ctx); }
-GR_SPECIAL_DEF int gr_beta_lower(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_ctx_t ctx) { return GR_TERNARY_OP(ctx, BETA_LOWER)(res, x, y, z, ctx); }
+GR_SPECIAL_DEF int gr_fresnel_s(gr_ptr res, gr_srcptr x, int normalized, gr_ctx_t ctx) { return GR_UNARY_OP_WITH_FLAG(ctx, FRESNEL_S)(res, x, normalized, ctx); }
+GR_SPECIAL_DEF int gr_fresnel_c(gr_ptr res, gr_srcptr x, int normalized, gr_ctx_t ctx) { return GR_UNARY_OP_WITH_FLAG(ctx, FRESNEL_C)(res, x, normalized, ctx); }
+GR_SPECIAL_DEF int gr_fresnel(gr_ptr res1, gr_ptr res2, gr_srcptr x, int normalized, gr_ctx_t ctx) { return GR_BINARY_UNARY_OP_WITH_FLAG(ctx, FRESNEL)(res1, res2, x, normalized, ctx); }
+GR_SPECIAL_DEF int gr_gamma_upper(gr_ptr res, gr_srcptr x, gr_srcptr y, int regularized, gr_ctx_t ctx) { return GR_BINARY_OP_WITH_FLAG(ctx, GAMMA_UPPER)(res, x, y, regularized, ctx); }
+GR_SPECIAL_DEF int gr_gamma_lower(gr_ptr res, gr_srcptr x, gr_srcptr y, int regularized, gr_ctx_t ctx) { return GR_BINARY_OP_WITH_FLAG(ctx, GAMMA_LOWER)(res, x, y, regularized, ctx); }
+GR_SPECIAL_DEF int gr_beta_lower(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, int regularized, gr_ctx_t ctx) { return GR_TERNARY_OP_WITH_FLAG(ctx, BETA_LOWER)(res, x, y, z, regularized, ctx); }
 GR_SPECIAL_DEF int gr_exp_integral(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, EXP_INTEGRAL)(res, x, y, ctx); }
 GR_SPECIAL_DEF int gr_exp_integral_ei(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, EXP_INTEGRAL_EI)(res, x, ctx); }
-
 GR_SPECIAL_DEF int gr_sin_integral(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SIN_INTEGRAL)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_cos_integral(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, COS_INTEGRAL)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_sinh_integral(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SINH_INTEGRAL)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_cosh_integral(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, COSH_INTEGRAL)(res, x, ctx); }
-GR_SPECIAL_DEF int gr_log_integral(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, LOG_INTEGRAL)(res, x, ctx); }
+GR_SPECIAL_DEF int gr_log_integral(gr_ptr res, gr_srcptr x, int offset, gr_ctx_t ctx) { return GR_UNARY_OP_WITH_FLAG(ctx, LOG_INTEGRAL)(res, x, offset, ctx); }
 GR_SPECIAL_DEF int gr_dilog(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, DILOG)(res, x, ctx); }
 
 GR_SPECIAL_DEF int gr_zeta(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ZETA)(res, x, ctx); }

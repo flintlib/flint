@@ -216,13 +216,13 @@ Error function and exponential integrals
               int gr_erfinv(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
               int gr_erfcinv(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 
-.. function:: int gr_fresnel_s(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
-              int gr_fresnel_c(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
-              int gr_fresnel(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_ctx_t ctx)
+.. function:: int gr_fresnel_s(gr_ptr res, gr_srcptr x, int normalized, gr_ctx_t ctx)
+              int gr_fresnel_c(gr_ptr res, gr_srcptr x, int normalized, gr_ctx_t ctx)
+              int gr_fresnel(gr_ptr res1, gr_ptr res2, gr_srcptr x, int normalized, gr_ctx_t ctx)
 
-.. function:: int gr_gamma_upper(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
-              int gr_gamma_lower(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
-              int gr_beta_lower(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_ctx_t ctx)
+.. function:: int gr_gamma_upper(gr_ptr res, gr_srcptr x, gr_srcptr y, int regularized, gr_ctx_t ctx)
+              int gr_gamma_lower(gr_ptr res, gr_srcptr x, gr_srcptr y, int regularized, gr_ctx_t ctx)
+              int gr_beta_lower(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, int regularized, gr_ctx_t ctx)
 
 .. function:: int gr_exp_integral(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
               int gr_exp_integral_ei(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
@@ -230,7 +230,7 @@ Error function and exponential integrals
               int gr_cos_integral(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
               int gr_sinh_integral(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
               int gr_cosh_integral(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
-              int gr_log_integral(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_log_integral(gr_ptr res, gr_srcptr x, int offset, gr_ctx_t ctx)
               int gr_dilog(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 
 Orthogonal polynomials
