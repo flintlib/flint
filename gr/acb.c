@@ -834,6 +834,13 @@ _gr_acb_exp(acb_t res, const acb_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_acb_expm1(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_expm1(res, x, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
 _gr_acb_log(acb_t res, const acb_t x, const gr_ctx_t ctx)
 {
     if (acb_contains_zero(x))
@@ -844,6 +851,20 @@ _gr_acb_log(acb_t res, const acb_t x, const gr_ctx_t ctx)
     }
 
     acb_log(res, x, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_log1p(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    if (arb_contains_si(acb_realref(x), -1) && arb_contains_zero(acb_imagref(x)))
+    {
+        if (arb_equal_si(acb_realref(x), -1) && arb_is_zero(acb_imagref(x)))
+            return GR_DOMAIN;
+        return GR_UNABLE;
+    }
+
+    acb_log1p(res, x, ACB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
@@ -1449,7 +1470,9 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_CSGN,            (gr_funcptr) _gr_acb_csgn},
     {GR_METHOD_PI,              (gr_funcptr) _gr_acb_pi},
     {GR_METHOD_EXP,             (gr_funcptr) _gr_acb_exp},
+    {GR_METHOD_EXPM1,           (gr_funcptr) _gr_acb_expm1},
     {GR_METHOD_LOG,             (gr_funcptr) _gr_acb_log},
+    {GR_METHOD_LOG1P,           (gr_funcptr) _gr_acb_log1p},
     {GR_METHOD_SIN,             (gr_funcptr) _gr_acb_sin},
     {GR_METHOD_COS,             (gr_funcptr) _gr_acb_cos},
     {GR_METHOD_SIN_PI,          (gr_funcptr) _gr_acb_sin_pi},

@@ -707,6 +707,27 @@ _gr_arf_exp(arf_t res, const arf_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_arf_expm1(arf_t res, const arf_t x, const gr_ctx_t ctx)
+{
+    if (arf_is_special(x))
+    {
+        if (arf_is_zero(x))
+            arf_zero(res);
+        else if (arf_is_pos_inf(x))
+            arf_pos_inf(res);
+        else if (arf_is_neg_inf(x))
+            arf_set_si(res, -1);
+        else
+            arf_nan(res);
+        return GR_SUCCESS;
+    }
+    else
+    {
+        ARF_FUNC_VIA_ARB(res, arb_expm1, x)
+    }
+}
+
+int
 _gr_arf_log(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     if (arf_is_special(x))
@@ -719,10 +740,48 @@ _gr_arf_log(arf_t res, const arf_t x, const gr_ctx_t ctx)
             arf_nan(res);
         return GR_SUCCESS;
     }
+    else if (arf_sgn(x) < 0)
+    {
+        arf_nan(res);
+        return GR_SUCCESS;
+    }
     else
     {
         ARF_FUNC_VIA_ARB(res, arb_log, x)
     }
+}
+
+int
+_gr_arf_log1p(arf_t res, const arf_t x, const gr_ctx_t ctx)
+{
+    int cmp;
+
+    if (arf_is_special(x))
+    {
+        if (arf_is_zero(x))
+            arf_zero(res);
+        else if (arf_is_pos_inf(x))
+            arf_pos_inf(res);
+        else
+            arf_nan(res);
+        return GR_SUCCESS;
+    }
+
+    cmp = arf_cmp_si(x, -1);
+
+    if (cmp == 0)
+    {
+        arf_neg_inf(res);
+        return GR_SUCCESS;
+    }
+
+    if (cmp < 0)
+    {
+        arf_nan(res);
+        return GR_SUCCESS;
+    }
+
+    ARF_FUNC_VIA_ARB(res, arb_log1p, x)
 }
 
 int
@@ -1268,7 +1327,9 @@ gr_method_tab_input _arf_methods_input[] =
     {GR_METHOD_I,               (gr_funcptr) gr_not_in_domain},
     {GR_METHOD_PI,              (gr_funcptr) _gr_arf_pi},
     {GR_METHOD_EXP,             (gr_funcptr) _gr_arf_exp},
+    {GR_METHOD_EXPM1,           (gr_funcptr) _gr_arf_expm1},
     {GR_METHOD_LOG,             (gr_funcptr) _gr_arf_log},
+    {GR_METHOD_LOG1P,           (gr_funcptr) _gr_arf_log1p},
     {GR_METHOD_SIN,             (gr_funcptr) _gr_arf_sin},
     {GR_METHOD_COS,             (gr_funcptr) _gr_arf_cos},
     {GR_METHOD_TAN,             (gr_funcptr) _gr_arf_tan},

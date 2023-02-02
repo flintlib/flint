@@ -1351,12 +1351,56 @@ gr_generic_exp(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 }
 
 int
+gr_generic_expm1(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    int status = gr_exp(res, x, ctx);
+    status |= gr_sub_ui(res, res, 1, ctx);
+    return status;
+}
+
+int
+gr_generic_exp2(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+    status |= gr_set_ui(t, 2, ctx);
+    status |= gr_pow(res, t, x, ctx);
+    GR_TMP_CLEAR(t, ctx);
+
+    return status;
+}
+
+int
+gr_generic_exp10(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+    status |= gr_set_ui(t, 10, ctx);
+    status |= gr_pow(res, t, x, ctx);
+    GR_TMP_CLEAR(t, ctx);
+
+    return status;
+}
+
+int
 gr_generic_log(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 {
     if (gr_is_one(x, ctx) == T_TRUE)
         return gr_zero(res, ctx);
 
     return GR_UNABLE;
+}
+
+int
+gr_generic_log1p(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    int status = gr_add_ui(res, x, 1, ctx);
+    status |= gr_log(res, res, ctx);
+    return status;
 }
 
 int
@@ -2690,7 +2734,11 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_CMPABS_OTHER,            (gr_funcptr) gr_generic_cmpabs_other},
 
     {GR_METHOD_EXP,                     (gr_funcptr) gr_generic_exp},
+    {GR_METHOD_EXPM1,                   (gr_funcptr) gr_generic_expm1},
+    {GR_METHOD_EXP2,                    (gr_funcptr) gr_generic_exp2},
+    {GR_METHOD_EXP10,                   (gr_funcptr) gr_generic_exp10},
     {GR_METHOD_LOG,                     (gr_funcptr) gr_generic_log},
+    {GR_METHOD_LOG1P,                   (gr_funcptr) gr_generic_log1p},
     {GR_METHOD_SIN,                     (gr_funcptr) gr_generic_sin},
     {GR_METHOD_COS,                     (gr_funcptr) gr_generic_cos},
     {GR_METHOD_TAN,                     (gr_funcptr) gr_generic_tan},

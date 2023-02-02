@@ -749,9 +749,21 @@ _gr_acf_exp(acf_t res, const acf_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_acf_expm1(acf_t res, const acf_t x, const gr_ctx_t ctx)
+{
+    ACF_FUNC_VIA_ACB(res, acb_expm1, x)
+}
+
+int
 _gr_acf_log(acf_t res, const acf_t x, const gr_ctx_t ctx)
 {
     ACF_FUNC_VIA_ACB(res, acb_log, x)
+}
+
+int
+_gr_acf_log1p(acf_t res, const acf_t x, const gr_ctx_t ctx)
+{
+    ACF_FUNC_VIA_ACB(res, acb_log1p, x)
 }
 
 int
@@ -1214,7 +1226,9 @@ gr_method_tab_input _acf_methods_input[] =
     {GR_METHOD_I,               (gr_funcptr) _gr_acf_i},
     {GR_METHOD_PI,              (gr_funcptr) _gr_acf_pi},
     {GR_METHOD_EXP,             (gr_funcptr) _gr_acf_exp},
+    {GR_METHOD_EXPM1,           (gr_funcptr) _gr_acf_expm1},
     {GR_METHOD_LOG,             (gr_funcptr) _gr_acf_log},
+    {GR_METHOD_LOG1P,           (gr_funcptr) _gr_acf_log1p},
     {GR_METHOD_SIN,             (gr_funcptr) _gr_acf_sin},
     {GR_METHOD_COS,             (gr_funcptr) _gr_acf_cos},
 

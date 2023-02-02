@@ -693,6 +693,12 @@ class gr_ctx:
     def exp(ctx, x):
         return ctx._unary_op(x, libgr.gr_exp, "exp($x)")
 
+    def exp2(ctx, x):
+        return ctx._unary_op(x, libgr.gr_exp2, "exp2($x)")
+
+    def exp10(ctx, x):
+        return ctx._unary_op(x, libgr.gr_exp10, "exp10($x)")
+
     def expm1(ctx, x):
         return ctx._unary_op(x, libgr.gr_expm1, "expm1($x)")
 
@@ -1984,8 +1990,76 @@ class gr_elem:
         """
         return self._unary_op(self, libgr.gr_exp, "exp($x)")
 
+    def expm1(self):
+        """
+        Exponential function minus 1.
+
+            >>> RR("1e-10").expm1()
+            [1.000000000050000e-10 +/- 3.86e-26]
+            >>> CC(RR("1e-10")).expm1()
+            [1.000000000050000e-10 +/- 3.86e-26]
+            >>> RF("1e-10").expm1()
+            1.000000000050000e-10
+            >>> CF(RF("1e-10")).expm1()
+            1.000000000050000e-10
+            >>> QQ(0).expm1()
+            0
+            >>> QQ(1).expm1()
+            Traceback (most recent call last):
+              ...
+            FlintUnableError: failed to compute expm1(x) in {Rational field (fmpq)} for {x = 1}
+        """
+        return self._unary_op(self, libgr.gr_expm1, "expm1($x)")
+
+    def exp2(self):
+        """
+        Exponential function with base 2.
+
+            >>> QQ(5).exp2()
+            32
+            >>> RF(0.5).exp2()
+            1.414213562373095
+        """
+        return self._unary_op(self, libgr.gr_exp2, "exp2($x)")
+
+    def exp10(self):
+        """
+        Exponential function with base 10.
+
+            >>> QQ(5).exp2()
+            32
+            >>> RF(0.5).exp10()
+            3.162277660168380
+        """
+        return self._unary_op(self, libgr.gr_exp10, "exp10($x)")
+
     def log(self):
+        """
+        Natural logarithm.
+
+            >>> QQ(1).log()
+            0
+            >>> QQ(2).log()
+            Traceback (most recent call last):
+              ...
+            FlintUnableError: failed to compute log(x) in {Rational field (fmpq)} for {x = 2}
+            >>> RF(2).log()
+            0.6931471805599453
+        """
         return self._unary_op(self, libgr.gr_log, "log($x)")
+
+    def log1p(self):
+        """
+        Natural logarithm with one added to the argument.
+
+            >>> QQ(0).log1p()
+            0
+            >>> RF(-0.5).log1p()
+            -0.6931471805599453
+            >>> RR(1).log1p()
+            [0.693147180559945 +/- 4.12e-16]
+        """
+        return self._unary_op(self, libgr.gr_log1p, "log1p($x)")
 
     def sin(self):
         return self._unary_op(self, libgr.gr_sin, "sin($x)")
