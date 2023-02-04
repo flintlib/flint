@@ -182,6 +182,31 @@ GR_SPECIAL_DEF int gr_cosh_integral(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { ret
 GR_SPECIAL_DEF int gr_log_integral(gr_ptr res, gr_srcptr x, int offset, gr_ctx_t ctx) { return GR_UNARY_OP_WITH_FLAG(ctx, LOG_INTEGRAL)(res, x, offset, ctx); }
 GR_SPECIAL_DEF int gr_dilog(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, DILOG)(res, x, ctx); }
 
+GR_SPECIAL_DEF int gr_bessel_j(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, BESSEL_J)(res, x, y, ctx); }
+GR_SPECIAL_DEF int gr_bessel_y(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, BESSEL_Y)(res, x, y, ctx); }
+GR_SPECIAL_DEF int gr_bessel_i(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, BESSEL_I)(res, x, y, ctx); }
+GR_SPECIAL_DEF int gr_bessel_k(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, BESSEL_K)(res, x, y, ctx); }
+GR_SPECIAL_DEF int gr_bessel_j_y(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_BINARY_OP(ctx, BESSEL_J_Y)(res1, res2, x, y, ctx); }
+GR_SPECIAL_DEF int gr_bessel_i_scaled(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, BESSEL_I_SCALED)(res, x, y, ctx); }
+GR_SPECIAL_DEF int gr_bessel_k_scaled(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, BESSEL_K_SCALED)(res, x, y, ctx); }
+
+GR_SPECIAL_DEF int gr_airy(gr_ptr res1, gr_ptr res2, gr_ptr res3, gr_ptr res4, gr_srcptr x, gr_ctx_t ctx) { return GR_QUATERNARY_UNARY_OP(ctx, AIRY)(res1, res2, res3, res4, x, ctx); }
+GR_SPECIAL_DEF int gr_airy_ai(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, AIRY_AI)(res, x, ctx); }
+GR_SPECIAL_DEF int gr_airy_bi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, AIRY_BI)(res, x, ctx); }
+GR_SPECIAL_DEF int gr_airy_ai_prime(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, AIRY_AI_PRIME)(res, x, ctx); }
+GR_SPECIAL_DEF int gr_airy_bi_prime(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, AIRY_BI_PRIME)(res, x, ctx); }
+
+GR_SPECIAL_DEF int gr_airy_ai_zero(gr_ptr res, const fmpz_t n, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, AIRY_AI_ZERO)(res, n, ctx); }
+GR_SPECIAL_DEF int gr_airy_bi_zero(gr_ptr res, const fmpz_t n, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, AIRY_BI_ZERO)(res, n, ctx); }
+GR_SPECIAL_DEF int gr_airy_ai_prime_zero(gr_ptr res, const fmpz_t n, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, AIRY_AI_PRIME_ZERO)(res, n, ctx); }
+GR_SPECIAL_DEF int gr_airy_bi_prime_zero(gr_ptr res, const fmpz_t n, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, AIRY_BI_PRIME_ZERO)(res, n, ctx); }
+
+GR_SPECIAL_DEF int gr_coulomb(gr_ptr res1, gr_ptr res2, gr_ptr res3, gr_ptr res4, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_ctx_t ctx) { return GR_QUATERNARY_TERNARY_OP(ctx, COULOMB)(res1, res2, res3, res4, x, y, z, ctx); }
+GR_SPECIAL_DEF int gr_coulomb_f(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_ctx_t ctx) { return GR_TERNARY_OP(ctx, COULOMB_F)(res, x, y, z, ctx); }
+GR_SPECIAL_DEF int gr_coulomb_g(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_ctx_t ctx) { return GR_TERNARY_OP(ctx, COULOMB_G)(res, x, y, z, ctx); }
+GR_SPECIAL_DEF int gr_coulomb_hpos(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_ctx_t ctx) { return GR_TERNARY_OP(ctx, COULOMB_HPOS)(res, x, y, z, ctx); }
+GR_SPECIAL_DEF int gr_coulomb_hneg(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_ctx_t ctx) { return GR_TERNARY_OP(ctx, COULOMB_HNEG)(res, x, y, z, ctx); }
+
 GR_SPECIAL_DEF int gr_zeta(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ZETA)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_zeta_ui(gr_ptr res, ulong x, gr_ctx_t ctx) { return GR_UNARY_OP_UI(ctx, ZETA_UI)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_hurwitz_zeta(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, HURWITZ_ZETA)(res, x, y, ctx); }
@@ -211,27 +236,6 @@ GR_SPECIAL_DEF int gr_agm(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { 
     GR_METHOD_GAUSS_LEGENDRE_NODE,
     GR_METHOD_SPHERICAL_Y_SI,
 
-    GR_METHOD_BESSEL_J,
-    GR_METHOD_BESSEL_Y,
-    GR_METHOD_BESSEL_J_Y,
-    GR_METHOD_BESSEL_I,
-    GR_METHOD_BESSEL_I_SCALED,
-    GR_METHOD_BESSEL_K,
-    GR_METHOD_BESSEL_K_SCALED,
-
-    GR_METHOD_AIRY,
-    GR_METHOD_AIRY_AI,
-    GR_METHOD_AIRY_BI,
-    GR_METHOD_AIRY_AI_PRIME,
-    GR_METHOD_AIRY_BI_PRIME,
-    GR_METHOD_AIRY_AI_ZERO_FMPZ,
-    GR_METHOD_AIRY_BI_ZERO_FMPZ,
-    GR_METHOD_AIRY_AI_PRIME_ZERO_FMPZ,
-    GR_METHOD_AIRY_BI_PRIME_ZERO_FMPZ,
-
-    GR_METHOD_COULOMB_F,
-    GR_METHOD_COULOMB_G,
-    GR_METHOD_COULOMB,
 
     GR_METHOD_DIRICHLET_CHI_UI,
     GR_METHOD_DIRICHLET_L,

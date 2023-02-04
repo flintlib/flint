@@ -461,6 +461,15 @@ class gr_ctx:
             _handle_error(ctx, status, rstr, x)
         return res1, res2
 
+    def _unary_op_fmpz(ctx, x, op, rstr):
+        if type(x) is not fmpz:
+            x = ZZ(x)
+        res = ctx._elem_type(context=ctx)
+        status = op(res._ref, x._ref, ctx._ref)
+        if status:
+            _handle_error(ctx, status, rstr, x)
+        return res
+
     def _unary_op_with_fmpz_fmpq_overloads(ctx, x, op, op_ui=None, op_fmpz=None, op_fmpq=None, rstr=None):
         type_x = type(x)
         res = ctx._elem_type(context=ctx)
@@ -522,6 +531,18 @@ class gr_ctx:
             _handle_error(ctx, status, rstr, x, y)
         return res
 
+    def _binary_binary_op(ctx, x, y, op, rstr):
+        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
+            x = ctx(x)
+        if type(y) is not ctx._elem_type or y._ctx_python is not ctx:
+            y = ctx(y)
+        res1 = ctx._elem_type(context=ctx)
+        res2 = ctx._elem_type(context=ctx)
+        status = op(res1._ref, res2._ref, x._ref, y._ref, ctx._ref)
+        if status:
+            _handle_error(ctx, status, rstr, x, y)
+        return res
+
     def _binary_op_with_flag(ctx, x, y, flag, op, rstr):
         if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
             x = ctx(x)
@@ -531,6 +552,19 @@ class gr_ctx:
         status = op(res._ref, x._ref, y._ref, flag, ctx._ref)
         if status:
             _handle_error(ctx, status, rstr, x, y)
+        return res
+
+    def _ternary_op(ctx, x, y, z, op, rstr):
+        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
+            x = ctx(x)
+        if type(y) is not ctx._elem_type or y._ctx_python is not ctx:
+            y = ctx(y)
+        if type(z) is not ctx._elem_type or z._ctx_python is not ctx:
+            z = ctx(z)
+        res = ctx._elem_type(context=ctx)
+        status = op(res._ref, x._ref, y._ref, z._ref, ctx._ref)
+        if status:
+            _handle_error(ctx, status, rstr, x, y, z)
         return res
 
     def _ternary_op_with_flag(ctx, x, y, z, flag, op, rstr):
@@ -1036,6 +1070,129 @@ class gr_ctx:
             [1.644934066848226 +/- 6.45e-16]
         """
         return ctx._unary_op(x, libgr.gr_dilog, "dilog($x)")
+
+    def bessel_j(ctx, x, y):
+        """
+            >>> RR.bessel_j(2, 3)
+            [0.486091260585891 +/- 4.75e-16]
+        """
+        return ctx._binary_op(x, y, libgr.gr_bessel_j, "bessel_j($n, $x)")
+
+    def bessel_y(ctx, x, y):
+        """
+            >>> RR.bessel_y(2, 3)
+            [-0.16040039348492 +/- 5.80e-15]
+        """
+        return ctx._binary_op(x, y, libgr.gr_bessel_y, "bessel_y($n, $x)")
+
+    def bessel_i(ctx, x, y, scaled=False):
+        """
+            >>> RR.bessel_i(2, 3)
+            [2.24521244092995 +/- 1.88e-15]
+            >>> RR.bessel_i(2, 3, scaled=True)
+            [0.111782545296958 +/- 2.09e-16]
+        """
+        if scaled:
+            return ctx._binary_op(x, y, libgr.gr_bessel_i_scaled, "bessel_i($n, $x, scaled=True)")
+        else:
+            return ctx._binary_op(x, y, libgr.gr_bessel_i, "bessel_i($n, $x)")
+
+    def bessel_k(ctx, x, y, scaled=False):
+        """
+            >>> RR.bessel_k(2, 3)
+            [0.06151045847174 +/- 8.87e-15]
+            >>> RR.bessel_k(2, 3, scaled=True)
+            [1.235470584796 +/- 5.14e-13]
+        """
+        if scaled:
+            return ctx._binary_op(x, y, libgr.gr_bessel_k_scaled, "bessel_k($n, $x, scaled=True)")
+        else:
+            return ctx._binary_op(x, y, libgr.gr_bessel_k, "bessel_k($n, $x)")
+
+    # todo: simultaneous airy, bessel, coulomb
+    #def bessel_j_y(ctx, x, y):
+    #    return ctx._binary_binary_op(x, y, libgr.gr_bessel_k, "bessel_j_y($n, $x)")
+
+    def airy_ai(ctx, x):
+        """
+            [0.1352924163128814 +/- 4.17e-17]
+        """
+        return ctx._unary_op(x, libgr.gr_airy_ai, "airy_ai($x)")
+
+    def airy_bi(ctx, x):
+        """
+            [-0.1591474412967932 +/- 2.95e-17]
+        """
+        return ctx._unary_op(x, libgr.gr_airy_bi, "airy_bi($x)")
+
+
+    def airy_ai_prime(ctx, x):
+        """
+            [1.207423594952871 +/- 3.27e-16]
+        """
+        return ctx._unary_op(x, libgr.gr_airy_ai_prime, "airy_ai_prime($x)")
+
+    def airy_bi_prime(ctx, x):
+        """
+            [0.932435933392776 +/- 5.83e-16]
+        """
+        return ctx._unary_op(x, libgr.gr_airy_bi_prime, "airy_bi_prime($x)")
+
+    def airy_ai_zero(ctx, n):
+        """
+            >>> RR.airy_ai(RR.airy_ai_zero(1))
+            [+/- 3.51e-16]
+        """
+        return ctx._unary_op_fmpz(n, libgr.gr_airy_ai_zero, "airy_ai_zero($n)")
+
+    def airy_bi_zero(ctx, n):
+        """
+            >>> RR.airy_bi(RR.airy_bi_zero(1))
+            [+/- 2.08e-16]
+        """
+        return ctx._unary_op_fmpz(n, libgr.gr_airy_bi_zero, "airy_bi_zero($n)")
+
+    def airy_ai_prime_zero(ctx, n):
+        """
+            >>> RR.airy_ai_prime(RR.airy_ai_prime_zero(1))
+            [+/- 1.44e-16]
+        """
+        return ctx._unary_op_fmpz(n, libgr.gr_airy_ai_prime_zero, "airy_ai_prime_zero($n)")
+
+    def airy_bi_prime_zero(ctx, n):
+        """
+            >>> RR.airy_bi_prime(RR.airy_bi_prime_zero(1))
+            [+/- 6.18e-16]
+        """
+        return ctx._unary_op_fmpz(n, libgr.gr_airy_bi_prime_zero, "airy_bi_prime_zero($n)")
+
+    def coulomb_f(ctx, x, y, z):
+        """
+            >>> CC.coulomb_f(2, 3, 4)
+            [0.101631502833431 +/- 8.03e-16]
+        """
+        return ctx._ternary_op(x, y, z, libgr.gr_coulomb_f, "coulomb_f($x)")
+
+    def coulomb_g(ctx, x, y, z):
+        """
+            >>> CC.coulomb_g(2, 3, 4)
+            [5.371722466 +/- 6.15e-10]
+        """
+        return ctx._ternary_op(x, y, z, libgr.gr_coulomb_g, "coulomb_g($x)")
+
+    def coulomb_hpos(ctx, x, y, z):
+        """
+            >>> CC.coulomb_hpos(2, 3, 4)
+            ([5.371722466 +/- 6.15e-10] + [0.101631502833431 +/- 8.03e-16]*I)
+        """
+        return ctx._ternary_op(x, y, z, libgr.gr_coulomb_hpos, "coulomb_hpos($x)")
+
+    def coulomb_hneg(ctx, x, y, z):
+        """
+            >>> CC.coulomb_hneg(2, 3, 4)
+            ([5.371722466 +/- 6.15e-10] + [-0.101631502833431 +/- 8.03e-16]*I)
+        """
+        return ctx._ternary_op(x, y, z, libgr.gr_coulomb_hneg, "coulomb_hneg($x)")
 
     def fac(ctx, x):
         """

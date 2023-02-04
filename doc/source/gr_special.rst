@@ -236,8 +236,33 @@ Error function and exponential integrals
 Orthogonal polynomials
 --------------------------------------------------------------------------------
 
-Bessel and Airy functions
+Bessel, Airy and Coulomb functions
 --------------------------------------------------------------------------------
+
+.. function:: int gr_bessel_j(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_bessel_y(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_bessel_i(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_bessel_k(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_bessel_j_y(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_bessel_i_scaled(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_bessel_k_scaled(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+
+.. function:: int gr_airy(gr_ptr res1, gr_ptr res2, gr_ptr res3, gr_ptr res4, gr_srcptr x, gr_ctx_t ctx)
+              int gr_airy_ai(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_airy_bi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_airy_ai_prime(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_airy_bi_prime(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_airy_ai_zero(gr_ptr res, const fmpz_t n, gr_ctx_t ctx)
+              int gr_airy_bi_zero(gr_ptr res, const fmpz_t n, gr_ctx_t ctx)
+              int gr_airy_ai_prime_zero(gr_ptr res, const fmpz_t n, gr_ctx_t ctx)
+              int gr_airy_bi_prime_zero(gr_ptr res, const fmpz_t n, gr_ctx_t ctx)
+
+.. function:: int gr_coulomb(gr_ptr res1, gr_ptr res2, gr_ptr res3, gr_ptr res4, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_ctx_t ctx)
+              int gr_coulomb_f(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_ctx_t ctx)
+              int gr_coulomb_g(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_ctx_t ctx)
+              int gr_coulomb_hpos(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_ctx_t ctx)
+              int gr_coulomb_hneg(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_ctx_t ctx)
 
 Hypergeometric functions
 --------------------------------------------------------------------------------

@@ -1422,6 +1422,77 @@ _gr_arb_log_barnes_g(arb_t res, const arb_t x, const gr_ctx_t ctx)
     }
 }
 
+int _gr_arb_bessel_j(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) { arb_hypgeom_bessel_j(res, x, y, ARB_CTX_PREC(ctx)); return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+int _gr_arb_bessel_y(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) { arb_hypgeom_bessel_y(res, x, y, ARB_CTX_PREC(ctx)); return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+int _gr_arb_bessel_i(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) { arb_hypgeom_bessel_i(res, x, y, ARB_CTX_PREC(ctx)); return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+int _gr_arb_bessel_k(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) { arb_hypgeom_bessel_k(res, x, y, ARB_CTX_PREC(ctx)); return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+
+int _gr_arb_bessel_j_y(arb_t res1, arb_t res2, const arb_t x, const arb_t y, const gr_ctx_t ctx)
+{
+    arb_hypgeom_bessel_jy(res1, res2, x, y, ARB_CTX_PREC(ctx));
+    return (arb_is_finite(res1) && arb_is_finite(res2)) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_arb_bessel_i_scaled(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) { arb_hypgeom_bessel_i_scaled(res, x, y, ARB_CTX_PREC(ctx)); return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+int _gr_arb_bessel_k_scaled(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) { arb_hypgeom_bessel_k_scaled(res, x, y, ARB_CTX_PREC(ctx)); return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+
+int _gr_arb_airy(arb_t res1, arb_t res2, arb_t res3, arb_t res4, const arb_t x, const gr_ctx_t ctx) { arb_hypgeom_airy(res1, res2, res3, res4, x, ARB_CTX_PREC(ctx)); return GR_SUCCESS; }
+int _gr_arb_airy_ai(arb_t res, const arb_t x, const gr_ctx_t ctx) { arb_hypgeom_airy(res, NULL, NULL, NULL, x, ARB_CTX_PREC(ctx)); return GR_SUCCESS; }
+int _gr_arb_airy_ai_prime(arb_t res, const arb_t x, const gr_ctx_t ctx) { arb_hypgeom_airy(NULL, res, NULL, NULL, x, ARB_CTX_PREC(ctx)); return GR_SUCCESS; }
+int _gr_arb_airy_bi(arb_t res, const arb_t x, const gr_ctx_t ctx) { arb_hypgeom_airy(NULL, NULL, res, NULL, x, ARB_CTX_PREC(ctx)); return GR_SUCCESS; }
+int _gr_arb_airy_bi_prime(arb_t res, const arb_t x, const gr_ctx_t ctx) { arb_hypgeom_airy(NULL, NULL, NULL, res, x, ARB_CTX_PREC(ctx)); return GR_SUCCESS; }
+
+int _gr_arb_airy_ai_zero(arb_t res, const fmpz_t n, const gr_ctx_t ctx)
+{
+    if (fmpz_sgn(n) <= 0)
+        return GR_DOMAIN;
+    arb_hypgeom_airy_zero(res, NULL, NULL, NULL, n, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int _gr_arb_airy_ai_prime_zero(arb_t res, const fmpz_t n, const gr_ctx_t ctx)
+{
+    if (fmpz_sgn(n) <= 0)
+        return GR_DOMAIN;
+    arb_hypgeom_airy_zero(NULL, res, NULL, NULL, n, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int _gr_arb_airy_bi_zero(arb_t res, const fmpz_t n, const gr_ctx_t ctx)
+{
+    if (fmpz_sgn(n) <= 0)
+        return GR_DOMAIN;
+    arb_hypgeom_airy_zero(NULL, NULL, res, NULL, n, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int _gr_arb_airy_bi_prime_zero(arb_t res, const fmpz_t n, const gr_ctx_t ctx)
+{
+    if (fmpz_sgn(n) <= 0)
+        return GR_DOMAIN;
+    arb_hypgeom_airy_zero(NULL, NULL, NULL, res, n, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int _gr_arb_coulomb(arb_t res1, arb_t res2, arb_t res3, arb_t res4, const arb_t x, const arb_t y, const arb_t z, const gr_ctx_t ctx)
+{
+    /* H+, H- are typically complex */
+    /* todo: document allowing NULL, or separate F+G method? */
+    if (res3 == NULL && res4 == NULL)
+    {
+        arb_hypgeom_coulomb(res1, res2, x, y, z, ARB_CTX_PREC(ctx));
+        return (arb_is_finite(res1) && arb_is_finite(res2)) ? GR_SUCCESS : GR_UNABLE;
+    }
+    else
+    {
+        return GR_UNABLE;
+    }
+}
+
+int _gr_arb_coulomb_f(arb_t res, const arb_t x, const arb_t y, const arb_t z, const gr_ctx_t ctx) { arb_hypgeom_coulomb(res, NULL,  x, y, z, ARB_CTX_PREC(ctx)); return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+int _gr_arb_coulomb_g(arb_t res, const arb_t x, const arb_t y, const arb_t z, const gr_ctx_t ctx) { arb_hypgeom_coulomb(NULL, res, x, y, z, ARB_CTX_PREC(ctx)); return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+int _gr_arb_coulomb_hpos(arb_t res, const arb_t x, const arb_t y, const arb_t z, const gr_ctx_t ctx) { return GR_UNABLE; }
+int _gr_arb_coulomb_hneg(arb_t res, const arb_t x, const arb_t y, const arb_t z, const gr_ctx_t ctx) { return GR_UNABLE; }
 
 int
 _gr_arb_zeta(arb_t res, const arb_t x, const gr_ctx_t ctx)
@@ -1746,7 +1817,27 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_COSH_INTEGRAL,   (gr_funcptr) _gr_arb_cosh_integral},
     {GR_METHOD_LOG_INTEGRAL,    (gr_funcptr) _gr_arb_log_integral},
     {GR_METHOD_DILOG,           (gr_funcptr) _gr_arb_dilog},
-
+    {GR_METHOD_BESSEL_J,             (gr_funcptr) _gr_arb_bessel_j},
+    {GR_METHOD_BESSEL_Y,             (gr_funcptr) _gr_arb_bessel_y},
+    {GR_METHOD_BESSEL_I,             (gr_funcptr) _gr_arb_bessel_i},
+    {GR_METHOD_BESSEL_K,             (gr_funcptr) _gr_arb_bessel_k},
+    {GR_METHOD_BESSEL_J_Y,           (gr_funcptr) _gr_arb_bessel_j_y},
+    {GR_METHOD_BESSEL_I_SCALED,      (gr_funcptr) _gr_arb_bessel_i_scaled},
+    {GR_METHOD_BESSEL_K_SCALED,      (gr_funcptr) _gr_arb_bessel_k_scaled},
+    {GR_METHOD_AIRY,                 (gr_funcptr) _gr_arb_airy},
+    {GR_METHOD_AIRY_AI,              (gr_funcptr) _gr_arb_airy_ai},
+    {GR_METHOD_AIRY_BI,              (gr_funcptr) _gr_arb_airy_bi},
+    {GR_METHOD_AIRY_AI_PRIME,        (gr_funcptr) _gr_arb_airy_ai_prime},
+    {GR_METHOD_AIRY_BI_PRIME,        (gr_funcptr) _gr_arb_airy_bi_prime},
+    {GR_METHOD_AIRY_AI_ZERO,         (gr_funcptr) _gr_arb_airy_ai_zero},
+    {GR_METHOD_AIRY_BI_ZERO,         (gr_funcptr) _gr_arb_airy_bi_zero},
+    {GR_METHOD_AIRY_AI_PRIME_ZERO,   (gr_funcptr) _gr_arb_airy_ai_prime_zero},
+    {GR_METHOD_AIRY_BI_PRIME_ZERO,   (gr_funcptr) _gr_arb_airy_bi_prime_zero},
+    {GR_METHOD_COULOMB,              (gr_funcptr) _gr_arb_coulomb},
+    {GR_METHOD_COULOMB_F,            (gr_funcptr) _gr_arb_coulomb_f},
+    {GR_METHOD_COULOMB_G,            (gr_funcptr) _gr_arb_coulomb_g},
+    {GR_METHOD_COULOMB_HNEG,         (gr_funcptr) _gr_arb_coulomb_hneg},
+    {GR_METHOD_COULOMB_HPOS,         (gr_funcptr) _gr_arb_coulomb_hpos},
     {GR_METHOD_GAMMA,           (gr_funcptr) _gr_arb_gamma},
     {GR_METHOD_GAMMA_FMPZ,      (gr_funcptr) _gr_arb_gamma_fmpz},
     {GR_METHOD_GAMMA_FMPQ,      (gr_funcptr) _gr_arb_gamma_fmpq},
