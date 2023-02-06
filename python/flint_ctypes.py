@@ -1209,6 +1209,8 @@ class gr_ctx:
             [1, 2, 7, 26, 97]
             >>> RR.chebyshev_t(0.5, 0.75)
             [0.935414346693485 +/- 5.18e-16]
+            >>> ZZx.chebyshev_t(4, [0, 1])
+            [1, 0, -8, 0, 8]
         """
         return ctx._binary_op_with_overloads(n, x, libgr.gr_chebyshev_t, fmpz_op=libgr.gr_chebyshev_t_fmpz, rstr="chebyshev_t($n, $x)")
 
@@ -1218,6 +1220,8 @@ class gr_ctx:
             [1, 4, 15, 56, 209]
             >>> RR.chebyshev_u(0.5, 0.75)
             [1.33630620956212 +/- 2.68e-15]
+            >>> ZZx.chebyshev_u(4, [0, 1])
+            [1, 0, -12, 0, 16]
         """
         return ctx._binary_op_with_overloads(n, x, libgr.gr_chebyshev_u, fmpz_op=libgr.gr_chebyshev_u_fmpz, rstr="chebyshev_u($n, $x)")
 
