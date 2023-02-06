@@ -1283,6 +1283,18 @@ int _gr_acb_coulomb_g(acb_t res, const acb_t x, const acb_t y, const acb_t z, co
 int _gr_acb_coulomb_hpos(acb_t res, const acb_t x, const acb_t y, const acb_t z, const gr_ctx_t ctx) { acb_hypgeom_coulomb(NULL, NULL, res, NULL, x, y, z, ACB_CTX_PREC(ctx)); return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
 int _gr_acb_coulomb_hneg(acb_t res, const acb_t x, const acb_t y, const acb_t z, const gr_ctx_t ctx) { acb_hypgeom_coulomb(NULL, NULL, NULL, res, x, y, z, ACB_CTX_PREC(ctx)); return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
 
+int _gr_acb_chebyshev_t(acb_t res, const acb_t n, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_hypgeom_chebyshev_t(res, n, x, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_acb_chebyshev_u(acb_t res, const acb_t n, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_hypgeom_chebyshev_u(res, n, x, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
 int
 _gr_acb_zeta(acb_t res, const acb_t x, const gr_ctx_t ctx)
 {
@@ -1727,6 +1739,8 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_COULOMB_G,            (gr_funcptr) _gr_acb_coulomb_g},
     {GR_METHOD_COULOMB_HNEG,         (gr_funcptr) _gr_acb_coulomb_hneg},
     {GR_METHOD_COULOMB_HPOS,         (gr_funcptr) _gr_acb_coulomb_hpos},
+    {GR_METHOD_CHEBYSHEV_T,          (gr_funcptr) _gr_acb_chebyshev_t},
+    {GR_METHOD_CHEBYSHEV_U,          (gr_funcptr) _gr_acb_chebyshev_u},
     {GR_METHOD_ZETA,            (gr_funcptr) _gr_acb_zeta},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_acb_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_acb_vec_dot_rev},

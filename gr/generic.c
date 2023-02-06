@@ -2800,6 +2800,9 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_STIRLING_S1U_UI_VEC,     (gr_funcptr) gr_generic_stirling_s1u_ui_vec},
     {GR_METHOD_STIRLING_S1_UI_VEC,      (gr_funcptr) gr_generic_stirling_s1_ui_vec},
     {GR_METHOD_STIRLING_S2_UI_VEC,      (gr_funcptr) gr_generic_stirling_s2_ui_vec},
+
+    {GR_METHOD_CHEBYSHEV_T_FMPZ,        (gr_funcptr) gr_generic_chebyshev_t_fmpz},
+    {GR_METHOD_CHEBYSHEV_U_FMPZ,        (gr_funcptr) gr_generic_chebyshev_u_fmpz},
  
     {GR_METHOD_VEC_INIT,                (gr_funcptr) gr_generic_vec_init},
     {GR_METHOD_VEC_CLEAR,               (gr_funcptr) gr_generic_vec_clear},

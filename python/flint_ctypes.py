@@ -494,28 +494,37 @@ class gr_ctx:
             _handle_error(ctx, status, rstr, x)
         return res
 
-    def _binary_op_with_overloads(ctx, x, y, op, op_ui=None, op_fmpz=None, op_fmpq=None, rstr=None):
-        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
-            x = ctx(x)
-        type_y = type(y)
-        res = ctx._elem_type(context=ctx)
-        if type_y is not ctx._elem_type or y._ctx_python is not ctx:
-            if type_y is fmpq and op_fmpq is not None:
-                status = op_fmpq(res._ref, x._ref, y._ref, ctx._ref)
-            elif type_y is fmpz and op_fmpz is not None:
-                status = op_fmpz(res._ref, x._ref, y._ref, ctx._ref)
-            elif type_y is int and op_fmpz is not None:
-                y = ZZ(y)
-                status = op_fmpz(res._ref, x._ref, y._ref, ctx._ref)
-            elif type_y in (fmpz, int) and op_ui is not None:
-                y = ctx._as_ui(y)
-                op_ui.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_ulong, ctypes.c_void_p)
-                status = op_ui(res._ref, x._ref, y, ctx._ref)
-            else:
+    def _binary_op_with_overloads(ctx, x, y, op, op_ui=None, op_fmpz=None, op_fmpq=None, fmpz_op=None, rstr=None):
+        type_x = type(x)
+        if fmpz_op is not None and (type_x is fmpz or type_x is int):
+            x = ZZ(x)
+            type_y = type(y)
+            if type_y is not ctx._elem_type or y._ctx_python is not ctx:
                 y = ctx(y)
-                status = op(res._ref, x._ref, ctx._ref)
+            res = ctx._elem_type(context=ctx)
+            status = fmpz_op(res._ref, x._ref, y._ref, ctx._ref)
         else:
-            status = op(res._ref, x._ref, y._ref, ctx._ref)
+            if type_x is not ctx._elem_type or x._ctx_python is not ctx:
+                x = ctx(x)
+            type_y = type(y)
+            res = ctx._elem_type(context=ctx)
+            if type_y is not ctx._elem_type or y._ctx_python is not ctx:
+                if type_y is fmpq and op_fmpq is not None:
+                    status = op_fmpq(res._ref, x._ref, y._ref, ctx._ref)
+                elif type_y is fmpz and op_fmpz is not None:
+                    status = op_fmpz(res._ref, x._ref, y._ref, ctx._ref)
+                elif type_y is int and op_fmpz is not None:
+                    y = ZZ(y)
+                    status = op_fmpz(res._ref, x._ref, y._ref, ctx._ref)
+                elif type_y in (fmpz, int) and op_ui is not None:
+                    y = ctx._as_ui(y)
+                    op_ui.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_ulong, ctypes.c_void_p)
+                    status = op_ui(res._ref, x._ref, y, ctx._ref)
+                else:
+                    y = ctx(y)
+                    status = op(res._ref, x._ref, y._ref, ctx._ref)
+            else:
+                status = op(res._ref, x._ref, y._ref, ctx._ref)
         if status:
             _handle_error(ctx, status, rstr, x)
         return res
@@ -1193,6 +1202,24 @@ class gr_ctx:
             ([5.371722466 +/- 6.15e-10] + [-0.101631502833431 +/- 8.03e-16]*I)
         """
         return ctx._ternary_op(x, y, z, libgr.gr_coulomb_hneg, "coulomb_hneg($x)")
+
+    def chebyshev_t(ctx, n, x):
+        """
+            >>> [ZZ.chebyshev_t(n, 2) for n in range(5)]
+            [1, 2, 7, 26, 97]
+            >>> RR.chebyshev_t(0.5, 0.75)
+            [0.935414346693485 +/- 5.18e-16]
+        """
+        return ctx._binary_op_with_overloads(n, x, libgr.gr_chebyshev_t, fmpz_op=libgr.gr_chebyshev_t_fmpz, rstr="chebyshev_t($n, $x)")
+
+    def chebyshev_u(ctx, n, x):
+        """
+            >>> [ZZ.chebyshev_u(n, 2) for n in range(5)]
+            [1, 4, 15, 56, 209]
+            >>> RR.chebyshev_u(0.5, 0.75)
+            [1.33630620956212 +/- 2.68e-15]
+        """
+        return ctx._binary_op_with_overloads(n, x, libgr.gr_chebyshev_u, fmpz_op=libgr.gr_chebyshev_u_fmpz, rstr="chebyshev_u($n, $x)")
 
     def fac(ctx, x):
         """

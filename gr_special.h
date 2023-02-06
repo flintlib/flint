@@ -207,6 +207,11 @@ GR_SPECIAL_DEF int gr_coulomb_g(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr 
 GR_SPECIAL_DEF int gr_coulomb_hpos(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_ctx_t ctx) { return GR_TERNARY_OP(ctx, COULOMB_HPOS)(res, x, y, z, ctx); }
 GR_SPECIAL_DEF int gr_coulomb_hneg(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_ctx_t ctx) { return GR_TERNARY_OP(ctx, COULOMB_HNEG)(res, x, y, z, ctx); }
 
+GR_SPECIAL_DEF int gr_chebyshev_t_fmpz(gr_ptr res, const fmpz_t n, gr_srcptr x, gr_ctx_t ctx) { return GR_FMPZ_BINARY_OP(ctx, CHEBYSHEV_T_FMPZ)(res, n, x, ctx); }
+GR_SPECIAL_DEF int gr_chebyshev_t(gr_ptr res, gr_srcptr n, gr_srcptr x, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, CHEBYSHEV_T)(res, n, x, ctx); }
+GR_SPECIAL_DEF int gr_chebyshev_u_fmpz(gr_ptr res, const fmpz_t n, gr_srcptr x, gr_ctx_t ctx) { return GR_FMPZ_BINARY_OP(ctx, CHEBYSHEV_U_FMPZ)(res, n, x, ctx); }
+GR_SPECIAL_DEF int gr_chebyshev_u(gr_ptr res, gr_srcptr n, gr_srcptr x, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, CHEBYSHEV_U)(res, n, x, ctx); }
+
 GR_SPECIAL_DEF int gr_zeta(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ZETA)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_zeta_ui(gr_ptr res, ulong x, gr_ctx_t ctx) { return GR_UNARY_OP_UI(ctx, ZETA_UI)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_hurwitz_zeta(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, HURWITZ_ZETA)(res, x, y, ctx); }
@@ -260,47 +265,52 @@ GR_SPECIAL_DEF int gr_agm(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { 
 
 /* generic implementations */
 
-int gr_generic_fac(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
-int gr_generic_fac_fmpz(gr_ptr res, const fmpz_t n, gr_ctx_t ctx);
-int gr_generic_fac_ui(gr_ptr res, ulong n, gr_ctx_t ctx);
-int gr_generic_fac_vec(gr_ptr res, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_fac(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_fac_fmpz(gr_ptr res, const fmpz_t n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_fac_ui(gr_ptr res, ulong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_fac_vec(gr_ptr res, slong len, gr_ctx_t ctx);
 
-int gr_generic_rfac(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
-int gr_generic_rfac_fmpz(gr_ptr res, const fmpz_t n, gr_ctx_t ctx);
-int gr_generic_rfac_ui(gr_ptr res, ulong n, gr_ctx_t ctx);
-int gr_generic_rfac_vec(gr_ptr res, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_rfac(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_rfac_fmpz(gr_ptr res, const fmpz_t n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_rfac_ui(gr_ptr res, ulong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_rfac_vec(gr_ptr res, slong len, gr_ctx_t ctx);
 
-int gr_generic_rising(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx);
-int gr_generic_rising_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx);
-int gr_generic_falling(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx);
-int gr_generic_falling_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_rising(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_rising_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_falling(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_falling_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx);
 
-int gr_generic_bin(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx);
-int gr_generic_bin_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx);
-int gr_generic_bin_uiui(gr_ptr res, ulong x, ulong y, gr_ctx_t ctx);
-int gr_generic_bin_vec(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx);
-int gr_generic_bin_ui_vec(gr_ptr res, ulong x, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_bin(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_bin_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_bin_uiui(gr_ptr res, ulong x, ulong y, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_bin_vec(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_bin_ui_vec(gr_ptr res, ulong x, slong len, gr_ctx_t ctx);
 
-int gr_generic_doublefac(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
-int gr_generic_doublefac_ui(gr_ptr res, ulong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_doublefac(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_doublefac_ui(gr_ptr res, ulong n, gr_ctx_t ctx);
 
-int gr_generic_harmonic(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
-int gr_generic_harmonic_ui(gr_ptr res, ulong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_harmonic(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_harmonic_ui(gr_ptr res, ulong n, gr_ctx_t ctx);
 
-int gr_generic_beta(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_beta(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx);
 
-int gr_generic_fib2_fmpz(gr_ptr v, gr_ptr u, const fmpz_t n, gr_ctx_t ctx);
-int gr_generic_fib_fmpz(gr_ptr res, const fmpz_t n, gr_ctx_t ctx);
-int gr_generic_fib_ui(gr_ptr res, ulong n, gr_ctx_t ctx);
-int gr_generic_fib_vec(gr_ptr res, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_fib2_fmpz(gr_ptr v, gr_ptr u, const fmpz_t n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_fib_fmpz(gr_ptr res, const fmpz_t n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_fib_ui(gr_ptr res, ulong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_fib_vec(gr_ptr res, slong len, gr_ctx_t ctx);
 
-int gr_generic_bellnum_fmpz(gr_ptr res, const fmpz_t n, gr_ctx_t ctx);
-int gr_generic_bellnum_ui(gr_ptr res, ulong n, gr_ctx_t ctx);
-int gr_generic_bellnum_vec(gr_ptr res, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_bellnum_fmpz(gr_ptr res, const fmpz_t n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_bellnum_ui(gr_ptr res, ulong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_bellnum_vec(gr_ptr res, slong len, gr_ctx_t ctx);
 
-int gr_generic_partitions_fmpz(gr_ptr res, const fmpz_t n, gr_ctx_t ctx);
-int gr_generic_partitions_ui(gr_ptr res, ulong n, gr_ctx_t ctx);
-int gr_generic_partitions_vec(gr_ptr res, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_partitions_fmpz(gr_ptr res, const fmpz_t n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_partitions_ui(gr_ptr res, ulong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_partitions_vec(gr_ptr res, slong len, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_generic_chebyshev_t2_fmpz(gr_ptr a, gr_ptr b, const fmpz_t n, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_chebyshev_t_fmpz(gr_ptr y, const fmpz_t n, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_chebyshev_u2_fmpz(gr_ptr a, gr_ptr b, const fmpz_t n, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_chebyshev_u_fmpz(gr_ptr y, const fmpz_t n, gr_srcptr x, gr_ctx_t ctx);
 
 #ifdef __cplusplus
 }

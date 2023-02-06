@@ -236,6 +236,11 @@ Error function and exponential integrals
 Orthogonal polynomials
 --------------------------------------------------------------------------------
 
+.. function:: int gr_chebyshev_t_fmpz(gr_ptr res, const fmpz_t n, gr_srcptr x, gr_ctx_t ctx)
+              int gr_chebyshev_t(gr_ptr res, gr_srcptr n, gr_srcptr x, gr_ctx_t ctx)
+              int gr_chebyshev_u_fmpz(gr_ptr res, const fmpz_t n, gr_srcptr x, gr_ctx_t ctx)
+              int gr_chebyshev_u(gr_ptr res, gr_srcptr n, gr_srcptr x, gr_ctx_t ctx)
+
 Bessel, Airy and Coulomb functions
 --------------------------------------------------------------------------------
 

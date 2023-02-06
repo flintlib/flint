@@ -1494,6 +1494,18 @@ int _gr_arb_coulomb_g(arb_t res, const arb_t x, const arb_t y, const arb_t z, co
 int _gr_arb_coulomb_hpos(arb_t res, const arb_t x, const arb_t y, const arb_t z, const gr_ctx_t ctx) { return GR_UNABLE; }
 int _gr_arb_coulomb_hneg(arb_t res, const arb_t x, const arb_t y, const arb_t z, const gr_ctx_t ctx) { return GR_UNABLE; }
 
+int _gr_arb_chebyshev_t(arb_t res, const arb_t n, const arb_t x, const gr_ctx_t ctx)
+{
+    arb_hypgeom_chebyshev_t(res, n, x, ARB_CTX_PREC(ctx));
+    return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_arb_chebyshev_u(arb_t res, const arb_t n, const arb_t x, const gr_ctx_t ctx)
+{
+    arb_hypgeom_chebyshev_u(res, n, x, ARB_CTX_PREC(ctx));
+    return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
 int
 _gr_arb_zeta(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
@@ -1789,6 +1801,14 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_FAC_FMPZ,        (gr_funcptr) _gr_arb_fac_fmpz},
     {GR_METHOD_RISING_UI,       (gr_funcptr) _gr_arb_rising_ui},
     {GR_METHOD_RISING,          (gr_funcptr) _gr_arb_rising},
+    {GR_METHOD_GAMMA,           (gr_funcptr) _gr_arb_gamma},
+    {GR_METHOD_GAMMA_FMPZ,      (gr_funcptr) _gr_arb_gamma_fmpz},
+    {GR_METHOD_GAMMA_FMPQ,      (gr_funcptr) _gr_arb_gamma_fmpq},
+    {GR_METHOD_RGAMMA,          (gr_funcptr) _gr_arb_rgamma},
+    {GR_METHOD_LGAMMA,          (gr_funcptr) _gr_arb_lgamma},
+    {GR_METHOD_DIGAMMA,         (gr_funcptr) _gr_arb_digamma},
+    {GR_METHOD_BARNES_G,        (gr_funcptr) _gr_arb_barnes_g},
+    {GR_METHOD_LOG_BARNES_G,    (gr_funcptr) _gr_arb_log_barnes_g},
     {GR_METHOD_BERNOULLI_UI,    (gr_funcptr) _gr_arb_bernoulli_ui},
     {GR_METHOD_BERNOULLI_FMPZ,  (gr_funcptr) _gr_arb_bernoulli_fmpz},
     {GR_METHOD_EULERNUM_UI,     (gr_funcptr) _gr_arb_eulernum_ui},
@@ -1797,7 +1817,6 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_BELLNUM_FMPZ,    (gr_funcptr) _gr_arb_bellnum_fmpz},
     {GR_METHOD_PARTITIONS_UI,   (gr_funcptr) _gr_arb_partitions_ui},
     {GR_METHOD_PARTITIONS_FMPZ, (gr_funcptr) _gr_arb_partitions_fmpz},
-
     {GR_METHOD_ERF,             (gr_funcptr) _gr_arb_erf},
     {GR_METHOD_ERFI,            (gr_funcptr) _gr_arb_erfi},
     {GR_METHOD_ERFC,            (gr_funcptr) _gr_arb_erfc},
@@ -1838,14 +1857,8 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_COULOMB_G,            (gr_funcptr) _gr_arb_coulomb_g},
     {GR_METHOD_COULOMB_HNEG,         (gr_funcptr) _gr_arb_coulomb_hneg},
     {GR_METHOD_COULOMB_HPOS,         (gr_funcptr) _gr_arb_coulomb_hpos},
-    {GR_METHOD_GAMMA,           (gr_funcptr) _gr_arb_gamma},
-    {GR_METHOD_GAMMA_FMPZ,      (gr_funcptr) _gr_arb_gamma_fmpz},
-    {GR_METHOD_GAMMA_FMPQ,      (gr_funcptr) _gr_arb_gamma_fmpq},
-    {GR_METHOD_RGAMMA,          (gr_funcptr) _gr_arb_rgamma},
-    {GR_METHOD_LGAMMA,          (gr_funcptr) _gr_arb_lgamma},
-    {GR_METHOD_DIGAMMA,         (gr_funcptr) _gr_arb_digamma},
-    {GR_METHOD_BARNES_G,        (gr_funcptr) _gr_arb_barnes_g},
-    {GR_METHOD_LOG_BARNES_G,    (gr_funcptr) _gr_arb_log_barnes_g},
+    {GR_METHOD_CHEBYSHEV_T,          (gr_funcptr) _gr_arb_chebyshev_t},
+    {GR_METHOD_CHEBYSHEV_U,          (gr_funcptr) _gr_arb_chebyshev_u},
     {GR_METHOD_ZETA,            (gr_funcptr) _gr_arb_zeta},
     {GR_METHOD_POLYLOG,         (gr_funcptr) _gr_arb_polylog},
     {GR_METHOD_HURWITZ_ZETA,    (gr_funcptr) _gr_arb_hurwitz_zeta},
