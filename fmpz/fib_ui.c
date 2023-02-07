@@ -18,8 +18,10 @@
 
 #if FLINT64
 #define NUM_SMALL_FIB 94
+#define NUM_SMALL_FIB2 184
 #else
 #define NUM_SMALL_FIB 48
+#define NUM_SMALL_FIB2 92
 #endif
 
 static const mp_limb_t small_fib[NUM_SMALL_FIB] =
@@ -50,7 +52,30 @@ static const mp_limb_t small_fib[NUM_SMALL_FIB] =
 void fmpz_fib_ui(fmpz_t f, ulong n)
 {
     if (n < NUM_SMALL_FIB)
+    {
         fmpz_set_ui(f, small_fib[n]);
+    }
+    else if (n < NUM_SMALL_FIB2)
+    {
+        mp_limb_t hi, lo, a, b;
+        a = small_fib[n / 2];
+        b = small_fib[n / 2 - 1];
+        if (n & 1)
+        {
+            umul_ppmm(hi, lo, 2 * a + b, 2 * a - b);
+            if ((n / 2) % 2 == 0)
+                lo += 2;
+            else
+                lo -= 2;
+        }
+        else
+        {
+            umul_ppmm(hi, lo, a, a + 2 * b);
+        }
+        fmpz_set_uiui(f, hi, lo);
+    }
     else
+    {
         flint_mpz_fib_ui(_fmpz_promote(f), n);
+    }
 }

@@ -32,6 +32,10 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     slong cutoff;
     slong flint_num_threads = flint_get_num_threads();
 
+    FLINT_ASSERT(C->r == A->r);
+    FLINT_ASSERT(C->c == B->c);
+    FLINT_ASSERT(A->c == B->r);
+
 #if FLINT_USES_BLAS
     /*
         tuning is based on several assumptions:

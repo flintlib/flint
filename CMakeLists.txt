@@ -64,6 +64,7 @@ set(BUILD_DIRS
     nmod_poly_factor arith mpn_extras nmod_mat fmpq fmpq_vec fmpq_mat padic 
     fmpz_poly_q fmpz_poly_mat nmod_poly_mat fmpz_mod_poly fmpz_mod_mat 
     fmpz_mod_poly_factor fmpz_factor fmpz_poly_factor fft qsieve 
+    nf nf_elem qfb 
     double_extras d_vec d_mat padic_poly padic_mat qadic  
     fq fq_vec fq_mat fq_poly fq_poly_factor
     fq_nmod fq_nmod_vec fq_nmod_mat fq_nmod_poly fq_nmod_poly_factor 

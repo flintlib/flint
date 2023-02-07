@@ -19,6 +19,12 @@ int fmpz_mod_mat_can_solve(fmpz_mod_mat_t X, const fmpz_mod_mat_t A,
     slong i, j, k, col, *pivots, rank, *perm;
     fmpz_mod_mat_t LU, LU2, PB;
     int result = 1;
+
+    if (A->mat->r != B->mat->r || A->mat->c != X->mat->r || X->mat->c != B->mat->c)
+    {
+        return 0;
+    }
+
     if (A->mat->r == 0 || B->mat->c == 0)
     {
         fmpz_mod_mat_zero(X);
@@ -74,6 +80,7 @@ int fmpz_mod_mat_can_solve(fmpz_mod_mat_t X, const fmpz_mod_mat_t A,
 
         LU->mat->rows += rank;
         LU->mat->r = A->mat->r - rank;
+        X->mat->r = LU->mat->c;
 
         fmpz_mod_mat_init(P, LU->mat->r, B->mat->c, A->mod);
 
@@ -91,6 +98,7 @@ int fmpz_mod_mat_can_solve(fmpz_mod_mat_t X, const fmpz_mod_mat_t A,
 
         if (!result)
         {
+            X->mat->r = A->mat->c;
             fmpz_mod_mat_zero(X);
             goto cleanup;
         }
@@ -124,6 +132,7 @@ cleanup:
     PB->mat->r = B->mat->r;
     fmpz_mod_mat_window_clear(PB);
 
+    LU->mat->r = A->mat->r;
     fmpz_mod_mat_clear(LU);
     flint_free(perm);
 

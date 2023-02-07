@@ -61,7 +61,7 @@ echo \
 ##################################################"
 
 echo "Downloading..."
-wget https://www.mpfr.org/mpfr-current/mpfr-4.1.0.tar.bz2 > out.log 2>&1
+wget https://www.mpfr.org/mpfr-4.1.1/mpfr-4.1.1.tar.bz2 > out.log 2>&1
 if [ $? = 0 ]; then
     echo "Successfully downloaded."
     echo ""
@@ -71,8 +71,8 @@ else
     exit 1
 fi
 
-tar -xf mpfr-4.1.0.tar.bz2
-cd mpfr-4.1.0
+tar -xf mpfr-4.1.1.tar.bz2
+cd mpfr-4.1.1
 
 echo "Configuring..."
 ./configure --with-gmp=${LOCAL} --prefix=${LOCAL} --enable-shared \

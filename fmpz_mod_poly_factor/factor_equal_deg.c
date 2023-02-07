@@ -376,10 +376,12 @@ next_alpha:
                 fmpz_mod_poly_set(res->poly + res->num, S[k].f, ctx);
                 res->num++;
             }
-            else if (fmpz_mod_poly_degree(S[k].f, ctx) > d)
+            else
             {
+                FLINT_ASSERT(fmpz_mod_poly_degree(S[k].f, ctx) > d);
+                /* S[k].g should be a monic linear */
                 FLINT_ASSERT(S[k].g->length == 2);
-                fmpz_mod_poly_scalar_mul_fmpz(tr, S[k].a, S[k].g->coeffs + 1, ctx);
+                FLINT_ASSERT(fmpz_is_one(S[k].g->coeffs + 1));
                 fmpz_mod_poly_add_fmpz(tr, S[k].a, S[k].g->coeffs + 0, ctx);
                 fmpz_mod_poly_gcd(t, tr, S[k].f, ctx);
                 _add_split(res, &Q, &Qlen, &Qalloc, S[k].f, t, d, S[k].xp, ctx, tr);

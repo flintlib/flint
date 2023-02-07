@@ -18,6 +18,10 @@ TEMPLATE(T, mat_mul) (TEMPLATE(T, mat_t) C,
                       const TEMPLATE(T, mat_t) A,
                       const TEMPLATE(T, mat_t) B, const TEMPLATE(T, ctx_t) ctx)
 {
+    FLINT_ASSERT(C->r == A->r);
+    FLINT_ASSERT(C->c == B->c);
+    FLINT_ASSERT(A->c == B->r);
+
     if (C == A || C == B)
     {
         TEMPLATE(T, mat_t) TT;

@@ -21,6 +21,9 @@ TEMPLATE(T, mat_can_solve)(TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t) A,
     TEMPLATE(T, mat_t) LU, LU2, PB;
     int result = 1;
 
+    if (X->r != A->c || X->c != B->c)
+        return 0;
+
     if (A->r == 0 || B->c == 0)
     {
         TEMPLATE(T, mat_zero)(X, ctx);
@@ -76,6 +79,7 @@ TEMPLATE(T, mat_can_solve)(TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t) A,
 
         LU->rows += rank;
         LU->r = A->r - rank;
+        X->r = LU->c;
 
         TEMPLATE(T, mat_init)(P, LU->r, B->c, ctx);
 
@@ -93,6 +97,7 @@ TEMPLATE(T, mat_can_solve)(TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t) A,
 
         if (!result)
         {
+            X->r = A->c;
             TEMPLATE(T, mat_zero)(X, ctx);
             goto cleanup;
         }
@@ -121,10 +126,11 @@ TEMPLATE(T, mat_can_solve)(TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t) A,
 cleanup:
 
     TEMPLATE(T, mat_clear)(LU2, ctx);
-    
+
     PB->r = B->r;
     TEMPLATE(T, mat_window_clear)(PB, ctx);
 
+    LU->r = A->r;
     TEMPLATE(T, mat_clear)(LU, ctx);
     flint_free(perm);
 

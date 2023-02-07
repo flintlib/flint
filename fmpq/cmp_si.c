@@ -25,16 +25,16 @@ _fmpq_cmp_si(const fmpz_t p, const fmpz_t q, slong c)
 
     if (!COEFF_IS_MPZ(*p) && !COEFF_IS_MPZ(*q))
     {
-        slong a1, a0, b1, b0;
+        ulong a1, a0, b1, b0;
 
         a0 = *p;
         a1 = FLINT_SIGN_EXT(a0);
         smul_ppmm(b1, b0, *q, c);
         sub_ddmmss(a1, a0, a1, a0, b1, b0);
 
-        if (a1 < 0)
+        if ((slong) a1 < 0)
             return -1;
-        if (a1 > 0)
+        if ((slong) a1 > 0)
             return 1;
         return a0 != 0;
     }

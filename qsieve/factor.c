@@ -11,6 +11,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+/* try to get fdopen, mkstemp declared */
+#if defined __STRICT_ANSI__
+#undef __STRICT_ANSI__
+#endif
+
 #include "qsieve.h"
 #include "fmpz_factor.h"
 #include "thread_support.h"
@@ -25,7 +30,7 @@
 #if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER)
 #include <unistd.h>
 #endif
-#if defined (__WIN32) && !defined(__CYGWIN__)
+#if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(_MSC_VER)
 #include <windows.h>
 #endif
 
@@ -55,7 +60,9 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     fmpz_t temp, temp2, X, Y;
     slong num_facs;
     fmpz * facs;
-    int nchars;
+#if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(_MSC_VER)
+    char temp_path[MAX_PATH];
+#endif
 
     if (fmpz_sgn(n) < 0)
     {
@@ -202,15 +209,22 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     pthread_mutex_init(&qs_inf->mutex, NULL);
 #endif
     
-#if defined (__WIN32) && !defined(__CYGWIN__)
-    srand((int) GetCurrentProcessId());
-#else
-    srand((int) getpid());
-#endif
-    nchars = sprintf(qs_inf->fname, "%d", (int) rand());
-    strcat(qs_inf->fname + nchars, "siqs.dat");
-
+#if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(_MSC_VER)
+    if (GetTempPathA(MAX_PATH, temp_path) == 0)
+    {
+        flint_printf("Exception (qsieve_factor). GetTempPathA() failed.\n");
+        flint_abort();
+    }
+    if (GetTempFileNameA(temp_path, "siqs", /*uUnique*/ TRUE, qs_inf->fname) == 0)
+    {
+        flint_printf("Exception (qsieve_factor). GetTempFileNameA() failed.\n");
+        flint_abort();
+    }
     qs_inf->siqs = fopen(qs_inf->fname, "w");
+#else
+    strcpy(qs_inf->fname, "/tmp/siqsXXXXXX"); /* must be shorter than fname_alloc_size in init.c */
+    qs_inf->siqs = fdopen(mkstemp(qs_inf->fname), "w");
+#endif
 
     for (j = qs_inf->small_primes; j < qs_inf->num_primes; j++)
     {
