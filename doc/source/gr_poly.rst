@@ -351,6 +351,24 @@ GCD
     The underscore methods assume ``lenA >= lenB >= 1`` and that both
     *A* and *B* have nonzero leading coefficient.
 
+Squarefree factorization
+-------------------------------------------------------------------------------
+
+TODO: currently only fields of characteristic 0 are supported.
+
+.. function:: int gr_poly_factor_squarefree(gr_ptr c, gr_vec_t fac, gr_vec_t exp, const gr_poly_t poly, gr_ctx_t ctx)
+
+    Computes a squarefree factorization of *poly*.
+
+    The constant *c* is set to an element of the scalar ring.
+    The factors in *fac* are set to polynomials; the user must thus
+    initialize it to a vector of polynomials of the same type as
+    *poly* (and *not* to the parent *ctx*).
+    The exponent vector *exp* must be initialized to the *fmpz* type.
+
+.. function:: int gr_poly_squarefree_part(gr_poly_t res, const gr_poly_t poly, gr_ctx_t ctx)
+
+    Sets *res* to the squarefreepart of *poly*.
 
 Roots
 -------------------------------------------------------------------------------
