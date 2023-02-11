@@ -30,6 +30,7 @@ EXTRA_BUILD=
 FLINT_DLL=0
 FLINT_LIBNAME=
 FLINT_SOLIB=0
+USE_PKG_CONFIG=0
 
 # soname version, minor release number and patch number
 
@@ -82,6 +83,7 @@ usage()
    echo "     --without-blas       Do not use BLAS (default)"
    echo "     --with-ntl[=<path>]  Build NTL interface and specify its location (default: /usr/local)"
    echo "     --without-ntl        Do not build NTL interface (default)"
+   echo "     --with-pkg-config    Use pkg-config for finding libraries"
    echo "     --extensions=<path>  Specify location of extension modules"
    echo "     --build=arch-os      Specify architecture/OS combination rather than use values from uname -m/-s"
    echo "     --enable-shared      Build a shared library (default)"
@@ -148,6 +150,9 @@ while [ "$1" != "" ]; do
          ;;
       --without-ntl)
          WANT_NTL=0
+         ;;
+      --with-pkg-config)
+         USE_PKG_CONFIG=1
          ;;
       --with-blas)
          WANT_BLAS=1
@@ -251,7 +256,10 @@ done
 
 LIBS="m"
 
-if [ -d "${GMP_DIR}/lib" ]; then
+if [ "${USE_PKG_CONFIG}" = "1" ]; then
+   GMP_LIB_DIR=$(pkg-config --variable=libdir gmp)
+   GMP_INC_DIR=$(pkg-config --variable=includedir gmp)
+elif [ -d "${GMP_DIR}/lib" ]; then
    GMP_LIB_DIR="${GMP_DIR}/lib"
    GMP_INC_DIR="${GMP_DIR}/include"
 elif [ -d "${GMP_DIR}/lib64" ]; then
@@ -269,7 +277,10 @@ LIB_DIRS="${LIB_DIRS} ${GMP_LIB_DIR}"
 INC_DIRS="${INC_DIRS} ${GMP_INC_DIR}"
 LIBS="${LIBS} gmp"
 
-if [ -d "${MPFR_DIR}/lib" ]; then
+if [ "${USE_PKG_CONFIG}" = "1" ]; then
+   MPFR_LIB_DIR=$(pkg-config --variable=libdir mpfr)
+   MPFR_INC_DIR=$(pkg-config --variable=includedir mpfr)
+elif [ -d "${MPFR_DIR}/lib" ]; then
    MPFR_LIB_DIR="${MPFR_DIR}/lib"
    MPFR_INC_DIR="${MPFR_DIR}/include"
 elif [ -d "${MPFR_DIR}/lib64" ]; then
@@ -310,7 +321,10 @@ if [ "$WANT_NTL" = "1" ]; then
 fi
 
 if [ "$WANT_BLAS" = "1" ]; then
-   if [ -d "${BLAS_DIR}/lib/x86_64-linux-gnu/openblas-pthread" ]; then
+   if [ "${USE_PKG_CONFIG}" = "1" ]; then
+      BLAS_LIB_DIR=$(pkg-config --variable=libdir openblas)
+      BLAS_INC_DIR=$(pkg-config --variable=includedir openblas)
+   elif [ -d "${BLAS_DIR}/lib/x86_64-linux-gnu/openblas-pthread" ]; then
       BLAS_LIB_DIR="${BLAS_DIR}/lib/x86_64-linux-gnu"
       BLAS_INC_DIR="${BLAS_DIR}/include/x86_64-linux-gnu"
    elif [ -d "${BLAS_DIR}/lib" ]; then
@@ -331,7 +345,10 @@ fi
 CONFIG_BLAS="#define FLINT_USES_BLAS ${WANT_BLAS}"
 
 if [ "$WANT_GC" = "1" ]; then
-   if [ -d "${GC_DIR}" ]; then
+   if [ "${USE_PKG_CONFIG}" = "1" ]; then
+      GC_LIB_DIR=$(pkg-config --variable=libdir bdw-gc)
+      GC_INC_DIR=$(pkg-config --variable=includedir bdw-gc)
+   elif [ -d "${GC_DIR}" ]; then
       GC_LIB_DIR="${GC_DIR}/lib"
       GC_INC_DIR="${GC_DIR}/include"
    else
