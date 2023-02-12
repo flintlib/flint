@@ -128,7 +128,7 @@ int main()
             for (i = 0; i < F->length; i++)
                 maxexp = FLINT_MAX(maxexp, expc[i]);
 
-            if (status == GR_SUCCESS && gr_poly_equal(P, Q, ctx) == T_FALSE || maxexp < FLINT_MAX(FLINT_MAX(ea, eb), ec))
+            if (status == GR_SUCCESS && (gr_poly_equal(P, Q, ctx) == T_FALSE || maxexp < FLINT_MAX(FLINT_MAX(ea, eb), ec)))
             {
                 flint_printf("FAIL (product)\n\n");
                 flint_printf("A = "); gr_poly_print(A, ctx); flint_printf("\n");

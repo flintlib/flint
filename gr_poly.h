@@ -146,6 +146,12 @@ WARN_UNUSED_RESULT int gr_poly_pow_fmpz(gr_poly_t res, const gr_poly_t poly, con
 WARN_UNUSED_RESULT int _gr_poly_pow_series_fmpq_recurrence(gr_ptr h, gr_srcptr f, slong flen, const fmpq_t exp, slong len, int precomp, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_pow_series_fmpq_recurrence(gr_poly_t res, const gr_poly_t poly, const fmpq_t exp, slong len, gr_ctx_t ctx);
 
+/* shifting */
+
+WARN_UNUSED_RESULT int _gr_poly_shift_left(gr_ptr res, gr_srcptr poly, slong len, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_shift_left(gr_poly_t res, const gr_poly_t poly, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_shift_right(gr_ptr res, gr_srcptr poly, slong len, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_shift_right(gr_poly_t res, const gr_poly_t poly, slong n, gr_ctx_t ctx);
 
 /* division */
 
