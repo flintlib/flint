@@ -90,72 +90,53 @@ matrix *mat* is square of even size `2g`.
 The Siegel upper half space
 -------------------------------------------------------------------------------
 
-We denote the Siegel upper half space by `\mathbb{H}_g`. It contains the
-standard fundamental domain `\mathbb{F}_g` as a closed subset, defined
-in... For `\varepsilon\geq 0`, closed neighborhoods `\mathcal{F}_g^\varepsilon`
-can be defined following...
+The Siegel upper half space `\mathbb{H}_g` contains the standard fundamental
+domain `\mathcal{F}_g`, defined in..., as a closed subset.
 
-.. function:: void acb_siegel_randtest(acb_mat_t tau, flint_rand_t state, slong
-              prec, slong mag_bits)
-
-.. function:: void acb_siegel_randtest_fund(acb_mat_t tau, flint_rand_t state,
-              slong prec)
-
-    Sets the `g\times g` matrix *tau* to a random element of *\mathbb{H}_g*. In
-    the second version, *tau* is guaranteed to belong to *\mathcal{F}_g*.
-
-.. function:: void acb_siegel_cocycle(acb_mat_t res, const fmpz_mat_t mat,
-              const acb_mat_t tau, slong prec)
+.. function:: void acb_siegel_cocycle(acb_mat_t res, const fmpz_mat_t mat, const acb_mat_t tau, slong prec)
 
     Sets *res* to `c\tau+d` where *c,d* are the lower `g\times g` blocks of
     *mat*.
 
-.. function:: void acb_siegel_transform(acb_mat_t w, const fmpz_mat_t m, const
-              acb_mat_t tau, slong prec)
+.. function:: void acb_siegel_transform(acb_mat_t w, const fmpz_mat_t m, const acb_mat_t tau, slong prec)
 
     Sets *res* to `(a\tau + b)(c\tau + d)^{-1}` where *a,b,c,d* are the
     `g\times g` blocks of *mat*.
 
-.. function:: int acb_siegel_is_real_reduced(const acb_mat_t tau, const arf_t
-              eps, slong prec)
+.. function:: void acb_siegel_transform_ext(acb_ptr r, acb_mat_t w, const fmpz_mat_t mat, acb_srcptr z, const acb_mat_t tau, slong prec)
 
-    Returns nonzero if each entry *z* of the square matrix *tau* satisfies
-    `|\operatorname{Re}(z)|\leq 1/2+\varepsilon`. Returns 0 if this is false or
-    cannot be determined.
+    Sets *r* and *w* to `(c\tau + d)^{-T} z` and `(a\tau + b)(c\tau + d)^{-1}`
+    respectively, where *a,b,c,d* are the `g\times g` blocks of *mat*.
 
-.. function:: int acb_siegel_not_real_reduced(const acb_mat_t tau, slong prec)
+.. function:: void acb_siegel_reduce_imag(fmpz_mat_t mat, const acb_mat_t tau, slong prec)
 
-    Returns nonzero if some entry *z* of the square matrix *tau* satisfies
-    `|\operatorname{Re}(z)|> 1/2`. Returns 0 if this is false or cannot be
-    determined.
+    Reduces the imaginary part of *tau* by calling :func:`arb_mat_spd_lll_reduce`
+    and sets *mat* to the corresponding unimodular transformation.
 
-.. function:: void acb_siegel_reduce_real(acb_mat_t res, fmpz_mat_t mat, const
-              acb_mat_t tau, slong prec)
+.. function:: void acb_siegel_reduce_real(fmpz_mat_t mat, const acb_mat_t tau, slong prec)
 
-    Given a `g\times g` square matrix *tau*, computes a symmetric integer
-    matrix *M* approximating `\operatorname{Re}(tau)`, sets *mat* to
-    `\left(\begin{textmatrix} U_g&-M\\0&I_g \end{textmatrix}\right)`, and sets
-    *res* to the image of *tau* under the action of *mat*, which should have a
-    more reduced real part.
+    Computes a symmetric, integral matrix *mat* such that *tau+mat* has a small
+    real part, ideally at most `1/2` in absolute value for each coefficient.
 
-.. function:: void acb_siegel_reduce(acb_mat_t res, fmpz_mat_t mat, const
-              acb_mat_t tau, slong prec)
+.. function:: void acb_siegel_reduce(acb_mat_t res, fmpz_mat_t mat, const acb_mat_t tau, slong prec)
 
-    Given `\tau\in \mathbb{H}_g`, attempts to compute a symplectic matrix *mat*
-    such that the image *res* of *tau* under this matrix is closer to the
-    fundamental domain `\mathcal{F}_g`. We require `g\leq 2`.
+    Computes a symplectic matrix *mat* such that the result *res* of *mat*
+    acting on *tau* is closer to `\mathcal{F}_g`, by repeatedly reducing its
+    real and imaginary parts and applying fundamental symplectic matrices.
+    
+.. function:: void acb_siegel_randtest(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits)
 
-    As in :func:`acb_modular_fundamental_domain_approx`, the output *mat* is
-    always a valid symplectic matrix, but it us up to the user to check that
-    the output *res* is close enough to the fundamental domain.
+    Generates a random matrix *tau* in `\mathbb{H}_g`, possibly far from the
+    fundamental domain.
 
-.. function:: int acb_siegel_is_reduced(const acb_mat_t tau, const arf_t eps,
-              slong prec)
+.. function:: void acb_siegel_randtest_reduced(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits)
 
-    Returns nonzero if the `g\times g` matrix *tau* belongs to
-    `\mathcal{F}_g^\varepsilon`. We require `g\leq 2`. Returns 0 if this is
-    false or cannot be determined.
+    Generates a random matrix *tau* in `\mathbb{H}_g` that is close to the
+    fundamental domain by calling :func:`acb_siegel_reduce` on a random matrix.
 
+.. function:: void acb_siegel_randtest_nice(acb_mat_t tau, flint_rand_t state, slong prec)
+
+    Generates a random matrix that is well in the interior of `\mathcal{F}_g`.
 
 AGM sequences
 -------------------------------------------------------------------------------
@@ -179,26 +160,21 @@ generality, AGM sequences converge quadratically if and only if the chosen
 square roots `r_b` are eventually always in *good position*, i.e. they all
 belong to a common quarter plane seen from the origin.
 
-Following..., we will also be interested in *extended Borchardt sequences*,
-defined by similar formulas for a tuple of `2^{g+1}` complex numbers.
+Following..., we also compute *extended Borchardt sequences*, defined by
+similar formulas for a tuple of `2^{g+1}` complex numbers.
 
-The formulas for steps in (extended) AGM sequences replicate the duplication
-formulas for theta functions (see below). This remark is at the heart of
-quasi-linear algorithms to evaluate theta functions; see below.
-
-.. function:: void acb_theta_agm_hadamard(acb_ptr r, acb_srcptr a, slong g,
-              slong prec)
+.. function:: void acb_theta_agm_hadamard(acb_ptr r, acb_srcptr a, slong g, slong prec)
 
     Sets *r* to the image of *a* under multiplication by *H*, the `2^g\times
-    2^g` Hadamard matrix. We require `g\geq 0`; moreover *r* and *a* must be
+    2^g` Hadamard matrix (see ...). Requires that `g\geq 0` and *r* and *a* are
     initialized with at least `2^g` elements.
 
-.. function:: void acb_theta_agm_sqrt_lowprec(acb_t r, const acb_t a, const
-              acb_t root, slong prec)
+.. function:: void acb_theta_agm_sqrt_lowprec(acb_t r, const acb_t a, const acb_t root, slong prec)
 
-    Sets *r* to a square root of *a* to high precision that is contained in the
-    (low-precision) approximation *root*. Unlike :func:`acb_sqrt`, no special
-    precision losses happen when *a* touches the negative real axis.
+    Sets *r* to a square root of *a*. Unlike :func:`acb_sqrt`, no special
+    precision losses happen when *a* touches the negative real axis. If *root*
+    is a (low-precision) complex ball containing either `\sqrt{a}` or `-\sqrt{a}`,
+    then the output *r* will be contained in *root*.
 
 .. function:: void acb_theta_agm_step_sqrt(acb_ptr r, acb_srcptr a, slong g,
               slong prec)
@@ -213,8 +189,8 @@ quasi-linear algorithms to evaluate theta functions; see below.
     :func:`sqrt` version, *a* is the vector of square roots. In the :func:`bad`
     version, a low-precision approximation of the roots is given. In the
     :func:`good` version, we assume that all entries of *a* have positive real
-    parts, and a good choice of square roots is made. We require `g\geq 0`; all
-    vectors must be initialized with at least `2^g` elements.
+    parts, and a good choice of square roots is made. We require that `g\geq 0`
+    and all vectors are initialized with at least `2^g` elements.
 
 .. function:: void acb_theta_agm_ext_step_sqrt(acb_ptr r, acb_srcptr a, slong
               g, slong prec)
@@ -227,6 +203,64 @@ quasi-linear algorithms to evaluate theta functions; see below.
     
     Analogous functions for extended Borchardt sequences. All vectors must be
     initialized with at least `2^{g+1}` elements.
+    
+.. function:: void acb_theta_agm_step_last(acb_t r, acb_srcptr a, slong g, slong prec)
+
+    Sets *r* to the average of the first `2^g` entries of *a*.
+
+.. function:: void acb_theta_agm_ext_step_last(acb_t r, const acb_t s, acb_srcptr a, slong g, slong prec)
+
+    Computes an extended Borchardt mean *r* given the last term of the
+    associated AGM sequence and the associated (regular) Borchardt mean *s*.
+    
+.. function:: void acb_theta_agm_max_abs(arb_t max, acb_srcptr a, slong nb, slong prec)
+              
+.. function:: void acb_theta_agm_min_abs(arb_t min, acb_srcptr a, slong nb, slong prec)
+
+    Sets *max* (resp. *min*) to the maximum (resp. minimum) absolute value of
+    the first *nb* entries of *a*.    
+              
+.. function:: void acb_theta_agm_abs_dist(arb_t eps, acb_srcptr a, slong nb, slong lowprec, slong prec)
+    
+    Computes `\varepsilon = \max_{0< i< nb} |a_i - a_0|`. Differences are
+    computed at precision *prec* and absolute values at precision *lowprec*.
+
+.. function:: void acb_theta_agm_rel_dist(arb_t eps, acb_srcptr a, slong nb, slong lowprec, slong prec)
+
+    Computes `1|a_0|` times the output of :func:`acb_theta_agm_abs_dist`.
+
+.. function:: void acb_theta_agm_radius(arf_t rad, const arf_struct* mi, const arf_struct* Mi, const arf_t abs_dist, slong nb, slong prec)
+
+    Sets *rad* to the radius of a polydisk where a certain Borchardt mean
+    function is surely analytic. The input data is as follows: *nb* is the
+    number of (possibly) bad steps; *abs_dist* is the output of
+    :func:`acb_theta_agm_abs_dist` for the vector obtained after *nb* steps;
+    and *mi* (resp. *Mi*) contains a lower (resp. upper) bound for the absolute
+    values of all entries in the `i\text{th}` term of the sequence for each *i*
+    between *0* and *nb-1*.
+
+.. function:: void acb_theta_agm_conv_rate(arf_t c, arf_t r, const arf_t eps, slong prec)
+
+    Computes the convergence rate of an AGM sequence consisting of good steps
+    only, i.e. *c* and *r<1* such that the `i\text{th}` term of the sequence
+    satisfies `|a_0 - m|\leq c r^i |a_0|` for all `i\geq 0`. The input *eps* is
+    an upper bound on the relative distance for the term `i=0`, as computed by
+    :func:`acb_theta_agm_rel_dist`, and must be less than *1/4*. Otherwise
+    *c,r* are set to infinite values.
+
+.. function:: slong acb_theta_agm_nb_good_steps(const arf_t c, const arf_t r, slong prec)
+
+    Given the convergence rate *c,r* of an AGM sequence with good steps as,
+    above, returns the number of steps to compute before . Throws an error if
+    the number of steps is infinite.
+
+.. function:: void acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr roots, slong nb_bad, slong g, slong prec)
+
+    Computes the limit of an AGM sequence starting from `2^g` complex
+    numbers. The input data is as follows: *a* is the first term; *nb* is the
+    number of (possibly) bad steps; and *roots* consists of low-precision
+    approximations of the correct roots for the first *nb* steps, as in
+    :func:`acb_theta_agm_sqrt_lowprec`.
 
 .. function:: void acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr all_roots,
               const arf_t rel_err, slong nb_bad, slong nb_good, slong g,
@@ -618,25 +652,25 @@ available.
     in the data structure.
 
 .. function:: void acb_theta_naive(acb_ptr th, acb_srcptr z, slong nb_z, const
-              acb_mat_t tau, slong prec);
+              acb_mat_t tau, slong prec)
 
 .. function:: void acb_theta_naive_const(acb_ptr th, const acb_mat_t tau, slong
-              prec);
+              prec)
 
 .. function:: void acb_theta_naive_const_proj(acb_ptr th, const acb_mat_t tau,
-              slong prec);
+              slong prec)
 
 .. function:: void acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z,
-              const acb_mat_t tau, slong prec);
+              const acb_mat_t tau, slong prec)
 
 .. function:: void acb_theta_naive_all_const(acb_ptr th, const acb_mat_t tau,
-              slong prec);
+              slong prec)
 
 .. function:: void acb_theta_naive_ind(acb_t th, ulong ab, acb_srcptr z, const
-              acb_mat_t tau, slong prec);
+              acb_mat_t tau, slong prec)
 
 .. function:: void acb_theta_naive_ind_const(acb_t th, ulong ab, const
-              acb_mat_t tau, slong prec);
+              acb_mat_t tau, slong prec)
 
     Evaluates theta functions using the naive algorithm. See above for the
     meaning of different suffixes.
@@ -690,7 +724,7 @@ for all inputs in the Siegel fundamental domain.
     `|\theta_{a,b}(0,\tau')|` is at most *bound*.
 
 .. function:: void acb_theta_cauchy(arf_t bound_der, const arf_t rad, const
-              arf_t bound, slong ord, slong dim, slong prec);
+              arf_t bound, slong ord, slong dim, slong prec)
 
     Applies Cauchy's formula to compute *bound_der* with the following
     property: if *f* is an analytic function defined on a disk of radius *rad*
@@ -782,7 +816,7 @@ for all inputs in the Siegel fundamental domain.
               acb_srcptr z, slong prec)
 
 .. function:: void acb_theta_newton_const_sqr(acb_ptr th2, const acb_mat_t tau,
-              slong prec);
+              slong prec)
 
 .. function:: void acb_theta_newton_all_const_sqr(acb_ptr th, const acb_mat_t
               tau, slong prec)

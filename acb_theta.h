@@ -24,6 +24,10 @@
 extern "C" {
 #endif
 
+/* Tuning */
+
+#define ACB_THETA_AGM_LOWPREC 50 /* Low precision in AGM computations */
+
 /* The Siegel modular group */
 
 static __inline__ void
@@ -53,98 +57,53 @@ void sp2gz_randtest(fmpz_mat_t mat, flint_rand_t state, slong bits);
 
 /* Siegel space */
 
-void acb_siegel_randtest(acb_mat_t tau, flint_rand_t state, slong prec,
-    slong mag_bits);
-
-void acb_siegel_randtest_fund(acb_mat_t tau, flint_rand_t state,
-    slong prec);
-
-void acb_siegel_randtest_reduced(acb_mat_t tau, flint_rand_t state, slong prec,
-    slong mag_bits);
-
-void acb_siegel_cocycle(acb_mat_t res, const fmpz_mat_t mat,
-    const acb_mat_t tau, slong prec);
-
-void acb_siegel_transform(acb_mat_t res, const fmpz_mat_t mat,
-    const acb_mat_t tau, slong prec);
-
+void acb_siegel_cocycle(acb_mat_t res, const fmpz_mat_t mat, const acb_mat_t tau, slong prec);
+void acb_siegel_transform(acb_mat_t res, const fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 void acb_siegel_transform_ext(acb_ptr r, acb_mat_t w, const fmpz_mat_t mat,
     acb_srcptr z, const acb_mat_t tau, slong prec);
 
 void acb_siegel_reduce_imag(fmpz_mat_t mat, const acb_mat_t tau, slong prec);
-
 void acb_siegel_reduce_real(fmpz_mat_t mat, const acb_mat_t tau, slong prec);
+void acb_siegel_reduce(acb_mat_t res, fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 
-void acb_siegel_reduce(acb_mat_t res, fmpz_mat_t mat, const acb_mat_t tau,
-    slong prec);
+void acb_siegel_randtest(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits);
+void acb_siegel_randtest_reduced(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits);
+void acb_siegel_randtest_nice(acb_mat_t tau, flint_rand_t state, slong prec);
 
 /* AGM sequences */
 
-#define ACB_THETA_AGM_LOWPREC 50
-
 void acb_theta_agm_hadamard(acb_ptr r, acb_srcptr a, slong g, slong prec);
-
-void acb_theta_agm_sqrt_lowprec(acb_t r, const acb_t a, const acb_t root,
-    slong prec);
+void acb_theta_agm_sqrt_lowprec(acb_t r, const acb_t a, const acb_t root, slong prec);
 
 void acb_theta_agm_step_sqrt(acb_ptr r, acb_srcptr a, slong g, slong prec);
-
-void acb_theta_agm_step_bad(acb_ptr r, acb_srcptr a, acb_srcptr roots, slong g,
-    slong prec);
-
+void acb_theta_agm_step_bad(acb_ptr r, acb_srcptr a, acb_srcptr roots, slong g, slong prec);
 void acb_theta_agm_step_good(acb_ptr r, acb_srcptr a, slong g, slong prec);
-
 void acb_theta_agm_step_last(acb_t r, acb_srcptr a, slong g, slong prec);
 
 void acb_theta_agm_ext_step_sqrt(acb_ptr r, acb_srcptr a, slong g, slong prec);
-
-void acb_theta_agm_ext_step_bad(acb_ptr r, acb_srcptr a, acb_srcptr roots,
-    slong g, slong prec);
-
+void acb_theta_agm_ext_step_bad(acb_ptr r, acb_srcptr a, acb_srcptr roots, slong g, slong prec);
 void acb_theta_agm_ext_step_good(acb_ptr r, acb_srcptr a, slong g, slong prec);
-
-void acb_theta_agm_ext_step_last(acb_t r, const acb_t s, acb_srcptr a, slong g,
-    slong prec);
+void acb_theta_agm_ext_step_last(acb_t r, const acb_t s, acb_srcptr a, slong g, slong prec);
 
 void acb_theta_agm_max_abs(arb_t max, acb_srcptr a, slong nb, slong prec);
-
 void acb_theta_agm_min_abs(arb_t min, acb_srcptr a, slong nb, slong prec);
+void acb_theta_agm_abs_dist(arb_t eps, acb_srcptr a, slong nb, slong lowprec, slong prec);
+void acb_theta_agm_rel_dist(arb_t eps, acb_srcptr a, slong nb, slong lowprec, slong prec);
 
-void acb_theta_agm_abs_dist(arb_t eps, acb_srcptr a, slong nb, slong lowprec,
-    slong prec);
-
-void acb_theta_agm_rel_dist(arb_t eps, acb_srcptr a, slong nb, slong lowprec,
-    slong prec);
-
-void acb_theta_agm_radius(arf_t rad, const arf_struct* mi, const arf_struct* Mi,
-    const arf_t abs_dist, slong nb, slong prec);
+void acb_theta_agm_radius(arf_t rad, const arf_struct* mi, const arf_struct* Mi, const arf_t abs_dist, slong nb, slong prec);
 
 void acb_theta_agm_conv_rate(arf_t c, arf_t r, const arf_t eps, slong prec);
-
 slong acb_theta_agm_nb_good_steps(const arf_t c, const arf_t r, slong prec);
+void acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr roots, slong nb_bad, slong g, slong prec);
 
-void acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr roots, slong nb_bad,
-    slong g, slong prec);
-
-void acb_theta_agm_ext_conv_rate(arf_t c1, arf_t c2, arf_t r, const arf_t eps,
-    const arf_t m, const arf_t M, slong prec);
-
-void acb_theta_agm_ext_rel_err(arf_t err, const arf_t c2, const arf_t r,
-    slong nb_good, slong prec);
-
-void acb_theta_agm_ext(acb_t r, acb_t s, acb_srcptr a, acb_srcptr roots,
-    slong nb_bad, slong g, slong prec);
+void acb_theta_agm_ext_conv_rate(arf_t c1, arf_t c2, arf_t r, const arf_t eps,const arf_t m, const arf_t M, slong prec);
+void acb_theta_agm_ext_rel_err(arf_t err, const arf_t c2, const arf_t r, slong nb_good, slong prec);
+void acb_theta_agm_ext(acb_t r, acb_t s, acb_srcptr a, acb_srcptr roots, slong nb_bad, slong g, slong prec);
 
 slong acb_theta_agm_nb_bad_steps(const acb_mat_t tau, slong prec);
-
-slong acb_theta_agm_ext_nb_bad_steps(acb_srcptr z, const acb_mat_t tau,
-    slong prec);
-
-void acb_theta_agm_roots(acb_ptr roots, const acb_mat_t tau, slong nb_bad,
-    slong prec);
-
-void acb_theta_agm_ext_roots(acb_ptr roots, acb_srcptr z, const acb_mat_t tau,
-    slong nb_bad, slong prec);
+slong acb_theta_agm_ext_nb_bad_steps(acb_srcptr z, const acb_mat_t tau, slong prec);
+void acb_theta_agm_roots(acb_ptr roots, const acb_mat_t tau, slong nb_bad, slong prec);
+void acb_theta_agm_ext_roots(acb_ptr roots, acb_srcptr z, const acb_mat_t tau, slong nb_bad, slong prec);
 
 /* Transformation formulas */
 

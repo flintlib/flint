@@ -14,56 +14,57 @@
 void
 acb_theta_agm_conv_rate(arf_t c, arf_t r, const arf_t eps, slong prec)
 {
-    arb_t eps_arb;
-    arb_t temp;
-    arb_t res;
+    arb_t e;
+    arb_t t;
 
-    arb_init(temp);
-    arb_init(eps_arb);
-    arb_init(res);
+    arb_init(t);
+    arb_init(e);
 
-    arb_set_arf(eps_arb, eps);
+    arb_set_arf(e, eps);
+    arb_mul_2exp_si(e, e, 2); /* 4eps */
+    arb_sub_si(e, e, 1, prec);
 
-    /* Get eta = 1/8 + 1/12*eps^3/(1-eps) */
-    arb_sub_si(res, eps_arb, 1, prec);
-    arb_pow_ui(temp, eps_arb, 3, prec);
-    arb_mul(res, res, temp, prec);
-    arb_div_si(res, res, -12, prec);
-
-    arb_one(temp);
-    arb_mul_2exp_si(temp, temp, -3);
-    arb_add(res, res, temp, prec);
-
-    /* Get res = (1 + eta*(2+eps)^2)/(2(1-eps)) */
-    arb_add_si(temp, eps_arb, 2, prec);
-    arb_sqr(temp, temp, prec);
-    arb_mul(res, res, temp, prec);
-    arb_add_si(res, res, 1, prec);
-
-    arb_sub_si(temp, eps_arb, 1, prec);
-    arb_mul_si(temp, temp, -2, prec);
-    arb_div(res, res, temp, prec);
-
-    /* Replace eps by res*eps, res by 1/res */
-    arb_mul(eps_arb, eps_arb, res, prec);
-    arb_inv(res, res, prec);
-
-    /* Abort if not eps < 1 */
-    arb_set_si(temp, 1);
-    if (!arb_lt(eps_arb, temp))
+    if (!arb_is_negative(e))
     {
-        flint_printf
-            ("agm_conv_rate: Error (quadratic convergence not reached)");
-        arb_printd(eps_arb, 10);
-        flint_printf("\n");
-        fflush(stdout);
-        flint_abort();
+        arf_pos_inf(c);
+        arf_pos_inf(r);
+    }
+    else
+    {   
+        /* Set t = eta(eps) */  
+        arb_set_arf(e, eps);
+        arb_add_si(e, e, 2, prec);
+        arb_mul_arf(e, e, eps, prec); /* 2eps + eps^2 */
+        
+        arb_sub_si(t, e, 1, prec);
+        arb_neg(t, t);
+        arb_sqrt(t, t, prec);
+        
+        arb_mul_2exp_si(e, e, -1); /* eps + eps^2/2 */
+        arb_add(t, t, e, prec);
+        arb_neg(t, t);
+        arb_add_si(t, t, 1);
+        
+        arb_set_arf(e, eps);
+        arb_sqr(e, e, prec); /* eps^2 */        
+        arb_div(t, t, e, prec);
+        
+        arb_one(e);
+        arb_mul_2exp_si(e, e, -1); /* 1/2 */
+        arb_add(t, t, e, prec);
+        
+        arb_set_arf(e, eps);
+        arb_sub_si(e, e, 1, prec);
+        arb_neg(e, e); /* 1-eps */
+        arb_div(t, t, e, prec);
+        
+        /* Set e to t*eps, t to 1/t */
+        arb_mul_arf(e, t, eps, prec);
+        arb_inv(t, t, prec);
+        arb_get_ubound_arf(c, t, prec);
+        arb_get_ubound_arf(r, e, prec);
     }
 
-    arb_get_ubound_arf(c, res, prec);
-    arb_get_ubound_arf(r, eps_arb, prec);
-
-    arb_clear(temp);
-    arb_clear(eps_arb);
-    arb_clear(res);
+    arb_clear(t);
+    arb_clear(e);
 }

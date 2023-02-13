@@ -13,7 +13,7 @@
 
 void
 acb_siegel_randtest_reduced(acb_mat_t tau, flint_rand_t state, slong prec,
-                            slong mag_bits)
+    slong mag_bits)
 {
     slong g = acb_mat_nrows(tau);
     fmpz_mat_t mat;

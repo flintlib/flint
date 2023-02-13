@@ -18,7 +18,9 @@ acb_theta_agm_hadamard(acb_ptr r, acb_srcptr a, slong g, slong prec)
     slong half;
 
     if (g == 0)
+    {
         acb_set(&r[0], &a[0]);
+    }
     else
     {
         half = 1 << (g - 1);

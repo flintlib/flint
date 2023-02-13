@@ -12,20 +12,13 @@
 #include "acb_theta.h"
 
 void
-acb_siegel_randtest_fund(acb_mat_t tau, flint_rand_t state, slong prec)
+acb_siegel_randtest_nice(acb_mat_t tau, flint_rand_t state, slong prec)
 {
     slong g = arb_mat_nrows(tau);
-    arf_t rad;
-    acb_t err;
     acb_t c;
     slong k, j;
 
-    arf_init(rad);
-    acb_init(err);
     acb_init(c);
-
-    arf_one(rad);
-    arf_div_si(rad, rad, 2 * g, prec, ARF_RND_FLOOR);
 
     acb_mat_zero(tau);
     for (k = 0; k < g; k++)
@@ -36,19 +29,17 @@ acb_siegel_randtest_fund(acb_mat_t tau, flint_rand_t state, slong prec)
         acb_set(acb_mat_entry(tau, k, k), c);
     }
 
-    acb_zero(c);
     for (k = 0; k < g; k++)
     {
         for (j = k + 1; j < g; j++)
         {
-            acb_randtest_disk(err, c, rad, state, prec);
+            acb_urandom(c, state, prec);
+            acb_div_si(c, c, 2*g, prec);
             acb_add(acb_mat_entry(tau, k, j),
-                    acb_mat_entry(tau, k, j), err, prec);
+                    acb_mat_entry(tau, k, j), c, prec);
             acb_set(acb_mat_entry(tau, j, k), acb_mat_entry(tau, k, j));
         }
     }
 
-    arf_clear(rad);
-    acb_clear(err);
     acb_clear(c);
 }

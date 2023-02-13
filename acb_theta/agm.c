@@ -75,9 +75,13 @@ acb_theta_agm(acb_t res, acb_srcptr a, acb_srcptr roots, slong nb_bad,
     }
 
     if (nb_good > 0)
+    {
         acb_theta_agm_step_last(res, v, g, prec);
+    }
     else
+    {
         acb_set(res, &v[0]);
+    }
 
     /* Rescale, add relative error */
     acb_mul(res, res, scal, prec);

@@ -26,7 +26,7 @@ acb_theta_agm_nb_good_steps(const arf_t c, const arf_t r, slong prec)
     arf_init(b);
     fmpz_init(exp);
 
-    /* Solve for c * e^(2^k) * (1+cr)/(1-cr) * 1/(1-r) <= 2^(-prec) */
+    /* Solve for c * r^(2^k) * (1+cr)/(1-r) <= 2^(-prec) */
     arb_one(x);
     arb_mul_2exp_si(x, x, -prec);
     arb_div_arf(x, x, c, lowprec);
@@ -53,7 +53,7 @@ acb_theta_agm_nb_good_steps(const arf_t c, const arf_t r, slong prec)
 
     if (!arf_is_finite(b))
     {
-        flint_printf("agm_nb_good_steps: Error (infinite value)\n");
+        flint_printf("acb_theta_agm_nb_good_steps: Error (infinite value)\n");
         fflush(stdout);
         flint_abort();
     }
