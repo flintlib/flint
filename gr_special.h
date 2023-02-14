@@ -212,6 +212,24 @@ GR_SPECIAL_DEF int gr_chebyshev_t(gr_ptr res, gr_srcptr n, gr_srcptr x, gr_ctx_t
 GR_SPECIAL_DEF int gr_chebyshev_u_fmpz(gr_ptr res, const fmpz_t n, gr_srcptr x, gr_ctx_t ctx) { return GR_FMPZ_BINARY_OP(ctx, CHEBYSHEV_U_FMPZ)(res, n, x, ctx); }
 GR_SPECIAL_DEF int gr_chebyshev_u(gr_ptr res, gr_srcptr n, gr_srcptr x, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, CHEBYSHEV_U)(res, n, x, ctx); }
 
+GR_SPECIAL_DEF int gr_jacobi_p(gr_ptr res, gr_srcptr n, gr_srcptr a, gr_srcptr b, gr_srcptr z, gr_ctx_t ctx) { return GR_QUATERNARY_OP(ctx, JACOBI_P)(res, n, a, b, z, ctx); }
+GR_SPECIAL_DEF int gr_gegenbauer_c(gr_ptr res, gr_srcptr n, gr_srcptr m, gr_srcptr z, gr_ctx_t ctx) { return GR_TERNARY_OP(ctx, GEGENBAUER_C)(res, n, m, z, ctx); }
+GR_SPECIAL_DEF int gr_laguerre_l(gr_ptr res, gr_srcptr n, gr_srcptr m, gr_srcptr z, gr_ctx_t ctx) { return GR_TERNARY_OP(ctx, LAGUERRE_L)(res, n, m, z, ctx); }
+GR_SPECIAL_DEF int gr_hermite_h(gr_ptr res, gr_srcptr n, gr_srcptr z, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, HERMITE_H)(res, n, z, ctx); }
+GR_SPECIAL_DEF int gr_legendre_p(gr_ptr res, gr_srcptr n, gr_srcptr m, gr_srcptr z, int type, gr_ctx_t ctx) { return GR_TERNARY_OP_WITH_FLAG(ctx, LEGENDRE_P)(res, n, m, z, type, ctx); }
+GR_SPECIAL_DEF int gr_legendre_q(gr_ptr res, gr_srcptr n, gr_srcptr m, gr_srcptr z, int type, gr_ctx_t ctx) { return GR_TERNARY_OP_WITH_FLAG(ctx, LEGENDRE_Q)(res, n, m, z, type, ctx); }
+GR_SPECIAL_DEF int gr_spherical_y_si(gr_ptr res, slong n, slong m, gr_srcptr theta, gr_srcptr phi, gr_ctx_t ctx) { return GR_SI_SI_QUATERNARY_OP(ctx, SPHERICAL_Y_SI)(res, n, m, theta, phi, ctx); }
+GR_SPECIAL_DEF int gr_legendre_p_root_ui(gr_ptr root, gr_ptr weight, ulong n, ulong k, gr_ctx_t ctx) { return GR_BINARY_BINARY_OP_UI_UI(ctx, LEGENDRE_P_ROOT_UI)(root, weight, n, k, ctx); }
+
+typedef int ((*gr_method_pfq_op_op)(gr_ptr, const gr_vec_t, const gr_vec_t, gr_srcptr, int, gr_ctx_ptr));
+#define GR_PFQ_OP(ctx, NAME) (((gr_method_pfq_op_op *) ctx->methods)[GR_METHOD_ ## NAME])
+
+GR_SPECIAL_DEF int gr_hypgeom_0f1(gr_ptr res, gr_srcptr a, gr_srcptr z, int flags, gr_ctx_t ctx) { return GR_BINARY_OP_WITH_FLAG(ctx, HYPGEOM_0F1)(res, a, z, flags, ctx); }
+GR_SPECIAL_DEF int gr_hypgeom_1f1(gr_ptr res, gr_srcptr a, gr_srcptr b, gr_srcptr z, int flags, gr_ctx_t ctx) { return GR_TERNARY_OP_WITH_FLAG(ctx, HYPGEOM_1F1)(res, a, b, z, flags, ctx); }
+GR_SPECIAL_DEF int gr_hypgeom_u(gr_ptr res, gr_srcptr a, gr_srcptr b, gr_srcptr z, int flags, gr_ctx_t ctx) { return GR_TERNARY_OP_WITH_FLAG(ctx, HYPGEOM_U)(res, a, b, z, flags, ctx); }
+GR_SPECIAL_DEF int gr_hypgeom_2f1(gr_ptr res, gr_srcptr a, gr_srcptr b, gr_srcptr c, gr_srcptr z, int flags, gr_ctx_t ctx) { return GR_QUATERNARY_OP_WITH_FLAG(ctx, HYPGEOM_2F1)(res, a, b, c, z, flags, ctx); }
+GR_SPECIAL_DEF int gr_hypgeom_pfq(gr_ptr res, const gr_vec_t a, const gr_vec_t b, gr_srcptr z, int flags, gr_ctx_t ctx) { return GR_PFQ_OP(ctx, HYPGEOM_PFQ)(res, a, b, z, flags, ctx); }
+
 GR_SPECIAL_DEF int gr_zeta(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ZETA)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_zeta_ui(gr_ptr res, ulong x, gr_ctx_t ctx) { return GR_UNARY_OP_UI(ctx, ZETA_UI)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_hurwitz_zeta(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, HURWITZ_ZETA)(res, x, y, ctx); }
@@ -226,21 +244,7 @@ GR_SPECIAL_DEF int gr_agm(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { 
 
 /* todo
 
-    GR_METHOD_CHEBYSHEV_T_UI,
-    GR_METHOD_CHEBYSHEV_T_FMPZ,
-    GR_METHOD_CHEBYSHEV_T,
-    GR_METHOD_CHEBYSHEV_U_UI,
-    GR_METHOD_CHEBYSHEV_U_FMPZ,
-    GR_METHOD_CHEBYSHEV_U,
-    GR_METHOD_JACOBI_P,
-    GR_METHOD_GEGENBAUER_C,
-    GR_METHOD_LAGUERRE_L,
-    GR_METHOD_HERMITE_H,
-    GR_METHOD_LEGENDRE_P,
-    GR_METHOD_LEGENDRE_Q,
-    GR_METHOD_GAUSS_LEGENDRE_NODE,
-    GR_METHOD_SPHERICAL_Y_SI,
-
+    orthogonal + hypergeometric
 
     GR_METHOD_DIRICHLET_CHI_UI,
     GR_METHOD_DIRICHLET_L,
@@ -249,13 +253,6 @@ GR_SPECIAL_DEF int gr_agm(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { 
     GR_METHOD_EULERPOLY_UI,
     GR_METHOD_POLYLOG_SI,
     GR_METHOD_POLYGAMMA,
-
-    GR_METHOD_HYPGEOM_0F1,
-    GR_METHOD_HYPGEOM_1F1,
-    GR_METHOD_HYPGEOM_2F0,
-    GR_METHOD_HYPGEOM_2F1,
-    GR_METHOD_HYPGEOM_U,
-    GR_METHOD_HYPGEOM_PFQ,
 
 
 */

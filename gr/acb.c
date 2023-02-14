@@ -1295,6 +1295,90 @@ int _gr_acb_chebyshev_u(acb_t res, const acb_t n, const acb_t x, const gr_ctx_t 
     return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
+int _gr_acb_jacobi_p(acb_t res, const acb_t n, const acb_t a, const acb_t b, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_hypgeom_jacobi_p(res, n, a, b, x, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_acb_gegenbauer_c(acb_t res, const acb_t n, const acb_t m, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_hypgeom_gegenbauer_c(res, n, m, x, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_acb_laguerre_l(acb_t res, const acb_t n, const acb_t m, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_hypgeom_laguerre_l(res, n, m, x, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_acb_hermite_h(acb_t res, const acb_t n, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_hypgeom_hermite_h(res, n, x, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_acb_legendre_p(acb_t res, const acb_t n, const acb_t m, const acb_t x, int type, const gr_ctx_t ctx)
+{
+    acb_hypgeom_legendre_p(res, n, m, x, type, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_acb_legendre_q(acb_t res, const acb_t n, const acb_t m, const acb_t x, int type, const gr_ctx_t ctx)
+{
+    acb_hypgeom_legendre_q(res, n, m, x, type, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_acb_legendre_p_root_ui(acb_t res, acb_t res2, ulong n, ulong k, const gr_ctx_t ctx)
+{
+    if (k >= n)
+        return GR_DOMAIN;
+
+    arb_hypgeom_legendre_p_ui_root(acb_realref(res), res2 ? acb_realref(res2) : NULL, n, k, ACB_CTX_PREC(ctx));
+    arb_zero(acb_imagref(res));
+    if (res2 != NULL)
+        arb_zero(acb_imagref(res2));
+    return GR_SUCCESS;
+}
+
+int _gr_acb_spherical_y_si(acb_t res, slong n, slong m, const acb_t theta, const acb_t phi, gr_ctx_t ctx)
+{
+    acb_hypgeom_spherical_y(res, n, m, theta, phi, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_acb_hypgeom_0f1(acb_t res, const acb_t a, const acb_t x, int flags, const gr_ctx_t ctx)
+{
+    acb_hypgeom_0f1(res, a, x, flags, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_acb_hypgeom_1f1(acb_t res, const acb_t a, const acb_t b, const acb_t x, int flags, const gr_ctx_t ctx)
+{
+    acb_hypgeom_1f1(res, a, b, x, flags, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_acb_hypgeom_u(acb_t res, const acb_t a, const acb_t b, const acb_t x, int flags, const gr_ctx_t ctx)
+{
+    acb_hypgeom_u(res, a, b, x, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_acb_hypgeom_2f1(acb_t res, const acb_t a, const acb_t b, const acb_t c, const acb_t x, int flags, const gr_ctx_t ctx)
+{
+    acb_hypgeom_2f1(res, a, b, c, x, flags, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_acb_hypgeom_pfq(acb_t res, const gr_vec_t a, const gr_vec_t b, const acb_t x, int flags, const gr_ctx_t ctx)
+{
+    acb_hypgeom_pfq(res, a->entries, a->length, b->entries, b->length, x, flags, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
 int
 _gr_acb_zeta(acb_t res, const acb_t x, const gr_ctx_t ctx)
 {
@@ -1741,6 +1825,19 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_COULOMB_HPOS,         (gr_funcptr) _gr_acb_coulomb_hpos},
     {GR_METHOD_CHEBYSHEV_T,          (gr_funcptr) _gr_acb_chebyshev_t},
     {GR_METHOD_CHEBYSHEV_U,          (gr_funcptr) _gr_acb_chebyshev_u},
+    {GR_METHOD_JACOBI_P,             (gr_funcptr) _gr_acb_jacobi_p},
+    {GR_METHOD_GEGENBAUER_C,         (gr_funcptr) _gr_acb_gegenbauer_c},
+    {GR_METHOD_LAGUERRE_L,           (gr_funcptr) _gr_acb_laguerre_l},
+    {GR_METHOD_HERMITE_H,            (gr_funcptr) _gr_acb_hermite_h},
+    {GR_METHOD_LEGENDRE_P,           (gr_funcptr) _gr_acb_legendre_p},
+    {GR_METHOD_LEGENDRE_Q,           (gr_funcptr) _gr_acb_legendre_q},
+    {GR_METHOD_LEGENDRE_P_ROOT_UI,   (gr_funcptr) _gr_acb_legendre_p_root_ui},
+    {GR_METHOD_SPHERICAL_Y_SI,       (gr_funcptr) _gr_acb_spherical_y_si},
+    {GR_METHOD_HYPGEOM_0F1,          (gr_funcptr) _gr_acb_hypgeom_0f1},
+    {GR_METHOD_HYPGEOM_1F1,          (gr_funcptr) _gr_acb_hypgeom_1f1},
+    {GR_METHOD_HYPGEOM_U,            (gr_funcptr) _gr_acb_hypgeom_u},
+    {GR_METHOD_HYPGEOM_2F1,          (gr_funcptr) _gr_acb_hypgeom_2f1},
+    {GR_METHOD_HYPGEOM_PFQ,          (gr_funcptr) _gr_acb_hypgeom_pfq},
     {GR_METHOD_ZETA,            (gr_funcptr) _gr_acb_zeta},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_acb_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_acb_vec_dot_rev},

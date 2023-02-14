@@ -452,7 +452,7 @@ typedef enum
     GR_METHOD_HERMITE_H,
     GR_METHOD_LEGENDRE_P,
     GR_METHOD_LEGENDRE_Q,
-    GR_METHOD_GAUSS_LEGENDRE_NODE,
+    GR_METHOD_LEGENDRE_P_ROOT_UI,
     GR_METHOD_SPHERICAL_Y_SI,
 
     /* Misc real constants */
@@ -751,9 +751,13 @@ typedef int ((*gr_method_binary_op_get_int)(int *, gr_srcptr, gr_srcptr, gr_ctx_
 typedef int ((*gr_method_binary_op_other_get_int)(int *, gr_srcptr, gr_srcptr, gr_ctx_ptr, gr_ctx_ptr));
 typedef int ((*gr_method_binary_binary_op)(gr_ptr, gr_ptr, gr_srcptr, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_binary_op_with_flag)(gr_ptr, gr_srcptr, gr_srcptr, int, gr_ctx_ptr));
+typedef int ((*gr_method_binary_binary_op_ui_ui)(gr_ptr, gr_ptr, ulong, ulong, gr_ctx_ptr));
 typedef int ((*gr_method_ternary_op)(gr_ptr, gr_srcptr, gr_srcptr, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_ternary_op_with_flag)(gr_ptr, gr_srcptr, gr_srcptr, gr_srcptr, int, gr_ctx_ptr));
+typedef int ((*gr_method_quaternary_op)(gr_ptr, gr_srcptr, gr_srcptr, gr_srcptr, gr_srcptr, gr_ctx_ptr));
+typedef int ((*gr_method_quaternary_op_with_flag)(gr_ptr, gr_srcptr, gr_srcptr, gr_srcptr, gr_srcptr, int, gr_ctx_ptr));
 typedef int ((*gr_method_quaternary_ternary_op)(gr_ptr, gr_ptr, gr_ptr, gr_ptr, gr_srcptr, gr_srcptr, gr_srcptr, gr_ctx_ptr));
+typedef int ((*gr_method_si_si_quaternary_op)(gr_ptr, slong, slong, gr_srcptr, gr_srcptr, gr_ctx_ptr));
 typedef truth_t ((*gr_method_unary_predicate)(gr_srcptr, gr_ctx_ptr));
 typedef truth_t ((*gr_method_binary_predicate)(gr_srcptr, gr_srcptr, gr_ctx_ptr));
 typedef void ((*gr_method_vec_init_clear_op)(gr_ptr, slong, gr_ctx_ptr));
@@ -828,9 +832,13 @@ typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcp
 #define GR_UNARY_PREDICATE(ctx, NAME) (((gr_method_unary_predicate *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_PREDICATE(ctx, NAME) (((gr_method_binary_predicate *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_OP_WITH_FLAG(ctx, NAME) (((gr_method_binary_op_with_flag *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_BINARY_BINARY_OP_UI_UI(ctx, NAME) (((gr_method_binary_binary_op_ui_ui *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_TERNARY_OP(ctx, NAME) (((gr_method_ternary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_TERNARY_OP_WITH_FLAG(ctx, NAME) (((gr_method_ternary_op_with_flag *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_QUATERNARY_OP(ctx, NAME) (((gr_method_quaternary_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_QUATERNARY_OP_WITH_FLAG(ctx, NAME) (((gr_method_quaternary_op_with_flag *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_QUATERNARY_TERNARY_OP(ctx, NAME) (((gr_method_quaternary_ternary_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_SI_SI_QUATERNARY_OP(ctx, NAME) (((gr_method_si_si_quaternary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_INIT_CLEAR_OP(ctx, NAME) (((gr_method_vec_init_clear_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_SWAP_OP(ctx, NAME) (((gr_method_vec_swap_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_CONSTANT_OP(ctx, NAME) (((gr_method_vec_constant_op *) ctx->methods)[GR_METHOD_ ## NAME])

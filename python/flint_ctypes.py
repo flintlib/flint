@@ -423,6 +423,16 @@ class gr_ctx:
             x = ZZ(x)
         return x
 
+    def _as_elem(ctx, x):
+        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
+            x = ctx(x)
+        return x
+
+    def _as_vec(ctx, x):
+        if type(x) is not gr_vec or x._ctx_python._element_ring is not ctx:
+            x = Vec(ctx)(x)
+        return x
+
     def _unary_op(ctx, x, op, rstr):
         if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
             x = ctx(x)
@@ -588,6 +598,37 @@ class gr_ctx:
         if status:
             _handle_error(ctx, status, rstr, x, y, z)
         return res
+
+    def _quaternary_op(ctx, x, y, z, w, op, rstr):
+        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
+            x = ctx(x)
+        if type(y) is not ctx._elem_type or y._ctx_python is not ctx:
+            y = ctx(y)
+        if type(z) is not ctx._elem_type or z._ctx_python is not ctx:
+            z = ctx(z)
+        if type(w) is not ctx._elem_type or w._ctx_python is not ctx:
+            w = ctx(w)
+        res = ctx._elem_type(context=ctx)
+        status = op(res._ref, x._ref, y._ref, z._ref, w._ref, ctx._ref)
+        if status:
+            _handle_error(ctx, status, rstr, x, y, z, w)
+        return res
+
+    def _quaternary_op_with_flag(ctx, x, y, z, w, flag, op, rstr):
+        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
+            x = ctx(x)
+        if type(y) is not ctx._elem_type or y._ctx_python is not ctx:
+            y = ctx(y)
+        if type(z) is not ctx._elem_type or z._ctx_python is not ctx:
+            z = ctx(z)
+        if type(w) is not ctx._elem_type or w._ctx_python is not ctx:
+            w = ctx(w)
+        res = ctx._elem_type(context=ctx)
+        status = op(res._ref, x._ref, y._ref, z._ref, w._ref, flag, ctx._ref)
+        if status:
+            _handle_error(ctx, status, rstr, x, y, z, w)
+        return res
+
 
     def _binary_op_fmpz(ctx, x, y, op, rstr):
         if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
@@ -1205,6 +1246,8 @@ class gr_ctx:
 
     def chebyshev_t(ctx, n, x):
         """
+        Chebyshev polynomial of the first kind.
+
             >>> [ZZ.chebyshev_t(n, 2) for n in range(5)]
             [1, 2, 7, 26, 97]
             >>> RR.chebyshev_t(0.5, 0.75)
@@ -1216,6 +1259,8 @@ class gr_ctx:
 
     def chebyshev_u(ctx, n, x):
         """
+        Chebyshev polynomial of the second kind.
+
             >>> [ZZ.chebyshev_u(n, 2) for n in range(5)]
             [1, 4, 15, 56, 209]
             >>> RR.chebyshev_u(0.5, 0.75)
@@ -1224,6 +1269,170 @@ class gr_ctx:
             [1, 0, -12, 0, 16]
         """
         return ctx._binary_op_with_overloads(n, x, libgr.gr_chebyshev_u, fmpz_op=libgr.gr_chebyshev_u_fmpz, rstr="chebyshev_u($n, $x)")
+
+    def jacobi_p(ctx, n, a, b, x):
+        """
+        Jacobi polynomial.
+
+            >>> RR.jacobi_p(3, 1, 2, 4)
+            [602.500000000000 +/- 3.28e-13]
+        """
+        return ctx._quaternary_op(n, a, b, x, libgr.gr_jacobi_p, rstr="jacobi_p($n, $a, $b, $x)")
+
+    def gegenbauer_c(ctx, n, m, x):
+        """
+        Gegenbauer polynomial.
+
+            >>> RR.gegenbauer_c(3, 2, 4)
+            [2000.00000000000 +/- 3.60e-12]
+        """
+        return ctx._ternary_op(n, m, x, libgr.gr_gegenbauer_c, rstr="gegenbauer_c($n, $m, $x)")
+
+    def laguerre_l(ctx, n, m, x):
+        """
+        Associated Laguerre polynomial (or Laguerre function).
+
+            >>> RR.laguerre_l(3, 2, 4)
+            [-0.66666666666667 +/- 5.71e-15]
+        """
+        return ctx._ternary_op(n, m, x, libgr.gr_laguerre_l, rstr="laguerre_l($n, $m, $x)")
+
+    def hermite_h(ctx, n, x):
+        """
+        Hermite polynomial (Hermite function).
+
+            >>> RR.hermite_h(3, 4)
+            464.0000000000000
+        """
+        return ctx._binary_op(n, x, libgr.gr_hermite_h, rstr="hermite_h($n, $x)")
+
+    def legendre_p(ctx, n, m, x, typ=0):
+        """
+        Associated Legendre function of the first kind.
+        """
+        return ctx._ternary_op_with_flag(n, m, x, typ, libgr.gr_legendre_p, rstr="legendre_p($n, $m, $x, $typ)")
+
+    def legendre_q(ctx, n, m, x, typ=0):
+        """
+        Associated Legendre function of the second kind.
+        """
+        return ctx._ternary_op_with_flag(n, m, x, typ, libgr.gr_legendre_q, rstr="legendre_q($n, $m, $x, $typ)")
+
+    def spherical_y(ctx, n, m, theta, phi):
+        """
+        Spherical harmonic.
+
+            >>> CC.spherical_y(4, 3, 0.5, 0.75)
+            ([0.076036396941350 +/- 2.18e-16] + [-0.094180781089734 +/- 4.96e-16]*I)
+        """
+        n = ctx._as_si(n)
+        m = ctx._as_si(m)
+        theta = ctx._as_elem(theta)
+        phi = ctx._as_elem(phi)
+        res = ctx._elem_type(context=ctx)
+        status = libgr.gr_spherical_y_si(res._ref, n, m, theta._ref, phi._ref, ctx._ref)
+        if status:
+            _handle_error(ctx, status, "spherical_y($n, $m, $theta, $phi)", n, m, theta, phi)
+        return res
+
+    def legendre_p_root(ctx, n, k, weight=False):
+        """
+        Root of Legendre polynomial.
+        With weight=True, also returns the corresponding weight for
+        Gauss-Legendre quadrature.
+
+            >>> RR.legendre_p_root(5, 1)
+            [0.538469310105683 +/- 1.15e-16]
+            >>> RR.legendre_p(5, 0, RR.legendre_p_root(5, 1))
+            [+/- 8.15e-16]
+            >>> RR.legendre_p_root(5, 1, weight=True)
+            ([0.538469310105683 +/- 1.15e-16], [0.4786286704993664 +/- 7.10e-17])
+        """
+        n = ctx._as_si(n)
+        k = ctx._as_si(k)
+        if weight:
+            res1 = ctx._elem_type(context=ctx)
+            res2 = ctx._elem_type(context=ctx)
+            status = libgr.gr_legendre_p_root_ui(res1._ref, res2._ref, n, k, ctx._ref)
+        else:
+            res1 = ctx._elem_type(context=ctx)
+            res2 = None
+            status = libgr.gr_legendre_p_root_ui(res1._ref, res2, n, k, ctx._ref)
+        if status:
+            _handle_error(ctx, status, "legendre_p_root($n, $k)", n, k)
+        if weight:
+            return (res1, res2)
+        else:
+            return res1
+
+    def hypgeom_0f1(ctx, a, z, regularized=False):
+        """
+        Hypergeometric function 0F1, optionally regularized.
+
+            >>> RR.hypgeom_0f1(3, 4)
+            [3.21109468764205 +/- 5.00e-15]
+            >>> RR.hypgeom_0f1(3, 4, regularized=True)
+            [1.60554734382103 +/- 5.20e-15]
+            >>> CC.hypgeom_0f1(1, 2+2j)
+            ([2.435598449671389 +/- 7.27e-16] + [4.43452765355337 +/- 4.91e-15]*I)
+        """
+        flags = int(regularized)
+        return ctx._binary_op_with_flag(a, z, flags, libgr.gr_hypgeom_0f1, rstr="hypgeom_0f1($a, $x)")
+
+    def hypgeom_1f1(ctx, a, b, z, regularized=False):
+        """
+        Hypergeometric function 1F1, optionally regularized.
+
+            >>> RR.hypgeom_1f1(3, 4, 5)
+            [60.504568913851 +/- 3.82e-13]
+            >>> RR.hypgeom_1f1(3, 4, 5, regularized=True)
+            [10.0840948189752 +/- 3.31e-14]
+        """
+        flags = int(regularized)
+        return ctx._ternary_op_with_flag(a, b, z, flags, libgr.gr_hypgeom_1f1, rstr="hypgeom_1f1($a, $b, $x)")
+
+    def hypgeom_u(ctx, a, b, z):
+        """
+        Hypergeometric function U.
+
+            >>> RR.hypgeom_u(1, 2, 3)
+            [0.3333333333333333 +/- 7.04e-17]
+        """
+        flags = 0
+        return ctx._ternary_op_with_flag(a, b, z, flags, libgr.gr_hypgeom_u, rstr="hypgeom_u($a, $b, $x)")
+
+    def hypgeom_2f1(ctx, a, b, c, z, regularized=False):
+        """
+        Hypergeometric function 2F1, optionally regularized.
+
+            >>> RR.hypgeom_2f1(1, 2, 3, -4)
+            [0.29882026094574 +/- 8.48e-15]
+            >>> RR.hypgeom_2f1(1, 2, 3, -4, regularized=True)
+            [0.14941013047287 +/- 4.24e-15]
+        """
+        flags = int(regularized)
+        return ctx._quaternary_op_with_flag(a, b, c, z, flags, libgr.gr_hypgeom_2f1, rstr="hypgeom_2f1($a, $b, $c, $x)")
+
+    def hypgeom_pfq(ctx, a, b, z, regularized=False):
+        """
+        Generalized hypergeometric function, optionally regularized.
+
+            >>> RR.hypgeom_pfq([1,2], [3,4], 0.5)
+            [1.09002619782383 +/- 4.32e-15]
+            >>> RR.hypgeom_pfq([1, 2], [3, 4], 0.5, regularized=True)
+            [0.090835516485319 +/- 2.36e-16]
+            >>> CC.hypgeom_pfq([1,2], [3,4], 0.5+0.5j)
+            ([1.08239550393928 +/- 2.16e-15] + [0.096660812453003 +/- 5.55e-16]*I)
+        """
+        a = ctx._as_vec(a)
+        b = ctx._as_vec(b)
+        z = ctx._as_elem(z)
+        res = ctx._elem_type(context=ctx)
+        flags = int(regularized)
+        status = libgr.gr_hypgeom_pfq(res._ref, a._ref, b._ref, z._ref, flags, ctx._ref)
+        if status:
+            _handle_error(ctx, status, "hypgeom_pfq($a, $b, $x)", a, b, z)
+        return res
 
     def fac(ctx, x):
         """

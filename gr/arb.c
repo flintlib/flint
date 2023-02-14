@@ -1506,6 +1506,83 @@ int _gr_arb_chebyshev_u(arb_t res, const arb_t n, const arb_t x, const gr_ctx_t 
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
+int _gr_arb_jacobi_p(arb_t res, const arb_t n, const arb_t a, const arb_t b, const arb_t x, const gr_ctx_t ctx)
+{
+    arb_hypgeom_jacobi_p(res, n, a, b, x, ARB_CTX_PREC(ctx));
+    return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_arb_gegenbauer_c(arb_t res, const arb_t n, const arb_t m, const arb_t x, const gr_ctx_t ctx)
+{
+    arb_hypgeom_gegenbauer_c(res, n, m, x, ARB_CTX_PREC(ctx));
+    return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_arb_laguerre_l(arb_t res, const arb_t n, const arb_t m, const arb_t x, const gr_ctx_t ctx)
+{
+    arb_hypgeom_laguerre_l(res, n, m, x, ARB_CTX_PREC(ctx));
+    return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_arb_hermite_h(arb_t res, const arb_t n, const arb_t x, const gr_ctx_t ctx)
+{
+    arb_hypgeom_hermite_h(res, n, x, ARB_CTX_PREC(ctx));
+    return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_arb_legendre_p(arb_t res, const arb_t n, const arb_t m, const arb_t x, int type, const gr_ctx_t ctx)
+{
+    arb_hypgeom_legendre_p(res, n, m, x, type, ARB_CTX_PREC(ctx));
+    return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_arb_legendre_q(arb_t res, const arb_t n, const arb_t m, const arb_t x, int type, const gr_ctx_t ctx)
+{
+    arb_hypgeom_legendre_q(res, n, m, x, type, ARB_CTX_PREC(ctx));
+    return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_arb_legendre_p_root_ui(arb_t res, arb_t res2, ulong n, ulong k, const gr_ctx_t ctx)
+{
+    if (k >= n)
+        return GR_DOMAIN;
+
+    arb_hypgeom_legendre_p_ui_root(res, res2, n, k, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int _gr_arb_hypgeom_0f1(arb_t res, const arb_t a, const arb_t x, int flags, const gr_ctx_t ctx)
+{
+    arb_hypgeom_0f1(res, a, x, flags, ARB_CTX_PREC(ctx));
+    return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_arb_hypgeom_1f1(arb_t res, const arb_t a, const arb_t b, const arb_t x, int flags, const gr_ctx_t ctx)
+{
+    arb_hypgeom_1f1(res, a, b, x, flags, ARB_CTX_PREC(ctx));
+    return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_arb_hypgeom_u(arb_t res, const arb_t a, const arb_t b, const arb_t x, int flags, const gr_ctx_t ctx)
+{
+    arb_hypgeom_u(res, a, b, x, ARB_CTX_PREC(ctx));
+    return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_arb_hypgeom_2f1(arb_t res, const arb_t a, const arb_t b, const arb_t c, const arb_t x, int flags, const gr_ctx_t ctx)
+{
+    arb_hypgeom_2f1(res, a, b, c, x, flags, ARB_CTX_PREC(ctx));
+    return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_arb_hypgeom_pfq(arb_t res, const gr_vec_t a, const gr_vec_t b, const arb_t x, int flags, const gr_ctx_t ctx)
+{
+    arb_hypgeom_pfq(res, a->entries, a->length, b->entries, b->length, x, flags, ARB_CTX_PREC(ctx));
+    return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+
+
 int
 _gr_arb_zeta(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
@@ -1859,6 +1936,18 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_COULOMB_HPOS,         (gr_funcptr) _gr_arb_coulomb_hpos},
     {GR_METHOD_CHEBYSHEV_T,          (gr_funcptr) _gr_arb_chebyshev_t},
     {GR_METHOD_CHEBYSHEV_U,          (gr_funcptr) _gr_arb_chebyshev_u},
+    {GR_METHOD_JACOBI_P,             (gr_funcptr) _gr_arb_jacobi_p},
+    {GR_METHOD_GEGENBAUER_C,         (gr_funcptr) _gr_arb_gegenbauer_c},
+    {GR_METHOD_LAGUERRE_L,           (gr_funcptr) _gr_arb_laguerre_l},
+    {GR_METHOD_HERMITE_H,            (gr_funcptr) _gr_arb_hermite_h},
+    {GR_METHOD_LEGENDRE_P,           (gr_funcptr) _gr_arb_legendre_p},
+    {GR_METHOD_LEGENDRE_Q,           (gr_funcptr) _gr_arb_legendre_q},
+    {GR_METHOD_LEGENDRE_P_ROOT_UI,   (gr_funcptr) _gr_arb_legendre_p_root_ui},
+    {GR_METHOD_HYPGEOM_0F1,          (gr_funcptr) _gr_arb_hypgeom_0f1},
+    {GR_METHOD_HYPGEOM_1F1,          (gr_funcptr) _gr_arb_hypgeom_1f1},
+    {GR_METHOD_HYPGEOM_U,            (gr_funcptr) _gr_arb_hypgeom_u},
+    {GR_METHOD_HYPGEOM_2F1,          (gr_funcptr) _gr_arb_hypgeom_2f1},
+    {GR_METHOD_HYPGEOM_PFQ,          (gr_funcptr) _gr_arb_hypgeom_pfq},
     {GR_METHOD_ZETA,            (gr_funcptr) _gr_arb_zeta},
     {GR_METHOD_POLYLOG,         (gr_funcptr) _gr_arb_polylog},
     {GR_METHOD_HURWITZ_ZETA,    (gr_funcptr) _gr_arb_hurwitz_zeta},
