@@ -434,8 +434,7 @@ class gr_ctx:
         return x
 
     def _unary_op(ctx, x, op, rstr):
-        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
-            x = ctx(x)
+        x = ctx._as_elem(x)
         res = ctx._elem_type(context=ctx)
         status = op(res._ref, x._ref, ctx._ref)
         if status:
@@ -443,8 +442,7 @@ class gr_ctx:
         return res
 
     def _unary_unary_op(ctx, x, op, rstr):
-        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
-            x = ctx(x)
+        x = ctx._as_elem(x)
         res1 = ctx._elem_type(context=ctx)
         res2 = ctx._elem_type(context=ctx)
         status = op(res1._ref, res2._ref, x._ref, ctx._ref)
@@ -453,8 +451,7 @@ class gr_ctx:
         return res1, res2
 
     def _unary_op_with_flag(ctx, x, flag, op, rstr):
-        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
-            x = ctx(x)
+        x = ctx._as_elem(x)
         res = ctx._elem_type(context=ctx)
         status = op(res._ref, x._ref, flag, ctx._ref)
         if status:
@@ -462,8 +459,7 @@ class gr_ctx:
         return res
 
     def _unary_unary_op_with_flag(ctx, x, flag, op, rstr):
-        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
-            x = ctx(x)
+        x = ctx._as_elem(x)
         res1 = ctx._elem_type(context=ctx)
         res2 = ctx._elem_type(context=ctx)
         status = op(res1._ref, res2._ref, x._ref, flag, ctx._ref)
@@ -472,8 +468,7 @@ class gr_ctx:
         return res1, res2
 
     def _unary_op_fmpz(ctx, x, op, rstr):
-        if type(x) is not fmpz:
-            x = ZZ(x)
+        x = ctx._as_fmpz(x)
         res = ctx._elem_type(context=ctx)
         status = op(res._ref, x._ref, ctx._ref)
         if status:
@@ -540,10 +535,8 @@ class gr_ctx:
         return res
 
     def _binary_op(ctx, x, y, op, rstr):
-        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
-            x = ctx(x)
-        if type(y) is not ctx._elem_type or y._ctx_python is not ctx:
-            y = ctx(y)
+        x = ctx._as_elem(x)
+        y = ctx._as_elem(y)
         res = ctx._elem_type(context=ctx)
         status = op(res._ref, x._ref, y._ref, ctx._ref)
         if status:
@@ -551,10 +544,8 @@ class gr_ctx:
         return res
 
     def _binary_binary_op(ctx, x, y, op, rstr):
-        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
-            x = ctx(x)
-        if type(y) is not ctx._elem_type or y._ctx_python is not ctx:
-            y = ctx(y)
+        x = ctx._as_elem(x)
+        y = ctx._as_elem(y)
         res1 = ctx._elem_type(context=ctx)
         res2 = ctx._elem_type(context=ctx)
         status = op(res1._ref, res2._ref, x._ref, y._ref, ctx._ref)
@@ -563,10 +554,8 @@ class gr_ctx:
         return res
 
     def _binary_op_with_flag(ctx, x, y, flag, op, rstr):
-        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
-            x = ctx(x)
-        if type(y) is not ctx._elem_type or y._ctx_python is not ctx:
-            y = ctx(y)
+        x = ctx._as_elem(x)
+        y = ctx._as_elem(y)
         res = ctx._elem_type(context=ctx)
         status = op(res._ref, x._ref, y._ref, flag, ctx._ref)
         if status:
@@ -574,12 +563,9 @@ class gr_ctx:
         return res
 
     def _ternary_op(ctx, x, y, z, op, rstr):
-        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
-            x = ctx(x)
-        if type(y) is not ctx._elem_type or y._ctx_python is not ctx:
-            y = ctx(y)
-        if type(z) is not ctx._elem_type or z._ctx_python is not ctx:
-            z = ctx(z)
+        x = ctx._as_elem(x)
+        y = ctx._as_elem(y)
+        z = ctx._as_elem(z)
         res = ctx._elem_type(context=ctx)
         status = op(res._ref, x._ref, y._ref, z._ref, ctx._ref)
         if status:
@@ -587,12 +573,9 @@ class gr_ctx:
         return res
 
     def _ternary_op_with_flag(ctx, x, y, z, flag, op, rstr):
-        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
-            x = ctx(x)
-        if type(y) is not ctx._elem_type or y._ctx_python is not ctx:
-            y = ctx(y)
-        if type(z) is not ctx._elem_type or z._ctx_python is not ctx:
-            z = ctx(z)
+        x = ctx._as_elem(x)
+        y = ctx._as_elem(y)
+        z = ctx._as_elem(z)
         res = ctx._elem_type(context=ctx)
         status = op(res._ref, x._ref, y._ref, z._ref, flag, ctx._ref)
         if status:
@@ -600,14 +583,10 @@ class gr_ctx:
         return res
 
     def _quaternary_op(ctx, x, y, z, w, op, rstr):
-        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
-            x = ctx(x)
-        if type(y) is not ctx._elem_type or y._ctx_python is not ctx:
-            y = ctx(y)
-        if type(z) is not ctx._elem_type or z._ctx_python is not ctx:
-            z = ctx(z)
-        if type(w) is not ctx._elem_type or w._ctx_python is not ctx:
-            w = ctx(w)
+        x = ctx._as_elem(x)
+        y = ctx._as_elem(y)
+        z = ctx._as_elem(z)
+        w = ctx._as_elem(w)
         res = ctx._elem_type(context=ctx)
         status = op(res._ref, x._ref, y._ref, z._ref, w._ref, ctx._ref)
         if status:
@@ -615,24 +594,18 @@ class gr_ctx:
         return res
 
     def _quaternary_op_with_flag(ctx, x, y, z, w, flag, op, rstr):
-        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
-            x = ctx(x)
-        if type(y) is not ctx._elem_type or y._ctx_python is not ctx:
-            y = ctx(y)
-        if type(z) is not ctx._elem_type or z._ctx_python is not ctx:
-            z = ctx(z)
-        if type(w) is not ctx._elem_type or w._ctx_python is not ctx:
-            w = ctx(w)
+        x = ctx._as_elem(x)
+        y = ctx._as_elem(y)
+        z = ctx._as_elem(z)
+        w = ctx._as_elem(w)
         res = ctx._elem_type(context=ctx)
         status = op(res._ref, x._ref, y._ref, z._ref, w._ref, flag, ctx._ref)
         if status:
             _handle_error(ctx, status, rstr, x, y, z, w)
         return res
 
-
     def _binary_op_fmpz(ctx, x, y, op, rstr):
-        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
-            x = ctx(x)
+        x = ctx._as_elem(x)
         y = ctx._as_fmpz(y)
         res = ctx._elem_type(context=ctx)
         status = op(res._ref, x._ref, y._ref, ctx._ref)
@@ -680,8 +653,7 @@ class gr_ctx:
         return res
 
     def _op_vec_arg_len(ctx, x, n, op, rstr):
-        if type(x) is not ctx._elem_type or x._ctx_python is not ctx:
-            x = ctx(x)
+        x = ctx._as_elem(x)
         n = ctx._as_si(n)
         assert n >= 0
         assert n <= HUGE_LENGTH
