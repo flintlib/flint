@@ -514,14 +514,20 @@ typedef enum
     GR_METHOD_HURWITZ_ZETA,
     GR_METHOD_LERCH_PHI,
     GR_METHOD_STIELTJES,
+    GR_METHOD_DIRICHLET_ETA,
+    GR_METHOD_DIRICHLET_BETA,
+    GR_METHOD_RIEMANN_XI,
+    GR_METHOD_ZETA_ZERO,
+    GR_METHOD_ZETA_ZERO_VEC,
+    GR_METHOD_ZETA_NZEROS,
 
     GR_METHOD_DIRICHLET_CHI_UI,
+    GR_METHOD_DIRICHLET_CHI_FMPZ,
     GR_METHOD_DIRICHLET_L,
 
     GR_METHOD_BERNPOLY_UI,
     GR_METHOD_EULERPOLY_UI,
     GR_METHOD_POLYLOG,
-    GR_METHOD_POLYLOG_SI,
     GR_METHOD_POLYGAMMA,
 
     GR_METHOD_HYPGEOM_0F1,
@@ -690,6 +696,9 @@ typedef gr_ctx_struct gr_ctx_t[1];
 
 #define GR_CTX_DATA_AS_PTR(ctx) (*(void **) (&(ctx)->data))
 
+GR_INLINE void * gr_ctx_data_ptr(gr_ctx_t ctx) { return (void *) ctx->data; }
+GR_INLINE void * gr_ctx_data_as_ptr(gr_ctx_t ctx) { return (void *) GR_CTX_DATA_AS_PTR(ctx); }
+
 GR_INLINE slong gr_ctx_sizeof_ctx()
 {
     return sizeof(gr_ctx_struct);
@@ -738,6 +747,7 @@ typedef int ((*gr_method_binary_op_si)(gr_ptr, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_binary_op_ui)(gr_ptr, gr_srcptr, ulong, gr_ctx_ptr));
 typedef int ((*gr_method_binary_op_fmpz)(gr_ptr, gr_srcptr, const fmpz_t, gr_ctx_ptr));
 typedef int ((*gr_method_binary_op_fmpz_fmpz)(gr_ptr, const fmpz_t, const fmpz_t, gr_ctx_ptr));
+typedef int ((*gr_method_binary_op_fmpz_si)(gr_ptr, const fmpz_t, slong, gr_ctx_ptr));
 typedef int ((*gr_method_binary_op_fmpq)(gr_ptr, gr_srcptr, const fmpq_t, gr_ctx_ptr));
 typedef int ((*gr_method_binary_op_other)(gr_ptr, gr_srcptr, gr_srcptr, gr_ctx_ptr, gr_ctx_ptr));
 typedef int ((*gr_method_other_binary_op)(gr_ptr, gr_srcptr, gr_ctx_ptr, gr_srcptr, gr_ctx_ptr));
@@ -822,10 +832,14 @@ typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcp
 #define GR_BINARY_OP_FMPQ(ctx, NAME) (((gr_method_binary_op_fmpq *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_OP_OTHER(ctx, NAME) (((gr_method_binary_op_other *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_OP_FMPZ_FMPZ(ctx, NAME) (((gr_method_binary_op_fmpz_fmpz *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_BINARY_OP_FMPZ_SI(ctx, NAME) (((gr_method_binary_op_fmpz_si *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_OP_UI_UI(ctx, NAME) (((gr_method_binary_op_ui_ui *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_OP_UI_SI(ctx, NAME) (((gr_method_binary_op_ui_si *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_OTHER_BINARY_OP(ctx, NAME) (((gr_method_other_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_SI_BINARY_OP(ctx, NAME) (((gr_method_si_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_UI_BINARY_OP(ctx, NAME) (((gr_method_ui_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_FMPZ_BINARY_OP(ctx, NAME) (((gr_method_fmpz_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_FMPQ_BINARY_OP(ctx, NAME) (((gr_method_fmpq_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_OP_GET_INT(ctx, NAME) (((gr_method_binary_op_get_int *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_OP_OTHER_GET_INT(ctx, NAME) (((gr_method_binary_op_other_get_int *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_BINARY_OP(ctx, NAME) (((gr_method_binary_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])

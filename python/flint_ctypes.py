@@ -250,6 +250,9 @@ libflint.fmpz_get_str.restype = ctypes.c_void_p
 libgr.gr_heap_init.argtypes = (ctypes.POINTER(gr_ctx_struct),)
 libgr.gr_heap_init.restype = ctypes.c_void_p
 
+libgr.gr_ctx_data_as_ptr.argtypes = (ctypes.c_void_p,)
+libgr.gr_ctx_data_as_ptr.restype = ctypes.c_void_p
+
 libgr.gr_set_si.argtypes = (ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
 libgr.gr_add_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
 libgr.gr_sub_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
@@ -677,6 +680,20 @@ class gr_ctx:
         if status:
             _handle_error(ctx, status, rstr, x, n)
         return res
+
+    def _op_vec_fmpz_len(ctx, x, n, op, rstr):
+        x = ctx._as_fmpz(x)
+        n = ctx._as_si(n)
+        assert n >= 0
+        assert n <= HUGE_LENGTH
+        op.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.c_void_p)
+        res = Vec(ctx)()
+        assert not libgr.gr_vec_set_length(res._ref, n, ctx._ref)
+        status = op(libgr.gr_vec_entry_ptr(res._ref, 0, ctx._ref), x._ref, n, ctx._ref)
+        if status:
+            _handle_error(ctx, status, rstr, x, n)
+        return res
+
 
     def i(ctx):
         """
@@ -1633,11 +1650,72 @@ class gr_ctx:
     def zeta(ctx, x):
         return ctx._unary_op(x, libgr.gr_zeta, "zeta($x)")
 
-    def hurwitz_zeta(ctx, x, y):
-        return ctx._binary_op(x, y, libgr.gr_hurwitz_zeta, "hurwitz_zeta($x, $y)")
+    def hurwitz_zeta(ctx, s, a):
+        return ctx._binary_op(x, y, libgr.gr_hurwitz_zeta, "hurwitz_zeta($s, $a)")
 
-    def polylog(ctx, x, y):
-        return ctx._binary_op(x, y, libgr.gr_polylog, "polylog($x, $y)")
+    def stieltjes(ctx, n, a=1):
+        """
+        Stieltjes constant.
+
+            >>> CC.stieltjes(1)
+            [-0.0728158454836767 +/- 2.78e-17]
+            >>> CC.stieltjes(1, a=0.5)
+            [-1.353459680804942 +/- 7.22e-16]
+        """
+        n = ctx._as_fmpz(n)
+        a = ctx._as_elem(a)
+        res = ctx._elem_type(context=ctx)
+        libgr.gr_stieltjes.argtypes = (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p)
+        status = libgr.gr_stieltjes(res._ref, n._ref, a._ref, ctx._ref)
+        if status:
+            _handle_error(ctx, status, "stieltjes($n, $a)", n, a)
+        return res
+
+    def polylog(ctx, s, z):
+        """
+        Polylogarithm.
+
+            >>> CC.polylog(2, -1)
+            [-0.822467033424113 +/- 3.22e-16]
+        """
+        return ctx._binary_op(s, z, libgr.gr_polylog, "polylog($s, $z)")
+
+    def polygamma(ctx, s, z):
+        """
+        Polygamma function.
+
+            >>> CC.polygamma(2, 3)
+            [-0.1541138063191886 +/- 7.16e-17]
+        """
+        return ctx._binary_op(s, z, libgr.gr_polygamma, "polygamma($s, $z)")
+
+    def lerch_phi(ctx, z, s, a):
+        """
+            >>> CC.lerch_phi(2, 3, 4)
+            ([-0.00213902437921 +/- 1.70e-15] + [-0.04716836434127 +/- 5.28e-15]*I)
+        """
+        return ctx._ternary_op(z, s, a, libgr.gr_lerch_phi, "lerch_phi($z, $s, $a)")
+
+    def dirichlet_eta(ctx, x):
+        """
+        Dirichlet eta function.
+
+            >>> CC.dirichlet_eta(1)
+            [0.6931471805599453 +/- 6.93e-17]
+            >>> CC.dirichlet_eta(2)
+            [0.822467033424113 +/- 2.36e-16]
+        """
+        return ctx._unary_op(x, libgr.gr_dirichlet_eta, "dirichlet_eta($x)")
+
+    def riemann_xi(ctx, x):
+        """
+        Riemann xi function.
+
+            >>> s = 2+3j; CC.riemann_xi(s); CC.riemann_xi(1-s)
+            ([0.41627125989962 +/- 4.65e-15] + [0.08882330496564 +/- 1.43e-15]*I)
+            ([0.41627125989962 +/- 4.65e-15] + [0.08882330496564 +/- 1.43e-15]*I)
+        """
+        return ctx._unary_op(x, libgr.gr_riemann_xi, "riemann_xi($x)")
 
     def lambertw(ctx, x, k=None):
         if k is None:
@@ -1916,7 +1994,7 @@ class gr_ctx:
             7337
 
         """
-        return ctx._op_vec_len(length, libgr.gr_bellnum_vec, "bellnum_vec(length)")
+        return ctx._op_vec_len(length, libgr.gr_bellnum_vec, "bellnum_vec($length)")
 
     def partitions(ctx, n):
         """
@@ -1931,7 +2009,7 @@ class gr_ctx:
             >>> RR.partitions(10**20)
             [1.838176508344883e+11140086259 +/- 8.18e+11140086243]
         """
-        return ctx._op_fmpz(n, libgr.gr_partitions_fmpz, "partitions(n)")
+        return ctx._op_fmpz(n, libgr.gr_partitions_fmpz, "partitions($n)")
 
     def partitions_vec(ctx, length):
         """
@@ -1948,7 +2026,125 @@ class gr_ctx:
             >>> sum(RR.partitions_vec(100))
             1452423276.000000
         """
-        return ctx._op_vec_len(length, libgr.gr_partitions_vec, "partitions(length)")
+        return ctx._op_vec_len(length, libgr.gr_partitions_vec, "partitions($length)")
+
+    def zeta_zero(ctx, n):
+        """
+        Zero of the Riemann zeta function.
+
+            >>> CC.zeta_zero(1)
+            (0.5000000000000000 + [14.13472514173469 +/- 4.71e-15]*I)
+            >>> CC.zeta_zero(2)
+            (0.5000000000000000 + [21.02203963877155 +/- 6.02e-15]*I)
+        """
+        return ctx._unary_op_fmpz(n, libgr.gr_zeta_zero, "zeta_zero($n)")
+
+    def zeta_zeros(ctx, num, start=1):
+        """
+        Zeros of the Riemann zeta function.
+
+            >>> [x.im() for x in CC.zeta_zeros(4)]
+            [[14.13472514173469 +/- 4.71e-15], [21.02203963877155 +/- 6.02e-15], [25.01085758014569 +/- 7.84e-15], [30.42487612585951 +/- 5.96e-15]]
+            >>> [x.im() for x in CC.zeta_zeros(2, start=100)]
+            [[236.5242296658162 +/- 3.51e-14], [237.7698204809252 +/- 5.29e-14]]
+        """
+        return ctx._op_vec_fmpz_len(start, num, libgr.gr_zeta_zero_vec, "zeta_zeros($n)")
+
+    def zeta_nzeros(ctx, t):
+        """
+        Number of zeros of Riemann zeta function up to given height.
+
+            >>> CC.zeta_nzeros(100)
+            29.00000000000000
+        """
+        return ctx._unary_op(t, libgr.gr_zeta_nzeros, "zeta_nzeros($t)")
+
+    def dirichlet_l(ctx, s, chi):
+        """
+        Dirichlet L-function with character chi.
+
+            >>> CC.dirichlet_l(2, DirichletGroup(1)(1))
+            [1.644934066848226 +/- 4.57e-16]
+            >>> RR.dirichlet_l(2, DirichletGroup(4)(3))
+            [0.915965594177219 +/- 2.68e-16]
+            >>> CC.dirichlet_l(2+3j, DirichletGroup(7)(3))
+            ([1.273313649440491 +/- 9.69e-16] + [-0.074323294425594 +/- 6.96e-16]*I)
+        """
+        s = ctx._as_elem(s)
+        assert isinstance(chi, dirichlet_char)
+        res = ctx._elem_type(context=ctx)
+        libgr.gr_dirichlet_l.argtypes = (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p)
+        G = libgr.gr_ctx_data_as_ptr(chi.parent()._ref)
+        status = libgr.gr_dirichlet_l(res._ref, G, chi._ref, s._ref, ctx._ref)
+        if status:
+            _handle_error(ctx, status, "dirichlet_l($s, $chi)", s, chi)
+        return res
+
+    def hardy_theta(ctx, s, chi=None):
+        """
+        Hardy theta function.
+
+            >>> CC.hardy_theta(10)
+            [-3.06707439628989 +/- 6.66e-15]
+            >>> CC.hardy_theta(10, DirichletGroup(4)(3))
+            [4.64979557270698 +/- 4.41e-15]
+        """
+        s = ctx._as_elem(s)
+        res = ctx._elem_type(context=ctx)
+        libgr.gr_dirichlet_hardy_theta.argtypes = (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p)
+        if chi is None:
+            chi_ref = G = None
+        else:
+            assert isinstance(chi, dirichlet_char)
+            G = libgr.gr_ctx_data_as_ptr(chi.parent()._ref)
+            chi_ref = chi._ref
+        status = libgr.gr_dirichlet_hardy_theta(res._ref, G, chi_ref, s._ref, ctx._ref)
+        if status:
+            _handle_error(ctx, status, "hardy_theta($s, $chi)", s, chi)
+        return res
+
+    def hardy_z(ctx, s, chi=None):
+        """
+        Hardy Z-function.
+
+            >>> CC.hardy_z(2)
+            [-0.539633125646145 +/- 8.59e-16]
+            >>> CC.hardy_z(2, DirichletGroup(4)(3))
+            [1.15107760668266 +/- 5.01e-15]
+        """
+        s = ctx._as_elem(s)
+        res = ctx._elem_type(context=ctx)
+        libgr.gr_dirichlet_hardy_z.argtypes = (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p)
+        if chi is None:
+            chi_ref = G = None
+        else:
+            assert isinstance(chi, dirichlet_char)
+            G = libgr.gr_ctx_data_as_ptr(chi.parent()._ref)
+            chi_ref = chi._ref
+        status = libgr.gr_dirichlet_hardy_z(res._ref, G, chi_ref, s._ref, ctx._ref)
+        if status:
+            _handle_error(ctx, status, "hardy_z($s, $chi)", s, chi)
+        return res
+
+    def dirichlet_chi(ctx, n, chi):
+        """
+        Value of the Dirichlet character chi(n).
+
+            >>> chi = DirichletGroup(5)(3)
+            >>> [CC.dirichlet_chi(n, chi) for n in range(5)]
+            [0, 1.000000000000000, -1.000000000000000*I, 1.000000000000000*I, -1.000000000000000]
+        """
+        n = ctx._as_fmpz(n)
+        assert isinstance(chi, dirichlet_char)
+        res = ctx._elem_type(context=ctx)
+        libgr.gr_dirichlet_chi_fmpz.argtypes = (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p)
+        G = libgr.gr_ctx_data_as_ptr(chi.parent()._ref)
+        status = libgr.gr_dirichlet_chi_fmpz(res._ref, G, chi._ref, n._ref, ctx._ref)
+        if status:
+            _handle_error(ctx, status, "dirichlet_chi($n, $chi)", n, chi)
+        return res
+
+
 
 def _gr_set_int(self, val):
     if WORD_MIN <= val <= WORD_MAX:
@@ -2352,9 +2548,13 @@ class gr_elem:
         c = (ctypes.c_double * 1)()
         status = libgr.gr_get_d(c, self._ref, self._ctx)
         if status:
-            if status & GR_UNABLE: raise NotImplementedError(f"x = {self} is not an integer in {self.parent()}")
+            if status & GR_UNABLE: raise NotImplementedError(f"x = {self} is not a float in {self.parent()}")
             if status & GR_DOMAIN: raise ValueError(f"x = {self} is not a float in {self.parent()}")
         return c[0]
+
+    # todo
+    def __complex__(self):
+        return float(self.re()) + float(self.im()) * 1j
 
     def inv(self):
         """
@@ -3394,6 +3594,18 @@ class psl2z(gr_elem):
 
 
 class DirichletGroup_dirichlet_char(gr_ctx_ca):
+    """
+    Group of Dirichlet characters of given modulus.
+
+        >>> G = DirichletGroup(10)
+        >>> G.q
+        10
+        >>> len(G)
+        4
+        >>> [G(i) for i in [1,3,7,9]]
+        [chi_10(1, .), chi_10(3, .), chi_10(7, .), chi_10(9, .)]
+    """
+
     def __init__(self, q, **kwargs):
         # todo: automatic range checking with ctypes int -> c_ulong cast?
         if q <= 0:
@@ -3405,6 +3617,22 @@ class DirichletGroup_dirichlet_char(gr_ctx_ca):
         if status & GR_UNABLE: raise NotImplementedError(f"modulus with prime factor p > 10^16 is not currently supported")
         if status & GR_DOMAIN: raise ValueError(f"modulus must not be zero")
         self._elem_type = dirichlet_char
+        self.q = int(q)    # for easy access
+
+    def __len__(self):
+        libarb.dirichlet_group_size.restype = c_slong
+        libarb.dirichlet_group_size.argtypes = (ctypes.c_void_p,)
+        return libarb.dirichlet_group_size(libgr.gr_ctx_data_as_ptr(self._ref))
+
+    def __call__(self, n):
+        n = int(n)
+        assert 1 <= n <= max(self.q, 2) - 1
+        assert ZZ(n).gcd(self.q) == 1
+        x = dirichlet_char(context=self)
+        libarb.dirichlet_char_log.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_ulong)
+        libarb.dirichlet_char_log(x._ref, libgr.gr_ctx_data_as_ptr(self._ref), n)
+        return x
+
 
 class dirichlet_char(gr_elem):
     _struct_type = dirichlet_char_struct

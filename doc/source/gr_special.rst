@@ -293,9 +293,23 @@ Riemann zeta, polylogarithms and Dirichlet L-functions
 .. function:: int gr_zeta(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
               int gr_zeta_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
               int gr_hurwitz_zeta(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_polygamma(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
               int gr_polylog(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
               int gr_lerch_phi(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_ctx_t ctx)
               int gr_stieltjes(gr_ptr res, const fmpz_t x, gr_srcptr y, gr_ctx_t ctx)
+
+.. function:: int gr_dirichlet_eta(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_riemann_xi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_zeta_zero(gr_ptr res, const fmpz_t n, gr_ctx_t ctx)
+              int gr_zeta_zero_vec(gr_ptr res, const fmpz_t n, slong len, gr_ctx_t ctx)
+              int gr_zeta_nzeros(gr_ptr res, gr_srcptr t, gr_ctx_t ctx)
+
+.. function:: int gr_dirichlet_chi_fmpz(gr_ptr res, const dirichlet_group_t G, const dirichlet_char_t chi, const fmpz_t n, gr_ctx_t ctx)
+              int gr_dirichlet_chi_vec(gr_ptr res, const dirichlet_group_t G, const dirichlet_char_t chi, slong len, gr_ctx_t ctx)
+              int gr_dirichlet_l(gr_ptr res, const dirichlet_group_t G, const dirichlet_char_t chi, gr_srcptr s, gr_ctx_t ctx)
+              int gr_dirichlet_l_all(gr_vec_t res, const dirichlet_group_t G, gr_srcptr s, gr_ctx_t ctx)
+              int gr_dirichlet_hardy_theta(gr_ptr res, const dirichlet_group_t G, const dirichlet_char_t chi, gr_srcptr t, gr_ctx_t ctx)
+              int gr_dirichlet_hardy_z(gr_ptr res, const dirichlet_group_t G, const dirichlet_char_t chi, gr_srcptr t, gr_ctx_t ctx)
 
 Elliptic integrals
 --------------------------------------------------------------------------------

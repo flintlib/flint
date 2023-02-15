@@ -14,6 +14,9 @@
 #include "acb_mat.h"
 #include "arb_hypgeom.h"
 #include "acb_hypgeom.h"
+#include "acb_dirichlet.h"
+#include "acb_modular.h"
+#include "acb_elliptic.h"
 #include "acf.h"
 #include "fmpzi.h"
 #include "qqbar.h"
@@ -1396,6 +1399,95 @@ _gr_acb_zeta(acb_t res, const acb_t x, const gr_ctx_t ctx)
     }
 }
 
+int _gr_acb_hurwitz_zeta(acb_t res, const acb_t s, const acb_t a, const gr_ctx_t ctx)
+{
+    acb_hurwitz_zeta(res, s, a, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_acb_polylog(acb_t res, const acb_t s, const acb_t z, const gr_ctx_t ctx)
+{
+    acb_polylog(res, s, z, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_acb_polygamma(acb_t res, const acb_t s, const acb_t z, const gr_ctx_t ctx)
+{
+    acb_polygamma(res, s, z, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_acb_lerch_phi(acb_t res, const acb_t z, const acb_t s, const acb_t a, const gr_ctx_t ctx)
+{
+    acb_dirichlet_lerch_phi(res, z, s, a, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_acb_stieltjes(acb_t res, const fmpz_t n, const acb_t a, const gr_ctx_t ctx)
+{
+    acb_dirichlet_stieltjes(res, n, a, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+
+int
+_gr_acb_dirichlet_eta(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_dirichlet_eta(res, x, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+/* todo
+int
+_gr_acb_dirichlet_beta(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_dirichlet_beta(res, x, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+*/
+
+int
+_gr_acb_riemann_xi(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_dirichlet_xi(res, x, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_zeta_zero(acb_t res, const fmpz_t n, const gr_ctx_t ctx)
+{
+    if (fmpz_sgn(n) <= 0)
+    {
+        return GR_UNABLE;
+    }
+
+    acb_dirichlet_zeta_zero(res, n, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_zeta_zero_vec(acb_ptr res, const fmpz_t n, slong len, const gr_ctx_t ctx)
+{
+    if (fmpz_sgn(n) <= 0)
+    {
+        return GR_UNABLE;
+    }
+
+    acb_dirichlet_zeta_zeros(res, n, len, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_acb_zeta_nzeros(acb_t res, const acb_t t, const gr_ctx_t ctx)
+{
+    if (!acb_is_real(t) || !acb_is_finite(t))
+        return GR_UNABLE;
+
+    acb_dirichlet_zeta_nzeros(acb_realref(res), acb_realref(t), ACB_CTX_PREC(ctx));
+    arb_zero(acb_imagref(res));
+    return GR_SUCCESS;
+}
+
 int
 _gr_acb_vec_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr vec1, acb_srcptr vec2, slong len, gr_ctx_t ctx)
 {
@@ -1838,7 +1930,17 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_HYPGEOM_U,            (gr_funcptr) _gr_acb_hypgeom_u},
     {GR_METHOD_HYPGEOM_2F1,          (gr_funcptr) _gr_acb_hypgeom_2f1},
     {GR_METHOD_HYPGEOM_PFQ,          (gr_funcptr) _gr_acb_hypgeom_pfq},
-    {GR_METHOD_ZETA,            (gr_funcptr) _gr_acb_zeta},
+    {GR_METHOD_ZETA,                 (gr_funcptr) _gr_acb_zeta},
+    {GR_METHOD_HURWITZ_ZETA,         (gr_funcptr) _gr_acb_hurwitz_zeta},
+    {GR_METHOD_POLYLOG,              (gr_funcptr) _gr_acb_polylog},
+    {GR_METHOD_POLYGAMMA,            (gr_funcptr) _gr_acb_polygamma},
+    {GR_METHOD_LERCH_PHI,            (gr_funcptr) _gr_acb_lerch_phi},
+    {GR_METHOD_STIELTJES,            (gr_funcptr) _gr_acb_stieltjes},
+    {GR_METHOD_DIRICHLET_ETA,        (gr_funcptr) _gr_acb_dirichlet_eta},
+    {GR_METHOD_RIEMANN_XI,           (gr_funcptr) _gr_acb_riemann_xi},
+    {GR_METHOD_ZETA_ZERO,            (gr_funcptr) _gr_acb_zeta_zero},
+    {GR_METHOD_ZETA_ZERO_VEC,        (gr_funcptr) _gr_acb_zeta_zero_vec},
+    {GR_METHOD_ZETA_NZEROS,          (gr_funcptr) _gr_acb_zeta_nzeros},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_acb_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_acb_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_acb_poly_mullow},

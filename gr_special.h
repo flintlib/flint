@@ -145,6 +145,9 @@ GR_SPECIAL_DEF int gr_eulernum_ui(gr_ptr res, ulong x, gr_ctx_t ctx) { return GR
 GR_SPECIAL_DEF int gr_eulernum_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx) { return GR_UNARY_OP_FMPZ(ctx, EULERNUM_FMPZ)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_eulernum_vec(gr_ptr res, slong len, gr_ctx_t ctx) { return GR_UNARY_OP_SI(ctx, EULERNUM_VEC)(res, len, ctx); }
 
+GR_SPECIAL_DEF int gr_bernpoly_ui(gr_ptr res, ulong n, gr_srcptr x, gr_ctx_t ctx) { return GR_UI_BINARY_OP(ctx, BERNPOLY_UI)(res, n, x, ctx); }
+GR_SPECIAL_DEF int gr_eulerpoly_ui(gr_ptr res, ulong n, gr_srcptr x, gr_ctx_t ctx) { return GR_UI_BINARY_OP(ctx, EULERPOLY_UI)(res, n, x, ctx); }
+
 GR_SPECIAL_DEF int gr_bellnum_ui(gr_ptr res, ulong x, gr_ctx_t ctx) { return GR_UNARY_OP_UI(ctx, BELLNUM_UI)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_bellnum_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx) { return GR_UNARY_OP_FMPZ(ctx, BELLNUM_FMPZ)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_bellnum_vec(gr_ptr res, slong len, gr_ctx_t ctx) { return GR_UNARY_OP_SI(ctx, BELLNUM_VEC)(res, len, ctx); }
@@ -234,8 +237,29 @@ GR_SPECIAL_DEF int gr_zeta(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UN
 GR_SPECIAL_DEF int gr_zeta_ui(gr_ptr res, ulong x, gr_ctx_t ctx) { return GR_UNARY_OP_UI(ctx, ZETA_UI)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_hurwitz_zeta(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, HURWITZ_ZETA)(res, x, y, ctx); }
 GR_SPECIAL_DEF int gr_polylog(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, POLYLOG)(res, x, y, ctx); }
+GR_SPECIAL_DEF int gr_polygamma(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, POLYGAMMA)(res, x, y, ctx); }
 GR_SPECIAL_DEF int gr_lerch_phi(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_ctx_t ctx) { return GR_TERNARY_OP(ctx, LERCH_PHI)(res, x, y, z, ctx); }
 GR_SPECIAL_DEF int gr_stieltjes(gr_ptr res, const fmpz_t x, gr_srcptr y, gr_ctx_t ctx) { return GR_FMPZ_BINARY_OP(ctx, STIELTJES)(res, x, y, ctx); }
+
+GR_SPECIAL_DEF int gr_dirichlet_eta(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, DIRICHLET_ETA)(res, x, ctx); }
+GR_SPECIAL_DEF int gr_dirichlet_beta(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, DIRICHLET_BETA)(res, x, ctx); }
+GR_SPECIAL_DEF int gr_riemann_xi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, RIEMANN_XI)(res, x, ctx); }
+GR_SPECIAL_DEF int gr_zeta_zero(gr_ptr res, const fmpz_t n, gr_ctx_t ctx) { return GR_UNARY_OP_FMPZ(ctx, ZETA_ZERO)(res, n, ctx); }
+GR_SPECIAL_DEF int gr_zeta_zero_vec(gr_ptr res, const fmpz_t n, slong len, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ_SI(ctx, ZETA_ZERO_VEC)(res, n, len, ctx); }
+GR_SPECIAL_DEF int gr_zeta_nzeros(gr_ptr res, gr_srcptr t, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ZETA_NZEROS)(res, t, ctx); }
+
+/* todo: backlund_s, etc */
+
+#ifdef DIRICHLET_H
+
+WARN_UNUSED_RESULT int gr_dirichlet_chi_fmpz(gr_ptr res, const dirichlet_group_t G, const dirichlet_char_t chi, const fmpz_t n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_dirichlet_chi_vec(gr_ptr res, const dirichlet_group_t G, const dirichlet_char_t chi, slong len, gr_ctx_t ctx);  /* todo: wrap, test */
+WARN_UNUSED_RESULT int gr_dirichlet_l(gr_ptr res, const dirichlet_group_t G, const dirichlet_char_t chi, gr_srcptr s, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_dirichlet_l_all(gr_vec_t res, const dirichlet_group_t G, gr_srcptr s, gr_ctx_t ctx);  /* todo: wrap, test */
+WARN_UNUSED_RESULT int gr_dirichlet_hardy_theta(gr_ptr res, const dirichlet_group_t G, const dirichlet_char_t chi, gr_srcptr t, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_dirichlet_hardy_z(gr_ptr res, const dirichlet_group_t G, const dirichlet_char_t chi, gr_srcptr t, gr_ctx_t ctx);
+
+#endif
 
 GR_SPECIAL_DEF int gr_agm1(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, AGM1)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_agm(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, AGM)(res, x, y, ctx); }
@@ -244,21 +268,50 @@ GR_SPECIAL_DEF int gr_agm(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { 
 
 /* todo
 
-    orthogonal + hypergeometric
-
-    GR_METHOD_DIRICHLET_CHI_UI,
-    GR_METHOD_DIRICHLET_L,
 
     GR_METHOD_BERNPOLY_UI,
     GR_METHOD_EULERPOLY_UI,
-    GR_METHOD_POLYLOG_SI,
-    GR_METHOD_POLYGAMMA,
+
+    gr_jacobi_theta
+    gr_dedekind_eta
+    gr_modular_j
+    gr_modular_lambda
+    gr_modular_delta
+    gr_eisenstein_g_vec
+
+    gr_hilbert_class_poly
+
+    gr_elliptic_k
+    gr_elliptic_e
+    gr_elliptic_pi
+    gr_elliptic_f
+    gr_elliptic_e_inc
+    gr_elliptic_pi_inc
+
+    gr_elliptic_rc
+    gr_elliptic_rf
+    gr_elliptic_rg
+    gr_elliptic_rd
+    gr_elliptic_rj
+
+    gr_elliptic_roots
+    gr_elliptic_invariants
+    gr_weierstrass_p
+    gr_weierstrass_p_jet
+    gr_weierstrass_p_inv
+    gr_weierstrass_zeta
+    gr_weierstrass_sigma
+
+    zeta_ui_vec
+
+    cyclotomic
+    dedekind sum
+    moebius
+    prime_pi, primorial
+    etc
 
 
 */
-
-/* todo: elliptic, modular */
-
 
 /* generic implementations */
 
