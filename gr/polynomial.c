@@ -194,6 +194,17 @@ polynomial_neg_one(gr_poly_t res, gr_ctx_t ctx)
     return gr_poly_neg_one(res, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
+int
+polynomial_gen(gr_poly_t res, gr_ctx_t ctx)
+{
+    int status = GR_SUCCESS;
+
+    status |= gr_poly_zero(res, POLYNOMIAL_ELEM_CTX(ctx));
+    status |= gr_poly_set_coeff_ui(res, 1, 1, POLYNOMIAL_ELEM_CTX(ctx));
+
+    return status;
+}
+
 /*
 truth_t
 polynomial_is_zero(const gr_poly_t poly, gr_ctx_t ctx)
@@ -351,6 +362,9 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_ZERO,        (gr_funcptr) polynomial_zero},
     {GR_METHOD_ONE,         (gr_funcptr) polynomial_one},
     {GR_METHOD_NEG_ONE,     (gr_funcptr) polynomial_neg_one},
+
+    {GR_METHOD_GEN,         (gr_funcptr) polynomial_gen},
+
 /*
     {GR_METHOD_IS_ZERO,     (gr_funcptr) polynomial_is_zero},
     {GR_METHOD_IS_ONE,      (gr_funcptr) polynomial_is_one},

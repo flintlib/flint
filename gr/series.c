@@ -185,6 +185,20 @@ gr_series_set(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx
 }
 
 int
+gr_series_gen(gr_series_t res, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    int status = GR_SUCCESS;
+
+    status |= gr_poly_zero(&res->poly, cctx);
+    status |= gr_poly_set_coeff_ui(&res->poly, 1, 1, cctx);
+    res->error = SERIES_ERR_EXACT;
+
+    /* force truncation if needed */
+    status |= gr_series_set(res, res, sctx, cctx);
+    return status;
+}
+
+int
 gr_series_neg(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx_t cctx)
 {
     int status = GR_SUCCESS;
@@ -402,32 +416,20 @@ gr_series_add(gr_series_t res, const gr_series_t x, const gr_series_t y, gr_seri
     yerr = y->error;
     err = FLINT_MIN(xerr, yerr);
 
+    /* length of the polynomial sum, ignoring errors */
     len = FLINT_MAX(xlen, ylen);
+
+    /* the result will be truncated */
+    if (len > sctx->prec)
+        err = FLINT_MIN(err, sctx->prec);
+
     len = FLINT_MIN(len, sctx->mod);
     len = FLINT_MIN(len, sctx->prec);
     len = FLINT_MIN(len, err);
 
-    if (0)
-    {
-        gr_stream_t out;
-        printf("\nADDITION\n");
-        printf("xlen %ld ylen %ld xerr %ld yerr %ld err %ld len %ld\n", xlen, ylen, xerr, yerr, err, len);
-        gr_stream_init_file(out, stdout);
-        gr_series_write(out, x, sctx, cctx); printf("\n");
-        gr_series_write(out, y, sctx, cctx); printf("\n");
-    }
-
     /* terms >= x^mod are zero by definition */
     if (err >= sctx->mod)
-    {
         err = SERIES_ERR_EXACT;
-    }
-    else
-    {
-        /* the truncation is introducing error */
-        if (xlen > len) err = FLINT_MIN(err, len);
-        if (ylen > len) err = FLINT_MIN(err, len);
-    }
 
     res->error = err;
     status |= gr_poly_add_series(&res->poly, &x->poly, &y->poly, len, cctx);
@@ -446,22 +448,20 @@ gr_series_sub(gr_series_t res, const gr_series_t x, const gr_series_t y, gr_seri
     yerr = y->error;
     err = FLINT_MIN(xerr, yerr);
 
+    /* length of the polynomial sum, ignoring errors */
     len = FLINT_MAX(xlen, ylen);
+
+    /* the result will be truncated */
+    if (len > sctx->prec)
+        err = FLINT_MIN(err, sctx->prec);
+
     len = FLINT_MIN(len, sctx->mod);
     len = FLINT_MIN(len, sctx->prec);
     len = FLINT_MIN(len, err);
 
     /* terms >= x^mod are zero by definition */
     if (err >= sctx->mod)
-    {
         err = SERIES_ERR_EXACT;
-    }
-    else
-    {
-        /* the truncation is introducing error */
-        if (xlen > len) err = FLINT_MIN(err, len);
-        if (ylen > len) err = FLINT_MIN(err, len);
-    }
 
     res->error = err;
     status |= gr_poly_sub_series(&res->poly, &x->poly, &y->poly, len, cctx);
@@ -482,13 +482,19 @@ gr_series_mul(gr_series_t res, const gr_series_t x, const gr_series_t y, gr_seri
 
     if (xlen == 0 && xerr == SERIES_ERR_EXACT)
         return gr_series_zero(res, sctx, cctx);
+
     if (ylen == 0 && yerr == SERIES_ERR_EXACT)
         return gr_series_zero(res, sctx, cctx);
 
+    /* length of the polynomial product, ignoring errors */
     if (xlen == 0 || ylen == 0)
         len = 0;
     else
         len = xlen + ylen - 1;
+
+    /* the result will be truncated */
+    if (len > sctx->prec)
+        err = FLINT_MIN(err, sctx->prec);
 
     len = FLINT_MIN(len, sctx->mod);
     len = FLINT_MIN(len, sctx->prec);
@@ -496,21 +502,19 @@ gr_series_mul(gr_series_t res, const gr_series_t x, const gr_series_t y, gr_seri
 
     /* terms >= x^mod are zero by definition */
     if (err >= sctx->mod)
-    {
         err = SERIES_ERR_EXACT;
-    }
-    else
-    {
-        /* the truncation is introducing error */
-        if (xlen > len) err = FLINT_MIN(err, len);
-        if (ylen > len) err = FLINT_MIN(err, len);
-    }
 
     res->error = err;
     status |= gr_poly_mullow(&res->poly, &x->poly, &y->poly, len, cctx);
     return status;
 }
 
+/*
+
+from flint2 import *; R = PowerSeriesRing_gr_series(ZZ, 10); x = R.gen(); (1+x)**20
+
+
+*/
 
 
 
@@ -538,7 +542,7 @@ static int _gr_gr_series_ctx_write(gr_stream_t out, gr_ctx_t ctx)
         gr_stream_write_si(out, SERIES_SCTX(ctx)->mod);
     }
 
-    printf(" with precision ");
+    gr_stream_write(out, " with precision ");
     gr_stream_write(out, "O(x^");
     gr_stream_write_si(out, SERIES_SCTX(ctx)->prec);
     gr_stream_write(out, ")");
@@ -553,6 +557,7 @@ static int _gr_gr_series_zero(gr_series_t res, gr_ctx_t ctx) { return gr_series_
 static int _gr_gr_series_randtest(gr_series_t res, flint_rand_t state, gr_ctx_t ctx) { return gr_series_randtest(res, state, 6, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_write(gr_stream_t out, const gr_series_t x, gr_ctx_t ctx) { return gr_series_write(out, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_one(gr_series_t res, gr_ctx_t ctx) { return gr_series_one(res, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_gen(gr_series_t res, gr_ctx_t ctx) { return gr_series_gen(res, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_set(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_set(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static void _gr_gr_series_set_shallow(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { *res = *x; }
 static int _gr_gr_series_set_si(gr_series_t res, slong c, gr_ctx_t ctx) { return gr_series_set_si(res, c, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
@@ -630,6 +635,7 @@ gr_method_tab_input _gr_series_methods_input[] =
     {GR_METHOD_ONE,         (gr_funcptr) _gr_gr_series_one},
     {GR_METHOD_IS_ZERO,     (gr_funcptr) _gr_gr_series_is_zero},
     {GR_METHOD_EQUAL,       (gr_funcptr) _gr_gr_series_equal},
+    {GR_METHOD_GEN,         (gr_funcptr) _gr_gr_series_gen},
     {GR_METHOD_SET,         (gr_funcptr) _gr_gr_series_set},
     {GR_METHOD_SET_UI,      (gr_funcptr) _gr_gr_series_set_ui},
     {GR_METHOD_SET_SI,      (gr_funcptr) _gr_gr_series_set_si},
@@ -677,7 +683,7 @@ gr_ctx_init_gr_series_mod(gr_ctx_t ctx, gr_ctx_t base_ring, slong mod)
     SERIES_CTX(ctx)->base_ring = (gr_ctx_struct *) base_ring;
     SERIES_CTX(ctx)->var = (char *) default_var;
     SERIES_CTX(ctx)->sctx.mod = FLINT_MAX(0, mod);
-    SERIES_CTX(ctx)->sctx.prec = FLINT_MIN(0, SERIES_ERR_MAX);
+    SERIES_CTX(ctx)->sctx.prec = mod;
 
     ctx->methods = _gr_series_methods;
 

@@ -202,6 +202,13 @@ class gr_poly_struct(ctypes.Structure):
                 ('alloc', c_slong),
                 ('length', c_slong)]
 
+class gr_series_struct(ctypes.Structure):
+    _fields_ = [('coeffs', ctypes.c_void_p),
+                ('alloc', c_slong),
+                ('length', c_slong),
+                ('error', c_slong)]
+
+
 class psl2z_struct(ctypes.Structure):
     _fields_ = [('a', c_slong), ('b', c_slong),
                 ('c', c_slong), ('d', c_slong)]
@@ -693,6 +700,19 @@ class gr_ctx:
         if status:
             _handle_error(ctx, status, rstr, x, n)
         return res
+
+    def gen(ctx):
+        """
+        Generator of this domain.
+
+            >>> QQbar.i()
+            Root a = 1.00000*I of a^2+1
+            >>> QQ.i()
+            Traceback (most recent call last):
+              ...
+            FlintDomainError: i is not an element of {Rational field (fmpq)}
+        """
+        return ctx._constant(ctx, libgr.gr_gen, "gen")
 
 
     def i(ctx):
@@ -3077,6 +3097,33 @@ class PolynomialRing_gr_poly(gr_ctx):
     def __del__(self):
         self._coefficient_ring._decrement_refcount()
 
+
+class PowerSeriesRing_gr_series(gr_ctx):
+    def __init__(self, coefficient_ring, prec=6):
+        assert isinstance(coefficient_ring, gr_ctx)
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_gr_series(self._ref, coefficient_ring._ref, prec)
+        coefficient_ring._refcount += 1
+        self._coefficient_ring = coefficient_ring
+        self._elem_type = gr_series
+
+    def __del__(self):
+        self._coefficient_ring._decrement_refcount()
+
+class PowerSeriesModRing_gr_series(gr_ctx):
+    def __init__(self, coefficient_ring, mod=6):
+        assert isinstance(coefficient_ring, gr_ctx)
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_gr_series_mod(self._ref, coefficient_ring._ref, mod)
+        coefficient_ring._refcount += 1
+        self._coefficient_ring = coefficient_ring
+        self._elem_type = gr_series
+
+    def __del__(self):
+        self._coefficient_ring._decrement_refcount()
+
+
+
 class fmpz(gr_elem):
 
     _struct_type = fmpz_struct
@@ -3570,6 +3617,15 @@ class gr_poly(gr_elem):
     def rsqrt_series(self, n):
         return self._series_op(n, libgr.gr_poly_rsqrt_series, "$f.rsqrt_series($n)")
 
+
+
+class gr_series(gr_elem):
+    _struct_type = gr_series_struct
+
+    def __init__(self, val=None, error=None, context=None, random=False):
+        gr_elem.__init__(self, val, context, random)
+        if error is not None:
+            raise NotImplementedError
 
 
 class ModularGroup_psl2z(gr_ctx_ca):

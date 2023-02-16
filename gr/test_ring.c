@@ -681,6 +681,7 @@ gr_test_mul_2exp_fmpz(gr_ctx_t R, flint_rand_t state, int test_flags)
 
 int
 gr_test_binary_op_type_variants(gr_ctx_t R,
+    const char * opname,
     int (*gr_op)(gr_ptr, gr_srcptr, gr_srcptr, gr_ctx_t),
     int (*gr_op_ui)(gr_ptr, gr_srcptr, ulong, gr_ctx_t),
     int (*gr_op_si)(gr_ptr, gr_srcptr, slong, gr_ctx_t),
@@ -786,10 +787,11 @@ gr_test_binary_op_type_variants(gr_ctx_t R,
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
         printf("\n");
+        flint_printf("%s\n", opname);
+        gr_ctx_println(R);
         printf("which: %d\n", which);
         printf("alias: %d\n", alias);
         printf("x = "); gr_println(x, R);
-        printf("uy = %lu\n", uy);
         printf("y = "); gr_println(y, R);
         printf("y (op) y (1) = "); gr_println(xy1, R);
         printf("x (op) y (2) = "); gr_println(xy2, R);
@@ -1297,7 +1299,7 @@ gr_test_add_aliasing(gr_ctx_t R, flint_rand_t state, int test_flags)
 int
 gr_test_add_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
-    return gr_test_binary_op_type_variants(R,
+    return gr_test_binary_op_type_variants(R, "add",
         gr_add, gr_add_ui, gr_add_si, gr_add_fmpz, gr_add_fmpq,
             state, test_flags);
 }
@@ -1354,7 +1356,7 @@ gr_test_sub_aliasing(gr_ctx_t R, flint_rand_t state, int test_flags)
 int
 gr_test_sub_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
-    return gr_test_binary_op_type_variants(R,
+    return gr_test_binary_op_type_variants(R, "sub",
         gr_sub, gr_sub_ui, gr_sub_si, gr_sub_fmpz, gr_sub_fmpq,
             state, test_flags);
 }
@@ -1393,7 +1395,7 @@ gr_test_mul_aliasing(gr_ctx_t R, flint_rand_t state, int test_flags)
 int
 gr_test_mul_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
-    return gr_test_binary_op_type_variants(R,
+    return gr_test_binary_op_type_variants(R, "mul",
         gr_mul, gr_mul_ui, gr_mul_si, gr_mul_fmpz, gr_mul_fmpq,
             state, test_flags);
 }
@@ -1401,7 +1403,7 @@ gr_test_mul_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
 int
 gr_test_div_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
-    return gr_test_binary_op_type_variants(R,
+    return gr_test_binary_op_type_variants(R, "div",
         gr_div, gr_div_ui, gr_div_si, gr_div_fmpz, gr_div_fmpq,
             state, test_flags);
 }
