@@ -4561,6 +4561,8 @@ def test_all():
     assert ZZp64(QQ(5)) ** (QQ(5)) == 3125
     assert ZZp32(10001).sqrt() ** 2 == 10001
 
+    assert abs(VecZZ([-3,2,5])) == [3, 2, 5]
+
 def test_float():
     assert RF(5).mul_2exp(-1) == RF(2.5)
     assert CF(2+3j).mul_2exp(-1) == CF(1+1.5j)

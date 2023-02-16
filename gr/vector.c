@@ -173,6 +173,51 @@ vector_gr_vec_neg(gr_vec_t res, const gr_vec_t src, gr_ctx_t ctx)
     return gr_poly_neg((gr_poly_struct *) res, (gr_poly_struct *) src, ENTRY_CTX(ctx));
 }
 
+static int
+_gr_vec_apply_unary(gr_ptr res, gr_method_unary_op f, gr_srcptr src, slong len, gr_ctx_t ctx)
+{
+    int status;
+    slong i, sz;
+
+    sz = ctx->sizeof_elem;
+    status = GR_SUCCESS;
+
+    for (i = 0; i < len; i++)
+        status |= f(GR_ENTRY(res, i, sz), GR_ENTRY(src, i, sz), ctx);
+
+    return status;
+}
+
+#define DEF_UNARY_OP_FROM_ENTRY_OP(op, OP) \
+int \
+vector_gr_vec_ ## op(gr_vec_t res, const gr_vec_t x, gr_ctx_t ctx) \
+{ \
+    slong xlen = x->length; \
+    gr_method_unary_op f = GR_UNARY_OP(ENTRY_CTX(ctx), OP); \
+ \
+    if (res->length != xlen) \
+        gr_vec_set_length(res, xlen, ENTRY_CTX(ctx)); \
+ \
+    return _gr_vec_apply_unary(res->entries, f, x->entries, xlen, ENTRY_CTX(ctx)); \
+} \
+
+DEF_UNARY_OP_FROM_ENTRY_OP(sqrt, SQRT)
+DEF_UNARY_OP_FROM_ENTRY_OP(rsqrt, RSQRT)
+DEF_UNARY_OP_FROM_ENTRY_OP(floor, FLOOR)
+DEF_UNARY_OP_FROM_ENTRY_OP(ceil, CEIL)
+DEF_UNARY_OP_FROM_ENTRY_OP(trunc, TRUNC)
+DEF_UNARY_OP_FROM_ENTRY_OP(nint, NINT)
+DEF_UNARY_OP_FROM_ENTRY_OP(abs, ABS)
+DEF_UNARY_OP_FROM_ENTRY_OP(conj, CONJ)
+DEF_UNARY_OP_FROM_ENTRY_OP(re, RE)
+DEF_UNARY_OP_FROM_ENTRY_OP(im, IM)
+DEF_UNARY_OP_FROM_ENTRY_OP(sgn, SGN)
+DEF_UNARY_OP_FROM_ENTRY_OP(csgn, CSGN)
+
+DEF_UNARY_OP_FROM_ENTRY_OP(exp, EXP)
+DEF_UNARY_OP_FROM_ENTRY_OP(log, LOG)
+
+
 #define DEF_BINARY_OP(op) \
 int \
 vector_gr_vec_ ## op(gr_vec_t res, const gr_vec_t x, const gr_vec_t y, gr_ctx_t ctx) \
@@ -404,6 +449,22 @@ gr_method_tab_input _gr_vec_methods_input[] =
     {GR_METHOD_POW_FMPQ,    (gr_funcptr) vector_gr_vec_pow_fmpq},
     {GR_METHOD_POW_OTHER,   (gr_funcptr) vector_gr_vec_pow_other},
     {GR_METHOD_OTHER_POW,   (gr_funcptr) vector_gr_vec_other_pow},
+
+    {GR_METHOD_SQRT,            (gr_funcptr) vector_gr_vec_sqrt},
+    {GR_METHOD_RSQRT,           (gr_funcptr) vector_gr_vec_rsqrt},
+    {GR_METHOD_FLOOR,           (gr_funcptr) vector_gr_vec_floor},
+    {GR_METHOD_CEIL,            (gr_funcptr) vector_gr_vec_ceil},
+    {GR_METHOD_TRUNC,           (gr_funcptr) vector_gr_vec_trunc},
+    {GR_METHOD_NINT,            (gr_funcptr) vector_gr_vec_nint},
+    {GR_METHOD_ABS,             (gr_funcptr) vector_gr_vec_abs},
+    {GR_METHOD_CONJ,            (gr_funcptr) vector_gr_vec_conj},
+    {GR_METHOD_RE,              (gr_funcptr) vector_gr_vec_re},
+    {GR_METHOD_IM,              (gr_funcptr) vector_gr_vec_im},
+    {GR_METHOD_SGN,             (gr_funcptr) vector_gr_vec_sgn},
+    {GR_METHOD_CSGN,            (gr_funcptr) vector_gr_vec_csgn},
+
+    {GR_METHOD_EXP,            (gr_funcptr) vector_gr_vec_exp},
+    {GR_METHOD_LOG,            (gr_funcptr) vector_gr_vec_log},
 
     {0,                     (gr_funcptr) NULL},
 };
