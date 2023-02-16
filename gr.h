@@ -667,6 +667,9 @@ typedef enum
     GR_CTX_GR_MPOLY,
     GR_CTX_GR_MAT,
 
+    GR_CTX_GR_SERIES,
+    GR_CTX_GR_SERIES_MOD,
+
     GR_CTX_GR_VEC,
 
     GR_CTX_PSL2Z,
@@ -1280,6 +1283,11 @@ polynomial_ctx_t;
 #define POLYNOMIAL_ELEM_CTX(ring_ctx) (POLYNOMIAL_CTX(ring_ctx)->base_ring)
 
 void gr_ctx_init_polynomial(gr_ctx_t ctx, gr_ctx_t base_ring);
+
+/* Generic series */
+
+void gr_ctx_init_gr_series(gr_ctx_t ctx, gr_ctx_t base_ring, slong prec);
+void gr_ctx_init_gr_series_mod(gr_ctx_t ctx, gr_ctx_t base_ring, slong mod);
 
 /* Generic vectors */
 

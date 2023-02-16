@@ -375,7 +375,7 @@ gr_method_tab_input _gr_poly_methods_input[] =
 
     {GR_METHOD_EUCLIDEAN_DIV,         (gr_funcptr) polynomial_euclidean_div},
     {GR_METHOD_EUCLIDEAN_REM,         (gr_funcptr) polynomial_euclidean_rem},
-    {GR_METHOD_EUCLIDEAN_DIVREM,         (gr_funcptr) polynomial_euclidean_divrem},
+    {GR_METHOD_EUCLIDEAN_DIVREM,      (gr_funcptr) polynomial_euclidean_divrem},
 
     {0,                     (gr_funcptr) NULL},
 };

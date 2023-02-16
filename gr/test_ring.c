@@ -298,6 +298,7 @@ gr_test_set_fmpq(gr_ctx_t R, flint_rand_t state, int test_flags)
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
         printf("\n");
+        gr_ctx_println(R);
         printf("a = "); fmpq_print(a); printf("\n");
         printf("b = "); fmpq_print(b); printf("\n");
         printf("c = "); fmpq_print(c); printf("\n");
@@ -836,6 +837,7 @@ gr_test_binary_op_associative(gr_ctx_t R, int (*gr_op)(gr_ptr, gr_srcptr, gr_src
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
         printf("\n");
+        gr_ctx_println(R);
         printf("x = \n"); gr_println(x, R);
         printf("y = \n"); gr_println(y, R);
         printf("z = \n"); gr_println(z, R);
@@ -1036,6 +1038,46 @@ gr_test_init_clear(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     if ((test_flags & GR_TEST_ALWAYS_ABLE) && (status & GR_UNABLE))
         status = GR_TEST_FAIL;
+
+    return status;
+}
+
+int
+gr_test_equal(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status;
+    gr_ptr a, b;
+    truth_t equal0, equal1;
+
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT2(a, b, R);
+
+    status |= gr_randtest(a, state, R);
+    status |= gr_set(b, a, R);
+
+    equal0 = gr_equal(a, a, R);
+    equal1 = gr_equal(a, b, R);
+
+    if (status == GR_SUCCESS && (equal0 == T_FALSE || equal1 == T_FALSE))
+    {
+        status = GR_TEST_FAIL;
+    }
+
+    if ((test_flags & GR_TEST_ALWAYS_ABLE) && (status & GR_UNABLE))
+        status = GR_TEST_FAIL;
+
+    if (status == GR_TEST_FAIL)
+    {
+        flint_printf("FAIL: equal\n");
+        gr_ctx_println(R);
+        printf("a = "); gr_println(a, R);
+        printf("(a == a) = "); truth_println(equal0);
+        printf("b = "); gr_println(b, R);
+        printf("(a == b) = "); truth_println(equal1);
+    }
+
+    GR_TMP_CLEAR2(a, b, R);
 
     return status;
 }
@@ -2536,6 +2578,7 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
         flint_abort(); */
 
     gr_test_iter(R, state, "init/clear", gr_test_init_clear, iters, test_flags);
+    gr_test_iter(R, state, "equal", gr_test_equal, iters, test_flags);
     gr_test_iter(R, state, "swap", gr_test_swap, iters, test_flags);
     gr_test_iter(R, state, "zero_one", gr_test_zero_one, iters, test_flags);
     gr_test_iter(R, state, "randtest_not_zero", gr_test_randtest_not_zero, iters, test_flags);

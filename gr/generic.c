@@ -2628,6 +2628,7 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_INIT,                    (gr_funcptr) gr_generic_init},
     {GR_METHOD_CLEAR,                   (gr_funcptr) gr_generic_clear},
     {GR_METHOD_SWAP,                    (gr_funcptr) gr_generic_swap},
+    {GR_METHOD_SET_SHALLOW,             (gr_funcptr) gr_generic_set_shallow},
     {GR_METHOD_WRITE,                   (gr_funcptr) gr_generic_write},
 
     {GR_METHOD_RANDTEST,                (gr_funcptr) gr_generic_randtest},
