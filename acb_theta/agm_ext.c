@@ -13,7 +13,7 @@
 
 static void
 agm_ext_get_conv_rate(arf_t c1, arf_t c2, arf_t r, acb_srcptr a,
-                      slong n, slong prec)
+    slong n, slong prec)
 {
     arb_t eps;
     arb_t u0;
@@ -45,7 +45,7 @@ agm_ext_get_conv_rate(arf_t c1, arf_t c2, arf_t r, acb_srcptr a,
 
 void
 acb_theta_agm_ext(acb_t r, acb_t s, acb_srcptr a, acb_srcptr roots,
-                  slong nb_bad, slong g, slong prec)
+    slong nb_bad, slong g, slong prec)
 {
     acb_ptr v;
     acb_t scal;

@@ -13,7 +13,7 @@
 
 void
 acb_theta_dupl_radius(arf_t rho, const arf_t r, acb_srcptr th, slong nb,
-                      slong prec)
+    slong prec)
 {
     arb_t abs;
     arf_t bound, max;
@@ -31,7 +31,7 @@ acb_theta_dupl_radius(arf_t rho, const arf_t r, acb_srcptr th, slong nb,
         arf_max(max, max, bound);
     }
     arf_div(rho, r, max, prec, ARF_RND_FLOOR);
-    arf_div_si(rho, rho, 3, prec, ARF_RND_FLOOR);
+    arf_mul_2exp_si(rho, rho, -1);
     arf_min(rho, rho, max);
 
     arb_clear(abs);

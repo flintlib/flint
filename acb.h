@@ -994,6 +994,14 @@ _acb_vec_scalar_div_fmpz(acb_ptr res, acb_srcptr vec, slong len, const fmpz_t c,
 }
 
 ACB_INLINE void
+_acb_vec_sqr(acb_ptr res, acb_srcptr vec, slong len, slong prec)
+{
+    slong i;
+    for (i = 0; i < len; i++)
+        acb_sqr(res + i, vec + i, prec);
+}
+
+ACB_INLINE void
 acb_fprint(FILE * file, const acb_t x)
 {
     flint_fprintf(file, "(");

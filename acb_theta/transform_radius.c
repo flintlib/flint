@@ -12,14 +12,14 @@
 #include "acb_theta.h"
 
 void
-acb_theta_transform_sqr_radius(arf_t rho, const arf_t r, acb_srcptr th2,
-                               const fmpz_mat_t mat, slong prec)
+acb_theta_transform_radius(arf_t rho, const arf_t r, acb_srcptr th,
+    const fmpz_mat_t mat, slong prec)
 {
     ulong ab_0, ab;
     fmpz_t eps;
     arb_t abs_0, abs, t;
     arf_t bound, max, res;
-    slong g = fmpz_mat_nrows(mat) / 2;
+    slong g = sp2gz_dim(mat);
     slong n = 1 << g;
     slong k;
 
@@ -34,13 +34,13 @@ acb_theta_transform_sqr_radius(arf_t rho, const arf_t r, acb_srcptr th2,
     ab_0 = acb_theta_transform_image_char(eps, 0, mat);
 
     /* Compute suitable radius for duplicated values */
-    acb_abs(abs_0, &th2[ab_0], prec);
+    acb_abs(abs_0, &th[ab_0], prec);
     arf_pos_inf(res);
 
     for (k = 1; k < n; k++)
     {
         ab = acb_theta_transform_image_char(eps, k, mat);
-        acb_abs(abs, &th2[ab], prec);
+        acb_abs(abs, &th[ab], prec);
 
         arb_one(t);
         arb_add_arf(t, t, r, prec);

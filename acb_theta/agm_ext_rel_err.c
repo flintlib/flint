@@ -13,7 +13,7 @@
 
 void
 acb_theta_agm_ext_rel_err(arf_t err, const arf_t c2, const arf_t r,
-                          slong nb_good, slong prec)
+    slong nb_good, slong prec)
 {
     fmpz_t exp;
     arb_t x, y, z;

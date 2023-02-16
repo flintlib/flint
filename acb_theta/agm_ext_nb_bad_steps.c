@@ -35,7 +35,7 @@ acb_theta_agm_ext_nb_bad_steps(acb_srcptr z, const acb_mat_t tau, slong prec)
 
     /* Get lambda = smallest eigenvalue of Pi Im(tau) */
     acb_mat_get_imag(im, tau);
-    arb_mat_pos_lambda(lambda, im, prec);
+    arb_mat_spd_lbound_eig_arf(arb_midref(lambda), im, prec);
     arb_const_pi(lambda0, prec);
     arb_mul(lambda, lambda, lambda0, prec);
 
@@ -45,7 +45,7 @@ acb_theta_agm_ext_nb_bad_steps(acb_srcptr z, const acb_mat_t tau, slong prec)
     arb_log(lambda0, lambda0, prec);
     arb_neg(lambda0, lambda0);
 
-    /* Max lambda0 with 4*norm(Im(z)) */
+    /* Max lambda0 with 2*norm(Im(z)) */
     arb_zero(norm);
     for (k = 0; k < g; k++)
     {
@@ -54,7 +54,7 @@ acb_theta_agm_ext_nb_bad_steps(acb_srcptr z, const acb_mat_t tau, slong prec)
         arb_add(norm, norm, temp, prec);
     }
     arb_sqrt(norm, norm, prec);
-    arb_mul_2exp_si(norm, norm, 2);
+    arb_mul_2exp_si(norm, norm, 1);
     arb_max(lambda0, lambda0, norm, prec);
 
     /* Compute n, minimal s.t. 2^n lambda > 2lambda0 */
@@ -63,13 +63,13 @@ acb_theta_agm_ext_nb_bad_steps(acb_srcptr z, const acb_mat_t tau, slong prec)
 
     if (!arf_is_finite(up))
     {
-        flint_printf("agm_ext_nb_bad_steps: Error (infinite value)\n");
-        fflush(stdout);
-        flint_abort();
+        res = -1;
     }
-
-    arf_frexp(up, e, up);
-    res = fmpz_get_si(e) + 1;
+    else
+    {
+        arf_frexp(up, e, up);
+        res = FLINT_MAX(0, fmpz_get_si(e)) + 1;
+    }
 
     arb_mat_clear(im);
     arb_clear(lambda);

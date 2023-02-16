@@ -12,6 +12,49 @@ Siegel complex upper half-space `\mathbb{H}_g = \{\tau \in
 \operatorname{Mat}_{g\times g}(\mathbb{C}) : \tau^t = \tau, \quad
 \operatorname{Im}(\tau) \text{ is positive definite}\}`.
 
+For each `a,b\in \{0,1\}^g`, the Riemann theta function is the following
+analytic function in two variables `\tau\in \mathbb{H}_g` and `z\in
+\mathbb{C}^g`:
+
+    .. math ::
+    
+        \theta_{a,b}(z,\tau) = \sum_{n\in a/2 + \mathbb{Z}^{g}} \exp(\pi i n^T\tau n + 2\pi i n^T (z + b/2))
+
+considering `a, b, z` as column vectors. The pair `(a,b)` is called a theta
+characteristic.
+
+When handling vectors of theta values, the value of `\theta_{a,b}` always
+appear at index *ab* (concatenation). Note that this convention is *not* the
+same as the one chosen in :ref:`acb_modular.h <acb-modular>`: indeed we order
+the vector of genus 1 theta values as `\theta_3,\theta_4,\theta_2,\theta_1` in
+this order. We encode *ab* as an :type:`ulong` of length *2g*, allowing us to
+work with theta functions up to genus at least 32 on 64-bit machines.
+
+The main focus of this module is the efficient evaluation in different
+situations, indicated by combinations of suffixes from the following
+categories:
+
+1. Choice of algorithm:
+    * Naive algorithm: suffix :func:`naive`.
+    * Newton's method and the AGM (quasi-linear in the required precision):
+      suffix :func:`newton`.
+    * Uniform algorithm (when available): suffix :func:`unif`.
+2. Number of theta values:
+    * All values `\theta_{0,b}` for `b\in \{0,1\}^g`: default (no suffix).
+    * All values `\theta_{a,b}` for all *a,b*: suffix :func:`all`.
+    * Individual value `\theta_{a,b}` for specified *a,b*: suffix :func:`ind`.
+3. Value of *z*:
+    * `z=0` (theta constants): suffix :func:`const`. The result is zero
+      whenever `a^T b` is odd.
+    * Specified *z*: default (no suffix). Some functions accept several vectors
+      *z* simultaneously: in this case an extra argument *nb_z* is provided.
+4. Theta values taken at `\tau/2` instead of `tau`: suffix :func:`half`.
+5. Projective theta values (i.e., the result is defined up to simultaneous
+   multiplication by a nonzero complex number): suffix :func:`proj`.
+6. Squared theta values: suffix :func:`sqr`.
+7. Also compute derivatives of theta functions up to some order: suffix
+   :func:`jet`.
+
 As usual, the numerical functions in this module compute strict error bounds:
 if *tau* is represented by an :type:`acb_mat_t` which is not certainly positive
 definite, the output will have an infinite radius.
@@ -230,16 +273,6 @@ similar formulas for a tuple of `2^{g+1}` complex numbers.
 
     Computes `1|a_0|` times the output of :func:`acb_theta_agm_abs_dist`.
 
-.. function:: void acb_theta_agm_radius(arf_t rad, const arf_struct* mi, const arf_struct* Mi, const arf_t abs_dist, slong nb, slong prec)
-
-    Sets *rad* to the radius of a polydisk where a certain Borchardt mean
-    function is surely analytic. The input data is as follows: *nb* is the
-    number of (possibly) bad steps; *abs_dist* is the output of
-    :func:`acb_theta_agm_abs_dist` for the vector obtained after *nb* steps;
-    and *mi* (resp. *Mi*) contains a lower (resp. upper) bound for the absolute
-    values of all entries in the `i\text{th}` term of the sequence for each *i*
-    between *0* and *nb-1*.
-
 .. function:: void acb_theta_agm_conv_rate(arf_t c, arf_t r, const arf_t eps, slong prec)
 
     Computes the convergence rate of an AGM sequence consisting of good steps
@@ -300,9 +333,10 @@ similar formulas for a tuple of `2^{g+1}` complex numbers.
 
 .. function:: slong acb_theta_agm_ext_nb_bad_steps(acb_srcptr z, const acb_mat_t tau, slong prec)
 
-    Given `\tau\in \mathcal{H}_g` and `z\in \mathbb{C}^g`, computes an upper
-    bound on the number of bad steps for the (extended) AGM sequence formed by
-    theta values at `(z, 2^n\tau)` as *n* grows.
+    Given `\tau\in \mathcal{H}_g` and `z\in \mathbb{C}^g`, computes a
+    nonnegative upper bound on the number of bad steps for the (extended) AGM
+    sequence formed by theta values at `(z, 2^n\tau)` as *n* grows. A return
+    value of -1 indicates that this bound cannot be computed.
 
 .. function:: void acb_theta_agm_roots(acb_ptr roots, const acb_mat_t tau, slong nb_bad, slong prec)
 
@@ -313,52 +347,15 @@ similar formulas for a tuple of `2^{g+1}` complex numbers.
     required by :func:`acb_theta_agm` and :func:`acb_theta_agm_ext`
     respectively, using the naive algorithm for theta functions.
 
+.. function:: void acb_theta_agm_radius(arf_t rad, const arf_struct* mi, const arf_struct* Mi, const arf_t abs_dist, slong nb, slong prec)
 
-Conventions on theta functions
--------------------------------------------------------------------------------
-
-For each `a,b\in \{0,1\}^g`, the Riemann theta function is the following
-analytic function in two variables `\tau\in \mathbb{H}_g` and `z\in
-\mathbb{C}^g`:
-
-    .. math ::
-    
-        \theta_{a,b}(z,\tau) = \sum_{n\in a/2 + \mathbb{Z}^{g}} \exp(\pi i n^T\tau n + 2\pi i n^T (z + b/2))
-
-considering `a, b, z` as column vectors. The pair `(a,b)` is called a theta
-characteristic.
-
-When handling vectors of theta values, the value of `\theta_{a,b}` always
-appear at index *ab* (concatenation). Note that this convention is *not* the
-same as the one chosen in :ref:`acb_modular.h <acb-modular>`: indeed we order
-the vector of genus 1 theta values as `\theta_3,\theta_4,\theta_2,\theta_1` in
-this order. We encode *ab* as an :type:`ulong` of length *2g*, allowing us to
-work with theta functions up to genus at least 32 on 64-bit machines.
-
-The main focus of this module is the efficient evaluation in different
-situations, indicated by combinations of suffixes from the following
-categories:
-
-1. Choice of algorithm:
-    * Naive algorithm: suffix :func:`naive`.
-    * Newton's method and the AGM (quasi-linear in the required precision):
-      suffix :func:`newton`.
-    * Uniform algorithm (when available): suffix :func:`unif`.
-2. Number of theta values:
-    * All values `\theta_{0,b}` for `b\in \{0,1\}^g`: default (no suffix).
-    * All values `\theta_{a,b}` for all *a,b*: suffix :func:`all`.
-    * Individual value `\theta_{a,b}` for specified *a,b*: suffix :func:`ind`.
-3. Value of *z*:
-    * `z=0` (theta constants): suffix :func:`const`. The result is zero
-      whenever `a^T b` is odd.
-    * Specified *z*: default (no suffix). Some functions accept several vectors
-      *z* simultaneously: in this case an extra argument *nb_z* is provided.
-4. Theta values taken at `\tau/2` instead of `tau`: suffix :func:`half`.
-5. Projective theta values (i.e., the result is defined up to simultaneous
-   multiplication by a nonzero complex number): suffix :func:`proj`.
-6. Squared theta values: suffix :func:`sqr`.
-7. Also compute derivatives of theta functions up to some order: suffix
-   :func:`jet`.
+    Sets *rad* to the radius of a polydisk where a certain Borchardt mean
+    function is surely analytic. The input data is as follows: *nb* is the
+    number of (possibly) bad steps; *abs_dist* is the output of
+    :func:`acb_theta_agm_abs_dist` for the vector obtained after *nb* steps;
+    and *mi* (resp. *Mi*) contains a lower (resp. upper) bound for the absolute
+    values of all entries in the `i\text{th}` term of the sequence for each *i*
+    between *0* and *nb-1*.
 
 Transformation formulas
 -------------------------------------------------------------------------------
@@ -371,46 +368,73 @@ Transformation formulas
 
     Returns *a^T n* mod *8*.
 
-.. function:: void acb_theta_dupl_const(acb_ptr th2, acb_srcptr th, slong g,
-              slong prec)
+.. function:: void acb_theta_dupl_const(acb_ptr th2, acb_srcptr th, slong g, slong prec)
 
     Applies the duplication formula to compute `(\theta_{0,b}^2(0,2\tau))_{b\in
     \{0,1\}^g}` from `(\theta_{0,b}(0,\tau))_{b\in \{0,1\}^g}`. If the input is
-    projective (i.e. given up to a common scalar factor), so is the output.
+    projective (i.e. given up to a common scalar factor), then so is the
+    output.
 
     This function simply calls :func:`acb_theta_agm_step_sqrt`.
 
-.. function:: void acb_theta_dupl_all_const(acb_ptr th2, acb_srcptr th, slong
-              g, slong prec)
+.. function:: void acb_theta_dupl_all_const(acb_ptr th2, acb_srcptr th, slong g, slong prec)
 
     Applies the duplication formula to compute to
     `(\theta_{a,b}^2(0,2\tau))_{a,b\in \{0,1\}^g}` from
-    `(\theta_{0,b}(0,\tau))_{b\in \{0,1\}^g}`. If the input is projective, so
-    is the output.
+    `(\theta_{0,b}(0,\tau))_{b\in \{0,1\}^g}`. If the input is projective, then
+    so is the output.
 
 .. function:: void acb_theta_dupl(acb_ptr th2, acb_srcptr th, slong g, slong prec)
 
 .. function:: void acb_theta_dupl_all(acb_ptr th2, acb_srcptr th, slong g, slong prec)
 
     Analogues of the above to compute `(theta^2(z,2\tau), \theta^2(0,2\tau))`
-    from `(theta(z,\tau),\theta(0,\tau))`.
+    from `(theta(z,\tau),\theta(0,\tau))`. The first function simply calls
+    :func:`acb_theta_agm_ext_step_sqrt`.
+
+.. function:: void acb_theta_dupl_z(acb_ptr r, acb_srcptr th, slong g, slong prec)
+
+    Computes `(\theta_{a,b}(2z,\tau))` from `(\theta_{a,b}(z,\tau))`.
         
-.. function:: ulong acb_theta_transform_image_char(fmpz_t eps, ulong ab, const
-              fmpz_mat_t mat)
+.. function:: ulong acb_theta_transform_image_char(fmpz_t eps, ulong ab, const fmpz_mat_t mat)
 
     Computes the theta characteristic *a',b'* and an integer `\varepsilon` such
     that `\theta_{a,b}(0,N\tau) = \exp(i\pi \varepsilon/4) \theta_{a',b'}(0,\tau)`
     up to a scalar factor depending only on *N* and `\tau`. The matrix *N* must
     be symplectic. See also :func:`acb_modular_theta_transform`.
 
-.. function:: void acb_theta_transform_sqr_proj(acb_ptr res, acb_srcptr th2,
-              const fmpz_mat_t mat, slong prec)
+.. function:: void acb_theta_transform_proj(acb_ptr res, acb_srcptr th, const fmpz_mat_t mat, slong prec)
 
-    Applies the transformation formula to compute the projective vector
-    `(\theta_{0,b}^2(0,N\tau)_{b\in \{0,1\}^g}` from the projective vector
-    `(\theta_{a,b}(0,\tau))_{a,b\in \{0,1\}^g}`.
+.. function:: void acb_theta_transform_sqr_proj(acb_ptr res, acb_srcptr th2, const fmpz_mat_t mat, slong prec)
 
-Naive algorithms
+.. function:: void acb_theta_transform_all_sqr_proj(acb_ptr res, acb_srcptr th2, const fmpz_mat_t mat, slong prec)
+    
+    Computes projective vectors of theta values at `(Nz,N\tau)` starting from
+    the projective vector `(\theta_{a,b}(0,\tau))_{a,b\in \{0,1\}^g}`. Exactly
+    what is computed depends on the suffix, as explained above.
+
+.. function:: void acb_theta_transform_scal_const(acb_t scal, const acb_mat_t tau, const fmpz_mat_t mat, slong k2, slong prec)
+
+.. function:: void acb_theta_transform_scal(acb_t scal_z, acb_t scal_0, acb_srcptr z, const acb_mat_t tau, const fmpz_mat_t mat, slong k2, slong prec)
+
+    Computes the scalar factor appearing in the transformation formula for
+    theta values at `(z,\tau)`. The input `k2` can be computed by
+    :func:`sp2gz_k2`.
+
+.. function:: void acb_theta_dupl_radius(arf_t rho, const arf_t r, acb_srcptr th, slong nb, slong prec)
+              
+.. function:: void acb_theta_transform_radius(arf_t rho, const arf_t r, acb_srcptr th, const fmpz_mat_t mat, slong prec)
+
+.. function:: void acb_theta_dupl_transform_const_radius(arf_t rho, const arf_t r, acb_srcptr th, const fmpz_mat_t mat, slong prec)
+
+.. function:: void acb_theta_dupl_transform_radius(arf_t rho, const arf_t r, acb_srcptr th, const fmpz_mat_t mat, slong prec)
+
+    Computes a radius *rho* such that adding a deformation of entrywise modulus
+    at most *rho* to the input vector leads to a deformation of radius at most
+    *r* for the output. The operation is: either duplication, transformation,
+    duplication+transformation for either theta constants or all theta values.
+
+Ellipsoids
 -------------------------------------------------------------------------------
 
 The principle in naive algorithms to compute theta constants is to compute
@@ -421,19 +445,7 @@ series. Following..., we consider partial sums over points `n` in the lattice
 In the :func:`acb_theta_naive` functions, we first compute the relevant
 ellipsoid using low-precision computations; our representation uses
 `O(R^{g-1})` space for an ellipsoid of radius `R`, containing approximately
-`R^g` points, gathered in one-dimensional lines. The partial sum of exponential
-terms is then computed at high precision. Some precomputation occurs for each
-line so that, on average as `R\to\infty`, the code uses only two
-multiplications per exponential term. Further, many of these multiplications
-are performed only at a fraction of the full precision, resulting in
-considerable speedups. Note that using short addition sequences as in
-:func:`acb_modular_addseq_theta` does not seem to further accelerate the
-computations in genus `g\geq 2`.
-
-Many similar :func:`theta_naive` functions are provided; they essentially
-differ by their way of handling individual lattice points. Using function
-pointers for this last step allows us to factor out significant amounts of
-code.
+`R^g` points, gathered in one-dimensional lines.
 
 .. type:: acb_theta_eld_struct
 
@@ -442,9 +454,9 @@ code.
     Represents a *d*-dimensional sheet in an ellipsoid of ambient dimension
     *g*, i.e. a set of points of the form `n = (n_0,\ldots,n_{g-1})\in
     2\mathbb{Z}^g + a` such that `v + Yn` has `L^2` norm bounded by `R`, for
-    some Cholesky matrix `Y`, some radius `R>0`, and some offset `v\in
-    \mathbb{R}^g`, and finally `(n_{d},\ldots,n_{g-1})` have fixed values. This is
-    a recursive type: we store
+    some (upper-triangular) Cholesky matrix `Y`, some radius `R>0`, and some
+    offset `v\in \mathbb{R}^g`, and finally `(n_{d},\ldots,n_{g-1})` have fixed
+    values. This is a recursive type: we store
     * the interval of values for `n_{d-1}`,
     * the midpoint of that interval,
     * in the case `d\geq 2`, a number of *d-1* dimensional children of *E*,
@@ -457,43 +469,33 @@ code.
 
 .. function::  void acb_theta_eld_init(acb_theta_eld_t E, slong d, slong g)
 
-    Initializes *E* as a *d*-dimensional ellipsoid sheet in ambient dimension
-    *g*.
+    Initializes *E* as a *d*-dimensional ellipsoid in ambient dimension *g*.
 
 .. function:: void acb_theta_eld_clear(acb_theta_eld_t E)
 
     Clears *E* as well as any recursive data contained in it.
 
-.. function:: void acb_theta_eld_interval(slong* min, slong* mid, slong* max,
-              const arb_t ctr, const arf_t rad, int a, slong prec)
+.. function:: void acb_theta_eld_interval(slong* min, slong* mid, slong* max, const arb_t ctr, const arf_t rad, int a, slong prec)
 
     Computes the minimum, middle point, and maximum of a subinterval of
     `2\mathbb{Z} + a` that is guaranteed to contain all points within a
     distance *rad* of the real number *ctr*. Both *ctr* and *rad* must be
-    finite values.
+    finite values, otherwise an error is thrown.
 
-.. function:: void acb_theta_eld_fill(acb_theta_eld_t E, const arb_mat_t Y,
-              const arf_t R2, arb_srcptr offset, slong* last_coords, ulong
-              a, slong prec)
+.. function:: void acb_theta_eld_round(slong* r, const arb_mat_t v)
 
-    Sets *E* to represent lattice points in an ellipsoid as defined above,
-    where *R2* indicates `R^2` and *offset* contains the vector `v`. The matrix
-    *Y* must be a valid Cholesky matrix, i.e. an upper triangular matrix with
-    positive diagonal entries, and *R2* must be finite.
+    Given a `g\times 1` matrix *v*, computes a vector *r* of length *g* with
+    integer entries that is close to *v*. The entries of *v* must be finite,
+    otherwise an error is thrown.
 
-.. function:: void acb_theta_eld_points(slong* pts, const acb_theta_eld_t E)
+.. function:: void acb_theta_eld_fill(acb_theta_eld_t E, const arb_mat_t Y, const arf_t R2, arb_srcptr offset, slong* last_coords, ulong a, slong prec)
 
-    Sets *pts* to the list of lattice points contained in *E*.
+    Sets *E* to represent an ellipsoid as defined above, where *R2* indicates
+    `R^2` and *offset* contains the vector `v`. The matrix *Y* must be a valid
+    Cholesky matrix, i.e. an upper triangular matrix with positive diagonal
+    entries, and *R2* must be finite, otherwise an error is thrown.
 
-.. function:: int acb_theta_eld_contains(const acb_theta_eld_t E, slong* pt)
-
-    Returns nonzero iff *pt* is contained in the ellipsoid sheet *E*.
-
-.. function:: void acb_theta_eld_print(const acb_theta_eld_t E)
-
-    Prints a compact representation of *E* to :type:`stdout`.
-
-In addition, the following macros are available after the function
+The following macros return meaningful values after the function
 :func:`arb_eld_fill` has been called, with no computational cost.
 
 .. macro:: acb_theta_eld_dim(E)
@@ -513,12 +515,13 @@ In addition, the following macros are available after the function
 .. macro:: acb_theta_eld_mid(E)
 .. macro:: acb_theta_eld_max(E)
     
-    Returns the minimum, midpoint, and maximum of `n_{d-1}` in the ellipsoid sheet `E`.
+    Returns the minimum, midpoint, and maximum of `n_{d-1}` in the ellipsoid
+    sheet `E`.
 
 .. macro:: acb_theta_eld_nr(E) ((E)->nr)
 .. macro:: acb_theta_eld_nl(E) ((E)->nl)
 
-    Returns the number of right and left children of *E*, respectively
+    Returns the number of right and left children of *E*, respectively.
 
 .. macro:: acb_theta_eld_rchild(E, k)
 .. macro:: acb_theta_eld_lchild(E, k)
@@ -534,6 +537,37 @@ In addition, the following macros are available after the function
 
     Returns an integer `M_k` such that all lattice points `n` inside the
     ellipsoid sheet *E* satisfy `|n_k|\leq M_k`.
+
+Finally, the following functions are available for convenience.
+
+.. function:: void acb_theta_eld_points(slong* pts, const acb_theta_eld_t E)
+
+    Sets *pts* to the list of lattice points contained in *E* (as a
+    concatenation of vectors of length *g*).
+
+.. function:: int acb_theta_eld_contains(const acb_theta_eld_t E, slong* pt)
+
+    Returns nonzero iff *pt* is contained in the ellipsoid sheet *E*.
+
+.. function:: void acb_theta_eld_print(const acb_theta_eld_t E)
+
+    Prints a compact representation of *E* to :type:`stdout`.
+
+Naive algorithms
+-------------------------------------------------------------------------------
+
+After computing a suitable ellipsoid, we can evaluate partial sums of the
+series defining theta functions at high precisions. Some precomputation occurs
+for each line in the ellipsoid, so that, on average as `R\to\infty`, the code
+uses only two multiplications per exponential term. Further, many of these
+multiplications are performed only at a fraction of the full precision,
+resulting in considerable speedups. Note that using short addition sequences as
+in :func:`acb_modular_addseq_theta` does not seem to further accelerate the
+computations in genus `g\geq 2`.
+
+The different :func:`theta_naive` functions only differ by their way of
+handling individual lattice points. Using function pointers thus allows us to
+factor out significant amounts of code.
 
 .. function:: void acb_theta_naive_tail(arf_t bound, const arf_t R2, const
               arb_mat_t Y, slong ord, slong prec)

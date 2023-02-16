@@ -13,7 +13,7 @@
 
 void
 acb_theta_agm_ext_conv_rate(arf_t c1, arf_t c2, arf_t r, const arf_t eps,
-                            const arf_t m, const arf_t M, slong prec)
+    const arf_t m, const arf_t M, slong prec)
 {
     arb_t M0, m0, M1, u0, U0, u1, U1;
     arb_t t, c;

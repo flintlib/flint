@@ -28,6 +28,11 @@ extern "C" {
 
 #define ACB_THETA_AGM_LOWPREC 50 /* Low precision in AGM computations */
 
+#define ACB_THETA_ELD_DEFAULT_PREC 50 /* Low precision in ellipsoid computations */
+#define ACB_THETA_NAIVE_EPS_2EXP 0
+#define ACB_THETA_NAIVE_FULLPREC_ADDLOG 1.1
+#define ACB_THETA_NAIVE_NEWPREC_MARGIN 1.0
+
 /* The Siegel modular group */
 
 static __inline__ void
@@ -90,8 +95,6 @@ void acb_theta_agm_min_abs(arb_t min, acb_srcptr a, slong nb, slong prec);
 void acb_theta_agm_abs_dist(arb_t eps, acb_srcptr a, slong nb, slong lowprec, slong prec);
 void acb_theta_agm_rel_dist(arb_t eps, acb_srcptr a, slong nb, slong lowprec, slong prec);
 
-void acb_theta_agm_radius(arf_t rad, const arf_struct* mi, const arf_struct* Mi, const arf_t abs_dist, slong nb, slong prec);
-
 void acb_theta_agm_conv_rate(arf_t c, arf_t r, const arf_t eps, slong prec);
 slong acb_theta_agm_nb_good_steps(const arf_t c, const arf_t r, slong prec);
 void acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr roots, slong nb_bad, slong g, slong prec);
@@ -105,55 +108,33 @@ slong acb_theta_agm_ext_nb_bad_steps(acb_srcptr z, const acb_mat_t tau, slong pr
 void acb_theta_agm_roots(acb_ptr roots, const acb_mat_t tau, slong nb_bad, slong prec);
 void acb_theta_agm_ext_roots(acb_ptr roots, acb_srcptr z, const acb_mat_t tau, slong nb_bad, slong prec);
 
+void acb_theta_agm_radius(arf_t rad, const arf_struct* mi, const arf_struct* Mi, const arf_t abs_dist, slong nb, slong prec);
+
 /* Transformation formulas */
 
 slong acb_theta_char_dot(ulong a, ulong b, slong g);
-
 slong acb_theta_dot(ulong a, slong* n, slong g);
 
-void acb_theta_vecsqr(acb_ptr th2, acb_srcptr th, slong n, slong prec);
-
 void acb_theta_dupl_const(acb_ptr th2, acb_srcptr th, slong g, slong prec);
-
 void acb_theta_dupl_all_const(acb_ptr th2, acb_srcptr th, slong g, slong prec);
-
 void acb_theta_dupl(acb_ptr th2, acb_srcptr th, slong g, slong prec);
-
 void acb_theta_dupl_all(acb_ptr th2, acb_srcptr th, slong g, slong prec);
-
 void acb_theta_dupl_z(acb_ptr r, acb_srcptr th, slong g, slong prec);
 
-ulong acb_theta_transform_image_char(fmpz_t eps, ulong ab,
-    const fmpz_mat_t mat);
+ulong acb_theta_transform_image_char(fmpz_t eps, ulong ab, const fmpz_mat_t mat);
+void acb_theta_transform_proj(acb_ptr res, acb_srcptr th, const fmpz_mat_t mat, slong prec);
+void acb_theta_transform_sqr_proj(acb_ptr res, acb_srcptr th2, const fmpz_mat_t mat, slong prec);
+void acb_theta_transform_all_sqr_proj(acb_ptr res, acb_srcptr th2, const fmpz_mat_t mat, slong prec);
 
-void acb_theta_transform_proj(acb_ptr res, acb_srcptr th,
-        const fmpz_mat_t mat, slong prec);
+void acb_theta_transform_scal_const(acb_t scal, const acb_mat_t tau, const fmpz_mat_t mat, slong k2, slong prec);
+void acb_theta_transform_scal(acb_t scal_z, acb_t scal_0, acb_srcptr z, const acb_mat_t tau, const fmpz_mat_t mat, slong k2, slong prec);
 
-void acb_theta_transform_sqr_proj(acb_ptr res, acb_srcptr th2,
-        const fmpz_mat_t mat, slong prec);
+void acb_theta_dupl_radius(arf_t rho, const arf_t r, acb_srcptr th, slong nb, slong prec);
+void acb_theta_transform_radius(arf_t rho, const arf_t r, acb_srcptr th, const fmpz_mat_t mat, slong prec);
+void acb_theta_dupl_transform_const_radius(arf_t rho, const arf_t r, acb_srcptr th, const fmpz_mat_t mat, slong prec);
+void acb_theta_dupl_transform_radius(arf_t rho, const arf_t r, acb_srcptr th, const fmpz_mat_t mat, slong prec);
 
-void acb_theta_transform_all_sqr_proj(acb_ptr res, acb_srcptr th2,
-    const fmpz_mat_t mat, slong prec);
-    
-void acb_theta_transform_scal_const(acb_t scal, const acb_mat_t tau,
-        const fmpz_mat_t mat, slong k2, slong prec);
-
-void acb_theta_transform_scal(acb_t scal_z, acb_t scal_0, acb_srcptr z,
-        const acb_mat_t tau, const fmpz_mat_t mat, slong k2, slong prec);
-
-void acb_theta_dupl_radius(arf_t rho, const arf_t r, acb_srcptr th, slong nb,
-        slong prec);
-
-void acb_theta_transform_sqr_radius(arf_t rho, const arf_t r, acb_srcptr th2,
-        const fmpz_mat_t mat, slong prec);
-
-void acb_theta_dupl_transform_radius_const(arf_t rho, const arf_t r,
-        acb_srcptr th, const fmpz_mat_t mat, slong prec);
-
-void acb_theta_dupl_transform_radius(arf_t rho, const arf_t r,
-        acb_srcptr th, const fmpz_mat_t mat, slong prec);
-
-/* Naive algorithms */
+/* Ellipsoids */
 
 struct acb_theta_eld_struct
 {
@@ -185,41 +166,23 @@ typedef struct acb_theta_eld_struct acb_theta_eld_t[1];
 #define acb_theta_eld_box(E, k) ((E)->box[(k)])
 
 void acb_theta_eld_init(acb_theta_eld_t E, slong d, slong g);
-
 void acb_theta_eld_clear(acb_theta_eld_t E);
 
-void acb_theta_eld_interval(slong* min, slong* mid, slong* max,
-        const arb_t ctr, const arf_t rad, int a, slong prec);
-
+void acb_theta_eld_interval(slong* min, slong* mid, slong* max, const arb_t ctr, const arf_t rad, int a, slong prec);
 void acb_theta_eld_round(slong* r, const arb_mat_t v);
-
-void acb_theta_eld_fill(acb_theta_eld_t E, const arb_mat_t Y, const arf_t R2,
-        arb_srcptr offset, slong* last_coords, ulong a, slong prec);
-
+void acb_theta_eld_fill(acb_theta_eld_t E, const arb_mat_t Y, const arf_t R2, arb_srcptr offset, slong* last_coords, ulong a, slong prec);
 void acb_theta_eld_points(slong* pts, const acb_theta_eld_t E);
-
 int acb_theta_eld_contains(const acb_theta_eld_t E, slong* pt);
-
 void acb_theta_eld_print(const acb_theta_eld_t E);
 
-#define ACB_THETA_ELD_DEFAULT_PREC 50
-#define ACB_THETA_NAIVE_EPS_2EXP 0
-#define ACB_THETA_NAIVE_FULLPREC_ADDLOG 1.1
-#define ACB_THETA_NAIVE_NEWPREC_MARGIN 1.0
+/* Naive algorithms */
 
-void acb_theta_naive_tail(arf_t bound, const arf_t R2, const arb_mat_t Y,
-        slong ord, slong prec);
-
-void acb_theta_naive_radius(arf_t R2, const arb_mat_t Y, slong ord,
-        const arf_t eps, slong prec);
-
+void acb_theta_naive_tail(arf_t bound, const arf_t R2, const arb_mat_t Y, slong ord, slong prec);
+void acb_theta_naive_radius(arf_t R2, const arb_mat_t Y, slong ord, const arf_t eps, slong prec);
 void acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_struct* eps, acb_ptr c,
-        acb_ptr new_z, ulong ab, int all, slong ord, acb_srcptr z, slong nb_z,
-        const acb_mat_t tau, slong prec);
-
-slong acb_theta_naive_newprec(slong prec, slong coord, slong dist,
-        slong max_dist, slong ord);
-
+    acb_ptr new_z, ulong ab, int all, slong ord, acb_srcptr z, slong nb_z,
+    const acb_mat_t tau, slong prec);
+slong acb_theta_naive_newprec(slong prec, slong coord, slong dist, slong max_dist, slong ord);
 slong acb_theta_naive_fullprec(const acb_theta_eld_t E, slong prec);
 
 typedef struct

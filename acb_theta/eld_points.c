@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 void
-acb_theta_eld_points(slong * pts, const acb_theta_eld_t E)
+acb_theta_eld_points(slong* pts, const acb_theta_eld_t E)
 {
     slong d = acb_theta_eld_dim(E);
     slong g = acb_theta_eld_ambient_dim(E);
@@ -33,7 +33,7 @@ acb_theta_eld_points(slong * pts, const acb_theta_eld_t E)
             i += g;
         }
     }
-    else                        /* d > 1 */
+    else /* d > 1 */
     {
         i = 0;
         for (k = 0; k < nr; k++)
