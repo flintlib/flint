@@ -172,9 +172,10 @@ similar formulas for a tuple of `2^{g+1}` complex numbers.
 .. function:: void acb_theta_agm_sqrt_lowprec(acb_t r, const acb_t a, const acb_t root, slong prec)
 
     Sets *r* to a square root of *a*. Unlike :func:`acb_sqrt`, no special
-    precision losses happen when *a* touches the negative real axis. If *root*
-    is a (low-precision) complex ball containing either `\sqrt{a}` or `-\sqrt{a}`,
-    then the output *r* will be contained in *root*.
+    precision losses happen when *a* touches the negative real axis. The sign
+    of the output is determined: it must overlap *root*, which is a
+    (low-precision) complex ball containing either `\sqrt{a}` or `-\sqrt{a}`.
+    Returns indeterminate if the correct sign cannot be determined.
 
 .. function:: void acb_theta_agm_step_sqrt(acb_ptr r, acb_srcptr a, slong g,
               slong prec)
@@ -251,50 +252,66 @@ similar formulas for a tuple of `2^{g+1}` complex numbers.
 .. function:: slong acb_theta_agm_nb_good_steps(const arf_t c, const arf_t r, slong prec)
 
     Given the convergence rate *c,r* of an AGM sequence with good steps as,
-    above, returns the number of steps to compute before . Throws an error if
-    the number of steps is infinite.
+    above, returns the (nonnegative) number of steps to compute before the
+    equality `|a_0-m|\leq 2^{-\mathrm{prec}}|a_0|` holds. Returns negative if
+    this number is infinite or cannot be computed from the given
+    *c,r*. Computations are performed at a low precision specified by...
 
 .. function:: void acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr roots, slong nb_bad, slong g, slong prec)
 
     Computes the limit of an AGM sequence starting from `2^g` complex
-    numbers. The input data is as follows: *a* is the first term; *nb* is the
-    number of (possibly) bad steps; and *roots* consists of low-precision
-    approximations of the correct roots for the first *nb* steps, as in
-    :func:`acb_theta_agm_sqrt_lowprec`.
+    numbers. The input data is as follows: *a* is the first term; *nb_bad* is
+    the number of (possibly) bad steps; and *roots* consists of low-precision
+    approximations of the correct roots for the first *nb_bad* steps, as in
+    :func:`acb_theta_agm_sqrt_lowprec`. Returns an indeterminate result if a
+    suitable convergence rate cannot be determined after *nb_bad* steps.
 
-.. function:: void acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr all_roots,
-              const arf_t rel_err, slong nb_bad, slong nb_good, slong g,
-              slong prec)
+.. function:: void acb_theta_agm_ext_conv_rate(arf_t c1, arf_t c2, arf_t r, const arf_t eps, const arf_t m, const arf_t M, slong prec)
 
-.. function:: void acb_theta_agm_ext(acb_t r, acb_srcptr a, acb_srcptr
-              all_roots, const arf_t rel_err, slong nb_bad, slong nb_good,
-              slong g, slong prec)
+    Computes the convergence rate of an extended AGM sequence consisting of
+    good steps only, i.e. *c1, c2* and *r<1* such that *c1,r* is the
+    convergence rate of the regular AGM and for all `n\geq 1`, the inequality
+    `|q_{n+1}-1|\leq c_2 r^{2^{n-1}}` holds. The input is as follows: *eps* is
+    an upper bound on the relative distance for the term `i=0`, as computed by
+    :func:`acb_theta_agm_rel_dist`, and must be less than *1/4*; and *m*
+    (resp. *M*) is a lower (resp. upper) bound on the modulus of all entries of
+    the initial extended AGM vector, which must be finite, with *m>0*. If these
+    conditions are not satisfied then *c1, c2, r* are set to infinite values.
 
-    Evaluates the limit of an AGM sequence starting from *a*. First takes
-    *nb_bad* bad steps using low-precision square roots stored in *all_roots*
-    of length *nb_bad* `\times 2^g`; then, renormalizes and takes *nb_good*
-    good steps.
+.. function:: void acb_theta_agm_ext_rel_err(arf_t err, const arf_t c2, const arf_t r, slong nb_good, slong prec)
+    
+    Computes the relative error for an extended AGM computation with
+    convergence rate given by *c1, c2, r* and *nb_good* steps: the extended AGM
+    is equal to `(u_n^{(0)}/\mu\cdot (1+\delta))^{2^n}` where *n* is given by
+    *nb_good* and *err* is an upper bound on `|\delta|`. Requires that
+    *nb_good* is at least `1` and `r < 1/2`, otherwise sets *err* to an
+    infinite value.
+              
+.. function:: void acb_theta_agm_ext(acb_t r, acb_t s, acb_srcptr a, acb_srcptr roots, slong nb_bad, slong g, slong prec)
 
-    The first entry of the resulting vector is an approximation of the
-    limit. We finally add some relative error specified by *rel_err* to account
-    for the mathematical convergence error. This error must be computed by the
-    user in terms of the starting data: while general formulas predict suitable
-    values of *nb_bad*, *nb_good* and *rel_err* in terms of *a*, they are
-    overly pessimistic for our applications.
+    Computes the extended Borchardt mean starting from `2^(g+1)` complex
+    numbers. The input data is as follows: *a* is the first term; *nb_bad* is
+    the number of (possibly) bad steps; and *roots* consists of low-precision
+    approximations of the correct roots for the first *nb_bad* steps, as in
+    :func:`acb_theta_agm_sqrt_lowprec`. Returns an indeterminate result if a
+    suitable convergence rate cannot be determined after *nb_bad* steps.
 
 .. function:: slong acb_theta_agm_nb_bad_steps(const acb_mat_t tau, slong prec)
 
-    Given `\tau\in \mathcal{H}_g`, computes *n\geq 0* such that theta constants
-    at `2^n\tau` lie in a disk centered at `1` with radius `1/20`. The result
-    is intended for use as *nb_bad* in :func:`acb_theta_agm`.
+.. function:: slong acb_theta_agm_ext_nb_bad_steps(acb_srcptr z, const acb_mat_t tau, slong prec)
 
-.. function:: slong acb_theta_agm_nb_good_steps(arf_t rel_err, slong g, slong prec)
+    Given `\tau\in \mathcal{H}_g` and `z\in \mathbb{C}^g`, computes an upper
+    bound on the number of bad steps for the (extended) AGM sequence formed by
+    theta values at `(z, 2^n\tau)` as *n* grows.
 
-    Computes the number of good AGM steps, starting from a configuration of
-    complex numbers within the disk centered at `1` with radius `1/20`, to
-    approximate the limit value up to a relative error of
-    `2^{-\text{prec}}`. Also sets *rel_err* to this value. The result is
-    intended for use as *nb_good* and *rel_err* in :func:`acb_theta_agm`.
+.. function:: void acb_theta_agm_roots(acb_ptr roots, const acb_mat_t tau, slong nb_bad, slong prec)
+
+.. function:: void acb_theta_agm_ext_roots(acb_ptr roots, acb_srcptr z, const acb_mat_t tau, slong nb_bad, slong prec)
+    
+    Given `\tau\in \mathcal{H}_g`, `z\in \mathbb{C}^g` and a number of bad
+    steps *nb_bad*, computes an approximation of the required square root as
+    required by :func:`acb_theta_agm` and :func:`acb_theta_agm_ext`
+    respectively, using the naive algorithm for theta functions.
 
 
 Conventions on theta functions

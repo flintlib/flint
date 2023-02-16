@@ -15,55 +15,86 @@ void
 acb_theta_agm_ext_conv_rate(arf_t c1, arf_t c2, arf_t r, const arf_t eps,
                             const arf_t m, const arf_t M, slong prec)
 {
-    arb_t M_arb, m_arb;
-    arb_t temp;
-    arb_t res;
+    arb_t M0, m0, M1, u0, U0, u1, U1;
+    arb_t t, c;
 
-    arb_init(M_arb);
-    arb_init(m_arb);
-    arb_init(temp);
-    arb_init(res);
+    arb_init(M0);
+    arb_init(m0);
+    arb_init(M1);
+    arb_init(u0);
+    arb_init(U0);
+    arb_init(u1);
+    arb_init(U1);
+    arb_init(t);
+    arb_init(c);
 
-    arb_set_arf(M_arb, M);
-    arb_set_arf(m_arb, m);
-
-    /* Get convergence rate of regular Borchardt */
+    /* Get convergence rate of regular Borchardt; set ui, Mi */
     acb_theta_agm_conv_rate(c1, r, eps, prec);
+    arb_set_arf(M0, M);
+    arb_set_arf(m0, m);
+    
+    arb_set_arf(U0, c1);
+    arb_mul_arf(U0, U0, r, prec);
+    arb_mul_arf(U1, U0, r, prec);
+    arb_neg(u0, U0);
+    arb_neg(u1, U1);
+    
+    arb_add_si(U0, U0, 1, prec);
+    arb_add_si(u0, u0, 1, prec);
+    arb_add_si(U1, U1, 1, prec);
+    arb_add_si(u1, u1, 1, prec);
+    arb_mul(M1, M0, U0, prec);
+    arb_sqrt(M1, M1, prec);
 
-    /* Get lambda s.t. |u_0^(n+1) - v_0^n t_0^n| <= x_n:= lambda e^(2^(n-1)) */
-    arb_div(res, M_arb, m_arb, prec);
-    arb_sqrt(res, res, prec);
-    arb_one(temp);
-    arb_add_arf(temp, temp, r, prec);
-    arb_mul(res, res, temp, prec);
+    /* Get c such that |u_0^(n+1) - v_0^n t_0^n| <= x_n:= c r^(2^(n-1)) */
+    arb_sqrt(c, M1, prec);
+    arb_mul_2exp_si(c, c, -1);
+    arb_mul_arf(c, c, r, prec);
+    
+    arb_mul(t, M0, U0, prec);
+    arb_div(t, t, m0, prec);
+    arb_sqrt(t, t, prec);
+    arb_add(c, c, t, prec);
 
-    arb_mul_arf(res, res, c1, prec);
-    arb_mul_2exp_si(res, res, -1);
-    arb_mul(res, res, M_arb, prec);
+    arb_mul(c, c, c1, prec);
+    arb_mul(c, c, U0, prec);
+    arb_sqrt(t, u0, prec);
+    arb_div(c, c, t, prec);
 
-    /* Get lambda' s.t. x_n^2 + 2 x_n v_0^(n) t_0^(n) <= lambda' e^(2^(n-1)) */
-    arb_mul_2exp_si(temp, M_arb, 1);
-    arb_addmul_arf(temp, res, c1, prec);
-    arb_mul(res, res, temp, prec);
+    /* Get c' such that x_n^2 + 2 x_n v_0^(n) t_0^(n) <= c' r^(2^(n-1)) */
+    arb_mul(t, M1, U0, prec);
+    arb_sqrt(t, t, prec);
+    arb_mul_si(t, t, prec);
+    arb_mul(t, t, c, prec);
+    
+    arb_sqr(c, c, prec);
+    arb_mul_arf(c, c, r, prec);
+    arb_add(c, c, t, prec);
+    
+    /* Get c2 such that |q_{n+1} - 1| <= c2 r^(2^(n-1)) */
+    arb_div(c, c, u0);
+    arb_div(c, c, u0);
 
-    /* Get lambda'' s.t. |q_{n+1} - 1| <= lambda'' e^(2^(n-1)) */
-    arb_set_arf(temp, r);
-    arb_sub_si(temp, temp, 1, prec);
-    arb_neg(temp, temp);
-    arb_inv(temp, temp, prec);
-    arb_mul_arf(temp, temp, r, prec);
-    arb_mul_arf(temp, temp, c1, prec);
-    arb_mul(temp, temp, M_arb, prec);
-    arb_mul(temp, temp, M_arb, prec);
-    arb_add(res, res, temp, prec);
+    arb_set_arf(t, r);
+    arb_sqr(t, t);
+    arb_sub_si(t, t, 1, prec);
+    arb_neg(t, t);
+    arb_inv(t, t, prec);
+    arb_mul(t, t, U1, prec);
+    arb_div(t, t, u1, prec);
+    arb_mul_arf(t, t, r, prec);
+    arb_mul_arf(t, t, c1, prec);
+    arb_add(c, c, t, prec);
+    
+    arb_get_ubound_arf(c2, c, prec);
 
-    arb_sqr(temp, m_arb, prec);
-    arb_div(res, res, temp, prec);
-
-    arb_get_ubound_arf(c2, res, prec);
-
-    arb_clear(M_arb);
-    arb_clear(m_arb);
-    arb_clear(temp);
-    arb_clear(res);
+    arb_clear(M0);
+    arb_clear(m0);
+    arb_init(M1);
+    arb_init(u0);
+    arb_init(U0);
+    arb_init(u1);
+    arb_init(U1);
+    arb_clear(t);
+    arb_clear(c);
 }

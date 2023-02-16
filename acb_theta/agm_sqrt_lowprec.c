@@ -15,10 +15,10 @@ void
 acb_theta_agm_sqrt_lowprec(acb_t r, const acb_t a, const acb_t root, slong prec)
 {
     acb_t res;
-    acb_t dist;
+    acb_t neg;
 
     acb_init(res);
-    acb_init(dist);
+    acb_init(neg);
 
     /* Take any square root, avoiding potentially massive precision loss
        if a intersects the default branch cut */
@@ -33,14 +33,31 @@ acb_theta_agm_sqrt_lowprec(acb_t r, const acb_t a, const acb_t root, slong prec)
     {
         acb_sqrt(res, a, prec);
     }
+    acb_neg(neg, res);
 
-    /* Change sign if not contained in root */
-    if (!acb_contains(root, res))
+    if (acb_overlaps(root, res))
     {
-        acb_neg(res, res);
+        if (acb_overlaps(root, neg))
+        {
+            acb_indeterminate(r);
+        }
+        else
+        {
+            acb_set(r, res);
+        }
+    }
+    else /* (!acb_overlaps(root, res)) */
+    {
+        if (!acb_ovelaps(root, neg))
+        {
+            acb_indeterminate(r);
+        }
+        else
+        {
+            acb_set(r, neg);
+        }
     }
     
-    acb_set(r, res);
     acb_clear(res);
-    acb_clear(dist);
+    acb_clear(neg);
 }

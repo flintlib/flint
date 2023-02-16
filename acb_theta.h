@@ -96,7 +96,7 @@ void acb_theta_agm_conv_rate(arf_t c, arf_t r, const arf_t eps, slong prec);
 slong acb_theta_agm_nb_good_steps(const arf_t c, const arf_t r, slong prec);
 void acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr roots, slong nb_bad, slong g, slong prec);
 
-void acb_theta_agm_ext_conv_rate(arf_t c1, arf_t c2, arf_t r, const arf_t eps,const arf_t m, const arf_t M, slong prec);
+void acb_theta_agm_ext_conv_rate(arf_t c1, arf_t c2, arf_t r, const arf_t eps, const arf_t m, const arf_t M, slong prec);
 void acb_theta_agm_ext_rel_err(arf_t err, const arf_t c2, const arf_t r, slong nb_good, slong prec);
 void acb_theta_agm_ext(acb_t r, acb_t s, acb_srcptr a, acb_srcptr roots, slong nb_bad, slong g, slong prec);
 
