@@ -1262,7 +1262,7 @@ class gr_ctx:
             >>> RR.chebyshev_t(0.5, 0.75)
             [0.935414346693485 +/- 5.18e-16]
             >>> ZZx.chebyshev_t(4, [0, 1])
-            [1, 0, -8, 0, 8]
+            1 - 8*x^2 + 8*x^4
         """
         return ctx._binary_op_with_overloads(n, x, libgr.gr_chebyshev_t, fmpz_op=libgr.gr_chebyshev_t_fmpz, rstr="chebyshev_t($n, $x)")
 
@@ -1275,7 +1275,7 @@ class gr_ctx:
             >>> RR.chebyshev_u(0.5, 0.75)
             [1.33630620956212 +/- 2.68e-15]
             >>> ZZx.chebyshev_u(4, [0, 1])
-            [1, 0, -12, 0, 16]
+            1 - 12*x^2 + 16*x^4
         """
         return ctx._binary_op_with_overloads(n, x, libgr.gr_chebyshev_u, fmpz_op=libgr.gr_chebyshev_u_fmpz, rstr="chebyshev_u($n, $x)")
 
@@ -1528,7 +1528,7 @@ class gr_ctx:
             >>> [ZZ.rising(3, k) for k in range(5)]
             [1, 3, 12, 60, 360]
             >>> ZZx.rising(ZZx([0,1]), 5)
-            [0, 24, 50, 35, 10, 1]
+            24*x + 50*x^2 + 35*x^3 + 10*x^4 + x^5
             >>> RR.rising(1, 10**7)
             [1.202423400515903e+65657059 +/- 5.57e+65657043]
         """
@@ -1541,7 +1541,7 @@ class gr_ctx:
             >>> [ZZ.falling(3, k) for k in range(5)]
             [1, 3, 6, 6, 0]
             >>> ZZx.falling(ZZx([0,1]), 5)
-            [0, 24, -50, 35, -10, 1]
+            24*x - 50*x^2 + 35*x^3 - 10*x^4 + x^5
             >>> RR.log(RR.falling(RR.pi(), 10**7))
             [151180898.7174084 +/- 9.72e-8]
         """
@@ -3406,7 +3406,7 @@ class gr_poly(gr_elem):
 
             >>> f = RRx([1,RR.pi()])
             >>> f.monic()
-            [[0.318309886183791 +/- 4.43e-16], 1.000000000000000]
+            [0.318309886183791 +/- 4.43e-16] + 1.000000000000000*x
             >>> RRx([]).monic()   # the zero polynomial cannot be made monic
             Traceback (most recent call last):
               ...
@@ -3545,13 +3545,13 @@ class gr_poly(gr_elem):
         truncated to length n.
 
             >>> ZZx([1,2,3]).inv_series(10)
-            [1, -2, 1, 4, -11, 10, 13, -56, 73, 22]
+            1 - 2*x + x^2 + 4*x^3 - 11*x^4 + 10*x^5 + 13*x^6 - 56*x^7 + 73*x^8 + 22*x^9
             >>> ZZx([2,3,4]).inv_series(5)
             Traceback (most recent call last):
               ...
-            FlintDomainError: f.inv_series(n) is not an element of {Ring of polynomials over Integer ring (fmpz)} for {f = [2, 3, 4]}, {n = 5}
+            FlintDomainError: f.inv_series(n) is not an element of {Ring of polynomials over Integer ring (fmpz)} for {f = 2 + 3*x + 4*x^2}, {n = 5}
             >>> QQx([2,3,4]).inv_series(5)
-            [1/2, -3/4, 1/8, 21/16, -71/32]
+            (1/2) + (-3/4)*x + (1/8)*x^2 + (21/16)*x^3 + (-71/32)*x^4
         """
         return self._series_op(n, libgr.gr_poly_inv_series, "$f.inv_series($n)")
 
@@ -3564,9 +3564,9 @@ class gr_poly(gr_elem):
         truncated to length n.
 
             >>> QQx([1,1]).log_series(8)
-            [0, 1, -1/2, 1/3, -1/4, 1/5, -1/6, 1/7]
+            x + (-1/2)*x^2 + (1/3)*x^3 + (-1/4)*x^4 + (1/5)*x^5 + (-1/6)*x^6 + (1/7)*x^7
             >>> RRx([2,1]).log_series(3)
-            [[0.693147180559945 +/- 4.12e-16], 0.5000000000000000, -0.1250000000000000]
+            [0.693147180559945 +/- 4.12e-16] + 0.5000000000000000*x - 0.1250000000000000*x^2
             >>> RRx([0,0]).log_series(3)
             Traceback (most recent call last):
               ...
@@ -3580,15 +3580,15 @@ class gr_poly(gr_elem):
         truncated to length n.
 
             >>> QQx([0,1]).exp_series(8)
-            [1, 1, 1/2, 1/6, 1/24, 1/120, 1/720, 1/5040]
+            1 + x + (1/2)*x^2 + (1/6)*x^3 + (1/24)*x^4 + (1/120)*x^5 + (1/720)*x^6 + (1/5040)*x^7
             >>> QQx([1,1]).exp_series(2)
             Traceback (most recent call last):
               ...
-            FlintUnableError: failed to compute f.exp_series(n) in {Ring of polynomials over Rational field (fmpq)} for {f = [1, 1]}, {n = 2}
+            FlintUnableError: failed to compute f.exp_series(n) in {Ring of polynomials over Rational field (fmpq)} for {f = 1 + x}, {n = 2}
             >>> RRx([1,1]).exp_series(2)
-            [[2.718281828459045 +/- 5.41e-16], [2.718281828459045 +/- 5.41e-16]]
+            [2.718281828459045 +/- 5.41e-16] + [2.718281828459045 +/- 5.41e-16]*x
             >>> RRx([2,3]).log_series(3).exp_series(3)
-            [[2.000000000000000 +/- 6.97e-16], [3.00000000000000 +/- 1.61e-15], [+/- 1.49e-15]]
+            [2.000000000000000 +/- 6.97e-16] + [3.00000000000000 +/- 1.61e-15]*x + [+/- 1.49e-15]*x^2
         """
         return self._series_op(n, libgr.gr_poly_exp_series, "$f.exp_series($n)")
 
@@ -3598,9 +3598,9 @@ class gr_poly(gr_elem):
         truncated to length n.
 
             >>> QQx([4,3,2]).pow_series(QQ(1) / 2, 6)
-            [2, 3/4, 23/64, -69/512, 299/16384, 2277/131072]
+            2 + (3/4)*x + (23/64)*x^2 + (-69/512)*x^3 + (299/16384)*x^4 + (2277/131072)*x^5
             >>> (QQx([4,3,2]) ** 2).pow_series(QQ(1) / 2, 6)
-            [4, 3, 2]
+            4 + 3*x + 2*x^2
         """
         # todo
         return self._series_op_fmpz_fmpq_overloads(other, n, None, None, libgr.gr_poly_pow_series_fmpq_recurrence, "$f.pow_series($g, $n)")
