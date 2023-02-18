@@ -21,7 +21,7 @@ Memory management
 .. function:: void nmod_mat_init(nmod_mat_t mat, slong rows, slong cols, mp_limb_t n)
 
     Initialises ``mat`` to a ``rows``-by-``cols`` matrix with 
-    coefficients modulo~`n`, where `n` can be any nonzero integer that 
+    coefficients modulo `n`, where `n` can be any nonzero integer that 
     fits in a limb. All elements are set to zero.
 
 .. function:: void nmod_mat_init_set(nmod_mat_t mat, nmod_mat_t src)
@@ -71,7 +71,7 @@ Basic properties and manipulation
 
 .. function:: void nmod_mat_set_entry(nmod_mat_t mat, slong i, slong j, mp_limb_t x)
 
-    Set the entry at row `i` and column `j` of the matrix ``mat` to
+    Set the entry at row `i` and column `j` of the matrix ``mat`` to
     ``x``.
     
 .. function:: slong nmod_mat_nrows(nmod_mat_t mat)
@@ -202,7 +202,7 @@ Comparison
 
 .. function:: int nmod_mat_equal(nmod_mat_t mat1, nmod_mat_t mat2)
 
-    Returns nonzero if mat1 and mat2 have the same dimensions and elements,
+    Returns nonzero if ``mat1`` and ``mat2`` have the same dimensions and elements,
     and zero otherwise. The moduli are ignored.
 
 .. function:: int nmod_mat_is_zero_row(const nmod_mat_t mat, slong i)
