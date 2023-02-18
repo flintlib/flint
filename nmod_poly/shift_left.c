@@ -22,6 +22,12 @@ void _nmod_poly_shift_left(mp_ptr res, mp_srcptr poly, slong len, slong k)
 
 void nmod_poly_shift_left(nmod_poly_t res, const nmod_poly_t poly, slong k)
 {
+    if (nmod_poly_is_zero(poly))
+    {
+        nmod_poly_zero(res);
+        return;
+    }
+
     nmod_poly_fit_length(res, poly->length + k);
    
     _nmod_poly_shift_left(res->coeffs, poly->coeffs, poly->length, k);
