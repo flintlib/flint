@@ -98,6 +98,7 @@ Basic manipulation
 .. function:: int gr_poly_zero(gr_poly_t poly, gr_ctx_t ctx)
               int gr_poly_one(gr_poly_t poly, gr_ctx_t ctx)
               int gr_poly_neg_one(gr_poly_t poly, gr_ctx_t ctx)
+              int gr_poly_gen(gr_poly_t poly, gr_ctx_t ctx)
 
 .. function:: int gr_poly_write(gr_stream_t out, const gr_poly_t poly, gr_ctx_t ctx)
               int gr_poly_print(const gr_poly_t poly, gr_ctx_t ctx)
@@ -122,10 +123,6 @@ Basic manipulation
               int gr_poly_set_coeff_ui(gr_poly_t poly, slong n, ulong c, gr_ctx_t ctx)
               int gr_poly_set_coeff_fmpz(gr_poly_t poly, slong n, const fmpz_t c, gr_ctx_t ctx)
               int gr_poly_set_coeff_fmpq(gr_poly_t poly, slong n, const fmpq_t c, gr_ctx_t ctx)
-
-.. function:: int gr_poly_set_fmpz_poly(gr_poly_t res, const fmpz_poly_t src, gr_ctx_t ctx);
-              int gr_poly_set_fmpq_poly(gr_poly_t res, const fmpq_poly_t src, gr_ctx_t ctx);
-              int gr_poly_set_gr_poly_other(gr_poly_t res, const gr_poly_t x, gr_ctx_t x_ctx, gr_ctx_t ctx);
 
 .. function:: int gr_poly_get_coeff_scalar(gr_ptr res, const gr_poly_t poly, slong n, gr_ctx_t ctx)
 

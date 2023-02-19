@@ -80,6 +80,7 @@ gr_poly_zero(gr_poly_t poly, gr_ctx_t ctx)
 
 WARN_UNUSED_RESULT int gr_poly_one(gr_poly_t poly, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_neg_one(gr_poly_t poly, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_gen(gr_poly_t poly, gr_ctx_t ctx);
 
 int gr_poly_write(gr_stream_t out, const gr_poly_t poly, gr_ctx_t ctx);
 int gr_poly_print(const gr_poly_t poly, gr_ctx_t ctx);
