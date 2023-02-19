@@ -1544,35 +1544,85 @@ int _gr_acb_eisenstein_e(gr_ptr res, ulong k, gr_srcptr tau, gr_ctx_t ctx)
     return status;
 }
 
-/*
-GR_SPECIAL_DEF int gr_elliptic_k(gr_ptr res, gr_srcptr m, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ELLIPTIC_K)(res, m, ctx); }
-GR_SPECIAL_DEF int gr_elliptic_e(gr_ptr res, gr_srcptr m, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ELLIPTIC_E)(res, m, ctx); }
-GR_SPECIAL_DEF int gr_elliptic_pi(gr_ptr res, gr_srcptr n, gr_srcptr m, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, ELLIPTIC_PI)(res, n, m, ctx); }
-GR_SPECIAL_DEF int gr_elliptic_f(gr_ptr res, gr_srcptr phi, gr_srcptr m, int pi, gr_ctx_t ctx) { return GR_BINARY_OP_WITH_FLAG(ctx, ELLIPTIC_F)(res, phi, m, pi, ctx); }
-GR_SPECIAL_DEF int gr_elliptic_e_inc(gr_ptr res, gr_srcptr phi, gr_srcptr m, int pi, gr_ctx_t ctx) { return GR_BINARY_OP_WITH_FLAG(ctx, ELLIPTIC_E_INC)(res, phi, m, pi, ctx); }
-GR_SPECIAL_DEF int gr_elliptic_pi_inc(gr_ptr res, gr_srcptr n, gr_srcptr phi, gr_srcptr m, int pi, gr_ctx_t ctx) { return GR_TERNARY_OP_WITH_FLAG(ctx, ELLIPTIC_PI_INC)(res, n, phi, m, pi, ctx); }
+int _gr_acb_jacobi_theta(gr_ptr res1, gr_ptr res2, gr_ptr res3, gr_ptr res4, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx)
+{
+    acb_modular_theta(res1, res2, res3, res4, z, tau, ACB_CTX_PREC(ctx));
+    return (acb_is_finite(res1) && acb_is_finite(res2) && acb_is_finite(res3) && acb_is_finite(res4)) ? GR_SUCCESS : GR_UNABLE;
+}
 
-GR_SPECIAL_DEF int gr_carlson_rc(gr_ptr res, gr_srcptr x, gr_srcptr y, int flags, gr_ctx_t ctx) { return GR_BINARY_OP_WITH_FLAG(ctx, CARLSON_RC)(res, x, y, flags, ctx); }
-GR_SPECIAL_DEF int gr_carlson_rf(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, int flags, gr_ctx_t ctx) { return GR_TERNARY_OP_WITH_FLAG(ctx, CARLSON_RF)(res, x, y, z, flags, ctx); }
-GR_SPECIAL_DEF int gr_carlson_rd(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, int flags, gr_ctx_t ctx) { return GR_TERNARY_OP_WITH_FLAG(ctx, CARLSON_RD)(res, x, y, z, flags, ctx); }
-GR_SPECIAL_DEF int gr_carlson_rg(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, int flags, gr_ctx_t ctx) { return GR_TERNARY_OP_WITH_FLAG(ctx, CARLSON_RG)(res, x, y, z, flags, ctx); }
-GR_SPECIAL_DEF int gr_carlson_rj(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_srcptr w, int flags, gr_ctx_t ctx) { return GR_QUATERNARY_OP_WITH_FLAG(ctx, CARLSON_RJ)(res, x, y, z, w, flags, ctx); }
+int _gr_acb_jacobi_theta_1(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx)
+{
+    acb_t t, u, v;
+    acb_init(t);
+    acb_init(u);
+    acb_init(v);
+    acb_modular_theta(res, t, u, v, z, tau, ACB_CTX_PREC(ctx));
+    acb_clear(t);
+    acb_clear(u);
+    acb_clear(v);
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
 
-GR_SPECIAL_DEF int gr_elliptic_invariants(gr_ptr res1, gr_ptr res2, gr_srcptr tau, gr_ctx_t ctx) { return GR_BINARY_UNARY_OP(ctx, ELLIPTIC_INVARIANTS)(res1, res2, tau, ctx); }
-GR_SPECIAL_DEF int gr_elliptic_roots(gr_ptr res1, gr_ptr res2, gr_ptr res3, gr_srcptr tau, gr_ctx_t ctx) { return GR_TERNARY_UNARY_OP(ctx, ELLIPTIC_ROOTS)(res1, res2, res3, tau, ctx); }
+int _gr_acb_jacobi_theta_2(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx)
+{
+    acb_t t, u, v;
+    acb_init(t);
+    acb_init(u);
+    acb_init(v);
+    acb_modular_theta(t, res, u, v, z, tau, ACB_CTX_PREC(ctx));
+    acb_clear(t);
+    acb_clear(u);
+    acb_clear(v);
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
 
-GR_SPECIAL_DEF int gr_weierstrass_p(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, WEIERSTRASS_P)(res, z, tau, ctx); }
-GR_SPECIAL_DEF int gr_weierstrass_p_prime(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, WEIERSTRASS_P_PRIME)(res, z, tau, ctx); }
-GR_SPECIAL_DEF int gr_weierstrass_p_inv(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, WEIERSTRASS_P_INV)(res, z, tau, ctx); }
-GR_SPECIAL_DEF int gr_weierstrass_zeta(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, WEIERSTRASS_ZETA)(res, z, tau, ctx); }
-GR_SPECIAL_DEF int gr_weierstrass_sigma(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, WEIERSTRASS_SIGMA)(res, z, tau, ctx); }
+int _gr_acb_jacobi_theta_3(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx)
+{
+    acb_t t, u, v;
+    acb_init(t);
+    acb_init(u);
+    acb_init(v);
+    acb_modular_theta(t, u, res, v, z, tau, ACB_CTX_PREC(ctx));
+    acb_clear(t);
+    acb_clear(u);
+    acb_clear(v);
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
 
-*/
+int _gr_acb_jacobi_theta_4(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx)
+{
+    acb_t t, u, v;
+    acb_init(t);
+    acb_init(u);
+    acb_init(v);
+    acb_modular_theta(t, u, v, res, z, tau, ACB_CTX_PREC(ctx));
+    acb_clear(t);
+    acb_clear(u);
+    acb_clear(v);
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
 
+int _gr_acb_elliptic_k(gr_ptr res, gr_srcptr m, gr_ctx_t ctx) { acb_elliptic_k(res, m, ACB_CTX_PREC(ctx)); return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+int _gr_acb_elliptic_e(gr_ptr res, gr_srcptr m, gr_ctx_t ctx) { acb_elliptic_e(res, m, ACB_CTX_PREC(ctx)); return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+int _gr_acb_elliptic_pi(gr_ptr res, gr_srcptr n, gr_srcptr m, gr_ctx_t ctx) { acb_elliptic_pi(res, n, m, ACB_CTX_PREC(ctx)); return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+int _gr_acb_elliptic_f(gr_ptr res, gr_srcptr phi, gr_srcptr m, int pi, gr_ctx_t ctx) { acb_elliptic_f(res, phi, m, pi, ACB_CTX_PREC(ctx)); return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+int _gr_acb_elliptic_e_inc(gr_ptr res, gr_srcptr phi, gr_srcptr m, int pi, gr_ctx_t ctx) { acb_elliptic_e_inc(res, phi, m, pi, ACB_CTX_PREC(ctx)); return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+int _gr_acb_elliptic_pi_inc(gr_ptr res, gr_srcptr n, gr_srcptr phi, int pi, gr_srcptr m, gr_ctx_t ctx) { acb_elliptic_pi_inc(res, n, phi, m, pi, ACB_CTX_PREC(ctx)); return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
 
+int _gr_acb_carlson_rc(gr_ptr res, gr_srcptr x, gr_srcptr y, int flags, gr_ctx_t ctx) { acb_elliptic_rf(res, x, y, y, flags, ACB_CTX_PREC(ctx)); return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+int _gr_acb_carlson_rf(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, int flags, gr_ctx_t ctx) { acb_elliptic_rf(res, x, y, z, flags, ACB_CTX_PREC(ctx)); return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+int _gr_acb_carlson_rg(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, int flags, gr_ctx_t ctx) { acb_elliptic_rg(res, x, y, z, flags, ACB_CTX_PREC(ctx)); return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+int _gr_acb_carlson_rd(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, int flags, gr_ctx_t ctx) { acb_elliptic_rj(res, x, y, z, z, flags, ACB_CTX_PREC(ctx)); return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+int _gr_acb_carlson_rj(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_srcptr w, int flags, gr_ctx_t ctx) { acb_elliptic_rj(res, x, y, z, w, flags, ACB_CTX_PREC(ctx)); return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
 
+int _gr_acb_elliptic_invariants(gr_ptr res1, gr_ptr res2, gr_srcptr tau, gr_ctx_t ctx) { acb_elliptic_invariants(res1, res2, tau, ACB_CTX_PREC(ctx)); return (acb_is_finite(res1) && acb_is_finite(res2)) ? GR_SUCCESS : GR_UNABLE; }
+int _gr_acb_elliptic_roots(gr_ptr res1, gr_ptr res2, gr_ptr res3, gr_srcptr tau, gr_ctx_t ctx) { acb_elliptic_roots(res1, res2, res3, tau, ACB_CTX_PREC(ctx)); return (acb_is_finite(res1) && acb_is_finite(res2) && acb_is_finite(res3)) ? GR_SUCCESS : GR_UNABLE; }
 
-
+int _gr_acb_weierstrass_p(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { acb_elliptic_p(res, z, tau, ACB_CTX_PREC(ctx)); return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+int _gr_acb_weierstrass_p_prime(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { acb_elliptic_p_prime(res, z, tau, ACB_CTX_PREC(ctx)); return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+int _gr_acb_weierstrass_p_inv(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { acb_elliptic_inv_p(res, z, tau, ACB_CTX_PREC(ctx)); return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+int _gr_acb_weierstrass_zeta(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { acb_elliptic_zeta(res, z, tau, ACB_CTX_PREC(ctx)); return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+int _gr_acb_weierstrass_sigma(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { acb_elliptic_sigma(res, z, tau, ACB_CTX_PREC(ctx)); return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
 
 
 int
@@ -2036,6 +2086,34 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_EISENSTEIN_G,         (gr_funcptr) _gr_acb_eisenstein_g},
     {GR_METHOD_EISENSTEIN_E,         (gr_funcptr) _gr_acb_eisenstein_e},
     {GR_METHOD_EISENSTEIN_G_VEC,     (gr_funcptr) _gr_acb_eisenstein_g_vec},
+
+    {GR_METHOD_ELLIPTIC_K,           (gr_funcptr)  _gr_acb_elliptic_k},
+    {GR_METHOD_ELLIPTIC_E,           (gr_funcptr)  _gr_acb_elliptic_e},
+    {GR_METHOD_ELLIPTIC_PI,          (gr_funcptr)  _gr_acb_elliptic_pi},
+    {GR_METHOD_ELLIPTIC_F,           (gr_funcptr)  _gr_acb_elliptic_f},
+    {GR_METHOD_ELLIPTIC_E_INC,       (gr_funcptr)  _gr_acb_elliptic_e_inc},
+    {GR_METHOD_ELLIPTIC_PI_INC,      (gr_funcptr)  _gr_acb_elliptic_pi_inc},
+
+    {GR_METHOD_CARLSON_RC,           (gr_funcptr)  _gr_acb_carlson_rc},
+    {GR_METHOD_CARLSON_RF,           (gr_funcptr)  _gr_acb_carlson_rf},
+    {GR_METHOD_CARLSON_RG,           (gr_funcptr)  _gr_acb_carlson_rg},
+    {GR_METHOD_CARLSON_RD,           (gr_funcptr)  _gr_acb_carlson_rd},
+    {GR_METHOD_CARLSON_RJ,           (gr_funcptr)  _gr_acb_carlson_rj},
+
+    {GR_METHOD_JACOBI_THETA,         (gr_funcptr)  _gr_acb_jacobi_theta},
+    {GR_METHOD_JACOBI_THETA_1,       (gr_funcptr)  _gr_acb_jacobi_theta_1},
+    {GR_METHOD_JACOBI_THETA_2,       (gr_funcptr)  _gr_acb_jacobi_theta_2},
+    {GR_METHOD_JACOBI_THETA_3,       (gr_funcptr)  _gr_acb_jacobi_theta_3},
+    {GR_METHOD_JACOBI_THETA_4,       (gr_funcptr)  _gr_acb_jacobi_theta_4},
+
+    {GR_METHOD_ELLIPTIC_INVARIANTS,  (gr_funcptr)  _gr_acb_elliptic_invariants},
+    {GR_METHOD_ELLIPTIC_ROOTS,       (gr_funcptr)  _gr_acb_elliptic_roots},
+
+    {GR_METHOD_WEIERSTRASS_P,        (gr_funcptr)  _gr_acb_weierstrass_p},
+    {GR_METHOD_WEIERSTRASS_P_PRIME,  (gr_funcptr)  _gr_acb_weierstrass_p_prime},
+    {GR_METHOD_WEIERSTRASS_P_INV,    (gr_funcptr)  _gr_acb_weierstrass_p_inv},
+    {GR_METHOD_WEIERSTRASS_ZETA,     (gr_funcptr)  _gr_acb_weierstrass_zeta},
+    {GR_METHOD_WEIERSTRASS_SIGMA,    (gr_funcptr)  _gr_acb_weierstrass_sigma},
 
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_acb_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_acb_vec_dot_rev},

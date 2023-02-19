@@ -614,6 +614,18 @@ class gr_ctx:
             _handle_error(ctx, status, rstr, x, y, z, w)
         return res
 
+    def _quaternary_binary_op(ctx, x, y, op, rstr):
+        x = ctx._as_elem(x)
+        y = ctx._as_elem(y)
+        res1 = ctx._elem_type(context=ctx)
+        res2 = ctx._elem_type(context=ctx)
+        res3 = ctx._elem_type(context=ctx)
+        res4 = ctx._elem_type(context=ctx)
+        status = op(res1._ref, res2._ref, res3._ref, res4._ref, x._ref, y._ref, ctx._ref)
+        if status:
+            _handle_error(ctx, status, rstr, x, y)
+        return (res1, res2, res3, res4)
+
     def _binary_op_fmpz(ctx, x, y, op, rstr):
         x = ctx._as_elem(x)
         y = ctx._as_fmpz(y)
@@ -1752,20 +1764,6 @@ class gr_ctx:
         else:
             return ctx._binary_op_fmpz(x, k, libgr.gr_lambertw_fmpz, "lambertw($x, $k)")
 
-    def agm(ctx, x, y=None):
-        """
-        Arithmetic-geometric mean.
-
-            >>> RR.agm(2)
-            [1.45679103104691 +/- 3.98e-15]
-            >>> RR.agm(2, 3)
-            [2.47468043623630 +/- 4.68e-15]
-        """
-        if y is None:
-            return ctx._unary_op(x, libgr.gr_agm1, "agm1($x)")
-        else:
-            return ctx._binary_op(x, y, libgr.gr_agm, "agm($x, $y)")
-
     def bernoulli(ctx, n):
         """
         Bernoulli number `B_n` as an element of this domain.
@@ -2266,6 +2264,125 @@ class gr_ctx:
             [[3.1512120021539 +/- 3.41e-14], [+/- 4.40e-14], [4.255773035365 +/- 2.12e-13]]
         """
         return ctx._op_vec_arg_len(tau, n, libgr.gr_eisenstein_g_vec, "eisenstein_g_vec($tau, $n)")
+
+    def agm(ctx, x, y=None):
+        """
+        Arithmetic-geometric mean.
+
+            >>> RR.agm(2)
+            [1.45679103104691 +/- 3.98e-15]
+            >>> RR.agm(2, 3)
+            [2.47468043623630 +/- 4.68e-15]
+        """
+        if y is None:
+            return ctx._unary_op(x, libgr.gr_agm1, "agm1($x)")
+        else:
+            return ctx._binary_op(x, y, libgr.gr_agm, "agm($x, $y)")
+
+    def elliptic_k(ctx, m):
+        return ctx._unary_op(m, libgr.gr_elliptic_k, "elliptic_k($m)")
+
+    def elliptic_e(ctx, m):
+        return ctx._unary_op(m, libgr.gr_elliptic_e, "elliptic_e($m)")
+
+    def elliptic_pi(ctx, n, m):
+        return ctx._binary_op(n, m, libgr.gr_elliptic_pi, "elliptic_pi($n, $m)")
+
+    def elliptic_f(ctx, phi, m, pi=0):
+        return ctx._binary_op_with_flag(phi, m, pi, libgr.gr_elliptic_f, "elliptic_f($phi, $m, $pi)")
+
+    def elliptic_e_inc(ctx, phi, m, pi=0):
+        return ctx._binary_op_with_flag(phi, m, pi, libgr.gr_elliptic_e_inc, "elliptic_e_inc($phi, $m, $pi)")
+
+    def elliptic_pi_inc(ctx, n, phi, m, pi=0):
+        return ctx._ternary_op_with_flag(n, phi, m, pi, libgr.gr_elliptic_pi_inc, "elliptic_pi_inc($n, $phi, $m, $pi)")
+
+    def carlson_rc(ctx, x, y, flags=0):
+        return ctx._binary_op_with_flag(x, y, flags, libgr.gr_carlson_rc, "carlson_rc($x, $y)")
+
+    def carlson_rf(ctx, x, y, z, flags=0):
+        return ctx._ternary_op_with_flag(x, y, z, flags, libgr.gr_carlson_rf, "carlson_rf($x, $y, $z)")
+
+    def carlson_rg(ctx, x, y, z, flags=0):
+        return ctx._ternary_op_with_flag(x, y, z, flags, libgr.gr_carlson_rg, "carlson_rg($x, $y, $z)")
+
+    def carlson_rd(ctx, x, y, z, flags=0):
+        return ctx._ternary_op_with_flag(x, y, z, flags, libgr.gr_carlson_rd, "carlson_rd($x, $y, $z)")
+
+    def carlson_rj(ctx, x, y, z, w, flags=0):
+        return ctx._quaternary_op_with_flag(x, y, z, w, flags, libgr.gr_carlson_rd, "carlson_rj($x, $y, $z, $w)")
+
+    def jacobi_theta(ctx, z, tau):
+        """
+        Simultaneous computation of the four Jacobi theta functions.
+
+            >>> CC.jacobi_theta(0.125, 1j)
+            ([0.347386687929454 +/- 3.21e-16], [0.843115469091413 +/- 8.18e-16], [1.061113709291166 +/- 5.74e-16], [0.938886290708834 +/- 3.52e-16])
+        """
+        return ctx._quaternary_binary_op(z, tau, libgr.gr_jacobi_theta, "jacobi_theta($z, $tau)")
+
+    def jacobi_theta_1(ctx, z, tau):
+        """
+        Jacobi theta function.
+
+            >>> CC.jacobi_theta_1(0.125, 1j)
+            [0.347386687929454 +/- 3.21e-16]
+        """
+        return ctx._binary_op(z, tau, libgr.gr_jacobi_theta_1, "jacobi_theta_1($z, $tau)")
+
+    def jacobi_theta_2(ctx, z, tau):
+        """
+        Jacobi theta function.
+
+            >>> CC.jacobi_theta_2(0.125, 1j)
+            [0.843115469091413 +/- 8.18e-16]
+        """
+        return ctx._binary_op(z, tau, libgr.gr_jacobi_theta_2, "jacobi_theta_2($z, $tau)")
+
+    def jacobi_theta_3(ctx, z, tau):
+        """
+        Jacobi theta function.
+
+            >>> CC.jacobi_theta_3(0.125, 1j)
+            [1.061113709291166 +/- 5.74e-16]
+        """
+        return ctx._binary_op(z, tau, libgr.gr_jacobi_theta_3, "jacobi_theta_3($z, $tau)")
+
+    def jacobi_theta_4(ctx, z, tau):
+        """
+        Jacobi theta function.
+
+            >>> CC.jacobi_theta_4(0.125, 1j)
+            [0.938886290708834 +/- 3.52e-16]
+        """
+        return ctx._binary_op(z, tau, libgr.gr_jacobi_theta_4, "jacobi_theta_4($z, $tau)")
+
+    def elliptic_invariants(ctx, tau):
+        return ctx._unary_unary_op(tau, libgr.gr_elliptic_invariants, "elliptic_invariants($tau)")
+
+    def elliptic_roots(ctx, tau):
+        return ctx._ternary_unary_op(tau, libgr.gr_elliptic_roots, "elliptic_roots($tau)")
+
+    def weierstrass_p(ctx, z, tau):
+        return ctx._binary_op(z, tau, libgr.gr_weierstrass_p, "weierstrass_p($z, $tau)")
+
+    def weierstrass_p_prime(ctx, z, tau):
+        return ctx._binary_op(z, tau, libgr.gr_weierstrass_p_prime, "weierstrass_p_prime($z, $tau)")
+
+    def weierstrass_p_inv(ctx, z, tau):
+        """
+        Inverse Weierstrass elliptic function.
+
+            >>> CC.weierstrass_p(CC.weierstrass_p_inv(0.5, 1j), 1j)
+            ([0.50000000000 +/- 4.61e-12] + [+/- 6.98e-12]*I)
+        """
+        return ctx._binary_op(z, tau, libgr.gr_weierstrass_p_inv, "weierstrass_p_inv($z, $tau)")
+
+    def weierstrass_zeta(ctx, z, tau):
+        return ctx._binary_op(z, tau, libgr.gr_weierstrass_zeta, "weierstrass_zeta($z, $tau)")
+
+    def weierstrass_sigma(ctx, z, tau):
+        return ctx._binary_op(z, tau, libgr.gr_weierstrass_sigma, "weierstrass_sigma($z, $tau)")
 
 
 def _gr_set_int(self, val):
