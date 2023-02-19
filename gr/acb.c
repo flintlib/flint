@@ -1429,7 +1429,6 @@ int _gr_acb_stieltjes(acb_t res, const fmpz_t n, const acb_t a, const gr_ctx_t c
     return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-
 int
 _gr_acb_dirichlet_eta(acb_t res, const acb_t x, const gr_ctx_t ctx)
 {
@@ -1487,6 +1486,94 @@ _gr_acb_zeta_nzeros(acb_t res, const acb_t t, const gr_ctx_t ctx)
     arb_zero(acb_imagref(res));
     return GR_SUCCESS;
 }
+
+int _gr_acb_modular_j(gr_ptr res, gr_srcptr tau, gr_ctx_t ctx) { acb_modular_j(res, tau, ACB_CTX_PREC(ctx)); return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+int _gr_acb_modular_lambda(gr_ptr res, gr_srcptr tau, gr_ctx_t ctx) { acb_modular_lambda(res, tau, ACB_CTX_PREC(ctx)); return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+int _gr_acb_modular_delta(gr_ptr res, gr_srcptr tau, gr_ctx_t ctx) { acb_modular_delta(res, tau, ACB_CTX_PREC(ctx)); return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+int _gr_acb_dedekind_eta(gr_ptr res, gr_srcptr tau, gr_ctx_t ctx) { acb_modular_eta(res, tau, ACB_CTX_PREC(ctx)); return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+
+int _gr_acb_eisenstein_g(gr_ptr res, ulong k, gr_srcptr tau, gr_ctx_t ctx)
+{
+    if (k == 0 || k % 2 == 1)
+        return GR_DOMAIN;
+
+    if (k == 2)
+    {
+        acb_t t;
+        acb_init(t);
+        acb_set_d(t, 0.5);
+        acb_elliptic_zeta(res, t, tau, ACB_CTX_PREC(ctx));
+        acb_mul_2exp_si(res, res, 1);
+        acb_clear(t);
+    }
+    else   /* todo: better algorithm */
+    {
+        acb_ptr t;
+
+        t = _acb_vec_init(k / 2 - 1);
+        acb_modular_eisenstein(t, tau, k / 2 - 1, ACB_CTX_PREC(ctx));
+        acb_swap((acb_ptr) res, t + (k / 2 - 2));
+        _acb_vec_clear(t, k / 2 - 1);
+    }
+
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_acb_eisenstein_g_vec(gr_ptr res, gr_srcptr tau, slong len, gr_ctx_t ctx)
+{
+    acb_modular_eisenstein(res, tau,  len, ACB_CTX_PREC(ctx));
+    return _arb_vec_is_finite(res, 2 * len) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int _gr_acb_eisenstein_e(gr_ptr res, ulong k, gr_srcptr tau, gr_ctx_t ctx)
+{
+    int status;
+
+    status = _gr_acb_eisenstein_g(res, k, tau, ctx);
+
+    if (status == GR_SUCCESS)
+    {
+        arb_t t;
+        arb_init(t);
+        arb_zeta_ui(t, k, ACB_CTX_PREC(ctx));
+        acb_div_arb(res, res, t, ACB_CTX_PREC(ctx));
+        acb_mul_2exp_si(res, res, -1);
+        arb_clear(t);
+    }
+
+    return status;
+}
+
+/*
+GR_SPECIAL_DEF int gr_elliptic_k(gr_ptr res, gr_srcptr m, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ELLIPTIC_K)(res, m, ctx); }
+GR_SPECIAL_DEF int gr_elliptic_e(gr_ptr res, gr_srcptr m, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ELLIPTIC_E)(res, m, ctx); }
+GR_SPECIAL_DEF int gr_elliptic_pi(gr_ptr res, gr_srcptr n, gr_srcptr m, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, ELLIPTIC_PI)(res, n, m, ctx); }
+GR_SPECIAL_DEF int gr_elliptic_f(gr_ptr res, gr_srcptr phi, gr_srcptr m, int pi, gr_ctx_t ctx) { return GR_BINARY_OP_WITH_FLAG(ctx, ELLIPTIC_F)(res, phi, m, pi, ctx); }
+GR_SPECIAL_DEF int gr_elliptic_e_inc(gr_ptr res, gr_srcptr phi, gr_srcptr m, int pi, gr_ctx_t ctx) { return GR_BINARY_OP_WITH_FLAG(ctx, ELLIPTIC_E_INC)(res, phi, m, pi, ctx); }
+GR_SPECIAL_DEF int gr_elliptic_pi_inc(gr_ptr res, gr_srcptr n, gr_srcptr phi, gr_srcptr m, int pi, gr_ctx_t ctx) { return GR_TERNARY_OP_WITH_FLAG(ctx, ELLIPTIC_PI_INC)(res, n, phi, m, pi, ctx); }
+
+GR_SPECIAL_DEF int gr_carlson_rc(gr_ptr res, gr_srcptr x, gr_srcptr y, int flags, gr_ctx_t ctx) { return GR_BINARY_OP_WITH_FLAG(ctx, CARLSON_RC)(res, x, y, flags, ctx); }
+GR_SPECIAL_DEF int gr_carlson_rf(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, int flags, gr_ctx_t ctx) { return GR_TERNARY_OP_WITH_FLAG(ctx, CARLSON_RF)(res, x, y, z, flags, ctx); }
+GR_SPECIAL_DEF int gr_carlson_rd(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, int flags, gr_ctx_t ctx) { return GR_TERNARY_OP_WITH_FLAG(ctx, CARLSON_RD)(res, x, y, z, flags, ctx); }
+GR_SPECIAL_DEF int gr_carlson_rg(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, int flags, gr_ctx_t ctx) { return GR_TERNARY_OP_WITH_FLAG(ctx, CARLSON_RG)(res, x, y, z, flags, ctx); }
+GR_SPECIAL_DEF int gr_carlson_rj(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_srcptr w, int flags, gr_ctx_t ctx) { return GR_QUATERNARY_OP_WITH_FLAG(ctx, CARLSON_RJ)(res, x, y, z, w, flags, ctx); }
+
+GR_SPECIAL_DEF int gr_elliptic_invariants(gr_ptr res1, gr_ptr res2, gr_srcptr tau, gr_ctx_t ctx) { return GR_BINARY_UNARY_OP(ctx, ELLIPTIC_INVARIANTS)(res1, res2, tau, ctx); }
+GR_SPECIAL_DEF int gr_elliptic_roots(gr_ptr res1, gr_ptr res2, gr_ptr res3, gr_srcptr tau, gr_ctx_t ctx) { return GR_TERNARY_UNARY_OP(ctx, ELLIPTIC_ROOTS)(res1, res2, res3, tau, ctx); }
+
+GR_SPECIAL_DEF int gr_weierstrass_p(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, WEIERSTRASS_P)(res, z, tau, ctx); }
+GR_SPECIAL_DEF int gr_weierstrass_p_prime(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, WEIERSTRASS_P_PRIME)(res, z, tau, ctx); }
+GR_SPECIAL_DEF int gr_weierstrass_p_inv(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, WEIERSTRASS_P_INV)(res, z, tau, ctx); }
+GR_SPECIAL_DEF int gr_weierstrass_zeta(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, WEIERSTRASS_ZETA)(res, z, tau, ctx); }
+GR_SPECIAL_DEF int gr_weierstrass_sigma(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, WEIERSTRASS_SIGMA)(res, z, tau, ctx); }
+
+*/
+
+
+
+
+
+
 
 int
 _gr_acb_vec_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr vec1, acb_srcptr vec2, slong len, gr_ctx_t ctx)
@@ -1941,6 +2028,15 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_ZETA_ZERO,            (gr_funcptr) _gr_acb_zeta_zero},
     {GR_METHOD_ZETA_ZERO_VEC,        (gr_funcptr) _gr_acb_zeta_zero_vec},
     {GR_METHOD_ZETA_NZEROS,          (gr_funcptr) _gr_acb_zeta_nzeros},
+
+    {GR_METHOD_MODULAR_J,            (gr_funcptr) _gr_acb_modular_j},
+    {GR_METHOD_MODULAR_DELTA,        (gr_funcptr) _gr_acb_modular_delta},
+    {GR_METHOD_MODULAR_LAMBDA,       (gr_funcptr) _gr_acb_modular_lambda},
+    {GR_METHOD_DEDEKIND_ETA,         (gr_funcptr) _gr_acb_dedekind_eta},
+    {GR_METHOD_EISENSTEIN_G,         (gr_funcptr) _gr_acb_eisenstein_g},
+    {GR_METHOD_EISENSTEIN_E,         (gr_funcptr) _gr_acb_eisenstein_e},
+    {GR_METHOD_EISENSTEIN_G_VEC,     (gr_funcptr) _gr_acb_eisenstein_g_vec},
+
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_acb_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_acb_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_acb_poly_mullow},

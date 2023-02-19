@@ -623,6 +623,15 @@ class gr_ctx:
             _handle_error(ctx, status, rstr, x, y)
         return res
 
+    def _ui_binary_op(ctx, n, x, op, rstr):
+        n = ctx._as_ui(n)
+        x = ctx._as_elem(x)
+        res = ctx._elem_type(context=ctx)
+        status = op(res._ref, n, x._ref, ctx._ref)
+        if status:
+            _handle_error(ctx, status, rstr, n, x)
+        return res
+
     def _op_fmpz(ctx, x, op, rstr):
         x = ctx._as_fmpz(x)
         res = ctx._elem_type(context=ctx)
@@ -2164,6 +2173,42 @@ class gr_ctx:
             _handle_error(ctx, status, "dirichlet_chi($n, $chi)", n, chi)
         return res
 
+    def modular_j(ctx, tau):
+        """
+        j-invariant j(tau).
+
+            >>> CC.modular_j(1j)
+            [1728.0000000000 +/- 5.10e-11]
+        """
+        return ctx._unary_op(tau, libgr.gr_modular_j, "modular_j($tau)")
+
+    def modular_lambda(ctx, tau):
+        """
+        Modular lambda function lambda(tau).
+
+            >>> CC.modular_lambda(1j)
+            [0.50000000000000 +/- 2.16e-15]
+        """
+        return ctx._unary_op(tau, libgr.gr_modular_lambda, "modular_lambda($tau)")
+
+    def modular_delta(ctx, tau):
+        """
+        Modular discriminant delta(tau).
+
+            >>> CC.modular_delta(1j)
+            [0.0017853698506421 +/- 6.01e-17]
+        """
+        return ctx._unary_op(tau, libgr.gr_modular_delta, "modular_delta($tau)")
+
+    def dedekind_eta(ctx, tau):
+        """
+        Dedekind eta function eta(tau).
+
+            >>> CC.dedekind_eta(1j)
+            [0.768225422326057 +/- 9.03e-16]
+        """
+        return ctx._unary_op(tau, libgr.gr_dedekind_eta, "dedekind_eta($tau)")
+
     def hilbert_class_poly(ctx, D, x):
         """
         Hilbert class polynomial H_D(x) evaluated at x.
@@ -2185,6 +2230,42 @@ class gr_ctx:
         if status:
             _handle_error(ctx, status, "hilbert_class_poly($D, $x)", D, x)
         return res
+
+    def eisenstein_g(ctx, n, tau):
+        """
+        Eisenstein series G_n(tau).
+
+            >>> CC.eisenstein_g(2, 1j)
+            [3.14159265358979 +/- 8.71e-15]
+            >>> CC.eisenstein_g(4, 1j); RR.gamma(0.25)**8 / (960 * RR.pi()**2)
+            [3.1512120021539 +/- 3.41e-14]
+            [3.15121200215390 +/- 7.72e-15]
+
+        """
+        return ctx._ui_binary_op(n, tau, libgr.gr_eisenstein_g, "eisenstein_g($n, $tau)")
+
+    def eisenstein_e(ctx, n, tau):
+        """
+        Eisenstein series E_n(tau).
+
+            >>> CC.eisenstein_e(2, 1j)
+            [0.95492965855137 +/- 3.85e-15]
+            >>> CC.eisenstein_e(4, 1j); 3*RR.gamma(0.25)**8/(64*RR.pi()**6)
+            [1.4557628922687 +/- 1.32e-14]
+            [1.45576289226871 +/- 3.76e-15]
+
+        """
+        return ctx._ui_binary_op(n, tau, libgr.gr_eisenstein_e, "eisenstein_e($n, $tau)")
+
+    def eisenstein_g_vec(ctx, tau, n):
+        """
+        Vector of Eisenstein series [G_4(tau), G_6(tau), ...].
+        Note that G_2(tau) is omitted.
+
+            >>> CC.eisenstein_g_vec(1j, 3)
+            [[3.1512120021539 +/- 3.41e-14], [+/- 4.40e-14], [4.255773035365 +/- 2.12e-13]]
+        """
+        return ctx._op_vec_arg_len(tau, n, libgr.gr_eisenstein_g_vec, "eisenstein_g_vec($tau, $n)")
 
 
 def _gr_set_int(self, val):
