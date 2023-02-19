@@ -86,7 +86,7 @@ gr_poly_sqrt_series_newton(gr_poly_t res, const gr_poly_t h, slong len, slong cu
 
     hlen = h->length;
 
-    if (len == 0 || len == 0)
+    if (hlen == 0 || len == 0)
         return gr_poly_zero(res, ctx);
 
     if (hlen == 1)

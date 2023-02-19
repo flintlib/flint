@@ -317,10 +317,55 @@ Elliptic integrals
 .. function:: int gr_agm1(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
               int gr_agm(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 
-Elliptic and modular functions
+.. function:: int gr_elliptic_k(gr_ptr res, gr_srcptr m, gr_ctx_t ctx)
+              int gr_elliptic_e(gr_ptr res, gr_srcptr m, gr_ctx_t ctx)
+              int gr_elliptic_pi(gr_ptr res, gr_srcptr n, gr_srcptr m, gr_ctx_t ctx)
+              int gr_elliptic_f(gr_ptr res, gr_srcptr phi, gr_srcptr m, int pi, gr_ctx_t ctx)
+              int gr_elliptic_e_inc(gr_ptr res, gr_srcptr phi, gr_srcptr m, int pi, gr_ctx_t ctx)
+              int gr_elliptic_pi_inc(gr_ptr res, gr_srcptr n, gr_srcptr phi, gr_srcptr m, int pi, gr_ctx_t ctx)
+
+.. function:: int gr_carlson_rc(gr_ptr res, gr_srcptr x, gr_srcptr y, int flags, gr_ctx_t ctx)
+              int gr_carlson_rf(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, int flags, gr_ctx_t ctx)
+              int gr_carlson_rd(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, int flags, gr_ctx_t ctx)
+              int gr_carlson_rg(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, int flags, gr_ctx_t ctx)
+              int gr_carlson_rj(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_srcptr w, int flags, gr_ctx_t ctx)
+
+Elliptic, modular and theta functions
 --------------------------------------------------------------------------------
 
+.. function:: int gr_jacobi_theta(gr_ptr res1, gr_ptr res2, gr_ptr res3, gr_ptr res4, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx)
+              int gr_jacobi_theta_1(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx)
+              int gr_jacobi_theta_2(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx)
+              int gr_jacobi_theta_3(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx)
+              int gr_jacobi_theta_4(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx)
 
+.. function:: int gr_jacobi_theta_q(gr_ptr res1, gr_ptr res2, gr_ptr res3, gr_ptr res4, gr_srcptr w, gr_srcptr q, gr_ctx_t ctx)
+              int gr_jacobi_theta_q_1(gr_ptr res, gr_srcptr w, gr_srcptr q, gr_ctx_t ctx)
+              int gr_jacobi_theta_q_2(gr_ptr res, gr_srcptr w, gr_srcptr q, gr_ctx_t ctx)
+              int gr_jacobi_theta_q_3(gr_ptr res, gr_srcptr w, gr_srcptr q, gr_ctx_t ctx)
+              int gr_jacobi_theta_q_4(gr_ptr res, gr_srcptr w, gr_srcptr q, gr_ctx_t ctx)
+
+.. function:: int gr_dedekind_eta(gr_ptr res, gr_srcptr tau, gr_ctx_t ctx)
+              int gr_dedekind_eta_q(gr_ptr res, gr_srcptr tau, gr_ctx_t ctx)
+
+.. function:: int gr_modular_j(gr_ptr res, gr_srcptr tau, gr_ctx_t ctx)
+              int gr_modular_lambda(gr_ptr res, gr_srcptr tau, gr_ctx_t ctx)
+              int gr_modular_delta(gr_ptr res, gr_srcptr tau, gr_ctx_t ctx)
+
+.. function:: int gr_hilbert_class_poly(gr_ptr res, slong D, gr_srcptr x, gr_ctx_t ctx)
+
+.. function:: int gr_eisenstein_e(gr_ptr res, ulong n, gr_srcptr tau, gr_ctx_t ctx)
+              int gr_eisenstein_g(gr_ptr res, ulong n, gr_srcptr tau, gr_ctx_t ctx)
+              int gr_eisenstein_g_vec(gr_ptr res, gr_srcptr tau, slong len, gr_ctx_t ctx)
+
+.. function:: int gr_elliptic_invariants(gr_ptr res1, gr_ptr res2, gr_srcptr tau, gr_ctx_t ctx)
+              int gr_elliptic_roots(gr_ptr res1, gr_ptr res2, gr_ptr res3, gr_srcptr tau, gr_ctx_t ctx)
+
+.. function:: int gr_weierstrass_p(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx)
+              int gr_weierstrass_p_prime(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx)
+              int gr_weierstrass_p_inv(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx)
+              int gr_weierstrass_zeta(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx)
+              int gr_weierstrass_sigma(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx)
 
 .. raw:: latex
 

@@ -2164,6 +2164,27 @@ class gr_ctx:
             _handle_error(ctx, status, "dirichlet_chi($n, $chi)", n, chi)
         return res
 
+    def hilbert_class_poly(ctx, D, x):
+        """
+        Hilbert class polynomial H_D(x) evaluated at x.
+
+            >>> ZZx.hilbert_class_poly(-20, ZZx.gen())
+            -681472000 - 1264000*x + x^2
+            >>> CC.hilbert_class_poly(-20, 1+1j)
+            (-682736000.0000000 - 1263998.000000000*I)
+            >>> ZZx.hilbert_class_poly(-21, ZZx.gen())
+            Traceback (most recent call last):
+              ...
+            FlintDomainError: hilbert_class_poly(D, x) is not an element of {Ring of polynomials over Integer ring (fmpz)} for {D = -21}, {x = x}
+        """
+        D = ctx._as_si(D)
+        x = ctx._as_elem(x)
+        res = ctx._elem_type(context=ctx)
+        libgr.gr_hilbert_class_poly.argtypes = (ctypes.c_void_p, c_slong, ctypes.c_void_p, ctypes.c_void_p)
+        status = libgr.gr_hilbert_class_poly(res._ref, D, x._ref, ctx._ref)
+        if status:
+            _handle_error(ctx, status, "hilbert_class_poly($D, $x)", D, x)
+        return res
 
 
 def _gr_set_int(self, val):
@@ -4298,6 +4319,8 @@ class gr_vec(gr_elem):
 
 
 PolynomialRing = PolynomialRing_gr_poly
+PowerSeriesRing = PowerSeriesRing_gr_series
+PowerSeriesModRing = PowerSeriesModRing_gr_series
 
 ZZ = IntegerRing_fmpz()
 QQ = RationalField_fmpq()
@@ -4339,10 +4362,18 @@ MatCF = Mat(CF)
 
 ZZx = PolynomialRing_gr_poly(ZZ)
 QQx = PolynomialRing_gr_poly(QQ)
-RRx_ca = PolynomialRing_gr_poly(RR_ca)
-CCx_ca = PolynomialRing_gr_poly(CC_ca)
 RRx = RRx_arb = PolynomialRing_gr_poly(RR_arb)
 CCx = CCx_acb = PolynomialRing_gr_poly(CC_acb)
+RRx_ca = PolynomialRing_gr_poly(RR_ca)
+CCx_ca = PolynomialRing_gr_poly(CC_ca)
+
+ZZser = PowerSeriesRing(ZZ)
+QQser = PowerSeriesRing(QQ)
+RRser = RRser_arb = PowerSeriesRing(RR_arb)
+CCser = CCser_acb = PowerSeriesRing(CC_acb)
+RRser_ca = PowerSeriesRing(RR_ca)
+CCser_ca = PowerSeriesRing(CC_ca)
+
 
 ModularGroup = ModularGroup_psl2z
 DirichletGroup = DirichletGroup_dirichlet_char

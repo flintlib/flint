@@ -261,52 +261,66 @@ WARN_UNUSED_RESULT int gr_dirichlet_hardy_z(gr_ptr res, const dirichlet_group_t 
 
 #endif
 
+GR_SPECIAL_DEF int gr_jacobi_theta(gr_ptr res1, gr_ptr res2, gr_ptr res3, gr_ptr res4, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { return GR_QUATERNARY_BINARY_OP(ctx, JACOBI_THETA)(res1, res2, res3, res4, z, tau, ctx); }
+GR_SPECIAL_DEF int gr_jacobi_theta_1(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, JACOBI_THETA_1)(res, z, tau, ctx); }
+GR_SPECIAL_DEF int gr_jacobi_theta_2(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, JACOBI_THETA_2)(res, z, tau, ctx); }
+GR_SPECIAL_DEF int gr_jacobi_theta_3(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, JACOBI_THETA_3)(res, z, tau, ctx); }
+GR_SPECIAL_DEF int gr_jacobi_theta_4(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, JACOBI_THETA_4)(res, z, tau, ctx); }
+GR_SPECIAL_DEF int gr_jacobi_theta_q(gr_ptr res1, gr_ptr res2, gr_ptr res3, gr_ptr res4, gr_srcptr w, gr_srcptr q, gr_ctx_t ctx) { return GR_QUATERNARY_BINARY_OP(ctx, JACOBI_THETA_Q)(res1, res2, res3, res4, w, q, ctx); }
+GR_SPECIAL_DEF int gr_jacobi_theta_q_1(gr_ptr res, gr_srcptr w, gr_srcptr q, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, JACOBI_THETA_Q_1)(res, w, q, ctx); }
+GR_SPECIAL_DEF int gr_jacobi_theta_q_2(gr_ptr res, gr_srcptr w, gr_srcptr q, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, JACOBI_THETA_Q_2)(res, w, q, ctx); }
+GR_SPECIAL_DEF int gr_jacobi_theta_q_3(gr_ptr res, gr_srcptr w, gr_srcptr q, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, JACOBI_THETA_Q_3)(res, w, q, ctx); }
+GR_SPECIAL_DEF int gr_jacobi_theta_q_4(gr_ptr res, gr_srcptr w, gr_srcptr q, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, JACOBI_THETA_Q_4)(res, w, q, ctx); }
+
+GR_SPECIAL_DEF int gr_modular_j(gr_ptr res, gr_srcptr tau, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, MODULAR_J)(res, tau, ctx); }
+GR_SPECIAL_DEF int gr_modular_lambda(gr_ptr res, gr_srcptr tau, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, MODULAR_LAMBDA)(res, tau, ctx); }
+GR_SPECIAL_DEF int gr_modular_delta(gr_ptr res, gr_srcptr tau, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, MODULAR_DELTA)(res, tau, ctx); }
+
+GR_SPECIAL_DEF int gr_hilbert_class_poly(gr_ptr res, slong D, gr_srcptr x, gr_ctx_t ctx) { return GR_SI_BINARY_OP(ctx, HILBERT_CLASS_POLY)(res, D, x, ctx); }
+
+GR_SPECIAL_DEF int gr_dedekind_eta(gr_ptr res, gr_srcptr tau, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, DEDEKIND_ETA)(res, tau, ctx); }
+GR_SPECIAL_DEF int gr_dedekind_eta_q(gr_ptr res, gr_srcptr tau, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, DEDEKIND_ETA_Q)(res, tau, ctx); }
+
+GR_SPECIAL_DEF int gr_eisenstein_e(gr_ptr res, ulong n, gr_srcptr tau, gr_ctx_t ctx) { return GR_UI_BINARY_OP(ctx, EISENSTEIN_E)(res, n, tau, ctx); }
+GR_SPECIAL_DEF int gr_eisenstein_g(gr_ptr res, ulong n, gr_srcptr tau, gr_ctx_t ctx) { return GR_UI_BINARY_OP(ctx, EISENSTEIN_G)(res, n, tau, ctx); }
+GR_SPECIAL_DEF int gr_eisenstein_g_vec(gr_ptr res, gr_srcptr tau, slong len, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, EISENSTEIN_G_VEC)(res, tau, len, ctx); }
+
 GR_SPECIAL_DEF int gr_agm1(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, AGM1)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_agm(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, AGM)(res, x, y, ctx); }
 
+GR_SPECIAL_DEF int gr_elliptic_k(gr_ptr res, gr_srcptr m, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ELLIPTIC_K)(res, m, ctx); }
+GR_SPECIAL_DEF int gr_elliptic_e(gr_ptr res, gr_srcptr m, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ELLIPTIC_E)(res, m, ctx); }
+GR_SPECIAL_DEF int gr_elliptic_pi(gr_ptr res, gr_srcptr n, gr_srcptr m, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, ELLIPTIC_PI)(res, n, m, ctx); }
+GR_SPECIAL_DEF int gr_elliptic_f(gr_ptr res, gr_srcptr phi, gr_srcptr m, int pi, gr_ctx_t ctx) { return GR_BINARY_OP_WITH_FLAG(ctx, ELLIPTIC_F)(res, phi, m, pi, ctx); }
+GR_SPECIAL_DEF int gr_elliptic_e_inc(gr_ptr res, gr_srcptr phi, gr_srcptr m, int pi, gr_ctx_t ctx) { return GR_BINARY_OP_WITH_FLAG(ctx, ELLIPTIC_E_INC)(res, phi, m, pi, ctx); }
+GR_SPECIAL_DEF int gr_elliptic_pi_inc(gr_ptr res, gr_srcptr n, gr_srcptr phi, gr_srcptr m, int pi, gr_ctx_t ctx) { return GR_TERNARY_OP_WITH_FLAG(ctx, ELLIPTIC_PI_INC)(res, n, phi, m, pi, ctx); }
+
+GR_SPECIAL_DEF int gr_carlson_rc(gr_ptr res, gr_srcptr x, gr_srcptr y, int flags, gr_ctx_t ctx) { return GR_BINARY_OP_WITH_FLAG(ctx, CARLSON_RC)(res, x, y, flags, ctx); }
+GR_SPECIAL_DEF int gr_carlson_rf(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, int flags, gr_ctx_t ctx) { return GR_TERNARY_OP_WITH_FLAG(ctx, CARLSON_RF)(res, x, y, z, flags, ctx); }
+GR_SPECIAL_DEF int gr_carlson_rd(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, int flags, gr_ctx_t ctx) { return GR_TERNARY_OP_WITH_FLAG(ctx, CARLSON_RD)(res, x, y, z, flags, ctx); }
+GR_SPECIAL_DEF int gr_carlson_rg(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, int flags, gr_ctx_t ctx) { return GR_TERNARY_OP_WITH_FLAG(ctx, CARLSON_RG)(res, x, y, z, flags, ctx); }
+GR_SPECIAL_DEF int gr_carlson_rj(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_srcptr z, gr_srcptr w, int flags, gr_ctx_t ctx) { return GR_QUATERNARY_OP_WITH_FLAG(ctx, CARLSON_RJ)(res, x, y, z, w, flags, ctx); }
+
+GR_SPECIAL_DEF int gr_elliptic_invariants(gr_ptr res1, gr_ptr res2, gr_srcptr tau, gr_ctx_t ctx) { return GR_BINARY_UNARY_OP(ctx, ELLIPTIC_INVARIANTS)(res1, res2, tau, ctx); }
+GR_SPECIAL_DEF int gr_elliptic_roots(gr_ptr res1, gr_ptr res2, gr_ptr res3, gr_srcptr tau, gr_ctx_t ctx) { return GR_TERNARY_UNARY_OP(ctx, ELLIPTIC_ROOTS)(res1, res2, res3, tau, ctx); }
+
+GR_SPECIAL_DEF int gr_weierstrass_p(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, WEIERSTRASS_P)(res, z, tau, ctx); }
+GR_SPECIAL_DEF int gr_weierstrass_p_prime(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, WEIERSTRASS_P_PRIME)(res, z, tau, ctx); }
+GR_SPECIAL_DEF int gr_weierstrass_p_inv(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, WEIERSTRASS_P_INV)(res, z, tau, ctx); }
+GR_SPECIAL_DEF int gr_weierstrass_zeta(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, WEIERSTRASS_ZETA)(res, z, tau, ctx); }
+GR_SPECIAL_DEF int gr_weierstrass_sigma(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, WEIERSTRASS_SIGMA)(res, z, tau, ctx); }
 
 
 /* todo
 
 
-    GR_METHOD_BERNPOLY_UI,
-    GR_METHOD_EULERPOLY_UI,
-
-    gr_jacobi_theta
-    gr_dedekind_eta
-    gr_modular_j
-    gr_modular_lambda
-    gr_modular_delta
-    gr_eisenstein_g_vec
-
-    gr_hilbert_class_poly
-
-    gr_elliptic_k
-    gr_elliptic_e
-    gr_elliptic_pi
-    gr_elliptic_f
-    gr_elliptic_e_inc
-    gr_elliptic_pi_inc
-
-    gr_elliptic_rc
-    gr_elliptic_rf
-    gr_elliptic_rg
-    gr_elliptic_rd
-    gr_elliptic_rj
-
-    gr_elliptic_roots
-    gr_elliptic_invariants
-    gr_weierstrass_p
-    gr_weierstrass_p_jet
-    gr_weierstrass_p_inv
-    gr_weierstrass_zeta
-    gr_weierstrass_sigma
-
+    bernoulli
+    eulerpoly
     zeta_ui_vec
 
     cyclotomic
-    dedekind sum
-    moebius
+    dedekind_sum
+    moebius, ...
     prime_pi, primorial
     etc
 
@@ -361,6 +375,8 @@ WARN_UNUSED_RESULT int gr_generic_chebyshev_t2_fmpz(gr_ptr a, gr_ptr b, const fm
 WARN_UNUSED_RESULT int gr_generic_chebyshev_t_fmpz(gr_ptr y, const fmpz_t n, gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_chebyshev_u2_fmpz(gr_ptr a, gr_ptr b, const fmpz_t n, gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_chebyshev_u_fmpz(gr_ptr y, const fmpz_t n, gr_srcptr x, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_generic_hilbert_class_poly(gr_ptr res, slong D, gr_srcptr x, gr_ctx_t ctx);
 
 #ifdef __cplusplus
 }

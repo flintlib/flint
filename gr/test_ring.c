@@ -2071,8 +2071,8 @@ gr_test_sqrt(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
-        printf("\n");
-        gr_ctx_println(R);
+        flint_printf("FAIL: sqrt\n");
+        printf("R = "); gr_ctx_println(R);
         printf("x = \n"); gr_println(x, R);
         printf("y = \n"); gr_println(y, R);
         printf("y ^ 2 = \n"); gr_println(y2, R);
@@ -2136,7 +2136,7 @@ gr_test_ordered_ring_cmp(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
-        printf("\n");
+        flint_printf("FAIL: ordered_ring_cmp\n");
         printf("R = "); gr_ctx_println(R);
         printf("x = \n"); gr_println(x, R);
         printf("y = \n"); gr_println(y, R);

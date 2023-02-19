@@ -91,6 +91,7 @@ truth_t gr_poly_equal(const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx
 
 truth_t gr_poly_is_zero(const gr_poly_t poly, gr_ctx_t ctx);
 truth_t gr_poly_is_one(const gr_poly_t poly, gr_ctx_t ctx);
+truth_t gr_poly_is_gen(const gr_poly_t poly, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_poly_set_scalar(gr_poly_t poly, gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_set_si(gr_poly_t poly, slong x, gr_ctx_t ctx);
@@ -98,8 +99,8 @@ WARN_UNUSED_RESULT int gr_poly_set_ui(gr_poly_t poly, slong x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_set_fmpz(gr_poly_t poly, const fmpz_t x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_set_fmpq(gr_poly_t poly, const fmpq_t x, gr_ctx_t ctx);
 
-/* todo: document/test */
-WARN_UNUSED_RESULT int gr_poly_get_fmpz_poly(gr_poly_t res, const fmpz_poly_t src, gr_ctx_t ctx);
+/* todo: test */
+WARN_UNUSED_RESULT int gr_poly_set_fmpz_poly(gr_poly_t res, const fmpz_poly_t src, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_set_fmpq_poly(gr_poly_t res, const fmpq_poly_t src, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_set_gr_poly_other(gr_poly_t res, const gr_poly_t x, gr_ctx_t x_ctx, gr_ctx_t ctx);
 
