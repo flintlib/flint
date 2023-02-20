@@ -20,7 +20,7 @@
 
 #include <string.h>
 #include <assert.h>
-#include "flint/flint.h"
+#include "flint.h"
 
 /*
 #include "flint/fmpz.h"

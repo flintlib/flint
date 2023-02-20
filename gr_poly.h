@@ -18,8 +18,8 @@
 #define GR_POLY_INLINE static __inline__
 #endif
 
-#include "flint/fmpz_poly.h"
-#include "flint/fmpq_poly.h"
+#include "fmpz_poly.h"
+#include "fmpq_poly.h"
 #include "gr.h"
 
 #ifdef __cplusplus

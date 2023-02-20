@@ -266,11 +266,14 @@ GR_SPECIAL_DEF int gr_jacobi_theta_1(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_
 GR_SPECIAL_DEF int gr_jacobi_theta_2(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, JACOBI_THETA_2)(res, z, tau, ctx); }
 GR_SPECIAL_DEF int gr_jacobi_theta_3(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, JACOBI_THETA_3)(res, z, tau, ctx); }
 GR_SPECIAL_DEF int gr_jacobi_theta_4(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, JACOBI_THETA_4)(res, z, tau, ctx); }
+
+/*
 GR_SPECIAL_DEF int gr_jacobi_theta_q(gr_ptr res1, gr_ptr res2, gr_ptr res3, gr_ptr res4, gr_srcptr w, gr_srcptr q, gr_ctx_t ctx) { return GR_QUATERNARY_BINARY_OP(ctx, JACOBI_THETA_Q)(res1, res2, res3, res4, w, q, ctx); }
 GR_SPECIAL_DEF int gr_jacobi_theta_q_1(gr_ptr res, gr_srcptr w, gr_srcptr q, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, JACOBI_THETA_Q_1)(res, w, q, ctx); }
 GR_SPECIAL_DEF int gr_jacobi_theta_q_2(gr_ptr res, gr_srcptr w, gr_srcptr q, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, JACOBI_THETA_Q_2)(res, w, q, ctx); }
 GR_SPECIAL_DEF int gr_jacobi_theta_q_3(gr_ptr res, gr_srcptr w, gr_srcptr q, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, JACOBI_THETA_Q_3)(res, w, q, ctx); }
 GR_SPECIAL_DEF int gr_jacobi_theta_q_4(gr_ptr res, gr_srcptr w, gr_srcptr q, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, JACOBI_THETA_Q_4)(res, w, q, ctx); }
+*/
 
 GR_SPECIAL_DEF int gr_modular_j(gr_ptr res, gr_srcptr tau, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, MODULAR_J)(res, tau, ctx); }
 GR_SPECIAL_DEF int gr_modular_lambda(gr_ptr res, gr_srcptr tau, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, MODULAR_LAMBDA)(res, tau, ctx); }

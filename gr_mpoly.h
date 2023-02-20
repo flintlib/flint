@@ -20,7 +20,7 @@
 #define GR_MPOLY_INLINE static __inline__
 #endif
 
-#include "flint/fmpz_mpoly.h"
+#include "fmpz_mpoly.h"
 #include "gr.h"
 #include "gr_vec.h"
 
