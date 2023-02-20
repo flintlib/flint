@@ -1,9 +1,18 @@
 /* This file is public domain. Author: Fredrik Johansson. */
 
-#include "flint/profiler.h"
+#include "profiler.h"
 #include "ca.h"
 #include "ca_ext.h"
 #include "ca_field.h"
+
+#if 1
+
+int main()
+{
+    return 0;
+}
+
+#else
 
 void main_ca()
 {
@@ -14503,3 +14512,5 @@ int main(int argc, char *argv[])
     flint_cleanup();
     return EXIT_SUCCESS;
 }
+
+#endif

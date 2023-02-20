@@ -4,7 +4,7 @@
 #include "arb_calc.h"
 #include "acb_hypgeom.h"
 #include "acb_dirichlet.h"
-#include "flint/profiler.h"
+#include "profiler.h"
 
 slong eval_count = 0;
 

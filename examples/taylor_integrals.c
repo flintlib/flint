@@ -1,7 +1,7 @@
 /* This file is public domain. Author: Fredrik Johansson. */
 
 #include "acb_calc.h"
-#include "flint/profiler.h"
+#include "profiler.h"
 
 int
 sinx(acb_ptr out, const acb_t inp, void * params, slong order, slong prec)

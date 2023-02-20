@@ -1,6 +1,6 @@
 /* This file is public domain. Author: Fredrik Johansson. */
 
-#include "flint/profiler.h"
+#include "profiler.h"
 #include "ca.h"
 #include "ca_ext.h"
 #include "ca_field.h"

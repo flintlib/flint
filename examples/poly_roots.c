@@ -4,8 +4,8 @@
 #include <ctype.h>
 #include "acb.h"
 #include "arb_fmpz_poly.h"
-#include "flint/arith.h"
-#include "flint/profiler.h"
+#include "arith.h"
+#include "profiler.h"
 
 int main(int argc, char *argv[])
 {

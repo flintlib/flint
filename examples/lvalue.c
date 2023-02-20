@@ -2,7 +2,7 @@
 
 #include <string.h>
 #include "acb_dirichlet.h"
-#include "flint/profiler.h"
+#include "profiler.h"
 
 int main(int argc, char *argv[])
 {

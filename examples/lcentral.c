@@ -2,7 +2,7 @@
 
 #include <string.h>
 #include <math.h>
-#include "flint/profiler.h"
+#include "profiler.h"
 #include "acb_dirichlet.h"
 
 static int usage(char *argv[])

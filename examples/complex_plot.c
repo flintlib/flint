@@ -5,7 +5,7 @@
 #include "acb_hypgeom.h"
 #include "acb_modular.h"
 #include "acb_elliptic.h"
-#include "flint/profiler.h"
+#include "profiler.h"
 
 /* some useful color operations */
 #define CLAMP(y) FLINT_MAX(0.0, FLINT_MIN((y), 1.0))

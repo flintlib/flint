@@ -3,7 +3,7 @@
 #include <string.h>
 #include "arb.h"
 #include "bernoulli.h"
-#include "flint/profiler.h"
+#include "profiler.h"
 
 int main(int argc, char *argv[])
 {

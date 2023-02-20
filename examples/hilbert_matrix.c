@@ -3,7 +3,7 @@
 #include <string.h>
 #include "arb_mat.h"
 #include "acb_mat.h"
-#include "flint/profiler.h"
+#include "profiler.h"
 
 int main(int argc, char *argv[])
 {

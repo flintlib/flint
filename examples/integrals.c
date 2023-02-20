@@ -8,7 +8,7 @@
 */
 
 #include <string.h>
-#include "flint/profiler.h"
+#include "profiler.h"
 #include "arb_hypgeom.h"
 #include "acb_hypgeom.h"
 #include "acb_dirichlet.h"

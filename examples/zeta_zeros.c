@@ -2,7 +2,7 @@
 
 #include <string.h>
 #include "acb_dirichlet.h"
-#include "flint/profiler.h"
+#include "profiler.h"
 
 void print_zeros(arb_srcptr p, const fmpz_t n, slong len, slong digits)
 {

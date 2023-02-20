@@ -4,7 +4,7 @@
 #include "arb.h"
 #include "acb.h"
 #include "arb_poly.h"
-#include "flint/profiler.h"
+#include "profiler.h"
 
 void
 keiper_li_series(arb_ptr z, slong len, slong prec)

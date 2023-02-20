@@ -1,6 +1,6 @@
 /* This file is public domain. Author: Fredrik Johansson. */
 
-#include "flint/profiler.h"
+#include "profiler.h"
 #include "arb.h"
 #include "arb_hypgeom.h"
 #include "acb.h"
