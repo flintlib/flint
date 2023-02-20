@@ -19,6 +19,11 @@ BUILD_DIRS= thread_pool                     thread_support                  \
                                                                             \
             nf nf_elem qfb                                                  \
                                                                             \
+            fmpr arf mag arb arb_mat arb_poly arb_calc acf acb acb_mat acb_poly           \
+            acb_dft acb_calc acb_hypgeom acb_elliptic acb_modular dirichlet acb_dirichlet \
+            arb_hypgeom bernoulli hypgeom fmpz_extras fmpzi bool_mat partitions dlog      \
+            double_interval arb_fmpz_poly arb_fpwrap                        \
+                                                                            \
             fq              fq_vec          fq_mat          fq_poly         \
             fq_nmod         fq_nmod_vec     fq_nmod_mat     fq_nmod_poly    \
             fq_zech         fq_zech_vec     fq_zech_mat     fq_zech_poly    \
