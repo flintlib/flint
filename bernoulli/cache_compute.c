@@ -11,9 +11,9 @@
 
 #include "bernoulli.h"
 
-TLS_PREFIX slong bernoulli_cache_num = 0;
+FLINT_TLS_PREFIX slong bernoulli_cache_num = 0;
 
-TLS_PREFIX fmpq * bernoulli_cache = NULL;
+FLINT_TLS_PREFIX fmpq * bernoulli_cache = NULL;
 
 void
 bernoulli_cleanup(void)

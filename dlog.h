@@ -19,13 +19,6 @@
 #endif
 
 #include "flint.h"
-
-#ifndef flint_abort
-#if __FLINT_RELEASE <= 20502
-#define flint_abort abort
-#endif
-#endif
-
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 

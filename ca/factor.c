@@ -9,18 +9,10 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mpoly_factor.h"
 #include "ca.h"
 
-/* #if __FLINT_RELEASE >= 20700 */
-#if 1
 #define HAVE_MPOLY_FAC 1
-#else
-#define HAVE_MPOLY_FAC 0
-#endif
-
-#if HAVE_MPOLY_FAC
-#include "fmpz_mpoly_factor.h"
-#endif
 
 void
 _ca_factor_fmpz(ca_factor_t res, const fmpz_t x, int inv, ulong flags, ca_ctx_t ctx)

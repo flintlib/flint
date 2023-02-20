@@ -34,7 +34,7 @@ typedef struct
 }
 gl_cache_struct;
 
-TLS_PREFIX gl_cache_struct * gl_cache = NULL;
+FLINT_TLS_PREFIX gl_cache_struct * gl_cache = NULL;
 
 void gl_cleanup()
 {

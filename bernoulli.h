@@ -24,9 +24,9 @@
 extern "C" {
 #endif
 
-extern slong TLS_PREFIX bernoulli_cache_num;
+extern slong FLINT_TLS_PREFIX bernoulli_cache_num;
 
-extern TLS_PREFIX fmpq * bernoulli_cache;
+extern FLINT_TLS_PREFIX fmpq * bernoulli_cache;
 
 void bernoulli_cache_compute(slong n);
 

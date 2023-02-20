@@ -628,8 +628,8 @@ arb_sqr(arb_t res, const arb_t val, slong prec)
 }
 
 #define ARB_DEF_CACHED_CONSTANT(name, comp_func) \
-    TLS_PREFIX slong name ## _cached_prec = 0; \
-    TLS_PREFIX arb_t name ## _cached_value; \
+    FLINT_TLS_PREFIX slong name ## _cached_prec = 0; \
+    FLINT_TLS_PREFIX arb_t name ## _cached_value; \
     void name ## _cleanup(void) \
     { \
         arb_clear(name ## _cached_value); \

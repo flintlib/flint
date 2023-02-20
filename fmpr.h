@@ -22,20 +22,8 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq.h"
-#if __FLINT_RELEASE < 20600
-#include "config.h"
-#else
 #include "flint-config.h"
-#endif
 #include "fmpz_extras.h"
-
-#ifndef flint_abort
-#if __FLINT_RELEASE <= 20502
-#define flint_abort abort
-#endif
-#endif
-
-#define TLS_PREFIX FLINT_TLS_PREFIX
 
 #if defined(_MSC_VER) && defined(ARB_BUILD_DLL)
 #define ARB_DLL __declspec(dllexport)

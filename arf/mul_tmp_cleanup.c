@@ -11,8 +11,8 @@
 
 #include "arf.h"
 
-TLS_PREFIX mp_ptr __arf_mul_tmp = NULL;
-TLS_PREFIX slong __arf_mul_alloc = 0;
+FLINT_TLS_PREFIX mp_ptr __arf_mul_tmp = NULL;
+FLINT_TLS_PREFIX slong __arf_mul_alloc = 0;
 
 void _arf_mul_tmp_cleanup(void)
 {

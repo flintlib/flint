@@ -14,8 +14,8 @@
 #define ADD_STACK_ALLOC 40
 #define ADD_TLS_ALLOC 1000
 
-TLS_PREFIX mp_ptr __add_tmp = NULL;
-TLS_PREFIX slong __add_alloc = 0;
+FLINT_TLS_PREFIX mp_ptr __add_tmp = NULL;
+FLINT_TLS_PREFIX slong __add_alloc = 0;
 
 void _add_tmp_cleanup(void)
 {

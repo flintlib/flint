@@ -14,8 +14,8 @@
 #define MUL_STACK_ALLOC 40
 #define MUL_TLS_ALLOC 1000
 
-TLS_PREFIX mp_ptr __mul_tmp = NULL;
-TLS_PREFIX slong __mul_alloc = 0;
+FLINT_TLS_PREFIX mp_ptr __mul_tmp = NULL;
+FLINT_TLS_PREFIX slong __mul_alloc = 0;
 
 void _mul_tmp_cleanup(void)
 {

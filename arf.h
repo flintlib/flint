@@ -27,12 +27,6 @@
 #include "fmpr.h"
 #include "mag.h"
 
-#ifndef flint_abort
-#if __FLINT_RELEASE <= 20502
-#define flint_abort abort
-#endif
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -880,8 +874,8 @@ void flint_mpn_mul_fft_main(mp_ptr r1, mp_srcptr i1, mp_size_t n1, mp_srcptr i2,
 #define ARF_MUL_STACK_ALLOC 40
 #define ARF_MUL_TLS_ALLOC 1000
 
-extern TLS_PREFIX mp_ptr __arf_mul_tmp;
-extern TLS_PREFIX slong __arf_mul_alloc;
+extern FLINT_TLS_PREFIX mp_ptr __arf_mul_tmp;
+extern FLINT_TLS_PREFIX slong __arf_mul_alloc;
 
 ARB_DLL extern void _arf_mul_tmp_cleanup(void);
 
@@ -976,8 +970,8 @@ arf_mul_fmpz(arf_ptr z, arf_srcptr x, const fmpz_t y, slong prec, arf_rnd_t rnd)
 #define ARF_ADD_STACK_ALLOC 40
 #define ARF_ADD_TLS_ALLOC 1000
 
-extern TLS_PREFIX mp_ptr __arf_add_tmp;
-extern TLS_PREFIX slong __arf_add_alloc;
+extern FLINT_TLS_PREFIX mp_ptr __arf_add_tmp;
+extern FLINT_TLS_PREFIX slong __arf_add_alloc;
 
 ARB_DLL extern void _arf_add_tmp_cleanup(void);
 
