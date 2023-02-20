@@ -11,10 +11,10 @@
 
 #include "gr.h"
 #include "gr_vec.h"
-#include "flint/fq.h"
-#include "flint/fq_zech_poly.h"
-#include "flint/fq_zech_poly_factor.h"
-#include "flint/fq_zech_mat.h"
+#include "fq.h"
+#include "fq_zech_poly.h"
+#include "fq_zech_poly_factor.h"
+#include "fq_zech_mat.h"
 
 #define FQ_CTX(ring_ctx) ((fq_zech_ctx_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
 

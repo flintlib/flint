@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "flint/fmpz_poly.h"
+#include "fmpz_poly.h"
 #include "gr.h"
 #include "gr_vec.h"
 

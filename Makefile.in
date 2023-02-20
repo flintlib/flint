@@ -5,6 +5,9 @@ QUIET_AR  = @echo '   ' AR  ' ' $@;
 AT=@
 
 BUILD_DIRS= thread_pool                     thread_support                  \
+                                                                            \
+            gr gr_mat gr_poly gr_mpoly gr_vec gr_special                    \
+                                                                            \
             ulong_extras                                                    \
             long_extras                                                     \
             perm                                                            \

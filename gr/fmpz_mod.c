@@ -9,10 +9,10 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "flint/fmpz_mod.h"
-#include "flint/fmpz_mod_poly.h"
-#include "flint/fmpz_mod_poly_factor.h"
-#include "flint/fmpz_mod_mat.h"
+#include "fmpz_mod.h"
+#include "fmpz_mod_poly.h"
+#include "fmpz_mod_poly_factor.h"
+#include "fmpz_mod_mat.h"
 #include "gr.h"
 #include "gr_vec.h"
 

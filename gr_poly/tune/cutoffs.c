@@ -12,7 +12,7 @@
 #include "gr_special.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
-#include "flint/profiler.h"
+#include "profiler.h"
 
 #define TIMEIT_END_REPEAT3(__timer, __reps, __min_time) \
             } \

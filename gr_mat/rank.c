@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "flint/perm.h"
+#include "perm.h"
 #include "gr_mat.h"
 
 /* todo: different algorithms */

@@ -14,7 +14,7 @@
 
 #include "gr_mat.h"
 #include "gr_poly.h"
-/* #include "flint/fq.h" */
+/* #include "fq.h" */
 
 extern gr_static_method_table _ca_methods;
 

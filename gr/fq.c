@@ -10,10 +10,10 @@
 */
 
 #include "gr.h"
-#include "flint/fq.h"
-#include "flint/fq_poly.h"
-#include "flint/fq_mat.h"
-#include "flint/fq_poly_factor.h"
+#include "fq.h"
+#include "fq_poly.h"
+#include "fq_mat.h"
+#include "fq_poly_factor.h"
 #include "gr_vec.h"
 
 #define FQ_CTX(ring_ctx) ((fq_ctx_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))

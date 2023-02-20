@@ -12,10 +12,10 @@
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
-#include "flint/fq.h"
-#include "flint/fq_nmod_poly.h"
-#include "flint/fq_nmod_mat.h"
-#include "flint/fq_nmod_poly_factor.h"
+#include "fq.h"
+#include "fq_nmod_poly.h"
+#include "fq_nmod_mat.h"
+#include "fq_nmod_poly_factor.h"
 
 #define FQ_CTX(ring_ctx) ((fq_nmod_ctx_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
 

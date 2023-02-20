@@ -9,9 +9,9 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "flint/fmpz.h"
-#include "flint/fmpq.h"
-#include "flint/nmod_vec.h"
+#include "fmpz.h"
+#include "fmpq.h"
+#include "nmod_vec.h"
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
@@ -136,7 +136,7 @@ _gr_nmod_inv(ulong * res, const ulong * x, const gr_ctx_t ctx)
     }
 }
 
-#include "flint/fmpz_mod.h"
+#include "fmpz_mod.h"
 
 /* todo: public interface */
 

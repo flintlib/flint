@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "flint/fmpz.h"
+#include "fmpz.h"
 #include "gr.h"
 
 void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)

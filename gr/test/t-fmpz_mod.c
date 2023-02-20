@@ -1,4 +1,4 @@
-#include "flint/fmpz.h"
+#include "fmpz.h"
 #include "gr.h"
 
 int main()

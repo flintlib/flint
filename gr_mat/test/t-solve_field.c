@@ -14,7 +14,7 @@
 
 #include "gr_mat.h"
 
-#include "flint/fq_nmod_mat.h"
+#include "fq_nmod_mat.h"
 
 int
 main(void)

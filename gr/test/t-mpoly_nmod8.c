@@ -1,4 +1,4 @@
-#include "flint/mpoly.h"
+#include "mpoly.h"
 #include "gr.h"
 
 int main()

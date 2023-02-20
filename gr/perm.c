@@ -9,8 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "flint/perm.h"
-#include "flint/fmpz_mat.h"
+#include "perm.h"
+#include "fmpz_mat.h"
 #include "gr.h"
 
 #define PERM_N(ctx) (*((ulong *) (ctx)))

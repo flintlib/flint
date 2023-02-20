@@ -10,9 +10,9 @@
 */
 
 #include "qqbar.h"
-#include "flint/fmpz_factor.h"
-#include "flint/fmpz_poly.h"
-#include "flint/fmpz_mat.h"
+#include "fmpz_factor.h"
+#include "fmpz_poly.h"
+#include "fmpz_mat.h"
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_special.h"

@@ -10,8 +10,8 @@
 */
 
 #include "qqbar.h"
-#include "flint/fmpq_poly.h"
-#include "flint/fmpq_mat.h"
+#include "fmpq_poly.h"
+#include "fmpq_mat.h"
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_poly.h"

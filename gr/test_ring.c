@@ -9,8 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "flint/profiler.h"
-#include "flint/long_extras.h"
+#include "profiler.h"
+#include "long_extras.h"
 
 #include "gr.h"
 #include "gr_vec.h"
