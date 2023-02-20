@@ -18,7 +18,7 @@
 #define FMPZI_INLINE static __inline__
 #endif
 
-#include "flint/fmpz.h"
+#include "fmpz.h"
 
 #ifdef __cplusplus
 extern "C" {

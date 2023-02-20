@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "flint/thread_pool.h"
+#include "thread_pool.h"
 #include "fmpz_extras.h"
 
 slong arb_thread_pool_num_available(thread_pool_t T)

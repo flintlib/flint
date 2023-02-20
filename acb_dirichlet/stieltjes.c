@@ -10,7 +10,7 @@
 */
 
 #include <math.h>
-#include "flint/double_extras.h"
+#include "double_extras.h"
 #include "acb_dirichlet.h"
 #include "acb_calc.h"
 

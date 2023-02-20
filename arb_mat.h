@@ -19,9 +19,9 @@
 #endif
 
 #include <stdio.h>
-#include "flint/fmpz_mat.h"
-#include "flint/fmpq_mat.h"
-#include "flint/perm.h"
+#include "fmpz_mat.h"
+#include "fmpq_mat.h"
+#include "perm.h"
 #include "arb.h"
 #include "arb_poly.h"
 

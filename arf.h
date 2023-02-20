@@ -23,7 +23,7 @@
 
 #include <stdio.h>
 #include <math.h>
-#include "flint/flint.h"
+#include "flint.h"
 #include "fmpr.h"
 #include "mag.h"
 

@@ -12,7 +12,7 @@
 #include <math.h>
 #include <string.h>
 #include "dlog.h"
-#include "flint/profiler.h"
+#include "profiler.h"
 
 #define NUMPRIMES 400
 #define LOG 0

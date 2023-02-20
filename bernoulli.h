@@ -13,11 +13,11 @@
 #define BERNOULLI_H
 
 #include <math.h>
-#include "flint/flint.h"
-#include "flint/fmpz.h"
-#include "flint/fmpz_vec.h"
-#include "flint/fmpq.h"
-#include "flint/arith.h"
+#include "flint.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "fmpq.h"
+#include "arith.h"
 #include "arb.h"
 
 #ifdef __cplusplus

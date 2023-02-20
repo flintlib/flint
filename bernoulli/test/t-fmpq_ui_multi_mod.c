@@ -11,8 +11,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "flint/fmpz_vec.h"
-#include "flint/arith.h"
+#include "fmpz_vec.h"
+#include "arith.h"
 #include "bernoulli.h"
 
 int main()

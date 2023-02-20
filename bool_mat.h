@@ -19,8 +19,8 @@
 #endif
 
 #include <stdio.h>
-#include "flint/flint.h"
-#include "flint/fmpz_mat.h"
+#include "flint.h"
+#include "fmpz_mat.h"
 
 #ifndef flint_abort
 #if __FLINT_RELEASE <= 20502

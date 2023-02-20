@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "flint/mpn_extras.h"
+#include "mpn_extras.h"
 #include "arb.h"
 
 int main()

@@ -10,7 +10,7 @@
 */
 
 #include "arb.h"
-#include "flint/longlong.h"
+#include "longlong.h"
 
 /* We need uint64_t instead of mp_limb_t on 32-bit systems for
    safe summation of 30-bit error bounds. */

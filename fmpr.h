@@ -19,13 +19,13 @@
 #include <limits.h>
 #include <gmp.h>
 #include <mpfr.h>
-#include "flint/flint.h"
-#include "flint/fmpz.h"
-#include "flint/fmpq.h"
+#include "flint.h"
+#include "fmpz.h"
+#include "fmpq.h"
 #if __FLINT_RELEASE < 20600
-#include "flint/config.h"
+#include "config.h"
 #else
-#include "flint/flint-config.h"
+#include "flint-config.h"
 #endif
 #include "fmpz_extras.h"
 

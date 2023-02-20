@@ -10,7 +10,7 @@
 */
 
 #include "arb.h"
-#include "flint/double_extras.h"
+#include "double_extras.h"
 
 int main()
 {

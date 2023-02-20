@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "flint/arith.h"
+#include "arith.h"
 #include "acb_poly.h"
 
 int main()

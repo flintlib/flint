@@ -18,7 +18,7 @@
 #define DOUBLE_INTERVAL_INLINE static __inline__
 #endif
 
-#include "flint/double_extras.h"
+#include "double_extras.h"
 #include "arb.h"
 
 #ifdef __cplusplus

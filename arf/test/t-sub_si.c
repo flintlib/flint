@@ -10,7 +10,7 @@
 */
 
 #include "arf.h"
-#include "flint/long_extras.h"
+#include "long_extras.h"
 
 int
 arf_sub_si_naive(arf_t z, const arf_t x, slong y, slong prec, arf_rnd_t rnd)

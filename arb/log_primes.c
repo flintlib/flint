@@ -10,7 +10,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "flint/thread_support.h"
+#include "thread_support.h"
 #include "arb.h"
 
 #define HAVE_64_BIT (FLINT_BITS == 64)

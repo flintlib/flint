@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "flint/arith.h"
+#include "arith.h"
 #include "arb.h"
 
 void arb_hypgeom_gamma_stirling_choose_param(int * reflect, slong * r, slong * n,

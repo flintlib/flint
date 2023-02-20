@@ -10,7 +10,7 @@
 */
 
 #include "arb_fmpz_poly.h"
-#include "flint/profiler.h"
+#include "profiler.h"
 
 static int check_accuracy(acb_ptr vec, slong len, slong prec)
 {

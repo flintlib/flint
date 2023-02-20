@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <string.h>
-#include "flint/ulong_extras.h"
+#include "ulong_extras.h"
 #include "bernoulli.h"
 
 #define DEBUG 0

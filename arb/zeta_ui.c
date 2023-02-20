@@ -10,7 +10,7 @@
 */
 
 #include <math.h>
-#include "flint/arith.h"
+#include "arith.h"
 #include "arb.h"
 
 /* The constant factor is nearly optimal up to at least 300000 bits. */

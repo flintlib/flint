@@ -11,7 +11,7 @@
 
 #include <string.h>
 #include "acb_dft.h"
-#include "flint/profiler.h"
+#include "profiler.h"
 
 #define LOG 0
 #define CSV 1

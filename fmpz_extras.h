@@ -13,8 +13,8 @@
 #define FMPZ_EXTRAS_H
 
 #include <limits.h>
-#include "flint/flint.h"
-#include "flint/fmpz.h"
+#include "flint.h"
+#include "fmpz.h"
 
 #ifdef __cplusplus
 extern "C" {

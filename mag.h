@@ -20,8 +20,8 @@
 
 #include <stdio.h>
 #include <math.h>
-#include "flint/flint.h"
-#include "flint/fmpz.h"
+#include "flint.h"
+#include "fmpz.h"
 #include "fmpz_extras.h"
 
 #ifndef flint_abort

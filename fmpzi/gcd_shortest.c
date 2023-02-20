@@ -10,7 +10,7 @@
 */
 
 #include "fmpzi.h"
-#include "flint/fmpq.h"
+#include "fmpq.h"
 
 /*
 return with (u1,u2) = t1*(c,b) + t2*(0,a)

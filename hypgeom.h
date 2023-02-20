@@ -12,7 +12,7 @@
 #ifndef HYPGEOM_H
 #define HYPGEOM_H
 
-#include "flint/fmpz_poly.h"
+#include "fmpz_poly.h"
 #include "arb.h"
 #include "mag.h"
 

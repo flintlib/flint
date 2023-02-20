@@ -10,7 +10,7 @@
 */
 
 #include "arb.h"
-#include "flint/longlong.h"
+#include "longlong.h"
 
 void
 _arb_dot_addmul_generic(mp_ptr sum, mp_ptr serr, mp_ptr tmp, mp_size_t sn,

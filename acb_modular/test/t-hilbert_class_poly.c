@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "flint/fmpz_poly.h"
+#include "fmpz_poly.h"
 #include "acb_modular.h"
 
 /* reference values h_(-d)(2015) mod 31337 computed using sage */

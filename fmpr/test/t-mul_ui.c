@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "flint/ulong_extras.h"
+#include "ulong_extras.h"
 #include "fmpr.h"
 
 static slong

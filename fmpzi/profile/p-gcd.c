@@ -10,7 +10,7 @@
 */
 
 #include "fmpzi.h"
-#include "flint/profiler.h"
+#include "profiler.h"
 
 /* approx nbits(norm(x)) = n */
 static void fmpzi_randbits_norm(fmpzi_t x, flint_rand_t state, flint_bitcnt_t n)

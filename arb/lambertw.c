@@ -10,7 +10,7 @@
 */
 
 #include "arb.h"
-#include "flint/double_extras.h"
+#include "double_extras.h"
 
 /* Helper functions to compute W_{-1}(x) on (-1/e,0) in double precision --
    just to get a good starting value for the multiprecision code, and

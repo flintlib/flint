@@ -10,7 +10,7 @@
 */
 
 #include "bool_mat.h"
-#include "flint/perm.h"
+#include "perm.h"
 
 
 int

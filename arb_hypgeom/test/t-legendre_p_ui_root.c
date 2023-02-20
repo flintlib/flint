@@ -10,7 +10,7 @@
 */
 
 #include "arb_hypgeom.h"
-#include "flint/arith.h"
+#include "arith.h"
 
 int main()
 {

@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "flint/double_extras.h"
+#include "double_extras.h"
 #include "acb_mat.h"
 #include "bool_mat.h"
 

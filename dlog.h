@@ -18,7 +18,7 @@
 #define DLOG_INLINE static __inline__
 #endif
 
-#include "flint/flint.h"
+#include "flint.h"
 
 #ifndef flint_abort
 #if __FLINT_RELEASE <= 20502
@@ -26,8 +26,8 @@
 #endif
 #endif
 
-#include "flint/ulong_extras.h"
-#include "flint/nmod_vec.h"
+#include "ulong_extras.h"
+#include "nmod_vec.h"
 
 #ifdef __cplusplus
 extern "C" {

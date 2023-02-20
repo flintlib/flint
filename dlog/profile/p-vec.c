@@ -11,7 +11,7 @@
 
 #include <string.h>
 #include "dlog.h"
-#include "flint/profiler.h"
+#include "profiler.h"
 
 #define NPRIMES 640
 #define LOG 0

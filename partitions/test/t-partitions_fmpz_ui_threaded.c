@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "flint/arith.h"
+#include "arith.h"
 #include "partitions.h"
 
 /* Values mod 10^9 */

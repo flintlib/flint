@@ -19,8 +19,8 @@
 #endif
 
 #include <stdio.h>
-#include "flint/fmpz_poly.h"
-#include "flint/fmpq_poly.h"
+#include "fmpz_poly.h"
+#include "fmpq_poly.h"
 #include "arb.h"
 #include "acb.h"
 

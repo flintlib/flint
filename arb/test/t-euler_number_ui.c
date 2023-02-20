@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "flint/arith.h"
+#include "arith.h"
 #include "arb.h"
 
 ulong euler_mod_p_powsum_noredc(ulong n, ulong p, const unsigned int * divtab);

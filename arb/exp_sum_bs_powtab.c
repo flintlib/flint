@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "flint/thread_support.h"
+#include "thread_support.h"
 #include "arb.h"
 
 /* When splitting [a,b) into [a,m), [m,b), we need the power x^(m-a).

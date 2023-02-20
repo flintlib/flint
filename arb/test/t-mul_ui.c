@@ -10,7 +10,7 @@
 */
 
 #include "arb.h"
-#include "flint/ulong_extras.h"
+#include "ulong_extras.h"
 
 int main()
 {

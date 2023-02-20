@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "flint/fmpq_vec.h"
+#include "fmpq_vec.h"
 #include "arb_hypgeom.h"
 
 int main()

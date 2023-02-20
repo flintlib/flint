@@ -10,8 +10,8 @@
 */
 
 #include <math.h>
-#include "flint/profiler.h"
-#include "flint/thread_support.h"
+#include "profiler.h"
+#include "thread_support.h"
 #include "partitions.h"
 #include "arb.h"
 
