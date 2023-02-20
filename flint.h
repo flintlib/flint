@@ -491,6 +491,20 @@ FLINT_INLINE slong flint_mul_sizes(slong x, slong y)
 #include "gmpcompat.h"
 #include "exception.h"
 
+/* defined ahead of fmpz.h and fmpq.h so that the types
+   are usable in prototypes without importing those headers */
+typedef slong fmpz;
+typedef fmpz fmpz_t[1];
+
+typedef struct
+{
+    fmpz num;
+    fmpz den;
+}
+fmpq;
+
+typedef fmpq fmpq_t[1];
+
 #ifdef __cplusplus
 }
 #endif

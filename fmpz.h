@@ -39,8 +39,10 @@
  extern "C" {
 #endif
 
+/* already defined in flint.h
 typedef slong fmpz;
 typedef fmpz fmpz_t[1];
+*/
 
 typedef gmp_randstate_t fmpz_randstate_t;
 
