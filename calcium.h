@@ -19,8 +19,8 @@
 #endif
 
 #include <stdio.h>
-#include "flint/flint.h"
-#include "flint/fmpz.h"
+#include "flint.h"
+#include "fmpz.h"
 #include "acb.h"
 
 #ifdef __cplusplus

@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "flint/fmpz_lll.h"
+#include "fmpz_lll.h"
 #include "qqbar.h"
 
 int

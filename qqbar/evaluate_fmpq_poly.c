@@ -9,8 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "antic/nf.h"
-#include "antic/nf_elem.h"
+#include "nf.h"
+#include "nf_elem.h"
 #include "arb_fmpz_poly.h"
 #include "qqbar.h"
 

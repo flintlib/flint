@@ -24,6 +24,8 @@ BUILD_DIRS= thread_pool                     thread_support                  \
             arb_hypgeom bernoulli hypgeom fmpz_extras fmpzi bool_mat partitions dlog      \
             double_interval arb_fmpz_poly arb_fpwrap                        \
                                                                             \
+            calcium utils_flint fmpz_mpoly_q fexpr fexpr_builtin qqbar ca ca_ext ca_field ca_vec ca_poly ca_mat \
+                                                                            \
             fq              fq_vec          fq_mat          fq_poly         \
             fq_nmod         fq_nmod_vec     fq_nmod_mat     fq_nmod_poly    \
             fq_zech         fq_zech_vec     fq_zech_mat     fq_zech_poly    \
@@ -51,13 +53,16 @@ BUILD_DIRS= thread_pool                     thread_support                  \
             fft             fmpz_poly_q     fmpz_lll        n_poly          \
             arith           qsieve          aprcl           $(EXTRA_BUILD_DIRS)
 
+
 TEMPLATE_DIRS = fq_vec_templates fq_mat_templates fq_poly_templates \
    fq_poly_factor_templates fq_embed_templates fq_templates
 
 export
 
 SOURCES = printf.c fprintf.c sprintf.c scanf.c fscanf.c sscanf.c clz_tab.c memory_manager.c version.c profiler.c exception.c hashmap.c inlines.c
-LIB_SOURCES = $(wildcard $(patsubst %, %/*.c, $(BUILD_DIRS)))  $(patsubst %, %/*.c, $(TEMPLATE_DIRS))
+LIB_SOURCES = $(patsubst %, %/*.c, $(BUILD_DIRS))  $(patsubst %, %/*.c, $(TEMPLATE_DIRS))
+
+$(info $(LIB_SOURCES))
 
 HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) NTL-interface.h flint.h longlong.h flint-config.h gmpcompat.h fft_tuning.h fmpz-conversions.h profiler.h templates.h exception.h hashmap.h $(patsubst %, %.h, $(TEMPLATE_DIRS))
 

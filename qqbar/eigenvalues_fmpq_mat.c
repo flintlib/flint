@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "flint/fmpq_mat.h"
+#include "fmpq_mat.h"
 #include "qqbar.h"
 
 void

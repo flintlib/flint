@@ -22,8 +22,8 @@
 extern "C" {
 #endif
 
-#include "flint/fmpz_mpoly.h"
-#include "flint/fmpq.h"
+#include "fmpz_mpoly.h"
+#include "fmpq.h"
 #include "calcium.h"
 
 /* Multivariate polynomials */

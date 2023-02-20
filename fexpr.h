@@ -23,9 +23,9 @@ extern "C" {
 #endif
 
 #include <string.h>
-#include "flint/flint.h"
-#include "flint/fmpz.h"
-#include "flint/fmpq.h"
+#include "flint.h"
+#include "fmpz.h"
+#include "fmpq.h"
 #include "calcium.h"
 #include "fmpz_mpoly_q.h"
 
