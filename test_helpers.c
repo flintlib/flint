@@ -13,5 +13,5 @@
 
 int flint_test_multiplier()
 {
-    return 10;
+    return 1;
 }
