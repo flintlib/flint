@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "flint/fmpz.h"
 #include "gr_special.h"
 
 /* TODO: Binet formula + exp/log should be faster for huge

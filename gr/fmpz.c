@@ -10,12 +10,12 @@
 */
 
 #include "qqbar.h"
-#include "gr.h"
-#include "gr_vec.h"
-#include "gr_special.h"
 #include "flint/fmpz_factor.h"
 #include "flint/fmpz_poly.h"
 #include "flint/fmpz_mat.h"
+#include "gr.h"
+#include "gr_vec.h"
+#include "gr_special.h"
 
 int
 _gr_fmpz_ctx_write(gr_stream_t out, gr_ctx_t ctx)

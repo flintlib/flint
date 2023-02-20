@@ -9,16 +9,25 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "flint/ulong_extras.h"
 #include "gr_vec.h"
-#include "gr_poly.h"
 
 int
-gr_poly_randtest(gr_poly_t poly, flint_rand_t state, slong len, gr_ctx_t ctx)
+_gr_vec_randtest(gr_ptr res, flint_rand_t state, slong len, gr_ctx_t ctx)
 {
-    int status = GR_SUCCESS;
-    gr_poly_fit_length(poly, len, ctx);
-    status |= _gr_vec_randtest(poly->coeffs, state, len, ctx);
-    _gr_poly_set_length(poly, len, ctx);
-    _gr_poly_normalise(poly, ctx);
+    int status;
+    slong i, sz;
+
+    sz = ctx->sizeof_elem;
+
+    status = GR_SUCCESS;
+    for (i = 0; i < len; i++)
+    {
+        if (n_randint(state, 2))
+            status |= gr_zero(GR_ENTRY(res, i, sz), ctx);
+        else
+            status |= gr_randtest(GR_ENTRY(res, i, sz), state, ctx);
+    }
+
     return status;
 }

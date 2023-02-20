@@ -9,12 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "gr.h"
-#include "gr_vec.h"
 #include "flint/fmpz_mod.h"
 #include "flint/fmpz_mod_poly.h"
 #include "flint/fmpz_mod_poly_factor.h"
 #include "flint/fmpz_mod_mat.h"
+#include "gr.h"
+#include "gr_vec.h"
 
 typedef struct
 {

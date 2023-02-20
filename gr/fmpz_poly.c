@@ -9,9 +9,9 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "gr.h"
 #include "flint/fmpz_poly.h"
 #include "flint/fmpz_mat.h"
+#include "gr.h"
 
 /* todo: _fmpz methods */
 

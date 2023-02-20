@@ -9,6 +9,9 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "flint/fmpz.h"
+#include "flint/fmpq.h"
+#include "flint/nmod_vec.h"
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_poly.h"

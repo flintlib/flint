@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "flint/fmpz.h"
 #include "gr.h"
 
 /* todo: error handling */

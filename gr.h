@@ -21,13 +21,14 @@
 #include <string.h>
 #include <assert.h>
 #include "flint/flint.h"
+
+/*
 #include "flint/fmpz.h"
 #include "flint/fmpq.h"
-/*
 #include "flint/fmpz_poly.h"
 #include "flint/fmpq_poly.h"
+#include "flint/fmpz_mpoly.h"
 */
-/* #include "flint/fmpz_mpoly.h" */
 
 #ifdef __cplusplus
  extern "C" {

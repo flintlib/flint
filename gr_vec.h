@@ -167,28 +167,9 @@ GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_reciprocals(gr_ptr res, slong len, 
 
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_set_powers(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx) { return GR_VEC_OP(ctx, VEC_SET_POWERS)(res, x, len, ctx); }
 
-
 /* todo: could allow overloading this as well */
 /* todo: worth warning about unused result? */
-GR_VEC_INLINE int
-_gr_vec_randtest(gr_ptr res, flint_rand_t state, slong len, gr_ctx_t ctx)
-{
-    int status;
-    slong i, sz;
-
-    sz = ctx->sizeof_elem;
-
-    status = GR_SUCCESS;
-    for (i = 0; i < len; i++)
-    {
-        if (n_randint(state, 2))
-            status |= gr_zero(GR_ENTRY(res, i, sz), ctx);
-        else
-            status |= gr_randtest(GR_ENTRY(res, i, sz), state, ctx);
-    }
-
-    return status;
-}
+WARN_UNUSED_RESULT int _gr_vec_randtest(gr_ptr res, flint_rand_t state, slong len, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int _gr_vec_sum_bsplit_parallel(gr_ptr res, gr_srcptr vec, slong len, slong basecase_cutoff, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_vec_sum_bsplit(gr_ptr res, gr_srcptr vec, slong len, slong basecase_cutoff, gr_ctx_t ctx);

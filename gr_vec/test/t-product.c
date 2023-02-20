@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "flint/ulong_extras.h"
 #include "gr_vec.h"
 
 int

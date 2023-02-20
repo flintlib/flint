@@ -10,8 +10,8 @@
 */
 
 #include "qqbar.h"
-#include "gr.h"
 #include "fmpzi.h"
+#include "gr.h"
 
 int
 _gr_fmpzi_ctx_write(gr_stream_t out, gr_ctx_t ctx)
