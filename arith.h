@@ -221,7 +221,6 @@ FLINT_DLL extern const unsigned int partitions_lookup[128];
 
 FLINT_DLL void arith_number_of_partitions_nmod_vec(mp_ptr res, slong len, nmod_t mod);
 FLINT_DLL void arith_number_of_partitions_vec(fmpz * res, slong len);
-FLINT_DLL void arith_number_of_partitions_mpfr(mpfr_t x, ulong n);
 FLINT_DLL void arith_number_of_partitions(fmpz_t x, ulong n);
 
 /* Number of sums of squares representations *********************************/
