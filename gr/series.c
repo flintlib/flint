@@ -12,6 +12,8 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
+/* arb wrappers todo: elementary functions; pfq, coulomb, zeta/dirichlet deflated */
+
 static const char * default_var = "x";
 
 int
@@ -653,31 +655,6 @@ UNARY_POLY_WRAPPER(atanh)
 #include "acb_elliptic.h"
 #include "acb_modular.h"
 
-/*
-
-elementary
-
-dirichlet_l
-hardy_theta
-hardy_z
-polylog
-
-agm1
-
-pfq
-gamma_upper
-gamma_lower
-beta_lower
-
-airy
-coulomb
-
-elliptic_p
-elliptic_k
-
-
-*/
-
 #define ARB_WRAPPER(func, arb_func, acb_func) \
 int \
 gr_series_ ## func(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx_t cctx) \
@@ -708,7 +685,7 @@ gr_series_ ## func(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, g
  \
     res->error = err; \
  \
-    GR_MUST_SUCCEED(gr_ctx_get_real_prec(&prec, cctx)); \
+    prec = _gr_ctx_get_real_prec(cctx); \
  \
     if (cctx->which_ring == GR_CTX_RR_ARB) \
     { \
@@ -740,25 +717,198 @@ ARB_WRAPPER(sin_integral, arb_hypgeom_si_series, acb_hypgeom_si_series)
 ARB_WRAPPER(sinh_integral, arb_hypgeom_shi_series, acb_hypgeom_shi_series)
 
 int
-gr_series_log_integral(gr_series_t res, const gr_series_t x, int offset, gr_series_ctx_t sctx, gr_ctx_t cctx) \
+gr_series_fresnel(gr_series_t res1, gr_series_t res2, const gr_series_t x, int normalized, gr_series_ctx_t sctx, gr_ctx_t cctx)
 {
-    slong len, xerr, err;
+    slong xlen, len, xerr, err;
     slong prec;
     int status = GR_SUCCESS;
 
     if (cctx->which_ring != GR_CTX_RR_ARB && cctx->which_ring != GR_CTX_CC_ACB)
         return GR_UNABLE;
 
+    xlen = x->poly.length;
     xerr = x->error;
     err = xerr;
+
     len = FLINT_MIN(sctx->mod, sctx->prec);
     len = FLINT_MIN(len, err);
     err = len;
+
     if (err >= sctx->mod)
         err = SERIES_ERR_EXACT;
+
+    if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
+    {
+        len = FLINT_MIN(len, 1);
+        err = SERIES_ERR_EXACT;
+    }
+
+    if (res1 != NULL) res1->error = err;
+    if (res2 != NULL) res2->error = err;
+
+    prec = _gr_ctx_get_real_prec(cctx);
+
+    if (cctx->which_ring == GR_CTX_RR_ARB)
+    {
+        arb_hypgeom_fresnel_series(res1 ? (arb_poly_struct *) &res1->poly : NULL,
+                                   res2 ? (arb_poly_struct *) &res2->poly : NULL,
+                                    (arb_poly_struct *) &x->poly, normalized, len, prec);
+        if (res1 && !_arb_vec_is_finite((arb_ptr) res1->poly.coeffs, res1->poly.length))
+            status = GR_UNABLE;
+        if (res2 && !_arb_vec_is_finite((arb_ptr) res2->poly.coeffs, res2->poly.length))
+            status = GR_UNABLE;
+    }
+    else
+    {
+        acb_hypgeom_fresnel_series(res1 ? (acb_poly_struct *) &res1->poly : NULL,
+                                   res2 ? (acb_poly_struct *) &res2->poly : NULL,
+                                    (acb_poly_struct *) &x->poly, normalized, len, prec);
+        if (res1 && !_arb_vec_is_finite((arb_ptr) res1->poly.coeffs, 2 * res1->poly.length))
+            status = GR_UNABLE;
+        if (res2 && !_arb_vec_is_finite((arb_ptr) res2->poly.coeffs, 2 * res2->poly.length))
+            status = GR_UNABLE;
+    }
+
+    return status;
+}
+
+int
+gr_series_fresnel_s(gr_series_t res, const gr_series_t x, int normalized, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    return gr_series_fresnel(res, NULL, x, normalized, sctx, cctx);
+}
+
+int
+gr_series_fresnel_c(gr_series_t res, const gr_series_t x, int normalized, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    return gr_series_fresnel(NULL, res, x, normalized, sctx, cctx);
+}
+
+int
+gr_series_airy(gr_series_t res1, gr_series_t res2, gr_series_t res3, gr_series_t res4, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    slong xlen, len, xerr, err;
+    slong prec;
+    int status = GR_SUCCESS;
+
+    if (cctx->which_ring != GR_CTX_RR_ARB && cctx->which_ring != GR_CTX_CC_ACB)
+        return GR_UNABLE;
+
+    xlen = x->poly.length;
+    xerr = x->error;
+    err = xerr;
+
+    len = FLINT_MIN(sctx->mod, sctx->prec);
+    len = FLINT_MIN(len, err);
+    err = len;
+
+    if (err >= sctx->mod)
+        err = SERIES_ERR_EXACT;
+
+    if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
+    {
+        len = FLINT_MIN(len, 1);
+        err = SERIES_ERR_EXACT;
+    }
+
+    if (res1 != NULL) res1->error = err;
+    if (res2 != NULL) res2->error = err;
+    if (res3 != NULL) res3->error = err;
+    if (res4 != NULL) res4->error = err;
+
+    prec = _gr_ctx_get_real_prec(cctx);
+
+    if (cctx->which_ring == GR_CTX_RR_ARB)
+    {
+        arb_hypgeom_airy_series(res1 ? (arb_poly_struct *) &res1->poly : NULL,
+                                res2 ? (arb_poly_struct *) &res2->poly : NULL,
+                                res3 ? (arb_poly_struct *) &res3->poly : NULL,
+                                res4 ? (arb_poly_struct *) &res4->poly : NULL,
+                                (arb_poly_struct *) &x->poly, len, prec);
+        if (res1 && !_arb_vec_is_finite((arb_ptr) res1->poly.coeffs, res1->poly.length))
+            status = GR_UNABLE;
+        if (res2 && !_arb_vec_is_finite((arb_ptr) res2->poly.coeffs, res2->poly.length))
+            status = GR_UNABLE;
+        if (res3 && !_arb_vec_is_finite((arb_ptr) res3->poly.coeffs, res3->poly.length))
+            status = GR_UNABLE;
+        if (res4 && !_arb_vec_is_finite((arb_ptr) res4->poly.coeffs, res4->poly.length))
+            status = GR_UNABLE;
+    }
+    else
+    {
+        acb_hypgeom_airy_series(res1 ? (acb_poly_struct *) &res1->poly : NULL,
+                                res2 ? (acb_poly_struct *) &res2->poly : NULL,
+                                res3 ? (acb_poly_struct *) &res3->poly : NULL,
+                                res4 ? (acb_poly_struct *) &res4->poly : NULL,
+                                (acb_poly_struct *) &x->poly, len, prec);
+        if (res1 && !_arb_vec_is_finite((arb_ptr) res1->poly.coeffs, 2 * res1->poly.length))
+            status = GR_UNABLE;
+        if (res2 && !_arb_vec_is_finite((arb_ptr) res2->poly.coeffs, 2 * res2->poly.length))
+            status = GR_UNABLE;
+        if (res3 && !_arb_vec_is_finite((arb_ptr) res3->poly.coeffs, 2 * res3->poly.length))
+            status = GR_UNABLE;
+        if (res4 && !_arb_vec_is_finite((arb_ptr) res4->poly.coeffs, 2 * res4->poly.length))
+            status = GR_UNABLE;
+    }
+
+    return status;
+}
+
+int
+gr_series_airy_ai(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    return gr_series_airy(res, NULL, NULL, NULL, x, sctx, cctx);
+}
+
+int
+gr_series_airy_ai_prime(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    return gr_series_airy(NULL, res, NULL, NULL, x, sctx, cctx);
+}
+
+int
+gr_series_airy_bi(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    return gr_series_airy(NULL, NULL, res, NULL, x, sctx, cctx);
+}
+
+int
+gr_series_airy_bi_prime(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    return gr_series_airy(NULL, NULL, NULL, res, x, sctx, cctx);
+}
+
+
+int
+gr_series_log_integral(gr_series_t res, const gr_series_t x, int offset, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    slong xlen, len, xerr, err;
+    slong prec;
+    int status = GR_SUCCESS;
+
+    if (cctx->which_ring != GR_CTX_RR_ARB && cctx->which_ring != GR_CTX_CC_ACB)
+        return GR_UNABLE;
+
+    xlen = x->poly.length;
+    xerr = x->error;
+    err = xerr;
+
+    len = FLINT_MIN(sctx->mod, sctx->prec);
+    len = FLINT_MIN(len, err);
+    err = len;
+
+    if (err >= sctx->mod)
+        err = SERIES_ERR_EXACT;
+
+    if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
+    {
+        len = FLINT_MIN(len, 1);
+        err = SERIES_ERR_EXACT;
+    }
+
     res->error = err;
 
-    GR_MUST_SUCCEED(gr_ctx_get_real_prec(&prec, cctx));
+    prec = _gr_ctx_get_real_prec(cctx);
 
     if (cctx->which_ring == GR_CTX_RR_ARB)
     {
@@ -776,10 +926,620 @@ gr_series_log_integral(gr_series_t res, const gr_series_t x, int offset, gr_seri
     return status;
 }
 
-/* todo: elementary functions */
-/* todo: fresnel, incomplete gamma, beta, ... */
-/* theta, elliptic_k, dirichlet, zeta */
+int
+gr_series_gamma_upper(gr_series_t res, const gr_series_t s, const gr_series_t x, int regularized, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    slong xlen, len, xerr, err;
+    slong prec;
+    int status = GR_SUCCESS;
 
+    if (cctx->which_ring != GR_CTX_RR_ARB && cctx->which_ring != GR_CTX_CC_ACB)
+        return GR_UNABLE;
+
+    xlen = x->poly.length;
+    xerr = x->error;
+    err = xerr;
+
+    len = FLINT_MIN(sctx->mod, sctx->prec);
+    len = FLINT_MIN(len, err);
+    err = len;
+
+    if (err >= sctx->mod)
+        err = SERIES_ERR_EXACT;
+
+    if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
+    {
+        len = FLINT_MIN(len, 1);
+        err = SERIES_ERR_EXACT;
+    }
+
+    /* we only handle constant s */
+    if (len >= 2 && s->poly.length >= 2)
+        return GR_UNABLE;
+
+    res->error = err;
+
+    prec = _gr_ctx_get_real_prec(cctx);
+
+    if (cctx->which_ring == GR_CTX_RR_ARB)
+    {
+        arb_t t;
+        arb_init(t);
+        arb_poly_get_coeff_arb(t, (arb_poly_struct *) &s->poly, 0);
+        arb_hypgeom_gamma_upper_series((arb_poly_struct *) &res->poly, t, (arb_poly_struct *) &x->poly, regularized, len, prec);
+        if (!_arb_vec_is_finite((arb_ptr) res->poly.coeffs, res->poly.length))
+            status = GR_UNABLE; \
+        arb_clear(t);
+    }
+    else
+    {
+        acb_t t;
+        acb_init(t);
+        acb_poly_get_coeff_acb(t, (acb_poly_struct *) &s->poly, 0);
+        acb_hypgeom_gamma_upper_series((acb_poly_struct *) &res->poly, t, (acb_poly_struct *) &x->poly, regularized, len, prec);
+        if (!_arb_vec_is_finite((arb_ptr) res->poly.coeffs, 2 * res->poly.length))
+            status = GR_UNABLE;
+        acb_clear(t);
+    }
+
+    return status;
+}
+
+int
+gr_series_gamma_lower(gr_series_t res, const gr_series_t s, const gr_series_t x, int regularized, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    slong xlen, len, xerr, err;
+    slong prec;
+    int status = GR_SUCCESS;
+
+    if (cctx->which_ring != GR_CTX_RR_ARB && cctx->which_ring != GR_CTX_CC_ACB)
+        return GR_UNABLE;
+
+    xlen = x->poly.length;
+    xerr = x->error;
+    err = xerr;
+
+    len = FLINT_MIN(sctx->mod, sctx->prec);
+    len = FLINT_MIN(len, err);
+    err = len;
+
+    if (err >= sctx->mod)
+        err = SERIES_ERR_EXACT;
+
+    if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
+    {
+        len = FLINT_MIN(len, 1);
+        err = SERIES_ERR_EXACT;
+    }
+
+    /* we only handle constant s */
+    if (len >= 2 && s->poly.length >= 2)
+        return GR_UNABLE;
+
+    res->error = err;
+
+    prec = _gr_ctx_get_real_prec(cctx);
+
+    if (cctx->which_ring == GR_CTX_RR_ARB)
+    {
+        arb_t t;
+        arb_init(t);
+        arb_poly_get_coeff_arb(t, (arb_poly_struct *) &s->poly, 0);
+        arb_hypgeom_gamma_lower_series((arb_poly_struct *) &res->poly, t, (arb_poly_struct *) &x->poly, regularized, len, prec);
+        if (!_arb_vec_is_finite((arb_ptr) res->poly.coeffs, res->poly.length))
+            status = GR_UNABLE; \
+        arb_clear(t);
+    }
+    else
+    {
+        acb_t t;
+        acb_init(t);
+        acb_poly_get_coeff_acb(t, (acb_poly_struct *) &s->poly, 0);
+        acb_hypgeom_gamma_lower_series((acb_poly_struct *) &res->poly, t, (acb_poly_struct *) &x->poly, regularized, len, prec);
+        if (!_arb_vec_is_finite((arb_ptr) res->poly.coeffs, 2 * res->poly.length))
+            status = GR_UNABLE;
+        acb_clear(t);
+    }
+
+    return status;
+}
+
+int
+gr_series_beta_lower(gr_series_t res, const gr_series_t a, const gr_series_t b, const gr_series_t x, int regularized, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    slong xlen, len, xerr, err;
+    slong prec;
+    int status = GR_SUCCESS;
+
+    if (cctx->which_ring != GR_CTX_RR_ARB && cctx->which_ring != GR_CTX_CC_ACB)
+        return GR_UNABLE;
+
+    xlen = x->poly.length;
+    xerr = x->error;
+    err = xerr;
+
+    len = FLINT_MIN(sctx->mod, sctx->prec);
+    len = FLINT_MIN(len, err);
+    err = len;
+
+    if (err >= sctx->mod)
+        err = SERIES_ERR_EXACT;
+
+    if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
+    {
+        len = FLINT_MIN(len, 1);
+        err = SERIES_ERR_EXACT;
+    }
+
+    /* we only handle constant a, b */
+    if (len >= 2 && a->poly.length >= 2)
+        return GR_UNABLE;
+    if (len >= 2 && b->poly.length >= 2)
+        return GR_UNABLE;
+
+    res->error = err;
+
+    prec = _gr_ctx_get_real_prec(cctx);
+
+    if (cctx->which_ring == GR_CTX_RR_ARB)
+    {
+        arb_t t, u;
+        arb_init(t);
+        arb_init(u);
+        arb_poly_get_coeff_arb(t, (arb_poly_struct *) &a->poly, 0);
+        arb_poly_get_coeff_arb(u, (arb_poly_struct *) &b->poly, 0);
+        arb_hypgeom_beta_lower_series((arb_poly_struct *) &res->poly, t, u, (arb_poly_struct *) &x->poly, regularized, len, prec);
+        if (!_arb_vec_is_finite((arb_ptr) res->poly.coeffs, res->poly.length))
+            status = GR_UNABLE; \
+        arb_clear(t);
+        arb_clear(u);
+    }
+    else
+    {
+        acb_t t, u;
+        acb_init(t);
+        acb_init(u);
+        acb_poly_get_coeff_acb(t, (acb_poly_struct *) &a->poly, 0);
+        acb_poly_get_coeff_acb(u, (acb_poly_struct *) &b->poly, 0);
+        acb_hypgeom_beta_lower_series((acb_poly_struct *) &res->poly, t, u, (acb_poly_struct *) &x->poly, regularized, len, prec);
+        if (!_arb_vec_is_finite((arb_ptr) res->poly.coeffs, 2 * res->poly.length))
+            status = GR_UNABLE;
+        acb_clear(t);
+        acb_clear(u);
+    }
+
+    return status;
+}
+
+int
+gr_series_polylog(gr_series_t res, const gr_series_t s, const gr_series_t z, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    slong xlen, len, xerr, err;
+    slong prec;
+    int status = GR_SUCCESS;
+
+    if (cctx->which_ring != GR_CTX_CC_ACB)
+        return GR_UNABLE;
+
+    xlen = s->poly.length;
+    xerr = s->error;
+    err = xerr;
+
+    len = FLINT_MIN(sctx->mod, sctx->prec);
+    len = FLINT_MIN(len, err);
+    err = len;
+
+    if (err >= sctx->mod)
+        err = SERIES_ERR_EXACT;
+
+    if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
+    {
+        len = FLINT_MIN(len, 1);
+        err = SERIES_ERR_EXACT;
+    }
+
+    /* we only handle constant z */
+    if (len >= 2 && z->poly.length >= 2)
+        return GR_UNABLE;
+
+    res->error = err;
+
+    prec = _gr_ctx_get_real_prec(cctx);
+
+    {
+        acb_t t;
+        acb_init(t);
+        acb_poly_get_coeff_acb(t, (acb_poly_struct *) &z->poly, 0);
+        acb_poly_polylog_series((acb_poly_struct *) &res->poly, (acb_poly_struct *) &s->poly, t, len, prec);
+        if (!_arb_vec_is_finite((arb_ptr) res->poly.coeffs, 2 * res->poly.length))
+            status = GR_UNABLE;
+        acb_clear(t);
+    }
+
+    return status;
+}
+
+int
+gr_series_hurwitz_zeta(gr_series_t res, const gr_series_t s, const gr_series_t z, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    slong xlen, len, xerr, err;
+    slong prec;
+    int status = GR_SUCCESS;
+
+    if (cctx->which_ring != GR_CTX_CC_ACB)
+        return GR_UNABLE;
+
+    xlen = s->poly.length;
+    xerr = s->error;
+    err = xerr;
+
+    len = FLINT_MIN(sctx->mod, sctx->prec);
+    len = FLINT_MIN(len, err);
+    err = len;
+
+    if (err >= sctx->mod)
+        err = SERIES_ERR_EXACT;
+
+    if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
+    {
+        len = FLINT_MIN(len, 1);
+        err = SERIES_ERR_EXACT;
+    }
+
+    /* we only handle constant z */
+    if (len >= 2 && z->poly.length >= 2)
+        return GR_UNABLE;
+
+    res->error = err;
+
+    prec = _gr_ctx_get_real_prec(cctx);
+
+    {
+        acb_t t;
+        acb_init(t);
+        acb_poly_get_coeff_acb(t, (acb_poly_struct *) &z->poly, 0);
+        acb_poly_zeta_series((acb_poly_struct *) &res->poly, (acb_poly_struct *) &s->poly, t, 0, len, prec);
+        if (!_arb_vec_is_finite((arb_ptr) res->poly.coeffs, 2 * res->poly.length))
+            status = GR_UNABLE;
+        acb_clear(t);
+    }
+
+    return status;
+}
+
+int
+gr_series_dirichlet_l(gr_series_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    slong xlen, len, xerr, err;
+    slong prec;
+    int status = GR_SUCCESS;
+
+    if (cctx->which_ring != GR_CTX_CC_ACB)
+        return GR_UNABLE;
+
+    xlen = x->poly.length;
+    xerr = x->error;
+    err = xerr;
+
+    len = FLINT_MIN(sctx->mod, sctx->prec);
+    len = FLINT_MIN(len, err);
+    err = len;
+
+    if (err >= sctx->mod)
+        err = SERIES_ERR_EXACT;
+
+    if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
+    {
+        len = FLINT_MIN(len, 1);
+        err = SERIES_ERR_EXACT;
+    }
+
+    res->error = err;
+
+    prec = _gr_ctx_get_real_prec(cctx);
+
+    {
+        acb_dirichlet_l_series((acb_poly_struct *) &res->poly, (acb_poly_struct *) &x->poly, G, chi, 0, len, prec);
+        if (!_arb_vec_is_finite((arb_ptr) res->poly.coeffs, 2 * res->poly.length))
+            status = GR_UNABLE;
+    }
+
+    return status;
+}
+
+int
+gr_series_dirichlet_hardy_theta(gr_series_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    slong xlen, len, xerr, err;
+    slong prec;
+    int status = GR_SUCCESS;
+
+    if (cctx->which_ring != GR_CTX_CC_ACB)
+        return GR_UNABLE;
+
+    xlen = x->poly.length;
+    xerr = x->error;
+    err = xerr;
+
+    len = FLINT_MIN(sctx->mod, sctx->prec);
+    len = FLINT_MIN(len, err);
+    err = len;
+
+    if (err >= sctx->mod)
+        err = SERIES_ERR_EXACT;
+
+    if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
+    {
+        len = FLINT_MIN(len, 1);
+        err = SERIES_ERR_EXACT;
+    }
+
+    res->error = err;
+
+    prec = _gr_ctx_get_real_prec(cctx);
+
+    {
+        acb_dirichlet_hardy_theta_series((acb_poly_struct *) &res->poly, (acb_poly_struct *) &x->poly, G, chi, len, prec);
+        if (!_arb_vec_is_finite((arb_ptr) res->poly.coeffs, 2 * res->poly.length))
+            status = GR_UNABLE;
+    }
+
+    return status;
+}
+
+int
+gr_series_dirichlet_hardy_z(gr_series_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    slong xlen, len, xerr, err;
+    slong prec;
+    int status = GR_SUCCESS;
+
+    if (cctx->which_ring != GR_CTX_CC_ACB)
+        return GR_UNABLE;
+
+    xlen = x->poly.length;
+    xerr = x->error;
+    err = xerr;
+
+    len = FLINT_MIN(sctx->mod, sctx->prec);
+    len = FLINT_MIN(len, err);
+    err = len;
+
+    if (err >= sctx->mod)
+        err = SERIES_ERR_EXACT;
+
+    if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
+    {
+        len = FLINT_MIN(len, 1);
+        err = SERIES_ERR_EXACT;
+    }
+
+    res->error = err;
+
+    prec = _gr_ctx_get_real_prec(cctx);
+
+    {
+        acb_dirichlet_hardy_z_series((acb_poly_struct *) &res->poly, (acb_poly_struct *) &x->poly, G, chi, len, prec);
+        if (!_arb_vec_is_finite((arb_ptr) res->poly.coeffs, 2 * res->poly.length))
+            status = GR_UNABLE;
+    }
+
+    return status;
+}
+
+int
+gr_series_jacobi_theta(gr_series_t res1, gr_series_t res2, gr_series_t res3, gr_series_t res4, const gr_series_t x, const gr_series_t tau, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    slong xlen, len, xerr, err;
+    slong prec;
+    int status = GR_SUCCESS;
+
+    if (cctx->which_ring != GR_CTX_CC_ACB)
+        return GR_UNABLE;
+
+    xlen = x->poly.length;
+    xerr = x->error;
+    err = xerr;
+
+    len = FLINT_MIN(sctx->mod, sctx->prec);
+    len = FLINT_MIN(len, err);
+    err = len;
+
+    if (err >= sctx->mod)
+        err = SERIES_ERR_EXACT;
+
+    if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
+    {
+        len = FLINT_MIN(len, 1);
+        err = SERIES_ERR_EXACT;
+    }
+
+    /* we only handle constant z */
+    if (len >= 2 && tau->poly.length >= 2)
+        return GR_UNABLE;
+
+    if (res1 != NULL) res1->error = err;
+    if (res2 != NULL) res2->error = err;
+    if (res3 != NULL) res3->error = err;
+    if (res4 != NULL) res4->error = err;
+
+    prec = _gr_ctx_get_real_prec(cctx);
+
+    {
+        acb_t t;
+        acb_init(t);
+        acb_poly_get_coeff_acb(t, (acb_poly_struct *) &tau->poly, 0);
+        acb_modular_theta_series(res1 ? (acb_poly_struct *) &res1->poly : NULL,
+                                res2 ? (acb_poly_struct *) &res2->poly : NULL,
+                                res3 ? (acb_poly_struct *) &res3->poly : NULL,
+                                res4 ? (acb_poly_struct *) &res4->poly : NULL,
+                                (acb_poly_struct *) &x->poly, t, len, prec);
+        if (res1 && !_arb_vec_is_finite((arb_ptr) res1->poly.coeffs, 2 * res1->poly.length))
+            status = GR_UNABLE;
+        if (res2 && !_arb_vec_is_finite((arb_ptr) res2->poly.coeffs, 2 * res2->poly.length))
+            status = GR_UNABLE;
+        if (res3 && !_arb_vec_is_finite((arb_ptr) res3->poly.coeffs, 2 * res3->poly.length))
+            status = GR_UNABLE;
+        if (res4 && !_arb_vec_is_finite((arb_ptr) res4->poly.coeffs, 2 * res4->poly.length))
+            status = GR_UNABLE;
+        acb_clear(t);
+    }
+
+    return status;
+}
+
+int
+gr_series_jacobi_theta_1(gr_series_t res, const gr_series_t x, const gr_series_t tau, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    return gr_series_jacobi_theta(res, NULL, NULL, NULL, x, tau, sctx, cctx);
+}
+
+int
+gr_series_jacobi_theta_2(gr_series_t res, const gr_series_t x, const gr_series_t tau, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    return gr_series_jacobi_theta(NULL, res, NULL, NULL, x, tau, sctx, cctx);
+}
+
+int
+gr_series_jacobi_theta_3(gr_series_t res, const gr_series_t x, const gr_series_t tau, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    return gr_series_jacobi_theta(NULL, NULL, res, NULL, x, tau, sctx, cctx);
+}
+
+int
+gr_series_jacobi_theta_4(gr_series_t res, const gr_series_t x, const gr_series_t tau, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    return gr_series_jacobi_theta(NULL, NULL, NULL, res, x, tau, sctx, cctx);
+}
+
+
+int
+gr_series_agm1(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    slong xlen, len, xerr, err;
+    slong prec;
+    int status = GR_SUCCESS;
+
+    if (cctx->which_ring != GR_CTX_CC_ACB)
+        return GR_UNABLE;
+
+    xlen = x->poly.length;
+    xerr = x->error;
+    err = xerr;
+
+    len = FLINT_MIN(sctx->mod, sctx->prec);
+    len = FLINT_MIN(len, err);
+    err = len;
+
+    if (err >= sctx->mod)
+        err = SERIES_ERR_EXACT;
+
+    if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
+    {
+        len = FLINT_MIN(len, 1);
+        err = SERIES_ERR_EXACT;
+    }
+
+    res->error = err;
+
+    prec = _gr_ctx_get_real_prec(cctx);
+
+    {
+        acb_poly_agm1_series((acb_poly_struct *) &res->poly, (acb_poly_struct *) &x->poly, len, prec);
+        if (!_arb_vec_is_finite((arb_ptr) res->poly.coeffs, 2 * res->poly.length))
+            status = GR_UNABLE;
+    }
+
+    return status;
+}
+
+int
+gr_series_elliptic_k(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    slong xlen, len, xerr, err;
+    slong prec;
+    int status = GR_SUCCESS;
+
+    if (cctx->which_ring != GR_CTX_CC_ACB)
+        return GR_UNABLE;
+
+    xlen = x->poly.length;
+    xerr = x->error;
+    err = xerr;
+
+    len = FLINT_MIN(sctx->mod, sctx->prec);
+    len = FLINT_MIN(len, err);
+    err = len;
+
+    if (err >= sctx->mod)
+        err = SERIES_ERR_EXACT;
+
+    if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
+    {
+        len = FLINT_MIN(len, 1);
+        err = SERIES_ERR_EXACT;
+    }
+
+    res->error = err;
+
+    prec = _gr_ctx_get_real_prec(cctx);
+
+    {
+        acb_poly_elliptic_k_series((acb_poly_struct *) &res->poly, (acb_poly_struct *) &x->poly, len, prec);
+        if (!_arb_vec_is_finite((arb_ptr) res->poly.coeffs, 2 * res->poly.length))
+            status = GR_UNABLE;
+    }
+
+    return status;
+}
+
+int
+gr_series_weierstrass_p(gr_series_t res, const gr_series_t x, const gr_series_t tau, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    slong xlen, len, xerr, err;
+    slong prec;
+    int status = GR_SUCCESS;
+
+    if (cctx->which_ring != GR_CTX_CC_ACB)
+        return GR_UNABLE;
+
+    xlen = x->poly.length;
+    xerr = x->error;
+    err = xerr;
+
+    len = FLINT_MIN(sctx->mod, sctx->prec);
+    len = FLINT_MIN(len, err);
+    err = len;
+
+    if (err >= sctx->mod)
+        err = SERIES_ERR_EXACT;
+
+    if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
+    {
+        len = FLINT_MIN(len, 1);
+        err = SERIES_ERR_EXACT;
+    }
+
+    /* we only handle constant tau */
+    if (len >= 2 && tau->poly.length >= 2)
+        return GR_UNABLE;
+
+    res->error = err;
+
+    prec = _gr_ctx_get_real_prec(cctx);
+
+    {
+        acb_t t;
+        acb_init(t);
+        acb_poly_get_coeff_acb(t, (acb_poly_struct *) &tau->poly, 0);
+        acb_elliptic_p_series((acb_poly_struct *) &res->poly, (acb_poly_struct *) &x->poly, t, len, prec);
+        if (!_arb_vec_is_finite((arb_ptr) res->poly.coeffs, 2 * res->poly.length))
+            status = GR_UNABLE;
+        acb_clear(t);
+    }
+
+    return status;
+}
 
 typedef struct
 {
@@ -849,12 +1609,43 @@ static int _gr_gr_series_digamma(gr_series_t res, const gr_series_t x, gr_ctx_t 
 static int _gr_gr_series_erf(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_erf(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_erfc(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_erfc(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_erfi(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_erfi(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+
+static int _gr_gr_series_fresnel(gr_series_t res1, gr_series_t res2, const gr_series_t x, int normalized, gr_ctx_t ctx) { return gr_series_fresnel(res1, res2, x, normalized, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_fresnel_s(gr_series_t res, const gr_series_t x, int normalized, gr_ctx_t ctx) { return gr_series_fresnel_s(res, x, normalized, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_fresnel_c(gr_series_t res, const gr_series_t x, int normalized, gr_ctx_t ctx) { return gr_series_fresnel_c(res, x, normalized, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+
+static int _gr_gr_series_airy(gr_series_t res1, gr_series_t res2, gr_series_t res3, gr_series_t res4, const gr_series_t x, gr_ctx_t ctx) { return gr_series_airy(res1, res2, res3, res4, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_airy_ai(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_airy_ai(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_airy_ai_prime(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_airy_ai_prime(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_airy_bi(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_airy_bi(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_airy_bi_prime(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_airy_bi_prime(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+
 static int _gr_gr_series_exp_integral_ei(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_erf(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_cos_integral(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_cos_integral(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_cosh_integral(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_cosh_integral(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_sin_integral(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_sin_integral(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_sinh_integral(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_sinh_integral(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_log_integral(gr_series_t res, const gr_series_t x, int offset, gr_ctx_t ctx) { return gr_series_log_integral(res, x, offset, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_gamma_upper(gr_series_t res, const gr_series_t x, const gr_series_t y, int regularized, gr_ctx_t ctx) { return gr_series_gamma_upper(res, x, y, regularized, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_gamma_lower(gr_series_t res, const gr_series_t x, const gr_series_t y, int regularized, gr_ctx_t ctx) { return gr_series_gamma_lower(res, x, y, regularized, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_beta_lower(gr_series_t res, const gr_series_t a, const gr_series_t b, const gr_series_t x, int regularized, gr_ctx_t ctx) { return gr_series_beta_lower(res, a, b, x, regularized, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+
+static int _gr_gr_series_polylog(gr_series_t res, const gr_series_t s, const gr_series_t z, gr_ctx_t ctx) { return gr_series_polylog(res, s, z, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_hurwitz_zeta(gr_series_t res, const gr_series_t s, const gr_series_t z, gr_ctx_t ctx) { return gr_series_hurwitz_zeta(res, s, z, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+
+static int _gr_gr_series_dirichlet_l(gr_series_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const gr_series_t s, const gr_series_t z, gr_ctx_t ctx) { return gr_series_dirichlet_l(res, G, chi, s, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_dirichlet_hardy_theta(gr_series_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const gr_series_t s, const gr_series_t z, gr_ctx_t ctx) { return gr_series_dirichlet_hardy_theta(res, G, chi, s, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_dirichlet_hardy_z(gr_series_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const gr_series_t s, const gr_series_t z, gr_ctx_t ctx) { return gr_series_dirichlet_hardy_z(res, G, chi, s, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+
+static int _gr_gr_series_jacobi_theta(gr_series_t res1, gr_series_t res2, gr_series_t res3, gr_series_t res4, const gr_series_t x, const gr_series_t tau, gr_ctx_t ctx) { return gr_series_jacobi_theta(res1, res2, res3, res4, x, tau, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_jacobi_theta_1(gr_series_t res, const gr_series_t x, const gr_series_t tau, gr_ctx_t ctx) { return gr_series_jacobi_theta_1(res, x, tau, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_jacobi_theta_2(gr_series_t res, const gr_series_t x, const gr_series_t tau, gr_ctx_t ctx) { return gr_series_jacobi_theta_2(res, x, tau, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_jacobi_theta_3(gr_series_t res, const gr_series_t x, const gr_series_t tau, gr_ctx_t ctx) { return gr_series_jacobi_theta_3(res, x, tau, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_jacobi_theta_4(gr_series_t res, const gr_series_t x, const gr_series_t tau, gr_ctx_t ctx) { return gr_series_jacobi_theta_4(res, x, tau, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+
+static int _gr_gr_series_agm1(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_agm1(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_elliptic_k(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_elliptic_k(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_weierstrass_p(gr_series_t res, const gr_series_t x, const gr_series_t tau, gr_ctx_t ctx) { return gr_series_weierstrass_p(res, x, tau, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 
 
 static int
@@ -963,12 +1754,37 @@ gr_method_tab_input _gr_series_methods_input[] =
     {GR_METHOD_ERF,         (gr_funcptr) _gr_gr_series_erf},
     {GR_METHOD_ERFC,        (gr_funcptr) _gr_gr_series_erfc},
     {GR_METHOD_ERFI,        (gr_funcptr) _gr_gr_series_erfi},
-    {GR_METHOD_EXP_INTEGRAL_EI,      (gr_funcptr) _gr_gr_series_exp_integral_ei},
-    {GR_METHOD_COS_INTEGRAL,         (gr_funcptr) _gr_gr_series_cos_integral},
-    {GR_METHOD_COSH_INTEGRAL,        (gr_funcptr) _gr_gr_series_cosh_integral},
-    {GR_METHOD_SIN_INTEGRAL,         (gr_funcptr) _gr_gr_series_sin_integral},
-    {GR_METHOD_SINH_INTEGRAL,        (gr_funcptr) _gr_gr_series_sinh_integral},
-    {GR_METHOD_LOG_INTEGRAL,         (gr_funcptr) _gr_gr_series_log_integral},
+    {GR_METHOD_FRESNEL,     (gr_funcptr) _gr_gr_series_fresnel},
+    {GR_METHOD_FRESNEL_S,   (gr_funcptr) _gr_gr_series_fresnel_s},
+    {GR_METHOD_FRESNEL_C,   (gr_funcptr) _gr_gr_series_fresnel_c},
+    {GR_METHOD_AIRY,        (gr_funcptr) _gr_gr_series_airy},
+    {GR_METHOD_AIRY_AI,        (gr_funcptr) _gr_gr_series_airy_ai},
+    {GR_METHOD_AIRY_AI_PRIME,  (gr_funcptr) _gr_gr_series_airy_ai_prime},
+    {GR_METHOD_AIRY_BI,        (gr_funcptr) _gr_gr_series_airy_bi},
+    {GR_METHOD_AIRY_BI_PRIME,  (gr_funcptr) _gr_gr_series_airy_bi_prime},
+    {GR_METHOD_EXP_INTEGRAL_EI,       (gr_funcptr) _gr_gr_series_exp_integral_ei},
+    {GR_METHOD_COS_INTEGRAL,          (gr_funcptr) _gr_gr_series_cos_integral},
+    {GR_METHOD_COSH_INTEGRAL,         (gr_funcptr) _gr_gr_series_cosh_integral},
+    {GR_METHOD_SIN_INTEGRAL,          (gr_funcptr) _gr_gr_series_sin_integral},
+    {GR_METHOD_SINH_INTEGRAL,         (gr_funcptr) _gr_gr_series_sinh_integral},
+    {GR_METHOD_LOG_INTEGRAL,          (gr_funcptr) _gr_gr_series_log_integral},
+    {GR_METHOD_GAMMA_UPPER,           (gr_funcptr) _gr_gr_series_gamma_upper},
+    {GR_METHOD_GAMMA_LOWER,           (gr_funcptr) _gr_gr_series_gamma_lower},
+    {GR_METHOD_BETA_LOWER,            (gr_funcptr) _gr_gr_series_beta_lower},
+    {GR_METHOD_HURWITZ_ZETA,          (gr_funcptr) _gr_gr_series_hurwitz_zeta},
+    {GR_METHOD_POLYLOG,               (gr_funcptr) _gr_gr_series_polylog},
+    {GR_METHOD_DIRICHLET_L,           (gr_funcptr) _gr_gr_series_dirichlet_l},
+    {GR_METHOD_DIRICHLET_HARDY_Z,     (gr_funcptr) _gr_gr_series_dirichlet_hardy_z},
+    {GR_METHOD_DIRICHLET_HARDY_THETA, (gr_funcptr) _gr_gr_series_dirichlet_hardy_theta},
+    {GR_METHOD_JACOBI_THETA,          (gr_funcptr) _gr_gr_series_jacobi_theta},
+    {GR_METHOD_JACOBI_THETA_1,          (gr_funcptr) _gr_gr_series_jacobi_theta_1},
+    {GR_METHOD_JACOBI_THETA_2,          (gr_funcptr) _gr_gr_series_jacobi_theta_2},
+    {GR_METHOD_JACOBI_THETA_3,          (gr_funcptr) _gr_gr_series_jacobi_theta_3},
+    {GR_METHOD_JACOBI_THETA_4,          (gr_funcptr) _gr_gr_series_jacobi_theta_4},
+    {GR_METHOD_AGM1,                   (gr_funcptr) _gr_gr_series_agm1},
+    {GR_METHOD_ELLIPTIC_K,             (gr_funcptr) _gr_gr_series_elliptic_k},
+    {GR_METHOD_WEIERSTRASS_P,          (gr_funcptr) _gr_gr_series_weierstrass_p},
+
     {0,                     (gr_funcptr) NULL},
 };
 

@@ -614,6 +614,27 @@ class gr_ctx:
             _handle_error(ctx, status, rstr, x, y, z, w)
         return res
 
+    def _ternary_unary_op(ctx, x, op, rstr):
+        x = ctx._as_elem(x)
+        res1 = ctx._elem_type(context=ctx)
+        res2 = ctx._elem_type(context=ctx)
+        res3 = ctx._elem_type(context=ctx)
+        status = op(res1._ref, res2._ref, res3._ref, x._ref, ctx._ref)
+        if status:
+            _handle_error(ctx, status, rstr, x)
+        return (res1, res2, res3)
+
+    def _quaternary_unary_op(ctx, x, op, rstr):
+        x = ctx._as_elem(x)
+        res1 = ctx._elem_type(context=ctx)
+        res2 = ctx._elem_type(context=ctx)
+        res3 = ctx._elem_type(context=ctx)
+        res4 = ctx._elem_type(context=ctx)
+        status = op(res1._ref, res2._ref, res3._ref, res4._ref, x._ref, ctx._ref)
+        if status:
+            _handle_error(ctx, status, rstr, x)
+        return (res1, res2, res3, res4)
+
     def _quaternary_binary_op(ctx, x, y, op, rstr):
         x = ctx._as_elem(x)
         y = ctx._as_elem(y)
@@ -1189,9 +1210,11 @@ class gr_ctx:
         else:
             return ctx._binary_op(x, y, libgr.gr_bessel_k, "bessel_k($n, $x)")
 
-    # todo: simultaneous airy, bessel, coulomb
-    #def bessel_j_y(ctx, x, y):
-    #    return ctx._binary_binary_op(x, y, libgr.gr_bessel_k, "bessel_j_y($n, $x)")
+    def bessel_j_y(ctx, x, y):
+        return ctx._binary_binary_op(x, y, libgr.gr_bessel_k, "bessel_j_y($n, $x)")
+
+    def airy(ctx, x):
+        return ctx._quaternary_unary_op(x, libgr.gr_airy, "airy($x)")
 
     def airy_ai(ctx, x):
         """
@@ -1245,6 +1268,8 @@ class gr_ctx:
             [+/- 6.18e-16]
         """
         return ctx._unary_op_fmpz(n, libgr.gr_airy_bi_prime_zero, "airy_bi_prime_zero($n)")
+
+    # todo: coulomb()
 
     def coulomb_f(ctx, x, y, z):
         """
@@ -1688,11 +1713,11 @@ class gr_ctx:
         """
         return ctx._unary_op(x, libgr.gr_log_barnes_g, "log_barnes_g($x)")
 
-    def zeta(ctx, x):
-        return ctx._unary_op(x, libgr.gr_zeta, "zeta($x)")
+    def zeta(ctx, s):
+        return ctx._unary_op(s, libgr.gr_zeta, "zeta($s)")
 
     def hurwitz_zeta(ctx, s, a):
-        return ctx._binary_op(x, y, libgr.gr_hurwitz_zeta, "hurwitz_zeta($s, $a)")
+        return ctx._binary_op(s, a, libgr.gr_hurwitz_zeta, "hurwitz_zeta($s, $a)")
 
     def stieltjes(ctx, n, a=1):
         """
@@ -2358,9 +2383,25 @@ class gr_ctx:
         return ctx._binary_op(z, tau, libgr.gr_jacobi_theta_4, "jacobi_theta_4($z, $tau)")
 
     def elliptic_invariants(ctx, tau):
+        """
+            >>> g2, g3 = CC.elliptic_invariants(1j)
+            >>> CC.weierstrass_p_prime(0.25, 1j)**2; 4*CC.weierstrass_p(0.25, 1j)**3 - g2*CC.weierstrass_p(0.25, 1j) - g3
+            [15152.862386715 +/- 7.03e-10]
+            [15152.86238672 +/- 5.09e-9]
+        """
         return ctx._unary_unary_op(tau, libgr.gr_elliptic_invariants, "elliptic_invariants($tau)")
 
     def elliptic_roots(ctx, tau):
+        """
+            >>> e1, e2, e3 = CC.elliptic_roots(1j)
+            >>> g2, g3 = CC.elliptic_invariants(1j)
+            >>> 4*e1**3 - g2*e1 - g3
+            [+/- 3.12e-11]
+            >>> 4*e2**3 - g2*e2 - g3
+            [+/- 8.29e-12]
+            >>> 4*e3**3 - g2*e3 - g3
+            [+/- 3.14e-11]
+        """
         return ctx._ternary_unary_op(tau, libgr.gr_elliptic_roots, "elliptic_roots($tau)")
 
     def weierstrass_p(ctx, z, tau):

@@ -524,6 +524,8 @@ typedef enum
     GR_METHOD_DIRICHLET_CHI_UI,
     GR_METHOD_DIRICHLET_CHI_FMPZ,
     GR_METHOD_DIRICHLET_L,
+    GR_METHOD_DIRICHLET_HARDY_THETA,
+    GR_METHOD_DIRICHLET_HARDY_Z,
 
     GR_METHOD_BERNPOLY_UI,
     GR_METHOD_EULERPOLY_UI,
@@ -954,6 +956,13 @@ GR_INLINE truth_t gr_ctx_is_threadsafe(gr_ctx_t ctx) { return GR_CTX_PREDICATE(c
 GR_INLINE truth_t gr_ctx_has_real_prec(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_HAS_REAL_PREC)(ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_ctx_set_real_prec(gr_ctx_t ctx, slong prec) { return GR_CTX_SET_SI(ctx, CTX_SET_REAL_PREC)(ctx, prec); }
 GR_INLINE WARN_UNUSED_RESULT int gr_ctx_get_real_prec(slong * prec, gr_ctx_t ctx) { return GR_CTX_GET_SI(ctx, CTX_GET_REAL_PREC)(prec, ctx); }
+
+GR_INLINE slong _gr_ctx_get_real_prec(gr_ctx_t ctx)
+{
+    slong res = 0;
+    GR_IGNORE(gr_ctx_get_real_prec(&res, ctx));
+    return res;
+}
 
 GR_INLINE void gr_init(gr_ptr res, gr_ctx_t ctx) { GR_INIT_CLEAR_OP(ctx, INIT)(res, ctx); }
 GR_INLINE void gr_clear(gr_ptr res, gr_ctx_t ctx) { GR_INIT_CLEAR_OP(ctx, CLEAR)(res, ctx); }
