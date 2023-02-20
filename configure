@@ -830,9 +830,9 @@ LIBS="$LLIBS $lLIBS"
 
 #cxx
 
-if [ "$WANT_CXX" = "1" ]; then
-   EXTRA_BUILD="$EXTRA_BUILD flintxx"
-fi
+# if [ "$WANT_CXX" = "1" ]; then
+#    EXTRA_BUILD="$EXTRA_BUILD flintxx"
+# fi
 
 if [ -z "$CXXFLAGS" ]; then
    CXXFLAGS="$CFLAGS"
