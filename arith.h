@@ -164,9 +164,6 @@ FLINT_DLL void _arith_bernoulli_number_vec_zeta(fmpz * num, fmpz * den, slong n)
 #define _arith_cyclotomic_polynomial _fmpz_poly_cyclotomic
 #define arith_cyclotomic_polynomial fmpz_poly_cyclotomic
 
-FLINT_DLL void _arith_cos_minpoly(fmpz * coeffs, slong d, ulong n);
-FLINT_DLL void arith_cos_minpoly(fmpz_poly_t poly, ulong n);
-
 /* Hypergeometric polynomials ************************************************/
 
 #define _arith_chebyshev_t_polynomial _fmpz_poly_chebyshev_t

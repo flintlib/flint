@@ -436,43 +436,6 @@ Multiplicative functions
     directly since the polynomial is very sparse at this point.
 
 
-
-Cyclotomic polynomials
---------------------------------------------------------------------------------
-
-
-.. function:: void _arith_cos_minpoly(fmpz * coeffs, slong d, ulong n)
-
-    For `n \ge 1`, sets ``(coeffs, d+1)`` to the minimal polynomial
-    `\Psi_n(x)` of `\cos(2 \pi / n)`, scaled to have integer coefficients
-    by multiplying by `2^d` (`2^{d-1}` when `n` is a power of two).
-
-    The polynomial `\Psi_n(x)` is described in [WaktinsZeitlin1993]_.
-    As proved in that paper, the roots of `\Psi_n(x)` for `n \ge 3` are
-    `\cos(2 \pi k / n)` where `0 \le k < d` and where `\gcd(k, n) = 1`.
-
-    To calculate `\Psi_n(x)`, we compute the roots numerically with MPFR
-    and use a balanced product tree to form a polynomial with fixed-point
-    coefficients, i.e. an approximation of `2^p 2^d \Psi_n(x)`.
-
-    To determine the precision `p`, we note that the coefficients
-    in `\prod_{i=1}^d (x - \alpha)` can be bounded by the central
-    coefficient in the binomial expansion of `(x+1)^d`.
-
-    When `n` is an odd prime, we use a direct formula for the coefficients
-    (https://mathworld.wolfram.com/TrigonometryAngles.html ).
-
-.. function:: void arith_cos_minpoly(fmpz_poly_t poly, ulong n)
-
-    Sets ``poly`` to the minimal polynomial `\Psi_n(x)` of
-    `\cos(2 \pi / n)`, scaled to have integer coefficients. This
-    polynomial has degree 1 if `n = 1` or `n = 2`, and
-    degree `\phi(n) / 2` otherwise.
-
-    We allow `n = 0` and define `\Psi_0 = 1`.
-
-
-
 Landau's function
 --------------------------------------------------------------------------------
 

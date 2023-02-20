@@ -12,6 +12,8 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
+/* todo: constructing from roots is sometimes faster (e.g. n = 3389) */
+
 /* Use a lookup table for small n. We skip 53, 59 and 61, as the
    coefficients do not fit in 16 bits. */
 #define MINPOLY_TAB_NUM 65

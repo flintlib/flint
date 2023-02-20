@@ -3272,6 +3272,8 @@ Minimal polynomials
     For `n = 1, 2`, the degree is 1. For `n = 0`, we define
     the output to be the constant polynomial 1.
 
+    See [WaktinsZeitlin1993]_.
+
 .. function:: void _fmpz_poly_swinnerton_dyer(fmpz * coeffs, ulong n)
               void fmpz_poly_swinnerton_dyer(fmpz_poly_t poly, ulong n)
              
