@@ -13,7 +13,7 @@
 #include "ca_ext.h"
 #include "ca_field.h"
 
-#include "flint/fmpz_lll.h"
+#include "fmpz_lll.h"
 #include "qqbar.h"
 #include "utils_flint.h"
 

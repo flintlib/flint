@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "flint/fmpz_poly_mat.h"
+#include "fmpz_poly_mat.h"
 #include "ca_mat.h"
 
 static const fmpz * _nf_denref(const nf_elem_t a, const nf_t nf)

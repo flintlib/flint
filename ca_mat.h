@@ -19,14 +19,14 @@
 #endif
 
 #include <stdio.h>
-#include "flint/flint.h"
-#include "flint/fmpz_mat.h"
-#include "flint/fmpq_mat.h"
-#include "flint/perm.h"
+#include "flint.h"
+#include "fmpz_mat.h"
+#include "fmpq_mat.h"
+#include "perm.h"
 #include "arb_mat.h"
 #include "acb_mat.h"
-#include "antic/nf.h"
-#include "antic/nf_elem.h"
+#include "nf.h"
+#include "nf_elem.h"
 #include "ca.h"
 #include "ca_vec.h"
 #include "ca_poly.h"

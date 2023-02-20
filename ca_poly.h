@@ -19,13 +19,13 @@
 #endif
 
 #include <stdio.h>
-#include "flint/flint.h"
-#include "flint/fmpz_poly.h"
-#include "flint/fmpq_poly.h"
+#include "flint.h"
+#include "fmpz_poly.h"
+#include "fmpq_poly.h"
 #include "arb_poly.h"
 #include "acb_poly.h"
-#include "antic/nf.h"
-#include "antic/nf_elem.h"
+#include "nf.h"
+#include "nf_elem.h"
 #include "ca.h"
 #include "ca_vec.h"
 

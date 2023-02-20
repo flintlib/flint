@@ -192,7 +192,7 @@ qqbar_fmpz_poly_composed_op(fmpz_poly_t res, const fmpz_poly_t A, const fmpz_pol
 #define TIMING 0
 
 #if TIMING
-#include "flint/profiler.h"
+#include "profiler.h"
 #endif
 
 void

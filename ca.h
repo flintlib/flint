@@ -19,9 +19,9 @@
 #endif
 
 #include <stdio.h>
-#include "flint/flint.h"
-#include "antic/nf.h"
-#include "antic/nf_elem.h"
+#include "flint.h"
+#include "nf.h"
+#include "nf_elem.h"
 #include "calcium.h"
 #include "qqbar.h"
 #include "fmpz_mpoly_q.h"

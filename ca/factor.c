@@ -19,7 +19,7 @@
 #endif
 
 #if HAVE_MPOLY_FAC
-#include "flint/fmpz_mpoly_factor.h"
+#include "fmpz_mpoly_factor.h"
 #endif
 
 void

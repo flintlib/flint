@@ -10,7 +10,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "flint/fmpz_mpoly.h"
+#include "fmpz_mpoly.h"
 #include "ca.h"
 
 /*
