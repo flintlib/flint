@@ -173,7 +173,7 @@ libflint.a: $(OBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) | bu
 	$(AT)$(foreach mod, $(BUILD_DIRS), $(AR) rcs libflint.a build/$(mod)/*.o || exit $$?;)
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach mod, $(filter-out %templates, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h))), $(AR) rcs libflint.a build/$(mod)/*.o || exit $$?;))
 
-library: build/CPimport.h
+library:
 	$(AT)if [ "$(FLINT_SHARED)" -eq "1" ]; then \
 		$(MAKE) shared; \
 	fi
@@ -276,9 +276,6 @@ uninstall:
 
 build:
 	mkdir -p build
-
-build/CPimport.h: qadic/CPimport.txt build
-	$(AT)sed "s/ /,/g;s/.*/&,/g" $< > $@
 
 build/%.lo: %.c $(HEADERS) | build
 	$(QUIET_CC) $(CC) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@;
