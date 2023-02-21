@@ -260,7 +260,7 @@ _gr_fmpz_mod_addmul(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t c
     fmpz_init(t);
     fmpz_mul(t, x, y);
     fmpz_add(t, t, res);
-    fmpz_mod(res, t, FMPZ_MOD_CTX(ctx)->n);
+    fmpz_mod_set_fmpz(res, t, FMPZ_MOD_CTX(ctx));
     fmpz_clear(t);
     return GR_SUCCESS;
 }
@@ -272,7 +272,7 @@ _gr_fmpz_mod_submul(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t c
     fmpz_init(t);
     fmpz_mul(t, x, y);
     fmpz_sub(t, res, t);
-    fmpz_mod(res, t, FMPZ_MOD_CTX(ctx)->n);
+    fmpz_mod_set_fmpz(res, t, FMPZ_MOD_CTX(ctx));
     fmpz_clear(t);
     return GR_SUCCESS;
 }
@@ -392,7 +392,7 @@ _gr_fmpz_mod_vec_dot(fmpz_t res, const fmpz_t initial, int subtract, const fmpz 
     if (subtract)
         fmpz_neg(res, res);
 
-    fmpz_mod(res, res, FMPZ_MOD_CTX(ctx)->n);
+    fmpz_mod_set_fmpz(res, res, FMPZ_MOD_CTX(ctx));
 
     return GR_SUCCESS;
 }
@@ -432,7 +432,7 @@ _gr_fmpz_mod_vec_dot_rev(fmpz_t res, const fmpz_t initial, int subtract, const f
     if (subtract)
         fmpz_neg(res, res);
 
-    fmpz_mod(res, res, FMPZ_MOD_CTX(ctx)->n);
+    fmpz_mod_set_fmpz(res, res, FMPZ_MOD_CTX(ctx));
 
     return GR_SUCCESS;
 }
