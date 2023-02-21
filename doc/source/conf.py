@@ -11,11 +11,12 @@
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
 
+import os
+import sys
+sys.path.insert(0, os.path.abspath('../..'))
+sys.path.append(os.path.abspath("."))
+sys.path.append(os.path.abspath('../../python'))
 
 # -- Project information -----------------------------------------------------
 
@@ -25,6 +26,9 @@ author = u'The Flint development team'
 
 # The short X.Y version
 version = u''
+
+
+
 
 for _line in open("../../flint.h").readlines():
     if _line.startswith("#define FLINT_VERSION"):
@@ -49,6 +53,7 @@ release = version
 # ones.
 extensions = [
     'sphinx.ext.mathjax',
+    'sphinx.ext.autodoc',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -97,7 +102,6 @@ primary_domain = 'c'
 # a list of builtin themes.
 #
 html_theme = 'default'
-
 
 html_context = {
     'css_files': ['_static/default.css'],
