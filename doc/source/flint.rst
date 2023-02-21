@@ -3,6 +3,67 @@
 **flint.h** -- global definitions
 ===============================================================================
 
+Integer types
+-----------------------------------------------
+
+The *char*, *short* and *int* types are assumed to be two's complement
+types with exactly 8, 16 and 32 bits. This is not technically guaranteed
+by the C standard, but it is true on all mainstreal platforms.
+
+Since the C types *long* and *unsigned long* do not have a standardized size
+in practice, FLINT defines *slong* and *ulong* types which are guaranteed
+to be 32 bits on a 32-bit system and 64 bits on a 64-bit system.
+They are also guaranteed to have the same size as GMP's :type:`mp_limb_t`.
+GMP builds with a different limb size configuration are not supported at all.
+For convenience, the macro *FLINT_BITS* specifies the word length (32 or 64)
+of the system.
+
+.. type:: slong
+
+    The *slong* type is used for precisions, bit counts, loop indices,
+    array sizes, and the like, even when those values are known to be
+    nonnegative. It is also used for small integer-valued coefficients.
+    In method names, an *slong* parameter is denoted by *si*, for example
+    :func:`arb_add_si`.
+
+    The constants *WORD_MIN* and *WORD_MAX* give the range of this type.
+    This type can be printed with *flint_printf* using the format string ``%wd``.
+
+.. type:: ulong
+
+    The *ulong* type is used for integer-valued coefficients
+    that are known to be unsigned, and for values that require the
+    full 32-bit or 64-bit range.
+    In method names, a *ulong* parameter is denoted by *ui*, for example
+    :func:`arb_add_ui`.
+
+    The constant *UWORD_MAX* gives the range of this type.
+    This type can be printed with *flint_printf* using the format string ``%wu``.
+
+The following GMP-defined types are used in methods that manipulate the
+internal representation of numbers (using limb arrays).
+
+.. type:: mp_limb_t
+
+    A single limb.
+
+.. type:: mp_ptr
+
+    Pointer to a writable array of limbs.
+
+.. type:: mp_srcptr
+
+    Pointer to a read-only array of limbs.
+
+.. type:: mp_size_t
+
+    A limb count (always nonnegative).
+
+.. type:: flint_bitcnt_t
+
+    A bit offset within an array of limbs (always nonnegative).
+
+
 
 Allocation Functions
 -----------------------------------------------

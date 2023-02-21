@@ -14,6 +14,7 @@
 
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath('../..'))
 sys.path.append(os.path.abspath("."))
 sys.path.append(os.path.abspath('../../python'))
@@ -28,15 +29,11 @@ author = u'The Flint development team'
 version = u''
 
 
-
-
 for _line in open("../../flint.h").readlines():
     if _line.startswith("#define FLINT_VERSION"):
         _i1 = _line.find('"')
         _i2 = _line.find('"', _i1 + 1)
         version = _line[_i1+1:_i2]
-
-release = version
 
 # The full version, including alpha/beta/rc tags
 release = version
@@ -153,7 +150,7 @@ latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
     'papersize': 'a4paper',
-
+    'fontpkg': '',
     # The font size ('10pt', '11pt' or '12pt').
     #
     # 'pointsize': '10pt',
@@ -162,11 +159,13 @@ latex_elements = {
     #
     # 'preamble': '',
     'preamble': '\\usepackage{lmodern}\n\\setcounter{tocdepth}{2}\n\\urlstyle{tt}',
+    'preamble': '\\usepackage{mathrsfs}\n\\usepackage{lmodern}\n\\setcounter{tocdepth}{2}\n\\urlstyle{tt}',
 
     # Latex figure (float) alignment
     #
     # 'figure_align': 'htbp',
 }
+
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,

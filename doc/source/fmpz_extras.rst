@@ -18,12 +18,6 @@ Memory-related methods
 Convenience methods
 -------------------------------------------------------------------------------
 
-.. function:: void fmpz_add_si(fmpz_t z, const fmpz_t x, slong y)
-
-.. function:: void fmpz_sub_si(fmpz_t z, const fmpz_t x, slong y)
-
-    Sets *z* to the sum (respectively difference) of *x* and *y*.
-
 .. function:: void fmpz_adiv_q_2exp(fmpz_t z, const fmpz_t x, flint_bitcnt_t exp)
 
     Sets *z* to `x / 2^{exp}`, rounded away from zero.

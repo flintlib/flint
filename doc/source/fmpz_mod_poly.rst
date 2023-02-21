@@ -764,11 +764,11 @@ Division
 
 .. function:: void _fmpz_mod_poly_div_divconquer_recursive(fmpz * Q, fmpz * W, const fmpz * A, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_t p)
 
-   Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R)` less than
+    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R)` less than
     ``lenB``, where ``A`` is of length ``2 * lenB - 1`` and ``B``
     is of length ``lenB``. We require that ``Q`` have space for
     ``lenB`` coefficients and that ``W`` be temporary space of size
-    ``2*lenB ``. 
+    ``2*lenB``.
 
 .. function:: void _fmpz_mod_poly_div_newton(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t p)
 

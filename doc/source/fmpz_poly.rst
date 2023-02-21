@@ -3379,7 +3379,9 @@ function
     = \sum_{n = 0}^{\infty} A_n(x) \frac{t^n}{n!}.
 
 The Eulerian numbers can be expressed explicitly via the formula
+
 .. math ::
+
     A(n, m) = \sum_{k = 0}^{m + 1} (-1)^k \binom{n + 1}{k} (m + 1 - k)^n.
 
 Note: Not to be confused with Euler numbers and polynomials.

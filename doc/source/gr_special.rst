@@ -339,12 +339,6 @@ Elliptic, modular and theta functions
               int gr_jacobi_theta_3(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx)
               int gr_jacobi_theta_4(gr_ptr res, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx)
 
-.. function:: int gr_jacobi_theta_q(gr_ptr res1, gr_ptr res2, gr_ptr res3, gr_ptr res4, gr_srcptr w, gr_srcptr q, gr_ctx_t ctx)
-              int gr_jacobi_theta_q_1(gr_ptr res, gr_srcptr w, gr_srcptr q, gr_ctx_t ctx)
-              int gr_jacobi_theta_q_2(gr_ptr res, gr_srcptr w, gr_srcptr q, gr_ctx_t ctx)
-              int gr_jacobi_theta_q_3(gr_ptr res, gr_srcptr w, gr_srcptr q, gr_ctx_t ctx)
-              int gr_jacobi_theta_q_4(gr_ptr res, gr_srcptr w, gr_srcptr q, gr_ctx_t ctx)
-
 .. function:: int gr_dedekind_eta(gr_ptr res, gr_srcptr tau, gr_ctx_t ctx)
               int gr_dedekind_eta_q(gr_ptr res, gr_srcptr tau, gr_ctx_t ctx)
 
