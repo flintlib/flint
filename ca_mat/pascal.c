@@ -10,66 +10,12 @@
 */
 
 #include "ca_mat.h"
+#include "gr_mat.h"
 
 void
 ca_mat_pascal(ca_mat_t mat, int triangular, ca_ctx_t ctx)
 {
-    slong R, C, i, j;
-
-    R = ca_mat_nrows(mat);
-    C = ca_mat_ncols(mat);
-
-    if (R == 0 || C == 0)
-        return;
-
-    if (triangular == 1)
-    {
-        for (i = 1; i < R; i++)
-            for (j = 0; j < i && j < C; j++)
-                ca_zero(ca_mat_entry(mat, i, j), ctx);
-
-        for (j = 0; j < C; j++)
-            ca_one(ca_mat_entry(mat, 0, j), ctx);
-
-        for (i = 1; i < R && i < C; i++)
-            ca_one(ca_mat_entry(mat, i, i), ctx);
-
-        for (i = 1; i < R; i++)
-            for (j = i + 1; j < C; j++)
-                ca_add(ca_mat_entry(mat, i, j),
-                    ca_mat_entry(mat, i, j - 1),
-                    ca_mat_entry(mat, i - 1, j - 1), ctx);
-    }
-    else if (triangular == -1)
-    {
-        for (i = 0; i < R; i++)
-            for (j = i + 1; j < C; j++)
-                ca_zero(ca_mat_entry(mat, i, j), ctx);
-
-        for (i = 0; i < R; i++)
-            ca_one(ca_mat_entry(mat, i, 0), ctx);
-
-        for (i = 1; i < R && i < C; i++)
-            ca_one(ca_mat_entry(mat, i, i), ctx);
-
-        for (i = 2; i < R; i++)
-            for (j = 1; j < i && j < C; j++)
-                ca_add(ca_mat_entry(mat, i, j),
-                    ca_mat_entry(mat, i - 1, j - 1),
-                    ca_mat_entry(mat, i - 1, j), ctx);
-    }
-    else
-    {
-        for (j = 0; j < C; j++)
-            ca_one(ca_mat_entry(mat, 0, j), ctx);
-
-        for (i = 1; i < R; i++)
-            ca_one(ca_mat_entry(mat, i, 0), ctx);
-
-        for (i = 1; i < R; i++)
-            for (j = 1; j < C; j++)
-                ca_add(ca_mat_entry(mat, i, j),
-                    ca_mat_entry(mat, i, j - 1),
-                    ca_mat_entry(mat, i - 1, j), ctx);
-    }
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_ca_from_ref(gr_ctx, GR_CTX_CC_CA, ctx);
+    GR_MUST_SUCCEED(gr_mat_pascal((gr_mat_struct *) mat, triangular, gr_ctx));
 }

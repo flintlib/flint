@@ -10,23 +10,12 @@
 */
 
 #include "ca_mat.h"
+#include "gr_mat.h"
 
 void
 ca_mat_hilbert(ca_mat_t mat, ca_ctx_t ctx)
 {
-    slong R, C, i, j;
-
-    R = ca_mat_nrows(mat);
-    C = ca_mat_ncols(mat);
-
-    for (i = 0; i < R; i++)
-    {
-        for (j = 0; j < C; j++)
-        {
-            ca_one(ca_mat_entry(mat, i, j), ctx);
-            ca_div_ui(ca_mat_entry(mat, i, j),
-                ca_mat_entry(mat, i, j), i + j + 1, ctx);
-        }
-    }
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_ca_from_ref(gr_ctx, GR_CTX_CC_CA, ctx);
+    GR_MUST_SUCCEED(gr_mat_hilbert((gr_mat_struct *) mat, gr_ctx));
 }
-

@@ -1323,6 +1323,25 @@ _gr_ctx_init_ca(gr_ctx_t ctx, int which_ring)
     }
 }
 
+/* ca_ctx is a (ca_ctx_struct *) */
+void
+_gr_ctx_init_ca_from_ref(gr_ctx_t ctx, int which_ring, void * ca_ctx)
+{
+    ctx->which_ring = which_ring;
+    ctx->sizeof_elem = sizeof(ca_struct);
+    ctx->size_limit = WORD_MAX;
+
+    GR_CTX_DATA_AS_PTR(ctx) = ca_ctx;
+
+    ctx->methods = _ca_methods;
+
+    if (!_ca_methods_initialized)
+    {
+        gr_method_tab_init(_ca_methods, _ca_methods_input);
+        _ca_methods_initialized = 1;
+    }
+}
+
 void
 gr_ctx_init_real_ca(gr_ctx_t ctx)
 {

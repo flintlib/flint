@@ -10,89 +10,24 @@
 */
 
 #include "ca_mat.h"
+#include "gr_mat.h"
 
 void
 ca_mat_solve_tril_classical(ca_mat_t X,
         const ca_mat_t L, const ca_mat_t B, int unit, ca_ctx_t ctx)
 {
-    slong i, j, n, m;
-    ca_ptr tmp;
-    ca_t s;
-
-    n = L->r;
-    m = B->c;
-
-    ca_init(s, ctx);
-    tmp = flint_malloc(sizeof(ca_struct) * n);
-
-    for (i = 0; i < m; i++)
-    {
-        for (j = 0; j < n; j++)
-            tmp[j] = *ca_mat_entry(X, j, i);
-
-        for (j = 0; j < n; j++)
-        {
-            ca_dot(s, ca_mat_entry(B, j, i), 1, L->rows[j], 1, tmp, 1, j, ctx);
-
-            if (!unit)
-                ca_div(tmp + j, s, ca_mat_entry(L, j, j), ctx);
-            else
-                ca_swap(tmp + j, s, ctx);
-        }
-
-        for (j = 0; j < n; j++)
-            *ca_mat_entry(X, j, i) = tmp[j];
-    }
-
-    flint_free(tmp);
-    ca_clear(s, ctx);
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_ca_from_ref(gr_ctx, GR_CTX_CC_CA, ctx);
+    GR_MUST_SUCCEED(gr_mat_nonsingular_solve_tril_classical((gr_mat_struct *) X, (const gr_mat_struct *) L, (const gr_mat_struct *) B, unit, gr_ctx));
 }
 
 void
 ca_mat_solve_tril_recursive(ca_mat_t X,
         const ca_mat_t L, const ca_mat_t B, int unit, ca_ctx_t ctx)
 {
-    ca_mat_t LA, LC, LD, XX, XY, BX, BY, T;
-    slong r, n, m;
-
-    n = L->r;
-    m = B->c;
-    r = n / 2;
-
-    if (n == 0 || m == 0)
-        return;
-
-    /*
-    Denoting inv(M) by M^, we have:
-
-    [A 0]^ [X]  ==  [A^          0 ] [X]  ==  [A^ X]
-    [C D]  [Y]  ==  [-D^ C A^    D^] [Y]  ==  [D^ (Y - C A^ X)]
-    */
-    ca_mat_window_init(LA, L, 0, 0, r, r, ctx);
-    ca_mat_window_init(LC, L, r, 0, n, r, ctx);
-    ca_mat_window_init(LD, L, r, r, n, n, ctx);
-    ca_mat_window_init(BX, B, 0, 0, r, m, ctx);
-    ca_mat_window_init(BY, B, r, 0, n, m, ctx);
-    ca_mat_window_init(XX, X, 0, 0, r, m, ctx);
-    ca_mat_window_init(XY, X, r, 0, n, m, ctx);
-
-    ca_mat_solve_tril(XX, LA, BX, unit, ctx);
-
-    /* ca_mat_submul(XY, BY, LC, XX); */
-    ca_mat_init(T, LC->r, BX->c, ctx);
-    ca_mat_mul(T, LC, XX, ctx);
-    ca_mat_sub(XY, BY, T, ctx);
-    ca_mat_clear(T, ctx);
-
-    ca_mat_solve_tril(XY, LD, XY, unit, ctx);
-
-    ca_mat_window_clear(LA, ctx);
-    ca_mat_window_clear(LC, ctx);
-    ca_mat_window_clear(LD, ctx);
-    ca_mat_window_clear(BX, ctx);
-    ca_mat_window_clear(BY, ctx);
-    ca_mat_window_clear(XX, ctx);
-    ca_mat_window_clear(XY, ctx);
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_ca_from_ref(gr_ctx, GR_CTX_CC_CA, ctx);
+    GR_MUST_SUCCEED(gr_mat_nonsingular_solve_tril_recursive((gr_mat_struct *) X, (const gr_mat_struct *) L, (const gr_mat_struct *) B, unit, gr_ctx));
 }
 
 void
