@@ -214,7 +214,9 @@ endef
 
 check: LDFLAGS:=$(LDFLAGS) -Wl,-rpath,$(GMP_LIB_DIR) -Wl,-rpath,$(MPFR_LIB_DIR) -Wl,-rpath,$(CURDIR)
 check: library test_helpers.o
-ifndef MOD
+ifdef PYTHON
+	PYTHONPATH=$(CURDIR) python3 python/flint_ctypes.py
+else ifndef MOD
 	$(AT)$(MAKE) $(TESTS)
 	$(AT)(WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=build; export BUILD_DIR; $(MAKE) -f Makefile.subdirs -C . check || exit $$?;)
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir)/test; WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) check || exit $$?;))

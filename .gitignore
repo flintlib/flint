@@ -45,3 +45,5 @@ build.vc12
 build
 flint2
 .DS_Store
+python/__pycache__/*.pyc
+

@@ -5,14 +5,16 @@ import sys
 libflint_path = ctypes.util.find_library('flint')
 libflint = ctypes.CDLL(libflint_path)
 
-libcalcium_path = ctypes.util.find_library('calcium')
-libcalcium = ctypes.CDLL(libcalcium_path)
+libcalcium = libarb = libgr = libflint
 
-libarb_path = ctypes.util.find_library('arb')
-libarb = ctypes.CDLL(libarb_path)
+#libcalcium_path = ctypes.util.find_library('calcium')
+#libcalcium = ctypes.CDLL(libcalcium_path)
 
-libgr_path = ctypes.util.find_library('genericrings')
-libgr = ctypes.CDLL(libgr_path)
+#libarb_path = ctypes.util.find_library('arb')
+#libarb = ctypes.CDLL(libarb_path)
+
+#libgr_path = ctypes.util.find_library('genericrings')
+#libgr = ctypes.CDLL(libgr_path)
 
 T_TRUE = 0
 T_FALSE = 1
