@@ -110,7 +110,7 @@ html_context = {
 #
 
 html_theme_options = {
-    'sidebarwidth' : 280,
+    'sidebarwidth' : 300,
     'collapsiblesidebar': True,
     'bodyfont': "'arial', sans-serif",
     'headfont': "'arial', sans-serif",

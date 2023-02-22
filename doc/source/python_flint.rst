@@ -1,6 +1,6 @@
 .. _pyflint:
 
-Python interface (python-flint)
+**flint_ctypes** - Python interface
 ===============================================================================
 
 .. highlight:: python3
