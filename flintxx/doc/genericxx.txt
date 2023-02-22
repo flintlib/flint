@@ -1,0 +1,463 @@
+/*
+    Copyright (C) 2013 Tom Bachmann
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+*/
+
+*******************************************************************************
+
+    Rules and standard methods
+
+    A typical expression template class begins with the following lines of code:
+
+    \begin{lstlisting}[language=c++]
+    template<class Operation, class Data>
+    class some_expression
+        : public expression<derived_wrapper<some_expression>, Operation, Data>
+    {
+        // ...
+    };
+    \end{lstlisting}
+
+    We document here methods this class inherits from its base, and how they
+    relate to rules.
+
+    There are the following public typedefs:
+
+    \begin{description}
+    \item[ev\_traits\_t] A specialisation of \code{detail::evaluation_traits}.
+        Used to compute the rule for evaluation.
+    \item[derived\_t] The specialised derived class.
+    \item[evaluated\_t] The resulting type of evaluating this expression.
+    \item[evaluation\_return\_t] The return type of \code{evaluate()}. This
+        differs from the above for immediates, where evaluation returns a
+        reference instead of a copy.
+    \item[data\_t] The same as \code{Data}.
+    \item[operation\_t] The same as \code{Operation}.
+    \end{description}
+
+*******************************************************************************
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Standard methods
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+data_t& some_expression::_data()
+const data_t& some_expression::_data() const
+
+    Obtain the data related to this expression template.
+
+evaluated_t some_expression::create_temporary() const
+
+    Default instantiate a temporary. Override this if your class is not default
+    instantiable.
+
+template<class T> T some_expression::to() const
+
+    Convert self to type \code{T} (after evaluating). Uses
+    \code{rules::conversion}.
+
+void some_expression::print(std::ostream& o) const
+
+    Print self to \code{o}. Uses \code{rules::print} or
+    \code{rules::to_string}.
+
+int some_expression::print(FILE* f = stdout) const
+
+    Print self to \code{f}. Uses \code{rules::cprint}.
+
+int some_expression::print_pretty(FILE* f = stdout) const
+
+    Print self to \code{f}. Uses \code{rules::print_pretty}.
+
+template<class T> int some_expression::print_pretty(const T& extra,
+        FILE* f = stdout) const
+
+    Print self to \code{f}. Uses \code{rules::print_pretty} with two arguments.
+
+int some_expression::read(FILE* f = stdin)
+
+    Read self from \code{f}. Uses \code{rules::read}.
+
+const evaluation_return_t some_expression::evaluate() const
+
+    Evaluate self.
+
+template<class T> void some_expression::set(const T& t)
+
+    Assign \code{t} to self. Uses evaluation and/or \code{rules::assignment}.
+
+template<class T> bool some_expression::equals(const T& t) const
+
+    Determine if \code{t} is equal to self. Uses \code{rules::equals} or
+    \code{rules::cmp}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    Global functions
+
+    In addition to member functions, flintxx also provides a number of global
+    functions. In general these operate on sets of arguments at least one of
+    which derives from \code{expression}, and are conditionally enabled only if
+    the relevant operation is implemented (via a rule).
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+template<class Expr> std::ostream& operator<<(std::ostream& o, const Expr& e)
+
+    Print \code{e} to \code{o}. Uses the member \code{print}.
+
+template<class Expr1, class Expr2> bool operator==(const Expr1&, const Expr2&)
+template<class Expr1, class Expr2> bool operator!=(const Expr1&, const Expr2&)
+
+    Compare two expressions. Uses the member \code{equals}.
+
+template<class Expr1, class Expr2> bool operator??(const Expr1&, const Expr2&)
+
+    Relational operators \code{< > <= =>} are implemented using
+    \code{rules::cmp}.
+
+template<class Expr1, class Expr2> ?? operator??(const Expr1&, const Expr2&)
+
+    Arithmetic operators \code{+ - * / % & | ^ << >>} are implemented
+    by constructing new expression templates with operation
+    \code{operations::plus} etc.
+
+template<class Expr1> ?? operator??(const Expr1&)
+
+    Unary operators \code{- ~} are implemented by constructing new expression
+    templates with operation \code{operations::negate} and
+    \code{operations::complement}.
+
+template<class Expr1, class Expr2> ?? operator?=(const Expr1&, const Expr2&)
+
+    Arithmetic-assignment operators \code{+= -= *= /= %= |= &= ^=}.
+
+template<class Expr1> int print(const Expr1&)
+template<class Expr1> int print(FILE*f, const Expr1&)
+template<class Expr1> int print_pretty(const Expr1&)
+template<class Expr1> int print_pretty(FILE*f, const Expr1&)
+template<class Expr1, class T> int print_pretty(const Expr1&, const T& extra)
+template<class Expr1, class T> int print_pretty(FILE*f, const Expr1&,
+        const T& extra)
+
+    Forward to member.
+
+template<class Expr1, class Expr2> void swap(Expr1& e1, Expr2& e2)
+
+    Swap \code{e1} and \code{e2} using \code{rules::swap}. Note that via ADL,
+    this can be used by STL containers.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    flintxx classes
+
+    The flint wrapper classes share some other common interfaces. These have to
+    be enabled using the convenience macros in \code{flintxx/flint_classes.h}
+    (q.v.). Here \code{accessname} and \code{ctype} are specified via the
+    macros. For e.g. \code{fmpz_polyxx} these are \code{_poly} and
+    \code{fmpz_poly_struct}.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+?? some_expression::accessname()
+?? some_expression::accessname() const
+
+    Obtain a reference to the underlying C struct. This is only available on
+    immediate expressions.
+
+some_expression_ref::some_expression_ref(some_expression&)
+some_expression_srcref::some_expression_srcref(const some_expression&)
+some_expression_srcref::some_expression_srcref(some_expression_ref)
+
+    Build a reference type. Note that these are \emph{implicit} constructors.
+
+static some_expression_ref some_expression_ref::make(ctype*)
+static some_expression_srcref some_expression_srcref::make(const ctype*)
+
+    Build a reference type from a pointer to the underlying C struct.
+
+
+*******************************************************************************
+
+    Convenience macros
+
+*******************************************************************************
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    flintxx/rules.h
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+FLINT_DEFINE_GET2(name, totype, fromtype1, fromtype2, eval)
+
+    Specialise a getter called \code{name}, which takes arguments \code{e1} of
+    type \code{fromtype1} and \code{e2} of type \code{fromtype2}. It returns
+    \code{totype} by executing \code{eval}.
+
+FLINT_DEFINE_GET(name, totype, fromtype, eval)
+
+    Same as \code{FLINT_DEFINE_GET2(name, totype, fromtype, fromtype, eval)}.
+
+FLINT_DEFINE_GET_COND(name, totype, cond, eval)
+
+    Specialise a getter called \code{name}, which takes an argument \code{from}
+    of type \code{T:cond} It returns \code{totype} by
+    executing \code{eval}.
+
+FLINT_DEFINE_DOIT(name, totype, fromtype, eval)
+
+    Specialise a doit rule called \code{name}, which takes arguments
+    \code{to} of type \code{totype&} and \code{from} of type
+    \code{const fromtype&}, and executes \code{eval}.
+
+FLINT_DEFINE_DOIT_COND(name, totype, cond, eval)
+
+    Same as above, but takes \code{const T& from} for any \code{T:cond}.
+
+FLINT_DEFINE_DOIT_COND2(name, cond1, cond2, eval)
+
+    Same as \code{FLINT_DEFINE_DOIT_COND}, but takes \code{T& to} and
+    \code{const U& from} for any \code{T} satisfying \code{cond1<T>} and
+    \code{U} satisfying \code{cond2<U>}.
+
+FLINT_DEFINE_PRINT_COND(cond, eval)
+
+    Specialise the \code{cprint} rule. This takes a arguments \code{FILE* to}
+    and \code{const T& from} for any \code{T:cond}. It
+    prints \code{from} to \code{to} and returns \code{int} by executing
+    \code{eval}.
+
+FLINT_DEFINE_PRINT_PRETTY_COND(cond, eval)
+
+    Same as above, but with \code{print_pretty} instead of \code{cprint}.
+
+FLINT_DEFINE_PRINT_PRETTY_COND2(cond, extratype, eval)
+
+    Same as above, but takes an additional argument \code{extratype extra}.
+    Useful e.g. when printing polynomials and taking an extra variable name.
+
+FLINT_DEFINE_READ_COND(cond, eval)
+
+    Specialise the \code{read} rule. This takes a arguments \code{FILE* from}
+    and \code{T& to} for any \code{T:cond}. It
+    reads \code{to} from \code{from} and returns \code{int} by executing
+    \code{eval}.
+
+FLINT_DEFINE_UNARY_EXPR_(name, rtype, type, eval)
+
+    Specialise the unary expression rule for \code{operations::name} with
+    nominal return type \code{rtype}. It takes
+    arguments \code{V& to} and \code{const type& from}. Here \code{V} is any
+    type which \code{rtype} can be evaluated into. Executes \code{eval}.
+
+FLINT_DEFINE_UNARY_EXPR(name, type, eval)
+
+    Same as \code{FLINT_DEFINE_UNARY_EXPR_(name, type, type, eval)}.
+
+FLINT_DEFINE_BINARY_EXPR2(name, rtype, type1, type2, eval)
+
+    Specialise the binary expression rule for \code{operations::name} of
+    nominal return type \code{rtype}, and arguments \code{type1} and
+    \code{type2}.
+
+FLINT_DEFINE_BINARY_EXPR(name, type, eval)
+
+    Same as \code{FLINT_DEFINE_BINARY_EXPR2(name, type, type, type, eval)}.
+
+FLINT_DEFINE_CBINARY_EXPR(name, type, eval)
+
+    Same as above, but with \code{commutative_binary_expression} instead of
+    \code{binary_expression}.
+
+FLINT_DEFINE_BINARY_EXPR_COND(name, type, cond, eval)
+FLINT_DEFINE_CBINARY_EXPR_COND(name, type, cond, eval)
+
+    Specialise the (commutative) binary expression rule for
+    \code{operations::name} of nominal return type \code{type}, and arguments
+    \code{type} and \code{T:cond}.
+
+FLINT_DEFINE_BINARY_EXPR_COND2(name, rettype, cond1, cond2, eval)
+FLINT_DEFINE_CBINARY_EXPR_COND2(name, rettype, cond1, cond2, eval)
+
+    Specialise the (commutative) binary expression rule for
+    \code{operations::name} of nominal return type \code{rettype}, and arguments
+    \code{T:cond1} and \code{U:cond2}.
+
+FLINT_DEFINE_THREEARY_EXPR_COND3(name, rettype, cond1, cond2, cond3, eval)
+FLINT_DEFINE_FOURARY_EXPR_COND4(name, rettype, cond1 ... cond4, eval)
+FLINT_DEFINE_FIVEARY_EXPR_COND5(name, rettype, cond1 ... cond5, eval)
+FLINT_DEFINE_SIXARY_EXPR_COND6(name, rettype, cond1 ... cond6, eval)
+FLINT_DEFINE_SEVENARY_EXPR_COND7(name, rettype, cond1 ... cond7, eval)
+
+    Specialise higher order rules, similarly to the above.
+
+FLINT_DEFINE_THREEARY_EXPR(name, rettype, T1, T2, T3, eval)
+
+    Specialise a threeary expression rule unconditionally.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    flintxx/expression.h
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+FLINT_DEFINE_UNNOP(name)
+FLINT_DEFINE_BINOP(name)
+FLINT_DEFINE_THREEARY(name)
+FLINT_DEFINE_FOURARY(name)
+FLINT_DEFINE_FIVEARY(name)
+FLINT_DEFINE_SIXARY(name)
+FLINT_DEFINE_SEVENARY(name)
+
+    Introduce a new n-ary operation \code{operations::##name##_op} and make it
+    available. This has to be called in namespace \code{flint}.
+
+FLINT_DEFINE_UNNOP_HERE(name)
+FLINT_DEFINE_BINOP_HERE(name)
+FLINT_DEFINE_THREEARY_HERE(name)
+FLINT_DEFINE_FOURARY_HERE(name)
+FLINT_DEFINE_FIVEARY_HERE(name)
+FLINT_DEFINE_SIXARY_HERE(name)
+FLINT_DEFINE_SEVENARY_HERE(name)
+
+    Make the n-ary operation \code{operations::##name##_op} available in the
+    current namespace.
+
+FLINT_DEFINE_THREEARY_HERE_2DEFAULT(name, type1, val1, type2, val2)
+
+    Make the threeary operation \code{name} available in current namespace,
+    but with only two arguments, the second of which is of type \code{type1} and
+    defaults to \code{val1}, and the third argument always (implicitly) of type
+    \code{type2} and value \code{val2}.
+    The suggested usage of this macro is to first call
+    \code{FLINT_DEFINE_THREEARY_HERE} (or \code{FLINT_DEFINE_THREEARY}),
+    and then call \code{FLINT_DEFINE_THREEARY_HERE_2DEFAULT}. The effect will be an
+    operation which can be invoked with 1, 2 or 3 arguments.
+
+FLINT_UNOP_ENABLE_RETTYPE(name, T1)
+FLINT_BINOP_ENABLE_RETTYPE(name, T1, T2)
+FLINT_THREEARY_ENABLE_RETTYPE(name, T1, T2, T3)
+FLINT_FOURARY_ENABLE_RETTYPE(name, T1, T2, T3, T4)
+FLINT_FIVEARY_ENABLE_RETTYPE(name, T1, T2, T3, T4, T5)
+FLINT_SIXARY_ENABLE_RETTYPE(name, T1, T2, T3, T4, T5, T6)
+FLINT_SEVENARY_ENABLE_RETTYPE(name, T1, T2, T3, T4, T5, T6, T7)
+
+    Obtain the resulting type of invoking \code{name} with arguments of types
+    \code{T1}, ..., \code{Tn} if this is possible. Otherwise results in an
+    (SFINAE) error.
+
+FLINT_UNOP_BUILD_RETTYPE(name, rettype, T)
+
+    Obtain the resulting type (i.e. expression template) of invoking
+    \code{name} with argument type \code{T}, assuming the nominal return type
+    is \code{rettype}. This version is sometimes necessary to break cyclic
+    dependencies.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    flintxx/flint\_classes.h
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+FLINTXX_DEFINE_BASICS(name)
+
+    Add standard constructors (forwarded to \code{data_t}, and implicit ones
+    for reference types). Here \code{name} is the name of the expression
+    template class.
+
+FLINTXX_DEFINE_C_REF(name, ctype, accessname)
+
+    Enable the reference types scheme.
+
+FLINTXX_DEFINE_FORWARD_STATIC(funcname)
+
+    Add a statically forwarded constructor (similar to \code{make} for
+    reference types) which invokes a static constructor of the same name of
+    \code{data_t}.
+
+FLINTXX_DEFINE_MEMBER_UNOP_RTYPE(rettype, name)
+
+    Add a no-argument member function which applies self to the lazy function
+    \code{name}, where \code{name} has nominal return type \code{rettype}.
+    (The return type has to be specified to break circular dependencies.)
+
+FLINTXX_DEFINE_MEMBER_UNOP(name)
+
+    Same as above, but where the nominal return type is the (evaluated type of
+    the) current expression template class.
+
+FLINTXX_DEFINE_MEMBER_BINOP(name)
+FLINTXX_DEFINE_MEMBER_3OP(name)
+FLINTXX_DEFINE_MEMBER_4OP(name)
+FLINTXX_DEFINE_MEMBER_5OP(name)
+
+    Add a member function which \code{n-1} arguments, the result of which is to
+    invoke \code{name} on self and the arguments (in that order).
+
+FLINTXX_COND_S(Base)
+FLINTXX_COND_T(Base)
+
+    Expands to a condition (which can be passed to e.g.
+    \code{FLINT_DEFINE_CBINARY_EXPR_COND2}) appropriate for testing a
+    source/target of type \code{Base}.
+
+FLINTXX_DEFINE_TO_STR(Base, eval)
+
+    Add a \code{to_string} rule which works well with the \code{*_get_str}
+    functions in FLINT.
+
+FLINTXX_DEFINE_SWAP(Base, eval)
+
+    Add a swap rule.
+
+FLINTXX_DEFINE_CONVERSION_TMP(totype, Base, eval)
+
+    Define a conversion rule from \code{Base} to \code{totype}, which
+    default-constructs a temporary object \code{to} of type \code{totype},
+    then executes \code{eval}, and then returns \code{to}.
+
+FLINTXX_DEFINE_CMP(Base, eval)
+FLINTXX_DEFINE_EQUALS(Base, eval)
+
+    Define a cmp/equality rule.
+
+FLINTXX_DEFINE_ASSIGN_STR(Base, eval)
+
+    Define a string assignment rule (used by many polynomial classes).
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    flintxx/matrix.h
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+FLINTXX_DEFINE_MATRIX_METHODS(Traits)
+
+    Inside a matrix expression template class definition, given the unified
+    access traits \code{Traits} appropriate for this class, define the standard
+    methods \code{rows, cols, create_temporary}.
+
+FLINTXX_DEFINE_TEMPORARY_RULES(Matrix)
+
+    Given a matrix expression template class \code{Matrix}, define appropriate
+    temporary instantiation rule, disable temporary merging, etc.
+
+*******************************************************************************
+
+    Helper functions
+
+*******************************************************************************
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    flintxx/flint\_exception.h
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void execution_check(bool worked, const std::string& where,
+    const std::string& context)
+
+    If \code{worked} is true, do nothing. Else raise a \code{flint_exception}
+    with message \code{context + " computation failed: " + where}.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    permxx.h
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+slong* maybe_perm_data(permxx* p)
+
+    Return \code{0} if \code{p == 0}, and else the underlying data.
+    It is helpful to use this together with \code{traits::is_maybe_perm} as
+    condition.
