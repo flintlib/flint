@@ -65,7 +65,12 @@ set(BUILD_DIRS
     fmpz_poly_q fmpz_poly_mat nmod_poly_mat fmpz_mod_poly fmpz_mod_mat 
     fmpz_mod_poly_factor fmpz_factor fmpz_poly_factor fft qsieve 
     nf nf_elem qfb 
-    double_extras d_vec d_mat padic_poly padic_mat qadic  
+    fmpr arf mag arb arb_mat arb_poly arb_calc acf acb acb_mat acb_poly
+    acb_dft acb_calc acb_hypgeom acb_elliptic acb_modular dirichlet acb_dirichlet
+    arb_hypgeom bernoulli hypgeom fmpz_extras fmpzi bool_mat partitions dlog
+    double_interval arb_fmpz_poly arb_fpwrap
+    calcium utils_flint fmpz_mpoly_q fexpr fexpr_builtin qqbar ca ca_ext ca_field ca_vec ca_poly ca_mat
+    double_extras d_vec d_mat padic_poly padic_mat qadic
     fq fq_vec fq_mat fq_poly fq_poly_factor
     fq_nmod fq_nmod_vec fq_nmod_mat fq_nmod_poly fq_nmod_poly_factor 
     fq_zech fq_zech_vec fq_zech_mat fq_zech_poly fq_zech_poly_factor 
@@ -107,25 +112,6 @@ foreach (build_dir IN LISTS BUILD_DIRS TEMPLATE_DIRS)
     file(GLOB TEMP RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${build_dir}/*.h")
     list(APPEND HEADERS ${TEMP})
 endforeach ()
-
-execute_process(
-    COMMAND ${PYTHON_EXECUTABLE} -c 
-"
-from os.path import join
-
-with open(join('${CMAKE_CURRENT_SOURCE_DIR}','qadic', 'CPimport.txt')) as fin:
-    with open(join('${CMAKE_CURRENT_BINARY_DIR}','CPimport.h.in'), 'w+') as fout:
-        while True:
-            l = fin.readline()
-            if not l:
-                break
-            l = l.replace(' ', ',')
-            l = l.replace('\\n', ',\\n')
-            fout.writelines([l])
-"
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-)
-configure_file(${CMAKE_CURRENT_BINARY_DIR}/CPimport.h.in ${CMAKE_CURRENT_BINARY_DIR}/CPimport.h COPYONLY)
 
 # Setup for flint-config.h
 check_c_compiler_flag("-mpopcnt" HAS_FLAG_MPOPCNT)
