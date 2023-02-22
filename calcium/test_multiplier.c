@@ -22,14 +22,14 @@ double calcium_test_multiplier()
 
         if (s == NULL)
         {
-            _calcium_test_multiplier = 1.0;
+            _calcium_test_multiplier = 0.1;
         }
         else
         {
             _calcium_test_multiplier = strtod(s, NULL);
 
             if (!(_calcium_test_multiplier >= 0.0 && _calcium_test_multiplier <= 1000.0))
-                _calcium_test_multiplier = 1.0;
+                _calcium_test_multiplier = 0.1;
         }
     }
 

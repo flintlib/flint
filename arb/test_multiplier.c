@@ -22,14 +22,14 @@ double arb_test_multiplier()
 
         if (s == NULL)
         {
-            _arb_test_multiplier = 1.0;
+            _arb_test_multiplier = 0.1;
         }
         else
         {
             _arb_test_multiplier = strtod(s, NULL);
 
             if (!(_arb_test_multiplier >= 0.0 && _arb_test_multiplier <= 1000.0))
-                _arb_test_multiplier = 1.0;
+                _arb_test_multiplier = 0.1;
         }
     }
 
