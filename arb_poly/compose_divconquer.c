@@ -37,7 +37,7 @@ _arb_poly_compose_divconquer(arb_ptr res, arb_srcptr poly1, slong len1,
     else
     {
         gr_ctx_t ctx;
-        gr_ctx_init_complex_acb(ctx, prec);
+        gr_ctx_init_real_arb(ctx, prec);
         GR_MUST_SUCCEED(_gr_poly_compose_divconquer(res, poly1, len1, poly2, len2, ctx));
     }
 }
