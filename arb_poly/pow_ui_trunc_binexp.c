@@ -10,103 +10,31 @@
 */
 
 #include "arb_poly.h"
-
-#define MUL(z, zlen, x, xlen, y, ylen, trunc, prec) \
-    do { \
-        slong slen = FLINT_MIN(xlen + ylen - 1, trunc); \
-        _arb_poly_mullow(z, x, xlen, y, ylen, slen, prec); \
-        zlen = slen; \
-    } while (0)
+#include "gr_poly.h"
 
 void
 _arb_poly_pow_ui_trunc_binexp(arb_ptr res,
     arb_srcptr f, slong flen, ulong exp, slong len, slong prec)
 {
-    arb_ptr v, R, S, T;
-    slong rlen;
-    ulong bit;
-
-    if (exp <= 1)
+    if (exp <= 2)
     {
         if (exp == 0)
             arb_one(res);
         else if (exp == 1)
             _arb_vec_set_round(res, f, len, prec);
-        return;
-    }
-
-    /* (f * x^r)^m = x^(rm) * f^m */
-    while (flen > 1 && arb_is_zero(f))
-    {
-        if (((ulong) len) > exp)
-        {
-            _arb_vec_zero(res, exp);
-            len -= exp;
-            res += exp;
-        }
         else
-        {
-            _arb_vec_zero(res, len);
-            return;
-        }
-
-        f++;
-        flen--;
+            _arb_poly_mullow(res, f, flen, f, flen, len, prec);
     }
-
-    if (exp == 2)
+    else if (!_arb_vec_is_finite(f, flen))
     {
-        _arb_poly_mullow(res, f, flen, f, flen, len, prec);
-        return;
-    }
-
-    if (flen == 1)
-    {
-        arb_pow_ui(res, f, exp, prec);
-        return;
-    }
-
-    v = _arb_vec_init(len);
-    bit = UWORD(1) << (FLINT_BIT_COUNT(exp) - 2);
-    
-    if (n_zerobits(exp) % 2)
-    {
-        R = res;
-        S = v;
+        _arb_vec_indeterminate(res, len);
     }
     else
     {
-        R = v;
-        S = res;
+        gr_ctx_t ctx;
+        gr_ctx_init_real_arb(ctx, prec);
+        GR_MUST_SUCCEED(_gr_poly_pow_series_ui_binexp(res, f, flen, exp, len, ctx));
     }
-
-    MUL(R, rlen, f, flen, f, flen, len, prec);
-
-    if (bit & exp)
-    {
-        MUL(S, rlen, R, rlen, f, flen, len, prec);
-        T = R;
-        R = S;
-        S = T;
-    }
-    
-    while (bit >>= 1)
-    {
-        if (bit & exp)
-        {
-            MUL(S, rlen, R, rlen, R, rlen, len, prec);
-            MUL(R, rlen, S, rlen, f, flen, len, prec);
-        }
-        else
-        {
-            MUL(S, rlen, R, rlen, R, rlen, len, prec);
-            T = R;
-            R = S;
-            S = T;
-        }
-    }
-    
-    _arb_vec_clear(v, len);
 }
 
 void

@@ -10,103 +10,27 @@
 */
 
 #include "ca_poly.h"
-
-#define MUL(z, zlen, x, xlen, y, ylen, trunc, ctx) \
-    do { \
-        slong slen = FLINT_MIN(xlen + ylen - 1, trunc); \
-        _ca_poly_mullow(z, x, xlen, y, ylen, slen, ctx); \
-        zlen = slen; \
-    } while (0)
+#include "gr_poly.h"
 
 void
 _ca_poly_pow_ui_trunc(ca_ptr res,
     ca_srcptr f, slong flen, ulong exp, slong len, ca_ctx_t ctx)
 {
-    ca_ptr v, R, S, T;
-    slong rlen;
-    ulong bit;
-
-    if (exp <= 1)
+    if (exp <= 2)
     {
         if (exp == 0)
             ca_one(res, ctx);
         else if (exp == 1)
             _ca_vec_set(res, f, len, ctx);
-        return;
-    }
-
-    /* (f * x^r)^m = x^(rm) * f^m */
-    while (flen > 1 && (ca_check_is_zero(f, ctx) == T_TRUE))
-    {
-        if (((ulong) len) > exp)
-        {
-            _ca_vec_zero(res, exp, ctx);
-            len -= exp;
-            res += exp;
-        }
         else
-        {
-            _ca_vec_zero(res, len, ctx);
-            return;
-        }
-
-        f++;
-        flen--;
-    }
-
-    if (exp == 2)
-    {
-        _ca_poly_mullow(res, f, flen, f, flen, len, ctx);
-        return;
-    }
-
-    if (flen == 1)
-    {
-        ca_pow_ui(res, f, exp, ctx);
-        return;
-    }
-
-    v = _ca_vec_init(len, ctx);
-    bit = UWORD(1) << (FLINT_BIT_COUNT(exp) - 2);
-    
-    if (n_zerobits(exp) % 2)
-    {
-        R = res;
-        S = v;
+            _ca_poly_mullow(res, f, flen, f, flen, len, ctx);
     }
     else
     {
-        R = v;
-        S = res;
+        gr_ctx_t gr_ctx;
+        _gr_ctx_init_ca_from_ref(gr_ctx, GR_CTX_CC_CA, ctx);
+        GR_MUST_SUCCEED(_gr_poly_pow_series_ui_binexp(res, f, flen, exp, len, gr_ctx));
     }
-
-    MUL(R, rlen, f, flen, f, flen, len, ctx);
-
-    if (bit & exp)
-    {
-        MUL(S, rlen, R, rlen, f, flen, len, ctx);
-        T = R;
-        R = S;
-        S = T;
-    }
-    
-    while (bit >>= 1)
-    {
-        if (bit & exp)
-        {
-            MUL(S, rlen, R, rlen, R, rlen, len, ctx);
-            MUL(R, rlen, S, rlen, f, flen, len, ctx);
-        }
-        else
-        {
-            MUL(S, rlen, R, rlen, R, rlen, len, ctx);
-            T = R;
-            R = S;
-            S = T;
-        }
-    }
-    
-    _ca_vec_clear(v, len, ctx);
 }
 
 void
