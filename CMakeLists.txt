@@ -65,6 +65,7 @@ set(BUILD_DIRS
     fmpz_poly_q fmpz_poly_mat nmod_poly_mat fmpz_mod_poly fmpz_mod_mat 
     fmpz_mod_poly_factor fmpz_factor fmpz_poly_factor fft qsieve 
     nf nf_elem qfb 
+    gr gr_mat gr_poly gr_mpoly gr_vec gr_special
     fmpr arf mag arb arb_mat arb_poly arb_calc acf acb acb_mat acb_poly
     acb_dft acb_calc acb_hypgeom acb_elliptic acb_modular dirichlet acb_dirichlet
     arb_hypgeom bernoulli hypgeom fmpz_extras fmpzi bool_mat partitions dlog
