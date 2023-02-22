@@ -12,7 +12,7 @@
 #include "arb_hypgeom.h"
 #include "acb_hypgeom.h"
 
-void arb_gamma_stirling_coeff(acb_t b, ulong k, int digamma, slong prec);
+void arb_gamma_stirling_coeff(arb_t b, ulong k, int digamma, slong prec);
 
 void
 acb_hypgeom_gamma_stirling_sum_horner(acb_t s, const acb_t z, slong N, slong prec)
@@ -59,8 +59,8 @@ acb_hypgeom_gamma_stirling_sum_horner(acb_t s, const acb_t z, slong N, slong pre
         else
             acb_mul(s, s, w, term_prec);
 
-        arb_gamma_stirling_coeff(b, n, 0, term_prec);
-        acb_add(s, s, b, term_prec);
+        arb_gamma_stirling_coeff(acb_realref(b), n, 0, term_prec);
+        acb_add_arb(s, s, acb_realref(b), term_prec);
     }
 
     acb_mul(s, s, zinv, prec);
