@@ -547,6 +547,8 @@ FLINT_DLL void fmpz_fmms(fmpz_t f, const fmpz_t a, const fmpz_t b,
 
 FLINT_DLL void fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong exp);
 
+FLINT_DLL void fmpz_ui_pow_ui(fmpz_t x, ulong b, ulong e);
+
 FLINT_DLL int fmpz_pow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t e);
 
 FLINT_DLL void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong exp, const fmpz_t m);

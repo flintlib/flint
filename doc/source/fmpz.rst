@@ -832,6 +832,7 @@ Basic arithmetic
     number of limbs of `h` is at least ``PREINVN_CUTOFF``.
 
 .. function:: void fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong x)
+              void fmpz_ui_pow_ui(fmpz_t f, ulong g, ulong x)
 
     Sets `f` to `g^x`.  Defines `0^0 = 1`.
 

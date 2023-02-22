@@ -205,20 +205,6 @@ fmpz_ui_mul_ui(fmpz_t r, ulong a, ulong b)
 }
 
 static __inline__ void
-fmpz_ui_pow_ui(fmpz_t x, ulong b, ulong e)
-{
-    if (e <= 1)
-    {
-        fmpz_set_ui(x, e == 0 ? UWORD(1) : b);
-    }
-    else
-    {
-        fmpz_set_ui(x, b);
-        fmpz_pow_ui(x, x, e);
-    }
-}
-
-static __inline__ void
 fmpz_max(fmpz_t z, const fmpz_t x, const fmpz_t y)
 {
     if (fmpz_cmp(x, y) >= 0)

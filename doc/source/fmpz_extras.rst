@@ -26,10 +26,6 @@ Convenience methods
 
     Sets *x* to *a* times *b*.
 
-.. function:: void fmpz_ui_pow_ui(fmpz_t x, ulong b, ulong e)
-
-    Sets *x* to *b* raised to the power *e*.
-
 .. function:: void fmpz_max(fmpz_t z, const fmpz_t x, const fmpz_t y)
 
 .. function:: void fmpz_min(fmpz_t z, const fmpz_t x, const fmpz_t y)
