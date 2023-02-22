@@ -1123,6 +1123,33 @@ _gr_ca_log(ca_t res, const ca_t x, gr_ctx_t ctx)
 }
 
 int
+_gr_ca_atan(ca_t res, const ca_t x, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA || 
+        ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
+    {
+        truth_t ok = ca_check_is_zero(x, GR_CA_CTX(ctx));
+
+        if (ok == T_TRUE)
+            return _gr_ca_zero(res, ctx);
+
+        return (ok == T_FALSE) ? GR_DOMAIN : GR_UNABLE;
+    }
+    else
+    {
+        ca_atan(res, x, GR_CA_CTX(ctx));
+
+        if (ca_check_is_infinity(res, GR_CA_CTX(ctx)) == T_TRUE)
+            return GR_DOMAIN;
+
+        if (ca_is_unknown(res, GR_CA_CTX(ctx)))
+            return GR_UNABLE;
+
+        return GR_SUCCESS;
+    }
+}
+
+int
 _gr_ca_poly_mullow(ca_ptr res,
     ca_srcptr poly1, slong len1,
     ca_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
@@ -1295,6 +1322,7 @@ gr_method_tab_input _ca_methods_input[] =
     {GR_METHOD_PI,              (gr_funcptr) _gr_ca_pi},
     {GR_METHOD_EXP,             (gr_funcptr) _gr_ca_exp},
     {GR_METHOD_LOG,             (gr_funcptr) _gr_ca_log},
+    {GR_METHOD_ATAN,            (gr_funcptr) _gr_ca_atan},
 
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_ca_poly_mullow},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_ca_mat_mul},

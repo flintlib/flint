@@ -970,6 +970,23 @@ class gr_ctx:
         return ctx._unary_op(x, libgr.gr_acos, "acos($x)")
 
     def atan(ctx, x):
+        """
+        Inverse tangent.
+
+            >>> QQ.atan(0)
+            0
+            >>> RR.atan(1)
+            [0.7853981633974483 +/- 7.66e-17]
+            >>> RR_ca.atan(1)
+            0.785398 {(a)/4 where a = 3.14159 [Pi]}
+            >>> CC.atan(0.5j)
+            [0.549306144334055 +/- 3.32e-16]*I
+            >>> CC.atan(1j)
+            Traceback (most recent call last):
+              ...
+            FlintDomainError: atan(x) is not an element of {Complex numbers (acb, prec = 53)} for {x = 1.000000000000000*I}
+
+        """
         return ctx._unary_op(x, libgr.gr_atan, "atan($x)")
 
     def atan2(ctx, y, x):

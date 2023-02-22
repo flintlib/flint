@@ -324,12 +324,6 @@ Elementary functions
     Sets *res* to the power series logarithm of *f* truncated
     to length *len*.
 
-.. function:: void _ca_poly_atan_series(ca_ptr res, ca_srcptr f, slong flen, slong len, ca_ctx_t ctx)
-              void ca_poly_atan_series(ca_poly_t res, const ca_poly_t f, slong len, ca_ctx_t ctx)
-
-    Sets *res* to the power series inverse tangent of *f* truncated
-    to length *len*.
-
 Greatest common divisor
 -------------------------------------------------------------------------------
 
