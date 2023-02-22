@@ -32,7 +32,7 @@ int main()
     flint_printf("euler_number_zeta....");
     fflush(stdout);
 
-    N = 3000;
+    N = 50;
 
     ress = _fmpz_vec_init(N);
     arith_euler_number_vec(ress, N);

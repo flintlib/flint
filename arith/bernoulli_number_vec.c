@@ -15,8 +15,6 @@ void _arith_bernoulli_number_vec(fmpz * num, fmpz * den, slong n)
 {
     if (n < 700)
         _arith_bernoulli_number_vec_recursive(num, den, n);
-    else if (n < 3900)
-        _arith_bernoulli_number_vec_zeta(num, den, n);
     else
         _arith_bernoulli_number_vec_multi_mod(num, den, n);
 }

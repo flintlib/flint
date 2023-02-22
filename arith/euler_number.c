@@ -10,8 +10,9 @@
 */
 
 #include "arith.h"
+#include "arb.h"
 
 void arith_euler_number(fmpz_t res, ulong n)
 {
-    _arith_euler_number_zeta(res, n);
+    arb_fmpz_euler_number_ui(res, n);
 }

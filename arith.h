@@ -32,10 +32,6 @@
  extern "C" {
 #endif
 
-/* MPFR extras ***************************************************************/
-
-FLINT_DLL void mpfr_zeta_inv_euler_product(mpfr_t res, ulong s, int char_4);
-
 /* Various arithmetic functions **********************************************/
 
 #define arith_primorial fmpz_primorial
@@ -119,10 +115,7 @@ static const mp_limb_t euler_number_small[] = {
 };
 
 FLINT_DLL double arith_euler_number_size(ulong n);
-
 FLINT_DLL void arith_euler_number_vec(fmpz * res, slong n);
-
-FLINT_DLL void _arith_euler_number_zeta(fmpz_t res, ulong n);
 FLINT_DLL void arith_euler_number(fmpz_t res, ulong n);
 
 FLINT_DLL void arith_euler_polynomial(fmpq_poly_t poly, ulong n);
@@ -154,10 +147,8 @@ FLINT_DLL double arith_bernoulli_number_size(ulong n);
 
 FLINT_DLL void arith_bernoulli_polynomial(fmpq_poly_t poly, ulong n);
 
-FLINT_DLL void _arith_bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n);
 FLINT_DLL void _arith_bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, slong n);
 FLINT_DLL void _arith_bernoulli_number_vec_recursive(fmpz * num, fmpz * den, slong n);
-FLINT_DLL void _arith_bernoulli_number_vec_zeta(fmpz * num, fmpz * den, slong n);
 
 /* Cyclotomic polynomials ****************************************************/
 

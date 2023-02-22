@@ -21,6 +21,40 @@ mag_ui_div(mag_t z, ulong c, const mag_t x)
     mag_clear(t);
 }
 
+static const short small_denom[] = {
+    1, 6, 30, 42, 30, 66, 2730, 6, 510, 798, 330, 138, 2730, 6, 870, 14322
+};
+
+static const int small_numer[] = {
+    1, 1, -1, 1, -1, 5, -691, 7, -3617, 43867, -174611, 854513, -236364091, 8553103
+};
+
+static void
+_fmpq_bernoulli_small(fmpz_t p, fmpz_t q, ulong n)
+{
+    if (n == 1)
+    {
+        fmpz_set_si(p, -1);
+        fmpz_set_ui(q, 2);
+    }
+    else if (n % 2 == 1)
+    {
+        fmpz_zero(p);
+        fmpz_one(q);
+    }
+    else
+    {
+        if (n == 28)
+            fmpz_set_d(p, -23749461029.0);
+        else if (n == 30)
+            fmpz_set_d(p, 8615841276005.0);
+        else
+            fmpz_set_si(p, small_numer[n / 2]);
+
+        fmpz_set_si(q, small_denom[n / 2]);
+    }
+}
+
 void
 bernoulli_rev_next(fmpz_t numer, fmpz_t denom, bernoulli_rev_t iter)
 {
@@ -35,7 +69,7 @@ bernoulli_rev_next(fmpz_t numer, fmpz_t denom, bernoulli_rev_t iter)
 
     if (n < BERNOULLI_REV_MIN)
     {
-        _arith_bernoulli_number(numer, denom, n);
+        _fmpq_bernoulli_small(numer, denom, n);
         if (n != 0)
             iter->n -= 2;
         return;
