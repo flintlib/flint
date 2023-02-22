@@ -20,18 +20,6 @@
 #include "acb_elliptic.h"
 #include "acb_modular.h"
 
-static int
-_acb_vec_is_finite(acb_srcptr x, slong len)
-{
-    slong i;
-
-    for (i = 0; i < len; i++)
-        if (!acb_is_finite(x + i))
-            return 0;
-
-    return 1;
-}
-
 int
 arb_accurate_enough_d(const arb_t x, int flags)
 {

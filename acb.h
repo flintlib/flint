@@ -1084,6 +1084,12 @@ _acb_vec_is_real(acb_srcptr v, slong len)
     return 1;
 }
 
+ACB_INLINE int
+_acb_vec_is_finite(acb_srcptr vec, slong len)
+{
+    return _arb_vec_is_finite((arb_srcptr) vec, 2 * len);
+}
+
 ACB_INLINE slong
 _acb_vec_bits(acb_srcptr vec, slong len)
 {
