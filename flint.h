@@ -426,44 +426,6 @@ mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
 #define mpn_neg_n mpn_neg
 #endif
 
-#ifndef mpn_tdiv_q
-/* substitute for mpir's mpn_tdiv_q */
-static __inline__ void
-mpn_tdiv_q(mp_ptr qp, mp_srcptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn)
-{
-    mp_ptr _scratch;
-    TMP_INIT;
-    TMP_START;
-    _scratch = (mp_ptr) TMP_ALLOC(dn * sizeof(mp_limb_t));
-    mpn_tdiv_qr(qp, _scratch, 0, np, nn, dp, dn);
-    TMP_END;
-}
-#endif
-
-/* Newton iteration macros */
-#define FLINT_NEWTON_INIT(from, to) \
-    { \
-        slong __steps[FLINT_BITS], __i, __from, __to; \
-        __steps[__i = 0] = __to = (to); \
-        __from = (from); \
-        while (__to > __from) \
-            __steps[++__i] = (__to = (__to + 1) / 2); \
-
-#define FLINT_NEWTON_BASECASE(bc_to) { slong bc_to = __to;
-
-#define FLINT_NEWTON_END_BASECASE }
-
-#define FLINT_NEWTON_LOOP(step_from, step_to) \
-        { \
-            for (__i--; __i >= 0; __i--) \
-            { \
-                slong step_from = __steps[__i+1]; \
-                slong step_to = __steps[__i]; \
-
-#define FLINT_NEWTON_END_LOOP }}
-
-#define FLINT_NEWTON_END }
-
 FLINT_DLL int parse_fmt(int * floating, const char * fmt);
 
 FLINT_DLL int flint_printf(const char * str, ...); /* flint version of printf */

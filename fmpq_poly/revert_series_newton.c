@@ -16,6 +16,30 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
+/* Newton iteration macros */
+#define FLINT_NEWTON_INIT(from, to) \
+    { \
+        slong __steps[FLINT_BITS], __i, __from, __to; \
+        __steps[__i = 0] = __to = (to); \
+        __from = (from); \
+        while (__to > __from) \
+            __steps[++__i] = (__to = (__to + 1) / 2); \
+
+#define FLINT_NEWTON_BASECASE(bc_to) { slong bc_to = __to;
+
+#define FLINT_NEWTON_END_BASECASE }
+
+#define FLINT_NEWTON_LOOP(step_from, step_to) \
+        { \
+            for (__i--; __i >= 0; __i--) \
+            { \
+                slong step_from = __steps[__i+1]; \
+                slong step_to = __steps[__i]; \
+
+#define FLINT_NEWTON_END_LOOP }}
+
+#define FLINT_NEWTON_END }
+
 
 #define FLINT_REVERSE_NEWTON_CUTOFF 4
 

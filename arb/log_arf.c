@@ -10,6 +10,7 @@
 */
 
 #include "arb.h"
+#include "mpn_extras.h"
 
 int _arb_log_ui_smooth(arb_t res, ulong n, slong prec);
 
