@@ -17,6 +17,7 @@
 #include <gmp.h>
 
 #include "flint.h"
+#include "gmpcompat.h"
 #include "fmpz_mod_poly.h"
 
 #define NP 20  /* number of moduli */

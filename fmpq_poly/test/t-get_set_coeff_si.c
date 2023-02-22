@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
+#include "gmpcompat.h"
 #include "fmpq_poly.h"
 #include "long_extras.h"
 #include "ulong_extras.h"

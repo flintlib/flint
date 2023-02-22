@@ -488,7 +488,6 @@ FLINT_INLINE slong flint_mul_sizes(slong x, slong y)
     return lo;
 }
 
-#include "gmpcompat.h"
 #include "exception.h"
 
 /* defined ahead of fmpz.h and fmpq.h so that the types

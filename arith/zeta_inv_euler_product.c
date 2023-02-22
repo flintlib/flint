@@ -12,6 +12,7 @@
 #include <math.h>
 #include "mpfr.h"
 #include "arith.h"
+#include "gmpcompat.h"
 
 void mpfr_zeta_inv_euler_product(mpfr_t res, ulong s, int char_4)
 {

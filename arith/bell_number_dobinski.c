@@ -11,6 +11,7 @@
 
 #include <math.h>
 #include "arith.h"
+#include "gmpcompat.h"
 
 static void
 _fmpz_ui_pow_ui(fmpz_t x, ulong b, ulong e)

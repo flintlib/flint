@@ -135,6 +135,9 @@ void fmpz_init_set(fmpz_t f, const fmpz_t g)
     }
 }
 
+FLINT_DLL void _fmpz_mpz_set_ui(mpz_ptr r, ulong u);
+FLINT_DLL void _fmpz_mpz_set_si(mpz_ptr r, slong s);
+
 FMPZ_INLINE
 void fmpz_init_set_ui(fmpz_t f, ulong g)
 {
@@ -148,7 +151,7 @@ void fmpz_init_set_ui(fmpz_t f, ulong g)
 
         ptr = _fmpz_new_mpz();
         *f = PTR_TO_COEFF(ptr);
-        flint_mpz_set_ui(ptr, g);
+        _fmpz_mpz_set_ui(ptr, g);
     }
 }
 
@@ -165,7 +168,7 @@ void fmpz_init_set_si(fmpz_t f, slong g)
 
         ptr = _fmpz_new_mpz();
         *f = PTR_TO_COEFF(ptr);
-        flint_mpz_set_si(ptr, g);
+        _fmpz_mpz_set_si(ptr, g);
     }
 }
 
@@ -221,7 +224,7 @@ fmpz_set_si(fmpz_t f, slong val)
     if (val < COEFF_MIN || val > COEFF_MAX) /* val is large */
     {
         __mpz_struct *mpz_coeff = _fmpz_promote(f);
-        flint_mpz_set_si(mpz_coeff, val);
+        _fmpz_mpz_set_si(mpz_coeff, val);
     }
     else
     {
@@ -236,7 +239,7 @@ fmpz_set_ui(fmpz_t f, ulong val)
     if (val > COEFF_MAX)        /* val is large */
     {
         __mpz_struct *mpz_coeff = _fmpz_promote(f);
-        flint_mpz_set_ui(mpz_coeff, val);
+        _fmpz_mpz_set_ui(mpz_coeff, val);
     }
     else
     {
@@ -251,7 +254,7 @@ fmpz_neg_ui(fmpz_t f, ulong val)
     if (val > COEFF_MAX)
     {
         __mpz_struct *mpz_coeff = _fmpz_promote(f);
-        flint_mpz_set_ui(mpz_coeff, val);
+        _fmpz_mpz_set_ui(mpz_coeff, val);
         mpz_neg(mpz_coeff, mpz_coeff);
     }
     else
@@ -522,48 +525,6 @@ FMPZ_INLINE void fmpz_sub_si(fmpz_t f, const fmpz_t g, slong x)
         fmpz_sub_ui(f, g, (ulong) x);
     else
         fmpz_add_ui(f, g, (ulong) -x);
-}
-
-FMPZ_INLINE
-void flint_mpz_add_uiui(mpz_ptr a, mpz_srcptr b, ulong c1, ulong c0)
-{
-    ulong d[2];
-    mpz_t c;
-    d[0] = c0;
-    d[1] = c1;
-    c->_mp_d = d;
-    c->_mp_alloc = 2;
-    c->_mp_size = d[1] != 0 ? 2 : d[0] != 0;
-    mpz_add(a, b, c);
-}
-
-FMPZ_INLINE
-void flint_mpz_add_signed_uiui(mpz_ptr a, mpz_srcptr b, ulong c1, ulong c0)
-{
-    ulong d[2];
-    ulong c2 = FLINT_SIGN_EXT(c1);
-    mpz_t c;
-    sub_ddmmss(d[1], d[0], c2^c1, c2^c0, c2, c2);
-    c->_mp_d = d;
-    c->_mp_alloc = 2;
-    c->_mp_size = d[1] != 0 ? 2 : d[0] != 0;
-    if (c2 != 0)
-        c->_mp_size = -c->_mp_size;
-    mpz_add(a, b, c);
-}
-
-FMPZ_INLINE
-void flint_mpz_add_uiuiui(mpz_ptr a, mpz_srcptr b, ulong c2, ulong c1, ulong c0)
-{
-    ulong d[3];
-    mpz_t c;
-    d[0] = c0;
-    d[1] = c1;
-    d[2] = c2;
-    c->_mp_d = d;
-    c->_mp_alloc = 3;
-    c->_mp_size = d[2] != 0 ? 3 : d[1] != 0 ? 2 : d[0] != 0;
-    mpz_add(a, b, c);
 }
 
 FLINT_DLL void fmpz_addmul_si(fmpz_t f, const fmpz_t g, slong x);

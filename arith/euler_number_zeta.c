@@ -11,6 +11,7 @@
 
 #include "mpfr.h"
 #include "arith.h"
+#include "gmpcompat.h"
 
 void _arith_euler_number_zeta(fmpz_t res, ulong n)
 {

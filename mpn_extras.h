@@ -128,6 +128,8 @@ mp_limb_t  __gmpn_modexact_1_odd(mp_srcptr src, mp_size_t size,
 #ifdef mpn_modexact_1_odd
 #define flint_mpn_divisible_1_p(x, xsize, d) (mpn_modexact_1_odd(x, xsize, d) == 0)
 #else
+#include "gmpcompat.h"
+
 MPN_EXTRAS_INLINE int
 flint_mpn_divisible_1_p(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
 {

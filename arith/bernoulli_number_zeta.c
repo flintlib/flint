@@ -11,6 +11,7 @@
 
 #include "mpfr.h"
 #include "arith.h"
+#include "gmpcompat.h"
 
 void _arith_bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n)
 {

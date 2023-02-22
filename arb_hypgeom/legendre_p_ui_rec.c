@@ -10,6 +10,7 @@
 */
 
 #include "arb_hypgeom.h"
+#include "gmpcompat.h"
 
 void
 arb_hypgeom_legendre_p_ui_rec(arb_t res, arb_t res_prime, ulong n, const arb_t x, slong prec)

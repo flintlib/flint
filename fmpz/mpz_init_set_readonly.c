@@ -11,6 +11,7 @@
 
 #include <gmp.h>
 #include "flint.h"
+#include "gmpcompat.h"
 #include "fmpz.h"
 
 void flint_mpz_init_set_readonly(mpz_t z, const fmpz_t f)

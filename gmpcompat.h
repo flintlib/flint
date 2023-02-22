@@ -29,6 +29,67 @@
     (b) = __tmp;                    \
   } while (0)
 
+static __inline__
+void flint_mpz_add_uiui(mpz_ptr a, mpz_srcptr b, ulong c1, ulong c0)
+{
+    ulong d[2];
+    mpz_t c;
+    d[0] = c0;
+    d[1] = c1;
+    c->_mp_d = d;
+    c->_mp_alloc = 2;
+    c->_mp_size = d[1] != 0 ? 2 : d[0] != 0;
+    mpz_add(a, b, c);
+}
+
+static __inline__
+void flint_mpz_add_signed_uiui(mpz_ptr a, mpz_srcptr b, ulong c1, ulong c0)
+{
+    ulong d[2];
+    ulong c2 = FLINT_SIGN_EXT(c1);
+    mpz_t c;
+    sub_ddmmss(d[1], d[0], c2^c1, c2^c0, c2, c2);
+    c->_mp_d = d;
+    c->_mp_alloc = 2;
+    c->_mp_size = d[1] != 0 ? 2 : d[0] != 0;
+    if (c2 != 0)
+        c->_mp_size = -c->_mp_size;
+    mpz_add(a, b, c);
+}
+
+static __inline__
+void flint_mpz_add_uiuiui(mpz_ptr a, mpz_srcptr b, ulong c2, ulong c1, ulong c0)
+{
+    ulong d[3];
+    mpz_t c;
+    d[0] = c0;
+    d[1] = c1;
+    d[2] = c2;
+    c->_mp_d = d;
+    c->_mp_alloc = 3;
+    c->_mp_size = d[2] != 0 ? 3 : d[1] != 0 ? 2 : d[0] != 0;
+    mpz_add(a, b, c);
+}
+
+static __inline__
+void flint_mpz_add_signed_uiuiui(mpz_ptr a, mpz_srcptr b,
+                                                 ulong c2, ulong c1, ulong c0)
+{
+    ulong cs, d[3];
+    mpz_t c;
+    c->_mp_d = d;
+    c->_mp_alloc = 3;
+    cs = FLINT_SIGN_EXT(c2);
+    sub_dddmmmsss(d[2], d[1], d[0], cs^c2, cs^c1, cs^c0, cs, cs, cs);
+    c->_mp_size = d[2] != 0 ? 3 :
+                  d[1] != 0 ? 2 :
+                  d[0] != 0;
+    if (cs != 0)
+        c->_mp_size = -c->_mp_size;
+    mpz_add(a, b, c);
+}
+
+
 /* mpn_get_d -- limbs to double conversion.
 
    THE FUNCTIONS IN THIS FILE ARE FOR INTERNAL USE ONLY.  THEY'RE ALMOST

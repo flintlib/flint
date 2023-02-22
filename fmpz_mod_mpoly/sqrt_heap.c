@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_mod_mpoly.h"
+#include "gmpcompat.h"
 
 /* try to prove that A is not a square */
 static int _is_proved_not_square(

@@ -15,6 +15,7 @@
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "gmpcompat.h"
 
 int
 _gr_fmpq_ctx_write(gr_stream_t out, gr_ctx_t ctx)

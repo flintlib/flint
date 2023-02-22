@@ -13,6 +13,7 @@
 #include "arith.h"
 #include "nmod_poly.h"
 #include "fmpq_poly.h"
+#include "gmpcompat.h"
 
 /* S(n,k) <= (1/2) binomial(n,k) * k^(n-k) */
 static slong

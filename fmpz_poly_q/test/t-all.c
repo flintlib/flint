@@ -16,6 +16,8 @@
 #include <string.h>
 
 #include "fmpz_poly_q.h"
+#include "gmpcompat.h"
+
 
 void test_set(char * in, char * out)
 {

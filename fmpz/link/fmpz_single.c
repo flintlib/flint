@@ -25,6 +25,7 @@
 
 #include <gmp.h>
 #include "flint.h"
+#include "gmpcompat.h"
 #include "fmpz.h"
 
 /* Always free larger mpz's to avoid wasting too much heap space */
