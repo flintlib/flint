@@ -663,8 +663,8 @@ if [ -z "$CFLAGS" ]; then
    fi
 fi
 
-# avois spurious warnings with gcc
-CFLAGS="-Wno-stringop-overflow -Wno-stringop-overread -Wno-maybe-uninitialized $CFLAGS"
+# avoid spurious warnings with gcc
+# CFLAGS="-Wno-stringop-overflow -Wno-stringop-overread -Wno-maybe-uninitialized $CFLAGS"
 
 #this is needed on PPC G5 and does not hurt on other OS Xes
 
