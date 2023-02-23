@@ -1148,7 +1148,12 @@ gr_test_zero_one(gr_ctx_t R, flint_rand_t state, int test_flags)
     status |= gr_one(a, R);
     equal = gr_is_one(a, R);
     if (status == GR_SUCCESS && equal == T_FALSE)
+    {
+        printf("FAILL is_one\n");
+        gr_ctx_println(R);
+        gr_println(a, R);
         status = GR_TEST_FAIL;
+    }
 
     status |= gr_randtest(a, state, R);
     status |= gr_one(a, R);

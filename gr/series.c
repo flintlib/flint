@@ -382,6 +382,56 @@ _gr_poly_equal2(gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx
 }
 
 truth_t
+gr_series_is_one(const gr_series_t x, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    truth_t is_zero, is_one;
+    slong xlen = x->poly.length;
+
+    if (x->error <= 0)
+        return T_UNKNOWN;
+
+    if (sctx->mod == 0)
+        return T_TRUE;
+
+    if (xlen == 0)
+    {
+        /* deal with characteristic 0 */
+        if (gr_ctx_is_finite_characteristic(cctx) != T_FALSE)
+        {
+            gr_ptr tmp;
+            GR_TMP_INIT(tmp, cctx);
+            is_one = gr_is_one(tmp, cctx);
+            GR_TMP_CLEAR(tmp, cctx);
+            return is_one;
+        }
+
+        return T_FALSE;
+    }
+
+    is_one = gr_is_one(x->poly.coeffs, cctx);
+
+    if (is_one == T_FALSE)
+        return T_FALSE;
+
+    if (xlen >= 2)
+    {
+        is_zero = _gr_vec_is_zero(GR_ENTRY(x->poly.coeffs, 1, cctx->sizeof_elem), FLINT_MIN(xlen - 1, x->error - 1), cctx);
+        if (is_zero == T_FALSE)
+            return T_FALSE;
+    }
+    else
+    {
+        is_zero = T_TRUE;
+    }
+
+    if (x->error == SERIES_ERR_EXACT && is_zero == T_TRUE && is_one == T_TRUE)
+        return T_TRUE;
+
+    return T_UNKNOWN;
+}
+
+
+truth_t
 gr_series_equal(const gr_series_t x, const gr_series_t y, gr_series_ctx_t sctx, gr_ctx_t cctx)
 {
     truth_t equal;
@@ -1543,6 +1593,102 @@ gr_series_weierstrass_p(gr_series_t res, const gr_series_t x, const gr_series_t 
 
 typedef struct
 {
+    gr_series_struct * entries;
+    slong alloc;
+    slong length;
+}
+gr_series_vec_struct;
+
+typedef gr_series_vec_struct gr_series_vec_t[1];
+
+int
+gr_series_hypgeom_pfq(gr_series_t res, const gr_series_vec_t a, const gr_series_vec_t b, const gr_series_t x, int regularized, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    slong len, err, i;
+    slong prec;
+    slong p, q, pp, qq;
+    int have_one;
+    int status = GR_SUCCESS;
+    acb_poly_struct *aa, *bb;
+
+    if (cctx->which_ring != GR_CTX_CC_ACB)
+        return GR_UNABLE;
+
+    p = a->length;
+    q = b->length;
+
+    err = x->error;
+    for (i = 0; i < p; i++)
+        err = FLINT_MIN(err, a->entries[i].error);
+    for (i = 0; i < q; i++)
+        err = FLINT_MIN(err, b->entries[i].error);
+
+    len = FLINT_MIN(sctx->mod, sctx->prec);
+    len = FLINT_MIN(len, err);
+    err = len;
+
+    if (err >= sctx->mod)
+        err = SERIES_ERR_EXACT;
+
+    aa = GR_TMP_ALLOC(sizeof(acb_poly_struct) * (p + q + 1));
+
+    have_one = 0;
+
+    for (i = 0; i < p; i++)
+    {
+        if (!have_one && acb_poly_is_one((acb_poly_struct *) (&a->entries[i].poly)))
+        {
+            have_one = 1;
+            continue;
+        }
+
+        aa[i - have_one].coeffs = a->entries[i].poly.coeffs;
+        aa[i - have_one].alloc = a->entries[i].poly.alloc;
+        aa[i - have_one].length = a->entries[i].poly.length;
+    }
+
+    if (have_one)
+    {
+        pp = p - 1;
+        qq = q;
+        bb = aa + pp;
+    }
+    else
+    {
+        pp = p;
+        qq = q + 1;
+        bb = aa + pp;
+
+        acb_poly_init(bb + qq - 1);
+        acb_poly_one(bb + qq - 1);
+    }
+
+    for (i = 0; i < q; i++)
+    {
+        bb[i].coeffs = b->entries[i].poly.coeffs;
+        bb[i].alloc = b->entries[i].poly.alloc;
+        bb[i].length = b->entries[i].poly.length;
+    }
+
+    prec = _gr_ctx_get_real_prec(cctx);
+
+    res->error = err;
+
+    acb_hypgeom_pfq_series_direct((acb_poly_struct *) &res->poly, aa, pp, bb, qq, (const acb_poly_struct *) &x->poly, regularized, -1, len, prec);
+
+    if (!_acb_vec_is_finite((acb_ptr) res->poly.coeffs, res->poly.length))
+        status = GR_UNABLE;
+
+    if (!have_one)
+        acb_poly_clear(bb + qq - 1);
+
+    GR_TMP_FREE(aa, sizeof(acb_poly_struct) * (p + q + 1));
+
+    return status;
+}
+
+typedef struct
+{
     gr_ctx_struct * base_ring;
     gr_series_ctx_struct sctx;
     char * var;
@@ -1588,6 +1734,7 @@ static int _gr_gr_series_set_ui(gr_series_t res, ulong c, gr_ctx_t ctx) { return
 static int _gr_gr_series_set_fmpz(gr_series_t res, const fmpz_t c, gr_ctx_t ctx) { return gr_series_set_fmpz(res, c, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_set_fmpq(gr_series_t res, const fmpq_t c, gr_ctx_t ctx) { return gr_series_set_fmpq(res, c, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static truth_t _gr_gr_series_is_zero(const gr_series_t x, gr_ctx_t ctx) { return gr_series_is_zero(x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static truth_t _gr_gr_series_is_one(const gr_series_t x, gr_ctx_t ctx) { return gr_series_is_one(x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static truth_t _gr_gr_series_equal(const gr_series_t x, const gr_series_t y, gr_ctx_t ctx) { return gr_series_equal(x, y, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_neg(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_neg(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_add(gr_series_t res, const gr_series_t x, const gr_series_t y, gr_ctx_t ctx) { return gr_series_add(res, x, y, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
@@ -1629,6 +1776,8 @@ static int _gr_gr_series_log_integral(gr_series_t res, const gr_series_t x, int 
 static int _gr_gr_series_gamma_upper(gr_series_t res, const gr_series_t x, const gr_series_t y, int regularized, gr_ctx_t ctx) { return gr_series_gamma_upper(res, x, y, regularized, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_gamma_lower(gr_series_t res, const gr_series_t x, const gr_series_t y, int regularized, gr_ctx_t ctx) { return gr_series_gamma_lower(res, x, y, regularized, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_beta_lower(gr_series_t res, const gr_series_t a, const gr_series_t b, const gr_series_t x, int regularized, gr_ctx_t ctx) { return gr_series_beta_lower(res, a, b, x, regularized, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+
+static int _gr_gr_series_hypgeom_pfq(gr_series_t res, const gr_series_vec_t a, const gr_series_vec_t b, const gr_series_t x, int regularized, gr_ctx_t ctx) { return gr_series_hypgeom_pfq(res, a, b, x, regularized, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 
 static int _gr_gr_series_polylog(gr_series_t res, const gr_series_t s, const gr_series_t z, gr_ctx_t ctx) { return gr_series_polylog(res, s, z, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_hurwitz_zeta(gr_series_t res, const gr_series_t s, const gr_series_t z, gr_ctx_t ctx) { return gr_series_hurwitz_zeta(res, s, z, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
@@ -1726,6 +1875,7 @@ gr_method_tab_input _gr_series_methods_input[] =
     {GR_METHOD_ZERO,        (gr_funcptr) _gr_gr_series_zero},
     {GR_METHOD_ONE,         (gr_funcptr) _gr_gr_series_one},
     {GR_METHOD_IS_ZERO,     (gr_funcptr) _gr_gr_series_is_zero},
+    {GR_METHOD_IS_ONE,      (gr_funcptr) _gr_gr_series_is_one},
     {GR_METHOD_EQUAL,       (gr_funcptr) _gr_gr_series_equal},
     {GR_METHOD_GEN,         (gr_funcptr) _gr_gr_series_gen},
     {GR_METHOD_SET,         (gr_funcptr) _gr_gr_series_set},
@@ -1771,6 +1921,7 @@ gr_method_tab_input _gr_series_methods_input[] =
     {GR_METHOD_GAMMA_UPPER,           (gr_funcptr) _gr_gr_series_gamma_upper},
     {GR_METHOD_GAMMA_LOWER,           (gr_funcptr) _gr_gr_series_gamma_lower},
     {GR_METHOD_BETA_LOWER,            (gr_funcptr) _gr_gr_series_beta_lower},
+    {GR_METHOD_HYPGEOM_PFQ,           (gr_funcptr) _gr_gr_series_hypgeom_pfq},
     {GR_METHOD_HURWITZ_ZETA,          (gr_funcptr) _gr_gr_series_hurwitz_zeta},
     {GR_METHOD_POLYLOG,               (gr_funcptr) _gr_gr_series_polylog},
     {GR_METHOD_DIRICHLET_L,           (gr_funcptr) _gr_gr_series_dirichlet_l},
