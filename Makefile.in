@@ -263,6 +263,9 @@ install: library
 	$(AT)if [ ! -z "$(EXT_HEADERS)" ]; then \
 	   cp $(EXT_HEADERS) "$(DESTDIR)$(PREFIX)/include/flint"; \
 	fi
+	mkdir -p "$(DESTDIR)$(PREFIX)/include/flint/flintxx"
+	cp flintxx/*.h "$(DESTDIR)$(PREFIX)/include/flint/flintxx"
+	cp flintxx_public/*xx.h "$(DESTDIR)$(PREFIX)/include/flint"
 	$(AT)if [ "$(OS)" = "Darwin" ] && [ "$(FLINT_SHARED)" -eq "1" ]; then \
 	   install_name_tool -id "$(PREFIX)/$(LIBDIR)/$(FLINT_LIB)" "$(DESTDIR)$(PREFIX)/$(LIBDIR)/$(FLINT_LIBNAME)"; \
 	fi

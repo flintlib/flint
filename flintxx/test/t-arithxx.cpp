@@ -153,8 +153,6 @@ test_polys()
     // just very basic tests ...
     ulong N = 1234;
     tassert(cyclotomic_polynomial(N).degree() == euler_phi(fmpzxx(N)));
-    tassert(cos_minpoly(N).degree() == euler_phi(fmpzxx(N))/2);
-
     tassert(swinnerton_dyer_polynomial(8u).degree() == fmpzxx(2).pow(8u));
 }
 

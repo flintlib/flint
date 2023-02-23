@@ -833,9 +833,10 @@ LIBS="$LLIBS $lLIBS"
 
 #cxx
 
-# if [ "$WANT_CXX" = "1" ]; then
+if [ "$WANT_CXX" = "1" ]; then
+   INCS="${INCS} -I\$(CURDIR)/flintxx_public"
 #    EXTRA_BUILD="$EXTRA_BUILD flintxx"
-# fi
+fi
 
 if [ -z "$CXXFLAGS" ]; then
    CXXFLAGS="$CFLAGS"

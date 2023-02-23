@@ -21,7 +21,7 @@
 #include "ltuple.h"
 #include "traits.h"
 #include "tuple.h"
-#include "../permxx.h"
+#include "permxx.h"
 
 namespace flint {
 FLINT_DEFINE_BINOP(solve)

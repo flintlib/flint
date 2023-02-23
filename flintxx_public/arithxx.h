@@ -260,7 +260,6 @@ ARITHXX_DEFINE_UNOP(divisors, fmpz_polyxx, FMPZXX_COND_S)
 ARITHXX_DEFINE_UNOP(ramanujan_tau, fmpzxx, FMPZXX_COND_S)
 ARITHXX_DEFINE_UNOP(ramanujan_tau_series, fmpz_polyxx, at::slong)
 ARITHXX_DEFINE_UNOP(cyclotomic_polynomial, fmpz_polyxx, at::ulong)
-ARITHXX_DEFINE_UNOP(cos_minpoly, fmpz_polyxx, at::ulong)
 ARITHXX_DEFINE_UNOP(swinnerton_dyer_polynomial, fmpz_polyxx, at::ulong)
 ARITHXX_DEFINE_UNOP(landau_function_vec, fmpz_vecxx, at::slong)
 
