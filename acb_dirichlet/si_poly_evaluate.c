@@ -50,9 +50,8 @@ acb_dirichlet_si_poly_evaluate(acb_t res, slong * v, slong len, const acb_t z, s
     r = k % m;
     for (; k >= 0; r = m - 1)
     {
-        acb_zero(sq);
-        for (; r >= 0; r--, k--)
-            acb_addmul_si(sq, zk + r, v[k], prec);
+        acb_dot_si(sq, NULL, 0, zk + r, -1, v + k, -1, r + 1, prec);
+        k -= (r + 1);
         acb_mul(res, res, zk + m, prec);
         acb_add(res, res, sq, prec);
     }
