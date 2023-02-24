@@ -397,6 +397,7 @@ __gr_fq_nmod_vec_dot(fq_nmod_struct * res, const fq_nmod_struct * initial, int s
         slen--;
 
     _fq_nmod_reduce(s, slen, FQ_CTX(ctx));
+    slen = FLINT_MIN(slen, plen - 1);
 
     while (slen > 0 && s[slen - 1] == 0)
         slen--;
@@ -491,6 +492,7 @@ __gr_fq_nmod_vec_dot_rev(fq_nmod_struct * res, const fq_nmod_struct * initial, i
         slen--;
 
     _fq_nmod_reduce(s, slen, FQ_CTX(ctx));
+    slen = FLINT_MIN(slen, plen - 1);
 
     while (slen > 0 && s[slen - 1] == 0)
         slen--;
