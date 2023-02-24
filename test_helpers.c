@@ -9,9 +9,30 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
 #include "flint.h"
 
-int flint_test_multiplier()
+double _flint_test_multiplier = -1.0;
+
+double flint_test_multiplier()
 {
-    return 1;
+    if (_flint_test_multiplier == -1.0)
+    {
+        const char * s = getenv("FLINT_TEST_MULTIPLIER");
+
+        if (s == NULL)
+        {
+            _flint_test_multiplier = 1.0;
+        }
+        else
+        {
+            _flint_test_multiplier = strtod(s, NULL);
+
+            if (!(_flint_test_multiplier >= 0.0 && _flint_test_multiplier <= 1000.0))
+                _flint_test_multiplier = 1.0;
+        }
+    }
+
+    return _flint_test_multiplier;
 }
+
