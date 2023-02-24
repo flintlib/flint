@@ -18,6 +18,8 @@
 
 #define FQ_CTX(ring_ctx) ((fq_zech_ctx_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
 
+/* todo: lots of inlining */
+
 void
 _gr_fq_zech_ctx_clear(gr_ctx_t ctx)
 {
@@ -315,15 +317,28 @@ _gr_fq_zech_pth_root(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+/* todo: _fq_zech_poly_mullow should do the right thing */
 int
 _gr_fq_zech_poly_mullow(fq_zech_struct * res,
     const fq_zech_struct * poly1, slong len1,
     const fq_zech_struct * poly2, slong len2, slong n, gr_ctx_t ctx)
 {
-    if (len1 >= len2)
-        _fq_zech_poly_mullow(res, poly1, len1, poly2, len2, n, FQ_CTX(ctx));
+    if (len1 + len2 - 1 == n)
+    {
+        if (poly1 == poly2 && len1 == len2)
+            _fq_zech_poly_sqr(res, poly1, len1, FQ_CTX(ctx));
+        else if (len1 >= len2)
+            _fq_zech_poly_mul(res, poly1, len1, poly2, len2, FQ_CTX(ctx));
+        else
+            _fq_zech_poly_mul(res, poly2, len2, poly1, len1, FQ_CTX(ctx));
+    }
     else
-        _fq_zech_poly_mullow(res, poly2, len2, poly1, len1, n, FQ_CTX(ctx));
+    {
+        if (len1 >= len2)
+            _fq_zech_poly_mullow(res, poly1, len1, poly2, len2, n, FQ_CTX(ctx));
+        else
+            _fq_zech_poly_mullow(res, poly2, len2, poly1, len1, n, FQ_CTX(ctx));
+    }
 
     return GR_SUCCESS;
 }
@@ -448,14 +463,12 @@ gr_method_tab_input _fq_zech_methods_input[] =
 };
 
 void
-gr_ctx_init_fq_zech(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var)
+_gr_ctx_init_fq_zech_from_ref(gr_ctx_t ctx, const void * fq_zech_ctx)
 {
     ctx->which_ring = GR_CTX_FQ_ZECH;
     ctx->sizeof_elem = sizeof(fq_zech_struct);
-    GR_CTX_DATA_AS_PTR(ctx) = flint_malloc(sizeof(fq_zech_ctx_struct));
+    GR_CTX_DATA_AS_PTR(ctx) = (fq_zech_ctx_struct *) fq_zech_ctx;
     ctx->size_limit = WORD_MAX;
-
-    fq_zech_ctx_init(FQ_CTX(ctx), p, d, var == NULL ? "a" : var);
     ctx->methods = _fq_zech_methods;
 
     if (!_fq_zech_methods_initialized)
@@ -463,4 +476,14 @@ gr_ctx_init_fq_zech(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var)
         gr_method_tab_init(_fq_zech_methods, _fq_zech_methods_input);
         _fq_zech_methods_initialized = 1;
     }
+}
+
+void
+gr_ctx_init_fq_zech(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var)
+{
+    fq_zech_ctx_struct * fq_zech_ctx;
+
+    fq_zech_ctx = flint_malloc(sizeof(fq_zech_ctx_struct));
+    fq_zech_ctx_init(fq_zech_ctx, p, d, var == NULL ? "a" : var);
+    _gr_ctx_init_fq_zech_from_ref(ctx, fq_zech_ctx);
 }

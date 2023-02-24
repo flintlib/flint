@@ -1323,6 +1323,10 @@ void gr_ctx_init_fq(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var);
 void gr_ctx_init_fq_nmod(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var);
 void gr_ctx_init_fq_zech(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var);
 
+void _gr_ctx_init_fq_from_ref(gr_ctx_t ctx, const void * fq_ctx);
+void _gr_ctx_init_fq_nmod_from_ref(gr_ctx_t ctx, const void * fq_nmod_ctx);
+void _gr_ctx_init_fq_zech_from_ref(gr_ctx_t ctx, const void * fq_zech_ctx);
+
 void gr_ctx_init_fmpz_poly(gr_ctx_t ctx);
 
 
