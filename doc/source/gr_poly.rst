@@ -363,6 +363,19 @@ GCD
     The underscore methods assume ``lenA >= lenB >= 1`` and that both
     *A* and *B* have nonzero leading coefficient.
 
+Resultant
+-------------------------------------------------------------------------------
+
+.. function:: int _gr_poly_resultant_euclidean(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
+              int gr_poly_resultant_euclidean(gr_ptr r, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)
+
+.. function:: int _gr_poly_resultant_hgcd(gr_ptr res, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, slong inner_cutoff, slong cutoff, gr_ctx_t ctx)
+              int gr_poly_resultant_hgcd(gr_ptr r, const gr_poly_t f, const gr_poly_t g, slong inner_cutoff, slong cutoff, gr_ctx_t ctx)
+
+.. function:: int _gr_poly_resultant_sylvester(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
+              int gr_poly_resultant_sylvester(gr_ptr r, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)
+
+
 Squarefree factorization
 -------------------------------------------------------------------------------
 

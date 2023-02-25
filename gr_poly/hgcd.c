@@ -14,7 +14,6 @@
 #include "gr_poly.h"
 #include "gr_vec.h"
 
-
 typedef struct
 {
    gr_ptr res;
@@ -704,6 +703,85 @@ int _gr_poly_hgcd(slong * sgn, gr_ptr * M, slong * lenM,
         status = _gr_poly_hgcd_recursive(&sgnM, M, lenM, A, lenA, B, lenB, a, lena, b, lenb, W, ctx, cutoff, 1, NULL);
     }
 
+    GR_TMP_CLEAR_VEC(W, lenW, ctx);
+
+    if (sgn != NULL)
+        *sgn = sgnM;
+
+    return status;
+}
+
+/* todo: deduplicate code with the above */
+int _gr_poly_hgcd_res(gr_ptr r, slong * sgn, gr_ptr * M, slong * lenM,
+                               gr_ptr A, slong * lenA,
+                               gr_ptr B, slong * lenB,
+                               gr_srcptr a, slong lena,
+                               gr_srcptr b, slong lenb,
+                               slong cutoff,
+                               gr_ctx_t ctx)
+{
+    slong lenW = 22 * lena + 16 * (FLINT_CLOG2(lena) + 1);
+    slong sgnM;
+    gr_ptr W;
+    int status = GR_SUCCESS;
+    gr_poly_res_t res;
+    slong sz = ctx->sizeof_elem;
+
+    if (lena == 0 || lenb == 0)
+    {
+        *sgn = 0;
+        lenM[0] = lenM[1] = lenM[2] = lenM[3] = *lenA = *lenB = 0;
+        return GR_DOMAIN;
+    }
+
+    GR_TMP_INIT2(res->res, res->lc, ctx);
+
+    status |= gr_set(res->res, r, ctx);
+    status |= gr_set(res->lc, GR_ENTRY(b, lenb - 1, sz), ctx);
+
+    res->len0 = lena;
+    res->len1 = lenb;
+    res->off = 0;
+
+    if (lenb < lena / 2 + 1)
+        lenW = 0;
+
+    GR_TMP_INIT_VEC(W, lenW, ctx);
+
+    if (M == NULL)
+    {
+        status = _gr_poly_hgcd_recursive(&sgnM, NULL, NULL, A, lenA, B, lenB, a, lena, b, lenb, W, ctx, cutoff, 0, res);
+    }
+    else
+    {
+        status = _gr_poly_hgcd_recursive(&sgnM, M, lenM, A, lenA, B, lenB, a, lena, b, lenb, W, ctx, cutoff, 1, res);
+    }
+
+    if (*lenB < lenb) /* make sure something happened */
+    {
+        if (*lenB >= 1)
+        {
+            status |= gr_pow_ui(res->lc, res->lc, res->len0 - *lenB, ctx);
+            status |= gr_mul(res->res, res->res, res->lc, ctx);
+
+            if (((res->len0 | res->len1) & 1) == 0)
+                status |= gr_neg(res->res, res->res, ctx);
+        }
+        else
+        {
+            if (res->len1 == 1) 
+            {
+                status |= gr_pow_ui(res->lc, res->lc, res->len0 - 1, ctx);
+                status |= gr_mul(res->res, res->res, res->lc, ctx);
+            }
+            else
+                status |= gr_zero(res->res, ctx);
+        }
+    }
+
+    status |= gr_set(r, res->res, ctx);
+
+    GR_TMP_CLEAR2(res->res, res->lc, ctx);
     GR_TMP_CLEAR_VEC(W, lenW, ctx);
 
     if (sgn != NULL)

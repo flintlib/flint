@@ -91,6 +91,7 @@ _gr_poly_gcd_hgcd(gr_ptr G, slong * _lenG, gr_srcptr A, slong lenA, gr_srcptr B,
 
         while (lenJ != 0)
         {
+            /* todo: only rem */
             __divrem(Q, lenQ, R, lenR, G, lenG, J, lenJ);
             (void) lenQ; /* unused */
 
