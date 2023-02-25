@@ -15,6 +15,8 @@
 
 #include "templates.h"
 
+#if 1
+
 /*
     We define a whole bunch of macros here which essentially provide 
     the TEMPLATE(T, poly) functionality as far as the setting of coefficient 
@@ -532,6 +534,26 @@ slong _TEMPLATE(T, poly_hgcd) (TEMPLATE(T, struct)**M, slong * lenM,
     return sgnM;
 }
 
+#else
 
+#include "gr_poly.h"
+
+slong _TEMPLATE(T, poly_hgcd) (TEMPLATE(T, struct)**M, slong * lenM,
+                               TEMPLATE(T, struct) * A, slong * lenA,
+                               TEMPLATE(T, struct) * B, slong * lenB,
+                               const TEMPLATE(T, struct) * a, slong lena,
+                               const TEMPLATE(T, struct) * b, slong lenb,
+                               const TEMPLATE(T, ctx_t) ctx)
+{
+    slong s;
+    gr_ctx_t gr_ctx;
+
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_hgcd(&s, (void **) M, lenM, A, lenA, B, lenB, a, lena, b, lenb, 0, gr_ctx));
+
+    return s;
+}
+
+#endif
 
 #endif

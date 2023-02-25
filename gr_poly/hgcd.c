@@ -14,6 +14,19 @@
 #include "gr_poly.h"
 #include "gr_vec.h"
 
+
+typedef struct
+{
+   gr_ptr res;
+   gr_ptr lc;
+   slong len0;
+   slong len1;
+   slong off;
+} gr_poly_res_struct;
+
+typedef gr_poly_res_struct gr_poly_res_t[1];
+
+
 #define OFFSET(x, i) GR_ENTRY((x), (i), sz)
 
 #define GR_VEC_NORM(status, R, lenR, sz, ctx) \
@@ -288,7 +301,8 @@ _gr_poly_hgcd_recursive_iter(
     gr_srcptr b, slong lenb,
     gr_ptr Q, gr_ptr * T,
     gr_ptr * t,
-    gr_ctx_t ctx)
+    gr_ctx_t ctx,
+    gr_poly_res_t res)
 {
     const slong m = lena / 2;
     slong sgn = 1;
@@ -305,7 +319,40 @@ _gr_poly_hgcd_recursive_iter(
     {
         slong lenQ, lenT, lent;
 
+        if (res != NULL)
+           status |= gr_set(res->lc, OFFSET(*B, *lenB - 1), ctx);
+
         __divrem(Q, lenQ, *T, lenT, *A, *lenA, *B, *lenB);
+
+        if (res != NULL)
+        {
+            if (lenT >= m + 1)
+            {
+                if (lenT >= 1)
+                {
+                    status |= gr_pow_ui(res->lc, res->lc, *lenA - lenT, ctx);
+                    status |= gr_mul(res->res, res->res, res->lc, ctx);
+
+                    if ((((*lenA + res->off) | (*lenB + res->off)) & 1) == 0)
+                        status |= gr_neg(res->res, res->res, ctx);
+                }
+                else
+                {
+                    if (*lenB == 1) 
+                    {
+                        status |= gr_pow_ui(res->lc, res->lc, *lenA - 1, ctx);
+                        status |= gr_mul(res->res, res->res, res->lc, ctx);
+                    }
+                    else
+                        status |= gr_zero(res->res, ctx);
+                }
+            }
+            else
+            {
+                res->len0 = *lenA;
+                res->len1 = *lenB;
+            }
+        }
 
         __swap(*B, *lenB, *T, lenT);
         __swap(*A, *lenA, *T, lenT);
@@ -350,7 +397,7 @@ int _gr_poly_hgcd_recursive(
     gr_srcptr a, slong lena,
     gr_srcptr b, slong lenb,
     gr_ptr P,
-    gr_ctx_t ctx, slong cutoff, int flag)
+    gr_ctx_t ctx, slong cutoff, int flag, gr_poly_res_t res)
 {
     const slong m = lena / 2;
     int status = GR_SUCCESS;
@@ -405,15 +452,30 @@ int _gr_poly_hgcd_recursive(
         __attach_shift(a0, lena0, (gr_ptr) a, lena, m);
         __attach_shift(b0, lenb0, (gr_ptr) b, lenb, m);
 
+        if (res != NULL)
+        {
+            status |= gr_set(res->lc, OFFSET(b, lenb - 1), ctx);
+            res->len0 -= m;
+            res->len1 -= m;
+            res->off += m;
+        }
+
         if (lena0 < cutoff)
             status |= _gr_poly_hgcd_recursive_iter(&sgnR, R, lenR, &a3, &lena3,
                                                         &b3, &lenb3, a0, lena0,
                                                         b0, lenb0, q, &T0, &T1,
-                                                        ctx);
+                                                        ctx, res);
         else
             status |= _gr_poly_hgcd_recursive(&sgnR, R, lenR, a3, &lena3, b3,
                                                    &lenb3, a0, lena0, b0,
-                                                   lenb0, P, ctx, cutoff, 1);
+                                                   lenb0, P, ctx, cutoff, 1, res);
+
+        if (res != NULL)
+        {
+            res->off -= m;
+            res->len0 += m;
+            res->len1 += m;
+        }
 
         __attach_truncate(s, lens, (gr_ptr) a, lena, m);
         __attach_truncate(t, lent, (gr_ptr) b, lenb, m);
@@ -469,18 +531,91 @@ int _gr_poly_hgcd_recursive(
         {
             slong k = 2 * m - lenb2 + 1;
 
+            if (res != NULL)
+            {
+                if (lenb2 < lenb) /* ensure something happened */
+                {
+                    if (lenb2 >= 1)
+                    {
+                        status |= gr_pow_ui(res->lc, res->lc, res->len0 - lenb2, ctx);
+                        status |= gr_mul(res->res, res->res, res->lc, ctx);
+
+                        if ((((res->len0 + res->off) | (res->len1 + res->off)) & 1) == 0)
+                        {
+                            status |= gr_neg(res->res, res->res, ctx);
+                        }
+                    }
+                    else
+                    {
+                        if (res->len1 == 1) 
+                        {
+                            status |= gr_pow_ui(res->lc, res->lc, res->len0 - 1, ctx);
+                            status |= gr_mul(res->res, res->res, res->lc, ctx);
+                        }
+                        else
+                        {
+                            status |= gr_zero(res->res, ctx);
+                        }
+                    }
+                }
+
+                status |= gr_set(res->lc, OFFSET(b2, lenb2 - 1), ctx);
+
+                res->len0 = lena2;
+                res->len1 = lenb2;
+            }
+
             __divrem(q, lenq, d, lend, a2, lena2, b2, lenb2);
             __attach_shift(c0, lenc0, b2, lenb2, k);
             __attach_shift(d0, lend0, d, lend, k);
 
+            if (res != NULL)
+            {
+                if (lend >= m + 1)
+                {
+                    if (lend >= 1)
+                    {
+                        status |= gr_pow_ui(res->lc, res->lc, lena2 - lend, ctx);
+                        status |= gr_mul(res->res, res->res, res->lc, ctx);
+
+                        if ((((lena2 + res->off) | (lenb2 + res->off)) & 1) == 0)
+                            status |= gr_neg(res->res, res->res, ctx);
+                    }
+                    else
+                    {
+                        if (lenb2 == 1) 
+                        {
+                            status |= gr_pow_ui(res->lc, res->lc, lena2 - 1, ctx);
+                            status |= gr_mul(res->res, res->res, res->lc, ctx);
+                        }
+                        else
+                            status |= gr_zero(res->res, ctx);
+                    }
+
+                    res->len0 = lenb2;
+                    res->len1 = lend;
+               }
+
+               res->len0 -= k;
+               res->len1 -= k;
+               res->off += k;
+            }
+
             if (lenc0 < cutoff)
                 status |= _gr_poly_hgcd_recursive_iter(&sgnS,
                     S, lenS, &a3, &lena3, &b3, &lenb3, c0, lenc0, d0, lend0, a2,
-                    &T0, &T1, ctx); /* a2 as temp */
+                    &T0, &T1, ctx, res); /* a2 as temp */
             else
                 status |= _gr_poly_hgcd_recursive(&sgnS, S, lenS, a3, &lena3, b3,
                                                        &lenb3, c0, lenc0, d0,
-                                                       lend0, P, ctx, cutoff, 1);
+                                                       lend0, P, ctx, cutoff, 1, res);
+
+            if (res != NULL)
+            {
+                res->len0 += k;
+                res->len1 += k;
+                res->off -= k;
+            }
 
             __attach_truncate(s, lens, b2, lenb2, k);
             __attach_truncate(t, lent, d, lend, k);
@@ -562,11 +697,11 @@ int _gr_poly_hgcd(slong * sgn, gr_ptr * M, slong * lenM,
 
     if (M == NULL)
     {
-        status = _gr_poly_hgcd_recursive(&sgnM, NULL, NULL, A, lenA, B, lenB, a, lena, b, lenb, W, ctx, cutoff, 0);
+        status = _gr_poly_hgcd_recursive(&sgnM, NULL, NULL, A, lenA, B, lenB, a, lena, b, lenb, W, ctx, cutoff, 0, NULL);
     }
     else
     {
-        status = _gr_poly_hgcd_recursive(&sgnM, M, lenM, A, lenA, B, lenB, a, lena, b, lenb, W, ctx, cutoff, 1);
+        status = _gr_poly_hgcd_recursive(&sgnM, M, lenM, A, lenA, B, lenB, a, lena, b, lenb, W, ctx, cutoff, 1, NULL);
     }
 
     GR_TMP_CLEAR_VEC(W, lenW, ctx);
