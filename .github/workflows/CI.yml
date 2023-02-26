@@ -128,7 +128,7 @@ jobs:
       - name: "Configure"
         run: |
           cd ${REPO}
-          echo "int flint_test_multiplier(void) { return 1; }" > test_helpers.c
+          export FLINT_TEST_MULTIPLIER=1
           dos2unix configure
           ./configure CFLAGS="${CFLAGS}" ${EXTRA_OPTIONS}
 
@@ -251,7 +251,7 @@ jobs:
       - name: "Configure"
         run: |
           mkdir -p build
-          echo "int flint_test_multiplier(){return 1;}" > test_helpers.c
+          export FLINT_TEST_MULTIPLIER=1
           cd build
           cmake -G "MinGW Makefiles" -DBUILD_TESTING=ON \
                                     -DCMAKE_BUILD_TYPE=Release ..

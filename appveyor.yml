@@ -38,8 +38,7 @@ install:
   - conda config --add channels conda-forge --force
   - conda install --yes --quiet mpir=3.0.0 mpfr=4.* pthreads-win32 ninja
   - set "CFLAGS=/wd4146 /wd4018 /wd4267 /wd4244"
-  - echo int flint_test_multiplier(){return 1;} > test_helpers.c
-  - cat test_helpers.c
+  - set "FLINT_TEST_MULTIPLIER=1"
 
 before_build:
   - ps: if (-Not (Test-Path .\build)) { mkdir build }
