@@ -11,6 +11,7 @@
 
 #include "fmpz_mat.h"
 #include "longlong.h"
+#include "gmpcompat.h"
 
 void
 fmpz_mat_mul_classical_inline(fmpz_mat_t C, const fmpz_mat_t A,

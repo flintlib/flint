@@ -12,6 +12,7 @@
 #include <gmp.h>
 #include "profiler.h"
 #include "fmpz.h"
+#include "gmpcompat.h"
 
 #define ntests 1000
 

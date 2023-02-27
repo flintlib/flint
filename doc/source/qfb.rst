@@ -29,16 +29,16 @@ Hash table
 
 .. function:: qfb_hash_t * qfb_hash_init(slong depth)
     
-    Initialises a hash table of size `2^\mbox{depth}`. 
+    Initialises a hash table of size `2^{depth}`. 
 
 .. function:: void qfb_hash_clear(qfb_hash_t * qhash, slong depth)
 
-    Frees all memory used by a hash table of size `2^\mbox{depth}`. 
+    Frees all memory used by a hash table of size `2^{depth}`. 
 
 .. function:: void qfb_hash_insert(qfb_hash_t * qhash, qfb_t q, qfb_t q2, slong iter, slong depth)
 
     Insert the binary quadratic form \code{q} into the given hash table 
-    of size `2^\mbox{depth}` in the field \code{q} of the hash structure. 
+    of size `2^{depth}` in the field \code{q} of the hash structure. 
     Also store the second binary quadratic form \code{q2} (if not 
     \code{NULL}) in the similarly named field and \code{iter} in the 
     similarly named field of the hash structure. 
@@ -46,7 +46,7 @@ Hash table
 .. function:: slong qfb_hash_find(qfb_hash_t * qhash, qfb_t q, slong depth)
 
     Search for the given binary quadratic form or its inverse in the 
-    given hash table of size `2^\mbox{depth}`. If it is found, return
+    given hash table of size `2^{depth}`. If it is found, return
     the index in the table (which is an array of \code{qfb_hash_t} 
     structs, otherwise return \code{-1L}.
 

@@ -1434,31 +1434,6 @@ void _fmpz_mpoly_addmul_uiuiui_fmpz(ulong * c, slong d1, slong d2)
 FLINT_DLL mpz_srcptr _fmpz_mpoly_get_mpz_signed_uiuiui(ulong * sm, fmpz x,
                                                                     mpz_ptr t);
 
-FMPZ_MPOLY_INLINE
-void flint_mpz_add_signed_uiuiui(mpz_ptr a, mpz_srcptr b,
-                                                 ulong c2, ulong c1, ulong c0)
-{
-    ulong cs, d[3];
-    mpz_t c;
-
-    c->_mp_d = d;
-    c->_mp_alloc = 3;
-
-    cs = FLINT_SIGN_EXT(c2);
-
-    sub_dddmmmsss(d[2], d[1], d[0], cs^c2, cs^c1, cs^c0, cs, cs, cs);
-
-    c->_mp_size = d[2] != 0 ? 3 :
-                  d[1] != 0 ? 2 :
-                  d[0] != 0;
-    if (cs != 0)
-        c->_mp_size = -c->_mp_size;
-
-    mpz_add(a, b, c);
-}
-
-
-
 /******************************************************************************
 
    Internal consistency checks

@@ -12,41 +12,6 @@
 #include <math.h>
 #include "arith.h"
 
-static void
-_fmpz_ui_pow_ui(fmpz_t x, ulong b, ulong e)
-{
-    if (e <= 1)
-    {
-        fmpz_set_ui(x, e == 0 ? 1 : b);
-    }
-    else if (e == 2)
-    {
-        mp_limb_t t[2];
-        umul_ppmm(t[1], t[0], b, b);
-        fmpz_set_uiui(x, t[1], t[0]);
-    }
-    else if (b <= 1)
-    {
-        fmpz_set_ui(x, b);
-    }
-    else
-    {
-        ulong bits = FLINT_BIT_COUNT(b);
-
-        if (e * bits <= FLINT_BITS)
-        {
-            fmpz_set_ui(x, n_pow(b, e));
-        }
-        else
-        {
-            __mpz_struct * z = _fmpz_promote(x);
-            flint_mpz_set_ui(z, b);
-            flint_mpz_pow_ui(z, z, e);
-            _fmpz_demote_val(x);
-        }
-    }
-}
-
 void
 arith_bell_number_dobinski(fmpz_t res, ulong n)
 {
@@ -81,12 +46,12 @@ arith_bell_number_dobinski(fmpz_t res, ulong n)
         {
             if (2 * k <= N)
             {
-                _fmpz_ui_pow_ui(pow + k / 2, k, n);
+                fmpz_ui_pow_ui(pow + k / 2, k, n);
                 fmpz_add(P, P, pow + k / 2);
             }
             else
             {
-                _fmpz_ui_pow_ui(t, k, n);
+                fmpz_ui_pow_ui(t, k, n);
                 fmpz_add(P, P, t);
             }
         }

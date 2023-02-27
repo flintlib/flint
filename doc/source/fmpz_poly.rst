@@ -3272,6 +3272,8 @@ Minimal polynomials
     For `n = 1, 2`, the degree is 1. For `n = 0`, we define
     the output to be the constant polynomial 1.
 
+    See [WaktinsZeitlin1993]_.
+
 .. function:: void _fmpz_poly_swinnerton_dyer(fmpz * coeffs, ulong n)
               void fmpz_poly_swinnerton_dyer(fmpz_poly_t poly, ulong n)
              
@@ -3377,7 +3379,9 @@ function
     = \sum_{n = 0}^{\infty} A_n(x) \frac{t^n}{n!}.
 
 The Eulerian numbers can be expressed explicitly via the formula
+
 .. math ::
+
     A(n, m) = \sum_{k = 0}^{m + 1} (-1)^k \binom{n + 1}{k} (m + 1 - k)^n.
 
 Note: Not to be confused with Euler numbers and polynomials.

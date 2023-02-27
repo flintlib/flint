@@ -45,7 +45,7 @@ main(void)
         result = 1;
         for (i = 0; i < limit; i++)
         {
-            deviation = count[i] - (1000 * flint_test_multiplier())/limit;
+            deviation = count[i] - (1000 * (int) flint_test_multiplier())/limit;
             if (deviation >= WORD(100) * flint_test_multiplier() ||
                 deviation <= WORD(-100) * flint_test_multiplier())
             {
@@ -102,7 +102,7 @@ main(void)
         result = 1;
         for (j = 0; j < 4; j++)
         {
-            deviation = count_in_subrange[j] - ((1000 * flint_test_multiplier()) >> 2);
+            deviation = count_in_subrange[j] - ((1000 * (int) flint_test_multiplier()) >> 2);
             if (deviation >= WORD(100) * flint_test_multiplier() || 
                 deviation <= WORD(-100) * flint_test_multiplier())
             {

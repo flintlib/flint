@@ -13,6 +13,7 @@
 #include <gmp.h>
 #include <stdlib.h>
 #include "flint.h"
+#include "gmpcompat.h"
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 #include "longlong.h"

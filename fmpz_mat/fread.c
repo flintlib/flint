@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_mat.h"
+#include "gmpcompat.h"
 
 int 
 fmpz_mat_fread(FILE* file, fmpz_mat_t mat)

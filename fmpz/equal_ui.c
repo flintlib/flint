@@ -11,6 +11,7 @@
 */
 
 #include "fmpz.h"
+#include "gmpcompat.h"
 #include "ulong_extras.h"
 
 int fmpz_equal_ui(const fmpz_t f, ulong g)

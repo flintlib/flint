@@ -13,6 +13,7 @@
 #include "profiler.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
+#include "gmpcompat.h"
 
 #define ntests 30
 

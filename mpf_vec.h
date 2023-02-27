@@ -20,6 +20,7 @@
 #endif
 
 #include "flint.h"
+#include "gmpcompat.h"
 
 typedef __mpf_struct mpf;
 

@@ -205,18 +205,13 @@ Bernoulli numbers and polynomials
 .. function:: void _arith_bernoulli_number(fmpz_t num, fmpz_t den, ulong n)
 
     Sets ``(num, den)`` to the reduced numerator and denominator
-    of the `n`-th Bernoulli number. As presently implemented,
-    this function simply calls ``_arith_bernoulli_number_zeta``.
+    of the `n`-th Bernoulli number.
 
 .. function:: void arith_bernoulli_number(fmpq_t x, ulong n)
 
     Sets ``x`` to the `n`-th Bernoulli number. This function is
     equivalent to ``_arith_bernoulli_number`` apart from the output
     being a single ``fmpq_t`` variable.
-
-    Warning: this function does not use proven precision bounds, and
-    could return the wrong results for very large `n`.
-    It is recommended to use the Bernoulli number functions in Arb instead.
 
 .. function:: void _arith_bernoulli_number_vec(fmpz * num, fmpz * den, slong n)
 
@@ -258,22 +253,6 @@ Bernoulli numbers and polynomials
     ``arith_bernoulli_number_vec`` and then rescales the coefficients
     efficiently.
 
-.. function:: void _arith_bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n)
-
-    Sets ``(num, den)`` to the reduced numerator and denominator
-    of the `n`-th Bernoulli number.
-
-    This function first computes the exact denominator and a bound
-    for the size of the numerator. It then computes an approximation
-    of `|B_n| = 2n! \zeta(n) / (2 \pi)^n` as a floating-point number
-    and multiplies by the denominator to to obtain a real number
-    that rounds to the exact numerator. For tiny `n`, the numerator
-    is looked up from a table to avoid unnecessary overhead.
-
-    Warning: this function does not use proven precision bounds, and
-    could return the wrong results for very large `n`.
-    It is recommended to use the Bernoulli number functions in Arb instead.
-
 .. function:: void _arith_bernoulli_number_vec_recursive(fmpz * num, fmpz * den, slong n)
 
     Sets the elements of ``num`` and ``den`` to the reduced
@@ -291,13 +270,6 @@ Bernoulli numbers and polynomials
     as the primorial of `n + 1`.
 
     %[1] https://en.wikipedia.org/w/index.php?title=Bernoulli_number&oldid=405938876
-
-.. function:: void _arith_bernoulli_number_vec_zeta(fmpz * num, fmpz * den, slong n)
-
-    Sets the elements of ``num`` and ``den`` to the reduced
-    numerators and denominators of `B_0, B_1, B_2, \ldots, B_{n-1}`
-    inclusive. Uses repeated direct calls to
-    ``_arith_bernoulli_number_zeta``.
 
 .. function:: void _arith_bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, slong n)
 
@@ -331,12 +303,7 @@ The corresponding Euler polynomials are defined by
 
 .. function:: void arith_euler_number(fmpz_t res, ulong n)
 
-    Sets ``res`` to the Euler number `E_n`. Currently calls
-    ``_arith_euler_number_zeta``.
-
-    Warning: this function does not use proven precision bounds, and
-    could return the wrong results for very large `n`.
-    It is recommended to use the Euler number functions in Arb instead.
+    Sets ``res`` to the Euler number `E_n`.
 
 .. function:: void arith_euler_number_vec(fmpz * res, slong n)
 
@@ -368,17 +335,6 @@ The corresponding Euler polynomials are defined by
 
     with the Bernoulli polynomial `B_{n+1}(x)` evaluated once
     using ``bernoulli_polynomial`` and then rescaled.
-
-.. function:: void _arith_euler_number_zeta(fmpz_t res, ulong n)
-
-    Sets ``res`` to the Euler number `E_n`. For even `n`, this function
-    uses the relation ``|E_n| = \frac{2^{n+2} n!}{\pi^{n+1}} L(n+1)``
-    where `L(n+1)` denotes the Dirichlet `L`-function with character
-    `\chi = \{ 0, 1, 0, -1 \}`.
-
-    Warning: this function does not use proven precision bounds, and
-    could return the wrong results for very large `n`.
-    It is recommended to use the Euler number functions in Arb instead.
 
 
 Multiplicative functions
@@ -434,43 +390,6 @@ Multiplicative functions
 
     which is evaluated using three squarings. The first squaring is done
     directly since the polynomial is very sparse at this point.
-
-
-
-Cyclotomic polynomials
---------------------------------------------------------------------------------
-
-
-.. function:: void _arith_cos_minpoly(fmpz * coeffs, slong d, ulong n)
-
-    For `n \ge 1`, sets ``(coeffs, d+1)`` to the minimal polynomial
-    `\Psi_n(x)` of `\cos(2 \pi / n)`, scaled to have integer coefficients
-    by multiplying by `2^d` (`2^{d-1}` when `n` is a power of two).
-
-    The polynomial `\Psi_n(x)` is described in [WaktinsZeitlin1993]_.
-    As proved in that paper, the roots of `\Psi_n(x)` for `n \ge 3` are
-    `\cos(2 \pi k / n)` where `0 \le k < d` and where `\gcd(k, n) = 1`.
-
-    To calculate `\Psi_n(x)`, we compute the roots numerically with MPFR
-    and use a balanced product tree to form a polynomial with fixed-point
-    coefficients, i.e. an approximation of `2^p 2^d \Psi_n(x)`.
-
-    To determine the precision `p`, we note that the coefficients
-    in `\prod_{i=1}^d (x - \alpha)` can be bounded by the central
-    coefficient in the binomial expansion of `(x+1)^d`.
-
-    When `n` is an odd prime, we use a direct formula for the coefficients
-    (https://mathworld.wolfram.com/TrigonometryAngles.html ).
-
-.. function:: void arith_cos_minpoly(fmpz_poly_t poly, ulong n)
-
-    Sets ``poly`` to the minimal polynomial `\Psi_n(x)` of
-    `\cos(2 \pi / n)`, scaled to have integer coefficients. This
-    polynomial has degree 1 if `n = 1` or `n = 2`, and
-    degree `\phi(n) / 2` otherwise.
-
-    We allow `n = 0` and define `\Psi_0 = 1`.
-
 
 
 Landau's function

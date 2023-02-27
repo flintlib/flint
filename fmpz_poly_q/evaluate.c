@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_poly_q.h"
+#include "gmpcompat.h"
 
 int fmpz_poly_q_evaluate(mpq_t rop, const fmpz_poly_q_t f, const mpq_t a)
 {

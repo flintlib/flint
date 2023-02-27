@@ -14,6 +14,7 @@
 #include <gmp.h>
 #include <mpfr.h>
 #include "flint.h"
+#include "gmpcompat.h"
 #include "arith.h"
 #include "profiler.h"
 #include "fmpz.h"

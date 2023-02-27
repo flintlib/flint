@@ -16,8 +16,19 @@
 #undef ulong
 #include <gmp.h>
 #include "flint.h"
+#include "gmpcompat.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
+
+void _fmpz_mpz_set_ui(mpz_ptr r, ulong u)
+{
+    flint_mpz_set_ui(r, u);
+}
+
+void _fmpz_mpz_set_si(mpz_ptr r, slong s)
+{
+    flint_mpz_set_si(r, s);
+}
  
 fmpz * __new_fmpz()
 {

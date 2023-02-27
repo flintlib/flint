@@ -470,41 +470,6 @@ stirling_2_egf(fmpz_t res, ulong n, ulong k)
 }
 
 static void
-_fmpz_ui_pow_ui(fmpz_t x, ulong b, ulong e)
-{
-    if (e <= 1)
-    {
-        fmpz_set_ui(x, e == 0 ? 1 : b);
-    }
-    else if (e == 2)
-    {
-        mp_limb_t t[2];
-        umul_ppmm(t[1], t[0], b, b);
-        fmpz_set_uiui(x, t[1], t[0]);
-    }
-    else if (b <= 1)
-    {
-        fmpz_set_ui(x, b);
-    }
-    else
-    {
-        ulong bits = FLINT_BIT_COUNT(b);
-
-        if (e * bits <= FLINT_BITS)
-        {
-            fmpz_set_ui(x, n_pow(b, e));
-        }
-        else
-        {
-            __mpz_struct * z = _fmpz_promote(x);
-            flint_mpz_set_ui(z, b);
-            flint_mpz_pow_ui(z, z, e);
-            _fmpz_demote_val(x);
-        }
-    }
-}
-
-static void
 stirling_2_powsum(fmpz_t s, ulong n, ulong k)
 {
     fmpz_t t, u;
@@ -527,7 +492,7 @@ stirling_2_powsum(fmpz_t s, ulong n, ulong k)
     fmpz_zero(s);
     for (j = 1; j <= k; j += 2)
     {
-        _fmpz_ui_pow_ui(u, j, n);
+        fmpz_ui_pow_ui(u, j, n);
 
         m = j;
         while (1)  /* Process each m = 2^p * j */

@@ -128,6 +128,8 @@ mp_limb_t  __gmpn_modexact_1_odd(mp_srcptr src, mp_size_t size,
 #ifdef mpn_modexact_1_odd
 #define flint_mpn_divisible_1_p(x, xsize, d) (mpn_modexact_1_odd(x, xsize, d) == 0)
 #else
+#include "gmpcompat.h"
+
 MPN_EXTRAS_INLINE int
 flint_mpn_divisible_1_p(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
 {
@@ -137,6 +139,22 @@ flint_mpn_divisible_1_p(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
     return flint_mpz_divisible_ui_p(&s, d);
 }
 #endif
+
+/* todo: figure out how to call GMP's actual division code instead of mpn_tdiv_qr here */
+#ifndef mpn_tdiv_q
+/* substitute for mpir's mpn_tdiv_q */
+static __inline__ void
+mpn_tdiv_q(mp_ptr qp, mp_srcptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn)
+{
+    mp_ptr _scratch;
+    TMP_INIT;
+    TMP_START;
+    _scratch = (mp_ptr) TMP_ALLOC(dn * sizeof(mp_limb_t));
+    mpn_tdiv_qr(qp, _scratch, 0, np, nn, dp, dn);
+    TMP_END;
+}
+#endif
+
 
 MPN_EXTRAS_INLINE
 int flint_mpn_zero_p(mp_srcptr x, mp_size_t xsize)

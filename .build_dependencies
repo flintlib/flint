@@ -109,4 +109,4 @@ else
 fi
 cd ..
 
-echo "int flint_test_multiplier(){return 1;}" > test_helpers.c
+export FLINT_TEST_MULTIPLIER=1

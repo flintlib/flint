@@ -29,10 +29,6 @@
 #include "flint.h"
 #include "mpn_extras.h"
 
-#if HAVE_OPENMP
-#include <omp.h> /* must come after flint.h */
-#endif
-
 #ifdef __cplusplus
  extern "C" {
 #endif

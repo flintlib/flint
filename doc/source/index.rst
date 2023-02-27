@@ -6,8 +6,7 @@
 FLINT: Fast Library for Number Theory
 ======================================
 
-Welcome to FLINT's documentation! FLINT is a C library for doing number theory,
-maintained by William Hart and Fredrik Johansson.
+Welcome to FLINT's documentation! FLINT is a C library for doing number theory.
 
 * Source code on GitHub: https://github.com/flintlib/flint2
 * Issue tracker: https://github.com/flintlib/flint2/issues
@@ -43,6 +42,27 @@ General utilities
    thread_pool.rst
    mpoly.rst
 
+Generic rings
+-----------------------------------------------------------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   gr.rst
+   gr_implementing.rst
+   gr_domains.rst
+   gr_special.rst
+   gr_vec.rst
+   gr_mat.rst
+   gr_poly.rst
+   gr_mpoly.rst
+
+.. toctree::
+   :maxdepth: 1
+
+   index_generic.rst
+
+
 Integers
 ---------------
 
@@ -68,6 +88,11 @@ Integers
    fft.rst
    qsieve.rst
 
+.. toctree::
+   :maxdepth: 1
+
+   index_integers.rst
+
 Rational numbers
 ----------------
 
@@ -81,6 +106,12 @@ Rational numbers
    fmpq_mpoly_factor.rst
    fmpq_mpoly.rst
    fmpz_poly_q.rst
+   fmpz_mpoly_q.rst
+
+.. toctree::
+   :maxdepth: 1
+
+   index_rationals.rst
 
 Integers mod n
 ---------------
@@ -104,23 +135,101 @@ Integers mod n
    fmpz_mod_mpoly.rst
    fmpz_mod_mpoly_factor.rst
 
-Groups
----------------
+.. toctree::
+   :maxdepth: 1
+
+   index_integers_mod.rst
+
+Groups and other structures
+---------------------------
 
 .. toctree::
    :maxdepth: 1
 
    perm.rst
    qfb.rst
+   dirichlet.rst
+   dlog.rst
+   bool_mat.rst
 
-Number fields
-----------------
+Number fields and algebraic numbers
+-----------------------------------
 
 .. toctree::
    :maxdepth: 1
 
    nf.rst
    nf_elem.rst
+   fmpzi.rst
+   qqbar.rst
+
+Real and complex numbers
+----------------------------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   overview.rst
+   using.rst
+   issues.rst
+   examples_arb.rst
+   mag.rst
+   arf.rst
+   acf.rst
+   arb.rst
+   acb.rst
+   arb_poly.rst
+   acb_poly.rst
+   arb_fmpz_poly.rst
+   acb_dft.rst
+   arb_mat.rst
+   acb_mat.rst
+   acb_hypgeom.rst
+   arb_hypgeom.rst
+   acb_elliptic.rst
+   acb_modular.rst
+   acb_dirichlet.rst
+   bernoulli.rst
+   hypgeom.rst
+   partitions.rst
+   arb_calc.rst
+   acb_calc.rst
+   arb_fpwrap.rst
+   fmpz_extras.rst
+   formulas.rst
+   constants.rst
+   gamma.rst
+   hurwitz.rst
+   polylogarithms.rst
+   hypergeometric.rst
+   agm.rst
+   setup.rst
+   contributing.rst
+   credits.rst
+
+.. toctree::
+   :maxdepth: 1
+
+   index_arb.rst
+
+Exact real and complex numbers
+----------------------------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   introduction_calcium.rst
+   examples_calcium.rst
+   calcium.rst
+   ca.rst
+   ca_vec.rst
+   ca_poly.rst
+   ca_mat.rst
+   ca_ext.rst
+   ca_field.rst
+   fexpr.rst
+   fexpr_builtin.rst
+   utils_flint.rst
 
 Finite fields
 ---------------
@@ -179,6 +288,8 @@ Floating-point support code
    :maxdepth: 1
 
    double_extras.rst
+   double_interval.rst
+   fmpr.rst
    d_vec.rst
    d_mat.rst
    mpf_vec.rst
@@ -186,13 +297,15 @@ Floating-point support code
    mpfr_vec.rst
    mpfr_mat.rst
 
-C++ Interface
+Interfaces
 -----------------------------------
 
 .. toctree::
    :maxdepth: 1
 
    flintxx.rst
+   python_flint.rst
+
 
 References
 ----------------

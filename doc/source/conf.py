@@ -11,11 +11,13 @@
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
 
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath('../..'))
+sys.path.append(os.path.abspath("."))
+sys.path.append(os.path.abspath('../../python'))
 
 # -- Project information -----------------------------------------------------
 
@@ -26,13 +28,12 @@ author = u'The Flint development team'
 # The short X.Y version
 version = u''
 
+
 for _line in open("../../flint.h").readlines():
     if _line.startswith("#define FLINT_VERSION"):
         _i1 = _line.find('"')
         _i2 = _line.find('"', _i1 + 1)
         version = _line[_i1+1:_i2]
-
-release = version
 
 # The full version, including alpha/beta/rc tags
 release = version
@@ -49,6 +50,7 @@ release = version
 # ones.
 extensions = [
     'sphinx.ext.mathjax',
+    'sphinx.ext.autodoc',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -98,7 +100,6 @@ primary_domain = 'c'
 #
 html_theme = 'default'
 
-
 html_context = {
     'css_files': ['_static/default.css'],
 }
@@ -109,7 +110,7 @@ html_context = {
 #
 
 html_theme_options = {
-    'sidebarwidth' : 280,
+    'sidebarwidth' : 300,
     'collapsiblesidebar': True,
     'bodyfont': "'arial', sans-serif",
     'headfont': "'arial', sans-serif",
@@ -149,7 +150,7 @@ latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
     'papersize': 'a4paper',
-
+    'fontpkg': '',
     # The font size ('10pt', '11pt' or '12pt').
     #
     # 'pointsize': '10pt',
@@ -158,11 +159,13 @@ latex_elements = {
     #
     # 'preamble': '',
     'preamble': '\\usepackage{lmodern}\n\\setcounter{tocdepth}{2}\n\\urlstyle{tt}',
+    'preamble': '\\usepackage{mathrsfs}\n\\usepackage{lmodern}\n\\setcounter{tocdepth}{2}\n\\urlstyle{tt}',
 
     # Latex figure (float) alignment
     #
     # 'figure_align': 'htbp',
 }
+
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,

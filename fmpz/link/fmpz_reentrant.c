@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
+#include "gmpcompat.h"
 #include "fmpz.h"
 
 __mpz_struct * _fmpz_new_mpz(void)

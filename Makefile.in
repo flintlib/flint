@@ -5,6 +5,9 @@ QUIET_AR  = @echo '   ' AR  ' ' $@;
 AT=@
 
 BUILD_DIRS= thread_pool                     thread_support                  \
+                                                                            \
+            gr gr_mat gr_poly gr_mpoly gr_vec gr_special                    \
+                                                                            \
             ulong_extras                                                    \
             long_extras                                                     \
             perm                                                            \
@@ -18,6 +21,13 @@ BUILD_DIRS= thread_pool                     thread_support                  \
             fmpq            fmpq_vec        fmpq_mat        fmpq_poly       \
                                                                             \
             nf nf_elem qfb                                                  \
+                                                                            \
+            fmpr arf mag arb arb_mat arb_poly arb_calc acf acb acb_mat acb_poly           \
+            acb_dft acb_calc acb_hypgeom acb_elliptic acb_modular dirichlet acb_dirichlet \
+            arb_hypgeom bernoulli hypgeom fmpz_extras fmpzi bool_mat partitions dlog      \
+            double_interval arb_fmpz_poly arb_fpwrap                        \
+                                                                            \
+            calcium utils_flint fmpz_mpoly_q fexpr fexpr_builtin qqbar ca ca_ext ca_field ca_vec ca_poly ca_mat \
                                                                             \
             fq              fq_vec          fq_mat          fq_poly         \
             fq_nmod         fq_nmod_vec     fq_nmod_mat     fq_nmod_poly    \
@@ -46,13 +56,16 @@ BUILD_DIRS= thread_pool                     thread_support                  \
             fft             fmpz_poly_q     fmpz_lll        n_poly          \
             arith           qsieve          aprcl           $(EXTRA_BUILD_DIRS)
 
+
 TEMPLATE_DIRS = fq_vec_templates fq_mat_templates fq_poly_templates \
    fq_poly_factor_templates fq_embed_templates fq_templates
 
 export
 
-SOURCES = printf.c fprintf.c sprintf.c scanf.c fscanf.c sscanf.c clz_tab.c memory_manager.c version.c profiler.c exception.c hashmap.c inlines.c
-LIB_SOURCES = $(wildcard $(patsubst %, %/*.c, $(BUILD_DIRS)))  $(patsubst %, %/*.c, $(TEMPLATE_DIRS))
+SOURCES = printf.c fprintf.c sprintf.c scanf.c fscanf.c sscanf.c clz_tab.c memory_manager.c version.c profiler.c exception.c hashmap.c inlines.c test_helpers.c
+LIB_SOURCES = $(patsubst %, %/*.c, $(BUILD_DIRS))  $(patsubst %, %/*.c, $(TEMPLATE_DIRS))
+
+# $(info $(LIB_SOURCES))
 
 HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) NTL-interface.h flint.h longlong.h flint-config.h gmpcompat.h fft_tuning.h fmpz-conversions.h profiler.h templates.h exception.h hashmap.h $(patsubst %, %.h, $(TEMPLATE_DIRS))
 
@@ -94,7 +107,6 @@ verbose:
 clean:
 	$(AT)$(foreach dir, $(BUILD_DIRS), WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=../build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) clean || exit $$?;)
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(filter-out %templates, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h))), BUILD_DIR=$(CURDIR)/build/$(dir); WANTDEPS=$(WANT_DEPS); export WANTDEPS; export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) clean || exit $$?;))
-	rm -rf test_helpers.o profiler.o
 	rm -f $(OBJS) $(LOBJS) $(TESTS) $(PROFS) $(EXMPS)
 	rm -f libflint.a
 	rm -f $(wildcard $(FLINT_LIBNAME)*)
@@ -163,7 +175,7 @@ libflint.a: $(OBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) | bu
 	$(AT)$(foreach mod, $(BUILD_DIRS), $(AR) rcs libflint.a build/$(mod)/*.o || exit $$?;)
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach mod, $(filter-out %templates, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h))), $(AR) rcs libflint.a build/$(mod)/*.o || exit $$?;))
 
-library: build/CPimport.h
+library:
 	$(AT)if [ "$(FLINT_SHARED)" -eq "1" ]; then \
 		$(MAKE) shared; \
 	fi
@@ -175,7 +187,7 @@ shared: $(FLINT_LIB)
 
 static: libflint.a
 
-tests: library test_helpers.o $(TESTS)
+tests: library $(TESTS)
 	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=../build/$(dir); export BUILD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) tests || exit $$?;)
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir)/test; WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) tests || exit $$?;))
 	mkdir -p build/interfaces/test
@@ -202,7 +214,9 @@ endef
 
 check: LDFLAGS:=$(LDFLAGS) -Wl,-rpath,$(GMP_LIB_DIR) -Wl,-rpath,$(MPFR_LIB_DIR) -Wl,-rpath,$(CURDIR)
 check: library test_helpers.o
-ifndef MOD
+ifdef PYTHON
+	PYTHONPATH=$(CURDIR) python3 python/flint_ctypes.py
+else ifndef MOD
 	$(AT)$(MAKE) $(TESTS)
 	$(AT)(WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=build; export BUILD_DIR; $(MAKE) -f Makefile.subdirs -C . check || exit $$?;)
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir)/test; WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) check || exit $$?;))
@@ -251,7 +265,7 @@ install: library
 	fi
 	mkdir -p "$(DESTDIR)$(PREFIX)/include/flint/flintxx"
 	cp flintxx/*.h "$(DESTDIR)$(PREFIX)/include/flint/flintxx"
-	cp *xx.h "$(DESTDIR)$(PREFIX)/include/flint"
+	cp flintxx_public/*xx.h "$(DESTDIR)$(PREFIX)/include/flint"
 	$(AT)if [ "$(OS)" = "Darwin" ] && [ "$(FLINT_SHARED)" -eq "1" ]; then \
 	   install_name_tool -id "$(PREFIX)/$(LIBDIR)/$(FLINT_LIB)" "$(DESTDIR)$(PREFIX)/$(LIBDIR)/$(FLINT_LIBNAME)"; \
 	fi
@@ -269,9 +283,6 @@ uninstall:
 
 build:
 	mkdir -p build
-
-build/CPimport.h: qadic/CPimport.txt build
-	$(AT)sed "s/ /,/g;s/.*/&,/g" $< > $@
 
 build/%.lo: %.c $(HEADERS) | build
 	$(QUIET_CC) $(CC) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@;

@@ -10,10 +10,11 @@
 */
 
 #include "arith.h"
+#include "bernoulli.h"
 
 void _arith_bernoulli_number(fmpz_t num, fmpz_t den, ulong n)
 {
-    _arith_bernoulli_number_zeta(num, den, n);
+    _bernoulli_fmpq_ui(num, den, n);
 }
 
 void arith_bernoulli_number(fmpq_t x, ulong n)

@@ -12,6 +12,7 @@
 
 #include <gmp.h>
 #include "fmpz.h"
+#include "gmpcompat.h"
 #include "long_extras.h"
 
 int

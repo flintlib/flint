@@ -1,4 +1,7 @@
+@import url("pygments.css");
 @import url("classic.css");
+
+body { font-family: "georgia", serif; }
 
 div .toctree-wrapper { column-count: 2; }
 
@@ -15,4 +18,6 @@ div.body {
     min-width: 450px;
     max-width: 100%;
 }
+
+li p { margin: 0.2em; }
 

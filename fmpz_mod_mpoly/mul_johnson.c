@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_mod_mpoly.h"
+#include "gmpcompat.h"
 #include "mpn_extras.h"
 
 

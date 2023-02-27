@@ -16,6 +16,7 @@
 
 #include "nmod_poly.h"
 #include "ulong_extras.h"
+#include "gmpcompat.h"
 
 int
 nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,

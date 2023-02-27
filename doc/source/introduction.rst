@@ -21,8 +21,7 @@ key functions have multithreaded implementations.
 Maintainers and Authors
 -------------------------------------------------------------------------------
 
-FLINT is currently maintained by William Hart of Technische Universitaet
-in Kaiserslautern and Fredrik Johansson of INRIA Bordeaux.
+FLINT is currently maintained by Fredrik Johansson of INRIA Bordeaux.
 
 FLINT was originally designed by William Hart and David Harvey. Since then
 FLINT was rewritten as FLINT 2 by William Hart, Fredrik Johansson and

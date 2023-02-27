@@ -8,7 +8,12 @@ Types, macros and constants
 
 .. type:: fmpz
 
-   an ``fmpz`` is implemented as an ``slong``. When its second most significant
+   The FLINT multi-precision integer type uses an inline representation for small
+   integers, specifically when the absolute value is at most `2^{62}-1` (on
+   64-bit machines) or `2^{30}-1` (on 32-bit machines). It switches
+   automatically to a GMP integer for larger values.
+
+   An ``fmpz`` is implemented as an ``slong``. When its second most significant
    bit is `0` the ``fmpz`` represents an ordinary ``slong`` integer whose
    absolute value is at most ``FLINT_BITS - 2`` bits.
 
@@ -827,6 +832,7 @@ Basic arithmetic
     number of limbs of `h` is at least ``PREINVN_CUTOFF``.
 
 .. function:: void fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong x)
+              void fmpz_ui_pow_ui(fmpz_t f, ulong g, ulong x)
 
     Sets `f` to `g^x`.  Defines `0^0 = 1`.
 

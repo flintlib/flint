@@ -663,6 +663,9 @@ if [ -z "$CFLAGS" ]; then
    fi
 fi
 
+# avoid spurious warnings with gcc
+# CFLAGS="-Wno-stringop-overflow -Wno-stringop-overread -Wno-maybe-uninitialized $CFLAGS"
+
 #this is needed on PPC G5 and does not hurt on other OS Xes
 
 if [ "$KERNEL" = Darwin ]; then
@@ -831,7 +834,8 @@ LIBS="$LLIBS $lLIBS"
 #cxx
 
 if [ "$WANT_CXX" = "1" ]; then
-   EXTRA_BUILD="$EXTRA_BUILD flintxx"
+   INCS="${INCS} -I\$(CURDIR)/flintxx_public"
+#    EXTRA_BUILD="$EXTRA_BUILD flintxx"
 fi
 
 if [ -z "$CXXFLAGS" ]; then
