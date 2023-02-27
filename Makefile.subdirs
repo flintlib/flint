@@ -1,6 +1,6 @@
 ifeq ($(strip $(VERBOSE)),)
-	QUIET_CC  = @echo '   ' CC  ' ' $@;
-	QUIET_CXX = @echo '   ' CXX ' ' $@;
+	QUIET_CC  = @echo '   ' CC  ' ' $(patsubst ../../%,%, $@);
+	QUIET_CXX = @echo '   ' CXX ' ' $(patsubst ../../%,%, $@);
 else
 	QUIET_CC  = 
 	QUIET_CXX = 
