@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.10)
 
 include(CheckIPOSupported)
 include(CheckIncludeFiles)
@@ -58,61 +58,92 @@ endif()
 
 # Find sources
 
-set(BUILD_DIRS
-    aprcl ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly 
-    fmpq_poly fmpz_mat fmpz_lll mpfr_vec mpfr_mat mpf_vec mpf_mat nmod_vec nmod_poly 
-    nmod_poly_factor arith mpn_extras nmod_mat fmpq fmpq_vec fmpq_mat padic 
-    fmpz_poly_q fmpz_poly_mat nmod_poly_mat fmpz_mod_poly fmpz_mod_mat 
-    fmpz_mod_poly_factor fmpz_factor fmpz_poly_factor fft qsieve 
-    nf nf_elem qfb 
-    gr gr_mat gr_poly gr_mpoly gr_vec gr_special
-    fmpr arf mag arb arb_mat arb_poly arb_calc acf acb acb_mat acb_poly
-    acb_dft acb_calc acb_hypgeom acb_elliptic acb_modular dirichlet acb_dirichlet
-    arb_hypgeom bernoulli hypgeom fmpz_extras fmpzi bool_mat partitions dlog
-    double_interval arb_fmpz_poly arb_fpwrap
-    calcium utils_flint fmpz_mpoly_q fexpr fexpr_builtin qqbar ca ca_ext ca_field ca_vec ca_poly ca_mat
-    double_extras d_vec d_mat padic_poly padic_mat qadic
-    fq fq_vec fq_mat fq_poly fq_poly_factor
-    fq_nmod fq_nmod_vec fq_nmod_mat fq_nmod_poly fq_nmod_poly_factor 
-    fq_zech fq_zech_vec fq_zech_mat fq_zech_poly fq_zech_poly_factor 
-    fq_default fq_default_mat fq_default_poly fq_default_poly_factor
-    thread_pool thread_support fmpz_mod fmpz_mod_vec n_poly
-    mpoly fmpz_mpoly fmpq_mpoly nmod_mpoly fq_nmod_mpoly fmpz_mod_mpoly 
-    fmpz_mpoly_factor fmpq_mpoly_factor nmod_mpoly_factor fmpz_mod_mpoly_factor 
-    fq_nmod_mpoly_factor fq_zech_mpoly fq_zech_mpoly_factor 
+set(_BUILD_DIRS
+    generic_files
+    thread_pool                     thread_support
+
+    ulong_extras
+    long_extras
+    perm
+    double_extras   d_vec           d_mat
+    mpn_extras
+    mpf_vec                         mpf_mat
+    mpfr_vec                        mpfr_mat
+    nmod            nmod_vec        nmod_mat        nmod_poly
+    fmpz            fmpz_vec        fmpz_mat        fmpz_poly
+    fmpz_mod        fmpz_mod_vec    fmpz_mod_mat    fmpz_mod_poly
+    fmpq            fmpq_vec        fmpq_mat        fmpq_poly
+
+    fq              fq_vec          fq_mat          fq_poly
+    fq_nmod         fq_nmod_vec     fq_nmod_mat     fq_nmod_poly
+    fq_zech         fq_zech_vec     fq_zech_mat     fq_zech_poly
+    fq_default                      fq_default_mat  fq_default_poly
+    fq_embed
+    fq_nmod_embed
+    fq_zech_embed
+    padic                           padic_mat       padic_poly
+    qadic
+
+    nmod_poly_factor                fmpz_factor
+    fmpz_poly_factor                fmpz_mod_poly_factor
+    fq_poly_factor                  fq_nmod_poly_factor
+    fq_zech_poly_factor             fq_default_poly_factor
+
+    nmod_poly_mat                   fmpz_poly_mat
+
+    mpoly           nmod_mpoly      fmpz_mpoly      fmpz_mod_mpoly
+    fmpq_mpoly      fq_nmod_mpoly   fq_zech_mpoly
+
+    nmod_mpoly_factor               fmpz_mpoly_factor
+    fmpz_mod_mpoly_factor           fmpq_mpoly_factor
+    fq_nmod_mpoly_factor            fq_zech_mpoly_factor
+
+    fft             fmpz_poly_q     fmpz_lll        n_poly
+    arith           qsieve          aprcl
+
+    nf              nf_elem         qfb
+
+    double_interval dlog
+    fmpz_extras     fmpzi
+    bool_mat        partitions
+    fmpr            mag
+    arf             acf             arb             acb
+    arb_mat         arb_poly        arb_calc        arb_hypgeom
+    acb_mat         acb_poly        acb_calc        acb_hypgeom
+    arb_fmpz_poly   arb_fpwrap
+    acb_dft         acb_elliptic    acb_modular     acb_dirichlet
+    dirichlet       bernoulli       hypgeom
+
+    gr              gr_vec          gr_mat          gr_poly
+    gr_mpoly        gr_special
+
+    calcium
+    utils_flint     fmpz_mpoly_q
+    fexpr           fexpr_builtin
+    qqbar
+    ca              ca_ext          ca_field        ca_vec
+    ca_poly         ca_mat
+
     flintxx
 )
+string(REGEX REPLACE "([A-Za-z0-9_-]+;|[A-Za-z0-9_-]+$)" "src/\\1" BUILD_DIRS "${_BUILD_DIRS}")
 
-set(TEMPLATE_DIRS
-    fq_vec_templates fq_mat_templates fq_poly_templates
-    fq_poly_factor_templates fq_templates
+set(_TEMPLATE_DIRS
+    fq_vec_templates     fq_mat_templates
+    fq_poly_templates    fq_poly_factor_templates
+    fq_embed_templates   fq_templates
 )
-
-set(SOURCES
-    printf.c fprintf.c sprintf.c scanf.c fscanf.c sscanf.c clz_tab.c
-    memory_manager.c version.c profiler.c exception.c
-    hashmap.c inlines.c fmpz/fmpz.c
-)
-
-if (MSVC)
-    list(APPEND SOURCES gettimeofday.c)
-endif()
+string(REGEX REPLACE "([A-Za-z0-9_-]+;|[A-Za-z0-9_-]+$)" "src/\\1" TEMPLATE_DIRS "${_TEMPLATE_DIRS}")
 
 if (WITH_NTL)
-    list(APPEND SOURCES interfaces/NTL-interface.cpp)
+    list(APPEND SOURCES src/interfaces/NTL-interface.cpp)
 endif()
 
-set(HEADERS
+set(_HEADERS
     NTL-interface.h flint.h longlong.h flint-config.h gmpcompat.h fft_tuning.h
     fmpz-conversions.h profiler.h templates.h exception.h hashmap.h
 )
-
-foreach (build_dir IN LISTS BUILD_DIRS TEMPLATE_DIRS)
-    file(GLOB TEMP RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${build_dir}/*.c")
-    list(APPEND SOURCES ${TEMP})
-    file(GLOB TEMP RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${build_dir}/*.h")
-    list(APPEND HEADERS ${TEMP})
-endforeach ()
+string(REGEX REPLACE "([A-Za-z0-9_-]+\.h;|[A-Za-z0-9_-]+\.h$)" "src/\\1" HEADERS "${_HEADERS}")
 
 # Setup for flint-config.h
 check_c_compiler_flag("-mpopcnt" HAS_FLAG_MPOPCNT)
@@ -166,36 +197,43 @@ endif()
 
 # Populate headers
 configure_file(
-    config.h.in
-    flint-config.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/config.h.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/flint-config.h
 )
 
 configure_file(
-    fmpz-conversions-${MEMORY_MANAGER}.in
-    fmpz-conversions.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/fmpz-conversions-${MEMORY_MANAGER}.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/fmpz-conversions.h
     COPYONLY
 )
 
 configure_file(
-    fmpz/link/fmpz_${MEMORY_MANAGER}.c
-    fmpz/fmpz.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/fmpz/link/fmpz_${MEMORY_MANAGER}.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/fmpz/fmpz.c
     COPYONLY
 )
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     configure_file(
-        fft_tuning64.in
-        fft_tuning.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/fft_tuning64.in
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/fft_tuning.h
         COPYONLY
     )   
 elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
     configure_file(
-        fft_tuning32.in
-        fft_tuning.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/fft_tuning32.in
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/fft_tuning.h
         COPYONLY
     )
 endif()
 
+
+foreach (build_dir IN LISTS BUILD_DIRS TEMPLATE_DIRS)
+    file(GLOB TEMP RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${build_dir}/*.c")
+    list(APPEND SOURCES ${TEMP})
+    file(GLOB TEMP RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${build_dir}/*.h")
+    list(APPEND HEADERS ${TEMP})
+endforeach ()
 
 set(TEMP ${HEADERS})
 set(HEADERS )
@@ -207,7 +245,7 @@ foreach(header IN LISTS TEMP)
     endif()
 endforeach()
 
-file(GLOB TEMP "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
+file(GLOB TEMP "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h")
 list(APPEND HEADERS ${TEMP})
 
 add_library(flint ${SOURCES})
@@ -222,7 +260,7 @@ endif()
 # Include directories
 
 target_include_directories(flint PUBLIC 
-    ${CMAKE_CURRENT_SOURCE_DIR} ${GMP_INCLUDE_DIRS} ${MPFR_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src ${GMP_INCLUDE_DIRS} ${MPFR_INCLUDE_DIRS}
     ${CMAKE_CURRENT_BINARY_DIR} ${PThreads_INCLUDE_DIRS}
     ${NTL_INCLUDE_DIR}
 )
@@ -305,9 +343,6 @@ set_target_properties(flint
 
 if(BUILD_TESTING)
     enable_testing()
-    add_library(test_helpers STATIC test_helpers.c)
-    target_link_libraries(test_helpers flint)
-
     foreach (build_dir IN LISTS BUILD_DIRS CMAKE_CURRENT_SOURCE_DIR)
         file(GLOB TEST_FILES "${build_dir}/test/*.c")
         foreach(test_file IN LISTS TEST_FILES)
@@ -315,9 +350,7 @@ if(BUILD_TESTING)
             string(REPLACE "/" "-" test_name ${test_name})
             get_filename_component(test_name ${test_name} NAME_WE)
             add_executable(${test_name} ${test_file})
-            target_link_libraries(${test_name}
-                flint test_helpers
-            )
+            target_link_libraries(${test_name} flint)
 
             add_test(
                 NAME ${test_name}

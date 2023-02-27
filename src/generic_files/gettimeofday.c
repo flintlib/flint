@@ -1,3 +1,6 @@
+/* We only want this file if someone is using pure windows, and not MinGW */
+
+#if !defined(__MINGW64__) && !defined(__MINGW32__) && !defined(__CYGWIN__) && !defined(__CYGWIN32__) && (defined(_WIN64) || defined(_WIN32) || defined(_MSC_VER))
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -37,3 +40,4 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 
     return 0;
 }
+#endif /* defined(_WIN64) */
