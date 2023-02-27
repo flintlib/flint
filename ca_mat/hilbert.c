@@ -1,0 +1,32 @@
+/*
+    Copyright (C) 2020 Fredrik Johansson
+
+    This file is part of Calcium.
+
+    Calcium is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
+
+#include "ca_mat.h"
+
+void
+ca_mat_hilbert(ca_mat_t mat, ca_ctx_t ctx)
+{
+    slong R, C, i, j;
+
+    R = ca_mat_nrows(mat);
+    C = ca_mat_ncols(mat);
+
+    for (i = 0; i < R; i++)
+    {
+        for (j = 0; j < C; j++)
+        {
+            ca_one(ca_mat_entry(mat, i, j), ctx);
+            ca_div_ui(ca_mat_entry(mat, i, j),
+                ca_mat_entry(mat, i, j), i + j + 1, ctx);
+        }
+    }
+}
+

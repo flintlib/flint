@@ -1,0 +1,91 @@
+/*
+    Copyright (C) 2020 Fredrik Johansson
+
+    This file is part of Calcium.
+
+    Calcium is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
+
+#include "ca.h"
+
+int main()
+{
+    slong iter;
+    flint_rand_t state;
+
+    flint_printf("sqrt....");
+    fflush(stdout);
+
+    flint_randinit(state);
+
+    for (iter = 0; iter < 1000 * calcium_test_multiplier(); iter++)
+    {
+        ca_ctx_t ctx;
+        ca_t x, y, z, a, b, c, d;
+        truth_t equal;
+
+        ca_ctx_init(ctx);
+        ca_init(x, ctx);
+        ca_init(y, ctx);
+        ca_init(z, ctx);
+        ca_init(a, ctx);
+        ca_init(b, ctx);
+        ca_init(c, ctx);
+        ca_init(d, ctx);
+
+        /* test sqrt(x)^2 = x */
+        ca_randtest(x, state, 5, 5, ctx);
+        ca_randtest(y, state, 5, 5, ctx);
+        ca_randtest(z, state, 5, 5, ctx);
+        ca_randtest(a, state, 5, 5, ctx);
+        ca_randtest(b, state, 5, 5, ctx);
+
+        ca_mul(x, x, x, ctx);
+        ca_mul(x, x, z, ctx);
+
+        ca_sqrt(y, x, ctx);
+        ca_mul(z, y, y, ctx);
+
+        equal = ca_check_equal(x, z, ctx);
+
+        if (equal == T_FALSE)
+        {
+            flint_printf("FAIL (sqrt(x)^2 != x)\n\n");
+            flint_printf("x = "); ca_print(x, ctx); flint_printf("\n\n");
+            flint_printf("y = "); ca_print(y, ctx); flint_printf("\n\n");
+            flint_printf("z = "); ca_print(z, ctx); flint_printf("\n\n");
+            flint_abort();
+        }
+
+        ca_sqrt_inert(z, x, ctx);
+
+        equal = ca_check_equal(y, z, ctx);
+
+        if (equal == T_FALSE)
+        {
+            flint_printf("FAIL: sqrt(x) != sqrt_inert(x)\n\n");
+            flint_printf("x = "); ca_print(x, ctx); flint_printf("\n\n");
+            flint_printf("y = "); ca_print(y, ctx); flint_printf("\n\n");
+            flint_printf("z = "); ca_print(z, ctx); flint_printf("\n\n");
+            flint_abort();
+        }
+
+        ca_clear(x, ctx);
+        ca_clear(y, ctx);
+        ca_clear(z, ctx);
+        ca_clear(a, ctx);
+        ca_clear(b, ctx);
+        ca_clear(c, ctx);
+        ca_clear(d, ctx);
+        ca_ctx_clear(ctx);
+    }
+
+    flint_randclear(state);
+    flint_cleanup();
+    flint_printf("PASS\n");
+    return EXIT_SUCCESS;
+}
+
