@@ -1,0 +1,22 @@
+/*
+    Copyright (C) 2015 Fredrik Johansson
+
+    This file is part of Arb.
+
+    Arb is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
+
+#include "acb_hypgeom.h"
+
+void
+acb_hypgeom_shi(acb_t res, const acb_t z, slong prec)
+{
+    acb_mul_onei(res, z);
+    acb_hypgeom_si(res, res, prec);
+    acb_mul_onei(res, res);
+    acb_neg(res, res);
+}
+
