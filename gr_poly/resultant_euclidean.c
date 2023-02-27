@@ -39,92 +39,79 @@ int
 _gr_poly_resultant_euclidean(gr_ptr res, gr_srcptr poly1, slong len1,
                     gr_srcptr poly2, slong len2, gr_ctx_t ctx)
 {
-    if (poly1 == poly2 && len1 == len2)
+    gr_ptr u, v, r, t, w, q;
+    slong l0, l1, l2;
+    gr_ptr lc;
+    int status = GR_SUCCESS;
+    slong sz = ctx->sizeof_elem;
+
+    if (len2 == 1)
+        return _gr_poly_resultant_small(res, poly1, len1, poly2, len2, ctx);
+
+    /* todo: we can skip the q tmp allocation when we have a dedicated rem() */
+    GR_TMP_INIT_VEC(w, 4 * len1 + 1, ctx);
+
+    q = w;
+    u = GR_ENTRY(q, len1, sz);
+    v = GR_ENTRY(u, len1, sz);
+    r = GR_ENTRY(v, len1, sz);
+    lc = GR_ENTRY(r, len1, sz);
+
+    status |= gr_one(res, ctx);
+
+    status |= _gr_vec_set(u, poly1, len1, ctx);
+    status |= _gr_vec_set(v, poly2, len2, ctx);
+    l1 = len1;
+    l2 = len2;
+
+    do
     {
-        return gr_zero(res, ctx);
-    }
-    else if (len2 == 1)
-    {
-        if (len1 == 1)
-            return gr_one(res, ctx);
-        else if (len1 == 2)
-            return gr_set(res, poly2, ctx);
-        else
-            return gr_pow_ui(res, poly2, len1 - 1, ctx);
-    }
-    else  /* len1 >= len2 >= 2 */
-    {
-        gr_ptr u, v, r, t, w, q;
-        slong l0, l1, l2;
-        gr_ptr lc;
-        int status = GR_SUCCESS;
-        slong sz = ctx->sizeof_elem;
+        l0 = l1;
+        l1 = l2;
+        status |= gr_set(lc, GR_ENTRY(v, l1 - 1, sz), ctx);
+        /* todo: just rem */
+        status |= _gr_poly_divrem(q, r, u, l0, v, l1, ctx);
 
-        /* todo: we can skip the q tmp allocation when we have a dedicated rem() */
-        GR_TMP_INIT_VEC(w, 4 * len1 + 1, ctx);
+        if (status != GR_SUCCESS)
+            break;
 
-        q = w;
-        u = GR_ENTRY(q, len1, sz);
-        v = GR_ENTRY(u, len1, sz);
-        r = GR_ENTRY(v, len1, sz);
-        lc = GR_ENTRY(r, len1, sz);
+        l2 = l1 - 1;
 
-        status |= gr_one(res, ctx);
+        GR_VEC_NORM(status, r, l2, sz, ctx);
 
-        status |= _gr_vec_set(u, poly1, len1, ctx);
-        status |= _gr_vec_set(v, poly2, len2, ctx);
-        l1 = len1;
-        l2 = len2;
-
-        do
         {
-            l0 = l1;
-            l1 = l2;
-            status |= gr_set(lc, GR_ENTRY(v, l1 - 1, sz), ctx);
-            /* todo: just rem */
-            status |= _gr_poly_divrem(q, r, u, l0, v, l1, ctx);
+            t = u;
+            u = v;
+            v = r;
+            r = t;
+        }
 
-            if (status != GR_SUCCESS)
-                break;
-
-            l2 = l1 - 1;
-
-            GR_VEC_NORM(status, r, l2, sz, ctx);
-
+        if (l2 >= 1) 
+        {
+            status |= gr_pow_ui(lc, lc, l0 - l2, ctx);
+            status |= gr_mul(res, res, lc, ctx);
+            
+            if (((l0 | l1) & 1) == 0)
+                status |= gr_neg(res, res, ctx);
+        }
+        else 
+        {
+            if (l1 == 1)
             {
-                t = u;
-                u = v;
-                v = r;
-                r = t;
-            }
-
-            if (l2 >= 1) 
-            {
-                status |= gr_pow_ui(lc, lc, l0 - l2, ctx);
+                status |= gr_pow_ui(lc, lc, l0 - 1, ctx);
                 status |= gr_mul(res, res, lc, ctx);
-                
-                if (((l0 | l1) & 1) == 0)
-                    status |= gr_neg(res, res, ctx);
             }
-            else 
+            else
             {
-                if (l1 == 1)
-                {
-                    status |= gr_pow_ui(lc, lc, l0 - 1, ctx);
-                    status |= gr_mul(res, res, lc, ctx);
-                }
-                else
-                {
-                    status |= gr_zero(res, ctx);
-                }
+                status |= gr_zero(res, ctx);
             }
         }
-        while (l2 > 0);
-
-        GR_TMP_CLEAR_VEC(w, 4 * len1 + 1, ctx);
-
-        return status;
     }
+    while (l2 > 0);
+
+    GR_TMP_CLEAR_VEC(w, 4 * len1 + 1, ctx);
+
+    return status;
 }
 
 int gr_poly_resultant_euclidean(gr_ptr r, const gr_poly_t f,

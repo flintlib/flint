@@ -18,6 +18,9 @@ int _gr_poly_resultant(gr_ptr res, gr_srcptr A, slong lenA, gr_srcptr B, slong l
 {
     int status = GR_SUCCESS;
 
+    if (_gr_poly_resultant_small(res, A, lenA, B, lenB, ctx) == GR_SUCCESS)
+        return GR_SUCCESS;
+
     /* todo: hgcd algorithm selection */
     status = _gr_poly_resultant_euclidean(res, A, lenA, B, lenB, ctx);
 

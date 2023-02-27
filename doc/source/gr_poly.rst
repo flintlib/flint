@@ -28,9 +28,8 @@ The ``gr_poly`` type has the same data layout as the following
 polynomial types: ``fmpz_poly``, ``fq_poly``, ``fq_nmod_poly``,
 ``fq_zech_poly``, ``arb_poly``, ``acb_poly``, ``ca_poly``.
 Methods in this module can therefore be mixed freely with
-methods in the corresponding Flint, Arb and Calcium modules
+methods in the corresponding FLINT modules
 when the underlying coefficient type is the same.
-
 It is not directly compatible with the following types:
 ``fmpq_poly`` (coefficients are stored with a common denominator),
 ``nmod_poly`` (modulus data is stored as part of the polynomial object).
@@ -363,17 +362,50 @@ GCD
     The underscore methods assume ``lenA >= lenB >= 1`` and that both
     *A* and *B* have nonzero leading coefficient.
 
+.. function:: int _gr_poly_xgcd_euclidean(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_srcptr invB, gr_ctx_t ctx)
+              int gr_poly_xgcd_euclidean(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
+
 Resultant
 -------------------------------------------------------------------------------
 
 .. function:: int _gr_poly_resultant_euclidean(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
-              int gr_poly_resultant_euclidean(gr_ptr r, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)
+              int gr_poly_resultant_euclidean(gr_ptr res, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)
+              int _gr_poly_resultant_hgcd(gr_ptr res, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, slong inner_cutoff, slong cutoff, gr_ctx_t ctx)
+              int gr_poly_resultant_hgcd(gr_ptr res, const gr_poly_t f, const gr_poly_t g, slong inner_cutoff, slong cutoff, gr_ctx_t ctx)
+              int _gr_poly_resultant_sylvester(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
+              int gr_poly_resultant_sylvester(gr_ptr res, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)
+              int _gr_poly_resultant_small(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
+              int gr_poly_resultant_small(gr_ptr res, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)
+              int _gr_poly_resultant(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
+              int gr_poly_resultant(gr_ptr res, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)
 
-.. function:: int _gr_poly_resultant_hgcd(gr_ptr res, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, slong inner_cutoff, slong cutoff, gr_ctx_t ctx)
-              int gr_poly_resultant_hgcd(gr_ptr r, const gr_poly_t f, const gr_poly_t g, slong inner_cutoff, slong cutoff, gr_ctx_t ctx)
+    Sets *res* to the resultant of *poly1* and *poly2*.
+    The underscore methods assume that `len1 \ge len2 \ge 1`
+    and that the leading coefficients are nonzero.
 
-.. function:: int _gr_poly_resultant_sylvester(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
-              int gr_poly_resultant_sylvester(gr_ptr r, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)
+    The *euclidean* algorithm is the ordinary Euclidean algorithm.
+    The *hgcd* version uses the quasilinear half-GCD algorithm.
+    It requires two extra tuning parameters ``inner_cutoff``
+    (recursion threshold passed forward to the HGCD algorithm)
+    and ``cutoff``. Both algorithms can fail when run over
+    non-fields; they will return ``GR_DOMAIN``
+    when encountering an impossible inverse.
+
+    The *small* version uses division-free straight-line programs
+    optimized for short polynomials.
+    It returns ``GR_UNABLE`` if the polynomials are too large.
+    Currently this function handles the cases where `len1 \le 2`
+    or `len2 \le 3`.
+
+    The *sylvester* version constructs the Sylvester matrix
+    and computes its determinant. This is useful over inexact rings
+    and as a fallback for rings without division.
+
+    The default version attempts to choose an appropriate
+    algorithm automatically.
+
+    Currently no algorithm has been implemented that is appropriate for
+    integral domains.
 
 
 Squarefree factorization

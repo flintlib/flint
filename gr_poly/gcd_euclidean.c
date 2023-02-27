@@ -64,7 +64,6 @@ _gr_poly_gcd_euclidean(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA,
     R2 = GR_ENTRY(R1, lenA, sz);
     R3 = GR_ENTRY(R2, lenB, sz);
 
-    /* todo: just rem, when it's optimized */
     status |= _gr_poly_divrem(Q, R1, A, lenA, B, lenB, ctx);
 
     lenR3 = lenB - 1;
@@ -90,7 +89,6 @@ _gr_poly_gcd_euclidean(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA,
 
     do
     {
-        /* todo: just rem, when it's optimized */
         status |= _gr_poly_divrem(Q, R1, R2, lenR2, R3, lenR3, ctx);
 
         lenR2 = lenR3--;

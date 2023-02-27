@@ -17,42 +17,26 @@
 
 int _gr_poly_resultant_sylvester(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
 {
-    if (poly1 == poly2 && len1 == len2)
-    {
-        return gr_zero(res, ctx);
-    }
-    else if (len2 == 1)
-    {
-        if (len1 == 1)
-            return gr_one(res, ctx);
-        else if (len1 == 2)
-            return gr_set(res, poly2, ctx);
-        else
-            return gr_pow_ui(res, poly2, len1 - 1, ctx);
-    }
-    else
-    {
-        slong d, e, i;
-        int status = GR_SUCCESS;
-        gr_mat_t M;
+    slong d, e, i;
+    int status = GR_SUCCESS;
+    gr_mat_t M;
 
-        d = len1 - 1;
-        e = len2 - 1;
+    d = len1 - 1;
+    e = len2 - 1;
 
-        gr_mat_init(M, d + e, d + e, ctx);
+    gr_mat_init(M, d + e, d + e, ctx);
 
-        for (i = 0; i < e; i++)
-            status |= _gr_poly_reverse(gr_mat_entry_ptr(M, i, i, ctx), poly1, len1, len1, ctx);
+    for (i = 0; i < e; i++)
+        status |= _gr_poly_reverse(gr_mat_entry_ptr(M, i, i, ctx), poly1, len1, len1, ctx);
 
-        for (i = 0; i < d; i++)
-            status |= _gr_poly_reverse(gr_mat_entry_ptr(M, e + i, i, ctx), poly2, len2, len2, ctx);
+    for (i = 0; i < d; i++)
+        status |= _gr_poly_reverse(gr_mat_entry_ptr(M, e + i, i, ctx), poly2, len2, len2, ctx);
 
-        status |= gr_mat_det(res, M, ctx);
+    status |= gr_mat_det(res, M, ctx);
 
-        gr_mat_clear(M, ctx);
+    gr_mat_clear(M, ctx);
 
-        return status;
-    }
+    return status;
 }
 
 int gr_poly_resultant_sylvester(gr_ptr r, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)

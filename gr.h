@@ -649,6 +649,7 @@ typedef enum
 
     /* Polynomial methods (todo: rename -> GR_POLY) */
     GR_METHOD_POLY_MULLOW,
+    GR_METHOD_POLY_DIVREM,
     GR_METHOD_POLY_INV_SERIES,
     GR_METHOD_POLY_DIV_SERIES,
     GR_METHOD_POLY_RSQRT_SERIES,
@@ -843,6 +844,8 @@ typedef truth_t ((*gr_method_vec_predicate)(gr_srcptr, slong, gr_ctx_ptr));
 typedef truth_t ((*gr_method_vec_vec_predicate)(gr_srcptr, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_factor_op)(gr_ptr, gr_vec_t, gr_vec_t, gr_srcptr, int, gr_ctx_ptr));
 typedef int ((*gr_method_poly_unary_trunc_op)(gr_ptr, gr_srcptr, slong, slong, gr_ctx_ptr));
+typedef int ((*gr_method_poly_binary_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, slong, gr_ctx_ptr));
+typedef int ((*gr_method_poly_binary_binary_op)(gr_ptr, gr_ptr, gr_srcptr, slong, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, slong, slong, gr_ctx_ptr));
 
 
@@ -927,7 +930,9 @@ typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcp
 #define GR_VEC_PREDICATE(ctx, NAME) (((gr_method_vec_predicate *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_VEC_PREDICATE(ctx, NAME) (((gr_method_vec_vec_predicate *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_FACTOR_OP(ctx, NAME) (((gr_method_factor_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_POLY_BINARY_OP(ctx, NAME) (((gr_method_poly_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_UNARY_TRUNC_OP(ctx, NAME) (((gr_method_poly_unary_trunc_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_POLY_BINARY_BINARY_OP(ctx, NAME) (((gr_method_poly_binary_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_BINARY_TRUNC_OP(ctx, NAME) (((gr_method_poly_binary_trunc_op *) ctx->methods)[GR_METHOD_ ## NAME])
 
 
