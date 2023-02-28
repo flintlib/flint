@@ -9,8 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpr.h"
 #include "mag.h"
-#include "arf.h"
 
 void
 mag_set_fmpr(mag_t x, const fmpr_t y)

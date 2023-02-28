@@ -10,6 +10,7 @@
 */
 
 #include "double_extras.h"
+#include "mpfr.h"
 #include "mag.h"
 
 /* XXX: d_randtest is not good enough */

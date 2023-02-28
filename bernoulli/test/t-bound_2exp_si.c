@@ -23,33 +23,33 @@ int main()
     slong i, bound;
     double a, b;
     fmpq_t q;
-    fmpr_t t;
+    arf_t t;
 
     flint_printf("bound_2exp_si....");
     fflush(stdout);
 
     fmpq_init(q);
-    fmpr_init(t);
+    arf_init(t);
 
     for (i = 0; i < 1000; i++)
     {
         arith_bernoulli_number(q, i);
         bound = bernoulli_bound_2exp_si(i);
 
-        fmpr_set_round_fmpz(t, fmpq_numref(q), 32, FMPR_RND_UP);
-        fmpr_div_fmpz(t, t, fmpq_denref(q), 32, FMPR_RND_UP);
+        arf_set_round_fmpz(t, fmpq_numref(q), 32, ARF_RND_UP);
+        arf_div_fmpz(t, t, fmpq_denref(q), 32, ARF_RND_UP);
 
-        if (fmpr_cmpabs_2exp_si(t, bound) > 0)
+        if (arf_cmpabs_2exp_si(t, bound) > 0)
         {
             flint_printf("FAIL: %wd\n", i);
-            fmpr_print(t); flint_printf("\n\n");
+            arf_print(t); flint_printf("\n\n");
             flint_printf("%wd\n", bound); flint_printf("\n\n");
             flint_abort();
         }
     }
 
     fmpq_clear(q);
-    fmpr_clear(t);
+    arf_clear(t);
 
     for (i = 100; i < 4000000; i += 1)
     {
