@@ -818,6 +818,32 @@ FLINT_DLL int _fmpz_mpoly_mul_dense(fmpz_mpoly_t P,
                                  const fmpz_mpoly_t B, fmpz * maxBfields,
                                                    const fmpz_mpoly_ctx_t ctx);
 
+/* Combined Addition and Multiplication **************************************/
+
+FLINT_DLL void fmpz_mpoly_addmul_multi(fmpz_mpoly_t A,
+       const fmpz_mpoly_struct ** Blist, const slong * Blengths, const slong Bnumseq, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_addmul_multi_threaded(fmpz_mpoly_t A,
+       const fmpz_mpoly_struct ** Blist, const slong * Blengths, const slong Bnumseq, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_DLL void fmpz_mpoly_addmul_multi_threaded_abstract(void * A,
+       const fmpz_mpoly_struct ** Blist, const slong * Blengths, const slong Bnumseq, const fmpz_mpoly_ctx_t ctx,
+       const char * (* output_function)(void * A, slong index, const flint_bitcnt_t bits,
+                                        ulong * exp, fmpz_t coeff, const fmpz_mpoly_ctx_t ctx));
+
+/* Abstract Addition *********************************************************/
+
+void fmpz_mpoly_abstract_add(
+    void * A,
+    void ** Blist,
+    const slong Blen,
+    const flint_bitcnt_t bits,
+    const fmpz_mpoly_ctx_t ctx,
+    void (* input_function)(void * poly, ulong index, const flint_bitcnt_t bits,
+                            ulong * exp, fmpz_t coeff, const fmpz_mpoly_ctx_t ctx),
+    void (* output_function)(void * poly, slong index, const flint_bitcnt_t bits,
+                             ulong * exp, fmpz_t coeff, const fmpz_mpoly_ctx_t ctx));
+
 /* Powering ******************************************************************/
 
 FLINT_DLL int fmpz_mpoly_pow_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
