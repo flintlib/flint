@@ -15,8 +15,6 @@
 #include "arb_fmpz_poly.h"
 #include "qqbar.h"
 
-#if __FLINT_RELEASE >= 20700
-
 static void
 fmpz_poly_randtest_irreducible1(fmpz_poly_t p, flint_rand_t state, slong len, mp_bitcnt_t bits)
 {
@@ -54,45 +52,6 @@ fmpz_poly_randtest_irreducible1(fmpz_poly_t p, flint_rand_t state, slong len, mp
     fmpz_mod_ctx_clear(ctx);
     fmpz_clear(c);
 }
-
-#else
-
-static void
-fmpz_poly_randtest_irreducible1(fmpz_poly_t p, flint_rand_t state, slong len, mp_bitcnt_t bits)
-{
-    slong i;
-    fmpz_t c;
-    fmpz_mod_poly_t q;
-
-    len = 1 + n_randint(state, len);
-
-    fmpz_init(c);
-
-    if (bits == 1)
-        fmpz_set_ui(c, 2);
-    else
-        fmpz_randprime(c, state, bits, 0);
-    fmpz_mod_poly_init(q, c);
-    fmpz_mod_poly_randtest_irreducible(q, state, len);
-
-    fmpz_mod_poly_get_fmpz_poly(p, q);
-
-    /* After lifting, the coefficients belong to {0, ..., c-1}. We now  */
-    /* randomly subtract c so that some of them become negative.        */
-    for (i = 0; i < p->length; i++)
-    {
-        if (n_randint(state, 3) == 0 && !(bits == 1 && fmpz_is_zero(p->coeffs + i)))
-            fmpz_sub(p->coeffs + i, p->coeffs + i, c);
-    }
-
-    fmpz_poly_content(c, p);
-    fmpz_poly_scalar_divexact_fmpz(p, p, c);
-
-    fmpz_mod_poly_clear(q);
-    fmpz_clear(c);
-}
-
-#endif
 
 static void
 fmpz_poly_randtest_irreducible2(fmpz_poly_t pol, flint_rand_t state, slong len, mp_bitcnt_t bits)

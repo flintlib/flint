@@ -20,16 +20,6 @@
 extern "C" {
 #endif
 
-#ifndef flint_abort
-#if __FLINT_RELEASE <= 20502
-#define flint_abort abort
-#endif
-#endif
-
-#if __FLINT_RELEASE < 20600
-#define flint_bitcnt_t ulong
-#endif
-
 /* currently defined in the arb module, but global to the library */
 double arb_test_multiplier(void);
 
@@ -49,28 +39,6 @@ fmpz_add_inline(fmpz_t z, const fmpz_t x, const fmpz_t y)
     else
         fmpz_add(z, x, y);
 }
-
-#if __FLINT_RELEASE < 20600
-
-static __inline__ void
-fmpz_add_si(fmpz_t z, const fmpz_t x, slong y)
-{
-    if (y >= 0)
-        fmpz_add_ui(z, x, y);
-    else
-        fmpz_sub_ui(z, x, -y);
-}
-
-static __inline__ void
-fmpz_sub_si(fmpz_t z, const fmpz_t x, slong y)
-{
-    if (y >= 0)
-        fmpz_sub_ui(z, x, y);
-    else
-        fmpz_add_ui(z, x, -y);
-}
-
-#endif
 
 static __inline__ void
 fmpz_add_si_inline(fmpz_t z, const fmpz_t x, slong y)

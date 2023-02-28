@@ -16,12 +16,8 @@
 
 #include "nf_elem.h"
 
-#if __FLINT_RELEASE >= 20700
 void _nf_elem_get_fmpz_mod_poly(fmpz_mod_poly_t pol, const nf_elem_t a,
                                        const nf_t nf, const fmpz_mod_ctx_t ctx)
-#else
-void _nf_elem_get_fmpz_mod_poly(fmpz_mod_poly_t pol, const nf_elem_t a, const nf_t nf)
-#endif
 {
     if (nf_elem_is_zero(a, nf))
     {
@@ -65,18 +61,10 @@ void _nf_elem_get_fmpz_mod_poly(fmpz_mod_poly_t pol, const nf_elem_t a, const nf
     }
 }
 
-#if __FLINT_RELEASE >= 20700
 void nf_elem_get_fmpz_mod_poly_den(fmpz_mod_poly_t pol, const nf_elem_t a,
                               const nf_t nf, int den, const fmpz_mod_ctx_t ctx)
-#else
-void nf_elem_get_fmpz_mod_poly_den(fmpz_mod_poly_t pol, const nf_elem_t a, const nf_t nf, int den)
-#endif
 {
-#if __FLINT_RELEASE >= 20700
     _nf_elem_get_fmpz_mod_poly(pol, a, nf, ctx);
-#else
-    _nf_elem_get_fmpz_mod_poly(pol, a, nf);
-#endif
     if (den)
     {
         if (nf->flag & NF_LINEAR)
@@ -88,15 +76,8 @@ void nf_elem_get_fmpz_mod_poly_den(fmpz_mod_poly_t pol, const nf_elem_t a, const
     }
 }
 
-#if __FLINT_RELEASE >= 20700
 void nf_elem_get_fmpz_mod_poly(fmpz_mod_poly_t pol, const nf_elem_t a,
                                        const nf_t nf, const fmpz_mod_ctx_t ctx)
 {
     nf_elem_get_fmpz_mod_poly_den(pol, a, nf, 1, ctx);
 }
-#else
-void nf_elem_get_fmpz_mod_poly(fmpz_mod_poly_t pol, const nf_elem_t a, const nf_t nf)
-{
-    nf_elem_get_fmpz_mod_poly_den(pol, a, nf, 1);
-}
-#endif
