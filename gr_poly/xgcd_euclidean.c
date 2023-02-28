@@ -48,9 +48,8 @@ do {                                          \
     (len2) = __tn;                            \
 } while (0);
 
-/* todo: use invB */
 int
-_gr_poly_xgcd_euclidean(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_srcptr invB, gr_ctx_t ctx)
+_gr_poly_xgcd_euclidean(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;
     slong sz = ctx->sizeof_elem;
@@ -73,7 +72,7 @@ _gr_poly_xgcd_euclidean(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A,
         GR_TMP_INIT_VEC(Q, 2 * lenA, ctx);
         R = GR_ENTRY(Q, lenA, sz);
 
-        /* todo: preinv1 B */
+        /* todo: preinv1 B; use also for second division later */
         status |= _gr_poly_divrem(Q, R, A, lenA, B, lenB, ctx);
         lenR = lenB - 1;
         GR_VEC_NORM(status, R, lenR, sz, ctx);
@@ -177,9 +176,8 @@ gr_poly_xgcd_euclidean(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A,
         const slong lenA = A->length, lenB = B->length;
         int status = GR_SUCCESS;
         slong sz = ctx->sizeof_elem;
-        gr_ptr inv;
+        gr_ptr t;
 
-        GR_TMP_INIT(inv, ctx);
 
         if (lenA == 0)          /* lenA = lenB = 0 */
         {
@@ -189,17 +187,26 @@ gr_poly_xgcd_euclidean(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A,
         }
         else if (lenB == 0)     /* lenA > lenB = 0 */
         {
-            status |= gr_inv(inv, GR_ENTRY(A->coeffs, lenA - 1, sz), ctx);
-            status |= gr_poly_mul_scalar(G, A, inv, ctx);
+            GR_TMP_INIT(t, ctx);
+            status |= gr_inv(t, GR_ENTRY(A->coeffs, lenA - 1, sz), ctx);
+            status |= gr_poly_mul_scalar(G, A, t, ctx);
             status |= gr_poly_zero(T, ctx);
-            status |= gr_poly_set_scalar(S, inv, ctx);
+            status |= gr_poly_set_scalar(S, t, ctx);
+            GR_TMP_CLEAR(t, ctx);
+        }
+        else if (gr_is_zero(GR_ENTRY(A->coeffs, A->length - 1, sz), ctx) != T_FALSE ||
+                gr_is_zero(GR_ENTRY(B->coeffs, B->length - 1, sz), ctx) != T_FALSE)
+        {
+            status |= GR_UNABLE;
         }
         else if (lenB == 1)  /* lenA >= lenB = 1 */
         {
-            status |= gr_inv(inv, B->coeffs, ctx);
-            status |= gr_poly_set_scalar(T, inv, ctx);
+            GR_TMP_INIT(t, ctx);
+            status |= gr_inv(t, B->coeffs, ctx);
+            status |= gr_poly_set_scalar(T, t, ctx);
             status |= gr_poly_one(G, ctx);
             status |= gr_poly_zero(S, ctx);
+            GR_TMP_CLEAR(t, ctx);
         }
         else                    /* lenA >= lenB >= 2 */
         {
@@ -239,8 +246,7 @@ gr_poly_xgcd_euclidean(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A,
                 t = T->coeffs;
             }
 
-            status |= gr_inv(inv, GR_ENTRY(B->coeffs, lenB - 1, sz), ctx);
-            status |= _gr_poly_xgcd_euclidean(&lenG, g, s, t, A->coeffs, lenA, B->coeffs, lenB, inv, ctx);
+            status |= _gr_poly_xgcd_euclidean(&lenG, g, s, t, A->coeffs, lenA, B->coeffs, lenB, ctx);
 
             if (G == A || G == B)
             {
@@ -277,14 +283,14 @@ gr_poly_xgcd_euclidean(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A,
 
             if (gr_is_one(GR_ENTRY(G->coeffs, G->length - 1, sz), ctx) != T_TRUE)
             {
-                status |= gr_inv(inv, GR_ENTRY(G->coeffs, G->length - 1, sz), ctx);
-                status |= gr_poly_mul_scalar(G, G, inv, ctx);
-                status |= gr_poly_mul_scalar(S, S, inv, ctx);
-                status |= gr_poly_mul_scalar(T, T, inv, ctx);
+                GR_TMP_INIT(t, ctx);
+                status |= gr_inv(t, GR_ENTRY(G->coeffs, G->length - 1, sz), ctx);
+                status |= gr_poly_mul_scalar(G, G, t, ctx);
+                status |= gr_poly_mul_scalar(S, S, t, ctx);
+                status |= gr_poly_mul_scalar(T, T, t, ctx);
+                GR_TMP_CLEAR(t, ctx);
             }
         }
-
-        GR_TMP_CLEAR(inv, ctx);
 
         return status;
     }
