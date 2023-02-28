@@ -426,7 +426,6 @@ void nf_elem_get_nmod_poly_den(nmod_poly_t pol,
 ANTIC_DLL
 void nf_elem_get_nmod_poly(nmod_poly_t pol, const nf_elem_t a, const nf_t nf);
 
-#if __FLINT_RELEASE >= 20700
 ANTIC_DLL
 void _nf_elem_get_fmpz_mod_poly(fmpz_mod_poly_t pol,
                    const nf_elem_t a, const nf_t nf, const fmpz_mod_ctx_t ctx);
@@ -438,16 +437,6 @@ void nf_elem_get_fmpz_mod_poly_den(fmpz_mod_poly_t pol,
 ANTIC_DLL
 void nf_elem_get_fmpz_mod_poly(fmpz_mod_poly_t pol,
                    const nf_elem_t a, const nf_t nf, const fmpz_mod_ctx_t ctx);
-#else
-ANTIC_DLL
-void _nf_elem_get_fmpz_mod_poly(fmpz_mod_poly_t pol, const nf_elem_t a, const nf_t nf);
-
-ANTIC_DLL
-void nf_elem_get_fmpz_mod_poly_den(fmpz_mod_poly_t pol, const nf_elem_t a, const nf_t nf, int den);
-
-ANTIC_DLL
-void nf_elem_get_fmpz_mod_poly(fmpz_mod_poly_t pol, const nf_elem_t a, const nf_t nf);
-#endif
 
 /******************************************************************************
 
@@ -762,19 +751,13 @@ void nf_elem_coprime_den_signed(nf_elem_t res, const nf_elem_t a, const fmpz_t m
 
 /******************************************************************************
 
-    Helpers for compatibility with FLINT 2.6
+    Helpers originally for compatibility with FLINT 2.6
 
 ******************************************************************************/
-#if __FLINT_RELEASE >= 20700
+
 #define FMPZ_MOD_POLY_FIT_LENGTH(POL, N, CTX) fmpz_mod_poly_fit_length(POL, N, CTX)
 #define FMPZ_MOD(F, G, CTX, P) fmpz_mod(F, G, (CTX)->n)
 #define FMPZ_MOD_POLY_ZERO(POL, CTX) fmpz_mod_poly_zero(POL, CTX)
 #define FMPZ_MOD_POLY_SCALAR_DIV_FMPZ(RES, POL, X, CTX) fmpz_mod_poly_scalar_div_fmpz(RES, POL, X, CTX)
-#else
-#define FMPZ_MOD_POLY_FIT_LENGTH(POL, N, CTX) fmpz_mod_poly_fit_length(POL, N)
-#define FMPZ_MOD(F, G, CTX, P) fmpz_mod(F, G, P)
-#define FMPZ_MOD_POLY_ZERO(POL, CTX) fmpz_mod_poly_zero(POL)
-#define FMPZ_MOD_POLY_SCALAR_DIV_FMPZ(RES, POL, X, CTX) fmpz_mod_poly_scalar_div_fmpz(RES, POL, X)
-#endif
 
 #endif
