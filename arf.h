@@ -23,20 +23,27 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <mpfr.h>
 #include "flint.h"
-#include "fmpr.h"
+#include "fmpq.h"
 #include "mag.h"
+
+#if defined(_MSC_VER) && defined(ARB_BUILD_DLL)
+#define ARB_DLL __declspec(dllexport)
+#else
+#define ARB_DLL FLINT_DLL
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define arf_rnd_t fmpr_rnd_t
-#define ARF_RND_DOWN FMPR_RND_DOWN
-#define ARF_RND_UP FMPR_RND_UP
-#define ARF_RND_FLOOR FMPR_RND_FLOOR
-#define ARF_RND_CEIL FMPR_RND_CEIL
-#define ARF_RND_NEAR FMPR_RND_NEAR
+typedef int arf_rnd_t;
+#define ARF_RND_DOWN 0
+#define ARF_RND_UP 1
+#define ARF_RND_FLOOR 2
+#define ARF_RND_CEIL 3
+#define ARF_RND_NEAR 4
 
 ARF_INLINE int
 arf_rounds_down(arf_rnd_t rnd, int sgnbit)
@@ -598,9 +605,10 @@ int arf_set_round(arf_t y, const arf_t x, slong prec, arf_rnd_t rnd);
 
 int arf_neg_round(arf_t y, const arf_t x, slong prec, arf_rnd_t rnd);
 
+#ifdef FMPR_H
 void arf_get_fmpr(fmpr_t y, const arf_t x);
-
 void arf_set_fmpr(arf_t y, const fmpr_t x);
+#endif
 
 int arf_get_mpfr(mpfr_t x, const arf_t y, mpfr_rnd_t rnd);
 
@@ -918,7 +926,7 @@ int arf_mul_rnd_any(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t
 int arf_mul_rnd_down(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec);
 
 #define arf_mul(z, x, y, prec, rnd)              \
-    ((rnd == FMPR_RND_DOWN)                      \
+    ((rnd == ARF_RND_DOWN)                      \
         ? arf_mul_rnd_down(z, x, y, prec)        \
         : arf_mul_rnd_any(z, x, y, prec, rnd))
 

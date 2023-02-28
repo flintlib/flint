@@ -21,7 +21,7 @@ huge_double(arf_rnd_t rnd, int negative)
 {
     double v;
 
-    if (rnd == ARF_RND_NEAR || rounds_up(rnd, negative))
+    if (rnd == ARF_RND_NEAR || arf_rounds_up(rnd, negative))
         v = D_INF;
     else
         v = ldexp(9007199254740991.0, 971);
@@ -34,7 +34,7 @@ tiny_double(arf_rnd_t rnd, int negative)
 {
     double v;
 
-    if (rnd == ARF_RND_NEAR || !rounds_up(rnd, negative))
+    if (rnd == ARF_RND_NEAR || !arf_rounds_up(rnd, negative))
         v = 0.0;
     else
         v = ldexp(1.0, -1074);
@@ -83,7 +83,7 @@ arf_get_d(const arf_t x, arf_rnd_t rnd)
             xx->_mpfr_sign = ARF_SGNBIT(x) ? -1 : 1;
             xx->_mpfr_exp = ARF_EXP(x);
 
-            return mpfr_get_d(xx, rnd_to_mpfr(rnd));
+            return mpfr_get_d(xx, arf_rnd_to_mpfr(rnd));
         }
 
         arf_init(t);

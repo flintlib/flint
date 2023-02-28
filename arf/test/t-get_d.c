@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "mpfr.h"
 #include "arf.h"
 
 int main()
@@ -124,7 +125,7 @@ int main()
         }
 
         d1 = arf_get_d(x, rnd);
-        d2 = mpfr_get_d(t, rnd_to_mpfr(rnd));
+        d2 = mpfr_get_d(t, arf_rnd_to_mpfr(rnd));
 
         arf_set_d(r1, d1);
         arf_set_d(r2, d2);
