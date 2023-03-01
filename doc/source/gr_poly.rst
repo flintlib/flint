@@ -196,10 +196,12 @@ TODO: algorithms handle allocation for R differently
     The underscore methods make the following assumptions:
 
     * *Q* has room for ``lenA - lenB + 1`` coefficients.
-    * *R* has room for ``lenA`` coefficients.
+    * *R* has room for ``lenB - 1`` coefficients.
     * ``lenA >= lenB >= 1``.
     * *Q* is not aliased with either *A* or *B*.
     * *R* is not aliased with *B*.
+    * *R* may be aliased with *A*, in which case all ``lenA``
+      entries may be used as scratch space.
     * The divisor *B* is normalized to have nonzero leading coefficient.
       (The non-underscore methods check for leading coefficients that
       are not provably nonzero and return ``GR_UNABLE``)

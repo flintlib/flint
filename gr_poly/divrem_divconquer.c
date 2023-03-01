@@ -188,7 +188,6 @@ _gr_poly_divrem_divconquer_preinv(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, g
     if (lenA <= 2 * lenB - 1)
     {
         gr_ptr W;
-
         /* todo: the fq version avoids this temporary, writing directly to R */
         GR_TMP_INIT_VEC(W, lenA, ctx);
         status |= __gr_poly_divrem_divconquer(Q, W, A, lenA, B, lenB, invB, cutoff, ctx);
@@ -197,29 +196,31 @@ _gr_poly_divrem_divconquer_preinv(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, g
     }
     else                        /* lenA > 2 * lenB - 1 */
     {
-        slong shift, n = 2 * lenB - 1;
-        gr_ptr QB, W;
+        slong shift, n = 2 * lenB - 1, len1;
+        gr_ptr QB, W, S;
 
-        status |= _gr_vec_set(R, A, lenA, ctx);
-
-        GR_TMP_INIT_VEC(W, 2 * n, ctx);
+        len1 = 2 * n + lenA;
+        GR_TMP_INIT_VEC(W, len1, ctx);
+        S = GR_ENTRY(W, 2 * n, sz);
+        status |= _gr_vec_set(S, A, lenA, ctx);
         QB = GR_ENTRY(W, n, sz);
 
         while (lenA >= n)
         {
             shift = lenA - n;
-            status |= _gr_poly_divrem_divconquer_recursive(GR_ENTRY(Q, shift, sz), QB, W, GR_ENTRY(R, shift, sz), B, lenB, invB, cutoff, ctx);
-            status |= _gr_poly_sub(GR_ENTRY(R, shift, sz), GR_ENTRY(R, shift, sz), n, QB, n, ctx);
+            status |= _gr_poly_divrem_divconquer_recursive(GR_ENTRY(Q, shift, sz), QB, W, GR_ENTRY(S, shift, sz), B, lenB, invB, cutoff, ctx);
+            status |= _gr_poly_sub(GR_ENTRY(S, shift, sz), GR_ENTRY(S, shift, sz), n, QB, n, ctx);
             lenA -= lenB;
         }
 
         if (lenA >= lenB)
         {
-            status |= __gr_poly_divrem_divconquer(Q, W, R, lenA, B, lenB, invB, cutoff, ctx);
-            _gr_vec_swap(W, R, lenA, ctx);
+            status |= __gr_poly_divrem_divconquer(Q, W, S, lenA, B, lenB, invB, cutoff, ctx);
+            _gr_vec_swap(W, S, lenA, ctx);
         }
 
-        GR_TMP_CLEAR_VEC(W, 2 * n, ctx);
+        _gr_vec_swap(R, S, lenB - 1, ctx);
+        GR_TMP_CLEAR_VEC(W, len1, ctx);
     }
 
     return status;
@@ -279,14 +280,14 @@ gr_poly_divrem_divconquer(gr_poly_t Q, gr_poly_t R,
         q = Q->coeffs;
     }
 
-    if (R == A || R == B)
+    if (R == B)
     {
-        r = flint_malloc(lenA * sz);
-        _gr_vec_init(r, lenA, ctx);
+        r = flint_malloc((lenB - 1) * sz);
+        _gr_vec_init(r, lenB - 1, ctx);
     }
     else
     {
-        gr_poly_fit_length(R, lenA, ctx);
+        gr_poly_fit_length(R, lenB - 1, ctx);
         r = R->coeffs;
     }
 
@@ -305,13 +306,13 @@ gr_poly_divrem_divconquer(gr_poly_t Q, gr_poly_t R,
         _gr_poly_set_length(Q, lenQ, ctx);
     }
 
-    if (R == A || R == B)
+    if (R == B)
     {
         _gr_vec_clear(R->coeffs, R->alloc, ctx);
         flint_free(R->coeffs);
         R->coeffs = r;
-        R->alloc = lenA;
-        R->length = lenA;
+        R->alloc = lenB - 1;
+        R->length = lenB - 1;
     }
 
     _gr_poly_set_length(R, lenB - 1, ctx);

@@ -69,8 +69,19 @@ int _gr_poly_divrem_newton(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcpt
 
     if (lenB > 1 && status == GR_SUCCESS)
     {
-        status |= _gr_poly_mullow(R, Q, lenQ, B, lenB - 1, lenB - 1, ctx);
-        status |= _gr_vec_sub(R, A, R, lenB - 1, ctx);
+        if (R == A)
+        {
+            gr_ptr W;
+            GR_TMP_INIT_VEC(W, lenB - 1, ctx);
+            status |= _gr_poly_mullow(W, Q, lenQ, B, lenB - 1, lenB - 1, ctx);
+            status |= _gr_vec_sub(R, A, W, lenB - 1, ctx);
+            GR_TMP_CLEAR_VEC(W, lenB - 1, ctx);
+        }
+        else
+        {
+            status |= _gr_poly_mullow(R, Q, lenQ, B, lenB - 1, lenB - 1, ctx);
+            status |= _gr_vec_sub(R, A, R, lenB - 1, ctx);
+        }
     }
 
     return status;
@@ -109,7 +120,7 @@ gr_poly_divrem_newton(gr_poly_t Q, gr_poly_t R,
         q = Q->coeffs;
     }
 
-    if (R == A || R == B)
+    if (R == B)
     {
         r = flint_malloc((lenB - 1) * sz);
         _gr_vec_init(r, lenB - 1, ctx);
@@ -135,7 +146,7 @@ gr_poly_divrem_newton(gr_poly_t Q, gr_poly_t R,
         _gr_poly_set_length(Q, lenQ, ctx);
     }
 
-    if (R == A || R == B)
+    if (R == B)
     {
         _gr_vec_clear(R->coeffs, R->alloc, ctx);
         flint_free(R->coeffs);

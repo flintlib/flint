@@ -23,14 +23,7 @@ _gr_poly_divrem_generic(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B
     status = _gr_poly_divrem_newton(Q, R, A, lenA, B, lenB, ctx);
 
     if (status != GR_SUCCESS)
-    {
-        GR_TMP_INIT_VEC(T, lenA, ctx);
-
-        status = _gr_poly_divrem_basecase(Q, T, A, lenA, B, lenB, ctx);
-        _gr_vec_swap(R, T, lenB - 1, ctx);
-
-        GR_TMP_CLEAR_VEC(T, lenA, ctx);
-    }
+        status = _gr_poly_divrem_basecase(Q, R, A, lenA, B, lenB, ctx);
 
     return status;
 }

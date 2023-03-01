@@ -19,22 +19,37 @@ _gr_poly_divrem_basecase_preinv(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_
 {
     slong sz = ctx->sizeof_elem;
     int status = GR_SUCCESS;
+    gr_ptr W;
     slong iQ, iR;
 
     if (R != A)
-        status |= _gr_vec_set(R, A, lenA, ctx);
+    {
+        /* cannot use R as it might not have enough space */
+        GR_TMP_INIT_VEC(W, lenA, ctx);
+        status |= _gr_vec_set(W, A, lenA, ctx);
+    }
+    else
+    {
+        W = R;
+    }
 
     for (iQ = lenA - lenB, iR = lenA - 1; iQ >= 0; iQ--, iR--)
     {
-        if (gr_is_zero(GR_ENTRY(R, iR, sz), ctx) == T_TRUE)
+        if (gr_is_zero(GR_ENTRY(W, iR, sz), ctx) == T_TRUE)
         {
             status |= gr_zero(GR_ENTRY(Q, iQ, sz), ctx);
         }
         else
         {
-            status |= gr_mul(GR_ENTRY(Q, iQ, sz), GR_ENTRY(R, iR, sz), invB, ctx);
-            status |= _gr_vec_submul_scalar(GR_ENTRY(R, iQ, sz), B, lenB, GR_ENTRY(Q, iQ, sz), ctx);
+            status |= gr_mul(GR_ENTRY(Q, iQ, sz), GR_ENTRY(W, iR, sz), invB, ctx);
+            status |= _gr_vec_submul_scalar(GR_ENTRY(W, iQ, sz), B, lenB, GR_ENTRY(Q, iQ, sz), ctx);
         }
+    }
+
+    if (R != A)
+    {
+        _gr_vec_swap(R, W, lenB - 1, ctx);
+        GR_TMP_CLEAR_VEC(W, lenA, ctx);
     }
 
     return status;
@@ -45,24 +60,39 @@ _gr_poly_divrem_basecase_noinv(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_s
 {
     slong sz = ctx->sizeof_elem;
     int status = GR_SUCCESS;
+    gr_ptr W;
     slong iQ, iR;
 
     if (R != A)
-        status |= _gr_vec_set(R, A, lenA, ctx);
+    {
+        /* cannot use R as it might not have enough space */
+        GR_TMP_INIT_VEC(W, lenA, ctx);
+        status |= _gr_vec_set(W, A, lenA, ctx);
+    }
+    else
+    {
+        W = R;
+    }
 
     for (iQ = lenA - lenB, iR = lenA - 1; iQ >= 0; iQ--, iR--)
     {
-        if (gr_is_zero(GR_ENTRY(R, iR, sz), ctx) == T_TRUE)
+        if (gr_is_zero(GR_ENTRY(W, iR, sz), ctx) == T_TRUE)
         {
             status |= gr_zero(GR_ENTRY(Q, iQ, sz), ctx);
         }
         else
         {
-            status |= gr_div(GR_ENTRY(Q, iQ, sz), GR_ENTRY(R, iR, sz), GR_ENTRY(B, lenB - 1, sz), ctx);
+            status |= gr_div(GR_ENTRY(Q, iQ, sz), GR_ENTRY(W, iR, sz), GR_ENTRY(B, lenB - 1, sz), ctx);
             if (status != GR_SUCCESS)
                 break;
-            status |= _gr_vec_submul_scalar(GR_ENTRY(R, iQ, sz), B, lenB, GR_ENTRY(Q, iQ, sz), ctx);
+            status |= _gr_vec_submul_scalar(GR_ENTRY(W, iQ, sz), B, lenB, GR_ENTRY(Q, iQ, sz), ctx);
         }
+    }
+
+    if (R != A)
+    {
+        _gr_vec_swap(R, W, lenB - 1, ctx);
+        GR_TMP_CLEAR_VEC(W, lenA, ctx);
     }
 
     return status;
@@ -124,12 +154,12 @@ gr_poly_divrem_basecase(gr_poly_t Q, gr_poly_t R,
 
     if (R == B)
     {
-        r = flint_malloc(lenA * sz);
-        _gr_vec_init(r, lenA, ctx);
+        r = flint_malloc((lenB - 1) * sz);
+        _gr_vec_init(r, lenB - 1, ctx);
     }
     else
     {
-        gr_poly_fit_length(R, lenA, ctx);
+        gr_poly_fit_length(R, lenB - 1, ctx);
         r = R->coeffs;
     }
 
@@ -153,8 +183,8 @@ gr_poly_divrem_basecase(gr_poly_t Q, gr_poly_t R,
         _gr_vec_clear(R->coeffs, R->alloc, ctx);
         flint_free(R->coeffs);
         R->coeffs = r;
-        R->alloc = lenA;
-        R->length = lenA;
+        R->alloc = lenB - 1;
+        R->length = lenB - 1;
     }
 
     _gr_poly_set_length(R, lenB - 1, ctx);
