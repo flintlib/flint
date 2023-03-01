@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
+    Copyright (C) 2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,9 +10,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mpoly.h"
 
 void _fmpz_mpoly_fit_length(fmpz ** poly,
@@ -35,4 +33,43 @@ fmpz_mpoly_fit_length(fmpz_mpoly_t poly, slong len, const fmpz_mpoly_ctx_t ctx)
             len = 2 * poly->alloc;
         fmpz_mpoly_realloc(poly, len, ctx);
     }
+}
+
+/*
+    Ensure that A has space for "len" terms with bits "bits" and set A->bits
+    The value of A is destroyed.
+
+    Since the coefficient alloc and the exponent alloc are coupled, we must
+    have the assumption that A is allocated wrt ctx upon entry.
+
+    TODO: decouple the two allocations as in nmod_mpoly/fq_nmod_mpoly
+*/
+void fmpz_mpoly_fit_length_reset_bits(
+    fmpz_mpoly_t A,
+    slong len,
+    flint_bitcnt_t bits,
+    const fmpz_mpoly_ctx_t ctx)
+{
+    slong i;
+    slong oldN = mpoly_words_per_exp(A->bits, ctx->minfo);
+    slong newN = mpoly_words_per_exp(bits, ctx->minfo);
+
+    if (len > A->alloc)
+    {
+        len = FLINT_MAX(len, 2*A->alloc);
+
+        A->exps = (ulong *) flint_realloc(A->exps, newN*len*sizeof(ulong));
+        A->coeffs = (fmpz *) flint_realloc(A->coeffs, len*sizeof(fmpz));
+
+        for (i = A->alloc; i < len; i++)
+            fmpz_init(A->coeffs + i);
+
+        A->alloc = len;
+    }
+    else if (newN > oldN && A->alloc > 0)
+    {
+        A->exps = (ulong *) flint_realloc(A->exps, newN*A->alloc*sizeof(ulong));
+    }
+
+    A->bits = bits;
 }
