@@ -1,4 +1,5 @@
 /*
+    Copyright (C) 2016 William Hart
     Copyright (C) 2018 Daniel Schultz
 
     This file is part of FLINT.
@@ -57,4 +58,30 @@ void fmpz_mpoly_assert_canonical(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ct
         if (COEFF_IS_MPZ(A->coeffs[i]))
             flint_throw(FLINT_ERROR, "Polynomial has a big coeff past length");
     }
+}
+
+int fmpz_mpoly_is_fmpz(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
+{
+    slong N;
+
+    if (A->length > WORD(1))
+        return 0;
+
+    if (A->length == WORD(0))
+        return 1;
+
+    N = mpoly_words_per_exp(A->bits, ctx->minfo);
+    return mpoly_monomial_is_zero(A->exps + N*0, N);
+}
+
+int fmpz_mpoly_is_gen(const fmpz_mpoly_t A,
+                                         slong var, const fmpz_mpoly_ctx_t ctx)
+{
+    if (A->length != WORD(1))
+        return 0;
+
+    if (!fmpz_is_one(A->coeffs + 0))
+        return 0;
+
+    return mpoly_is_gen(A->exps, var, A->bits, ctx->minfo);
 }
