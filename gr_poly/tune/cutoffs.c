@@ -12,6 +12,9 @@
 #include "gr_special.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "fmpz_mod.h"
+#include "fmpz_mod_poly.h"
+#include "nmod_poly.h"
 #include "profiler.h"
 
 #define TIMEIT_END_REPEAT3(__timer, __reps, __min_time) \
@@ -29,34 +32,123 @@
         (twall) = __timer->wall*0.001 / __reps; \
     } while (0);
 
+#if 1
+#define INIT_CTX gr_ctx_init_nmod(ctx, n_nextprime(UWORD(1) << (bits - 1), 0));
+#define RANDCOEFF(t, ctx) GR_IGNORE(gr_set_ui(t, n_randlimb(state), ctx))
+#define STEP_BITS for (bits = 1, j = 0; bits <= 64; bits++, j++)
+#endif
+
 #if 0
+#define INIT_CTX fmpz_t t; fmpz_init(t); fmpz_ui_pow_ui(t, 2, bits - 1); fmpz_nextprime(t, t, 0); gr_ctx_init_fmpz_mod(ctx, t); fmpz_clear(t);
+#define RANDCOEFF(t, ctx) fmpz_mod_rand(t, state, gr_ctx_data_as_ptr(ctx));
+#define STEP_BITS for (bits = 32, j = 0; bits <= 8192; bits *= 2, j++)
+#endif
+
+#if 0
+#define INFO "inv_series"
+#define SETUP random_input(A, state, len, ctx); \
+              GR_IGNORE(gr_poly_set_coeff_si(A, 0, 1, ctx));
 #define CASE_A GR_IGNORE(gr_poly_inv_series_basecase(B, A, len, ctx));
 #define CASE_B GR_IGNORE(gr_poly_inv_series_newton(B, A, len, len, ctx));
 #endif
 
 #if 0
+#define INFO "div_series"
+#define SETUP random_input(A, state, len, ctx); \
+              random_input(B, state, len, ctx); \
+              GR_IGNORE(gr_poly_set_coeff_si(B, 0, 1, ctx));
+#define CASE_A GR_IGNORE(gr_poly_div_series_basecase(C, A, B, len, ctx));
+#define CASE_B GR_IGNORE(gr_poly_div_series_newton(C, A, B, len, len, ctx));
+#endif
+
+#if 0
+#define INFO "rsqrt_series"
+#define SETUP random_input(A, state, len, ctx); \
+              GR_IGNORE(gr_poly_set_coeff_si(A, 0, 1, ctx));
 #define CASE_A GR_IGNORE(gr_poly_rsqrt_series_basecase(B, A, len, ctx));
 #define CASE_B GR_IGNORE(gr_poly_rsqrt_series_newton(B, A, len, len, ctx));
 #endif
 
-#if 1
+#if 0
+#define INFO "sqrt_series"
+#define SETUP random_input(A, state, len, ctx); \
+              GR_IGNORE(gr_poly_set_coeff_si(A, 0, 1, ctx));
 #define CASE_A GR_IGNORE(gr_poly_sqrt_series_basecase(B, A, len, ctx));
 #define CASE_B GR_IGNORE(gr_poly_sqrt_series_newton(B, A, len, len, ctx));
 #endif
 
 #if 0
-#define DIVREM 1
-#define CASE_A GR_IGNORE(gr_poly_divrem_basecase(C, D, B, A, ctx));
-#define CASE_B GR_IGNORE(gr_poly_divrem_newton(C, D, B, A, ctx));
-#else
-#define DIVREM 0
+#define INFO "exp_series (basecase -> mul)"
+#define SETUP random_input(A, state, len, ctx); \
+              GR_IGNORE(gr_poly_set_coeff_si(A, 0, 0, ctx));
+#define CASE_A GR_IGNORE(gr_poly_exp_series_basecase(B, A, len, ctx));
+#define CASE_B GR_IGNORE(gr_poly_exp_series_basecase_mul(B, A, len, ctx));
 #endif
+
+#if 0
+#define INFO "exp_series (mul-> newton)"
+#define SETUP random_input(A, state, len, ctx); \
+              GR_IGNORE(gr_poly_set_coeff_si(A, 0, 0, ctx));
+#define CASE_A GR_IGNORE(gr_poly_exp_series_basecase_mul(B, A, len, ctx));
+#define CASE_B GR_IGNORE(gr_poly_exp_series_newton(B, A, len, len, ctx));
+#endif
+
+
+#if 0
+#define INFO "divrem"
+#define SETUP random_input(A, state, 2 * len, ctx); \
+              random_input(B, state, len, ctx); \
+              GR_IGNORE(gr_poly_set_coeff_si(B, len - 1, 1, ctx));
+#define CASE_A GR_IGNORE(gr_poly_divrem_basecase(C, D, A, B, ctx));
+#define CASE_B GR_IGNORE(gr_poly_divrem_newton(C, D, A, B, ctx));
+#endif
+
+#if 1
+#define INFO "divrem (nmod basecase)"
+#define SETUP random_input(A, state, 2 * len, ctx); \
+              random_input(B, state, len, ctx); \
+              GR_IGNORE(gr_poly_set_coeff_si(B, len - 1, 1, ctx));
+#define CASE_A gr_poly_fit_length(C, A->length - B->length + 1, ctx); gr_poly_fit_length(D, B->length - 1, ctx); \
+               _nmod_poly_divrem(C->coeffs, D->coeffs, A->coeffs, A->length, B->coeffs, B->length, ((nmod_t *) gr_ctx_data_ptr(ctx))[0]);
+#define CASE_B GR_IGNORE(gr_poly_divrem_newton(C, D, A, B, ctx));
+#endif
+
+
+#if 0
+#define INFO "divrem (fmpz_mod basecase)"
+#define SETUP random_input(A, state, 2 * len, ctx); \
+              random_input(B, state, len, ctx); \
+              GR_IGNORE(gr_poly_set_coeff_si(B, len - 1, 1, ctx));
+#define CASE_A GR_IGNORE(gr_poly_set(D, A, ctx)); fmpz_mod_poly_divrem_basecase(C, D, D, B, gr_ctx_data_as_ptr(ctx));
+#define CASE_B GR_IGNORE(gr_poly_set(D, A, ctx)); GR_IGNORE(gr_poly_divrem_newton(C, D, D, B, ctx));
+#endif
+
+
+void random_input(gr_poly_t A, flint_rand_t state, slong len, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    slong i;
+    GR_TMP_INIT(t, ctx);
+
+    for (i = 0; i < len; i++)
+    {
+        RANDCOEFF(t, ctx);
+        GR_IGNORE(gr_poly_set_coeff_scalar(A, i, t, ctx));
+    }
+
+    while (A->length != len)
+    {
+        RANDCOEFF(t, ctx);
+        GR_IGNORE(gr_poly_set_coeff_scalar(A, len - 1, t, ctx));
+    }
+
+    GR_TMP_CLEAR(t, ctx);
+}
 
 double
 get_profile(gr_ctx_t ctx, slong len)
 {
     gr_poly_t A, B, C, D;
-    slong i;
     double tcpu, twall, tbase, tnew;
     flint_rand_t state;
 
@@ -67,17 +159,7 @@ get_profile(gr_ctx_t ctx, slong len)
 
     flint_randinit(state);
 
-#if DIVREM
-    for (i = 0; i < 2 * len; i++)
-        GR_IGNORE(gr_poly_set_coeff_si(B, i, n_randlimb(state), ctx));
-    for (i = 0; i < len; i++)
-        GR_IGNORE(gr_poly_set_coeff_si(A, i, n_randlimb(state), ctx));
-    GR_IGNORE(gr_poly_set_coeff_si(A, 0, 1, ctx));
-#else
-    for (i = 0; i < len; i++)
-        GR_IGNORE(gr_poly_set_coeff_si(A, i, n_randlimb(state), ctx));
-    GR_IGNORE(gr_poly_set_coeff_si(A, 0, 1, ctx));
-#endif
+    SETUP
 
     TIMEIT_START
     CASE_A
@@ -144,18 +226,20 @@ get_tuning(gr_ctx_t ctx, slong from)
 int main()
 {
     gr_ctx_t ctx;
-    slong i, results[64];
+    slong i, results[64], j;
     slong bits, cutoff, prev_cutoff = 0;
 
-    for (bits = 2; bits <= 64; bits++)
+    printf("%s\n", INFO);
+
+    STEP_BITS
     {
-        gr_ctx_init_nmod(ctx, n_nextprime(UWORD(1) << (bits - 1), 0));
-        cutoff = get_tuning(ctx, FLINT_MAX(prev_cutoff * 0.75, 2));
-        results[bits - 1] = cutoff;
+        INIT_CTX
+        cutoff = get_tuning(ctx, FLINT_MAX(prev_cutoff * 0.75 - 5, 2));
+        results[j] = cutoff;
         prev_cutoff = cutoff;
         flint_printf("bits = %wd  cutoff = %wd  accuracy = %f\n", bits, cutoff, get_profile(ctx, cutoff));
         flint_printf("tab[] = {");
-        for (i = 0; i < bits; i++)
+        for (i = 0; i <= j; i++)
             flint_printf("%wd, ", results[i]);
         flint_printf("};\n");
     }

@@ -162,7 +162,8 @@ main(void)
             }
 
             flint_printf("%wd", best_off); 
-            if (w != 2) flint_printf(", "); fflush(stdout);
+            if (w != 2) flint_printf(", ");
+            fflush(stdout);
 
             flint_free(i1);
         }
