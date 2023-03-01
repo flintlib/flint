@@ -107,10 +107,11 @@ _gr_poly_xgcd_euclidean(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A,
             do
             {
                 /* todo: in-place remainder (see fmpz_mod_poly) */
-                status |= _gr_poly_divrem(Q, R, D, lenD, V3, lenV3, ctx);
+                status |= _gr_poly_divrem(Q, D, D, lenD, V3, lenV3, ctx);
                 lenQ = lenD - lenV3 + 1;
-                lenR = lenV3 - 1;
-                GR_VEC_NORM(status, R, lenR, sz, ctx);                if (status != GR_SUCCESS)
+                lenD = lenV3 - 1;
+                GR_VEC_NORM(status, D, lenD, sz, ctx);
+                if (status != GR_SUCCESS)
                     break;
 
                 if (lenV1 >= lenQ)
@@ -126,19 +127,7 @@ _gr_poly_xgcd_euclidean(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A,
                     break;
 
                 GR_VEC_SWAP(U, lenU, V1, lenV1);
-                {
-                    gr_ptr __t;
-                    slong __tn;
-
-                    __t = D;
-                    D = V3;
-                    V3 = R;
-                    R = __t;
-                    __tn = lenD;
-                    lenD = lenV3;
-                    lenV3 = lenR;
-                    lenR = __tn;
-                }
+                GR_VEC_SWAP(D, lenD, V3, lenV3);
 
             } while (lenV3 != 0);
 
@@ -281,7 +270,7 @@ gr_poly_xgcd_euclidean(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A,
             _gr_poly_normalise(S, ctx);
             _gr_poly_normalise(T, ctx);
 
-            if (gr_is_one(GR_ENTRY(G->coeffs, G->length - 1, sz), ctx) != T_TRUE)
+            if (status == GR_SUCCESS && gr_is_one(GR_ENTRY(G->coeffs, G->length - 1, sz), ctx) != T_TRUE)
             {
                 GR_TMP_INIT(t, ctx);
                 status |= gr_inv(t, GR_ENTRY(G->coeffs, G->length - 1, sz), ctx);

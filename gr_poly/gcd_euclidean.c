@@ -37,6 +37,18 @@
         } \
     } while (0) \
 
+#define GR_VEC_SWAP(vec1, len1, vec2, len2) \
+do {                                          \
+    gr_ptr __t;                                \
+    slong __tn;                                \
+    __t    = (vec1);                          \
+    (vec1) = (vec2);                          \
+    (vec2) = __t;                             \
+    __tn   = (len1);                          \
+    (len1) = (len2);                          \
+    (len2) = __tn;                            \
+} while (0);
+
 /* assumes lenA >= lenB >= 1, and both A and B have nonzero leading
    coefficient */
 int
@@ -89,10 +101,9 @@ _gr_poly_gcd_euclidean(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA,
 
     do
     {
-        status |= _gr_poly_divrem(Q, R1, R2, lenR2, R3, lenR3, ctx);
-
-        lenR2 = lenR3--;
-        GR_VEC_NORM(status, R1, lenR3, sz, ctx);
+        status |= _gr_poly_divrem(Q, R2, R2, lenR2, R3, lenR3, ctx);
+        lenR2 = lenR3 - 1;
+        GR_VEC_NORM(status, R2, lenR2, sz, ctx);
 
         if (status != GR_SUCCESS)
         {
@@ -100,14 +111,11 @@ _gr_poly_gcd_euclidean(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA,
             goto cleanup;
         }
 
-        T = R2;
-        R2 = R3;
-        R3 = R1;
-        R1 = T;
+        GR_VEC_SWAP(R2, lenR2, R3, lenR3);
     }
     while (lenR3 > 0);
 
-    status |= _gr_vec_set(G, R2, lenR2, ctx);
+    _gr_vec_swap(G, R2, lenR2, ctx);
     *lenG = lenR2;
 
 cleanup:

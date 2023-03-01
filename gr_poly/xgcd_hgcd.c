@@ -368,7 +368,7 @@ gr_poly_xgcd_hgcd(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, cons
             _gr_poly_normalise(S, ctx);
             _gr_poly_normalise(T, ctx);
 
-            if (gr_is_one(GR_ENTRY(G->coeffs, G->length - 1, sz), ctx) != T_TRUE)
+            if (status == GR_SUCCESS && gr_is_one(GR_ENTRY(G->coeffs, G->length - 1, sz), ctx) != T_TRUE)
             {
                 GR_TMP_INIT(t, ctx);
                 status |= gr_inv(t, GR_ENTRY(G->coeffs, G->length - 1, sz), ctx);
