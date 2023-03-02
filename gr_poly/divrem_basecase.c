@@ -125,6 +125,7 @@ gr_poly_divrem_basecase(gr_poly_t Q, gr_poly_t R,
 {
     slong lenA = A->length, lenB = B->length, lenQ = lenA - lenB + 1;
     slong sz = ctx->sizeof_elem;
+    gr_poly_t tQ, tR;
     gr_ptr q, r;
     int status = GR_SUCCESS;
 
@@ -143,8 +144,8 @@ gr_poly_divrem_basecase(gr_poly_t Q, gr_poly_t R,
 
     if (Q == A || Q == B)
     {
-        q = flint_malloc(lenQ * sz);
-        _gr_vec_init(q, lenQ, ctx);
+        gr_poly_init2(tQ, lenQ, ctx);
+        q = tQ->coeffs;
     }
     else
     {
@@ -154,8 +155,8 @@ gr_poly_divrem_basecase(gr_poly_t Q, gr_poly_t R,
 
     if (R == B)
     {
-        r = flint_malloc((lenB - 1) * sz);
-        _gr_vec_init(r, lenB - 1, ctx);
+        gr_poly_init2(tR, lenB - 1, ctx);
+        r = tR->coeffs;
     }
     else
     {
@@ -167,26 +168,17 @@ gr_poly_divrem_basecase(gr_poly_t Q, gr_poly_t R,
 
     if (Q == A || Q == B)
     {
-        _gr_vec_clear(Q->coeffs, Q->alloc, ctx);
-        flint_free(Q->coeffs);
-        Q->coeffs = q;
-        Q->alloc = lenQ;
-        Q->length = lenQ;
-    }
-    else
-    {
-        _gr_poly_set_length(Q, lenQ, ctx);
+        gr_poly_swap(tQ, Q, ctx);
+        gr_poly_clear(tQ, ctx);
     }
 
     if (R == B)
     {
-        _gr_vec_clear(R->coeffs, R->alloc, ctx);
-        flint_free(R->coeffs);
-        R->coeffs = r;
-        R->alloc = lenB - 1;
-        R->length = lenB - 1;
+        gr_poly_swap(tR, R, ctx);
+        gr_poly_clear(tR, ctx);
     }
 
+    _gr_poly_set_length(Q, lenQ, ctx);
     _gr_poly_set_length(R, lenB - 1, ctx);
     _gr_poly_normalise(R, ctx);
 
