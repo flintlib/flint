@@ -1,6 +1,6 @@
 ifeq ($(strip $(VERBOSE)),)
-	QUIET_CC  = @echo '   ' CC  ' ' $@;
-	QUIET_CXX = @echo '   ' CXX ' ' $@;
+	QUIET_CC  = @echo '   ' CC  ' ' $(subst $(BUILD_DIR)/,,$@);
+	QUIET_CXX = @echo '   ' CXX ' ' $(subst $(BUILD_DIR)/,,$@);
 else
 	QUIET_CC  = 
 	QUIET_CXX = 
@@ -8,12 +8,12 @@ endif
 
 ifeq ($(WANTDEPS), 1)
 	DEPFLAGS1 = -MMD -MP -MF $@.d -MT "$@" -MT "$@.d";
-	DEPFLAGS2 = -MMD -MP -MF "$(BUILD_DIR)/$(MOD_DIR)_$*.d" -MT "$(BUILD_DIR)/$(MOD_DIR)_$*.d" -MT "$@";
-	DEPFLAGS3 = -MMD -MP -MF "$(BUILD_DIR)/$*.d" -MT "$(BUILD_DIR)/$*.d" -MT "$@";
+	DEPFLAGS2 = -MMD -MP -MF "$(BUILD_DIR)/$(MOD_DIR)/$(MOD_DIR)_$*.d" -MT "$(BUILD_DIR)/$(MOD_DIR)/$(MOD_DIR)_$*.d" -MT "$@";
+	DEPFLAGS3 = -MMD -MP -MF "$(BUILD_DIR)/$(MOD_DIR)/$*.d" -MT "$(BUILD_DIR)/$(MOD_DIR)/$*.d" -MT "$@";
 else
-	DEPFLAGS1 =  
-	DEPFLAGS2 = 
-	DEPFLAGS3 = 
+	DEPFLAGS1 =
+	DEPFLAGS2 =
+	DEPFLAGS3 =
 endif
 
 AT=@
@@ -24,10 +24,10 @@ SOURCES = $(wildcard *.c)
 HEADERS = $(wildcard ../*.h)
 TEST_HEADERS = $(wildcard *.h)
 
-OBJS = $(patsubst %.c, $(BUILD_DIR)/$(MOD_DIR)_%.o, $(SOURCES))
+OBJS = $(patsubst %.c, $(BUILD_DIR)/$(MOD_DIR)/%.o, $(SOURCES))
 
-LOBJS = $(patsubst %.c, $(BUILD_DIR)/%.lo, $(SOURCES))
-MOD_LOBJ = $(BUILD_DIR)/../$(MOD_DIR).lo
+LOBJS = $(patsubst %.c, $(BUILD_DIR)/$(MOD_DIR)/%.lo, $(SOURCES))
+MOD_LOBJ = $(BUILD_DIR)/$(MOD_DIR).lo
 
 ifndef USER_SET_TESTS
 	TEST_SOURCES = $(wildcard test/*.c)
@@ -42,16 +42,14 @@ PROF_SOURCES = $(wildcard profile/*.c)
 
 TUNE_SOURCES = $(wildcard tune/*.c)
 
-TESTS = $(patsubst %.c, $(BUILD_DIR)/%$(EXEEXT), $(TEST_SOURCES)) \
-        $(patsubst %.cpp, $(BUILD_DIR)/%$(EXEEXT), $(TESTXX_SOURCES))
+TESTS = $(patsubst %.c,$(BUILD_DIR)/$(MOD_DIR)/%$(EXEEXT), $(TEST_SOURCES)) \
+        $(patsubst %.cpp,$(BUILD_DIR)/$(MOD_DIR)/%$(EXEEXT), $(TESTXX_SOURCES))
 
 TESTS_RUN = $(patsubst %, %_RUN, $(TESTS))
 
 VALGRIND_RUN = $(patsubst %, %_VALGRIND_RUN, $(TESTS))
 
-PROFS = $(patsubst %.c, $(BUILD_DIR)/%$(EXEEXT), $(PROF_SOURCES))
-
-TUNE = $(patsubst %.c, %$(EXEEXT), $(TUNE_SOURCES))
+PROFS = $(patsubst %.c, $(BUILD_DIR)/$(MOD_DIR)/%$(EXEEXT), $(PROF_SOURCES))
 
 all: shared static
 
@@ -63,15 +61,15 @@ profile: $(PROFS)
 
 -include $(patsubst %, %.d, $(PROFS))
 
-$(BUILD_DIR)/profile/%$(EXEEXT): profile/%.c $(BUILD_DIR)/../profiler.o
-	$(QUIET_CC) $(CC) $(CFLAGS) -std=gnu99 $(INCS) $< $(BUILD_DIR)/../profiler.o -o $@ $(LIBS) $(DEPFLAGS1)
+$(BUILD_DIR)/$(MOD_DIR)/profile/%$(EXEEXT): profile/%.c
+	$(QUIET_CC) $(CC) $(CFLAGS) -std=gnu99 $(INCS) $< -o $@ $(LIBS) $(DEPFLAGS1)
 
 tune: $(TUNE_SOURCES) $(HEADERS)
-	$(AT)$(foreach prog, $(TUNE), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(BUILD_DIR)/$(prog) $(LIBS) || exit $$?;)
+	$(AT)$(foreach prog, $(TUNE_SOURCES), $(CC) $(CFLAGS) $(INCS) $(prog) -o $(BUILD_DIR)/$(MOD_DIR)/$(patsubst %.c,%,$(prog))$(EXEEXT) $(LIBS) || exit $$?;)
 
 -include $(OBJS:.o=.d)
 
-$(BUILD_DIR)/$(MOD_DIR)_%.o: %.c
+$(BUILD_DIR)/$(MOD_DIR)/%.o: %.c
 	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) -c $< -o $@ $(DEPFLAGS2)
 
 $(MOD_LOBJ): $(LOBJS)
@@ -79,7 +77,7 @@ $(MOD_LOBJ): $(LOBJS)
 
 -include $(LOBJS:.lo=.d)
 
-$(BUILD_DIR)/%.lo: %.c
+$(BUILD_DIR)/$(MOD_DIR)/%.lo: %.c
 	$(QUIET_CC) $(CC) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@ $(DEPFLAGS3)
 
 clean:
@@ -94,19 +92,22 @@ valgrind: tests $(VALGRIND_RUN)
 -include $(patsubst %, %.d, $(TESTS))
 
 ifeq ($(FLINT_SHARED), 0)
-$(BUILD_DIR)/test/%$(EXEEXT): $(BUILD_DIR)/../../libflint.a
+$(BUILD_DIR)/$(MOD_DIR)/test/%$(EXEEXT): $(FLINT_DIR)/libflint.a
 endif
 
-$(BUILD_DIR)/test/%$(EXEEXT): test/%.c $(BUILD_DIR)/../../test_helpers.o
-	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) $(LDFLAGS) $< $(BUILD_DIR)/../../test_helpers.o -o $@ $(LIBS) $(DEPFLAGS1)
+$(BUILD_DIR)/$(MOD_DIR)/test/%$(EXEEXT): test/%.c
+	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) $(LDFLAGS) $< -o $@ $(LIBS) $(DEPFLAGS1)
 
-$(BUILD_DIR)/test/%$(EXEEXT): test/%.cpp $(BUILD_DIR)/../../test_helpers.o
-	$(QUIET_CXX) $(CXX) $(CXXFLAGS) $(INCS) $(LDFLAGS) $< $(BUILD_DIR)/../../test_helpers.o -o $@ $(LIBS) $(DEPFLAGS1)
+$(BUILD_DIR)/$(MOD_DIR)/test/%$(EXEEXT): test/%.cpp
+	$(QUIET_CXX) $(CXX) $(CXXFLAGS) $(INCS) $(LDFLAGS) $< -o $@ $(LIBS) $(DEPFLAGS1)
 
 %_RUN: %
 	@$<
 
 %_VALGRIND_RUN: %
 	valgrind --track-origins=yes --leak-check=full --show-reachable=yes --log-file="$*.valgrind" $<
+
+print-%:
+	@echo '$*=$($*)'
 
 .PHONY: profile tune clean check tests all shared static valgrind %_RUN %_VALGRIND_RUN
