@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2011 William Hart
+    Copyright (C) 2023 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -10,31 +11,30 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "gr_poly.h"
 
 void
-_nmod_poly_div(mp_ptr Q, mp_srcptr A, slong lenA, 
-                                  mp_srcptr B, slong lenB, nmod_t mod)
+_nmod_poly_div(mp_ptr Q, mp_srcptr A, slong lenA,  mp_srcptr B, slong lenB, nmod_t mod)
 {
-    TMP_INIT;
-    
-    if (lenB < 15)
+    if (lenA == lenB)
     {
-        mp_ptr W;
-        
-        TMP_START;
-        W = TMP_ALLOC(NMOD_DIV_BC_ITCH(lenA, lenB, mod)*sizeof(mp_limb_t));
-        _nmod_poly_div_basecase(Q, W, A, lenA, B, lenB, mod);
-        TMP_END;
+        Q[0] = nmod_div(A[lenA - 1], B[lenB - 1], mod);
     }
-    else if (lenB < 6000)
-        _nmod_poly_div_divconquer(Q, A, lenA, B, lenB, mod);
+    else if (lenB == 1)
+    {
+        _nmod_vec_scalar_mul_nmod(Q, A, lenA, nmod_inv(B[0], mod), mod);
+    }
     else
-        _nmod_poly_div_newton(Q, A, lenA, B, lenB, mod);
+    {
+        gr_ctx_t ctx;
+        gr_ctx_init_nmod(ctx, mod.n);  /* todo: init from nmod_t */
+
+        if (lenB <= 15 || lenA - lenB <= 15)
+            GR_MUST_SUCCEED(_gr_poly_div_basecase(Q, A, lenA, B, lenB, ctx));
+        else
+            GR_MUST_SUCCEED(_gr_poly_div_newton(Q, A, lenA, B, lenB, ctx));
+    }
 }
 
 void

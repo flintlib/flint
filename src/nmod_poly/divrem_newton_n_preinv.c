@@ -34,7 +34,8 @@ void _nmod_poly_divrem_newton_n_preinv(mp_ptr Q, mp_ptr R, mp_srcptr A,
 
     if (lenA == lenB + 1)
     {
-        _nmod_poly_divrem_q1(Q, R, A, lenA, B, lenB, mod);
+        /* xxx: direction */
+        _nmod_poly_divrem_basecase_preinv1(Q, R, A, lenA, B, lenB, Binv[0], mod);
         return;
     }
 

@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2011 William Hart
+    Copyright (C) 2023 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -10,37 +11,34 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
-
-#include "mpn_extras.h"
+#include "gr_poly.h"
 
 void
 _nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA, 
                                   mp_srcptr B, slong lenB, nmod_t mod)
 {
-    TMP_INIT;
-    
-    if (lenA == lenB)
-        _nmod_poly_divrem_q0(Q, R, A, B, lenB, mod);
-    else if (lenA == lenB + 1)
-        _nmod_poly_divrem_q1(Q, R, A, lenA, B, lenB, mod);
-    else if (lenB < 15)
+    mp_limb_t invB;
+  
+    if (lenA <= 20 || lenB <= 8 || lenA - lenB <= 6 ||
+            (NMOD_BITS(mod) <= 61 && lenA <= 40) ||
+            (NMOD_BITS(mod) <= 29 && lenA <= 70))
     {
-        mp_ptr W;
-        
-        TMP_START;
-        W = TMP_ALLOC(NMOD_DIVREM_BC_ITCH(lenA, lenB, mod)*sizeof(mp_limb_t));
-        _nmod_poly_divrem_basecase(Q, R, W, A, lenA, B, lenB, mod);
-        TMP_END;
+        invB = (B[lenB - 1] == 1) ? 1 : n_invmod(B[lenB - 1], mod.n);
+
+        _nmod_poly_divrem_basecase_preinv1(Q, R, A, lenA, B, lenB, invB, mod);
     }
-    else if (lenB < 6000)
-        _nmod_poly_divrem_divconquer(Q, R, A, lenA, B, lenB, mod);
     else
-        _nmod_poly_divrem_newton(Q, R, A, lenA, B, lenB, mod);
+    {
+        gr_ctx_t ctx;
+        gr_ctx_init_nmod(ctx, mod.n);  /* todo: init from nmod_t */
+
+        if (NMOD_BITS(mod) >= 16 && lenB >= 1024 && lenA <= 16384)
+            GR_MUST_SUCCEED(_gr_poly_divrem_divconquer(Q, R, A, lenA, B, lenB, 16, ctx));
+        else
+            GR_MUST_SUCCEED(_gr_poly_divrem_newton(Q, R, A, lenA, B, lenB, ctx));
+    }
 }
 
 void nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,
@@ -111,4 +109,3 @@ void nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,
 
     _nmod_poly_normalise(R);
 }
-
