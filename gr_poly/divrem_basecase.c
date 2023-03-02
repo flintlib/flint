@@ -15,7 +15,7 @@
 #include "gr_poly.h"
 
 int
-_gr_poly_divrem_basecase_preinv(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_srcptr invB, gr_ctx_t ctx)
+_gr_poly_divrem_basecase_preinv1(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_srcptr invB, gr_ctx_t ctx)
 {
     slong sz = ctx->sizeof_elem;
     int status = GR_SUCCESS;
@@ -110,7 +110,7 @@ _gr_poly_divrem_basecase(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr 
     status = gr_inv(invB, GR_ENTRY(B, lenB - 1, sz), ctx);
 
     if (status == GR_SUCCESS)
-        status = _gr_poly_divrem_basecase_preinv(Q, R, A, lenA, B, lenB, invB, ctx);
+        status = _gr_poly_divrem_basecase_preinv1(Q, R, A, lenA, B, lenB, invB, ctx);
     else
         status = _gr_poly_divrem_basecase_noinv(Q, R, A, lenA, B, lenB, ctx);
 

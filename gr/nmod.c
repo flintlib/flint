@@ -757,20 +757,33 @@ __gr_nmod_vec_dot_rev(ulong * res, const ulong * initial, int subtract, const ul
     int nlimbs;
     nmod_t mod;
 
-    if (len <= 0)
+    if (len <= 1)
     {
-        if (initial == NULL)
-            _gr_nmod_zero(res, ctx);
+        if (len == 2)   /* todo: fmma */
+        {
+            s = nmod_mul(vec1[0], vec2[1], mod);
+            s = nmod_addmul(s, vec1[1], vec2[0], mod);
+        }
+        else if (len == 1)
+        {
+            mod = NMOD_CTX(ctx);
+            s = nmod_mul(vec1[0], vec2[0], mod);
+        }
         else
-            _gr_nmod_set(res, initial, ctx);
-        return GR_SUCCESS;
+        {
+            if (initial == NULL)
+                _gr_nmod_zero(res, ctx);
+            else
+                _gr_nmod_set(res, initial, ctx);
+            return GR_SUCCESS;
+        }
     }
-
-    mod = NMOD_CTX(ctx);
-
-    nlimbs = _nmod_vec_dot_bound_limbs(len, mod);
-
-    NMOD_VEC_DOT(s, i, len, vec1[i], vec2[len - 1 - i], mod, nlimbs);
+    else
+    {
+        mod = NMOD_CTX(ctx);
+        nlimbs = _nmod_vec_dot_bound_limbs(len, mod);
+        NMOD_VEC_DOT(s, i, len, vec1[i], vec2[len - 1 - i], mod, nlimbs);
+    }
 
     if (initial == NULL)
     {

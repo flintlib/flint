@@ -25,7 +25,7 @@ _gr_poly_divrem_divconquer_recursive(gr_ptr Q, gr_ptr BQ, gr_ptr W,
     {
         status |= _gr_vec_zero(BQ, lenB - 1, ctx);
         status |= _gr_vec_set(GR_ENTRY(BQ, lenB - 1, sz), GR_ENTRY(A, lenB - 1, sz), lenB, ctx);
-        status |= _gr_poly_divrem_basecase_preinv(Q, BQ, BQ, 2 * lenB - 1, B, lenB, invB, ctx);
+        status |= _gr_poly_divrem_basecase_preinv1(Q, BQ, BQ, 2 * lenB - 1, B, lenB, invB, ctx);
         status |= _gr_vec_neg(BQ, BQ, lenB - 1, ctx);
         status |= _gr_vec_set(GR_ENTRY(BQ, lenB - 1, sz), GR_ENTRY(A, lenB - 1, sz), lenB, ctx);
     }
@@ -180,7 +180,7 @@ __gr_poly_divrem_divconquer(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcp
 }
 
 int
-_gr_poly_divrem_divconquer_preinv(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_srcptr invB, slong cutoff, gr_ctx_t ctx)
+_gr_poly_divrem_divconquer_preinv1(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_srcptr invB, slong cutoff, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;
     slong sz = ctx->sizeof_elem;
@@ -238,7 +238,7 @@ _gr_poly_divrem_divconquer(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcpt
     status = gr_inv(invB, GR_ENTRY(B, lenB - 1, sz), ctx);
 
     if (status == GR_SUCCESS)
-        status = _gr_poly_divrem_divconquer_preinv(Q, R, A, lenA, B, lenB, invB, cutoff, ctx);
+        status = _gr_poly_divrem_divconquer_preinv1(Q, R, A, lenA, B, lenB, invB, cutoff, ctx);
     else
         status = GR_UNABLE;
 

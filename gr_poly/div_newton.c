@@ -61,43 +61,41 @@ _gr_poly_div_newton(gr_ptr Q, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, 
 }
 
 int
-gr_poly_div_newton(gr_poly_t Q,
-    const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
+gr_poly_div_newton(gr_poly_t Q, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
 {
-    slong lenA = A->length, lenB = B->length, lenQ = lenA - lenB + 1;
-    slong sz = ctx->sizeof_elem;
-    gr_poly_t tQ;
-    gr_ptr q;
+    slong Alen, Blen, Qlen;
     int status = GR_SUCCESS;
+    slong sz = ctx->sizeof_elem;
 
-    if (lenB == 0)
+    Alen = A->length;
+    Blen = B->length;
+
+    if (Blen == 0)
         return GR_DOMAIN;
 
-    if (gr_is_zero(GR_ENTRY(B->coeffs, lenB - 1, sz), ctx) != T_FALSE)
+    if (gr_is_zero(GR_ENTRY(B->coeffs, Blen - 1, sz), ctx) != T_FALSE)
         return GR_UNABLE;
 
-    if (lenA < lenB)
+    if (Alen < Blen)
         return gr_poly_zero(Q, ctx);
+
+    Qlen = Alen - Blen + 1;
 
     if (Q == A || Q == B)
     {
-        gr_poly_init2(tQ, lenQ, ctx);
-        q = tQ->coeffs;
+        gr_poly_t t;
+        gr_poly_init2(t, Qlen, ctx);
+        status = _gr_poly_div_newton(t->coeffs, A->coeffs, A->length, B->coeffs, B->length, ctx);
+        gr_poly_swap(Q, t, ctx);
+        gr_poly_clear(t, ctx);
     }
     else
     {
-        gr_poly_fit_length(Q, lenQ, ctx);
-        q = Q->coeffs;
+        gr_poly_fit_length(Q, Qlen, ctx);
+        status = _gr_poly_div_newton(Q->coeffs, A->coeffs, A->length, B->coeffs, B->length, ctx);
     }
 
-    status |= _gr_poly_div_newton(q, A->coeffs, lenA, B->coeffs, lenB, ctx);
-
-    if (Q == A || Q == B)
-    {
-        gr_poly_swap(tQ, Q, ctx);
-        gr_poly_clear(tQ, ctx);
-    }
-
-    _gr_poly_set_length(Q, lenQ, ctx);
+    _gr_poly_set_length(Q, Qlen, ctx);
+    _gr_poly_normalise(Q, ctx);
     return status;
 }
