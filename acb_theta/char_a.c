@@ -11,21 +11,17 @@
 
 #include "acb_theta.h"
 
-slong
-acb_theta_dot(ulong a, slong * n, slong g)
+ulong
+acb_theta_char_a(slong* coords, slong g)
 {
-    ulong a_shift = a;
-    slong sgn = 0;
+    ulong a = 0;
     slong k;
 
     for (k = 0; k < g; k++)
     {
-        if (a_shift & 1)
-        {
-            sgn += 8 + n[g - 1 - k] % 8;
-        }
-        a_shift = a_shift >> 1;
+        a = a << 1;
+        a += ((4 + coords[k] % 4) % 4) / 2;
     }
 
-    return sgn % 8;
+    return a;
 }

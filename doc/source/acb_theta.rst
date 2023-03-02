@@ -360,11 +360,16 @@ similar formulas for a tuple of `2^{g+1}` complex numbers.
 Transformation formulas
 -------------------------------------------------------------------------------
 
+.. function:: ulong acb_theta_char_a(slong* coords, slong g)
+
+    Returns *a* such that the *i*-th bit of *a* is 1 iff the *i*-th entry of
+    *coords* is odd, for each `1\leq i\leq g`.
+
 .. function:: slong acb_theta_char_dot(ulong a, ulong b, slong g)
 
     Returns *a^T b* mod *2*.
 
-.. function:: slong acb_theta_dot(ulong a, slong* n, slong g)
+.. function:: slong acb_theta_char_dot_slong(ulong a, slong* n, slong g)
 
     Returns *a^T n* mod *8*.
 
@@ -553,6 +558,56 @@ Finally, the following functions are available for convenience.
 
     Prints a compact representation of *E* to :type:`stdout`.
 
+Precomputations in naive algorithms
+-------------------------------------------------------------------------------
+
+.. type:: acb_theta_precomp_struct
+
+.. type:: acb_theta_precomp_t
+
+    Structure containing precomputed data in the context of naive algorithms.
+
+.. function:: void acb_theta_precomp_init(acb_theta_precomp_t D, slong nb_z, slong g)
+
+    Initializes *D* for precomputations on *nb_z* vectors `z\in \mathbb{C}^g`.
+
+.. function:: void acb_theta_precomp_clear(acb_theta_precomp_t D)
+
+    Clears *D*.
+
+.. function:: void acb_theta_precomp_set(acb_theta_precomp_t D, acb_srcptr z, const acb_mat_t tau, const acb_theta_eld_t E, slong prec)
+
+    Precomputes data attached to `(z,tau)` for all the vectors *z* in the
+    provided list, for a given ellipsoid *E*.
+
+After :func:`acb_theta_precomp_set` has been called, the following macros
+return meaningful values:
+
+.. macro:: acb_theta_precomp_dim(D)
+
+    Macro giving access to the ambient dimension *g*.
+
+.. macro:: acb_theta_precomp_exp_mat(D)
+
+    Macro giving a pointer to the matrix whose entry `(j,k)` contains
+    `\exp(i\pi/4 \tau_{j,j})` if `j=k`, and `\exp(i\pi/2 \tau_{j,k})`
+    otherwise.
+
+.. macro:: acb_theta_precomp_sqr_pow(D, k, j)
+
+    Macro giving a pointer to the complex number `\exp(i\pi/4 (2j + t)^2
+    \tau_{k,k})`, where `t=1` if the lattice points in *E* have odd coordinates
+    `n_k`, and `t=0` if these coordinates are even.
+
+.. macro:: acb_theta_precomp_nb_z(D)
+
+    Macro giving the number of vectors *z* stored in *D*.
+
+.. macro:: acb_theta_precomp_exp_z(D, k, j)
+
+    Macro giving a pointer to the complex number `exp(\pi i z_j)`, where *z* is
+    the `k^\text{th}` vector stored in *D*.
+    
 Naive algorithms
 -------------------------------------------------------------------------------
 
@@ -569,8 +624,7 @@ The different :func:`theta_naive` functions only differ by their way of
 handling individual lattice points. Using function pointers thus allows us to
 factor out significant amounts of code.
 
-.. function:: void acb_theta_naive_tail(arf_t bound, const arf_t R2, const
-              arb_mat_t Y, slong ord, slong prec)
+.. function:: void acb_theta_naive_tail(arf_t bound, const arf_t R2, const arb_mat_t Y, slong ord, slong prec)
 
     Computes an upper bound for the following sum, where `p` stands for *ord*:
 
@@ -585,16 +639,14 @@ factor out significant amounts of code.
 
         2^{2g+2} R^{g-1+2p} e^{-R^2} \prod_{i=1}^g (1 + \gamma_i^{-1})
 
-    where the `gamma_i` are the entries on the diagonal of `Y`.
+    where the `gamma_i` are the diagonal entries of `Y`.
 
-.. function:: void acb_theta_naive_radius(arf_t R2, const arb_mat_t Y, slong ord,
-              const arf_t eps, slong prec)
+.. function:: void acb_theta_naive_radius(arf_t R2, const arb_mat_t Y, slong ord, const arf_t eps, slong prec)
 
-    Returns `R^2` such that the above upper bound is at most `\varepsilon`.
+    Returns `R^2` such that the upper bound from :func:`acb_theta_naive_tail`
+    is at most `\varepsilon`.
 
-.. function:: void acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_struct*
-              eps, acb_ptr c, acb_ptr new_z, ulong ab, int all, slong ord,
-              acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
+.. function:: void acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_struct* eps, acb_ptr c, acb_ptr new_z, ulong ab, int all, slong ord, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
 
     Sets the ellipsoid *E* and `\varepsilon` *c*, *new_z*, `\varepsilon` such
     that summing exponential terms involving *new_z* over points of *E* and
@@ -609,74 +661,24 @@ factor out significant amounts of code.
     If *all=0*, the ellipsoid consists of lattice points in `2\mathbb{Z}^g+a`
     only, where *a* is specified by the theta characteristic *ab*. If *all* is
     nonzero, the ellipsoid consists of lattice points in `2\mathbb{Z}^g` and
-    the radius is doubled, making *E* suitable for evaluating
+    the radius is doubled, thus making *E* suitable for evaluating
     `\theta_{a,b}(z,\tau)` for all *a*.
 
-.. function:: slong acb_theta_naive_newprec(slong prec, slong coord, slong
-              dist, slong max_dist, slong ord)
+.. function:: slong acb_theta_naive_newprec(slong prec, slong coord, slong dist, slong max_dist, slong ord)
 
     Returns a good choice of precision to process the next ellipsoid
     sheet. Here *coord* should be `n_{d-1}`, *dist* should be the distance to the
     midpoint of the interval, *max_dist* the half-length of the interval, and
     *ord* is the order of derivation.
 
-.. function:: slong acb_theta_naive_fullprec(const acb_theta_eld_t E, slong
-              prec)
+.. function:: slong acb_theta_naive_fullprec(const acb_theta_eld_t E, slong prec)
 
     Returns a good choice of full precision for the summation phase.
-
-.. type:: acb_theta_precomp_struct
-
-.. type:: acb_theta_precomp_t
-
-    Data structure containing precomputed data in the context of naive
-    algorithms.
-
-.. function:: void acb_theta_precomp_init(acb_theta_precomp_t D, slong nb_z,
-              slong g)
-
-    Initializes *D* to contain precomputations about *nb_z* vectors `z\in
-    \mathbb{C}^g`.
-
-.. function:: void acb_theta_precomp_clear(acb_theta_precomp_t D)
-
-    Clears *D*.
-
-.. function:: void acb_theta_precomp_set(acb_theta_precomp_t D, acb_srcptr z,
-              const acb_mat_t tau, const acb_theta_eld_t E, slong prec)
-
-    Precomputes the necessary data to evaluate theta functions at `(z,tau)` for
-    all the vectors *z* in the provided list, using naive algorithms with
-    lattice points contained in the ellipsoid *E*.
-
-After :func:`acb_theta_precomp_set` has been called, the following macros are
-available.
-
-.. macro:: acb_theta_precomp_exp_mat(D)
-
-    Macro giving a pointer to the matrix whose entry `(j,k)` contains
-    `\exp(i\pi/4 \tau_{j,j})` if `j=k`, and `\exp(i\pi/2 \tau_{j,k})`
-    otherwise.
-
-.. macro:: acb_theta_precomp_sqr_pow(D, k, j)
-
-    Macro giving a pointer to the complex number `\exp(i\pi/4 (2j + t)^2
-    \tau_{k,k})`, where `t=1` if the lattice points in *E* has odd coordinates
-    `n_k`, and `t=0` if these coordinates are even.
-
-.. macro:: acb_theta_precomp_nb_z(D)
-
-    Macro giving the number of vectors *z* stored in *D*.
-
-.. macro:: acb_theta_precomp_exp_z(D, k, j)
-
-    Macro giving a pointer to the complex number `exp(\pi i z_j)`, where *z* is
-    the `k^\text{th}` vector stored in *D*.
 
 .. type:: acb_theta_naive_worker_t
 
     Represents a function pointer to the "dimension 0" worker in different
-    kinds of naive algorithm. A function :func:`worker_dim0` of this type has
+    kinds of naive algorithms. A function :func:`worker_dim0` of this type has
     the following signature:
 
     .. function:: void worker_dim0(acb_ptr th, const acb_t term, slong* coords,
@@ -693,35 +695,27 @@ available.
     * *prec* is the (relative) precision at which *term* was computed,
     * *fullprec* is the desired full precision in the summation phase.
 
-.. function:: acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const
-              arf_t eps, const acb_theta_eld_t E, const acb_theta_precomp_t D,
-              slong k, ulong ab, slong ord, slong prec,
-              acb_theta_naive_worker_t worker_dim0)
+.. function:: acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arf_t eps, const acb_theta_eld_t E, const acb_theta_precomp_t D, slong k, ulong ab, slong ord, slong prec, acb_theta_naive_worker_t worker_dim0)
 
     Run the naive algorithm on the ellipsoid *E* to evaluate `\theta(z,\tau)`
     using precomputed data stored in *D*, where *z* is the `k^\text{th}` vector
     in the data structure.
 
-.. function:: void acb_theta_naive(acb_ptr th, acb_srcptr z, slong nb_z, const
-              acb_mat_t tau, slong prec)
+.. function:: void acb_theta_naive(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
 
-.. function:: void acb_theta_naive_const(acb_ptr th, const acb_mat_t tau, slong
-              prec)
+.. function:: void acb_theta_naive_proj(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
 
-.. function:: void acb_theta_naive_const_proj(acb_ptr th, const acb_mat_t tau,
-              slong prec)
+.. function:: void acb_theta_naive_const(acb_ptr th, const acb_mat_t tau, slong prec)
 
-.. function:: void acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z,
-              const acb_mat_t tau, slong prec)
+.. function:: void acb_theta_naive_const_proj(acb_ptr th, const acb_mat_t tau, slong prec)
 
-.. function:: void acb_theta_naive_all_const(acb_ptr th, const acb_mat_t tau,
-              slong prec)
+.. function:: void acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
 
-.. function:: void acb_theta_naive_ind(acb_t th, ulong ab, acb_srcptr z, const
-              acb_mat_t tau, slong prec)
+.. function:: void acb_theta_naive_all_const(acb_ptr th, const acb_mat_t tau, slong prec)
 
-.. function:: void acb_theta_naive_ind_const(acb_t th, ulong ab, const
-              acb_mat_t tau, slong prec)
+.. function:: void acb_theta_naive_ind(acb_t th, ulong ab, acb_srcptr z, const acb_mat_t tau, slong prec)
+
+.. function:: void acb_theta_naive_ind_const(acb_t th, ulong ab, const acb_mat_t tau, slong prec)
 
     Evaluates theta functions using the naive algorithm. See above for the
     meaning of different suffixes.

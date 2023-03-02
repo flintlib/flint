@@ -12,9 +12,9 @@
 #include "acb_theta.h"
 
 static void
-acb_theta_naive_red_z(arb_ptr offset, arf_struct * eps, acb_ptr new_z,
-                      acb_ptr c, acb_srcptr z, slong nb_z, const acb_mat_t tau,
-                      const arb_mat_t cho, slong g, slong prec)
+acb_theta_naive_red_z(arb_ptr offset, arf_struct* eps, acb_ptr new_z,
+    acb_ptr c, acb_srcptr z, slong nb_z, const acb_mat_t tau,
+    const arb_mat_t cho, slong g, slong prec)
 {
     arb_mat_t x, y, vec, r;
     arb_mat_t X, Y, Yinv;
@@ -22,7 +22,7 @@ acb_theta_naive_red_z(arb_ptr offset, arf_struct * eps, acb_ptr new_z,
     arb_t bound;
     slong *v;
     slong k, j;
-
+    
     arb_mat_init(vec, g, 1);
     arb_mat_init(x, g, 1);
     arb_mat_init(y, g, 1);
@@ -64,14 +64,16 @@ acb_theta_naive_red_z(arb_ptr offset, arf_struct * eps, acb_ptr new_z,
         arb_mat_scalar_mul_2exp_si(vec, vec, -1);
         acb_theta_eld_round(v, vec);
         for (j = 0; j < g; j++)
+        {
             v[j] *= 2;
+        }
         arb_mat_scalar_mul_2exp_si(vec, vec, 1);
 
         /* Get r and uniform offset */
         for (j = 0; j < g; j++)
         {
             arb_sub_si(arb_mat_entry(r, j, 0), arb_mat_entry(vec, j, 0),
-                       v[j], prec);
+                v[j], prec);
         }
         arb_mat_mul(vec, cho, r, prec);
         for (j = 0; j < g; j++)
@@ -83,7 +85,7 @@ acb_theta_naive_red_z(arb_ptr offset, arf_struct * eps, acb_ptr new_z,
             else
             {
                 arb_union(&offset[j], &offset[j],
-                          arb_mat_entry(vec, j, 0), prec);
+                    arb_mat_entry(vec, j, 0), prec);
             }
         }
 
@@ -95,7 +97,7 @@ acb_theta_naive_red_z(arb_ptr offset, arf_struct * eps, acb_ptr new_z,
         }
         arb_mat_mul(prod, tp, x, prec);
         arb_mul_2exp_si(arb_mat_entry(prod, 0, 0),
-                        arb_mat_entry(prod, 0, 0), 1);
+            arb_mat_entry(prod, 0, 0), 1);
         acb_sub_arb(&c[k], &c[k], arb_mat_entry(prod, 0, 0), prec);
 
         for (j = 0; j < g; j++)
@@ -107,22 +109,21 @@ acb_theta_naive_red_z(arb_ptr offset, arf_struct * eps, acb_ptr new_z,
         for (j = 0; j < g; j++)
         {
             acb_sub_arb(&new_z[k * g + j], &new_z[k * g + j],
-                        arb_mat_entry(vec, j, 0), prec);
+                arb_mat_entry(vec, j, 0), prec);
         }
         arb_mat_mul(prod, tp, vec, prec);
         acb_add_arb(&c[k], &c[k], arb_mat_entry(prod, 0, 0), prec);
-
+        
         arb_mat_mul(vec, Y, r, prec);
         for (j = 0; j < g; j++)
         {
-            arb_add(acb_imagref(&new_z[k * g + j]),
-                    acb_imagref(&new_z[k * g + j]), arb_mat_entry(vec, j, 0),
-                    prec);
+            arb_add(acb_imagref(&new_z[k * g + j]), acb_imagref(&new_z[k * g + j]),
+                arb_mat_entry(vec, j, 0), prec);
         }
         arb_mat_transpose(tp, r);
         arb_mat_mul(prod, tp, vec, prec);
         arb_add(acb_imagref(&c[k]), acb_imagref(&c[k]),
-                arb_mat_entry(prod, 0, 0), prec);
+            arb_mat_entry(prod, 0, 0), prec);
         acb_exp_pi_i(&c[k], &c[k], prec);
     }
 
@@ -141,9 +142,8 @@ acb_theta_naive_red_z(arb_ptr offset, arf_struct * eps, acb_ptr new_z,
 
 void
 acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_struct * eps, acb_ptr c,
-                          acb_ptr new_z, ulong ab, int all, slong ord,
-                          acb_srcptr z, slong nb_z, const acb_mat_t tau,
-                          slong prec)
+    acb_ptr new_z, ulong ab, int all, slong ord, acb_srcptr z, slong nb_z,
+    const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong eld_prec = ACB_THETA_ELD_DEFAULT_PREC;

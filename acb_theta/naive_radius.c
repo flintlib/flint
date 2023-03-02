@@ -80,7 +80,7 @@ invert_lin_plus_log(arf_t R2, slong a, const arb_t b, slong prec)
 
 void
 acb_theta_naive_radius(arf_t R2, const arb_mat_t Y, slong p,
-                       const arf_t eps, slong prec)
+    const arf_t eps, slong prec)
 {
     arb_t b, temp;
     arf_t cmp;
