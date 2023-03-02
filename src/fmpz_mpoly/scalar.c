@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2020 Daniel Schultz
+    Copyright (C) 2016 William Hart
+    Copyright (C) 2018, 2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -11,6 +12,107 @@
 
 #include "fmpz_mpoly.h"
 
+void fmpz_mpoly_scalar_divexact_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                    const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+{
+    slong N;
+
+    if (A != B)
+    {
+        N = mpoly_words_per_exp(B->bits, ctx->minfo);
+        fmpz_mpoly_fit_length(A, B->length, ctx);
+        fmpz_mpoly_fit_bits(A, B->bits, ctx);
+        A->bits = B->bits;
+        mpn_copyi(A->exps, B->exps, N*B->length);
+    }
+    _fmpz_vec_scalar_divexact_fmpz(A->coeffs, B->coeffs, B->length, c);
+    _fmpz_mpoly_set_length(A, B->length, ctx);
+}
+
+void fmpz_mpoly_scalar_divexact_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                           ulong c, const fmpz_mpoly_ctx_t ctx)
+{
+    fmpz_t t;
+    fmpz_init_set_ui(t, c);
+    fmpz_mpoly_scalar_divexact_fmpz(A, B, t, ctx);
+    fmpz_clear(t);
+}
+
+void fmpz_mpoly_scalar_divexact_si(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                           slong c, const fmpz_mpoly_ctx_t ctx)
+{
+    fmpz_t t;
+    fmpz_init(t);
+    fmpz_set_si(t, c);
+    fmpz_mpoly_scalar_divexact_fmpz(A, B, t, ctx);
+    fmpz_clear(t);
+}
+
+/* leave vec1 undefined but valid if division is not exact */
+int _fmpz_vec_scalar_divides_fmpz(fmpz * vec1, const fmpz * vec2,
+                                                    slong len2, const fmpz_t x)
+{
+    slong i;
+    fmpz_t r;
+
+    fmpz_init(r);
+
+    for (i = 0; i < len2; i++)
+    {
+        fmpz_fdiv_qr(vec1 + i, r, vec2 + i, x);
+        if (!fmpz_is_zero(r))
+        {
+            fmpz_clear(r);
+            return 0;
+        }
+    }
+
+    fmpz_clear(r);
+    return 1;
+}
+
+
+int fmpz_mpoly_scalar_divides_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                    const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+{
+    int divides;
+    slong N;
+
+    if (A != B)
+    {
+        N = mpoly_words_per_exp(B->bits, ctx->minfo);
+        fmpz_mpoly_fit_length(A, B->length, ctx);
+        fmpz_mpoly_fit_bits(A, B->bits, ctx);
+        A->bits = B->bits;
+        mpn_copyi(A->exps, B->exps, N*B->length);
+    }
+    divides = _fmpz_vec_scalar_divides_fmpz(A->coeffs, B->coeffs, B->length, c);
+    _fmpz_mpoly_set_length(A, divides ? B->length : WORD(0), ctx);
+    return divides;
+}
+
+int fmpz_mpoly_scalar_divides_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                           ulong c, const fmpz_mpoly_ctx_t ctx)
+{
+    int divides;
+    fmpz_t t;
+    fmpz_init_set_ui(t, c);
+    divides = fmpz_mpoly_scalar_divides_fmpz(A, B, t, ctx);
+    fmpz_clear(t);
+    return divides;
+}
+
+int fmpz_mpoly_scalar_divides_si(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                           slong c, const fmpz_mpoly_ctx_t ctx)
+{
+    int divides;
+    fmpz_t t;
+    fmpz_init(t);
+    fmpz_set_si(t, c);
+    divides = fmpz_mpoly_scalar_divides_fmpz(A, B, t, ctx);
+    fmpz_clear(t);
+    return divides;
+}
 
 static slong _fmpz_mpoly_scalar_fmma1(
     fmpz * Acoeffs, ulong * Aexps,
@@ -317,4 +419,47 @@ void fmpz_mpoly_scalar_fmma(
         flint_free(Dexps);
 
     TMP_END;
+}
+
+void fmpz_mpoly_scalar_mul_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                    const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+{
+    slong N;
+
+    if (fmpz_is_zero(c))
+    {
+        _fmpz_mpoly_set_length(A, 0, ctx);
+        return;
+    }
+
+    if (A != B)
+    {
+        N = mpoly_words_per_exp(B->bits, ctx->minfo);
+        fmpz_mpoly_fit_length_reset_bits(A, B->length, B->bits, ctx);
+        mpoly_copy_monomials(A->exps, B->exps, B->length, N);
+    }
+
+    if ((A != B) || !fmpz_is_one(c))
+        _fmpz_vec_scalar_mul_fmpz(A->coeffs, B->coeffs, B->length, c);
+
+    _fmpz_mpoly_set_length(A, B->length, ctx);
+}
+
+void fmpz_mpoly_scalar_mul_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                           ulong c, const fmpz_mpoly_ctx_t ctx)
+{
+    fmpz_t t;
+    fmpz_init_set_ui(t, c);
+    fmpz_mpoly_scalar_mul_fmpz(A, B, t, ctx);
+    fmpz_clear(t);
+}
+
+void fmpz_mpoly_scalar_mul_si(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+                                           slong c, const fmpz_mpoly_ctx_t ctx)
+{
+    fmpz_t t;
+    fmpz_init(t);
+    fmpz_set_si(t, c);
+    fmpz_mpoly_scalar_mul_fmpz(A, B, t, ctx);
+    fmpz_clear(t);
 }
