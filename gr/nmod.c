@@ -827,10 +827,20 @@ _gr_nmod_poly_mullow(ulong * res,
     const ulong * poly1, slong len1,
     const ulong * poly2, slong len2, slong n, gr_ctx_t ctx)
 {
-    if (len1 >= len2)
-        _nmod_poly_mullow(res, poly1, len1, poly2, len2, n, NMOD_CTX(ctx));
+    if (len1 + len2 - 1 == n)
+    {
+        if (len1 >= len2)
+            _nmod_poly_mul(res, poly1, len1, poly2, len2, NMOD_CTX(ctx));
+        else
+            _nmod_poly_mul(res, poly2, len2, poly1, len1, NMOD_CTX(ctx));
+    }
     else
-        _nmod_poly_mullow(res, poly2, len2, poly1, len1, n, NMOD_CTX(ctx));
+    {
+        if (len1 >= len2)
+            _nmod_poly_mullow(res, poly1, len1, poly2, len2, n, NMOD_CTX(ctx));
+        else
+            _nmod_poly_mullow(res, poly2, len2, poly1, len1, n, NMOD_CTX(ctx));
+    }
 
     return GR_SUCCESS;
 }
