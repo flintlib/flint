@@ -339,10 +339,7 @@ void _n_fq_reduce(
 
         if (lenQ <= 2)
         {
-            if (lenQ == 2)
-                _nmod_poly_divrem_q1(Q, R, A, lenA, B, lenB, ctx->mod);
-            else
-                _nmod_poly_divrem_q0(Q, R, A, B, lenB, ctx->mod);
+            _nmod_poly_divrem_basecase_preinv1(Q, R, A, lenA, B, lenB, Binv[0], ctx->mod);
             return;
         }
 
