@@ -934,60 +934,6 @@ Division
     Finds `Q` and `R` such that `A = B Q + R` with `\operatorname{len}(R) < \operatorname{len}(B)`.
     If `\operatorname{len}(B) = 0` an exception is raised.
 
-.. function:: void _nmod_poly_div_basecase(mp_ptr Q, mp_ptr W, mp_srcptr A, slong A_len, mp_srcptr B, slong B_len, nmod_t mod)
-
-    Notionally finds polynomials `Q` and `R` such that `A = B Q + R` with
-    `\operatorname{len}(R) < \operatorname{len}(B)`, but returns only ``Q``. If `\operatorname{len}(B) = 0` an
-    exception is raised. We require that ``W`` is temporary space of
-    ``NMOD_DIV_BC_ITCH(A_len, B_len, mod)`` coefficients.
-
-.. function:: void nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B)
-
-    Notionally finds polynomials `Q` and `R` such that `A = B Q + R` with
-    `\operatorname{len}(R) < \operatorname{len}(B)`, but returns only ``Q``. If `\operatorname{len}(B) = 0` an
-    exception is raised.
-
-.. function:: void _nmod_poly_divrem_divconquer_recursive(mp_ptr Q, mp_ptr BQ, mp_ptr W, mp_ptr V, mp_srcptr A, mp_srcptr B, slong lenB, nmod_t mod)
-
-    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R)` less than
-    ``lenB``, where ``A`` is of length ``2 * lenB - 1`` and ``B``
-    is of length ``lenB``. Sets ``BQ`` to the low ``lenB - 1``
-    coefficients of ``B * Q``. We require that ``Q`` have space for
-    ``lenB`` coefficients, that ``W`` be temporary space of size
-    ``lenB - 1`` and ``V`` be temporary space for a number of
-    coefficients computed by ``NMOD_DIVREM_DC_ITCH(lenB, mod)``.
-
-.. function:: void _nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
-
-    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R)` less than
-    ``lenB``, where ``A`` is of length ``lenA`` and ``B`` is of
-    length ``lenB``. We require that ``Q`` have space for
-    ``lenA - lenB + 1`` coefficients.
-
-.. function:: void nmod_poly_divrem_divconquer(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
-
-    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R) < \operatorname{len}(B)`.
-
-.. function:: void _nmod_poly_divrem_q0(mp_ptr Q, mp_ptr R, mp_srcptr A, mp_srcptr B, slong lenA, nmod_t mod)
-
-    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R) < \operatorname{len}(B)`,
-    where `\operatorname{len}(A) = \operatorname{len}(B) > 0`.
-
-    Requires that `Q` and `R` have space for `1` and `\operatorname{len}(B) - 1`
-    coefficients, respectively.
-
-    Does not support aliasing or zero-padding.
-
-.. function:: void _nmod_poly_divrem_q1(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
-
-    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R) < \operatorname{len}(B)`,
-    where `\operatorname{len}(A) = \operatorname{len}(B) + 1 \geq \operatorname{len}(B) > 0`.
-
-    Requires that `Q` and `R` have space for `\operatorname{len}(A) - \operatorname{len}(B) + 1` and
-    `\operatorname{len}(B) - 1` coefficients, respectively.
-
-    Does not support aliasing or zero-padding.
-
 .. function:: void _nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
 
     Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R)` less than
@@ -999,27 +945,6 @@ Division
 
     Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R) < \operatorname{len}(B)`.
 
-.. function:: void _nmod_poly_div_divconquer_recursive(mp_ptr Q, mp_ptr W, mp_ptr V, mp_srcptr A, mp_srcptr B, slong lenB, nmod_t mod)
-
-    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R)` less than
-    ``lenB``, where ``A`` is of length ``2 * lenB - 1`` and ``B``
-    is of length ``lenB``. We require that ``Q`` have space for
-    ``lenB`` coefficients and that ``W`` be temporary space of size
-    ``lenB - 1`` and ``V`` be temporary space for a number of
-    coefficients computed by ``NMOD_DIV_DC_ITCH(lenB, mod)``.
-
-.. function:: void _nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
-
-    Notionally computes polynomials `Q` and `R` such that `A = BQ + R` with
-    `\operatorname{len}(R)` less than ``lenB``, where ``A`` is of length ``lenA``
-    and ``B`` is of length ``lenB``, but returns only ``Q``. We
-    require that ``Q`` have space for ``lenA - lenB + 1`` coefficients.
-
-.. function:: void nmod_poly_div_divconquer(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B)
-
-    Notionally computes `Q` and `R` such that `A = BQ + R` with
-    `\operatorname{len}(R) < \operatorname{len}(B)`, but returns only `Q`.
-
 .. function:: void _nmod_poly_div(mp_ptr Q, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
 
     Notionally computes polynomials `Q` and `R` such that `A = BQ + R` with
@@ -1027,23 +952,11 @@ Division
     and ``B`` is of length ``lenB``, but returns only ``Q``. We
     require that ``Q`` have space for ``lenA - lenB + 1`` coefficients.
 
-
 .. function:: void nmod_poly_div(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B)
 
     Computes the quotient `Q` on polynomial division of `A` and `B`.
 
-.. function:: void _nmod_poly_rem_basecase(mp_ptr R, mp_ptr W, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
-              void nmod_poly_rem_basecase(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
-              void _nmod_poly_rem_q1(mp_ptr R, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
-
-    Notationally, computes `Q` and `R` such that `A = BQ + R` with
-    `\operatorname{len}(R) < \operatorname{len}(B)`, where `\operatorname{len}(A) = \operatorname{len}(B) + 1 \geq \operatorname{len}(B) > 0`,
-    but returns only the remainder.
-
-    Requires that `R` has space for `\operatorname{len}(B) - 1` coefficients,
-    respectively.
-
-    Does not support aliasing or zero-padding.
+.. function:: void _nmod_poly_rem_q1(mp_ptr R, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
 
 .. function:: void _nmod_poly_rem(mp_ptr R, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
 
@@ -1137,28 +1050,6 @@ Division
     An exception is raised if ``n == 0`` or the constant coefficient
     of ``B`` is zero.
 
-.. function:: void _nmod_poly_div_newton(mp_ptr Q, mp_srcptr A, slong Alen, mp_srcptr B, slong Blen, nmod_t mod)
-
-    Notionally computes polynomials `Q` and `R` such that `A = BQ + R` with
-    `\operatorname{len}(R)` less than ``lenB``, where ``A`` is of length ``lenA``
-    and ``B`` is of length ``lenB``, but return only `Q`.
-
-    We require that `Q` have space for ``lenA - lenB + 1`` coefficients
-    and assume that the leading coefficient of `B` is a unit.
-
-    The algorithm used is to reverse the polynomials and divide the
-    resulting power series, then reverse the result.
-
-.. function:: void nmod_poly_div_newton(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B)
-
-    Notionally computes `Q` and `R` such that `A = BQ + R` with
-    `\operatorname{len}(R) < \operatorname{len}(B)`, but returns only `Q`.
-
-    We assume that the leading coefficient of `B` is a unit.
-
-    The algorithm used is to reverse the polynomials and divide the
-    resulting power series, then reverse the result.
-
 .. function:: void _nmod_poly_div_newton_n_preinv (mp_ptr Q, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, mp_srcptr Binv, slong lenBinv, nmod_t mod)
 
     Notionally computes polynomials `Q` and `R` such that `A = BQ + R` with
@@ -1185,20 +1076,6 @@ Division
 
     The algorithm used is to reverse the polynomials and divide the
     resulting power series, then reverse the result.
-
-.. function:: void _nmod_poly_divrem_newton(mp_ptr Q, mp_ptr R, mp_srcptr A, slong Alen, mp_srcptr B, slong Blen, nmod_t mod)
-
-    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R)` less than
-    ``lenB``, where `A` is of length ``lenA`` and `B` is of length
-    ``lenB``. We require that `Q` have space for ``lenA - lenB + 1``
-    coefficients. The algorithm used is to call :func:`div_newton` and then
-    multiply out and compute the remainder.
-
-.. function:: void nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
-
-    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R) < \operatorname{len}(B)`.
-    The algorithm used is to call :func:`div_newton` and then multiply out
-    and compute the remainder.
 
 .. function:: void _nmod_poly_divrem_newton_n_preinv (mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, mp_srcptr Binv, slong lenBinv, nmod_t mod)
 
