@@ -741,18 +741,6 @@ FLINT_DLL void _nmod_poly_div_series(mp_ptr Q, mp_srcptr A, slong Alen,
 FLINT_DLL void nmod_poly_div_series(nmod_poly_t Q, const nmod_poly_t A, 
                                                  const nmod_poly_t B, slong n);
 
-FLINT_DLL void _nmod_poly_div_newton(mp_ptr Q, mp_srcptr A, slong Alen, 
-                                          mp_srcptr B, slong Blen, nmod_t mod);
-
-FLINT_DLL void nmod_poly_div_newton(nmod_poly_t Q, const nmod_poly_t A,
-                                                          const nmod_poly_t B);
-
-FLINT_DLL void _nmod_poly_divrem_newton(mp_ptr Q, mp_ptr R, 
-                 mp_srcptr A, slong Alen, mp_srcptr B, slong Blen, nmod_t mod);
-
-FLINT_DLL void nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R, 
-                                     const nmod_poly_t A, const nmod_poly_t B);
-
 FLINT_DLL void _nmod_poly_div_newton_n_preinv (mp_ptr Q, 
                    mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, 
                                     mp_srcptr Binv, slong lenBinv, nmod_t mod);
