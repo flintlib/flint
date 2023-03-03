@@ -23,25 +23,16 @@
 #include <gmp.h>
 #include "fmpz.h"
 #include "fmpq.h"
+#include "fmpq_types.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "flint.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /*  Type definitions  ********************************************************/
-
-typedef struct
-{
-    fmpz * coeffs;
-    slong alloc;
-    slong length;
-    fmpz_t den;
-} fmpq_poly_struct;
-
-typedef fmpq_poly_struct fmpq_poly_t[1];
 
 typedef struct
 {

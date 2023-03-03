@@ -29,21 +29,11 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
-
+#include "fmpq_types.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
-
-/* already defined in flint.h
-typedef struct
-{
-    fmpz num;
-    fmpz den;
-}
-fmpq;
-
-typedef fmpq fmpq_t[1]; */
 
 #define fmpq_numref(__x) (&(__x)->num)
 #define fmpq_denref(__y) (&(__y)->den)

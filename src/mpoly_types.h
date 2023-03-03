@@ -56,6 +56,14 @@ fmpz_mpoly_ctx_struct;
 
 typedef fmpz_mpoly_ctx_struct fmpz_mpoly_ctx_t[1];
 
+typedef struct
+{
+    fmpz_mpoly_ctx_t zctx;
+}
+fmpq_mpoly_ctx_struct;
+
+typedef fmpq_mpoly_ctx_struct fmpq_mpoly_ctx_t[1];
+
 #ifdef __cplusplus
 }
 #endif
