@@ -22,7 +22,11 @@
 #define T fq_nmod
 #define CAP_T FQ_NMOD
 #define B nmod
+
 #include "fq_embed_templates/composition_matrix.c"
+#include "fq_embed_templates/embed.c"
+#include "fq_embed_templates/matrices.c"
+
 #undef B
 #undef CAP_T
 #undef T
