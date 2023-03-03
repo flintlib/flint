@@ -22,7 +22,9 @@
 #define T fq
 #define CAP_T FQ
 #define B fmpz_mod
+
 #include "fq_embed_templates/composition_matrix.c"
+
 #undef B
 #undef CAP_T
 #undef T
