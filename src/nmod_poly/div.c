@@ -28,7 +28,7 @@ _nmod_poly_div(mp_ptr Q, mp_srcptr A, slong lenA,  mp_srcptr B, slong lenB, nmod
     else
     {
         gr_ctx_t ctx;
-        gr_ctx_init_nmod(ctx, mod.n);  /* todo: init from nmod_t */
+        _gr_ctx_init_nmod(ctx, &mod);
 
         if (lenB <= 15 || lenA - lenB <= 15)
             GR_MUST_SUCCEED(_gr_poly_div_basecase(Q, A, lenA, B, lenB, ctx));

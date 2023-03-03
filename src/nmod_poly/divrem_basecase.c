@@ -38,9 +38,17 @@ void _nmod_poly_divrem_q0_preinv1(mp_ptr Q, mp_ptr R,
     }
     else
     {
-        Q[0] = n_mulmod2_preinv(A[lenA-1], invL, mod.n, mod.ninv);
-        _nmod_vec_scalar_mul_nmod(R, B, lenA - 1, Q[0], mod);
-        _nmod_vec_sub(R, A, R, lenA - 1, mod);
+        Q[0] = nmod_mul(A[lenA-1], invL, mod);
+
+        if (R == A)
+        {
+            _nmod_vec_scalar_addmul_nmod(R, B, lenA - 1, nmod_neg(Q[0], mod), mod);
+        }
+        else
+        {
+            _nmod_vec_scalar_mul_nmod(R, B, lenA - 1, Q[0], mod);
+            _nmod_vec_sub(R, A, R, lenA - 1, mod);
+        }
     }
 }
 
@@ -326,7 +334,7 @@ void nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R,
         q = Q->coeffs;
     }
 
-    if (R == A || R == B)
+    if (R == B)
     {
         nmod_poly_init2_preinv(tR, B->mod.n, B->mod.ninv, lenB - 1);
         r = tR->coeffs;
@@ -344,7 +352,7 @@ void nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R,
         nmod_poly_swap(Q, tQ);
         nmod_poly_clear(tQ);
     }
-    if (R == A || R == B)
+    if (R == B)
     {
         nmod_poly_swap(R, tR);
         nmod_poly_clear(tR);

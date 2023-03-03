@@ -514,6 +514,25 @@ _gr_nmod_vec_set(ulong * res, const ulong * vec, slong len, gr_ctx_t ctx)
 }
 
 int
+_gr_nmod_vec_normalise(slong * res, const ulong * vec, slong len, gr_ctx_t ctx)
+{
+    while (len > 0 && vec[len - 1] == 0)
+        len--;
+
+    res[0] = len;
+    return GR_SUCCESS;
+}
+
+slong
+_gr_nmod_vec_normalise_weak(const ulong * vec, slong len, gr_ctx_t ctx)
+{
+    while (len > 0 && vec[len - 1] == 0)
+        len--;
+
+    return len;
+}
+
+int
 _gr_nmod_vec_neg(ulong * res, const ulong * vec, slong len, gr_ctx_t ctx)
 {
     slong i;
@@ -858,6 +877,36 @@ _gr_nmod_poly_mullow(ulong * res,
     return GR_SUCCESS;
 }
 
+/* fixme: duplicates _nmod_poly_divrem for error handling */
+/* todo: also overload div, rem */
+int
+_gr_nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA, 
+                                  mp_srcptr B, slong lenB, gr_ctx_t ctx)
+{
+    if (lenA <= 20 || lenB <= 8 || lenA - lenB <= 6 ||
+            (NMOD_BITS(NMOD_CTX(ctx)) <= 61 && lenA <= 40) ||
+            (NMOD_BITS(NMOD_CTX(ctx)) <= 29 && lenA <= 70))
+    {
+        mp_limb_t invB;
+        int status;
+
+        status = _gr_nmod_inv(&invB, &B[lenB - 1], ctx);
+        if (status != GR_SUCCESS)
+            return status;
+
+        _nmod_poly_divrem_basecase_preinv1(Q, R, A, lenA, B, lenB, invB, NMOD_CTX(ctx));
+
+        return status;
+    }
+    else
+    {
+        if (NMOD_BITS(NMOD_CTX(ctx)) >= 16 && lenB >= 1024 && lenA <= 16384)
+            return _gr_poly_divrem_divconquer(Q, R, A, lenA, B, lenB, 16, ctx);
+        else
+            return _gr_poly_divrem_newton(Q, R, A, lenA, B, lenB, ctx);
+    }
+}
+
 /* todo: unbalanced cutoffs */
 static const short inv_series_cutoff_tab[64] = {38, 36, 38, 36, 41, 48, 49, 54, 60,
   102, 112, 150, 165, 172, 210, 272, 339, 378, 385, 442, 468, 557, 596,
@@ -1096,6 +1145,8 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_VEC_INIT,        (gr_funcptr) _gr_nmod_vec_init},
     {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _gr_nmod_vec_clear},
     {GR_METHOD_VEC_SET,         (gr_funcptr) _gr_nmod_vec_set},
+    {GR_METHOD_VEC_NORMALISE,   (gr_funcptr) _gr_nmod_vec_normalise},
+    {GR_METHOD_VEC_NORMALISE_WEAK,   (gr_funcptr) _gr_nmod_vec_normalise_weak},
     {GR_METHOD_VEC_NEG,         (gr_funcptr) _gr_nmod_vec_neg},
     {GR_METHOD_VEC_ADD,         (gr_funcptr) _gr_nmod_vec_add},
     {GR_METHOD_VEC_SUB,         (gr_funcptr) _gr_nmod_vec_sub},
@@ -1111,6 +1162,7 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) __gr_nmod_vec_dot_rev},
     {GR_METHOD_VEC_RECIPROCALS, (gr_funcptr) _gr_nmod_vec_reciprocals},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_nmod_poly_mullow},
+    {GR_METHOD_POLY_DIVREM,     (gr_funcptr) _gr_nmod_poly_divrem},
     {GR_METHOD_POLY_INV_SERIES, (gr_funcptr) _gr_nmod_poly_inv_series},
     {GR_METHOD_POLY_DIV_SERIES, (gr_funcptr) _gr_nmod_poly_div_series},
     {GR_METHOD_POLY_RSQRT_SERIES, (gr_funcptr) _gr_nmod_poly_rsqrt_series},
@@ -1129,6 +1181,23 @@ gr_ctx_init_nmod(gr_ctx_t ctx, ulong n)
 
     nmod_init(NMOD_CTX_REF(ctx), n);
 
+    ctx->methods = __gr_nmod_methods;
+
+    if (!__gr_nmod_methods_initialized)
+    {
+        gr_method_tab_init(__gr_nmod_methods, __gr_nmod_methods_input);
+        __gr_nmod_methods_initialized = 1;
+    }
+}
+
+void
+_gr_ctx_init_nmod(gr_ctx_t ctx, void * nmod_t_ref)
+{
+    ctx->which_ring = GR_CTX_NMOD;
+    ctx->sizeof_elem = sizeof(ulong);
+    ctx->size_limit = WORD_MAX;
+
+    *NMOD_CTX_REF(ctx) = ((nmod_t *) nmod_t_ref)[0];
     ctx->methods = __gr_nmod_methods;
 
     if (!__gr_nmod_methods_initialized)

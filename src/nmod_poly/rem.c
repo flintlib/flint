@@ -108,7 +108,7 @@ void nmod_poly_rem(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
         return;
     }
 
-    if (R == A || R == B)
+    if (R == B)
     {
         nmod_poly_init2_preinv(tR, B->mod.n, B->mod.ninv, lenB - 1);
         r = tR->coeffs;
@@ -121,7 +121,7 @@ void nmod_poly_rem(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
 
     _nmod_poly_rem(r, A->coeffs, lenA, B->coeffs, lenB, A->mod);
 
-    if (R == A || R == B)
+    if (R == B)
     {
         nmod_poly_swap(R, tR);
         nmod_poly_clear(tR);

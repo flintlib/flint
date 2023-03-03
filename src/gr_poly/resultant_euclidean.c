@@ -16,24 +16,9 @@
 
 #define GR_VEC_NORM(status, R, lenR, sz, ctx) \
     do { \
-        while ((lenR) > 0) \
-        { \
-            truth_t is_zero; \
-            is_zero = gr_is_zero(GR_ENTRY((R), (lenR) - 1, sz), (ctx)); \
-            if (is_zero == T_TRUE) \
-                (lenR)--; \
-            else if (is_zero == T_UNKNOWN) \
-            { \
-                (status) |= GR_UNABLE; \
-                break; \
-            } \
-            else \
-            { \
-                break; \
-            } \
-        } \
-    } while (0) \
-
+        (void) sz; \
+        (status) |= _gr_vec_normalise(&(lenR), (R), (lenR), (ctx)); \
+    } while (0)
 
 int
 _gr_poly_resultant_euclidean(gr_ptr res, gr_srcptr poly1, slong len1,

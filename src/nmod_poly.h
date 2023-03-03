@@ -1137,30 +1137,11 @@ FLINT_DLL mp_limb_t _nmod_poly_resultant_hgcd(mp_srcptr A, slong lenA,
 
 FLINT_DLL mp_limb_t nmod_poly_resultant_hgcd(const nmod_poly_t A, const nmod_poly_t B);
 
-NMOD_POLY_INLINE
-mp_limb_t _nmod_poly_resultant(mp_srcptr poly1, slong len1, 
-                     mp_srcptr poly2, slong len2, nmod_t mod)
-{
-    const slong cutoff = FLINT_BIT_COUNT(mod.n) <= 8 ? 
-                        NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
+FLINT_DLL mp_limb_t _nmod_poly_resultant(mp_srcptr A, slong lenA, 
+                         mp_srcptr B, slong lenB, nmod_t mod);
 
-    if (len1 < cutoff)
-        return _nmod_poly_resultant_euclidean(poly1, len1, poly2, len2, mod);
-    else
-        return _nmod_poly_resultant_hgcd(poly1, len1, poly2, len2, mod);
-}
+FLINT_DLL mp_limb_t nmod_poly_resultant(const nmod_poly_t A, const nmod_poly_t B);
 
-NMOD_POLY_INLINE
-mp_limb_t nmod_poly_resultant(const nmod_poly_t f, const nmod_poly_t g)
-{
-    const slong cutoff = FLINT_BIT_COUNT(f->mod.n) <= 8 ? 
-                        NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
-
-    if (FLINT_MAX(f->length, g->length) < cutoff)
-       return nmod_poly_resultant_euclidean(f, g);
-    else
-       return nmod_poly_resultant_hgcd(f, g);
-}
 
 FLINT_DLL slong _nmod_poly_gcdinv(mp_limb_t *G, mp_limb_t *S, 
                         const mp_limb_t *A, slong lenA,

@@ -17,24 +17,7 @@
 #include "gr_poly.h"
 
 #define GR_VEC_NORM(R, lenR) \
-    do { \
-        while ((lenR) > 0) \
-        { \
-            truth_t is_zero; \
-            is_zero = gr_is_zero(GR_ENTRY((R), (lenR) - 1, sz), (ctx)); \
-            if (is_zero == T_TRUE) \
-                (lenR)--; \
-            else if (is_zero == T_UNKNOWN) \
-            { \
-                (status) |= GR_UNABLE; \
-                break; \
-            } \
-            else \
-            { \
-                break; \
-            } \
-        } \
-    } while (0) \
+    (status) |= _gr_vec_normalise(&(lenR), (R), (lenR), (ctx))
 
 #define __set(B, lenB, A, lenA)          \
 do {                                     \

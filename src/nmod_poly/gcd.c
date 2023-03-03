@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2023 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -14,10 +15,9 @@
 slong _nmod_poly_gcd(mp_ptr G, mp_srcptr A, slong lenA, 
                               mp_srcptr B, slong lenB, nmod_t mod)
 {
-    const slong cutoff = FLINT_BIT_COUNT(mod.n) <= 8 ? 
-                        NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
+    slong cutoff = NMOD_BITS(mod) <= 8 ? NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
 
-    if (lenA < cutoff)
+    if (lenB < cutoff)
         return _nmod_poly_gcd_euclidean(G, A, lenA, B, lenB, mod);
     else
         return _nmod_poly_gcd_hgcd(G, A, lenA, B, lenB, mod);

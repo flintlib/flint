@@ -32,7 +32,7 @@ _nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA,
     else
     {
         gr_ctx_t ctx;
-        gr_ctx_init_nmod(ctx, mod.n);  /* todo: init from nmod_t */
+        _gr_ctx_init_nmod(ctx, &mod);
 
         if (NMOD_BITS(mod) >= 16 && lenB >= 1024 && lenA <= 16384)
             GR_MUST_SUCCEED(_gr_poly_divrem_divconquer(Q, R, A, lenA, B, lenB, 16, ctx));
@@ -80,7 +80,7 @@ void nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,
         q = Q->coeffs;
     }
 
-    if (R == A || R == B)
+    if (R == B)
     {
         nmod_poly_init2_preinv(tR, B->mod.n, B->mod.ninv, lenB - 1);
         r = tR->coeffs;
@@ -98,7 +98,8 @@ void nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,
         nmod_poly_swap(Q, tQ);
         nmod_poly_clear(tQ);
     }
-    if (R == A || R == B)
+
+    if (R == B)
     {
         nmod_poly_swap(R, tR);
         nmod_poly_clear(tR);
