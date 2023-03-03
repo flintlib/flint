@@ -27,6 +27,7 @@
 #include "flint.h"
 #include "fmpq.h"
 #include "mag.h"
+#include "arf_types.h"
 
 #if defined(_MSC_VER) && defined(ARB_BUILD_DLL)
 #define ARB_DLL __declspec(dllexport)
@@ -115,9 +116,6 @@ arf_rnd_to_mpfr(arf_rnd_t rnd)
 /* Assumes non-special value */
 #define ARF_NEG(x) (ARF_XSIZE(x) ^= 1)
 
-/* Note: may also be hardcoded in a few places. */
-#define ARF_NOPTR_LIMBS 2
-
 /* Direct access to the limb data. */
 #define ARF_NOPTR_D(x)   ((x)->d.noptr.d)
 #define ARF_PTR_D(x)     ((x)->d.ptr.d)
@@ -137,38 +135,6 @@ arf_rnd_to_mpfr(arf_rnd_t rnd)
         ARF_XSIZE(x) = 0;           \
     } while (0)
 
-
-typedef struct
-{
-    mp_limb_t d[ARF_NOPTR_LIMBS];
-}
-mantissa_noptr_struct;
-
-typedef struct
-{
-    mp_size_t alloc;
-    mp_ptr d;
-}
-mantissa_ptr_struct;
-
-typedef union
-{
-    mantissa_noptr_struct noptr;
-    mantissa_ptr_struct ptr;
-}
-mantissa_struct;
-
-typedef struct
-{
-    fmpz exp;
-    mp_size_t size;
-    mantissa_struct d;
-}
-arf_struct;
-
-typedef arf_struct arf_t[1];
-typedef arf_struct * arf_ptr;
-typedef const arf_struct * arf_srcptr;
 
 void _arf_promote(arf_t x, mp_size_t n);
 
