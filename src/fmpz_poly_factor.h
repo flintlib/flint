@@ -34,7 +34,7 @@
 #include "nmod_poly.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 FLINT_DLL void fmpz_poly_factor_init(fmpz_poly_factor_t fac);

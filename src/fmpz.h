@@ -28,6 +28,7 @@
 #define ulong mp_limb_t
 
 #include "flint.h"
+#include "fmpz_types.h"
 #include "nmod_vec.h"
 #include "fmpz-conversions.h"
 

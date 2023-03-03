@@ -28,15 +28,6 @@ extern "C" {
 
 #include "calcium.h"
 
-typedef struct
-{
-    fmpz_mpoly_struct num;
-    fmpz_mpoly_struct den;
-}
-fmpz_mpoly_q_struct;
-
-typedef fmpz_mpoly_q_struct fmpz_mpoly_q_t[1];
-
 #define fmpz_mpoly_q_numref(x) (&((x)->num))
 #define fmpz_mpoly_q_denref(x) (&((x)->den))
 

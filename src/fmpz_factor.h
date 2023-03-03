@@ -18,23 +18,11 @@
 #define FMPZ_FACTOR_INLINE static __inline__
 #endif
 
-#include <gmp.h>
-#include "flint.h"
+#include "fmpz.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
-
-typedef struct
-{
-    int sign;
-    fmpz * p;
-    ulong * exp;
-    slong alloc;
-    slong num;
-} fmpz_factor_struct;
-
-typedef fmpz_factor_struct fmpz_factor_t[1];
 
 /* Utility functions *********************************************************/
 
