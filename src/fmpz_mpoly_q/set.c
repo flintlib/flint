@@ -21,3 +21,23 @@ fmpz_mpoly_q_set(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, const fmpz_mpoly_ct
     }
 }
 
+void
+fmpz_mpoly_q_set_si(fmpz_mpoly_q_t res, slong x, const fmpz_mpoly_ctx_t ctx)
+{
+    fmpz_mpoly_set_si(fmpz_mpoly_q_numref(res), x, ctx);
+    fmpz_mpoly_one(fmpz_mpoly_q_denref(res), ctx);
+}
+
+void
+fmpz_mpoly_q_set_fmpz(fmpz_mpoly_q_t res, const fmpz_t x, const fmpz_mpoly_ctx_t ctx)
+{
+    fmpz_mpoly_set_fmpz(fmpz_mpoly_q_numref(res), x, ctx);
+    fmpz_mpoly_one(fmpz_mpoly_q_denref(res), ctx);
+}
+
+void
+fmpz_mpoly_q_set_fmpq(fmpz_mpoly_q_t res, const fmpq_t x, const fmpz_mpoly_ctx_t ctx)
+{
+    fmpz_mpoly_set_fmpz(fmpz_mpoly_q_numref(res), fmpq_numref(x), ctx);
+    fmpz_mpoly_set_fmpz(fmpz_mpoly_q_denref(res), fmpq_denref(x), ctx);
+}

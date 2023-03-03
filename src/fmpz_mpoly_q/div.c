@@ -62,3 +62,76 @@ fmpz_mpoly_q_div(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, const fmpz_mpoly_q_
                 ctx);
 }
 
+void
+fmpz_mpoly_q_div_fmpq(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, const fmpq_t y, const fmpz_mpoly_ctx_t ctx)
+{
+    if (fmpq_is_zero(y))
+    {
+        flint_printf("fmpz_mpoly_q_div_fmpq: division by zero\n");
+        flint_abort();
+    }
+    else
+    {
+        if (fmpz_sgn(fmpq_numref(y)) > 0)
+        {
+            _fmpz_mpoly_q_mul_fmpq(fmpz_mpoly_q_numref(res), fmpz_mpoly_q_denref(res),
+                        fmpz_mpoly_q_numref(x), fmpz_mpoly_q_denref(x),
+                        fmpq_denref(y), fmpq_numref(y),
+                        ctx);
+        }
+        else
+        {
+            fmpz_t t, u;
+            fmpz_init(t);
+            fmpz_init(u);
+            fmpz_neg(t, fmpq_numref(y));
+            fmpz_neg(u, fmpq_denref(y));
+
+            _fmpz_mpoly_q_mul_fmpq(fmpz_mpoly_q_numref(res), fmpz_mpoly_q_denref(res),
+                        fmpz_mpoly_q_numref(x), fmpz_mpoly_q_denref(x),
+                        u, t,
+                        ctx);
+
+            fmpz_clear(t);
+            fmpz_clear(u);
+        }
+    }
+}
+
+void
+fmpz_mpoly_q_div_fmpz(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, const fmpz_t y, const fmpz_mpoly_ctx_t ctx)
+{
+    if (fmpz_is_zero(y))
+    {
+        flint_printf("fmpz_mpoly_q_div_fmpz: division by zero\n");
+        flint_abort();
+    }
+    else
+    {
+        if (fmpz_sgn(y) > 0)
+        {
+            fmpz_t one;
+            *one = 1;
+            _fmpz_mpoly_q_mul_fmpq(fmpz_mpoly_q_numref(res), fmpz_mpoly_q_denref(res),
+                        fmpz_mpoly_q_numref(x), fmpz_mpoly_q_denref(x),
+                        one, y,
+                        ctx);
+        }
+        else
+        {
+            fmpz_t t;
+            fmpz_t one;
+            *one = -1;
+            fmpz_init(t);
+            fmpz_neg(t, y);
+
+            _fmpz_mpoly_q_mul_fmpq(fmpz_mpoly_q_numref(res), fmpz_mpoly_q_denref(res),
+                        fmpz_mpoly_q_numref(x), fmpz_mpoly_q_denref(x),
+                        one, t,
+                        ctx);
+
+            fmpz_clear(t);
+        }
+    }
+}
+
