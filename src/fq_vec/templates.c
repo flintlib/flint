@@ -17,6 +17,22 @@
 
 #define T fq
 #define CAP_T FQ
+
+#include "fq_vec_templates/add.c"
+#include "fq_vec_templates/clear.c"
+#include "fq_vec_templates/equal.c"
+#include "fq_vec_templates/fprint.c"
+#include "fq_vec_templates/init.c"
+#include "fq_vec_templates/is_zero.c"
+#include "fq_vec_templates/neg.c"
+#include "fq_vec_templates/randtest.c"
+#include "fq_vec_templates/scalar_addmul_fq.c"
+#include "fq_vec_templates/scalar_mul_fq.c"
 #include "fq_vec_templates/scalar_submul_fq.c"
+#include "fq_vec_templates/set.c"
+#include "fq_vec_templates/sub.c"
+#include "fq_vec_templates/swap.c"
+#include "fq_vec_templates/zero.c"
+
 #undef CAP_T
 #undef T
