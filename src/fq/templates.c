@@ -1,5 +1,7 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2018 Luca De Feo
+    Copyright (C) 2020 William Hart
 
     This file is part of FLINT.
 
@@ -17,6 +19,13 @@
 
 #define T fq
 #define CAP_T FQ
+
+#include "fq_templates/div.c"
+#include "fq_templates/is_invertible.c"
 #include "fq_templates/is_invertible_f.c"
+#include "fq_templates/is_square.c"
+#include "fq_templates/multiplicative_order.c"
+#include "fq_templates/sqrt.c"
+
 #undef CAP_T
 #undef T
