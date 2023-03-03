@@ -32,16 +32,6 @@
 #define FMPZ_MOD_MAT_SOLVE_TRI_ROWS_CUTOFF 64
 #define FMPZ_MOD_MAT_SOLVE_TRI_COLS_CUTOFF 64
 
-typedef struct
-{
-    fmpz_mat_t mat;
-    fmpz_t mod;
-}
-fmpz_mod_mat_struct;
-
-/* fmpz_mod_mat_t allows reference-like semantics for fmpz_mod_mat_struct */
-typedef fmpz_mod_mat_struct fmpz_mod_mat_t[1];
-
 /* Element access  ********************************************************/
 
 FMPZ_MOD_MAT_INLINE

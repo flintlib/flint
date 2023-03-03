@@ -13,6 +13,7 @@
 #define MPOLY_TYPES_H
 
 #include "flint.h"
+#include "fmpz_mod_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -63,6 +64,15 @@ typedef struct
 fmpq_mpoly_ctx_struct;
 
 typedef fmpq_mpoly_ctx_struct fmpq_mpoly_ctx_t[1];
+
+typedef struct
+{
+    mpoly_ctx_t minfo;
+    fmpz_mod_ctx_t ffinfo;
+}
+fmpz_mod_mpoly_ctx_struct;
+
+typedef fmpz_mod_mpoly_ctx_struct fmpz_mod_mpoly_ctx_t[1];
 
 #ifdef __cplusplus
 }
