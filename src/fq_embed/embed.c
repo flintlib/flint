@@ -12,22 +12,6 @@
 #include "fq_embed.h"
 #include "fq_poly.h"
 
-#ifdef T
-#undef T
-#endif
-#ifdef B
-#undef B
-#endif
-
-#define T fq
-#define CAP_T FQ
-#define B fmpz_mod
-
-#ifdef T
-#ifdef B
-
-#include "templates.h"
-
 void fq_embed_gens(fq_t gen_sub, fq_t gen_sup, fmpz_mod_poly_t minpoly,
                              const fq_ctx_t sub_ctx,
                              const fq_ctx_t sup_ctx)
@@ -76,11 +60,3 @@ void _fq_embed_gens_naive(fq_t gen_sub,
     fq_poly_clear(modulus, sup_ctx);
     fq_poly_clear(fact, sup_ctx);
 }
-
-
-#endif
-#endif
-
-#undef B
-#undef CAP_T
-#undef T
