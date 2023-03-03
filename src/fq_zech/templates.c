@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2018 Luca De Feo
 
     This file is part of FLINT.
 
@@ -17,6 +18,11 @@
 
 #define T fq_zech
 #define CAP_T FQ_ZECH
+
 #include "fq_templates/div.c"
+#include "fq_templates/is_invertible.c"
+#include "fq_templates/is_invertible_f.c"
+#include "fq_templates/multiplicative_order.c"
+
 #undef CAP_T
 #undef T
