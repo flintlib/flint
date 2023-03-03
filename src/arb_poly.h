@@ -28,17 +28,6 @@
 extern "C" {
 #endif
 
-typedef struct
-{
-    arb_ptr coeffs;
-    slong alloc;
-    slong length;
-}
-arb_poly_struct;
-
-typedef arb_poly_struct arb_poly_t[1];
-
-
 /* Memory management */
 
 void arb_poly_init(arb_poly_t poly);

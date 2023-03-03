@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include "mag.h"
 #include "arf.h"
+#include "arb_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,17 +37,6 @@ extern "C" {
 
 ARB_DLL extern const char * arb_version;
 double arb_test_multiplier(void);
-
-typedef struct
-{
-    arf_struct mid;
-    mag_struct rad;
-}
-arb_struct;
-
-typedef arb_struct arb_t[1];
-typedef arb_struct * arb_ptr;
-typedef const arb_struct * arb_srcptr;
 
 #define arb_midref(x) (&(x)->mid)
 #define arb_radref(x) (&(x)->rad)
