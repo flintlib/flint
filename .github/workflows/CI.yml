@@ -95,6 +95,35 @@ jobs:
 
 
   ##############################################################################
+  # freebsd with clang
+  ##############################################################################
+  freebsd-gcc:
+    name: FreeBSD Clang
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: "Set up FreeBSD"
+        uses: cross-platform-actions/action@v0.10.0
+        with:
+          operating_system: freebsd
+          version: '13.1'
+          shell: bash
+          run: |
+            yes | sudo pkg install gmake
+            yes | sudo pkg install gmp
+            yes | sudo pkg install mpfr
+            gmake --version
+            clang --version
+            ./configure CC=clang CFLAGS="-Wall" --disable-static --enable-shared
+            gmake -j8
+            gmake -j8 check
+
+
+
+  ##############################################################################
   # cygwin with gcc
   ##############################################################################
   cygwin-gcc:
