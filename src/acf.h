@@ -19,21 +19,11 @@
 #endif
 
 #include "arf.h"
+#include "acf_types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef struct
-{
-    arf_struct real;
-    arf_struct imag;
-}
-acf_struct;
-
-typedef acf_struct acf_t[1];
-typedef acf_struct * acf_ptr;
-typedef const acf_struct * acf_srcptr;
 
 #define acf_realref(x) (&(x)->real)
 #define acf_imagref(x) (&(x)->imag)
