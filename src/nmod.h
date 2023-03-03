@@ -28,19 +28,11 @@
 
 #include "longlong.h"
 #include "ulong_extras.h"
-#include "flint.h"
+#include "nmod_types.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
-
-typedef struct
-{
-   mp_limb_t n;
-   mp_limb_t ninv;
-   flint_bitcnt_t norm;
-} nmod_t;
-
 
 #define NMOD_RED2(r, a_hi, a_lo, mod) \
    do { \

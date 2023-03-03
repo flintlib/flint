@@ -42,6 +42,15 @@ typedef mpoly_ctx_struct mpoly_ctx_t[1];
 typedef struct
 {
     mpoly_ctx_t minfo;
+    nmod_t mod;
+}
+nmod_mpoly_ctx_struct;
+
+typedef nmod_mpoly_ctx_struct nmod_mpoly_ctx_t[1];
+
+typedef struct
+{
+    mpoly_ctx_t minfo;
 }
 fmpz_mpoly_ctx_struct;
 

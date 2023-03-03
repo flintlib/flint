@@ -36,21 +36,8 @@
 #include "thread_support.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
-
-typedef struct
-{
-    mp_limb_t * entries;
-    slong r;
-    slong c;
-    mp_limb_t ** rows;
-    nmod_t mod;
-}
-nmod_mat_struct;
-
-/* nmod_mat_t allows reference-like semantics for nmod_mat_struct */
-typedef nmod_mat_struct nmod_mat_t[1];
 
 #define nmod_mat_entry(mat,i,j) ((mat)->rows[(i)][(j)])
 

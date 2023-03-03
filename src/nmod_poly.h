@@ -37,22 +37,12 @@
 #include "thread_support.h"
 
 #ifdef __cplusplus
-    extern "C" {
+extern "C" {
 #endif
 
 #define NMOD_POLY_HGCD_CUTOFF  100      /* HGCD: Basecase -> Recursion      */
 #define NMOD_POLY_GCD_CUTOFF  340       /* GCD:  Euclidean -> HGCD          */
 #define NMOD_POLY_SMALL_GCD_CUTOFF 200  /* GCD (small n): Euclidean -> HGCD */
-
-typedef struct
-{
-    mp_ptr coeffs;
-    slong alloc;
-    slong length;
-    nmod_t mod;
-} nmod_poly_struct;
-
-typedef nmod_poly_struct nmod_poly_t[1];
 
 typedef struct
 {
@@ -1410,7 +1400,7 @@ NMOD_POLY_INLINE const nmod_poly_struct * nmod_berlekamp_massey_R_poly(
 }
 
 #ifdef __cplusplus
-    }
+}
 #endif
 
 #include "nmod_poly_factor.h"

@@ -36,16 +36,8 @@
 #include "fmpz.h"
 
 #ifdef __cplusplus
-    extern "C" {
+extern "C" {
 #endif
-
-typedef struct
-{
-    nmod_poly_struct *p;
-    slong *exp;
-    slong num;
-    slong alloc;
-} nmod_poly_factor_struct;
 
 typedef struct
 {
@@ -60,8 +52,6 @@ typedef struct
 nmod_poly_interval_poly_arg_t;
 
 /* Factoring  ****************************************************************/
-
-typedef nmod_poly_factor_struct nmod_poly_factor_t[1];
 
 FLINT_DLL void nmod_poly_factor_init(nmod_poly_factor_t fac);
 
@@ -164,7 +154,7 @@ FLINT_DLL int nmod_poly_roots_factored(nmod_poly_factor_t r,
 FLINT_DLL void nmod_poly_factor_get_nmod_poly(nmod_poly_t z, nmod_poly_factor_t fac, slong i);
 
 #ifdef __cplusplus
-    }
+}
 #endif
 
 #endif
