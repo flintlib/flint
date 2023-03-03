@@ -16,31 +16,78 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
+void _nmod_poly_rem_q1(mp_ptr R, 
+                       mp_srcptr A, slong lenA, mp_srcptr B, slong lenB,
+                       nmod_t mod)
+{
+    slong i;
+    mp_limb_t invL, t, q0, q1, t1, t0, s1, s0;
+
+    FLINT_ASSERT(lenA == lenB + 1);
+    invL = (B[lenB-1] == 1) ? 1 : n_invmod(B[lenB-1], mod.n);
+
+    if (lenB < 2)
+        return;
+
+    q1 = n_mulmod2_preinv(A[lenA-1], invL, mod.n, mod.ninv);
+    t  = n_mulmod2_preinv(q1, B[lenB-2], mod.n, mod.ninv);
+    t  = n_submod(t, A[lenA-2], mod.n);
+    q0 = n_mulmod2_preinv(t, invL, mod.n, mod.ninv);
+    q1 = nmod_neg(q1, mod);
+
+    /* R = A + (q1*x + q0)*B */
+    t = A[0];
+    NMOD_ADDMUL(t, q0, B[0], mod);
+    R[0] = t;
+
+    if (mod.norm >= (FLINT_BITS + 1)/2 + 1)
+    {
+        for (i = 1; i < lenB - 1; i++)
+        {
+            NMOD_RED2(R[i], 0, A[i] + q1*B[i - 1] + q0*B[i], mod);
+        }
+    }
+    else if (mod.norm != 0)
+    {
+        for (i = 1; i < lenB - 1; i++)
+        {
+            umul_ppmm(t1, t0, q1, B[i - 1]);
+            umul_ppmm(s1, s0, q0, B[i]);
+            add_ssaaaa(t1, t0, t1, t0, 0, A[i]);
+            add_ssaaaa(t1, t0, t1, t0, s1, s0);
+            t1 = FLINT_MIN(t1, t1 - mod.n);
+            FLINT_ASSERT(t1 < mod.n);
+            NMOD_RED2(R[i], t1, t0, mod);
+        }
+    }
+    else
+    {
+        for (i = 1; i < lenB - 1; i++)
+        {
+            t = A[i];
+            NMOD_ADDMUL(t, q1, B[i - 1], mod);
+            NMOD_ADDMUL(t, q0, B[i], mod);
+            R[i] = t;
+        }
+    }
+}
+
 void _nmod_poly_rem(mp_ptr R, mp_srcptr A, slong lenA, 
                               mp_srcptr B, slong lenB, nmod_t mod)
 {
-    TMP_INIT;
-
     if (lenA - lenB == 1)
     {
         _nmod_poly_rem_q1(R, A, lenA, B, lenB, mod);
     }
-    else if (lenA < NMOD_DIVREM_DIVCONQUER_CUTOFF)
+    else if (lenB >= 2)
     {
-        mp_ptr W;
-        
+        mp_ptr Q;
+        TMP_INIT;
+
         TMP_START;
-        W = TMP_ALLOC(NMOD_DIVREM_BC_ITCH(lenA, lenB, mod)*sizeof(mp_limb_t));
-
-        _nmod_poly_rem_basecase(R, W, A, lenA, B, lenB, mod);
-        TMP_END;
-    }
-    else
-    {
-        mp_ptr Q = _nmod_vec_init(lenA - lenB + 1);
-
+        Q = TMP_ALLOC((lenA - lenB + 1) * sizeof(mp_limb_t));
         _nmod_poly_divrem(Q, R, A, lenA, B, lenB, mod);
-        _nmod_vec_clear(Q);
+        TMP_END;
     }
 }
 
@@ -61,7 +108,7 @@ void nmod_poly_rem(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
         return;
     }
 
-    if (R == A || R == B)
+    if (R == B)
     {
         nmod_poly_init2_preinv(tR, B->mod.n, B->mod.ninv, lenB - 1);
         r = tR->coeffs;
@@ -74,7 +121,7 @@ void nmod_poly_rem(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
 
     _nmod_poly_rem(r, A->coeffs, lenA, B->coeffs, lenB, A->mod);
 
-    if (R == A || R == B)
+    if (R == B)
     {
         nmod_poly_swap(R, tR);
         nmod_poly_clear(tR);

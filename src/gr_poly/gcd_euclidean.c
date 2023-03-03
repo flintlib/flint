@@ -17,26 +17,6 @@
 
 /* todo: over appropriate domains, make_monic -> extract content; unit */
 
-#define GR_VEC_NORM(status, R, lenR, sz, ctx) \
-    do { \
-        while ((lenR) > 0) \
-        { \
-            truth_t is_zero; \
-            is_zero = gr_is_zero(GR_ENTRY((R), (lenR) - 1, sz), (ctx)); \
-            if (is_zero == T_TRUE) \
-                (lenR)--; \
-            else if (is_zero == T_UNKNOWN) \
-            { \
-                (status) |= GR_UNABLE; \
-                break; \
-            } \
-            else \
-            { \
-                break; \
-            } \
-        } \
-    } while (0) \
-
 #define GR_VEC_SWAP(vec1, len1, vec2, len2) \
 do {                                          \
     gr_ptr __t;                                \
@@ -79,7 +59,8 @@ _gr_poly_gcd_euclidean(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA,
     status |= _gr_poly_divrem(Q, R1, A, lenA, B, lenB, ctx);
 
     lenR3 = lenB - 1;
-    GR_VEC_NORM(status, R1, lenR3, sz, ctx);
+    status |= _gr_vec_normalise(&lenR3, R1, lenR3, ctx);
+
     if (status != GR_SUCCESS)
     {
         *lenG = 0;
@@ -103,7 +84,7 @@ _gr_poly_gcd_euclidean(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA,
     {
         status |= _gr_poly_divrem(Q, R2, R2, lenR2, R3, lenR3, ctx);
         lenR2 = lenR3 - 1;
-        GR_VEC_NORM(status, R2, lenR2, sz, ctx);
+        status |= _gr_vec_normalise(&lenR2, R2, lenR2, ctx);
 
         if (status != GR_SUCCESS)
         {

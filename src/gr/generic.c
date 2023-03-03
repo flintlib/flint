@@ -1957,6 +1957,55 @@ gr_generic_vec_neg(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx)
     return status;
 }
 
+int
+gr_generic_vec_normalise(slong * res, gr_srcptr vec, slong len, gr_ctx_t ctx)
+{
+    gr_method_unary_predicate is_zero = GR_UNARY_PREDICATE(ctx, IS_ZERO);
+    truth_t eq;
+    int status = GR_SUCCESS;
+    slong sz = ctx->sizeof_elem;
+
+    while (len > 0)
+    {
+        eq = is_zero(GR_ENTRY(vec, len - 1, sz), ctx);
+
+        if (eq == T_FALSE)
+            break;
+
+        if (eq == T_UNKNOWN)
+        {
+            status = GR_UNABLE;
+            break;
+        }
+
+        len--;
+    }
+
+    *res = len;
+    return status;
+}
+
+slong
+gr_generic_vec_normalise_weak(gr_srcptr vec, slong len, gr_ctx_t ctx)
+{
+    gr_method_unary_predicate is_zero = GR_UNARY_PREDICATE(ctx, IS_ZERO);
+    truth_t eq;
+    slong sz = ctx->sizeof_elem;
+
+    while (len > 0)
+    {
+        eq = is_zero(GR_ENTRY(vec, len - 1, sz), ctx);
+
+        if (eq != T_TRUE)
+            break;
+
+        len--;
+    }
+
+    return len;
+}
+
+
 #define BINARY_OP(OP, op) \
 int \
 gr_generic_vec_ ## op(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx) \
@@ -2813,6 +2862,9 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_VEC_ZERO,                (gr_funcptr) gr_generic_vec_zero},
     {GR_METHOD_VEC_SET,                 (gr_funcptr) gr_generic_vec_set},
     {GR_METHOD_VEC_NEG,                 (gr_funcptr) gr_generic_vec_neg},
+
+    {GR_METHOD_VEC_NORMALISE,           (gr_funcptr) gr_generic_vec_normalise},
+    {GR_METHOD_VEC_NORMALISE_WEAK,      (gr_funcptr) gr_generic_vec_normalise_weak},
 
     {GR_METHOD_VEC_ADD,                 (gr_funcptr) gr_generic_vec_add},
     {GR_METHOD_VEC_SUB,                 (gr_funcptr) gr_generic_vec_sub},

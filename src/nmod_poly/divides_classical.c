@@ -76,23 +76,15 @@ int _nmod_poly_divides_classical(mp_ptr Q, mp_srcptr A, slong lenA,
                                            mp_srcptr B, slong lenB, nmod_t mod)
 {    
     slong lenQ = lenA - lenB + 1;
-    mp_ptr W;
     int res;
-    TMP_INIT;
 
-    TMP_START;
-
-    W = TMP_ALLOC(NMOD_DIV_BC_ITCH(lenA, lenB, mod)*sizeof(mp_limb_t));
-
-    _nmod_poly_div_basecase(Q, W, A, lenA, B, lenB, mod);
+    _nmod_poly_div(Q, A, lenA, B, lenB, mod);
 
     /* check coefficients of product one at a time */
     res = _nmod_poly_mullow_classical_check(A, Q, lenQ, B, lenB - 1, mod);
-		    
+
     if (!res)
         _nmod_vec_zero(Q, lenQ);
-
-    TMP_END;
 
     return res;
 }

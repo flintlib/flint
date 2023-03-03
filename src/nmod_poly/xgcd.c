@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2011 William Hart
     Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2023 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -10,20 +11,27 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
 #include "nmod_poly.h"
+#include "gr_poly.h"
 #include "mpn_extras.h"
 
 slong _nmod_poly_xgcd(mp_ptr G, mp_ptr S, mp_ptr T, 
                      mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
 {
-    const slong cutoff = FLINT_BIT_COUNT(mod.n) <= 8 ? 
-                        NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
+    slong cutoff = NMOD_BITS(mod) <= 8 ? NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
 
-    if (lenA < cutoff)
+    if (lenB < cutoff)
+    {
         return _nmod_poly_xgcd_euclidean(G, S, T, A, lenA, B, lenB, mod);
+    }
     else
-        return _nmod_poly_xgcd_hgcd(G, S, T, A, lenA, B, lenB, mod);
+    {
+        slong lenG = 0;
+        gr_ctx_t ctx;
+        _gr_ctx_init_nmod(ctx, &mod);
+        GR_MUST_SUCCEED(_gr_poly_xgcd_hgcd(&lenG, G, S, T, A, lenA, B, lenB, NMOD_POLY_HGCD_CUTOFF, cutoff, ctx));
+        return lenG;
+    }
 }
 
 void

@@ -612,6 +612,9 @@ typedef enum
     GR_METHOD_VEC_IS_ZERO,
     GR_METHOD_VEC_NEG,
 
+    GR_METHOD_VEC_NORMALISE,
+    GR_METHOD_VEC_NORMALISE_WEAK,
+
     GR_METHOD_VEC_ADD, GR_METHOD_VEC_SUB, GR_METHOD_VEC_MUL, GR_METHOD_VEC_DIV, GR_METHOD_VEC_DIVEXACT, GR_METHOD_VEC_POW,
     GR_METHOD_VEC_ADD_SCALAR, GR_METHOD_VEC_SUB_SCALAR, GR_METHOD_VEC_MUL_SCALAR, GR_METHOD_VEC_DIV_SCALAR, GR_METHOD_VEC_DIVEXACT_SCALAR, GR_METHOD_VEC_POW_SCALAR,
     GR_METHOD_SCALAR_ADD_VEC, GR_METHOD_SCALAR_SUB_VEC, GR_METHOD_SCALAR_MUL_VEC, GR_METHOD_SCALAR_DIV_VEC, GR_METHOD_SCALAR_DIVEXACT_VEC, GR_METHOD_SCALAR_POW_VEC,
@@ -1306,6 +1309,7 @@ void gr_ctx_init_fmpz_mod(gr_ctx_t ctx, const fmpz_t n);
 void gr_ctx_fmpz_mod_set_primality(gr_ctx_t ctx, truth_t is_prime);
 
 void gr_ctx_init_nmod(gr_ctx_t ctx, ulong n);
+void _gr_ctx_init_nmod(gr_ctx_t ctx, void * nmod_t_ref);
 void gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n);
 
 void gr_ctx_init_real_qqbar(gr_ctx_t ctx);

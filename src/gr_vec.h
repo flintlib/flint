@@ -54,6 +54,14 @@ GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_zero(gr_ptr vec, slong len, gr_ctx_
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_set(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx) { return GR_VEC_OP(ctx, VEC_SET)(res, src, len, ctx); }
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_neg(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx) { return GR_VEC_OP(ctx, VEC_NEG)(res, src, len, ctx); }
 
+typedef int ((*gr_method_vec_normalise_op)(slong *, gr_srcptr, slong, gr_ctx_ptr));
+typedef slong ((*gr_method_vec_normalise_weak_op)(gr_srcptr, slong, gr_ctx_ptr));
+#define GR_VEC_NORMALISE_OP(ctx, NAME) (((gr_method_vec_normalise_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_VEC_NORMALISE_WEAK_OP(ctx, NAME) (((gr_method_vec_normalise_weak_op *) ctx->methods)[GR_METHOD_ ## NAME])
+
+GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_normalise(slong * res, gr_srcptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_NORMALISE_OP(ctx, VEC_NORMALISE)(res, vec, len, ctx); }
+GR_VEC_INLINE WARN_UNUSED_RESULT slong _gr_vec_normalise_weak(gr_srcptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_NORMALISE_WEAK_OP(ctx, VEC_NORMALISE_WEAK)(vec, len, ctx); }
+
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_add(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx) { return GR_VEC_VEC_OP(ctx, VEC_ADD)(res, src1, src2, len, ctx); }
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_sub(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx) { return GR_VEC_VEC_OP(ctx, VEC_SUB)(res, src1, src2, len, ctx); }
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_mul(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx) { return GR_VEC_VEC_OP(ctx, VEC_MUL)(res, src1, src2, len, ctx); }

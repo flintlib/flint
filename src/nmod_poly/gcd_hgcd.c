@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2011 William Hart
     Copyright (C) 2011, 2012 Sebastian Pancratz
+    Copyright (C) 2023 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -10,78 +11,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
 #include "nmod_poly.h"
-#include "mpn_extras.h"
-
-#define __set(B, lenB, A, lenA)      \
-do {                                 \
-    _nmod_vec_set((B), (A), (lenA)); \
-    (lenB) = (lenA);                 \
-} while (0)
-
-#define __rem(R, lenR, A, lenA, B, lenB)                    \
-do {                                                        \
-    if ((lenA) >= (lenB))                                   \
-    {                                                       \
-        _nmod_poly_rem((R), (A), (lenA), (B), (lenB), mod); \
-        (lenR) = (lenB) - 1;                                \
-        MPN_NORM((R), (lenR));                              \
-    }                                                       \
-    else                                                    \
-    {                                                       \
-        _nmod_vec_set((R), (A), (lenA));                    \
-        (lenR) = (lenA);                                    \
-    }                                                       \
-} while (0)
-
-/*
-    XXX: Incidentally, this implementation currently supports aliasing.  
-    But since this may change in the future, no function other than 
-    nmod_poly_gcd_hgcd() should rely on this.
- */
+#include "gr_poly.h"
 
 slong _nmod_poly_gcd_hgcd(mp_ptr G, mp_srcptr A, slong lenA, 
                                    mp_srcptr B, slong lenB, nmod_t mod)
 {
-    const slong cutoff = FLINT_BIT_COUNT(mod.n) <= 8 ? 
-                        NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
-
-    mp_ptr J = _nmod_vec_init(2 * lenB);
-    mp_ptr R = J + lenB;
-
-    slong lenG, lenJ, lenR;
-
-    __rem(R, lenR, A, lenA, B, lenB);
-
-    if (lenR == 0)
-    {
-        __set(G, lenG, B, lenB);
-    }
-    else
-    {
-        _nmod_poly_hgcd(NULL, NULL, G, &(lenG), J, &(lenJ), B, lenB, R, lenR, mod);
-
-        while (lenJ != 0)
-        {
-            __rem(R, lenR, G, lenG, J, lenJ);
-
-            if (lenR == 0)
-            {
-                __set(G, lenG, J, lenJ);
-                break;
-            }
-            if (lenJ < cutoff)
-            {
-                lenG = _nmod_poly_gcd_euclidean(G, J, lenJ, R, lenR, mod);
-                break;
-            }
-
-            _nmod_poly_hgcd(NULL, NULL, G, &(lenG), J, &(lenJ), J, lenJ, R, lenR, mod);
-        }
-    }
-    _nmod_vec_clear(J);
-
+    slong cutoff = NMOD_BITS(mod) <= 8 ? NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
+    slong lenG = 0;
+    gr_ctx_t ctx;
+    _gr_ctx_init_nmod(ctx, &mod);
+    GR_MUST_SUCCEED(_gr_poly_gcd_hgcd(G, &lenG, A, lenA, B, lenB, NMOD_POLY_HGCD_CUTOFF, cutoff, ctx));
     return lenG;
 }
 
@@ -136,7 +76,3 @@ void nmod_poly_gcd_hgcd(nmod_poly_t G,
         }
     }
 }
-
-#undef __set
-#undef __rem
-

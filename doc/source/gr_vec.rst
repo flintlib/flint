@@ -87,6 +87,10 @@ Types and basic operations
 
 .. function:: truth_t _gr_vec_is_zero(gr_srcptr vec, slong len, gr_ctx_t ctx)
 
+.. function:: int _gr_vec_normalise(slong * res, gr_srcptr vec, slong len, gr_ctx_t ctx)
+
+.. function:: slong _gr_vec_normalise_weak(gr_srcptr vec, slong len, gr_ctx_t ctx)
+
 
 Arithmetic
 --------------------------------------------------------------------------------
