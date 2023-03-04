@@ -238,7 +238,7 @@ else ifndef MOD
 	$(AT)$(MAKE) $(TESTS)
 	$(AT)(WANTDEPS=$(WANT_DEPS); export WANTDEPS; $(MAKE) -f $(FLINT_DIR)/Makefile.subdirs -C $(SRC_DIR) check || exit $$?;)
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p $(BUILD_DIR)/$(dir)/test; WANTDEPS=$(WANT_DEPS); export WANTDEPS; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(FLINT_DIR)/Makefile.subdirs -C $(ext)/$(dir) check || exit $$?;))
-	$(AT)$(foreach dir, $(_DIRS), mkdir -p $(BUILD_DIR)/$(dir)/test; WANTDEPS=$(WANT_DEPS); export WANTDEPS; $(MAKE) -f $(FLINT_DIR)/Makefile.subdirs -C $(SRC_DIR)/$(dir) check || exit $$?;)
+	$(AT)$(foreach dir, $(_DIRS), MOD_DIR=$(dir); export MOD_DIR; mkdir -p $(BUILD_DIR)/$(dir)/test; WANTDEPS=$(WANT_DEPS); export WANTDEPS; $(MAKE) -f $(FLINT_DIR)/Makefile.subdirs -C $(SRC_DIR)/$(dir) check || exit $$?;)
 	$(AT)if [ "$(WANT_NTL)" -eq "1" ]; then \
 		$(MAKE) $(BUILD_DIR)/interfaces/test/t-NTL-interface$(EXEEXT); \
 		$(BUILD_DIR)/interfaces/test/t-NTL-interface$(EXEEXT); \
