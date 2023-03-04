@@ -29,7 +29,7 @@ author = u'The Flint development team'
 version = u''
 
 
-for _line in open("../../flint.h").readlines():
+for _line in open("../../src/flint.h").readlines():
     if _line.startswith("#define FLINT_VERSION"):
         _i1 = _line.find('"')
         _i2 = _line.find('"', _i1 + 1)
