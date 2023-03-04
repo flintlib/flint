@@ -246,6 +246,11 @@ void flint_rand_free(flint_rand_s * state)
     flint_free(state);
 }
 
+/* defined in ulong_extras, but used throughout the test code */
+FLINT_DLL ulong n_randint(flint_rand_t, ulong);
+FLINT_DLL ulong n_randtest(flint_rand_t);
+FLINT_DLL ulong n_randtest_not_zero(flint_rand_t);
+
 #if FLINT_USES_GC
 #define FLINT_GC_INIT() GC_init()
 #else

@@ -12,6 +12,7 @@
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "ulong_extras.h"
 
 void fmpz_randprime(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits, int proved)
 {

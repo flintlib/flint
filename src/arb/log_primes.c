@@ -11,6 +11,7 @@
 */
 
 #include "thread_support.h"
+#include "ulong_extras.h"
 #include "arb.h"
 
 #define HAVE_64_BIT (FLINT_BITS == 64)

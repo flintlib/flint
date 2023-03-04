@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "fmpq.h"
 
 void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, slong p, ulong q)

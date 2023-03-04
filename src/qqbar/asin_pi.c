@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "qqbar.h"
 
 void best_rational_fast(slong * p, ulong * q, double x, slong N);

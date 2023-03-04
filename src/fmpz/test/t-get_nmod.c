@@ -14,6 +14,7 @@
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
+#include "nmod.h"
 #include "fmpz.h"
 
 int

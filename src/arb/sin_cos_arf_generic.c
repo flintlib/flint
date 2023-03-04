@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "arb.h"
 
 /* Computes sin(x) or cos(x) using Taylor series truncated at x^N exclusive.

@@ -12,6 +12,7 @@
 #include "arb_fmpz_poly.h"
 #include "acb_poly.h"
 #include "fexpr_builtin.h"
+#include "ulong_extras.h"
 #include "qqbar.h"
 
 static ulong _deflation(const fmpz * poly, slong len)

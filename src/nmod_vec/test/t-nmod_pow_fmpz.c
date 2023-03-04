@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "fmpz.h"
+#include "nmod_vec.h"
 
 int
 main(void)

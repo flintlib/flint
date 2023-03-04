@@ -10,6 +10,7 @@
 */
 
 #include "fmpz.h"
+#include "ulong_extras.h"
 #include "gr.h"
 
 void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)

@@ -12,6 +12,7 @@
 
 #include "fmpq.h"
 #include "gmpcompat.h"
+#include "ulong_extras.h"
 
 static ulong _fmpz_gcd_ui(const fmpz_t g, ulong h)
 {
