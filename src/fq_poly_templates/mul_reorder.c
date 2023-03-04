@@ -12,6 +12,11 @@
 
 #ifdef T
 
+/* Inclusion of both mul_reorder.c and sqr_reorder.c can screw things up by
+ * multiple definitions. If changes are made to this file, make sure that
+ * proper changes are made to the other file as well. */
+#define MUL_REORDER_C
+
 #include "templates.h"
 
 /*
@@ -20,6 +25,7 @@
     $X$-direction.
  */
 
+#ifndef SQR_REORDER_C
 static fmpz_poly_struct *
 __vec_init(slong len)
 {
@@ -105,6 +111,7 @@ __scalar_mul(fmpz_poly_struct * rop,
             fmpz_poly_mul(rop + i, op + i, x);
     }
 }
+#endif
 
 static void
 __mul(fmpz_poly_struct * rop,

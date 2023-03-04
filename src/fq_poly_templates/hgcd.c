@@ -534,6 +534,8 @@ slong _TEMPLATE(T, poly_hgcd) (TEMPLATE(T, struct)**M, slong * lenM,
     return sgnM;
 }
 
+#undef __mul
+
 #else
 
 #include "gr_poly.h"
