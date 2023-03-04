@@ -22,15 +22,13 @@
 extern "C" {
 #endif
 
-#include "fmpz_poly.h"
-#include "fmpq_poly.h"
-#include "fmpz_mat.h"
-#include "fmpq_mat.h"
-#include "fmpz_mpoly.h"
+#include "fmpz_types.h"
+#include "fmpq_types.h"
+#include "mpoly_types.h"
 #include "acb.h"
 
-#include "calcium.h"
-#include "fexpr.h"
+/* for test code */
+double calcium_test_multiplier(void);
 
 typedef struct
 {
@@ -99,7 +97,7 @@ int qqbar_set_re_im_d(qqbar_t res, double x, double y);
 QQBAR_INLINE slong
 qqbar_degree(const qqbar_t x)
 {
-    return fmpz_poly_degree(QQBAR_POLY(x));
+    return QQBAR_POLY(x)->length - 1;
 }
 
 QQBAR_INLINE int
@@ -429,6 +427,8 @@ int qqbar_express_in_field(fmpq_poly_t res, const qqbar_t alpha, const qqbar_t x
 
 void qqbar_get_quadratic(fmpz_t res_a, fmpz_t res_b, fmpz_t res_c, fmpz_t res_q, const qqbar_t x, int factoring);
 
+#ifdef FEXPR_H
+
 void qqbar_get_fexpr_repr(fexpr_t res, const qqbar_t x);
 void qqbar_get_fexpr_root_nearest(fexpr_t res, const qqbar_t x);
 void qqbar_get_fexpr_root_indexed(fexpr_t res, const qqbar_t x);
@@ -453,6 +453,8 @@ int qqbar_get_fexpr_formula(fexpr_t res, const qqbar_t x, ulong flags);
 
 
 int qqbar_set_fexpr(qqbar_t res, const fexpr_t expr);
+
+#endif
 
 /* Internal functions */
 

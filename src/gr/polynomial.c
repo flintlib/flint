@@ -11,6 +11,8 @@
 
 /* Polynomials over generic rings */
 
+#include "fmpz.h"
+#include "ulong_extras.h"
 #include "gr.h"
 #include "gr_poly.h"
 

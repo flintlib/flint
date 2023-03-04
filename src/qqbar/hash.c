@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "calcium.h"
 #include "qqbar.h"
 
 ulong qqbar_hash(const qqbar_t x)

@@ -9,11 +9,11 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fexpr.h"
+#include "fexpr_builtin.h"
 #include "ca.h"
 #include "ca_ext.h"
 #include "ca_vec.h"
-#include "fexpr.h"
-#include "fexpr_builtin.h"
 
 #define BINARY_OP(ca_func) \
     if (nargs == 2) \

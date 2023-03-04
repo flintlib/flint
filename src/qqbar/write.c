@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "calcium.h"
 #include "qqbar.h"
 
 /* Todo: document, unify and generalize. This is currently only

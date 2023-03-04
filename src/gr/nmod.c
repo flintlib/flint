@@ -781,6 +781,7 @@ __gr_nmod_vec_dot_rev(ulong * res, const ulong * initial, int subtract, const ul
     {
         if (len == 2)   /* todo: fmma */
         {
+            mod = NMOD_CTX(ctx);
             s = nmod_mul(vec1[0], vec2[1], mod);
             s = nmod_addmul(s, vec1[1], vec2[0], mod);
         }

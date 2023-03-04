@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fexpr.h"
 #include "qqbar.h"
 
 int main()
