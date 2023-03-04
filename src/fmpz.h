@@ -423,12 +423,9 @@ FLINT_DLL char * fmpz_get_str(char * str, int b, const fmpz_t f);
 FMPZ_INLINE
 void fmpz_swap(fmpz_t f, fmpz_t g)
 {
-    if (f != g)  /* swapping required */
-    {
-        fmpz t = *f;
-        *f = *g;
-        *g = t;
-    }
+    fmpz t = *f;
+    *f = *g;
+    *g = t;
 }
 
 FLINT_DLL int fmpz_cmp(const fmpz_t f, const fmpz_t g);
