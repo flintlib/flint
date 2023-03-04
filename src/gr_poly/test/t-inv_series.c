@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "gr_poly.h"
 
 extern gr_static_method_table _ca_methods;

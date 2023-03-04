@@ -12,6 +12,7 @@
 #include "fmpz.h"
 #include "fmpq.h"
 #include "nmod_vec.h"
+#include "nmod_poly.h"
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_poly.h"

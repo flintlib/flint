@@ -18,8 +18,8 @@
 #define GR_POLY_INLINE static __inline__
 #endif
 
-#include "fmpz_poly.h"
-#include "fmpq_poly.h"
+#include "fmpz_types.h"
+#include "fmpq_types.h"
 #include "gr.h"
 
 #ifdef __cplusplus

@@ -10,6 +10,7 @@
 */
 
 #include "arb_poly.h"
+#include "fmpq.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
 

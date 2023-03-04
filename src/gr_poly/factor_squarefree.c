@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
 
