@@ -40,4 +40,9 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 
     return 0;
 }
+
+#else
+
+typedef int this_file_is_empty;
+
 #endif /* defined(_WIN64) */
