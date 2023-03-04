@@ -14,6 +14,7 @@
 
 ******************************************************************************/
 
+#include "fmpq_mat.h"
 #include "nf_elem.h"
 
 void nf_elem_rep_mat(fmpq_mat_t res, const nf_elem_t a, const nf_t nf)

@@ -14,6 +14,7 @@
 
 ******************************************************************************/
 
+#include "fmpz_mod_poly.h"
 #include "nf_elem.h"
 
 void _nf_elem_get_fmpz_mod_poly(fmpz_mod_poly_t pol, const nf_elem_t a,

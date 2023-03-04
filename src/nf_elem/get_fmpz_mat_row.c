@@ -17,6 +17,7 @@
 
 ******************************************************************************/
 
+#include "fmpz_mat.h"
 #include "nf_elem.h"
 
 void nf_elem_get_fmpz_mat_row(fmpz_mat_t M, const slong i, fmpz_t den, 

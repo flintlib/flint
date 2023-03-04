@@ -14,6 +14,7 @@
 
 ******************************************************************************/
 
+#include "fmpz_mat.h"
 #include "nf_elem.h"
 
 void nf_elem_rep_mat_fmpz_mat_den(fmpz_mat_t res, fmpz_t den, const nf_elem_t a, const nf_t nf)
