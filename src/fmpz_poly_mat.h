@@ -25,20 +25,10 @@
 #include "fmpz_poly.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Types *********************************************************************/
-
-typedef struct
-{
-    fmpz_poly_struct * entries;
-    slong r;
-    slong c;
-    fmpz_poly_struct ** rows;
-} fmpz_poly_mat_struct;
-
-typedef fmpz_poly_mat_struct fmpz_poly_mat_t[1];
 
 FMPZ_POLY_MAT_INLINE
 fmpz_poly_struct * fmpz_poly_mat_entry(const fmpz_poly_mat_t mat, slong i, slong j)

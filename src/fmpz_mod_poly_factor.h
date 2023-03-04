@@ -30,20 +30,10 @@
 #include "fmpz.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Factoring  ****************************************************************/
-
-typedef struct
-{
-    fmpz_mod_poly_struct *poly;
-    slong *exp;
-    slong num;
-    slong alloc;
-} fmpz_mod_poly_factor_struct;
-
-typedef fmpz_mod_poly_factor_struct fmpz_mod_poly_factor_t[1];
 
 FLINT_DLL void fmpz_mod_poly_factor_init(fmpz_mod_poly_factor_t fac,
                                                      const fmpz_mod_ctx_t ctx);

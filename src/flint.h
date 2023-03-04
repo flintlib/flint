@@ -452,8 +452,17 @@ FLINT_INLINE slong flint_mul_sizes(slong x, slong y)
 
 #include "exception.h"
 
-/* defined ahead of fmpz.h and fmpq.h so that the types
-   are usable in prototypes without importing those headers */
+/* Defined ahead of nmod.h, fmpz.h and fmpq.h so that the types are usable in
+ * prototypes without importing those headers */
+
+typedef struct
+{
+   mp_limb_t n;
+   mp_limb_t ninv;
+   flint_bitcnt_t norm;
+}
+nmod_t;
+
 typedef slong fmpz;
 typedef fmpz fmpz_t[1];
 

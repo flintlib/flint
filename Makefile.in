@@ -91,7 +91,13 @@ SOURCES = $(patsubst %, %/*.c, $(DIRS))                                 \
 _HEADERS = flint.h             longlong.h          flint-config.h       \
            gmpcompat.h         fmpz-conversions.h  NTL-interface.h      \
            fft_tuning.h        profiler.h          templates.h          \
-           exception.h         hashmap.h
+           exception.h         hashmap.h                                \
+		                                                                \
+           mpoly_types.h                                                \
+           fmpz_types.h        fmpq_types.h                             \
+           nmod_types.h        fmpz_mod_types.h                         \
+           arf_types.h         acf_types.h                              \
+           arb_types.h         acb_types.h
 HEADERS = $(patsubst %, $(SRC_DIR)/%, $(_HEADERS))                      \
           $(patsubst %, %.h, $(subst $(SRC_DIR)/generic_files,,$(DIRS)))\
           $(patsubst %, %.h, $(TEMPLATE_DIRS))

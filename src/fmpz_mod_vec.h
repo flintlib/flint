@@ -23,7 +23,7 @@
 #include "fmpz_mod.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 FLINT_DLL void _fmpz_mod_vec_set_fmpz_vec(fmpz * A, const fmpz * B, slong len,

@@ -32,17 +32,6 @@ typedef int (*arb_calc_func_t)(arb_ptr out,
 
 /* Root-finding */
 
-typedef struct
-{
-    arf_struct a;
-    arf_struct b;
-}
-arf_interval_struct;
-
-typedef arf_interval_struct arf_interval_t[1];
-typedef arf_interval_struct * arf_interval_ptr;
-typedef const arf_interval_struct * arf_interval_srcptr;
-
 static __inline__ void
 arf_interval_init(arf_interval_t v)
 {

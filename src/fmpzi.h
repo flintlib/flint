@@ -24,15 +24,6 @@
 extern "C" {
 #endif
 
-typedef struct
-{
-    fmpz a;
-    fmpz b;
-}
-fmpzi_struct;
-
-typedef fmpzi_struct fmpzi_t[1];
-
 #define fmpzi_realref(x) (&((x)->a))
 #define fmpzi_imagref(x) (&((x)->b))
 

@@ -30,18 +30,6 @@
 extern "C" {
 #endif
 
-
-typedef struct
-{
-    acb_ptr entries;
-    slong r;
-    slong c;
-    acb_ptr * rows;
-}
-acb_mat_struct;
-
-typedef acb_mat_struct acb_mat_t[1];
-
 #define acb_mat_entry(mat,i,j) ((mat)->rows[i] + (j))
 #define acb_mat_nrows(mat) ((mat)->r)
 #define acb_mat_ncols(mat) ((mat)->c)

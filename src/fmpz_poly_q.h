@@ -30,16 +30,8 @@
 #include "fmpz_poly.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
-
-typedef struct
-{
-    fmpz_poly_struct *num;
-    fmpz_poly_struct *den;
-} fmpz_poly_q_struct;
-
-typedef fmpz_poly_q_struct fmpz_poly_q_t[1];
 
 /* Accessing numerator and denominator ***************************************/
 

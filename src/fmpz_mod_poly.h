@@ -34,24 +34,16 @@
 #include "fmpz_mod_mat.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 #define FMPZ_MOD_POLY_HGCD_CUTOFF  128      /* HGCD: Basecase -> Recursion      */
 #define FMPZ_MOD_POLY_GCD_CUTOFF  256       /* GCD:  Euclidean -> HGCD          */
 
 #define FMPZ_MOD_POLY_INV_NEWTON_CUTOFF  64 /* Inv series newton: Basecase -> Newton */
-#define FMPZ_MOD_POLY_DIV_DIVCONQUER_CUTOFF 
+#define FMPZ_MOD_POLY_DIV_DIVCONQUER_CUTOFF
+
 /*  Type definitions *********************************************************/
-
-typedef struct
-{
-    fmpz * coeffs;
-    slong alloc;
-    slong length;
-} fmpz_mod_poly_struct;
-
-typedef fmpz_mod_poly_struct fmpz_mod_poly_t[1];
 
 typedef struct
 {

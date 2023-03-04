@@ -23,6 +23,7 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_extras.h"
+#include "arb_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -177,17 +178,6 @@ __mag_fixmul32(mp_limb_t x, mp_limb_t y)
         MAG_EXP(x) -= __t; \
     } while (0)
 
-
-typedef struct
-{
-    fmpz exp;
-    mp_limb_t man;
-}
-mag_struct;
-
-typedef mag_struct mag_t[1];
-typedef mag_struct * mag_ptr;
-typedef const mag_struct * mag_srcptr;
 
 MAG_INLINE void
 mag_init(mag_t x)

@@ -29,7 +29,7 @@
 #include "nmod.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 #define NMOD_VEC_NORM(vec, i)                   \

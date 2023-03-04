@@ -30,17 +30,10 @@
 #include "fmpz_mpoly.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Context object ************************************************************/
-
-typedef struct
-{
-    fmpz_mpoly_ctx_t zctx;
-} fmpq_mpoly_ctx_struct;
-
-typedef fmpq_mpoly_ctx_struct fmpq_mpoly_ctx_t[1];
 
 FMPQ_MPOLY_INLINE
 void fmpq_mpoly_ctx_init(fmpq_mpoly_ctx_t ctx, 
@@ -75,22 +68,6 @@ ordering_t fmpq_mpoly_ctx_ord(const fmpq_mpoly_ctx_t ctx)
 }
 
 /* Polynomials over Q ********************************************************/
-
-/*
-    A polynomial f is represented as
-        content * zpoly,
-    where zpoly should have positive leading coefficient and trivial content.
-    If f is zero, then the representation should have
-        content = 0 and zpoly = 0
-*/
-
-typedef struct
-{                       /* non zero case:                   |  zero case: */
-    fmpq_t content;     /* positive or negative content     |  zero       */
-    fmpz_mpoly_t zpoly; /* contentless poly, lc is positive |  zero       */
-} fmpq_mpoly_struct;
-
-typedef fmpq_mpoly_struct fmpq_mpoly_t[1];
 
 FMPQ_MPOLY_INLINE
 fmpq * fmpq_mpoly_content_ref(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)

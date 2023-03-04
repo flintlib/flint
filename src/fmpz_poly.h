@@ -47,30 +47,11 @@
 
 typedef struct
 {
-    fmpz * coeffs;
-    slong alloc;
-    slong length;
-} fmpz_poly_struct;
-
-typedef fmpz_poly_struct fmpz_poly_t[1];
-
-typedef struct
-{
    fmpz ** powers;
    slong len;
 } fmpz_poly_powers_precomp_struct;
 
 typedef fmpz_poly_powers_precomp_struct fmpz_poly_powers_precomp_t[1];
-
-typedef struct {
-    fmpz c;
-    fmpz_poly_struct *p;
-    slong *exp;
-    slong num;
-    slong alloc;
-} fmpz_poly_factor_struct;
-
-typedef fmpz_poly_factor_struct fmpz_poly_factor_t[1];
 
 typedef struct
 {

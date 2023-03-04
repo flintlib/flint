@@ -26,17 +26,6 @@
 extern "C" {
 #endif
 
-typedef struct
-{
-    acb_ptr coeffs;
-    slong alloc;
-    slong length;
-}
-acb_poly_struct;
-
-typedef acb_poly_struct acb_poly_t[1];
-
-
 /* Memory management */
 
 void acb_poly_init(acb_poly_t poly);
