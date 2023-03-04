@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
+#include "nmod_mpoly.h"
 
 void univar_divides_check(
     const nmod_mpoly_t A,

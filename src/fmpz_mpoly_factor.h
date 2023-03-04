@@ -27,6 +27,7 @@
 
 #include "fmpz_mpoly.h"
 #include "fmpq_poly.h"
+#include "nmod_mpoly.h"
 #include "fmpz_poly_factor.h"
 
 #ifdef __cplusplus
