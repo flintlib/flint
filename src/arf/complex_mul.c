@@ -11,6 +11,7 @@
 
 #include "fmpzi.h"
 #include "arf.h"
+#include "mpn_extras.h"
 
 int arf_complex_mul_fallback(arf_t e, arf_t f,
         const arf_t a, const arf_t b,
@@ -110,7 +111,7 @@ int arf_complex_mul(arf_t e, arf_t f, const arf_t a, const arf_t b,
     dsgn = ARF_SGNBIT(d);
     dexp = ARF_EXP(d);
 
-    /* Gauss multiplication
+    /* Karatsuba multiplication
         e = ac - bd
         f = (a+b)(c+d) - ac - bd */
     if (an >= 20 &&
@@ -183,19 +184,19 @@ int arf_complex_mul(arf_t e, arf_t f, const arf_t a, const arf_t b,
         adp = bdp + bdn;
         bcp = adp + adn;
 
-        ARF_MPN_MUL(acp, ap, an, cp, cn)
+        FLINT_MPN_MUL_WITH_SPECIAL_CASES(acp, ap, an, cp, cn)
         acn -= (acp[0] == 0);
         acp += (acp[0] == 0);
 
-        ARF_MPN_MUL(bdp, bp, bn, dp, dn)
+        FLINT_MPN_MUL_WITH_SPECIAL_CASES(bdp, bp, bn, dp, dn)
         bdn -= (bdp[0] == 0);
         bdp += (bdp[0] == 0);
 
-        ARF_MPN_MUL(adp, ap, an, dp, dn)
+        FLINT_MPN_MUL_WITH_SPECIAL_CASES(adp, ap, an, dp, dn)
         adn -= (adp[0] == 0);
         adp += (adp[0] == 0);
 
-        ARF_MPN_MUL(bcp, bp, bn, cp, cn)
+        FLINT_MPN_MUL_WITH_SPECIAL_CASES(bcp, bp, bn, cp, cn)
         bcn -= (bcp[0] == 0);
         bcp += (bcp[0] == 0);
 
@@ -294,11 +295,11 @@ int arf_complex_sqr(arf_t e, arf_t f,
             aap = tmp;
             bbp = tmp + aan;
 
-            ARF_MPN_MUL(aap, ap, an, ap, an)
+            FLINT_MPN_MUL_WITH_SPECIAL_CASES(aap, ap, an, ap, an)
             aan -= (aap[0] == 0);
             aap += (aap[0] == 0);
 
-            ARF_MPN_MUL(bbp, bp, bn, bp, bn)
+            FLINT_MPN_MUL_WITH_SPECIAL_CASES(bbp, bp, bn, bp, bn)
             bbn -= (bbp[0] == 0);
             bbp += (bbp[0] == 0);
 

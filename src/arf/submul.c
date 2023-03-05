@@ -10,6 +10,7 @@
 */
 
 #include "arf.h"
+#include "mpn_extras.h"
 
 int
 arf_submul(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd)
@@ -58,7 +59,7 @@ arf_submul(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd)
     ARF_MUL_TMP_ALLOC(tptr2, alloc)
     tptr = tptr2;
 
-    ARF_MPN_MUL(tptr, xptr, xn, yptr, yn);
+    FLINT_MPN_MUL_WITH_SPECIAL_CASES(tptr, xptr, xn, yptr, yn);
 
     tn -= (tptr[0] == 0);
     tptr += (tptr[0] == 0);
@@ -129,7 +130,7 @@ arf_submul_mpz(arf_ptr z, arf_srcptr x, const mpz_t y, slong prec, arf_rnd_t rnd
     ARF_MUL_TMP_ALLOC(tptr2, alloc)
     tptr = tptr2;
 
-    ARF_MPN_MUL(tptr, xptr, xn, yptr, yn);
+    FLINT_MPN_MUL_WITH_SPECIAL_CASES(tptr, xptr, xn, yptr, yn);
 
     shift = (tptr[tn - 1] == 0) * FLINT_BITS;
     tn -= (tptr[tn - 1] == 0);

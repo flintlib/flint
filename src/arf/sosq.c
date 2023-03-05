@@ -10,6 +10,7 @@
 */
 
 #include "arf.h"
+#include "mpn_extras.h"
 
 int
 arf_sosq(arf_t res, const arf_t a, const arf_t b, slong prec, arf_rnd_t rnd)
@@ -57,11 +58,11 @@ arf_sosq(arf_t res, const arf_t a, const arf_t b, slong prec, arf_rnd_t rnd)
         aap = tmp;
         bbp = tmp + aan;
 
-        ARF_MPN_MUL(aap, ap, an, ap, an)
+        FLINT_MPN_MUL_WITH_SPECIAL_CASES(aap, ap, an, ap, an)
         aan -= (aap[0] == 0);
         aap += (aap[0] == 0);
 
-        ARF_MPN_MUL(bbp, bp, bn, bp, bn)
+        FLINT_MPN_MUL_WITH_SPECIAL_CASES(bbp, bp, bn, bp, bn)
         bbn -= (bbp[0] == 0);
         bbp += (bbp[0] == 0);
 

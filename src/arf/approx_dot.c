@@ -11,6 +11,7 @@
 
 #include "arb.h"
 #include "longlong.h"
+#include "mpn_extras.h"
 
 void
 _arb_dot_addmul_generic(mp_ptr sum, mp_ptr serr, mp_ptr tmp, mp_size_t sn,
@@ -280,7 +281,7 @@ arf_approx_dot(arf_t res, const arf_t initial, int subtract, arf_srcptr x, slong
                 y0 = ARF_NOPTR_D(ym)[0];
                 y1 = ARF_NOPTR_D(ym)[1];
 
-                nn_mul_2x2(u3, u2, u1, u0, x1, x0, y1, y0);
+                flint_mpn_mul_2x2(u3, u2, u1, u0, x1, x0, y1, y0);
 
                 u1 = (u1 >> shift) | (u2 << (FLINT_BITS - shift));
                 u2 = (u2 >> shift) | (u3 << (FLINT_BITS - shift));
@@ -320,14 +321,14 @@ arf_approx_dot(arf_t res, const arf_t initial, int subtract, arf_srcptr x, slong
                     x1 = ARF_NOPTR_D(xm)[1];
                     y0 = ARF_NOPTR_D(ym)[0];
                     y1 = ARF_NOPTR_D(ym)[1];
-                    nn_mul_2x2(u3, u2, u1, u0, x1, x0, y1, y0);
+                    flint_mpn_mul_2x2(u3, u2, u1, u0, x1, x0, y1, y0);
                 }
                 else if (xn == 1)
                 {
                     x0 = ARF_NOPTR_D(xm)[0];
                     y0 = ARF_NOPTR_D(ym)[0];
                     y1 = ARF_NOPTR_D(ym)[1];
-                    nn_mul_2x1(u3, u2, u1, y1, y0, x0);
+                    flint_mpn_mul_2x1(u3, u2, u1, y1, y0, x0);
                     u0 = 0;
                 }
                 else
@@ -335,7 +336,7 @@ arf_approx_dot(arf_t res, const arf_t initial, int subtract, arf_srcptr x, slong
                     x0 = ARF_NOPTR_D(xm)[0];
                     x1 = ARF_NOPTR_D(xm)[1];
                     y0 = ARF_NOPTR_D(ym)[0];
-                    nn_mul_2x1(u3, u2, u1, x1, x0, y0);
+                    flint_mpn_mul_2x1(u3, u2, u1, x1, x0, y0);
                     u0 = 0;
                 }
 

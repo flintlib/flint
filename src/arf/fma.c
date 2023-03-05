@@ -10,6 +10,7 @@
 */
 
 #include "arf.h"
+#include "mpn_extras.h"
 
 int
 arf_fma(arf_ptr res, arf_srcptr x, arf_srcptr y, arf_srcptr z, slong prec, arf_rnd_t rnd)
@@ -58,7 +59,7 @@ arf_fma(arf_ptr res, arf_srcptr x, arf_srcptr y, arf_srcptr z, slong prec, arf_r
     ARF_MUL_TMP_ALLOC(tptr2, alloc)
     tptr = tptr2;
 
-    ARF_MPN_MUL(tptr, xptr, xn, yptr, yn);
+    FLINT_MPN_MUL_WITH_SPECIAL_CASES(tptr, xptr, xn, yptr, yn);
 
     tn -= (tptr[0] == 0);
     tptr += (tptr[0] == 0);

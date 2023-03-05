@@ -10,6 +10,7 @@
 */
 
 #include "arb.h"
+#include "mpn_extras.h"
 
 void
 arb_si_pow_ui(arb_t res, slong b, ulong e, slong prec)
@@ -185,7 +186,7 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
                         mp_limb_t y0, y1;
                         y0 = yman[0];
                         y1 = yman[1];
-                        nn_mul_2x1(yman[2], yman[1], yman[0], y1, y0, aodd);
+                        flint_mpn_mul_2x1(yman[2], yman[1], yman[0], y1, y0, aodd);
                         yn += (yman[2] != 0);
                     }
                 }
@@ -292,10 +293,7 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
         }
         else   /* or exactly */
         {
-            if (ARF_USE_FFT_MUL(yn))
-                flint_mpn_mul_fft_main(tmp, yman, yn, yman, yn);
-            else
-                mpn_sqr(tmp, yman, yn);
+            flint_mpn_sqr(tmp, yman, yn);
             yn = 2 * yn;
         }
 

@@ -11,6 +11,7 @@
 
 #include "arb.h"
 #include "longlong.h"
+#include "mpn_extras.h"
 
 /* We need uint64_t instead of mp_limb_t on 32-bit systems for
    safe summation of 30-bit error bounds. */
@@ -284,7 +285,7 @@ arb_approx_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong
                 y0 = ARF_NOPTR_D(ym)[0];
                 y1 = ARF_NOPTR_D(ym)[1];
 
-                nn_mul_2x2(u3, u2, u1, u0, x1, x0, y1, y0);
+                flint_mpn_mul_2x2(u3, u2, u1, u0, x1, x0, y1, y0);
 
                 u1 = (u1 >> shift) | (u2 << (FLINT_BITS - shift));
                 u2 = (u2 >> shift) | (u3 << (FLINT_BITS - shift));
@@ -324,14 +325,14 @@ arb_approx_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong
                     x1 = ARF_NOPTR_D(xm)[1];
                     y0 = ARF_NOPTR_D(ym)[0];
                     y1 = ARF_NOPTR_D(ym)[1];
-                    nn_mul_2x2(u3, u2, u1, u0, x1, x0, y1, y0);
+                    flint_mpn_mul_2x2(u3, u2, u1, u0, x1, x0, y1, y0);
                 }
                 else if (xn == 1)
                 {
                     x0 = ARF_NOPTR_D(xm)[0];
                     y0 = ARF_NOPTR_D(ym)[0];
                     y1 = ARF_NOPTR_D(ym)[1];
-                    nn_mul_2x1(u3, u2, u1, y1, y0, x0);
+                    flint_mpn_mul_2x1(u3, u2, u1, y1, y0, x0);
                     u0 = 0;
                 }
                 else
@@ -339,7 +340,7 @@ arb_approx_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong
                     x0 = ARF_NOPTR_D(xm)[0];
                     x1 = ARF_NOPTR_D(xm)[1];
                     y0 = ARF_NOPTR_D(ym)[0];
-                    nn_mul_2x1(u3, u2, u1, x1, x0, y0);
+                    flint_mpn_mul_2x1(u3, u2, u1, x1, x0, y0);
                     u0 = 0;
                 }
 

@@ -1,6 +1,9 @@
 /*
     Copyright (C) 2010 Fredrik Johansson
 
+    2x2 mul code taken from MPFR 2.3.0
+    (Copyright (C) 1991-2007 Free Software Foundation, Inc.)
+
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
@@ -105,6 +108,48 @@ flint_mpn_sqr(mp_ptr z, mp_srcptr x, mp_size_t n)
     else
         flint_mpn_mul_fft_main(z, x, n, x, n);
 }
+
+#define FLINT_MPN_MUL_WITH_SPECIAL_CASES(_z, _x, _xn, _y, _yn) \
+    if ((_xn) == (_yn)) \
+    { \
+        if ((_xn) == 1) \
+        { \
+            umul_ppmm((_z)[1], (_z)[0], (_x)[0], (_y)[0]); \
+        } \
+        else if ((_xn) == 2) \
+        { \
+            mp_limb_t __tt_x1, __tt_x0, __tt_y1, __tt_y0; \
+            __tt_x0 = (_x)[0]; \
+            __tt_x1 = (_x)[1]; \
+            __tt_y0 = (_y)[0]; \
+            __tt_y1 = (_y)[1]; \
+            flint_mpn_mul_2x2((_z)[3], (_z)[2], (_z)[1], (_z)[0], __tt_x1, __tt_x0, __tt_y1, __tt_y0); \
+        } \
+        else if ((_xn) >= FLINT_FFT_MUL_THRESHOLD) \
+            flint_mpn_mul_fft_main((_z), (_x), (_xn), (_y), (_yn)); \
+        else if ((_x) == (_y)) \
+            mpn_sqr((_z), (_x), (_xn)); \
+        else \
+            mpn_mul_n((_z), (_x), (_y), (_xn)); \
+    } \
+    else if ((_xn) > (_yn)) \
+    { \
+        if ((_yn) == 1) \
+            (_z)[(_xn) + (_yn) - 1] = mpn_mul_1((_z), (_x), (_xn), (_y)[0]); \
+        else if ((_yn) >= FLINT_FFT_MUL_THRESHOLD) \
+            flint_mpn_mul_fft_main((_z), (_x), (_xn), (_y), (_yn)); \
+        else \
+            mpn_mul((_z), (_x), (_xn), (_y), (_yn)); \
+    } \
+    else \
+    { \
+        if ((_xn) == 1) \
+            (_z)[(_xn) + (_yn) - 1] = mpn_mul_1((_z), (_y), (_yn), (_x)[0]); \
+        else if ((_xn) >= FLINT_FFT_MUL_THRESHOLD) \
+            flint_mpn_mul_fft_main((_z), (_y), (_yn), (_x), (_xn)); \
+        else \
+            mpn_mul((_z), (_y), (_yn), (_x), (_xn)); \
+    }
 
 /*
     return the high limb of a two limb left shift by n < GMP_LIMB_BITS bits.

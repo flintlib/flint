@@ -10,6 +10,7 @@
 */
 
 #include "arf.h"
+#include "mpn_extras.h"
 
 int
 arf_mul_rnd_any(arf_ptr z, arf_srcptr x, arf_srcptr y,
@@ -55,7 +56,7 @@ arf_mul_rnd_any(arf_ptr z, arf_srcptr x, arf_srcptr y,
         {
             tmp[zn - 1] = mpn_mul_1(tmp, xptr, xn, yptr[0]);
         }
-        else if (ARF_USE_FFT_MUL(yn))
+        else if ((yn) >= FLINT_FFT_MUL_THRESHOLD)
         {
             flint_mpn_mul_fft_main(tmp, xptr, xn, yptr, yn);
         }

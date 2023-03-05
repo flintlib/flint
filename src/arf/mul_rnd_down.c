@@ -10,6 +10,7 @@
 */
 
 #include "arf.h"
+#include "mpn_extras.h"
 
 int
 arf_mul_rnd_down(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec)
@@ -118,7 +119,7 @@ arf_mul_rnd_down(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec)
             y0 = ARF_NOPTR_D(y)[0];
             y1 = ARF_NOPTR_D(y)[1];
 
-            nn_mul_2x2(zz[3], zz[2], zz[1], zz[0], x1, x0, y1, y0);
+            flint_mpn_mul_2x2(zz[3], zz[2], zz[1], zz[0], x1, x0, y1, y0);
 
             /* Likely case, must be inexact */
             if (prec <= 2 * FLINT_BITS)
@@ -167,7 +168,7 @@ arf_mul_rnd_down(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec)
         else
         {
             y0 = ARF_NOPTR_D(y)[0];
-            nn_mul_2x1(zz[2], zz[1], zz[0], x1, x0, y0);
+            flint_mpn_mul_2x1(zz[2], zz[1], zz[0], x1, x0, y0);
         }
 
         zn = xn + yn;
@@ -194,7 +195,7 @@ arf_mul_rnd_down(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec)
         alloc = zn = xn + yn;
         ARF_MUL_TMP_ALLOC(tmp, alloc)
 
-        if (ARF_USE_FFT_MUL(yn))
+        if (yn >= FLINT_FFT_MUL_THRESHOLD)
         {
             flint_mpn_mul_fft_main(tmp, xptr, xn, yptr, yn);
         }
@@ -263,7 +264,7 @@ arf_mul_mpz(arf_ptr z, arf_srcptr x, const mpz_t y, slong prec, arf_rnd_t rnd)
         alloc = zn = xn + yn;
         ARF_MUL_TMP_ALLOC(tmp, alloc)
 
-        ARF_MPN_MUL(tmp, xptr, xn, yptr, yn);
+        FLINT_MPN_MUL_WITH_SPECIAL_CASES(tmp, xptr, xn, yptr, yn);
 
         shift = yn * FLINT_BITS - (tmp[zn - 1] == 0) * FLINT_BITS;
         zn -= (tmp[zn - 1] == 0);
