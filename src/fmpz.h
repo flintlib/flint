@@ -807,61 +807,6 @@ FLINT_DLL void fmpz_multi_CRT_clear(fmpz_multi_CRT_t P);
 FLINT_DLL void _fmpz_multi_CRT_precomp(fmpz * outputs, const fmpz_multi_CRT_t P,
                                                 const fmpz * inputs, int sign);
 
-/* deprecated versions that assume sign = 1 **********************************/
-/*
-deprecated functions and types   new functions and types
-fmpz_multi_crt_t              => fmpz_multi_CRT_t
-fmpz_multi_crt_init           => fmpz_multi_CRT_init
-fmpz_multi_crt_precompute     => fmpz_multi_CRT_precompute
-fmpz_multi_crt_precompute_p   gone
-fmpz_multi_crt_precomp        => fmpz_multi_CRT_precomp now with sign option
-fmpz_multi_crt_precomp_p      gone
-fmpz_multi_crt                => fmpz_multi_CRT now with sign option
-fmpz_multi_crt_clear          => fmpz_multi_CRT_clear
-*/
-
-#define fmpz_multi_crt_struct fmpz_multi_CRT_struct
-#define fmpz_multi_crt_t fmpz_multi_CRT_t
-
-#define fmpz_multi_crt_init fmpz_deprecated_multi_crt_init
-#define fmpz_multi_crt_precompute fmpz_deprecated_multi_crt_precompute
-#define fmpz_multi_crt_precompute_p fmpz_deprecated_multi_crt_precompute_p
-#define fmpz_multi_crt_precomp fmpz_deprecated_multi_crt_precomp
-#define fmpz_multi_crt_precomp_p fmpz_deprecated_multi_crt_precomp_p
-#define fmpz_multi_crt fmpz_deprecated_multi_crt
-#define fmpz_multi_crt_clear fmpz_deprecated_multi_crt_clear
-#define _fmpz_multi_crt_local_size _fmpz_deprecated_multi_crt_local_size
-#define _fmpz_multi_crt_run _fmpz_deprecated_multi_crt_run
-#define _fmpz_multi_crt_run_p _fmpz_deprecated_multi_crt_run_p
-
-FLINT_DLL void fmpz_deprecated_multi_crt_init(fmpz_multi_crt_t CRT);
-
-FLINT_DLL int fmpz_deprecated_multi_crt_precompute(fmpz_multi_crt_t CRT,
-                                               const fmpz * moduli, slong len);
-
-FLINT_DLL int fmpz_deprecated_multi_crt_precompute_p(fmpz_multi_crt_t CRT,
-                                       const fmpz * const * moduli, slong len);
-
-FLINT_DLL void fmpz_deprecated_multi_crt_precomp(fmpz_t output, const fmpz_multi_crt_t P,
-                                                          const fmpz * inputs);
-
-FLINT_DLL void fmpz_deprecated_multi_crt_precomp_p(fmpz_t output,
-                        const fmpz_multi_crt_t P, const fmpz * const * inputs);
-
-FLINT_DLL int fmpz_deprecated_multi_crt(fmpz_t output, const fmpz * moduli,
-                                               const fmpz * values, slong len);
-
-FLINT_DLL void fmpz_deprecated_multi_crt_clear(fmpz_multi_crt_t P);
-
-FLINT_DLL slong _fmpz_deprecated_multi_crt_local_size(const fmpz_multi_crt_t CRT);
-
-FLINT_DLL void _fmpz_deprecated_multi_crt_run(fmpz * outputs, const fmpz_multi_crt_t CRT,
-                                                          const fmpz * inputs);
-
-FLINT_DLL void _fmpz_deprecated_multi_crt_run_p(fmpz * outputs,
-                      const fmpz_multi_crt_t CRT, const fmpz * const * inputs);
-
-
 /* multi mod *****************************************************************/
 
 typedef struct
