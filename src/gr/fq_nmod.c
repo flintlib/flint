@@ -406,7 +406,7 @@ __gr_fq_nmod_vec_dot(fq_nmod_struct * res, const fq_nmod_struct * initial, int s
     _nmod_vec_set(res->coeffs, s, slen);
     _nmod_poly_set_length(res, slen);
 
-    GR_TMP_FREE(t, 4 * plen);
+    GR_TMP_FREE(t, (4 * plen) * sizeof(mp_limb_t));
 
     return GR_SUCCESS;
 }
@@ -501,7 +501,7 @@ __gr_fq_nmod_vec_dot_rev(fq_nmod_struct * res, const fq_nmod_struct * initial, i
     _nmod_vec_set(res->coeffs, s, slen);
     _nmod_poly_set_length(res, slen);
 
-    GR_TMP_FREE(t, 4 * plen);
+    GR_TMP_FREE(t, (4 * plen) * sizeof(mp_limb_t));
 
     return GR_SUCCESS;
 }

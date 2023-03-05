@@ -15,6 +15,9 @@
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 #include "nmod_poly.h"
+#include "fq.h"
+#include "fq_nmod.h"
+#include "fq_zech.h"
 #include "profiler.h"
 
 #define TIMEIT_END_REPEAT3(__timer, __reps, __min_time) \
@@ -32,7 +35,7 @@
         (twall) = __timer->wall*0.001 / __reps; \
     } while (0);
 
-#if 1
+#if 0
 #define INIT_CTX gr_ctx_init_nmod(ctx, n_nextprime(UWORD(1) << (bits - 1), 0));
 #define RANDCOEFF(t, ctx) GR_IGNORE(gr_set_ui(t, n_randlimb(state), ctx))
 #define STEP_BITS for (bits = 1, j = 0; bits <= 64; bits++, j++)
@@ -44,7 +47,26 @@
 #define STEP_BITS for (bits = 32, j = 0; bits <= 8192; bits *= 2, j++)
 #endif
 
+#if 1
+#define INIT_CTX fmpz_t t; fmpz_init(t); fmpz_ui_pow_ui(t, 2, bits - 1); fmpz_nextprime(t, t, 0); gr_ctx_init_fq(ctx, t, 2, "a"); fmpz_clear(t);
+#define RANDCOEFF(t, ctx) fq_rand(t, state, gr_ctx_data_as_ptr(ctx));
+#define STEP_BITS for (bits = 100, j = 1; bits <= 100; bits *= 2, j++)
+#endif
+
 #if 0
+#define INIT_CTX fmpz_t t; fmpz_init(t); fmpz_set_ui(t, n_nextprime(1000000, 0)); gr_ctx_init_fq_nmod(ctx, t, bits, "a"); fmpz_clear(t);
+#define RANDCOEFF(t, ctx) fq_nmod_rand(t, state, gr_ctx_data_as_ptr(ctx));
+#define STEP_BITS for (bits = 4, j = 1; bits <= 64; bits *= 2, j++)
+#endif
+
+#if 0
+#define INIT_CTX fmpz_t t; fmpz_init(t); fmpz_set_ui(t, 3); gr_ctx_init_fq_zech(ctx, t, bits, "a"); fmpz_clear(t);
+#define RANDCOEFF(t, ctx) fq_zech_rand(t, state, gr_ctx_data_as_ptr(ctx));
+#define STEP_BITS for (bits = 2, j = 1; bits <= 12; bits++, j++)
+#endif
+
+
+#if 1
 #define INFO "inv_series"
 #define SETUP random_input(A, state, len, ctx); \
               GR_IGNORE(gr_poly_set_coeff_si(A, 0, 1, ctx));
@@ -103,7 +125,7 @@
 #define CASE_B GR_IGNORE(gr_poly_divrem_newton(C, D, A, B, ctx));
 #endif
 
-#if 1
+#if 0
 #define INFO "divrem (nmod basecase)"
 #define SETUP random_input(A, state, 2 * len, ctx); \
               random_input(B, state, len, ctx); \

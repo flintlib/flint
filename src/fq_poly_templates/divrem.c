@@ -27,6 +27,7 @@ _TEMPLATE(T, poly_divrem) (TEMPLATE(T, struct) * Q,
     gr_ctx_t gr_ctx;
     TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
 
+    /* todo: tuning, and make sure it is also used in gr_poly_divrem */
     if (lenB <= 10 || lenA - lenB <= 1)
         GR_MUST_SUCCEED(_gr_poly_divrem_basecase_preinv1(Q, R, A, lenA, B, lenB, invB, gr_ctx));
     else

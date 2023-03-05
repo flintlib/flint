@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2023 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -12,25 +13,31 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
 
 slong
 _TEMPLATE(T, poly_gcd) (TEMPLATE(T, struct)*G,
                         const TEMPLATE(T, struct) * A, slong lenA,
                         const TEMPLATE(T, struct) * B, slong lenB,
-                        const TEMPLATE(T, t) invB,
                         const TEMPLATE(T, ctx_t) ctx)
 {
+    gr_ctx_t gr_ctx;
     slong cutoff;
+    slong lenG;
+
     if (fmpz_bits(TEMPLATE(T, ctx_prime) (ctx)) <= 8)
         cutoff = TEMPLATE(CAP_T, POLY_SMALL_GCD_CUTOFF);
     else
         cutoff = TEMPLATE(CAP_T, POLY_GCD_CUTOFF);
 
-    if (lenA < cutoff)
-        return _TEMPLATE(T, poly_gcd_euclidean) (G, A, lenA, B, lenB, invB,
-                                                 ctx);
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+
+    if (FLINT_MIN(lenA, lenB) < cutoff)
+        GR_MUST_SUCCEED(_gr_poly_gcd_euclidean(G, &lenG, A, lenA, B, lenB, gr_ctx));
     else
-        return _TEMPLATE(T, poly_gcd_hgcd) (G, A, lenA, B, lenB, invB, ctx);
+        GR_MUST_SUCCEED(_gr_poly_gcd_hgcd(G, &lenG, A, lenA, B, lenB, TEMPLATE(CAP_T, POLY_HGCD_CUTOFF), cutoff, gr_ctx));
+
+    return lenG;
 }
 
 void
@@ -46,7 +53,6 @@ TEMPLATE(T, poly_gcd) (TEMPLATE(T, poly_t) G,
     else                        /* lenA >= lenB >= 0 */
     {
         slong lenA = A->length, lenB = B->length, lenG;
-        TEMPLATE(T, t) invB;
         TEMPLATE(T, struct) * g;
 
         if (lenA == 0)          /* lenA = lenB = 0 */
@@ -69,11 +75,8 @@ TEMPLATE(T, poly_gcd) (TEMPLATE(T, poly_t) G,
                 g = G->coeffs;
             }
 
-            TEMPLATE(T, init) (invB, ctx);
-            TEMPLATE(T, inv) (invB, TEMPLATE(T, poly_lead) (B, ctx), ctx);
             lenG = _TEMPLATE(T, poly_gcd) (g, A->coeffs, lenA,
-                                           B->coeffs, lenB, invB, ctx);
-            TEMPLATE(T, clear) (invB, ctx);
+                                           B->coeffs, lenB, ctx);
 
             if (G == A || G == B)
             {

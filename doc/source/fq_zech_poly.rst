@@ -957,62 +957,6 @@ Greatest common divisor
     made to make the GCD monic. It is required that `G` have space for
     ``lenB`` coefficients.
 
-.. function:: void fq_zech_poly_gcd_euclidean(fq_zech_poly_t rop, const fq_zech_poly_t op1, const fq_zech_poly_t op2, const fq_zech_ctx_t ctx)
-
-    Sets ``rop`` to the greatest common divisor of ``op1`` and
-    ``op2``, using the Euclidean algorithm. The GCD of zero
-    polynomials is defined to be zero, whereas the GCD of the zero
-    polynomial and some other polynomial `P` is defined to be
-    `P`. Except in the case where the GCD is zero, the GCD `G` is made
-    monic.
-
-.. function:: long _fq_zech_poly_gcd_euclidean(fq_zech_struct* G, const fq_zech_struct* A, slong lenA, const fq_zech_struct* B, slong lenB, const fq_zech_ctx_t ctx)
-
-    Computes the GCD of `A` of length ``lenA`` and `B` of length
-    ``lenB``, where ``lenA >= lenB > 0`` and sets `G` to it. The
-    length of the GCD `G` is returned by the function. No attempt is
-    made to make the GCD monic. It is required that `G` have space for
-    ``lenB`` coefficients.
-
-.. function:: slong _fq_zech_poly_hgcd(fq_zech_struct **M, slong *lenM, fq_zech_struct *A, slong *lenA, fq_zech_struct *B, slong *lenB, const fq_zech_struct * a, slong lena, const fq_zech_struct *b, slong lenb, const fq_zech_ctx_t ctx)
-
-    Computes the HGCD of `a` and `b`, that is, a matrix `M`, a sign `\sigma`
-    and two polynomials `A` and `B` such that
-
-    .. math ::
-
-
-        (A,B)^t = \sigma M^{-1} (a,b)^t.
-
-
-
-    Assumes that `\operatorname{len}(a) > \operatorname{len}(b) > 0`.
-
-    Assumes that `A` and `B` have space of size at least `\operatorname{len}(a)`
-    and `\operatorname{len}(b)`, respectively.  On exit, ``*lenA`` and ``*lenB``
-    will contain the correct lengths of `A` and `B`.
-
-    Assumes that ``M[0]``, ``M[1]``, ``M[2]``, and ``M[3]``
-    each point to a vector of size at least `\operatorname{len}(a)`.
-
-.. function:: void fq_zech_poly_gcd_hgcd(fq_zech_poly_t rop, const fq_zech_poly_t op1, const fq_zech_poly_t op2, const fq_zech_ctx_t ctx)
-
-    Sets ``rop`` to the greatest common divisor of ``op1`` and
-    ``op2``, using the HGCD algorithm. The GCD of zero
-    polynomials is defined to be zero, whereas the GCD of the zero
-    polynomial and some other polynomial `P` is defined to be
-    `P`. Except in the case where the GCD is zero, the GCD `G` is made
-    monic.
-
-.. function:: long _fq_zech_poly_gcd_hgcd(fq_zech_struct* G, const fq_zech_struct* A, slong lenA, const fq_zech_struct* B, slong lenB, const fq_zech_ctx_t ctx)
-
-    Computes the GCD of `A` of length ``lenA`` and `B` of length
-    ``lenB`` using the HGCD algorithm, where
-    ``lenA >= lenB > 0`` and sets `G` to it. The length of the GCD
-    `G` is returned by the function. No attempt is made to make the
-    GCD monic. It is required that `G` have space for ``lenB``
-    coefficients.
-
 .. function:: slong _fq_zech_poly_gcd_euclidean_f(fq_zech_t f, fq_zech_struct *G, const fq_zech_struct *A, slong lenA, const fq_zech_struct *B, slong lenB, const fq_zech_ctx_t ctx)
 
     Either sets `f = 1` and `G` to the greatest common divisor of
@@ -1027,34 +971,6 @@ Greatest common divisor
 
     Either sets `f = 1` and `G` to the greatest common divisor of `A`
     and `B` or sets `f` to a factor of the modulus of ``ctx``.
-
-.. function:: slong _fq_zech_poly_xgcd_euclidean(fq_zech_struct *G, fq_zech_struct *S, fq_zech_struct *T, const fq_zech_struct *A, slong lenA, const fq_zech_struct *B, slong lenB, const fmpz_t invB, const fq_zech_ctx_t ctx)
-
-    Computes the GCD of `A` and `B` together with cofactors `S` and `T`
-    such that `S A + T B = G`.  Returns the length of `G`.
-
-    Assumes that `\operatorname{len}(A) \geq \operatorname{len}(B) \geq 1` and
-    `(\operatorname{len}(A),\operatorname{len}(B)) \neq (1,1)`.
-
-    No attempt is made to make the GCD monic.
-
-    Requires that `G` have space for `\operatorname{len}(B)` coefficients.  Writes
-    `\operatorname{len}(B)-1` and `\operatorname{len}(A)-1` coefficients to `S` and `T`, respectively.
-    Note that, in fact, `\operatorname{len}(S) \leq \max(\operatorname{len}(B) - \operatorname{len}(G), 1)` and
-    `\operatorname{len}(T) \leq \max(\operatorname{len}(A) - \operatorname{len}(G), 1)`.
-
-    No aliasing of input and output operands is permitted.
-
-.. function:: void fq_zech_poly_xgcd_euclidean(fq_zech_poly_t G, fq_zech_poly_t S, fq_zech_poly_t T, const fq_zech_poly_t A, const fq_zech_poly_t B, const fq_zech_ctx_t ctx)
-
-    Computes the GCD of `A` and `B`. The GCD of zero polynomials is
-    defined to be zero, whereas the GCD of the zero polynomial and some other
-    polynomial `P` is defined to be `P`. Except in the case where
-    the GCD is zero, the GCD `G` is made monic.
-
-    Polynomials ``S`` and ``T`` are computed such that
-    ``S*A + T*B = G``. The length of ``S`` will be at most
-    ``lenB`` and the length of ``T`` will be at most ``lenA``.
 
 .. function:: slong _fq_zech_poly_xgcd(fq_zech_struct *G, fq_zech_struct *S, fq_zech_struct *T, const fq_zech_struct *A, slong lenA, const fq_zech_struct *B, slong lenB, const fmpz_t invB, const fq_zech_ctx_t ctx)
 

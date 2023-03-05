@@ -21,7 +21,6 @@ _TEMPLATE(T, poly_is_squarefree) (const TEMPLATE(T, struct) * f, slong len,
                                   const TEMPLATE(T, ctx_t) ctx)
 {
     TEMPLATE(T, struct) * fd, *g;
-    TEMPLATE(T, t) invfd;
     slong dlen;
     int res;
 
@@ -37,10 +36,7 @@ _TEMPLATE(T, poly_is_squarefree) (const TEMPLATE(T, struct) * f, slong len,
 
     if (dlen)
     {
-        TEMPLATE(T, init) (invfd, ctx);
-        TEMPLATE(T, inv) (invfd, fd + (dlen - 1), ctx);
-        res = (_TEMPLATE(T, poly_gcd) (g, f, len, fd, dlen, invfd, ctx) == 1);
-        TEMPLATE(T, clear) (invfd, ctx);
+        res = (_TEMPLATE(T, poly_gcd) (g, f, len, fd, dlen, ctx) == 1);
     }
     else
         res = 0;                /* gcd(f, 0) = f, and len(f) > 2 */

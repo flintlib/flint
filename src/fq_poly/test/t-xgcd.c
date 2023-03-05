@@ -9,14 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod_poly.h"
+#include "fq_poly.h"
 
 #ifdef T
 #undef T
 #endif
 
-#define T fq_nmod
-#define CAP_T FQ_NMOD
-#include "fq_poly_templates/test/t-xgcd_euclidean.c"
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/test/t-xgcd.c"
 #undef CAP_T
 #undef T

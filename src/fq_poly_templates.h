@@ -671,7 +671,6 @@ FLINT_DLL slong _TEMPLATE(T, poly_gcd_euclidean)(TEMPLATE(T, struct)* G,
 FLINT_DLL slong _TEMPLATE(T, poly_gcd)(TEMPLATE(T, struct)* G,
                        const TEMPLATE(T, struct)* A, slong lenA,
                        const TEMPLATE(T, struct)* B, slong lenB,
-                       const TEMPLATE(T, t) invB,
                        const TEMPLATE(T, ctx_t) ctx);
 
 FLINT_DLL void TEMPLATE(T, poly_gcd)(TEMPLATE(T, poly_t) rop,
@@ -689,25 +688,6 @@ FLINT_DLL void TEMPLATE(T, poly_gcd_euclidean_f)(TEMPLATE(T, t) f, TEMPLATE(T, p
                                   const TEMPLATE(T, poly_t) B,
                                   const TEMPLATE(T, ctx_t) ctx);
 
-FLINT_DLL slong _TEMPLATE(T, poly_hgcd)(TEMPLATE(T, struct) **M, slong *lenM,
-                        TEMPLATE(T, struct)* A, slong *lenA,
-                        TEMPLATE(T, struct)* B, slong *lenB,
-                        const TEMPLATE(T, struct)* a, slong lena,
-                        const TEMPLATE(T, struct)* b, slong lenb,
-                        const TEMPLATE(T, ctx_t) ctx);
-
-
-FLINT_DLL slong _TEMPLATE(T, poly_gcd_hgcd)(TEMPLATE(T, struct)* G,
-                            const TEMPLATE(T, struct)* A, slong lenA,
-                            const TEMPLATE(T, struct)* B, slong lenB,
-                            const TEMPLATE(T, t) invB,
-                            const TEMPLATE(T, ctx_t) ctx);
-
-FLINT_DLL void TEMPLATE(T, poly_gcd_hgcd)(TEMPLATE(T, poly_t) G,
-                                const TEMPLATE(T, poly_t) A,
-                                const TEMPLATE(T, poly_t) B,
-                                const TEMPLATE(T, ctx_t) ctx);
-
 FLINT_DLL slong _TEMPLATE(T, poly_xgcd_euclidean_f)(TEMPLATE(T, t) f, TEMPLATE(T, struct) *G,
                                     TEMPLATE(T, struct) *S,
                                     TEMPLATE(T, struct) *T,
@@ -722,42 +702,18 @@ FLINT_DLL void TEMPLATE(T, poly_xgcd_euclidean_f)(TEMPLATE(T, t) f, TEMPLATE(T, 
                                    const TEMPLATE(T, poly_t) B,
                                    const TEMPLATE(T, ctx_t) ctx);
 
-FLINT_DLL slong _TEMPLATE(T, poly_xgcd_euclidean)(TEMPLATE(T, struct) *G,
+FLINT_DLL slong _TEMPLATE(T, poly_xgcd)(TEMPLATE(T, struct) *G,
                                   TEMPLATE(T, struct) *S,
                                   TEMPLATE(T, struct) *T,
                                   const TEMPLATE(T, struct) *A, slong lenA,
                                   const TEMPLATE(T, struct) *B, slong lenB,
-                                  const TEMPLATE(T, t) invB,
                                   const TEMPLATE(T, ctx_t) ctx);
 
-FLINT_DLL void TEMPLATE(T, poly_xgcd_euclidean)(TEMPLATE(T, poly_t) G,
+FLINT_DLL void TEMPLATE(T, poly_xgcd)(TEMPLATE(T, poly_t) G,
                                  TEMPLATE(T, poly_t) S, TEMPLATE(T, poly_t) T,
                                  const TEMPLATE(T, poly_t) A,
                                  const TEMPLATE(T, poly_t) B,
                                  const TEMPLATE(T, ctx_t) ctx);
-
-FQ_POLY_TEMPLATES_INLINE slong
-_TEMPLATE(T, poly_xgcd)(TEMPLATE(T, struct) *G,
-                        TEMPLATE(T, struct) *S, TEMPLATE(T, struct) *T,
-                        const TEMPLATE(T, struct) *A, slong lenA,
-                        const TEMPLATE(T, struct) *B, slong lenB,
-                        const TEMPLATE(T, t) invB,
-                        const TEMPLATE(T, ctx_t) ctx)
-{
-    return _TEMPLATE(T, poly_xgcd_euclidean)(G, S, T, A, lenA,
-                                             B, lenB, invB, ctx);
-}
-
-
-FQ_POLY_TEMPLATES_INLINE void
-TEMPLATE(T, poly_xgcd)(TEMPLATE(T, poly_t) G,
-                       TEMPLATE(T, poly_t) S, TEMPLATE(T, poly_t) T,
-                       const TEMPLATE(T, poly_t) A,
-                       const TEMPLATE(T, poly_t) B,
-                       const TEMPLATE(T, ctx_t) ctx)
-{
-    TEMPLATE(T, poly_xgcd_euclidean)(G, S, T, A, B, ctx);
-}
 
 
 /*  Euclidean division  ******************************************************/

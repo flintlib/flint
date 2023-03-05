@@ -20,7 +20,7 @@ main(void)
     int i, result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("xgcd_euclidean....");
+    flint_printf("xgcd....");
     fflush(stdout);
 
     /* Generic case, most likely co-prime arguments ***************************** */
@@ -44,8 +44,8 @@ main(void)
         TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 100), ctx);
         TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 100), ctx);
 
-        TEMPLATE(T, poly_gcd_euclidean) (d, a, b, ctx);
-        TEMPLATE(T, poly_xgcd_euclidean) (g, s, t, a, b, ctx);
+        TEMPLATE(T, poly_gcd) (d, a, b, ctx);
+        TEMPLATE(T, poly_xgcd) (g, s, t, a, b, ctx);
 
         TEMPLATE(T, poly_mul) (v, s, a, ctx);
         TEMPLATE(T, poly_mul) (w, t, b, ctx);
@@ -107,8 +107,8 @@ main(void)
         TEMPLATE(T, poly_mul) (a, a, f, ctx);
         TEMPLATE(T, poly_mul) (b, b, f, ctx);
 
-        TEMPLATE(T, poly_gcd_euclidean) (d, a, b, ctx);
-        TEMPLATE(T, poly_xgcd_euclidean) (g, s, t, a, b, ctx);
+        TEMPLATE(T, poly_gcd) (d, a, b, ctx);
+        TEMPLATE(T, poly_xgcd) (g, s, t, a, b, ctx);
 
         TEMPLATE(T, poly_mul) (v, s, a, ctx);
         TEMPLATE(T, poly_mul) (w, t, b, ctx);
@@ -171,8 +171,8 @@ main(void)
         TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 100), ctx);
         TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 100), ctx);
 
-        TEMPLATE(T, poly_xgcd_euclidean) (g, s, t, a, b, ctx);
-        TEMPLATE(T, poly_xgcd_euclidean) (a, v, w, a, b, ctx);
+        TEMPLATE(T, poly_xgcd) (g, s, t, a, b, ctx);
+        TEMPLATE(T, poly_xgcd) (a, v, w, a, b, ctx);
 
         result = (TEMPLATE(T, poly_equal) (s, v, ctx) &&
                   TEMPLATE(T, poly_equal) (t, w, ctx) &&
@@ -220,8 +220,8 @@ main(void)
         TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 100), ctx);
         TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 100), ctx);
 
-        TEMPLATE(T, poly_xgcd_euclidean) (g, s, t, a, b, ctx);
-        TEMPLATE(T, poly_xgcd_euclidean) (b, v, w, a, b, ctx);
+        TEMPLATE(T, poly_xgcd) (g, s, t, a, b, ctx);
+        TEMPLATE(T, poly_xgcd) (b, v, w, a, b, ctx);
 
         result = (TEMPLATE(T, poly_equal) (s, v, ctx) &&
                   TEMPLATE(T, poly_equal) (t, w, ctx) &&
@@ -269,8 +269,8 @@ main(void)
         TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 100), ctx);
         TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 100), ctx);
 
-        TEMPLATE(T, poly_xgcd_euclidean) (g, s, t, a, b, ctx);
-        TEMPLATE(T, poly_xgcd_euclidean) (d, a, w, a, b, ctx);
+        TEMPLATE(T, poly_xgcd) (g, s, t, a, b, ctx);
+        TEMPLATE(T, poly_xgcd) (d, a, w, a, b, ctx);
 
         result = (TEMPLATE(T, poly_equal) (s, a, ctx) &&
                   TEMPLATE(T, poly_equal) (t, w, ctx) &&
@@ -318,8 +318,8 @@ main(void)
         TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 100), ctx);
         TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 100), ctx);
 
-        TEMPLATE(T, poly_xgcd_euclidean) (g, s, t, a, b, ctx);
-        TEMPLATE(T, poly_xgcd_euclidean) (d, b, w, a, b, ctx);
+        TEMPLATE(T, poly_xgcd) (g, s, t, a, b, ctx);
+        TEMPLATE(T, poly_xgcd) (d, b, w, a, b, ctx);
 
         result = (TEMPLATE(T, poly_equal) (s, b, ctx) &&
                   TEMPLATE(T, poly_equal) (t, w, ctx) &&
@@ -367,8 +367,8 @@ main(void)
         TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 100), ctx);
         TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 100), ctx);
 
-        TEMPLATE(T, poly_xgcd_euclidean) (g, s, t, a, b, ctx);
-        TEMPLATE(T, poly_xgcd_euclidean) (d, w, a, a, b, ctx);
+        TEMPLATE(T, poly_xgcd) (g, s, t, a, b, ctx);
+        TEMPLATE(T, poly_xgcd) (d, w, a, a, b, ctx);
 
         result = (TEMPLATE(T, poly_equal) (s, w, ctx) &&
                   TEMPLATE(T, poly_equal) (t, a, ctx) &&
@@ -416,8 +416,8 @@ main(void)
         TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 100), ctx);
         TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 100), ctx);
 
-        TEMPLATE(T, poly_xgcd_euclidean) (g, s, t, a, b, ctx);
-        TEMPLATE(T, poly_xgcd_euclidean) (d, w, b, a, b, ctx);
+        TEMPLATE(T, poly_xgcd) (g, s, t, a, b, ctx);
+        TEMPLATE(T, poly_xgcd) (d, w, b, a, b, ctx);
 
         result = (TEMPLATE(T, poly_equal) (s, w, ctx) &&
                   TEMPLATE(T, poly_equal) (t, b, ctx) &&

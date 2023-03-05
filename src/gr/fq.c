@@ -349,6 +349,200 @@ _gr_fq_pth_root(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_fq_vec_dot(fq_struct * res, const fq_struct * initial, int subtract, const fq_struct * vec1, const fq_struct * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    fmpz * s, * t;
+    slong slen, tlen, len1, len2;
+    slong plen;
+
+    if (len <= 0)
+    {
+        if (initial == NULL)
+            fq_zero(res, FQ_CTX(ctx));
+        else
+            fq_set(res, initial, FQ_CTX(ctx));
+        return GR_SUCCESS;
+    }
+
+    plen = FQ_CTX(ctx)->modulus->length;
+
+    t = GR_TMP_ALLOC((4 * plen) * sizeof(fmpz));
+    s = t + 2 * plen;
+
+    for (i = 0; i < 4 * plen; i++)
+        fmpz_init(t + i);
+
+    len1 = vec1[0].length;
+    len2 = vec2[0].length;
+
+    if (len1 == 0 || len2 == 0)
+    {
+        slen = 0;
+    }
+    else
+    {
+        slen = len1 + len2 - 1;
+        if (len1 >= len2)
+            _fmpz_poly_mul(s, vec1[0].coeffs, len1, vec2[0].coeffs, len2);
+        else
+            _fmpz_poly_mul(s, vec2[0].coeffs, len2, vec1[0].coeffs, len1);
+    }
+
+    for (i = 1; i < len; i++)
+    {
+        len1 = vec1[i].length;
+        len2 = vec2[i].length;
+
+        if (len1 != 0 && len2 != 0)
+        {
+            tlen = len1 + len2 - 1;
+            if (len1 >= len2)
+                _fmpz_poly_mul(t, vec1[i].coeffs, len1, vec2[i].coeffs, len2);
+            else
+                _fmpz_poly_mul(t, vec2[i].coeffs, len2, vec1[i].coeffs, len1);
+
+            _fmpz_poly_add(s, s, slen, t, tlen);
+            slen = FLINT_MAX(slen, tlen);
+        }
+    }
+
+    if (initial == NULL)
+    {
+        if (subtract)
+            _fmpz_vec_neg(s, s, slen);
+    }
+    else
+    {
+        len2 = initial->length;
+
+        if (subtract)
+            _fmpz_poly_sub(s, initial->coeffs, len2, s, slen);
+        else
+            _fmpz_poly_add(s, initial->coeffs, len2, s, slen);
+
+        slen = FLINT_MAX(slen, len2);
+    }
+
+    while (slen > 0 && fmpz_is_zero(s + slen - 1))
+        slen--;
+
+    _fq_reduce(s, slen, FQ_CTX(ctx));
+    slen = FLINT_MIN(slen, plen - 1);
+
+    while (slen > 0 && fmpz_is_zero(s + slen - 1))
+        slen--;
+
+    fmpz_poly_fit_length(res, slen);
+    _fmpz_vec_set(res->coeffs, s, slen); /* todo: swap */
+    _fmpz_poly_set_length(res, slen);
+
+    for (i = 0; i < 4 * plen; i++)
+        fmpz_clear(t + i);
+
+    GR_TMP_FREE(t, (4 * plen) * sizeof(fmpz));
+
+    return GR_SUCCESS;
+}
+
+int
+_gr_fq_vec_dot_rev(fq_struct * res, const fq_struct * initial, int subtract, const fq_struct * vec1, const fq_struct * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    fmpz * s, * t;
+    slong slen, tlen, len1, len2;
+    slong plen;
+
+    if (len <= 0)
+    {
+        if (initial == NULL)
+            fq_zero(res, FQ_CTX(ctx));
+        else
+            fq_set(res, initial, FQ_CTX(ctx));
+        return GR_SUCCESS;
+    }
+
+    plen = FQ_CTX(ctx)->modulus->length;
+
+    t = GR_TMP_ALLOC((4 * plen) * sizeof(fmpz));
+    s = t + 2 * plen;
+
+    for (i = 0; i < 4 * plen; i++)
+        fmpz_init(t + i);
+
+    len1 = vec1[0].length;
+    len2 = vec2[len - 1].length;
+
+    if (len1 == 0 || len2 == 0)
+    {
+        slen = 0;
+    }
+    else
+    {
+        slen = len1 + len2 - 1;
+        if (len1 >= len2)
+            _fmpz_poly_mul(s, vec1[0].coeffs, len1, vec2[len - 1].coeffs, len2);
+        else
+            _fmpz_poly_mul(s, vec2[len - 1].coeffs, len2, vec1[0].coeffs, len1);
+    }
+
+    for (i = 1; i < len; i++)
+    {
+        len1 = vec1[i].length;
+        len2 = vec2[len - 1 - i].length;
+
+        if (len1 != 0 && len2 != 0)
+        {
+            tlen = len1 + len2 - 1;
+            if (len1 >= len2)
+                _fmpz_poly_mul(t, vec1[i].coeffs, len1, vec2[len - 1 - i].coeffs, len2);
+            else
+                _fmpz_poly_mul(t, vec2[len - 1 - i].coeffs, len2, vec1[i].coeffs, len1);
+
+            _fmpz_poly_add(s, s, slen, t, tlen);
+            slen = FLINT_MAX(slen, tlen);
+        }
+    }
+
+    if (initial == NULL)
+    {
+        if (subtract)
+            _fmpz_vec_neg(s, s, slen);
+    }
+    else
+    {
+        len2 = initial->length;
+
+        if (subtract)
+            _fmpz_poly_sub(s, initial->coeffs, len2, s, slen);
+        else
+            _fmpz_poly_add(s, initial->coeffs, len2, s, slen);
+
+        slen = FLINT_MAX(slen, len2);
+    }
+
+    while (slen > 0 && fmpz_is_zero(s + slen - 1))
+        slen--;
+
+    _fq_reduce(s, slen, FQ_CTX(ctx));
+    slen = FLINT_MIN(slen, plen - 1);
+
+    while (slen > 0 && fmpz_is_zero(s + slen - 1))
+        slen--;
+
+    fmpz_poly_fit_length(res, slen);
+    _fmpz_vec_set(res->coeffs, s, slen); /* todo: swap */
+    _fmpz_poly_set_length(res, slen);
+
+    for (i = 0; i < 4 * plen; i++)
+        fmpz_clear(t + i);
+
+    GR_TMP_FREE(t, (4 * plen) * sizeof(fmpz));
+
+    return GR_SUCCESS;
+}
+
 /* todo: _fq_poly_mullow should do the right thing */
 int
 _gr_fq_poly_mullow(fq_struct * res,
@@ -497,6 +691,8 @@ gr_method_tab_input _fq_methods_input[] =
     {GR_METHOD_FQ_IS_PRIMITIVE,         (gr_funcptr) _gr_fq_is_primitive},
     {GR_METHOD_FQ_PTH_ROOT,             (gr_funcptr) _gr_fq_pth_root},
 
+    {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_fq_vec_dot},
+    {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_fq_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fq_poly_mullow},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fq_roots_gr_poly},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fq_mat_mul},

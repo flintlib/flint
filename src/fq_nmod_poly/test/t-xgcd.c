@@ -17,6 +17,6 @@
 
 #define T fq_nmod
 #define CAP_T FQ_NMOD
-#include "fq_poly_templates/test/t-gcd_hgcd.c"
+#include "fq_poly_templates/test/t-xgcd.c"
 #undef CAP_T
 #undef T

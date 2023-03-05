@@ -2,6 +2,7 @@
     Copyright (C) 2011 William Hart
     Copyright (C) 2012 Sebastian Pancratz
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2023 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -14,125 +15,38 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
 
+/* todo: the gr method don't accept the precomputed inverse */
 slong
-_TEMPLATE(T, poly_xgcd_euclidean) (TEMPLATE(T, struct) * G,
+_TEMPLATE(T, poly_xgcd) (TEMPLATE(T, struct) * G,
                                    TEMPLATE(T, struct) * S,
                                    TEMPLATE(T, struct) * T,
                                    const TEMPLATE(T, struct) * A, slong lenA,
                                    const TEMPLATE(T, struct) * B, slong lenB,
-                                   const TEMPLATE(T, t) invB,
                                    const TEMPLATE(T, ctx_t) ctx)
 {
-    _TEMPLATE(T, vec_zero) (G, lenB, ctx);
-    _TEMPLATE(T, vec_zero) (S, lenB - 1, ctx);
-    _TEMPLATE(T, vec_zero) (T, lenA - 1, ctx);
+    gr_ctx_t gr_ctx;
+    slong cutoff;
+    slong lenG;
 
-    if (lenB == 1)
-    {
-        TEMPLATE(T, set) (G + 0, B + 0, ctx);
-        TEMPLATE(T, one) (T + 0, ctx);
-        return 1;
-    }
+    if (fmpz_bits(TEMPLATE(T, ctx_prime) (ctx)) <= 8)
+        cutoff = TEMPLATE(CAP_T, POLY_SMALL_GCD_CUTOFF);
     else
-    {
-        TEMPLATE(T, struct) * Q, *R;
-        slong lenQ, lenR;
+        cutoff = TEMPLATE(CAP_T, POLY_GCD_CUTOFF);
 
-        Q = _TEMPLATE(T, vec_init) (2 * lenA, ctx);
-        R = Q + lenA;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
 
-        _TEMPLATE(T, poly_divrem) (Q, R, A, lenA, B, lenB, invB, ctx);
-        lenR = lenB - 1;
-        TEMPLATE(CAP_T, VEC_NORM) (R, lenR, ctx);
+    if (FLINT_MIN(lenA, lenB) < cutoff)
+        GR_MUST_SUCCEED(_gr_poly_xgcd_euclidean(&lenG, G, S, T, A, lenA, B, lenB, gr_ctx));
+    else
+        GR_MUST_SUCCEED(_gr_poly_xgcd_hgcd(&lenG, G, S, T, A, lenA, B, lenB, TEMPLATE(CAP_T, POLY_HGCD_CUTOFF), cutoff, gr_ctx));
 
-        if (lenR == 0)
-        {
-            _TEMPLATE(T, vec_set) (G, B, lenB, ctx);
-            TEMPLATE(T, one) (T + 0, ctx);
-
-            _TEMPLATE(T, vec_clear) (Q, 2 * lenA, ctx);
-            return lenB;
-        }
-        else
-        {
-            TEMPLATE(T, t) inv;
-            TEMPLATE(T, struct) * D, *U, *V1, *V3, *W;
-            slong lenD, lenU, lenV1, lenV3, lenW;
-
-            TEMPLATE(T, init) (inv, ctx);
-            W = _TEMPLATE(T, vec_init) (FLINT_MAX(5 * lenB, lenA + lenB), ctx);
-            D = W + lenB;
-            U = D + lenB;
-            V1 = U + lenB;
-            V3 = V1 + lenB;
-
-            lenU = 0;
-            _TEMPLATE(T, vec_set) (D, B, lenB, ctx);
-            lenD = lenB;
-            TEMPLATE(T, one) (V1 + 0, ctx);
-            lenV1 = 1;
-            lenV3 = 0;
-            TEMPLATE(CAP_T, VEC_SWAP) (V3, lenV3, R, lenR);
-
-            do
-            {
-                TEMPLATE(T, inv) (inv, V3 + (lenV3 - 1), ctx);
-                _TEMPLATE(T, poly_divrem) (Q, R, D, lenD, V3, lenV3, inv, ctx);
-                lenQ = lenD - lenV3 + 1;
-                lenR = lenV3 - 1;
-                TEMPLATE(CAP_T, VEC_NORM) (R, lenR, ctx);
-
-                if (lenV1 >= lenQ)
-                    _TEMPLATE(T, poly_mul) (W, V1, lenV1, Q, lenQ, ctx);
-                else
-                    _TEMPLATE(T, poly_mul) (W, Q, lenQ, V1, lenV1, ctx);
-                lenW = lenQ + lenV1 - 1;
-
-                _TEMPLATE(T, poly_sub) (U, U, lenU, W, lenW, ctx);
-                lenU = FLINT_MAX(lenU, lenW);
-                TEMPLATE(CAP_T, VEC_NORM) (U, lenU, ctx);
-
-                TEMPLATE(CAP_T, VEC_SWAP) (U, lenU, V1, lenV1);
-                {
-                    TEMPLATE(T, struct) * __t;
-                    slong __tn;
-
-                    __t = D;
-                    D = V3;
-                    V3 = R;
-                    R = __t;
-                    __tn = lenD;
-                    lenD = lenV3;
-                    lenV3 = lenR;
-                    lenR = __tn;
-                }
-
-            } while (lenV3 != 0);
-
-            _TEMPLATE(T, vec_set) (G, D, lenD, ctx);
-            _TEMPLATE(T, vec_set) (S, U, lenU, ctx);
-            {
-                lenQ = lenA + lenU - 1;
-
-                _TEMPLATE(T, poly_mul) (Q, A, lenA, S, lenU, ctx);
-                _TEMPLATE(T, poly_neg) (Q, Q, lenQ, ctx);
-                _TEMPLATE(T, poly_add) (Q, G, lenD, Q, lenQ, ctx);
-
-                _TEMPLATE(T, poly_divrem) (T, W, Q, lenQ, B, lenB, invB, ctx);
-            }
-
-            _TEMPLATE(T, vec_clear) (W, FLINT_MAX(5 * lenB, lenA + lenB), ctx);
-            _TEMPLATE(T, vec_clear) (Q, 2 * lenA, ctx);
-            TEMPLATE(T, clear) (inv, ctx);
-
-            return lenD;
-        }
-    }
+    return lenG;
 }
 
 void
-TEMPLATE(T, poly_xgcd_euclidean) (TEMPLATE(T, poly_t) G,
+TEMPLATE(T, poly_xgcd) (TEMPLATE(T, poly_t) G,
                                   TEMPLATE(T, poly_t) S, TEMPLATE(T, poly_t) T,
                                   const TEMPLATE(T, poly_t) A,
                                   const TEMPLATE(T, poly_t) B,
@@ -140,7 +54,7 @@ TEMPLATE(T, poly_xgcd_euclidean) (TEMPLATE(T, poly_t) G,
 {
     if (A->length < B->length)
     {
-        TEMPLATE(T, poly_xgcd_euclidean) (G, T, S, B, A, ctx);
+        TEMPLATE(T, poly_xgcd) (G, T, S, B, A, ctx);
     }
     else                        /* lenA >= lenB >= 0 */
     {
@@ -202,8 +116,8 @@ TEMPLATE(T, poly_xgcd_euclidean) (TEMPLATE(T, poly_t) G,
             }
 
             TEMPLATE(T, inv) (inv, TEMPLATE(T, poly_lead) (B, ctx), ctx);
-            lenG = _TEMPLATE(T, poly_xgcd_euclidean) (g, s, t, A->coeffs, lenA,
-                                                      B->coeffs, lenB, inv,
+            lenG = _TEMPLATE(T, poly_xgcd) (g, s, t, A->coeffs, lenA,
+                                                      B->coeffs, lenB,
                                                       ctx);
 
             if (G == A || G == B)
@@ -211,21 +125,21 @@ TEMPLATE(T, poly_xgcd_euclidean) (TEMPLATE(T, poly_t) G,
                 _TEMPLATE(T, vec_clear) (G->coeffs, G->alloc, ctx);
                 G->coeffs = g;
                 G->alloc = FLINT_MIN(lenA, lenB);
-		G->length = G->alloc;
+                G->length = G->alloc;
             }
             if (S == A || S == B)
             {
                 _TEMPLATE(T, vec_clear) (S->coeffs, S->alloc, ctx);
                 S->coeffs = s;
                 S->alloc = lenB;
-		S->length = S->alloc;
+                S->length = S->alloc;
             }
             if (T == A || T == B)
             {
                 _TEMPLATE(T, vec_clear) (T->coeffs, T->alloc, ctx);
                 T->coeffs = t;
                 T->alloc = lenA;
-		T->length = T->alloc;
+                T->length = T->alloc;
             }
 
             _TEMPLATE(T, poly_set_length) (G, lenG, ctx);
