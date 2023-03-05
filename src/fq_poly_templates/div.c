@@ -80,5 +80,14 @@ TEMPLATE(T, poly_div) (TEMPLATE(T, poly_t) Q,
     TEMPLATE(T, clear) (invB, ctx);
 }
 
+/* flint 2.x compatibility needed by Nemo */
+void
+TEMPLATE(T, poly_div_basecase) (TEMPLATE(T, poly_t) Q,
+                                const TEMPLATE(T, poly_t) A,
+                                const TEMPLATE(T, poly_t) B,
+                                const TEMPLATE(T, ctx_t) ctx)
+{
+    TEMPLATE(T, poly_div) (Q, A, B, ctx);
+}
 
 #endif
