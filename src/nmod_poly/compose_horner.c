@@ -35,7 +35,10 @@ _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, slong len1,
         const slong alloc = (len1 - 1) * (len2 - 1) + 1;
         slong i = len1 - 1, lenr = len2;
         mp_limb_t *t, *t1, *t2;
-        t = _nmod_vec_init(alloc);
+        TMP_INIT;
+
+        TMP_START;
+        t = TMP_ALLOC(alloc * sizeof(mp_limb_t));
 
         if (len1 % 2 == 0)
         {
@@ -62,7 +65,8 @@ _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, slong len1,
             MP_PTR_SWAP(t1, t2);
             t1[0] = n_addmod(t1[0], poly1[i], mod.n);
         }
-        _nmod_vec_clear(t);
+
+        TMP_END;
     }
 }
 

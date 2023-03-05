@@ -884,16 +884,15 @@ FLINT_DLL void _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1,
 FLINT_DLL void nmod_poly_compose_horner(nmod_poly_t res, 
                              const nmod_poly_t poly1, const nmod_poly_t poly2);
 
-FLINT_DLL void _nmod_poly_compose_divconquer(mp_ptr res, mp_srcptr poly1, slong len1, 
-                                       mp_srcptr poly2, slong len2, nmod_t mod);
-FLINT_DLL void nmod_poly_compose_divconquer(nmod_poly_t res, 
-                             const nmod_poly_t poly1, const nmod_poly_t poly2);
-
 FLINT_DLL void _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, slong len1, 
                                        mp_srcptr poly2, slong len2, nmod_t mod);
 
 FLINT_DLL void nmod_poly_compose(nmod_poly_t res, 
                              const nmod_poly_t poly1, const nmod_poly_t poly2);
+
+/* obsolete implementation */
+#define _nmod_poly_compose_divconquer _nmod_poly_compose
+#define nmod_poly_compose_divconquer nmod_poly_compose
 
 /* Taylor shift  *************************************************************/
 

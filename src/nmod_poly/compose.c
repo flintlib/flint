@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2010 William Hart
     Copyright (C) 2010, 2012 Sebastian Pancratz
+    Copyright (C) 2023 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -11,6 +12,7 @@
 */
 
 #include "nmod_poly.h"
+#include "gr_poly.h"
 
 void
 _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, slong len1, 
@@ -23,7 +25,13 @@ _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, slong len1,
     else if (len1 <= 7)
         _nmod_poly_compose_horner(res, poly1, len1, poly2, len2, mod);
     else
-        _nmod_poly_compose_divconquer(res, poly1, len1, poly2, len2, mod);
+    {
+        /* delegates to Taylor shift, divconquer */
+        /* todo: also incorporate the nmod_poly Taylor shift in gr_poly */
+        gr_ctx_t ctx;
+        _gr_ctx_init_nmod(ctx, &mod);
+        GR_MUST_SUCCEED(_gr_poly_compose(res, poly1, len1, poly2, len2, ctx));
+    }
 }
 
 void nmod_poly_compose(nmod_poly_t res, 
@@ -49,14 +57,14 @@ void nmod_poly_compose(nmod_poly_t res,
         if (res != poly1 && res != poly2)
         {
             nmod_poly_fit_length(res, lenr);
-            _nmod_poly_compose_horner(res->coeffs, poly1->coeffs, len1, 
+            _nmod_poly_compose(res->coeffs, poly1->coeffs, len1,
                                                    poly2->coeffs, len2, poly1->mod);
         }
         else
         {
             nmod_poly_t t;
             nmod_poly_init2(t, poly1->mod.n, lenr);
-            _nmod_poly_compose_horner(t->coeffs, poly1->coeffs, len1,
+            _nmod_poly_compose(t->coeffs, poly1->coeffs, len1,
                                                  poly2->coeffs, len2, poly1->mod);
             nmod_poly_swap(res, t);
             nmod_poly_clear(t);
