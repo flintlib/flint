@@ -164,25 +164,8 @@ void fmpz_mpoly_truncate(fmpz_mpoly_t A, slong newlen,
     }  
 }
 
-FMPZ_MPOLY_INLINE
-void fmpz_mpoly_fit_bits(fmpz_mpoly_t A,
-                                  flint_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx)
-{
-   if (A->bits < bits)
-   {
-      if (A->alloc != 0)
-      {
-         slong N = mpoly_words_per_exp(bits, ctx->minfo);
-         ulong * t = (ulong *) flint_malloc(N*A->alloc*sizeof(ulong));
-         mpoly_repack_monomials(t, bits, A->exps, A->bits, A->length, ctx->minfo);
-         flint_free(A->exps);
-         A->exps = t;
-      }
-
-      A->bits = bits;
-   }
-}
-
+FLINT_DLL void fmpz_mpoly_fit_bits(fmpz_mpoly_t A,
+                                  flint_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx);
 
 /* Input/output **************************************************************/
 
