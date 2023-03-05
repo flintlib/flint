@@ -19,6 +19,9 @@ _gr_poly_divrem_generic(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B
 {
     int status;
 
+    if (lenB == 1)
+        return _gr_poly_divrem_basecase(Q, R, A, lenA, B, lenB, ctx);
+
     status = _gr_poly_divrem_newton(Q, R, A, lenA, B, lenB, ctx);
 
     if (status != GR_SUCCESS)

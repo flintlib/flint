@@ -85,7 +85,7 @@ TEMPLATE(T, poly_divrem_f) (TEMPLATE(T, t) f,
         r = R->coeffs;
     }
 
-    _TEMPLATE(T, poly_divrem_divconquer) (q, r, A->coeffs, lenA,
+    _TEMPLATE(T, poly_divrem) (q, r, A->coeffs, lenA,
                                           B->coeffs, lenB, invB, ctx);
 
     if (Q == A || Q == B)

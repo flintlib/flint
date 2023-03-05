@@ -1,4 +1,6 @@
 /*
+    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2009 William Hart
     Copyright (C) 2013 Mike Hansen
 
     This file is part of FLINT.
@@ -9,14 +11,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech_poly.h"
+#include "fq_poly.h"
+
+
 
 #ifdef T
 #undef T
 #endif
 
-#define T fq_zech
-#define CAP_T FQ_ZECH
-#include "fq_poly_templates/test/t-divrem_divconquer.c"
+#define T fq
+#define CAP_T FQ
+#include "fq_poly_templates/test/t-div.c"
 #undef CAP_T
 #undef T

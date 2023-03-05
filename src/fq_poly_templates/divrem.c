@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2012 Sebastian Pancratz
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2023 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -13,36 +14,27 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
 
 void
-_TEMPLATE(T, poly_divrem_basecase) (TEMPLATE(T, struct) * Q,
+_TEMPLATE(T, poly_divrem) (TEMPLATE(T, struct) * Q,
                                     TEMPLATE(T, struct) * R,
                                     const TEMPLATE(T, struct) * A, slong lenA,
                                     const TEMPLATE(T, struct) * B, slong lenB,
                                     const TEMPLATE(T, t) invB,
                                     const TEMPLATE(T, ctx_t) ctx)
 {
-    slong iQ, iR;
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
 
-    if (R != A)
-        _TEMPLATE(T, poly_set) (R, A, lenA, ctx);
-
-    for (iQ = lenA - lenB, iR = lenA - 1; iQ >= 0; iQ--, iR--)
-    {
-        if (TEMPLATE(T, is_zero) (R + iR, ctx))
-            TEMPLATE(T, zero) (Q + iQ, ctx);
-        else
-        {
-            TEMPLATE(T, mul) (Q + iQ, R + iR, invB, ctx);
-
-            _TEMPLATE(T, TEMPLATE(poly_scalar_submul, T)) (R + iQ, B, lenB,
-                                                           Q + iQ, ctx);
-        }
-    }
+    if (lenB <= 10 || lenA - lenB <= 1)
+        GR_MUST_SUCCEED(_gr_poly_divrem_basecase_preinv1(Q, R, A, lenA, B, lenB, invB, gr_ctx));
+    else
+        GR_MUST_SUCCEED(_gr_poly_divrem_newton(Q, R, A, lenA, B, lenB, gr_ctx));  /* todo: pass invB */
 }
 
 void
-TEMPLATE(T, poly_divrem_basecase) (TEMPLATE(T, poly_t) Q,
+TEMPLATE(T, poly_divrem) (TEMPLATE(T, poly_t) Q,
                                    TEMPLATE(T, poly_t) R,
                                    const TEMPLATE(T, poly_t) A,
                                    const TEMPLATE(T, poly_t) B,
@@ -81,7 +73,7 @@ TEMPLATE(T, poly_divrem_basecase) (TEMPLATE(T, poly_t) Q,
         r = R->coeffs;
     }
 
-    _TEMPLATE(T, poly_divrem_basecase) (q, r, A->coeffs, lenA,
+    _TEMPLATE(T, poly_divrem) (q, r, A->coeffs, lenA,
                                         B->coeffs, lenB, invB, ctx);
 
     if (Q == A || Q == B)
@@ -107,6 +99,5 @@ TEMPLATE(T, poly_divrem_basecase) (TEMPLATE(T, poly_t) Q,
 
     TEMPLATE(T, clear) (invB, ctx);
 }
-
 
 #endif

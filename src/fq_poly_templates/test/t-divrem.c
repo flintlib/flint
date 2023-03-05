@@ -26,7 +26,7 @@ main(void)
     int i, result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("divrem_basecase... ");
+    flint_printf("divrem... ");
     fflush(stdout);
 
     /* Check q*b + r == a */
@@ -47,7 +47,7 @@ main(void)
         TEMPLATE(T, poly_randtest_not_zero) (b, state,
                                              n_randint(state, 50) + 1, ctx);
 
-        TEMPLATE(T, poly_divrem_basecase) (q, r, a, b, ctx);
+        TEMPLATE(T, poly_divrem) (q, r, a, b, ctx);
         TEMPLATE(T, poly_mul) (c, q, b, ctx);
         TEMPLATE(T, poly_add) (c, c, r, ctx);
 
@@ -95,8 +95,8 @@ main(void)
         TEMPLATE(T, poly_randtest_not_zero) (b, state,
                                              n_randint(state, 50) + 1, ctx);
 
-        TEMPLATE(T, poly_divrem_basecase) (q, r, a, b, ctx);
-        TEMPLATE(T, poly_divrem_basecase) (q, a, a, b, ctx);
+        TEMPLATE(T, poly_divrem) (q, r, a, b, ctx);
+        TEMPLATE(T, poly_divrem) (q, a, a, b, ctx);
 
         result = (TEMPLATE(T, poly_equal) (a, r, ctx));
         if (!result)
@@ -139,8 +139,8 @@ main(void)
         TEMPLATE(T, poly_randtest_not_zero) (b, state,
                                              n_randint(state, 50) + 1, ctx);
 
-        TEMPLATE(T, poly_divrem_basecase) (q, r, a, b, ctx);
-        TEMPLATE(T, poly_divrem_basecase) (q, b, a, b, ctx);
+        TEMPLATE(T, poly_divrem) (q, r, a, b, ctx);
+        TEMPLATE(T, poly_divrem) (q, b, a, b, ctx);
 
         result = (TEMPLATE(T, poly_equal) (b, r, ctx));
         if (!result)
@@ -183,8 +183,8 @@ main(void)
         TEMPLATE(T, poly_randtest_not_zero) (b, state,
                                              n_randint(state, 50) + 1, ctx);
 
-        TEMPLATE(T, poly_divrem_basecase) (q, r, a, b, ctx);
-        TEMPLATE(T, poly_divrem_basecase) (a, r, a, b, ctx);
+        TEMPLATE(T, poly_divrem) (q, r, a, b, ctx);
+        TEMPLATE(T, poly_divrem) (a, r, a, b, ctx);
 
         result = (TEMPLATE(T, poly_equal) (a, q, ctx));
         if (!result)
@@ -227,8 +227,8 @@ main(void)
         TEMPLATE(T, poly_randtest_not_zero) (b, state,
                                              n_randint(state, 50) + 1, ctx);
 
-        TEMPLATE(T, poly_divrem_basecase) (q, r, a, b, ctx);
-        TEMPLATE(T, poly_divrem_basecase) (b, r, a, b, ctx);
+        TEMPLATE(T, poly_divrem) (q, r, a, b, ctx);
+        TEMPLATE(T, poly_divrem) (b, r, a, b, ctx);
 
         result = (TEMPLATE(T, poly_equal) (b, q, ctx));
         if (!result)

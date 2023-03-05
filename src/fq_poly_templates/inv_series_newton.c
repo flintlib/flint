@@ -48,7 +48,7 @@ _TEMPLATE(T, poly_inv_series_newton) (TEMPLATE(T, struct) * Qinv,
             _TEMPLATE(T, poly_reverse) (Qrev, Q, n, n, ctx);
             _TEMPLATE(T, vec_zero) (W, 2 * n - 2, ctx);
             TEMPLATE(T, one) (W + (2 * n - 2), ctx);
-            _TEMPLATE(T, poly_div_basecase) (Qinv, W, W, 2 * n - 1, Qrev, n,
+            _TEMPLATE(T, poly_div) (Qinv, W, 2 * n - 1, Qrev, n,
                                              cinv, ctx);
             _TEMPLATE(T, poly_reverse) (Qinv, Qinv, n, n, ctx);
         }

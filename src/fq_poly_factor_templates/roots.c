@@ -71,7 +71,7 @@ try_again:
         goto try_again;
     }
 
-    TEMPLATE(T, poly_div_basecase)(b, f, a, ctx);
+    TEMPLATE(T, poly_div)(b, f, a, ctx);
 
     /* ensure deg a >= deg b */
     if (TEMPLATE(T, poly_degree)(a, ctx) < TEMPLATE(T, poly_degree)(b, ctx))

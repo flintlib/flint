@@ -1,6 +1,4 @@
 /*
-    Copyright (C) 2011 Sebastian Pancratz
-    Copyright (C) 2009 William Hart
     Copyright (C) 2013 Mike Hansen
 
     This file is part of FLINT.
@@ -11,16 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_poly.h"
-
-
+#include "fq_nmod_poly.h"
 
 #ifdef T
 #undef T
 #endif
 
-#define T fq
-#define CAP_T FQ
-#include "fq_poly_templates/test/t-div_basecase.c"
+#define T fq_nmod
+#define CAP_T FQ_NMOD
+#include "fq_poly_templates/test/t-divrem.c"
 #undef CAP_T
 #undef T

@@ -833,27 +833,6 @@ Euclidean division
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fq_poly_divrem_basecase(fq_struct *Q, fq_struct *R, const fq_struct *A, slong lenA, const fq_struct *B, slong lenB, const fq_t invB, const fq_ctx_t ctx)
-
-    Computes ``(Q, lenA - lenB + 1)``, ``(R, lenA)`` such that
-    `A = B Q + R` with `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
-
-    Assumes that the leading coefficient of `B` is invertible
-    and that ``invB`` is its inverse.
-
-    Assumes that `\operatorname{len}(A), \operatorname{len}(B) > 0`.  Allows zero-padding in
-    ``(A, lenA)``.  `R` and `A` may be aliased, but apart from
-    this no aliasing of input and output operands is allowed.
-
-.. function:: void fq_poly_divrem_basecase(fq_poly_t Q, fq_poly_t R, const fq_poly_t A, const fq_poly_t B, const fq_ctx_t ctx)
-
-    Computes `Q`, `R` such that `A = B Q + R` with
-    `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
-
-    Assumes that the leading coefficient of `B` is invertible.  This can
-    be taken for granted the context is for a finite field, that is, when
-    `p` is prime and `f(X)` is irreducible.
-
 .. function:: void _fq_poly_divrem(fq_struct *Q, fq_struct *R, const fq_struct *A, slong lenA, const fq_struct *B, slong lenB, const fq_t invB, const fq_ctx_t ctx)
 
     Computes ``(Q, lenA - lenB + 1)``, ``(R, lenA)`` such that
@@ -899,57 +878,17 @@ Euclidean division
     Sets ``R`` to the remainder of the division of ``A`` by
     ``B`` in the context described by ``ctx``.
 
-.. function:: void _fq_poly_div_basecase(fq_struct *Q, fq_struct *R, const fq_struct *A, slong lenA, const fq_struct *B, slong lenB, const fq_t invB, const fq_ctx_t ctx)
+.. function:: void _fq_poly_div(fq_struct *Q, const fq_struct *A, slong lenA, const fq_struct *B, slong lenB, const fq_t invB, const fq_ctx_t ctx)
 
     Notationally, computes `Q`, `R` such that `A = B Q + R` with `0
     \leq \operatorname{len}(R) < \operatorname{len}(B)` but only sets ``(Q, lenA - lenB + 1)``.
+    Allows zero-padding in `A` but not in `B`.  Assumes that the leading coefficient of `B` is a unit.
 
-    Requires temporary space ``(R, lenA)``.  If ``R`` is
-    ``NULL``, then the temporary space will be allocated.  Allows
-    aliasing only between `A` and `R`.  Allows zero-padding in `A` but
-    not in `B`.  Assumes that the leading coefficient of `B` is a
-    unit.
-
-.. function:: void fq_poly_div_basecase(fq_poly_t Q, const fq_poly_t A, const fq_poly_t B, const fq_ctx_t ctx)
+.. function:: void fq_poly_div(fq_poly_t Q, const fq_poly_t A, const fq_poly_t B, const fq_ctx_t ctx)
 
     Notionally finds polynomials `Q` and `R` such that `A = B Q + R` with
     `\operatorname{len}(R) < \operatorname{len}(B)`, but returns only ``Q``. If `\operatorname{len}(B) = 0` an
     exception is raised.
-
-.. function:: void _fq_poly_divrem_divconquer_recursive(fq_struct * Q, fq_struct * BQ, fq_struct * W, const fq_struct * A, const fq_struct * B, slong lenB, const fq_t invB, const fq_ctx_t ctx)
-
-    Computes ``(Q, lenB)``, ``(BQ, 2 lenB - 1)`` such that
-    `BQ = B \times Q` and `A = B Q + R` where `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
-
-    Assumes that the leading coefficient of `B` is invertible and that
-    ``invB`` is the inverse.
-
-    Assumes `\operatorname{len}(B) > 0`.  Allows zero-padding in ``(A, lenA)``.  Requires
-    a temporary array ``(W, 2 lenB - 1)``.  No aliasing of input and output
-    operands is allowed.
-
-    This function does not read the bottom `\operatorname{len}(B) - 1` coefficients from
-    `A`, which means that they might not even need to exist in allocated
-    memory.
-
-.. function:: void _fq_poly_divrem_divconquer(fq_struct * Q, fq_struct * R, const fq_struct * A, slong lenA, const fq_struct * B, slong lenB, const fq_t invB, const fq_ctx_t ctx)
-
-    Computes ``(Q, lenA - lenB + 1)``, ``(R, lenA)`` such that
-    `A = B Q + R` and `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
-
-    Assumes that the leading coefficient of `B` is invertible and that
-    ``invB`` is the inverse.
-
-    Assumes `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`.  Allows zero-padding in
-    ``(A, lenA)``.  No aliasing of input and output operands is
-    allowed.
-
-.. function:: void fq_poly_divrem_divconquer(fq_poly_t Q, fq_poly_t R, const fq_poly_t A, const fq_poly_t B, const fq_ctx_t ctx)
-
-    Computes `Q`, `R` such that `A = B Q + R` and `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
-
-    Assumes that `B` is non-zero and that the leading coefficient of
-    `B` is invertible.
 
 .. function:: void _fq_poly_div_newton_n_preinv(fq_struct* Q, const fq_struct* A, slong lenA, const fq_struct* B, slong lenB, const fq_struct* Binv, slong lenBinv, const fq_struct ctx_t)
 

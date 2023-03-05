@@ -2,6 +2,7 @@
     Copyright (C) 2011, 2010 Sebastian Pancratz
     Copyright (C) 2008, 2009 William Hart
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2023 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -14,53 +15,26 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
 
 void
-_TEMPLATE(T, poly_div_basecase) (TEMPLATE(T, struct) * Q,
-                                 TEMPLATE(T, struct) * R,
+_TEMPLATE(T, poly_div) (TEMPLATE(T, struct) * Q,
                                  const TEMPLATE(T, struct) * A, slong lenA,
                                  const TEMPLATE(T, struct) * B, slong lenB,
                                  const TEMPLATE(T, t) invB,
                                  const TEMPLATE(T, ctx_t) ctx)
 {
-    const slong alloc = (R == NULL) ? lenA : 0;
-    slong lenR = lenB - 1, iQ;
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
 
-    if (alloc)
-        R = _TEMPLATE(T, vec_init) (alloc, ctx);
-    if (R != A)
-        _TEMPLATE(T, vec_set) (R + lenR, A + lenR, lenA - lenR, ctx);
-
-    for (iQ = lenA - lenB; iQ >= 0; iQ--)
-    {
-        if (TEMPLATE(T, is_zero) (R + lenA - 1, ctx))
-        {
-            TEMPLATE(T, zero) (Q + iQ, ctx);
-        }
-        else
-        {
-            TEMPLATE(T, mul) (Q + iQ, R + lenA - 1, invB, ctx);
-
-            _TEMPLATE(T, TEMPLATE(vec_scalar_submul, T)) (R + lenA - lenR - 1,
-                                                          B, lenR, Q + iQ,
-                                                          ctx);
-        }
-
-        if (lenR - 1 >= iQ)
-        {
-            B++;
-            lenR--;
-        }
-
-        lenA--;
-    }
-
-    if (alloc)
-        _TEMPLATE(T, vec_clear) (R, alloc, ctx);
+    if (lenB <= 15 || lenA - lenB <= 15)
+        GR_MUST_SUCCEED(_gr_poly_div_basecase_preinv1(Q, A, lenA, B, lenB, invB, gr_ctx));
+    else
+        GR_MUST_SUCCEED(_gr_poly_div_newton(Q, A, lenA, B, lenB, gr_ctx));  /* todo: pass invB */
 }
 
 void
-TEMPLATE(T, poly_div_basecase) (TEMPLATE(T, poly_t) Q,
+TEMPLATE(T, poly_div) (TEMPLATE(T, poly_t) Q,
                                 const TEMPLATE(T, poly_t) A,
                                 const TEMPLATE(T, poly_t) B,
                                 const TEMPLATE(T, ctx_t) ctx)
@@ -88,8 +62,8 @@ TEMPLATE(T, poly_div_basecase) (TEMPLATE(T, poly_t) Q,
         q = Q->coeffs;
     }
 
-    _TEMPLATE(T, poly_div_basecase) (q, NULL, A->coeffs, lenA,
-                                     B->coeffs, lenB, invB, ctx);
+    _TEMPLATE(T, poly_div) (q, A->coeffs, lenA,
+                               B->coeffs, lenB, invB, ctx);
 
     if (Q == A || Q == B)
     {

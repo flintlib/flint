@@ -21,10 +21,10 @@ main(void)
     int i, result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("div_basecase....");
+    flint_printf("div....");
     fflush(stdout);
 
-    /* Compare to divrem_basecase */
+    /* Compare to divrem */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
@@ -42,8 +42,8 @@ main(void)
         TEMPLATE(T, poly_randtest_not_zero) (b, state,
                                              n_randint(state, 100) + 1, ctx);
 
-        TEMPLATE(T, poly_div_basecase) (q, a, b, ctx);
-        TEMPLATE(T, poly_divrem_basecase) (q2, r2, a, b, ctx);
+        TEMPLATE(T, poly_div) (q, a, b, ctx);
+        TEMPLATE(T, poly_divrem) (q2, r2, a, b, ctx);
 
         result = (TEMPLATE(T, poly_equal) (q, q2, ctx));
         if (!result)
@@ -88,8 +88,8 @@ main(void)
         TEMPLATE(T, poly_randtest_not_zero) (b, state,
                                              n_randint(state, 100) + 1, ctx);
 
-        TEMPLATE(T, poly_div_basecase) (q, a, b, ctx);
-        TEMPLATE(T, poly_div_basecase) (a, a, b, ctx);
+        TEMPLATE(T, poly_div) (q, a, b, ctx);
+        TEMPLATE(T, poly_div) (a, a, b, ctx);
 
         result = (TEMPLATE(T, poly_equal) (q, a, ctx));
         if (!result)
@@ -128,8 +128,8 @@ main(void)
         TEMPLATE(T, poly_randtest_not_zero) (b, state,
                                              n_randint(state, 100) + 1, ctx);
 
-        TEMPLATE(T, poly_div_basecase) (q, a, b, ctx);
-        TEMPLATE(T, poly_div_basecase) (b, a, b, ctx);
+        TEMPLATE(T, poly_div) (q, a, b, ctx);
+        TEMPLATE(T, poly_div) (b, a, b, ctx);
 
         result = (TEMPLATE(T, poly_equal) (q, b, ctx));
         if (!result)

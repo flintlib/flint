@@ -317,6 +317,83 @@ _gr_fq_zech_pth_root(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+void
+_gr_fq_zech_vec_init(fq_zech_struct * vec, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        fq_zech_init(vec + i, FQ_CTX(ctx));
+}
+
+void
+_gr_fq_zech_vec_clear(fq_zech_struct * vec, slong len, gr_ctx_t ctx)
+{
+}
+
+void
+_gr_fq_zech_vec_swap(fq_zech_struct * vec1, fq_zech_struct * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        fq_zech_swap(vec1 + i, vec2 + i, FQ_CTX(ctx));
+}
+
+int
+_gr_fq_zech_vec_set(fq_zech_struct * res, const fq_zech_struct * vec, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        res[i] = vec[i];
+
+    return GR_SUCCESS;
+}
+
+int
+_gr_fq_zech_vec_normalise(slong * res, const fq_zech_struct * vec, slong len, gr_ctx_t ctx)
+{
+    while (len > 0 && fq_zech_is_zero(vec + len - 1, FQ_CTX(ctx)))
+        len--;
+
+    res[0] = len;
+    return GR_SUCCESS;
+}
+
+slong
+_gr_fq_zech_vec_normalise_weak(const fq_zech_struct * vec, slong len, gr_ctx_t ctx)
+{
+    while (len > 0 && fq_zech_is_zero(vec + len - 1, FQ_CTX(ctx)))
+        len--;
+
+    return len;
+}
+
+int
+_gr_fq_zech_vec_mul_scalar(fq_zech_struct * res, const fq_zech_struct * vec, slong len, const fq_zech_t x, gr_ctx_t ctx)
+{
+    _fq_zech_vec_scalar_mul_fq_zech(res, vec, len, x, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fq_zech_vec_addmul_scalar(fq_zech_struct * res, const fq_zech_struct * vec, slong len, const fq_zech_t x, gr_ctx_t ctx)
+{
+    /* the poly method checks for special cases. worth it? */
+    _fq_zech_poly_scalar_addmul_fq_zech(res, vec, len, x, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fq_zech_vec_submul_scalar(fq_zech_struct * res, const fq_zech_struct * vec, slong len, const fq_zech_t x, gr_ctx_t ctx)
+{
+    /* the poly method checks for special cases. worth it? */
+    _fq_zech_poly_scalar_submul_fq_zech(res, vec, len, x, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+
 /* todo: _fq_zech_poly_mullow should do the right thing */
 int
 _gr_fq_zech_poly_mullow(fq_zech_struct * res,
@@ -454,6 +531,16 @@ gr_method_tab_input _fq_zech_methods_input[] =
     {GR_METHOD_FQ_TRACE,                (gr_funcptr) _gr_fq_zech_trace},
     {GR_METHOD_FQ_IS_PRIMITIVE,         (gr_funcptr) _gr_fq_zech_is_primitive},
     {GR_METHOD_FQ_PTH_ROOT,             (gr_funcptr) _gr_fq_zech_pth_root},
+
+    {GR_METHOD_VEC_INIT,            (gr_funcptr) _gr_fq_zech_vec_init},
+    {GR_METHOD_VEC_CLEAR,           (gr_funcptr) _gr_fq_zech_vec_clear},
+    {GR_METHOD_VEC_SET,             (gr_funcptr) _gr_fq_zech_vec_set},
+    {GR_METHOD_VEC_SWAP,            (gr_funcptr) _gr_fq_zech_vec_swap},
+    {GR_METHOD_VEC_NORMALISE,       (gr_funcptr) _gr_fq_zech_vec_normalise},
+    {GR_METHOD_VEC_NORMALISE_WEAK,  (gr_funcptr) _gr_fq_zech_vec_normalise_weak},
+    {GR_METHOD_VEC_MUL_SCALAR,            (gr_funcptr) _gr_fq_zech_vec_mul_scalar},
+    {GR_METHOD_VEC_ADDMUL_SCALAR,            (gr_funcptr) _gr_fq_zech_vec_addmul_scalar},
+    {GR_METHOD_VEC_SUBMUL_SCALAR,            (gr_funcptr) _gr_fq_zech_vec_submul_scalar},
 
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fq_zech_poly_mullow},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fq_zech_roots_gr_poly},
