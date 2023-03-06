@@ -64,17 +64,13 @@ int _fmpz_mod_poly_divides_classical(fmpz * Q, const fmpz * A, slong lenA,
                           const fmpz * B, slong lenB, const fmpz_mod_ctx_t ctx)
 {    
     slong lenQ = lenA - lenB + 1;
-    fmpz * W;
     int res;
     fmpz_t invB;
-
-    W = _fmpz_vec_init(lenA);
 
     fmpz_init(invB);
     fmpz_invmod(invB, B + lenB - 1, fmpz_mod_ctx_modulus(ctx));
 
-    _fmpz_mod_poly_div_basecase(Q, W, A, lenA,
-		                     B, lenB, invB, fmpz_mod_ctx_modulus(ctx));
+    _fmpz_mod_poly_div(Q, A, lenA, B, lenB, invB, ctx);
     /* check coefficients of product one at a time */
     res = _fmpz_mod_poly_mullow_classical_check(A, Q, lenQ, B, lenB - 1, ctx);
 		    
@@ -82,7 +78,6 @@ int _fmpz_mod_poly_divides_classical(fmpz * Q, const fmpz * A, slong lenA,
         _fmpz_vec_zero(Q, lenQ);
 
     fmpz_clear(invB);
-    _fmpz_vec_clear(W, lenA);
 
     return res;
 }

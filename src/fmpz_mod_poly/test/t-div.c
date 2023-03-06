@@ -25,27 +25,27 @@ main(void)
     fmpz_mod_ctx_t ctx;
     FLINT_TEST_INIT(state);
 
-    flint_printf("div_newton....");
+    flint_printf("div....");
     fflush(stdout);
 
     fmpz_mod_ctx_init_ui(ctx, 2);
 
-    /* Compare with divrem_divconquer, no aliasing */
+    /* Compare to divrem */
     for (i = 0; i < 500 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
-        fmpz_mod_poly_t a, b, q, r, q2;
+        fmpz_mod_poly_t a, b, q, q2, r2;
 
         fmpz_init(p);
-        fmpz_randtest_unsigned(p, state, 2*FLINT_BITS);
+        fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);
         fmpz_add_ui(p, p, 2);
         fmpz_mod_ctx_set_modulus(ctx, p);
 
         fmpz_mod_poly_init(a, ctx);
         fmpz_mod_poly_init(b, ctx);
         fmpz_mod_poly_init(q, ctx);
-        fmpz_mod_poly_init(r, ctx);
         fmpz_mod_poly_init(q2, ctx);
+        fmpz_mod_poly_init(r2, ctx);
         fmpz_mod_poly_randtest(a, state, n_randint(state, 100), ctx);
         fmpz_mod_poly_randtest_not_zero(b, state, n_randint(state, 100) + 1, ctx);
 
@@ -63,18 +63,19 @@ main(void)
             fmpz_clear(d);
         }
 
-        fmpz_mod_poly_divrem_divconquer(q, r, a, b, ctx);
-        fmpz_mod_poly_div_newton(q2, a, b, ctx);
+        fmpz_mod_poly_div(q, a, b, ctx);
+        fmpz_mod_poly_divrem(q2, r2, a, b, ctx);
 
         result = (fmpz_mod_poly_equal(q, q2, ctx));
         if (!result)
         {
-            flint_printf("FAIL #1:\n");
+            flint_printf("FAIL:\n");
             flint_printf("p = "), fmpz_print(p), flint_printf("\n\n");
             flint_printf("a = "), fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
             flint_printf("b = "), fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
             flint_printf("q = "), fmpz_mod_poly_print(q, ctx), flint_printf("\n\n");
             flint_printf("q2 = "), fmpz_mod_poly_print(q2, ctx), flint_printf("\n\n");
+            flint_printf("r2 = "), fmpz_mod_poly_print(r2, ctx), flint_printf("\n\n");
             fflush(stdout);
             flint_abort();
         }
@@ -82,8 +83,8 @@ main(void)
         fmpz_mod_poly_clear(a, ctx);
         fmpz_mod_poly_clear(b, ctx);
         fmpz_mod_poly_clear(q, ctx);
-        fmpz_mod_poly_clear(r, ctx);
         fmpz_mod_poly_clear(q2, ctx);
+        fmpz_mod_poly_clear(r2, ctx);
         fmpz_clear(p);
     }
 
@@ -118,13 +119,13 @@ main(void)
             fmpz_clear(d);
         }
 
-        fmpz_mod_poly_div_newton(q, a, b, ctx);
-        fmpz_mod_poly_div_newton(a, a, b, ctx);
+        fmpz_mod_poly_div(q, a, b, ctx);
+        fmpz_mod_poly_div(a, a, b, ctx);
 
         result = (fmpz_mod_poly_equal(q, a, ctx));
         if (!result)
         {
-            flint_printf("FAIL #2:\n");
+            flint_printf("FAIL:\n");
             flint_printf("p = "), fmpz_print(p), flint_printf("\n\n");
             flint_printf("a = "), fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
             flint_printf("b = "), fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
@@ -153,7 +154,6 @@ main(void)
         fmpz_mod_poly_init(a, ctx);
         fmpz_mod_poly_init(b, ctx);
         fmpz_mod_poly_init(q, ctx);
-
         fmpz_mod_poly_randtest(a, state, n_randint(state, 100), ctx);
         fmpz_mod_poly_randtest_not_zero(b, state, n_randint(state, 100) + 1, ctx);
 
@@ -171,13 +171,13 @@ main(void)
             fmpz_clear(d);
         }
 
-        fmpz_mod_poly_div_newton(q, a, b, ctx);
-        fmpz_mod_poly_div_newton(b, a, b, ctx);
+        fmpz_mod_poly_div(q, a, b, ctx);
+        fmpz_mod_poly_div(b, a, b, ctx);
 
         result = (fmpz_mod_poly_equal(q, b, ctx));
         if (!result)
         {
-            flint_printf("FAIL #3:\n");
+            flint_printf("FAIL:\n");
             flint_printf("p = "), fmpz_print(p), flint_printf("\n\n");
             flint_printf("a = "), fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
             flint_printf("b = "), fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");

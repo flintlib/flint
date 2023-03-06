@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2011, 2010 Sebastian Pancratz
     Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2023 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -13,60 +14,22 @@
 #include <stdlib.h>
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
+#include "gr_poly.h"
 
-void _fmpz_mod_poly_div_basecase(fmpz *Q, fmpz *R, 
+void _fmpz_mod_poly_div(fmpz * Q, 
     const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
-    const fmpz_t invB, const fmpz_t p)
+    const fmpz_t invB, const fmpz_mod_ctx_t ctx)
 {
-    const slong alloc = (R == NULL) ? lenA : 0;
-    slong lenR = lenB - 1, iQ;
-    TMP_INIT;
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
 
-	TMP_START;
-
-    if (alloc)
-    {
-        FMPZ_VEC_TMP_INIT(R, alloc);
-    }
-
-    if (R != A)
-        _fmpz_vec_set(R + lenR, A + lenR, lenA - lenR);
-
-    for (iQ = lenA - lenB; iQ >= 0; iQ--)
-    {
-        if (fmpz_is_zero(R + lenA - 1))
-        {
-            fmpz_zero(Q + iQ);
-        }
-        else
-        {
-            fmpz_mul(Q + iQ, R + lenA - 1, invB);
-            fmpz_mod(Q + iQ, Q + iQ, p);
-
-            _fmpz_vec_scalar_submul_fmpz(R + lenA - lenR - 1, B, lenR, Q + iQ);
-        }
-        if (iQ > 0)
-            fmpz_mod(R + lenA - 2, R + lenA - 2, p);
-
-        if (lenR - 1 >= iQ)
-        {
-            B++;
-            lenR--;
-        }
-
-        lenA--;
-    }
-
-    if (alloc)
-    {
-        FMPZ_VEC_TMP_CLEAR(R, alloc);
-    }
-
-	TMP_END;
+    if (lenB <= 15 || lenA - lenB <= 15)
+        GR_MUST_SUCCEED(_gr_poly_div_basecase_preinv1(Q, A, lenA, B, lenB, invB, gr_ctx));
+    else
+        GR_MUST_SUCCEED(_gr_poly_div_newton(Q, A, lenA, B, lenB, gr_ctx));  /* todo: pass inverse */
 }
 
-void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
-                             const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
+void fmpz_mod_poly_div(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
 {
     const slong lenA = A->length, lenB = B->length, lenQ = lenA - lenB + 1;
     fmpz *q;
@@ -105,8 +68,7 @@ void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
         q = Q->coeffs;
     }
 
-    _fmpz_mod_poly_div_basecase(q, NULL, A->coeffs, lenA,
-                             B->coeffs, lenB, invB, fmpz_mod_ctx_modulus(ctx));
+    _fmpz_mod_poly_div(q, A->coeffs, lenA, B->coeffs, lenB, invB, ctx);
 
     if (Q == A || Q == B)
     {

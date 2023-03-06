@@ -22,7 +22,7 @@ slong _fmpz_mod_poly_hgcd(fmpz **M, slong *lenM,
     slong sgnM;
     gr_ctx_t ctx;
 
-    gr_ctx_init_fmpz_mod(ctx, mod);  /* todo: by ref */
+    gr_ctx_init_fmpz_mod(ctx, mod);
     GR_MUST_SUCCEED(_gr_poly_hgcd(&sgnM, (gr_ptr *) M, lenM, A, lenA, B, lenB, a, lena, b, lenb, FMPZ_MOD_POLY_HGCD_CUTOFF, ctx));
     gr_ctx_clear(ctx);
 

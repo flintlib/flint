@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_mod.h"
+#include "gr.h"
 
 void fmpz_mod_ctx_init(fmpz_mod_ctx_t ctx, const fmpz_t n)
 {
@@ -64,4 +65,6 @@ void fmpz_mod_ctx_init(fmpz_mod_ctx_t ctx, const fmpz_t n)
             ctx->mul_fxn = _fmpz_mod_mul2;
         }
     }
+
+    ctx->is_prime = T_UNKNOWN;
 }

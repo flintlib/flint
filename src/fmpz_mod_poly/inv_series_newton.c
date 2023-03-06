@@ -17,6 +17,7 @@
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
+/* todo: change signature; use gr_poly */
 void 
 _fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n, 
                                  const fmpz_t cinv, const fmpz_t p)
@@ -42,12 +43,15 @@ _fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n,
 
         /* Base case */
         {
+            fmpz_mod_ctx_t fctx;
             fmpz *Qrev = W + 2 * FMPZ_MOD_POLY_INV_NEWTON_CUTOFF;
 
             _fmpz_poly_reverse(Qrev, Q, n, n);
             _fmpz_vec_zero(W, 2*n - 2);
             fmpz_one(W + (2*n - 2));
-            _fmpz_mod_poly_div_basecase(Qinv, W, W, 2*n - 1, Qrev, n, cinv, p);
+            fmpz_mod_ctx_init(fctx, p);
+            _fmpz_mod_poly_div(Qinv, W, 2*n - 1, Qrev, n, cinv, fctx);
+            fmpz_mod_ctx_clear(fctx);
             _fmpz_poly_reverse(Qinv, Qinv, n, n);
         }
         

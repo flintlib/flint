@@ -41,7 +41,7 @@ int _fmpz_mod_poly_divides(fmpz * Q, const fmpz * A, slong lenA,
 
 	_fmpz_vec_zero(R, lenB - 1);
 
-	_fmpz_mod_poly_div(Q, A, lenA, B, lenB, invB, p);
+	_fmpz_mod_poly_div(Q, A, lenA, B, lenB, invB, ctx);
 
         while (offset < lenB - 1)
         {

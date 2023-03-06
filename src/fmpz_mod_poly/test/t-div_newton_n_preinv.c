@@ -79,7 +79,7 @@ main(void)
 
         fmpz_mod_poly_reverse (binv, b, b->length, ctx);
         fmpz_mod_poly_inv_series_newton (binv, binv, b->length, ctx);
-        fmpz_mod_poly_div_basecase(q, a, b, ctx);
+        fmpz_mod_poly_div(q, a, b, ctx);
         fmpz_mod_poly_div_newton_n_preinv(q2, a, b, binv, ctx);
 
         result = (fmpz_mod_poly_equal(q, q2, ctx));
