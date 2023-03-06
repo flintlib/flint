@@ -17,6 +17,7 @@
 #include "fmpz_mod_poly.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
+#include "gr_poly.h"
 
 slong _fmpz_mod_poly_minpoly_hgcd(fmpz* poly, 
                                   const fmpz* seq, slong len, const fmpz_t p)
@@ -45,8 +46,23 @@ slong _fmpz_mod_poly_minpoly_hgcd(fmpz* poly,
     leng = len;
     FMPZ_VEC_NORM(g, leng);
 
-    _fmpz_mod_poly_hgcd(M, lenM, 
-            A, &lenA, B, &lenB, f, len + 1, g, leng, p);
+    /* leng is invalid intput for hgcd. todo: change hgcd to allow this? */
+    if (leng == 0)
+    {
+        fmpz_one(M[0]);
+        fmpz_one(M[3]);
+        lenM[0] = lenM[3] = 1;
+        lenM[1] = lenM[2] = 0;
+        lenA = len + 1;
+        _fmpz_vec_set(A, f, lenA);
+        lenB = leng;
+        _fmpz_vec_set(B, g, leng);
+    }
+    else
+    {
+        _fmpz_mod_poly_hgcd(M, lenM, A, &lenA, B, &lenB, f, len + 1, g, leng, p);
+    }
+
     len_poly = lenM[0];
 
     /* one more step may be necessary */

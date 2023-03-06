@@ -876,11 +876,6 @@ void fmpz_mod_poly_gcd_f(fmpz_t f, fmpz_mod_poly_t G, const fmpz_mod_poly_t A,
     fmpz_mod_poly_gcd_euclidean_f(f, G, A, B, ctx);
 }
 
-FLINT_DLL slong _fmpz_mod_poly_hgcd_recursive(fmpz **M, slong *lenM, 
-    fmpz *A, slong *lenA, fmpz *B, slong *lenB, 
-    const fmpz *a, slong lena, const fmpz *b, slong lenb, 
-    fmpz *P, const fmpz_t mod, int flag, fmpz_mod_poly_res_t res);
-
 FLINT_DLL slong _fmpz_mod_poly_hgcd(fmpz **M, slong *lenM, 
                      fmpz *A, slong *lenA, fmpz *B, slong *lenB, 
                      const fmpz *a, slong lena, const fmpz *b, slong lenb, 
