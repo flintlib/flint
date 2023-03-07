@@ -20,7 +20,6 @@
 
 #include <stdio.h>
 #include <gmp.h>
-#define ulong mp_limb_t
 
 #include "fmpq_mpoly.h"
 #include "fmpz_mpoly_factor.h"

@@ -45,7 +45,6 @@ FLINT_DLL int gettimeofday(struct timeval * p, void * tz);
 #elif !defined(_MSC_VER)
 #include <sys/resource.h>
 #endif
-#define ulong mp_limb_t
 
 #ifdef __cplusplus
  extern "C" {

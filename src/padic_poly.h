@@ -21,7 +21,6 @@
 #include <limits.h>
 
 #include <gmp.h>
-#define ulong mp_limb_t
 
 #include "fmpz.h"
 #include "fmpq.h"

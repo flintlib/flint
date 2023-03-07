@@ -21,7 +21,6 @@
 
 #include <stdlib.h>
 #include <gmp.h>
-#define ulong mp_limb_t
 
 #include "longlong.h"
 #include "ulong_extras.h"

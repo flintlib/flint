@@ -23,7 +23,6 @@
 #include <gmp.h>
 #include "flint.h"
 
-#define ulong mp_limb_t
 
 #ifdef __cplusplus
  extern "C" {

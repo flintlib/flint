@@ -20,7 +20,6 @@
 
 #include <stdio.h>
 #include <gmp.h>
-#define ulong mp_limb_t
 
 #include "nmod_poly.h"
 #include "fq_nmod_poly.h"
