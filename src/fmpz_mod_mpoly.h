@@ -18,7 +18,6 @@
 #define FMPZ_MOD_MPOLY_INLINE static __inline__
 #endif
 
-#define ulong ulongxx /* interferes with system includes */
 #include <stdio.h>
 
 #include <gmp.h>

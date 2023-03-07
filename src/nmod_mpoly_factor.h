@@ -18,7 +18,6 @@
 #define NMOD_MPOLY_FACTOR_INLINE static __inline__
 #endif
 
-#define ulong ulongxx /* interferes with system includes */
 #include <stdio.h>
 #include <gmp.h>
 #define ulong mp_limb_t

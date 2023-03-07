@@ -18,7 +18,6 @@
 #define DOUBLE_EXTRAS_INLINE static __inline__
 #endif
 
-#define ulong ulongxx /* interferes with system includes */
 #include <math.h>
 #include <float.h>
 #include <gmp.h>

@@ -18,7 +18,6 @@
 #define FFT_INLINE static __inline__
 #endif
 
-#define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
 #include <stdio.h>
 

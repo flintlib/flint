@@ -12,7 +12,6 @@
 #ifndef FLINT_H
 #define FLINT_H
 
-#define ulong ulongxx /* ensure vendor doesn't typedef ulong */
 #if !defined(_MSC_VER)
 #include <sys/param.h> /* for BSD define */
 #endif

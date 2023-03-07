@@ -14,7 +14,6 @@
 
 #include "flint.h"
 
-#define ulong ulongxx /* interferes with system includes */
 #include <time.h>
 #if defined( _MSC_VER )
 #include <intrin.h>

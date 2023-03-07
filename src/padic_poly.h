@@ -18,7 +18,6 @@
 #define PADIC_POLY_INLINE static __inline__
 #endif
 
-#define ulong ulongxx/* interferes with system includes */
 #include <limits.h>
 
 #include <gmp.h>
