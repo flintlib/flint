@@ -24,7 +24,7 @@ main(void)
     fmpz_mod_ctx_t ctx;
     FLINT_TEST_INIT(state);
 
-    flint_printf("gcd_euclidean....");
+    flint_printf("gcd....");
     fflush(stdout);
 
     fmpz_mod_ctx_init_ui(ctx, 2);
@@ -47,8 +47,8 @@ main(void)
         fmpz_mod_poly_randtest(a, state, n_randint(state, 100), ctx);
         fmpz_mod_poly_randtest(b, state, n_randint(state, 100), ctx);
 
-        fmpz_mod_poly_gcd_euclidean(c, a, b, ctx);
-        fmpz_mod_poly_gcd_euclidean(a, a, b, ctx);
+        fmpz_mod_poly_gcd(c, a, b, ctx);
+        fmpz_mod_poly_gcd(a, a, b, ctx);
 
         result = (fmpz_mod_poly_equal(a, c, ctx));
         if (!result)
@@ -83,8 +83,8 @@ main(void)
         fmpz_mod_poly_randtest(a, state, n_randint(state, 100), ctx);
         fmpz_mod_poly_randtest(b, state, n_randint(state, 100), ctx);
 
-        fmpz_mod_poly_gcd_euclidean(c, a, b, ctx);
-        fmpz_mod_poly_gcd_euclidean(b, a, b, ctx);
+        fmpz_mod_poly_gcd(c, a, b, ctx);
+        fmpz_mod_poly_gcd(b, a, b, ctx);
 
         result = (fmpz_mod_poly_equal(b, c, ctx));
         if (!result)
@@ -127,7 +127,7 @@ main(void)
         fmpz_mod_poly_randtest(a, state, n_randint(state, 100), ctx);
         fmpz_mod_poly_randtest(b, state, n_randint(state, 100), ctx);
 
-        fmpz_mod_poly_gcd_euclidean(g, a, b, ctx);
+        fmpz_mod_poly_gcd(g, a, b, ctx);
 
         if (fmpz_mod_poly_is_zero(g, ctx))
         {
@@ -137,7 +137,7 @@ main(void)
         {
             fmpz_mod_poly_divrem_basecase(c, s, a, g, ctx);
             fmpz_mod_poly_divrem_basecase(d, t, b, g, ctx);
-            fmpz_mod_poly_gcd_euclidean(h, c, d, ctx);
+            fmpz_mod_poly_gcd(h, c, d, ctx);
 
             result = (fmpz_mod_poly_is_zero(s, ctx) && fmpz_mod_poly_is_zero(t, ctx) 
                       && (h->length == 1) && (fmpz_is_one(h->coeffs)));
@@ -192,8 +192,8 @@ main(void)
         fmpz_mod_poly_mul(a, a, f, ctx);
         fmpz_mod_poly_mul(b, b, f, ctx);
 
-        fmpz_mod_poly_gcd_euclidean(c, a, b, ctx);
-        fmpz_mod_poly_gcd_euclidean(a, a, b, ctx);
+        fmpz_mod_poly_gcd(c, a, b, ctx);
+        fmpz_mod_poly_gcd(a, a, b, ctx);
 
         result = (fmpz_mod_poly_equal(a, c, ctx));
         if (!result)
@@ -233,8 +233,8 @@ main(void)
         fmpz_mod_poly_mul(a, a, f, ctx);
         fmpz_mod_poly_mul(b, b, f, ctx);
 
-        fmpz_mod_poly_gcd_euclidean(c, a, b, ctx);
-        fmpz_mod_poly_gcd_euclidean(b, a, b, ctx);
+        fmpz_mod_poly_gcd(c, a, b, ctx);
+        fmpz_mod_poly_gcd(b, a, b, ctx);
 
         result = (fmpz_mod_poly_equal(b, c, ctx));
         if (!result)
@@ -282,7 +282,7 @@ main(void)
         fmpz_mod_poly_mul(a, a, f, ctx);
         fmpz_mod_poly_mul(b, b, f, ctx);
 
-        fmpz_mod_poly_gcd_euclidean(g, a, b, ctx);
+        fmpz_mod_poly_gcd(g, a, b, ctx);
 
         if (fmpz_mod_poly_is_zero(g, ctx))
         {
@@ -292,7 +292,7 @@ main(void)
         {
             fmpz_mod_poly_divrem_basecase(c, s, a, g, ctx);
             fmpz_mod_poly_divrem_basecase(d, t, b, g, ctx);
-            fmpz_mod_poly_gcd_euclidean(h, c, d, ctx);
+            fmpz_mod_poly_gcd(h, c, d, ctx);
 
             result = (fmpz_mod_poly_is_zero(s, ctx) && fmpz_mod_poly_is_zero(t, ctx) 
                       && (h->length == 1) && (fmpz_is_one(h->coeffs)));

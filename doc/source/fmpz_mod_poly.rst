@@ -971,28 +971,6 @@ Greatest common divisor
     coefficient or set `f` to a nontrivial factor of `p` and leave ``res``
     undefined.
 
-.. function:: slong _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invB, const fmpz_t p)
-
-    Sets `G` to the greatest common divisor of `(A, \operatorname{len}(A))`
-    and `(B, \operatorname{len}(B))` and returns its length.
-
-    Assumes that `\operatorname{len}(A) \geq \operatorname{len}(B) > 0` and that the vector `G` has
-    space for sufficiently many coefficients.
-
-    Assumes that ``invB`` is the inverse of the leading coefficients
-    of `B` modulo the prime number `p`.
-
-.. function:: void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
-
-    Sets `G` to the greatest common divisor of `A` and `B`.
-
-    The algorithm used to compute `G` is the classical Euclidean
-    algorithm.
-
-    In general, the greatest common divisor is defined in the polynomial
-    ring `(\mathbf{Z}/(p \mathbf{Z}))[X]` if and only if `p` is a prime
-    number.  Thus, this function assumes that `p` is prime.
-
 .. function:: slong _fmpz_mod_poly_gcd(fmpz *G, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invB, const fmpz_t p)
 
     Sets `G` to the greatest common divisor of `(A, \operatorname{len}(A))`
@@ -1063,10 +1041,7 @@ Greatest common divisor
 
     .. math ::
 
-
         (A,B)^t = \sigma M^{-1} (a,b)^t.
-
-
 
     Assumes that `\operatorname{len}(a) > \operatorname{len}(b) > 0`.
 
@@ -1077,91 +1052,17 @@ Greatest common divisor
     Assumes that ``M[0]``, ``M[1]``, ``M[2]``, and ``M[3]``
     each point to a vector of size at least `\operatorname{len}(a)`.
 
-.. function:: slong _fmpz_mod_poly_gcd_hgcd(fmpz *G, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t mod)
-
-    Computes the monic GCD of `A` and `B`, assuming that
-    `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`.
-
-    Assumes that `G` has space for `\operatorname{len}(B)` coefficients and
-    returns the length of `G` on output.
-
-.. function:: void fmpz_mod_poly_gcd_hgcd(fmpz_mod_poly_t G, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
-
-    Computes the monic GCD of `A` and `B` using the HGCD algorithm.
-
-    As a special case, the GCD of two zero polynomials is defined to be
-    the zero polynomial.
-
-    The time complexity of the algorithm is `\mathcal{O}(n \log^2 n)`
-    ring operations. For further details, see [ThullYap1990]_.
-
-.. function:: slong _fmpz_mod_poly_xgcd_euclidean(fmpz *G, fmpz *S, fmpz *T, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invB, const fmpz_t p)
-
-    Computes the GCD of `A` and `B` together with cofactors `S` and `T`
-    such that `S A + T B = G`.  Returns the length of `G`.
-
-    Assumes that `\operatorname{len}(A) \geq \operatorname{len}(B) \geq 1` and
-    `(\operatorname{len}(A),\operatorname{len}(B)) \neq (1,1)`.
-
-    No attempt is made to make the GCD monic.
-
-    Requires that `G` have space for `\operatorname{len}(B)` coefficients.  Writes
-    `\operatorname{len}(B)-1` and `\operatorname{len}(A)-1` coefficients to `S` and `T`, respectively.
-    Note that, in fact, `\operatorname{len}(S) \leq \max(\operatorname{len}(B) - \operatorname{len}(G), 1)` and
-    `\operatorname{len}(T) \leq \max(\operatorname{len}(A) - \operatorname{len}(G), 1)`.
-
-    No aliasing of input and output operands is permitted.
-
 .. function:: slong _fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz *G, fmpz *S, fmpz *T, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invB, const fmpz_t p)
 
     If `f` returns with the value `1` then the function operates as per
     ``_fmpz_mod_poly_xgcd_euclidean``, otherwise `f` is set to a nontrivial
     factor of `p`.
 
-.. function:: void fmpz_mod_poly_xgcd_euclidean(fmpz_mod_poly_t G, fmpz_mod_poly_t S, fmpz_mod_poly_t T, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
-
-    Computes the GCD of `A` and `B`. The GCD of zero polynomials is
-    defined to be zero, whereas the GCD of the zero polynomial and some other
-    polynomial `P` is defined to be `P`. Except in the case where
-    the GCD is zero, the GCD `G` is made monic.
-
-    Polynomials ``S`` and ``T`` are computed such that
-    ``S*A + T*B = G``. The length of ``S`` will be at most
-    ``lenB`` and the length of ``T`` will be at most ``lenA``.
-
 .. function:: void fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G, fmpz_mod_poly_t S, fmpz_mod_poly_t T, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
 
     If `f` returns with the value `1` then the function operates as per
     ``fmpz_mod_poly_xgcd_euclidean``, otherwise `f` is set to a nontrivial
     factor of `p`.
-
-.. function:: slong _fmpz_mod_poly_xgcd_hgcd(fmpz *G, fmpz *S, fmpz *T, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t mod)
-
-    Computes the GCD of `A` and `B`, where `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`,
-    together with cofactors `S` and `T` such that `S A + T B = G`. Returns
-    the length of `G`.
-
-    No attempt is made to make the GCD monic.
-
-    Requires that `G` have space for `\operatorname{len}(B)` coefficients.  Writes
-    `\operatorname{len}(B) - 1` and `\operatorname{len}(A) - 1` coefficients to `S` and `T`,
-    respectively.  Note that, in fact, `\operatorname{len}(S) \leq \operatorname{len}(B) - \operatorname{len}(G)`
-    and `\operatorname{len}(T) \leq \operatorname{len}(A) - \operatorname{len}(G)`.
-
-    Both `S` and `T` must have space for at least `2` coefficients.
-
-    No aliasing of input and output operands is permitted.
-
-.. function:: void fmpz_mod_poly_xgcd_hgcd(fmpz_mod_poly_t G, fmpz_mod_poly_t S, fmpz_mod_poly_t T, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
-
-    Computes the GCD of `A` and `B`. The GCD of zero polynomials is
-    defined to be zero, whereas the GCD of the zero polynomial and some other
-    polynomial `P` is defined to be `P`. Except in the case where
-    the GCD is zero, the GCD `G` is made monic.
-
-    Polynomials ``S`` and ``T`` are computed such that
-    ``S*A + T*B = G``. The length of ``S`` will be at most
-    ``lenB`` and the length of ``T`` will be at most ``lenA``.
 
 .. function:: slong _fmpz_mod_poly_xgcd(fmpz *G, fmpz *S, fmpz *T, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invB, const fmpz_t p)
 

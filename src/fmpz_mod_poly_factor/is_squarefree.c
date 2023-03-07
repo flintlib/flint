@@ -20,7 +20,6 @@ int
 _fmpz_mod_poly_is_squarefree(const fmpz * f, slong len, const fmpz_t p)
 {
     fmpz * fd, * g;
-    fmpz_t invd;
     slong dlen;
     int res;
 
@@ -36,10 +35,10 @@ _fmpz_mod_poly_is_squarefree(const fmpz * f, slong len, const fmpz_t p)
 
     if (dlen)
     {
-        fmpz_init(invd);
-        fmpz_invmod(invd, fd + dlen - 1, p);
-        res = (_fmpz_mod_poly_gcd(g, f, len, fd, dlen, invd, p) == 1);
-        fmpz_clear(invd);
+        fmpz_mod_ctx_t ctx;
+        fmpz_mod_ctx_init(ctx, p);  /* todo: do not recompute context object */
+        res = (_fmpz_mod_poly_gcd(g, f, len, fd, dlen, ctx) == 1);
+        fmpz_mod_ctx_clear(ctx);
     }
     else
         res = 0;   /* gcd(f, 0) = f, and len(f) > 2 */
