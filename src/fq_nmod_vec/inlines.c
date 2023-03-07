@@ -11,7 +11,6 @@
 
 #define FQ_NMOD_VEC_INLINES_C
 
-#define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"

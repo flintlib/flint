@@ -10,7 +10,6 @@
 */
 
 #include <gmp.h>
-#define ulong ulongxx /* interferes with system includes */
 #include <math.h>
 #define ulong mp_limb_t
 #include "flint.h"

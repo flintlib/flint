@@ -11,7 +11,6 @@
 
 #define FQ_ZECH_POLY_FACTOR_INLINES_C
 
-#define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
 #include <stdio.h>
 #include <gmp.h>

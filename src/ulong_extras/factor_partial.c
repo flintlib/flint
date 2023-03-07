@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define ulong ulongxx /* prevent clash with standard library */
 #include <stdlib.h>
 #include <stdio.h>
 #include <gmp.h>
