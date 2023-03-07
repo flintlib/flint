@@ -28,11 +28,12 @@ void sample(void * arg, ulong count)
    flint_bitcnt_t bits = info->bits;
    ulong type = info->type;
    ulong i;
+   mp_ptr arr, arr2;
    FLINT_TEST_INIT(state);
    
       
-   mp_ptr arr  = (mp_ptr) flint_malloc(1024*sizeof(mp_limb_t));
-   mp_ptr arr2 = (mp_ptr) flint_malloc(1024*sizeof(mp_limb_t));
+   arr = (mp_ptr) flint_malloc(1024*sizeof(mp_limb_t));
+   arr2 = (mp_ptr) flint_malloc(1024*sizeof(mp_limb_t));
       
    for (i = 0; i < count; i++)
    {
@@ -53,7 +54,7 @@ void sample(void * arg, ulong count)
 	  case 1:
 
          prof_start();
-         for (mp_size_t j = 0; j < UWORD(10000); j++)
+         for (j = 0; j < UWORD(10000); j++)
          {
             r += n_lll_mod_preinv(arr2[j&1023], arr[j&1023], arr[(j+1)&1023], d, dinv);  
          }

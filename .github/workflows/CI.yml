@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j"
+      MAKE: "make -j -l 10 --output-sync=target"
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: "-Wall"
@@ -60,7 +60,7 @@ jobs:
     runs-on: macos-latest
 
     env:
-      MAKE: "make -j"
+      MAKE: "gmake -j -l 10 --output-sync=target"
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: "-Wall"
@@ -74,7 +74,7 @@ jobs:
           brew install gcc
           brew install make
           gcc --version
-          make --version
+          gmake --version
 
       - name: "Build dependencies"
         run: |
@@ -148,7 +148,7 @@ jobs:
         shell: C:\cygwin64\bin\bash.exe --login -o igncr '{0}'
 
     env:
-      MAKE: "make -j"
+      MAKE: "make -j -l 10 --output-sync=target"
       REPO: /cygdrive/d/a/flint2/flint2 # FIXME: De-hardcode this
       CFLAGS: "-Wall -D _WIN64"
       EXTRA_OPTIONS: "--enable-static --disable-shared"
@@ -198,7 +198,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j"
+      MAKE: "make -j -l 10 --output-sync=target"
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: "-Wall"
@@ -246,7 +246,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j"
+      MAKE: "make -j -l 10 --output-sync=target"
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: "-Wall"
@@ -338,7 +338,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j"
+      MAKE: "make -j -l 10 --output-sync=target"
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: ""

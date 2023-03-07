@@ -49,16 +49,15 @@ void sample(void * arg, ulong count)
    int algo = info->algo;
    int scale;
    
+   fmpz_poly_t p1, p2, b, q, r;
+   fmpz_poly_powers_precomp_t pinv;
+           
+   FLINT_TEST_INIT(state);
+
    scale = 100;
    if (length >= 50) scale = 10;
    if (length >= 500) scale = 4;
    
-   FLINT_TEST_INIT(state);
-   
-
-   fmpz_poly_t p1, p2, b, q, r;
-   fmpz_poly_powers_precomp_t pinv;
-           
    fmpz_poly_init(p1);
    fmpz_poly_init(p2);
    fmpz_poly_init(b);

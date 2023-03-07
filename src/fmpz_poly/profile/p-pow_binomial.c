@@ -86,4 +86,6 @@ main(void)
     fmpz_poly_clear(g[0]);
 
     flint_randclear(state);
+
+    return 0;
 }
