@@ -43,6 +43,8 @@ void flint_set_abort(FLINT_NORETURN void (*func)(void))
 
 FLINT_NORETURN void flint_abort()
 {
+    fflush(stdout);
+    fflush(stderr);
     (*abort_func)();
 }
 
