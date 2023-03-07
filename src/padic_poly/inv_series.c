@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011, 2012 Sebastian Pancratz
+    Copyright (C) 2023
 
     This file is part of FLINT.
 
@@ -9,8 +10,53 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_poly.h"
 #include "padic_poly.h"
+
+/*  The tests fail if one reduces the coefficients modulo N before
+    doing the calculation in Z/NZ. Therefore _fmpz_mod_poly_inv_series
+    cannot be used. To do: explain why this particular algorithm,
+    given non-normalized input, gives the expected result. */
+
+static void 
+_fmpz_mod_poly_inv_series_pure_newton(fmpz * Qinv, const fmpz * Q, slong n, 
+                                 const fmpz_t cinv, const fmpz_t p)
+{
+    if (n == 1)
+    {
+        fmpz_set(Qinv, cinv);
+    }
+    else
+    {
+        const slong alloc = FLINT_MAX(n, 3);
+        slong a[FLINT_BITS], i, m;
+        fmpz *W;
+
+        W = _fmpz_vec_init(alloc);
+
+        for (i = 1; (WORD(1) << i) < n; i++) ;
+
+        a[i = 0] = n;
+        while (n >= 2)
+            a[++i] = (n = (n + 1) / 2);
+
+        /* Base case */
+        fmpz_set(Qinv, cinv);
+
+        for (i--; i >= 0; i--)
+        {
+            m = n;
+            n = a[i];
+
+            _fmpz_poly_mullow(W, Q, n, Qinv, m, n);
+            _fmpz_vec_scalar_mod_fmpz(W, W, n, p);
+            _fmpz_poly_mullow(Qinv + m, Qinv, m, W + m, n - m, n - m);
+            _fmpz_vec_neg(Qinv + m, Qinv + m, n - m);
+            _fmpz_vec_scalar_mod_fmpz(Qinv + m, Qinv + m, n - m, p);
+        }
+
+        _fmpz_vec_clear(W, alloc);
+    }
+}
 
 void padic_poly_inv_series(padic_poly_t Qinv, const padic_poly_t Q, slong n, 
                            const padic_ctx_t ctx)
@@ -66,14 +112,16 @@ void padic_poly_inv_series(padic_poly_t Qinv, const padic_poly_t Q, slong n,
     if (Qinv != Q)
     {
         padic_poly_fit_length(Qinv, n);
-        _fmpz_mod_poly_inv_series_newton(Qinv->coeffs, Qcopy, n, cinv, pow);
+
+        /* fails: _fmpz_vec_scalar_mod_fmpz(Qcopy, Qcopy, n, pow); */
+        _fmpz_mod_poly_inv_series_pure_newton(Qinv->coeffs, Qcopy, n, cinv, pow);
     }
     else
     {
         fmpz *t = _fmpz_vec_init(n);
 
-        _fmpz_mod_poly_inv_series_newton(t, Qcopy, n, cinv, pow);
-
+        /* fails: _fmpz_vec_scalar_mod_fmpz(Qcopy, Qcopy, n, pow); */
+        _fmpz_mod_poly_inv_series_pure_newton(t, Qcopy, n, cinv, pow);
         _fmpz_vec_clear(Qinv->coeffs, Qinv->alloc);
         Qinv->coeffs = t;
         Qinv->alloc  = n;
