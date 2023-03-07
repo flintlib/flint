@@ -91,7 +91,12 @@ int gr_generic_falling_ui(gr_ptr res, gr_srcptr x, ulong n, gr_ctx_t ctx)
     if (n == 0)
         return gr_one(res, ctx);
     else
-        return gr_sub_ui(res, x, n - 1, ctx) | gr_rising_ui(res, res, n, ctx);
+    {
+        int status;
+        status = gr_sub_ui(res, x, n - 1, ctx);
+        status |= gr_rising_ui(res, res, n, ctx);
+        return status;
+    }
 }
 
 int gr_generic_rising(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
