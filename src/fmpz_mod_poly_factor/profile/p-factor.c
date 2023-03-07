@@ -33,7 +33,6 @@
 
 int main(void)
 {
-    FLINT_TEST_INIT(state);
     fmpz_mod_poly_t f, g;
     fmpz_mod_poly_factor_t res;
     fmpz_t p;
@@ -43,6 +42,8 @@ int main(void)
     double t, T1, T2, T3;
     const slong degs[] = {8, 16, 32, 64, 128, 256, 512, 1024};
     const int iter_count[] = {10000, 5000, 1000, 500, 300, 100, 50, 20};
+
+    FLINT_TEST_INIT(state);
 
     mpz_init(pz);
     mpz_init(curr);

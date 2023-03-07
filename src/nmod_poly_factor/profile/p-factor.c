@@ -32,7 +32,6 @@
 
 int main(void)
 {
-    FLINT_TEST_INIT(state);
     nmod_poly_t f, g;
     nmod_poly_factor_t res;
     mp_limb_t modulus;
@@ -42,7 +41,7 @@ int main(void)
     const slong degs[] = {8, 16, 32, 64, 128, 256, 512, 1024};
     const int iter_count[] = {10000, 5000, 1000, 500, 300, 100, 50, 20};
 
-    
+    FLINT_TEST_INIT(state);
 
     flint_printf("Random polynomials\n");
     for (i = 0; i < NP; i++)

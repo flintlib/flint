@@ -68,18 +68,19 @@ void sample(void * arg, ulong count)
    int monic = info->monic;
    int scale;
    
-   scale = 100;
-   if (length >= 50) scale = 10;
-   if (length >= 500) scale = 4;
-   
    flint_rand_t state;
-   flint_randinit(state);
 
    fmpq_poly_t pol;
    nf_t nf;
    nf_elem_t a;
    fmpq_t norm;
+
+   flint_randinit(state);
         
+   scale = 100;
+   if (length >= 50) scale = 10;
+   if (length >= 500) scale = 4;
+   
    fmpq_poly_init(pol);
    fmpq_init(norm);
      

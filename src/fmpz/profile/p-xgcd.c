@@ -15,9 +15,10 @@
 
 void sample_xgcd_small(void * arg, ulong count)
 {
-    FLINT_TEST_INIT(state);
     fmpz_t d, x, y, a, b;
     fmpz_t nmax;
+    int ix;
+    FLINT_TEST_INIT(state);
 
     fmpz_init(d);
     fmpz_init(x);
@@ -29,7 +30,7 @@ void sample_xgcd_small(void * arg, ulong count)
     fmpz_set_d_2exp(nmax, 1.0, SMALL_FMPZ_BITCOUNT_MAX);
 
     prof_start();
-    for (int ix = 0; ix < count; ix++)
+    for (ix = 0; ix < count; ix++)
     {
         fmpz_randm(a, state, nmax);
         fmpz_randm(b, state, nmax);
@@ -49,9 +50,10 @@ void sample_xgcd_small(void * arg, ulong count)
 
 void sample_xgcd_mixed(void * arg, ulong count)
 {
-    FLINT_TEST_INIT(state);
     fmpz_t d, x, y, a, b;
     fmpz_t nmax;
+    int ix;
+    FLINT_TEST_INIT(state);
 
     fmpz_init(d);
     fmpz_init(x);
@@ -63,7 +65,7 @@ void sample_xgcd_mixed(void * arg, ulong count)
     fmpz_set_d_2exp(nmax, 1.0, FLINT_BITS);
 
     prof_start();
-    for (int ix = 0; ix < count; ix++)
+    for (ix = 0; ix < count; ix++)
     {
         fmpz_randm(a, state, nmax);
         fmpz_randm(b, state, nmax);
@@ -83,9 +85,10 @@ void sample_xgcd_mixed(void * arg, ulong count)
 
 void sample_xgcd_big(void * arg, ulong count)
 {
-    FLINT_TEST_INIT(state);
     fmpz_t d, x, y, a, b;
     fmpz_t nmax;
+    int ix;
+    FLINT_TEST_INIT(state);
 
     fmpz_init(d);
     fmpz_init(x);
@@ -97,7 +100,7 @@ void sample_xgcd_big(void * arg, ulong count)
     fmpz_set_d_2exp(nmax, 1.0, 512);
 
     prof_start();
-    for (int ix = 0; ix < count; ix++)
+    for (ix = 0; ix < count; ix++)
     {
         fmpz_randm(a, state, nmax);
         fmpz_randm(b, state, nmax);
@@ -117,9 +120,10 @@ void sample_xgcd_big(void * arg, ulong count)
 
 void sample_xgcd_canonical_bezout_small(void * arg, ulong count)
 {
-    FLINT_TEST_INIT(state);
     fmpz_t d, x, y, a, b;
     fmpz_t nmax;
+    int ix;
+    FLINT_TEST_INIT(state);
 
     fmpz_init(d);
     fmpz_init(x);
@@ -131,7 +135,7 @@ void sample_xgcd_canonical_bezout_small(void * arg, ulong count)
     fmpz_set_d_2exp(nmax, 1.0, SMALL_FMPZ_BITCOUNT_MAX);
 
     prof_start();
-    for (int ix = 0; ix < count; ix++)
+    for (ix = 0; ix < count; ix++)
     {
         fmpz_randm(a, state, nmax);
         fmpz_randm(b, state, nmax);
@@ -151,9 +155,10 @@ void sample_xgcd_canonical_bezout_small(void * arg, ulong count)
 
 void sample_xgcd_canonical_bezout_mixed(void * arg, ulong count)
 {
-    FLINT_TEST_INIT(state);
     fmpz_t d, x, y, a, b;
     fmpz_t nmax;
+    int ix;
+    FLINT_TEST_INIT(state);
 
     fmpz_init(d);
     fmpz_init(x);
@@ -165,7 +170,7 @@ void sample_xgcd_canonical_bezout_mixed(void * arg, ulong count)
     fmpz_set_d_2exp(nmax, 1.0, FLINT_BITS);
 
     prof_start();
-    for (int ix = 0; ix < count; ix++)
+    for (ix = 0; ix < count; ix++)
     {
         fmpz_randm(a, state, nmax);
         fmpz_randm(b, state, nmax);
@@ -185,9 +190,10 @@ void sample_xgcd_canonical_bezout_mixed(void * arg, ulong count)
 
 void sample_xgcd_canonical_bezout_big(void * arg, ulong count)
 {
-    FLINT_TEST_INIT(state);
     fmpz_t d, x, y, a, b;
     fmpz_t nmax;
+    int ix;
+    FLINT_TEST_INIT(state);
 
     fmpz_init(d);
     fmpz_init(x);
@@ -199,7 +205,7 @@ void sample_xgcd_canonical_bezout_big(void * arg, ulong count)
     fmpz_set_d_2exp(nmax, 1.0, 512);
 
     prof_start();
-    for (int ix = 0; ix < count; ix++)
+    for (ix = 0; ix < count; ix++)
     {
         fmpz_randm(a, state, nmax);
         fmpz_randm(b, state, nmax);

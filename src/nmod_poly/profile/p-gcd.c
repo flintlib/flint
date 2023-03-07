@@ -31,8 +31,6 @@
 
 int main(void)
 {
-    FLINT_TEST_INIT(state);
-
     mp_limb_t p[] = {17ul, 2147483659ul, 9223372036854775837ul};
     const slong degs[]      = {   20,   40,  60,  80, 100, 120, 140, 160, 180, 200, 
                                 220,  240, 260, 280, 300, 320, 340, 360, 380, 400, 
@@ -60,6 +58,8 @@ int main(void)
     slong i, k, c, n;
 
     nmod_poly_t A, B, C, G;
+
+    FLINT_TEST_INIT(state);
 
     
 

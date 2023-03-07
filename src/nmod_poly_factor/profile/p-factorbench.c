@@ -24,7 +24,8 @@ int main (void)
 
     double t;
     nmod_poly_t f, g, h;
-    for (int i= 15001;i < 16000; i++)
+    int i;
+    for (i= 15001;i < 16000; i++)
     {
       nmod_poly_init2 (f, 17, i/2+1);
       nmod_poly_init2 (g, 17, i+1);
@@ -43,8 +44,8 @@ int main (void)
 
       if (!nmod_poly_is_one (h))
       {
-        flint_printf ("i= %d\n", i);
         nmod_poly_factor_t factors;
+        flint_printf ("i= %d\n", i);
         nmod_poly_factor_init (factors);
         t= clock();
         nmod_poly_factor (factors, h);

@@ -27,10 +27,13 @@ void sample(void * arg, ulong count)
    slong n = info->n, i, j;
    slong scale;
 
-   FLINT_TEST_INIT(state);
-   
    nmod_poly_t a, b, c;
-   mp_limb_t m = n_randint(state, 1<<((48-FLINT_BIT_COUNT(n))/2));
+   mp_limb_t m;
+
+   FLINT_TEST_INIT(state);
+
+   m = n_randint(state, 1<<((48-FLINT_BIT_COUNT(n))/2));
+   
    if (m == 0) m = 2;
    
    nmod_poly_init2(a, m, n);

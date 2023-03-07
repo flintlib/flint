@@ -157,12 +157,12 @@ sample_new(void * arg, ulong count)
     info_t * info = (info_t *) arg;
     slong bits = info->bits;
 
+    FLINT_TEST_INIT(state);
+
     fmpz_init(r);
     fmpz_init(a);
     fmpz_init(b);
     fmpz_init(c);
-
-    FLINT_TEST_INIT(state);
 
     prof_start();
     for (ix = 0; ix < 1000 * count; ix++)
@@ -189,12 +189,12 @@ sample_old(void * arg, ulong count)
     info_t * info = (info_t *) arg;
     slong bits = info->bits;
 
+    FLINT_TEST_INIT(state);
+
     fmpz_init(r);
     fmpz_init(a);
     fmpz_init(b);
     fmpz_init(c);
-
-    FLINT_TEST_INIT(state);
 
     prof_start();
     for (ix = 0; ix < 1000 * count; ix++)
@@ -229,4 +229,6 @@ main()
         flint_printf("%3d bits:   (min) %.2fx speedup   (max) %.2fx speedup\n",
                 bits, minold / minnew, maxold / maxnew);
     }
+
+    return 0;
 }

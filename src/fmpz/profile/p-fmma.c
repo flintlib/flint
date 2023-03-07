@@ -76,6 +76,7 @@ fmpz_fmma_old(fmpz_t f, const fmpz_t a, const fmpz_t b,
 void sample_small(void * arg, ulong count)
 {
     fmpz_t r, a, b, c, d;
+    int ix;
 
     FLINT_TEST_INIT(state);
 
@@ -86,7 +87,7 @@ void sample_small(void * arg, ulong count)
     fmpz_init(d);
     
     prof_start();
-    for (int ix = 0; ix < 1000000 * count; ix++)
+    for (ix = 0; ix < 1000000 * count; ix++)
     {
         fmpz_set_ui(a, n_randint(state, COEFF_MAX));
         fmpz_set_ui(b, n_randint(state, COEFF_MAX));
@@ -108,6 +109,7 @@ void sample_small(void * arg, ulong count)
 void sample_small_old(void * arg, ulong count)
 {
     fmpz_t r, a, b, c, d;
+    int ix;
 
     FLINT_TEST_INIT(state);
 
@@ -118,7 +120,7 @@ void sample_small_old(void * arg, ulong count)
     fmpz_init(d);
     
     prof_start();
-    for (int ix = 0; ix < 1000000 * count; ix++)
+    for (ix = 0; ix < 1000000 * count; ix++)
     {
         fmpz_set_ui(a, n_randint(state, COEFF_MAX));
         fmpz_set_ui(b, n_randint(state, COEFF_MAX));
@@ -140,6 +142,7 @@ void sample_small_old(void * arg, ulong count)
 void sample_small_zeros(void * arg, ulong count)
 {
     fmpz_t r, a, b, c, d;
+    int ix;
 
     FLINT_TEST_INIT(state);
 
@@ -152,7 +155,7 @@ void sample_small_zeros(void * arg, ulong count)
     fmpz_zero(c);
     
     prof_start();
-    for (int ix = 0; ix < 1000000 * count; ix++)
+    for (ix = 0; ix < 1000000 * count; ix++)
     {
         fmpz_set_ui(a, n_randint(state, COEFF_MAX));
         fmpz_set_ui(b, n_randint(state, COEFF_MAX));
@@ -173,6 +176,7 @@ void sample_small_zeros(void * arg, ulong count)
 void sample_small_zeros_old(void * arg, ulong count)
 {
     fmpz_t r, a, b, c, d;
+    int ix;
 
     FLINT_TEST_INIT(state);
 
@@ -185,7 +189,7 @@ void sample_small_zeros_old(void * arg, ulong count)
     fmpz_zero(c);
     
     prof_start();
-    for (int ix = 0; ix < 1000000 * count; ix++)
+    for (ix = 0; ix < 1000000 * count; ix++)
     {
         fmpz_set_ui(a, n_randint(state, COEFF_MAX));
         fmpz_set_ui(b, n_randint(state, COEFF_MAX));
@@ -206,6 +210,7 @@ void sample_small_zeros_old(void * arg, ulong count)
 void sample_big_zeros(void * arg, ulong count)
 {
     fmpz_t r, a, b, c, d;
+    int ix;
 
     FLINT_TEST_INIT(state);
 
@@ -218,7 +223,7 @@ void sample_big_zeros(void * arg, ulong count)
     fmpz_zero(c);
     
     prof_start();
-    for (int ix = 0; ix < 1000000 * count; ix++)
+    for (ix = 0; ix < 1000000 * count; ix++)
     {
         fmpz_randtest(a, state, 100);
         fmpz_randtest(b, state, 100);
@@ -239,6 +244,7 @@ void sample_big_zeros(void * arg, ulong count)
 void sample_big_zeros_old(void * arg, ulong count)
 {
     fmpz_t r, a, b, c, d;
+    int ix;
 
     FLINT_TEST_INIT(state);
 
@@ -251,7 +257,7 @@ void sample_big_zeros_old(void * arg, ulong count)
     fmpz_zero(c);
     
     prof_start();
-    for (int ix = 0; ix < 1000000 * count; ix++)
+    for (ix = 0; ix < 1000000 * count; ix++)
     {
         fmpz_randtest(a, state, 100);
         fmpz_randtest(b, state, 100);

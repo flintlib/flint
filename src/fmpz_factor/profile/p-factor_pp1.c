@@ -23,11 +23,10 @@ int main(void)
    ulong c;
    ulong B1;
    
+   FLINT_TEST_INIT(state);
+
    fmpz_init(n);
    fmpz_init(p);
-
-   FLINT_TEST_INIT(state);
-   
 
    while(1)
    {

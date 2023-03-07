@@ -30,11 +30,10 @@ void sample(void * arg, ulong count)
    int algo = info->algo;
    int scale = 200;
 
-   FLINT_TEST_INIT(state);
-   
-
    fmpz_t a, b, c, r;
    fmpz_preinvn_t inv;
+
+   FLINT_TEST_INIT(state);
    
    fmpz_init(a);
    fmpz_init(b);
