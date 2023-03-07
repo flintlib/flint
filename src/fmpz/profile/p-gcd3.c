@@ -12,6 +12,7 @@
 
 #include <gmp.h>
 #include "fmpz.h"
+#include "ulong_extras.h"
 #include "profiler.h"
 
 typedef struct

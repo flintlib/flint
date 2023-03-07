@@ -1,4 +1,5 @@
 #include "fmpz.h"
+#include "ulong_extras.h"
 #include "profiler.h"
 
 void
