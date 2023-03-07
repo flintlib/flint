@@ -112,7 +112,7 @@ static mp_size_t fft_split_bits_fmpz(
     mp_size_t limbs)
 {
     mp_size_t len;
-    int x_is_neg;
+    int x_is_neg = 0;
 
     if (COEFF_IS_MPZ(*x))
     {

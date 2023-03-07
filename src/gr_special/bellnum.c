@@ -118,7 +118,7 @@ gr_generic_bellnum_vec(gr_ptr res, slong len, gr_ctx_t ctx)
             arb_clear(t);
             gr_ctx_clear(RR);
 
-            return GR_SUCCESS;
+            return status;
         }
     }
 

@@ -61,6 +61,8 @@ gr_mat_lu_recursive(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int 
     for (i = 0; i < m; i++)
         P[i] = i;
 
+    r1 = r2 = 0;
+
     P1 = flint_malloc(sizeof(slong) * m);
     gr_mat_window_init(A0, LU, 0, 0, m, n1, ctx);
     gr_mat_window_init(A1, LU, 0, n1, m, n, ctx);
