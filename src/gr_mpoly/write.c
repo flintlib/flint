@@ -49,7 +49,7 @@ int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A,
         }
         else
         {
-            ssize_t per_var = 22;
+            slong per_var = 22;
             char * tmp = TMP_ALLOC(mctx->nvars * per_var);
 
             for (i = 0; i < mctx->nvars; i++)
