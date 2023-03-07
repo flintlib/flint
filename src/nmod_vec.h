@@ -19,12 +19,8 @@
 #define NMOD_VEC_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
-#undef ulong
 #include <gmp.h>
-#define ulong mp_limb_t
 
 #include "nmod.h"
 

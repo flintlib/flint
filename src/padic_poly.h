@@ -18,13 +18,9 @@
 #define PADIC_POLY_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx/* interferes with system includes */
 #include <limits.h>
-#undef ulong
 
 #include <gmp.h>
-#define ulong mp_limb_t
 
 #include "fmpz.h"
 #include "fmpq.h"

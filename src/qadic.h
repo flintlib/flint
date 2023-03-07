@@ -18,14 +18,10 @@
 #define QADIC_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
 #include <stdio.h>
-#undef ulong
 
 #include <gmp.h>
-#define ulong mp_limb_t
 
 #include "flint.h"
 #include "fmpz.h"

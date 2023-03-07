@@ -15,8 +15,6 @@
 #undef __STRICT_ANSI__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with standard libraries */
 #include <sys/types.h>
 #if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER) 
 #include <unistd.h>
@@ -24,9 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#undef ulong
 #include <gmp.h>
-#define ulong mp_limb_t
 
 #include "flint.h"
 #include "fmpz.h"
