@@ -1,5 +1,7 @@
 /*
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2010, 2011 Sebastian Pancratz
+    Copyright (C) 2023 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -9,28 +11,28 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
+#include "gr_poly.h"
 
-void _fmpz_mod_poly_divrem_f(fmpz_t f, fmpz *Q, fmpz *R, 
-                             const fmpz *A, slong lenA, 
-                             const fmpz *B, slong lenB, const fmpz_t p)
+void _fmpz_mod_poly_divrem(fmpz *Q, fmpz *R, 
+    const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
+    const fmpz_t invB, const fmpz_t p)
 {
-    fmpz_t invB;
-
-    fmpz_init(invB);
-    fmpz_gcdinv(f, invB, B + lenB - 1, p);
-
-    if (fmpz_is_one(f))
+    if (lenB <= 30 || lenA - lenB <= 10)
     {
-        _fmpz_mod_poly_divrem(Q, R, A, lenA, B, lenB, invB, p);
+        _fmpz_mod_poly_divrem_basecase(Q, R, A, lenA, B, lenB, invB, p);
     }
-
-    fmpz_clear(invB);
+    else
+    {
+        gr_ctx_t gr_ctx;
+        gr_ctx_init_fmpz_mod(gr_ctx, p);   /* todo: ref from ctx */
+        GR_MUST_SUCCEED(_gr_poly_divrem_newton(Q, R, A, lenA, B, lenB, gr_ctx));  /* todo: pass invB as input */
+        gr_ctx_clear(gr_ctx);
+    }
 }
 
-void fmpz_mod_poly_divrem_f(fmpz_t f, fmpz_mod_poly_t Q, fmpz_mod_poly_t R, 
+void
+fmpz_mod_poly_divrem(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
                             const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
                                                       const fmpz_mod_ctx_t ctx)
 {
@@ -41,29 +43,36 @@ void fmpz_mod_poly_divrem_f(fmpz_t f, fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     fmpz *q, *r;
     fmpz_t invB;
 
-    fmpz_init(invB);
-    fmpz_gcdinv(f, invB, fmpz_mod_poly_lead(B, ctx), fmpz_mod_ctx_modulus(ctx));
-
-    if (!fmpz_is_one(f))
-    {
-        fmpz_clear(invB);
-        return;
-    }
-
     if (lenB == 0)
     {
-        fmpz_clear(invB);
-	    flint_printf("Exception (fmpz_mod_poly_divrem_f). Division by zero.\n");
-        flint_abort();
+        if (fmpz_is_one(fmpz_mod_ctx_modulus(ctx)))
+        {
+            fmpz_mod_poly_set(Q, A, ctx);
+            fmpz_mod_poly_zero(R, ctx);
+            return;
+        }
+        else
+        {
+            flint_printf("Exception (fmpz_mod_poly_divrem). Division by zero.\n");
+            flint_abort();
+        }
     }
 
     if (lenA < lenB)
     {
         fmpz_mod_poly_set(R, A, ctx);
         fmpz_mod_poly_zero(Q, ctx);
-        fmpz_clear(invB);
         return;
     }
+
+	if (B->length < 8)
+	{
+        fmpz_mod_poly_divrem_basecase(Q, R, A, B, ctx);
+        return;
+    }
+	
+    fmpz_init(invB);
+    fmpz_invmod(invB, fmpz_mod_poly_lead(B, ctx), fmpz_mod_ctx_modulus(ctx));
 
     if (Q == A || Q == B)
     {
@@ -77,11 +86,11 @@ void fmpz_mod_poly_divrem_f(fmpz_t f, fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
 
     if (R == A || R == B)
     {
-        r = _fmpz_vec_init(lenA);
+        r = _fmpz_vec_init(lenB - 1);
     }
     else
     {
-        fmpz_mod_poly_fit_length(R, lenA, ctx);
+        fmpz_mod_poly_fit_length(R, lenB - 1, ctx);
         r = R->coeffs;
     }
 
@@ -104,9 +113,10 @@ void fmpz_mod_poly_divrem_f(fmpz_t f, fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     {
         _fmpz_vec_clear(R->coeffs, R->alloc);
         R->coeffs = r;
-        R->alloc  = lenA;
-        R->length = lenA;
+        R->alloc  = lenB - 1;
+        R->length = lenB - 1;
     }
+
     _fmpz_mod_poly_set_length(R, lenB - 1);
     _fmpz_mod_poly_normalise(R);
 

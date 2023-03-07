@@ -793,53 +793,6 @@ Division
     `0 \leq \operatorname{len}(R) < \operatorname{len}(B)` assuming that the leading term
     of `B` is a unit.
 
-.. function:: void _fmpz_mod_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W, const fmpz * A, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_t p)
-
-    Computes ``(Q, lenB)``, ``(BQ, 2 lenB - 1)`` such that
-    `BQ = B \times Q` and `A = B Q + R` where `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
-
-    Assumes that the leading coefficient of `B` is invertible
-    modulo `p`, and that ``invB`` is the inverse.
-
-    Assumes `\operatorname{len}(B) > 0`.  Allows zero-padding in ``(A, lenA)``.  Requires
-    a temporary array ``(W, 2 lenB - 1)``.  No aliasing of input and output
-    operands is allowed.
-
-    This function does not read the bottom `\operatorname{len}(B) - 1` coefficients from
-    `A`, which means that they might not even need to exist in allocated
-    memory.
-
-.. function:: void _fmpz_mod_poly_divrem_divconquer(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_t p)
-
-    Computes ``(Q, lenA - lenB + 1)``, ``(R, lenB - 1)`` such that
-    `A = B Q + R` and `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
-
-    Assumes that the leading coefficient of `B` is invertible
-    modulo `p`, and that ``invB`` is the inverse.
-
-    Assumes `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`.  Allows zero-padding in
-    ``(A, lenA)``.  No aliasing of input and output operands is
-    allowed.
-
-.. function:: void _fmpz_mod_poly_div_divconquer(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_t p)
-
-    Notionally computes polynomials `Q` and `R` such that `A = BQ + R` with
-    `\operatorname{len}(R)` less than ``lenB``, where ``A`` is of length ``lenA``
-    and ``B`` is of length ``lenB``, but returns only ``Q``. We
-    require that ``Q`` have space for ``lenA - lenB + 1`` coefficients.
-
-.. function:: void fmpz_mod_poly_div_divconquer(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
-
-    Notionally computes `Q` and `R` such that `A = BQ + R` with
-    `\operatorname{len}(R) < \operatorname{len}(B)`, but returns only `Q`.
-
-.. function:: void fmpz_mod_poly_divrem_divconquer(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
-
-    Computes `Q`, `R` such that `A = B Q + R` and `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
-
-    Assumes that `B` is non-zero and that the leading coefficient
-    of `B` is invertible modulo `p`.
-
 .. function:: void _fmpz_mod_poly_div(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_mod_ctx_t ctx)
 
     Notationally, computes `Q`, `R` such that `A = B Q + R` with
