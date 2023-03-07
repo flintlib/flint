@@ -51,10 +51,11 @@ void sample(void * arg, ulong count)
     mpz_t a, b, d, r2;
 
     gmp_randstate_t st;
-    FLINT_TEST_INIT(state);
 
     mp_ptr dinv;
     flint_bitcnt_t norm;
+
+    FLINT_TEST_INIT(state);
     
     mpz_init(a);
     mpz_init(b);

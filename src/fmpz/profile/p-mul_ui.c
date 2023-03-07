@@ -12,6 +12,7 @@
 #include <gmp.h>
 #include "profiler.h"
 #include "fmpz.h"
+#include "ulong_extras.h"
 
 #define ntests 2000
 

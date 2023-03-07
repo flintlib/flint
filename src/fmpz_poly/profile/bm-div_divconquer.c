@@ -131,4 +131,6 @@ main(void)
     }
 
     gmp_randclear(state);
+
+    return 0;
 }

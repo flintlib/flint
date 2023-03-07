@@ -56,7 +56,7 @@ main(void)
   
        for (j = 0; j < iters; j++)
           mul_mfa_truncate_sqrt2(r1, i1, int_limbs, i2, int_limbs, depth, w);
-          //mpn_mul(r2, i1, int_limbs, i2, int_limbs);
+          /* mpn_mul(r2, i1, int_limbs, i2, int_limbs); */
        
        flint_free(i1);
     }

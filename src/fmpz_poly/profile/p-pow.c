@@ -121,4 +121,6 @@ main(void)
     fmpz_poly_clear(g);
 
     flint_randclear(state);  
+
+    return 0;
 }

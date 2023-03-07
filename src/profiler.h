@@ -14,8 +14,6 @@
 
 #include "flint.h"
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
 #include <time.h>
 #if defined( _MSC_VER )
 #include <intrin.h>
@@ -47,8 +45,6 @@ FLINT_DLL int gettimeofday(struct timeval * p, void * tz);
 #elif !defined(_MSC_VER)
 #include <sys/resource.h>
 #endif
-#undef ulong
-#define ulong mp_limb_t
 
 #ifdef __cplusplus
  extern "C" {

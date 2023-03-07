@@ -70,4 +70,6 @@ main(void)
     fmpz_mod_ctx_clear(ctx);
     
     flint_randclear(state);
+
+    return 0;
 }

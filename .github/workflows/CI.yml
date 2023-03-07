@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j"
+      MAKE: "make -j -l 10 --output-sync=target"
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: "-Wall"
@@ -45,6 +45,10 @@ jobs:
         run: |
           $MAKE check
 
+      - if: failure()
+        name: "If failure, stop all other jobs"
+        uses: andymckay/cancel-action@0.2
+
 
 
   ##############################################################################
@@ -56,7 +60,7 @@ jobs:
     runs-on: macos-latest
 
     env:
-      MAKE: "make -j"
+      MAKE: "gmake -j -l 10 --output-sync=target"
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: "-Wall"
@@ -70,7 +74,7 @@ jobs:
           brew install gcc
           brew install make
           gcc --version
-          make --version
+          gmake --version
 
       - name: "Build dependencies"
         run: |
@@ -91,6 +95,10 @@ jobs:
       - name: "Check"
         run: |
           $MAKE check
+
+      - if: failure()
+        name: "If failure, stop all other jobs"
+        uses: andymckay/cancel-action@0.2
 
 
 
@@ -121,6 +129,10 @@ jobs:
             gmake -j8
             gmake -j8 check
 
+      - if: failure()
+        name: "If failure, stop all other jobs"
+        uses: andymckay/cancel-action@0.2
+
 
 
   ##############################################################################
@@ -136,7 +148,7 @@ jobs:
         shell: C:\cygwin64\bin\bash.exe --login -o igncr '{0}'
 
     env:
-      MAKE: "make -j"
+      MAKE: "make -j -l 10 --output-sync=target"
       REPO: /cygdrive/d/a/flint2/flint2 # FIXME: De-hardcode this
       CFLAGS: "-Wall -D _WIN64"
       EXTRA_OPTIONS: "--enable-static --disable-shared"
@@ -171,6 +183,10 @@ jobs:
           cd ${REPO}
           $MAKE check
 
+      - if: failure()
+        name: "If failure, stop all other jobs"
+        uses: andymckay/cancel-action@0.2
+
 
 
   #############################################################################
@@ -182,7 +198,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j"
+      MAKE: "make -j -l 10 --output-sync=target"
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: "-Wall"
@@ -215,6 +231,10 @@ jobs:
         run: |
           $MAKE check
 
+      - if: failure()
+        name: "If failure, stop all other jobs"
+        uses: andymckay/cancel-action@0.2
+
 
 
   #############################################################################
@@ -226,7 +246,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j"
+      MAKE: "make -j -l 10 --output-sync=target"
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: "-Wall"
@@ -257,6 +277,10 @@ jobs:
           cd build
           $MAKE
           ldd lib/libflint.so
+
+      - if: failure()
+        name: "If failure, stop all other jobs"
+        uses: andymckay/cancel-action@0.2
 
 
 
@@ -298,6 +322,11 @@ jobs:
           ctest -j4 --output-on-failure --timeout 300
         shell: bash
 
+      # FIXME: Fix Cygwin so this can be enabled.
+      # - if: failure()
+      #   name: "If failure, stop all other jobs"
+      #   uses: andymckay/cancel-action@0.2
+
 
 
   ##############################################################################
@@ -309,7 +338,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j"
+      MAKE: "make -j -l 10 --output-sync=target"
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: ""
@@ -363,3 +392,7 @@ jobs:
       - name: "Check Nemo.jl"
         run: |
           julia -e "import Pkg; Pkg.test(\"Nemo\")"
+
+      - if: failure()
+        name: "If failure, stop all other jobs"
+        uses: andymckay/cancel-action@0.2

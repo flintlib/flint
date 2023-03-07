@@ -18,13 +18,9 @@
 #define FMPQ_MPOLY_INLINE static __inline__
 #endif
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
 #include <stdio.h>
-#undef ulong
 
 #include <gmp.h>
-#define ulong mp_limb_t
 
 #include "fmpq_poly.h"
 #include "fmpz_mpoly.h"

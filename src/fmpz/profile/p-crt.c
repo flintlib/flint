@@ -1,4 +1,5 @@
 #include "fmpz.h"
+#include "ulong_extras.h"
 #include "profiler.h"
 
 void
@@ -110,7 +111,7 @@ tree_crt(fmpz_t r, fmpz_t m, mp_srcptr residues, mp_srcptr primes, slong len)
 void
 fmpz_print1(const fmpz_t n)
 {
-//    printf("%lu", fmpz_fdiv_ui(n, 1000000000)); printf("\n");
+    /* printf("%lu", fmpz_fdiv_ui(n, 1000000000)); printf("\n"); */
 }
 
 void
@@ -186,4 +187,6 @@ int main()
         printf("bits = %ld, len = %ld\n", bits, len);
         benchmark(len, bits);
     }
+
+    return 0;
 }

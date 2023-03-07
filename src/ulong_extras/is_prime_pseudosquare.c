@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
 #include <stdio.h>
-#undef ulong
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"

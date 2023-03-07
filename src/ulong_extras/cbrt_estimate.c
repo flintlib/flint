@@ -12,10 +12,8 @@
 */
 
 #include <gmp.h>
-#define ulong ulongxx /* interferes with system includes */
 #include <math.h>
 #include <float.h>
-#undef ulong
 #include "flint.h"
 #include "ulong_extras.h"
 #include "longlong.h"

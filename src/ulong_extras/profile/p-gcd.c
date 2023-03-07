@@ -57,8 +57,8 @@ int main(void)
 {
    double min, max;
    gcd_t params;
-   FLINT_TEST_INIT(state);
    int i;
+   FLINT_TEST_INIT(state);
    
 
    params.rnums1 = flint_malloc(1024*sizeof(ulong));

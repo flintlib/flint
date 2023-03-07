@@ -20,11 +20,10 @@ void sample(void * arg, ulong count)
 {
    mp_limb_t d, q, r, dinv, norm;
    mp_ptr array = (mp_ptr) flint_malloc(200 * sizeof(mp_limb_t));
-   FLINT_TEST_INIT(state);
    ulong i;
    int j;
-   
-   
+
+   FLINT_TEST_INIT(state);
 
    d = n_randtest_not_zero(state);
    count_leading_zeros(norm, d);

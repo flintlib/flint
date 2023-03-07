@@ -16,9 +16,11 @@
 
 void sample_ndiv_qr(void * arg, ulong count)
 {
-    FLINT_TEST_INIT(state);
     fmpz_t q, r, a, b;
     fmpz_t nmax;
+    int ix;
+
+    FLINT_TEST_INIT(state);
 
     fmpz_init(q);
     fmpz_init(r);
@@ -29,7 +31,7 @@ void sample_ndiv_qr(void * arg, ulong count)
     fmpz_set_d_2exp(nmax, 1.0, FLINT_BITS);
 
     prof_start();
-    for (int ix = 0; ix < count; ix++)
+    for (ix = 0; ix < count; ix++)
     {
         fmpz_randm(a, state, nmax);
         fmpz_randm(b, state, nmax);
@@ -54,9 +56,11 @@ void sample_ndiv_qr(void * arg, ulong count)
 
 void sample_fdiv_qr(void * arg, ulong count)
 {
-    FLINT_TEST_INIT(state);
     fmpz_t q, r, a, b;
     fmpz_t nmax;
+    int ix;
+
+    FLINT_TEST_INIT(state);
 
     fmpz_init(q);
     fmpz_init(r);
@@ -67,7 +71,7 @@ void sample_fdiv_qr(void * arg, ulong count)
     fmpz_set_d_2exp(nmax, 1.0, FLINT_BITS);
 
     prof_start();
-    for (int ix = 0; ix < count; ix++)
+    for (ix = 0; ix < count; ix++)
     {
         fmpz_randm(a, state, nmax);
         fmpz_randm(b, state, nmax);
@@ -92,9 +96,11 @@ void sample_fdiv_qr(void * arg, ulong count)
 
 void sample_cdiv_qr(void * arg, ulong count)
 {
-    FLINT_TEST_INIT(state);
     fmpz_t q, r, a, b;
     fmpz_t nmax;
+    int ix;
+
+    FLINT_TEST_INIT(state);
 
     fmpz_init(q);
     fmpz_init(r);
@@ -105,7 +111,7 @@ void sample_cdiv_qr(void * arg, ulong count)
     fmpz_set_d_2exp(nmax, 1.0, FLINT_BITS);
 
     prof_start();
-    for (int ix = 0; ix < count; ix++)
+    for (ix = 0; ix < count; ix++)
     {
         fmpz_randm(a, state, nmax);
         fmpz_randm(b, state, nmax);
@@ -130,9 +136,11 @@ void sample_cdiv_qr(void * arg, ulong count)
 
 void sample_tdiv_qr(void * arg, ulong count)
 {
-    FLINT_TEST_INIT(state);
     fmpz_t q, r, a, b;
     fmpz_t nmax;
+    int ix;
+
+    FLINT_TEST_INIT(state);
 
     fmpz_init(q);
     fmpz_init(r);
@@ -143,7 +151,7 @@ void sample_tdiv_qr(void * arg, ulong count)
     fmpz_set_d_2exp(nmax, 1.0, FLINT_BITS);
 
     prof_start();
-    for (int ix = 0; ix < count; ix++)
+    for (ix = 0; ix < count; ix++)
     {
         fmpz_randm(a, state, nmax);
         fmpz_randm(b, state, nmax);

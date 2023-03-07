@@ -11,10 +11,8 @@
 
 #define FMPZ_MOD_INLINES_C
 
-#define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
 #include <stdio.h>
-#undef ulong
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz_mod.h"

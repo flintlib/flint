@@ -31,6 +31,7 @@ void sample(void * arg, ulong count)
    int type = info->type;
    mp_size_t j;
    slong i;
+   mp_ptr vec1, vec2, res;
    FLINT_TEST_INIT(state);
    
    
@@ -39,9 +40,9 @@ void sample(void * arg, ulong count)
       
    nmod_init(&mod, n);
 
-   mp_ptr vec1 = _nmod_vec_init(1000);
-   mp_ptr vec2 = _nmod_vec_init(1000);
-   mp_ptr res = _nmod_vec_init(1000);
+   vec1 = _nmod_vec_init(1000);
+   vec2 = _nmod_vec_init(1000);
+   res = _nmod_vec_init(1000);
      
    for (j = 0; j < 1000; j++)
       vec1[j] = n_randint(state, n);

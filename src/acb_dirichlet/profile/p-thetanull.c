@@ -51,12 +51,12 @@ check_q(ulong q, int odd, slong prec, slong digits, int onlymod)
     ulong k, len;
     dirichlet_group_t G;
     dirichlet_char_t x;
-    dirichlet_group_init(G, q);
-    dirichlet_char_init(x, G);
     acb_ptr theta, z;
     arb_t z1;
     arb_ptr t;
 
+    dirichlet_group_init(G, q);
+    dirichlet_char_init(x, G);
     theta = _acb_vec_init(G->phi_q);
     z =  _acb_vec_init(G->phi_q);
 

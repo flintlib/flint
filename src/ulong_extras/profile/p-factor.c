@@ -68,8 +68,8 @@ int main(void)
 {
    double min, max;
    fac_one_line_t params;
-   FLINT_TEST_INIT(state);
    int i;
+   FLINT_TEST_INIT(state);
    
 
    params.composites = flint_malloc(1024*sizeof(ulong));
