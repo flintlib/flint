@@ -44,7 +44,6 @@ MA 02110-1301, USA. */
 #include <gmp.h>
 #define ulong ulongxx /* interferes with system includes */
 #include <stdio.h> /* for NULL */
-#undef ulong
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"

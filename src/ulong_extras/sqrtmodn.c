@@ -12,7 +12,6 @@
 #define ulong ulongxx /* interferes with system includes */
 #include <stdio.h>
 #include <stdlib.h>
-#undef ulong
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"

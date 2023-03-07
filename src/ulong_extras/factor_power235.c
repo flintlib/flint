@@ -12,7 +12,6 @@
 
 #define ulong ulongxx /* interferes with standard libraries */
 #include <math.h>
-#undef ulong
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
