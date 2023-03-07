@@ -15,7 +15,6 @@
 
 #include <gmp.h>
 
-#define ulong mp_limb_t
 
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"

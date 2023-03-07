@@ -19,7 +19,6 @@
 #include <gmp.h>
 #include <pthread.h>
 
-#define ulong mp_limb_t
 
 #include "flint.h"
 #include "nmod_poly.h"

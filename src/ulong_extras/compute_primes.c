@@ -15,7 +15,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <gmp.h>
-#define ulong mp_limb_t
 
 #include "flint.h"
 #include "ulong_extras.h"

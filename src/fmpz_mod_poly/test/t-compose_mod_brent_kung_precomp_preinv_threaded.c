@@ -20,7 +20,6 @@
 #include <gmp.h>
 #include <pthread.h>
 
-#define ulong mp_limb_t
 
 #include "flint.h"
 #include "fmpz_mod_poly.h"

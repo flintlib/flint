@@ -15,7 +15,6 @@
 #include <math.h>
 #include <pthread.h>
 #include <gmp.h>
-#define ulong mp_limb_t
 #include "nmod_poly.h"
 
 void
