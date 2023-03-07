@@ -12,7 +12,6 @@
 #ifndef FLINT_H
 #define FLINT_H
 
-#undef ulong
 #define ulong ulongxx /* ensure vendor doesn't typedef ulong */
 #if !defined(_MSC_VER)
 #include <sys/param.h> /* for BSD define */
@@ -31,7 +30,6 @@
 #include "limits.h"
 #include "longlong.h"
 #include "flint-config.h"
-#undef ulong
 
 #ifdef FLINT_INLINES_C
 #define FLINT_INLINE FLINT_DLL
