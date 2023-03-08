@@ -289,7 +289,6 @@ Floating-point support code
 
    double_extras.rst
    double_interval.rst
-   fmpr.rst
    d_vec.rst
    d_mat.rst
    mpf_vec.rst

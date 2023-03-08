@@ -9,69 +9,46 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpr.h"
+#include "mpfr.h"
 #include "arf.h"
 
 int
 arf_div_naive(arf_t z, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)
 {
-    if (rnd == ARF_RND_NEAR)
+    arf_t m, n;
+    fmpz_t e, f;
+    mpfr_t a, b, c;
+    int inexact;
+
+    if (arf_is_zero(y))
     {
-        arf_t m, n;
-        fmpz_t e, f;
-        mpfr_t a, b, c;
-        int inexact;
-
-        if (arf_is_zero(y))
-        {
-            arf_nan(z);
-            return 0;
-        }
-
-        arf_init(m); arf_init(n);
-        fmpz_init(e); fmpz_init(f);
-        mpfr_init2(a, FLINT_MAX(2, arf_bits(x)));
-        mpfr_init2(b, FLINT_MAX(2, arf_bits(y)));
-        mpfr_init2(c, prec);
-
-        arf_frexp(m, e, x);
-        arf_frexp(n, f, y);
-
-        arf_get_mpfr(a, m, MPFR_RNDD);
-        arf_get_mpfr(b, n, MPFR_RNDD);
-
-        inexact = (mpfr_div(c, a, b, arf_rnd_to_mpfr(rnd)) != 0);
-
-        arf_set_mpfr(z, c);
-        fmpz_sub(e, e, f);
-        arf_mul_2exp_fmpz(z, z, e);
-
-        arf_clear(m); arf_clear(n);
-        fmpz_clear(e); fmpz_clear(f);
-        mpfr_clear(a); mpfr_clear(b); mpfr_clear(c);
-
-        return inexact;
+        arf_nan(z);
+        return 0;
     }
-    else
-    {
-        fmpr_t a, b;
-        slong r;
 
-        fmpr_init(a);
-        fmpr_init(b);
+    arf_init(m); arf_init(n);
+    fmpz_init(e); fmpz_init(f);
+    mpfr_init2(a, FLINT_MAX(2, arf_bits(x)));
+    mpfr_init2(b, FLINT_MAX(2, arf_bits(y)));
+    mpfr_init2(c, prec);
 
-        arf_get_fmpr(a, x);
-        arf_get_fmpr(b, y);
+    arf_frexp(m, e, x);
+    arf_frexp(n, f, y);
 
-        r = fmpr_div(a, a, b, prec, rnd);
+    arf_get_mpfr(a, m, MPFR_RNDD);
+    arf_get_mpfr(b, n, MPFR_RNDD);
 
-        arf_set_fmpr(z, a);
+    inexact = (mpfr_div(c, a, b, arf_rnd_to_mpfr(rnd)) != 0);
 
-        fmpr_clear(a);
-        fmpr_clear(b);
+    arf_set_mpfr(z, c);
+    fmpz_sub(e, e, f);
+    arf_mul_2exp_fmpz(z, z, e);
 
-        return (r == FMPR_RESULT_EXACT) ? 0 : 1;
-    }
+    arf_clear(m); arf_clear(n);
+    fmpz_clear(e); fmpz_clear(f);
+    mpfr_clear(a); mpfr_clear(b); mpfr_clear(c);
+
+    return inexact;
 }
 
 int main()

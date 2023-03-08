@@ -126,8 +126,6 @@ Assignment and conversions
 
 .. function:: void mag_set_d(mag_t res, double x)
 
-.. function:: void mag_set_fmpr(mag_t res, const fmpr_t x)
-
 .. function:: void mag_set_ui(mag_t res, ulong x)
 
 .. function:: void mag_set_fmpz(mag_t res, const fmpz_t x)
@@ -167,10 +165,6 @@ Assignment and conversions
     Returns a *double* approximating `\log_2(x)`, suitable for estimating
     magnitudes (warning: not a rigorous bound).
     The value is clamped between *COEFF_MIN* and *COEFF_MAX*.
-
-.. function:: void mag_get_fmpr(fmpr_t res, const mag_t x)
-
-    Sets *res* exactly to *x*.
 
 .. function:: void mag_get_fmpq(fmpq_t res, const mag_t x)
 

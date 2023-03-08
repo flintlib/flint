@@ -9,26 +9,30 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpr.h"
 #include "arf.h"
 
 int
 arf_rsqrt_naive(arf_t z, const arf_t x, slong prec, arf_rnd_t rnd)
 {
-    fmpr_t a;
-    slong r;
-
-    fmpr_init(a);
-
-    arf_get_fmpr(a, x);
-
-    r = fmpr_rsqrt(a, a, prec, rnd);
-
-    arf_set_fmpr(z, a);
-
-    fmpr_clear(a);
-
-    return (r == FMPR_RESULT_EXACT) ? 0 : 1;
+    if (arf_is_special(x))
+    {
+        return _arf_call_mpfr_func(z, NULL, (int (*)(void)) mpfr_rec_sqrt, x, NULL, prec, rnd);
+    }
+    else
+    {
+        fmpz_t t;
+        int res;
+        fmpz_init(t);
+        fmpz_tdiv_q_2exp(t, ARF_EXPREF(x), 1);
+        fmpz_mul_2exp(t, t, 1);
+        fmpz_neg(t, t);
+        arf_mul_2exp_fmpz(z, x, t);
+        res = _arf_call_mpfr_func(z, NULL, (int (*)(void)) mpfr_rec_sqrt, z, NULL, prec, rnd);
+        fmpz_tdiv_q_2exp(t, t, 1);
+        arf_mul_2exp_fmpz(z, z, t);
+        fmpz_clear(t);
+        return res;
+    }
 }
 
 int main()

@@ -193,8 +193,6 @@ Assignment, rounding and conversions
 
 .. function:: void arf_set_mpfr(arf_t res, const mpfr_t x)
 
-.. function:: void arf_set_fmpr(arf_t res, const fmpr_t x)
-
 .. function:: void arf_set_d(arf_t res, double x)
 
     Sets *res* to the exact value of *x*.
@@ -254,10 +252,6 @@ Assignment, rounding and conversions
     Returns *x* rounded to a double in the direction specified by *rnd*.
     This method rounds correctly when overflowing or underflowing
     the double exponent range (this was not the case in an earlier version).
-
-.. function:: void arf_get_fmpr(fmpr_t res, const arf_t x)
-
-    Sets *res* exactly to *x*.
 
 .. function:: int arf_get_mpfr(mpfr_t res, const arf_t x, mpfr_rnd_t rnd)
 

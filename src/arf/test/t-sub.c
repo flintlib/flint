@@ -9,36 +9,18 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpr.h"
 #include "arf.h"
 
 int
 arf_sub_naive(arf_t z, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)
 {
-    if (rnd == ARF_RND_NEAR)
-    {
-        arf_sub(z, x, y, ARF_PREC_EXACT, ARF_RND_DOWN);
-        return arf_set_round(z, z, prec, rnd);
-    }
-    else
-    {
-        fmpr_t a, b;
-        slong r;
-
-        fmpr_init(a);
-        fmpr_init(b);
-
-        arf_get_fmpr(a, x);
-        arf_get_fmpr(b, y);
-
-        r = fmpr_sub(a, a, b, prec, rnd);
-        arf_set_fmpr(z, a);
-
-        fmpr_clear(a);
-        fmpr_clear(b);
-
-        return (r == FMPR_RESULT_EXACT) ? 0 : 1;
-    }
+    int r;
+    arf_t t;
+    arf_init(t);
+    arf_neg(t, y);
+    r = arf_add(z, x, t, prec, rnd);
+    arf_clear(t);
+    return r;
 }
 
 int main()

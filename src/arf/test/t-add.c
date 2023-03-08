@@ -9,35 +9,56 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpr.h"
 #include "arf.h"
 
 int
 arf_add_naive(arf_t z, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)
 {
-    if (rnd == ARF_RND_NEAR)
+    if (!arf_is_special(x) && !arf_is_special(y))
     {
-        arf_add(z, x, y, ARF_PREC_EXACT, ARF_RND_DOWN);
-        return arf_set_round(z, z, prec, rnd);
+        fmpz_t t;
+        int inexact;
+
+        fmpz_init(t);
+        fmpz_sub(t, ARF_EXPREF(x), ARF_EXPREF(y));
+
+        if (fmpz_cmp_si(t, 5000) > 0)
+        {
+            arf_t eps;
+            arf_init(eps);
+            arf_mul_2exp_si(eps, x, -5000);
+            arf_abs(eps, eps);
+            if (arf_sgn(y) < 0)
+                arf_neg(eps, eps);
+            arf_add(z, x, eps, ARF_PREC_EXACT, ARF_RND_DOWN);
+            inexact = arf_set_round(z, z, prec, rnd);
+            arf_clear(eps);
+        }
+        else if (fmpz_cmp_si(t, -5000) < 0)
+        {
+            arf_t eps;
+            arf_init(eps);
+            arf_mul_2exp_si(eps, y, -5000);
+            arf_abs(eps, eps);
+            if (arf_sgn(x) < 0)
+                arf_neg(eps, eps);
+            arf_add(z, eps, y, ARF_PREC_EXACT, ARF_RND_DOWN);
+            inexact = arf_set_round(z, z, prec, rnd);
+            arf_clear(eps);
+        }
+        else
+        {
+            arf_add(z, x, y, ARF_PREC_EXACT, ARF_RND_DOWN);
+            inexact = arf_set_round(z, z, prec, rnd);
+        }
+
+        fmpz_clear(t);
+        return inexact;
     }
     else
     {
-        fmpr_t a, b;
-        slong r;
-
-        fmpr_init(a);
-        fmpr_init(b);
-
-        arf_get_fmpr(a, x);
-        arf_get_fmpr(b, y);
-
-        r = fmpr_add(a, a, b, prec, rnd);
-        arf_set_fmpr(z, a);
-
-        fmpr_clear(a);
-        fmpr_clear(b);
-
-        return (r == FMPR_RESULT_EXACT) ? 0 : 1;
+        arf_add(z, x, y, ARF_PREC_EXACT, ARF_RND_DOWN);
+        return arf_set_round(z, z, prec, rnd);
     }
 }
 
@@ -90,10 +111,6 @@ int main()
                 {
                     if (n_randint(state, 10) == 0)
                         prec = ARF_PREC_EXACT;
-                }
-                else if (rnd == ARF_RND_NEAR)
-                { /* large shift not supported in add_naive */
-                    rnd = ARF_RND_DOWN;
                 }
             }
 

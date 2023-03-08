@@ -106,7 +106,7 @@ set(_BUILD_DIRS
     double_interval dlog
     fmpz_extras     fmpzi
     bool_mat        partitions
-    fmpr            mag
+    mag
     arf             acf             arb             acb
     arb_mat         arb_poly        arb_calc        arb_hypgeom
     acb_mat         acb_poly        acb_calc        acb_hypgeom

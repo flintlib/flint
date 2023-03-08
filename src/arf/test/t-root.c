@@ -9,26 +9,53 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpr.h"
+#include "mpfr.h"
 #include "arf.h"
 
 int
-arf_root_naive(arf_t z, const arf_t x, ulong k, slong prec, arf_rnd_t rnd)
+arf_root_naive(arf_t z, const arf_t x, int k, slong prec, arf_rnd_t rnd)
 {
-    fmpr_t a;
-    slong r;
+    fmpz_t t;
+    mpfr_t u, v;
+    int res;
 
-    fmpr_init(a);
+    if ((k == 0) || (k > 1 && arf_sgn(x) < 0))
+    {
+        arf_nan(z);
+        return 0;
+    }
 
-    arf_get_fmpr(a, x);
+    fmpz_init(t);
 
-    r = fmpr_root(a, a, k, prec, rnd);
+    if (arf_is_special(x))
+        fmpz_zero(t);
+    else
+        fmpz_fdiv_q_ui(t, ARF_EXPREF(x), k);
+    fmpz_mul_ui(t, t, k);
+    fmpz_neg(t, t);
+    arf_mul_2exp_fmpz(z, x, t);
 
-    arf_set_fmpr(z, a);
+    mpfr_init2(u, FLINT_MAX(2, arf_bits(z)));
+    mpfr_init2(v, prec);
 
-    fmpr_clear(a);
+    arf_get_mpfr(u, z, MPFR_RNDD);
 
-    return (r == FMPR_RESULT_EXACT) ? 0 : 1;
+#if MPFR_VERSION_MAJOR >= 4
+    res = (mpfr_rootn_ui(v, u, k, arf_rnd_to_mpfr(rnd)) != 0);
+#else
+    res = (mpfr_root(v, u, k, arf_rnd_to_mpfr(rnd)) != 0);
+#endif
+    arf_set_mpfr(z, v);
+
+    fmpz_neg(t, t);
+    fmpz_tdiv_q_ui(t, t, k);
+    arf_mul_2exp_fmpz(z, z, t);
+
+    mpfr_clear(u);
+    mpfr_clear(v);
+
+    fmpz_clear(t);
+    return res;
 }
 
 int main()
