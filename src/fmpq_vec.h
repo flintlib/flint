@@ -18,7 +18,6 @@
 #define FMPQ_VEC_INLINE static __inline__
 #endif
 
-#include <gmp.h>
 #include "fmpq.h"
 #include "flint.h"
 

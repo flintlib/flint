@@ -10,7 +10,6 @@
 */
 
 #include "fmpz.h"
-#include "gmp.h"
 #include "fmpq.h"
 
 void fmpq_get_mpz_frac(mpz_t a, mpz_t b, fmpq_t c)

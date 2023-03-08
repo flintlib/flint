@@ -14,7 +14,6 @@
 
 #include <math.h>
 #include <pthread.h>
-#include <gmp.h>
 #include "nmod_poly.h"
 
 void

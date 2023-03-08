@@ -20,7 +20,6 @@
 
 #include <stdio.h>
 
-#include <gmp.h>
 
 #include "fmpq_poly.h"
 #include "fmpz_mpoly.h"

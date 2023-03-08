@@ -10,7 +10,6 @@
 */
 
 #include <stdio.h>
-#include <gmp.h>
 #include <mpfr.h>
 #include "flint.h"
 #include "fmpz.h"

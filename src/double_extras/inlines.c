@@ -11,7 +11,6 @@
 
 #define DOUBLE_EXTRAS_INLINES_C
 
-#include <gmp.h>
 #include "flint.h"
 #include "double_extras.h"
 

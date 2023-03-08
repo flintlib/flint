@@ -11,7 +11,6 @@
 
 #define FMPZ_VEC_INLINES_C
 
-#include <gmp.h>
 #include "flint.h"
 #include "fmpz_vec.h"
 

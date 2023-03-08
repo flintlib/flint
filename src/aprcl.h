@@ -12,7 +12,6 @@
 #ifndef APRCL_H
 #define APRCL_H
 
-#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"

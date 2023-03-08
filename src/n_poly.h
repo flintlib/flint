@@ -19,7 +19,6 @@
 #endif
 
 #include <stdio.h>
-#include <gmp.h>
 
 #include "nmod_poly.h"
 #include "fq_nmod_poly.h"

@@ -10,7 +10,6 @@
 */
 
 #include <stdio.h>
-#include <gmp.h>
 #include "profiler.h"
 #include "flint.h"
 #include "ulong_extras.h"

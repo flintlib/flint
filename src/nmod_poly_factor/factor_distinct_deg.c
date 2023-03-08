@@ -12,7 +12,6 @@
 */
 
 #include <math.h>
-#include <gmp.h>
 #include "nmod_poly.h"
 
 void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,

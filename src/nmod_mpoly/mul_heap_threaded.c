@@ -10,7 +10,6 @@
 */
 
 #include <string.h>
-#include <gmp.h>
 #include "thread_pool.h"
 #include "nmod_mpoly.h"
 #include "long_extras.h"

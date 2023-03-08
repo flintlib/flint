@@ -21,7 +21,6 @@
 
 #include <stdio.h>
 
-#include <gmp.h>
 
 #include "string.h"
 #include "mpoly_types.h"

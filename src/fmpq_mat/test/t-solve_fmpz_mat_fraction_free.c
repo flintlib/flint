@@ -11,7 +11,6 @@
 */
 
 #include <stdio.h>
-#include <gmp.h>
 #include "flint.h"
 #include "fmpq.h"
 #include "fmpq_mat.h"

@@ -12,7 +12,6 @@
 */
 
 #include <stdio.h>
-#include <gmp.h>
 #include "flint.h"
 #include "d_mat.h"
 #include "ulong_extras.h"

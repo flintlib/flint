@@ -19,7 +19,6 @@
 #define FMPZ_VEC_INLINE static __inline__
 #endif
 
-#include <gmp.h>
 #include "fmpz.h"
 #include "flint.h"
 

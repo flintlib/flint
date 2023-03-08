@@ -11,7 +11,6 @@
 
 #define PERM_INLINES_C
 
-#include <gmp.h>
 #include "flint.h"
 #include "perm.h"
 

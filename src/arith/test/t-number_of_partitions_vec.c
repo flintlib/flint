@@ -11,7 +11,6 @@
 
 #include <stdio.h>
 #include <limits.h>
-#include <gmp.h>
 #include "flint.h"
 #include "arith.h"
 #include "fmpz_vec.h"

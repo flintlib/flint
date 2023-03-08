@@ -16,7 +16,6 @@
 
 
 
-#include <gmp.h>
 
 
 #include "flint.h"

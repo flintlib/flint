@@ -11,7 +11,6 @@
 */
 
 #include <stdio.h>
-#include <gmp.h>
 #include "flint.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"

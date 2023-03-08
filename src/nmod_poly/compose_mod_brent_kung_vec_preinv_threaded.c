@@ -11,7 +11,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
 #if FLINT_USES_PTHREAD
 #include <pthread.h>
 #endif

@@ -12,7 +12,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"

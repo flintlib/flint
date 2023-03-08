@@ -19,7 +19,6 @@
 #endif
 
 #include <stdio.h>
-#include <gmp.h>
 
 #include "n_poly.h"
 #include "nmod_mpoly_factor.h"

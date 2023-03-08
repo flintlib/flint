@@ -13,7 +13,6 @@
 */
 
 #include <stdio.h>
-#include <gmp.h>
 #include <math.h>
 #include "flint.h"
 #include "nmod_poly.h"

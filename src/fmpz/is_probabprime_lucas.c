@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <math.h>
 #include <assert.h>
-#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"

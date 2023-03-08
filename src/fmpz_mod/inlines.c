@@ -12,7 +12,6 @@
 #define FMPZ_MOD_INLINES_C
 
 #include <stdio.h>
-#include <gmp.h>
 #include "flint.h"
 #include "fmpz_mod.h"
 

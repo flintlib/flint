@@ -12,7 +12,6 @@
 #define FQ_DEFAULT_POLY_INLINES_C
 
 #include <stdio.h>
-#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fq_default.h"

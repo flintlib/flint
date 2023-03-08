@@ -12,7 +12,6 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "long_extras.h"

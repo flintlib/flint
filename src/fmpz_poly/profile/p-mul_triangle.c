@@ -11,7 +11,6 @@
 */
 
 #include <stdio.h>
-#include <gmp.h>
 #include <float.h>
 #include <math.h>
 #include "flint.h"
