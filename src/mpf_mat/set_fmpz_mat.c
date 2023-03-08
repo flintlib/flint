@@ -10,10 +10,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include "mpf_mat.h"
+#include "fmpz_vec.h"
 
 void
-fmpz_mat_get_mpf_mat(mpf_mat_t B, const fmpz_mat_t A)
+mpf_mat_set_fmpz_mat(mpf_mat_t B, const fmpz_mat_t A)
 {
     slong i;
 

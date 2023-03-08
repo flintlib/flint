@@ -60,7 +60,7 @@ Conversions
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpz_mat_get_mpf_mat(mpf_mat_t B, const fmpz_mat_t A)
+.. function:: void mpf_mat_set_fmpz_mat(mpf_mat_t B, const fmpz_mat_t A)
 
     Sets the entries of ``B`` as mpfs corresponding to the entries of
     ``A``.
