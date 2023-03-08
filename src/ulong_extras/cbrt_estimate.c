@@ -15,7 +15,6 @@
 #include <float.h>
 #include "flint.h"
 #include "ulong_extras.h"
-#include "longlong.h"
 
 double
 n_cbrt_estimate(double a)

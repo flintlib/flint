@@ -20,7 +20,6 @@
 #endif
 
 
-#include "longlong.h"
 #include "ulong_extras.h"
 #include "nmod_types.h"
 

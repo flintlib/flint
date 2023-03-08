@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "longlong.h"
 #include "fmpq.h"
 #include "fmpz_poly.h"
 #include "mpn_extras.h"

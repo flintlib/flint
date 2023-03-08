@@ -10,7 +10,6 @@
 */
 
 #include "flint.h"
-#include "longlong.h"
 #include "mpn_extras.h"
 
 #if !defined(_MSC_VER)

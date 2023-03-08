@@ -12,7 +12,6 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
-#include "longlong.h"
 
 /*
    Set polyq, polyr to the quotient and remainder of poly2 by poly3 (with

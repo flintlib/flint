@@ -11,7 +11,6 @@
 
 #include <stdio.h>
 #include "flint.h"
-#include "longlong.h"
 #include "mpn_extras.h"
 #include "ulong_extras.h"
 

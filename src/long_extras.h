@@ -19,7 +19,6 @@
 #endif
 
 #include "flint.h"
-#include "longlong.h"
 
 #ifdef __cplusplus
  extern "C" {

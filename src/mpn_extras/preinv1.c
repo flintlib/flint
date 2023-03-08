@@ -10,7 +10,6 @@
 */
 
 #include "flint.h"
-#include "longlong.h"
 #include "mpn_extras.h"
 
 mp_limb_t flint_mpn_preinv1(mp_limb_t d1, mp_limb_t d2)
