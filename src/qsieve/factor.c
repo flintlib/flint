@@ -16,6 +16,7 @@
 #undef __STRICT_ANSI__
 #endif
 
+#include <stdlib.h>
 #include "qsieve.h"
 #include "fmpz_factor.h"
 #include "thread_support.h"

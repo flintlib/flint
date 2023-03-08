@@ -2995,7 +2995,7 @@ gr_method_tab_init(gr_funcptr * methods, gr_method_tab_input * tab)
             break;
 
         if (_gr_generic_methods[i].index >= GR_METHOD_TAB_SIZE)
-            abort();
+            flint_abort();
 
         methods[_gr_generic_methods[i].index] = _gr_generic_methods[i].function;
     }
@@ -3006,7 +3006,7 @@ gr_method_tab_init(gr_funcptr * methods, gr_method_tab_input * tab)
             break;
 
         if (tab[i].index >= GR_METHOD_TAB_SIZE)
-            abort();
+            flint_abort();
 
         methods[tab[i].index] = tab[i].function;
     }

@@ -45,7 +45,7 @@ void gr_stream_write(gr_stream_t out, const char * s)
         if (alloc > out->alloc)
         {
             alloc = FLINT_MAX(alloc, out->alloc * 2);
-            out->s = realloc(out->s, alloc);
+            out->s = flint_realloc(out->s, alloc);
             out->alloc = alloc;
         }
 

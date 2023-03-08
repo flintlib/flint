@@ -10,5 +10,5 @@
 */
 
 #define FEXPR_INLINES_C
+#include <stdlib.h> /* Important for defining _fexpr_vec_sort_fast properly */
 #include "fexpr.h"
-

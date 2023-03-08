@@ -1442,7 +1442,7 @@ _create_heuristic_context(const fmpz_t n, slong prec)
     sigma_grid = ((slong) (dgrid/2))*2 + 1;
     sigma_interp = ((slong) (dinterp/2))*2 + 1;
 
-    p = malloc(sizeof(platt_ctx_struct));
+    p = flint_malloc(sizeof(platt_ctx_struct));
     platt_ctx_init(p, T, A, B, h, J, K,
             sigma_grid, Ns_max, H, sigma_interp, prec);
 
@@ -1482,7 +1482,7 @@ acb_dirichlet_platt_isolate_local_hardy_z_zeros(
         {
             zeros_count = _isolate_zeros(res, ctx, n, len, prec);
             platt_ctx_clear(ctx);
-            free(ctx);
+            flint_free(ctx);
         }
         return zeros_count;
     }
@@ -1522,7 +1522,7 @@ acb_dirichlet_platt_local_hardy_z_zeros(
             }
             _arf_interval_vec_clear(p, len);
             platt_ctx_clear(ctx);
-            free(ctx);
+            flint_free(ctx);
         }
         return zeros_count;
     }

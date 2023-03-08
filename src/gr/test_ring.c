@@ -2549,7 +2549,7 @@ gr_test_iter(gr_ctx_t R, flint_rand_t state, const char * descr, gr_test_functio
         if (status & GR_TEST_FAIL)
         {
             flint_printf("\nFAIL\n");
-            abort();
+            flint_abort();
         }
     }
 

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
 #include "calcium.h"
 
 double _calcium_test_multiplier = -1.0;

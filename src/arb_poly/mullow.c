@@ -93,7 +93,7 @@ arb_poly_mullow(arb_poly_t res, const arb_poly_t poly1,
         }
         else
         {
-            abort();
+            flint_abort();
 
             if (res == poly1 || res == poly2)
             {

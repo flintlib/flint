@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
 #include "arb.h"
 
 double _arb_test_multiplier = -1.0;
