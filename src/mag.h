@@ -482,11 +482,6 @@ void mag_set_d_2exp_fmpz_lower(mag_t z, double c, const fmpz_t exp);
 
 void mag_set_fmpz_2exp_fmpz(mag_t z, const fmpz_t man, const fmpz_t exp);
 
-#ifdef FMPR_H
-void mag_set_fmpr(mag_t x, const fmpr_t y);
-void mag_get_fmpr(fmpr_t x, const mag_t r);
-#endif
-
 void mag_randtest_special(mag_t x, flint_rand_t state, slong expbits);
 
 void mag_randtest(mag_t x, flint_rand_t state, slong expbits);

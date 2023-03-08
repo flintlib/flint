@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpr.h"
+#include "arf.h"
 #include "mag.h"
 
 int main()
@@ -24,13 +24,13 @@ int main()
 
     for (iter = 0; iter < 100000 * arb_test_multiplier(); iter++)
     {
-        fmpr_t x, y, z;
+        arf_t x, y, z;
         mag_t xb, yb;
         fmpz_t e;
 
-        fmpr_init(x);
-        fmpr_init(y);
-        fmpr_init(z);
+        arf_init(x);
+        arf_init(y);
+        arf_init(z);
 
         fmpz_init(e);
 
@@ -39,28 +39,28 @@ int main()
 
         mag_randtest_special(xb, state, 100);
         fmpz_randtest(e, state, 100);
-        mag_get_fmpr(x, xb);
+        arf_set_mag(x, xb);
 
         mag_mul_2exp_fmpz(yb, xb, e);
 
-        fmpr_mul_2exp_fmpz(y, x, e);
+        arf_mul_2exp_fmpz(y, x, e);
 
-        mag_get_fmpr(z, yb);
+        arf_set_mag(z, yb);
 
         MAG_CHECK_BITS(yb)
 
-        if (!fmpr_equal(z, y))
+        if (!arf_equal(z, y))
         {
             flint_printf("FAIL\n\n");
-            flint_printf("x = "); fmpr_printd(x, 15); flint_printf("\n\n");
-            flint_printf("y = "); fmpr_printd(y, 15); flint_printf("\n\n");
-            flint_printf("z = "); fmpr_printd(z, 15); flint_printf("\n\n");
+            flint_printf("x = "); arf_printd(x, 15); flint_printf("\n\n");
+            flint_printf("y = "); arf_printd(y, 15); flint_printf("\n\n");
+            flint_printf("z = "); arf_printd(z, 15); flint_printf("\n\n");
             flint_abort();
         }
 
-        fmpr_clear(x);
-        fmpr_clear(y);
-        fmpr_clear(z);
+        arf_clear(x);
+        arf_clear(y);
+        arf_clear(z);
 
         mag_clear(xb);
         mag_clear(yb);

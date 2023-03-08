@@ -9,8 +9,75 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpr.h"
+#include "arf.h"
 #include "mag.h"
+
+void
+arf_pow_binexp_fmpz(arf_t y, const arf_t b, const fmpz_t e,
+    slong prec, arf_rnd_t rnd)
+{
+    slong i, wp, bits;
+
+    if (fmpz_is_zero(e))
+    {
+        arf_set_ui(y, UWORD(1));
+        return;
+    }
+
+    if (fmpz_sgn(e) < 0)
+    {
+        fmpz_t f;
+        fmpz_init(f);
+        fmpz_neg(f, e);
+        arf_pow_binexp_fmpz(y, b, f, prec + 2,
+            (rnd == ARF_RND_FLOOR || rnd == ARF_RND_DOWN)
+            ? ARF_RND_UP : ARF_RND_DOWN);
+        arf_ui_div(y, UWORD(1), y, prec, rnd);
+        fmpz_clear(f);
+        return;
+    }
+
+    if (y == b)
+    {
+        arf_t t;
+        arf_init(t);
+        arf_set(t, b);
+        arf_pow_binexp_fmpz(y, t, e, prec, rnd);
+        arf_clear(t);
+        return;
+    }
+
+    arf_set(y, b);
+
+    bits = fmpz_bits(e);
+    wp = ARF_PREC_ADD(prec, bits);
+
+    for (i = bits - 2; i >= 0; i--)
+    {
+        arf_mul(y, y, y, wp, rnd);
+        if (fmpz_tstbit(e, i))
+            arf_mul(y, y, b, wp, rnd);
+    }
+}
+
+void
+arf_pow_binexp_ui(arf_t y, const arf_t b, ulong e, slong prec, arf_rnd_t rnd)
+{
+    fmpz_t f;
+    fmpz_init_set_ui(f, e);
+    arf_pow_binexp_fmpz(y, b, f, prec, rnd);
+    fmpz_clear(f);
+}
+
+void
+arf_pow_binexp_si(arf_t y, const arf_t b, slong e, slong prec, arf_rnd_t rnd)
+{
+    fmpz_t f;
+    fmpz_init(f);
+    fmpz_set_si(f, e);
+    arf_pow_binexp_fmpz(y, b, f, prec, rnd);
+    fmpz_clear(f);
+}
 
 int main()
 {
@@ -24,15 +91,15 @@ int main()
 
     for (iter = 0; iter < 1000 * arb_test_multiplier(); iter++)
     {
-        fmpr_t x, t, y, z;
+        arf_t x, t, y, z;
         fmpz_t f;
         mag_t xb, yb;
         ulong N, k;
 
-        fmpr_init(x);
-        fmpr_init(t);
-        fmpr_init(y);
-        fmpr_init(z);
+        arf_init(x);
+        arf_init(t);
+        arf_init(y);
+        arf_init(z);
         fmpz_init(f);
         mag_init(xb);
         mag_init(yb);
@@ -43,31 +110,31 @@ int main()
 
         mag_exp_tail(yb, xb, N);
 
-        mag_get_fmpr(x, xb);
-        mag_get_fmpr(y, yb);
+        arf_set_mag(x, xb);
+        arf_set_mag(y, yb);
 
-        fmpr_pow_sloppy_ui(t, x, N, MAG_BITS, FMPR_RND_DOWN);
+        arf_pow_binexp_ui(t, x, N, MAG_BITS, ARF_RND_DOWN);
         fmpz_fac_ui(f, N);
-        fmpr_div_fmpz(t, t, f, MAG_BITS, FMPR_RND_DOWN);
-        fmpr_set(z, t);
+        arf_div_fmpz(t, t, f, MAG_BITS, ARF_RND_DOWN);
+        arf_set(z, t);
 
         for (k = 1; k < 50; k++)
         {
-            fmpr_mul(t, t, x, MAG_BITS, FMPR_RND_DOWN);
-            fmpr_div_ui(t, t, N + k, MAG_BITS, FMPR_RND_DOWN);
-            fmpr_add(z, z, t, MAG_BITS, FMPR_RND_DOWN);
+            arf_mul(t, t, x, MAG_BITS, ARF_RND_DOWN);
+            arf_div_ui(t, t, N + k, MAG_BITS, ARF_RND_DOWN);
+            arf_add(z, z, t, MAG_BITS, ARF_RND_DOWN);
         }
 
         MAG_CHECK_BITS(xb)
         MAG_CHECK_BITS(yb)
 
-        if (!(fmpr_cmpabs(z, y) <= 0))
+        if (!(arf_cmpabs(z, y) <= 0))
         {
             flint_printf("FAIL\n\n");
             flint_printf("N = %wu\n\n", N);
-            flint_printf("x = "); fmpr_print(x); flint_printf("\n\n");
-            flint_printf("y = "); fmpr_print(y); flint_printf("\n\n");
-            flint_printf("z = "); fmpr_print(z); flint_printf("\n\n");
+            flint_printf("x = "); arf_print(x); flint_printf("\n\n");
+            flint_printf("y = "); arf_print(y); flint_printf("\n\n");
+            flint_printf("z = "); arf_print(z); flint_printf("\n\n");
             flint_abort();
         }
 
@@ -79,10 +146,10 @@ int main()
             flint_abort();
         }
 
-        fmpr_clear(x);
-        fmpr_clear(t);
-        fmpr_clear(y);
-        fmpr_clear(z);
+        arf_clear(x);
+        arf_clear(t);
+        arf_clear(y);
+        arf_clear(z);
         fmpz_clear(f);
         mag_clear(xb);
         mag_clear(yb);

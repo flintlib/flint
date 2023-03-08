@@ -9,23 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpr.h"
+#include "arf.h"
 #include "mag.h"
 
-slong
-fmpr_cosh(fmpr_t y, const fmpr_t x, slong prec, fmpr_rnd_t rnd)
+void
+arf_cosh(arf_t y, const arf_t x, slong prec, arf_rnd_t rnd)
 {
-    if (fmpr_is_special(x))
-    {
-        fmpr_add_ui(y, x, 1, prec, rnd);
-        return FMPR_RESULT_EXACT;
-    }
-    else
-    {
-        slong r;
-        CALL_MPFR_FUNC(r, mpfr_cosh, y, x, prec, rnd);
-        return r;
-    }
+    _arf_call_mpfr_func(y, NULL, (int (*)(void)) mpfr_cosh, x, NULL, prec, rnd);
 }
 
 int main()
@@ -33,20 +23,21 @@ int main()
     slong iter;
     flint_rand_t state;
 
-    flint_printf("atan....");
+    flint_printf("cosh....");
     fflush(stdout);
 
     flint_randinit(state);
 
+    /* test cosh */
     for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
     {
-        fmpr_t x, y, z, z2;
+        arf_t x, y, z, z2;
         mag_t xb, yb;
 
-        fmpr_init(x);
-        fmpr_init(y);
-        fmpr_init(z);
-        fmpr_init(z2);
+        arf_init(x);
+        arf_init(y);
+        arf_init(z);
+        arf_init(z2);
 
         mag_init(xb);
         mag_init(yb);
@@ -57,23 +48,23 @@ int main()
 
         mag_cosh(yb, xb);
 
-        mag_get_fmpr(x, xb);
-        mag_get_fmpr(y, yb);
+        arf_set_mag(x, xb);
+        arf_set_mag(y, yb);
 
-        fmpr_cosh(z, x, MAG_BITS, FMPR_RND_UP);
-        fmpr_mul_ui(z2, z, 1025, MAG_BITS, FMPR_RND_UP);
-        fmpr_mul_2exp_si(z2, z2, -10);
+        arf_cosh(z, x, MAG_BITS, ARF_RND_UP);
+        arf_mul_ui(z2, z, 1025, MAG_BITS, ARF_RND_UP);
+        arf_mul_2exp_si(z2, z2, -10);
 
         MAG_CHECK_BITS(xb)
         MAG_CHECK_BITS(yb)
 
-        if (!(fmpr_cmpabs(z, y) <= 0 && fmpr_cmpabs(y, z2) <= 0))
+        if (!(arf_cmpabs(z, y) <= 0 && arf_cmpabs(y, z2) <= 0))
         {
             flint_printf("FAIL\n\n");
-            flint_printf("x = "); fmpr_print(x); flint_printf("\n\n");
-            flint_printf("y = "); fmpr_print(y); flint_printf("\n\n");
-            flint_printf("z = "); fmpr_print(z); flint_printf("\n\n");
-            flint_printf("z2 = "); fmpr_print(z2); flint_printf("\n\n");
+            flint_printf("x = "); arf_print(x); flint_printf("\n\n");
+            flint_printf("y = "); arf_print(y); flint_printf("\n\n");
+            flint_printf("z = "); arf_print(z); flint_printf("\n\n");
+            flint_printf("z2 = "); arf_print(z2); flint_printf("\n\n");
             flint_abort();
         }
 
@@ -85,10 +76,67 @@ int main()
             flint_abort();
         }
 
-        fmpr_clear(x);
-        fmpr_clear(y);
-        fmpr_clear(z);
-        fmpr_clear(z2);
+        arf_clear(x);
+        arf_clear(y);
+        arf_clear(z);
+        arf_clear(z2);
+
+        mag_clear(xb);
+        mag_clear(yb);
+    }
+
+    /* test cosh_lower */
+    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    {
+        arf_t x, y, z, z2;
+        mag_t xb, yb;
+
+        arf_init(x);
+        arf_init(y);
+        arf_init(z);
+        arf_init(z2);
+
+        mag_init(xb);
+        mag_init(yb);
+
+        mag_randtest_special(xb, state, 0);
+        mag_mul_2exp_si(xb, xb, -100 + n_randint(state,120));
+        mag_randtest_special(yb, state, 25);
+
+        mag_cosh_lower(yb, xb);
+
+        arf_set_mag(x, xb);
+        arf_set_mag(y, yb);
+
+        arf_cosh(z, x, MAG_BITS, ARF_RND_DOWN);
+        arf_mul_ui(z2, z, 1023, MAG_BITS, ARF_RND_DOWN);
+        arf_mul_2exp_si(z2, z2, -10);
+
+        MAG_CHECK_BITS(xb)
+        MAG_CHECK_BITS(yb)
+
+        if (!(arf_cmpabs(z2, y) <= 0 && arf_cmpabs(y, z) <= 0))
+        {
+            flint_printf("FAIL\n\n");
+            flint_printf("x = "); arf_print(x); flint_printf("\n\n");
+            flint_printf("y = "); arf_print(y); flint_printf("\n\n");
+            flint_printf("z = "); arf_print(z); flint_printf("\n\n");
+            flint_printf("z2 = "); arf_print(z2); flint_printf("\n\n");
+            flint_abort();
+        }
+
+        mag_cosh_lower(xb, xb);
+
+        if (!mag_equal(xb, yb))
+        {
+            flint_printf("FAIL (aliasing)\n\n");
+            flint_abort();
+        }
+
+        arf_clear(x);
+        arf_clear(y);
+        arf_clear(z);
+        arf_clear(z2);
 
         mag_clear(xb);
         mag_clear(yb);

@@ -9,8 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpr.h"
+#include "arf.h"
 #include "mag.h"
+
+void
+arf_log(arf_t y, const arf_t x, slong prec, arf_rnd_t rnd)
+{
+    _arf_call_mpfr_func(y, NULL, (int (*)(void)) mpfr_log, x, NULL, prec, rnd);
+}
 
 int main()
 {
@@ -24,14 +30,14 @@ int main()
 
     for (iter = 0; iter < 100000 * arb_test_multiplier(); iter++)
     {
-        fmpr_t x, y, z, z2;
+        arf_t x, y, z, z2;
         fmpz_t n;
         mag_t xb, yb;
 
-        fmpr_init(x);
-        fmpr_init(y);
-        fmpr_init(z);
-        fmpr_init(z2);
+        arf_init(x);
+        arf_init(y);
+        arf_init(z);
+        arf_init(z2);
 
         mag_init(xb);
         mag_init(yb);
@@ -45,18 +51,18 @@ int main()
         {
             mag_neg_log(yb, xb);
 
-            mag_get_fmpr(x, xb);
+            arf_set_mag(x, xb);
             if (mag_cmp_2exp_si(xb, 0) >= 0)
-                fmpr_zero(z);
+                arf_zero(z);
             else
             {
-                fmpr_log(z, x, MAG_BITS, FMPR_RND_UP);
-                fmpr_neg(z, z);
+                arf_log(z, x, MAG_BITS, ARF_RND_UP);
+                arf_neg(z, z);
             }
         }
         else
         {
-            mag_get_fmpr(x, xb);
+            arf_set_mag(x, xb);
 
             fmpz_randtest(n, state, 100);
             mag_mul_2exp_fmpz(xb, xb, n);
@@ -64,34 +70,34 @@ int main()
 
             if (mag_cmp_2exp_si(xb, 0) >= 0)
             {
-                fmpr_zero(z);
+                arf_zero(z);
             }
             else
             {
-                fmpr_log(z, x, 2 * MAG_BITS, FMPR_RND_UP);
-                fmpr_neg(z, z);
-                fmpr_set_ui(z2, 2);
-                fmpr_log(z2, z2, 2 * MAG_BITS, FMPR_RND_UP);
-                fmpr_submul_fmpz(z, z2, n, 2 * MAG_BITS, FMPR_RND_UP);
+                arf_log(z, x, 2 * MAG_BITS, ARF_RND_UP);
+                arf_neg(z, z);
+                arf_set_ui(z2, 2);
+                arf_log(z2, z2, 2 * MAG_BITS, ARF_RND_UP);
+                arf_submul_fmpz(z, z2, n, 2 * MAG_BITS, ARF_RND_UP);
             }
         }
 
-        mag_get_fmpr(y, yb);
+        arf_set_mag(y, yb);
 
-        fmpr_mul_ui(z2, z, 1025, MAG_BITS, FMPR_RND_UP);
-        fmpr_mul_2exp_si(z2, z2, -10);
+        arf_mul_ui(z2, z, 1025, MAG_BITS, ARF_RND_UP);
+        arf_mul_2exp_si(z2, z2, -10);
 
         MAG_CHECK_BITS(xb)
         MAG_CHECK_BITS(yb)
 
-        if (!(fmpr_cmpabs(z, y) <= 0 && fmpr_cmpabs(y, z2) <= 0))
+        if (!(arf_cmpabs(z, y) <= 0 && arf_cmpabs(y, z2) <= 0))
         {
             flint_printf("FAIL\n\n");
             flint_printf("n = "); fmpz_print(n); flint_printf("\n\n");
-            flint_printf("x = "); fmpr_print(x); flint_printf("\n\n");
-            flint_printf("y = "); fmpr_print(y); flint_printf("\n\n");
-            flint_printf("z = "); fmpr_print(z); flint_printf("\n\n");
-            flint_printf("z2 = "); fmpr_print(z2); flint_printf("\n\n");
+            flint_printf("x = "); arf_print(x); flint_printf("\n\n");
+            flint_printf("y = "); arf_print(y); flint_printf("\n\n");
+            flint_printf("z = "); arf_print(z); flint_printf("\n\n");
+            flint_printf("z2 = "); arf_print(z2); flint_printf("\n\n");
             flint_abort();
         }
 
@@ -103,10 +109,102 @@ int main()
             flint_abort();
         }
 
-        fmpr_clear(x);
-        fmpr_clear(y);
-        fmpr_clear(z);
-        fmpr_clear(z2);
+        arf_clear(x);
+        arf_clear(y);
+        arf_clear(z);
+        arf_clear(z2);
+
+        mag_clear(xb);
+        mag_clear(yb);
+
+        fmpz_clear(n);
+    }
+
+    for (iter = 0; iter < 100000 * arb_test_multiplier(); iter++)
+    {
+        arf_t x, y, z, z2;
+        fmpz_t n;
+        mag_t xb, yb;
+
+        arf_init(x);
+        arf_init(y);
+        arf_init(z);
+        arf_init(z2);
+
+        mag_init(xb);
+        mag_init(yb);
+
+        fmpz_init(n);
+
+        mag_randtest_special(xb, state, 25);
+        mag_randtest_special(yb, state, 25);
+
+        if (n_randint(state, 2))
+        {
+            mag_neg_log_lower(yb, xb);
+
+            arf_set_mag(x, xb);
+            if (mag_cmp_2exp_si(xb, 0) >= 0)
+                arf_zero(z);
+            else
+            {
+                arf_log(z, x, MAG_BITS, ARF_RND_DOWN);
+                arf_neg(z, z);
+            }
+        }
+        else
+        {
+            arf_set_mag(x, xb);
+
+            fmpz_randtest(n, state, 100);
+            mag_mul_2exp_fmpz(xb, xb, n);
+            mag_neg_log_lower(yb, xb);
+
+            if (mag_cmp_2exp_si(xb, 0) >= 0)
+            {
+                arf_zero(z);
+            }
+            else
+            {
+                arf_log(z, x, 2 * MAG_BITS, ARF_RND_DOWN);
+                arf_neg(z, z);
+                arf_set_ui(z2, 2);
+                arf_log(z2, z2, 2 * MAG_BITS, ARF_RND_DOWN);
+                arf_submul_fmpz(z, z2, n, 2 * MAG_BITS, ARF_RND_DOWN);
+            }
+        }
+
+        arf_set_mag(y, yb);
+
+        arf_mul_ui(z2, z, 1023, MAG_BITS, ARF_RND_DOWN);
+        arf_mul_2exp_si(z2, z2, -10);
+
+        MAG_CHECK_BITS(xb)
+        MAG_CHECK_BITS(yb)
+
+        if (!(arf_cmpabs(z2, y) <= 0 && arf_cmpabs(y, z) <= 0))
+        {
+            flint_printf("FAIL\n\n");
+            flint_printf("n = "); fmpz_print(n); flint_printf("\n\n");
+            flint_printf("x = "); arf_print(x); flint_printf("\n\n");
+            flint_printf("y = "); arf_print(y); flint_printf("\n\n");
+            flint_printf("z = "); arf_print(z); flint_printf("\n\n");
+            flint_printf("z2 = "); arf_print(z2); flint_printf("\n\n");
+            flint_abort();
+        }
+
+        mag_neg_log_lower(xb, xb);
+
+        if (!mag_equal(xb, yb))
+        {
+            flint_printf("FAIL (aliasing)\n\n");
+            flint_abort();
+        }
+
+        arf_clear(x);
+        arf_clear(y);
+        arf_clear(z);
+        arf_clear(z2);
 
         mag_clear(xb);
         mag_clear(yb);

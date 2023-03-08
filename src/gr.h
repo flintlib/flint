@@ -853,7 +853,6 @@ typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcp
 
 
 /* Macros to retrieve methods (with correct call signature) from context object. */
-
 #define GR_CTX_OP(ctx, NAME) (((gr_method_ctx *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_CTX_STREAM(ctx, NAME) (((gr_method_ctx_stream *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_CTX_PREDICATE(ctx, NAME) (((gr_method_ctx_predicate *) ctx->methods)[GR_METHOD_ ## NAME])

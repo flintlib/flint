@@ -9,8 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpr.h"
+#include "mpfr.h"
+#include "arf.h"
 #include "mag.h"
+
+void
+arf_expm1(arf_t y, const arf_t x, slong prec, arf_rnd_t rnd)
+{
+    _arf_call_mpfr_func(y, NULL, (int (*)(void)) mpfr_expm1, x, NULL, prec, rnd);
+}
 
 int main()
 {
@@ -24,13 +31,13 @@ int main()
 
     for (iter = 0; iter < 100000 * arb_test_multiplier(); iter++)
     {
-        fmpr_t x, y, z, z2;
+        arf_t x, y, z, z2;
         mag_t xb, yb;
 
-        fmpr_init(x);
-        fmpr_init(y);
-        fmpr_init(z);
-        fmpr_init(z2);
+        arf_init(x);
+        arf_init(y);
+        arf_init(z);
+        arf_init(z2);
 
         mag_init(xb);
         mag_init(yb);
@@ -42,31 +49,31 @@ int main()
 
         mag_expm1(yb, xb);
 
-        mag_get_fmpr(x, xb);
-        mag_get_fmpr(y, yb);
+        arf_set_mag(x, xb);
+        arf_set_mag(y, yb);
 
-        fmpr_expm1(z, x, MAG_BITS, FMPR_RND_UP);
+        arf_expm1(z, x, MAG_BITS, ARF_RND_UP);
 
-        if (fmpr_cmpabs_ui(x, 1000) < 0)
+        if (arf_cmpabs_ui(x, 1000) < 0)
         {
-            fmpr_mul_ui(z2, z, 1025, MAG_BITS, FMPR_RND_UP);
-            fmpr_mul_2exp_si(z2, z2, -10);
+            arf_mul_ui(z2, z, 1025, MAG_BITS, ARF_RND_UP);
+            arf_mul_2exp_si(z2, z2, -10);
         }
         else
         {
-            fmpr_mul_2exp_si(z2, z, 2);
+            arf_mul_2exp_si(z2, z, 2);
         }
 
         MAG_CHECK_BITS(xb)
         MAG_CHECK_BITS(yb)
 
-        if (!(fmpr_cmpabs(z, y) <= 0 && fmpr_cmpabs(y, z2) <= 0))
+        if (!(arf_cmpabs(z, y) <= 0 && arf_cmpabs(y, z2) <= 0))
         {
             flint_printf("FAIL\n\n");
-            flint_printf("x = "); fmpr_printd(x, 15); flint_printf("\n\n");
-            flint_printf("y = "); fmpr_printd(y, 15); flint_printf("\n\n");
-            flint_printf("z = "); fmpr_printd(z, 15); flint_printf("\n\n");
-            flint_printf("z2 = "); fmpr_printd(z2, 15); flint_printf("\n\n");
+            flint_printf("x = "); arf_printd(x, 15); flint_printf("\n\n");
+            flint_printf("y = "); arf_printd(y, 15); flint_printf("\n\n");
+            flint_printf("z = "); arf_printd(z, 15); flint_printf("\n\n");
+            flint_printf("z2 = "); arf_printd(z2, 15); flint_printf("\n\n");
             flint_abort();
         }
 
@@ -78,10 +85,10 @@ int main()
             flint_abort();
         }
 
-        fmpr_clear(x);
-        fmpr_clear(y);
-        fmpr_clear(z);
-        fmpr_clear(z2);
+        arf_clear(x);
+        arf_clear(y);
+        arf_clear(z);
+        arf_clear(z2);
 
         mag_clear(xb);
         mag_clear(yb);

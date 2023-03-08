@@ -543,8 +543,8 @@ void arf_set_fmpr(arf_t y, const fmpr_t x);
 #endif
 
 int arf_get_mpfr(mpfr_t x, const arf_t y, mpfr_rnd_t rnd);
-
 void arf_set_mpfr(arf_t x, const mpfr_t y);
+int _arf_call_mpfr_func(arf_ptr r1, arf_ptr r2, int (*func)(void), arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd);
 
 int arf_equal(const arf_t x, const arf_t y);
 int arf_equal_si(const arf_t x, slong y);

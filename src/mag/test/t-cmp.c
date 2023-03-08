@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpr.h"
+#include "arf.h"
 #include "mag.h"
 
 int main()
@@ -24,12 +24,12 @@ int main()
 
     for (iter = 0; iter < 100000 * arb_test_multiplier(); iter++)
     {
-        fmpr_t x, y;
+        arf_t x, y;
         mag_t xb, yb;
         int c1, c2;
 
-        fmpr_init(x);
-        fmpr_init(y);
+        arf_init(x);
+        arf_init(y);
 
         mag_init(xb);
         mag_init(yb);
@@ -37,24 +37,24 @@ int main()
         mag_randtest_special(xb, state, 100);
         mag_randtest_special(yb, state, 100);
 
-        mag_get_fmpr(x, xb);
-        mag_get_fmpr(y, yb);
+        arf_set_mag(x, xb);
+        arf_set_mag(y, yb);
 
-        c1 = fmpr_cmp(x, y);
+        c1 = arf_cmp(x, y);
         c2 = mag_cmp(xb, yb);
 
         if (c1 != c2)
         {
             flint_printf("FAIL\n\n");
-            flint_printf("x = "); fmpr_print(x); flint_printf("\n\n");
-            flint_printf("y = "); fmpr_print(y); flint_printf("\n\n");
+            flint_printf("x = "); arf_print(x); flint_printf("\n\n");
+            flint_printf("y = "); arf_print(y); flint_printf("\n\n");
             flint_printf("xb = "); mag_print(xb); flint_printf("\n\n");
             flint_printf("yb = "); mag_print(yb); flint_printf("\n\n");
             flint_abort();
         }
 
-        fmpr_clear(x);
-        fmpr_clear(y);
+        arf_clear(x);
+        arf_clear(y);
 
         mag_clear(xb);
         mag_clear(yb);

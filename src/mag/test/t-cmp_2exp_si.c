@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpr.h"
+#include "arf.h"
 #include "mag.h"
 #include "long_extras.h"
 
@@ -25,32 +25,32 @@ int main()
 
     for (iter = 0; iter < 100000 * arb_test_multiplier(); iter++)
     {
-        fmpr_t x;
+        arf_t x;
         mag_t xb;
         slong y;
         int c1, c2;
 
-        fmpr_init(x);
+        arf_init(x);
         mag_init(xb);
 
         mag_randtest_special(xb, state, 100);
         y = z_randtest(state);
 
-        mag_get_fmpr(x, xb);
+        arf_set_mag(x, xb);
 
-        c1 = fmpr_cmp_2exp_si(x, y);
+        c1 = arf_cmp_2exp_si(x, y);
         c2 = mag_cmp_2exp_si(xb, y);
 
         if (c1 != c2)
         {
             flint_printf("FAIL\n\n");
-            flint_printf("x = "); fmpr_print(x); flint_printf("\n\n");
+            flint_printf("x = "); arf_print(x); flint_printf("\n\n");
             flint_printf("y = %wd", y);  flint_printf("\n\n");
             flint_printf("xb = "); mag_print(xb); flint_printf("\n\n");
             flint_abort();
         }
 
-        fmpr_clear(x);
+        arf_clear(x);
         mag_clear(xb);
     }
 
