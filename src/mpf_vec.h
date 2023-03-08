@@ -45,6 +45,10 @@ FLINT_DLL void _mpf_vec_zero(mpf * vec, slong len);
 
 FLINT_DLL void _mpf_vec_set(mpf * vec1, const mpf * vec2, slong len2);
 
+/*  Conversion  **************************************************************/
+
+FLINT_DLL void _fmpz_vec_get_mpf_vec(mpf * appv, const fmpz * vec, slong len);
+
 /*  Comparison  **************************************************************/
 
 FLINT_DLL int _mpf_vec_equal(const mpf * vec1, const mpf * vec2, slong len);

@@ -26,7 +26,7 @@ main(void)
     int i;
     FLINT_TEST_INIT(state);
 
-    flint_printf("get_mpf_vec....");
+    flint_printf("fmpz_vec_get_mpf_vec....");
     fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
