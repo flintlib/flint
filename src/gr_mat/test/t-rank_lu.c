@@ -65,5 +65,5 @@ int main()
     flint_randclear(state);
     flint_cleanup();
     flint_printf(" [%wd success, %wd domain, %wd unable] PASS\n", count_success, count_domain, count_unable);
-    return EXIT_SUCCESS;
+    return 0;
 }

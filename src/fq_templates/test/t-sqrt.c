@@ -126,7 +126,7 @@ main(void)
     
     flint_printf("PASS\n");
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 #endif

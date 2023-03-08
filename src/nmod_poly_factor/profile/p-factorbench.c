@@ -57,5 +57,5 @@ int main (void)
       nmod_poly_clear (g);
       nmod_poly_clear (h);
     }
-    return EXIT_SUCCESS;
+    return 0;
 }

@@ -154,7 +154,7 @@ int main(void)
     FLINT_TEST_CLEANUP(state);
     
     printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 #else
@@ -164,7 +164,7 @@ int main(void)
     printf("out_raw/ inp_raw....");
     fflush(stdout);
     printf("SKIPPED\n");
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 #endif

@@ -364,6 +364,6 @@ int main(void)
     fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
     
-    return EXIT_SUCCESS;
+    return 0;
 }
 

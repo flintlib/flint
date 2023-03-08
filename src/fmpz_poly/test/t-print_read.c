@@ -255,7 +255,7 @@ int main(void)
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 #else
@@ -265,7 +265,7 @@ int main(void)
     flint_printf("print/ read....");
     fflush(stdout);
     flint_printf("SKIPPED\n");
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 #endif

@@ -1600,6 +1600,6 @@ int main(int argc, char *argv[])
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }
 

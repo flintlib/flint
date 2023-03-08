@@ -106,5 +106,5 @@ main(void)
     
     flint_printf("PASS\n");
     FLINT_TEST_CLEANUP(state);
-    return EXIT_SUCCESS;
+    return 0;
 }
