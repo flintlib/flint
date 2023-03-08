@@ -64,7 +64,7 @@ int main(void)
                  printf("NUDUPL does not agree with NUCOMP\n");
                  printf("f = "); qfb_print(forms + i1); printf("\n");
                  qfb_print(r); printf(" != "); qfb_print(s);
-                 abort();
+                 flint_abort();
               }
            }
            

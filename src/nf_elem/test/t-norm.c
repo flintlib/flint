@@ -69,7 +69,7 @@ main(void)
            printf("norm(b) = "); fmpq_print(bnorm); printf("\n");
            printf("norm(a*b) = "); fmpq_print(cnorm); printf("\n");
            printf("norm(a)*norm(b) = "); fmpq_print(cnorm2); printf("\n");
-           abort();
+           flint_abort();
         }
 
         fmpq_clear(anorm);

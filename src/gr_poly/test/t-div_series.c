@@ -93,7 +93,7 @@ test_div_series(flint_rand_t state, int which)
 
 
         default:
-            abort();
+            flint_abort();
     }
 
     if (status == GR_SUCCESS)

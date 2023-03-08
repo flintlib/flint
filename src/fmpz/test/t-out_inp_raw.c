@@ -96,7 +96,7 @@ int main(void)
             for (i = 0; i < n; ++i)
                 fmpz_clear(a + i);
             flint_free(a);
-            exit(0);
+            return 0;
         }
         else  /* Parent process */
         {

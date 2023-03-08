@@ -61,7 +61,7 @@ main(void)
            printf("p1 = "); nf_elem_print_pretty(p1, nf, "x"); printf("\n");
            printf("p2 = "); nf_elem_print_pretty(p2, nf, "x"); printf("\n");
            flint_printf("exp = %w\n", exp);
-           abort();
+           flint_abort();
         }
 
         nf_elem_clear(a, nf);
@@ -100,7 +100,7 @@ main(void)
            printf("p1 = "); nf_elem_print_pretty(p1, nf, "x"); printf("\n");
            printf("p2 = "); nf_elem_print_pretty(p2, nf, "x"); printf("\n");
            flint_printf("exp = %w\n", exp);
-           abort();
+           flint_abort();
         }
 
         nf_elem_clear(a, nf);

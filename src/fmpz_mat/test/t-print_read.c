@@ -102,7 +102,7 @@ int main(void)
             for (i = 0; i < k; ++i)
                 fmpz_mat_clear(M[i]);
             flint_free(M);
-            exit(0);
+            return 0;
         }
         else  /* Parent process */
         {
@@ -205,7 +205,7 @@ int main(void)
             }
 
             fclose(out);
-            exit(0);
+            return 0;
         }
         else  /* Parent process */
         {

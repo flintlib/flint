@@ -55,7 +55,7 @@ int main(void)
         {
            printf("FAIL:\n");
            qfb_print(r); printf("\n");
-           abort();
+           flint_abort();
         }
            
         fmpz_clear(D);

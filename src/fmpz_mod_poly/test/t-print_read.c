@@ -105,7 +105,7 @@ int main(void)
                 fmpz_mod_poly_clear(a[j], ctx);
             flint_free(a);
             fclose(out);
-            exit(0);
+            return 0;
         }
         else  /* Parent process */
         {
@@ -213,7 +213,7 @@ int main(void)
             }
 
             fclose(out);
-            exit(0);
+            return 0;
         }
         else  /* Parent process */
         {

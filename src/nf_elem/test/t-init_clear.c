@@ -42,7 +42,7 @@ main(void)
         if (!nf_elem_is_zero(a, nf))
         {
             flint_printf("FAIL\n");
-            abort();
+            flint_abort();
         }
 
         nf_elem_randtest(a, state, 200, nf);

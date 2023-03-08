@@ -77,7 +77,7 @@ int main(void)
            qfb_print(r); printf("\n");
            qfb_print(s); printf("\n");
            qfb_print(t); printf("\n");
-           abort();
+           flint_abort();
         }
          
         fmpz_clear(D);

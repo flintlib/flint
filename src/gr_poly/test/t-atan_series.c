@@ -51,7 +51,7 @@ test_atan_series(flint_rand_t state, int which)
             status |= gr_poly_atanh_series(b, b, n, ctx);
             break;
         default:
-            abort();
+            flint_abort();
     }
 
     if (status == GR_SUCCESS)

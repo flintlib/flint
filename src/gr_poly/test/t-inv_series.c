@@ -61,7 +61,7 @@ test_inv_series(flint_rand_t state, int which)
             status |= gr_poly_inv_series_newton(B, B, n, n_randint(state, 20), ctx);
             break;
         default:
-            abort();
+            flint_abort();
     }
 
     if (status == GR_SUCCESS)

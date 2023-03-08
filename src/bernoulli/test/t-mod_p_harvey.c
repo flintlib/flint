@@ -150,7 +150,7 @@ int main()
         for (p = n_nextprime(1000000, 1);
             p < 1000000 + 1000 * FLINT_MIN(10, arb_test_multiplier()); p = n_nextprime(p, 1))
         {
-            k = 2 * (rand() % ((p-3)/2)) + 2;
+            k = 2 * (n_randlimb(state) % ((p-3)/2)) + 2;
             test_bern_modp_pow2(p, k);
         }
 
