@@ -10,8 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "gmp.h"
 #include "flint.h"
+#include "gmpcompat.h"
 #include "fmpz.h"
 #include "fmpq.h"
 #include "long_extras.h"
