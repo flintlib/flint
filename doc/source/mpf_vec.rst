@@ -47,7 +47,7 @@ Conversion
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fmpz_vec_get_mpf_vec(mpf * appv, const fmpz * vec, slong len)
+.. function:: void _mpf_vec_set_fmpz_vec(mpf * appv, const fmpz * vec, slong len)
 
     Export the array of ``len`` entries starting at the pointer ``vec``
     to an array of mpfs ``appv``.

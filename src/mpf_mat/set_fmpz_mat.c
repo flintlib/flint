@@ -20,5 +20,5 @@ mpf_mat_set_fmpz_mat(mpf_mat_t B, const fmpz_mat_t A)
 
     if (A->c != 0)
         for (i = 0; i < A->r; i++)
-            _fmpz_vec_get_mpf_vec(B->rows[i], A->rows[i], A->c);
+            _mpf_vec_set_fmpz_vec(B->rows[i], A->rows[i], A->c);
 }

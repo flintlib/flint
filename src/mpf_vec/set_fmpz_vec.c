@@ -10,10 +10,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_vec.h"
+#include "mpf_vec.h"
+#include "fmpz.h"
 
 void
-_fmpz_vec_get_mpf_vec(mpf * appv, const fmpz * vec, slong len)
+_mpf_vec_set_fmpz_vec(mpf * appv, const fmpz * vec, slong len)
 {
     slong i;
 

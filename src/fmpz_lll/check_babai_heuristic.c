@@ -220,7 +220,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
 
             if (test)           /* Anything happened? */
             {
-                _fmpz_vec_get_mpf_vec(appB->rows[kappa], B->rows[kappa], n);
+                _mpf_vec_set_fmpz_vec(appB->rows[kappa], B->rows[kappa], n);
                 aa = zeros + 1;
 
                 for (i = zeros + 1; i <= kappa; i++)
