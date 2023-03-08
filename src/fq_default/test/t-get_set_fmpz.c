@@ -12,7 +12,6 @@
 #include "fq_default.h"
 #include "test_helpers.h"
 
-#include <stdlib.h>
 #include <stdio.h>
 
 int main(void)

@@ -15,7 +15,6 @@
 ******************************************************************************/
 
 #include <stdio.h>
-#include <stdlib.h>
 #include "qfb.h"
 
 int main(void)

@@ -12,7 +12,6 @@
 #include "fq_embed.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "ulong_extras.h"
 #include "long_extras.h"

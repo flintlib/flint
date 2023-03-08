@@ -10,7 +10,6 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include "fmpz_vec.h"
 #include "arith.h"
 #include "bernoulli.h"

@@ -10,7 +10,6 @@
 */
 
 #include <gmp.h>
-#include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mod_poly.h"

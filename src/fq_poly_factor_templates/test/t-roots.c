@@ -13,7 +13,6 @@
 
 #include "templates.h"
 
-#include <stdlib.h>
 #include "ulong_extras.h"
 
 

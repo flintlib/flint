@@ -14,7 +14,6 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
 #include <gmp.h>
 #include "fmpz.h"
 #include "qfb.h"

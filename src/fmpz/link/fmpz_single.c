@@ -21,7 +21,6 @@
 #include <atomic.h>
 #endif
 
-#include <stdlib.h>
 
 #include <gmp.h>
 #include "flint.h"

@@ -15,7 +15,6 @@
 #include "test_helpers.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 
 int main(void)
 {

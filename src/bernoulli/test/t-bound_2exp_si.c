@@ -10,7 +10,6 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include "bernoulli.h"
 
 double log2bern_approx(double n)

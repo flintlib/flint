@@ -11,7 +11,6 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "fq_zech.h"
 #include "ulong_extras.h"

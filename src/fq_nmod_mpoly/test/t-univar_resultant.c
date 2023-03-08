@@ -10,7 +10,6 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include "fq_nmod_mpoly.h"
 
 /* fq_nmod_poly_resultant is missing */

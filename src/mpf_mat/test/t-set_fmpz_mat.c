@@ -12,7 +12,6 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include "fmpz_mat.h"
 #include "mpf_mat.h"
 #include "ulong_extras.h"

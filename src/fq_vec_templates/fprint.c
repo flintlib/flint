@@ -15,7 +15,6 @@
 
 #include "templates.h"
 
-#include <stdlib.h>
 #include <stdio.h>
 
 /*

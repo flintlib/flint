@@ -11,7 +11,6 @@
 */
 
 #include <gmp.h>
-#include <stdlib.h> /* qsort */
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"

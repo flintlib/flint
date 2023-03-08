@@ -20,7 +20,6 @@
 #define NMOD_MAT_INLINE static __inline__
 #endif
 
-#include <stdlib.h>
 #include <gmp.h>
 
 #include "flint.h"

@@ -15,7 +15,6 @@
 
 #include <gmp.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <limits.h>
 #include "ulong_extras.h"
 

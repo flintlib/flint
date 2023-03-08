@@ -19,7 +19,6 @@ p-gcd nthreads sparse m1 n1 m2 n2:
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include "profiler.h"
 #include "fmpz_mpoly.h"
 

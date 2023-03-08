@@ -11,7 +11,6 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include "gr_mpoly.h"
 
 int

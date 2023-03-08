@@ -10,7 +10,6 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
 #include "nmod_mat.h"

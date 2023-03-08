@@ -23,7 +23,6 @@
 #include <inttypes.h>
 #define _STDC_FORMAT_MACROS
 #include <time.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include <sys/types.h>

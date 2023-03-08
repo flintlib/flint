@@ -14,7 +14,6 @@
 
 #include "templates.h"
 
-#include <stdlib.h>
 #include "ulong_extras.h"
 int
 main(void)

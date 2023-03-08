@@ -11,7 +11,6 @@
 
 #include "fq_default.h"
 
-#include <stdlib.h>
 #include <stdio.h>
 #include <gmp.h>
 #include "flint.h"

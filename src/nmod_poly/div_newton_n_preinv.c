@@ -12,7 +12,6 @@
 */
 
 
-#include <stdlib.h>
 
 
 #include <gmp.h>

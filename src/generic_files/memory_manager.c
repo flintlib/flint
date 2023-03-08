@@ -12,7 +12,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
 #include <stdio.h>
 #include "flint.h"
 #include "mpfr.h"

@@ -10,7 +10,6 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include "long_extras.h"
 #include "ulong_extras.h"
 #include "padic_poly.h"

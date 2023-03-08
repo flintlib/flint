@@ -11,7 +11,6 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include "fmpz_mpoly.h"
 
 void fmpz_mpoly_pow_naive(fmpz_mpoly_t res, fmpz_mpoly_t f,
