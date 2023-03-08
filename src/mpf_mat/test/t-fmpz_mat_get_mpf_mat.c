@@ -26,7 +26,7 @@ main(void)
     FLINT_TEST_INIT(state);
 
 
-    flint_printf("get_mpf_mat....");
+    flint_printf("fmpz_mat_get_mpf_mat....");
     fflush(stdout);
 
     /* set entries of an fmpz_mat, convert to mpf_mat and then check that

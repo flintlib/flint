@@ -27,7 +27,6 @@
 #include "fmpz_vec.h"
 #include "nmod_mat.h"
 #include "d_mat.h"
-#include "mpf_mat.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -633,8 +632,6 @@ FLINT_DLL void fmpz_mat_gram(fmpz_mat_t B, const fmpz_mat_t A);
 FLINT_DLL int fmpz_mat_get_d_mat(d_mat_t B, const fmpz_mat_t A);
 
 FLINT_DLL int fmpz_mat_get_d_mat_transpose(d_mat_t B, const fmpz_mat_t A);
-
-FLINT_DLL void fmpz_mat_get_mpf_mat(mpf_mat_t B, const fmpz_mat_t A);
 
 /* Cholesky Decomposition ****************************************************/
 

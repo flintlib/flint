@@ -21,6 +21,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include "fmpz_types.h"
 #include "mpf_vec.h"
 
 #ifdef __cplusplus
@@ -97,6 +98,11 @@ mpf_mat_is_square(const mpf_mat_t mat)
 FLINT_DLL void mpf_mat_zero(mpf_mat_t mat);
 
 FLINT_DLL void mpf_mat_one(mpf_mat_t mat);
+
+
+/* Conversions ***************************************************************/
+
+FLINT_DLL void fmpz_mat_get_mpf_mat(mpf_mat_t B, const fmpz_mat_t A);
 
 /* Input and output  *********************************************************/
 
