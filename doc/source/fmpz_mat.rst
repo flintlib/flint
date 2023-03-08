@@ -1340,11 +1340,6 @@ Conversions
     be represented exactly. The return value is -1 if any entry of ``A`` is
     too large to fit in the normal range of a double, and 0 otherwise.
 
-.. function:: void fmpz_mat_get_mpf_mat(mpf_mat_t B, const fmpz_mat_t A)
-
-    Sets the entries of ``B`` as mpfs corresponding to the entries of
-    ``A``.
-
 
 Cholesky Decomposition
 --------------------------------------------------------------------------------

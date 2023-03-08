@@ -26,7 +26,7 @@ main(void)
     int i;
     FLINT_TEST_INIT(state);
 
-    flint_printf("get_mpf_vec....");
+    flint_printf("set_fmpz_vec....");
     fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -46,9 +46,9 @@ main(void)
 
         _fmpz_vec_randtest(a, state, len, bits);
 
-        _fmpz_vec_get_mpf_vec(d1, a, len / 2);
-        _fmpz_vec_get_mpf_vec(d1 + len / 2, a + len / 2, (len + 1) / 2);
-        _fmpz_vec_get_mpf_vec(d2, a, len);
+        _mpf_vec_set_fmpz_vec(d1, a, len / 2);
+        _mpf_vec_set_fmpz_vec(d1 + len / 2, a + len / 2, (len + 1) / 2);
+        _mpf_vec_set_fmpz_vec(d2, a, len);
 
         result = (_mpf_vec_equal(d1, d2, len));
         if (!result)

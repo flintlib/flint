@@ -41,6 +41,16 @@ Assignment and basic manipulation
 
     Copies the vector ``vec2`` of the given length into ``vec1``. 
     A check is made to ensure ``vec1`` and ``vec2`` are different.
+
+
+Conversion
+--------------------------------------------------------------------------------
+
+
+.. function:: void _mpf_vec_set_fmpz_vec(mpf * appv, const fmpz * vec, slong len)
+
+    Export the array of ``len`` entries starting at the pointer ``vec``
+    to an array of mpfs ``appv``.
     
 
 Comparison

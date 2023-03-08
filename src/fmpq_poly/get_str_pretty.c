@@ -13,8 +13,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include <gmp.h>
 #include "flint.h"
+#include "gmpcompat.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
 

@@ -45,6 +45,14 @@ FLINT_DLL void _mpf_vec_zero(mpf * vec, slong len);
 
 FLINT_DLL void _mpf_vec_set(mpf * vec1, const mpf * vec2, slong len2);
 
+/*  Conversion  **************************************************************/
+
+FLINT_DLL void _mpf_vec_set_fmpz_vec(mpf * appv, const fmpz * vec, slong len);
+
+/* Backwards compatibility (this will generate errors for non-GCC compatible
+ * compilers) */
+#define _fmpz_vec_get_mpf_vec(appv, vec, len) _Pragma("GCC warning \"'_fmpz_vec_get_mpf_vec' is deprecated in favor for '_mpf_vec_set_fmpz_vec'\"") _mpf_vec_set_fmpz_vec(appv, vec, len)
+
 /*  Comparison  **************************************************************/
 
 FLINT_DLL int _mpf_vec_equal(const mpf * vec1, const mpf * vec2, slong len);

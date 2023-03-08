@@ -56,6 +56,16 @@ Basic assignment and manipulation
     truncation of a unit matrix.
 
 
+Conversions
+--------------------------------------------------------------------------------
+
+
+.. function:: void mpf_mat_set_fmpz_mat(mpf_mat_t B, const fmpz_mat_t A)
+
+    Sets the entries of ``B`` as mpfs corresponding to the entries of
+    ``A``.
+
+
 Random matrix generation
 --------------------------------------------------------------------------------
 
