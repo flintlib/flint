@@ -11,7 +11,6 @@
 
 #define FQ_NMOD_MPOLY_FACTOR_INLINES_C
 
-#include <stdio.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fq_nmod_mpoly_factor.h"

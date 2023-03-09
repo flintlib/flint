@@ -11,7 +11,6 @@
 
 #define FQ_POLY_INLINES_C
 
-#include <stdio.h>
 #include "flint.h"
 #include "fq_poly.h"
 

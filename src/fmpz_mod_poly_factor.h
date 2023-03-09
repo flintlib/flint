@@ -19,7 +19,6 @@
 #define FMPZ_MOD_POLY_FACTOR_INLINE static __inline__
 #endif
 
-#include <stdio.h>
 
 #include "flint.h"
 #include "fmpz.h"

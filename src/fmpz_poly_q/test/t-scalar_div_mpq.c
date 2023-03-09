@@ -11,7 +11,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
 
 #include "fmpz_poly_q.h"
 #include "long_extras.h"

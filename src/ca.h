@@ -18,7 +18,6 @@
 #define CA_INLINE static __inline__
 #endif
 
-#include <stdio.h>
 #include "flint.h"
 #include "nf.h"
 #include "nf_elem.h"

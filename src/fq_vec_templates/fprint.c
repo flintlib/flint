@@ -15,7 +15,6 @@
 
 #include "templates.h"
 
-#include <stdio.h>
 
 /*
     Recall the return value conventions for fputc (of type int) 

@@ -9,7 +9,6 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
 #include "bernoulli.h"
 
 double log2bern_approx(double n)

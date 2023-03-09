@@ -11,7 +11,6 @@
 
 #include "fq_default_poly.h"
 
-#include <stdio.h>
 #include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"

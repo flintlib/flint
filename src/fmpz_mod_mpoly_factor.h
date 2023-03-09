@@ -18,7 +18,6 @@
 #define FMPZ_MOD_MPOLY_FACTOR_INLINE static __inline__
 #endif
 
-#include <stdio.h>
 
 #include "n_poly.h"
 #include "nmod_mpoly_factor.h"

@@ -18,7 +18,6 @@
 #define N_POLY_INLINE static __inline__
 #endif
 
-#include <stdio.h>
 
 #include "nmod_poly.h"
 #include "fq_nmod_poly.h"

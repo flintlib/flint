@@ -16,7 +16,6 @@
     and multiply a = 3^{3 N}, b = 5^{3 N} mod p^N.
  */
 
-#include <stdio.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>

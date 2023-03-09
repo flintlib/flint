@@ -10,7 +10,6 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
 #include "fmpz_vec.h"
 #include "arith.h"
 #include "bernoulli.h"

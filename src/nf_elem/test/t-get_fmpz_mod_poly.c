@@ -15,7 +15,6 @@
 
  ******************************************************************************/
 
-#include <stdio.h>
 #include "nf.h"
 #include "nf_elem.h"
 #include "fmpz_mod_poly.h"

@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
 #include "fq_nmod_mpoly.h"
 
 /* fq_nmod_poly_resultant is missing */

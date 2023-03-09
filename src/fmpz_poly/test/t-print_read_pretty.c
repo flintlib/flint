@@ -18,7 +18,6 @@
 #if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER) 
 #include <unistd.h>
 #endif
-#include <stdio.h>
 #include <string.h>
 
 #include "flint.h"

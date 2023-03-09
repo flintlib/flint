@@ -20,7 +20,6 @@
 #endif
 
 #include <math.h>
-#include <stdio.h>
 #include "fmpz_types.h"
 #include "mpf_vec.h"
 

@@ -16,7 +16,6 @@
     and compute the logarithm of e = 17 a + 1, a = 3^{3 N} mod p^N.
  */
 
-#include <stdio.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
