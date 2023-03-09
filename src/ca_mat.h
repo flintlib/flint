@@ -18,7 +18,6 @@
 #define CA_MAT_INLINE static __inline__
 #endif
 
-#include <stdio.h>
 #include "flint.h"
 #include "fmpz_mat.h"
 #include "fmpq_mat.h"

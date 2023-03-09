@@ -19,9 +19,7 @@
 #define FMPZ_MPOLY_INLINE static __inline__
 #endif
 
-#include <stdio.h>
 
-#include <gmp.h>
 
 #include "flint.h"
 #include "fmpz.h"

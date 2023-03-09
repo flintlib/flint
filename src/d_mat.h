@@ -20,9 +20,7 @@
 #define D_MAT_INLINE static __inline__
 #endif
 
-#include <stdio.h>
 
-#include <gmp.h>
 #include "flint.h"
 #include "d_vec.h"
 

@@ -14,8 +14,6 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "profiler.h"
 #include "flint.h"
 #include "fmpz.h"

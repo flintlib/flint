@@ -11,9 +11,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"

@@ -73,7 +73,7 @@ test_rsqrt_series(flint_rand_t state, int which)
             status |= gr_poly_rsqrt_series_miller(B, B, n, ctx);
             break;
         default:
-            abort();
+            flint_abort();
     }
 
     if (status == GR_SUCCESS)
@@ -120,5 +120,5 @@ int main()
     flint_randclear(state);
     flint_cleanup_master();
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }

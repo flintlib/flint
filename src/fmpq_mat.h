@@ -18,7 +18,6 @@
 #define FMPQ_MAT_INLINE static __inline__
 #endif
 
-#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"

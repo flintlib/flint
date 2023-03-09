@@ -11,12 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
+#include "mpf_mat.h"
 #include "ulong_extras.h"
 
 int
@@ -26,7 +22,7 @@ main(void)
     FLINT_TEST_INIT(state);
 
 
-    flint_printf("get_mpf_mat....");
+    flint_printf("set_fmpz_mat....");
     fflush(stdout);
 
     /* set entries of an fmpz_mat, convert to mpf_mat and then check that
@@ -50,7 +46,7 @@ main(void)
             }
         }
 
-        fmpz_mat_get_mpf_mat(B, A);
+        mpf_mat_set_fmpz_mat(B, A);
 
         for (j = 0; j < rows; j++)
         {

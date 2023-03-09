@@ -9,9 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -47,7 +44,7 @@ main(void)
             flint_printf("FAIL:\n");
             fmpz_poly_print(a), flint_printf("\n\n");
             fmpz_poly_print(b), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
 
         fmpz_poly_clear(a);
@@ -77,7 +74,7 @@ main(void)
             flint_printf("FAIL:\n");
             fmpz_poly_print(a), flint_printf("\n\n");
             fmpz_poly_print(b), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
         
         fmpz_poly_clear(a);

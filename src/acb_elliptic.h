@@ -12,7 +12,6 @@
 #ifndef ACB_ELLIPTIC_H
 #define ACB_ELLIPTIC_H
 
-#include <stdio.h>
 #include "acb.h"
 #include "acb_poly.h"
 

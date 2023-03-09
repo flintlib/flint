@@ -14,8 +14,6 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "qfb.h"
 
 int main(void)
@@ -73,7 +71,7 @@ int main(void)
                  printf("Exponent not found\n");
                  printf("Discriminant: "); fmpz_print(D); printf("\n");
                  printf("Form: "); qfb_print(forms + i1); printf("\n");
-                 abort();
+                 flint_abort();
               }
 
               result = (fmpz_cmp(exp1, exp2) == 0);
@@ -86,7 +84,7 @@ int main(void)
                  printf("Exponent ");
                  fmpz_print(exp2); printf(" should be "); 
                  fmpz_print(exp1); printf("\n");
-                 abort();
+                 flint_abort();
               }
            }
            

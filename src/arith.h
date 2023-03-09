@@ -18,7 +18,6 @@
 #define ARITH_INLINE static __inline__
 #endif
 
-#include <gmp.h>
 #include "mpfr.h"
 #include "flint.h"
 #include "fmpz.h"

@@ -20,7 +20,7 @@ acb_dft_convol_pad(acb_ptr fp, acb_ptr gp, acb_srcptr f, acb_srcptr g, slong n, 
     if (np < 2 * n - 1)
     {
         flint_printf("dft_convol_pad: overlapping padding %wd < 2*%wd-1\n", np, n);
-        abort();
+        flint_abort();
     }
 
     for (k = 0; k < n; k++)

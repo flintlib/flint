@@ -9,12 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
-#include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
-#include "longlong.h"
 
 /* ensure rounding is towards -\infty like fmpz_fdiv_qr */
 #define fdiv_qrnnd(qxx, rxx, nhixx, nloxx, dxx)        \

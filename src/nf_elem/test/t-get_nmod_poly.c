@@ -15,7 +15,6 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
 #include "nf.h"
 #include "nf_elem.h"
 
@@ -62,7 +61,7 @@ main(void)
                 printf("a = "); nf_elem_print_pretty(a, nf, "x"); printf("\n");
                 printf("n = "); flint_printf("%u\n", mod);
                 printf("a mod n = "); nmod_poly_print_pretty(reduced_elem, "x"); printf("\n");
-                abort();
+                flint_abort();
             }
         }
 
@@ -114,7 +113,7 @@ main(void)
                 printf("a = "); nf_elem_print_pretty(a, nf, "x"); printf("\n");
                 printf("n = "); flint_printf("%u\n", mod);
                 printf("a mod n = "); nmod_poly_print_pretty(reduced_elem, "x"); printf("\n");
-                abort();
+                flint_abort();
             }
         }
 

@@ -12,7 +12,6 @@
 /* Outer wrapper for ECM 
    makes calls to stage I and stage II (two) */
 
-#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "mpn_extras.h"

@@ -10,7 +10,6 @@
 */
 
 #include "arb.h"
-#include "longlong.h"
 #include "mpn_extras.h"
 
 void

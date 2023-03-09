@@ -10,7 +10,6 @@
 */
 
 #include "acf.h"
-#include "longlong.h"
 #include "mpn_extras.h"
 
 /* We need uint64_t instead of mp_limb_t on 32-bit systems for

@@ -14,8 +14,6 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "qfb.h"
 
 int main(void)
@@ -56,7 +54,7 @@ int main(void)
         {
            printf("FAIL:\n");
            qfb_print(r); printf("\n");
-           abort();
+           flint_abort();
         }
            
         fmpz_clear(D);

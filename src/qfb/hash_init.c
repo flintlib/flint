@@ -14,8 +14,6 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <gmp.h>
 #include "qfb.h"
 
 qfb_hash_t * qfb_hash_init(slong depth)

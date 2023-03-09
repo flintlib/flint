@@ -9,9 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
 #include "flint.h"
 #include "fmpq.h"
 #include "fmpq_poly.h"
@@ -50,7 +47,7 @@ main(void)
             fmpq_poly_debug(a), flint_printf("\n\n");
             fmpq_poly_debug(b), flint_printf("\n\n");
             flint_printf("cflags = %wu\n\n", cflags);
-            abort();
+            flint_abort();
         }
 
         fmpq_poly_clear(a);
@@ -80,7 +77,7 @@ main(void)
             flint_printf("FAIL:\n");
             fmpq_poly_print(a), flint_printf("\n\n");
             fmpq_poly_print(b), flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
         
         fmpq_poly_clear(a);

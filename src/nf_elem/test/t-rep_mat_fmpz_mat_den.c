@@ -15,7 +15,6 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
 #include "fmpq_mat.h"
 #include "nf.h"
 #include "nf_elem.h"
@@ -88,7 +87,7 @@ main(void)
                 printf("b = "); nf_elem_print_pretty(b, nf, "x"); printf("\n");
                 printf("p1 = "); nf_elem_print_pretty(p1, nf, "x"); printf("\n");
                 printf("p2 = "); nf_elem_print_pretty(p2, nf, "x"); printf("\n");
-                abort();
+                flint_abort();
             }
         }
 

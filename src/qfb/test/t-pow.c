@@ -14,8 +14,6 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "qfb.h"
 
 int main(void)
@@ -80,7 +78,7 @@ int main(void)
            qfb_print(r); printf("\n");
            qfb_print(s); printf("\n");
            qfb_print(t); printf("\n");
-           abort();
+           flint_abort();
         }
          
         fmpz_clear(fexp);

@@ -18,7 +18,6 @@
 
 #include "templates.h"
 
-#include <stdio.h>
 void
 TEMPLATE(T, poly_factor_print) (const TEMPLATE(T, poly_factor_t) fac,
                                 const TEMPLATE(T, ctx_t) ctx)

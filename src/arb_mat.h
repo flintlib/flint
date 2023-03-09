@@ -18,7 +18,6 @@
 #define ARB_MAT_INLINE static __inline__
 #endif
 
-#include <stdio.h>
 #include "fmpz_mat.h"
 #include "fmpq_mat.h"
 #include "perm.h"

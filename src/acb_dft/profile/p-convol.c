@@ -134,5 +134,5 @@ int main(int argc, char *argv[])
 
     }
     flint_cleanup();
-    return EXIT_SUCCESS;
+    return 0;
 }

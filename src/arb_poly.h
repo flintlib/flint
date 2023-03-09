@@ -18,7 +18,6 @@
 #define ARB_POLY_INLINE static __inline__
 #endif
 
-#include <stdio.h>
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 #include "arb.h"

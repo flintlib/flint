@@ -18,8 +18,6 @@
 #define FQ_ZECH_MPOLY_FACTOR_INLINE static __inline__
 #endif
 
-#include <stdio.h>
-#include <gmp.h>
 
 #include "fq_zech_mpoly.h"
 #include "nmod_mpoly_factor.h"

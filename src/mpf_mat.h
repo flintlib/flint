@@ -20,7 +20,7 @@
 #endif
 
 #include <math.h>
-#include <stdio.h>
+#include "fmpz_types.h"
 #include "mpf_vec.h"
 
 #ifdef __cplusplus
@@ -97,6 +97,15 @@ mpf_mat_is_square(const mpf_mat_t mat)
 FLINT_DLL void mpf_mat_zero(mpf_mat_t mat);
 
 FLINT_DLL void mpf_mat_one(mpf_mat_t mat);
+
+
+/* Conversions ***************************************************************/
+
+FLINT_DLL void mpf_mat_set_fmpz_mat(mpf_mat_t B, const fmpz_mat_t A);
+
+/* Backwards compatibility (this will generate errors for non-GCC compatible
+ * compilers) */
+#define fmpz_mat_get_mpf_mat(B, A) _Pragma("GCC warning \"'fmpz_mat_get_mpf_mat' is deprecated in favor for 'mpf_mat_set_fmpz_mat'\"") mpf_mat_set_fmpz_mat(B, A)
 
 /* Input and output  *********************************************************/
 

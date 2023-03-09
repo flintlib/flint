@@ -77,7 +77,7 @@ FUNC_HEAD
         /* ************************** */
 
         for (i = 0; i < d; i++)
-            _fmpz_vec_get_mpf_vec(appB->rows[i], B->rows[i], n);
+            _mpf_vec_set_fmpz_vec(appB->rows[i], B->rows[i], n);
 
         /* ********************************* */
         /* Step2: Initializing the main loop */

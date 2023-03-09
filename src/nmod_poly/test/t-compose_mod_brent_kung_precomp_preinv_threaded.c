@@ -12,11 +12,8 @@
 */
 
 
-#include <stdlib.h>
-#include <stdio.h>
 
 
-#include <gmp.h>
 #include <pthread.h>
 
 

@@ -22,8 +22,6 @@
 #define NMOD_POLY_INLINE static __inline__
 #endif
 
-#include <stdio.h>
-#include <gmp.h>
 
 #include "flint.h"
 #include "nmod_vec.h"

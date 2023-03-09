@@ -11,9 +11,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
 
 #include "fmpz_poly_q.h"
 #include "long_extras.h"
@@ -128,5 +125,5 @@ main(void)
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }

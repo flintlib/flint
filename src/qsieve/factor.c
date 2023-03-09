@@ -16,6 +16,7 @@
 #undef __STRICT_ANSI__
 #endif
 
+#include <stdlib.h>
 #include "qsieve.h"
 #include "fmpz_factor.h"
 #include "thread_support.h"
@@ -23,7 +24,6 @@
 #include <inttypes.h>
 #define _STDC_FORMAT_MACROS
 #include <time.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include <sys/types.h>

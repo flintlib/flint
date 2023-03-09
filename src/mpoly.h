@@ -19,9 +19,7 @@
 #define MPOLY_INLINE static __inline__
 #endif
 
-#include <stdio.h>
 
-#include <gmp.h>
 
 #include "string.h"
 #include "mpoly_types.h"

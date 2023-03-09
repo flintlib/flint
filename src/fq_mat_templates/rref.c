@@ -14,8 +14,6 @@
 
 #include "templates.h"
 
-#include <stdlib.h>
-#include <gmp.h>
 #include "flint.h"
 #include "perm.h"
 

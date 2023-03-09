@@ -14,8 +14,6 @@
 
 #include "templates.h"
 
-#include <stdio.h>
-#include <gmp.h>
 #include "fmpz.h"
 int
 _TEMPLATE(T, poly_fprint) (FILE * file, const TEMPLATE(T, struct) * poly,

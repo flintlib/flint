@@ -14,8 +14,6 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "qfb.h"
 
 int main(void)
@@ -62,7 +60,7 @@ int main(void)
                  printf("FAIL:\n");
                  printf("Incorrect discriminant\n");
                  fmpz_print(D); printf(" should be %ld\n", -i);
-                 abort();
+                 flint_abort();
               }
            }
            
@@ -120,7 +118,7 @@ int main(void)
                  printf("Associativity fails\n");
                  printf("r = "); qfb_print(r); printf("\n");
                  printf("s = "); qfb_print(s); printf("\n");
-                 abort();
+                 flint_abort();
               }
            }
            

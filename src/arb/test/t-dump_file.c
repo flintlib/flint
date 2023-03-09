@@ -10,7 +10,6 @@
 */
 
 #include <string.h>
-#include <stdio.h>
 #include "arb.h"
 
 int main()
@@ -99,5 +98,5 @@ int main()
     flint_randclear(state);
     flint_cleanup();
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }

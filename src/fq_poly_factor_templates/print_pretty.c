@@ -13,7 +13,6 @@
 
 #include "templates.h"
 
-#include <stdio.h>
 void
 TEMPLATE(T, poly_factor_print_pretty) (const TEMPLATE(T, poly_factor_t) fac,
                                        const char *var,

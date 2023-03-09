@@ -15,7 +15,6 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
 #include "nf.h"
 #include "nf_elem.h"
 
@@ -57,7 +56,7 @@ main(void)
             flint_printf("f = "); fmpq_poly_print_pretty(f, "x");
             printf("\n");
             flint_printf("g = "); fmpq_poly_print_pretty(f, "x");
-            abort();
+            flint_abort();
         }
 
         nf_elem_clear(a, nf);
@@ -100,7 +99,7 @@ main(void)
             flint_printf("g = "); fmpq_poly_print_pretty(f, "x");
             printf("\n");
             flint_printf("r = "); fmpq_poly_print_pretty(r, "x");
-            abort();
+            flint_abort();
         }
 
         nf_elem_clear(a, nf);

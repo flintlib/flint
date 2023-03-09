@@ -26,7 +26,7 @@ void nf_init_randtest(nf_t nf, flint_rand_t state,
     if (len < 2 || bits_in < 1)
     {
         fprintf(stderr, "[nf_init_randtest] len must be >= 2 and bits_in >= 1\n");
-        abort();
+        flint_abort();
     }
 
     if (len <= 2 || n_randint(state, 10) == 0)

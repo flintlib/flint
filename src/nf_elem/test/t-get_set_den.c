@@ -15,7 +15,6 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
 #include "nf.h"
 #include "nf_elem.h"
 
@@ -56,7 +55,7 @@ main(void)
             flint_printf("d = "); fmpz_print(d); printf("\n");
             flint_printf("d2 = "); fmpz_print(d2); printf("\n");
             flint_printf("a = "); nf_elem_print_pretty(a, nf, "x");
-            abort();
+            flint_abort();
         }
 
         nf_elem_clear(a, nf);

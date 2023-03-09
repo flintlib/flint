@@ -11,9 +11,6 @@
 */
 
 #include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"

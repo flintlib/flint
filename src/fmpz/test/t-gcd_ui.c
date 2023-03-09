@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 
@@ -54,7 +53,7 @@ main(void)
             fmpz_print(r2);
             flint_printf("\n");
             fflush(stdout);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(r1);
@@ -92,7 +91,7 @@ main(void)
             fmpz_print(r);
             flint_printf("\n");
             fflush(stdout);
-            abort();
+            flint_abort();
         }
 
         fmpz_clear(r);

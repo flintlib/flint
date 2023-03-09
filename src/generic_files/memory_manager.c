@@ -13,7 +13,6 @@
 */
 
 #include <stdlib.h>
-#include <stdio.h>
 #include "flint.h"
 #include "mpfr.h"
 #include "thread_pool.h"

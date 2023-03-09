@@ -21,7 +21,6 @@
 #define ULONG_EXTRAS_INLINE static __inline__
 #endif
 
-#include <gmp.h>
 #include "flint.h"
 
 #ifdef __cplusplus

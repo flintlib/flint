@@ -18,8 +18,6 @@
 #define PADIC_MAT_INLINE static __inline__
 #endif
 
-#include <stdio.h>
-#include <gmp.h>
 
 #include "flint.h"
 #include "fmpz.h"

@@ -11,7 +11,6 @@
 
 #include "fmpz_mat.h"
 #include "perm.h"
-#include "longlong.h"
 
 #define E(j,k) fmpz_mat_entry(B,j,k)
 

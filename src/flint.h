@@ -15,20 +15,25 @@
 #if !defined(_MSC_VER)
 #include <sys/param.h> /* for BSD define */
 #endif
-#include <gmp.h>
-#include <stdarg.h>
 #include <stdio.h>
-#include <stdlib.h> /* for alloca on FreeBSD */
-#if (!defined(BSD) && !defined(__MINGW64__) && !defined(__MINGW32__) && !defined(_MSC_VER)) || defined(__GNU__)
-/* MinGW and FreeBSD have alloca, but not alloca.h */
-#include <alloca.h>
-#endif
-#if defined(__MINGW32__)
-#include <malloc.h> /* for alloca on MinGW */
-#endif
+#include <stdarg.h>
+#include <gmp.h>
 #include "limits.h"
 #include "longlong.h"
 #include "flint-config.h"
+
+#ifndef alloca
+# ifdef __GNUC__
+#  define alloca __builtin_alloca
+# else
+#  ifdef _MSC_VER
+#   include <malloc.h>
+#   define alloca _alloca
+#  else
+#   include <alloca.h> /* We assume then that you have alloca.h */
+#  endif
+# endif
+#endif
 
 #ifdef FLINT_INLINES_C
 #define FLINT_INLINE FLINT_DLL

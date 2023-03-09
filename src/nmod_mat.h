@@ -20,12 +20,9 @@
 #define NMOD_MAT_INLINE static __inline__
 #endif
 
-#include <stdlib.h>
-#include <gmp.h>
 
 #include "flint.h"
 #include "perm.h"
-#include "longlong.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 #include "fmpz.h"

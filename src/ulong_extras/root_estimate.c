@@ -11,11 +11,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
 #include <math.h>
 #include "flint.h"
 #include "ulong_extras.h"
-#include "longlong.h"
 
 
 /* this table contains the value of UWORD_MAX / n, for n in range [1, FLINT_BITS] */

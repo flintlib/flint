@@ -18,9 +18,6 @@
 #if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER) 
 #include <unistd.h>
 #endif
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
 
 #include "flint.h"
 #include "fmpz.h"
@@ -97,7 +94,7 @@ int main(void)
             for (i = 0; i < n; ++i)
                 fmpz_clear(a + i);
             flint_free(a);
-            exit(0);
+            return 0;
         }
         else  /* Parent process */
         {
@@ -202,7 +199,7 @@ int main(void)
             }
 
             fclose(out);
-            exit(0);
+            return 0;
         }
         else  /* Parent process */
         {
@@ -252,7 +249,7 @@ int main(void)
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 #else
@@ -262,7 +259,7 @@ int main(void)
     flint_printf("print/ read....");
     fflush(stdout);
     flint_printf("SKIPPED\n");
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 #endif

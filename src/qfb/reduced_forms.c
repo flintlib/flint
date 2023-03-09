@@ -14,8 +14,6 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <gmp.h>
 #include "qfb.h"
 
 /*
@@ -50,7 +48,7 @@ slong qfb_reduced_forms_large(qfb ** forms, slong d)
     if (d >= 0)
     {
        printf("Exception: qfb_reduced_forms not implemented for positive discriminant.\n");
-       abort();
+       flint_abort();
     }
 
     alim = n_sqrt(-d/3); /* maximum a value to check */
@@ -183,7 +181,7 @@ slong qfb_reduced_forms(qfb ** forms, slong d)
     if (d >= 0)
     {
        printf("Exception: qfb_reduced_forms not implemented for positive discriminant.\n");
-       abort();
+       flint_abort();
     }
 
     blim = n_sqrt(-d/3); /* maximum a value to check */

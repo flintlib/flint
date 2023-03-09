@@ -18,7 +18,6 @@
 #define ACB_INLINE static __inline__
 #endif
 
-#include <stdio.h>
 #include "arf.h"
 #include "arb.h"
 #include "acb_types.h"

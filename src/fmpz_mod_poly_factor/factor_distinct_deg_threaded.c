@@ -16,7 +16,6 @@
 #include <pthread.h>
 
 
-#include <gmp.h>
 
 
 #include "fmpz_mod_poly.h"

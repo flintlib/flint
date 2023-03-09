@@ -266,5 +266,5 @@ int main()
         flint_printf("};\n");
     }
 
-    return EXIT_SUCCESS;
+    return 0;
 }

@@ -9,12 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
-#include <gmp.h>
 
 #include "flint.h"
 #include "gmpcompat.h"
@@ -365,6 +362,6 @@ int main(void)
     fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
     
-    return EXIT_SUCCESS;
+    return 0;
 }
 

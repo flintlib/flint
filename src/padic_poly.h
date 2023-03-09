@@ -20,7 +20,6 @@
 
 #include <limits.h>
 
-#include <gmp.h>
 
 #include "fmpz.h"
 #include "fmpq.h"

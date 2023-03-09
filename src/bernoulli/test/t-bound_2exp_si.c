@@ -9,8 +9,6 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "bernoulli.h"
 
 double log2bern_approx(double n)
@@ -67,6 +65,6 @@ int main()
 
     flint_cleanup();
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }
 

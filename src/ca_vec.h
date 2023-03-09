@@ -18,7 +18,6 @@
 #define CA_VEC_INLINE static __inline__
 #endif
 
-#include <stdio.h>
 #include "flint.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"

@@ -12,9 +12,6 @@
 
 #define NMOD_POLY_INLINES_C
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"

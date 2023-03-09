@@ -30,7 +30,7 @@ check_vec_eq_prec(acb_srcptr w1, acb_srcptr w2, slong len, slong prec, slong dig
             flint_printf("\n%s =\n", f2);
             acb_vec_printd(w2, len, digits);
             flint_printf("\n\n");
-            abort();
+            flint_abort();
         }
         else if (acb_rel_accuracy_bits(w1 + i) < 30
                 || acb_rel_accuracy_bits(w2 + i) < 30)
@@ -45,7 +45,7 @@ check_vec_eq_prec(acb_srcptr w1, acb_srcptr w2, slong len, slong prec, slong dig
             flint_printf("\nerrors %wd & %wd [prec = %wd]\n",
                     acb_rel_accuracy_bits(w1 + i),
                     acb_rel_accuracy_bits(w2 + i), prec);
-            abort();
+            flint_abort();
         }
     }
 }
@@ -124,5 +124,5 @@ int main()
     flint_randclear(state);
     flint_cleanup();
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }

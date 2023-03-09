@@ -14,10 +14,8 @@
 */
 
 
-#include <stdlib.h>
 
 
-#include <gmp.h>
 
 
 #include "flint.h"

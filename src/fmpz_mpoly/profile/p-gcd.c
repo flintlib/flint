@@ -18,8 +18,6 @@ p-gcd nthreads sparse m1 n1 m2 n2:
     run the sparse benchmark on nthreads with powers (m1, n1) and (m2, n2)
 */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "profiler.h"
 #include "fmpz_mpoly.h"
 

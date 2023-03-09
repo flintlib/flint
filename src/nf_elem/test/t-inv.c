@@ -15,7 +15,6 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
 #include "nf.h"
 #include "nf_elem.h"
 
@@ -56,7 +55,7 @@ main(void)
            printf("a = "); nf_elem_print_pretty(a, nf, "x"); printf("\n");
            printf("ainv = "); nf_elem_print_pretty(ainv, nf, "x"); printf("\n");
            printf("p1 = "); nf_elem_print_pretty(p1, nf, "x"); printf("\n");
-           abort();
+           flint_abort();
         }
 
         nf_elem_clear(a, nf);
@@ -90,7 +89,7 @@ main(void)
            printf("FAIL:\n");
            printf("a = "); nf_elem_print_pretty(a, nf, "x"); printf("\n");
            printf("b = "); nf_elem_print_pretty(b, nf, "x"); printf("\n");
-           abort();
+           flint_abort();
         }
 
         nf_elem_clear(a, nf);

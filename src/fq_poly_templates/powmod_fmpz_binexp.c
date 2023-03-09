@@ -13,8 +13,6 @@
 
 #include "templates.h"
 
-#include <stdlib.h>
-#include <gmp.h>
 #include "flint.h"
 void
 _TEMPLATE(T, poly_powmod_fmpz_binexp) (

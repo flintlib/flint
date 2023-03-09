@@ -14,8 +14,6 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <gmp.h>
 #include "qfb.h"
 
 void qfb_reduce(qfb_t r, qfb_t f, fmpz_t D)

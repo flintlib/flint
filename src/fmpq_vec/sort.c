@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
 #include "fmpq_vec.h"
 
 typedef int(*__compar_fn_t) (const void *, const void *);

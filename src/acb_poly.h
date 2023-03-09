@@ -18,7 +18,6 @@
 #define ACB_POLY_INLINE static __inline__
 #endif
 
-#include <stdio.h>
 #include "acb.h"
 #include "arb_poly.h"
 

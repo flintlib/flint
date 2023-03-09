@@ -9,8 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "fq_zech_embed.h"
 
 int
@@ -139,5 +137,5 @@ main(void)
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }

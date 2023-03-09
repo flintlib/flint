@@ -9,9 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
@@ -58,7 +55,7 @@ int main()
 			else
 			{
 				flint_printf("FAIL!\n");
-				abort();	
+				flint_abort();	
 			}
 		}
 		
@@ -73,7 +70,7 @@ int main()
 		if (fmpz_cmpabs(gcd_mat, temp) != 0)
 		{
 			flint_printf("FAIL!\n");
-			abort();
+			flint_abort();
 		}
 
 cleanup:

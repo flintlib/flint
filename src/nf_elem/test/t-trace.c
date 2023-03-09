@@ -15,7 +15,6 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
 #include "nf.h"
 #include "nf_elem.h"
 
@@ -69,7 +68,7 @@ main(void)
            printf("trace(b) = "); fmpq_print(btrace); printf("\n");
            printf("trace(a + b) = "); fmpq_print(ctrace); printf("\n");
            printf("trace(a) + trace(b) = "); fmpq_print(ctrace2); printf("\n");
-           abort();
+           flint_abort();
         }
 
         fmpq_clear(atrace);

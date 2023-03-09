@@ -15,7 +15,6 @@
 
  ******************************************************************************/
 
-#include <stdio.h>
 #include "nf.h"
 #include "nf_elem.h"
 #include "fmpz_mod_poly.h"
@@ -72,7 +71,7 @@ main(void)
                 printf("a mod n = ");
                 fmpz_mod_poly_print_pretty(reduced_elem, "x", ctx);
                 printf("\n");
-                abort();
+                flint_abort();
             }
         }
 
@@ -137,7 +136,7 @@ main(void)
                 printf("a mod n = ");
                 fmpz_mod_poly_print_pretty(reduced_elem, "x", ctx);
                 printf("\n");
-                abort();
+                flint_abort();
             }
         }
 

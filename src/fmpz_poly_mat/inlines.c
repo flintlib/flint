@@ -11,8 +11,6 @@
 
 #define FMPZ_POLY_MAT_INLINES_C
 
-#include <stdlib.h>
-#include <gmp.h>
 #include "flint.h"
 #include "fmpz_poly_mat.h"
 

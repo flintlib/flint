@@ -18,9 +18,6 @@
 #define PERM_INLINE static __inline__
 #endif
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <gmp.h>
 
 #include "flint.h"
 

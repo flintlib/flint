@@ -148,10 +148,10 @@ jobs:
         shell: C:\cygwin64\bin\bash.exe --login -o igncr '{0}'
 
     env:
-      MAKE: "make -j -l 10 --output-sync=target"
+      MAKE: "make -j --output-sync=target"
       REPO: /cygdrive/d/a/flint2/flint2 # FIXME: De-hardcode this
       CFLAGS: "-Wall -D _WIN64"
-      EXTRA_OPTIONS: "--enable-static --disable-shared"
+      EXTRA_OPTIONS: "--enable-shared --disable-static"
 
     steps:
       - uses: actions/checkout@v3

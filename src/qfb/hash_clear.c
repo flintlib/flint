@@ -14,8 +14,6 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <gmp.h>
 #include "qfb.h"
 
 void qfb_hash_clear(qfb_hash_t * qhash, slong depth)

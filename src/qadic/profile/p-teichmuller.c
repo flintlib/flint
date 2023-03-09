@@ -18,12 +18,9 @@
         C = [c{0},...,c{d-1}], where c{i} = (3+i) mod p.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
-#include <gmp.h>
 
 #include "flint.h"
 #include "fmpz.h"

@@ -18,9 +18,7 @@
 #define FMPQ_MPOLY_INLINE static __inline__
 #endif
 
-#include <stdio.h>
 
-#include <gmp.h>
 
 #include "fmpq_poly.h"
 #include "fmpz_mpoly.h"

@@ -18,10 +18,7 @@
 #define FFT_INLINE static __inline__
 #endif
 
-#include <stdlib.h>
-#include <stdio.h>
 
-#include <gmp.h>
 #include "flint.h"
 #include "mpn_extras.h"
 

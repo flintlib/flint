@@ -11,8 +11,6 @@
 
 #define FFT_INLINES_C
 
-#include <stdlib.h>
-#include <gmp.h>
 #include "flint.h"
 #include "fft.h"
 
