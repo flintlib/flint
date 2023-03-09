@@ -11,7 +11,6 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include "fq_nmod_mpoly.h"
 
 int

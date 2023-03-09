@@ -11,7 +11,6 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include "flint.h"
 #include "gmpcompat.h"
 #include "fmpz.h"

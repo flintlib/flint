@@ -11,7 +11,6 @@
 */
 
 #include <gmp.h>
-#include <stdlib.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"

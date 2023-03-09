@@ -12,7 +12,6 @@
 #include "fq_embed.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 
 int
 main(void)
@@ -131,6 +130,6 @@ main(void)
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }
 

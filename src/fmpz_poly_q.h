@@ -18,7 +18,6 @@
 #define FMPZ_POLY_Q_INLINE static __inline__
 #endif
 
-#include <stdlib.h>
 #include <gmp.h>
 
 #include "flint.h"

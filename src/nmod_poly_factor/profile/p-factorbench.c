@@ -10,7 +10,6 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
@@ -58,5 +57,5 @@ int main (void)
       nmod_poly_clear (g);
       nmod_poly_clear (h);
     }
-    return EXIT_SUCCESS;
+    return 0;
 }

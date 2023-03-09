@@ -10,7 +10,6 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include "fmpq_vec.h"
 #include "fmpq_mat.h"
 

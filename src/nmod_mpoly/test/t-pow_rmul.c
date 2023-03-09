@@ -10,7 +10,6 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include "nmod_mpoly.h"
 
 void nmod_mpoly_pow_naive(nmod_mpoly_t res, nmod_mpoly_t f,

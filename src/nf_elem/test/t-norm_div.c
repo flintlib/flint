@@ -92,7 +92,7 @@ main(void)
            printf("divisor found = "); fmpq_print(cnorm); printf("\n");
            printf("correct result = "); fmpq_print(anorm); printf("\n");
            flint_printf("bits bound: %wd\n", nbits);
-           abort();
+           flint_abort();
         }
 
         fmpq_clear(anorm);

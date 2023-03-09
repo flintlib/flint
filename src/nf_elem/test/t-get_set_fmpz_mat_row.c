@@ -62,7 +62,7 @@ main(void)
            flint_printf("a = "); nf_elem_print_pretty(a, nf, "x"); printf("\n");
            flint_printf("b = "); nf_elem_print_pretty(b, nf, "x"); printf("\n");
            flint_printf("d = "); fmpz_print(d); printf("\n");
-           abort();
+           flint_abort();
         }
 
         nf_elem_clear(a, nf);

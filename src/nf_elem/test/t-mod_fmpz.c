@@ -66,7 +66,7 @@ main(void)
                 printf("a = "); nf_elem_print_pretty(a, nf, "x"); printf("\n");
                 printf("n = "); fmpz_print(mod); printf("\n");
                 printf("b = "); nf_elem_print_pretty(b, nf, "x"); printf("\n");
-                abort();
+                flint_abort();
             }
         }
 
@@ -85,7 +85,7 @@ main(void)
                 printf("a = "); nf_elem_print_pretty(a, nf, "x"); printf("\n");
                 printf("n = "); fmpz_print(mod); printf("\n");
                 printf("b = "); nf_elem_print_pretty(b, nf, "x"); printf("\n");
-                abort();
+                flint_abort();
             }
         }
 
@@ -136,7 +136,7 @@ main(void)
                 printf("b = "); nf_elem_print_pretty(b, nf, "x"); printf("\n");
                 printf("c = "); nf_elem_print_pretty(c, nf, "x"); printf("\n");
                 printf("n = "); fmpz_print(mod); printf("\n");
-                abort();
+                flint_abort();
             }
         }
 
@@ -157,7 +157,7 @@ main(void)
                 printf("b = "); nf_elem_print_pretty(b, nf, "x"); printf("\n");
                 printf("c = "); nf_elem_print_pretty(c, nf, "x"); printf("\n");
                 printf("n = "); fmpz_print(mod); printf("\n");
-                abort();
+                flint_abort();
             }
         }
 
@@ -206,7 +206,7 @@ main(void)
             printf("b = "); nf_elem_print_pretty(b, nf, "x"); printf("\n");
             printf("c = "); nf_elem_print_pretty(c, nf, "x"); printf("\n");
             printf("n = "); fmpz_print(mod); printf("\n");
-            abort();
+            flint_abort();
         }
 
         nf_elem_clear(a, nf);

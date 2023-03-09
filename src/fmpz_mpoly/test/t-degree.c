@@ -10,7 +10,6 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include "fmpz_mpoly.h"
 
 /* check various degree operations */

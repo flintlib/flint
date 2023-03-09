@@ -11,7 +11,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -1601,6 +1600,6 @@ int main(int argc, char *argv[])
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }
 

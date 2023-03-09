@@ -169,7 +169,7 @@ ca_mat_jordan_transformation(ca_mat_t mat, const ca_vec_t lambda, slong num_bloc
                 break;
 
             if (ca_mat_ncols(Y) != 1)
-                abort();
+                flint_abort();
 
             for (j = 0; j < n; j++)
                 ca_set(ca_mat_entry(mat, j, i), ca_mat_entry(Y, j, 0), ctx);

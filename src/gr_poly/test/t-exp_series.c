@@ -111,7 +111,7 @@ test_exp_series(flint_rand_t state)
                 status |= gr_poly_exp_series_newton(y, y, n, n_randint(state, 20), ctx);
                 break;
             default:
-                abort();
+                flint_abort();
         }
     }
 
@@ -167,5 +167,5 @@ int main()
     flint_randclear(state);
     flint_cleanup_master();
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }

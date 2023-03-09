@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>  /* qsort */
+#include <stdlib.h>
 #include "fmpz.h"
 #include "fmpz_mat.h"
 

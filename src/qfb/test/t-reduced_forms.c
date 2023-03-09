@@ -15,7 +15,6 @@
 ******************************************************************************/
 
 #include <stdio.h>
-#include <stdlib.h>
 #include "qfb.h"
 
 int main(void)
@@ -61,7 +60,7 @@ int main(void)
              } else
                 printf("%ld != %ld\n", num, num2);
             
-            abort();
+            flint_abort();
         }
 
         qfb_array_clear(&forms, num);

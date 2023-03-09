@@ -95,7 +95,7 @@ acb_dft_precomp_clear(acb_dft_pre_t pre)
             break;
         default:
             flint_printf("acb_dft_clear: unknown strategy code %i\n", pre->type);
-            abort();
+            flint_abort();
             break;
     }
 }
@@ -125,7 +125,7 @@ acb_dft_precomp(acb_ptr w, acb_srcptr v, const acb_dft_pre_t pre, slong prec)
             break;
         default:
             flint_printf("acb_dft_precomp: unknown strategy code %i\n", pre->type);
-            abort();
+            flint_abort();
             break;
     }
 }

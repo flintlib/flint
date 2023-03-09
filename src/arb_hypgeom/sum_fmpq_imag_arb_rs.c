@@ -167,7 +167,7 @@ arb_hypgeom_sum_fmpq_imag_arb_rs(arb_t res_real, arb_t res_imag, const fmpq * a,
         }
 
         if (jbot != jtop - jlen + 1)
-            abort();
+            flint_abort();
 
         /* Factors between jbot and jtop inclusive */
         if (jbot == 0 || alen == 0)

@@ -10,7 +10,6 @@
 */
 
 #include <gmp.h>
-#include <stdlib.h>
 #include "flint.h"
 #include "mpoly.h"
 

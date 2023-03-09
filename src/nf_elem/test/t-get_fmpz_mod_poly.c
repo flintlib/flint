@@ -72,7 +72,7 @@ main(void)
                 printf("a mod n = ");
                 fmpz_mod_poly_print_pretty(reduced_elem, "x", ctx);
                 printf("\n");
-                abort();
+                flint_abort();
             }
         }
 
@@ -137,7 +137,7 @@ main(void)
                 printf("a mod n = ");
                 fmpz_mod_poly_print_pretty(reduced_elem, "x", ctx);
                 printf("\n");
-                abort();
+                flint_abort();
             }
         }
 

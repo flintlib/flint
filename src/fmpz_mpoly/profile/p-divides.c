@@ -20,7 +20,6 @@ p-divides nthreads sparse m n:
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include "profiler.h"
 #include "fmpz_mpoly.h"
 

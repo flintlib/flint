@@ -9,9 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
 #include "mpoly.h"
 #include "long_extras.h"
-
 
 typedef struct {
     slong x;

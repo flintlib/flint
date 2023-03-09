@@ -54,7 +54,7 @@ main(void)
            printf("a = "); nf_elem_print_pretty(a, nf, "x"); printf("\n");
            printf("b = "); nf_elem_print_pretty(b, nf, "x"); printf("\n");
            printf("c = "); fmpq_print(c); printf("\n");
-           abort();
+           flint_abort();
         }
 
         nf_elem_clear(a, nf);
@@ -94,7 +94,7 @@ main(void)
            printf("a = "); nf_elem_print_pretty(a, nf, "x"); printf("\n");
            printf("b = "); nf_elem_print_pretty(b, nf, "x"); printf("\n");
            printf("c = "); fmpq_print(c); printf("\n");
-           abort();
+           flint_abort();
         }
 
         nf_elem_clear(a, nf);

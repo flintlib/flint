@@ -15,7 +15,6 @@
 ******************************************************************************/
 
 #include <stdio.h>
-#include <stdlib.h>
 #include "qfb.h"
 
 int main(void)
@@ -54,7 +53,7 @@ int main(void)
               printf("FAIL:\n");
               printf("Exponent not computed\n");
               printf("Discriminant: "); fmpz_print(D); printf("\n");
-              abort();
+              flint_abort();
            }
            
            e = fmpz_get_si(exp);
@@ -65,7 +64,7 @@ int main(void)
               printf("Exponent does not divide class number\n");
               printf("Discriminant: "); fmpz_print(D); printf("\n");
               printf("%ld does not divide %ld\n", e, num);
-              abort();
+              flint_abort();
            }
            
            for (k = 0; k < 5; k++)
@@ -80,7 +79,7 @@ int main(void)
                  printf("Discriminant: "); fmpz_print(D); printf("\n");
                  printf("Form: "); qfb_print(forms + i1); printf("\n");
                  printf("Exponent: %ld\n", e);
-                 abort();
+                 flint_abort();
               }
            }
 

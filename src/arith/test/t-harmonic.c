@@ -10,7 +10,6 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <limits.h>
 #include "flint.h"
 #include "gmpcompat.h"

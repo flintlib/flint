@@ -11,7 +11,6 @@
 
 #define FMPQ_MPOLY_FACTOR_INLINES_C
 
-#include <stdlib.h>
 #include <stdio.h>
 #include <gmp.h>
 #include "flint.h"

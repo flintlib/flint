@@ -42,7 +42,7 @@ _acb_dft_rad2_init(acb_dft_rad2_t t, slong dv, int e, slong prec)
     if (e < 0)
     {
         flint_printf("acb_dft_rad2_init: need e >= 0");
-        abort();
+        flint_abort();
     }
     t->e = e;
     t->n = WORD(1) << e;

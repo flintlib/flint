@@ -10,7 +10,6 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -58,7 +57,7 @@ int main()
 			else
 			{
 				flint_printf("FAIL!\n");
-				abort();	
+				flint_abort();	
 			}
 		}
 		
@@ -73,7 +72,7 @@ int main()
 		if (fmpz_cmpabs(gcd_mat, temp) != 0)
 		{
 			flint_printf("FAIL!\n");
-			abort();
+			flint_abort();
 		}
 
 cleanup:

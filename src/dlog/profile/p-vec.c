@@ -138,5 +138,5 @@ int main(int argc, char *argv[])
     flint_randclear(state);
     flint_cleanup();
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }

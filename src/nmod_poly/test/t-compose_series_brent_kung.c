@@ -12,7 +12,6 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <gmp.h>
 #include "nmod_vec.h"
 #include "nmod_poly.h"

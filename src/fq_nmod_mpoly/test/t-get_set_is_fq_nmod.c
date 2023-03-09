@@ -10,7 +10,6 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include "ulong_extras.h"
 #include "fq_nmod_mpoly.h"
 

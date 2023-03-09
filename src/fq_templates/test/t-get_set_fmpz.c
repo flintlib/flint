@@ -15,7 +15,6 @@
 #include "test_helpers.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 
 int main(void)
 {
@@ -65,7 +64,7 @@ int main(void)
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 

@@ -12,7 +12,6 @@
 #include "fq_default.h"
 #include "test_helpers.h"
 
-#include <stdlib.h>
 #include <stdio.h>
 
 int main(void)
@@ -69,5 +68,5 @@ int main(void)
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }

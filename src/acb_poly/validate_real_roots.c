@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
 #include "acb_poly.h"
 
 #ifndef __compar_fn_t

@@ -13,7 +13,6 @@
 
 #include <gmp.h>
 #include <math.h>
-#include <stdlib.h>
 #include "flint.h"
 #include "ulong_extras.h"
 

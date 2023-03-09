@@ -11,7 +11,6 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include "fmpz_mpoly.h"
 #include "long_extras.h"
 #include "ulong_extras.h"

@@ -197,11 +197,8 @@ ulong fexpr_hash(const fexpr_t expr);
 
 int fexpr_cmp_fast(const fexpr_t a, const fexpr_t b);
 
-FEXPR_INLINE void
-_fexpr_vec_sort_fast(fexpr_ptr vec, slong len)
-{
-    qsort(vec, len, sizeof(fexpr_struct), (int(*)(const void*,const void*)) fexpr_cmp_fast);
-}
+void
+_fexpr_vec_sort_fast(fexpr_ptr vec, slong len);
 
 FEXPR_INLINE int
 _fexpr_is_integer(const ulong * expr)

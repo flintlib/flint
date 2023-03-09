@@ -10,7 +10,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
 #include "fmpz_mod_poly.h"
 
 int _fmpz_mod_poly_invmod(fmpz *A, 

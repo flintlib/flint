@@ -43,7 +43,7 @@ void nf_init(nf_t nf, const fmpq_poly_t pol)
     if (len < 2)
     {
        flint_printf("Exception (nf_init). Degree must be at least 1.\n");
-       abort();
+       flint_abort();
     } else if (len == 2) /* linear case */
        nf->flag |= NF_LINEAR;
     else if (len == 3) /* quadratic case */

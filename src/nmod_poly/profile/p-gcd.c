@@ -10,7 +10,6 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
@@ -131,6 +130,6 @@ int main(void)
     flint_printf("]\n");
 
     flint_randclear(state);
-    return EXIT_SUCCESS;
+    return 0;
 }
 

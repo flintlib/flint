@@ -10,7 +10,6 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include "long_extras.h"
 #include "ulong_extras.h"
 #include "padic_poly.h"
@@ -124,5 +123,5 @@ main(void)
     FLINT_TEST_CLEANUP(state);
     
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }

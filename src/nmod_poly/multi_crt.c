@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
 #include "nmod_poly.h"
 
 void nmod_poly_multi_crt_init(nmod_poly_multi_crt_t P)

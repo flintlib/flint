@@ -11,7 +11,6 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <gmp.h>
 #include "fmpz_mpoly.h"
 #include "ulong_extras.h"
