@@ -197,30 +197,8 @@ ulong fexpr_hash(const fexpr_t expr);
 
 int fexpr_cmp_fast(const fexpr_t a, const fexpr_t b);
 
-#if defined(H_STDLIB)               \
- || defined(_H_STDLIB)              \
- || defined(_STDLIB_H)              \
- || defined(_STDLIB_H_)             \
- || defined(__STDLIB_H)             \
- || defined(__STDLIB_H__)           \
- || defined(_STDLIB_INCLUDED)       \
- || defined(__dj_include_stdlib_h_) \
- || defined(__STDLIB__)             \
- || defined(_MSL_STDLIB_H)          \
- || defined(_STDLIB_H_INCLUDED)     \
- || defined(_ISO_STDLIB_ISO_H)      \
- || defined(__STDLIB_LOADED)        \
- || defined(_STDLIB)
-FEXPR_INLINE void
-_fexpr_vec_sort_fast(fexpr_ptr vec, slong len)
-{
-    qsort(vec, len, sizeof(fexpr_struct), (int(*)(const void*,const void*)) fexpr_cmp_fast);
-}
-#else
-/* This is defined in fexpr/inlines.c */
 void
 _fexpr_vec_sort_fast(fexpr_ptr vec, slong len);
-#endif
 
 FEXPR_INLINE int
 _fexpr_is_integer(const ulong * expr)

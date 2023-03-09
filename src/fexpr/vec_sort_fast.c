@@ -9,5 +9,11 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#define FEXPR_INLINES_C
+#include <stdlib.h>
 #include "fexpr.h"
+
+void
+_fexpr_vec_sort_fast(fexpr_ptr vec, slong len)
+{
+    qsort(vec, len, sizeof(fexpr_struct), (int(*)(const void*,const void*)) fexpr_cmp_fast);
+}

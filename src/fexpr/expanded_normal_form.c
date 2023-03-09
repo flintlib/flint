@@ -9,7 +9,6 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h> /* use inline version of _fexpr_vec_sort_fast */
 #include "fexpr.h"
 
 int
