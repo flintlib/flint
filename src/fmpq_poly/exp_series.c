@@ -10,9 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
+#include "ulong_extras.h"
 #include "fmpq_poly.h"
 
 static ulong _fmpz_gcd_big_small(const fmpz_t g, ulong h)

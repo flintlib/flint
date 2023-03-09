@@ -12,7 +12,6 @@
 #include <string.h>
 
 #include "fq.h"
-#include "fq_poly.h"
 
 void fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_mod_poly_t modulus,
                                     const fmpz_mod_ctx_t ctxp, const char *var)

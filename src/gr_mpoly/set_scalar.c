@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpq.h"
 #include "gr_mpoly.h"
 
 int gr_mpoly_set_scalar(gr_mpoly_t A,

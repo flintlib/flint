@@ -12,6 +12,12 @@
 #include <ctype.h>
 #include "gr_poly.h"
 
+#ifdef __GNUC__
+# define strcmp __builtin_strcmp
+#else
+# include <string.h>
+#endif
+
 static int
 want_parens(const char * s)
 {

@@ -9,8 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mat.h"
 #include "bool_mat.h"
-
 
 /*
  * Condensation of a matrix.

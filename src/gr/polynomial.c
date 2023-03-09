@@ -16,6 +16,12 @@
 #include "gr.h"
 #include "gr_poly.h"
 
+#ifdef __GNUC__
+# define strcmp __builtin_strcmp
+#else
+# include <string.h>
+#endif
+
 static const char * default_var = "x";
 
 void

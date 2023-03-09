@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "dlog.h"
 
 /* todo: recursion could be made quadratic (not very useful for ulongs) */

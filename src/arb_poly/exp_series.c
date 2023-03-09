@@ -11,6 +11,13 @@
 
 #include "arb_poly.h"
 
+#ifdef __GNUC__
+# define log __builtin_log
+# define pow __builtin_pow
+#else
+# include <math.h>
+#endif
+
 /* allow changing this from the test code */
 ARB_DLL slong arb_poly_newton_exp_cutoff = 0;
 

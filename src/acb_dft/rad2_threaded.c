@@ -11,7 +11,6 @@
 */
 
 #include "acb_dft.h"
-#include "pthread.h"
 
 void acb_dft_rad2_reorder(acb_ptr v, slong n);
 

@@ -12,6 +12,14 @@
 #include "fexpr.h"
 #include "fexpr_builtin.h"
 
+#ifdef __GNUC__
+# define memcpy __builtin_memcpy
+# define strcmp __builtin_strcmp
+# define strlen __builtin_strlen
+#else
+# include <string.h>
+#endif
+
 void fexpr_write_latex_symbol(int * subscript, calcium_stream_t out, const fexpr_t expr, ulong flags);
 int _fexpr_is_symbol_with_trailing_underscore(const fexpr_t expr);
 

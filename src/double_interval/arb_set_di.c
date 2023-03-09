@@ -10,6 +10,7 @@
 */
 
 #include "double_interval.h"
+#include "arb.h"
 
 void
 arb_set_di(arb_t res, di_t x, slong prec)

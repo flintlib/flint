@@ -9,9 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "thread_pool.h"
+#include "thread_support.h"
 #include "nmod_mpoly.h"
-#include "fmpz_mpoly.h" /* for mpoly_divides_select_exps */
+#include "fmpz_mpoly.h"
 
 #define PROFILE_THIS 0
 

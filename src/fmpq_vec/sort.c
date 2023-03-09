@@ -10,6 +10,7 @@
 */
 
 #include <stdlib.h>
+#include "fmpq.h"
 #include "fmpq_vec.h"
 
 typedef int(*__compar_fn_t) (const void *, const void *);

@@ -12,6 +12,13 @@
 #include "fexpr.h"
 #include "fexpr_builtin.h"
 
+#ifdef __GNUC__
+# define memcpy __builtin_memcpy
+# define strlen __builtin_strlen
+#else
+# include <string.h>
+#endif
+
 void
 fexpr_set_symbol_str(fexpr_t res, const char * s)
 {

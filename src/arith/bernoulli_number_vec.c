@@ -9,6 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "fmpq.h"
 #include "arith.h"
 
 void _arith_bernoulli_number_vec(fmpz * num, fmpz * den, slong n)

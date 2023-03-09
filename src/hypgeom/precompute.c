@@ -9,7 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
+#include "fmpz_poly.h"
+#include "mag.h"
 #include "hypgeom.h"
 
 /* Compute a pure ratio P2(k)/Q2(k) for the term

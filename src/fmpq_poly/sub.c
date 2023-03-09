@@ -9,9 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
+#include "fmpq.h"
 #include "fmpq_poly.h"
 
 void _fmpq_poly_sub_can(fmpz * rpoly, fmpz_t rden, 

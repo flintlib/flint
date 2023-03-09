@@ -12,6 +12,13 @@
 #include "fmpz.h"
 #include "gr.h"
 
+#ifdef __GNUC__
+# define memcpy __builtin_memcpy
+# define strlen __builtin_strlen
+#else
+# include <math.h>
+#endif
+
 /* todo: error handling */
 
 void gr_stream_init_file(gr_stream_t out, FILE * fp)

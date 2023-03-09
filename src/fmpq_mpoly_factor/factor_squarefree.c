@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mpoly_factor.h"
 #include "fmpq_mpoly_factor.h"
-
 
 int fmpq_mpoly_factor_squarefree(fmpq_mpoly_factor_t f, const fmpq_mpoly_t A,
                                                     const fmpq_mpoly_ctx_t ctx)

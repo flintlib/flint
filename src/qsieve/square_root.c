@@ -10,7 +10,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "qsieve.h"
+
+#ifdef __GNUC__
+# define memset __builtin_memset
+#else
+# include <string.h>
+#endif
 
 void qsieve_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf,
    uint64_t * nullrows, slong ncols, slong l, fmpz_t N)

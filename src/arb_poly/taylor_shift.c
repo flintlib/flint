@@ -11,6 +11,12 @@
 
 #include "arb_poly.h"
 
+#ifdef __GNUC__
+# define sqrt __builtin_sqrt
+#else
+# include <math.h>
+#endif
+
 void
 _arb_poly_taylor_shift(arb_ptr poly, const arb_t c, slong n, slong prec)
 {

@@ -9,7 +9,6 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb_poly.h"
 #include "acb_dft.h"
 
 /* all roots are already computed, w != v */

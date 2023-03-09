@@ -10,8 +10,8 @@
 */
 
 #include "fmpz_mod_vec.h"
+#include "fmpz_mod_mat.h"
 #include "fmpz_mod_mpoly_factor.h"
-
 
 void fmpz_mod_tpoly_fit_length(
     fmpz_mod_tpoly_t A,

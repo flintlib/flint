@@ -10,6 +10,7 @@
 */
 
 #include <stdlib.h>
+#include "nmod.h"
 #include "dlog.h"
 
 ulong

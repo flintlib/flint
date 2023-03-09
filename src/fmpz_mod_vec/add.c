@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod.h"
 #include "fmpz_mod_vec.h"
 
 void _fmpz_mod_vec_add(fmpz * a, const fmpz * b, const fmpz * c,

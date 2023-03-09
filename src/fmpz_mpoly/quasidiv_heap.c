@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "fmpz_mpoly.h"
 
 slong _fmpz_mpoly_quasidiv_heap1(fmpz_t scale,

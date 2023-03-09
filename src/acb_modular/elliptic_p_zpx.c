@@ -10,7 +10,6 @@
 */
 
 #include "acb_modular.h"
-#include "acb_poly.h"
 #include "acb_elliptic.h"
 
 void

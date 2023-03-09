@@ -9,8 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
+#include "acb.h"
 #include "calcium.h"
+
+#ifdef __GNUC__
+# define strcpy __builtin_strcpy
+#else
+# include <string.h>
+#endif
 
 /* todo: this will be obsolete with a new arb release */
 static char * arb_get_str2(const arb_t x, slong digits, ulong flags)

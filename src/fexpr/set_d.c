@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "arf.h"
 #include "fexpr.h"
 #include "fexpr_builtin.h"
 

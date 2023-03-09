@@ -9,8 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
 #include "double_extras.h"
+#include "mag.h"
 #include "hypgeom.h"
 
 #define LOG2 0.69314718055994530942

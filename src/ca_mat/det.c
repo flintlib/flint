@@ -9,6 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mat.h"
+#include "fmpq_mat.h"
 #include "ca_mat.h"
 
 int

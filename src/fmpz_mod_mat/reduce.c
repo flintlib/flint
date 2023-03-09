@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "thread_support.h"
 #include "fmpz_mod_mat.h"
-
 
 typedef struct {
     slong startrow;

@@ -9,8 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "dlog.h"
-#include <math.h>
 
 #define vbs 1
 #define FACTOR_RATIO 4

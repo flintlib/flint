@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "acb.h"
 #include "acb_elliptic.h"
 
 /* Compute R_C(1,1+x) = atan(sqrt(x))/sqrt(x) = 2F1(1,1/2,3/2,-x) */

@@ -11,6 +11,12 @@
 
 #include "acb_modular.h"
 
+#ifdef __GNUC__
+# define floor __builtin_floor
+#else
+# include <math.h>
+#endif
+
 static __inline__ int
 d_is_ok(double x)
 {

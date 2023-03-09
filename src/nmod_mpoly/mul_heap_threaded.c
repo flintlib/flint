@@ -9,11 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
-#include "thread_pool.h"
-#include "nmod_mpoly.h"
+#include "thread_support.h"
 #include "long_extras.h"
-
+#include "nmod_mpoly.h"
 
 /*
     set A = the part of B*C with exps in [start, end)

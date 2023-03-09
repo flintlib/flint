@@ -10,6 +10,7 @@
 */
 
 #include "mpfr.h"
+#include "fmpz_mat.h"
 #include "fmpz_lll.h"
 #include "mpfr_vec.h"
 #include "mpfr_mat.h"

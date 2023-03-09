@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod_mat.h"
 #include "fq_embed.h"
 
 void fq_embed_mul_matrix(fmpz_mod_mat_t matrix,

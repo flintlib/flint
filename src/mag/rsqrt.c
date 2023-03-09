@@ -11,6 +11,14 @@
 
 #include "mag.h"
 
+#ifdef __GNUC__
+# define frexp __builtin_frexp
+# define ldexp __builtin_ldexp
+# define sqrt __builtin_sqrt
+#else
+# include <math.h>
+#endif
+
 void
 mag_rsqrt(mag_t y, const mag_t x)
 {

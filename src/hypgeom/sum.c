@@ -10,6 +10,8 @@
 */
 
 #include "thread_support.h"
+#include "fmpz_poly.h"
+#include "arb.h"
 #include "hypgeom.h"
 
 static __inline__ void

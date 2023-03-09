@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "arb_poly.h"
 #include "arb_mat.h"
 
 void _arb_mat_charpoly(arb_ptr cp, const arb_mat_t mat, slong prec)

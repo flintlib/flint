@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpq.h"
 #include "bernoulli.h"
 
 FLINT_TLS_PREFIX slong bernoulli_cache_num = 0;

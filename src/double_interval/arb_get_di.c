@@ -10,6 +10,7 @@
 */
 
 #include "double_interval.h"
+#include "arb.h"
 
 di_t
 arb_get_di(const arb_t x)

@@ -11,6 +11,12 @@
 
 #include "acb_poly.h"
 
+#ifdef __GNUC__
+# define log __builtin_log
+#else
+# include <math.h>
+#endif
+
 static void
 _acb_poly_exp_series_basecase_rec(acb_ptr f, acb_ptr a,
         acb_srcptr h, slong hlen, slong n, slong prec)

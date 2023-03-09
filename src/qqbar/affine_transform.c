@@ -9,9 +9,9 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpq_poly.h"
 #include "arb_fmpz_poly.h"
 #include "qqbar.h"
-
 
 static void
 _fmpq_poly_compose2(fmpz * res, const fmpz * poly1, const fmpz_t den1, 

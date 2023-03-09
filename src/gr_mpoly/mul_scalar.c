@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpq.h"
 #include "gr_mpoly.h"
 
 /* c is assumed to be reduced mod n */

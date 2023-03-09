@@ -12,6 +12,7 @@
 */
 
 #include "mpf_vec.h"
+#include "gmpcompat.h"
 
 void
 _mpf_vec_norm(mpf_t res, const mpf * vec, slong len)

@@ -13,6 +13,12 @@
 
 #include "d_vec.h"
 
+#ifdef __GNUC__
+# define fabs __builtin_fabs
+#else
+# include <math.h>
+#endif
+
 int
 _d_vec_approx_equal(const double *vec1, const double *vec2, slong len,
                     double eps)

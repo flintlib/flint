@@ -11,9 +11,7 @@
 */
 
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
+#include "fmpq.h"
 #include "fmpq_poly.h"
 
 void fmpq_poly_set_coeff_mpq(fmpq_poly_t poly, slong n, const mpq_t x)

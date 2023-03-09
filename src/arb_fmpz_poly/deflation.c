@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "arb_fmpz_poly.h"
 
 ulong arb_fmpz_poly_deflation(const fmpz_poly_t input)

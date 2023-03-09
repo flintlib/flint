@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpz_mod_mpoly.h"
-
 
 int fmpz_mod_mpoly_repack_bits(
     fmpz_mod_mpoly_t A,
