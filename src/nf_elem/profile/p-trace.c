@@ -14,7 +14,6 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
 #include <math.h>
 #include "profiler.h"
 #include "flint.h"

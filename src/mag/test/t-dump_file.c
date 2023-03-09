@@ -10,7 +10,6 @@
 */
 
 #include <string.h>
-#include <stdio.h>
 #include "arb.h"
 
 int main()

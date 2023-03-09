@@ -19,7 +19,6 @@
         B = [b{0},...,b{d-1}], where b{i} = (5+2*i)^{3N}, 
  */
 
-#include <stdio.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>

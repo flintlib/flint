@@ -14,7 +14,6 @@
 
 #include "templates.h"
 
-#include <stdio.h>
 #include "perm.h"
 #include "flint.h"
 

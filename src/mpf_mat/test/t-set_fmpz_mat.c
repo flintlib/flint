@@ -11,7 +11,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
 #include "fmpz_mat.h"
 #include "mpf_mat.h"
 #include "ulong_extras.h"

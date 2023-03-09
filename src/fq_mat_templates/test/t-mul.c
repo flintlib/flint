@@ -15,7 +15,6 @@
 
 #include "templates.h"
 
-#include <stdio.h>
 
 int
 main(void)

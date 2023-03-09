@@ -18,7 +18,6 @@
         A = [a{0},...,a{d-1}], where a{i} = (3+i)^{3N}.
  */
 
-#include <stdio.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>

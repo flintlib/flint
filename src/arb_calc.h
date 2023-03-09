@@ -12,7 +12,6 @@
 #ifndef ARB_CALC_H
 #define ARB_CALC_H
 
-#include <stdio.h>
 #include "arb.h"
 #include "arb_poly.h"
 #include "arb_mat.h"

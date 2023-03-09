@@ -11,7 +11,6 @@
 
 #define FQ_DEFAULT_INLINES_C
 
-#include <stdio.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fq_default.h"

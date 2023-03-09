@@ -15,7 +15,6 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
 #include "flint.h"
 #include "fmpq_poly.h"
 #include "nf.h"

@@ -15,7 +15,6 @@
 
 #include "templates.h"
 
-#include <stdio.h>
 #include "flint.h"
 #include "fmpz_vec.h"
 #include "ulong_extras.h"

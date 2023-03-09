@@ -14,7 +14,6 @@
 
 #include "templates.h"
 
-#include <stdio.h>
 
 static void
 _apply_permutation(slong * AP,

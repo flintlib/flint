@@ -15,7 +15,6 @@
 #if defined(__MINGW64__) || defined(_MSC_VER)
 #include "stdint.h"
 #endif
-#include <stdio.h>
 #include <limits.h>
 #include <mpfr.h>
 #include "flint.h"

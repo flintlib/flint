@@ -13,7 +13,6 @@
 #ifndef QSIEVE_H
 #define QSIEVE_H
 
-#include <stdio.h>
 #include <math.h>
 #include <string.h>
 #include <stdint.h>

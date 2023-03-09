@@ -18,7 +18,6 @@
 #define NMOD_MPOLY_FACTOR_INLINE static __inline__
 #endif
 
-#include <stdio.h>
 
 #include "nmod_mpoly.h"
 #include "n_poly.h"

@@ -11,7 +11,6 @@
 
 #include "fq_embed.h"
 
-#include <stdio.h>
 
 int
 main(void)

@@ -14,7 +14,6 @@
 #include "templates.h"
 #include "test_helpers.h"
 
-#include <stdio.h>
 
 int main(void)
 {

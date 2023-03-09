@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
 #include "flint.h"
 #include "profiler.h"
 #include "fmpz.h"

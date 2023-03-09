@@ -16,7 +16,6 @@
     and compute the Teichmuller lift of c = 3.
  */
 
-#include <stdio.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>

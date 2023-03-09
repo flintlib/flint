@@ -22,7 +22,6 @@ p-mul nthreads dense m n:
     mul((1+x+y+z+t)^m, (1+x+y+z+t)^n)
 */
 
-#include <stdio.h>
 #include "nmod_mpoly.h"
 #include "profiler.h"
 

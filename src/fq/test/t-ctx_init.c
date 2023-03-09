@@ -24,7 +24,6 @@
 
 #include "templates.h"
 
-#include <stdio.h>
 
 #include "fmpz_mod_poly.h"
 #include "ulong_extras.h"

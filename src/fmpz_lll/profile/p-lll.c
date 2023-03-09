@@ -11,7 +11,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
 #include "profiler.h"
 #include "flint.h"
 #include "fmpz_lll.h"

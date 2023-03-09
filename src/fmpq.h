@@ -19,7 +19,6 @@
 #define FMPQ_INLINE static __inline__
 #endif
 
-#include <stdio.h>
 
 #include "flint.h"
 #include "fmpz.h"

@@ -11,7 +11,6 @@
 
 #include "flint.h"
 #include "fq.h"
-#include <stdio.h>
 #include "profiler.h"
 
 int
