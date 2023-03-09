@@ -22,11 +22,9 @@
 extern "C" {
 #endif
 
-#include "fmpz_mpoly.h"
 #include "fmpq.h"
-#include "acb.h"
-
-#include "calcium.h"
+#include "fmpz_mpoly.h"
+#include "acb_types.h"
 
 #define fmpz_mpoly_q_numref(x) (&((x)->num))
 #define fmpz_mpoly_q_denref(x) (&((x)->den))

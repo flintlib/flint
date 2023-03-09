@@ -12,9 +12,8 @@
 #ifndef HYPGEOM_H
 #define HYPGEOM_H
 
-#include "fmpz_poly.h"
-#include "arb.h"
-#include "mag.h"
+#include "fmpz_types.h"
+#include "arb_types.h"
 
 #ifdef __cplusplus
 extern "C" {

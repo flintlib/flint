@@ -18,8 +18,6 @@
 #define GR_MAT_INLINE static __inline__
 #endif
 
-#include "fmpz_mat.h"
-#include "fmpq_mat.h"
 #include "gr.h"
 #include "gr_poly.h"
 

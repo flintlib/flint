@@ -22,12 +22,8 @@
 extern "C" {
 #endif
 
-#include <string.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpq.h"
+#include "mpoly_types.h"
 #include "calcium.h"
-#include "fmpz_mpoly_q.h"
 
 #define FEXPR_TYPE_SMALL_INT     UWORD(0)
 #define FEXPR_TYPE_SMALL_SYMBOL  UWORD(1)

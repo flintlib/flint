@@ -19,18 +19,11 @@
 #define FQ_DEFAULT_MAT_INLINE static __inline__
 #endif
 
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "fq.h"
-#include "fq_nmod.h"
-#include "fq_zech.h"
+#include "nmod_mat.h"
 #include "fq_default.h"
 #include "fq_mat.h"
 #include "fq_nmod_mat.h"
 #include "fq_zech_mat.h"
-#include "nmod_mat.h"
-#include "fmpz_mod_mat.h"
-#include "flint.h"
 
 #ifdef __cplusplus
  extern "C" {

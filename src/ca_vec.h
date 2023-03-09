@@ -18,13 +18,6 @@
 #define CA_VEC_INLINE static __inline__
 #endif
 
-#include "flint.h"
-#include "fmpz_poly.h"
-#include "fmpq_poly.h"
-#include "arb_poly.h"
-#include "acb_poly.h"
-#include "nf.h"
-#include "nf_elem.h"
 #include "ca.h"
 
 #ifdef __cplusplus

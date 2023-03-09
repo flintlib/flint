@@ -18,7 +18,7 @@
 #define FMPZ_FACTOR_INLINE static __inline__
 #endif
 
-#include "fmpz.h"
+#include "fmpz_types.h"
 
 #ifdef __cplusplus
 extern "C" {

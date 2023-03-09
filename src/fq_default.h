@@ -19,8 +19,6 @@
 #define FQ_DEFAULT_INLINE static __inline__
 #endif
 
-#include "ulong_extras.h"
-#include "fmpz.h"
 #include "fq.h"
 #include "fq_nmod.h"
 #include "fq_zech.h"

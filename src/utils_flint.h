@@ -23,8 +23,6 @@ extern "C" {
 #endif
 
 #include "fmpz_mpoly.h"
-#include "fmpq.h"
-#include "calcium.h"
 
 /* Multivariate polynomials */
 

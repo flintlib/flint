@@ -13,7 +13,6 @@
 #define ARB_HYPGEOM_H
 
 #include "arb.h"
-#include "arb_poly.h"
 
 #ifdef __cplusplus
 extern "C" {

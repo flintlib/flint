@@ -18,15 +18,8 @@
 #define FMPZ_MOD_INLINE static __inline__
 #endif
 
-
-
 #include "flint.h"
-#include "nmod_vec.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mod_types.h"
-
 
 #ifdef __cplusplus
 extern "C" {

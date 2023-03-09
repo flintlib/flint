@@ -23,9 +23,7 @@
 #define QFB_INLINE static __inline__
 #endif
 
-#include "flint.h"
 #include "fmpz.h"
-#include "ulong_extras.h"
 
 #ifdef __cplusplus
  extern "C" {

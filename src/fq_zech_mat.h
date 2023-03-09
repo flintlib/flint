@@ -21,7 +21,6 @@
 #endif
 
 #include "fq_zech.h"
-#include "fq_zech_vec.h"
 
 /* Cutoff between classical and recursive triangular solving */
 #define FQ_ZECH_MAT_SOLVE_TRI_ROWS_CUTOFF 64

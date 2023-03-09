@@ -18,9 +18,7 @@
 #define ARB_FPWRAP_INLINE static __inline__
 #endif
 
-#include "double_extras.h"
-#include "arb.h"
-#include "acb.h"
+#include "flint.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -22,9 +22,11 @@
 #define FQ_TEMPLATES_INLINE static __inline__
 #endif
 
+#include "fmpz_types.h"
+#include "fmpz_mod_types.h"
+#include "fmpz_mod.h"
+#include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
-#include "fmpz_mod_mat.h"
-#include "ulong_extras.h"
 
 /* Data types and context ****************************************************/
 

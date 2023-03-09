@@ -19,7 +19,6 @@
 #define MPF_MAT_INLINE static __inline__
 #endif
 
-#include <math.h>
 #include "fmpz_types.h"
 #include "mpf_vec.h"
 

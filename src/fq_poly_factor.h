@@ -20,6 +20,11 @@
 #define FQ_POLY_FACTOR_INLINE static __inline__
 #endif
 
+#include "thread_pool.h"
+#include "ulong_extras.h"
+#include "fq_vec.h"
+#include "fq_poly.h"
+
 FQ_POLY_FACTOR_INLINE
 int FQ_POLY_ITERATED_FROBENIUS_CUTOFF(const fq_ctx_t ctx, slong length)
 {

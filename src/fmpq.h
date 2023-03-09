@@ -19,11 +19,8 @@
 #define FMPQ_INLINE static __inline__
 #endif
 
-
-#include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
-#include "fmpq_types.h"
 
 #ifdef __cplusplus
 extern "C" {

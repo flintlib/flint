@@ -18,9 +18,6 @@
 #define FMPZ_POLY_MAT_INLINE static __inline__
 #endif
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mat.h"
 #include "fmpz_poly.h"
 
 #ifdef __cplusplus

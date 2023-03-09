@@ -21,7 +21,6 @@
 #endif
 
 #include "fq_nmod.h"
-#include "fq_nmod_vec.h"
 
 /* Cutoff between classical and recursive triangular solving */
 #define FQ_NMOD_MAT_SOLVE_TRI_ROWS_CUTOFF 64

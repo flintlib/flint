@@ -18,9 +18,6 @@
 #define FMPZ_INLINE static __inline__
 #endif
 
-
-
-#include "flint.h"
 #include "fmpz_types.h"
 #include "fmpz-conversions.h"
 

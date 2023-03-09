@@ -18,8 +18,7 @@
 #define BOOL_MAT_INLINE static __inline__
 #endif
 
-#include "flint.h"
-#include "fmpz_mat.h"
+#include "fmpz_types.h"
 
 #ifdef __cplusplus
 extern "C" {

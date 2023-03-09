@@ -22,12 +22,7 @@
 #define NMOD_POLY_FACTOR_INLINE static __inline__
 #endif
 
-
-#include "flint.h"
-#include "nmod_vec.h"
-#include "nmod_mat.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
+#include "nmod_poly.h"
 
 #ifdef __cplusplus
 extern "C" {

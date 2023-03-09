@@ -23,8 +23,6 @@
 #endif
 
 #include "nmod_poly.h"
-#include "nmod_mat.h"
-#include "ulong_extras.h"
 
 /* Data types and context ****************************************************/
 #ifdef __cplusplus

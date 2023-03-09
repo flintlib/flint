@@ -21,7 +21,6 @@
 #endif
 
 #include "acb.h"
-#include "acb_poly.h"
 #include "dirichlet.h"
 
 #ifdef __cplusplus

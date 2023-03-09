@@ -18,8 +18,8 @@
 #define ACB_DFT_INLINE static __inline__
 #endif
 
+#include "ulong_extras.h"
 #include "acb.h"
-#include "dlog.h"
 
 #ifdef __cplusplus
 extern "C" {

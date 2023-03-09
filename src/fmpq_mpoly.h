@@ -18,9 +18,8 @@
 #define FMPQ_MPOLY_INLINE static __inline__
 #endif
 
-
-
-#include "fmpq_poly.h"
+#include "fmpq.h"
+#include "fmpq_types.h"
 #include "fmpz_mpoly.h"
 
 #ifdef __cplusplus

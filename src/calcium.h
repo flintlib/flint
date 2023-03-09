@@ -18,9 +18,8 @@
 #define CALCIUM_INLINE static __inline__
 #endif
 
-#include "flint.h"
 #include "fmpz.h"
-#include "acb.h"
+#include "acb_types.h"
 
 #ifdef __cplusplus
 extern "C" {

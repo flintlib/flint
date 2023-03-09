@@ -18,8 +18,9 @@
 #define DOUBLE_INTERVAL_INLINE static __inline__
 #endif
 
+#include <math.h>
 #include "double_extras.h"
-#include "arb.h"
+#include "arb_types.h"
 
 #ifdef __cplusplus
 extern "C" {

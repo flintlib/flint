@@ -18,14 +18,11 @@
 #define FQ_ZECH_MPOLY_FACTOR_INLINE static __inline__
 #endif
 
-
 #include "fq_zech_mpoly.h"
-#include "nmod_mpoly_factor.h"
 
 #ifdef __cplusplus
  extern "C" {
 #endif
-
 
 typedef struct
 {
