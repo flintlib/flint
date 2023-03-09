@@ -12,7 +12,6 @@
 */
 
 #include <math.h>
-#include <gmp.h>
 #include "nmod_poly.h"
 
 int nmod_poly_is_irreducible_ddf(const nmod_poly_t poly)

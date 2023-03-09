@@ -23,7 +23,6 @@
 #define QFB_INLINE static __inline__
 #endif
 
-#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "ulong_extras.h"

@@ -21,7 +21,6 @@
 #endif
 
 #include <stdio.h>
-#include <gmp.h>
 #include "flint.h"
 #include "fmpz_mat.h"
 #include "d_mat.h"

@@ -11,7 +11,6 @@
 
 #define NMOD_VEC_INLINES_C
 
-#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 

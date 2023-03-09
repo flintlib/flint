@@ -15,7 +15,6 @@
 ******************************************************************************/
 
 #include <stdio.h>
-#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"

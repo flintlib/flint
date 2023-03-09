@@ -19,9 +19,7 @@
 #define NMOD_INLINE static __inline__
 #endif
 
-#include <gmp.h>
 
-#include "longlong.h"
 #include "ulong_extras.h"
 #include "nmod_types.h"
 

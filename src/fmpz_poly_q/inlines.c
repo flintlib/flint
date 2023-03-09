@@ -11,7 +11,6 @@
 
 #define FMPZ_POLY_Q_INLINES_C
 
-#include <gmp.h>
 #include "flint.h"
 #include "fmpz_poly_q.h"
 

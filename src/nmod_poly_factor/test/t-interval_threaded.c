@@ -15,7 +15,6 @@
 #include <pthread.h>
 
 
-#include <gmp.h>
 
 
 #include "flint.h"

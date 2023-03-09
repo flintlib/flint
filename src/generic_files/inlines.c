@@ -11,5 +11,4 @@
 
 #define FLINT_INLINES_C
 
-#include <gmp.h>
 #include "flint.h"

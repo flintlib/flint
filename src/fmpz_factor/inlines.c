@@ -12,7 +12,6 @@
 #define FMPZ_FACTOR_INLINES_C
 
 #include <stdio.h>
-#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 

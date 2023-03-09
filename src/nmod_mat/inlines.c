@@ -12,7 +12,6 @@
 
 #define NMOD_MAT_INLINES_C
 
-#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "nmod_mat.h"

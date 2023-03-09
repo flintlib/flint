@@ -11,7 +11,6 @@
 
 #include <stdio.h>
 #include <limits.h>
-#include <gmp.h>
 #include "flint.h"
 #include "fmpz_mod_mat.h"
 #include "ulong_extras.h"

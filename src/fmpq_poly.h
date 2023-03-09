@@ -20,7 +20,6 @@
 #define FMPQ_POLY_INLINE static __inline__
 #endif
 
-#include <gmp.h>
 #include "fmpz.h"
 #include "fmpq.h"
 #include "fmpq_types.h"

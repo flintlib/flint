@@ -10,13 +10,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
 #include "flint.h"
 #include "gmpcompat.h"
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 #include "nmod_mpoly.h"
-#include "longlong.h"
 #include "mpn_extras.h"
 
 /* try to prove that A is not a square */

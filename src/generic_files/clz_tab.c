@@ -25,7 +25,6 @@ Inc.
 */
 
 #include "flint.h"
-#include "longlong.h"
 
 #ifdef NEED_CLZ_TAB
 

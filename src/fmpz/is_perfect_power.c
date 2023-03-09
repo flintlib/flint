@@ -41,7 +41,6 @@ MA 02110-1301, USA. */
    arithmetic for computing possible roots. 
 */
 
-#include <gmp.h>
 #include <stdio.h> /* for NULL */
 #include "flint.h"
 #include "ulong_extras.h"

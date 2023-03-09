@@ -19,7 +19,6 @@
 #endif
 
 #include <stdio.h>
-#include <gmp.h>
 
 #include "fmpz_mpoly.h"
 #include "fmpq_poly.h"

@@ -19,7 +19,6 @@
 #define NMOD_VEC_INLINE static __inline__
 #endif
 
-#include <gmp.h>
 
 #include "nmod.h"
 

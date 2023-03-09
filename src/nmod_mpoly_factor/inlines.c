@@ -12,7 +12,6 @@
 #define NMOD_MPOLY_FACTOR_INLINES_C
 
 #include <stdio.h>
-#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "nmod_mpoly_factor.h"

@@ -10,7 +10,6 @@
 */
 
 #include "fmpz_mat.h"
-#include "longlong.h"
 #include "gmpcompat.h"
 
 void

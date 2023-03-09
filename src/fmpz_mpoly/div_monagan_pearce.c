@@ -10,11 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
-#include "longlong.h"
 
 /*
    Set polyq to the quotient poly2 by poly3 discarding remainder (with notional

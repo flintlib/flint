@@ -10,11 +10,9 @@
 */
 
 #include <stdio.h>
-#include <gmp.h>
 #include <math.h>
 #include "profiler.h"
 #include "flint.h"
-#include "longlong.h"
 #include "mpn_extras.h"
 #include "ulong_extras.h"
 

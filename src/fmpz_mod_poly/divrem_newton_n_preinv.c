@@ -12,7 +12,6 @@
 
 
 
-#include <gmp.h>
 
 
 #include "fmpz_vec.h"

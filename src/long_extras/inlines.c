@@ -11,7 +11,6 @@
 
 #define LONG_EXTRAS_INLINES_C
 
-#include <gmp.h>
 #include "flint.h"
 #include "long_extras.h"
 

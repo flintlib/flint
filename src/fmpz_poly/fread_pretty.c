@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include <gmp.h>
 
 #include "flint.h"
 #include "gmpcompat.h"

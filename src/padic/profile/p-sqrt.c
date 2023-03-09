@@ -20,7 +20,6 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
-#include <gmp.h>
 
 #include "flint.h"
 #include "fmpz.h"
