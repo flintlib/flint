@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mat.h"
 #include "arith.h"
 
 void arith_stirling_number_1u_vec_next(fmpz * row,

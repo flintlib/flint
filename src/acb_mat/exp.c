@@ -10,6 +10,7 @@
 */
 
 #include "double_extras.h"
+#include "fmpz_mat.h"
 #include "acb_mat.h"
 #include "bool_mat.h"
 

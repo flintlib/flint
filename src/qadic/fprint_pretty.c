@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <limits.h>
-
+#include "fmpq_poly.h"
 #include "qadic.h"
-#include "padic.h"
 
 int _qadic_fprint_pretty(FILE * file, const fmpz *u, slong len, slong v, 
     const qadic_ctx_t ctx)

@@ -23,9 +23,7 @@
 #define NF_ELEM_INLINE static __inline__
 #endif
 
-#include "flint.h"
-#include "fmpq_poly.h"
-#include "fmpz_types.h"
+#include "fmpq.h"
 #include "fmpq_types.h"
 #include "fmpz_mod_types.h"
 #include "nf.h"

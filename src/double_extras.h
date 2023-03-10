@@ -19,9 +19,7 @@
 #endif
 
 #include <math.h>
-#include <float.h>
 #include "flint.h"
-
 
 #ifdef __cplusplus
  extern "C" {

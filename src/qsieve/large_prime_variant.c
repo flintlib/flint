@@ -12,7 +12,14 @@
 
 #include <stdlib.h>
 #include <ctype.h>
+#include "fmpz.h"
 #include "qsieve.h"
+
+#ifdef __GNUC__
+# define memset __builtin_memset
+#else
+# include <strin.h>
+#endif
 
 #define HASH_MULT (2654435761U)       /* hash function, taken from 'msieve' */
 #define HASH(a) ((ulong)((((unsigned int) a) * HASH_MULT) >> (12)))

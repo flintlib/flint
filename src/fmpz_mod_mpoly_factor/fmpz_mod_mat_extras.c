@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod_mat.h"
 #include "fmpz_mod_mpoly_factor.h"
-
 
 int fmpz_mod_mat_is_reduced(const fmpz_mod_mat_t N)
 {

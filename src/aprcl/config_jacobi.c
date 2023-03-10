@@ -11,6 +11,12 @@
 
 #include "aprcl.h"
 
+#ifdef __GNUC__
+# define log __builtin_log
+#else
+# include <math.h>
+#endif
+
 ulong
 aprcl_R_value(const fmpz_t n)
 {

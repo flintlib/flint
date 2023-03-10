@@ -19,15 +19,8 @@
 #define FMPZ_MPOLY_INLINE static __inline__
 #endif
 
-
-
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_vec.h"
-#include "fmpz_poly.h"
 #include "mpoly.h"
-#include "nmod_types.h"
-#include "fmpz_mod_types.h"
 
 #ifdef __cplusplus
 extern "C" {

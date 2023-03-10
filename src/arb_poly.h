@@ -18,10 +18,9 @@
 #define ARB_POLY_INLINE static __inline__
 #endif
 
-#include "fmpz_poly.h"
-#include "fmpq_poly.h"
+#include "fmpq_types.h"
 #include "arb.h"
-#include "acb.h"
+#include "acb_types.h"
 
 #ifdef __cplusplus
 extern "C" {

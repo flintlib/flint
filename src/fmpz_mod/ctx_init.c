@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "fmpz_mod.h"
 
 void fmpz_mod_ctx_init(fmpz_mod_ctx_t ctx, const fmpz_t n)

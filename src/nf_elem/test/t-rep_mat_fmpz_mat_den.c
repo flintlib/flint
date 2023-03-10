@@ -15,8 +15,7 @@
 
 ******************************************************************************/
 
-#include "fmpq_mat.h"
-#include "nf.h"
+#include "fmpz_mat.h"
 #include "nf_elem.h"
 
 int

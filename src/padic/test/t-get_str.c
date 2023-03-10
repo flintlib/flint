@@ -9,10 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
 #include "ulong_extras.h"
-#include "long_extras.h"
+#include "fmpq.h"
 #include "padic.h"
+
+#ifdef __GNUC__
+# define strcmp __builtin_strcmp
+#else
+# include <string.h>
+#endif
 
 int
 main(void)

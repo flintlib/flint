@@ -18,16 +18,6 @@
 #define CA_MAT_INLINE static __inline__
 #endif
 
-#include "flint.h"
-#include "fmpz_mat.h"
-#include "fmpq_mat.h"
-#include "perm.h"
-#include "arb_mat.h"
-#include "acb_mat.h"
-#include "nf.h"
-#include "nf_elem.h"
-#include "ca.h"
-#include "ca_vec.h"
 #include "ca_poly.h"
 
 #ifdef __cplusplus

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mat.h"
 #include "gr_mat.h"
 
 /* todo: could reimplement the generic construction here, for

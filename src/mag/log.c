@@ -11,6 +11,12 @@
 
 #include "mag.h"
 
+#ifdef __GNUC__
+# define ldexp __builtin_ldexp
+#else
+# include <math.h>
+#endif
+
 void
 mag_neg_log(mag_t z, const mag_t x)
 {

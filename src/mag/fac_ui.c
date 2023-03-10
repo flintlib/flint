@@ -11,6 +11,12 @@
 
 #include "mag.h"
 
+#ifdef __GNUC__
+# define ceil __builtin_ceil
+#else
+# include <math.h>
+#endif
+
 #define MAG_FAC_TABLE_NUM 256
 
 const int mag_fac_tab[MAG_FAC_TABLE_NUM * 2] =

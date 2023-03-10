@@ -11,7 +11,6 @@
 
 #include "arb_poly.h"
 
-
 int main()
 {
     slong iter;

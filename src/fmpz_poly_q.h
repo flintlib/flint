@@ -18,9 +18,6 @@
 #define FMPZ_POLY_Q_INLINE static __inline__
 #endif
 
-
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_poly.h"
 
 #ifdef __cplusplus

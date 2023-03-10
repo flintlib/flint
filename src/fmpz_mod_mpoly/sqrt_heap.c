@@ -13,6 +13,12 @@
 #include "fmpz_mod_mpoly.h"
 #include "gmpcompat.h"
 
+#ifdef __GNUC__
+# define sqrt __builtin_sqrt
+#else
+# include <math.h>
+#endif
+
 /* try to prove that A is not a square */
 static int _is_proved_not_square(
     int count,

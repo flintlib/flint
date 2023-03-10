@@ -13,6 +13,12 @@
 #include "d_vec.h"
 #include "ulong_extras.h"
 
+#ifdef __GNUC__
+# define fabs __builtin_fabs
+#else
+# include <math.h>
+#endif
+
 #define D_VEC_NORM_EPS (1e-14)
 
 int

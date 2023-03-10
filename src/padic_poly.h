@@ -18,15 +18,9 @@
 #define PADIC_POLY_INLINE static __inline__
 #endif
 
-#include <limits.h>
-
-
-#include "fmpz.h"
-#include "fmpq.h"
 #include "padic.h"
 #include "fmpz_vec.h"
-#include "fmpz_poly.h"
-#include "fmpq_poly.h"
+#include "fmpq_types.h"
 
 #ifdef __cplusplus
  extern "C" {

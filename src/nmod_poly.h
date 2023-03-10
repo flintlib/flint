@@ -22,13 +22,10 @@
 #define NMOD_POLY_INLINE static __inline__
 #endif
 
-
-#include "flint.h"
 #include "nmod_vec.h"
-#include "nmod_mat.h"
-#include "ulong_extras.h"
+#include "nmod_types.h"
 #include "fmpz.h"
-#include "thread_support.h"
+#include "thread_pool.h"
 
 #ifdef __cplusplus
 extern "C" {

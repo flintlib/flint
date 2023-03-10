@@ -14,6 +14,12 @@
 #include "acb_dirichlet.h"
 #include "arb_calc.h"
 
+#ifdef __GNUC__
+# define exp __builtin_exp
+#else
+# include <math.h>
+#endif
+
 static const slong LOOPCOUNT = 4;
 
 /*

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpq_poly.h"
 #include "arith.h"
 
 void arith_euler_polynomial(fmpq_poly_t poly, ulong n)

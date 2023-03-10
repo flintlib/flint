@@ -9,10 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
+#include "d_vec.h"
+#include "fmpz_mat.h"
 #include "fmpz_lll.h"
-#include "ulong_extras.h"
+
+#ifdef __GNUC__
+# define fabs __builtin_fabs
+#else
+# include <math.h>
+#endif
 
 #define FMPZ_LLL_HD_EPS (1.0E-9)
 

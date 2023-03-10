@@ -12,8 +12,7 @@
 #ifndef ACB_HYPGEOM_H
 #define ACB_HYPGEOM_H
 
-#include "acb.h"
-#include "acb_poly.h"
+#include "acb_types.h"
 
 #ifdef __cplusplus
 extern "C" {

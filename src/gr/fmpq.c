@@ -9,8 +9,9 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "qqbar.h"
-#include "fmpq_poly.h"
+#include "fmpz_poly.h"
 #include "fmpq_mat.h"
 #include "gr.h"
 #include "gr_vec.h"

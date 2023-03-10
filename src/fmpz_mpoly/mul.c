@@ -9,9 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
+#include "thread_support.h"
 #include "long_extras.h"
-
+#include "fmpz_poly.h"
+#include "fmpz_mpoly.h"
 
 static int _try_dense(int try_array, slong * Bdegs, slong * Cdegs,
                                            slong Blen, slong Clen, slong nvars)

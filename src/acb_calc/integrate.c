@@ -9,6 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "acb.h"
+#include "arb_calc.h"
 #include "acb_calc.h"
 
 static void

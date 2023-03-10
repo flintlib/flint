@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpq_poly.h"
 #include "arb_poly.h"
 
 ARB_DLL extern slong arb_poly_newton_exp_cutoff;

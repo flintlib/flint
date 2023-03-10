@@ -9,10 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "arith.h"
-#include "fmpz.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
+#include "arith.h"
 
 int main()
 {

@@ -11,6 +11,7 @@
 */
 
 #include "mpf_vec.h"
+#include "gmpcompat.h"
 
 void
 _mpf_vec_zero(mpf * vec, slong len)

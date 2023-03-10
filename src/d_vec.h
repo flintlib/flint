@@ -18,8 +18,6 @@
 #define D_VEC_INLINE static __inline__
 #endif
 
-#include <math.h>
-#include "double_extras.h"
 #include "flint.h"
 
 #ifdef __cplusplus

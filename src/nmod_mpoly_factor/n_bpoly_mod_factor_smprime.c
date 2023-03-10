@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_mat.h"
 #include "nmod_mpoly_factor.h"
-#include "fq_nmod_mpoly_factor.h"
-
 
 static void n_bpoly_reverse_gens(n_bpoly_t a, const n_bpoly_t b)
 {

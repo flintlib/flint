@@ -18,12 +18,9 @@
 #define ACB_MAT_INLINE static __inline__
 #endif
 
-#include "fmpz_mat.h"
-#include "fmpq_mat.h"
-#include "arb.h"
-#include "acb.h"
+#include "fmpq_types.h"
 #include "arb_mat.h"
-#include "acb_poly.h"
+#include "acb.h"
 
 #ifdef __cplusplus
 extern "C" {

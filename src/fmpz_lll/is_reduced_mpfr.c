@@ -10,9 +10,11 @@
 */
 
 #include "mpfr.h"
-#include "fmpz_lll.h"
 #include "mpfr_vec.h"
 #include "mpfr_mat.h"
+#include "fmpz.h"
+#include "fmpz_mat.h"
+#include "fmpz_lll.h"
 
 int
 fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl,

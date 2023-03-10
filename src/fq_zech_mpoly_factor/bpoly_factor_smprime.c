@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_mat.h"
+#include "nmod_mpoly_factor.h"
 #include "fq_zech_mpoly_factor.h"
-#include "nmod_poly.h"
 
 int fq_zech_next(fq_zech_t x, const fq_zech_ctx_t ctx)
 {

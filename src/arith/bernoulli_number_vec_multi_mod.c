@@ -9,7 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
+#include "ulong_extras.h"
+#include "nmod_poly.h"
+#include "fmpz_vec.h"
 #include "arith.h"
 
 static void

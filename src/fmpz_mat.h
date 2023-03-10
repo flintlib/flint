@@ -19,15 +19,13 @@
 #define FMPZ_MAT_INLINE static __inline__
 #endif
 
-
-#include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
-#include "nmod_mat.h"
+#include "nmod_types.h"
 #include "d_mat.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Element access  ********************************************************/

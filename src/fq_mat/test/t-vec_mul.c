@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_vec.h"
 #include "fq_mat.h"
 
 #ifdef T

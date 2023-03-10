@@ -11,6 +11,13 @@
 
 #include "arb_mat.h"
 
+#ifdef __GNUC__
+# define frexp __builtin_frexp
+# define ldexp __builtin_ldexp
+#else
+# include <math.h>
+#endif
+
 /* Block size for better cache locality. */
 #define BLOCK_SIZE 32
 

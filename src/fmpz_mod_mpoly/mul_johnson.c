@@ -9,10 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mpoly.h"
-#include "gmpcompat.h"
 #include "mpn_extras.h"
-
+#include "fmpz_vec.h"
+#include "fmpz_mod_mpoly.h"
 
 void _fmpz_mod_mpoly_mul_johnson1(
     fmpz_mod_mpoly_t A,

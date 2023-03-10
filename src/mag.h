@@ -18,9 +18,6 @@
 #define MAG_INLINE static __inline__
 #endif
 
-#include <math.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_extras.h"
 #include "arb_types.h"
 

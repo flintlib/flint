@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "acb_dft.h"
 #include "acb_modular.h"
 

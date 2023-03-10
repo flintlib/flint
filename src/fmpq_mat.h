@@ -18,12 +18,8 @@
 #define FMPQ_MAT_INLINE static __inline__
 #endif
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mat.h"
-#include "fmpq_types.h"
-#include "fmpq_poly.h"
 #include "fmpq.h"
+#include "fmpq_types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "arith.h"
 
 static const int mod4_tab[8] = { 2, 1, 3, 0, 0, 3, 1, 2 };

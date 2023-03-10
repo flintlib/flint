@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "acb.h"
 #include "acb_modular.h"
 
 void acb_modular_transform(acb_t w, const psl2z_t g, const acb_t z, slong prec)

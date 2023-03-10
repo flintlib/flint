@@ -18,20 +18,8 @@
 #define FQ_ZECH_MPOLY_INLINE static __inline__
 #endif
 
-
-
-#include "flint.h"
-#include "nmod_vec.h"
-#include "nmod_mat.h"
-#include "nmod_poly.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "mpoly.h"
-#include "fq_zech.h"
 #include "fq_zech_poly.h"
 #include "fq_nmod_mpoly.h"
-
 
 #ifdef __cplusplus
  extern "C" {

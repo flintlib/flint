@@ -18,17 +18,7 @@
 #define GR_INLINE static __inline__
 #endif
 
-#include <string.h>
-#include <assert.h>
 #include "flint.h"
-
-/*
-#include "fmpz.h"
-#include "fmpq.h"
-#include "fmpz_poly.h"
-#include "fmpq_poly.h"
-#include "fmpz_mpoly.h"
-*/
 
 #ifdef __cplusplus
  extern "C" {

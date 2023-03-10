@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_mod_vec.h"
+#include "fmpz_mod_poly.h"
 #include "fmpz_mod_mpoly.h"
 
 /* multiply A by (x^k + c) */

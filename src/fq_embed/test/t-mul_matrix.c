@@ -9,13 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod_mat.h"
 #include "fq_embed.h"
-
-#include "templates.h"
-
-
-#include "ulong_extras.h"
-#include "long_extras.h"
 
 int
 main(void)

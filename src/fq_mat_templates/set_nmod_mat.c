@@ -12,6 +12,7 @@
 #ifdef T
 
 #include "templates.h"
+#include "nmod_mat.h"
 
 void
 TEMPLATE(T, mat_set_nmod_mat) (TEMPLATE(T, mat_t) mat1,

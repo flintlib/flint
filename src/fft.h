@@ -18,9 +18,7 @@
 #define FFT_INLINE static __inline__
 #endif
 
-
 #include "flint.h"
-#include "mpn_extras.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -81,6 +79,7 @@ mp_limb_t mpn_sumdiff_n(mp_ptr s, mp_ptr d, mp_srcptr x, mp_srcptr y, mp_size_t 
    } while (0)
 
 /* used for generating random values mod p in test code */
+/* NOTE: One needs to include mpn_extras.h for this macro. */
 #define random_fermat(nn, state, limbs) \
    do { \
       if (n_randint(state, 10) == 0) { \

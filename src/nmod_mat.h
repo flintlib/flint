@@ -20,13 +20,11 @@
 #define NMOD_MAT_INLINE static __inline__
 #endif
 
-
-#include "flint.h"
 #include "perm.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 #include "fmpz.h"
-#include "thread_support.h"
+#include "thread_pool.h"
 
 #ifdef __cplusplus
 extern "C" {

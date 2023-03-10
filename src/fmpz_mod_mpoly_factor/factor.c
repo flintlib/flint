@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_mpoly_factor.h"
 #include "fmpz_mod_mpoly_factor.h"
-#include "long_extras.h"
 
 /*
     The property "sep" used here is that of the returned factors of

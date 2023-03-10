@@ -23,8 +23,8 @@
 #endif
 
 #include "fq_nmod.h"
+#include "fq_nmod_vec.h"
 #include "fq_nmod_mat.h"
-#include "fmpz_mod_poly.h"
 
 #define FQ_NMOD_POLY_DIVREM_DIVCONQUER_CUTOFF  16
 #define FQ_NMOD_COMPOSE_MOD_LENH_CUTOFF 6

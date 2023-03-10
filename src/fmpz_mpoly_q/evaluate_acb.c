@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "acb.h"
 #include "fmpz_mpoly_q.h"
 
 /* stupid algorithm, just to have something working... */

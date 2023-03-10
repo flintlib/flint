@@ -12,6 +12,11 @@
 #include "nmod_mpoly.h"
 #include "fq_zech_mpoly.h"
 
+#ifdef __GNUC__
+# define sqrt __builtin_sqrt
+#else
+# include <math.h>
+#endif
 
 static int _is_proved_not_square_medprime(
     int count,

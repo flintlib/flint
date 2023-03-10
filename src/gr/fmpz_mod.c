@@ -9,14 +9,11 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
-#include "fmpz_mod_poly_factor.h"
 #include "fmpz_mod_mat.h"
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
-
 
 typedef struct
 {

@@ -10,7 +10,6 @@
 */
 
 #include "dlog.h"
-#include <math.h>
 
 #define vbs 0
 

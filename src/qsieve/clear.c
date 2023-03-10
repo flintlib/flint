@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "qsieve.h"
 
 void qsieve_clear(qs_t qs_inf)

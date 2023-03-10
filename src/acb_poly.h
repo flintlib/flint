@@ -18,8 +18,8 @@
 #define ACB_POLY_INLINE static __inline__
 #endif
 
+#include "fmpq_poly.h"
 #include "acb.h"
-#include "arb_poly.h"
 
 #ifdef __cplusplus
 extern "C" {

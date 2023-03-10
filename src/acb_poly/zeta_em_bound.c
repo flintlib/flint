@@ -9,8 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "arb_poly.h"
 #include "acb_poly.h"
-
 
 static void
 bound_I(arb_ptr I, const arb_t A, const arb_t B, const arb_t C, slong len, slong wp)

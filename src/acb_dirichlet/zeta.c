@@ -9,7 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "acb_poly.h"
 #include "acb_dirichlet.h"
+
+#ifdef __GNUC__
+# define sqrt __builtin_sqrt
+#else
+# include <math.h>
+#endif
 
 void acb_zeta_si(acb_t z, slong s, slong prec);
 

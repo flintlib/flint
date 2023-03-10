@@ -23,6 +23,7 @@
 #endif
 
 #include "fq.h"
+#include "fq_vec.h"
 #include "fq_mat.h"
 
 #define FQ_POLY_DIVREM_DIVCONQUER_CUTOFF  16

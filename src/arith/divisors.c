@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
 #include "arith.h"
-#include "fmpz.h"
 
 #define FLINT_NUM_TINY_DIVISORS FLINT_BITS
 

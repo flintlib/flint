@@ -13,8 +13,6 @@
 #define ARB_CALC_H
 
 #include "arb.h"
-#include "arb_poly.h"
-#include "arb_mat.h"
 
 #ifdef __cplusplus
 extern "C" {

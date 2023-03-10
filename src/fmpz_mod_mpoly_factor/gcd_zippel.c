@@ -11,7 +11,7 @@
 
 #include "fmpz_mod_vec.h"
 #include "fmpz_mod_mpoly_factor.h"
-
+#include "n_poly.h"
 
 static void fmpz_mod_mpoly_monomial_evals1(
     fmpz_mod_polyun_t E,

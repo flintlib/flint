@@ -19,9 +19,8 @@
 #define FMPZ_MOD_POLY_FACTOR_INLINE static __inline__
 #endif
 
-
-#include "flint.h"
-#include "fmpz.h"
+#include "thread_pool.h"
+#include "fmpz_mod_poly.h"
 
 #ifdef __cplusplus
 extern "C" {

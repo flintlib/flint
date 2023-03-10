@@ -9,6 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "acb.h"
 #include "acb_hypgeom.h"
 
 void acb_hypgeom_mag_chi(mag_t chi, ulong n);

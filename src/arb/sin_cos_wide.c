@@ -11,6 +11,13 @@
 
 #include "arb.h"
 
+#ifdef __GNUC__
+# define ldexp __builtin_ldexp
+# define floor __builtin_floor
+#else
+# include <math.h>
+#endif
+
 #define ONE_OVER_PI 0.31830988618379067154
 #define PI 3.1415926535897932385
 

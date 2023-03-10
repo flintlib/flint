@@ -10,8 +10,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
+#include "fmpz.h"
 #include "fmpz_vec.h"
+
+#ifdef __GNUC__
+# define ldexp __builtin_ldexp
+#else
+# include <math.h>
+#endif
 
 slong
 _fmpz_vec_get_d_vec_2exp(double *appv, const fmpz * vec, slong len)

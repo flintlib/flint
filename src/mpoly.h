@@ -19,14 +19,8 @@
 #define MPOLY_INLINE static __inline__
 #endif
 
-
-
-#include "string.h"
+#include <string.h>
 #include "mpoly_types.h"
-#include "fmpz.h"
-#include "fmpz_mat.h"
-#include "fmpq.h"
-#include "ulong_extras.h"
 #include "thread_pool.h"
 
 #ifdef __cplusplus

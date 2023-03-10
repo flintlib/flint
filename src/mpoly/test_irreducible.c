@@ -10,8 +10,9 @@
 */
 
 #include <stdlib.h>
-#include "mpoly.h"
+#include "ulong_extras.h"
 #include "long_extras.h"
+#include "mpoly.h"
 
 typedef struct {
     slong x;

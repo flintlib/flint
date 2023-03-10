@@ -12,10 +12,7 @@
 #ifndef ACB_CALC_H
 #define ACB_CALC_H
 
-#include "acb.h"
-#include "acb_poly.h"
-#include "acb_mat.h"
-#include "arb_calc.h"
+#include "acb_types.h"
 
 #ifdef __cplusplus
 extern "C" {

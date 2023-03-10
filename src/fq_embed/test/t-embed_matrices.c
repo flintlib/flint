@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod_mat.h"
 #include "fq_embed.h"
-
 
 int
 main(void)

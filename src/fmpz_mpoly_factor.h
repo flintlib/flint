@@ -18,11 +18,9 @@
 #define FMPZ_MPOLY_FACTOR_INLINE static __inline__
 #endif
 
-
+#include "fmpq.h"
 #include "fmpz_mpoly.h"
-#include "fmpq_poly.h"
 #include "nmod_mpoly.h"
-#include "fmpz_poly_factor.h"
 
 #ifdef __cplusplus
  extern "C" {

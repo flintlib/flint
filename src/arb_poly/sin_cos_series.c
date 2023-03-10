@@ -11,6 +11,13 @@
 
 #include "arb_poly.h"
 
+#ifdef __GNUC__
+# define log __builtin_log
+# define pow __builtin_pow
+#else
+# include <math.h>
+#endif
+
 void
 _arb_poly_sin_cos_series(arb_ptr s, arb_ptr c, arb_srcptr h, slong hlen, slong n, slong prec)
 {

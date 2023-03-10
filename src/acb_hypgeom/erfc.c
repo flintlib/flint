@@ -9,8 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "acb.h"
 #include "arb_hypgeom.h"
 #include "acb_hypgeom.h"
+
+#ifdef __GNUC__
+# define log __builtin_log
+#else
+# include <math.h>
+#endif
 
 void
 acb_hypgeom_erfc(acb_t res, const acb_t z, slong prec)

@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "ulong_extras.h"
 #include "fmpz.h"
-#include "mpn_extras.h"
 
 /* P (x0 : z0) <- kP using Montgomery ladder algorithm */
 

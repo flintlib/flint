@@ -11,6 +11,14 @@
 
 #include "acb_dirichlet.h"
 
+#ifdef __GNUC__
+# define log __builtin_log
+# define pow __builtin_pow
+# define sqrt __builtin_sqrt
+#else
+# include <math.h>
+#endif
+
 #define ONE_OVER_LOG2 1.4426950408889634
 
 void

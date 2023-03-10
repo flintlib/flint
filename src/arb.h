@@ -18,7 +18,6 @@
 #define ARB_INLINE static __inline__
 #endif
 
-#include "mag.h"
 #include "arf.h"
 #include "arb_types.h"
 

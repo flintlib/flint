@@ -11,6 +11,12 @@
 
 #include "arb_poly.h"
 
+#ifdef __GNUC__
+# define log __builtin_log
+#else
+# include <math.h>
+#endif
+
 void
 _arb_poly_mullow(arb_ptr res,
     arb_srcptr poly1, slong len1,

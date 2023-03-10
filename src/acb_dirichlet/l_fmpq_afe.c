@@ -13,6 +13,12 @@
 #include "arb_hypgeom.h"
 #include "acb_dirichlet.h"
 
+#ifdef __GNUC__
+# define log __builtin_log
+#else
+# include <math.h>
+#endif
+
 #define VERBOSE 0
 
 static double

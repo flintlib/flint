@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "padic.h"
 
 void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, slong N)

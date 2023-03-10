@@ -9,6 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "thread_support.h"
+#include "ulong_extras.h"
 #include "bernoulli.h"
 #include "arb.h"
 

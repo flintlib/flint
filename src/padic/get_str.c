@@ -9,10 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <limits.h>
-
-#include "padic.h"
 #include "long_extras.h"
+#include "fmpq.h"
+#include "padic.h"
 
 char * _padic_get_str(char *str, const padic_t op, const fmpz_t p, enum padic_print_mode mode)
 {

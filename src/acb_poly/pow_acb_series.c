@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "arb_poly.h"
 #include "acb_poly.h"
 
 /* (a + bx^c)^g where a = f[0] and b = f[flen-1] */

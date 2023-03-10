@@ -9,16 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
-
-#include "arb.h"
+#include "double_extras.h"
 #include "acb.h"
-#include "arb_fpwrap.h"
+#include "acb_dirichlet.h"
 #include "arb_hypgeom.h"
 #include "acb_hypgeom.h"
-#include "acb_dirichlet.h"
 #include "acb_elliptic.h"
 #include "acb_modular.h"
+#include "arb_fpwrap.h"
 
 int
 arb_accurate_enough_d(const arb_t x, int flags)
