@@ -598,7 +598,7 @@ endif
 ################################################################################
 
 coverage:
-	mkdir build/coverage
+	mkdir -p build/coverage
 	lcov --capture --exclude "*test/t-*.c" --exclude "/usr/*" --directory build --output-file build/coverage/coverage.info
 	genhtml build/coverage/coverage.info --output-directory build/coverage
 
