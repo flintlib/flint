@@ -43,8 +43,10 @@ jobs:
 
       - name: "Build"
         run: |
+          cd build
           cmake --build . -- -j4
 
       - name: "Test"
         run: |
+          cd build
           ctest -j4 --output-on-failure --timeout 100
