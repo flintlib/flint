@@ -101,8 +101,10 @@ FLINT_DLL void __flint_get_memory_functions(void *(**alloc_func) (size_t),
 
 #ifdef __GNUC__
 #define FLINT_NORETURN __attribute__ ((noreturn))
+#define FLINT_CONST __attribute__ ((const))
 #else
 #define FLINT_NORETURN
+#define FLINT_CONST
 #endif
 
 FLINT_DLL FLINT_NORETURN void flint_abort(void);
@@ -179,7 +181,7 @@ FLINT_DLL void flint_reset_num_workers(int max_workers);
 FLINT_DLL int flint_set_thread_affinity(int * cpus, slong length);
 FLINT_DLL int flint_restore_thread_affinity();
 
-double flint_test_multiplier(void);
+FLINT_CONST double flint_test_multiplier(void);
 
 typedef struct
 {
