@@ -276,6 +276,10 @@ if(BUILD_SHARED_LIBS AND WIN32)
     target_compile_definitions(flint PUBLIC "MSC_USE_DLL")
 endif()
 
+if(WIN32)
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS yes)
+endif()
+
 if (HAS_FLAG_MPOPCNT)
     target_compile_options(flint PUBLIC "-mpopcnt")
 endif()
