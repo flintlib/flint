@@ -10,15 +10,6 @@ Version
 
     Returns a pointer to the version of the library as a string ``X.Y.Z``.
 
-Test code
--------------------------------------------------------------------------------
-
-.. function:: double calcium_test_multiplier(void)
-
-    Multiplier for the number of iterations to run in each unit test.
-    The value can be changed by setting the environment variable
-    ``CALCIUM_TEST_MULTIPLIER``. The default value is 1.0.
-
 Triple-valued logic
 -------------------------------------------------------------------------------
 
