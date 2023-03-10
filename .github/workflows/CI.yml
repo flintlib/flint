@@ -32,7 +32,7 @@ jobs:
 
       - name: "Configure"
         run: |
-          ./configure CC=${CC} CFLAGS="${CFLAGS}" --with-gmp=/usr/lib --with-mpfr=/usr/lib
+          ./configure CC=${CC} CFLAGS="${CFLAGS}" --with-gmp=/usr --with-mpfr=/usr
 
       - name: "Compile"
         run: |
