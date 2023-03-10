@@ -23,6 +23,7 @@ WANT_GC=0
 WANT_TLS=0
 WANT_CXX=0
 ASSERT=0
+COVERAGE=0
 BUILD=
 EXTRA_BUILD=
 FLINT_DLL=0
@@ -123,6 +124,7 @@ Configuration:
   --disable-tls           Do not use thread-local storage
   --enable-assert         Enable use of asserts
   --disable-assert        Disable use of asserts [default]
+  --enable-coverage       Enable test coverage
   --enable-cxx            Enable C++ wrapper tests
   --disable-cxx           Disable C++ wrapper tests [default]
   --disable-dependency-tracking
@@ -258,6 +260,9 @@ while [ "$1" != "" ]; do
          ;;
       --disable-assert)
          ASSERT=0
+         ;;
+      --enable-coverage)
+         COVERAGE=1
          ;;
       --enable-cxx)
          WANT_CXX=1
@@ -710,6 +715,10 @@ fi
 
 # avoid spurious warnings with gcc
 # CFLAGS="-Wno-stringop-overflow -Wno-stringop-overread -Wno-maybe-uninitialized $CFLAGS"
+
+if [ "$COVERAGE" = "1" ]; then
+   CFLAGS="-fprofile-arcs -ftest-coverage $CFLAGS"
+fi
 
 #this is needed on PPC G5 and does not hurt on other OS Xes
 
