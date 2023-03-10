@@ -25,8 +25,8 @@ jobs:
 
       - name: "Setup"
         run: |
-          sudo apt install gmp
-          sudo apt install mpfr
+          sudo apt install libgmp-dev
+          sudo apt install libmpfr-dev
           gcc --version
           make --version
 
@@ -208,8 +208,8 @@ jobs:
 
       - name: "Setup"
         run: |
-          sudo apt install gmp
-          sudo apt install mpfr
+          sudo apt install libgmp-dev
+          sudo apt install libmpfr-dev
           clang --version
           make --version
 
@@ -253,8 +253,8 @@ jobs:
       - name: "Setup"
         run: |
           sudo apt install cmake
-          sudo apt install gmp
-          sudo apt install mpfr
+          sudo apt install libgmp-dev
+          sudo apt install libmpfr-dev
           gcc --version
           make --version
           cmake --version
@@ -345,8 +345,8 @@ jobs:
       - name: "Setup"
         run: |
           sudo apt install sed
-          sudo apt install gmp
-          sudo apt install mpfr
+          sudo apt install libgmp-dev
+          sudo apt install libmpfr-dev
           gcc --version
           make --version
           julia --version
