@@ -33,7 +33,7 @@ static ulong smul(ulong x, ulong y)
         return lo;
 }
 
-static slong index(const ulong * v, ulong c)
+static slong _index(const ulong * v, ulong c)
 {
     slong i;
     for (i = 0; ; i++)
@@ -131,15 +131,15 @@ acb_dirichlet_powsum_smooth(acb_ptr res, const acb_t s, ulong N, slong d, slong 
             }
             else if (n % 3 == 0)
             {
-                i3 = index(smooth, 3);
-                iu = index(smooth, n / 3);
+                i3 = _index(smooth, 3);
+                iu = _index(smooth, n / 3);
                 _acb_poly_mullow(powers + i * d,
                     powers + i3 * d, d, powers + iu * d, d, d, prec);
             }
             else
             {
-                i5 = index(smooth, 5);
-                iu = index(smooth, n / 5);
+                i5 = _index(smooth, 5);
+                iu = _index(smooth, n / 5);
                 _acb_poly_mullow(powers + i * d,
                     powers + i5 * d, d, powers + iu * d, d, d, prec);
             }
@@ -163,8 +163,8 @@ acb_dirichlet_powsum_smooth(acb_ptr res, const acb_t s, ulong N, slong d, slong 
 
         if ((UWORD(1) << v) != m)
         {
-            j = index(smooth, UWORD(1) << v);
-            iu = index(smooth, u);
+            j = _index(smooth, UWORD(1) << v);
+            iu = _index(smooth, u);
 
             if (u == 1)
             {
@@ -180,7 +180,7 @@ acb_dirichlet_powsum_smooth(acb_ptr res, const acb_t s, ulong N, slong d, slong 
 
     /* finally evaluate with respect to powers of 2 using horner */
     _acb_vec_zero(res, d);
-    i2 = index(smooth, 2);
+    i2 = _index(smooth, 2);
 
     for (i = num_smooth - 1; i >= 0; i--)
     {

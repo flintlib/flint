@@ -84,7 +84,7 @@ acb_log(acb_t r, const acb_t z, slong prec)
 }
 
 void
-acb_log_analytic(acb_ptr res, const acb_t z, int analytic, slong prec)
+acb_log_analytic(acb_t res, const acb_t z, int analytic, slong prec)
 {
     if (analytic && arb_contains_zero(acb_imagref(z)) &&
         !arb_is_positive(acb_realref(z)))
