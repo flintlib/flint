@@ -10,6 +10,7 @@
 */
 
 #include "double_extras.h"
+#include "arb.h"
 #include "arb_fpwrap.h"
 
 #define CHECK_DOUBLE(fcall) \

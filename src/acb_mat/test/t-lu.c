@@ -9,6 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "perm.h"
+#include "fmpq_mat.h"
 #include "acb_mat.h"
 
 int fmpq_mat_is_invertible(const fmpq_mat_t A)

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_mat.h"
 #include "fq_zech_embed.h"
 
 int

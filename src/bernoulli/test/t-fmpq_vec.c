@@ -9,10 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "bernoulli.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 #include "nmod_vec.h"
+#include "fmpq.h"
+#include "fmpz_extras.h"
+#include "bernoulli.h"
 
 int main()
 {

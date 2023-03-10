@@ -9,9 +9,9 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "bool_mat.h"
 #include "perm.h"
-
+#include "fmpz_mat.h"
+#include "bool_mat.h"
 
 int
 _is_superficially_ok_entrywise(const fmpz_mat_t A)

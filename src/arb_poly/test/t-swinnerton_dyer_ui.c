@@ -9,6 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "fmpz_poly.h"
 #include "arb_poly.h"
 
 int main()

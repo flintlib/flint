@@ -13,6 +13,12 @@
 #include "fexpr.h"
 #include "fexpr_builtin.h"
 
+#ifdef __GNUC__
+# define strlen __builtin_strlen
+#else
+# include <string.h>
+#endif
+
 void
 fexpr_randtest_atom(fexpr_t expr, flint_rand_t state)
 {

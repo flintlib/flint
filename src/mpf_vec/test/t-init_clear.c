@@ -11,7 +11,7 @@
 */
 
 #include "mpfr.h"
-#include "flint.h"
+#include "gmpcompat.h"
 #include "mpf_vec.h"
 #include "ulong_extras.h"
 

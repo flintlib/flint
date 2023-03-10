@@ -10,9 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "padic_poly.h"
 #include "ulong_extras.h"
-#include "long_extras.h"
+#include "fmpq_poly.h"
+#include "padic_poly.h"
 
 int
 main(void)

@@ -18,8 +18,9 @@
 #define ARF_INLINE static __inline__
 #endif
 
-#include "fmpq.h"
+#include "flint.h"
 #include <mpfr.h>
+#include "fmpq.h"
 #include "mag.h"
 #include "arf_types.h"
 

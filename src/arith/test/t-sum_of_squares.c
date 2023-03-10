@@ -9,9 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "arith.h"
+#include "fmpz.h"
 #include "fmpz_vec.h"
+#include "arith.h"
 
 #define N 10
 

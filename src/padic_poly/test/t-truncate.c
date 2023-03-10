@@ -9,11 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "long_extras.h"
 #include "ulong_extras.h"
+#include "fmpq_poly.h"
 #include "padic_poly.h"
 
 int

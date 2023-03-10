@@ -9,11 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <mpfr.h>
-#include "flint.h"
-#include "arith.h"
+#include "nmod_vec.h"
+#include "fmpz.h"
 #include "fmpz_vec.h"
-#include "ulong_extras.h"
+#include "arith.h"
 
 #define STRESS_TEST 0
 

@@ -9,11 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <mpfr.h>
-#include "flint.h"
+#include "fmpz.h"
 #include "arith.h"
-#include "fmpz_vec.h"
-#include "ulong_extras.h"
 
 int main(void)
 {
