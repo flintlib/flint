@@ -53,7 +53,7 @@ int main()
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 100000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
     {
         ulong a, b, n, q1, r1, r2;
         mp_limb_t q2[2];
@@ -102,7 +102,7 @@ int main()
 
         for (n = 2; n < N; n += 2)
         {
-            for (iter = 0; iter < 10 * arb_test_multiplier(); iter++)
+            for (iter = 0; iter < 10 * 0.1 * flint_test_multiplier(); iter++)
             {
                 if (n_randint(state, 100) == 0)
                 {
@@ -149,14 +149,14 @@ int main()
 
         /* a few larger values of p */
         for (p = n_nextprime(1000000, 1);
-            p < 1000000 + 1000 * FLINT_MIN(10, arb_test_multiplier()); p = n_nextprime(p, 1))
+            p < 1000000 + 1000 * FLINT_MIN(10, 0.1 * flint_test_multiplier()); p = n_nextprime(p, 1))
         {
             k = 2 * (n_randlimb(state) % ((p-3)/2)) + 2;
             test_bern_modp_pow2(p, k);
         }
 
         /* these are slow */
-        if (FLINT_BITS == 64 && arb_test_multiplier() >= 10)
+        if (FLINT_BITS == 64 && 0.1 * flint_test_multiplier() >= 10)
         {
             test_bern_modp_pow2(2147483647, 10);
             test_bern_modp_pow2(2147483629, 10);
@@ -165,7 +165,7 @@ int main()
 
         for (p = n_nextprime((1 << 15) - 1000, 1); p < (1 << 15); p = n_nextprime(p, 1))
         {
-            for (iter = 0; iter < 10 * arb_test_multiplier(); iter++)
+            for (iter = 0; iter < 10 * 0.1 * flint_test_multiplier(); iter++)
             {
                 test_bern_modp_pow2(p, 2 * (n_randlimb(state) % ((p - 3)/2)) + 2);
             }

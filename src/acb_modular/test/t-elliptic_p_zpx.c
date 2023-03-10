@@ -23,7 +23,7 @@ int main()
     flint_randinit(state);
 
     /* Test differential equation */
-    for (iter = 0; iter < 5000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 5000 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_t tau, z;
         acb_ptr g, wp, wp3, wpd, wpd2;
@@ -80,7 +80,7 @@ int main()
     }
 
     /* Consistency test */
-    for (iter = 0; iter < 5000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 5000 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_t tau, z;
         acb_ptr wp1, wp2;

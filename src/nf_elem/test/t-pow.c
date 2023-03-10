@@ -30,7 +30,7 @@ main(void)
     flint_randinit(state);
 
     /* test pow(a, e) = e*e*...*e */
-    for (i = 0; i < 100 * antic_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nf_t nf;
         nf_elem_t a, p1, p2;
@@ -71,7 +71,7 @@ main(void)
     }
     
     /* test aliasing a and res */
-    for (i = 0; i < 100 * antic_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nf_t nf;
         nf_elem_t a, p1, p2;

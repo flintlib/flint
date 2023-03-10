@@ -23,7 +23,7 @@ int main()
     flint_randinit(state);
 
     /* Test functional equation */
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_t tau1, tau2, z1, z2, z3, t;
         fmpq_t arg;
@@ -100,7 +100,7 @@ int main()
     }
 
     /* Test special values */
-    for (iter = 0; iter < 100 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_t tau, z;
         arb_t t, u;

@@ -22,7 +22,7 @@ int main()
     flint_randinit(state);
 
     /* Test P J P^{-1} = A for random matrices A generated from Jordan blocks */
-    for (iter = 0; iter < 1000 * calcium_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
         ca_ctx_t ctx;
         ca_mat_t A, P, Q, B, J;
@@ -121,7 +121,7 @@ int main()
     }
 
     /* Test P J P^{-1} = A for random matrices A */
-    for (iter = 0; iter < 500 * calcium_test_multiplier(); iter++)
+    for (iter = 0; iter < 500 * 0.1 * flint_test_multiplier(); iter++)
     {
         ca_ctx_t ctx;
         ca_mat_t A, B, J, P, Q;

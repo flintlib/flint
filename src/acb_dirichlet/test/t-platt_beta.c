@@ -45,7 +45,7 @@ int main()
     arb_init(t0);
     arb_init(expe);
 
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arb_t beta, a, b, c;
         acb_t z;

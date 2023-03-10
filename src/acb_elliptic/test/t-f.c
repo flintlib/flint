@@ -24,7 +24,7 @@ int main()
     flint_randinit(state);
 
     /* test F(z,m) = F(z+pi k, m) - 2 k K(m) */
-    for (iter = 0; iter < 2000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 2000 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_t z1, z2, m, r1, r2, r3, t;
         arb_t pi;

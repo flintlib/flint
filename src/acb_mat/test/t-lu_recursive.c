@@ -37,7 +37,7 @@ int main()
     /* Dummy test with rectangular matrices. Rectangular matrices are
        not actually supported (the output may be bogus), but the algorithm
        should at least not crash. */
-    for (iter = 0; iter < 1000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
         slong m, n, prec;
         slong *perm;
@@ -68,7 +68,7 @@ int main()
         _perm_clear(perm);
     }
 
-    for (iter = 0; iter < 2000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 2000 * 0.1 * flint_test_multiplier(); iter++)
     {
         fmpq_mat_t Q;
         acb_mat_t A, LU, P, L, U, T;

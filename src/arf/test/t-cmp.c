@@ -31,7 +31,7 @@ int main()
         fmpz_init(X);
         fmpz_init(Y);
 
-        for (iter = 0; iter < 100000 * arb_test_multiplier(); iter++)
+        for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
         {
             int cmp1, cmp2;
 
@@ -76,7 +76,7 @@ int main()
     }
 
     /* compare with mpfr */
-    for (iter = 0; iter < 100000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
     {
         slong bits;
         arf_t x, y;

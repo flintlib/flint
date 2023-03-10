@@ -89,7 +89,7 @@ int main()
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arf_t x, y, w;
         mag_t xb, yb;
@@ -149,7 +149,7 @@ int main()
         mag_clear(yb);
     }
 
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arf_t x, y, w;
         mag_t xb, yb;

@@ -30,7 +30,7 @@ int main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 1000 * antic_test_multiplier(); i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t z;
         fmpq_t q;

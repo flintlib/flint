@@ -30,7 +30,7 @@ main(void)
     flint_randinit(state);
 
     /* test mul_gen(b) = a * b, where a is the generator */
-    for (i = 0; i < 100 * antic_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nf_t nf;
         nf_elem_t a, b, p1, p2;
@@ -70,7 +70,7 @@ main(void)
     }
     
     /* test aliasing b and b */
-    for (i = 0; i < 100 * antic_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nf_t nf;
         nf_elem_t b, c;

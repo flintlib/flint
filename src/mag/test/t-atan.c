@@ -30,7 +30,7 @@ int main()
     flint_randinit(state);
 
     /* check atan */
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arf_t x, y, z, z2;
         mag_t xb, yb;
@@ -86,7 +86,7 @@ int main()
     }
 
     /* check atan_lower */
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arf_t x, y, z, z2;
         mag_t xb, yb;

@@ -314,7 +314,7 @@ int main()
         acb_clear(t);
     }
 
-    for (iter = 0; iter < 250 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 250 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_t s, z;
         acb_ptr w1, w2;

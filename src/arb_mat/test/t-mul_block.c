@@ -24,7 +24,7 @@ int main()
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 5000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 5000 * 0.1 * flint_test_multiplier(); iter++)
     {
         slong m, n, k, qbits1, qbits2, rbits1, rbits2, rbits3;
         fmpq_mat_t A, B, C;
@@ -111,7 +111,7 @@ int main()
         arb_mat_clear(d);
     }
 
-    for (iter = 0; iter < 2000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 2000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arb_mat_t A, B, C, D;
         slong m, n, p, bits1, bits2, exp1, exp2, prec1, prec2;

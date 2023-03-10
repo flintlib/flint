@@ -22,7 +22,7 @@ int main()
     flint_randinit(state);
 
     /* Test random matrices */
-    for (iter = 0; iter < 1000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_mat_t A, X, R, AR, J, RJ, Z, Z0;
         acb_ptr E, F;

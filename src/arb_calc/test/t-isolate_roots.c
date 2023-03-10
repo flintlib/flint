@@ -43,7 +43,7 @@ int main()
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 40 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 40 * 0.1 * flint_test_multiplier(); iter++)
     {
         slong m, r, a, b, maxdepth, maxeval, maxfound, prec, i, j, num;
         arf_interval_ptr blocks;

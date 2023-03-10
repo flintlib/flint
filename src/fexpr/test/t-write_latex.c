@@ -101,7 +101,7 @@ int main()
     flint_randinit(state);
 
     /* Generate gibberish and just check that we get valid strings */
-    for (iter = 0; iter < 100000 * calcium_test_multiplier(); iter++)
+    for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
     {
         fexpr_t expr;
         char * s;

@@ -42,7 +42,7 @@ int main()
     flint_randinit(state);
 
     /* check large arguments + compare with exp_simple */
-    for (iter = 0; iter < 100000 *arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 100000 *0.1 * flint_test_multiplier(); iter++)
     {
         arb_t a, b, c, d;
         slong prec0, prec1, prec2, acc1, acc2;
@@ -118,7 +118,7 @@ int main()
     }
 
     /* test union */
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arb_t a, b, c, d, e;
         slong prec0, prec1, prec2, prec3, prec4;
@@ -169,7 +169,7 @@ int main()
     }
 
     /* comparison with mpfr */
-    for (iter = 0; iter < 100000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arb_t a, b;
         fmpq_t q;

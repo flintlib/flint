@@ -26,7 +26,7 @@ int main()
     flint_randinit(state);
 
     /* test the rs algorithm explicitly */
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arb_t x, s1, s2;
         slong prec;
@@ -87,7 +87,7 @@ int main()
     }
 
     /* test the series evaluation code directly */
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arb_t x, y, z;
         slong prec;

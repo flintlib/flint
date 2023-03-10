@@ -22,7 +22,7 @@ int main()
     flint_randinit(state);
 
     /* Check large arguments. */
-    for (iter = 0; iter < 5000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 5000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arb_t a, b, c, d;
         slong prec1, prec2;
@@ -70,7 +70,7 @@ int main()
     }
 
     /* Higher precision + large arguments. */
-    for (iter = 0; iter < 1000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arb_t a, b, c, d;
         slong prec1, prec2;
@@ -118,7 +118,7 @@ int main()
     }
 
     /* Check wide arguments. */
-    for (iter = 0; iter < 5000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 5000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arb_t a, b, c, d;
 

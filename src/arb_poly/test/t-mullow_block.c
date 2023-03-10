@@ -23,7 +23,7 @@ int main()
     flint_randinit(state);
 
     /* compare with fmpq_poly */
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         slong qbits1, qbits2, rbits1, rbits2, rbits3, trunc;
         fmpq_poly_t A, B, C;
@@ -123,7 +123,7 @@ int main()
         arb_poly_clear(d);
     }
 
-    for (iter = 0; iter < 3000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 3000 * 0.1 * flint_test_multiplier(); iter++)
     {
         slong rbits1, rbits2, rbits3, trunc;
         arb_poly_t a, b, c, ab, ac, bc, abc, abc2;

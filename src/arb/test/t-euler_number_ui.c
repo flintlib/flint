@@ -55,7 +55,7 @@ int main()
         unsigned int * divtab_odd;
         fmpz * En;
 
-        nmax = 1000 * FLINT_MIN(1.0, arb_test_multiplier());
+        nmax = 1000 * FLINT_MIN(1.0, 0.1 * flint_test_multiplier());
 
         En = _fmpz_vec_init(nmax);
         arith_euler_number_vec(En, nmax);
@@ -99,7 +99,7 @@ int main()
         }
 
         /* test the mod p code */
-        for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+        for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
         {
             ulong p, n, m, m1, m5;
 
