@@ -10,7 +10,6 @@
 */
 
 #include "dlog.h"
-#include "math.h"
 
 /* group of order n modulo mod, mod a prime and no information on n */
 void

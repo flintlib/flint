@@ -11,6 +11,12 @@
 
 #include "mag.h"
 
+#ifdef __GNUC__
+# define ldexp __builtin_ldexp
+#else
+# include <math.h>
+#endif
+
 /* defined in exp.c */
 void _mag_exp_d(mag_t res, double x, int roundup);
 void mag_exp_huge(mag_t res, const mag_t x);

@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mpoly.h"
 #include "long_extras.h"
+#include "fmpz_mod_poly.h"
+#include "fmpz_mod_mpoly.h"
 
 /*
     Convert D to A if the degrees of A are <= expected_deg

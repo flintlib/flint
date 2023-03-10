@@ -18,7 +18,6 @@
 #define ARF_INLINE static __inline__
 #endif
 
-#include <math.h>
 #include "flint.h"
 #include <mpfr.h>
 #include "fmpq.h"

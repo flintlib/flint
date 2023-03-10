@@ -9,6 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "thread_support.h"
+#include "fmpz_poly.h"
 #include "arb.h"
 #include "hypgeom.h"
 #include "arb_hypgeom.h"

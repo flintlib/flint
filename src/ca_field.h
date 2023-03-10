@@ -18,7 +18,6 @@
 #define CA_FIELD_INLINE static __inline__
 #endif
 
-#include "calcium.h"
 #include "ca.h"
 
 #ifdef __cplusplus

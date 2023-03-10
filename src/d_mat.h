@@ -22,7 +22,6 @@
 
 
 #include "flint.h"
-#include "d_vec.h"
 
 #ifdef __cplusplus
  extern "C" {

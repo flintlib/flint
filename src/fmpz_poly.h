@@ -21,16 +21,12 @@
 #define FMPZ_POLY_INLINE static __inline__
 #endif
 
-
-
-#include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
-#include "nmod_poly.h"
-#include "fmpq.h"
+#include "nmod_types.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 #define FMPZ_POLY_INV_NEWTON_CUTOFF 32

@@ -9,6 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpq.h"
+#include "arb.h"
 #include "arith.h"
 #include "bernoulli.h"
 #include "gr.h"
@@ -16,6 +18,12 @@
 #include "gr_mat.h"
 #include "gr_poly.h"
 #include "gr_special.h"
+
+#ifdef __GNUC__
+# define memcpy __builtin_memcpy
+#else
+# include <string.h>
+#endif
 
 #define DEBUG_RINGS 0
 

@@ -9,8 +9,16 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "acb.h"
 #include "arb_hypgeom.h"
 #include "acb_hypgeom.h"
+
+#ifdef __GNUC__
+# define pow __builtin_pow
+#else
+# include <math.h>
+#endif
 
 void
 acb_hypgeom_rising_ui_rs(acb_t res, const acb_t x, ulong n, ulong m, slong prec)

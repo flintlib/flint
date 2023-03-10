@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "dlog.h"
 
 /* for odd prime p, assume b1 = 1 mod p */

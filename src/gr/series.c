@@ -13,6 +13,12 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
+#ifdef __GNUC__
+# define strcmp __builtin_strcmp
+#else
+# include <string.h>
+#endif
+
 /* arb wrappers todo: elementary functions; pfq, coulomb, zeta/dirichlet deflated */
 
 static const char * default_var = "x";

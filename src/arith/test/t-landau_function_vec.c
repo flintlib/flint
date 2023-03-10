@@ -9,9 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "arith.h"
+#include "fmpz.h"
 #include "fmpz_vec.h"
+#include "arith.h"
 
 static const mp_limb_t known[] = {
     1, 1, 2, 3, 4, 6, 6, 12, 15, 20, 30, 30, 60, 60, 84, 105, 140, 210,

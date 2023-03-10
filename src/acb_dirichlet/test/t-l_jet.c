@@ -11,6 +11,12 @@
 
 #include "acb_dirichlet.h"
 
+#ifdef __GNUC__
+# define fabs __builtin_fabs
+#else
+# include <math.h>
+#endif
+
 /* Laurent expansions at s = 1 of first 10 principal L-functions */
 
 /* with mpmath:

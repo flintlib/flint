@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "fmpz_poly.h"
 #include "arith.h"
-#include "ulong_extras.h"
 
 void check_value(slong n, char *ans)
 {

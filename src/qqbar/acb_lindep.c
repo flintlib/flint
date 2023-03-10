@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mat.h"
 #include "fmpz_lll.h"
 #include "qqbar.h"
 

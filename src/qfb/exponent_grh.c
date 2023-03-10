@@ -15,8 +15,8 @@
 ******************************************************************************/
 
 #include <mpfr.h>
+#include "ulong_extras.h"
 #include "qfb.h"
-#include "gmpcompat.h"
 
 int qfb_exponent_grh(fmpz_t exponent, fmpz_t n, ulong B1, ulong B2_sqrt)
 {

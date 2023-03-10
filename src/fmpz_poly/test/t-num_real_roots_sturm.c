@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_poly.h"
+#include "fmpq.h"
 #include "fmpq_vec.h"
 
 int main()

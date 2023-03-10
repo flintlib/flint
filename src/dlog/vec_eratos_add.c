@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "dlog.h"
 
 /* assume non invertible and 1 mod n already set */

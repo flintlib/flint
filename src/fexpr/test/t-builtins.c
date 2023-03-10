@@ -13,6 +13,12 @@
 #include "fexpr.h"
 #include "fexpr_builtin.h"
 
+#ifdef __GNUC__
+# define strcmp __builtin_strcmp
+#else
+# include <string.h>
+#endif
+
 int main()
 {
     flint_rand_t state;

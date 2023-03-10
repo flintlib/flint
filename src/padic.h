@@ -18,13 +18,7 @@
 #define PADIC_INLINE static __inline__
 #endif
 
-
-
-#include "flint.h"
 #include "fmpz.h"
-#include "fmpq.h"
-#include "fmpz_vec.h"
-#include "ulong_extras.h"
 
 #ifdef __cplusplus
  extern "C" {

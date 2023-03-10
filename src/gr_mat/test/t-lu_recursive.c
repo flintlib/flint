@@ -1,4 +1,5 @@
 
+#include "fmpz_mat.h"
 #include "gr_mat.h"
 
 void perm(gr_mat_t A, slong * P)

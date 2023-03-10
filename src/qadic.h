@@ -18,14 +18,6 @@
 #define QADIC_INLINE static __inline__
 #endif
 
-
-
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpq.h"
-#include "fmpz_vec.h"
-#include "ulong_extras.h"
-#include "padic.h"
 #include "padic_poly.h"
 
 #ifdef __cplusplus

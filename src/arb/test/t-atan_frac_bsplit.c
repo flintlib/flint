@@ -11,6 +11,12 @@
 
 #include "arb.h"
 
+#ifdef __GNUC__
+# define fabs __builtin_fabs
+#else
+# include <math.h>
+#endif
+
 int main()
 {
     slong iter;

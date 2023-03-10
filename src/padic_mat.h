@@ -18,12 +18,9 @@
 #define PADIC_MAT_INLINE static __inline__
 #endif
 
-
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mat.h"
-#include "fmpq_mat.h"
 #include "padic.h"
+#include "fmpz_mat.h"
+#include "fmpq_types.h"
 
 #ifdef __cplusplus
  extern "C" {

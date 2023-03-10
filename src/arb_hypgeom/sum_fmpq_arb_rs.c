@@ -9,7 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "arb_hypgeom.h"
+
+#ifdef __GNUC__
+# define ldexp __builtin_ldexp
+# define log __builtin_log
+#else
+# include <math.h>
+#endif
 
 static double
 d_log2_fac(double n)
@@ -181,6 +189,15 @@ arb_hypgeom_sum_fmpq_arb_rs(arb_t res, const fmpq * a, slong alen, const fmpq * 
                 /* r = 2 -> exp(2*z^(1/2)) */
                 /* r = 3 -> exp(3*z^(1/3)) */
                 /* ... */
+#ifdef __GNUC__
+                log2max = r * __builtin_exp(log2z * 0.693147180559945 / r) * 1.44269504088896;
+
+                /* fixme */
+                if (r == 1)
+                    adaptive_min_k = __builtin_exp(log2z * log(2));
+                else
+                    adaptive_min_k = __builtin_exp(0.5 * log2z * log(2));
+#else
                 log2max = r * exp(log2z * 0.693147180559945 / r) * 1.44269504088896;
 
                 /* fixme */
@@ -188,6 +205,7 @@ arb_hypgeom_sum_fmpq_arb_rs(arb_t res, const fmpq * a, slong alen, const fmpq * 
                     adaptive_min_k = exp(log2z * log(2));
                 else
                     adaptive_min_k = exp(0.5 * log2z * log(2));
+#endif
             }
         }
     }

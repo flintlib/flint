@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mpoly_factor.h"
+#include "nmod_mpoly_factor.h"
 
 int compute_gcd(
     nmod_mpoly_t G,

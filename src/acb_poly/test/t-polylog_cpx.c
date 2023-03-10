@@ -11,6 +11,12 @@
 
 #include "acb_poly.h"
 
+#ifdef __GNUC__
+# define fabs __builtin_fabs
+#else
+# include <math.h>
+#endif
+
 #define EPS 1e-13
 #define NUM_DERIVS 3
 #define NUM_TESTS 56

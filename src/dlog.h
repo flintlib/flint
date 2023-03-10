@@ -18,9 +18,7 @@
 #define DLOG_INLINE static __inline__
 #endif
 
-#include "flint.h"
 #include "ulong_extras.h"
-#include "nmod_vec.h"
 
 #ifdef __cplusplus
 extern "C" {

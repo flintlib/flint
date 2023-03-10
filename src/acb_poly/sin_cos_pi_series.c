@@ -11,6 +11,13 @@
 
 #include "acb_poly.h"
 
+#ifdef __GNUC__
+# define log __builtin_log
+# define pow __builtin_pow
+#else
+# include <math.h>
+#endif
+
 void
 _acb_poly_sin_cos_pi_series(acb_ptr s, acb_ptr c, acb_srcptr h, slong hlen, slong n, slong prec)
 {

@@ -11,7 +11,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "d_vec.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_lll.h"
+
+#ifdef __GNUC__
+# define ldexp __builtin_ldexp
+#else
+# include <math.h>
+#endif
 
 double
 fmpz_lll_heuristic_dot(const double *vec1, const double *vec2, slong len2,

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "calcium.h"
 #include "fmpz_mpoly_q.h"
 
 int main()

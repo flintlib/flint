@@ -20,12 +20,9 @@
 #define FMPQ_POLY_INLINE static __inline__
 #endif
 
-#include "fmpz.h"
-#include "fmpq.h"
 #include "fmpq_types.h"
-#include "fmpz_vec.h"
+#include "nmod_types.h"
 #include "fmpz_poly.h"
-#include "flint.h"
 
 #ifdef __cplusplus
 extern "C" {

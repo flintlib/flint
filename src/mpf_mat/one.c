@@ -11,6 +11,7 @@
 */
 
 #include "mpf_mat.h"
+#include "gmpcompat.h"
 
 void
 mpf_mat_one(mpf_mat_t mat)

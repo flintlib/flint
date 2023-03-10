@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod.h"
 #include "fmpz_mod_mat.h"
 
 void fmpz_mod_mat_similarity(fmpz_mod_mat_t A, slong r, fmpz_t d)

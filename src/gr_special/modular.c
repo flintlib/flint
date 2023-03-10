@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
 #include "acb_modular.h"
 #include "gr_special.h"
 #include "gr_poly.h"

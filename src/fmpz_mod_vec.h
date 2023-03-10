@@ -18,8 +18,7 @@
 #define FMPZ_MOD_VEC_INLINE static __inline__
 #endif
 
-#include "flint.h"
-#include "fmpz_mod.h"
+#include "fmpz_mod_types.h"
 
 #ifdef __cplusplus
 extern "C" {

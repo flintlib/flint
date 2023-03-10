@@ -14,6 +14,12 @@
 #include "ulong_extras.h"
 #include "arb.h"
 
+#ifdef __GNUC__
+# define fabs __builtin_fabs
+#else
+# include <math.h>
+#endif
+
 #define HAVE_64_BIT (FLINT_BITS == 64)
 
 /* one coefficient doesn't fit in 64 bits */

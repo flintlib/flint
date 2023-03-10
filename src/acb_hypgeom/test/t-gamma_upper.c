@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "acb.h"
 #include "acb_hypgeom.h"
 
 int _mag_gt_norm_ui(const mag_t a, const mag_t b, const mag_t c, ulong n);

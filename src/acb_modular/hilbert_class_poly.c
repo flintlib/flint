@@ -9,8 +9,18 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "thread_support.h"
+#include "ulong_extras.h"
+#include "fmpz_poly.h"
+#include "acb.h"
 #include "arb_poly.h"
 #include "acb_modular.h"
+
+#ifdef __GNUC__
+# define sqrt __builtin_sqrt
+#else
+# include <math.h>
+#endif
 
 static void
 bsplit(arb_poly_t pol, const arb_t sqrtD,

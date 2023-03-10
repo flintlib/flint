@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "acb_poly.h"
 #include "acb_mat.h"
 
 void _acb_mat_charpoly(acb_ptr cp, const acb_mat_t mat, slong prec)

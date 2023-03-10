@@ -10,11 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "thread_support.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
-#include "fmpz_poly.h"
-#include "fft.h"
 
 static void _fmpz_vec_get_fft_coeff(mp_limb_t ** coeffs_f, 
                        const fmpz * coeffs_m, slong l, slong i)

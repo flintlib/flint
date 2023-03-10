@@ -9,10 +9,21 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
-#include "double_extras.h"
+#include "acb_poly.h"
 #include "acb_dirichlet.h"
 #include "acb_calc.h"
+
+#ifdef __GNUC__
+# define atan2 __builtin_atan2
+# define cos __builtin_cos
+# define exp __builtin_exp
+# define log __builtin_log
+# define pow __builtin_pow
+# define sqrt __builtin_sqrt
+# define tan __builtin_tan
+#else
+# include <math.h>
+#endif
 
 /* Bound the quadratic Taylor error term. */
 static void

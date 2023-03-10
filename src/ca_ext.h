@@ -18,8 +18,6 @@
 #define CA_EXT_INLINE static __inline__
 #endif
 
-#include "calcium.h"
-#include "qqbar.h"
 #include "ca.h"
 
 #ifdef __cplusplus

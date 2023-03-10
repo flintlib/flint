@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "acb_poly.h"
 #include "acb_hypgeom.h"
 
 /* need special case for integer l and z = 0 since the recurrence relations break down */

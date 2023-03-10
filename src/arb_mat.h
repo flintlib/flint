@@ -18,11 +18,8 @@
 #define ARB_MAT_INLINE static __inline__
 #endif
 
-#include "fmpz_mat.h"
-#include "fmpq_mat.h"
-#include "perm.h"
+#include "fmpq_types.h"
 #include "arb.h"
-#include "arb_poly.h"
 
 #ifdef __cplusplus
 extern "C" {

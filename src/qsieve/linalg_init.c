@@ -10,8 +10,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "qsieve.h"
 
+#ifdef __GNUC__
+# define memset __builtin_memset
+#else
+# include <string.h>
+#endif
 /*
     Initialise linear algebra.
 */

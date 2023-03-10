@@ -18,20 +18,7 @@
 #define FQ_NMOD_MPOLY_INLINE static __inline__
 #endif
 
-
-
-#include "flint.h"
-#include "nmod_vec.h"
-#include "nmod_mat.h"
-#include "nmod_poly.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "mpoly.h"
-
 #include "nmod_mpoly.h"
-#include "n_poly.h"
-
 
 #ifdef __cplusplus
  extern "C" {

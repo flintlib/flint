@@ -11,6 +11,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "double_extras.h"
+#include "d_vec.h"
+#include "fmpz_mat.h"
 #include "fmpz_lll.h"
 
 #ifdef FUNC_HEAD

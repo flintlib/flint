@@ -19,13 +19,10 @@
 #define FMPZ_MOD_POLY_INLINE static __inline__
 #endif
 
-
-#include "flint.h"
-#include "fmpz.h"
+#include "thread_pool.h"
+#include "fmpz_mod_types.h"
 #include "fmpz_poly.h"
 #include "fmpz_mod.h"
-#include "fmpz_mat.h"
-#include "fmpz_mod_mat.h"
 
 #ifdef __cplusplus
 extern "C" {

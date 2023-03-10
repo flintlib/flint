@@ -9,9 +9,19 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
 #include "qqbar.h"
 #include "fexpr.h"
 #include "fexpr_builtin.h"
+
+#ifdef __GNUC__
+# define fabs __builtin_fabs
+# define strchr __builtin_strchr
+# define strlen __builtin_strlen
+#else
+# include <math.h>
+# include <string.h>
+#endif
 
 int qqbar_set_fexpr(qqbar_t res, const fexpr_t expr);
 

@@ -9,8 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "acb.h"
 #include "acb_elliptic.h"
 #include "acb_modular.h"
+
+#ifdef __GNUC__
+# define fabs __builtin_fabs
+#else
+# include <math.h>
+#endif
 
 static const double testdata_pi[17][6] = {
   {-2.0, 0.0, 0.0, 0.0, 0.9068996821171089253, 0.0},

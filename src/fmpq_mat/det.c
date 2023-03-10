@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mat.h"
 #include "fmpq_mat.h"
 
 void fmpq_mat_det(fmpq_t det, const fmpq_mat_t mat)

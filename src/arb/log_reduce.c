@@ -11,6 +11,13 @@
 
 #include "arb.h"
 
+#ifdef __GNUC__
+# define floor __builtin_floor
+# define ldexp __builtin_ldexp
+#else
+# include <math.h>
+#endif
+
 #define TERMINATOR -32768
 
 /* Precomputed data for ARB_LOG_PRIME_CACHE_NUM primes */

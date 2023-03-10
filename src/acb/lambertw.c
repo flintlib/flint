@@ -11,6 +11,17 @@
 
 #include "acb.h"
 
+#ifdef __GNUC__
+# define atan2 __builtin_atan2
+# define cos __builtin_cos
+# define fabs __builtin_fabs
+# define log __builtin_log
+# define pow __builtin_pow
+# define sin __builtin_sin
+#else
+# include <math.h>
+#endif
+
 /* Check if z crosses a branch cut. */
 int
 acb_lambertw_branch_crossing(const acb_t z, const acb_t ez1, const fmpz_t k)
@@ -138,7 +149,11 @@ acb_lambertw_principal_d(acb_t res, const acb_t z)
 
     for (k = 0; k < maxk; k++)
     {
+#if __GNUC__
+        t = __builtin_exp(wa);
+#else
         t = exp(wa);
+#endif
         ewa = t * cos(wb);
         ewb = t * sin(wb);
         t = (ewa * wa - ewb * wb); q = t + ewa; t -= za;

@@ -13,12 +13,8 @@
 #define BERNOULLI_H
 
 #include <math.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpq.h"
 #include "arith.h"
-#include "arb.h"
+#include "arb_types.h"
 
 #ifdef __cplusplus
 extern "C" {

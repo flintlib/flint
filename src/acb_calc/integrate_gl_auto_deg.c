@@ -9,7 +9,10 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "thread_support.h"
+#include "acb.h"
 #include "arb_hypgeom.h"
+#include "arb_calc.h"
 #include "acb_calc.h"
 
 /*

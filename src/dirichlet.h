@@ -18,6 +18,7 @@
 #define DIRICHLET_INLINE static __inline__
 #endif
 
+#include "nmod.h"
 #include "dlog.h"
 
 #ifdef __cplusplus

@@ -12,10 +12,7 @@
 #ifndef PARTITIONS_H
 #define PARTITIONS_H
 
-#include <math.h>
-#include "flint.h"
-#include "arith.h"
-#include "arb.h"
+#include "arb_types.h"
 
 #ifdef __cplusplus
 extern "C" {

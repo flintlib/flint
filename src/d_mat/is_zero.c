@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "d_vec.h"
 #include "d_mat.h"
 
 int

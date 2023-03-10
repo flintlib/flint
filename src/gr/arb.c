@@ -9,8 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "arb.h"
 #include "arb_poly.h"
+#include "acb_poly.h"
 #include "arb_mat.h"
 #include "arb_fmpz_poly.h"
 #include "arb_hypgeom.h"

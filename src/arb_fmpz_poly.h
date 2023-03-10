@@ -18,13 +18,8 @@
 #define ARB_FMPZ_POLY_INLINE static __inline__
 #endif
 
-#include "ulong_extras.h"
-#include "fmpz.h"
 #include "fmpz_poly.h"
-#include "arb.h"
-#include "acb.h"
-#include "arb_poly.h"
-#include "acb_poly.h"
+#include "acb_types.h"
 
 #ifdef __cplusplus
 extern "C" {

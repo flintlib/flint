@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "nmod_poly.h"
 #include "arith.h"
 
 mp_limb_t nmod_inv_check(mp_limb_t x, nmod_t mod)

@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpz_mod_mpoly.h"
-
 
 void fmpz_mod_mpoly_univar_init(
     fmpz_mod_mpoly_univar_t A,

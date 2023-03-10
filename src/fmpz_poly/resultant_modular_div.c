@@ -10,12 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
+#include "nmod_poly.h"
 #include "fmpz_poly.h"
-#include "mpn_extras.h"
-
 
 void _fmpz_poly_resultant_modular_div(fmpz_t res, 
         const fmpz * poly1, slong len1, 

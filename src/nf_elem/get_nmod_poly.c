@@ -14,6 +14,7 @@
 
 ******************************************************************************/
 
+#include "nmod_poly.h"
 #include "nf_elem.h"
 
 void _nf_elem_get_nmod_poly(nmod_poly_t pol, const nf_elem_t a, const nf_t nf)

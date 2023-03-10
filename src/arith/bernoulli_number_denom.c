@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "fmpz.h"
 #include "arith.h"
 
 #define BERNOULLI_DENOM_MAX_SMALL 178

@@ -11,6 +11,7 @@
 */
 
 #include "mpf_vec.h"
+#include "gmpcompat.h"
 
 void
 _mpf_vec_dot(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2)

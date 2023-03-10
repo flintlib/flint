@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "perm.h"
 #include "acb_mat.h"
 
 int

@@ -9,8 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <limits.h>
-
+#include "fmpq.h"
 #include "padic.h"
 
 int _padic_fprint(FILE * file, const fmpz_t u, slong v, const padic_ctx_t ctx)
