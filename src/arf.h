@@ -1028,7 +1028,7 @@ int arf_sqrt_fmpz(arf_t z, const fmpz_t x, slong prec, arf_rnd_t rnd);
 
 int arf_rsqrt(arf_ptr z, arf_srcptr x, slong prec, arf_rnd_t rnd);
 
-int arf_root(arf_t z, const arf_t x, ulong k, slong prec, arf_rnd_t rnd);
+int arf_root(arf_ptr z, arf_srcptr x, ulong k, slong prec, arf_rnd_t rnd);
 
 /* Magnitude bounds */
 

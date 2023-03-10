@@ -16,6 +16,7 @@ int _arb_log_ui_smooth(arb_t res, ulong n, slong prec);
 
 #define TMP_ALLOC_LIMBS(size) TMP_ALLOC((size) * sizeof(mp_limb_t))
 
+#if 0
 /* requires x != 1 */
 static void
 arf_log_via_mpfr(arf_t z, const arf_t x, slong prec, arf_rnd_t rnd)
@@ -60,6 +61,7 @@ arf_log_via_mpfr(arf_t z, const arf_t x, slong prec, arf_rnd_t rnd)
 
     TMP_END;
 }
+#endif
 
 void
 arb_log_arf_huge(arb_t z, const arf_t x, slong prec)
