@@ -112,7 +112,7 @@ int main()
         gr_poly_fit_length(c, a->length, ctx);
         gr_poly_fit_length(d, b->length, ctx);
 
-        status |= _gr_poly_hgcd(&sgnM, M, lenM,
+        status |= _gr_poly_hgcd(NULL, &sgnM, M, lenM,
                                         c->coeffs, &(c->length), d->coeffs,
                                         &(d->length), a->coeffs, a->length,
                                         b->coeffs, b->length, cutoff, ctx);

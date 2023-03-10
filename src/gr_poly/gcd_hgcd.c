@@ -74,7 +74,7 @@ _gr_poly_gcd_hgcd(gr_ptr G, slong * _lenG, gr_srcptr A, slong lenA, gr_srcptr B,
     }
     else
     {
-        status |= _gr_poly_hgcd(NULL, NULL, NULL, G, &(lenG), J, &(lenJ), B, lenB, R, lenR, inner_cutoff, ctx);
+        status |= _gr_poly_hgcd(NULL, NULL, NULL, NULL, G, &(lenG), J, &(lenJ), B, lenB, R, lenR, inner_cutoff, ctx);
 
         while (lenJ != 0)
         {
@@ -94,7 +94,7 @@ _gr_poly_gcd_hgcd(gr_ptr G, slong * _lenG, gr_srcptr A, slong lenA, gr_srcptr B,
                 break;
             }
 
-            status |= _gr_poly_hgcd(NULL, NULL, NULL, G, &(lenG), J, &(lenJ), J, lenJ, R, lenR, inner_cutoff, ctx);
+            status |= _gr_poly_hgcd(NULL, NULL, NULL, NULL, G, &(lenG), J, &(lenJ), J, lenJ, R, lenR, inner_cutoff, ctx);
         }
     }
 

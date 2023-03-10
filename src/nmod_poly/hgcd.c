@@ -28,7 +28,7 @@ slong _nmod_poly_hgcd(mp_ptr *M, slong *lenM,
     gr_ctx_t ctx;
 
     _gr_ctx_init_nmod(ctx, &mod);
-    GR_MUST_SUCCEED(_gr_poly_hgcd(&sgnM, (gr_ptr *) M, lenM, A, lenA, B, lenB, a, lena, b, lenb, NMOD_POLY_HGCD_CUTOFF, ctx));
+    GR_MUST_SUCCEED(_gr_poly_hgcd(NULL, &sgnM, (gr_ptr *) M, lenM, A, lenA, B, lenB, a, lena, b, lenb, NMOD_POLY_HGCD_CUTOFF, ctx));
 
     return sgnM;
 }

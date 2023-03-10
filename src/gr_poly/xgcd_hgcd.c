@@ -144,7 +144,7 @@ int _gr_poly_xgcd_hgcd(slong * Glen, gr_ptr G, gr_ptr S, gr_ptr T,
             R[2] = GR_ENTRY(R[1], lenR[1], sz);
             R[3] = GR_ENTRY(R[2], lenR[2], sz);
 
-            status |= _gr_poly_hgcd(&sgnR, R, lenR, h, &lenh, j, &lenj, B, lenB, r, lenr, hgcd_cutoff, ctx);
+            status |= _gr_poly_hgcd(NULL, &sgnR, R, lenR, h, &lenh, j, &lenj, B, lenB, r, lenr, hgcd_cutoff, ctx);
 
             if (sgnR > 0)
             {
@@ -195,7 +195,7 @@ int _gr_poly_xgcd_hgcd(slong * Glen, gr_ptr G, gr_ptr S, gr_ptr T,
                     goto cofactor;
                 }
 
-                status |= _gr_poly_hgcd(&sgnR, R, lenR, h, &lenh, j, &lenj, j,lenj, r, lenr, hgcd_cutoff, ctx);
+                status |= _gr_poly_hgcd(NULL, &sgnR, R, lenR, h, &lenh, j, &lenj, j,lenj, r, lenr, hgcd_cutoff, ctx);
 
                 __mul(v, lenv, R[1], lenR[1], T, lenT);
                 __mul(w, lenw, R[2], lenR[2], S, lenS);

@@ -89,7 +89,7 @@ int _gr_poly_resultant_hgcd(gr_ptr res, gr_srcptr A, slong lenA,
         if (((lenA | lenB) & 1) == 0)
             status |= gr_neg(res, res, ctx);
 
-        status |= _gr_poly_hgcd_res(res, NULL, NULL, NULL, G, &(lenG), J, &(lenJ), B, lenB, R, lenR, inner_cutoff, ctx);
+        status |= _gr_poly_hgcd(res, NULL, NULL, NULL, G, &(lenG), J, &(lenJ), B, lenB, R, lenR, inner_cutoff, ctx);
 
         if (status != GR_SUCCESS)
             goto cleanup;
@@ -138,7 +138,7 @@ int _gr_poly_resultant_hgcd(gr_ptr res, gr_srcptr A, slong lenA,
                 break;
             }
 
-            status |= _gr_poly_hgcd_res(res, NULL, NULL, NULL, G, &(lenG), J, &(lenJ), J, lenJ, R, lenR, inner_cutoff, ctx);
+            status |= _gr_poly_hgcd(res, NULL, NULL, NULL, G, &(lenG), J, &(lenJ), J, lenJ, R, lenR, inner_cutoff, ctx);
         }
     }
 
