@@ -18,10 +18,10 @@ jobs:
         with:
           miniconda-version: "latest"
           channels: conda-forge
-        run: |
-          conda install --yes gmp
-          conda install --yes mpfr
-          conda install --yes pthreads-win32
+          run: |
+            conda install --yes gmp
+            conda install --yes mpfr
+            conda install --yes pthreads-win32
 
       - name: "Setup MSVC"
         uses: ilammy/msvc-dev-cmd@v1
