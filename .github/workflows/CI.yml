@@ -21,9 +21,9 @@ jobs:
 
       - name: "Install dependencies"
         run: |
-          conda install --yes gmp
-          conda install --yes mpfr
-          conda install --yes pthreads-win32
+          conda install --yes -c conda-forge m2w64-gmp
+          # conda install --yes -c conda-forge mpfr
+          # conda install --yes -c conda-forge pthreads-win32
           conda info
           confa list
 
