@@ -35,8 +35,6 @@ jobs:
         run: |
           mkdir build
           cd build
-          set "CFLAGS=/wd4146 /wd4018 /wd4267 /wd4244"
-          set "FLINT_TEST_MULTIPLIER=1"
           set "LIB=C:\Miniconda3\Library\lib;%LIB%"
           set "CPATH=C:\Miniconda3\Library\include;%CPATH%"
           cmake -G "Ninja" -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
@@ -44,9 +42,11 @@ jobs:
       - name: "Build"
         run: |
           cd build
+          set "CFLAGS=/wd4018 /wd4146 /wd4244 /wd4267 /wd4305 /wd4996"
           cmake --build . -- -j4
 
       - name: "Test"
         run: |
           cd build
+          set "FLINT_TEST_MULTIPLIER=1"
           ctest -j4 --output-on-failure --timeout 100
