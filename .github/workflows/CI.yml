@@ -123,8 +123,8 @@ jobs:
             clang --version
             export FLINT_TEST_MULTIPLIER=0.5
             ./configure CC=clang CFLAGS="-Wall" --disable-static --enable-shared
-            gmake -j --output-sync=target
-            gmake -j --output-sync=target check
+            gmake -j
+            gmake -j check
 
       - if: failure()
         name: "If failure, stop all other jobs"
