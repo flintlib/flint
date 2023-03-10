@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include "flint.h"
 
-FLINT_DLL double _flint_test_multiplier = -1.0;
+static double _flint_test_multiplier = -1.0;
 
 double flint_test_multiplier()
 {
