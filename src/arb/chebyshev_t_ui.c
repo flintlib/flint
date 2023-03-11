@@ -10,49 +10,26 @@
 */
 
 #include "arb.h"
+#include "gr_special.h"
+
+void
+arb_chebyshev_t2_ui(arb_t a, arb_t b, ulong n, const arb_t x, slong prec)
+{
+    gr_ctx_t ctx;
+    fmpz_t m;
+    gr_ctx_init_real_arb(ctx, prec);
+    fmpz_init_set_ui(m, n);
+    GR_MUST_SUCCEED(gr_generic_chebyshev_t2_fmpz(a, b, m, x, ctx));
+    fmpz_clear(m);
+}
 
 void
 arb_chebyshev_t_ui(arb_t y, ulong n, const arb_t x, slong prec)
 {
-    int i, r;
-
-    if (n <= 1)
-    {
-        if (n == 0)
-            arb_one(y);
-        else
-            arb_set_round(y, x, prec);
-        return;
-    }
-
-    count_trailing_zeros(r, n);
-
-    if ((n >> r) == 1)
-    {
-        arb_mul(y, x, x, prec);
-        arb_mul_2exp_si(y, y, 1);
-        arb_sub_ui(y, y, 1, prec);
-        r -= 1;
-    }
-    else
-    {
-        /* we only need one value, so break out final iteration */
-        arb_t t, u;
-        arb_init(t);
-        arb_init(u);
-        arb_chebyshev_t2_ui(t, u, (n >> (r + 1)) + 1, x, prec);
-        arb_mul(t, t, u, prec);
-        arb_mul_2exp_si(t, t, 1);
-        arb_sub(y, t, x, prec);
-        arb_clear(t);
-        arb_clear(u);
-    }
-
-    for (i = 0; i < r; i++)
-    {
-        arb_mul(y, y, y, prec);
-        arb_mul_2exp_si(y, y, 1);
-        arb_sub_ui(y, y, 1, prec);
-    }
+    gr_ctx_t ctx;
+    fmpz_t m;
+    gr_ctx_init_real_arb(ctx, prec);
+    fmpz_init_set_ui(m, n);
+    GR_MUST_SUCCEED(gr_generic_chebyshev_t_fmpz(y, m, x, ctx));
+    fmpz_clear(m);
 }
-
