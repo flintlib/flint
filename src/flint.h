@@ -12,9 +12,6 @@
 #ifndef FLINT_H
 #define FLINT_H
 
-#if !defined(_MSC_VER)
-#include <sys/param.h> /* for BSD define */
-#endif
 #include <stdio.h>
 #include <stdarg.h>
 #include <gmp.h>

@@ -914,8 +914,17 @@ $CONFIG_CPU_SET_T
 #define FLINT_REENTRANT $REENTRANT
 #define FLINT_WANT_ASSERT $ASSERT
 EOF
+
+if [ "$OS" = "CYGWIN32" ] || [ "$OS" = "CYGWIN64" ]; then
+    cat >> ${SRC_DIR}/flint-config.h << EOF
+
+#include <sys/param.h> /* Avoid clash with ulong */
+EOF
+fi
+
 if [ "$FLINT_DLL" = "1" ]; then
     cat >> ${SRC_DIR}/flint-config.h << EOF
+
 #ifdef FLINT_USE_DLL
 # define FLINT_DLL __declspec(dllimport)
 #else

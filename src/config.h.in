@@ -28,6 +28,10 @@
 #define MSC_VERSION "Microsoft C++ (Version " MSC_CC_(_MSC_FULL_VER) ")"
 #endif
 
+#if defined(__CYGWIN32__) || defined(__CYGWIN__)
+# include <sys/param.h>
+#endif
+
 #if defined (FLINT_BUILD_DLL)
 #define FLINT_DLL __declspec(dllexport)
 #elif defined(MSC_USE_DLL)
