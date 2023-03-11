@@ -1541,13 +1541,9 @@ Other special functions
 -------------------------------------------------------------------------------
 
 .. function:: void arb_fib_fmpz(arb_t z, const fmpz_t n, slong prec)
+              void arb_fib_ui(arb_t z, ulong n, slong prec)
 
-.. function:: void arb_fib_ui(arb_t z, ulong n, slong prec)
-
-    Computes the Fibonacci number `F_n`. Uses the binary squaring
-    algorithm described in [Tak2000]_.
-    Provided that *n* is small enough, an exact Fibonacci number can be
-    computed by setting the precision to *ARF_PREC_EXACT*.
+    Computes the Fibonacci number `F_n` using binary squaring.
 
 .. function:: void arb_agm(arb_t z, const arb_t x, const arb_t y, slong prec)
 
