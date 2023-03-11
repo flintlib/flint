@@ -276,7 +276,7 @@ if(BUILD_SHARED_LIBS AND WIN32)
     target_compile_definitions(flint PUBLIC "MSC_USE_DLL")
 endif()
 
-if(WIN32)
+if(WIN32 OR MINGW)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS yes)
 endif()
 
