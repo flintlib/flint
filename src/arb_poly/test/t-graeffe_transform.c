@@ -30,7 +30,7 @@ int main()
 
     arb_init(leading);
 
-    for (iter = 0; iter < 200 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 200 * 0.1 * flint_test_multiplier(); iter++)
     {
         slong n, prec, i;
 

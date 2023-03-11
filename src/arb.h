@@ -34,7 +34,6 @@ extern "C" {
                          __ARB_VERSION_PATCHLEVEL)
 
 ARB_DLL extern const char * arb_version;
-double arb_test_multiplier(void);
 
 #define arb_midref(x) (&(x)->mid)
 #define arb_radref(x) (&(x)->rad)

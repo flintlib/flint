@@ -126,7 +126,7 @@ int main()
     }
 
     /* self-consistency test */
-    for (iter = 0; iter < 1000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_ptr m1, m2;
         acb_t z1, z2, t;

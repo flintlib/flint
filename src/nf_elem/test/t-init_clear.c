@@ -29,7 +29,7 @@ main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 100 * antic_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nf_t nf;
         nf_elem_t a;

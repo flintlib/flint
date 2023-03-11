@@ -23,7 +23,7 @@ int main()
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 1000 * calcium_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
         qqbar_t x, y;
         fexpr_t e;
@@ -60,7 +60,7 @@ int main()
     }
 
     /* test trigonometrics and exponentials */
-    for (iter = 0; iter < 1000 * calcium_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
         qqbar_t x, y;
         fexpr_t e;

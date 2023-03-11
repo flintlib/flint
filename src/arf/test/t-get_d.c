@@ -23,7 +23,7 @@ int main()
     flint_randinit(state);
 
     /* test exact roundtrip */
-    for (iter = 0; iter < 100000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arf_t x, z;
         double y;
@@ -59,7 +59,7 @@ int main()
     }
 
     /* test rounding */
-    for (iter = 0; iter < 100000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arf_t x, z, w;
         arf_rnd_t rnd;
@@ -100,7 +100,7 @@ int main()
     }
 
     /* compare with mpfr */
-    for (iter = 0; iter < 100000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arf_t x, r1, r2;
         arf_rnd_t rnd;

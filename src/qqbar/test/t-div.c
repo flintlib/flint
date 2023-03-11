@@ -22,7 +22,7 @@ int main()
     flint_randinit(state);
 
     /* Check division with degree-1 terms, large coefficients */
-    for (iter = 0; iter < 100 * calcium_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * 0.1 * flint_test_multiplier(); iter++)
     {
         qqbar_t x, y, z, a, b;
 

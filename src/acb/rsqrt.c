@@ -469,7 +469,7 @@ acb_rsqrt(acb_t y, const acb_t x, slong prec)
 }
 
 void
-acb_rsqrt_analytic(acb_ptr res, const acb_t z, int analytic, slong prec)
+acb_rsqrt_analytic(acb_t res, const acb_t z, int analytic, slong prec)
 {
     if (analytic && arb_contains_zero(acb_imagref(z)) &&
         !arb_is_positive(acb_realref(z)))

@@ -47,7 +47,7 @@ int main()
     flint_randinit(state);
 
     /* correct rounding test */
-    for (iter = 0; iter < 100000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
     {
         mpfr_t t;
         double x, y, z;

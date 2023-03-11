@@ -23,7 +23,7 @@ int main()
     flint_randinit(state);
 
     /* compare with fmpq_poly */
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         slong m, n, qbits, rbits1, rbits2;
         fmpq_poly_t A, B;
@@ -72,7 +72,7 @@ int main()
     }
 
     /* test aliasing */
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         slong m, n, qbits, rbits1, rbits2;
         fmpq_poly_t A;
@@ -117,7 +117,7 @@ int main()
     }
 
     /* test that exp(log(f)) contains f */
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         slong m, n, qbits, rbits1, rbits2, rbits3;
         fmpq_poly_t A;

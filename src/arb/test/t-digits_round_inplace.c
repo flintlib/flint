@@ -32,7 +32,7 @@ int main()
         fmpz_init(err);
         fmpz_init(t);
 
-        for (i = 0; i < 100000 * arb_test_multiplier(); i++)
+        for (i = 0; i < 100000 * 0.1 * flint_test_multiplier(); i++)
         {
             len = 1 + n_randint(state, 20);
             n = 1 + n_randint(state, 20);

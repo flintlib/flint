@@ -9,14 +9,15 @@ jobs:
   # ubuntu with gcc
   ##############################################################################
   ubuntu-gcc:
-    name: Ubuntu GCC
+    name: Ubuntu GCC (x10)
 
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j -l 10 --output-sync=target"
+      MAKE: "make -j --output-sync=target"
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
+      CC: "gcc"
       CFLAGS: "-Wall"
 
     steps:
@@ -24,17 +25,14 @@ jobs:
 
       - name: "Setup"
         run: |
+          sudo apt install libgmp-dev
+          sudo apt install libmpfr-dev
           gcc --version
           make --version
 
-      - name: "Build dependencies"
-        run: |
-          ./.build_dependencies
-
       - name: "Configure"
         run: |
-          ./configure CFLAGS="${CFLAGS}" --with-gmp=${LOCAL} \
-              --with-mpfr=${LOCAL}
+          ./configure CC=${CC} CFLAGS="${CFLAGS}" --with-gmp=/usr --with-mpfr=/usr
 
       - name: "Compile"
         run: |
@@ -43,6 +41,7 @@ jobs:
 
       - name: "Check"
         run: |
+          export FLINT_TEST_MULTIPLIER=10
           $MAKE check
 
       - if: failure()
@@ -55,16 +54,17 @@ jobs:
   # macos with gcc
   ##############################################################################
   macos-gcc:
-    name: macOS GCC
+    name: macOS GCC (x3)
 
     runs-on: macos-latest
 
     env:
-      MAKE: "gmake -j -l 10 --output-sync=target"
+      MAKE: "gmake -j --output-sync=target"
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: "-Wall"
       EXTRA_OPTIONS: "--disable-static --enable-shared"
+      CC: "gcc"
 
     steps:
       - uses: actions/checkout@v3
@@ -73,27 +73,23 @@ jobs:
         run: |
           brew install gcc
           brew install make
+          brew install gmp
+          brew install mpfr
           gcc --version
           gmake --version
 
-      - name: "Build dependencies"
-        run: |
-          ./.build_dependencies
-
       - name: "Configure"
         run: |
-          ./configure CFLAGS="${CFLAGS}" --with-gmp=${LOCAL} \
-              --with-mpfr=${LOCAL} ${EXTRA_OPTIONS}
+          ./configure CC=${CC} CFLAGS="${CFLAGS}" --with-gmp=$(brew --prefix) \
+              --with-mpfr=$(brew --prefix) ${EXTRA_OPTIONS}
 
       - name: "Compile"
         run: |
           $MAKE
-          # Next line is there to check dependencies. But it does not work at
-          # its current state.
-          # otool -L libflint.so
 
       - name: "Check"
         run: |
+          export FLINT_TEST_MULTIPLIER=3
           $MAKE check
 
       - if: failure()
@@ -106,7 +102,7 @@ jobs:
   # freebsd with clang
   ##############################################################################
   freebsd-gcc:
-    name: FreeBSD Clang
+    name: FreeBSD Clang (x0.5)
 
     runs-on: ubuntu-latest
 
@@ -125,9 +121,10 @@ jobs:
             yes | sudo pkg install mpfr
             gmake --version
             clang --version
+            export FLINT_TEST_MULTIPLIER=0.5
             ./configure CC=clang CFLAGS="-Wall" --disable-static --enable-shared
-            gmake -j8
-            gmake -j8 check
+            gmake -j
+            gmake -j check
 
       - if: failure()
         name: "If failure, stop all other jobs"
@@ -139,7 +136,7 @@ jobs:
   # cygwin with gcc
   ##############################################################################
   cygwin-gcc:
-    name: Cygwin GCC
+    name: Cygwin GCC (x1)
 
     runs-on: windows-latest
 
@@ -152,6 +149,7 @@ jobs:
       REPO: /cygdrive/d/a/flint2/flint2 # FIXME: De-hardcode this
       CFLAGS: "-Wall -D _WIN64"
       EXTRA_OPTIONS: "--enable-shared --disable-static"
+      CC: "gcc"
 
     steps:
       - uses: actions/checkout@v3
@@ -169,9 +167,8 @@ jobs:
       - name: "Configure"
         run: |
           cd ${REPO}
-          export FLINT_TEST_MULTIPLIER=1
           dos2unix configure
-          ./configure CFLAGS="${CFLAGS}" ${EXTRA_OPTIONS}
+          ./configure CC=${CC} CFLAGS="${CFLAGS}" ${EXTRA_OPTIONS}
 
       - name: "Compile"
         run: |
@@ -181,6 +178,7 @@ jobs:
       - name: "Check"
         run: |
           cd ${REPO}
+          export FLINT_TEST_MULTIPLIER=1
           $MAKE check
 
       - if: failure()
@@ -193,34 +191,31 @@ jobs:
   # ubuntu with clang
   #############################################################################
   ubuntu-clang:
-    name: Ubuntu Clang
+    name: Ubuntu Clang (x5)
 
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j -l 10 --output-sync=target"
+      MAKE: "make -j --output-sync=target"
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: "-Wall"
       CC: "clang"
-      EXTRA_OPTIONS: "--disable-static --enable-shared"
+      EXTRA_OPTIONS: "--disable-static --enable-shared --with-pkg-config"
 
     steps:
       - uses: actions/checkout@v3
 
       - name: "Setup"
         run: |
+          sudo apt install libgmp-dev
+          sudo apt install libmpfr-dev
           clang --version
           make --version
 
-      - name: "Build dependencies"
-        run: |
-          ./.build_dependencies
-
       - name: "Configure"
         run: |
-          ./configure CFLAGS="${CFLAGS}" CC=${CC} --with-gmp=${LOCAL} \
-              --with-mpfr=${LOCAL} ${EXTRA_OPTIONS}
+          ./configure CC=${CC} CFLAGS="${CFLAGS}" ${EXTRA_OPTIONS}
 
       - name: "Compile"
         run: |
@@ -229,6 +224,7 @@ jobs:
 
       - name: "Check"
         run: |
+          export FLINT_TEST_MULTIPLIER=5
           $MAKE check
 
       - if: failure()
@@ -241,12 +237,12 @@ jobs:
   # ubuntu with gcc and cmake (no checks)
   #############################################################################
   ubuntu-cmake-gcc:
-    name: Ubuntu GCC via CMake
+    name: Ubuntu GCC via CMake (no check)
 
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j -l 10 --output-sync=target"
+      MAKE: "make -j --output-sync=target"
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: "-Wall"
@@ -257,13 +253,11 @@ jobs:
       - name: "Setup"
         run: |
           sudo apt install cmake
+          sudo apt install libgmp-dev
+          sudo apt install libmpfr-dev
           gcc --version
           make --version
           cmake --version
-
-      - name: "Build dependencies"
-        run: |
-          ./.build_dependencies
 
       - name: "Configure"
         run: |
@@ -288,9 +282,13 @@ jobs:
   # mingw with gcc
   #############################################################################
   mingw64-gcc:
-    name: MinGW GCC
+    name: MinGW GCC (x0.5)
 
     runs-on: windows-2019
+
+    defaults:
+      run:
+        shell: bash
 
     steps:
       - uses: actions/checkout@v3
@@ -299,28 +297,24 @@ jobs:
         run: |
           gcc --version
           cmake --version
-        shell: bash
 
       - name: "Configure"
         run: |
           mkdir -p build
-          export FLINT_TEST_MULTIPLIER=1
           cd build
           cmake -G "MinGW Makefiles" -DBUILD_TESTING=ON \
                                     -DCMAKE_BUILD_TYPE=Release ..
-        shell: bash
 
       - name: "Compile"
         run: |
           cd build
-          cmake --build . -- -j4
-        shell: bash
+          cmake --build . -- -j8
 
       - name: "Check"
         run: |
           cd build
-          ctest -j4 --output-on-failure --timeout 300
-        shell: bash
+          export FLINT_TEST_MULTIPLIER=0.5
+          ctest -j8 --output-on-failure --timeout 300
 
       # FIXME: Fix Cygwin so this can be enabled.
       # - if: failure()
@@ -338,11 +332,12 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j -l 10 --output-sync=target"
+      MAKE: "make -j --output-sync=target"
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: ""
-      EXTRA_OPTIONS: "--disable-static --enable-shared"
+      EXTRA_OPTIONS: "--disable-static --enable-shared --with-pkg-config"
+      CC: "gcc"
 
     steps:
       - uses: actions/checkout@v3
@@ -350,13 +345,11 @@ jobs:
       - name: "Setup"
         run: |
           sudo apt install sed
+          sudo apt install libgmp-dev
+          sudo apt install libmpfr-dev
           gcc --version
           make --version
           julia --version
-
-      - name: "Build dependencies"
-        run: |
-          ./.build_dependencies
 
       - name: "Configure"
         run: |
@@ -373,8 +366,7 @@ jobs:
           sed -i "s/^\(FLINT_PATCH=\)[0-9]\+/\1$FLINT_JLL_PATCH/" configure
 
           # Now we can create the makefile
-          ./configure CFLAGS="${CFLAGS}" --with-gmp=${LOCAL} \
-              --with-mpfr=${LOCAL} --prefix=${LOCAL} ${EXTRA_OPTIONS}
+          ./configure CC=${CC} CFLAGS="${CFLAGS}" --prefix=${LOCAL} ${EXTRA_OPTIONS}
 
       - name: "Compile and install"
         run: |

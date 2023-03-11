@@ -144,7 +144,7 @@ int main()
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 10000 * calcium_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         fexpr_t expr, res1, res2, res3;
         fexpr_vec_t xs, ys;

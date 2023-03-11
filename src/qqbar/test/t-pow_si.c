@@ -22,7 +22,7 @@ int main()
     flint_randinit(state);
 
     /* Check x^m x^n = x^(m+n) */
-    for (iter = 0; iter < 100 * calcium_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * 0.1 * flint_test_multiplier(); iter++)
     {
         qqbar_t x, xm, xn, xmxn, xmn;
         slong m, n;
@@ -79,7 +79,7 @@ int main()
     }
 
     /* Check (xy)^n = x^n y^n */
-    for (iter = 0; iter < 100 * calcium_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * 0.1 * flint_test_multiplier(); iter++)
     {
         qqbar_t x, y, xyn, xn, yn, xnyn;
         slong n;

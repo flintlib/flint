@@ -70,7 +70,7 @@ int main()
     flint_randinit(state);
 
     /* check test values */
-    for (iter = 0; iter < 5 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 5 * 0.1 * flint_test_multiplier(); iter++)
     {
         slong i;
         acb_t z, s, a, p1, p2;
@@ -112,7 +112,7 @@ int main()
         acb_clear(p2);
     }
 
-    for (iter = 0; iter < 500 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 500 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_t z, s, a, b, r1, r2, r3;
         slong prec1, prec2;

@@ -22,7 +22,7 @@ int main()
     flint_randinit(state);
 
     /* check sin(a+b) = cos(b)*sin(a) + cos(a)*sin(b) */
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_t a, b, c, d, cosa, sina, cosb, sinb;
         slong prec;
@@ -71,7 +71,7 @@ int main()
     }
 
     /* check cos(a+b) = cos(b)*cos(a) - sin(a)*sin(b) */
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_t a, b, c, d, cosa, sina, cosb, sinb;
         slong prec;

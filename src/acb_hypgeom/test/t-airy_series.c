@@ -23,7 +23,7 @@ int main()
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 1000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_poly_t ai, aip, bi, bip, ai2, aip2, bi2, bip2, z, w, t;
         acb_t c;

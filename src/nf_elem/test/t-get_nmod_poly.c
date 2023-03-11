@@ -29,7 +29,7 @@ main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 100 * antic_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong j;
         nf_t nf;
@@ -72,7 +72,7 @@ main(void)
         nf_clear(nf);
     }
 
-    for (i = 0; i < 100 * antic_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong j;
         nf_t nf;

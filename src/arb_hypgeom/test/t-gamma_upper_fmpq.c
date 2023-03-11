@@ -21,7 +21,7 @@ int main()
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         fmpq_t a;
         arb_t z, r1, r2;
@@ -81,7 +81,7 @@ int main()
         mag_clear(err2);
     }
 
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         fmpq_t a;
         arb_t z, r1, r2;
@@ -141,7 +141,7 @@ int main()
         mag_clear(err2);
     }
 
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         slong na;
         arb_t z, r1, r2;

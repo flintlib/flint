@@ -30,7 +30,7 @@ int main()
     flint_printf("fmpq_ui_multi_mod....");
     fflush(stdout);
 
-    N = 1500 * FLINT_MIN(1.0, arb_test_multiplier());
+    N = 1500 * FLINT_MIN(1.0, 0.1 * flint_test_multiplier());
 
     num1 = _fmpz_vec_init(N);
     den1 = _fmpz_vec_init(N);

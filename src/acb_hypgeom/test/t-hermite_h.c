@@ -22,7 +22,7 @@ int main()
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 1000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_t n, n1, n2, z, res1, res2, res3, s;
         slong prec1, prec2, prec3;

@@ -37,7 +37,7 @@ int main()
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 1000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
         slong m, n, k, qbits1, qbits2, rbits1, rbits2, rbits3;
         fmpq_mat_t A, B, C;
@@ -123,7 +123,7 @@ int main()
     }
 
     /* general aliasing test */
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         slong m, n;
         slong rbits;
@@ -184,7 +184,7 @@ int main()
     }
 
     /* check algebraic properties like associativity and distributivity */
-    for (iter = 0; iter < 1000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
         slong m, n, k, l;
         slong rbits;

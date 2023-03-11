@@ -34,7 +34,7 @@ int main()
     }
 
     /* detect nilpotency of matrices that are constructed to be nilpotent */
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         slong m;
         bool_mat_t A;
@@ -54,7 +54,7 @@ int main()
     }
 
     /* check nilpotency by computing a matrix power */
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         slong m;
         bool_mat_t A, B;

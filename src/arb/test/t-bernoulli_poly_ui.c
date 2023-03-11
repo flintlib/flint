@@ -22,7 +22,7 @@ int main()
     flint_randinit(state);
 
     /* test multiplication theorem */
-    for (iter = 0; iter < 1000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arb_t x, t, res1, res2;
         ulong n, m, k;

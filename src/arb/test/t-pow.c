@@ -23,7 +23,7 @@ int main()
     flint_randinit(state);
 
     /* check large arguments */
-    for (iter = 0; iter < 20000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 20000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arb_t a, b, c, d, e, f;
         slong prec1, prec2;
@@ -110,7 +110,7 @@ int main()
         arb_clear(f);
     }
 
-    for (iter = 0; iter < 1000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
         ulong n, prec;
         double epsilon, delta;

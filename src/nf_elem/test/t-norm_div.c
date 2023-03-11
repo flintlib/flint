@@ -28,7 +28,7 @@ main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 10 * antic_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t pol;
         fmpz_poly_t pol2;

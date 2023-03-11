@@ -24,7 +24,7 @@ int main()
 
     /* todo; this does noting useful right now except verifying
        that the function can be called */
-    for (iter = 0; iter < 1000 * calcium_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t F;

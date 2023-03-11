@@ -23,7 +23,7 @@ main(void)
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 100 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * 0.1 * flint_test_multiplier(); iter++)
     {
         arb_mat_t A;
         arb_poly_t f, g;

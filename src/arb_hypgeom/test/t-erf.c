@@ -21,7 +21,7 @@ int main()
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arb_t a, b, c;
         slong prec1, prec2;
@@ -73,7 +73,7 @@ int main()
         arb_clear(c);
     }
 
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arb_t a, b, c;
         slong prec1, prec2;
@@ -126,7 +126,7 @@ int main()
     }
 
 #if 0
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arb_t a, b, c;
         slong prec1;
@@ -172,7 +172,7 @@ int main()
 
 
 #if 0
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arb_t a, b, c;
         slong prec1;

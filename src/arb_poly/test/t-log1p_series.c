@@ -22,7 +22,7 @@ int main()
     flint_randinit(state);
 
     /* compare with log_series */
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arb_poly_t a, b, c;
         slong m, n, prec;

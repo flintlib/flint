@@ -34,7 +34,7 @@ int main()
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         fmpq_mat_t Q;
         arb_mat_t A, LU, P, L, U, T;

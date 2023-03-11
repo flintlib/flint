@@ -23,7 +23,7 @@ int main()
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 5000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 5000 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_mat_t A, L, R, LAR, D;
         acb_ptr E, F;
@@ -179,7 +179,7 @@ int main()
     }
 
     /* Test convergence, given companion matrices */
-    for (iter = 0; iter < 1000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_mat_t A, R, QC;
         acb_ptr E;

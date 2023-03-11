@@ -28,7 +28,7 @@ int main()
     fflush(stdout);
     flint_randinit(state);
 
-    bound = 1000 * FLINT_MIN(1.0, arb_test_multiplier());
+    bound = 1000 * FLINT_MIN(1.0, 0.1 * flint_test_multiplier());
 
     p = n_nextprime(UWORD(1) << (FLINT_BITS - 1), 0);
     pinv = n_preinvert_limb(p);
@@ -46,7 +46,7 @@ int main()
         m1 = n_mulmod2_preinv(m1, n + 1, p, pinv);
     }
 
-    for (iter = 0; iter < 100 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * 0.1 * flint_test_multiplier(); iter++)
     {
         slong a, b, num;
         fmpq * res;

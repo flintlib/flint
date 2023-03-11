@@ -179,7 +179,7 @@ int main()
         _arb_vec_clear(vec, N);
     }
 
-    for (iter = 0; iter < 10 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10 * 0.1 * flint_test_multiplier(); iter++)
     {
         slong prec;
         ulong A, B, N, K;
