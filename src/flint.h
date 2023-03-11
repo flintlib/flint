@@ -12,8 +12,14 @@
 #ifndef FLINT_H
 #define FLINT_H
 
-#include <stdio.h>
-#include <stdarg.h>
+#ifndef FLINT_NOSTDIO
+# include <stdio.h>
+#endif
+
+#ifndef FLINT_NOSTDARG
+# include <stdarg.h>
+#endif
+
 #include <gmp.h>
 #include "longlong.h"
 #include "flint-config.h"
