@@ -23,7 +23,7 @@ int main()
     flint_randinit(state);
 
     /* compare with fmpz_poly */
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         slong zbits1, rbits1, rbits2;
         ulong e;

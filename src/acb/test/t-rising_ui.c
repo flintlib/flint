@@ -22,7 +22,7 @@ int main()
     flint_randinit(state);
 
     /* check functional equation */
-    for (iter = 0; iter < 1000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_t x, xn, y, z;
         ulong n, m;
@@ -62,7 +62,7 @@ int main()
     }
 
     /* aliasing of y and x */
-    for (iter = 0; iter < 1000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_t x, y;
         ulong n;

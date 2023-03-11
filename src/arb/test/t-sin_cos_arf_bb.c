@@ -25,7 +25,7 @@ int main()
     flint_randinit(state);
 
     /* test the series evaluation code directly */
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         fmpz_t x;
         slong r;
@@ -77,7 +77,7 @@ int main()
     }
 
     /* test the bb algorithm */
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arb_t x, s1, s2, c1, c2;
         slong prec = 2 + n_randint(state, 4000);

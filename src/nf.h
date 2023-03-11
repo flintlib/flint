@@ -36,8 +36,6 @@
 
 #define ANTIC_DLL FLINT_DLL
 
-#define antic_test_multiplier flint_test_multiplier
-
 typedef struct {
    fmpq_poly_t pol;  /* defining polynomial */
    union {

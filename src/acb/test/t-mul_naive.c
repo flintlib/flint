@@ -22,7 +22,7 @@ int main()
     flint_randinit(state);
 
     /* test aliasing of c and a */
-    for (iter = 0; iter < 100000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_t a, b, c;
         slong prec;
@@ -55,7 +55,7 @@ int main()
     }
 
     /* test aliasing of c and b */
-    for (iter = 0; iter < 100000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_t a, b, c;
         slong prec;
@@ -88,7 +88,7 @@ int main()
     }
 
     /* test aliasing a, a */
-    for (iter = 0; iter < 100000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_t a, b, c, d;
         slong prec;
@@ -125,7 +125,7 @@ int main()
     }
 
     /* test aliasing a, a, a */
-    for (iter = 0; iter < 100000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_t a, b, c;
         slong prec;
@@ -159,7 +159,7 @@ int main()
     }
 
     /* test a*(b+c) = a*b + a*c */
-    for (iter = 0; iter < 100000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_t a, b, c, d, e, f;
 

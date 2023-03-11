@@ -20,7 +20,7 @@ int main()
     fflush(stdout);
     flint_randinit(state);
 
-    for (iter = 0; iter < 5 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 5 * 0.1 * flint_test_multiplier(); iter++)
     {
         ulong A, B, iter2;
         int Tbits;

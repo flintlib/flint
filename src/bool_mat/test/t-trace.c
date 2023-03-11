@@ -72,7 +72,7 @@ int main()
     }
 
     /* traces of random matrices with modified diagonal */
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         slong n, i;
         bool_mat_t A;
@@ -105,7 +105,7 @@ int main()
     }
 
     /* trace(A + B) == trace(A) + trace(B) */
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         slong n;
         bool_mat_t A, B, C;
@@ -135,7 +135,7 @@ int main()
     }
 
     /* trace(A*B) == trace(B*A) */
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         slong n, m;
         bool_mat_t A, B, AB, BA;

@@ -22,7 +22,7 @@ int main()
     flint_randinit(state);
 
     /* Compare with MPFR */
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arb_t a, b;
         fmpq_t q;
@@ -66,7 +66,7 @@ int main()
     }
 
     /* Check large arguments. */
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arb_t a, b, c, d;
         slong prec1, prec2;
@@ -114,7 +114,7 @@ int main()
     }
 
     /* Compare with MPFR, higher precision. */
-    for (iter = 0; iter < 200 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 200 * 0.1 * flint_test_multiplier(); iter++)
     {
         arb_t a, b;
         fmpq_t q;
@@ -160,7 +160,7 @@ int main()
     }
 
     /* Higher precision + large arguments. */
-    for (iter = 0; iter < 2000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 2000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arb_t a, b, c, d;
         slong prec1, prec2;
@@ -208,7 +208,7 @@ int main()
     }
 
     /* Check wide arguments. */
-    for (iter = 0; iter < 100000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arb_t a, b, c, d;
 

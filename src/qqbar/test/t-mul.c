@@ -22,7 +22,7 @@ int main()
     flint_randinit(state);
 
     /* Check multiplication with degree-1 terms, large coefficients */
-    for (iter = 0; iter < 100 * calcium_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * 0.1 * flint_test_multiplier(); iter++)
     {
         qqbar_t x, y, z, a, b;
 
@@ -61,7 +61,7 @@ int main()
     }
 
     /* Check multiplication with degree-1 terms, small coefficients */
-    for (iter = 0; iter < 100 * calcium_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * 0.1 * flint_test_multiplier(); iter++)
     {
         qqbar_t x, y, z, a, b;
 
@@ -100,7 +100,7 @@ int main()
     }
 
     /* Check multiplication with higher-degree terms */
-    for (iter = 0; iter < 100 * calcium_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * 0.1 * flint_test_multiplier(); iter++)
     {
         qqbar_t x, y, z, a, b;
 
@@ -139,7 +139,7 @@ int main()
     }
 
     /* More iterations, low degree */
-    for (iter = 0; iter < 1000 * calcium_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
         qqbar_t x, y, z, a, b;
 

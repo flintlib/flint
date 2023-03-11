@@ -30,7 +30,7 @@ main(void)
     flint_randinit(state);
 
     /* test b + c - c = b */
-    for (i = 0; i < 100 * antic_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nf_t nf;
         nf_elem_t a, b, c, t;
@@ -67,7 +67,7 @@ main(void)
     }
     
     /* test b + c - c = b : exercise common denominator path */
-    for (i = 0; i < 100 * antic_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nf_t nf;
         nf_elem_t a, b, c, t;
@@ -107,7 +107,7 @@ main(void)
     }
     
     /* test aliasing a and b */
-    for (i = 0; i < 100 * antic_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nf_t nf;
         nf_elem_t a, b, c;
@@ -143,7 +143,7 @@ main(void)
     }
 
     /* test aliasing a and c */
-    for (i = 0; i < 100 * antic_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nf_t nf;
         nf_elem_t a, b, c;

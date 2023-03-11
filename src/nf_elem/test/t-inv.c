@@ -30,7 +30,7 @@ main(void)
     flint_randinit(state);
 
     /* test a*^-1 = 1 */
-    for (i = 0; i < 10*antic_test_multiplier(); i++)
+    for (i = 0; i < 10*flint_test_multiplier(); i++)
     {
         nf_t nf;
         nf_elem_t a, ainv, p1;
@@ -66,7 +66,7 @@ main(void)
     }
     
     /* test aliasing a and b */
-    for (i = 0; i < 10 * antic_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         nf_t nf;
         nf_elem_t a, b;

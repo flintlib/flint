@@ -37,8 +37,6 @@ const char * calcium_version(void);
                          __CALCIUM_VERSION_MINOR * 100 + \
                          __CALCIUM_VERSION_PATCHLEVEL)
 
-double calcium_test_multiplier(void);
-
 /* Input and output */
 
 typedef struct

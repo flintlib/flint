@@ -82,7 +82,7 @@ int main()
     }
 
     /* self-consistency and accuracy test */
-    for (iter = 0; iter < 2000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 2000 * 0.1 * flint_test_multiplier(); iter++)
     {
         arb_t x1, x2, v1, v2;
         fmpz_t n;

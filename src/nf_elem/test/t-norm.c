@@ -30,7 +30,7 @@ main(void)
     flint_randinit(state);
 
     /* test norm(a*b) = norm(a)*norm(b) */
-    for (i = 0; i < 10 * antic_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         nf_t nf;
         nf_elem_t a, b, c;

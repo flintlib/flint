@@ -73,7 +73,7 @@ int main()
     flint_randinit(state);
 
     /* Test J(A) = J(P * A * P^-1) for random rational Jordan block matrix A and random P */
-    for (iter = 0; iter < 1000 * calcium_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
         ca_ctx_t ctx;
         ca_mat_t A, P, Q, B;
@@ -168,7 +168,7 @@ int main()
     }
 
     /* Test J(A) = J(P * A * P^-1) for random A, P */
-    for (iter = 0; iter < 1000 * calcium_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
         ca_ctx_t ctx;
         ca_mat_t A, P, Q, B;

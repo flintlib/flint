@@ -23,7 +23,7 @@ int main()
     flint_randinit(state);
 
     /* test random matrices, to test complex solving */
-    for (iter = 0; iter < 2000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 2000 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_mat_t A, X, B, Y;
         slong n, m, prec;
@@ -63,7 +63,7 @@ int main()
         acb_mat_clear(Y);
     }
 
-    for (iter = 0; iter < 10000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         fmpq_mat_t Q, QX, QB;
         acb_mat_t A, X, B;

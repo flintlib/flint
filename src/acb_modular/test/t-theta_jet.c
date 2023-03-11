@@ -22,7 +22,7 @@ int main()
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 3000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 3000 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_ptr t1a, t1b, t2a, t2b, t3a, t3b, t4a, t4b;
         acb_t z, tau;

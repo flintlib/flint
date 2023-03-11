@@ -27,9 +27,6 @@ extern "C" {
 #include "mpoly_types.h"
 #include "acb.h"
 
-/* for test code */
-double calcium_test_multiplier(void);
-
 typedef struct
 {
     fmpz_poly_struct poly;

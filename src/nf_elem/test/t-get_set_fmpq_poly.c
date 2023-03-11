@@ -29,7 +29,7 @@ main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 100 * antic_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t f;
         fmpq_poly_t g;
@@ -68,7 +68,7 @@ main(void)
     }
 
     /* try unreduced polys */
-    for (i = 0; i < 100 * antic_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t f, g, r;
         nf_t nf;

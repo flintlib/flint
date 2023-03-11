@@ -22,7 +22,7 @@ int main()
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 1000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
         fmpq_mat_t Q;
         fmpq_t Qdet;
@@ -68,7 +68,7 @@ int main()
         acb_clear(Adet);
     }
 
-    for (iter = 0; iter < 5000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 5000 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_mat_t A, B, AB;
         acb_t detA, detB, detAB, detAb, detBb, detABb, t;

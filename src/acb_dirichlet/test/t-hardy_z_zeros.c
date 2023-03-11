@@ -21,7 +21,7 @@ int main()
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 20 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 20 * 0.1 * flint_test_multiplier(); iter++)
     {
         arb_t x1, x2, v1, v2;
         acb_t t;

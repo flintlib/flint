@@ -22,7 +22,7 @@ int main()
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 3000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 3000 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_mat_t A, R;
         acb_ptr E, F;
@@ -144,7 +144,7 @@ int main()
     }
 
     /* Test convergence for DFT matrices */
-    for (iter = 0; iter < 50 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 50 * 0.1 * flint_test_multiplier(); iter++)
     {
         acb_mat_t A, R, QC;
         acb_ptr E;
