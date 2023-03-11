@@ -9,8 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod_mpoly.h"
+#ifdef __GNUC__
+# define printf __builtin_printf
+#else
+# include <stdio.h>
+#endif
 
+#include "fq_nmod_mpoly.h"
 
 void fq_nmod_mpolyn_one(fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t ctx)
 {

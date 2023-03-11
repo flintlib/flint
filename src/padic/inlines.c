@@ -11,10 +11,7 @@
 
 #define PADIC_INLINES_C
 
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
+#include <stdio.h>
 #include "padic.h"
 
 void padic_get_unit(fmpz_t f, padic_t p)

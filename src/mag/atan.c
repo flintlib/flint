@@ -9,14 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "mag.h"
-#include "arb.h"  /* for atan table */
-
 #ifdef __GNUC__
 # define ldexp __builtin_ldexp
 #else
 # include <math.h>
 #endif
+
+#include "mag.h"
+#include "arb.h"  /* for atan table */
 
 static double
 mag_atan_d(double x)

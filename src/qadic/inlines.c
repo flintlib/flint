@@ -11,6 +11,6 @@
 
 #define QADIC_INLINES_C
 
-#include "flint.h"
+#include <stdio.h>
 #include "qadic.h"
 

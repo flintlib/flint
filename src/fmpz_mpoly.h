@@ -166,13 +166,16 @@ FLINT_DLL char * _fmpz_mpoly_get_str_pretty(const fmpz * poly,
 FLINT_DLL char * fmpz_mpoly_get_str_pretty(const fmpz_mpoly_t A,
                                   const char ** x, const fmpz_mpoly_ctx_t ctx);
 
+#ifdef FLINT_HAVE_FILE
 FLINT_DLL int _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly, 
                         const ulong * exps, slong len, const char ** x_in,
                                      flint_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 FLINT_DLL int fmpz_mpoly_fprint_pretty(FILE * file, 
             const fmpz_mpoly_t A, const char ** x, const fmpz_mpoly_ctx_t ctx);
+#endif
 
+#ifdef FLINT_HAVE_FILE
 FMPZ_MPOLY_INLINE
 int _fmpz_mpoly_print_pretty(const fmpz * poly, 
                        const ulong * exps, slong len, const char ** x,
@@ -187,6 +190,13 @@ int fmpz_mpoly_print_pretty(const fmpz_mpoly_t A,
 {
    return fmpz_mpoly_fprint_pretty(stdout, A, x, ctx);
 }
+#else
+int _fmpz_mpoly_print_pretty(const fmpz * poly,
+                       const ulong * exps, slong len, const char ** x,
+                                            slong bits, const mpoly_ctx_t mctx);
+int fmpz_mpoly_print_pretty(const fmpz_mpoly_t A,
+                                   const char ** x, const fmpz_mpoly_ctx_t ctx);
+#endif
 
 
 /*  Basic manipulation *******************************************************/
@@ -1426,8 +1436,8 @@ void fmpz_mpoly_remainder_test(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
         if (divides && fmpz_cmpabs(g->coeffs + 0, r->coeffs + i) <= 0)
         {
             flint_printf("fmpz_mpoly_remainder_test FAILED i = %wd\n", i);
-            flint_printf("rem ");fmpz_mpoly_print_pretty(r, NULL, ctx); printf("\n\n");
-            flint_printf("den ");fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
+            flint_printf("rem ");fmpz_mpoly_print_pretty(r, NULL, ctx); flint_printf("\n\n");
+            flint_printf("den ");fmpz_mpoly_print_pretty(g, NULL, ctx); flint_printf("\n\n");
             flint_abort();
         }
     }
@@ -1480,8 +1490,8 @@ void fmpz_mpoly_remainder_strongtest(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
         if (divides)
         {
             flint_printf("fmpz_mpoly_remainder_strongtest FAILED i = %wd\n", i);
-            flint_printf("rem ");fmpz_mpoly_print_pretty(r, NULL, ctx); printf("\n\n");
-            flint_printf("den ");fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
+            flint_printf("rem ");fmpz_mpoly_print_pretty(r, NULL, ctx); flint_printf("\n\n");
+            flint_printf("den ");fmpz_mpoly_print_pretty(g, NULL, ctx); flint_printf("\n\n");
             flint_abort();
         }
     }

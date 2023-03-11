@@ -9,14 +9,16 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "arb_mat.h"
-#include "arb_hypgeom.h"
-
 #ifdef __GNUC__
 # define ceil __builtin_ceil
+# define printf __builtin_printf
 #else
 # include <math.h>
+# include <stdio.h>
 #endif
+
+#include "arb_mat.h"
+#include "arb_hypgeom.h"
 
 static void
 taylor_M(mag_t M, const arb_t a, const arb_t z, const mag_t x, slong Rexp)

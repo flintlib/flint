@@ -10,5 +10,6 @@
 */
 
 #define CA_INLINES_C
+#include <stdio.h>
 #include "ca.h"
 

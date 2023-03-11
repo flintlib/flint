@@ -10,5 +10,6 @@
 */
 
 #define ARF_INLINES_C
+#include <stdio.h>
 #include "arf.h"
 

@@ -10,5 +10,6 @@
 */
 
 #define ACF_INLINES_C
+#include <stdio.h>
 #include "acf.h"
 

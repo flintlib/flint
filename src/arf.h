@@ -18,7 +18,6 @@
 #define ARF_INLINE static __inline__
 #endif
 
-#include "flint.h"
 #include <mpfr.h>
 #include "fmpq.h"
 #include "mag.h"
@@ -708,10 +707,12 @@ void arf_debug(const arf_t x);
 
 char * arf_get_str(const arf_t x, slong d);
 
+#ifdef FLINT_HAVE_FILE
 void arf_fprint(FILE * file, const arf_t x);
-
 void arf_fprintd(FILE * file, const arf_t y, slong d);
+#endif
 
+#ifdef FLINT_HAVE_FILE
 ARF_INLINE void
 arf_print(const arf_t x)
 {
@@ -723,6 +724,10 @@ arf_printd(const arf_t y, slong d)
 {
     arf_fprintd(stdout, y, d);
 }
+#else
+void arf_print(const arf_t x);
+void arf_printd(const arf_t y, slong d);
+#endif
 
 void arf_randtest(arf_t x, flint_rand_t state, slong bits, slong mag_bits);
 
@@ -1167,9 +1172,10 @@ int arf_load_str(arf_t res, const char * data);
 
 char * arf_dump_str(const arf_t x);
 
+#ifdef FLINT_HAVE_FILE
 int arf_load_file(arf_t res, FILE *stream);
-
 int arf_dump_file(FILE* stream, const arf_t x);
+#endif
 
 void arf_approx_dot(arf_t res, const arf_t initial, int subtract,
     arf_srcptr x, slong xstep, arf_srcptr y, slong ystep, slong len, slong prec, arf_rnd_t rnd);

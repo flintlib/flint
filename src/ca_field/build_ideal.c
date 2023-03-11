@@ -9,6 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#ifdef __GNUC__
+# define printf __builtin_printf
+#else
+# include <stdio.h>
+#endif
+
 #include "ca.h"
 #include "ca_ext.h"
 #include "ca_field.h"

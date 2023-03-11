@@ -10,5 +10,6 @@
 */
 
 #define DIRICHLET_INLINES_C
+#include <stdio.h>
 #include "dirichlet.h"
 

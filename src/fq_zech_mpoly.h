@@ -232,15 +232,22 @@ FLINT_DLL int fq_zech_mpoly_set_str_pretty(fq_zech_mpoly_t A, const char * str,
 FLINT_DLL char * fq_zech_mpoly_get_str_pretty(const fq_zech_mpoly_t A,
                                const char ** x, const fq_zech_mpoly_ctx_t ctx);
 
+#ifdef FLINT_HAVE_FILE
 FLINT_DLL int fq_zech_mpoly_fprint_pretty(FILE * file, 
       const fq_zech_mpoly_t A, const char ** x, const fq_zech_mpoly_ctx_t ctx);
+#endif
 
+#ifdef FLINT_HAVE_FILE
 FQ_ZECH_MPOLY_INLINE
 int fq_zech_mpoly_print_pretty(const fq_zech_mpoly_t A,
                                 const char ** x, const fq_zech_mpoly_ctx_t ctx)
 {
    return fq_zech_mpoly_fprint_pretty(stdout, A, x, ctx);
 }
+#else
+int fq_zech_mpoly_print_pretty(const fq_zech_mpoly_t A,
+                                const char ** x, const fq_zech_mpoly_ctx_t ctx);
+#endif
 
 
 /*  Basic manipulation *******************************************************/

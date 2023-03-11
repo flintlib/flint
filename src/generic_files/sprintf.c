@@ -11,9 +11,24 @@
 */
 
 #include <stdlib.h>
-#include <string.h>
 #include <ctype.h>
-#include <stdarg.h>
+
+#ifdef __GNUC__
+# define va_start __builtin_va_start
+# define va_arg __builtin_va_arg
+# define va_list __builtin_va_list
+# define va_end __builtin_va_end
+# define strlen __builtin_strlen
+# define strcspn __builtin_strcspn
+# define strncpy __builtin_strncpy
+# define strspn __builtin_strspn
+# define sprintf __builtin_sprintf
+#else
+# include <stdarg.h>
+# include <string.h>
+# include <stdio.h>
+#endif
+
 #include "flint.h"
 
 int flint_sprintf(char * s, const char * str, ...)

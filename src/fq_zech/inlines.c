@@ -11,10 +11,7 @@
 
 #define FQ_ZECH_INLINES_C
 
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
+#include <stdio.h>
 #include "fq_zech.h"
 
 void __fq_zech_ctx_prime(fmpz_t p, fq_zech_ctx_t ctx)

@@ -11,8 +11,7 @@
 
 #define FMPZ_MOD_POLY_FACTOR_INLINES_C
 
-#include "flint.h"
-#include "ulong_extras.h"
+#include <stdio.h>
 #include "fmpz_mod_poly.h"
 
 void fmpz_mod_poly_factor_get_fmpz_mod_poly(fmpz_mod_poly_t z,

@@ -11,6 +11,6 @@
 
 #define NMOD_POLY_MAT_INLINES_C
 
-#include "flint.h"
+#include <stdio.h>
 #include "nmod_poly_mat.h"
 

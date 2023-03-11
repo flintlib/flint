@@ -90,6 +90,7 @@ FQ_NMOD_INLINE void fq_nmod_ctx_order(fmpz_t f, const fq_nmod_ctx_t ctx)
     fmpz_pow_ui(f, f, fq_nmod_ctx_degree(ctx));
 }
 
+#ifdef FLINT_HAVE_FILE
 /* TODO */
 FQ_NMOD_INLINE int fq_nmod_ctx_fprint(FILE * file, const fq_nmod_ctx_t ctx)
 {
@@ -145,11 +146,16 @@ FQ_NMOD_INLINE int fq_nmod_ctx_fprint(FILE * file, const fq_nmod_ctx_t ctx)
     r = flint_fprintf(file, "\n");
     return r;
 }
+#endif
 
+#ifdef FLINT_HAVE_FILE
 FQ_NMOD_INLINE void fq_nmod_ctx_print(const fq_nmod_ctx_t ctx)
 {
     fq_nmod_ctx_fprint(stdout, ctx);
 }
+#else
+void fq_nmod_ctx_print(const fq_nmod_ctx_t ctx);
+#endif
 
 /* Memory management  *********************************************************/
 
@@ -393,11 +399,13 @@ FLINT_DLL void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b,
 
 /* Output ********************************************************************/
 
+#ifdef FLINT_HAVE_FILE
 FQ_NMOD_INLINE 
 int fq_nmod_fprint(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 {
     return nmod_poly_fprint(file, op);
 }
+#endif
 
 FQ_NMOD_INLINE 
 void fq_nmod_print(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
@@ -405,11 +413,13 @@ void fq_nmod_print(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
     nmod_poly_print(op);
 }
 
+#ifdef FLINT_HAVE_FILE
 FQ_NMOD_INLINE 
 int fq_nmod_fprint_pretty(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 {
     return nmod_poly_fprint_pretty(file, op, ctx->var);
 }
+#endif
 
 FQ_NMOD_INLINE 
 void fq_nmod_print_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx)

@@ -9,14 +9,16 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
-#include "arb_hypgeom.h"
+#include <stdio.h>
 
 #ifdef __GNUC__
 # define fabs __builtin_fabs
 #else
 # include <math.h>
 #endif
+
+#include "ulong_extras.h"
+#include "arb_hypgeom.h"
 
 int main()
 {

@@ -15,6 +15,12 @@
 
 ******************************************************************************/
 
+#ifdef __GNUC__
+# define printf __builtin_printf
+#else
+# include <stdio.h>
+#endif
+
 #include "nf_elem.h"
 
 void nf_elem_print_pretty(const nf_elem_t a, const nf_t nf, const char * var)

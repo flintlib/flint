@@ -9,13 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "mag.h"
-
 #ifdef __GNUC__
 # define ldexp __builtin_ldexp
 #else
 # include <math.h>
 #endif
+
+#include "mag.h"
 
 /* defined in exp.c */
 void _mag_exp_d(mag_t res, double x, int roundup);

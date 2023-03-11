@@ -12,6 +12,12 @@
 #ifndef ARB_CALC_H
 #define ARB_CALC_H
 
+#ifdef ARB_CALC_INLINES_C
+#define ARB_CALC_INLINE
+#else
+#define ARB_CALC_INLINE static __inline__
+#endif
+
 #include "arb.h"
 
 #ifdef __cplusplus
@@ -29,21 +35,21 @@ typedef int (*arb_calc_func_t)(arb_ptr out,
 
 /* Root-finding */
 
-static __inline__ void
+ARB_CALC_INLINE void
 arf_interval_init(arf_interval_t v)
 {
     arf_init(&v->a);
     arf_init(&v->b);
 }
 
-static __inline__ void
+ARB_CALC_INLINE void
 arf_interval_clear(arf_interval_t v)
 {
     arf_clear(&v->a);
     arf_clear(&v->b);
 }
 
-static __inline__ arf_interval_ptr
+ARB_CALC_INLINE arf_interval_ptr
 _arf_interval_vec_init(slong n)
 {
     slong i;
@@ -55,7 +61,7 @@ _arf_interval_vec_init(slong n)
     return v;
 }
 
-static __inline__ void
+ARB_CALC_INLINE void
 _arf_interval_vec_clear(arf_interval_ptr v, slong n)
 {
     slong i;
@@ -64,27 +70,28 @@ _arf_interval_vec_clear(arf_interval_ptr v, slong n)
     flint_free(v);
 }
 
-static __inline__ void
+ARB_CALC_INLINE void
 arf_interval_set(arf_interval_t v, const arf_interval_t u)
 {
     arf_set(&v->a, &u->a);
     arf_set(&v->b, &u->b);
 }
 
-static __inline__ void
+ARB_CALC_INLINE void
 arf_interval_swap(arf_interval_t v, arf_interval_t u)
 {
     arf_swap(&v->a, &u->a);
     arf_swap(&v->b, &u->b);
 }
 
-static __inline__ void
+ARB_CALC_INLINE void
 arf_interval_get_arb(arb_t x, const arf_interval_t v, slong prec)
 {
     arb_set_interval_arf(x, &v->a, &v->b, prec);
 }
 
-static __inline__ void
+#ifdef FLINT_HAVE_FILE
+ARB_CALC_INLINE void
 arf_interval_fprintd(FILE * file, const arf_interval_t v, slong n)
 {
     flint_fprintf(file, "[");
@@ -93,12 +100,17 @@ arf_interval_fprintd(FILE * file, const arf_interval_t v, slong n)
     arf_fprintd(file, &v->b, n);
     flint_fprintf(file, "]");
 }
+#endif
 
-static __inline__ void
+#ifdef FLINT_HAVE_FILE
+ARB_CALC_INLINE void
 arf_interval_printd(const arf_interval_t v, slong n)
 {
     arf_interval_fprintd(stdout, v, n);
 }
+#else
+void arf_interval_printd(const arf_interval_t v, slong n);
+#endif
 
 /* bisection */
 

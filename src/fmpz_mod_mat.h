@@ -166,6 +166,7 @@ void fmpz_mod_mat_concat_vertical(fmpz_mod_mat_t res,
 }
 
 /* Input/output */
+#ifdef FLINT_HAVE_FILE
 FMPZ_MOD_MAT_INLINE
 int fmpz_mod_mat_fprint(FILE * file, const fmpz_mod_mat_t mat)
 {
@@ -177,7 +178,9 @@ int fmpz_mod_mat_fprint_pretty(FILE * file, const fmpz_mod_mat_t mat)
 {
     return fmpz_mat_fprint_pretty(file, mat->mat);
 }
+#endif
 
+#ifdef FLINT_HAVE_FILE
 FMPZ_MOD_MAT_INLINE
 int fmpz_mod_mat_print(const fmpz_mod_mat_t mat)
 {
@@ -189,6 +192,10 @@ void fmpz_mod_mat_print_pretty(const fmpz_mod_mat_t mat)
 {
     fmpz_mat_print_pretty(mat->mat);
 }
+#else
+int fmpz_mod_mat_print(const fmpz_mod_mat_t mat);
+void fmpz_mod_mat_print_pretty(const fmpz_mod_mat_t mat);
+#endif
 
 /* Comparison */
 FMPZ_MOD_MAT_INLINE

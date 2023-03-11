@@ -12,7 +12,7 @@
 
 #define FMPZ_MOD_MAT_INLINES_C
 
-#include "flint.h"
+#include <stdio.h>
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_mod_mat.h"

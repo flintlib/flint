@@ -9,16 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "arith.h"
-
 #ifdef __GNUC__
 # define log __builtin_log
 # define sqrt __builtin_sqrt
 #else
 # include <math.h>
 #endif
+
+#include "ulong_extras.h"
+#include "fmpz.h"
+#include "arith.h"
 
 void arith_landau_function_vec(fmpz * res, slong len)
 {

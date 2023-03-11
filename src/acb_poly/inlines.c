@@ -10,5 +10,6 @@
 */
 
 #define ACB_POLY_INLINES_C
+#include <stdio.h>
 #include "acb_poly.h"
 

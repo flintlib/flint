@@ -10,4 +10,5 @@
 */
 
 #define FEXPR_INLINES_C
+#include <stdio.h>
 #include "fexpr.h"

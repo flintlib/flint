@@ -9,7 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
+#include <stdio.h>
+
+#ifdef __GNUC__
+# define strchr __builtin_strchr
+# define strncpy __builtin_strncpy
+#else
+# include <string.h>
+#endif
 
 #include "arf.h"
 

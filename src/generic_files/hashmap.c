@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "hashmap.h"
 
 void hashmap1_init(hashmap1_t h)

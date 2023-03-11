@@ -9,6 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#ifdef __GNUC__
+# define printf __builtin_printf
+#else
+# include <stdio.h>
+#endif
+
 #include "fmpq_poly.h"
 #include "arb_fmpz_poly.h"
 #include "acb_poly.h"

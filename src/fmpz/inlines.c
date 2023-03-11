@@ -11,7 +11,7 @@
 
 #define FMPZ_INLINES_C
 
-#include "flint.h"
+#include <stdio.h>
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 #include "fmpz.h"

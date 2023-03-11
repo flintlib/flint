@@ -370,7 +370,9 @@ int fexpr_replace_vec(fexpr_t res, const fexpr_t expr, const fexpr_vec_t xs, con
 
 /* Input/output */
 
+#ifdef FLINT_HAVE_FILE
 void fexpr_write(calcium_stream_t stream, const fexpr_t expr);
+#endif
 void fexpr_print(const fexpr_t expr);
 char * fexpr_get_str(const fexpr_t expr);
 
@@ -379,10 +381,13 @@ char * fexpr_get_str(const fexpr_t expr);
 #define FEXPR_LATEX_SMALL 1
 #define FEXPR_LATEX_LOGIC 2
 
+#ifdef FLINT_HAVE_FILE
 void fexpr_write_latex(calcium_stream_t out, const fexpr_t expr, ulong flags);
+#endif
 void fexpr_print_latex(const fexpr_t expr, ulong flags);
 char * fexpr_get_str_latex(const fexpr_t expr, ulong flags);
 
+#ifdef FLINT_HAVE_FILE
 void fexpr_write_latex_call(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_subscript(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_subscript_call(calcium_stream_t out, const fexpr_t expr, ulong flags);
@@ -419,6 +424,7 @@ void fexpr_write_latex_sub1_call1_optional_derivative(calcium_stream_t out, cons
 void fexpr_write_latex_sub1_call2_optional_derivative(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_misc_special(calcium_stream_t out, const fexpr_t expr, ulong flags);
 void fexpr_write_latex_residue(calcium_stream_t out, const fexpr_t expr, ulong flags);
+#endif
 
 void fexpr_set_arf(fexpr_t res, const arf_t x);
 void fexpr_set_d(fexpr_t res, double x);

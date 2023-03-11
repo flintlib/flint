@@ -9,8 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly_factor.h"
+#ifdef __GNUC__
+# define printf __builtin_printf
+#else
+# include <stdio.h>
+#endif
 
+#include "nmod_mpoly_factor.h"
 
 int nmod_mpolyu_is_canonical(
     const nmod_mpolyu_t A,

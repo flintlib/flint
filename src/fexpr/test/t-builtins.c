@@ -9,15 +9,17 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "calcium.h"
-#include "fexpr.h"
-#include "fexpr_builtin.h"
+#include <stdio.h>
 
 #ifdef __GNUC__
 # define strcmp __builtin_strcmp
 #else
 # include <string.h>
 #endif
+
+#include "calcium.h"
+#include "fexpr.h"
+#include "fexpr_builtin.h"
 
 int main()
 {

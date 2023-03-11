@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "acf.h"
 #include "acb.h"
 #include "arb_fmpz_poly.h"

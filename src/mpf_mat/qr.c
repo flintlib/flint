@@ -9,14 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpf_mat.h"
-#include "gmpcompat.h"
-
 #ifdef __GNUC__
 # define ceil __builtin_ceil
 #else
 # include <math.h>
 #endif
+
+#include "mpf_mat.h"
+#include "gmpcompat.h"
 
 void
 mpf_mat_qr(mpf_mat_t Q, mpf_mat_t R, const mpf_mat_t A)

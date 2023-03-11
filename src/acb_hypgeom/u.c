@@ -9,15 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb_poly.h"
-#include "arb_hypgeom.h"
-#include "acb_hypgeom.h"
-
 #ifdef __GNUC__
 # define sqrt __builtin_sqrt
 #else
 # include <math.h>
 #endif
+
+#include "acb_poly.h"
+#include "arb_hypgeom.h"
+#include "acb_hypgeom.h"
 
 static void
 bsplit(acb_t A, acb_t B, acb_t C, acb_t D,

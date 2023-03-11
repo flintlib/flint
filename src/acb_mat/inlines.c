@@ -10,5 +10,6 @@
 */
 
 #define ACB_MAT_INLINES_C
+#include <stdio.h>
 #include "acb_mat.h"
 

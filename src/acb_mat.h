@@ -92,13 +92,19 @@ void acb_mat_randtest_eig(acb_mat_t A, flint_rand_t state, acb_srcptr E, slong p
 
 /* I/O */
 
+#ifdef FLINT_HAVE_FILE
 void acb_mat_fprintd(FILE * file, const acb_mat_t mat, slong digits);
+#endif
 
+#ifdef FLINT_HAVE_FILE
 ACB_MAT_INLINE void
 acb_mat_printd(const acb_mat_t mat, slong digits)
 {
     acb_mat_fprintd(stdout, mat, digits);
 }
+#else
+void acb_mat_printd(const acb_mat_t mat, slong digits);
+#endif
 
 /* Comparisons */
 

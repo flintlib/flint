@@ -9,6 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#ifdef __GNUC__
+# define printf __builtin_printf
+#else
+# include <stdio.h>
+#endif
+
 #include "fmpz_mpoly.h"
 
 void fmpz_mpolyd_swap(fmpz_mpolyd_t A, fmpz_mpolyd_t B)

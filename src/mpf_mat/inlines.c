@@ -11,6 +11,6 @@
 
 #define MPF_MAT_INLINES_C
 
-#include "flint.h"
+#include <stdio.h>
 #include "mpf_mat.h"
 

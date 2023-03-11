@@ -9,6 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#ifdef __GNUC__
+# define printf __builtin_printf
+#else
+# include <stdio.h>
+#endif
+
 #include "n_poly.h"
 #include "mpn_extras.h"
 #include "nmod_vec.h"

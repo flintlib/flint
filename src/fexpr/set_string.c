@@ -9,15 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fexpr.h"
-#include "fexpr_builtin.h"
-
 #ifdef __GNUC__
 # define memcpy __builtin_memcpy
 # define strlen __builtin_strlen
 #else
 # include <string.h>
 #endif
+
+#include "fexpr.h"
+#include "fexpr_builtin.h"
 
 void
 fexpr_set_string(fexpr_t res, const char * s)

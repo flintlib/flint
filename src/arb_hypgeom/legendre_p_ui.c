@@ -9,8 +9,6 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "arb_hypgeom.h"
-
 #ifdef __GNUC__
 # define ldexp __builtin_ldexp
 # define fabs __builtin_fabs
@@ -19,6 +17,8 @@
 #else
 # include <math.h>
 #endif
+
+#include "arb_hypgeom.h"
 
 /* todo: improve for small k */
 static double log2_bin_uiui_fast(ulong n, ulong k)

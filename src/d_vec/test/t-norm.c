@@ -9,15 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "d_vec.h"
-#include "ulong_extras.h"
+#include <stdio.h>
 
 #ifdef __GNUC__
 # define fabs __builtin_fabs
 #else
 # include <math.h>
 #endif
+
+#include "d_vec.h"
+#include "ulong_extras.h"
 
 #define D_VEC_NORM_EPS (1e-14)
 

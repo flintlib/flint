@@ -436,13 +436,19 @@ FLINT_DLL int qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
 /* Output ********************************************************************/
 
+#ifdef FLINT_HAVE_FILE
 FLINT_DLL int qadic_fprint_pretty(FILE *file, const qadic_t op, const qadic_ctx_t ctx);
+#endif
 
+#ifdef FLINT_HAVE_FILE
 QADIC_INLINE int 
 qadic_print_pretty(const qadic_t op, const qadic_ctx_t ctx)
 {
     return qadic_fprint_pretty(stdout, op, ctx);
 }
+#else
+int qadic_print_pretty(const qadic_t op, const qadic_ctx_t ctx);
+#endif
 
 QADIC_INLINE int qadic_debug(const qadic_t op)
 {

@@ -9,15 +9,17 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "calcium.h"
-#include "fexpr.h"
-#include "fexpr_builtin.h"
+#include <stdio.h>
 
 #ifdef __GNUC__
 # define strlen __builtin_strlen
 #else
 # include <string.h>
 #endif
+
+#include "calcium.h"
+#include "fexpr.h"
+#include "fexpr_builtin.h"
 
 void
 fexpr_randtest_atom(fexpr_t expr, flint_rand_t state)

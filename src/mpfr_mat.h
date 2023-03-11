@@ -18,8 +18,8 @@
 #define MPFR_MAT_INLINE static __inline__
 #endif
 
-#include "flint.h"
 #include <mpfr.h> 
+#include "flint.h"
 
 #ifdef __cplusplus
  extern "C" {

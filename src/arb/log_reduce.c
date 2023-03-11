@@ -9,14 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "arb.h"
-
 #ifdef __GNUC__
 # define floor __builtin_floor
 # define ldexp __builtin_ldexp
 #else
 # include <math.h>
 #endif
+
+#include "arb.h"
 
 #define TERMINATOR -32768
 

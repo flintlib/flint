@@ -9,13 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "arb_poly.h"
-
 #ifdef __GNUC__
 # define sqrt __builtin_sqrt
 #else
 # include <math.h>
 #endif
+
+#include "arb_poly.h"
 
 void
 _arb_poly_taylor_shift(arb_ptr poly, const arb_t c, slong n, slong prec)

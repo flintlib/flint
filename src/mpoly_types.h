@@ -12,7 +12,6 @@
 #ifndef MPOLY_TYPES_H
 #define MPOLY_TYPES_H
 
-#include "flint.h"
 #include "fmpz_mod_types.h"
 
 #ifdef __cplusplus

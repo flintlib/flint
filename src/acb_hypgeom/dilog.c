@@ -9,9 +9,6 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb.h"
-#include "acb_hypgeom.h"
-
 #ifdef __GNUC__
 # define atan2 __builtin_atan2
 # define fabs __builtin_fabs
@@ -19,6 +16,9 @@
 #else
 # include <math.h>
 #endif
+
+#include "acb.h"
+#include "acb_hypgeom.h"
 
 void
 acb_hypgeom_dilog(acb_t res, const acb_t z, slong prec)

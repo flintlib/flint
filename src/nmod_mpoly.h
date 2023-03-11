@@ -397,15 +397,22 @@ FLINT_DLL int nmod_mpoly_set_str_pretty(nmod_mpoly_t A, const char * str,
 FLINT_DLL char * nmod_mpoly_get_str_pretty(const nmod_mpoly_t A,
                                   const char ** x, const nmod_mpoly_ctx_t ctx);
 
+#ifdef FLINT_HAVE_FILE
 FLINT_DLL int nmod_mpoly_fprint_pretty(FILE * file, 
             const nmod_mpoly_t A, const char ** x, const nmod_mpoly_ctx_t ctx);
+#endif
 
+#ifdef FLINT_HAVE_FILE
 NMOD_MPOLY_INLINE
 int nmod_mpoly_print_pretty(const nmod_mpoly_t A,
                                    const char ** x, const nmod_mpoly_ctx_t ctx)
 {
    return nmod_mpoly_fprint_pretty(stdout, A, x, ctx);
 }
+#else
+int nmod_mpoly_print_pretty(const nmod_mpoly_t A,
+                                   const char ** x, const nmod_mpoly_ctx_t ctx);
+#endif
 
 
 /*  Basic manipulation *******************************************************/
@@ -1858,8 +1865,8 @@ void nmod_mpoly_remainder_strongtest(const nmod_mpoly_t r, const nmod_mpoly_t g,
         if (divides)
         {
             flint_printf("nmod_mpoly_remainder_strongtest FAILED i = %wd\n", i);
-            flint_printf("rem ");nmod_mpoly_print_pretty(r, NULL, ctx); printf("\n\n");
-            flint_printf("den ");nmod_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
+            flint_printf("rem ");nmod_mpoly_print_pretty(r, NULL, ctx); flint_printf("\n\n");
+            flint_printf("den ");nmod_mpoly_print_pretty(g, NULL, ctx); flint_printf("\n\n");
             flint_abort();
         }
     }

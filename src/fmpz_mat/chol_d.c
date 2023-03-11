@@ -9,13 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
-
 #ifdef __GNUC__
 # define sqrt __builtin_sqrt
 #else
 # include <math.h>
 #endif
+
+#include "fmpz_mat.h"
 
 void
 fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A)

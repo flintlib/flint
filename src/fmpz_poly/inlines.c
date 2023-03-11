@@ -11,8 +11,6 @@
 
 #define FMPZ_POLY_INLINES_C
 
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
+#include <stdio.h>
 #include "fmpz_poly.h"
 

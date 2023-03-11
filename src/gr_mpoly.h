@@ -159,7 +159,9 @@ int gr_mpoly_randtest_bits(gr_mpoly_t A, flint_rand_t state, slong length, flint
 
 /* Input and output */
 
+#ifdef FLINT_HAVE_FILE
 int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A, const char ** x_in, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+#endif
 int gr_mpoly_print_pretty(const gr_mpoly_t A, const char ** x_in, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 
 /* Constants */

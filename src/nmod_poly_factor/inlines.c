@@ -11,8 +11,7 @@
 
 #define NMOD_POLY_FACTOR_INLINES_C
 
-#include "flint.h"
-#include "ulong_extras.h"
+#include <stdio.h>
 #include "nmod_poly.h"
 
 void nmod_poly_factor_get_nmod_poly(nmod_poly_t z, nmod_poly_factor_t fac, slong i)

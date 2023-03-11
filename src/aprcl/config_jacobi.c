@@ -9,13 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "aprcl.h"
-
 #ifdef __GNUC__
 # define log __builtin_log
 #else
 # include <math.h>
 #endif
+
+#include "aprcl.h"
 
 ulong
 aprcl_R_value(const fmpz_t n)

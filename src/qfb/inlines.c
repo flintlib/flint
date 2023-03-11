@@ -16,5 +16,6 @@
 
 #define QFB_INLINES_C
 
+#include <stdio.h>
 #include "qfb.h"
 

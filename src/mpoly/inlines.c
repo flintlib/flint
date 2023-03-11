@@ -11,7 +11,6 @@
 
 #define MPOLY_INLINES_C
 
-#include "flint.h"
-#include "ulong_extras.h"
+#include <stdio.h>
 #include "mpoly.h"
 

@@ -18,8 +18,8 @@
 #define MPFR_VEC_INLINE static __inline__
 #endif
 
-#include "flint.h"
 #include <mpfr.h> 
+#include "flint.h"
 
 #if MPFR_VERSION_MAJOR < 3
 #error MPFR 3.0.0 or later is required

@@ -10,15 +10,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "qsieve.h"
-
 #ifdef __GNUC__
 # define log __builtin_log
 #else
 # include <math.h>
 #endif
+
+#include "ulong_extras.h"
+#include "fmpz.h"
+#include "qsieve.h"
 
 /* Array of possible Knuth-Schroeppel multipliers */
 static const mp_limb_t multipliers[] = {1, 2, 3, 5, 6, 7, 10, 11, 13, 14, 15,

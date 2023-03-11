@@ -11,6 +11,6 @@
 
 #define ULONG_EXTRAS_INLINES_C
 
-#include "flint.h"
+#include <stdio.h>
 #include "ulong_extras.h"
 

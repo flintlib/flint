@@ -227,6 +227,7 @@ int mpoly_ordering_isrev(const mpoly_ctx_t mctx)
    return mctx->ord == ORD_DEGREVLEX;
 }
 
+#ifdef FLINT_HAVE_FILE
 MPOLY_INLINE
 void mpoly_ordering_print(ordering_t ord)
 {
@@ -245,6 +246,9 @@ void mpoly_ordering_print(ordering_t ord)
       printf("Unknown ordering in mpoly_ordering_print.");
    }
 }
+#else
+void mpoly_ordering_print(ordering_t ord);
+#endif
 
 /*  Monomials ****************************************************************/
 

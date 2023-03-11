@@ -11,6 +11,6 @@
 
 #define FMPQ_MAT_INLINES_C
 
-#include "flint.h"
+#include <stdio.h>
 #include "fmpq_mat.h"
 

@@ -10,13 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "d_vec.h"
-
 #ifdef __GNUC__
 # define fabs __builtin_fabs
 #else
 # include <math.h>
 #endif
+
+#include "d_vec.h"
 
 int
 _d_vec_is_approx_zero(const double *vec, slong len, double eps)

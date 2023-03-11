@@ -9,15 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
-#include "arb_hypgeom.h"
-
 #ifdef __GNUC__
 # define fabs __builtin_fabs
 # define log __builtin_log
 #else
 # include <math.h>
 #endif
+
+#include "ulong_extras.h"
+#include "arb_hypgeom.h"
 
 static slong
 asymp_prec(slong k, double logdz, slong prec)

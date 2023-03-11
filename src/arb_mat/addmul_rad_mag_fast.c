@@ -9,14 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "arb_mat.h"
-
 #ifdef __GNUC__
 # define frexp __builtin_frexp
 # define ldexp __builtin_ldexp
 #else
 # include <math.h>
 #endif
+
+#include "arb_mat.h"
 
 /* Block size for better cache locality. */
 #define BLOCK_SIZE 32

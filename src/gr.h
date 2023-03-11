@@ -73,6 +73,7 @@ typedef int (*gr_funcptr)(void);
 
 /* Copied from Calcium: stream interface allows simple file or string IO. */
 
+#ifdef FLINT_HAVE_FILE
 typedef struct
 {
     FILE * fp;
@@ -91,6 +92,7 @@ void gr_stream_write_si(gr_stream_t out, slong x);
 void gr_stream_write_ui(gr_stream_t out, ulong x);
 void gr_stream_write_free(gr_stream_t out, char * s);
 void gr_stream_write_fmpz(gr_stream_t out, const fmpz_t x);
+#endif
 
 #define GR_SUCCESS 0
 #define GR_DOMAIN 1
@@ -763,8 +765,10 @@ typedef int ((*gr_method_ctx)(gr_ctx_ptr));
 typedef truth_t ((*gr_method_ctx_predicate)(gr_ctx_ptr));
 typedef int ((*gr_method_ctx_set_si)(gr_ctx_ptr, slong));
 typedef int ((*gr_method_ctx_get_si)(slong *, gr_ctx_ptr));
+#ifdef FLINT_HAVE_FILE
 typedef int ((*gr_method_ctx_stream)(gr_stream_t, gr_ctx_ptr));
 typedef int ((*gr_method_stream_in)(gr_stream_t, gr_srcptr, gr_ctx_ptr));
+#endif
 typedef int ((*gr_method_randtest)(gr_ptr, flint_rand_t state, gr_ctx_ptr));
 typedef int ((*gr_method_constant_op)(gr_ptr, gr_ctx_ptr));
 typedef int ((*gr_method_constant_op_get_si)(slong *, gr_ctx_ptr));
@@ -931,7 +935,9 @@ typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcp
 /* Wrappers to call methods. */
 
 GR_INLINE int gr_ctx_clear(gr_ctx_t ctx) { return GR_CTX_OP(ctx, CTX_CLEAR)(ctx); }
+#ifdef FLINT_HAVE_FILE
 GR_INLINE int gr_ctx_write(gr_stream_t out, gr_ctx_t ctx) { return GR_CTX_STREAM(ctx, CTX_WRITE)(out, ctx); }
+#endif
 
 GR_INLINE truth_t gr_ctx_is_ring(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_RING)(ctx); }
 GR_INLINE truth_t gr_ctx_is_commutative_ring(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_COMMUTATIVE_RING)(ctx); }
@@ -969,7 +975,9 @@ GR_INLINE void gr_set_shallow(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { GR_VOID_U
 
 GR_INLINE WARN_UNUSED_RESULT int gr_randtest(gr_ptr x, flint_rand_t state, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST)(x, state, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_randtest_not_zero(gr_ptr x, flint_rand_t state, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST_NOT_ZERO)(x, state, ctx); }
+#ifdef FLINT_HAVE_FILE
 GR_INLINE /* todo: warn? */ int gr_write(gr_stream_t out, gr_srcptr x, gr_ctx_t ctx) { return GR_STREAM_IN(ctx, WRITE)(out, x, ctx); }
+#endif
 GR_INLINE WARN_UNUSED_RESULT int gr_zero(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, ZERO)(res, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_one(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, ONE)(res, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_neg_one(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, NEG_ONE)(res, ctx); }

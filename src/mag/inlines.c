@@ -10,5 +10,6 @@
 */
 
 #define MAG_INLINES_C
+#include <stdio.h>
 #include "mag.h"
 

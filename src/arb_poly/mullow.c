@@ -9,13 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "arb_poly.h"
-
 #ifdef __GNUC__
 # define log __builtin_log
 #else
 # include <math.h>
 #endif
+
+#include "arb_poly.h"
 
 void
 _arb_poly_mullow(arb_ptr res,

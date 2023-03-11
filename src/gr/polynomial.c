@@ -11,16 +11,18 @@
 
 /* Polynomials over generic rings */
 
-#include "fmpz.h"
-#include "ulong_extras.h"
-#include "gr.h"
-#include "gr_poly.h"
+#include <stdio.h>
 
 #ifdef __GNUC__
 # define strcmp __builtin_strcmp
 #else
 # include <string.h>
 #endif
+
+#include "fmpz.h"
+#include "ulong_extras.h"
+#include "gr.h"
+#include "gr_poly.h"
 
 static const char * default_var = "x";
 

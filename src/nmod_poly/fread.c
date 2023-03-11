@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include <stdio.h>
 #include "nmod_poly.h"
 
 int nmod_poly_fread(FILE * f, nmod_poly_t poly)

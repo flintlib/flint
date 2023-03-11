@@ -2131,6 +2131,7 @@ void fq_default_poly_compose_mod(fq_default_poly_t res,
 
 /*  Input and output  ********************************************************/
 
+#ifdef FLINT_HAVE_FILE
 FQ_DEFAULT_POLY_INLINE int fq_default_poly_fprint_pretty(FILE * file,
                              const fq_default_poly_t poly, const char *x,
                                                     const fq_default_ctx_t ctx)
@@ -2184,6 +2185,7 @@ FQ_DEFAULT_POLY_INLINE int fq_default_poly_fprint(FILE * file,
         return fq_poly_fprint(file, poly->fq, ctx->ctx.fq);
     }
 }
+#endif
 
 FQ_DEFAULT_POLY_INLINE int
 fq_default_poly_print(const fq_default_poly_t poly, const fq_default_ctx_t ctx)

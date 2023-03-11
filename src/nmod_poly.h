@@ -325,6 +325,7 @@ FLINT_DLL char * nmod_poly_get_str_pretty(const nmod_poly_t poly, const char * x
 
 FLINT_DLL int nmod_poly_set_str(nmod_poly_t poly, const char * s);
 
+#ifdef FLINT_HAVE_FILE
 FLINT_DLL int nmod_poly_fread(FILE * f, nmod_poly_t poly);
 
 NMOD_POLY_INLINE
@@ -341,7 +342,9 @@ int nmod_poly_fprint(FILE * f, const nmod_poly_t poly)
 }
 
 FLINT_DLL int nmod_poly_fprint_pretty(FILE * f, const nmod_poly_t a, const char * x);
+#endif
 
+#ifdef FLINT_HAVE_FILE
 NMOD_POLY_INLINE
 int nmod_poly_print(const nmod_poly_t a)
 {
@@ -373,6 +376,12 @@ int nmod_poly_read(nmod_poly_t poly)
 {
     return nmod_poly_fread(stdin, poly);
 }
+#else
+/* These functions should still be callable, but they may not be inlined. */
+int nmod_poly_print(const nmod_poly_t a);
+int nmod_poly_print_pretty(const nmod_poly_t a, const char * x);
+int nmod_poly_read(nmod_poly_t poly);
+#endif
 
 /* Shifting  *****************************************************************/
 

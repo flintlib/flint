@@ -11,7 +11,6 @@
 
 #define FMPZ_MOD_MPOLY_INLINES_C
 
-#include "flint.h"
-#include "ulong_extras.h"
+#include <stdio.h>
 #include "fmpz_mod_mpoly.h"
 

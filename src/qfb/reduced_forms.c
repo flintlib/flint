@@ -47,10 +47,7 @@ slong qfb_reduced_forms_large(qfb ** forms, slong d)
     n_factor_t * fac;
 
     if (d >= 0)
-    {
-       printf("Exception: qfb_reduced_forms not implemented for positive discriminant.\n");
-       flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "qfb_reduced_forms not implemented for positive discriminant in %s\n", __func__);
 
     alim = n_sqrt(-d/3); /* maximum a value to check */
 
@@ -180,10 +177,7 @@ slong qfb_reduced_forms(qfb ** forms, slong d)
     mp_limb_t * s;
 
     if (d >= 0)
-    {
-       printf("Exception: qfb_reduced_forms not implemented for positive discriminant.\n");
-       flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "qfb_reduced_forms not implemented for positive discriminant in %s\n", __func__);
 
     blim = n_sqrt(-d/3); /* maximum a value to check */
 

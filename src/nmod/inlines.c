@@ -11,6 +11,6 @@
 
 #define NMOD_INLINES_C
 
-#include "flint.h"
+#include <stdio.h>
 #include "nmod.h"
 

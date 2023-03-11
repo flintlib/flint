@@ -11,5 +11,5 @@
 
 #define FQ_ZECH_POLY_INLINES_C
 
-#include "flint.h"
+#include <stdio.h>
 #include "fq_zech_poly.h"

@@ -509,6 +509,7 @@ typedef enum
 }
 fexpr_builtin_symbol;
 
+#ifdef FLINT_HAVE_FILE
 typedef void (*_fexpr_latex_writer)(calcium_stream_t, const fexpr_t, ulong);
 
 typedef struct
@@ -521,6 +522,7 @@ typedef struct
 fexpr_symbol_info;
 
 extern const fexpr_symbol_info fexpr_builtin_table[FEXPR_BUILTIN_LENGTH];
+#endif
 
 #define FEXPR_SYMBOL_Pos  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Pos << 16))
 #define FEXPR_SYMBOL_Neg  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Neg << 16))
@@ -532,11 +534,15 @@ extern const fexpr_symbol_info fexpr_builtin_table[FEXPR_BUILTIN_LENGTH];
 
 slong fexpr_builtin_lookup(const char * s);
 
+#ifdef FLINT_HAVE_FILE
 FEXPR_BUILTIN_INLINE 
 const char * fexpr_builtin_name(slong n)
 {
     return fexpr_builtin_table[n].string;
 }
+#else
+const char * fexpr_builtin_name(slong n);
+#endif
 
 FEXPR_BUILTIN_INLINE slong fexpr_builtin_length(void)
 {

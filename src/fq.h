@@ -95,6 +95,7 @@ FQ_INLINE void fq_ctx_order(fmpz_t f, const fq_ctx_t ctx)
     fmpz_pow_ui(f, fq_ctx_prime(ctx), fq_ctx_degree(ctx));
 }
 
+#ifdef FLINT_HAVE_FILE
 FQ_INLINE int fq_ctx_fprint(FILE * file, const fq_ctx_t ctx)
 {
     int r;
@@ -123,11 +124,16 @@ FQ_INLINE int fq_ctx_fprint(FILE * file, const fq_ctx_t ctx)
 
     return r;
 }
+#endif
 
+#ifdef FLINT_HAVE_FILE
 FQ_INLINE void fq_ctx_print(const fq_ctx_t ctx)
 {
     fq_ctx_fprint(stdout, ctx);
 }
+#else
+void fq_ctx_print(const fq_ctx_t ctx);
+#endif
 
 
 /* Memory management  *********************************************************/
@@ -357,11 +363,13 @@ FLINT_DLL void fq_set_fmpz_mod_poly(fq_t a, const fmpz_mod_poly_t b,
 
 /* Output ********************************************************************/
 
+#ifdef FLINT_HAVE_FILE
 FQ_INLINE
 int fq_fprint(FILE * file, const fq_t op, const fq_ctx_t ctx)
 {
     return fmpz_poly_fprint(file, op);
 }
+#endif
 
 FQ_INLINE
 void fq_print(const fq_t op, const fq_ctx_t ctx)
@@ -369,11 +377,13 @@ void fq_print(const fq_t op, const fq_ctx_t ctx)
     fmpz_poly_print(op);
 }
 
+#ifdef FLINT_HAVE_FILE
 FQ_INLINE 
 int fq_fprint_pretty(FILE * file, const fq_t op, const fq_ctx_t ctx)
 {
     return fmpz_poly_fprint_pretty(file, op, ctx->var);
 }
+#endif
 
 FQ_INLINE 
 int fq_print_pretty(const fq_t op, const fq_ctx_t ctx)

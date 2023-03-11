@@ -167,7 +167,11 @@ typedef struct qs_s
                        RELATION DATA
    ***************************************************************************/
 
+#ifdef FLINT_HAVE_FILE
    FILE * siqs;           /* pointer to file for storing relations */
+#else
+   void * siqs;
+#endif
    char * fname;          /* name of file used for relations */
 
    slong full_relation;   /* number of full relations */

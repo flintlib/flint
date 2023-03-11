@@ -9,8 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech_mpoly_factor.h"
+#ifdef __GNUC__
+# define printf __builtin_printf
+#else
+# include <stdio.h>
+#endif
 
+#include "fq_zech_mpoly_factor.h"
 
 void fq_zech_polyu_clear(fq_zech_polyu_t A, const fq_zech_ctx_t ctx)
 {

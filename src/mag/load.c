@@ -9,9 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
-#include <assert.h>
-
+#include <stdio.h>
 #include "mag.h"
 #include "arf.h"
 

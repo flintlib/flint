@@ -227,12 +227,15 @@ FLINT_DLL void TEMPLATE(T, mat_concat_vertical)(TEMPLATE(T, mat_t) res,
 
 /* Input and output  *********************************************************/
 
+#ifdef FLINT_HAVE_FILE
 FLINT_DLL int TEMPLATE(T, mat_fprint)(FILE * file, const TEMPLATE(T, mat_t) mat,
                             const TEMPLATE(T, ctx_t) ctx);
 
 FLINT_DLL int TEMPLATE(T, mat_fprint_pretty)(FILE * file, const TEMPLATE(T, mat_t) mat,
                                    const TEMPLATE(T, ctx_t) ctx);
+#endif
 
+#ifdef FLINT_HAVE_FILE
 FQ_MAT_TEMPLATES_INLINE
 int TEMPLATE(T, mat_print)(const TEMPLATE(T, mat_t) mat,
                            const TEMPLATE(T, ctx_t) ctx)
@@ -246,6 +249,12 @@ int TEMPLATE(T, mat_print_pretty)(const TEMPLATE(T, mat_t) mat,
 {
     return TEMPLATE(T, mat_fprint_pretty)(stdout, mat, ctx);
 }
+#else
+int TEMPLATE(T, mat_print)(const TEMPLATE(T, mat_t) mat,
+                           const TEMPLATE(T, ctx_t) ctx);
+int TEMPLATE(T, mat_print_pretty)(const TEMPLATE(T, mat_t) mat,
+                                  const TEMPLATE(T, ctx_t) ctx);
+#endif
 
 /* TODO: Read functions */
 

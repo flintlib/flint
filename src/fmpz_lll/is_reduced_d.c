@@ -9,19 +9,19 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#ifdef __GNUC__
+# define fabs __builtin_fabs
+# define sqrt __builtin_sqrt
+#else
+# include <math.h>
+#endif
+
 #include "d_vec.h"
 #include "fmpz_mat.h"
 #include "fmpz_lll.h"
 
 #if FLINT_USES_FENV
 #include <fenv.h>
-#endif
-
-#ifdef __GNUC__
-# define fabs __builtin_fabs
-# define sqrt __builtin_sqrt
-#else
-# include <math.h>
 #endif
 
 int

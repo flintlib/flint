@@ -9,14 +9,16 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include <ctype.h>
-#include "gr_poly.h"
 
 #ifdef __GNUC__
 # define strcmp __builtin_strcmp
 #else
 # include <string.h>
 #endif
+
+#include "gr_poly.h"
 
 static int
 want_parens(const char * s)

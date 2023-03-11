@@ -9,13 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb_dirichlet.h"
+#include <stdio.h>
 
 #ifdef __GNUC__
 # define fabs __builtin_fabs
 #else
 # include <math.h>
 #endif
+
+#include "acb_dirichlet.h"
 
 /* Laurent expansions at s = 1 of first 10 principal L-functions */
 

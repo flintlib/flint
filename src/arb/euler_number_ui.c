@@ -9,15 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "thread_support.h"
-#include "arb.h"
-#include "acb_dirichlet.h"
-
 #ifdef __GNUC__
 # define log __builtin_log
 #else
 # include <math.h>
 #endif
+
+#include "thread_support.h"
+#include "arb.h"
+#include "acb_dirichlet.h"
 
 #if FLINT64
 #define ARB_EULER_NUMBER_TAB_SIZE 25

@@ -11,11 +11,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "thread_support.h"
-#include "ulong_extras.h"
-#include "fmpz_mat.h"
-#include "fmpz_mod_poly_factor.h"
-
 #ifdef __GNUC__
 # define ceil __builtin_ceil
 # define log __builtin_log
@@ -23,6 +18,11 @@
 #else
 # include <math.h>
 #endif
+
+#include "thread_support.h"
+#include "ulong_extras.h"
+#include "fmpz_mat.h"
+#include "fmpz_mod_poly_factor.h"
 
 void
 _fmpz_mod_poly_precompute_matrix_worker (void * arg_ptr)

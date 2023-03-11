@@ -9,14 +9,16 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb.h"
-#include "acb_modular.h"
+#include <stdio.h>
 
 #ifdef __GNUC__
 # define fabs __builtin_fabs
 #else
 # include <math.h>
 #endif
+
+#include "acb.h"
+#include "acb_modular.h"
 
 #define EPS 1e-13
 #define NUM_DERIVS 4

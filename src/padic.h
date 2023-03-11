@@ -331,10 +331,12 @@ FLINT_DLL char * _padic_get_str(char * str, const padic_t op, const fmpz_t p, en
 
 FLINT_DLL char * padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx);
 
+#ifdef FLINT_HAVE_FILE
 FLINT_DLL int _padic_fprint(FILE * file, const fmpz_t u, slong v, const padic_ctx_t ctx);
-
 FLINT_DLL int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx);
+#endif
 
+#ifdef FLINT_HAVE_FILE
 PADIC_INLINE 
 int _padic_print(const fmpz_t u, slong v, const padic_ctx_t ctx)
 {
@@ -345,6 +347,10 @@ PADIC_INLINE int padic_print(const padic_t op, const padic_ctx_t ctx)
 {
     return padic_fprint(stdout, op, ctx);
 }
+#else
+int _padic_print(const fmpz_t u, slong v, const padic_ctx_t ctx);
+int padic_print(const padic_t op, const padic_ctx_t ctx);
+#endif
 
 PADIC_INLINE void padic_debug(const padic_t op)
 {

@@ -211,12 +211,15 @@ FLINT_DLL int padic_mat_is_zero(const padic_mat_t A);
 
 /* Input and output  *********************************************************/
 
+#ifdef FLINT_HAVE_FILE
 FLINT_DLL int padic_mat_fprint(FILE * file, 
                      const padic_mat_t A, const padic_ctx_t ctx);
 
 FLINT_DLL int padic_mat_fprint_pretty(FILE * file, const padic_mat_t A, 
                                          const padic_ctx_t ctx);
+#endif
 
+#ifdef FLINT_HAVE_FILE
 PADIC_MAT_INLINE
 int padic_mat_print(const padic_mat_t A, const padic_ctx_t ctx)
 {
@@ -228,6 +231,10 @@ int padic_mat_print_pretty(const padic_mat_t A, const padic_ctx_t ctx)
 {
     return padic_mat_fprint_pretty(stdout, A, ctx);
 }
+#else
+int padic_mat_print(const padic_mat_t A, const padic_ctx_t ctx);
+int padic_mat_print_pretty(const padic_mat_t A, const padic_ctx_t ctx);
+#endif
 
 /* Random matrix generation  *************************************************/
 

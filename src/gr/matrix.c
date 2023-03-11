@@ -11,6 +11,7 @@
 
 /* Matrices over generic rings */
 
+#include <stdio.h>
 #include "fmpz.h"
 #include "fmpq.h"
 #include "gr.h"

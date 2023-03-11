@@ -9,15 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "arb_poly.h"
-#include "acb_poly.h"
-
 #ifdef __GNUC__
 # define log __builtin_log
 # define pow __builtin_pow
 #else
 # include <math.h>
 #endif
+
+#include "arb_poly.h"
+#include "acb_poly.h"
 
 /* allow changing this from the test code */
 ARB_DLL slong acb_poly_newton_exp_cutoff = 0;

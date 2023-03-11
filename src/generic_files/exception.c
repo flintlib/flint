@@ -10,7 +10,16 @@
 */
 
 #include <stdlib.h>
-#include <stdarg.h>
+#include <stdio.h>
+
+#ifdef __GNUC__
+# define va_start __builtin_va_start
+# define va_arg __builtin_va_arg
+# define va_end __builtin_va_end
+#else
+# include <stdarg.h>
+#endif
+
 #include "flint.h"
 
 #if FLINT_REENTRANT && !FLINT_USES_TLS

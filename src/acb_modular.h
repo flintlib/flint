@@ -76,6 +76,7 @@ psl2z_one(psl2z_t g)
     fmpz_one(&g->d);
 }
 
+#ifdef FLINT_HAVE_FILE
 static __inline__ void
 psl2z_fprint(FILE * file, const psl2z_t g)
 {
@@ -85,12 +86,17 @@ psl2z_fprint(FILE * file, const psl2z_t g)
     fmpz_fprint(file, &g->c); flint_fprintf(file, " ");
     fmpz_fprint(file, &g->d); flint_fprintf(file, "]");
 }
+#endif
 
+#ifdef FLINT_HAVE_FILE
 static __inline__ void
 psl2z_print(const psl2z_t g)
 {
     psl2z_fprint(stdout, g);
 }
+#else
+void psl2z_print(const psl2z_t g);
+#endif
 
 static __inline__ int
 psl2z_equal(const psl2z_t f, const psl2z_t g)

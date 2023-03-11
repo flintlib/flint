@@ -11,15 +11,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "qsieve.h"
-
 #ifdef __GNUC__
 # define memset __builtin_memset
 #else
 # include <string.h>
 #endif
+
+#include "ulong_extras.h"
+#include "fmpz.h"
+#include "qsieve.h"
 
 /*
     The actual sieving part of the quadratic sieve. This version is only run

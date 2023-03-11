@@ -91,6 +91,7 @@ void qfb_discriminant(fmpz_t D, qfb_t f)
    fmpz_clear(t);
 }
 
+#ifdef FLINT_HAVE_FILE
 QFB_INLINE
 void qfb_print(qfb_t q)
 {
@@ -99,6 +100,9 @@ void qfb_print(qfb_t q)
    fmpz_print(q->b); printf(", ");
    fmpz_print(q->c); printf(")");
 }
+#else
+void qfb_print(qfb_t q);
+#endif
 
 QFB_INLINE
 void qfb_array_clear(qfb ** forms, slong num)

@@ -125,13 +125,19 @@ void _acb_poly_majorant(arb_ptr res, acb_srcptr vec, slong len, slong prec);
 
 void acb_poly_majorant(arb_poly_t res, const acb_poly_t poly, slong prec);
 
+#ifdef FLINT_HAVE_FILE
 void acb_poly_fprintd(FILE * file, const acb_poly_t poly, slong digits);
+#endif
 
+#ifdef FLINT_HAVE_FILE
 ACB_POLY_INLINE void
 acb_poly_printd(const acb_poly_t poly, slong digits)
 {
     acb_poly_fprintd(stdout, poly, digits);
 }
+#else
+void acb_poly_printd(const acb_poly_t poly, slong digits);
+#endif
 
 void _acb_poly_evaluate_horner(acb_t res, acb_srcptr f, slong len, const acb_t a, slong prec);
 void acb_poly_evaluate_horner(acb_t res, const acb_poly_t f, const acb_t a, slong prec);

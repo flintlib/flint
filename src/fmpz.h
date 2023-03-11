@@ -393,15 +393,15 @@ FLINT_DLL int fmpz_equal_ui(const fmpz_t f, ulong g);
 
 FLINT_DLL int fmpz_read(fmpz_t f);
 
-FLINT_DLL int fmpz_fread(FILE * file, fmpz_t f);
-
-FLINT_DLL size_t fmpz_inp_raw( fmpz_t x, FILE *fin );
-
 FLINT_DLL int fmpz_print(const fmpz_t x);
 
-FLINT_DLL int fmpz_fprint(FILE * file, const fmpz_t x);
+#ifdef FLINT_HAVE_FILE
+FLINT_DLL int fmpz_fread(FILE * file, fmpz_t f);
+FLINT_DLL size_t fmpz_inp_raw(fmpz_t x, FILE * fin);
 
+FLINT_DLL int fmpz_fprint(FILE * file, const fmpz_t x);
 FLINT_DLL size_t fmpz_out_raw( FILE *fout, const fmpz_t x );
+#endif
 
 FLINT_DLL size_t fmpz_sizeinbase(const fmpz_t f, int b);
 

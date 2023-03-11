@@ -9,8 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
-
+#include <stdio.h>
 #include "mag.h"
 
 int

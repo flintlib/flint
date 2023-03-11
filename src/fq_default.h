@@ -229,6 +229,7 @@ FQ_DEFAULT_INLINE void fq_default_ctx_order(fmpz_t f,
     }
 }
 
+#ifdef FLINT_HAVE_FILE
 FQ_DEFAULT_INLINE int fq_default_ctx_fprint(FILE * file,
 		                                    const fq_default_ctx_t ctx)
 {
@@ -259,6 +260,7 @@ FQ_DEFAULT_INLINE int fq_default_ctx_fprint(FILE * file,
         return fq_ctx_fprint(file, ctx->ctx.fq);
     }
 }
+#endif
 
 FQ_DEFAULT_INLINE void fq_default_ctx_print(const fq_default_ctx_t ctx)
 {
@@ -1352,6 +1354,7 @@ FQ_DEFAULT_INLINE void fq_default_get_coeff_fmpz(fmpz_t c,
 
 /* Output ********************************************************************/
 
+#ifdef FLINT_HAVE_FILE
 FQ_DEFAULT_INLINE
 int fq_default_fprint(FILE * file, const fq_default_t op,
 		                                    const fq_default_ctx_t ctx)
@@ -1377,6 +1380,7 @@ int fq_default_fprint(FILE * file, const fq_default_t op,
         return fq_fprint(file, op->fq, ctx->ctx.fq);
     }
 }
+#endif
 
 FQ_DEFAULT_INLINE
 void fq_default_print(const fq_default_t op, const fq_default_ctx_t ctx)
@@ -1403,6 +1407,7 @@ void fq_default_print(const fq_default_t op, const fq_default_ctx_t ctx)
     }
 }
 
+#ifdef FLINT_HAVE_FILE
 FQ_DEFAULT_INLINE 
 int fq_default_fprint_pretty(FILE * file, const fq_default_t op,
 		                                    const fq_default_ctx_t ctx)
@@ -1428,6 +1433,7 @@ int fq_default_fprint_pretty(FILE * file, const fq_default_t op,
         return fq_fprint_pretty(file, op->fq, ctx->ctx.fq);
     }
 }
+#endif
 
 FQ_DEFAULT_INLINE 
 void fq_default_print_pretty(const fq_default_t op, const fq_default_ctx_t ctx)

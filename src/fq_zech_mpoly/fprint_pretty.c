@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
+#include <stdio.h>
 #include "fq_zech_mpoly.h"
 
 int fq_zech_mpoly_fprint_pretty(FILE * file, const fq_zech_mpoly_t A,

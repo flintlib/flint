@@ -9,14 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
-#include "arb.h"
-
 #ifdef __GNUC__
 # define pow __builtin_pow
 #else
 # include <math.h>
 #endif
+
+#include "ulong_extras.h"
+#include "arb.h"
 
 void
 arb_exp_taylor_sum_rs_generic(arb_t res, const arb_t x, slong N, slong prec)

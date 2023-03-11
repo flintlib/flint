@@ -1208,7 +1208,7 @@ char * fmpz_mod_poly_get_str_pretty(const fmpz_mod_poly_t poly, const char * x,
     return _fmpz_poly_get_str_pretty(poly->coeffs, poly->length, x);
 }
 
-
+#ifdef FLINT_HAVE_FILE
 FLINT_DLL int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, slong len, 
                           const fmpz_t p);
 
@@ -1224,7 +1224,9 @@ int fmpz_mod_poly_fprint_pretty(FILE * file, const fmpz_mod_poly_t poly,
 {
     return _fmpz_poly_fprint_pretty(file, poly->coeffs, poly->length, x);
 }
+#endif
 
+#ifdef FLINT_HAVE_FILE
 FMPZ_MOD_POLY_INLINE 
 int _fmpz_mod_poly_print(const fmpz *poly, slong len, const fmpz_t p)
 {
@@ -1242,6 +1244,11 @@ int fmpz_mod_poly_print_pretty(const fmpz_mod_poly_t poly, const char * x, const
 {
     return fmpz_mod_poly_fprint_pretty(stdout, poly, x, ctx);
 }
+#else
+int _fmpz_mod_poly_print(const fmpz *poly, slong len, const fmpz_t p);
+int fmpz_mod_poly_print(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx);
+int fmpz_mod_poly_print_pretty(const fmpz_mod_poly_t poly, const char * x, const fmpz_mod_ctx_t ctx);
+#endif
 
 /* Products *****************************************************************/
 

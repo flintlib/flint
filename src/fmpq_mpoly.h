@@ -163,16 +163,22 @@ FLINT_DLL int fmpq_mpoly_set_str_pretty(fmpq_mpoly_t A, const char * str,
 FLINT_DLL char * fmpq_mpoly_get_str_pretty(const fmpq_mpoly_t A,
                                   const char ** x, const fmpq_mpoly_ctx_t ctx);
 
+#ifdef FLINT_HAVE_FILE
 FLINT_DLL int fmpq_mpoly_fprint_pretty(FILE * file, 
             const fmpq_mpoly_t A, const char ** x, const fmpq_mpoly_ctx_t ctx);
+#endif
 
+#ifdef FLINT_HAVE_FILE
 FMPQ_MPOLY_INLINE
 int fmpq_mpoly_print_pretty(const fmpq_mpoly_t A,
                                    const char ** x, const fmpq_mpoly_ctx_t ctx)
 {
     return fmpq_mpoly_fprint_pretty(stdout, A, x, ctx);
 }
-
+#else
+int fmpq_mpoly_print_pretty(const fmpq_mpoly_t A,
+                                   const char ** x, const fmpq_mpoly_ctx_t ctx);
+#endif
 
 /*  Basic manipulation *******************************************************/
 

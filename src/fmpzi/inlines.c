@@ -10,5 +10,6 @@
 */
 
 #define FMPZI_INLINES_C
+#include <stdio.h>
 #include "fmpzi.h"
 

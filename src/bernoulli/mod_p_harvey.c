@@ -56,14 +56,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ===============================================================================
 */
 
-#include "ulong_extras.h"
-#include "bernoulli.h"
-
 #ifdef __GNUC__
 # define memset __builtin_memset
 #else
 # include <string.h>
 #endif
+
+#include "ulong_extras.h"
+#include "bernoulli.h"
 
 #define DEBUG 0
 #define TIMING 1

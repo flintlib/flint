@@ -1115,6 +1115,7 @@ FLINT_DLL void TEMPLATE(T, poly_compose_mod_brent_kung_precomp_preinv)(
 
 /*  Input and output  ********************************************************/
 
+#ifdef FLINT_HAVE_FILE
 FLINT_DLL int _TEMPLATE(T, poly_fprint_pretty)(FILE *file,
                                  const TEMPLATE(T, struct) *poly, slong len,
                                  const char *x,
@@ -1132,7 +1133,9 @@ FLINT_DLL int _TEMPLATE(T, poly_fprint)(FILE * file,
 FLINT_DLL int TEMPLATE(T, poly_fprint)(FILE * file,
                          const TEMPLATE(T, poly_t) poly,
                          const TEMPLATE(T, ctx_t) ctx);
+#endif
 
+#ifdef FLINT_HAVE_FILE
 FQ_POLY_TEMPLATES_INLINE int
 _TEMPLATE(T, poly_print)(const TEMPLATE(T, struct) *poly, slong len,
                          const TEMPLATE(T, ctx_t) ctx)
@@ -1162,6 +1165,12 @@ TEMPLATE(T, poly_print_pretty)(const TEMPLATE(T, poly_t) poly,
 {
     return TEMPLATE(T, poly_fprint_pretty)(stdout, poly, x, ctx);
 }
+#else
+int _TEMPLATE(T, poly_print)(const TEMPLATE(T, struct) *poly, slong len, const TEMPLATE(T, ctx_t) ctx);
+int TEMPLATE(T, poly_print)(const TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx);
+int _TEMPLATE(T, poly_print_pretty)(const TEMPLATE(T, struct) *poly, slong len, const char *x, const TEMPLATE(T, ctx_t) ctx);
+int TEMPLATE(T, poly_print_pretty)(const TEMPLATE(T, poly_t) poly, const char *x, const TEMPLATE(T, ctx_t) ctx);
+#endif
 
 FLINT_DLL char * _TEMPLATE(T, poly_get_str_pretty)(const TEMPLATE(T, struct) * poly, slong len,
                                   const char *x,

@@ -45,8 +45,10 @@ void gr_vec_set_length(gr_vec_t vec, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_vec_set(gr_vec_t res, const gr_vec_t src, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_vec_append(gr_vec_t vec, gr_srcptr f, gr_ctx_t ctx);
 
+#ifdef FLINT_HAVE_FILE
 int _gr_vec_write(gr_stream_t out, gr_srcptr vec, slong len, gr_ctx_t ctx);
 int gr_vec_write(gr_stream_t out, const gr_vec_t vec, gr_ctx_t ctx);
+#endif
 int _gr_vec_print(gr_srcptr vec, slong len, gr_ctx_t ctx);
 int gr_vec_print(const gr_vec_t vec, gr_ctx_t ctx);
 

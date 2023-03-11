@@ -39,6 +39,7 @@ const char * calcium_version(void);
 
 /* Input and output */
 
+#ifdef FLINT_HAVE_FILE
 typedef struct
 {
     FILE * fp;
@@ -78,6 +79,7 @@ void calcium_write_free(calcium_stream_t out, char * s)
     calcium_write(out, s);
     flint_free(s);
 }
+#endif
 
 /* Triple-valued logic */
 

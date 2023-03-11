@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "acb_hypgeom.h"
 #include "acb_modular.h"
 #include "acb_dirichlet.h"

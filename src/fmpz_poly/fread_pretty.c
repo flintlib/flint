@@ -9,10 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
+#include <stdio.h>
 #include <ctype.h>
 
-#include "flint.h"
+#ifdef __GNUC__
+# define strcmp __builtin_strcmp
+# define strcpy __builtin_strcpy
+#else
+# include <string.h>
+#endif
+
 #include "gmpcompat.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"

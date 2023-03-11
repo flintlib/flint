@@ -9,15 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
-#include "arb_poly.h"
-#include "arb_hypgeom.h"
-
 #ifdef __GNUC__
 # define pow __builtin_pow
 #else
 # include <math.h>
 #endif
+
+#include "ulong_extras.h"
+#include "arb_poly.h"
+#include "arb_hypgeom.h"
 
 void
 arb_hypgeom_rising_ui_jet_rs(arb_ptr res, const arb_t x, ulong n, ulong m, slong len, slong prec)

@@ -9,13 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "arb_hypgeom.h"
-
 #ifdef __GNUC__
 # define ldexp __builtin_ldexp
 #else
 # include <math.h>
 #endif
+
+#include "arb_hypgeom.h"
 
 /*
 https://dlmf.nist.gov/9.9

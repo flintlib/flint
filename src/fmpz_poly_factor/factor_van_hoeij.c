@@ -10,16 +10,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
-#include "fmpz_lll.h"
-#include "fmpz_poly_factor.h"
-
 #ifdef __GNUC__
 # define log __builtin_log
 # define sqrt __builtin_sqrt
 #else
 # include <math.h>
 #endif
+
+#include "fmpz_mat.h"
+#include "fmpz_lll.h"
+#include "fmpz_poly_factor.h"
 
 slong _heuristic_van_hoeij_starting_precision(const fmpz_poly_t f, 
                                                             slong r, ulong p)

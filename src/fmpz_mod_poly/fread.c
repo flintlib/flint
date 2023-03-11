@@ -10,9 +10,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include <stdio.h>
 #include "fmpz_mod_poly.h"
-#include "fmpz.h"
 
 int fmpz_mod_poly_fread(FILE * f, fmpz_mod_poly_t poly, fmpz_mod_ctx_t ctx)
 {

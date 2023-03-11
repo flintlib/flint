@@ -174,13 +174,19 @@ void arb_poly_majorant(arb_poly_t res, const arb_poly_t poly, slong prec);
 
 /* IO */
 
+#ifdef FLINT_HAVE_FILE
 void arb_poly_fprintd(FILE * file, const arb_poly_t poly, slong digits);
+#endif
 
+#ifdef FLINT_HAVE_FILE
 ARB_POLY_INLINE void
 arb_poly_printd(const arb_poly_t poly, slong digits)
 {
     arb_poly_fprintd(stdout, poly, digits);
 }
+#else
+void arb_poly_printd(const arb_poly_t poly, slong digits);
+#endif
 
 /* Random generation */
 

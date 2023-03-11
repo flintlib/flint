@@ -1133,6 +1133,8 @@ FLINT_DLL void _fmpz_poly_signature(slong * r1, slong * r2, const fmpz * poly, s
 FLINT_DLL void fmpz_poly_signature(slong * r1, slong * r2, const fmpz_poly_t poly);
 
 /*  Input and output  ********************************************************/
+
+#ifdef FLINT_HAVE_FILE
 FLINT_DLL int _fmpz_poly_fprint(FILE * file, const fmpz * poly, slong len);
 
 FLINT_DLL int fmpz_poly_fprint(FILE * file, const fmpz_poly_t poly);
@@ -1142,7 +1144,9 @@ FLINT_DLL int _fmpz_poly_fprint_pretty(FILE * file,
 
 FLINT_DLL int fmpz_poly_fprint_pretty(FILE * file, 
                                        const fmpz_poly_t poly, const char * x);
+#endif
 
+#ifdef FLINT_HAVE_FILE
 FMPZ_POLY_INLINE
 int _fmpz_poly_print_pretty(const fmpz * poly, slong len, const char * x)
 {
@@ -1166,11 +1170,20 @@ int fmpz_poly_print_pretty(const fmpz_poly_t poly, const char * x)
 {
     return fmpz_poly_fprint_pretty(stdout, poly, x);
 }
+#else
+int _fmpz_poly_print_pretty(const fmpz * poly, slong len, const char * x);
+int _fmpz_poly_print(const fmpz * poly, slong n);
+int fmpz_poly_print(const fmpz_poly_t poly);
+int fmpz_poly_print_pretty(const fmpz_poly_t poly, const char * x);
+#endif
 
+#ifdef FLINT_HAVE_FILE
 FLINT_DLL int fmpz_poly_fread(FILE * file, fmpz_poly_t poly);
 
 FLINT_DLL int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x);
+#endif
 
+#ifdef FLINT_HAVE_FILE
 FMPZ_POLY_INLINE
 int fmpz_poly_read(fmpz_poly_t poly)
 {
@@ -1200,6 +1213,11 @@ void fmpz_poly_debug(const fmpz_poly_t poly)
     flint_printf(")");
     fflush(stdout);
 }
+#else
+int fmpz_poly_read(fmpz_poly_t poly);
+int fmpz_poly_read_pretty(fmpz_poly_t poly, char **x);
+void fmpz_poly_debug(const fmpz_poly_t poly);
+#endif
 
 /* Norms *********************************************************************/
 

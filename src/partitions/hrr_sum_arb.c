@@ -9,12 +9,6 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "thread_support.h"
-#include "ulong_extras.h"
-#include "arb.h"
-#include "arith.h"
-#include "partitions.h"
-
 #ifdef __GNUC__
 # define log __builtin_log
 # define sinh __builtin_sinh
@@ -22,6 +16,12 @@
 #else
 # include <math.h>
 #endif
+
+#include "thread_support.h"
+#include "ulong_extras.h"
+#include "arb.h"
+#include "arith.h"
+#include "partitions.h"
 
 #define VERBOSE 0
 

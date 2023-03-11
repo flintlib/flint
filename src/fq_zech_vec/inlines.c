@@ -11,6 +11,6 @@
 
 #define FQ_ZECH_VEC_INLINES_C
 
-#include "flint.h"
+#include <stdio.h>
 #include "fq_zech_vec.h"
 

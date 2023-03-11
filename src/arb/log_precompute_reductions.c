@@ -9,10 +9,6 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
-#include "fmpz_lll.h"
-#include "arb.h"
-
 #ifdef __GNUC__
 # define fabs __builtin_fabs
 # define log __builtin_log
@@ -20,6 +16,10 @@
 #else
 # include <math.h>
 #endif
+
+#include "fmpz_mat.h"
+#include "fmpz_lll.h"
+#include "arb.h"
 
 #define TERMINATOR -32768
 

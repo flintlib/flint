@@ -11,6 +11,6 @@
 
 #define FQ_NMOD_MAT_INLINES_C
 
-#include "flint.h"
+#include <stdio.h>
 #include "fq_nmod_mat.h"
 

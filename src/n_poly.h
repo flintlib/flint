@@ -734,10 +734,12 @@ FLINT_DLL char * n_fq_get_str_pretty(
     const mp_limb_t * a,
     const fq_nmod_ctx_t ctx);
 
+#ifdef FLINT_HAVE_FILE
 FLINT_DLL int n_fq_fprint_pretty(
     FILE * file,
     const mp_limb_t * a,
     const fq_nmod_ctx_t ctx);
+#endif
 
 FLINT_DLL void n_fq_print_pretty(
     const mp_limb_t * a,

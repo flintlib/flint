@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fmpz_mat.h"
 #include "acb_modular.h"
 #include "gr.h"

@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
+#include <stdio.h>
 #include "fmpq_mpoly.h"
-
 
 int
 fmpq_mpoly_fprint_pretty(FILE * file, const fmpq_mpoly_t A,

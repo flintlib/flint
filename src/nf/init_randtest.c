@@ -24,10 +24,7 @@ void nf_init_randtest(nf_t nf, flint_rand_t state,
     fmpz_poly_t q;
 
     if (len < 2 || bits_in < 1)
-    {
-        fprintf(stderr, "[nf_init_randtest] len must be >= 2 and bits_in >= 1\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "len must be >= 2 and bits_in >= 1 in %s\n", __func__);
 
     if (len <= 2 || n_randint(state, 10) == 0)
         len = 2; /* linear */

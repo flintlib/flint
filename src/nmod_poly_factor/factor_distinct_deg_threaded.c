@@ -11,10 +11,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "thread_support.h"
-#include "nmod_mat.h"
-#include "nmod_poly.h"
-
 #ifdef __GNUC__
 # define ceil __builtin_ceil
 # define log __builtin_log
@@ -22,6 +18,10 @@
 #else
 # include <math.h>
 #endif
+
+#include "thread_support.h"
+#include "nmod_mat.h"
+#include "nmod_poly.h"
 
 void
 _nmod_poly_precompute_matrix_worker(void * arg_ptr)

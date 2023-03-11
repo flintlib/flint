@@ -9,13 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb_poly.h"
+#include <stdio.h>
 
 #ifdef __GNUC__
 # define fabs __builtin_fabs
 #else
 # include <math.h>
 #endif
+
+#include "acb_poly.h"
 
 #define EPS 1e-13
 #define NUM_DERIVS 3

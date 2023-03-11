@@ -17,6 +17,14 @@
 #endif
 
 #include <stdlib.h>
+#include <stdio.h>
+
+#ifdef __GNUC__
+# define strcpy __builtin_strcpy
+#else
+# include <string.h>
+#endif
+
 #include "thread_support.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -26,12 +34,6 @@
 
 #if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(_MSC_VER)
 #include <windows.h>
-#endif
-
-#ifdef __GNUC__
-# define strcpy __builtin_strcpy
-#else
-# include <math.h>
 #endif
 
 int compare_facs(const void * a, const void * b)

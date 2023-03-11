@@ -9,15 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "arith.h"
-
 #ifdef __GNUC__
 # define log __builtin_log
 #else
 # include <math.h>
 #endif
+
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "arith.h"
 
 void
 arith_bell_number_dobinski(fmpz_t res, ulong n)

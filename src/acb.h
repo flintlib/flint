@@ -981,6 +981,7 @@ _acb_vec_scalar_div_fmpz(acb_ptr res, acb_srcptr vec, slong len, const fmpz_t c,
         acb_div_fmpz(res + i, vec + i, c, prec);
 }
 
+#ifdef FLINT_HAVE_FILE
 ACB_INLINE void
 acb_fprint(FILE * file, const acb_t x)
 {
@@ -991,27 +992,32 @@ acb_fprint(FILE * file, const acb_t x)
     flint_fprintf(file, ")");
 }
 
+void acb_fprintd(FILE * file, const acb_t z, slong digits);
+
+void acb_fprintn(FILE * fp, const acb_t z, slong digits, ulong flags);
+#endif
+
+#ifdef FLINT_HAVE_FILE
 ACB_INLINE void
 acb_print(const acb_t x)
 {
     acb_fprint(stdout, x);
 }
-
-void acb_fprintd(FILE * file, const acb_t z, slong digits);
-
 ACB_INLINE void
 acb_printd(const acb_t z, slong digits)
 {
     acb_fprintd(stdout, z, digits);
 }
-
-void acb_fprintn(FILE * fp, const acb_t z, slong digits, ulong flags);
-
 ACB_INLINE void
 acb_printn(const acb_t x, slong digits, ulong flags)
 {
     acb_fprintn(stdout, x, digits, flags);
 }
+#else
+void acb_print(const acb_t x);
+void acb_printd(const acb_t z, slong digits);
+void acb_printn(const acb_t x, slong digits, ulong flags);
+#endif
 
 ACB_INLINE void
 _acb_vec_printn(acb_srcptr vec, slong len, slong ndigits, ulong flags)

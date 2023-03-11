@@ -12,14 +12,19 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include "flint.h"
+#include <stdio.h>
+
+#ifdef __GNUC__
+# define calloc __builtin_calloc
+# define malloc __builtin_malloc
+# define realloc __builtin_realloc
+# define free __builtin_free
+#else
+# include <stdlib.h>
+#endif
+
 #include "mpfr.h"
 #include "thread_pool.h"
-
-#if FLINT_USES_GC
-#include "gc.h"
-#endif
 
 static void * _flint_malloc(size_t);
 static void * _flint_calloc(size_t, size_t);

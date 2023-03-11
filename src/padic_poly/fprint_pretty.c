@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "padic_poly.h"
 
 int _padic_poly_fprint_pretty(FILE *file, 

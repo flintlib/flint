@@ -10,5 +10,6 @@
 */
 
 #define ACB_INLINES_C
+#include <stdio.h>
 #include "acb.h"
 

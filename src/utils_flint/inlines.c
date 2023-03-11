@@ -10,5 +10,6 @@
 */
 
 #define UTILS_FLINT_INLINES_C
+#include <stdio.h>
 #include "utils_flint.h"
 

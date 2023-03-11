@@ -9,9 +9,24 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
 #include <ctype.h>
-#include <stdarg.h>
+
+#ifdef __GNUC__
+# define va_start __builtin_va_start
+# define va_arg __builtin_va_arg
+# define va_list __builtin_va_list
+# define va_end __builtin_va_end
+# define strlen __builtin_strlen
+# define strcspn __builtin_strcspn
+# define strncpy __builtin_strncpy
+# define sprintf __builtin_sprintf
+# define sscanf __builtin_sscanf
+#else
+# include <stdarg.h>
+# include <string.h>
+# include <stdio.h>
+#endif
+
 #include "flint.h"
 
 int flint_sscanf(const char * s, const char * str, ...)

@@ -9,15 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "nmod.h"
-#include "dlog.h"
-
 #ifdef __GNUC__
 # define log __builtin_log
 # define pow __builtin_pow
 #else
 # include <math.h>
 #endif
+
+#include "nmod.h"
+#include "dlog.h"
 
 #define vbs 0
 

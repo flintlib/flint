@@ -9,15 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb_poly.h"
-#include "acb_hypgeom.h"
-#include "arb_hypgeom.h"
-
 #ifdef __GNUC__
 # define fabs __builtin_fabs
 #else
 # include <math.h>
 #endif
+
+#include "acb_poly.h"
+#include "acb_hypgeom.h"
+#include "arb_hypgeom.h"
 
 static void
 _acb_log_rising_correct_branch(acb_t res,

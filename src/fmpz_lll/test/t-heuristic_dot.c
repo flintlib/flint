@@ -9,15 +9,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "d_vec.h"
-#include "fmpz_mat.h"
-#include "fmpz_lll.h"
+#include <stdio.h>
 
 #ifdef __GNUC__
 # define fabs __builtin_fabs
 #else
 # include <math.h>
 #endif
+
+#include "d_vec.h"
+#include "fmpz_mat.h"
+#include "fmpz_lll.h"
 
 #define FMPZ_LLL_HD_EPS (1.0E-9)
 

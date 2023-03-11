@@ -9,15 +9,17 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpq.h"
-#include "gr_vec.h"
-#include "gr_poly.h"
+#include <stdio.h>
 
 #ifdef __GNUC__
 # define strcmp __builtin_strcmp
 #else
 # include <string.h>
 #endif
+
+#include "fmpq.h"
+#include "gr_vec.h"
+#include "gr_poly.h"
 
 /* arb wrappers todo: elementary functions; pfq, coulomb, zeta/dirichlet deflated */
 

@@ -9,14 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
-#include "arb_hypgeom.h"
-
 #ifdef __GNUC__
 # define log __builtin_log
 #else
 # include <math.h>
 #endif
+
+#include "ulong_extras.h"
+#include "arb_hypgeom.h"
 
 static double
 d_log2_fac(double n)

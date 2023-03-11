@@ -11,6 +11,6 @@
 
 #define PADIC_MAT_INLINES_C
 
-#include "flint.h"
+#include <stdio.h>
 #include "padic_mat.h"
 

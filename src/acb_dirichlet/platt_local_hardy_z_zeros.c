@@ -11,14 +11,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb_dirichlet.h"
-#include "arb_calc.h"
-
 #ifdef __GNUC__
 # define exp __builtin_exp
 #else
 # include <math.h>
 #endif
+
+#include "acb_dirichlet.h"
+#include "arb_calc.h"
 
 static const slong LOOPCOUNT = 4;
 

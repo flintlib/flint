@@ -9,8 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod_mpoly_factor.h"
+#ifdef __GNUC__
+# define printf __builtin_printf
+#else
+# include <stdio.h>
+#endif
 
+#include "fq_nmod_mpoly_factor.h"
 
 void n_polyu2n_fq_print_pretty(
     const n_polyun_t A,

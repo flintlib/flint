@@ -202,12 +202,15 @@ arb_is_one(const arb_t f)
 
 void arb_one(arb_t f);
 
+#ifdef FLINT_HAVE_FILE
 void arb_fprint(FILE * file, const arb_t x);
 
 void arb_fprintd(FILE * file, const arb_t x, slong digits);
 
 void arb_fprintn(FILE * file, const arb_t x, slong digits, ulong flags);
+#endif
 
+#ifdef FLINT_HAVE_FILE
 ARB_INLINE void
 arb_print(const arb_t x)
 {
@@ -225,6 +228,11 @@ arb_printn(const arb_t x, slong digits, ulong flags)
 {
     arb_fprintn(stdout, x, digits, flags);
 }
+#else
+void arb_print(const arb_t x);
+void arb_printd(const arb_t x, slong digits);
+void arb_printn(const arb_t x, slong digits, ulong flags);
+#endif
 
 void arb_mul_2exp_si(arb_t y, const arb_t x, slong e);
 
@@ -1083,9 +1091,10 @@ int arb_load_str(arb_t res, const char * data);
 
 char * arb_dump_str(const arb_t x);
 
+#ifdef FLINT_HAVE_FILE
 int arb_load_file(arb_t res, FILE *stream);
-
 int arb_dump_file(FILE* stream, const arb_t x);
+#endif
 
 #ifdef __cplusplus
 }

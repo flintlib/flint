@@ -9,7 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
+#include <stdio.h>
+
+#ifdef __GNUC__
+# define strlen __builtin_strlen
+# define memcpy __builtin_memcpy
+#else
+# include <string.h>
+#endif
+
 #include "calcium.h"
 
 void

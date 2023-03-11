@@ -780,6 +780,7 @@ void fq_default_mat_concat_vertical(fq_default_mat_t res,
 
 /* Input and output  *********************************************************/
 
+#ifdef FLINT_HAVE_FILE
 FQ_DEFAULT_MAT_INLINE int fq_default_mat_fprint(FILE * file,
                         const fq_default_mat_t mat, const fq_default_ctx_t ctx)
 {
@@ -829,6 +830,7 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_fprint_pretty(FILE * file,
         return fq_mat_fprint_pretty(file, mat->fq, ctx->ctx.fq);
     }
 }
+#endif
 
 FQ_DEFAULT_MAT_INLINE
 int fq_default_mat_print(const fq_default_mat_t mat,

@@ -9,10 +9,6 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "arb_poly.h"
-#include "arb_hypgeom.h"
-#include "arb_fmpz_poly.h"
-
 #ifdef __GNUC__
 # define ldexp __builtin_ldexp
 # define log __builtin_log
@@ -20,6 +16,10 @@
 #else
 # include <math.h>
 #endif
+
+#include "arb_poly.h"
+#include "arb_hypgeom.h"
+#include "arb_fmpz_poly.h"
 
 /* Actually an enclosure for |x| < 0.99. */
 static void

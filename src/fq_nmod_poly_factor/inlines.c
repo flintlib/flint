@@ -11,9 +11,7 @@
 
 #define FQ_NMOD_POLY_FACTOR_INLINES_C
 
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fq_nmod.h"
+#include <stdio.h>
 #include "fq_nmod_poly.h"
 
 void fq_nmod_poly_factor_get_poly(fq_nmod_poly_t z,

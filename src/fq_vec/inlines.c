@@ -11,6 +11,6 @@
 
 #define FQ_VEC_INLINES_C
 
-#include "flint.h"
+#include <stdio.h>
 #include "fq_vec.h"
 

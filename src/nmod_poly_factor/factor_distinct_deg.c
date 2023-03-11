@@ -11,9 +11,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mat.h"
-#include "nmod_poly.h"
-
 #ifdef __GNUC__
 # define ceil __builtin_ceil
 # define log __builtin_log
@@ -21,6 +18,9 @@
 #else
 # include <math.h>
 #endif
+
+#include "nmod_mat.h"
+#include "nmod_poly.h"
 
 void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
                                   const nmod_poly_t poly, slong * const * degs)

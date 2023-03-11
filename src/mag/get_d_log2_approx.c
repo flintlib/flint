@@ -9,13 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "mag.h"
-
 #ifdef __GNUC__
 # define ldexp __builtin_ldexp
 #else
 # include <math.h>
 #endif
+
+#include "mag.h"
 
 double
 mag_get_d_log2_approx(const mag_t x)

@@ -9,16 +9,16 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb.h"
-#include "acb_hypgeom.h"
-#include "arb_hypgeom.h"
-
 #ifdef __GNUC__
 # define fabs __builtin_fabs
 # define floor __builtin_floor
 #else
 # include <math.h>
 #endif
+
+#include "acb.h"
+#include "acb_hypgeom.h"
+#include "arb_hypgeom.h"
 
 void acb_hypgeom_gamma_stirling_choose_param(int * reflect, slong * r, slong * n,
     const acb_t z, int use_reflect, int digamma, slong prec);

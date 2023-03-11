@@ -10,14 +10,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
-#include "fmpz_poly.h"
-
 #ifdef __GNUC__
 # define sqrt __builtin_sqrt
 #else
 # include <math.h>
 #endif
+
+#include "fmpz.h"
+#include "fmpz_poly.h"
 
 slong _fmpz_poly_factor_CLD_mat(fmpz_mat_t res, const fmpz_poly_t f,
                               fmpz_poly_factor_t lifted_fac, fmpz_t P, ulong k)

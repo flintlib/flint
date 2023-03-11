@@ -12,6 +12,7 @@
 /* Multivariate polynomials over generic rings */
 
 #define DEFINE_MPOLY_METHODS
+#include <stdio.h>
 #include "gr.h"
 #include "gr_mpoly.h"
 

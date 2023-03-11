@@ -10,10 +10,19 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
-#include <float.h>
-#include <string.h>
+#include <stdio.h>
 #include "profiler.h"
+
+#ifdef __GNUC__
+# define DBL_MIN __DBL_MIN__
+# define DBL_MAX __DBL_MAX__
+# define ceil __builtin_ceil
+# define strncmp __builtin_strncmp
+#else
+# include <float.h>
+# include <math.h>
+# include <string.h>
+#endif
 
 #if (defined( _MSC_VER ) || (GMP_LIMB_BITS == 64 && defined (__amd64__)) || \
 	                    (GMP_LIMB_BITS == 32 && (defined (__i386__) || \

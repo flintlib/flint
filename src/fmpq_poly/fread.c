@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include <stdio.h>
 #include "gmpcompat.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
 int fmpq_poly_fread(FILE * file, fmpq_poly_t poly)

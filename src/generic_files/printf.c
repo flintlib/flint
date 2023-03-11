@@ -11,9 +11,24 @@
 */
 
 #include <stdlib.h>
-#include <string.h>
 #include <ctype.h>
-#include <stdarg.h>
+
+#ifdef __GNUC__
+# define printf __builtin_printf
+# define va_arg __builtin_va_arg
+# define va_list __builtin_va_list
+# define va_start __builtin_va_start
+# define va_end __builtin_va_end
+# define strcspn __builtin_strcspn
+# define strlen __builtin_strlen
+# define strncpy __builtin_strncpy
+# define strspn __builtin_strspn
+#else
+# include <stdio.h>
+# include <stdarg.h>
+# include <string.h>
+#endif
+
 #include "flint.h"
 
 /* return number of arguments called for by a specific format specifier */

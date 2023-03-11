@@ -9,14 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly.h"
-#include "arb_poly.h"
-
 #ifdef __GNUC__
 # define ldexp __builtin_ldexp
 #else
 # include <math.h>
 #endif
+
+#include "fmpz_poly.h"
+#include "arb_poly.h"
 
 void
 _arb_poly_get_scale(fmpz_t scale, arb_srcptr x, slong xlen,

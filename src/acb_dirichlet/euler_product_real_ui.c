@@ -9,15 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "thread_support.h"
-#include "acb_dirichlet.h"
-
 #ifdef __GNUC__
 # define log __builtin_log
 # define sqrt __builtin_sqrt
 #else
 # include <math.h>
 #endif
+
+#include "thread_support.h"
+#include "acb_dirichlet.h"
 
 #define ONE_OVER_LOG2 1.4426950408889634
 

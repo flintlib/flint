@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "nmod_mat.h"
 
 int nmod_mat_fprint_pretty(FILE* file, const nmod_mat_t mat)

@@ -9,10 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly.h"
-#include "fmpq_poly.h"
-#include "arith.h"
-
 #ifdef __GNUC__
 # define log __builtin_log
 # define exp __builtin_exp
@@ -20,6 +16,10 @@
 #else
 # include <math.h>
 #endif
+
+#include "nmod_poly.h"
+#include "fmpq_poly.h"
+#include "arith.h"
 
 /* S(n,k) <= (1/2) binomial(n,k) * k^(n-k) */
 static slong

@@ -10,5 +10,6 @@
 */
 
 #define CA_FIELD_INLINES_C
+#include <stdio.h>
 #include "ca_field.h"
 

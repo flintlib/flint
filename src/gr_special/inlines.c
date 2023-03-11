@@ -10,5 +10,6 @@
 */
 
 #define GR_SPECIAL_INLINES_C
+#include <stdio.h>
 #include "gr_special.h"
 #undef GR_SPECIAL_INLINES_C
