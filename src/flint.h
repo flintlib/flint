@@ -37,6 +37,17 @@
 # endif
 #endif
 
+#ifdef va_start
+# define FLINT_HAVE_VA_LIST
+#endif
+
+#if defined(FILE)       || defined(_FILE_DEFINED) || defined(__DEFINED_FILE) \
+ || defined(H_STDIO)    || defined(_H_STDIO)      || defined(_STDIO_H)       \
+ || defined(_STDIO_H_)  || defined(__STDIO_H)     || defined(__STDIO_H__)    \
+ || defined(__STDIO__)
+# define FLINT_HAVE_FILE
+#endif
+
 #ifdef FLINT_INLINES_C
 #define FLINT_INLINE FLINT_DLL
 #else
@@ -440,13 +451,19 @@ mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
 FLINT_DLL int parse_fmt(int * floating, const char * fmt);
 
 FLINT_DLL int flint_printf(const char * str, ...); /* flint version of printf */
-FLINT_DLL int flint_vprintf(const char * str, va_list ap); /* va_list version of flint_printf */
-FLINT_DLL int flint_fprintf(FILE * f, const char * str, ...); /* flint version of fprintf */
 FLINT_DLL int flint_sprintf(char * s, const char * str, ...); /* flint version of sprintf */
 
 FLINT_DLL int flint_scanf(const char * str, ...); /* flint version of scanf */
-FLINT_DLL int flint_fscanf(FILE * f, const char * str, ...); /* flint version of fscanf */
 FLINT_DLL int flint_sscanf(const char * s, const char * str, ...); /* flint version of sscanf */
+
+#ifdef FLINT_HAVE_VA_LIST
+FLINT_DLL int flint_vprintf(const char * str, va_list ap); /* va_list version of flint_printf */
+#endif
+
+#ifdef FLINT_HAVE_FILE
+FLINT_DLL int flint_fprintf(FILE * f, const char * str, ...); /* flint version of fprintf */
+FLINT_DLL int flint_fscanf(FILE * f, const char * str, ...); /* flint version of fscanf */
+#endif
 
 FLINT_INLINE slong flint_mul_sizes(slong x, slong y)
 {
