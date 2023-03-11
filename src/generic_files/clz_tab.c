@@ -36,9 +36,8 @@ const unsigned char __flint_clz_tab[128] =
   8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8
 };
 
-#endif
+#else
 
-int dummy_fn_to_prevent_ISOC_warning(void)
-{
-   return 0;
-}
+typedef int this_file_is_empty;
+
+#endif
