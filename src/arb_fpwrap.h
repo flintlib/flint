@@ -211,6 +211,9 @@ int arb_fpwrap_cdouble_cosh_integral(complex_double * res, complex_double x, int
 int arb_fpwrap_double_log_integral(double * res, double x, int offset, int flags);
 int arb_fpwrap_cdouble_log_integral(complex_double * res, complex_double x, int offset, int flags);
 
+int arb_fpwrap_double_dilog(double * res, double x, int flags);
+int arb_fpwrap_cdouble_dilog(complex_double * res, complex_double x, int flags);
+
 int arb_fpwrap_double_bessel_j(double * res, double nu, double x, int flags);
 int arb_fpwrap_cdouble_bessel_j(complex_double * res, complex_double nu, complex_double x, int flags);
 

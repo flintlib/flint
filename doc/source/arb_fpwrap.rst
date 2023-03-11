@@ -328,6 +328,9 @@ Error functions and exponential integrals
 .. function:: int arb_fpwrap_double_log_integral(double * res, double x, int offset, int flags)
               int arb_fpwrap_cdouble_log_integral(complex_double * res, complex_double x, int offset, int flags)
 
+.. function:: int arb_fpwrap_double_dilog(double * res, double x, int flags)
+              int arb_fpwrap_cdouble_dilog(complex_double * res, complex_double x, int flags)
+
 Bessel, Airy and Coulomb functions
 ...............................................................................
 

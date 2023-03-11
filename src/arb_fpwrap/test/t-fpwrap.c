@@ -367,6 +367,9 @@ int main()
         CHECK_DOUBLE(arb_fpwrap_double_log_integral(&res, x, 0, flags));
         CHECK_CDOUBLE(arb_fpwrap_cdouble_log_integral(&cres, cx, 0, flags));
 
+        CHECK_DOUBLE(arb_fpwrap_double_dilog(&res, x, flags));
+        CHECK_CDOUBLE(arb_fpwrap_cdouble_dilog(&cres, cx, flags));
+
         CHECK_DOUBLE(arb_fpwrap_double_bessel_j(&res, y, x, flags));
         CHECK_CDOUBLE(arb_fpwrap_cdouble_bessel_j(&cres, cy, cx, flags));
 
