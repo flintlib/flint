@@ -18,6 +18,10 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
+if(WIN32 OR MINGW)
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif()
+
 option(BUILD_SHARED_LIBS "Build shared libs" on)
 option(WITH_NTL "Build with NTL or not" off)
 
@@ -274,10 +278,6 @@ if(BUILD_SHARED_LIBS AND WIN32)
     target_compile_definitions(flint PRIVATE "FLINT_BUILD_DLL")
     # Use MPIR's dll import functions
     target_compile_definitions(flint PUBLIC "MSC_USE_DLL")
-endif()
-
-if(WIN32 OR MINGW)
-    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 
 if (HAS_FLAG_MPOPCNT)
