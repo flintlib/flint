@@ -18,7 +18,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <gmp.h>
-#include "limits.h"
 #include "longlong.h"
 #include "flint-config.h"
 

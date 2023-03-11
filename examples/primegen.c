@@ -11,7 +11,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <limits.h>
 #include "flint.h"
 #include "ulong_extras.h"
 

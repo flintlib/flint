@@ -16,7 +16,6 @@
 
 #include "templates.h"
 
-#include <limits.h>
 
 int
 main(void)
