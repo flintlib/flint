@@ -17,7 +17,11 @@ _arb_10_pow_fmpz(arb_t res, const fmpz_t m, slong prec)
 {
     slong bits = fmpz_bits(m);
 
-    if (bits < 128)
+    if (bits <= FLINT_BITS)
+    {
+        arb_ui_pow_ui(res, 10, fmpz_get_ui(m), prec);
+    }
+    else if (bits < 128)
     {
         arb_set_ui(res, 10);
         arb_pow_fmpz_binexp(res, res, m, prec + 2 * bits);
