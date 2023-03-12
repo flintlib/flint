@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
 #include "nmod_mpoly.h"
 
 int nmod_mpoly_set_str_pretty(nmod_mpoly_t poly, const char * str,

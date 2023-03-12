@@ -14,7 +14,6 @@
 #include "fmpz_vec.h"
 #include "ulong_extras.h"
 
-#include <string.h>
 
 int
 _fmpz_mod_poly_is_squarefree_f(fmpz_t fac, const fmpz * f, slong len, const fmpz_t p)

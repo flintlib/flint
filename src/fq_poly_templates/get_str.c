@@ -14,9 +14,6 @@
 
 #include "templates.h"
 
-#include <string.h>
-#include <math.h>
-
 char *_TEMPLATE(T, poly_get_str) (const TEMPLATE(T, struct) * poly, slong len,
                                   const TEMPLATE(T, ctx_t) ctx)
 {

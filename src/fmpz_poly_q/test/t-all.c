@@ -11,11 +11,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
+#ifdef __GNUC__
+# define strcmp __builtin_strcmp
+#else
+# include <string.h>
+#endif
 
 #include "fmpz_poly_q.h"
 #include "gmpcompat.h"
-
 
 void test_set(char * in, char * out)
 {

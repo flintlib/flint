@@ -9,8 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
-#include "flint.h"
+#ifdef __GNUC__
+# define memset __builtin_memset
+#else
+# include <string.h>
+#endif
+
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"

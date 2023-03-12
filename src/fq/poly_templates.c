@@ -18,6 +18,16 @@
 */
 
 #include <stdio.h>
+
+#ifdef __GNUC__
+# define ceil __builtin_ceil
+# define log10 __builtin_log10
+# define strlen __builtin_strlen
+#else
+# include <math.h>
+# include <string.h>
+#endif
+
 #include "fq_poly.h"
 #include "fq_mat.h"
 

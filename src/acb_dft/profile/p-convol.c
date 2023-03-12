@@ -9,7 +9,6 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
 #include "acb_dft.h"
 #include "profiler.h"
 

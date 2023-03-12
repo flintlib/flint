@@ -10,7 +10,6 @@
 */
 
 #include <math.h>
-#include <string.h>
 #include "dlog.h"
 #include "profiler.h"
 

@@ -10,7 +10,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
 #include "fmpz_mpoly.h"
 
 #define ALLOC_PER_VAR ((FLINT_BITS+4)/3)

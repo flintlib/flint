@@ -9,7 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
+#ifdef __GNUC__
+# define strlen __builtin_strlen
+#else
+# include <string.h>
+#endif
 
 #include "fmpz_poly_q.h"
 

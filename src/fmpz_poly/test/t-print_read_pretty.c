@@ -18,7 +18,12 @@
 #if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER) 
 #include <unistd.h>
 #endif
-#include <string.h>
+
+#ifdef __GNUC__
+# define strcmp __builtin_strcmp
+#else
+# include <string.h>
+#endif
 
 #include "flint.h"
 #include "fmpz.h"

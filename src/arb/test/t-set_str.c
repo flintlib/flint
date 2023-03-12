@@ -10,7 +10,14 @@
 */
 
 #include <stdlib.h>
-#include <string.h>
+
+#ifdef __GNUC__
+# define strcat __builtin_strcat
+# define strcpy __builtin_strcpy
+#else
+# include <string.h>
+#endif
+
 #include "arb.h"
 
 const char * testdata_floats[] = {

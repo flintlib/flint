@@ -10,7 +10,6 @@
 */
 
 #include <stdlib.h>
-#include <string.h>
 #include "fmpz_mod_mpoly_factor.h"
 
 typedef struct {

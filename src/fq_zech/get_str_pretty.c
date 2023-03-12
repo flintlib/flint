@@ -9,8 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#ifdef __GNUC__
+# define strlen __builtin_strlen
+#else
+# include <string.h>
+#endif
+
 #include "fq_zech.h"
-#include <string.h>
 
 char *
 fq_zech_get_str_pretty(const fq_zech_t op, const fq_zech_ctx_t ctx)

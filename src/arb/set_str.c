@@ -9,8 +9,17 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
 #include <ctype.h>
+
+#ifdef __GNUC__
+# define strchr __builtin_strchr
+# define strcmp __builtin_strcmp
+# define strstr __builtin_strstr
+# define strlen __builtin_strlen
+#else
+# include <string.h>
+#endif
+
 #include "arb.h"
 
 static int

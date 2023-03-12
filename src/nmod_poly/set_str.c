@@ -10,8 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
-#include "flint.h"
+#ifdef __GNUC__
+# define strcspn __builtin_strcspn
+# define strspn __builtin_strspn
+#else
+# include <string.h>
+#endif
+
 #include "nmod_poly.h"
 
 int nmod_poly_set_str(nmod_poly_t poly, const char * s)

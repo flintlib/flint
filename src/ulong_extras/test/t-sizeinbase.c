@@ -9,8 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
-#include "flint.h"
+#ifdef __GNUC__
+# define strlen __builtin_strlen
+#else
+# include <string.h>
+#endif
+
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 

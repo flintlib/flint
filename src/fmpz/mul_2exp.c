@@ -10,8 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#ifdef __GNUC__
+# define memset __builtin_memset
+#else
+# include <string.h>
+#endif
+
 #include "fmpz.h"
-#include <string.h>
 
 void
 fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp)

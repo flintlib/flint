@@ -10,7 +10,6 @@
 */
 
 #include <stdlib.h>
-#include <string.h>
 #include "fq_nmod_mpoly_factor.h"
 
 typedef struct {
