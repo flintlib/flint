@@ -432,27 +432,16 @@ Composition
     The underscore methods do not support aliasing of the output
     with either input polynomial.
 
-.. function:: void _acb_poly_compose_series_horner(acb_ptr res, acb_srcptr poly1, slong len1, acb_srcptr poly2, slong len2, slong n, slong prec)
-
-.. function:: void acb_poly_compose_series_horner(acb_poly_t res, const acb_poly_t poly1, const acb_poly_t poly2, slong n, slong prec)
-
-.. function:: void _acb_poly_compose_series_brent_kung(acb_ptr res, acb_srcptr poly1, slong len1, acb_srcptr poly2, slong len2, slong n, slong prec)
-
-.. function:: void acb_poly_compose_series_brent_kung(acb_poly_t res, const acb_poly_t poly1, const acb_poly_t poly2, slong n, slong prec)
-
 .. function:: void _acb_poly_compose_series(acb_ptr res, acb_srcptr poly1, slong len1, acb_srcptr poly2, slong len2, slong n, slong prec)
-
-.. function:: void acb_poly_compose_series(acb_poly_t res, const acb_poly_t poly1, const acb_poly_t poly2, slong n, slong prec)
+              void acb_poly_compose_series(acb_poly_t res, const acb_poly_t poly1, const acb_poly_t poly2, slong n, slong prec)
 
     Sets *res* to the power series composition `h(x) = f(g(x))` truncated
-    to order `O(x^n)` where `f` is given by *poly1* and `g` is given by *poly2*,
-    respectively using Horner's rule, the Brent-Kung baby step-giant step
-    algorithm, and an automatic choice between the two algorithms.
-
-    The default algorithm also handles special-form input `g = ax^n` efficiently.
+    to order `O(x^n)` where `f` is given by *poly1* and `g` is given by *poly2*.
+    Wraps :func:`_gr_poly_compose_series` which chooses automatically
+    between various algorithms.
 
     We require that the constant term in `g(x)` is exactly zero.
-    The underscore methods do not support aliasing of the output
+    The underscore method does not support aliasing of the output
     with either input polynomial.
 
 .. function:: void _acb_poly_revert_series_lagrange(acb_ptr h, acb_srcptr f, slong flen, slong n, slong prec)

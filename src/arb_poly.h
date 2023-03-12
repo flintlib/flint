@@ -375,13 +375,6 @@ void _arb_poly_compose_divconquer(arb_ptr res,
 void arb_poly_compose_divconquer(arb_poly_t res,
               const arb_poly_t poly1, const arb_poly_t poly2, slong prec);
 
-void _arb_poly_compose_series_horner(arb_ptr res, arb_srcptr poly1, slong len1,
-                            arb_srcptr poly2, slong len2, slong n, slong prec);
-
-void arb_poly_compose_series_horner(arb_poly_t res,
-                    const arb_poly_t poly1,
-                    const arb_poly_t poly2, slong n, slong prec);
-
 void _arb_poly_compose_series(arb_ptr res, arb_srcptr poly1, slong len1,
                             arb_srcptr poly2, slong len2, slong n, slong prec);
 
@@ -629,14 +622,6 @@ void arb_poly_sinc_series(arb_poly_t g, const arb_poly_t h, slong n, slong prec)
 
 void _arb_poly_sinc_pi_series(arb_ptr g, arb_srcptr h, slong hlen, slong n, slong prec);
 void arb_poly_sinc_pi_series(arb_poly_t g, const arb_poly_t h, slong n, slong prec);
-
-void _arb_poly_compose_series_brent_kung(arb_ptr res, arb_srcptr poly1, slong len1,
-                            arb_srcptr poly2, slong len2, slong n, slong prec);
-
-void arb_poly_compose_series_brent_kung(arb_poly_t res,
-                    const arb_poly_t poly1,
-                    const arb_poly_t poly2, slong n, slong prec);
-
 
 void _arb_poly_evaluate_acb_horner(acb_t res, arb_srcptr f, slong len, const acb_t x, slong prec);
 void arb_poly_evaluate_acb_horner(acb_t res, const arb_poly_t f, const acb_t a, slong prec);

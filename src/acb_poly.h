@@ -410,20 +410,6 @@ void _acb_poly_compose_divconquer(acb_ptr res,
 void acb_poly_compose_divconquer(acb_poly_t res,
               const acb_poly_t poly1, const acb_poly_t poly2, slong prec);
 
-void _acb_poly_compose_series_horner(acb_ptr res, acb_srcptr poly1, slong len1,
-                            acb_srcptr poly2, slong len2, slong n, slong prec);
-
-void acb_poly_compose_series_horner(acb_poly_t res,
-                    const acb_poly_t poly1,
-                    const acb_poly_t poly2, slong n, slong prec);
-
-void _acb_poly_compose_series_brent_kung(acb_ptr res, acb_srcptr poly1, slong len1,
-                            acb_srcptr poly2, slong len2, slong n, slong prec);
-
-void acb_poly_compose_series_brent_kung(acb_poly_t res,
-                    const acb_poly_t poly1,
-                    const acb_poly_t poly2, slong n, slong prec);
-
 void _acb_poly_compose_series(acb_ptr res, acb_srcptr poly1, slong len1,
                             acb_srcptr poly2, slong len2, slong n, slong prec);
 

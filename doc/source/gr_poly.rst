@@ -357,6 +357,18 @@ Power series composition and reversion
               int _gr_poly_compose_series(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
               int gr_poly_compose_series(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, gr_ctx_t ctx)
 
+    Sets *res* to the power series composition `h(x) = f(g(x))` truncated
+    to order `O(x^n)` where `f` is given by *poly1* and `g` is given by *poly2*,
+    respectively using Horner's rule, the Brent-Kung baby step-giant step
+    algorithm, divide-and-conquer, and an automatic choice between the algorithms.
+
+    The default algorithm also handles short input and
+    special-form input `g = ax^n` efficiently.
+
+    We require that the constant term in `g(x)` is exactly zero.
+    The underscore methods do not support aliasing of the output
+    with either input polynomial, and do not zero-pad the result.
+
 Derivative and integral
 -------------------------------------------------------------------------------
 
