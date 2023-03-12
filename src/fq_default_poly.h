@@ -1560,7 +1560,7 @@ void fq_default_poly_powmod_fmpz_binexp(fq_default_poly_t res,
         fq_nmod_poly_powmod_fmpz_binexp(res->fq_nmod,
                                poly->fq_nmod, e, f->fq_nmod, ctx->ctx.fq_nmod);
     }
-    else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
+    else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         nmod_poly_powmod_fmpz_binexp(res->nmod, poly->nmod, (fmpz*) e, f->nmod);
     }
