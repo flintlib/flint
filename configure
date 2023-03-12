@@ -136,6 +136,7 @@ Configuration:
                           [ar]
   LDCONFIG=<name>         Use the given ldconfig tool
   CFLAGS=<flags>          Pass the given flags to the compiler
+  TEST_CFLAGS=<flags>     Pass the given flags to the compiler for tests
   CXXFLAGS=<flags>        Pass the given flags to the C++ compiler
   ABI=[32|64]             Tell the compiler to use given ABI
 _ACEOF
@@ -287,6 +288,9 @@ while [ "$1" != "" ]; do
          ;;
       CFLAGS)
          CFLAGS="$VALUE"
+         ;;
+      TEST_CFLAGS)
+         TEST_CFLAGS="$VALUE"
          ;;
       CXXFLAGS)
          CXXFLAGS="$VALUE"
@@ -726,6 +730,10 @@ if [ "$KERNEL" = Darwin ]; then
    CFLAGS="-fno-common $CFLAGS"
 fi
 
+if [ -z "$TEST_CFLAGS" ]; then
+    TEST_CFLAGS="$CFLAGS"
+fi
+
 #PIC flag
 
 if [ -z "$PIC_FLAG" ]; then
@@ -984,6 +992,7 @@ AR:=$AR
 LDCONFIG:=$LDCONFIG
 
 CFLAGS:=$ANSI_FLAG $CFLAGS
+TEST_CFLAGS:=$ANSI_FLAG $TEST_CFLAGS
 CXXFLAGS:=$CXXFLAGS
 ABI_FLAG:=$ABI_FLAG
 PIC_FLAG:=$PIC_FLAG

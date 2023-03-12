@@ -442,24 +442,24 @@ endif
 ifeq ($(FLINT_SHARED), 0)
 $(BUILD_DIR)/profile/%$(EXEEXT): $(SRC_DIR)/profile/%.c $(FLINT_DIR)/libflint.a | $(BUILD_DIR)/profile
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
+	@$(CC) $(TEST_CFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
 else
 $(BUILD_DIR)/profile/%$(EXEEXT): $(SRC_DIR)/profile/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/profile
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
+	@$(CC) $(TEST_CFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
 endif
 
 ifeq ($(FLINT_SHARED), 0)
 define xxx_PROFS_rule
 $(BUILD_DIR)/$(1)/profile/%$(EXEEXT): $(SRC_DIR)/$(1)/profile/%.c $(FLINT_DIR)/libflint.a | $(BUILD_DIR)/$(1)/profile
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $$(@:%=%.d)
+	@$(CC) $(TEST_CFLAGS) $(INCS) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $$(@:%=%.d)
 endef
 else
 define xxx_PROFS_rule
 $(BUILD_DIR)/$(1)/profile/%$(EXEEXT): $(SRC_DIR)/$(1)/profile/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/$(1)/profile
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $$(@:%=%.d)
+	@$(CC) $(TEST_CFLAGS) $(INCS) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $$(@:%=%.d)
 endef
 endif
 
@@ -468,24 +468,24 @@ $(foreach dir, $(DIRS), $(eval $(call xxx_PROFS_rule,$(dir))))
 ifeq ($(FLINT_SHARED), 0)
 $(BUILD_DIR)/test/%$(EXEEXT): $(SRC_DIR)/test/%.c $(FLINT_DIR)/libflint.a | $(BUILD_DIR)/test
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
+	@$(CC) $(TEST_CFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
 else
 $(BUILD_DIR)/test/%$(EXEEXT): $(SRC_DIR)/test/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/test
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
+	@$(CC) $(TEST_CFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
 endif
 
 ifeq ($(FLINT_SHARED), 0)
 define xxx_TESTS_rule
 $(BUILD_DIR)/$(1)/test/%$(EXEEXT): $(SRC_DIR)/$(1)/test/%.c $(FLINT_DIR)/libflint.a | $(BUILD_DIR)/$(1)/test
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $$(@:%=%.d)
+	@$(CC) $(TEST_CFLAGS) $(INCS) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $$(@:%=%.d)
 endef
 else
 define xxx_TESTS_rule
 $(BUILD_DIR)/$(1)/test/%$(EXEEXT): $(SRC_DIR)/$(1)/test/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/$(1)/test
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $$(@:%=%.d)
+	@$(CC) $(TEST_CFLAGS) $(INCS) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $$(@:%=%.d)
 endef
 endif
 
@@ -506,24 +506,24 @@ endif
 ifeq ($(FLINT_SHARED), 0)
 $(BUILD_DIR)/tune/%$(EXEEXT): $(SRC_DIR)/tune/%.c $(FLINT_DIR)/libflint.a | $(BUILD_DIR)/tune
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
+	@$(CC) $(TEST_CFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
 else
 $(BUILD_DIR)/tune/%$(EXEEXT): $(SRC_DIR)/tune/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/tune
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
+	@$(CC) $(TEST_CFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
 endif
 
 ifeq ($(FLINT_SHARED), 0)
 define xxx_TUNES_rule
 $(BUILD_DIR)/$(1)/tune/%$(EXEEXT): $(SRC_DIR)/$(1)/tune/%.c $(FLINT_DIR)/libflint.a | $(BUILD_DIR)/$(1)/tune
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $$(@:%=%.d)
+	@$(CC) $(TEST_CFLAGS) $(INCS) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $$(@:%=%.d)
 endef
 else
 define xxx_TUNES_rule
 $(BUILD_DIR)/$(1)/tune/%$(EXEEXT): $(SRC_DIR)/$(1)/tune/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/$(1)/tune
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $$(@:%=%.d)
+	@$(CC) $(TEST_CFLAGS) $(INCS) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $$(@:%=%.d)
 endef
 endif
 
@@ -532,11 +532,11 @@ $(foreach dir, $(DIRS), $(eval $(call xxx_TUNES_rule,$(dir))))
 ifeq ($(FLINT_SHARED), 0)
 $(BUILD_DIR)/examples/%$(EXEEXT): $(FLINT_DIR)/examples/%.c $(FLINT_DIR)/libflint.a | $(BUILD_DIR)/examples
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
+	@$(CC) $(TEST_CFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
 else
 $(BUILD_DIR)/examples/%$(EXEEXT): $(FLINT_DIR)/examples/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/examples
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
+	@$(CC) $(TEST_CFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
 endif
 
 ################################################################################
