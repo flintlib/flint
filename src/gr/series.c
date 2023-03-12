@@ -174,6 +174,7 @@ gr_series_one(gr_series_t res, gr_series_ctx_t sctx, gr_ctx_t cctx)
     }
 }
 
+/* todo: truncate without set */
 int
 gr_series_set(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx_t cctx)
 {
@@ -194,7 +195,7 @@ gr_series_set(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx
         if (len > sctx->prec)
             res->error = FLINT_MIN(res->error, sctx->prec);
 
-        status |= gr_poly_truncate(&res->poly, trunc, cctx);
+        status |= gr_poly_truncate(&res->poly, &res->poly, trunc, cctx);
     }
 
     return status;
@@ -214,6 +215,7 @@ gr_series_gen(gr_series_t res, gr_series_ctx_t sctx, gr_ctx_t cctx)
     return status;
 }
 
+/* todo: truncate before neg */
 int
 gr_series_neg(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx_t cctx)
 {
@@ -234,7 +236,7 @@ gr_series_neg(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx
         if (len > sctx->prec)
             res->error = FLINT_MIN(res->error, sctx->prec);
 
-        status |= gr_poly_truncate(&res->poly, trunc, cctx);
+        status |= gr_poly_truncate(&res->poly, &res->poly, trunc, cctx);
     }
 
     return status;

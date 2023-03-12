@@ -13,9 +13,11 @@
 #include "fmpq.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "nmod_mat.h"
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "gr_mat.h"
 
 #define NMOD_CTX_REF(ring_ctx) (((nmod_t *)((ring_ctx))))
 #define NMOD_CTX(ring_ctx) (*NMOD_CTX_REF(ring_ctx))
@@ -1087,6 +1089,55 @@ _gr_nmod_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int 
 
 }
 
+int
+_gr_nmod_mat_mul(gr_mat_t res, const gr_mat_t x, const gr_mat_t y, gr_ctx_t ctx)
+{
+    nmod_mat_t R, X, Y;
+    nmod_mat_struct *XX, *YY;
+
+    R->entries = res->entries;
+    R->rows = (mp_ptr *) res->rows;
+    R->r = res->r;
+    R->c = res->c;
+    R->mod = NMOD_CTX(ctx);
+
+    if (res == x)
+    {
+        XX = R;
+    }
+    else
+    {
+        X->entries = x->entries;
+        X->rows = (mp_ptr *) x->rows;
+        X->r = x->r;
+        X->c = x->c;
+        X->mod = NMOD_CTX(ctx);
+        XX = X;
+    }
+
+    if (res == y)
+    {
+        YY = R;
+    }
+    else if (x == y)
+    {
+        YY = XX;
+    }
+    else
+    {
+        Y->entries = y->entries;
+        Y->rows = (mp_ptr *) y->rows;
+        Y->r = y->r;
+        Y->c = y->c;
+        Y->mod = NMOD_CTX(ctx);
+        YY = Y;
+    }
+
+    nmod_mat_mul(R, XX, YY);
+
+    return GR_SUCCESS;
+}
+
 int __gr_nmod_methods_initialized = 0;
 
 gr_static_method_table __gr_nmod_methods;
@@ -1171,6 +1222,8 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_POLY_SQRT_SERIES,  (gr_funcptr) _gr_nmod_poly_sqrt_series},
     {GR_METHOD_POLY_EXP_SERIES,  (gr_funcptr) _gr_nmod_poly_exp_series},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_nmod_roots_gr_poly},
+    {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_nmod_mat_mul},
+
     {0,                         (gr_funcptr) NULL},
 };
 

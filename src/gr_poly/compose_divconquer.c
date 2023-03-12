@@ -44,7 +44,7 @@ _gr_poly_compose_divconquer(gr_ptr res, gr_srcptr poly1, slong len1,
 
     for (k = 1; (2 << k) < len1; k++) ;
 
-    hlen[0] = hlen[1] = ((1 << k) - 1) * (len2 - 1) + 1;
+    hlen[0] = hlen[1] = ((1 << k) - 1) *(len2 - 1) + 1;
     for (i = k - 1; i > 0; i--)
     {
         slong hi = (len1 + (1 << i) - 1) / (1 << i);
@@ -57,8 +57,7 @@ _gr_poly_compose_divconquer(gr_ptr res, gr_srcptr poly1, slong len1,
     for (i = 0; i < (len1 + 1) / 2; i++)
         alloc += hlen[i];
 
-    v = flint_malloc(sz * (alloc + 2 * powlen));
-    _gr_vec_init(v, alloc + 2 * powlen, ctx);
+    GR_TMP_INIT_VEC(v, alloc + 2 * powlen, ctx);
 
     h = (gr_ptr *) flint_malloc(((len1 + 1) / 2) * sizeof(gr_ptr));
     h[0] = v;
@@ -88,6 +87,7 @@ _gr_poly_compose_divconquer(gr_ptr res, gr_srcptr poly1, slong len1,
             hlen[i] = 1;
         }
     }
+
     if ((len1 & WORD(1)))
     {
         if (gr_is_zero(GR_ENTRY(poly1, j, sz), ctx) != T_TRUE)
@@ -144,8 +144,7 @@ _gr_poly_compose_divconquer(gr_ptr res, gr_srcptr poly1, slong len1,
     status |= _gr_poly_mul(res, pow, powlen, h[1], hlen[1], ctx);
     status |= _gr_vec_add(res, res, h[0], hlen[0], ctx);
 
-    _gr_vec_clear(v, alloc + 2 * powlen, ctx);
-    flint_free(v);
+    GR_TMP_CLEAR_VEC(v, alloc + 2 * powlen, ctx);
 
     flint_free(h);
     flint_free(hlen);

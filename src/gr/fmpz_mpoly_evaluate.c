@@ -59,7 +59,7 @@ static int _gr_pmul(gr_ptr A, gr_srcptr X, const fmpz_t pow, gr_ptr T, gr_ctx_t 
         int status;
         status = gr_pow_fmpz(T, X, pow, ctx);
         status |= gr_mul(A, A, T, ctx);
-        return GR_SUCCESS;
+        return status;
     }
 }
 

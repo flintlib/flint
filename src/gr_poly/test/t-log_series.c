@@ -73,7 +73,7 @@ test_log_series(flint_rand_t state)
         }
 
         status |= gr_poly_log_series(fb, a, n + n_randint(state, 3), ctx);
-        status |= gr_poly_truncate(fb, n, ctx);
+        status |= gr_poly_truncate(fb, fb, n, ctx);
 
         if (status == GR_SUCCESS && gr_poly_equal(fa, fb, ctx) == T_FALSE)
         {

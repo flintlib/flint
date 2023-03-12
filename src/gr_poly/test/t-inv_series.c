@@ -68,7 +68,7 @@ test_inv_series(flint_rand_t state, int which)
     {
         status |= gr_poly_mullow(AB, A, B, n, ctx);
         status |= gr_poly_one(one, ctx);
-        status |= gr_poly_truncate(one, n, ctx);
+        status |= gr_poly_truncate(one, one, n, ctx);
 
         if (status == GR_SUCCESS && gr_poly_equal(AB, one, ctx) == T_FALSE)
         {

@@ -2067,7 +2067,7 @@ gr_test_sqrt(gr_ctx_t R, flint_rand_t state, int test_flags)
         status = GR_TEST_FAIL;
     }
 
-    if (status == GR_DOMAIN && perfect && gr_is_square(x, R) == T_FALSE)
+    if (status == GR_SUCCESS && perfect && gr_is_square(x, R) == T_FALSE)
     {
         status = GR_TEST_FAIL;
     }
@@ -2086,6 +2086,59 @@ gr_test_sqrt(gr_ctx_t R, flint_rand_t state, int test_flags)
     }
 
     GR_TMP_CLEAR3(x, y, y2, R);
+
+    return status;
+}
+
+int
+gr_test_rsqrt(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status = GR_SUCCESS;
+    gr_ptr x, y, z;
+    int perfect;
+
+    GR_TMP_INIT3(x, y, z, R);
+
+    GR_MUST_SUCCEED(gr_randtest(x, state, R));
+    GR_MUST_SUCCEED(gr_randtest(y, state, R));
+
+    perfect = n_randint(state, 2);
+
+    if (perfect)
+        status |= gr_sqr(x, x, R);
+
+    if (n_randint(state, 2))
+    {
+        status |= gr_set(y, x, R);
+        status |= gr_rsqrt(y, y, R);
+    }
+    else
+    {
+        status |= gr_rsqrt(y, x, R);
+    }
+
+    status |= gr_inv(z, y, R);
+    status |= gr_sqr(z, z, R);
+
+    if (status == GR_SUCCESS && gr_equal(z, x, R) == T_FALSE)
+    {
+        status = GR_TEST_FAIL;
+    }
+
+    if ((test_flags & GR_TEST_ALWAYS_ABLE) && (status & GR_UNABLE))
+        status = GR_TEST_FAIL;
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        flint_printf("FAIL: rsqrt\n");
+        printf("R = "); gr_ctx_println(R);
+        printf("x = \n"); gr_println(x, R);
+        printf("y = \n"); gr_println(y, R);
+        printf("1 / y ^ 2 = \n"); gr_println(z, R);
+        printf("\n");
+    }
+
+    GR_TMP_CLEAR3(x, y, z, R);
 
     return status;
 }
@@ -2651,6 +2704,7 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
     gr_test_iter(R, state, "pow_fmpz: exponent addition", gr_test_pow_fmpz_exponent_addition, iters, test_flags);
 
     gr_test_iter(R, state, "sqrt", gr_test_sqrt, iters, test_flags & (~GR_TEST_ALWAYS_ABLE));
+    gr_test_iter(R, state, "rsqrt", gr_test_sqrt, iters, test_flags & (~GR_TEST_ALWAYS_ABLE));
 
     if (gr_ctx_is_ordered_ring(R) == T_TRUE)
     {

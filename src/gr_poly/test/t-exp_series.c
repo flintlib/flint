@@ -118,7 +118,7 @@ test_exp_series(flint_rand_t state)
     if (status == GR_SUCCESS)
     {
         status |= gr_poly_mullow(fafb, fa, fb, FLINT_MIN(FLINT_MIN(len1, len2), len3), ctx);
-        status |= gr_poly_truncate(fab, FLINT_MIN(FLINT_MIN(len1, len2), len3), ctx);
+        status |= gr_poly_truncate(fab, fab, FLINT_MIN(FLINT_MIN(len1, len2), len3), ctx);
 
         if (status == GR_SUCCESS && gr_poly_equal(fafb, fab, ctx) == T_FALSE)
         {

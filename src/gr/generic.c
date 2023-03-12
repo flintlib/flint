@@ -107,7 +107,7 @@ int gr_generic_randtest_not_zero(gr_ptr x, flint_rand_t state, gr_ctx_t ctx)
         status |= gr_neg_one(x, ctx);
 
     /* unused */
-    status = status;
+    (void) status;
 
     is_zero = gr_is_zero(x, ctx);
     if (is_zero == T_FALSE)
@@ -1572,7 +1572,7 @@ gr_generic_bernoulli_vec(gr_ptr res, slong len, gr_ctx_t ctx)
             arb_clear(t);
             gr_ctx_clear(RR);
 
-            return GR_SUCCESS;
+            return status;
         }
     }
 
@@ -1714,7 +1714,7 @@ gr_generic_eulernum_vec(gr_ptr res, slong len, gr_ctx_t ctx)
             arb_clear(t);
             gr_ctx_clear(RR);
 
-            return GR_SUCCESS;
+            return status;
         }
     }
 

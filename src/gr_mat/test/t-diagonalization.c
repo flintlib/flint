@@ -86,7 +86,7 @@ int main()
                 status |= gr_mat_mul_diag(B, R, D, ctx);
                 status |= gr_mat_mul(B, B, L, ctx);
 
-                if (gr_mat_equal(A, B, ctx) == T_FALSE)
+                if (status == GR_SUCCESS && gr_mat_equal(A, B, ctx) == T_FALSE)
                 {
                     flint_printf("FAIL: RDL != A\n");
                     flint_printf("A: "); gr_mat_print(A, ctx); flint_printf("\n");

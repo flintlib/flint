@@ -299,7 +299,7 @@ _ca_ext_get_fexpr_given_ext(fexpr_t res, const ca_ext_t x, ulong flags,
 
         f = CA_EXT_HEAD(x);
         nargs = CA_EXT_FUNC_NARGS(x);
-        nargs = nargs;
+        (void) nargs;   /* currently unused */
 
         /* Todo: make a table */
         switch (f)

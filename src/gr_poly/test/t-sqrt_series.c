@@ -76,7 +76,7 @@ test_sqrt_series(flint_rand_t state, int which)
     if (status == GR_SUCCESS)
     {
         status |= gr_poly_mullow(C, B, B, n, ctx);
-        status |= gr_poly_truncate(A, n, ctx);
+        status |= gr_poly_truncate(A, A, n, ctx);
 
         if (status == GR_SUCCESS && gr_poly_equal(C, A, ctx) == T_FALSE)
         {
