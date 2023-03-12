@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include <gmp.h>
 #include "fft.h"
 
 void butterfly_lshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1, 

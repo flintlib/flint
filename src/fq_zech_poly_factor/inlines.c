@@ -12,6 +12,7 @@
 #define FQ_ZECH_POLY_FACTOR_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "fq_zech_poly_factor.h"
 
 void fq_zech_poly_factor_get_poly(fq_zech_poly_t z,

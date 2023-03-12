@@ -21,6 +21,10 @@
 
 #include "flint.h"
 
+#ifndef FLINT_HAVE_GMP
+# error gmp.h must be included to utilize this file.
+#endif
+
 typedef __mpf_struct mpf;
 
 #ifdef __cplusplus

@@ -12,6 +12,7 @@
 #define NMOD_POLY_FACTOR_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "nmod_poly.h"
 
 void nmod_poly_factor_get_nmod_poly(nmod_poly_t z, nmod_poly_factor_t fac, slong i)

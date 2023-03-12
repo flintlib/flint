@@ -11,5 +11,6 @@
 
 #define GR_VEC_INLINES_C
 #include <stdio.h>
+#include <gmp.h>
 #include "gr_vec.h"
 #undef GR_VEC_INLINES_C

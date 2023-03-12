@@ -12,6 +12,7 @@
 */
 
 #include <float.h>
+#include <gmp.h>
 #include "fmpz_mat.h"
 #include "fmpz_lll.h"
 

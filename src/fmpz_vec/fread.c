@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include <gmp.h>
 #include "gmpcompat.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"

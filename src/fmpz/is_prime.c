@@ -11,7 +11,6 @@
 */
 
 #include "fmpz.h"
-#include "fmpz_vec.h"
 #include "nmod_vec.h"
 #include "aprcl.h"
 #include "mpn_extras.h"

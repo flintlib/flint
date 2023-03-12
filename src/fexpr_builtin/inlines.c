@@ -11,5 +11,6 @@
 
 #define FEXPR_BUILTIN_INLINES_C
 #include <stdio.h>
+#include <gmp.h>
 #include "fexpr_builtin.h"
 

@@ -11,8 +11,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include <gmp.h>
 #include "mpn_extras.h"
+#include "fmpz.h"
 
 /* This can only be called from fmpz_mul, and assumes
    x and y are not small. */

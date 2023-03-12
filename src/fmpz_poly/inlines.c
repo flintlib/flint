@@ -12,5 +12,6 @@
 #define FMPZ_POLY_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "fmpz_poly.h"
 

@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include <gmp.h>
 #include "mpn_extras.h"
 
 /* ret + (xp,n) = (yp,n)*(zp,n) % 2^b+1  

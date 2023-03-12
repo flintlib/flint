@@ -12,4 +12,5 @@
 #define FQ_NMOD_POLY_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "fq_nmod_poly.h"

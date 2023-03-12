@@ -20,6 +20,11 @@
 #endif
 
 #include "fmpz_types.h"
+
+#ifndef FLINT_HAVE_GMP
+# error gmp.h must be included to utilize this file.
+#endif
+
 #include "mpf_vec.h"
 
 #ifdef __cplusplus

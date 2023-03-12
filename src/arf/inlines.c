@@ -11,5 +11,6 @@
 
 #define ARF_INLINES_C
 #include <stdio.h>
+#include <gmp.h>
 #include "arf.h"
 

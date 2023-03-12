@@ -21,8 +21,7 @@
 #include <atomic.h>
 #endif
 
-
-#include "flint.h"
+#include <gmp.h>
 #include "gmpcompat.h"
 #include "fmpz.h"
 

@@ -16,6 +16,7 @@
 # include <math.h>
 #endif
 
+#include <gmp.h>
 #include "mpn_extras.h"
 #include "nmod_mpoly.h"
 #include "fmpz_mpoly.h"

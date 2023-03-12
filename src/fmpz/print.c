@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include <gmp.h>
 #include "fmpz.h"
 
 int fmpz_print(const fmpz_t x)

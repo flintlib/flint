@@ -12,4 +12,5 @@
 #define FMPZ_VEC_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "fmpz_vec.h"

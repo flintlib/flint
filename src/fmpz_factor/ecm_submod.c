@@ -9,9 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
+#include <gmp.h>
 #include "mpn_extras.h"
+#include "fmpz_factor.h"
 
 /* x = (a - b) mod n 
 

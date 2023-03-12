@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "fmpz_mpoly.h"
 
 void fmpz_mpoly_neg(fmpz_mpoly_t A, const fmpz_mpoly_t B,

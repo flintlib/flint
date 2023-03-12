@@ -11,6 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "double_extras.h"
 #include "fmpz_mat.h"
 #include "fmpz_lll.h"

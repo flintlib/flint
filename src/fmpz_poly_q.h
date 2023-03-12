@@ -116,11 +116,15 @@ FLINT_DLL void fmpz_poly_q_submul(fmpz_poly_q_t rop, const fmpz_poly_q_t op1, co
 
 FLINT_DLL void fmpz_poly_q_scalar_mul_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, slong x);
 FLINT_DLL void fmpz_poly_q_scalar_mul_mpz(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const mpz_t x);
+#ifdef FLINT_HAVE_GMP
 FLINT_DLL void fmpz_poly_q_scalar_mul_mpq(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const mpq_t x);
+#endif
 
 FLINT_DLL void fmpz_poly_q_scalar_div_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, slong x);
 FLINT_DLL void fmpz_poly_q_scalar_div_mpz(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const mpz_t x);
+#ifdef FLINT_HAVE_GMP
 FLINT_DLL void fmpz_poly_q_scalar_div_mpq(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const mpq_t x);
+#endif
 
 /* Multiplication and division ***********************************************/
 
@@ -140,7 +144,9 @@ FLINT_DLL void fmpz_poly_q_derivative(fmpz_poly_q_t rop, const fmpz_poly_q_t op)
 
 /* Evaluation ****************************************************************/
 
+#ifdef FLINT_HAVE_GMP
 FLINT_DLL int fmpz_poly_q_evaluate(mpq_t rop, const fmpz_poly_q_t f, const mpq_t a);
+#endif
 
 /* Input and output **********************************************************/
 

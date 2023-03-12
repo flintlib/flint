@@ -11,5 +11,6 @@
 
 #define ARB_POLY_INLINES_C
 #include <stdio.h>
+#include <gmp.h>
 #include "arb_poly.h"
 

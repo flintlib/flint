@@ -11,7 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include <mpfr.h>
 #include "mpfr_vec.h"
 #include "mpfr_mat.h"
 

@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "mpfr.h"
+#include <mpfr.h>
 #include "arf.h"
 
 typedef int ((*mpfr_func_1x1)(mpfr_ptr, mpfr_srcptr, mpfr_rnd_t));

@@ -11,7 +11,6 @@
 
 #include "nmod_mpoly.h"
 
-
 int nmod_mpoly_gcd_cofactors(
     nmod_mpoly_t G,
     nmod_mpoly_t Abar,

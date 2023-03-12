@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "gmpcompat.h"
+#include <gmp.h>
 #include "mpn_extras.h"
 #include "ulong_extras.h"
 #include "fmpz_mat.h"

@@ -15,6 +15,7 @@
 # include <math.h>
 #endif
 
+#include <gmp.h>
 #include "nmod_mpoly.h"
 #include "fq_zech_mpoly.h"
 

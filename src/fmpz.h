@@ -108,6 +108,7 @@ void fmpz_init(fmpz_t f)
 
 FLINT_DLL void fmpz_init2(fmpz_t f, ulong limbs);
 
+#ifdef FLINT_HAVE_GMP
 FMPZ_INLINE
 void fmpz_init_set(fmpz_t f, const fmpz_t g)
 {
@@ -124,10 +125,16 @@ void fmpz_init_set(fmpz_t f, const fmpz_t g)
         mpz_set(ptr, COEFF_TO_PTR(*g));
     }
 }
+#else
+void fmpz_init_set(fmpz_t f, const fmpz_t g);
+#endif
 
+#ifdef FLINT_HAVE_GMP
 FLINT_DLL void _fmpz_mpz_set_ui(mpz_ptr r, ulong u);
 FLINT_DLL void _fmpz_mpz_set_si(mpz_ptr r, slong s);
+#endif
 
+#ifdef FLINT_HAVE_GMP
 FMPZ_INLINE
 void fmpz_init_set_ui(fmpz_t f, ulong g)
 {
@@ -161,6 +168,10 @@ void fmpz_init_set_si(fmpz_t f, slong g)
         _fmpz_mpz_set_si(ptr, g);
     }
 }
+#else
+void fmpz_init_set_ui(fmpz_t f, ulong g);
+void fmpz_init_set_si(fmpz_t f, slong g);
+#endif
 
 FMPZ_INLINE
 void fmpz_clear(fmpz_t f)
@@ -208,6 +219,7 @@ fmpz_get_uiui(mp_limb_t * hi, mp_limb_t * low, const fmpz_t f)
     }
 }
 
+#ifdef FLINT_HAVE_GMP
 FMPZ_INLINE void
 fmpz_set_si(fmpz_t f, slong val)
 {
@@ -289,6 +301,13 @@ fmpz_neg_uiui(fmpz_t f, mp_limb_t hi, mp_limb_t lo)
         z->_mp_size = -2;
     }
 }
+#else
+void fmpz_set_si(fmpz_t f, slong val);
+void fmpz_set_ui(fmpz_t f, ulong val);
+void fmpz_neg_ui(fmpz_t f, ulong val);
+void fmpz_set_uiui(fmpz_t f, mp_limb_t hi, mp_limb_t lo);
+void fmpz_neg_uiui(fmpz_t f, mp_limb_t hi, mp_limb_t lo);
+#endif
 
 FLINT_DLL void fmpz_get_signed_uiui(ulong * hi, ulong * lo, const fmpz_t x);
 
@@ -325,9 +344,10 @@ FLINT_DLL double fmpz_get_d(const fmpz_t f);
 
 FLINT_DLL void fmpz_set_d(fmpz_t f, double c);
 
+#ifdef FLINT_HAVE_GMP
 FLINT_DLL void fmpz_get_mpf(mpf_t x, const fmpz_t f);
-
 FLINT_DLL void fmpz_set_mpf(fmpz_t f, const mpf_t x);
+#endif
 
 #ifdef FLINT_HAVE_MPFR
 FLINT_DLL void fmpz_get_mpfr(mpfr_t x, const fmpz_t f, mpfr_rnd_t rnd);
@@ -425,6 +445,7 @@ FLINT_DLL int fmpz_cmpabs(const fmpz_t f, const fmpz_t g);
 
 FLINT_DLL int fmpz_cmp2abs(const fmpz_t f, const fmpz_t g);
 
+#ifdef FLINT_HAVE_GMP
 FMPZ_INLINE
 int fmpz_is_even(const fmpz_t f)
 {
@@ -442,6 +463,10 @@ int fmpz_is_odd(const fmpz_t f)
     else
         return mpz_odd_p(COEFF_TO_PTR(*f));
 }
+#else
+int fmpz_is_even(const fmpz_t f);
+int fmpz_is_odd(const fmpz_t f);
+#endif
 
 FLINT_DLL mp_size_t fmpz_size(const fmpz_t f);
 

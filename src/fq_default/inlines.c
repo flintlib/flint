@@ -12,5 +12,6 @@
 #define FQ_DEFAULT_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "fq_default.h"
 

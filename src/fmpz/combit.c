@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "fmpz.h"
 
 void fmpz_combit(fmpz_t f, ulong i)

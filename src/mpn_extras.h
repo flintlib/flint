@@ -76,6 +76,7 @@
 FLINT_DLL void flint_mpn_mul_fft_main(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
                         mp_srcptr i2, mp_size_t n2);
 
+#ifdef FLINT_HAVE_GMP
 MPN_EXTRAS_INLINE mp_limb_t
 flint_mpn_mul(mp_ptr z, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn)
 {
@@ -105,6 +106,11 @@ flint_mpn_sqr(mp_ptr z, mp_srcptr x, mp_size_t n)
     else
         flint_mpn_mul_fft_main(z, x, n, x, n);
 }
+#else
+mp_limb_t flint_mpn_mul(mp_ptr z, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn);
+void flint_mpn_mul_n(mp_ptr z, mp_srcptr x, mp_srcptr y, mp_size_t n);
+void flint_mpn_sqr(mp_ptr z, mp_srcptr x, mp_size_t n);
+#endif
 
 #define FLINT_MPN_MUL_WITH_SPECIAL_CASES(_z, _x, _xn, _y, _yn) \
     if ((_xn) == (_yn)) \
@@ -167,10 +173,11 @@ mp_limb_t  __gmpn_modexact_1_odd(mp_srcptr src, mp_size_t size,
 #define mpn_modexact_1_odd __gmpn_modexact_1_odd
 */
 
-#ifdef mpn_modexact_1_odd
-#define flint_mpn_divisible_1_p(x, xsize, d) (mpn_modexact_1_odd(x, xsize, d) == 0)
-#else
-#include "gmpcompat.h"
+#ifdef FLINT_HAVE_GMP
+# ifdef mpn_modexact_1_odd
+#  define flint_mpn_divisible_1_p(x, xsize, d) (mpn_modexact_1_odd(x, xsize, d) == 0)
+# else
+#  include "gmpcompat.h"
 
 MPN_EXTRAS_INLINE int
 flint_mpn_divisible_1_p(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
@@ -180,10 +187,12 @@ flint_mpn_divisible_1_p(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
     s._mp_d = (mp_ptr) x;
     return flint_mpz_divisible_ui_p(&s, d);
 }
+# endif
 #endif
 
 /* todo: figure out how to call GMP's actual division code instead of mpn_tdiv_qr here */
-#ifndef mpn_tdiv_q
+#ifdef FLINT_HAVE_GMP
+# ifndef mpn_tdiv_q
 /* substitute for mpir's mpn_tdiv_q */
 static __inline__ void
 mpn_tdiv_q(mp_ptr qp, mp_srcptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn)
@@ -195,8 +204,8 @@ mpn_tdiv_q(mp_ptr qp, mp_srcptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn)
     mpn_tdiv_qr(qp, _scratch, 0, np, nn, dp, dn);
     TMP_END;
 }
+# endif
 #endif
-
 
 MPN_EXTRAS_INLINE
 int flint_mpn_zero_p(mp_srcptr x, mp_size_t xsize)
@@ -210,6 +219,7 @@ int flint_mpn_zero_p(mp_srcptr x, mp_size_t xsize)
     return 1;
 }
 
+#ifdef FLINT_HAVE_GMP
 MPN_EXTRAS_INLINE
 mp_size_t flint_mpn_divexact_1(mp_ptr x, mp_size_t xsize, mp_limb_t d)
 {
@@ -218,6 +228,9 @@ mp_size_t flint_mpn_divexact_1(mp_ptr x, mp_size_t xsize, mp_limb_t d)
         xsize -= 1;
     return xsize;
 }
+#else
+mp_size_t flint_mpn_divexact_1(mp_ptr x, mp_size_t xsize, mp_limb_t d);
+#endif
 
 FLINT_DLL void flint_mpn_debug(mp_srcptr x, mp_size_t xsize);
 
@@ -279,6 +292,7 @@ FLINT_DLL void flint_mpn_mulmod_preinvn(mp_ptr r,
 FLINT_DLL int flint_mpn_mulmod_2expp1_basecase(mp_ptr xp, mp_srcptr yp, mp_srcptr zp, 
     int c, flint_bitcnt_t b, mp_ptr tp);
 
+#ifdef FLINT_HAVE_GMP
 MPN_EXTRAS_INLINE
 void flint_mpn_rrandom(mp_limb_t *rp, gmp_randstate_t state, mp_size_t n)
 {
@@ -298,6 +312,7 @@ void flint_mpn_urandomb(mp_limb_t *rp, gmp_randstate_t state, flint_bitcnt_t n)
   str._mp_size = (n + FLINT_BITS - 1)/FLINT_BITS;
   mpz_rrandomb(&str,state,n);
 }
+#endif
 
 
 /******************************************************************************

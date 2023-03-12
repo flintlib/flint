@@ -10,8 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include <gmp.h>
 #include "ulong_extras.h"
+#include "fmpz.h"
 
 #if FLINT64
 #define LARGEST_ULONG_PRIMORIAL 52

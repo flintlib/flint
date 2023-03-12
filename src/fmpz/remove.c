@@ -9,10 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include <gmp.h>
 #include "gmpcompat.h"
-#include "fmpz.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 
 slong _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
 {

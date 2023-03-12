@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include <gmp.h>
 #include "n_poly.h"
 #include "nmod_vec.h"
 

@@ -12,5 +12,6 @@
 #define FQ_DEFAULT_POLY_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "fq_default_poly.h"
 

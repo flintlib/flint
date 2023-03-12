@@ -12,5 +12,6 @@
 #define QADIC_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "qadic.h"
 

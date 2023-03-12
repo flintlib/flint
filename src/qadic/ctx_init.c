@@ -18,6 +18,8 @@
 # include <string.h>
 #endif
 
+#include <gmp.h>
+
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 #include "padic.h"

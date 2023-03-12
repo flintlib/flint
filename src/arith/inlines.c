@@ -12,5 +12,6 @@
 #define ARITH_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "arith.h"
 

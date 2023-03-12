@@ -19,7 +19,7 @@
 #include "ulong_extras.h"
 
 void nf_elem_randtest(nf_elem_t a, flint_rand_t state, 
-                                               mp_bitcnt_t bits, const nf_t nf)
+                                               flint_bitcnt_t bits, const nf_t nf)
 {
     if (nf->flag & NF_LINEAR)
     {
@@ -67,7 +67,7 @@ void nf_elem_randtest(nf_elem_t a, flint_rand_t state,
 }
 
 void nf_elem_randtest_not_zero(nf_elem_t a, flint_rand_t state, 
-                                               mp_bitcnt_t bits, const nf_t nf)
+                                               flint_bitcnt_t bits, const nf_t nf)
 {
    if (nf->flag & NF_LINEAR)
    {

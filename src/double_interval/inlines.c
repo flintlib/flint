@@ -11,5 +11,6 @@
 
 #define DOUBLE_INTERVAL_INLINES_C
 #include <stdio.h>
+#include <gmp.h>
 #include "double_interval.h"
 

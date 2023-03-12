@@ -11,5 +11,6 @@
 
 #define CA_FIELD_INLINES_C
 #include <stdio.h>
+#include <gmp.h>
 #include "ca_field.h"
 

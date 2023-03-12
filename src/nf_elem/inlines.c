@@ -17,5 +17,6 @@
 #define NF_ELEM_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "nf_elem.h"
 

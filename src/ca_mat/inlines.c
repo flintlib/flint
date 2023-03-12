@@ -11,5 +11,6 @@
 
 #define CA_MAT_INLINES_C
 #include <stdio.h>
+#include <gmp.h>
 #include "ca_mat.h"
 

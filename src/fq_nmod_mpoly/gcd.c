@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "fq_nmod_mpoly.h"
 #include "fq_nmod_mpoly_factor.h"
 

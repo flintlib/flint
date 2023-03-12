@@ -12,5 +12,6 @@
 #define DOUBLE_EXTRAS_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "double_extras.h"
 

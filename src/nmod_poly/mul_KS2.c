@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include <gmp.h>
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "mpn_extras.h"

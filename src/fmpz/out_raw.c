@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include <gmp.h>
 #include "fmpz.h"
 
 size_t fmpz_out_raw( FILE *fout, const fmpz_t x ) 

@@ -11,5 +11,6 @@
 
 #define MAG_INLINES_C
 #include <stdio.h>
+#include <gmp.h>
 #include "mag.h"
 

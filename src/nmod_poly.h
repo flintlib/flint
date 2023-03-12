@@ -71,6 +71,7 @@ Copyright (C) 2007, 2008 David Harvey
 
 */
 
+#ifdef FLINT_HAVE_GMP
 NMOD_POLY_INLINE
 int signed_mpn_sub_n(mp_ptr res, mp_srcptr op1, mp_srcptr op2, slong n)
 {
@@ -85,6 +86,9 @@ int signed_mpn_sub_n(mp_ptr res, mp_srcptr op1, mp_srcptr op2, slong n)
       return 1;
    }
 }
+#else
+int signed_mpn_sub_n(mp_ptr res, mp_srcptr op1, mp_srcptr op2, slong n);
+#endif
 
 /* Memory management  ********************************************************/
 

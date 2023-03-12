@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include <gmp.h>
 #include "fq_poly_factor.h"
 
 void fq_poly_factor_get_poly(fq_poly_t z,

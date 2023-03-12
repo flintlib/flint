@@ -10,9 +10,9 @@
 */
 
 #include <stdio.h>
+#include <gmp.h>
 #include "profiler.h"
 #include "long_extras.h"
-
 #include "fmpq.h"
 #include "gr.h"
 #include "gr_vec.h"

@@ -12,6 +12,7 @@
 #define PADIC_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "padic.h"
 
 void padic_get_unit(fmpz_t f, padic_t p)

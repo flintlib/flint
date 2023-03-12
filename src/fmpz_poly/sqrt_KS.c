@@ -10,9 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
+#include <gmp.h>
 #include "fmpz_poly.h"
 
 #define FMPZ_POLY_SQRT_KS_HEURISTIC_BITS 3

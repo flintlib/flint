@@ -269,6 +269,7 @@ void mpoly_monomial_add(ulong * exp_ptr, const ulong * exp2,
       exp_ptr[i] = exp2[i] + exp3[i];
 }
 
+#ifdef FLINT_HAVE_GMP
 MPOLY_INLINE
 void mpoly_monomial_add_mp(ulong * exp_ptr, const ulong * exp2,
                                                    const ulong * exp3, slong N)
@@ -277,28 +278,10 @@ void mpoly_monomial_add_mp(ulong * exp_ptr, const ulong * exp2,
 }
 
 MPOLY_INLINE
-void mpoly_monomial_sub(ulong * exp_ptr, const ulong * exp2,
-                                                   const ulong * exp3, slong N)
-{
-   slong i;
-   for (i = 0; i < N; i++)
-      exp_ptr[i] = exp2[i] - exp3[i];
-}
-
-MPOLY_INLINE
 void mpoly_monomial_sub_mp(ulong * exp_ptr, const ulong * exp2,
                                                    const ulong * exp3, slong N)
 {
     mpn_sub_n(exp_ptr, exp2, exp3, N);
-}
-
-MPOLY_INLINE
-void mpoly_monomial_madd(ulong * exp1, const ulong * exp2, ulong scalar,
-                                                   const ulong * exp3, slong N)
-{
-   slong i;
-   for (i = 0; i < N; i++)
-      exp1[i] = exp2[i] + scalar*exp3[i];
 }
 
 MPOLY_INLINE
@@ -316,15 +299,6 @@ void mpoly_monomial_madd_inplace_mp(ulong * exp12, ulong scalar,
                                                    const ulong * exp3, slong N)
 {
     mpn_addmul_1(exp12, exp3, N, scalar);
-}
-
-MPOLY_INLINE
-void mpoly_monomial_msub(ulong * exp1, const ulong * exp2, ulong scalar,
-                                                   const ulong * exp3, slong N)
-{
-   slong i;
-   for (i = 0; i < N; i++)
-      exp1[i] = exp2[i] - scalar*exp3[i];
 }
 
 MPOLY_INLINE
@@ -365,6 +339,92 @@ void mpoly_monomial_madd_ui_array(ulong * exp1, const ulong * exp2,
     FLINT_ASSERT(scalar_limbs <= N);
     for (i = 0; i < scalar_limbs; i++)
         mpn_addmul_1(exp1 + i, exp3, N - i, scalar[i]);
+}
+
+MPOLY_INLINE
+int mpoly_monomial_divides_mp(ulong * exp_ptr, const ulong * exp2,
+                               const ulong * exp3, slong N, flint_bitcnt_t bits)
+{
+    slong i;
+
+    mpn_sub_n(exp_ptr, exp2, exp3, N);
+
+    i = bits/FLINT_BITS - 1;
+    do {
+        if ((slong)(exp_ptr[i]) < 0)
+            return 0;
+        i += bits/FLINT_BITS;
+    } while (i < N);
+
+    return 1;
+}
+
+MPOLY_INLINE
+int mpoly_monomial_halves_mp(ulong * exp_ptr, const ulong * exp2,
+		                                  slong N, flint_bitcnt_t bits)
+{
+   slong i;
+   ulong bw;
+
+   bw = mpn_rshift(exp_ptr, exp2, N, 1);
+
+   if (bw != 0)
+      return 0;
+
+   i = bits/FLINT_BITS - 1;
+   do {
+      if ((slong)(exp_ptr[i]) < 0)
+         return 0;
+      i += bits/FLINT_BITS;
+   } while (i < N);
+
+   return 1;
+}
+
+MPOLY_INLINE
+void mpoly_monomial_mul_ui_mp(ulong * exp2, const ulong * exp3, slong N, ulong c)
+{
+    FLINT_ASSERT(N > 0);
+    mpn_mul_1(exp2, exp3, N, c);
+}
+#else
+void mpoly_monomial_add_mp(ulong * exp_ptr, const ulong * exp2, const ulong * exp3, slong N);
+void mpoly_monomial_sub_mp(ulong * exp_ptr, const ulong * exp2, const ulong * exp3, slong N);
+void mpoly_monomial_madd_mp(ulong * exp1, const ulong * exp2, ulong scalar, const ulong * exp3, slong N);
+void mpoly_monomial_madd_inplace_mp(ulong * exp12, ulong scalar, const ulong * exp3, slong N);
+void mpoly_monomial_msub_mp(ulong * exp1, const ulong * exp2, ulong scalar, const ulong * exp3, slong N);
+void mpoly_monomial_msub_ui_array(ulong * exp1, const ulong * exp2, const ulong * scalar, slong scalar_limbs, const ulong * exp3, slong N);
+void mpoly_monomial_madd_ui_array(ulong * exp1, const ulong * exp2, const ulong * scalar, slong scalar_limbs, const ulong * exp3, slong N);
+int mpoly_monomial_divides_mp(ulong * exp_ptr, const ulong * exp2, const ulong * exp3, slong N, flint_bitcnt_t bits);
+int mpoly_monomial_halves_mp(ulong * exp_ptr, const ulong * exp2, slong N, flint_bitcnt_t bits);
+void mpoly_monomial_mul_ui_mp(ulong * exp2, const ulong * exp3, slong N, ulong c);
+#endif
+
+MPOLY_INLINE
+void mpoly_monomial_sub(ulong * exp_ptr, const ulong * exp2,
+                                                   const ulong * exp3, slong N)
+{
+   slong i;
+   for (i = 0; i < N; i++)
+      exp_ptr[i] = exp2[i] - exp3[i];
+}
+
+MPOLY_INLINE
+void mpoly_monomial_madd(ulong * exp1, const ulong * exp2, ulong scalar,
+                                                   const ulong * exp3, slong N)
+{
+   slong i;
+   for (i = 0; i < N; i++)
+      exp1[i] = exp2[i] + scalar*exp3[i];
+}
+
+MPOLY_INLINE
+void mpoly_monomial_msub(ulong * exp1, const ulong * exp2, ulong scalar,
+                                                   const ulong * exp3, slong N)
+{
+   slong i;
+   for (i = 0; i < N; i++)
+      exp1[i] = exp2[i] - scalar*exp3[i];
 }
 
 MPOLY_INLINE
@@ -563,46 +623,6 @@ int mpoly_monomial_halves(ulong * exp_ptr, const ulong * exp2,
 }
 
 MPOLY_INLINE
-int mpoly_monomial_divides_mp(ulong * exp_ptr, const ulong * exp2,
-                               const ulong * exp3, slong N, flint_bitcnt_t bits)
-{
-    slong i;
-
-    mpn_sub_n(exp_ptr, exp2, exp3, N);
-
-    i = bits/FLINT_BITS - 1;
-    do {
-        if ((slong)(exp_ptr[i]) < 0)
-            return 0;
-        i += bits/FLINT_BITS;
-    } while (i < N);
-
-    return 1;
-}
-
-MPOLY_INLINE
-int mpoly_monomial_halves_mp(ulong * exp_ptr, const ulong * exp2,
-		                                  slong N, flint_bitcnt_t bits)
-{
-   slong i;
-   ulong bw;
-
-   bw = mpn_rshift(exp_ptr, exp2, N, 1);
-
-   if (bw != 0)
-      return 0;
-
-   i = bits/FLINT_BITS - 1;
-   do {
-      if ((slong)(exp_ptr[i]) < 0)
-         return 0;
-      i += bits/FLINT_BITS;
-   } while (i < N);
-
-   return 1;
-}
-
-MPOLY_INLINE
 int mpoly_monomial_divides_test(const ulong * exp2,
                                        const ulong * exp3, slong N, ulong mask)
 {
@@ -706,13 +726,6 @@ void mpoly_monomial_mul_ui(ulong * exp2, const ulong * exp3, slong N, ulong c)
    slong i;
    for (i = 0; i < N; i++)
       exp2[i] = exp3[i]*c;
-}
-
-MPOLY_INLINE
-void mpoly_monomial_mul_ui_mp(ulong * exp2, const ulong * exp3, slong N, ulong c)
-{
-    FLINT_ASSERT(N > 0);
-    mpn_mul_1(exp2, exp3, N, c);
 }
 
 FLINT_DLL void mpoly_monomial_mul_fmpz(ulong * exp2, const ulong * exp3,

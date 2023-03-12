@@ -96,6 +96,7 @@ fmpz_add2_fmpz_si_inline(fmpz_t z, const fmpz_t x, const fmpz_t y, slong c)
     fmpz_add_si(z, z, c);
 }
 
+#ifdef FLINT_HAVE_GMP
 static __inline__ void
 fmpz_set_mpn_large(fmpz_t z, mp_srcptr src, mp_size_t n, int negative)
 {
@@ -108,6 +109,7 @@ fmpz_set_mpn_large(fmpz_t z, mp_srcptr src, mp_size_t n, int negative)
     flint_mpn_copyi(zz->_mp_d, src, n);
     zz->_mp_size = negative ? -n : n;
 }
+#endif
 
 static __inline__ void
 fmpz_adiv_q_2exp(fmpz_t z, const fmpz_t x, flint_bitcnt_t exp)
@@ -142,6 +144,7 @@ _fmpz_sub_small(const fmpz_t x, const fmpz_t y)
     }
 }
 
+#ifdef FLINT_HAVE_GMP
 static __inline__ mp_size_t
 _fmpz_size(const fmpz_t f)
 {
@@ -152,6 +155,7 @@ _fmpz_size(const fmpz_t f)
     else
         return mpz_size(COEFF_TO_PTR(d));
 }
+#endif
 
 static __inline__ void
 fmpz_ui_mul_ui(fmpz_t r, ulong a, ulong b)

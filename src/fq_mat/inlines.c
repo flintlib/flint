@@ -12,5 +12,6 @@
 #define FQ_MAT_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "fq_mat.h"
 

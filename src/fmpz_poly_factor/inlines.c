@@ -12,6 +12,7 @@
 #define FMPZ_POLY_FACTOR_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "fmpz_poly.h"
 
 void fmpz_poly_factor_get_fmpz_poly(fmpz_poly_t z, const fmpz_poly_factor_t F, slong i)

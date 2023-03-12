@@ -11,7 +11,6 @@
 
 #include "fmpz.h"
 
-
 void fmpz_multi_CRT_clear(fmpz_multi_CRT_t P)
 {
     slong i;

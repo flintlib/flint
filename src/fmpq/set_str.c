@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "fmpq.h"
 
 int fmpq_set_str(fmpq_t x, const char *str, int base)

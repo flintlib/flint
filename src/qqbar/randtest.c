@@ -16,7 +16,7 @@
 #include "qqbar.h"
 
 static void
-fmpz_poly_randtest_irreducible1(fmpz_poly_t p, flint_rand_t state, slong len, mp_bitcnt_t bits)
+fmpz_poly_randtest_irreducible1(fmpz_poly_t p, flint_rand_t state, slong len, flint_bitcnt_t bits)
 {
     slong i;
     fmpz_t c;
@@ -54,7 +54,7 @@ fmpz_poly_randtest_irreducible1(fmpz_poly_t p, flint_rand_t state, slong len, mp
 }
 
 static void
-fmpz_poly_randtest_irreducible2(fmpz_poly_t pol, flint_rand_t state, slong len, mp_bitcnt_t bits)
+fmpz_poly_randtest_irreducible2(fmpz_poly_t pol, flint_rand_t state, slong len, flint_bitcnt_t bits)
 {
     while (1)
     {

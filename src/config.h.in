@@ -1,3 +1,6 @@
+#ifndef FLINT_CONFIG_H
+#define FLINT_CONFIG_H
+
 /* Define if the compiler supports and should use thread-local storage */
 #cmakedefine01 FLINT_USES_TLS
 
@@ -39,3 +42,5 @@
 #else
 #define FLINT_DLL
 #endif
+
+#endif /* FLINT_CONFIG_H */

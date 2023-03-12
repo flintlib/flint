@@ -18,8 +18,11 @@
 #define MPFR_MAT_INLINE static __inline__
 #endif
 
-#include <mpfr.h> 
 #include "flint.h"
+
+#ifndef FLINT_HAVE_MPFR
+# error mpfr.h must be included to utilize this file.
+#endif
 
 #ifdef __cplusplus
  extern "C" {

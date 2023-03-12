@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include <gmp.h>
 #include "gmpcompat.h"
 #include "fmpq_poly.h"
 

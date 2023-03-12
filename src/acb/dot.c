@@ -9,12 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb.h"
-#include "mpn_extras.h"
-
 /* We need uint64_t instead of mp_limb_t on 32-bit systems for
    safe summation of 30-bit error bounds. */
 #include <stdint.h>
+
+#include <gmp.h>
+#include "acb.h"
+#include "mpn_extras.h"
 
 /* Add ((a * b) / 2^MAG_BITS) * 2^exp into srad*2^srad_exp.
    Assumes that srad_exp >= exp and that overflow cannot occur.  */

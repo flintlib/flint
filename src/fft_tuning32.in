@@ -3,8 +3,6 @@
 #ifndef FFT_TUNING_H
 #define FFT_TUNING_H
 
-#include "gmp.h"
-
 #define FFT_TAB \
    { { 3, 3 }, { 3, 2 }, { 2, 1 }, { 2, 1 }, { 0, 0 } }
 

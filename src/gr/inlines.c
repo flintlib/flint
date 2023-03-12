@@ -11,5 +11,6 @@
 
 #define GR_INLINES_C
 #include <stdio.h>
+#include <gmp.h>
 #include "gr.h"
 #undef GR_INLINES_C

@@ -11,5 +11,6 @@
 
 #define ARB_FMPZ_POLY_INLINES_C
 #include <stdio.h>
+#include <gmp.h>
 #include "arb_fmpz_poly.h"
 

@@ -12,5 +12,6 @@
 #define PADIC_MAT_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "padic_mat.h"
 

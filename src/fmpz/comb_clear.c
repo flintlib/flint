@@ -14,7 +14,6 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-
 void fmpz_comb_temp_clear(fmpz_comb_temp_t CT)
 {
     _fmpz_vec_clear(CT->A, CT->Alen);

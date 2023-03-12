@@ -21,7 +21,11 @@
 #endif
 
 #include "d_mat.h"
-#include "mpf_mat.h"
+#include "fmpz_types.h"
+
+#ifdef FLINT_HAVE_GMP
+# include "mpf_mat.h"
+#endif
 
 #ifdef __cplusplus
  extern "C" {
@@ -59,6 +63,7 @@ typedef struct
 
 typedef fmpz_lll_struct fmpz_lll_t[1];
 
+#ifdef FLINT_HAVE_GMP
 typedef union
 {
     d_mat_t appSP;
@@ -67,6 +72,7 @@ typedef union
 } fmpz_gram_union;
 
 typedef fmpz_gram_union fmpz_gram_t[1];
+#endif
 
 /* Parameter manipulation  ***************************************************/
 
@@ -84,6 +90,7 @@ FLINT_DLL void fmpz_lll_randtest(fmpz_lll_t fl, flint_rand_t state);
 FLINT_DLL double fmpz_lll_heuristic_dot(const double * vec1, const double * vec2, slong len2,
        const fmpz_mat_t B, slong k, slong j, slong exp_adj);
 
+#ifdef FLINT_HAVE_GMP
 FLINT_DLL int fmpz_lll_check_babai(int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s,
        d_mat_t appB, int *expo, fmpz_gram_t A,
        int a, int zeros, int kappamax, int n, const fmpz_lll_t fl);
@@ -91,6 +98,7 @@ FLINT_DLL int fmpz_lll_check_babai(int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_
 FLINT_DLL int fmpz_lll_check_babai_heuristic_d(int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s,
        d_mat_t appB, int *expo, fmpz_gram_t A,
        int a, int zeros, int kappamax, int n, const fmpz_lll_t fl);
+#endif
 
 FLINT_DLL int fmpz_lll_shift(const fmpz_mat_t B);
 
@@ -98,9 +106,11 @@ FLINT_DLL int fmpz_lll_d(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl);
 
 FLINT_DLL int fmpz_lll_d_heuristic(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl);
 
+#ifdef FLINT_HAVE_GMP
 FLINT_DLL int fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U, mpf_mat_t mu, mpf_mat_t r, mpf *s,
        mpf_mat_t appB, fmpz_gram_t A,
        int a, int zeros, int kappamax, int n, mpf_t tmp, mpf_t rtmp, flint_bitcnt_t prec, const fmpz_lll_t fl);
+#endif
 
 FLINT_DLL int fmpz_lll_mpf2(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, const fmpz_lll_t fl);
 
@@ -108,6 +118,7 @@ FLINT_DLL int fmpz_lll_mpf(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl);
 
 FLINT_DLL int fmpz_lll_wrapper(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl);
 
+#ifdef FLINT_HAVE_GMP
 FLINT_DLL int fmpz_lll_advance_check_babai(int cur_kappa, int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s,
        d_mat_t appB, int *expo, fmpz_gram_t A,
        int a, int zeros, int kappamax, int n, const fmpz_lll_t fl);
@@ -115,6 +126,7 @@ FLINT_DLL int fmpz_lll_advance_check_babai(int cur_kappa, int kappa, fmpz_mat_t 
 FLINT_DLL int fmpz_lll_advance_check_babai_heuristic_d(int cur_kappa, int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s,
        d_mat_t appB, int *expo, fmpz_gram_t A,
        int a, int zeros, int kappamax, int n, const fmpz_lll_t fl);
+#endif
 
 /* LLL with removals  ********************************************************/
 

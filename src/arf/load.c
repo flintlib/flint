@@ -18,6 +18,7 @@
 # include <string.h>
 #endif
 
+#include <gmp.h>
 #include "arf.h"
 
 static void

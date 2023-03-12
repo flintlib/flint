@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include <math.h>
 #include "fmpzi.h"
 

@@ -1320,6 +1320,7 @@ FLINT_DLL void _fmpz_mpoly_to_fmpz_array(fmpz * p, const fmpz * coeffs,
 
 /* Misc arithmetic - has nothing to do with mpoly, should be moved out *******/
 
+#ifdef FLINT_HAVE_GMP
 FMPZ_MPOLY_INLINE
 void _fmpz_mpoly_sub_uiuiui_fmpz(ulong * c, const fmpz_t d)
 {
@@ -1363,6 +1364,10 @@ void _fmpz_mpoly_add_uiuiui_fmpz(ulong * c, const fmpz_t d)
          mpn_add(c, c, 3, m->_mp_d, size);
    }
 }
+#else
+void _fmpz_mpoly_sub_uiuiui_fmpz(ulong * c, const fmpz_t d);
+void _fmpz_mpoly_add_uiuiui_fmpz(ulong * c, const fmpz_t d);
+#endif
 
 FMPZ_MPOLY_INLINE
 void _fmpz_mpoly_submul_uiuiui_fmpz(ulong * c, slong d1, slong d2)

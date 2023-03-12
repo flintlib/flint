@@ -12,4 +12,5 @@
 #define FQ_DEFAULT_POLY_FACTOR_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "fq_default_poly_factor.h"

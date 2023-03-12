@@ -11,6 +11,7 @@
 */
 
 #include <stdio.h>
+#include <gmp.h>
 #include "mpf_mat.h"
 
 void

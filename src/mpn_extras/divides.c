@@ -9,8 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
+#include <gmp.h>
 #include "mpn_extras.h"
 
 int flint_mpn_divides(mp_ptr q, mp_srcptr array1, 

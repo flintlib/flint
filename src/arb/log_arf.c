@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "arb.h"
 #include "mpn_extras.h"
 

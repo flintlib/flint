@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "fmpq.h"
 
 void fmpq_init_set_readonly(fmpq_t f, const mpq_t z)

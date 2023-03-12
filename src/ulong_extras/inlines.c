@@ -12,5 +12,6 @@
 #define ULONG_EXTRAS_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "ulong_extras.h"
 

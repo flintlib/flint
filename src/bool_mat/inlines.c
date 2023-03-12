@@ -11,4 +11,5 @@
 
 #define BOOL_MAT_INLINES_C
 #include <stdio.h>
+#include <gmp.h>
 #include "bool_mat.h"

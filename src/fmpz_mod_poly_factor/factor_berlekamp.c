@@ -13,11 +13,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_poly.h"
-#include "fmpz_mat.h"
-#include "ulong_extras.h"
-#include "profiler.h"
+#include <gmp.h>
 #include "perm.h"
+#include "fmpz_mat.h"
+#include "fmpz_mod_poly.h"
 
 static void
 fmpz_mod_poly_to_fmpz_mat_col(fmpz_mat_t mat, slong col, fmpz_mod_poly_t poly)

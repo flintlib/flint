@@ -15,6 +15,8 @@
 # include <math.h>
 #endif
 
+#include <gmp.h>
+
 #include "mpf_mat.h"
 #include "gmpcompat.h"
 

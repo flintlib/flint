@@ -11,7 +11,6 @@
 
 #include "fmpz.h"
 
-
 static void _fmpz_multi_CRT_fit_length(fmpz_multi_CRT_t P, slong k)
 {
     slong i;

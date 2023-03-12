@@ -12,6 +12,7 @@
 #define FQ_ZECH_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "fq_zech.h"
 
 void __fq_zech_ctx_prime(fmpz_t p, fq_zech_ctx_t ctx)

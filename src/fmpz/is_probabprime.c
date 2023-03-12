@@ -10,10 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "ulong_extras.h"
-#include "fmpz.h"
 #include "mpn_extras.h"
+#include "fmpz.h"
 
 int
 fmpz_is_probabprime(const fmpz_t n)

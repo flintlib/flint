@@ -11,7 +11,7 @@
 */
 
 #include <math.h>
-#include "flint.h"
+#include <gmp.h>
 #include "fmpz.h"
 #include "ulong_extras.h"
 

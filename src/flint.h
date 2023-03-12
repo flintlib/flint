@@ -20,9 +20,12 @@
 # include <stdarg.h>
 #endif
 
-#include <gmp.h>
-#include "longlong.h"
-#include "flint-config.h"
+#include <stddef.h>
+#include <limits.h>
+
+#ifndef FLINT_NOGMP
+# include <gmp.h>
+#endif
 
 #ifndef alloca
 # ifdef __GNUC__
@@ -48,22 +51,33 @@
 # define FLINT_HAVE_FILE
 #endif
 
+#ifdef __GMP_H__
+# define FLINT_HAVE_GMP
+#endif
+
 #ifdef __MPFR_H
 # define FLINT_HAVE_MPFR
 #endif
+
+#if FLINT_USES_GC
+# include "gc.h"
+#endif
+
+#if FLINT_WANT_ASSERT
+# include <assert.h>
+#endif
+
+#ifndef FLINT_HAVE_GMP
+# include "mock_gmp_types.h"
+#endif
+
+#include "longlong.h"
+#include "flint-config.h"
 
 #ifdef FLINT_INLINES_C
 #define FLINT_INLINE FLINT_DLL
 #else
 #define FLINT_INLINE static __inline__
-#endif
-
-#if FLINT_USES_GC
-#include "gc.h"
-#endif
-
-#if FLINT_WANT_ASSERT
-#include <assert.h>
 #endif
 
 #ifdef __cplusplus
@@ -80,8 +94,10 @@
                          __FLINT_VERSION_MINOR * 100 + \
                          __FLINT_VERSION_PATCHLEVEL)
 
-#if __GNU_MP_VERSION < 5
-#error GMP 5.0.0 or MPIR 2.6.0 or later are required
+#ifdef FLINT_HAVE_GMP
+# if __GNU_MP_VERSION < 5
+#  error GMP 5.0.0 or MPIR 2.6.0 or later are required
+# endif
 #endif
 
 /*
@@ -237,7 +253,7 @@ void flint_get_randseed(ulong * seed1, ulong * seed2, flint_rand_t state)
    *seed2 = state->__randval2;
 }
 
-
+#ifdef FLINT_HAVE_GMP
 FLINT_INLINE
 void _flint_rand_init_gmp(flint_rand_t state)
 {
@@ -254,6 +270,7 @@ void flint_randclear(flint_rand_t state)
     if (state->gmp_init)
         gmp_randclear(state->gmp_state);
 }
+#endif
 
 FLINT_INLINE
 flint_rand_s * flint_rand_alloc(void)

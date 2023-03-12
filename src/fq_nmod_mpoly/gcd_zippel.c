@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "fq_nmod_mpoly.h"
-
 
 int fq_nmod_mpolyu_gcdm_zippel_bivar(
     fq_nmod_mpolyu_t G,

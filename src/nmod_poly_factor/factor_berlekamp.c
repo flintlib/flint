@@ -12,11 +12,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "nmod_poly.h"
 #include "nmod_mat.h"
-#include "ulong_extras.h"
-#include "profiler.h"
-#include "perm.h"
 
 static void
 nmod_poly_to_nmod_mat_col(nmod_mat_t mat, slong col, nmod_poly_t poly)

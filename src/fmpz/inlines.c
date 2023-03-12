@@ -12,8 +12,8 @@
 #define FMPZ_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "gmpcompat.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
 
 void _fmpz_mpz_set_ui(mpz_ptr r, ulong u)

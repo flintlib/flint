@@ -12,6 +12,7 @@
 #define FMPZ_MOD_POLY_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "fmpz_mod_poly.h"
 
 void fmpz_mod_poly_add_si(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,

@@ -15,6 +15,7 @@
 # include <math.h>
 #endif
 
+#include <gmp.h>
 #include "fq_nmod_mpoly.h"
 
 /* try to prove that A is not a square */

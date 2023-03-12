@@ -10,8 +10,6 @@
 */
 
 #include "fmpz.h"
-#include "fmpz_vec.h"
-
 
 void fmpz_multi_mod_init(fmpz_multi_mod_t P)
 {

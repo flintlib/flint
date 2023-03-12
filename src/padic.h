@@ -188,15 +188,16 @@ FLINT_DLL void padic_set_fmpq(padic_t rop, const fmpq_t op, const padic_ctx_t ct
 
 FLINT_DLL void padic_set_mpz(padic_t rop, const mpz_t op, const padic_ctx_t ctx);
 
-FLINT_DLL void padic_set_mpq(padic_t rop, const mpq_t op, const padic_ctx_t ctx);
-
 FLINT_DLL void padic_get_fmpz(fmpz_t rop, const padic_t op, const padic_ctx_t ctx);
 
 FLINT_DLL void padic_get_fmpq(fmpq_t rop, const padic_t op, const padic_ctx_t ctx);
 
 FLINT_DLL void padic_get_mpz(mpz_t rop, const padic_t op, const padic_ctx_t ctx);
 
+#ifdef FLINT_HAVE_GMP
+FLINT_DLL void padic_set_mpq(padic_t rop, const mpq_t op, const padic_ctx_t ctx);
 FLINT_DLL void padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx);
+#endif
 
 PADIC_INLINE void padic_swap(padic_t op1, padic_t op2)
 {

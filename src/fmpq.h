@@ -155,6 +155,7 @@ FLINT_DLL void fmpq_set_fmpz_frac(fmpq_t res, const fmpz_t p, const fmpz_t q);
 
 FLINT_DLL int fmpq_set_str(fmpq_t res, const char * str, int base);
 
+#ifdef FLINT_HAVE_GMP
 FMPQ_INLINE void fmpq_set_mpq(fmpq_t dest, const mpq_t src)
 {
     fmpz_set_mpz(fmpq_numref(dest), mpq_numref(src));
@@ -166,6 +167,7 @@ FMPQ_INLINE void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
     fmpz_get_mpz(mpq_numref(dest), fmpq_numref(src));
     fmpz_get_mpz(mpq_denref(dest), fmpq_denref(src));
 }
+#endif
 
 FLINT_DLL double fmpq_get_d(const fmpq_t a);
 
@@ -175,11 +177,11 @@ FLINT_DLL int fmpq_get_mpfr(mpfr_t r, const fmpq_t x, mpfr_rnd_t rnd);
 
 FLINT_DLL void fmpq_get_mpz_frac(mpz_t a, mpz_t b, fmpq_t c);
 
+#ifdef FLINT_HAVE_GMP
 FLINT_DLL void flint_mpq_init_set_readonly(mpq_t z, const fmpq_t f);
-
 FLINT_DLL void flint_mpq_clear_readonly(mpq_t z);
-
 FLINT_DLL void fmpq_init_set_readonly(fmpq_t f, const mpq_t z);
+#endif
 
 FLINT_DLL void fmpq_clear_readonly(fmpq_t f);
 

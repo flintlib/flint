@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "fmpz_poly_q.h"
 
 void fmpz_poly_q_scalar_div_mpq(fmpz_poly_q_t rop, 

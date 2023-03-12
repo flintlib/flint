@@ -11,5 +11,6 @@
 
 #define ACF_INLINES_C
 #include <stdio.h>
+#include <gmp.h>
 #include "acf.h"
 

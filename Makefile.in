@@ -127,6 +127,7 @@ SINGLE_HEADERS :=                                                           \
         hashmap.h       profiler.h      templates.h    flint-config.h       \
         fft_tuning.h    fmpz-conversions.h                                  \
                                                                             \
+        mock_gmp_types.h                                                    \
         mpoly_types.h                                                       \
         fmpz_types.h                    fmpq_types.h                        \
         nmod_types.h                    fmpz_mod_types.h                    \

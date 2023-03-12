@@ -11,7 +11,6 @@
 
 #include "fmpz.h"
 
-
 int fmpz_multi_CRT(
     fmpz_t output,
     const fmpz * moduli,

@@ -12,11 +12,7 @@
 
 #include <stdlib.h>
 #include <errno.h>
-#include <ctype.h>
-#include <math.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
+#include <gmp.h>
 #include "fmpq_poly.h"
 
 int

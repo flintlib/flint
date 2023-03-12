@@ -12,5 +12,6 @@
 #define D_MAT_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "d_mat.h"
 

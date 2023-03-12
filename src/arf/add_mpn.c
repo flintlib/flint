@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "arf.h"
 
 FLINT_TLS_PREFIX mp_ptr __arf_add_tmp = NULL;

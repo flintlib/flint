@@ -9,8 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
+#include <gmp.h>
 #include "fmpz_mpoly.h"
 
 /* ensure rounding is towards -\infty like fmpz_fdiv_qr */

@@ -12,5 +12,6 @@
 #define LONG_EXTRAS_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "long_extras.h"
 

@@ -11,4 +11,5 @@
 
 #define ARB_CALC_INLINES_C
 #include <stdio.h>
+#include <gmp.h>
 #include "arb_calc.h"

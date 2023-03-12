@@ -15,11 +15,11 @@
 # include <string.h>
 #endif
 
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_mod_poly.h"
+#include <gmp.h>
 #include "mpn_extras.h"
 #include "ulong_extras.h"
+#include "fmpz_factor.h"
+#include "fmpz_mod_poly.h"
 
 #define DEBUG 0 /* turn on some trace information */
 

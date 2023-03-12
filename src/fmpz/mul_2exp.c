@@ -16,6 +16,8 @@
 # include <string.h>
 #endif
 
+#include <gmp.h>
+
 #include "fmpz.h"
 
 void

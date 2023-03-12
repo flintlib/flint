@@ -9,9 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "ulong_extras.h"
-#include "fmpz.h"
 #include "mpn_extras.h"
+#include "fmpz_factor.h"
 
 /* Implementation of the stage I of ECM */
 

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "fmpz_mpoly.h"
 
 /* leave vec1 undefined but valid if division is not exact */

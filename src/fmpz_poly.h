@@ -967,8 +967,10 @@ FLINT_DLL void fmpz_poly_evaluate_fmpq(fmpq_t res,
                                           const fmpz_poly_t f, const fmpq_t a);
 
 
+#ifdef FLINT_HAVE_GMP
 FLINT_DLL void fmpz_poly_evaluate_mpq(mpq_t res,
                                            const fmpz_poly_t f, const mpq_t a);
+#endif
 
 FLINT_DLL mp_limb_t _fmpz_poly_evaluate_mod(const fmpz * poly, slong len,
                                      mp_limb_t a, mp_limb_t n, mp_limb_t ninv);

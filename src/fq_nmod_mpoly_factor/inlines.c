@@ -12,5 +12,6 @@
 #define FQ_NMOD_MPOLY_FACTOR_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "fq_nmod_mpoly_factor.h"
 

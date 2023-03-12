@@ -15,6 +15,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "fq_poly.h"
 
 #ifdef T

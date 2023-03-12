@@ -14,6 +14,7 @@
 
 #include "flint.h"
 
+#ifdef FLINT_HAVE_GMP
 #define FLINT_MPZ_REALLOC(z, len)       \
     ((len) > ((z)->_mp_alloc)           \
         ? (mp_ptr) _mpz_realloc(z, len) \
@@ -85,7 +86,7 @@ void flint_mpz_add_signed_uiuiui(mpz_ptr a, mpz_srcptr b,
         c->_mp_size = -c->_mp_size;
     mpz_add(a, b, c);
 }
-
+#endif
 
 /* mpn_get_d -- limbs to double conversion.
 
@@ -202,6 +203,7 @@ union ieee_double_extract
 };
 #endif
 
+#ifdef FLINT_HAVE_GMP
 static __inline__
 double flint_mpn_get_d (mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp)
 {
@@ -319,7 +321,9 @@ double flint_mpn_get_d (mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp)
       return u.d;
     }
 }
+#endif
 
+#ifdef FLINT_HAVE_GMP
 #if WORD_MAX != LONG_MAX && !defined(__MPIR_VERSION)
 
 #define FLINT_MOCK_MPZ_UI(xxx, yyy) \
@@ -1182,6 +1186,7 @@ double flint_mpf_get_d_2exp(slong * exp2, mpf_srcptr src)
                     (long) - (abs_size * FLINT_BITS - cnt));
 }
 
+#endif
 #endif
 
 #endif

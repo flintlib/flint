@@ -9,9 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
-#include "flint.h"
-#include "ulong_extras.h"
+#ifdef __GNUC__
+# define frexp __builtin_frexp
+# define ldexp __builtin_ldexp
+#else
+# include <math.h>
+#endif
+
 #include "fmpz.h"
 
 void fmpz_set_d_2exp(fmpz_t f, double m, slong exp)

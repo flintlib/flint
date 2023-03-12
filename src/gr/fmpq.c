@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <gmp.h>
 #include "qqbar.h"
 #include "fmpz_poly.h"
 #include "fmpq_mat.h"

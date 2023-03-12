@@ -11,5 +11,6 @@
 
 #define DIRICHLET_INLINES_C
 #include <stdio.h>
+#include <gmp.h>
 #include "dirichlet.h"
 

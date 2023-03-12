@@ -10,9 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include <gmp.h>
 #include "gmpcompat.h"
-#include "ulong_extras.h"
+#include "fmpz.h"
 
 int fmpz_equal_si(const fmpz_t f, slong g)
 {

@@ -25,6 +25,7 @@
 # include <string.h>
 #endif
 
+#include <gmp.h>
 #include "thread_support.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"

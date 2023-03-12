@@ -19,6 +19,8 @@
 # include <string.h>
 #endif
 
+#include <gmp.h>
+
 #include "gmpcompat.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"

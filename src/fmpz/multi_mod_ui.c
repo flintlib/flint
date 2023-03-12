@@ -11,11 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
 #include "nmod_vec.h"
-
+#include "fmpz.h"
 
 void fmpz_multi_mod_ui(
     mp_limb_t * out,

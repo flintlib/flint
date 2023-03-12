@@ -12,6 +12,7 @@
 #define FQ_NMOD_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "fq_nmod.h"
 
 void __fq_nmod_ctx_prime(fmpz_t p, fq_nmod_ctx_t ctx)

@@ -34,6 +34,7 @@ mp_limb_t mpn_sumdiff_n(mp_ptr, mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 
 #else
 
+#ifdef FLINT_HAVE_GMP
 FFT_INLINE
 mp_limb_t mpn_sumdiff_n(mp_ptr s, mp_ptr d, mp_srcptr x, mp_srcptr y, mp_size_t n)
 {
@@ -64,6 +65,9 @@ mp_limb_t mpn_sumdiff_n(mp_ptr s, mp_ptr d, mp_srcptr x, mp_srcptr y, mp_size_t 
     ret += mpn_sub_n(d, x, y, n);
     return ret;
 }
+#else
+mp_limb_t mpn_sumdiff_n(mp_ptr s, mp_ptr d, mp_srcptr x, mp_srcptr y, mp_size_t n);
+#endif
 
 #endif
 
@@ -96,6 +100,7 @@ mp_limb_t mpn_sumdiff_n(mp_ptr s, mp_ptr d, mp_srcptr x, mp_srcptr y, mp_size_t 
          nn[limbs] = -nn[limbs]; \
    } while (0)
 
+#ifdef FLINT_HAVE_GMP
 FFT_INLINE
 void mpn_addmod_2expp1_1(mp_limb_t * r, mp_size_t limbs, mp_limb_signed_t c)
 {
@@ -110,6 +115,9 @@ void mpn_addmod_2expp1_1(mp_limb_t * r, mp_size_t limbs, mp_limb_signed_t c)
       else mpn_sub_1(r, r, limbs + 1, -c);
    }
 }
+#else
+void mpn_addmod_2expp1_1(mp_limb_t * r, mp_size_t limbs, mp_limb_signed_t c);
+#endif
 
 FLINT_DLL void fft_combine_limbs(mp_limb_t * res, mp_limb_t ** poly, slong length, 
             mp_size_t coeff_limbs, mp_size_t output_limbs, mp_size_t total_limbs);

@@ -12,6 +12,7 @@
 #define FMPZ_FACTOR_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "fmpz.h"
 
 void fmpz_factor_get_fmpz(fmpz_t z, const fmpz_factor_t factor, slong i)

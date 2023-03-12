@@ -12,6 +12,7 @@
 #define FQ_NMOD_POLY_FACTOR_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "fq_nmod_poly.h"
 
 void fq_nmod_poly_factor_get_poly(fq_nmod_poly_t z,

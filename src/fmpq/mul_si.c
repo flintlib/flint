@@ -10,9 +10,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq.h"
+#include <gmp.h>
 #include "gmpcompat.h"
 #include "ulong_extras.h"
+#include "fmpq.h"
 
 static ulong _fmpz_gcd_ui(const fmpz_t g, ulong h)
 {

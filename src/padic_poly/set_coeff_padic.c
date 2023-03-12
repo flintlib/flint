@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "padic_poly.h"
 
 void padic_poly_set_coeff_padic(padic_poly_t poly, slong n, const padic_t x, 

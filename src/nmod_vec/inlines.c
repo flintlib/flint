@@ -12,5 +12,6 @@
 #define NMOD_VEC_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "nmod_vec.h"
 

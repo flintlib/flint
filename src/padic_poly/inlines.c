@@ -12,5 +12,6 @@
 #define PADIC_POLY_INLINES_C
 
 #include <stdio.h>
+#include <gmp.h>
 #include "padic_poly.h"
 

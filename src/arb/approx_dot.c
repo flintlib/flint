@@ -9,12 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "arb.h"
-#include "mpn_extras.h"
-
 /* We need uint64_t instead of mp_limb_t on 32-bit systems for
    safe summation of 30-bit error bounds. */
 #include <stdint.h>
+
+#include <gmp.h>
+#include "arb.h"
+#include "mpn_extras.h"
 
 void
 _arb_dot_addmul_generic(mp_ptr sum, mp_ptr serr, mp_ptr tmp, mp_size_t sn,
