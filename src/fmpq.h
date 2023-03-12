@@ -169,7 +169,7 @@ FMPQ_INLINE void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
 
 FLINT_DLL double fmpq_get_d(const fmpq_t a);
 
-#ifdef __MPFR_H
+#ifdef FLINT_HAVE_MPFR
 FLINT_DLL int fmpq_get_mpfr(mpfr_t r, const fmpq_t x, mpfr_rnd_t rnd);
 #endif
 

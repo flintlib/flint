@@ -353,7 +353,9 @@ int arb_contains_fmpz(const arb_t x, const fmpz_t y);
 
 int arb_contains_si(const arb_t x, slong y);
 
+#ifdef FLINT_HAVE_MPFR
 int arb_contains_mpfr(const arb_t x, const mpfr_t y);
+#endif
 
 int arb_overlaps(const arb_t x, const arb_t y);
 
@@ -372,10 +374,14 @@ void arb_floor(arb_t z, const arb_t x, slong prec);
 void arb_ceil(arb_t z, const arb_t x, slong prec);
 
 void arb_set_interval_arf(arb_t x, const arf_t a, const arf_t b, slong prec);
+#ifdef FLINT_HAVE_MPFR
 void arb_set_interval_mpfr(arb_t x, const mpfr_t a, const mpfr_t b, slong prec);
+#endif
 
 void arb_get_interval_arf(arf_t a, arf_t b, const arb_t x, slong prec);
+#ifdef FLINT_HAVE_MPFR
 void arb_get_interval_mpfr(mpfr_t a, mpfr_t b, const arb_t x);
+#endif
 
 void arb_set_interval_mag(arb_t res, const mag_t a, const mag_t b, slong prec);
 void arb_set_interval_neg_pos_mag(arb_t res, const mag_t a, const mag_t b, slong prec);
@@ -388,7 +394,9 @@ void arb_min(arb_t z, const arb_t x, const arb_t y, slong prec);
 void arb_max(arb_t z, const arb_t x, const arb_t y, slong prec);
 
 int arb_can_round_arf(const arb_t x, slong prec, arf_rnd_t rnd);
+#ifdef FLINT_HAVE_MPFR
 int arb_can_round_mpfr(const arb_t x, slong prec, mpfr_rnd_t rnd);
+#endif
 
 void arb_add(arb_t z, const arb_t x, const arb_t y, slong prec);
 void arb_add_arf(arb_t z, const arb_t x, const arf_t y, slong prec);

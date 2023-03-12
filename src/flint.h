@@ -48,6 +48,10 @@
 # define FLINT_HAVE_FILE
 #endif
 
+#ifdef __MPFR_H
+# define FLINT_HAVE_MPFR
+#endif
+
 #ifdef FLINT_INLINES_C
 #define FLINT_INLINE FLINT_DLL
 #else
