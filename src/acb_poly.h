@@ -18,7 +18,7 @@
 #define ACB_POLY_INLINE static __inline__
 #endif
 
-#include "fmpq_poly.h"
+#include "fmpq_types.h"
 #include "acb.h"
 
 #ifdef __cplusplus
