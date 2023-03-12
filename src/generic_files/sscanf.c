@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include <ctype.h>
 
 #ifdef __GNUC__
@@ -19,12 +20,9 @@
 # define strlen __builtin_strlen
 # define strcspn __builtin_strcspn
 # define strncpy __builtin_strncpy
-# define sprintf __builtin_sprintf
-# define sscanf __builtin_sscanf
 #else
 # include <stdarg.h>
 # include <string.h>
-# include <stdio.h>
 #endif
 
 #include "flint.h"
