@@ -360,7 +360,7 @@ Power series composition and reversion
     Sets *res* to the power series composition `h(x) = f(g(x))` truncated
     to order `O(x^n)` where `f` is given by *poly1* and `g` is given by *poly2*,
     respectively using Horner's rule, the Brent-Kung baby step-giant step
-    algorithm, divide-and-conquer, and an automatic choice between the algorithms.
+    algorithm [BrentKung1978]_, divide-and-conquer, and an automatic choice between the algorithms.
 
     The default algorithm also handles short input and
     special-form input `g = ax^n` efficiently.

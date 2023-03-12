@@ -10,21 +10,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "nmod_vec.h"
 #include "nmod_poly.h"
-#include "ulong_extras.h"
+#include "gr_poly.h"
 
 void
 _nmod_poly_compose_series(mp_ptr res, mp_srcptr poly1, slong len1, 
                             mp_srcptr poly2, slong len2, slong n, nmod_t mod)
 {
-    if (len1 < 24 || len2 < 8)
-        _nmod_poly_compose_series_horner(res, poly1, len1,
-                                                    poly2, len2, n, mod);
-    else
-        _nmod_poly_compose_series_brent_kung(res, poly1, len1,
-                                                    poly2, len2, n, mod);
+    gr_ctx_t ctx;
+    _gr_ctx_init_nmod(ctx, &mod);
+    GR_MUST_SUCCEED(_gr_poly_compose_series(res, poly1, len1, poly2, len2, n, ctx));
 }
 
 void

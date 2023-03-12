@@ -991,17 +991,6 @@ FLINT_DLL void nmod_poly_compose_mod(nmod_poly_t res,
 
 /* Power series composition and reversion ************************************/
 
-FLINT_DLL void _nmod_poly_compose_series_horner(mp_ptr res, mp_srcptr poly1, slong len1, 
-                            mp_srcptr poly2, slong len2, slong n, nmod_t mod);
-FLINT_DLL void nmod_poly_compose_series_horner(nmod_poly_t res, 
-                    const nmod_poly_t poly1, const nmod_poly_t poly2, slong n);
-
-FLINT_DLL void _nmod_poly_compose_series_brent_kung(mp_ptr res, mp_srcptr poly1, slong len1, 
-                            mp_srcptr poly2, slong len2, slong n, nmod_t mod);
-
-FLINT_DLL void nmod_poly_compose_series_brent_kung(nmod_poly_t res, 
-                    const nmod_poly_t poly1, const nmod_poly_t poly2, slong n);
-
 FLINT_DLL void _nmod_poly_compose_series(mp_ptr res, mp_srcptr poly1, slong len1, 
                             mp_srcptr poly2, slong len2, slong n, nmod_t mod);
 
@@ -1028,13 +1017,6 @@ FLINT_DLL void _nmod_poly_revert_series(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_
 
 FLINT_DLL void nmod_poly_revert_series(nmod_poly_t Qinv,
                                  const nmod_poly_t Q, slong n);
-
-FLINT_DLL void _nmod_poly_compose_series_divconquer(mp_ptr res, mp_srcptr poly1, slong len1, 
-                                                 mp_srcptr poly2, slong len2, 
-                                                 slong N, nmod_t mod);
-
-FLINT_DLL void nmod_poly_compose_series_divconquer(nmod_poly_t res, 
-    const nmod_poly_t poly1, const nmod_poly_t poly2, slong N);
 
 /* norms *********************************************************************/
 

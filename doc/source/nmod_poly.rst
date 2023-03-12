@@ -1912,70 +1912,6 @@ Power series composition
 Power series composition
 --------------------------------------------------------------------------------
 
-
-.. function:: void _nmod_poly_compose_series_horner(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong n)
-
-    Sets ``res`` to the composition of ``poly1`` and ``poly2``
-    modulo `x^n`, where the constant term of ``poly2`` is required
-    to be zero.
-
-    Assumes that ``len1, len2, n > 0``, that ``len1, len2 <= n``,
-    and that ``(len1-1) * (len2-1) + 1 <= n``, and that ``res`` has
-    space for ``n`` coefficients. Does not support aliasing between any
-    of the inputs and the output.
-
-    This implementation uses the Horner scheme.
-
-.. function:: void nmod_poly_compose_series_horner(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2, slong n)
-
-    Sets ``res`` to the composition of ``poly1`` and ``poly2``
-    modulo `x^n`, where the constant term of ``poly2`` is required
-    to be zero.
-
-    This implementation uses the Horner scheme.
-
-.. function:: void _nmod_poly_compose_series_brent_kung(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong n)
-
-    Sets ``res`` to the composition of ``poly1`` and ``poly2``
-    modulo `x^n`, where the constant term of ``poly2`` is required
-    to be zero.
-
-    Assumes that ``len1, len2, n > 0``, that ``len1, len2 <= n``,
-    and that\\ ``(len1-1) * (len2-1) + 1 <= n``, and that ``res`` has
-    space for ``n`` coefficients. Does not support aliasing between any
-    of the inputs and the output.
-
-    This implementation uses Brent-Kung algorithm 2.1 [BrentKung1978]_.
-
-.. function:: void nmod_poly_compose_series_brent_kung(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2, slong n)
-
-    Sets ``res`` to the composition of ``poly1`` and ``poly2``
-    modulo `x^n`, where the constant term of ``poly2`` is required
-    to be zero.
-
-    This implementation uses Brent-Kung algorithm 2.1 [BrentKung1978]_.
-
-.. function:: void _nmod_poly_compose_series_divconquer(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong N, nmod_t mod)
-
-    Composes ``poly1`` of length `\ell_1` with ``poly2`` of
-    length `\ell_2` modulo `x^N` and sets ``res`` to the result,
-    i.e.\ evaluates ``poly1`` at ``poly2``.
-
-    Writes `\min\{(\ell_1 - 1)(\ell_2 - 2) + 1, N\}` coefficients
-    to the vector ``res``.
-
-    The algorithm used is the divide and conquer algorithm.
-    It is assumed that `0 < \ell_1` and `0 < \ell_2 \leq N`.
-
-    Does not support aliasing between the inputs and the output.
-
-.. function:: void nmod_poly_compose_series_divconquer(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2, slong N)
-
-    Composes ``poly1`` with ``poly2`` modulo `x^N` and sets ``res``
-    to the result, i.e.\ evaluates ``poly1`` at ``poly2``.
-
-    The algorithm used is the divide and conquer algorithm.
-
 .. function:: void _nmod_poly_compose_series(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong n)
 
     Sets ``res`` to the composition of ``poly1`` and ``poly2``
@@ -1987,17 +1923,14 @@ Power series composition
     space for ``n`` coefficients. Does not support aliasing between any
     of the inputs and the output.
 
-    This implementation automatically switches between the Horner scheme
-    and Brent-Kung algorithm 2.1 depending on the size of the inputs.
+    Wraps :func:`_gr_poly_compose_series` which chooses automatically
+    between various algorithms.
 
 .. function:: void nmod_poly_compose_series(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2, slong n)
 
     Sets ``res`` to the composition of ``poly1`` and ``poly2``
     modulo `x^n`, where the constant term of ``poly2`` is required
     to be zero.
-
-    This implementation automatically switches between the Horner scheme
-    and Brent-Kung algorithm 2.1 depending on the size of the inputs.
 
 
 Power series reversion
