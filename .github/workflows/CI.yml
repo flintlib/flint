@@ -18,7 +18,8 @@ jobs:
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CC: "gcc"
-      CFLAGS: "-Wall"
+      CFLAGS: "-Wall -DFLINT_NOSTDIO -DFLINT_NOSTDARG"
+      TEST_CFLAGS: "-Wall -DFLINT_NOSTDARG"
 
     steps:
       - uses: actions/checkout@v3
@@ -32,7 +33,7 @@ jobs:
 
       - name: "Configure"
         run: |
-          ./configure CC=${CC} CFLAGS="${CFLAGS}" --with-gmp=/usr --with-mpfr=/usr
+          ./configure CC=${CC} CFLAGS="${CFLAGS}" TEST_CFLAGS="${TEST_CFLAGS}" --with-gmp=/usr --with-mpfr=/usr
 
       - name: "Compile"
         run: |
