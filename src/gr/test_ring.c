@@ -2425,14 +2425,15 @@ gr_test_complex_parts(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int 
-gr_test_vec_add(gr_ctx_t R, flint_rand_t state, int test_flags)
+int
+gr_test_vec_binary_op(gr_ctx_t R, const char * opname, int (*gr_op)(gr_ptr, gr_srcptr, gr_srcptr, gr_ctx_t),
+    int (*_gr_vec_op)(gr_ptr, gr_srcptr, gr_srcptr, slong, gr_ctx_t), flint_rand_t state, int test_flags)
 {
     int status, aliasing;
     slong i, len;
     gr_ptr x, y, xy1, xy2;
 
-    len = n_randint(state, 10);
+    len = n_randint(state, 5);
 
     GR_TMP_INIT_VEC(x, len, R);
     GR_TMP_INIT_VEC(y, len, R);
@@ -2448,27 +2449,28 @@ gr_test_vec_add(gr_ctx_t R, flint_rand_t state, int test_flags)
     status = GR_SUCCESS;
 
     aliasing = n_randint(state, 4);
+
     switch (aliasing)
     {
         case 0:
             status |= _gr_vec_set(xy1, x, len, R);
-            status |= _gr_vec_add(xy1, xy1, y, len, R);
+            status |= _gr_vec_op(xy1, xy1, y, len, R);
             break;
         case 1:
             status |= _gr_vec_set(xy1, y, len, R);
-            status |= _gr_vec_add(xy1, x, xy1, len, R);
+            status |= _gr_vec_op(xy1, x, xy1, len, R);
             break;
         case 2:
             status |= _gr_vec_set(y, x, len, R);
             status |= _gr_vec_set(xy1, x, len, R);
-            status |= _gr_vec_add(xy1, xy1, xy1, len, R);
+            status |= _gr_vec_op(xy1, xy1, xy1, len, R);
             break;
         default:
-            status |= _gr_vec_add(xy1, x, y, len, R);
+            status |= _gr_vec_op(xy1, x, y, len, R);
     }
 
     for (i = 0; i < len; i++)
-        status |= gr_add(GR_ENTRY(xy2, i, R->sizeof_elem),
+        status |= gr_op(GR_ENTRY(xy2, i, R->sizeof_elem),
                          GR_ENTRY(x, i, R->sizeof_elem),
                          GR_ENTRY(y, i, R->sizeof_elem), R);
 
@@ -2482,16 +2484,102 @@ gr_test_vec_add(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
-        /* todo: vec print */
-        printf("\n");
+        printf("%s\n", opname);
+        gr_ctx_println(R);
         printf("aliasing: %d\n", aliasing);
-        printf("\n");
+        _gr_vec_print(xy1, len, R); printf("\n");
+        _gr_vec_print(xy2, len, R); printf("\n");
     }
 
     GR_TMP_CLEAR_VEC(x, len, R);
     GR_TMP_CLEAR_VEC(y, len, R);
     GR_TMP_CLEAR_VEC(xy1, len, R);
     GR_TMP_CLEAR_VEC(xy2, len, R);
+
+    return status;
+}
+
+int gr_test_vec_add(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op(R, "vec_add", gr_add, _gr_vec_add, state, test_flags); }
+int gr_test_vec_sub(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op(R, "vec_sub", gr_sub, _gr_vec_sub, state, test_flags); }
+int gr_test_vec_mul(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op(R, "vec_mul", gr_mul, _gr_vec_mul, state, test_flags); }
+int gr_test_vec_div(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op(R, "vec_div", gr_div, _gr_vec_div, state, test_flags); }
+int gr_test_vec_divexact(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op(R, "vec_divexact", gr_divexact, _gr_vec_divexact, state, test_flags); }
+int gr_test_vec_pow(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op(R, "vec_pow", gr_pow, _gr_vec_pow, state, test_flags); }
+
+int gr_generic_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx);
+
+int
+gr_test_vec_dot(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status;
+    slong len;
+    gr_ptr x, y, a, s, t;
+    int initial, alias, subtract, reverse;
+
+    len = n_randint(state, 5);
+
+    initial = n_randint(state, 2);
+    alias = n_randint(state, 2);
+    subtract = n_randint(state, 2);
+    reverse = n_randint(state, 2);
+
+    GR_TMP_INIT_VEC(x, len, R);
+    GR_TMP_INIT_VEC(y, len, R);
+    GR_TMP_INIT3(a, s, t, R);
+
+    GR_MUST_SUCCEED(_gr_vec_randtest(x, state, len, R));
+    GR_MUST_SUCCEED(_gr_vec_randtest(y, state, len, R));
+    GR_MUST_SUCCEED(gr_randtest(a, state, R));
+    GR_MUST_SUCCEED(gr_randtest(s, state, R));
+    GR_MUST_SUCCEED(gr_randtest(t, state, R));
+
+    status = GR_SUCCESS;
+
+    if (initial && alias)
+    {
+        GR_MUST_SUCCEED(gr_set(s, a, R));
+        GR_MUST_SUCCEED(gr_set(t, a, R));
+    }
+
+    if (reverse)
+    {
+        status |= _gr_vec_dot_rev(s, initial ? (alias ? s : a) : NULL, subtract, x, y, len, R);
+        status |= _gr_poly_reverse(y, y, len, len, R);
+        status |= gr_generic_vec_dot(t, initial ? (alias ? t : a) : NULL, subtract, x, y, len, R);
+        status |= _gr_poly_reverse(y, y, len, len, R);
+    }
+    else
+    {
+        status |= _gr_vec_dot(s, initial ? (alias ? s : a) : NULL, subtract, x, y, len, R);
+        status |= gr_generic_vec_dot(t, initial ? (alias ? t : a) : NULL, subtract, x, y, len, R);
+    }
+
+    if (status == GR_SUCCESS && gr_equal(s, t, R) == T_FALSE)
+    {
+        status = GR_TEST_FAIL;
+    }
+
+    if ((test_flags & GR_TEST_ALWAYS_ABLE) && (status & GR_UNABLE))
+        status = GR_TEST_FAIL;
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        printf("dot\n");
+        gr_ctx_println(R);
+        printf("alias: %d\n", alias);
+        printf("initial: %d\n", initial);
+        printf("subtract: %d\n", subtract);
+        printf("reverse: %d\n", reverse);
+        _gr_vec_print(x, len, R); printf("\n");
+        _gr_vec_print(y, len, R); printf("\n");
+        gr_println(a, R);
+        gr_println(s, R);
+        gr_println(t, R);
+    }
+
+    GR_TMP_CLEAR_VEC(x, len, R);
+    GR_TMP_CLEAR_VEC(y, len, R);
+    GR_TMP_CLEAR3(a, s, t, R);
 
     return status;
 }
@@ -2725,6 +2813,7 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
 {
     timeit_t timer;
     flint_rand_t state;
+    slong vec_iters = iters / 10 + 1;
 
     /* test_flags |= GR_TEST_VERBOSE; */
 
@@ -2811,7 +2900,7 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
     gr_test_iter(R, state, "pow_fmpz: exponent addition", gr_test_pow_fmpz_exponent_addition, iters, test_flags);
 
     gr_test_iter(R, state, "sqrt", gr_test_sqrt, iters, test_flags & (~GR_TEST_ALWAYS_ABLE));
-    gr_test_iter(R, state, "rsqrt", gr_test_sqrt, iters, test_flags & (~GR_TEST_ALWAYS_ABLE));
+    gr_test_iter(R, state, "rsqrt", gr_test_rsqrt, iters, test_flags & (~GR_TEST_ALWAYS_ABLE));
 
     if (gr_ctx_is_ordered_ring(R) == T_TRUE)
     {
@@ -2821,7 +2910,14 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
 
     gr_test_iter(R, state, "complex_parts", gr_test_complex_parts, iters, test_flags);
 
-    gr_test_iter(R, state, "vec_add", gr_test_vec_add, iters, test_flags);
+    gr_test_iter(R, state, "vec_add", gr_test_vec_add, vec_iters, test_flags);
+    gr_test_iter(R, state, "vec_sub", gr_test_vec_sub, vec_iters, test_flags);
+    gr_test_iter(R, state, "vec_mul", gr_test_vec_mul, vec_iters, test_flags);
+    gr_test_iter(R, state, "vec_div", gr_test_vec_div, vec_iters, test_flags);
+    gr_test_iter(R, state, "vec_divexact", gr_test_vec_divexact, vec_iters, test_flags);
+    /* gr_test_iter(R, state, "vec_pow", gr_test_vec_pow, vec_iters, test_flags & (~GR_TEST_ALWAYS_ABLE)); large elements */
+
+    gr_test_iter(R, state, "vec_dot", gr_test_vec_dot, iters, test_flags);
 
     gr_test_iter(R, state, "mat_mul_classical: associative", gr_test_mat_mul_classical_associative, iters, test_flags);
 
