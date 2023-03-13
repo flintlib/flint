@@ -649,6 +649,38 @@ _gr_nmod_vec_mul_scalar_2exp_si(ulong * res, const ulong * vec1, slong len, slon
 }
 
 int
+_gr_nmod_vec_addmul_scalar(ulong * res, const ulong * vec1, slong len, const ulong * c, gr_ctx_t ctx)
+{
+    nmod_t mod = NMOD_CTX(ctx);
+    _nmod_vec_scalar_addmul_nmod(res, vec1, len, c[0], mod);
+    return GR_SUCCESS;
+}
+
+int
+_gr_nmod_vec_submul_scalar(ulong * res, const ulong * vec1, slong len, const ulong * c, gr_ctx_t ctx)
+{
+    nmod_t mod = NMOD_CTX(ctx);
+    _nmod_vec_scalar_addmul_nmod(res, vec1, len, nmod_neg(c[0], mod), mod);
+    return GR_SUCCESS;
+}
+
+int
+_gr_nmod_vec_addmul_scalar_si(ulong * res, const ulong * vec1, slong len, slong c, gr_ctx_t ctx)
+{
+    nmod_t mod = NMOD_CTX(ctx);
+    _nmod_vec_scalar_addmul_nmod(res, vec1, len, nmod_set_si(c, mod), mod);
+    return GR_SUCCESS;
+}
+
+int
+_gr_nmod_vec_submul_scalar_si(ulong * res, const ulong * vec1, slong len, slong c, gr_ctx_t ctx)
+{
+    nmod_t mod = NMOD_CTX(ctx);
+    _nmod_vec_scalar_addmul_nmod(res, vec1, len, nmod_neg(nmod_set_si(c, mod), mod), mod);
+    return GR_SUCCESS;
+}
+
+int
 _gr_nmod_vec_sum(ulong * res, const ulong * vec, slong len, gr_ctx_t ctx)
 {
     ulong hi, lo;
@@ -1208,6 +1240,10 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_VEC_MUL_SCALAR_UI,   (gr_funcptr) _gr_nmod_vec_mul_scalar_ui},
     {GR_METHOD_VEC_MUL_SCALAR_FMPZ, (gr_funcptr) _gr_nmod_vec_mul_scalar_fmpz},
     {GR_METHOD_VEC_MUL_SCALAR_2EXP_SI,   (gr_funcptr) _gr_nmod_vec_mul_scalar_2exp_si},
+    {GR_METHOD_VEC_ADDMUL_SCALAR,        (gr_funcptr) _gr_nmod_vec_addmul_scalar},
+    {GR_METHOD_VEC_ADDMUL_SCALAR_SI,     (gr_funcptr) _gr_nmod_vec_addmul_scalar_si},
+    {GR_METHOD_VEC_SUBMUL_SCALAR,        (gr_funcptr) _gr_nmod_vec_submul_scalar},
+    {GR_METHOD_VEC_SUBMUL_SCALAR_SI,     (gr_funcptr) _gr_nmod_vec_submul_scalar_si},
     {GR_METHOD_VEC_SUB,         (gr_funcptr) _gr_nmod_vec_sub},
     {GR_METHOD_VEC_SUM,         (gr_funcptr) _gr_nmod_vec_sum},
     {GR_METHOD_VEC_PRODUCT,     (gr_funcptr) _gr_nmod_vec_product},
