@@ -108,6 +108,12 @@ void fmpz_init(fmpz_t f)
 
 FLINT_DLL void fmpz_init2(fmpz_t f, ulong limbs);
 
+FLINT_DLL void _fmpz_promote_set_ui(fmpz_t f, ulong v);
+FLINT_DLL void _fmpz_promote_neg_ui(fmpz_t f, ulong v);
+FLINT_DLL void _fmpz_promote_set_si(fmpz_t f, slong v);
+FLINT_DLL void _fmpz_init_promote_set_ui(fmpz_t f, ulong v);
+FLINT_DLL void _fmpz_init_promote_set_si(fmpz_t f, slong v);
+
 FMPZ_INLINE
 void fmpz_init_set(fmpz_t f, const fmpz_t g)
 {
@@ -118,48 +124,28 @@ void fmpz_init_set(fmpz_t f, const fmpz_t g)
     else
     {
         __mpz_struct *ptr;
-
         ptr = _fmpz_new_mpz();
         *f = PTR_TO_COEFF(ptr);
         mpz_set(ptr, COEFF_TO_PTR(*g));
     }
 }
 
-FLINT_DLL void _fmpz_mpz_set_ui(mpz_ptr r, ulong u);
-FLINT_DLL void _fmpz_mpz_set_si(mpz_ptr r, slong s);
-
 FMPZ_INLINE
 void fmpz_init_set_ui(fmpz_t f, ulong g)
 {
     if (g <= COEFF_MAX)
-    {
         *f = g;
-    }
     else
-    {
-        __mpz_struct *ptr;
-
-        ptr = _fmpz_new_mpz();
-        *f = PTR_TO_COEFF(ptr);
-        _fmpz_mpz_set_ui(ptr, g);
-    }
+        _fmpz_init_promote_set_ui(f, g);
 }
 
 FMPZ_INLINE
 void fmpz_init_set_si(fmpz_t f, slong g)
 {
     if (COEFF_MIN <= g && g <= COEFF_MAX)
-    {
         *f = g;
-    }
     else
-    {
-        __mpz_struct *ptr;
-
-        ptr = _fmpz_new_mpz();
-        *f = PTR_TO_COEFF(ptr);
-        _fmpz_mpz_set_si(ptr, g);
-    }
+        _fmpz_init_promote_set_si(f, g);
 }
 
 FMPZ_INLINE
@@ -211,47 +197,40 @@ fmpz_get_uiui(mp_limb_t * hi, mp_limb_t * low, const fmpz_t f)
 FMPZ_INLINE void
 fmpz_set_si(fmpz_t f, slong val)
 {
-    if (val < COEFF_MIN || val > COEFF_MAX) /* val is large */
+    if (val >= COEFF_MIN && val <= COEFF_MAX)
     {
-        __mpz_struct *mpz_coeff = _fmpz_promote(f);
-        _fmpz_mpz_set_si(mpz_coeff, val);
+        if (COEFF_IS_MPZ(*f)) 
+            _fmpz_clear_mpz(*f);
+        *f = val;
     }
     else
-    {
-        _fmpz_demote(f);
-        *f = val;               /* val is small */
-    }
+        _fmpz_promote_set_si(f, val);
 }
 
 FMPZ_INLINE void
 fmpz_set_ui(fmpz_t f, ulong val)
 {
-    if (val > COEFF_MAX)        /* val is large */
+    if (val <= COEFF_MAX)
     {
-        __mpz_struct *mpz_coeff = _fmpz_promote(f);
-        _fmpz_mpz_set_ui(mpz_coeff, val);
+        if (COEFF_IS_MPZ(*f)) 
+            _fmpz_clear_mpz(*f);
+        *f = val;
     }
     else
-    {
-        _fmpz_demote(f);
-        *f = val;               /* val is small */
-    }
+        _fmpz_promote_set_ui(f, val);
 }
 
 FMPZ_INLINE void
 fmpz_neg_ui(fmpz_t f, ulong val)
 {
-    if (val > COEFF_MAX)
+    if (val <= COEFF_MAX)
     {
-        __mpz_struct *mpz_coeff = _fmpz_promote(f);
-        _fmpz_mpz_set_ui(mpz_coeff, val);
-        mpz_neg(mpz_coeff, mpz_coeff);
-    }
-    else
-    {
-        _fmpz_demote(f);
+        if (COEFF_IS_MPZ(*f)) 
+            _fmpz_clear_mpz(*f);
         *f = -(slong) val;
     }
+    else
+        _fmpz_promote_neg_ui(f, val);
 }
 
 FMPZ_INLINE void

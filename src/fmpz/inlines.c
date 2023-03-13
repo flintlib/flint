@@ -16,16 +16,39 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-void _fmpz_mpz_set_ui(mpz_ptr r, ulong u)
+void _fmpz_promote_set_ui(fmpz_t f, ulong v)
 {
-    flint_mpz_set_ui(r, u);
+    __mpz_struct * z = _fmpz_promote(f);
+    flint_mpz_set_ui(z, v);
 }
 
-void _fmpz_mpz_set_si(mpz_ptr r, slong s)
+void _fmpz_promote_neg_ui(fmpz_t f, ulong v)
 {
-    flint_mpz_set_si(r, s);
+    __mpz_struct * z = _fmpz_promote(f);
+    flint_mpz_set_ui(z, v);
+    mpz_neg(z, z);
 }
- 
+
+void _fmpz_promote_set_si(fmpz_t f, slong v)
+{
+    __mpz_struct * z = _fmpz_promote(f);
+    flint_mpz_set_si(z, v);
+}
+
+void _fmpz_init_promote_set_ui(fmpz_t f, ulong v)
+{
+    __mpz_struct * z = _fmpz_new_mpz();
+    *f = PTR_TO_COEFF(z);
+    flint_mpz_set_ui(z, v);
+}
+
+void _fmpz_init_promote_set_si(fmpz_t f, slong v)
+{
+    __mpz_struct * z = _fmpz_new_mpz();
+    *f = PTR_TO_COEFF(z);
+    flint_mpz_set_si(z, v);
+}
+
 fmpz * __new_fmpz()
 {
     return flint_calloc(sizeof(fmpz), 1);
