@@ -15,15 +15,16 @@
 int main(void)
 {
    int i, result;
+   slong num_iter;
    ulong count = UWORD(0);
    FLINT_TEST_INIT(state);
    
    flint_printf("factor_one_line....");
    fflush(stdout);
 
-   
+   num_iter = 500 * FLINT_MAX(1, flint_test_multiplier());
 
-   for (i = 0; i < 500 * flint_test_multiplier(); i++) /* Test random numbers */
+   for (i = 0; i < num_iter; i++) /* Test random numbers */
    {
       mp_limb_t n1, n2, bits;
       
@@ -54,7 +55,7 @@ int main(void)
       }
    }
    
-   if (count < 450 * flint_test_multiplier())
+   if (count < 0.9 * num_iter)
    {
       flint_printf("FAIL:\n");
       flint_printf("Only %wu numbers factored\n", count);

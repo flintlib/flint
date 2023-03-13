@@ -20,11 +20,14 @@ main(void)
     int i, j, result;
     int * count;
     int * count_in_subrange;
+    slong test_multiplier;
 
     FLINT_TEST_INIT(state);
 
     flint_printf("n_urandint....");
     fflush(stdout);
+
+    test_multiplier = FLINT_MAX(1, flint_test_multiplier());
 
     /* Test for limit <= 1000 */
     count = flint_malloc(sizeof(int) * 1000);
@@ -35,7 +38,7 @@ main(void)
             count[i] = 0;
         }
 
-        for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+        for (i = 0; i < 1000 * test_multiplier; i++)
         {
             rand_num = n_urandint(state, limit);
             count[rand_num]++;
@@ -44,9 +47,9 @@ main(void)
         result = 1;
         for (i = 0; i < limit; i++)
         {
-            deviation = count[i] - (1000 * (int) flint_test_multiplier())/limit;
-            if (deviation >= WORD(100) * flint_test_multiplier() ||
-                deviation <= WORD(-100) * flint_test_multiplier())
+            deviation = count[i] - (1000 * (int) test_multiplier)/limit;
+            if (deviation >= WORD(100) * test_multiplier ||
+                deviation <= WORD(-100) * test_multiplier)
             {
                 result = 0;
                 break;
@@ -76,7 +79,7 @@ main(void)
 
         limit = UWORD_MAX/(i + 2)*(i + 1);
 
-        for (j = 0; j < 1000 * flint_test_multiplier(); j++)
+        for (j = 0; j < 1000 * test_multiplier; j++)
         {
             rand_num = n_urandint(state, limit);
 
@@ -101,9 +104,9 @@ main(void)
         result = 1;
         for (j = 0; j < 4; j++)
         {
-            deviation = count_in_subrange[j] - ((1000 * (int) flint_test_multiplier()) >> 2);
-            if (deviation >= WORD(100) * flint_test_multiplier() || 
-                deviation <= WORD(-100) * flint_test_multiplier())
+            deviation = count_in_subrange[j] - ((1000 * (int) test_multiplier) >> 2);
+            if (deviation >= WORD(100) * test_multiplier || 
+                deviation <= WORD(-100) * test_multiplier)
             {
                 result = 0;
                 break;

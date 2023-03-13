@@ -17,14 +17,15 @@ int main(void)
 {
    int i, j, result;
    ulong count = UWORD(0);
+   slong test_multiplier;
    FLINT_TEST_INIT(state);
    
    flint_printf("is_strong_probabprime_precomp....");
    fflush(stdout);
 
-   
+   test_multiplier = FLINT_MAX(1, flint_test_multiplier());
 
-   for (i = 0; i < 100 * flint_test_multiplier(); i++) /* Test that primes pass the test */
+   for (i = 0; i < 100 * test_multiplier; i++) /* Test that primes pass the test */
    {
       mp_limb_t a, d, norm;
       mpz_t d_m;
@@ -63,7 +64,7 @@ int main(void)
       mpz_clear(d_m);
    }
 
-   for (i = 0; i < 100 * flint_test_multiplier(); i++) /* Test that not too many composites pass */
+   for (i = 0; i < 100 * test_multiplier; i++) /* Test that not too many composites pass */
    {
       mp_limb_t a, d, norm;
       mpz_t d_m;
@@ -93,7 +94,7 @@ int main(void)
       mpz_clear(d_m);
    }
 
-   if (count > 220 * flint_test_multiplier()) 
+   if (count > 220 * test_multiplier) 
    {
       flint_printf("FAIL:\n");
       flint_printf("count = %wu\n", count);
