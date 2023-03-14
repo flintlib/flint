@@ -46,4 +46,12 @@ build
 flint2
 .DS_Store
 python/__pycache__/*.pyc
-
+aclocal.m4
+config.guess
+config.status
+config.sub
+configure
+install-sh
+libtool
+ltmain.sh
+src/config.h.in

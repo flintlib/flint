@@ -1,4 +1,85 @@
-EXE_LDFLAGS:=$(LDFLAGS) -Wl,-rpath,$(GMP_LIB_DIR) -Wl,-rpath,$(MPFR_LIB_DIR) -Wl,-rpath,$(ABS_FLINT_DIR)
+#
+# Copyright (C) 2023 Albin Ahlbäck
+#
+# This file is part of FLINT.
+#
+# FLINT is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Lesser General Public License (LGPL) as published
+# by the Free Software Foundation; either version 2.1 of the License, or
+# (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+#
+
+FLINT_DIR:=.
+SRC_DIR:=src
+BUILD_DIR:=build
+ABS_FLINT_DIR:=$(patsubst %/,%, $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
+ABS_SRC_DIR:=$(ABS_FLINT_DIR)/$(SRC_DIR)
+ABS_BUILD_DIR:=$(ABS_FLINT_DIR)/$(SRC_DIR)
+
+FLINT_MAJOR:=@FLINT_MAJOR@
+FLINT_MINOR:=@FLINT_MINOR@
+FLINT_PATCH:=@FLINT_PATCH@
+FLINT_MAJOR_SO:=@FLINT_MAJOR_SO@
+FLINT_MINOR_SO:=@FLINT_MINOR_SO@
+FLINT_PATCH_SO:=@FLINT_PATCH_SO@
+
+FLINT_LIB:=@FLINT_LIB@
+FLINT_IMPLIB:=@FLINT_IMPLIB@
+FLINT_LIBNAME:=@FLINT_LIBNAME@
+FLINT_LIB_STATIC:=@FLINT_LIB_STATIC@
+
+FLINT_SOLIB:=@FLINT_SOLIB@
+
+prefix:=@prefix@
+exec_prefix:=@exec_prefix@
+
+INCLUDEDIR:=@includedir@
+LIBDIR:=@libdir@
+BINDIR:=@bindir@
+
+HOST_OS:=@host_os@
+
+EXEEXT:=@EXEEXT@
+
+AR:=@AR@
+CC:=@CC@
+CXX:=@CC@
+DLLTOOL:=@DLLTOOL@
+LD:=@LD@
+LDCONFIG:=@LDCONFIG@
+LN_S:=@LN_S@
+MKDIR_P:=@MKDIR_P@
+STRIP:=@STRIP@
+RM_F:=rm -f
+RM_RF:=rm -rf
+CP:=cp
+CP_A:=cp -a
+
+STATIC:=@STATIC@
+SHARED:=@SHARED@
+
+COVERAGE:=@COVERAGE@
+WANT_NTL:=@WANT_NTL@
+
+WANT_DEPS:=@WANT_DEPS@
+
+GMP_LIB_PATH:=@GMP_LIB_PATH@
+MPFR_LIB_PATH:=@MPFR_LIB_PATH@
+BLAS_LIB_PATH:=@BLAS_LIB_PATH@
+GC_LIB_PATH:=@GC_LIB_PATH@
+NTL_LIB_PATH:=@NTL_LIB_PATH@
+
+CFLAGS:=@CFLAGS@
+CPPFLAGS:=@CPPFLAGS@
+CPPFLAGS2:=-L$(FLINT_DIR) $(CPPFLAGS)
+CXXFLAGS:=@CXXFLAGS@
+LIBS:=@LIBS@
+LIBS2:=$(LIBS) -lflint
+PIC_FLAG:=@PIC_FLAG@
+
+LDFLAGS:=@LDFLAGS@
+EXTRA_SHARED_FLAGS:=@EXTRA_SHARED_FLAGS@ $(foreach path, $(GMP_LIB_PATH) $(MPFR_LIB_PATH) $(BLAS_LIB_PATH) $(GC_LIB_PATH) $(NTL_LIB_PATH), @WL@-rpath,$(path))
+EXE_LDFLAGS:=$(LDFLAGS) $(foreach path, $(ABS_FLINT_DIR) $(GMP_LIB_PATH) $(MPFR_LIB_PATH) $(BLAS_LIB_PATH) $(GC_LIB_PATH) $(NTL_LIB_PATH), @WL@-rpath,$(path))
 
 ################################################################################
 ################################################################################
@@ -12,7 +93,7 @@ EXE_LDFLAGS:=$(LDFLAGS) -Wl,-rpath,$(GMP_LIB_DIR) -Wl,-rpath,$(MPFR_LIB_DIR) -Wl
 
 CFG_FILES :=                                                                \
         $(FLINT_DIR)/config.log         $(FLINT_DIR)/flint-config.h         \
-        $(SRC_DIR)/fft_tuning.h         $(SRC_DIR)/fmpz-conversions.h       \
+        $(SRC_DIR)/fft_tuning.h                                             \
         $(FLINT_DIR)/Makefile           $(SRC_DIR)/fmpz/fmpz.c
 
 ################################################################################
@@ -94,6 +175,7 @@ TEMPLATE_DIRS :=                                                            \
         fq_embed_templates              fq_templates
 
 BUILD_DIRS :=                                                               \
+		$(BUILD_DIR)                                                        \
         $(patsubst %, $(BUILD_DIR)/%, $(DIRS))                              \
         $(patsubst %, $(BUILD_DIR)/%/profile, $(DIRS))                      \
         $(patsubst %, $(BUILD_DIR)/%/test, $(DIRS))                         \
@@ -104,18 +186,16 @@ ifneq ($(WANT_NTL), 0)
 BUILD_DIRS +=                                                               \
         $(BUILD_DIR)/interfaces         $(BUILD_DIR)/interfaces/test
 endif
+ifneq ($(COVERAGE), 0)
+BUILD_DIRS +=                                                               \
+        $(BUILD_DIR)/coverage
+endif
 
 INSTALL_DIRS :=                                                             \
-        $(PREFIX)/$(LIBDIR)             $(PREFIX)/include/flint             \
-        $(PREFIX)/include/flint/flintxx
-ifeq ($(OS),"MINGW32")
-INSTALL_DIRS += $(PREFIX)/lib
-else ifeq ($(OS),"MINGW64")
-INSTALL_DIRS += $(PREFIX)/lib
-else ifeq ($(OS),"CYGWIN32")
-INSTALL_DIRS += $(PREFIX)/lib
-else ifeq ($(OS),"CYGWIN64")
-INSTALL_DIRS += $(PREFIX)/lib
+        $(LIBDIR)                       $(INCLUDEDIR)/flint                 \
+        $(INCLUDEDIR)/flint/flintxx
+ifneq ($(findstring $(HOST_OS),mingw32 mingw64 cygwin msys),)
+INSTALL_DIRS += $(BINDIR)
 endif
 
 ################################################################################
@@ -152,7 +232,7 @@ endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_SOURCES,$(dir))))
 SOURCES := $(foreach dir,$(DIRS),$($(dir)_SOURCES))
 # NOTE: We do not add CPP files to C files in SOURCES in order to not screw up
-# the `patsubst'.
+# the `patsubst' in the object files.
 ifneq ($(WANT_NTL), 0)
 interfaces_SOURCES := $(SRC_DIR)/interfaces/NTL-interface.cpp
 endif
@@ -187,8 +267,12 @@ EXMP_SOURCES := $(wildcard $(FLINT_DIR)/examples/*.c)
 # objects
 ################################################################################
 
-ifneq ($(FLINT_STATIC), 0)
-OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SOURCES))
+ifneq ($(STATIC), 0)
+define xxx_OBJS
+$(1)_OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$($(1)_SOURCES))
+endef
+$(foreach dir, $(DIRS), $(eval $(call xxx_OBJS,$(dir))))
+OBJS := $(foreach dir, $(DIRS), $($(dir)_OBJS))
 ifneq ($(WANT_NTL), 0)
 OBJS += $(BUILD_DIR)/interfaces/NTL-interface.o
 endif
@@ -198,8 +282,12 @@ endif
 # library objects
 ################################################################################
 
-ifneq ($(FLINT_SHARED), 0)
-LOBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.lo,$(SOURCES))
+ifneq ($(SHARED), 0)
+define xxx_LOBJS
+$(1)_LOBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.lo,$($(1)_SOURCES))
+endef
+$(foreach dir, $(DIRS), $(eval $(call xxx_LOBJS,$(dir))))
+LOBJS := $(foreach dir, $(DIRS), $($(dir)_LOBJS))
 ifneq ($(WANT_NTL), 0)
 LOBJS += $(BUILD_DIR)/interfaces/NTL-interface.lo
 endif
@@ -251,38 +339,53 @@ all: library
 # library
 ################################################################################
 
-ifneq ($(FLINT_SHARED), 0)
+ifneq ($(SHARED), 0)
 library: shared
 endif
-ifneq ($(FLINT_STATIC), 0)
+ifneq ($(STATIC), 0)
 library: static
 endif
 
-ifneq ($(FLINT_SHARED), 0)
+ifneq ($(SHARED), 0)
 shared: $(FLINT_DIR)/$(FLINT_LIB)
 
-$(FLINT_DIR)/$(FLINT_LIB): $(LOBJS)
-	$(CC) $(CFLAGS) $(ABI_FLAG) -shared $(EXTRA_SHARED_FLAGS) $(LOBJS) -o $(FLINT_LIB) $(LDFLAGS) $(LIBS2)
+# The following is to avoid reaching the maximum length of command line
+# arguments, mainly present on MinGW.
+define xxx_merged_lobj_rule
+$(BUILD_DIR)/$(1)_merged.lo: $($(1)_LOBJS) | $(BUILD_DIR)
+	$(LD) -r $($(1)_LOBJS) -o $(BUILD_DIR)/$(1)_merged.lo
+endef
+$(foreach dir, $(DIRS), $(eval $(call xxx_merged_lobj_rule,$(dir))))
+MERGED_LOBJS:=$(foreach dir, $(DIRS),$(BUILD_DIR)/$(dir)_merged.lo)
+
+$(FLINT_DIR)/$(FLINT_LIB): $(MERGED_LOBJS)
+	$(CC) $(CFLAGS) -shared $(EXTRA_SHARED_FLAGS) $(MERGED_LOBJS) -o $(FLINT_LIB) $(LDFLAGS) $(LIBS)
 ifneq ($(FLINT_SOLIB), 0)
 	$(LDCONFIG) -n .
 endif
-ifneq ($(OS),"MINGW32")
-ifneq ($(OS),"MINGW64")
-ifneq ($(OS),"CYGWIN32")
-ifneq ($(OS),"CYGWIN64")
-	ln -sf "$(FLINT_LIB)" "$(FLINT_LIBNAME)"
-	ln -sf "$(FLINT_LIB)" "$(FLINT_LIBNAME).$(FLINT_MAJOR)"
-endif
-endif
-endif
-endif
+ifeq ($(findstring $(HOST_OS),mingw32 mingw64 cygwin msys),)
+	$(RM_F) "$(FLINT_LIBNAME)"
+	$(RM_F) "$(FLINT_LIBNAME).$(FLINT_MAJOR_SO)"
+	$(LN_S) "$(FLINT_LIB)" "$(FLINT_LIBNAME)"
+	$(LN_S) "$(FLINT_LIB)" "$(FLINT_LIBNAME).$(FLINT_MAJOR_SO)"
+else
+	$(DLLTOOL) $(FLINT_LIB) -z $(FLINT_IMPLIB) --export-all-symbols
 endif
 
-ifneq ($(FLINT_STATIC), 0)
-static: $(FLINT_DIR)/libflint.a
+ifneq ($(STATIC), 0)
+static: $(FLINT_DIR)/$(FLINT_LIB_STATIC)
 
-$(FLINT_DIR)/libflint.a: $(OBJS)
-	$(AR) rcs $(FLINT_DIR)/libflint.a $(OBJS)
+# The following is to avoid reaching the maximum length of command line
+# arguments, mainly present on MinGW.
+define xxx_merged_obj_rule
+$(BUILD_DIR)/$(1)_merged.o: $($(1)_OBJS) | $(BUILD_DIR)
+	$(LD) -r $($(1)_OBJS) -o $(BUILD_DIR)/$(1)_merged.o
+endef
+$(foreach dir, $(DIRS), $(eval $(call xxx_merged_obj_rule,$(dir))))
+MERGED_OBJS:=$(foreach dir, $(DIRS),$(BUILD_DIR)/$(dir)_merged.o)
+
+$(FLINT_DIR)/$(FLINT_LIB_STATIC): $(MERGED_OBJS)
+	$(AR) rcs $(FLINT_DIR)/$(FLINT_LIB_STATIC) $(MERGED_OBJS)
 endif
 
 ################################################################################
@@ -290,7 +393,7 @@ endif
 ################################################################################
 
 $(BUILD_DIRS) $(INSTALL_DIRS):
-	mkdir -p $@
+	$(MKDIR_P) $@
 
 ################################################################################
 # inclusions
@@ -399,11 +502,11 @@ endif
 # objects
 ################################################################################
 
-ifneq ($(FLINT_STATIC), 0)
+ifneq ($(STATIC), 0)
 define xxx_OBJS_rule
 $(BUILD_DIR)/$(1)/%.o: $(SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) -c $$< -o $$@ -MMD -MF $$(@:%=%.d)
+	@$(CC) $(CFLAGS) $(CPPFLAGS) -c $$< -o $$@ -MMD -MF $$(@:%=%.d)
 endef
 
 $(foreach dir, $(DIRS), $(eval $(call xxx_OBJS_rule,$(dir))))
@@ -411,7 +514,7 @@ $(foreach dir, $(DIRS), $(eval $(call xxx_OBJS_rule,$(dir))))
 ifneq ($(WANT_NTL), 0)
 $(BUILD_DIR)/interfaces/NTL-interface.o: $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp | $(BUILD_DIR)/interfaces
 	@echo "  CXX $(@:$(BUILD_DIR)/%=%)"
-	@$(CXX) $(CXXFLAGS) $(INCS) -c $< -o $@ -MMD -MF $(@:%=%.d)
+	@$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@ -MMD -MF $(@:%=%.d)
 endif
 endif
 
@@ -419,19 +522,19 @@ endif
 # library objects
 ################################################################################
 
-ifneq ($(FLINT_SHARED), 0)
+ifneq ($(SHARED), 0)
 define xxx_LOBJS_rule
 $(BUILD_DIR)/$(1)/%.lo: $(SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $$< -o $$@ -MMD -MF $$(@:%=%.d)
+	@$(CC) $(PIC_FLAG) $(CFLAGS) $(CPPFLAGS) -c $$< -o $$@ -MMD -MF $$(@:%=%.d)
 endef
 
 $(foreach dir, $(DIRS), $(eval $(call xxx_LOBJS_rule,$(dir))))
 
 ifneq ($(WANT_NTL), 0)
-$(BUILD_DIR)/interfaces/NTL-interface.o: $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp | $(BUILD_DIR)/interfaces
+$(BUILD_DIR)/interfaces/NTL-interface.lo: $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp | $(BUILD_DIR)/interfaces
 	@echo "  CXX $(@:$(BUILD_DIR)/%=%)"
-	@$(CXX) $(PIC_FLAG) $(CXXFLAGS) $(INCS) -c $< -o $@ -MMD -MF $(@:%=.d)
+	@$(CXX) $(PIC_FLAG) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@ -MMD -MF $(@:%=.d)
 endif
 endif
 
@@ -439,104 +542,104 @@ endif
 # executables
 ################################################################################
 
-ifeq ($(FLINT_SHARED), 0)
-$(BUILD_DIR)/profile/%$(EXEEXT): $(SRC_DIR)/profile/%.c $(FLINT_DIR)/libflint.a | $(BUILD_DIR)/profile
+ifeq ($(SHARED), 0)
+$(BUILD_DIR)/profile/%$(EXEEXT): $(SRC_DIR)/profile/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/profile
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
+	@$(CC) $(CFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
 else
 $(BUILD_DIR)/profile/%$(EXEEXT): $(SRC_DIR)/profile/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/profile
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
+	@$(CC) $(CFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
 endif
 
-ifeq ($(FLINT_SHARED), 0)
+ifeq ($(SHARED), 0)
 define xxx_PROFS_rule
-$(BUILD_DIR)/$(1)/profile/%$(EXEEXT): $(SRC_DIR)/$(1)/profile/%.c $(FLINT_DIR)/libflint.a | $(BUILD_DIR)/$(1)/profile
+$(BUILD_DIR)/$(1)/profile/%$(EXEEXT): $(SRC_DIR)/$(1)/profile/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/$(1)/profile
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $$(@:%=%.d)
+	@$(CC) $(CFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $$(@:%=%.d)
 endef
 else
 define xxx_PROFS_rule
 $(BUILD_DIR)/$(1)/profile/%$(EXEEXT): $(SRC_DIR)/$(1)/profile/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/$(1)/profile
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $$(@:%=%.d)
+	@$(CC) $(CFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $$(@:%=%.d)
 endef
 endif
 
 $(foreach dir, $(DIRS), $(eval $(call xxx_PROFS_rule,$(dir))))
 
-ifeq ($(FLINT_SHARED), 0)
-$(BUILD_DIR)/test/%$(EXEEXT): $(SRC_DIR)/test/%.c $(FLINT_DIR)/libflint.a | $(BUILD_DIR)/test
+ifeq ($(SHARED), 0)
+$(BUILD_DIR)/test/%$(EXEEXT): $(SRC_DIR)/test/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/test
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
+	@$(CC) $(CFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
 else
 $(BUILD_DIR)/test/%$(EXEEXT): $(SRC_DIR)/test/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/test
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
+	@$(CC) $(CFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
 endif
 
-ifeq ($(FLINT_SHARED), 0)
+ifeq ($(SHARED), 0)
 define xxx_TESTS_rule
 $(BUILD_DIR)/$(1)/test/%$(EXEEXT): $(SRC_DIR)/$(1)/test/%.c $(FLINT_DIR)/libflint.a | $(BUILD_DIR)/$(1)/test
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $$(@:%=%.d)
+	@$(CC) $(CFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $$(@:%=%.d)
 endef
 else
 define xxx_TESTS_rule
 $(BUILD_DIR)/$(1)/test/%$(EXEEXT): $(SRC_DIR)/$(1)/test/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/$(1)/test
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $$(@:%=%.d)
+	@$(CC) $(CFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $$(@:%=%.d)
 endef
 endif
 
 $(foreach dir, $(DIRS), $(eval $(call xxx_TESTS_rule,$(dir))))
 
 ifneq ($(WANT_NTL), 0)
-ifeq ($(FLINT_SHARED), 0)
-$(BUILD_DIR)/interfaces/test/t-NTL-interface$(EXEEXT): $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp $(FLINT_DIR)/libflint.a | $(BUILD_DIR)/interfaces/test
+ifeq ($(SHARED), 0)
+$(BUILD_DIR)/interfaces/test/t-NTL-interface$(EXEEXT): $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/interfaces/test
 	@echo "  CXX $(@:$(BUILD_DIR)/%=%)"
-	@$(CXX) $(CXXFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
+	@$(CXX) $(CXXFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
 else
 $(BUILD_DIR)/interfaces/test/t-NTL-interface$(EXEEXT): $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/interfaces/test
 	@echo "  CXX $(@:$(BUILD_DIR)/%=%)"
-	@$(CXX) $(CXXFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
+	@$(CXX) $(CXXFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
 endif
 endif
 
-ifeq ($(FLINT_SHARED), 0)
-$(BUILD_DIR)/tune/%$(EXEEXT): $(SRC_DIR)/tune/%.c $(FLINT_DIR)/libflint.a | $(BUILD_DIR)/tune
+ifeq ($(SHARED), 0)
+$(BUILD_DIR)/tune/%$(EXEEXT): $(SRC_DIR)/tune/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/tune
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
+	@$(CC) $(CFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
 else
 $(BUILD_DIR)/tune/%$(EXEEXT): $(SRC_DIR)/tune/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/tune
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
+	@$(CC) $(CFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
 endif
 
-ifeq ($(FLINT_SHARED), 0)
+ifeq ($(SHARED), 0)
 define xxx_TUNES_rule
-$(BUILD_DIR)/$(1)/tune/%$(EXEEXT): $(SRC_DIR)/$(1)/tune/%.c $(FLINT_DIR)/libflint.a | $(BUILD_DIR)/$(1)/tune
+$(BUILD_DIR)/$(1)/tune/%$(EXEEXT): $(SRC_DIR)/$(1)/tune/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/$(1)/tune
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $$(@:%=%.d)
+	@$(CC) $(CFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $$(@:%=%.d)
 endef
 else
 define xxx_TUNES_rule
 $(BUILD_DIR)/$(1)/tune/%$(EXEEXT): $(SRC_DIR)/$(1)/tune/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/$(1)/tune
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $$(@:%=%.d)
+	@$(CC) $(CFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $$(@:%=%.d)
 endef
 endif
 
 $(foreach dir, $(DIRS), $(eval $(call xxx_TUNES_rule,$(dir))))
 
-ifeq ($(FLINT_SHARED), 0)
-$(BUILD_DIR)/examples/%$(EXEEXT): $(FLINT_DIR)/examples/%.c $(FLINT_DIR)/libflint.a | $(BUILD_DIR)/examples
+ifeq ($(SHARED), 0)
+$(BUILD_DIR)/examples/%$(EXEEXT): $(FLINT_DIR)/examples/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/examples
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
+	@$(CC) $(CFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
 else
 $(BUILD_DIR)/examples/%$(EXEEXT): $(FLINT_DIR)/examples/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/examples
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(INCS) $< -o $@ $(EXE_LDFLAGS) $(LIBS) -MMD -MF $(@:%=%.d)
+	@$(CC) $(CFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
 endif
 
 ################################################################################
@@ -597,81 +700,59 @@ endif
 # coverage
 ################################################################################
 
-coverage:
-	mkdir -p build/coverage
-	lcov --capture --exclude "*test/t-*.c" --exclude "/usr/*" --directory build --output-file build/coverage/coverage.info
-	genhtml build/coverage/coverage.info --output-directory build/coverage
+ifneq ($(COVERAGE), 0)
+coverage: | $(BUILD_DIR)/coverage
+	lcov --capture --exclude "*test/t-*.c" --exclude "/usr/*" --directory $(BUILD_DIR) --output-file $(BUILD_DIR)/coverage/coverage.info
+	genhtml $(BUILD_DIR)/coverage/coverage.info --output-directory $(BUILD_DIR)/coverage
+endif
 
 ################################################################################
 # clean
 ################################################################################
 
 clean:
-	rm -f $(FLINT_DIR)/libflint.a
-	rm -f $(FLINT_DIR)/$(FLINT_LIBNAME)*
-	rm -f $(FLINT_DIR)/$(FLINT_LIB)*
-	rm -rf $(BUILD_DIR)
+	$(RM_F) $(FLINT_DIR)/libflint.a
+	$(RM_F) $(FLINT_DIR)/$(FLINT_LIBNAME)*
+	$(RM_F) $(FLINT_DIR)/$(FLINT_LIB)*
+	$(RM_RF) $(BUILD_DIR)
 
 distclean: clean
-	rm -f $(CFG_FILES)
+	$(RM_F) $(CFG_FILES)
 
 ################################################################################
 # install and uninstall
 ################################################################################
 
 install: library | $(INSTALL_DIRS)
-ifneq ($(FLINT_SHARED), 0)
-	cp -a $(FLINT_DIR)/$(FLINT_LIBNAME)* $(PREFIX)/$(LIBDIR)
-ifeq ($(OS), "MINGW32")
-	cp $(FLINT_DIR)/libflint.dll.a $(PREFIX)/lib
-else ifeq ($(OS), "MINGW64")
-	cp $(FLINT_DIR)/libflint.dll.a $(PREFIX)/lib
-else ifeq ($(OS), "CYGWIN32")
-	cp $(FLINT_DIR)/libflint.dll.a $(PREFIX)/lib
-else ifeq ($(OS), "CYGWIN64")
-	cp $(FLINT_DIR)/libflint.dll.a $(PREFIX)/lib
-endif
-endif
-ifneq ($(FLINT_STATIC), 0)
-ifeq ($(OS), "MINGW32")
-	cp $(FLINT_DIR)/libflint.a $(PREFIX)/lib
-else ifeq ($(OS), "MINGW64")
-	cp $(FLINT_DIR)/libflint.a $(PREFIX)/lib
-else ifeq ($(OS), "CYGWIN32")
-	cp $(FLINT_DIR)/libflint.a $(PREFIX)/lib
-else ifeq ($(OS), "CYGWIN64")
-	cp $(FLINT_DIR)/libflint.a $(PREFIX)/lib
+ifneq ($(SHARED), 0)
+ifeq ($(findstring $(HOST_OS),mingw32 mingw64 cygwin msys),)
+	$(CP_A) $(FLINT_DIR)/$(FLINT_LIBNAME)* $(LIBDIR)
 else
-	cp $(FLINT_DIR)/libflint.a $(PREFIX)/$(LIBDIR)
+	$(CP_A) $(FLINT_DIR)/$(FLINT_LIBNAME)* $(BINDIR)
+	$(CP) $(FLINT_DIR)/$(FLINT_IMPLIB) $(LIBDIR)
 endif
 endif
-	cp $(HEADERS) $(PREFIX)/include/flint
-	cp $(SRC_DIR)/flintxx/*.h $(PREFIX)/include/flint/flintxx
-	cp $(SRC_DIR)/flintxx_public/*xx.h $(PREFIX)/include/flint
-ifeq ($(OS), "Darwin")
-ifneq ($(FLINT_SHARED), 0)
-	install_name_tool -id $(PREFIX)/$(LIBDIR)/$(FLINT_LIB) $(PREFIX)/$(LIBDIR)/$(FLINT_LIBNAME)
+ifneq ($(STATIC), 0)
+	$(CP) $(FLINT_DIR)/$(FLINT_LIB_STATIC) $(LIBDIR)
+endif
+endif
+	$(CP) $(HEADERS) $(INCLUDEDIR)/flint
+	$(CP) $(SRC_DIR)/flintxx/*.h $(INCLUDEDIR)/flint/flintxx
+	$(CP) $(SRC_DIR)/flintxx_public/*xx.h $(INCLUDEDIR)/flint
+ifeq ($(findstring darwin,$(HOST_OS)),darwin)
+ifneq ($(SHARED), 0)
+	install_name_tool -id $(LIBDIR)/$(FLINT_LIB) $(LIBDIR)/$(FLINT_LIBNAME)
 endif
 endif
 
 uninstall:
-	rm -rf $(PREFIX)/include/flint
-	rm -rf $(PREFIX)/$(LIBDIR)/$(FLINT_LIB)
-	rm -rf $(PREFIX)/$(LIBDIR)/$(FLINT_LIBNAME)*
-ifeq ($(OS), "MINGW32")
-	rm -f $(PREFIX)/lib/libflint.a
-	rm -f $(PREFIX)/lib/libflint.dll.a
-else ifeq ($(OS), "MINGW64")
-	rm -f $(PREFIX)/lib/libflint.a
-	rm -f $(PREFIX)/lib/libflint.dll.a
-else ifeq ($(OS), "CYGWIN32")
-	rm -f $(PREFIX)/lib/libflint.a
-	rm -f $(PREFIX)/lib/libflint.dll.a
-else ifeq ($(OS), "CYGWIN64")
-	rm -f $(PREFIX)/lib/libflint.a
-	rm -f $(PREFIX)/lib/libflint.dll.a
+	$(RM_RF) $(INCLUDEDIR)/flint
+	$(RM_F) $(LIBDIR)/$(FLINT_LIB_STATIC)
+ifeq ($(findstring $(HOST_OS),mingw32 mingw64 cygwin msys),)
+	$(RM_F) $(LIBDIR)/$(FLINT_LIBNAME)*
 else
-	rm -f $(PREFIX)/$(LIBDIR)/libflint.a
+	$(RM_F) $(BINDIR)/$(FLINT_LIBNAME)*
+	$(RM_F) $(LIBDIR)/$(FLINT_IMPLIB)
 endif
 
 ################################################################################
@@ -689,4 +770,4 @@ dist:
 print-%:
 	@echo "$*=$($*)"
 
-.PHONY: all library shared static examples profile tests check tune valgrind clean distclean install uninstall dist %_TEST_RUN %_VALGRIND_RUN print-%
+.PHONY: all library shared static examples profile tests check tune valgrind clean distclean install uninstall dist %_TEST_RUN %_VALGRIND_RUN print-% coverage
