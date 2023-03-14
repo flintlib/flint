@@ -9,65 +9,36 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "ulong_extras.h"
-#include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "gr_poly.h"
 
-/* todo: handle short h */
 void
-_nmod_poly_atanh_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
+_nmod_poly_atanh_series(mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod)
 {
-    mp_ptr t, u;
-
-    t = _nmod_vec_init(n);
-    u = _nmod_vec_init(n);
-
-    /* atanh(h(x)) = integral(h'(x)/(1-h(x)^2)) */
-    _nmod_poly_mullow(u, h, n, h, n, n, mod);
-    _nmod_vec_neg(u, u, n, mod); u[0] = UWORD(1);
-    _nmod_poly_derivative(t, h, n, mod); t[n-1] = UWORD(0);
-    _nmod_poly_div_series(g, t, n, u, n, n, mod);
-    _nmod_poly_integral(g, g, n, mod);
-
-    _nmod_vec_clear(t);
-    _nmod_vec_clear(u);
+    gr_ctx_t ctx;
+    _gr_ctx_init_nmod(ctx, &mod);
+    GR_MUST_SUCCEED(_gr_poly_atanh_series(g, h, hlen, n, ctx));
 }
 
 void
 nmod_poly_atanh_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 {
-    mp_ptr h_coeffs;
-    slong h_len = h->length;
+    slong hlen = h->length;
 
-    if (h_len > 0 && h->coeffs[0] != UWORD(0))
+    if (hlen > 0 && h->coeffs[0] != UWORD(0))
     {
-        flint_printf("Exception (nmod_poly_atanh_series): Constant term != 0.\n");
+        flint_printf("Exception (nmod_poly_atanh_series). Constant term != 0.\n");
         flint_abort();
     }
 
-    if (h_len == 1 || n < 2)
+    if (hlen == 1 || n <= 1)
     {
         nmod_poly_zero(g);
         return;
     }
 
     nmod_poly_fit_length(g, n);
-
-    if (h_len < n)
-    {
-        h_coeffs = _nmod_vec_init(n);
-        flint_mpn_copyi(h_coeffs, h->coeffs, h_len);
-        flint_mpn_zero(h_coeffs + h_len, n - h_len);
-    }
-    else
-        h_coeffs = h->coeffs;
-
-    _nmod_poly_atanh_series(g->coeffs, h_coeffs, n, h->mod);
-
-    if (h_len < n)
-        _nmod_vec_clear(h_coeffs);
-
-    g->length = n;
+    _nmod_poly_atanh_series(g->coeffs, h->coeffs, hlen, n, h->mod);
+    _nmod_poly_set_length(g, n);
 	_nmod_poly_normalise(g);
 }

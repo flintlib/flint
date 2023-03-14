@@ -2245,9 +2245,8 @@ of polynomial multiplication.
 
 .. function:: void _nmod_poly_atan_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
 
-    Set `g = \operatorname{atan}(h) + O(x^n)`. Assumes `n > 0` and that `h`
-    is zero-padded as necessary to length `n`. Aliasing of `g` and `h` is
-    allowed.
+    Set `g = \operatorname{atan}(h) + O(x^n)`. Assumes `n > 0`.
+    Aliasing of `g` and `h` is allowed.
 
 .. function:: void nmod_poly_atan_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 
@@ -2255,109 +2254,93 @@ of polynomial multiplication.
 
 .. function:: void _nmod_poly_atanh_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
 
-    Set `g = \operatorname{atanh}(h) + O(x^n)`. Assumes `n > 0` and that `h`
-    is zero-padded as necessary to length `n`. Aliasing of `g` and `h` is
-    allowed.
+    Set `g = \operatorname{atanh}(h) + O(x^n)`. Assumes `n > 0`.
+    Aliasing of `g` and `h` is allowed.
 
 .. function:: void nmod_poly_atanh_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 
     Set `g = \operatorname{atanh}(h) + O(x^n)`.
 
-.. function:: void _nmod_poly_asin_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
+.. function:: void _nmod_poly_asin_series(mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod)
 
-    Set `g = \operatorname{asin}(h) + O(x^n)`. Assumes `n > 0` and that `h`
-    is zero-padded as necessary to length `n`. Aliasing of `g` and `h` is
-    allowed. The modulus must be less than `n` and not equal to `2`.
+    Set `g = \operatorname{asin}(h) + O(x^n)`. Assumes `n > 0`.
+    Aliasing of `g` and `h` is allowed.
 
 .. function:: void nmod_poly_asin_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 
-    Set `g = \operatorname{asin}(h) + O(x^n)`. The modulus must be less than
-    `n` and not equal to `2`.
+    Set `g = \operatorname{asin}(h) + O(x^n)`.
 
-.. function:: void _nmod_poly_asinh_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
+.. function:: void _nmod_poly_asinh_series(mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod)
 
-    Set `g = \operatorname{asinh}(h) + O(x^n)`. Assumes `n > 0` and that `h`
-    is zero-padded as necessary to length `n`. Aliasing of `g` and `h` is
-    allowed. The modulus must be less than `n` and not equal to `2`.
+    Set `g = \operatorname{asinh}(h) + O(x^n)`. Assumes `n > 0`.
+    Aliasing of `g` and `h` is allowed.
 
 .. function:: void nmod_poly_asinh_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 
-    Set `g = \operatorname{asinh}(h) + O(x^n)`. The modulus must be less than
-    `n` and not equal to `2`.
+    Set `g = \operatorname{asinh}(h) + O(x^n)`.
 
 .. function:: void _nmod_poly_sin_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
 
     Set `g = \operatorname{sin}(h) + O(x^n)`. Assumes `n > 0` and that `h`
     is zero-padded as necessary to length `n`. Aliasing of `g` and `h` is
-    allowed. The modulus must be less than `n` and not equal to `2`.
-    The value is computed using the identity
+    allowed. The value is computed using the identity
     `\sin(x) = 2 \tan(x/2)) / (1 + \tan^2(x/2)).`
 
 .. function:: void nmod_poly_sin_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 
-    Set `g = \operatorname{sin}(h) + O(x^n)`. The modulus must be less than
-    `n` and not equal to `2`.
+    Set `g = \operatorname{sin}(h) + O(x^n)`.
 
 .. function:: void _nmod_poly_cos_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
 
     Set `g = \operatorname{cos}(h) + O(x^n)`. Assumes `n > 0` and that `h`
     is zero-padded as necessary to length `n`. Aliasing of `g` and `h` is
-    allowed. The modulus must be less than `n` and not equal to `2`.
-    The value is computed using the identity
+    allowed. The value is computed using the identity
     `\cos(x) = (1-\tan^2(x/2)) / (1 + \tan^2(x/2)).`
 
 .. function:: void nmod_poly_cos_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 
-    Set `g = \operatorname{cos}(h) + O(x^n)`. The modulus must be less than
-    `n` and not equal to `2`.
+    Set `g = \operatorname{cos}(h) + O(x^n)`.
 
 .. function:: void _nmod_poly_tan_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
 
     Set `g = \operatorname{tan}(h) + O(x^n)`. Assumes `n > 0` and that `h`
     is zero-padded as necessary to length `n`. Aliasing of `g` and `h` is
-    not allowed. The modulus must be less than `n`. Uses Newton iteration
-    to invert the atan function.
+    not allowed. Uses Newton iteration to invert the atan function.
 
 .. function:: void nmod_poly_tan_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 
-    Set `g = \operatorname{tan}(h) + O(x^n)`. The modulus must be less than
-    `n`.
+    Set `g = \operatorname{tan}(h) + O(x^n)`.
 
 .. function:: void _nmod_poly_sinh_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
 
     Set `g = \operatorname{sinh}(h) + O(x^n)`. Assumes `n > 0` and that `h`
     is zero-padded as necessary to length `n`. Aliasing of `g` and `h` is
-    not allowed. The modulus must be less than `n` and not equal to `2`.
-    Uses the identity `\sinh(x) = (e^x - e^{-x})/2`.
+    not allowed. Uses the identity `\sinh(x) = (e^x - e^{-x})/2`.
 
 .. function:: void nmod_poly_sinh_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 
-    Set `g = \operatorname{sinh}(h) + O(x^n)`. The modulus must be less than
-    `n` and not equal to `2`.
+    Set `g = \operatorname{sinh}(h) + O(x^n)`.
 
 .. function:: void _nmod_poly_cosh_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
 
     Set `g = \operatorname{cos}(h) + O(x^n)`. Assumes `n > 0` and that `h`
     is zero-padded as necessary to length `n`. Aliasing of `g` and `h` is
-    not allowed. The modulus must be less than `n` and not equal to `2`.
+    not allowed.
     Uses the identity `\cosh(x) = (e^x + e^{-x})/2`.
 
 .. function:: void nmod_poly_cosh_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 
-    Set `g = \operatorname{cosh}(h) + O(x^n)`. The modulus must be less than
-    `n` and not equal to `2`.
+    Set `g = \operatorname{cosh}(h) + O(x^n)`.
 
 .. function:: void _nmod_poly_tanh_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
 
     Set `g = \operatorname{tanh}(h) + O(x^n)`. Assumes `n > 0` and that `h`
-    is zero-padded as necessary to length `n`. The modulus must be less than
-    `n` and not equal to `2`. Uses the identity
+    is zero-padded as necessary to length `n`. Uses the identity
     `\tanh(x) = (e^{2x}-1)/(e^{2x}+1)`.
 
 .. function:: void nmod_poly_tanh_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 
-    Set `g = \operatorname{tanh}(h) + O(x^n)`. The modulus must be less than
-    `n` and not equal to `2`.
+    Set `g = \operatorname{tanh}(h) + O(x^n)`.
 
 
 Products

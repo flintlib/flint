@@ -808,12 +808,47 @@ _gr_acb_im(acb_t res, const acb_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
-_gr_acb_sgn(acb_t res, const acb_t x, const gr_ctx_t ctx)
-{
-    acb_sgn(res, x, ACB_CTX_PREC(ctx));
-    return GR_SUCCESS;
-}
+#define DEF_FUNC(fname) \
+int \
+_gr_acb_ ## fname(acb_t res, const acb_t x, const gr_ctx_t ctx) \
+{ \
+    acb_ ## fname(res, x, ACB_CTX_PREC(ctx)); \
+    return GR_SUCCESS; \
+} \
+
+#define DEF_2FUNC(fname) \
+int \
+_gr_acb_ ## fname(acb_t res1, acb_t res2, const acb_t x, const gr_ctx_t ctx) \
+{ \
+    acb_ ## fname(res1, res2, x, ACB_CTX_PREC(ctx)); \
+    return GR_SUCCESS; \
+} \
+
+#define DEF_FUNC2(fname) \
+int \
+_gr_acb_ ## fname(acb_t res, const acb_t x, const acb_t y, const gr_ctx_t ctx) \
+{ \
+    acb_ ## fname(res, x, y, ACB_CTX_PREC(ctx)); \
+    return GR_SUCCESS; \
+} \
+
+#define DEF_FUNC_SING(fname) \
+int \
+_gr_acb_ ## fname(acb_t res, const acb_t x, const gr_ctx_t ctx) \
+{ \
+    acb_ ## fname(res, x, ACB_CTX_PREC(ctx)); \
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; \
+} \
+
+#define DEF_FUNC2_SING(fname) \
+int \
+_gr_acb_ ## fname(acb_t res, const acb_t x, const acb_t y, const gr_ctx_t ctx) \
+{ \
+    acb_ ## fname(res, x, y, ACB_CTX_PREC(ctx)); \
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; \
+} \
+
+DEF_FUNC(sgn)
 
 int
 _gr_acb_csgn(acb_t res, const acb_t x, const gr_ctx_t ctx)
@@ -830,19 +865,8 @@ _gr_acb_pi(acb_t res, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
-_gr_acb_exp(acb_t res, const acb_t x, const gr_ctx_t ctx)
-{
-    acb_exp(res, x, ACB_CTX_PREC(ctx));
-    return GR_SUCCESS;
-}
-
-int
-_gr_acb_expm1(acb_t res, const acb_t x, const gr_ctx_t ctx)
-{
-    acb_expm1(res, x, ACB_CTX_PREC(ctx));
-    return GR_SUCCESS;
-}
+DEF_FUNC(exp)
+DEF_FUNC(expm1)
 
 int
 _gr_acb_log(acb_t res, const acb_t x, const gr_ctx_t ctx)
@@ -872,41 +896,14 @@ _gr_acb_log1p(acb_t res, const acb_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
-_gr_acb_sin(acb_t res, const acb_t x, const gr_ctx_t ctx)
-{
-    acb_sin(res, x, ACB_CTX_PREC(ctx));
-    return GR_SUCCESS;
-}
+DEF_FUNC(sin)
+DEF_FUNC(sin_pi)
+DEF_FUNC(cos)
+DEF_FUNC(cos_pi)
+DEF_FUNC_SING(tan)
 
-int
-_gr_acb_cos(acb_t res, const acb_t x, const gr_ctx_t ctx)
-{
-    acb_cos(res, x, ACB_CTX_PREC(ctx));
-    return GR_SUCCESS;
-}
-
-int
-_gr_acb_sin_pi(acb_t res, const acb_t x, const gr_ctx_t ctx)
-{
-    acb_sin_pi(res, x, ACB_CTX_PREC(ctx));
-    return GR_SUCCESS;
-}
-
-int
-_gr_acb_cos_pi(acb_t res, const acb_t x, const gr_ctx_t ctx)
-{
-    acb_cos_pi(res, x, ACB_CTX_PREC(ctx));
-    return GR_SUCCESS;
-}
-
-
-int
-_gr_acb_tan(acb_t res, const acb_t x, const gr_ctx_t ctx)
-{
-    acb_tan(res, x, ACB_CTX_PREC(ctx));
-    return acb_is_finite(res) ? GR_SUCCESS : GR_DOMAIN;
-}
+DEF_FUNC(asin)
+DEF_FUNC(acos)
 
 int
 _gr_acb_atan(acb_t res, const acb_t x, const gr_ctx_t ctx)
@@ -923,6 +920,11 @@ _gr_acb_atan(acb_t res, const acb_t x, const gr_ctx_t ctx)
     acb_atan(res, x, ACB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
+
+DEF_FUNC(asinh)
+DEF_FUNC(acosh)
+
+DEF_FUNC_SING(atanh)
 
 int
 _gr_acb_erf(acb_t res, const acb_t x, const gr_ctx_t ctx)
@@ -1999,7 +2001,12 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_SIN_PI,          (gr_funcptr) _gr_acb_sin_pi},
     {GR_METHOD_COS_PI,          (gr_funcptr) _gr_acb_cos_pi},
     {GR_METHOD_TAN,             (gr_funcptr) _gr_acb_tan},
+    {GR_METHOD_ASIN,            (gr_funcptr) _gr_acb_asin},
+    {GR_METHOD_ACOS,            (gr_funcptr) _gr_acb_acos},
     {GR_METHOD_ATAN,            (gr_funcptr) _gr_acb_atan},
+    {GR_METHOD_ASINH,           (gr_funcptr) _gr_acb_asinh},
+    {GR_METHOD_ACOSH,           (gr_funcptr) _gr_acb_acosh},
+    {GR_METHOD_ATANH,           (gr_funcptr) _gr_acb_atanh},
     {GR_METHOD_FAC_UI,          (gr_funcptr) _gr_acb_fac_ui},
     {GR_METHOD_FAC_FMPZ,        (gr_funcptr) _gr_acb_fac_fmpz},
     {GR_METHOD_RISING_UI,       (gr_funcptr) _gr_acb_rising_ui},

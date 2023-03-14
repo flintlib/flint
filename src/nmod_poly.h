@@ -1161,13 +1161,13 @@ FLINT_DLL void nmod_poly_power_sums_to_poly(nmod_poly_t res, const nmod_poly_t Q
 
 /* Transcendental functions **************************************************/
 
-FLINT_DLL void _nmod_poly_atan_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod);
+FLINT_DLL void _nmod_poly_atan_series(mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod);
 FLINT_DLL void nmod_poly_atan_series(nmod_poly_t g, const nmod_poly_t h, slong n);
 
 FLINT_DLL void _nmod_poly_tan_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod);
 FLINT_DLL void nmod_poly_tan_series(nmod_poly_t g, const nmod_poly_t h, slong n);
 
-FLINT_DLL void _nmod_poly_asin_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod);
+FLINT_DLL void _nmod_poly_asin_series(mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod);
 FLINT_DLL void nmod_poly_asin_series(nmod_poly_t g, const nmod_poly_t h, slong n);
 
 FLINT_DLL void _nmod_poly_sin_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod);
@@ -1176,10 +1176,10 @@ FLINT_DLL void nmod_poly_sin_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 FLINT_DLL void _nmod_poly_cos_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod);
 FLINT_DLL void nmod_poly_cos_series(nmod_poly_t g, const nmod_poly_t h, slong n);
 
-FLINT_DLL void _nmod_poly_asinh_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod);
+FLINT_DLL void _nmod_poly_asinh_series(mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod);
 FLINT_DLL void nmod_poly_asinh_series(nmod_poly_t g, const nmod_poly_t h, slong n);
 
-FLINT_DLL void _nmod_poly_atanh_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod);
+FLINT_DLL void _nmod_poly_atanh_series(mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod);
 FLINT_DLL void nmod_poly_atanh_series(nmod_poly_t g, const nmod_poly_t h, slong n);
 
 FLINT_DLL void _nmod_poly_sinh_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod);

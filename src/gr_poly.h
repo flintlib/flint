@@ -346,10 +346,18 @@ typedef int ((*gr_poly_roots_op_other)(gr_vec_t, gr_vec_t, const gr_poly_t, gr_c
 #define GR_POLY_ROOTS_OP_OTHER(ctx, NAME) (((gr_poly_roots_op_other *) ctx->methods)[GR_METHOD_ ## NAME])
 GR_POLY_INLINE WARN_UNUSED_RESULT int gr_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr_ctx_t poly_ctx, int flags, gr_ctx_t ctx) { return GR_POLY_ROOTS_OP_OTHER(ctx, POLY_ROOTS_OTHER)(roots, mult, poly, poly_ctx, flags, ctx); }
 
-WARN_UNUSED_RESULT int _gr_poly_atan_series(gr_ptr res, gr_srcptr A, slong Alen, slong len, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_poly_atan_series(gr_poly_t res, const gr_poly_t A, slong len, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int _gr_poly_atanh_series(gr_ptr res, gr_srcptr A, slong Alen, slong len, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_poly_atanh_series(gr_poly_t res, const gr_poly_t A, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_asin_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_asin_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_asinh_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_asinh_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_acos_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_acos_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_acosh_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_acosh_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_atan_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_atan_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_atanh_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_atanh_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int _gr_poly_log_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_log_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx);

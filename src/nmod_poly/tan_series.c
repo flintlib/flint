@@ -41,7 +41,7 @@ _nmod_poly_tan_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
     u[0] = UWORD(1);
     if (2*m - 1 < n) u[n-1] = UWORD(0);
 
-    _nmod_poly_atan_series(t, g, n, mod);
+    _nmod_poly_atan_series(t, g, n, n, mod);
     _nmod_vec_sub(t + m, h + m, t + m, n - m, mod);
     _nmod_poly_mullow(g + m, u, n, t + m, n - m, n - m, mod);
 

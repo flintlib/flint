@@ -10,46 +10,15 @@
 */
 
 #include "arb_poly.h"
+#include "gr_poly.h"
 
 void
 _arb_poly_acos_series(arb_ptr g, arb_srcptr h, slong hlen, slong n, slong prec)
 {
-    arb_t c;
-    arb_init(c);
-
-    arb_acos(c, h, prec);
-
-    hlen = FLINT_MIN(hlen, n);
-
-    if (hlen == 1)
-    {
-        _arb_vec_zero(g + 1, n - 1);
-    }
-    else
-    {
-        arb_ptr t, u;
-        slong ulen;
-
-        t = _arb_vec_init(n);
-        u = _arb_vec_init(n);
-
-        /* acos(h(x)) = integral(-h'(x)/sqrt(1-h(x)^2)) */
-        ulen = FLINT_MIN(n, 2 * hlen - 1);
-        _arb_poly_mullow(u, h, hlen, h, hlen, ulen, prec);
-        arb_sub_ui(u, u, 1, prec);
-        _arb_vec_neg(u, u, ulen);
-        _arb_poly_rsqrt_series(t, u, ulen, n, prec);
-        _arb_poly_derivative(u, h, hlen, prec);
-        _arb_poly_mullow(g, t, n, u, hlen - 1, n, prec);
-        _arb_poly_integral(g, g, n, prec);
-        _arb_vec_neg(g, g, n);
-
-        _arb_vec_clear(t, n);
-        _arb_vec_clear(u, n);
-    }
-
-    arb_swap(g, c);
-    arb_clear(c);
+    gr_ctx_t ctx;
+    gr_ctx_init_real_arb(ctx, prec);
+    if (_gr_poly_acos_series(g, h, hlen, n, ctx) != GR_SUCCESS)
+        _arb_vec_indeterminate(g, n);
 }
 
 void
