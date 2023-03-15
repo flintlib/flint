@@ -43,15 +43,24 @@ void fq_default_ctx_init_modulus_nmod_type(fq_default_ctx_t ctx,
     }
     else if (type == FQ_DEFAULT_NMOD || (type == 0 && d == 1))
     {
+        mp_limb_t c0, c1;
         ctx->type = FQ_DEFAULT_NMOD;
         nmod_init(&ctx->ctx.nmod.mod, p);
-        ctx->ctx.nmod.a = 0;
+        c0 = modulus->coeffs[0];
+        c1 = modulus->coeffs[1];
+        c0 = nmod_neg(c0, ctx->ctx.nmod.mod);
+        ctx->ctx.nmod.a = nmod_div(c0, c1, ctx->ctx.nmod.mod);
     }
     else if (type == FQ_DEFAULT_FMPZ_MOD || (type == 0 && d == 1))
     {
+        mp_limb_t c0, c1;
         ctx->type = FQ_DEFAULT_FMPZ_MOD;
         fmpz_mod_ctx_init_ui(ctx->ctx.fmpz_mod.mod, p);
         fmpz_init_set_ui(ctx->ctx.fmpz_mod.a, 0);
+        c0 = modulus->coeffs[0];
+        c1 = modulus->coeffs[1];
+        c0 = nmod_neg(c0, modulus->mod);
+        fmpz_set_ui(ctx->ctx.fmpz_mod.a, nmod_div(c0, c1, modulus->mod));
     }
     else
     {
