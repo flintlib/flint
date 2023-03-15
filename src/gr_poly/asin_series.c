@@ -133,6 +133,9 @@ gr_poly_asin_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx)
     if (flen == 0 || len == 0)
         return gr_poly_zero(res, ctx);
 
+    if (flen == 1)
+        len = 1;
+
     gr_poly_fit_length(res, len, ctx);
     status |= _gr_poly_asin_series(res->coeffs, f->coeffs, flen, len, ctx);
     _gr_poly_set_length(res, len, ctx);
@@ -149,6 +152,9 @@ gr_poly_asinh_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx)
     if (flen == 0 || len == 0)
         return gr_poly_zero(res, ctx);
 
+    if (flen == 1)
+        len = 1;
+
     gr_poly_fit_length(res, len, ctx);
     status |= _gr_poly_asinh_series(res->coeffs, f->coeffs, flen, len, ctx);
     _gr_poly_set_length(res, len, ctx);
@@ -164,6 +170,9 @@ gr_poly_acos_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx)
 
     if (len == 0)
         return gr_poly_zero(res, ctx);
+
+    if (flen == 1)
+        len = 1;
 
     gr_poly_fit_length(res, len, ctx);
 
@@ -191,6 +200,9 @@ gr_poly_acosh_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx)
     if (len == 0)
         return gr_poly_zero(res, ctx);
 
+    if (flen == 1)
+        len = 1;
+
     gr_poly_fit_length(res, len, ctx);
 
     if (flen == 0)
@@ -215,9 +227,10 @@ gr_poly_atan_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx)
     int status = GR_SUCCESS;
 
     if (flen == 0 || len == 0)
-    {
         return gr_poly_zero(res, ctx);
-    }
+
+    if (flen == 1)
+        len = 1;
 
     gr_poly_fit_length(res, len, ctx);
     status |= _gr_poly_atan_series(res->coeffs, f->coeffs, flen, len, ctx);
@@ -233,9 +246,10 @@ gr_poly_atanh_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx)
     int status = GR_SUCCESS;
 
     if (flen == 0 || len == 0)
-    {
         return gr_poly_zero(res, ctx);
-    }
+
+    if (flen == 1)
+        len = 1;
 
     gr_poly_fit_length(res, len, ctx);
     status |= _gr_poly_atanh_series(res->coeffs, f->coeffs, flen, len, ctx);

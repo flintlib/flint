@@ -10,63 +10,15 @@
 */
 
 #include "arb_poly.h"
+#include "gr_poly.h"
 
 void
 _arb_poly_log_series(arb_ptr res, arb_srcptr f, slong flen, slong n, slong prec)
 {
-    flen = FLINT_MIN(flen, n);
-
-    if (flen == 1)
-    {
-        arb_log(res, f, prec);
-        _arb_vec_zero(res + 1, n - 1);
-    }
-    else if (n == 2)
-    {
-        arb_div(res + 1, f + 1, f + 0, prec);  /* safe since hlen >= 2 */
-        arb_log(res, f, prec);
-    }
-    else if (_arb_vec_is_zero(f + 1, flen - 2))  /* f = a + bx^d */
-    {
-        slong i, j, d = flen - 1;
-
-        for (i = 1, j = d; j < n; j += d, i++)
-        {
-            if (i == 1)
-                arb_div(res + j, f + d, f + 0, prec);
-            else
-                arb_mul(res + j, res + j - d, res + d, prec);
-            _arb_vec_zero(res + j - d + 1, flen - 2);
-        }
-        _arb_vec_zero(res + j - d + 1, n - (j - d + 1));
-
-        for (i = 2, j = 2 * d; j < n; j += d, i++)
-            arb_div_si(res + j, res + j, i % 2 ? i : -i, prec);
-
-        arb_log(res, f, prec); /* done last to allow aliasing */
-    }
-    else
-    {
-        arb_ptr f_diff, f_inv;
-        arb_t a;
-        slong alloc;
-
-        alloc = n + flen - 1;
-        f_inv = _arb_vec_init(alloc);
-        f_diff = f_inv + n;
-
-        arb_init(a);
-        arb_log(a, f, prec);
-
-        _arb_poly_derivative(f_diff, f, flen, prec);
-        _arb_poly_inv_series(f_inv, f, flen, n, prec);
-        _arb_poly_mullow(res, f_inv, n - 1, f_diff, flen - 1, n - 1, prec);
-        _arb_poly_integral(res, res, n, prec);
-        arb_swap(res, a);
-
-        arb_clear(a);
-        _arb_vec_clear(f_inv, alloc);
-    }
+    gr_ctx_t ctx;
+    gr_ctx_init_real_arb(ctx, prec);
+    if (_gr_poly_log_series(res, f, flen, n, ctx) != GR_SUCCESS)
+        _arb_vec_indeterminate(res, n);
 }
 
 void
