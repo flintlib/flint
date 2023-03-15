@@ -155,6 +155,6 @@ int main(void)
     fmpz_clear(p);
 
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 

@@ -1,6 +1,7 @@
 /* This file is public domain. Author: Fredrik Johansson. */
 
 #include <string.h>
+#include <stdlib.h>
 #include "arb_mat.h"
 #include "acb_mat.h"
 #include "profiler.h"

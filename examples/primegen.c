@@ -51,5 +51,5 @@ int main(int argc, char* argv[])
         n_primes_clear(iter);
     }
 
-    return EXIT_SUCCESS;
+    return 0;
 }

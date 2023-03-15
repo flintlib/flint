@@ -14510,7 +14510,7 @@ int main(int argc, char *argv[])
     SHOW_MEMORY_USAGE
 
     flint_cleanup();
-    return EXIT_SUCCESS;
+    return 0;
 }
 
 #endif

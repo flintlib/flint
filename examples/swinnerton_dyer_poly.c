@@ -1,8 +1,10 @@
 /* This file is public domain. Author: Fredrik Johansson. */
 
+#include <stdlib.h>
 #include "profiler.h"
 #include "ca.h"
 #include "ca_vec.h"
+#include "ulong_extras.h"
 
 void
 _ca_poly_mullow(ca_ptr res, ca_srcptr x, slong xlen,
@@ -129,5 +131,5 @@ int main(int argc, char *argv[])
     SHOW_MEMORY_USAGE
 
     flint_cleanup();
-    return EXIT_SUCCESS;
+    return 0;
 }

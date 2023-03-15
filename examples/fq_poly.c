@@ -15,7 +15,8 @@
 */
 
 #include <time.h>
-
+#include <stdlib.h>
+#include "fq.h"
 #include "fq_poly.h"
 
 int main(void)
@@ -141,6 +142,6 @@ int main(void)
     fq_poly_clear(h, ctx);
     FLINT_TEST_CLEANUP(state);
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 

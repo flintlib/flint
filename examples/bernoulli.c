@@ -1,6 +1,7 @@
 /* This file is public domain. Author: Fredrik Johansson. */
 
 #include <string.h>
+#include <stdlib.h>
 #include "arb.h"
 #include "bernoulli.h"
 #include "profiler.h"

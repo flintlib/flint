@@ -58,5 +58,5 @@ int main(int argc, char* argv[])
     fmpz_mat_clear(S2);
     fmpz_mat_clear(P);
 
-    return EXIT_SUCCESS;
+    return 0;
 }

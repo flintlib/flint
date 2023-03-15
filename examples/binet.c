@@ -1,5 +1,6 @@
 /* This file is public domain. Author: Fredrik Johansson. */
 
+#include <stdlib.h>
 #include "profiler.h"
 #include "ca.h"
 
@@ -59,5 +60,5 @@ int main(int argc, char *argv[])
     SHOW_MEMORY_USAGE
 
     flint_cleanup();
-    return EXIT_SUCCESS;
+    return 0;
 }

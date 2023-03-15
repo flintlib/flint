@@ -2,6 +2,8 @@
 
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
+#include "fmpq_poly.h"
 #include "acb.h"
 #include "arb_fmpz_poly.h"
 #include "arith.h"
@@ -213,6 +215,6 @@ int main(int argc, char *argv[])
     fmpz_clear(t);
 
     flint_cleanup();
-    return EXIT_SUCCESS;
+    return 0;
 }
 

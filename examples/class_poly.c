@@ -1,8 +1,10 @@
 /* This file is public domain. Author: Fredrik Johansson. */
 
 #include <string.h>
+#include <stdlib.h>
 #include "arb.h"
 #include "acb_modular.h"
+#include "fmpz_poly.h"
 #include "profiler.h"
 
 int main(int argc, char *argv[])

@@ -85,5 +85,5 @@ int main(int argc, char* argv[])
     flint_free(residues);
     flint_free(primes);
 
-    return EXIT_SUCCESS;
+    return 0;
 }

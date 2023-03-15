@@ -1,11 +1,14 @@
 /* This file is public domain. Author: Fredrik Johansson. */
 
 #include <string.h>
+#include <stdlib.h>
+#include <math.h>
 #include "acb.h"
 #include "acb_hypgeom.h"
 #include "acb_modular.h"
 #include "acb_elliptic.h"
 #include "profiler.h"
+#include "thread_support.h"
 
 /* some useful color operations */
 #define CLAMP(y) FLINT_MAX(0.0, FLINT_MIN((y), 1.0))

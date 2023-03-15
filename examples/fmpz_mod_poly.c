@@ -40,6 +40,6 @@ int main(int argc, char* argv[])
     fmpz_mod_ctx_clear(ctx);
     fmpz_clear(n);
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 

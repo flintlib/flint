@@ -8,6 +8,8 @@
 */
 
 #include <string.h>
+#include <stdlib.h>
+#include <math.h>
 #include "profiler.h"
 #include "arb_hypgeom.h"
 #include "acb_hypgeom.h"

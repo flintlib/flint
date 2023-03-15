@@ -1,6 +1,8 @@
 /* This file is public domain. Author: Fredrik Johansson. */
 
 #include <string.h>
+#include <stdlib.h>
+#include "arb_poly.h"
 #include "arb_calc.h"
 #include "acb_hypgeom.h"
 #include "acb_dirichlet.h"

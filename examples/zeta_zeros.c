@@ -1,6 +1,7 @@
 /* This file is public domain. Author: D.H.J. Polymath. */
 
 #include <string.h>
+#include <stdlib.h>
 #include "acb_dirichlet.h"
 #include "profiler.h"
 

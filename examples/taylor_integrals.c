@@ -1,5 +1,8 @@
 /* This file is public domain. Author: Fredrik Johansson. */
 
+#include <stdlib.h>
+#include "acb_poly.h"
+#include "arb_calc.h"
 #include "acb_calc.h"
 #include "profiler.h"
 

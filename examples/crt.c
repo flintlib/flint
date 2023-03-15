@@ -60,5 +60,5 @@ int main(int argc, char* argv[])
     fmpz_clear(y);
     fmpz_clear(prod);
 
-    return EXIT_SUCCESS;
+    return 0;
 }

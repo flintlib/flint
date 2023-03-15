@@ -1,6 +1,7 @@
 /* This file is public domain. Author: Fredrik Johansson. */
 
 #include <string.h>
+#include <stdlib.h>
 #include "acb_dirichlet.h"
 #include "profiler.h"
 
@@ -110,6 +111,6 @@ int main(int argc, char *argv[])
     dirichlet_char_clear(chi);
     dirichlet_group_clear(G);
     flint_cleanup();
-    return EXIT_SUCCESS;
+    return 0;
 }
 
