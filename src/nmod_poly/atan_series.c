@@ -31,7 +31,7 @@ nmod_poly_atan_series(nmod_poly_t g, const nmod_poly_t h, slong n)
         flint_abort();
     }
 
-    if (hlen == 1 || n <= 1)
+    if (hlen <= 1 || n <= 1)
     {
         nmod_poly_zero(g);
         return;

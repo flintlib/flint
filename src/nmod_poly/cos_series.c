@@ -24,7 +24,7 @@ _nmod_poly_cos_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
 
     /* cos(x) = (1-tan(x/2)^2)/(1+tan(x/2)^2) */
     _nmod_vec_scalar_mul_nmod(u, h, n, n_invmod(UWORD(2), mod.n), mod);
-    _nmod_poly_tan_series(t, u, n, mod);
+    _nmod_poly_tan_series(t, u, n, n, mod);
     _nmod_poly_mullow(u, t, n, t, n, n, mod);
     _nmod_vec_neg(t, u, n, mod);
     t[0] = u[0] = UWORD(1);

@@ -10,6 +10,7 @@
 */
 
 #include "acb_poly.h"
+#include "gr_poly.h"
 
 #ifdef __GNUC__
 # define log __builtin_log
@@ -18,14 +19,17 @@
 # include <math.h>
 #endif
 
-void
-_acb_poly_sin_cos_series(acb_ptr s, acb_ptr c, acb_srcptr h, slong hlen, slong n, slong prec)
+static void
+__acb_poly_sin_cos_series(acb_ptr s, acb_ptr c, acb_srcptr h, slong hlen, slong n, int times_pi, slong prec)
 {
     hlen = FLINT_MIN(hlen, n);
 
     if (hlen == 1)
     {
-        acb_sin_cos(s, c, h, prec);
+        if (times_pi)
+            acb_sin_cos_pi(s, c, h, prec);
+        else
+            acb_sin_cos(s, c, h, prec);
         _acb_vec_zero(s + 1, n - 1);
         _acb_vec_zero(c + 1, n - 1);
     }
@@ -33,8 +37,17 @@ _acb_poly_sin_cos_series(acb_ptr s, acb_ptr c, acb_srcptr h, slong hlen, slong n
     {
         acb_t t;
         acb_init(t);
-        acb_set(t, h + 1);
-        acb_sin_cos(s, c, h, prec);
+        if (times_pi)
+        {
+            acb_const_pi(t, prec);
+            acb_mul(t, t, h + 1, prec);
+            acb_sin_cos_pi(s, c, h, prec);
+        }
+        else
+        {
+            acb_set(t, h + 1);
+            acb_sin_cos(s, c, h, prec);
+        }
         acb_mul(s + 1, c, t, prec);
         acb_neg(t, t);
         acb_mul(c + 1, s, t, prec);
@@ -43,6 +56,8 @@ _acb_poly_sin_cos_series(acb_ptr s, acb_ptr c, acb_srcptr h, slong hlen, slong n
     else
     {
         slong cutoff;
+        gr_ctx_t ctx;
+        int status;
 
         if (prec <= 128)
         {
@@ -54,11 +69,31 @@ _acb_poly_sin_cos_series(acb_ptr s, acb_ptr c, acb_srcptr h, slong hlen, slong n
             cutoff = FLINT_MIN(cutoff, 700);
         }
 
+        gr_ctx_init_complex_acb(ctx, 53);
+
         if (hlen < cutoff)
-            _acb_poly_sin_cos_series_basecase(s, c, h, hlen, n, prec, 0);
+            status = _gr_poly_sin_cos_series_basecase(s, c, h, hlen, n, times_pi, ctx);
         else
-            _acb_poly_sin_cos_series_tangent(s, c, h, hlen, n, prec, 0);
+            status = _gr_poly_sin_cos_series_tangent(s, c, h, hlen, n, times_pi, ctx);
+
+        if (status != GR_SUCCESS)
+        {
+            _acb_vec_indeterminate(s, n);
+            _acb_vec_indeterminate(c, n);
+        }
     }
+}
+
+void
+_acb_poly_sin_cos_series(acb_ptr s, acb_ptr c, acb_srcptr h, slong hlen, slong n, slong prec)
+{
+    __acb_poly_sin_cos_series(s, c, h, hlen, n, 0, prec);
+}
+
+void
+_acb_poly_sin_cos_pi_series(acb_ptr s, acb_ptr c, acb_srcptr h, slong hlen, slong n, slong prec)
+{
+    __acb_poly_sin_cos_series(s, c, h, hlen, n, 1, prec);
 }
 
 void
@@ -93,3 +128,34 @@ acb_poly_sin_cos_series(acb_poly_t s, acb_poly_t c,
     _acb_poly_normalise(c);
 }
 
+void
+acb_poly_sin_cos_pi_series(acb_poly_t s, acb_poly_t c,
+                                    const acb_poly_t h, slong n, slong prec)
+{
+    slong hlen = h->length;
+
+    if (n == 0)
+    {
+        acb_poly_zero(s);
+        acb_poly_zero(c);
+        return;
+    }
+
+    if (hlen == 0)
+    {
+        acb_poly_zero(s);
+        acb_poly_one(c);
+        return;
+    }
+
+    if (hlen == 1)
+        n = 1;
+
+    acb_poly_fit_length(s, n);
+    acb_poly_fit_length(c, n);
+    _acb_poly_sin_cos_pi_series(s->coeffs, c->coeffs, h->coeffs, hlen, n, prec);
+    _acb_poly_set_length(s, n);
+    _acb_poly_normalise(s);
+    _acb_poly_set_length(c, n);
+    _acb_poly_normalise(c);
+}

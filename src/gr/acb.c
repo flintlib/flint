@@ -905,6 +905,10 @@ DEF_FUNC_SING(tan)
 DEF_FUNC(asin)
 DEF_FUNC(acos)
 
+DEF_2FUNC(sin_cos)
+DEF_2FUNC(sin_cos_pi)
+
+
 int
 _gr_acb_atan(acb_t res, const acb_t x, const gr_ctx_t ctx)
 {
@@ -1998,8 +2002,10 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_LOG1P,           (gr_funcptr) _gr_acb_log1p},
     {GR_METHOD_SIN,             (gr_funcptr) _gr_acb_sin},
     {GR_METHOD_COS,             (gr_funcptr) _gr_acb_cos},
+    {GR_METHOD_SIN_COS,         (gr_funcptr) _gr_acb_sin_cos},
     {GR_METHOD_SIN_PI,          (gr_funcptr) _gr_acb_sin_pi},
     {GR_METHOD_COS_PI,          (gr_funcptr) _gr_acb_cos_pi},
+    {GR_METHOD_SIN_COS_PI,      (gr_funcptr) _gr_acb_sin_cos_pi},
     {GR_METHOD_TAN,             (gr_funcptr) _gr_acb_tan},
     {GR_METHOD_ASIN,            (gr_funcptr) _gr_acb_asin},
     {GR_METHOD_ACOS,            (gr_funcptr) _gr_acb_acos},

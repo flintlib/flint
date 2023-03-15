@@ -797,41 +797,12 @@ Elementary functions
     The underscore method supports aliasing and allows the input to be
     shorter than the output, but requires the lengths to be nonzero.
 
-.. function:: void _acb_poly_sin_cos_series_basecase(acb_ptr s, acb_ptr c, acb_srcptr h, slong hlen, slong n, slong prec, int times_pi)
-
-.. function:: void acb_poly_sin_cos_series_basecase(acb_poly_t s, acb_poly_t c, const acb_poly_t h, slong n, slong prec, int times_pi)
-
-.. function:: void _acb_poly_sin_cos_series_tangent(acb_ptr s, acb_ptr c, acb_srcptr h, slong hlen, slong n, slong prec, int times_pi)
-
-.. function:: void acb_poly_sin_cos_series_tangent(acb_poly_t s, acb_poly_t c, const acb_poly_t h, slong n, slong prec, int times_pi)
-
 .. function:: void _acb_poly_sin_cos_series(acb_ptr s, acb_ptr c, acb_srcptr h, slong hlen, slong n, slong prec)
-
-.. function:: void acb_poly_sin_cos_series(acb_poly_t s, acb_poly_t c, const acb_poly_t h, slong n, slong prec)
+              void acb_poly_sin_cos_series(acb_poly_t s, acb_poly_t c, const acb_poly_t h, slong n, slong prec)
 
     Sets *s* and *c* to the power series sine and cosine of *h*, computed
     simultaneously.
-
-    The *basecase* version uses a simple recurrence for the coefficients,
-    requiring `O(nm)` operations where `m` is the length of `h`.
-
-    The *tangent* version uses the tangent half-angle formulas to compute
-    the sine and cosine via :func:`_acb_poly_tan_series`. This
-    requires `O(M(n))` operations.
-    When `h = h_0 + h_1` where the constant term `h_0` is nonzero,
-    the evaluation is done as
-    `\sin(h_0 + h_1) = \cos(h_0) \sin(h_1) + \sin(h_0) \cos(h_1)`,
-    `\cos(h_0 + h_1) = \cos(h_0) \cos(h_1) - \sin(h_0) \sin(h_1)`,
-    to improve accuracy and avoid dividing by zero at the poles of
-    the tangent function.
-
-    The default version automatically selects between the *basecase* and
-    *tangent* algorithms depending on the input.
-
-    The *basecase* and *tangent* versions take a flag *times_pi*
-    specifying that the input is to be multiplied by `\pi`.
-
-    The underscore methods support aliasing and require the lengths to be nonzero.
+    The underscore method supports aliasing and requires the lengths to be nonzero.
 
 .. function:: void _acb_poly_sin_series(acb_ptr s, acb_srcptr h, slong hlen, slong n, slong prec)
 

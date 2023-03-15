@@ -49,7 +49,7 @@ int main()
         arb_poly_asin_series(b, a, n, rbits2);
 
         /* Check sin(asin(x)) = x */
-        arb_poly_sin_cos_series_basecase(c, d, b, n, rbits2, 0);
+        arb_poly_sin_cos_series(c, d, b, n, rbits2);
 
         fmpq_poly_truncate(A, n);
         if (!arb_poly_contains_fmpq_poly(c, A))

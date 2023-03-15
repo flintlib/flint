@@ -1430,6 +1430,15 @@ gr_generic_cos(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 }
 
 int
+gr_generic_sin_cos(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_ctx_t ctx)
+{
+    if (gr_is_zero(x, ctx) == T_TRUE)
+        return gr_zero(res1, ctx) | gr_one(res2, ctx);
+    else
+        return GR_UNABLE;
+}
+
+int
 gr_generic_tan(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 {
     if (gr_is_zero(x, ctx) == T_TRUE)
@@ -2817,6 +2826,7 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_LOG1P,                   (gr_funcptr) gr_generic_log1p},
     {GR_METHOD_SIN,                     (gr_funcptr) gr_generic_sin},
     {GR_METHOD_COS,                     (gr_funcptr) gr_generic_cos},
+    {GR_METHOD_SIN_COS,                 (gr_funcptr) gr_generic_sin_cos},
     {GR_METHOD_TAN,                     (gr_funcptr) gr_generic_tan},
     {GR_METHOD_ASIN,                    (gr_funcptr) gr_generic_asin},
     {GR_METHOD_ATAN,                    (gr_funcptr) gr_generic_atan},
