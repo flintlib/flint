@@ -72,11 +72,11 @@ _nmod_poly_sqrt(mp_ptr s, mp_srcptr p, slong len, nmod_t mod)
     t = _nmod_vec_init(len);
 
     if (c == 1)
-        _nmod_poly_sqrt_series(s, p, slen, mod);
+        _nmod_poly_sqrt_series(s, p, slen, slen, mod);
     else
     {
        _nmod_vec_scalar_mul_nmod(t, p, slen, n_invmod(d, mod.n), mod);
-        _nmod_poly_sqrt_series(s, t, slen, mod);
+        _nmod_poly_sqrt_series(s, t, slen, slen, mod);
     }
 
     if (c != 1)

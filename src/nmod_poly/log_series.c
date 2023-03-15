@@ -9,30 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "ulong_extras.h"
-#include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "gr_poly.h"
 
 void
-_nmod_poly_log_series(mp_ptr res, mp_srcptr f, slong flen, slong n, nmod_t mod)
+_nmod_poly_log_series(mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod)
 {
-    flen = FLINT_MIN(flen, n);
-
-    if (flen == 1)
-    {
-        res[0] = 1;
-        _nmod_vec_zero(res + 1, n - 1);
-    }
-    else
-    {
-        mp_ptr tmp = _nmod_vec_init(2 * n);
-        _nmod_poly_derivative(tmp, f, flen, mod);
-        _nmod_poly_div_series(tmp + n, tmp, flen - 1, f,
-            FLINT_MIN(flen, n - 1), n - 1, mod);
-        _nmod_poly_integral(res, tmp + n, n, mod);
-        _nmod_vec_clear(tmp);
-    }
+    gr_ctx_t ctx;
+    _gr_ctx_init_nmod(ctx, &mod);
+    GR_MUST_SUCCEED(_gr_poly_log_series(g, h, hlen, n, ctx));
 }
 
 void

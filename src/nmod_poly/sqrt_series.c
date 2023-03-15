@@ -10,74 +10,45 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "nmod_vec.h"
 #include "nmod_poly.h"
-#include "ulong_extras.h"
-
+#include "gr_poly.h"
 
 void
-_nmod_poly_sqrt_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
+_nmod_poly_sqrt_series(mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod)
 {
-    mp_ptr t = _nmod_vec_init(n);
-    _nmod_poly_invsqrt_series(t, h, n, mod);
-    _nmod_poly_mullow(g, t, n, h, n, n, mod);
-    _nmod_vec_clear(t);
+    gr_ctx_t ctx;
+    _gr_ctx_init_nmod(ctx, &mod);
+    GR_MUST_SUCCEED(_gr_poly_sqrt_series(g, h, hlen, n, ctx));
 }
 
 void
-nmod_poly_sqrt_series(nmod_poly_t g, const nmod_poly_t h, slong n)
+nmod_poly_sqrt_series(nmod_poly_t res, const nmod_poly_t h, slong len)
 {
-    mp_ptr g_coeffs, h_coeffs;
-    nmod_poly_t t1;
     slong hlen;
-    
     hlen = h->length;
 
-    if (n == 0)
+    if (hlen == 0 || len == 0)
     {
-        flint_printf("Exception (nmod_poly_sqrt_series). Division by zero.\n");
-        flint_abort();
+        nmod_poly_zero(res);
+        return;
     }
 
-    if (h->length == 0 || h->coeffs[0] != UWORD(1))
-    {
-        flint_printf("Exception (nmod_poly_sqrt_series). Requires constant term 1.\n");
-        flint_abort();
-    }
+    if (hlen == 1)
+        len = 1;
 
-    if (hlen < n)
+    if (res == h)
     {
-        h_coeffs = _nmod_vec_init(n);
-        flint_mpn_copyi(h_coeffs, h->coeffs, hlen);
-        flint_mpn_zero(h_coeffs + hlen, n - hlen);
-    }
-    else
-        h_coeffs = h->coeffs;
-
-    if (h == g && hlen >= n)
-    {
-        nmod_poly_init2(t1, h->mod.n, n);
-        g_coeffs = t1->coeffs;
+        nmod_poly_t t;
+        nmod_poly_init_preinv(t, h->mod.n, h->mod.ninv);
+        nmod_poly_sqrt_series(t, h, len);
+        nmod_poly_swap(res, t);
+        nmod_poly_clear(t);
     }
     else
     {
-        nmod_poly_fit_length(g, n);
-        g_coeffs = g->coeffs;
+        nmod_poly_fit_length(res, len);
+        _nmod_poly_sqrt_series(res->coeffs, h->coeffs, h->length, len, h->mod);
+        _nmod_poly_set_length(res, len);
+        _nmod_poly_normalise(res);
     }
-
-    _nmod_poly_sqrt_series(g_coeffs, h_coeffs, n, h->mod);
-
-    if (h == g && hlen >= n)
-    {
-        nmod_poly_swap(g, t1);
-        nmod_poly_clear(t1);
-    }
-    
-    g->length = n;
-
-    if (hlen < n)
-        _nmod_vec_clear(h_coeffs);
-
-    _nmod_poly_normalise(g);
 }

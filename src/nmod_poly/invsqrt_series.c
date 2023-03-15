@@ -11,105 +11,50 @@
 */
 
 #include "nmod_poly.h"
-#include "ulong_extras.h"
+#include "gr_poly.h"
 
-static void 
-__nmod_poly_invsqrt_series_prealloc(mp_ptr g, 
-                                    mp_srcptr h, mp_ptr t, mp_ptr u,
-                                    slong n, nmod_t mod)
+void
+_nmod_poly_invsqrt_series(mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod)
 {
-    const int alloc = (t == NULL);
-    const slong m    = (n + 1) / 2;
-    mp_limb_t c;
+    gr_ctx_t ctx;
+    _gr_ctx_init_nmod(ctx, &mod);
+    GR_MUST_SUCCEED(_gr_poly_rsqrt_series(g, h, hlen, n, ctx));
+}
 
-    if (n == 1)
+void
+nmod_poly_invsqrt_series(nmod_poly_t res, const nmod_poly_t h, slong len)
+{
+    slong hlen;
+    hlen = h->length;
+
+    if (h->length == 0 || h->coeffs[0] == 0)
     {
-        g[0] = UWORD(1);
+        flint_printf("Exception (nmod_poly_invsqrt_series). Division by zero.\n");
+        flint_abort();
+    }
+
+    if (len == 0)
+    {
+        nmod_poly_zero(res);
         return;
     }
 
-    if (alloc)
+    if (hlen == 1)
+        len = 1;
+
+    if (res == h)
     {
-        t = _nmod_vec_init(n);
-        u = _nmod_vec_init(n);
-    }
-
-    __nmod_poly_invsqrt_series_prealloc(g, h, t, u, m, mod);
-
-    _nmod_vec_zero(g + m, n - m);
-
-    _nmod_poly_mul(t, g, m, g, m, mod);
-    if (2*m - 1 < n)
-        t[n-1] = UWORD(0);
-
-    _nmod_poly_mullow(u, t, n, g, n, n, mod);
-    _nmod_poly_mullow(t, u, n, h, n, n, mod);
-
-    c = n_invmod(mod.n - 2, mod.n);
-    _nmod_vec_scalar_mul_nmod(g + m, t + m, n - m, c, mod);
-
-    if (alloc)
-    {
-        _nmod_vec_clear(t);
-        _nmod_vec_clear(u);
-    }
-}
-
-void _nmod_poly_invsqrt_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
-{
-    __nmod_poly_invsqrt_series_prealloc(g, h, NULL, NULL, n, mod);
-}
-
-void nmod_poly_invsqrt_series(nmod_poly_t g, const nmod_poly_t h, slong n)
-{
-    const slong hlen = h->length;
-    mp_ptr g_coeffs, h_coeffs;
-    nmod_poly_t t1;
-
-    if (n == 0 || h->length == 0 || h->coeffs[0] == 0)
-    {
-        flint_printf("Exception (nmod_poly_invsqrt). Division by zero.\n");
-        flint_abort();
-    }
-
-    if (h->coeffs[0] != UWORD(1))
-    {
-        flint_printf("Exception (nmod_poly_invsqrt_series). Constant term != 1.\n");
-        flint_abort();
-    }
-
-    if (hlen < n)
-    {
-        h_coeffs = _nmod_vec_init(n);
-        flint_mpn_copyi(h_coeffs, h->coeffs, hlen);
-        flint_mpn_zero(h_coeffs + hlen, n - hlen);
-    }
-    else
-        h_coeffs = h->coeffs;
-
-    if (h == g && hlen >= n)
-    {
-        nmod_poly_init2(t1, h->mod.n, n);
-        g_coeffs = t1->coeffs;
+        nmod_poly_t t;
+        nmod_poly_init_preinv(t, h->mod.n, h->mod.ninv);
+        nmod_poly_invsqrt_series(t, h, len);
+        nmod_poly_swap(res, t);
+        nmod_poly_clear(t);
     }
     else
     {
-        nmod_poly_fit_length(g, n);
-        g_coeffs = g->coeffs;
+        nmod_poly_fit_length(res, len);
+        _nmod_poly_invsqrt_series(res->coeffs, h->coeffs, h->length, len, h->mod);
+        _nmod_poly_set_length(res, len);
+        _nmod_poly_normalise(res);
     }
-
-    _nmod_poly_invsqrt_series(g_coeffs, h_coeffs, n, h->mod);
-
-    if (h == g && hlen >= n)
-    {
-        nmod_poly_swap(g, t1);
-        nmod_poly_clear(t1);
-    }
-    
-    g->length = n;
-
-    if (hlen < n)
-        _nmod_vec_clear(h_coeffs);
-
-    _nmod_poly_normalise(g);
 }

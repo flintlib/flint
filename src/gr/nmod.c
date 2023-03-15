@@ -770,20 +770,48 @@ __gr_nmod_vec_dot(ulong * res, const ulong * initial, int subtract, const ulong 
     int nlimbs;
     nmod_t mod;
 
-    if (len <= 0)
+    if (len <= 1)
     {
-        if (initial == NULL)
-            _gr_nmod_zero(res, ctx);
+        if (len == 2)   /* todo: fmma */
+        {
+            mod = NMOD_CTX(ctx);
+            s = nmod_mul(vec1[0], vec2[0], mod);
+            s = nmod_addmul(s, vec1[1], vec2[1], mod);
+        }
+        else if (len == 1)
+        {
+            mod = NMOD_CTX(ctx);
+            s = nmod_mul(vec1[0], vec2[0], mod);
+        }
         else
-            _gr_nmod_set(res, initial, ctx);
-        return GR_SUCCESS;
+        {
+            if (initial == NULL)
+                _gr_nmod_zero(res, ctx);
+            else
+                _gr_nmod_set(res, initial, ctx);
+            return GR_SUCCESS;
+        }
     }
+    else
+    {
+        mod = NMOD_CTX(ctx);
 
-    mod = NMOD_CTX(ctx);
+        if (len <= 16)
+        {
+            if (mod.n <= UWORD(1) << (FLINT_BITS / 2 - 2))
+                nlimbs = 1;
+            if (mod.n <= UWORD(1) << (FLINT_BITS - 2))
+                nlimbs = 2;
+            else
+                nlimbs = 3;
+        }
+        else
+        {
+            nlimbs = _nmod_vec_dot_bound_limbs(len, mod);
+        }
 
-    nlimbs = _nmod_vec_dot_bound_limbs(len, mod);
-
-    NMOD_VEC_DOT(s, i, len, vec1[i], vec2[i], mod, nlimbs);
+        NMOD_VEC_DOT(s, i, len, vec1[i], vec2[i], mod, nlimbs);
+    }
 
     if (initial == NULL)
     {
@@ -836,7 +864,21 @@ __gr_nmod_vec_dot_rev(ulong * res, const ulong * initial, int subtract, const ul
     else
     {
         mod = NMOD_CTX(ctx);
-        nlimbs = _nmod_vec_dot_bound_limbs(len, mod);
+
+        if (len <= 16)
+        {
+            if (mod.n <= UWORD(1) << (FLINT_BITS / 2 - 2))
+                nlimbs = 1;
+            if (mod.n <= UWORD(1) << (FLINT_BITS - 2))
+                nlimbs = 2;
+            else
+                nlimbs = 3;
+        }
+        else
+        {
+            nlimbs = _nmod_vec_dot_bound_limbs(len, mod);
+        }
+
         NMOD_VEC_DOT(s, i, len, vec1[i], vec2[len - 1 - i], mod, nlimbs);
     }
 
@@ -951,6 +993,57 @@ static const short inv_series_cutoff_tab[64] = {38, 36, 38, 36, 41, 48, 49, 54, 
   1381, 1418, 1513, 1540, 1598, 1692, 1846, 1883, 1942, 1963, 1803,
   1788, 1861, 1881, 1920, };
 
+#if 0
+
+static int
+_nmod_poly_inv_series_basecase_1(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
+{
+    mp_limb_t q;
+
+    Qlen = FLINT_MIN(Qlen, n);
+
+    if (Q[0] == 1)
+        q = 1;
+    else if (n_gcdinv(&q, Q[0], mod.n) != 1)
+        return GR_DOMAIN;
+
+    Qinv[0] = q;
+
+    if (Qlen == 1)
+    {
+        _nmod_vec_zero(Qinv + 1, n - 1);
+    }
+    else
+    {
+        slong i, j, l;
+        int nlimbs;
+        mp_limb_t s;
+
+        nlimbs = _nmod_vec_dot_bound_limbs(FLINT_MIN(n, Qlen), mod);
+
+        for (i = 1; i < n; i++)
+        {
+            l = FLINT_MIN(i, Qlen - 1);
+            NMOD_VEC_DOT(s, j, l, Q[j + 1], Qinv[i - 1 - j], mod, nlimbs);
+
+            if (q == 1)
+                Qinv[i] = n_negmod(s, mod.n);
+            else
+                Qinv[i] = n_negmod(n_mulmod2_preinv(s, q, mod.n, mod.ninv), mod.n);
+        }
+    }
+
+    return GR_SUCCESS;
+}
+
+#define INV_SERIES_BASECASE _nmod_poly_inv_series_basecase_1(res, f, flen, n, NMOD_CTX(ctx))
+
+#else
+
+#define INV_SERIES_BASECASE _gr_poly_inv_series_basecase(res, f, flen, n, ctx)
+
+#endif
+
 int
 _gr_nmod_poly_inv_series(ulong * res,
     const ulong * f, slong flen, slong n, gr_ctx_t ctx)
@@ -962,7 +1055,7 @@ _gr_nmod_poly_inv_series(ulong * res,
     cutoff = inv_series_cutoff_tab[NMOD_BITS(NMOD_CTX(ctx)) - 1];
 
     if (flen < cutoff)
-        return _gr_poly_inv_series_basecase(res, f, flen, n, ctx);
+        return INV_SERIES_BASECASE;
     else
         return _gr_poly_inv_series_newton(res, f, flen, n, cutoff, ctx);
 }

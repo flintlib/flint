@@ -2046,22 +2046,20 @@ by means of the generalised binomial theorem
 It is assumed that `h` has constant term `1` and that the coefficients
 `2^{-k}` exist in the coefficient ring (i.e. `2` must be invertible).
 
-.. function:: void _nmod_poly_invsqrt_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
+.. function:: void _nmod_poly_invsqrt_series(mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod)
 
     Set the first `n` terms of `g` to the series expansion of `1/\sqrt{h}`.
-    It is assumed that `n > 0`, that `h` has constant term 1 and that `h`
-    is zero-padded as necessary to length `n`. Aliasing is not permitted.
+    It is assumed that `n > 0`, that `h` has constant term 1. Aliasing is not permitted.
 
 .. function:: void nmod_poly_invsqrt_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 
     Set `g` to the series expansion of `1/\sqrt{h}` to order `O(x^n)`.
     It is assumed that `h` has constant term 1.
 
-.. function:: void _nmod_poly_sqrt_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
+.. function:: void _nmod_poly_sqrt_series(mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod)
 
     Set the first `n` terms of `g` to the series expansion of `\sqrt{h}`.
-    It is assumed that `n > 0`, that `h` has constant term 1 and that `h`
-    is zero-padded as necessary to length `n`. Aliasing is not permitted.
+    It is assumed that `n > 0`, that `h` has constant term 1. Aliasing is not permitted.
 
 .. function:: void nmod_poly_sqrt_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 
@@ -2176,16 +2174,6 @@ If the input does not satisfy all these conditions, results are undefined.
 Except where otherwise noted, functions are implemented with optimal
 (up to constants) complexity `O(M(n))`, where `M(n)` is the cost
 of polynomial multiplication.
-
-.. function:: void _nmod_poly_log_series_monomial_ui(mp_ptr g, mp_limb_t c, ulong r, slong n, nmod_t mod)
-
-    Set `g = \log(1+cx^r) + O(x^n)`. Assumes `n > 0`, `r > 0`, and that
-    the coefficient is reduced by the modulus. Works efficiently in linear
-    time.
-
-.. function:: void nmod_poly_log_series_monomial_ui(nmod_poly_t g, mp_limb_t c, ulong r, slong n)
-
-    Set `g = \log(1+cx^r) + O(x^n)`. Works efficiently in linear time.
 
 .. function:: void _nmod_poly_log_series(mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod)
 
