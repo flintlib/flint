@@ -12,7 +12,7 @@
 #include "fmpq_poly.h"
 #include "arb_poly.h"
 
-ARB_DLL extern slong arb_poly_newton_exp_cutoff;
+extern slong arb_poly_newton_exp_cutoff;
 
 int main()
 {

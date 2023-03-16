@@ -13,7 +13,7 @@
 #include "fmpq.h"
 #include "fmpz_poly.h"
 
-FLINT_DLL void _fmpz_poly_product_roots_fmpq_vec(fmpz * poly,
+void _fmpz_poly_product_roots_fmpq_vec(fmpz * poly,
                                         const fmpq * xs, slong n)
 {
     if (n == 0)

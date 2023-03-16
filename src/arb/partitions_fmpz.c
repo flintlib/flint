@@ -13,7 +13,7 @@
 #include "partitions.h"
 
 /* defined in flint*/
-FLINT_DLL extern const unsigned int partitions_lookup[128];
+extern const unsigned int partitions_lookup[128];
 
 /* we get log2(p(n))/2 bits with the leading term */
 static int

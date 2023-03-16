@@ -25,7 +25,7 @@
     On failure, a negative number is returned.''
  */
 
-FLINT_DLL int _fmpq_fprint(FILE * file, const fmpz_t num, const fmpz_t den)
+int _fmpq_fprint(FILE * file, const fmpz_t num, const fmpz_t den)
 {
     if (fmpz_is_one(den))
     {
