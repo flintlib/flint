@@ -25,7 +25,7 @@ struct timezone
     int tz_dsttime;     /* type of dst correction */
 };
 
-FLINT_DLL int gettimeofday(struct timeval *tv, struct timezone *tz);
+int gettimeofday(struct timeval *tv, struct timezone *tz);
 
 #if defined(__cplusplus)
 }

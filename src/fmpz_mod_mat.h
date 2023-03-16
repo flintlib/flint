@@ -14,7 +14,7 @@
 #define FMPZ_MOD_MAT_H
 
 #ifdef FMPZ_MOD_MAT_INLINES_C
-#define FMPZ_MOD_MAT_INLINE FLINT_DLL
+#define FMPZ_MOD_MAT_INLINE 
 #else
 #define FMPZ_MOD_MAT_INLINE static __inline__
 #endif
@@ -48,11 +48,11 @@ void fmpz_mod_mat_set_entry(fmpz_mod_mat_t mat, slong i, slong j, const fmpz_t v
 
 /* Memory management  ********************************************************/
 
-FLINT_DLL void fmpz_mod_mat_init(fmpz_mod_mat_t mat, slong rows, slong cols, const fmpz_t n);
+void fmpz_mod_mat_init(fmpz_mod_mat_t mat, slong rows, slong cols, const fmpz_t n);
 
-FLINT_DLL void fmpz_mod_mat_init_set(fmpz_mod_mat_t mat, const fmpz_mod_mat_t src);
+void fmpz_mod_mat_init_set(fmpz_mod_mat_t mat, const fmpz_mod_mat_t src);
 
-FLINT_DLL void fmpz_mod_mat_clear(fmpz_mod_mat_t mat);
+void fmpz_mod_mat_clear(fmpz_mod_mat_t mat);
 
 /* Basic manipulation  ********************************************************/
 
@@ -121,18 +121,18 @@ fmpz_mod_mat_swap_entrywise(fmpz_mod_mat_t mat1, fmpz_mod_mat_t mat2)
             fmpz_swap(fmpz_mod_mat_entry(mat2, i, j), fmpz_mod_mat_entry(mat1, i, j));
 }
 
-FLINT_DLL void _fmpz_mod_mat_reduce(fmpz_mod_mat_t mat);
+void _fmpz_mod_mat_reduce(fmpz_mod_mat_t mat);
 
 /* Random matrix generation */
-FLINT_DLL void fmpz_mod_mat_randtest(fmpz_mod_mat_t mat, flint_rand_t state);
+void fmpz_mod_mat_randtest(fmpz_mod_mat_t mat, flint_rand_t state);
 
-FLINT_DLL void fmpz_mod_mat_randrank(fmpz_mod_mat_t mat, flint_rand_t state,
+void fmpz_mod_mat_randrank(fmpz_mod_mat_t mat, flint_rand_t state,
                                                                    slong rank);
 
-FLINT_DLL void fmpz_mod_mat_randtril(fmpz_mod_mat_t mat, flint_rand_t state,
+void fmpz_mod_mat_randtril(fmpz_mod_mat_t mat, flint_rand_t state,
                                                                      int unit);
 
-FLINT_DLL void fmpz_mod_mat_randtriu(fmpz_mod_mat_t mat, flint_rand_t state,
+void fmpz_mod_mat_randtriu(fmpz_mod_mat_t mat, flint_rand_t state,
                                                                      int unit);
 
 FMPZ_MOD_MAT_INLINE
@@ -144,10 +144,10 @@ void fmpz_mod_mat_randops(fmpz_mod_mat_t mat, slong count, flint_rand_t state)
 
 /* Windows and concatenation */
 
-FLINT_DLL void fmpz_mod_mat_window_init(fmpz_mod_mat_t window, const fmpz_mod_mat_t mat,
+void fmpz_mod_mat_window_init(fmpz_mod_mat_t window, const fmpz_mod_mat_t mat,
                               slong r1, slong c1, slong r2, slong c2);
 
-FLINT_DLL void fmpz_mod_mat_window_clear(fmpz_mod_mat_t window);
+void fmpz_mod_mat_window_clear(fmpz_mod_mat_t window);
 
 FMPZ_MOD_MAT_INLINE
 void fmpz_mod_mat_concat_horizontal(fmpz_mod_mat_t res,
@@ -232,115 +232,115 @@ void fmpz_mod_mat_set_nmod_mat(fmpz_mod_mat_t A, const nmod_mat_t B)
     fmpz_mat_set_nmod_mat_unsigned(A->mat, B);
 }
 
-FLINT_DLL void fmpz_mod_mat_set_fmpz_mat(fmpz_mod_mat_t A, const fmpz_mat_t B);
+void fmpz_mod_mat_set_fmpz_mat(fmpz_mod_mat_t A, const fmpz_mat_t B);
 
-FLINT_DLL void fmpz_mod_mat_get_fmpz_mat(fmpz_mat_t A, const fmpz_mod_mat_t B);
+void fmpz_mod_mat_get_fmpz_mat(fmpz_mat_t A, const fmpz_mod_mat_t B);
 
 /* Addition and subtraction */
 
-FLINT_DLL void fmpz_mod_mat_add(fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B);
+void fmpz_mod_mat_add(fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B);
 
-FLINT_DLL void fmpz_mod_mat_sub(fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B);
+void fmpz_mod_mat_sub(fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B);
 
-FLINT_DLL void fmpz_mod_mat_neg(fmpz_mod_mat_t B, const fmpz_mod_mat_t A);
+void fmpz_mod_mat_neg(fmpz_mod_mat_t B, const fmpz_mod_mat_t A);
 
 /* Matrix-scalar arithmetic */
 
-FLINT_DLL void fmpz_mod_mat_scalar_mul_si(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, slong c);
+void fmpz_mod_mat_scalar_mul_si(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, slong c);
 
-FLINT_DLL void fmpz_mod_mat_scalar_mul_ui(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, ulong c);
+void fmpz_mod_mat_scalar_mul_ui(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, ulong c);
 
-FLINT_DLL void fmpz_mod_mat_scalar_mul_fmpz(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, fmpz_t c);
+void fmpz_mod_mat_scalar_mul_fmpz(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, fmpz_t c);
 
 /* Matrix multiplication */
 
-FLINT_DLL void fmpz_mod_mat_mul(fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B);
+void fmpz_mod_mat_mul(fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B);
 
-FLINT_DLL void _fmpz_mod_mat_mul_classical_threaded_pool_op(fmpz_mod_mat_t D,
+void _fmpz_mod_mat_mul_classical_threaded_pool_op(fmpz_mod_mat_t D,
       const fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B,
                       int op, thread_pool_handle * threads, slong num_threads);
 
-FLINT_DLL void fmpz_mod_mat_mul_classical_threaded(fmpz_mod_mat_t C,
+void fmpz_mod_mat_mul_classical_threaded(fmpz_mod_mat_t C,
                                const fmpz_mod_mat_t A, const fmpz_mod_mat_t B);
 
-FLINT_DLL void fmpz_mod_mat_sqr(fmpz_mod_mat_t B, const fmpz_mod_mat_t A);
+void fmpz_mod_mat_sqr(fmpz_mod_mat_t B, const fmpz_mod_mat_t A);
 
-FLINT_DLL void fmpz_mod_mat_submul(fmpz_mod_mat_t D, const fmpz_mod_mat_t C,
+void fmpz_mod_mat_submul(fmpz_mod_mat_t D, const fmpz_mod_mat_t C,
                                const fmpz_mod_mat_t A, const fmpz_mod_mat_t B);
 
-FLINT_DLL void fmpz_mod_mat_mul_fmpz_vec(fmpz * c, const fmpz_mod_mat_t A,
+void fmpz_mod_mat_mul_fmpz_vec(fmpz * c, const fmpz_mod_mat_t A,
                                                    const fmpz * b, slong blen);
 
-FLINT_DLL void fmpz_mod_mat_mul_fmpz_vec_ptr(fmpz * const * c,
+void fmpz_mod_mat_mul_fmpz_vec_ptr(fmpz * const * c,
                    const fmpz_mod_mat_t A, const fmpz * const * b, slong blen);
 
-FLINT_DLL void fmpz_mod_mat_fmpz_vec_mul(fmpz * c, const fmpz * a, slong alen,
+void fmpz_mod_mat_fmpz_vec_mul(fmpz * c, const fmpz * a, slong alen,
                                                        const fmpz_mod_mat_t B);
 
-FLINT_DLL void fmpz_mod_mat_fmpz_vec_mul_ptr(fmpz * const * c,
+void fmpz_mod_mat_fmpz_vec_mul_ptr(fmpz * const * c,
                    const fmpz * const * a, slong alen, const fmpz_mod_mat_t B);
 
 /* Trace */
 
-FLINT_DLL void fmpz_mod_mat_trace(fmpz_t trace, const fmpz_mod_mat_t mat);
+void fmpz_mod_mat_trace(fmpz_t trace, const fmpz_mod_mat_t mat);
 
 /* Gaussian elimination *********************************************/
 
-FLINT_DLL slong fmpz_mod_mat_rref(slong * perm, fmpz_mod_mat_t mat);
+slong fmpz_mod_mat_rref(slong * perm, fmpz_mod_mat_t mat);
 
-FLINT_DLL slong _fmpz_mod_mat_reduce_row(fmpz_mod_mat_t A, slong * P, slong * L, 
+slong _fmpz_mod_mat_reduce_row(fmpz_mod_mat_t A, slong * P, slong * L, 
                                             slong m, const fmpz_mod_ctx_t ctx);
 
-FLINT_DLL slong fmpz_mod_mat_reduce_row(fmpz_mod_mat_t A, slong * P, slong * L,
+slong fmpz_mod_mat_reduce_row(fmpz_mod_mat_t A, slong * P, slong * L,
                                                                       slong m);
 
-FLINT_DLL slong fmpz_mod_mat_lu(slong * P, fmpz_mod_mat_t A, int rank_check);
+slong fmpz_mod_mat_lu(slong * P, fmpz_mod_mat_t A, int rank_check);
 
-FLINT_DLL slong fmpz_mod_mat_lu_classical(slong * P, fmpz_mod_mat_t A,
+slong fmpz_mod_mat_lu_classical(slong * P, fmpz_mod_mat_t A,
                                                                int rank_check);
 
-FLINT_DLL slong fmpz_mod_mat_lu_recursive(slong * P, fmpz_mod_mat_t A,
+slong fmpz_mod_mat_lu_recursive(slong * P, fmpz_mod_mat_t A,
                                                                int rank_check);
 
-FLINT_DLL void fmpz_mod_mat_solve_triu(fmpz_mod_mat_t X, const fmpz_mod_mat_t L,
+void fmpz_mod_mat_solve_triu(fmpz_mod_mat_t X, const fmpz_mod_mat_t L,
                                              const fmpz_mod_mat_t B, int unit);
 
-FLINT_DLL void fmpz_mod_mat_solve_triu_classical(fmpz_mod_mat_t X,
+void fmpz_mod_mat_solve_triu_classical(fmpz_mod_mat_t X,
                     const fmpz_mod_mat_t L, const fmpz_mod_mat_t B, int unit);
 
-FLINT_DLL void fmpz_mod_mat_solve_triu_recursive(fmpz_mod_mat_t X,
+void fmpz_mod_mat_solve_triu_recursive(fmpz_mod_mat_t X,
                     const fmpz_mod_mat_t L, const fmpz_mod_mat_t B, int unit);
 
-FLINT_DLL void fmpz_mod_mat_solve_tril(fmpz_mod_mat_t X, const fmpz_mod_mat_t L,
+void fmpz_mod_mat_solve_tril(fmpz_mod_mat_t X, const fmpz_mod_mat_t L,
                                              const fmpz_mod_mat_t B, int unit);
 
-FLINT_DLL void fmpz_mod_mat_solve_tril_classical(fmpz_mod_mat_t X,
+void fmpz_mod_mat_solve_tril_classical(fmpz_mod_mat_t X,
                     const fmpz_mod_mat_t L, const fmpz_mod_mat_t B, int unit);
 
-FLINT_DLL void fmpz_mod_mat_solve_tril_recursive(fmpz_mod_mat_t X,
+void fmpz_mod_mat_solve_tril_recursive(fmpz_mod_mat_t X,
                     const fmpz_mod_mat_t L, const fmpz_mod_mat_t B, int unit);
 
-FLINT_DLL int fmpz_mod_mat_can_solve(fmpz_mod_mat_t X, const fmpz_mod_mat_t A,
+int fmpz_mod_mat_can_solve(fmpz_mod_mat_t X, const fmpz_mod_mat_t A,
                                                        const fmpz_mod_mat_t B);
 
-FLINT_DLL int fmpz_mod_mat_solve(fmpz_mod_mat_t X, const fmpz_mod_mat_t A,
+int fmpz_mod_mat_solve(fmpz_mod_mat_t X, const fmpz_mod_mat_t A,
                                                        const fmpz_mod_mat_t B);
 
-FLINT_DLL int fmpz_mod_mat_inv(fmpz_mod_mat_t B, fmpz_mod_mat_t A);
+int fmpz_mod_mat_inv(fmpz_mod_mat_t B, fmpz_mod_mat_t A);
 
-FLINT_DLL slong fmpz_mod_mat_rank(const fmpz_mod_mat_t A);
+slong fmpz_mod_mat_rank(const fmpz_mod_mat_t A);
 
-FLINT_DLL slong fmpz_mod_mat_nullspace(fmpz_mod_mat_t X, const fmpz_mod_mat_t A);
+slong fmpz_mod_mat_nullspace(fmpz_mod_mat_t X, const fmpz_mod_mat_t A);
 
 /* Howell and strong echelon form ***********************************/
 
-FLINT_DLL slong fmpz_mod_mat_howell_form(fmpz_mod_mat_t mat);
+slong fmpz_mod_mat_howell_form(fmpz_mod_mat_t mat);
 
-FLINT_DLL void fmpz_mod_mat_strong_echelon_form(fmpz_mod_mat_t mat);
+void fmpz_mod_mat_strong_echelon_form(fmpz_mod_mat_t mat);
 
 /* Transforms ****************************************************************/
 
-FLINT_DLL void fmpz_mod_mat_similarity(fmpz_mod_mat_t A, slong r, fmpz_t d);
+void fmpz_mod_mat_similarity(fmpz_mod_mat_t A, slong r, fmpz_t d);
 
 /* Permutations ************************************************************/
 
@@ -370,7 +370,7 @@ void fmpz_mod_mat_invert_cols(fmpz_mod_mat_t mat, slong * perm)
 
 /* Inlines *******************************************************************/
 
-FLINT_DLL void fmpz_mod_mat_get_entry(fmpz_t x, const fmpz_mod_mat_t mat, slong i, slong j);
+void fmpz_mod_mat_get_entry(fmpz_t x, const fmpz_mod_mat_t mat, slong i, slong j);
 
 #ifdef __cplusplus
 }

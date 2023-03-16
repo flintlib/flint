@@ -14,7 +14,7 @@
 #define FQ_DEFAULT_POLY_H
 
 #ifdef FQ_DEFAULT_POLY_INLINES_C
-#define FQ_DEFAULT_POLY_INLINE FLINT_DLL
+#define FQ_DEFAULT_POLY_INLINE 
 #else
 #define FQ_DEFAULT_POLY_INLINE static __inline__
 #endif
@@ -836,7 +836,7 @@ void fq_default_poly_set_fmpz_mod_poly(fq_default_poly_t rop,
     }
 }
 
-FLINT_DLL
+
 void fq_default_poly_set_fmpz_poly(fq_default_poly_t rop,
                              const fmpz_poly_t op, const fq_default_ctx_t ctx);
 

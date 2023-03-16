@@ -14,7 +14,7 @@
 #define FQ_DEFAULT_MAT_H
 
 #ifdef FQ_DEFAULT_MAT_INLINES_C
-#define FQ_DEFAULT_MAT_INLINE FLINT_DLL
+#define FQ_DEFAULT_MAT_INLINE 
 #else
 #define FQ_DEFAULT_MAT_INLINE static __inline__
 #endif

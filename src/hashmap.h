@@ -99,11 +99,11 @@ ulong hash_word(ulong a)
 
 ******************************************************************************/
 
-FLINT_DLL void hashmap1_init(hashmap1_t h);
+void hashmap1_init(hashmap1_t h);
 
-FLINT_DLL void hashmap1_init2(hashmap1_t h, slong size);
+void hashmap1_init2(hashmap1_t h, slong size);
 
-FLINT_DLL void hashmap1_clear(hashmap1_t h);
+void hashmap1_clear(hashmap1_t h);
 
 static __inline__
 ulong hashmap1_hash_key(ulong key, hashmap1_t h)
@@ -111,12 +111,12 @@ ulong hashmap1_hash_key(ulong key, hashmap1_t h)
    return hash_word(key) & h->mask;
 }
 
-FLINT_DLL slong hashmap1_hash(ulong key, hashmap1_t h);
+slong hashmap1_hash(ulong key, hashmap1_t h);
 
-FLINT_DLL void hashmap1_rehash(hashmap1_t h);
+void hashmap1_rehash(hashmap1_t h);
 
-FLINT_DLL void hashmap1_insert(ulong key, void * value, hashmap1_t h);
+void hashmap1_insert(ulong key, void * value, hashmap1_t h);
 
-FLINT_DLL int hashmap1_find(void ** ptr, ulong key, hashmap1_t h);
+int hashmap1_find(void ** ptr, ulong key, hashmap1_t h);
 
 #endif

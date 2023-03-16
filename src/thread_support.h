@@ -22,10 +22,10 @@
 
 #define FLINT_DEFAULT_THREAD_LIMIT 99999
 
-FLINT_DLL slong flint_request_threads(thread_pool_handle ** handles,
+slong flint_request_threads(thread_pool_handle ** handles,
                                                            slong thread_limit);
 
-FLINT_DLL void flint_give_back_threads(thread_pool_handle * handles,
+void flint_give_back_threads(thread_pool_handle * handles,
                                                             slong num_handles);
 
 #define FLINT_PARALLEL_UNIFORM 1
@@ -36,14 +36,14 @@ FLINT_DLL void flint_give_back_threads(thread_pool_handle * handles,
 
 typedef void (* do_func_t)(slong i, void * args);
 
-FLINT_DLL void flint_parallel_do(do_func_t f, void * args, slong n, int thread_limit, int flags);
+void flint_parallel_do(do_func_t f, void * args, slong n, int thread_limit, int flags);
 
 typedef void (* bsplit_merge_func_t)(void *, void *, void *, void *);
 typedef void (* bsplit_basecase_func_t)(void *, slong, slong, void *);
 typedef void (* bsplit_init_func_t)(void *, void *);
 typedef void (* bsplit_clear_func_t)(void *, void *);
 
-FLINT_DLL void flint_parallel_binary_splitting(void * res, bsplit_basecase_func_t basecase, bsplit_merge_func_t merge,
+void flint_parallel_binary_splitting(void * res, bsplit_basecase_func_t basecase, bsplit_merge_func_t merge,
     size_t sizeof_res, bsplit_init_func_t init, bsplit_clear_func_t clear, void * args, slong a, slong b, slong basecase_cutoff, int thread_limit, int flags);
 
 #ifdef __cplusplus

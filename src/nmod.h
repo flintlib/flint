@@ -14,7 +14,7 @@
 #define NMOD_H
 
 #ifdef NMOD_INLINES_C
-#define NMOD_INLINE FLINT_DLL
+#define NMOD_INLINE 
 #else
 #define NMOD_INLINE static __inline__
 #endif
@@ -247,17 +247,17 @@ typedef struct {
 
 typedef nmod_discrete_log_pohlig_hellman_struct nmod_discrete_log_pohlig_hellman_t[1];
 
-FLINT_DLL void nmod_discrete_log_pohlig_hellman_init(
+void nmod_discrete_log_pohlig_hellman_init(
                 nmod_discrete_log_pohlig_hellman_t L);
 
-FLINT_DLL void nmod_discrete_log_pohlig_hellman_clear(
+void nmod_discrete_log_pohlig_hellman_clear(
                 nmod_discrete_log_pohlig_hellman_t L);
 
-FLINT_DLL double nmod_discrete_log_pohlig_hellman_precompute_prime(
+double nmod_discrete_log_pohlig_hellman_precompute_prime(
                 nmod_discrete_log_pohlig_hellman_t L,
                 mp_limb_t p);
 
-FLINT_DLL ulong nmod_discrete_log_pohlig_hellman_run(
+ulong nmod_discrete_log_pohlig_hellman_run(
                 const nmod_discrete_log_pohlig_hellman_t L,
                 mp_limb_t y);
 

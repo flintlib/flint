@@ -13,7 +13,7 @@
 #define GR_H
 
 #ifdef GR_INLINES_C
-#define GR_INLINE FLINT_DLL
+#define GR_INLINE 
 #else
 #define GR_INLINE static __inline__
 #endif
