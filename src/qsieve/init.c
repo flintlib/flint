@@ -18,7 +18,7 @@ void qsieve_init(qs_t qs_inf, const fmpz_t n)
     size_t fname_alloc_size;
     slong i;
 
-#if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(_MSC_VER)
+#if (defined(__WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__) && !defined(__MINGW64__)) || defined(_MSC_VER)
     fname_alloc_size = MAX_PATH;
 #else
     fname_alloc_size = 20;
