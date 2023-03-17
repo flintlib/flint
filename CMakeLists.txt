@@ -21,13 +21,13 @@ endif()
 option(BUILD_SHARED_LIBS "Build shared libs" on)
 option(WITH_NTL "Build with NTL or not" off)
 
-file(READ "${CMAKE_CURRENT_SOURCE_DIR}/configure" CONFIGURE_CONTENTS)
-string(REGEX MATCH "FLINT_MAJOR=([0-9]*)" _ ${CONFIGURE_CONTENTS})
-set(FLINT_MAJOR ${CMAKE_MATCH_1})
-string(REGEX MATCH "FLINT_MINOR=([0-9]*)" _ ${CONFIGURE_CONTENTS})
-set(FLINT_MINOR ${CMAKE_MATCH_1})
-string(REGEX MATCH "FLINT_PATCH=([0-9]*)" _ ${CONFIGURE_CONTENTS})
-set(FLINT_PATCH ${CMAKE_MATCH_1})
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/configure.ac" CONFIGURE_CONTENTS)
+string(REGEX MATCH "FLINT_MAJOR_SO=([0-9]*)" _ ${CONFIGURE_CONTENTS})
+set(FLINT_MAJOR_SO ${CMAKE_MATCH_1})
+string(REGEX MATCH "FLINT_MINOR_SO=([0-9]*)" _ ${CONFIGURE_CONTENTS})
+set(FLINT_MINOR_SO ${CMAKE_MATCH_1})
+string(REGEX MATCH "FLINT_PATCH_SO=([0-9]*)" _ ${CONFIGURE_CONTENTS})
+set(FLINT_PATCH_SO ${CMAKE_MATCH_1})
 
 find_package(GMP REQUIRED)
 find_package(MPFR REQUIRED)
@@ -197,14 +197,8 @@ endif()
 
 # Populate headers
 configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/config.h.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/CMake/cmake_config.h.in
     ${CMAKE_CURRENT_SOURCE_DIR}/src/flint-config.h
-)
-
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/fmpz-conversions-${MEMORY_MANAGER}.in
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/fmpz-conversions.h
-    COPYONLY
 )
 
 configure_file(
@@ -286,8 +280,8 @@ endif()
 # Versioning
 
 set_target_properties(flint PROPERTIES
-    VERSION ${FLINT_MAJOR}.${FLINT_MINOR}.${FLINT_PATCH}
-    SOVERSION ${FLINT_MAJOR}
+    VERSION ${FLINT_MAJOR_SO}.${FLINT_MINOR_SO}.${FLINT_PATCH_SO}
+    SOVERSION ${FLINT_MAJOR_SO}
 )
 
 # Following versioning parts are optional
@@ -297,12 +291,12 @@ if (APPLE)
         message(WARNING "To match the versioning scheme of configure based build system, switch to cmake 3.17.0")
     else ()
         set_target_properties(flint PROPERTIES
-            MACHO_COMPATIBILITY_VERSION ${FLINT_MAJOR}.${FLINT_MINOR}
-            MACHO_CURRENT_VERSION ${FLINT_MAJOR}.${FLINT_MINOR}.${FLINT_PATCH}
+            MACHO_COMPATIBILITY_VERSION ${FLINT_MAJOR_SO}.${FLINT_MINOR_SO}
+            MACHO_CURRENT_VERSION ${FLINT_MAJOR_SO}.${FLINT_MINOR_SO}.${FLINT_PATCH_SO}
         )
     endif()
 elseif (WIN32)
-    set_target_properties(flint PROPERTIES RUNTIME_OUTPUT_NAME "flint-${FLINT_MAJOR}")
+    set_target_properties(flint PROPERTIES RUNTIME_OUTPUT_NAME "flint-${FLINT_MAJOR_SO}")
 endif()
 
 if(NOT DEFINED IPO_SUPPORTED)

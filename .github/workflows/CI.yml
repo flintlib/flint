@@ -297,49 +297,49 @@ jobs:
         uses: andymckay/cancel-action@0.2
 
 
-          # FIXME: Reenable when possible
-  ##############################################################################
-  ## ubuntu with gcc and cmake (no checks)
-  ##############################################################################
-  #ubuntu-cmake-gcc:
-  #  name: Ubuntu GCC via CMake (no check)
 
-  #  runs-on: ubuntu-latest
+  #############################################################################
+  # ubuntu with gcc and cmake (no checks)
+  #############################################################################
+  ubuntu-cmake-gcc:
+    name: Ubuntu GCC via CMake (no check)
 
-  #  env:
-  #    MAKE: "make -j --output-sync=target"
-  #    LOCAL: ${{ github.workspace }}/local
-  #    LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
-  #    CFLAGS: "-Wall"
+    runs-on: ubuntu-latest
 
-  #  steps:
-  #    - uses: actions/checkout@v3
+    env:
+      MAKE: "make -j --output-sync=target"
+      LOCAL: ${{ github.workspace }}/local
+      LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
+      CFLAGS: "-Wall"
 
-  #    - name: "Setup"
-  #      run: |
-  #        sudo apt install -y cmake
-  #        sudo apt install -y libgmp-dev
-  #        sudo apt install -y libmpfr-dev
-  #        gcc --version
-  #        make --version
-  #        cmake --version
+    steps:
+      - uses: actions/checkout@v3
 
-  #    - name: "Configure"
-  #      run: |
-  #        mkdir build
-  #        cd build
-  #        cmake -G"Unix Makefiles" -DWITH_NTL=no -DBUILD_TESTING=yes \
-  #            -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=${LOCAL} ..
+      - name: "Setup"
+        run: |
+          sudo apt install -y cmake
+          sudo apt install -y libgmp-dev
+          sudo apt install -y libmpfr-dev
+          gcc --version
+          make --version
+          cmake --version
 
-  #    - name: "Compile"
-  #      run: |
-  #        cd build
-  #        $MAKE
-  #        ldd lib/libflint.so
+      - name: "Configure"
+        run: |
+          mkdir build
+          cd build
+          cmake -G"Unix Makefiles" -DWITH_NTL=no -DBUILD_TESTING=yes \
+              -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=${LOCAL} ..
 
-  #    - if: failure()
-  #      name: "If failure, stop all other jobs"
-  #      uses: andymckay/cancel-action@0.2
+      - name: "Compile"
+        run: |
+          cd build
+          $MAKE
+          ldd lib/libflint.so
+
+      - if: failure()
+        name: "If failure, stop all other jobs"
+        uses: andymckay/cancel-action@0.2
 
 
 
