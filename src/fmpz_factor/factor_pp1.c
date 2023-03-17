@@ -523,7 +523,8 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
       _fmpz_mod_poly_tree_build(tree2, roots2, num_roots, n_in);
 
       fmpz_poly_mul(tree2[FLINT_CLOG2(num_roots)], tree2[FLINT_CLOG2(num_roots)-1], tree2[FLINT_CLOG2(num_roots)-1]+1);
-     
+      fmpz_poly_scalar_mod_fmpz(tree2[FLINT_CLOG2(num_roots)], tree2[FLINT_CLOG2(num_roots)], n_in);
+
 #if DEBUG
       flint_printf("built trees\n");
 #endif
