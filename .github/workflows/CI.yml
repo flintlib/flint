@@ -51,6 +51,50 @@ jobs:
 
 
   ##############################################################################
+  # ubuntu with gcc (assert)
+  ##############################################################################
+  ubuntu-gcc-assert:
+    name: Ubuntu GCC (assert, x2)
+
+    runs-on: ubuntu-latest
+
+    env:
+      MAKE: "make -j --output-sync=target"
+      CC: "gcc"
+      CFLAGS: "-Wall"
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: "Setup"
+        run: |
+          sudo apt install libgmp-dev
+          sudo apt install libmpfr-dev
+          gcc --version
+          make --version
+
+      - name: "Configure"
+        run: |
+          ./configure CC=${CC} CFLAGS="${CFLAGS}" --with-gmp=/usr --with-mpfr=/usr --enable-assert --disable-static
+
+      - name: "Compile"
+        run: |
+          $MAKE
+          ldd libflint.so
+
+      - name: "Check"
+        run: |
+          export FLINT_TEST_MULTIPLIER=2
+          $MAKE check
+
+          # FIXME: Enable when this won't fail
+      # - if: failure()
+      #   name: "If failure, stop all other jobs"
+      #   uses: andymckay/cancel-action@0.2
+
+
+
+  ##############################################################################
   # macos with gcc
   ##############################################################################
   macos-gcc:
