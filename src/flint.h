@@ -116,42 +116,37 @@ void flint_set_abort(FLINT_NORETURN void (*func)(void));
    */
 
 
-#if defined(_WIN64) || defined(__mips64)
-#if defined(__MINGW64__)
-#define WORD_FMT "%I64"
-#define WORD_WIDTH_FMT "%*I64"
+#if defined(_LONG_LONG_LIMB)
+# define WORD_FMT "%ll"
+# define WORD_WIDTH_FMT "%*ll"
+# define WORD(xx) (xx##LL)
+# define UWORD(xx) (xx##ULL)
+# ifndef FLINT_NO_WORDMAC
+#  define UWORD_MAX ULLONG_MAX
+#  define UWORD_MIN ULLONG_MIN
+#  define WORD_MAX LLONG_MAX
+#  define WORD_MIN LLONG_MIN
+# endif
 #else
-#define WORD_FMT "%ll"
-#define WORD_WIDTH_FMT "%*ll"
-#endif
-#define WORD(xx) (xx##LL)
-#define UWORD(xx) (xx##ULL)
-#ifndef FLINT_NO_WORDMAC
-#define UWORD_MAX ULLONG_MAX
-#define UWORD_MIN ULLONG_MIN
-#define WORD_MAX LLONG_MAX
-#define WORD_MIN LLONG_MIN
-#endif
-#else
-#define WORD_FMT "%l"
-#define WORD_WIDTH_FMT "%*l"
-#define WORD(xx) (xx##L)
-#define UWORD(xx) (xx##UL)
-#ifndef FLINT_NO_WORDMAC
-#define UWORD_MAX ULONG_MAX
-#define UWORD_MIN ULONG_MIN
-#define WORD_MAX LONG_MAX
-#define WORD_MIN LONG_MIN
-#endif
+# define WORD_FMT "%l"
+# define WORD_WIDTH_FMT "%*l"
+# define WORD(xx) (xx##L)
+# define UWORD(xx) (xx##UL)
+# ifndef FLINT_NO_WORDMAC
+#  define UWORD_MAX ULONG_MAX
+#  define UWORD_MIN ULONG_MIN
+#  define WORD_MAX LONG_MAX
+#  define WORD_MIN LONG_MIN
+# endif
 #endif
 
 #if GMP_LIMB_BITS == 64
-    #define FLINT_BITS 64
-    #define FLINT_D_BITS 53
-    #define FLINT64 1
+# define FLINT_BITS 64
+# define FLINT_D_BITS 53
+# define FLINT64 1
 #else
-    #define FLINT_BITS 32
-    #define FLINT_D_BITS 31
+# define FLINT_BITS 32
+# define FLINT_D_BITS 31
 #endif
 
 #define flint_bitcnt_t ulong

@@ -18,7 +18,7 @@
 #ifdef __GNUC__
 # define memset __builtin_memset
 #else
-# include <strin.h>
+# include <string.h>
 #endif
 
 #define HASH_MULT (2654435761U)       /* hash function, taken from 'msieve' */

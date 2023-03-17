@@ -24,8 +24,8 @@
 
 #define _STDC_FORMAT_MACROS
 
-#if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(_MSC_VER)
-#include <windows.h>
+#if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(__MINGW32__) || defined(__MINGW64__) || defined(_MSC_VER)
+# include <windows.h>
 #endif
 
 #ifdef __GNUC__
@@ -60,8 +60,10 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     fmpz_t temp, temp2, X, Y;
     slong num_facs;
     fmpz * facs;
-#if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(_MSC_VER)
+#if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(__MINGW32__) || defined(__MINGW64__) || defined(_MSC_VER)
     char temp_path[MAX_PATH];
+#else
+    int fd;
 #endif
 
     if (fmpz_sgn(n) < 0)
@@ -209,21 +211,25 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     pthread_mutex_init(&qs_inf->mutex, NULL);
 #endif
     
-#if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(_MSC_VER)
+#if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(__MINGW32__) || defined(__MINGW64__) || defined(_MSC_VER)
     if (GetTempPathA(MAX_PATH, temp_path) == 0)
-    {
-        flint_printf("Exception (qsieve_factor). GetTempPathA() failed.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "GetTempPathA failed\n");
+
     if (GetTempFileNameA(temp_path, "siqs", /*uUnique*/ TRUE, qs_inf->fname) == 0)
-    {
-        flint_printf("Exception (qsieve_factor). GetTempFileNameA() failed.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "GetTempFileNameA failed\n");
+
     qs_inf->siqs = fopen(qs_inf->fname, "w");
+    if (qs_inf->siqs == NULL)
+        flint_throw(FLINT_ERROR, "fopen failed\n");
 #else
     strcpy(qs_inf->fname, "/tmp/siqsXXXXXX"); /* must be shorter than fname_alloc_size in init.c */
-    qs_inf->siqs = fdopen(mkstemp(qs_inf->fname), "w");
+    fd = mkstemp(qs_inf->fname);
+    if (fd == -1)
+        flint_throw(FLINT_ERROR, "mkstemp failed\n");
+
+    qs_inf->siqs = fdopen(fd, "w");
+    if (qs_inf->siqs == NULL)
+        flint_throw(FLINT_ERROR, "fdopen failed\n");
 #endif
 
     for (j = qs_inf->small_primes; j < qs_inf->num_primes; j++)
@@ -266,7 +272,9 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
             {
                 int ok;
 
-                fclose(qs_inf->siqs);
+                if (fclose(qs_inf->siqs))
+                    flint_throw(FLINT_ERROR, "fclose fail\n");
+                qs_inf->siqs = NULL;
 
                 ok = qsieve_process_relation(qs_inf);
 
@@ -381,6 +389,8 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
                     _fmpz_vec_clear(facs, 100);
 
                     qs_inf->siqs = fopen(qs_inf->fname, "w");
+                    if (qs_inf->siqs == NULL)
+                        flint_throw(FLINT_ERROR, "fopen fail\n");
                     qs_inf->num_primes = num_primes; /* linear algebra adjusts this */
                     goto more_primes; /* factoring failed, may need more primes */
                 }
@@ -458,7 +468,8 @@ cleanup:
     flint_give_back_threads(qs_inf->handles, qs_inf->num_handles);
 
     flint_free(sieve);
-    remove(qs_inf->fname);
+    if (remove(qs_inf->fname))
+        flint_throw(FLINT_ERROR, "remove fail\n");
     qsieve_clear(qs_inf);
     qsieve_linalg_clear(qs_inf);
     qsieve_poly_clear(qs_inf);
