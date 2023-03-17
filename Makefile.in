@@ -353,7 +353,7 @@ shared: $(FLINT_DIR)/$(FLINT_LIB)
 # arguments, mainly present on MinGW.
 define xxx_merged_lobj_rule
 $(BUILD_DIR)/$(1)_merged.lo: $($(1)_LOBJS) | $(BUILD_DIR)
-	$(LD) -r $($(1)_LOBJS) -o $(BUILD_DIR)/$(1)_merged.lo
+	@$(LD) -r $($(1)_LOBJS) -o $(BUILD_DIR)/$(1)_merged.lo
 endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_merged_lobj_rule,$(dir))))
 MERGED_LOBJS:=$(foreach dir, $(DIRS),$(BUILD_DIR)/$(dir)_merged.lo)
@@ -377,7 +377,7 @@ static: $(FLINT_DIR)/$(FLINT_LIB_STATIC)
 # arguments, mainly present on MinGW.
 define xxx_merged_obj_rule
 $(BUILD_DIR)/$(1)_merged.o: $($(1)_OBJS) | $(BUILD_DIR)
-	$(LD) -r $($(1)_OBJS) -o $(BUILD_DIR)/$(1)_merged.o
+	@$(LD) -r $($(1)_OBJS) -o $(BUILD_DIR)/$(1)_merged.o
 endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_merged_obj_rule,$(dir))))
 MERGED_OBJS:=$(foreach dir, $(DIRS),$(BUILD_DIR)/$(dir)_merged.o)
