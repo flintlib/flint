@@ -71,13 +71,18 @@ jobs:
 
       - name: "Setup"
         run: |
-          sudo apt install libgmp-dev
-          sudo apt install libmpfr-dev
+          sudo apt install -y libgmp-dev
+          sudo apt install -y libmpfr-dev
+          sudo apt install -y autoconf
+          sudo apt install -y libtool-bin
           gcc --version
           make --version
+          autoconf --version
+          libtool --version
 
       - name: "Configure"
         run: |
+          ./bootstrap.sh
           ./configure CC=${CC} CFLAGS="${CFLAGS}" --with-gmp=/usr --with-mpfr=/usr --enable-assert --disable-static
 
       - name: "Compile"
