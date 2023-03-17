@@ -457,7 +457,6 @@ case "$host_os" in
         flint_libname="libflint.dll"
         flint_implib="$flint_libname.$libext"
         extra_shared_flags="-static-libgcc $wl--export-all-symbols,--out-implib,$flint_libname.a"
-        flint_dll="yes"
         ;;
     *)
         flint_lib="libflint.so.$FLINT_MAJOR_SO.$FLINT_MINOR_SO.$FLINT_PATCH_SO"
@@ -481,11 +480,6 @@ AC_SUBST(FLINT_LIBNAME,$flint_libname)
 AC_SUBST(FLINT_IMPLIB,$flint_implib)
 AC_SUBST(FLINT_LIB_STATIC,$flint_lib_static)
 AC_SUBST(EXTRA_SHARED_FLAGS,$extra_shared_flags)
-
-if test "$flint_dll" = "yes";
-then
-    AC_DEFINE(FLINT_USE_DLL,1,[Define if DLL])
-fi
 
 if test "$flint_solib" = "yes";
 then
@@ -869,34 +863,6 @@ fi
 
 AC_CONFIG_FILES([Makefile:Makefile.in])
 AC_OUTPUT
-
-dnl This should be removed. We shouldn't need FLINT_DLL.
-if test "$flint_dll" = "yes";
-then
-    cat >> src/flint-config.h <<_ACEOF
-
-/* NOTE: This FLINT_DLL is for Windows type systems only. */
-
-#ifdef FLINT_USE_DLL
-# define FLINT_DLL __declspec(dllimport)
-#else
-# define FLINT_DLL __declspec(dllexport)
-#endif
-
-/* #define FLINT_DLL */
-_ACEOF
-else
-    cat >> src/flint-config.h <<_ACEOF
-
-/* #ifdef FLINT_USE_DLL
- * # define FLINT_DLL __declspec(dllimport)
- * #else
- * # define FLINT_DLL __declspec(dllexport)
- * #endif */
-
-#define FLINT_DLL
-_ACEOF
-fi
 
 dnl Shorten the original help message
 m4_cleardivert([HELP_BEGIN])dnl
