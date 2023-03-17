@@ -1,31 +1,50 @@
-Instructions on installing flint 2
+Instructions on installing FLINT
 ----------------------------------
 
-FLINT 2 follows a standard format for installation:
+If you obtained a tarball of FLINT, you should be able to install FLINT through
+the following standard format:
 
-./configure
-make
-make check
-make install
+    ./configure
+    make
+    make install
 
-However, this assumes that MPIR and MPFR are already installed in the default
-search path of your compiler (e.g. /usr/include/ and /usr/lib/). If these
-libraries are not in such location you must specify where they are by passing
-their location to configure `--with-mpir=ABSOLUTE_PATH` for MPIR and
-`--with-mpfr=ABSOLUTE_PATH` for MPFR.
+We also recommend that you run `make check' before installing.  However, this
+assumes that GMP and MPFR are already installed in the default search path of
+your compiler (e.g. /usr/include/ and /usr/lib/).  If these libraries are not in
+such location you must specify where they are by passing their location to
+configure `--with-gmp=ABSOLUTE_PATH` for GMP and `--with-mpfr=ABSOLUTE_PATH`
+for MPFR.  You can also change other settings.  For a complete list, write
 
-The configure script also assumes you wish to install FLINT 2 at the prefix
-/usr/local. If not you must pass the prefix (the directory containing lib and
-include subdirectories into which FLINT will be installed) to configure with
-the option `--prefix=PATH`.
+    ./configure --help
 
-A complete example of a custom configuration command would be
+The configure script also assumes you wish to install FLINT at the prefix
+/usr/local.  If you wish to install the library to another location, you must
+pass the path to the location via `--prefix=PATH'.
 
-./configure --with-mpir=/home/user1/mpir-2.1.1/ --with-mpfr=/usr --prefix=/usr
+An example of a custom configuration command would be
 
-Note that the FLINT configure system can handle MPIR/MPFR as installed (in lib
-and include dirs) at some location, or as source builds (built from source and
-not installed). Though, to run the FLINT tests, MPIR/MPFR needs to be
-properly installed.
+    ./configure                                         \
+        --enable-assert                                 \
+        --with-gmp-include=/home/user1/builds/includes/ \
+        --with-gmp-lib=/home/user1/builds/lib/          \
+        --with-mpfr=/usr                                \
+        --prefix=/home/user1/installations/             \
+        CC=clang                                        \
+        CFLAGS="-Wall -O3 -march=alderlake"
 
-For further configure and make options, please refer to the FLINT 2 documentation.
+As mentioned, you can see the full list of options by running
+
+    ./configure --help
+
+However, if you only obtained FLINT directly from source, `configure' should be
+missing.  To generate the `configure' file, you also have to run
+
+    ./bootstrap.sh
+
+This assumes that you have `autoconf', `automake' and `libtool' installed.  If
+you have installed GMP or MPFR from source, then you should already have these
+utilities.
+
+Note that the FLINT building system can handle GMP and MPFR as installed at some
+location and as source builds (built from source but not installed).  Though, to
+run the FLINT tests, GMP and MPFR needs to be properly installed.
