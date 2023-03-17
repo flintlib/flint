@@ -39,6 +39,8 @@ TEMPLATE(T, poly_factor_squarefree) (TEMPLATE(T, poly_factor_t) res,
     if (f->length == 2)
     {
         TEMPLATE(T, poly_factor_insert) (res, f, 1, ctx);
+        TEMPLATE(T, poly_make_monic) (res->poly + (res->num - 1),
+                                      res->poly + (res->num - 1), ctx);
         return;
     }
 

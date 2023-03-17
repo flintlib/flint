@@ -31,6 +31,8 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
     if (f->length == 2)
     {
         nmod_poly_factor_insert(res, f, 1);
+        nmod_poly_make_monic(res->p + (res->num - 1),
+                             res->p + (res->num - 1));
         return;
     }
 
