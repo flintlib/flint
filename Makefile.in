@@ -368,8 +368,6 @@ ifeq ($(findstring $(HOST_OS),mingw32 mingw64 cygwin msys),)
 	$(RM_F) "$(FLINT_LIBNAME).$(FLINT_MAJOR_SO)"
 	$(LN_S) "$(FLINT_LIB)" "$(FLINT_LIBNAME)"
 	$(LN_S) "$(FLINT_LIB)" "$(FLINT_LIBNAME).$(FLINT_MAJOR_SO)"
-else
-	$(DLLTOOL) $(FLINT_LIB) -z $(FLINT_IMPLIB) --export-all-symbols
 endif
 
 ifneq ($(STATIC), 0)
