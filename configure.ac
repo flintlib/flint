@@ -745,7 +745,8 @@ then
             ;;
     esac
     AC_MSG_RESULT([$DEFAULT_CFLAGS])
-    CFLAGS="$CFLAGS$DEFAULT_CFLAGS"
+    dnl FIXME: -g -funroll-loops shouldn't be activated by default
+    CFLAGS="$CFLAGS $DEFAULT_CFLAGS $FLINT_CFLAGS -g -funroll-loops"
 fi
 
 AX_CHECK_COMPILE_FLAG($CFLAGS,[],AC_MSG_ERROR([Couldn't compile with CFLAGS!]))
