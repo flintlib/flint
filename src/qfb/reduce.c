@@ -22,7 +22,7 @@ void qfb_reduce(qfb_t r, qfb_t f, fmpz_t D)
    fmpz_t t;
 
    qfb_set(r, f);
-   
+
    fmpz_init(t);
 
    while(!done)

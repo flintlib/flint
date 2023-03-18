@@ -10,8 +10,8 @@
 */
 
 /* This is an implementation of the pollard rho algorithm, with a more efficient
-   cycle finding algorithm, as proposed by Richard Brent. Details can be found 
-   in the paper https://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf, pseudocode 
+   cycle finding algorithm, as proposed by Richard Brent. Details can be found
+   in the paper https://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf, pseudocode
    is available on page 182 of the same paper */
 
 #include "flint.h"
@@ -20,7 +20,7 @@
 #include "mpn_extras.h"
 
 int
-fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in, 
+fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
                           mp_limb_t max_tries, mp_limb_t max_iters)
 {
     fmpz_t fa, fy, maxa, maxy;
@@ -77,7 +77,7 @@ fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
 
     while (max_tries--)
     {
-        fmpz_randm(fa, state, maxa);  
+        fmpz_randm(fa, state, maxa);
         fmpz_add_ui(fa, fa, 1);
         fmpz_randm(fy, state, maxy);
         fmpz_add_ui(fy, fy, 1);
@@ -134,8 +134,8 @@ fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
         if (ret)
         {
             fac->_mp_size = ret;        /* ret is number of limbs of factor found */
-            _fmpz_demote_val(p_factor);    
-            break; 
+            _fmpz_demote_val(p_factor);
+            break;
         }
     }
 
@@ -145,6 +145,6 @@ fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
     fmpz_clear(maxy);
 
     TMP_END;
-    
-    return ret;    
+
+    return ret;
 }

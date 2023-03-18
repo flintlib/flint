@@ -13,7 +13,7 @@
 #define NMOD_MPOLY_FACTOR_H
 
 #ifdef NMOD_MPOLY_FACTOR_INLINES_C
-#define NMOD_MPOLY_FACTOR_INLINE 
+#define NMOD_MPOLY_FACTOR_INLINE
 #else
 #define NMOD_MPOLY_FACTOR_INLINE static __inline__
 #endif
@@ -363,7 +363,7 @@ typedef nmod_mpoly_pfrac_struct nmod_mpoly_pfrac_t[1];
 
 
 int nmod_mpoly_pfrac_init(nmod_mpoly_pfrac_t I, flint_bitcnt_t bits,
-                         slong l, slong r, const nmod_mpoly_struct * betas, 
+                         slong l, slong r, const nmod_mpoly_struct * betas,
                           const mp_limb_t * alpha, const nmod_mpoly_ctx_t ctx);
 
 void nmod_mpoly_pfrac_clear(nmod_mpoly_pfrac_t I,

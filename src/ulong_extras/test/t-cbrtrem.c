@@ -18,7 +18,7 @@ int main(void)
    int i, result;
 
    FLINT_TEST_INIT(state);
-   
+
    flint_printf("cbrtrem....");
    fflush(stdout);
 
@@ -30,13 +30,13 @@ int main(void)
         mpz_init(e);
         mpz_init(f);
         mpz_init(g);
-      
+
         c = n_randint(state, 0);    /*number */
         flint_mpz_set_ui(g, c);
 
         a = n_cbrtrem(&b, c);
         mpz_rootrem(e, f, g, 3);
-      
+
         i = flint_mpz_get_ui(e);
         j = flint_mpz_get_ui(f);
 

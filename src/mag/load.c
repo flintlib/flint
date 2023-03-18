@@ -91,7 +91,7 @@ mag_load_file(mag_t x, FILE* stream)
     }
 
     mag_set_arf_dump(x, y);
-    
+
     arf_clear(y);
     return err;
 }

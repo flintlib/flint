@@ -24,7 +24,7 @@ main(void)
     flint_printf("cmp....");
     fflush(stdout);
 
-    
+
 
     /* Check aliasing */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -47,7 +47,7 @@ main(void)
     }
 
     /*
-       Check transitivity, i.e. f <= g <= h implies f <= h, that is 
+       Check transitivity, i.e. f <= g <= h implies f <= h, that is
        NOT (f <= g <= h) OR f <= h
      */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -106,7 +106,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

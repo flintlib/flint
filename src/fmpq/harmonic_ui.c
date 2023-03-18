@@ -17,7 +17,7 @@
 #define FMPQ_HARMONIC_UI_TAB_SIZE 25
 #endif
 
-static const mp_limb_t fmpq_harmonic_ui_tab_num[] = 
+static const mp_limb_t fmpq_harmonic_ui_tab_num[] =
 {
     0, 1, 3, 11, 25, 137, 49, 363, 761, 7129, 7381, 83711, 86021, 1145993,
     1171733, 1195757, 2436559, 42142223, 14274301, 275295799, 55835135,

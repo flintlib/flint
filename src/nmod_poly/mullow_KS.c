@@ -65,7 +65,7 @@ _nmod_poly_mullow_KS(mp_ptr out, mp_srcptr in1, slong len1,
         flint_mpn_mul(res, mpn1, limbs1, mpn2, limbs2);
 
     _nmod_poly_bit_unpack(out, n, res, bits, mod);
-    
+
     TMP_END;
 }
 

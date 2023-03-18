@@ -14,7 +14,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-slong 
+slong
 fmpz_get_si(const fmpz_t f)
 {
     return (!COEFF_IS_MPZ(*f) ? *f : flint_mpz_get_si(COEFF_TO_PTR(*f)));

@@ -117,7 +117,7 @@ main(void)
         for (v = 0; v < nvars1; v++)
         {
             vals1[v] = (nmod_poly_struct *) flint_malloc(
-                                                    sizeof(nmod_poly_struct)); 
+                                                    sizeof(nmod_poly_struct));
             nmod_poly_init(vals1[v], modulus);
             nmod_poly_randtest(vals1[v], state, len2);
         }

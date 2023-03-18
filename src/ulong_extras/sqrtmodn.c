@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 
 /* compute square roots of a modulo m given factorisation of m */
-slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac) 
+slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
 {
     mp_limb_t m = 1, minv = 1;
     slong i, j, num;
@@ -25,7 +25,7 @@ slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
         (*sqrt)[0] = 0;
         return 1;
     }
-    
+
     x = flint_malloc(sizeof(mp_limb_t)*fac->num);
     sn = flint_malloc(sizeof(mp_limb_t)*fac->num);
     ind = flint_malloc(sizeof(mp_limb_t)*fac->num);
@@ -39,7 +39,7 @@ slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
         x[i] = n_pow(fac->p[i], fac->exp[i]);
         sn[i] = n_sqrtmod_primepow(s + i, a % x[i], fac->p[i], fac->exp[i]);
         num *= sn[i];
-        
+
         if (num == 0)
         {
             for (j = 0; j < i; j++)
@@ -55,14 +55,14 @@ slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
 
     *sqrt = flint_malloc(num*sizeof(mp_limb_t));
 
-    /* 
-        compute values s_i = 1 mod x_i and s_i = 0 mod x_j for j != i 
+    /*
+        compute values s_i = 1 mod x_i and s_i = 0 mod x_j for j != i
         then replace sqrts a_i with a_i * s_i mod m = x_1*x_2*...*x_n
     */
     for (i = 0; i < fac->num; i++)
     {
         mp_limb_t xp = 1, si;
-        
+
         /* compute product of x_j for j != i */
         for (j = 0; j < i; j++)
             xp *= x[j];
@@ -84,8 +84,8 @@ slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
             s[i][j] = n_mulmod2_preinv(si, s[i][j], m, minv);
     }
 
-    /* 
-       compute all the square roots by computing 
+    /*
+       compute all the square roots by computing
        sum_{i=0}^{fac->num} s[i][j] for each different permutation
        of j's, all modulo m
     */
@@ -96,7 +96,7 @@ slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
         (*sqrt)[i] = 0;
         for (j = 0; j < fac->num; j++)
             (*sqrt)[i] = n_addmod((*sqrt)[i], s[j][ind[j]], m);
-        
+
         /* increment to next set of indices */
         for (j = 0; j < fac->num; j++)
         {

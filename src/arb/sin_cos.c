@@ -279,7 +279,7 @@ _arb_sin_cos(arb_t zsin, arb_t zcos, const arf_t x, const mag_t xrad, slong prec
     sin(a+b) = sin(a)*cos(b) + cos(a)*sin(b)
     cos(a+b) = cos(a)*cos(b) - sin(a)*sin(b)
 
-    [F1+e1]*[F2+e2] + [F3+e3]*[F4+e4] - F1 F2 + F3 F4 = 
+    [F1+e1]*[F2+e2] + [F3+e3]*[F4+e4] - F1 F2 + F3 F4 =
 
        e1 e2 + e3 e4 + e2 F1 + e1 F2 + e4 F3 + e3 F4
 
@@ -288,7 +288,7 @@ _arb_sin_cos(arb_t zsin, arb_t zcos, const arf_t x, const mag_t xrad, slong prec
        <= 2*left_err + 2*right_err + 1     (ulp)
 
     Truncating both terms before adding adds another 2 ulp, so the error
-    is bounded by 
+    is bounded by
 
        <= 2*left_err + 2*right_err + 3     (ulp)
     */

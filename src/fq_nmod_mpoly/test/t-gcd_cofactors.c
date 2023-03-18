@@ -639,7 +639,7 @@ main(void)
         len2 = n_randint(state, 200);
         len3 = n_randint(state, 200);
         len4 = n_randint(state, 200);
- 
+
         for (j = 0; j < ctx->minfo->nvars; j++)
         {
             degbounds1[j] = 2 + n_randint(state, 10/ctx->minfo->nvars);
@@ -698,7 +698,7 @@ main(void)
         len2 = n_randint(state, 200);
         len3 = n_randint(state, 200);
         len4 = n_randint(state, 200);
- 
+
         for (j = 0; j < ctx->minfo->nvars; j++)
         {
             degbounds1[j] = 2 + n_randint(state, 10/ctx->minfo->nvars);
@@ -774,7 +774,7 @@ main(void)
         len2 = n_randint(state, 200);
         len3 = n_randint(state, 200);
         len4 = n_randint(state, 200);
- 
+
         for (j = 0; j < ctx->minfo->nvars; j++)
         {
             degbounds1[j] = 2 + n_randint(state, 10/ctx->minfo->nvars);

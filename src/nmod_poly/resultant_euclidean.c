@@ -15,8 +15,8 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-mp_limb_t 
-_nmod_poly_resultant_euclidean(mp_srcptr poly1, slong len1, 
+mp_limb_t
+_nmod_poly_resultant_euclidean(mp_srcptr poly1, slong len1,
                                mp_srcptr poly2, slong len2, nmod_t mod)
 {
     if (poly1 == poly2)
@@ -72,7 +72,7 @@ _nmod_poly_resultant_euclidean(mp_srcptr poly1, slong len1,
                 r = t;
             }
 
-            if (l2 >= 1) 
+            if (l2 >= 1)
             {
                 lc  = n_powmod2_preinv(lc, l0 - l2, mod.n, mod.ninv);
                 res = n_mulmod2_preinv(res, lc, mod.n, mod.ninv);
@@ -80,9 +80,9 @@ _nmod_poly_resultant_euclidean(mp_srcptr poly1, slong len1,
                 if (((l0 | l1) & 1) == 0)
                 {
                     res = nmod_neg(res, mod);
-                }  
+                }
             }
-            else 
+            else
             {
                 if (l1 == 1)
                 {
@@ -103,7 +103,7 @@ _nmod_poly_resultant_euclidean(mp_srcptr poly1, slong len1,
     }
 }
 
-mp_limb_t 
+mp_limb_t
 nmod_poly_resultant_euclidean(const nmod_poly_t f, const nmod_poly_t g)
 {
     const slong len1 = f->length;
@@ -118,12 +118,12 @@ nmod_poly_resultant_euclidean(const nmod_poly_t f, const nmod_poly_t g)
     {
         if (len1 >= len2)
         {
-            r = _nmod_poly_resultant_euclidean(f->coeffs, len1, 
+            r = _nmod_poly_resultant_euclidean(f->coeffs, len1,
                                                g->coeffs, len2, f->mod);
         }
         else
         {
-            r = _nmod_poly_resultant_euclidean(g->coeffs, len2, 
+            r = _nmod_poly_resultant_euclidean(g->coeffs, len2,
                                                f->coeffs, len1, f->mod);
 
             if (((len1 | len2) & WORD(1)) == WORD(0))

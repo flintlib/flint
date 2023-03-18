@@ -15,7 +15,7 @@ void fmpz_mod_poly_mulhigh(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
             const fmpz_mod_poly_t poly2, slong start, const fmpz_mod_ctx_t ctx)
 {
     slong len1, len2, len_out;
-    
+
     len1 = poly1->length;
     len2 = poly2->length;
     len_out = len1 + len2 - 1;
@@ -43,14 +43,14 @@ void fmpz_mod_poly_mulhigh(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
         else
             _fmpz_poly_mulhigh(temp->coeffs, poly2->coeffs, len2,
                                          poly1->coeffs, len1, start);
-        
+
         fmpz_mod_poly_swap(temp, res, ctx);
         fmpz_mod_poly_clear(temp, ctx);
     }
     else
     {
         fmpz_mod_poly_fit_length(res, len_out, ctx);
-        
+
         if (len1 >= len2)
             _fmpz_poly_mulhigh(res->coeffs, poly1->coeffs, len1,
                                          poly2->coeffs, len2, start);

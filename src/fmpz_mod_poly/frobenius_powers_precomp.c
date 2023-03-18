@@ -15,7 +15,7 @@
 #include "fmpz_mod_poly.h"
 
 void
-fmpz_mod_poly_frobenius_powers_precomp(fmpz_mod_poly_frobenius_powers_t pow, 
+fmpz_mod_poly_frobenius_powers_precomp(fmpz_mod_poly_frobenius_powers_t pow,
                  const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m,
                                                       const fmpz_mod_ctx_t ctx)
 {

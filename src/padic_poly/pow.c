@@ -12,7 +12,7 @@
 #include "fmpz_mod_poly.h"
 #include "padic_poly.h"
 
-void _padic_poly_pow(fmpz *rop, slong *rval, slong N, 
+void _padic_poly_pow(fmpz *rop, slong *rval, slong N,
                      const fmpz *op, slong val, slong len, ulong e,
                      const padic_ctx_t ctx)
 {
@@ -29,7 +29,7 @@ void _padic_poly_pow(fmpz *rop, slong *rval, slong N,
         fmpz_clear(pow);
 }
 
-void padic_poly_pow(padic_poly_t rop, const padic_poly_t op, ulong e, 
+void padic_poly_pow(padic_poly_t rop, const padic_poly_t op, ulong e,
                     const padic_ctx_t ctx)
 {
     if (e == 0)
@@ -59,7 +59,7 @@ void padic_poly_pow(padic_poly_t rop, const padic_poly_t op, ulong e,
             t = rop->coeffs;
         }
 
-        _padic_poly_pow(t, &(rop->val), rop->N, 
+        _padic_poly_pow(t, &(rop->val), rop->N,
                         op->coeffs, op->val, op->length, e, ctx);
 
         if (rop == op)

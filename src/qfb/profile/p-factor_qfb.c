@@ -36,7 +36,7 @@ int main(void)
 
    qfb_init(pow);
    qfb_init(twopow);
-   
+
    printf("Enter number to be factored: "); fflush(stdout);
    if (!fmpz_read(n0))
    {
@@ -46,20 +46,20 @@ int main(void)
    fmpz_neg(n0, n0);
 
    iters = 10;
-    
+
    /* find prime such that n is a square mod p (or p divides n) */
    if (fmpz_is_even(n0))
    {
       printf("Factor: 2\n");
       return 0;
    }
-   
+
    mult = 1;
-   
+
    while (1) /* keep increasing iterations for each multiplier until done */
    {
       printf("iters = %ld, multipliers = %ld\n", iters, jmax);
-   
+
       for (j = 0; j < jmax; j++) /* loop over jmax different multipliers */
       {
 
@@ -70,7 +70,7 @@ int main(void)
             printf("Factor: %ld\n", mult);
             return 0;
          }
-      
+
          fmpz_mul_ui(n, n0, mult);
          if (fmpz_fdiv_ui(n, 4) == 3)
             fmpz_mul_2exp(n, n, 2);
@@ -84,9 +84,9 @@ int main(void)
             pr = n_nextprime(pr, 0);
             while (mult % pr == 0)
                pr = n_nextprime(pr, 0);
-      
+
             nmodpr = fmpz_fdiv_ui(n, pr);
-      
+
             if (nmodpr == 0) /* pr is a factor */
             {
                printf("Factor: %lu\n", pr);
@@ -98,7 +98,7 @@ int main(void)
 
          /* find prime form of discriminant n */
          qfb_prime_form(pow, n, p);
-   
+
          /* raise to various powers of small primes */
          qfb_pow_ui(pow, pow, n, 59049); /* 3^10 */
          qfb_pow_ui(twopow, pow, n, 4096);
@@ -143,14 +143,14 @@ int main(void)
          {
             ulong jump = iters*iters;
             slong iters2;
-      
+
             for (i = 0; i < iters; i++)
             {
                qfb_pow_ui(pow, pow, n, jump);
                qfb_pow_ui(twopow, pow, n, 4096);
                if (qfb_is_principal_form(twopow, n)) /* found factor */
                   break;
-               iters2 = qfb_hash_find(qhash, twopow, depth); 
+               iters2 = qfb_hash_find(qhash, twopow, depth);
                if (iters2 != -1) /* found factor */
                {
                   if (fmpz_sgn(qhash[iters2].q->b) == fmpz_sgn(twopow->b))
@@ -162,7 +162,7 @@ int main(void)
                   break;
                }
             }
-            
+
             if (i == iters)
                done = 0;
          }
@@ -197,8 +197,8 @@ done:
                }
                qfb_set(pow, twopow);
             }
-         } 
-   
+         }
+
          mult += 2;
 
          qfb_hash_clear(qhash, depth);
@@ -214,7 +214,7 @@ done:
 
    qfb_clear(pow);
    qfb_clear(twopow);
-   
+
    fmpz_clear(g);
    fmpz_clear(n);
    fmpz_clear(n0);

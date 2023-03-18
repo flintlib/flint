@@ -42,7 +42,7 @@ main(void)
 
         nf_elem_init(a, nf);
         nf_elem_randtest(a, state, 200, nf);
-        
+
         fmpz_randtest_not_zero(d, state, 200);
 
         nf_elem_set_den(a, d, nf);
@@ -59,7 +59,7 @@ main(void)
         }
 
         nf_elem_clear(a, nf);
-        
+
         nf_clear(nf);
 
         fmpz_clear(d);

@@ -14,8 +14,8 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
-/* 
-Implements the recurrence 
+/*
+Implements the recurrence
 https://en.wikipedia.org/wiki/Formal_power_series#Operations_on_formal_power_series
 */
 

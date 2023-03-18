@@ -36,7 +36,7 @@
 #endif
 
 #ifdef FLINT_INLINES_C
-#define FLINT_INLINE 
+#define FLINT_INLINE
 #else
 #define FLINT_INLINE static __inline__
 #endif

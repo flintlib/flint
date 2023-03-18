@@ -33,15 +33,15 @@ char * nmod_poly_get_str(const nmod_poly_t poly)
         else size += 2;
     }
 
-    buf = (char *) flint_malloc(size);  
+    buf = (char *) flint_malloc(size);
     ptr = buf + flint_sprintf(buf, "%wd %wu", poly->length, poly->mod.n);
-   
+
     if (poly->length)
         ptr += flint_sprintf(ptr, " ");
 
     for (i = 0; i < poly->length; i++)
         ptr += flint_sprintf(ptr, " %wu", poly->coeffs[i]);
-   
+
     return buf;
 }
 

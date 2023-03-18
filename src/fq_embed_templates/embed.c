@@ -20,12 +20,12 @@ void TEMPLATE(T, embed_gens)(TEMPLATE(T, t) gen_sub,
                              const TEMPLATE(T, ctx_t) sub_ctx,
                              const TEMPLATE(T, ctx_t) sup_ctx)
 {
-    if (TEMPLATE(T, ctx_degree)(sub_ctx) == 1) 
+    if (TEMPLATE(T, ctx_degree)(sub_ctx) == 1)
     {
         TEMPLATE(T, gen)(gen_sub, sub_ctx);
         TEMPLATE(T, set)(gen_sup, gen_sub, sup_ctx);
     }
-    else 
+    else
     {
         _TEMPLATE(T, embed_gens_naive)(gen_sub, gen_sup, minpoly, sub_ctx, sup_ctx);
     }
@@ -45,11 +45,11 @@ void _TEMPLATE(T, embed_gens_naive)(TEMPLATE(T, t) gen_sub,
     TEMPLATE4(T, poly_set, B, poly)(modulus,
 				    TEMPLATE(T, ctx_modulus)(sub_ctx),
 				    sup_ctx);
-    
+
     flint_randinit(state);
 
     /* Get one linear factor of sub_ctx->modulus in sup_ctx */
-    while (TEMPLATE(T, poly_degree)(modulus, sup_ctx) != 1) 
+    while (TEMPLATE(T, poly_degree)(modulus, sup_ctx) != 1)
     {
         while (!TEMPLATE(T, poly_factor_equal_deg_prob)
                (fact, state, modulus, 1, sup_ctx))

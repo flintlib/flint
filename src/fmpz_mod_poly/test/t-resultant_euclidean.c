@@ -42,7 +42,7 @@ main(void)
 
         fmpz_mod_poly_init(f, ctx);
         fmpz_mod_poly_init(g, ctx);
-        
+
         fmpz_mod_poly_randtest(f, state, n_randint(state, 100), ctx);
         fmpz_mod_poly_randtest(g, state, n_randint(state, 100), ctx);
 
@@ -89,7 +89,7 @@ main(void)
         fmpz_mod_poly_init(f, ctx);
         fmpz_mod_poly_init(g, ctx);
         fmpz_mod_poly_init(h, ctx);
-        
+
         fmpz_mod_poly_randtest(f, state, n_randint(state, 100), ctx);
         fmpz_mod_poly_randtest(g, state, n_randint(state, 100), ctx);
         fmpz_mod_poly_randtest(h, state, n_randint(state, 100), ctx);
@@ -99,7 +99,7 @@ main(void)
         fmpz_mod_mul(y, y, z, ctx);
         fmpz_mod_poly_mul(f, f, h, ctx);
         fmpz_mod_poly_resultant_euclidean(x, f, g, ctx);
-        
+
         result = (fmpz_equal(x, y));
         if (!result)
         {
@@ -126,7 +126,7 @@ main(void)
 
     fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

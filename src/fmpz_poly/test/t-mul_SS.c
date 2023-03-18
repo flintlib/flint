@@ -24,8 +24,8 @@ main(void)
     flint_printf("mul_SS....");
     fflush(stdout);
 
-    
-    
+
+
     /* Check aliasing of a and b */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
@@ -53,7 +53,7 @@ main(void)
         fmpz_poly_clear(b);
         fmpz_poly_clear(c);
     }
-    
+
     /* Check aliasing of a and c */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
@@ -82,7 +82,7 @@ main(void)
         fmpz_poly_clear(b);
         fmpz_poly_clear(c);
     }
-    
+
     /* Check aliasing of b and c */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
@@ -111,7 +111,7 @@ main(void)
         fmpz_poly_clear(b);
         fmpz_poly_clear(c);
     }
-    
+
     /* Compare with mul_KS */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
@@ -136,13 +136,13 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         fmpz_poly_clear(a);
         fmpz_poly_clear(b);
         fmpz_poly_clear(c);
         fmpz_poly_clear(d);
     }
-    
+
     /* Compare with mul_KS large */
     for (i = 0; i < 40 * flint_test_multiplier(); i++)
     {
@@ -167,13 +167,13 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         fmpz_poly_clear(a);
         fmpz_poly_clear(b);
         fmpz_poly_clear(c);
         fmpz_poly_clear(d);
     }
-    
+
     /* Compare with mul_KS unsigned */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
@@ -204,9 +204,9 @@ main(void)
         fmpz_poly_clear(c);
         fmpz_poly_clear(d);
     }
-    
+
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

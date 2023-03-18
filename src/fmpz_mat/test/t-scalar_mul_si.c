@@ -21,7 +21,7 @@ main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("scalar_mul/divexact_si....");
     fflush(stdout);
@@ -70,7 +70,7 @@ main(void)
         fmpz_mat_clear(C);
     }
 
-    
+
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

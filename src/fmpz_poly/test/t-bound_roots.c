@@ -23,7 +23,7 @@ main(void)
     flint_printf("bound_roots....");
     fflush(stdout);
 
-    
+
 
     for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
     {
@@ -77,7 +77,7 @@ main(void)
             flint_printf("bound = "); fmpz_print(bound); flint_printf("\n\n");
             flint_printf("computed bound = "); fmpz_print(nbound); flint_printf("\n\n");
             fflush(stdout);
-            flint_abort(); 
+            flint_abort();
        }
 
         fmpz_clear(t);
@@ -90,7 +90,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

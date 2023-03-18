@@ -13,7 +13,7 @@
 #define FMPZ_MOD_MPOLY_FACTOR_H
 
 #ifdef FMPZ_MOD_MPOLY_FACTOR_INLINES_C
-#define FMPZ_MOD_MPOLY_FACTOR_INLINE 
+#define FMPZ_MOD_MPOLY_FACTOR_INLINE
 #else
 #define FMPZ_MOD_MPOLY_FACTOR_INLINE static __inline__
 #endif
@@ -634,7 +634,7 @@ FMPZ_MOD_MPOLY_INLINE void fmpz_mod_mpolyn_swap(fmpz_mod_mpolyn_t A,
 {
    fmpz_mod_mpolyn_struct t = *A;
    *A = *B;
-   *B = t;    
+   *B = t;
 }
 
 void fmpz_mod_mpolyn_fit_length(fmpz_mod_mpolyn_t A,
@@ -1204,7 +1204,7 @@ typedef fmpz_mod_mpoly_pfrac_struct fmpz_mod_mpoly_pfrac_t[1];
 
 
 int fmpz_mod_mpoly_pfrac_init(fmpz_mod_mpoly_pfrac_t I,
-    flint_bitcnt_t bits, slong l, slong r, const fmpz_mod_mpoly_struct * betas, 
+    flint_bitcnt_t bits, slong l, slong r, const fmpz_mod_mpoly_struct * betas,
                           const fmpz * alpha, const fmpz_mod_mpoly_ctx_t ctx);
 
 void fmpz_mod_mpoly_pfrac_clear(fmpz_mod_mpoly_pfrac_t I,

@@ -13,8 +13,8 @@
 #define FQ_NMOD_EMBED_H
 
 #ifdef FQ_NMOD_EMBED_INLINES_C
-#define FQ_NMOD_EMBED_INLINE 
-#define FQ_EMBED_TEMPLATES_INLINE 
+#define FQ_NMOD_EMBED_INLINE
+#define FQ_EMBED_TEMPLATES_INLINE
 #else
 #define FQ_NMOD_EMBED_INLINE static __inline__
 #define FQ_EMBED_TEMPLATES_INLINE static __inline__
@@ -31,8 +31,8 @@ void TEMPLATE(T, modulus_pow_series_inv)(TEMPLATE(B, poly_t) res,
                                          const TEMPLATE(T, ctx_t) ctx,
                                          slong trunc)
 {
-    TEMPLATE(B, poly_reverse)(res, 
-                              TEMPLATE(T, ctx_modulus)(ctx), 
+    TEMPLATE(B, poly_reverse)(res,
+                              TEMPLATE(T, ctx_modulus)(ctx),
                               TEMPLATE(T, ctx_degree)(ctx) + 1);
     TEMPLATE(B, poly_inv_series)(res, res, trunc);
 }

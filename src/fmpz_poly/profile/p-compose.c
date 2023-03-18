@@ -18,7 +18,7 @@
 
 /*
    Definitions for the parameters of the timing process.
-   
+
    len1lo   Minimum length
    len1hi   Maximum length
    len1h    Step size for the length
@@ -56,28 +56,28 @@ main(void)
     double T[rows][cols][nalgs];
     fmpz_poly_t f, g, h;
     FLINT_TEST_INIT(state);
-    
-       
+
+
     fmpz_poly_init2(f, len1hi);
     fmpz_poly_init2(g, len2hi);
     fmpz_poly_init2(h, (len1hi-1) * (len2hi-1) + 1);
-    
+
     for (len1 = len1lo, j = 0; len1 <= len1hi; len1 += len1h, j++)
     {
         slong s[nalgs];
-        
+
         for (len2 = len2lo, i = 0; len2 <= len2hi; len2 += len2h, i++)
         {
             int c, n, reps = 0;
-            
+
             for (c = 0; c < nalgs; c++)
                 s[c] = WORD(0);
-            
+
             for (n = 0; n < ncases; n++)
             {
                 timeit_t t[nalgs];
                 int l, loops = 1;
-                
+
                 /*
                    Construct random polynomials f and g
                  */
@@ -97,14 +97,14 @@ main(void)
                         fmpz_randtest_not_zero(g->coeffs + (len2 - 1), state, bits);
                     g->length = len2;
                 }
-                
+
               loop:
 
                 timeit_start(t[0]);
                 for (l = 0; l < loops; l++)
                     fmpz_poly_compose_horner(h, f, g);
                 timeit_stop(t[0]);
-                
+
                 timeit_start(t[1]);
                 for (l = 0; l < loops; l++)
                     fmpz_poly_compose_divconquer(h, f, g);
@@ -116,15 +116,15 @@ main(void)
                         loops *= 10;
                         goto loop;
                     }
-                
+
                 for (c = 0; c < nalgs; c++)
                     s[c] += t[c]->cpu;
                 reps += loops;
             }
-            
+
             for (c = 0; c < nalgs; c++)
                 T[i][j][c] = s[c] / (double) reps;
-            
+
             if (s[0] <= s[1])
                 X[i][j] = 0;
             else
@@ -135,8 +135,8 @@ main(void)
     fmpz_poly_clear(f);
     fmpz_poly_clear(g);
     fmpz_poly_clear(h);
-    
-    /* 
+
+    /*
        Print 2-D ASCII image of the winning algorithms
      */
     for (i = 0; i < rows; i++)

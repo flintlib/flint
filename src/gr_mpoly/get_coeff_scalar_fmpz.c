@@ -11,7 +11,7 @@
 
 #include "gr_mpoly.h"
 
-/* todo: should have an 
+/* todo: should have an
    mpoly_monomial_index_pfmpz function */
 
 int gr_mpoly_get_coeff_scalar_fmpz(gr_ptr c, const gr_mpoly_t A,

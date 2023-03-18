@@ -18,7 +18,7 @@ int
 main(void)
 {
     int i, result;
-    
+
     FLINT_TEST_INIT(state);
 
     printf("invmod....");
@@ -39,7 +39,7 @@ main(void)
         nmod_poly_init(b, p);
         nmod_poly_init(c, p);
 
-        do 
+        do
             nmod_poly_randtest(b, state, n_randint(state, 100));
         while (b->length < 3);
         nmod_poly_randtest(a, state, n_randint(state, 100));
@@ -78,7 +78,7 @@ main(void)
         nmod_poly_init(b, p);
         nmod_poly_init(c, p);
 
-        do 
+        do
             nmod_poly_randtest(b, state, n_randint(state, 100));
         while (b->length < 3);
         nmod_poly_randtest(a, state, n_randint(state, 100));
@@ -120,7 +120,7 @@ main(void)
         nmod_poly_init(t, p);
         nmod_poly_init(u, p);
 
-        do 
+        do
             nmod_poly_randtest(b, state, n_randint(state, 100));
         while (b->length < 3);
         nmod_poly_randtest(a, state, n_randint(state, 100));
@@ -128,8 +128,8 @@ main(void)
         ans = nmod_poly_invmod(u, a, b);
         nmod_poly_xgcd(g, s, t, a, b);
 
-        result = (((ans) && g->length == 1 
-                   && g->coeffs[0] == WORD(1) && nmod_poly_equal(s, u)) 
+        result = (((ans) && g->length == 1
+                   && g->coeffs[0] == WORD(1) && nmod_poly_equal(s, u))
                  || (!(ans) && g->length > 1));
 
         if (!result)
@@ -170,11 +170,11 @@ main(void)
         nmod_poly_init(f, p);
         nmod_poly_init(u, p);
 
-        do 
+        do
             nmod_poly_randtest(b, state, n_randint(state, 100));
         while (b->length < 2);
         nmod_poly_randtest(a, state, n_randint(state, 100));
-        do 
+        do
             nmod_poly_randtest_not_zero(f, state, n_randint(state, 20) + 1);
         while (f->length < 2);
         nmod_poly_mul(a, f, a);

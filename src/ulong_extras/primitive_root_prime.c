@@ -56,7 +56,7 @@ mp_limb_t n_primitive_root_prime(mp_limb_t p)
 
     n_factor_init(&factors);
     n_factor(&factors, p - 1, 1);
-    
+
     a = n_primitive_root_prime_prefactor(p, &factors);
 
     return a;

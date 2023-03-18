@@ -75,7 +75,7 @@ fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
     {
         while (l < c && fmpz_is_zero(LU(i, l)))
             l++;
- 
+
         piv[i] = l;
 
         if (l < c)
@@ -113,7 +113,7 @@ fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
                 if (work_to_do)
                 {
                     for (j = i + 1; j < n; j++)
-                    {        
+                    {
                         if (i < c && piv[i] < c)
                         {
                             smul_ppmm(p1h, p1l, *XXx(j, k), diag[i]);
@@ -147,7 +147,7 @@ fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
                                     udiv_qrnnd_preinv(quo, rem,
                                       (p1h << norm) + r_shift(p1l, (FLINT_BITS - norm)),
                                           p1l << norm, uden << norm, dinv);
-                                
+
                                     flag = rem == 0;
                                     if (!flag)
                                         goto cleanup;

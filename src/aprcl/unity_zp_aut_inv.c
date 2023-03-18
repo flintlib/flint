@@ -20,7 +20,7 @@ unity_zp_aut_inv(unity_zp f, const unity_zp g, ulong x)
 {
     ulong i, j, p_pow1, p_pow2, m, p_pow_preinv;
     fmpz_t f_coeff, g_coeff;
-    
+
     fmpz_init(f_coeff);
     fmpz_init(g_coeff);
     p_pow1 = n_pow(f->p, f->exp - 1);   /* p_pow1 = p^{k - 1}       */
@@ -44,8 +44,8 @@ unity_zp_aut_inv(unity_zp f, const unity_zp g, ulong x)
 
     /*
         for i = m, m + 1,..., p^k - 1
-        for j = 1, 2,..., p - 1 
-        set f[i - j * p^{k - 1}] = 
+        for j = 1, 2,..., p - 1
+        set f[i - j * p^{k - 1}] =
         (f[i - j * p^{k - 1}] - g[x * i mod p^k]) mod n
     */
     for (i = m; i < p_pow2; i++)

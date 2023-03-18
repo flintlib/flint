@@ -16,7 +16,7 @@
 void fmpz_mod_poly_set_nmod_poly(fmpz_mod_poly_t f, const nmod_poly_t g)
 {
     slong i;
-    
+
     _fmpz_mod_poly_fit_length(f, g->length);
     _fmpz_mod_poly_set_length(f, g->length);
 

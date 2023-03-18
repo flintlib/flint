@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011, 2012 Sebastian Pancratz 
+    Copyright (C) 2011, 2012 Sebastian Pancratz
     Copyright (C) 2012 Andres Goens
     Copyright (C) 2013 Mike Hansen
 
@@ -19,8 +19,8 @@ void fq_nmod_add(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_t op2, const 
 
     nmod_poly_fit_length(rop, max);
 
-    _nmod_poly_add(rop->coeffs, 
-                   op1->coeffs, op1->length, op2->coeffs, op2->length, 
+    _nmod_poly_add(rop->coeffs,
+                   op1->coeffs, op1->length, op2->coeffs, op2->length,
                    rop->mod);
 
     _nmod_poly_set_length(rop, max);

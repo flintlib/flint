@@ -12,8 +12,8 @@
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
-void _qadic_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e, 
-                   const fmpz *a, const slong *j, slong lena, 
+void _qadic_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e,
+                   const fmpz *a, const slong *j, slong lena,
                    const fmpz_t p)
 {
     const slong d = j[lena - 1];
@@ -43,10 +43,10 @@ void _qadic_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e,
         bit = fmpz_bits(e) - 2;
 
         /*
-           Trial run without any polynomial arithmetic to determine the parity 
+           Trial run without any polynomial arithmetic to determine the parity
            of the number of swaps;  then set R and S accordingly
          */
-        
+
         {
             unsigned int swaps = 0U;
             ulong bit2 = bit;
@@ -55,7 +55,7 @@ void _qadic_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e,
             while (bit2--)
                 if (!fmpz_tstbit(e, bit2))
                     swaps = ~swaps;
-            
+
             if (swaps == 0U)
             {
                 R = rop;
@@ -67,7 +67,7 @@ void _qadic_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e,
                 S = rop;
             }
         }
-        
+
         /*
            We unroll the first step of the loop, referring to {op, len}
          */
@@ -140,7 +140,7 @@ void qadic_pow(qadic_t x, const qadic_t y, const fmpz_t e, const qadic_ctx_t ctx
         {
             qadic_set(x, y, ctx);
         }
-        else 
+        else
         {
             const slong d = qadic_ctx_degree(ctx);
             fmpz *t;

@@ -16,12 +16,12 @@ void fq_embed_gens(fq_t gen_sub, fq_t gen_sup, fmpz_mod_poly_t minpoly,
                              const fq_ctx_t sub_ctx,
                              const fq_ctx_t sup_ctx)
 {
-    if (fq_ctx_degree(sub_ctx) == 1) 
+    if (fq_ctx_degree(sub_ctx) == 1)
     {
         fq_gen(gen_sub, sub_ctx);
         fq_set(gen_sup, gen_sub, sup_ctx);
     }
-    else 
+    else
     {
         _fq_embed_gens_naive(gen_sub, gen_sup, minpoly, sub_ctx, sup_ctx);
     }
@@ -39,11 +39,11 @@ void _fq_embed_gens_naive(fq_t gen_sub,
     fq_poly_init(modulus, sup_ctx);
     fq_poly_init(fact, sup_ctx);
     fq_poly_set_fmpz_mod_poly(modulus, fq_ctx_modulus(sub_ctx), sup_ctx);
-    
+
     flint_randinit(state);
 
     /* Get one linear factor of sub_ctx->modulus in sup_ctx */
-    while (fq_poly_degree(modulus, sup_ctx) != 1) 
+    while (fq_poly_degree(modulus, sup_ctx) != 1)
     {
         while (!fq_poly_factor_equal_deg_prob(fact, state, modulus, 1, sup_ctx))
         {

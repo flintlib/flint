@@ -31,7 +31,7 @@ main(void)
         fq_nmod_t a, b;
 
         fq_nmod_ctx_randtest(ctx, state);
-        
+
         fq_nmod_init(a, ctx);
         fq_nmod_init(b, ctx);
 
@@ -66,7 +66,7 @@ main(void)
 	nmod_poly_t b;
 
         fq_nmod_ctx_randtest(ctx, state);
-        
+
         fq_nmod_init(a, ctx);
         fq_nmod_init(c, ctx);
 	nmod_poly_init(b, ctx->mod.n);

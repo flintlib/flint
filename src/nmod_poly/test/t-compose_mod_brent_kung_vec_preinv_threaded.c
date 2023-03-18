@@ -29,7 +29,7 @@ main(void)
     slong max_threads = 5;
 #endif
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("compose_mod_brent_kung_vec_preinv_threaded....");
     fflush(stdout);
 
@@ -97,15 +97,15 @@ main(void)
 
         for (j = 0; j < l; j++)
             nmod_poly_clear(pow + j);
-        
+
 	for (j = 0; j < k; j++)
             nmod_poly_clear(res + j);
-        
+
 	flint_free(pow);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
 #else
     FLINT_TEST_CLEANUP(state);

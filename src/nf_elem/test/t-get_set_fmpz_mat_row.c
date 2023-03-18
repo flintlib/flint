@@ -49,7 +49,7 @@ main(void)
         nf_elem_randtest(a, state, 200, nf);
 
         fmpz_init(d);
-        
+
         nf_elem_get_fmpz_mat_row(mat, j, d, a, nf);
         nf_elem_set_fmpz_mat_row(b, mat, j, d, nf);
 
@@ -66,7 +66,7 @@ main(void)
 
         nf_elem_clear(a, nf);
         nf_elem_clear(b, nf);
-        
+
         fmpz_mat_clear(mat);
 
         fmpz_clear(d);

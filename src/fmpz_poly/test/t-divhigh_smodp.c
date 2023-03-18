@@ -48,7 +48,7 @@ main(void)
         n = n_randint(state, 40) + 2;
 
         vec = _fmpz_vec_init(n);
-        
+
         do {
            fmpz_poly_randtest(a, state, n_randint(state, 100) + 2*n, 200);
            if (a->length > 1)
@@ -57,7 +57,7 @@ main(void)
               fmpz_gcd(d2, P, a->coeffs + a->length - 1);
            }
         } while (a->length <= n || !fmpz_is_one(d1) || !fmpz_is_one(d2));
-        
+
         do {
            fmpz_poly_randtest(b, state, n_randint(state, 50), 200);
            if (b->length > 1)
@@ -66,7 +66,7 @@ main(void)
               fmpz_gcd(d2, P, b->coeffs + b->length - 1);
            }
         } while (b->length < 2 || !fmpz_is_one(d1) || !fmpz_is_one(d2));
-        
+
         fmpz_poly_mulhigh_n(c, a, b, n);
 
         fmpz_poly_scalar_mod_fmpz(d, b, P);
@@ -105,7 +105,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

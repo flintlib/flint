@@ -24,7 +24,7 @@ main(void)
 {
     int iter;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("is_irreducible_rabin....");
     fflush(stdout);
@@ -42,7 +42,7 @@ main(void)
         nmod_poly_init(poly, modulus);
         nmod_poly_init(poly2, modulus);
         nmod_poly_init(poly3, modulus);
-      
+
         length = n_randint(state, 10) + 2;
 
         do
@@ -68,9 +68,9 @@ main(void)
 
         length2 = n_randint(state, 10) + 2;
 
-        do 
+        do
         {
-            nmod_poly_randtest(poly2, state, length2); 
+            nmod_poly_randtest(poly2, state, length2);
             if(!nmod_poly_is_zero(poly2))
                 nmod_poly_make_monic(poly2, poly2);
         }
@@ -93,7 +93,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

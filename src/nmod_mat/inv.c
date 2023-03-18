@@ -36,7 +36,7 @@ int nmod_mat_inv(nmod_mat_t B, const nmod_mat_t A)
             }
             else
             {
-                nmod_mat_entry(B, 0, 0) = 
+                nmod_mat_entry(B, 0, 0) =
                     n_invmod(nmod_mat_entry(A, 0, 0), B->mod.n);
                 result = 1;
             }

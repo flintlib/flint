@@ -68,10 +68,10 @@ static slong _fq_zech_mpoly_divrem_monagan_pearce(slong * lenr,
 
     q_len = WORD(0);
     r_len = WORD(0);
-   
+
     /* s is the number of terms * (latest quotient) we should put into heap */
     s = len3;
-   
+
     /* insert (-1, 0, exp2[0]) into heap */
     x = chain + 0;
     x->i = -WORD(1);
@@ -84,7 +84,7 @@ static slong _fq_zech_mpoly_divrem_monagan_pearce(slong * lenr,
     /* precompute leading coefficient info */
     fq_zech_inv(lc_minus_inv, coeff3 + 0, fqctx);
     fq_zech_neg(lc_minus_inv, lc_minus_inv, fqctx);
-   
+
     while (heap_len > 1)
     {
         _fq_zech_mpoly_fit_length(&q_coeff, &q_exp, allocq, q_len + 1, N, fqctx);
@@ -330,7 +330,7 @@ void fq_zech_mpoly_divrem_monagan_pearce(fq_zech_mpoly_t q, fq_zech_mpoly_t r,
 
     /* do division with remainder */
     while ((lenq = _fq_zech_mpoly_divrem_monagan_pearce(&lenr, &tq->coeffs, &tq->exps,
-                      &tq->alloc, &tr->coeffs, &tr->exps, &tr->alloc, poly2->coeffs, exp2, 
+                      &tq->alloc, &tr->coeffs, &tr->exps, &tr->alloc, poly2->coeffs, exp2,
                        poly2->length, poly3->coeffs, exp3, poly3->length, exp_bits,
                                          N, cmpmask, ctx->fqctx)) == 0
           && lenr == 0)
@@ -358,7 +358,7 @@ void fq_zech_mpoly_divrem_monagan_pearce(fq_zech_mpoly_t q, fq_zech_mpoly_t r,
         if (free3)
             flint_free(old_exp3);
 
-        free2 = free3 = 1; 
+        free2 = free3 = 1;
 
         fq_zech_mpoly_fit_bits(tq, exp_bits, ctx);
         tq->bits = exp_bits;

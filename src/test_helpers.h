@@ -21,7 +21,7 @@
             flint_printf("%s:%d\n", __FILE__, __LINE__);\
             flint_abort();                              \
         }                                               \
-    } while (0)  
+    } while (0)
 
 #endif
 

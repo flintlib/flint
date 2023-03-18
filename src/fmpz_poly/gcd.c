@@ -54,11 +54,11 @@ fmpz_poly_gcd(fmpz_poly_t res, const fmpz_poly_t poly1,
     {
         const slong len1 = poly1->length;
         const slong len2 = poly2->length;
-        
+
         if (len1 == 0) /* len1 = len2 = 0 */
         {
             fmpz_poly_zero(res);
-        } 
+        }
         else if (len2 == 0) /* len1 > len2 = 0 */
         {
             if (fmpz_sgn(poly1->coeffs + (len1 - 1)) > 0)
@@ -69,12 +69,12 @@ fmpz_poly_gcd(fmpz_poly_t res, const fmpz_poly_t poly1,
         else /* len1 >= len2 >= 1 */
         {
             /* all current gcd functions automatically handle aliasing */
-           
+
             fmpz_poly_fit_length(res, len2);
-                
+
             _fmpz_poly_gcd(res->coeffs, poly1->coeffs, len1,
                                     poly2->coeffs, len2);
-    
+
             _fmpz_poly_set_length(res, len2);
             _fmpz_poly_normalise(res);
         }

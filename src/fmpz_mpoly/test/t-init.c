@@ -42,11 +42,11 @@ main(void)
        fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
        fmpz_mpoly_assert_canonical(f, ctx);
 
-       fmpz_mpoly_clear(f, ctx);        
+       fmpz_mpoly_clear(f, ctx);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

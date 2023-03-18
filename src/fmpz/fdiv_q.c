@@ -42,7 +42,7 @@ fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
         {
             if ((c1 > WORD(0) && fmpz_sgn(h) < 0) || (c1 < WORD(0) && fmpz_sgn(h) > 0))  /* signs are the same */
                 fmpz_set_si(f, WORD(-1));   /* quotient is negative, round down to minus one */
-            else 
+            else
                 fmpz_zero(f);
         }
     }

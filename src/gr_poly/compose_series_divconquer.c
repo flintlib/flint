@@ -44,7 +44,7 @@ _gr_poly_compose_series_divconquer(gr_ptr res, gr_srcptr poly1, slong len1,
             hlen[n] = t;
     }
     powlen = FLINT_MIN(N, (1 << k) * (len2 - 1) + 1);
-    
+
     alloc = 0;
     for (i = 0; i < (len1 + 1) / 2; i++)
         alloc += hlen[i];
@@ -81,7 +81,7 @@ _gr_poly_compose_series_divconquer(gr_ptr res, gr_srcptr poly1, slong len1,
 
     powlen = FLINT_MIN(N, 2 * len2 - 1);
     status |= _gr_poly_mullow(pow, poly2, len2, poly2, len2, powlen, ctx);
-    
+
     for (n = (len1 + 1) / 2; n > 2; n = (n + 1) / 2)
     {
         if (hlen[1] > 0)
@@ -91,7 +91,7 @@ _gr_poly_compose_series_divconquer(gr_ptr res, gr_srcptr poly1, slong len1,
             status |= _gr_poly_add(h[0], temp, templen, h[0], hlen[0], ctx);
             hlen[0] = FLINT_MAX(hlen[0], templen);
         }
-        
+
         for (i = 1; i < n / 2; i++)
         {
             if (hlen[2*i + 1] > 0)
@@ -111,7 +111,7 @@ _gr_poly_compose_series_divconquer(gr_ptr res, gr_srcptr poly1, slong len1,
             hlen[i] = FLINT_MIN(N, hlen[2*i]);
             status |= _gr_vec_set(h[i], h[2*i], hlen[i], ctx);
         }
-        
+
         status |= _gr_poly_mullow(temp, pow, powlen, pow, powlen, FLINT_MIN(N, 2 * powlen - 1), ctx);
         powlen = FLINT_MIN(N, 2 * powlen - 1);
 

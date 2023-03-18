@@ -18,7 +18,7 @@ void _fmpz_poly_nth_derivative(fmpz * rpoly, const fmpz * poly, ulong n, slong l
     slong i;
     fmpz_t c;
     fmpz_init(c);
-    
+
     fmpz_fac_ui(c, n);
     fmpz_mul(rpoly, poly + n, c);
     for (i = n + 1; i < len; i ++)
@@ -27,14 +27,14 @@ void _fmpz_poly_nth_derivative(fmpz * rpoly, const fmpz * poly, ulong n, slong l
         fmpz_mul_ui(c, c, i);
         fmpz_mul(rpoly + i - n, poly + i, c);
     }
-    
+
     fmpz_clear(c);
 }
 
 void fmpz_poly_nth_derivative(fmpz_poly_t res, const fmpz_poly_t poly, ulong n)
 {
     const slong len = poly->length;
-    
+
     if (len <= n)
     {
         fmpz_poly_zero(res);

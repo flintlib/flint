@@ -18,8 +18,8 @@
 /*
     Macro for the lift G := [{(f - gh)/p} * b mod g] p + g.
 
-    Assumes that {C, lenF} contains the inner part {f - gh}/p mod p1. 
-    Requires temporary space M, D, E.  We really only need 
+    Assumes that {C, lenF} contains the inner part {f - gh}/p mod p1.
+    Requires temporary space M, D, E.  We really only need
         lenM = max(lenG, lenH)
         lenE = max(lenG + lenB - 2, lenH + lenA - 2)
         lenD = max(lenE, lenF)
@@ -44,10 +44,10 @@ do {                                                                  \
     fmpz_one(G + lenG - 1);                                           \
 } while (0)
 
-void _fmpz_poly_hensel_lift_without_inverse(fmpz *G, fmpz *H, 
-    const fmpz *f, slong lenF, 
-    const fmpz *g, slong lenG, const fmpz *h, slong lenH, 
-    const fmpz *a, slong lenA, const fmpz *b, slong lenB, 
+void _fmpz_poly_hensel_lift_without_inverse(fmpz *G, fmpz *H,
+    const fmpz *f, slong lenF,
+    const fmpz *g, slong lenG, const fmpz *h, slong lenH,
+    const fmpz *a, slong lenA, const fmpz *b, slong lenB,
     const fmpz_t p, const fmpz_t p1)
 {
     const fmpz one[1] = {1l};
@@ -76,9 +76,9 @@ void _fmpz_poly_hensel_lift_without_inverse(fmpz *G, fmpz *H,
     _fmpz_vec_clear(C, lenF + lenD + lenE + lenM);
 }
 
-void fmpz_poly_hensel_lift_without_inverse(fmpz_poly_t Gout, fmpz_poly_t Hout, 
-	const fmpz_poly_t f, const fmpz_poly_t g, const fmpz_poly_t h, 
-    const fmpz_poly_t a, const fmpz_poly_t b, 
+void fmpz_poly_hensel_lift_without_inverse(fmpz_poly_t Gout, fmpz_poly_t Hout,
+	const fmpz_poly_t f, const fmpz_poly_t g, const fmpz_poly_t h,
+    const fmpz_poly_t a, const fmpz_poly_t b,
     const fmpz_t p, const fmpz_t p1)
 {
     fmpz_poly_fit_length(Gout, g->length);
@@ -86,8 +86,8 @@ void fmpz_poly_hensel_lift_without_inverse(fmpz_poly_t Gout, fmpz_poly_t Hout,
     _fmpz_poly_set_length(Gout, g->length);
     _fmpz_poly_set_length(Hout, h->length);
 
-    _fmpz_poly_hensel_lift_without_inverse(Gout->coeffs, Hout->coeffs, 
-        f->coeffs, f->length, g->coeffs, g->length, h->coeffs, h->length, 
+    _fmpz_poly_hensel_lift_without_inverse(Gout->coeffs, Hout->coeffs,
+        f->coeffs, f->length, g->coeffs, g->length, h->coeffs, h->length,
         a->coeffs, a->length, b->coeffs, b->length, p, p1);
 }
 

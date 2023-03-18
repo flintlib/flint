@@ -18,7 +18,7 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("scalar_mul_fmpq....");
     fflush(stdout);
@@ -108,7 +108,7 @@ main(void)
         fmpq_clear(x);
     }
 
-    
+
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

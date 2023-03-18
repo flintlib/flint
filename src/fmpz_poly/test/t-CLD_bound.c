@@ -25,7 +25,7 @@ main(void)
     fflush(stdout);
 
     /*
-       test that CLD_bound is between the absolute value of the n-th 
+       test that CLD_bound is between the absolute value of the n-th
        coeff of f' and the sum of the absolute values of the coeffs of f'
     */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -61,7 +61,7 @@ main(void)
         } while (!fmpz_poly_is_one(g));
 
         fmpz_poly_scalar_abs(b, b);
-        
+
         for (j = 0; j < b->length && result; j++)
         {
            fmpz_poly_CLD_bound(bound, a, j);
@@ -115,7 +115,7 @@ main(void)
         {
            do {
               fmpz_poly_randtest(a, state, n_randint(state, 100) + 2, bits);
-           
+
               if (!fmpz_poly_is_zero(a))
               {
                  xpow = 0;
@@ -129,7 +129,7 @@ main(void)
 
            do {
               fmpz_poly_randtest(b, state, n_randint(state, 100) + 1, bits);
-           
+
               if (!fmpz_poly_is_zero(b))
               {
                  xpow = 0;
@@ -177,7 +177,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

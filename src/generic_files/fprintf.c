@@ -42,7 +42,7 @@ int flint_fprintf(FILE * f, const char * str, ...)
       n = strcspn(str + 2, "%") + 2; /* be sure to skip a %% */
       strncpy(str2, str, n);
       str2[n] = '\0';
-   
+
       switch (str[1])
       {
       case 'w':
@@ -70,7 +70,7 @@ int flint_fprintf(FILE * f, const char * str, ...)
          break;
       default: /* pass to fprintf */
          args = parse_fmt(&floating, str2);
-         if (args) 
+         if (args)
          {
             if (args == 3)
                w1 = va_arg(ap, int);

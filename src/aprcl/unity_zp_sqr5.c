@@ -13,7 +13,7 @@
 #include "aprcl.h"
 
 /*
-    Computes f = g * g for p = 5. 
+    Computes f = g * g for p = 5.
     g must be reduced by F_5 cyclotomic polynomial.
     t is the memory for fmpz_t; size of t must be > 14.
     Resulting f reduced by F_5 cyclotomic polynomial.

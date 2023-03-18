@@ -163,7 +163,7 @@ fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
             return;
         }
     }
-    
+
     if (!COEFF_IS_MPZ(*f))
     {
         if (c1 == 0 || c2 == 0)
@@ -182,7 +182,7 @@ fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
             *f = 0;
             return;
         }
-        
+
         mf = COEFF_TO_PTR(*f);
     }
 

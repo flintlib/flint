@@ -49,7 +49,7 @@ static int _nmod_mpoly_fprint_pretty(FILE * file,
     exponents = (fmpz *) TMP_ALLOC(mctx->nvars*sizeof(fmpz));
     for (i = 0; i < mctx->nvars; i++)
         fmpz_init(exponents + i);
-   
+
     for (i = 0; i < len; i++)
     {
         if (i > 0)
@@ -102,7 +102,7 @@ static int _nmod_mpoly_fprint_pretty(FILE * file,
             if (r <= 0) goto done;
         }
     }
-   
+
 done:
     for (i = 0; i < mctx->nvars; i++)
         fmpz_clear(exponents + i);

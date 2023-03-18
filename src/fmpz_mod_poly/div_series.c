@@ -14,7 +14,7 @@
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
-void 
+void
 _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
     const fmpz * B, slong Blen, const fmpz_t p, slong n)
 {
@@ -22,7 +22,7 @@ _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
 
     fmpz_init(d);
     fmpz_init(u);
-     
+
     if (!fmpz_is_one(B + 0))
     {
        fmpz_gcdinv(d, u, B + 0, p);
@@ -30,15 +30,15 @@ _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
        if (!fmpz_is_one(d)) /* check for invertibility */
        {
            printf("Exception (fmpz_mod_poly_div_series). Impossible inverse.");
-               
+
            fmpz_clear(u);
            fmpz_clear(d);
-               
+
            flint_abort();
        }
     } else
        fmpz_set_ui(u, 1);
-      
+
     Alen = FLINT_MIN(Alen, n);
     Blen = FLINT_MIN(Blen, n);
 
@@ -77,14 +77,14 @@ _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
 
             if (!fmpz_is_one(B + 0))
                fmpz_mul(Q + i, Q + i, u);
-                           
+
             fmpz_mod(Q + i, Q + i, p);
         }
     }
     else
     {
         fmpz * B2, * Binv = _fmpz_vec_init(n);
-        
+
         if (n > Blen)
         {
            B2 = _fmpz_vec_init(n);
@@ -104,7 +104,7 @@ _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
     fmpz_clear(u);
 }
 
-void fmpz_mod_poly_div_series(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, 
+void fmpz_mod_poly_div_series(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
                     const fmpz_mod_poly_t B, slong n, const fmpz_mod_ctx_t ctx)
 {
     slong Alen = FLINT_MIN(A->length, n);

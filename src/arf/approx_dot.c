@@ -426,7 +426,7 @@ arf_approx_dot(arf_t res, const arf_t initial, int subtract, arf_srcptr x, slong
         mp_size_t sn2;
 
         sn2 = sn;
-        sum_exp2 = sum_exp; 
+        sum_exp2 = sum_exp;
 
         while (sn2 > 0 && sum[sn2 - 1] == 0)
         {

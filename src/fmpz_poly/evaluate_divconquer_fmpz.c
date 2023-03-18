@@ -14,8 +14,8 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void 
-_fmpz_poly_evaluate_divconquer_fmpz(fmpz_t res, const fmpz * poly, slong len, 
+void
+_fmpz_poly_evaluate_divconquer_fmpz(fmpz_t res, const fmpz * poly, slong len,
                                                 const fmpz_t x)
 {
     slong c, h, i, k = 1;
@@ -70,7 +70,7 @@ _fmpz_poly_evaluate_divconquer_fmpz(fmpz_t res, const fmpz * poly, slong len,
 }
 
 void
-fmpz_poly_evaluate_divconquer_fmpz(fmpz_t res, const fmpz_poly_t poly, 
+fmpz_poly_evaluate_divconquer_fmpz(fmpz_t res, const fmpz_poly_t poly,
                                    const fmpz_t a)
 {
     if (fmpz_poly_is_zero(poly))

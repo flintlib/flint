@@ -158,7 +158,7 @@ void fmpz_mpoly_consume_fmpz_mpolyd_clear(fmpz_mpoly_t A, fmpz_mpolyd_t B,
     /* get most significant exponent in exps and its vector in ptempexp */
     ptempexp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
     k = i;
-    for (j = nvars - 1; j >= 0; j--) 
+    for (j = nvars - 1; j >= 0; j--)
     {
         exps[j] = k % B->deg_bounds[j];
         k = k / B->deg_bounds[j];
@@ -184,7 +184,7 @@ void fmpz_mpoly_consume_fmpz_mpolyd_clear(fmpz_mpoly_t A, fmpz_mpolyd_t B,
         --exps[nvars - 1];
         if ((slong)(exps[nvars - 1]) < WORD(0))
         {
-            exps[nvars - 1] = B->deg_bounds[nvars - 1] - 1;            
+            exps[nvars - 1] = B->deg_bounds[nvars - 1] - 1;
             for (j = nvars - 2; j >= 0; j--)
             {
                 --exps[j];

@@ -54,9 +54,9 @@ slong qfb_reduced_forms_large(qfb ** forms, slong d)
 
     alim = n_sqrt(-d/3); /* maximum a value to check */
 
-    (*forms) = NULL; 
+    (*forms) = NULL;
     alloc = 0;
-    
+
     if ((-d & 3) == 2 || (-d & 3) == 1) /* ensure d is 0, 1 mod 4 */
         return 0;
 
@@ -76,7 +76,7 @@ slong qfb_reduced_forms_large(qfb ** forms, slong d)
         fac[a].p[0] = 2;
         fac[a].num = 1;
     }
-    
+
     sqrt = n_sqrt(alim);
     primes = n_primes_arr_readonly(FLINT_MAX(sqrt, 10000));
     prime_inverses = n_prime_inverses_arr_readonly(FLINT_MAX(sqrt, 10000));
@@ -94,7 +94,7 @@ slong qfb_reduced_forms_large(qfb ** forms, slong d)
         }
         prime_i++;
     }
-    
+
     for (a = 1; a <= alim; a++) /* write any remaining prime factor of each 4a value */
     {
         prod = 1;
@@ -121,24 +121,24 @@ slong qfb_reduced_forms_large(qfb ** forms, slong d)
         for (j = 0; j < roots; j++) /* loop through all square roots of d mod 4a */
         {
            mp_limb_signed_t b = s[j];
-           
+
            if (b > 2*a) b -= 4*a;
-           
+
            if (-a < b && b <= a) /* we may have a form */
            {
-               /* 
+               /*
                   let B = FLINT_BITS
-                  -sqrt(2^(B-1)/3) < b < sqrt(2^(B-1)/3) 
+                  -sqrt(2^(B-1)/3) < b < sqrt(2^(B-1)/3)
                   0 < -d < 2^(B-1)
                */
-               mp_limb_t c = ((mp_limb_t) (b*b) + (mp_limb_t) (-d))/(4*(mp_limb_t) a); 
-               
+               mp_limb_t c = ((mp_limb_t) (b*b) + (mp_limb_t) (-d))/(4*(mp_limb_t) a);
+
                if (c >= (mp_limb_t) a && (b >= 0 || a != c)) /* we have a form */
                {
                    mp_limb_t g;
-                   
+
                    if (b)
-                   {   
+                   {
                       g = n_gcd(c, FLINT_ABS(b));
                       g = n_gcd(a, g);
                    } else
@@ -187,9 +187,9 @@ slong qfb_reduced_forms(qfb ** forms, slong d)
 
     blim = n_sqrt(-d/3); /* maximum a value to check */
 
-    (*forms) = NULL; 
+    (*forms) = NULL;
     alloc = 0;
-    
+
     if ((-d & 3) == 2 || (-d & 3) == 1) /* ensure d is 0, 1 mod 4 */
         return 0;
 
@@ -200,25 +200,25 @@ slong qfb_reduced_forms(qfb ** forms, slong d)
 
     primes = n_primes_arr_readonly(FLINT_MAX(sqrt, 10000));
     prime_inverses = n_prime_inverses_arr_readonly(FLINT_MAX(sqrt, 10000));
-    
+
     fac = flint_calloc(blim + 1, sizeof(n_factor_t));
-    
+
     prime_i = 1;
     while ((p = primes[prime_i]) <= sqrt) /* sieve for factors of p^exp */
     {
         num = n_sqrtmod_primepow(&s, n_negmod((-d) % p, p), p, 1);
-            
+
         for (i = 0; i < num; i++) /* sieve with each sqrt mod p */
         {
             mp_limb_t off = s[i];
             while (off <= blim)
             {
                 b2 = (off*off - (mp_limb_t) d)/4;
-                         
+
                 fac[off].p[fac[off].num] = p;
                 fac[off].exp[fac[off].num] = n_remove2_precomp(&b2, p, prime_inverses[prime_i]);
                 fac[off].num++;
-                         
+
                 off += p;
             }
         }
@@ -239,18 +239,18 @@ slong qfb_reduced_forms(qfb ** forms, slong d)
             fac[b].exp[fac[b].num] = exp;
             fac[b].num++;
         }
-        
+
         prod = 1;
         for (i = 0; i < fac[b].num; i++)
             prod *= n_pow(fac[b].p[i], fac[b].exp[i]);
 
         b2 /= prod;
-        
+
         if (b2 != 1)
         {
             fac[b].p[fac[b].num] = b2;
             fac[b].exp[fac[b].num] = 1;
-            fac[b].num++;     
+            fac[b].num++;
         }
     }
 
@@ -268,18 +268,18 @@ slong qfb_reduced_forms(qfb ** forms, slong d)
          do
          {
              a = 1;
-             
+
              for (i = 0; i < n; i++)
                  a *= n_pow(fac[b].p[i], pows[i]);
-             
+
              c = b2 / a;
-             
+
              if (a <= c && b <= a) /* we have a form */
              {
                  mp_limb_t g;
-                 
+
                  if (b)
-                 {   
+                 {
                      g = n_gcd(c, b);
                      g = n_gcd(a, g);
                  } else
@@ -294,11 +294,11 @@ slong qfb_reduced_forms(qfb ** forms, slong d)
                          for (k = num; k < alloc; k++)
                             qfb_init((*forms) + k);
                     }
-                    
+
                      fmpz_set_si((*forms)[num].a, a); /* record form */
                      fmpz_set_si((*forms)[num].b, b);
                      fmpz_set_si((*forms)[num++].c, c);
-                     
+
                      if (b && a != c && b != a)
                      {
                          if (num == alloc) /* realloc if necessary */
@@ -308,7 +308,7 @@ slong qfb_reduced_forms(qfb ** forms, slong d)
                              for (k = num; k < alloc; k++)
                                 qfb_init((*forms) + k);
                          }
-                    
+
                         fmpz_set_si((*forms)[num].a, a); /* record opposite form */
                         fmpz_set_si((*forms)[num].b, -b);
                         fmpz_set_si((*forms)[num++].c, c);

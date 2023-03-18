@@ -28,27 +28,27 @@ int main(void)
 
     flint_randinit(state);
 
-    for (i = 1; i < 10000; i++) 
+    for (i = 1; i < 10000; i++)
     {
         qfb_t r, s;
         fmpz_t root, D;
 
         num = qfb_reduced_forms(&forms, -i);
-        
+
         if (num)
         {
            fmpz_init(root);
            fmpz_init(D);
            qfb_init(r);
            qfb_init(s);
-              
+
            fmpz_set_ui(root, i);
            fmpz_root(root, root, 4);
 
            for (k = 0; k < 20; k++)
            {
               i1 = n_randint(state, num);
-              
+
               qfb_discriminant(D, forms + i1);
 
               qfb_nucomp(r, forms + i1, forms + i1, D, root);
@@ -66,7 +66,7 @@ int main(void)
                  flint_abort();
               }
            }
-           
+
            fmpz_clear(D);
            fmpz_clear(root);
            qfb_clear(r);

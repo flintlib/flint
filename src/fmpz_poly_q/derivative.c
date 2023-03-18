@@ -14,13 +14,13 @@
 void fmpz_poly_q_derivative(fmpz_poly_q_t rop, const fmpz_poly_q_t op)
 {
     fmpz_poly_t d, lhs, rhs;
-    
+
     if (fmpz_poly_q_is_zero(op))
     {
         fmpz_poly_q_zero(rop);
         return;
     }
-    
+
     if (fmpz_poly_length(op->den) == 1)
     {
         fmpz_poly_derivative(rop->num, op->num);
@@ -76,7 +76,7 @@ void fmpz_poly_q_derivative(fmpz_poly_q_t rop, const fmpz_poly_q_t op)
         fmpz_clear(b);
         fmpz_clear(c);
     }
-    
+
     fmpz_poly_clear(d);
     fmpz_poly_clear(rhs);
 }

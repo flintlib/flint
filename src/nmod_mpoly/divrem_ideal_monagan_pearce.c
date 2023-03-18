@@ -73,7 +73,7 @@ int _nmod_mpoly_divrem_ideal_monagan_pearce1(
         s[w] = Bs[w]->length;
     }
     r_len = WORD(0);
-   
+
     x = chains[0] + 0;
     x->i = -WORD(1);
     x->j = 0;
@@ -275,7 +275,7 @@ int _nmod_mpoly_divrem_ideal_monagan_pearce(
     }
 
     TMP_START;
-   
+
     chains = (mpoly_nheap_t **) TMP_ALLOC(Blen*sizeof(mpoly_nheap_t *));
     hinds = (slong **) TMP_ALLOC(Blen*sizeof(mpoly_heap_t *));
     len3 = 0;
@@ -311,7 +311,7 @@ int _nmod_mpoly_divrem_ideal_monagan_pearce(
         s[w] = Bs[w]->length;
     }
     r_len = WORD(0);
-   
+
     x = chains[0] + 0;
     x->i = -WORD(1);
     x->j = 0;
@@ -458,7 +458,7 @@ int _nmod_mpoly_divrem_ideal_monagan_pearce(
                     x->p = w;
                     x->next = NULL;
                     hinds[w][x->i] = 2*(x->j + 1) + 0;
-                    mpoly_monomial_add_mp(exp_list[exp_next], Bexps[w] + N*x->i, 
+                    mpoly_monomial_add_mp(exp_list[exp_next], Bexps[w] + N*x->i,
                                                        Q[w]->exps + N*x->j, N);
                     exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
@@ -525,7 +525,7 @@ void nmod_mpoly_divrem_ideal_monagan_pearce(
     TMP_INIT;
 
     for (i = 0; i < Blen; i++)
-    {  
+    {
         len3 = FLINT_MAX(len3, B[i]->length);
         if (nmod_mpoly_is_zero(B[i], ctx))
         {
@@ -605,7 +605,7 @@ void nmod_mpoly_divrem_ideal_monagan_pearce(
     /* do division with remainder */
     while (1)
     {
-        nmod_mpoly_fit_length_reset_bits(r, len3, QRbits, ctx);        
+        nmod_mpoly_fit_length_reset_bits(r, len3, QRbits, ctx);
         for (i = 0; i < Blen; i++)
             nmod_mpoly_fit_length_reset_bits(Q[i], 1, QRbits, ctx);
 
@@ -624,7 +624,7 @@ void nmod_mpoly_divrem_ideal_monagan_pearce(
             flint_free(Aexps);
         Aexps = (ulong *) flint_malloc(N*A->length*sizeof(ulong));
         mpoly_repack_monomials(Aexps, QRbits, A->exps, A->bits, A->length, ctx->minfo);
-        freeAexps = 1; 
+        freeAexps = 1;
 
         for (i = 0; i < Blen; i++)
         {

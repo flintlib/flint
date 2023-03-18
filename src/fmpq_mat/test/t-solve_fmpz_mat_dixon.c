@@ -18,7 +18,7 @@ main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("solve_fmpz_mat_dixon....");
     fflush(stdout);
@@ -115,7 +115,7 @@ main(void)
         fmpq_mat_clear(X);
     }
 
-    
+
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

@@ -41,29 +41,29 @@ _gr_poly_div_divconquer_recursive(gr_ptr Q, gr_ptr W,
         gr_srcptr d1 = GR_ENTRY(B, n2, sz);
         gr_srcptr d2 = B;
         gr_srcptr d3 = GR_ENTRY(B, n1, sz);
-        
+
         gr_ptr q1   = GR_ENTRY(Q, n2, sz);
         gr_ptr q2   = Q;
         gr_ptr d1q1 = W2;
 
         gr_ptr d2q1, t;
 
-        /* 
-           Set q1 to p1 div d1, a 2 n1 - 1 by n1 division so q1 ends up 
+        /*
+           Set q1 to p1 div d1, a 2 n1 - 1 by n1 division so q1 ends up
            being of length n1;  low(d1q1) = d1 q1 is of length n1 - 1
          */
 
         status |= _gr_poly_divrem_divconquer_recursive(q1, d1q1, W1, p1, d1, n1, invB, cutoff, ctx);
-        /* 
+        /*
            Compute bottom n1 + n2 - 1 coeffs of d2q1 = d2 q1
          */
 
         d2q1 = W1;
         status |= _gr_poly_mullow(d2q1, q1, n1, d2, n2, n1 + n2 - 1, ctx);
 
-        /* 
+        /*
            Compute dq1 = d1 q1 x^n2 + d2 q1, of length n1 + n2 - 1
-           Split it into a segment of length n1 - 1 at which is ignored 
+           Split it into a segment of length n1 - 1 at which is ignored
            and a piece of length n2 at BQ.
          */
 
@@ -73,12 +73,12 @@ _gr_poly_div_divconquer_recursive(gr_ptr Q, gr_ptr W,
         status |= _gr_poly_add(GR_ENTRY(W1, n2 - (n1 - 1), sz), d1q1, n1 - 1, GR_ENTRY(d2q1, n2, sz), n1 - 1, ctx);
 
         /*
-           Compute t = A/x^n2 - dq1, which has length 2 n1 + n2 - 1, but we 
-           are not interested in the top n1 coeffs as they will be zero, so 
+           Compute t = A/x^n2 - dq1, which has length 2 n1 + n2 - 1, but we
+           are not interested in the top n1 coeffs as they will be zero, so
            this has effective length n1 + n2 - 1
-           For the following division, we want to set {p2, 2 n2 - 1} to the 
+           For the following division, we want to set {p2, 2 n2 - 1} to the
            top 2 n2 - 1 coeffs of this
-           Since the bottom n2 - 1 coeffs of p2 are irrelevant for the 
+           Since the bottom n2 - 1 coeffs of p2 are irrelevant for the
            division, we in fact set {t, n2} to the relevant coeffs
          */
 
@@ -87,8 +87,8 @@ _gr_poly_div_divconquer_recursive(gr_ptr Q, gr_ptr W,
         p2 = GR_ENTRY(t, - (n2 - 1), sz);
 
         /*
-           Compute q2 = t div d3, a 2 n2 - 1 by n2 division, so q2 will have 
-           length n2; 
+           Compute q2 = t div d3, a 2 n2 - 1 by n2 division, so q2 will have
+           length n2;
          */
         status |= _gr_poly_div_divconquer_recursive(q2, W2, p2, d3, n2, invB, cutoff, ctx);
 
@@ -102,7 +102,7 @@ _gr_poly_div_divconquer_recursive(gr_ptr Q, gr_ptr W,
 
 
 static int
-__gr_poly_div_divconquer(gr_ptr Q, gr_srcptr A, slong lenA, 
+__gr_poly_div_divconquer(gr_ptr Q, gr_srcptr A, slong lenA,
                   gr_srcptr B, slong lenB, gr_srcptr invB, slong cutoff, gr_ctx_t ctx)
 {
     slong sz = ctx->sizeof_elem;

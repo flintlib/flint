@@ -17,8 +17,8 @@
 #include "fmpq_poly.h"
 
 
-void 
-_fmpq_poly_invsqrt_series(fmpz * rpoly, fmpz_t rden, 
+void
+_fmpq_poly_invsqrt_series(fmpz * rpoly, fmpz_t rden,
                       const fmpz * poly, const fmpz_t den, slong len, slong n)
 {
     slong m;

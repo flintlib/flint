@@ -12,7 +12,7 @@
 #include "fmpz_mat.h"
 #include "gmpcompat.h"
 
-int 
+int
 fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
 {
     slong r, c, i, j;
@@ -27,7 +27,7 @@ fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
         mpz_clear(t);
         return 0;
     }
-    
+
     if (!mpz_fits_slong_p(t))
     {
         flint_printf("Exception (fmpz_mat_fread). "
@@ -43,7 +43,7 @@ fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
         mpz_clear(t);
         return 0;
     }
-    
+
     if (!mpz_fits_slong_p(t))
     {
         flint_printf("Exception (fmpz_mat_fread). "
@@ -52,7 +52,7 @@ fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
     }
     c = flint_mpz_get_si(t);
     mpz_clear(t);
-    
+
     /* if the input is 0 by 0 then set the dimensions to r and c */
     if (mat->r == 0 && mat->c == 0)
     {
@@ -75,7 +75,7 @@ fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
         }
     }
 
-    /* a return value of 0 means a problem with 
+    /* a return value of 0 means a problem with
        the file stream a value of 1 means success*/
     return 1;
 }

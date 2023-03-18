@@ -22,7 +22,7 @@ int main(void)
    gmp_randstate_t st;
    FLINT_TEST_INIT(state);
    gmp_randinit_default(st);
-   
+
 
    flint_printf("factor_pp1....");
    fflush(stdout);
@@ -40,10 +40,10 @@ int main(void)
       fmpz_init(r);
 
       do {
-         mpz_urandomb(n, st, n_randint(state, 128) + 2); 
+         mpz_urandomb(n, st, n_randint(state, 128) + 2);
       } while (flint_mpz_cmp_ui(n, 2) < 0);
       do {
-         mpz_urandomb(m, st, n_randint(state, 50) + 2); 
+         mpz_urandomb(m, st, n_randint(state, 50) + 2);
       } while (!mpz_probab_prime_p(m, 20));
       mpz_mul(n, n, m);
 
@@ -55,7 +55,7 @@ int main(void)
          fmpz_factor_pp1(n2, n1, 10000, 10000, n_randbits(state, bits - 2) + 3);
          if (fmpz_cmp_ui(n2, 1) > 0) break;
       }
-      
+
       if (fmpz_cmp_ui(n2, 1) > 0)
       {
          count++;
@@ -68,7 +68,7 @@ int main(void)
             fmpz_print(n1);
             flint_printf(", n2 = ");
             fmpz_print(n2);
-            flint_printf("\n"); 
+            flint_printf("\n");
             fmpz_print(r); flint_printf("\n");
             fflush(stdout);
             flint_abort();
@@ -81,16 +81,16 @@ int main(void)
       mpz_clear(m);
       mpz_clear(n);
    }
-   
+
    if (count < 49 * flint_test_multiplier())
    {
       flint_printf("FAIL:\n");
-      flint_printf("Only %wu numbers factored\n", count); 
+      flint_printf("Only %wu numbers factored\n", count);
       fflush(stdout);
       flint_abort();
    }
 
-   
+
    gmp_randclear(st);
    FLINT_TEST_CLEANUP(state);
    flint_printf("PASS\n");

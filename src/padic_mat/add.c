@@ -20,7 +20,7 @@
     o  That ord_p(A) >= ord_p(B).
  */
 
-void _padic_mat_add(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
+void _padic_mat_add(padic_mat_t C, const padic_mat_t A, const padic_mat_t B,
                                    const padic_ctx_t ctx)
 {
     if (padic_mat_is_zero(A))
@@ -38,7 +38,7 @@ void _padic_mat_add(padic_mat_t C, const padic_mat_t A, const padic_mat_t B,
         padic_mat_zero(C);
         return;
     }
-    
+
 
     if (padic_mat_val(A) == padic_mat_val(B))
     {
@@ -79,7 +79,7 @@ void _padic_mat_add(padic_mat_t C, const padic_mat_t A, const padic_mat_t B,
         int alloc = _padic_ctx_pow_ui(pow, padic_mat_prec(C)- padic_mat_val(C), ctx);
 
         /* TODO: Improve, use input precision */
-        _fmpz_vec_scalar_mod_fmpz(padic_mat(C)->entries, 
+        _fmpz_vec_scalar_mod_fmpz(padic_mat(C)->entries,
             padic_mat(C)->entries, padic_mat_nrows(C)*padic_mat_ncols(C), pow);
 
         if (fmpz_mat_is_zero(padic_mat(C)))
@@ -93,7 +93,7 @@ void _padic_mat_add(padic_mat_t C, const padic_mat_t A, const padic_mat_t B,
     }
 }
 
-void padic_mat_add(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
+void padic_mat_add(padic_mat_t C, const padic_mat_t A, const padic_mat_t B,
                                   const padic_ctx_t ctx)
 {
     if (padic_mat_is_empty(C))

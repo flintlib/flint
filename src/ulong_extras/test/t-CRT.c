@@ -17,7 +17,7 @@ int main(void)
 {
     slong i, j;
     FLINT_TEST_INIT(state);
-   
+
     flint_printf("CRT....");
     fflush(stdout);
 

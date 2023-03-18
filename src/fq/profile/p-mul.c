@@ -27,7 +27,7 @@ main()
     fq_t a,b,c;
 
     FLINT_TEST_INIT(state);
-    
+
     fmpz_init(p);
     fmpz_set_ui(p, n_randprime(state, 2+ n_randint(state,3),1));
     d = n_randint(state,10)+1;

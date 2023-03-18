@@ -25,7 +25,7 @@ void sample(void * arg, ulong count)
    d = n_randtest_not_zero(state);
    count_leading_zeros(norm, d);
    d <<= norm;
-      
+
    for (i = 0; i < count; i++)
    {
       for (j = 0; j < 200; j+=2)
@@ -34,9 +34,9 @@ void sample(void * arg, ulong count)
          {
             array[j] = n_randtest(state);
          } while (array[j] >= d);
-         array[j + 1] = n_randtest(state);  
+         array[j + 1] = n_randtest(state);
       }
-       
+
       invert_limb(dinv, d);
 
       prof_start();
@@ -45,7 +45,7 @@ void sample(void * arg, ulong count)
          udiv_qrnnd_preinv(q, r, array[j], array[j+1], d, dinv);
       }
       prof_stop();
-      
+
       if (q + r == 0) flint_printf("\r");
    }
 
@@ -56,10 +56,10 @@ void sample(void * arg, ulong count)
 int main(void)
 {
    double min, max;
-   
+
    prof_repeat(&min, &max, sample, NULL);
-   
-   flint_printf("udiv_qrnnd_preinv min time is %.3f cycles, max time is %.3f cycles\n", 
+
+   flint_printf("udiv_qrnnd_preinv min time is %.3f cycles, max time is %.3f cycles\n",
            (min/(double)FLINT_CLOCK_SCALE_FACTOR)/100, (max/(double)FLINT_CLOCK_SCALE_FACTOR)/100);
 
    return 0;

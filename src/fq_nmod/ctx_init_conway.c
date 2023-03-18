@@ -40,11 +40,11 @@ int _fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const c
             slong i;
 
             nmod_poly_init(mod, fmpz_get_ui(p));
-            
+
             /* Copy the polynomial */
             for (i = 0; i < d; i++)
             {
-                int coeff = flint_conway_polynomials[position+2+i];                
+                int coeff = flint_conway_polynomials[position+2+i];
                 nmod_poly_set_coeff_ui(mod, i, coeff);
             }
 

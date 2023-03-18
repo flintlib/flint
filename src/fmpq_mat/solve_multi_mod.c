@@ -127,7 +127,7 @@ _fmpq_mat_solve_multi_mod(fmpq_mat_t X,
               break;
         }
 
-        fmpz_mat_CRT_ui(x, x, pprod, Xmod, 0); 
+        fmpz_mat_CRT_ui(x, x, pprod, Xmod, 0);
         fmpz_mul_ui(pprod, pprod, p);
     }
 

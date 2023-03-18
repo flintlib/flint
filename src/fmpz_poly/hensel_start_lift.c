@@ -12,8 +12,8 @@
 
 #include "fmpz_poly.h"
 
-slong _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, slong *link, 
-    fmpz_poly_t *v, fmpz_poly_t *w, const fmpz_poly_t f, 
+slong _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, slong *link,
+    fmpz_poly_t *v, fmpz_poly_t *w, const fmpz_poly_t f,
     const nmod_poly_factor_t local_fac, slong N)
 {
     const slong r = local_fac->num;
@@ -66,12 +66,12 @@ slong _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, slong *link,
 
         for (i--; i > 0; i--)
         {
-            fmpz_poly_hensel_lift_tree(link, v, w, monic_f, r, 
+            fmpz_poly_hensel_lift_tree(link, v, w, monic_f, r,
                 p, e[i+1], e[i], 1);
         }
         if (N > 1)
         {
-            fmpz_poly_hensel_lift_tree(link, v, w, monic_f, r, 
+            fmpz_poly_hensel_lift_tree(link, v, w, monic_f, r,
                 p, e[i+1], e[i], 0);
         }
 
@@ -81,17 +81,17 @@ slong _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, slong *link,
     }
 
     /*
-        Now everything is lifted to p^N, we just need to 
+        Now everything is lifted to p^N, we just need to
         insert the factors into their correct places in lifted_fac.
      */
     fmpz_poly_factor_fit_length(lifted_fac, r);
 
     for (i = 0; i < 2*r - 2; i++)
-    { 
+    {
         if (link[i] < 0)
         {
             fmpz_poly_scalar_smod_fmpz(lifted_fac->p + (- link[i] - 1), v[i], P);
-            lifted_fac->exp[- link[i] - 1] = WORD(1); 
+            lifted_fac->exp[- link[i] - 1] = WORD(1);
         }
     }
     lifted_fac->num = r;

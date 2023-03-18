@@ -12,7 +12,7 @@
 /*
     Benchmarks for the p-adic square root routine.
 
-    We consider the set-up with p = 17, N = 2^i, i = 0, ..., 19, 
+    We consider the set-up with p = 17, N = 2^i, i = 0, ..., 19,
     and compute a square root of b = a^2, a = 3^{3 N} mod p^N.
  */
 
@@ -29,15 +29,15 @@ main(void)
 {
     long l, len = 20;
     long runs[] = {
-        1000000, 1000000, 1000000, 1000000, 1000000, 
-        100000, 100000, 100000, 100000, 10000, 
-        10000, 1000, 1000, 1000, 10, 
+        1000000, 1000000, 1000000, 1000000, 1000000,
+        100000, 100000, 100000, 100000, 10000,
+        10000, 1000, 1000, 1000, 10,
         10, 10, 10, 10, 1
     };
     long N[] = {
-        1, 2, 4, 8, 16, 
-        32, 64, 128, 256, 512, 
-        1024, WORD(1) << 11, WORD(1) << 12, WORD(1) << 13, WORD(1) << 14, 
+        1, 2, 4, 8, 16,
+        32, 64, 128, 256, 512,
+        1024, WORD(1) << 11, WORD(1) << 12, WORD(1) << 13, WORD(1) << 14,
         WORD(1) << 15, WORD(1) << 16, WORD(1) << 17, WORD(1) << 18, WORD(1) << 19
     };
     long T[20] = {0};
@@ -89,7 +89,7 @@ for (l = 0; l < len; l++)
 
     T[l] = (slong) (cputime * (1000000000 / runs[l]));
 
-    flint_printf("%2ld, %4XYXYXYXY, %8ld, %wd\n", 
+    flint_printf("%2ld, %4XYXYXYXY, %8ld, %wd\n",
         l, cputime, runs[l], T[l]);
 
     padic_clear(a);

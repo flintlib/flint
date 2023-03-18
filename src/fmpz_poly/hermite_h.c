@@ -16,28 +16,28 @@ void
 _fmpz_poly_hermite_h(fmpz * coeffs, ulong n)
 {
     long k;
-    
+
     if (n == 0)
     {
         fmpz_one(coeffs);
         return;
     }
-    
+
     if (n == 1)
     {
         fmpz_zero(coeffs);
         fmpz_set_ui(coeffs + 1, 2);
         return;
     }
-    
+
     for (k = n & 1; k < n; k += 2)
     {
         fmpz_zero(coeffs + k);
     }
-    
+
     fmpz_one(coeffs + n);
     fmpz_mul_2exp(coeffs + n, coeffs + n, n);
-    
+
     for (k = n - 2; k >= 0; k -= 2)
     {
         fmpz_mul2_uiui(coeffs + k, coeffs + k+2, k+1, k+2);

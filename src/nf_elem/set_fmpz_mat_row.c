@@ -21,7 +21,7 @@
 #include "nf_elem.h"
 #include "fmpq_poly.h"
 
-void nf_elem_set_fmpz_mat_row(nf_elem_t b, const fmpz_mat_t M, 
+void nf_elem_set_fmpz_mat_row(nf_elem_t b, const fmpz_mat_t M,
                                       const slong i, fmpz_t den, const nf_t nf)
 {
    if (nf->flag & NF_LINEAR)
@@ -39,7 +39,7 @@ void nf_elem_set_fmpz_mat_row(nf_elem_t b, const fmpz_mat_t M,
       fmpz_set(bnum, fmpz_mat_entry(M, i, 0));
       fmpz_set(bnum + 1, fmpz_mat_entry(M, i, 1));
       fmpz_set(QNF_ELEM_DENREF(b), den);
-      
+
       fmpz_gcd(d, bnum, bnum + 1);
 
       if (!fmpz_is_one(d))

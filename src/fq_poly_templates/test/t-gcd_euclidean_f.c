@@ -26,7 +26,7 @@ main(void)
     /*
        Compare with the usual GCD function.
 
-       N.B.  I checked by hand that this test shows both outcomes, 
+       N.B.  I checked by hand that this test shows both outcomes,
        i.e. trivial and non-trivial factors, sufficiently frequently.
      */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)

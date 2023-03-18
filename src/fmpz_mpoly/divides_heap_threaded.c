@@ -26,7 +26,7 @@ typedef struct _fmpz_mpoly_ts_struct
     volatile slong length;
     slong alloc;
     flint_bitcnt_t bits;
-    flint_bitcnt_t idx;    
+    flint_bitcnt_t idx;
     ulong * exp_array[FLINT_BITS];
     fmpz * coeff_array[FLINT_BITS];
 } fmpz_mpoly_ts_struct;
@@ -89,7 +89,7 @@ void fmpz_mpoly_ts_clear(fmpz_mpoly_ts_t A)
         if (A->exp_array[i] != NULL)
         {
             FLINT_ASSERT(A->coeff_array[i] != NULL);
-            flint_free(A->coeff_array[i]);    
+            flint_free(A->coeff_array[i]);
             flint_free(A->exp_array[i]);
         }
     }
@@ -422,7 +422,7 @@ slong _fmpz_mpoly_mulsub_stripe1(fmpz ** A_coeff, ulong ** A_exp, slong * A_allo
         hind[i] = 2*startidx + 1;
 
         if (  (startidx < endidx)
-           && (((ulong)startidx) < prev_startidx) 
+           && (((ulong)startidx) < prev_startidx)
            )
         {
             x = chain + i;
@@ -707,7 +707,7 @@ slong _fmpz_mpoly_mulsub_stripe(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc
         hind[i] = 2*startidx + 1;
 
         if (  (startidx < endidx)
-           && (((ulong)startidx) < prev_startidx) 
+           && (((ulong)startidx) < prev_startidx)
            )
         {
             x = chain + i;
@@ -1227,7 +1227,7 @@ slong _fmpz_mpoly_divides_stripe1(
                 hind[x->i] |= 1;
             }
         }
-        s = 1;      
+        s = 1;
         Qlen++;
     }
 
@@ -1591,10 +1591,10 @@ slong _fmpz_mpoly_divides_stripe(
             }
             else
             {
-                hind[x->i] |= 1;                
+                hind[x->i] |= 1;
             }
         }
-        s = 1;      
+        s = 1;
         Qlen++;
     }
 

@@ -66,9 +66,9 @@ main(void)
     }
 
 
-    /* 
-       Find coprime polys, multiply by another poly 
-       and check the GCD is that poly 
+    /*
+       Find coprime polys, multiply by another poly
+       and check the GCD is that poly
      */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {

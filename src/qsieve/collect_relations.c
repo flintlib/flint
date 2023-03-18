@@ -107,7 +107,7 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
     memset(sieve, qs_inf->sieve_fill, qs_inf->sieve_size + sizeof(ulong));
     sieve[qs_inf->sieve_size] = (char) 255;
 
-    /* 
+    /*
        initial values for positions (which must be saved at the end of each
        sieve block in preparation for start of next sieve block)
     */
@@ -149,7 +149,7 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
 
             while (pos < Bp)
             {
-                (*pos) += size, 
+                (*pos) += size,
                 (*(pos + d1)) += size, pos += p;
             }
 
@@ -158,8 +158,8 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
                 (*pos) += size, pos += d1;
                 posn2[pind] = d2;
             }
-            else 
-            { 
+            else
+            {
                 posn2[pind] = d1;
             }
 
@@ -230,8 +230,8 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
    fmpz_init(p);
    fmpz_init(C);
 
-   qsieve_compute_C(C, qs_inf, poly);   
-      
+   qsieve_compute_C(C, qs_inf, poly);
+
    fmpz_set_si(X, i - qs_inf->sieve_size / 2); /* X */
 
    fmpz_mul(Y, X, qs_inf->A);
@@ -379,7 +379,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
          pthread_mutex_lock(&qs_inf->mutex);
 #endif
 	 qsieve_write_to_file(qs_inf, 1, Y, poly);
-         
+
          qs_inf->full_relation++;
 
 #if FLINT_USES_PTHREAD
@@ -400,12 +400,12 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
           if (fmpz_bits(res) <= 30)
           {
               prime = fmpz_get_ui(res);
-              
+
               /*
                  a large prime is taken heuristically to be < 60 times largest
                  FB prime; skip values not coprime with multiplier, as this
                  will lead to factors of kn, not n
-              */ 
+              */
               if (prime < 60*factor_base[qs_inf->num_primes - 1].p && n_gcd(prime, qs_inf->k) == 1)
               {
                   for (k = 0; k < qs_inf->s; k++)  /* commit any outstanding A factors */
@@ -473,7 +473,7 @@ slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
         {
             j++; /* advance to next word */
         }
-        
+
         i = j * sizeof(ulong);
 
         /* check bytes individually in word */
@@ -485,10 +485,10 @@ slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
 
             i++;
         }
-        
+
         j++;
     }
-    
+
     return rels;
 }
 

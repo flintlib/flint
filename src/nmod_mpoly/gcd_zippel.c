@@ -141,7 +141,7 @@ int nmod_mpolyu_gcdm_zippel_bivar(
             }
             else if (Geval->exps[0] < H->exps[0])
             {
-                n_poly_one(modulus);                
+                n_poly_one(modulus);
             }
         }
 

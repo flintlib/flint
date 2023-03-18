@@ -21,7 +21,7 @@ TEMPLATE(T, div)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op1,
     TEMPLATE(T, init)(inv, ctx);
     TEMPLATE(T, inv)(inv, op2, ctx);
     TEMPLATE(T, mul)(rop, op1, inv, ctx);
-    TEMPLATE(T, clear)(inv, ctx);    
+    TEMPLATE(T, clear)(inv, ctx);
 }
 
 #endif

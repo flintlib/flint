@@ -11,7 +11,7 @@
 
 #include "fmpz_mod_mpoly.h"
 
-void fmpz_mod_mpoly_get_term_exp_si(slong * exp, const fmpz_mod_mpoly_t A, 
+void fmpz_mod_mpoly_get_term_exp_si(slong * exp, const fmpz_mod_mpoly_t A,
                                        slong i, const fmpz_mod_mpoly_ctx_t ctx)
 {
     slong N = mpoly_words_per_exp(A->bits, ctx->minfo);

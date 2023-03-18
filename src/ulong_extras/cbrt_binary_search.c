@@ -35,7 +35,7 @@ n_cbrt_binary_search(mp_limb_t x)
         high = upper_limit;
 
     /* binary search for cube root */
-        
+
     while (low < high)
     {
         mid = (high + low) / 2;

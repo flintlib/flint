@@ -13,7 +13,7 @@
 #include "aprcl.h"
 
 /*
-    Computes f = g * h for p = 11. 
+    Computes f = g * h for p = 11.
     g and h must be reduced by F_11 cyclotomic polynomial.
     t is the memory for fmpz_t; size of t must be > 60.
     Resulting f reduced by F_11 cyclotomic polynomial.
@@ -30,7 +30,7 @@ unity_zp_mul11(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
 
         x0 = t[40]; ... ; x9 = t[49];
         y0 = t[50]; ... ; y9 = t[59];
-        
+
         for auxiliary routine 4:
         a0 = t[0]; ... ; a4 = t[4];
         c0 = t[5]; ... ; c8 = t[13];
@@ -60,7 +60,7 @@ unity_zp_mul11(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
         fmpz_add(t[5 + i], t[50 + i], t[55 + i]);
     }
 
-    /* 
+    /*
         apply auxiliary routine 3 with (a0, ... , a4) and (b0, ... , b4)
         store result in (c0, ... , c8)
     */
@@ -77,7 +77,7 @@ unity_zp_mul11(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
         fmpz_mod_poly_get_coeff_fmpz(t[5 + i], h->poly, i, h->ctx);
     }
 
-    /* 
+    /*
         apply auxiliary routine 3 with (a0, ... , a4) and (b0, ... , b4)
         store result in (c0, ... , c8)
     */
@@ -87,14 +87,14 @@ unity_zp_mul11(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
     for (i = 0; i < 9; i++)
         fmpz_set(t[50 + i], t[10 + i]);
 
-    /* set ai = x{i + 5} and bi = y{i + 5} */ 
+    /* set ai = x{i + 5} and bi = y{i + 5} */
     for (i = 0; i < 5; i++)
     {
         fmpz_mod_poly_get_coeff_fmpz(t[i], g->poly, 5 + i, g->ctx);
         fmpz_mod_poly_get_coeff_fmpz(t[5 + i], h->poly, 5 + i, h->ctx);
     }
 
-    /* 
+    /*
         apply auxiliary routine 3 with (a0, ... , a4) and (b0, ... , b4)
         store result in (c0, ... , c8)
     */

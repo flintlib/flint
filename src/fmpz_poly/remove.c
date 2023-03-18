@@ -72,7 +72,7 @@ fmpz_poly_remove(fmpz_poly_t res, const fmpz_poly_t poly1,
         fmpz_poly_init(p);
 
         fmpz_poly_pow(p, poly2, i);
-    
+
         while (i > 0 && !fmpz_poly_divides(q, poly1, p))
         {
 	    fmpz_poly_div(p, p, poly2);

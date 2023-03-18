@@ -25,7 +25,7 @@ _nmod_poly_compose_mod(mp_ptr res,
 }
 
 void
-nmod_poly_compose_mod(nmod_poly_t res, 
+nmod_poly_compose_mod(nmod_poly_t res,
                     const nmod_poly_t poly1, const nmod_poly_t poly2,
                     const nmod_poly_t poly3)
 {

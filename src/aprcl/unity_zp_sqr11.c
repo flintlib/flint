@@ -13,7 +13,7 @@
 #include "aprcl.h"
 
 /*
-    Computes f = g * g for p = 11. 
+    Computes f = g * g for p = 11.
     g must be reduced by F_11 cyclotomic polynomial.
     t is the memory for fmpz_t; size of t must be > 69.
     Resulting f reduced by F_11 cyclotomic polynomial.
@@ -28,7 +28,7 @@ unity_zp_sqr11(unity_zp f, const unity_zp g, fmpz_t * t)
         f = (y0, ... , y9);
 
         x0 = t[30]; ... ; x9 = t[39];
-        
+
         for auxiliary routine 4:
         a0 = t[0]; ... ; a4 = t[4];
         c0 = t[5]; ... ; c8 = t[13];
@@ -53,7 +53,7 @@ unity_zp_sqr11(unity_zp f, const unity_zp g, fmpz_t * t)
     fmpz_set(t[3], t[33]);                  /*  set a3 = x3     */
     fmpz_set(t[4], t[34]);                  /*  set a4 = x4     */
 
-    /* 
+    /*
         apply auxiliary routine 4 with (a0, .. , a4)
         store result in (c0, .. , c8)
     */
@@ -69,7 +69,7 @@ unity_zp_sqr11(unity_zp f, const unity_zp g, fmpz_t * t)
     fmpz_set(t[3], t[38]);                  /*  set a3 = x8     */
     fmpz_set(t[4], t[39]);                  /*  set a4 = x9     */
 
-    /* 
+    /*
         apply auxiliary routine 4 with (a0, ... , a4)
         store result in (c0, ... , c8)
     */
@@ -91,7 +91,7 @@ unity_zp_sqr11(unity_zp f, const unity_zp g, fmpz_t * t)
     fmpz_mul_2exp(t[8], t[33], 1);          /*  b3 = 2 * x3     */
     fmpz_mul_2exp(t[9], t[34], 1);          /*  b4 = 2 * x4     */
 
-    /* 
+    /*
         apply auxiliary routine 3 with (a0, ... , a4) and (b0, ... , b4)
         store result in (c0, ... , c8)
     */

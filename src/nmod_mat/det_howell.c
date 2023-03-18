@@ -109,10 +109,10 @@ mp_limb_t _nmod_mat_det_howell(nmod_mat_t A)
     while (row < n && col < m)
     {
         int pivswap = _nmod_mat_pivot(A, row, col);
-	
+
 	if (pivswap == 0)
             return 0;
-        
+
 	if (pivswap == -1)
            det = nmod_neg(det, mod);
 
@@ -138,11 +138,11 @@ mp_limb_t _nmod_mat_det_howell(nmod_mat_t A)
 
                 for (k = col; k < m; k++)
                 {
-		    
+
                     t1 = nmod_sub(nmod_mul(s, nmod_mat_entry(A, row, k), mod), nmod_mul(t, nmod_mat_entry(A, i, k), mod), mod);
                     nmod_mat_entry(A, row, k) = t1;
                 }
-                
+
 		/* now it's divisible, restart this row */
                 i--;
 		continue;

@@ -25,7 +25,7 @@
    the case of a degree ordering) to facilitate the reverse ordering in
    degrevlex. Division is from left to right with a heap with largest
    exponent at the head. Quotient poly is written in order.
-   [1] http://www.cecm.sfu.ca/~rpearcea/sdmp/sdmp_paper.pdf 
+   [1] http://www.cecm.sfu.ca/~rpearcea/sdmp/sdmp_paper.pdf
 */
 slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
                 slong * allocq, const fmpz * poly2, const ulong * exp2,
@@ -78,7 +78,7 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
 
     /* see description of divisor heap division in paper */
     s = len3;
-   
+
     /* insert (-1, 0, exp2[0]) into heap */
     x = chain + 0;
     x->i = -WORD(1);
@@ -157,7 +157,7 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
         {
             /* general coeff arithmetic */
 
-            fmpz_zero(acc_lg);  
+            fmpz_zero(acc_lg);
             do
             {
                 x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
@@ -238,7 +238,7 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
 
             /* d1:d0 = abs(acc_sm[1:0]) assuming ds is sign extension of acc_sm[1] */
             sub_ddmmss(d1, d0, acc_sm[1]^ds, acc_sm[0]^ds, ds, ds);
-            
+
             if ((acc_sm[0] | acc_sm[1] | acc_sm[2]) == 0)
                 continue;
 
@@ -328,7 +328,7 @@ exp_overflow:
 
 slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
            ulong ** expq, slong * allocq, const fmpz * poly2,
-   const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, 
+   const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3,
                    slong len3, slong bits, slong N, const ulong * cmpmask)
 {
     slong i, j, q_len, s;
@@ -394,10 +394,10 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
     mask = bits <= FLINT_BITS ? mpoly_overflow_mask_sp(bits) : 0;
 
     q_len = WORD(0);
-   
+
     /* s is the number of terms * (latest quotient) we should put into heap */
     s = len3;
-   
+
     /* insert (-1, 0, exp2[0]) into heap */
     x = chain + 0;
     x->i = -WORD(1);
@@ -592,7 +592,7 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
 
             /* d1:d0 = abs(acc_sm[1:0]) assuming ds is sign extension of acc_sm[1] */
             sub_ddmmss(d1, d0, acc_sm[1]^ds, acc_sm[0]^ds, ds, ds);
-            
+
             if ((acc_sm[0] | acc_sm[1] | acc_sm[2]) == 0)
             {
                 continue;
@@ -662,7 +662,7 @@ large_lt_divides:
             else
                 mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
                                                          q_exp + x->j*N, N);
-        
+
             exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
         }
@@ -692,7 +692,7 @@ exp_overflow:
 
 }
 
-void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2, 
+void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
                           const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 {
     slong exp_bits, N, lenq = 0;
@@ -761,7 +761,7 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
 
    /* do division without remainder */
    while ((lenq = _fmpz_mpoly_div_monagan_pearce(&tq->coeffs, &tq->exps,
-                         &tq->alloc, poly2->coeffs, exp2, poly2->length, 
+                         &tq->alloc, poly2->coeffs, exp2, poly2->length,
                                      poly3->coeffs, exp3, poly3->length,
                                       exp_bits, N, cmpmask)) == -WORD(1)  )
    {
@@ -788,7 +788,7 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
       if (free3)
          flint_free(old_exp3);
 
-      free2 = free3 = 1; 
+      free2 = free3 = 1;
 
       fmpz_mpoly_fit_bits(tq, exp_bits, ctx);
       tq->bits = exp_bits;
@@ -799,7 +799,7 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
    {
       fmpz_mpoly_swap(temp1, q, ctx);
       fmpz_mpoly_clear(temp1, ctx);
-   } 
+   }
 
    _fmpz_mpoly_set_length(q, lenq, ctx);
 

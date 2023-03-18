@@ -29,7 +29,7 @@ int main(void)
     fmpz_init(x);
     fmpz_init(y);
     fmpz_init(z);
-    
+
 
     for (i = 0; i < 100; i++)
     {
@@ -92,7 +92,7 @@ int main(void)
         flint_abort();
     }
 
-    
+
 
     fmpz_clear(x);
     fmpz_clear(y);

@@ -11,8 +11,8 @@
 
 #include "qadic.h"
 
-void _qadic_log(fmpz *z, const fmpz *y, slong v, slong len, 
-                const fmpz *a, const slong *j, slong lena, 
+void _qadic_log(fmpz *z, const fmpz *y, slong v, slong len,
+                const fmpz *a, const slong *j, slong lena,
                 const fmpz_t p, slong N, const fmpz_t pN)
 {
     if (N < (WORD(1) < 10) / (slong) fmpz_bits(p))
@@ -71,7 +71,7 @@ int qadic_log(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
                 {
                     padic_poly_fit_length(rop, d);
 
-                    _qadic_log(rop->coeffs, x, v, len, 
+                    _qadic_log(rop->coeffs, x, v, len,
                                ctx->a, ctx->j, ctx->len, p, N, pN);
                     rop->val = 0;
 

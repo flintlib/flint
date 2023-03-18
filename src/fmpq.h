@@ -14,7 +14,7 @@
 #define FMPQ_H
 
 #ifdef FMPQ_INLINES_C
-#define FMPQ_INLINE 
+#define FMPQ_INLINE
 #else
 #define FMPQ_INLINE static __inline__
 #endif
@@ -222,7 +222,7 @@ void _fmpq_add(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
 
 void fmpq_add(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
 
-void _fmpq_add_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, 
+void _fmpq_add_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p,
                                                       const fmpz_t q, slong r);
 
 void fmpq_add_si(fmpq_t res, const fmpq_t op1, slong c);
@@ -232,7 +232,7 @@ void _fmpq_add_ui(fmpz_t rnum, fmpz_t rden, const fmpz_t p,
 
 void fmpq_add_ui(fmpq_t res, const fmpq_t op1, ulong c);
 
-void _fmpq_add_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, 
+void _fmpq_add_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p,
                                                const fmpz_t q, const fmpz_t r);
 
 void fmpq_add_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c);
@@ -242,7 +242,7 @@ void _fmpq_sub(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
 
 void fmpq_sub(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
 
-void _fmpq_sub_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, 
+void _fmpq_sub_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p,
                                                       const fmpz_t q, slong r);
 
 void fmpq_sub_si(fmpq_t res, const fmpq_t op1, slong c);
@@ -252,7 +252,7 @@ void _fmpq_sub_ui(fmpz_t rnum, fmpz_t rden, const fmpz_t p,
 
 void fmpq_sub_ui(fmpq_t res, const fmpq_t op1, ulong c);
 
-void _fmpq_sub_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, 
+void _fmpq_sub_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p,
                                                const fmpz_t q, const fmpz_t r);
 
 void fmpq_sub_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c);
@@ -275,7 +275,7 @@ void fmpq_mul(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
 
 void fmpq_mul_fmpz(fmpq_t res, const fmpq_t op, const fmpz_t x);
 
-void _fmpq_pow_si(fmpz_t rnum, fmpz_t rden, 
+void _fmpq_pow_si(fmpz_t rnum, fmpz_t rden,
                   const fmpz_t opnum, const fmpz_t opden, slong e);
 
 void fmpq_pow_si(fmpq_t rop, const fmpq_t op, slong e);
@@ -327,10 +327,10 @@ _fmpq_gcd(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q,
    fmpz_clear(a); fmpz_clear(b);
 }
 
-FMPQ_INLINE void 
+FMPQ_INLINE void
 fmpq_gcd(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
 {
-    _fmpq_gcd(fmpq_numref(res), fmpq_denref(res), fmpq_numref(op1), 
+    _fmpq_gcd(fmpq_numref(res), fmpq_denref(res), fmpq_numref(op1),
               fmpq_denref(op1), fmpq_numref(op2), fmpq_denref(op2));
 }
 

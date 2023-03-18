@@ -15,7 +15,7 @@
 #include "gr_poly.h"
 #include "mpn_extras.h"
 
-slong _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T, 
+slong _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T,
                      mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
 {
     slong cutoff = NMOD_BITS(mod) <= 8 ? NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;

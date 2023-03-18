@@ -82,7 +82,7 @@ typedef struct _nmod_mpoly_ts_struct
     volatile slong length;
     slong alloc;
     flint_bitcnt_t bits;
-    flint_bitcnt_t idx;    
+    flint_bitcnt_t idx;
     mp_limb_t * exp_array[FLINT_BITS];
     ulong * coeff_array[FLINT_BITS];
 } nmod_mpoly_ts_struct;
@@ -124,7 +124,7 @@ static void nmod_mpoly_ts_clear(nmod_mpoly_ts_t A)
         if (A->exp_array[i] != NULL)
         {
             FLINT_ASSERT(A->coeff_array[i] != NULL);
-            flint_free(A->coeff_array[i]);    
+            flint_free(A->coeff_array[i]);
             flint_free(A->exp_array[i]);
         }
     }
@@ -322,7 +322,7 @@ static int divides_heap_base_clear(nmod_mpoly_t Q, divides_heap_base_t H)
         Q->length = A->length;
         Q->coeffs_alloc = A->alloc;
         Q->exps_alloc = N*A->alloc;
-        
+
         A->coeff_array[A->idx] = NULL;
         A->exp_array[A->idx] = NULL;
         nmod_mpoly_ts_clear(A);
@@ -448,7 +448,7 @@ static void _nmod_mpoly_mulsub_stripe1(
         hind[i] = 2*startidx + 1;
 
         if (  (startidx < endidx)
-           && (((ulong)startidx) < prev_startidx) 
+           && (((ulong)startidx) < prev_startidx)
            )
         {
             x = chain + i;
@@ -679,7 +679,7 @@ static void _nmod_mpoly_mulsub_stripe(
         hind[i] = 2*startidx + 1;
 
         if (  (startidx < endidx)
-           && (((ulong)startidx) < prev_startidx) 
+           && (((ulong)startidx) < prev_startidx)
            )
         {
             x = chain + i;
@@ -922,7 +922,7 @@ static int _nmod_mpoly_divides_stripe1(
                 {
                     hind[x->i] |= WORD(1);
                     umul_ppmm(pp1, pp0, Bcoeff[x->i], Qcoeff[x->j]);
-                    add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);                    
+                    add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);
                 }
             } while ((x = x->next) != NULL);
         } while (heap_len > 1 && heap[1].exp == exp);
@@ -1034,7 +1034,7 @@ static int _nmod_mpoly_divides_stripe1(
                 hind[x->i] |= 1;
             }
         }
-        s = 1;      
+        s = 1;
         Qlen++;
     }
 
@@ -1166,7 +1166,7 @@ static int _nmod_mpoly_divides_stripe(
                 {
                     hind[x->i] |= WORD(1);
                     umul_ppmm(pp1, pp0, Bcoeff[x->i], Qcoeff[x->j]);
-                    add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);                    
+                    add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);
                 }
             } while ((x = x->next) != NULL);
         } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
@@ -1282,10 +1282,10 @@ static int _nmod_mpoly_divides_stripe(
             }
             else
             {
-                hind[x->i] |= 1;                
+                hind[x->i] |= 1;
             }
         }
-        s = 1;      
+        s = 1;
         Qlen++;
     }
 

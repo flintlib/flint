@@ -53,24 +53,24 @@ main(void)
         fmpq_poly_clear(a);
         fmpq_poly_clear(b);
     }
-    
+
     /* Check if derivative is correct */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b;
-            
+
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_randtest(a, state, n_randint(state, 100), 200);
-        
+
         nth = n_randint(state, 100);
-        
+
         fmpq_poly_nth_derivative(b, a, nth);
         for (j = 0; j < nth; j ++)
         {
             fmpq_poly_derivative(a, a);
         }
-        
+
         result = (fmpq_poly_equal(a, b));
         if (!result)
         {
@@ -79,13 +79,13 @@ main(void)
             fmpq_poly_print(b), flint_printf("\n\n");
             flint_abort();
         }
-        
+
         fmpq_poly_clear(a);
         fmpq_poly_clear(b);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

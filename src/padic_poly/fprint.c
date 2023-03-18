@@ -12,7 +12,7 @@
 
 #include "padic_poly.h"
 
-int _padic_poly_fprint(FILE *file, const fmpz *poly, slong val, slong len, 
+int _padic_poly_fprint(FILE *file, const fmpz *poly, slong val, slong len,
                        const padic_ctx_t ctx)
 {
     slong i, v;
@@ -49,7 +49,7 @@ int _padic_poly_fprint(FILE *file, const fmpz *poly, slong val, slong len,
     return 1;
 }
 
-int padic_poly_fprint(FILE *file, const padic_poly_t poly, 
+int padic_poly_fprint(FILE *file, const padic_poly_t poly,
                       const padic_ctx_t ctx)
 {
     _padic_poly_fprint(file, poly->coeffs, poly->val, poly->length, ctx);

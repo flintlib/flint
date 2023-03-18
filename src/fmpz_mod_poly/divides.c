@@ -13,16 +13,16 @@
 #include "fmpz_mod_vec.h"
 #include "fmpz_mod_poly.h"
 
-int _fmpz_mod_poly_divides(fmpz * Q, const fmpz * A, slong lenA, 
+int _fmpz_mod_poly_divides(fmpz * Q, const fmpz * A, slong lenA,
                           const fmpz * B, slong lenB, const fmpz_mod_ctx_t ctx)
-{    
+{
     fmpz * R;
     fmpz_t invB;
     slong i, lenQ = lenA - lenB + 1;
     int res = 1;
     const fmpz * p = fmpz_mod_ctx_modulus(ctx);
 
-    if (lenA < 40 && lenB < 20) 
+    if (lenA < 40 && lenB < 20)
         return _fmpz_mod_poly_divides_classical(Q, A, lenA, B, lenB, ctx);
 
     R = _fmpz_vec_init(lenB - 1);
@@ -125,7 +125,7 @@ int fmpz_mod_poly_divides(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
         fmpz_mod_poly_swap(tQ, Q, ctx);
         fmpz_mod_poly_clear(tQ, ctx);
     }
-    
+
     _fmpz_mod_poly_set_length(Q, lenA - lenB + 1);
     _fmpz_mod_poly_normalise(Q);
 

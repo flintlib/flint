@@ -26,17 +26,17 @@ _nmod_poly_pow_binexp(mp_ptr res, mp_srcptr poly, slong len, ulong e, nmod_t mod
     /*
        Set bits to the bitmask with a 1 one place lower than the msb of e
      */
-    
+
     while ((bit & e) == UWORD(0))
         bit >>= 1;
-    
+
     bit >>= 1;
-    
+
     /*
-       Trial run without any polynomial arithmetic to determine the parity 
+       Trial run without any polynomial arithmetic to determine the parity
        of the number of swaps;  then set R and S accordingly
      */
-    
+
     {
         unsigned int swaps = 0U;
         ulong bit2 = bit;
@@ -45,7 +45,7 @@ _nmod_poly_pow_binexp(mp_ptr res, mp_srcptr poly, slong len, ulong e, nmod_t mod
         while (bit2 >>= 1)
             if ((bit2 & e) == UWORD(0))
                 swaps = ~swaps;
-        
+
         if (swaps == 0U)
         {
             R = res;
@@ -57,11 +57,11 @@ _nmod_poly_pow_binexp(mp_ptr res, mp_srcptr poly, slong len, ulong e, nmod_t mod
             S = res;
         }
     }
-    
+
     /*
        We unroll the first step of the loop, referring to {poly, len}
      */
-    
+
     _nmod_poly_mul(R, poly, len, poly, len, mod);
     rlen = 2 * len - 1;
     if ((bit & e))
@@ -72,7 +72,7 @@ _nmod_poly_pow_binexp(mp_ptr res, mp_srcptr poly, slong len, ulong e, nmod_t mod
         R = S;
         S = T;
     }
-    
+
     while ((bit >>= 1))
     {
         if ((bit & e))
@@ -91,7 +91,7 @@ _nmod_poly_pow_binexp(mp_ptr res, mp_srcptr poly, slong len, ulong e, nmod_t mod
             S = T;
         }
     }
-    
+
     _nmod_vec_clear(v);
 }
 

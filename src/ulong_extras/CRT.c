@@ -28,7 +28,7 @@ ulong n_CRT(ulong A1, ulong M1, ulong A2, ulong M2)
 
     fmpz_CRT(r, a1, m1, a2, m2, 0);
     FLINT_ASSERT(fmpz_abs_fits_ui(r));
-    R = fmpz_get_ui(r);   
+    R = fmpz_get_ui(r);
 
     fmpz_clear(r);
     fmpz_clear(a1);

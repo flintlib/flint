@@ -1,7 +1,7 @@
 /*
     Copyright (C) 2012 Fredrik Johansson
     Copyright (C) 2018 William Hart
-    
+
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
@@ -56,7 +56,7 @@ main(void)
         sqrtrem1 = fmpz_poly_sqrtrem_classical(b, r1, a);
         sqrtrem2 = fmpz_poly_sqrtrem_classical(a, r2, a);
 
-        if ((sqrtrem1 != sqrtrem2) || 
+        if ((sqrtrem1 != sqrtrem2) ||
             (sqrtrem1 && (!fmpz_poly_equal(a, b) || !fmpz_poly_equal(r1, r2))))
         {
             flint_printf("FAIL: aliasing:\n");
@@ -94,7 +94,7 @@ main(void)
             fmpz_poly_randtest(a, state, len + 1, 1 + n_randint(state, 200));
             fmpz_poly_randtest(c, state, len, 1 + n_randint(state, 200));
         } while (fmpz_poly_length(a) == fmpz_poly_length(c));
-        
+
         if (fmpz_poly_length(a) < fmpz_poly_length(c))
            fmpz_poly_swap(a, c);
 
@@ -107,7 +107,7 @@ main(void)
         sqrtrem1 = fmpz_poly_sqrtrem_classical(b, r, a);
         sqrtrem2 = fmpz_poly_sqrtrem_classical(c, a, a);
 
-        if ((sqrtrem1 != sqrtrem2) || 
+        if ((sqrtrem1 != sqrtrem2) ||
             (sqrtrem1 && (!fmpz_poly_equal(a, r) || !fmpz_poly_equal(b, c))))
         {
             flint_printf("FAIL: aliasing2:\n");
@@ -145,7 +145,7 @@ main(void)
             fmpz_poly_randtest(a, state, len + 1, 1 + n_randint(state, 200));
             fmpz_poly_randtest(r1, state, len, 1 + n_randint(state, 200));
         } while (fmpz_poly_length(a) == fmpz_poly_length(r1));
-    
+
         if (fmpz_poly_length(a) < fmpz_poly_length(r1))
            fmpz_poly_swap(a, r1);
 
@@ -199,7 +199,7 @@ main(void)
         fmpz_poly_clear(r1);
         fmpz_poly_clear(r2);
     }
-    
+
     flint_printf("PASS\n");
     FLINT_TEST_CLEANUP(state);
     return 0;

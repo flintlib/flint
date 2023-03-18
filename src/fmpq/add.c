@@ -376,9 +376,9 @@ _fmpq_add_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q,
     if (fmpz_is_one(q))
     {
         fmpz_add(rnum, p, r);
-        
+
         fmpz_set(rden, q);
-        
+
         return;
     }
 
@@ -389,7 +389,7 @@ _fmpq_add_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q,
     Note (p + q*r, q) is in canonical form.
 
     */
-    
+
     fmpz_init(u);
 
     fmpz_mul(u, q, r);
@@ -426,7 +426,7 @@ _fmpq_add_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q,
            fmpz_sub_ui(rnum, p, -r);
 
         fmpz_set(rden, q);
-        
+
         return;
     }
 
@@ -437,7 +437,7 @@ _fmpq_add_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q,
     Note (p + q*r, q) is in canonical form.
 
     */
-    
+
     fmpz_init(u);
 
     fmpz_mul_si(u, q, r);
@@ -480,7 +480,7 @@ _fmpq_add_ui(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q,
     Note (p + q*r, q) is in canonical form.
 
     */
-    
+
     fmpz_init(u);
 
     fmpz_mul_ui(u, q, r);

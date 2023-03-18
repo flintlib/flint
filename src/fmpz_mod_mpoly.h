@@ -13,7 +13,7 @@
 #define FMPZ_MOD_MPOLY_H
 
 #ifdef FMPZ_MOD_MPOLY_INLINES_C
-#define FMPZ_MOD_MPOLY_INLINE 
+#define FMPZ_MOD_MPOLY_INLINE
 #else
 #define FMPZ_MOD_MPOLY_INLINE static __inline__
 #endif
@@ -45,7 +45,7 @@ typedef fmpz_mod_mpoly_univar_struct fmpz_mod_mpoly_univar_t[1];
 
 /* Context object ************************************************************/
 
-void fmpz_mod_mpoly_ctx_init(fmpz_mod_mpoly_ctx_t ctx, 
+void fmpz_mod_mpoly_ctx_init(fmpz_mod_mpoly_ctx_t ctx,
                       slong nvars, const ordering_t ord, const fmpz_t modulus);
 
 void fmpz_mod_mpoly_ctx_init_rand(fmpz_mod_mpoly_ctx_t ctx,
@@ -145,7 +145,7 @@ void _fmpz_mod_mpoly_fit_length(
 }
 
 FMPZ_MOD_MPOLY_INLINE
-void _fmpz_mod_mpoly_set_length(fmpz_mod_mpoly_t A, slong newlen, 
+void _fmpz_mod_mpoly_set_length(fmpz_mod_mpoly_t A, slong newlen,
                                                 const fmpz_mod_mpoly_ctx_t ctx)
 {
     FLINT_ASSERT(newlen <= A->coeffs_alloc);
@@ -155,7 +155,7 @@ void _fmpz_mod_mpoly_set_length(fmpz_mod_mpoly_t A, slong newlen,
 }
 
 FMPZ_MOD_MPOLY_INLINE
-void fmpz_mod_mpoly_truncate(fmpz_mod_mpoly_t A, slong newlen, 
+void fmpz_mod_mpoly_truncate(fmpz_mod_mpoly_t A, slong newlen,
                                                 const fmpz_mod_mpoly_ctx_t ctx)
 {
     if (A->length > newlen)

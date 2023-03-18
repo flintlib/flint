@@ -26,7 +26,7 @@ void sample_ndiv_qr(void * arg, ulong count)
     fmpz_init(r);
     fmpz_init(a);
     fmpz_init(b);
-    
+
     fmpz_init(nmax);
     fmpz_set_d_2exp(nmax, 1.0, FLINT_BITS);
 
@@ -66,7 +66,7 @@ void sample_fdiv_qr(void * arg, ulong count)
     fmpz_init(r);
     fmpz_init(a);
     fmpz_init(b);
-    
+
     fmpz_init(nmax);
     fmpz_set_d_2exp(nmax, 1.0, FLINT_BITS);
 
@@ -106,7 +106,7 @@ void sample_cdiv_qr(void * arg, ulong count)
     fmpz_init(r);
     fmpz_init(a);
     fmpz_init(b);
-    
+
     fmpz_init(nmax);
     fmpz_set_d_2exp(nmax, 1.0, FLINT_BITS);
 
@@ -146,7 +146,7 @@ void sample_tdiv_qr(void * arg, ulong count)
     fmpz_init(r);
     fmpz_init(a);
     fmpz_init(b);
-    
+
     fmpz_init(nmax);
     fmpz_set_d_2exp(nmax, 1.0, FLINT_BITS);
 

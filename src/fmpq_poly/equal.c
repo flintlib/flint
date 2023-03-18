@@ -16,7 +16,7 @@
 
 int fmpq_poly_equal(const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 {
-    return (poly1->length == poly2->length) 
+    return (poly1->length == poly2->length)
         && (fmpz_equal(poly1->den, poly2->den))
         && (_fmpz_vec_equal(poly1->coeffs, poly2->coeffs, poly1->length));
 }

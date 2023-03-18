@@ -21,8 +21,8 @@ main(void)
 {
     int i, result = 1;
     FLINT_TEST_INIT(state);
-    
-    
+
+
     flint_printf("interpolate_nmod_vec_barycentric....");
     fflush(stdout);
 
@@ -69,7 +69,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

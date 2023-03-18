@@ -20,7 +20,7 @@ int main(void)
     mp_ptr temp;
     gmp_randstate_t st;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("divides....");
     fflush(stdout);
 
@@ -30,7 +30,7 @@ int main(void)
     mpz_init(s);
     /* don't init g */
     gmp_randinit_default(st);
-    
+
 
     /* check if b divides a*b */
     for (i = 0; i < 10000; i++)
@@ -46,14 +46,14 @@ int main(void)
        } while (mpz_sgn(c) == 0);
 
        mpz_mul(c, a, b);
-       
+
        g->_mp_d = flint_malloc((c->_mp_size - b->_mp_size + 1)*sizeof(mp_limb_t));
        temp = flint_malloc(b->_mp_size * sizeof(mp_limb_t));
 
        result = flint_mpn_divides(g->_mp_d, c->_mp_d, c->_mp_size, b->_mp_d, b->_mp_size, temp);
        g->_mp_size = c->_mp_size - b->_mp_size + 1;
        g->_mp_size -= (g->_mp_d[g->_mp_size - 1] == 0);
-       
+
        result &= (mpz_cmp(g, a) == 0);
        if (!result)
        {
@@ -92,7 +92,7 @@ int main(void)
        temp = flint_malloc(b->_mp_size * sizeof(mp_limb_t));
 
        result = !flint_mpn_divides(g->_mp_d, c->_mp_d, c->_mp_size, b->_mp_d, b->_mp_size, temp);
-       
+
        if (!result)
        {
           flint_printf("FAIL:\n");
@@ -115,7 +115,7 @@ int main(void)
     /* don't clear g */
     gmp_randclear(st);
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

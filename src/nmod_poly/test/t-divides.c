@@ -18,7 +18,7 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("divides....");
     fflush(stdout);
 
@@ -36,7 +36,7 @@ main(void)
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
         nmod_poly_init(prod, n);
-        
+
         nmod_poly_randtest(a, state, n_randint(state, 1000));
         nmod_poly_randtest(b, state, n_randint(state, 1000));
 
@@ -57,7 +57,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         nmod_poly_clear(a);
         nmod_poly_clear(b);
         nmod_poly_clear(q);
@@ -78,7 +78,7 @@ main(void)
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
         nmod_poly_init(prod, n);
-        
+
         nmod_poly_randtest(a, state, n_randint(state, 1000));
         nmod_poly_randtest(b, state, n_randint(state, 1000));
         nmod_poly_mul(a, b, a);
@@ -99,7 +99,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         nmod_poly_clear(a);
         nmod_poly_clear(b);
         nmod_poly_clear(q);
@@ -119,7 +119,7 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
-        
+
         nmod_poly_randtest(a, state, n_randint(state, 300));
         nmod_poly_randtest(b, state, n_randint(state, 300));
 
@@ -138,7 +138,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         nmod_poly_clear(a);
         nmod_poly_clear(b);
         nmod_poly_clear(q);
@@ -157,7 +157,7 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
-        
+
         nmod_poly_randtest(a, state, n_randint(state, 300));
         nmod_poly_randtest(b, state, n_randint(state, 300));
 
@@ -176,14 +176,14 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         nmod_poly_clear(a);
         nmod_poly_clear(b);
         nmod_poly_clear(q);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

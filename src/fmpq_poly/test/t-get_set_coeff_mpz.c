@@ -76,7 +76,7 @@ main(void)
     mpq_clear(n2);
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -376,7 +376,7 @@ void flint_mpz_set_ui(mpz_ptr r, ulong u)
       r->_mp_alloc = 1;
    }
 
-   r->_mp_d[0] = u; 
+   r->_mp_d[0] = u;
    r->_mp_size = u != 0;
 }
 
@@ -401,7 +401,7 @@ void flint_mpz_init_set_ui(mpz_ptr r, ulong u)
    r->_mp_d = (mp_ptr) flint_malloc(sizeof(mp_limb_t));
    r->_mp_alloc = 1;
 
-   r->_mp_d[0] = u; 
+   r->_mp_d[0] = u;
    r->_mp_size = u != 0;
 }
 
@@ -409,7 +409,7 @@ static __inline__
 void flint_mpz_add_ui(mpz_ptr a, mpz_srcptr b, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
-   
+
    mpz_add(a, b, tc);
 }
 
@@ -417,7 +417,7 @@ static __inline__
 void flint_mpz_sub_ui(mpz_ptr a, mpz_srcptr b, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
-   
+
    mpz_sub(a, b, tc);
 }
 
@@ -425,7 +425,7 @@ static __inline__
 void flint_mpz_mul_ui(mpz_ptr a, mpz_srcptr b, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
-   
+
    mpz_mul(a, b, tc);
 }
 
@@ -433,7 +433,7 @@ static __inline__
 void flint_mpz_mul_si(mpz_ptr a, mpz_srcptr b, slong c)
 {
    FLINT_MOCK_MPZ_SI(tc, c);
-   
+
    mpz_mul(a, b, tc);
 }
 
@@ -441,7 +441,7 @@ static __inline__
 void flint_mpz_addmul_ui(mpz_ptr a, mpz_srcptr b, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
-   
+
    mpz_addmul(a, b, tc);
 }
 
@@ -449,7 +449,7 @@ static __inline__
 void flint_mpz_submul_ui(mpz_ptr a, mpz_srcptr b, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
-   
+
    mpz_submul(a, b, tc);
 }
 
@@ -457,7 +457,7 @@ static __inline__
 void flint_mpz_ui_sub(mpz_ptr a, ulong b, mpz_srcptr c)
 {
    FLINT_MOCK_MPZ_UI(tb, b);
-   
+
    mpz_sub(a, tb, c);
 }
 
@@ -465,7 +465,7 @@ static __inline__
 void flint_mpz_ui_pow_ui(mpz_ptr a, ulong b, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tb, b);
-   
+
    mpz_pow_ui(a, tb, c);
 }
 
@@ -473,7 +473,7 @@ static __inline__
 void flint_mpz_divexact_ui(mpz_ptr a, mpz_srcptr b, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
-   
+
    mpz_divexact(a, b, tc);
 }
 
@@ -481,7 +481,7 @@ static __inline__
 int flint_mpz_divisible_ui_p(mpz_srcptr a, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
-   
+
    return mpz_divisible_p(a, tc);
 }
 
@@ -491,7 +491,7 @@ int flint_mpz_congruent_ui_p(mpz_srcptr a, ulong b, ulong c)
    FLINT_MOCK_MPZ_UI(tc, c);
    {
       FLINT_MOCK_MPZ_UI(tb, b);
-   
+
       return mpz_congruent_p(a, tb, tc);
    }
 }
@@ -500,7 +500,7 @@ static __inline__
 int flint_mpz_cmp_ui(mpz_srcptr a, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
-   
+
    return mpz_cmp(a, tc);
 }
 
@@ -508,7 +508,7 @@ static __inline__
 int flint_mpz_cmp_si(mpz_srcptr a, slong c)
 {
    FLINT_MOCK_MPZ_SI(tc, c);
-   
+
    return mpz_cmp(a, tc);
 }
 
@@ -587,7 +587,7 @@ ulong flint_mpz_cdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
       mpz_t rz;
 
       mpz_init(rz);
-      
+
       FLINT_MOCK_MPZ_UI(tc, c);
 
       mpz_cdiv_qr(q, rz, n, tc);
@@ -598,7 +598,7 @@ ulong flint_mpz_cdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
 
       return r;
    }
-}    
+}
 
 static __inline__
 ulong flint_mpz_fdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
@@ -611,7 +611,7 @@ ulong flint_mpz_fdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
       mpz_t rz;
 
       mpz_init(rz);
-      
+
       FLINT_MOCK_MPZ_UI(tc, c);
 
       mpz_fdiv_qr(q, rz, n, tc);
@@ -635,7 +635,7 @@ ulong flint_mpz_tdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
       mpz_t rz;
 
       mpz_init(rz);
-      
+
       FLINT_MOCK_MPZ_UI(tc, c);
 
       mpz_tdiv_qr(q, rz, n, tc);
@@ -787,7 +787,7 @@ void flint_mpz_pow_ui(mpz_ptr r, mpz_srcptr b, ulong exp)
       printf("Exception (flint_mpz_pow_ui). Power too large.\n");
       flint_abort();
    }
-   
+
    mpz_pow_ui(r, b, (unsigned long) exp);
 }
 
@@ -798,7 +798,7 @@ void flint_mpz_fac_ui(mpz_ptr r, ulong n)
       printf("Exception (flint_mpz_fac_ui). Value n too large.\n");
       flint_abort();
    }
-   
+
    mpz_fac_ui(r, (unsigned long) n);
 }
 
@@ -809,12 +809,12 @@ void flint_mpz_bin_uiui(mpz_ptr r, ulong n, ulong k)
       printf("Exception (flint_mpz_bin_uiui). Value n too large.\n");
       flint_abort();
    }
-   
+
    if (k >= (UWORD(1) << 32)) {
       printf("Exception (flint_mpz_bin_uiui). Value k too large.\n");
       flint_abort();
    }
-   
+
    mpz_bin_uiui(r, (unsigned long) n, (unsigned long) k);
 }
 
@@ -825,7 +825,7 @@ void flint_mpz_fib_ui(mpz_ptr r, ulong n)
       printf("Exception (flint_mpz_fib_ui). Value n too large.\n");
       flint_abort();
    }
-   
+
    mpz_fib_ui(r, (unsigned long) n);
 }
 
@@ -991,7 +991,7 @@ int flint_mpf_cmp_ui(mpf_srcptr u, ulong vval)
 
   if (usize < 0)
     return -1;
-  
+
   if (vval == 0)
     return usize != 0;
 

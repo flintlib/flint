@@ -40,11 +40,11 @@ int main(void)
 
         fmpz_poly_mat_randtest(A, state, n_randint(state, 10) + 1, bits);
         fmpz_poly_mat_randtest(B, state, n_randint(state, 10) + 1, bits);
-        
+
         fmpz_poly_mat_randtest(C, state, n_randint(state, 10) + 1, bits);
 
         fmpz_poly_mat_concat_horizontal(C, A, B);
-        
+
         fmpz_poly_mat_window_init(window1, C, 0, 0, r1, c1);
         fmpz_poly_mat_window_init(window2, C, 0, c1, r1, (c1 + c2));
 
@@ -56,7 +56,7 @@ int main(void)
             flint_abort();
         }
 
-        
+
         fmpz_poly_mat_clear(A);
         fmpz_poly_mat_clear(B);
         fmpz_poly_mat_clear(C);
@@ -66,7 +66,7 @@ int main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -36,14 +36,14 @@ void _fmpz_poly_fibonacci(fmpz * coeffs, ulong n)
         fmpz_one(coeffs + 1);
         fmpz_mul_ui(coeffs + 1, coeffs + 1, L);
     }
-    else 
+    else
     {
         fmpz_one(coeffs);
         fmpz_zero(coeffs + 1);
     }
 
     fmpz_one(coeffs + n - 1);
-    
+
     r = coeffs + even;
     r += 2;
 

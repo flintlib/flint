@@ -568,7 +568,7 @@ main(void)
         len2 = n_randint(state, 300);
         len3 = n_randint(state, 300);
         len4 = n_randint(state, 300);
- 
+
         for (j = 0; j < ctx->zctx->minfo->nvars; j++)
         {
             degbounds1[j] = 1 + n_randint(state, 15/ctx->zctx->minfo->nvars);

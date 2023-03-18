@@ -11,7 +11,7 @@
 
 #include "nmod_mpoly.h"
 
-void nmod_mpoly_get_term_exp_si(slong * exp, const nmod_mpoly_t A, 
+void nmod_mpoly_get_term_exp_si(slong * exp, const nmod_mpoly_t A,
                                            slong i, const nmod_mpoly_ctx_t ctx)
 {
     slong N;

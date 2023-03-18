@@ -64,7 +64,7 @@ acb_dft_step(acb_ptr w, acb_srcptr v, acb_dft_step_ptr cyc, slong num, slong pre
 
 #if REORDER
         /* reorder w to avoid dv shifts in next DFT */
-        w2 = flint_malloc(m * M * sizeof(acb_struct)); 
+        w2 = flint_malloc(m * M * sizeof(acb_struct));
         for (j = 0; j < M; j++)
             for (i = 0; i < m; i++)
                 w2[j + M * i] = w[i + m * j];

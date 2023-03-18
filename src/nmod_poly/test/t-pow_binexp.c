@@ -18,7 +18,7 @@ main(void)
 {
     int i, j, result;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("pow_binexp....");
     fflush(stdout);
@@ -37,12 +37,12 @@ main(void)
         e = n_randint(state, 20);
 
         nmod_poly_pow_binexp(b, a, e);
-        
+
         nmod_poly_set_coeff_ui(c, 0, 1);
         for (j = 0; j < e; j++)
             nmod_poly_mul(c, c, a);
 
-        result = (nmod_poly_equal(b, c) 
+        result = (nmod_poly_equal(b, c)
             || (a->length == 0 && e == 0 && c->length == 1 && c->coeffs[0] == 1));
         if (!result)
         {
@@ -74,10 +74,10 @@ main(void)
         e = n_randint(state, 20);
 
         nmod_poly_pow_binexp(b, a, e);
-        
+
         nmod_poly_set(c, a);
         nmod_poly_pow_binexp(c, c, e);
-        
+
         result = (nmod_poly_equal(b, c));
         if (!result)
         {
@@ -96,7 +96,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

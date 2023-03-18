@@ -1,4 +1,4 @@
-/* 
+/*
    Copyright 1991, 1992, 1993, 1994, 1996, 1997, 1999, 2000, 2001, 2002, 2003,
    2004, 2005 Free Software Foundation, Inc.
 
@@ -18,7 +18,7 @@
    You should have received a copy of the GNU Lesser General Public License
    along with this file; see the file COPYING.LIB.  If not, write to
    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-   MA 02110-1301, USA. 
+   MA 02110-1301, USA.
 */
 
 /*
@@ -32,7 +32,7 @@
  extern "C" {
 #endif
 
-/* Undefine to make the ifndef logic below for the fallback 
+/* Undefine to make the ifndef logic below for the fallback
    work even if the symbols are already defined (e.g. by givaro).  */
 #undef count_leading_zeros
 #undef count_trailing_zeros
@@ -41,7 +41,7 @@
 #define FLINT_KNOW_STRONG_ORDER 0
 
 /* x86 : 64 bit */
-#if (GMP_LIMB_BITS == 64 && defined (__amd64__)) 
+#if (GMP_LIMB_BITS == 64 && defined (__amd64__))
 
 #undef FLINT_KNOW_STRONG_ORDER
 #define FLINT_KNOW_STRONG_ORDER 1

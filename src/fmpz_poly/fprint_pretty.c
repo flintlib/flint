@@ -12,7 +12,7 @@
 
 #include "fmpz_poly.h"
 
-int _fmpz_poly_fprint_pretty(FILE * file, 
+int _fmpz_poly_fprint_pretty(FILE * file,
                              const fmpz * poly, slong len, const char * x)
 {
     int r;
@@ -47,7 +47,7 @@ int _fmpz_poly_fprint_pretty(FILE * file,
             if (r > 0)
                 r = flint_fprintf(file, "*%s", x);
         }
-        
+
         if (r > 0)
         {
             if (fmpz_sgn(poly + 0) > 0)
@@ -160,7 +160,7 @@ int _fmpz_poly_fprint_pretty(FILE * file,
     return r;
 }
 
-int fmpz_poly_fprint_pretty(FILE * file, 
+int fmpz_poly_fprint_pretty(FILE * file,
                             const fmpz_poly_t poly, const char * x)
 {
     return _fmpz_poly_fprint_pretty(file, poly->coeffs, poly->length, x);

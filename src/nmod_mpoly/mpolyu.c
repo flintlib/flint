@@ -167,7 +167,7 @@ nmod_mpoly_struct * _nmod_mpolyu_get_coeff(nmod_mpolyu_t A,
 
     for (i = 0; i < A->length && A->exps[i] >= pow; i++)
     {
-        if (A->exps[i] == pow) 
+        if (A->exps[i] == pow)
         {
             return A->coeffs + i;
         }
@@ -180,7 +180,7 @@ nmod_mpoly_struct * _nmod_mpolyu_get_coeff(nmod_mpolyu_t A,
         A->exps[j] = A->exps[j - 1];
         nmod_mpoly_swap(A->coeffs + j, A->coeffs + j - 1, uctx);
     }
-    
+
     A->length++;
     A->exps[i] = pow;
     xk = A->coeffs + i;
@@ -873,7 +873,7 @@ void nmod_mpolyu_cvtto_poly(nmod_poly_t a, nmod_mpolyu_t A,
     for (i = 0; i < A->length; i++)
     {
         FLINT_ASSERT((A->coeffs + i)->length == 1);
-        FLINT_ASSERT(mpoly_monomial_is_zero((A->coeffs + i)->exps, 
+        FLINT_ASSERT(mpoly_monomial_is_zero((A->coeffs + i)->exps,
                       mpoly_words_per_exp((A->coeffs + i)->bits, ctx->minfo)));
         nmod_poly_set_coeff_ui(a, A->exps[i], (A->coeffs + i)->coeffs[0]);
     }
@@ -947,7 +947,7 @@ void nmod_mpolyu_msub(nmod_mpolyu_t R, nmod_mpolyu_t A, nmod_mpolyu_t B,
             k += !nmod_mpoly_is_zero(R->coeffs + k, ctx);
             i++;
             j++;
-        } else 
+        } else
         {
             FLINT_ASSERT(0);
         }

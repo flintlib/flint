@@ -69,7 +69,7 @@ slong _nmod_mpoly_mul_johnson1(
         do
         {
             x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
-         
+
             hind[x->i] |= WORD(1);
             Q[Q_len++] = x->i;
             Q[Q_len++] = x->j;
@@ -88,7 +88,7 @@ slong _nmod_mpoly_mul_johnson1(
 
         NMOD_RED3(p1[len1], acc2, acc1, acc0, fctx);
         len1 += (p1[len1] != 0);
-      
+
         while (Q_len > 0)
         {
             j = Q[--Q_len];
@@ -132,7 +132,7 @@ slong _nmod_mpoly_mul_johnson1(
     A->coeffs = p1;
     A->exps = e1;
     A->length = len1;
-   
+
     TMP_END;
 
     return len1;

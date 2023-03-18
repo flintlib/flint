@@ -82,7 +82,7 @@ void fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m)
             {
                 __mpz_struct * mf = _fmpz_promote(f);
 
-                mpz_powm(mf, 
+                mpz_powm(mf,
                     COEFF_TO_PTR(*g), COEFF_TO_PTR(*e), COEFF_TO_PTR(*m));
                 _fmpz_demote_val(f);
             }

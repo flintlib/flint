@@ -13,7 +13,7 @@
 #define FMPZ_MPOLY_FACTOR_H
 
 #ifdef FMPZ_MPOLY_FACTOR_INLINES_C
-#define FMPZ_MPOLY_FACTOR_INLINE 
+#define FMPZ_MPOLY_FACTOR_INLINE
 #else
 #define FMPZ_MPOLY_FACTOR_INLINE static __inline__
 #endif

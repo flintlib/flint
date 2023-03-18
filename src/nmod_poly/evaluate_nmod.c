@@ -26,7 +26,7 @@ _nmod_poly_evaluate_nmod(mp_srcptr poly, slong len, mp_limb_t c, nmod_t mod)
         return poly[0];
 
     m = len - 1;
-    
+
     val = poly[m];
     m--;
 

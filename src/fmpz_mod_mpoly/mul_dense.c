@@ -101,7 +101,7 @@ static void _from_dense(
     off--;
     mpoly_monomial_zero(pcurexp, N);
     k = off;
-    for (j = nvars - 1; j >= 0; j--) 
+    for (j = nvars - 1; j >= 0; j--)
     {
         exps[j] = k % Adeg_bounds[j];
         k = k / Adeg_bounds[j];

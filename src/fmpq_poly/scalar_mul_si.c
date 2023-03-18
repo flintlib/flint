@@ -15,8 +15,8 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden, 
-                              const fmpz * poly, const fmpz_t den, slong len, 
+void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden,
+                              const fmpz * poly, const fmpz_t den, slong len,
                               slong c)
 {
     fmpz_t gcd;  /* GCD( den, c ) */
@@ -61,11 +61,11 @@ void fmpq_poly_scalar_mul_si(fmpq_poly_t rop, const fmpq_poly_t op, slong c)
         fmpq_poly_zero(rop);
         return;
     }
-    
+
     fmpq_poly_fit_length(rop, op->length);
     _fmpq_poly_set_length(rop, op->length);
-    
-    _fmpq_poly_scalar_mul_si(rop->coeffs, rop->den, 
+
+    _fmpq_poly_scalar_mul_si(rop->coeffs, rop->den,
                              op->coeffs, op->den, op->length, c);
 }
 

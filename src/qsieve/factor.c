@@ -74,11 +74,11 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
        fmpz_abs(n2, n);
 
        factors->sign *= -1;
-       
+
        qsieve_factor(factors, n2);
 
        fmpz_clear(n2);
-       
+
        return;
     }
 
@@ -123,13 +123,13 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
         expt += fmpz_remove(temp, qs_inf->n, temp);
 
         _fmpz_factor_append_ui(factors, small_factor, expt);
-        
+
         qsieve_clear(qs_inf);
 
         fmpz_factor_no_trial(factors, temp);
 
         fmpz_clear(temp);
-        
+
         return;
     }
 
@@ -166,7 +166,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
         expt += fmpz_remove(temp, qs_inf->n, temp);
 
         _fmpz_factor_append_ui(factors, small_factor, expt);
-        
+
         qsieve_clear(qs_inf);
 
         fmpz_factor_no_trial(factors, temp);
@@ -210,7 +210,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 #if FLINT_USES_PTHREAD
     pthread_mutex_init(&qs_inf->mutex, NULL);
 #endif
-    
+
 #if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(__MINGW32__) || defined(__MINGW64__) || defined(_MSC_VER)
     if (GetTempPathA(MAX_PATH, temp_path) == 0)
         flint_throw(FLINT_ERROR, "GetTempPathA failed\n");
@@ -255,9 +255,9 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
         }
 
         do
-        {           
+        {
             qsieve_collect_relations(qs_inf, sieve);
-                
+
             qs_inf->num_cycles = qs_inf->edges + qs_inf->components - qs_inf->vertices;
 
 #if QS_DEBUG
@@ -266,8 +266,8 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
                           qs_inf->num_cycles, qs_inf->ks_primes,
                           qs_inf->extra_rels, qs_inf->poly_count, qs_inf->num_primes);
 #endif
- 
-            if (qs_inf->full_relation + qs_inf->num_cycles >= 
+
+            if (qs_inf->full_relation + qs_inf->num_cycles >=
                 ((slong) (1.10*qs_inf->num_primes) + qs_inf->ks_primes + qs_inf->extra_rels))
             {
                 int ok;
@@ -312,7 +312,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 #if QS_DEBUG
                     flint_printf("\nBlock Lanczos\n");
 #endif
- 
+
                     flint_randinit(state); /* initialise the random generator */
 
                     do /* repeat block lanczos until it succeeds */
@@ -373,12 +373,12 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
                             {
                                 factors->exp[factors->num - 1] = fmpz_remove(temp2, factors->p + factors->num - 1, temp);
                                 fmpz_set(factors->p + factors->num - 1, temp);
-                                
+
                                 if (fmpz_is_one(temp2))
                                    break;
                                 else
                                    _fmpz_factor_append(factors, temp2, 1);
-                             }  
+                             }
                         }
 
                         _fmpz_vec_clear(facs, 100);
@@ -405,7 +405,7 @@ more_primes: /* ran out of A's in init/sieving of linalg failed, increase FB */
 
         delta = qs_inf->num_primes / 10;
         delta = FLINT_MAX(delta, 100); /* add at least 100 more primes */
-        
+
 #if QS_DEBUG
         flint_printf("\nfactor base increment\n");
 #endif
@@ -441,9 +441,9 @@ found_small_factor:
             expt += fmpz_remove(temp, qs_inf->n, temp);
 
             _fmpz_factor_append_ui(factors, small_factor, expt);
-        
+
             fmpz_factor_no_trial(factors, temp);
-            
+
             goto cleanup;
         }
 

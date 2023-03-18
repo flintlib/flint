@@ -24,7 +24,7 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("div_newton_n_preinv....");
     fflush(stdout);
@@ -69,7 +69,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         nmod_poly_clear(a);
         nmod_poly_clear(b);
         nmod_poly_clear(binv);
@@ -212,7 +212,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

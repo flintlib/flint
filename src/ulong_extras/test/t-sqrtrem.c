@@ -17,11 +17,11 @@ int main(void)
 {
    int i, result;
    FLINT_TEST_INIT(state);
-   
+
    flint_printf("sqrtrem....");
    fflush(stdout);
 
-   
+
 
    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
    {
@@ -31,21 +31,21 @@ int main(void)
       mpz_init(a_m);
       mpz_init(r2_m);
       mpz_init(s2_m);
-      
+
       a = n_randtest(state);
-      
+
       s1 = n_sqrtrem(&r1, a);
 
       flint_mpz_set_ui(a_m, a);
       mpz_sqrtrem(s2_m, r2_m, a_m);
       r2 = flint_mpz_get_ui(r2_m);
       s2 = flint_mpz_get_ui(s2_m);
-      
+
       result = ((r1 == r2) && (s1 == s2));
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("a = %wu, r1 = %wd, r2 = %wu, s1 = %wd, s2 = %wu\n", a, r1, r2, s1, s2); 
+         flint_printf("a = %wu, r1 = %wd, r2 = %wu, s1 = %wd, s2 = %wu\n", a, r1, r2, s1, s2);
          fflush(stdout);
          flint_abort();
       }
@@ -63,7 +63,7 @@ int main(void)
       mpz_init(a_m);
       mpz_init(r2_m);
       mpz_init(s2_m);
-      
+
       bits = n_randint(state, FLINT_BITS/2 + 1);
       a = n_randtest_bits(state, bits);
       a = a*a;
@@ -74,12 +74,12 @@ int main(void)
       mpz_sqrtrem(s2_m, r2_m, a_m);
       r2 = flint_mpz_get_ui(r2_m);
       s2 = flint_mpz_get_ui(s2_m);
-      
+
       result = ((r1 == r2) && (s1 == s2));
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("a = %wu, r1 = %wd, r2 = %wu, s1 = %wd, s2 = %wu\n", a, r1, r2, s1, s2); 
+         flint_printf("a = %wu, r1 = %wd, r2 = %wu, s1 = %wd, s2 = %wu\n", a, r1, r2, s1, s2);
          fflush(stdout);
          flint_abort();
       }
@@ -90,7 +90,7 @@ int main(void)
    }
 
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

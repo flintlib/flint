@@ -22,7 +22,7 @@ main(void)
 {
     int iter;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("factor....");
     fflush(stdout);
@@ -48,9 +48,9 @@ main(void)
         nmod_poly_set_coeff_ui(pol1, 0, 1);
 
         length = n_randint(state, 7) + 2;
-        do 
+        do
         {
-            nmod_poly_randtest(poly, state, length); 
+            nmod_poly_randtest(poly, state, length);
             if (poly->length)
                 nmod_poly_make_monic(poly, poly);
         }
@@ -63,10 +63,10 @@ main(void)
         num = n_randint(state, 5) + 1;
         for (i = 1; i < num; i++)
         {
-            do 
+            do
             {
                 length = n_randint(state, 7) + 2;
-                nmod_poly_randtest(poly, state, length); 
+                nmod_poly_randtest(poly, state, length);
                 if (poly->length)
                 {
                     nmod_poly_make_monic(poly, poly);
@@ -158,9 +158,9 @@ main(void)
         inflation = n_randint(state, 7) + 1;
 
         length = n_randint(state, 7) + 2;
-        do 
+        do
         {
-            nmod_poly_randtest(poly, state, length); 
+            nmod_poly_randtest(poly, state, length);
             if (poly->length)
                 nmod_poly_make_monic(poly, poly);
         }
@@ -177,7 +177,7 @@ main(void)
             do
             {
                 length = n_randint(state, 6) + 2;
-                nmod_poly_randtest(poly, state, length); 
+                nmod_poly_randtest(poly, state, length);
                 if (poly->length)
                 {
                     nmod_poly_make_monic(poly, poly);
@@ -248,7 +248,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

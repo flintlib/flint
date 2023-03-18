@@ -20,7 +20,7 @@ main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("get/set_nmod_poly....");
     fflush(stdout);
@@ -63,7 +63,7 @@ main(void)
         nmod_poly_clear(M2);
     }
 
-    
+
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

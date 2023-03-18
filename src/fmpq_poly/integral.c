@@ -27,7 +27,7 @@ static ulong _fmpz_gcd_small(const fmpz_t g, ulong h)
         return _fmpz_gcd_big_small(g, h);
 }
 
-void _fmpq_poly_integral(fmpz * rpoly, fmpz_t rden, 
+void _fmpq_poly_integral(fmpz * rpoly, fmpz_t rden,
                            const fmpz * poly, const fmpz_t den, slong len)
 {
     slong k;

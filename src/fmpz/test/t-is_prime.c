@@ -92,7 +92,7 @@ main(void)
 
         fmpz_clear(p);
         fmpz_clear(F);
-    }  
+    }
 
     /* test composites never pass */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -109,7 +109,7 @@ main(void)
         do {
            fmpz_randbits(a, state, n_randint(state, 80) + 2);
         } while (fmpz_cmp_ui(a, 2) < 0);
-        
+
         fmpz_mul(p, p, a);
 
         r1 = fmpz_is_prime(p);
@@ -164,7 +164,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

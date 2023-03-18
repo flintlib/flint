@@ -101,7 +101,7 @@ void _fq_nmod_mpoly_from_fq_nmod_poly_inflate(
     /* must have at least space for the highest exponent of var */
     FLINT_ASSERT(Bdeg >= 0);
     FLINT_ASSERT(1 + FLINT_BIT_COUNT(Ashift[var] + Bdeg*Astride[var]) <= Abits);
-    
+
     strideexp = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     shiftexp = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     mpoly_set_monomial_ui(shiftexp, Ashift, Abits, ctx->minfo);

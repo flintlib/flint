@@ -15,9 +15,9 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
-void _fmpq_poly_xgcd(fmpz *G, fmpz_t denG, 
-                     fmpz *S, fmpz_t denS, fmpz *T, fmpz_t denT, 
-                     const fmpz *A, const fmpz_t denA, slong lenA, 
+void _fmpq_poly_xgcd(fmpz *G, fmpz_t denG,
+                     fmpz *S, fmpz_t denS, fmpz *T, fmpz_t denT,
+                     const fmpz *A, const fmpz_t denA, slong lenA,
                      const fmpz *B, const fmpz_t denB, slong lenB)
 {
     int alloc = 0;
@@ -122,7 +122,7 @@ void _fmpq_poly_xgcd(fmpz *G, fmpz_t denG,
     fmpz_clear(cB);
 }
 
-void fmpq_poly_xgcd(fmpq_poly_t G, fmpq_poly_t S, fmpq_poly_t T, 
+void fmpq_poly_xgcd(fmpq_poly_t G, fmpq_poly_t S, fmpq_poly_t T,
                     const fmpq_poly_t A, const fmpq_poly_t B)
 {
     if (G == S || G == T || S == T)
@@ -190,7 +190,7 @@ void fmpq_poly_xgcd(fmpq_poly_t G, fmpq_poly_t S, fmpq_poly_t T,
                fmpq_poly_xgcd(tG, S, T, A, B);
                fmpq_poly_swap(tG, G);
                fmpq_poly_clear(tG);
-           } 
+           }
            else if (S == A || S == B)
            {
                fmpq_poly_t tS;
@@ -216,9 +216,9 @@ void fmpq_poly_xgcd(fmpq_poly_t G, fmpq_poly_t S, fmpq_poly_t T,
                fmpq_poly_fit_length(S, lenB);
                fmpq_poly_fit_length(T, lenA);
 
-               _fmpq_poly_xgcd(G->coeffs, G->den, S->coeffs, S->den, T->coeffs, T->den, 
+               _fmpq_poly_xgcd(G->coeffs, G->den, S->coeffs, S->den, T->coeffs, T->den,
                     A->coeffs, A->den, lenA, B->coeffs, B->den, lenB);
-               
+
                _fmpq_poly_set_length(G, lenG);
                _fmpq_poly_set_length(S, lenB);
                _fmpq_poly_set_length(T, lenA);

@@ -13,7 +13,7 @@
 #include "aprcl.h"
 
 /*
-    Computes f = g * h for p = 7. 
+    Computes f = g * h for p = 7.
     g and h must be reduced by F_7 cyclotomic polynomial.
     t is the memory for fmpz_t; size of t must be > 68.
     Resulting f reduced by F_7 cyclotomic polynomial.
@@ -62,7 +62,7 @@ unity_zp_mul7(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
     fmpz_set(t[4], t[41]);                  /*  set b1 = y1     */
     fmpz_set(t[5], t[42]);                  /*  set b2 = y2     */
 
-    /* 
+    /*
         apply auxiliary routine 2 with (a0, a1, a2) and (b0, b1, b2)
         store result in (c0, .. , c4)
     */
@@ -81,7 +81,7 @@ unity_zp_mul7(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
     fmpz_set(t[4], t[44]);                  /*  set b1 = y4     */
     fmpz_set(t[5], t[45]);                  /*  set b2 = y5     */
 
-    /* 
+    /*
         apply auxiliary routine 2 with (a0, a1, a2) and (b0, b1, b2)
         store result in (c0, .. , c4)
     */
@@ -100,7 +100,7 @@ unity_zp_mul7(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
     fmpz_sub(t[4], t[44], t[41]);           /*  b1 = y4 - y1    */
     fmpz_sub(t[5], t[45], t[42]);           /*  b2 = y5 - y2    */
 
-    /* 
+    /*
         apply auxiliary routine 2 with (a0, a1, a2) and (b0, b1, b2)
         store result in (c0, .. , c4)
     */

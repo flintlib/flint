@@ -20,7 +20,7 @@ arb_nonnegative_abs(arb_t y, const arb_t x)
         arb_get_abs_ubound_arf(arb_midref(y), x, MAG_BITS+1);
 
         /* Now t := arb_midref(y) is the upper bound of the interval x; we
-           need to set arb_midref(y) and arb_radref(y) to (approximations 
+           need to set arb_midref(y) and arb_radref(y) to (approximations
            of) t/2.  */
         arf_mul_2exp_si(arb_midref(y), arb_midref(y), -1);
         arf_get_mag(arb_radref(y), arb_midref(y));

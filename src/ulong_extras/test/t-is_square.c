@@ -16,16 +16,16 @@ int main(void)
 {
    int i, result;
    FLINT_TEST_INIT(state);
-   
+
    flint_printf("is_square....");
    fflush(stdout);
-   
-   
+
+
 
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that non-squares pass */
    {
       mp_limb_t a, s, bits;
-      
+
       bits = n_randint(state, FLINT_BITS/2) + 1;
       a = n_randtest_bits(state, bits);
       s = a*a + n_randtest(state) % (2*a) + 1;
@@ -34,16 +34,16 @@ int main(void)
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("s = %wu is declared square\n", s); 
+         flint_printf("s = %wu is declared square\n", s);
          fflush(stdout);
          flint_abort();
       }
    }
-         
+
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that squares pass */
    {
       mp_limb_t a, s, bits;
-      
+
       bits = n_randint(state, FLINT_BITS/2);
       a = n_randtest_bits(state, bits);
       s = a*a;
@@ -52,14 +52,14 @@ int main(void)
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("s = %wu is declared square\n", s); 
+         flint_printf("s = %wu is declared square\n", s);
          fflush(stdout);
          flint_abort();
       }
    }
 
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

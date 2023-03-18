@@ -451,7 +451,7 @@ _gr_fmpz_mod_poly_mullow(fmpz * res,
 /* fixme: duplicates _fmpz_mod_poly_divrem for error handling */
 /* todo: better tuning */
 int
-_gr_fmpz_mod_poly_divrem(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, 
+_gr_fmpz_mod_poly_divrem(fmpz * Q, fmpz * R, const fmpz * A, slong lenA,
                                   const fmpz * B, slong lenB, gr_ctx_t ctx)
 {
     if (lenB <= 30 || lenA - lenB <= 5)

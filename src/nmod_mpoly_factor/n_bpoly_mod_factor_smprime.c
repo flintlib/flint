@@ -240,7 +240,7 @@ static void _hensel_lift_inv(
     n_bpoly_clear(t1);
     n_bpoly_clear(t2);
     n_bpoly_clear(q);
-    n_bpoly_clear(r); 
+    n_bpoly_clear(r);
 }
 
 static void _hensel_lift_tree(
@@ -1348,7 +1348,7 @@ int n_bpoly_mod_factor_smprime(
     int local_fac_tries = 0;
     n_bpoly_t monicA;
     nmod_mat_t N;
-    slong zas_limit;    
+    slong zas_limit;
     zassenhaus_prune_t zas;
     n_bpoly_mod_lift_t L;
 
@@ -1473,7 +1473,7 @@ doit:
     n_bpoly_mod_lift_start(L, local_fac_best->p, r, monicA, ctx);
     n_bpoly_mod_lift_continue(L, monicA, lift_order, ctx);
 
-    /* the rows of N give the combinations of local factors */    
+    /* the rows of N give the combinations of local factors */
     nmod_mat_clear(N);
     nmod_mat_init(N, r, r, ctx.n);
     for (i = 0; i < r; i++)

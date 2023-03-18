@@ -22,7 +22,7 @@ int main(void)
     slong rep;
     mpz_t mpz_n;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("nextprime....");
     fflush(stdout);
 
@@ -45,8 +45,8 @@ int main(void)
     for (rep = 0; rep < 10000 * flint_test_multiplier(); rep++)
     {
         ulong bits = n_randint(state, FLINT_D_BITS-1)+1;
-        n = n_randtest(state) % ((UWORD(1)<<bits) - UWORD(1)) + 1; 
-        
+        n = n_randtest(state) % ((UWORD(1)<<bits) - UWORD(1)) + 1;
+
         flint_mpz_set_ui(mpz_n, n);
 
         mpz_nextprime(mpz_n, mpz_n);
@@ -58,7 +58,7 @@ int main(void)
         if (res1 != res2)
         {
             flint_printf("FAIL:\n");
-            flint_printf("%wu, %wu\n", res1, res2); 
+            flint_printf("%wu, %wu\n", res1, res2);
             fflush(stdout);
             flint_abort();
         }
@@ -78,16 +78,16 @@ int main(void)
         if (res1 != res2)
         {
             flint_printf("FAIL:\n");
-            flint_printf("%wu, %wu\n", res1, res2); 
+            flint_printf("%wu, %wu\n", res1, res2);
             fflush(stdout);
             flint_abort();
         }
     }
 
-    mpz_clear(mpz_n); 
+    mpz_clear(mpz_n);
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

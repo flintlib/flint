@@ -87,7 +87,7 @@ typedef struct _nmod_mpolyn_ts_struct
     volatile slong length;
     slong alloc;
     flint_bitcnt_t bits;
-    flint_bitcnt_t idx;    
+    flint_bitcnt_t idx;
     ulong * exp_array[FLINT_BITS];
     n_poly_struct * coeff_array[FLINT_BITS];
 } nmod_mpolyn_ts_struct;
@@ -142,7 +142,7 @@ static void nmod_mpolyn_ts_clear(nmod_mpolyn_ts_t A)
         if (A->exp_array[i] != NULL)
         {
             FLINT_ASSERT(A->coeff_array[i] != NULL);
-            flint_free(A->coeff_array[i]);    
+            flint_free(A->coeff_array[i]);
             flint_free(A->exp_array[i]);
         }
     }
@@ -503,7 +503,7 @@ static slong _nmod_mpolyn_mulsub_stripe1(
         hind[i] = 2*startidx + 1;
 
         if (  (startidx < endidx)
-           && (((ulong)startidx) < prev_startidx) 
+           && (((ulong)startidx) < prev_startidx)
            )
         {
             x = chain + i;
@@ -743,7 +743,7 @@ static slong _nmod_mpolyn_mulsub_stripe(
         hind[i] = 2*startidx + 1;
 
         if (  (startidx < endidx)
-           && (((ulong)startidx) < prev_startidx) 
+           && (((ulong)startidx) < prev_startidx)
            )
         {
             x = chain + i;
@@ -1115,7 +1115,7 @@ static slong _nmod_mpolyn_divides_stripe1(
                 hind[x->i] |= 1;
             }
         }
-        s = 1;      
+        s = 1;
         Qlen++;
     }
 
@@ -1371,10 +1371,10 @@ static slong _nmod_mpolyn_divides_stripe(
             }
             else
             {
-                hind[x->i] |= 1;                
+                hind[x->i] |= 1;
             }
         }
-        s = 1;      
+        s = 1;
         Qlen++;
     }
 

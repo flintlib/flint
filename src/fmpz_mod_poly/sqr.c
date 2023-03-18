@@ -47,7 +47,7 @@ void fmpz_mod_poly_sqr(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
     else
     {
         fmpz_mod_poly_fit_length(res, 2*len - 1, ctx);
-    
+
         _fmpz_mod_poly_sqr(res->coeffs, poly->coeffs, len,
                                                     fmpz_mod_ctx_modulus(ctx));
 

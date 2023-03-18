@@ -39,9 +39,9 @@ main(void)
         fmpz_poly_init(g);
         fmpz_poly_init(q);
         fmpz_poly_init(r);
-        
+
         fmpz_mat_randtest(A, state, 10);
-        
+
         for (i = 0; i < n/2; i++)
         {
            for (j = 0; j < n/2; j++)
@@ -138,7 +138,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

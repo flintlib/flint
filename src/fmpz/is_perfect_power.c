@@ -38,7 +38,7 @@ MA 02110-1301, USA. */
 
 /* This is a naive approach to recognizing perfect powers.
    Many things can be improved.  In particular, we should use p-adic
-   arithmetic for computing possible roots. 
+   arithmetic for computing possible roots.
 */
 
 #include "flint.h"
@@ -79,7 +79,7 @@ int fmpz_is_perfect_power(fmpz_t root, const fmpz_t f)
       ulong r = 0;
       ulong r2;
       ulong n = fmpz_get_ui(f);
- 
+
       int exp = n_is_perfect_power(&r, n);
 
       /* get highest exponent */
@@ -178,23 +178,23 @@ int fmpz_is_perfect_power(fmpz_t root, const fmpz_t f)
 	 {
 	    mpz_clear(q);
             mpz_clear(u2);
-	    
+
             if (usize < 0)
             {
                if ((n2 & (n2 - 1)) == 0)
                   return 0;        /* factoring completed; not consistent power */
-                
+
                while ((n2 & 1) == 0)
                   n2 >>= 1;
             }
-	    
+
             r = _fmpz_promote(root);
             mpz_root(r, u, n2);
             _fmpz_demote_val(root);
 	    return n2;        /* factoring completed; consistent power */
 	 }
-         
-         /* 
+
+         /*
             as soon as n2 becomes a prime number, stop factoring
 	    either we have u=x^n2 or u is not a perfect power
          */
@@ -236,7 +236,7 @@ int fmpz_is_perfect_power(fmpz_t root, const fmpz_t f)
     {
        unsigned long int nth;
 
-       /* 
+       /*
           we found some factors above and we just need to consider values of n
 	  that divide n2
        */
@@ -260,7 +260,7 @@ int fmpz_is_perfect_power(fmpz_t root, const fmpz_t f)
              mpz_clear(u2);
 	     return nth;
 	  }
-	  
+
           if (mpz_cmpabs_ui(q, SMALLEST_OMITTED_PRIME) < 0)
 	  {
 	     mpz_clear(q);
@@ -273,7 +273,7 @@ int fmpz_is_perfect_power(fmpz_t root, const fmpz_t f)
       mpz_clear(u2);
       return 0;
    }
-   
+
 n2prime:
 
    if (n2 == 2 && usize < 0)
@@ -282,9 +282,9 @@ n2prime:
       mpz_clear(u2);
       return 0;
    }
-   
+
    exact = mpz_root(q, u, n2);
- 
+
    if (exact)
    {
       r = _fmpz_promote(root);

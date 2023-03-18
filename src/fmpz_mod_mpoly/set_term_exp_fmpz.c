@@ -11,7 +11,7 @@
 
 #include "fmpz_mod_mpoly.h"
 
-void fmpz_mod_mpoly_set_term_exp_fmpz(fmpz_mod_mpoly_t A, 
+void fmpz_mod_mpoly_set_term_exp_fmpz(fmpz_mod_mpoly_t A,
                    slong i, fmpz * const * exp, const fmpz_mod_mpoly_ctx_t ctx)
 {
     slong N;

@@ -18,7 +18,7 @@ void check(mp_limb_t n, int mu1, int mu2)
     if (mu1 != mu2)
     {
         flint_printf("FAIL:\n");
-        flint_printf("mu(%wu): %d != %d\n", n, mu1, mu2); 
+        flint_printf("mu(%wu): %d != %d\n", n, mu1, mu2);
         fflush(stdout);
         flint_abort();
     }
@@ -30,7 +30,7 @@ int main(void)
     int * mu;
 
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("moebius_mu....");
     fflush(stdout);
 

@@ -589,7 +589,7 @@ static void _hensel_lift_inv(
     n_bpoly_clear(t1);
     n_bpoly_clear(t2);
     n_bpoly_clear(q);
-    n_bpoly_clear(r); 
+    n_bpoly_clear(r);
     n_poly_clear(tq);
     n_poly_clear(tr);
 }
@@ -716,7 +716,7 @@ void n_bpoly_mod_factor_lgprime(
     slong Blenx = B->length;
     slong Bleny;
     slong final_pow, curr_lift_pow, prev_lift_pow, next_lift_pow;
-    slong * starts;    
+    slong * starts;
     fq_nmod_poly_t Beval;
     fq_nmod_poly_factor_t local_fac;
     fq_nmod_t Blc;

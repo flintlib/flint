@@ -22,7 +22,7 @@ main(void)
     flint_printf("get_coeff_ptr....");
     fflush(stdout);
 
-    
+
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -36,8 +36,8 @@ main(void)
 
         fmpz_poly_get_coeff_fmpz(a, A, n);
 
-        result = n < fmpz_poly_length(A) ? 
-                     fmpz_equal(a, fmpz_poly_get_coeff_ptr(A, n)) : 
+        result = n < fmpz_poly_length(A) ?
+                     fmpz_equal(a, fmpz_poly_get_coeff_ptr(A, n)) :
                      fmpz_poly_get_coeff_ptr(A, n) == NULL;
         if (!result)
         {
@@ -54,7 +54,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

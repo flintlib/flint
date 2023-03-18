@@ -20,7 +20,7 @@
 #include "fmpz_mat.h"
 #include "nf_elem.h"
 
-void nf_elem_get_fmpz_mat_row(fmpz_mat_t M, const slong i, fmpz_t den, 
+void nf_elem_get_fmpz_mat_row(fmpz_mat_t M, const slong i, fmpz_t den,
                                               const nf_elem_t b, const nf_t nf)
 {
    if (nf->flag & NF_LINEAR)
@@ -36,7 +36,7 @@ void nf_elem_get_fmpz_mat_row(fmpz_mat_t M, const slong i, fmpz_t den,
    } else
    {
       slong j;
-      for (j = 0; j < NF_ELEM(b)->length; j++) 
+      for (j = 0; j < NF_ELEM(b)->length; j++)
       {
          fmpz_set(fmpz_mat_entry(M, i, j), NF_ELEM_NUMREF(b) + j);
       }

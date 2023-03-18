@@ -51,21 +51,21 @@ _gr_poly_divrem_divconquer_recursive(gr_ptr Q, gr_ptr BQ, gr_ptr W,
 
         gr_ptr d2q1, d3q2, d4q2, t;
 
-        /* 
-           Set q1 to p1 div d1, a 2 n1 - 1 by n1 division so q1 ends up 
+        /*
+           Set q1 to p1 div d1, a 2 n1 - 1 by n1 division so q1 ends up
            being of length n1;  d1q1 = d1 q1 is of length 2 n1 - 1
          */
 
         status |= _gr_poly_divrem_divconquer_recursive(q1, d1q1, W1, p1, d1, n1, invB, cutoff, ctx);
 
-        /* 
+        /*
            Compute d2q1 = d2 q1, of length lenB - 1
          */
 
         d2q1 = W1;
         status |= _gr_poly_mul(d2q1, q1, n1, d2, n2, ctx);
 
-        /* 
+        /*
            Compute dq1 = d1 q1 x^n2 + d2 q1, of length 2 n1 + n2 - 1
          */
 
@@ -73,12 +73,12 @@ _gr_poly_divrem_divconquer_recursive(gr_ptr Q, gr_ptr BQ, gr_ptr W,
         status |= _gr_poly_add(GR_ENTRY(dq1, n2, sz), GR_ENTRY(dq1, n2, sz), n1 - 1, GR_ENTRY(d2q1, n2, sz), n1 - 1, ctx);
 
         /*
-           Compute t = A/x^n2 - dq1, which has length 2 n1 + n2 - 1, but we 
-           are not interested in the top n1 coeffs as they will be zero, so 
+           Compute t = A/x^n2 - dq1, which has length 2 n1 + n2 - 1, but we
+           are not interested in the top n1 coeffs as they will be zero, so
            this has effective length n1 + n2 - 1
-           For the following division, we want to set {p2, 2 n2 - 1} to the 
+           For the following division, we want to set {p2, 2 n2 - 1} to the
            top 2 n2 - 1 coeffs of this
-           Since the bottom n2 - 1 coeffs of p2 are irrelevant for the 
+           Since the bottom n2 - 1 coeffs of p2 are irrelevant for the
            division, we in fact set {t, n2} to the relevant coeffs
          */
 
@@ -87,7 +87,7 @@ _gr_poly_divrem_divconquer_recursive(gr_ptr Q, gr_ptr BQ, gr_ptr W,
         p2 = GR_ENTRY(t, - (n2 - 1), sz);
 
         /*
-           Compute q2 = t div d3, a 2 n2 - 1 by n2 division, so q2 will have 
+           Compute q2 = t div d3, a 2 n2 - 1 by n2 division, so q2 will have
            length n2; let d3q2 = d3 q2, of length 2 n2 - 1
          */
 
@@ -154,7 +154,7 @@ __gr_poly_divrem_divconquer(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcp
             status |= _gr_poly_mul(d2q1, d2, n2, Q, n1, ctx);
 
         /*
-           Compute BQ = d1q1 * x^n1 + d2q1, of length lenB - 1; 
+           Compute BQ = d1q1 * x^n1 + d2q1, of length lenB - 1;
            then compute R = A - BQ
          */
 

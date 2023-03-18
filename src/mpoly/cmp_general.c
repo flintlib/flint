@@ -100,7 +100,7 @@ int mpoly_monomial_cmp_general(ulong * Aexp, flint_bitcnt_t Abits,
             N = mpoly_words_per_exp(newbits, mctx);
             newBexp = Bexp;
             newAexp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-            mpoly_repack_monomials(newAexp, newbits, Aexp, Abits, 1, mctx);            
+            mpoly_repack_monomials(newAexp, newbits, Aexp, Abits, 1, mctx);
         }
 
         cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));

@@ -12,7 +12,7 @@
 #include "fmpz_mat.h"
 #include "padic_mat.h"
 
-void padic_mat_set_entry_padic(padic_mat_t rop, slong i, slong j, 
+void padic_mat_set_entry_padic(padic_mat_t rop, slong i, slong j,
                                const padic_t op, const padic_ctx_t ctx)
 {
     if (padic_is_zero(op))
@@ -43,8 +43,8 @@ void padic_mat_set_entry_padic(padic_mat_t rop, slong i, slong j,
 
         fmpz_init(pow);
         fmpz_pow_ui(pow, ctx->p, padic_mat_val(rop) - padic_val(op));
-        _fmpz_vec_scalar_mul_fmpz(padic_mat(rop)->entries, 
-                                  padic_mat(rop)->entries, 
+        _fmpz_vec_scalar_mul_fmpz(padic_mat(rop)->entries,
+                                  padic_mat(rop)->entries,
                                   padic_mat(rop)->r * padic_mat(rop)->c, pow);
         fmpz_clear(pow);
 

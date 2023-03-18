@@ -32,7 +32,7 @@ n_cbrt(mp_limb_t n)
         return 11 + (n >= 1728) + (n >= 2197) + (n >= 2744) + (n >= 3375) + (n >= 4096);
 
     val = (double)n;
-    bits = FLINT_BIT_COUNT(n); 
+    bits = FLINT_BIT_COUNT(n);
 
     if (bits > 46)    /* for larger numbers chebyshev approximation method is faster */
         return n_cbrt_chebyshev_approx(n);
@@ -57,7 +57,7 @@ n_cbrt(mp_limb_t n)
 
     /* In case ret^3 or (ret+1)^3 will cause overflow */
 
-    if (ret >= upper_limit)      
+    if (ret >= upper_limit)
     {
         if (n >= upper_limit * upper_limit * upper_limit)
             return upper_limit;

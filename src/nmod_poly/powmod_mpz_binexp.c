@@ -17,7 +17,7 @@
 #include "nmod_poly.h"
 
 
-static __inline__ mp_limb_t 
+static __inline__ mp_limb_t
 n_powmod2_mpz(mp_limb_t a, mpz_srcptr exp, mp_limb_t n, mp_limb_t ninv)
 {
     if (mpz_fits_slong_p(exp))
@@ -85,7 +85,7 @@ _nmod_poly_powmod_mpz_binexp(mp_ptr res, mp_srcptr poly, mpz_srcptr e,
 
 
 void
-nmod_poly_powmod_mpz_binexp(nmod_poly_t res, 
+nmod_poly_powmod_mpz_binexp(nmod_poly_t res,
                      const nmod_poly_t poly, mpz_srcptr e, const nmod_poly_t f)
 {
     mp_ptr p;
@@ -118,14 +118,14 @@ nmod_poly_powmod_mpz_binexp(nmod_poly_t res,
 
         nmod_poly_init_mod(t, res->mod);
         nmod_poly_init_mod(r, res->mod);
-        
+
         nmod_poly_divrem(t, r, poly, f);
 
         nmod_poly_powmod_mpz_binexp(res, r, e, f);
-        
+
         nmod_poly_clear(t);
         nmod_poly_clear(r);
-        
+
         return;
     }
 
@@ -138,7 +138,7 @@ nmod_poly_powmod_mpz_binexp(nmod_poly_t res,
             if (exp == 0)
             {
                 nmod_poly_fit_length(res, 1);
-        
+
                 res->coeffs[0] = 1;
                 res->length = 1;
             } else if (exp == 1)

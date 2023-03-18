@@ -37,8 +37,8 @@ void fmpz_mod_poly_set_coeff_ui(fmpz_mod_poly_t poly, slong n, ulong x,
         fmpz_set_ui(poly->coeffs + n, x);
         fmpz_mod(poly->coeffs + n, poly->coeffs + n, fmpz_mod_ctx_modulus(ctx));
     }
-    
-    if (n == poly->length - 1) 
+
+    if (n == poly->length - 1)
         _fmpz_mod_poly_normalise(poly); /* we may have set the leading coefficient to 0 */
 }
 

@@ -22,9 +22,9 @@
 
     Definitions.
 
-    Define a sequence $(n_i)$ by $n_1 = \ceil{len1 / 2}$, 
-    $n_2 = \ceil{n_1 / 2}$, etc. all the way to 
-    $n_K = \ceil{n_{K-1} / 2} = 2$.  Thus, $K = \ceil{\log_2 len1} - 1$. 
+    Define a sequence $(n_i)$ by $n_1 = \ceil{len1 / 2}$,
+    $n_2 = \ceil{n_1 / 2}$, etc. all the way to
+    $n_K = \ceil{n_{K-1} / 2} = 2$.  Thus, $K = \ceil{\log_2 len1} - 1$.
     Note that we can write $n_i = \ceil{len1 / 2^i}$.
 
 
@@ -33,14 +33,14 @@
     Step 1.
     For $0 \leq i < n_1$, set h[i] to something of length at most len2.
     Set pow to $poly2^2$.
-    
+
     Step n.
-    For $0 \leq i < n_n$, set h[i] to something of length at most the length 
+    For $0 \leq i < n_n$, set h[i] to something of length at most the length
     of $poly2^{2^n - 1}$.
     Set pow to $poly^{2^n}$.
-    
+
     Step K.
-    For $0 \leq i < n_K$, set h[i] to something of length at most the length 
+    For $0 \leq i < n_K$, set h[i] to something of length at most the length
     of $poly2^{2^K - 1}$.
     Set pow to $poly^{2^K}$.
 
@@ -48,32 +48,32 @@
     Analysis of the space requirements.
 
     Let $S$ be the over all space we need, measured in number of coefficients.
-    Then 
+    Then
     \begin{align*}
-    S & = 2 \times \bigl[ (2^K - 1) (len2 - 1) + 1 \bigr] 
+    S & = 2 \times \bigl[ (2^K - 1) (len2 - 1) + 1 \bigr]
         + \sum_{i=1}^{K-1} (n_i - n_{i+1}) \bigl[(2^i - 1) (len2 - 1) + 1\bigr] \\
-      & = 2 \times \bigl[ (2^K - 1) (len2 - 1) + 1 \bigr] 
+      & = 2 \times \bigl[ (2^K - 1) (len2 - 1) + 1 \bigr]
         + (len2 - 1) \sum_{i=1}^{K-1} (n_i - n_{i+1}) (2^i - 1) + n_1 - n_K.
     \end{align*}
 
     If $K = 1$, or equivalently $len1$ is 3 or 4, then $S = 2 \times len2$.
-    Otherwise, we can bound $n_i - n_{i+1}$ from above as follows.  For any 
-    non-negative integer $x$, 
+    Otherwise, we can bound $n_i - n_{i+1}$ from above as follows.  For any
+    non-negative integer $x$,
     \begin{equation*}
     \ceil{x / 2^i} - \ceil{x / 2^{i+1}} \leq x/2^i - x/2^{i+1} = x / 2^{i+1}.
     \end{equation*}
 
-    Thus, 
+    Thus,
     \begin{align*}
-    S & \leq 2 \times \bigl[ (2^K - 1) (len2 - 1) + 1 \bigr] 
+    S & \leq 2 \times \bigl[ (2^K - 1) (len2 - 1) + 1 \bigr]
            + (len2 - 1) \times len1 \times \sum_{i=1}^{K-1} (1/2 - 1/2^{i+1}) \\
-      & \leq 2 \times \bigl[ (2^K - 1) (len2 - 1) + 1 \bigr] 
+      & \leq 2 \times \bigl[ (2^K - 1) (len2 - 1) + 1 \bigr]
            + (len2 - 1) \times len1 \times (K/2 + 1).
     \end{align*}
  */
 
 void
-_fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, slong len1, 
+_fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, slong len1,
                                           const fmpz * poly2, slong len2)
 {
     slong i, j, k, n;
@@ -92,11 +92,11 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, slong len1,
     }
 
     /* Initialisation */
-    
+
     hlen = (slong *) flint_malloc(((len1 + 1) / 2) * sizeof(slong));
-    
+
     k = FLINT_CLOG2(len1) - 1;
-    
+
     hlen[0] = hlen[1] = ((1 << k) - 1) * (len2 - 1) + 1;
     for (i = k - 1; i > 0; i--)
     {
@@ -105,7 +105,7 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, slong len1,
             hlen[n] = ((1 << i) - 1) * (len2 - 1) + 1;
     }
     powlen = (1 << k) * (len2 - 1) + 1;
-    
+
     alloc = 0;
     for (i = 0; i < (len1 + 1) / 2; i++)
         alloc += hlen[i];
@@ -121,9 +121,9 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, slong len1,
     hlen[(len1 - 1) / 2] = 0;
     pow  = v + alloc;
     temp = pow + powlen;
-    
+
     /* Let's start the actual work */
-    
+
     for (i = 0, j = 0; i < len1 / 2; i++, j += 2)
     {
         if (poly1[j + 1] != WORD(0))
@@ -146,10 +146,10 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, slong len1,
             hlen[i] = 1;
         }
     }
-    
+
     _fmpz_poly_sqr(pow, poly2, len2);
     powlen = 2 * len2 - 1;
-    
+
     for (n = (len1 + 1) / 2; n > 2; n = (n + 1) / 2)
     {
         if (hlen[1] > 0)
@@ -159,7 +159,7 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, slong len1,
             _fmpz_poly_add(h[0], temp, templen, h[0], hlen[0]);
             hlen[0] = FLINT_MAX(hlen[0], templen);
         }
-        
+
         for (i = 1; i < n / 2; i++)
         {
             if (hlen[2*i + 1] > 0)
@@ -176,7 +176,7 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, slong len1,
             _fmpz_vec_set(h[i], h[2*i], hlen[2*i]);
             hlen[i] = hlen[2*i];
         }
-        
+
         _fmpz_poly_sqr(temp, pow, powlen);
         powlen += powlen - 1;
         {
@@ -188,20 +188,20 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, slong len1,
 
     _fmpz_poly_mul(res, pow, powlen, h[1], hlen[1]);
     _fmpz_vec_add(res, res, h[0], hlen[0]);
-    
+
     _fmpz_vec_clear(v, alloc + 2 * powlen);
     flint_free(h);
     flint_free(hlen);
 }
 
 void
-fmpz_poly_compose_divconquer(fmpz_poly_t res, 
+fmpz_poly_compose_divconquer(fmpz_poly_t res,
                              const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 {
     const slong len1 = poly1->length;
     const slong len2 = poly2->length;
     slong lenr;
-    
+
     if (len1 == 0)
     {
         fmpz_poly_zero(res);
@@ -212,13 +212,13 @@ fmpz_poly_compose_divconquer(fmpz_poly_t res,
         fmpz_poly_set_fmpz(res, poly1->coeffs);
         return;
     }
-    
+
     lenr = (len1 - 1) * (len2 - 1) + 1;
-    
+
     if (res != poly1 && res != poly2)
     {
         fmpz_poly_fit_length(res, lenr);
-        _fmpz_poly_compose_divconquer(res->coeffs, poly1->coeffs, len1, 
+        _fmpz_poly_compose_divconquer(res->coeffs, poly1->coeffs, len1,
                                                    poly2->coeffs, len2);
         _fmpz_poly_set_length(res, lenr);
         _fmpz_poly_normalise(res);

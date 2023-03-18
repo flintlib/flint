@@ -37,7 +37,7 @@ _nmod_poly_div_series(mp_ptr Q, mp_srcptr A, slong Alen,
 }
 
 void
-nmod_poly_div_series(nmod_poly_t Q, const nmod_poly_t A, 
+nmod_poly_div_series(nmod_poly_t Q, const nmod_poly_t A,
                                     const nmod_poly_t B, slong n)
 {
     slong Alen, Blen;

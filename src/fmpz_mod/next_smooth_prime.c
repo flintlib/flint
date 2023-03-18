@@ -399,7 +399,7 @@ int fmpz_next_smooth_prime(fmpz_t a, const fmpz_t b)
     {
         fmpz_zero(a);
         success = 0;
-        goto cleanup;        
+        goto cleanup;
     }
 
     /* lo_p <= b < hi_p now */

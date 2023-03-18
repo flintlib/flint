@@ -37,7 +37,7 @@ int main(void)
        if (!fmpz_equal(x, y))
        {
           flint_printf("FAIL:\n");
-          flint_printf("primorial of %wu disagrees with direct product\n", k); 
+          flint_printf("primorial of %wu disagrees with direct product\n", k);
           fmpz_print(x);
           flint_printf("\n");
           fflush(stdout);

@@ -20,7 +20,7 @@ int main(void)
     flint_printf("gram....");
     fflush(stdout);
 
-    
+
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -35,7 +35,7 @@ int main(void)
         fmpz_mat_init(D, m, m);
 
         fmpz_mat_randtest(A, state, n_randint(state, 200) + 1);
-        
+
         fmpz_mat_transpose(B, A);
         fmpz_mat_mul(C, A, B);
         fmpz_mat_gram(D, A);
@@ -54,7 +54,7 @@ int main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
-    flint_printf("PASS\n");    
+
+    flint_printf("PASS\n");
     return 0;
 }

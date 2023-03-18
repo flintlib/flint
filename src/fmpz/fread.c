@@ -13,7 +13,7 @@
 #include "flint.h"
 #include "fmpz.h"
 
-int 
+int
 fmpz_fread(FILE * file, fmpz_t f)
 {
     mpz_t t;

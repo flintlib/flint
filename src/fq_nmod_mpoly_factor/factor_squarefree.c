@@ -18,7 +18,7 @@
            -1 don't know
 */
 static int fq_nmod_mpoly_factor_is_pairwise_prime(
-	const fq_nmod_mpoly_factor_t f, 
+	const fq_nmod_mpoly_factor_t f,
 	const fq_nmod_mpoly_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx->fqctx);
@@ -122,7 +122,7 @@ static int fq_nmod_mpoly_factor_mul_pairwise_prime(
 	for (i = 0; i < b->num; i++)
 	for (j = 0; j < c->num; j++)
 	{
-		if (!fq_nmod_mpoly_gcd_cofactors(g, b->poly + i, c->poly + j, 
+		if (!fq_nmod_mpoly_gcd_cofactors(g, b->poly + i, c->poly + j,
                                             b->poly + i, c->poly + j, ctx))
 		{
 			success = 0;

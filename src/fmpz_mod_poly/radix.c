@@ -14,8 +14,8 @@
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_radix_init(fmpz **Rpow, fmpz **Rinv, 
-                    const fmpz *R, slong lenR, slong k, 
+void _fmpz_mod_poly_radix_init(fmpz **Rpow, fmpz **Rinv,
+                    const fmpz *R, slong lenR, slong k,
                     const fmpz_t invL, const fmpz_t p)
 {
     const slong degR = lenR - 1;
@@ -57,7 +57,7 @@ void _fmpz_mod_poly_radix_init(fmpz **Rpow, fmpz **Rinv,
     flint_free(W);
 }
 
-void fmpz_mod_poly_radix_init(fmpz_mod_poly_radix_t D, 
+void fmpz_mod_poly_radix_init(fmpz_mod_poly_radix_t D,
                  const fmpz_mod_poly_t R, slong degF, const fmpz_mod_ctx_t ctx)
 {
     const slong degR = R->length - 1;
@@ -91,7 +91,7 @@ void fmpz_mod_poly_radix_init(fmpz_mod_poly_radix_t D,
         fmpz_init(&(D->invL));
         fmpz_invmod(&(D->invL), R->coeffs + degR, fmpz_mod_ctx_modulus(ctx));
 
-        _fmpz_mod_poly_radix_init(D->Rpow, D->Rinv, R->coeffs, degR + 1, 
+        _fmpz_mod_poly_radix_init(D->Rpow, D->Rinv, R->coeffs, degR + 1,
                                   k, &(D->invL), fmpz_mod_ctx_modulus(ctx));
 
         D->k = k;
@@ -115,7 +115,7 @@ void fmpz_mod_poly_radix_clear(fmpz_mod_poly_radix_t D)
     }
 }
 
-void _fmpz_mod_poly_radix(fmpz **B, const fmpz *F, fmpz **Rpow, fmpz **Rinv, 
+void _fmpz_mod_poly_radix(fmpz **B, const fmpz *F, fmpz **Rpow, fmpz **Rinv,
                           slong degR, slong k, slong i, fmpz *W, const fmpz_t p)
 {
     if (i == -1)
@@ -143,7 +143,7 @@ void _fmpz_mod_poly_radix(fmpz **B, const fmpz *F, fmpz **Rpow, fmpz **Rinv,
     }
 }
 
-void fmpz_mod_poly_radix(fmpz_mod_poly_struct **B, const fmpz_mod_poly_t F, 
+void fmpz_mod_poly_radix(fmpz_mod_poly_struct **B, const fmpz_mod_poly_t F,
                        const fmpz_mod_poly_radix_t D, const fmpz_mod_ctx_t ctx)
 {
     const slong lenF = F->length;
@@ -211,7 +211,7 @@ void fmpz_mod_poly_radix(fmpz_mod_poly_struct **B, const fmpz_mod_poly_t F,
         {
             flint_free(G);
         }
-        if (t) 
+        if (t)
         {
             _fmpz_vec_clear(T, t * degR);
         }

@@ -13,7 +13,7 @@
 #define FQ_ZECH_MPOLY_H
 
 #ifdef FQ_ZECH_MPOLY_INLINES_C
-#define FQ_ZECH_MPOLY_INLINE 
+#define FQ_ZECH_MPOLY_INLINE
 #else
 #define FQ_ZECH_MPOLY_INLINE static __inline__
 #endif
@@ -186,7 +186,7 @@ void fq_zech_mpoly_clear(fq_zech_mpoly_t A,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
 FQ_ZECH_MPOLY_INLINE
-void _fq_zech_mpoly_set_length(fq_zech_mpoly_t A, slong newlen, 
+void _fq_zech_mpoly_set_length(fq_zech_mpoly_t A, slong newlen,
                                                  const fq_zech_mpoly_ctx_t ctx)
 {
     FLINT_ASSERT(newlen <= A->alloc);
@@ -194,7 +194,7 @@ void _fq_zech_mpoly_set_length(fq_zech_mpoly_t A, slong newlen,
 }
 
 FQ_ZECH_MPOLY_INLINE
-void fq_zech_mpoly_truncate(fq_zech_mpoly_t A, slong newlen, 
+void fq_zech_mpoly_truncate(fq_zech_mpoly_t A, slong newlen,
                                                  const fq_zech_mpoly_ctx_t ctx)
 {
     if (A->length > newlen)
@@ -232,7 +232,7 @@ int fq_zech_mpoly_set_str_pretty(fq_zech_mpoly_t A, const char * str,
 char * fq_zech_mpoly_get_str_pretty(const fq_zech_mpoly_t A,
                                const char ** x, const fq_zech_mpoly_ctx_t ctx);
 
-int fq_zech_mpoly_fprint_pretty(FILE * file, 
+int fq_zech_mpoly_fprint_pretty(FILE * file,
       const fq_zech_mpoly_t A, const char ** x, const fq_zech_mpoly_ctx_t ctx);
 
 FQ_ZECH_MPOLY_INLINE
@@ -434,7 +434,7 @@ void fq_zech_mpoly_resize(fq_zech_mpoly_t A, slong new_length,
 void fq_zech_mpoly_get_term_coeff_fq_zech(fq_zech_t c,
               const fq_zech_mpoly_t A, slong i, const fq_zech_mpoly_ctx_t ctx);
 
-void fq_zech_mpoly_set_term_coeff_fq_zech(fq_zech_mpoly_t A, 
+void fq_zech_mpoly_set_term_coeff_fq_zech(fq_zech_mpoly_t A,
                     slong i, const fq_zech_t c, const fq_zech_mpoly_ctx_t ctx);
 
 FQ_ZECH_MPOLY_INLINE

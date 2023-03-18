@@ -18,12 +18,12 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("xgcd....");
     fflush(stdout);
 
-    /* 
+    /*
        Compare with result from gcd and check a*s + b*t = g
     */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -43,22 +43,22 @@ main(void)
         nmod_poly_init(t, n);
         nmod_poly_init(sum, n);
         nmod_poly_init(temp, n);
-        
+
         nmod_poly_randtest(a, state, n_randtest(state) % 600);
         nmod_poly_randtest(b, state, n_randtest(state) % 600);
         nmod_poly_randtest(c, state, n_randtest(state) % 400);
-        
+
         nmod_poly_mul(a, a, c);
         nmod_poly_mul(b, b, c);
 
         nmod_poly_gcd(g1, a, b);
         nmod_poly_xgcd(g2, s, t, a, b);
-        
+
         nmod_poly_mul(sum, s, a);
         nmod_poly_mul(temp, t, b);
         nmod_poly_add(sum, sum, temp);
 
-        result = (nmod_poly_equal(g1, g2) && nmod_poly_equal(g1, sum) 
+        result = (nmod_poly_equal(g1, g2) && nmod_poly_equal(g1, sum)
             && (g1->length == 0 || g1->coeffs[g1->length - 1] == 1));
         if (!result)
         {
@@ -75,7 +75,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         nmod_poly_clear(a);
         nmod_poly_clear(b);
         nmod_poly_clear(c);
@@ -103,7 +103,7 @@ main(void)
         nmod_poly_init(t, n);
         nmod_poly_randtest(a, state, n_randtest(state) % 600);
         nmod_poly_randtest(b, state, n_randtest(state) % 600);
-        
+
         nmod_poly_xgcd(g, s, t, a, b);
         nmod_poly_xgcd(a, s, t, a, b);
 
@@ -142,7 +142,7 @@ main(void)
         nmod_poly_init(t, n);
         nmod_poly_randtest(a, state, n_randtest(state) % 600);
         nmod_poly_randtest(b, state, n_randtest(state) % 600);
-       
+
         nmod_poly_xgcd(g, s, t, a, b);
         nmod_poly_xgcd(b, s, t, a, b);
 
@@ -181,7 +181,7 @@ main(void)
         nmod_poly_init(t, n);
         nmod_poly_randtest(a, state, n_randtest(state) % 600);
         nmod_poly_randtest(b, state, n_randtest(state) % 600);
-       
+
         nmod_poly_xgcd(g, s, t, a, b);
         nmod_poly_xgcd(g, a, t, a, b);
 
@@ -219,7 +219,7 @@ main(void)
         nmod_poly_init(t, n);
         nmod_poly_randtest(a, state, n_randtest(state) % 600);
         nmod_poly_randtest(b, state, n_randtest(state) % 600);
-       
+
         nmod_poly_xgcd(g, s, t, a, b);
         nmod_poly_xgcd(g, b, t, a, b);
 
@@ -257,7 +257,7 @@ main(void)
         nmod_poly_init(t, n);
         nmod_poly_randtest(a, state, n_randtest(state) % 600);
         nmod_poly_randtest(b, state, n_randtest(state) % 600);
-       
+
         nmod_poly_xgcd(g, s, t, a, b);
         nmod_poly_xgcd(g, s, a, a, b);
 
@@ -295,7 +295,7 @@ main(void)
         nmod_poly_init(t, n);
         nmod_poly_randtest(a, state, n_randtest(state) % 600);
         nmod_poly_randtest(b, state, n_randtest(state) % 600);
-       
+
         nmod_poly_xgcd(g, s, t, a, b);
         nmod_poly_xgcd(g, s, b, a, b);
 
@@ -318,7 +318,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

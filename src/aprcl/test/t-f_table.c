@@ -16,7 +16,7 @@ int main(void)
 {
     int i, j;
     FLINT_TEST_INIT(state);
-   
+
     flint_printf("f_table....");
     fflush(stdout);
 
@@ -39,7 +39,7 @@ int main(void)
             ulong g_powx, g_powfx;
             g_powx = n_powmod(g, j, q);
             g_powfx = n_powmod(g, table[j], q);
-            
+
             if (n_submod(1, g_powx, q) != g_powfx)
             {
                 flint_printf("FAIL:\n");
@@ -53,7 +53,7 @@ int main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -13,7 +13,7 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, mat_charpoly_danilevsky) (TEMPLATE(T, poly_t) p, 
+TEMPLATE(T, mat_charpoly_danilevsky) (TEMPLATE(T, poly_t) p,
                       const TEMPLATE(T, mat_t) M, const TEMPLATE(T, ctx_t) ctx)
 {
    slong n = M->r, i, j, k;
@@ -21,7 +21,7 @@ TEMPLATE(T, mat_charpoly_danilevsky) (TEMPLATE(T, poly_t) p,
    TEMPLATE(T, poly_t) b;
    TEMPLATE(T, t) c, h;
    TEMPLATE(T, mat_t) A;
-   
+
    if (n == 0)
    {
       TEMPLATE(T, poly_one) (p, ctx);
@@ -32,7 +32,7 @@ TEMPLATE(T, mat_charpoly_danilevsky) (TEMPLATE(T, poly_t) p,
 
    if (n == 1)
    {
-      TEMPLATE(T, set_ui) (c, 1, ctx); 
+      TEMPLATE(T, set_ui) (c, 1, ctx);
       TEMPLATE(T, poly_set_coeff) (p, 1, c, ctx);
       TEMPLATE(T, neg) (c, TEMPLATE(T, mat_entry) (M, 0, 0), ctx);
       TEMPLATE(T, poly_set_coeff) (p, 0, c, ctx);
@@ -104,31 +104,31 @@ TEMPLATE(T, mat_charpoly_danilevsky) (TEMPLATE(T, poly_t) p,
 
          TEMPLATE(T, set) (h, TEMPLATE(T, mat_entry) (A, n - i, n - i - 1), ctx);
       }
-      
+
       TEMPLATE(T, neg) (h, h, ctx);
       TEMPLATE(T, inv) (h, h, ctx);
-      
+
       for (j = 1; j <= n; j++)
       {
          TEMPLATE(T, mul) (V + j - 1, TEMPLATE(T, mat_entry) (A, n - i, j - 1), h, ctx);
          TEMPLATE(T, set) (W + j - 1, TEMPLATE(T, mat_entry) (A, n - i, j - 1), ctx);
-      } 
+      }
 
       TEMPLATE(T, neg) (h, h, ctx);
-      
+
       for (j = 1; j <= n - i; j++)
       {
          for (k = 1; k <= n - i - 1; k++)
          {
             TEMPLATE(T, mul) (c, TEMPLATE(T, mat_entry) (A, j - 1, n - i - 1), V + k - 1, ctx);
-            TEMPLATE(T, add) (TEMPLATE(T, mat_entry) (A, j - 1, k - 1), 
+            TEMPLATE(T, add) (TEMPLATE(T, mat_entry) (A, j - 1, k - 1),
                               TEMPLATE(T, mat_entry) (A, j - 1, k - 1), c, ctx);
          }
 
          for (k = n - i + 1; k <= n; k++)
          {
             TEMPLATE(T, mul) (c, TEMPLATE(T, mat_entry) (A, j - 1, n - i - 1), V + k - 1, ctx);
-            TEMPLATE(T, add) (TEMPLATE(T, mat_entry) (A, j - 1, k - 1), 
+            TEMPLATE(T, add) (TEMPLATE(T, mat_entry) (A, j - 1, k - 1),
                               TEMPLATE(T, mat_entry) (A, j - 1, k - 1), c, ctx);
          }
 
@@ -138,7 +138,7 @@ TEMPLATE(T, mat_charpoly_danilevsky) (TEMPLATE(T, poly_t) p,
 
       for (j = 1; j <= n - i - 1; j++)
       {
-         TEMPLATE(T, mul) (TEMPLATE(T, mat_entry) (A, n - i - 1, j - 1), 
+         TEMPLATE(T, mul) (TEMPLATE(T, mat_entry) (A, n - i - 1, j - 1),
                            TEMPLATE(T, mat_entry) (A, n - i - 1, j - 1), W + n - i - 1, ctx);
 
          for (k = 1; k < n - i; k++)
@@ -151,7 +151,7 @@ TEMPLATE(T, mat_charpoly_danilevsky) (TEMPLATE(T, poly_t) p,
 
       for (j = n - i; j <= n - 1; j++)
       {
-         TEMPLATE(T, mul) (TEMPLATE(T, mat_entry) (A, n - i - 1, j - 1), 
+         TEMPLATE(T, mul) (TEMPLATE(T, mat_entry) (A, n - i - 1, j - 1),
                            TEMPLATE(T, mat_entry) (A, n - i - 1, j - 1), W + n - i - 1, ctx);
 
          for (k = 1; k < n - i; k++)
@@ -165,7 +165,7 @@ TEMPLATE(T, mat_charpoly_danilevsky) (TEMPLATE(T, poly_t) p,
                               TEMPLATE(T, mat_entry) (A, n - i - 1, j - 1), W + j, ctx);
       }
 
-      TEMPLATE(T, mul) (TEMPLATE(T, mat_entry) (A, n - i - 1, n - 1), 
+      TEMPLATE(T, mul) (TEMPLATE(T, mat_entry) (A, n - i - 1, n - 1),
                         TEMPLATE(T, mat_entry) (A, n - i - 1, n - 1), W + n - i - 1, ctx);
 
       for (k = 1; k < n - i; k++)
@@ -188,9 +188,9 @@ TEMPLATE(T, mat_charpoly_danilevsky) (TEMPLATE(T, poly_t) p,
    }
    _TEMPLATE(T, poly_set_length) (b, n + 1, ctx);
    TEMPLATE(T, poly_mul) (p, p, b, ctx);
- 
+
 cleanup:
-  
+
    TEMPLATE(T, mat_clear) (A, ctx);
    TEMPLATE(T, clear) (c, ctx);
    TEMPLATE(T, clear) (h, ctx);

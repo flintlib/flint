@@ -390,7 +390,7 @@ int mpoly_parse_parse(mpoly_parse_t E, void * poly, const char * s, slong slen)
                 goto failed;
 
             s = _parse_int(c, s, send);
-            
+
             if (mpoly_parse_pop_prec(E, PREC_POWER))
                 goto failed;
 

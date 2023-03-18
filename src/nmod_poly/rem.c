@@ -14,7 +14,7 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_rem_q1(mp_ptr R, 
+void _nmod_poly_rem_q1(mp_ptr R,
                        mp_srcptr A, slong lenA, mp_srcptr B, slong lenB,
                        nmod_t mod)
 {
@@ -70,7 +70,7 @@ void _nmod_poly_rem_q1(mp_ptr R,
     }
 }
 
-void _nmod_poly_rem(mp_ptr R, mp_srcptr A, slong lenA, 
+void _nmod_poly_rem(mp_ptr R, mp_srcptr A, slong lenA,
                               mp_srcptr B, slong lenB, nmod_t mod)
 {
     if (lenA - lenB == 1)
@@ -124,7 +124,7 @@ void nmod_poly_rem(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
         nmod_poly_swap(R, tR);
         nmod_poly_clear(tR);
     }
-        
+
     R->length = lenB - 1;
     _nmod_poly_normalise(R);
 }

@@ -71,10 +71,10 @@ int main(void)
    FLINT_TEST_INIT(state);
 
    flint_printf("is_prime....");
-   fflush(stdout);   
-  
+   fflush(stdout);
+
    /* Test that primes pass the test */
-   for (i = 0; i < 10000 * flint_test_multiplier(); i++) 
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++)
    {
       mpz_init(d_m);
 
@@ -90,16 +90,16 @@ int main(void)
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("d = %wu is declared composite\n", d); 
+         flint_printf("d = %wu is declared composite\n", d);
          fflush(stdout);
          flint_abort();
       }
 
       mpz_clear(d_m);
    }
-         
+
    /* Test that composites do not pass */
-   for (i = 0; i < 10000 * flint_test_multiplier(); i++) 
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++)
    {
       mpz_init(d_m);
 
@@ -114,7 +114,7 @@ int main(void)
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("d = %wu is declared prime\n", d); 
+         flint_printf("d = %wu is declared prime\n", d);
          fflush(stdout);
          flint_abort();
       }
@@ -136,7 +136,7 @@ int main(void)
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("Perfect power d = %wu is declared prime\n", d); 
+         flint_printf("Perfect power d = %wu is declared prime\n", d);
          fflush(stdout);
          flint_abort();
       }
@@ -159,7 +159,7 @@ int main(void)
 #endif
 
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

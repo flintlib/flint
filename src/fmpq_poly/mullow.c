@@ -16,8 +16,8 @@
 #include "fmpq_poly.h"
 
 void
-_fmpq_poly_mullow(fmpz * rpoly, fmpz_t rden, 
-                  const fmpz * poly1, const fmpz_t den1, slong len1, 
+_fmpq_poly_mullow(fmpz * rpoly, fmpz_t rden,
+                  const fmpz * poly1, const fmpz_t den1, slong len1,
                   const fmpz * poly2, const fmpz_t den2, slong len2, slong n)
 {
     _fmpz_poly_mullow(rpoly, poly1, len1, poly2, len2, n);
@@ -54,12 +54,12 @@ fmpq_poly_mullow(fmpq_poly_t res,
 
     fmpq_poly_fit_length(res, n);
     if (len1 >= len2)
-        _fmpq_poly_mullow(res->coeffs, res->den, 
-                          poly1->coeffs, poly1->den, len1, 
+        _fmpq_poly_mullow(res->coeffs, res->den,
+                          poly1->coeffs, poly1->den, len1,
                           poly2->coeffs, poly2->den, len2, n);
     else
-        _fmpq_poly_mullow(res->coeffs, res->den, 
-                          poly2->coeffs, poly2->den, len2, 
+        _fmpq_poly_mullow(res->coeffs, res->den,
+                          poly2->coeffs, poly2->den, len2,
                           poly1->coeffs, poly1->den, len1, n);
     _fmpq_poly_set_length(res, n);
     fmpq_poly_canonicalise(res);

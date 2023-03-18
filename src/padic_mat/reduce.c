@@ -29,7 +29,7 @@ void _padic_mat_reduce(padic_mat_t mat, const padic_ctx_t ctx)
             fmpz_pow_ui(pow, ctx->p, padic_mat_prec(mat) - mat->val);
             for (i = 0; i < padic_mat(mat)->r * padic_mat(mat)->c; i++)
             {
-                fmpz_mod(padic_mat(mat)->entries + i, 
+                fmpz_mod(padic_mat(mat)->entries + i,
                          padic_mat(mat)->entries + i, pow);
             }
             fmpz_clear(pow);

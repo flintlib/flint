@@ -29,15 +29,15 @@ int main(void)
     flint_randinit(state);
 
     /* Check exponent divides class number */
-    for (i = 1; i < 1000; i++) 
+    for (i = 1; i < 1000; i++)
     {
         fmpz_t D, exp;
         qfb_t pow;
         slong e;
-        
+
         d = n_randint(state, 100000) + 1;
         num = qfb_reduced_forms(&forms, -d);
-        
+
         if (num)
         {
            fmpz_init(D);
@@ -45,7 +45,7 @@ int main(void)
            qfb_init(pow);
 
            fmpz_set_si(D, -d);
-           
+
            result = qfb_exponent_grh(exp, D, 1000000, 100000);
            if (!result)
            {
@@ -54,7 +54,7 @@ int main(void)
               printf("Discriminant: "); fmpz_print(D); printf("\n");
               flint_abort();
            }
-           
+
            e = fmpz_get_si(exp);
            result = ((num % e) == 0);
            if (!result)
@@ -65,7 +65,7 @@ int main(void)
               printf("%ld does not divide %ld\n", e, num);
               flint_abort();
            }
-           
+
            for (k = 0; k < 5; k++)
            {
               i1 = n_randint(state, num);

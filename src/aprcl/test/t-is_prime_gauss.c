@@ -16,7 +16,7 @@ int main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
-   
+
     flint_printf("is_prime_gauss....");
     fflush(stdout);
 
@@ -33,7 +33,7 @@ int main(void)
 
         pbprime = fmpz_is_probabprime(n);
         cycloprime = aprcl_is_prime_gauss(n);
-        
+
         if (pbprime != cycloprime)
         {
             flint_printf("FAIL\n");

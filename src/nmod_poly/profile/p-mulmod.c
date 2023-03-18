@@ -34,9 +34,9 @@ void sample(void * arg, ulong count)
    FLINT_TEST_INIT(state);
 
    m = n_randint(state, 1<<((48-FLINT_BIT_COUNT(n))/2)); /* modulus */
-   
+
    if (m == 0) m = 2;
-   
+
    nmod_poly_init2(a, m, n);
    nmod_poly_init2(b, m, n);
    nmod_poly_init2(c, m, 2*n - 1);
@@ -61,7 +61,7 @@ void sample(void * arg, ulong count)
    if (n < 100000) scale = 10;
    if (n < 10000) scale = 100;
    if (n < 100) scale = 1000;
-      
+
    for (i = 0; i < count; i++)
    {
       if (alg == 1)
@@ -84,7 +84,7 @@ void sample(void * arg, ulong count)
       }
       if (c->coeffs[n - 2] == 123) flint_abort();
    }
-  
+
    nmod_poly_clear(a);
    nmod_poly_clear(b);
    nmod_poly_clear(c);
@@ -119,9 +119,9 @@ int main(void)
 
       info.alg= 1;
       prof_repeat(&min, &max, sample, (void *) &info);
-         
-      flint_printf("length %wd, modulus degree %wd, min %.3g ms, max %.3g ms, norm %.3g\n", 
-           info.n, info.s, 
+
+      flint_printf("length %wd, modulus degree %wd, min %.3g ms, max %.3g ms, norm %.3g\n",
+           info.n, info.s,
 		   ((min/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,
            ((max/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,
            (((min/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0)
@@ -130,9 +130,9 @@ int main(void)
 
       info.alg= 2;
       prof_repeat(&min, &max, sample, (void *) &info);
-         
-      flint_printf("length %wd, modulus degree %wd, min %.3g ms, max %.3g ms, norm %.3g\n", 
-           info.n, info.s, 
+
+      flint_printf("length %wd, modulus degree %wd, min %.3g ms, max %.3g ms, norm %.3g\n",
+           info.n, info.s,
 		   ((min/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,
            ((max/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,
            (((min/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0)

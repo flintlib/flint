@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008, 2009, William Hart 
+    Copyright (C) 2008, 2009, William Hart
     Copyright (C) 2010 Fredrik Johansson
     Copyright (C) 2021 Daniel Schultz
 

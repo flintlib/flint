@@ -21,7 +21,7 @@ fmpz_poly_sub_series(fmpz_poly_t res, const fmpz_poly_t poly1,
 
     if (n < 0)
        n = 0;
- 
+
     max = FLINT_MIN(max, n);
     len1 = FLINT_MIN(poly1->length, max);
     len2 = FLINT_MIN(poly2->length, max);
@@ -32,5 +32,5 @@ fmpz_poly_sub_series(fmpz_poly_t res, const fmpz_poly_t poly1,
                    len2);
 
     _fmpz_poly_set_length(res, max);
-    _fmpz_poly_normalise(res);  
+    _fmpz_poly_normalise(res);
 }

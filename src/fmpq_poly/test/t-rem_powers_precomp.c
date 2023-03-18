@@ -39,7 +39,7 @@ main(void)
         fmpq_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, 100);
 
         fmpq_poly_powers_precompute(binv, b);
-        
+
         fmpq_poly_rem_powers_precomp(r, a, b, binv);
         fmpq_poly_rem_powers_precomp(a, a, b, binv);
 
@@ -61,7 +61,7 @@ main(void)
         fmpq_poly_clear(b);
         fmpq_poly_clear(r);
     }
-    
+
     /* Check aliasing of q and b */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
@@ -75,7 +75,7 @@ main(void)
         fmpq_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, 100);
 
         fmpq_poly_powers_precompute(binv, b);
-        
+
         fmpq_poly_rem_powers_precomp(r, a, b, binv);
         fmpq_poly_rem_powers_precomp(b, a, b, binv);
 
@@ -113,7 +113,7 @@ main(void)
         fmpq_poly_randtest_not_zero(b, state, n_randint(state, 50) + 1, 100);
 
         fmpq_poly_powers_precompute(binv, b);
-        
+
         fmpq_poly_divrem(q, r, a, b);
         fmpq_poly_rem_powers_precomp(r2, a, b, binv);
         fmpq_poly_canonicalise(r2);
@@ -142,7 +142,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

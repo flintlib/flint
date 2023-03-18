@@ -13,7 +13,7 @@
 #define FQ_ZECH_H
 
 #ifdef FQ_ZECH_INLINES_C
-#define FQ_ZECH_INLINE 
+#define FQ_ZECH_INLINE
 /* #define FQ_TEMPLATES_INLINE */
 #else
 #define FQ_ZECH_INLINE static __inline__
@@ -366,7 +366,7 @@ void __fq_zech_ctx_prime(fmpz_t p, fq_zech_ctx_t ctx);
 #undef B
 #undef CAP_T
 #undef T
-    
+
 #ifdef __cplusplus
 }
 #endif

@@ -14,7 +14,7 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
-void 
+void
 _fmpq_poly_powers_clear(fmpq_poly_struct * powers, slong len)
 {
    slong i;
@@ -24,7 +24,7 @@ _fmpq_poly_powers_clear(fmpq_poly_struct * powers, slong len)
    flint_free(powers);
 }
 
-void 
+void
 fmpq_poly_powers_clear(fmpq_poly_powers_precomp_t pinv)
 {
    _fmpq_poly_powers_clear(pinv->powers, pinv->len);

@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2009, 2011 William Hart
 
     This file is part of FLINT.
@@ -11,8 +11,8 @@
 
 #include "flint.h"
 #include "fft.h"
-      
-void ifft_negacyclic(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, 
+
+void ifft_negacyclic(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w,
                      mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp)
 {
    mp_size_t i;
@@ -23,8 +23,8 @@ void ifft_negacyclic(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w,
 
    if (w & 1)
    {
-      for (i = 0; i < n; i++) 
-      {   
+      for (i = 0; i < n; i++)
+      {
           ifft_butterfly(*t1, *t2, ii[i], ii[n+i], i, limbs, w);
           SWAP_PTRS(ii[i],   *t1);
           SWAP_PTRS(ii[n+i], *t2);
@@ -32,11 +32,11 @@ void ifft_negacyclic(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w,
           fft_adjust(*t1, ii[i], n - i/2, limbs, w);
           mpn_neg_n(*t1, *t1, limbs + 1);
           SWAP_PTRS(ii[i], *t1);
-            
+
           fft_adjust(*t2, ii[n+i], n - (n+i)/2, limbs, w);
           mpn_neg_n(*t2, *t2, limbs + 1);
           SWAP_PTRS(ii[n+i], *t2);
-            
+
           i++;
 
           ifft_butterfly(*t1, *t2, ii[i], ii[n+i], i, limbs, w);
@@ -46,15 +46,15 @@ void ifft_negacyclic(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w,
           fft_adjust_sqrt2(*t1, ii[i], 2*n-i, limbs, w, *temp);
           mpn_neg_n(*t1, *t1, limbs + 1);
           SWAP_PTRS(ii[i], *t1);
-          
+
           fft_adjust_sqrt2(*t2, ii[n+i], n-i, limbs, w, *temp);
           mpn_neg_n(*t2, *t2, limbs + 1);
           SWAP_PTRS(ii[n+i], *t2);
        }
    } else
    {
-       for (i = 0; i < n; i++) 
-       {   
+       for (i = 0; i < n; i++)
+       {
           ifft_butterfly(*t1, *t2, ii[i], ii[n+i], i, limbs, w);
           SWAP_PTRS(ii[i],   *t1);
           SWAP_PTRS(ii[n+i], *t2);
@@ -62,7 +62,7 @@ void ifft_negacyclic(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w,
           fft_adjust(*t1, ii[i], 2*n-i, limbs, w/2);
           mpn_neg_n(*t1, *t1, limbs + 1);
           SWAP_PTRS(ii[i], *t1);
-            
+
           fft_adjust(*t2, ii[n+i], n-i, limbs, w/2);
           mpn_neg_n(*t2, *t2, limbs + 1);
           SWAP_PTRS(ii[n+i], *t2);

@@ -24,7 +24,7 @@ char * fmpq_poly_get_str(const fmpq_poly_t poly)
     mpz_t z;
     mpq_t q;
     char * str;
-    
+
     if (poly->length == 0)
     {
         str = (char *) flint_malloc(2 * sizeof(char));
@@ -32,7 +32,7 @@ char * fmpq_poly_get_str(const fmpq_poly_t poly)
         str[1] = '\0';
         return str;
     }
-    
+
     mpz_init(z);
     if (*poly->den == WORD(1))
     {
@@ -51,10 +51,10 @@ char * fmpq_poly_get_str(const fmpq_poly_t poly)
         if (mpz_sgn(z))
             len += denlen + (size_t) 2;
     }
-    
+
     mpq_init(q);
     str = (char *) flint_malloc(len * sizeof(char));
-    
+
     j = flint_sprintf(str, "%li", poly->length);
     str[j++] = ' ';
     for (i = 0; i < poly->length; i++)
@@ -66,10 +66,10 @@ char * fmpq_poly_get_str(const fmpq_poly_t poly)
         mpq_get_str(str + j, 10, q);
         j += strlen(str + j);
     }
-    
+
     mpq_clear(q);
     mpz_clear(z);
-    
+
     return str;
 }
 

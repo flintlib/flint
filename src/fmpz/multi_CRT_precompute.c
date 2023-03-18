@@ -176,7 +176,7 @@ int fmpz_multi_CRT_precompute(
     if (r < 2)
     {
         P->good = !fmpz_is_zero(f + 0);
-        
+
         if (P->good)
         {
             fmpz_abs(P->final_modulus, f + 0);

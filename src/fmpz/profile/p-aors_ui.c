@@ -365,7 +365,7 @@ void fmpz_add_ui_old(fmpz_t f, const fmpz_t g, ulong x)
         }
     }
     else
-    {	
+    {
         __mpz_struct * mf = _fmpz_promote(f);  /* g is already large */
         __mpz_struct * mc = COEFF_TO_PTR(c);
         flint_mpz_add_ui(mf, mc, x);
@@ -419,7 +419,7 @@ sample_add_new(void * arg, ulong count)
     res = _fmpz_vec_init(ntests);
     a = _fmpz_vec_init(ntests);
     b = flint_malloc(sizeof(mp_limb_t) * ntests);
-   
+
     for (ix = 0; ix < 10 * count; ix++)
     {
         for (jx = 0; jx < ntests; jx++)
@@ -454,7 +454,7 @@ sample_add_old(void * arg, ulong count)
     res = _fmpz_vec_init(ntests);
     a = _fmpz_vec_init(ntests);
     b = flint_malloc(sizeof(mp_limb_t) * ntests);
-   
+
     for (ix = 0; ix < 10 * count; ix++)
     {
         for (jx = 0; jx < ntests; jx++)
@@ -489,7 +489,7 @@ sample_sub_new(void * arg, ulong count)
     res = _fmpz_vec_init(ntests);
     a = _fmpz_vec_init(ntests);
     b = flint_malloc(sizeof(mp_limb_t) * ntests);
-   
+
     for (ix = 0; ix < 10 * count; ix++)
     {
         for (jx = 0; jx < ntests; jx++)
@@ -524,7 +524,7 @@ sample_sub_old(void * arg, ulong count)
     res = _fmpz_vec_init(ntests);
     a = _fmpz_vec_init(ntests);
     b = flint_malloc(sizeof(mp_limb_t) * ntests);
-   
+
     for (ix = 0; ix < 10 * count; ix++)
     {
         for (jx = 0; jx < ntests; jx++)
@@ -560,7 +560,7 @@ main(void)
     {
         prof_repeat(&minnew, &maxnew, sample_add_new, &bits);
         prof_repeat(&minold, &maxold, sample_add_old, &bits);
-        
+
         flint_printf("%d bits:      min %.2fx,    max %.2fx\n",
                 bits, minold / minnew, maxold / maxnew);
     }
@@ -570,7 +570,7 @@ main(void)
     {
         prof_repeat(&minnew, &maxnew, sample_sub_new, &bits);
         prof_repeat(&minold, &maxold, sample_sub_old, &bits);
-        
+
         flint_printf("%d bits:      min %.2fx,    max %.2fx\n",
                 bits, minold / minnew, maxold / maxnew);
     }

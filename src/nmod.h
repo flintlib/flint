@@ -14,7 +14,7 @@
 #define NMOD_H
 
 #ifdef NMOD_INLINES_C
-#define NMOD_INLINE 
+#define NMOD_INLINE
 #else
 #define NMOD_INLINE static __inline__
 #endif
@@ -134,7 +134,7 @@ mp_limb_t nmod_add(mp_limb_t a, mp_limb_t b, nmod_t mod)
    const mp_limb_t neg = mod.n - a;
    if (neg > b)
       return a + b;
-   else 
+   else
       return b - neg;
 }
 
@@ -142,7 +142,7 @@ NMOD_INLINE
 mp_limb_t nmod_sub(mp_limb_t a, mp_limb_t b, nmod_t mod)
 {
    const mp_limb_t diff = a - b;
-   
+
    if (a < b)
       return mod.n + diff;
    else

@@ -21,7 +21,7 @@ main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("init/clear....");
     fflush(stdout);
@@ -42,7 +42,7 @@ main(void)
         fmpz_poly_mat_clear(a);
     }
 
-    
+
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

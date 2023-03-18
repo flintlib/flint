@@ -78,7 +78,7 @@ void fq_embed_trace_matrix(fmpz_mod_mat_t res,
                                const fq_ctx_t sub_ctx,
                                const fq_ctx_t sup_ctx)
 {
-    slong m = fmpz_mod_mat_ncols(basis); 
+    slong m = fmpz_mod_mat_ncols(basis);
     slong n = fmpz_mod_mat_nrows(basis);
     fmpz_mod_mat_t m2d, d2m, tmp;
 
@@ -150,7 +150,7 @@ void fq_embed_matrices(fmpz_mod_mat_t embed,
         int i;
         fq_t mul, trace;
         fmpz_mod_mat_t column, tvec, mat_mul, tmp;
-        
+
         fq_init(mul, sup_ctx);
         fq_init(trace, sup_ctx);
         fmpz_mod_mat_init(tvec, n, 1, fmpz_mod_ctx_modulus(ctxp));
@@ -164,7 +164,7 @@ void fq_embed_matrices(fmpz_mod_mat_t embed,
             if (!fmpz_is_zero(fmpz_mod_mat_entry(sup2gen, 0, i)))
                 break;
         }
-        
+
         /* Set mul to x^i */
         fq_gen(mul, sup_ctx);
         fq_pow_ui(mul, mul, i, sup_ctx);
@@ -174,12 +174,12 @@ void fq_embed_matrices(fmpz_mod_mat_t embed,
         fq_set_fmpz_mod_mat(trace, tvec, sup_ctx);
         /* Get an element of trace 1 */
         fq_div(mul, mul, trace, sup_ctx);
-        
+
         /* Correct the matrix */
         fq_embed_mul_matrix(mat_mul, mul, sup_ctx);
         fmpz_mod_mat_mul(tmp, sup2gen, mat_mul);
         fmpz_mod_mat_swap(tmp, sup2gen);
-        
+
         fmpz_mod_mat_clear(tmp);
         fmpz_mod_mat_clear(mat_mul);
         fmpz_mod_mat_clear(tvec);

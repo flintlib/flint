@@ -249,7 +249,7 @@ void n_polyu3n_mod_interp_lift_2sm_bpoly(
     slong * lastdeg,
     n_polyun_t T,
     const n_bpoly_t A,
-    const n_bpoly_t B,    
+    const n_bpoly_t B,
     mp_limb_t alpha,
     nmod_t mod)
 {

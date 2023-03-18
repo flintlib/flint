@@ -11,8 +11,8 @@
 */
 
 /*
-    Demo FLINT program to demonstrate some use of the 
-    function fmpz_mod_poly_radix() for radix conversion 
+    Demo FLINT program to demonstrate some use of the
+    function fmpz_mod_poly_radix() for radix conversion
     over $\mathbf{Z}/n \mathbf{Z}$.
 */
 
@@ -52,7 +52,7 @@ int main(void)
     fmpz_mod_polyxx r(A.pow(3u) * fmpzxx(4) + B.pow(2u) * fmpzxx(27));
 
     fmpz_mod_poly_vecxx b(N + 1, m);
-    
+
     fmpz_mod_polyxx t = fmpz_mod_polyxx::randtest(m, state, n + 1);
 
     flint_printf("Radix conversion\n");

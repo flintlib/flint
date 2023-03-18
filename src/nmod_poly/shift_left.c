@@ -28,9 +28,9 @@ void nmod_poly_shift_left(nmod_poly_t res, const nmod_poly_t poly, slong k)
     }
 
     nmod_poly_fit_length(res, poly->length + k);
-   
+
     _nmod_poly_shift_left(res->coeffs, poly->coeffs, poly->length, k);
-   
+
     res->length = poly->length + k;
 }
 

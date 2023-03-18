@@ -13,7 +13,7 @@
 #include "aprcl.h"
 
 /*
-    Computes f = g * h for p = 5. 
+    Computes f = g * h for p = 5.
     g and h must be reduced by F_5 cyclotomic polynomial.
     t is the memory for fmpz_t; size of t must be > 24.
     Resulting f reduced by F_5 cyclotomic polynomial.
@@ -34,7 +34,7 @@ unity_zp_mul5(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
 
         d0 = t[16]; d1 = t[17]; d2 = t[18]; d3 = t[19];
         d4 = t[20]; d5 = t[21]; d6 = t[22]; d7 = t[23];
-        d8 = t[24]. 
+        d8 = t[24].
     */
 
     /* set xi */

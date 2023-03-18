@@ -187,10 +187,10 @@ main(void)
         flint_free(shifts);
         flint_free(strides);
 
-        fmpz_mpoly_clear(f, ctx);  
-        fmpz_mpoly_clear(g, ctx);  
-        fmpz_mpoly_clear(h, ctx);  
-        fmpz_mpoly_clear(k, ctx);  
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(h, ctx);
+        fmpz_mpoly_clear(k, ctx);
         fmpz_mpoly_ctx_clear(ctx);
     }
 
@@ -266,7 +266,7 @@ main(void)
        fmpz_mpoly_init(f, ctx);
        fmpz_mpoly_init(g, ctx);
        fmpz_mpoly_init(h, ctx);
- 
+
        len = n_randint(state, 20);
        len1 = n_randint(state, 20);
        len2 = n_randint(state, 20) + 1;
@@ -302,9 +302,9 @@ main(void)
           }
        }
 
-       fmpz_mpoly_clear(f, ctx);  
-       fmpz_mpoly_clear(g, ctx);  
-       fmpz_mpoly_clear(h, ctx);  
+       fmpz_mpoly_clear(f, ctx);
+       fmpz_mpoly_clear(g, ctx);
+       fmpz_mpoly_clear(h, ctx);
        fmpz_mpoly_ctx_clear(ctx);
     }
 
@@ -380,7 +380,7 @@ main(void)
        fmpz_mpoly_init(f, ctx);
        fmpz_mpoly_init(g, ctx);
        fmpz_mpoly_init(h, ctx);
- 
+
        len = n_randint(state, 100);
        len1 = n_randint(state, 100);
        len2 = n_randint(state, 100) + 1;
@@ -410,20 +410,20 @@ main(void)
           if (!result)
           {
              printf("FAIL\n");
-             flint_printf("Check aliasing, second argument, random polys\ni = %wd, j = %wd\n", i ,j);          
+             flint_printf("Check aliasing, second argument, random polys\ni = %wd, j = %wd\n", i ,j);
              fflush(stdout);
              flint_abort();
           }
        }
 
-       fmpz_mpoly_clear(f, ctx);  
-       fmpz_mpoly_clear(g, ctx);  
-       fmpz_mpoly_clear(h, ctx);  
+       fmpz_mpoly_clear(f, ctx);
+       fmpz_mpoly_clear(g, ctx);
+       fmpz_mpoly_clear(h, ctx);
        fmpz_mpoly_ctx_clear(ctx);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

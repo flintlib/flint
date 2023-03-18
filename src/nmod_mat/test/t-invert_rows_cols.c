@@ -19,7 +19,7 @@ main(void)
 {
     slong m, n, mod, rep;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("invert_rows/cols....");
     fflush(stdout);
@@ -47,7 +47,7 @@ main(void)
         {
             for (j =0; j < A->c; j++)
             {
-                if (nmod_mat_entry(B, i, j) != nmod_mat_entry(A, A->r - i - 1, A->c - j - 1)) 
+                if (nmod_mat_entry(B, i, j) != nmod_mat_entry(A, A->r - i - 1, A->c - j - 1))
                 {
                     flint_printf("FAIL: B != A\n");
                     flint_printf("A:\n");
@@ -65,7 +65,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

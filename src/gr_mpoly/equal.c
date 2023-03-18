@@ -24,7 +24,7 @@ truth_t gr_mpoly_equal(
         return T_TRUE;
 
     /* todo: if canonical representation */
-    /* 
+    /*
     if (A->length != B->length)
         return T_FALSE;
 

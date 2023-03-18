@@ -50,7 +50,7 @@ const value_type multiplication[NUM_VALUE_TYPES][NUM_VALUE_TYPES] = {
     {ALL_POSITIVE,     CONTAINS_ZERO,    ALL_NEGATIVE,     ANY_FINITE,       POSITIVE_INFINITY,NEGATIVE_INFINITY,WHOLE_LINE,       ANY_INFINITE,     NOT_A_NUMBER},
     {CONTAINS_ZERO,    CONTAINS_ZERO,    CONTAINS_ZERO,    ANY_FINITE,       WHOLE_LINE,       WHOLE_LINE,       WHOLE_LINE,       ANY_INFINITE,     NOT_A_NUMBER},
     {ALL_NEGATIVE,     CONTAINS_ZERO,    ALL_POSITIVE,     ANY_FINITE,       NEGATIVE_INFINITY,POSITIVE_INFINITY,WHOLE_LINE,       ANY_INFINITE,     NOT_A_NUMBER},
-    {ANY_FINITE,       ANY_FINITE,       ANY_FINITE,       ANY_FINITE,       ANY_INFINITE,     ANY_INFINITE,     WHOLE_LINE,       ANY_INFINITE,     NOT_A_NUMBER},  
+    {ANY_FINITE,       ANY_FINITE,       ANY_FINITE,       ANY_FINITE,       ANY_INFINITE,     ANY_INFINITE,     WHOLE_LINE,       ANY_INFINITE,     NOT_A_NUMBER},
     {POSITIVE_INFINITY,WHOLE_LINE,       NEGATIVE_INFINITY,ANY_INFINITE,     POSITIVE_INFINITY,NEGATIVE_INFINITY,WHOLE_LINE,       ANY_INFINITE,     NOT_A_NUMBER},
     {NEGATIVE_INFINITY,WHOLE_LINE,       POSITIVE_INFINITY,ANY_INFINITE,     NEGATIVE_INFINITY,POSITIVE_INFINITY,WHOLE_LINE,       ANY_INFINITE,     NOT_A_NUMBER},
     {WHOLE_LINE,       WHOLE_LINE,       WHOLE_LINE,       WHOLE_LINE,       WHOLE_LINE,       WHOLE_LINE,       WHOLE_LINE,       WHOLE_LINE,       NOT_A_NUMBER},
@@ -116,7 +116,7 @@ int main()
     slong i, j, k, prec;
     arb_t t, u, v, w;
     arf_t x;
-    
+
     flint_printf("pos_times_posinf....");
     fflush(stdout);
 
@@ -170,7 +170,7 @@ int main()
                     arb_set_str(w, test_values_arb[k].value, prec);
 
                     arb_submul(w, t, u, prec);
-                    
+
                     if(!arb_satisfies_value_type(w, expected))
                     {
                         flint_printf("FAIL (arb_submul): %s, %s, %s\n", test_values_arb[k].value, test_values_arb[i].value, test_values_arb[j].value);
@@ -241,7 +241,7 @@ int main()
                     arb_set_str(w, test_values_arb[k].value, prec);
 
                     arb_submul_arf(w, t, x, prec);
-                    
+
                     if(!arb_satisfies_value_type(w, expected))
                     {
                         flint_printf("FAIL (arb_submul_arf): %s, %s, %s\n", test_values_arb[k].value, test_values_arb[i].value, test_values_arf[j].value);
@@ -267,16 +267,16 @@ int main()
                         flint_printf("\nexpected type: %d\n", expected);
                         flint_abort();
                     }
-                }                
+                }
             }
         }
-    
+
     arf_clear(x);
     arb_clear(w);
     arb_clear(v);
     arb_clear(u);
     arb_clear(t);
-    
+
     flint_cleanup();
     flint_printf("PASS\n");
     return 0;

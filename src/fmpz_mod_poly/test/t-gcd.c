@@ -100,8 +100,8 @@ main(void)
         fmpz_clear(p);
     }
 
-    /* 
-        Check that g = GCD(a,b) divides a and b, 
+    /*
+        Check that g = GCD(a,b) divides a and b,
         and that 1 == GCD(a/g, b/g)
      */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
@@ -136,7 +136,7 @@ main(void)
             fmpz_mod_poly_divrem_basecase(d, t, b, g, ctx);
             fmpz_mod_poly_gcd(h, c, d, ctx);
 
-            result = (fmpz_mod_poly_is_zero(s, ctx) && fmpz_mod_poly_is_zero(t, ctx) 
+            result = (fmpz_mod_poly_is_zero(s, ctx) && fmpz_mod_poly_is_zero(t, ctx)
                       && (h->length == 1) && (fmpz_is_one(h->coeffs)));
         }
 
@@ -251,8 +251,8 @@ main(void)
         fmpz_clear(p);
     }
 
-    /* 
-        Check that g = GCD(a,b) divides a and b, 
+    /*
+        Check that g = GCD(a,b) divides a and b,
         and that 1 == GCD(a/g, b/g)
      */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
@@ -291,7 +291,7 @@ main(void)
             fmpz_mod_poly_divrem_basecase(d, t, b, g, ctx);
             fmpz_mod_poly_gcd(h, c, d, ctx);
 
-            result = (fmpz_mod_poly_is_zero(s, ctx) && fmpz_mod_poly_is_zero(t, ctx) 
+            result = (fmpz_mod_poly_is_zero(s, ctx) && fmpz_mod_poly_is_zero(t, ctx)
                       && (h->length == 1) && (fmpz_is_one(h->coeffs)));
         }
 
@@ -325,7 +325,7 @@ main(void)
 
     fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

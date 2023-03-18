@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Sebastian Pancratz 
+    Copyright (C) 2012 Sebastian Pancratz
     Copyright (C) 2013 Mike Hansen
 
     This file is part of FLINT.
@@ -42,9 +42,9 @@ main(void)
         fmpz_t p;
         slong d;
         TEMPLATE(T, ctx_t) ctx;
-        
+
         fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 
+        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state,
                                    FLINT_MIN(FLINT_BITS - 1, 50)), 1));
         d = n_randint(state, 20) + 1;
 

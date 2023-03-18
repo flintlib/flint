@@ -13,7 +13,7 @@
 #define FMPQ_MPOLY_H
 
 #ifdef FMPQ_MPOLY_INLINES_C
-#define FMPQ_MPOLY_INLINE 
+#define FMPQ_MPOLY_INLINE
 #else
 #define FMPQ_MPOLY_INLINE static __inline__
 #endif
@@ -29,7 +29,7 @@ extern "C" {
 /* Context object ************************************************************/
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_ctx_init(fmpq_mpoly_ctx_t ctx, 
+void fmpq_mpoly_ctx_init(fmpq_mpoly_ctx_t ctx,
                                             slong nvars, const ordering_t ord)
 {
     fmpz_mpoly_ctx_init(ctx->zctx, nvars, ord);
@@ -110,7 +110,7 @@ void fmpq_mpoly_init(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 }
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_init2(fmpq_mpoly_t A, slong alloc, 
+void fmpq_mpoly_init2(fmpq_mpoly_t A, slong alloc,
                                                    const fmpq_mpoly_ctx_t ctx)
 {
     fmpq_init(A->content);
@@ -127,14 +127,14 @@ void fmpq_mpoly_init3(fmpq_mpoly_t A, slong alloc, flint_bitcnt_t bits,
 
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_realloc(fmpq_mpoly_t A, slong alloc, 
+void fmpq_mpoly_realloc(fmpq_mpoly_t A, slong alloc,
                                                    const fmpq_mpoly_ctx_t ctx)
 {
     fmpz_mpoly_realloc(A->zpoly, alloc, ctx->zctx);
 }
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_fit_length(fmpq_mpoly_t A, slong len, 
+void fmpq_mpoly_fit_length(fmpq_mpoly_t A, slong len,
                                                    const fmpq_mpoly_ctx_t ctx)
 {
     fmpz_mpoly_fit_length(A->zpoly, len, ctx->zctx);
@@ -163,7 +163,7 @@ int fmpq_mpoly_set_str_pretty(fmpq_mpoly_t A, const char * str,
 char * fmpq_mpoly_get_str_pretty(const fmpq_mpoly_t A,
                                   const char ** x, const fmpq_mpoly_ctx_t ctx);
 
-int fmpq_mpoly_fprint_pretty(FILE * file, 
+int fmpq_mpoly_fprint_pretty(FILE * file,
             const fmpq_mpoly_t A, const char ** x, const fmpq_mpoly_ctx_t ctx);
 
 FMPQ_MPOLY_INLINE
@@ -208,7 +208,7 @@ int fmpq_mpoly_equal(const fmpq_mpoly_t A, const fmpq_mpoly_t B,
 }
 
 FMPQ_MPOLY_INLINE
-void fmpq_mpoly_swap(fmpq_mpoly_t A, 
+void fmpq_mpoly_swap(fmpq_mpoly_t A,
                                 fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
 {
     fmpq_mpoly_struct t = *A;

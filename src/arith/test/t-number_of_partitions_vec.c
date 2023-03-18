@@ -26,7 +26,7 @@ int main(void)
 
     flint_printf("number_of_partitions_vec....");
     fflush(stdout);
-    
+
     p = _fmpz_vec_init(maxn);
     pmod = _nmod_vec_init(maxn);
 
@@ -96,7 +96,7 @@ int main(void)
     _nmod_vec_clear(pmod);
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

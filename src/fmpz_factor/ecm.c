@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-/* Outer wrapper for ECM 
+/* Outer wrapper for ECM
    makes calls to stage I and stage II (one) */
 
 #include "ulong_extras.h"
@@ -22,8 +22,8 @@ ulong n_ecm_primorial[] =
 #ifdef FLINT64
 
     UWORD(2), UWORD(6), UWORD(30), UWORD(210), UWORD(2310), UWORD(30030),
-    UWORD(510510), UWORD(9699690), UWORD(223092870), UWORD(6469693230), 
-    UWORD(200560490130), UWORD(7420738134810), UWORD(304250263527210), 
+    UWORD(510510), UWORD(9699690), UWORD(223092870), UWORD(6469693230),
+    UWORD(200560490130), UWORD(7420738134810), UWORD(304250263527210),
     UWORD(13082761331670030), UWORD(614889782588491410)
     /* 15 values */
 
@@ -104,7 +104,7 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
     num = n_prime_pi(B1);   /* number of primes under B1 */
 
     /* compute list of primes under B1 for stage I */
-    prime_array = n_primes_arr_readonly(num);   
+    prime_array = n_primes_arr_readonly(num);
 
     /************************ STAGE II PRECOMPUTATIONS ***********************/
 
@@ -116,16 +116,16 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
     while ((j < num_n_ecm_primorials) && (n_ecm_primorial[j] < maxP))
         j += 1;
 
-    P = n_ecm_primorial[j - 1]; 
-    
+    P = n_ecm_primorial[j - 1];
+
     mmin = (B1 + (P/2)) / P;
     mmax = ((B2 - P/2) + P - 1)/P;      /* ceil */
     if (mmax < mmin)
-    {  
+    {
        flint_printf("Exception (ecm). B1 > B2 encountered.\n");
        flint_abort();
     }
-    maxj = (P + 1)/2; 
+    maxj = (P + 1)/2;
     mdiff = mmax - mmin + 1;
 
     /* compute GCD_table */
@@ -135,10 +135,10 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
     for (j = 1; j <= maxj; j += 2)
     {
         if ((j%2) && n_gcd(j, P) == 1)
-            ecm_inf->GCD_table[j] = 1;  
+            ecm_inf->GCD_table[j] = 1;
         else
             ecm_inf->GCD_table[j] = 0;
-    }  
+    }
 
     /* compute prime table */
 
@@ -179,7 +179,7 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
         fmpz_add_ui(sig, sig, 7);
 
         mpn_zero(mpsig, ecm_inf->n_size);
-        
+
         if ((!COEFF_IS_MPZ(*sig)))
         {
             mpsig[0] = fmpz_get_ui(sig);
@@ -219,7 +219,7 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
             MPN_NORM(fac->_mp_d, ret);
 
             fac->_mp_size = ret;
-            _fmpz_demote_val(f);    
+            _fmpz_demote_val(f);
             ret = -1;
             goto cleanup;
         }
@@ -239,10 +239,10 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
                 MPN_NORM(fac->_mp_d, ret);
 
                 fac->_mp_size = ret;
-                _fmpz_demote_val(f);    
+                _fmpz_demote_val(f);
                 ret = 1;
                 goto cleanup;
-            }  
+            }
             /************************** STAGE II ***************************/
 
             ret = fmpz_factor_ecm_stage_II(fac->_mp_d, B1, B2, P, n, ecm_inf);
@@ -254,7 +254,7 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
                    mpn_rshift(fac->_mp_d, fac->_mp_d, ret, ecm_inf->normbits);
                 MPN_NORM(fac->_mp_d, ret);
                 fac->_mp_size = ret;
-                _fmpz_demote_val(f);  
+                _fmpz_demote_val(f);
                 ret = 2;
                 goto cleanup;
             }
@@ -270,7 +270,7 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
     flint_free(ecm_inf->prime_table);
 
     fmpz_factor_ecm_clear(ecm_inf);
-   
+
     fmpz_clear(nm8);
     fmpz_clear(sig);
 

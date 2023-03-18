@@ -16,7 +16,7 @@
 #define ULONG_EXTRAS_H
 
 #ifdef ULONG_EXTRAS_INLINES_C
-#define ULONG_EXTRAS_INLINE 
+#define ULONG_EXTRAS_INLINE
 #else
 #define ULONG_EXTRAS_INLINE static __inline__
 #endif
@@ -178,7 +178,7 @@ ulong n_clog(ulong n, ulong b);
 
 ulong n_clog_2exp(ulong n, ulong b);
 
-ULONG_EXTRAS_INLINE 
+ULONG_EXTRAS_INLINE
 double n_precompute_inverse(ulong n)
 {
    return (double) 1 / (double) n;
@@ -198,7 +198,7 @@ ulong n_mod_precomp(ulong a, ulong n, double ninv);
 
 ulong n_mod2_precomp(ulong a, ulong n, double ninv);
 
-ulong n_divrem2_precomp(ulong * q, ulong a, 
+ulong n_divrem2_precomp(ulong * q, ulong a,
                                            ulong n, double npre);
 
 ulong n_divrem2_preinv(ulong * q, ulong a, ulong n, ulong ninv);
@@ -207,13 +207,13 @@ ulong n_div2_preinv(ulong a, ulong n, ulong ninv);
 
 ulong n_mod2_preinv(ulong a, ulong n, ulong ninv);
 
-ulong n_ll_mod_preinv(ulong a_hi, ulong a_lo, 
+ulong n_ll_mod_preinv(ulong a_hi, ulong a_lo,
                                         ulong n, ulong ninv);
 
-ulong n_lll_mod_preinv(ulong a_hi, ulong a_mi, 
+ulong n_lll_mod_preinv(ulong a_hi, ulong a_mi,
                         ulong a_lo, ulong n, ulong ninv);
 
-ulong n_mulmod_precomp(ulong a, ulong b, 
+ulong n_mulmod_precomp(ulong a, ulong b,
                                            ulong n, double ninv);
 
 ULONG_EXTRAS_INLINE
@@ -239,7 +239,7 @@ ulong n_mulmod2(ulong a, ulong b, ulong n)
     return n_ll_mod_preinv(p1, p2, n, ninv);
 }
 
-ulong n_mulmod_preinv(ulong a, ulong b, 
+ulong n_mulmod_preinv(ulong a, ulong b,
                             ulong n, ulong ninv, ulong norm);
 
 ulong n_powmod_ui_precomp(ulong a, ulong exp, ulong n, double npre);
@@ -264,7 +264,7 @@ ulong n_powmod2_preinv(ulong a, slong exp, ulong n, ulong ninv);
 
 ulong n_powmod2_ui_preinv(ulong a, ulong exp, ulong n, ulong ninv);
 
-ulong n_powmod_ui_preinv(ulong a, ulong exp, ulong n, 
+ulong n_powmod_ui_preinv(ulong a, ulong exp, ulong n,
                                                        ulong ninv, ulong norm);
 
 ULONG_EXTRAS_INLINE
@@ -310,9 +310,9 @@ ulong n_negmod(ulong x, ulong n)
 
 ulong n_sqrtmod(ulong a, ulong p);
 
-slong n_sqrtmod_2pow(ulong ** sqrt, ulong a, slong exp); 
+slong n_sqrtmod_2pow(ulong ** sqrt, ulong a, slong exp);
 
-slong n_sqrtmod_primepow(ulong ** sqrt, ulong a, 
+slong n_sqrtmod_primepow(ulong ** sqrt, ulong a,
                                               ulong p, slong exp);
 
 slong n_sqrtmodn(ulong ** sqrt, ulong a, n_factor_t * fac);
@@ -381,10 +381,10 @@ int n_is_probabprime_lucas(ulong n);
 
 int n_is_probabprime_BPSW(ulong n);
 
-int n_is_strong_probabprime_precomp(ulong n, 
+int n_is_strong_probabprime_precomp(ulong n,
                               double npre, ulong a, ulong d);
 
-int n_is_strong_probabprime2_preinv(ulong n, 
+int n_is_strong_probabprime2_preinv(ulong n,
                            ulong ninv, ulong a, ulong d);
 
 int n_is_probabprime(ulong n);
@@ -415,16 +415,16 @@ void n_factor_init(n_factor_t * factors)
 
 void n_factor_insert(n_factor_t * factors, ulong p, ulong exp);
 
-ulong n_factor_trial_range(n_factor_t * factors, 
+ulong n_factor_trial_range(n_factor_t * factors,
                          ulong n, ulong start, ulong num_primes);
 
-ulong n_factor_trial_partial(n_factor_t * factors, ulong n, 
+ulong n_factor_trial_partial(n_factor_t * factors, ulong n,
                 ulong * prod, ulong num_primes, ulong limit);
 
-ulong n_factor_trial(n_factor_t * factors, 
+ulong n_factor_trial(n_factor_t * factors,
                                   ulong n, ulong num_primes);
 
-ulong n_factor_partial(n_factor_t * factors, 
+ulong n_factor_partial(n_factor_t * factors,
                            ulong n, ulong limit, int proved);
 
 ulong n_factor_power235(ulong *exp, ulong n);
@@ -443,13 +443,13 @@ ulong n_factor_pp1_wrapper(ulong n);
 
 void n_factor_pp1_table_insert(slong bits, slong B1, slong count);
 
-int n_factor_pollard_brent_single(ulong *factor, ulong n, 
-                                            ulong ninv, ulong ai, 
+int n_factor_pollard_brent_single(ulong *factor, ulong n,
+                                            ulong ninv, ulong ai,
                                             ulong xi, ulong normbits,
                                             ulong max_iters);
 
-int n_factor_pollard_brent(ulong *factor, flint_rand_t state, 
-                                     ulong n_in, ulong max_tries, 
+int n_factor_pollard_brent(ulong *factor, flint_rand_t state,
+                                     ulong n_in, ulong max_tries,
                                      ulong max_iters);
 
 int n_is_squarefree(ulong n);
@@ -503,13 +503,13 @@ void n_factor_ecm_double(ulong *x, ulong *z, ulong x0,
                                    ulong z0, ulong n, n_ecm_t n_ecm_inf);
 
 void n_factor_ecm_add(ulong *x, ulong *z, ulong x1,
-                                ulong z1, ulong x2, ulong z2, 
-                                ulong x0, ulong z0, ulong n, 
+                                ulong z1, ulong x2, ulong z2,
+                                ulong x0, ulong z0, ulong n,
                                 n_ecm_t n_ecm_inf);
 
 void n_factor_ecm_mul_montgomery_ladder(ulong *x, ulong *z,
                                                   ulong x0, ulong z0,
-                                                  ulong k, ulong n, 
+                                                  ulong k, ulong n,
                                                   n_ecm_t n_ecm_inf);
 
 int n_factor_ecm_select_curve(ulong *f, ulong sig, ulong n,
@@ -535,7 +535,7 @@ n_mulmod_shoup(mp_limb_t w, mp_limb_t t, mp_limb_t w_precomp, mp_limb_t p)
    umul_ppmm(p_hi, p_lo, w_precomp, t);
    q = p_hi;
 
-   
+
    r = w * t;
    r -= q * p;
 

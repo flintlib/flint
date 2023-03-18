@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2009, 2011 William Hart
 
     This file is part of FLINT.
@@ -16,13 +16,13 @@ int
 main(void)
 {
     flint_bitcnt_t depth, w;
-    
+
     FLINT_TEST_INIT(state);
 
     flint_printf("mul_fft_main....");
     fflush(stdout);
 
-    
+
     _flint_rand_init_gmp(state);
 
     for (depth = 6; depth <= 12; depth++)
@@ -30,11 +30,11 @@ main(void)
         for (w = 1; w <= 3 - (depth >= 12); w++)
         {
             int iter = 1 + 200*(depth <= 8) + 80*(depth <= 9) + 10*(depth <= 10), i;
-            
+
             for (i = 0; i < iter; i++)
             {
                mp_size_t n = (UWORD(1)<<depth);
-               flint_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
+               flint_bitcnt_t bits1 = (n*w - (depth + 1))/2;
                mp_size_t len1 = 2*n + n_randint(state, 2*n) + 1;
                mp_size_t len2 = 2*n + 2 - len1 + n_randint(state, 2*n);
 
@@ -45,12 +45,12 @@ main(void)
 
                if (len2 <= 0)
                   len2 = 2*n + n_randint(state, 2*n) + 1;
-               
+
                b2 = len2*bits1;
-               
+
                n1 = (b1 - 1)/FLINT_BITS + 1;
                n2 = (b2 - 1)/FLINT_BITS + 1;
-                    
+
                if (n1 < n2) /* ensure b1 >= b2 */
                {
                   mp_size_t t = n1;
@@ -65,16 +65,16 @@ main(void)
                i2 = i1 + n1;
                r1 = i2 + n2;
                r2 = r1 + n1 + n2;
-   
+
                flint_mpn_urandomb(i1, state->gmp_state, b1);
                flint_mpn_urandomb(i2, state->gmp_state, b2);
-  
+
                mpn_mul(r2, i1, n1, i2, n2);
                flint_mpn_mul_fft_main(r1, i1, n1, i2, n2);
-           
+
                for (j = 0; j < n1 + n2; j++)
                {
-                   if (r1[j] != r2[j]) 
+                   if (r1[j] != r2[j])
                    {
                        flint_printf("error in limb %wd, %wx != %wx\n", j, r1[j], r2[j]);
                        fflush(stdout);
@@ -88,7 +88,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

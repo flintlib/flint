@@ -15,7 +15,7 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
-void _fmpq_poly_gcd(fmpz *G, fmpz_t denG, 
+void _fmpq_poly_gcd(fmpz *G, fmpz_t denG,
                     const fmpz *A, slong lenA, const fmpz *B, slong lenB)
 {
     if (lenA == 1)  /* lenA == lenB == 1 */
@@ -108,18 +108,18 @@ void fmpq_poly_gcd(fmpq_poly_t G, const fmpq_poly_t A, const fmpq_poly_t B)
             {
                 fmpq_poly_t t;
                 fmpq_poly_init2(t, lenB);
-                
-                _fmpq_poly_gcd(t->coeffs, t->den, A->coeffs, A->length, 
+
+                _fmpq_poly_gcd(t->coeffs, t->den, A->coeffs, A->length,
                                               B->coeffs, B->length);
-            
+
                 fmpq_poly_swap(t, G);
                 fmpq_poly_clear(t);
             }
             else
             {
                 fmpq_poly_fit_length(G, lenB);
-                 
-                _fmpq_poly_gcd(G->coeffs, G->den, A->coeffs, A->length, 
+
+                _fmpq_poly_gcd(G->coeffs, G->den, A->coeffs, A->length,
                                               B->coeffs, B->length);
             }
 

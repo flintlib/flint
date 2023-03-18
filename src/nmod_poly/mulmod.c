@@ -13,7 +13,7 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_mulmod(mp_ptr res, mp_srcptr poly1, slong len1, 
+void _nmod_poly_mulmod(mp_ptr res, mp_srcptr poly1, slong len1,
                              mp_srcptr poly2, slong len2, mp_srcptr f,
                             slong lenf, nmod_t mod)
 {

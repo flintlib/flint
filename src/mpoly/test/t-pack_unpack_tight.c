@@ -37,7 +37,7 @@ main(void)
 
     for (k = 0; k < 20 * flint_test_multiplier(); k++)
     {
-        /* do FLINT_BITS => bits1 
+        /* do FLINT_BITS => bits1
                          => tight packing
                          => bits2 => FLINT_BITS and compare */
 

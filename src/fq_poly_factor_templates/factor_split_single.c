@@ -43,7 +43,7 @@ TEMPLATE(T, poly_factor_split_single) (TEMPLATE(T, poly_t) linfactor,
                 {
                 };
                 TEMPLATE(T, poly_set) (pol, linfactor, ctx);
-            }   
+            }
         }
         else
         {
@@ -55,8 +55,8 @@ TEMPLATE(T, poly_factor_split_single) (TEMPLATE(T, poly_t) linfactor,
                 {
                 };
                 TEMPLATE(T, poly_set) (pol, linfactor, ctx);
-            }   
-            
+            }
+
             TEMPLATE(T, poly_inflate) (pol, linfactor, deflation, ctx);
 
             while (TEMPLATE(T, poly_degree)(pol, ctx) != 1) {
@@ -65,7 +65,7 @@ TEMPLATE(T, poly_factor_split_single) (TEMPLATE(T, poly_t) linfactor,
                 {
                 };
                 TEMPLATE(T, poly_set) (pol, linfactor, ctx);
-            }   
+            }
         }
 
         flint_randclear(state);

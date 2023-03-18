@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011, 2012 Sebastian Pancratz 
+    Copyright (C) 2011, 2012 Sebastian Pancratz
     Copyright (C) 2013 Mike Hansen
 
     This file is part of FLINT.
@@ -12,7 +12,7 @@
 
 #include "fq_nmod.h"
 
-void _fq_nmod_pow(mp_limb_t *rop, const mp_limb_t *op, slong len, const fmpz_t e, 
+void _fq_nmod_pow(mp_limb_t *rop, const mp_limb_t *op, slong len, const fmpz_t e,
                   const fq_nmod_ctx_t ctx)
 {
     const slong d = fq_nmod_ctx_degree(ctx);
@@ -43,10 +43,10 @@ void _fq_nmod_pow(mp_limb_t *rop, const mp_limb_t *op, slong len, const fmpz_t e
         bit = fmpz_bits(e) - 2;
 
         /*
-           Trial run without any polynomial arithmetic to determine the parity 
+           Trial run without any polynomial arithmetic to determine the parity
            of the number of swaps;  then set R and S accordingly
          */
-        
+
         {
             unsigned int swaps = 0U;
             ulong bit2 = bit;
@@ -55,7 +55,7 @@ void _fq_nmod_pow(mp_limb_t *rop, const mp_limb_t *op, slong len, const fmpz_t e
             while (bit2--)
                 if (!fmpz_tstbit(e, bit2))
                     swaps = ~swaps;
-            
+
             if (swaps == 0U)
             {
                 R = rop;
@@ -67,7 +67,7 @@ void _fq_nmod_pow(mp_limb_t *rop, const mp_limb_t *op, slong len, const fmpz_t e
                 S = rop;
             }
         }
-        
+
         /*
            We unroll the first step of the loop, referring to {op, len}
          */

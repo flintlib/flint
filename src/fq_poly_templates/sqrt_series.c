@@ -32,7 +32,7 @@ TEMPLATE(T, poly_sqrt_series)(TEMPLATE(T, poly_t) g, const TEMPLATE(T, poly_t) h
     TEMPLATE(T, struct) * h_coeffs;
     TEMPLATE(T, poly_t) t1;
     slong hlen;
-    
+
     hlen = h->length;
 
     if (n == 0)
@@ -73,7 +73,7 @@ TEMPLATE(T, poly_sqrt_series)(TEMPLATE(T, poly_t) g, const TEMPLATE(T, poly_t) h
         TEMPLATE(T, poly_swap)(g, t1, ctx);
         TEMPLATE(T, poly_clear)(t1, ctx);
     }
-    
+
     g->length = n;
 
     if (hlen < n)

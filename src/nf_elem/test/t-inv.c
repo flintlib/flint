@@ -36,18 +36,18 @@ main(void)
         nf_elem_t a, ainv, p1;
 
         nf_init_randtest(nf, state, 25, 100);
-        
+
         nf_elem_init(a, nf);
         nf_elem_init(ainv, nf);
         nf_elem_init(p1, nf);
-        
+
         do {
            nf_elem_randtest_not_zero(a, state, 100, nf);
         } while (!_nf_elem_invertible_check(a, nf));
 
         nf_elem_inv(ainv, a, nf);
         nf_elem_mul(p1, ainv, a, nf);
-        
+
         result = (nf_elem_is_one(p1, nf));
         if (!result)
         {
@@ -61,10 +61,10 @@ main(void)
         nf_elem_clear(a, nf);
         nf_elem_clear(ainv, nf);
         nf_elem_clear(p1, nf);
-         
+
         nf_clear(nf);
     }
-    
+
     /* test aliasing a and b */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
@@ -75,14 +75,14 @@ main(void)
 
         nf_elem_init(a, nf);
         nf_elem_init(b, nf);
-        
+
         do {
            nf_elem_randtest_not_zero(b, state, 100, nf);
         } while (!_nf_elem_invertible_check(b, nf));
-        
+
         nf_elem_inv(a, b, nf);
         nf_elem_inv(b, b, nf);
-        
+
         result = (nf_elem_equal(a, b, nf));
         if (!result)
         {
@@ -94,7 +94,7 @@ main(void)
 
         nf_elem_clear(a, nf);
         nf_elem_clear(b, nf);
-         
+
         nf_clear(nf);
     }
 

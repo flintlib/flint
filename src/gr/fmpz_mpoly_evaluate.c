@@ -196,7 +196,7 @@ HornerForm:
             /* this term should be a scalar */
             FLINT_ASSERT(fmpz_is_zero(Buexp + nvars*Blist[f] + v));
             status |= gr_add_fmpz(GR_ENTRY(regs, rp, sz), GR_ENTRY(regs, rp, sz),  Bcoeff + Blist[f], ctx);
-        }   
+        }
 
         rtypes[rp] = -WORD(1);
 

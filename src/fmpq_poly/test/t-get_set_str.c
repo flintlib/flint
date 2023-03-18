@@ -75,7 +75,7 @@ main(void)
         fmpq_poly_init(f);
         fmpq_poly_init(g);
         fmpq_poly_randtest(f, state, n_randint(state, 100), 200);
-        
+
         str = fmpq_poly_get_str(f);
         ans = fmpq_poly_set_str(g, str);
 
@@ -97,9 +97,9 @@ main(void)
         fmpq_poly_clear(g);
         flint_free(str);
     }
-    
+
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

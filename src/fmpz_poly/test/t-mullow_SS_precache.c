@@ -40,7 +40,7 @@ main(void)
         trunc = (len <= 0) ? 0 : n_randint(state, b->length + c->length);
 
         fmpz_poly_mul_SS_precache_init(pre, 50, 200, c);
-	
+
         fmpz_poly_mullow_SS(a, b, c, trunc);
         fmpz_poly_mullow_SS_precache(b, b, pre, trunc);
 
@@ -74,9 +74,9 @@ main(void)
         fmpz_poly_init(c);
         fmpz_poly_init(d);
         fmpz_poly_randtest(c, state, n_randint(state, 50), 200);
-	
+
 	fmpz_poly_mul_SS_precache_init(pre, 50, 200, c);
-	
+
 	for (k = 0; k < 3; k++)
 	{
 	   fmpz_poly_randtest(b, state, n_randint(state, 50), 200);
@@ -108,7 +108,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

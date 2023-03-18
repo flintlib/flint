@@ -57,7 +57,7 @@ int flint_set_num_workers(int num_workers)
 #endif
 
     old_num_workers = _flint_num_workers;
-    
+
     _flint_num_workers = FLINT_MIN(_flint_num_workers, num_workers);
 
     return old_num_workers;
@@ -90,7 +90,7 @@ slong flint_request_threads(thread_pool_handle ** handles, slong thread_limit)
 {
     slong num_handles = 0;
     slong num_threads = flint_get_num_threads();
-    
+
     thread_limit = FLINT_MIN(thread_limit, num_threads);
 
     *handles = NULL;

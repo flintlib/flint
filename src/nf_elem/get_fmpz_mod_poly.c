@@ -23,16 +23,16 @@ void _nf_elem_get_fmpz_mod_poly(fmpz_mod_poly_t pol, const nf_elem_t a,
     if (nf_elem_is_zero(a, nf))
     {
         FMPZ_MOD_POLY_ZERO(pol, ctx);
-        
+
         return;
     }
     if (nf->flag & NF_LINEAR)
     {
         {
             FMPZ_MOD_POLY_FIT_LENGTH(pol, 1, ctx);
-        
+
             FMPZ_MOD(pol->coeffs + 0, LNF_ELEM_NUMREF(a), ctx, &(pol->p));
-        
+
             _fmpz_mod_poly_set_length(pol, 1);
             _fmpz_mod_poly_normalise(pol);
 
@@ -40,11 +40,11 @@ void _nf_elem_get_fmpz_mod_poly(fmpz_mod_poly_t pol, const nf_elem_t a,
     } else if (nf->flag & NF_QUADRATIC)
     {
         FMPZ_MOD_POLY_FIT_LENGTH(pol, 3, ctx);
-        
+
         FMPZ_MOD(pol->coeffs + 0, QNF_ELEM_NUMREF(a), ctx, &(pol->p));
         FMPZ_MOD(pol->coeffs + 1, QNF_ELEM_NUMREF(a) + 1, ctx, &(pol->p));
         FMPZ_MOD(pol->coeffs + 2, QNF_ELEM_NUMREF(a) + 2, ctx, &(pol->p));
-        
+
         _fmpz_mod_poly_set_length(pol, 3);
         _fmpz_mod_poly_normalise(pol);
     } else
@@ -53,10 +53,10 @@ void _nf_elem_get_fmpz_mod_poly(fmpz_mod_poly_t pol, const nf_elem_t a,
         slong i;
 
         FMPZ_MOD_POLY_FIT_LENGTH(pol, len, ctx);
-        
+
         for (i = 0; i < len; i++)
             FMPZ_MOD(pol->coeffs + i, NF_ELEM_NUMREF(a) + i, ctx, &(pol->p));
-        
+
         _fmpz_mod_poly_set_length(pol, len);
         _fmpz_mod_poly_normalise(pol);
     }

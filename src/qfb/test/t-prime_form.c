@@ -22,30 +22,30 @@ int main(void)
     int result;
     flint_rand_t state;
     slong i;
-    
+
     printf("prime_form....");
     fflush(stdout);
 
     flint_randinit(state);
 
-    for (i = 1; i < 50000; i++) 
+    for (i = 1; i < 50000; i++)
     {
         fmpz_t D, D2, p;
         qfb_t r, s;
         ulong n, q, Dmodp;
-        
+
         fmpz_init(D);
         fmpz_init(D2);
         fmpz_init(p);
         qfb_init(r);
         qfb_init(s);
-            
+
         do
         {
            fmpz_randtest_unsigned(r->a, state, 100);
            if (fmpz_is_zero(r->a))
               fmpz_set_ui(r->a, 1);
- 
+
            fmpz_randtest(r->b, state, 100);
            fmpz_randtest(r->c, state, 100);
 
@@ -74,7 +74,7 @@ int main(void)
            printf("D2 = \n"); fmpz_print(D2); printf("\n");
            flint_abort();
         }
-           
+
         fmpz_clear(D);
         fmpz_clear(D2);
         fmpz_clear(p);

@@ -29,7 +29,7 @@ void check_omega(slong lower, slong upper, const fq_nmod_mpoly_t p, const fq_nmo
     {
         flint_printf("FAIL:\ncheck factorization could be computed\n");
         fflush(stdout);
-        flint_abort();        
+        flint_abort();
     }
 
     for (i = 0; i < g->num; i++)
@@ -50,7 +50,7 @@ void check_omega(slong lower, slong upper, const fq_nmod_mpoly_t p, const fq_nmo
     {
         flint_printf("FAIL:\nfactorization has wrong number of factors\n");
         fflush(stdout);
-        flint_abort();        
+        flint_abort();
     }
 
     fq_nmod_mpoly_factor_expand(q, g, ctx);
@@ -58,7 +58,7 @@ void check_omega(slong lower, slong upper, const fq_nmod_mpoly_t p, const fq_nmo
     {
         flint_printf("FAIL:\nfactorization does not match original polynomial\n");
         fflush(stdout);
-        flint_abort();        
+        flint_abort();
     }
 
     for (i = 0; i < g->num; i++)
@@ -130,7 +130,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

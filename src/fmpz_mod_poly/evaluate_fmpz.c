@@ -12,7 +12,7 @@
 #include "flint.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz *poly, slong len, 
+void _fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz *poly, slong len,
                                   const fmpz_t a, const fmpz_t p)
 {
     if (len == 0)
@@ -51,14 +51,14 @@ void fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz_mod_poly_t poly,
         fmpz_t t;
 
         fmpz_init(t);
-        _fmpz_mod_poly_evaluate_fmpz(t, poly->coeffs, poly->length, 
+        _fmpz_mod_poly_evaluate_fmpz(t, poly->coeffs, poly->length,
                                      a, fmpz_mod_ctx_modulus(ctx));
         fmpz_swap(res, t);
         fmpz_clear(t);
     }
     else
     {
-        _fmpz_mod_poly_evaluate_fmpz(res, poly->coeffs, poly->length, 
+        _fmpz_mod_poly_evaluate_fmpz(res, poly->coeffs, poly->length,
                                      a, fmpz_mod_ctx_modulus(ctx));
     }
 }

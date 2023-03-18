@@ -15,8 +15,8 @@
 #define FQ_H
 
 #ifdef FQ_INLINES_C
-#define FQ_INLINE 
-#define FQ_TEMPLATES_INLINE 
+#define FQ_INLINE
+#define FQ_TEMPLATES_INLINE
 #else
 #define FQ_INLINE static __inline__
 #define FQ_TEMPLATES_INLINE static __inline__
@@ -147,7 +147,7 @@ FQ_INLINE void fq_clear(fq_t rop, const fq_ctx_t ctx)
     fmpz_poly_clear(rop);
 }
 
-FQ_INLINE 
+FQ_INLINE
 void _fq_sparse_reduce(fmpz *R, slong lenR, const fq_ctx_t ctx)
 {
     const slong d = ctx->j[ctx->len - 1];
@@ -180,11 +180,11 @@ FQ_INLINE void _fq_dense_reduce(fmpz* R, slong lenR, const fq_ctx_t ctx)
         _fmpz_vec_scalar_mod_fmpz(R, R, lenR, fq_ctx_prime(ctx));
         return;
     }
-    
+
     q = _fmpz_vec_init(lenR - ctx->modulus->length + 1);
     r = _fmpz_vec_init(ctx->modulus->length - 1);
 
-    _fmpz_mod_poly_divrem_newton_n_preinv(q, r, R, lenR, 
+    _fmpz_mod_poly_divrem_newton_n_preinv(q, r, R, lenR,
                                         ctx->modulus->coeffs, ctx->modulus->length,
                                         ctx->inv->coeffs, ctx->inv->length,
                                         fq_ctx_prime(ctx));
@@ -201,7 +201,7 @@ FQ_INLINE void _fq_reduce(fmpz* R, slong lenR, const fq_ctx_t ctx)
     if (ctx->sparse_modulus)
         _fq_sparse_reduce(R, lenR, ctx);
     else
-        _fq_dense_reduce(R, lenR, ctx);    
+        _fq_dense_reduce(R, lenR, ctx);
 }
 
 FQ_INLINE void fq_reduce(fq_t rop, const fq_ctx_t ctx)
@@ -369,13 +369,13 @@ void fq_print(const fq_t op, const fq_ctx_t ctx)
     fmpz_poly_print(op);
 }
 
-FQ_INLINE 
+FQ_INLINE
 int fq_fprint_pretty(FILE * file, const fq_t op, const fq_ctx_t ctx)
 {
     return fmpz_poly_fprint_pretty(file, op, ctx->var);
 }
 
-FQ_INLINE 
+FQ_INLINE
 int fq_print_pretty(const fq_t op, const fq_ctx_t ctx)
 {
     return fmpz_poly_print_pretty(op, ctx->var);
@@ -391,7 +391,7 @@ void _fq_trace(fmpz_t rop, const fmpz *op, slong len, const fq_ctx_t ctx);
 
 void fq_trace(fmpz_t rop, const fq_t op, const fq_ctx_t ctx);
 
-void _fq_frobenius(fmpz *rop, const fmpz *op, slong len, slong e, 
+void _fq_frobenius(fmpz *rop, const fmpz *op, slong len, slong e,
                    const fq_ctx_t ctx);
 
 void fq_frobenius(fq_t rop, const fq_t op, slong e, const fq_ctx_t ctx);

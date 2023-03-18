@@ -16,7 +16,7 @@
     Below is the implementation of primality test using Jacobi sums.
     The steps are described in:
         [1] "A Course in Computational Algebraic Number Theory" by H. Cohen
-    
+
     For a different version of the algorithm, also see:
         [2] "Implementation of a New Primality Test" by H. Cohen and A.K. Lenstra
 
@@ -34,9 +34,9 @@
 
     Standard variables:
         n - number to check for primality;
-        
+
         R - configuration parameter;
-        s - configuration parameter depends on the R; s^2 > n; 
+        s - configuration parameter depends on the R; s^2 > n;
         a^R = 1 mod s for all integer a coprime to s;
 
         q - prime number such that (q | s);
@@ -53,12 +53,12 @@
                 \sigma_x(\zeta_p) = \zeta_p^x;
         \sigma_x^{-1} - inverse of \sigma_x;
 
-        \chi_{p, q} - character defined by 
-                \chi_{p, q}(g^x) = \zeta_{p^k}^x, 
+        \chi_{p, q} - character defined by
+                \chi_{p, q}(g^x) = \zeta_{p^k}^x,
                 there g is a primitive root modulo q;
 
         J(p, q) - jacobi sum j(\chi_{p, q}, \chi_{p, q});
-        J_2(q)  - jacobi sum 
+        J_2(q)  - jacobi sum
                 ( j(\chi_{2, q}^{2^{k - 3}}, \chi_{2, q}^{3 * 2^{k - 3}}) )^2;
         J_3(q)  - jacobi sum
                 j(\chi_{2, q}, \chi_{2, q}, \chi_{2, q}) =
@@ -132,7 +132,7 @@ _aprcl_is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v)
     unity_zp_pow_sliding_fmpz(temp, j0, u);
     /* j0 = j0^u * jv */
     unity_zp_mul(j0, jv, temp);
-    
+
     /* try to find h */
     h = unity_zp_is_unity(j0);
 
@@ -262,7 +262,7 @@ _aprcl_is_prime_jacobi_check_22(const unity_zp j, const fmpz_t u, ulong v, ulong
         j = J(2, q);
         j2_1 = J_3(q);
         j2_2 = j_2(q);
-        
+
         u, v from standard variables;
 
     Returns:
@@ -356,7 +356,7 @@ _aprcl_is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1,
     /* set j0 = j0^u * jv */
     unity_zp_pow_sliding_fmpz(temp, j0, u);
     unity_zp_mul(j0, jv, temp);
-    
+
     /* try to find h */
     h = unity_zp_is_unity(j0);
 
@@ -385,7 +385,7 @@ _aprcl_is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1,
     if this is not the case for (p, q) then n is composite.
 
     If we can't find q check p | n or if n is a perfect power; if so
-    then n is composite. 
+    then n is composite.
     Otherwise n can be prime but we can't prove its primality.
 
     Parameters:
@@ -416,8 +416,8 @@ _aprcl_is_prime_jacobi_additional_test(const fmpz_t n, ulong p)
     /* check first 50 primes */
     while (p_counter > 0)
     {
-        /* 
-            q = 2mp + 1 and m is odd, so if p == 2 
+        /*
+            q = 2mp + 1 and m is odd, so if p == 2
             then q - 1 | 4 and not q - 1 | 8.
         */
         q = 2 * m * p + 1;
@@ -560,10 +560,10 @@ _aprcl_is_prime_jacobi(const fmpz_t n, const aprcl_config config)
     fmpz_init_set(ndec, n);
     fmpz_sub_ui(ndec, ndec, 1);
     fmpz_fdiv_q_2exp(ndecdiv, ndec, 1);
-    
+
     result = PROBABPRIME;
 
-    /* 
+    /*
         Condition (Lp) is satisfied iff:
         For each p | R we must show that for all prime r | n and all
         positive integers a there exists l such that:
@@ -576,7 +576,7 @@ _aprcl_is_prime_jacobi(const fmpz_t n, const aprcl_config config)
     /* nmod4 = n % 4 */
     nmod4 = fmpz_tdiv_ui(n, 4);
 
-    /* 
+    /*
         For every prime p | R, set lambdas_p:
             to 1 if p >= 3 and n^{p - 1} != 1 mod p^2;
             to 0 otherwise.
@@ -676,10 +676,10 @@ _aprcl_is_prime_jacobi(const fmpz_t n, const aprcl_config config)
                 if (h < 0)
                     result = COMPOSITE;
 
-                /* 
-                    check (Lp); 
-                    if h == 1 (unity root = -1) 
-                    and n % 4 == 1 then lambdas_2 = 1 
+                /*
+                    check (Lp);
+                    if h == 1 (unity root = -1)
+                    and n % 4 == 1 then lambdas_2 = 1
                 */
                 if (lambdas[pind] == 0 && h == 1 && nmod4 == 1)
                     lambdas[pind] = 1;
@@ -693,9 +693,9 @@ _aprcl_is_prime_jacobi(const fmpz_t n, const aprcl_config config)
                 if (h < 0)
                     result = COMPOSITE;
 
-                /* 
-                    check (Lp); 
-                    if h == 1 or 3 (unity root = -i or i) 
+                /*
+                    check (Lp);
+                    if h == 1 or 3 (unity root = -i or i)
                     and q^{(n - 1) / 2} = -1 mod n then lambdas_2 = 1
                 */
                 if (h % 2 != 0 && lambdas[pind] == 0 && fmpz_equal(q_pow, ndec))
@@ -711,9 +711,9 @@ _aprcl_is_prime_jacobi(const fmpz_t n, const aprcl_config config)
                 if (h < 0)
                     result = COMPOSITE;
 
-                /* 
-                    check (Lp); 
-                    if h % 2 != 0 (primitive unity root) 
+                /*
+                    check (Lp);
+                    if h % 2 != 0 (primitive unity root)
                     and q^{(n - 1) / 2} = -1 mod n then lambdas_2 = 1
                 */
                 if (h % 2 != 0 && lambdas[pind] == 0 && fmpz_equal(q_pow, ndec))
@@ -728,9 +728,9 @@ _aprcl_is_prime_jacobi(const fmpz_t n, const aprcl_config config)
                 if (h < 0)
                     result = COMPOSITE;
 
-                /* 
-                    check (Lp); 
-                    if h % p != 0 (primitive unity root) 
+                /*
+                    check (Lp);
+                    if h % p != 0 (primitive unity root)
                     then lambdas_p = 1
                 */
                 if (h % p != 0 && lambdas[pind] == 0)
@@ -764,15 +764,15 @@ _aprcl_is_prime_jacobi(const fmpz_t n, const aprcl_config config)
                     result = COMPOSITE;
                 }
                 else if (r == 1)
-                {   
+                {
                     /* if r == 1 then we check that n still can be prime */
                     lambdas[i] = 1;
                 }
                 else
                 {
-                    /* 
-                        if r == 0 then we can't find q and we can't 
-                        prove n prime or composite 
+                    /*
+                        if r == 0 then we can't find q and we can't
+                        prove n prime or composite
                     */
                     result = UNKNOWN;
                 }
@@ -782,7 +782,7 @@ _aprcl_is_prime_jacobi(const fmpz_t n, const aprcl_config config)
 
     /* Trial division and primality proving step */
 
-    /* 
+    /*
         If result = PROBAPRIME then all lambdas_p = 1.
         Using this information we know that:
             for every divisor p of f of n there exists i from 0..R-1 such that
@@ -816,7 +816,7 @@ aprcl_is_prime_jacobi(const fmpz_t n)
     primality_test_status result;
     aprcl_config config;
 
-    /* 
+    /*
         Choose R and s values for n and store its factorisation.
         See definition in config_jacobi functions documentation. s^2 > n.
     */

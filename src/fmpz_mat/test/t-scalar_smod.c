@@ -21,7 +21,7 @@ main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("scalar_smod....");
     fflush(stdout);
 
@@ -53,7 +53,7 @@ main(void)
            for (k = 0; k < A->c; k++)
            {
               fmpz_smod(c, A->rows[j] + k, P);
-              
+
               if (!fmpz_equal(c, B->rows[j] + k))
               {
                  flint_printf("FAIL!\n");

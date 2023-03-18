@@ -42,7 +42,7 @@ z^n * 1/rf(K+1,m)^r * (rf(K+1,m)/rf(K+1-A,m)) * (rf(K+1-B,m)/rf(K+1-2B,m))
 
 where m = n - K. This is equal to
 
-z^n * 
+z^n *
 
 (K+A)! (K-2B)! (K-B+m)!
 -----------------------    * ((K+m)! / K!)^(1-r)

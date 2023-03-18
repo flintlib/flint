@@ -116,7 +116,7 @@ _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, slong hlen, slong n, nmod_t mod)
         _nmod_poly_exp_series_newton(f, NULL, h, hlen, n, mod);
 }
 
-void 
+void
 _nmod_poly_exp_expinv_series(mp_ptr f, mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod)
 {
     hlen = FLINT_MIN(hlen, n);

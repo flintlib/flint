@@ -13,12 +13,12 @@
 
 /*
     Returns 1 if \tau^{\sigma_n-n}(\chi)=-1; otherwise returns 0.
-    It is equal to check: 
+    It is equal to check:
         (\chi(-1) * q)^((n - 1) / 2) congruent -1 mod n
 
     \tau is the Gauss sum;
     \chi is the character of conductor q and order 2 (quadratic character);
-    \tau(\chi)^\sigma_n means \sigma_n(\tau(\chi)), 
+    \tau(\chi)^\sigma_n means \sigma_n(\tau(\chi)),
         there \sigma_n is the ring automorphism
 */
 int
@@ -32,10 +32,10 @@ _aprcl_is_gausspower_2q_equal_first(ulong q, const fmpz_t n)
     fmpz_init_set(ncmp, n);
 
     /* ncmp = -1 mod n */
-    fmpz_sub_ui(ncmp, ncmp, 1); 
+    fmpz_sub_ui(ncmp, ncmp, 1);
 
     /* nval = (\chi(-1) * q) = ((-1)^((q - 1) / 2) * q) */
-    if ((q - 1) % 2 == 1)       
+    if ((q - 1) % 2 == 1)
     {
         fmpz_neg(nval, nval);
         fmpz_add(nval, nval, n);
@@ -43,11 +43,11 @@ _aprcl_is_gausspower_2q_equal_first(ulong q, const fmpz_t n)
 
     /* npow = (n - 1) / 2 */
     fmpz_sub_ui(npow, npow, 1);
-    fmpz_fdiv_q_2exp(npow, npow, 1); 
+    fmpz_fdiv_q_2exp(npow, npow, 1);
 
     /* nval = (\chi(-1) * q)^((n - 1) / 2) mod n */
     fmpz_powm(nval, nval, npow, n);
-    
+
     result = 0;
     if (fmpz_equal(nval, ncmp))
         result = 1;
@@ -66,7 +66,7 @@ _aprcl_is_gausspower_2q_equal_first(ulong q, const fmpz_t n)
 
     \tau is the Gauss sum;
     \chi is the character of conductor q and order 2 (quadratic character);
-    \tau(\chi)^\sigma_n means \sigma_n(\tau(\chi)), 
+    \tau(\chi)^\sigma_n means \sigma_n(\tau(\chi)),
         there \sigma_n is the ring automorphism
 */
 int
@@ -85,8 +85,8 @@ _aprcl_is_gausspower_2q_equal_second(ulong q, const fmpz_t n)
     /* nval = q^((n - 1) / 2) mod n */
     fmpz_sub_ui(npow, npow, 1);
     fmpz_fdiv_q_2exp(npow, npow, 1);
-    fmpz_powm(nval, nval, npow, n);    
-    
+    fmpz_powm(nval, nval, npow, n);
+
     result = 0;
     if (fmpz_equal(nval, ncmp))
         result = 1;
@@ -98,15 +98,15 @@ _aprcl_is_gausspower_2q_equal_second(ulong q, const fmpz_t n)
     return result;
 }
 
-/*  
-    Returns non-negative value if \tau(\chi)^(\sigma_n - n) from <\zeta_p> 
-    cyclic group. It is equal to check that for some i from 0 to p - 1 
+/*
+    Returns non-negative value if \tau(\chi)^(\sigma_n - n) from <\zeta_p>
+    cyclic group. It is equal to check that for some i from 0 to p - 1
     \tau(\chi^n) == \zeta_p^i * \tau^n(\chi). If such i exists returns i.
     Otherwise returns -1.
 
     \tau is the Gauss sum;
     \chi is the character of conductor q and order r;
-    \tau(\chi)^\sigma_n means \sigma_n(\tau(\chi)), 
+    \tau(\chi)^\sigma_n means \sigma_n(\tau(\chi)),
         there \sigma_n is the ring automorphism
 */
 slong
@@ -122,7 +122,7 @@ _aprcl_is_gausspower_from_unity_p(ulong q, ulong r, const fmpz_t n)
     unity_zpq_init(temp, q, r, n);
 
     /* gauss = \tau(\chi) */
-    unity_zpq_gauss_sum(gauss, q, r); 
+    unity_zpq_gauss_sum(gauss, q, r);
     /* gausssigma = \tau(\chi^n) */
     unity_zpq_gauss_sum_sigma_pow(gausssigma, q, r);
     /* gausspow = \tau^n(\chi) */
@@ -155,7 +155,7 @@ _aprcl_is_prime_gauss(const fmpz_t n, const aprcl_config config)
     ulong i, j, k, nmod4;
     primality_test_status result;
 
-    /* 
+    /*
         Condition (Lp) is satisfied iff:
         For each p | R we must show that for all prime r | n and all
         positive integers a there exists l such that:
@@ -221,10 +221,10 @@ _aprcl_is_prime_gauss(const fmpz_t n, const aprcl_config config)
             /*
                 (Lp.b)
                 if p == 2, r = 2^k >= 4 and n = 3 mod 4 then (Lp) is equal to:
-                    1) for quadratic character \chi 
+                    1) for quadratic character \chi
                         (\tau(\chi^(r / 2)))^(\sigma_n-n) = -1
                     2) for character \chi = \chi_{r, q}
-                        (\tau(\chi))^(\sigma_n-n) is a generator of cyclic 
+                        (\tau(\chi))^(\sigma_n-n) is a generator of cyclic
                         group <\zeta_r>
 
                 if 1) is true, then lambdas_p = 1
@@ -259,8 +259,8 @@ _aprcl_is_prime_gauss(const fmpz_t n, const aprcl_config config)
                     break;
                 }
 
-                /* 
-                    if exists z such that \tau(\chi^n) = \zeta_r^z*\tau^n(\chi) 
+                /*
+                    if exists z such that \tau(\chi^n) = \zeta_r^z*\tau^n(\chi)
                     unity_power = z; otherwise unity_power = -1
                 */
                 unity_power = _aprcl_is_gausspower_from_unity_p(q, r, n);
@@ -275,14 +275,14 @@ _aprcl_is_prime_gauss(const fmpz_t n, const aprcl_config config)
                 /*
                     (Lp.c)
                     if p > 2 then (Lp) is equal to:
-                        (\tau(\chi))^(\sigma_n - n) is a generator of cyclic 
+                        (\tau(\chi))^(\sigma_n - n) is a generator of cyclic
                         group <\zeta_r>
                 */
                 if (p > 2 && state == 0 && unity_power > 0)
                 {
                     ulong upow = unity_power;
-                    /* 
-                        if gcd(r, unity_power) = 1 then 
+                    /*
+                        if gcd(r, unity_power) = 1 then
                         (\tau(\chi))^(\sigma_n - n) is a generator
                     */
                     if (n_gcd(r, upow) == 1)
@@ -296,14 +296,14 @@ _aprcl_is_prime_gauss(const fmpz_t n, const aprcl_config config)
                     (Lp.b)
                     check 2) of (Lp) if p == 2 and nmod4 == 3
                 */
-                if (p == 2 && unity_power > 0 
+                if (p == 2 && unity_power > 0
                     && (state == 0 || state == 1) && nmod4 == 3)
                 {
                     ulong upow = unity_power;
                     if (n_gcd(r, upow) == 1)
                     {
-                        if (state == 0) 
-                        { 
+                        if (state == 0)
+                        {
                             state = 2;
                             lambdas[pind] = state;
                         }
@@ -318,8 +318,8 @@ _aprcl_is_prime_gauss(const fmpz_t n, const aprcl_config config)
         }
     }
 
-    /* 
-        if for some p we have not proved (Lp) 
+    /*
+        if for some p we have not proved (Lp)
         then n can be as prime or composite
     */
     if (result == PROBABPRIME)
@@ -327,7 +327,7 @@ _aprcl_is_prime_gauss(const fmpz_t n, const aprcl_config config)
             if (lambdas[i] != 3)
                 result = UNKNOWN;
 
-  
+
     /* if n can be prime we do final division */
     if (result == UNKNOWN || result == PROBABPRIME)
     {
@@ -336,9 +336,9 @@ _aprcl_is_prime_gauss(const fmpz_t n, const aprcl_config config)
         /* if (Lp) is true for all p | R and f_division == 1 then n - prime */
         if (result == PROBABPRIME && f_division == 1)
             result = PRIME;
-        /* 
-            if we not prove (Lp) for some p and f_division == 1 
-            then n still can be prime 
+        /*
+            if we not prove (Lp) for some p and f_division == 1
+            then n still can be prime
         */
         if (result == UNKNOWN && f_division == 1)
             result = PROBABPRIME;
@@ -383,9 +383,9 @@ aprcl_is_prime_gauss(const fmpz_t n)
     R = config->R;
     aprcl_config_gauss_clear(config);
 
-    /* 
+    /*
         if result == PROBABPRIME it means that we have
-        not proved (Lp) for some p (most likely we fail L.c step); 
+        not proved (Lp) for some p (most likely we fail L.c step);
         we can try to use bigger R
     */
     if (result == PROBABPRIME)

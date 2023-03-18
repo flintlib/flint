@@ -9,7 +9,7 @@
 
 /******************************************************************************
 
-    Authored 2016 by Daniel S. Roche; US Government work in the public domain. 
+    Authored 2016 by Daniel S. Roche; US Government work in the public domain.
 
 ******************************************************************************/
 
@@ -18,7 +18,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-slong _fmpz_mod_poly_minpoly_bm(fmpz* poly, 
+slong _fmpz_mod_poly_minpoly_bm(fmpz* poly,
                                 const fmpz* seq, slong len, const fmpz_t p)
 {
     fmpz *buf, *curpoly, *prevpoly;
@@ -49,7 +49,7 @@ slong _fmpz_mod_poly_minpoly_bm(fmpz* poly,
         {
             /* quick update; no switch, curlen doesn't change. */
             slong pos = (curlen - prevlen) - (i - m);
-            _fmpz_vec_scalar_addmul_fmpz(curpoly + pos, 
+            _fmpz_vec_scalar_addmul_fmpz(curpoly + pos,
                 prevpoly, prevlen, disc);
         }
         else
@@ -57,7 +57,7 @@ slong _fmpz_mod_poly_minpoly_bm(fmpz* poly,
             /* switching update */
             slong pos = (i - m) - (curlen - prevlen);
             _fmpz_vec_scalar_mul_fmpz(prevpoly, prevpoly, prevlen, disc);
-            _fmpz_poly_add(prevpoly + pos, 
+            _fmpz_poly_add(prevpoly + pos,
                 prevpoly + pos, FLINT_MAX(0, prevlen - pos), curpoly, curlen);
             prevlen = curlen + pos;
 

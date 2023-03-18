@@ -12,7 +12,7 @@
 #include "arb.h"
 #include "arb_fmpz_poly.h"
 
-static const fmpz log_coeffs[] = 
+static const fmpz log_coeffs[] =
 {
     0, 232792560, -116396280, 77597520, -58198140, 46558512,
     -38798760, 33256080, -29099070, 25865840, -23279256, 21162960,

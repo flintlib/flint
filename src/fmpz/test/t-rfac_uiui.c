@@ -22,7 +22,7 @@ main(void)
     flint_printf("rfac_uiui... ");
     fflush(stdout);
 
-    
+
 
     /* Check rf(x,a) * rf(x+a,b) = rf(x,a+b) */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -71,7 +71,7 @@ main(void)
         fmpz_clear(r3);
     }
 
-    
+
     flint_printf("PASS\n");
     FLINT_TEST_CLEANUP(state);
     return 0;

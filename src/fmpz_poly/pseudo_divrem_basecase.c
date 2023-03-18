@@ -101,13 +101,13 @@ fmpz_poly_pseudo_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R,
         fmpz_poly_fit_length(R, lenr);
         r = R->coeffs;
     }
-    
-    _fmpz_poly_pseudo_divrem_basecase(q, r, d, A->coeffs, A->length, 
+
+    _fmpz_poly_pseudo_divrem_basecase(q, r, d, A->coeffs, A->length,
                                                B->coeffs, B->length, NULL);
-    
+
     for (lenr = B->length - 2; (lenr >= 0) && !r[lenr]; lenr--) ;
     lenr++;
-    
+
     if (Q == A || Q == B)
     {
         _fmpz_vec_clear(Q->coeffs, Q->alloc);

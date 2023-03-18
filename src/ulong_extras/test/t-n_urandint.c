@@ -67,7 +67,7 @@ main(void)
     }
 
     flint_free(count);
-    
+
     /* Test for larger values of limit */
     count_in_subrange = flint_malloc(sizeof(int) * 4);
     for (i = 0; i < 1000; i+=10)
@@ -105,7 +105,7 @@ main(void)
         for (j = 0; j < 4; j++)
         {
             deviation = count_in_subrange[j] - ((1000 * (int) test_multiplier) >> 2);
-            if (deviation >= WORD(100) * test_multiplier || 
+            if (deviation >= WORD(100) * test_multiplier ||
                 deviation <= WORD(-100) * test_multiplier)
             {
                 result = 0;

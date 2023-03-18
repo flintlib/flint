@@ -52,20 +52,20 @@ int qfb_exponent(fmpz_t exponent, fmpz_t n, ulong B1, ulong B2_sqrt, slong c)
       if (i < c + 2)
       {
          fmpz_set_ui(p, pr);
-      
+
          /* find prime form of discriminant n */
          qfb_prime_form(f, n, p);
          fmpz_set(n2, n);
 
          /* deal with non-fundamental discriminant */
          if (nmodpr == 0 && fmpz_fdiv_ui(f->c, pr) == 0)
-         {   
+         {
             fmpz_fdiv_q_ui(f->a, f->a, pr);
             fmpz_fdiv_q_ui(f->b, f->b, pr);
             fmpz_fdiv_q_ui(f->c, f->c, pr);
             fmpz_fdiv_q_ui(n2, n2, pr*pr);
          }
-         if (pr == 2 && fmpz_is_even(f->a) 
+         if (pr == 2 && fmpz_is_even(f->a)
                      && fmpz_is_even(f->b) && fmpz_is_even(f->c))
          {
             fmpz_fdiv_q_2exp(f->a, f->a, 1);
@@ -73,9 +73,9 @@ int qfb_exponent(fmpz_t exponent, fmpz_t n, ulong B1, ulong B2_sqrt, slong c)
             fmpz_fdiv_q_2exp(f->c, f->c, 1);
             fmpz_fdiv_q_2exp(n2, n2, 2);
          }
-         
+
          qfb_reduce(f, f, n2);
-         
+
          if (!fmpz_is_one(exponent))
             qfb_pow(f, f, n2, exponent);
 
@@ -84,7 +84,7 @@ int qfb_exponent(fmpz_t exponent, fmpz_t n, ulong B1, ulong B2_sqrt, slong c)
             ret = 0;
             goto cleanup;
          }
-      
+
          if (fmpz_is_one(exp))
             i++;
          else

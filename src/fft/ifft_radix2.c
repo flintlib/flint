@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2009, 2011 William Hart
 
     This file is part of FLINT.
@@ -11,13 +11,13 @@
 
 #include "flint.h"
 #include "fft.h"
-      
-void ifft_butterfly(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1, 
+
+void ifft_butterfly(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1,
                     mp_limb_t * i2, mp_size_t i, mp_size_t limbs, flint_bitcnt_t w)
 {
    mp_size_t y;
    flint_bitcnt_t b1;
-   
+
    b1 = i*w;
    y  = b1/FLINT_BITS;
    b1 = b1%FLINT_BITS;
@@ -26,29 +26,29 @@ void ifft_butterfly(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1,
    butterfly_rshB(s, t, i1, i2, limbs, 0, y);
 }
 
-void ifft_radix2(mp_limb_t ** ii, mp_size_t n, 
+void ifft_radix2(mp_limb_t ** ii, mp_size_t n,
                  flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2)
 {
    mp_size_t i;
    mp_size_t limbs = (w*n)/FLINT_BITS;
-    
-   if (n == 1) 
+
+   if (n == 1)
    {
       ifft_butterfly(*t1, *t2, ii[0], ii[1], 0, limbs, w);
-      
+
       SWAP_PTRS(ii[0], *t1);
       SWAP_PTRS(ii[1], *t2);
-      
+
       return;
    }
 
    ifft_radix2(ii,   n/2, 2*w, t1, t2);
    ifft_radix2(ii+n, n/2, 2*w, t1, t2);
 
-   for (i = 0; i < n; i++) 
-   {   
+   for (i = 0; i < n; i++)
+   {
       ifft_butterfly(*t1, *t2, ii[i], ii[n+i], i, limbs, w);
-   
+
       SWAP_PTRS(ii[i],   *t1);
       SWAP_PTRS(ii[n+i], *t2);
    }

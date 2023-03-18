@@ -12,8 +12,8 @@
 #include "fmpq.h"
 #include "fmpq_poly.h"
 
-void _fmpq_poly_scalar_mul_fmpq(fmpz * rpoly, fmpz_t rden, 
-                                const fmpz * poly, const fmpz_t den, slong len, 
+void _fmpq_poly_scalar_mul_fmpq(fmpz * rpoly, fmpz_t rden,
+                                const fmpz * poly, const fmpz_t den, slong len,
                                 const fmpz_t r, const fmpz_t s)
 {
     fmpz_t gcd1;  /* GCD( poly, s ) */
@@ -34,7 +34,7 @@ void _fmpq_poly_scalar_mul_fmpq(fmpz * rpoly, fmpz_t rden,
         _fmpz_vec_content_chained(gcd1, poly, len, s);
     if (!fmpz_is_one(den) && !fmpz_is_one(r))
         fmpz_gcd(gcd2, r, den);
-    
+
     if (fmpz_is_one(gcd1))
     {
         if (fmpz_is_one(gcd2))
@@ -77,7 +77,7 @@ void _fmpq_poly_scalar_mul_fmpq(fmpz * rpoly, fmpz_t rden,
         }
         fmpz_clear(s2);
     }
-    
+
     fmpz_clear(gcd1);
     fmpz_clear(gcd2);
 }
@@ -96,9 +96,9 @@ void fmpq_poly_scalar_mul_fmpq(fmpq_poly_t rop, const fmpq_poly_t op, const fmpq
     {
         fmpq_poly_fit_length(rop, op->length);
         _fmpq_poly_set_length(rop, op->length);
-        
-        _fmpq_poly_scalar_mul_fmpq(rop->coeffs, rop->den, 
-                                   op->coeffs, op->den, op->length, 
+
+        _fmpq_poly_scalar_mul_fmpq(rop->coeffs, rop->den,
+                                   op->coeffs, op->den, op->length,
                                    fmpq_numref(c), fmpq_denref(c));
     }
 }

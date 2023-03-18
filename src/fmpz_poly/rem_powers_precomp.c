@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_rem_powers_precomp(fmpz * A, slong m, 
+void _fmpz_poly_rem_powers_precomp(fmpz * A, slong m,
                                  const fmpz * B, slong n, fmpz ** const powers)
 {
    slong i;
@@ -30,7 +30,7 @@ void _fmpz_poly_rem_powers_precomp(fmpz * A, slong m,
       return;
 
    prod = _fmpz_vec_init(n - 1);
-             
+
    for (i = n - 1; i < m; i++)
    {
       _fmpz_vec_scalar_mul_fmpz(prod, powers[i], n - 1, A + i);
@@ -40,14 +40,14 @@ void _fmpz_poly_rem_powers_precomp(fmpz * A, slong m,
    _fmpz_vec_clear(prod, n - 1);
 }
 
-void 
-fmpz_poly_rem_powers_precomp(fmpz_poly_t R, const fmpz_poly_t A, 
+void
+fmpz_poly_rem_powers_precomp(fmpz_poly_t R, const fmpz_poly_t A,
                     const fmpz_poly_t B, const fmpz_poly_powers_precomp_t B_inv)
 {
     fmpz_poly_t tR;
     fmpz *r;
     slong len1 = A->length, len2 = B->length;
-    
+
     if (len1 < len2)
     {
         fmpz_poly_set(R, A);

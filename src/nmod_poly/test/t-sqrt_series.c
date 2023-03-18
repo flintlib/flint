@@ -19,7 +19,7 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("sqrt_series....");
     fflush(stdout);
@@ -59,7 +59,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         nmod_poly_clear(h);
         nmod_poly_clear(g);
         nmod_poly_clear(r);
@@ -102,7 +102,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

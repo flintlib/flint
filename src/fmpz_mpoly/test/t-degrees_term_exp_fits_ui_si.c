@@ -202,8 +202,8 @@ main(void)
         deg = (fmpz **) flint_malloc(nvars*sizeof(fmpz *));
         for (k = 0; k < nvars; k++)
         {
-            exp[k] = (fmpz *) flint_malloc(sizeof(fmpz)); 
-            deg[k] = (fmpz *) flint_malloc(sizeof(fmpz)); 
+            exp[k] = (fmpz *) flint_malloc(sizeof(fmpz));
+            deg[k] = (fmpz *) flint_malloc(sizeof(fmpz));
             fmpz_init(exp[k]);
             fmpz_init(deg[k]);
             fmpz_set_si(deg[k], -WORD(1));
@@ -252,7 +252,7 @@ main(void)
                 flint_printf("FAIL\nCheck degree computation\ni = %wd\n", i);
                 fflush(stdout);
                 flint_abort();
-            }            
+            }
             result = result && fmpz_fits_si(exp[k]);
         }
         if (result != fmpz_mpoly_degrees_fit_si(f, ctx))
@@ -260,14 +260,14 @@ main(void)
             flint_printf("FAIL\nCheck degrees_fit_si\ni = %wd\n", i);
             fflush(stdout);
             flint_abort();
-        }            
+        }
 
         for (k = 0; k < nvars; k++)
         {
             fmpz_clear(deg[k]);
-            flint_free(deg[k]); 
+            flint_free(deg[k]);
             fmpz_clear(exp[k]);
-            flint_free(exp[k]); 
+            flint_free(exp[k]);
         }
         flint_free(deg);
         flint_free(exp);
@@ -277,7 +277,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

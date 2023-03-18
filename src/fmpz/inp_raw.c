@@ -11,7 +11,7 @@
 
 #include "fmpz.h"
 
-size_t fmpz_inp_raw( fmpz_t x, FILE *fin ) 
+size_t fmpz_inp_raw( fmpz_t x, FILE *fin )
 {
     mpz_t v;
     size_t size;

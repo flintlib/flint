@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2009, 2011 William Hart
 
     This file is part of FLINT.
@@ -12,45 +12,45 @@
 #include "flint.h"
 #include "fft.h"
 
-void fft_combine_limbs(mp_limb_t * res, mp_limb_t ** poly, slong length, 
+void fft_combine_limbs(mp_limb_t * res, mp_limb_t ** poly, slong length,
             mp_size_t coeff_limbs, mp_size_t output_limbs, mp_size_t total_limbs)
 {
    mp_size_t skip, i;
-   
-   for (skip = 0, i = 0; i < length && skip + output_limbs + 1 <= total_limbs; i++, skip += coeff_limbs) 
-      mpn_add(res + skip, res + skip, output_limbs + 1, poly[i], output_limbs); 
+
+   for (skip = 0, i = 0; i < length && skip + output_limbs + 1 <= total_limbs; i++, skip += coeff_limbs)
+      mpn_add(res + skip, res + skip, output_limbs + 1, poly[i], output_limbs);
 
    while ((skip < total_limbs) && (i < length))
    {
       mpn_add(res + skip, res + skip, total_limbs - skip, poly[i], FLINT_MIN(total_limbs - skip, output_limbs));
-      
+
       i++;
-      
+
       skip += coeff_limbs;
-   }  
+   }
 }
 
-void fft_combine_bits(mp_limb_t * res, mp_limb_t ** poly, slong length, 
+void fft_combine_bits(mp_limb_t * res, mp_limb_t ** poly, slong length,
                   flint_bitcnt_t bits, mp_size_t output_limbs, mp_size_t total_limbs)
 {
    flint_bitcnt_t shift_bits, top_bits = ((FLINT_BITS - 1) & bits);
    mp_size_t coeff_limbs, i;
    mp_limb_t * temp, * limb_ptr, * end;
-   
+
    if (top_bits == 0)
    {
       fft_combine_limbs(res, poly, length, bits/FLINT_BITS, output_limbs, total_limbs);
       return;
    }
-   
+
    coeff_limbs = (bits/FLINT_BITS) + 1;
    temp = flint_malloc((output_limbs + 1)*sizeof(mp_limb_t));
    shift_bits = 0;
    limb_ptr = res;
    end = res + total_limbs;
-   
+
    for (i = 0; i < length && limb_ptr + output_limbs + 1 < end; i++)
-   { 
+   {
       if (shift_bits)
       {
          mpn_lshift(temp, poly[i], output_limbs + 1, shift_bits);
@@ -65,8 +65,8 @@ void fft_combine_bits(mp_limb_t * res, mp_limb_t ** poly, slong length,
       {
          limb_ptr++;
          shift_bits -= FLINT_BITS;
-      }      
-   } 
+      }
+   }
 
    while (limb_ptr < end && i < length)
    {
@@ -84,10 +84,10 @@ void fft_combine_bits(mp_limb_t * res, mp_limb_t ** poly, slong length,
       {
          limb_ptr++;
          shift_bits -= FLINT_BITS;
-      }  
+      }
 
-      i++;    
+      i++;
    }
-   
-   flint_free(temp);     
+
+   flint_free(temp);
 }

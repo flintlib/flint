@@ -84,7 +84,7 @@ int gr_mpoly_set_coeff_scalar_fmpz(
         status |= gr_set(GR_ENTRY(A->coeffs, index, sz), c, cctx);
     }
 
-    TMP_END; 
+    TMP_END;
 
     return status;
 }

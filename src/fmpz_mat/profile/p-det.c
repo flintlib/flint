@@ -33,8 +33,8 @@ void sample(void * arg, ulong count)
     fmpz_mat_t A;
     fmpz_t d;
     FLINT_TEST_INIT(state);
-    
-   
+
+
     fmpz_mat_init(A, dim, dim);
     fmpz_init(d);
 
@@ -56,7 +56,7 @@ void sample(void * arg, ulong count)
 
     fmpz_mat_clear(A);
     fmpz_clear(d);
-    
+
     flint_randclear(state);
 }
 
@@ -86,7 +86,7 @@ int main(void)
             params.algorithm = 2;
             prof_repeat(&min_modular_2, &max, sample, &params);
 
-            flint_printf("dim = %wd classical/modular/acc. %.2f %.2f %.2f (us)\n", 
+            flint_printf("dim = %wd classical/modular/acc. %.2f %.2f %.2f (us)\n",
                 dim, min_classical, min_modular, min_modular_2);
 
             if (min_modular > 1.1*min_modular_2)

@@ -78,7 +78,7 @@ nmod_poly_mat_mul_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A,
         for (j = 0; j < A->c; j++)
         {
             _nmod_poly_evaluate_nmod_vec_fast_precomp(tt,
-                nmod_poly_mat_entry(A, i, j)->coeffs, 
+                nmod_poly_mat_entry(A, i, j)->coeffs,
                 nmod_poly_mat_entry(A, i, j)->length,
                 tree, len, mod);
 
@@ -92,7 +92,7 @@ nmod_poly_mat_mul_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A,
         for (j = 0; j < B->c; j++)
         {
             _nmod_poly_evaluate_nmod_vec_fast_precomp(tt,
-                nmod_poly_mat_entry(B, i, j)->coeffs, 
+                nmod_poly_mat_entry(B, i, j)->coeffs,
                 nmod_poly_mat_entry(B, i, j)->length,
                 tree, len, mod);
 

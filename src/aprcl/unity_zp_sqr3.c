@@ -13,7 +13,7 @@
 #include "aprcl.h"
 
 /*
-    Computes f = g * g for p = 3. 
+    Computes f = g * g for p = 3.
     g must be reduced by F_3 cyclotomic polynomial.
     t is the memory for fmpz_t; size of t must be > 3.
     Resulting f reduced by F_3 cyclotomic polynomial.
@@ -42,7 +42,7 @@ unity_zp_sqr3(unity_zp f, const unity_zp g, fmpz_t * t)
 }
 
 /*
-    Computes f = g * g for p = 3. 
+    Computes f = g * g for p = 3.
     g must be reduced by F_3 cyclotomic polynomial.
     t is the memory for fmpz_t; size of t must be > 30.
     Resulting f reduced by F_3 cyclotomic polynomial.
@@ -79,7 +79,7 @@ unity_zp_sqr9(unity_zp f, const unity_zp g, fmpz_t * t)
     fmpz_add(t[4], t[21], t[24]);           /*  b1 = x1 + x4    */
     fmpz_add(t[5], t[22], t[25]);           /*  b2 = x2 + x5    */
 
-    /* 
+    /*
         apply auxiliary routine 2 with (a0, a1, a2) and (b0, b1, b2)
         store result in (c0, .. , c4)
     */
@@ -91,14 +91,14 @@ unity_zp_sqr9(unity_zp f, const unity_zp g, fmpz_t * t)
     fmpz_set(t[29], t[9]);                  /*  set d3 = c3     */
     fmpz_set(t[30], t[10]);                 /*  set d4 = c4     */
 
-    fmpz_add(t[3], t[20], t[0]);            /*  b0 = x0 + a0    */        
+    fmpz_add(t[3], t[20], t[0]);            /*  b0 = x0 + a0    */
     fmpz_add(t[4], t[21], t[1]);            /*  b1 = x1 + a1    */
     fmpz_add(t[5], t[22], t[2]);            /*  b2 = x2 + a2    */
     fmpz_set(t[0], t[23]);                  /*  set a0 = x3     */
     fmpz_set(t[1], t[24]);                  /*  set a1 = x4     */
     fmpz_set(t[2], t[25]);                  /*  set a2 = x5     */
 
-    /* 
+    /*
         apply auxiliary routine 2 with (a0, a1, a2) and (b0, b1, b2)
         store result in (c0, .. , c4)
     */

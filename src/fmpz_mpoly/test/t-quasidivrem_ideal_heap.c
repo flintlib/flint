@@ -46,7 +46,7 @@ main(void)
             darr[w] = g + w;
             fmpz_mpoly_init(q + w, ctx);
             qarr[w] = q + w;
-        }  
+        }
 
         fmpz_init(scale);
         fmpz_mpoly_init(f, ctx);
@@ -164,7 +164,7 @@ main(void)
             darr[w] = g + w;
             fmpz_mpoly_init(q + w, ctx);
             qarr[w] = q + w;
-        }  
+        }
 
         fmpz_init(scale);
         fmpz_mpoly_init(f, ctx);
@@ -235,7 +235,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

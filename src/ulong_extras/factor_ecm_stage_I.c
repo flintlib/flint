@@ -27,10 +27,10 @@ n_factor_ecm_stage_I(mp_limb_t *f, const mp_limb_t *prime_array, mp_limb_t num,
         for (j = 1; j <= p; j ++)
         {
             n_factor_ecm_mul_montgomery_ladder(&(n_ecm_inf->x), &(n_ecm_inf->z),
-                                               n_ecm_inf->x, n_ecm_inf->z, 
+                                               n_ecm_inf->x, n_ecm_inf->z,
                                                times, n, n_ecm_inf);
         }
-        
+
         *f = n_gcd(n_ecm_inf->z, n);
 
         if ((*f > n_ecm_inf->one) && (*f < n))

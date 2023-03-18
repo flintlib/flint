@@ -79,7 +79,7 @@ _fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz * res, const fmpz_t e, const fmpz * f,
         if (c == 0)
         {
             _fmpz_mod_poly_shift_left(T, res, lenf - 1, window);
-            
+
             _fmpz_mod_poly_divrem_newton_n_preinv(Q, res, T, lenf - 1 + window,
                                                   f, lenf, finv, lenfinv, p);
             c = l + 1;

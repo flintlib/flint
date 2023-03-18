@@ -81,7 +81,7 @@ main(void)
                     flint_printf("FAIL: Check pushed exponent matches\n");
                     flint_printf("i = %wd, j = %wd\n", i, j);
                     fflush(stdout);
-                    flint_abort();                    
+                    flint_abort();
                 }
             }
         }
@@ -110,7 +110,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

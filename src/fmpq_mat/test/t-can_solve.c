@@ -18,7 +18,7 @@ main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("can_solve....");
     fflush(stdout);
@@ -52,7 +52,7 @@ main(void)
             fmpz_mat_randops(M, state, n_randint(state, 2*n*k + 1));
         fmpz_randtest_not_zero(den, state, bits);
         fmpq_mat_set_fmpz_mat_div_fmpz(A, M, den);
-        
+
         fmpq_mat_randtest(B, state, bits);
 
         success = fmpq_mat_can_solve(X, A, B);
@@ -75,7 +75,7 @@ main(void)
         }
 
         fmpz_clear(den);
-        
+
         fmpz_mat_clear(M);
         fmpq_mat_clear(A);
         fmpq_mat_clear(B);
@@ -112,7 +112,7 @@ main(void)
             fmpz_mat_randops(M, state, n_randint(state, 2*m*n + 1));
         fmpz_randtest_not_zero(den, state, bits);
         fmpq_mat_set_fmpz_mat_div_fmpz(A, M, den);
-        
+
         fmpq_mat_randtest(X, state, bits);
 
         fmpq_mat_mul(B, A, X);
@@ -137,7 +137,7 @@ main(void)
         }
 
         fmpz_clear(den);
-        
+
         fmpz_mat_clear(M);
         fmpq_mat_clear(A);
         fmpq_mat_clear(B);
@@ -146,7 +146,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

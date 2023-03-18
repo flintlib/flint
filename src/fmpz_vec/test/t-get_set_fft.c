@@ -25,8 +25,8 @@ main(void)
     flint_printf("get/set_fft....");
     fflush(stdout);
 
-    
-    
+
+
      /* convert back and forth and compare */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -39,7 +39,7 @@ main(void)
         bits = n_randint(state, 300) + 1;
         len = n_randint(state, 300) + 1;
         limbs = 2*((bits - 1)/FLINT_BITS + 1);
-        
+
         ii = flint_malloc((len + len*(limbs + 1))*sizeof(mp_limb_t));
         ptr = (mp_limb_t *) ii + len;
         for (i = 0; i < len; i++, ptr += (limbs + 1))
@@ -57,7 +57,7 @@ main(void)
         for (i = 0; i < len; i++)
            mpn_normmod_2expp1(ii[i], limbs);
         _fmpz_vec_set_fft(b, len, ii, limbs, bt < 0);
-        
+
         result = (_fmpz_vec_equal(a, b, len));
         if (!result)
         {
@@ -72,7 +72,7 @@ main(void)
         _fmpz_vec_clear(a, len);
         _fmpz_vec_clear(b, len);
     }
-        
+
      /* convert back and forth unsigned and compare */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -85,7 +85,7 @@ main(void)
         bits = n_randint(state, 300) + 1;
         len = n_randint(state, 300) + 1;
         limbs = 2*((bits - 1)/FLINT_BITS + 1);
-        
+
         ii = flint_malloc((len + len*(limbs + 1))*sizeof(mp_limb_t));
         ptr = (mp_limb_t *) ii + len;
         for (i = 0; i < len; i++, ptr += (limbs + 1))
@@ -98,7 +98,7 @@ main(void)
         _fmpz_vec_get_fft(ii, a, limbs, len);
         bt = _fmpz_vec_max_bits(a, len);
         _fmpz_vec_set_fft(b, len, ii, limbs, bt < 0);
-        
+
         result = (_fmpz_vec_equal(a, b, len));
         if (!result)
         {
@@ -113,9 +113,9 @@ main(void)
         _fmpz_vec_clear(a, len);
         _fmpz_vec_clear(b, len);
     }
-        
+
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -48,16 +48,16 @@ n_factor_ecm_mul_montgomery_ladder(mp_limb_t *x, mp_limb_t *z, mp_limb_t x0, mp_
         if (((UWORD(1) << len) & k) != 0)       /* ith bit is 1 */
         {
             /* Q <- P + Q */
-            n_factor_ecm_add(&x1, &z1, x1, z1, x2, z2, x0, z0, n, n_ecm_inf);   
+            n_factor_ecm_add(&x1, &z1, x1, z1, x2, z2, x0, z0, n, n_ecm_inf);
             /* P <- 2 * P */
-            n_factor_ecm_double(&x2, &z2, x2, z2, n, n_ecm_inf);                
+            n_factor_ecm_double(&x2, &z2, x2, z2, n, n_ecm_inf);
         }
         else
-        {   
+        {
             /* P <- P + Q */
-            n_factor_ecm_add(&x2, &z2, x1, z1, x2, z2, x0, z0, n, n_ecm_inf);   
-            /* Q <- 2 * Q */        
-            n_factor_ecm_double(&x1, &z1, x1, z1, n, n_ecm_inf);                
+            n_factor_ecm_add(&x2, &z2, x1, z1, x2, z2, x0, z0, n, n_ecm_inf);
+            /* Q <- 2 * Q */
+            n_factor_ecm_double(&x1, &z1, x1, z1, n, n_ecm_inf);
         }
 
 

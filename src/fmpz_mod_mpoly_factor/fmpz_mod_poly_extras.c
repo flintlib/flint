@@ -141,7 +141,7 @@ void fmpz_mod_poly_eval_pow(
 void fmpz_mod_poly_eval2_pow(
     fmpz_t vp,
     fmpz_t vm,
-    const fmpz_mod_poly_t P, 
+    const fmpz_mod_poly_t P,
     fmpz_mod_poly_t alphapow,
     const fmpz_mod_ctx_t ctx)
 {

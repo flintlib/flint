@@ -12,9 +12,9 @@
 #include "fmpz_poly.h"
 #include "padic_poly.h"
 
-void _padic_poly_mul(fmpz *rop, slong *rval, slong N, 
-                     const fmpz *op1, slong val1, slong len1, 
-                     const fmpz *op2, slong val2, slong len2, 
+void _padic_poly_mul(fmpz *rop, slong *rval, slong N,
+                     const fmpz *op1, slong val1, slong len1,
+                     const fmpz *op2, slong val2, slong len2,
                      const padic_ctx_t ctx)
 {
     fmpz_t pow;
@@ -31,8 +31,8 @@ void _padic_poly_mul(fmpz *rop, slong *rval, slong N,
         fmpz_clear(pow);
 }
 
-void padic_poly_mul(padic_poly_t f, 
-                    const padic_poly_t g, const padic_poly_t h, 
+void padic_poly_mul(padic_poly_t f,
+                    const padic_poly_t g, const padic_poly_t h,
                     const padic_ctx_t ctx)
 {
     const slong lenG = g->length;
@@ -58,10 +58,10 @@ void padic_poly_mul(padic_poly_t f,
         }
 
         if (lenG >= lenH)
-            _padic_poly_mul(t, &(f->val), f->N, g->coeffs, g->val, lenG, 
+            _padic_poly_mul(t, &(f->val), f->N, g->coeffs, g->val, lenG,
                                           h->coeffs, h->val, lenH, ctx);
         else
-            _padic_poly_mul(t, &(f->val), f->N, h->coeffs, h->val, lenH, 
+            _padic_poly_mul(t, &(f->val), f->N, h->coeffs, h->val, lenH,
                                           g->coeffs, g->val, lenG, ctx);
 
         if (f == g || f == h)

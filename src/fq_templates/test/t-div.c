@@ -29,7 +29,7 @@ main(void)
         TEMPLATE(T, t) a, b, c, d;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
-        
+
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(b, ctx);
         TEMPLATE(T, init)(c, ctx);

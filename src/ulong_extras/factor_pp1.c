@@ -41,7 +41,7 @@ void n_pp1_print(mp_limb_t x, mp_limb_t y, ulong norm)
    {
       x >>= norm;
       y >>= norm;
-   } 
+   }
 
    flint_printf("[%wu, %wu]", x, y);
 }
@@ -64,7 +64,7 @@ void n_pp1_print(mp_limb_t x, mp_limb_t y, ulong norm)
       y = n_submod(y, two, n);                  \
    } while (0)
 
-void n_pp1_pow_ui(mp_limb_t * x, mp_limb_t * y, ulong exp, 
+void n_pp1_pow_ui(mp_limb_t * x, mp_limb_t * y, ulong exp,
                     mp_limb_t n, mp_limb_t ninv, ulong norm)
 {
    const mp_limb_t x0 = *x;
@@ -73,7 +73,7 @@ void n_pp1_pow_ui(mp_limb_t * x, mp_limb_t * y, ulong exp,
 
    (*y) = n_mulmod_preinv(*x, *x, n, ninv, norm);
    (*y) = n_submod(*y, two, n);
-   
+
    while (bit)
    {
       if (exp & bit)
@@ -92,7 +92,7 @@ mp_limb_t n_pp1_factor(mp_limb_t n, mp_limb_t x, ulong norm)
       n >>= norm;
       x >>= norm;
    }
-   
+
    x = n_submod(x, 2, n);
    if (x == 0)
       return 0;
@@ -100,11 +100,11 @@ mp_limb_t n_pp1_factor(mp_limb_t n, mp_limb_t x, ulong norm)
    return n_gcd(n, x);
 }
 
-mp_limb_t n_pp1_find_power(mp_limb_t * x, mp_limb_t * y, 
+mp_limb_t n_pp1_find_power(mp_limb_t * x, mp_limb_t * y,
                   ulong p, mp_limb_t n, mp_limb_t ninv, ulong norm)
 {
    mp_limb_t factor;
-   
+
    do
    {
       n_pp1_pow_ui(x, y, p, n, ninv, norm);
@@ -134,10 +134,10 @@ mp_limb_t n_factor_pp1(mp_limb_t n, ulong B1, ulong c)
    n <<= norm;
 
    ninv = n_preinvert_limb(n);
-   
+
    n_pp1_set_ui(x, norm, c);
-   
-   /* mul by various prime powers */   
+
+   /* mul by various prime powers */
    pr = 0;
    oldpr = 0;
 
@@ -146,7 +146,7 @@ mp_limb_t n_factor_pp1(mp_limb_t n, ulong B1, ulong c)
       j = i + 1024;
       oldpr = pr;
       n_pp1_set(oldx, oldy, x, y);
-         
+
       for ( ; i < j; i++)
       {
          pr = n_primes_next(iter);
@@ -158,7 +158,7 @@ mp_limb_t n_factor_pp1(mp_limb_t n, ulong B1, ulong c)
          } else
             n_pp1_pow_ui(&x, &y, pr, n, ninv, norm);
       }
-      
+
       factor = n_pp1_factor(n, x, norm);
       if (factor == 0)
          break;
@@ -169,7 +169,7 @@ mp_limb_t n_factor_pp1(mp_limb_t n, ulong B1, ulong c)
    if (pr < B1) /* factor = 0 */
    {
       n_primes_jump_after(iter, oldpr);
-      n_pp1_set(x, y, oldx, oldy);  
+      n_pp1_set(x, y, oldx, oldy);
 
       do
       {

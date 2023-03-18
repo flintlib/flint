@@ -12,10 +12,10 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-/* 
+/*
    Method of Niels Moller and Torbjorn Granlund, see "Improved Division by
    Invariant Integers: (Algorithm 4)
-   https://gmplib.org/~tege/division-paper.pdf 
+   https://gmplib.org/~tege/division-paper.pdf
 */
 
 ulong
@@ -26,8 +26,8 @@ n_lll_mod_preinv(ulong a_hi, ulong a_mi, ulong a_lo, ulong n, ulong ninv)
     count_leading_zeros(norm, n);
     n <<= norm;
 
-    /* 
-       a_hi is already reduced, so first reduce a_hi, a_mi mod n 
+    /*
+       a_hi is already reduced, so first reduce a_hi, a_mi mod n
      */
     {
         const ulong u1 = (a_hi << norm) + r_shift(a_mi, FLINT_BITS - norm);
@@ -45,8 +45,8 @@ n_lll_mod_preinv(ulong a_hi, ulong a_mi, ulong a_lo, ulong n, ulong ninv)
             a_mi -= n;
     }
 
-    /* 
-       a_mi is now reduced mod n, so reduce a_mi, a_lo mod n 
+    /*
+       a_mi is now reduced mod n, so reduce a_mi, a_lo mod n
      */
     {
         const ulong u1 = a_mi + r_shift(a_lo, FLINT_BITS - norm);

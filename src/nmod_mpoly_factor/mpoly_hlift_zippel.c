@@ -70,7 +70,7 @@ static int nmod_mpoly_from_zip(
 
     /* x is most significant in ctx, so keeping the lc_x in B is easy */
     FLINT_ASSERT(xvar == 0);
-    
+
     for (Bi = 0; Bi < B->length; Bi++)
     {
         x = (((B->exps + N*Bi)[xoff] >> xshift) & mask);
@@ -207,7 +207,7 @@ static void nmod_mpoly_set_eval_helper3(
         if (its_new)
         {
             n_poly_init2(Wc, 4);
-            Wc->coeffs[0] = i;                
+            Wc->coeffs[0] = i;
             Wc->length = 1;
         }
         else
@@ -339,7 +339,7 @@ static slong nmod_mpoly_set_eval_helper_and_zip_form3(
             if (its_new)
             {
                 n_poly_init2(Wc, 4);
-                Wc->coeffs[0] = i;                
+                Wc->coeffs[0] = i;
                 Wc->length = 1;
             }
             else
@@ -396,7 +396,7 @@ static slong nmod_mpoly_set_eval_helper_and_zip_form3(
             p[j + n] = meval;
 
             /* copy coeff */
-            p[j + 2*n] = Bcoeffs[Bi];            
+            p[j + 2*n] = Bcoeffs[Bi];
         }
 
         if (x < deg)
@@ -498,7 +498,7 @@ static void n_polyu3_add_zip_limit1(
             n_poly_fit_length(Zcoeffs + Zi, fit_length);
             Zcoeffs[Zi].length = cur_length;
             flint_mpn_zero(Zcoeffs[Zi].coeffs, cur_length);
-            goto in_both;            
+            goto in_both;
         }
         else if (Aexps[Ai] + ai < Zexps[Zi])
         {
@@ -547,7 +547,7 @@ static void n_polyu3_add_zip_limit1(
         FLINT_ASSERT(cur_length + 1 <= Zcoeffs[Zi].alloc);
         Zcoeffs[Zi].coeffs[cur_length] = Acoeffs[Ai].coeffs[ai];
         Zcoeffs[Zi].length = cur_length + 1;
-        
+
         Z->length = ++Zi;
 
         do {
@@ -717,7 +717,7 @@ next_zip_image:
     for (i = 0; i < r; i++)
     {
         n_polyu3_add_zip_limit1(Z + i, BBeval + i, Bdegs[i],
-                                                cur_zip_image, req_zip_images); 
+                                                cur_zip_image, req_zip_images);
     }
 
     cur_zip_image++;

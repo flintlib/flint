@@ -25,7 +25,7 @@ main(void)
     slong n;
     mpq_t n_mpq;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("get/set_coeff_si....");
     fflush(stdout);
@@ -48,7 +48,7 @@ main(void)
             fmpq_poly_get_coeff_mpq(n_mpq, a, coeff);
 
             cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
-            result = (flint_mpz_cmp_ui(mpq_denref(n_mpq), 1) == 0 
+            result = (flint_mpz_cmp_ui(mpq_denref(n_mpq), 1) == 0
                    && flint_mpz_cmp_si(mpq_numref(n_mpq), n) == 0
                    && !cflags);
             if (!result)
@@ -67,7 +67,7 @@ main(void)
         fmpq_poly_clear(a);
     }
 
-    
+
     mpq_clear(n_mpq);
 
     FLINT_TEST_CLEANUP(state);

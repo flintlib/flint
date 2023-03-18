@@ -68,7 +68,7 @@ void fq_zech_mpoly_sub_fq_zech(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
                 fq_zech_set(A->coeffs + i, B->coeffs + i, ctx->fqctx);
 
             mpoly_copy_monomials(A->exps, B->exps, Blen, N);
-        } 
+        }
 
         mpoly_monomial_zero(A->exps + N*Blen, N);
 

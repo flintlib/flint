@@ -18,7 +18,7 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("make_monic....");
     fflush(stdout);
 
@@ -31,21 +31,21 @@ main(void)
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
-        
+
         if (n == 1) continue;
-        do 
+        do
         {
            nmod_poly_randtest(a, state, n_randint(state, 100) + 1);
         } while (a->length == 0 || n_gcd(*nmod_poly_lead(a), n) != 1);
-        
+
         nmod_poly_make_monic(b, a);
         l = n_gcd(a->mod.n, a->coeffs[a->length - 1]);
-        
+
         result = (l == b->coeffs[b->length - 1]);
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("l = %wu, a->lead = %wd, n = %wu\n", 
+            flint_printf("l = %wu, a->lead = %wd, n = %wu\n",
                 l, a->coeffs[a->length - 1], a->mod.n);
             nmod_poly_print(a), flint_printf("\n\n");
             nmod_poly_print(b), flint_printf("\n\n");
@@ -65,21 +65,21 @@ main(void)
         mp_limb_t l;
 
         nmod_poly_init(a, n);
-        
+
         if (n == 1) continue;
         do
         {
             nmod_poly_randtest(a, state, n_randint(state, 100) + 1);
         } while (a->length == 0 || n_gcd(*nmod_poly_lead(a), n) != 1);
-        
+
         l = n_gcd(a->mod.n, a->coeffs[a->length - 1]);
         nmod_poly_make_monic(a, a);
-        
+
         result = (l == a->coeffs[a->length - 1]);
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("l = %wu, a->lead = %wd, n = %wu\n", 
+            flint_printf("l = %wu, a->lead = %wd, n = %wu\n",
                 l, a->coeffs[a->length - 1], a->mod.n);
             nmod_poly_print(a), flint_printf("\n\n");
             fflush(stdout);
@@ -90,7 +90,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

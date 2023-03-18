@@ -68,11 +68,11 @@ main(void)
 
        flint_free(exp);
 
-       fmpz_mpoly_clear(f, ctx);  
+       fmpz_mpoly_clear(f, ctx);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

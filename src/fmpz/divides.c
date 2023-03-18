@@ -31,7 +31,7 @@ fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h)
     }
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */
-    {	
+    {
         if (!COEFF_IS_MPZ(c2))  /* h is also small */
         {
             mp_limb_t qz;

@@ -13,8 +13,8 @@
 
 #include "flint.h"
 #include "ulong_extras.h"
-    
-int n_is_oddprime_binary(mp_limb_t n) 
+
+int n_is_oddprime_binary(mp_limb_t n)
 {
     ulong diff, prime_lo, prime_hi;
     const mp_limb_t * primes;

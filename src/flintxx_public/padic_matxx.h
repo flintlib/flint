@@ -105,7 +105,7 @@ public:
                 rows, cols, tools::padic_output_prec(e));
     }
     FLINTXX_DEFINE_MATRIX_METHODS(traits_t)
-        
+
     // static methods which only make sense with padicxx
     static padic_matxx_expression randtest(slong rows, slong cols,
             frandxx& state,
@@ -126,7 +126,7 @@ public:
     bool is_reduced() const {return padic_mat_is_reduced(_mat());}
 
     template<class Padic>
-    void set_entry(slong i, slong j, const Padic& p, 
+    void set_entry(slong i, slong j, const Padic& p,
             typename mp::enable_if<traits::is_padicxx<Padic> >::type* = 0)
     {
         padic_mat_set_entry_padic(_mat(), i, j, p.evaluate()._padic(), _ctx());
@@ -218,11 +218,11 @@ struct padic_mat_traits<padic_matxx_srcref>
       padic_matxx_srcref_traits_no_std_matrix { };
 template<>
 struct padic_mat_traits<padic_matxx_ref>
-    : matrices::generic_traits_ref<fmpzxx_ref>, 
+    : matrices::generic_traits_ref<fmpzxx_ref>,
       padic_matxx_ref_traits_no_std_matrix { };
 template<>
 struct padic_mat_traits<padic_matxx>
-    : matrices::generic_traits_nonref<fmpzxx_ref, fmpzxx_srcref>, 
+    : matrices::generic_traits_nonref<fmpzxx_ref, fmpzxx_srcref>,
       padic_matxx_ref_traits_no_std_matrix { };
 } // detail
 

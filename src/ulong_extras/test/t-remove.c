@@ -17,11 +17,11 @@ int main(void)
 {
    int i, result;
    FLINT_TEST_INIT(state);
-   
+
    flint_printf("remove....");
    fflush(stdout);
- 
-   
+
+
 
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test random numbers */
    {
@@ -29,7 +29,7 @@ int main(void)
       mpz_t d_n2, d_n1, d_p;
       int exp1, exp2;
       ulong j;
-      
+
       mpz_init(d_n1);
       mpz_init(d_n2);
       mpz_init(d_p);
@@ -59,14 +59,14 @@ int main(void)
       mpz_clear(d_n2);
       mpz_clear(d_p);
    }
-         
+
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test perfect powers */
    {
       mp_limb_t n1, n2, orig_n, base;
       mpz_t d_n2, d_n1, d_p;
       int exp1, exp2, exp;
       ulong j;
-      
+
       mpz_init(d_n1);
       mpz_init(d_n2);
       mpz_init(d_p);
@@ -100,9 +100,9 @@ int main(void)
       mpz_clear(d_n2);
       mpz_clear(d_p);
    }
-   
+
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

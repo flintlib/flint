@@ -532,7 +532,7 @@ extern const fexpr_symbol_info fexpr_builtin_table[FEXPR_BUILTIN_LENGTH];
 
 slong fexpr_builtin_lookup(const char * s);
 
-FEXPR_BUILTIN_INLINE 
+FEXPR_BUILTIN_INLINE
 const char * fexpr_builtin_name(slong n)
 {
     return fexpr_builtin_table[n].string;

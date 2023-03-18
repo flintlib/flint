@@ -35,8 +35,8 @@ main(void)
 
         acb_poly_get_coeff_acb(a, A, n);
 
-        result = n < acb_poly_length(A) ? 
-                     acb_equal(a, acb_poly_get_coeff_ptr(A, n)) : 
+        result = n < acb_poly_length(A) ?
+                     acb_equal(a, acb_poly_get_coeff_ptr(A, n)) :
                      acb_poly_get_coeff_ptr(A, n) == NULL;
         if (!result)
         {

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Sebastian Pancratz 
+    Copyright (C) 2012 Sebastian Pancratz
     Copyright (C) 2012 Andres Goens
     Copyright (C) 2013 Mike Hansen
 
@@ -37,7 +37,7 @@ main(void)
         slong e;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
-        
+
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(b, ctx);
         TEMPLATE(T, init)(c, ctx);
@@ -76,7 +76,7 @@ main(void)
         slong e;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
-        
+
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(b, ctx);
         TEMPLATE(T, init)(c, ctx);

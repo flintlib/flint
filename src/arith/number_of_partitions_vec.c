@@ -39,6 +39,6 @@ arith_number_of_partitions_vec(fmpz * res, slong len)
     if (n + 3*k + 1 < len) tmp[n + 3*k + 1] = WORD(1);
 
     _fmpz_poly_inv_series(res, tmp, len, len);
-     
+
     _fmpz_vec_clear(tmp, len);
 }

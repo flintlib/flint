@@ -66,7 +66,7 @@ void fmpz_mod_bpoly_set_polyx(
         fmpz_mod_poly_set_fmpz(A->coeffs + i, B->coeffs + i, ctx);
         if (!fmpz_mod_poly_is_zero(A->coeffs + i, ctx))
             A->length = i + 1;
-    }    
+    }
 }
 
 void fmpz_mod_bpoly_set_polyy(
@@ -244,7 +244,7 @@ void fmpz_bpoly_taylor_shift(fmpz_bpoly_t A, const fmpz_t alpha)
 {
     slong i;
     for (i = A->length - 1; i >= 0; i--)
-        _fmpz_poly_taylor_shift((A->coeffs + i)->coeffs, alpha, (A->coeffs + i)->length);    
+        _fmpz_poly_taylor_shift((A->coeffs + i)->coeffs, alpha, (A->coeffs + i)->length);
 }
 
 typedef struct {

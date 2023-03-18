@@ -24,7 +24,7 @@ void qfb_prime_form(qfb_t r, fmpz_t D, fmpz_t p)
    fmpz_t q, rem, s, t;
 
    fmpz_init(s);
-   
+
    if (fmpz_cmp_ui(p, 2) == 0) /* special case, p = 2 */
    {
       ulong m8 = fmpz_fdiv_ui(D, 8);
@@ -32,7 +32,7 @@ void qfb_prime_form(qfb_t r, fmpz_t D, fmpz_t p)
          fmpz_set_ui(r->b, 2);
       else
          fmpz_set_ui(r->b, m8);
-      
+
       fmpz_sub_ui(s, D, m8);
       fmpz_neg(s, s);
       fmpz_fdiv_q_2exp(r->c, s, 3);
@@ -42,15 +42,15 @@ void qfb_prime_form(qfb_t r, fmpz_t D, fmpz_t p)
 
       return;
    }
-   
+
    fmpz_init(t);
-   
+
    fmpz_mod(t, D, p);
    if (fmpz_is_zero(t)) /* special case, p | D */
    {
       fmpz_init(q);
       fmpz_init(rem);
-      
+
       fmpz_fdiv_q(s, D, p); /* s = D/p */
       if (fmpz_is_zero(s))
          fmpz_set(t, s);
@@ -68,7 +68,7 @@ void qfb_prime_form(qfb_t r, fmpz_t D, fmpz_t p)
          else
             fmpz_add_ui(q, q, 1 + fmpz_is_odd(q));
       } /* q = b/p */
-      
+
       fmpz_mul(r->b, q, p);
       fmpz_mul(q, q, q);
       fmpz_mul(q, q, p);

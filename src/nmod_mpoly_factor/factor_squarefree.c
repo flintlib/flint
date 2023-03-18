@@ -39,7 +39,7 @@ static void nmod_mpoly_factor_mul_mpoly_fmpz(
            -1 don't know
 */
 static int nmod_mpoly_factor_is_pairwise_prime(
-	const nmod_mpoly_factor_t f, 
+	const nmod_mpoly_factor_t f,
 	const nmod_mpoly_ctx_t ctx)
 {
 	int result;
@@ -151,7 +151,7 @@ static int nmod_mpoly_factor_mul_pairwise_prime(
             FLINT_ASSERT(success);
 		}
 		nmod_mpoly_factor_mul_mpoly_fmpz(a, T1, b->exp + i, ctx);
-	}	
+	}
 
 	for (j = 0; j < c->num; j++)
 	{
@@ -162,7 +162,7 @@ static int nmod_mpoly_factor_mul_pairwise_prime(
             FLINT_ASSERT(success);
 		}
 		nmod_mpoly_factor_mul_mpoly_fmpz(a, T1, c->exp + j, ctx);
-	}	
+	}
 
 	success = 1;
 

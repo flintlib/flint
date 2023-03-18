@@ -14,20 +14,20 @@
 
 /*
     Forms the product of (op1,len1) and (op2,len2) modulo (a,j,lena) and pN.
-    Assumes that len1 >= len2 > 0.  Requires rop to be of size at least 
+    Assumes that len1 >= len2 > 0.  Requires rop to be of size at least
     len1 + len2 - 1.
  */
 
-static 
-void _qadic_mul(fmpz *rop, 
-                const fmpz *op1, slong len1, const fmpz *op2, slong len2, 
+static
+void _qadic_mul(fmpz *rop,
+                const fmpz *op1, slong len1, const fmpz *op2, slong len2,
                 const fmpz *a, const slong *j, slong lena, const fmpz_t pN)
 {
     _fmpz_poly_mul(rop, op1, len1, op2, len2);
     _fmpz_mod_poly_reduce(rop, len1 + len2 - 1, a, j, lena, pN);
 }
 
-void qadic_mul(qadic_t x, const qadic_t y, const qadic_t z, 
+void qadic_mul(qadic_t x, const qadic_t y, const qadic_t z,
                           const qadic_ctx_t ctx)
 {
     const slong leny = y->length;
@@ -61,10 +61,10 @@ void qadic_mul(qadic_t x, const qadic_t y, const qadic_t z,
         }
 
         if (leny >= lenz)
-            _qadic_mul(t, y->coeffs, leny, 
+            _qadic_mul(t, y->coeffs, leny,
                           z->coeffs, lenz, ctx->a, ctx->j, ctx->len, pN);
         else
-            _qadic_mul(t, z->coeffs, lenz, 
+            _qadic_mul(t, z->coeffs, lenz,
                           y->coeffs, leny, ctx->a, ctx->j, ctx->len, pN);
 
         if (x == y || x == z)

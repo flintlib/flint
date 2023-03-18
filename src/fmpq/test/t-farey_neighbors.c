@@ -77,7 +77,7 @@ main(void)
             flint_printf("FAIL:\n");
             flint_printf("check end q = %wd\n", q);
             fflush(stdout);
-            flint_abort();            
+            flint_abort();
         }
 
         fmpz_clear(Q);

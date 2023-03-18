@@ -341,7 +341,7 @@ arb_log_ui_smooth(arb_t s, ulong n, slong prec)
     m = n;
     i = j = k = 0;
     while (m % 2 == 0) { m /= 2; i++; }
-    while (m % 3 == 0) { m /= 3; j++; } 
+    while (m % 3 == 0) { m /= 3; j++; }
     while (m % 5 == 0) { m /= 5; k++; }
 
     if (m != 1)

@@ -41,12 +41,12 @@ main(void)
         fmpz_mod_poly_frobenius_powers_2exp_t pow;
         fmpz_t p;
         ulong exp;
-        
+
         fmpz_init(p);
         fmpz_set_ui(p, n_randtest_prime(state, 0));
         fmpz_mod_ctx_set_modulus(ctx, p);
         exp = n_randint(state, 50);
-        
+
         fmpz_mod_poly_init(f, ctx);
         fmpz_mod_poly_init(finv, ctx);
         fmpz_mod_poly_init(res, ctx);
@@ -86,7 +86,7 @@ main(void)
         fmpz_mod_poly_frobenius_powers_2exp_t pow2;
         fmpz_t p;
         ulong exp, exp2;
-        
+
         fmpz_init(p);
         fmpz_set_ui(p, n_randtest_prime(state, 0));
         fmpz_mod_ctx_set_modulus(ctx, p);
@@ -104,9 +104,9 @@ main(void)
 
         fmpz_mod_poly_frobenius_powers_precomp(pow, f, finv, exp, ctx);
         fmpz_mod_poly_frobenius_powers_2exp_precomp(pow2, f, finv, exp, ctx);
-        
+
         fmpz_mod_poly_frobenius_power(res, pow2, f, exp2, ctx);
-        
+
         result = (fmpz_mod_poly_equal(res, pow->pow + exp2, ctx));
         if (!result)
         {
@@ -127,7 +127,7 @@ main(void)
 
     fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

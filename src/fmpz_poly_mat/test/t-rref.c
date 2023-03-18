@@ -64,7 +64,7 @@ main(void)
     flint_printf("rref....");
     fflush(stdout);
 
-    
+
 
     for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
     {
@@ -156,7 +156,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

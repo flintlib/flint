@@ -78,7 +78,7 @@ main(void)
     flint_free(limbs);
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

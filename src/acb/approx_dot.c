@@ -46,7 +46,7 @@ _arb_dot_output(arb_t res, mp_ptr sum, mp_size_t sn, int negative,
         mp_size_t sn2;
 
         sn2 = sn;
-        sum_exp2 = sum_exp; 
+        sum_exp2 = sum_exp;
 
         while (sn2 > 0 && sum[sn2 - 1] == 0)
         {

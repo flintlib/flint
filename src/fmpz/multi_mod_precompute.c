@@ -142,7 +142,7 @@ int fmpz_multi_mod_precompute(
     if (r < 2)
     {
         P->good = !fmpz_is_zero(f + 0);
-        
+
         if (P->good)
         {
             fmpz_abs(P->moduli + 0, f + 0);

@@ -20,24 +20,24 @@ void fmpz_addmul_old(fmpz_t f, const fmpz_t g, const fmpz_t h)
 {
     fmpz c1, c2;
     __mpz_struct * mf;
-	
+
     c1 = *g;
-	
+
 	if (!COEFF_IS_MPZ(c1))  /* g is small */
 	{
 		if (c1 < WORD(0)) fmpz_submul_ui(f, h, -c1);
 		else fmpz_addmul_ui(f, h, c1);
 		return;
-	} 
+	}
 
 	c2 = *h;
-   
+
 	if (!COEFF_IS_MPZ(c2))  /* h is small */
 	{
 		if (c2 < WORD(0)) fmpz_submul_ui(f, g, -c2);
 		else fmpz_addmul_ui(f, g, c2);
 		return;
-	} 
+	}
 
 	/* both g and h are large */
     mf = _fmpz_promote_val(f);
@@ -57,7 +57,7 @@ sample_new(void * arg, ulong count)
     res = _fmpz_vec_init(ntests);
     a = _fmpz_vec_init(ntests);
     b = _fmpz_vec_init(ntests);
-   
+
     for (ix = 0; ix < 10 * count; ix++)
     {
         for (jx = 0; jx < ntests; jx++)
@@ -91,7 +91,7 @@ sample_old(void * arg, ulong count)
     res = _fmpz_vec_init(ntests);
     a = _fmpz_vec_init(ntests);
     b = _fmpz_vec_init(ntests);
-   
+
     for (ix = 0; ix < 10 * count; ix++)
     {
         for (jx = 0; jx < ntests; jx++)
@@ -125,7 +125,7 @@ main(void)
     {
         prof_repeat(&minnew, &maxnew, sample_new, &bits);
         prof_repeat(&minold, &maxold, sample_old, &bits);
-        
+
         flint_printf("%d bits:      min %.2fx,    max %.2fx\n",
                 bits, minold / minnew, maxold / maxnew);
     }

@@ -32,7 +32,7 @@ _nmod_poly_powmod_fmpz_binexp_preinv (mp_ptr res, mp_srcptr poly, fmpz_t e,
 
     if (lenf == 2)
     {
-        /* n = ndivg * g. Compute (poly[0]%ndivg)^e mod ndivg and use CRT */        
+        /* n = ndivg * g. Compute (poly[0]%ndivg)^e mod ndivg and use CRT */
         if (fmpz_abs_fits_ui(e))
         {
            ulong e_ui = fmpz_get_ui(e);
@@ -112,14 +112,14 @@ nmod_poly_powmod_fmpz_binexp_preinv(nmod_poly_t res, const nmod_poly_t poly,
 
         nmod_poly_init_mod(t, res->mod);
         nmod_poly_init_mod(r, res->mod);
-        
+
         nmod_poly_divrem(t, r, poly, f);
-        
+
         nmod_poly_powmod_fmpz_binexp_preinv(res, r, e, f, finv);
-        
+
         nmod_poly_clear(t);
         nmod_poly_clear(r);
-        
+
         return;
     }
 

@@ -22,7 +22,7 @@ main(void)
     flint_printf("xgcd....");
     fflush(stdout);
 
-    
+
 
     /* Test aliasing of d and f, a and g */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -155,7 +155,7 @@ main(void)
         fmpz_xgcd(d, a, b, f, g);
         fmpz_xgcd(f, c, g, f, g);
 
-        result = (fmpz_equal(d, f) 
+        result = (fmpz_equal(d, f)
                && fmpz_equal(a, c)
                && fmpz_equal(b, g));
         if (!result)
@@ -254,7 +254,7 @@ main(void)
         fmpz_randm(f, state, g);
         if (n_randint(state, 2)) fmpz_neg(g, g);
         if (n_randint(state, 2)) fmpz_neg(f, f);
-        
+
         fmpz_xgcd(d, a, b, f, g);
 
         fmpz_mul(t1, a, f);
@@ -286,7 +286,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

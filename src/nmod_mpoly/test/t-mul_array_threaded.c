@@ -49,7 +49,7 @@ main(void)
         len2 = n_randint(state, 100);
 
         max_bound = ctx->minfo->ord == ORD_LEX ? 200 : 100;
-        n = FLINT_MAX(WORD(1), ctx->minfo->nvars); 
+        n = FLINT_MAX(WORD(1), ctx->minfo->nvars);
         max_bound = max_bound/n/n;
         exp_bound =  n_randint(state, max_bound) + 1;
         exp_bound1 = n_randint(state, max_bound) + 1;
@@ -82,10 +82,10 @@ main(void)
             }
         }
 
-        nmod_mpoly_clear(f, ctx);  
-        nmod_mpoly_clear(g, ctx);  
-        nmod_mpoly_clear(h, ctx);  
-        nmod_mpoly_clear(k, ctx);  
+        nmod_mpoly_clear(f, ctx);
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_clear(h, ctx);
+        nmod_mpoly_clear(k, ctx);
         nmod_mpoly_ctx_clear(ctx);
     }
 
@@ -206,7 +206,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

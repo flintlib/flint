@@ -27,14 +27,14 @@ void nf_elem_print_pretty(const nf_elem_t a, const nf_t nf, const char * var)
 		{
 		   flint_printf("/");
 		   fmpz_print(LNF_ELEM_DENREF(a));
-		}       
+		}
     } else if (nf->flag & NF_QUADRATIC)
     {
         const fmpz * const anum = QNF_ELEM_NUMREF(a);
         const fmpz * const aden = QNF_ELEM_DENREF(a);
         int den1 = fmpz_is_one(aden);
 		int lead0 = fmpz_is_zero(anum + 1);
-		
+
         if (!den1 && !lead0)
 		   flint_printf("(");
         if (!lead0)

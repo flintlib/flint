@@ -47,8 +47,8 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
     val = n_pow(limit, 3);
 
     while (val < n1 && limit < upper_limit)    /* ensuring that limit >= n1^(1/3) */
-    {                                               
-        limit++;                                   
+    {
+        limit++;
         val = n_pow(limit, 3);
     }
 
@@ -73,10 +73,10 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
     Fsq = F*F;
 
     if (F <= rootn)                         /* cube root method applicable only if n^1/3 <= F < n^1/2 */
-    {   
+    {
         c2 = n1/(Fsq);                      /* expressing n as c2*F^2 + c1*F + 1  */
         c1 = (n1 - c2*Fsq )/F;
-        det = c1*c1 - 4*c2; 
+        det = c1*c1 - 4*c2;
         if (n_is_square(det))               /* BSL's test for (n^1/3 <= F < n^1/2) */
             return 0;
     }

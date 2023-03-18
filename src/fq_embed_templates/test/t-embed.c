@@ -40,7 +40,7 @@ main(void)
         TEMPLATE(T, init) (b, ctx);
         TEMPLATE(T, init) (ev_a, ctx);
         TEMPLATE(T, init) (ev_b, ctx);
-        TEMPLATE(B, poly_init) (minpoly, 
+        TEMPLATE(B, poly_init) (minpoly,
                                 TEMPLATE(B, poly_modulus)(TEMPLATE(T, ctx_modulus)(ctx)));
         TEMPLATE(T, poly_init) (minpoly_fq, ctx);
 
@@ -49,7 +49,7 @@ main(void)
         TEMPLATE4(T, poly_set, B, poly)(minpoly_fq, minpoly, ctx);
         TEMPLATE3(T, poly_evaluate, T)(ev_a, minpoly_fq, a, ctx);
         TEMPLATE3(T, poly_evaluate, T)(ev_b, minpoly_fq, b, ctx);
-        
+
         if (!TEMPLATE(T, is_zero)(ev_a, ctx) || !TEMPLATE(T, is_zero)(ev_b, ctx))
         {
             flint_printf("FAIL:\n\n");

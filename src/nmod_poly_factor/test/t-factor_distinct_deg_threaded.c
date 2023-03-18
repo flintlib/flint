@@ -27,7 +27,7 @@ main(void)
     int iter;
 #endif
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("factor_distinct_deg_threaded....");
     fflush(stdout);
 
@@ -73,7 +73,7 @@ main(void)
 
         for (i = 1; i < num; i++)
         {
-            do 
+            do
             {
                 length = n_randint(state, MAX_DEG) + 2;
                 nmod_poly_randtest(poly, state, length);
@@ -91,7 +91,7 @@ main(void)
         }
 
         degs = (slong *) flint_malloc((poly1->length - 1) * sizeof(slong));
-	
+
         nmod_poly_factor_init(res);
         nmod_poly_factor_distinct_deg_threaded(res, poly1, &degs);
 
@@ -132,7 +132,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 

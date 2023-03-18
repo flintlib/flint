@@ -61,7 +61,7 @@ _nmod_poly_div_series_basecase(mp_ptr Qinv, mp_srcptr P, slong Plen,
 }
 
 void
-nmod_poly_div_series_basecase(nmod_poly_t Q, const nmod_poly_t A, 
+nmod_poly_div_series_basecase(nmod_poly_t Q, const nmod_poly_t A,
                                     const nmod_poly_t B, slong n)
 {
     slong Alen, Blen;

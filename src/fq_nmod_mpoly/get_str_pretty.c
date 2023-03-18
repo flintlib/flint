@@ -54,7 +54,7 @@ char * _fq_nmod_mpoly_get_str_pretty(
     }
 
     coeffstrs = (char **)flint_malloc(len * sizeof(char *));
-    
+
     bound = 1;
     for (i = 0; i < len; i++)
     {
@@ -72,7 +72,7 @@ char * _fq_nmod_mpoly_get_str_pretty(
 
     str = flint_malloc(bound);
     off = 0;
-   
+
     for (i = 0; i < len; i++)
     {
         if (i > 0)
@@ -113,7 +113,7 @@ char * _fq_nmod_mpoly_get_str_pretty(
             {
                 off += flint_sprintf(str + off, "%s", x[j]);
             }
-            
+
             first = 0;
         }
 

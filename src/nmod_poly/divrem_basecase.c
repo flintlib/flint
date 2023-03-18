@@ -17,9 +17,9 @@
 static
 slong NMOD_DIVREM_BC_ITCH(slong lenA, slong lenB, nmod_t mod)
 {
-    const flint_bitcnt_t bits = 
+    const flint_bitcnt_t bits =
         2 * (FLINT_BITS - mod.norm) + FLINT_BIT_COUNT(lenA - lenB + 1);
-    
+
     if (bits <= FLINT_BITS)
         return lenA;
     else if (bits <= 2 * FLINT_BITS)
@@ -29,7 +29,7 @@ slong NMOD_DIVREM_BC_ITCH(slong lenA, slong lenB, nmod_t mod)
 }
 
 
-void _nmod_poly_divrem_q0_preinv1(mp_ptr Q, mp_ptr R, 
+void _nmod_poly_divrem_q0_preinv1(mp_ptr Q, mp_ptr R,
                           mp_srcptr A, mp_srcptr B, slong lenA, mp_limb_t invL, nmod_t mod)
 {
     if (lenA == 1)
@@ -52,7 +52,7 @@ void _nmod_poly_divrem_q0_preinv1(mp_ptr Q, mp_ptr R,
     }
 }
 
-void _nmod_poly_divrem_q1_preinv1(mp_ptr Q, mp_ptr R, 
+void _nmod_poly_divrem_q1_preinv1(mp_ptr Q, mp_ptr R,
                           mp_srcptr A, slong lenA, mp_srcptr B, slong lenB,
                           mp_limb_t invL, nmod_t mod)
 {
@@ -127,7 +127,7 @@ _nmod_poly_divrem_basecase_preinv1_1(mp_ptr Q, mp_ptr R, mp_ptr W,
         {
             ptrQ[iR] = WORD(0);
         }
-        else 
+        else
         {
             ptrQ[iR] = n_mulmod2_preinv(R1[iR], invL, mod.n, mod.ninv);
 
@@ -165,7 +165,7 @@ _nmod_poly_divrem_basecase_preinv1_2(mp_ptr Q, mp_ptr R, mp_ptr W,
 
     for (iR = lenA - 1; iR >= lenB - 1; )
     {
-        mp_limb_t r = 
+        mp_limb_t r =
             n_ll_mod_preinv(R2[2 * iR + 1], R2[2 * iR], mod.n, mod.ninv);
 
         while ((iR + 1 >= lenB) && (r == WORD(0)))
@@ -286,7 +286,7 @@ _nmod_poly_divrem_basecase_preinv1(mp_ptr Q, mp_ptr R,
 }
 
 void
-_nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA, 
+_nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA,
                                   mp_srcptr B, slong lenB, nmod_t mod)
 {
     mp_limb_t invB;
@@ -301,7 +301,7 @@ void nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R,
     const slong lenA = A->length, lenB = B->length;
     nmod_poly_t tQ, tR;
     mp_ptr q, r;
-    
+
     if (lenB == 0)
     {
         if (nmod_poly_modulus(B) == 1)
@@ -357,7 +357,7 @@ void nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R,
         nmod_poly_swap(R, tR);
         nmod_poly_clear(tR);
     }
-        
+
     Q->length = lenA - lenB + 1;
     R->length = lenB - 1;
 

@@ -18,7 +18,7 @@ void nmod_mpoly_compression_do(
     mp_limb_t * Acoeffs,
     slong Alen,
     mpoly_compression_t M)
-{    
+{
     slong i, max_deg;
     flint_bitcnt_t Lbits;
     slong mvars = Lctx->minfo->nvars;

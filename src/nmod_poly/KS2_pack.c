@@ -23,7 +23,7 @@ _nmod_poly_KS2_pack1(mp_ptr res, mp_srcptr op, slong n, slong s,
 {
    /* where to write the next limb */
    mp_ptr dest = res;
-   
+
    /* limb currently being filled */
    mp_limb_t buf;
 
@@ -40,7 +40,7 @@ _nmod_poly_KS2_pack1(mp_ptr res, mp_srcptr op, slong n, slong s,
    buf = 0;
 
    buf_b = k;
-   
+
    for (; n > 0; n--, op += s)
    {
       /* put low bits of current input into buffer */
@@ -56,7 +56,7 @@ _nmod_poly_KS2_pack1(mp_ptr res, mp_srcptr op, slong n, slong s,
          buf = buf_b_old ? (*op >> (FLINT_BITS - buf_b_old)) : 0;
       }
    }
-   
+
    /* write last limb if it's non-empty */
    if (buf_b)
       *dest++ = buf;
@@ -76,7 +76,7 @@ _nmod_poly_KS2_pack(mp_ptr res, mp_srcptr op, slong n, slong s,
 {
    /* where to write the next limb */
    mp_ptr dest = res;
-   
+
    /* limb currently being filled */
    mp_limb_t buf;
 
@@ -89,7 +89,7 @@ _nmod_poly_KS2_pack(mp_ptr res, mp_srcptr op, slong n, slong s,
       _nmod_poly_KS2_pack1(res, op, n, s, b, k, r);
       return;
    }
-   
+
    /* write leading zero-padding */
    while (k >= FLINT_BITS)
    {
@@ -100,7 +100,7 @@ _nmod_poly_KS2_pack(mp_ptr res, mp_srcptr op, slong n, slong s,
    buf = 0;
 
    buf_b = k;
-   
+
    for (; n > 0; n--, op += s)
    {
       /* put low bits of current input into buffer */
@@ -129,7 +129,7 @@ _nmod_poly_KS2_pack(mp_ptr res, mp_srcptr op, slong n, slong s,
          }
       }
    }
-   
+
    /* write last limb if it's non-empty */
    if (buf_b)
       *dest++ = buf;
@@ -137,7 +137,7 @@ _nmod_poly_KS2_pack(mp_ptr res, mp_srcptr op, slong n, slong s,
    /* zero-pad up to requested length */
    if (r)
    {
-      slong written = dest - res; 
+      slong written = dest - res;
       for (; written < r; written++)
          *dest++ = 0;
    }

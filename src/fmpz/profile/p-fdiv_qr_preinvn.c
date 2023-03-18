@@ -32,19 +32,19 @@ void sample(void * arg, ulong count)
    fmpz_preinvn_t inv;
 
    FLINT_TEST_INIT(state);
-   
+
    fmpz_init(a);
    fmpz_init(b);
    fmpz_init(c);
    fmpz_init(r);
-           
+
    for (i = 0; i < count; i++)
    {
       fmpz_randbits(a, state, (2*limbs - 1)*FLINT_BITS);
       fmpz_randbits(b, state, limbs*FLINT_BITS);
-      
+
       fmpz_preinvn_init(inv, b);
-	
+
       prof_start();
       if (algo == 1)
       {
@@ -61,7 +61,7 @@ void sample(void * arg, ulong count)
      }
 	   prof_stop();
    }
-  
+
    fmpz_preinvn_clear(inv);
    fmpz_clear(a);
    fmpz_clear(b);
@@ -85,20 +85,20 @@ int main(void)
       info.algo = 1;
 
       scale = 200;
-   
+
       prof_repeat(&min, &max, sample, (void *) &info);
-         
-      flint_printf("1: limbs %wd, min %.3g ms, max %.3g ms\n", 
+
+      flint_printf("1: limbs %wd, min %.3g ms, max %.3g ms\n",
            info.limbs,
 		   ((min/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,
            ((max/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0
 	     );
 
      info.algo = 2;
-     
+
      prof_repeat(&min, &max, sample, (void *) &info);
-         
-      flint_printf("2: limbs %wd, min %.3g ms, max %.3g ms\n\n", 
+
+      flint_printf("2: limbs %wd, min %.3g ms, max %.3g ms\n\n",
            info.limbs,
 		   ((min/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,
            ((max/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0

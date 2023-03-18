@@ -24,7 +24,7 @@ arb_poly_fprintd(FILE * file, const arb_poly_t poly, slong digits)
         flint_fprintf(file, "(");
         arb_fprintd(file, poly->coeffs + i, digits);
         flint_fprintf(file, ")");
-        
+
         if (i + 1 < poly->length)
             flint_fprintf(file, ", ");
     }

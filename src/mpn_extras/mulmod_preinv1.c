@@ -16,8 +16,8 @@
 #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif
 
-void flint_mpn_mulmod_preinv1(mp_ptr r, 
-        mp_srcptr a, mp_srcptr b, mp_size_t n, 
+void flint_mpn_mulmod_preinv1(mp_ptr r,
+        mp_srcptr a, mp_srcptr b, mp_size_t n,
         mp_srcptr d, mp_limb_t dinv, ulong norm)
 {
    mp_limb_t q;

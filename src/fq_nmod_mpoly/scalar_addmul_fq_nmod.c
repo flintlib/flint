@@ -132,7 +132,7 @@ void fq_nmod_mpoly_scalar_addmul_fq_nmod(
         fq_nmod_mpoly_t T;
         fq_nmod_mpoly_init(T, ctx);
         fq_nmod_mpoly_fit_length_reset_bits(T, B->length + C->length, Abits, ctx);
-        T->length = _fq_nmod_mpoly_scalar_addmul_n_fq(T->coeffs, T->exps, 
+        T->length = _fq_nmod_mpoly_scalar_addmul_n_fq(T->coeffs, T->exps,
                                                  B->coeffs, Bexps, B->length,
                                                  C->coeffs, Cexps, C->length,
                                                     f, N, cmpmask, ctx->fqctx);
@@ -142,7 +142,7 @@ void fq_nmod_mpoly_scalar_addmul_fq_nmod(
     else
     {
         fq_nmod_mpoly_fit_length_reset_bits(A, B->length + C->length, Abits, ctx);
-        A->length = _fq_nmod_mpoly_scalar_addmul_n_fq(A->coeffs, A->exps, 
+        A->length = _fq_nmod_mpoly_scalar_addmul_n_fq(A->coeffs, A->exps,
                                                  B->coeffs, Bexps, B->length,
                                                  C->coeffs, Cexps, C->length,
                                                     f, N, cmpmask, ctx->fqctx);

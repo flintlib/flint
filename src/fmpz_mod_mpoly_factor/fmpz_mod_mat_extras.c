@@ -17,7 +17,7 @@ int fmpz_mod_mat_is_reduced(const fmpz_mod_mat_t N)
     slong i, j, k = 0;
     slong r = fmpz_mod_mat_ncols(N);
     slong d = fmpz_mod_mat_nrows(N);
-    
+
     for (i = 0; i < d; i++)
     for (j = 0; j < r; j++)
     {
@@ -27,7 +27,7 @@ int fmpz_mod_mat_is_reduced(const fmpz_mod_mat_t N)
                 k++;
             else
                 return 0;
-        }   
+        }
     }
     return k == r;
 }

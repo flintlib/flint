@@ -29,14 +29,14 @@ int main(void)
     flint_randinit(state);
 
     /* Check correct exponent is returned */
-    for (i = 1; i < 500; i++) 
+    for (i = 1; i < 500; i++)
     {
         qfb_t r, pow;
         fmpz_t root, D, exp1, exp2;
-        
+
         d = n_randint(state, 100000);
         num = qfb_reduced_forms(&forms, -d);
-        
+
         if (num)
         {
            fmpz_init(D);
@@ -45,7 +45,7 @@ int main(void)
            fmpz_init(root);
            qfb_init(r);
            qfb_init(pow);
-              
+
            fmpz_set_ui(root, d);
            fmpz_root(root, root, 4);
 
@@ -82,12 +82,12 @@ int main(void)
                  printf("Discriminant: "); fmpz_print(D); printf("\n");
                  printf("Form: "); qfb_print(forms + i1); printf("\n");
                  printf("Exponent ");
-                 fmpz_print(exp2); printf(" should be "); 
+                 fmpz_print(exp2); printf(" should be ");
                  fmpz_print(exp1); printf("\n");
                  flint_abort();
               }
            }
-           
+
            fmpz_clear(root);
            fmpz_clear(D);
            fmpz_clear(exp1);

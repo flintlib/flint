@@ -277,7 +277,7 @@ gamma_upper_taylor_bsplit(arb_mat_t M, arb_t Q,
     }
 }
 
-/* 
+/*
 Given Gz0 = Gamma(a, z0) and expmz0 = exp(-z0), compute Gz1 = Gamma(a, z1)
 */
 void

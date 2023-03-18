@@ -18,7 +18,7 @@ void fmpz_mod_mpoly_compression_do(
     fmpz * Acoeffs,
     slong Alen,
     mpoly_compression_t M)
-{    
+{
     slong i, max_deg;
     flint_bitcnt_t Lbits;
     slong mvars = Lctx->minfo->nvars;

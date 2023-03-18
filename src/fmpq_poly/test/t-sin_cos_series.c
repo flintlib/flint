@@ -26,7 +26,7 @@ main(void)
     FLINT_TEST_INIT(state);
 
     flint_printf("sin_cos_series....");
-    fflush(stdout);    
+    fflush(stdout);
 
     /* Check aliasing (sin) */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
@@ -122,7 +122,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

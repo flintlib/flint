@@ -14,27 +14,27 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_hensel_lift_tree_recursive(slong *link, 
-    fmpz_poly_t *v, fmpz_poly_t *w, fmpz_poly_t f, slong j, slong inv, 
+void fmpz_poly_hensel_lift_tree_recursive(slong *link,
+    fmpz_poly_t *v, fmpz_poly_t *w, fmpz_poly_t f, slong j, slong inv,
     const fmpz_t p0, const fmpz_t p1)
 {
     if (j >= 0)
     {
         if (inv == 1)
-            fmpz_poly_hensel_lift(v[j], v[j + 1], w[j], w[j + 1], f, 
-                                  v[j], v[j + 1], w[j], w[j + 1], 
+            fmpz_poly_hensel_lift(v[j], v[j + 1], w[j], w[j + 1], f,
+                                  v[j], v[j + 1], w[j], w[j + 1],
                                   p0, p1);
         else if (inv == -1)
-            fmpz_poly_hensel_lift_only_inverse(w[j], w[j+1], 
+            fmpz_poly_hensel_lift_only_inverse(w[j], w[j+1],
                                  v[j], v[j+1], w[j], w[j+1], p0, p1);
         else
-            fmpz_poly_hensel_lift_without_inverse(v[j], v[j+1], f, 
-                                                  v[j], v[j+1], w[j], w[j+1], 
+            fmpz_poly_hensel_lift_without_inverse(v[j], v[j+1], f,
+                                                  v[j], v[j+1], w[j], w[j+1],
                                                   p0, p1);
 
-        fmpz_poly_hensel_lift_tree_recursive(link, v, w, v[j], link[j], 
+        fmpz_poly_hensel_lift_tree_recursive(link, v, w, v[j], link[j],
             inv, p0, p1);
-        fmpz_poly_hensel_lift_tree_recursive(link, v, w, v[j+1], link[j+1], 
+        fmpz_poly_hensel_lift_tree_recursive(link, v, w, v[j+1], link[j+1],
             inv, p0, p1);
     }
 }

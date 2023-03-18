@@ -14,7 +14,7 @@
 void fmpz_poly_q_scalar_div_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, slong x)
 {
     fmpz_t cont, fx, gcd;
-    
+
     if (FLINT_ABS(x) <= 1)
     {
         if (x == 0)

@@ -125,7 +125,7 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
             } while (heap_len > 1 && heap[1].exp == exp);
         } else
         {
-            fmpz_zero(acc_lg);  
+            fmpz_zero(acc_lg);
             do
             {
                 x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
@@ -204,7 +204,7 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
 
             /* d1:d0 = abs(acc_sm[1:0]) assuming ds is sign extension of acc_sm[1] */
             sub_ddmmss(d1, d0, acc_sm[1]^ds, acc_sm[0]^ds, ds, ds);
-            
+
             if ((acc_sm[0] | acc_sm[1] | acc_sm[2]) == 0)
             {
                 k--;
@@ -397,7 +397,7 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
             if (mpoly_monomial_overflows_mp(exp, N, bits))
                 goto not_exact_division;
         }
-      
+
         k++;
         _fmpz_mpoly_fit_length(&p1, &e1, alloc, k + 1, N);
 
@@ -406,7 +406,7 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
         else
             lt_divides = mpoly_monomial_divides_mp(e1 + k*N, exp, exp3, N, bits);
 
-        if (small) 
+        if (small)
         {
             acc_sm[0] = acc_sm[1] = acc_sm[2] = 0;
             do
@@ -485,7 +485,7 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
                                                                e1 + x->j*N, N);
                     else
                         mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
-                                                               e1 + x->j*N, N);                        
+                                                               e1 + x->j*N, N);
 
                     exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
@@ -524,7 +524,7 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
 
             /* d1:d0 = abs(acc_sm[1:0]) assuming ds is sign extension of acc_sm[1] */
             sub_ddmmss(d1, d0, acc_sm[1]^ds, acc_sm[0]^ds, ds, ds);
-            
+
             if ((acc_sm[0] | acc_sm[1] | acc_sm[2]) == 0)
             {
                 k--;
@@ -597,7 +597,7 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
             exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
         }
-        s = 1;      
+        s = 1;
     }
 
     k++;
@@ -699,7 +699,7 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
    expq = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
    /* quick check for easy case of inexact division of leading monomials */
-   if (poly2->bits == poly3->bits && N == 1 && 
+   if (poly2->bits == poly3->bits && N == 1 &&
        poly2->exps[0] < poly3->exps[0])
    {
       goto cleanup;

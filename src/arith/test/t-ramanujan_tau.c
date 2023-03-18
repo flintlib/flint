@@ -25,7 +25,7 @@ void check_value(slong n, char *ans)
           flint_printf("FAIL:\n");
           flint_printf("tau(%wd) gave ", n);
           fmpz_print(x);
-          flint_printf(", expected %s\n", ans); 
+          flint_printf(", expected %s\n", ans);
           fflush(stdout);
           flint_abort();
     }

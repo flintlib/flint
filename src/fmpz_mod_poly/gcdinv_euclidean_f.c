@@ -13,9 +13,9 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
-slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S, 
-                                   const fmpz *A, slong lenA, 
-                                   const fmpz *B, slong lenB, 
+slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S,
+                                   const fmpz *A, slong lenA,
+                                   const fmpz *B, slong lenB,
                                    const fmpz_t invA, const fmpz_t p)
 {
 	_fmpz_vec_zero(G, lenA);
@@ -41,7 +41,7 @@ slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S,
         _fmpz_mod_poly_divrem_f(f, Q, R, B, lenB, A, lenA, p);
         if (!fmpz_is_one(f))
             goto cleanup2;
-        
+
 		lenR = lenA - 1;
         FMPZ_VEC_NORM(R, lenR);
 
@@ -54,7 +54,7 @@ slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S,
             FMPZ_VEC_TMP_CLEAR(Q, 2*lenB);
 
 			TMP_END;
-			
+
             return lenA;
         } else if (lenR == 1)
 		{
@@ -85,7 +85,7 @@ slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S,
 
 			lenQ = lenB - lenA + 1;
 			FMPZ_VEC_NORM(Q, lenQ);
-			
+
             fmpz_set_ui(U1, 1);
 			lenU1 = 1;
             _fmpz_vec_set(D, A, lenA);
@@ -97,9 +97,9 @@ slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S,
 
             do {
                 fmpz_gcdinv(f, inv, V3 + (lenV3 - 1), p);
-                if (!fmpz_is_one(f))					
+                if (!fmpz_is_one(f))
 					goto cleanup;
-				
+
 				_fmpz_mod_poly_divrem_basecase(Q, D, D, lenD, V3, lenV3, inv, p);
                 lenQ = lenD - lenV3 + 1;
                 lenD = lenV3 - 1;
@@ -117,7 +117,7 @@ slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S,
                     lenU1 = FLINT_MAX(lenU1, lenW);
                     FMPZ_VEC_NORM(U1, lenU1);
                 }
-				
+
                 FMPZ_VEC_SWAP(U1, lenU1, U2, lenU2);
 				FMPZ_VEC_SWAP(V3, lenV3, D, lenD);
             } while (lenV3 != 0);
@@ -128,20 +128,20 @@ slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S,
 cleanup:
             FMPZ_VEC_TMP_CLEAR(W, 3*lenB + 2*lenA);
 
-cleanup2:			
+cleanup2:
             FMPZ_VEC_TMP_CLEAR(Q, 2*lenB);
 
 		    fmpz_clear(inv);
 
             TMP_END;
-			
+
 			return lenD;
         }
 	}
 }
 
-void 
-fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz_mod_poly_t G, 
+void
+fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
                              fmpz_mod_poly_t S, const fmpz_mod_poly_t A,
                              const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
 {
@@ -165,7 +165,7 @@ fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
     }
 
     fmpz_init(inv);
-    if (lenA == 0)  
+    if (lenA == 0)
 	{
         fmpz_set_ui(f, 1);
         fmpz_mod_poly_zero(G, ctx);
@@ -200,7 +200,7 @@ fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
             s = S->coeffs;
         }
 
-	    lenG = _fmpz_mod_poly_gcdinv_euclidean_f(f, g, s, 
+	    lenG = _fmpz_mod_poly_gcdinv_euclidean_f(f, g, s,
                                      A->coeffs, lenA, B->coeffs, lenB, inv, p);
 
         if (G == A || G == B)

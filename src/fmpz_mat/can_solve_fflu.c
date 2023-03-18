@@ -34,7 +34,7 @@ void _fmpz_mat_window_with_perm_init(fmpz_mat_t Ap, slong * perm,
 void _fmpz_mat_window_with_perm_clear(fmpz_mat_t Ap)
 {
     if (Ap->r != 0)
-        flint_free(Ap->rows); 
+        flint_free(Ap->rows);
 }
 
 int
@@ -63,10 +63,10 @@ fmpz_mat_can_solve_fflu(fmpz_mat_t X, fmpz_t den,
     n = fmpz_mat_nrows(A);
 
     perm = _perm_init(n);
-    
+
     fmpz_mat_init_set(LU, A);
     rank = fmpz_mat_fflu(LU, den, perm, LU, 0);
-    
+
     result = !fmpz_is_zero(den) && fmpz_mat_solve_fflu_precomp(X, perm, LU, B);
 
     if (result)

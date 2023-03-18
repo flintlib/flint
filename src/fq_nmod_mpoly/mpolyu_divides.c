@@ -172,7 +172,7 @@ static void _fq_nmod_mpoly_mulsub(fq_nmod_mpoly_t A,
         }
         else
         {
-            _n_fq_neg(Acoeffs + d*Alen, Acoeffs + d*Alen, d, fqctx->mod);            
+            _n_fq_neg(Acoeffs + d*Alen, Acoeffs + d*Alen, d, fqctx->mod);
         }
 
         Alen += !_n_fq_is_zero(Acoeffs + d*Alen, d);

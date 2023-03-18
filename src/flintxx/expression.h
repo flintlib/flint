@@ -44,7 +44,7 @@ struct evaluation_traits
 
     static evaluation_return_t evaluate(const derived_t& from)
     {
-        evaluated_t res = 
+        evaluated_t res =
             rules::instantiate_temporaries<derived_t, evaluated_t>::get(from);
         evaluate_into_fresh(res, from);
         return res;

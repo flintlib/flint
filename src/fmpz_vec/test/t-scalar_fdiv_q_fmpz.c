@@ -24,7 +24,7 @@ main(void)
     flint_printf("scalar_fdiv_q_fmpz....");
     fflush(stdout);
 
-    
+
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -82,7 +82,7 @@ main(void)
         mpz_clear(e);
         mpz_clear(f);
         mpz_clear(m);
-    }    
+    }
 
     /* Test aliasing of a and c */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -142,7 +142,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

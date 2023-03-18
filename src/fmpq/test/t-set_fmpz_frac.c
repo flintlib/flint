@@ -20,7 +20,7 @@ main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("set_fmpz_frac....");
     fflush(stdout);
@@ -47,10 +47,10 @@ main(void)
         if (!fmpq_is_canonical(x) || !fmpq_equal(x, y))
         {
             flint_printf("FAIL");
-            flint_printf("p: "); fmpz_print(p); flint_printf("\n"); 
-            flint_printf("q: "); fmpz_print(q); flint_printf("\n"); 
-            flint_printf("x: "); fmpq_print(x); flint_printf("\n"); 
-            flint_printf("y: "); fmpq_print(y); flint_printf("\n"); 
+            flint_printf("p: "); fmpz_print(p); flint_printf("\n");
+            flint_printf("q: "); fmpz_print(q); flint_printf("\n");
+            flint_printf("x: "); fmpq_print(x); flint_printf("\n");
+            flint_printf("y: "); fmpq_print(y); flint_printf("\n");
             fflush(stdout);
             flint_abort();
         }
@@ -61,7 +61,7 @@ main(void)
         fmpz_clear(q);
     }
 
-    
+
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

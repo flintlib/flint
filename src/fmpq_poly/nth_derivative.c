@@ -14,7 +14,7 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-void _fmpq_poly_nth_derivative(fmpz * rpoly, fmpz_t rden, 
+void _fmpq_poly_nth_derivative(fmpz * rpoly, fmpz_t rden,
     const fmpz * poly, const fmpz_t den, ulong n, slong len)
 {
     _fmpz_poly_nth_derivative(rpoly, poly, n, len);
@@ -30,7 +30,7 @@ void fmpq_poly_nth_derivative(fmpq_poly_t res, const fmpq_poly_t poly, ulong n)
         fmpq_poly_zero(res);
         return;
     }
-    
+
     fmpq_poly_fit_length(res, len - n);
     if (n == 0)
     {

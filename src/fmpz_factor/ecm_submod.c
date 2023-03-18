@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "mpn_extras.h"
 
-/* x = (a - b) mod n 
+/* x = (a - b) mod n
 
     Not a normal sub mod function, assumes n is normalized (highest bit set)
     and a and b are reduced modulo n

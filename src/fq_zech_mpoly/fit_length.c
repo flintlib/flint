@@ -21,7 +21,7 @@ void _fq_zech_mpoly_fit_length(fq_zech_struct ** coeff,
         len = FLINT_MAX(len, 2*(*alloc));
         (* coeff) = (fq_zech_struct *) flint_realloc(* coeff,
                                                    len*sizeof(fq_zech_struct));
-        (* exps) = (ulong *) flint_realloc(*exps, len*N*sizeof(ulong)); 
+        (* exps) = (ulong *) flint_realloc(*exps, len*N*sizeof(ulong));
         for (i = *alloc; i < len; i++)
             fq_zech_init((* coeff) + i, fqctx);
         (* alloc) = len;

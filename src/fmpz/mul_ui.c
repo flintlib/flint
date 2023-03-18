@@ -42,7 +42,7 @@ fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
                 *f = 0;
                 return;
             }
-            
+
             mf = _fmpz_new_mpz();
             *f = PTR_TO_COEFF(mf);
         }

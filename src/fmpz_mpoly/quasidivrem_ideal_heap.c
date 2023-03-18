@@ -15,7 +15,7 @@
 slong _fmpz_mpoly_quasidivrem_ideal_heap1(fmpz_t scale, fmpz_mpoly_struct ** polyq,
   fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2,
      const ulong * exp2, slong len2, fmpz_mpoly_struct * const * poly3,
-                     ulong * const * exp3, slong len, slong bits, 
+                     ulong * const * exp3, slong len, slong bits,
                                       const fmpz_mpoly_ctx_t ctx, ulong maskhi)
 {
     slong i, j, p, w;
@@ -241,7 +241,7 @@ cleanup2:
 
     for (w = 0; w < len; w++)
     {
-        _fmpz_mpoly_set_length(polyq[w], q_len[w], ctx); 
+        _fmpz_mpoly_set_length(polyq[w], q_len[w], ctx);
         for (i = 0; i < q_len[w]; i++)
         {
             fmpz_divexact(tp, scale, qs[w] + i);
@@ -292,7 +292,7 @@ exp_overflow:
 slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** polyq,
   fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2,
      const ulong * exp2, slong len2, fmpz_mpoly_struct * const * poly3,
-                     ulong * const * exp3, slong len, slong N, slong bits, 
+                     ulong * const * exp3, slong len, slong N, slong bits,
                         const fmpz_mpoly_ctx_t ctx, const ulong * cmpmask)
 {
     slong i, j, p, w;
@@ -371,7 +371,7 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** poly
         exp_list[i] = exps + i*N;
 
     mask = bits <= FLINT_BITS ? mpoly_overflow_mask_sp(bits) : 0;
-   
+
     x = chains[0] + 0;
     x->i = -WORD(1);
     x->j = 0;
@@ -524,7 +524,7 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** poly
                     x->next = NULL;
                     hinds[w][x->i] = 2*(x->j + 1) + 0;
 
-                    mpoly_monomial_add_mp(exp_list[exp_next], exp3[w] + N*x->i, 
+                    mpoly_monomial_add_mp(exp_list[exp_next], exp3[w] + N*x->i,
                                                     polyq[w]->exps + N*x->j, N);
                     exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
@@ -562,7 +562,7 @@ cleanup2:
 
     for (w = 0; w < len; w++)
     {
-        _fmpz_mpoly_set_length(polyq[w], q_len[w], ctx); 
+        _fmpz_mpoly_set_length(polyq[w], q_len[w], ctx);
         for (i = 0; i < q_len[w]; i++)
         {
             fmpz_divexact(tp, scale, qs[w] + i);
@@ -627,7 +627,7 @@ void fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale,
 
     /* check none of the divisor polynomials is zero */
     for (i = 0; i < len; i++)
-    {  
+    {
         if (poly3[i]->length == 0)
             flint_throw(FLINT_DIVZERO, "Divide by zero in fmpz_mpoly_divrem_ideal_monagan_pearce");
 
@@ -760,11 +760,11 @@ void fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale,
             exp3[i] = (ulong *) flint_malloc(N*poly3[i]->length*sizeof(ulong));
             mpoly_repack_monomials(exp3[i], exp_bits, old_exp3, old_exp_bits,
                                                  poly3[i]->length, ctx->minfo);
-   
+
             if (free3[i])
                 flint_free(old_exp3);
 
-            free3[i] = 1; 
+            free3[i] = 1;
 
             fmpz_mpoly_fit_bits(q[i], exp_bits, ctx);
             q[i]->bits = exp_bits;
@@ -776,7 +776,7 @@ void fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale,
     {
         fmpz_mpoly_swap(temp2, r, ctx);
         fmpz_mpoly_clear(temp2, ctx);
-    } 
+    }
 
     _fmpz_mpoly_set_length(r, lenr, ctx);
 

@@ -24,7 +24,7 @@ _fmpz_poly_pow(fmpz * res, const fmpz * poly, slong len, ulong e)
     else
     {
         ulong limbs = (ulong) _fmpz_vec_max_limbs(poly, len);
-        
+
         if (limbs < ((UWORD(3) * e) / UWORD(2) + UWORD(150)) / (ulong) len)
             _fmpz_poly_pow_multinomial(res, poly, len, e);
         else

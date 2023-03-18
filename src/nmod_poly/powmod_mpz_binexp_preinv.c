@@ -77,14 +77,14 @@ _nmod_poly_powmod_mpz_binexp_preinv(mp_ptr res, mp_srcptr poly, mpz_srcptr e,
     for (i = mpz_sizeinbase(e, 2) - 2; i >= 0; i--)
     {
         _nmod_poly_mul(T, res, lenf - 1, res, lenf - 1, mod);
-        
+
         _nmod_poly_divrem_newton_n_preinv(Q, res, T, 2*lenf - 3, f, lenf,
                                                            finv, lenfinv, mod);
 
         if (mpz_tstbit(e, i))
         {
             _nmod_poly_mul(T, res, lenf - 1, poly, lenf - 1, mod);
-        
+
             _nmod_poly_divrem_newton_n_preinv(Q, res, T, 2*lenf - 3, f, lenf,
                                                            finv, lenfinv, mod);
         }
@@ -128,14 +128,14 @@ nmod_poly_powmod_mpz_binexp_preinv(nmod_poly_t res, const nmod_poly_t poly,
 
         nmod_poly_init_mod(t, res->mod);
         nmod_poly_init_mod(r, res->mod);
-       
+
                nmod_poly_divrem(t, r, poly, f);
-       
+
                nmod_poly_powmod_mpz_binexp(res, r, e, f);
-       
+
                nmod_poly_clear(t);
         nmod_poly_clear(r);
-       
+
                return;
     }
 
@@ -172,7 +172,7 @@ nmod_poly_powmod_mpz_binexp_preinv(nmod_poly_t res, const nmod_poly_t poly,
 
         flint_mpn_copyi(p, poly->coeffs, poly->length);
         flint_mpn_zero(p + poly->length, trunc - poly->length);
-        
+
         pcopy = 1;
     } else
         p = poly->coeffs;
@@ -182,7 +182,7 @@ nmod_poly_powmod_mpz_binexp_preinv(nmod_poly_t res, const nmod_poly_t poly,
         nmod_poly_t t;
 
         nmod_poly_init2(t, poly->mod.n, trunc);
-        
+
         _nmod_poly_powmod_mpz_binexp_preinv(t->coeffs,
                  p, e, f->coeffs, lenf, finv->coeffs, finv->length, poly->mod);
 

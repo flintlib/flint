@@ -85,7 +85,7 @@ _nmod_poly_compose_mod_brent_kung_preinv(mp_ptr res, mp_srcptr poly1,
 }
 
 void
-nmod_poly_compose_mod_brent_kung_preinv(nmod_poly_t res, 
+nmod_poly_compose_mod_brent_kung_preinv(nmod_poly_t res,
                     const nmod_poly_t poly1, const nmod_poly_t poly2,
                            const nmod_poly_t poly3, const nmod_poly_t poly3inv)
 {
@@ -149,7 +149,7 @@ nmod_poly_compose_mod_brent_kung_preinv(nmod_poly_t res,
     _nmod_poly_compose_mod_brent_kung_preinv(res->coeffs,
                       poly1->coeffs, len1, ptr2, poly3->coeffs, len3,
                                  poly3inv->coeffs, poly3inv->length, res->mod);
-    
+
     res->length = len;
     _nmod_poly_normalise(res);
 

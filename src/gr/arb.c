@@ -160,7 +160,7 @@ _gr_arb_set_d(arb_t res, double x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int 
+int
 _gr_ca_get_arb_with_prec(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec);
 
 int
@@ -1610,7 +1610,7 @@ arb_agm1(arb_t res, const arb_t x, slong prec)
 {
     arb_t t;
     arb_init(t);
-    arb_one(t); 
+    arb_one(t);
     arb_agm(res, t, x, prec);
     arb_clear(t);
 }

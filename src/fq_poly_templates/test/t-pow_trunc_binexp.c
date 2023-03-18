@@ -22,7 +22,7 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("pow_trunc_binexp....");
     fflush(stdout);
 
@@ -45,17 +45,17 @@ main(void)
         trunc = n_randint(state, 30);
 
         TEMPLATE(T, poly_pow_trunc_binexp) (b, a, e, trunc, ctx);
-        
+
         TEMPLATE(T, poly_pow) (c, a, e, ctx);
         TEMPLATE(T, poly_truncate) (c, trunc, ctx);
-        
+
         TEMPLATE(T, poly_get_coeff) (d, c, 0, ctx);
-        result = (TEMPLATE(T, poly_equal) (b, c, ctx) 
+        result = (TEMPLATE(T, poly_equal) (b, c, ctx)
             || (a->length == 0 && e == 0 && c->length == 1 && TEMPLATE(T, is_one) (d, ctx)));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("a->length = %wd, exp = %wd, trunc = %wd\n", 
+            flint_printf("a->length = %wd, exp = %wd, trunc = %wd\n",
                 a->length, e, trunc);
             TEMPLATE(T, poly_print) (a, ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print) (b, ctx), flint_printf("\n\n");
@@ -88,15 +88,15 @@ main(void)
         trunc = n_randint(state, 30);
 
         TEMPLATE(T, poly_pow_trunc_binexp) (b, a, e, trunc, ctx);
-        
+
         TEMPLATE(T, poly_set) (c, a, ctx);
         TEMPLATE(T, poly_pow_trunc_binexp) (c, c, e, trunc, ctx);
-        
+
         result = (TEMPLATE(T, poly_equal) (b, c, ctx));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("a->length = %wd, exp = %wd, trunc = %wd\n", 
+            flint_printf("a->length = %wd, exp = %wd, trunc = %wd\n",
                 a->length, e, trunc);
             TEMPLATE(T, poly_print) (a, ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print) (b, ctx), flint_printf("\n\n");
@@ -112,7 +112,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

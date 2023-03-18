@@ -25,9 +25,9 @@
 #define HASH(a) ((ulong)((((unsigned int) a) * HASH_MULT) >> (12)))
 
 /******************************************************************************
- * 
- *  Some helper function, used for debugging 
- * 
+ *
+ *  Some helper function, used for debugging
+ *
  *****************************************************************************/
 
 /*
@@ -124,9 +124,9 @@ void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y, qs_poly_t poly
 }
 
 /******************************************************************************
- * 
+ *
  *  Hash table
- * 
+ *
  *****************************************************************************/
 
 /*
@@ -159,7 +159,7 @@ hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime)
     /* find first offset with that hash */
     first_offset = HASH(prime);
     offset = hash_table[first_offset];
-    
+
     /* check linked offsets to see if prime is there, return if so */
     while (offset != 0)
     {
@@ -179,7 +179,7 @@ hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime)
         entry->count = 0;
         hash_table[first_offset] = qs_inf->vertices;
     }
-    
+
     return entry;
 }
 
@@ -190,15 +190,15 @@ hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime)
 void qsieve_add_to_hashtable(qs_t qs_inf, mp_limb_t prime)
 {
     hash_t * entry;
- 
+
     entry = qsieve_get_table_entry(qs_inf, prime);
     entry->count++;
 }
 
 /******************************************************************************
- * 
+ *
  *  Large prime functionality
- * 
+ *
  *****************************************************************************/
 
 /*
@@ -501,7 +501,7 @@ int qsieve_process_relation(qs_t qs_inf)
     relation_t * rel_list = (relation_t *) flint_malloc(rel_size * sizeof(relation_t));
     relation_t * rlist;
     int done = 0;
-  
+
     qs_inf->siqs = fopen(qs_inf->fname, "r");
 
 #if QS_DEBUG & 64
@@ -518,7 +518,7 @@ int qsieve_process_relation(qs_t qs_inf)
            rel_list = (relation_t *) flint_realloc(rel_list, 2*rel_size * sizeof(relation_t));
            rel_size *= 2;
         }
-        
+
         if (prime == 1 || entry->count >= 2)
         {
             rel_list[num_relations] = qsieve_parse_relation(qs_inf, str);
@@ -562,7 +562,7 @@ int qsieve_process_relation(qs_t qs_inf)
                 if (fmpz_fdiv_ui(qs_inf->kn, rel_list[i].lp) == 0)
                 {
                    qs_inf->small_factor = rel_list[i].lp;
-                   
+
                    done = -1;
                    goto cleanup;
                 }

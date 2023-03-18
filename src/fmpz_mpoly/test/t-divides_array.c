@@ -78,10 +78,10 @@ main(void)
           }
        }
 
-       fmpz_mpoly_clear(f, ctx);  
-       fmpz_mpoly_clear(g, ctx);  
-       fmpz_mpoly_clear(h, ctx);  
-       fmpz_mpoly_clear(k, ctx);  
+       fmpz_mpoly_clear(f, ctx);
+       fmpz_mpoly_clear(g, ctx);
+       fmpz_mpoly_clear(h, ctx);
+       fmpz_mpoly_clear(k, ctx);
     }
 
     /* Check random polys don't divide */
@@ -142,10 +142,10 @@ main(void)
           }
        }
 
-       fmpz_mpoly_clear(f, ctx);  
-       fmpz_mpoly_clear(g, ctx);  
-       fmpz_mpoly_clear(h, ctx);  
-       fmpz_mpoly_clear(k, ctx);  
+       fmpz_mpoly_clear(f, ctx);
+       fmpz_mpoly_clear(g, ctx);
+       fmpz_mpoly_clear(h, ctx);
+       fmpz_mpoly_clear(k, ctx);
     }
 
     /* Check aliasing first argument */
@@ -194,7 +194,7 @@ main(void)
           ok2 = fmpz_mpoly_divides_array(h, h, g, ctx);
           fmpz_mpoly_assert_canonical(h, ctx);
 
-          result = (ok1 == -1 || ok2 == -1) || 
+          result = (ok1 == -1 || ok2 == -1) ||
                    (ok1 == 1 && ok2 == 1 && fmpz_mpoly_equal(h, k, ctx));
 
           if (!result)
@@ -206,10 +206,10 @@ main(void)
           }
        }
 
-       fmpz_mpoly_clear(f, ctx);  
-       fmpz_mpoly_clear(g, ctx);  
-       fmpz_mpoly_clear(h, ctx);  
-       fmpz_mpoly_clear(k, ctx);  
+       fmpz_mpoly_clear(f, ctx);
+       fmpz_mpoly_clear(g, ctx);
+       fmpz_mpoly_clear(h, ctx);
+       fmpz_mpoly_clear(k, ctx);
     }
 
     /* Check aliasing second argument */
@@ -258,7 +258,7 @@ main(void)
           ok2 = fmpz_mpoly_divides_array(g, h, g, ctx);
           fmpz_mpoly_assert_canonical(g, ctx);
 
-          result = (ok1 == -1 && ok2 == -1) || 
+          result = (ok1 == -1 && ok2 == -1) ||
                    (ok1 == 1 && ok2 == 1 && fmpz_mpoly_equal(g, k, ctx));
 
           if (!result)
@@ -270,14 +270,14 @@ main(void)
           }
        }
 
-       fmpz_mpoly_clear(f, ctx);  
-       fmpz_mpoly_clear(g, ctx);  
-       fmpz_mpoly_clear(h, ctx);  
-       fmpz_mpoly_clear(k, ctx);  
+       fmpz_mpoly_clear(f, ctx);
+       fmpz_mpoly_clear(g, ctx);
+       fmpz_mpoly_clear(h, ctx);
+       fmpz_mpoly_clear(k, ctx);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

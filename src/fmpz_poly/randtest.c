@@ -15,7 +15,7 @@
 #include "ulong_extras.h"
 
 void
-fmpz_poly_randtest(fmpz_poly_t f, flint_rand_t state, 
+fmpz_poly_randtest(fmpz_poly_t f, flint_rand_t state,
                    slong len, flint_bitcnt_t bits)
 {
     fmpz_poly_fit_length(f, len);
@@ -25,7 +25,7 @@ fmpz_poly_randtest(fmpz_poly_t f, flint_rand_t state,
 }
 
 void
-fmpz_poly_randtest_unsigned(fmpz_poly_t f, flint_rand_t state, 
+fmpz_poly_randtest_unsigned(fmpz_poly_t f, flint_rand_t state,
                             slong len, flint_bitcnt_t bits)
 {
     fmpz_poly_fit_length(f, len);
@@ -35,7 +35,7 @@ fmpz_poly_randtest_unsigned(fmpz_poly_t f, flint_rand_t state,
 }
 
 void
-fmpz_poly_randtest_not_zero(fmpz_poly_t f, flint_rand_t state, 
+fmpz_poly_randtest_not_zero(fmpz_poly_t f, flint_rand_t state,
                             slong len, flint_bitcnt_t bits)
 {
     if ((bits == 0) || (len == 0))

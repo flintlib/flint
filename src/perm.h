@@ -13,7 +13,7 @@
 #define PERM_H
 
 #ifdef PERM_INLINES_C
-#define PERM_INLINE 
+#define PERM_INLINE
 #else
 #define PERM_INLINE static __inline__
 #endif

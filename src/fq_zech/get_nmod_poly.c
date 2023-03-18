@@ -19,7 +19,7 @@ fq_zech_get_nmod_poly(nmod_poly_t rop, const fq_zech_t op,
     mp_limb_t q, r;
 
     rop->mod = ctx->fq_nmod_ctx->modulus->mod;
-    
+
     nmod_poly_fit_length(rop, fq_zech_ctx_degree(ctx));
 
     q = ctx->eval_table[op->value];

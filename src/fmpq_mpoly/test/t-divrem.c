@@ -137,11 +137,11 @@ main(void)
             }
        }
 
-       fmpq_mpoly_clear(f, ctx);  
-       fmpq_mpoly_clear(g, ctx);  
-       fmpq_mpoly_clear(h, ctx);  
-       fmpq_mpoly_clear(k, ctx);  
-       fmpq_mpoly_clear(r, ctx);  
+       fmpq_mpoly_clear(f, ctx);
+       fmpq_mpoly_clear(g, ctx);
+       fmpq_mpoly_clear(h, ctx);
+       fmpq_mpoly_clear(k, ctx);
+       fmpq_mpoly_clear(r, ctx);
     }
 
     /* Check f = g*q + r for random polys, alias quotient and numerator */
@@ -181,7 +181,7 @@ main(void)
 
             fmpq_mpoly_set(h, f, ctx);
             fmpq_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
-            
+
             fmpq_mpoly_divrem(h, r, h, g, ctx);
             fmpq_mpoly_assert_canonical(h, ctx);
             fmpq_mpoly_assert_canonical(r, ctx);
@@ -202,11 +202,11 @@ main(void)
             }
        }
 
-       fmpq_mpoly_clear(f, ctx);  
-       fmpq_mpoly_clear(g, ctx);  
-       fmpq_mpoly_clear(h, ctx);  
-       fmpq_mpoly_clear(k, ctx);  
-       fmpq_mpoly_clear(r, ctx);  
+       fmpq_mpoly_clear(f, ctx);
+       fmpq_mpoly_clear(g, ctx);
+       fmpq_mpoly_clear(h, ctx);
+       fmpq_mpoly_clear(k, ctx);
+       fmpq_mpoly_clear(r, ctx);
     }
 
     /* Check f = g*q + r for random polys, alias quotient and denominator */
@@ -246,7 +246,7 @@ main(void)
 
             fmpq_mpoly_set(h, g, ctx);
             fmpq_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
-            
+
             fmpq_mpoly_divrem(h, r, f, h, ctx);
             fmpq_mpoly_assert_canonical(h, ctx);
             fmpq_mpoly_assert_canonical(r, ctx);
@@ -267,11 +267,11 @@ main(void)
             }
        }
 
-       fmpq_mpoly_clear(f, ctx);  
-       fmpq_mpoly_clear(g, ctx);  
-       fmpq_mpoly_clear(h, ctx);  
-       fmpq_mpoly_clear(k, ctx);  
-       fmpq_mpoly_clear(r, ctx);  
+       fmpq_mpoly_clear(f, ctx);
+       fmpq_mpoly_clear(g, ctx);
+       fmpq_mpoly_clear(h, ctx);
+       fmpq_mpoly_clear(k, ctx);
+       fmpq_mpoly_clear(r, ctx);
     }
 
 
@@ -312,7 +312,7 @@ main(void)
 
             fmpq_mpoly_set(r, g, ctx);
             fmpq_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
-            
+
             fmpq_mpoly_divrem(h, r, f, r, ctx);
             fmpq_mpoly_assert_canonical(h, ctx);
             fmpq_mpoly_assert_canonical(r, ctx);
@@ -333,11 +333,11 @@ main(void)
             }
        }
 
-       fmpq_mpoly_clear(f, ctx);  
-       fmpq_mpoly_clear(g, ctx);  
-       fmpq_mpoly_clear(h, ctx);  
-       fmpq_mpoly_clear(k, ctx);  
-       fmpq_mpoly_clear(r, ctx);  
+       fmpq_mpoly_clear(f, ctx);
+       fmpq_mpoly_clear(g, ctx);
+       fmpq_mpoly_clear(h, ctx);
+       fmpq_mpoly_clear(k, ctx);
+       fmpq_mpoly_clear(r, ctx);
     }
 
     /* Check f = g*q + r for random polys, alias remainder and numerator */
@@ -377,7 +377,7 @@ main(void)
 
             fmpq_mpoly_set(r, f, ctx);
             fmpq_mpoly_randtest_bound(k, state, len, coeff_bits, exp_bound, ctx);
-            
+
             fmpq_mpoly_divrem(h, r, r, g, ctx);
             fmpq_mpoly_assert_canonical(h, ctx);
             fmpq_mpoly_assert_canonical(r, ctx);
@@ -398,15 +398,15 @@ main(void)
             }
        }
 
-       fmpq_mpoly_clear(f, ctx);  
-       fmpq_mpoly_clear(g, ctx);  
-       fmpq_mpoly_clear(h, ctx);  
-       fmpq_mpoly_clear(k, ctx);  
-       fmpq_mpoly_clear(r, ctx);  
+       fmpq_mpoly_clear(f, ctx);
+       fmpq_mpoly_clear(g, ctx);
+       fmpq_mpoly_clear(h, ctx);
+       fmpq_mpoly_clear(k, ctx);
+       fmpq_mpoly_clear(r, ctx);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

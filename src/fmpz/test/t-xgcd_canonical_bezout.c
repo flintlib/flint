@@ -80,7 +80,7 @@ main(void)
                && fmpz_cmpabs(nd, ng) == 0
                && fmpz_is_zero(na)
                && fmpz_equal_si(nb, fmpz_sgn(ng)));
-        
+
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -109,7 +109,7 @@ main(void)
                && fmpz_cmpabs(nd, nf) == 0
                && fmpz_equal_si(na, fmpz_sgn(nf))
                && fmpz_is_zero(nb));
-        
+
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -138,7 +138,7 @@ main(void)
                && fmpz_cmpabs(nd, ng) == 0
                && fmpz_is_zero(na)
                && fmpz_equal_si(nb, fmpz_sgn(ng)));
-        
+
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -168,7 +168,7 @@ main(void)
         result = (fmpz_is_one(nd)
                && fmpz_is_zero(na)
                && fmpz_equal_si(nb, fmpz_sgn(ng)));
-        
+
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -200,7 +200,7 @@ main(void)
         result = (fmpz_is_one(nd)
                && fmpz_equal_si(na, fmpz_sgn(nf))
                && fmpz_is_zero(nb));
-        
+
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -237,7 +237,7 @@ main(void)
 
         result = (fmpz_equal(nd, dsave)
                && fmpz_equal_si(nb, fmpz_sgn(ng)));
-        
+
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -274,7 +274,7 @@ main(void)
 
         result = (fmpz_equal(nd, dsave)
                && fmpz_equal_si(na, fmpz_sgn(nf)));
-        
+
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -307,7 +307,7 @@ main(void)
 
         fmpz_mul(tmp, na, nf);
         fmpz_addmul(tmp, nb, ng);
-        
+
         fmpz_mul_si(na, na, 2);
         fmpz_mul(na, na, nd);
         fmpz_mul_si(nb, nb, 2);
@@ -316,7 +316,7 @@ main(void)
         result = (fmpz_equal(tmp, nd)
                && fmpz_cmpabs(na, ng) < 0
                && fmpz_cmpabs(nb, nf) < 0);
-        
+
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -463,7 +463,7 @@ main(void)
         fmpz_xgcd(d, a, b, f, g);
         fmpz_xgcd(f, c, g, f, g);
 
-        result = (fmpz_equal(d, f) 
+        result = (fmpz_equal(d, f)
                && fmpz_equal(a, c)
                && fmpz_equal(b, g));
         if (!result)
@@ -551,7 +551,7 @@ main(void)
     fmpz_clear(ng);
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

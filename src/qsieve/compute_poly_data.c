@@ -66,7 +66,7 @@ int qsieve_init_A(qs_t qs_inf)
 
     fmpz_fdiv_q_ui(lower_bound, qs_inf->target_A, 2);
     fmpz_mul_ui(upper_bound, qs_inf->target_A, 2);
-    
+
     bits = fmpz_bits(qs_inf->target_A);
 
     /*
@@ -108,7 +108,7 @@ int qsieve_init_A(qs_t qs_inf)
         if (factor_bound[i] == 0 || num_factors == 1)
             continue; /* factor too large or not enough factors */
 
-        /* 
+        /*
             let n = bits, num_factors = floor(n/i), rem = n - i*num_factors
             we can only guarantee that bounds cover [2^(n - 1), 2^n]
             when factor base is very small, the algorithm is forced to use
@@ -209,7 +209,7 @@ int qsieve_init_A(qs_t qs_inf)
         {
            fmpz_mul_ui(prod, prod, factor_base[curr_subset[j] + low].p);
            A_ind[j] = curr_subset[j] + low;
-        }   
+        }
     }
     else
     {
@@ -239,15 +239,15 @@ int qsieve_init_A(qs_t qs_inf)
             /* binary search for final prime */
             i = 0;
             j = span/4 - 1;
-            
+
             found_j = 0;
 
             while (i < j)
             {
                 mid = i + (j - i) / 2;
-                
+
                 fmpz_mul_ui(temp, prod, factor_base[4*mid + low].p);
- 
+
                 if (fmpz_cmp(lower_bound, temp) > 0)
                 {
                     i = mid + (i == mid);
@@ -263,7 +263,7 @@ int qsieve_init_A(qs_t qs_inf)
                     break;
                 }
             }
-            
+
             if (found_j) break; /* success */
 
             /* (s - 1)-tuple failed, step to next (s - 1)-tuple */
@@ -453,7 +453,7 @@ int qsieve_next_A(qs_t qs_inf)
 
             for (j = 0; j < h; j++)
                 curr_subset[s + j - h - 2] = m + j;
-            
+
             curr_subset[s - 2] = curr_subset[s - 3] + diff;
 
             fmpz_set_ui(prod, 1);
@@ -470,9 +470,9 @@ int qsieve_next_A(qs_t qs_inf)
             while (i < j)
             {
                 mid = i + (j - i) / 2;
-                
+
                 fmpz_mul_ui(temp, prod, factor_base[4*mid + low].p);
- 
+
                 if (fmpz_cmp(qs_inf->low_bound, temp) > 0)
                 {
                     i = mid + (i == mid);
@@ -532,7 +532,7 @@ next_A_cleanup:
    * Precompute data for polynomials which depends only on current A and the
      factor base primes and not on the current B coeff:
      A_inv, A_divp, B0_terms, B_terms, A_inv2B
-   * Compute the first B coeff 
+   * Compute the first B coeff
 */
 void qsieve_init_poly_first(qs_t qs_inf)
 {
@@ -587,7 +587,7 @@ void qsieve_init_poly_first(qs_t qs_inf)
         /* compute first B */
         fmpz_add(qs_inf->B, qs_inf->B, B_terms[i]);
     }
-    
+
     /* calculate A_inv[k] = A^-1 modulo p_k for p_k in the factor base */
     for (k = 3; k < qs_inf->num_primes; k++)
     {
@@ -670,7 +670,7 @@ void qsieve_init_poly_next(qs_t qs_inf, slong i)
     mp_limb_t ** A_inv2B = qs_inf->A_inv2B;
     mp_limb_t sign, p, r1, r2;
     fmpz_t temp;
-    
+
     fmpz_init(temp);
 
 #if QS_DEBUG
@@ -733,9 +733,9 @@ void qsieve_init_poly_next(qs_t qs_inf, slong i)
 void qsieve_compute_C(fmpz_t C, qs_t qs_inf, qs_poly_t poly)
 {
     fmpz_t r;
-       
+
     fmpz_init(r);
-       
+
     fmpz_mul(C, poly->B, poly->B);
     fmpz_sub(C, C, qs_inf->kn);
 
@@ -747,7 +747,7 @@ void qsieve_compute_C(fmpz_t C, qs_t qs_inf, qs_poly_t poly)
        flint_abort();
     }
 #endif
-       
+
     fmpz_divexact(C, C, qs_inf->A);
 
     fmpz_clear(r);
@@ -762,7 +762,7 @@ void qsieve_poly_copy(qs_poly_t poly, qs_t qs_inf)
    slong i;
 
    fmpz_set(poly->B, qs_inf->B);
-   
+
    for (i = 0; i < qs_inf->num_primes; i++)
    {
       poly->soln1[i] = qs_inf->soln1[i];

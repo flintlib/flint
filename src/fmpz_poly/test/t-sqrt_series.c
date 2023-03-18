@@ -123,7 +123,7 @@ main(void)
             n = n_randint(state, fmpz_poly_length(a) + 1);
             fmpz_poly_mullow(b, a, a, n);
         } while (fmpz_poly_length(b) == 0);
-        
+
         j = n_randint(state, fmpz_poly_length(b));
         fmpz_randtest_not_zero(t, state, 1 + n_randint(state, 100));
         fmpz_add(b->coeffs + j, b->coeffs + j, t);
@@ -151,7 +151,7 @@ main(void)
         fmpz_poly_clear(c);
     }
 
-    
+
     flint_printf("PASS\n");
     FLINT_TEST_CLEANUP(state);
     return 0;

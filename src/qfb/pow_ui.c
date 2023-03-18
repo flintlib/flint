@@ -39,7 +39,7 @@ void qfb_pow_ui(qfb_t r, qfb_t f, fmpz_t D, ulong exp)
    fmpz_root(L, L, 4);
 
    qfb_init(pow);
-   
+
    qfb_set(pow, f);
    while ((exp & 1) == 0)
    {

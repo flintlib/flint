@@ -12,9 +12,9 @@
 #include "fmpz_poly.h"
 #include "qadic.h"
 
-static void 
-_qadic_exp_bsplit_series(fmpz *P, fmpz_t Q, fmpz *T, 
-                         const fmpz *x, slong len, slong lo, slong hi, 
+static void
+_qadic_exp_bsplit_series(fmpz *P, fmpz_t Q, fmpz *T,
+                         const fmpz *x, slong len, slong lo, slong hi,
                          const fmpz *a, const slong *j, slong lena)
 {
     const slong d = j[lena - 1];
@@ -76,9 +76,9 @@ _qadic_exp_bsplit_series(fmpz *P, fmpz_t Q, fmpz *T,
     }
 }
 
-static void 
-_qadic_exp_bsplit(fmpz *y, const fmpz *x, slong v, slong len, 
-                  const fmpz *a, const slong *j, slong lena, 
+static void
+_qadic_exp_bsplit(fmpz *y, const fmpz *x, slong v, slong len,
+                  const fmpz *a, const slong *j, slong lena,
                   const fmpz_t p, slong N)
 {
     const slong d = j[lena - 1];
@@ -119,8 +119,8 @@ _qadic_exp_bsplit(fmpz *y, const fmpz *x, slong v, slong len,
     }
 }
 
-void _qadic_exp_balanced(fmpz *rop, const fmpz *x, slong v, slong len, 
-                         const fmpz *a, const slong *j, slong lena, 
+void _qadic_exp_balanced(fmpz *rop, const fmpz *x, slong v, slong len,
+                         const fmpz *a, const slong *j, slong lena,
                          const fmpz_t p, slong N, const fmpz_t pN)
 {
     const slong d = j[lena - 1];
@@ -200,7 +200,7 @@ int qadic_exp_balanced(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 
             padic_poly_fit_length(rop, d);
 
-            _qadic_exp_balanced(rop->coeffs, op->coeffs, v, op->length, 
+            _qadic_exp_balanced(rop->coeffs, op->coeffs, v, op->length,
                                 ctx->a, ctx->j, ctx->len, p, N, pN);
             rop->val = 0;
 

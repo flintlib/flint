@@ -15,7 +15,7 @@
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_add(fmpz *res, const fmpz *poly1, slong len1, 
+void _fmpz_mod_poly_add(fmpz *res, const fmpz *poly1, slong len1,
                                    const fmpz *poly2, slong len2, const fmpz_t p)
 {
     slong i, len = FLINT_MAX(len1, len2);
@@ -36,7 +36,7 @@ void fmpz_mod_poly_add(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
 
     fmpz_mod_poly_fit_length(res, max, ctx);
 
-    _fmpz_mod_poly_add(res->coeffs, poly1->coeffs, poly1->length, 
+    _fmpz_mod_poly_add(res->coeffs, poly1->coeffs, poly1->length,
                       poly2->coeffs, poly2->length, fmpz_mod_ctx_modulus(ctx));
 
     _fmpz_mod_poly_set_length(res, max);

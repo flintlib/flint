@@ -34,7 +34,7 @@ _nf_elem_mod_fmpz(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t
         fmpz_one(LNF_ELEM_DENREF(res));
     }
     else if (nf->flag & NF_QUADRATIC)
-    { 
+    {
         if (sign == 0)
             _fmpz_vec_scalar_mod_fmpz(QNF_ELEM_NUMREF(res), QNF_ELEM_NUMREF(a), 3, mod);
         else
@@ -81,7 +81,7 @@ _nf_elem_mod_fmpz_den(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const 
         {
             nf_elem_scalar_div_fmpz(res, res, QNF_ELEM_DENREF(a), nf);
         }
-        else 
+        else
         {
             nf_elem_scalar_div_fmpz(res, res, NF_ELEM_DENREF(a), nf);
         }
@@ -111,7 +111,7 @@ void nf_elem_mod_fmpz(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const 
 {
     nf_elem_smod_fmpz_den(res, a, mod, nf, 1);
 }
-   
+
 static void
 _fmpz_ppio(fmpz_t ppi, fmpz_t ppo, const fmpz_t a, const fmpz_t b)
 {
@@ -174,7 +174,7 @@ _nf_elem_coprime_den(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const n
         fmpz_clear(nc);
     }
     else if (nf->flag & NF_QUADRATIC)
-    { 
+    {
         fmpz_t c, nc;
         fmpz_init(c);
         fmpz_init(nc);
@@ -188,7 +188,7 @@ _nf_elem_coprime_den(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const n
         else
             _fmpz_vec_scalar_smod_fmpz(QNF_ELEM_NUMREF(res), QNF_ELEM_NUMREF(res), 3, QNF_ELEM_DENREF(res));
         fmpz_set(QNF_ELEM_DENREF(res), c);
-        
+
         fmpz_clear(c);
         fmpz_clear(nc);
     }
@@ -215,13 +215,13 @@ _nf_elem_coprime_den(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const n
     }
     nf_elem_canonicalise(res, nf);
 }
-  
+
 void
 nf_elem_coprime_den_signed(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t nf)
 {
     _nf_elem_coprime_den(res, a, mod, nf, 1);
 }
-  
+
 void
 nf_elem_coprime_den(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t nf)
 {

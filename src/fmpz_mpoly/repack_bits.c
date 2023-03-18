@@ -24,7 +24,7 @@ int fmpz_mpoly_repack_bits(fmpz_mpoly_t A, const fmpz_mpoly_t B,
         fmpz_mpoly_set(A, B, ctx);
         return 1;
     }
-    
+
     /* must use B->alloc because we are going to swap coeff in aliasing case */
     fmpz_mpoly_init3(T, B->alloc, Abits, ctx);
     success = mpoly_repack_monomials(T->exps, Abits, B->exps, B->bits,

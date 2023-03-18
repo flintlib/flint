@@ -32,7 +32,7 @@ main(void)
     fmpz_t x;
 
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("abs_fits_ui....");
     fflush(stdout);
 

@@ -59,7 +59,7 @@ fmpz_factor_no_trial(fmpz_factor_t factor, const fmpz_t n)
 	    slong exp2;
 
 	    fmpz_init(n2);
-	    
+
 	    /* take out cofactor and factor it */
 	    fmpz_set(n2, fac3->p + fac3->num - 1);
 	    exp = fac3->exp[fac3->num - 1];
@@ -83,7 +83,7 @@ fmpz_factor_no_trial(fmpz_factor_t factor, const fmpz_t n)
                fmpz_factor_no_trial(fac2, fac->p + i);
 
                _fmpz_factor_concat(fac3, fac2, exp*fac->exp[i]);
- 
+
                fmpz_factor_clear(fac2);
             }
 

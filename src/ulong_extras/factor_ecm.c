@@ -18,8 +18,8 @@ ulong n_ecm_primorial[] =
 #ifdef FLINT64
 
     UWORD(2), UWORD(6), UWORD(30), UWORD(210), UWORD(2310), UWORD(30030),
-    UWORD(510510), UWORD(9699690), UWORD(223092870), UWORD(6469693230), 
-    UWORD(200560490130), UWORD(7420738134810), UWORD(304250263527210), 
+    UWORD(510510), UWORD(9699690), UWORD(223092870), UWORD(6469693230),
+    UWORD(200560490130), UWORD(7420738134810), UWORD(304250263527210),
     UWORD(13082761331670030), UWORD(614889782588491410)
 
 #else
@@ -58,7 +58,7 @@ n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
     num = n_prime_pi(B1);   /* number of primes under B1 */
 
     /* compute list of primes under B1 for stage I */
-    prime_array = n_primes_arr_readonly(num);   
+    prime_array = n_primes_arr_readonly(num);
 
     /************************ STAGE II PRECOMPUTATIONS ***********************/
 
@@ -70,11 +70,11 @@ n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
     while ((j < num_n_ecm_primorials) && (n_ecm_primorial[j] < maxD))
         j += 1;
 
-    P = n_ecm_primorial[j - 1]; 
-    
+    P = n_ecm_primorial[j - 1];
+
     mmin = (B1 + (P/2)) / P;
     mmax = ((B2 - P/2) + P - 1)/P;      /* ceil */
-    maxj = (P + 1)/2; 
+    maxj = (P + 1)/2;
     mdiff = mmax - mmin + 1;
 
     /* compute GCD_table */
@@ -84,10 +84,10 @@ n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
     for (j = 1; j <= maxj; j += 2)
     {
         if ((j%2) && n_gcd(j, P) == 1)
-            n_ecm_inf->GCD_table[j] = 1;  
+            n_ecm_inf->GCD_table[j] = 1;
         else
             n_ecm_inf->GCD_table[j] = 0;
-    }  
+    }
 
     /* compute prime table */
 
@@ -129,7 +129,7 @@ n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
 
         /************************ SELECT CURVE ************************/
 
-        if (n_factor_ecm_select_curve(f, sig, n, n_ecm_inf)) 
+        if (n_factor_ecm_select_curve(f, sig, n, n_ecm_inf))
         {
             /* Found factor while selecting curve,
                very very lucky :) */
@@ -148,7 +148,7 @@ n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
             (*f) >>= n_ecm_inf->normbits;
             ret = 1;
             goto cleanup;
-        }  
+        }
 
         /************************** STAGE II ***************************/
 
@@ -160,7 +160,7 @@ n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
             (*f) >>= n_ecm_inf->normbits;
             ret = 2;
             goto cleanup;
-        }   
+        }
     }
 
     cleanup:

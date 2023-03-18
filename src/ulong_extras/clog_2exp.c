@@ -23,7 +23,7 @@ ulong n_clog_2exp(ulong n, ulong b)
     ulong r;
 
     if (n == 0)
-        return 0;        
+        return 0;
 
     if ((b & (b - 1)) == 0)
     {

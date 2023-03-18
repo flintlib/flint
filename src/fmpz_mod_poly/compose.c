@@ -12,8 +12,8 @@
 #include "fmpz_mod_poly.h"
 #include "gr_poly.h"
 
-void _fmpz_mod_poly_compose(fmpz *res, const fmpz *poly1, slong len1, 
-                                              const fmpz *poly2, slong len2, 
+void _fmpz_mod_poly_compose(fmpz *res, const fmpz *poly1, slong len1,
+                                              const fmpz *poly2, slong len2,
                                               const fmpz_t p)
 {
     gr_ctx_t ctx;
@@ -44,7 +44,7 @@ void fmpz_mod_poly_compose(fmpz_mod_poly_t res,
         if ((res != poly1) && (res != poly2))
         {
             fmpz_mod_poly_fit_length(res, lenr, ctx);
-            _fmpz_mod_poly_compose(res->coeffs, poly1->coeffs, len1, 
+            _fmpz_mod_poly_compose(res->coeffs, poly1->coeffs, len1,
                                poly2->coeffs, len2, fmpz_mod_ctx_modulus(ctx));
         }
         else

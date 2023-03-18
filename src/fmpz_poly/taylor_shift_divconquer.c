@@ -77,7 +77,7 @@ _fmpz_poly_taylor_shift_divconquer(fmpz * poly, const fmpz_t c, slong len)
     else
     {
         slong nw_save;
-        
+
         args[0].poly = poly;
         args[0].c = c;
         args[0].len = len1;
@@ -89,7 +89,7 @@ _fmpz_poly_taylor_shift_divconquer(fmpz * poly, const fmpz_t c, slong len)
         FLINT_ASSERT(nt >= 2);
 
         nw_save = flint_set_num_workers(nt - nt/2 - 1);
-        
+
         thread_pool_wake(global_thread_pool, threads[0], nt/2 - 1,
                           _fmpz_poly_taylor_shift_divconquer_worker, &args[1]);
 

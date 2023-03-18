@@ -318,7 +318,7 @@ namespace rules {
 FLINT_DEFINE_DOIT_COND2(assignment, QADICXX_COND_T, QADICXX_COND_S,
         qadic_set(to._qadic(), from._qadic(), to._ctx()))
 
-FLINT_DEFINE_DOIT_COND2(assignment, QADICXX_COND_T, traits::is_unsigned_integer, 
+FLINT_DEFINE_DOIT_COND2(assignment, QADICXX_COND_T, traits::is_unsigned_integer,
         qadic_set_ui(to._qadic(), from, to._ctx()))
 FLINT_DEFINE_DOIT_COND2(assignment, QADICXX_COND_T, PADICXX_COND_S,
         padic_poly_set_padic(to._qadic(), from._padic(), from._ctx()))

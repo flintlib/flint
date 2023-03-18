@@ -13,8 +13,8 @@
 #include "nmod_poly.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_resultant_modular_div(fmpz_t res, 
-        const fmpz * poly1, slong len1, 
+void _fmpz_poly_resultant_modular_div(fmpz_t res,
+        const fmpz * poly1, slong len1,
         const fmpz * poly2, slong len2, const fmpz_t divisor, slong nbits)
 {
     flint_bitcnt_t pbits;
@@ -41,14 +41,14 @@ void _fmpz_poly_resultant_modular_div(fmpz_t res,
 
         return;
     }
-    
+
     fmpz_init(ac);
     fmpz_init(bc);
-    
+
     /* compute content of poly1 and poly2 */
     _fmpz_vec_content(ac, poly1, len1);
     _fmpz_vec_content(bc, poly2, len2);
-    
+
     /* divide poly1 and poly2 by their content */
     A = _fmpz_vec_init(len1);
     B = _fmpz_vec_init(len2);
@@ -57,14 +57,14 @@ void _fmpz_poly_resultant_modular_div(fmpz_t res,
 
 
     fmpz_init(l);
-    /* we have, originally 
-    // res(p1, p2) = r d 
+    /* we have, originally
+    // res(p1, p2) = r d
     // with nbits(r) <= nbits
     // Now
     // res(p1, p2) = ac^(len2-1) bc^(len1-1) res(A, B)
     // So we need to split ac^(len2-1) bc^(len1-1) = xy
     // such that d mod x == 0 and gcd(ac^... /x, y) = 1
-    // Then we need to compute res(A,B)/(d/x) 
+    // Then we need to compute res(A,B)/(d/x)
     // res(p1, p2) =  x y res(A,B) = r d
     // and
     // r = x y res(A,B)/d = y res(A, B)/(d/x)
@@ -83,7 +83,7 @@ void _fmpz_poly_resultant_modular_div(fmpz_t res,
     } else {
         fmpz_init_set(div, divisor);
     }
-    
+
     if (!fmpz_is_one(bc))
     {
         fmpz_init(lb);
@@ -94,7 +94,7 @@ void _fmpz_poly_resultant_modular_div(fmpz_t res,
         nbits = nbits - fmpz_bits(lb) + 1;
     }
 
-    
+
     /* get product of leading coefficients */
     lead_A = A + len1 - 1;
     lead_B = B + len2 - 1;
@@ -119,13 +119,13 @@ void _fmpz_poly_resultant_modular_div(fmpz_t res,
     parr = _nmod_vec_init(num_primes);
     rarr = _nmod_vec_init(num_primes);
 
-    
+
     for(i=0; i< num_primes; )
     {
         /* get new prime and initialise modulus */
         p = n_nextprime(p, 0);
 
-        if (fmpz_fdiv_ui(l, p) == 0) 
+        if (fmpz_fdiv_ui(l, p) == 0)
             continue;
         d = fmpz_fdiv_ui(div, p);
         if (d==0)
@@ -146,35 +146,35 @@ void _fmpz_poly_resultant_modular_div(fmpz_t res,
 
     fmpz_comb_init(comb, parr, num_primes);
     fmpz_comb_temp_init(comb_temp, comb);
-    
+
     fmpz_multi_CRT_ui(res, rarr, comb, comb_temp, 1);
-        
+
     fmpz_clear(modulus);
     fmpz_comb_temp_clear(comb_temp);
     fmpz_comb_clear(comb);
-        
+
     _nmod_vec_clear(a);
     _nmod_vec_clear(b);
 
     _nmod_vec_clear(parr);
     _nmod_vec_clear(rarr);
-    
+
     /* finally multiply by powers of content */
     if (!fmpz_is_one(ac))
     {
         fmpz_mul(res, res, la);
         fmpz_clear(la);
     }
-    
+
     if (!fmpz_is_one(bc))
     {
         fmpz_mul(res, res, lb);
         fmpz_clear(lb);
     }
 
-    fmpz_clear(l); 
-    fmpz_clear(div); 
-    
+    fmpz_clear(l);
+    fmpz_clear(div);
+
     _fmpz_vec_clear(A, len1);
     _fmpz_vec_clear(B, len2);
 
@@ -188,7 +188,7 @@ fmpz_poly_resultant_modular_div(fmpz_t res, const fmpz_poly_t poly1,
 {
     slong len1 = poly1->length;
     slong len2 = poly2->length;
-    
+
     if (len1 == 0 || len2 == 0 || fmpz_is_zero(divisor))
         fmpz_zero(res);
     else if (len1 >= len2)
@@ -196,8 +196,8 @@ fmpz_poly_resultant_modular_div(fmpz_t res, const fmpz_poly_t poly1,
                                           poly2->coeffs, len2, divisor, nbits);
     else
     {
-        _fmpz_poly_resultant_modular_div(res, poly2->coeffs, len2, 
-                                          poly1->coeffs, len1, divisor, nbits);  
+        _fmpz_poly_resultant_modular_div(res, poly2->coeffs, len2,
+                                          poly1->coeffs, len1, divisor, nbits);
         if ((len1 > 1) && (!(len1 & WORD(1)) & !(len2 & WORD(1))))
             fmpz_neg(res, res);
     }

@@ -16,7 +16,7 @@ int main(void)
 {
    int i, result;
    FLINT_TEST_INIT(state);
-   
+
 
    flint_printf("factor_lehman....");
    fflush(stdout);
@@ -35,17 +35,17 @@ int main(void)
          );
 
       n2 = n_factor_lehman(n1);
-      
+
       result = ((n1%n2) == UWORD(0) && n1 != n2);
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("n1 = %wu, n2 = %wu\n", n1, n2); 
+         flint_printf("n1 = %wu, n2 = %wu\n", n1, n2);
          fflush(stdout);
          flint_abort();
       }
    }
-   
+
    for (i = 0; i < 100 * flint_test_multiplier(); i++) /* Test random products of two primes */
    {
       mp_limb_t n1, n2, n3, n, limit;
@@ -58,7 +58,7 @@ int main(void)
 
       n1 = n_randtest(state) % (limit + 1);
       n2 = n_randtest(state) % (limit + 1);
-          
+
       n1 = n_nextprime(n1, 1);
       n2 = n_nextprime(n2, 1);
 
@@ -74,7 +74,7 @@ int main(void)
       n = n1*n2;
 
       n3 = n_factor_lehman(n);
-      
+
       result = ((n%n3) == UWORD(0) && n != n3);
       if (!result)
       {
@@ -84,9 +84,9 @@ int main(void)
          flint_abort();
       }
    }
-   
+
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2009, 2011 William Hart
 
     This file is part of FLINT.
@@ -15,7 +15,7 @@
 void fermat_to_mpz(mpz_t m, mp_limb_t * i, mp_size_t limbs)
 {
    mp_limb_signed_t hi;
-   
+
    mpz_realloc(m, limbs + 1);
    flint_mpn_copyi(m->_mp_d, i, limbs + 1);
    hi = i[limbs];
@@ -23,13 +23,13 @@ void fermat_to_mpz(mpz_t m, mp_limb_t * i, mp_size_t limbs)
    {
       mpn_neg_n(m->_mp_d, m->_mp_d, limbs + 1);
       m->_mp_size = limbs + 1;
-      while ((m->_mp_size) && (!m->_mp_d[m->_mp_size - 1])) 
+      while ((m->_mp_size) && (!m->_mp_d[m->_mp_size - 1]))
          m->_mp_size--;
       m->_mp_size = -m->_mp_size;
    } else
    {
       m->_mp_size = limbs + 1;
-      while ((m->_mp_size) && (!m->_mp_d[m->_mp_size - 1])) 
+      while ((m->_mp_size) && (!m->_mp_d[m->_mp_size - 1]))
          m->_mp_size--;
    }
 }

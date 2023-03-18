@@ -31,9 +31,9 @@ main(int argc, char** argv)
     fq_mat_t f, g, h;
 
     double s[nalgs];
-    
+
     FLINT_TEST_INIT(state);
-    
+
     fmpz_init(p);
     fmpz_set_str(p, argv[1], 10);
 
@@ -48,7 +48,7 @@ main(int argc, char** argv)
 
     for (c = 0; c < nalgs; c++)
         s[c] = 0.0;
-            
+
     for (n = 0; n < ncases; n++)
     {
         double t[nalgs];
@@ -61,7 +61,7 @@ main(int argc, char** argv)
             TEMPLATE(T, mat_randtest)(g, state, ctx);
             TEMPLATE(T, mat_randtest)(h, state, ctx);
         }
-                
+
     loop:
 
         t[0] = 0.0;
@@ -73,7 +73,7 @@ main(int argc, char** argv)
         }
         prof_stop();
         t[0] += get_clock(0);
-                
+
         t[1] = 0.0;
         init_clock(0);
         prof_start();
@@ -90,19 +90,19 @@ main(int argc, char** argv)
                 loops *= 10;
                 goto loop;
             }
-                
+
         for (c = 0; c < nalgs; c++)
             s[c] += t[c];
         reps += loops;
     }
-            
+
     for (c = 0; c < nalgs; c++)
     {
         printf("%20f", s[c] / (double) reps);
         fflush(stdout);
     }
     printf("\n");
-    
+
     TEMPLATE(T, mat_clear)(f, ctx);
     TEMPLATE(T, mat_clear)(g, ctx);
     TEMPLATE(T, mat_clear)(h, ctx);
@@ -110,7 +110,7 @@ main(int argc, char** argv)
     fmpz_clear(p);
 
     FLINT_TEST_CLEANUP(state);
-    
+
     return 0;
 }
 

@@ -47,7 +47,7 @@ main(void)
 
         fq_zech_embed_matrices(embed, project, gen, ctx, gen, ctx, modulus);
         nmod_mat_one(one);
-        
+
         if (!nmod_mat_equal(embed, one) || !nmod_mat_equal(project, one)) {
             flint_printf("FAIL:\n\n");
             flint_printf("CTX\n"), fq_zech_ctx_print(ctx), flint_printf("\n");
@@ -84,7 +84,7 @@ main(void)
             m = degrees[i % 2];
 
             fq_zech_ctx_init_random(ctx1, p, m, "a");
-            
+
             n = m*j;
             if (m == 1) {
                 i--;

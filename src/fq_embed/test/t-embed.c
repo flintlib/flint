@@ -63,7 +63,7 @@ main(void)
         TEMPLATE4(T, poly_set, B, poly)(minpoly_fq, minpoly, ctx);
         TEMPLATE3(T, poly_evaluate, T)(ev_a, minpoly_fq, a, ctx);
         TEMPLATE3(T, poly_evaluate, T)(ev_b, minpoly_fq, b, ctx);
-        
+
         if (!TEMPLATE(T, is_zero)(ev_a, ctx) || !TEMPLATE(T, is_zero)(ev_b, ctx))
         {
             flint_printf("FAIL:\n\n");

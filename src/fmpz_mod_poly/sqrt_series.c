@@ -32,7 +32,7 @@ fmpz_mod_poly_sqrt_series(fmpz_mod_poly_t g, const fmpz_mod_poly_t h, slong n, f
     fmpz * g_coeffs, * h_coeffs;
     fmpz_mod_poly_t t1;
     slong hlen;
-    
+
     hlen = h->length;
 
     if (n == 0)
@@ -73,7 +73,7 @@ fmpz_mod_poly_sqrt_series(fmpz_mod_poly_t g, const fmpz_mod_poly_t h, slong n, f
         fmpz_mod_poly_swap(g, t1, ctx);
         fmpz_mod_poly_clear(t1, ctx);
     }
-    
+
     g->length = n;
 
     if (hlen < n)

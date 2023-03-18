@@ -31,13 +31,13 @@ mp_limb_t n_factor_trial_partial(n_factor_t * factors, mp_limb_t n, mp_limb_t * 
       if (p*p > n) break;
       ppre = inverses[i];
       exp = n_remove2_precomp(&n, p, ppre);
-      if (exp) 
+      if (exp)
       {
          n_factor_insert(factors, p, exp);
          (*prod) *= n_pow(p, exp);
          if (*prod > limit) break;
       }
    }
-       
+
    return n;
 }

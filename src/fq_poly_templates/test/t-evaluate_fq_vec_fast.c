@@ -20,7 +20,7 @@ main(void)
 {
     int i, result = 1;
     FLINT_TEST_INIT(state);
-    
+
     TEMPLATE_PRINTF("evaluate_%s_vec_fast....", T);
     fflush(stdout);
 
@@ -32,7 +32,7 @@ main(void)
         slong j, n, npoints;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
-        
+
         npoints = n_randint(state, 10);
         n = n_randint(state, 10);
 
@@ -48,7 +48,7 @@ main(void)
 
         TEMPLATE4(T, poly_evaluate, T, vec_iter)(y, P, x, npoints, ctx);
         TEMPLATE4(T, poly_evaluate, T, vec_fast)(z, P, x, npoints, ctx);
-        
+
         result = _TEMPLATE(T, vec_equal)(y, z, npoints, ctx);
 
         if (!result)
@@ -77,7 +77,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

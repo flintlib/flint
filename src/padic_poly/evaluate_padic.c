@@ -38,14 +38,14 @@ static void __padic_reduce(fmpz_t u, slong *v, slong N, const padic_ctx_t ctx)
 }
 
 /*
-    Evaluates the polynomial $F(x) = p^w f(x)$ at $x = p^b a$, setting 
+    Evaluates the polynomial $F(x) = p^w f(x)$ at $x = p^b a$, setting
     $y = p^v u$ to the result reduced modulo $p^N$.
 
-    Suppose first that $b \geq 0$, in which case we can quickly relay 
-    the call to the \code{fmpz_mod_poly} module.  Namely, we need to 
+    Suppose first that $b \geq 0$, in which case we can quickly relay
+    the call to the \code{fmpz_mod_poly} module.  Namely, we need to
     compute $f(x) \bmod {p^{N-w}}$ where we know $f(x)$ to be integral.
 
-    Otherwise, suppose now that $b < 0$ and we still wish to evaluate 
+    Otherwise, suppose now that $b < 0$ and we still wish to evaluate
     $f(x) \bmod {p^{N-w}}$.
     \begin{align*}
     f(x) & = \sum_{i = 0}^{n} a_i x^i \\
@@ -53,13 +53,13 @@ static void __padic_reduce(fmpz_t u, slong *v, slong N, const padic_ctx_t ctx)
     \intertext{Multiplying through by $p^{- n b} \in \mathbf{Z}$, }
     p^{-nb} f(x) & = \sum_{i = 0}^{n} a_i p^{-(n-i)b} a
     \end{align*}
-    which leaves the right hand side integral.  As we want to 
-    compute $f(x)$ to precision $N-w$, we have to compute 
+    which leaves the right hand side integral.  As we want to
+    compute $f(x)$ to precision $N-w$, we have to compute
     $p^{-nb} f(x)$ to precision $N-w-nb$.
  */
 
-void _padic_poly_evaluate_padic(fmpz_t u, slong *v, slong N,  
-                                const fmpz *poly, slong val, slong len, 
+void _padic_poly_evaluate_padic(fmpz_t u, slong *v, slong N,
+                                const fmpz *poly, slong val, slong len,
                                 const fmpz_t a, slong b, const padic_ctx_t ctx)
 {
     if (len == 0)
@@ -81,7 +81,7 @@ void _padic_poly_evaluate_padic(fmpz_t u, slong *v, slong N,
             fmpz_zero(u);
             *v = 0;
         }
-        else 
+        else
         {
             fmpz_t x;
             fmpz_t pow;
@@ -150,7 +150,7 @@ void _padic_poly_evaluate_padic(fmpz_t u, slong *v, slong N,
     }
 }
 
-void padic_poly_evaluate_padic(padic_t y, const padic_poly_t poly, 
+void padic_poly_evaluate_padic(padic_t y, const padic_poly_t poly,
                                           const padic_t x, const padic_ctx_t ctx)
 {
     if (y == x)
@@ -158,16 +158,16 @@ void padic_poly_evaluate_padic(padic_t y, const padic_poly_t poly,
         padic_t t;
 
         padic_init2(t, padic_prec(y));
-        _padic_poly_evaluate_padic(padic_unit(t), &padic_val(t), padic_prec(t), 
-                                   poly->coeffs, poly->val, poly->length, 
+        _padic_poly_evaluate_padic(padic_unit(t), &padic_val(t), padic_prec(t),
+                                   poly->coeffs, poly->val, poly->length,
                                    padic_unit(x), padic_val(x), ctx);
         padic_swap(y, t);
         padic_clear(t);
     }
     else
     {
-        _padic_poly_evaluate_padic(padic_unit(y), &padic_val(y), padic_prec(y), 
-                                   poly->coeffs, poly->val, poly->length, 
+        _padic_poly_evaluate_padic(padic_unit(y), &padic_val(y), padic_prec(y),
+                                   poly->coeffs, poly->val, poly->length,
                                    padic_unit(x), padic_val(x), ctx);
     }
 }

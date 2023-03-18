@@ -20,7 +20,7 @@
     o  That ord_p(A) >= ord_p(B).
  */
 
-void _padic_mat_sub(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
+void _padic_mat_sub(padic_mat_t C, const padic_mat_t A, const padic_mat_t B,
                                    const padic_ctx_t ctx)
 {
     if (padic_mat_is_zero(A))
@@ -45,7 +45,7 @@ void _padic_mat_sub(padic_mat_t C, const padic_mat_t A, const padic_mat_t B,
         padic_mat_val(C) = padic_mat_val(A);
         _padic_mat_canonicalise(C, ctx);
     }
-    else 
+    else
     {
         fmpz_t x;
         fmpz_init(x);
@@ -81,7 +81,7 @@ void _padic_mat_sub(padic_mat_t C, const padic_mat_t A, const padic_mat_t B,
                 fmpz_mat_scalar_submul_fmpz(padic_mat(C), padic_mat(A), x);
                 fmpz_mat_neg(padic_mat(C), padic_mat(C));
             }
-            else 
+            else
             {
                 fmpz_mat_scalar_mul_fmpz(padic_mat(C), padic_mat(A), x);
                 fmpz_mat_sub(padic_mat(C), padic_mat(C), padic_mat(B));
@@ -93,7 +93,7 @@ void _padic_mat_sub(padic_mat_t C, const padic_mat_t A, const padic_mat_t B,
 
 }
 
-void padic_mat_sub(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
+void padic_mat_sub(padic_mat_t C, const padic_mat_t A, const padic_mat_t B,
                                   const padic_ctx_t ctx)
 {
     if (padic_mat_is_empty(C))

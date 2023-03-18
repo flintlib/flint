@@ -1,7 +1,7 @@
 /*
     Copyright (C) 2012 Fredrik Johansson
     Copyright (C) 2018 William Hart
-    
+
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
@@ -154,7 +154,7 @@ main(void)
         fmpz_poly_clear(c);
     }
 
-    
+
     flint_printf("PASS\n");
     FLINT_TEST_CLEANUP(state);
     return 0;

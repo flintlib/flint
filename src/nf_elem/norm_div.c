@@ -58,7 +58,7 @@ void _nf_elem_norm_div(fmpz_t rnum, fmpz_t rden, const nf_elem_t a, const nf_t n
 
             return;
         }
-      
+
         fmpz_init_set_ui(one, 1);
         fmpz_init(pow);
 
@@ -69,7 +69,7 @@ void _nf_elem_norm_div(fmpz_t rnum, fmpz_t rden, const nf_elem_t a, const nf_t n
         {
             fmpz_pow_ui(pow, nf->pol->coeffs + 2, alen - 1);
             _fmpq_mul(rnum, rden, rnum, rden, one, pow);
-         
+
             if (fmpz_sgn(rden) < 0)
             {
                 fmpz_neg(rnum, rnum);
@@ -106,7 +106,7 @@ void _nf_elem_norm_div(fmpz_t rnum, fmpz_t rden, const nf_elem_t a, const nf_t n
         {
             fmpz_pow_ui(pow, coeffs + len - 1, alen - 1);
             _fmpq_mul(rnum, rden, rnum, rden, one, pow);
-         
+
             if (fmpz_sgn(rden) < 0)
             {
                 fmpz_neg(rnum, rnum);
@@ -116,7 +116,7 @@ void _nf_elem_norm_div(fmpz_t rnum, fmpz_t rden, const nf_elem_t a, const nf_t n
 
         fmpz_clear(one);
         fmpz_clear(pow);
-    }   
+    }
 }
 
 void nf_elem_norm_div(fmpq_t res, const nf_elem_t a, const nf_t nf, const fmpz_t divisor, slong nbits)

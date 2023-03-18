@@ -48,7 +48,7 @@ int _fq_nmod_mpoly_divrem_ideal_monagan_pearce(
     TMP_INIT;
 
     TMP_START;
-   
+
     chains = (mpoly_nheap_t **) TMP_ALLOC(len*sizeof(mpoly_nheap_t *));
     hinds = (slong **) TMP_ALLOC(len*sizeof(slong *));
     len3 = 0;
@@ -84,7 +84,7 @@ int _fq_nmod_mpoly_divrem_ideal_monagan_pearce(
         q_len[w] = 0;
         s[w] = poly3[w]->length;
     }
-   
+
     x = chains[0] + 0;
     x->i = -WORD(1);
     x->j = 0;
@@ -229,7 +229,7 @@ int _fq_nmod_mpoly_divrem_ideal_monagan_pearce(
                     x->p = w;
                     x->next = NULL;
                     hinds[w][x->i] = 2*(x->j + 1) + 0;
-                    mpoly_monomial_add_mp(exp_list[exp_next], exp3[w] + N*x->i, 
+                    mpoly_monomial_add_mp(exp_list[exp_next], exp3[w] + N*x->i,
                                                    Q[w]->exps + N*x->j, N);
                     exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
@@ -297,7 +297,7 @@ void fq_nmod_mpoly_divrem_ideal_monagan_pearce(
     TMP_INIT;
 
     for (i = 0; i < len; i++)
-    {  
+    {
         len3 = FLINT_MAX(len3, B[i]->length);
         if (fq_nmod_mpoly_is_zero(B[i], ctx))
         {
@@ -377,7 +377,7 @@ void fq_nmod_mpoly_divrem_ideal_monagan_pearce(
     /* do division with remainder */
     while (1)
     {
-        fq_nmod_mpoly_fit_length_reset_bits(r, len3, QRbits, ctx);        
+        fq_nmod_mpoly_fit_length_reset_bits(r, len3, QRbits, ctx);
         for (i = 0; i < len; i++)
             fq_nmod_mpoly_fit_length_reset_bits(Q[i], 1, QRbits, ctx);
 
@@ -396,7 +396,7 @@ void fq_nmod_mpoly_divrem_ideal_monagan_pearce(
             flint_free(Aexps);
         Aexps = (ulong *) flint_malloc(N*A->length*sizeof(ulong));
         mpoly_repack_monomials(Aexps, QRbits, A->exps, A->bits, A->length, ctx->minfo);
-        freeAexps = 1; 
+        freeAexps = 1;
 
         for (i = 0; i < len; i++)
         {

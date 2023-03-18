@@ -55,7 +55,7 @@ TEMPLATE(T, mat_mul_classical) (TEMPLATE(T, mat_t) C,
        for (j = 0; j < bc; j++)
           trB[j*br + i] = *TEMPLATE(T, mat_entry) (B, i, j);
     }
-   
+
     for (i = 0; i < ar; i++)
     {
         for (j = 0; j < bc; j++)

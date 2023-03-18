@@ -18,7 +18,7 @@
 #define FLINT_DIVREMLOW_DIVCONQUER_CUTOFF  16
 
 int
-_fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB, 
+_fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB,
                          const fmpz * A, const fmpz * B, slong lenB, int exact)
 {
     if (lenB <= FLINT_DIVREMLOW_DIVCONQUER_CUTOFF)
@@ -42,7 +42,7 @@ _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB,
         fmpz * q2 = Q;
 
         /*
-           Think of the top lenB coefficients of QB as temporary space; this 
+           Think of the top lenB coefficients of QB as temporary space; this
            code will not depend on {QB, lenB - 1} and W being adjacent
          */
 
@@ -51,17 +51,17 @@ _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB,
         fmpz *d1q1, *d2q1, *t, *d3q2, *d4q2;
 
         /*
-           Set q1 to p1 div d1, a 2 n1 - 1 by n1 division, so q1 has length 
+           Set q1 to p1 div d1, a 2 n1 - 1 by n1 division, so q1 has length
            at most n1; {W, n1 - 1} is d1 * q1 is truncated to length n1 - 1
          */
 
         if (!_fmpz_poly_divremlow_divconquer_recursive(q1, W, p1, d1, n1, exact))
             return 0;
 
-        /* 
-           W is of length lenB, but we only care about the bottom n1 - 1 
-           coeffs, which we push up by n2 + 1, to the very top; we do this 
-           manually here instead of via _fmpz_vec_swap() because the source 
+        /*
+           W is of length lenB, but we only care about the bottom n1 - 1
+           coeffs, which we push up by n2 + 1, to the very top; we do this
+           manually here instead of via _fmpz_vec_swap() because the source
            and destination arrays overlap
          */
 
@@ -74,7 +74,7 @@ _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB,
         }
 
         /*
-           Compute d2q1 = d2 * q1, of length at most lenB - 1; we'll need the 
+           Compute d2q1 = d2 * q1, of length at most lenB - 1; we'll need the
            top n2 coeffs for t and the bottom n1 - 1 coeffs for QB
          */
 
@@ -83,7 +83,7 @@ _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB,
         _fmpz_poly_mul(d2q1, q1, n1, d2, n2);
 
         /*
-           Compute {t - (n2 - 1), 2 n2 - 1} to be the top 2 n2 - 1 coeffs of 
+           Compute {t - (n2 - 1), 2 n2 - 1} to be the top 2 n2 - 1 coeffs of
 
                A / x^n2 - (d1q1 x^n2 + d2q1).
 
@@ -101,7 +101,7 @@ _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB,
         p2 = t - (n2 - 1);
 
         /*
-           Move {QB, n1 - 1} into the bottom coefficients of W, so that 
+           Move {QB, n1 - 1} into the bottom coefficients of W, so that
            we can use {QB, 2 n2 - 1} as space in the next division
          */
 
@@ -123,8 +123,8 @@ _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB,
         _fmpz_vec_add(QB + n2, QB + n2, W, n1 - 1);
 
         /*
-           Compute {d4q2, lenB - 1} as {B, n1} * {q2, n2}; then move the 
-           bottom n2 coeffs of this into {QB, n2}, and add the top n1 - 1 
+           Compute {d4q2, lenB - 1} as {B, n1} * {q2, n2}; then move the
+           bottom n2 coeffs of this into {QB, n2}, and add the top n1 - 1
            coeffs to {QB + n2, n1 - 1}
          */
 

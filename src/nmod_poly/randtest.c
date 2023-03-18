@@ -119,7 +119,7 @@ nmod_poly_randtest_trinomial_irreducible(nmod_poly_t poly, flint_rand_t state,
             return 1;
         }
         i++;
-        
+
     }
     return 0;
 }
@@ -138,7 +138,7 @@ nmod_poly_randtest_pentomial_irreducible(nmod_poly_t poly, flint_rand_t state,
             return 1;
         }
         i++;
-        
+
     }
     return 0;
 }

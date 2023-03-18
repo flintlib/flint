@@ -29,14 +29,14 @@ void  GetSystemTimeAsFileTime(FILETIME*);
 static __inline__ int gettimeofday(struct timeval * p, void * tz)
 {
    union {
-      slong slong ns100; 
+      slong slong ns100;
       FILETIME ft;
    } now;
 
     GetSystemTimeAsFileTime(&(now.ft));
     p->tv_usec=(slong)((now.ns100 / WORD(10)L) % WORD(1000000)L );
     p->tv_sec= (slong)((now.ns100-(WORD(116444736000000000)L))/WORD(10000000)L);
-	
+
     return 0;
 }
 #else
@@ -50,7 +50,7 @@ int gettimeofday(struct timeval * p, void * tz);
  extern "C" {
 #endif
 
-typedef struct  
+typedef struct
 {
     ulong size;
     ulong peak;
@@ -95,7 +95,7 @@ void timeit_stop(timeit_t t)
 /******************************************************************************
 
     Timer based on the x86 cycle counter
-   
+
 ******************************************************************************/
 
 #if (defined( _MSC_VER ) || (GMP_LIMB_BITS == 64 && defined (__amd64__)) || \
@@ -109,7 +109,7 @@ void timeit_stop(timeit_t t)
 extern double clock_last[FLINT_NUM_CLOCKS];
 extern double clock_accum[FLINT_NUM_CLOCKS];
 
-static __inline__ 
+static __inline__
 double get_cycle_counter()
 {
 #if defined( _MSC_VER )
@@ -118,9 +118,9 @@ double get_cycle_counter()
     unsigned int hi;
    unsigned int lo;
 
-   __asm("rdtsc; movl %%edx,%0; movl %%eax,%1" 
+   __asm("rdtsc; movl %%edx,%0; movl %%eax,%1"
        : "=r" (hi), "=r" (lo)
-       : 
+       :
        : "%edx", "%eax");
 
    return (double) hi * (1 << 30) * 4 + lo;
@@ -129,13 +129,13 @@ double get_cycle_counter()
 
 #define FLINT_CLOCK_SCALE_FACTOR (1000000.0 / FLINT_CLOCKSPEED)
 
-static __inline__ 
+static __inline__
 void init_clock(int n)
 {
    clock_accum[n] = 0.0;
 }
 
-static __inline__ 
+static __inline__
 void init_all_clocks()
 {
    int i;
@@ -149,13 +149,13 @@ double get_clock(int n)
    return clock_accum[n] * FLINT_CLOCK_SCALE_FACTOR;
 }
 
-static __inline__ 
+static __inline__
 void start_clock(int n)
 {
    clock_last[n] = get_cycle_counter();
 }
 
-static __inline__ 
+static __inline__
 void stop_clock(int n)
 {
    double now = get_cycle_counter();
@@ -168,13 +168,13 @@ void stop_clock(int n)
 
 ******************************************************************************/
 
-static __inline__ 
+static __inline__
 void prof_start()
 {
    start_clock(0);
 }
 
-static __inline__ 
+static __inline__
 void prof_stop()
 {
    stop_clock(0);

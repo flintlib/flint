@@ -16,11 +16,11 @@
 #include "ulong_extras.h"
 
 /*
-    Tests whether the polynomial is suitably normalised for the 
-    result of a GCD operation, that is, whether it's leading 
+    Tests whether the polynomial is suitably normalised for the
+    result of a GCD operation, that is, whether it's leading
     coefficient is non-negative.
  */
-static 
+static
 int _t_gcd_is_canonical(const fmpz_poly_t poly)
 {
     return fmpz_poly_is_zero(poly) || (fmpz_sgn(fmpz_poly_lead(poly)) > 0);
@@ -31,11 +31,11 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("gcd_modular....");
     fflush(stdout);
 
-    
+
 
     /* Check aliasing of a and b */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -170,7 +170,7 @@ main(void)
            flint_printf("d = "), fmpz_poly_print(d), flint_printf("\n");
            fflush(stdout);
            flint_abort();
-        } 
+        }
 
         fmpz_poly_clear(a);
         fmpz_poly_clear(d);
@@ -198,7 +198,7 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL (check 1 == gcd(x^2, 24*x - 32):\n");
-            fmpz_poly_print(d); flint_printf("\n"); 
+            fmpz_poly_print(d); flint_printf("\n");
             fflush(stdout);
             flint_abort();
         }
@@ -227,7 +227,7 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL (check special #2):\n");
-            fmpz_poly_print(d); flint_printf("\n"); 
+            fmpz_poly_print(d); flint_printf("\n");
             fflush(stdout);
             flint_abort();
         }
@@ -239,7 +239,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

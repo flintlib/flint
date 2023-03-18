@@ -13,7 +13,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p) 
+mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
 {
     slong i, r, m, iter;
     mp_limb_t p1, k, b, g, bpow, gpow, res;
@@ -38,7 +38,7 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
         {
             t2 = n_addmod(t2, 2*t + 1, p);
             t++;
-            
+
             if (t2 == a)
                 return t;
         }
@@ -48,7 +48,7 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
 
     if (n_is_square(p)) /* modulus is a square */
        return 0;
-   
+
     if ((p & 1) == 0) /* modulus is even */
        return 0;
 
@@ -78,7 +78,7 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
     p1 = p - 1;
 
     do {
-        p1 >>= UWORD(1); 
+        p1 >>= UWORD(1);
         r++;
     } while ((p1 & UWORD(1)) == 0);
 
@@ -93,7 +93,7 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
     res = n_powmod2_ui_preinv(a, (p1 + 1) / 2, p, pinv);
 
     iter = r - 1; /* maximum number of iterations possible if p is prime */
-    
+
     while (b != 1)
     {
         bpow = b;

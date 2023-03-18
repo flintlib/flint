@@ -22,14 +22,14 @@ void fmpz_mod_poly_sub_series(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
 
     if (n < 0)
        n = 0;
- 
+
     max = FLINT_MIN(max, n);
     len1 = FLINT_MIN(poly1->length, max);
     len2 = FLINT_MIN(poly2->length, max);
 
     fmpz_mod_poly_fit_length(res, max, ctx);
 
-    _fmpz_mod_poly_sub(res->coeffs, poly1->coeffs, len1, 
+    _fmpz_mod_poly_sub(res->coeffs, poly1->coeffs, len1,
                                poly2->coeffs, len2, fmpz_mod_ctx_modulus(ctx));
 
     _fmpz_mod_poly_set_length(res, max);

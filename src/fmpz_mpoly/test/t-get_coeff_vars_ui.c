@@ -101,7 +101,7 @@ main(void)
         fmpz_mpoly_clear(g, ctx);
         fmpz_mpoly_clear(h, ctx);
         fmpz_mpoly_clear(m, ctx);
-        fmpz_mpoly_ctx_clear(ctx);  
+        fmpz_mpoly_ctx_clear(ctx);
     }
 
     /* check 2 variable sum of coefficients */
@@ -167,11 +167,11 @@ main(void)
         fmpz_mpoly_clear(g, ctx);
         fmpz_mpoly_clear(h, ctx);
         fmpz_mpoly_clear(m, ctx);
-        fmpz_mpoly_ctx_clear(ctx);  
+        fmpz_mpoly_ctx_clear(ctx);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

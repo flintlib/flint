@@ -18,7 +18,7 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("transpose....");
     fflush(stdout);
@@ -100,7 +100,7 @@ main(void)
         fmpq_mat_clear(B);
     }
 
-    
+
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

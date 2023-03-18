@@ -15,7 +15,7 @@
 int n_divides(mp_limb_t * q, mp_limb_t n, mp_limb_t p)
 {
    mp_limb_t quo, rem;
-  
+
    if (p == 0)
    {
       *q = 0;

@@ -18,7 +18,7 @@
 #define NF_ELEM_H
 
 #ifdef NF_ELEM_INLINES_C
-#define NF_ELEM_INLINE 
+#define NF_ELEM_INLINE
 #else
 #define NF_ELEM_INLINE static __inline__
 #endif
@@ -307,7 +307,7 @@ void nf_elem_scalar_mul_fmpz(nf_elem_t a, const nf_elem_t b,
 
 void nf_elem_scalar_mul_fmpq(nf_elem_t a, const nf_elem_t b,
                                                      const fmpq_t c, const nf_t nf);
-									
+
 void nf_elem_scalar_div_si(nf_elem_t a, const nf_elem_t b,
                                                       slong c, const nf_t nf);
 
@@ -316,7 +316,7 @@ void nf_elem_scalar_div_fmpz(nf_elem_t a, const nf_elem_t b,
 
 void nf_elem_scalar_div_fmpq(nf_elem_t a, const nf_elem_t b,
                                                      const fmpq_t c, const nf_t nf);
-									
+
 void _nf_elem_add_lf(nf_elem_t a, const nf_elem_t b,
                                    const nf_elem_t c, const nf_t nf, int can);
 

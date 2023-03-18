@@ -17,7 +17,7 @@ main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("solve_fraction_free....");
     fflush(stdout);
@@ -119,7 +119,7 @@ main(void)
         fmpz_clear(den);
     }
 
-    
+
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

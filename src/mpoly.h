@@ -14,7 +14,7 @@
 #define MPOLY_H
 
 #ifdef MPOLY_INLINES_C
-#define MPOLY_INLINE 
+#define MPOLY_INLINE
 #else
 #define MPOLY_INLINE static __inline__
 #endif
@@ -822,7 +822,7 @@ int mpoly_monomial_lt_nomask(const ulong * exp2, const ulong * exp3, slong N)
     } while (--i >= 0);
     return 0;
 }
- 
+
 MPOLY_INLINE
 int mpoly_monomial_gt_nomask(const ulong * exp2, const ulong * exp3, slong N)
 {
@@ -850,7 +850,7 @@ int mpoly_monomial_lt_nomask_extra(const ulong * exp2, const ulong * exp3,
     } while (--i >= 0);
     return 0;
 }
- 
+
 MPOLY_INLINE
 int mpoly_monomial_gt_nomask_extra(const ulong * exp2, const ulong * exp3,
                                             slong N, slong offset, ulong extra)
@@ -939,16 +939,16 @@ void mpoly_max_degrees_tight(slong * max_exp,
                              ulong * exps, slong len, slong * prods, slong num)
 {
    slong i, j;
-   
+
    for (j = 0; j < num; j++)
       max_exp[j] = 0;
-	  
+
    for (i = 0; i < len; i++)
    {
       for (j = 0; j < num; j++)
 	  {
 	     slong d1 = (exps[i] % prods[j + 1])/prods[j];
-      
+
 	     if (d1 > max_exp[j])
 		    max_exp[j] = d1;
 	  }
@@ -1021,7 +1021,7 @@ void mpoly_gen_monomial_offset_shift_sp(ulong * mexp, slong * offset,
 void mpoly_gen_monomial_sp(ulong * oneexp, slong var,
                                      flint_bitcnt_t bits, const mpoly_ctx_t mctx);
 
-slong mpoly_gen_offset_mp(slong var, 
+slong mpoly_gen_offset_mp(slong var,
                                      flint_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 slong mpoly_gen_monomial_offset_mp(ulong * mexp, slong var,
@@ -1161,7 +1161,7 @@ int mpoly_repack_monomials(ulong * exps1, flint_bitcnt_t bits1,
                                                        const mpoly_ctx_t mctx);
 
 void mpoly_pack_monomials_tight(ulong * exp1,
-                  const ulong * exp2, slong len, const slong * mults, 
+                  const ulong * exp2, slong len, const slong * mults,
                                                         slong num, slong bits);
 
 void mpoly_unpack_monomials_tight(ulong * e1, ulong * e2, slong len,
@@ -1598,7 +1598,7 @@ int mpoly_parse_parse(mpoly_parse_t E, void * res,
    variables, each taking the given number of bits in the exponent. This
    assumes there are l1 "coefficients" in a list of len1 exponents.
    Note this doesn't currently mask the relevant bits.
-*/ 
+*/
 MPOLY_INLINE
 void mpoly_main_variable_terms1(slong * i1, slong * n1, const ulong * exp1,
                           slong l1, slong len1, slong k, slong num, slong bits)

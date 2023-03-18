@@ -23,7 +23,7 @@ void _fmpz_mpoly_realloc(fmpz ** poly, ulong ** exps,
 
     if (len > *alloc)
         memset(*poly + *alloc, 0, (len - *alloc)*sizeof(fmpz));
-    
+
     (*alloc) = len;
 }
 

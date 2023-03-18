@@ -27,9 +27,9 @@ main(int argc, char** argv)
     fq_poly_t f, g, h, hinv, res;
 
     double s[nalgs];
-    
+
     FLINT_TEST_INIT(state);
-    
+
     fmpz_init(p);
     fmpz_set_str(p, argv[1], 10);
 
@@ -46,10 +46,10 @@ main(int argc, char** argv)
     fq_poly_init(hinv, ctx);
 
     fq_poly_init(res, ctx);
-    
+
     for (c = 0; c < nalgs; c++)
         s[c] = 0.0;
-            
+
     for (n = 0; n < ncases; n++)
     {
         double t[nalgs];
@@ -65,7 +65,7 @@ main(int argc, char** argv)
             fq_poly_reverse(hinv, h, h->length, ctx);
             fq_poly_inv_series_newton(hinv, hinv, h->length, ctx);
         }
-                
+
     loop:
 
         t[0] = 0.0;
@@ -75,7 +75,7 @@ main(int argc, char** argv)
             fq_poly_compose_mod_horner_preinv(res, f, g, h, hinv, ctx);
         prof_stop();
         t[0] += get_clock(0);
-                
+
         t[1] = 0.0;
         init_clock(0);
         prof_start();
@@ -90,12 +90,12 @@ main(int argc, char** argv)
                 loops *= 10;
                 goto loop;
             }
-                
+
         for (c = 0; c < nalgs; c++)
             s[c] += t[c];
         reps += loops;
     }
-            
+
     for (c = 0; c < nalgs; c++)
     {
         printf("%20f", s[c] / (double) reps);
@@ -103,7 +103,7 @@ main(int argc, char** argv)
     }
     printf("\n");
 
-    
+
     fq_poly_clear(f, ctx);
     fq_poly_clear(g, ctx);
     fq_poly_clear(h, ctx);
@@ -113,6 +113,6 @@ main(int argc, char** argv)
     fmpz_clear(p);
 
     FLINT_TEST_CLEANUP(state);
-    
+
     return 0;
 }

@@ -19,11 +19,11 @@ main(void)
 {
     int cflags = 0, i, result;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("gcd....");
     fflush(stdout);
 
-    
+
 
     /* Check aliasing of a and c */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -109,7 +109,7 @@ main(void)
 
         cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
         cflags |= fmpq_poly_is_canonical(c) ? 0 : 2;
-        result = (fmpq_poly_equal(a, c) && !cflags 
+        result = (fmpq_poly_equal(a, c) && !cflags
                   && (fmpq_poly_is_zero(c) || fmpq_poly_is_monic(c)));
         if (!result)
         {
@@ -188,7 +188,7 @@ main(void)
 
         cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
         cflags |= fmpq_poly_is_canonical(c) ? 0 : 2;
-        result = (fmpq_poly_equal(a, c) && !cflags 
+        result = (fmpq_poly_equal(a, c) && !cflags
                   && (fmpq_poly_is_zero(c) || fmpq_poly_is_monic(c)));
         if (!result)
         {
@@ -252,7 +252,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

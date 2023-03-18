@@ -15,8 +15,8 @@
 #define FQ_NMOD_H
 
 #ifdef FQ_NMOD_INLINES_C
-#define FQ_NMOD_INLINE 
-#define FQ_TEMPLATES_INLINE 
+#define FQ_NMOD_INLINE
+#define FQ_TEMPLATES_INLINE
 #else
 #define FQ_NMOD_INLINE static __inline__
 #define FQ_TEMPLATES_INLINE static __inline__
@@ -168,7 +168,7 @@ FQ_NMOD_INLINE void fq_nmod_clear(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
     nmod_poly_clear(rop);
 }
 
-FQ_NMOD_INLINE 
+FQ_NMOD_INLINE
 void _fq_nmod_sparse_reduce(mp_limb_t *R, slong lenR, const fq_nmod_ctx_t ctx)
 {
     slong i, k;
@@ -202,7 +202,7 @@ FQ_NMOD_INLINE void _fq_nmod_dense_reduce(mp_limb_t* R, slong lenR, const fq_nmo
     q = _nmod_vec_init(lenR - ctx->modulus->length + 1);
     r = _nmod_vec_init(ctx->modulus->length - 1);
 
-    _nmod_poly_divrem_newton_n_preinv(q, r, R, lenR, 
+    _nmod_poly_divrem_newton_n_preinv(q, r, R, lenR,
                                       ctx->modulus->coeffs, ctx->modulus->length,
                                       ctx->inv->coeffs, ctx->inv->length,
                                       ctx->mod);
@@ -218,7 +218,7 @@ FQ_NMOD_INLINE void _fq_nmod_reduce(mp_limb_t* R, slong lenR, const fq_nmod_ctx_
     if (ctx->sparse_modulus)
         _fq_nmod_sparse_reduce(R, lenR, ctx);
     else
-        _fq_nmod_dense_reduce(R, lenR, ctx);    
+        _fq_nmod_dense_reduce(R, lenR, ctx);
 }
 
 FQ_NMOD_INLINE void fq_nmod_reduce(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
@@ -393,25 +393,25 @@ void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b,
 
 /* Output ********************************************************************/
 
-FQ_NMOD_INLINE 
+FQ_NMOD_INLINE
 int fq_nmod_fprint(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 {
     return nmod_poly_fprint(file, op);
 }
 
-FQ_NMOD_INLINE 
+FQ_NMOD_INLINE
 void fq_nmod_print(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 {
     nmod_poly_print(op);
 }
 
-FQ_NMOD_INLINE 
+FQ_NMOD_INLINE
 int fq_nmod_fprint_pretty(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 {
     return nmod_poly_fprint_pretty(file, op, ctx->var);
 }
 
-FQ_NMOD_INLINE 
+FQ_NMOD_INLINE
 void fq_nmod_print_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 {
     nmod_poly_print_pretty(op, ctx->var);
@@ -423,17 +423,17 @@ char * fq_nmod_get_str_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
 /* Special functions *********************************************************/
 
-void _fq_nmod_trace(fmpz_t rop, const mp_limb_t *op, slong len, 
+void _fq_nmod_trace(fmpz_t rop, const mp_limb_t *op, slong len,
                     const fq_nmod_ctx_t ctx);
 
 void fq_nmod_trace(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
-void _fq_nmod_frobenius(mp_limb_t *rop, const mp_limb_t *op, slong len, slong e, 
+void _fq_nmod_frobenius(mp_limb_t *rop, const mp_limb_t *op, slong len, slong e,
                         const fq_nmod_ctx_t ctx);
 
 void fq_nmod_frobenius(fq_nmod_t rop, const fq_nmod_t op, slong e, const fq_nmod_ctx_t ctx);
 
-void _fq_nmod_norm(fmpz_t rop, const mp_limb_t *op, slong len, 
+void _fq_nmod_norm(fmpz_t rop, const mp_limb_t *op, slong len,
                    const fq_nmod_ctx_t ctx);
 
 void fq_nmod_norm(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);

@@ -524,9 +524,9 @@ namespace rules {
 
 FLINT_DEFINE_DOIT_COND2(assignment, PADICXX_COND_T, PADICXX_COND_S,
         padic_set(to._padic(), from._padic(), to._ctx()))
-FLINT_DEFINE_DOIT_COND2(assignment, PADICXX_COND_T, traits::is_signed_integer, 
+FLINT_DEFINE_DOIT_COND2(assignment, PADICXX_COND_T, traits::is_signed_integer,
         padic_set_si(to._padic(), from, to._ctx()))
-FLINT_DEFINE_DOIT_COND2(assignment, PADICXX_COND_T, traits::is_unsigned_integer, 
+FLINT_DEFINE_DOIT_COND2(assignment, PADICXX_COND_T, traits::is_unsigned_integer,
         padic_set_ui(to._padic(), from, to._ctx()))
 FLINT_DEFINE_DOIT_COND2(assignment, PADICXX_COND_T, FMPZXX_COND_S,
         padic_set_fmpz(to._padic(), from._fmpz(), to._ctx()))

@@ -20,8 +20,8 @@ main(void)
     int i, j, result = 1;
     fmpz_t t;
     FLINT_TEST_INIT(state);
-    
-    
+
+
     flint_printf("derivative....");
     fflush(stdout);
 
@@ -32,13 +32,13 @@ main(void)
     {
         nmod_poly_t a, b;
         mp_limb_t n = n_randtest_not_zero(state);
-        
+
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_randtest(a, state, n_randint(state, 100));
-        
+
         nmod_poly_derivative(b, a);
-        
+
         if (a->length <= 1)
             result = (b->length == 0);
         else
@@ -51,7 +51,7 @@ main(void)
                 result &= (fmpz_get_ui(t) == nmod_poly_get_coeff_ui(b, j - 1));
             }
         }
-        
+
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -73,14 +73,14 @@ main(void)
     {
         nmod_poly_t a, b;
         mp_limb_t n = n_randtest_not_zero(state);
-        
+
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_randtest(a, state, n_randint(state, 100));
-        
+
         nmod_poly_derivative(b, a);
         nmod_poly_derivative(a, a);
-        
+
         result = nmod_poly_equal(a, b);
         if (!result)
         {
@@ -97,7 +97,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

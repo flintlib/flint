@@ -14,13 +14,13 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-int _fmpq_poly_cmp(const fmpz * lpoly, const fmpz_t lden, 
+int _fmpq_poly_cmp(const fmpz * lpoly, const fmpz_t lden,
                    const fmpz * rpoly, const fmpz_t rden, slong len)
 {
     int ans;
     slong i = len - 1;
     fmpz_t lcoeff, rcoeff;
-    
+
     if (fmpz_equal(lden, rden))
     {
         while (i && fmpz_equal(lpoly + i, rpoly + i))
@@ -67,13 +67,13 @@ int _fmpq_poly_cmp(const fmpz * lpoly, const fmpz_t lden,
 int fmpq_poly_cmp(const fmpq_poly_t left, const fmpq_poly_t right)
 {
     slong len1, len2;
-    
+
     if (left == right)
         return 0;
-    
+
     len1 = left->length;
     len2 = right->length;
-    
+
     if (len1 < len2)
         return -1;
     else if (len1 > len2)

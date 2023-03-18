@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Sebastian Pancratz 
+    Copyright (C) 2012 Sebastian Pancratz
     Copyright (C) 2012 Andres Goens
     Copyright (C) 2013 Mike Hansen
 
@@ -47,7 +47,7 @@ main(void)
         TEMPLATE(T, randtest)(a, state, ctx);
 
         TEMPLATE(T, trace)(x, a, ctx);
-        
+
         TEMPLATE(T, zero)(b, ctx);
         for (j = 0; j < TEMPLATE(T, ctx_degree)(ctx); j++)
         {

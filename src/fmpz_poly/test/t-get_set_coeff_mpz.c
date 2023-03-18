@@ -23,7 +23,7 @@ main(void)
     flint_printf("get/set_coeff_mpz....");
     fflush(stdout);
 
-    
+
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -68,7 +68,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

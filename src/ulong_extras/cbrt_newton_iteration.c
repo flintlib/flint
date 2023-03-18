@@ -29,14 +29,14 @@ n_cbrt_newton_iteration(mp_limb_t n)
 #else
     const mp_limb_t  upper_limit = 1625;    /* 1625 < (2^32)^(1/3) */
 #endif
-    
+
     val = (double)n;
-    bits = FLINT_BIT_COUNT(n); 
+    bits = FLINT_BIT_COUNT(n);
     if (bits < 46)      /* one iteration seems to be sufficient for n < 2^46 */
         iter = 1;
     else
         iter = 2;       /* 2 gives us a precise enough answer for any mp_limb_t */
-    
+
     x = n_cbrt_estimate((double)n);         /* initial estimate */
 
     /* Newton's iterations to get cube root */
@@ -46,13 +46,13 @@ n_cbrt_newton_iteration(mp_limb_t n)
         xsq = x * x;
         dx = val / xsq;
         dx -= x;
-        dx *= 0.333333333333333;     /* dx = dx * (1/3) */     
+        dx *= 0.333333333333333;     /* dx = dx * (1/3) */
         x += dx;
     }
     /* In case ret^3 or (ret+1)^3 will cause overflow */
 
     ret = x;
-    if (ret >= upper_limit)      
+    if (ret >= upper_limit)
     {
         if (n >= upper_limit * upper_limit * upper_limit)
             return upper_limit;

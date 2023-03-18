@@ -14,7 +14,7 @@
 #define NMOD_VEC_H
 
 #ifdef NMOD_VEC_INLINES_C
-#define NMOD_VEC_INLINE 
+#define NMOD_VEC_INLINE
 #else
 #define NMOD_VEC_INLINE static __inline__
 #endif
@@ -94,25 +94,25 @@ int _nmod_vec_is_zero(mp_srcptr vec, slong len)
    return 1;
 }
 
-void _nmod_vec_reduce(mp_ptr res, mp_srcptr vec, 
+void _nmod_vec_reduce(mp_ptr res, mp_srcptr vec,
                                         slong len, nmod_t mod);
 
-void _nmod_vec_add(mp_ptr res, mp_srcptr vec1, 
+void _nmod_vec_add(mp_ptr res, mp_srcptr vec1,
                         mp_srcptr vec2, slong len, nmod_t mod);
 
-void _nmod_vec_sub(mp_ptr res, mp_srcptr vec1, 
+void _nmod_vec_sub(mp_ptr res, mp_srcptr vec1,
                         mp_srcptr vec2, slong len, nmod_t mod);
 
-void _nmod_vec_neg(mp_ptr res, mp_srcptr vec, 
+void _nmod_vec_neg(mp_ptr res, mp_srcptr vec,
                                             slong len, nmod_t mod);
 
-void _nmod_vec_scalar_mul_nmod(mp_ptr res, mp_srcptr vec, 
+void _nmod_vec_scalar_mul_nmod(mp_ptr res, mp_srcptr vec,
                             slong len, mp_limb_t c, nmod_t mod);
 
-void _nmod_vec_scalar_mul_nmod_shoup(mp_ptr res, mp_srcptr vec, 
+void _nmod_vec_scalar_mul_nmod_shoup(mp_ptr res, mp_srcptr vec,
                             slong len, mp_limb_t c, nmod_t mod);
 
-void _nmod_vec_scalar_addmul_nmod(mp_ptr res, mp_srcptr vec, 
+void _nmod_vec_scalar_addmul_nmod(mp_ptr res, mp_srcptr vec,
                             slong len, mp_limb_t c, nmod_t mod);
 
 int _nmod_vec_dot_bound_limbs(slong len, nmod_t mod);

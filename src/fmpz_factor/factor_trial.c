@@ -74,11 +74,11 @@ fmpz_factor_trial(fmpz_factor_t factor, const fmpz_t n, slong num_primes)
     if (found)
     {
         primes = n_primes_arr_readonly(3512);
-        
+
         for (i = 0; i < found; i++)
         {
             p = primes[idx[i]];
-        
+
             exp = 1;
             xsize = flint_mpn_divexact_1(xd, xsize, p);
 

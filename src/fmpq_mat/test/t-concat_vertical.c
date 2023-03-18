@@ -24,7 +24,7 @@ int main(void)
 
     flint_printf("concat_vertical....");
     fflush(stdout);
-    
+
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -44,7 +44,7 @@ int main(void)
         fmpz_mat_randtest(C, state, n_randint(state, 200) + 1);
 
         fmpz_mat_concat_vertical(C, A, B);
-        
+
         fmpz_mat_window_init(window1, C, 0, 0, r1, c1);
         fmpz_mat_window_init(window2, C, r1, 0, (r1 + r2), c1);
 
@@ -56,7 +56,7 @@ int main(void)
             flint_abort();
         }
 
-        
+
         fmpz_mat_clear(A);
         fmpz_mat_clear(B);
         fmpz_mat_clear(C);
@@ -67,7 +67,7 @@ int main(void)
 
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

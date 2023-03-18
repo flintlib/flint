@@ -27,11 +27,11 @@ fmpq_poly_shift_left(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
         fmpq_poly_zero(res);
         return;
     }
-    
+
     fmpq_poly_fit_length(res, poly->length + n);
-    
+
     _fmpz_poly_shift_left(res->coeffs, poly->coeffs, poly->length, n);
     fmpz_set(res->den, poly->den);
-    
+
     _fmpq_poly_set_length(res, poly->length + n);
 }

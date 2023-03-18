@@ -24,7 +24,7 @@ main(void)
     fmpz_poly_t a;
 
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("get_str_pretty....");
     fflush(stdout);
 

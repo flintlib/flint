@@ -43,7 +43,7 @@ main(void)
         fmpz_mod_poly_init(b, ctx);
         fmpz_mod_poly_init(c, ctx);
 
-        do 
+        do
             fmpz_mod_poly_randtest(b, state, n_randint(state, 100), ctx);
         while (b->length < 3);
         fmpz_mod_poly_randtest(a, state, n_randint(state, 100), ctx);
@@ -85,7 +85,7 @@ main(void)
         fmpz_mod_poly_init(b, ctx);
         fmpz_mod_poly_init(c, ctx);
 
-        do 
+        do
             fmpz_mod_poly_randtest(b, state, n_randint(state, 100), ctx);
         while (b->length < 3);
         fmpz_mod_poly_randtest(a, state, n_randint(state, 100), ctx);
@@ -130,7 +130,7 @@ main(void)
         fmpz_mod_poly_init(t, ctx);
         fmpz_mod_poly_init(u, ctx);
 
-        do 
+        do
             fmpz_mod_poly_randtest(b, state, n_randint(state, 100), ctx);
         while (b->length < 3);
         fmpz_mod_poly_randtest(a, state, n_randint(state, 100), ctx);
@@ -138,8 +138,8 @@ main(void)
         ans = fmpz_mod_poly_invmod(u, a, b, ctx);
         fmpz_mod_poly_xgcd(g, s, t, a, b, ctx);
 
-        result = (((ans) && g->length == 1 
-                        && fmpz_is_one(g->coeffs) && fmpz_mod_poly_equal(s, u, ctx)) 
+        result = (((ans) && g->length == 1
+                        && fmpz_is_one(g->coeffs) && fmpz_mod_poly_equal(s, u, ctx))
                  || (!(ans) && g->length > 1));
 
         if (!result)
@@ -183,11 +183,11 @@ main(void)
         fmpz_mod_poly_init(f, ctx);
         fmpz_mod_poly_init(u, ctx);
 
-        do 
+        do
             fmpz_mod_poly_randtest(b, state, n_randint(state, 100), ctx);
         while (b->length < 2);
         fmpz_mod_poly_randtest(a, state, n_randint(state, 100), ctx);
-        do 
+        do
             fmpz_mod_poly_randtest_not_zero(f, state, n_randint(state, 20) + 1, ctx);
         while (f->length < 2);
         fmpz_mod_poly_mul(a, f, a, ctx);
@@ -217,7 +217,7 @@ main(void)
 
     fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

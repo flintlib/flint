@@ -14,7 +14,7 @@
 #define FMPZ_MOD_POLY_FACTOR_H
 
 #ifdef FMPZ_MOD_POLY_FACTOR_INLINES_C
-#define FMPZ_MOD_POLY_FACTOR_INLINE 
+#define FMPZ_MOD_POLY_FACTOR_INLINE
 #else
 #define FMPZ_MOD_POLY_FACTOR_INLINE static __inline__
 #endif
@@ -97,12 +97,12 @@ int fmpz_mod_poly_is_irreducible_ddf(const fmpz_mod_poly_t f,
 int fmpz_mod_poly_is_irreducible_rabin(const fmpz_mod_poly_t f,
                                                      const fmpz_mod_ctx_t ctx);
 
-int fmpz_mod_poly_is_irreducible_rabin_f(fmpz_t fac, 
+int fmpz_mod_poly_is_irreducible_rabin_f(fmpz_t fac,
                             const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx);
 
 int _fmpz_mod_poly_is_squarefree(const fmpz * f, slong len, const fmpz_t p);
 
-int _fmpz_mod_poly_is_squarefree_f(fmpz_t fac, 
+int _fmpz_mod_poly_is_squarefree_f(fmpz_t fac,
                                     const fmpz * f, slong len, const fmpz_t p);
 
 int fmpz_mod_poly_is_squarefree(const fmpz_mod_poly_t f,

@@ -28,7 +28,7 @@ void mpoly_unpack_vec_ui(ulong * exp1, const ulong * exp2, flint_bitcnt_t bits,
             shift += bits;      /* number of bits to encode 0th field */
             while (++i < nfields)
             {
-                if (shift + bits > FLINT_BITS) 
+                if (shift + bits > FLINT_BITS)
                 {
                     u = *exp2++;
                     shift = 0;

@@ -16,7 +16,7 @@ int main(void)
 {
     int i, j;
     FLINT_TEST_INIT(state);
-   
+
     flint_printf("unity_zp_pow_2k....");
     fflush(stdout);
 
@@ -73,7 +73,7 @@ int main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

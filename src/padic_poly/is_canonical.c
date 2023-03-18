@@ -11,7 +11,7 @@
 
 #include "padic_poly.h"
 
-int _padic_poly_is_canonical(const fmpz *op, slong val, slong len, 
+int _padic_poly_is_canonical(const fmpz *op, slong val, slong len,
                              const padic_ctx_t ctx)
 {
     if (len == 0)

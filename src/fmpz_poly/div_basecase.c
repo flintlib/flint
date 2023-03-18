@@ -48,7 +48,7 @@ _fmpz_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA,
 
     if (exact)
         fmpz_init(r);
-    
+
     while (lenA >= lenB)
     {
         if (fmpz_cmpabs(R + lenA - 1, leadB) < 0)
@@ -88,7 +88,7 @@ _fmpz_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA,
     }
 
 cleanup:
-        
+
     if (exact)
         fmpz_clear(r);
 
@@ -99,12 +99,12 @@ cleanup:
 }
 
 void
-fmpz_poly_div_basecase(fmpz_poly_t Q, 
+fmpz_poly_div_basecase(fmpz_poly_t Q,
                        const fmpz_poly_t A, const fmpz_poly_t B)
 {
     slong lenq;
     fmpz *q;
-    
+
     if (B->length == 0)
     {
         flint_printf("Exception (fmpz_poly_div_basecase). Division by zero.\n");

@@ -29,11 +29,11 @@ int main(void)
 
     flint_randinit(state);
 
-    for (i = 1; i < 30000; i++) 
+    for (i = 1; i < 30000; i++)
     {
         num = qfb_reduced_forms(&forms, -i);
         num2 = qfb_reduced_forms_large(&forms2, -i);
-        
+
         result = (num == num2);
         for (j = 0; result == 1 && j < num; j++)
         {
@@ -45,11 +45,11 @@ int main(void)
 
             if (!result) break;
         }
-        
+
         if (!result)
         {
             printf("FAIL:\n");
-            
+
             if (num == num2)
             {
                 qfb_print(forms + j);
@@ -58,7 +58,7 @@ int main(void)
                 printf("\n");
              } else
                 printf("%ld != %ld\n", num, num2);
-            
+
             flint_abort();
         }
 

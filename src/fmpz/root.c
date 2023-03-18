@@ -18,7 +18,7 @@ int
 fmpz_root(fmpz_t r, const fmpz_t f, slong n)
 {
     fmpz c = *f;
-    
+
     if (n <= 0)
     {
         flint_printf("Exception (fmpz_root). Unable to take %wd-th root.\n", n);
@@ -30,7 +30,7 @@ fmpz_root(fmpz_t r, const fmpz_t f, slong n)
         fmpz_set(r, f);
         return 1;
     }
-    
+
     if (!COEFF_IS_MPZ(c)) /* f is small */
     {
         mp_limb_t rem, root;
@@ -66,7 +66,7 @@ fmpz_root(fmpz_t r, const fmpz_t f, slong n)
                 } else /* odd */
                     c = -c;
             }
-            
+
             root = n_rootrem(&rem, c, n);
             fmpz_set_si(r, sgn ? -root : root);
             return rem == 0;
@@ -75,7 +75,7 @@ fmpz_root(fmpz_t r, const fmpz_t f, slong n)
     {
         __mpz_struct * mpz2 = COEFF_TO_PTR(c);
         __mpz_struct * mpz1 = _fmpz_promote(r);
-            
+
         int exact = mpz_root(mpz1, mpz2, n);
         _fmpz_demote_val(r); /* root may be small */
 

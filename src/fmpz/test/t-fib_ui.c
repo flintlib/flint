@@ -21,7 +21,7 @@ main(void)
     fmpz_t x, y, z, w;
 
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("fib_ui....");
     fflush(stdout);
 

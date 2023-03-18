@@ -192,7 +192,7 @@ _fmpq_mat_can_solve_multi_mod(fmpq_mat_t X,
                break; /* everything the same : accept */
         }
 
-        fmpz_mat_CRT_ui(x, x, pprod, Xmod, 0); 
+        fmpz_mat_CRT_ui(x, x, pprod, Xmod, 0);
         fmpz_mul_ui(pprod, pprod, p);
     }
 
@@ -265,7 +265,7 @@ int fmpq_mat_can_solve_multi_mod(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_ma
         flint_printf("Exception (fmpq_mat_can_solve_multi_mod). Incompatible matrix dimensions.\n");
         flint_abort();
     }
-    
+
     if (A->r == 0)
     {
         fmpq_mat_zero(X);

@@ -22,7 +22,7 @@ main(void)
     flint_printf("log... ");
     fflush(stdout);
 
-    
+
 
 /** p == 2 *******************************************************************/
 
@@ -96,14 +96,14 @@ main(void)
         qadic_init2(g, N);
 
         qadic_randtest_not_zero(a, state, ctx);
-        if (a->val < 1) 
+        if (a->val < 1)
             a->val = 1;
         padic_poly_reduce(a, &ctx->pctx);
         qadic_one(c);
         qadic_add(a, a, c, ctx);
 
         qadic_randtest_not_zero(b, state, ctx);
-        if (b->val < 1) 
+        if (b->val < 1)
             b->val = 1;
         padic_poly_reduce(b, &ctx->pctx);
         qadic_one(c);
@@ -188,7 +188,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

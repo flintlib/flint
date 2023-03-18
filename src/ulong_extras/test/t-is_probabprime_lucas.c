@@ -21,11 +21,11 @@ int main(void)
    mpz_t d_m;
    slong test_multiplier;
    FLINT_TEST_INIT(state);
-   
-   
+
+
    flint_printf("is_probabprime_lucas....");
    fflush(stdout);
- 
+
    test_multiplier = FLINT_MAX(1, flint_test_multiplier());
 
    for (i = 0; i < 10000 * test_multiplier; i++) /* Test that primes pass the test */
@@ -44,14 +44,14 @@ int main(void)
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("d = %wu is declared composite\n", d); 
+         flint_printf("d = %wu is declared composite\n", d);
          fflush(stdout);
          flint_abort();
       }
 
       mpz_clear(d_m);
    }
-         
+
    for (i = 0; i < 10000 * test_multiplier; i++) /* Test that not too many composites pass */
    {
       mpz_init(d_m);
@@ -63,21 +63,21 @@ int main(void)
       } while (mpz_probab_prime_p(d_m, 12));
 
       if (n_is_probabprime_lucas(d) == 1) count++;
-      
+
       mpz_clear(d_m);
    }
-      
+
    result = (count < 20 * test_multiplier);
    if (!result)
    {
       flint_printf("FAIL:\n");
-      flint_printf("%wu composites declared prime\n", count); 
+      flint_printf("%wu composites declared prime\n", count);
       fflush(stdout);
       flint_abort();
    }
 
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

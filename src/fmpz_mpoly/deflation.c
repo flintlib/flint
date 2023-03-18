@@ -12,7 +12,7 @@
 #include "fmpz_mpoly.h"
 
 
-void fmpz_mpoly_deflation(fmpz * shift, fmpz * stride, 
+void fmpz_mpoly_deflation(fmpz * shift, fmpz * stride,
                               const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 {
 

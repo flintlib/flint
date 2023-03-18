@@ -102,7 +102,7 @@ fmpz_poly_revert_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
         fmpz_poly_swap(Qinv, t);
         fmpz_poly_clear(t);
     }
-    
+
     _fmpz_poly_set_length(Qinv, n);
     _fmpz_poly_normalise(Qinv);
 }

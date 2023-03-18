@@ -138,7 +138,7 @@ int fq_nmod_mpoly_factor_irred_lgprime_zassenhaus(
     fq_nmod_mpoly_t eA;
     bad_fq_nmod_mpoly_embed_chooser_t embc;
     bad_fq_nmod_embed_struct * cur_emb;
-    fq_nmod_mpoly_ctx_t ectx;    
+    fq_nmod_mpoly_ctx_t ectx;
 
     cur_emb = bad_fq_nmod_mpoly_embed_chooser_init(embc, ectx, ctx, state);
 

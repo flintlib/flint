@@ -119,7 +119,7 @@ static void fq_nmod_mpoly_set_eval_helper3(
         if (its_new)
         {
             n_poly_init2(Wc, 4);
-            Wc->coeffs[0] = i;                
+            Wc->coeffs[0] = i;
             Wc->length = 1;
         }
         else
@@ -229,7 +229,7 @@ static void fq_nmod_mpoly_set_evalp_helper3(
         if (its_new)
         {
             n_poly_init2(Wc, 4);
-            Wc->coeffs[0] = i;                
+            Wc->coeffs[0] = i;
             Wc->length = 1;
         }
         else
@@ -361,7 +361,7 @@ static slong fq_nmod_mpoly_set_eval_helper_and_zip_form3(
             if (its_new)
             {
                 n_poly_init2(Wc, 4);
-                Wc->coeffs[0] = i;                
+                Wc->coeffs[0] = i;
                 Wc->length = 1;
             }
             else
@@ -518,7 +518,7 @@ static slong fq_nmod_mpoly_set_evalp_helper_and_zip_form3(
             if (its_new)
             {
                 n_poly_init2(Wc, 4);
-                Wc->coeffs[0] = i;                
+                Wc->coeffs[0] = i;
                 Wc->length = 1;
             }
             else
@@ -717,7 +717,7 @@ static void fq_nmod_polyu3_add_zip_limit1(
             n_poly_fit_length(Zcoeffs + Zi, d*fit_length);
             Zcoeffs[Zi].length = cur_length;
             flint_mpn_zero(Zcoeffs[Zi].coeffs, d*cur_length);
-            goto in_both;            
+            goto in_both;
         }
         else if (Aexps[Ai] + ai < Zexps[Zi])
         {

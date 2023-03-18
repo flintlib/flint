@@ -1201,7 +1201,7 @@ fexpr_write_latex_divsum(calcium_stream_t out, const fexpr_t expr, ulong flags)
 
     if (need_parens)
         calcium_write(out, "\\right)");
-}    
+}
 
 void
 fexpr_write_latex_integral(calcium_stream_t out, const fexpr_t expr, ulong flags)

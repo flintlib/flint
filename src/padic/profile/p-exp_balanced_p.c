@@ -12,7 +12,7 @@
 /*
     Benchmarks for the p-adic exponential method, balanced.
 
-    We consider the set-up with p = 17, N = 2^i, i = 0, ..., 19, 
+    We consider the set-up with p = 17, N = 2^i, i = 0, ..., 19,
     and compute the exponential of d = 17 a, a = 3^{3 N} mod p^N.
  */
 
@@ -29,15 +29,15 @@ main(void)
 {
     long l, len = 20;
     long runs[] = {
-        100000000, 1000000, 100000, 100000, 100000, 
-        10000, 10000, 10000, 10000, 1000, 
-        1000, 100, 100, 10, 10, 
+        100000000, 1000000, 100000, 100000, 100000,
+        10000, 10000, 10000, 10000, 1000,
+        1000, 100, 100, 10, 10,
         1, 1, 1, 1, 1
     };
     long N[] = {
-        1, 2, 4, 8, 16, 
-        32, 64, 128, 256, 512, 
-        1024, WORD(1) << 11, WORD(1) << 12, WORD(1) << 13, WORD(1) << 14, 
+        1, 2, 4, 8, 16,
+        32, 64, 128, 256, 512,
+        1024, WORD(1) << 11, WORD(1) << 12, WORD(1) << 13, WORD(1) << 14,
         WORD(1) << 15, WORD(1) << 16, WORD(1) << 17, WORD(1) << 18, WORD(1) << 19
     };
     long T[20] = {0};
@@ -73,7 +73,7 @@ for (l = 0; l < len; l++)
         fmpz_pow_ui(padic_unit(d), f, 3 * n);
         fmpz_mod(padic_unit(d), padic_unit(d), pow);
         padic_val(d) = 1;
-        
+
         fmpz_clear(pow);
     }
 
@@ -89,7 +89,7 @@ for (l = 0; l < len; l++)
 
     T[l] = (slong) (cputime * (1000000000 / runs[l]));
 
-    flint_printf("%2ld, %4XYXYXYXY, %9ld, %wd\n", 
+    flint_printf("%2ld, %4XYXYXYXY, %9ld, %wd\n",
         l, cputime, runs[l], T[l]);
 
     padic_clear(d);

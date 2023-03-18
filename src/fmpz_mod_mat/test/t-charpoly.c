@@ -40,7 +40,7 @@ int main(void)
         fmpz_mod_mat_init(C, n, n, fmpz_mod_ctx_modulus(ctx));
         fmpz_mod_mat_randtest(A, state);
         fmpz_mod_mat_randtest(B, state);
-        
+
         fmpz_mod_mat_mul(C, A, B);
         fmpz_mod_mat_charpoly(p1, C, ctx);
         fmpz_mod_mat_mul(C, B, A);

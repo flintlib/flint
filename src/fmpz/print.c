@@ -14,9 +14,9 @@
 
 int fmpz_print(const fmpz_t x)
 {
-	if (!COEFF_IS_MPZ(*x)) 
+	if (!COEFF_IS_MPZ(*x))
         return flint_printf("%wd", *x);
-	else 
+	else
         return (int) mpz_out_str(stdout, 10, COEFF_TO_PTR(*x));
 }
 

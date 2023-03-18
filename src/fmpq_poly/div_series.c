@@ -14,8 +14,8 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-void 
-_fmpq_poly_div_series(fmpz * Q, fmpz_t Qden, 
+void
+_fmpq_poly_div_series(fmpz * Q, fmpz_t Qden,
                       const fmpz * A, const fmpz_t Aden, slong Alen,
                       const fmpz * B, const fmpz_t Bden, slong Blen, slong n)
 {
@@ -32,7 +32,7 @@ _fmpq_poly_div_series(fmpz * Q, fmpz_t Qden,
     fmpz_clear(Cden);
 }
 
-void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A, 
+void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A,
                                          const fmpq_poly_t B, slong n)
 {
     if (A->length == 0)

@@ -13,7 +13,7 @@
 #define D_VEC_H
 
 #ifdef D_VEC_INLINES_C
-#define D_VEC_INLINE 
+#define D_VEC_INLINE
 #else
 #define D_VEC_INLINE static __inline__
 #endif
@@ -32,7 +32,7 @@ void _d_vec_clear(double * vec);
 
 /*  Randomisation  ***********************************************************/
 
-void _d_vec_randtest(double * f, flint_rand_t state, 
+void _d_vec_randtest(double * f, flint_rand_t state,
                         slong len, slong minexp, slong maxexp);
 
 /*  Assignment and basic manipulation  ***************************************/

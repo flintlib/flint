@@ -31,7 +31,7 @@ _fmpz_poly_div_series_divconquer(fmpz * Q, const fmpz * A, slong Alen,
 
         flint_printf("Not an exact division\n");
         flint_abort();
-    } 
+    }
 
     _fmpz_poly_reverse(Q, Q, n, n);
 

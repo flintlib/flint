@@ -13,7 +13,7 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, mat_minpoly) (TEMPLATE(T, poly_t) p, 
+TEMPLATE(T, mat_minpoly) (TEMPLATE(T, poly_t) p,
                       const TEMPLATE(T, mat_t) X, const TEMPLATE(T, ctx_t) ctx)
 {
    slong n = X->r, i, j, c, c1, c2, r1, r2;
@@ -59,7 +59,7 @@ TEMPLATE(T, mat_minpoly) (TEMPLATE(T, poly_t) p,
    TEMPLATE(T, mat_init) (A, n + 1, 2*n + 1, ctx);
    TEMPLATE(T, mat_init) (B, n, n, ctx);
    TEMPLATE(T, mat_init) (v, n, 1, ctx);
- 
+
    L1 = (slong *) TMP_ALLOC((n + 1)*sizeof(slong));
    L2 = (slong *) TMP_ALLOC(n*sizeof(slong));
    P1 = (slong *) TMP_ALLOC((2*n + 1)*sizeof(slong));
@@ -107,12 +107,12 @@ TEMPLATE(T, mat_minpoly) (TEMPLATE(T, poly_t) p,
       {
          r1++;
          r2 = indep ? r2 + 1 : r2;
-         
+
          TEMPLATE(T, mat_mul) (v, X, v, ctx);
-         
+
          for (i = 0; i < n; i++)
             TEMPLATE(T, set) (TEMPLATE(T, mat_entry) (A, r1, i), TEMPLATE(T, mat_entry) (v, i, 0), ctx);
-         
+
          for (i = n; i < n + r1; i++)
             TEMPLATE(T, zero) (TEMPLATE(T, mat_entry) (A, r1, i), ctx);
 
@@ -140,7 +140,7 @@ TEMPLATE(T, mat_minpoly) (TEMPLATE(T, poly_t) p,
       }
 
       c = -WORD(1);
-         
+
       for (i = c2 + 1; i < n; i++)
       {
          if (P2[i] == -WORD(1))
@@ -153,7 +153,7 @@ TEMPLATE(T, mat_minpoly) (TEMPLATE(T, poly_t) p,
       c2 = c;
 
       TEMPLATE(T, poly_fit_length) (b, r1 + 1, ctx);
-        
+
       TEMPLATE(T, inv) (h, TEMPLATE(T, mat_entry) (A, r1, n + r1), ctx);
 
       for (i = 0; i < r1 + 1; i++)
@@ -162,7 +162,7 @@ TEMPLATE(T, mat_minpoly) (TEMPLATE(T, poly_t) p,
          TEMPLATE(T, poly_set_coeff) (b, i, t, ctx);
       }
       _TEMPLATE(T, poly_set_length) (b, r1 + 1, ctx);
-      
+
       TEMPLATE(T, poly_gcd) (g, p, b, ctx);
       TEMPLATE(T, poly_mul) (p, p, b, ctx);
       TEMPLATE(T, poly_divrem) (p, r, p, g, ctx);
@@ -174,7 +174,7 @@ TEMPLATE(T, mat_minpoly) (TEMPLATE(T, poly_t) p,
             for (j = 0; j < n; j++)
                TEMPLATE(T, set) (TEMPLATE(T, mat_entry) (B, i, j),  TEMPLATE(T, mat_entry) (A, i, j), ctx);
          }
-      } 
+      }
 
       first_poly = 0;
    }

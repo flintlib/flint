@@ -12,11 +12,11 @@
 #include "flint.h"
 #include "mpn_extras.h"
 
-/* 
+/*
    TODO: speedup mpir's mullow and mulhigh and use instead of mul/mul_n
-*/  
+*/
 
-void flint_mpn_mod_preinvn(mp_ptr rp, mp_srcptr ap, mp_size_t m, 
+void flint_mpn_mod_preinvn(mp_ptr rp, mp_srcptr ap, mp_size_t m,
                           mp_srcptr d, mp_size_t n, mp_srcptr dinv)
 {
    mp_limb_t cy;
@@ -63,14 +63,14 @@ void flint_mpn_mod_preinvn(mp_ptr rp, mp_srcptr ap, mp_size_t m,
    {
       if (rp != ap)
          mpn_copyi(rp, ap, size);
-      
+
       mpn_mul(t, dinv, n, rp + n, size);
       cy = mpn_add_n(t + 2*n, t + n, rp + n, size);
 
       mpn_mul(t, d, n, t + 2*n, size);
       if (cy)
          mpn_add_n(t + size, t + size, d, n + 1 - size);
-      
+
       cy = rp[n] - t[n] - mpn_sub_n(rp, rp, t, n);
 
       while (cy > 0)

@@ -32,7 +32,7 @@ fmpz_poly_mat_swap_rows(fmpz_poly_mat_t mat, slong * perm, slong r, slong s)
 
         u = mat->rows[s];
         mat->rows[s] = mat->rows[r];
-        mat->rows[r] = u; 
+        mat->rows[r] = u;
     }
 }
 

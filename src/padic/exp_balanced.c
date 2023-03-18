@@ -13,7 +13,7 @@
 #include "padic.h"
 
 /*
-    Computes the sum 
+    Computes the sum
     \begin{equation*}
     (a-1)! x^{1-a} \sum_{i=a}^{b-1} \frac{x^i}{i!}.
     \end{equation*}
@@ -23,7 +23,7 @@
 
     If $a + 1 = b$, sets $P = x$, $Q = a$, and $T = x$.
     If $a + 2 = b$, sets $P = x^2$, $Q = a (a + 1)$, $T = x (a + 1) + x^2$.
-    In general, sets 
+    In general, sets
     \begin{align*}
     P & = x^{b-a}, \\
     Q & = \frac{(b-1)!}{(a-1)!}, \\
@@ -76,7 +76,7 @@ _padic_exp_bsplit_series(fmpz_t P, fmpz_t Q, fmpz_t T,
 /*
     Assumes that $x$ is such that $\exp(x)$ converges.
 
-    Assumes that $v = \ord_p(x)$ with $v < N$, 
+    Assumes that $v = \ord_p(x)$ with $v < N$,
     which also forces $N$ to positive.
 
     The result $y$ might not be reduced modulo $p^N$.
@@ -154,7 +154,7 @@ void _padic_exp_balanced_2(fmpz_t rop, const fmpz_t xu, slong xv, slong N)
     fmpz_clear(t);
 }
 
-void _padic_exp_balanced_p(fmpz_t rop, const fmpz_t xu, slong xv, 
+void _padic_exp_balanced_p(fmpz_t rop, const fmpz_t xu, slong xv,
                                        const fmpz_t p, slong N)
 {
     fmpz_t r, t, pw, pN;
@@ -199,7 +199,7 @@ void _padic_exp_balanced_p(fmpz_t rop, const fmpz_t xu, slong xv,
 }
 
 /*
-    Assumes that the exponential series converges at $x \neq 0$, 
+    Assumes that the exponential series converges at $x \neq 0$,
     and that $\ord_p(x) < N$.
 
     Supports aliasing between $x$ and $y$.
@@ -207,7 +207,7 @@ void _padic_exp_balanced_p(fmpz_t rop, const fmpz_t xu, slong xv,
     TODO:  Take advantage of additional factors of $p$ in $x$.
  */
 
-void _padic_exp_balanced(fmpz_t rop, const fmpz_t u, slong v, 
+void _padic_exp_balanced(fmpz_t rop, const fmpz_t u, slong v,
                                      const fmpz_t p, slong N)
 {
     if (fmpz_equal_ui(p, 2))
@@ -236,7 +236,7 @@ int padic_exp_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     {
         if (v < N)
         {
-            _padic_exp_balanced(padic_unit(rop), 
+            _padic_exp_balanced(padic_unit(rop),
                                 padic_unit(op), padic_val(op), p, N);
             padic_val(rop) = 0;
         }

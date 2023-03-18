@@ -27,12 +27,12 @@ fmpz_mod_poly_factor_kaltofen_shoup(fmpz_mod_poly_factor_t res,
 
     fmpz_mod_poly_init(t, ctx);
     fmpz_mod_poly_make_monic(t, poly, ctx);
-    
+
     if (poly->length <= 2)
     {
         fmpz_mod_poly_factor_insert(res, t, 1, ctx);
         fmpz_mod_poly_clear(t, ctx);
-        return;        
+        return;
     }
 
     fmpz_mod_poly_init(DDxp, ctx);

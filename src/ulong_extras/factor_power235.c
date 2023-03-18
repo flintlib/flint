@@ -27,7 +27,7 @@ mp_limb_t n_factor_power235(ulong * exp, mp_limb_t n)
    static char mod31[31] = {7,7,3,0,3,5,4,1,3,1,1,0,0,0,1,2,3,0,1,1,1,0,
                             0,2,0,5,4,2,1,2,6};
    char t;
-   
+
    t = mod31[n%31];
    if (!t) return UWORD(0);
 
@@ -39,7 +39,7 @@ mp_limb_t n_factor_power235(ulong * exp, mp_limb_t n)
 
    t&= mod63[n%63];
 
-   if (t & 1) 
+   if (t & 1)
    {
       double x = sqrt((double) n);
       mp_limb_t y = (mp_limb_t) (x + 0.5);
@@ -49,8 +49,8 @@ mp_limb_t n_factor_power235(ulong * exp, mp_limb_t n)
          return y;
       }
    }
-    
-   if (t & 2) 
+
+   if (t & 2)
    {
       double x = pow((double) n, 1.0 / 3.0);
       mp_limb_t y = (mp_limb_t) (x + 0.5);
@@ -60,8 +60,8 @@ mp_limb_t n_factor_power235(ulong * exp, mp_limb_t n)
          return y;
       }
    }
-    
-   if (t & 4) 
+
+   if (t & 4)
    {
       double x = pow((double) n, 1.0 / 5.0);
       mp_limb_t y = (mp_limb_t) (x + 0.5);

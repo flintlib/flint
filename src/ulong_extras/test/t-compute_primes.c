@@ -23,7 +23,7 @@ int main()
 
     flint_printf("compute_primes....");
     fflush(stdout);
-    
+
 
     ref_primes = flint_malloc(sizeof(mp_limb_t) * lim);
     ref_inverses = flint_malloc(sizeof(double) * lim);
@@ -65,7 +65,7 @@ int main()
     flint_free(ref_primes);
     flint_free(ref_inverses);
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

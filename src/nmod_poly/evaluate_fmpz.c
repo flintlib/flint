@@ -35,7 +35,7 @@ _nmod_poly_evaluate_fmpz(fmpz_t rop, mp_srcptr poly, const slong len, const fmpz
     }
 
     m = len - 1;
-    
+
 
     fmpz_init(t);
     fmpz_set_ui(rop, poly[m]);

@@ -27,7 +27,7 @@ void sample(void * arg, ulong count)
 {
    gcd_t * params = (gcd_t *) arg;
    ulong i, j;
-   
+
    for (i = 0; i < count; i++)
    {
       prof_start();
@@ -43,7 +43,7 @@ void fill_array(ulong * ret, flint_bitcnt_t bits, flint_rand_t state)
 {
    ulong n;
    ulong i;
-   
+
    for (i = 0; i < 1024; i++)
    {
 	  n = n_randbits(state, bits);
@@ -57,20 +57,20 @@ int main(void)
    gcd_t params;
    int i;
    FLINT_TEST_INIT(state);
-   
+
 
    params.rnums1 = flint_malloc(1024*sizeof(ulong));
    params.rnums2 = flint_malloc(1024*sizeof(ulong));
 
    flint_printf("n_gcd:\n");
-   
+
    for (i = 1; i <= 64; i++)
    {
       fill_array(params.rnums1, i, state);
       params.bits1 = i;
 		  fill_array(params.rnums2, i, state);
 		  prof_repeat(&min, &max, sample, &params);
-		  flint_printf("bits1 = %d, bits2 = %d, time is %.3f us\n", 
+		  flint_printf("bits1 = %d, bits2 = %d, time is %.3f us\n",
 						i, i, max/(double)ITERS);
 	}
 

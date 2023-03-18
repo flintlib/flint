@@ -134,7 +134,7 @@ int main()
         if (success1 && success2)
         {
             if (!check_jordan_forms(lambda1, num_blocks1, block_lambda1, block_size1,
-                                    lambda2, num_blocks2, block_lambda2, block_size2, ctx)) 
+                                    lambda2, num_blocks2, block_lambda2, block_size2, ctx))
             {
                 flint_printf("FAIL (different Jordan forms)\n");
                 flint_printf("A: "); ca_mat_print(A, ctx); flint_printf("\n");
@@ -211,7 +211,7 @@ int main()
         if (success1 && success2)
         {
             if (!check_jordan_forms(lambda1, num_blocks1, block_lambda1, block_size1,
-                                    lambda2, num_blocks2, block_lambda2, block_size2, ctx)) 
+                                    lambda2, num_blocks2, block_lambda2, block_size2, ctx))
             {
                 flint_printf("FAIL (different jordan forms)\n");
                 flint_printf("A: "); ca_mat_print(A, ctx); flint_printf("\n");

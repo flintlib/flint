@@ -250,7 +250,7 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
                 sub_ddmmss(yexp_hi, yexp_lo, yexp_hi, yexp_lo, 0, 1);
             }
             yman[0] = hi;
-    
+
             if (exp & (UWORD(1) << i))
             {
                 /* y = y * a: exponent */

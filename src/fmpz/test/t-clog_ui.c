@@ -22,7 +22,7 @@ main(void)
     flint_printf("clog_ui....");
     fflush(stdout);
 
-    
+
 
     /* Check correctness */
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
@@ -100,7 +100,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

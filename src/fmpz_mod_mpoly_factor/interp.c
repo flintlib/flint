@@ -623,7 +623,7 @@ int fmpz_mod_mpolyn_interp_crt_sm_poly(
             }
             else
             {
-                fmpz_mod_poly_set(Tcoeff + Ti, Fcoeff + Fi, ctx->ffinfo);                
+                fmpz_mod_poly_set(Tcoeff + Ti, Fcoeff + Fi, ctx->ffinfo);
             }
 
             (Texp + N*Ti)[off] = (Fexp + N*Fi)[off];
@@ -1211,7 +1211,7 @@ int fmpz_mod_mpolyn_interp_crt_sm_mpoly(
             }
             else
             {
-                fmpz_mod_poly_set(Tcoeff + k, Fcoeff + i, ctx->ffinfo);                
+                fmpz_mod_poly_set(Tcoeff + k, Fcoeff + i, ctx->ffinfo);
             }
 
             FLINT_ASSERT(!fmpz_mod_poly_is_zero(Tcoeff + k, ctx->ffinfo));
@@ -1252,7 +1252,7 @@ int fmpz_mod_mpolyn_interp_crt_sm_mpoly(
             }
             else
             {
-                fmpz_mod_poly_set(Tcoeff + k, Fcoeff + i, ctx->ffinfo);            
+                fmpz_mod_poly_set(Tcoeff + k, Fcoeff + i, ctx->ffinfo);
             }
             FLINT_ASSERT(!fmpz_mod_poly_is_zero(Tcoeff + k, ctx->ffinfo));
             lastlen = FLINT_MAX(lastlen, Tcoeff[k].length);

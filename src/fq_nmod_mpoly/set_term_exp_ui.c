@@ -11,7 +11,7 @@
 
 #include "fq_nmod_mpoly.h"
 
-void fq_nmod_mpoly_set_term_exp_ui(fq_nmod_mpoly_t A, 
+void fq_nmod_mpoly_set_term_exp_ui(fq_nmod_mpoly_t A,
                      slong i, const ulong * exp, const fq_nmod_mpoly_ctx_t ctx)
 {
     slong N;

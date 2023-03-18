@@ -31,16 +31,16 @@ void sample(void * arg, ulong count)
    slong i;
    mp_ptr vec1, vec2, res;
    FLINT_TEST_INIT(state);
-      
+
    n = n_randbits(state, bits);
    if (n == UWORD(0)) n++;
-      
+
    nmod_init(&mod, n);
 
    vec1 = _nmod_vec_init(1000);
    vec2 = _nmod_vec_init(1000);
    res = _nmod_vec_init(1000);
-     
+
    for (j = 0; j < 1000; j++)
       vec1[j] = n_randint(state, n);
 
@@ -86,7 +86,7 @@ int main(void)
 
       if (i != FLINT_BITS)
       {
-        flint_printf("bits %wd, mul = %.1lf c/l\n", 
+        flint_printf("bits %wd, mul = %.1lf c/l\n",
            i, (min1/(double)FLINT_CLOCK_SCALE_FACTOR)/1000);
       }
       else
@@ -94,7 +94,7 @@ int main(void)
         info.fullword = 1;
         prof_repeat(&min2, &max, sample, (void *) &info);
 
-        flint_printf("bits %wd, mul = %.1lf c/l, mul_fullword = %.1lf c/l\n", 
+        flint_printf("bits %wd, mul = %.1lf c/l, mul_fullword = %.1lf c/l\n",
            i, (min1/(double)FLINT_CLOCK_SCALE_FACTOR)/1000,
               (min2/(double)FLINT_CLOCK_SCALE_FACTOR)/1000);
       }

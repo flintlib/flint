@@ -117,7 +117,7 @@ void fq_nmod_mpoly_add(
         fq_nmod_mpoly_t T;
         fq_nmod_mpoly_init(T, ctx);
         fq_nmod_mpoly_fit_length_reset_bits(T, B->length + C->length, Abits, ctx);
-        Alen = _fq_nmod_mpoly_add(T->coeffs, T->exps, 
+        Alen = _fq_nmod_mpoly_add(T->coeffs, T->exps,
                                       B->coeffs, Bexps, B->length,
                                       C->coeffs, Cexps, C->length,
                                                        N, cmpmask, ctx->fqctx);
@@ -127,14 +127,14 @@ void fq_nmod_mpoly_add(
     else
     {
         fq_nmod_mpoly_fit_length_reset_bits(A, B->length + C->length, Abits, ctx);
-        Alen = _fq_nmod_mpoly_add(A->coeffs, A->exps, 
+        Alen = _fq_nmod_mpoly_add(A->coeffs, A->exps,
                                       B->coeffs, Bexps, B->length,
                                       C->coeffs, Cexps, C->length,
                                                        N, cmpmask, ctx->fqctx);
     }
 
     _fq_nmod_mpoly_set_length(A, Alen, ctx);
-      
+
     if (freeBexps)
         flint_free(Bexps);
 

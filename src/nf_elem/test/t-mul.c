@@ -36,7 +36,7 @@ main(void)
         nf_elem_t a, b, c, s, p, p1, p2;
 
         nf_init_randtest(nf, state, 40, 200);
-        
+
         nf_elem_init(a, nf);
         nf_elem_init(b, nf);
         nf_elem_init(c, nf);
@@ -48,7 +48,7 @@ main(void)
         nf_elem_randtest(a, state, 200, nf);
         nf_elem_randtest(b, state, 200, nf);
         nf_elem_randtest(c, state, 200, nf);
-        
+
         nf_elem_add(s, b, c, nf);
         nf_elem_mul(p1, a, b, nf);
         nf_elem_mul(p2, a, c, nf);
@@ -77,10 +77,10 @@ main(void)
         nf_elem_clear(p, nf);
         nf_elem_clear(p1, nf);
         nf_elem_clear(p2, nf);
-         
+
         nf_clear(nf);
     }
-    
+
     /* test aliasing a and b */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -95,10 +95,10 @@ main(void)
 
         nf_elem_randtest(b, state, 200, nf);
         nf_elem_randtest(c, state, 200, nf);
-        
+
         nf_elem_mul(a, b, c, nf);
         nf_elem_mul(b, b, c, nf);
-        
+
         result = (nf_elem_equal(a, b, nf));
         if (!result)
         {
@@ -112,7 +112,7 @@ main(void)
         nf_elem_clear(a, nf);
         nf_elem_clear(b, nf);
         nf_elem_clear(c, nf);
-         
+
         nf_clear(nf);
     }
 
@@ -123,17 +123,17 @@ main(void)
         nf_elem_t a, b, c;
 
         nf_init_randtest(nf, state, 40, 200);
-        
+
         nf_elem_init(a, nf);
         nf_elem_init(b, nf);
         nf_elem_init(c, nf);
 
         nf_elem_randtest(b, state, 200, nf);
         nf_elem_randtest(c, state, 200, nf);
-        
+
         nf_elem_mul(a, b, c, nf);
         nf_elem_mul(c, b, c, nf);
-        
+
         result = (nf_elem_equal(a, c, nf));
         if (!result)
         {
@@ -147,7 +147,7 @@ main(void)
         nf_elem_clear(a, nf);
         nf_elem_clear(b, nf);
         nf_elem_clear(c, nf);
-         
+
         nf_clear(nf);
     }
 

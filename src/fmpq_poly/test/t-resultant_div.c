@@ -39,7 +39,7 @@ main(void)
         fmpq_init(y);
         fmpq_init(z);
         fmpq_init(zz);
-        
+
         fmpz_init(den);
 
         fmpq_poly_randtest(f, state, n_randint(state, 50), 100);
@@ -58,7 +58,7 @@ main(void)
         fmpq_poly_mul(p, f, g);
 
         fmpq_poly_resultant(x, f, h);
-        
+
         if (!fmpz_is_one(fmpq_denref(x)))
         {
             flint_printf("FAIL resultant not integral\n");
@@ -70,7 +70,7 @@ main(void)
         }
 
         fmpq_poly_resultant(y, g, h);
-        
+
         if (!fmpz_is_one(fmpq_denref(y)))
         {
             flint_printf("FAIL resultant not integral\n");
@@ -93,7 +93,7 @@ main(void)
             flint_abort();
         }
 
-        if (fmpq_is_zero(z)) 
+        if (fmpq_is_zero(z))
         {
             fmpq_poly_clear(f);
             fmpq_poly_clear(g);
@@ -104,18 +104,18 @@ main(void)
             fmpq_clear(y);
             fmpq_clear(z);
             fmpq_clear(zz);
-        
+
             fmpz_clear(den);
             continue;
         }
-    
+
         nbits = (slong)fmpz_bits(fmpq_numref(y)) + 1;
 
         fmpq_poly_resultant_div(z, p, h, fmpq_numref(x), nbits);
         fmpq_poly_resultant(zz, p, h);
 
         result = fmpq_equal(z, y);
-        
+
         if (!result)
         {
             flint_printf("FAIL (res(p, g)/div == res(p, g)/div:\n");
@@ -130,7 +130,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         fmpq_poly_clear(f);
         fmpq_poly_clear(g);
         fmpq_poly_clear(h);
@@ -140,12 +140,12 @@ main(void)
         fmpq_clear(y);
         fmpq_clear(z);
         fmpq_clear(zz);
-        
+
         fmpz_clear(den);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

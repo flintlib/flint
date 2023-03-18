@@ -66,7 +66,7 @@ main(void)
     FLINT_TEST_INIT(state);
 
     flint_printf("rref_mod....");
-    fflush(stdout);    
+    fflush(stdout);
 
     /* Maximally sparse matrices of given rank */
     for (i = 0; i < 10000; i++)
@@ -153,7 +153,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

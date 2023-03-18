@@ -18,8 +18,8 @@ main(void)
 {
     int i, result = 1;
     FLINT_TEST_INIT(state);
-    
-    
+
+
     flint_printf("compose_horner....");
     fflush(stdout);
 
@@ -28,13 +28,13 @@ main(void)
     {
         nmod_poly_t a, r, xp1, xm1;
         mp_limb_t n = n_randtest_not_zero(state);
-        
+
         nmod_poly_init(a, n);
         nmod_poly_init(r, n);
         nmod_poly_init(xm1, n);
         nmod_poly_init(xp1, n);
         nmod_poly_randtest(a, state, n_randint(state, 100));
-        
+
         nmod_poly_set_coeff_ui(xm1, 1, 1);
         nmod_poly_set_coeff_ui(xm1, 0, n - 1);
         nmod_poly_set_coeff_ui(xp1, 1, 1);
@@ -42,7 +42,7 @@ main(void)
 
         nmod_poly_compose_horner(r, a, xm1);
         nmod_poly_compose_horner(r, r, xp1);
-        
+
         result = nmod_poly_equal(a, r);
         if (!result)
         {
@@ -65,7 +65,7 @@ main(void)
     {
         nmod_poly_t a, b, c, r1, r2;
         mp_limb_t n = n_randtest_not_zero(state);
-        
+
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
@@ -74,14 +74,14 @@ main(void)
         nmod_poly_randtest(a, state, n_randint(state, 30));
         nmod_poly_randtest(b, state, n_randint(state, 30));
         nmod_poly_randtest(c, state, n_randint(state, 10));
-        
+
         nmod_poly_compose_horner(r1, a, c);
         nmod_poly_compose_horner(r2, b, c);
         nmod_poly_add(r1, r1, r2);
 
         nmod_poly_add(a, a, b);
         nmod_poly_compose_horner(r2, a, c);
-        
+
         result = nmod_poly_equal(r1, r2);
         if (!result)
         {
@@ -102,7 +102,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

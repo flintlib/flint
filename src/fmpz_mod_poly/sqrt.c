@@ -60,7 +60,7 @@ _fmpz_mod_poly_sqrt(fmpz * s, const fmpz * p, slong len, fmpz_mod_ctx_t mod)
     fmpz_init(d);
 
     fmpz_set(d, p + 0);
-    fmpz_set(c, d); 
+    fmpz_set(c, d);
 
     if (!fmpz_is_one(c))
     {

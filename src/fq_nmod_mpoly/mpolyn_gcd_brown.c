@@ -373,7 +373,7 @@ choose_prime:
         fq_nmod_mpolyn_one(G, ctx);
         fq_nmod_mpolyn_swap(Abar, A);
         fq_nmod_mpolyn_swap(Bbar, B);
-        goto successful_put_content;    
+        goto successful_put_content;
     }
 
     if (fq_nmod_poly_degree(modulus, ctx->fqctx) > 0)

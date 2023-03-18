@@ -14,7 +14,7 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
-void _fmpq_poly_pow(fmpz * rpoly, fmpz_t rden, 
+void _fmpq_poly_pow(fmpz * rpoly, fmpz_t rden,
                     const fmpz * poly, const fmpz_t den, slong len, ulong e)
 {
     _fmpz_poly_pow(rpoly, poly, len, e);

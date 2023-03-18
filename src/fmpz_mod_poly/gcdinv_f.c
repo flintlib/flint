@@ -13,8 +13,8 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
-slong _fmpz_mod_poly_gcdinv_f(fmpz_t f, fmpz *G, fmpz *S, 
-                           const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
+slong _fmpz_mod_poly_gcdinv_f(fmpz_t f, fmpz *G, fmpz *S,
+                           const fmpz *A, slong lenA, const fmpz *B, slong lenB,
                            const fmpz_t p)
 {
     fmpz *T;
@@ -28,24 +28,24 @@ slong _fmpz_mod_poly_gcdinv_f(fmpz_t f, fmpz *G, fmpz *S,
     {
         if (lenB < 16)
         {
-            ans = _fmpz_mod_poly_gcdinv_euclidean_f(f, G, S, 
+            ans = _fmpz_mod_poly_gcdinv_euclidean_f(f, G, S,
 			                               A, lenA, B, lenB, inv, p);
         } else
         {
             T = _fmpz_vec_init(lenA - 1);
-    
+
             ans = _fmpz_mod_poly_xgcd_f(f, G, T, S, B, lenB, A, lenA, inv, p);
-            
+
             _fmpz_vec_clear(T, lenA - 1);
         }
     }
-	
+
     fmpz_clear(inv);
 
     return ans;
 }
 
-void fmpz_mod_poly_gcdinv_f(fmpz_t f, fmpz_mod_poly_t G, fmpz_mod_poly_t S, 
+void fmpz_mod_poly_gcdinv_f(fmpz_t f, fmpz_mod_poly_t G, fmpz_mod_poly_t S,
                             const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
                                                       const fmpz_mod_ctx_t ctx)
 {
@@ -76,7 +76,7 @@ void fmpz_mod_poly_gcdinv_f(fmpz_t f, fmpz_mod_poly_t G, fmpz_mod_poly_t S,
         fmpz_mod_poly_zero(G, ctx);
         fmpz_mod_poly_zero(S, ctx);
         fmpz_one(f);
-    } 
+    }
     else
     {
         fmpz *g, *s;
@@ -101,7 +101,7 @@ void fmpz_mod_poly_gcdinv_f(fmpz_t f, fmpz_mod_poly_t G, fmpz_mod_poly_t S,
             s = S->coeffs;
         }
 
-        lenG = _fmpz_mod_poly_gcdinv_f(f, g, s, 
+        lenG = _fmpz_mod_poly_gcdinv_f(f, g, s,
                   A->coeffs, lenA, B->coeffs, lenB, fmpz_mod_ctx_modulus(ctx));
 
         if (G == A || G == B)

@@ -22,7 +22,7 @@ void fmpq_poly_get_coeff_fmpq(fmpq_t x, const fmpq_poly_t poly, slong n)
         fmpq_zero(x);
         return;
     }
-    
+
     fmpz_set(fmpq_numref(x), poly->coeffs + n);
     fmpz_set(fmpq_denref(x), poly->den);
     fmpq_canonicalise(x);

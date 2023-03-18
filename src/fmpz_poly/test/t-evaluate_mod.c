@@ -24,7 +24,7 @@ main(void)
     flint_printf("evaluate_mod....");
     fflush(stdout);
 
-    
+
 
     /* Compare with evaluation over the integers */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -65,7 +65,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

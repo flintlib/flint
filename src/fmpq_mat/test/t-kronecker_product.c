@@ -16,7 +16,7 @@
 int
 main(void)
 {
-    int r, result;    
+    int r, result;
     fmpq_mat_t A, B, C;
     fmpq_mat_t window1, window2;
     slong m, n, k, l, i, j;
@@ -82,7 +82,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

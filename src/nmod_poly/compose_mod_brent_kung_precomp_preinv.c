@@ -28,7 +28,7 @@ _nmod_poly_reduce_matrix_mod_poly(nmod_mat_t A, const nmod_mat_t B,
     nmod_mat_init(A, m, n, f->mod.n);
 
     tmp1 = _nmod_vec_init(B->c - f->length + 1);
-    
+
     A->rows[0][0] = 1;
 
     for (i = 1; i < m; i++)
@@ -201,14 +201,14 @@ nmod_poly_compose_mod_brent_kung_precomp_preinv(nmod_poly_t res,
     if (res == poly3 || res == poly1 || res == poly3inv)
     {
         nmod_poly_t tmp;
-        
+
         nmod_poly_init_mod(tmp, res->mod);
-        
+
         nmod_poly_compose_mod_brent_kung_precomp_preinv(tmp, poly1, A,
                                                               poly3, poly3inv);
-        
+
         nmod_poly_swap(tmp, res);
-        
+
         nmod_poly_clear(tmp);
 
         return;
@@ -221,6 +221,6 @@ nmod_poly_compose_mod_brent_kung_precomp_preinv(nmod_poly_t res,
                                  poly3inv->coeffs, poly3inv->length, res->mod);
 
     res->length = len;
-    
+
     _nmod_poly_normalise(res);
 }

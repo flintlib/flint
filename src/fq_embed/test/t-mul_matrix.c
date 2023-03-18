@@ -16,7 +16,7 @@ int
 main(void)
 {
     int i;
-    
+
     FLINT_TEST_INIT(state);
 
     flint_printf("mul_matrix... ");
@@ -43,7 +43,7 @@ main(void)
 
         fq_mul(a, a, a, ctx);
         fq_embed_mul_matrix(mat_a_sq, a, ctx);
-        
+
         fmpz_mod_mat_mul(mat_a_a, mat_a, mat_a);
 
         if (!fmpz_mod_mat_equal(mat_a_a, mat_a_sq))

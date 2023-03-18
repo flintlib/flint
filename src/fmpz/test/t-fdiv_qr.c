@@ -22,7 +22,7 @@ main(void)
     flint_printf("fdiv_qr....");
     fflush(stdout);
 
-    
+
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
@@ -44,7 +44,7 @@ main(void)
         mpz_init(s);
 
         fmpz_randbits(a, state, 1000);
-        do { 
+        do {
            fmpz_randbits(b, state, 500);
         } while(fmpz_is_zero(b));
 
@@ -299,7 +299,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

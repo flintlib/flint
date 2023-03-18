@@ -203,7 +203,7 @@ main(void)
         nmod_mpoly_clear(g, ctx);
         nmod_mpoly_clear(h, ctx);
         nmod_mpoly_clear(k, ctx);
-        
+
         nmod_mpoly_ctx_clear(ctx);
     }
 
@@ -389,7 +389,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

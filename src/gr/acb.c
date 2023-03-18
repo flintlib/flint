@@ -191,7 +191,7 @@ _gr_acb_set_d(acb_t res, double x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int 
+int
 _gr_ca_get_acb_with_prec(acb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec);
 
 int

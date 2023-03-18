@@ -36,19 +36,19 @@ main(void)
         nf_elem_t a, b, c;
 
         nf_init_randtest(nf, state, 25, 100);
-        
+
         nf_elem_init(a, nf);
         nf_elem_init(b, nf);
         nf_elem_init(c, nf);
-        
+
         do {
            nf_elem_randtest_not_zero(a, state, 100, nf);
         } while (!_nf_elem_invertible_check(a, nf));
         nf_elem_randtest(b, state, 100, nf);
-           
+
         nf_elem_div(c, b, a, nf);
         nf_elem_mul(c, c, a, nf);
-        
+
         result = (nf_elem_equal(b, c, nf));
         if (!result)
         {
@@ -62,10 +62,10 @@ main(void)
         nf_elem_clear(a, nf);
         nf_elem_clear(b, nf);
         nf_elem_clear(c, nf);
-         
+
         nf_clear(nf);
     }
-    
+
     /* test aliasing a and b */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
@@ -77,15 +77,15 @@ main(void)
         nf_elem_init(a, nf);
         nf_elem_init(b, nf);
         nf_elem_init(c, nf);
-        
+
         nf_elem_randtest(b, state, 100, nf);
         do {
            nf_elem_randtest_not_zero(c, state, 100, nf);
         } while (!_nf_elem_invertible_check(c, nf));
-        
+
         nf_elem_div(a, b, c, nf);
         nf_elem_div(b, b, c, nf);
-        
+
         result = (nf_elem_equal(a, b, nf));
         if (!result)
         {
@@ -98,7 +98,7 @@ main(void)
 
         nf_elem_clear(a, nf);
         nf_elem_clear(b, nf);
-         
+
         nf_clear(nf);
     }
 
@@ -119,16 +119,16 @@ main(void)
         nf_elem_init(a, nf);
         nf_elem_init(b, nf);
         nf_elem_init(c, nf);
-        
+
         nf_elem_randtest(b, state, 100, nf);
-        
+
         do {
            nf_elem_randtest_not_zero(c, state, 100, nf);
         } while (!_nf_elem_invertible_check(c, nf));
-        
+
         nf_elem_div(a, b, c, nf);
         nf_elem_div(c, b, c, nf);
-        
+
         result = (nf_elem_equal(a, c, nf));
         if (!result)
         {
@@ -141,7 +141,7 @@ main(void)
 
         nf_elem_clear(a, nf);
         nf_elem_clear(b, nf);
-         
+
         nf_clear(nf);
 
         fmpq_poly_clear(pol);

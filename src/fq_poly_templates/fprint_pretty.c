@@ -15,7 +15,7 @@
 #include "templates.h"
 
 /*
-    TODO:  When op has only one non-zero term, this 
+    TODO:  When op has only one non-zero term, this
     function would omit the parentheses.
  */
 

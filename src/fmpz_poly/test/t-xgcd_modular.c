@@ -20,11 +20,11 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("xgcd_modular....");
     fflush(stdout);
 
-    
+
 
     /* Check s*f + t*g == r */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
@@ -142,10 +142,10 @@ main(void)
             fmpz_poly_primitive_part(g, g);
             fmpz_poly_gcd_modular(d, f, g);
         } while (d->length != 1);
-        
+
         fmpz_poly_xgcd_modular(r, s, t, f, g);
         fmpz_poly_xgcd_modular(r, f, t, f, g);
-        
+
         result = (fmpz_poly_equal(s, f) || fmpz_is_zero(r));
         if (!result)
         {
@@ -184,10 +184,10 @@ main(void)
             fmpz_poly_primitive_part(g, g);
             fmpz_poly_gcd_modular(d, f, g);
         } while (d->length != 1);
-        
+
         fmpz_poly_xgcd_modular(r, s, t, f, g);
         fmpz_poly_xgcd_modular(r, g, t, f, g);
-        
+
         result = (fmpz_poly_equal(s, g) || fmpz_is_zero(r));
         if (!result)
         {
@@ -226,10 +226,10 @@ main(void)
             fmpz_poly_primitive_part(g, g);
             fmpz_poly_gcd_modular(d, f, g);
         } while (d->length != 1);
-        
+
         fmpz_poly_xgcd_modular(r, s, t, f, g);
         fmpz_poly_xgcd_modular(r, s, f, f, g);
-        
+
         result = (fmpz_poly_equal(t, f) || fmpz_is_zero(r));
         if (!result)
         {
@@ -268,10 +268,10 @@ main(void)
             fmpz_poly_primitive_part(g, g);
             fmpz_poly_gcd_modular(d, f, g);
         } while (d->length != 1);
-        
+
         fmpz_poly_xgcd_modular(r, s, t, f, g);
         fmpz_poly_xgcd_modular(r, s, g, f, g);
-        
+
         result = (fmpz_poly_equal(t, g) || fmpz_is_zero(r));
         if (!result)
         {
@@ -291,7 +291,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

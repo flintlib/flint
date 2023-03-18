@@ -1,7 +1,7 @@
 /*
     Copyright (C) 2012 Fredrik Johansson
     Copyright (C) 2018 William Hart
-    
+
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
@@ -41,7 +41,7 @@ _fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly, slong len, int exact)
 
     /* check whether a square root exists modulo 2 */
     m = (len + 1) / 2;
-    
+
     for (i = ((m - 1) | 1); i < len; i += 2)
         if (!fmpz_is_even(poly + i))
             return 0;
@@ -126,7 +126,7 @@ _fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly, slong len, int exact)
                 fmpz_mul_si(t, res + m - i - 1, -2);
                 _fmpz_vec_scalar_addmul_fmpz(r + len - m, res + i, m - i - 1, t);
             }
-            
+
             if (m > 1)
             {
                 fmpz_fdiv_qr(res + 0, t, r + len - m, u);

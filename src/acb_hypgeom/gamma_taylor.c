@@ -138,7 +138,7 @@ acb_hypgeom_gamma_taylor(acb_t res, const acb_t z, int reciprocal, slong prec)
     short term_prec[ARB_HYPGEOM_GAMMA_TAB_NUM];
     mag_t err;
 
-    if (!acb_is_finite(z) || 
+    if (!acb_is_finite(z) ||
         arf_cmp_2exp_si(arb_midref(acb_imagref(z)), 4) >= 0 ||
         arf_cmp_2exp_si(arb_midref(acb_realref(z)), 10) >= 0)
     {

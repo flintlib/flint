@@ -14,7 +14,7 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-mp_limb_t 
+mp_limb_t
 _nmod_poly_discriminant(mp_srcptr poly, slong len, nmod_t mod)
 {
    mp_ptr der = _nmod_vec_init(len - 1);
@@ -42,11 +42,11 @@ _nmod_poly_discriminant(mp_srcptr poly, slong len, nmod_t mod)
    return res;
 }
 
-mp_limb_t 
+mp_limb_t
 nmod_poly_discriminant(const nmod_poly_t f)
 {
     const slong len = f->length;
-    
+
     if (len <= 1)
         return 0;
     else

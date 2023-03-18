@@ -38,8 +38,8 @@ do {                                                                \
 } while (0)
 
 /*
-    XXX: Incidentally, this implementation currently supports aliasing.  
-    But since this may change in the future, no function other than 
+    XXX: Incidentally, this implementation currently supports aliasing.
+    But since this may change in the future, no function other than
     gr_poly_resultant_hgcd() should rely on this.
  */
 
@@ -116,7 +116,7 @@ int _gr_poly_resultant_hgcd(gr_ptr res, gr_srcptr A, slong lenA,
                 {
                     status |= gr_zero(res, ctx);
                 }
-            
+
                 break;
             }
             else
@@ -159,7 +159,7 @@ int gr_poly_resultant_hgcd(gr_ptr r, const gr_poly_t f,
     slong len2 = g->length;
     int status = GR_SUCCESS;
     slong sz = ctx->sizeof_elem;
-    
+
     if (len1 == 0 || len2 == 0)
     {
         return gr_zero(r, ctx);

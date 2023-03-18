@@ -238,7 +238,7 @@ acb_set_si_si(acb_t z, slong x, slong y)
     arb_set_si(acb_imagref(z), y);
 }
 
-ACB_INLINE void 
+ACB_INLINE void
 acb_set_d_d(acb_t z, double x, double y)
 {
     arb_set_d(acb_realref(z), x);

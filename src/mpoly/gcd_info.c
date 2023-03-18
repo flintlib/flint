@@ -95,7 +95,7 @@ void mpoly_gcd_info_limits(ulong * Amax_exp, ulong * Amin_exp,
             if (Amin_exp[j] > exps[j])
             {
                 Amin_exp[j] = exps[j];
-                Amin_exp_count[j] = 1;            
+                Amin_exp_count[j] = 1;
             }
             else if (Amin_exp[j] == exps[j])
             {
@@ -105,7 +105,7 @@ void mpoly_gcd_info_limits(ulong * Amax_exp, ulong * Amin_exp,
             if (Amax_exp[j] < exps[j])
             {
                 Amax_exp[j] = exps[j];
-                Amax_exp_count[j] = 1;            
+                Amax_exp_count[j] = 1;
             }
             else if (Amax_exp[j] == exps[j])
             {

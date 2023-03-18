@@ -14,7 +14,7 @@
 
 void hashmap1_init(hashmap1_t h)
 {
-   h->data = (hashmap1_elem_s *) flint_calloc(HASHMAP_START_SIZE, 
+   h->data = (hashmap1_elem_s *) flint_calloc(HASHMAP_START_SIZE,
                                                        sizeof(hashmap1_elem_s));
    h->alloc = HASHMAP_START_SIZE;
    h->mask  = HASHMAP_START_MASK;
@@ -30,12 +30,12 @@ void hashmap1_init2(hashmap1_t h, slong size)
 
    while ((WORD(1) << bits) < size)
       bits++;
- 
+
    h->alloc = (WORD(1) << bits);
    h->mask  = h->alloc - 1;
    h->num_used = 0;
 
-   h->data = (hashmap1_elem_s *) flint_calloc(h->alloc, 
+   h->data = (hashmap1_elem_s *) flint_calloc(h->alloc,
                                                        sizeof(hashmap1_elem_s));
 }
 
@@ -85,7 +85,7 @@ void hashmap1_rehash(hashmap1_t h)
       if (tmp[i].in_use == 1)
          hashmap1_insert(tmp[i].key, tmp[i].value, h);
    }
-   
+
    flint_free(tmp);
 }
 

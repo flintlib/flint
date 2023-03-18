@@ -12,8 +12,8 @@
 #include "flint.h"
 #include "mpn_extras.h"
 
-/* ret + (xp,n) = (yp,n)*(zp,n) % 2^b+1  
-   needs (tp,2n) temp space, everything reduced mod 2^b 
+/* ret + (xp,n) = (yp,n)*(zp,n) % 2^b+1
+   needs (tp,2n) temp space, everything reduced mod 2^b
    inputs, outputs are fully reduced
    NOTE: 2n is not the same as 2b rounded up to nearest limb
 */

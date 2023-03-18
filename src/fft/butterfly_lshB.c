@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2009, 2011 William Hart
 
     This file is part of FLINT.
@@ -12,7 +12,7 @@
 #include "flint.h"
 #include "fft.h"
 
-void butterfly_lshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1, 
+void butterfly_lshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1,
                        mp_limb_t * i2, mp_size_t limbs, mp_size_t x, mp_size_t y)
 {
    mp_limb_t cy, cy1, cy2;

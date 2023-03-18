@@ -14,14 +14,14 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_divrem_preinv(fmpz * Q, fmpz * A, slong len1, 
+_fmpz_poly_divrem_preinv(fmpz * Q, fmpz * A, slong len1,
                               const fmpz * B, const fmpz * B_inv, slong len2)
 {
    slong n = len1 - len2 + 1;
    fmpz * P = _fmpz_vec_init(len2 - 1);
 
    _fmpz_poly_div_preinv(Q, A, len1, B, B_inv, len2);
-   
+
    if (len2 - 1 > n)
       _fmpz_poly_mullow(P, B, len2 - 1, Q, n, len2 - 1);
    else
@@ -33,7 +33,7 @@ _fmpz_poly_divrem_preinv(fmpz * Q, fmpz * A, slong len1,
 }
 
 void
-fmpz_poly_divrem_preinv(fmpz_poly_t Q, fmpz_poly_t R, const fmpz_poly_t A, 
+fmpz_poly_divrem_preinv(fmpz_poly_t Q, fmpz_poly_t R, const fmpz_poly_t A,
                                   const fmpz_poly_t B, const fmpz_poly_t B_inv)
 {
     fmpz_poly_t tQ, tR;

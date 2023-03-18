@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2015 Tommy Hofmann 
+    Copyright (C) 2015 Tommy Hofmann
 
     This file is part of FLINT.
 
@@ -61,7 +61,7 @@ _fmpz_ppio(fmpz_t ppi, fmpz_t ppo, fmpz_t a, fmpz_t b)
     fmpz_clear(g);
 }
 
-static void 
+static void
 _fmpz_stab(fmpz_t t, const fmpz_t a, const fmpz_t b, const fmpz_t N)
 {
     fmpz_t g, gg, s, aa, bb;

@@ -40,11 +40,11 @@ char * nmod_poly_get_str_pretty(const nmod_poly_t poly, const char * x)
     for (i = 0; i < poly->length; i++)
     {
         if (poly->coeffs[i]) /* log(2)/log(10) < 0.30103, +3 for +*^ or null*/
-            size += (ulong) ceil(0.30103*FLINT_BIT_COUNT(poly->coeffs[i])) + 
-                    (ulong) ceil(0.30103*FLINT_BIT_COUNT(i)) + strlen(x) + 3; 
+            size += (ulong) ceil(0.30103*FLINT_BIT_COUNT(poly->coeffs[i])) +
+                    (ulong) ceil(0.30103*FLINT_BIT_COUNT(i)) + strlen(x) + 3;
     }
 
-    buf = (char *) flint_malloc(size);  
+    buf = (char *) flint_malloc(size);
     ptr = buf;
     --i;
     if (i == 1)
@@ -83,12 +83,12 @@ char * nmod_poly_get_str_pretty(const nmod_poly_t poly, const char * x)
             default:
                 ptr += flint_sprintf(ptr, "+%wu*%s^%wd", poly->coeffs[i], x, i);
         }
-        
+
     }
     if (i == 1)
-    {   
+    {
         switch (poly->coeffs[1])
-        {   
+        {
             case UWORD(0):
                 break;
             case UWORD(1):

@@ -33,7 +33,7 @@ int main(void)
    qfb_init(pow);
    qfb_init(oldpow);
    qfb_init(twopow);
-   
+
    printf("Enter number to be factored: "); fflush(stdout);
    if (!fmpz_read(n))
    {
@@ -48,16 +48,16 @@ int main(void)
       printf("Read failed\n");
       abort();
    }
-    
+
    /* find prime such that n is a square mod p (or p divides n) */
    if (fmpz_is_even(n))
    {
       printf("Factor: 2\n");
       return 0;
    }
-   
+
    pr = 2;
-   
+
    if (fmpz_fdiv_ui(n, 4) == 3)
    {
       if (fmpz_fdiv_ui(n, 3) == 0)
@@ -73,7 +73,7 @@ int main(void)
    {
       pr = n_nextprime(pr, 0);
       nmodpr = fmpz_fdiv_ui(n, pr);
-      
+
       if (nmodpr == 0) /* pr is a factor */
       {
          printf("Factor: %lu\n", pr);
@@ -85,7 +85,7 @@ int main(void)
 
    /* find prime form of discriminant n */
    qfb_prime_form(pow, n, p);
-   
+
    /* raise to various powers of small primes */
    qfb_pow_ui(pow, pow, n, 59049); /* 3^10 */
    qfb_pow_ui(twopow, pow, n, 4096);
@@ -160,7 +160,7 @@ done:
    qfb_clear(pow);
    qfb_clear(oldpow);
    qfb_clear(twopow);
-   
+
    fmpz_clear(n);
    fmpz_clear(p);
 

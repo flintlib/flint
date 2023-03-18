@@ -36,7 +36,7 @@ int main()
                 flint_printf("FAIL (identity matrix)\n");
                 flint_abort();
             }
-            
+
             /* square zero matrices are transitive */
             bool_mat_zero(A);
             if (!bool_mat_is_transitive(A))

@@ -19,7 +19,7 @@
     For documentation, see fmpz_poly/mullow_karatsuba_n.c
  */
 
-void _fmpz_poly_sqrlow_kara_recursive(fmpz * out, 
+void _fmpz_poly_sqrlow_kara_recursive(fmpz * out,
                                       const fmpz * pol, fmpz * temp, slong len)
 {
     slong m1 = len / 2;
@@ -50,11 +50,11 @@ void _fmpz_poly_sqrlow_kara_recursive(fmpz * out,
     _fmpz_vec_add(out + m1, out + m1, temp, m2);
 }
 
-/* 
+/*
     Assumes poly1 and poly2 are not length 0.
 
-    We almost get away with temporary space of length 2 * len, 
-    but in the recursion we might need 4 * \ceil{len/2}, which 
+    We almost get away with temporary space of length 2 * len,
+    but in the recursion we might need 4 * \ceil{len/2}, which
     exceeds 2 * len by at most 2.
 */
 void _fmpz_poly_sqrlow_karatsuba_n(fmpz * res, const fmpz * poly, slong n)

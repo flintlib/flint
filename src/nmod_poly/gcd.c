@@ -12,7 +12,7 @@
 
 #include "nmod_poly.h"
 
-slong _nmod_poly_gcd(mp_ptr G, mp_srcptr A, slong lenA, 
+slong _nmod_poly_gcd(mp_ptr G, mp_srcptr A, slong lenA,
                               mp_srcptr B, slong lenB, nmod_t mod)
 {
     slong cutoff = NMOD_BITS(mod) <= 8 ? NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
@@ -23,7 +23,7 @@ slong _nmod_poly_gcd(mp_ptr G, mp_srcptr A, slong lenA,
         return _nmod_poly_gcd_hgcd(G, A, lenA, B, lenB, mod);
 }
 
-void nmod_poly_gcd(nmod_poly_t G, 
+void nmod_poly_gcd(nmod_poly_t G,
                              const nmod_poly_t A, const nmod_poly_t B)
 {
     if (A->length < B->length)
@@ -39,7 +39,7 @@ void nmod_poly_gcd(nmod_poly_t G,
         if (lenA == 0) /* lenA = lenB = 0 */
         {
             nmod_poly_zero(G);
-        } 
+        }
         else if (lenB == 0) /* lenA > lenB = 0 */
         {
             nmod_poly_make_monic(G, A);

@@ -14,23 +14,23 @@
 /*
     Discussion on the choice of the norm algorithm.
 
-    When the logarithm function does not converge for x, 
+    When the logarithm function does not converge for x,
     the only choice is the resultant method.
 
-    However, when the logarithm function converges, we 
-    can choose between the analytic method and the resultant 
-    method.  Roughly speaking, we postulate that the analytic 
-    method has runtime A (log N)^2 mu(p,d,N), where mu(p,d,N) 
-    is (d log d) M(N log p).  The resultant method has runtime 
-    B d^4 M(N log p).  Experimentally, we find that A/B is 
+    However, when the logarithm function converges, we
+    can choose between the analytic method and the resultant
+    method.  Roughly speaking, we postulate that the analytic
+    method has runtime A (log N)^2 mu(p,d,N), where mu(p,d,N)
+    is (d log d) M(N log p).  The resultant method has runtime
+    B d^4 M(N log p).  Experimentally, we find that A/B is
     somewhere around 4.
 
-    TODO:  Repeat the experiments with p=2, which is an 
+    TODO:  Repeat the experiments with p=2, which is an
     important special case.
  */
 
-void _qadic_norm(fmpz_t rop, const fmpz *op, slong len, 
-                 const fmpz *a, const slong *j, slong lena, 
+void _qadic_norm(fmpz_t rop, const fmpz *op, slong len,
+                 const fmpz *a, const slong *j, slong lena,
                  const fmpz_t p, slong N)
 {
     const slong d = j[lena - 1];
@@ -91,7 +91,7 @@ void qadic_norm(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
     }
     else
     {
-        _qadic_norm(padic_unit(rop), op->coeffs, op->length, 
+        _qadic_norm(padic_unit(rop), op->coeffs, op->length,
                     ctx->a, ctx->j, ctx->len, p, N - d * op->val);
         padic_val(rop) = d * op->val;
     }

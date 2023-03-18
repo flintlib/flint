@@ -21,7 +21,7 @@ int
 main(void)
 {
     int i;
-    FLINT_TEST_INIT(state); 
+    FLINT_TEST_INIT(state);
 
     flint_printf("set_ui....");
     fflush(stdout);
@@ -49,10 +49,10 @@ main(void)
         if (!fmpq_is_canonical(y) || !fmpq_equal(x, y))
         {
             flint_printf("FAIL");
-            flint_printf("p: "); fmpz_print(p); flint_printf("\n"); 
-            flint_printf("q: "); fmpz_print(q); flint_printf("\n"); 
-            flint_printf("x: "); fmpq_print(x); flint_printf("\n"); 
-            flint_printf("y: "); fmpq_print(y); flint_printf("\n"); 
+            flint_printf("p: "); fmpz_print(p); flint_printf("\n");
+            flint_printf("q: "); fmpz_print(q); flint_printf("\n");
+            flint_printf("x: "); fmpq_print(x); flint_printf("\n");
+            flint_printf("y: "); fmpq_print(y); flint_printf("\n");
             fflush(stdout);
             flint_abort();
         }

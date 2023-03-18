@@ -16,7 +16,7 @@
 #include "fmpz_mod_poly.h"
 
 void
-_fmpz_mod_poly_resultant_euclidean(fmpz_t res, const fmpz *poly1, slong len1, 
+_fmpz_mod_poly_resultant_euclidean(fmpz_t res, const fmpz *poly1, slong len1,
                                const fmpz *poly2, slong len2, const fmpz_t mod)
 {
     if (poly1 == poly2)
@@ -78,18 +78,18 @@ _fmpz_mod_poly_resultant_euclidean(fmpz_t res, const fmpz *poly1, slong len1,
                 r = t;
             }
 
-            if (l2 >= 1) 
+            if (l2 >= 1)
             {
                 fmpz_powm_ui(lc, lc, l0 - l2, mod);
                 fmpz_mul(res, res, lc);
                 fmpz_mod(res, res, mod);
-                
+
                 if (((l0 | l1) & 1) == 0)
                 {
                     fmpz_negmod(res, res, mod);
-                }  
+                }
             }
-            else 
+            else
             {
                 if (l1 == 1)
                 {
@@ -119,7 +119,7 @@ void fmpz_mod_poly_resultant_euclidean(fmpz_t r, const fmpz_mod_poly_t f,
 {
     const slong len1 = f->length;
     const slong len2 = g->length;
-    
+
     if (len1 == 0 || len2 == 0)
     {
         fmpz_zero(r);
@@ -128,12 +128,12 @@ void fmpz_mod_poly_resultant_euclidean(fmpz_t r, const fmpz_mod_poly_t f,
     {
         if (len1 >= len2)
         {
-            _fmpz_mod_poly_resultant_euclidean(r, f->coeffs, len1, 
+            _fmpz_mod_poly_resultant_euclidean(r, f->coeffs, len1,
                                    g->coeffs, len2, fmpz_mod_ctx_modulus(ctx));
         }
         else
         {
-            _fmpz_mod_poly_resultant_euclidean(r, g->coeffs, len2, 
+            _fmpz_mod_poly_resultant_euclidean(r, g->coeffs, len2,
                                    f->coeffs, len1, fmpz_mod_ctx_modulus(ctx));
 
             if (((len1 | len2) & WORD(1)) == WORD(0))

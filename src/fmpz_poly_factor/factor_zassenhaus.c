@@ -17,24 +17,24 @@
 #define TRACE_ZASSENHAUS 0
 
 /*
-    Let $f$ be a polynomial of degree $m = \deg(f) \geq 2$. 
-    If another polynomial $g$ divides $f$ then, for all 
-    $0 \leq j \leq \deg(g)$, 
+    Let $f$ be a polynomial of degree $m = \deg(f) \geq 2$.
+    If another polynomial $g$ divides $f$ then, for all
+    $0 \leq j \leq \deg(g)$,
     \begin{equation*}
     \abs{b_j} \leq \binom{n-1}{j} \abs{f} + \binom{n-1}{j-1} \abs{a_m}
     \end{equation*}
-    where $\abs{f}$ denotes the $2$-norm of $f$.  This bound 
+    where $\abs{f}$ denotes the $2$-norm of $f$.  This bound
     is due to Mignotte, see e.g., Cohen p.\ 134.
 
-    This function sets $B$ such that, for all $0 \leq j \leq \deg(g)$, 
+    This function sets $B$ such that, for all $0 \leq j \leq \deg(g)$,
     $\abs{b_j} \leq B$.
 
-    Consequently, when proceeding with Hensel lifting, we 
-    proceed to choose an $a$ such that $p^a \geq 2 B + 1$, 
+    Consequently, when proceeding with Hensel lifting, we
+    proceed to choose an $a$ such that $p^a \geq 2 B + 1$,
     e.g., $a = \ceil{\log_p(2B + 1)}$.
 
-    Note that the formula degenerates for $j = 0$ and $j = n$ 
-    and so in this case we use that the leading (resp.\ constant) 
+    Note that the formula degenerates for $j = 0$ and $j = n$
+    and so in this case we use that the leading (resp.\ constant)
     term of $g$ divides the leading (resp.\ constant) term of $f$.
  */
 void _fmpz_poly_factor_mignotte(fmpz_t B, const fmpz *f, slong m)
@@ -57,7 +57,7 @@ void _fmpz_poly_factor_mignotte(fmpz_t B, const fmpz *f, slong m)
 
     fmpz_abs(B, f + 0);
 
-    /*  We have $b = \binom{m-1}{j-1}$ on loop entry and 
+    /*  We have $b = \binom{m-1}{j-1}$ on loop entry and
         $b = \binom{m-1}{j}$ on exit. */
     fmpz_set_ui(b, m-1);
     for (j = 1; j < m; j++)
@@ -88,7 +88,7 @@ void fmpz_poly_factor_mignotte(fmpz_t B, const fmpz_poly_t f)
     _fmpz_poly_factor_mignotte(B, f->coeffs, f->length - 1);
 }
 
-void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, 
+void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
                slong exp, const fmpz_poly_t f, slong cutoff, int use_van_hoeij)
 {
     const slong lenF = f->length;
@@ -173,7 +173,7 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
         nmod_poly_clear(t);
 
         p = (fac->p + 0)->mod.n;
-            
+
         if (r == 1 && r <= cutoff)
         {
             fmpz_poly_factor_insert(final_fac, f, exp);
@@ -273,7 +273,7 @@ void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t fac, const fmpz_poly_t G)
 
         fmpz_poly_shift_right(g, G, k);
 
-        /* Could make other tests for x-1 or simple things 
+        /* Could make other tests for x-1 or simple things
            maybe take advantage of the composition algorithm */
         fmpz_poly_factor_init(sq_fr_fac);
         fmpz_poly_factor_squarefree(sq_fr_fac, g);

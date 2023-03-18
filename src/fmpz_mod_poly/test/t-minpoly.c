@@ -43,7 +43,7 @@ int check(const fmpz_mod_poly_t poly, const fmpz* seq, slong len,
         }
         fmpz_add(sum, sum, seq+(i+d));
         fmpz_mod(sum, sum, fmpz_mod_ctx_modulus(ctx));
-        if (!fmpz_is_zero(sum)) 
+        if (!fmpz_is_zero(sum))
         {
             fmpz_clear(sum);
             fmpz_clear(temp);
@@ -90,7 +90,7 @@ int main(void)
         fmpz_mod_poly_minpoly_bm(poly1, seq, len, ctx);
         fmpz_mod_poly_minpoly_hgcd(poly2, seq, len, ctx);
 
-        if (!check(poly1, seq, len, ctx) 
+        if (!check(poly1, seq, len, ctx)
             || fmpz_mod_poly_degree(poly1, ctx) > fmpz_mod_poly_degree(poly2, ctx))
         {
             flint_printf("FAIL 1:\n");
@@ -100,7 +100,7 @@ int main(void)
             flint_abort();
         }
 
-        if (!check(poly2, seq, len, ctx) 
+        if (!check(poly2, seq, len, ctx)
             || fmpz_mod_poly_degree(poly2, ctx) > fmpz_mod_poly_degree(poly1, ctx))
         {
             flint_printf("FAIL 2:\n");
@@ -207,7 +207,7 @@ int main(void)
 
     fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

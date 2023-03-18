@@ -29,14 +29,14 @@ main(int argc, char** argv)
     TEMPLATE(T, ctx_t) ctx;
     TEMPLATE(T, poly_factor_t) res;
     timeit_t t;
-    
+
     FLINT_TEST_INIT(state);
-    
+
     fmpz_init(p);
     fmpz_set_str(p, argv[1], 10);
 
     fmpz_init(temp);
-       
+
     fmpz_set_str(temp, argv[2], 10);
     ext = fmpz_get_si(temp);
 
@@ -44,7 +44,7 @@ main(int argc, char** argv)
     len = fmpz_get_si(temp);
 
     TEMPLATE(T, ctx_init)(ctx, p, ext, "a");
-    
+
     TEMPLATE(T, poly_init)(f, ctx);
     fmpz_one(temp);
     TEMPLATE(T, poly_set_coeff_fmpz)(f, len + 1, temp, ctx);
@@ -66,7 +66,7 @@ main(int argc, char** argv)
     fmpz_clear(temp);
 
     FLINT_TEST_CLEANUP(state);
-    
+
     return 0;
 }
 

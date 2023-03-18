@@ -43,16 +43,16 @@ int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, const fmpz
    fmpz_invmod(r1, r, s); /* r1 = r^-1 mod s */
    fmpz_mul(r2, r1, n);
    fmpz_mod(r2, r2, s); /* r2 = r1*n mod s */
-   
+
    fmpz_set(a0, s); /* a0 = s */
    fmpz_mul(a1, r1, r2); /* a1 = r1*r2 mod s */
    fmpz_mod(a1, a1, s);
    if (fmpz_is_zero(a1))
       fmpz_add(a1, a1, s); /* 0 < a1 <= s */
-   
+
    fmpz_zero(b0);
    fmpz_one(b1);
-   
+
    fmpz_zero(c0);
    fmpz_mul(c1, r, r2); /* c1 = (n - r*r2)/s * r1 mod s */
    fmpz_sub(c1, n, c1);
@@ -74,7 +74,7 @@ int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, const fmpz
       if ((i & 1) == 0)
       {
          fmpz_mod(s1, c1, s);
-         fmpz_neg(s2, s); 
+         fmpz_neg(s2, s);
       } else
       {
          fmpz_mul(s2, a1, b1); /* s2 = a1*b1 */
@@ -154,14 +154,14 @@ int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, const fmpz
 
          fmpz_sub(s1, s1, s);
       }
-      
+
       if (fmpz_is_zero(a1) || res == 1) /* Euclidean chain has terminated */
          break;
-      
-      /* 
+
+      /*
          Euclidean chain:
-         
-         a1, a0 = a0 - q*a1, a1, 
+
+         a1, a0 = a0 - q*a1, a1,
          where 0 <= a1 < a0 for i even
          and 0 < a1 <= a0 for i odd
       */

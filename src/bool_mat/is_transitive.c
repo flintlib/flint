@@ -24,7 +24,7 @@ bool_mat_is_transitive(const bool_mat_t mat)
 
     if (bool_mat_is_empty(mat))
         return 1;
-    
+
     n = bool_mat_nrows(mat);
 
     for (i = 0; i < n; i++)

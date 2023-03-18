@@ -31,8 +31,8 @@ unity_zp_pow_2k_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
     k = _unity_zp_pow_select_k(pow);
     /* selects e such that 2^(ek) < n < 2^((e + 1) * k) */
     e = (fmpz_bits(pow) - 1) / k;
-    
-    /* 
+
+    /*
         g_powers store odd powers of g up to 2^k - 1;
         g_powers[(i + 1) / 2] = g^i
     */
@@ -57,7 +57,7 @@ unity_zp_pow_2k_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
     /* for all digits[i] */
     for (i = e; i >= 0; i--)
     {
-        /* 
+        /*
             digit contains i-th digit of pow in k-ary base;
             k <= 11 so digit < 2^11 and fit into ulong
         */
@@ -82,7 +82,7 @@ unity_zp_pow_2k_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
             t = aprcl_p_power_in_q(*digit, 2);
             b = *digit / (1 << t);
 
-            if (i == e) 
+            if (i == e)
             {
                 unity_zp_copy(f, g_powers[(b + 1) / 2]);
             }

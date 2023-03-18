@@ -14,11 +14,11 @@
 #include "fq_nmod.h"
 
 /*
-    Sets (rop, 2d-1) to the image of (op, len) under the Frobenius operator 
+    Sets (rop, 2d-1) to the image of (op, len) under the Frobenius operator
     raised to the e-th power, assuming that neither op nor e are zero.
  */
 
-void _fq_nmod_frobenius(mp_limb_t *rop, const mp_limb_t *op, slong len, slong e, 
+void _fq_nmod_frobenius(mp_limb_t *rop, const mp_limb_t *op, slong len, slong e,
                         const fq_nmod_ctx_t ctx)
 {
     const slong d = ctx->j[ctx->len - 1];

@@ -23,7 +23,7 @@ main(void)
     flint_printf("fmpz_cleanup....");
     fflush(stdout);
 
-    
+
 
     for (iter = 0; iter < 300 * flint_test_multiplier(); iter++)
     {
@@ -49,7 +49,7 @@ main(void)
 
             if (n_randint(state, 10) == 0)
             {
-                
+
             }
         }
 
@@ -58,7 +58,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

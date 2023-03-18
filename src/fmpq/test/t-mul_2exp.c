@@ -19,7 +19,7 @@ main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("mul_2exp....");
     fflush(stdout);
@@ -133,7 +133,7 @@ main(void)
         fmpq_clear(y);
     }
 
-    
+
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

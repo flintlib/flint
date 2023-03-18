@@ -20,7 +20,7 @@ void fmpz_mod_poly_scalar_addmul_fmpz(fmpz_mod_poly_t A,
         return;
 
     fmpz_mod_poly_fit_length(A, B->length, ctx);
-    
+
     if (B->length > A->length)
         _fmpz_vec_zero(A->coeffs + A->length, B->length - A->length);
 

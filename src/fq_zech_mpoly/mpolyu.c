@@ -152,7 +152,7 @@ fq_zech_mpoly_struct * _fq_zech_mpolyu_get_coeff(fq_zech_mpolyu_t A,
 
     for (i = 0; i < A->length && A->exps[i] >= pow; i++)
     {
-        if (A->exps[i] == pow) 
+        if (A->exps[i] == pow)
         {
             return A->coeffs + i;
         }
@@ -165,7 +165,7 @@ fq_zech_mpoly_struct * _fq_zech_mpolyu_get_coeff(fq_zech_mpolyu_t A,
         A->exps[j] = A->exps[j - 1];
         fq_zech_mpoly_swap(A->coeffs + j, A->coeffs + j - 1, uctx);
     }
-    
+
     A->length++;
     A->exps[i] = pow;
     xk = A->coeffs + i;

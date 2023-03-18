@@ -23,7 +23,7 @@ main(void)
     mp_limb_t mod;
     int result;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("inv....");
     fflush(stdout);
@@ -127,7 +127,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

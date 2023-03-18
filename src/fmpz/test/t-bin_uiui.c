@@ -26,7 +26,7 @@ main(void)
     flint_printf("bin_uiui....");
     fflush(stdout);
 
-    
+
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -53,7 +53,7 @@ main(void)
         mpz_clear(z);
     }
 
-    
+
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

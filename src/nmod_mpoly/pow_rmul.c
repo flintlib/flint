@@ -73,7 +73,7 @@ void nmod_mpoly_pow_rmul(nmod_mpoly_t A, const nmod_mpoly_t B,
     {
         nmod_mpoly_one(A, ctx);
         while (k > 0)
-        { 
+        {
             nmod_mpoly_mul_johnson(T, A, B, ctx);
             nmod_mpoly_swap(A, T, ctx);
             k -= 1;

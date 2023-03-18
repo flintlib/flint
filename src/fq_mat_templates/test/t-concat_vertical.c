@@ -25,7 +25,7 @@ main(void)
     flint_printf("concat_vertical....");
     fflush(stdout);
 
-    
+
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
     	TEMPLATE(T, ctx_t) ctx;
@@ -49,7 +49,7 @@ main(void)
         TEMPLATE(T, mat_randtest) (C, state, ctx);
 
         TEMPLATE(T, mat_concat_vertical) (C, A, B, ctx);
-        
+
         TEMPLATE(T, mat_window_init) (window1, C, 0, 0, r1, c1, ctx);
         TEMPLATE(T, mat_window_init) (window2, C, r1, 0, (r1+r2), c1, ctx);
 
@@ -59,7 +59,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         TEMPLATE(T, mat_clear) (A, ctx);
         TEMPLATE(T, mat_clear) (B, ctx);
         TEMPLATE(T, mat_clear) (C, ctx);
@@ -71,7 +71,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

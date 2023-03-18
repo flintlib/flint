@@ -66,7 +66,7 @@ void fmpz_mod_mpoly_factor_sort(
         f->exp[i] = data[i].exp;
         f->poly[i] = fc[data[i].idx];
     }
-    
+
     flint_free(fc);
     flint_free(data);
 
