@@ -386,7 +386,9 @@ jobs:
       - name: "Configure"
         run: |
           ./bootstrap.sh
-          ./configure CC=${CC} CFLAGS="${CFLAGS}" ${EXTRA_OPTIONS}
+          # We need to specify TMPPATH as we do not have write access to the
+          # CI's /tmp directory.
+          ./configure CC=${CC} CFLAGS="${CFLAGS}" TMPPATH="." ${EXTRA_OPTIONS}
 
       - name: "Compile"
         run: |
