@@ -14,8 +14,8 @@
 #include "nmod_poly.h"
 #include "gr_poly.h"
 
-mp_limb_t 
-_nmod_poly_resultant(mp_srcptr poly1, slong len1, 
+mp_limb_t
+_nmod_poly_resultant(mp_srcptr poly1, slong len1,
                                mp_srcptr poly2, slong len2, nmod_t mod)
 {
     if (poly1 == poly2)
@@ -46,7 +46,7 @@ _nmod_poly_resultant(mp_srcptr poly1, slong len1,
     }
 }
 
-mp_limb_t 
+mp_limb_t
 nmod_poly_resultant(const nmod_poly_t f, const nmod_poly_t g)
 {
     const slong len1 = f->length;

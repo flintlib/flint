@@ -19,7 +19,7 @@ int main(void)
    ulong bits, exp;
    fmpz_t root, d, n, n2, pow;
    FLINT_TEST_INIT(state);
-   
+
    flint_printf("is_perfect_power....");
    fflush(stdout);
 
@@ -56,8 +56,8 @@ int main(void)
          fflush(stdout);
          flint_abort();
       }
-   }         
- 
+   }
+
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that non perfect powers fail */
    {
       mpz_t d_m;
@@ -67,7 +67,7 @@ int main(void)
       {
          bits = n_randint(state, 1000) + 1;
          fmpz_randtest(n, state, bits);
-         fmpz_get_mpz(d_m, n); 
+         fmpz_get_mpz(d_m, n);
       } while (mpz_perfect_power_p(d_m));
 
       result = !fmpz_is_perfect_power(root, n);
@@ -75,7 +75,7 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          fmpz_print(n);
-         flint_printf(" is declared a perfect power\n"); 
+         flint_printf(" is declared a perfect power\n");
          fflush(stdout);
          flint_abort();
       }
@@ -111,8 +111,8 @@ int main(void)
          fflush(stdout);
          flint_abort();
       }
-   }         
- 
+   }
+
    for (i = 0; i < 100 * flint_test_multiplier(); i++) /* aliasing test, non perfect powers */
    {
       mpz_t d_m;
@@ -122,7 +122,7 @@ int main(void)
       {
          bits = n_randint(state, 1000) + 1;
          fmpz_randtest(n, state, bits);
-         fmpz_get_mpz(d_m, n); 
+         fmpz_get_mpz(d_m, n);
       } while (mpz_perfect_power_p(d_m));
 
       result = !fmpz_is_perfect_power(n, n);
@@ -130,7 +130,7 @@ int main(void)
       {
          flint_printf("FAIL:\n");
          fmpz_print(n2);
-         flint_printf(" is declared a perfect power\n"); 
+         flint_printf(" is declared a perfect power\n");
          fflush(stdout);
          flint_abort();
       }
@@ -145,7 +145,7 @@ int main(void)
    fmpz_clear(root);
 
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
 
    return 0;

@@ -18,7 +18,7 @@
 #include "ulong_extras.h"
 
 void
-_nmod_poly_powmod_fmpz_binexp(mp_ptr res, mp_srcptr poly, 
+_nmod_poly_powmod_fmpz_binexp(mp_ptr res, mp_srcptr poly,
                                   fmpz_t e, mp_srcptr f, slong lenf, nmod_t mod)
 {
     mp_ptr T, Q;
@@ -77,7 +77,7 @@ _nmod_poly_powmod_fmpz_binexp(mp_ptr res, mp_srcptr poly,
 
 
 void
-nmod_poly_powmod_fmpz_binexp(nmod_poly_t res, 
+nmod_poly_powmod_fmpz_binexp(nmod_poly_t res,
                          const nmod_poly_t poly, fmpz_t e, const nmod_poly_t f)
 {
     mp_ptr p;

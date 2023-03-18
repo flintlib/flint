@@ -208,7 +208,7 @@ slong
 acb_lambertw_initial(acb_t res, const acb_t z, const acb_t ez1, const fmpz_t k, slong prec)
 {
     /* Handle z very close to 0 on the principal branch. */
-    if (fmpz_is_zero(k) && 
+    if (fmpz_is_zero(k) &&
             (arf_cmpabs_2exp_si(arb_midref(acb_realref(z)), -20) <= 0 &&
              arf_cmpabs_2exp_si(arb_midref(acb_imagref(z)), -20) <= 0))
     {
@@ -581,7 +581,7 @@ _acb_lambertw(acb_t res, const acb_t z, const acb_t ez1, const fmpz_t k, int fla
         goal = FLINT_MAX(goal, 10);
         goal = FLINT_MIN(goal, prec);
 
-        /* The asymptotic series with truncation L, M gives us about 
+        /* The asymptotic series with truncation L, M gives us about
            t - max(2+lt+L*(2+ls), M*(2+lt)) bits of accuracy where
            ls = -ebits, lt = ebits2 - ebits. */
         ls = 2 - ebits;

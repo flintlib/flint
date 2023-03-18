@@ -122,7 +122,7 @@ acb_hypgeom_dilog_continuation(acb_t res, const acb_t a, const acb_t z, slong pr
     acb_log(log1a, log1a, prec);   /* log(1-a) */
 
     acb_get_mag(am, a);
-    if (mag_cmp_2exp_si(am, -1) <= 0 || 
+    if (mag_cmp_2exp_si(am, -1) <= 0 ||
         (acb_is_exact(a) && arb_is_zero(acb_realref(a)) &&
             arf_cmpabs_ui(arb_midref(acb_imagref(a)), 1) == 0))
     {

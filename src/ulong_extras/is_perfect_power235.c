@@ -28,7 +28,7 @@ int n_is_perfect_power235(mp_limb_t n)
                               1,0,0,2,0,5,4,2,1,2,6};
 
     unsigned char t;
-    
+
     t = mod31[n%31];
     if (!t) return 0;
 
@@ -39,22 +39,22 @@ int n_is_perfect_power235(mp_limb_t n)
     if (!t) return 0;
 
     t &= mod63[n%63];
-    
-    if (t & 1) 
+
+    if (t & 1)
     {
         double x = sqrt((double) n);
         mp_limb_t y = (mp_limb_t) (x + 0.5);
         if (n == n_pow(y, 2)) return 1;
     }
 
-    if (t & 2) 
+    if (t & 2)
     {
         double x = pow((double) n, 1.0 / 3.0);
         mp_limb_t y = (mp_limb_t) (x + 0.5);
         if (n == n_pow(y, 3)) return 1;
     }
 
-    if (t & 4) 
+    if (t & 4)
     {
         double x = pow((double) n, 1.0 / 5.0);
         mp_limb_t y = (mp_limb_t) (x + 0.5);

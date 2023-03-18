@@ -15,7 +15,7 @@
 #define NMOD_MAT_H
 
 #ifdef NMOD_MAT_INLINES_C
-#define NMOD_MAT_INLINE 
+#define NMOD_MAT_INLINE
 #else
 #define NMOD_MAT_INLINE static __inline__
 #endif
@@ -382,7 +382,7 @@ int nmod_mat_solve_vec(mp_ptr x, const nmod_mat_t A, mp_srcptr b);
 
 int nmod_mat_can_solve_inner(slong * rank, slong * prm, slong * piv,
                           nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B);
-    
+
 int nmod_mat_can_solve(nmod_mat_t X, const nmod_mat_t A,
                                                             const nmod_mat_t B);
 
@@ -414,7 +414,7 @@ void nmod_mat_similarity(nmod_mat_t M, slong r, ulong d);
 /* Characteristic polynomial and minimal polynomial */
 
 /* The following prototype actually lives in nmod_poly.h
- * 
+ *
  * void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M);
  *
  * void nmod_mat_minpoly(nmod_poly_t p, const nmod_mat_t M);

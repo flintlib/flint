@@ -47,7 +47,7 @@ bsplit(arb_ptr Q, arb_ptr T, const arb_t z, slong a, slong b, slong num, slong p
             arb_set(Q, z);
             if (num > 1) arb_one(Q + 1);
             if (num > 2) arb_zero(Q + 2);
-        }             
+        }
         else
         {   /* (z + t)^2 */
             arb_mul(Q, z, z, prec);  /* TODO: precompute */

@@ -173,7 +173,7 @@ bsplit(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
 
         /* find x^step in table */
         i = _arb_get_exp_pos(xexp, step);
-        fmpz_addmul(T, xpow + i, T2);  
+        fmpz_addmul(T, xpow + i, T2);
         fmpz_clear(T2);
 
         fmpz_mul(Q, Q, Q2);

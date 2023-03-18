@@ -93,7 +93,7 @@ void arb_poly_compose(arb_poly_t res,
 {
     const slong len1 = poly1->length;
     const slong len2 = poly2->length;
-    
+
     if (len1 == 0)
     {
         arb_poly_zero(res);
@@ -105,7 +105,7 @@ void arb_poly_compose(arb_poly_t res,
     else
     {
         const slong lenr = (len1 - 1) * (len2 - 1) + 1;
-        
+
         if (res != poly1 && res != poly2)
         {
             arb_poly_fit_length(res, lenr);

@@ -19,7 +19,7 @@ int main(void)
     mpz_t a, b, c, g;
     gmp_randstate_t st;
     slong s1, s2;
-    
+
     FLINT_TEST_INIT(state);
 
     flint_printf("gcd_full....");
@@ -55,7 +55,7 @@ int main(void)
 
        g->_mp_d = flint_malloc(FLINT_MIN(s1, s2)*sizeof(mp_limb_t));
 
-       g->_mp_size = flint_mpn_gcd_full(g->_mp_d, a->_mp_d, a->_mp_size, b->_mp_d, b->_mp_size); 
+       g->_mp_size = flint_mpn_gcd_full(g->_mp_d, a->_mp_d, a->_mp_size, b->_mp_d, b->_mp_size);
 
        result = (mpz_cmp(g, c) == 0);
        if (!result)
@@ -76,7 +76,7 @@ int main(void)
     /* don't clear g */
     gmp_randclear(st);
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

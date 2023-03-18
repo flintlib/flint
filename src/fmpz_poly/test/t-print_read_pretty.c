@@ -15,7 +15,7 @@
 #endif
 
 #include <sys/types.h>
-#if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER) 
+#if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER)
 #include <unistd.h>
 #endif
 #include <string.h>
@@ -37,7 +37,7 @@ int main(void)
     FLINT_TEST_INIT(state);
 
     flint_printf("print/ read_pretty....");
-    fflush(stdout);   
+    fflush(stdout);
 
     /* Randomise n polynomials, write to and read from a pipe */
     {
@@ -232,8 +232,8 @@ int main(void)
             while (!feof(in))
             {
                 r = fmpz_poly_fread_pretty(in, t, &rvar);
-                result = (r > 0) && rvar && (strcmp(str, rvar) == 0) && 
-                         (t->length == 2) && (t->coeffs[0] == WORD(0)) && 
+                result = (r > 0) && rvar && (strcmp(str, rvar) == 0) &&
+                         (t->length == 2) && (t->coeffs[0] == WORD(0)) &&
                          (t->coeffs[1] == WORD(1));
                 if (!result)
                 {
@@ -255,7 +255,7 @@ int main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

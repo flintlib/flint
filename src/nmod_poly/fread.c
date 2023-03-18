@@ -20,12 +20,12 @@ int nmod_poly_fread(FILE * f, nmod_poly_t poly)
 
     if (flint_fscanf(f, "%wd %wu", &length, &n) != 2)
         return 0;
-    
+
     nmod_poly_clear(poly);
-    nmod_poly_init(poly,n); 
+    nmod_poly_init(poly,n);
     nmod_poly_fit_length(poly, length);
     poly->length = length;
-    
+
     for (i = 0; i < length; i++)
     {
         if (!flint_fscanf(f, "%wu", &poly->coeffs[i]))
@@ -34,8 +34,8 @@ int nmod_poly_fread(FILE * f, nmod_poly_t poly)
             return 0;
         }
     }
-   
+
     _nmod_poly_normalise(poly);
-   
+
     return 1;
 }

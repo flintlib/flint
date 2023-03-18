@@ -20,7 +20,7 @@ int
 fmpz_factor_ecm_stage_II(mp_ptr f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
                           mp_ptr n, ecm_t ecm_inf)
 {
-    
+
     mp_ptr Qx, Qz, Rx, Rz, Qdx, Qdz, a, b, g;
     mp_limb_t mmin, mmax, maxj, sz, gcdlimbs;
     int i, j, ret;
@@ -30,7 +30,7 @@ fmpz_factor_ecm_stage_II(mp_ptr f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
 
     mmin = (B1 + (P/2)) / P;
     mmax = ((B2 - P/2) + P - 1)/P;      /* ceil */
-    maxj = (P + 1)/2; 
+    maxj = (P + 1)/2;
 
     TMP_START;
     Qx   = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
@@ -71,12 +71,12 @@ fmpz_factor_ecm_stage_II(mp_ptr f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
     /* For each odd j (j > 3) , compute j * Q0 [x0 :: z0] */
     /* jth stored in arr[j/2] */
 
-    /* We are adding 2Q0 every time. Need to calculate all j's 
+    /* We are adding 2Q0 every time. Need to calculate all j's
        as (j - 2)Q0 is required for (j + 2)Q0 */
 
     for (j = 2; j <= (maxj >> 1); j += 1)
     {
-        /* jQ0 = (j - 2)Q0 + 2Q0 
+        /* jQ0 = (j - 2)Q0 + 2Q0
            Difference is (j - 4)Q0 */
 
         fmpz_factor_ecm_add(arrx + j * ecm_inf->n_size, arrz + j * ecm_inf->n_size,
@@ -122,7 +122,7 @@ fmpz_factor_ecm_stage_II(mp_ptr f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
         flint_mpn_copyi(a, Rx, ecm_inf->n_size);
         flint_mpn_copyi(b, Rz, ecm_inf->n_size);
 
-        /* R = R + Q    
+        /* R = R + Q
            difference is stored in Qd, initially (Mmin - 1)Q */
 
         fmpz_factor_ecm_add(Rx, Rz, Rx, Rz, Qx, Qz, Qdx, Qdz, n, ecm_inf);
@@ -146,7 +146,7 @@ fmpz_factor_ecm_stage_II(mp_ptr f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
        condition two -> gcd = n
        if neither is true, factor found */
 
-    if (!(gcdlimbs == 1 && f[0] == ecm_inf->one[0]) && 
+    if (!(gcdlimbs == 1 && f[0] == ecm_inf->one[0]) &&
         !(gcdlimbs == ecm_inf->n_size && mpn_cmp(f, n, ecm_inf->n_size) == 0))
     {
         /* Found factor in stage II */

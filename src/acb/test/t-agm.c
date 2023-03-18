@@ -397,7 +397,7 @@ int main()
                 acb_div(t, x1, y1, prec1);
                 acb_agm1(t, t, prec1);
                 acb_mul(t, t, y1, prec1);
-            }   
+            }
             else
             {
                 acb_div(t, y1, x1, prec1);

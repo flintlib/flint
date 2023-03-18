@@ -33,7 +33,7 @@ int qfb_exponent_grh(fmpz_t exponent, fmpz_t n, ulong B1, ulong B2_sqrt)
    fmpz_init(n2);
    fmpz_init(exp);
    qfb_init(f);
-   
+
    flint_mpz_init_set_readonly(mn, n);
    mpfr_init_set_z(lim, mn, MPFR_RNDA);
    mpfr_abs(lim, lim, MPFR_RNDU);
@@ -43,7 +43,7 @@ int qfb_exponent_grh(fmpz_t exponent, fmpz_t n, ulong B1, ulong B2_sqrt)
    grh_limit = mpfr_get_ui(lim, MPFR_RNDU);
 
    fmpz_set_ui(exponent, 1);
-   
+
    /* find odd prime such that n is a square mod p */
    pr = 0;
    for (pr = 1; pr < grh_limit; )
@@ -58,20 +58,20 @@ int qfb_exponent_grh(fmpz_t exponent, fmpz_t n, ulong B1, ulong B2_sqrt)
       if (pr < grh_limit)
       {
          fmpz_set_ui(p, pr);
-      
+
          /* find prime form of discriminant n */
          qfb_prime_form(f, n, p);
          fmpz_set(n2, n);
 
          /* deal with non-fundamental discriminants */
          if (nmodpr == 0 && fmpz_fdiv_ui(f->c, pr) == 0)
-         {   
+         {
             fmpz_fdiv_q_ui(f->a, f->a, pr);
             fmpz_fdiv_q_ui(f->b, f->b, pr);
             fmpz_fdiv_q_ui(f->c, f->c, pr);
             fmpz_fdiv_q_ui(n2, n2, pr*pr);
          }
-         if (pr == 2 && fmpz_is_even(f->a) 
+         if (pr == 2 && fmpz_is_even(f->a)
                      && fmpz_is_even(f->b) && fmpz_is_even(f->c))
          {
             fmpz_fdiv_q_2exp(f->a, f->a, 1);
@@ -79,9 +79,9 @@ int qfb_exponent_grh(fmpz_t exponent, fmpz_t n, ulong B1, ulong B2_sqrt)
             fmpz_fdiv_q_2exp(f->c, f->c, 1);
             fmpz_fdiv_q_2exp(n2, n2, 2);
          }
-         
+
          qfb_reduce(f, f, n2);
-         
+
          if (!fmpz_is_one(exponent))
             qfb_pow(f, f, n2, exponent);
 
@@ -104,6 +104,6 @@ cleanup:
    n_primes_clear(iter);
 
    flint_mpz_clear_readonly(mn);
-            
+
    return ret;
 }

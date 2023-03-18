@@ -22,7 +22,7 @@ int fmpz_is_probabprime_BPSW(const fmpz_t n)
    int res = 1;
 
    fmpz_init_set_ui(b, 2);
-   
+
    if (!fmpz_is_strong_probabprime(n, b) || !fmpz_is_probabprime_lucas(n))
       res = 0;
 

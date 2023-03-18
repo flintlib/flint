@@ -114,7 +114,7 @@ int _gr_poly_xgcd_hgcd(slong * Glen, gr_ptr G, gr_ptr S, gr_ptr T,
         GR_TMP_INIT(invB, ctx);
 
         __divrem(q, lenq, r, lenr, A, lenA, B, lenB);
-        
+
         if (lenr == 0)
         {
             __set(G, lenG, B, lenB);

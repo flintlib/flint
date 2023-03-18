@@ -15,7 +15,7 @@
 #include "long_extras.h"
 
 extern int
-_artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len, 
+_artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
                          const fmpz *a, const slong *j, slong lena);
 
 int main(void)
@@ -26,7 +26,7 @@ int main(void)
     flint_printf("sqrt... ");
     fflush(stdout);
 
-    
+
 
 /* PRIME p = 2 ***************************************************************/
 
@@ -50,7 +50,7 @@ int main(void)
         qadic_randtest_val(a, state, 0, ctx);
         padic_poly_fit_length(b, d);
 
-        ans = _artin_schreier_preimage(b->coeffs, a->coeffs, a->length, 
+        ans = _artin_schreier_preimage(b->coeffs, a->coeffs, a->length,
                                        ctx->a, ctx->j, ctx->len);
 
         b->val = 0;
@@ -310,7 +310,7 @@ int main(void)
         {
             flint_printf("FAIL (output prec lower than input prec, random squares):\n\n");
             fflush(stdout);
-            flint_abort();            
+            flint_abort();
         }
 
         if (ans)
@@ -529,7 +529,7 @@ int main(void)
             fflush(stdout);
             flint_abort();
         }
-     
+
         if (ans)
         {
             qadic_t d, e;
@@ -815,7 +815,7 @@ int main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

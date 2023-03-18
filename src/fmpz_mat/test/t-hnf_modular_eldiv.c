@@ -40,7 +40,7 @@ main(void)
         fmpz_mat_init(H2, m, n);
 
         /* sparse */
-        
+
         b = 1 + n_randint(state, 10) * n_randint(state, 10);
         fmpz_mat_randrank(A, state, n, b);
 
@@ -54,7 +54,7 @@ main(void)
                 fmpz_set(fmpz_mat_entry(B, i, j), fmpz_mat_entry(A, i, j));
 
         /* dense */
-        
+
         d = n_randint(state, 2*m*n + 1);
         if (n_randint(state, 2))
             fmpz_mat_randops(B, state, d);

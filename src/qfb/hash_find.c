@@ -37,7 +37,7 @@ slong qfb_hash_find(qfb_hash_t * qhash, qfb_t q, slong depth)
             return i;
          }
       }
-      
+
       i++;
       if (i == size)
          i = 0;

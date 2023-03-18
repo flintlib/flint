@@ -23,7 +23,7 @@ main(void)
     flint_printf("pseudo_div....");
     fflush(stdout);
 
-    
+
 
     /* Check r = a - q * b has small degree, no aliasing */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
@@ -46,7 +46,7 @@ main(void)
         fmpz_pow_ui(p, b->coeffs + b->length - 1, d);
         fmpz_poly_scalar_mul_fmpz(a, a, p);
         fmpz_poly_sub(r, a, prod);
-        
+
         result = (fmpz_poly_length(r) < fmpz_poly_length(b));
         if (!result)
         {
@@ -127,7 +127,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

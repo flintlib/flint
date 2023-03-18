@@ -58,7 +58,7 @@ main(void)
         for (v = 0; v < nvars1; v++)
         {
             vals1[v] = (fmpq_poly_struct *) flint_malloc(
-                                                    sizeof(fmpq_poly_struct)); 
+                                                    sizeof(fmpq_poly_struct));
             fmpq_poly_init(vals1[v]);
             fmpq_poly_randtest(vals1[v], state, len2, coeff_bits2);
         }
@@ -161,7 +161,7 @@ main(void)
         for (v = 0; v < nvars1; v++)
         {
             vals1[v] = (fmpq_poly_struct *) flint_malloc(
-                                                    sizeof(fmpq_poly_struct)); 
+                                                    sizeof(fmpq_poly_struct));
             fmpq_poly_init(vals1[v]);
             fmpq_poly_set_fmpq(vals1[v], vals3[v]);
         }
@@ -252,7 +252,7 @@ main(void)
         for (v = 0; v < nvars1; v++)
         {
             vals1[v] = (fmpq_poly_struct *) flint_malloc(
-                                                    sizeof(fmpq_poly_struct)); 
+                                                    sizeof(fmpq_poly_struct));
             fmpq_poly_init(vals1[v]);
             fmpq_poly_set_fmpq(vals1[v], vals3[v]);
         }

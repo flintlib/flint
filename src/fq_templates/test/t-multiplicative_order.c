@@ -70,7 +70,7 @@ main(void)
         fmpz_init(ord);
         fmpz_init(size);
         fmpz_init(pm1);
-        
+
         TEMPLATE(T, gen)(X, ctx);
         if (TEMPLATE(T, is_primitive)(X, ctx))
         {

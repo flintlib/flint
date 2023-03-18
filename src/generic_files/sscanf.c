@@ -26,13 +26,13 @@ int flint_sscanf(const char * s, const char * str, ...)
    int ret;
    char *str2, *s2;
    size_t n, len = strlen(str);
-   
+
    if(!strlen(s))
        return 0;
 
    str2 = flint_malloc(len + 1);
    s2 = flint_malloc(strlen(s) + 1);
-   
+
    /* deal with first substring */
    n = strcspn(str, "%");
    strncpy(str2, s, n);
@@ -49,7 +49,7 @@ int flint_sscanf(const char * s, const char * str, ...)
       n = strcspn(str + 2, "%") + 2; /* be sure to skip a %% */
       strncpy(str2, str, n);
       str2[n] = '\0';
-   
+
       switch (str[1])
       {
       case 'w':
@@ -81,7 +81,7 @@ int flint_sscanf(const char * s, const char * str, ...)
          break;
       default: /* pass to printf */
          args = parse_fmt(&floating, str2);
-         if (args) 
+         if (args)
          {
             if (args == 3)
                w1 = va_arg(ap, int *);

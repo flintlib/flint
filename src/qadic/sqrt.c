@@ -19,7 +19,7 @@
 /*
     FILE DOCUMENTATION.
 
-    This file contains routines for computing square roots in 
+    This file contains routines for computing square roots in
     finite fields and Hensel lifting.
 
         - _find_nonresidue()
@@ -32,11 +32,11 @@
  */
 
 /*
-    Sets \code{(rop,d)} to a non-residue in $\mathbf{F_q}$ for odd $p$ 
+    Sets \code{(rop,d)} to a non-residue in $\mathbf{F_q}$ for odd $p$
     and $d \geq 2$.
  */
-static void _find_nonresidue(fmpz *rop, 
-                             const fmpz *a, const slong *j, slong lena, 
+static void _find_nonresidue(fmpz *rop,
+                             const fmpz *a, const slong *j, slong lena,
                              const fmpz_t p)
 {
     const slong d = j[lena - 1];
@@ -55,7 +55,7 @@ static void _find_nonresidue(fmpz *rop,
     fmpz_fdiv_q_2exp(z, z, 1);
 
     /*
-        Find a non-residue g; 
+        Find a non-residue g;
         uses stack-based depth first traversal starting from [0,...,0,1]
      */
     _fmpz_vec_zero(rop, d);
@@ -91,19 +91,19 @@ static void _find_nonresidue(fmpz *rop,
 }
 
 /*
-    Given an element $d$ as \code{(op,len)}, returns whether it has a 
-    preimage $u$ under the Artin Schreier map $Y \mapsto Y^2 + Y$, and 
+    Given an element $d$ as \code{(op,len)}, returns whether it has a
+    preimage $u$ under the Artin Schreier map $Y \mapsto Y^2 + Y$, and
     if so sets \code{(rop,d)} to $u$.
 
-    In this case, the other preimage is given by $u + 1$.  This 
-    completes the set of preimages as the kernel of the Artin Schreier 
+    In this case, the other preimage is given by $u + 1$.  This
+    completes the set of preimages as the kernel of the Artin Schreier
     map is $\mathbf{F}_2$.
 
-    The value of \code{(rop,d)}$ is undefined when the return value 
+    The value of \code{(rop,d)}$ is undefined when the return value
     is zero.
  */
 int
-_artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len, 
+_artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
                          const fmpz *a, const slong *j, slong lena)
 {
     const slong d   = j[lena - 1];
@@ -142,14 +142,14 @@ _artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
     /* Perform LUP decomposition ------------------------------------------- */
 
     /*
-        Write LU = PA and r = rank(A) so that U is in row echelon form 
-        with only the top r rows non-zero, and L is lower unit triangular 
+        Write LU = PA and r = rank(A) so that U is in row echelon form
+        with only the top r rows non-zero, and L is lower unit triangular
         truncated to r columns.
 
-        We know that Y^2 + Y = 0 if and only if Y is in the base field, 
+        We know that Y^2 + Y = 0 if and only if Y is in the base field,
         i.e., dim ker(A) = 1 and rank(A) = d-1.
 
-        Consider the linear system A x = b, which we can then write as 
+        Consider the linear system A x = b, which we can then write as
         LU x = Pb, hence L y = Pb and U x = y.
      */
 
@@ -206,7 +206,7 @@ _artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
 }
 
 /*
-    Returns whether the non-zero element \code{(op, len)} is a square, 
+    Returns whether the non-zero element \code{(op, len)} is a square,
     and if so sets \code{(rop, 2 * d - 1)} to its square root.
 
     Assumes that $p$ is an odd prime.
@@ -215,9 +215,9 @@ _artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
 
     Does not support aliasing.
  */
-static int 
-_fmpz_mod_poly_sqrtmod_p(fmpz *rop, const fmpz *op, slong len, 
-                         const fmpz *a, const slong *j, slong lena, 
+static int
+_fmpz_mod_poly_sqrtmod_p(fmpz *rop, const fmpz *op, slong len,
+                         const fmpz *a, const slong *j, slong lena,
                          const fmpz_t p)
 {
     const slong d = j[lena - 1];
@@ -226,10 +226,10 @@ _fmpz_mod_poly_sqrtmod_p(fmpz *rop, const fmpz *op, slong len,
     /*
         When $q \equiv 3 \pmod{4}$...
 
-        A non-zero element $x$ is a square if and only if $x^{(q-1)/2} = 1$, 
+        A non-zero element $x$ is a square if and only if $x^{(q-1)/2} = 1$,
         and in this case one of its square roots is given by $x^{(q+1)/4}$.
 
-        To avoid recomputation of powers of $x$, we compute $x^{(q-3)/4}$, 
+        To avoid recomputation of powers of $x$, we compute $x^{(q-3)/4}$,
         multiply this by $x$ to obtain the potential square root $x^{(q+1)/4}$,
         and then combine these two powers to find $x^{(q-1)/2}$.
      */
@@ -260,15 +260,15 @@ _fmpz_mod_poly_sqrtmod_p(fmpz *rop, const fmpz *op, slong len,
         _fmpz_vec_clear(v, 4 * d - 2);
     }
 
-    /* 
+    /*
         When $q \equiv 5 \pmod{8}$...
 
-        A non-zero element $x$ is a square if and only if $y = x^{(q-1)/4}$ 
-        is $\pm 1$.  If $y = +1$, a square root is given by $x^{(q+3)/8}$, 
+        A non-zero element $x$ is a square if and only if $y = x^{(q-1)/4}$
+        is $\pm 1$.  If $y = +1$, a square root is given by $x^{(q+3)/8}$,
         otherwise it is $(2x) (4x)^{(q-5)/8}$.
 
-        We begin by computing $v = x^{(q-5)/8}$, $w = x v = x^{(q+3)/8}$ 
-        and $y = v w = x^{(q-1)/4}$.  If $y = +1$ we return $w$, and if 
+        We begin by computing $v = x^{(q-5)/8}$, $w = x v = x^{(q+3)/8}$
+        and $y = v w = x^{(q-1)/4}$.  If $y = +1$ we return $w$, and if
         $y = -1$ we return $2^{(q-1)/4} x^{(q+3)/8} = 2^{(q-1)/4} w$.
      */
     else if (fmpz_fdiv_ui(p, 8) == 5 && (d & WORD(1)))
@@ -340,7 +340,7 @@ _fmpz_mod_poly_sqrtmod_p(fmpz *rop, const fmpz *op, slong len,
     /*
         General case for odd $q$...
 
-        TODO:  Find a better way to integrate the check for square-ness 
+        TODO:  Find a better way to integrate the check for square-ness
         into the computation of a potential square root.
      */
     else
@@ -442,17 +442,17 @@ _fmpz_mod_poly_sqrtmod_p(fmpz *rop, const fmpz *op, slong len,
 }
 
 /*
-    Sets \code{(rop, 2 * d - 1)} to the square root of 
+    Sets \code{(rop, 2 * d - 1)} to the square root of
     \code{(op, len)}.
 
-    Note that the group of units of $\mathbf{F}_q$ is cyclic of order $q - 1$, 
+    Note that the group of units of $\mathbf{F}_q$ is cyclic of order $q - 1$,
     which is odd if $p = 2$.  We have $x^{q-1} = 1$ for every non-zero $x$, so
     $x^q = x$ for every $x$ and $u = x^{q/2}$ satisfies $u^2 = x$.
 
     Assumes that $d \geq 1$.
  */
-static void 
-_fmpz_mod_poly_sqrtmod_2(fmpz *rop, const fmpz *op, slong len, 
+static void
+_fmpz_mod_poly_sqrtmod_2(fmpz *rop, const fmpz *op, slong len,
                          const fmpz *a, const slong *j, slong lena)
 {
     const fmpz_t p = {WORD(2)};
@@ -467,14 +467,14 @@ _fmpz_mod_poly_sqrtmod_2(fmpz *rop, const fmpz *op, slong len,
 }
 
 /*
-    Returns whether \code{(op, len)} is a square, and if so 
+    Returns whether \code{(op, len)} is a square, and if so
     sets \code{(rop, 2 * d - 1)} to a square root mod $p^N$.
 
     Assumes that \code{(op, len)} has valuation $0$.
  */
-static int 
-_qadic_sqrt_p(fmpz *rop, const fmpz *op, slong len, 
-              const fmpz *a, const slong *j, slong lena, 
+static int
+_qadic_sqrt_p(fmpz *rop, const fmpz *op, slong len,
+              const fmpz *a, const slong *j, slong lena,
               const fmpz_t p, slong N)
 {
     const slong d = j[lena - 1];
@@ -606,13 +606,13 @@ _qadic_sqrt_p(fmpz *rop, const fmpz *op, slong len,
 }
 
 /*
-    Returns whether \code{(op, len)} is a square, and if so 
+    Returns whether \code{(op, len)} is a square, and if so
     sets \code{(rop, 2 * d - 1)} to a square root mod $2^N$.
 
     Assumes that \code{(op, len)} has valuation $0$.
  */
-static int 
-_qadic_sqrt_2(fmpz *rop, const fmpz *op, slong len, 
+static int
+_qadic_sqrt_2(fmpz *rop, const fmpz *op, slong len,
               const fmpz *a, const slong *j, slong lena, slong N)
 {
     int ans;
@@ -757,14 +757,14 @@ _qadic_sqrt_2(fmpz *rop, const fmpz *op, slong len,
 }
 
 /*
-    Returns whether \code{(op, len)} is a square, and if so 
-    sets \code{(rop, 2 * d - 1)} to a square root, reduced 
+    Returns whether \code{(op, len)} is a square, and if so
+    sets \code{(rop, 2 * d - 1)} to a square root, reduced
     modulo $2^N$.
 
     Assumes that \code{(op, len)} has valuation $0$.
  */
-int _qadic_sqrt(fmpz *rop, const fmpz *op, slong len, 
-                const fmpz *a, const slong *j, slong lena, 
+int _qadic_sqrt(fmpz *rop, const fmpz *op, slong len,
+                const fmpz *a, const slong *j, slong lena,
                 const fmpz_t p, slong N)
 {
     if (*p == WORD(2))
@@ -825,7 +825,7 @@ int qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         rop->alloc  = 2 * d - 1;
         rop->length = d;
     }
-   
+
     if (rop->val >= N)
         qadic_zero(rop);
     else

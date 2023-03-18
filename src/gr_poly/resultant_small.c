@@ -139,7 +139,7 @@ int gr_poly_resultant_small(gr_ptr r, const gr_poly_t f,
     slong len2 = g->length;
     int status = GR_SUCCESS;
     slong sz = ctx->sizeof_elem;
-    
+
     if (len1 == 0 || len2 == 0)
     {
         return gr_zero(r, ctx);

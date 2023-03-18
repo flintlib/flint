@@ -34,7 +34,7 @@ slong nmod_mat_reduce_row(nmod_mat_t M, slong * P, slong * L, slong m)
 
    for (i = 0, j = 0; i < n; i++, j += limbs)
       rowm[j] = A[m][i];
-   
+
    for (i = 0; i < n; i++)
    {
       if (i != 0)

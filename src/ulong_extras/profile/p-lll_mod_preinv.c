@@ -28,11 +28,11 @@ void sample(void * arg, ulong count)
    ulong i;
    mp_ptr arr, arr2;
    FLINT_TEST_INIT(state);
-   
-      
+
+
    arr = (mp_ptr) flint_malloc(1024*sizeof(mp_limb_t));
    arr2 = (mp_ptr) flint_malloc(1024*sizeof(mp_limb_t));
-      
+
    for (i = 0; i < count; i++)
    {
       int j;
@@ -40,7 +40,7 @@ void sample(void * arg, ulong count)
       if (d == UWORD(0)) d++;
 
       dinv = n_preinvert_limb(d);
-      
+
       for (j = 0; j < 1024; j++)
       {
          arr[j] = n_randbits(state, FLINT_BITS);
@@ -54,7 +54,7 @@ void sample(void * arg, ulong count)
          prof_start();
          for (j = 0; j < UWORD(10000); j++)
          {
-            r += n_lll_mod_preinv(arr2[j&1023], arr[j&1023], arr[(j+1)&1023], d, dinv);  
+            r += n_lll_mod_preinv(arr2[j&1023], arr[j&1023], arr[(j+1)&1023], d, dinv);
          }
 	     prof_stop();
 
@@ -62,7 +62,7 @@ void sample(void * arg, ulong count)
 	  }
 
    }
-  
+
    if (r == UWORD(9879875897)) flint_abort();
 
    flint_randclear(state);
@@ -82,7 +82,7 @@ int main(void)
 	  info.type = 1;
       prof_repeat(&min1, &max, sample, (void *) &info);
 
-	  flint_printf("bits %d, ll_inv %.1f c/l\n", 
+	  flint_printf("bits %d, ll_inv %.1f c/l\n",
            i,
 		   (min1/(double)FLINT_CLOCK_SCALE_FACTOR)/10000
  	  );

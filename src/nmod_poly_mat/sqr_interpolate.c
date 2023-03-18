@@ -74,7 +74,7 @@ nmod_poly_mat_sqr_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A)
         for (j = 0; j < A->c; j++)
         {
             _nmod_poly_evaluate_nmod_vec_fast_precomp(tt,
-                nmod_poly_mat_entry(A, i, j)->coeffs, 
+                nmod_poly_mat_entry(A, i, j)->coeffs,
                 nmod_poly_mat_entry(A, i, j)->length,
                 tree, len, mod);
 

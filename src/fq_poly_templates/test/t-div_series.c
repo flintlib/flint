@@ -45,7 +45,7 @@ main(void)
         TEMPLATE(T, poly_randtest_not_zero) (b, state,
                                              n_randint(state, 80) + 1, ctx);
         TEMPLATE(T, randtest_not_zero) (b->coeffs + 0, state, ctx);
-        
+
         TEMPLATE(T, poly_div_series) (c, a, b, n, ctx);
         TEMPLATE(T, poly_mullow) (d, c, b, n, ctx);
 

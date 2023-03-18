@@ -44,15 +44,15 @@ void sample(void * arg, ulong count)
    info_t * info = (info_t *) arg;
    slong bits = info->bits, i, j;
    int scale;
-   
+
    fmpz_poly_t p1, p2, a, b, c, g;
-           
+
    FLINT_TEST_INIT(state);
-   
+
    scale = 100;
    if (bits >= 50) scale = 10;
    if (bits >= 500) scale = 4;
-   
+
    fmpz_poly_init(p1);
    fmpz_poly_init(p2);
    fmpz_poly_init(a);
@@ -65,7 +65,7 @@ void sample(void * arg, ulong count)
       random_fmpz_poly(a, state, bits);
       random_fmpz_poly(b, state, bits);
       random_fmpz_poly(c, state, bits);
-      
+
       fmpz_poly_mul(p1, a, c);
       fmpz_poly_mul(p2, b, c);
 
@@ -76,7 +76,7 @@ void sample(void * arg, ulong count)
       }
       prof_stop();
    }
-  
+
    fmpz_poly_clear(p1);
    fmpz_poly_clear(p2);
    fmpz_poly_clear(a);
@@ -99,14 +99,14 @@ int main(void)
    for (k = 31; k <= 1000; k += 31)
    {
       info.bits = k;
-     
+
       scale = 100;
       if (k >= 50) scale = 10;
       if (k >= 500) scale = 4;
-      
+
       prof_repeat(&min, &max, sample, (void *) &info);
-      
-      flint_printf("bits %wd, min %.3g ms, max %.3g ms\n", 
+
+      flint_printf("bits %wd, min %.3g ms, max %.3g ms\n",
            info.bits,
 		   (min/scale)/1000.0,
                    (max/scale)/1000.0

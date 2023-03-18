@@ -38,7 +38,7 @@ slong check_omega(slong om, const fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx)
     if (fmpz_cmp_si(omega, om) != 0)
     {
         flint_printf("factorization has wrong number of factors\n");
-        flint_abort();        
+        flint_abort();
     }
 
     fmpz_mpoly_factor_clear(g, ctx);

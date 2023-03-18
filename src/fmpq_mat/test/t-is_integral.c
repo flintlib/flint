@@ -17,7 +17,7 @@ main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("is_integral....");
     fflush(stdout);
@@ -65,7 +65,7 @@ main(void)
         fmpz_mat_clear(B);
     }
 
-    
+
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

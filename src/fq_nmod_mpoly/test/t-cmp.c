@@ -68,7 +68,7 @@ main(void)
         fq_nmod_mpoly_clear(g, ctx);
         fq_nmod_mpoly_clear(mf, ctx);
         fq_nmod_mpoly_clear(mg, ctx);
-        fq_nmod_mpoly_ctx_clear(ctx);  
+        fq_nmod_mpoly_ctx_clear(ctx);
     }
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -173,7 +173,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

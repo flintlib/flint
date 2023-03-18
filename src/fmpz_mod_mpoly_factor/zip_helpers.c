@@ -245,7 +245,7 @@ void fmpz_mod_polyun_zip_start(
 
 
 /*
-    return 
+    return
         -1: singular
         0:  inconsistent
         1:  success

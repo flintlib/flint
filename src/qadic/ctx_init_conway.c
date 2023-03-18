@@ -22,7 +22,7 @@ int flint_conway_polynomials [] = {
 };
 
 void qadic_ctx_init_conway(qadic_ctx_t ctx,
-                           const fmpz_t p, slong d, slong min, slong max, 
+                           const fmpz_t p, slong d, slong min, slong max,
                            const char *var, enum padic_print_mode mode)
 {
     unsigned int position;

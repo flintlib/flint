@@ -38,14 +38,14 @@ flint_printf("---------------------------\n");
     if (fmpz_cmp_si(omega, om) < 0)
     {
         flint_printf("factorization has wrong number of factors\n");
-        flint_abort();        
+        flint_abort();
     }
 
     fq_nmod_mpoly_factor_expand(q, g, ctx);
     if (!fq_nmod_mpoly_equal(q, p, ctx))
     {
         flint_printf("FAIL:\nfactorization does not match original polynomial\n");
-        flint_abort();        
+        flint_abort();
     }
 
     fq_nmod_mpoly_clear(q, ctx);

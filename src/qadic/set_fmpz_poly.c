@@ -11,7 +11,7 @@
 
 #include "qadic.h"
 
-void qadic_set_fmpz_poly(qadic_t rop, const fmpz_poly_t op, 
+void qadic_set_fmpz_poly(qadic_t rop, const fmpz_poly_t op,
                          const qadic_ctx_t ctx)
 {
     const slong len = op->length;

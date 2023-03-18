@@ -36,7 +36,7 @@ void _fmpq_poly_scalar_div_si(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
 
         fmpz_init(d);
         fmpz_init(f);
-        
+
         fmpz_set_si(f, c);
         _fmpz_vec_content_chained(d, poly, len, f);
 
@@ -66,17 +66,17 @@ void fmpq_poly_scalar_div_si(fmpq_poly_t rop, const fmpq_poly_t op, slong c)
         flint_printf("Exception (fmpq_poly_scalar_div_si). Division by zero.\n");
         flint_abort();
     }
-    
+
     if (fmpq_poly_is_zero(op))
     {
         fmpq_poly_zero(rop);
         return;
     }
-    
+
     fmpq_poly_fit_length(rop, op->length);
     _fmpq_poly_set_length(rop, op->length);
-    
-    _fmpq_poly_scalar_div_si(rop->coeffs, rop->den, 
+
+    _fmpq_poly_scalar_div_si(rop->coeffs, rop->den,
                              op->coeffs, op->den, op->length, c);
 }
 

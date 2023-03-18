@@ -22,7 +22,7 @@ void fmpz_poly_divlow_smodp(fmpz * res, const fmpz_poly_t f,
 
    fmpz_init(d);
    fmpz_init(cinv);
-   
+
    while (fmpz_is_zero(g->coeffs + i))
       i++;
 
@@ -54,7 +54,7 @@ void fmpz_poly_divlow_smodp(fmpz * res, const fmpz_poly_t f,
 
    for (k = 0; k < n; i++, k++)
    {
-      fmpz_mul(res + k, tf->coeffs + i, cinv); 
+      fmpz_mul(res + k, tf->coeffs + i, cinv);
 
       fmpz_smod(res + k, res + k, p);
 
@@ -63,7 +63,7 @@ void fmpz_poly_divlow_smodp(fmpz * res, const fmpz_poly_t f,
       _fmpz_vec_scalar_smod_fmpz(tf->coeffs + i, tf->coeffs + i,
                                       FLINT_MIN(g->length - zeroes, n - k), p);
    }
-   
+
    fmpz_poly_clear(tf);
    fmpz_clear(cinv);
    fmpz_clear(d);

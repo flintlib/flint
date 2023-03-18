@@ -25,7 +25,7 @@ main(void)
     FLINT_TEST_INIT(state);
 
     flint_printf("inv_series... ");
-    fflush(stdout);    
+    fflush(stdout);
 
     /* Check aliasing */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -34,7 +34,7 @@ main(void)
         slong n;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
-        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN)
             + PADIC_TEST_PREC_MIN;
         padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
@@ -50,7 +50,7 @@ main(void)
             padic_poly_reduce(a, ctx);
         } else
             fmpz_remove(a->coeffs, a->coeffs, p);
-        
+
         padic_poly_set(b, a, ctx);
         n = n_randint(state, 100) + 1;
 
@@ -77,10 +77,10 @@ main(void)
     }
 
     /*
-        Check correctness: 
+        Check correctness:
 
-        If ord_p(a) = v then we can compute b = a^{-1} mod p^N 
-        and we will have a b = 1 mod p^{N-|v|}.  Thus, require 
+        If ord_p(a) = v then we can compute b = a^{-1} mod p^N
+        and we will have a b = 1 mod p^{N-|v|}.  Thus, require
         that N - |v| > 0.
      */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -150,7 +150,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

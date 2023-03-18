@@ -39,7 +39,7 @@ int main()
     fmpz_init(r2);
     fmpz_init(m2);
     fmpz_init(mprod);
-    
+
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -70,7 +70,7 @@ int main()
 
         fmpz_mod(r1, input, m1);
         fmpz_mod(r2, input, m2);
-        
+
         fmpz_CRT(result, r1, m1, r2, m2, sign);
 
         if (!fmpz_equal(result, input))
@@ -97,7 +97,7 @@ int main()
     fmpz_clear(r2);
     fmpz_clear(m2);
     fmpz_clear(mprod);
-    
+
 
     FLINT_TEST_CLEANUP(state);
 

@@ -35,7 +35,7 @@ main(void)
            fmpz_abs(p, p);
         } while (!fmpz_is_probabprime(p) || fmpz_cmp_ui(p, 2) == 0);
 
-        
+
         result = fmpz_is_probabprime_lucas(p);
         if (!result)
         {
@@ -64,7 +64,7 @@ main(void)
         do {
            fmpz_randbits(a, state, n_randint(state, 100) + 2);
         } while (fmpz_cmp_ui(a, 2) < 0);
-        
+
         fmpz_mul(p, p, a);
 
         if (fmpz_is_probabprime_lucas(p))
@@ -85,7 +85,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

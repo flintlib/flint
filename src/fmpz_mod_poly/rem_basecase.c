@@ -13,8 +13,8 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_rem_basecase(fmpz *R, 
-    const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
+void _fmpz_mod_poly_rem_basecase(fmpz *R,
+    const fmpz *A, slong lenA, const fmpz *B, slong lenB,
     const fmpz_t invB, const fmpz_t p)
 {
     fmpz_t q;

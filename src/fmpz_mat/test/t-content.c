@@ -40,10 +40,10 @@ int main()
 		fmpz_init(scalar);
 		fmpz_init(gcd_mat);
 		fmpz_init(temp);
-		
+
 
 		fmpz_mat_randtest(B, state, 100);
-		
+
 		fmpz_mat_content(gcd_mat, B);
 
 		if (r == 0 || c == 0)
@@ -55,16 +55,16 @@ int main()
 			else
 			{
 				flint_printf("FAIL!\n");
-				flint_abort();	
+				flint_abort();
 			}
 		}
-		
+
 		fmpz_randtest_not_zero(scalar, state, 50);
 
 		fmpz_mat_scalar_mul_fmpz(A, B, scalar);
 
 		fmpz_mat_content(temp, A);
-		
+
 		fmpz_mul(gcd_mat, gcd_mat, scalar);
 
 		if (fmpz_cmpabs(gcd_mat, temp) != 0)
@@ -77,7 +77,7 @@ cleanup:
 
 		fmpz_mat_clear(A);
 		fmpz_mat_clear(B);
-	
+
 		fmpz_clear(scalar);
 		fmpz_clear(temp);
 		fmpz_clear(gcd_mat);

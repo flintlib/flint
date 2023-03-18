@@ -26,17 +26,17 @@ _nmod_poly_powers_mod_preinv_naive(mp_ptr * res, mp_srcptr f, slong flen, slong 
          mp_srcptr g, slong glen, mp_srcptr ginv, slong ginvlen, const nmod_t mod)
 {
     slong i;
-    
+
     if (n == 0)
         return;
-        
+
     /* f^0 = 1 */
     if (glen > 1)
         res[0][0] = 1;
 
     if (glen > 2)
        flint_mpn_zero(res[0] + 1, glen - 2);
-    
+
     if (n == 1)
        return;
 
@@ -46,7 +46,7 @@ _nmod_poly_powers_mod_preinv_naive(mp_ptr * res, mp_srcptr f, slong flen, slong 
 
     if (n == 2)
        return;
-   
+
     /* f^i = f^(i - 1)*f */
     if (glen == 2) /* special case, constant polys */
     {
@@ -69,7 +69,7 @@ nmod_poly_powers_mod_naive(nmod_poly_struct * res, const nmod_poly_t f,
 
     nmod_poly_t ginv;
     mp_ptr * res_arr;
-    
+
     if (nmod_poly_length(g) == 0)
     {
         flint_printf("Exception (nmod_poly_powers_mod_naive). Divide by zero.\n");
@@ -121,7 +121,7 @@ nmod_poly_powers_mod_naive(nmod_poly_struct * res, const nmod_poly_t f,
 
     for (i = 0; i < n; i++)
        _nmod_poly_normalise(res + i);
-    
+
     nmod_poly_clear(ginv);
     flint_free(res_arr);
 }

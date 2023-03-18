@@ -14,7 +14,7 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, slong len1, 
+void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, slong len1,
                              mp_srcptr poly2, slong len2, nmod_t mod)
 {
     slong bits, cutoff_len;
@@ -41,7 +41,7 @@ void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, slong len1,
 void nmod_poly_mul(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2)
 {
     slong len1, len2, len_out;
-    
+
     len1 = poly1->length;
     len2 = poly2->length;
 
@@ -66,13 +66,13 @@ void nmod_poly_mul(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t p
         else
             _nmod_poly_mul(temp->coeffs, poly2->coeffs, len2,
                            poly1->coeffs, len1, poly1->mod);
-        
+
         nmod_poly_swap(temp, res);
         nmod_poly_clear(temp);
     } else
     {
         nmod_poly_fit_length(res, len_out);
-        
+
         if (len1 >= len2)
             _nmod_poly_mul(res->coeffs, poly1->coeffs, len1,
                            poly2->coeffs, len2, poly1->mod);

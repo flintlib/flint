@@ -142,7 +142,7 @@ slong _fmpz_mpoly_sqrt_heap1(
     chain_nodes[0] = (mpoly_heap_t *) flint_malloc(heap_alloc*sizeof(mpoly_heap_t));
     chain = (mpoly_heap_t **) flint_malloc(heap_alloc*sizeof(mpoly_heap_t*));
     store = store_base = (slong *) flint_malloc(2*heap_alloc*sizeof(mpoly_heap_t *));
-    
+
     for (i = 0; i < heap_alloc; i++)
        chain[i] = chain_nodes[0] + i;
 
@@ -151,16 +151,16 @@ slong _fmpz_mpoly_sqrt_heap1(
     mask = mpoly_overflow_mask_sp(bits);
 
     Qlen = 0;
-   
+
     /* "insert" (-1, 1, Aexps[1]) into "heap" */
     Ai = 1;
 
     /* compute first term */
     if (!fmpz_is_square(Acoeffs + 0))
-        goto not_sqrt; 
+        goto not_sqrt;
 
     _fmpz_mpoly_fit_length(&Qcoeffs, &Qexps, allocq, Qlen + 1, 1);
-   
+
     fmpz_sqrt(Qcoeffs + 0, Acoeffs + 0);
 
     Qlen++;
@@ -397,7 +397,7 @@ slong _fmpz_mpoly_sqrt_heap1(
 
             /* d1:d0 = abs(acc_sm[1:0]) assuming ds is sign extension of acc_sm[1] */
             sub_ddmmss(d1, d0, acc_sm[1]^ds, acc_sm[0]^ds, ds, ds);
-            
+
             if ((acc_sm[0] | acc_sm[1] | acc_sm[2]) == 0)
                 continue;
 
@@ -413,7 +413,7 @@ slong _fmpz_mpoly_sqrt_heap1(
 
                 if (rr != 0)
                     goto not_sqrt;
-                
+
                 if (qq == 0)
                     continue;
 
@@ -618,13 +618,13 @@ slong _fmpz_mpoly_sqrt_heap(
     mask = (bits <= FLINT_BITS) ? mpoly_overflow_mask_sp(bits) : 0;
 
     Qlen = 0;
-   
+
     /* "insert" (-1, 1, Aexps[0]) into "heap" */
     Ai = 1;
 
     /* compute first term */
     if (!fmpz_is_square(Acoeffs + 0))
-        goto not_sqrt; 
+        goto not_sqrt;
 
     _fmpz_mpoly_fit_length(&Qcoeffs, &Qexps, allocq, Qlen + 1, 1);
 
@@ -648,7 +648,7 @@ slong _fmpz_mpoly_sqrt_heap(
     {
         lc_lg = COEFF_TO_PTR(Qcoeffs[0]);
     }
-    
+
     if (bits <= FLINT_BITS)
         halves = mpoly_monomial_halves(Qexps + 0, Aexps + 0, N, mask);
     else
@@ -895,7 +895,7 @@ slong _fmpz_mpoly_sqrt_heap(
 
             /* d1:d0 = abs(acc_sm[1:0]) assuming ds is sign extension of acc_sm[1] */
             sub_ddmmss(d1, d0, acc_sm[1]^ds, acc_sm[0]^ds, ds, ds);
-            
+
             if ((acc_sm[0] | acc_sm[1] | acc_sm[2]) == 0)
                 continue;
 
@@ -1004,7 +1004,7 @@ slong _fmpz_mpoly_sqrt_heap(
         else
             mpoly_monomial_add_mp(exp_list[exp_next], Qexps + x->i*N,
                                                          Qexps + x->j*N, N);
-        
+
         if (check || !mpoly_monomial_gt(exp3 + 0, exp_list[exp_next], N, cmpmask))
         {
             exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
@@ -1050,7 +1050,7 @@ not_sqrt:
     goto cleanup;
 }
 
-int fmpz_mpoly_sqrt_heap(fmpz_mpoly_t Q, const fmpz_mpoly_t A, 
+int fmpz_mpoly_sqrt_heap(fmpz_mpoly_t Q, const fmpz_mpoly_t A,
                           const fmpz_mpoly_ctx_t ctx, int check)
 {
     slong lenq, lenq_est;
@@ -1088,7 +1088,7 @@ int fmpz_mpoly_sqrt_heap(fmpz_mpoly_t Q, const fmpz_mpoly_t A,
     {
         fmpz_mpoly_swap(Q, T, ctx);
         fmpz_mpoly_clear(T, ctx);
-    } 
+    }
 
     _fmpz_mpoly_set_length(Q, lenq, ctx);
 

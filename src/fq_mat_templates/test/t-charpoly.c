@@ -41,13 +41,13 @@ main(void)
         TEMPLATE(T, mat_init) (C, m, n, ctx);
         TEMPLATE(T, mat_randtest) (A, state, ctx);
         TEMPLATE(T, mat_randtest) (B, state, ctx);
-        
+
         TEMPLATE(T, mat_mul) (C, A, B, ctx);
         TEMPLATE(T, mat_charpoly) (p1, C, ctx);
-        
+
         TEMPLATE(T, mat_mul) (C, B, A, ctx);
         TEMPLATE(T, mat_charpoly) (p2, C, ctx);
-        
+
         if (!TEMPLATE(T, poly_equal) (p1, p2, ctx))
         {
             flint_printf("FAIL:\n");

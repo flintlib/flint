@@ -78,7 +78,7 @@ static void _nmod_mpoly_mul_array_threaded_worker_LEX(void * varg)
     slong * Amain = base->Amain;
     slong * Bmain = base->Bmain;
     ulong * coeff_array;
-    
+
     TMP_INIT;
 
     TMP_START;
@@ -128,7 +128,7 @@ static void _nmod_mpoly_mul_array_threaded_worker_LEX(void * varg)
                 if (j >= Bl)
                     continue;
 
-                _nmod_mpoly_addmul_array1_ulong3(coeff_array, 
+                _nmod_mpoly_addmul_array1_ulong3(coeff_array,
                         base->Acoeffs + base->Amain[i],
                             base->Apexp + base->Amain[i],
                             base->Amain[i + 1] - base->Amain[i],
@@ -137,7 +137,7 @@ static void _nmod_mpoly_mul_array_threaded_worker_LEX(void * varg)
                             base->Bmain[j + 1] - base->Bmain[j]);
             }
 
-            (base->Pchunks + Pi)->len = 
+            (base->Pchunks + Pi)->len =
                 nmod_mpoly_append_array_sm3_LEX(
                     (base->Pchunks + Pi)->poly, 0,
                     coeff_array, base->mults, base->nvars - 1,
@@ -151,7 +151,7 @@ static void _nmod_mpoly_mul_array_threaded_worker_LEX(void * varg)
                 if (j >= Bl)
                     continue;
 
-                _nmod_mpoly_addmul_array1_ulong2(coeff_array, 
+                _nmod_mpoly_addmul_array1_ulong2(coeff_array,
                         base->Acoeffs + base->Amain[i],
                             base->Apexp + base->Amain[i],
                             base->Amain[i + 1] - base->Amain[i],
@@ -160,12 +160,12 @@ static void _nmod_mpoly_mul_array_threaded_worker_LEX(void * varg)
                             base->Bmain[j + 1] - base->Bmain[j]);
             }
 
-            (base->Pchunks + Pi)->len = 
+            (base->Pchunks + Pi)->len =
                 nmod_mpoly_append_array_sm2_LEX(
                     (base->Pchunks + Pi)->poly, 0,
                     coeff_array, base->mults, base->nvars - 1,
                     base->array_size, Pl - Pi - 1, base->ctx);
-            
+
         }
         else if (t0 != 0)
         {
@@ -175,7 +175,7 @@ static void _nmod_mpoly_mul_array_threaded_worker_LEX(void * varg)
                 if (j >= Bl)
                     continue;
 
-                _nmod_mpoly_addmul_array1_ulong1(coeff_array, 
+                _nmod_mpoly_addmul_array1_ulong1(coeff_array,
                         base->Acoeffs + base->Amain[i],
                             base->Apexp + base->Amain[i],
                             base->Amain[i + 1] - base->Amain[i],
@@ -184,7 +184,7 @@ static void _nmod_mpoly_mul_array_threaded_worker_LEX(void * varg)
                             base->Bmain[j + 1] - base->Bmain[j]);
             }
 
-            (base->Pchunks + Pi)->len = 
+            (base->Pchunks + Pi)->len =
                 nmod_mpoly_append_array_sm1_LEX(
                     (base->Pchunks + Pi)->poly, 0,
                     coeff_array, base->mults, base->nvars - 1,
@@ -258,7 +258,7 @@ void _nmod_mpoly_mul_array_chunked_threaded_LEX(
         {
             if (j >= Bl)
                 continue;
-            
+
             (Pchunks + Pi)->work += (Amain[i + 1] - Amain[i])
                                    *(Bmain[j + 1] - Bmain[j]);
         }
@@ -517,7 +517,7 @@ static void _nmod_mpoly_mul_array_threaded_worker_DEG(void * varg)
                 if (j >= Bl)
                     continue;
 
-                _nmod_mpoly_addmul_array1_ulong3(coeff_array, 
+                _nmod_mpoly_addmul_array1_ulong3(coeff_array,
                         base->Acoeffs + base->Amain[i],
                             base->Apexp + base->Amain[i],
                             base->Amain[i + 1] - base->Amain[i],
@@ -537,7 +537,7 @@ static void _nmod_mpoly_mul_array_threaded_worker_DEG(void * varg)
                 if (j >= Bl)
                     continue;
 
-                _nmod_mpoly_addmul_array1_ulong2(coeff_array, 
+                _nmod_mpoly_addmul_array1_ulong2(coeff_array,
                         base->Acoeffs + base->Amain[i],
                             base->Apexp + base->Amain[i],
                             base->Amain[i + 1] - base->Amain[i],
@@ -557,7 +557,7 @@ static void _nmod_mpoly_mul_array_threaded_worker_DEG(void * varg)
                 if (j >= Bl)
                     continue;
 
-                _nmod_mpoly_addmul_array1_ulong1(coeff_array, 
+                _nmod_mpoly_addmul_array1_ulong1(coeff_array,
                         base->Acoeffs + base->Amain[i],
                             base->Apexp + base->Amain[i],
                             base->Amain[i + 1] - base->Amain[i],

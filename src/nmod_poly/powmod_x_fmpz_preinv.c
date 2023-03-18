@@ -45,7 +45,7 @@ _nmod_poly_powmod_x_fmpz_preinv (mp_ptr res, fmpz_t e, mp_srcptr f, slong lenf,
     window = (WORD(1) << l);
     c = l;
     i = fmpz_sizeinbase(e, 2) - 2;
-    
+
     if (i <= l)
     {
         window = (WORD(1) << i);
@@ -77,7 +77,7 @@ _nmod_poly_powmod_x_fmpz_preinv (mp_ptr res, fmpz_t e, mp_srcptr f, slong lenf,
         {
             if (window == 0 && i <= l - 1)
                 c = i;
-        
+
             if (c >= 0)
               window = window | (WORD(1) << c);
         } else if (window == 0)
@@ -86,7 +86,7 @@ _nmod_poly_powmod_x_fmpz_preinv (mp_ptr res, fmpz_t e, mp_srcptr f, slong lenf,
         if (c == 0)
         {
             _nmod_poly_shift_left(T, res, lenf - 1, window);
-          
+
             _nmod_poly_divrem_newton_n_preinv(Q, res, T, lenf - 1 + window, f,
                                                      lenf, finv, lenfinv, mod);
 
@@ -126,17 +126,17 @@ nmod_poly_powmod_x_fmpz_preinv(nmod_poly_t res, fmpz_t e, const nmod_poly_t f,
         nmod_poly_init_mod(tmp, res->mod);
         nmod_poly_init_mod(r, res->mod);
         nmod_poly_init2_preinv(poly, res->mod.n, res->mod.ninv, 2);
-        
+
         nmod_poly_set_coeff_ui(poly, 1, 1);
-        
+
         nmod_poly_divrem(tmp, r, poly, f);
-        
+
         nmod_poly_powmod_fmpz_binexp_preinv(res, r, e, f, finv);
-        
+
         nmod_poly_clear(tmp);
         nmod_poly_clear(r);
         nmod_poly_clear(poly);
-        
+
         return;
     }
 
@@ -145,20 +145,20 @@ nmod_poly_powmod_x_fmpz_preinv(nmod_poly_t res, fmpz_t e, const nmod_poly_t f,
         if (fmpz_is_zero(e))
         {
             nmod_poly_fit_length(res, 1);
-          
+
             res->coeffs[0] = 1;
             res->length = 1;
         } else if (fmpz_is_one(e))
         {
             nmod_poly_t r;
-          
+
             nmod_poly_init2_preinv(r, res->mod.n, res->mod.ninv, 2);
             nmod_poly_set_coeff_ui(r, 1, 1);
 
             nmod_poly_init_preinv(tmp, res->mod.n, res->mod.ninv);
-            
+
             nmod_poly_divrem (tmp, res, r, f);
-            
+
             nmod_poly_clear(tmp);
             nmod_poly_clear(r);
         }
@@ -166,9 +166,9 @@ nmod_poly_powmod_x_fmpz_preinv(nmod_poly_t res, fmpz_t e, const nmod_poly_t f,
         {
             nmod_poly_init2_preinv(tmp, res->mod.n, res->mod.ninv, 3);
             nmod_poly_set_coeff_ui(tmp, 1, 1);
-            
+
             nmod_poly_mulmod(res, tmp, tmp, f);
-            
+
             nmod_poly_clear(tmp);
         }
         return;
@@ -177,17 +177,17 @@ nmod_poly_powmod_x_fmpz_preinv(nmod_poly_t res, fmpz_t e, const nmod_poly_t f,
     if (res == f || res == finv)
     {
         nmod_poly_init2(tmp, res->mod.n, trunc);
-        
+
         _nmod_poly_powmod_x_fmpz_preinv(tmp->coeffs, e, f->coeffs, lenf,
                                            finv->coeffs, finv->length, f->mod);
-        
+
         nmod_poly_swap(res, tmp);
         nmod_poly_clear(tmp);
     }
     else
     {
         nmod_poly_fit_length(res, trunc);
-        
+
         _nmod_poly_powmod_x_fmpz_preinv(res->coeffs, e, f->coeffs, lenf,
                                            finv->coeffs, finv->length, f->mod);
     }

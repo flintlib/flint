@@ -20,7 +20,7 @@ int main(void)
    fmpz_t n, p;
    ulong c;
    ulong B1;
-   
+
    FLINT_TEST_INIT(state);
 
    fmpz_init(n);
@@ -34,14 +34,14 @@ int main(void)
          flint_printf("Read failed\n");
          flint_abort();
       }
-   
+
       flint_printf("Enter B1: "); fflush(stdout);
       if (!flint_scanf("%wu", &B1))
       {
          flint_printf("Read failed\n");
          flint_abort();
       }
-    
+
       do
       {
          c = n_randlimb(state);
@@ -55,7 +55,7 @@ int main(void)
       } else
          flint_printf("Factor not found!\n");
    } while(1);
-   
+
    flint_randclear(state);
 
    fmpz_clear(n);

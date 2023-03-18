@@ -16,7 +16,7 @@ int
 main(void)
 {
     int i;
-    
+
     FLINT_TEST_INIT(state);
 
     flint_printf("composition_matrix... ");
@@ -50,7 +50,7 @@ main(void)
 
         fq_randtest(a, state, ctx);
         fq_embed_composition_matrix(mat_a, a, ctx);
-        
+
         fmpz_mod_mat_mul(res, mat_frob, mat_a);
 
         fq_pow(a, a, fq_ctx_prime(ctx), ctx);
@@ -66,7 +66,7 @@ main(void)
                 fmpz_mod_mat_print_pretty(mat_a), flint_printf("\n"),
                 fmpz_mod_mat_print_pretty(mat_aq), flint_printf("\n"),
                 fmpz_mod_mat_print_pretty(res), flint_printf("\n");
-            
+
             fflush(stdout);
             flint_abort();
         }

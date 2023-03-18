@@ -91,7 +91,7 @@ main(void)
                 flint_printf("FAIL\n");
                 flint_printf("Check power success\ni = %wd, j1 = %wd\n", i, j1);
                 fflush(stdout);
-                flint_abort();                
+                flint_abort();
             }
             fq_nmod_mpoly_mul(g, g, m, ctx);
             fq_nmod_mpoly_add(h, h, g, ctx);
@@ -195,7 +195,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

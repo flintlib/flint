@@ -118,7 +118,7 @@ int main()
     fmpz_clear(a);
     fmpz_clear(b);
     fmpz_clear(mmin);
-    
+
     FLINT_TEST_CLEANUP(state);
 
     flint_printf("PASS\n");

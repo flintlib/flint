@@ -371,7 +371,7 @@ static slong _uiui_hgcd(
     else
     {
         if (b1 == 0 && b0 <= m11)
-            goto fix;        
+            goto fix;
         add_ssaaaa(t1,t0, 0,m21, 0,m22);
     }
     if (d1 < t1 || (d1 == t1 && d0 < t0))
@@ -1033,7 +1033,7 @@ again:
         goto cleanup;
 
     k = fmpz_bits(x->left_num);
-    
+
     if (k > 500*FLINT_BITS)
         goto split;
     if (k > 4*FLINT_BITS)
@@ -1236,7 +1236,7 @@ chop:
 cleanup:
 
 #if FLINT_WANT_ASSERT
-    FLINT_ASSERT(!needM || (_fmpq_ball_apply_mat22_inv(y, M, xorg), 
+    FLINT_ASSERT(!needM || (_fmpq_ball_apply_mat22_inv(y, M, xorg),
                                                        _fmpq_ball_equal(y, x)));
     _fmpq_ball_clear(xorg);
 #endif

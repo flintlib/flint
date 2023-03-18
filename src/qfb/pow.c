@@ -45,7 +45,7 @@ void qfb_pow(qfb_t r, qfb_t f, fmpz_t D, fmpz_t e)
    fmpz_root(L, L, 4);
 
    qfb_init(pow);
-   
+
    qfb_set(pow, f);
    while (fmpz_is_even(exp))
    {
@@ -56,7 +56,7 @@ void qfb_pow(qfb_t r, qfb_t f, fmpz_t D, fmpz_t e)
 
    qfb_set(r, pow);
    fmpz_fdiv_q_2exp(exp, exp, 1);
-   
+
    while (!fmpz_is_zero(exp))
    {
       qfb_nudupl(pow, pow, D, L);
@@ -96,7 +96,7 @@ void qfb_pow_with_root(qfb_t r, qfb_t f, fmpz_t D, fmpz_t e, fmpz_t L)
    fmpz_set(exp, e);
 
    qfb_init(pow);
-   
+
    qfb_set(pow, f);
    while (fmpz_is_even(exp))
    {
@@ -107,7 +107,7 @@ void qfb_pow_with_root(qfb_t r, qfb_t f, fmpz_t D, fmpz_t e, fmpz_t L)
 
    qfb_set(r, pow);
    fmpz_fdiv_q_2exp(exp, exp, 1);
-   
+
    while (!fmpz_is_zero(exp))
    {
       qfb_nudupl(pow, pow, D, L);

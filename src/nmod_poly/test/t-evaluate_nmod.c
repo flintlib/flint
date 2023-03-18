@@ -19,8 +19,8 @@ main(void)
 {
     int i, j, result = 1;
     FLINT_TEST_INIT(state);
-    
-    
+
+
     flint_printf("evaluate_nmod....");
     fflush(stdout);
 
@@ -33,13 +33,13 @@ main(void)
 
         nmod_poly_init(a, n);
         nmod_poly_randtest(a, state, n_randint(state, 100));
-        
+
         eval = nmod_poly_evaluate_nmod(a, 1);
-        
+
         sum = 0;
         for (j = 0; j < a->length; j++)
            sum = n_addmod(sum, nmod_poly_get_coeff_ui(a, j), n);
-        
+
         result = (sum == eval);
         if (!result)
         {
@@ -65,15 +65,15 @@ main(void)
         nmod_poly_init(b, n);
         nmod_poly_randtest(a, state, n_randint(state, 100));
         nmod_poly_randtest(b, state, n_randint(state, 100));
-        
+
         c = n_randint(state, n);
-        
+
         eval1 = nmod_poly_evaluate_nmod(a, c);
         eval1 = n_addmod(eval1, nmod_poly_evaluate_nmod(b, c), n);
-        
+
         nmod_poly_add(a, a, b);
         eval2 = nmod_poly_evaluate_nmod(a, c);
-        
+
 
         result = (eval1 == eval2);
         if (!result)
@@ -91,7 +91,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -13,7 +13,7 @@
 
 #include "fmpz_poly.h"
 
-void 
+void
 _fmpz_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
     const fmpz * B, slong Blen, slong n)
 {
@@ -34,7 +34,7 @@ _fmpz_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
         _fmpz_poly_div_series_divconquer(Q, A, Alen, B, Blen, n);
 }
 
-void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A, 
+void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A,
                                          const fmpz_poly_t B, slong n)
 {
     slong Alen = FLINT_MIN(A->length, n);

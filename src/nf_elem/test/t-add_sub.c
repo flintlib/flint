@@ -44,7 +44,7 @@ main(void)
 
         nf_elem_randtest(b, state, 200, nf);
         nf_elem_randtest(c, state, 200, nf);
-        
+
         nf_elem_add(t, b, c, nf);
         nf_elem_sub(a, t, c, nf);
 
@@ -62,10 +62,10 @@ main(void)
         nf_elem_clear(b, nf);
         nf_elem_clear(c, nf);
         nf_elem_clear(t, nf);
-         
+
         nf_clear(nf);
     }
-    
+
     /* test b + c - c = b : exercise common denominator path */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -81,7 +81,7 @@ main(void)
 
         nf_elem_randtest(b, state, 200, nf);
         nf_elem_randtest(c, state, 200, nf);
-        
+
         if (nf->flag & NF_QUADRATIC && n_randint(state, 2))
            fmpz_set(QNF_ELEM(c)->den, QNF_ELEM(b)->den);
 
@@ -102,10 +102,10 @@ main(void)
         nf_elem_clear(b, nf);
         nf_elem_clear(c, nf);
         nf_elem_clear(t, nf);
-         
+
         nf_clear(nf);
     }
-    
+
     /* test aliasing a and b */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -120,7 +120,7 @@ main(void)
 
         nf_elem_randtest(b, state, 200, nf);
         nf_elem_randtest(c, state, 200, nf);
-        
+
         nf_elem_set(a, b, nf);
         nf_elem_add(b, b, c, nf);
         nf_elem_sub(b, b, c, nf);
@@ -138,7 +138,7 @@ main(void)
         nf_elem_clear(a, nf);
         nf_elem_clear(b, nf);
         nf_elem_clear(c, nf);
-         
+
         nf_clear(nf);
     }
 
@@ -156,7 +156,7 @@ main(void)
 
         nf_elem_randtest(b, state, 200, nf);
         nf_elem_randtest(c, state, 200, nf);
-        
+
         nf_elem_set(a, c, nf);
         nf_elem_add(c, b, c, nf);
         nf_elem_sub(a, c, a, nf);
@@ -174,7 +174,7 @@ main(void)
         nf_elem_clear(a, nf);
         nf_elem_clear(b, nf);
         nf_elem_clear(c, nf);
-         
+
         nf_clear(nf);
     }
 

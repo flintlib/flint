@@ -18,8 +18,8 @@
     cannot be used. To do: explain why this particular algorithm,
     given non-normalized input, gives the expected result. */
 
-static void 
-_fmpz_mod_poly_inv_series_pure_newton(fmpz * Qinv, const fmpz * Q, slong n, 
+static void
+_fmpz_mod_poly_inv_series_pure_newton(fmpz * Qinv, const fmpz * Q, slong n,
                                  const fmpz_t cinv, const fmpz_t p)
 {
     if (n == 1)
@@ -59,7 +59,7 @@ _fmpz_mod_poly_inv_series_pure_newton(fmpz * Qinv, const fmpz * Q, slong n,
     }
 }
 
-void padic_poly_inv_series(padic_poly_t Qinv, const padic_poly_t Q, slong n, 
+void padic_poly_inv_series(padic_poly_t Qinv, const padic_poly_t Q, slong n,
                            const padic_ctx_t ctx)
 {
     fmpz_t cinv;

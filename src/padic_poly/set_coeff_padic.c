@@ -11,7 +11,7 @@
 
 #include "padic_poly.h"
 
-void padic_poly_set_coeff_padic(padic_poly_t poly, slong n, const padic_t x, 
+void padic_poly_set_coeff_padic(padic_poly_t poly, slong n, const padic_t x,
                                 const padic_ctx_t ctx)
 {
     if (padic_is_zero(x) || padic_val(x) >= padic_poly_prec(poly))
@@ -52,7 +52,7 @@ void padic_poly_set_coeff_padic(padic_poly_t poly, slong n, const padic_t x,
 
         fmpz_init(pow);
         fmpz_pow_ui(pow, ctx->p, poly->val - padic_val(x));
-        _fmpz_vec_scalar_mul_fmpz(poly->coeffs, 
+        _fmpz_vec_scalar_mul_fmpz(poly->coeffs,
                                   poly->coeffs, poly->length, pow);
         fmpz_set(poly->coeffs + n, padic_unit(x));
         fmpz_clear(pow);

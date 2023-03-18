@@ -388,7 +388,7 @@ static void fq_zech_mpoly_set_eval_helper3(
         if (its_new)
         {
             n_poly_init2(Wc, 4);
-            Wc->coeffs[0] = i;                
+            Wc->coeffs[0] = i;
             Wc->length = 1;
         }
         else
@@ -496,7 +496,7 @@ static slong fq_zech_mpoly_set_eval_helper_and_zip_form3(
             if (its_new)
             {
                 n_poly_init2(Wc, 4);
-                Wc->coeffs[0] = i;                
+                Wc->coeffs[0] = i;
                 Wc->length = 1;
             }
             else
@@ -680,7 +680,7 @@ void fq_zech_polyu3_add_zip_limit1(
             for (j = 0; j < cur_length; j++)
                 fq_zech_zero(Zcoeffs[Zi].coeffs + j, ctx);
 
-            goto in_both;            
+            goto in_both;
         }
         else if (Aexps[Ai] + ai < Zexps[Zi])
         {

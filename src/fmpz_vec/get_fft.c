@@ -14,7 +14,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-static void _fmpz_vec_get_fft_coeff(mp_limb_t ** coeffs_f, 
+static void _fmpz_vec_get_fft_coeff(mp_limb_t ** coeffs_f,
                        const fmpz * coeffs_m, slong l, slong i)
 {
     slong size_f = l + 1;
@@ -23,12 +23,12 @@ static void _fmpz_vec_get_fft_coeff(mp_limb_t ** coeffs_f,
     int signed_c;
     c = coeffs_m[i];
     signed_c = 0;
-		
+
     if (!COEFF_IS_MPZ(c)) /* coeff is small */
     {
         size_j = 1;
 
-        if (c < 0) 
+        if (c < 0)
         {
             signed_c = 1;
             c = -c;
@@ -41,7 +41,7 @@ static void _fmpz_vec_get_fft_coeff(mp_limb_t ** coeffs_f,
     {
         __mpz_struct * mc = COEFF_TO_PTR(c);
         size_j = mc->_mp_size;
-        if (size_j < 0) 
+        if (size_j < 0)
         {
             signed_c = 1;
             size_j = -size_j;
@@ -51,13 +51,13 @@ static void _fmpz_vec_get_fft_coeff(mp_limb_t ** coeffs_f,
 
     if (signed_c) /* write out FFT coefficient, ensuring sign is correct */
     {
-        mpn_neg_n(coeffs_f[i], coeff, size_j); 
-        flint_mpn_store(coeffs_f[i] + size_j, size_f - size_j, WORD(-1)); 
+        mpn_neg_n(coeffs_f[i], coeff, size_j);
+        flint_mpn_store(coeffs_f[i] + size_j, size_f - size_j, WORD(-1));
     }
     else
     {
-        flint_mpn_copyi(coeffs_f[i], coeff, size_j); 
-        flint_mpn_zero(coeffs_f[i] + size_j, size_f - size_j); 
+        flint_mpn_copyi(coeffs_f[i], coeff, size_j);
+        flint_mpn_zero(coeffs_f[i] + size_j, size_f - size_j);
     }
 }
 
@@ -75,7 +75,7 @@ worker(slong i, work_t * work)
     _fmpz_vec_get_fft_coeff(work->coeffs_f, work->coeffs_m, work->limbs, i);
 }
 
-void _fmpz_vec_get_fft(mp_limb_t ** coeffs_f, 
+void _fmpz_vec_get_fft(mp_limb_t ** coeffs_f,
                        const fmpz * coeffs_m, slong limbs, slong length)
 {
     work_t work;

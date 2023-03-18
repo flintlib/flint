@@ -20,7 +20,7 @@ int main(void)
     flint_printf("sqrtmod_primepow....");
     fflush(stdout);
 
-    
+
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random squares mod a power of 2 */
     {
@@ -38,12 +38,12 @@ int main(void)
         while (FLINT_BIT_COUNT(p*pow2) <= 12)
             pow2 *= p;
 
-        if ((b % (p*pow2)) == 0) 
+        if ((b % (p*pow2)) == 0)
         {
             b += pow2;
             b %= pow;
         }
-        
+
         pinv = n_preinvert_limb(pow);
         a = n_mulmod2_preinv(b, b, pow, pinv);
 
@@ -67,7 +67,7 @@ int main(void)
             flint_printf("a = %wu\n", a);
             flint_printf("b = %wu\n", b);
             flint_printf("num = %wd\n", num);
-            
+
             if (!btest)
                 flint_printf("Square root not found.\n");
             if (i != num)
@@ -79,7 +79,7 @@ int main(void)
 
         flint_free(sqrt);
     }
-    
+
     for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random squares mod other prime powers */
     {
         mp_limb_t a, b, p, pow, pow2, pinv;
@@ -94,14 +94,14 @@ int main(void)
         exp = n_randint(state, maxexp) + 1;
         pow = n_pow(p, exp);
         b = n_randtest(state) % pow;
-        
+
         if (bits <= FLINT_BITS/2)
-        { 
+        {
             pow2 = p;
             while (FLINT_BIT_COUNT(p*pow2) <= 12)
                 pow2 *= p;
 
-            if ((b % (p*pow2)) == 0) 
+            if ((b % (p*pow2)) == 0)
                 b += pow2;
 
             b %= pow;
@@ -130,7 +130,7 @@ int main(void)
             flint_printf("a = %wu\n", a);
             flint_printf("b = %wu\n", b);
             flint_printf("num = %wd\n", num);
-            
+
             if (!btest)
                 flint_printf("Square root not found.\n");
             if (i != num)
@@ -149,15 +149,15 @@ int main(void)
         slong exp, maxexp;
         flint_bitcnt_t bits;
         mp_limb_t * sqrt;
-        
+
         bits = n_randint(state, 18) + 2;
         p = n_randprime(state, bits, 0);
         maxexp = 20/bits;
         exp = n_randint(state, maxexp) + 1 + (p == 2);
         pow = n_pow(p, exp);
-        
+
         pinv = n_preinvert_limb(pow);
-        
+
         a = n_randtest(state) % pow;
         while (n_sqrtmod_primepow(&sqrt, a, p, exp))
         {
@@ -168,11 +168,11 @@ int main(void)
                 fflush(stdout);
                 flint_abort();
             }
-            
+
             flint_free(sqrt);
             a = n_randtest(state) % pow;
         }
-        
+
         for (b = 0; b < pow; b++)
         {
             if (n_mulmod2_preinv(b, b, pow, pinv) == a)
@@ -196,7 +196,7 @@ int main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

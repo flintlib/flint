@@ -53,7 +53,7 @@ int fq_nmod_mpoly_fprint_pretty(
     exponents = (fmpz *) TMP_ALLOC(ctx->minfo->nvars*sizeof(fmpz));
     for (i = 0; i < ctx->minfo->nvars; i++)
         fmpz_init(exponents + i);
-   
+
     for (i = 0; i < len; i++)
     {
         if (i > 0)

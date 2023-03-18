@@ -13,7 +13,7 @@
 #define GR_VEC_H
 
 #ifdef GR_VEC_INLINES_C
-#define GR_VEC_INLINE 
+#define GR_VEC_INLINE
 #else
 #define GR_VEC_INLINE static __inline__
 #endif

@@ -223,7 +223,7 @@ int main(int argc, char *argv[])
         nmod_mpoly_clear(A, ctx);
         nmod_mpoly_clear(b, ctx);
         nmod_mpoly_clear(a, ctx);
-        nmod_mpoly_ctx_clear(ctx);        
+        nmod_mpoly_ctx_clear(ctx);
     }
     else /* sparse */
     {

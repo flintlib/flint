@@ -13,7 +13,7 @@
 
 #include "templates.h"
 
-void TEMPLATE(T, poly_set_nmod_poly)(TEMPLATE(T, poly_t) rop, 
+void TEMPLATE(T, poly_set_nmod_poly)(TEMPLATE(T, poly_t) rop,
                                                const nmod_poly_t op,
                                                const TEMPLATE(T, ctx_t) ctx)
 {

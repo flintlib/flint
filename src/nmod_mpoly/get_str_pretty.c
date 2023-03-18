@@ -59,7 +59,7 @@ _nmod_mpoly_get_str_pretty(const mp_limb_t * coeff, const ulong * exp, slong len
 
     str = flint_malloc(bound);
     off = 0;
-   
+
     for (i = 0; i < len; i++)
     {
         if (i > 0)
@@ -97,7 +97,7 @@ _nmod_mpoly_get_str_pretty(const mp_limb_t * coeff, const ulong * exp, slong len
             {
                 off += flint_sprintf(str + off, "%s", x[j]);
             }
-            
+
             first = 0;
         }
 

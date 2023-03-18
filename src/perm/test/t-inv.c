@@ -17,7 +17,7 @@ int main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("inv....");
     fflush(stdout);
@@ -82,7 +82,7 @@ int main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -1,7 +1,7 @@
 /*
     Copyright (C) 2012 Fredrik Johansson
     Copyright (C) 2018, 2019 William Hart
-    
+
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
@@ -46,7 +46,7 @@ _fmpz_poly_sqrtrem_divconquer(fmpz * res, fmpz * r, const fmpz * poly, slong len
 
     if (r != poly)
         _fmpz_vec_set(r, poly, len);
-        
+
     if (!_fmpz_poly_sqrtrem_divconquer(res + n - n2, r + len - 2*n2 + 1, r + len - 2*n2 + 1, 2*n2 - 1, temp))
         return 0;
 
@@ -80,7 +80,7 @@ fmpz_poly_sqrtrem_divconquer(fmpz_poly_t b, fmpz_poly_t r, const fmpz_poly_t a)
         fmpz_poly_zero(r);
         return len == 0;
     }
-    
+
     if (b == a)
     {
         fmpz_poly_t tmp;

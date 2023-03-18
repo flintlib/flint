@@ -18,7 +18,7 @@ void fmpz_add(fmpz_t f, const fmpz_t g, const fmpz_t h)
 {
     fmpz c1 = *g;
     fmpz c2 = *h;
-    
+
     if (!COEFF_IS_MPZ(c1))  /* g is small */
     {
         if (!COEFF_IS_MPZ(c2))  /* both inputs are small */
@@ -39,7 +39,7 @@ void fmpz_add(fmpz_t f, const fmpz_t g, const fmpz_t h)
         {
             __mpz_struct * mpz3 = _fmpz_promote(f);  /* h is saved and g is large */
             __mpz_struct * mpz1 = COEFF_TO_PTR(c1);
-            if (c2 < WORD(0)) flint_mpz_sub_ui(mpz3, mpz1, -c2);   
+            if (c2 < WORD(0)) flint_mpz_sub_ui(mpz3, mpz1, -c2);
             else flint_mpz_add_ui(mpz3, mpz1, c2);
             _fmpz_demote_val(f);  /* may have cancelled */
         }

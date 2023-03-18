@@ -40,7 +40,7 @@ void check_omega(slong lower, slong upper, const fmpq_mpoly_t p, const fmpq_mpol
     {
         flint_printf("factorization has wrong number of factors\n");
         fflush(stdout);
-        flint_abort();        
+        flint_abort();
     }
 
     fmpq_mpoly_factor_expand(q, g, ctx);
@@ -48,7 +48,7 @@ void check_omega(slong lower, slong upper, const fmpq_mpoly_t p, const fmpq_mpol
     {
         flint_printf("factorization does not match original polynomial\n");
         fflush(stdout);
-        flint_abort();        
+        flint_abort();
     }
 
     for (i = 0; i < g->num; i++)
@@ -81,7 +81,7 @@ void check_omega(slong lower, slong upper, const fmpq_mpoly_t p, const fmpq_mpol
     {
         flint_printf("monic factorization does not match original polynomial\n");
         fflush(stdout);
-        flint_abort();        
+        flint_abort();
     }
 
     fmpq_mpoly_factor_make_integral(g, ctx);
@@ -103,7 +103,7 @@ void check_omega(slong lower, slong upper, const fmpq_mpoly_t p, const fmpq_mpol
     {
         flint_printf("integral factorization does not match original polynomial\n");
         fflush(stdout);
-        flint_abort();        
+        flint_abort();
     }
 
     fmpq_mpoly_clear(q, ctx);
@@ -166,7 +166,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

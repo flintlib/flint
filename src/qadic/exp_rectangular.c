@@ -14,8 +14,8 @@
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
-void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, slong v, slong len, 
-                            const fmpz *a, const slong *j, slong lena, 
+void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, slong v, slong len,
+                            const fmpz *a, const slong *j, slong lena,
                             const fmpz_t p, slong N, const fmpz_t pN)
 {
     const slong d = j[lena - 1];
@@ -70,7 +70,7 @@ void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, slong v, slong len,
     }
     else  /* n >= 4 */
     {
-        const slong k = fmpz_fits_si(p) ? 
+        const slong k = fmpz_fits_si(p) ?
                        (n - 1 - 1) / (fmpz_get_si(p) - 1) : 0;
         const slong b = n_sqrt(n);
 
@@ -185,7 +185,7 @@ int qadic_exp_rectangular(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
                 t = rop->coeffs;
             }
 
-            _qadic_exp_rectangular(t, op->coeffs, v, op->length, 
+            _qadic_exp_rectangular(t, op->coeffs, v, op->length,
                                    ctx->a, ctx->j, ctx->len, p, N, pN);
             rop->val = 0;
 

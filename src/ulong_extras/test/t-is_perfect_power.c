@@ -19,7 +19,7 @@ int main(void)
    ulong bits, root, hi, n;
    mp_limb_t d;
    FLINT_TEST_INIT(state);
-   
+
    flint_printf("is_perfect_power....");
    fflush(stdout);
 
@@ -44,7 +44,7 @@ int main(void)
          flint_abort();
       }
    }
-         
+
    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test that cubes pass the test */
    {
       bits = n_randint(state, FLINT_BITS/3) + 1;
@@ -66,7 +66,7 @@ int main(void)
          flint_abort();
       }
    }
-         
+
    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test that fifth powers pass the test */
    {
       bits = n_randint(state, FLINT_BITS/5) + 1;
@@ -88,13 +88,13 @@ int main(void)
          flint_abort();
       }
    }
-         
+
    /* exhaustively test all other powers */
    for (d = 2; d < (UWORD(1) << (FLINT_BITS/5)); d++)
    {
       hi = 0;
       n = d*d;
-      
+
       while (hi == 0)
       {
          result = n_is_perfect_power(&root, n);
@@ -104,12 +104,12 @@ int main(void)
             flint_printf("%wu^%wu != %wu\n", root, result, n);
             fflush(stdout);
             flint_abort();
-         }         
+         }
 
          umul_ppmm(hi, n, n, d);
       }
    }
- 
+
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that non perfect powers fail */
    {
       mpz_t d_m;
@@ -125,7 +125,7 @@ int main(void)
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("d = %wu is declared a perfect power\n", d); 
+         flint_printf("d = %wu is declared a perfect power\n", d);
          fflush(stdout);
          flint_abort();
       }
@@ -134,7 +134,7 @@ int main(void)
    }
 
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
 
    return 0;

@@ -16,7 +16,7 @@ int main(void)
 {
    int i, result;
    FLINT_TEST_INIT(state);
-   
+
    flint_printf("divides....");
    fflush(stdout);
 
@@ -39,12 +39,12 @@ int main(void)
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("n = %wu, p = %wu, q = %wu\n", n, p, q); 
+         flint_printf("n = %wu, p = %wu, q = %wu\n", n, p, q);
          fflush(stdout);
          flint_abort();
       }
    }
-   
+
    /* test known divisible values */
    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
    {
@@ -65,14 +65,14 @@ int main(void)
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("n = %wu, p = %wu, q = %wu\n", n, p, q); 
+         flint_printf("n = %wu, p = %wu, q = %wu\n", n, p, q);
          fflush(stdout);
          flint_abort();
       }
    }
- 
+
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

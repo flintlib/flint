@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2009, 2011, 2020 William Hart
 
     This file is part of FLINT.
@@ -63,7 +63,7 @@ _split_limbs_worker(void * arg_ptr)
     }
 }
 
-mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_srcptr limbs, 
+mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_srcptr limbs,
           mp_size_t total_limbs, mp_size_t coeff_limbs, mp_size_t output_limbs)
 {
     mp_size_t i, shared_i = 0, skip, length = (total_limbs - 1)/coeff_limbs + 1;
@@ -74,7 +74,7 @@ mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_srcptr limbs,
     slong num_threads;
     thread_pool_handle * threads;
     split_limbs_arg_t * args;
-    
+
 #if FLINT_USES_PTHREAD
     pthread_mutex_init(&mutex, NULL);
 #endif
@@ -94,7 +94,7 @@ mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_srcptr limbs,
        args[i].limbs = limbs;
        args[i].poly = poly;
 #if FLINT_USES_PTHREAD
-       args[i].mutex = &mutex;       
+       args[i].mutex = &mutex;
 #endif
     }
 
@@ -117,13 +117,13 @@ mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_srcptr limbs,
 
     i = num;
     skip = i*coeff_limbs;
-   
-    if (i < length) 
+
+    if (i < length)
         flint_mpn_zero(poly[i], output_limbs + 1);
-   
-    if (total_limbs > skip) 
+
+    if (total_limbs > skip)
         flint_mpn_copyi(poly[i], limbs + skip, total_limbs - skip);
-   
+
     return length;
 }
 
@@ -175,7 +175,7 @@ _split_bits_worker(void * arg_ptr)
         for ( ; i < end; i++)
         {
             flint_mpn_zero(poly[i], output_limbs + 1);
-      
+
             limb_ptr = limbs + i*(coeff_limbs - 1) + (i*top_bits)/FLINT_BITS;
             shift_bits = (i*top_bits) % FLINT_BITS;
 
@@ -196,16 +196,16 @@ _split_bits_worker(void * arg_ptr)
                    limb_ptr++;
                    poly[i][coeff_limbs - 1] +=
                        (limb_ptr[0] << (FLINT_BITS - (shift_bits - top_bits)));
-                   shift_bits -= FLINT_BITS; 
+                   shift_bits -= FLINT_BITS;
                 }
-         
+
                 poly[i][coeff_limbs - 1] &= mask;
-            } 
+            }
         }
     }
 }
 
-mp_size_t fft_split_bits(mp_limb_t ** poly, mp_srcptr limbs, 
+mp_size_t fft_split_bits(mp_limb_t ** poly, mp_srcptr limbs,
                mp_size_t total_limbs, flint_bitcnt_t bits, mp_size_t output_limbs)
 {
     mp_size_t i, shared_i = 0, coeff_limbs, limbs_left;
@@ -219,15 +219,15 @@ mp_size_t fft_split_bits(mp_limb_t ** poly, mp_srcptr limbs,
     slong num_threads;
     thread_pool_handle * threads;
     split_bits_arg_t * args;
-   
+
     if (top_bits == 0)
         return fft_split_limbs(poly, limbs, total_limbs, bits/FLINT_BITS, output_limbs);
 
     coeff_limbs = (bits/FLINT_BITS) + 1;
     mask = (WORD(1)<<top_bits) - WORD(1);
     shift_bits = WORD(0);
-    limb_ptr = limbs;                      
-    
+    limb_ptr = limbs;
+
 #if FLINT_USES_PTHREAD
     pthread_mutex_init(&mutex, NULL);
 #endif
@@ -249,7 +249,7 @@ mp_size_t fft_split_bits(mp_limb_t ** poly, mp_srcptr limbs,
        args[i].mask = mask;
        args[i].poly = poly;
 #if FLINT_USES_PTHREAD
-       args[i].mutex = &mutex;       
+       args[i].mutex = &mutex;
 #endif
     }
 
@@ -275,14 +275,14 @@ mp_size_t fft_split_bits(mp_limb_t ** poly, mp_srcptr limbs,
     shift_bits = (i*top_bits) % FLINT_BITS;
 
     flint_mpn_zero(poly[i], output_limbs + 1);
-   
+
     limbs_left = total_limbs - (limb_ptr - limbs);
-   
+
     if (!shift_bits)
         flint_mpn_copyi(poly[i], limb_ptr, limbs_left);
     else
-        mpn_rshift(poly[i], limb_ptr, limbs_left, shift_bits);                   
-     
+        mpn_rshift(poly[i], limb_ptr, limbs_left, shift_bits);
+
     return length;
 }
 

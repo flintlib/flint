@@ -81,7 +81,7 @@ main(void)
 
         nmod_poly_add_series(c, a, b, n);
         nmod_poly_add_series(b, a, b, n);
-    
+
         result = (nmod_poly_equal(b, c));
         if (!result)
         {
@@ -120,7 +120,7 @@ main(void)
         nmod_poly_add(c, a, b);
         nmod_poly_truncate(c, n);
         nmod_poly_add_series(d, a, b, n);
-    
+
         result = (nmod_poly_equal(d, c));
         if (!result)
         {
@@ -140,7 +140,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

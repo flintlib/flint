@@ -15,13 +15,13 @@
 void n_factor_insert(n_factor_t * factors, mp_limb_t p, ulong exp)
 {
    ulong i;
-   
+
    for (i = 0; i < factors->num; i++)
    {
       if (factors->p[i] == p) break;
    }
-   
-   if (i != factors->num) 
+
+   if (i != factors->num)
    {
       factors->exp[i] += exp;
    } else

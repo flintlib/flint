@@ -30,7 +30,7 @@ int main(void)
 
         fmpz_init(p);
         fmpz_randprime(p, state, n_randint(state, 2) ? 60 : 120, 1);
-        d = n_randint(state, 4) + 1, 
+        d = n_randint(state, 4) + 1,
         fq_default_ctx_init(ctx, p, d, "a");
 
         fq_default_init(a, ctx);

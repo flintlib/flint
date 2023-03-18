@@ -22,7 +22,7 @@ main(void)
 
     flint_printf("next_smooth_prime....");
     fflush(stdout);
-   
+
     flint_randinit(state);
 
     fmpz_init_set_ui(p, 2);
@@ -44,9 +44,9 @@ main(void)
     }
 
     fmpz_clear(p);
-    
+
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

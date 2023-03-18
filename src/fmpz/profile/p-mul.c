@@ -58,7 +58,7 @@ sample_new(void * arg, ulong count)
     res = _fmpz_vec_init(ntests);
     a = _fmpz_vec_init(ntests);
     b = _fmpz_vec_init(ntests);
-   
+
     for (ix = 0; ix < 10 * count; ix++)
     {
         for (jx = 0; jx < ntests; jx++)
@@ -92,7 +92,7 @@ sample_old(void * arg, ulong count)
     res = _fmpz_vec_init(ntests);
     a = _fmpz_vec_init(ntests);
     b = _fmpz_vec_init(ntests);
-   
+
     for (ix = 0; ix < 10 * count; ix++)
     {
         for (jx = 0; jx < ntests; jx++)
@@ -126,7 +126,7 @@ main(void)
     {
         prof_repeat(&minnew, &maxnew, sample_new, &bits);
         prof_repeat(&minold, &maxold, sample_old, &bits);
-        
+
         flint_printf("%d bits:      min %.2fx,    max %.2fx\n",
                 bits, minold / minnew, maxold / maxnew);
     }

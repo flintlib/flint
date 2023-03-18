@@ -36,7 +36,7 @@ main(void)
 
         fmpq_init(a);
         fmpq_randtest(a, state, 100);
-        
+
         fmpq_poly_rescale(g, f, a);
         fmpq_poly_rescale(f, f, a);
 
@@ -67,10 +67,10 @@ main(void)
         fmpq_poly_init(f);
         fmpq_poly_init(g);
         fmpq_poly_randtest(f, state, n_randint(state, 100), 100);
-        
+
         fmpq_init(a);
         fmpq_randtest_not_zero(a, state, 100);
-        
+
         fmpq_poly_rescale(g, f, a);
         fmpq_inv(a, a);
         fmpq_poly_rescale(g, g, a);
@@ -94,7 +94,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

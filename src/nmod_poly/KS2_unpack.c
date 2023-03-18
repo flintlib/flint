@@ -26,7 +26,7 @@ _nmod_poly_KS2_unpack1(mp_ptr res, mp_srcptr op, slong n, ulong b,
    mp_limb_t buf = 0;
    /* number of bits currently in buf; always in [0, FLINT_BITS) */
    ulong buf_b = 0;
-   
+
    /* skip over k leading bits */
    while (k >= FLINT_BITS)
    {
@@ -101,7 +101,7 @@ _nmod_poly_KS2_unpack2(mp_ptr res, mp_srcptr op, slong n, ulong b,
    mp_limb_t buf = 0;
    /* number of bits currently in buf; always in [0, FLINT_BITS) */
    ulong buf_b = 0;
-   
+
    /* skip over k leading bits */
    while (k >= FLINT_BITS)
    {
@@ -119,7 +119,7 @@ _nmod_poly_KS2_unpack2(mp_ptr res, mp_srcptr op, slong n, ulong b,
    if (b == 2 * FLINT_BITS)
    {
       n *= 2;
-      
+
       /* various special cases */
       if (buf_b)
       {
@@ -156,7 +156,7 @@ _nmod_poly_KS2_unpack2(mp_ptr res, mp_srcptr op, slong n, ulong b,
          }
          else
             *res++ = *op++;
-      
+
          /* now handle the fractional limb */
          if (b <= buf_b)
          {
@@ -230,7 +230,7 @@ _nmod_poly_KS2_unpack3(mp_ptr res, mp_srcptr op, slong n, ulong b,
          *res++ = *op++;
          *res++ = *op++;
       }
-   
+
       /* now handle the fractional limb */
       if (b <= buf_b)
       {

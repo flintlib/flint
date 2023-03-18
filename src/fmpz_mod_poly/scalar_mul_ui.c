@@ -14,18 +14,18 @@
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_scalar_mul_ui(fmpz *res, const fmpz *poly, slong len, 
+void _fmpz_mod_poly_scalar_mul_ui(fmpz *res, const fmpz *poly, slong len,
                                     ulong x, const fmpz_t p)
 {
     _fmpz_vec_scalar_mul_ui(res, poly, len, x);
     _fmpz_vec_scalar_mod_fmpz(res, res, len, p);
 }
 
-void fmpz_mod_poly_scalar_mul_ui(fmpz_mod_poly_t res, 
+void fmpz_mod_poly_scalar_mul_ui(fmpz_mod_poly_t res,
                 const fmpz_mod_poly_t poly, ulong x, const fmpz_mod_ctx_t ctx)
 {
     fmpz_mod_poly_fit_length(res, poly->length, ctx);
-    _fmpz_mod_poly_scalar_mul_ui(res->coeffs, 
+    _fmpz_mod_poly_scalar_mul_ui(res->coeffs,
                      poly->coeffs, poly->length, x, fmpz_mod_ctx_modulus(ctx));
 
     _fmpz_mod_poly_set_length(res, poly->length);

@@ -27,7 +27,7 @@ _nmod_poly_sub(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2,
             res[i] = poly1[i];
 
     /*
-       Careful, it is *always* necessary to negate coeffs from poly2, 
+       Careful, it is *always* necessary to negate coeffs from poly2,
        even if this is already res.
      */
     for (i = min; i < len2; i++)

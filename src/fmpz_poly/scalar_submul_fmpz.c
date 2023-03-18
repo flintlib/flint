@@ -25,7 +25,7 @@ fmpz_poly_scalar_submul_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2,
         if (poly2->length > poly1->length)
 	    _fmpz_vec_zero(poly1->coeffs + poly1->length,
 	                   poly2->length - poly1->length);
-	_fmpz_vec_scalar_submul_fmpz(poly1->coeffs, 
+	_fmpz_vec_scalar_submul_fmpz(poly1->coeffs,
                                      poly2->coeffs, poly2->length, x);
         _fmpz_poly_set_length(poly1, FLINT_MAX(poly1->length, poly2->length));
         _fmpz_poly_normalise(poly1);

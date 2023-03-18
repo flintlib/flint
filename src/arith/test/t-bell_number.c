@@ -29,7 +29,7 @@ int main(void)
     FLINT_TEST_INIT(state);
 
     flint_printf("bell_number....");
-    fflush(stdout);    
+    fflush(stdout);
 
     {
         slong len, prev_len;

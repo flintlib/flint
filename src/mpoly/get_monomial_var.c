@@ -21,7 +21,7 @@ ulong mpoly_get_monomial_var_exp_ui_sp(const ulong * poly_exps,
 
     mpoly_gen_offset_shift_sp(&offset, &shift, var, bits, mctx);
 
-    return (poly_exps[offset] >> shift) & ((-UWORD(1)) >> (FLINT_BITS - bits));    
+    return (poly_exps[offset] >> shift) & ((-UWORD(1)) >> (FLINT_BITS - bits));
 }
 
 ulong mpoly_get_monomial_var_exp_ui_mp(const ulong * poly_exps,

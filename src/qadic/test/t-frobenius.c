@@ -23,7 +23,7 @@ main(void)
     flint_printf("frobenius... ");
     fflush(stdout);
 
-    
+
 
     /* Check aliasing */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -255,7 +255,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

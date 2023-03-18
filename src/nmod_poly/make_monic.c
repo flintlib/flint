@@ -13,11 +13,11 @@
 #include "flint.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_make_monic(mp_ptr output, 
+void _nmod_poly_make_monic(mp_ptr output,
                             mp_srcptr input, slong len, nmod_t mod)
 {
     mp_limb_t inv;
-    
+
     inv = n_invmod(input[len - 1], mod.n);
     _nmod_vec_scalar_mul_nmod(output, input, len, inv, mod);
 }
@@ -31,7 +31,7 @@ void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input)
     }
 
     nmod_poly_fit_length(output, input->length);
-    _nmod_poly_make_monic(output->coeffs, 
+    _nmod_poly_make_monic(output->coeffs,
                             input->coeffs, input->length, input->mod);
     output->length = input->length;
 }

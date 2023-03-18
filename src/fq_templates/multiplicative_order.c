@@ -39,7 +39,7 @@ int TEMPLATE(T, multiplicative_order)(fmpz_t ord, const TEMPLATE(T, t) op,
     for (i = 0; i < ord_fact->num; i++)
     {
         fmpz_set(tmp, ord);
-        for (j = ord_fact->exp[i]; j > 0; j--) 
+        for (j = ord_fact->exp[i]; j > 0; j--)
         {
             fmpz_cdiv_q(tmp, tmp, ord_fact->p + i);
             TEMPLATE(T, pow)(one, op, tmp, ctx);
@@ -47,16 +47,16 @@ int TEMPLATE(T, multiplicative_order)(fmpz_t ord, const TEMPLATE(T, t) op,
                 break;
             is_primitive = -1;
         }
-        if (j > 0) 
+        if (j > 0)
             fmpz_mul(ord, tmp, ord_fact->p + i);
-        else 
+        else
             fmpz_set(ord, tmp);
     }
-    
+
     fmpz_clear(tmp);
     fmpz_factor_clear(ord_fact);
     TEMPLATE(T, clear)(one, ctx);
-    
+
     return is_primitive;
 }
 

@@ -43,7 +43,7 @@ main(void)
 	fmpz_poly_mul(p, p, a);
 
         e2 = fmpz_poly_remove(q, p, b);
-	
+
 	result = (e2 == e1 && (e2 == 0 || fmpz_poly_equal(q, a)));
         if (!result)
         {
@@ -154,7 +154,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

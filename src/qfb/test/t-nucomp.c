@@ -29,19 +29,19 @@ int main(void)
     flint_randinit(state);
 
     /* Check discriminants of composed forms are correct */
-    for (i = 1; i < 10000; i++) 
+    for (i = 1; i < 10000; i++)
     {
         qfb_t r;
         fmpz_t root, D;
 
         num = qfb_reduced_forms(&forms, -i);
-        
+
         if (num)
         {
            fmpz_init(root);
            fmpz_init(D);
            qfb_init(r);
-              
+
            fmpz_set_ui(root, i);
            fmpz_root(root, root, 4);
 
@@ -63,7 +63,7 @@ int main(void)
                  flint_abort();
               }
            }
-           
+
            fmpz_clear(D);
            fmpz_clear(root);
            qfb_clear(r);
@@ -73,13 +73,13 @@ int main(void)
     }
 
     /* Associativity test (Q1 o Q2) o Q3 == Q1 o (Q2 o Q3) */
-    for (i = 1; i < 10000; i++) 
+    for (i = 1; i < 10000; i++)
     {
         qfb_t r, s;
         fmpz_t root, t1, t2, D;
 
         num = qfb_reduced_forms(&forms, -i);
-        
+
         if (num)
         {
            fmpz_init(root);
@@ -88,7 +88,7 @@ int main(void)
            fmpz_init(D);
            qfb_init(r);
            qfb_init(s);
-              
+
            fmpz_set_si(D, -i);
            fmpz_set_ui(root, i);
            fmpz_root(root, root, 4);
@@ -121,7 +121,7 @@ int main(void)
                  flint_abort();
               }
            }
-           
+
            fmpz_clear(t1);
            fmpz_clear(t2);
            fmpz_clear(D);

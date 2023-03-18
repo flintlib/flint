@@ -205,7 +205,7 @@ int main()
 
         ca_clear(x, ctx);
         ca_clear(y, ctx);
-        ca_clear(pi4, ctx); 
+        ca_clear(pi4, ctx);
         ca_ctx_clear(ctx);
     }
 

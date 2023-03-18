@@ -25,7 +25,7 @@ static void nmod_mpoly_mock_eval_coeff(
     {
         mock->alloc = FLINT_MAX(Aeh_inc->length, mock->alloc + mock->alloc/2);
         mock->coeffs = FLINT_ARRAY_REALLOC(mock->coeffs, mock->alloc,
-                                                                n_poly_struct);        
+                                                                n_poly_struct);
     }
 
     mock->length = Aeh_inc->length;
@@ -364,7 +364,7 @@ general_case:
         for (i = 1; i < l; i++)
         {
             _nmod_vec_mul(nmod_mat_row_ref(ML + s, i),
-                          nmod_mat_row_ref(ML + s, i - 1), 
+                          nmod_mat_row_ref(ML + s, i - 1),
                                       HG->coeffs[s].coeffs, n, ctx->mod);
         }
 
@@ -717,7 +717,7 @@ outer_loop:
 
     Gdeg = nmod_mpoly_degree_si(Geval, 0, ctx);
 
-    if (Gdeg > Gdegbound)        
+    if (Gdeg > Gdegbound)
         goto outer_loop;
 
     if (Gdeg < Gdegbound)

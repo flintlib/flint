@@ -12,8 +12,8 @@
 #include "fmpq.h"
 #include "fmpq_poly.h"
 
-int _fmpq_poly_divides(fmpz * qpoly, fmpz_t qden, 
-                    const fmpz * poly1, const fmpz_t den1, slong len1, 
+int _fmpq_poly_divides(fmpz * qpoly, fmpz_t qden,
+                    const fmpz * poly1, const fmpz_t den1, slong len1,
                     const fmpz * poly2, const fmpz_t den2, slong len2)
 {
     fmpz_t c1, c2, n;
@@ -24,7 +24,7 @@ int _fmpq_poly_divides(fmpz * qpoly, fmpz_t qden,
     fmpz_init(c2);
     _fmpz_poly_content(c1, poly1, len1);
     _fmpz_poly_content(c2, poly2, len2);
-    
+
     if (!fmpz_is_one(c1))
     {
 	poly1_pp = _fmpz_vec_init(len1);
@@ -37,7 +37,7 @@ int _fmpq_poly_divides(fmpz * qpoly, fmpz_t qden,
         poly2_pp = _fmpz_vec_init(len2);
         _fmpz_vec_scalar_divexact_fmpz(poly2_pp, poly2, len2, c2);
     } else
-        poly2_pp = (fmpz *) poly2;    
+        poly2_pp = (fmpz *) poly2;
 
     divides = _fmpz_poly_divides(qpoly, poly1_pp, len1, poly2_pp, len2);
 
@@ -64,7 +64,7 @@ int _fmpq_poly_divides(fmpz * qpoly, fmpz_t qden,
     return divides;
 }
 
-int fmpq_poly_divides(fmpq_poly_t q, const fmpq_poly_t poly1, 
+int fmpq_poly_divides(fmpq_poly_t q, const fmpq_poly_t poly1,
                                     const fmpq_poly_t poly2)
 {
     fmpz * qpoly;
@@ -83,7 +83,7 @@ int fmpq_poly_divides(fmpq_poly_t q, const fmpq_poly_t poly1,
 	    return 1;
         } else
 	    return 0;
-    } 
+    }
 
     if (fmpq_poly_is_zero(poly1))
     {
@@ -103,7 +103,7 @@ int fmpq_poly_divides(fmpq_poly_t q, const fmpq_poly_t poly1,
 
 	divides = _fmpq_poly_divides(qpoly, qden,
              poly1->coeffs, poly1->den, len1, poly2->coeffs, poly2->den, len2);
-        
+
 	_fmpz_vec_set(q->coeffs, qpoly, len1 - len2 + 1);
 	fmpz_set(q->den, qden);
 

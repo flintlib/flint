@@ -17,7 +17,7 @@ fq_zech_bit_unpack(fq_zech_t rop, const fmpz_t f, flint_bitcnt_t bit_size,
 {
     fq_nmod_t ropn;
     fq_nmod_init(ropn, ctx->fq_nmod_ctx);
-    
+
     fq_nmod_bit_unpack(ropn, f, bit_size, ctx->fq_nmod_ctx);
     fq_zech_set_fq_nmod(rop, ropn, ctx);
 

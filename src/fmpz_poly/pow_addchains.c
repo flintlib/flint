@@ -14,7 +14,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_pow_addchains(fmpz * res, const fmpz * poly, slong len, 
+void _fmpz_poly_pow_addchains(fmpz * res, const fmpz * poly, slong len,
                                                           const int * a, int n)
 {
     int *b;
@@ -31,21 +31,21 @@ void _fmpz_poly_pow_addchains(fmpz * res, const fmpz * poly, slong len,
         for (i = 1; i < n; i++)
             b[i] = b[i-1] + a[i];
     }
-    
+
     /*
        Allocate memory for the polynomials f^{a[1]}, ..., f^{a[n-1]}
      */
     lenv = lenm1 * b[n-1] + n - 1;
     v = _fmpz_vec_init(lenv);
-    
-    /* 
+
+    /*
        Compute f^{a[1]}, ..., f^{a[n-1]}
      */
     {
         int d, i, j;
-        
+
         _fmpz_poly_sqr(v, poly, len);
-        
+
         for (i = 1; i < n-1; i++)
         {
             d = a[i+1] - a[i];
@@ -83,7 +83,7 @@ void _fmpz_poly_pow_addchains(fmpz * res, const fmpz * poly, slong len,
                                v + lenm1 * b[j-1] + (j-1), lenm1 * a[j] + 1);
             }
         }
-        
+
     }
 
     flint_free(b);
@@ -93,7 +93,7 @@ void _fmpz_poly_pow_addchains(fmpz * res, const fmpz * poly, slong len,
 void fmpz_poly_pow_addchains(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 {
     const slong len = poly->length;
-    
+
     if ((len < 2) | (e < UWORD(3)))
     {
         if (e == UWORD(0))
@@ -112,21 +112,21 @@ void fmpz_poly_pow_addchains(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
             fmpz_poly_sqr(res, poly);
         return;
     }
-    
+
     if (e <= UWORD(148))
     {
         /*
-           An array storing a tree with shortest addition chains (star chains, 
-           in fact) for all integers up to and including 148.  
-           
-           Let A denote the array.  The entry A[0] is present to provide 
-           1-based indexing.  The integer 1 is the root of the tree and the 
-           entry A[1] is irrelevant.  For integers i >= 2, A[i] is the parent 
+           An array storing a tree with shortest addition chains (star chains,
+           in fact) for all integers up to and including 148.
+
+           Let A denote the array.  The entry A[0] is present to provide
+           1-based indexing.  The integer 1 is the root of the tree and the
+           entry A[1] is irrelevant.  For integers i >= 2, A[i] is the parent
            of i.
-           
-           We can iterate through an addition chain for n, where 0 < n < 148, 
+
+           We can iterate through an addition chain for n, where 0 < n < 148,
            in the array shortest_addchains_148 as follows:
-           
+
                Visit n
                while ((n = shortest_addchains_148[n]))
                {
@@ -136,21 +136,21 @@ void fmpz_poly_pow_addchains(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
         static const int shortest_addchains_148[149] = {
              0,  0,  1,  2,  2,  3,  3,  5,  4,  8,
              5, 10,  6,  9,  7, 12,  8,  9, 16, 18,
-            10, 15, 11, 20, 12, 17, 13, 24, 14, 25, 
+            10, 15, 11, 20, 12, 17, 13, 24, 14, 25,
             15, 28, 16, 32, 17, 26, 18, 36, 19, 27,
             20, 40, 21, 34, 22, 30, 23, 46, 24, 33,
-            25, 48, 26, 37, 27, 54, 28, 49, 29, 56, 
+            25, 48, 26, 37, 27, 54, 28, 49, 29, 56,
             30, 52, 31, 51, 32, 64, 33, 66, 34, 68,
             35, 70, 36, 72, 66, 60, 38, 43, 39, 78,
             40, 65, 41, 80, 42, 80, 43, 86, 44, 88,
-            45, 90, 46, 92, 47, 92, 48, 96, 49, 96, 
+            45, 90, 46, 92, 47, 92, 48, 96, 49, 96,
             50,100, 51,102, 52,102, 53, 74, 54,108,
             55,108, 56,104, 57,112, 58,104, 59,112,
             60,120, 61,120, 62,100, 63,126, 64,128,
             65,130,128,132, 67, 90, 68,136, 69,138,
-            70,140, 71,117, 72,144, 73, 99, 74 
+            70,140, 71,117, 72,144, 73, 99, 74
         };
-        
+
         int a[11], i = 11, n = (int) e;
         slong rlen = (slong) e * (len - 1) + 1;
 

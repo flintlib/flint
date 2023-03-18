@@ -65,7 +65,7 @@ void sample(void * arg, ulong count)
     fmpz_mat_clear(A);
     fmpz_mat_clear(B);
     fmpz_mat_clear(C);
-    
+
     flint_randclear(state);
 }
 
@@ -98,11 +98,11 @@ int main(void)
 
             params.algorithm = 3;
             prof_repeat(&min_multi_mod, &max, sample, &params);
-            
+
             params.algorithm = 4;
             prof_repeat(&min_strassen, &max, sample, &params);
 
-            flint_printf("dim = %wd default/classical/inline/multi_mod/strassen %.2f %.2f %.2f %.2f %.2f (us)\n", 
+            flint_printf("dim = %wd default/classical/inline/multi_mod/strassen %.2f %.2f %.2f %.2f %.2f (us)\n",
                 dim, min_default, min_classical, min_inline, min_multi_mod, min_strassen);
 
             if (min_multi_mod < 0.6*min_default)
@@ -110,7 +110,7 @@ int main(void)
 
             if (min_inline < 0.6*min_default)
                 flint_printf("BAD!\n");
-                
+
             if (min_strassen < 0.7*min_default)
                 flint_printf("BAD!\n");
 

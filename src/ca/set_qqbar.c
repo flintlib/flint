@@ -349,14 +349,14 @@ ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx)
                         arb_mul_2exp_si(r1, r1, -1);
                         arb_mul_2exp_si(r2, r2, -1);
 
-                        if (arb_overlaps(r1, acb_realref(QQBAR_ENCLOSURE(x))) && 
+                        if (arb_overlaps(r1, acb_realref(QQBAR_ENCLOSURE(x))) &&
                             !arb_overlaps(r2, acb_realref(QQBAR_ENCLOSURE(x))))
                         {
                             fmpz_set(res_num + 1, B);
                             break;
                         }
 
-                        if (arb_overlaps(r2, acb_realref(QQBAR_ENCLOSURE(x))) && 
+                        if (arb_overlaps(r2, acb_realref(QQBAR_ENCLOSURE(x))) &&
                             !arb_overlaps(r1, acb_realref(QQBAR_ENCLOSURE(x))))
                         {
                             fmpz_neg(res_num + 1, B);

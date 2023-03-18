@@ -25,7 +25,7 @@ main(void)
     fmpz_mod_ctx_t ctx;
 #endif
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("compose_mod_brent_kung_precomp_preinv_threaded....");
     fflush(stdout);
 
@@ -44,7 +44,7 @@ main(void)
         slong j, num_threads;
         fmpz_mod_poly_matrix_precompute_arg_t * args1;
         thread_pool_handle * threads;
-    
+
         flint_set_num_threads(1 + n_randint(state, 3));
 
         num_threads = flint_request_threads(&threads,
@@ -87,10 +87,10 @@ main(void)
         for (j = 0; j < num_threads + 1; j++)
         {
             fmpz_mat_init(C + j, n_sqrt(c->length - 1) + 1, c->length - 1);
-            
+
     	    fmpz_mod_poly_set(tmp + j, b, ctx);
             fmpz_mod_poly_rem(tmp + j, tmp + j, c, ctx);
-            
+
             if (tmp[j].length < c->length - 1)
             {
                 fmpz_mod_poly_fit_length(tmp + j, c->length - 1, ctx);
@@ -215,7 +215,7 @@ main(void)
             args1[j].poly3inv = cinv;
             args1[j].ctx      = ctx;
         }
-        
+
         for (j = 1; j < num_threads + 1; j++)
           thread_pool_wake(global_thread_pool, threads[j - 1], 0,
               _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv_worker,
@@ -264,7 +264,7 @@ main(void)
 
     fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 

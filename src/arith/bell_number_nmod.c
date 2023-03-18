@@ -12,7 +12,7 @@
 #include "nmod.h"
 #include "arith.h"
 
-const mp_limb_t bell_number_tab[] = 
+const mp_limb_t bell_number_tab[] =
 {
     UWORD(1), UWORD(1), UWORD(2), UWORD(5), UWORD(15), UWORD(52), UWORD(203), UWORD(877), UWORD(4140), UWORD(21147), UWORD(115975),
     UWORD(678570), UWORD(4213597), UWORD(27644437), UWORD(190899322), UWORD(1382958545),

@@ -13,7 +13,7 @@
 #define FMPQ_MPOLY_FACTOR_H
 
 #ifdef FMPQ_MPOLY_FACTOR_INLINES_C
-#define FMPQ_MPOLY_FACTOR_INLINE 
+#define FMPQ_MPOLY_FACTOR_INLINE
 #else
 #define FMPQ_MPOLY_FACTOR_INLINE static __inline__
 #endif

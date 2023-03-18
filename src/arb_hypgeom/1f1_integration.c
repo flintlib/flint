@@ -191,7 +191,7 @@ acb_my_pow_arb(acb_t res, const acb_t a, const arb_t b, slong prec)
 
         acb_zero(res);
         acb_add_error_arb(res, t);
-     
+
         arb_clear(t);
         arb_clear(u);
     }

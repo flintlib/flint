@@ -13,8 +13,8 @@
 #include "fmpq.h"
 #include "fmpq_poly.h"
 
-void _fmpq_poly_resultant(fmpz_t rnum, fmpz_t rden, 
-                          const fmpz *poly1, const fmpz_t den1, slong len1, 
+void _fmpq_poly_resultant(fmpz_t rnum, fmpz_t rden,
+                          const fmpz *poly1, const fmpz_t den1, slong len1,
                           const fmpz *poly2, const fmpz_t den2, slong len2)
 {
     if (len2 == 1)
@@ -161,14 +161,14 @@ void fmpq_poly_resultant(fmpq_t r, const fmpq_poly_t f, const fmpq_poly_t g)
     {
         if (len1 >= len2)
         {
-            _fmpq_poly_resultant(fmpq_numref(r), fmpq_denref(r), 
-                                 f->coeffs, f->den, len1, 
+            _fmpq_poly_resultant(fmpq_numref(r), fmpq_denref(r),
+                                 f->coeffs, f->den, len1,
                                  g->coeffs, g->den, len2);
         }
         else
         {
-            _fmpq_poly_resultant(fmpq_numref(r), fmpq_denref(r), 
-                                 g->coeffs, g->den, len2, 
+            _fmpq_poly_resultant(fmpq_numref(r), fmpq_denref(r),
+                                 g->coeffs, g->den, len2,
                                  f->coeffs, f->den, len1);
 
             if (((len1 | len2) & WORD(1)) == WORD(0))

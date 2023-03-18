@@ -44,7 +44,7 @@ int main()
             ca_init(c3, ctx);
             ca_init(s4, ctx);
             ca_init(c4, ctx);
-     
+
             ca_randtest_special(x, state, 5, 5, ctx);
 
             ca_sin_cos_direct(s1, c1, x, ctx);

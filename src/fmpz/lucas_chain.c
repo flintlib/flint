@@ -15,7 +15,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-void fmpz_lucas_chain(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A, 
+void fmpz_lucas_chain(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A,
                                          const fmpz_t m, const fmpz_t n)
 {
     fmpz_t t;
@@ -51,7 +51,7 @@ void fmpz_lucas_chain(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A,
     fmpz_clear(t);
 }
 
-void fmpz_lucas_chain_full(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A, const fmpz_t B, 
+void fmpz_lucas_chain_full(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A, const fmpz_t B,
                                          const fmpz_t m, const fmpz_t n)
 {
     fmpz_t t, Q;
@@ -100,7 +100,7 @@ void fmpz_lucas_chain_full(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A, const fmpz_t B
 }
 
 /* Compute U_{2m}, U_{2m + 1} given U_m, U_{m + 1} */
-void fmpz_lucas_chain_double(fmpz_t U2m, fmpz_t U2m1, const fmpz_t Um, 
+void fmpz_lucas_chain_double(fmpz_t U2m, fmpz_t U2m1, const fmpz_t Um,
                             const fmpz_t Um1, const fmpz_t A, const fmpz_t B,
                             const fmpz_t n)
 {
@@ -124,13 +124,13 @@ void fmpz_lucas_chain_double(fmpz_t U2m, fmpz_t U2m1, const fmpz_t Um,
    fmpz_clear(t2);
 }
 
-/* 
+/*
    Compute U_{m + n}, U_{m + n + 1} given U_m, U_{m + 1} and
    U_n, U_{n + 1}
 */
-void fmpz_lucas_chain_add(fmpz_t Umn, fmpz_t Umn1, const fmpz_t Um, 
-                            const fmpz_t Um1, const fmpz_t Un, 
-                            const fmpz_t Un1, const fmpz_t A, const fmpz_t B, 
+void fmpz_lucas_chain_add(fmpz_t Umn, fmpz_t Umn1, const fmpz_t Um,
+                            const fmpz_t Um1, const fmpz_t Un,
+                            const fmpz_t Un1, const fmpz_t A, const fmpz_t B,
                             const fmpz_t n)
 {
    fmpz_t t, t2;
@@ -138,7 +138,7 @@ void fmpz_lucas_chain_add(fmpz_t Umn, fmpz_t Umn1, const fmpz_t Um,
    fmpz_init(t);
    fmpz_init(t2);
 
-   fmpz_mul(t, Un, A); /* U_nU_{m + 1} - BU_m(AU_n - U_{n + 1})/B */ 
+   fmpz_mul(t, Un, A); /* U_nU_{m + 1} - BU_m(AU_n - U_{n + 1})/B */
    fmpz_sub(t, Un1, t);
    fmpz_mul(t, t, Um);
    fmpz_addmul(t, Un, Um1);
@@ -157,7 +157,7 @@ void fmpz_lucas_chain_add(fmpz_t Umn, fmpz_t Umn1, const fmpz_t Um,
 /* Compute U_{km}, U_{km + 1} from U_m, U_{m + 1}, k > 0 */
 void fmpz_lucas_chain_mul(fmpz_t Ukm, fmpz_t Ukm1,
                         const fmpz_t Um, const fmpz_t Um1,
-                         const fmpz_t A, const fmpz_t B, const fmpz_t k, 
+                         const fmpz_t A, const fmpz_t B, const fmpz_t k,
                          const fmpz_t n)
 {
    slong i = 0, b = fmpz_sizeinbase(k, 2);
@@ -176,7 +176,7 @@ void fmpz_lucas_chain_mul(fmpz_t Ukm, fmpz_t Ukm1,
    }
 
    i++;
-   
+
    if (i < b)
    {
       fmpz_set(t, Ukm);
@@ -196,9 +196,9 @@ void fmpz_lucas_chain_mul(fmpz_t Ukm, fmpz_t Ukm1,
 }
 
 /* Compute U_m, U_{m + 1} from V_m, V_{m + 1} */
-void fmpz_lucas_chain_VtoU(fmpz_t Um, fmpz_t Um1, 
+void fmpz_lucas_chain_VtoU(fmpz_t Um, fmpz_t Um1,
                            const fmpz_t Vm, const fmpz_t Vm1,
-                           const fmpz_t A, const fmpz_t B, const fmpz_t Dinv, 
+                           const fmpz_t A, const fmpz_t B, const fmpz_t Dinv,
                            const fmpz_t n)
 {
    fmpz_t t;
@@ -208,7 +208,7 @@ void fmpz_lucas_chain_VtoU(fmpz_t Um, fmpz_t Um1,
    fmpz_mul_2exp(t, Vm1, 1); /* (2V_{m + 1} - AV_m) / D */
    fmpz_submul(t, Vm, A);
    fmpz_mul(t, t, Dinv);
-   
+
    fmpz_set(Um1, Vm);
    fmpz_mod(Um, t, n);
 

@@ -2946,7 +2946,7 @@ gr_test_multiplicative_group(gr_ctx_t R, slong iters, int test_flags)
         timeit_start(timer);
 
         flint_printf("===============================================================================\n");
-        flint_printf("Testing "); gr_ctx_println(R);    
+        flint_printf("Testing "); gr_ctx_println(R);
         flint_printf("-------------------------------------------------------------------------------\n");
     }
 

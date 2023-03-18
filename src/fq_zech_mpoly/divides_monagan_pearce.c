@@ -221,7 +221,7 @@ static slong _fq_zech_mpoly_divides_monagan_pearce(
             exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
         }
-        s = 1;      
+        s = 1;
         q_len++;
     }
 
@@ -316,7 +316,7 @@ int fq_zech_mpoly_divides_monagan_pearce(fq_zech_mpoly_t poly1,
     expq = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
     /* quick check for easy case of inexact division of leading monomials */
-    if (poly2->bits == poly3->bits && N == 1 && 
+    if (poly2->bits == poly3->bits && N == 1 &&
        poly2->exps[0] < poly3->exps[0])
     {
         goto cleanup;

@@ -235,7 +235,7 @@ void fmpz_mod_polyu3_interp_reduce_2sm_bpoly(
 
     #if WANT_ASSERT
         fmpz_mod_pow_ui(t, alpha->coeffs + 1, e2, ctx);
-        FLINT_ASSERT(fmpz_equal(alpha->coeffs + e2, t));        
+        FLINT_ASSERT(fmpz_equal(alpha->coeffs + e2, t));
     #endif
 
         if (e2 & 1)
@@ -726,7 +726,7 @@ choose_prime:
         {
             fmpz_t cc;
             fmpz_init(cc);
-            fmpz_mod_neg(cc, alpha, ctx);        
+            fmpz_mod_neg(cc, alpha, ctx);
             fmpz_mod_poly_evaluate_fmpz(cc, modulus, cc, ctx);
             FLINT_ASSERT(fmpz_equal(cc, c));
             fmpz_clear(cc);

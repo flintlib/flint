@@ -12,7 +12,7 @@
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 
-void _fmpz_poly_factor_quadratic(fmpz_poly_factor_t fac, 
+void _fmpz_poly_factor_quadratic(fmpz_poly_factor_t fac,
             const fmpz_poly_t f, slong exp)
 {
     fmpz_t D;

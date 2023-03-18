@@ -487,7 +487,7 @@ int _fmpz_mod_mpoly_divides_monagan_pearce(
             exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
         }
-        s = 1;      
+        s = 1;
         Qlen++;
     }
 

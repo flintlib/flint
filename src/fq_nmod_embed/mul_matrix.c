@@ -41,7 +41,7 @@ void fq_nmod_embed_mul_matrix(nmod_mat_t matrix,
                     nmod_sub(nmod_mat_entry(matrix, i, j),
                              nmod_mat_entry(matrix, i - 1, j - 1),
                              mod);
-            nmod_mat_entry(matrix, i, j) = 
+            nmod_mat_entry(matrix, i, j) =
                 nmod_neg(nmod_mat_entry(matrix, i, j), mod);
         }
     }

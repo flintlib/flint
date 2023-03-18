@@ -35,7 +35,7 @@ int main(void)
     int n;
 
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("nth_prime_bounds....");
     fflush(stdout);
 

@@ -18,7 +18,7 @@ void fmpz_poly_q_inv(fmpz_poly_q_t rop, const fmpz_poly_q_t op)
         flint_printf("Exception (fmpz_poly_q_inv). Zero is not invertible.\n");
         flint_abort();
     }
-    
+
     if (rop == op)
     {
         fmpz_poly_swap(rop->num, rop->den);

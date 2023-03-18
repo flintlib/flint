@@ -13,7 +13,7 @@
 #include "aprcl.h"
 
 /*
-    Computes f = g * h for p = 3. 
+    Computes f = g * h for p = 3.
     g and h must be reduced by F_3 cyclotomic polynomial.
     t is the memory for fmpz_t; size of t must be > 3.
     Resulting f reduced by F_3 cyclotomic polynomial.
@@ -46,14 +46,14 @@ unity_zp_mul3(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
     fmpz_sub(t[5], t[3], t[2]);             /*  m2 = y1 - y0    */
     fmpz_mul(t[8], t[4], t[5]);             /*  d3 = m1 * m2    */
     fmpz_add(t[8], t[8], t[6]);             /*  d3 = d3 + d1    */
-    
+
     unity_zp_coeff_set_fmpz(f, 1, t[8]);    /*  z1 = d3 mod n   */
     fmpz_sub(t[0], t[6], t[7]);             /*  x0 = d1 - d2    */
     unity_zp_coeff_set_fmpz(f, 0, t[0]);    /*  z0 = x0 mod n   */
 }
 
 /*
-    Computes f = g * h for p = 3^2. 
+    Computes f = g * h for p = 3^2.
     g and h must be reduced by F_9 cyclotomic polynomial.
     t is the memory for fmpz_t; size of t must be > 50.
     Resulting f reduced by F_9 cyclotomic polynomial.
@@ -99,7 +99,7 @@ unity_zp_mul9(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
     fmpz_set(t[4], t[27]);                  /*  set b1 = y1     */
     fmpz_set(t[5], t[28]);                  /*  set b2 = y2     */
 
-    /* 
+    /*
         apply auxiliary routine 2 with (a0, a1, a2) and (b0, b1, b2)
         store result in (c0, .. , c4)
     */
@@ -118,7 +118,7 @@ unity_zp_mul9(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
     fmpz_set(t[4], t[30]);                  /*  set b1 = y4     */
     fmpz_set(t[5], t[31]);                  /*  set b2 = y5     */
 
-    /* 
+    /*
         apply auxiliary routine 2 with (a0, a1, a2) and (b0, b1, b2)
         store result in (c0, .. , c4)
     */
@@ -137,7 +137,7 @@ unity_zp_mul9(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
     fmpz_sub(t[4], t[30], t[27]);           /*  b1 = y4 - y1    */
     fmpz_sub(t[5], t[31], t[28]);           /*  b2 = y5 - y2    */
 
-    /* 
+    /*
         apply auxiliary routine 2 with (a0, a1, a2) and (b0, b1, b2)
         store result in (c0, .. , c4)
     */

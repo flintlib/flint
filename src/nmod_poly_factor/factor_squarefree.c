@@ -22,7 +22,7 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
     mp_limb_t p;
     slong deg, i;
 
-    if (f->length <= 1) 
+    if (f->length <= 1)
     {
         res->num = 0;
         return;
@@ -39,7 +39,7 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
     p = nmod_poly_modulus(f);
     deg = nmod_poly_degree(f);
 
-    
+
     /* Step 1, look at f', if it is zero then we are done since f = h(x)^p
        for some particular h(x), clearly f(x) = sum a_k x^kp, k <= deg(f) */
 
@@ -61,7 +61,7 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
         {
             nmod_poly_set_coeff_ui(h, i, nmod_poly_get_coeff_ui(f, i*p));
         }
-        
+
         /* Now run square-free on h, and return it to the pth power */
         nmod_poly_factor_init(new_res);
 
@@ -71,8 +71,8 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
         nmod_poly_factor_concat(res, new_res);
         nmod_poly_clear(h);
         nmod_poly_factor_clear(new_res);
-   } else 
-   { 
+   } else
+   {
         nmod_poly_t h, z;
 
         nmod_poly_gcd(g, f, f_d);
@@ -84,7 +84,7 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
         nmod_poly_init_mod(z, f->mod);
 
         /* Case 2 */
-        while (!nmod_poly_is_one(g_1)) 
+        while (!nmod_poly_is_one(g_1))
         {
             nmod_poly_gcd(h, g_1, g);
             nmod_poly_div(z, g_1, h);
@@ -106,7 +106,7 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
 
         nmod_poly_clear(h);
         nmod_poly_clear(z);
-        
+
         nmod_poly_make_monic(g, g);
 
         if (!nmod_poly_is_one(g))

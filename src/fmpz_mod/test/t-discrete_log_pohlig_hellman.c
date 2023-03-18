@@ -20,7 +20,7 @@ main(void)
 
     flint_printf("discrete_log_pohlig_hellman....");
     fflush(stdout);
-   
+
     flint_randinit(state);
 
     /* check random word-sized primes */
@@ -47,7 +47,7 @@ main(void)
             {
                 continue;
             }
-            
+
             for (k = 0; k < 10; k++)
             {
                 fmpz_t x, y, xr;
@@ -155,7 +155,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -25,7 +25,7 @@ main(void)
     flint_printf("compose_series_brent_kung....");
     fflush(stdout);
 
-    
+
 
     /* Check aliasing of the first argument */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -132,7 +132,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

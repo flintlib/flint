@@ -13,7 +13,7 @@
 #define FQ_ZECH_MPOLY_FACTOR_H
 
 #ifdef FQ_ZECH_MPOLY_FACTOR_INLINES_C
-#define FQ_ZECH_MPOLY_FACTOR_INLINE 
+#define FQ_ZECH_MPOLY_FACTOR_INLINE
 #else
 #define FQ_ZECH_MPOLY_FACTOR_INLINE static __inline__
 #endif

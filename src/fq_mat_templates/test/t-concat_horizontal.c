@@ -44,7 +44,7 @@ main(void)
 
         TEMPLATE(T, mat_randtest) (A, state, ctx);
         TEMPLATE(T, mat_randtest) (B, state, ctx);
-        
+
         TEMPLATE(T, mat_randtest) (C, state, ctx);
 
         TEMPLATE(T, mat_concat_horizontal) (C, A, B, ctx);
@@ -58,7 +58,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         TEMPLATE(T, mat_clear) (A, ctx);
         TEMPLATE(T, mat_clear) (B, ctx);
         TEMPLATE(T, mat_clear) (C, ctx);
@@ -70,7 +70,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

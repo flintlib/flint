@@ -17,10 +17,10 @@
 
 
 /*
-    Recall the return value conventions for fputc (of type int) 
+    Recall the return value conventions for fputc (of type int)
 
-    ``If there are no errors, the same character that has been written is 
-    returned.  If an error occurs, EOF is returned and the error indicator 
+    ``If there are no errors, the same character that has been written is
+    returned.  If an error occurs, EOF is returned and the error indicator
     is set''
 
     where the EOF macro expands to a negative int, and fprintf (of type int)

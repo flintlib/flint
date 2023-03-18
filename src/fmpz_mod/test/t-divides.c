@@ -20,7 +20,7 @@ main(void)
 
     flint_printf("divides....");
     fflush(stdout);
-   
+
     flint_randinit(state);
 
     {
@@ -141,7 +141,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

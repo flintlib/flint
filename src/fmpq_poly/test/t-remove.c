@@ -23,7 +23,7 @@ main(void)
     FLINT_TEST_INIT(state);
 
     flint_printf("remove....");
-    fflush(stdout);    
+    fflush(stdout);
 
     /* Check aliasing of q and a */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -125,7 +125,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, p, q;
-        slong e1, e2;                                                                     
+        slong e1, e2;
         fmpq_poly_init(a);
         fmpq_poly_init(b);
 	fmpq_poly_init(p);
@@ -167,7 +167,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

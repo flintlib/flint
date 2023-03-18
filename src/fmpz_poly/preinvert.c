@@ -14,7 +14,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void 
+void
 _fmpz_poly_preinvert(fmpz * Binv, const fmpz * B, slong len)
 {
     if (len == 1)  /* B is +-1 */
@@ -31,19 +31,19 @@ _fmpz_poly_preinvert(fmpz * Binv, const fmpz * B, slong len)
         W = T + len;
 
         for (i = 1; (WORD(1) << i) < n; i++) ;
-    
+
         a = (slong *) flint_malloc(i * sizeof(slong));
         a[i = 0] = n;
         while (n >= FMPZ_POLY_INV_NEWTON_CUTOFF)
             a[++i] = (n = (n + 1) / 2);
-        
-        if (len != n) 
+
+        if (len != n)
            _fmpz_poly_reverse(T, B, len, len); /* only reverse if it ... */
-        
+
         /* Base case */
         {
             fmpz *Brev = W + 2 * FMPZ_POLY_INV_NEWTON_CUTOFF;
-            if (len != n) 
+            if (len != n)
                _fmpz_poly_reverse(Brev, T, n, n); /* ... won't be undone */
             else Brev = (fmpz *) B;
 
@@ -52,7 +52,7 @@ _fmpz_poly_preinvert(fmpz * Binv, const fmpz * B, slong len)
             _fmpz_poly_div_basecase(Binv, W, W, 2*n - 1, Brev, n, 0);
             _fmpz_poly_reverse(Binv, Binv, n, n);
         }
-        
+
         for (i--; i >= 0; i--)
         {
             m = n;

@@ -16,7 +16,7 @@ int main(void)
 {
    int i, result;
    FLINT_TEST_INIT(state);
-   
+
 
    flint_printf("udiv_qrnnd....");
    fflush(stdout);
@@ -25,7 +25,7 @@ int main(void)
    {
       mp_limb_t d, nh, nl, q, r, ph, pl;
 
-      do 
+      do
       {
          d = n_randtest_not_zero(state);
          nh = n_randtest(state);
@@ -41,7 +41,7 @@ int main(void)
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("nh = %wu, nl = %wu, d = %wu\n", nh, nl, d); 
+         flint_printf("nh = %wu, nl = %wu, d = %wu\n", nh, nl, d);
          flint_printf("ph = %wu, pl = %wu\n", ph, pl);
          fflush(stdout);
          flint_abort();
@@ -49,7 +49,7 @@ int main(void)
    }
 
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

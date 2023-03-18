@@ -14,10 +14,10 @@
 #include "padic.h"
 
 /*
-    Returns whether \code{op} has a square root modulo $p^N$ and if 
+    Returns whether \code{op} has a square root modulo $p^N$ and if
     so sets \code{rop} to such an element.
 
-    Assumes that \code{op} is a unit modulo $p^N$.  Assumes $p$ is an 
+    Assumes that \code{op} is a unit modulo $p^N$.  Assumes $p$ is an
     odd prime.
 
     In the current implementation, allows aliasing.
@@ -54,11 +54,11 @@ static int _padic_sqrt_p(fmpz_t rop, const fmpz_t op, const fmpz_t p, slong N)
         }
 
         /*
-            Run Newton iteration for the inverse square root, 
-            using the update formula 
+            Run Newton iteration for the inverse square root,
+            using the update formula
                 z := z - z (u z^2 - 1) / 2
-            for all but the last step.  The last step is 
-            replaced with 
+            for all but the last step.  The last step is
+            replaced with
                 b := u z                  mod p^{N'}
                 z := b + z (u - b^2) / 2  mod p^{N}.
          */
@@ -105,7 +105,7 @@ static int _padic_sqrt_p(fmpz_t rop, const fmpz_t op, const fmpz_t p, slong N)
 }
 
 /*
-    Returns whether \code{op} has a square root modulo $2^N$ and if 
+    Returns whether \code{op} has a square root modulo $2^N$ and if
     so sets \code{rop} to such an element.
 
     Assumes that \code{op} is a unit modulo $2^N$.
@@ -202,8 +202,8 @@ int padic_sqrt(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     padic_val(rop) = padic_val(op) / 2;
 
     /*
-        In this case, if there is a square root it will be 
-        zero modulo $p^N$.  We only have to establish whether 
+        In this case, if there is a square root it will be
+        zero modulo $p^N$.  We only have to establish whether
         or not the element \code{op} is a square.
      */
     if (padic_val(rop) >= padic_prec(rop))
@@ -223,7 +223,7 @@ int padic_sqrt(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         return ans;
     }
 
-    return _padic_sqrt(padic_unit(rop), 
+    return _padic_sqrt(padic_unit(rop),
                        padic_unit(op), ctx->p, padic_prec(rop) - padic_val(rop));
 }
 

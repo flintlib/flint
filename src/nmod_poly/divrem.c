@@ -16,11 +16,11 @@
 #include "gr_poly.h"
 
 void
-_nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA, 
+_nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA,
                                   mp_srcptr B, slong lenB, nmod_t mod)
 {
     mp_limb_t invB;
-  
+
     if (lenA <= 20 || lenB <= 8 || lenA - lenB <= 6 ||
             (NMOD_BITS(mod) <= 61 && lenA <= 40) ||
             (NMOD_BITS(mod) <= 29 && lenA <= 70))
@@ -47,7 +47,7 @@ void nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,
     const slong lenA = A->length, lenB = B->length;
     nmod_poly_t tQ, tR;
     mp_ptr q, r;
-    
+
     if (lenB == 0)
     {
         if (nmod_poly_modulus(B) == 1)
@@ -104,7 +104,7 @@ void nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,
         nmod_poly_swap(R, tR);
         nmod_poly_clear(tR);
     }
-        
+
     Q->length = lenA - lenB + 1;
     R->length = lenB - 1;
 

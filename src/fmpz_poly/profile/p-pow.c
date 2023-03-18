@@ -37,13 +37,13 @@ main(void)
 {
     int k, exp;
     fmpz_poly_t f, g;
-    
+
     FLINT_TEST_INIT(state);
-    
-   
+
+
     fmpz_poly_init2(f, lenhi);
     fmpz_poly_init2(g, exphi * (lenhi - 1) + 1);
-    
+
     flint_printf("Comparative timing for fmpz_poly_pow\n");
     flint_printf("\n");
     flint_printf("Length:    [%d..%d] with step size %d\n", lenlo, lenhi, lenh);
@@ -52,21 +52,21 @@ main(void)
     flint_printf("\n");
     flint_printf("exp len bits (Binary exponentiation) Multinomials\n");
     flint_printf("\n");
-    
+
     for (exp = explo, k = 0; exp <= exphi; exp += exph, k++)
     {
         int i, j, len, bits;
-    
+
         for (len = lenlo, j = 0; len <= lenhi; len += lenh, j++)
         {
             for (bits = bitslo, i = 0; bits <= bitshi; bits += bitsh, i++)
             {
-            
+
                 timeit_t t[2];
                 int l, loops = 1, r = 0;
                 slong s[2] = {WORD(0), WORD(0)};
                 double T[2];
-            
+
                 /*
                    Construct random polynomial f of length len
                  */
@@ -78,13 +78,13 @@ main(void)
                         fmpz_randtest_not_zero(f->coeffs + (len - 1), state, bits);
                     f->length = len;
                 }
-                
+
                 /*
                    Run tests
                  */
-                
+
               loop:
-                
+
                 timeit_start(t[0]);
                 for (l = 0; l < loops; l++)
                     fmpz_poly_pow_binexp(g, f, exp);
@@ -94,30 +94,30 @@ main(void)
                 for (l = 0; l < loops; l++)
                     fmpz_poly_pow_multinomial(g, f, exp);
                 timeit_stop(t[1]);
-                
+
                 if (t[0]->cpu <= cpumin || t[1]->cpu <= cpumin)
                 {
                     loops *= 10;
                     goto loop;
                 }
-                
+
                 s[0] += t[0]->cpu;
                 s[1] += t[1]->cpu;
                 r    += loops;
-                
+
                 T[0] = s[0] / (double) r;
                 T[1] = s[1] / (double) r;
-                
+
                 flint_printf("%d %d %d %f %f\n", exp, len, bits, T[0], T[1]);
                 fflush(stdout);
             }
         }
     }
-    
+
     fmpz_poly_clear(f);
     fmpz_poly_clear(g);
 
-    flint_randclear(state);  
+    flint_randclear(state);
 
     return 0;
 }

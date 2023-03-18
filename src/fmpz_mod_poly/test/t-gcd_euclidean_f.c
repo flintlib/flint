@@ -28,7 +28,7 @@ main(void)
     /*
         Compare with the usual GCD function.
 
-        N.B.  I checked by hand that this test shows both outcomes, 
+        N.B.  I checked by hand that this test shows both outcomes,
         i.e. trivial and non-trivial factors, sufficiently frequently.
      */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -83,7 +83,7 @@ main(void)
 
     fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

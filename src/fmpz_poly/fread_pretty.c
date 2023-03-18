@@ -79,7 +79,7 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
     i = 0;
     N = 80;
     buf = flint_malloc(N);
-    
+
     fmpz_init(f_coeff);
     mpz_init(z_coeff);
     mpz_init(z_exp);

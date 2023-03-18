@@ -30,8 +30,8 @@ void sample(void * arg, ulong count)
    mp_size_t j;
    slong i;
    FLINT_TEST_INIT(state);
-   
-    
+
+
    for (j = 0; j < 1000; j++)
       vec[j] = n_randlimb(state);
 
@@ -40,12 +40,12 @@ void sample(void * arg, ulong count)
    {
       n = n_randbits(state, bits);
       if (n == UWORD(0)) n++;
-      
+
 	  nmod_init(&mod, n);
       _nmod_vec_reduce(vec2, vec, 1000, mod);
    }
    prof_stop();
- 
+
    flint_randclear(state);
    _nmod_vec_clear(vec);
    _nmod_vec_clear(vec2);
@@ -63,7 +63,7 @@ int main(void)
 
 	  prof_repeat(&min, &max, sample, (void *) &info);
 
-      flint_printf("bits %wd, c/l = %.1lf\n", 
+      flint_printf("bits %wd, c/l = %.1lf\n",
          i, (min/(double)FLINT_CLOCK_SCALE_FACTOR)/1000
 	  );
    }

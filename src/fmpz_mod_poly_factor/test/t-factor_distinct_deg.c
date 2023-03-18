@@ -24,7 +24,7 @@ main(void)
     int iter;
     fmpz_mod_ctx_t ctx;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("factor_distinct_deg....");
     fflush(stdout);
 
@@ -141,7 +141,7 @@ main(void)
 
     fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

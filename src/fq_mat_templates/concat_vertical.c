@@ -23,7 +23,7 @@ TEMPLATE(T, mat_concat_vertical) (TEMPLATE(T, mat_t) res,
     slong r1 = mat1->r;
     slong c1 = mat1->c;
     slong r2 = mat2->r;
-    
+
     if (c1 > 0)
     {
         for (i = 0; i < r1; i++)

@@ -73,7 +73,7 @@ _gr_poly_pow_series_ui_binexp(gr_ptr res,
     GR_TMP_INIT_VEC(v, len, ctx);
 
     bit = UWORD(1) << (FLINT_BIT_COUNT(exp) - 2);
-    
+
     if (n_zerobits(exp) % 2)
     {
         R = res;
@@ -110,7 +110,7 @@ _gr_poly_pow_series_ui_binexp(gr_ptr res,
             S = T;
         }
     }
-    
+
     GR_TMP_CLEAR_VEC(v, len, ctx);
 
     return status;

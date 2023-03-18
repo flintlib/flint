@@ -29,7 +29,7 @@
     V^T M     = selects last k rows from M, truncating matrix
     M U       = selects first n-k columns from M, truncating matrix
     M V       = selects last k columns from M, truncating matrix
- 
+
     X V^T     = extends X to n x n matrix (placing X on right)
 */
 

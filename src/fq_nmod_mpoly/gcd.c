@@ -853,7 +853,7 @@ static int _try_missing_var(
 
         fq_nmod_mpoly_clear(tG, ctx);
         fq_nmod_mpoly_clear(tAbar, ctx);
-        fq_nmod_mpoly_clear(tBbar, ctx);        
+        fq_nmod_mpoly_clear(tBbar, ctx);
     }
 
     success = 1;
@@ -1705,7 +1705,7 @@ skip_monomial_cofactors:
         if (density > 0.08)
         {
             if (_try_brown(G, Abar, Bbar, A, B, I, ctx))
-                goto successful;                
+                goto successful;
         }
 
         if (I->Adeflate_tdeg > 0 && I->Bdeflate_tdeg > 0)
@@ -1724,7 +1724,7 @@ skip_monomial_cofactors:
         if (density > 0.05)
         {
             if (_try_hensel(G, Abar, Bbar, A, B, I, ctx))
-                goto successful;                
+                goto successful;
         }
 
         k = I->zippel2_perm[1];
@@ -1777,7 +1777,7 @@ cleanup:
 
         FLINT_ASSERT(fq_nmod_mpoly_divides(T, Asave, G, ctx));
         FLINT_ASSERT(Abar == NULL || fq_nmod_mpoly_equal(T, Abar, ctx));
-            
+
         FLINT_ASSERT(fq_nmod_mpoly_divides(T, Bsave, G, ctx));
         FLINT_ASSERT(Bbar == NULL || fq_nmod_mpoly_equal(T, Bbar, ctx));
     }

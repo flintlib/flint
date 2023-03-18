@@ -19,7 +19,7 @@ fmpz_poly_mat_max_bits(const fmpz_poly_mat_t A)
     slong i, j, bits, max;
     int sign;
 
-    max = 0; 
+    max = 0;
     sign = 0;
 
     for (i = 0; i < A->r; i++)

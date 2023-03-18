@@ -202,7 +202,7 @@ choose_prime: /* primes are v - alpha, v + alpha */
         nmod_mpolyn_one(G, ctx);
         nmod_mpolyn_swap(Abar, A);
         nmod_mpolyn_swap(Bbar, B);
-        goto successful_put_content;    
+        goto successful_put_content;
     }
 
     if (n_poly_degree(Gevalp) != n_poly_degree(Gevalm))
@@ -487,7 +487,7 @@ choose_prime:
         nmod_mpolyn_one(G, ctx);
         nmod_mpolyn_swap(Abar, A);
         nmod_mpolyn_swap(Bbar, B);
-        goto successful_put_content;    
+        goto successful_put_content;
     }
 
     if (n_poly_degree(Gevalp->coeffs + 0) !=
@@ -812,7 +812,7 @@ have_prime:
         nmod_mpolyn_one(G, ctx);
         nmod_mpolyn_swap(Abar, A);
         nmod_mpolyn_swap(Bbar, B);
-        goto successful_put_content;    
+        goto successful_put_content;
     }
 
     if (n_poly_degree(modulus) > 0)
@@ -1058,7 +1058,7 @@ have_prime:
         nmod_mpolyn_one(G, ctx);
         nmod_mpolyn_swap(Abar, A);
         nmod_mpolyn_swap(Bbar, B);
-        goto successful_put_content;    
+        goto successful_put_content;
     }
 
     if (n_poly_degree(modulus) > 0)

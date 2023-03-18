@@ -14,7 +14,7 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
-void _fmpq_poly_primitive_part(fmpz * rpoly, fmpz_t rden, 
+void _fmpq_poly_primitive_part(fmpz * rpoly, fmpz_t rden,
                                const fmpz * poly, const fmpz_t den, slong len)
 {
     _fmpz_poly_primitive_part(rpoly, poly, len);
@@ -33,8 +33,8 @@ void fmpq_poly_primitive_part(fmpq_poly_t res, const fmpq_poly_t poly)
     {
         fmpq_poly_fit_length(res, len);
         _fmpq_poly_set_length(res, len);
-        
-        _fmpq_poly_primitive_part(res->coeffs, res->den, 
+
+        _fmpq_poly_primitive_part(res->coeffs, res->den,
                                   poly->coeffs, poly->den, len);
     }
 }

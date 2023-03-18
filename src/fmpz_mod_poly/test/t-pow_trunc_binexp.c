@@ -92,7 +92,7 @@ main(void)
         fmpz_mod_poly_pow_trunc_binexp(b, a, e, trunc, ctx);
         fmpz_mod_poly_pow(c, a, e, ctx);
         fmpz_mod_poly_truncate(c, trunc, ctx);
-        
+
         result = (fmpz_mod_poly_equal(b, c, ctx)
             || (a->length == 0 && e == 0 && c->length == 1 && c->coeffs[0] == 1));
         if (!result)
@@ -115,7 +115,7 @@ main(void)
 
     fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

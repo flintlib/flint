@@ -101,7 +101,7 @@ acb_calc_gl_node(arb_ptr x, arb_ptr w, slong i, slong k, slong prec)
         flint_abort();
 
     all = (k < 0);
-    
+
     if (gl_cache->gl_prec[i] < prec)
     {
         nodes_work_t work;

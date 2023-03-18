@@ -19,7 +19,7 @@ void
 _fmpz_vec_set_nmod_vec(fmpz * res, mp_srcptr poly, slong len, nmod_t mod)
 {
     slong i;
-        
+
     for (i = 0; i < len; i++)
        fmpz_set_ui_smod(res + i, poly[i], mod.n);
 }

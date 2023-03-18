@@ -14,7 +14,7 @@
 #include "fq.h"
 
 /*
-    Sets (rop, 2d-1) to the image of (op, len) under the Frobenius operator 
+    Sets (rop, 2d-1) to the image of (op, len) under the Frobenius operator
     raised to the e-th power, assuming that neither op nor e are zero.
  */
 

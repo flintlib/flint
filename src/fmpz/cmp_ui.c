@@ -23,7 +23,7 @@ fmpz_cmp_ui(const fmpz_t f, ulong g)
     {
         if (c < WORD(0) || g > COEFF_MAX)
             return -1;
-        else 
+        else
             return c < (slong) g ? -1 : c > (slong) g;
     }
     else                     /* f is large */

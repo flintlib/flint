@@ -32,7 +32,7 @@ main(void)
 #ifdef _WIN32
     tmul = 1;
 #endif
-    
+
     flint_printf("compose_mod_brent_kung_vec_preinv_threaded....");
     fflush(stdout);
 
@@ -77,7 +77,7 @@ main(void)
 
         for (j = 0; j < k; j++)
             fmpz_mod_poly_init(res + j, ctx);
-            
+
         fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(res, pow, l,
                                                                 k, b, a, ainv, ctx);
 
@@ -112,7 +112,7 @@ main(void)
 
     fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -18,7 +18,7 @@ nmod_mat_concat_horizontal(nmod_mat_t res, const nmod_mat_t mat1, const nmod_mat
     slong r = mat1->r;
     slong c1 = mat1->c;
     slong c2 = mat2->c;
-    
+
     for (i = 0; i < r; i++)
     {
     	flint_mpn_copyi(res->rows[i], mat1->rows[i], c1);

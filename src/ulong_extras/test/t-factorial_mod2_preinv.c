@@ -31,7 +31,7 @@ int main(void)
 {
     mp_limb_t n;
     int j;
-    
+
     FLINT_TEST_INIT(state);
 
     flint_printf("factorial_mod2_preinv....");
@@ -59,7 +59,7 @@ int main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

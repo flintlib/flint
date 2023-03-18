@@ -34,7 +34,7 @@ int gr_dirichlet_chi_vec(gr_ptr res, const dirichlet_group_t G, const dirichlet_
     {
         slong prec;
         GR_MUST_SUCCEED(gr_ctx_get_real_prec(&prec, ctx));
-        
+
         acb_dirichlet_chi_vec(res, G, chi, len, prec);
         return GR_SUCCESS;
     }
@@ -48,7 +48,7 @@ int gr_dirichlet_l(gr_ptr res, const dirichlet_group_t G, const dirichlet_char_t
     {
         slong prec;
         GR_MUST_SUCCEED(gr_ctx_get_real_prec(&prec, ctx));
-        
+
         acb_dirichlet_l(res, s, G, chi, prec);
         return GR_SUCCESS;
     }
@@ -85,7 +85,7 @@ int gr_dirichlet_hardy_z(gr_ptr res, const dirichlet_group_t G, const dirichlet_
     {
         slong prec;
         GR_MUST_SUCCEED(gr_ctx_get_real_prec(&prec, ctx));
-        
+
         acb_dirichlet_hardy_z(res, s, G, chi, 1, prec);
         return GR_SUCCESS;
     }
@@ -122,7 +122,7 @@ int gr_dirichlet_hardy_theta(gr_ptr res, const dirichlet_group_t G, const dirich
     {
         slong prec;
         GR_MUST_SUCCEED(gr_ctx_get_real_prec(&prec, ctx));
-        
+
         acb_dirichlet_hardy_theta(res, s, G, chi, 1, prec);
         return GR_SUCCESS;
     }

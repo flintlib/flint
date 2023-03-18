@@ -13,9 +13,9 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
-slong _fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz *G, fmpz *S, fmpz *T, 
-                                   const fmpz *A, slong lenA, 
-                                   const fmpz *B, slong lenB, 
+slong _fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz *G, fmpz *S, fmpz *T,
+                                   const fmpz *A, slong lenA,
+                                   const fmpz *B, slong lenB,
                                    const fmpz_t invB, const fmpz_t p)
 {
     _fmpz_vec_zero(G, lenB);
@@ -42,7 +42,7 @@ slong _fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz *G, fmpz *S, fmpz *T,
         _fmpz_mod_poly_divrem_f(f, Q, R, A, lenA, B, lenB, p);
         if (!fmpz_is_one(f))
             goto cleanup2;
-        
+
         lenR = lenB - 1;
         FMPZ_VEC_NORM(R, lenR);
 
@@ -80,9 +80,9 @@ slong _fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz *G, fmpz *S, fmpz *T,
 
             do {
                 fmpz_gcdinv(f, inv, V3 + (lenV3 - 1), p);
-                if (!fmpz_is_one(f))					
+                if (!fmpz_is_one(f))
                     goto cleanup;
-				
+
                 _fmpz_mod_poly_divrem_basecase(Q, D, D, lenD, V3, lenV3, inv, p);
                 lenQ = lenD - lenV3 + 1;
                 lenD = lenV3 - 1;
@@ -118,7 +118,7 @@ slong _fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz *G, fmpz *S, fmpz *T,
 cleanup:
             fmpz_clear(inv);
             FMPZ_VEC_TMP_CLEAR(W, FLINT_MAX(5*lenB, lenA + lenB));
-			
+
 cleanup2:
             FMPZ_VEC_TMP_CLEAR(Q, 2*lenA);
 
@@ -164,7 +164,7 @@ fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G, fmpz_mod_poly_t S,
             slong lenG;
 
             fmpz_gcdinv(f, inv, fmpz_mod_poly_lead(B, ctx), p);
-            
+
             if (!fmpz_is_one(f))
                goto cleanup;
 
@@ -196,7 +196,7 @@ fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G, fmpz_mod_poly_t S,
                 t = T->coeffs;
             }
 
-            lenG = _fmpz_mod_poly_xgcd_euclidean_f(f, g, s, t, 
+            lenG = _fmpz_mod_poly_xgcd_euclidean_f(f, g, s, t,
                                      A->coeffs, lenA, B->coeffs, lenB, inv, p);
 
             if (G == A || G == B)

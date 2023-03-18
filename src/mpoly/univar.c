@@ -298,7 +298,7 @@ looper:
                 DIVEXACT(COEFF(D, D->length), w, COEFF(A, 0));
                 fmpz_set(D->exps + D->length, A->exps + i);
                 i++;
-                j++;                
+                j++;
             }
             else if (i < A->length && (j >= B->length ||
                                        fmpz_cmp(A->exps + i, B->exps + j) > 0))
@@ -329,7 +329,7 @@ looper:
         fmpz_sub_ui(z1, e, 1);
         if (B->length > 1 && fmpz_equal(B->exps + 1, z1))
         {
-            j = 2;            
+            j = 2;
             k = 1;
         }
         else
@@ -497,7 +497,7 @@ looper:
                 SUB(COEFF(D, D->length), u, v);
                 fmpz_set(D->exps + D->length, A->exps + i);
                 i++;
-                j++;                
+                j++;
             }
             else if (i < A->length && (j >= H->length ||
                                        fmpz_cmp(A->exps + i, H->exps + j) > 0))
@@ -547,7 +547,7 @@ looper:
                         SUB(COEFF(T, T->length), COEFF(H, i), v);
                         fmpz_set(T->exps + T->length, B->exps + j);
                         i++;
-                        j++;                
+                        j++;
                     }
                     else if (i < H->length && (j >= B->length ||
                                                 fmpz_cmp(z1, B->exps + j) > 0))
@@ -565,7 +565,7 @@ looper:
                         DIVEXACT(COEFF(T, T->length), u, COEFF(B, 0));
                         NEG(COEFF(T, T->length), COEFF(T, T->length));
                         fmpz_set(T->exps + T->length, B->exps + j);
-                        j++;                
+                        j++;
                     }
 
                     T->length += !IS_ZERO(COEFF(T, T->length));
@@ -602,7 +602,7 @@ looper:
                     SUB(COEFF(T, T->length), COEFF(D, i), u);
                     fmpz_set(T->exps + T->length, D->exps + i);
                     i++;
-                    j++;                
+                    j++;
                 }
                 else if (i < D->length && (j >= H->length ||
                                        fmpz_cmp(D->exps + i, H->exps + j) > 0))
@@ -717,7 +717,7 @@ looper:
             }
 
             if (((fmpz_get_ui(d) - fmpz_get_ui(e)) & 1) == 0)
-                NEG(COEFF(T, T->length), COEFF(T, T->length));            
+                NEG(COEFF(T, T->length), COEFF(T, T->length));
 
             T->length += !IS_ZERO(COEFF(T, T->length));
 

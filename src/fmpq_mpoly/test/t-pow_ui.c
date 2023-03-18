@@ -87,7 +87,7 @@ main(void)
         fmpq_mpoly_ctx_init_rand(ctx, state, 20);
         fmpq_mpoly_init(f, ctx);
         fmpq_mpoly_init(g, ctx);
-        fmpq_mpoly_init(h, ctx);        
+        fmpq_mpoly_init(h, ctx);
 
         fmpz_init(power);
 
@@ -139,7 +139,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

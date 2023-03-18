@@ -250,7 +250,7 @@ static void _hensel_lift_fac(
         n_fq_bpoly_mul(t1, G, H, ctx);
         n_fq_bpoly_sub(c, f, t1, ctx);
 
-        for (i = 0; i < c->length; i++)        
+        for (i = 0; i < c->length; i++)
         for (j = 0; j < FLINT_MIN(p0 + p1, c->coeffs[i].length); j++)
             FLINT_ASSERT(_n_fq_is_zero(c->coeffs[i].coeffs + d*j, d));
     }
@@ -361,7 +361,7 @@ static void _hensel_lift_inv(
 
     {
         slong j, d = fq_nmod_ctx_degree(ctx);
-        for (i = 0; i < c->length; i++)        
+        for (i = 0; i < c->length; i++)
         for (j = 0; j < p0 + p1; j++)
         {
             FLINT_ASSERT(j >= c->coeffs[i].length ||
@@ -457,7 +457,7 @@ static void n_fq_bpoly_lift_clear(n_fq_bpoly_lift_t L)
 static void n_fq_bpoly_lift_start(
     n_fq_bpoly_lift_t L,
     fq_nmod_poly_struct * local_facs,
-    slong r,    
+    slong r,
     const fq_nmod_ctx_t ctx)
 {
     slong i, k, degx;
@@ -1200,7 +1200,7 @@ int n_fq_bpoly_factor_smprime(
 
     Alenx = 1 + n_fq_bpoly_degree0(A);
     Aleny = 1 + n_fq_bpoly_degree1(A);
-    
+
     FLINT_ASSERT(Alenx > 1);
 
     fq_nmod_init(alpha, ctx);
@@ -1322,7 +1322,7 @@ try_zas:
 
 more:
 
-    /* increase precision until N has fewer rows and is a nice 0-1 mat */ 
+    /* increase precision until N has fewer rows and is a nice 0-1 mat */
     old_nrows = nmod_mat_nrows(N);
     _lattice(N, L->lifted_fac, r, lift_order, CLD, A, ctx);
     if (nmod_mat_nrows(N) < old_nrows && nmod_mat_is_reduced(N))

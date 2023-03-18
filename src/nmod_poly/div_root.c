@@ -37,7 +37,7 @@ _nmod_poly_div_root(mp_ptr Q, mp_srcptr A, slong len, mp_limb_t c, nmod_t mod)
 }
 
 mp_limb_t
-nmod_poly_div_root(nmod_poly_t Q, 
+nmod_poly_div_root(nmod_poly_t Q,
                  const nmod_poly_t A, mp_limb_t c)
 {
     mp_limb_t rem;

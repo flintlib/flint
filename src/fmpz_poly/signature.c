@@ -19,14 +19,14 @@ void _fmpz_poly_signature(slong * r1, slong * r2, const fmpz * poly, slong len)
     fmpz *A, *B, *f, *g, *h, *w;
     slong lenA, lenB;
     int s, t;
-    
+
     if (len <= 2)
     {
         *r1 = (len == 2);
         *r2 = 0;
         return;
     }
-    
+
     w = _fmpz_vec_init(2 * len + 2);
     A = w;
     B = w + len;
@@ -35,18 +35,18 @@ void _fmpz_poly_signature(slong * r1, slong * r2, const fmpz * poly, slong len)
     f = w + 2 * len - 1;
     g = w + 2 * len;
     h = w + 2 * len + 1;
-    
+
     _fmpz_poly_primitive_part(A, poly, lenA);
     _fmpz_poly_derivative(B, A, lenA);
     _fmpz_poly_primitive_part(B, B, lenB);
-    
+
     fmpz_one(g);
     fmpz_one(h);
-    
+
     s = 1;
     t = (lenA & WORD(1)) ? -s : s;
     *r1 = 1;
-    
+
     while (1)
 	{
         slong delta = lenA - lenB;
@@ -63,7 +63,7 @@ void _fmpz_poly_signature(slong * r1, slong * r2, const fmpz * poly, slong len)
             _fmpz_vec_clear(w, 2 * len + 2);
 			flint_abort();
 		}
-      
+
         if ((fmpz_sgn(B + (lenB - 1)) > 0) || (delta & WORD(1)))
             _fmpz_vec_neg(A, A, lenA);
 
@@ -82,7 +82,7 @@ void _fmpz_poly_signature(slong * r1, slong * r2, const fmpz * poly, slong len)
         if (lenA == 1)
         {
             *r2 = ((len - 1) - *r1) / 2;
-            
+
             _fmpz_vec_clear(w, 2 * len + 2);
             return;
         }
@@ -98,7 +98,7 @@ void _fmpz_poly_signature(slong * r1, slong * r2, const fmpz * poly, slong len)
                 lenA = lenB;
                 lenB = temp;
             }
-            
+
             if (delta == 1)
             {
                 fmpz_mul(f, g, h);

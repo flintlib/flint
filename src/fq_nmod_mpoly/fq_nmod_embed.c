@@ -175,7 +175,7 @@ void bad_fq_nmod_embed_array_init(bad_fq_nmod_embed_struct * emb,
         fq_nmod_set_ui(cur->theta_lg, nmod_poly_get_coeff_ui(
                                               cur->smctx->modulus, 0), bigctx);
         fq_nmod_neg(cur->theta_lg, cur->theta_lg, bigctx);
-        
+
         fq_nmod_init(cur->x_lg, bigctx);
         fq_nmod_gen(cur->x_lg, bigctx);
 
@@ -294,7 +294,7 @@ void bad_fq_nmod_embed_array_init(bad_fq_nmod_embed_struct * emb,
             fq_nmod_zero(t, smallctx);
             for (j = 0; j < m; j++)
             {
-                nmod_poly_set_coeff_ui(t, j, 
+                nmod_poly_set_coeff_ui(t, j,
                             nmod_mul(lc_inv, nmod_mat_entry(Msol, m*i + j, 0),
                                  smallctx->modulus->mod));
             }

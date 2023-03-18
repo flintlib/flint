@@ -106,10 +106,10 @@ int nearly_equal(const arb_t x, const arb_t y)
     arf_set_mag(s, arb_radref(x));
     arf_sub(t, t, s, MAG_BITS, ARF_RND_UP);
     res = mag_equal(arb_radref(x), arb_radref(y)) || (arf_cmpabs_mag(t, ulp) <= 0);
-    
+
     arf_sub(t, arb_midref(x), arb_midref(y), MAG_BITS+2, ARF_RND_UP);
     res = res && (arf_equal(arb_midref(x), arb_midref(y)) || (arf_cmpabs_mag(t, ulp) <= 0));
-    
+
     mag_clear(ulp);
     arf_clear(s);
     arf_clear(t);
@@ -168,7 +168,7 @@ int main()
                 flint_printf("c = "); arb_printd(c, 100); flint_printf("\n\n");
                 flint_abort();
             }
-        
+
             arb_clear(c);
             arb_clear(b);
             arb_clear(a);

@@ -47,7 +47,7 @@ void fmpz_set_ZZ(fmpz_t rop, const ZZ& op)
 {
     const _ntl_gbigint x = op.rep;
 
-    if (!x) 
+    if (!x)
         fmpz_zero(rop);
     else
     {
@@ -61,12 +61,12 @@ void fmpz_set_ZZ(fmpz_t rop, const ZZ& op)
     }
 }
 
-void fmpz_set_ZZ_p(fmpz_t rop, const ZZ_p& op) 
+void fmpz_set_ZZ_p(fmpz_t rop, const ZZ_p& op)
 {
     fmpz_set_ZZ(rop, rep(op));
 }
 
-void fmpz_set_zz_p(fmpz_t rop, const zz_p& op) 
+void fmpz_set_zz_p(fmpz_t rop, const zz_p& op)
 {
     fmpz_set_si(rop, rep(op));
 }
@@ -78,13 +78,13 @@ void fmpz_get_ZZ(ZZ& rop, const fmpz_t op)
    slong lw = fmpz_size(op);
    fmpz c = *op;
 
-   if (lw == 0) 
+   if (lw == 0)
    {
       if (*x) ZZ_SIZE(*x) = 0;
       return;
    }
 
-   _ntl_gsetlength(x, lw); 
+   _ntl_gsetlength(x, lw);
    xp = ZZ_DATA(*x);
 
    if (COEFF_IS_MPZ(c))
@@ -98,19 +98,19 @@ void fmpz_get_ZZ(ZZ& rop, const fmpz_t op)
       else
          xp[0] = c;
    }
-   
+
    if (fmpz_sgn(op) < 0) ZZ_SIZE(*x) = -lw;
    else ZZ_SIZE(*x) = lw;
 }
 
-void fmpz_get_ZZ_p(ZZ_p& rop, const fmpz_t op) 
+void fmpz_get_ZZ_p(ZZ_p& rop, const fmpz_t op)
 {
     ZZ a;
     fmpz_get_ZZ(a, op);
     conv(rop, a);
 }
 
-void fmpz_get_zz_p(zz_p& rop, const fmpz_t op) 
+void fmpz_get_zz_p(zz_p& rop, const fmpz_t op)
 {
     conv(rop, fmpz_get_si(op));
 }
@@ -148,7 +148,7 @@ void fmpz_poly_set_ZZX(fmpz_poly_t rop, const ZZX& op)
     else
     {
         slong i;
-        const ZZ *ap; 
+        const ZZ *ap;
 
         fmpz_poly_fit_length(rop, len);
         _fmpz_poly_set_length(rop, len);
@@ -196,7 +196,7 @@ void fmpz_mod_poly_set_ZZ_pX(fmpz_mod_poly_t rop, const ZZ_pX& op,
     else
     {
         slong i;
-        const ZZ_p *ap; 
+        const ZZ_p *ap;
 
         fmpz_mod_poly_fit_length(rop, len, ctx);
         _fmpz_mod_poly_set_length(rop, len);
@@ -243,7 +243,7 @@ void fmpz_mod_poly_set_zz_pX(fmpz_mod_poly_t rop, const zz_pX& op,
     else
     {
         slong i;
-        const zz_p *ap; 
+        const zz_p *ap;
 
         fmpz_mod_poly_fit_length(rop, len, ctx);
         _fmpz_mod_poly_set_length(rop, len);
@@ -291,7 +291,7 @@ void fq_set_ZZ_pE(fq_t rop, const ZZ_pE& op, const fq_ctx_t ctx)
     else
     {
         slong i;
-        const ZZ_p *ap; 
+        const ZZ_p *ap;
 
         fmpz_poly_fit_length(rop, len);
         _fmpz_poly_set_length(rop, len);
@@ -338,7 +338,7 @@ void fq_poly_set_ZZ_pEX(fq_poly_t rop, const ZZ_pEX& op, const fq_ctx_t ctx)
     else
     {
         slong i;
-        const ZZ_pE *ap; 
+        const ZZ_pE *ap;
 
         fq_poly_fit_length(rop, len, ctx);
         _fq_poly_set_length(rop, len, ctx);
@@ -388,7 +388,7 @@ void fq_set_zz_pE(fq_t rop, const zz_pE& op, const fq_ctx_t ctx)
     else
     {
         slong i;
-        const zz_p *ap; 
+        const zz_p *ap;
 
         fmpz_poly_fit_length(rop, len);
         _fmpz_poly_set_length(rop, len);
@@ -435,7 +435,7 @@ void fq_poly_set_zz_pEX(fq_poly_t rop, const zz_pEX& op, const fq_ctx_t ctx)
     else
     {
         slong i;
-        const zz_pE *ap; 
+        const zz_pE *ap;
 
         fq_poly_fit_length(rop, len, ctx);
         _fq_poly_set_length(rop, len, ctx);

@@ -76,7 +76,7 @@ int nmod_mpoly_convert_from_nmod_mpolyd_degbound(
     outrange = 0;
     mpoly_monomial_zero(pcurexp, N);
     k = off;
-    for (j = nvars - 1; j >= 0; j--) 
+    for (j = nvars - 1; j >= 0; j--)
     {
         exps[j] = k % B->deg_bounds[j];
         rangemask[j] = UWORD(1) << j;
@@ -245,7 +245,7 @@ int nmod_mpoly_divides_dense(nmod_mpoly_t Q,
             Qbounds[i] = Abounds[i] - Bbounds[i] + 1;
             Bbounds[i] = Bbounds[i] + 1;
         }
-        Abounds[i] = Abounds[i] + 1;            
+        Abounds[i] = Abounds[i] + 1;
 
         if (Abounds[i] < WORD(0))
         {
@@ -315,7 +315,7 @@ done:
     return ret;
 
 cleanup_stage3:
-    nmod_poly_clear(Ru);    
+    nmod_poly_clear(Ru);
 
 cleanup_stage2:
     nmod_mpolyd_clear(Ad);

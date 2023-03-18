@@ -46,7 +46,7 @@ void padic_randtest(padic_t rop, flint_rand_t state, const padic_ctx_t ctx)
         fmpz_clear(pow);
 }
 
-void padic_randtest_not_zero(padic_t rop, flint_rand_t state, 
+void padic_randtest_not_zero(padic_t rop, flint_rand_t state,
                              const padic_ctx_t ctx)
 {
     slong i;
@@ -63,7 +63,7 @@ void padic_randtest_not_zero(padic_t rop, flint_rand_t state,
     }
 }
 
-void padic_randtest_int(padic_t rop, flint_rand_t state, 
+void padic_randtest_int(padic_t rop, flint_rand_t state,
                         const padic_ctx_t ctx)
 {
     const slong N = padic_prec(rop);

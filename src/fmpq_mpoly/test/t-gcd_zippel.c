@@ -119,7 +119,7 @@ main(void)
             if (!fmpq_mpoly_equal_ui(cg, UWORD(1), ctx))
             {
                 printf("FAIL\n");
-                flint_printf("Check cofactors are relatively prime\ni = %wd, j = %wd\n", i ,j);                
+                flint_printf("Check cofactors are relatively prime\ni = %wd, j = %wd\n", i ,j);
                 fflush(stdout);
                 flint_abort();
             }

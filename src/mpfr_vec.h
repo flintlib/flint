@@ -13,13 +13,13 @@
 #define MPFR_VEC_H
 
 #ifdef MPFR_VEC_INLINES_C
-#define MPFR_VEC_INLINE 
+#define MPFR_VEC_INLINE
 #else
 #define MPFR_VEC_INLINE static __inline__
 #endif
 
 #include "flint.h"
-#include <mpfr.h> 
+#include <mpfr.h>
 
 #if MPFR_VERSION_MAJOR < 3
 #error MPFR 3.0.0 or later is required

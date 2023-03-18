@@ -23,7 +23,7 @@ fq_zech_pth_root(fq_zech_t rop, const fq_zech_t op1, const fq_zech_ctx_t ctx)
         rop->value = op1->value;
         return;
     }
-    
+
     d = fq_zech_ctx_degree(ctx) - 1;
     qm1inv = n_precompute_inverse(ctx->qm1);
 
@@ -32,6 +32,6 @@ fq_zech_pth_root(fq_zech_t rop, const fq_zech_t op1, const fq_zech_ctx_t ctx)
     {
         e = n_mulmod_precomp(ctx->p, e, ctx->qm1, qm1inv);
     }
-    
-    rop->value = e;    
+
+    rop->value = e;
 }

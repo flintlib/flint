@@ -300,7 +300,7 @@ void fmpz_mpoly_convert_from_fmpz_mpolyd(
         if (fmpz_is_zero(B->coeffs + i))
             continue;
 
-        for (j = B->nvars - 1; j >= 0; j--) 
+        for (j = B->nvars - 1; j >= 0; j--)
         {
             ulong m = B->deg_bounds[j];
             ulong e = k % m;

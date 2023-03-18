@@ -53,7 +53,7 @@ main(void)
         nf_elem_init(a, nf);
         nf_elem_init(b, nf);
         nf_elem_init(c, nf);
-        
+
         fmpq_init(anorm);
         fmpq_init(bnorm);
         fmpq_init(cnorm);
@@ -104,7 +104,7 @@ main(void)
         nf_elem_clear(a, nf);
         nf_elem_clear(b, nf);
         nf_elem_clear(c, nf);
-         
+
         nf_clear(nf);
 
         fmpq_poly_clear(pol);

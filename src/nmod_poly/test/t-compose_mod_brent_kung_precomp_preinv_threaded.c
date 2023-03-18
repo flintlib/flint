@@ -23,7 +23,7 @@ main(void)
     int i;
 #endif
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("compose_mod_brent_kung_precomp_preinv_threaded....");
     fflush(stdout);
 
@@ -99,7 +99,7 @@ main(void)
         }
 
 	_nmod_poly_precompute_matrix_worker(&args1[0]);
-        
+
 	for (j = 1; j < num_threads + 1; j++)
             thread_pool_wait(global_thread_pool, threads[j - 1]);
 
@@ -125,13 +125,13 @@ main(void)
         nmod_mat_clear (B);
         nmod_poly_clear(c);
         nmod_poly_clear(cinv);
-        
+
 	for (j = 0; j < num_threads + 1; j++)
         {
             nmod_poly_clear(tmp + j);
             nmod_mat_clear(C + j);
         }
-        
+
 	flint_free(C);
         flint_free(tmp);
         flint_free(args1);
@@ -204,9 +204,9 @@ main(void)
         }
 
 	_nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(&args1[0]);
-        
+
 	_nmod_poly_normalise(res + 0);
-	
+
 	for (j = 1; j < num_threads + 1; j++)
         {
             thread_pool_wait(global_thread_pool, threads[j - 1]);
@@ -239,13 +239,13 @@ main(void)
 
         for (j = 0; j < num_threads + 1; j++)
             nmod_poly_clear(res + j);
-        
+
 	flint_free(res);
         flint_free(args1);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 

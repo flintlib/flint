@@ -16,7 +16,7 @@ int main(void)
 {
    int i, result;
    FLINT_TEST_INIT(state);
-   
+
 
    flint_printf("udiv_qrnnd_preinv....");
    fflush(stdout);
@@ -25,7 +25,7 @@ int main(void)
    {
       mp_limb_t d, dinv, nh, nl, q1, r1, q2, r2, norm;
 
-      do 
+      do
       {
          d = n_randtest_not_zero(state);
          nh = n_randtest(state);
@@ -43,7 +43,7 @@ int main(void)
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("nh = %wu, nl = %wu, d = %wu, dinv = %wu\n", nh, nl, d, dinv); 
+         flint_printf("nh = %wu, nl = %wu, d = %wu, dinv = %wu\n", nh, nl, d, dinv);
          flint_printf("q1 = %wu, q2 = %wu, r1 = %wu, r2 = %wu\n", q1, q2, r1, r2);
          fflush(stdout);
          flint_abort();
@@ -51,7 +51,7 @@ int main(void)
    }
 
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

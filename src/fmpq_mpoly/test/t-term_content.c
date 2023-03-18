@@ -102,7 +102,7 @@ main(void)
                     flint_printf("Check quotient is primitive\ni = %wd, j = %wd\n", i ,j);
                     fflush(stdout);
                     flint_abort();
-                }  
+                }
             }
 
             fmpq_mpoly_term_content(g, g, ctx);

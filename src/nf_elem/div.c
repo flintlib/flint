@@ -33,7 +33,7 @@ void _nf_elem_div(nf_elem_t a, const nf_elem_t b, const nf_elem_t c, const nf_t 
 void nf_elem_div(nf_elem_t a, const nf_elem_t b, const nf_elem_t c, const nf_t nf)
 {
    nf_elem_t t;
-   
+
    if (a == b)
    {
       nf_elem_init(t, nf);

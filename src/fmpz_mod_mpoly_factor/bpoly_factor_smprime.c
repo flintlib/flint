@@ -1231,7 +1231,7 @@ int fmpz_mod_bpoly_factor_smprime(
     int local_fac_tries = 0;
     fmpz_mod_bpoly_t monicA;
     fmpz_mod_mat_t N;
-    slong zas_limit;    
+    slong zas_limit;
     zassenhaus_prune_t zas;
     fmpz_mod_bpoly_lift_t L;
 
@@ -1357,7 +1357,7 @@ doit:
     fmpz_mod_bpoly_lift_start(L, local_fac_best->poly, r, monicA, ctx);
     fmpz_mod_bpoly_lift_continue(L, monicA, lift_order, ctx);
 
-    /* the rows of N give the combinations of local factors */    
+    /* the rows of N give the combinations of local factors */
     fmpz_mod_mat_clear(N);
     fmpz_mod_mat_init(N, r, r, fmpz_mod_ctx_modulus(ctx));
     for (i = 0; i < r; i++)

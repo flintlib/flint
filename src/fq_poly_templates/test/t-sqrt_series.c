@@ -23,7 +23,7 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("sqrt_series....");
     fflush(stdout);
 
@@ -69,7 +69,7 @@ main(void)
                 fflush(stdout);
                 flint_abort();
             }
-        
+
             TEMPLATE(T, poly_clear)(h, ctx);
             TEMPLATE(T, poly_clear)(g, ctx);
             TEMPLATE(T, poly_clear)(r, ctx);
@@ -96,7 +96,7 @@ main(void)
 
             TEMPLATE(T, poly_init)(h, ctx);
             TEMPLATE(T, poly_init)(g, ctx);
-            
+
             do TEMPLATE(T, poly_randtest)(h, state, n_randint(state, 500), ctx);
             while (h->length == 0);
             TEMPLATE(T, set_ui)(one, 1, ctx);
@@ -130,7 +130,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

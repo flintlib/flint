@@ -15,7 +15,7 @@
 
 #define RADIUS_DIGITS 3
 
-char * 
+char *
 _arb_condense_digits(char * s, slong n)
 {
     slong i, j, run, out;

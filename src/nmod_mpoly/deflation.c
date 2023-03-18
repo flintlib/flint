@@ -11,7 +11,7 @@
 
 #include "nmod_mpoly.h"
 
-void nmod_mpoly_deflation(fmpz * shift, fmpz * stride, 
+void nmod_mpoly_deflation(fmpz * shift, fmpz * stride,
                               const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 {
     mpoly_monomials_deflation(shift, stride, A->exps, A->bits, A->length,

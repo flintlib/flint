@@ -36,7 +36,7 @@ unity_zp_pow_sliding_fmpz(unity_zp f, unity_zp g, const fmpz_t pow)
     /* selects optimal k value for n */
     k = _unity_zp_pow_select_k(pow);
 
-    /* 
+    /*
         g_powers store odd powers of g up to 2^k - 1;
         g_powers[(i + 1) / 2] = g^i
     */
@@ -72,7 +72,7 @@ unity_zp_pow_sliding_fmpz(unity_zp f, unity_zp g, const fmpz_t pow)
         }
         else
         {
-            /* 
+            /*
                 finds length of chain; chain is length of
                 longest bitstring less then k ending on 1
             */
@@ -87,7 +87,7 @@ unity_zp_pow_sliding_fmpz(unity_zp f, unity_zp g, const fmpz_t pow)
                 unity_zp_swap(temp, f);
             }
 
-            /* 
+            /*
                 value = binary number (e_i, ... , e_j) in decimal base
             */
             value = 0;

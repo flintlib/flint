@@ -12,7 +12,7 @@
 #include "fmpq.h"
 #include "fmpq_poly.h"
 
-void _fmpq_poly_content(fmpq_t res, const fmpz * poly, 
+void _fmpq_poly_content(fmpq_t res, const fmpz * poly,
                         const fmpz_t den, slong len)
 {
     _fmpz_poly_content(fmpq_numref(res), poly, len);

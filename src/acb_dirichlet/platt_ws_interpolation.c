@@ -85,7 +85,7 @@ _platt_lambda(arb_t res, const arb_t t, slong prec)
     acb_mul(z, z, s2, prec);
     if (!arb_contains_zero(acb_imagref(z)))
     {
-        flint_abort(); 
+        flint_abort();
     }
     arb_set(res, acb_realref(z));
 

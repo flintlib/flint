@@ -52,7 +52,7 @@ _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d,
         return result;
     } else
         ctx->is_conway = 1;
-    
+
     fq_zech_ctx_init_fq_nmod_ctx(ctx, fq_nmod_ctx);
     ctx->owns_fq_nmod_ctx = 1;
     return result;
@@ -156,7 +156,7 @@ fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx,
  * 4. this is because if P(t) = (t-x_0)...(t-x_{d-1}), then the constant term of
  * P is the product of the x_i (ie the norm) and is equal to (-1)^d * a_0
  */
-    ctx->prime_root = (fq_nmod_ctx_degree(fq_nmod_ctx) & 1) ? 
+    ctx->prime_root = (fq_nmod_ctx_degree(fq_nmod_ctx) & 1) ?
         ctx->p - fq_nmod_ctx->a[0] : fq_nmod_ctx->a[0];
 
     ctx->zech_log_table = (mp_limb_t *) flint_malloc(q * sizeof(mp_limb_t));

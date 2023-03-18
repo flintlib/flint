@@ -14,7 +14,7 @@
 #include "fft_tuning.h"
 #include "flint.h"
 
-void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1, 
+void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1,
                const fmpz * input2, slong len2, slong trunc)
 {
     slong len_out, loglen, loglen2, n;
@@ -47,8 +47,8 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1,
     size2 = (FLINT_ABS(bits2) + FLINT_BITS - 1) / FLINT_BITS;
 
     /* Start with an upper bound on the number of bits needed */
-    output_bits = FLINT_BITS * (size1 + size2) + loglen2 + 1; 
-    
+    output_bits = FLINT_BITS * (size1 + size2) + loglen2 + 1;
+
     /* round up for sqrt2 trick */
     output_bits = (((output_bits - 1) >> (loglen - 2)) + 1) << (loglen - 2);
 
@@ -61,7 +61,7 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1,
 
     N = flint_get_num_threads();
     ii = flint_malloc((4*(n + n*size) + 5*size*N)*sizeof(mp_limb_t));
-    for (i = 0, ptr = (mp_limb_t *) ii + 4*n; i < 4*n; i++, ptr += size) 
+    for (i = 0, ptr = (mp_limb_t *) ii + 4*n; i < 4*n; i++, ptr += size)
         ii[i] = ptr;
    t1 = TMP_ALLOC(N*sizeof(mp_limb_t *));
    t2 = TMP_ALLOC(N*sizeof(mp_limb_t *));
@@ -84,7 +84,7 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1,
     if (input1 != input2)
     {
         jj = flint_malloc(4*(n + n*size)*sizeof(mp_limb_t));
-        for (i = 0, ptr = (mp_limb_t *) jj + 4*n; i < 4*n; i++, ptr += size) 
+        for (i = 0, ptr = (mp_limb_t *) jj + 4*n; i < 4*n; i++, ptr += size)
             jj[i] = ptr;
     } else jj = ii;
 
@@ -93,16 +93,16 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1,
     for (i = len1; i < 4*n; i++)
         flint_mpn_zero(ii[i], limbs + 1);
 
-    if (input1 != input2) 
+    if (input1 != input2)
     {
         _fmpz_vec_get_fft(jj, input2, limbs, len2);
         for (i = len2; i < 4*n; i++)
             flint_mpn_zero(jj[i], limbs + 1);
     }
 
-    if (bits1 < WORD(0) || bits2 < WORD(0)) 
+    if (bits1 < WORD(0) || bits2 < WORD(0))
     {
-        sign = 1;  
+        sign = 1;
         bits1 = FLINT_ABS(bits1);
         bits2 = FLINT_ABS(bits2);
     }
@@ -115,13 +115,13 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1,
 
     limbs = (output_bits - 1) / FLINT_BITS + 1;
     limbs = fft_adjust_limbs(limbs); /* round up limbs for Nussbaumer */
-    
-    fft_convolution(ii, jj, loglen - 2, limbs, len_out, t1, t2, s1, tt); 
+
+    fft_convolution(ii, jj, loglen - 2, limbs, len_out, t1, t2, s1, tt);
 
     _fmpz_vec_set_fft(output, trunc, ii, limbs, sign); /* write output */
 
-    flint_free(ii); 
-    if (input1 != input2) 
+    flint_free(ii);
+    if (input1 != input2)
         flint_free(jj);
 
     TMP_END;

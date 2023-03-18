@@ -48,7 +48,7 @@ acb_poly_compose_divconquer(acb_poly_t res,
 {
     const slong len1 = poly1->length;
     const slong len2 = poly2->length;
-    
+
     if (len1 == 0)
     {
         acb_poly_zero(res);
@@ -60,7 +60,7 @@ acb_poly_compose_divconquer(acb_poly_t res,
     else
     {
         const slong lenr = (len1 - 1) * (len2 - 1) + 1;
-        
+
         if (res != poly1 && res != poly2)
         {
             acb_poly_fit_length(res, lenr);

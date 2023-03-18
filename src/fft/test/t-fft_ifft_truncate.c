@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2009, 2011 William Hart
 
     This file is part of FLINT.
@@ -16,13 +16,13 @@ int
 main(void)
 {
     flint_bitcnt_t depth, w;
-    
+
     FLINT_TEST_INIT(state);
 
     flint_printf("fft/ifft_truncate....");
     fflush(stdout);
 
-    
+
     _flint_rand_init_gmp(state);
 
     for (depth = 6; depth <= 12; depth++)
@@ -36,28 +36,28 @@ main(void)
             mp_size_t i;
             mp_limb_t * ptr;
             mp_limb_t ** ii, ** jj, *t1, *t2;
-        
+
             trunc = 2*((trunc + 1)/2);
 
             ii = flint_malloc((2*(n + n*size) + 2*size)*sizeof(mp_limb_t));
-            for (i = 0, ptr = (mp_limb_t *) ii + 2*n; i < 2*n; i++, ptr += size) 
+            for (i = 0, ptr = (mp_limb_t *) ii + 2*n; i < 2*n; i++, ptr += size)
             {
                 ii[i] = ptr;
                 random_fermat(ii[i], state, limbs);
             }
             t1 = ptr;
             t2 = t1 + size;
-   
+
             for (i = 0; i < 2*n; i++)
                mpn_normmod_2expp1(ii[i], limbs);
-    
+
             jj = flint_malloc(2*(n + n*size)*sizeof(mp_limb_t));
-            for (i = 0, ptr = (mp_limb_t *) jj + 2*n; i < 2*n; i++, ptr += size) 
+            for (i = 0, ptr = (mp_limb_t *) jj + 2*n; i < 2*n; i++, ptr += size)
             {
                 jj[i] = ptr;
                 flint_mpn_copyi(jj[i], ii[i], size);
             }
-   
+
             fft_truncate(ii, n, w, &t1, &t2, trunc);
             ifft_truncate(ii, n, w, &t1, &t2, trunc);
             for (i = 0; i < trunc; i++)
@@ -83,7 +83,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

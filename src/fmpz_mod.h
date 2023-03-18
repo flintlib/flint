@@ -13,7 +13,7 @@
 #define FMPZ_MOD_H
 
 #ifdef FMPZ_MOD_INLINES_C
-#define FMPZ_MOD_INLINE 
+#define FMPZ_MOD_INLINE
 #else
 #define FMPZ_MOD_INLINE static __inline__
 #endif

@@ -72,7 +72,7 @@ ulong hash_word(ulong val)
    int a = ptr[0], b = ptr[1], c = 0;
 
    hash_mix(a, b, c);
-   
+
    ptr[0] = b;
    ptr[1] = c;
 
@@ -87,7 +87,7 @@ ulong hash_word(ulong a)
    int b = 0, c = 0;
 
    hash_mix(a, b, c);
-   
+
    return c;
 }
 

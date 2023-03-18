@@ -33,7 +33,7 @@ void TEMPLATE(T, embed_composition_matrix_sub)(TEMPLATE(B, mat_t) matrix,
     for (j = 0; j < trunc; j++)
     {
         for (i = 0; i < tmp->length; i++)
-            TEMPLATE(B, mat_set_entry)(matrix, i, j, 
+            TEMPLATE(B, mat_set_entry)(matrix, i, j,
                                        __TEMPLATE(B, poly_get_coeff)(tmp, i));
         if (j < len - 1)
             TEMPLATE(T, mul)(tmp, tmp, gen, ctx);

@@ -14,9 +14,9 @@
 #include "fmpz_mod_poly.h"
 #include "gr_poly.h"
 
-slong _fmpz_mod_poly_hgcd(fmpz **M, slong *lenM, 
-                     fmpz *A, slong *lenA, fmpz *B, slong *lenB, 
-                     const fmpz *a, slong lena, const fmpz *b, slong lenb, 
+slong _fmpz_mod_poly_hgcd(fmpz **M, slong *lenM,
+                     fmpz *A, slong *lenA, fmpz *B, slong *lenB,
+                     const fmpz *a, slong lena, const fmpz *b, slong lenb,
                      const fmpz_t mod)
 {
     slong sgnM;

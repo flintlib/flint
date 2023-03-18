@@ -29,8 +29,8 @@ void sample(void * arg, ulong count)
    ulong i;
    mp_ptr arr = (mp_ptr) flint_malloc(1024*sizeof(mp_limb_t));
    FLINT_TEST_INIT(state);
-   
-      
+
+
    for (i = 0; i < count; i++)
    {
       int j;
@@ -52,7 +52,7 @@ void sample(void * arg, ulong count)
          prof_start();
          for (mp_size_t j = 0; j < UWORD(10000); j++)
          {
-            r += n_empty(arr[j&1023], d, dinv);  
+            r += n_empty(arr[j&1023], d, dinv);
          }
 	     prof_stop();
 
@@ -63,7 +63,7 @@ void sample(void * arg, ulong count)
          prof_start();
          for (j = 0; j < 10000; j++)
          {
-            r += n_mod2_preinv(arr[j&1023], d, dinv);  
+            r += n_mod2_preinv(arr[j&1023], d, dinv);
          }
 	     prof_stop();
 
@@ -74,7 +74,7 @@ void sample(void * arg, ulong count)
          prof_start();
          for (mp_size_t j = 0; j < UWORD(10000); j++)
          {
-            r += n_mod3_preinv(arr[j&1023], d, dinv);  
+            r += n_mod3_preinv(arr[j&1023], d, dinv);
          }
 	     prof_stop();
 
@@ -85,7 +85,7 @@ void sample(void * arg, ulong count)
          prof_start();
          for (j = 0; j < 10000; j++)
          {
-            r += n_mod2_precomp(arr[j&1023], d, dpre);  
+            r += n_mod2_precomp(arr[j&1023], d, dpre);
          }
 	     prof_stop();
 
@@ -96,7 +96,7 @@ void sample(void * arg, ulong count)
          prof_start();
          for (j = 0; j < 10000; j++)
          {
-            r += n_mod_precomp(arr[j&1023], d, dpre);  
+            r += n_mod_precomp(arr[j&1023], d, dpre);
          }
 	     prof_stop();
 
@@ -104,7 +104,7 @@ void sample(void * arg, ulong count)
 	  }
 
    }
-  
+
    if (r == UWORD(9879875897)) flint_abort();
 
    flint_randclear(state);
@@ -142,7 +142,7 @@ int main(void)
 	     info.type = 5;
          prof_repeat(&min5, &max, sample, (void *) &info);
 
-         flint_printf("bits %d, inv2 %.1f c/l, pre2 %.1f c/l, pre %.1f c/l\n", 
+         flint_printf("bits %d, inv2 %.1f c/l, pre2 %.1f c/l, pre %.1f c/l\n",
            i,
 		   /* (min1/(double)FLINT_CLOCK_SCALE_FACTOR)/10000, */
            (min2/(double)FLINT_CLOCK_SCALE_FACTOR)/10000,
@@ -153,7 +153,7 @@ int main(void)
 
 	  } else
 	  {
-         flint_printf("bits %d, inv2 %.1f c/l, pre2 %.1f c/l\n", 
+         flint_printf("bits %d, inv2 %.1f c/l, pre2 %.1f c/l\n",
            i,
 		   /* (min1/(double)FLINT_CLOCK_SCALE_FACTOR)/10000, */
            (min2/(double)FLINT_CLOCK_SCALE_FACTOR)/10000,

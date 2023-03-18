@@ -26,7 +26,7 @@ main(void)
     flint_printf("sizeinbase....");
     fflush(stdout);
 
-    
+
 
     for (i = 0; i < 100000; i++)
     {
@@ -57,7 +57,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

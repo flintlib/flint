@@ -12,7 +12,7 @@
 #include "fmpq_mat.h"
 #include "padic_mat.h"
 
-void padic_mat_set_fmpq_mat(padic_mat_t B, 
+void padic_mat_set_fmpq_mat(padic_mat_t B,
                             const fmpq_mat_t A, const padic_ctx_t ctx)
 {
     if (!fmpq_mat_is_empty(A))

@@ -173,7 +173,7 @@ static slong _fmpz_mpoly_pow_fps1(
         } while (heap_len > 1 && heap[1].exp == exp);
 
         FLINT_ASSERT(Qlen <= 2*Flen);
-      
+
         while (Qlen > 0)
         {
             /* take node from store */
@@ -498,7 +498,7 @@ static slong _fmpz_mpoly_pow_fps(
 
     A->coeffs = Acoeffs;
     A->exps = Aexps;
-   
+
     fmpz_clear(t1);
     fmpz_clear(t2);
     fmpz_clear(C);

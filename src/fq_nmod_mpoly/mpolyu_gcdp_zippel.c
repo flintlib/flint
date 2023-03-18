@@ -72,7 +72,7 @@ static void fq_nmod_mpolyu_cvtto_poly(
     for (i = 0; i < A->length; i++)
     {
         FLINT_ASSERT((A->coeffs + i)->length == 1);
-        FLINT_ASSERT(mpoly_monomial_is_zero((A->coeffs + i)->exps, 
+        FLINT_ASSERT(mpoly_monomial_is_zero((A->coeffs + i)->exps,
                       mpoly_words_per_exp((A->coeffs + i)->bits, ctx->minfo)));
 
         n_fq_get_fq_nmod(at, (A->coeffs + i)->coeffs + 0, ctx->fqctx);
@@ -466,7 +466,7 @@ nmod_gcds_ret_t fq_nmod_mpolyu_gcds_zippel(
     */
     for (i = 1; i<f->length; i++)
     {
-        for (j=i; j > 0 && (f->coeffs + tlen[j-1])->length 
+        for (j=i; j > 0 && (f->coeffs + tlen[j-1])->length
                          > (f->coeffs + tlen[j-0])->length; j--)
         {
             slong temp = tlen[j-1];
@@ -509,7 +509,7 @@ nmod_gcds_ret_t fq_nmod_mpolyu_gcds_zippel(
     W = (fq_nmod_struct *) flint_malloc(l*f->length*sizeof(fq_nmod_struct));
     for (i = 0; i < l*f->length; i++)
         fq_nmod_init(W + i, ctx->fqctx);
-    
+
 
     fq_nmod_mat_init(Msol, l, 1, ctx->fqctx);
 
@@ -752,7 +752,7 @@ pick_evaluation_point:
             fq_nmod_mul(b + j, W + l*i + j, Msol->rows[j] + 0, ctx->fqctx);
         }
         success = fq_nmod_vandsolve((G->coeffs + i)->coeffs,
-                                 (fevalsk1->coeffs + i)->coeffs, b, 
+                                 (fevalsk1->coeffs + i)->coeffs, b,
                                     (f->coeffs + i)->length, ctx->fqctx);
         if (!success)
         {
@@ -1083,7 +1083,7 @@ int fq_nmod_mpolyu_gcdp_zippel_bivar(
             }
             else if (Geval->exps[0] < H->exps[0])
             {
-                fq_nmod_poly_one(modulus, ctx->fqctx);                
+                fq_nmod_poly_one(modulus, ctx->fqctx);
             }
         }
 
@@ -1331,7 +1331,7 @@ int fq_nmod_mpolyu_gcdp_zippel(
             success = 0;
             goto finished;
         }
-        
+
         degbound = Geval->exps[0];
 
         if (fq_nmod_mpolyu_is_one(Geval, ctx))
@@ -1354,7 +1354,7 @@ int fq_nmod_mpolyu_gcdp_zippel(
             }
             else if (Geval->exps[0] < H->exps[0])
             {
-                fq_nmod_poly_one(modulus, ctx->fqctx);                
+                fq_nmod_poly_one(modulus, ctx->fqctx);
             }
         }
 

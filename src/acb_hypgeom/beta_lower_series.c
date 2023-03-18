@@ -14,7 +14,7 @@
 
 void
 _acb_hypgeom_beta_lower_series(acb_ptr res,
-    const acb_t a, const acb_t b, acb_srcptr z, slong zlen, int regularized, 
+    const acb_t a, const acb_t b, acb_srcptr z, slong zlen, int regularized,
     slong len, slong prec)
 {
     acb_ptr t, u, v;
@@ -92,7 +92,7 @@ void acb_hypgeom_beta_lower_series(acb_poly_t res,
         acb_poly_zero(res);
         return;
     }
-        
+
     acb_poly_fit_length(res, len);
 
     if (z->length == 0)

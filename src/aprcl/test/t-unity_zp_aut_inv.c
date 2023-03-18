@@ -16,7 +16,7 @@ int main(void)
 {
     ulong i, j;
     FLINT_TEST_INIT(state);
-   
+
     flint_printf("unity_zp_aut_inv....");
     fflush(stdout);
 
@@ -37,7 +37,7 @@ int main(void)
         ind = n_randint(state, q_factors.num);
         p = q_factors.p[ind];
         k = q_factors.exp[ind];
-        
+
         x = n_randint(state, n_pow(p, k));
         while (n_gcd(p, x) != 1 || x == 0)
             x = n_randint(state, n_pow(p, k));
@@ -71,7 +71,7 @@ int main(void)
         unity_zp_aut_inv(f, h, x);
         /* g = \sigma_x(f) */
         unity_zp_aut(g, f, x);
-        
+
         if (unity_zp_equal(h, g) == 0)
         {
             flint_printf("FAIL\n");
@@ -86,7 +86,7 @@ int main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

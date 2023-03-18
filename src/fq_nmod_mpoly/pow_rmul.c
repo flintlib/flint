@@ -26,7 +26,7 @@ void fq_nmod_mpoly_pow_rmul(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
 
     fq_nmod_mpoly_set_ui(A, 1, ctx);
     while (k >= 1)
-    { 
+    {
         fq_nmod_mpoly_mul_johnson(T, A, B, ctx);
         fq_nmod_mpoly_swap(A, T, ctx);
         k -= 1;

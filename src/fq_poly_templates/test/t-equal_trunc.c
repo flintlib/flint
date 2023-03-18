@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Sebastian Pancratz 
+    Copyright (C) 2012 Sebastian Pancratz
     Copyright (C) 2013 Mike Hansen
     Copyright (C) 2014 William Hart
 
@@ -69,7 +69,7 @@ main(void)
 
         TEMPLATE(T, poly_clear) (a, ctx);
         TEMPLATE(T, poly_clear) (b, ctx);
-        
+
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
@@ -122,7 +122,7 @@ main(void)
 
         TEMPLATE(T, poly_clear) (a, ctx);
         TEMPLATE(T, poly_clear) (b, ctx);
-        
+
         TEMPLATE(T, ctx_clear) (ctx);
     }
 

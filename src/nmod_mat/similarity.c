@@ -23,9 +23,9 @@ void nmod_mat_similarity(nmod_mat_t M, slong r, ulong d)
    {
       for (j = 0; j < r - 1; j++)
          NMOD_ADDMUL(A[i][j], A[i][r], d, M->mod);
-      
+
       for (j = r + 1; j < n; j++)
-         NMOD_ADDMUL(A[i][j], A[i][r], d, M->mod); 
+         NMOD_ADDMUL(A[i][j], A[i][r], d, M->mod);
    }
 
    d = n_negmod(d, M->mod.n);
@@ -36,6 +36,6 @@ void nmod_mat_similarity(nmod_mat_t M, slong r, ulong d)
          NMOD_ADDMUL(A[r][i], A[j][i], d, M->mod);
 
       for (j = r + 1; j < n; j++)
-         NMOD_ADDMUL(A[r][i], A[j][i], d, M->mod);      
+         NMOD_ADDMUL(A[r][i], A[j][i], d, M->mod);
    }
 }

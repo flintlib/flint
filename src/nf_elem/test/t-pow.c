@@ -37,13 +37,13 @@ main(void)
         slong exp;
 
         nf_init_randtest(nf, state, 40, 20);
-        
+
         nf_elem_init(a, nf);
         nf_elem_init(p1, nf);
         nf_elem_init(p2, nf);
 
         nf_elem_randtest(a, state, 20, nf);
-        
+
         exp = n_randint(state, 10);
 
         nf_elem_pow(p1, a, exp, nf);
@@ -51,7 +51,7 @@ main(void)
 
         for (j = 0; j < exp; j++)
            nf_elem_mul(p2, p2, a, nf);
-        
+
         result = (nf_elem_equal(p1, p2, nf));
         if (!result)
         {
@@ -66,10 +66,10 @@ main(void)
         nf_elem_clear(a, nf);
         nf_elem_clear(p1, nf);
         nf_elem_clear(p2, nf);
-         
+
         nf_clear(nf);
     }
-    
+
     /* test aliasing a and res */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -78,19 +78,19 @@ main(void)
         slong exp;
 
         nf_init_randtest(nf, state, 40, 20);
-        
+
         nf_elem_init(a, nf);
         nf_elem_init(p1, nf);
         nf_elem_init(p2, nf);
 
         nf_elem_randtest(a, state, 20, nf);
-        
+
         exp = n_randint(state, 10);
 
         nf_elem_pow(p1, a, exp, nf);
         nf_elem_set(p2, a, nf);
         nf_elem_pow(p2, p2, exp, nf);
-        
+
         result = (nf_elem_equal(p1, p2, nf));
         if (!result)
         {
@@ -105,10 +105,10 @@ main(void)
         nf_elem_clear(a, nf);
         nf_elem_clear(p1, nf);
         nf_elem_clear(p2, nf);
-         
+
         nf_clear(nf);
     }
-    
+
     flint_randclear(state);
     flint_cleanup();
     flint_printf("PASS\n");

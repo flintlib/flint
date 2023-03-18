@@ -30,7 +30,7 @@ nmod_poly_sinh_series(nmod_poly_t g, const nmod_poly_t h, slong n)
     mp_ptr g_coeffs, h_coeffs;
     nmod_poly_t t1;
     slong h_len;
-    
+
     h_len = h->length;
 
     if (h_len > 0 && h->coeffs[0] != UWORD(0))
@@ -72,7 +72,7 @@ nmod_poly_sinh_series(nmod_poly_t g, const nmod_poly_t h, slong n)
         nmod_poly_swap(g, t1);
         nmod_poly_clear(t1);
     }
-    
+
     g->length = n;
 
     if (h_len < n)

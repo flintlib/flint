@@ -61,7 +61,7 @@ void padic_val_fac(fmpz_t rop, const fmpz_t op, const fmpz_t p)
     fmpz_init(s);
     fmpz_init_set(t, op);
 
-    do 
+    do
     {
         fmpz_fdiv_q(t, t, p);
         fmpz_add(s, s, t);

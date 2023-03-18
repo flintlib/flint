@@ -12,7 +12,7 @@
 #include "fmpz_mat.h"
 #include "padic_mat.h"
 
-int padic_mat_fprint_pretty(FILE * file, 
+int padic_mat_fprint_pretty(FILE * file,
                             const padic_mat_t A, const padic_ctx_t ctx)
 {
     const slong r = padic_mat(A)->r;

@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2009, 2011 William Hart
 
     This file is part of FLINT.
@@ -19,9 +19,9 @@ void mpn_div_2expmod_2expp1(mp_limb_t * t, mp_limb_t * i1, mp_size_t limbs, flin
    mp_limb_t lo;
    mp_limb_t * ptr;
    mp_limb_signed_t hi;
-   
+
    if (d == 0)
-   {   
+   {
       if (t != i1)
          flint_mpn_copyi(t, i1, limbs + 1);
    } else

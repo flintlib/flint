@@ -21,7 +21,7 @@ _fmpz_factor_set_length(fmpz_factor_t factor, slong newlen)
     {
         slong i;
         for (i = newlen; i < factor->num; i++)
-            _fmpz_demote(factor->p + i); 
+            _fmpz_demote(factor->p + i);
     }
     factor->num = newlen;
 }

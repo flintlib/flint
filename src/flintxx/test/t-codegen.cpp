@@ -128,7 +128,7 @@ std::vector<std::string> lines(const std::string& input)
 //
 //  movsbl %r9b,%r9d
 //  mov    %r8d,(%rdi)
-// 
+//
 std::string stripaddr(const std::string& input)
 {
     std::string result;
@@ -197,10 +197,10 @@ extern "C" {
 #if HAVE_OPTIMIZE_ATTRIBUTE
 #define DEFINE_FUNC(name, args) \
 void name args __attribute__((__optimize__("no-exceptions"))); \
-void name args 
+void name args
 #else
 #define DEFINE_FUNC(name, args) \
-void name args 
+void name args
 #endif
 
 DEFINE_FUNC(test_tuple_merge_1,

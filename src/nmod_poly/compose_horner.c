@@ -13,8 +13,8 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-void 
-_nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, slong len1, 
+void
+_nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, slong len1,
                                       mp_srcptr poly2, slong len2, nmod_t mod)
 {
     if (len1 == 1)
@@ -51,7 +51,7 @@ _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, slong len1,
             t2 = res;
         }
 
-        /*  Perform the first two steps as one, 
+        /*  Perform the first two steps as one,
             "res = a(m) * poly2 + a(m-1)".      */
         {
             _nmod_vec_scalar_mul_nmod(t1, poly2, len2, poly1[i], mod);
@@ -70,12 +70,12 @@ _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, slong len1,
     }
 }
 
-void nmod_poly_compose_horner(nmod_poly_t res, 
+void nmod_poly_compose_horner(nmod_poly_t res,
                               const nmod_poly_t poly1, const nmod_poly_t poly2)
 {
     const slong len1 = poly1->length;
     const slong len2 = poly2->length;
-    
+
     if (len1 == 0)
     {
         nmod_poly_zero(res);
@@ -89,11 +89,11 @@ void nmod_poly_compose_horner(nmod_poly_t res,
     else
     {
         const slong lenr = (len1 - 1) * (len2 - 1) + 1;
-        
+
         if (res != poly1 && res != poly2)
         {
             nmod_poly_fit_length(res, lenr);
-            _nmod_poly_compose_horner(res->coeffs, poly1->coeffs, len1, 
+            _nmod_poly_compose_horner(res->coeffs, poly1->coeffs, len1,
                                                    poly2->coeffs, len2, poly1->mod);
         }
         else

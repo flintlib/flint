@@ -17,7 +17,7 @@
 #include "fmpz_poly.h"
 
 static int
-__fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, slong lenA, 
+__fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, slong lenA,
                                      const fmpz * B, slong lenB, int exact)
 {
     int res;
@@ -60,8 +60,8 @@ _fmpz_vec_sub_dec(fmpz * a, const fmpz * b, const fmpz * c, slong n)
         fmpz_sub(a + i, b + i, c + i);
 }
 
-int _fmpz_poly_div_divconquer(fmpz *Q, 
-                               const fmpz *A, slong lenA, 
+int _fmpz_poly_div_divconquer(fmpz *Q,
+                               const fmpz *A, slong lenA,
                                const fmpz *B, slong lenB, int exact)
 {
     if (lenA <= 2 * lenB - 1)
@@ -109,7 +109,7 @@ int _fmpz_poly_div_divconquer(fmpz *Q,
 }
 
 void
-fmpz_poly_div_divconquer(fmpz_poly_t Q, 
+fmpz_poly_div_divconquer(fmpz_poly_t Q,
                          const fmpz_poly_t A, const fmpz_poly_t B)
 {
     const slong lenA = A->length;

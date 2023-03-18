@@ -19,17 +19,17 @@ void fmpq_poly_set_coeff_ui(fmpq_poly_t poly, slong n, ulong x)
 {
     slong len = poly->length;
     const int replace = (n < len && !fmpz_is_zero(poly->coeffs + n));
-    
+
     if (!replace && (x == UWORD(0)))
         return;
-    
+
     if (n + 1 > len)
     {
         fmpq_poly_fit_length(poly, n + 1);
         _fmpq_poly_set_length(poly, n + 1);
         flint_mpn_zero((mp_ptr) poly->coeffs + len, (n + 1) - len);
     }
-    
+
     if (*poly->den == WORD(1))
     {
         fmpz_set_ui(poly->coeffs + n, x);

@@ -18,7 +18,7 @@ void
 fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A)
 {
     slong n = A->r, ab;
-    
+
     if (B == A)
     {
         fmpz_mat_t t;
@@ -32,12 +32,12 @@ fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A)
     if (n <= 12)
     {
         if (n <= 3)
-        {   
+        {
             fmpz_mat_sqr_bodrato(B, A);
         }
         else
         {
-            fmpz_mat_mul(B, A, A);    
+            fmpz_mat_mul(B, A, A);
         }
     }
     else

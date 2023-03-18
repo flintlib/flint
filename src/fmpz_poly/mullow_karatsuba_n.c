@@ -14,15 +14,15 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void 
+void
 _fmpz_poly_mullow_kara_recursive(fmpz * out, const fmpz * pol1,
                                  const fmpz * pol2, fmpz * temp, slong len);
 
 /*
    Multiplication using truncated karatsuba.
-   
-   Below length 7, classical truncated multiplication is always theoretically 
-   faster, so we switch to that as the basecase.  Above that we use the 
+
+   Below length 7, classical truncated multiplication is always theoretically
+   faster, so we switch to that as the basecase.  Above that we use the
    ordinary (left/right) karatsuba identity and recursively do one full
    karatsuba multiplication and two truncated karatsuba multiplications.
  */
@@ -92,7 +92,7 @@ _fmpz_poly_mullow_karatsuba_n(fmpz * res, const fmpz * poly1,
 }
 
 void
-fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly1, 
+fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly1,
                              const fmpz_poly_t poly2, slong n)
 {
     const slong len1 = FLINT_MIN(poly1->length, n);

@@ -12,7 +12,7 @@
 #include "fmpq.h"
 #include "fmpq_poly.h"
 
-slong fmpq_poly_remove(fmpq_poly_t q, const fmpq_poly_t poly1, 
+slong fmpq_poly_remove(fmpq_poly_t q, const fmpq_poly_t poly1,
                                                        const fmpq_poly_t poly2)
 {
     fmpq_poly_t p1, p2, qpoly, pow;

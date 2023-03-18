@@ -12,7 +12,7 @@
 #include "fmpz_mod_poly.h"
 #include "padic_poly.h"
 
-void padic_poly_neg(padic_poly_t f, const padic_poly_t g, 
+void padic_poly_neg(padic_poly_t f, const padic_poly_t g,
                     const padic_ctx_t ctx)
 {
     const slong len = g->length;

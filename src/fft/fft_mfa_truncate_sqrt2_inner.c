@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2009, 2011, 2020 William Hart
 
     This file is part of FLINT.
@@ -71,15 +71,15 @@ _fft_inner1_worker(void * arg_ptr)
             i = n_revbin(s, depth);
             fft_radix2(ii + i*n1, n1/2, w*n2, t1, t2);
             if (ii != jj) fft_radix2(jj + i*n1, n1/2, w*n2, t1, t2);
-      
+
             for (j = 0; j < n1; j++)
             {
                 mp_size_t t = i*n1 + j;
                 mpn_normmod_2expp1(ii[t], limbs);
                 if (ii != jj) mpn_normmod_2expp1(jj[t], limbs);
                 fft_mulmod_2expp1(ii[t], ii[t], jj[t], n, w, tt);
-            }      
-      
+            }
+
             ifft_radix2(ii + i*n1, n1/2, w*n2, t1, t2);
         }
     }
@@ -126,15 +126,15 @@ _fft_inner2_worker(void * arg_ptr)
                 mpn_normmod_2expp1(ii[t], limbs);
                 if (ii != jj) mpn_normmod_2expp1(jj[t], limbs);
                 fft_mulmod_2expp1(ii[t], ii[t], jj[t], n, w, tt);
-            }      
-      
+            }
+
             ifft_radix2(ii + i*n1, n1/2, w*n2, t1, t2);
         }
     }
 }
 
-void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj, mp_size_t n, 
-                   flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
+void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj, mp_size_t n,
+                   flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
                   mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc, mp_limb_t ** tt)
 {
     mp_size_t i, shared_i = 0;
@@ -182,7 +182,7 @@ void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj, mp_size_t n,
        args[i].t2 = t2 + i;
        args[i].tt = tt[i];
 #if FLINT_USES_PTHREAD
-       args[i].mutex = &mutex;       
+       args[i].mutex = &mutex;
 #endif
     }
 

@@ -299,7 +299,7 @@ void nmod_mpoly_convert_from_nmod_mpolyd(
     pcurexp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
     mpoly_monomial_zero(pcurexp, N);
     k = off;
-    for (j = nvars - 1; j >= 0; j--) 
+    for (j = nvars - 1; j >= 0; j--)
     {
         exps[j] = k % B->deg_bounds[j];
         k = k / B->deg_bounds[j];
@@ -391,7 +391,7 @@ void nmod_mpolyd_print(nmod_mpolyd_t poly)
 
         flint_printf("%wu", poly->coeffs[i]);
 
-        for (j = poly->nvars - 1; j >= 0; j--) 
+        for (j = poly->nvars - 1; j >= 0; j--)
         {
             ulong m = poly->deg_bounds[j];
             ulong e = k % m;

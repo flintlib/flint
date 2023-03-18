@@ -18,7 +18,7 @@
 
 
 
-void _nmod_mpoly_addmul_array1_ulong1(ulong * poly1, 
+void _nmod_mpoly_addmul_array1_ulong1(ulong * poly1,
                            const ulong * poly2, const ulong * exp2, slong len2,
                            const ulong * poly3, const ulong * exp3, slong len3)
 {
@@ -45,7 +45,7 @@ void _nmod_mpoly_addmul_array1_ulong1(ulong * poly1,
    }
 }
 
-void _nmod_mpoly_addmul_array1_ulong2(ulong * poly1, 
+void _nmod_mpoly_addmul_array1_ulong2(ulong * poly1,
                            const ulong * poly2, const ulong * exp2, slong len2,
                            const ulong * poly3, const ulong * exp3, slong len3)
 {
@@ -75,7 +75,7 @@ void _nmod_mpoly_addmul_array1_ulong2(ulong * poly1,
    }
 }
 
-void _nmod_mpoly_addmul_array1_ulong3(ulong * poly1, 
+void _nmod_mpoly_addmul_array1_ulong3(ulong * poly1,
                            const ulong * poly2, const ulong * exp2, slong len2,
                            const ulong * poly3, const ulong * exp3, slong len3)
 {
@@ -256,7 +256,7 @@ void _nmod_mpoly_mul_array_chunked_LEX(
                 {
                     if (j < Bl)
                     {
-                        _nmod_mpoly_addmul_array1_ulong3(coeff_array, 
+                        _nmod_mpoly_addmul_array1_ulong3(coeff_array,
                                 A->coeffs + Amain[i],
                                 Apexp + Amain[i], Amain[i + 1] - Amain[i],
                                 B->coeffs + Bmain[j],
@@ -273,7 +273,7 @@ void _nmod_mpoly_mul_array_chunked_LEX(
                 {
                     if (j < Bl)
                     {
-                        _nmod_mpoly_addmul_array1_ulong2(coeff_array, 
+                        _nmod_mpoly_addmul_array1_ulong2(coeff_array,
                                 A->coeffs + Amain[i],
                                 Apexp + Amain[i], Amain[i + 1] - Amain[i],
                                 B->coeffs + Bmain[j],
@@ -291,7 +291,7 @@ void _nmod_mpoly_mul_array_chunked_LEX(
                 {
                     if (j < Bl)
                     {
-                        _nmod_mpoly_addmul_array1_ulong1(coeff_array, 
+                        _nmod_mpoly_addmul_array1_ulong1(coeff_array,
                                 A->coeffs + Amain[i],
                                 Apexp + Amain[i], Amain[i + 1] - Amain[i],
                                 B->coeffs + Bmain[j],
@@ -728,7 +728,7 @@ void _nmod_mpoly_mul_array_chunked_DEG(
                 {
                     if (j < Bl)
                     {
-                        _nmod_mpoly_addmul_array1_ulong3(coeff_array, 
+                        _nmod_mpoly_addmul_array1_ulong3(coeff_array,
                                 A->coeffs + Amain[i],
                                 Apexp + Amain[i], Amain[i + 1] - Amain[i],
                                 B->coeffs + Bmain[j],
@@ -745,7 +745,7 @@ void _nmod_mpoly_mul_array_chunked_DEG(
                 {
                     if (j < Bl)
                     {
-                        _nmod_mpoly_addmul_array1_ulong2(coeff_array, 
+                        _nmod_mpoly_addmul_array1_ulong2(coeff_array,
                                 A->coeffs + Amain[i],
                                 Apexp + Amain[i], Amain[i + 1] - Amain[i],
                                 B->coeffs + Bmain[j],
@@ -762,7 +762,7 @@ void _nmod_mpoly_mul_array_chunked_DEG(
                 {
                     if (j < Bl)
                     {
-                        _nmod_mpoly_addmul_array1_ulong1(coeff_array, 
+                        _nmod_mpoly_addmul_array1_ulong1(coeff_array,
                                 A->coeffs + Amain[i],
                                 Apexp + Amain[i], Amain[i + 1] - Amain[i],
                                 B->coeffs + Bmain[j],

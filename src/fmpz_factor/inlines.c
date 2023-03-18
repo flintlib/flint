@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Tommy Hofmann 
+    Copyright (C) 2017 Tommy Hofmann
 
     This file is part of FLINT.
 

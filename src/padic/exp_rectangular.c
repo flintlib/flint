@@ -15,13 +15,13 @@
 #include "padic.h"
 
 /*
-    Computes the sum $1 + x + x^2 / 2$ reduced modulo $p^N$, 
+    Computes the sum $1 + x + x^2 / 2$ reduced modulo $p^N$,
     where $x = p^v u$.
 
     Supports aliasing between \code{rop} and $u$.
  */
 
-static void _padic_exp_small(fmpz_t rop, const fmpz_t u, slong v, slong n, 
+static void _padic_exp_small(fmpz_t rop, const fmpz_t u, slong v, slong n,
                                          const fmpz_t p, const fmpz_t pN)
 {
     if (n == 1)  /* rop = 1 */
@@ -56,7 +56,7 @@ static void _padic_exp_small(fmpz_t rop, const fmpz_t u, slong v, slong n,
     }
 }
 
-void _padic_exp_rectangular(fmpz_t rop, const fmpz_t u, slong v, 
+void _padic_exp_rectangular(fmpz_t rop, const fmpz_t u, slong v,
                                         const fmpz_t p, slong N)
 {
     const slong n = _padic_exp_bound(v, N, p);
@@ -72,7 +72,7 @@ void _padic_exp_rectangular(fmpz_t rop, const fmpz_t u, slong v,
     }
     else
     {
-        const slong k = fmpz_fits_si(p) ? 
+        const slong k = fmpz_fits_si(p) ?
                        (n - 1 - 1) / (fmpz_get_si(p) - 1) : 0;
 
         slong i, npows, nsums;
@@ -171,7 +171,7 @@ int padic_exp_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     {
         if (v < N)
         {
-            _padic_exp_rectangular(padic_unit(rop), 
+            _padic_exp_rectangular(padic_unit(rop),
                                    padic_unit(op), padic_val(op), p, N);
             padic_val(rop) = 0;
         }

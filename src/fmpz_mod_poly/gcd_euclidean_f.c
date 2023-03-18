@@ -13,8 +13,8 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
-slong _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz *G, 
-                                    const fmpz *A, slong lenA, 
+slong _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz *G,
+                                    const fmpz *A, slong lenA,
                                     const fmpz *B, slong lenB, const fmpz_t p)
 {
     slong lenG = 0;
@@ -61,7 +61,7 @@ slong _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz *G,
         else
         {
             fmpz_t inv;
-			
+
             T  = R3;
             R3 = R1;
             R1 = T;
@@ -69,25 +69,25 @@ slong _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz *G,
             lenR2 = lenB;
 
             fmpz_init(inv);
-			
+
             do
             {
                 fmpz_gcdinv(f, inv, R3 + (lenR3 - 1), p);
-                if (!fmpz_is_one(f))					
+                if (!fmpz_is_one(f))
                     goto cleanup;
-				
+
                 _fmpz_mod_poly_divrem_basecase(Q, R2, R2, lenR2, R3, lenR3, inv, p);
-                
+
                 lenR2 = lenR3 - 1;
                 FMPZ_VEC_NORM(R2, lenR2);
                 FMPZ_VEC_SWAP(R2, lenR2, R3, lenR3);
-            } 
+            }
             while (lenR3 > 0);
 
             _fmpz_vec_set(G, R2, lenR2);
             lenG = lenR2;
 
-cleanup:			
+cleanup:
             fmpz_clear(inv);
         }
 

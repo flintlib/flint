@@ -30,7 +30,7 @@ void _fmpq_mpoly_get_coeff_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t qpoly,
     }
 
     TMP_START;
-   
+
     N = mpoly_words_per_exp(poly->bits, ctx->minfo);
 
     cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
@@ -50,7 +50,7 @@ void _fmpq_mpoly_get_coeff_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t qpoly,
         fmpq_mul_fmpz(c, qpoly->content, poly->coeffs + index);
     }
 
-    TMP_END; 
+    TMP_END;
 }
 
 void fmpq_mpoly_get_coeff_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t poly,

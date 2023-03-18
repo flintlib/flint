@@ -23,15 +23,15 @@ void nmod_poly_factor_kaltofen_shoup(nmod_poly_factor_t res,
     nmod_poly_init_mod(v, poly->mod);
 
     nmod_poly_make_monic(v, poly);
-    
+
     if (poly->length <= 2)
     {
         nmod_poly_factor_insert (res, v, 1);
-        nmod_poly_clear (v);        
+        nmod_poly_clear (v);
 
-        return;        
+        return;
     }
-    
+
     if (!(degs = (slong *) flint_malloc(nmod_poly_degree(poly)*sizeof(slong))))
     {
         flint_printf("Exception (nmod_poly_factor_kaltofen_shoup): \n");

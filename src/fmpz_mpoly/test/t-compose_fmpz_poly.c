@@ -124,7 +124,7 @@ main(void)
         for (v = 0; v < nvars1; v++)
         {
             vals1[v] = (fmpz_poly_struct *) flint_malloc(
-                                                    sizeof(fmpz_poly_struct)); 
+                                                    sizeof(fmpz_poly_struct));
             fmpz_poly_init(vals1[v]);
             fmpz_poly_randtest(vals1[v], state, len2, coeff_bits2);
         }
@@ -228,7 +228,7 @@ main(void)
         for (v = 0; v < nvars1; v++)
         {
             vals1[v] = (fmpz_poly_struct *) flint_malloc(
-                                                    sizeof(fmpz_poly_struct)); 
+                                                    sizeof(fmpz_poly_struct));
             fmpz_poly_init(vals1[v]);
             fmpz_poly_set_fmpz(vals1[v], vals3[v]);
         }
@@ -322,7 +322,7 @@ main(void)
         for (v = 0; v < nvars1; v++)
         {
             vals1[v] = (fmpz_poly_struct *) flint_malloc(
-                                                    sizeof(fmpz_poly_struct)); 
+                                                    sizeof(fmpz_poly_struct));
             fmpz_poly_init(vals1[v]);
             fmpz_poly_set_fmpz(vals1[v], vals3[v]);
         }

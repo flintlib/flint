@@ -19,7 +19,7 @@ main(void)
 {
     int i, result = 1;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("exp_series....");
     fflush(stdout);
@@ -100,7 +100,7 @@ main(void)
         slong n;
         mp_limb_t mod;
         mod = n_randtest_prime(state, 0);
- 
+
         if (i < 30)
             n = n_randint(state, 20000);
         else
@@ -131,7 +131,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

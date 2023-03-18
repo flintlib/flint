@@ -18,7 +18,7 @@ main(void)
 {
     int i, result, r1;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("get/set_str....");
     fflush(stdout);
@@ -33,10 +33,10 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_randtest(a, state, n_randint(state, 100));
-        
+
         str = nmod_poly_get_str(a);
         r1 = nmod_poly_set_str(b, str);
-        
+
         result = (r1 && nmod_poly_equal(a, b));
         if (!result)
         {
@@ -55,7 +55,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

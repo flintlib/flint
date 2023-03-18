@@ -31,13 +31,13 @@ void sample(void * arg, ulong count)
    FLINT_TEST_INIT(state);
 
    m = n_randint(state, 1<<((48-FLINT_BIT_COUNT(n))/2));
-   
+
    if (m == 0) m = 2;
-   
+
    nmod_poly_init2(a, m, n);
    nmod_poly_init2(b, m, n);
    nmod_poly_init2(c, m, 2*n - 1);
-   
+
    for (i = 0; i < n; i++)
    {
        a->coeffs[i] = n_randint(state, m);
@@ -50,7 +50,7 @@ void sample(void * arg, ulong count)
    if (n < 100000) scale = 10;
    if (n < 10000) scale = 100;
    if (n < 100) scale = 1000;
-      
+
    for (i = 0; i < count; i++)
    {
 	  prof_start();
@@ -61,7 +61,7 @@ void sample(void * arg, ulong count)
 	  prof_stop();
       if (c->coeffs[n - 2] == 123) flint_abort();
    }
-  
+
    nmod_poly_clear(a);
    nmod_poly_clear(b);
    nmod_poly_clear(c);
@@ -82,10 +82,10 @@ int main(void)
       if (info.n < 100000) scale = 10;
       if (info.n < 10000) scale = 100;
       if (info.n < 100) scale = 1000;
-   
+
       prof_repeat(&min, &max, sample, (void *) &info);
-         
-      flint_printf("length %wd, min %.3g ms, max %.3g ms, norm %.3g\n", 
+
+      flint_printf("length %wd, min %.3g ms, max %.3g ms, norm %.3g\n",
            info.n,
 		   ((min/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,
            ((max/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,

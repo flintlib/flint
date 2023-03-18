@@ -746,7 +746,7 @@ void fq_nmod_mpolyu_cvtto_mpolyun(
 {
     slong i, Blen = B->length;
     fq_nmod_mpolyun_fit_length(A, Blen, ctx);
-    A->length = Blen;  
+    A->length = Blen;
 
     for (i = 0; i < Blen; i++)
     {
@@ -791,7 +791,7 @@ void fq_nmod_mpoly_cvtfrom_mpolyn(
                                       &A->exps, &A->exps_alloc, N, k + 1);
 
             _n_fq_set(A->coeffs + d*k, B->coeffs[i].coeffs + d*j, d);
-            mpoly_monomial_madd(A->exps + N*k, B->exps + N*i, j, genexp, N);                
+            mpoly_monomial_madd(A->exps + N*k, B->exps + N*i, j, genexp, N);
             k++;
         }
     }

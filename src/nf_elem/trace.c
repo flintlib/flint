@@ -20,7 +20,7 @@
 void _nf_elem_trace(fmpz_t rnum, fmpz_t rden, const nf_elem_t a, const nf_t nf)
 {
    slong i;
-   
+
    if (nf->flag & NF_LINEAR)
    {
       const fmpz * const anum = LNF_ELEM_NUMREF(a);
@@ -34,7 +34,7 @@ void _nf_elem_trace(fmpz_t rnum, fmpz_t rden, const nf_elem_t a, const nf_t nf)
       const fmpz * const aden = QNF_ELEM_DENREF(a);
       const fmpz * const tnum = fmpq_poly_numref(nf->traces);
       const fmpz * const tden = fmpq_poly_denref(nf->traces);
-      
+
       slong alen = 2;
       while (alen > 0 && fmpz_is_zero(anum + alen - 1))
          alen--;
@@ -51,7 +51,7 @@ void _nf_elem_trace(fmpz_t rnum, fmpz_t rden, const nf_elem_t a, const nf_t nf)
             fmpz_addmul(rnum, anum + 1, tnum + 1);
 
          fmpz_mul(rden, aden, tden);
-      
+
          _fmpq_canonicalise(rnum, rden);
       }
    } else /* generic nf_elem */
@@ -60,9 +60,9 @@ void _nf_elem_trace(fmpz_t rnum, fmpz_t rden, const nf_elem_t a, const nf_t nf)
       const fmpz * const aden = NF_ELEM_DENREF(a);
       const fmpz * const tnum = fmpq_poly_numref(nf->traces);
       const fmpz * const tden = fmpq_poly_denref(nf->traces);
-      
+
       slong alen = NF_ELEM(a)->length;
-      
+
       if (alen == 0)
       {
          fmpz_zero(rnum);
@@ -75,10 +75,10 @@ void _nf_elem_trace(fmpz_t rnum, fmpz_t rden, const nf_elem_t a, const nf_t nf)
             fmpz_addmul(rnum, anum + i, tnum + i);
 
          fmpz_mul(rden, aden, tden);
-      
+
          _fmpq_canonicalise(rnum, rden);
       }
-   }   
+   }
 }
 
 void nf_elem_trace(fmpq_t res, const nf_elem_t a, const nf_t nf)

@@ -16,7 +16,7 @@
 #include "fmpq_poly.h"
 #include "fmpq.h"
 
-void 
+void
 fmpq_poly_evaluate_mpq(mpq_t res, const fmpq_poly_t poly, const mpq_t a)
 {
     fmpq_t r, b;

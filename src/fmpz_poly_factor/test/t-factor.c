@@ -36,9 +36,9 @@ void factor_poly(const char * file_str, const char * name)
    fmpz_poly_init(f);
 
    file = fopen(file_str, "rw");
-       
+
    fmpz_poly_fread(file, f);
-       
+
    fmpz_poly_factor_init(fac);
 
    gettimeofday(&start, NULL);
@@ -196,18 +196,18 @@ main(void)
         fmpz_poly_t a;
         fmpz_poly_factor_t f;
         fmpz_poly_init(a);
-        
+
         fmpz_poly_set_str(a, "31  294114975 822759704 601207031 3459410600 6329635407 5561735376 2870497527 -364079376 -984488613 -2855108728 -5168185293 -2678402184 -3199593893 -2740409376 -1003657917 -549998688 -252445155 -80724312 -19101979 -28418280 -2087859 -9732528 -2615547 -159120 -148311 -4680 -1359 2504 73 0 1");
-        
+
         fmpz_poly_factor_init(f);
         fmpz_poly_factor(f, a);
-        
+
         fmpz_poly_factor_clear(f);
         fmpz_poly_clear(a);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

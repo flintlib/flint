@@ -62,7 +62,7 @@ fmpz_mat_hnf_minors_transform(fmpz_mat_t H, fmpz_mat_t U, const fmpz_mat_t A)
                  }
                  continue;
             }
-                
+
 
             fmpz_divexact(r1d, fmpz_mat_entry(H, j, j), d);
             fmpz_divexact(r2d, fmpz_mat_entry(H, k, j), d);
@@ -143,7 +143,7 @@ fmpz_mat_hnf_minors_transform(fmpz_mat_t H, fmpz_mat_t U, const fmpz_mat_t A)
         {
             fmpz_xgcd(d, u, v, fmpz_mat_entry(H, j, j),
                       fmpz_mat_entry(H, k, j));
-            
+
             if (fmpz_cmpabs(d, fmpz_mat_entry(H, j, j)) == 0)
             {
                  fmpz_divexact(b, fmpz_mat_entry(H, k, j), fmpz_mat_entry(H, j, j));

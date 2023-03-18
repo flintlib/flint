@@ -13,14 +13,14 @@
 #include "fmpz.h"
 #include "mpn_extras.h"
 
-/* a = (b + c) mod n 
+/* a = (b + c) mod n
 
     Not a normal add mod function, assumes n is normalized (highest bit set)
     and b and c are reduced modulo n
 
 */
 
-void 
+void
 fmpz_factor_ecm_addmod(mp_ptr a, mp_ptr b, mp_ptr c, mp_ptr n, mp_limb_t n_size)
 {
 	mp_limb_t cy;

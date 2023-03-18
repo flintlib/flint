@@ -29,7 +29,7 @@ mp_limb_t _ll_factor_SQUFOF(mp_limb_t n_hi, mp_limb_t n_lo, ulong max_iters)
 
     if (n_hi) num = mpn_sqrtrem(sqrt, rem, n, 2);
     else num = ((sqrt[0] = n_sqrtrem(rem, n_lo)) != UWORD(0));
-	
+
     sqroot = sqrt[0];
     p = sqroot;
     q = rem[0];
@@ -38,7 +38,7 @@ mp_limb_t _ll_factor_SQUFOF(mp_limb_t n_hi, mp_limb_t n_lo, ulong max_iters)
     {
         return sqroot;
     }
-   
+
     l = 1 + 2*n_sqrt(2*p);
     l2 = l/2;
     qupto = 0;
@@ -48,9 +48,9 @@ mp_limb_t _ll_factor_SQUFOF(mp_limb_t n_hi, mp_limb_t n_lo, ulong max_iters)
     {
         iq = (sqroot + p)/q;
         pnext = iq*q - p;
-        if (q <= l) 
+        if (q <= l)
         {
-            if ((q & UWORD(1)) == UWORD(0)) 
+            if ((q & UWORD(1)) == UWORD(0))
             {
                 qarr[qupto] = q/2;
                 qupto++;
@@ -71,13 +71,13 @@ mp_limb_t _ll_factor_SQUFOF(mp_limb_t n_hi, mp_limb_t n_lo, ulong max_iters)
         if (!n_is_square(q)) continue;
         r = n_sqrt(q);
         if (qupto == UWORD(0)) break;
-        for (j = 0; j < qupto; j++)	
+        for (j = 0; j < qupto; j++)
             if (r == qarr[j]) goto cont;
         break;
       cont: ;
         if (r == UWORD(1)) return UWORD(0);
    }
-   
+
     if (i == max_iters) return UWORD(0);  /* taken too much time, give up */
 
     qlast = r;
@@ -89,7 +89,7 @@ mp_limb_t _ll_factor_SQUFOF(mp_limb_t n_hi, mp_limb_t n_lo, ulong max_iters)
 	{
         int norm;
         count_leading_zeros(norm, qlast);
-        udiv_qrnnd(q, rem[0], (sqrt[1] << norm) + r_shift(sqrt[0], FLINT_BITS - norm), sqrt[0] << norm, qlast << norm); 
+        udiv_qrnnd(q, rem[0], (sqrt[1] << norm) + r_shift(sqrt[0], FLINT_BITS - norm), sqrt[0] << norm, qlast << norm);
         rem[0] >>= norm;
     }
     else
@@ -98,7 +98,7 @@ mp_limb_t _ll_factor_SQUFOF(mp_limb_t n_hi, mp_limb_t n_lo, ulong max_iters)
     }
 
     for (j = 0; j < max_iters; j++)
-    {	
+    {
         iq = (sqroot + p)/q;
         pnext = iq*q - p;
         if (p == pnext) break;
@@ -121,7 +121,7 @@ mp_limb_t n_factor_SQUFOF(mp_limb_t n, ulong iters)
     mp_limb_t multiplier;
     mp_limb_t quot, rem;
     ulong i;
-    
+
     for (i = 1; (i < FLINT_NUM_PRIMES_SMALL) && !factor; i++)
     {
         mp_limb_t multn[2];
@@ -129,7 +129,7 @@ mp_limb_t n_factor_SQUFOF(mp_limb_t n, ulong iters)
         umul_ppmm(multn[1], multn[0], multiplier, n);
         factor = _ll_factor_SQUFOF(multn[1], multn[0], iters);
 
-        if (factor) 
+        if (factor)
         {
             quot = factor/multiplier;
             rem = factor - quot*multiplier;
@@ -140,5 +140,5 @@ mp_limb_t n_factor_SQUFOF(mp_limb_t n, ulong iters)
 
     if (i == FLINT_NUM_PRIMES_SMALL) return UWORD(0);
 
-    return factor; 
+    return factor;
 }

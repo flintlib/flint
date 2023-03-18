@@ -20,8 +20,8 @@ int main(void)
     flint_printf("sqrtmodn....");
     fflush(stdout);
 
-    
-    
+
+
     for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random squares mod n */
     {
         mp_limb_t a, b, n, ninv;
@@ -35,7 +35,7 @@ int main(void)
         n = n_randtest_bits(state, bits);
         if (n == 0) n = 1;
         b = n_randtest(state) % n;
-        
+
         n_factor_init(&fac);
         n_factor(&fac, n, 0);
 
@@ -43,7 +43,7 @@ int main(void)
         a = n_mulmod2_preinv(b, b, n, ninv);
 
         num = n_sqrtmodn(&sqrt, a, &fac);
-        
+
         btest = 0;
         for (i = 0; i < num; i++)
         {
@@ -61,7 +61,7 @@ int main(void)
             flint_printf("a = %wu\n", a);
             flint_printf("b = %wu\n", b);
             flint_printf("num = %wd\n", num);
-            
+
             if (!btest)
                 flint_printf("Square root not found.\n");
             if (i != num)
@@ -73,7 +73,7 @@ int main(void)
 
         flint_free(sqrt);
     }
-    
+
     for (i = 0; i < 500 * flint_test_multiplier(); i++) /* test random nonsquares */
     {
         mp_limb_t a, b, n, ninv;
@@ -88,7 +88,7 @@ int main(void)
         n_factor(&fac, n, 0);
 
         ninv = n_preinvert_limb(n);
-        
+
         a = n_randtest(state) % n;
         while (n_sqrtmodn(&sqrt, a, &fac))
         {
@@ -99,11 +99,11 @@ int main(void)
                 fflush(stdout);
                 flint_abort();
             }
-            
+
             flint_free(sqrt);
             a = n_randtest(state) % n;
         }
-        
+
         for (b = 0; b < n; b++)
         {
             if (n_mulmod2_preinv(b, b, n, ninv) == a)
@@ -126,7 +126,7 @@ int main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

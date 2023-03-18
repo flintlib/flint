@@ -13,9 +13,9 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
-slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S, 
-                                   const fmpz *A, slong lenA, 
-                                   const fmpz *B, slong lenB, 
+slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
+                                   const fmpz *A, slong lenA,
+                                   const fmpz *B, slong lenB,
                                    const fmpz_t invA, const fmpz_t p)
 {
 	_fmpz_vec_zero(G, lenA);
@@ -49,7 +49,7 @@ slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
             FMPZ_VEC_TMP_CLEAR(Q, 2*lenB);
 
 			TMP_END;
-			
+
             return lenA;
         } else if (lenR == 1)
 		{
@@ -86,7 +86,7 @@ slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
 
 			lenQ = lenB - lenA + 1;
 			FMPZ_VEC_NORM(Q, lenQ);
-			
+
             fmpz_set_ui(U1, 1);
 			lenU1 = 1;
             _fmpz_vec_set(D, A, lenA);
@@ -115,7 +115,7 @@ slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
                     lenU1 = FLINT_MAX(lenU1, lenW);
                     FMPZ_VEC_NORM(U1, lenU1);
                 }
-				
+
                 FMPZ_VEC_SWAP(U1, lenU1, U2, lenU2);
 				FMPZ_VEC_SWAP(V3, lenV3, D, lenD);
             } while (lenV3 != 0);
@@ -135,7 +135,7 @@ slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
 		    fmpz_clear(inv);
 
             TMP_END;
-			
+
 			return lenD;
         }
 	}
@@ -165,7 +165,7 @@ void fmpz_mod_poly_gcdinv_euclidean(fmpz_mod_poly_t G, fmpz_mod_poly_t S,
     }
 
     fmpz_init(inv);
-    if (lenA == 0)  
+    if (lenA == 0)
 	{
         fmpz_mod_poly_zero(G, ctx);
         fmpz_mod_poly_zero(S, ctx);

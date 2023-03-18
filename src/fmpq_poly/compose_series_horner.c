@@ -77,7 +77,7 @@ _fmpq_poly_compose_series_horner(fmpz * res, fmpz_t den, const fmpz * poly1,
 }
 
 void
-fmpq_poly_compose_series_horner(fmpq_poly_t res, 
+fmpq_poly_compose_series_horner(fmpq_poly_t res,
                     const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n)
 {
     slong len1 = poly1->length;
@@ -125,8 +125,8 @@ fmpq_poly_compose_series_horner(fmpq_poly_t res,
     if ((res != poly1) && (res != poly2))
     {
         fmpq_poly_fit_length(res, lenr);
-        _fmpq_poly_compose_series_horner(res->coeffs, res->den, 
-                           poly1->coeffs, poly1->den, len1, 
+        _fmpq_poly_compose_series_horner(res->coeffs, res->den,
+                           poly1->coeffs, poly1->den, len1,
                            poly2->coeffs, poly2->den, len2, lenr);
         _fmpq_poly_set_length(res, lenr);
         _fmpq_poly_normalise(res);
@@ -135,7 +135,7 @@ fmpq_poly_compose_series_horner(fmpq_poly_t res,
     {
         fmpq_poly_t t;
         fmpq_poly_init2(t, lenr);
-        _fmpq_poly_compose_series_horner(t->coeffs, t->den, 
+        _fmpq_poly_compose_series_horner(t->coeffs, t->den,
                            poly1->coeffs, poly1->den, len1,
                            poly2->coeffs, poly2->den, len2, lenr);
         _fmpq_poly_set_length(t, lenr);

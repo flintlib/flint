@@ -16,19 +16,19 @@
 #include "fmpz_mod_poly.h"
 
 /*
-    Macro for the lift B := [{(1 - aG - bH)/p} * b mod g] p + b, 
+    Macro for the lift B := [{(1 - aG - bH)/p} * b mod g] p + b,
     of length at most lenG - 1.
 
-    Assumes that {C, lenC} contains the inner part {(1 - aG - bH)/p} mod p1, 
-    where lenC = max(lenA + lenG - 1, lenB + lenH - 1).  Requires temporary 
-    space M, D, E.  We really only need 
+    Assumes that {C, lenC} contains the inner part {(1 - aG - bH)/p} mod p1,
+    where lenC = max(lenA + lenG - 1, lenB + lenH - 1).  Requires temporary
+    space M, D, E.  We really only need
         lenM = max(lenG, lenH)
         lenE = max(lenG + lenB - 2, lenH + lenA - 2)
         lenD = max(lenC, lenE)
 
-    Writes {B, lenG - 1}.  The cofactor that is lifted is the 
-    polynomial {b, lenB}, which may be aliased with B.  Although 
-    it suffices to have g modulo p, there is no harm in supplying 
+    Writes {B, lenG - 1}.  The cofactor that is lifted is the
+    polynomial {b, lenB}, which may be aliased with B.  Although
+    it suffices to have g modulo p, there is no harm in supplying
     {g, lenG} only reduced modulo p p1.
  */
 #define liftinv(B, b, lenB, g, lenG)                                  \
@@ -48,9 +48,9 @@ do {                                                                  \
     _fmpz_poly_add(B, M, lenG - 1, b, lenB);                          \
 } while (0)
 
-void _fmpz_poly_hensel_lift_only_inverse(fmpz *A, fmpz *B, 
-    const fmpz *G, slong lenG, const fmpz *H, slong lenH, 
-    const fmpz *a, slong lenA, const fmpz *b, slong lenB, 
+void _fmpz_poly_hensel_lift_only_inverse(fmpz *A, fmpz *B,
+    const fmpz *G, slong lenG, const fmpz *H, slong lenH,
+    const fmpz *a, slong lenA, const fmpz *b, slong lenB,
     const fmpz_t p, const fmpz_t p1)
 {
     const fmpz one[1] = {WORD(1)};
@@ -85,16 +85,16 @@ void _fmpz_poly_hensel_lift_only_inverse(fmpz *A, fmpz *B,
     _fmpz_vec_clear(C, lenC + lenD + lenD + lenM);
 }
 
-void fmpz_poly_hensel_lift_only_inverse(fmpz_poly_t Aout, fmpz_poly_t Bout, 
-    const fmpz_poly_t G, const fmpz_poly_t H, 
-    const fmpz_poly_t a, const fmpz_poly_t b, 
+void fmpz_poly_hensel_lift_only_inverse(fmpz_poly_t Aout, fmpz_poly_t Bout,
+    const fmpz_poly_t G, const fmpz_poly_t H,
+    const fmpz_poly_t a, const fmpz_poly_t b,
     const fmpz_t p, const fmpz_t p1)
 {
     fmpz_poly_fit_length(Aout, H->length - 1);
     fmpz_poly_fit_length(Bout, G->length - 1);
 
-    _fmpz_poly_hensel_lift_only_inverse(Aout->coeffs, Bout->coeffs, 
-        G->coeffs, G->length, H->coeffs, H->length, 
+    _fmpz_poly_hensel_lift_only_inverse(Aout->coeffs, Bout->coeffs,
+        G->coeffs, G->length, H->coeffs, H->length,
         a->coeffs, a->length, b->coeffs, b->length, p, p1);
 
     _fmpz_poly_set_length(Aout, H->length - 1);

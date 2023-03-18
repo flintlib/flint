@@ -39,7 +39,7 @@ main(void)
         fmpq_poly_init(r);
 
         fmpq_mat_randtest(A, state, 10);
-        
+
         fmpq_mat_charpoly(f, A);
         fmpq_mat_minpoly(g, A);
 
@@ -105,7 +105,7 @@ main(void)
            fmpq_set_si(d, n_randint(state, 6) - 3, 1);
            fmpq_mat_similarity(B, n_randint(state, n), d);
         }
-        
+
         fmpq_mat_minpoly(f, B);
 
         if (!fmpq_poly_equal(f, g))
@@ -127,7 +127,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

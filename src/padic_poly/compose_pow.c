@@ -37,8 +37,8 @@ static void __padic_reduce(fmpz_t u, slong *v, slong N, const padic_ctx_t ctx)
     }
 }
 
-void _padic_poly_compose_pow(fmpz *rop, slong *rval, slong N, 
-                             const fmpz *op, slong val, slong len, slong k, 
+void _padic_poly_compose_pow(fmpz *rop, slong *rval, slong N,
+                             const fmpz *op, slong val, slong len, slong k,
                              const padic_ctx_t ctx)
 {
     if (k == 1)
@@ -71,7 +71,7 @@ void _padic_poly_compose_pow(fmpz *rop, slong *rval, slong N,
     }
 }
 
-void padic_poly_compose_pow(padic_poly_t rop, const padic_poly_t op, slong k, 
+void padic_poly_compose_pow(padic_poly_t rop, const padic_poly_t op, slong k,
                             const padic_ctx_t ctx)
 {
     const slong len  = op->length;
@@ -84,7 +84,7 @@ void padic_poly_compose_pow(padic_poly_t rop, const padic_poly_t op, slong k,
     else
     {
         padic_poly_fit_length(rop, lenr);
-        _padic_poly_compose_pow(rop->coeffs, &(rop->val), rop->N, 
+        _padic_poly_compose_pow(rop->coeffs, &(rop->val), rop->N,
                                 op->coeffs, op->val, op->length, k, ctx);
         _padic_poly_set_length(rop, lenr);
     }

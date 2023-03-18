@@ -46,7 +46,7 @@ main(void)
 
         nf_elem_randtest(a, state, 200, nf);
         nf_elem_clear(a, nf);
-        
+
         nf_clear(nf);
     }
 

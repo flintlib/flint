@@ -14,9 +14,9 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-slong _nmod_poly_gcdinv(mp_limb_t *G, mp_limb_t *S, 
+slong _nmod_poly_gcdinv(mp_limb_t *G, mp_limb_t *S,
                         const mp_limb_t *A, slong lenA,
-                        const mp_limb_t *B, slong lenB, 
+                        const mp_limb_t *B, slong lenB,
                         const nmod_t mod)
 {
     mp_limb_t *T;
@@ -31,7 +31,7 @@ slong _nmod_poly_gcdinv(mp_limb_t *G, mp_limb_t *S,
     return ans;
 }
 
-void nmod_poly_gcdinv(nmod_poly_t G, nmod_poly_t S, 
+void nmod_poly_gcdinv(nmod_poly_t G, nmod_poly_t S,
                       const nmod_poly_t A, const nmod_poly_t B)
 {
     const slong lenA = A->length, lenB = B->length;
@@ -57,7 +57,7 @@ void nmod_poly_gcdinv(nmod_poly_t G, nmod_poly_t S,
     {
         nmod_poly_zero(G);
         nmod_poly_zero(S);
-    } 
+    }
     else
     {
         mp_limb_t *g, *s;
@@ -82,9 +82,9 @@ void nmod_poly_gcdinv(nmod_poly_t G, nmod_poly_t S,
             s = S->coeffs;
         }
 
-        lenG = _nmod_poly_gcdinv(g, s, 
-                                 A->coeffs, lenA, 
-                                 B->coeffs, lenB, 
+        lenG = _nmod_poly_gcdinv(g, s,
+                                 A->coeffs, lenA,
+                                 B->coeffs, lenB,
                                  A->mod);
 
         if (G == A || G == B)

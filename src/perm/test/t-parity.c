@@ -17,7 +17,7 @@ int main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("parity....");
     fflush(stdout);
@@ -65,7 +65,7 @@ int main(void)
         _perm_clear(c);
     }
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

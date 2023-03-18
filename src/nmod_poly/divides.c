@@ -13,14 +13,14 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-int _nmod_poly_divides(mp_ptr Q, mp_srcptr A, slong lenA, 
+int _nmod_poly_divides(mp_ptr Q, mp_srcptr A, slong lenA,
                                            mp_srcptr B, slong lenB, nmod_t mod)
-{    
+{
     mp_ptr R;
     slong i, lenQ = lenA - lenB + 1;
     int res = 1;
 
-    if (lenA < 40 && lenB < 20) 
+    if (lenA < 40 && lenB < 20)
         return _nmod_poly_divides_classical(Q, A, lenA, B, lenB, mod);
 
     R = _nmod_vec_init(lenB - 1);
@@ -117,7 +117,7 @@ int nmod_poly_divides(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B)
         nmod_poly_swap(tQ, Q);
         nmod_poly_clear(tQ);
     }
-    
+
     Q->length = lenA - lenB + 1;
     _nmod_poly_normalise(Q);
 

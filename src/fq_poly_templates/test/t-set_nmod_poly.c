@@ -44,7 +44,7 @@ main(void)
 
         nmod_poly_randtest(b, state, len);
         p = n_randint(state, 10);
-        
+
         TEMPLATE(T, poly_set_nmod_poly)(a, b, ctx);
         TEMPLATE(T, set_ui)(r, p, ctx);
         TEMPLATE3(T, poly_evaluate, T)(r, a, r, ctx);

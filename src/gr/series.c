@@ -32,7 +32,7 @@ gr_poly_add_series(gr_poly_t res, const gr_poly_t poly1,
 
     if (n < 0)
        n = 0;
- 
+
     max = FLINT_MIN(max, n);
     len1 = FLINT_MIN(poly1->length, max);
     len2 = FLINT_MIN(poly2->length, max);
@@ -53,7 +53,7 @@ gr_poly_sub_series(gr_poly_t res, const gr_poly_t poly1,
 
     if (n < 0)
        n = 0;
- 
+
     max = FLINT_MIN(max, n);
     len1 = FLINT_MIN(poly1->length, max);
     len2 = FLINT_MIN(poly2->length, max);

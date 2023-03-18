@@ -20,7 +20,7 @@ main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("cfrac_bound....");
     fflush(stdout);
@@ -62,7 +62,7 @@ main(void)
         fmpq_clear(r);
     }
 
-    
+
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

@@ -19,7 +19,7 @@ mp_limb_t
 n_cbrtrem(mp_limb_t* remainder, mp_limb_t n)
 {
     mp_limb_t base;
-    
+
     if (!n)
     {
         *remainder = 0;

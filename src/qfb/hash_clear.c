@@ -19,7 +19,7 @@
 void qfb_hash_clear(qfb_hash_t * qhash, slong depth)
 {
    slong i, size = (1L<<depth);
-   
+
    for (i = 0; i < size; i++)
    {
       qfb_clear(qhash[i].q);

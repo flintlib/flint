@@ -14,8 +14,8 @@
 
 /* P (x : z) = 2 * P1 (x0 : z0)  */
 
-/* 
-    Coordinates of P : 
+/*
+    Coordinates of P :
 
         x = (x0 + z0)^2 * (x0 - z0)^2 mod n
         z = 4 * x0 * z0 * ((x0 - z0)^2 + a24 * 4 * x0 * z0) mod n

@@ -12,8 +12,8 @@
 
 #include "fmpz_mod_poly.h"
 
-int _fmpz_mod_poly_invmod(fmpz *A, 
-                          const fmpz *B, slong lenB, 
+int _fmpz_mod_poly_invmod(fmpz *A,
+                          const fmpz *B, slong lenB,
                           const fmpz *P, slong lenP, const fmpz_t p)
 {
     fmpz *G;

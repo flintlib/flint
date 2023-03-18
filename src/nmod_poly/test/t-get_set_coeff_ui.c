@@ -19,7 +19,7 @@ main(void)
     int i, result;
     ulong j;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("get/set_coeff_ui....");
     fflush(stdout);
@@ -30,7 +30,7 @@ main(void)
         nmod_poly_t a;
         mp_limb_t n = n_randtest_not_zero(state);
         mp_limb_t c1 = n_randtest(state), c2;
-        
+
         j = n_randint(state, 100);
 
         nmod_poly_init(a, n);
@@ -38,7 +38,7 @@ main(void)
 
         nmod_poly_set_coeff_ui(a, j, c1);
         c2 = nmod_poly_get_coeff_ui(a, j);
-        
+
         result = (c2 == c1 % n);
         if (!result)
         {
@@ -53,7 +53,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

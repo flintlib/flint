@@ -24,7 +24,7 @@ int main(void)
     flint_printf("factor_pollard_brent....");
     fflush(stdout);
 
-    for (l = 5; l < 26; l += 5)    
+    for (l = 5; l < 26; l += 5)
     {
         for (i = l; i < 26 && i + l <= FLINT_BITS; i += 5)
         {

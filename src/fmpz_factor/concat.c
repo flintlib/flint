@@ -20,7 +20,7 @@ _fmpz_factor_concat(fmpz_factor_t factor1, fmpz_factor_t factor2, ulong exp)
     slong i;
 
     _fmpz_factor_fit_length(factor1, factor1->num + factor2->num);
-    
+
     for (i = 0; i < factor2->num; i++)
     {
        fmpz_set(factor1->p + factor1->num + i, factor2->p + i);

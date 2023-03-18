@@ -22,7 +22,7 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("invsqrt_series....");
     fflush(stdout);
 
@@ -68,7 +68,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         TEMPLATE(T, poly_clear)(h, ctx);
         TEMPLATE(T, poly_clear)(g, ctx);
         TEMPLATE(T, poly_clear)(r, ctx);
@@ -127,7 +127,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

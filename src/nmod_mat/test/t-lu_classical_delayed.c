@@ -96,7 +96,7 @@ main(void)
     slong i;
 
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("lu_classical_delayed....");
     fflush(stdout);
@@ -187,7 +187,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

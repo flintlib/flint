@@ -173,7 +173,7 @@ main(void)
 
             fmpz_mod_mpoly_init(q + w, ctx);
             qarr[w] = q + w;
-        }  
+        }
 
         fmpz_mod_mpoly_init(f, ctx);
         fmpz_mod_mpoly_init(k1, ctx);
@@ -231,13 +231,13 @@ main(void)
             fmpz_mod_mpoly_clear(qarr[w], ctx);
         for (w = 0; w < num; w++)
             fmpz_mod_mpoly_clear(darr[w], ctx);
-        fmpz_mod_mpoly_clear(f, ctx);  
-        fmpz_mod_mpoly_clear(k1, ctx);  
-        fmpz_mod_mpoly_clear(k2, ctx);  
+        fmpz_mod_mpoly_clear(f, ctx);
+        fmpz_mod_mpoly_clear(k1, ctx);
+        fmpz_mod_mpoly_clear(k2, ctx);
         fmpz_mod_mpoly_clear(r, ctx);
 
         flint_free(g);
-        flint_free(q);  
+        flint_free(q);
         fmpz_mod_mpoly_ctx_clear(ctx);
     }
 
@@ -265,7 +265,7 @@ main(void)
 
             fmpz_mod_mpoly_init(q + w, ctx);
             qarr[w] = q + w;
-        }  
+        }
 
         fmpz_mod_mpoly_init(f, ctx);
         fmpz_mod_mpoly_init(k1, ctx);
@@ -325,13 +325,13 @@ main(void)
             fmpz_mod_mpoly_clear(qarr[w], ctx);
         for (w = 0; w < num; w++)
             fmpz_mod_mpoly_clear(darr[w], ctx);
-        fmpz_mod_mpoly_clear(f, ctx);  
-        fmpz_mod_mpoly_clear(k1, ctx);  
-        fmpz_mod_mpoly_clear(k2, ctx);  
+        fmpz_mod_mpoly_clear(f, ctx);
+        fmpz_mod_mpoly_clear(k1, ctx);
+        fmpz_mod_mpoly_clear(k2, ctx);
         fmpz_mod_mpoly_clear(r, ctx);
 
         flint_free(g);
-        flint_free(q);  
+        flint_free(q);
         fmpz_mod_mpoly_ctx_clear(ctx);
     }
 

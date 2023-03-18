@@ -16,7 +16,7 @@
 #endif
 
 #include <sys/types.h>
-#if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER) 
+#if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER)
 #include <unistd.h>
 #endif
 
@@ -24,7 +24,7 @@
 #include "flint.h"
 #include "fmpz.h"
 
-#if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER) 
+#if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER)
 
 int main(void)
 {
@@ -150,7 +150,7 @@ int main(void)
     /* Not necessary */
 
     FLINT_TEST_CLEANUP(state);
-    
+
     printf("PASS\n");
     return 0;
 }

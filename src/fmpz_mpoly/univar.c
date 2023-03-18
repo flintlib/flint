@@ -116,7 +116,7 @@ void fmpz_mpoly_univar_set_coeff_ui(
             {
                 fmpz_mpoly_swap(A->coeffs + j, A->coeffs + j + 1, ctx);
                 fmpz_swap(A->exps + j, A->exps + j + 1);
-            }            
+            }
         }
     }
 

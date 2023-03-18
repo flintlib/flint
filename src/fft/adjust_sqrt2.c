@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2009, 2011 William Hart
 
     This file is part of FLINT.
@@ -11,8 +11,8 @@
 
 #include "flint.h"
 #include "fft.h"
-      
-void fft_adjust_sqrt2(mp_limb_t * r, mp_limb_t * i1, 
+
+void fft_adjust_sqrt2(mp_limb_t * r, mp_limb_t * i1,
             mp_size_t i, mp_size_t limbs, flint_bitcnt_t w, mp_limb_t * temp)
 {
    flint_bitcnt_t wn = limbs*FLINT_BITS;
@@ -23,14 +23,14 @@ void fft_adjust_sqrt2(mp_limb_t * r, mp_limb_t * i1,
    int negate = 0;
 
    b1 = j + wn/4 + i*k;
-   if (b1 >= wn) 
+   if (b1 >= wn)
    {
       negate = 1;
       b1 -= wn;
    }
    y  = b1/FLINT_BITS;
    b1 = b1%FLINT_BITS;
- 
+
    /* multiply by 2^{j + wn/4 + i*k} */
    if (y)
    {
@@ -38,7 +38,7 @@ void fft_adjust_sqrt2(mp_limb_t * r, mp_limb_t * i1,
       cy = mpn_neg_n(temp, i1 + limbs - y, y);
       temp[limbs] = 0;
       mpn_addmod_2expp1_1(temp + y, limbs - y, -i1[limbs]);
-      mpn_sub_1(temp + y, temp + y, limbs - y + 1, cy); 
+      mpn_sub_1(temp + y, temp + y, limbs - y + 1, cy);
       mpn_mul_2expmod_2expp1(r, temp, limbs, b1);
    } else
       mpn_mul_2expmod_2expp1(r, i1, limbs, b1);
@@ -51,10 +51,10 @@ void fft_adjust_sqrt2(mp_limb_t * r, mp_limb_t * i1,
    temp[limbs] = 0;
    if (y) cy = mpn_neg_n(temp, r + limbs - y, y);
    mpn_addmod_2expp1_1(temp + y, limbs - y, -r[limbs]);
-   mpn_sub_1(temp + y, temp + y, limbs - y + 1, cy); 
-   
+   mpn_sub_1(temp + y, temp + y, limbs - y + 1, cy);
+
    /* shift by an additional half limb (rare) */
-   if (limbs & 1) 
+   if (limbs & 1)
        mpn_mul_2expmod_2expp1(temp, temp, limbs, FLINT_BITS/2);
 
    /* subtract */

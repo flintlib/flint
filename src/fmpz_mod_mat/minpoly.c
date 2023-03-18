@@ -60,7 +60,7 @@ void fmpz_mod_mat_minpoly(fmpz_mod_poly_t p, const fmpz_mod_mat_t X,
     fmpz_mod_mat_init(A, n + 1, 2*n + 1, fmpz_mod_ctx_modulus(ctx));
     fmpz_mod_mat_init(B, n, n, fmpz_mod_ctx_modulus(ctx));
     fmpz_mod_mat_init(v, n, 1, fmpz_mod_ctx_modulus(ctx));
- 
+
     L1 = (slong *) TMP_ALLOC((n + 1)*sizeof(slong));
     L2 = (slong *) TMP_ALLOC(n*sizeof(slong));
     P1 = (slong *) TMP_ALLOC((2*n + 1)*sizeof(slong));
@@ -108,12 +108,12 @@ void fmpz_mod_mat_minpoly(fmpz_mod_poly_t p, const fmpz_mod_mat_t X,
         {
             r1++;
             r2 = indep ? r2 + 1 : r2;
-         
+
             fmpz_mod_mat_mul(v, X, v);
-         
+
             for (i = 0; i < n; i++)
                 fmpz_set(fmpz_mod_mat_entry(A, r1, i), fmpz_mod_mat_entry(v, i, 0));
-         
+
             for (i = n; i < n + r1; i++)
                 fmpz_zero(fmpz_mod_mat_entry(A, r1, i));
 
@@ -141,7 +141,7 @@ void fmpz_mod_mat_minpoly(fmpz_mod_poly_t p, const fmpz_mod_mat_t X,
         }
 
         c = -WORD(1);
-         
+
         for (i = c2 + 1; i < n; i++)
         {
             if (P2[i] == -WORD(1))
@@ -161,7 +161,7 @@ void fmpz_mod_mat_minpoly(fmpz_mod_poly_t p, const fmpz_mod_mat_t X,
             fmpz_mod_poly_set_coeff_fmpz(b, i, t, ctx);
         }
         _fmpz_mod_poly_set_length(b, r1 + 1);
-      
+
         fmpz_mod_poly_gcd(g, p, b, ctx);
         fmpz_mod_poly_mul(p, p, b, ctx);
         fmpz_mod_poly_divrem(p, r, p, g, ctx);
@@ -173,7 +173,7 @@ void fmpz_mod_mat_minpoly(fmpz_mod_poly_t p, const fmpz_mod_mat_t X,
                 for (j = 0; j < n; j++)
                     fmpz_set(fmpz_mod_mat_entry(B, i, j), fmpz_mod_mat_entry(A, i, j));
             }
-        } 
+        }
 
         first_poly = 0;
     }

@@ -46,9 +46,9 @@ int main()
     flint_printf("hgcd....");
     fflush(stdout);
 
-    /* 
-       Find coprime polys, multiply by another poly 
-       and check the GCD is that poly 
+    /*
+       Find coprime polys, multiply by another poly
+       and check the GCD is that poly
      */
     for (i = 0; i < 1000; i++)
     {

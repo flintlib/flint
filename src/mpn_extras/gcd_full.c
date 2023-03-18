@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "mpn_extras.h"
 
-mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg, 
+mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg,
                                mp_srcptr array1, mp_size_t limbs1,
 		               mp_srcptr array2, mp_size_t limbs2, mp_ptr temp)
 {
@@ -24,13 +24,13 @@ mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg,
    /* find maximum power of 2 dividing inputs */
    b1 = mpn_scan1(array1 + s1, 0);
    b2 = mpn_scan1(array2 + s2, 0);
-   
+
    /* get bit shifts [0, FLINT_BITS) and limb shifts */
    mb = FLINT_MIN(b1, b2) % FLINT_BITS;
    s1 = b1 / FLINT_BITS; b1 = b1 % FLINT_BITS; len1 = limbs1 - s1;
    s2 = b2 / FLINT_BITS; b2 = b2 % FLINT_BITS; len2 = limbs2 - s2;
    m = FLINT_MIN(s1, s2);
-   
+
    /* this many output limbs will be zero */
    flint_mpn_zero(arrayg, m);
 
@@ -43,7 +43,7 @@ mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg,
       flint_mpn_copyi(in1, array1 + s1, len1);
    else
       mpn_rshift(in1, array1 + s1, len1, b1);
-   len1 -= (in1[len1 - 1] == 0); 
+   len1 -= (in1[len1 - 1] == 0);
 
    /* set in2 to shifted array2 */
    if (temp != NULL)
@@ -54,13 +54,13 @@ mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg,
       flint_mpn_copyi(in2, array2 + s2, len2);
    else
       mpn_rshift(in2, array2 + s2, len2, b2);
-   len2 -= (in2[len2 - 1] == 0); 
-   
-   
+   len2 -= (in2[len2 - 1] == 0);
+
+
    /* compute gcd of shifted values */
    if (len1 >= len2)
       leng = mpn_gcd(arrayg + m, in1, len1, in2, len2);
-   else 
+   else
       leng = mpn_gcd(arrayg + m, in2, len2, in1, len1);
 
    if (mb) /* shift back by mb bits */

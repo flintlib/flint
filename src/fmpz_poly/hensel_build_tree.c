@@ -13,7 +13,7 @@
 #include "nmod_poly.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_hensel_build_tree(slong *link, fmpz_poly_t *v, fmpz_poly_t *w, 
+void fmpz_poly_hensel_build_tree(slong *link, fmpz_poly_t *v, fmpz_poly_t *w,
                                  const nmod_poly_factor_t fac)
 {
     const slong r = fac->num;
@@ -61,7 +61,7 @@ void fmpz_poly_hensel_build_tree(slong *link, fmpz_poly_t *v, fmpz_poly_t *w,
         /* Swap link[j] and V[minp] */
         tmp = link[j];
         link[j] = link[minp];
-        link[minp] = tmp; 
+        link[minp] = tmp;
 
         minp = j+1;
         mind = nmod_poly_degree(V[j+1]);

@@ -50,7 +50,7 @@ int fmpz_mod_divides(fmpz_t a, const fmpz_t b, const fmpz_t c,
     if (success)
     {
         fmpz_mul(a, q, x);
-        fmpz_mod(a, a, ctx->n);        
+        fmpz_mod(a, a, ctx->n);
     }
 
     fmpz_clear(g);

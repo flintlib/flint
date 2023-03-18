@@ -100,7 +100,7 @@ void fmpz_mod_mpolyn_print_pretty(
     exponents = (fmpz *) TMP_ALLOC(ctx->minfo->nvars*sizeof(fmpz));
     for (i = 0; i < ctx->minfo->nvars; i++)
         fmpz_init(exponents + i);
-   
+
     for (i = 0; i < len; i++)
     {
         if (i > 0)
@@ -260,7 +260,7 @@ void fmpz_mod_mpoly_cvtfrom_mpolyn(
             _fmpz_mod_mpoly_fit_length(&A->coeffs, &A->coeffs_alloc,
                                        &A->exps, &A->exps_alloc, N, k + 1);
             fmpz_set(A->coeffs + k, c);
-            mpoly_monomial_madd(A->exps + N*k, B->exps + N*i, j, genexp, N);                
+            mpoly_monomial_madd(A->exps + N*k, B->exps + N*i, j, genexp, N);
             k++;
         }
     }

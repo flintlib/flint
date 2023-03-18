@@ -17,7 +17,7 @@ int main(void)
    int result;
    ulong i;
    FLINT_TEST_INIT(state);
-   
+
 
    flint_printf("divrem2_precomp....");
    fflush(stdout);
@@ -29,9 +29,9 @@ int main(void)
 
       d = n_randtest(state);
       if (d == UWORD(0)) d++;
-  
+
       n = n_randtest(state);
-      
+
       dpre = n_precompute_inverse(d);
 
       r1 = n_divrem2_precomp(&q1, n, d, dpre);
@@ -42,7 +42,7 @@ int main(void)
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("n = %wu, d = %wu, dpre = %f\n", n, d, dpre); 
+         flint_printf("n = %wu, d = %wu, dpre = %f\n", n, d, dpre);
          flint_printf("q1 = %wu, q2 = %wu, r1 = %wu, r2 = %wu\n", q1, q2, r1, r2);
          fflush(stdout);
          flint_abort();
@@ -50,7 +50,7 @@ int main(void)
    }
 
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

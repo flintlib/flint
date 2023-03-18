@@ -43,7 +43,7 @@ mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf)
     mp_limb_t nmod8, mod8, p, nmod, pinv, mult;
     int kron, jac;
     n_primes_t iter;
-    
+
     if (fmpz_is_even(qs_inf->n)) /* check 2 is not a factor */
         return 2;
 

@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2009, 2011, 2020 William Hart
 
     This file is part of FLINT.
@@ -12,16 +12,16 @@
 #include "thread_support.h"
 #include "ulong_extras.h"
 #include "fft.h"
-      
-void fft_butterfly_twiddle(mp_limb_t * u, mp_limb_t * v, 
+
+void fft_butterfly_twiddle(mp_limb_t * u, mp_limb_t * v,
     mp_limb_t * s, mp_limb_t * t, mp_size_t limbs, flint_bitcnt_t b1, flint_bitcnt_t b2)
 {
    mp_limb_t nw = limbs*FLINT_BITS;
    mp_size_t x, y;
    int negate1 = 0;
    int negate2 = 0;
-   
-   if (b1 >= nw) 
+
+   if (b1 >= nw)
    {
       negate2 = 1;
       b1 -= nw;
@@ -29,14 +29,14 @@ void fft_butterfly_twiddle(mp_limb_t * u, mp_limb_t * v,
    x  = b1/FLINT_BITS;
    b1 = b1%FLINT_BITS;
 
-   if (b2 >= nw) 
+   if (b2 >= nw)
    {
       negate1 = 1;
       b2 -= nw;
    }
    y  = b2/FLINT_BITS;
    b2 = b2%FLINT_BITS;
- 
+
    butterfly_lshB(u, v, s, t, limbs, x, y);
    mpn_mul_2expmod_2expp1(u, u, limbs, b1);
    if (negate2) mpn_neg_n(u, u, limbs + 1);
@@ -50,23 +50,23 @@ void fft_radix2_twiddle(mp_limb_t ** ii, mp_size_t is,
 {
    mp_size_t i;
    mp_size_t limbs = (w*n)/FLINT_BITS;
-   
-   if (n == 1) 
+
+   if (n == 1)
    {
       mp_size_t tw1 = r*c;
       mp_size_t tw2 = tw1 + rs*c;
       fft_butterfly_twiddle(*t1, *t2, ii[0], ii[is], limbs, tw1*ws, tw2*ws);
-      
+
       SWAP_PTRS(ii[0],  *t1);
       SWAP_PTRS(ii[is], *t2);
 
       return;
    }
 
-   for (i = 0; i < n; i++) 
-   {   
+   for (i = 0; i < n; i++)
+   {
       fft_butterfly(*t1, *t2, ii[i*is], ii[(n+i)*is], i, limbs, w);
-   
+
       SWAP_PTRS(ii[i*is],     *t1);
       SWAP_PTRS(ii[(n+i)*is], *t2);
    }
@@ -81,33 +81,33 @@ void fft_truncate1_twiddle(mp_limb_t ** ii, mp_size_t is,
 {
    mp_size_t i;
    mp_size_t limbs = (w*n)/FLINT_BITS;
-   
+
    if (trunc == 2*n)
       fft_radix2_twiddle(ii, is, n, w, t1, t2, ws, r, c, rs);
    else if (trunc <= n)
    {
       for (i = 0; i < n; i++)
          mpn_add_n(ii[i*is], ii[i*is], ii[(i+n)*is], limbs + 1);
-      
+
       fft_truncate1_twiddle(ii, is, n/2, 2*w, t1, t2, ws, r, c, 2*rs, trunc);
    } else
    {
-      for (i = 0; i < n; i++) 
-      {   
+      for (i = 0; i < n; i++)
+      {
          fft_butterfly(*t1, *t2, ii[i*is], ii[(n+i)*is], i, limbs, w);
-   
+
          SWAP_PTRS(ii[i*is],     *t1);
          SWAP_PTRS(ii[(n+i)*is], *t2);
       }
 
-      fft_radix2_twiddle(ii, is, n/2, 2*w, t1, t2, ws, r, c, 2*rs);  
-      fft_truncate1_twiddle(ii + n*is, is, n/2, 2*w, 
+      fft_radix2_twiddle(ii, is, n/2, 2*w, t1, t2, ws, r, c, 2*rs);
+      fft_truncate1_twiddle(ii + n*is, is, n/2, 2*w,
                                      t1, t2, ws, r + rs, c, 2*rs, trunc - n);
    }
 }
 
-void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, 
-                   flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
+void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
+                   flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
                              mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc)
 {
    mp_size_t i, j, s;
@@ -116,24 +116,24 @@ void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
    mp_size_t limbs = (n*w)/FLINT_BITS;
    flint_bitcnt_t depth = 0;
    flint_bitcnt_t depth2 = 0;
-   
+
    while ((UWORD(1)<<depth) < n2) depth++;
    while ((UWORD(1)<<depth2) < n1) depth2++;
 
    /* first half matrix fourier FFT : n2 rows, n1 cols */
-   
+
    /* FFTs on columns */
    for (i = 0; i < n1; i++)
-   {   
+   {
       /* relevant part of first layer of full sqrt2 FFT */
       if (w & 1)
       {
-         for (j = i; j < trunc - 2*n; j+=n1) 
-         {   
+         for (j = i; j < trunc - 2*n; j+=n1)
+         {
             if (j & 1)
                fft_butterfly_sqrt2(*t1, *t2, ii[j], ii[2*n+j], j, limbs, w, *temp);
             else
-               fft_butterfly(*t1, *t2, ii[j], ii[2*n+j], j/2, limbs, w);     
+               fft_butterfly(*t1, *t2, ii[j], ii[2*n+j], j/2, limbs, w);
 
             SWAP_PTRS(ii[j],     *t1);
             SWAP_PTRS(ii[2*n+j], *t2);
@@ -142,16 +142,16 @@ void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
          for ( ; j < 2*n; j+=n1)
          {
              if (i & 1)
-                fft_adjust_sqrt2(ii[j + 2*n], ii[j], j, limbs, w, *temp); 
+                fft_adjust_sqrt2(ii[j + 2*n], ii[j], j, limbs, w, *temp);
              else
-                fft_adjust(ii[j + 2*n], ii[j], j/2, limbs, w); 
+                fft_adjust(ii[j + 2*n], ii[j], j/2, limbs, w);
          }
       } else
       {
-         for (j = i; j < trunc - 2*n; j+=n1) 
-         {   
+         for (j = i; j < trunc - 2*n; j+=n1)
+         {
             fft_butterfly(*t1, *t2, ii[j], ii[2*n+j], j, limbs, w/2);
-   
+
             SWAP_PTRS(ii[j],     *t1);
             SWAP_PTRS(ii[2*n+j], *t2);
          }
@@ -159,12 +159,12 @@ void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
          for ( ; j < 2*n; j+=n1)
             fft_adjust(ii[j + 2*n], ii[j], j, limbs, w/2);
       }
-   
-      /* 
-         FFT of length n2 on column i, applying z^{r*i} for rows going up in steps 
+
+      /*
+         FFT of length n2 on column i, applying z^{r*i} for rows going up in steps
          of 1 starting at row 0, where z => w bits
       */
-      
+
       fft_radix2_twiddle(ii + i, n1, n2/2, w*n1, t1, t2, w, 0, i, 1);
       for (j = 0; j < n2; j++)
       {
@@ -172,7 +172,7 @@ void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
          if (j < s) SWAP_PTRS(ii[i+j*n1], ii[i+s*n1]);
       }
    }
-   
+
    /* FFTs on rows */
    for (i = 0; i < n2; i++)
    {
@@ -183,18 +183,18 @@ void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
          if (j < t) SWAP_PTRS(ii[i*n1+j], ii[i*n1+t]);
       }
    }
-   
+
    /* second half matrix fourier FFT : n2 rows, n1 cols */
    ii += 2*n;
 
    /* FFTs on columns */
    for (i = 0; i < n1; i++)
-   {   
+   {
       /*
-         FFT of length n2 on column i, applying z^{r*i} for rows going up in steps 
+         FFT of length n2 on column i, applying z^{r*i} for rows going up in steps
          of 1 starting at row 0, where z => w bits
       */
-      
+
       fft_truncate1_twiddle(ii + i, n1, n2/2, w*n1, t1, t2, w, 0, i, 1, trunc2);
       for (j = 0; j < n2; j++)
       {
@@ -208,7 +208,7 @@ void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
    {
       i = n_revbin(s, depth);
       fft_radix2(ii + i*n1, n1/2, w*n2, t1, t2);
-      
+
       for (j = 0; j < n1; j++)
       {
          mp_size_t t = n_revbin(j, depth2);
@@ -273,13 +273,13 @@ _fft_outer1_worker(void * arg_ptr)
             /* relevant part of first layer of full sqrt2 FFT */
             if (w & 1)
             {
-                for (j = i; j < trunc - 2*n; j+=n1) 
-                {   
+                for (j = i; j < trunc - 2*n; j+=n1)
+                {
                     if (j & 1)
                         fft_butterfly_sqrt2(*t1, *t2, ii[j], ii[2*n+j],
                                                             j, limbs, w, temp);
                     else
-                        fft_butterfly(*t1, *t2, ii[j], ii[2*n+j], j/2, limbs, w);     
+                        fft_butterfly(*t1, *t2, ii[j], ii[2*n+j], j/2, limbs, w);
 
                     SWAP_PTRS(ii[j],     *t1);
                     SWAP_PTRS(ii[2*n+j], *t2);
@@ -288,16 +288,16 @@ _fft_outer1_worker(void * arg_ptr)
                 for ( ; j < 2*n; j+=n1)
                 {
                     if (i & 1)
-                        fft_adjust_sqrt2(ii[j + 2*n], ii[j], j, limbs, w, temp); 
+                        fft_adjust_sqrt2(ii[j + 2*n], ii[j], j, limbs, w, temp);
                     else
-                        fft_adjust(ii[j + 2*n], ii[j], j/2, limbs, w); 
+                        fft_adjust(ii[j + 2*n], ii[j], j/2, limbs, w);
                 }
             } else
             {
-                for (j = i; j < trunc - 2*n; j+=n1) 
-                {   
+                for (j = i; j < trunc - 2*n; j+=n1)
+                {
                     fft_butterfly(*t1, *t2, ii[j], ii[2*n+j], j, limbs, w/2);
-   
+
                     SWAP_PTRS(ii[j],     *t1);
                     SWAP_PTRS(ii[2*n+j], *t2);
                 }
@@ -305,12 +305,12 @@ _fft_outer1_worker(void * arg_ptr)
                 for ( ; j < 2*n; j+=n1)
                     fft_adjust(ii[j + 2*n], ii[j], j, limbs, w/2);
             }
-   
-            /* 
-                FFT of length n2 on column i, applying z^{r*i} for rows going up in steps 
+
+            /*
+                FFT of length n2 on column i, applying z^{r*i} for rows going up in steps
                 of 1 starting at row 0, where z => w bits
             */
-      
+
             fft_radix2_twiddle(ii + i, n1, n2/2, w*n1, t1, t2, w, 0, i, 1);
             for (j = 0; j < n2; j++)
             {
@@ -352,10 +352,10 @@ _fft_outer2_worker(void * arg_ptr)
         for ( ; i < end; i++)
         {
             /*
-                FFT of length n2 on column i, applying z^{r*i} for rows going up in steps 
+                FFT of length n2 on column i, applying z^{r*i} for rows going up in steps
                 of 1 starting at row 0, where z => w bits
             */
-      
+
             fft_truncate1_twiddle(ii + i, n1, n2/2, w*n1, t1, t2, w, 0, i, 1, trunc2);
             for (j = 0; j < n2; j++)
             {
@@ -366,8 +366,8 @@ _fft_outer2_worker(void * arg_ptr)
     }
 }
 
-void fft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n, 
-                   flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
+void fft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n,
+                   flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
                              mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc)
 {
     mp_size_t i, shared_i = 0;
@@ -389,7 +389,7 @@ void fft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n,
 #endif
 
     /* first half matrix fourier FFT : n2 rows, n1 cols */
-   
+
     /* FFTs on columns */
 
     num_threads = flint_request_threads(&threads,
@@ -413,7 +413,7 @@ void fft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n,
        args[i].t2 = t2 + i;
        args[i].temp = temp[i];
 #if FLINT_USES_PTHREAD
-       args[i].mutex = &mutex;       
+       args[i].mutex = &mutex;
 #endif
     }
 
@@ -433,7 +433,7 @@ void fft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n,
 
     shared_i = 0;
 
-    
+
     for (i = 0; i < num_threads + 1; i++)
     {
        args[i].trunc = trunc2;

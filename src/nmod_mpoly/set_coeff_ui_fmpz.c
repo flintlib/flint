@@ -76,7 +76,7 @@ void _nmod_mpoly_set_coeff_ui_fmpz(
         A->coeffs[index] = c;
     }
 
-    TMP_END; 
+    TMP_END;
 }
 
 

@@ -12,8 +12,8 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_divrem_f(fmpz_t f, fmpz *Q, fmpz *R, 
-                             const fmpz *A, slong lenA, 
+void _fmpz_mod_poly_divrem_f(fmpz_t f, fmpz *Q, fmpz *R,
+                             const fmpz *A, slong lenA,
                              const fmpz *B, slong lenB, const fmpz_t p)
 {
     fmpz_t invB;
@@ -29,7 +29,7 @@ void _fmpz_mod_poly_divrem_f(fmpz_t f, fmpz *Q, fmpz *R,
     fmpz_clear(invB);
 }
 
-void fmpz_mod_poly_divrem_f(fmpz_t f, fmpz_mod_poly_t Q, fmpz_mod_poly_t R, 
+void fmpz_mod_poly_divrem_f(fmpz_t f, fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
                             const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
                                                       const fmpz_mod_ctx_t ctx)
 {
@@ -84,7 +84,7 @@ void fmpz_mod_poly_divrem_f(fmpz_t f, fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
         r = R->coeffs;
     }
 
-    _fmpz_mod_poly_divrem(q, r, A->coeffs, lenA, 
+    _fmpz_mod_poly_divrem(q, r, A->coeffs, lenA,
                              B->coeffs, lenB, invB, fmpz_mod_ctx_modulus(ctx));
 
     if (Q == A || Q == B)

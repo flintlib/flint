@@ -17,11 +17,11 @@ int main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("init_set_readonly....");
     fflush(stdout);
-    
-    
+
+
 
     /* Create some small fmpz integers, clear the mpz_t */
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
@@ -99,7 +99,7 @@ int main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -42,7 +42,7 @@ void n_bpoly_mod_interp_lift_2sm_poly(
     slong * deg1,
     n_bpoly_t T,
     const n_poly_t A,
-    const n_poly_t B,    
+    const n_poly_t B,
     mp_limb_t alpha,
     nmod_t mod)
 {
@@ -331,7 +331,7 @@ choose_prime: /* primes are v - alpha, v + alpha */
         n_bpoly_one(G);
         n_bpoly_swap(Abar, A);
         n_bpoly_swap(Bbar, B);
-        goto successful_put_content;    
+        goto successful_put_content;
     }
 
     if (n_poly_degree(Gevalp) != n_poly_degree(Gevalm))

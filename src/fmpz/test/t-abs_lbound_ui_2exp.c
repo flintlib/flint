@@ -47,7 +47,7 @@ main(void)
     flint_printf("abs_lbound_ui_2exp....");
     fflush(stdout);
 
-    
+
 
     for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
     {
@@ -80,7 +80,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

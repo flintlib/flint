@@ -23,7 +23,7 @@ _TEMPLATE(T, poly_pow_trunc) (TEMPLATE(T, struct) * res,
 }
 
 void
-TEMPLATE(T, poly_pow_trunc) (TEMPLATE(T, poly_t) res, 
+TEMPLATE(T, poly_pow_trunc) (TEMPLATE(T, poly_t) res,
                           const TEMPLATE(T, poly_t) poly, ulong e,
                                      slong trunc, const TEMPLATE(T, ctx_t) ctx)
 {

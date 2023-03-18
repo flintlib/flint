@@ -21,7 +21,7 @@ main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("scalar_add/submul_nmod_mat_ui....");
     fflush(stdout);
@@ -66,7 +66,7 @@ main(void)
         nmod_mat_clear(M);
     }
 
-    
+
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

@@ -18,7 +18,7 @@ nmod_poly_randtest_monic_primitive(nmod_poly_t poly, flint_rand_t state, slong l
     fq_nmod_ctx_t ctx;
     fq_nmod_t X;
     int primitive = 0;
-    
+
     while (!primitive)
     {
         nmod_poly_randtest_monic_irreducible(poly, state, len);

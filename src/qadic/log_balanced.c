@@ -22,9 +22,9 @@
     Does not support aliasing.
  */
 
-static void 
-_qadic_log_bsplit_series(fmpz *P, fmpz_t B, fmpz *T, 
-                         const fmpz *y, slong len, slong lo, slong hi, 
+static void
+_qadic_log_bsplit_series(fmpz *P, fmpz_t B, fmpz *T,
+                         const fmpz *y, slong len, slong lo, slong hi,
                          const fmpz *a, const slong *j, slong lena)
 {
     const slong d = j[lena - 1];
@@ -88,19 +88,19 @@ _qadic_log_bsplit_series(fmpz *P, fmpz_t B, fmpz *T,
 }
 
 /*
-    Sets (z, d) to the sum 
+    Sets (z, d) to the sum
 
         sum_{i=1}^{\infty} y^i / i mod p^N.
 
-    The result may not be reduced modulo p^N, but it is 
+    The result may not be reduced modulo p^N, but it is
     reduced modulo f(X) given by the data (a, j, lena).
 
     Supports aliasing between y and z.
  */
 
-static void 
-_qadic_log_bsplit(fmpz *z, const fmpz *y, slong v, slong len, 
-                  const fmpz *a, const slong *j, slong lena, 
+static void
+_qadic_log_bsplit(fmpz *z, const fmpz *y, slong v, slong len,
+                  const fmpz *a, const slong *j, slong lena,
                   const fmpz_t p, slong N)
 {
     const slong d = j[lena - 1];
@@ -133,20 +133,20 @@ _qadic_log_bsplit(fmpz *z, const fmpz *y, slong v, slong len,
 }
 
 /*
-    Computes 
+    Computes
     \begin{equation*}
     z = - \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N}.
     \end{equation*}
 
-    Note that this can be used to compute the $p$-adic logarithm 
-    via the equation 
+    Note that this can be used to compute the $p$-adic logarithm
+    via the equation
     \begin{align*}
     \log(x) & = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i} \\
             & = - \sum_{i=1}^{\infty} \frac{(1-x)^i}{i}.
     \end{align*}
 
-    Assumes that $y = 1 - x$ is non-zero and that $v = \ord_p(y)$ 
-    is at least $1$ when $p$ is odd and at least $2$ when $p = 2$ 
+    Assumes that $y = 1 - x$ is non-zero and that $v = \ord_p(y)$
+    is at least $1$ when $p$ is odd and at least $2$ when $p = 2$
     so that the series converges.
 
     Assumes that $v < N$.
@@ -158,8 +158,8 @@ _qadic_log_bsplit(fmpz *z, const fmpz *y, slong v, slong len,
     Does not support aliasing between $y$ and $z$.
  */
 
-void _qadic_log_balanced(fmpz *z, const fmpz *y, slong len, 
-                         const fmpz *a, const slong *j, slong lena, 
+void _qadic_log_balanced(fmpz *z, const fmpz *y, slong len,
+                         const fmpz *a, const slong *j, slong lena,
                          const fmpz_t p, slong N, const fmpz_t pN)
 {
     const slong d = j[lena - 1];
@@ -267,7 +267,7 @@ int qadic_log_balanced(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
                 {
                     padic_poly_fit_length(rop, d);
 
-                    _qadic_log_balanced(rop->coeffs, x, len, 
+                    _qadic_log_balanced(rop->coeffs, x, len,
                                         ctx->a, ctx->j, ctx->len, p, N, pN);
                     rop->val = 0;
 

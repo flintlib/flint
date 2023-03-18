@@ -18,10 +18,10 @@ other problems.
 
 Here we introduce fast FFT code for multiplication of huge integers.
 
-Currently the code depends on GMP/MPIR, however, any sufficiently well 
+Currently the code depends on GMP/MPIR, however, any sufficiently well
 developed bignum library should have equivalent primitives for bignums. (There
 is also a dependence on the flint function n_revbin, which is found in the
-ulong_extras directory of flint -- I hereby license it under the BSD 
+ulong_extras directory of flint -- I hereby license it under the BSD
 license as per the remainder of the FFT implementation.)
 
 To use the FFT for multiplying large integers, one needs to use the function
@@ -41,12 +41,12 @@ Features:
 Performance Data
 ----------------
 
-Here are timings for multiplication of two integers of the given number of 
+Here are timings for multiplication of two integers of the given number of
 bits, comparing MPIR 2.4.0, this code and GMP 5.0.2 respectively. The timings
 are for varying numbers of iterations as specified. The timings were done on
 a 2.2GHz AMD K10-2 Mangy Cours machine.
 
-The tuning values used are specified in the final two columns. 
+The tuning values used are specified in the final two columns.
 
 The first part of the table uses mul_truncate_sqrt2, the second half uses
 mul_mfa_truncate_sqrt2.
@@ -55,46 +55,46 @@ bits          iters mpir   this   gmp     n w
 
 195840        1000  1.149s 1.105s 0.997s  7 16
 261120        1000  1.483s 1.415s 1.396s  7 16
-391296        100   0.261s 0.248s 0.282s  8 8  
-521728        100   0.344s 0.315s 0.411s  8 8  
-782592        100   0.577s 0.539s 0.628s  9 4  
-1043456       100   0.706s 0.688s 0.848s  9 4  
-1569024       100   1.229s 1.153s 1.317s  9 8  
+391296        100   0.261s 0.248s 0.282s  8 8
+521728        100   0.344s 0.315s 0.411s  8 8
+782592        100   0.577s 0.539s 0.628s  9 4
+1043456       100   0.706s 0.688s 0.848s  9 4
+1569024       100   1.229s 1.153s 1.317s  9 8
 
-2092032       100   1.543s 1.440s 2.765s  9 8 
-3127296       10    0.283s 0.266s 0.408s 11 1 
-4169728       10    0.357s 0.335s 0.543s 11 1  
-6273024       10    0.621s 0.597s 0.843s 11 2  
-8364032       10    0.831s 0.742s 1.156s 11 2 
-12539904      10    1.441s 1.394s 1.798s 12 1  
-16719872      1     0.230s 0.205s 0.288s 12 1 
-25122816      1     0.379s 0.336s 0.434s 12 2 
-33497088      1     0.524s 0.428s 0.646s 12 2 
-50245632      1     0.833s 0.693s 1.035s 13 1 
+2092032       100   1.543s 1.440s 2.765s  9 8
+3127296       10    0.283s 0.266s 0.408s 11 1
+4169728       10    0.357s 0.335s 0.543s 11 1
+6273024       10    0.621s 0.597s 0.843s 11 2
+8364032       10    0.831s 0.742s 1.156s 11 2
+12539904      10    1.441s 1.394s 1.798s 12 1
+16719872      1     0.230s 0.205s 0.288s 12 1
+25122816      1     0.379s 0.336s 0.434s 12 2
+33497088      1     0.524s 0.428s 0.646s 12 2
+50245632      1     0.833s 0.693s 1.035s 13 1
 66994176      1     1.596s 0.896s 1.358s 13 1
-100577280     1     1.906s 1.552s 2.177s 13 2 
-134103040     1     2.784s 2.076s 2.984s 13 2 
-201129984     1     3.971s 3.158s 4.536s 14 1 
-268173312     1     5.146s 4.137s 5.781s 14 1 
-402456576     1     7.548s 6.443s 9.867s 14 2 
-536608768     1     9.841s 8.365s 12.71s 14 2 
-804913152     1     15.48s 13.29s 20.06s 15 1 
-1073217536    1     21.17s 17.16s 27.19s 15 1 
-1610219520    1     31.64s 28.60s 43.37s 15 2 
-2146959360    1     43.25s 37.02s 57.66s 15 2 
-3220340736    1     70.14s 58.09s 92.94s 16 1 
-4293787648    1     96.00s 74.26s 146.1s 16 1 
-6441566208    1     150.2s 131.1s 217.5s 16 2 
-8588754944    1     208.4s 175.0s 312.8s 16 2 
-12883132416   1     327.4s 278.6s 447.7s 17 1  
-17177509888   1     485.0s 360.ss 614.2s 17 1 
+100577280     1     1.906s 1.552s 2.177s 13 2
+134103040     1     2.784s 2.076s 2.984s 13 2
+201129984     1     3.971s 3.158s 4.536s 14 1
+268173312     1     5.146s 4.137s 5.781s 14 1
+402456576     1     7.548s 6.443s 9.867s 14 2
+536608768     1     9.841s 8.365s 12.71s 14 2
+804913152     1     15.48s 13.29s 20.06s 15 1
+1073217536    1     21.17s 17.16s 27.19s 15 1
+1610219520    1     31.64s 28.60s 43.37s 15 2
+2146959360    1     43.25s 37.02s 57.66s 15 2
+3220340736    1     70.14s 58.09s 92.94s 16 1
+4293787648    1     96.00s 74.26s 146.1s 16 1
+6441566208    1     150.2s 131.1s 217.5s 16 2
+8588754944    1     208.4s 175.0s 312.8s 16 2
+12883132416   1     327.4s 278.6s 447.7s 17 1
+17177509888   1     485.0s 360.ss 614.2s 17 1
 
 
 Additional tuning
 -----------------
 
-Technically one should tune the values that appear in fft_tuning.h. The 
-mulmod_2expp1 tuning array indices correspond to (n, w) pairs starting 
+Technically one should tune the values that appear in fft_tuning.h. The
+mulmod_2expp1 tuning array indices correspond to (n, w) pairs starting
 at n = 12, w = 1. The values in the array should be nonnegative and less
 than 6. The length of the array is given by FFT_N_NUM. The cutoff
 FFT_MULMOD_2EXPP1_CUTOFF should also be tuned. It must be bigger than
@@ -105,7 +105,7 @@ The fft tuning array indices correspond to (n, w) pairs starting at
 n = 6, w = 1. The values in the array should be nonnegative and less
 than 6. The function that is tuned is in the file mpn_mul_fft_main.c.
 See the corresponding test function for an example of how to call it.
-The function implementation itself is the best reference for which 
+The function implementation itself is the best reference for which
 inputs will use which table entries.
 
 Strategy
@@ -133,7 +133,7 @@ The IFFT butterfly is:
 
 [a{i}, b{i}] => [a{i}+z^-i*b{i}, a{i}-z^-i*b{i}]
 
-We first decompose iw into b bits and x limbs. We perform the bit shift first, in-place. Then we use sumdiff, this time reading at an offset of x limbs, splitting the operation into two parts as before. 
+We first decompose iw into b bits and x limbs. We perform the bit shift first, in-place. Then we use sumdiff, this time reading at an offset of x limbs, splitting the operation into two parts as before.
 
 2. Cache locality
 
@@ -252,9 +252,9 @@ B' B' C' C'
 and clearly now we can compute the A's we don't know from the known
 coefficients.
 
-To combine the MFA with truncation we simply truncate at one level of the MFA, i.e. set the truncation length to be a multiple of the length of the inner FFT's. When we are at the lower levels computing row FFT's we don't compute those which lie past the truncation point. 
+To combine the MFA with truncation we simply truncate at one level of the MFA, i.e. set the truncation length to be a multiple of the length of the inner FFT's. When we are at the lower levels computing row FFT's we don't compute those which lie past the truncation point.
 
-We need to take care to perform the right pointwise mults because we do not transpose the matrix or output coefficients in revbin order. 
+We need to take care to perform the right pointwise mults because we do not transpose the matrix or output coefficients in revbin order.
 
 4. Negacyclic convolution
 
@@ -266,11 +266,11 @@ In order to get around this we must perform two multiplications, one via a negac
 
 5. Sqrt 2 trick
 
-In the ring Z/pZ where p = 2^S + 1 the value 2^(2S/4)-2^(S/4) is a 
-square root of 2. This allows us to perform a convolution of twice 
-the length without twice the cost. To perform the operations we need 
-to be able to perform twiddles by powers of sqrt2. These are decomposed 
-and the operations are combined as much as possible with the 
+In the ring Z/pZ where p = 2^S + 1 the value 2^(2S/4)-2^(S/4) is a
+square root of 2. This allows us to perform a convolution of twice
+the length without twice the cost. To perform the operations we need
+to be able to perform twiddles by powers of sqrt2. These are decomposed
+and the operations are combined as much as possible with the
 multiplications by powers of 2.
 
 Acknowledgements

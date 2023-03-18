@@ -14,7 +14,7 @@
 
 void
 _fmpz_poly_evaluate_fmpq(fmpz_t rnum, fmpz_t rden,
-                               const fmpz * f, slong len, 
+                               const fmpz * f, slong len,
                                const fmpz_t anum, const fmpz_t aden)
 {
     if (len < 40 || fmpz_bits(aden) > 0.003 * len * len)

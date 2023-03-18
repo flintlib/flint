@@ -20,7 +20,7 @@ main(void)
 {
     int i, result = 1;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("integral....");
     fflush(stdout);
 
@@ -75,7 +75,7 @@ main(void)
 
         nmod_poly_integral(b, a);
         nmod_poly_integral(a, a);
-        
+
         result = nmod_poly_equal(a, b);
         if (!result)
         {
@@ -92,7 +92,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

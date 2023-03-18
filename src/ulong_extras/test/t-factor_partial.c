@@ -16,11 +16,11 @@ int main(void)
 {
    int i, j, result;
    FLINT_TEST_INIT(state);
-   
+
 
    flint_printf("factor_partial....");
    fflush(stdout);
- 
+
    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random numbers */
    {
       mp_limb_t n1, n2, prod, limit;
@@ -31,7 +31,7 @@ int main(void)
       n1 = n_randtest_not_zero(state);
       limit = n_sqrt(n1);
       n2 = n_factor_partial(&factors, n1, limit, 0);
-      
+
       prod = 1;
       for (j = 0; j < factors.num; j++)
       {
@@ -42,14 +42,14 @@ int main(void)
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("n1 = %wu, n2 = %wu\n", n1, n2); 
+         flint_printf("n1 = %wu, n2 = %wu\n", n1, n2);
          fflush(stdout);
          flint_abort();
       }
    }
-   
+
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

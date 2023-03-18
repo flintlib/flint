@@ -22,7 +22,7 @@ void fmpq_poly_get_coeff_mpq(mpq_t x, const fmpq_poly_t poly, slong n)
         flint_mpq_set_si(x, 0, 1);
         return;
     }
-    
+
     fmpz_get_mpz(mpq_numref(x), poly->coeffs + n);
     fmpz_get_mpz(mpq_denref(x), poly->den);
     mpq_canonicalize(x);

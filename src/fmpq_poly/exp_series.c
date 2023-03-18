@@ -98,7 +98,7 @@ _fmpq_poly_exp_series_basecase(fmpz * B, fmpz_t Bden,
 }
 
 /* c_k x^k -> c_k x^k / (m+k) */
-void _fmpq_poly_integral_offset(fmpz * rpoly, fmpz_t rden, 
+void _fmpq_poly_integral_offset(fmpz * rpoly, fmpz_t rden,
                            const fmpz * poly, const fmpz_t den, slong len, slong m)
 {
     slong k;

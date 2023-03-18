@@ -24,7 +24,7 @@ main(void)
     flint_printf("compose_horner....");
     fflush(stdout);
 
-    
+
 
     /* Check aliasing of the first argument */
     for (i = 0; i < 8 * flint_test_multiplier(); i++)
@@ -95,7 +95,7 @@ main(void)
         fmpz_poly_init(h);
         fmpz_poly_randtest(g, state, n_randint(state, 40), 80);
         fmpz_poly_randtest(h, state, n_randint(state, 20), 50);
-        
+
         fmpz_poly_compose_horner(f1, g, h);
         fmpz_poly_compose(f2, g, h);
 
@@ -116,7 +116,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

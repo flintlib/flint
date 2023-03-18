@@ -41,10 +41,10 @@ int main(void)
         fmpz_mod_poly_init(r, ctx);
         fmpz_mod_mat_init(A, m, n, fmpz_mod_ctx_modulus(ctx));
         fmpz_mod_mat_randtest(A, state);
-        
+
         fmpz_mod_mat_charpoly(p1, A, ctx);
         fmpz_mod_mat_minpoly(p2, A, ctx);
-        
+
         fmpz_mod_poly_divrem(q, r, p1, p2, ctx);
         FLINT_TEST(fmpz_mod_poly_is_zero(r, ctx));
 
@@ -70,7 +70,7 @@ int main(void)
         fmpz_mod_mat_init(A, m, n, fmpz_mod_ctx_modulus(ctx));
         fmpz_mod_mat_init(B, m, n, fmpz_mod_ctx_modulus(ctx));
         fmpz_mod_mat_randtest(A, state);
-        
+
         for (j = 0; j < n/2; j++)
         {
            for (k = 0; k < n/2; k++)
@@ -81,10 +81,10 @@ int main(void)
                        fmpz_mod_mat_entry(A, j, k));
            }
         }
-        
+
         fmpz_mod_mat_set(B, A);
         fmpz_mod_mat_minpoly(p1, A, ctx);
-        
+
         for (j = 0; j < n; j++)
         {
            fmpz_mod_set_ui(t, n_randint(state, 6) - 3, ctx);

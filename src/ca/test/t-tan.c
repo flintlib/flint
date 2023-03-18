@@ -40,7 +40,7 @@ int main()
             ca_init(t2, ctx);
             ca_init(t3, ctx);
             ca_init(t4, ctx);
-     
+
             ca_randtest_special(x, state, 5, 5, ctx);
 
             ca_tan_direct(t1, x, ctx);

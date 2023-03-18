@@ -19,7 +19,7 @@ main(void)
 
     flint_printf("discrete_log_ph....");
     fflush(stdout);
-   
+
     flint_randinit(state);
 
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
@@ -39,7 +39,7 @@ main(void)
             {
                 continue;
             }
-            
+
             for (k = 0; k < 10; k++)
             {
                 ulong x;
@@ -62,7 +62,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

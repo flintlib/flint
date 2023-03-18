@@ -18,8 +18,8 @@
 
 
 static int
-__fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R, 
-                              const fmpz * A, slong lenA, 
+__fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R,
+                              const fmpz * A, slong lenA,
                               const fmpz * B, slong lenB, int exact)
 {
     if (lenA < 2 * lenB - 1)
@@ -56,7 +56,7 @@ __fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R,
             _fmpz_poly_mul(d2q1, d2, n2, Q, n1);
 
         /*
-           Compute BQ = d1q1 * x^n1 + d2q1, of length lenB - 1; 
+           Compute BQ = d1q1 * x^n1 + d2q1, of length lenB - 1;
            then compute R = A - BQ
          */
 
@@ -84,8 +84,8 @@ __fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R,
     return 1;
 }
 
-int _fmpz_poly_divrem_divconquer(fmpz *Q, fmpz *R, 
-                                  const fmpz *A, slong lenA, 
+int _fmpz_poly_divrem_divconquer(fmpz *Q, fmpz *R,
+                                  const fmpz *A, slong lenA,
                                   const fmpz *B, slong lenB, int exact)
 {
     if (lenA <= 2 * lenB - 1)

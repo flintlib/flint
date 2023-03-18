@@ -13,8 +13,8 @@
 #define FQ_EMBED_H
 
 #ifdef FQ_EMBED_INLINES_C
-#define FQ_EMBED_INLINE 
-#define FQ_EMBED_TEMPLATES_INLINE 
+#define FQ_EMBED_INLINE
+#define FQ_EMBED_TEMPLATES_INLINE
 #else
 #define FQ_EMBED_INLINE static __inline__
 #define FQ_EMBED_TEMPLATES_INLINE static __inline__
@@ -44,12 +44,12 @@ FQ_EMBED_INLINE void fq_modulus_derivative_inv(fq_t m_prime,
 {
     fmpz_mod_poly_t tmp;
     fmpz_mod_poly_init(tmp, ctx->ctxp);
-    
+
     fmpz_mod_poly_derivative(tmp, fq_ctx_modulus(ctx), ctx->ctxp);
     fmpz_poly_fit_length(m_prime, tmp->length);
     _fmpz_vec_set(m_prime->coeffs, tmp->coeffs, tmp->length);
     _fmpz_poly_set_length(m_prime, tmp->length);
-    
+
     fq_inv(m_prime_inv, m_prime, ctx);
     fmpz_mod_poly_clear(tmp, ctx->ctxp);
 }

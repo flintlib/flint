@@ -17,12 +17,12 @@ int main(void)
 {
    int i, result;
    FLINT_TEST_INIT(state);
-   
+
 
    flint_printf("jacobi....");
    fflush(stdout);
 
-   for (i = 0; i < 10000 * flint_test_multiplier(); i++) 
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++)
    {
       mp_limb_t d;
       mpz_t a_m, d_m;
@@ -31,21 +31,21 @@ int main(void)
 
       mpz_init(a_m);
       mpz_init(d_m);
-      
+
       a = n_randtest(state);
       d = n_randtest_not_zero(state) | WORD(1);
-      
+
       r1 = n_jacobi(a, d);
 
       flint_mpz_set_si(a_m, a);
       flint_mpz_set_ui(d_m, d);
       r2 = mpz_jacobi(a_m, d_m);
-      
+
       result = (r1 == r2);
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("a = %wu, d = %wu\n", a, d); 
+         flint_printf("a = %wu, d = %wu\n", a, d);
          fflush(stdout);
          flint_abort();
       }
@@ -55,7 +55,7 @@ int main(void)
    }
 
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

@@ -44,7 +44,7 @@ FLINT_WARN_UNUSED int flint_scanf(const char * str, ...)
       n = strcspn(str + 2, "%") + 2; /* be sure to skip a %% */
       strncpy(str2, str, n);
       str2[n] = '\0';
-   
+
       switch (str[1])
       {
       case 'w':
@@ -76,7 +76,7 @@ FLINT_WARN_UNUSED int flint_scanf(const char * str, ...)
          break;
       default: /* pass to scanf */
          args = parse_fmt(&floating, str2);
-         if (args) 
+         if (args)
          {
             if (args == 3)
                w1 = va_arg(ap, int *);
@@ -101,12 +101,12 @@ FLINT_WARN_UNUSED int flint_scanf(const char * str, ...)
                else
                   ret += scanf(str2, w3);
             }
-         } else 
+         } else
          {
             if (!fread(str2, 1, n, stdin) && n > 0) /* zero args */
                goto cleanup;
          }
-               
+
       }
 
       len -= n;

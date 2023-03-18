@@ -48,7 +48,7 @@ acb_hypgeom_legendre_p(acb_t res, const acb_t n, const acb_t m,
             return;
         }
 
-        if (arf_cmpabs_2exp_si(nn, FLINT_BITS - 1) < 0 && 
+        if (arf_cmpabs_2exp_si(nn, FLINT_BITS - 1) < 0 &&
             arf_cmpabs_2exp_si(mm, FLINT_BITS - 1) < 0)
         {
             slong nnn, mmm;

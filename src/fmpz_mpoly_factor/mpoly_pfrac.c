@@ -101,7 +101,7 @@ int fmpz_mpoly_pfrac_init(
                 fmpz_mpoly_to_mpolyv(I->prod_mbetas_coeffs + i*r + j,
                                  I->prod_mbetas + i*r + j, I->xalpha + i, ctx);
             }
-        }        
+        }
     }
 
     fmpz_poly_pfrac_init(I->uni_pfrac);

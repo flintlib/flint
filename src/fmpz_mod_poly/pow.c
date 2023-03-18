@@ -15,7 +15,7 @@
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_pow(fmpz *res, const fmpz *poly, slong len, ulong e, 
+void _fmpz_mod_poly_pow(fmpz *res, const fmpz *poly, slong len, ulong e,
                         const fmpz_t p)
 {
     ulong bit = ~((~UWORD(0)) >> 1);
@@ -27,17 +27,17 @@ void _fmpz_mod_poly_pow(fmpz *res, const fmpz *poly, slong len, ulong e,
     /*
        Set bits to the bitmask with a 1 one place lower than the msb of e
      */
-    
+
     while ((bit & e) == UWORD(0))
         bit >>= 1;
-    
+
     bit >>= 1;
-    
+
     /*
-       Trial run without any polynomial arithmetic to determine the parity 
+       Trial run without any polynomial arithmetic to determine the parity
        of the number of swaps;  then set R and S accordingly
      */
-    
+
     {
         unsigned int swaps = 0U;
         ulong bit2 = bit;
@@ -46,7 +46,7 @@ void _fmpz_mod_poly_pow(fmpz *res, const fmpz *poly, slong len, ulong e,
         while (bit2 >>= 1)
             if ((bit2 & e) == UWORD(0))
                 swaps = ~swaps;
-        
+
         if (swaps == 0U)
         {
             R = res;
@@ -58,11 +58,11 @@ void _fmpz_mod_poly_pow(fmpz *res, const fmpz *poly, slong len, ulong e,
             S = res;
         }
     }
-    
+
     /*
        We unroll the first step of the loop, referring to {poly, len}
      */
-    
+
     _fmpz_mod_poly_sqr(R, poly, len, p);
     rlen = 2 * len - 1;
     if ((bit & e))
@@ -73,7 +73,7 @@ void _fmpz_mod_poly_pow(fmpz *res, const fmpz *poly, slong len, ulong e,
         R = S;
         S = T;
     }
-    
+
     while ((bit >>= 1))
     {
         if ((bit & e))
@@ -92,7 +92,7 @@ void _fmpz_mod_poly_pow(fmpz *res, const fmpz *poly, slong len, ulong e,
             S = T;
         }
     }
-    
+
     _fmpz_vec_clear(v, alloc);
 }
 

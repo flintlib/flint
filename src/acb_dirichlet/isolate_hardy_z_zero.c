@@ -693,7 +693,7 @@ turing_search_near(zz_node_ptr *pu, zz_node_ptr *pv, slong *psb, const fmpz_t n)
 
     /*
      * Extend the search to greater heights t.
-     * 
+     *
      * Continue adding Gram points until the number of consecutive
      * 'good' Gram/Rosser blocks reaches the Turing method bound.
      */
@@ -787,7 +787,7 @@ turing_search_far(zz_node_ptr *pu, zz_node_ptr *pv, slong *psb,
 
     /*
      * Extend the search to greater heights t.
-     * 
+     *
      * Continue adding Gram points until the number of consecutive
      * 'good' Gram/Rosser blocks is twice the number required by
      * the Turing method bound.
@@ -1449,7 +1449,7 @@ acb_dirichlet_zeta_nzeros(arb_t res, const arb_t t, slong prec)
     {
         arf_struct b[2];
         fmpz n[2];
-        
+
         arf_init(b);
         arf_init(b + 1);
         fmpz_init(n);

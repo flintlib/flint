@@ -24,7 +24,7 @@ pthread_mutex_t fmpz_lock;
 #define FLINT_MPZ_MAX_CACHE_LIMBS 64
 
 /* The number of new mpz's allocated at a time */
-#define MPZ_BLOCK 64 
+#define MPZ_BLOCK 64
 
 /* there's no point using TLS here as GC doesn't support it */
 __mpz_struct ** mpz_free_arr = NULL;

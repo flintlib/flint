@@ -20,7 +20,7 @@
 
 /*
    Definitions for the parameters of the timing process.
-   
+
    lenlo    Minimum length
    lenhi    Maximum length
    lenh     Ratio for the length
@@ -53,7 +53,7 @@
 /*
    Write a binary 24-bit ppm image.
  */
-int write_rgb_ppm(const char* file_name, unsigned char* pixels, 
+int write_rgb_ppm(const char* file_name, unsigned char* pixels,
                    unsigned int width, unsigned int height)
 {
     FILE* file = fopen(file_name, "wb");
@@ -74,23 +74,23 @@ main(void)
     fmpz_mod_poly_t f, g, h;
     fmpz_t p;
     fmpz_mod_ctx_t ctx;
-    
+
     FLINT_TEST_INIT(state);
-    
+
     fmpz_init(p);
     fmpz_mod_ctx_init_ui(ctx, 2);
-    
+
     for (len = lenlo, j = 0; len <= lenhi; len = ceil((double)len*lenr), j++)
     {
         slong s[nalgs];
-        
+
         for (bits = bitslo, i = 0; bits <= bitshi; bits = ceil((double)bits*bitsr), i++)
         {
             int c, n, reps = 0;
-            
+
             for (c = 0; c < nalgs; c++)
                 s[c] = WORD(0);
-            
+
             do {
                fmpz_randbits(p, state, bits);
             } while (!fmpz_is_probabprime(p));
@@ -99,12 +99,12 @@ main(void)
             fmpz_mod_poly_init2(f, len, ctx);
             fmpz_mod_poly_init2(g, len, ctx);
             fmpz_mod_poly_init2(h, len, ctx);
-    
+
             for (n = 0; n < ncases; n++)
             {
                 timeit_t t[nalgs];
                 int l, loops = 1;
-                
+
                 /*
                    Construct random polynomials f and g
                  */
@@ -122,14 +122,14 @@ main(void)
                     f->length = len;
                     g->length = len;
                 }
-                
+
               loop:
 
                 timeit_start(t[0]);
                 for (l = 0; l < loops; l++)
                     fmpz_mod_poly_gcd_euclidean(h, f, g, ctx);
                 timeit_stop(t[0]);
-                
+
                 timeit_start(t[1]);
                 for (l = 0; l < loops; l++)
                     fmpz_mod_poly_gcd_hgcd(h, f, g, ctx);
@@ -141,18 +141,18 @@ main(void)
                         loops *= 2;
                         goto loop;
                     }
-                
+
                 for (c = 0; c < nalgs; c++)
                     s[c] += t[c]->cpu;
                 reps += loops;
             }
-            
+
             for (c = 0; c < nalgs; c++)
                 T[i][j][c] = s[c] / (double) reps;
-            
+
             if (s[0] <= s[1])
                 X[i][j] = 0;
-            else 
+            else
                 X[i][j] = 1;
 
             fmpz_mod_poly_clear(f, ctx);
@@ -169,11 +169,11 @@ main(void)
 
     fmpz_clear(p);
     fmpz_mod_ctx_clear(ctx);
-    
+
     maxcols = j;
     maxrows = i;
-    
-    /* 
+
+    /*
        Print 2-D ASCII image of the winning algorithms
      */
     for (i = 0; i < maxrows; i++)
@@ -182,7 +182,7 @@ main(void)
             flint_printf("%d", X[i][j]);
         flint_printf("\n");
     }
-    
+
     /*
        Print 2-D coloured image to file
      */
@@ -190,7 +190,7 @@ main(void)
     {
         unsigned char * PIXELS;
         int k;
-        
+
         PIXELS = (unsigned char *) flint_malloc(3 * maxrows * maxcols * sizeof(unsigned char));
         k = 0;
         for (i = 0; i < maxrows; i++)
@@ -199,7 +199,7 @@ main(void)
             {
                 double max = DBL_MIN, v[nalgs];
                 int m;
-                
+
                 for (m = 0; m < nalgs; m++)
                 {
                     v[m] = T[i][j][m] - T[i][j][X[i][j]];
@@ -218,7 +218,7 @@ main(void)
 
         k = write_rgb_ppm(imgname, PIXELS, maxcols, maxrows);
         flint_free(PIXELS);
-        
+
         if (k)
         {
             flint_printf("Exception:  writing ppm image failed\n");

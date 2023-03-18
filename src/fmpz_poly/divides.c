@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-int _fmpz_poly_divides(fmpz * q, const fmpz * a, 
+int _fmpz_poly_divides(fmpz * q, const fmpz * a,
                        slong len1, const fmpz * b, slong len2)
 {
     fmpz * r;

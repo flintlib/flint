@@ -115,7 +115,7 @@ _fmpq_poly_pow_trunc(fmpz * res, fmpz_t resden,
     v = _fmpz_vec_init(len);
     fmpz_init(vden);
     bit = UWORD(1) << (FLINT_BIT_COUNT(exp) - 2);
-    
+
     if (n_zerobits(exp) % 2)
     {
         R = res;
@@ -143,7 +143,7 @@ _fmpq_poly_pow_trunc(fmpz * res, fmpz_t resden,
         Rden = Sden;
         Sden = T;
     }
-    
+
     while (bit >>= 1)
     {
         if (bit & exp)

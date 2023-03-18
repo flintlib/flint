@@ -26,7 +26,7 @@ main(void)
     FLINT_TEST_INIT(state);
 
     flint_printf("cos_series....");
-    fflush(stdout);    
+    fflush(stdout);
 
     /* Check aliasing of a and c */
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
@@ -108,7 +108,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

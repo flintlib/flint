@@ -18,14 +18,14 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("gcd_euclidean....");
     fflush(stdout);
 
-    /* 
-       Find coprime polys, multiply by another poly 
-       and check the GCD is that poly 
+    /*
+       Find coprime polys, multiply by another poly
+       and check the GCD is that poly
     */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -39,7 +39,7 @@ main(void)
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
         nmod_poly_init(g, n);
-        
+
         do {
             nmod_poly_randtest(a, state, n_randint(state, 200));
             nmod_poly_randtest(b, state, n_randint(state, 200));
@@ -50,7 +50,7 @@ main(void)
             nmod_poly_randtest(c, state, n_randint(state, 200));
         } while (c->length < 2);
         nmod_poly_make_monic(c, c);
-        
+
         nmod_poly_mul(a, a, c);
         nmod_poly_mul(b, b, c);
 
@@ -68,7 +68,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         nmod_poly_clear(a);
         nmod_poly_clear(b);
         nmod_poly_clear(c);
@@ -89,7 +89,7 @@ main(void)
         nmod_poly_init(g, n);
         nmod_poly_randtest(a, state, n_randint(state, 200));
         nmod_poly_randtest(b, state, n_randint(state, 200));
-        
+
         nmod_poly_gcd_euclidean(g, a, b);
         nmod_poly_gcd_euclidean(a, a, b);
 
@@ -124,7 +124,7 @@ main(void)
         nmod_poly_init(g, n);
         nmod_poly_randtest(a, state, n_randint(state, 200));
         nmod_poly_randtest(b, state, n_randint(state, 200));
-       
+
         nmod_poly_gcd_euclidean(g, a, b);
         nmod_poly_gcd_euclidean(b, a, b);
 
@@ -146,7 +146,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

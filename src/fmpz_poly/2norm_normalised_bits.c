@@ -23,6 +23,6 @@ flint_bitcnt_t _fmpz_poly_2norm_normalised_bits(const fmpz * poly, slong len)
 
 	bits = fmpz_bits(norm);
 	fmpz_clear(norm);
-   
+
    return bits - fmpz_bits(poly + len - 1) + 1;
 }

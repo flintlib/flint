@@ -16,11 +16,11 @@ main(int argc, char** argv)
     n_factor_t fac;
 
     FLINT_TEST_INIT(state);
-    
+
     bits = atol(argv[1]);
 
     flint_printf("Looking for 1000 numbers with %ld bits cofactors\n", bits);
-    
+
     for (i = 0; i < 1000; )
     {
        n_factor_init(&fac);
@@ -71,8 +71,8 @@ main(int argc, char** argv)
 	    }
 	}
     }
-        
+
     FLINT_TEST_CLEANUP(state);
-    
+
     return 0;
 }

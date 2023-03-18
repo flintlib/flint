@@ -79,11 +79,11 @@ main(void)
           }
        }
 
-       fmpz_mpoly_clear(f, ctx);  
-       fmpz_mpoly_clear(g, ctx);  
-       fmpz_mpoly_clear(h, ctx);  
-       fmpz_mpoly_clear(k, ctx);  
-       fmpz_mpoly_clear(r, ctx);  
+       fmpz_mpoly_clear(f, ctx);
+       fmpz_mpoly_clear(g, ctx);
+       fmpz_mpoly_clear(h, ctx);
+       fmpz_mpoly_clear(k, ctx);
+       fmpz_mpoly_clear(r, ctx);
     }
 
     /* Check f = g1*q1 + ... + gn*qn + r for random polys */
@@ -112,7 +112,7 @@ main(void)
 
             fmpz_mpoly_init(q + w, ctx);
             qarr[w] = q + w;
-        }  
+        }
 
         fmpz_mpoly_init(f, ctx);
         fmpz_mpoly_init(k1, ctx);
@@ -193,13 +193,13 @@ main(void)
             fmpz_mpoly_clear(qarr[w], ctx);
         for (w = 0; w < num; w++)
             fmpz_mpoly_clear(darr[w], ctx);
-        fmpz_mpoly_clear(f, ctx);  
-        fmpz_mpoly_clear(k1, ctx);  
-        fmpz_mpoly_clear(k2, ctx);  
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_clear(k1, ctx);
+        fmpz_mpoly_clear(k2, ctx);
         fmpz_mpoly_clear(r, ctx);
 
         flint_free(g);
-        flint_free(q);  
+        flint_free(q);
     }
 
     /* Check aliasing */
@@ -227,7 +227,7 @@ main(void)
 
           fmpz_mpoly_init(q + w, ctx);
           qarr[w] = q + w;
-       }  
+       }
 
        fmpz_mpoly_init(f, ctx);
        fmpz_mpoly_init(k1, ctx);
@@ -285,17 +285,17 @@ main(void)
           fmpz_mpoly_clear(qarr[w], ctx);
        for (w = 0; w < num; w++)
           fmpz_mpoly_clear(darr[w], ctx);
-       fmpz_mpoly_clear(f, ctx);  
-       fmpz_mpoly_clear(k1, ctx);  
-       fmpz_mpoly_clear(k2, ctx);  
+       fmpz_mpoly_clear(f, ctx);
+       fmpz_mpoly_clear(k1, ctx);
+       fmpz_mpoly_clear(k2, ctx);
        fmpz_mpoly_clear(r, ctx);
 
        flint_free(g);
-       flint_free(q);  
+       flint_free(q);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

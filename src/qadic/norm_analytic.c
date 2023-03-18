@@ -12,7 +12,7 @@
 #include "qadic.h"
 
 /*
-    Computes the norm of an element $x$ of $\mathbf{Z}_q$ via the identity 
+    Computes the norm of an element $x$ of $\mathbf{Z}_q$ via the identity
 
         $\Norm(x) = \exp \Trace \log (x)$
 
@@ -21,8 +21,8 @@
     Assumes that $y$ is non-zero.
  */
 
-void _qadic_norm_analytic(fmpz_t rop, const fmpz *y, slong v, slong len, 
-                          const fmpz *a, const slong *j, slong lena, 
+void _qadic_norm_analytic(fmpz_t rop, const fmpz *y, slong v, slong len,
+                          const fmpz *a, const slong *j, slong lena,
                           const fmpz_t p, slong N)
 {
     const slong d = j[lena - 1];

@@ -28,7 +28,7 @@ main(void)
     FLINT_TEST_INIT(state);
 
     flint_printf("mul... ");
-    fflush(stdout);    
+    fflush(stdout);
 
     /* Check aliasing: a = a * b */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -36,7 +36,7 @@ main(void)
         padic_mat_t a, b, d;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
-        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN)
             + PADIC_TEST_PREC_MIN;
         padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_VAL_UNIT);
 
@@ -78,7 +78,7 @@ main(void)
         padic_mat_t a, b, d;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
-        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN)
             + PADIC_TEST_PREC_MIN;
         padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_VAL_UNIT);
 
@@ -120,7 +120,7 @@ main(void)
         padic_mat_t a, d;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
-        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN)
             + PADIC_TEST_PREC_MIN;
         padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_VAL_UNIT);
 
@@ -158,7 +158,7 @@ main(void)
         padic_mat_t a, b;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
-        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN)
             + PADIC_TEST_PREC_MIN;
         N = FLINT_MAX(1, N);
         padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_VAL_UNIT);
@@ -200,7 +200,7 @@ main(void)
         slong k, l, v;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
-        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN)
             + PADIC_TEST_PREC_MIN;
         padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_VAL_UNIT);
 
@@ -273,7 +273,7 @@ main(void)
         slong v;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
-        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN)
             + PADIC_TEST_PREC_MIN;
         padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_VAL_UNIT);
 
@@ -343,7 +343,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

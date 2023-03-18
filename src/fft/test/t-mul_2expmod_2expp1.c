@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2009, 2011 William Hart
 
     This file is part of FLINT.
@@ -34,7 +34,7 @@ main(void)
     flint_printf("mul_2expmod_2expp1....");
     fflush(stdout);
 
-    
+
     _flint_rand_init_gmp(state);
 
     mpz_init(m1);
@@ -55,21 +55,21 @@ main(void)
                     n = bits/k;
                     w = j*k;
                     limbs = (n*w)/GMP_LIMB_BITS;
-            
+
                     nn = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
                     r  = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
                     random_fermat(nn, state, limbs);
                     fermat_to_mpz(mn1, nn, limbs);
                     set_p(p, n, w);
-            
+
                     mpn_mul_2expmod_2expp1(r, nn, limbs, d);
                     fermat_to_mpz(m2, r, limbs);
                     mpz_mod(m2, m2, p);
-                    
+
                     mpz_mod(m1, mn1, p);
                     mpz_mul_2exp(m1, m1, d);
                     mpz_mod(m1, m1, p);
-                    
+
                     if (mpz_cmp(m1, m2) != 0)
                     {
                         flint_printf("FAIL:\n");
@@ -94,7 +94,7 @@ main(void)
     mpz_clear(p);
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -201,7 +201,7 @@ void fmpz_mod_mpoly_get_polyu1n(
     slong Boffx, Bshiftx, Boffy, Bshifty;
     ulong mask = (-UWORD(1)) >> (FLINT_BITS - B->bits);
     slong NB = mpoly_words_per_exp_sp(B->bits, ctx->minfo);
-    
+
     mpoly_gen_offset_shift_sp(&Boffx, &Bshiftx, varx, B->bits, ctx->minfo);
     mpoly_gen_offset_shift_sp(&Boffy, &Bshifty, vary, B->bits, ctx->minfo);
 

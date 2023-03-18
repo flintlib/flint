@@ -396,7 +396,7 @@ choose_prime: /* primes are v - alpha, v + alpha */
         n_polyun_one(G);
         n_polyun_swap(Abar, A);
         n_polyun_swap(Bbar, B);
-        goto successful_put_content;    
+        goto successful_put_content;
     }
 
     if (n_poly_degree(Gevalp) != n_poly_degree(Gevalm))

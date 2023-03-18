@@ -44,7 +44,7 @@ void _fq_nmod_mpoly_set_coeff_fq_nmod_fmpz(
     if (!exists)
     {
         if (!fq_nmod_is_zero(c, ctx->fqctx))
-        {       
+        {
             /* make new term only if coeff is nonzero*/
             fq_nmod_mpoly_fit_length(A, A->length + 1, ctx);
 
@@ -72,10 +72,10 @@ void _fq_nmod_mpoly_set_coeff_fq_nmod_fmpz(
     }
     else /* term with that monomial exists, coeff is nonzero */
     {
-        n_fq_set_fq_nmod(A->coeffs + d*index, c, ctx->fqctx);  
+        n_fq_set_fq_nmod(A->coeffs + d*index, c, ctx->fqctx);
     }
 
-    TMP_END; 
+    TMP_END;
 }
 
 

@@ -32,7 +32,7 @@ main(void)
         fmpz_t p;
 
         fmpz_init(p);
-        
+
         fmpz_set_ui(p, 3);
 
         fq_default_ctx_init(ctx, p, 3, "x");
@@ -70,7 +70,7 @@ main(void)
         fmpz_clear(p);
 
     }
-    
+
     FLINT_TEST_CLEANUP(state);
 
     flint_printf("PASS\n");

@@ -1740,7 +1740,7 @@ cleanup:
 
         FLINT_ASSERT(fmpz_mpoly_divides(T, Asave, G, ctx));
         FLINT_ASSERT(Abar == NULL || fmpz_mpoly_equal(T, Abar, ctx));
-            
+
         FLINT_ASSERT(fmpz_mpoly_divides(T, Bsave, G, ctx));
         FLINT_ASSERT(Bbar == NULL || fmpz_mpoly_equal(T, Bbar, ctx));
     }

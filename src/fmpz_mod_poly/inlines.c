@@ -31,7 +31,7 @@ void fmpz_mod_poly_add_si(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
          fmpz_add(d, d, fmpz_mod_ctx_modulus(ctx));
    } else
       fmpz_mod(d, d, fmpz_mod_ctx_modulus(ctx));
-      
+
    if (poly->length == 0)
       fmpz_mod_poly_set_fmpz(res, d, ctx);
    else
@@ -62,7 +62,7 @@ void fmpz_mod_poly_sub_si(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
          fmpz_add(d, d, fmpz_mod_ctx_modulus(ctx));
    } else
       fmpz_mod(d, d, fmpz_mod_ctx_modulus(ctx));
-      
+
    if (poly->length == 0)
    {
       fmpz_sub(d, fmpz_mod_ctx_modulus(ctx), d);
@@ -98,7 +98,7 @@ void fmpz_mod_poly_si_sub(fmpz_mod_poly_t res, slong c,
          fmpz_add(d, d, fmpz_mod_ctx_modulus(ctx));
    } else
       fmpz_mod(d, d, fmpz_mod_ctx_modulus(ctx));
-      
+
 
    if (poly->length == 0)
       fmpz_mod_poly_set_fmpz(res, d, ctx);

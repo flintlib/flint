@@ -2891,7 +2891,7 @@ const gr_method_tab_input _gr_generic_methods[] =
 
     {GR_METHOD_CHEBYSHEV_T_FMPZ,        (gr_funcptr) gr_generic_chebyshev_t_fmpz},
     {GR_METHOD_CHEBYSHEV_U_FMPZ,        (gr_funcptr) gr_generic_chebyshev_u_fmpz},
- 
+
     {GR_METHOD_HILBERT_CLASS_POLY,      (gr_funcptr) gr_generic_hilbert_class_poly},
 
     {GR_METHOD_VEC_INIT,                (gr_funcptr) gr_generic_vec_init},

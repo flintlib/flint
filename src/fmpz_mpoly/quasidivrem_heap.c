@@ -15,7 +15,7 @@
 slong _fmpz_mpoly_quasidivrem_heap1(fmpz_t scale, slong * lenr,
   fmpz ** polyq, ulong ** expq, slong * allocq, fmpz ** polyr,
                   ulong ** expr, slong * allocr, const fmpz * poly2,
-   const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, 
+   const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3,
                    slong len3, slong bits, ulong maskhi)
 {
     slong i, j, s = len3;
@@ -96,7 +96,7 @@ slong _fmpz_mpoly_quasidivrem_heap1(fmpz_t scale, slong * lenr,
 
     while (heap_len > 1)
     {
-        /* make sure quotient array has space for q_len + 1 entries */ 
+        /* make sure quotient array has space for q_len + 1 entries */
         _fmpz_mpoly_fit_length(&q_coeff, &q_exp, allocq, q_len + 1, 1);
         if (q_len + 1 > qs_alloc)
         {
@@ -129,12 +129,12 @@ slong _fmpz_mpoly_quasidivrem_heap1(fmpz_t scale, slong * lenr,
         if (small)
             acc_sm[0] = acc_sm[1] = acc_sm[2] = 0;
         else
-            fmpz_zero(acc_lg);  
+            fmpz_zero(acc_lg);
 
         while (heap_len > 1 && heap[1].exp == exp)
         {
             x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
-            do            
+            do
             {
                 *store++ = x->i;
                 *store++ = x->j;
@@ -273,7 +273,7 @@ slong _fmpz_mpoly_quasidivrem_heap1(fmpz_t scale, slong * lenr,
                 fmpz_set(rs + r_len, scale);
                 r_len++;
                 continue;
-            } 
+            }
 large_lt_divides:
             fmpz_gcd(gcd, acc_lg, poly3 + 0);
             fmpz_divexact(ns, lc_abs_lg, gcd);
@@ -352,7 +352,7 @@ exp_overflow:
 slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
   fmpz ** polyq, ulong ** expq, slong * allocq, fmpz ** polyr,
                   ulong ** expr, slong * allocr, const fmpz * poly2,
-   const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, 
+   const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3,
                    slong len3, slong bits, slong N, const ulong * cmpmask)
 {
     slong i, j, s = len3;
@@ -383,7 +383,7 @@ slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
     TMP_INIT;
 
     if (N == 1)
-        return _fmpz_mpoly_quasidivrem_heap1(scale, lenr, polyq, expq, 
+        return _fmpz_mpoly_quasidivrem_heap1(scale, lenr, polyq, expq,
                             allocq, polyr, expr, allocr, poly2, exp2, len2,
                                           poly3, exp3, len3, bits, cmpmask[0]);
 
@@ -458,7 +458,7 @@ slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
 
     while (heap_len > 1)
     {
-        /* make sure quotient array has space for q_len + 1 entries */ 
+        /* make sure quotient array has space for q_len + 1 entries */
         _fmpz_mpoly_fit_length(&q_coeff, &q_exp, allocq, q_len + 1, N);
         if (q_len + 1 > qs_alloc)
         {
@@ -501,13 +501,13 @@ slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
         if (small)
             acc_sm[0] = acc_sm[1] = acc_sm[2] = 0;
         else
-            fmpz_zero(acc_lg);  
+            fmpz_zero(acc_lg);
 
         while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N))
         {
             exp_list[--exp_next] = heap[1].exp;
             x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
-            do            
+            do
             {
                 *store++ = x->i;
                 *store++ = x->j;
@@ -664,7 +664,7 @@ slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
                 fmpz_set(rs + r_len, scale);
                 r_len++;
                 continue;
-            } 
+            }
 large_lt_divides:
             fmpz_gcd(gcd, acc_lg, poly3 + 0);
             fmpz_divexact(ns, lc_abs_lg, gcd);
@@ -839,7 +839,7 @@ void fmpz_mpoly_quasidivrem_heap(fmpz_t scale, fmpz_mpoly_t q, fmpz_mpoly_t r,
 
    /* do division with remainder */
    while ((lenq = _fmpz_mpoly_quasidivrem_heap(scale, &lenr, &tq->coeffs, &tq->exps,
-         &tq->alloc, &tr->coeffs, &tr->exps, &tr->alloc, poly2->coeffs, exp2, 
+         &tq->alloc, &tr->coeffs, &tr->exps, &tr->alloc, poly2->coeffs, exp2,
          poly2->length, poly3->coeffs, exp3, poly3->length, exp_bits,
                                                        N, cmpmask)) == 0
          && lenr == 0)
@@ -867,7 +867,7 @@ void fmpz_mpoly_quasidivrem_heap(fmpz_t scale, fmpz_mpoly_t q, fmpz_mpoly_t r,
       if (free3)
          flint_free(old_exp3);
 
-      free2 = free3 = 1; 
+      free2 = free3 = 1;
 
       fmpz_mpoly_fit_bits(tq, exp_bits, ctx);
       tq->bits = exp_bits;
@@ -882,14 +882,14 @@ void fmpz_mpoly_quasidivrem_heap(fmpz_t scale, fmpz_mpoly_t q, fmpz_mpoly_t r,
       fmpz_mpoly_swap(temp1, q, ctx);
 
       fmpz_mpoly_clear(temp1, ctx);
-   } 
+   }
 
    if (r == poly2 || r == poly3)
    {
       fmpz_mpoly_swap(temp2, r, ctx);
 
       fmpz_mpoly_clear(temp2, ctx);
-   } 
+   }
 
    _fmpz_mpoly_set_length(q, lenq, ctx);
    _fmpz_mpoly_set_length(r, lenr, ctx);

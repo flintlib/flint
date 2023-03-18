@@ -17,7 +17,7 @@ int main(void)
 {
    int i, result;
    FLINT_TEST_INIT(state);
-   
+
    flint_printf("powmod....");
    fflush(stdout);
 
@@ -30,7 +30,7 @@ int main(void)
       mpz_init(a_m);
       mpz_init(d_m);
       mpz_init(r2_m);
-      
+
       bits = n_randint(state, FLINT_D_BITS) + 1;
       d = n_randtest_bits(state, bits);
       do
@@ -38,7 +38,7 @@ int main(void)
          a = n_randtest(state) % d;
       } while (n_gcd(d, a) != UWORD(1));
       exp = n_randtest(state);
-      
+
       r1 = n_powmod(a, exp, d);
 
       flint_mpz_set_ui(a_m, a);
@@ -48,14 +48,14 @@ int main(void)
          flint_mpz_powm_ui(r2_m, a_m, -exp, d_m);
          mpz_invert(r2_m, r2_m, d_m);
       } else
-         flint_mpz_powm_ui(r2_m, a_m, exp, d_m);      
+         flint_mpz_powm_ui(r2_m, a_m, exp, d_m);
       r2 = flint_mpz_get_ui(r2_m);
-      
+
       result = (r1 == r2);
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("a = %wu, exp = %wd, d = %wu\n", a, exp, d); 
+         flint_printf("a = %wu, exp = %wd, d = %wu\n", a, exp, d);
          flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
          fflush(stdout);
          flint_abort();
@@ -70,7 +70,7 @@ int main(void)
    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
    {
       mp_limb_t bits, d, r;
-      
+
       bits = n_randint(state, FLINT_D_BITS) + 1;
       d = n_randtest_bits(state, bits);
       if (d == 0) d++;
@@ -88,7 +88,7 @@ int main(void)
    }
 
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

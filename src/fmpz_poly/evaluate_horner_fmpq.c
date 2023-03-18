@@ -15,7 +15,7 @@
 
 void
 _fmpz_poly_evaluate_horner_fmpq(fmpz_t rnum, fmpz_t rden,
-                               const fmpz * f, slong len, 
+                               const fmpz * f, slong len,
                                const fmpz_t anum, const fmpz_t aden)
 {
     if (len == 0)

@@ -16,7 +16,7 @@ int
 main(void)
 {
   int i, j;
-    
+
     FLINT_TEST_INIT(state);
 
     flint_printf("embed matrices... ");
@@ -45,7 +45,7 @@ main(void)
 
         fq_embed_matrices(embed, project, gen, ctx, gen, ctx, modulus);
         fmpz_mod_mat_one(one);
-        
+
         if (!fmpz_mod_mat_equal(embed, one) || !fmpz_mod_mat_equal(project, one)) {
             flint_printf("FAIL:\n\n");
             flint_printf("CTX\n"), fq_ctx_print(ctx), flint_printf("\n");

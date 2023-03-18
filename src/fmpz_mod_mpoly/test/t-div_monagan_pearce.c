@@ -91,8 +91,8 @@ main(void)
         fmpz_mod_mpoly_clear(f, ctx);
         fmpz_mod_mpoly_clear(g, ctx);
         fmpz_mod_mpoly_clear(h, ctx);
-        fmpz_mod_mpoly_clear(k, ctx); 
-        fmpz_mod_mpoly_clear(l, ctx); 
+        fmpz_mod_mpoly_clear(k, ctx);
+        fmpz_mod_mpoly_clear(l, ctx);
 
         fmpz_mod_mpoly_ctx_clear(ctx);
     }
@@ -157,7 +157,7 @@ main(void)
                 flint_abort();
             }
 
-            fmpz_mod_mpoly_set(k, f, ctx);            
+            fmpz_mod_mpoly_set(k, f, ctx);
             fmpz_mod_mpoly_div_monagan_pearce(k, k, g, ctx);
             fmpz_mod_mpoly_assert_canonical(k, ctx);
             if (!fmpz_mod_mpoly_equal(k, q, ctx))
@@ -167,7 +167,7 @@ main(void)
                 fflush(stdout);
                 flint_abort();
             }
-            
+
             fmpz_mod_mpoly_div_monagan_pearce(g, f, g, ctx);
             fmpz_mod_mpoly_assert_canonical(g, ctx);
             if (!fmpz_mod_mpoly_equal(g, q, ctx))
@@ -188,7 +188,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

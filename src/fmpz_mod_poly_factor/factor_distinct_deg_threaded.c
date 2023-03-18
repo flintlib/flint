@@ -298,7 +298,7 @@ void fmpz_mod_poly_factor_distinct_deg_threaded_with_frob(
                     fmpz_mat_init_set(HH + 0, HH + num_threads + 1);
 
                     fmpz_mat_clear(HH + num_threads + 1);
-                    
+
                     fmpz_mod_poly_rem(tmp, H + i - 1, v, ctx);
 
                     fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(H + i,
@@ -371,17 +371,17 @@ void fmpz_mod_poly_factor_distinct_deg_threaded_with_frob(
                 thread_pool_wake(global_thread_pool, threads[i - 1], 0,
                             _fmpz_mod_poly_precompute_matrix_worker, &args1[i]);
             }
-            
+
             for (i = 1; i < c1; i++)
                 thread_pool_wait(global_thread_pool, threads[i - 1]);
 
             fmpz_mod_poly_rem(tmp, H + num_threads, v, ctx);
-            
+
             for (i = 0; i < c1; i++)
             {
                 fmpz_mod_poly_fit_length(H + num_threads + 1 + i, v->length - 1, ctx);
                 _fmpz_mod_poly_set_length(H + num_threads + 1 + i, v->length - 1);
-                
+
                 args2[i].A        = HH + i;
                 args2[i].res      = H + num_threads + i + 1;
                 args2[i].poly1    = tmp;
@@ -395,11 +395,11 @@ void fmpz_mod_poly_factor_distinct_deg_threaded_with_frob(
                 thread_pool_wake(global_thread_pool, threads[i - 1], 0,
         _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv_worker, &args2[i]);
             }
-            
+
             _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv_worker(&args2[0]);
-            
+
             _fmpz_mod_poly_normalise(H + num_threads + 1);
-            
+
             for (i = 1; i < c1; i++)
             {
                 thread_pool_wait(global_thread_pool, threads[i - 1]);
@@ -411,7 +411,7 @@ void fmpz_mod_poly_factor_distinct_deg_threaded_with_frob(
                 fmpz_mod_poly_fit_length(I + num_threads + 1 + i, v->length - 1, ctx);
                 _fmpz_mod_poly_set_length(I + num_threads + 1 + i, v->length - 1);
                 _fmpz_vec_zero(I[num_threads + 1 + i].coeffs, v->length - 1);
-                
+
                 args3[i].baby = h;
                 args3[i].H    = H + num_threads + 1 + i;
                 args3[i].m    = l;
@@ -429,7 +429,7 @@ void fmpz_mod_poly_factor_distinct_deg_threaded_with_frob(
             }
 
             _fmpz_mod_poly_interval_poly_worker(&args3[0]);
-            
+
             _fmpz_mod_poly_normalise(I + num_threads + 1);
 
             for (i = 1; i < c1; i++)
@@ -456,7 +456,7 @@ void fmpz_mod_poly_factor_distinct_deg_threaded_with_frob(
                 fmpz_mod_poly_remove(v, II, ctx);
                 fmpz_mod_poly_reverse(vinv, v, v->length, ctx);
                 fmpz_mod_poly_inv_series_newton(vinv, vinv, v->length, ctx);
-                
+
                 for (i = 0; i < c1; i++)
                 {
                     fmpz_mod_poly_gcd(I + num_threads + 1 + i,
@@ -483,7 +483,7 @@ void fmpz_mod_poly_factor_distinct_deg_threaded_with_frob(
                 {
                     _fmpz_mod_poly_reduce_matrix_mod_poly(HH + num_threads + 1,
                                                                HH + i, v, ctx);
-                    
+
                     fmpz_mat_clear(HH + i);
                     fmpz_mat_init_set(HH + i, HH + num_threads + 1);
                     fmpz_mat_clear(HH + num_threads + 1);
@@ -491,7 +491,7 @@ void fmpz_mod_poly_factor_distinct_deg_threaded_with_frob(
             }
 
             fmpz_mod_poly_rem(tmp, H + j*(num_threads + 1) - 1, v, ctx);
-            
+
             for (i = 0; i < c2; i++)
             {
                 fmpz_mod_poly_fit_length(H + j*(num_threads + 1) + i,
@@ -506,7 +506,7 @@ void fmpz_mod_poly_factor_distinct_deg_threaded_with_frob(
                 args2[i].poly3inv = vinv;
                 args2[i].ctx      = ctx;
             }
-            
+
             for (i = 1; i < c2; i++)
             {
                 thread_pool_wake(global_thread_pool, threads[i - 1], 0,
@@ -530,7 +530,7 @@ void fmpz_mod_poly_factor_distinct_deg_threaded_with_frob(
                                                                 v->length - 1);
                 _fmpz_vec_zero(I[j*(num_threads + 1) + i].coeffs,
                                                                 v->length - 1);
-                
+
                 args3[i].baby = h;
                 args3[i].H    = H + j*(num_threads + 1) + i;
                 args3[i].m    = l;
@@ -650,7 +650,7 @@ void fmpz_mod_poly_factor_distinct_deg_threaded_with_frob(
     fmpz_mod_poly_clear(vinv, ctx);
     fmpz_mod_poly_clear(tmp, ctx);
     fmpz_mod_poly_clear(II, ctx);
-    
+
     for (i = 0; i < 2*m + l + num_threads + 2; i++)
         fmpz_mod_poly_clear(h + i, ctx);
 

@@ -528,7 +528,7 @@ private:
     typedef mp::merge_tuple<typename merger1::type, temporaries2_t> merger2;
     return2_t tmp2;
     return1_t* ret1;
-    
+
 public:
     typedef typename merger2::type temporaries_t;
 
@@ -1033,7 +1033,7 @@ struct ternary_hhelper<T, Left, right1_t, right2_t, false, false>
             typedef typename E1::ev_traits_t::temp_rule_t ev1;
             typedef typename E2::ev_traits_t::temp_rule_t ev2;
             typedef typename E3::ev_traits_t::temp_rule_t ev3;
-            a3.template doit<ev3>(e3._data(), 
+            a3.template doit<ev3>(e3._data(),
                     a2.template doit<ev2>(e2._data(),
                         a1.template doit<ev1>(e1._data(), temps)));
         }

@@ -24,7 +24,7 @@ int main()
     mp_limb_t p;
     fmpz_comb_t comb;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("comb_init/clear....");
     fflush(stdout);
@@ -48,7 +48,7 @@ int main()
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

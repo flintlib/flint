@@ -73,7 +73,7 @@ main(void)
         fmpz_t e, f;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
-        
+
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(b, ctx);
         TEMPLATE(T, init)(c, ctx);

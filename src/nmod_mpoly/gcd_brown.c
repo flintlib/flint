@@ -891,7 +891,7 @@ int nmod_mpolyn_gcd_brown_smprime_threaded_pool(
         slong k = I->brown_perm[var];
 
         FLINT_ASSERT(var < I->mvars);
-        
+
         g_stab_est = 2 + deggamma + I->Gdeflate_deg_bound[k];
         abar_stab_est = 2 + deggamma + I->Adeflate_deg[k] - I->Gdeflate_deg_bound[k];
         bbar_stab_est = 2 + deggamma + I->Bdeflate_deg[k] - I->Gdeflate_deg_bound[k];
@@ -1209,7 +1209,7 @@ successful_fix_lc:
             nmod_mpolyn_swap(T1, G);
             nmod_mpolyn_swap(T2, Abar);
             goto successful_fix_lc;
-        }        
+        }
     }
     else /* divisibility test == 0 */
     {

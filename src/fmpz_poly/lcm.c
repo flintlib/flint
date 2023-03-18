@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_lcm(fmpz * res, const fmpz * poly1, slong len1, 
+void _fmpz_poly_lcm(fmpz * res, const fmpz * poly1, slong len1,
                                               const fmpz * poly2, slong len2)
 {
     fmpz *W;
@@ -51,7 +51,7 @@ void _fmpz_poly_lcm(fmpz * res, const fmpz * poly1, slong len1,
     _fmpz_vec_clear(W, len2);
 }
 
-void fmpz_poly_lcm(fmpz_poly_t res, const fmpz_poly_t poly1, 
+void fmpz_poly_lcm(fmpz_poly_t res, const fmpz_poly_t poly1,
                                                     const fmpz_poly_t poly2)
 {
     slong len1 = poly1->length;
@@ -85,6 +85,6 @@ void fmpz_poly_lcm(fmpz_poly_t res, const fmpz_poly_t poly1,
         _fmpz_poly_lcm(res->coeffs, poly2->coeffs, len2, poly1->coeffs, len1);
     }
     _fmpz_poly_normalise(res);
-    
+
 }
 

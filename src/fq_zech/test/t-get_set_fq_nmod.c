@@ -20,7 +20,7 @@ main(void)
 {
     int i, j, result;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("get_fq_nmod/set_fq_nmod... ");
     fflush(stdout);
 

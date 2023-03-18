@@ -317,7 +317,7 @@ ca_field_prove_log_relation(ca_field_t K, const fmpz * rel,
 }
 
 slong
-ca_field_insert_log_relation(ca_field_t K, 
+ca_field_insert_log_relation(ca_field_t K,
     fmpz * rel,
     const slong * logs,
     slong index_i,
@@ -672,7 +672,7 @@ qqbar_end:
 }
 
 slong
-ca_field_insert_multiplicative_relation(ca_field_t K, 
+ca_field_insert_multiplicative_relation(ca_field_t K,
     fmpz * rel,
     const slong * powers,
     slong num_powers, ca_ctx_t ctx)
@@ -1159,7 +1159,7 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
             {
                 if (ctx->options[CA_OPT_VERBOSE])
                 {
-                    flint_printf("WARNING: Failed to compute a Groebner basis\n"); 
+                    flint_printf("WARNING: Failed to compute a Groebner basis\n");
                     flint_printf("Current ideal:\n    "); fmpz_mpoly_vec_print(CA_FIELD_IDEAL(K), CA_FIELD_MCTX(K, ctx)); flint_printf("\n\n");
                 }
             }

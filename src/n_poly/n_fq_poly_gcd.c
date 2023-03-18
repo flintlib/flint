@@ -12,7 +12,7 @@
 #include "n_poly.h"
 
 
-slong _n_fq_poly_gcd_euclidean_inplace_(    
+slong _n_fq_poly_gcd_euclidean_inplace_(
     mp_limb_t * A, slong Alen,
     mp_limb_t * B, slong Blen,
     const fq_nmod_ctx_t ctx,
@@ -54,13 +54,13 @@ again:
         if (Blen < 2)
         {
             _n_fq_one(B + d*0, d);
-            return -1 - 1;        
+            return -1 - 1;
         }
 
         FLINT_ASSERT(Alen < 2);
 
         _n_fq_one(A + d*0, d);
-        return 1;        
+        return 1;
     }
 
     if (Alen > Blen)

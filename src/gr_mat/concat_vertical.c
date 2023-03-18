@@ -20,7 +20,7 @@ gr_mat_concat_vertical(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, g
     slong r1 = mat1->r;
     slong c1 = mat1->c;
     slong r2 = mat2->r;
-    
+
     if (mat1->c != mat2->c || res->r != mat1->r + mat2->r)
         return GR_DOMAIN;
 

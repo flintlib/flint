@@ -40,7 +40,7 @@ n_factor_ecm_select_curve(mp_limb_t *f, mp_limb_t sig, mp_limb_t n, n_ecm_t n_ec
     n_ecm_inf->x = n_mulmod_preinv(w, u, n, n_ecm_inf->ninv, n_ecm_inf->normbits);
 
     /* w = v * v */
-    w = n_mulmod_preinv(v, v, n, n_ecm_inf->ninv, n_ecm_inf->normbits); 
+    w = n_mulmod_preinv(v, v, n, n_ecm_inf->ninv, n_ecm_inf->normbits);
 
     /* z = v * v * v */
     n_ecm_inf->z = n_mulmod_preinv(w, v, n, n_ecm_inf->ninv, n_ecm_inf->normbits);
@@ -50,12 +50,12 @@ n_factor_ecm_select_curve(mp_limb_t *f, mp_limb_t sig, mp_limb_t n, n_ecm_t n_ec
                         n_ecm_inf->normbits);
     w = n_mulmod_preinv(u, UWORD(3) << n_ecm_inf->normbits, n, n_ecm_inf->ninv,
                         n_ecm_inf->normbits);
-    
+
     u = n_submod(v, u, n);
     v = n_addmod(v, w, n);
     w = n_mulmod_preinv(u, u, n, n_ecm_inf->ninv, n_ecm_inf->normbits);
     u = n_mulmod_preinv(u, w, n, n_ecm_inf->ninv, n_ecm_inf->normbits);
-    
+
     n_ecm_inf->a24 = n_mulmod_preinv(u, v, n, n_ecm_inf->ninv, n_ecm_inf->normbits);
     v = n_mulmod_preinv(t, n_ecm_inf->z, n, n_ecm_inf->ninv, n_ecm_inf->normbits);
 
@@ -74,7 +74,7 @@ n_factor_ecm_select_curve(mp_limb_t *f, mp_limb_t sig, mp_limb_t n, n_ecm_t n_ec
     u = n_ll_mod_preinv(hi, lo, n, n_ecm_inf->ninv);
 
     v = n_mulmod_preinv(u, t, n, n_ecm_inf->ninv, n_ecm_inf->normbits);
-    n_ecm_inf->x = n_mulmod_preinv(n_ecm_inf->x, v, n, n_ecm_inf->ninv, 
+    n_ecm_inf->x = n_mulmod_preinv(n_ecm_inf->x, v, n, n_ecm_inf->ninv,
                                    n_ecm_inf->normbits);
 
     v = n_mulmod_preinv(u, n_ecm_inf->z, n, n_ecm_inf->ninv, n_ecm_inf->normbits);

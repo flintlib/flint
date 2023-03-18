@@ -15,7 +15,7 @@
 
 #include "templates.h"
 
-void 
+void
 _TEMPLATE(T, poly_div_series) (TEMPLATE(T, struct) * Q, const TEMPLATE(T, struct) * A, slong Alen,
     const TEMPLATE(T, struct) * B, slong Blen, slong n, const TEMPLATE(T, ctx_t) ctx)
 {
@@ -23,12 +23,12 @@ _TEMPLATE(T, poly_div_series) (TEMPLATE(T, struct) * Q, const TEMPLATE(T, struct
 
     TEMPLATE(T, init)(d, ctx);
     TEMPLATE(T, init)(u, ctx);
-     
+
     if (!TEMPLATE(T, is_one)(B + 0, ctx))
        TEMPLATE(T, inv)(u, B + 0, ctx);
     else
        TEMPLATE(T, set_si)(u, 1, ctx);
-      
+
     Alen = FLINT_MIN(Alen, n);
     Blen = FLINT_MIN(Blen, n);
 
@@ -47,7 +47,7 @@ _TEMPLATE(T, poly_div_series) (TEMPLATE(T, struct) * Q, const TEMPLATE(T, struct
         TEMPLATE(T, t) temp;
 
         TEMPLATE(T, init)(temp, ctx);
-    
+
         if (TEMPLATE(T, is_one)(B + 0, ctx))
             TEMPLATE(T, set)(Q + 0, A + 0, ctx);
         else
@@ -77,7 +77,7 @@ _TEMPLATE(T, poly_div_series) (TEMPLATE(T, struct) * Q, const TEMPLATE(T, struct
     else
     {
         TEMPLATE(T, struct) * B2, * Binv = _TEMPLATE(T, vec_init)(n, ctx);
-        
+
         if (n > Blen)
         {
            B2 = _TEMPLATE(T, vec_init)(n, ctx);
@@ -97,7 +97,7 @@ _TEMPLATE(T, poly_div_series) (TEMPLATE(T, struct) * Q, const TEMPLATE(T, struct
     TEMPLATE(T, clear)(u, ctx);
 }
 
-void TEMPLATE(T, poly_div_series)(TEMPLATE(T, poly_t) Q, const TEMPLATE(T, poly_t) A, 
+void TEMPLATE(T, poly_div_series)(TEMPLATE(T, poly_t) Q, const TEMPLATE(T, poly_t) A,
                                          const TEMPLATE(T, poly_t) B, slong n, const TEMPLATE(T, ctx_t) ctx)
 {
     slong Alen = FLINT_MIN(A->length, n);

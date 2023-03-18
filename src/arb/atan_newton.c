@@ -12,7 +12,7 @@
 #include "arb.h"
 #include "arb_fmpz_poly.h"
 
-static const fmpz atan_coeffs[] = 
+static const fmpz atan_coeffs[] =
 {
     334639305, -111546435, 66927861, -47805615, 37182145,
     -30421755, 25741485, -22309287, 19684665, -17612595,

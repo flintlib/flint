@@ -13,7 +13,7 @@
 #include "acb_hypgeom.h"
 #include "arb_hypgeom.h"
 
-static void 
+static void
 _acb_hypgeom_2f1r_reduced(acb_t res,
     const acb_t b, const acb_t c, const acb_t z, slong prec)
 {

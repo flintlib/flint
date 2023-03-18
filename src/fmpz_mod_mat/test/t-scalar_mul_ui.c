@@ -19,7 +19,7 @@ main(void)
 {
     slong m, n, rep;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("scalar_mul_ui....");
     fflush(stdout);
@@ -37,7 +37,7 @@ main(void)
 	fmpz_init(mod);
 	fmpz_randtest_not_zero(mod, state, 200);
         fmpz_abs(mod, mod);
-        
+
 	c = n_randbits(state, n_randint(state, FLINT_BITS));
 
         fmpz_mod_mat_init(A, m, n, mod);
@@ -84,7 +84,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

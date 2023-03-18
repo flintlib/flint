@@ -18,7 +18,7 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("divides....");
     fflush(stdout);
 
@@ -40,7 +40,7 @@ main(void)
         fmpz_mod_poly_init(b, ctx);
         fmpz_mod_poly_init(q, ctx);
         fmpz_mod_poly_init(prod, ctx);
-        
+
         fmpz_mod_poly_randtest(a, state, n_randint(state, 300), ctx);
         fmpz_mod_poly_randtest(b, state, n_randint(state, 300), ctx);
 
@@ -62,7 +62,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         fmpz_clear(n);
 	fmpz_mod_ctx_clear(ctx);
 	fmpz_mod_poly_clear(a, ctx);
@@ -89,7 +89,7 @@ main(void)
         fmpz_mod_poly_init(b, ctx);
         fmpz_mod_poly_init(q, ctx);
         fmpz_mod_poly_init(prod, ctx);
-        
+
         fmpz_mod_poly_randtest(a, state, n_randint(state, 300), ctx);
         fmpz_mod_poly_randtest(b, state, n_randint(state, 300), ctx);
         fmpz_mod_poly_mul(a, b, a, ctx);
@@ -110,7 +110,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         fmpz_clear(n);
 	fmpz_mod_ctx_clear(ctx);
 	fmpz_mod_poly_clear(a, ctx);
@@ -128,7 +128,7 @@ main(void)
         fmpz_t n;
 
         fmpz_init(n);
-	
+
         do fmpz_randtest_unsigned(n, state, 2 * FLINT_BITS);
         while (!fmpz_is_probabprime(n));
         fmpz_mod_ctx_init(ctx, n);
@@ -136,7 +136,7 @@ main(void)
         fmpz_mod_poly_init(a, ctx);
         fmpz_mod_poly_init(b, ctx);
         fmpz_mod_poly_init(q, ctx);
-        
+
         fmpz_mod_poly_randtest(a, state, n_randint(state, 100), ctx);
         fmpz_mod_poly_randtest(b, state, n_randint(state, 100), ctx);
 
@@ -155,7 +155,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         fmpz_clear(n);
 	fmpz_mod_ctx_clear(ctx);
 	fmpz_mod_poly_clear(a, ctx);
@@ -180,7 +180,7 @@ main(void)
         fmpz_mod_poly_init(a, ctx);
         fmpz_mod_poly_init(b, ctx);
         fmpz_mod_poly_init(q, ctx);
-        
+
         fmpz_mod_poly_randtest(a, state, n_randint(state, 100), ctx);
         fmpz_mod_poly_randtest(b, state, n_randint(state, 100), ctx);
 
@@ -199,7 +199,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         fmpz_clear(n);
 	fmpz_mod_ctx_clear(ctx);
 	fmpz_mod_poly_clear(a, ctx);
@@ -208,7 +208,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

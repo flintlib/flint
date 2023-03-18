@@ -33,7 +33,7 @@ fmpq_mat_pivot(slong * perm, fmpq_mat_t mat, slong r, slong c)
 
             u = mat->rows[j];
             mat->rows[j] = mat->rows[r];
-            mat->rows[r] = u; 
+            mat->rows[r] = u;
             return -1;
         }
     }

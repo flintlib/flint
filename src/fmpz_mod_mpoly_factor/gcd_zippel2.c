@@ -342,7 +342,7 @@ void fmpz_mod_mpoly_mock_eval_coeff(
     {
         mock->alloc = FLINT_MAX(Aeh_inc->length, mock->alloc + mock->alloc/2);
         mock->coeffs = FLINT_ARRAY_REALLOC(mock->coeffs, mock->alloc,
-                                                         fmpz_mod_poly_struct);        
+                                                         fmpz_mod_poly_struct);
     }
 
     mock->length = Aeh_inc->length;
@@ -854,7 +854,7 @@ choose_alphas:
                     fmpz_mod_mpoly_repack_bits_inplace(rG, bits, ctx);
                     fmpz_mod_mpoly_repack_bits_inplace(rBbar, bits, ctx);
                     break;
-                }                
+                }
             }
             else
             {
@@ -890,7 +890,7 @@ choose_alphas:
                     fmpz_mod_mpoly_repack_bits_inplace(rG, bits, ctx);
                     fmpz_mod_mpoly_repack_bits_inplace(rAbar, bits, ctx);
                     break;
-                }                
+                }
             }
             else
             {
@@ -1026,7 +1026,7 @@ choose_alphas:
                     goto choose_betas;
 
                 success = fmpz_mod_polyu1n_gcd_brown_smprime(Gev, Abarev, Bbarev,
-                      Aev, Bev, ctx->ffinfo, St->poly_stack, St->polyun_stack);        
+                      Aev, Bev, ctx->ffinfo, St->poly_stack, St->polyun_stack);
                 if (!success)
                     goto cleanup;
 
@@ -1270,7 +1270,7 @@ gcd_is_trivial:
     fmpz_mod_mpoly_set(rBbar, B, ctx);
 
     success = 1;
-    
+
     goto cleanup;
 }
 

@@ -32,7 +32,7 @@ _TEMPLATE(T, poly_compose_horner) (TEMPLATE(T, struct) * rop,
         TEMPLATE(T, struct) * t = _TEMPLATE(T, vec_init) (alloc, ctx);
 
         /*
-           Perform the first two steps as one, 
+           Perform the first two steps as one,
            "res = a(m) * poly2 + a(m-1)".
          */
         {

@@ -14,7 +14,7 @@
 #include "fmpz_mod_mat.h"
 #include "fmpz_mod_poly.h"
 
-slong _fmpz_mod_mat_reduce_row(fmpz_mod_mat_t A, slong * P, slong * L, 
+slong _fmpz_mod_mat_reduce_row(fmpz_mod_mat_t A, slong * P, slong * L,
                                              slong m, const fmpz_mod_ctx_t ctx)
 {
     slong n = fmpz_mod_mat_ncols(A), i, j, r;
@@ -36,18 +36,18 @@ slong _fmpz_mod_mat_reduce_row(fmpz_mod_mat_t A, slong * P, slong * L,
                     fmpz_mod_sub(fmpz_mod_mat_entry(A, m, j),
                                  fmpz_mod_mat_entry(A, m, j), h, ctx);
                 }
- 
+
                 fmpz_zero(fmpz_mod_mat_entry(A, m, i));
             }
             else
             {
                 fmpz_mod_inv(h, fmpz_mod_mat_entry(A, m, i), ctx);
                 fmpz_one(fmpz_mod_mat_entry(A, m, i));
-           
+
                 for (j = i + 1; j < L[m]; j++)
                     fmpz_mod_mul(fmpz_mod_mat_entry(A, m, j),
                                  fmpz_mod_mat_entry(A, m, j), h, ctx);
-               
+
                 P[i] = m;
 
                 fmpz_clear(h);

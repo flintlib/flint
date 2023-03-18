@@ -21,7 +21,7 @@ int main(void)
     flint_printf("sqrtmod....");
     fflush(stdout);
 
-    
+
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++) /* Test random integers */
     {
@@ -79,7 +79,7 @@ int main(void)
         fmpz_init(p);
 
         fmpz_set_ui(p, prime);
-        do 
+        do
             fmpz_randm(b, state, p);
         while (fmpz_is_zero(b));
 
@@ -120,7 +120,7 @@ int main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -23,37 +23,37 @@ void fft_precache(mp_limb_t ** jj, slong depth, slong limbs, slong trunc,
    if (depth <= 6)
    {
       trunc = 2*((trunc + 1)/2);
-      
+
       fft_truncate_sqrt2(jj, n, w, t1, t2, s1, trunc);
 
       for (j = 0; j < trunc; j++)
-         mpn_normmod_2expp1(jj[j], limbs);         
+         mpn_normmod_2expp1(jj[j], limbs);
    } else
    {
       trunc = 2*sqrt*((trunc + 2*sqrt - 1)/(2*sqrt));
-      
+
       fft_mfa_truncate_sqrt2(jj, n, w, t1, t2, s1, sqrt, trunc);
 
       for (j = 0; j < 2*n; j++)
          mpn_normmod_2expp1(jj[j], limbs);
-           
+
       trunc2 = (trunc - 2*n)/sqrt;
-      
+
       for (s = 0; s < trunc2; s++)
       {
          t = n_revbin(s, depth - depth/2 + 1);
-         
+
          for (u = 0; u < sqrt; u++)
          {
             j = 2*n + t*sqrt + u;
             mpn_normmod_2expp1(jj[j], limbs);
          }
-      }  
+      }
    }
 }
 
-void fft_convolution_precache(mp_limb_t ** ii, mp_limb_t ** jj, slong depth, 
-                              slong limbs, slong trunc, mp_limb_t ** t1, 
+void fft_convolution_precache(mp_limb_t ** ii, mp_limb_t ** jj, slong depth,
+                              slong limbs, slong trunc, mp_limb_t ** t1,
                           mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t ** tt)
 {
    slong n = (WORD(1)<<depth), j, s, t, u, trunc2;
@@ -63,13 +63,13 @@ void fft_convolution_precache(mp_limb_t ** ii, mp_limb_t ** jj, slong depth,
    if (depth <= 6)
    {
       trunc = 2*((trunc + 1)/2);
-      
+
       fft_truncate_sqrt2(ii, n, w, t1, t2, s1, trunc);
-   
+
       for (j = 0; j < trunc; j++)
       {
          mpn_normmod_2expp1(ii[j], limbs);
-         
+
          fft_mulmod_2expp1(ii[j], ii[j], jj[j], n, w, *tt);
       }
 
@@ -83,27 +83,27 @@ void fft_convolution_precache(mp_limb_t ** ii, mp_limb_t ** jj, slong depth,
    } else
    {
       trunc = 2*sqrt*((trunc + 2*sqrt - 1)/(2*sqrt));
-      
+
       fft_mfa_truncate_sqrt2(ii, n, w, t1, t2, s1, sqrt, trunc);
-   
+
       for (j = 0; j < 2*n; j++)
       {
          mpn_normmod_2expp1(ii[j], limbs);
-         
+
          fft_mulmod_2expp1(ii[j], ii[j], jj[j], n, w, *tt);
       }
 
       trunc2 = (trunc - 2*n)/sqrt;
-      
+
       for (s = 0; s < trunc2; s++)
       {
          t = n_revbin(s, depth - depth/2 + 1);
-         
+
          for (u = 0; u < sqrt; u++)
          {
             j = 2*n + t*sqrt + u;
             mpn_normmod_2expp1(ii[j], limbs);
-         
+
             fft_mulmod_2expp1(ii[j], ii[j], jj[j], n, w, *tt);
          }
       }

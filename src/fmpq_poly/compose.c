@@ -16,7 +16,7 @@
 #include "fmpq_poly.h"
 
 void
-_fmpq_poly_compose(fmpz * res, fmpz_t den, const fmpz * poly1, const fmpz_t den1, 
+_fmpq_poly_compose(fmpz * res, fmpz_t den, const fmpz * poly1, const fmpz_t den1,
                    slong len1, const fmpz * poly2, const fmpz_t den2, slong len2)
 {
     if (*den2 == WORD(1))
@@ -31,24 +31,24 @@ _fmpq_poly_compose(fmpz * res, fmpz_t den, const fmpz * poly1, const fmpz_t den1
         fmpz * v = _fmpz_vec_init(len1);
         fmpz_init(one);
         fmpz_one(one);
-        
+
         _fmpq_poly_rescale(v, den, poly1, den1, len1, one, den2);
         _fmpz_poly_compose(res, v, len1, poly2, len2);
         _fmpq_poly_canonicalise(res, den, (len1 - WORD(1)) * (len2 - WORD(1)) + WORD(1));
-        
+
         fmpz_clear(one);
         _fmpz_vec_clear(v, len1);
     }
 }
 
 void
-fmpq_poly_compose(fmpq_poly_t res, 
+fmpq_poly_compose(fmpq_poly_t res,
                               const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 {
     const slong len1 = poly1->length;
     const slong len2 = poly2->length;
     slong lenr;
-    
+
     if (len1 == WORD(0))
     {
         fmpq_poly_zero(res);
@@ -74,14 +74,14 @@ fmpq_poly_compose(fmpq_poly_t res,
         _fmpq_poly_normalise(res);
         return;
     }
-    
+
     lenr = (len1 - WORD(1)) * (len2 - WORD(1)) + WORD(1);
-    
+
     if ((res != poly1) && (res != poly2))
     {
         fmpq_poly_fit_length(res, lenr);
-        _fmpq_poly_compose(res->coeffs, res->den, 
-                           poly1->coeffs, poly1->den, len1, 
+        _fmpq_poly_compose(res->coeffs, res->den,
+                           poly1->coeffs, poly1->den, len1,
                            poly2->coeffs, poly2->den, len2);
         _fmpq_poly_set_length(res, lenr);
         _fmpq_poly_normalise(res);
@@ -90,7 +90,7 @@ fmpq_poly_compose(fmpq_poly_t res,
     {
         fmpq_poly_t t;
         fmpq_poly_init2(t, lenr);
-        _fmpq_poly_compose(t->coeffs, t->den, 
+        _fmpq_poly_compose(t->coeffs, t->den,
                            poly1->coeffs, poly1->den, len1,
                            poly2->coeffs, poly2->den, len2);
         _fmpq_poly_set_length(t, lenr);

@@ -40,7 +40,7 @@ main(void)
 
         fmpz_mod_poly_init(a, ctx);
         fmpz_mod_poly_init(b, ctx);
-        
+
         nmod_poly_init(c, fmpz_get_ui(p));
 
         fmpz_mod_poly_randtest(a, state, n_randint(state, 100), ctx);
@@ -66,7 +66,7 @@ main(void)
 
     fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

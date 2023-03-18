@@ -25,7 +25,7 @@ main(void)
     flint_printf("hensel_start_continue_lift....");
     fflush(stdout);
 
-    
+
 
     /* We check that lifting local factors of F yields factors */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -50,7 +50,7 @@ main(void)
         nmod_poly_factor_init(f_fac);
         fmpz_poly_factor_init(F_fac);
 
-        n = n_randprime(state, nbits, 0); 
+        n = n_randprime(state, nbits, 0);
         exp = bits / (FLINT_BIT_COUNT(n) - 1) + 1;
         part_exp = n_randint(state, exp);
 
@@ -108,9 +108,9 @@ main(void)
 
             fmpz_init_set_ui(nn, n);
 
-            prev_exp = _fmpz_poly_hensel_start_lift(F_fac, link, v, w, 
+            prev_exp = _fmpz_poly_hensel_start_lift(F_fac, link, v, w,
                 F, f_fac, part_exp);
-            _fmpz_poly_hensel_continue_lift(F_fac, link, v, w, 
+            _fmpz_poly_hensel_continue_lift(F_fac, link, v, w,
                 F, prev_exp, part_exp, exp, nn);
 
             fmpz_clear(nn);
@@ -133,7 +133,7 @@ main(void)
         flint_free(v);
         flint_free(w);
 
-        if (!result) 
+        if (!result)
         {
             flint_printf("FAIL:\n");
             flint_printf("bits = %wd, n = %wd, exp = %wd\n", bits, n, exp);
@@ -143,7 +143,7 @@ main(void)
             fmpz_poly_factor_print(F_fac); flint_printf("\n\n");
             fflush(stdout);
             flint_abort();
-        } 
+        }
 
         nmod_poly_factor_clear(f_fac);
         fmpz_poly_factor_clear(F_fac);
@@ -155,7 +155,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

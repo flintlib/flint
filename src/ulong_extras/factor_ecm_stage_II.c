@@ -17,7 +17,7 @@ int
 n_factor_ecm_stage_II(mp_limb_t *f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
                       mp_limb_t n, n_ecm_t n_ecm_inf)
 {
-    
+
     mp_limb_t g, Qx, Qz, Rx, Rz, Qdx, Qdz, a, b;
     mp_limb_t mmin, mmax, maxj, Q0x2, Q0z2;
     int i, j, ret;
@@ -25,7 +25,7 @@ n_factor_ecm_stage_II(mp_limb_t *f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
 
     mmin = (B1 + (P/2)) / P;
     mmax = ((B2 - P/2) + P - 1)/P;      /* ceil */
-    maxj = (P + 1)/2; 
+    maxj = (P + 1)/2;
 
     g = n_ecm_inf->one;
 
@@ -48,12 +48,12 @@ n_factor_ecm_stage_II(mp_limb_t *f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
     /* For each odd j (j > 3) , compute j * Q0 [x0 :: z0] */
     /* jth stored in arr[j/2] */
 
-    /* We are adding 2Q0 every time. Need to calculate all j's 
+    /* We are adding 2Q0 every time. Need to calculate all j's
        as (j - 2)Q0 is required for (j + 2)Q0 */
 
     for (j = 2; j <= (maxj >> 1); j += 1)
     {
-        /* jQ0 = (j - 2)Q0 + 2Q0 
+        /* jQ0 = (j - 2)Q0 + 2Q0
            Difference is (j - 4)Q0 */
 
         n_factor_ecm_add(arrx + j, arrz + j, arrx[j - 1], arrz[j - 1], Q0x2,
@@ -87,7 +87,7 @@ n_factor_ecm_stage_II(mp_limb_t *f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
         a = Rx;
         b = Rz;
 
-        /* R = R + Q    
+        /* R = R + Q
            difference is stored in Qd, initially (Mmin - 1)Q */
 
         n_factor_ecm_add(&Rx, &Rz, Rx, Rz, Qx, Qz, Qdx, Qdz, n, n_ecm_inf);

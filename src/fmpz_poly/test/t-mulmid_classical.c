@@ -23,7 +23,7 @@ main(void)
     flint_printf("mulmid_classical....");
     fflush(stdout);
 
-    
+
 
     /* Check aliasing of a and b */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
@@ -130,7 +130,7 @@ main(void)
         fmpz_poly_clear(d);
     }
 
-    
+
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

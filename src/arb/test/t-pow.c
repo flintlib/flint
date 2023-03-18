@@ -164,7 +164,7 @@ int main()
 
         arb_set(c, b);
         arb_pow(c, a, c, prec);
-        
+
         if (!arb_overlaps(c, d))
         {
             flint_printf("FAIL: interval from zero; alias 2\n\n");

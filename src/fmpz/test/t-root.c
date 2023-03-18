@@ -38,7 +38,7 @@ main(void)
         mpz_init(mg);
 
         n = n_randint(state, 20) + 1;
-        
+
         fmpz_randtest(g, state, 200);
         if ((n & 1) == 0)
             fmpz_abs(g, g);
@@ -77,7 +77,7 @@ main(void)
         fmpz_init(pow);
 
         n = n_randint(state, 20) + 1;
-        
+
         fmpz_randtest(g, state, 200);
         if ((n & 1) == 0)
             fmpz_abs(g, g);
@@ -113,7 +113,7 @@ main(void)
         fmpz_init(pow);
 
         n = n_randint(state, 20) + 2;
-        
+
         while (fmpz_cmp_ui(g, 2) < 0)
             fmpz_randtest_unsigned(g, state, 200);
 
@@ -160,7 +160,7 @@ main(void)
         mpz_init(mf2);
 
         n = n_randint(state, 20) + 1;
-        
+
         fmpz_randtest(f, state, 200);
         if ((n & 1) == 0)
             fmpz_abs(f, f);
@@ -188,7 +188,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

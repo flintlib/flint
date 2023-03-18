@@ -22,7 +22,7 @@ int
 main(void)
 {
     int i;
-    
+
     FLINT_TEST_INIT(state);
 
     flint_printf("mul_matrix... ");
@@ -51,7 +51,7 @@ main(void)
 
         TEMPLATE(T, mul)(a, a, a, ctx);
         TEMPLATE(T, embed_mul_matrix)(mat_a_sq, a, ctx);
-        
+
         TEMPLATE(B, mat_mul)(mat_a_a, mat_a, mat_a);
 
         if (!TEMPLATE(B, mat_equal)(mat_a_a, mat_a_sq)) {

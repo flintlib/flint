@@ -27,7 +27,7 @@ int main(void)
     flint_printf("sizeinbase....");
     fflush(stdout);
 
-    
+
     mpz_init(t);
     str = flint_malloc((FLINT_BITS + 1) * sizeof(char));
 
@@ -56,7 +56,7 @@ int main(void)
     mpz_clear(t);
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

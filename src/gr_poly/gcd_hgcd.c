@@ -45,8 +45,8 @@ do {                                                                \
 } while (0)
 
 /*
-    XXX: Incidentally, this implementation currently supports aliasing.  
-    But since this may change in the future, no function other than 
+    XXX: Incidentally, this implementation currently supports aliasing.
+    But since this may change in the future, no function other than
     gr_poly_gcd_hgcd() should rely on this.
  */
 

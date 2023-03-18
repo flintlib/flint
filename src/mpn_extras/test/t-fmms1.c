@@ -18,7 +18,7 @@ int main(void)
     fmpz_t X1, X2, Y, T;
     mp_limb_t * y, a1, * x1, a2, * x2;
     mp_size_t yn, n;
-    
+
     FLINT_TEST_INIT(state);
 
     flint_printf("fmms1....");
@@ -61,7 +61,7 @@ int main(void)
                 flint_printf("check positive answer, i = %wd\n", i);
                 fflush(stdout);
                 flint_abort();
-            }            
+            }
         }
         else if (yn == 0)
         {
@@ -81,7 +81,7 @@ int main(void)
                 flint_printf("check failed answer, i = %wd\n", i);
                 fflush(stdout);
                 flint_abort();
-            }            
+            }
         }
 
         flint_free(x1);
@@ -95,7 +95,7 @@ int main(void)
     fmpz_clear(T);
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

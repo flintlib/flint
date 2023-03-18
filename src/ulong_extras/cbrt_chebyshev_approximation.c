@@ -16,10 +16,10 @@
 #include "ulong_extras.h"
 
 /* Coefficients of Chebyshev's approximation polynomial (deg 2) {c0, c1, c2}
-   splitting 0.5 to 1 into 8 equal intervals 
+   splitting 0.5 to 1 into 8 equal intervals
 
    Values of these coefficients of Chebyshev's approximation polynomial have been
-   calculated from the python module, "mpmath" - https://mpmath.org/   
+   calculated from the python module, "mpmath" - https://mpmath.org/
    function call:
    mpmath.chebyfit(lambda x: mpmath.root(x,3), [i, j], 3, error=True)
    where (i, j) is the  range                                                           */
@@ -46,7 +46,7 @@ static const float coeff[16][3] = {{0.445434042, 0.864136635, -0.335205926},    
 mp_limb_t
 n_cbrt_chebyshev_approx(mp_limb_t n)
 {
-    typedef union { 
+    typedef union {
         mp_limb_t  uword_val;
 #ifdef FLINT64
         double     double_val;
@@ -68,7 +68,7 @@ n_cbrt_chebyshev_approx(mp_limb_t n)
     const mp_limb_t mantissa_mask = 0x000FFFFFFFFFFFFF; /* mantissa bits in float */
     const mp_limb_t table_mask = 0x000F000000000000;    /* first 4 bits of mantissa */
     const int mantissa_bits = 52;
-    const mp_limb_t bias_hex = 0x3FE0000000000000;      
+    const mp_limb_t bias_hex = 0x3FE0000000000000;
     const int bias = 1022;
     alias.double_val = (double)n;
 #else
@@ -77,7 +77,7 @@ n_cbrt_chebyshev_approx(mp_limb_t n)
     const mp_limb_t mantissa_mask = 0x007FFFFF; /* mantissa bits in float */
     const mp_limb_t table_mask = 0x00780000;    /* first 4 bits of mantissa */
     const int mantissa_bits = 23;
-    const mp_limb_t bias_hex = 0x3F000000;      
+    const mp_limb_t bias_hex = 0x3F000000;
     const int bias = 126;
     alias.double_val = (float)n;
 #endif
@@ -105,7 +105,7 @@ n_cbrt_chebyshev_approx(mp_limb_t n)
 
     /* Calculating cube root of dec using chebyshev approximation polynomial */
     /* Evaluating approx polynomial at (dec) by Estrin's scheme */
-    
+
     dec2 = dec*dec;
     root = (coeff[table_index][0] + coeff[table_index][1] * dec);
     root += (coeff[table_index][2] * dec2);
@@ -117,7 +117,7 @@ n_cbrt_chebyshev_approx(mp_limb_t n)
 
     /* In case ret^3 or (ret+1)^3 will cause overflow */
 
-    if (ret >= upper_limit)      
+    if (ret >= upper_limit)
     {
         if (n >= upper_limit * upper_limit * upper_limit)
             return upper_limit;

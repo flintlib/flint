@@ -15,7 +15,7 @@
 #define FMPZ_LLL_H
 
 #ifdef FMPZ_LLL_INLINES_C
-#define FMPZ_LLL_INLINE 
+#define FMPZ_LLL_INLINE
 #else
 #define FMPZ_LLL_INLINE static __inline__
 #endif
@@ -163,6 +163,6 @@ void fmpz_lll_storjohann_ulll(fmpz_mat_t FM, slong new_size, const fmpz_lll_t fl
 #ifdef __cplusplus
 }
 #endif
- 
+
 #endif
 

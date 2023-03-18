@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2009, 2011 William Hart
 
     This file is part of FLINT.
@@ -20,7 +20,7 @@ void set_p(mpz_t p, mp_size_t n, flint_bitcnt_t w)
    flint_mpz_add_ui(p, p, 1);
 }
 
-void ref_butterfly_lshB(mpz_t t, mpz_t u, mpz_t i1, mpz_t i2, 
+void ref_butterfly_lshB(mpz_t t, mpz_t u, mpz_t i1, mpz_t i2,
                                  mpz_t p, mp_size_t x, mp_size_t y)
 {
    mpz_add(t, i1, i2);
@@ -37,13 +37,13 @@ main(void)
     mp_size_t c, bits, j, k, x, y, n, w, limbs;
     mpz_t p, ma, mb, m2a, m2b, mn1, mn2;
     mp_limb_t * nn1, * nn2, * r1, * r2;
-   
+
     FLINT_TEST_INIT(state);
 
     flint_printf("butterfly_lshB....");
     fflush(stdout);
 
-    
+
     _flint_rand_init_gmp(state);
 
     mpz_init(p);
@@ -53,7 +53,7 @@ main(void)
     mpz_init(m2b);
     mpz_init(mn1);
     mpz_init(mn2);
-   
+
     for (bits = FLINT_BITS; bits < 20*FLINT_BITS; bits += FLINT_BITS)
     {
         for (j = 1; j < 10; j++)
@@ -69,7 +69,7 @@ main(void)
                 {
                     x = n_randint(state, limbs);
                     y = n_randint(state, limbs);
-                    
+
                     nn1 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
                     nn2 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
                     r1 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
@@ -77,15 +77,15 @@ main(void)
                     flint_mpn_rrandom(nn1, state->gmp_state, limbs);
                     random_fermat(nn1, state, limbs);
                     random_fermat(nn2, state, limbs);
-                     
+
                     fermat_to_mpz(mn1, nn1, limbs);
                     fermat_to_mpz(mn2, nn2, limbs);
                     set_p(p, n, w);
-            
+
                     butterfly_lshB(r1, r2, nn1, nn2, limbs, x, y);
                     fermat_to_mpz(m2a, r1, limbs);
                     fermat_to_mpz(m2b, r2, limbs);
-                    
+
                     mpz_mod(m2a, m2a, p);
                     mpz_mod(m2b, m2b, p);
                     ref_butterfly_lshB(ma, mb, mn1, mn2, p, x, y);
@@ -112,7 +112,7 @@ main(void)
                         fflush(stdout);
                         flint_abort();
                     }
-                    
+
                     flint_free(nn1);
                     flint_free(nn2);
                     flint_free(r1);
@@ -131,7 +131,7 @@ main(void)
     mpz_clear(mn2);
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

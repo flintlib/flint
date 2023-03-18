@@ -13,7 +13,7 @@
 #include "fmpq_poly.h"
 
 /*
-    Macro wrapping _fmpq_fprint(file, x, y), ensuring that the printed 
+    Macro wrapping _fmpq_fprint(file, x, y), ensuring that the printed
     rational is in lowest terms.  Assumes that y > 0.
  */
 
@@ -38,8 +38,8 @@ do {                               \
 /* checks if x/y == +/- 1, where (x, y) need not be in lowest terms */
 #define __fmpq_is_pm1(x,y) (fmpz_cmpabs((x),(y)) == 0)
 
-int _fmpq_poly_fprint_pretty(FILE * file, 
-                             const fmpz *poly, const fmpz_t den, slong len, 
+int _fmpq_poly_fprint_pretty(FILE * file,
+                             const fmpz *poly, const fmpz_t den, slong len,
                              const char * x)
 {
     fmpz_t n, d, g;
@@ -71,7 +71,7 @@ int _fmpq_poly_fprint_pretty(FILE * file,
             __fmpq_fprint(poly + 1, den);
             flint_fprintf(file, "*%s", x);
         }
-        
+
         if (fmpz_sgn(poly + 0) > 0)
         {
             flint_fprintf(file, "+");
@@ -160,7 +160,7 @@ int _fmpq_poly_fprint_pretty(FILE * file,
 
 #undef __fmpq_fprint
 
-int fmpq_poly_fprint_pretty(FILE * file, 
+int fmpq_poly_fprint_pretty(FILE * file,
                             const fmpq_poly_t poly, const char * var)
 {
     return _fmpq_poly_fprint_pretty(file, poly->coeffs, poly->den, poly->length, var);

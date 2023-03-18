@@ -18,7 +18,7 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("pow_trunc....");
     fflush(stdout);
@@ -38,16 +38,16 @@ main(void)
         trunc = n_randint(state, 30);
 
         nmod_poly_pow_trunc(b, a, e, trunc);
-        
+
         nmod_poly_pow(c, a, e);
         nmod_poly_truncate(c, trunc);
-        
-        result = (nmod_poly_equal(b, c) 
+
+        result = (nmod_poly_equal(b, c)
             || (a->length == 0 && e == 0 && c->length == 1 && c->coeffs[0] == 1));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("a->length = %wd, n = %wu, exp = %wd, trunc = %wd\n", 
+            flint_printf("a->length = %wd, n = %wu, exp = %wd, trunc = %wd\n",
                 a->length, a->mod.n, e, trunc);
             nmod_poly_print(a), flint_printf("\n\n");
             nmod_poly_print(b), flint_printf("\n\n");
@@ -76,15 +76,15 @@ main(void)
         trunc = n_randint(state, 30);
 
         nmod_poly_pow_trunc(b, a, e, trunc);
-        
+
         nmod_poly_set(c, a);
         nmod_poly_pow_trunc(c, c, e, trunc);
-        
+
         result = (nmod_poly_equal(b, c));
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("a->length = %wd, n = %wu, exp = %wd, trunc = %wd\n", 
+            flint_printf("a->length = %wd, n = %wu, exp = %wd, trunc = %wd\n",
                 a->length, a->mod.n, e, trunc);
             nmod_poly_print(a), flint_printf("\n\n");
             nmod_poly_print(b), flint_printf("\n\n");
@@ -99,7 +99,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

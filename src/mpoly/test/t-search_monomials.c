@@ -61,7 +61,7 @@ main(void)
         N = mpoly_words_per_exp(fg_bits, ctx->minfo);
         cmpmask = (ulong*) flint_malloc(N*sizeof(ulong));
         mpoly_get_cmpmask(cmpmask, N, fg_bits, ctx->minfo);
-        
+
 
         fexp = (ulong *) flint_malloc(f->length*N*sizeof(ulong));
         gexp = (ulong *) flint_malloc(g->length*N*sizeof(ulong));
@@ -186,7 +186,7 @@ main(void)
     flint_printf("PASS\n");
 
     FLINT_TEST_CLEANUP(state);
-    
+
     return 0;
 
 }

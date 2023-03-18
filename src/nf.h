@@ -41,7 +41,7 @@ typedef struct {
       fmpz_preinvn_t qq; /* precomputed inverse for leading coeff of num(pol), QQ case */
    } pinv;
    union { /* powers of the generator mod pol */
-      fmpq_poly_powers_precomp_t qq; 
+      fmpq_poly_powers_precomp_t qq;
       fmpz_poly_powers_precomp_t zz;
    } powers;
    fmpq_poly_t traces; /* S_k = sum_i \theta_i^k for k = 0, 1, 2, ..., (n-1) */

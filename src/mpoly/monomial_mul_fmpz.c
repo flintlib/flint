@@ -57,7 +57,7 @@ void mpoly_monomial_mul_fmpz(ulong * exp2, const ulong * exp3,
             for (i = 0; i < N; i++)
                 exp2[i] = t[i];
 
-            TMP_END;            
+            TMP_END;
         }
     }
 }

@@ -23,7 +23,7 @@ main(void)
     FLINT_TEST_INIT(state);
 
     flint_printf("divides....");
-    fflush(stdout);    
+    fflush(stdout);
 
     /* Check aliasing of q and a */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
@@ -76,7 +76,7 @@ main(void)
 
         if (n_randint(state, 2))
             fmpq_poly_mul(a, a, b);
-	
+
 	d1 = fmpq_poly_divides(q, a, b);
         d2 = fmpq_poly_divides(b, a, b);
 
@@ -114,7 +114,7 @@ main(void)
 
         if (n_randint(state, 2))
            fmpq_poly_mul(a, a, b);
-	 
+
 	fmpq_poly_divrem(q, r, a, b);
         d1 = fmpq_poly_divides(q2, a, b);
 
@@ -144,7 +144,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

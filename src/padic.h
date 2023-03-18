@@ -13,7 +13,7 @@
 #define PADIC_H
 
 #ifdef PADIC_INLINES_C
-#define PADIC_INLINE 
+#define PADIC_INLINE
 #else
 #define PADIC_INLINE static __inline__
 #endif
@@ -60,8 +60,8 @@ slong padic_get_prec(const padic_t x)
 
 enum padic_print_mode
 {
-    PADIC_TERSE, 
-    PADIC_SERIES, 
+    PADIC_TERSE,
+    PADIC_SERIES,
     PADIC_VAL_UNIT
 };
 
@@ -90,12 +90,12 @@ typedef padic_inv_struct padic_inv_t[1];
 
 /* Context *******************************************************************/
 
-void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, slong min, slong max, 
+void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, slong min, slong max,
                     enum padic_print_mode mode);
 
 void padic_ctx_clear(padic_ctx_t ctx);
 
-PADIC_INLINE 
+PADIC_INLINE
 int _padic_ctx_pow_ui(fmpz_t rop, ulong e, const padic_ctx_t ctx)
 {
     if (ctx->min <= (slong) e && (slong) e < ctx->max)
@@ -120,7 +120,7 @@ int _padic_ctx_pow_ui(fmpz_t rop, ulong e, const padic_ctx_t ctx)
     }
 }
 
-PADIC_INLINE 
+PADIC_INLINE
 void padic_ctx_pow_ui(fmpz_t rop, ulong e, const padic_ctx_t ctx)
 {
     if (ctx->min <= (slong) e && (slong) e < ctx->max)
@@ -168,10 +168,10 @@ void padic_reduce(padic_t rop, const padic_ctx_t ctx);
 
 void padic_randtest(padic_t rop, flint_rand_t state, const padic_ctx_t ctx);
 
-void padic_randtest_not_zero(padic_t rop, flint_rand_t state, 
+void padic_randtest_not_zero(padic_t rop, flint_rand_t state,
                              const padic_ctx_t ctx);
 
-void padic_randtest_int(padic_t rop, flint_rand_t state, 
+void padic_randtest_int(padic_t rop, flint_rand_t state,
                         const padic_ctx_t ctx);
 
 /* Assignments and conversions ***********************************************/
@@ -246,7 +246,7 @@ PADIC_INLINE int padic_is_one(const padic_t op)
 
 PADIC_INLINE int padic_equal(const padic_t op1, const padic_t op2)
 {
-    return (padic_val(op1) == padic_val(op2)) && 
+    return (padic_val(op1) == padic_val(op2)) &&
            (fmpz_equal(padic_unit(op1), padic_unit(op2)));
 }
 
@@ -256,20 +256,20 @@ slong * _padic_lifts_exps(slong *n, slong N);
 
 void _padic_lifts_pows(fmpz *pow, const slong *a, slong n, const fmpz_t p);
 
-void padic_add(padic_t rop, const padic_t op1, const padic_t op2, 
+void padic_add(padic_t rop, const padic_t op1, const padic_t op2,
                const padic_ctx_t ctx);
 
-void padic_sub(padic_t rop, const padic_t op1, const padic_t op2, 
+void padic_sub(padic_t rop, const padic_t op1, const padic_t op2,
                const padic_ctx_t ctx);
 
 void padic_neg(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
-void padic_mul(padic_t rop, const padic_t op1, const padic_t op2, 
+void padic_mul(padic_t rop, const padic_t op1, const padic_t op2,
                const padic_ctx_t ctx);
 
 void padic_shift(padic_t rop, const padic_t op, slong v, const padic_ctx_t ctx);
 
-void padic_div(padic_t rop, const padic_t op1, const padic_t op2, 
+void padic_div(padic_t rop, const padic_t op1, const padic_t op2,
                const padic_ctx_t ctx);
 
 void _padic_inv_precompute(padic_inv_t S, const fmpz_t p, slong N);
@@ -284,7 +284,7 @@ void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
 int padic_sqrt(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
-void padic_pow_si(padic_t rop, const padic_t op, slong e, 
+void padic_pow_si(padic_t rop, const padic_t op, slong e,
                   const padic_ctx_t ctx);
 
 /* Exponential ***************************************************************/
@@ -335,7 +335,7 @@ int _padic_fprint(FILE * file, const fmpz_t u, slong v, const padic_ctx_t ctx);
 
 int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx);
 
-PADIC_INLINE 
+PADIC_INLINE
 int _padic_print(const fmpz_t u, slong v, const padic_ctx_t ctx)
 {
     return _padic_fprint(stdout, u, v, ctx);
@@ -349,7 +349,7 @@ PADIC_INLINE int padic_print(const padic_t op, const padic_ctx_t ctx)
 PADIC_INLINE void padic_debug(const padic_t op)
 {
     flint_printf("(");
-    fmpz_print(padic_unit(op)); 
+    fmpz_print(padic_unit(op));
     flint_printf(" %wd %wd)", padic_val(op), padic_prec(op));
 }
 

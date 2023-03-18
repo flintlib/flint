@@ -55,9 +55,9 @@ void _fmpz_mat_bound_ovals_of_cassini(fmpz_t b, const fmpz_mat_t op)
    fmpz_init(q);
    fmpz_init(r1);
    fmpz_init(r2);
-   
+
    v1 = _fmpz_vec_init(n);
-   
+
    /* |A| [1,1,...,1]^T */
    for (i = 0; i < n; i++)
    {
@@ -95,7 +95,7 @@ void _fmpz_mat_bound_ovals_of_cassini(fmpz_t b, const fmpz_mat_t op)
    fmpz_mul(r1, r1, r2);
 
    fmpz_sqrtrem(b, r2, r1);
-   
+
    if (!fmpz_is_zero(r2))
       fmpz_add_ui(b, b, 1);
 
@@ -121,10 +121,10 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
     {
         /*
             If $A$ is an $n \times n$ matrix with spectral radius
-            bound by b, the coefficients of the minimal polynomial have 
+            bound by b, the coefficients of the minimal polynomial have
             at most $\ceil{d\log_2(b)}$ bits if $d \leq b$. Otherwise
             if $d > 0$ it has at most
-            $\min{\ceil{d/2\log_2(bd)}, \ceil{d\log_2(2b)}}$ 
+            $\min{\ceil{d/2\log_2(bd)}, \ceil{d\log_2(2b)}}$
             bits, where $d$ is the degree of the minimal polynomial.
             See Lemma 3.1 in Dumas, "Bounds on the coefficients of the
             characteristic and minimal polynomials", 2007.
@@ -149,7 +149,7 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
         /* Determine the bound in bits */
         {
             fmpz_t b;
-            
+
             fmpz_init(b);
 
             _fmpz_mat_bound_ovals_of_cassini(b, op);
@@ -160,13 +160,13 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
             b1 = _log2(bb);
             b2 = _log2(bb*n)/2;
             b3 = _log2(bb*2);
-            
+
             if (b3 < b2)
                b2 = b3;
 
             bound = n <= bb ? (slong) ceil(n*b1) : (slong) ceil(n*b2);
             bound = bound + 1;
-            
+
             fmpz_clear(b);
         }
 
@@ -186,7 +186,7 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
         {
             nmod_mat_t mat;
             nmod_poly_t poly;
-            
+
             p = n_nextprime(p, 0);
 
             nmod_mat_init(mat, n, n, p);
@@ -203,7 +203,7 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
             if (oldlen != 0 && len > oldlen)
             {
                /* all previous primes were bad, discard */
-                           
+
                fmpz_one(m);
                oldlen = len;
 
@@ -218,14 +218,14 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
 
                nmod_mat_clear(mat);
                nmod_poly_clear(poly);
-            
-               continue;   
+
+               continue;
             }
 
             for (i = 0; i < n; i++)
                Q[i] |= P[i];
 
-            _fmpz_poly_CRT_ui(rop, rop, n + 1, m, poly->coeffs, 
+            _fmpz_poly_CRT_ui(rop, rop, n + 1, m, poly->coeffs,
                               poly->length, poly->mod.n, poly->mod.ninv, 1);
 
             fmpz_mul_ui(m, m, p);
@@ -262,7 +262,7 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
                            fmpz_mat_swap(v1, v2);
                         }
                      }
-                  
+
                      /* check f(A)v = 0 */
                      for (j = 0; j < n; j++)
                      {

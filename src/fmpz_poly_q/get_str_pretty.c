@@ -15,10 +15,10 @@
 
 /**
  * \ingroup  StringConversions
- * 
+ *
  * Returns the pretty string representation of \c op.
- * 
- * Returns the pretty string representation of the rational function \c op, 
+ *
+ * Returns the pretty string representation of the rational function \c op,
  * using the string \c x as the variable name.
  */
 char * fmpz_poly_q_get_str_pretty(const fmpz_poly_q_t op, const char *x)
@@ -27,22 +27,22 @@ char * fmpz_poly_q_get_str_pretty(const fmpz_poly_q_t op, const char *x)
     char * str;
     char * numstr;
     char * denstr;
-    
+
     if (fmpz_poly_is_one(op->den))
     {
         return fmpz_poly_get_str_pretty(op->num, x);
     }
-    
+
     numstr = fmpz_poly_get_str_pretty(op->num, x);
     denstr = fmpz_poly_get_str_pretty(op->den, x);
-    
+
     str = flint_malloc(strlen(numstr) + strlen(denstr) + 6);
     if (!str)
     {
         flint_printf("Exception (fmpz_poly_q_get_str_pretty). Memory allocation failed.\n");
         flint_abort();
     }
-    
+
     i = 0;
     if (fmpz_poly_degree(op->num) > 0)
     {
@@ -70,9 +70,9 @@ char * fmpz_poly_q_get_str_pretty(const fmpz_poly_q_t op, const char *x)
             str[i++] = denstr[j];
     }
     str[i] = '\0';
-    
+
     flint_free(numstr);
     flint_free(denstr);
-    
+
     return str;
 }

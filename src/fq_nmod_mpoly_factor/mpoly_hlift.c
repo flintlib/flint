@@ -292,7 +292,7 @@ cleanup:
         fq_nmod_mpolyv_clear(U + i, ctx);
     }
     flint_free(B);
-    
+
     fq_nmod_mpoly_clear(t, ctx);
     fq_nmod_mpoly_clear(t1, ctx);
     fq_nmod_mpoly_clear(t2, ctx);

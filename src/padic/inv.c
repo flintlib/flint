@@ -94,7 +94,7 @@ void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     }
 
     /*
-        If x = u p^v has negative valuation with N <= -v then the 
+        If x = u p^v has negative valuation with N <= -v then the
         exact inverse of x is zero when reduced modulo $p^N$
      */
     if (padic_prec(rop) + padic_val(op) <= 0)
@@ -103,7 +103,7 @@ void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     }
     else
     {
-        _padic_inv(padic_unit(rop), 
+        _padic_inv(padic_unit(rop),
                    padic_unit(op), ctx->p, padic_prec(rop) + padic_val(op));
 
         padic_val(rop) = - padic_val(op);

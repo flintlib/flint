@@ -117,7 +117,7 @@ main(void)
                 /* q has enough coefficients of expansion of u/v at infty */
                 nmod_poly_shift_left(s, u, 2*k);
                 nmod_poly_divrem(q, r, s, v);
-                
+
                 nmod_berlekamp_massey_start_over(B1);
                 for (l = 2*k - 1; l >= 0 ; l--)
                 {
@@ -157,7 +157,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -125,7 +125,7 @@ main(void)
         vals = (fmpz **) flint_malloc(nvars*sizeof(fmpz*));
         for (v = 0; v < nvars; v++)
         {
-            vals[v] = (fmpz *) flint_malloc(sizeof(fmpz)); 
+            vals[v] = (fmpz *) flint_malloc(sizeof(fmpz));
             fmpz_init(vals[v]);
             fmpz_randbits(vals[v], state, 10);
             perm[v] = v;
@@ -214,7 +214,7 @@ main(void)
         for (v = 0; v < nvars; v++)
         {
             /* only evaluate at 0, 1, or -1 */
-            vals[v] = (fmpz *) flint_malloc(sizeof(fmpz)); 
+            vals[v] = (fmpz *) flint_malloc(sizeof(fmpz));
             fmpz_init(vals[v]);
             fmpz_set_si(vals[v], n_randint(state, UWORD(3)) - WORD(1));
             perm[v] = v;
@@ -311,7 +311,7 @@ main(void)
         vals = (fmpz **) flint_malloc(nvars*sizeof(fmpz*));
         for (v = 0; v < nvars; v++)
         {
-            vals[v] = (fmpz *) flint_malloc(sizeof(fmpz)); 
+            vals[v] = (fmpz *) flint_malloc(sizeof(fmpz));
             fmpz_init(vals[v]);
             fmpz_randbits(vals[v], state, 10);
         }
@@ -395,7 +395,7 @@ main(void)
         vals = (fmpz **) flint_malloc(nvars*sizeof(fmpz*));
         for (v = 0; v < nvars; v++)
         {
-            vals[v] = (fmpz *) flint_malloc(sizeof(fmpz)); 
+            vals[v] = (fmpz *) flint_malloc(sizeof(fmpz));
             fmpz_init(vals[v]);
             fmpz_randbits(vals[v], state, 10);
         }

@@ -78,7 +78,7 @@ arb_poly_geometric_sum(arb_poly_t F, const arb_poly_t U, slong len, slong prec)
 void
 acb_hypgeom_pfq_series_bound_factor(arb_poly_t F,
     const acb_poly_struct * a, slong p,
-    const acb_poly_struct * b, slong q, 
+    const acb_poly_struct * b, slong q,
     const acb_poly_t z,
     slong n, slong len, slong prec)
 {

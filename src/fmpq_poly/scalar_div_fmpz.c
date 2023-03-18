@@ -14,7 +14,7 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-void _fmpq_poly_scalar_div_fmpz(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
+void _fmpq_poly_scalar_div_fmpz(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
                                 const fmpz_t den, slong len, const fmpz_t c)
 {
     if (fmpz_is_one(c))
@@ -35,13 +35,13 @@ void _fmpq_poly_scalar_div_fmpz(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
         fmpz_t d;
         fmpz_init(d);
         _fmpz_vec_content_chained(d, poly, len, c);
-        
+
         if (fmpz_sgn(c) < 0)
             fmpz_neg(d, d);
         _fmpz_vec_scalar_divexact_fmpz(rpoly, poly, len, d);
         fmpz_divexact(d, c, d);
         fmpz_mul(rden, den, d);
-        
+
         fmpz_clear(d);
     }
 }
@@ -53,17 +53,17 @@ void fmpq_poly_scalar_div_fmpz(fmpq_poly_t rop, const fmpq_poly_t op, const fmpz
         flint_printf("Exception (fmpq_poly_scalar_div_fmpz). Division by zero.\n");
         flint_abort();
     }
-    
+
     if (fmpq_poly_is_zero(op))
     {
         fmpq_poly_zero(rop);
         return;
     }
-    
+
     fmpq_poly_fit_length(rop, op->length);
     _fmpq_poly_set_length(rop, op->length);
-    
-    _fmpq_poly_scalar_div_fmpz(rop->coeffs, rop->den, 
+
+    _fmpq_poly_scalar_div_fmpz(rop->coeffs, rop->den,
                                op->coeffs, op->den, op->length, c);
 }
 

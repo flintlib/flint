@@ -14,8 +14,8 @@
 
 #include "templates.h"
 
-static void 
-_TEMPLATE(T, poly_invsqrt_series_prealloc)(TEMPLATE(T, struct) * g, 
+static void
+_TEMPLATE(T, poly_invsqrt_series_prealloc)(TEMPLATE(T, struct) * g,
                         const TEMPLATE(T, struct) * h, TEMPLATE(T, struct) * t,
                         TEMPLATE(T, struct) * u, slong n, const TEMPLATE(T, ctx_t) ctx)
 {
@@ -123,7 +123,7 @@ void TEMPLATE(T, poly_invsqrt_series)(TEMPLATE(T, poly_t) g,
         TEMPLATE(T, poly_swap)(g, t1, ctx);
         TEMPLATE(T, poly_clear)(t1, ctx);
     }
-    
+
     g->length = n;
 
     if (hlen < n)

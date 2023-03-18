@@ -50,13 +50,13 @@ int fmpz_is_probabprime_lucas(const fmpz_t n)
 
          fmpz_neg(D, D);
       } while (fmpz_jacobi(D, n) != -1); /* this ensures D, n coprime */
-   
+
       fmpz_sub_ui(t, D, 1);
       fmpz_neg(t, t);
       fmpz_tdiv_q_2exp(Q, t, 2);
 
       fmpz_gcd(t, Q, n); /* require Q, n coprime */
-   } while (fmpz_equal(t, n)); 
+   } while (fmpz_equal(t, n));
 
    if (fmpz_is_one(t)) /* check no factor found */
    {
@@ -67,7 +67,7 @@ int fmpz_is_probabprime_lucas(const fmpz_t n)
 
       fmpz_add_ui(m, n, 1); /* m = (n - jacobi(D/n))/2 = (n + 1)/2 */
       fmpz_tdiv_q_2exp(m, m, 1);
- 
+
       fmpz_lucas_chain(Vm, Vm1, A, m, n);
 
       fmpz_mul(Vm, Vm, A);

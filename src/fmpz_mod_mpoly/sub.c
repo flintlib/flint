@@ -117,7 +117,7 @@ void fmpz_mod_mpoly_sub(
     {
         fmpz_mod_mpoly_t T;
         fmpz_mod_mpoly_init3(T, B->length + C->length, Abits, ctx);
-        T->length = _fmpz_mod_mpoly_sub(T->coeffs, T->exps, 
+        T->length = _fmpz_mod_mpoly_sub(T->coeffs, T->exps,
                                         B->coeffs, Bexps, B->length,
                                         C->coeffs, Cexps, C->length,
                                                       N, cmpmask, ctx->ffinfo);
@@ -127,7 +127,7 @@ void fmpz_mod_mpoly_sub(
     else
     {
         fmpz_mod_mpoly_fit_length_reset_bits(A, B->length + C->length, Abits, ctx);
-        A->length = _fmpz_mod_mpoly_sub(A->coeffs, A->exps, 
+        A->length = _fmpz_mod_mpoly_sub(A->coeffs, A->exps,
                                         B->coeffs, Bexps, B->length,
                                         C->coeffs, Cexps, C->length,
                                                       N, cmpmask, ctx->ffinfo);

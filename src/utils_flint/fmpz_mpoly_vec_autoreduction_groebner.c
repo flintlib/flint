@@ -83,7 +83,7 @@ fmpz_mpoly_vec_autoreduction_groebner(fmpz_mpoly_vec_t G, const fmpz_mpoly_vec_t
             }
         }
     }
-                
+
     flint_free(exp1);
     flint_free(exp2);
 

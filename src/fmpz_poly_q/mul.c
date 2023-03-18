@@ -13,7 +13,7 @@
 
 #include "fmpz_poly_q.h"
 
-void fmpz_poly_q_mul(fmpz_poly_q_t rop, 
+void fmpz_poly_q_mul(fmpz_poly_q_t rop,
                      const fmpz_poly_q_t op1, const fmpz_poly_q_t op2)
 {
     if (fmpz_poly_q_is_zero(op1) || fmpz_poly_q_is_zero(op2))
@@ -21,7 +21,7 @@ void fmpz_poly_q_mul(fmpz_poly_q_t rop,
         fmpz_poly_q_zero(rop);
         return;
     }
-    
+
     if (op1 == op2)
     {
         fmpz_poly_pow(rop->num, op1->num, 2);
@@ -36,11 +36,11 @@ void fmpz_poly_q_mul(fmpz_poly_q_t rop,
         fmpz_poly_q_mul(t, op1, op2);
         fmpz_poly_q_swap(rop, t);
         fmpz_poly_q_clear(t);
-        return; 
+        return;
     }
 
     /*
-        From here on, we may assume that rop, op1 and op2 refer to distinct 
+        From here on, we may assume that rop, op1 and op2 refer to distinct
         objects in memory, and that op1 and op2 are non-zero
      */
 
@@ -53,14 +53,14 @@ void fmpz_poly_q_mul(fmpz_poly_q_t rop,
         fmpz_poly_fit_length(rop->num, len1 + len2 - 1);
         if (len1 >= len2)
         {
-            _fmpq_poly_mul(rop->num->coeffs, rop->den->coeffs, 
-                           op1->num->coeffs, op1->den->coeffs, len1, 
+            _fmpq_poly_mul(rop->num->coeffs, rop->den->coeffs,
+                           op1->num->coeffs, op1->den->coeffs, len1,
                            op2->num->coeffs, op2->den->coeffs, len2);
         }
         else
         {
-            _fmpq_poly_mul(rop->num->coeffs, rop->den->coeffs, 
-                           op2->num->coeffs, op2->den->coeffs, len2, 
+            _fmpq_poly_mul(rop->num->coeffs, rop->den->coeffs,
+                           op2->num->coeffs, op2->den->coeffs, len2,
                            op1->num->coeffs, op1->den->coeffs, len1);
         }
         _fmpz_poly_set_length(rop->num, len1 + len2 - 1);
@@ -68,13 +68,13 @@ void fmpz_poly_q_mul(fmpz_poly_q_t rop,
 
         return;
     }
-    
+
     fmpz_poly_gcd(rop->num, op1->num, op2->den);
-    
+
     if (fmpz_poly_is_one(rop->num))
     {
         fmpz_poly_gcd(rop->den, op2->num, op1->den);
-        
+
         if (fmpz_poly_is_one(rop->den))
         {
             fmpz_poly_mul(rop->num, op1->num, op2->num);
@@ -91,7 +91,7 @@ void fmpz_poly_q_mul(fmpz_poly_q_t rop,
     else
     {
         fmpz_poly_gcd(rop->den, op2->num, op1->den);
-        
+
         if (fmpz_poly_is_one(rop->den))
         {
             fmpz_poly_div(rop->den, op2->den, rop->num);

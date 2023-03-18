@@ -16,7 +16,7 @@
 void fmpz_gcdinv(fmpz_t d, fmpz_t a, const fmpz_t f, const fmpz_t g)
 {
     FLINT_ASSERT(fmpz_cmp(f, g) < 0);
-    
+
     if (fmpz_is_zero(f))
     {
         fmpz_set(d, g);
@@ -38,10 +38,10 @@ void fmpz_gcdinv(fmpz_t d, fmpz_t a, const fmpz_t f, const fmpz_t g)
     else  /* g is large */
     {
         mpz_t atemp, dtemp;
-	
+
 	mpz_init(atemp);
 	mpz_init(dtemp);
-	
+
 	_fmpz_promote_val(d);
         _fmpz_promote_val(a);
 
@@ -53,12 +53,12 @@ void fmpz_gcdinv(fmpz_t d, fmpz_t a, const fmpz_t f, const fmpz_t g)
             fptr->_mp_size  = 1;
             fptr->_mp_d     = (mp_limb_t *) f;
 
-            mpz_gcdext(dtemp, atemp, NULL, 
+            mpz_gcdext(dtemp, atemp, NULL,
                        fptr, COEFF_TO_PTR(*g));
         }
         else  /* f is large */
         {
-            mpz_gcdext(dtemp, atemp, NULL, 
+            mpz_gcdext(dtemp, atemp, NULL,
                        COEFF_TO_PTR(*f), COEFF_TO_PTR(*g));
         }
 

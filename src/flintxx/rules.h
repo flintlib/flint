@@ -155,7 +155,7 @@ struct is_implemented : mp::not_<_is_convertible<rules::UNIMPLEMENTED, T> > { };
 // definition directly.
 
 // Specialise a getter called "name". The getter has one argument called "from"
-// of type "fromtype", and "eval" which should yield "totype". 
+// of type "fromtype", and "eval" which should yield "totype".
 #define FLINT_DEFINE_GET2(name, totype, fromtype1, fromtype2, eval) \
 template<> \
 struct name<fromtype1, fromtype2> \

@@ -14,7 +14,7 @@
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 
-void _nmod_vec_scalar_addmul_nmod_fullword(mp_ptr res, mp_srcptr vec, 
+void _nmod_vec_scalar_addmul_nmod_fullword(mp_ptr res, mp_srcptr vec,
 				             slong len, mp_limb_t c, nmod_t mod)
 {
     slong i;
@@ -27,7 +27,7 @@ void _nmod_vec_scalar_addmul_nmod_fullword(mp_ptr res, mp_srcptr vec,
     }
 }
 
-void _nmod_vec_scalar_addmul_nmod_generic(mp_ptr res, mp_srcptr vec, 
+void _nmod_vec_scalar_addmul_nmod_generic(mp_ptr res, mp_srcptr vec,
 				             slong len, mp_limb_t c, nmod_t mod)
 {
     slong i;
@@ -40,7 +40,7 @@ void _nmod_vec_scalar_addmul_nmod_generic(mp_ptr res, mp_srcptr vec,
     }
 }
 
-void _nmod_vec_scalar_addmul_nmod_shoup(mp_ptr res, mp_srcptr vec, 
+void _nmod_vec_scalar_addmul_nmod_shoup(mp_ptr res, mp_srcptr vec,
 				             slong len, mp_limb_t c, nmod_t mod)
 {
     slong i;
@@ -55,7 +55,7 @@ void _nmod_vec_scalar_addmul_nmod_shoup(mp_ptr res, mp_srcptr vec,
     }
 }
 
-void _nmod_vec_scalar_addmul_nmod(mp_ptr res, mp_srcptr vec, 
+void _nmod_vec_scalar_addmul_nmod(mp_ptr res, mp_srcptr vec,
 				             slong len, mp_limb_t c, nmod_t mod)
 {
     if (NMOD_BITS(mod) == FLINT_BITS)

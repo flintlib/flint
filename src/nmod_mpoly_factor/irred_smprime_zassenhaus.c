@@ -352,7 +352,7 @@ next_alpha:
 
     nmod_mpolyv_swap(fac, pfac, ctx);
 
-cleanup: 
+cleanup:
 
     flint_free(subset);
     flint_free(alpha);

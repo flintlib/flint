@@ -44,7 +44,7 @@ slong _fmpz_mod_mpoly_add(
         {
             mpoly_monomial_set(Aexps + k*N, Cexps + j*N, N);
             fmpz_set(Acoeffs + k, Ccoeffs + j);
-            j++;         
+            j++;
             k++;
         }
     }
@@ -117,7 +117,7 @@ void fmpz_mod_mpoly_add(
     {
         fmpz_mod_mpoly_t T;
         fmpz_mod_mpoly_init3(T, B->length + C->length, Abits, ctx);
-        T->length = _fmpz_mod_mpoly_add(T->coeffs, T->exps, 
+        T->length = _fmpz_mod_mpoly_add(T->coeffs, T->exps,
                                         B->coeffs, Bexps, B->length,
                                         C->coeffs, Cexps, C->length,
                                                       N, cmpmask, ctx->ffinfo);
@@ -127,7 +127,7 @@ void fmpz_mod_mpoly_add(
     else
     {
         fmpz_mod_mpoly_fit_length_reset_bits(A, B->length + C->length, Abits, ctx);
-        A->length = _fmpz_mod_mpoly_add(A->coeffs, A->exps, 
+        A->length = _fmpz_mod_mpoly_add(A->coeffs, A->exps,
                                         B->coeffs, Bexps, B->length,
                                         C->coeffs, Cexps, C->length,
                                                       N, cmpmask, ctx->ffinfo);

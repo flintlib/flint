@@ -14,7 +14,7 @@
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_derivative(fmpz *res, const fmpz *poly, slong len, 
+void _fmpz_mod_poly_derivative(fmpz *res, const fmpz *poly, slong len,
                                const fmpz_t p)
 {
     slong j, k = 1;

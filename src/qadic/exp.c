@@ -12,8 +12,8 @@
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
-void _qadic_exp(fmpz *rop, const fmpz *op, slong v, slong len, 
-                           const fmpz *a, const slong *j, slong lena, 
+void _qadic_exp(fmpz *rop, const fmpz *op, slong v, slong len,
+                           const fmpz *a, const slong *j, slong lena,
                            const fmpz_t p, slong N, const fmpz_t pN)
 {
     if (N < (WORD(1) << 13) / (slong) fmpz_bits(p))
@@ -67,7 +67,7 @@ int qadic_exp(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
                 t = rop->coeffs;
             }
 
-            _qadic_exp(t, op->coeffs, v, op->length, 
+            _qadic_exp(t, op->coeffs, v, op->length,
                        ctx->a, ctx->j, ctx->len, p, N, pN);
             rop->val = 0;
 

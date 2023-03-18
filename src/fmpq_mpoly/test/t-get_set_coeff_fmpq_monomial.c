@@ -51,7 +51,7 @@ main(void)
         exp = (fmpz **) flint_malloc(ctx->zctx->minfo->nvars*sizeof(fmpz *));
         for (k = 0; k < nvars; k++)
         {
-            exp[k] = (fmpz *) flint_malloc(sizeof(fmpz)); 
+            exp[k] = (fmpz *) flint_malloc(sizeof(fmpz));
             fmpz_init(exp[k]);
             fmpz_randtest_unsigned(exp[k], state, exp_bits1);
         }
@@ -108,7 +108,7 @@ main(void)
         for (k = 0; k < nvars; k++)
         {
             fmpz_clear(exp[k]);
-            flint_free(exp[k]); 
+            flint_free(exp[k]);
         }
         flint_free(exp);
 
@@ -121,7 +121,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

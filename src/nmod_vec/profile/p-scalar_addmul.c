@@ -31,8 +31,8 @@ void sample(void * arg, ulong count)
    mp_ptr vec = _nmod_vec_init(length);
    mp_ptr vec2 = _nmod_vec_init(length);
    FLINT_TEST_INIT(state);
-   
-    
+
+
    for (i = 0; i < count; i++)
    {
       n = n_randbits(state, bits);
@@ -50,7 +50,7 @@ void sample(void * arg, ulong count)
 		 _nmod_vec_scalar_addmul_nmod(vec2, vec, length, c, mod);
 	  prof_stop();
    }
-   
+
    flint_randclear(state);
    _nmod_vec_clear(vec);
    _nmod_vec_clear(vec2);
@@ -75,7 +75,7 @@ int main(void)
 	  info.length = 65536;
 	  prof_repeat(&min2, &max, sample, (void *) &info);
 
-      flint_printf("bits %wd, length 4 %.1lf c/l, length 128 %.1lf c/l, length 65536 %.1lf c/l\n", 
+      flint_printf("bits %wd, length 4 %.1lf c/l, length 128 %.1lf c/l, length 65536 %.1lf c/l\n",
          i,
          (min0/(double)FLINT_CLOCK_SCALE_FACTOR)/(4*30),
          (min1/(double)FLINT_CLOCK_SCALE_FACTOR)/(1024*30),

@@ -12,7 +12,7 @@
 
 #include "fq_nmod.h"
 
-void _fq_nmod_trace(fmpz_t rop2, const mp_limb_t *op, slong len, 
+void _fq_nmod_trace(fmpz_t rop2, const mp_limb_t *op, slong len,
                     const fq_nmod_ctx_t ctx)
 {
     const slong d = fq_nmod_ctx_degree(ctx);
@@ -30,7 +30,7 @@ void _fq_nmod_trace(fmpz_t rop2, const mp_limb_t *op, slong len,
         for (l = ctx->len - 2; l >= 0 && ctx->j[l] >= d - (i - 1); l--)
         {
             t[i] = n_addmod(t[i],
-                            n_mulmod2_preinv(t[ctx->j[l] + i - d], ctx->a[l], ctx->mod.n, ctx->mod.ninv), 
+                            n_mulmod2_preinv(t[ctx->j[l] + i - d], ctx->a[l], ctx->mod.n, ctx->mod.ninv),
                             ctx->mod.n);
         }
 
@@ -44,7 +44,7 @@ void _fq_nmod_trace(fmpz_t rop2, const mp_limb_t *op, slong len,
         t[i] = n_negmod(t[i], ctx->mod.n);
     }
 
-    
+
     rop = WORD(0);
     for (i = 0; i < len; i++)
     {

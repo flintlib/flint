@@ -48,7 +48,7 @@ slong _fmpq_mat_minpoly(fmpz * coeffs, fmpz_t den, const fmpq_mat_t mat)
    }
 
    fmpz_mul(coeffs + len - 1, coeffs + len - 1, den);
-      
+
    fmpz_mat_clear(zmat);
    fmpz_clear(p);
 
@@ -66,7 +66,7 @@ void fmpq_mat_minpoly(fmpq_poly_t pol, const fmpq_mat_t mat)
    }
 
    fmpq_poly_fit_length(pol, n + 1);
-   
+
    len = _fmpq_mat_minpoly(pol->coeffs, pol->den, mat);
 
    _fmpq_poly_set_length(pol, len);

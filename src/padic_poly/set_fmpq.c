@@ -11,7 +11,7 @@
 
 #include "padic_poly.h"
 
-void padic_poly_set_fmpq(padic_poly_t poly, const fmpq_t x, 
+void padic_poly_set_fmpq(padic_poly_t poly, const fmpq_t x,
                          const padic_ctx_t ctx)
 {
     padic_t y;

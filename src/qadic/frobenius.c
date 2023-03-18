@@ -14,18 +14,18 @@
 #include "qadic.h"
 
 /*
-    Assumes that \code{len1} and \code{len2} are positive but at 
+    Assumes that \code{len1} and \code{len2} are positive but at
     most~$d$, and also that \code{len1} is at least $6$.
 
-    The latter assumption guarantees that $\ceil{n/B} \geq 2$, 
+    The latter assumption guarantees that $\ceil{n/B} \geq 2$,
     i.e.\ $n \geq 2B$ so $n \geq 2 \ceil{\sqrt{n}}$.
  */
 
-static void 
-_fmpz_mod_poly_compose_smod_rectangular(fmpz *rop, 
-                           const fmpz *op1, slong len1, 
-                           const fmpz *op2, slong len2, 
-                           const fmpz *a, const slong *j, slong lena, 
+static void
+_fmpz_mod_poly_compose_smod_rectangular(fmpz *rop,
+                           const fmpz *op1, slong len1,
+                           const fmpz *op2, slong len2,
+                           const fmpz *a, const slong *j, slong lena,
                            const fmpz_t p)
 {
     const slong d = j[lena - 1];
@@ -75,11 +75,11 @@ _fmpz_mod_poly_compose_smod_rectangular(fmpz *rop,
     }
 }
 
-static void 
-_fmpz_mod_poly_compose_smod_horner(fmpz *rop, 
-                           const fmpz *op1, slong len1, 
-                           const fmpz *op2, slong len2, 
-                           const fmpz *a, const slong *j, slong lena, 
+static void
+_fmpz_mod_poly_compose_smod_horner(fmpz *rop,
+                           const fmpz *op1, slong len1,
+                           const fmpz *op2, slong len2,
+                           const fmpz *a, const slong *j, slong lena,
                            const fmpz_t p)
 {
     const slong d = j[lena - 1];
@@ -115,24 +115,24 @@ _fmpz_mod_poly_compose_smod_horner(fmpz *rop,
     }
 }
 
-/* 
-    Computes the composition $f(g(X))$ modulo the sparse polynomial 
-    given by the data \code{(a, j, lena)}, which is assumed to be 
+/*
+    Computes the composition $f(g(X))$ modulo the sparse polynomial
+    given by the data \code{(a, j, lena)}, which is assumed to be
     of degree~$d \geq 2$.
 
     Sets the vector \code{(rop, d)}.
 
-    Assumes that \code{len1} and \code{len2} are positive but at 
+    Assumes that \code{len1} and \code{len2} are positive but at
     most~$d$.
 
     Does not support aliasing.
  */
 
-void 
-_fmpz_mod_poly_compose_smod(fmpz *rop, 
-                           const fmpz *op1, slong len1, 
-                           const fmpz *op2, slong len2, 
-                           const fmpz *a, const slong *j, slong lena, 
+void
+_fmpz_mod_poly_compose_smod(fmpz *rop,
+                           const fmpz *op1, slong len1,
+                           const fmpz *op2, slong len2,
+                           const fmpz *a, const slong *j, slong lena,
                            const fmpz_t p)
 {
     if (len1 < 6)
@@ -145,8 +145,8 @@ _fmpz_mod_poly_compose_smod(fmpz *rop,
     }
 }
 
-void _qadic_frobenius_a(fmpz *rop, slong exp, 
-                    const fmpz *a, const slong *j, slong lena, 
+void _qadic_frobenius_a(fmpz *rop, slong exp,
+                    const fmpz *a, const slong *j, slong lena,
                     const fmpz_t p, slong N)
 {
     const slong d = j[lena - 1];
@@ -252,12 +252,12 @@ void _qadic_frobenius_a(fmpz *rop, slong exp,
 }
 
 /*
-    Sets (rop, 2d-1) to the image of (op, len) under the Frobenius operator 
+    Sets (rop, 2d-1) to the image of (op, len) under the Frobenius operator
     raised to the e-th power.
  */
 
-void _qadic_frobenius(fmpz *rop, const fmpz *op, slong len, slong e, 
-                  const fmpz *a, const slong *j, slong lena, 
+void _qadic_frobenius(fmpz *rop, const fmpz *op, slong len, slong e,
+                  const fmpz *a, const slong *j, slong lena,
                   const fmpz_t p, slong N)
 {
     const slong d = j[lena - 1];
@@ -326,7 +326,7 @@ void qadic_frobenius(qadic_t rop, const qadic_t op, slong e, const qadic_ctx_t c
             t = rop->coeffs;
         }
 
-        _qadic_frobenius(t, op->coeffs, op->length, e, 
+        _qadic_frobenius(t, op->coeffs, op->length, e,
                      ctx->a, ctx->j, ctx->len, (&ctx->pctx)->p, N - op->val);
 
         if (rop == op)

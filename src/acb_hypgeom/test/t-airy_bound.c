@@ -84,9 +84,9 @@ int main()
         do {
             acb_hypgeom_airy(ai, aip, bi, bip, z2, prec);
 
-            if (acb_rel_accuracy_bits(ai) >= MAG_BITS && 
-                acb_rel_accuracy_bits(aip) >= MAG_BITS && 
-                acb_rel_accuracy_bits(bi) >= MAG_BITS && 
+            if (acb_rel_accuracy_bits(ai) >= MAG_BITS &&
+                acb_rel_accuracy_bits(aip) >= MAG_BITS &&
+                acb_rel_accuracy_bits(bi) >= MAG_BITS &&
                 acb_rel_accuracy_bits(bip) >= MAG_BITS)
                 break;
 

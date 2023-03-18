@@ -94,7 +94,7 @@ int gr_poly_compose(gr_poly_t res,
 {
     const slong len1 = poly1->length;
     const slong len2 = poly2->length;
-    
+
     if (len1 == 0)
     {
         return gr_poly_zero(res, ctx);

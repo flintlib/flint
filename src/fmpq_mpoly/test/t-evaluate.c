@@ -47,7 +47,7 @@ main(void)
         vals = (fmpq **) flint_malloc(nvars*sizeof(fmpq*));
         for (v = 0; v < nvars; v++)
         {
-            vals[v] = (fmpq *) flint_malloc(sizeof(fmpq)); 
+            vals[v] = (fmpq *) flint_malloc(sizeof(fmpq));
             fmpq_init(vals[v]);
             fmpq_randtest(vals[v], state, 10);
             perm[v] = v;

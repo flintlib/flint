@@ -132,7 +132,7 @@ main(void)
         TEMPLATE(T, mat_t) A, B, A_window;
 
         TEMPLATE(T, ctx_randtest) (ctx, state);
-	
+
 	TEMPLATE(T, mat_init)(A, 2, 2, ctx);
         TEMPLATE(T, mat_init)(B, 2, 2, ctx);
 

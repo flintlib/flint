@@ -63,7 +63,7 @@ void fq_zech_mpolyl_lead_coeff(
         for (j = 0; j < off; j++)
             (cexps + N*i)[j] = (Aexps + N*i)[j];
 
-        (cexps + N*i)[off] = ((-UWORD(1)) >> (FLINT_BITS - shift)) & 
+        (cexps + N*i)[off] = ((-UWORD(1)) >> (FLINT_BITS - shift)) &
                                                             (Aexps + N*i)[off];
         for (j = off + 1; j < N; j++)
             (cexps + N*i)[j] = 0;

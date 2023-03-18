@@ -13,8 +13,8 @@
 #include "fmpz_mod_poly.h"
 #include "gr_poly.h"
 
-slong _fmpz_mod_poly_gcd(fmpz *G, const fmpz *A, slong lenA, 
-                                  const fmpz *B, slong lenB, 
+slong _fmpz_mod_poly_gcd(fmpz *G, const fmpz *A, slong lenA,
+                                  const fmpz *B, slong lenB,
                                   const fmpz_mod_ctx_t ctx)
 {
     if (lenB == 1)
@@ -49,11 +49,11 @@ void fmpz_mod_poly_gcd(fmpz_mod_poly_t G, const fmpz_mod_poly_t A,
         const slong lenA = A->length, lenB = B->length;
         slong lenG;
         fmpz *g;
-    
+
         if (lenA == 0) /* lenA = lenB = 0 */
         {
             fmpz_mod_poly_zero(G, ctx);
-        } 
+        }
         else if (lenB == 0) /* lenA > lenB = 0 */
         {
             fmpz_mod_poly_make_monic(G, A, ctx);
@@ -80,7 +80,7 @@ void fmpz_mod_poly_gcd(fmpz_mod_poly_t G, const fmpz_mod_poly_t A,
                 G->length = FLINT_MIN(lenA, lenB);
             }
             _fmpz_mod_poly_set_length(G, lenG);
-    
+
             if (lenG == 1)
                 fmpz_one(G->coeffs);
             else

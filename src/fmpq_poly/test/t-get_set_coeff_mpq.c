@@ -29,7 +29,7 @@ main(void)
     fflush(stdout);
 
     mpq_init(n1);
-    mpq_init(n2);    
+    mpq_init(n2);
 
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
@@ -78,7 +78,7 @@ main(void)
     mpq_clear(n2);
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

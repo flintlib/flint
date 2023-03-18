@@ -17,7 +17,7 @@
 void fmpz_set_d_2exp(fmpz_t f, double m, slong exp)
 {
    int exp2;
-   
+
    m = frexp(m, &exp2);
    exp += exp2;
 
@@ -28,6 +28,6 @@ void fmpz_set_d_2exp(fmpz_t f, double m, slong exp)
    } else if (exp < 0)
       fmpz_set_ui(f, 0);
    else
-      fmpz_set_d(f, ldexp(m, exp));    
+      fmpz_set_d(f, ldexp(m, exp));
 }
 

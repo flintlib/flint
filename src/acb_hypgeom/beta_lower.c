@@ -33,7 +33,7 @@ acb_beta(acb_t res, const acb_t a, const acb_t b, slong prec)
     acb_clear(u);
 }
 
-void acb_hypgeom_beta_lower(acb_t res, 
+void acb_hypgeom_beta_lower(acb_t res,
     const acb_t a, const acb_t b, const acb_t z, int regularized, slong prec)
 {
     acb_t t, u;

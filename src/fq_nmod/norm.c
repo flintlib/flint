@@ -19,7 +19,7 @@
     This computes the norm on $\mathbf{F}_q$.
  */
 
-void _fq_nmod_norm(fmpz_t rop2, const mp_limb_t *op, slong len, 
+void _fq_nmod_norm(fmpz_t rop2, const mp_limb_t *op, slong len,
                         const fq_nmod_ctx_t ctx)
 {
     const slong d = fq_nmod_ctx_degree(ctx);
@@ -29,18 +29,18 @@ void _fq_nmod_norm(fmpz_t rop2, const mp_limb_t *op, slong len,
     if (d == 1)
     {
         rop = op[0];
-    } 
+    }
     else if (len == 1) /* element scalar */
     {
         rop = n_powmod2_ui_preinv(op[0], d, ctx->mod.n, ctx->mod.ninv);
     }
-    else 
+    else
     {
         rop = _nmod_poly_resultant(ctx->modulus->coeffs, ctx->modulus->length,
             op, len, ctx->mod);
 
         /*
-            XXX:  This part of the code is currently untested as the Conway 
+            XXX:  This part of the code is currently untested as the Conway
             polynomials used for the extension Fq/Fp are monic.
 
             TODO: make polynomial monic!!!
@@ -68,7 +68,7 @@ void fq_nmod_norm(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
     }
     else
     {
-        _fq_nmod_norm(rop, op->coeffs, op->length, ctx); 
+        _fq_nmod_norm(rop, op->coeffs, op->length, ctx);
     }
 }
 

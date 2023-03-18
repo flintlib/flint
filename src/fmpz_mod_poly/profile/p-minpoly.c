@@ -9,7 +9,7 @@
 
 /******************************************************************************
 
-    Authored 2016 by Daniel S. Roche; US Government work in the public domain. 
+    Authored 2016 by Daniel S. Roche; US Government work in the public domain.
 
 ******************************************************************************/
 
@@ -72,7 +72,7 @@ void time_algs(double* times, flint_rand_t state,
     {
         fmpz_mod_poly_init2(polys+i, len+1, primes+i);
 
-        for (j=0; j < genlen; ++j) 
+        for (j=0; j < genlen; ++j)
         {
             fmpz_randm(gen + j, state, fmpz_mod_ctx_modulus(primes+i));
             fmpz_randm(curseq + j, state, fmpz_mod_ctx_modulus(primes+i));
@@ -86,7 +86,7 @@ void time_algs(double* times, flint_rand_t state,
     }
 
     _fmpz_vec_clear(gen, genlen);
-    
+
     TIME_INNER(fmpz_mod_poly_minpoly_bm, times[0]);
 
     TIME_INNER(fmpz_mod_poly_minpoly_hgcd, times[1]);
@@ -94,7 +94,7 @@ void time_algs(double* times, flint_rand_t state,
     _fmpz_vec_clear(seqs, len*NUMEX);
     for (i=0; i<NUMEX; ++i) fmpz_mod_poly_clear(polys+i, primes+i);
 }
-    
+
 int main(void)
 {
     flint_bitcnt_t bits;
@@ -102,7 +102,7 @@ int main(void)
     fmpz_mod_ctx_struct primes[NUMEX];
     double times[2];
     slong i, len, len2, lower, upper;
-    
+
     FLINT_TEST_INIT(state);
 
     fmpz_init(p);

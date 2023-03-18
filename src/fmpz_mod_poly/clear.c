@@ -19,7 +19,7 @@ void fmpz_mod_poly_clear(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
 
     for (i = 0; i < poly->alloc; i++)  /* Clean up any mpz_t's */
         _fmpz_demote(poly->coeffs + i);
-    if (poly->coeffs) 
+    if (poly->coeffs)
         flint_free(poly->coeffs);  /* clean up ordinary coeffs */
 }
 

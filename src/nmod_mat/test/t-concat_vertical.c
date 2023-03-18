@@ -44,7 +44,7 @@ int main(void)
         nmod_mat_randtest(C, state);
 
         nmod_mat_concat_vertical(C, A, B);
-        
+
         nmod_mat_window_init(window1, C, 0, 0, r1, c1);
         nmod_mat_window_init(window2, C, r1, 0, (r1+r2), c1);
 
@@ -60,7 +60,7 @@ int main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         nmod_mat_clear(A);
         nmod_mat_clear(B);
         nmod_mat_clear(C);
@@ -71,7 +71,7 @@ int main(void)
 
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

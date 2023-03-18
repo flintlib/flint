@@ -33,7 +33,7 @@ void padic_set_fmpq(padic_t rop, const fmpq_t op, const padic_ctx_t ctx)
         }
         else
         {
-            _padic_inv(fmpq_denref(t), 
+            _padic_inv(fmpq_denref(t),
                        fmpq_denref(t), ctx->p, padic_prec(rop) - padic_val(rop));
             fmpz_mul(padic_unit(rop), fmpq_numref(t), fmpq_denref(t));
             _padic_reduce(rop, ctx);

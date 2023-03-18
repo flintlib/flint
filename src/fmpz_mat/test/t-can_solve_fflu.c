@@ -28,7 +28,7 @@ main(void)
     FLINT_TEST_INIT(state);
 
     flint_printf("can_solve_fflu....");
-    fflush(stdout);    
+    fflush(stdout);
 
     /* test random systems (likely not soluble) */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -51,7 +51,7 @@ main(void)
             fmpz_mat_randops(A, state, 1+n_randint(state, 1 + m*m));
 
         success = fmpz_mat_can_solve_fflu(X, den, A, B);
-        
+
         if (success)
         {
             fmpz_mat_mul(AX, A, X);
@@ -104,7 +104,7 @@ main(void)
         fmpz_mat_scalar_mul_fmpz(A, A, den);
 
         success = fmpz_mat_can_solve_fflu(X, den, A, B);
-        
+
         if (success)
         {
             fmpz_mat_mul(AX, A, X);
@@ -133,7 +133,7 @@ main(void)
 
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

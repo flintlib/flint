@@ -15,7 +15,7 @@
 #define D_MAT_H
 
 #ifdef D_MAT_INLINES_C
-#define D_MAT_INLINE 
+#define D_MAT_INLINE
 #else
 #define D_MAT_INLINE static __inline__
 #endif
@@ -139,7 +139,7 @@ void d_mat_swap_rows(d_mat_t mat, slong r, slong s)
 
         u = mat->rows[s];
         mat->rows[s] = mat->rows[r];
-        mat->rows[r] = u; 
+        mat->rows[r] = u;
     }
 }
 

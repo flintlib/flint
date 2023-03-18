@@ -26,7 +26,7 @@ void sample(void * arg, ulong count)
    fac_one_line_t * params = (fac_one_line_t *) arg;
    ulong i, j;
    mp_limb_t n2;
-   
+
    for (i = 0; i < count; i++)
    {
       prof_start();
@@ -49,17 +49,17 @@ void fill_array(ulong * ret, flint_bitcnt_t bits, flint_rand_t state)
    ulong n;
    n_factor_t factors;
    ulong i, primes = (1<<(bits/3))/10 + 1;
-   
+
    for (i = 0; i < 1024; i++)
    {
-	  do 
+	  do
 	  {
 		 n_factor_init(&factors);
 	     n = n_randbits(state, bits);
 	  } while (n_is_probabprime(n) || (n_factor_trial(&factors, n, primes) != n));
 	  ret[i] = n;
    }
-      
+
 }
 
 int main(void)
@@ -68,18 +68,18 @@ int main(void)
    fac_one_line_t params;
    int i;
    FLINT_TEST_INIT(state);
-   
+
 
    params.composites = flint_malloc(1024*sizeof(ulong));
 
    flint_printf("factor_one_line:\n");
-   
+
    for (i = 4; i <= 64; i++)
    {
       fill_array(params.composites, i, state);
       params.bits = i;
 	  prof_repeat(&min, &max, sample, &params);
-      flint_printf("bits = %d, time is %.3f us\n", 
+      flint_printf("bits = %d, time is %.3f us\n",
 		  i, max/(double)ITERS);
    }
 

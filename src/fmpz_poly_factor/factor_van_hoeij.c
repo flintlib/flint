@@ -21,15 +21,15 @@
 # include <math.h>
 #endif
 
-slong _heuristic_van_hoeij_starting_precision(const fmpz_poly_t f, 
+slong _heuristic_van_hoeij_starting_precision(const fmpz_poly_t f,
                                                             slong r, ulong p)
 {
    fmpz_t lead_b, trail_b;
    slong min_b, a;
-   
+
    fmpz_init(lead_b);
    fmpz_init(trail_b);
-   
+
    fmpz_poly_CLD_bound(lead_b, f, f->length - 2);
    fmpz_poly_CLD_bound(trail_b, f, 0);
 
@@ -70,7 +70,7 @@ void fmpz_mat_van_hoeij_resize_matrix(fmpz_mat_t M, slong num_rows)
    for (i = num_rows; i < M->r; i++)
    {
       _fmpz_vec_zero(M->rows[i], M->c);
-      
+
       /* this row can be repopulated */
       if (M->rows[i] < end)
          empty_rows[num_empty++] = M->rows[i];
@@ -92,13 +92,13 @@ void fmpz_mat_van_hoeij_resize_matrix(fmpz_mat_t M, slong num_rows)
 
    M->r = num_rows;
 
-   TMP_END;   
+   TMP_END;
 }
 
 void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
          const nmod_poly_factor_t fac, const fmpz_poly_t f, slong exp, ulong p)
 {
-   fmpz_poly_factor_t lifted_fac; 
+   fmpz_poly_factor_t lifted_fac;
    fmpz_mat_t M;
    fmpz_t fp, P, B, lc, bound_sum;
    slong i, r = fac->num;
@@ -120,12 +120,12 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
 
    /* we prescale the identity matrix by 2^U_exp */
    U_exp = (slong) FLINT_BIT_COUNT(bit_r);
-   
+
    fmpz_mat_scalar_mul_2exp(M, M, U_exp);
- 
+
    /* compute Mignotte bound */
    fmpz_init(B);
-   
+
    fmpz_poly_factor_mignotte(B, f);
    /*
       bound adjustment, we multiply true factors (which might be
@@ -137,10 +137,10 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
    fmpz_mul_ui(B, B, 2);
    fmpz_add_ui(B, B, 1);
    a = fmpz_clog_ui(B, p);
-                
+
    /* compute heuristic starting precision */
    a = FLINT_MIN(a, _heuristic_van_hoeij_starting_precision(f, r, p));
-   
+
    /* start Hensel lift */
    fmpz_poly_factor_init(lifted_fac);
 
@@ -155,11 +155,11 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
    }
 
    prev_exp = _fmpz_poly_hensel_start_lift(lifted_fac, link, v, w, f, fac, a);
-   
+
    /* compute bound */
    fmpz_set_ui(B, r + 1);
    fmpz_mul_2exp(B, B, 2*U_exp);
-   
+
    /* compute leading coefficient */
    N = f->length - 1;
    sqN = (ulong) sqrt(N);
@@ -172,7 +172,7 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
    fmpz_init(fp);
    fmpz_set_ui(fp, p);
    fmpz_pow_ui(P, fp, a);
-         
+
    fmpz_init(bound_sum);
    fmpz_mat_init(col, r, 1);
    fmpz_lll_context_init_default(fl);
@@ -195,15 +195,15 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
          {
             /* we alternate taking columns from the right and left */
             slong alt_col, diff = next_col - prev_num_coeffs;
-            
+
             if ((diff % 2) == 0)
                alt_col = prev_num_coeffs + diff/2;
             else
                alt_col = num_data_cols - prev_num_coeffs - (diff + 1)/2;
 
             fmpz_mul_ui(bound_sum, data->rows[r] + alt_col, sqN);
-            worst_exp = fmpz_bits(bound_sum);   
-            
+            worst_exp = fmpz_bits(bound_sum);
+
             for (i = 0; i < r; i++)
                fmpz_set(col->rows[i], data->rows[i] + alt_col);
 
@@ -228,9 +228,9 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
          fmpz_mat_clear(data);
 
       } while (num_coeffs != prev_num_coeffs);
-   
+
       hensel_loops++;
-      
+
       prev_exp = _fmpz_poly_hensel_continue_lift(lifted_fac, link, v, w, f, prev_exp, a, 2*a, fp);
 
       a = 2*a;
@@ -247,7 +247,7 @@ cleanup:
    fmpz_mat_clear(M);
    fmpz_clear(bound_sum);
    fmpz_poly_factor_clear(lifted_fac);
-  
+
    for (i = 0; i < 2*r - 2; i++)
    {
       fmpz_poly_clear(v[i]);

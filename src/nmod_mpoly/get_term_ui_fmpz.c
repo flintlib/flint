@@ -28,7 +28,7 @@ ulong _nmod_mpoly_get_term_ui_fmpz(const nmod_mpoly_t poly,
     }
 
     TMP_START;
-   
+
     N = mpoly_words_per_exp(poly->bits, ctx->minfo);
 
     cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));

@@ -13,7 +13,7 @@
 #define GR_SPECIAL_H
 
 #ifdef GR_SPECIAL_INLINES_C
-#define GR_SPECIAL_INLINE 
+#define GR_SPECIAL_INLINE
 #else
 #define GR_SPECIAL_INLINE static __inline__
 #endif

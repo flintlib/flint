@@ -11,7 +11,7 @@
 
 #include "fmpq_mpoly.h"
 
-void fmpq_mpoly_get_term_exp_fmpz(fmpz ** exp, const fmpq_mpoly_t A, 
+void fmpq_mpoly_get_term_exp_fmpz(fmpz ** exp, const fmpq_mpoly_t A,
                                            slong i, const fmpq_mpoly_ctx_t ctx)
 {
     slong N;

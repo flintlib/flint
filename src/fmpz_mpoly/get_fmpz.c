@@ -12,7 +12,7 @@
 
 #include "fmpz_mpoly.h"
 
-void fmpz_mpoly_get_fmpz(fmpz_t c, const fmpz_mpoly_t A, 
+void fmpz_mpoly_get_fmpz(fmpz_t c, const fmpz_mpoly_t A,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
     slong N;

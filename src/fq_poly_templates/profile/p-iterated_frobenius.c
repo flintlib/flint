@@ -34,9 +34,9 @@ main(int argc, char** argv)
     double beta;
 
     double s[nalgs];
-    
+
     FLINT_TEST_INIT(state);
-    
+
     fmpz_init(p);
     fmpz_set_str(p, argv[1], 10);
 
@@ -50,7 +50,7 @@ main(int argc, char** argv)
 
     TEMPLATE(T, poly_init)(f, ctx);
     TEMPLATE(T, poly_init)(finv, ctx);
-    
+
     fmpz_init(q);
     TEMPLATE(T, ctx_order)(q, ctx);
 
@@ -71,7 +71,7 @@ main(int argc, char** argv)
 
     for (c = 0; c < nalgs; c++)
         s[c] = 0.0;
-            
+
     for (n = 0; n < ncases; n++)
     {
         double t[nalgs];
@@ -85,7 +85,7 @@ main(int argc, char** argv)
             TEMPLATE(T, poly_reverse)(finv, f, f->length, ctx);
             TEMPLATE(T, poly_inv_series_newton)(finv, finv, f->length, ctx);
         }
-                
+
     loop:
 
         t[0] = 0.0;
@@ -105,7 +105,7 @@ main(int argc, char** argv)
         prof_stop();
         t[0] += get_clock(0);
 
-        
+
         t[1] = 0.0;
         init_clock(0);
         prof_start();
@@ -131,7 +131,7 @@ main(int argc, char** argv)
         }
         prof_stop();
         t[2] += get_clock(0);
-               
+
         t[3] = 0.0;
         init_clock(0);
         prof_start();
@@ -152,19 +152,19 @@ main(int argc, char** argv)
                 loops *= 10;
                 goto loop;
             }
-                
+
         for (c = 0; c < nalgs; c++)
             s[c] += t[c];
         reps += loops;
     }
-            
+
     for (c = 0; c < nalgs; c++)
     {
         printf("%20f", s[c] / (double) reps);
         fflush(stdout);
     }
     printf("\n");
-    
+
     TEMPLATE(T, poly_clear)(f, ctx);
     TEMPLATE(T, poly_clear)(finv, ctx);
     for (i = 0; i < l + 1; i++)
@@ -175,7 +175,7 @@ main(int argc, char** argv)
     fmpz_clear(q);
 
     FLINT_TEST_CLEANUP(state);
-    
+
     return 0;
 }
 

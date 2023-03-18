@@ -19,7 +19,7 @@ main(void)
 {
     int i, result;
     gmp_randstate_t state;
-    
+
     FLINT_TEST_INIT(dummy);
 
     flint_printf("set_mpz_equal....");
@@ -94,7 +94,7 @@ main(void)
     }
 
     gmp_randclear(state);
-    
+
     FLINT_TEST_CLEANUP(dummy);
     flint_printf("PASS\n");
     return 0;

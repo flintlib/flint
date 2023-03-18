@@ -43,14 +43,14 @@ _nmod_poly_mul_KS2(mp_ptr res, mp_srcptr op1, slong n1,
 
    /* bits in each output coefficient */
    bits = 2 * (FLINT_BITS - mod.norm) + FLINT_CLOG2(n2);
-   
+
    /* we're evaluating at x = B and -B, where B = 2^b, and b = ceil(bits / 2) */
    b = (bits + 1) / 2;
 
    /* number of ulongs required to store each output coefficient */
    w = (2*b - 1)/FLINT_BITS + 1;
-   
-   /* 
+
+   /*
       Write f1(x) = f1e(x^2) + x * f1o(x^2)
             f2(x) = f2e(x^2) + x * f2o(x^2)
              h(x) =  he(x^2) + x *  ho(x^2)
@@ -101,9 +101,9 @@ _nmod_poly_mul_KS2(mp_ptr res, mp_srcptr op1, slong n1,
    v3p = v1_buf0;
    v3e = v1_buf2;
    v3o = v1_buf0;
-   
+
    z = TMP_ALLOC(sizeof(mp_limb_t) * w * n3e);
-   
+
    if (!sqr)
    {
       /* multiplication version */
@@ -161,8 +161,8 @@ _nmod_poly_mul_KS2(mp_ptr res, mp_srcptr op1, slong n1,
       flint_mpn_sqr(v3p, v1p, k1);
       v3m_neg = 0;
    }
-   
-   /* 
+
+   /*
       he(B^2) and B * ho(B^2) are both at most b * (n3 + 1) bits long (since
       the coefficients don't overlap). The buffers used below are at least
       b * (n1 + n2 + 2) = b * (n3 + 3) bits long. So we definitely have
@@ -170,7 +170,7 @@ _nmod_poly_mul_KS2(mp_ptr res, mp_srcptr op1, slong n1,
    */
 
    /* compute 2 * he(B^2) = h(B) + h(-B) */
-   if (v3m_neg) 
+   if (v3m_neg)
       mpn_sub_n(v3e, v3p, v3m, k3);
    else
       mpn_add_n(v3e, v3p, v3m, k3);
@@ -178,13 +178,13 @@ _nmod_poly_mul_KS2(mp_ptr res, mp_srcptr op1, slong n1,
    /* unpack coefficients of he, and reduce mod m */
    _nmod_poly_KS2_unpack(z, v3e, n3e, 2 * b, 1);
    _nmod_poly_KS2_reduce(res, 2, z, n3e, w, mod);
-   
+
    /* compute 2 * b * ho(B^2) = h(B) - h(-B) */
    if (v3m_neg)
       mpn_add_n(v3o, v3p, v3m, k3);
-   else 
+   else
       mpn_sub_n(v3o, v3p, v3m, k3);
-   
+
    /* unpack coefficients of ho, and reduce mod m */
    _nmod_poly_KS2_unpack(z, v3o, n3o, 2 * b, b + 1);
    _nmod_poly_KS2_reduce(res + 1, 2, z, n3o, w, mod);

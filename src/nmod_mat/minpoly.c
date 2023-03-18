@@ -58,7 +58,7 @@ void nmod_mat_minpoly_with_gens(nmod_poly_t p, const nmod_mat_t X, ulong * P)
    A = matA->rows;
    B = matB->rows;
    v = matv->rows;
- 
+
    L1 = (slong *) TMP_ALLOC((n + 1)*sizeof(slong));
    L2 = (slong *) TMP_ALLOC(n*sizeof(slong));
    P1 = (slong *) TMP_ALLOC((2*n + 1)*sizeof(slong));
@@ -108,13 +108,13 @@ void nmod_mat_minpoly_with_gens(nmod_poly_t p, const nmod_mat_t X, ulong * P)
       {
          r1++;
          r2 = indep ? r2 + 1 : r2;
-         
+
          nmod_mat_mul(matv, X, matv);
          v = matv->rows;
 
          for (i = 0; i < n; i++)
             A[r1][i] = v[i][0];
-         
+
          for (i = n; i < n + r1; i++)
             A[r1][i] = 0;
 
@@ -142,7 +142,7 @@ void nmod_mat_minpoly_with_gens(nmod_poly_t p, const nmod_mat_t X, ulong * P)
       }
 
       c = -WORD(1);
-         
+
       for (i = c2 + 1; i < n; i++)
       {
          if (P2[i] == -WORD(1))
@@ -155,7 +155,7 @@ void nmod_mat_minpoly_with_gens(nmod_poly_t p, const nmod_mat_t X, ulong * P)
       c2 = c;
 
       nmod_poly_fit_length(b, r1 + 1);
-        
+
       h = n_invmod(A[r1][n + r1], p->mod.n);
 
       for (i = 0; i < r1 + 1; i++)
@@ -164,7 +164,7 @@ void nmod_mat_minpoly_with_gens(nmod_poly_t p, const nmod_mat_t X, ulong * P)
          nmod_poly_set_coeff_ui(b, i, t);
       }
       _nmod_poly_set_length(b, r1 + 1);
-      
+
       nmod_poly_gcd(g, p, b);
       nmod_poly_mul(p, p, b);
       nmod_poly_div(p, p, g);
@@ -176,7 +176,7 @@ void nmod_mat_minpoly_with_gens(nmod_poly_t p, const nmod_mat_t X, ulong * P)
             for (j = 0; j < n; j++)
                B[i][j] = A[i][j];
          }
-      } 
+      }
 
       first_poly = 0;
    }

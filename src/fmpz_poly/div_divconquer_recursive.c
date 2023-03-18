@@ -17,7 +17,7 @@
 #define FLINT_DIV_DIVCONQUER_CUTOFF  16
 
 int
-_fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp, 
+_fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp,
                          const fmpz * A, const fmpz * B, slong lenB, int exact)
 {
     if (lenB <= FLINT_DIV_DIVCONQUER_CUTOFF)
@@ -34,7 +34,7 @@ _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp,
         fmpz * q1 = Q + n2;
 
         /*
-           t is a vector of length lenB - 1, h points to the top n2 coeffs 
+           t is a vector of length lenB - 1, h points to the top n2 coeffs
            of t;  r1 is vector of length lenB >= 2 n1 - 1
          */
 
@@ -43,7 +43,7 @@ _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp,
         fmpz * r1 = temp + (lenB - 1);
 
         /*
-           Set {q1, n1}, {r1, 2 n1 - 1} to the quotient and remainder of 
+           Set {q1, n1}, {r1, 2 n1 - 1} to the quotient and remainder of
            {A + 2 n2, 2 n1 - 1} divided by {B + n2, n1}
          */
 
@@ -54,18 +54,18 @@ _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp,
         _fmpz_vec_sub(r1, A + 2 * n2, r1, n1 - 1);
 
         /*
-           Set the top n2 coeffs of t to the top n2 coeffs of the product of 
+           Set the top n2 coeffs of t to the top n2 coeffs of the product of
            {q1, n1} and {B, n2}; the bottom n1 - 1 coeffs may be arbitrary
 
-           For sufficiently large polynomials, computing the full product 
-           using Kronecker segmentation is faster than computing the opposite 
+           For sufficiently large polynomials, computing the full product
+           using Kronecker segmentation is faster than computing the opposite
            short product via Karatsuba
          */
 
         _fmpz_poly_mul(t, q1, n1, B, n2);
 
         /*
-           If lenB is odd, set {h, n2} to {r1, n2} - {h, n2}, otherwise, to 
+           If lenB is odd, set {h, n2} to {r1, n2} - {h, n2}, otherwise, to
 
                {A + lenB - 1, 1} + {x * r1, n2} - {h, n2}
          */
@@ -82,17 +82,17 @@ _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp,
         }
 
         /*
-           Set t to h shifted to the right by n2 - 1, and set q0 to the 
+           Set t to h shifted to the right by n2 - 1, and set q0 to the
            quotient of {t, 2 n2 - 1} and {B + n1, n2}
-           
+
            Note the bottom n2 - 1 coefficients of t are irrelevant
          */
 
         t += (lenB & WORD(1));
-        
+
         return _fmpz_poly_div_divconquer_recursive(q0, temp + lenB,
                                                          t, B + n1, n2, exact);
-            
+
     }
 }
 

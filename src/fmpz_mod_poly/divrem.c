@@ -14,8 +14,8 @@
 #include "fmpz_mod_poly.h"
 #include "gr_poly.h"
 
-void _fmpz_mod_poly_divrem(fmpz *Q, fmpz *R, 
-    const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
+void _fmpz_mod_poly_divrem(fmpz *Q, fmpz *R,
+    const fmpz *A, slong lenA, const fmpz *B, slong lenB,
     const fmpz_t invB, const fmpz_t p)
 {
     if (lenB <= 30 || lenA - lenB <= 10)
@@ -70,7 +70,7 @@ fmpz_mod_poly_divrem(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
         fmpz_mod_poly_divrem_basecase(Q, R, A, B, ctx);
         return;
     }
-	
+
     fmpz_init(invB);
     fmpz_invmod(invB, fmpz_mod_poly_lead(B, ctx), fmpz_mod_ctx_modulus(ctx));
 
@@ -94,7 +94,7 @@ fmpz_mod_poly_divrem(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
         r = R->coeffs;
     }
 
-    _fmpz_mod_poly_divrem(q, r, A->coeffs, lenA, 
+    _fmpz_mod_poly_divrem(q, r, A->coeffs, lenA,
                              B->coeffs, lenB, invB, fmpz_mod_ctx_modulus(ctx));
 
     if (Q == A || Q == B)

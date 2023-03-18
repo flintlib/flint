@@ -31,7 +31,7 @@ fmpz_mat_solve_fflu(fmpz_mat_t X, fmpz_t den,
     fmpz_mat_init_set(LU, A);
     result = (fmpz_mat_fflu(LU, den, perm, LU, 1) == dim);
 
-    
+
     if (result)
     {
         fmpz_mat_solve_fflu_precomp(X, perm, LU, B);

@@ -47,7 +47,7 @@ fmpq_mat_can_solve_fraction_free(fmpq_mat_t X, const fmpq_mat_t A,
     fmpz_init(den);
 
     fmpq_mat_get_fmpz_mat_rowwise_2(Anum, Bnum, NULL, A, B);
-    
+
     success = fmpz_mat_can_solve_fflu(Xnum, den, Anum, Bnum);
 
     if (success)

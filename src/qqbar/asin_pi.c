@@ -51,7 +51,7 @@ qqbar_asin_pi(slong * p, ulong * q, const qqbar_t x)
             *q = 6;
             return 1;
         }
-    
+
         if (QQBAR_COEFFS(x)[1] == 2 && QQBAR_COEFFS(x)[0] == 1)
         {
             *p = -1;

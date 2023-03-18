@@ -41,7 +41,7 @@ void _n_fq_poly_mul_(
             slong j_start = FLINT_MAX(0, i - Clen + 1);
             slong j_stop = FLINT_MIN(i, Blen - 1);
             j = j_start;
-                
+
             if (j_stop <= j_start)
             {
                 FLINT_ASSERT(j_stop == j_start);

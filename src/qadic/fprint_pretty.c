@@ -12,7 +12,7 @@
 #include "fmpq_poly.h"
 #include "qadic.h"
 
-int _qadic_fprint_pretty(FILE * file, const fmpz *u, slong len, slong v, 
+int _qadic_fprint_pretty(FILE * file, const fmpz *u, slong len, slong v,
     const qadic_ctx_t ctx)
 {
     const fmpz *p = (&ctx->pctx)->p;
@@ -130,7 +130,7 @@ int _qadic_fprint_pretty(FILE * file, const fmpz *u, slong len, slong v,
             fputc('*', file);
             fmpz_fprint(file, p);
         }
-        else 
+        else
         {
             fputc('(', file);
             _fmpz_poly_fprint_pretty(file, u, len, ctx->var);

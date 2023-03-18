@@ -63,7 +63,7 @@ int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A,
     exponents = (fmpz *) TMP_ALLOC(mctx->nvars*sizeof(ulong));
     for (i = 0; i < mctx->nvars; i++)
         fmpz_init(exponents + i);
-   
+
     for (i = 0; i < len; i++)
     {
         if (i > 0)

@@ -14,24 +14,24 @@
 #include "qadic.h"
 
 /*
-    Carries out the finite series evaluation for the logarithm 
+    Carries out the finite series evaluation for the logarithm
     \begin{equation*}
     \sum_{i=1}^{n} a_i y^i
     = \sum_{j=0}^{\ceil{n/b}-1} \Bigl(\sum_{i=1}^b a_{i+jb} y^i\Bigr) y^{jb}
     \end{equation*}
-    where $a_i = 1/i$ with the choice $b = \floor{\sqrt{n}}$, 
+    where $a_i = 1/i$ with the choice $b = \floor{\sqrt{n}}$,
     all modulo $p^N$, where also $P = p^N$.
 
     Assumes that $y$ is reduced modulo $p^N$.
 
-    Assumes that $z$ has space for $2d - 1$ coefficients, but 
+    Assumes that $z$ has space for $2d - 1$ coefficients, but
     sets only the first $d$ to meaningful values on exit.
 
     Supports aliasing between $y$ and $z$.
  */
-static void 
-_qadic_log_rectangular_series(fmpz *z, const fmpz *y, slong len, slong n, 
-                       const fmpz *a, const slong *j, slong lena, 
+static void
+_qadic_log_rectangular_series(fmpz *z, const fmpz *y, slong len, slong n,
+                       const fmpz *a, const slong *j, slong lena,
                        const fmpz_t p, slong N, const fmpz_t pN)
 {
     const slong d = j[lena - 1];
@@ -143,8 +143,8 @@ _qadic_log_rectangular_series(fmpz *z, const fmpz *y, slong len, slong n,
     }
 }
 
-void _qadic_log_rectangular(fmpz *z, const fmpz *y, slong v, slong len, 
-                            const fmpz *a, const slong *j, slong lena, 
+void _qadic_log_rectangular(fmpz *z, const fmpz *y, slong v, slong len,
+                            const fmpz *a, const slong *j, slong lena,
                             const fmpz_t p, slong N, const fmpz_t pN)
 {
     const slong d = j[lena - 1];
@@ -200,7 +200,7 @@ int qadic_log_rectangular(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
                 {
                     padic_poly_fit_length(rop, d);
 
-                    _qadic_log_rectangular(rop->coeffs, x, v, len, 
+                    _qadic_log_rectangular(rop->coeffs, x, v, len,
                                            ctx->a, ctx->j, ctx->len, p, N, pN);
                     rop->val = 0;
 

@@ -20,7 +20,7 @@ main(void)
     slong i, j;
     fq_nmod_ctx_t ctx;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("get/set_nmod_poly... ");
     fflush(stdout);
 

@@ -1,5 +1,5 @@
 /*
-    Authored 2015 by Daniel S. Roche; US Government work in the public domain. 
+    Authored 2015 by Daniel S. Roche; US Government work in the public domain.
 
     This file is part of FLINT.
 
@@ -31,7 +31,7 @@ int main(void)
             fmpz_init(p);
 
             fmpz_randprime(p, state, bits, 1);
-            
+
             if (fmpz_bits(p) != bits)
             {
                 flint_printf("FAIL: not %wu bits\n", bits);
@@ -57,7 +57,7 @@ int main(void)
         /* at this point, the chances of a collision are less than
          * one in a billion. So it should never happen.
          */
-        
+
         for (i=0; i < 1 + flint_test_multiplier()/5; ++i)
         {
             int j;
@@ -69,7 +69,7 @@ int main(void)
             for (j=0; j<2; ++j)
             {
                 fmpz_randprime(p+j, state, bits, 0);
-                
+
                 if (fmpz_bits(p+j) != bits)
                 {
                     flint_printf("FAIL: not %wu bits\n", bits);

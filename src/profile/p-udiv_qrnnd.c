@@ -23,7 +23,7 @@ void sample(void * arg, ulong count)
    FLINT_TEST_INIT(state);
 
    d = n_randtest_not_zero(state);
-      
+
    for (i = 0; i < count; i++)
    {
       for (j = 0; j < 200; j+=2)
@@ -32,9 +32,9 @@ void sample(void * arg, ulong count)
          {
             array[j] = n_randtest(state);
          } while (array[j] >= d);
-         array[j + 1] = n_randtest(state);  
+         array[j + 1] = n_randtest(state);
       }
-      
+
       prof_start();
       for (j = 0; j < 200; j+=2)
       {
@@ -53,10 +53,10 @@ void sample(void * arg, ulong count)
 int main(void)
 {
    double min, max;
-   
+
    prof_repeat(&min, &max, sample, NULL);
-   
-   flint_printf("udiv_qrnnd min time is %.3f cycles, max time is %.3f cycles\n", 
+
+   flint_printf("udiv_qrnnd min time is %.3f cycles, max time is %.3f cycles\n",
            (min/(double)FLINT_CLOCK_SCALE_FACTOR)/100, (max/(double)FLINT_CLOCK_SCALE_FACTOR)/100);
 
    return 0;

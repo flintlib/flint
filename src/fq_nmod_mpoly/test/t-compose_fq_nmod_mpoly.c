@@ -119,7 +119,7 @@ main(void)
         C = (fq_nmod_mpoly_struct **) flint_malloc(nvarsB * sizeof(fq_nmod_mpoly_struct *));
         for (v = 0; v < nvarsB; v++)
         {
-            C[v] = (fq_nmod_mpoly_struct *) flint_malloc(sizeof(fq_nmod_mpoly_struct)); 
+            C[v] = (fq_nmod_mpoly_struct *) flint_malloc(sizeof(fq_nmod_mpoly_struct));
             fq_nmod_mpoly_init(C[v], ctxAC);
         }
 
@@ -201,9 +201,9 @@ main(void)
         vals1 = (fq_nmod_mpoly_struct **) flint_malloc(nvars*sizeof(fq_nmod_mpoly_struct *));
         for (v = 0; v < nvars; v++)
         {
-            vals1[v] = (fq_nmod_mpoly_struct *) flint_malloc(sizeof(fq_nmod_mpoly_struct)); 
+            vals1[v] = (fq_nmod_mpoly_struct *) flint_malloc(sizeof(fq_nmod_mpoly_struct));
             fq_nmod_mpoly_init(vals1[v], ctx);
-            fq_nmod_mpoly_gen(vals1[v], v, ctx);            
+            fq_nmod_mpoly_gen(vals1[v], v, ctx);
         }
 
         fq_nmod_mpoly_init(f, ctx);
@@ -248,7 +248,7 @@ main(void)
         for (v = 0; v < nvars; v++)
         {
             fq_nmod_mpoly_clear(vals1[v], ctx);
-            flint_free(vals1[v]);            
+            flint_free(vals1[v]);
         }
         flint_free(vals1);
 
@@ -294,7 +294,7 @@ main(void)
         for (v = 0; v < nvars1; v++)
         {
             vals1[v] = (fq_nmod_mpoly_struct *) flint_malloc(
-                                                 sizeof(fq_nmod_mpoly_struct)); 
+                                                 sizeof(fq_nmod_mpoly_struct));
             fq_nmod_mpoly_init(vals1[v], ctx2);
             fq_nmod_mpoly_randtest_bound(vals1[v], state, len2, exp_bits2, ctx2);
         }
@@ -411,7 +411,7 @@ main(void)
         for (v = 0; v < nvars1; v++)
         {
             vals1[v] = (fq_nmod_mpoly_struct *) flint_malloc(
-                                                 sizeof(fq_nmod_mpoly_struct)); 
+                                                 sizeof(fq_nmod_mpoly_struct));
             fq_nmod_mpoly_init(vals1[v], ctx2);
             vals2[v] = (fq_nmod_struct *) flint_malloc(sizeof(fq_nmod_struct));
             fq_nmod_init(vals2[v], ctx1->fqctx);

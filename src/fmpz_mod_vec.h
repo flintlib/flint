@@ -13,7 +13,7 @@
 #define FMPZ_MOD_VEC_H
 
 #ifdef FMPZ_MOD_VEC_INLINES_C
-#define FMPZ_MOD_VEC_INLINE 
+#define FMPZ_MOD_VEC_INLINE
 #else
 #define FMPZ_MOD_VEC_INLINE static __inline__
 #endif

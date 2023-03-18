@@ -12,7 +12,7 @@
 #include "fmpz_mat.h"
 #include "padic_mat.h"
 
-void padic_mat_mul(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
+void padic_mat_mul(padic_mat_t C, const padic_mat_t A, const padic_mat_t B,
                                   const padic_ctx_t ctx)
 {
     if (padic_mat_is_empty(C))

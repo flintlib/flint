@@ -31,7 +31,7 @@ int main(void)
 {
    int i, result;
    FLINT_TEST_INIT(state);
-   
+
    flint_printf("byte_swap....");
    fflush(stdout);
 
@@ -41,9 +41,9 @@ int main(void)
       ulong n, r1, r2;
 
       n = n_randtest(state);
-      
+
       r1 = n;
-      
+
       r2 = n;
       byte_swap(r2);
       byte_swap(r2);
@@ -65,7 +65,7 @@ int main(void)
       ulong n, r1, r2;
 
       n = n_randtest(state);
-      
+
       r1 = n;
       byte_swap(r1);
 
@@ -83,7 +83,7 @@ int main(void)
    }
 
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

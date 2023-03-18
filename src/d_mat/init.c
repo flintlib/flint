@@ -16,7 +16,7 @@ void
 d_mat_init(d_mat_t mat, slong rows, slong cols)
 {
     slong i;
-    
+
     if (rows != 0)
         mat->rows = (double **) flint_malloc(rows * sizeof(double *));
     else

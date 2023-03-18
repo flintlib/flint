@@ -89,7 +89,7 @@ slong _fmpz_poly_factor_CLD_mat(fmpz_mat_t res, const fmpz_poly_t f,
          fmpz_poly_derivative(gd, trunc_fac);
          fmpz_poly_mullow(gcld, f, gd, lo_n + zeroes);
          fmpz_poly_divlow_smodp(res->rows[i], gcld, trunc_fac, P, lo_n);
-      }      
+      }
    }
 
    if (hi_n > 0)
@@ -97,7 +97,7 @@ slong _fmpz_poly_factor_CLD_mat(fmpz_mat_t res, const fmpz_poly_t f,
       fmpz_poly_init(temp);
 
       fmpz_poly_attach_shift(trunc_f, f, f->length - hi_n);
-      
+
       for (i = 0; i < r; i++)
       {
          slong len = lifted_fac->p[i].length - hi_n - 1;
@@ -117,7 +117,7 @@ slong _fmpz_poly_factor_CLD_mat(fmpz_mat_t res, const fmpz_poly_t f,
          }
       }
 
-      fmpz_poly_clear(temp);      
+      fmpz_poly_clear(temp);
    }
 
    if (hi_n > 0)

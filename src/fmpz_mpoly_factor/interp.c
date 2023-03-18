@@ -332,7 +332,7 @@ int fmpz_mpoly_interp_crt_p_mpolyn(
 
             /* F term missing, A term ok */
             fmpz_CRT_ui(Tcoeff + Ti, zero, modulus, (Acoeff + Ai)->coeffs[vi],
-                                                               pctx->mod.n, 1);            
+                                                               pctx->mod.n, 1);
             FLINT_ASSERT(!fmpz_is_zero(Tcoeff + Ti));
             changed = 1;
             mpoly_monomial_set_extra(Texp + N*Ti, Aexp + N*Ai, N, offset, vi << shift);

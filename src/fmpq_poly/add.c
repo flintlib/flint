@@ -12,8 +12,8 @@
 #include "fmpq.h"
 #include "fmpq_poly.h"
 
-void _fmpq_poly_add_can(fmpz * rpoly, fmpz_t rden, 
-                    const fmpz * poly1, const fmpz_t den1, slong len1, 
+void _fmpq_poly_add_can(fmpz * rpoly, fmpz_t rden,
+                    const fmpz * poly1, const fmpz_t den1, slong len1,
                     const fmpz * poly2, const fmpz_t den2, slong len2, int can)
 {
     slong max = FLINT_MAX(len1, len2);
@@ -65,12 +65,12 @@ void _fmpq_poly_add_can(fmpz * rpoly, fmpz_t rden,
         fmpz_init(den22);
         fmpz_divexact(den11, den1, d);
         fmpz_divexact(den22, den2, d);
-        
+
         _fmpz_vec_scalar_mul_fmpz(rpoly, poly1, len1, den22);
         _fmpz_vec_scalar_addmul_fmpz(rpoly, poly2, len2, den11);
         if (len1 < len2)
             _fmpz_vec_scalar_mul_fmpz(rpoly + min, poly2 + min, max - min, den11);
-        
+
         if (_fmpz_vec_is_zero(rpoly, max))
             fmpz_one(rden);
         else
@@ -98,18 +98,18 @@ void _fmpq_poly_add_can(fmpz * rpoly, fmpz_t rden,
     fmpz_clear(d);
 }
 
-void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden, 
-                    const fmpz * poly1, const fmpz_t den1, slong len1, 
+void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden,
+                    const fmpz * poly1, const fmpz_t den1, slong len1,
                     const fmpz * poly2, const fmpz_t den2, slong len2)
 {
    _fmpq_poly_add_can(rpoly, rden, poly1, den1, len1, poly2, den2, len2, 1);
 }
 
-void fmpq_poly_add_can(fmpq_poly_t res, const fmpq_poly_t poly1, 
+void fmpq_poly_add_can(fmpq_poly_t res, const fmpq_poly_t poly1,
                                     const fmpq_poly_t poly2, int can)
 {
     slong len1 = poly1->length, len2, max;
-    
+
     if (poly1 == poly2)  /* Set res = 2 * poly1 */
     {
         fmpq_poly_fit_length(res, len1);
@@ -127,25 +127,25 @@ void fmpq_poly_add_can(fmpq_poly_t res, const fmpq_poly_t poly1,
         }
         return;
     }
-    
+
     len2 = poly2->length;
     max  = FLINT_MAX(len1, len2);
     fmpq_poly_fit_length(res, max);
-    
+
     if (res != poly2)
-        _fmpq_poly_add_can(res->coeffs, res->den, 
-                       poly1->coeffs, poly1->den, len1, 
+        _fmpq_poly_add_can(res->coeffs, res->den,
+                       poly1->coeffs, poly1->den, len1,
                        poly2->coeffs, poly2->den, len2, can);
     else
-        _fmpq_poly_add_can(res->coeffs, res->den, 
-                       poly2->coeffs, poly2->den, len2, 
+        _fmpq_poly_add_can(res->coeffs, res->den,
+                       poly2->coeffs, poly2->den, len2,
                        poly1->coeffs, poly1->den, len1, can);
-    
+
     _fmpq_poly_set_length(res, max);
     _fmpq_poly_normalise(res);
 }
 
-void fmpq_poly_add(fmpq_poly_t res, const fmpq_poly_t poly1, 
+void fmpq_poly_add(fmpq_poly_t res, const fmpq_poly_t poly1,
                                     const fmpq_poly_t poly2)
 {
    fmpq_poly_add_can(res, poly1, poly2, 1);

@@ -23,7 +23,7 @@ main(void)
     FLINT_TEST_INIT(state);
 
     flint_printf("sub_series....");
-    fflush(stdout);    
+    fflush(stdout);
 
     /* Check aliasing of a and c */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -41,7 +41,7 @@ main(void)
         fmpq_poly_sub_series(c, a, b, n);
         fmpq_poly_sub_series(a, a, b, n);
                 cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
-        
+
         cflags |= fmpq_poly_is_canonical(c) ? 0 : 2;
                 result = (fmpq_poly_equal(a, c) && !cflags);
         if (!result)
@@ -114,7 +114,7 @@ main(void)
         fmpq_poly_sub_series(d, a, b, n);
         fmpq_poly_sub(e, a, b);
         fmpq_poly_truncate(e, n);
-        
+
         cflags |= fmpq_poly_is_canonical(d) ? 0 : 1;
         cflags |= fmpq_poly_is_canonical(e) ? 0 : 2;
 
@@ -139,7 +139,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

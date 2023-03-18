@@ -12,7 +12,7 @@
 
 #include "fmpz_mpoly.h"
 
-void fmpz_mpoly_get_term_exp_si(slong * exp, const fmpz_mpoly_t A, 
+void fmpz_mpoly_get_term_exp_si(slong * exp, const fmpz_mpoly_t A,
                                            slong i, const fmpz_mpoly_ctx_t ctx)
 {
     slong N;

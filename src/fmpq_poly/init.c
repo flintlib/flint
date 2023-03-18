@@ -27,7 +27,7 @@ void fmpq_poly_init2(fmpq_poly_t poly, slong alloc)
 {
     /* Allocate space for alloc small coeffs */
     poly->coeffs = (alloc ? (fmpz *) flint_calloc(alloc, sizeof(fmpz)) : NULL);
-    
+
     fmpz_init(poly->den);
     fmpz_one(poly->den);
     poly->alloc  = alloc;

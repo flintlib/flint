@@ -77,7 +77,7 @@ void __flint_set_memory_functions(void *(*alloc_func) (size_t),
                              void *(*calloc_func) (size_t, size_t),
                              void *(*realloc_func) (void *, size_t),
                              void (*free_func) (void *))
-{  
+{
 #if FLINT_REENTRANT && !FLINT_USES_TLS
     pthread_once(&alloc_func_init, __flint_set_memory_functions_init);
     pthread_mutex_lock(&alloc_func_lock);
@@ -133,7 +133,7 @@ void * _flint_realloc(void * ptr, size_t size)
 FLINT_WARN_UNUSED void * flint_realloc(void * ptr, size_t size)
 {
     void * ptr2;
-  
+
     if (ptr)
       ptr2 = (*__flint_reallocate_func)(ptr, size);
     else
@@ -232,7 +232,7 @@ void _flint_cleanup()
 
     mpfr_free_cache();
     _fmpz_cleanup();
-    
+
 #if FLINT_REENTRANT && !FLINT_USES_TLS
     pthread_mutex_unlock(&register_lock);
 #endif

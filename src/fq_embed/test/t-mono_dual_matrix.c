@@ -16,7 +16,7 @@ int
 main(void)
 {
     int i;
-    
+
     FLINT_TEST_INIT(state);
 
     flint_printf("mono_to/from_dual_matrix... ");
@@ -36,13 +36,13 @@ main(void)
         fmpz_mod_mat_init(d2m, d, d, fq_ctx_prime(ctx));
         fmpz_mod_mat_init(one, d, d, fq_ctx_prime(ctx));
         fmpz_mod_mat_init(two, d, d, fq_ctx_prime(ctx));
-        
+
         fq_embed_mono_to_dual_matrix(m2d, ctx);
         fq_embed_dual_to_mono_matrix(d2m, ctx);
         fmpz_mod_mat_mul(one, m2d, d2m);
 
         fmpz_mod_mat_one(two);
-        
+
         if (!fmpz_mod_mat_equal(one, two))
         {
             flint_printf("FAIL:\n\n");

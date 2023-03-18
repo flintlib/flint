@@ -31,9 +31,9 @@ main(void)
         fmpz_t p;
         fmpz_mod_poly_t poly;
         slong d;
-        
+
         fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 
+        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state,
                                    FLINT_MIN(FLINT_BITS - 1, 10)), 1));
         fmpz_mod_ctx_set_modulus(ctx, p);
         d = n_randint(state, 5) + 3;
@@ -47,7 +47,7 @@ main(void)
 
     fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

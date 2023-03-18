@@ -74,14 +74,14 @@ main(void)
           }
        }
 
-       fmpz_mpoly_clear(f, ctx);  
-       fmpz_mpoly_clear(g, ctx);  
-       fmpz_mpoly_clear(h, ctx);  
-       fmpz_mpoly_clear(k, ctx);  
+       fmpz_mpoly_clear(f, ctx);
+       fmpz_mpoly_clear(g, ctx);
+       fmpz_mpoly_clear(h, ctx);
+       fmpz_mpoly_clear(k, ctx);
 
-       fmpz_clear(a);      
-       fmpz_clear(b);      
-       fmpz_clear(c);      
+       fmpz_clear(a);
+       fmpz_clear(b);
+       fmpz_clear(c);
     }
 
     /* Check aliasing */
@@ -104,7 +104,7 @@ main(void)
 
        exp_bits = n_randint(state, 200) + 1;
        coeff_bits = n_randint(state, 200);
-       
+
        for (j = 0; j < 10; j++)
        {
           fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
@@ -115,7 +115,7 @@ main(void)
           fmpz_mpoly_set(g, f, ctx);
 
           fmpz_mpoly_scalar_mul_fmpz(h, f, c, ctx);
-          
+
           fmpz_mpoly_scalar_mul_fmpz(g, g, c, ctx);
 
           result = fmpz_mpoly_equal(g, h, ctx);
@@ -129,15 +129,15 @@ main(void)
           }
        }
 
-       fmpz_mpoly_clear(f, ctx);  
-       fmpz_mpoly_clear(g, ctx);  
-       fmpz_mpoly_clear(h, ctx);  
+       fmpz_mpoly_clear(f, ctx);
+       fmpz_mpoly_clear(g, ctx);
+       fmpz_mpoly_clear(h, ctx);
 
-       fmpz_clear(c);      
+       fmpz_clear(c);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

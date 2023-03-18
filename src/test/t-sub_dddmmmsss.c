@@ -17,7 +17,7 @@ int main(void)
 {
     int i, j, result;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("sub_dddmmmsss....");
     fflush(stdout);
 
@@ -41,17 +41,17 @@ int main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("a[2] = %wu, a[1] = %wu, a[0] = %wu\n", a[2], a[1], a[0]); 
-            flint_printf("b[2] = %wu, b[1] = %wu, b[0] = %wu\n", b[2], b[1], b[0]); 
-            flint_printf("s[2] = %wu, s[1] = %wu, s[0] = %wu\n", s[2], s[1], s[0]); 
-            flint_printf("t[2] = %wu, t[1] = %wu, t[0] = %wu\n", t[2], t[1], t[0]); 
+            flint_printf("a[2] = %wu, a[1] = %wu, a[0] = %wu\n", a[2], a[1], a[0]);
+            flint_printf("b[2] = %wu, b[1] = %wu, b[0] = %wu\n", b[2], b[1], b[0]);
+            flint_printf("s[2] = %wu, s[1] = %wu, s[0] = %wu\n", s[2], s[1], s[0]);
+            flint_printf("t[2] = %wu, t[1] = %wu, t[0] = %wu\n", t[2], t[1], t[0]);
             fflush(stdout);
             flint_abort();
         }
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

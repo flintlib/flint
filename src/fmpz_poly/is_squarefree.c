@@ -27,7 +27,7 @@ int _fmpz_poly_is_squarefree(const fmpz * poly, slong len)
         fmpz_t lhs, rhs;
         fmpz_init(lhs);
         fmpz_init(rhs);
-        
+
         fmpz_mul(lhs, poly + 1, poly + 1);
         fmpz_mul(rhs, poly, poly + 2);
         fmpz_mul_ui(rhs, rhs, 4);
@@ -41,11 +41,11 @@ int _fmpz_poly_is_squarefree(const fmpz * poly, slong len)
     {
         int ans;
         fmpz * w = _fmpz_vec_init(2 * len);
-        
+
         _fmpz_poly_derivative(w, poly, len);
         _fmpz_poly_gcd(w + len, poly, len, w, len - WORD(1));
         ans = _fmpz_vec_is_zero(w + len + 1, len - 2);
- 
+
         _fmpz_vec_clear(w, 2 * len);
         return ans;
     }

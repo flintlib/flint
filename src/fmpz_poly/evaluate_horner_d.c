@@ -19,7 +19,7 @@ double _fmpz_poly_evaluate_horner_d(const fmpz * poly, slong n, double d)
    double ans;
 
    ans = fmpz_get_d(poly + n - 1);
-   
+
    for (i = n - 2; i >= 0L; i--)
    {
       ans *= d;

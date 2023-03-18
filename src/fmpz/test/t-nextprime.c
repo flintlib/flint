@@ -1,5 +1,5 @@
 /*
-    Authored 2015 by Daniel S. Roche; US Government work in the public domain. 
+    Authored 2015 by Daniel S. Roche; US Government work in the public domain.
 
     This file is part of FLINT.
 
@@ -50,7 +50,7 @@ int main(void)
         fmpz_init(start);
         fmpz_init(expected);
         fmpz_init(actual);
-        
+
         fmpz_set_str(start, manual_tests[i], 10);
         fmpz_nextprime(actual, start, 0);
         fmpz_set_str(expected, manual_tests[i+1], 10);

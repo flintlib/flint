@@ -13,7 +13,7 @@
 #include "aprcl.h"
 
 /*
-    Computes f = g * h for p = 2^2. 
+    Computes f = g * h for p = 2^2.
     g and h must be reduced by F_4 cyclotomic polynomial.
     t is the memory for fmpz_t; size of t must be > 9.
     Resulting f reduced by F_4 cyclotomic polynomial.
@@ -55,7 +55,7 @@ unity_zp_mul4(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
 }
 
 /*
-    Computes f = g * h for p = 2^3. 
+    Computes f = g * h for p = 2^3.
     g and h must be reduced by F_8 cyclotomic polynomial.
     t is the memory for fmpz_t; size of t must be > 27.
     Resulting f reduced by F_8 cyclotomic polynomial.
@@ -136,7 +136,7 @@ unity_zp_mul8(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
 }
 
 /*
-    Computes f = g * h for p = 2^4. 
+    Computes f = g * h for p = 2^4.
     g and h must be reduced by F_16 cyclotomic polynomial.
     t is the memory for fmpz_t; size of t must be > 63.
     Resulting f reduced by F_16 cyclotomic polynomial.
@@ -181,7 +181,7 @@ unity_zp_mul16(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
     fmpz_set(t[6], t[42]);                  /*  set b2 = y2     */
     fmpz_set(t[7], t[43]);                  /*  set b3 = y3     */
 
-    /* 
+    /*
         apply auxiliary routine 2 with (a0, .. , a3) and (b0, .. , b3)
         store result in (c0, .. , c6)
     */
@@ -200,7 +200,7 @@ unity_zp_mul16(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
     fmpz_set(t[6], t[36]);                  /*  set b2 = x6     */
     fmpz_set(t[7], t[37]);                  /*  set b3 = x7     */
 
-    /* 
+    /*
         apply auxiliary routine 2 with (a0, .. , a3) and (b0, .. , b3)
         store result in (c0, .. , c6)
     */
@@ -219,7 +219,7 @@ unity_zp_mul16(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
     fmpz_set(t[6], t[32]);                  /*  set b2 = x2     */
     fmpz_set(t[7], t[33]);                  /*  set b3 = x3     */
 
-    /* 
+    /*
         apply auxiliary routine 2 with (a0, .. , a3) and (b0, .. , b3)
         store result in (c0, .. , c6)
     */

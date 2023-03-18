@@ -31,7 +31,7 @@ main(void)
         slong nreal, ncomplex, nreal_max, ncomplex_max, r1, r2;
         slong len = n_randint(state, 20) + 1;
         flint_bitcnt_t bits = n_randint(state, 50) + 1;
-        
+
         fmpz_poly_init2(poly, len);
         fmpz_poly_init2(linear, 2);
         fmpz_poly_init2(quadratic, 3);
@@ -47,30 +47,30 @@ main(void)
         nreal = 0;
 
         fmpz_poly_set_coeff_si(poly, 0, 1);
-        
+
         for (j = 0; j < ncomplex_max; j++)
         {
             fmpz * a = quadratic->coeffs + 2;
             fmpz * b = quadratic->coeffs + 1;
             fmpz * c = quadratic->coeffs;
-            
+
             /* Form a quadratic polynomial with complex roots: b^2 < 4ac */
             fmpz_randtest_not_zero(c, state, bits);
             fmpz_randtest(b, state, bits);
             fmpz_randtest_unsigned(a, state, bits);
-            
+
             if (fmpz_sgn(c) < 0)
             {
                 fmpz_neg(c, c);
                 fmpz_neg(b, b);
             }
-            
+
             fmpz_mul_ui(rhs, c, 4);
             fmpz_mul(lhs, b, b);
             fmpz_add(lhs, lhs, rhs);
             fmpz_fdiv_q(lhs, lhs, rhs);
             fmpz_add(a, a, lhs);
-            
+
             /* If quadratic does not divide poly over Q, set poly *= complex */
             fmpz_poly_pseudo_rem_cohen(rem, poly, quadratic);
             if (rem->length > 0)
@@ -79,13 +79,13 @@ main(void)
                 ncomplex++;
             }
         }
-        
+
         for (j = 0; j < nreal_max; j++)
         {
             /* Form a linear polynomial */
             fmpz_randtest(linear->coeffs, state, bits);
             fmpz_randtest_not_zero(linear->coeffs + 1, state, bits);
-            
+
             /* If linear does not divide poly over Q, set poly *= linear */
             fmpz_poly_pseudo_rem_cohen(rem, poly, linear);
             if (rem->length > 0)
@@ -94,7 +94,7 @@ main(void)
                 nreal++;
             }
         }
-        
+
         fmpz_poly_signature(&r1, &r2, poly);
 
         result = ((r1 == nreal) && (r2 == ncomplex));
@@ -139,7 +139,7 @@ main(void)
         fmpz_poly_t poly;
 
         fmpz_poly_init(poly);
- 
+
         fmpz_poly_cyclotomic(poly, i + 3);
 
         fmpz_poly_signature(&r, &s, poly);
@@ -153,12 +153,12 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         fmpz_poly_clear(poly);
     }
-    
+
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

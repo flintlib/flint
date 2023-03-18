@@ -2762,7 +2762,7 @@ class gr_elem:
         """
         Return whether self has a multiplicative inverse in its domain.
 
-            >>> 
+            >>>
             >>> ZZ(3).is_invertible()
             False
             >>> ZZ(-1).is_invertible()

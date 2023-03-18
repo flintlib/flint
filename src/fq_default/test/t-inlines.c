@@ -32,7 +32,7 @@ int main(void)
         fmpz_init(o);
         fmpz_init(o1);
         fmpz_randprime(p, state, n_randint(state, 2) ? 60 : 120, 1);
-        d = n_randint(state, 4) + 1, 
+        d = n_randint(state, 4) + 1,
         fq_default_ctx_init(ctx, p, d, "a");
         fq_default_init(a, ctx);
         fq_default_init(b, ctx);
@@ -59,7 +59,7 @@ int main(void)
         fq_default_one(b, ctx);
         fq_default_sub(b, c, b, ctx);
         FLINT_TEST(fq_default_equal(a, b, ctx));
-        
+
         fq_default_randtest(a, state, ctx);
         fq_default_randtest(b, state, ctx);
         fq_default_randtest_not_zero(c, state, ctx);
@@ -79,7 +79,7 @@ int main(void)
         fq_default_add(a, c, c, ctx);
         fq_default_mul_ui(b, c, 2, ctx);
         FLINT_TEST(fq_default_equal(a, b, ctx));
-        
+
         fq_default_mul_fmpz(a, c, p, ctx);
         FLINT_TEST(fq_default_is_zero(a, ctx));
 
@@ -117,7 +117,7 @@ int main(void)
         fmpz_clear(o);
         fmpz_clear(o1);
     }
-    
+
     FLINT_TEST_CLEANUP(state);
 
     flint_printf("PASS\n");

@@ -94,7 +94,7 @@ _nmod_poly_KS2_recover_reduce2(mp_ptr res, slong s, mp_srcptr op1,
    y1 = *op2--;
 
    borrow = 0;
-   
+
    b2 = FLINT_BITS - b;
 
    /* plain reduction version */
@@ -161,7 +161,7 @@ _nmod_poly_KS2_recover_reduce3(mp_ptr res, slong s, mp_srcptr op1,
                           mp_srcptr op2, slong n, ulong b,
                           nmod_t mod)
 {
-   /* 
+   /*
       The main loop is the same as in zn_array_recover_reduce1(), but needs
       to operate on double-word quantities everywhere, i.e. we simulate
       double-word registers. The suffixes L and H stand for low and high words

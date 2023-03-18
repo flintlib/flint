@@ -287,7 +287,7 @@ arb_mat_mul_block(arb_mat_t C, const arb_mat_t A, const arb_mat_t B, slong prec)
             else
             {
                 b = arf_bits(arb_midref(t));
-                A_bot[i * N + j] = ARF_EXP(arb_midref(t)) - b; 
+                A_bot[i * N + j] = ARF_EXP(arb_midref(t)) - b;
                 A_bits[i * N + j] = b;
                 A_max_bits = FLINT_MAX(A_max_bits, b);
                 A_density++;

@@ -31,7 +31,7 @@ main(void)
         mp_limb_t p;
         nmod_poly_t a, b, d, g, s, t, u;
 
-        
+
         p = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, p);
@@ -43,7 +43,7 @@ main(void)
         nmod_poly_init(u, p);
 
         nmod_poly_randtest(a, state, n_randint(state, 100));
-        do 
+        do
             nmod_poly_randtest(b, state, n_randint(state, 100));
         while (b->length < 2);
 
@@ -95,7 +95,7 @@ main(void)
         nmod_poly_init(u, p);
 
         nmod_poly_randtest(a, state, n_randint(state, 100));
-        do 
+        do
             nmod_poly_randtest(b, state, n_randint(state, 100));
         while (b->length < 2);
         nmod_poly_randtest_not_zero(f, state, n_randint(state, 20) + 1);

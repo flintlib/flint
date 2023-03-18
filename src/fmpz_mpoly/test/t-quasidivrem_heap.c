@@ -80,7 +80,7 @@ main(void)
         fmpz_mpoly_clear(g, ctx);
         fmpz_mpoly_clear(h, ctx);
         fmpz_mpoly_clear(q1, ctx);
-        fmpz_mpoly_clear(r1, ctx);  
+        fmpz_mpoly_clear(r1, ctx);
         fmpz_clear(s1);
     }
 
@@ -159,11 +159,11 @@ main(void)
 
         fmpz_clear(s1);
         fmpz_clear(s2);
-        fmpz_mpoly_clear(f, ctx);  
-        fmpz_mpoly_clear(g, ctx);  
-        fmpz_mpoly_clear(h, ctx);  
-        fmpz_mpoly_clear(k, ctx);  
-        fmpz_mpoly_clear(r1, ctx);  
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(h, ctx);
+        fmpz_mpoly_clear(k, ctx);
+        fmpz_mpoly_clear(r1, ctx);
         fmpz_mpoly_clear(t1, ctx);
         fmpz_mpoly_clear(t2, ctx);
     }
@@ -243,15 +243,15 @@ main(void)
 
         fmpz_clear(s1);
         fmpz_clear(s2);
-        fmpz_mpoly_clear(f, ctx);  
-        fmpz_mpoly_clear(g, ctx);  
-        fmpz_mpoly_clear(h, ctx);  
-        fmpz_mpoly_clear(k, ctx);  
-        fmpz_mpoly_clear(r1, ctx);  
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(h, ctx);
+        fmpz_mpoly_clear(k, ctx);
+        fmpz_mpoly_clear(r1, ctx);
         fmpz_mpoly_clear(t1, ctx);
         fmpz_mpoly_clear(t2, ctx);
     }
-	
+
     /* Check aliasing of remainder with first argument */
     for (i = 0; i < 5 * flint_test_multiplier(); i++)
     {
@@ -327,11 +327,11 @@ main(void)
 
         fmpz_clear(s1);
         fmpz_clear(s2);
-        fmpz_mpoly_clear(f, ctx);  
-        fmpz_mpoly_clear(g, ctx);  
-        fmpz_mpoly_clear(h, ctx);  
-        fmpz_mpoly_clear(k, ctx);  
-        fmpz_mpoly_clear(r1, ctx);  
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(h, ctx);
+        fmpz_mpoly_clear(k, ctx);
+        fmpz_mpoly_clear(r1, ctx);
         fmpz_mpoly_clear(t1, ctx);
         fmpz_mpoly_clear(t2, ctx);
     }
@@ -411,18 +411,18 @@ main(void)
 
         fmpz_clear(s1);
         fmpz_clear(s2);
-        fmpz_mpoly_clear(f, ctx);  
-        fmpz_mpoly_clear(g, ctx);  
-        fmpz_mpoly_clear(h, ctx);  
-        fmpz_mpoly_clear(k, ctx);  
-        fmpz_mpoly_clear(r1, ctx);  
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(h, ctx);
+        fmpz_mpoly_clear(k, ctx);
+        fmpz_mpoly_clear(r1, ctx);
         fmpz_mpoly_clear(t1, ctx);
         fmpz_mpoly_clear(t2, ctx);
     }
 
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

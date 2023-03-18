@@ -91,7 +91,7 @@ fmpz_mat_rank_small_inplace(fmpz_mat_t B)
             return rank + _fmpz_mat_rank_overflow(B, pivot_row, pivot_col);
 
         r = fmpz_mat_find_pivot_smallest(B, pivot_row + 1, m, pivot_col);
-        
+
         if (r == -1)
         {
             pivot_row++;

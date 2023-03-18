@@ -166,11 +166,11 @@ int main(void)
     /* regression test */
     {
         fmpz_factor_t fac;
-        
+
         fmpz_factor_init(fac);
-        
+
         fmpz_set_str(x, "-27881013806671883810", 10);
-    
+
         fmpz_factor_trial(fac, x, 0);
 
         fmpz_factor_clear(fac);
@@ -180,7 +180,7 @@ int main(void)
 
         fmpz_factor_clear(fac);
     }
-    
+
 
     fmpz_clear(x);
 

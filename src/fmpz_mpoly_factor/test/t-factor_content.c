@@ -121,7 +121,7 @@ main(void)
             len = 1 + n_randint(state, 9);
             coeffbits = 2 + n_randint(state, 100);
             if (ctx->minfo->nvars > 0)
-            {            
+            {
                 k = n_randint(state, ctx->minfo->nvars);
                 expbounds[k] = 1;
             }

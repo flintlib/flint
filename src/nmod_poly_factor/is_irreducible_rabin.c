@@ -96,7 +96,7 @@ nmod_poly_is_irreducible_rabin(const nmod_poly_t f)
 
         nmod_poly_clear(a);
         nmod_poly_clear(x);
-        nmod_poly_clear(x_p);   
+        nmod_poly_clear(x_p);
     }
 
     return 1;

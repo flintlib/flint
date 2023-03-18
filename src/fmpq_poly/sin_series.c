@@ -19,7 +19,7 @@ _fmpq_poly_sin_cos_series_basecase_can(fmpz * S, fmpz_t Sden,
     fmpz * C, fmpz_t Cden, const fmpz * A, const fmpz_t Aden, slong Alen, slong n, int can);
 
 void
-_fmpq_poly_sin_series_basecase(fmpz * g, fmpz_t gden, 
+_fmpq_poly_sin_series_basecase(fmpz * g, fmpz_t gden,
                        const fmpz * h, const fmpz_t hden, slong hlen, slong n)
 {
     fmpz * tmp;
@@ -38,7 +38,7 @@ _fmpq_poly_sin_series_basecase(fmpz * g, fmpz_t gden,
 }
 
 void
-_fmpq_poly_sin_series_tangent(fmpz * g, fmpz_t gden, 
+_fmpq_poly_sin_series_tangent(fmpz * g, fmpz_t gden,
                        const fmpz * h, const fmpz_t hden, slong hlen, slong n)
 {
     fmpz * t;
@@ -70,7 +70,7 @@ _fmpq_poly_sin_series_tangent(fmpz * g, fmpz_t gden,
 }
 
 void
-_fmpq_poly_sin_series(fmpz * g, fmpz_t gden, 
+_fmpq_poly_sin_series(fmpz * g, fmpz_t gden,
                        const fmpz * h, const fmpz_t hden, slong hlen, slong n)
 {
     if (hlen < 20 || n < 20)

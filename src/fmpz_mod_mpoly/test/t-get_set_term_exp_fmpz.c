@@ -48,8 +48,8 @@ main(void)
 
             for (k = 0; k < nvars; k++)
             {
-                exp1[k] = (fmpz *) flint_malloc(sizeof(fmpz)); 
-                exp2[k] = (fmpz *) flint_malloc(sizeof(fmpz)); 
+                exp1[k] = (fmpz *) flint_malloc(sizeof(fmpz));
+                exp2[k] = (fmpz *) flint_malloc(sizeof(fmpz));
                 fmpz_init(exp1[k]);
                 fmpz_init(exp2[k]);
                 fmpz_randtest_unsigned(exp1[k], state, 200);
@@ -73,8 +73,8 @@ main(void)
                 result = result && fmpz_equal(exp1[k], exp2[k]);
                 fmpz_clear(exp1[k]);
                 fmpz_clear(exp2[k]);
-                flint_free(exp1[k]); 
-                flint_free(exp2[k]); 
+                flint_free(exp1[k]);
+                flint_free(exp2[k]);
             }
 
             if (!result)
@@ -88,12 +88,12 @@ main(void)
             flint_free(exp2);
         }
 
-        fmpz_mod_mpoly_clear(f, ctx);  
+        fmpz_mod_mpoly_clear(f, ctx);
         fmpz_mod_mpoly_ctx_clear(ctx);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

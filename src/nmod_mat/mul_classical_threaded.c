@@ -46,7 +46,7 @@ _nmod_mat_addmul_basic_op(mp_ptr * D, mp_ptr * const C, mp_ptr * const A,
     }
 }
 
-typedef struct 
+typedef struct
 {
     slong block;
     volatile slong * i;
@@ -83,7 +83,7 @@ _nmod_mat_addmul_transpose_worker(void * arg_ptr)
     nmod_t mod = arg.mod;
     int op = arg.op;
     mp_limb_t c;
-    
+
     while (1)
     {
 #if FLINT_USES_PTHREAD
@@ -141,7 +141,7 @@ _nmod_mat_addmul_transpose_threaded_pool_op(mp_ptr * D, const mp_ptr * C,
 #endif
 
     tmp = flint_malloc(sizeof(mp_limb_t) * k * n);
-	    
+
     /* transpose B */
     for (i = 0; i < k; i++)
         for (j = 0; j < n; j++)
@@ -149,7 +149,7 @@ _nmod_mat_addmul_transpose_threaded_pool_op(mp_ptr * D, const mp_ptr * C,
 
     /* compute optimal block width */
     block = FLINT_MAX(FLINT_MIN(m/(num_threads + 1), n/(num_threads + 1)), 1);
-    
+
     while (2*block*k > FLINT_MUL_CLASSICAL_CACHE_SIZE && block > 1)
         block >>= 1;
 
@@ -201,7 +201,7 @@ _nmod_mat_addmul_transpose_threaded_pool_op(mp_ptr * D, const mp_ptr * C,
     flint_free(tmp);
 }
 
-typedef struct 
+typedef struct
 {
     slong block;
     volatile slong * i;
@@ -245,7 +245,7 @@ _nmod_mat_addmul_packed_worker(void * arg_ptr)
     int op = arg.op;
     mp_limb_t c, d;
     mp_ptr Aptr, Tptr;
-    
+
     while (1)
     {
 #if FLINT_USES_PTHREAD
@@ -358,7 +358,7 @@ _nmod_mat_addmul_packed_threaded_pool_op(mp_ptr * D,
 
     /* compute optimal block width */
     block = FLINT_MAX(FLINT_MIN(M/(num_threads + 1), Kpack/(num_threads + 1)), 1);
-    
+
     while (2*block*N > FLINT_MUL_CLASSICAL_CACHE_SIZE && block > 1)
         block >>= 1;
 
@@ -450,7 +450,7 @@ _nmod_mat_mul_classical_threaded_op(nmod_mat_t D, const nmod_mat_t C,
 {
     thread_pool_handle * threads;
     slong num_threads;
-    
+
     if (A->c == 0)
     {
         if (op == 0)

@@ -13,16 +13,16 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_divrem_basecase(fmpz *Q, fmpz *R, 
-    const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
+void _fmpz_mod_poly_divrem_basecase(fmpz *Q, fmpz *R,
+    const fmpz *A, slong lenA, const fmpz *B, slong lenB,
     const fmpz_t invB, const fmpz_t p)
 {
     slong iQ, iR;
     fmpz * W;
     TMP_INIT;
-	
+
 	TMP_START;
-	
+
     if (R != A)
     {
         /* cannot use R as it might not have enough space */
@@ -52,17 +52,17 @@ void _fmpz_mod_poly_divrem_basecase(fmpz *Q, fmpz *R,
     }
 
 	_fmpz_vec_scalar_mod_fmpz(W, W, lenB - 1, p);
-	
+
     if (R != A)
     {
         _fmpz_vec_swap(R, W, lenB - 1);
         FMPZ_VEC_TMP_CLEAR(W, lenA);
     }
-	
+
 	TMP_END;
 }
 
-void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, 
+void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
 {
     const slong lenA = A->length, lenB = B->length, lenQ = lenA - lenB + 1;

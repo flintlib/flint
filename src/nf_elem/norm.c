@@ -40,10 +40,10 @@ void _nf_elem_norm(fmpz_t rnum, fmpz_t rden, const nf_elem_t a, const nf_t nf)
       {
          fmpz_zero(rnum);
          fmpz_one(rden);
-         
+
          return;
       }
-      
+
       fmpz_init_set_ui(one, 1);
       fmpz_init(pow);
 
@@ -59,7 +59,7 @@ void _nf_elem_norm(fmpz_t rnum, fmpz_t rden, const nf_elem_t a, const nf_t nf)
             fmpz_neg(pow, pow);
          }
          _fmpq_mul(rnum, rden, rnum, rden, one, pow);
-         
+
          if (fmpz_sgn(rden) < 0)
          {
             fmpz_neg(rnum, rnum);
@@ -102,7 +102,7 @@ void _nf_elem_norm(fmpz_t rnum, fmpz_t rden, const nf_elem_t a, const nf_t nf)
             fmpz_neg(pow, pow);
          }
          _fmpq_mul(rnum, rden, rnum, rden, one, pow);
-         
+
          if (fmpz_sgn(rden) < 0)
          {
             fmpz_neg(rnum, rnum);
@@ -113,7 +113,7 @@ void _nf_elem_norm(fmpz_t rnum, fmpz_t rden, const nf_elem_t a, const nf_t nf)
       fmpz_clear(one);
       fmpz_clear(pow);
 
-   }   
+   }
 }
 
 void nf_elem_norm(fmpq_t res, const nf_elem_t a, const nf_t nf)

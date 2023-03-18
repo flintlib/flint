@@ -34,7 +34,7 @@ main(void)
         slong j, num_threads, l;
         nmod_poly_interval_poly_arg_t * args1;
         thread_pool_handle * threads;
-	    
+
         flint_set_num_threads(1 + n_randint(state, 3));
 
         num_threads = flint_request_threads(&threads,
@@ -46,7 +46,7 @@ main(void)
 		flint_malloc(sizeof(nmod_poly_struct)*(num_threads + 1));
         tmp = (nmod_poly_struct *)
 		flint_malloc(sizeof(nmod_poly_struct)*l);
-        args1 = (nmod_poly_interval_poly_arg_t *) 
+        args1 = (nmod_poly_interval_poly_arg_t *)
 		flint_malloc((num_threads + 1)*
                              sizeof(nmod_poly_interval_poly_arg_t));
 
@@ -151,7 +151,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
 #else
    FLINT_TEST_CLEANUP(state);

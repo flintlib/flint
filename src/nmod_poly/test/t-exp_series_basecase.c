@@ -19,7 +19,7 @@ main(void)
 {
     int i, result = 1;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("exp_series_basecase....");
     fflush(stdout);
@@ -120,7 +120,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

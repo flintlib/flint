@@ -69,7 +69,7 @@ fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, flint_bitcnt_t shift,
         __mpz_struct * mcoeff;
         mp_limb_t * p;
         ulong l, b;
-        
+
         mcoeff = _fmpz_promote(coeff);
 
         /* the number of limbs to hold the bitfield _including_ b extra bits */

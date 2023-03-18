@@ -13,18 +13,18 @@
 #include "qadic.h"
 
 /*
-    Uses Hensel lifting along the polynomial $X^q - X$, which yields 
+    Uses Hensel lifting along the polynomial $X^q - X$, which yields
     the formula $z' = z - (z^q - z) / (q z^{q-1} - 1)$.
 
-    We observe that the denominator is an approximation to $q - 1$, 
-    which allows us to use the formula $z' = z - (q-1)^{-1} (z^q - z)$ 
+    We observe that the denominator is an approximation to $q - 1$,
+    which allows us to use the formula $z' = z - (q-1)^{-1} (z^q - z)$
     during the iteration.
 
     Supports aliasing between \code{rop} and \code{op}.
  */
 
-void _qadic_teichmuller(fmpz *rop, const fmpz *op, slong len, 
-                        const fmpz *a, const slong *j, slong lena, 
+void _qadic_teichmuller(fmpz *rop, const fmpz *op, slong len,
+                        const fmpz *a, const slong *j, slong lena,
                         const fmpz_t p, slong N)
 {
     const slong d = j[lena - 1];
@@ -152,7 +152,7 @@ void qadic_teichmuller(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 
         padic_poly_fit_length(rop, d);
 
-        _qadic_teichmuller(rop->coeffs, op->coeffs, op->length, 
+        _qadic_teichmuller(rop->coeffs, op->coeffs, op->length,
                            ctx->a, ctx->j, ctx->len, (&ctx->pctx)->p, N);
         rop->val = 0;
         _padic_poly_set_length(rop, d);

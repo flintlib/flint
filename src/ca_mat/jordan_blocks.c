@@ -103,7 +103,7 @@ ca_mat_jordan_blocks(ca_vec_t lambda, slong * num_blocks, slong * block_lambda, 
                 ca_mat_set(C, B, ctx);
 
                 success = ca_mat_rank(&rank, C, ctx);
-                
+
                 ranks_len = 2;
                 ranks[0] = n;
                 ranks[1] = rank;

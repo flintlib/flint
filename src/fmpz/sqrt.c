@@ -20,7 +20,7 @@ void fmpz_sqrt(fmpz_t f, const fmpz_t g)
         flint_printf("Exception (fmpz_sqrt). g is negative.\n");
         flint_abort();
     }
-    
+
     if (!COEFF_IS_MPZ(*g))
         fmpz_set_ui(f, n_sqrt(*g));
     else

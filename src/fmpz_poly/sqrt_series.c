@@ -19,7 +19,7 @@ _fmpz_poly_sqrt_series(fmpz * res, const fmpz * poly, slong len, slong n)
     int result;
     slong i;
     fmpz * rev;
-    
+
     while (len > 0 && n > 0 && fmpz_is_zero(poly))
     {
         if (len > 1 && !fmpz_is_zero(poly + 1))
@@ -38,7 +38,7 @@ _fmpz_poly_sqrt_series(fmpz * res, const fmpz * poly, slong len, slong n)
     {
         for (i = 0; i < n; i++)
             fmpz_zero(res + i);
-        
+
         return 1;
     }
 

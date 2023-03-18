@@ -147,7 +147,7 @@ __nmod_poly_factor_deflation(nmod_poly_factor_t result,
 
         nmod_poly_factor_clear(def_res);
 
-        return leading_coeff;  
+        return leading_coeff;
     }
 }
 

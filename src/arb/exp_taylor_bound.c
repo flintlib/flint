@@ -14,7 +14,7 @@
 #define TABSIZE 256
 
 /* bounds for log2(1/n!) */
-static const short rec_fac_bound_2exp_si_tab[TABSIZE] = 
+static const short rec_fac_bound_2exp_si_tab[TABSIZE] =
 {
     0, 0, -1, -2, -4, -6, -9, -12, -15, -18, -21, -25, -28, -32, -36,
     -40, -44, -48, -52, -56, -61, -65, -69, -74, -79, -83, -88, -93, -97,

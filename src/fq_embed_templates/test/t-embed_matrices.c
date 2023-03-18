@@ -19,7 +19,7 @@ int
 main(void)
 {
   int i, j;
-    
+
     FLINT_TEST_INIT(state);
 
     flint_printf("embed matrices... ");
@@ -48,7 +48,7 @@ main(void)
 
         TEMPLATE(T, embed_matrices)(embed, project, gen, ctx, gen, ctx, modulus);
         TEMPLATE(B, mat_one)(one);
-        
+
         if (!TEMPLATE(B, mat_equal)(embed, one) || !TEMPLATE(B, mat_equal)(project, one)) {
             flint_printf("FAIL:\n\n");
             flint_printf("CTX\n"), TEMPLATE(T, ctx_print)(ctx), flint_printf("\n");

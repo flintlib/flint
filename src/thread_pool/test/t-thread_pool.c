@@ -71,7 +71,7 @@ void test1(fmpz_t x, ulong n)
     fmpz_one(x);
     for (i = modulus; i <= n; i += modulus)
     {
-        fmpz_mul_ui(x, x, i);        
+        fmpz_mul_ui(x, x, i);
     }
 
     /* wait for each of the workers and combine their answers */
@@ -209,7 +209,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

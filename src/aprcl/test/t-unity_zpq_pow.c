@@ -16,7 +16,7 @@ int main(void)
 {
     int i, j;
     FLINT_TEST_INIT(state);
-   
+
     flint_printf("unity_zpq_pow....");
     fflush(stdout);
 
@@ -50,7 +50,7 @@ int main(void)
 
             x = n_randint(state, p);
             y = n_randint(state, q);
-            
+
             fmpz_randtest_not_zero(val, state, 100);
 
             unity_zpq_coeff_set_fmpz(h1, y, x, val);

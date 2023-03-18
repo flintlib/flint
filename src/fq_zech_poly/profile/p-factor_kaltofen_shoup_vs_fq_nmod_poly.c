@@ -34,14 +34,14 @@ main(int argc, char** argv)
     fq_nmod_poly_t fn;
     fq_zech_ctx_t ctx;
     fq_nmod_ctx_t ctxn;
-    
+
     FLINT_TEST_INIT(state);
-    
+
     fmpz_init(p);
     fmpz_set_str(p, argv[1], 10);
 
     fmpz_init(temp);
-       
+
     fmpz_set_str(temp, argv[2], 10);
     ext = fmpz_get_si(temp);
 
@@ -59,7 +59,7 @@ main(int argc, char** argv)
     {
         s[c] = WORD(0);
     }
-       
+
     for (n = 0; n < ncases; n++)
     {
         timeit_t t[nalgs];
@@ -80,11 +80,11 @@ main(int argc, char** argv)
             for (j = 0; j < f->length; j++)
             {
                 fq_zech_get_fq_nmod(fn->coeffs + j, f->coeffs + j, ctx);
-                
+
             }
             _fq_nmod_poly_set_length(fn, f->length, ctxn);
         }
-        
+
     loop:
         fflush(stdout);
         timeit_start(t[0]);
@@ -98,7 +98,7 @@ main(int argc, char** argv)
 
         timeit_start(t[1]);
         for (l = 0; l < loops; l++)
-        {            
+        {
             fq_nmod_poly_factor_init(resn, ctxn);
             fq_nmod_poly_factor_kaltofen_shoup(resn, fn, ctxn);
             fq_nmod_poly_factor_clear(resn, ctxn);
@@ -112,19 +112,19 @@ main(int argc, char** argv)
                 loops += 2;
                 goto loop;
             }
-        
+
         for (c = 0; c < nalgs; c++)
             s[c] += t[c]->cpu;
         reps += loops;
     }
-        
+
     for (c = 0; c < nalgs; c++)
     {
         flint_printf("%20f ", s[c] / (double) reps);
         fflush(stdout);
     }
     printf("\n");
-        
+
     fq_zech_poly_clear(f, ctx);
     fq_zech_poly_clear(g, ctx);
     fq_nmod_poly_clear(fn, ctxn);
@@ -134,6 +134,6 @@ main(int argc, char** argv)
     fmpz_clear(temp);
 
     FLINT_TEST_CLEANUP(state);
-    
+
     return 0;
 }

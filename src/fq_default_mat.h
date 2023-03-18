@@ -14,7 +14,7 @@
 #define FQ_DEFAULT_MAT_H
 
 #ifdef FQ_DEFAULT_MAT_INLINES_C
-#define FQ_DEFAULT_MAT_INLINE 
+#define FQ_DEFAULT_MAT_INLINE
 #else
 #define FQ_DEFAULT_MAT_INLINE static __inline__
 #endif
@@ -1429,9 +1429,9 @@ void fq_default_mat_similarity(fq_default_mat_t A, slong r,
 
 /* Characteristic polynomial *************************************************/
 
-/* this prototype really lives in fq_poly_templates.h 
+/* this prototype really lives in fq_poly_templates.h
  * FQ_DEFAULT_MAT_INLINE
- * void fq_default_mat_charpoly(fq_default_poly_t) p, 
+ * void fq_default_mat_charpoly(fq_default_poly_t) p,
  *                            fq_default_mat_t A, const fq_default_ctx_t ctx)
  * {
  *   fq_default_mat_charpoly_danilevsky(p, A, ctx)
@@ -1440,9 +1440,9 @@ void fq_default_mat_similarity(fq_default_mat_t A, slong r,
 
 /* Minimal polynomial ********************************************************/
 
-/* this prototype really lives in fq_poly_templates.h 
- * FQ_DEFAULT_MAT_INLINE 
- * void fq_default_mat_minpoly(fq_default_poly_t) p, 
+/* this prototype really lives in fq_poly_templates.h
+ * FQ_DEFAULT_MAT_INLINE
+ * void fq_default_mat_minpoly(fq_default_poly_t) p,
  *                   const fq_default_mat_t X, const fq_default_ctx_t ctx)
  */
 

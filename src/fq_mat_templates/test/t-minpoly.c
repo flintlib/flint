@@ -41,12 +41,12 @@ main(void)
         TEMPLATE(T, poly_init) (r, ctx);
         TEMPLATE(T, mat_init) (A, m, n, ctx);
         TEMPLATE(T, mat_randtest) (A, state, ctx);
-        
+
         TEMPLATE(T, mat_charpoly) (p1, A, ctx);
         TEMPLATE(T, mat_minpoly) (p2, A, ctx);
-        
+
         TEMPLATE(T, poly_divrem) (q, r, p1, p2, ctx);
-        
+
         if (!TEMPLATE(T, poly_is_zero) (r, ctx))
         {
             flint_printf("FAIL:\n");
@@ -77,7 +77,7 @@ main(void)
         TEMPLATE(T, mat_init) (A, m, n, ctx);
         TEMPLATE(T, mat_init) (B, m, n, ctx);
         TEMPLATE(T, mat_randtest) (A, state, ctx);
-        
+
         for (j = 0; j < n/2; j++)
         {
            for (k = 0; k < n/2; k++)
@@ -88,11 +88,11 @@ main(void)
                                 TEMPLATE(T, mat_entry) (A, j, k), ctx);
            }
         }
-        
+
         TEMPLATE(T, mat_set) (B, A, ctx);
 
         TEMPLATE(T, mat_minpoly) (p1, A, ctx);
-        
+
         for (j = 0; j < n; j++)
         {
            TEMPLATE(T, set_ui) (t, n_randint(state, 6) - 3, ctx);
@@ -100,7 +100,7 @@ main(void)
         }
 
         TEMPLATE(T, mat_minpoly) (p2, B, ctx);
-        
+
         if (!TEMPLATE(T, poly_equal) (p1, p2, ctx))
         {
             flint_printf("FAIL:\n");

@@ -22,7 +22,7 @@ main(void)
     flint_printf("remove....");
     fflush(stdout);
 
-    
+
 
     /* Compare with MPIR, random input */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -45,7 +45,7 @@ main(void)
             fmpz_randtest_not_zero(b, state, 200);
             fmpz_abs(b, b);
         } while (fmpz_is_one(b));
-        
+
 
         fmpz_get_mpz(d, a);
         fmpz_get_mpz(e, b);
@@ -236,7 +236,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

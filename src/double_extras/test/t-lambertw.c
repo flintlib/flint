@@ -24,11 +24,11 @@ main()
     mpfr_t xx, ww, wnew, t, u, v, p, q, max_err;
 
     FLINT_TEST_INIT(state);
-   
+
     flint_printf("lambertw....");
     fflush(stdout);
 
-    
+
 
     mpfr_init2(xx, prec);
     mpfr_init2(ww, prec);
@@ -139,7 +139,7 @@ main()
 
     mpfr_free_cache();
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

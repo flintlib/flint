@@ -43,7 +43,7 @@ slong _nmod_mpoly_scalar_addmul_ui1(
             Aexps[k] = Cexps[j];
             Acoeffs[k] = nmod_mul(Ccoeffs[j], d, fctx);
             k += (Acoeffs[k] != 0);
-            j++;         
+            j++;
         }
     }
 
@@ -108,7 +108,7 @@ static slong _nmod_mpoly_scalar_addmul_ui(
             mpoly_monomial_set(Aexps + k*N, Cexps + j*N, N);
             Acoeffs[k] = nmod_mul(Ccoeffs[j], d, fctx);
             k += (Acoeffs[k] != 0);
-            j++;         
+            j++;
         }
     }
 
@@ -184,7 +184,7 @@ void nmod_mpoly_scalar_addmul_ui(
     {
         nmod_mpoly_t T;
         nmod_mpoly_init3(T, B->length + C->length, Abits, ctx);
-        T->length = _nmod_mpoly_scalar_addmul_ui(T->coeffs, T->exps, 
+        T->length = _nmod_mpoly_scalar_addmul_ui(T->coeffs, T->exps,
                                     B->coeffs, Bexps, B->length,
                                     C->coeffs, Cexps, C->length, d,
                                                       N, cmpmask, ctx->mod);
@@ -194,7 +194,7 @@ void nmod_mpoly_scalar_addmul_ui(
     else
     {
         nmod_mpoly_fit_length_reset_bits(A, B->length + C->length, Abits, ctx);
-        A->length = _nmod_mpoly_scalar_addmul_ui(A->coeffs, A->exps, 
+        A->length = _nmod_mpoly_scalar_addmul_ui(A->coeffs, A->exps,
                                     B->coeffs, Bexps, B->length,
                                     C->coeffs, Cexps, C->length, d,
                                                       N, cmpmask, ctx->mod);

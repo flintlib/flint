@@ -71,15 +71,15 @@ _gr_poly_resultant_euclidean(gr_ptr res, gr_srcptr poly1, slong len1,
             r = t;
         }
 
-        if (l2 >= 1) 
+        if (l2 >= 1)
         {
             status |= gr_pow_ui(lc, lc, l0 - l2, ctx);
             status |= gr_mul(res, res, lc, ctx);
-            
+
             if (((l0 | l1) & 1) == 0)
                 status |= gr_neg(res, res, ctx);
         }
-        else 
+        else
         {
             if (l1 == 1)
             {
@@ -106,7 +106,7 @@ int gr_poly_resultant_euclidean(gr_ptr r, const gr_poly_t f,
     slong len2 = g->length;
     int status = GR_SUCCESS;
     slong sz = ctx->sizeof_elem;
-    
+
     if (len1 == 0 || len2 == 0)
     {
         return gr_zero(r, ctx);

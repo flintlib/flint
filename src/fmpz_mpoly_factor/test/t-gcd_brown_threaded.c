@@ -295,7 +295,7 @@ main(void)
         if (ctx->minfo->nvars < 1)
         {
             fmpz_mpoly_ctx_clear(ctx);
-            continue;            
+            continue;
         }
 
         fmpz_mpoly_init(g, ctx);

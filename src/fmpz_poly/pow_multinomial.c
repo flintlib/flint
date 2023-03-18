@@ -20,10 +20,10 @@ _fmpz_poly_pow_multinomial(fmpz * res, const fmpz * poly, slong len, ulong e)
     slong k, low, rlen;
     fmpz_t d, t;
     fmpz * P;
-    
+
     rlen = (slong) e * (len - WORD(1)) + WORD(1);
     _fmpz_vec_zero(res, rlen);
-    
+
     for (low = WORD(0); poly[low] == WORD(0); low++) ;
     if (low == WORD(0))
     {
@@ -36,12 +36,12 @@ _fmpz_poly_pow_multinomial(fmpz * res, const fmpz * poly, slong len, ulong e)
         res  += (slong) e * low;
         rlen -= (slong) e * low;
     }
-    
+
     fmpz_init(d);
     fmpz_init(t);
-    
+
     fmpz_pow_ui(res, P, e);
-    
+
     for (k = 1; k < rlen; k++)
     {
         slong i, u = -k;
@@ -57,7 +57,7 @@ _fmpz_poly_pow_multinomial(fmpz * res, const fmpz * poly, slong len, ulong e)
         fmpz_add(d, d, P);
         fmpz_divexact(res + k, res + k, d);
     }
-    
+
     fmpz_clear(d);
     fmpz_clear(t);
 }
@@ -86,7 +86,7 @@ fmpz_poly_pow_multinomial(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
             fmpz_poly_sqr(res, poly);
         return;
     }
-    
+
     rlen = (slong) e * (len - 1) + 1;
 
     if (res != poly)

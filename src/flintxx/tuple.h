@@ -236,7 +236,7 @@ struct tuple_get<Tuple, 0>
 // Create a tuple backing a tuple of points.
 // That is to say, given a tuple like <A*, B*, C*, D*>,
 // compute a backing tuple type <A, B, C, D>.
-// 
+//
 // If one of the types in the tuple is Return*, do not back it
 // and instead feed it in separately. I.e. if Return is A*, then type
 // will be just <B*, C*, D*>.
@@ -356,7 +356,7 @@ public:
     typedef merge_tuple<Tail, Tuple2> comp1;
     typedef merge_tuple<tuple<Head, empty_tuple>, typename comp1::tail_t> comp2;
     typedef concat_tuple<typename comp1::used_t, typename comp2::type> concater;
-    
+
 public:
     typedef typename concater::type type;
 

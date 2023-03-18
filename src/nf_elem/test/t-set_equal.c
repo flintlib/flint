@@ -39,9 +39,9 @@ main(void)
 
         nf_elem_init(a, nf);
         nf_elem_init(b, nf);
-        
+
         nf_elem_randtest(b, state, 200, nf);
-        
+
         nf_elem_set(a, b, nf);
 
         result = (nf_elem_equal(a, b, nf));
@@ -55,7 +55,7 @@ main(void)
 
         nf_elem_clear(a, nf);
         nf_elem_clear(b, nf);
-         
+
         nf_clear(nf);
     }
 
@@ -68,9 +68,9 @@ main(void)
         nf_init_randtest(nf, state, 40, 200);
 
         nf_elem_init(a, nf);
-        
+
         nf_elem_randtest(a, state, 200, nf);
-        
+
         nf_elem_set(a, a, nf);
 
         result = (nf_elem_equal(a, a, nf));
@@ -82,7 +82,7 @@ main(void)
         }
 
         nf_elem_clear(a, nf);
-         
+
         nf_clear(nf);
     }
 

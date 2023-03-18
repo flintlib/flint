@@ -43,7 +43,7 @@ fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
             if ((c1 < WORD(0) && fmpz_sgn(h) < 0) || (c1 > WORD(0) && fmpz_sgn(h) > 0))  /* signs are the same */
                 fmpz_one(f);  /* quotient is positive, round up to one */
             else
-                fmpz_zero(f);  /* quotient is zero, or negative, round up to zero */  
+                fmpz_zero(f);  /* quotient is zero, or negative, round up to zero */
         }
     }
     else  /* g is large */

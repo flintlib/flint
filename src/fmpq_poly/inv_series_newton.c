@@ -71,8 +71,8 @@ _fmpq_poly_inv_series_basecase_rev(fmpz * Qinv, fmpz_t Qinvden,
     else \
         _fmpz_poly_mullow(z, y, yn, x, xn, nn); \
 
-void 
-_fmpq_poly_inv_series_newton(fmpz * Qinv, fmpz_t Qinvden, 
+void
+_fmpq_poly_inv_series_newton(fmpz * Qinv, fmpz_t Qinvden,
                      const fmpz * Q, const fmpz_t Qden, slong Qlen, slong n)
 {
     if (fmpz_is_pm1(Q) && fmpz_is_one(Qden))

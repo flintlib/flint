@@ -16,7 +16,7 @@ int main(void)
 {
     int i, j;
     FLINT_TEST_INIT(state);
-   
+
     flint_printf("unity_zp_sqr....");
     fflush(stdout);
 
@@ -45,7 +45,7 @@ int main(void)
             fmpz_init(val1);
 
             ind = n_randint(state, p);
-            
+
             fmpz_randtest_unsigned(val1, state, 200);
 
             unity_zp_coeff_set_fmpz(h, ind, val1);
@@ -62,7 +62,7 @@ int main(void)
             fflush(stdout);
             flint_abort();
         }
-    
+
         fmpz_clear(n);
         unity_zp_clear(f);
         unity_zp_clear(g);
@@ -70,7 +70,7 @@ int main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

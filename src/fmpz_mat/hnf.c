@@ -36,11 +36,11 @@ fmpz_mat_hnf(fmpz_mat_t H, const fmpz_mat_t A)
     else if (b <= 512)
         cutoff = 3;
 
-    /* 
+    /*
         TODO: we should call Micciancio-Warisnchi or Pauderis-Storjohann
         when implemented
     */
-       
+
     if (m < cutoff)
         fmpz_mat_hnf_classical(H, A);
     else {

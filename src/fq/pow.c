@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011, 2012 Sebastian Pancratz 
+    Copyright (C) 2011, 2012 Sebastian Pancratz
     Copyright (C) 2013 Mike Hansen
 
     This file is part of FLINT.
@@ -43,7 +43,7 @@ _fq_pow(fmpz * rop, const fmpz * op, slong len, const fmpz_t e,
         bit = fmpz_bits(e) - 2;
 
         /*
-           Trial run without any polynomial arithmetic to determine the parity 
+           Trial run without any polynomial arithmetic to determine the parity
            of the number of swaps;  then set R and S accordingly
          */
 

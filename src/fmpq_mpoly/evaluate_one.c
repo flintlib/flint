@@ -146,7 +146,7 @@ static int _fmpq_mpoly_evaluate_one_fmpq_mp(
 
     fmpz_init(k);
     fmpz_init(degmk);
-    
+
     if (A != B)
         fmpz_mpoly_fit_length_reset_bits(A->zpoly, Blen, bits, ctx->zctx);
 

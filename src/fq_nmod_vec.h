@@ -13,8 +13,8 @@
 #define FQ_NMOD_VEC_H
 
 #ifdef FQ_NMOD_VEC_INLINES_C
-#define FQ_VEC_TEMPLATES_INLINE 
-#define FQ_NMOD_VEC_INLINE 
+#define FQ_VEC_TEMPLATES_INLINE
+#define FQ_NMOD_VEC_INLINE
 #else
 #define FQ_VEC_TEMPLATES_INLINE static __inline__
 #define FQ_NMOD_VEC_INLINE static __inline__

@@ -15,7 +15,7 @@
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
-void fmpz_mod_poly_inv_series_newton_f(fmpz_t f, fmpz_mod_poly_t Qinv, 
+void fmpz_mod_poly_inv_series_newton_f(fmpz_t f, fmpz_mod_poly_t Qinv,
                     const fmpz_mod_poly_t Q, slong n, const fmpz_mod_ctx_t ctx)
 {
     const fmpz *p = fmpz_mod_ctx_modulus(ctx);
@@ -43,7 +43,7 @@ void fmpz_mod_poly_inv_series_newton_f(fmpz_t f, fmpz_mod_poly_t Qinv,
 
     if (!fmpz_is_one(f))
        goto cleanup;
-    
+
     if (Qinv != Q)
     {
         fmpz_mod_poly_fit_length(Qinv, n, ctx);

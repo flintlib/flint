@@ -46,7 +46,7 @@ main(void)
         nf_elem_init(a, nf);
         nf_elem_set_fmpq_poly(a, f, nf);
         nf_elem_get_fmpq_poly(g, a, nf);
-        
+
         result = fmpq_poly_equal(f, g);
         if (!result)
         {
@@ -60,7 +60,7 @@ main(void)
         }
 
         nf_elem_clear(a, nf);
-        
+
         nf_clear(nf);
 
         fmpq_poly_clear(f);
@@ -85,7 +85,7 @@ main(void)
         nf_elem_init(a, nf);
         nf_elem_set_fmpq_poly(a, f, nf);
         nf_elem_get_fmpq_poly(g, a, nf);
-        
+
         fmpq_poly_rem(r, f, nf->pol);
 
         result = fmpq_poly_equal(r, g);
@@ -103,7 +103,7 @@ main(void)
         }
 
         nf_elem_clear(a, nf);
-        
+
         nf_clear(nf);
 
         fmpq_poly_clear(f);

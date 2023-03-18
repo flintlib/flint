@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2009, 2011 William Hart
 
     This file is part of FLINT.
@@ -17,14 +17,14 @@
 void mpn_mul_2expmod_2expp1(mp_limb_t * t, mp_limb_t * i1, mp_size_t limbs, flint_bitcnt_t d)
 {
    mp_limb_signed_t hi1, hi2;
-   
+
    if (d == 0)
-   {   
+   {
       if (t != i1)
          flint_mpn_copyi(t, i1, limbs + 1);
    } else
    {
-      hi1 = ((mp_limb_signed_t) i1[limbs] >> (GMP_LIMB_BITS - d)); 
+      hi1 = ((mp_limb_signed_t) i1[limbs] >> (GMP_LIMB_BITS - d));
       mpn_lshift(t, i1, limbs + 1, d);
       hi2 = t[limbs];
       t[limbs] = 0;

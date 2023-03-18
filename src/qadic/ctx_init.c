@@ -22,7 +22,7 @@
 extern int flint_conway_polynomials [];
 
 void qadic_ctx_init(qadic_ctx_t ctx,
-                           const fmpz_t p, slong d, slong min, slong max, 
+                           const fmpz_t p, slong d, slong min, slong max,
                            const char *var, enum padic_print_mode mode)
 {
     unsigned int position;
@@ -32,7 +32,7 @@ void qadic_ctx_init(qadic_ctx_t ctx,
     fmpz_mod_ctx_t ctxp;
 
     if (fmpz_cmp_ui(p, 109987) <= 0)
-    {  
+    {
       for (position = 0; flint_conway_polynomials[position] != 0;
                                position += 3 + flint_conway_polynomials[position + 1])
       {
@@ -82,15 +82,15 @@ void qadic_ctx_init(qadic_ctx_t ctx,
               return;
           }
       }
-    }  
+    }
 
     flint_randinit(state);
 
     fmpz_mod_ctx_init(ctxp, p);
     fmpz_mod_poly_init2(poly, d + 1, ctxp);
-    
+
     fmpz_mod_poly_randtest_sparse_irreducible(poly, state, d + 1, ctxp);
-    
+
     flint_randclear(state);
 
     /* Find number of non-zero coefficients */

@@ -25,7 +25,7 @@ void fmpz_mat_content(fmpz_t mat_gcd, const fmpz_mat_t A)
 		for (j = 0; j < cols; j++)
 		{
 			fmpz_gcd(mat_gcd,mat_gcd, fmpz_mat_entry(A, i, j));
-			
+
 			if (fmpz_is_one(mat_gcd))
 			{
 				return;

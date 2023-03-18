@@ -61,13 +61,13 @@ _nmod_poly_revert_series_newton(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
 }
 
 void
-nmod_poly_revert_series_newton(nmod_poly_t Qinv, 
+nmod_poly_revert_series_newton(nmod_poly_t Qinv,
                                  const nmod_poly_t Q, slong n)
 {
     mp_ptr Qinv_coeffs, Q_coeffs;
     nmod_poly_t t1;
     slong Qlen;
-    
+
     Qlen = Q->length;
 
     if (Qlen < 2 || Q->coeffs[0] != 0 || Q->coeffs[1] == 0)
@@ -104,7 +104,7 @@ nmod_poly_revert_series_newton(nmod_poly_t Qinv,
         nmod_poly_swap(Qinv, t1);
         nmod_poly_clear(t1);
     }
-    
+
     Qinv->length = n;
 
     if (Qlen < n)

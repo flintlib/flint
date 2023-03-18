@@ -31,7 +31,7 @@ void mpoly_unpack_monomials_tight(ulong * e1, ulong * e2, slong len,
    for (i = 0; i < len; i++)
    {
       exp = 0;
-         
+
       for (j = 0; j < num; j++)
          exp += (e2[i] % prods[j + 1])/prods[j] << bits*j;
 

@@ -20,13 +20,13 @@
 void randprime(fmpz_t p, flint_rand_t state, slong bits)
 {
     fmpz_randbits(p, state, bits);
- 
+
     if (fmpz_sgn(p) < 0)
        fmpz_neg(p, p);
 
     if (fmpz_is_even(p))
        fmpz_add_ui(p, p, 1);
- 
+
     while (!fmpz_is_probabprime(p))
        fmpz_add_ui(p, p, 2);
 }
@@ -54,7 +54,7 @@ int main(void)
    /* Test n with large prime factor */
    {
       fmpz_set_str(n, "12387192837918273918723981291837121933111751252512531193171", 10);
-    
+
       fmpz_factor_init(factors);
 
       qsieve_factor(factors, n);

@@ -53,7 +53,7 @@ main(void)
             printf("FAIL\n");
             flint_printf("Check simple example\n");
             fflush(stdout);
-            flint_abort();            
+            flint_abort();
         }
 
         FLINT_ASSERT(_nmod_poly_multi_crt_local_size(P) <= moduli_count);
@@ -130,7 +130,7 @@ main(void)
                 total_degree = 0;
                 for (k = 0; k < moduli_count; k++)
                 {
-                    total_degree += nmod_poly_degree(moduli[k]);                
+                    total_degree += nmod_poly_degree(moduli[k]);
 
                     nmod_poly_sub(t, output, inputs[k]);
                     nmod_poly_rem(t, t, moduli[k]);
@@ -182,7 +182,7 @@ main(void)
                     printf("FAIL\n");
                     flint_printf("Check crt failure i = %wd, j = %wd\n", i, j);
                     fflush(stdout);
-                    flint_abort();                    
+                    flint_abort();
                 }
             }
 
@@ -300,7 +300,7 @@ main(void)
                     printf("FAIL\n");
                     flint_printf("Check flat crt failure i = %wd, j = %wd\n", i, j);
                     fflush(stdout);
-                    flint_abort();                    
+                    flint_abort();
                 }
             }
 
@@ -411,7 +411,7 @@ main(void)
                     printf("FAIL\n");
                     flint_printf("Check lazy crt failure i = %wd, j = %wd\n", i, j);
                     fflush(stdout);
-                    flint_abort();                    
+                    flint_abort();
                 }
             }
 

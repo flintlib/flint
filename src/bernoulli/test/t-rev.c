@@ -65,7 +65,7 @@ int main()
 
         for (n = nmax; n >= 0 && count > 0; n -= 2, count--)
         {
-            bernoulli_rev_next(numer, denom, iter);   
+            bernoulli_rev_next(numer, denom, iter);
 
             m1 = fmpz_fdiv_ui(numer, p);
             m2 = fmpz_fdiv_ui(denom, p);

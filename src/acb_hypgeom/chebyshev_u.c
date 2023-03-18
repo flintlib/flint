@@ -17,7 +17,7 @@ acb_hypgeom_chebyshev_u(acb_t res, const acb_t n, const acb_t z, slong prec)
 {
     acb_t t, u;
 
-    if (acb_is_int(n) && 
+    if (acb_is_int(n) &&
         arf_cmpabs_2exp_si(arb_midref(acb_realref(n)), FLINT_BITS - 1) < 0)
     {
         slong k = arf_get_si(arb_midref(acb_realref(n)), ARF_RND_DOWN);

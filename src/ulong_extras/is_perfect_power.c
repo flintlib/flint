@@ -43,14 +43,14 @@ int n_is_perfect_power(ulong * root, ulong n)
 
     unsigned char t;
     ulong count, exp, r;
-    
+
     /* check for powers 2, 3, 5 */
     t = mod31[n%31];
     t &= mod44[n%44];
     t &= mod61[n%61];
     t &= mod63[n%63];
-    
-    if (t & 1) 
+
+    if (t & 1)
     {
         ulong y = n_sqrtrem(&r, n);
         if (r == 0)
@@ -60,7 +60,7 @@ int n_is_perfect_power(ulong * root, ulong n)
         }
     }
 
-    if (t & 2) 
+    if (t & 2)
     {
         ulong y = n_cbrtrem(&r, n);
         if (r == 0)
@@ -71,7 +71,7 @@ int n_is_perfect_power(ulong * root, ulong n)
         }
     }
 
-    if (t & 4) 
+    if (t & 4)
     {
         ulong y = n_rootrem(&r, n, 5);
         if (r == 0)
@@ -86,8 +86,8 @@ int n_is_perfect_power(ulong * root, ulong n)
     t |= mod67[n%67];
     t |= mod79[n%79];
     t &= mod72[n%72];
-    
-    if (t & 1) 
+
+    if (t & 1)
     {
         ulong y = n_rootrem(&r, n, 7);
         if (r == 0)
@@ -97,7 +97,7 @@ int n_is_perfect_power(ulong * root, ulong n)
         }
     }
 
-    if (t & 2) 
+    if (t & 2)
     {
         ulong y = n_rootrem(&r, n, 11);
         if (r == 0)
@@ -107,7 +107,7 @@ int n_is_perfect_power(ulong * root, ulong n)
         }
     }
 
-    if (t & 13) 
+    if (t & 13)
     {
         ulong y = n_rootrem(&r, n, 13);
         if (r == 0)
@@ -197,7 +197,7 @@ int n_is_perfect_power(ulong * root, ulong n)
        {
           *root = 7;
           return exp;
-       } 
+       }
        return 0;
     }
 
@@ -213,7 +213,7 @@ int n_is_perfect_power(ulong * root, ulong n)
        {
           *root = 11;
           return exp;
-       } 
+       }
        return 0;
     }
 
@@ -229,7 +229,7 @@ int n_is_perfect_power(ulong * root, ulong n)
        {
           *root = 13;
           return exp;
-       } 
+       }
        return 0;
     }
 

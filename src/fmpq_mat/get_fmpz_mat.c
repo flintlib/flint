@@ -16,7 +16,7 @@ int
 fmpq_mat_get_fmpz_mat(fmpz_mat_t dest, const fmpq_mat_t mat)
 {
     slong i, j;
-    
+
     for (i = 0; i < mat->r; i++)
     {
         for (j = 0; j < mat->c; j++)

@@ -55,7 +55,7 @@ arb_log(arb_t res, const arb_t x, slong prec)
                 mag_t u;
                 mag_init(u);
                 arb_get_mag(u, x);
- 
+
                 if (mag_cmp_2exp_si(t, 0) >= 0)
                 {
                     mag_log_lower(t, t);

@@ -20,7 +20,7 @@ main(void)
 {
     int iter;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("factor_cantor_zassenhaus....");
     fflush(stdout);
@@ -64,7 +64,7 @@ main(void)
 
         for (i = 1; i < num; i++)
         {
-            do 
+            do
             {
                 length = n_randint(state, 7) + 2;
                 nmod_poly_randtest(poly, state, length);
@@ -122,7 +122,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -18,7 +18,7 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("resultant_hgcd....");
     fflush(stdout);
@@ -35,7 +35,7 @@ main(void)
 
         nmod_poly_init(f, n);
         nmod_poly_init(g, n);
-        
+
         nmod_poly_randtest(f, state, n_randint(state, 200));
         nmod_poly_randtest(g, state, n_randint(state, 200));
 
@@ -57,7 +57,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         nmod_poly_clear(f);
         nmod_poly_clear(g);
     }
@@ -75,7 +75,7 @@ main(void)
         nmod_poly_init(f, n);
         nmod_poly_init(g, n);
         nmod_poly_init(h, n);
-        
+
         nmod_poly_randtest(f, state, n_randint(state, 600));
         nmod_poly_randtest(g, state, n_randint(state, 600));
         nmod_poly_randtest(h, state, n_randint(state, 600));
@@ -100,14 +100,14 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         nmod_poly_clear(f);
         nmod_poly_clear(g);
         nmod_poly_clear(h);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

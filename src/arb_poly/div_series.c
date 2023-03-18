@@ -11,7 +11,7 @@
 
 #include "arb_poly.h"
 
-void 
+void
 _arb_poly_div_series(arb_ptr Q, arb_srcptr A, slong Alen,
     arb_srcptr B, slong Blen, slong n, slong prec)
 {
