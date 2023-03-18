@@ -24,7 +24,7 @@
 
 #define _STDC_FORMAT_MACROS
 
-#if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(__MINGW32__) || defined(__MINGW64__) || defined(_MSC_VER)
+#if (defined(__WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__) && !defined(__MINGW64__)) || defined(_MSC_VER)
 # include <windows.h>
 #endif
 
@@ -60,7 +60,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     fmpz_t temp, temp2, X, Y;
     slong num_facs;
     fmpz * facs;
-#if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(__MINGW32__) || defined(__MINGW64__) || defined(_MSC_VER)
+#if (defined(__WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__) && !defined(__MINGW64__)) || defined(_MSC_VER)
     char temp_path[MAX_PATH];
 #else
     int fd;
@@ -211,7 +211,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     pthread_mutex_init(&qs_inf->mutex, NULL);
 #endif
 
-#if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(__MINGW32__) || defined(__MINGW64__) || defined(_MSC_VER)
+#if (defined(__WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__) && !defined(__MINGW64__)) || defined(_MSC_VER)
     if (GetTempPathA(MAX_PATH, temp_path) == 0)
         flint_throw(FLINT_ERROR, "GetTempPathA failed\n");
 
@@ -222,7 +222,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     if (qs_inf->siqs == NULL)
         flint_throw(FLINT_ERROR, "fopen failed\n");
 #else
-    strcpy(qs_inf->fname, "/tmp/siqsXXXXXX"); /* must be shorter than fname_alloc_size in init.c */
+    strcpy(qs_inf->fname, FLINT_TMPPATH "/siqsXXXXXX");
     fd = mkstemp(qs_inf->fname);
     if (fd == -1)
         flint_throw(FLINT_ERROR, "mkstemp failed\n");
