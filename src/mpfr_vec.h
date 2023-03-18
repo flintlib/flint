@@ -13,7 +13,7 @@
 #define MPFR_VEC_H
 
 #ifdef MPFR_VEC_INLINES_C
-#define MPFR_VEC_INLINE FLINT_DLL
+#define MPFR_VEC_INLINE 
 #else
 #define MPFR_VEC_INLINE static __inline__
 #endif
@@ -32,25 +32,25 @@
 /* Soon to be deprecated */
 #define flint_mpfr __mpfr_struct
 
-FLINT_DLL mpfr_ptr _mpfr_vec_init(slong length, flint_bitcnt_t prec);
+mpfr_ptr _mpfr_vec_init(slong length, flint_bitcnt_t prec);
 
-FLINT_DLL void _mpfr_vec_clear(mpfr_ptr vec, slong length);
+void _mpfr_vec_clear(mpfr_ptr vec, slong length);
 
-FLINT_DLL void _mpfr_vec_randtest(mpfr_ptr f, flint_rand_t state, slong len);
+void _mpfr_vec_randtest(mpfr_ptr f, flint_rand_t state, slong len);
 
-FLINT_DLL void _mpfr_vec_zero(mpfr_ptr vec, slong length);
+void _mpfr_vec_zero(mpfr_ptr vec, slong length);
 
-FLINT_DLL void _mpfr_vec_set(mpfr_ptr vec1, mpfr_srcptr vec2, slong length);
+void _mpfr_vec_set(mpfr_ptr vec1, mpfr_srcptr vec2, slong length);
 
-FLINT_DLL int _mpfr_vec_equal(mpfr_srcptr vec1, mpfr_srcptr vec2, slong len);
+int _mpfr_vec_equal(mpfr_srcptr vec1, mpfr_srcptr vec2, slong len);
 
-FLINT_DLL void _mpfr_vec_add(mpfr_ptr res, mpfr_srcptr vec1, mpfr_srcptr vec2, slong length);
+void _mpfr_vec_add(mpfr_ptr res, mpfr_srcptr vec1, mpfr_srcptr vec2, slong length);
 
-FLINT_DLL void _mpfr_vec_scalar_mul_2exp(mpfr_ptr res, mpfr_srcptr vec, slong length, flint_bitcnt_t exp);
+void _mpfr_vec_scalar_mul_2exp(mpfr_ptr res, mpfr_srcptr vec, slong length, flint_bitcnt_t exp);
 
-FLINT_DLL void _mpfr_vec_scalar_mul_mpfr(mpfr_ptr res, mpfr_srcptr vec, slong length, mpfr_t c);
+void _mpfr_vec_scalar_mul_mpfr(mpfr_ptr res, mpfr_srcptr vec, slong length, mpfr_t c);
 
-FLINT_DLL void _mpfr_vec_scalar_product(mpfr_t res, mpfr_srcptr vec1, mpfr_srcptr vec2, slong length);
+void _mpfr_vec_scalar_product(mpfr_t res, mpfr_srcptr vec1, mpfr_srcptr vec2, slong length);
 
 #ifdef __cplusplus
 }

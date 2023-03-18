@@ -13,27 +13,27 @@
 
 #include "templates.h"
 
-FLINT_DLL void TEMPLATE(T, gcdinv)(TEMPLATE(T, t) rop, TEMPLATE(T, t) inv,
+void TEMPLATE(T, gcdinv)(TEMPLATE(T, t) rop, TEMPLATE(T, t) inv,
                     const TEMPLATE(T, t) op,
                     const TEMPLATE(T, ctx_t) ctx);
 
-FLINT_DLL int TEMPLATE(T, is_invertible)(const TEMPLATE(T, t) op,
+int TEMPLATE(T, is_invertible)(const TEMPLATE(T, t) op,
                            const TEMPLATE(T, ctx_t) ctx);
 
-FLINT_DLL int TEMPLATE(T, is_invertible_f)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op,
+int TEMPLATE(T, is_invertible_f)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op,
                              const TEMPLATE(T, ctx_t) ctx);
 
-FLINT_DLL void TEMPLATE(T, div)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op1,
+void TEMPLATE(T, div)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op1,
                  const TEMPLATE(T, t) op2, const TEMPLATE(T, ctx_t) ctx);
 
-FLINT_DLL int TEMPLATE(T, multiplicative_order)(fmpz_t ord, const TEMPLATE(T, t) op,
+int TEMPLATE(T, multiplicative_order)(fmpz_t ord, const TEMPLATE(T, t) op,
                              const TEMPLATE(T, ctx_t) ctx);
 
 #ifdef B
-FLINT_DLL void TEMPLATE4(T, get, B, mat)(TEMPLATE(B, mat_t) col,
+void TEMPLATE4(T, get, B, mat)(TEMPLATE(B, mat_t) col,
                                          const TEMPLATE(T, t) a,
                                          const TEMPLATE(T, ctx_t) ctx);
-FLINT_DLL void TEMPLATE4(T, set, B, mat)(TEMPLATE(T, t) a,
+void TEMPLATE4(T, set, B, mat)(TEMPLATE(T, t) a,
                                          const TEMPLATE(B, mat_t) col,
                                          const TEMPLATE(T, ctx_t) ctx);
 #endif

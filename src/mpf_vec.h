@@ -14,7 +14,7 @@
 #define MPF_VEC_H
 
 #ifdef MPF_VEC_INLINES_C
-#define MPF_VEC_INLINE FLINT_DLL
+#define MPF_VEC_INLINE 
 #else
 #define MPF_VEC_INLINE static __inline__
 #endif
@@ -29,24 +29,24 @@ typedef __mpf_struct mpf;
 
 /*  Memory management  *******************************************************/
 
-FLINT_DLL mpf * _mpf_vec_init(slong len, flint_bitcnt_t prec);
+mpf * _mpf_vec_init(slong len, flint_bitcnt_t prec);
 
-FLINT_DLL void _mpf_vec_clear(mpf * vec, slong len);
+void _mpf_vec_clear(mpf * vec, slong len);
 
 /*  Randomisation  ***********************************************************/
 
-FLINT_DLL void _mpf_vec_randtest(mpf * f, flint_rand_t state, 
+void _mpf_vec_randtest(mpf * f, flint_rand_t state, 
                         slong len, flint_bitcnt_t bits);
 
 /*  Assignment and basic manipulation  ***************************************/
 
-FLINT_DLL void _mpf_vec_zero(mpf * vec, slong len);
+void _mpf_vec_zero(mpf * vec, slong len);
 
-FLINT_DLL void _mpf_vec_set(mpf * vec1, const mpf * vec2, slong len2);
+void _mpf_vec_set(mpf * vec1, const mpf * vec2, slong len2);
 
 /*  Conversion  **************************************************************/
 
-FLINT_DLL void _mpf_vec_set_fmpz_vec(mpf * appv, const fmpz * vec, slong len);
+void _mpf_vec_set_fmpz_vec(mpf * appv, const fmpz * vec, slong len);
 
 /* Backwards compatibility (this will generate errors for non-GCC compatible
  * compilers) */
@@ -54,33 +54,33 @@ FLINT_DLL void _mpf_vec_set_fmpz_vec(mpf * appv, const fmpz * vec, slong len);
 
 /*  Comparison  **************************************************************/
 
-FLINT_DLL int _mpf_vec_equal(const mpf * vec1, const mpf * vec2, slong len);
+int _mpf_vec_equal(const mpf * vec1, const mpf * vec2, slong len);
 
-FLINT_DLL int _mpf_vec_approx_equal(const mpf * vec1, const mpf * vec2, slong len, flint_bitcnt_t bits);
+int _mpf_vec_approx_equal(const mpf * vec1, const mpf * vec2, slong len, flint_bitcnt_t bits);
 
-FLINT_DLL int _mpf_vec_is_zero(const mpf * vec, slong len);
+int _mpf_vec_is_zero(const mpf * vec, slong len);
 
 /*  Addition  ****************************************************************/
 
-FLINT_DLL void _mpf_vec_add(mpf * res, const mpf * vec1, const mpf * vec2, slong len2);
+void _mpf_vec_add(mpf * res, const mpf * vec1, const mpf * vec2, slong len2);
 
-FLINT_DLL void _mpf_vec_sub(mpf * res, const mpf * vec1, const mpf * vec2, slong len2);
+void _mpf_vec_sub(mpf * res, const mpf * vec1, const mpf * vec2, slong len2);
 
 /*  Scalar multiplication  **************************************/
 
-FLINT_DLL void _mpf_vec_scalar_mul_2exp(mpf * res, const mpf * vec, slong len, flint_bitcnt_t exp);
+void _mpf_vec_scalar_mul_2exp(mpf * res, const mpf * vec, slong len, flint_bitcnt_t exp);
 
-FLINT_DLL void _mpf_vec_scalar_mul_mpf(mpf * res, const mpf * vec, slong len, mpf_t c);
+void _mpf_vec_scalar_mul_mpf(mpf * res, const mpf * vec, slong len, mpf_t c);
 
 /*  Dot product and norm  **************************************/
 
-FLINT_DLL void _mpf_vec_dot(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2);
+void _mpf_vec_dot(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2);
 
-FLINT_DLL void _mpf_vec_norm(mpf_t res, const mpf * vec, slong len);
+void _mpf_vec_norm(mpf_t res, const mpf * vec, slong len);
 
-FLINT_DLL int _mpf_vec_dot2(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2, flint_bitcnt_t prec);
+int _mpf_vec_dot2(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2, flint_bitcnt_t prec);
 
-FLINT_DLL void _mpf_vec_norm2(mpf_t res, const mpf * vec, slong len, flint_bitcnt_t prec);
+void _mpf_vec_norm2(mpf_t res, const mpf * vec, slong len, flint_bitcnt_t prec);
 
 #ifdef __cplusplus
 }

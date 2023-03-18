@@ -13,7 +13,7 @@
 #define LONG_EXTRAS_H
 
 #ifdef LONG_EXTRAS_INLINES_C
-#define LONG_EXTRAS_INLINE FLINT_DLL
+#define LONG_EXTRAS_INLINE 
 #else
 #define LONG_EXTRAS_INLINE static __inline__
 #endif
@@ -26,7 +26,7 @@
 
 /* Properties ****************************************************************/
 
-FLINT_DLL size_t z_sizeinbase(slong n, int b);
+size_t z_sizeinbase(slong n, int b);
 
 /* Checked arithmetic ********************************************************/
 
@@ -59,15 +59,15 @@ int z_mat22_det_is_negative(slong m11, slong m12, slong m21, slong m22)
 
 /* Randomisation  ************************************************************/
 
-FLINT_DLL mp_limb_signed_t z_randtest(flint_rand_t state);
+mp_limb_signed_t z_randtest(flint_rand_t state);
 
-FLINT_DLL mp_limb_signed_t z_randtest_not_zero(flint_rand_t state);
+mp_limb_signed_t z_randtest_not_zero(flint_rand_t state);
 
-FLINT_DLL mp_limb_signed_t z_randint(flint_rand_t state, mp_limb_t limit);
+mp_limb_signed_t z_randint(flint_rand_t state, mp_limb_t limit);
 
 /*****************************************************************************/
 
-FLINT_DLL int z_kronecker(slong a, slong n);
+int z_kronecker(slong a, slong n);
 
 #ifdef __cplusplus
 }

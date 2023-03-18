@@ -20,7 +20,7 @@
 
 #if FLINT_BITS == 64
 
-ARB_DLL const mp_limb_t factorial_tab_numer[FACTORIAL_TAB_SIZE] = {
+const mp_limb_t factorial_tab_numer[FACTORIAL_TAB_SIZE] = {
     UWORD(2432902008176640000),
     UWORD(2432902008176640000),
     UWORD(1216451004088320000),
@@ -311,7 +311,7 @@ ARB_DLL const mp_limb_t factorial_tab_numer[FACTORIAL_TAB_SIZE] = {
     UWORD(1),
 };
 
-ARB_DLL const mp_limb_t factorial_tab_denom[FACTORIAL_TAB_SIZE] = {
+const mp_limb_t factorial_tab_denom[FACTORIAL_TAB_SIZE] = {
     UWORD(2432902008176640000),
     UWORD(2432902008176640000),
     UWORD(2432902008176640000),
@@ -604,7 +604,7 @@ ARB_DLL const mp_limb_t factorial_tab_denom[FACTORIAL_TAB_SIZE] = {
 
 #else
 
-ARB_DLL const mp_limb_t factorial_tab_numer[FACTORIAL_TAB_SIZE] = {
+const mp_limb_t factorial_tab_numer[FACTORIAL_TAB_SIZE] = {
     UWORD(479001600),
     UWORD(479001600),
     UWORD(239500800),
@@ -895,7 +895,7 @@ ARB_DLL const mp_limb_t factorial_tab_numer[FACTORIAL_TAB_SIZE] = {
     UWORD(288),
 };
 
-ARB_DLL const mp_limb_t factorial_tab_denom[FACTORIAL_TAB_SIZE] = {
+const mp_limb_t factorial_tab_denom[FACTORIAL_TAB_SIZE] = {
     UWORD(479001600),
     UWORD(479001600),
     UWORD(479001600),

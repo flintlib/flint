@@ -11,7 +11,7 @@
 
 #include "acb_poly.h"
 
-ARB_DLL extern slong acb_poly_newton_exp_cutoff;
+extern slong acb_poly_newton_exp_cutoff;
 
 int main()
 {

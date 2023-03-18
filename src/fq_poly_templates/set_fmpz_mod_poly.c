@@ -13,7 +13,7 @@
 
 #include "templates.h"
 
-FLINT_DLL void TEMPLATE(T, poly_set_fmpz_mod_poly)(TEMPLATE(T, poly_t) rop,
+void TEMPLATE(T, poly_set_fmpz_mod_poly)(TEMPLATE(T, poly_t) rop,
                                                    const fmpz_mod_poly_t op,
                                                    const TEMPLATE(T, ctx_t) ctx)
 {
