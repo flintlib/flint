@@ -49,7 +49,7 @@ jobs:
 
       - if: failure()
         name: "If failure, stop all other jobs"
-        uses: andymckay/cancel-action@0.2
+        uses: andymckay/cancel-action@0.3
 
 
 
@@ -98,7 +98,7 @@ jobs:
           # FIXME: Enable when this won't fail
       # - if: failure()
       #   name: "If failure, stop all other jobs"
-      #   uses: andymckay/cancel-action@0.2
+      #   uses: andymckay/cancel-action@0.3
 
 
 
@@ -149,7 +149,7 @@ jobs:
 
       - if: failure()
         name: "If failure, stop all other jobs"
-        uses: andymckay/cancel-action@0.2
+        uses: andymckay/cancel-action@0.3
 
 
 
@@ -189,7 +189,7 @@ jobs:
 
       - if: failure()
         name: "If failure, stop all other jobs"
-        uses: andymckay/cancel-action@0.2
+        uses: andymckay/cancel-action@0.3
 
 
 
@@ -248,7 +248,7 @@ jobs:
 
       - if: failure()
         name: "If failure, stop all other jobs"
-        uses: andymckay/cancel-action@0.2
+        uses: andymckay/cancel-action@0.3
 
 
 
@@ -299,7 +299,7 @@ jobs:
 
       - if: failure()
         name: "If failure, stop all other jobs"
-        uses: andymckay/cancel-action@0.2
+        uses: andymckay/cancel-action@0.3
 
 
 
@@ -344,7 +344,7 @@ jobs:
 
       - if: failure()
         name: "If failure, stop all other jobs"
-        uses: andymckay/cancel-action@0.2
+        uses: andymckay/cancel-action@0.3
 
 
 
@@ -399,7 +399,7 @@ jobs:
 
       - if: failure()
         name: "If failure, stop all other jobs"
-        uses: andymckay/cancel-action@0.2
+        uses: andymckay/cancel-action@0.3
 
 
 
@@ -472,4 +472,4 @@ jobs:
 
       - if: failure()
         name: "If failure, stop all other jobs"
-        uses: andymckay/cancel-action@0.2
+        uses: andymckay/cancel-action@0.3
