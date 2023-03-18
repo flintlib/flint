@@ -96,6 +96,8 @@ main(void)
 
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
+        slong n, m;
+
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) f;
         TEMPLATE(T, poly_factor_t) r;
@@ -104,12 +106,14 @@ main(void)
         TEMPLATE(T, poly_init)(f, ctx);
         TEMPLATE(T, poly_factor_init)(r, ctx);
 
+        n = 1 + n_randint(state, 10);
+        m = n_randint(state, 5);
+
         for (j = 0; j < 4; j++)
         {
-            TEMPLATE(T, poly_randtest_not_zero)(f, state,
-                                                n_randint(state, 20) + 1, ctx);
+            TEMPLATE(T, poly_randtest_not_zero)(f, state, n, ctx);
 
-            for (k = 0; k < 5; k++)
+            for (k = 0; k < m; k++)
             {
                 TEMPLATE(T, poly_t) ff;
                 TEMPLATE(T, poly_init)(ff, ctx);
