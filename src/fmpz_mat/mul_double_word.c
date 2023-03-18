@@ -413,7 +413,7 @@ static void _mul_worker(void * varg)
 
     bits + sign <= 5*FLINT_BITS
 */
-FLINT_DLL void _fmpz_mat_mul_double_word_internal(
+void _fmpz_mat_mul_double_word_internal(
     fmpz_mat_t C,
     const fmpz_mat_t A,
     const fmpz_mat_t B,

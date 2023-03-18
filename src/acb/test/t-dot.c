@@ -11,7 +11,7 @@
 
 #include "acb.h"
 
-ARB_DLL extern slong acb_dot_gauss_dot_cutoff;
+extern slong acb_dot_gauss_dot_cutoff;
 
 int main()
 {

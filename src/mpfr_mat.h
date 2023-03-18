@@ -13,7 +13,7 @@
 #define MPFR_MAT_H
 
 #ifdef MPFR_MAT_INLINES_C
-#define MPFR_MAT_INLINE FLINT_DLL
+#define MPFR_MAT_INLINE 
 #else
 #define MPFR_MAT_INLINE static __inline__
 #endif
@@ -55,9 +55,9 @@ slong mpfr_mat_ncols(const mpfr_mat_t mat)
     return mat->c;
 }
 
-FLINT_DLL void mpfr_mat_init(mpfr_mat_t mat, slong rows, slong cols, mpfr_prec_t prec);
+void mpfr_mat_init(mpfr_mat_t mat, slong rows, slong cols, mpfr_prec_t prec);
 
-FLINT_DLL void mpfr_mat_swap(mpfr_mat_t mat1, mpfr_mat_t mat2);
+void mpfr_mat_swap(mpfr_mat_t mat1, mpfr_mat_t mat2);
 
 MPFR_MAT_INLINE void
 mpfr_mat_swap_entrywise(mpfr_mat_t mat1, mpfr_mat_t mat2)
@@ -69,21 +69,21 @@ mpfr_mat_swap_entrywise(mpfr_mat_t mat1, mpfr_mat_t mat2)
             mpfr_swap(mpfr_mat_entry(mat2, i, j), mpfr_mat_entry(mat1, i, j));
 }
 
-FLINT_DLL void mpfr_mat_set(mpfr_mat_t mat1, const mpfr_mat_t mat2);
+void mpfr_mat_set(mpfr_mat_t mat1, const mpfr_mat_t mat2);
 
-FLINT_DLL void mpfr_mat_clear(mpfr_mat_t mat);
+void mpfr_mat_clear(mpfr_mat_t mat);
 
-FLINT_DLL int mpfr_mat_equal(const mpfr_mat_t mat1, const mpfr_mat_t mat2);
+int mpfr_mat_equal(const mpfr_mat_t mat1, const mpfr_mat_t mat2);
 
-FLINT_DLL void mpfr_mat_zero(mpfr_mat_t mat);
+void mpfr_mat_zero(mpfr_mat_t mat);
 
 /* Random matrix generation  *************************************************/
 
-FLINT_DLL void mpfr_mat_randtest(mpfr_mat_t mat, flint_rand_t state);
+void mpfr_mat_randtest(mpfr_mat_t mat, flint_rand_t state);
 
 /* Multiplication */
 
-FLINT_DLL void mpfr_mat_mul_classical(mpfr_mat_t C, const mpfr_mat_t A, const mpfr_mat_t B, mpfr_rnd_t rnd);
+void mpfr_mat_mul_classical(mpfr_mat_t C, const mpfr_mat_t A, const mpfr_mat_t B, mpfr_rnd_t rnd);
 
 #ifdef __cplusplus
 }

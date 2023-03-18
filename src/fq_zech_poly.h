@@ -15,8 +15,8 @@
 #define FQ_ZECH_POLY_H
 
 #ifdef FQ_ZECH_POLY_INLINES_C
-#define FQ_ZECH_POLY_INLINE FLINT_DLL
-#define FQ_POLY_TEMPLATES_INLINE FLINT_DLL
+#define FQ_ZECH_POLY_INLINE 
+#define FQ_POLY_TEMPLATES_INLINE 
 #else
 #define FQ_ZECH_POLY_INLINE static __inline__
 #define FQ_POLY_TEMPLATES_INLINE static __inline__

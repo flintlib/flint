@@ -13,7 +13,7 @@
 #define QADIC_H
 
 #ifdef QADIC_INLINES_C
-#define QADIC_INLINE FLINT_DLL
+#define QADIC_INLINE 
 #else
 #define QADIC_INLINE static __inline__
 #endif
@@ -54,15 +54,15 @@ qadic_ctx_struct;
 
 typedef qadic_ctx_struct qadic_ctx_t[1];
 
-FLINT_DLL void qadic_ctx_init_conway(qadic_ctx_t ctx, 
+void qadic_ctx_init_conway(qadic_ctx_t ctx, 
                            const fmpz_t p, slong d, slong min, slong max, 
                            const char *var, enum padic_print_mode mode);
 
-FLINT_DLL void qadic_ctx_init(qadic_ctx_t ctx, 
+void qadic_ctx_init(qadic_ctx_t ctx, 
                            const fmpz_t p, slong d, slong min, slong max, 
                            const char *var, enum padic_print_mode mode);
 
-FLINT_DLL void qadic_ctx_clear(qadic_ctx_t ctx);
+void qadic_ctx_clear(qadic_ctx_t ctx);
 
 QADIC_INLINE slong qadic_ctx_degree(const qadic_ctx_t ctx)
 {
@@ -300,7 +300,7 @@ QADIC_INLINE void qadic_set(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx
     padic_poly_set(rop, op, &(ctx->pctx));
 }
 
-FLINT_DLL void qadic_set_fmpz_poly(qadic_t rop, const fmpz_poly_t op, 
+void qadic_set_fmpz_poly(qadic_t rop, const fmpz_poly_t op, 
                          const qadic_ctx_t ctx);
 
 /* Comparison ****************************************************************/
@@ -340,103 +340,103 @@ qadic_neg(qadic_t x, const qadic_t y, const qadic_ctx_t ctx)
     padic_poly_neg(x, y, &ctx->pctx);
 }
 
-FLINT_DLL void qadic_mul(qadic_t x, const qadic_t y, const qadic_t z,
+void qadic_mul(qadic_t x, const qadic_t y, const qadic_t z,
                           const qadic_ctx_t ctx);
 
-FLINT_DLL void _qadic_inv(fmpz *rop, const fmpz *op, slong len, 
+void _qadic_inv(fmpz *rop, const fmpz *op, slong len, 
                 const fmpz *a, const slong *j, slong lena, 
                 const fmpz_t p, slong N);
 
-FLINT_DLL void qadic_inv(qadic_t x, const qadic_t y, const qadic_ctx_t ctx);
+void qadic_inv(qadic_t x, const qadic_t y, const qadic_ctx_t ctx);
 
-FLINT_DLL void _qadic_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e, 
+void _qadic_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e, 
                 const fmpz *a, const slong *j, slong lena, 
                 const fmpz_t p);
 
-FLINT_DLL void qadic_pow(qadic_t x, const qadic_t y, const fmpz_t e, const qadic_ctx_t ctx);
+void qadic_pow(qadic_t x, const qadic_t y, const fmpz_t e, const qadic_ctx_t ctx);
 
 /* Special functions *********************************************************/
 
-FLINT_DLL void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, slong v, slong len, 
+void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, slong v, slong len, 
                             const fmpz *a, const slong *j, slong lena, 
                             const fmpz_t p, slong N, const fmpz_t pN);
 
-FLINT_DLL int qadic_exp_rectangular(qadic_t rop, const qadic_t op, 
+int qadic_exp_rectangular(qadic_t rop, const qadic_t op, 
                           const qadic_ctx_t ctx);
 
-FLINT_DLL void _qadic_exp_balanced(fmpz *rop, const fmpz *op, slong v, slong len, 
+void _qadic_exp_balanced(fmpz *rop, const fmpz *op, slong v, slong len, 
                          const fmpz *a, const slong *j, slong lena, 
                          const fmpz_t p, slong N, const fmpz_t pN);
 
-FLINT_DLL int qadic_exp_balanced(qadic_t rop, const qadic_t op, 
+int qadic_exp_balanced(qadic_t rop, const qadic_t op, 
                        const qadic_ctx_t ctx);
 
-FLINT_DLL void _qadic_exp(fmpz *rop, const fmpz *op, slong v, slong len, 
+void _qadic_exp(fmpz *rop, const fmpz *op, slong v, slong len, 
                            const fmpz *a, const slong *j, slong lena, 
                            const fmpz_t p, slong N, const fmpz_t pN);
 
-FLINT_DLL int qadic_exp(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
+int qadic_exp(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
-FLINT_DLL void _qadic_log_rectangular(fmpz *z, const fmpz *y, slong v, slong len, 
+void _qadic_log_rectangular(fmpz *z, const fmpz *y, slong v, slong len, 
                             const fmpz *a, const slong *j, slong lena, 
                             const fmpz_t p, slong N, const fmpz_t pN);
 
-FLINT_DLL int qadic_log_rectangular(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
+int qadic_log_rectangular(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
-FLINT_DLL void _qadic_log_balanced(fmpz *z, const fmpz *y, slong len, 
+void _qadic_log_balanced(fmpz *z, const fmpz *y, slong len, 
                          const fmpz *a, const slong *j, slong lena, 
                          const fmpz_t p, slong N, const fmpz_t pN);
 
-FLINT_DLL int qadic_log_balanced(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
+int qadic_log_balanced(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
-FLINT_DLL void _qadic_log(fmpz *z, const fmpz *y, slong v, slong len, 
+void _qadic_log(fmpz *z, const fmpz *y, slong v, slong len, 
                 const fmpz *a, const slong *j, slong lena, 
                 const fmpz_t p, slong N, const fmpz_t pN);
 
-FLINT_DLL int qadic_log(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
+int qadic_log(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
-FLINT_DLL void _qadic_frobenius_a(fmpz *rop, slong exp, 
+void _qadic_frobenius_a(fmpz *rop, slong exp, 
                         const fmpz *a, const slong *j, slong lena, 
                                   const fmpz_t p, slong N);
 
 
-FLINT_DLL void _qadic_frobenius(fmpz *rop, const fmpz *op, slong len, slong e, 
+void _qadic_frobenius(fmpz *rop, const fmpz *op, slong len, slong e, 
                   const fmpz *a, const slong *j, slong lena, 
                   const fmpz_t p, slong N);
 
-FLINT_DLL void qadic_frobenius(qadic_t rop, const qadic_t op, slong e, const qadic_ctx_t ctx);
+void qadic_frobenius(qadic_t rop, const qadic_t op, slong e, const qadic_ctx_t ctx);
 
-FLINT_DLL void _qadic_teichmuller(fmpz *rop, const fmpz *op, slong len, 
+void _qadic_teichmuller(fmpz *rop, const fmpz *op, slong len, 
                         const fmpz *a, const slong *j, slong lena, 
                         const fmpz_t p, slong N);
 
-FLINT_DLL void qadic_teichmuller(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
+void qadic_teichmuller(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
-FLINT_DLL void _qadic_trace(fmpz_t rop, const fmpz *op, slong len, 
+void _qadic_trace(fmpz_t rop, const fmpz *op, slong len, 
                   const fmpz *a, const slong *j, slong lena, const fmpz_t pN);
 
-FLINT_DLL void qadic_trace(padic_t rop, const qadic_t op, const qadic_ctx_t ctx);
+void qadic_trace(padic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
 
-FLINT_DLL void _qadic_norm_resultant(fmpz_t rop, const fmpz *op, slong len, 
+void _qadic_norm_resultant(fmpz_t rop, const fmpz *op, slong len, 
                            const fmpz *a, const slong *j, slong lena, 
                            const fmpz_t p, slong N);
-FLINT_DLL void _qadic_norm_analytic(fmpz_t rop, const fmpz *y, slong v, slong len, 
+void _qadic_norm_analytic(fmpz_t rop, const fmpz *y, slong v, slong len, 
                           const fmpz *a, const slong *j, slong lena, 
                           const fmpz_t p, slong N);
-FLINT_DLL void _qadic_norm(fmpz_t rop, const fmpz *op, slong len, 
+void _qadic_norm(fmpz_t rop, const fmpz *op, slong len, 
                  const fmpz *a, const slong *j, slong lena, 
                  const fmpz_t p, slong N);
 
-FLINT_DLL void qadic_norm(padic_t rop, const qadic_t op, const qadic_ctx_t ctx);
-FLINT_DLL void qadic_norm_analytic(padic_t rop, const qadic_t op, const qadic_ctx_t ctx);
-FLINT_DLL void qadic_norm_resultant(padic_t rop, const qadic_t op, const qadic_ctx_t ctx);
+void qadic_norm(padic_t rop, const qadic_t op, const qadic_ctx_t ctx);
+void qadic_norm_analytic(padic_t rop, const qadic_t op, const qadic_ctx_t ctx);
+void qadic_norm_resultant(padic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
-FLINT_DLL int qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
+int qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
 /* Output ********************************************************************/
 
-FLINT_DLL int qadic_fprint_pretty(FILE *file, const qadic_t op, const qadic_ctx_t ctx);
+int qadic_fprint_pretty(FILE *file, const qadic_t op, const qadic_ctx_t ctx);
 
 QADIC_INLINE int 
 qadic_print_pretty(const qadic_t op, const qadic_ctx_t ctx)

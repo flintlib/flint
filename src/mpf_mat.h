@@ -14,7 +14,7 @@
 #define MPF_MAT_H
 
 #ifdef MPF_MAT_INLINES_C
-#define MPF_MAT_INLINE FLINT_DLL
+#define MPF_MAT_INLINE 
 #else
 #define MPF_MAT_INLINE static __inline__
 #endif
@@ -57,9 +57,9 @@ slong mpf_mat_ncols(const mpf_mat_t mat)
 
 /* Memory management  ********************************************************/
 
-FLINT_DLL void mpf_mat_init(mpf_mat_t mat, slong rows, slong cols, flint_bitcnt_t prec);
+void mpf_mat_init(mpf_mat_t mat, slong rows, slong cols, flint_bitcnt_t prec);
 
-FLINT_DLL void mpf_mat_swap(mpf_mat_t mat1, mpf_mat_t mat2);
+void mpf_mat_swap(mpf_mat_t mat1, mpf_mat_t mat2);
 
 MPF_MAT_INLINE void
 mpf_mat_swap_entrywise(mpf_mat_t mat1, mpf_mat_t mat2)
@@ -71,15 +71,15 @@ mpf_mat_swap_entrywise(mpf_mat_t mat1, mpf_mat_t mat2)
             mpf_swap(mpf_mat_entry(mat2, i, j), mpf_mat_entry(mat1, i, j));
 }
 
-FLINT_DLL void mpf_mat_set(mpf_mat_t mat1, const mpf_mat_t mat2);
+void mpf_mat_set(mpf_mat_t mat1, const mpf_mat_t mat2);
 
-FLINT_DLL void mpf_mat_clear(mpf_mat_t mat);
+void mpf_mat_clear(mpf_mat_t mat);
 
-FLINT_DLL int mpf_mat_equal(const mpf_mat_t mat1, const mpf_mat_t mat2);
+int mpf_mat_equal(const mpf_mat_t mat1, const mpf_mat_t mat2);
 
-FLINT_DLL int mpf_mat_approx_equal(const mpf_mat_t mat1, const mpf_mat_t mat2, flint_bitcnt_t bits);
+int mpf_mat_approx_equal(const mpf_mat_t mat1, const mpf_mat_t mat2, flint_bitcnt_t bits);
 
-FLINT_DLL int mpf_mat_is_zero(const mpf_mat_t mat);
+int mpf_mat_is_zero(const mpf_mat_t mat);
 
 MPF_MAT_INLINE int
 mpf_mat_is_empty(const mpf_mat_t mat)
@@ -93,14 +93,14 @@ mpf_mat_is_square(const mpf_mat_t mat)
     return (mat->r == mat->c);
 }
 
-FLINT_DLL void mpf_mat_zero(mpf_mat_t mat);
+void mpf_mat_zero(mpf_mat_t mat);
 
-FLINT_DLL void mpf_mat_one(mpf_mat_t mat);
+void mpf_mat_one(mpf_mat_t mat);
 
 
 /* Conversions ***************************************************************/
 
-FLINT_DLL void mpf_mat_set_fmpz_mat(mpf_mat_t B, const fmpz_mat_t A);
+void mpf_mat_set_fmpz_mat(mpf_mat_t B, const fmpz_mat_t A);
 
 /* Backwards compatibility (this will generate errors for non-GCC compatible
  * compilers) */
@@ -108,15 +108,15 @@ FLINT_DLL void mpf_mat_set_fmpz_mat(mpf_mat_t B, const fmpz_mat_t A);
 
 /* Input and output  *********************************************************/
 
-FLINT_DLL void mpf_mat_print(const mpf_mat_t mat);
+void mpf_mat_print(const mpf_mat_t mat);
 
 /* Random matrix generation  *************************************************/
 
-FLINT_DLL void mpf_mat_randtest(mpf_mat_t mat, flint_rand_t state, flint_bitcnt_t bits);
+void mpf_mat_randtest(mpf_mat_t mat, flint_rand_t state, flint_bitcnt_t bits);
 
 /* Multiplication */
 
-FLINT_DLL void mpf_mat_mul(mpf_mat_t C, const mpf_mat_t A, const mpf_mat_t B);
+void mpf_mat_mul(mpf_mat_t C, const mpf_mat_t A, const mpf_mat_t B);
 
 /* Permutations */
 
@@ -135,9 +135,9 @@ mpf_mat_swap_rows(mpf_mat_t mat, slong r, slong s)
 
 /* Gram-Schmidt Orthogonalisation and QR Decomposition  ********************************************************/
 
-FLINT_DLL void mpf_mat_gso(mpf_mat_t B, const mpf_mat_t A);
+void mpf_mat_gso(mpf_mat_t B, const mpf_mat_t A);
 
-FLINT_DLL void mpf_mat_qr(mpf_mat_t Q, mpf_mat_t R, const mpf_mat_t A);
+void mpf_mat_qr(mpf_mat_t Q, mpf_mat_t R, const mpf_mat_t A);
 
 #ifdef __cplusplus
 }

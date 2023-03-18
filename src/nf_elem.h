@@ -18,7 +18,7 @@
 #define NF_ELEM_H
 
 #ifdef NF_ELEM_INLINES_C
-#define NF_ELEM_INLINE ANTIC_DLL
+#define NF_ELEM_INLINE 
 #else
 #define NF_ELEM_INLINE static __inline__
 #endif
@@ -73,16 +73,16 @@ typedef nf_elem_struct nf_elem_t[1];
 
 ******************************************************************************/
 
-ANTIC_DLL void nf_elem_init(nf_elem_t a, const nf_t nf);
+void nf_elem_init(nf_elem_t a, const nf_t nf);
 
-ANTIC_DLL void nf_elem_clear(nf_elem_t a, const nf_t nf);
+void nf_elem_clear(nf_elem_t a, const nf_t nf);
 
-ANTIC_DLL void nf_elem_swap(nf_elem_t a, nf_elem_t b, const nf_t nf);
+void nf_elem_swap(nf_elem_t a, nf_elem_t b, const nf_t nf);
 
-ANTIC_DLL void nf_elem_randtest(nf_elem_t a, flint_rand_t state,
+void nf_elem_randtest(nf_elem_t a, flint_rand_t state,
                                               mp_bitcnt_t bits, const nf_t nf);
 
-ANTIC_DLL void nf_elem_randtest_not_zero(nf_elem_t a, flint_rand_t state,
+void nf_elem_randtest_not_zero(nf_elem_t a, flint_rand_t state,
                                               mp_bitcnt_t bits, const nf_t nf);
 
 NF_ELEM_INLINE
@@ -96,11 +96,11 @@ void nf_elem_canonicalise(nf_elem_t a, const nf_t nf)
         fmpq_poly_canonicalise(NF_ELEM(a));
 }
 
-ANTIC_DLL void _nf_elem_reduce(nf_elem_t a, const nf_t nf);
+void _nf_elem_reduce(nf_elem_t a, const nf_t nf);
 
-ANTIC_DLL void nf_elem_reduce(nf_elem_t a, const nf_t nf);
+void nf_elem_reduce(nf_elem_t a, const nf_t nf);
 
-ANTIC_DLL int _nf_elem_invertible_check(nf_elem_t a, const nf_t nf);
+int _nf_elem_invertible_check(nf_elem_t a, const nf_t nf);
 
 /******************************************************************************
 
@@ -108,9 +108,9 @@ ANTIC_DLL int _nf_elem_invertible_check(nf_elem_t a, const nf_t nf);
 
 ******************************************************************************/
 
-ANTIC_DLL int _nf_elem_equal(const nf_elem_t a, const nf_elem_t b, const nf_t nf);
+int _nf_elem_equal(const nf_elem_t a, const nf_elem_t b, const nf_t nf);
 
-ANTIC_DLL int nf_elem_equal(const nf_elem_t a, const nf_elem_t b, const nf_t nf);
+int nf_elem_equal(const nf_elem_t a, const nf_elem_t b, const nf_t nf);
 
 NF_ELEM_INLINE
 int nf_elem_is_zero(const nf_elem_t a, const nf_t nf)
@@ -135,7 +135,7 @@ int nf_elem_is_one(const nf_elem_t a, const nf_t nf)
         return fmpq_poly_is_one(a->elem);
 }
 
-ANTIC_DLL int nf_elem_is_gen(const nf_elem_t a, const nf_t nf);
+int nf_elem_is_gen(const nf_elem_t a, const nf_t nf);
 
 NF_ELEM_INLINE
 int nf_elem_is_integer(const nf_elem_t a, const nf_t nf)
@@ -159,10 +159,10 @@ int nf_elem_is_rational(const nf_elem_t a, const nf_t nf)
         return NF_ELEM(a)->length <= 1;
 }
 
-ANTIC_DLL int nf_elem_equal_si(const nf_elem_t a, const slong b, const nf_t nf);
-ANTIC_DLL int nf_elem_equal_ui(const nf_elem_t a, const ulong b, const nf_t nf);
-ANTIC_DLL int nf_elem_equal_fmpz(const nf_elem_t a, const fmpz_t b, const nf_t nf);
-ANTIC_DLL int nf_elem_equal_fmpq(const nf_elem_t a, const fmpq_t b, const nf_t nf);
+int nf_elem_equal_si(const nf_elem_t a, const slong b, const nf_t nf);
+int nf_elem_equal_ui(const nf_elem_t a, const ulong b, const nf_t nf);
+int nf_elem_equal_fmpz(const nf_elem_t a, const fmpz_t b, const nf_t nf);
+int nf_elem_equal_fmpq(const nf_elem_t a, const fmpq_t b, const nf_t nf);
 
 /******************************************************************************
 
@@ -170,10 +170,10 @@ ANTIC_DLL int nf_elem_equal_fmpq(const nf_elem_t a, const fmpq_t b, const nf_t n
 
 ******************************************************************************/
 
-ANTIC_DLL void nf_elem_print_pretty(const nf_elem_t a,
+void nf_elem_print_pretty(const nf_elem_t a,
                              const nf_t nf, const char * var);
 
-ANTIC_DLL char * nf_elem_get_str_pretty(const nf_elem_t a,
+char * nf_elem_get_str_pretty(const nf_elem_t a,
                               const char * var, const nf_t nf);
 
 /******************************************************************************
@@ -182,16 +182,16 @@ ANTIC_DLL char * nf_elem_get_str_pretty(const nf_elem_t a,
 
 ******************************************************************************/
 
-ANTIC_DLL void nf_elem_zero(nf_elem_t a, const nf_t nf);
-ANTIC_DLL void nf_elem_one(nf_elem_t a, const nf_t nf);
-ANTIC_DLL void nf_elem_gen(nf_elem_t a, const nf_t nf);
+void nf_elem_zero(nf_elem_t a, const nf_t nf);
+void nf_elem_one(nf_elem_t a, const nf_t nf);
+void nf_elem_gen(nf_elem_t a, const nf_t nf);
 
-ANTIC_DLL void nf_elem_set(nf_elem_t a, const nf_elem_t b, const nf_t nf);
-ANTIC_DLL void nf_elem_set_si(nf_elem_t a, slong c, const nf_t nf);
-ANTIC_DLL void nf_elem_set_ui(nf_elem_t a, ulong c, const nf_t nf);
-ANTIC_DLL void nf_elem_set_fmpz(nf_elem_t a, const fmpz_t c, const nf_t nf);
-ANTIC_DLL void nf_elem_set_fmpq(nf_elem_t a, const fmpq_t c, const nf_t nf);
-ANTIC_DLL void nf_elem_set_fmpq_poly(nf_elem_t a, const fmpq_poly_t pol, const nf_t nf);
+void nf_elem_set(nf_elem_t a, const nf_elem_t b, const nf_t nf);
+void nf_elem_set_si(nf_elem_t a, slong c, const nf_t nf);
+void nf_elem_set_ui(nf_elem_t a, ulong c, const nf_t nf);
+void nf_elem_set_fmpz(nf_elem_t a, const fmpz_t c, const nf_t nf);
+void nf_elem_set_fmpq(nf_elem_t a, const fmpq_t c, const nf_t nf);
+void nf_elem_set_fmpq_poly(nf_elem_t a, const fmpq_poly_t pol, const nf_t nf);
 
 /******************************************************************************
 
@@ -199,36 +199,36 @@ ANTIC_DLL void nf_elem_set_fmpq_poly(nf_elem_t a, const fmpq_poly_t pol, const n
 
 ******************************************************************************/
 
-ANTIC_DLL
+
 void nf_elem_set_fmpz_mat_row(nf_elem_t b, const fmpz_mat_t M,
                                      const slong i, fmpz_t den, const nf_t nf);
 
-ANTIC_DLL
+
 void nf_elem_get_fmpz_mat_row(fmpz_mat_t M, const slong i, fmpz_t den,
                                              const nf_elem_t b, const nf_t nf);
 
-FLINT_DLL
+
 void nf_elem_get_fmpq_poly(fmpq_poly_t pol, const nf_elem_t a, const nf_t nf);
 
-ANTIC_DLL
+
 void _nf_elem_get_nmod_poly(nmod_poly_t pol, const nf_elem_t a, const nf_t nf);
 
-ANTIC_DLL
+
 void nf_elem_get_nmod_poly_den(nmod_poly_t pol,
                                     const nf_elem_t a, const nf_t nf, int den);
 
-ANTIC_DLL
+
 void nf_elem_get_nmod_poly(nmod_poly_t pol, const nf_elem_t a, const nf_t nf);
 
-ANTIC_DLL
+
 void _nf_elem_get_fmpz_mod_poly(fmpz_mod_poly_t pol,
                    const nf_elem_t a, const nf_t nf, const fmpz_mod_ctx_t ctx);
 
-ANTIC_DLL
+
 void nf_elem_get_fmpz_mod_poly_den(fmpz_mod_poly_t pol,
           const nf_elem_t a, const nf_t nf, int den, const fmpz_mod_ctx_t ctx);
 
-ANTIC_DLL
+
 void nf_elem_get_fmpz_mod_poly(fmpz_mod_poly_t pol,
                    const nf_elem_t a, const nf_t nf, const fmpz_mod_ctx_t ctx);
 
@@ -260,10 +260,10 @@ void nf_elem_set_den(nf_elem_t b, fmpz_t d, const nf_t nf)
         fmpz_set(NF_ELEM_DENREF(b), d);
 }
 
-ANTIC_DLL
+
 void nf_elem_get_coeff_fmpq(fmpq_t a, const nf_elem_t b, slong i, const nf_t nf);
 
-ANTIC_DLL
+
 void nf_elem_get_coeff_fmpz(fmpz_t a, const nf_elem_t b, slong i, const nf_t nf);
 
 NF_ELEM_INLINE
@@ -277,7 +277,7 @@ int nf_elem_den_is_one(const nf_elem_t a, const nf_t nf)
         return fmpz_is_one(NF_ELEM_DENREF(a));
 }
 
-ANTIC_DLL
+
 void _nf_elem_set_coeff_num_fmpz(nf_elem_t a, slong i, const fmpz_t b, const nf_t nf);
 
 /******************************************************************************
@@ -286,105 +286,105 @@ void _nf_elem_set_coeff_num_fmpz(nf_elem_t a, slong i, const fmpz_t b, const nf_
 
 ******************************************************************************/
 
-ANTIC_DLL void nf_elem_neg(nf_elem_t a, const nf_elem_t b, const nf_t nf);
+void nf_elem_neg(nf_elem_t a, const nf_elem_t b, const nf_t nf);
 
-ANTIC_DLL void nf_elem_add_si(nf_elem_t a, const nf_elem_t b, slong c, const nf_t nf);
-ANTIC_DLL void nf_elem_add_fmpz(nf_elem_t a, const nf_elem_t b, const fmpz_t c, const nf_t nf);
-ANTIC_DLL void nf_elem_add_fmpq(nf_elem_t a, const nf_elem_t b, const fmpq_t c, const nf_t nf);
+void nf_elem_add_si(nf_elem_t a, const nf_elem_t b, slong c, const nf_t nf);
+void nf_elem_add_fmpz(nf_elem_t a, const nf_elem_t b, const fmpz_t c, const nf_t nf);
+void nf_elem_add_fmpq(nf_elem_t a, const nf_elem_t b, const fmpq_t c, const nf_t nf);
 
-ANTIC_DLL void nf_elem_sub_si(nf_elem_t a, const nf_elem_t b, slong c, const nf_t nf);
-ANTIC_DLL void nf_elem_sub_fmpz(nf_elem_t a, const nf_elem_t b, const fmpz_t c, const nf_t nf);
-ANTIC_DLL void nf_elem_sub_fmpq(nf_elem_t a, const nf_elem_t b, const fmpq_t c, const nf_t nf);
-ANTIC_DLL void nf_elem_si_sub(nf_elem_t a, slong c, const nf_elem_t b, const nf_t nf);
-ANTIC_DLL void nf_elem_fmpz_sub(nf_elem_t a, const fmpz_t c, const nf_elem_t b, const nf_t nf);
-ANTIC_DLL void nf_elem_fmpq_sub(nf_elem_t a, const fmpq_t c, const nf_elem_t b, const nf_t nf);
+void nf_elem_sub_si(nf_elem_t a, const nf_elem_t b, slong c, const nf_t nf);
+void nf_elem_sub_fmpz(nf_elem_t a, const nf_elem_t b, const fmpz_t c, const nf_t nf);
+void nf_elem_sub_fmpq(nf_elem_t a, const nf_elem_t b, const fmpq_t c, const nf_t nf);
+void nf_elem_si_sub(nf_elem_t a, slong c, const nf_elem_t b, const nf_t nf);
+void nf_elem_fmpz_sub(nf_elem_t a, const fmpz_t c, const nf_elem_t b, const nf_t nf);
+void nf_elem_fmpq_sub(nf_elem_t a, const fmpq_t c, const nf_elem_t b, const nf_t nf);
 
-ANTIC_DLL void nf_elem_scalar_mul_si(nf_elem_t a, const nf_elem_t b,
+void nf_elem_scalar_mul_si(nf_elem_t a, const nf_elem_t b,
                                                       slong c, const nf_t nf);
 
-ANTIC_DLL void nf_elem_scalar_mul_fmpz(nf_elem_t a, const nf_elem_t b,
+void nf_elem_scalar_mul_fmpz(nf_elem_t a, const nf_elem_t b,
                                                      const fmpz_t c, const nf_t nf);
 
-ANTIC_DLL void nf_elem_scalar_mul_fmpq(nf_elem_t a, const nf_elem_t b,
+void nf_elem_scalar_mul_fmpq(nf_elem_t a, const nf_elem_t b,
                                                      const fmpq_t c, const nf_t nf);
 									
-ANTIC_DLL void nf_elem_scalar_div_si(nf_elem_t a, const nf_elem_t b,
+void nf_elem_scalar_div_si(nf_elem_t a, const nf_elem_t b,
                                                       slong c, const nf_t nf);
 
-ANTIC_DLL void nf_elem_scalar_div_fmpz(nf_elem_t a, const nf_elem_t b,
+void nf_elem_scalar_div_fmpz(nf_elem_t a, const nf_elem_t b,
                                                      const fmpz_t c, const nf_t nf);
 
-ANTIC_DLL void nf_elem_scalar_div_fmpq(nf_elem_t a, const nf_elem_t b,
+void nf_elem_scalar_div_fmpq(nf_elem_t a, const nf_elem_t b,
                                                      const fmpq_t c, const nf_t nf);
 									
-ANTIC_DLL void _nf_elem_add_lf(nf_elem_t a, const nf_elem_t b,
+void _nf_elem_add_lf(nf_elem_t a, const nf_elem_t b,
                                    const nf_elem_t c, const nf_t nf, int can);
 
-ANTIC_DLL void _nf_elem_sub_lf(nf_elem_t a, const nf_elem_t b,
+void _nf_elem_sub_lf(nf_elem_t a, const nf_elem_t b,
                                    const nf_elem_t c, const nf_t nf, int can);
 
-ANTIC_DLL void _nf_elem_add_qf(nf_elem_t a, const nf_elem_t b,
+void _nf_elem_add_qf(nf_elem_t a, const nf_elem_t b,
                                    const nf_elem_t c, const nf_t nf, int can);
 
-ANTIC_DLL void _nf_elem_sub_qf(nf_elem_t a, const nf_elem_t b,
+void _nf_elem_sub_qf(nf_elem_t a, const nf_elem_t b,
                                    const nf_elem_t c, const nf_t nf, int can);
 
-ANTIC_DLL void nf_elem_add_qf(nf_elem_t a, const nf_elem_t b,
+void nf_elem_add_qf(nf_elem_t a, const nf_elem_t b,
                                             const nf_elem_t c, const nf_t nf);
 
-ANTIC_DLL void nf_elem_sub_qf(nf_elem_t a, const nf_elem_t b,
+void nf_elem_sub_qf(nf_elem_t a, const nf_elem_t b,
                                             const nf_elem_t c, const nf_t nf);
 
-ANTIC_DLL void _nf_elem_add(nf_elem_t a, const nf_elem_t b, const nf_elem_t c, const nf_t nf);
-ANTIC_DLL void nf_elem_add(nf_elem_t a, const nf_elem_t b, const nf_elem_t c, const nf_t nf);
+void _nf_elem_add(nf_elem_t a, const nf_elem_t b, const nf_elem_t c, const nf_t nf);
+void nf_elem_add(nf_elem_t a, const nf_elem_t b, const nf_elem_t c, const nf_t nf);
 
-ANTIC_DLL void _nf_elem_sub(nf_elem_t a, const nf_elem_t b, const nf_elem_t c, const nf_t nf);
-ANTIC_DLL void nf_elem_sub(nf_elem_t a, const nf_elem_t b, const nf_elem_t c, const nf_t nf);
+void _nf_elem_sub(nf_elem_t a, const nf_elem_t b, const nf_elem_t c, const nf_t nf);
+void nf_elem_sub(nf_elem_t a, const nf_elem_t b, const nf_elem_t c, const nf_t nf);
 
-ANTIC_DLL void nf_elem_mul_gen(nf_elem_t a, const nf_elem_t b, const nf_t nf);
+void nf_elem_mul_gen(nf_elem_t a, const nf_elem_t b, const nf_t nf);
 
-ANTIC_DLL void _nf_elem_mul(nf_elem_t a, const nf_elem_t b,
+void _nf_elem_mul(nf_elem_t a, const nf_elem_t b,
                                              const nf_elem_t c, const nf_t nf);
 
-ANTIC_DLL void nf_elem_mul(nf_elem_t a, const nf_elem_t b,
+void nf_elem_mul(nf_elem_t a, const nf_elem_t b,
                                              const nf_elem_t c, const nf_t nf);
 
-ANTIC_DLL void _nf_elem_mul_red(nf_elem_t a, const nf_elem_t b,
+void _nf_elem_mul_red(nf_elem_t a, const nf_elem_t b,
                                     const nf_elem_t c, const nf_t nf, int red);
 
-ANTIC_DLL void nf_elem_mul_red(nf_elem_t a, const nf_elem_t b,
+void nf_elem_mul_red(nf_elem_t a, const nf_elem_t b,
                                     const nf_elem_t c, const nf_t nf, int red);
 
-ANTIC_DLL void _nf_elem_inv(nf_elem_t a, const nf_elem_t b, const nf_t nf);
+void _nf_elem_inv(nf_elem_t a, const nf_elem_t b, const nf_t nf);
 
-ANTIC_DLL void nf_elem_inv(nf_elem_t a, const nf_elem_t b, const nf_t nf);
+void nf_elem_inv(nf_elem_t a, const nf_elem_t b, const nf_t nf);
 
-ANTIC_DLL void _nf_elem_div(nf_elem_t a, const nf_elem_t b, const nf_elem_t c, const nf_t nf);
+void _nf_elem_div(nf_elem_t a, const nf_elem_t b, const nf_elem_t c, const nf_t nf);
 
-ANTIC_DLL void nf_elem_div(nf_elem_t a, const nf_elem_t b, const nf_elem_t c, const nf_t nf);
+void nf_elem_div(nf_elem_t a, const nf_elem_t b, const nf_elem_t c, const nf_t nf);
 
-ANTIC_DLL void _nf_elem_pow(nf_elem_t res, const nf_elem_t b, ulong e, const nf_t nf);
+void _nf_elem_pow(nf_elem_t res, const nf_elem_t b, ulong e, const nf_t nf);
 
-ANTIC_DLL void nf_elem_pow(nf_elem_t res, const nf_elem_t a, ulong e, const nf_t nf);
+void nf_elem_pow(nf_elem_t res, const nf_elem_t a, ulong e, const nf_t nf);
 
-ANTIC_DLL void _nf_elem_norm(fmpz_t rnum, fmpz_t rden, const nf_elem_t a, const nf_t nf);
+void _nf_elem_norm(fmpz_t rnum, fmpz_t rden, const nf_elem_t a, const nf_t nf);
 
-ANTIC_DLL void nf_elem_norm(fmpq_t res, const nf_elem_t a, const nf_t nf);
+void nf_elem_norm(fmpq_t res, const nf_elem_t a, const nf_t nf);
 
-ANTIC_DLL void _nf_elem_norm_div(fmpz_t rnum, fmpz_t rden, const nf_elem_t a,
+void _nf_elem_norm_div(fmpz_t rnum, fmpz_t rden, const nf_elem_t a,
                              const nf_t nf, const fmpz_t divisor, slong nbits);
 
-ANTIC_DLL void nf_elem_norm_div(fmpq_t res, const nf_elem_t a, const nf_t nf,
+void nf_elem_norm_div(fmpq_t res, const nf_elem_t a, const nf_t nf,
                                             const fmpz_t divisor, slong nbits);
 
-ANTIC_DLL void _nf_elem_trace(fmpz_t rnum, fmpz_t rden, const nf_elem_t a,
+void _nf_elem_trace(fmpz_t rnum, fmpz_t rden, const nf_elem_t a,
                                                                 const nf_t nf);
 
-ANTIC_DLL void nf_elem_trace(fmpq_t res, const nf_elem_t a, const nf_t nf);
+void nf_elem_trace(fmpq_t res, const nf_elem_t a, const nf_t nf);
 
-ANTIC_DLL void nf_elem_rep_mat(fmpq_mat_t res, const nf_elem_t a, const nf_t nf);
+void nf_elem_rep_mat(fmpq_mat_t res, const nf_elem_t a, const nf_t nf);
 
-ANTIC_DLL void nf_elem_rep_mat_fmpz_mat_den(fmpz_mat_t res, fmpz_t den, const nf_elem_t a, const nf_t nf);
+void nf_elem_rep_mat_fmpz_mat_den(fmpz_mat_t res, fmpz_t den, const nf_elem_t a, const nf_t nf);
 
 /******************************************************************************
 
@@ -392,13 +392,13 @@ ANTIC_DLL void nf_elem_rep_mat_fmpz_mat_den(fmpz_mat_t res, fmpz_t den, const nf
 
 ******************************************************************************/
 
-ANTIC_DLL void _nf_elem_mod_fmpz(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t nf, int sign);
-ANTIC_DLL void nf_elem_mod_fmpz_den(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t nf, int den);
-ANTIC_DLL void nf_elem_smod_fmpz_den(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t nf, int den);
-ANTIC_DLL void nf_elem_mod_fmpz(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t nf);
-ANTIC_DLL void nf_elem_smod_fmpz(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t nf);
-ANTIC_DLL void nf_elem_coprime_den(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t nf);
-ANTIC_DLL void nf_elem_coprime_den_signed(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t nf);
+void _nf_elem_mod_fmpz(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t nf, int sign);
+void nf_elem_mod_fmpz_den(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t nf, int den);
+void nf_elem_smod_fmpz_den(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t nf, int den);
+void nf_elem_mod_fmpz(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t nf);
+void nf_elem_smod_fmpz(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t nf);
+void nf_elem_coprime_den(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t nf);
+void nf_elem_coprime_den_signed(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t nf);
 
 #ifdef __cplusplus
 }

@@ -14,7 +14,7 @@
 #define NMOD_VEC_H
 
 #ifdef NMOD_VEC_INLINES_C
-#define NMOD_VEC_INLINE FLINT_DLL
+#define NMOD_VEC_INLINE 
 #else
 #define NMOD_VEC_INLINE static __inline__
 #endif
@@ -44,7 +44,7 @@ void _nmod_vec_clear(mp_ptr vec)
    flint_free(vec);
 }
 
-FLINT_DLL void _nmod_vec_randtest(mp_ptr vec, flint_rand_t state, slong len, nmod_t mod);
+void _nmod_vec_randtest(mp_ptr vec, flint_rand_t state, slong len, nmod_t mod);
 
 NMOD_VEC_INLINE
 void _nmod_vec_zero(mp_ptr vec, slong len)
@@ -52,7 +52,7 @@ void _nmod_vec_zero(mp_ptr vec, slong len)
    flint_mpn_zero(vec, len);
 }
 
-FLINT_DLL flint_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, slong len);
+flint_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, slong len);
 
 NMOD_VEC_INLINE
 void _nmod_vec_set(mp_ptr res, mp_srcptr vec, slong len)
@@ -94,28 +94,28 @@ int _nmod_vec_is_zero(mp_srcptr vec, slong len)
    return 1;
 }
 
-FLINT_DLL void _nmod_vec_reduce(mp_ptr res, mp_srcptr vec, 
+void _nmod_vec_reduce(mp_ptr res, mp_srcptr vec, 
                                         slong len, nmod_t mod);
 
-FLINT_DLL void _nmod_vec_add(mp_ptr res, mp_srcptr vec1, 
+void _nmod_vec_add(mp_ptr res, mp_srcptr vec1, 
                         mp_srcptr vec2, slong len, nmod_t mod);
 
-FLINT_DLL void _nmod_vec_sub(mp_ptr res, mp_srcptr vec1, 
+void _nmod_vec_sub(mp_ptr res, mp_srcptr vec1, 
                         mp_srcptr vec2, slong len, nmod_t mod);
 
-FLINT_DLL void _nmod_vec_neg(mp_ptr res, mp_srcptr vec, 
+void _nmod_vec_neg(mp_ptr res, mp_srcptr vec, 
                                             slong len, nmod_t mod);
 
-FLINT_DLL void _nmod_vec_scalar_mul_nmod(mp_ptr res, mp_srcptr vec, 
+void _nmod_vec_scalar_mul_nmod(mp_ptr res, mp_srcptr vec, 
                             slong len, mp_limb_t c, nmod_t mod);
 
-FLINT_DLL void _nmod_vec_scalar_mul_nmod_shoup(mp_ptr res, mp_srcptr vec, 
+void _nmod_vec_scalar_mul_nmod_shoup(mp_ptr res, mp_srcptr vec, 
                             slong len, mp_limb_t c, nmod_t mod);
 
-FLINT_DLL void _nmod_vec_scalar_addmul_nmod(mp_ptr res, mp_srcptr vec, 
+void _nmod_vec_scalar_addmul_nmod(mp_ptr res, mp_srcptr vec, 
                             slong len, mp_limb_t c, nmod_t mod);
 
-FLINT_DLL int _nmod_vec_dot_bound_limbs(slong len, nmod_t mod);
+int _nmod_vec_dot_bound_limbs(slong len, nmod_t mod);
 
 
 #define NMOD_VEC_DOT(res, i, len, expr1, expr2, mod, nlimbs)                \
@@ -182,13 +182,13 @@ FLINT_DLL int _nmod_vec_dot_bound_limbs(slong len, nmod_t mod);
         res = s0;                                                           \
     } while (0);
 
-FLINT_DLL mp_limb_t _nmod_vec_dot(mp_srcptr vec1, mp_srcptr vec2,
+mp_limb_t _nmod_vec_dot(mp_srcptr vec1, mp_srcptr vec2,
     slong len, nmod_t mod, int nlimbs);
 
-FLINT_DLL mp_limb_t _nmod_vec_dot_rev(mp_srcptr vec1, mp_srcptr vec2,
+mp_limb_t _nmod_vec_dot_rev(mp_srcptr vec1, mp_srcptr vec2,
     slong len, nmod_t mod, int nlimbs);
 
-FLINT_DLL mp_limb_t _nmod_vec_dot_ptr(mp_srcptr vec1, const mp_ptr * vec2, slong offset,
+mp_limb_t _nmod_vec_dot_ptr(mp_srcptr vec1, const mp_ptr * vec2, slong offset,
     slong len, nmod_t mod, int nlimbs);
 
 

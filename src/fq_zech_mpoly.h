@@ -13,7 +13,7 @@
 #define FQ_ZECH_MPOLY_H
 
 #ifdef FQ_ZECH_MPOLY_INLINES_C
-#define FQ_ZECH_MPOLY_INLINE FLINT_DLL
+#define FQ_ZECH_MPOLY_INLINE 
 #else
 #define FQ_ZECH_MPOLY_INLINE static __inline__
 #endif
@@ -137,13 +137,13 @@ typedef fq_zech_mpoly_geobucket_struct fq_zech_mpoly_geobucket_t[1];
 
 /* Context object ************************************************************/
 
-FLINT_DLL void fq_zech_mpoly_ctx_init_deg(fq_zech_mpoly_ctx_t ctx, slong nvars,
+void fq_zech_mpoly_ctx_init_deg(fq_zech_mpoly_ctx_t ctx, slong nvars,
                                  const ordering_t ord, mp_limb_t p, slong deg);
 
-FLINT_DLL void fq_zech_mpoly_ctx_init(fq_zech_mpoly_ctx_t ctx, slong nvars,
+void fq_zech_mpoly_ctx_init(fq_zech_mpoly_ctx_t ctx, slong nvars,
                               const ordering_t ord, const fq_zech_ctx_t fqctx);
 
-FLINT_DLL void fq_zech_mpoly_ctx_clear(fq_zech_mpoly_ctx_t ctx);
+void fq_zech_mpoly_ctx_clear(fq_zech_mpoly_ctx_t ctx);
 
 FQ_ZECH_MPOLY_INLINE
 slong fq_zech_mpoly_ctx_nvars(const fq_zech_mpoly_ctx_t ctx)
@@ -160,29 +160,29 @@ ordering_t fq_zech_mpoly_ctx_ord(const fq_zech_mpoly_ctx_t ctx)
 
 /*  Memory management ********************************************************/
 
-FLINT_DLL void fq_zech_mpoly_init(fq_zech_mpoly_t A,
+void fq_zech_mpoly_init(fq_zech_mpoly_t A,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_init2(fq_zech_mpoly_t A, slong alloc,
+void fq_zech_mpoly_init2(fq_zech_mpoly_t A, slong alloc,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_init3(fq_zech_mpoly_t A, slong alloc,
+void fq_zech_mpoly_init3(fq_zech_mpoly_t A, slong alloc,
                               flint_bitcnt_t bits, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_realloc(fq_zech_mpoly_t A,
+void fq_zech_mpoly_realloc(fq_zech_mpoly_t A,
                                    slong alloc, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_fit_length(fq_zech_mpoly_t A, slong length,
+void fq_zech_mpoly_fit_length(fq_zech_mpoly_t A, slong length,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void _fq_zech_mpoly_fit_length(fq_zech_struct ** coeff,
+void _fq_zech_mpoly_fit_length(fq_zech_struct ** coeff,
                               ulong ** exps, slong * alloc, slong len, slong N,
                                                     const fq_zech_ctx_t fqctx);
 
-FLINT_DLL void fq_zech_mpoly_fit_length_reset_bits(fq_zech_mpoly_t A,
+void fq_zech_mpoly_fit_length_reset_bits(fq_zech_mpoly_t A,
                 slong len, flint_bitcnt_t bits, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_clear(fq_zech_mpoly_t A,
+void fq_zech_mpoly_clear(fq_zech_mpoly_t A,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
 FQ_ZECH_MPOLY_INLINE
@@ -226,13 +226,13 @@ void fq_zech_mpoly_fit_bits(fq_zech_mpoly_t A, slong bits,
 
 /* Input/output **************************************************************/
 
-FLINT_DLL int fq_zech_mpoly_set_str_pretty(fq_zech_mpoly_t A, const char * str,
+int fq_zech_mpoly_set_str_pretty(fq_zech_mpoly_t A, const char * str,
                                const char ** x, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL char * fq_zech_mpoly_get_str_pretty(const fq_zech_mpoly_t A,
+char * fq_zech_mpoly_get_str_pretty(const fq_zech_mpoly_t A,
                                const char ** x, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL int fq_zech_mpoly_fprint_pretty(FILE * file, 
+int fq_zech_mpoly_fprint_pretty(FILE * file, 
       const fq_zech_mpoly_t A, const char ** x, const fq_zech_mpoly_ctx_t ctx);
 
 FQ_ZECH_MPOLY_INLINE
@@ -245,16 +245,16 @@ int fq_zech_mpoly_print_pretty(const fq_zech_mpoly_t A,
 
 /*  Basic manipulation *******************************************************/
 
-FLINT_DLL void fq_zech_mpoly_gen(fq_zech_mpoly_t A, slong var,
+void fq_zech_mpoly_gen(fq_zech_mpoly_t A, slong var,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL int fq_zech_mpoly_is_gen(const fq_zech_mpoly_t A,
+int fq_zech_mpoly_is_gen(const fq_zech_mpoly_t A,
                                      slong var, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_set(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
+void fq_zech_mpoly_set(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL int fq_zech_mpoly_equal(const fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
+int fq_zech_mpoly_equal(const fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
 FQ_ZECH_MPOLY_INLINE
@@ -269,22 +269,22 @@ void fq_zech_mpoly_swap(fq_zech_mpoly_t A, fq_zech_mpoly_t B,
 
 /* Constants *****************************************************************/
 
-FLINT_DLL int fq_zech_mpoly_is_fq_zech(const fq_zech_mpoly_t A,
+int fq_zech_mpoly_is_fq_zech(const fq_zech_mpoly_t A,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_get_fq_zech(fq_zech_t c, const fq_zech_mpoly_t A,
+void fq_zech_mpoly_get_fq_zech(fq_zech_t c, const fq_zech_mpoly_t A,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_set_fq_zech(fq_zech_mpoly_t A,
+void fq_zech_mpoly_set_fq_zech(fq_zech_mpoly_t A,
                              const fq_zech_t c, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_set_ui(fq_zech_mpoly_t A, ulong c,
+void fq_zech_mpoly_set_ui(fq_zech_mpoly_t A, ulong c,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_set_fq_zech_gen(fq_zech_mpoly_t A,
+void fq_zech_mpoly_set_fq_zech_gen(fq_zech_mpoly_t A,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL int fq_zech_mpoly_equal_fq_zech(const fq_zech_mpoly_t A,
+int fq_zech_mpoly_equal_fq_zech(const fq_zech_mpoly_t A,
                              const fq_zech_t c, const fq_zech_mpoly_ctx_t ctx);
 
 FQ_ZECH_MPOLY_INLINE
@@ -305,7 +305,7 @@ int fq_zech_mpoly_is_zero(const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ctx
    return A->length == 0;
 }
 
-FLINT_DLL int fq_zech_mpoly_is_one(const fq_zech_mpoly_t A,
+int fq_zech_mpoly_is_one(const fq_zech_mpoly_t A,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
 
@@ -371,35 +371,35 @@ slong fq_zech_mpoly_total_degree_si(const fq_zech_mpoly_t A,
 
 /* Coefficients **************************************************************/
 
-FLINT_DLL void fq_zech_mpoly_get_coeff_fq_zech_monomial(fq_zech_t c,
+void fq_zech_mpoly_get_coeff_fq_zech_monomial(fq_zech_t c,
                           const fq_zech_mpoly_t A, const fq_zech_mpoly_t M,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_set_coeff_fq_zech_monomial(fq_zech_mpoly_t A,
+void fq_zech_mpoly_set_coeff_fq_zech_monomial(fq_zech_mpoly_t A,
                                   const fq_zech_t c, const fq_zech_mpoly_t M,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_get_coeff_fq_zech_fmpz(fq_zech_t c,
+void fq_zech_mpoly_get_coeff_fq_zech_fmpz(fq_zech_t c,
                              const fq_zech_mpoly_t A, fmpz * const * exp,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_get_coeff_fq_zech_ui(fq_zech_t c,
+void fq_zech_mpoly_get_coeff_fq_zech_ui(fq_zech_t c,
                                 const fq_zech_mpoly_t A, const ulong * exp,
                                                const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void _fq_zech_mpoly_set_coeff_fq_zech_fmpz(fq_zech_mpoly_t A,
+void _fq_zech_mpoly_set_coeff_fq_zech_fmpz(fq_zech_mpoly_t A,
                                        const fq_zech_t c, const fmpz * exp,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_set_coeff_fq_zech_fmpz(fq_zech_mpoly_t A,
+void fq_zech_mpoly_set_coeff_fq_zech_fmpz(fq_zech_mpoly_t A,
                                      const fq_zech_t c, fmpz * const * exp,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_set_coeff_fq_zech_ui(fq_zech_mpoly_t A,
+void fq_zech_mpoly_set_coeff_fq_zech_ui(fq_zech_mpoly_t A,
                                       const fq_zech_t c, const ulong * exp,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_get_coeff_vars_ui(fq_zech_mpoly_t C,
+void fq_zech_mpoly_get_coeff_vars_ui(fq_zech_mpoly_t C,
               const fq_zech_mpoly_t A, const slong * vars, const ulong * exps,
                                   slong length, const fq_zech_mpoly_ctx_t ctx);
 
@@ -413,13 +413,13 @@ FQ_ZECH_MPOLY_INLINE fq_zech_struct * fq_zech_mpoly_leadcoeff(
 
 /* comparison ****************************************************************/
 
-FLINT_DLL int fq_zech_mpoly_cmp(const fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
+int fq_zech_mpoly_cmp(const fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
 
 /* container operations ******************************************************/
 
-FLINT_DLL int fq_zech_mpoly_is_canonical(const fq_zech_mpoly_t A,
+int fq_zech_mpoly_is_canonical(const fq_zech_mpoly_t A,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
 FQ_ZECH_MPOLY_INLINE
@@ -428,13 +428,13 @@ slong fq_zech_mpoly_length(const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ct
     return A->length;
 }
 
-FLINT_DLL void fq_zech_mpoly_resize(fq_zech_mpoly_t A, slong new_length,
+void fq_zech_mpoly_resize(fq_zech_mpoly_t A, slong new_length,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_get_term_coeff_fq_zech(fq_zech_t c,
+void fq_zech_mpoly_get_term_coeff_fq_zech(fq_zech_t c,
               const fq_zech_mpoly_t A, slong i, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_set_term_coeff_fq_zech(fq_zech_mpoly_t A, 
+void fq_zech_mpoly_set_term_coeff_fq_zech(fq_zech_mpoly_t A, 
                     slong i, const fq_zech_t c, const fq_zech_mpoly_ctx_t ctx);
 
 FQ_ZECH_MPOLY_INLINE
@@ -453,174 +453,174 @@ int fq_zech_mpoly_term_exp_fits_si(const fq_zech_mpoly_t A, slong i,
                      : mpoly_term_exp_fits_si(A->exps, A->bits, i, ctx->minfo);
 }
 
-FLINT_DLL void fq_zech_mpoly_get_term_exp_fmpz(fmpz ** exp,
+void fq_zech_mpoly_get_term_exp_fmpz(fmpz ** exp,
               const fq_zech_mpoly_t A, slong i, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_get_term_exp_ui(ulong * exp,
+void fq_zech_mpoly_get_term_exp_ui(ulong * exp,
               const fq_zech_mpoly_t A, slong i, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_get_term_exp_si(slong * exp,
+void fq_zech_mpoly_get_term_exp_si(slong * exp,
               const fq_zech_mpoly_t A, slong i, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL ulong fq_zech_mpoly_get_term_var_exp_ui(const fq_zech_mpoly_t A,
+ulong fq_zech_mpoly_get_term_var_exp_ui(const fq_zech_mpoly_t A,
                             slong i, slong var, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL slong fq_zech_mpoly_get_term_var_exp_si(const fq_zech_mpoly_t A,
+slong fq_zech_mpoly_get_term_var_exp_si(const fq_zech_mpoly_t A,
                             slong i, slong var, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_set_term_exp_fmpz(fq_zech_mpoly_t A,
+void fq_zech_mpoly_set_term_exp_fmpz(fq_zech_mpoly_t A,
                    slong i, fmpz * const * exp, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_set_term_exp_ui(fq_zech_mpoly_t A,
+void fq_zech_mpoly_set_term_exp_ui(fq_zech_mpoly_t A,
                     slong i, const ulong * exp, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_get_term(fq_zech_mpoly_t M, const fq_zech_mpoly_t A,
+void fq_zech_mpoly_get_term(fq_zech_mpoly_t M, const fq_zech_mpoly_t A,
                                        slong i, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_get_term_monomial(fq_zech_mpoly_t M,
+void fq_zech_mpoly_get_term_monomial(fq_zech_mpoly_t M,
               const fq_zech_mpoly_t A, slong i, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_push_term_fq_zech_fmpz(fq_zech_mpoly_t A,
+void fq_zech_mpoly_push_term_fq_zech_fmpz(fq_zech_mpoly_t A,
          const fq_zech_t c, fmpz * const * exp, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_push_term_fq_zech_ui(fq_zech_mpoly_t A,
+void fq_zech_mpoly_push_term_fq_zech_ui(fq_zech_mpoly_t A,
           const fq_zech_t c, const ulong * exp, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_sort_terms(fq_zech_mpoly_t A,
+void fq_zech_mpoly_sort_terms(fq_zech_mpoly_t A,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_combine_like_terms(fq_zech_mpoly_t A,
+void fq_zech_mpoly_combine_like_terms(fq_zech_mpoly_t A,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_reverse(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
+void fq_zech_mpoly_reverse(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_assert_canonical(const fq_zech_mpoly_t A,
+void fq_zech_mpoly_assert_canonical(const fq_zech_mpoly_t A,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void _fq_zech_mpoly_radix_sort1(fq_zech_mpoly_t A, slong left,
+void _fq_zech_mpoly_radix_sort1(fq_zech_mpoly_t A, slong left,
                  slong right, flint_bitcnt_t pos, ulong cmpmask, ulong totalmask);
 
-FLINT_DLL void _fq_zech_mpoly_radix_sort(fq_zech_mpoly_t A, slong left,
+void _fq_zech_mpoly_radix_sort(fq_zech_mpoly_t A, slong left,
                        slong right, flint_bitcnt_t pos, slong N, ulong * cmpmask);
 
-FLINT_DLL void _fq_zech_mpoly_push_exp_ffmpz(fq_zech_mpoly_t A,
+void _fq_zech_mpoly_push_exp_ffmpz(fq_zech_mpoly_t A,
                               const fmpz * exp, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void _fq_zech_mpoly_push_exp_pfmpz(fq_zech_mpoly_t A,
+void _fq_zech_mpoly_push_exp_pfmpz(fq_zech_mpoly_t A,
                             fmpz * const * exp, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void _fq_zech_mpoly_push_exp_ui(fq_zech_mpoly_t A,
+void _fq_zech_mpoly_push_exp_ui(fq_zech_mpoly_t A,
                              const ulong * exp, const fq_zech_mpoly_ctx_t ctx);
 
 
 /* Random generation *********************************************************/
 
-FLINT_DLL void fq_zech_mpoly_randtest_bound(fq_zech_mpoly_t A, flint_rand_t state,
+void fq_zech_mpoly_randtest_bound(fq_zech_mpoly_t A, flint_rand_t state,
                  slong length, ulong exp_bound, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_randtest_bounds(fq_zech_mpoly_t A, flint_rand_t state,
+void fq_zech_mpoly_randtest_bounds(fq_zech_mpoly_t A, flint_rand_t state,
               slong length, ulong * exp_bounds, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_randtest_bits(fq_zech_mpoly_t A, flint_rand_t state,
+void fq_zech_mpoly_randtest_bits(fq_zech_mpoly_t A, flint_rand_t state,
             slong length, flint_bitcnt_t exp_bits, const fq_zech_mpoly_ctx_t ctx);
 
 
 /* Addition/Subtraction ******************************************************/
 
-FLINT_DLL slong _fq_zech_mpoly_add(
+slong _fq_zech_mpoly_add(
                          fq_zech_struct * coeff1,       ulong * exp1,
                          fq_zech_struct * coeff2, const ulong * exp2, slong len2,
                          fq_zech_struct * coeff3, const ulong * exp3, slong len3,
                    slong N, const ulong * cmpmask, const fq_zech_ctx_t fqctx);
 
-FLINT_DLL void fq_zech_mpoly_add_fq_zech(fq_zech_mpoly_t A,
+void fq_zech_mpoly_add_fq_zech(fq_zech_mpoly_t A,
                             const fq_zech_mpoly_t B, const fq_zech_t C,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_sub_fq_zech(fq_zech_mpoly_t A,
+void fq_zech_mpoly_sub_fq_zech(fq_zech_mpoly_t A,
                             const fq_zech_mpoly_t B, const fq_zech_t C,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_add(fq_zech_mpoly_t A,
+void fq_zech_mpoly_add(fq_zech_mpoly_t A,
                             const fq_zech_mpoly_t B, const fq_zech_mpoly_t C,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_sub(fq_zech_mpoly_t A,
+void fq_zech_mpoly_sub(fq_zech_mpoly_t A,
                             const fq_zech_mpoly_t B, const fq_zech_mpoly_t C,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
 
 /* Scalar operations *********************************************************/
 
-FLINT_DLL void fq_zech_mpoly_neg(fq_zech_mpoly_t A,
+void fq_zech_mpoly_neg(fq_zech_mpoly_t A,
                        const fq_zech_mpoly_t B, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_scalar_mul_fq_zech(fq_zech_mpoly_t A,
+void fq_zech_mpoly_scalar_mul_fq_zech(fq_zech_mpoly_t A,
     const fq_zech_mpoly_t B, const fq_zech_t c, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_make_monic(fq_zech_mpoly_t A,
+void fq_zech_mpoly_make_monic(fq_zech_mpoly_t A,
                        const fq_zech_mpoly_t B, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_scalar_addmul_fq_zech(fq_zech_mpoly_t A,
+void fq_zech_mpoly_scalar_addmul_fq_zech(fq_zech_mpoly_t A,
          const fq_zech_mpoly_t B, const fq_zech_mpoly_t C, const fq_zech_t d,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
 /* Differentiation **********************************************************/
 
-FLINT_DLL void fq_zech_mpoly_derivative(fq_zech_mpoly_t A,
+void fq_zech_mpoly_derivative(fq_zech_mpoly_t A,
             const fq_zech_mpoly_t B, slong var, const fq_zech_mpoly_ctx_t ctx);
 
 
 /* Evaluation ****************************************************************/
 
-FLINT_DLL void fq_zech_mpoly_evaluate_one_fq_zech(fq_zech_mpoly_t A,
+void fq_zech_mpoly_evaluate_one_fq_zech(fq_zech_mpoly_t A,
                     const fq_zech_mpoly_t B, slong var, const fq_zech_t val,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void _fq_zech_mpoly_eval_all_fq_zech(fq_zech_t eval,
+void _fq_zech_mpoly_eval_all_fq_zech(fq_zech_t eval,
                const fq_zech_struct * Acoeffs, const ulong * Aexps, slong Alen,
                     flint_bitcnt_t Abits, fq_zech_struct * const * alphas,
                             const mpoly_ctx_t mctx, const fq_zech_ctx_t fqctx);
 
-FLINT_DLL void fq_zech_mpoly_evaluate_all_fq_zech(fq_zech_t ev, const fq_zech_mpoly_t A,
+void fq_zech_mpoly_evaluate_all_fq_zech(fq_zech_t ev, const fq_zech_mpoly_t A,
                  fq_zech_struct * const * vals, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL int fq_zech_mpoly_compose_fq_zech_poly(fq_zech_poly_t A,
+int fq_zech_mpoly_compose_fq_zech_poly(fq_zech_poly_t A,
                      const fq_zech_mpoly_t B, fq_zech_poly_struct * const * C,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void _fq_zech_mpoly_compose_mat(fq_zech_mpoly_t A,
+void _fq_zech_mpoly_compose_mat(fq_zech_mpoly_t A,
                             const fq_zech_mpoly_t B, const fmpz_mat_t M,
               const fq_zech_mpoly_ctx_t ctxB, const fq_zech_mpoly_ctx_t ctxAC);
 
-FLINT_DLL int fq_zech_mpoly_compose_fq_zech_mpoly_geobucket(fq_zech_mpoly_t A,
+int fq_zech_mpoly_compose_fq_zech_mpoly_geobucket(fq_zech_mpoly_t A,
               const fq_zech_mpoly_t B, fq_zech_mpoly_struct * const * C,
               const fq_zech_mpoly_ctx_t ctxB, const fq_zech_mpoly_ctx_t ctxAC);
 
-FLINT_DLL int fq_zech_mpoly_compose_fq_zech_mpoly_horner(fq_zech_mpoly_t A,
+int fq_zech_mpoly_compose_fq_zech_mpoly_horner(fq_zech_mpoly_t A,
               const fq_zech_mpoly_t B, fq_zech_mpoly_struct * const * C,
               const fq_zech_mpoly_ctx_t ctxB, const fq_zech_mpoly_ctx_t ctxAC);
 
-FLINT_DLL int fq_zech_mpoly_compose_fq_zech_mpoly(fq_zech_mpoly_t A,
+int fq_zech_mpoly_compose_fq_zech_mpoly(fq_zech_mpoly_t A,
               const fq_zech_mpoly_t B, fq_zech_mpoly_struct * const * C,
               const fq_zech_mpoly_ctx_t ctxB, const fq_zech_mpoly_ctx_t ctxAC);
 
-FLINT_DLL void fq_zech_mpoly_compose_fq_zech_mpoly_gen(fq_zech_mpoly_t A,
+void fq_zech_mpoly_compose_fq_zech_mpoly_gen(fq_zech_mpoly_t A,
                              const fq_zech_mpoly_t B, const slong * c,
               const fq_zech_mpoly_ctx_t ctxB, const fq_zech_mpoly_ctx_t ctxAC);
 
 
 /* Multiplication ************************************************************/
 
-FLINT_DLL void fq_zech_mpoly_mul(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
+void fq_zech_mpoly_mul(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
                        const fq_zech_mpoly_t C, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_mul_johnson(fq_zech_mpoly_t poly1,
+void fq_zech_mpoly_mul_johnson(fq_zech_mpoly_t poly1,
                     const fq_zech_mpoly_t poly2, const fq_zech_mpoly_t poly3,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL slong _fq_zech_mpoly_mul_johnson(
+slong _fq_zech_mpoly_mul_johnson(
                     fq_zech_struct ** coeff1, ulong ** exp1, slong * alloc,
              const fq_zech_struct * coeff2, const ulong * exp2, slong len2,
              const fq_zech_struct * coeff3, const ulong * exp3, slong len3,
@@ -629,110 +629,110 @@ FLINT_DLL slong _fq_zech_mpoly_mul_johnson(
 
 /* Powering ******************************************************************/
 
-FLINT_DLL int fq_zech_mpoly_pow_fmpz(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
+int fq_zech_mpoly_pow_fmpz(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
                                 const fmpz_t k, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL int fq_zech_mpoly_pow_ui(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
+int fq_zech_mpoly_pow_ui(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
                                        ulong k, const fq_zech_mpoly_ctx_t ctx);
 
 
 /* Division ******************************************************************/
 
-FLINT_DLL int fq_zech_mpoly_divides(fq_zech_mpoly_t Q,
+int fq_zech_mpoly_divides(fq_zech_mpoly_t Q,
                          const fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_div(fq_zech_mpoly_t Q,
+void fq_zech_mpoly_div(fq_zech_mpoly_t Q,
                             const fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_divrem(fq_zech_mpoly_t Q, fq_zech_mpoly_t R,
+void fq_zech_mpoly_divrem(fq_zech_mpoly_t Q, fq_zech_mpoly_t R,
                             const fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_divrem_ideal(fq_zech_mpoly_struct ** Q,
+void fq_zech_mpoly_divrem_ideal(fq_zech_mpoly_struct ** Q,
                                   fq_zech_mpoly_t R, const fq_zech_mpoly_t A,
                                   fq_zech_mpoly_struct * const * B, slong len,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL int fq_zech_mpoly_divides_monagan_pearce(fq_zech_mpoly_t poly1,
+int fq_zech_mpoly_divides_monagan_pearce(fq_zech_mpoly_t poly1,
                   const fq_zech_mpoly_t poly2, const fq_zech_mpoly_t poly3,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_div_monagan_pearce(fq_zech_mpoly_t q,
+void fq_zech_mpoly_div_monagan_pearce(fq_zech_mpoly_t q,
                       const fq_zech_mpoly_t poly2, const fq_zech_mpoly_t poly3,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_divrem_monagan_pearce(fq_zech_mpoly_t q, fq_zech_mpoly_t r,
+void fq_zech_mpoly_divrem_monagan_pearce(fq_zech_mpoly_t q, fq_zech_mpoly_t r,
                       const fq_zech_mpoly_t poly2, const fq_zech_mpoly_t poly3,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_divrem_ideal_monagan_pearce(
+void fq_zech_mpoly_divrem_ideal_monagan_pearce(
                         fq_zech_mpoly_struct ** q, fq_zech_mpoly_t r,
             const fq_zech_mpoly_t poly2, fq_zech_mpoly_struct * const * poly3,
                                       slong len, const fq_zech_mpoly_ctx_t ctx);
 
 /* GCD ***********************************************************************/
 
-FLINT_DLL int fq_zech_mpoly_gcd(fq_zech_mpoly_t G, const fq_zech_mpoly_t A,
+int fq_zech_mpoly_gcd(fq_zech_mpoly_t G, const fq_zech_mpoly_t A,
                        const fq_zech_mpoly_t B, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL int _fq_zech_mpoly_gcd(fq_zech_mpoly_t G, flint_bitcnt_t Gbits,
+int _fq_zech_mpoly_gcd(fq_zech_mpoly_t G, flint_bitcnt_t Gbits,
                             const fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL int fq_zech_mpoly_gcd_cofactors(fq_zech_mpoly_t G,
+int fq_zech_mpoly_gcd_cofactors(fq_zech_mpoly_t G,
           fq_zech_mpoly_t Abar, fq_zech_mpoly_t Bbar, const fq_zech_mpoly_t A,
                        const fq_zech_mpoly_t B, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL int _fq_zech_mpoly_gcd_cofactors(
+int _fq_zech_mpoly_gcd_cofactors(
                                 fq_zech_mpoly_t G, flint_bitcnt_t Gbits,
                                 fq_zech_mpoly_t Abar, flint_bitcnt_t Abarbits,
                                 fq_zech_mpoly_t Bbar, flint_bitcnt_t Bbarbits,
                              const fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL int fq_zech_mpoly_gcd_brown(fq_zech_mpoly_t G,
+int fq_zech_mpoly_gcd_brown(fq_zech_mpoly_t G,
                             const fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL int fq_zech_mpoly_gcd_zippel(fq_zech_mpoly_t G, const fq_zech_mpoly_t A,
+int fq_zech_mpoly_gcd_zippel(fq_zech_mpoly_t G, const fq_zech_mpoly_t A,
                        const fq_zech_mpoly_t B, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_deflation(fmpz * shift, fmpz * stride,
+void fq_zech_mpoly_deflation(fmpz * shift, fmpz * stride,
                        const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_deflate(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
+void fq_zech_mpoly_deflate(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
           const fmpz * shift, const fmpz * stride, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_inflate(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
+void fq_zech_mpoly_inflate(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
        const fmpz * shift, const fmpz * stride, const fq_zech_mpoly_ctx_t ctx);
 
 
 /* Univariates ***************************************************************/
 
-FLINT_DLL void fq_zech_mpoly_univar_init(fq_zech_mpoly_univar_t A,
+void fq_zech_mpoly_univar_init(fq_zech_mpoly_univar_t A,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_univar_clear(fq_zech_mpoly_univar_t A,
+void fq_zech_mpoly_univar_clear(fq_zech_mpoly_univar_t A,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_univar_fit_length(fq_zech_mpoly_univar_t A,
+void fq_zech_mpoly_univar_fit_length(fq_zech_mpoly_univar_t A,
                                   slong length, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_univar_print_pretty(const fq_zech_mpoly_univar_t A,
+void fq_zech_mpoly_univar_print_pretty(const fq_zech_mpoly_univar_t A,
                                const char ** x, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_univar_assert_canonical(fq_zech_mpoly_univar_t A,
+void fq_zech_mpoly_univar_assert_canonical(fq_zech_mpoly_univar_t A,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_to_univar(fq_zech_mpoly_univar_t A,
+void fq_zech_mpoly_to_univar(fq_zech_mpoly_univar_t A,
             const fq_zech_mpoly_t B, slong var, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_from_univar_bits(fq_zech_mpoly_t A, flint_bitcnt_t Abits,
+void fq_zech_mpoly_from_univar_bits(fq_zech_mpoly_t A, flint_bitcnt_t Abits,
      const fq_zech_mpoly_univar_t B, slong var, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_from_univar(fq_zech_mpoly_t A,
+void fq_zech_mpoly_from_univar(fq_zech_mpoly_t A,
      const fq_zech_mpoly_univar_t B, slong var, const fq_zech_mpoly_ctx_t ctx);
 
 FQ_ZECH_MPOLY_INLINE
@@ -790,41 +790,41 @@ void fq_zech_mpoly_univar_swap_term_coeff(fq_zech_mpoly_t c,
 ******************************************************************************/
 
 
-FLINT_DLL int _fq_zech_mpoly_get_nmod_mpoly(
+int _fq_zech_mpoly_get_nmod_mpoly(
     nmod_mpoly_t s,
     const nmod_mpoly_ctx_t sctx,
     const fq_zech_mpoly_t t,
     const fq_zech_mpoly_ctx_t tctx);
 
-FLINT_DLL void _fq_zech_mpoly_set_nmod_mpoly(
+void _fq_zech_mpoly_set_nmod_mpoly(
     fq_zech_mpoly_t A,
     const fq_zech_mpoly_ctx_t Actx,
     const nmod_mpoly_t B,
     const nmod_mpoly_ctx_t Bctx);
 
-FLINT_DLL void fq_zech_mpolyl_lead_coeff(
+void fq_zech_mpolyl_lead_coeff(
     fq_zech_mpoly_t c,
     const fq_zech_mpoly_t A,
     slong num_vars,
     const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpoly_pow_rmul(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
+void fq_zech_mpoly_pow_rmul(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
                                        ulong k, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL int fq_zech_mpoly_repack_bits_inplace(fq_zech_mpoly_t A,
+int fq_zech_mpoly_repack_bits_inplace(fq_zech_mpoly_t A,
                          flint_bitcnt_t Abits, const fq_zech_mpoly_ctx_t ctx);
 
 
-FLINT_DLL void fq_zech_mpoly_ctx_change_modulus(fq_zech_mpoly_ctx_t ctx,
+void fq_zech_mpoly_ctx_change_modulus(fq_zech_mpoly_ctx_t ctx,
                                                                     slong deg);
 
-FLINT_DLL void _fq_zech_mpoly_get_fq_nmod_mpoly(
+void _fq_zech_mpoly_get_fq_nmod_mpoly(
     fq_nmod_mpoly_t A,
     const fq_nmod_mpoly_ctx_t ctxA,
     const fq_zech_mpoly_t B,
     const fq_zech_mpoly_ctx_t ctxB);
 
-FLINT_DLL void _fq_zech_mpoly_set_fq_nmod_mpoly(
+void _fq_zech_mpoly_set_fq_nmod_mpoly(
     fq_zech_mpoly_t A,
     const fq_zech_mpoly_ctx_t ctxA,
     const fq_nmod_mpoly_t B,
@@ -833,30 +833,30 @@ FLINT_DLL void _fq_zech_mpoly_set_fq_nmod_mpoly(
 
 /* mpolyu ********************************************************************/
 
-FLINT_DLL int fq_zech_mpolyu_is_canonical(const fq_zech_mpolyu_t poly,
+int fq_zech_mpolyu_is_canonical(const fq_zech_mpolyu_t poly,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpolyu_init(fq_zech_mpolyu_t A, flint_bitcnt_t bits,
+void fq_zech_mpolyu_init(fq_zech_mpolyu_t A, flint_bitcnt_t bits,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpolyu_clear(fq_zech_mpolyu_t A,
+void fq_zech_mpolyu_clear(fq_zech_mpolyu_t A,
                                                const fq_zech_mpoly_ctx_t uctx);
 
-FLINT_DLL void fq_zech_mpolyu_swap(fq_zech_mpolyu_t A, fq_zech_mpolyu_t B);
+void fq_zech_mpolyu_swap(fq_zech_mpolyu_t A, fq_zech_mpolyu_t B);
 
-FLINT_DLL void fq_zech_mpolyu_zero(fq_zech_mpolyu_t A,
+void fq_zech_mpolyu_zero(fq_zech_mpolyu_t A,
                                                const fq_zech_mpoly_ctx_t uctx);
 
-FLINT_DLL int fq_zech_mpolyu_is_one(fq_zech_mpolyu_t A,
+int fq_zech_mpolyu_is_one(fq_zech_mpolyu_t A,
                                                const fq_zech_mpoly_ctx_t uctx);
 
-FLINT_DLL void fq_zech_mpolyu_print_pretty(const fq_zech_mpolyu_t poly,
+void fq_zech_mpolyu_print_pretty(const fq_zech_mpolyu_t poly,
                                const char ** x, const fq_zech_mpoly_ctx_t ctx);
 
-FLINT_DLL void fq_zech_mpolyu_fit_length(fq_zech_mpolyu_t A, slong length,
+void fq_zech_mpolyu_fit_length(fq_zech_mpolyu_t A, slong length,
                                                const fq_zech_mpoly_ctx_t uctx);
 
-FLINT_DLL void fq_zech_mpolyu_one(fq_zech_mpolyu_t A,
+void fq_zech_mpolyu_one(fq_zech_mpolyu_t A,
                                                const fq_zech_mpoly_ctx_t uctx);
 
 #ifdef __cplusplus

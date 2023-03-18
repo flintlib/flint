@@ -32,7 +32,7 @@ int arb_mat_is_lagom(const arb_mat_t A)
 }
 
 /* allow changing this from the test code */
-ARB_DLL slong arb_mat_mul_block_min_block_size = 0;
+slong arb_mat_mul_block_min_block_size = 0;
 
 void
 arb_mat_mid_addmul_block_fallback(arb_mat_t C,

@@ -11,6 +11,10 @@
 
 #include "fmpz_mpoly.h"
 
+#if FLINT_WANT_ASSERT
+# include "fmpz_mat.h"
+#endif
+
 /* essentially exps(A) = M*exps(B) */
 void _fmpz_mpoly_compose_mat(fmpz_mpoly_t A,
                             const fmpz_mpoly_t B, const fmpz_mat_t M,

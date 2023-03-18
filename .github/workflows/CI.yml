@@ -15,8 +15,6 @@ jobs:
 
     env:
       MAKE: "make -j --output-sync=target"
-      LOCAL: ${{ github.workspace }}/local
-      LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CC: "gcc"
       CFLAGS: "-Wall"
 
@@ -25,14 +23,19 @@ jobs:
 
       - name: "Setup"
         run: |
-          sudo apt install libgmp-dev
-          sudo apt install libmpfr-dev
+          sudo apt install -y libgmp-dev
+          sudo apt install -y libmpfr-dev
+          sudo apt install -y autoconf
+          sudo apt install -y libtool-bin
           gcc --version
           make --version
+          autoconf --version
+          libtool --version
 
       - name: "Configure"
         run: |
-          ./configure CC=${CC} CFLAGS="${CFLAGS}" --with-gmp=/usr --with-mpfr=/usr
+          ./bootstrap.sh
+          ./configure CC=${CC} CFLAGS="${CFLAGS}"
 
       - name: "Compile"
         run: |
@@ -68,13 +71,18 @@ jobs:
 
       - name: "Setup"
         run: |
-          sudo apt install libgmp-dev
-          sudo apt install libmpfr-dev
+          sudo apt install -y libgmp-dev
+          sudo apt install -y libmpfr-dev
+          sudo apt install -y autoconf
+          sudo apt install -y libtool-bin
           gcc --version
           make --version
+          autoconf --version
+          libtool --version
 
       - name: "Configure"
         run: |
+          ./bootstrap.sh
           ./configure CC=${CC} CFLAGS="${CFLAGS}" --with-gmp=/usr --with-mpfr=/usr --enable-assert --disable-static
 
       - name: "Compile"
@@ -104,8 +112,6 @@ jobs:
 
     env:
       MAKE: "gmake -j --output-sync=target"
-      LOCAL: ${{ github.workspace }}/local
-      LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: "-Wall"
       EXTRA_OPTIONS: "--disable-static --enable-shared"
       CC: "gcc"
@@ -119,11 +125,16 @@ jobs:
           brew install make
           brew install gmp
           brew install mpfr
+          brew install autoconf
+          brew install libtool
+          brew install automake
           gcc --version
           gmake --version
+          autoconf --version
 
       - name: "Configure"
         run: |
+          ./bootstrap.sh
           ./configure CC=${CC} CFLAGS="${CFLAGS}" --with-gmp=$(brew --prefix) \
               --with-mpfr=$(brew --prefix) ${EXTRA_OPTIONS}
 
@@ -163,9 +174,15 @@ jobs:
             yes | sudo pkg install gmake
             yes | sudo pkg install gmp
             yes | sudo pkg install mpfr
+            yes | sudo pkg install autoconf
+            yes | sudo pkg install libtool
+            yes | sudo pkg install automake
             gmake --version
             clang --version
+            autoconf --version
+            libtool --version
             export FLINT_TEST_MULTIPLIER=0.5
+            ./bootstrap.sh
             ./configure CC=clang CFLAGS="-Wall" --disable-static --enable-shared
             gmake -j
             gmake -j check
@@ -191,7 +208,7 @@ jobs:
     env:
       MAKE: "make -j --output-sync=target"
       REPO: /cygdrive/d/a/flint2/flint2 # FIXME: De-hardcode this
-      CFLAGS: "-Wall -D _WIN64"
+      CFLAGS: "-Wall"
       EXTRA_OPTIONS: "--enable-shared --disable-static"
       CC: "gcc"
 
@@ -201,17 +218,21 @@ jobs:
       - name: "Set up Cygwin"
         uses: gap-actions/setup-cygwin@v1
         with:
-          PKGS_TO_INSTALL: "dos2unix,gcc-core,make,libgmp-devel,libmpfr-devel"
+          PKGS_TO_INSTALL: "dos2unix,gcc-core,make,libgmp-devel,libmpfr-devel,libtool,autoconf,automake"
 
       - name: "Setup"
         run: |
           gcc --version
           make --version
+          autoconf --version
+          libtool --version
 
       - name: "Configure"
         run: |
           cd ${REPO}
           dos2unix configure
+          dos2unix bootstrap.sh
+          ./bootstrap.sh
           ./configure CC=${CC} CFLAGS="${CFLAGS}" ${EXTRA_OPTIONS}
 
       - name: "Compile"
@@ -245,20 +266,25 @@ jobs:
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: "-Wall"
       CC: "clang"
-      EXTRA_OPTIONS: "--disable-static --enable-shared --with-pkg-config"
+      EXTRA_OPTIONS: "--disable-static --enable-shared"
 
     steps:
       - uses: actions/checkout@v3
 
       - name: "Setup"
         run: |
-          sudo apt install libgmp-dev
-          sudo apt install libmpfr-dev
+          sudo apt install -y libgmp-dev
+          sudo apt install -y libmpfr-dev
+          sudo apt install -y autoconf
+          sudo apt install -y libtool-bin
           clang --version
           make --version
+          autoconf --version
+          libtool --version
 
       - name: "Configure"
         run: |
+          ./bootstrap.sh
           ./configure CC=${CC} CFLAGS="${CFLAGS}" ${EXTRA_OPTIONS}
 
       - name: "Compile"
@@ -296,9 +322,9 @@ jobs:
 
       - name: "Setup"
         run: |
-          sudo apt install cmake
-          sudo apt install libgmp-dev
-          sudo apt install libmpfr-dev
+          sudo apt install -y cmake
+          sudo apt install -y libgmp-dev
+          sudo apt install -y libmpfr-dev
           gcc --version
           make --version
           cmake --version
@@ -328,42 +354,52 @@ jobs:
   mingw64-gcc:
     name: MinGW GCC (x0.5)
 
-    runs-on: windows-2019
+    runs-on: windows-latest
 
     defaults:
       run:
-        shell: bash
+        shell: msys2 {0}
+
+    env:
+      MAKE: "make -j --output-sync=target"
+      CFLAGS: "-Wall"
+      EXTRA_OPTIONS: "--enable-shared --disable-static"
+      CC: "gcc"
 
     steps:
       - uses: actions/checkout@v3
 
+      - name: "Setup MinGW"
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: mingw64
+          update: true
+          install: mingw-w64-x86_64-gcc mingw-w64-x86_64-autotools
+
       - name: "Setup"
         run: |
           gcc --version
-          cmake --version
+          make --version
+          autoconf --version
+          libtool --version
 
       - name: "Configure"
         run: |
-          mkdir -p build
-          cd build
-          cmake -G "MinGW Makefiles" -DBUILD_TESTING=ON \
-                                    -DCMAKE_BUILD_TYPE=Release ..
+          ./bootstrap.sh
+          ./configure CC=${CC} CFLAGS="${CFLAGS}" ${EXTRA_OPTIONS}
 
       - name: "Compile"
         run: |
-          cd build
-          cmake --build . -- -j8
+          ${MAKE}
 
       - name: "Check"
         run: |
-          cd build
           export FLINT_TEST_MULTIPLIER=0.5
-          ctest -j8 --output-on-failure --timeout 300
+          ${MAKE} check
 
-      # FIXME: Fix Cygwin so this can be enabled.
-      # - if: failure()
-      #   name: "If failure, stop all other jobs"
-      #   uses: andymckay/cancel-action@0.2
+      - if: failure()
+        name: "If failure, stop all other jobs"
+        uses: andymckay/cancel-action@0.2
 
 
 
@@ -378,9 +414,8 @@ jobs:
     env:
       MAKE: "make -j --output-sync=target"
       LOCAL: ${{ github.workspace }}/local
-      LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: ""
-      EXTRA_OPTIONS: "--disable-static --enable-shared --with-pkg-config"
+      EXTRA_OPTIONS: "--disable-static --enable-shared"
       CC: "gcc"
 
     steps:
@@ -388,11 +423,15 @@ jobs:
 
       - name: "Setup"
         run: |
-          sudo apt install sed
-          sudo apt install libgmp-dev
-          sudo apt install libmpfr-dev
+          sudo apt install -y sed
+          sudo apt install -y libgmp-dev
+          sudo apt install -y libmpfr-dev
+          sudo apt install -y autoconf
+          sudo apt install -y libtool-bin
           gcc --version
           make --version
+          autoconf --version
+          libtool --version
           julia --version
 
       - name: "Configure"
@@ -401,15 +440,16 @@ jobs:
           # soname
           wget https://raw.githubusercontent.com/JuliaPackaging/Yggdrasil/master/F/FLINT/build_tarballs.jl
           FLINT_JLL_VERSION=$(grep "upstream_version =" build_tarballs.jl | sed "s/upstream_version = v\"\([0-9\.]*\)\"/\1/")
-          FLINT_JLL_SONAME=$(grep "$FLINT_JLL_VERSION => " configure | sed "s/# $FLINT_JLL_VERSION => \([0-9\.]\+\)/\1/")
+          FLINT_JLL_SONAME=$(grep "$FLINT_JLL_VERSION => " configure.ac | sed "s/# $FLINT_JLL_VERSION => \([0-9\.]\+\)/\1/")
           FLINT_JLL_MAJOR=$(echo $FLINT_JLL_SONAME | sed "s/\([0-9]\+\)\.[0-9]\+\.[0-9]\+/\1/")
           FLINT_JLL_MINOR=$(echo $FLINT_JLL_SONAME | sed "s/[0-9]\+\.\([0-9]\+\)\.[0-9]\+/\1/")
           FLINT_JLL_PATCH=$(echo $FLINT_JLL_SONAME | sed "s/[0-9]\+\.[0-9]\+\.\([0-9]\+\)/\1/")
-          sed -i "s/^\(FLINT_MAJOR=\)[0-9]\+/\1$FLINT_JLL_MAJOR/" configure
-          sed -i "s/^\(FLINT_MINOR=\)[0-9]\+/\1$FLINT_JLL_MINOR/" configure
-          sed -i "s/^\(FLINT_PATCH=\)[0-9]\+/\1$FLINT_JLL_PATCH/" configure
+          sed -i "s/^\(FLINT_MAJOR_SO=\)[0-9]\+/\1$FLINT_JLL_MAJOR/" configure.ac
+          sed -i "s/^\(FLINT_MINOR_SO=\)[0-9]\+/\1$FLINT_JLL_MINOR/" configure.ac
+          sed -i "s/^\(FLINT_PATCH_SO=\)[0-9]\+/\1$FLINT_JLL_PATCH/" configure.ac
 
           # Now we can create the makefile
+          ./bootstrap.sh
           ./configure CC=${CC} CFLAGS="${CFLAGS}" --prefix=${LOCAL} ${EXTRA_OPTIONS}
 
       - name: "Compile and install"
@@ -420,9 +460,10 @@ jobs:
       - name: "Set up Nemo.jl"
         run: |
           # Override FLINT_jll's libflint with ours
-          julia -e "import Pkg; Pkg.add(\"Nemo\");"
+          git clone https://github.com/Nemocas/Nemo.jl.git
+          julia -e "import Pkg; Pkg.develop(path=\"./Nemo.jl\");"
           echo -e "[e134572f-a0d5-539d-bddf-3cad8db41a82]\nFLINT = \"${LOCAL}\"" > ~/.julia/artifacts/Overrides.toml
-          touch ~/.julia/packages/Nemo/*/src/Nemo.jl
+          touch Nemo.jl/src/Nemo.jl
           julia -e "using Nemo; println(\"Path to Nemo's libflint:\", Nemo.libflint)"
 
       - name: "Check Nemo.jl"

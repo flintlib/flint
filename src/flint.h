@@ -36,7 +36,7 @@
 #endif
 
 #ifdef FLINT_INLINES_C
-#define FLINT_INLINE FLINT_DLL
+#define FLINT_INLINE 
 #else
 #define FLINT_INLINE static __inline__
 #endif
@@ -81,21 +81,21 @@ extern char flint_version[];
 #define ulong mp_limb_t
 #define slong mp_limb_signed_t
 
-FLINT_DLL void * flint_malloc(size_t size);
-FLINT_DLL void * flint_realloc(void * ptr, size_t size);
-FLINT_DLL void * flint_calloc(size_t num, size_t size);
-FLINT_DLL void flint_free(void * ptr);
+void * flint_malloc(size_t size);
+void * flint_realloc(void * ptr, size_t size);
+void * flint_calloc(size_t num, size_t size);
+void flint_free(void * ptr);
 
 typedef void (*flint_cleanup_function_t)(void);
-FLINT_DLL void flint_register_cleanup_function(flint_cleanup_function_t cleanup_function);
-FLINT_DLL void flint_cleanup(void);
-FLINT_DLL void flint_cleanup_master(void);
+void flint_register_cleanup_function(flint_cleanup_function_t cleanup_function);
+void flint_cleanup(void);
+void flint_cleanup_master(void);
 
-FLINT_DLL void __flint_set_memory_functions(void *(*alloc_func) (size_t),
+void __flint_set_memory_functions(void *(*alloc_func) (size_t),
      void *(*calloc_func) (size_t, size_t), void *(*realloc_func) (void *, size_t),
                                                               void (*free_func) (void *));
 
-FLINT_DLL void __flint_get_memory_functions(void *(**alloc_func) (size_t),
+void __flint_get_memory_functions(void *(**alloc_func) (size_t),
      void *(**calloc_func) (size_t, size_t), void *(**realloc_func) (void *, size_t),
                                                               void (**free_func) (void *));
 
@@ -107,8 +107,8 @@ FLINT_DLL void __flint_get_memory_functions(void *(**alloc_func) (size_t),
 #define FLINT_CONST
 #endif
 
-FLINT_DLL FLINT_NORETURN void flint_abort(void);
-FLINT_DLL void flint_set_abort(FLINT_NORETURN void (*func)(void));
+FLINT_NORETURN void flint_abort(void);
+void flint_set_abort(FLINT_NORETURN void (*func)(void));
   /* flint_abort is calling abort by default
    * if flint_set_abort is used, then instead of abort this function
    * is called. EXPERIMENTALLY use at your own risk!
@@ -116,42 +116,37 @@ FLINT_DLL void flint_set_abort(FLINT_NORETURN void (*func)(void));
    */
 
 
-#if defined(_WIN64) || defined(__mips64)
-#if defined(__MINGW64__)
-#define WORD_FMT "%I64"
-#define WORD_WIDTH_FMT "%*I64"
+#if defined(_LONG_LONG_LIMB)
+# define WORD_FMT "%ll"
+# define WORD_WIDTH_FMT "%*ll"
+# define WORD(xx) (xx##LL)
+# define UWORD(xx) (xx##ULL)
+# ifndef FLINT_NO_WORDMAC
+#  define UWORD_MAX ULLONG_MAX
+#  define UWORD_MIN ULLONG_MIN
+#  define WORD_MAX LLONG_MAX
+#  define WORD_MIN LLONG_MIN
+# endif
 #else
-#define WORD_FMT "%ll"
-#define WORD_WIDTH_FMT "%*ll"
-#endif
-#define WORD(xx) (xx##LL)
-#define UWORD(xx) (xx##ULL)
-#ifndef FLINT_NO_WORDMAC
-#define UWORD_MAX ULLONG_MAX
-#define UWORD_MIN ULLONG_MIN
-#define WORD_MAX LLONG_MAX
-#define WORD_MIN LLONG_MIN
-#endif
-#else
-#define WORD_FMT "%l"
-#define WORD_WIDTH_FMT "%*l"
-#define WORD(xx) (xx##L)
-#define UWORD(xx) (xx##UL)
-#ifndef FLINT_NO_WORDMAC
-#define UWORD_MAX ULONG_MAX
-#define UWORD_MIN ULONG_MIN
-#define WORD_MAX LONG_MAX
-#define WORD_MIN LONG_MIN
-#endif
+# define WORD_FMT "%l"
+# define WORD_WIDTH_FMT "%*l"
+# define WORD(xx) (xx##L)
+# define UWORD(xx) (xx##UL)
+# ifndef FLINT_NO_WORDMAC
+#  define UWORD_MAX ULONG_MAX
+#  define UWORD_MIN ULONG_MIN
+#  define WORD_MAX LONG_MAX
+#  define WORD_MIN LONG_MIN
+# endif
 #endif
 
 #if GMP_LIMB_BITS == 64
-    #define FLINT_BITS 64
-    #define FLINT_D_BITS 53
-    #define FLINT64 1
+# define FLINT_BITS 64
+# define FLINT_D_BITS 53
+# define FLINT64 1
 #else
-    #define FLINT_BITS 32
-    #define FLINT_D_BITS 31
+# define FLINT_BITS 32
+# define FLINT_D_BITS 31
 #endif
 
 #define flint_bitcnt_t ulong
@@ -173,13 +168,13 @@ FLINT_DLL void flint_set_abort(FLINT_NORETURN void (*func)(void));
 #define FLINT_TLS_PREFIX
 #endif
 
-FLINT_DLL int flint_get_num_threads(void);
-FLINT_DLL void flint_set_num_threads(int num_threads);
-FLINT_DLL void _flint_set_num_workers(int num_workers);
-FLINT_DLL int flint_set_num_workers(int num_workers);
-FLINT_DLL void flint_reset_num_workers(int max_workers);
-FLINT_DLL int flint_set_thread_affinity(int * cpus, slong length);
-FLINT_DLL int flint_restore_thread_affinity();
+int flint_get_num_threads(void);
+void flint_set_num_threads(int num_threads);
+void _flint_set_num_workers(int num_workers);
+int flint_set_num_workers(int num_workers);
+void flint_reset_num_workers(int max_workers);
+int flint_set_thread_affinity(int * cpus, slong length);
+int flint_restore_thread_affinity();
 
 FLINT_CONST double flint_test_multiplier(void);
 
@@ -251,9 +246,9 @@ void flint_rand_free(flint_rand_s * state)
 }
 
 /* defined in ulong_extras, but used throughout the test code */
-FLINT_DLL ulong n_randint(flint_rand_t, ulong);
-FLINT_DLL ulong n_randtest(flint_rand_t);
-FLINT_DLL ulong n_randtest_not_zero(flint_rand_t);
+ulong n_randint(flint_rand_t, ulong);
+ulong n_randtest(flint_rand_t);
+ulong n_randtest_not_zero(flint_rand_t);
 
 #if FLINT_USES_GC
 #define FLINT_GC_INIT() GC_init()
@@ -340,7 +335,7 @@ FLINT_DLL ulong n_randtest_not_zero(flint_rand_t);
     ((shift == FLINT_BITS) ? WORD(0) : ((in) << (shift)))
 
 #ifdef NEED_CLZ_TAB
-FLINT_DLL extern const unsigned char __flint_clz_tab[128];
+extern const unsigned char __flint_clz_tab[128];
 #endif
 
 /* Beware when using the unsigned return value in signed arithmetic */
@@ -435,16 +430,16 @@ mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
 #define mpn_neg_n mpn_neg
 #endif
 
-FLINT_DLL int parse_fmt(int * floating, const char * fmt);
+int parse_fmt(int * floating, const char * fmt);
 
-FLINT_DLL int flint_printf(const char * str, ...); /* flint version of printf */
-FLINT_DLL int flint_vprintf(const char * str, va_list ap); /* va_list version of flint_printf */
-FLINT_DLL int flint_fprintf(FILE * f, const char * str, ...); /* flint version of fprintf */
-FLINT_DLL int flint_sprintf(char * s, const char * str, ...); /* flint version of sprintf */
+int flint_printf(const char * str, ...); /* flint version of printf */
+int flint_vprintf(const char * str, va_list ap); /* va_list version of flint_printf */
+int flint_fprintf(FILE * f, const char * str, ...); /* flint version of fprintf */
+int flint_sprintf(char * s, const char * str, ...); /* flint version of sprintf */
 
-FLINT_DLL int flint_scanf(const char * str, ...); /* flint version of scanf */
-FLINT_DLL int flint_fscanf(FILE * f, const char * str, ...); /* flint version of fscanf */
-FLINT_DLL int flint_sscanf(const char * s, const char * str, ...); /* flint version of sscanf */
+int flint_scanf(const char * str, ...); /* flint version of scanf */
+int flint_fscanf(FILE * f, const char * str, ...); /* flint version of fscanf */
+int flint_sscanf(const char * s, const char * str, ...); /* flint version of sscanf */
 
 FLINT_INLINE slong flint_mul_sizes(slong x, slong y)
 {

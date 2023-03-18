@@ -24,12 +24,6 @@
 #include "mag.h"
 #include "arf_types.h"
 
-#if defined(_MSC_VER) && defined(ARB_BUILD_DLL)
-#define ARB_DLL __declspec(dllexport)
-#else
-#define ARB_DLL FLINT_DLL
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -741,7 +735,7 @@ void arf_urandom(arf_t x, flint_rand_t state, slong bits, arf_rnd_t rnd);
 extern FLINT_TLS_PREFIX mp_ptr __arf_mul_tmp;
 extern FLINT_TLS_PREFIX slong __arf_mul_alloc;
 
-ARB_DLL extern void _arf_mul_tmp_cleanup(void);
+extern void _arf_mul_tmp_cleanup(void);
 
 #define ARF_MUL_TMP_DECL \
     mp_limb_t tmp_stack[ARF_MUL_STACK_ALLOC]; \
@@ -837,7 +831,7 @@ arf_mul_fmpz(arf_ptr z, arf_srcptr x, const fmpz_t y, slong prec, arf_rnd_t rnd)
 extern FLINT_TLS_PREFIX mp_ptr __arf_add_tmp;
 extern FLINT_TLS_PREFIX slong __arf_add_alloc;
 
-ARB_DLL extern void _arf_add_tmp_cleanup(void);
+extern void _arf_add_tmp_cleanup(void);
 
 #define ARF_ADD_TMP_DECL \
     mp_limb_t tmp_stack[ARF_ADD_STACK_ALLOC]; \

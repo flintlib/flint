@@ -14,7 +14,7 @@
 #define FQ_DEFAULT_H
 
 #ifdef FQ_DEFAULT_INLINES_C
-#define FQ_DEFAULT_INLINE FLINT_DLL
+#define FQ_DEFAULT_INLINE 
 #else
 #define FQ_DEFAULT_INLINE static __inline__
 #endif
@@ -107,19 +107,19 @@ FQ_DEFAULT_INLINE void fq_default_ctx_init(fq_default_ctx_t ctx,
     fq_default_ctx_init_type(ctx, p, d, var, 0);
 }
 
-FLINT_DLL
+
 void fq_default_ctx_init_modulus_type(fq_default_ctx_t ctx,
                 const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx,
                                                    const char * var, int type);
-FLINT_DLL
+
 void fq_default_ctx_init_modulus(fq_default_ctx_t ctx,
       const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx, const char * var);
 
-FLINT_DLL
+
 void fq_default_ctx_init_modulus_nmod_type(fq_default_ctx_t ctx,
                         const nmod_poly_t modulus, const char * var, int type);
 
-FLINT_DLL
+
 void fq_default_ctx_init_modulus_nmod(fq_default_ctx_t ctx,
                                   const nmod_poly_t modulus, const char * var);
 
@@ -201,7 +201,7 @@ FQ_DEFAULT_INLINE void fq_default_ctx_prime(fmpz_t prime,
     }
 }
 
-FLINT_DLL void fq_default_ctx_modulus(fmpz_mod_poly_t p,
+void fq_default_ctx_modulus(fmpz_mod_poly_t p,
 		                                   const fq_default_ctx_t ctx);
 
 FQ_DEFAULT_INLINE void fq_default_ctx_order(fmpz_t f,
@@ -1296,16 +1296,16 @@ FQ_DEFAULT_INLINE int fq_default_get_fmpz(fmpz_t z, const fq_default_t op,
     }
 }
 
-FLINT_DLL void fq_default_get_fmpz_mod_poly(fmpz_mod_poly_t poly,
+void fq_default_get_fmpz_mod_poly(fmpz_mod_poly_t poly,
                             const fq_default_t op, const fq_default_ctx_t ctx);
 
-FLINT_DLL void fq_default_set_fmpz_mod_poly(fq_default_t op,
+void fq_default_set_fmpz_mod_poly(fq_default_t op,
                        const fmpz_mod_poly_t poly, const fq_default_ctx_t ctx);
 
-FLINT_DLL void fq_default_get_fmpz_poly(fmpz_poly_t poly,
+void fq_default_get_fmpz_poly(fmpz_poly_t poly,
                             const fq_default_t op, const fq_default_ctx_t ctx);
 
-FLINT_DLL void fq_default_set_fmpz_poly(fq_default_t op,
+void fq_default_set_fmpz_poly(fq_default_t op,
                            const fmpz_poly_t poly, const fq_default_ctx_t ctx);
 
 FQ_DEFAULT_INLINE void fq_default_get_coeff_fmpz(fmpz_t c,

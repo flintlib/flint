@@ -15,7 +15,7 @@
 #define GR_MPOLY_H
 
 #ifdef GR_MPOLY_INLINES_C
-#define GR_MPOLY_INLINE FLINT_DLL
+#define GR_MPOLY_INLINE 
 #else
 #define GR_MPOLY_INLINE static __inline__
 #endif

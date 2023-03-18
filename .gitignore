@@ -11,7 +11,6 @@
 src/fmpz/fmpz.c
 src/flint-config.h
 src/fft_tuning.h
-src/fmpz-conversions.h
 build/
 config.log
 /Makefile
@@ -46,4 +45,12 @@ build
 flint2
 .DS_Store
 python/__pycache__/*.pyc
-
+aclocal.m4
+config.guess
+config.status
+config.sub
+configure
+install-sh
+libtool
+ltmain.sh
+src/config.h.in

@@ -13,7 +13,7 @@
 #define DOUBLE_EXTRAS_H
 
 #ifdef DOUBLE_EXTRAS_INLINES_C
-#define DOUBLE_EXTRAS_INLINE FLINT_DLL
+#define DOUBLE_EXTRAS_INLINE 
 #else
 #define DOUBLE_EXTRAS_INLINE static __inline__
 #endif
@@ -30,11 +30,11 @@
 #define D_INF HUGE_VAL
 #define D_NAN (HUGE_VAL - HUGE_VAL)
 
-FLINT_DLL double d_randtest(flint_rand_t state);
+double d_randtest(flint_rand_t state);
 
-FLINT_DLL double d_randtest_signed(flint_rand_t state, slong minexp, slong maxexp);
+double d_randtest_signed(flint_rand_t state, slong minexp, slong maxexp);
 
-FLINT_DLL double d_randtest_special(flint_rand_t state, slong minexp, slong maxexp);
+double d_randtest_special(flint_rand_t state, slong minexp, slong maxexp);
 
 DOUBLE_EXTRAS_INLINE
 double d_polyval(const double * poly, int len, double x)
@@ -48,11 +48,11 @@ double d_polyval(const double * poly, int len, double x)
     return t;
 }
 
-FLINT_DLL double d_lambertw(double x);
+double d_lambertw(double x);
 
-FLINT_DLL int d_is_nan(double x);
+int d_is_nan(double x);
 
-FLINT_DLL double d_log2(double x);
+double d_log2(double x);
 
 #ifdef __cplusplus
 }
