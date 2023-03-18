@@ -338,42 +338,10 @@ void _arb_poly_tree_build(arb_ptr * tree, arb_srcptr roots, slong len, slong pre
 
 /* Composition */
 
-void _arb_poly_taylor_shift_horner(arb_ptr poly, const arb_t c, slong n, slong prec);
-
-void arb_poly_taylor_shift_horner(arb_poly_t g, const arb_poly_t f, const arb_t c, slong prec);
-
-void _arb_poly_taylor_shift_divconquer(arb_ptr poly, const arb_t c, slong n, slong prec);
-
-void arb_poly_taylor_shift_divconquer(arb_poly_t g, const arb_poly_t f, const arb_t c, slong prec);
-
-void _arb_poly_taylor_shift_convolution(arb_ptr poly, const arb_t c, slong n, slong prec);
-
-void arb_poly_taylor_shift_convolution(arb_poly_t g, const arb_poly_t f, const arb_t c, slong prec);
-
 void _arb_poly_taylor_shift(arb_ptr poly, const arb_t c, slong n, slong prec);
-
 void arb_poly_taylor_shift(arb_poly_t g, const arb_poly_t f, const arb_t c, slong prec);
-
-void _arb_poly_compose(arb_ptr res,
-    arb_srcptr poly1, slong len1,
-    arb_srcptr poly2, slong len2, slong prec);
-
-void arb_poly_compose(arb_poly_t res,
-              const arb_poly_t poly1, const arb_poly_t poly2, slong prec);
-
-void _arb_poly_compose_horner(arb_ptr res,
-    arb_srcptr poly1, slong len1,
-    arb_srcptr poly2, slong len2, slong prec);
-
-void arb_poly_compose_horner(arb_poly_t res,
-              const arb_poly_t poly1, const arb_poly_t poly2, slong prec);
-
-void _arb_poly_compose_divconquer(arb_ptr res,
-    arb_srcptr poly1, slong len1,
-    arb_srcptr poly2, slong len2, slong prec);
-
-void arb_poly_compose_divconquer(arb_poly_t res,
-              const arb_poly_t poly1, const arb_poly_t poly2, slong prec);
+void _arb_poly_compose(arb_ptr res, arb_srcptr poly1, slong len1, arb_srcptr poly2, slong len2, slong prec);
+void arb_poly_compose(arb_poly_t res, const arb_poly_t poly1, const arb_poly_t poly2, slong prec);
 
 void _arb_poly_compose_series(arb_ptr res, arb_srcptr poly1, slong len1,
                             arb_srcptr poly2, slong len2, slong n, slong prec);

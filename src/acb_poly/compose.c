@@ -12,80 +12,17 @@
 */
 
 #include "acb_poly.h"
-
-/* compose by poly2 = a*x^n + c, no aliasing; n >= 1 */
-void
-_acb_poly_compose_axnc(acb_ptr res, acb_srcptr poly1, slong len1,
-    const acb_t c, const acb_t a, slong n, slong prec)
-{
-    slong i;
-
-    _acb_vec_set_round(res, poly1, len1, prec);
-    /* shift by c (c = 0 case will be fast) */
-    _acb_poly_taylor_shift(res, c, len1, prec);
-
-    /* multiply by powers of a */
-    if (!acb_is_one(a))
-    {
-        if (acb_equal_si(a, -1))
-        {
-            for (i = 1; i < len1; i += 2)
-                acb_neg(res + i, res + i);
-        }
-        else if (len1 == 2)
-        {
-            acb_mul(res + 1, res + 1, a, prec);
-        }
-        else
-        {
-            acb_t t;
-            acb_init(t);
-            acb_set(t, a);
-
-            for (i = 1; i < len1; i++)
-            {
-                acb_mul(res + i, res + i, t, prec);
-                if (i + 1 < len1)
-                    acb_mul(t, t, a, prec);
-            }
-
-            acb_clear(t);
-        }
-    }
-
-    /* stretch */
-    for (i = len1 - 1; i >= 1 && n > 1; i--)
-    {
-        acb_swap(res + i * n, res + i);
-        _acb_vec_zero(res + (i - 1) * n + 1, n - 1);
-    }
-}
+#include "gr_poly.h"
 
 void
 _acb_poly_compose(acb_ptr res,
     acb_srcptr poly1, slong len1,
     acb_srcptr poly2, slong len2, slong prec)
 {
-    if (len1 == 1)
-    {
-        acb_set_round(res, poly1, prec);
-    }
-    else if (len2 == 1)
-    {
-        _acb_poly_evaluate(res, poly1, len1, poly2, prec);
-    }
-    else if (_acb_vec_is_zero(poly2 + 1, len2 - 2))
-    {
-        _acb_poly_compose_axnc(res, poly1, len1, poly2, poly2 + len2 - 1, len2 - 1, prec);
-    }
-    else if (len1 <= 7)
-    {
-        _acb_poly_compose_horner(res, poly1, len1, poly2, len2, prec);
-    }
-    else
-    {
-        _acb_poly_compose_divconquer(res, poly1, len1, poly2, len2, prec);
-    }
+    gr_ctx_t ctx;
+    gr_ctx_init_complex_acb(ctx, prec);
+    if (_gr_poly_compose_divconquer(res, poly1, len1, poly2, len2, ctx) != GR_SUCCESS)
+        _acb_vec_indeterminate(res, (len1 - 1) * (len2 - 1) + 1);
 }
 
 void acb_poly_compose(acb_poly_t res,

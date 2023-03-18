@@ -387,48 +387,18 @@ Arithmetic
 Composition
 -------------------------------------------------------------------------------
 
-.. function:: void _arb_poly_taylor_shift_horner(arb_ptr g, const arb_t c, slong n, slong prec)
-
-.. function:: void arb_poly_taylor_shift_horner(arb_poly_t g, const arb_poly_t f, const arb_t c, slong prec)
-
-.. function:: void _arb_poly_taylor_shift_divconquer(arb_ptr g, const arb_t c, slong n, slong prec)
-
-.. function:: void arb_poly_taylor_shift_divconquer(arb_poly_t g, const arb_poly_t f, const arb_t c, slong prec)
-
-.. function:: void _arb_poly_taylor_shift_convolution(arb_ptr g, const arb_t c, slong n, slong prec)
-
-.. function:: void arb_poly_taylor_shift_convolution(arb_poly_t g, const arb_poly_t f, const arb_t c, slong prec)
-
 .. function:: void _arb_poly_taylor_shift(arb_ptr g, const arb_t c, slong n, slong prec)
+              void arb_poly_taylor_shift(arb_poly_t g, const arb_poly_t f, const arb_t c, slong prec)
 
-.. function:: void arb_poly_taylor_shift(arb_poly_t g, const arb_poly_t f, const arb_t c, slong prec)
-
-    Sets *g* to the Taylor shift `f(x+c)`, computed respectively using
-    an optimized form of Horner's rule, divide-and-conquer, a single
-    convolution, and an automatic choice between the three algorithms.
-
+    Sets *g* to the Taylor shift `f(x+c)`.
     The underscore methods act in-place on *g* = *f* which has length *n*.
 
-.. function:: void _arb_poly_compose_horner(arb_ptr res, arb_srcptr poly1, slong len1, arb_srcptr poly2, slong len2, slong prec)
-
-.. function:: void arb_poly_compose_horner(arb_poly_t res, const arb_poly_t poly1, const arb_poly_t poly2, slong prec)
-
-.. function:: void _arb_poly_compose_divconquer(arb_ptr res, arb_srcptr poly1, slong len1, arb_srcptr poly2, slong len2, slong prec)
-
-.. function:: void arb_poly_compose_divconquer(arb_poly_t res, const arb_poly_t poly1, const arb_poly_t poly2, slong prec)
-
 .. function:: void _arb_poly_compose(arb_ptr res, arb_srcptr poly1, slong len1, arb_srcptr poly2, slong len2, slong prec)
-
-.. function:: void arb_poly_compose(arb_poly_t res, const arb_poly_t poly1, const arb_poly_t poly2, slong prec)
+              void arb_poly_compose(arb_poly_t res, const arb_poly_t poly1, const arb_poly_t poly2, slong prec)
 
     Sets *res* to the composition `h(x) = f(g(x))` where `f` is given by
-    *poly1* and `g` is given by *poly2*, respectively using Horner's rule,
-    divide-and-conquer, and an automatic choice between the two algorithms.
-
-    The default algorithm also handles special-form input `g = ax^n + c`
-    efficiently by performing a Taylor shift followed by a rescaling.
-
-    The underscore methods do not support aliasing of the output
+    *poly1* and `g` is given by *poly2*.
+    The underscore method does not support aliasing of the output
     with either input polynomial.
 
 .. function:: void _arb_poly_compose_series(arb_ptr res, arb_srcptr poly1, slong len1, arb_srcptr poly2, slong len2, slong n, slong prec)

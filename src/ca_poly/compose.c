@@ -12,86 +12,16 @@
 */
 
 #include "ca_poly.h"
-
-/* todo: implement taylor shift */
-#if 0
-/* compose by poly2 = a*x^n + c, no aliasing; n >= 1 */
-void
-_ca_poly_compose_axnc(ca_ptr res, ca_srcptr poly1, slong len1,
-    const ca_t c, const ca_t a, slong n, ca_ctx_t ctx)
-{
-    slong i;
-
-    _ca_vec_set(res, poly1, len1, ctx);
-
-    /* shift by c (c = 0 case will be fast) */
-    _ca_poly_taylor_shift(res, c, len1, ctx);
-
-    /* multiply by powers of a */
-    if (!ca_is_one(a, ctx))
-    {
-        if (ca_equal_si(a, -1, ctx))
-        {
-            for (i = 1; i < len1; i += 2)
-                ca_neg(res + i, res + i, ctx);
-        }
-        else if (len1 == 2)
-        {
-            ca_mul(res + 1, res + 1, a, ctx);
-        }
-        else
-        {
-            ca_t t;
-            ca_init(t, ctx);
-            ca_set(t, a, ctx);
-
-            for (i = 1; i < len1; i++)
-            {
-                ca_mul(res + i, res + i, t, ctx);
-                if (i + 1 < len1)
-                    ca_mul(t, t, a, ctx);
-            }
-
-            ca_clear(t, ctx);
-        }
-    }
-
-    /* stretch */
-    for (i = len1 - 1; i >= 1 && n > 1; i--)
-    {
-        ca_swap(res + i * n, res + i, ctx);
-        _ca_vec_zero(res + (i - 1) * n + 1, n - 1, ctx);
-    }
-}
-#endif
+#include "gr_poly.h"
 
 void
 _ca_poly_compose(ca_ptr res,
     ca_srcptr poly1, slong len1,
     ca_srcptr poly2, slong len2, ca_ctx_t ctx)
 {
-    if (len1 == 1)
-    {
-        ca_set(res, poly1, ctx);
-    }
-    else if (len2 == 1)
-    {
-        _ca_poly_evaluate(res, poly1, len1, poly2, ctx);
-    }
-#if 0
-    else if (_ca_vec_is_zero(poly2 + 1, len2 - 2))
-    {
-        _ca_poly_compose_axnc(res, poly1, len1, poly2, poly2 + len2 - 1, len2 - 1, ctx);
-    }
-#endif
-    else if (len1 <= 7)
-    {
-        _ca_poly_compose_horner(res, poly1, len1, poly2, len2, ctx);
-    }
-    else
-    {
-        _ca_poly_compose_divconquer(res, poly1, len1, poly2, len2, ctx);
-    }
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_ca_from_ref(gr_ctx, GR_CTX_CC_CA, ctx);
+    GR_MUST_SUCCEED(_gr_poly_compose(res, poly1, len1, poly2, len2, gr_ctx));
 }
 
 void ca_poly_compose(ca_poly_t res,

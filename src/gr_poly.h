@@ -253,6 +253,10 @@ WARN_UNUSED_RESULT int _gr_poly_taylor_shift_horner(gr_ptr res, gr_srcptr poly, 
 WARN_UNUSED_RESULT int gr_poly_taylor_shift_horner(gr_poly_t res, const gr_poly_t f, gr_srcptr c, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_poly_taylor_shift_divconquer(gr_ptr res, gr_srcptr poly, slong len, gr_srcptr c, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_taylor_shift_divconquer(gr_poly_t res, const gr_poly_t f, gr_srcptr c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_taylor_shift_convolution(gr_ptr res, gr_srcptr poly, slong len, gr_srcptr c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_taylor_shift_convolution(gr_poly_t res, const gr_poly_t f, gr_srcptr c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_taylor_shift_generic(gr_ptr res, gr_srcptr poly, slong len, gr_srcptr c, gr_ctx_t ctx);
+GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_poly_taylor_shift(gr_ptr res, gr_srcptr f, slong len, gr_srcptr c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP(ctx, POLY_TAYLOR_SHIFT)(res, f, len, c, ctx); }
 WARN_UNUSED_RESULT int _gr_poly_taylor_shift(gr_ptr res, gr_srcptr poly, slong len, gr_srcptr c, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_taylor_shift(gr_poly_t res, const gr_poly_t f, gr_srcptr c, gr_ctx_t ctx);
 

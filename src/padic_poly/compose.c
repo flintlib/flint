@@ -62,11 +62,12 @@ void _padic_poly_compose(fmpz *rop, slong *rval, slong N,
         }
         else
         {
-            fmpz *vec2;
+            fmpz *vec1, *vec2;
             fmpz_t f;
             fmpz_t pow;
             int alloc;
 
+            vec1 = _fmpz_vec_init(len1);
             vec2 = _fmpz_vec_init(len2);
             fmpz_init(f);
 
@@ -75,12 +76,15 @@ void _padic_poly_compose(fmpz *rop, slong *rval, slong N,
 
             alloc = _padic_ctx_pow_ui(pow, N - val1, ctx);
 
+            _fmpz_vec_scalar_mod_fmpz(vec1, op1, len1, pow);
+            _fmpz_vec_scalar_mod_fmpz(vec2, vec2, len2, pow);
             _fmpz_mod_poly_compose(rop, op1, len1, vec2, len2, pow);
             *rval= val1;
 
             _padic_poly_canonicalise(rop, rval, lenr, ctx->p);
 
             _fmpz_vec_clear(vec2, len2);
+            _fmpz_vec_clear(vec1, len1);
             fmpz_clear(f);
             if (alloc)
                 fmpz_clear(pow);
@@ -99,11 +103,12 @@ void _padic_poly_compose(fmpz *rop, slong *rval, slong N,
         {
             fmpz_t pow;
             int alloc;
-            fmpz *vec1;
+            fmpz *vec1, *vec2;
             fmpz_t s, t;
             slong i;
 
             vec1 = _fmpz_vec_init(len1);
+            vec2 = _fmpz_vec_init(len2);
             fmpz_init(s);
             fmpz_init(t);
 
@@ -118,12 +123,15 @@ void _padic_poly_compose(fmpz *rop, slong *rval, slong N,
                 fmpz_mul(vec1 + i, op1 + i, t);
             }
 
-            _fmpz_mod_poly_compose(rop, vec1, len1, op2, len2, pow);
+            _fmpz_vec_scalar_mod_fmpz(vec1, vec1, len1, pow);
+            _fmpz_vec_scalar_mod_fmpz(vec2, op2, len2, pow);
+            _fmpz_mod_poly_compose(rop, vec1, len1, vec2, len2, pow);
             *rval = val1 + n*val2;
 
             _padic_poly_canonicalise(rop, rval, lenr, ctx->p);
 
             _fmpz_vec_clear(vec1, len1);
+            _fmpz_vec_clear(vec2, len2);
             fmpz_clear(s);
             fmpz_clear(t);
             if (alloc)

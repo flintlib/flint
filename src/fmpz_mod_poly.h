@@ -1038,37 +1038,13 @@ FLINT_DLL void fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys,
 
 /*  Composition  *************************************************************/
 
-FLINT_DLL void _fmpz_mod_poly_compose_horner(fmpz *res, const fmpz *poly1, slong len1, 
+FLINT_DLL void _fmpz_mod_poly_compose(fmpz *res, const fmpz *poly1, slong len1, 
                                               const fmpz *poly2, slong len2, 
                                               const fmpz_t p);
 
-FLINT_DLL void fmpz_mod_poly_compose_horner(fmpz_mod_poly_t res, 
+FLINT_DLL void fmpz_mod_poly_compose(fmpz_mod_poly_t res, 
                     const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2,
                                                      const fmpz_mod_ctx_t ctx);
-
-FLINT_DLL void _fmpz_mod_poly_compose_divconquer(fmpz *res, 
-                                       const fmpz *poly1, slong len1, 
-                                       const fmpz *poly2, slong len2, 
-                                       const fmpz_t p);
-
-FLINT_DLL void fmpz_mod_poly_compose_divconquer(fmpz_mod_poly_t res, 
-                     const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2,
-                                                     const fmpz_mod_ctx_t ctx);
-
-FMPZ_MOD_POLY_INLINE
-void _fmpz_mod_poly_compose(fmpz *res, const fmpz *poly1, slong len1, 
-                                       const fmpz *poly2, slong len2, 
-                                       const fmpz_t p)
-{
-    _fmpz_mod_poly_compose_divconquer(res, poly1, len1, poly2, len2, p);
-}
-
-FMPZ_MOD_POLY_INLINE
-void fmpz_mod_poly_compose(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, 
-                         const fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t ctx)
-{
-    fmpz_mod_poly_compose_divconquer(res, poly1, poly2, ctx);
-}
 
 /* Modular composition  ******************************************************/
 

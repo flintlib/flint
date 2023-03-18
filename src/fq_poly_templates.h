@@ -963,27 +963,6 @@ FLINT_DLL void TEMPLATE4(T, poly_evaluate, T, vec_iter)(TEMPLATE(T, struct) * ys
 
 /*  Composition  *************************************************************/
 
-FLINT_DLL void _TEMPLATE(T, poly_compose_divconquer)(
-    TEMPLATE(T, struct) *rop,
-    const TEMPLATE(T, struct) *op1, slong len1,
-    const TEMPLATE(T, struct) *op2, slong len2,
-    const TEMPLATE(T, ctx_t) ctx);
-
-FLINT_DLL void TEMPLATE(T, poly_compose_divconquer)(TEMPLATE(T, poly_t) rop,
-                                     const TEMPLATE(T, poly_t) op1,
-                                     const TEMPLATE(T, poly_t) op2,
-                                     const TEMPLATE(T, ctx_t) ctx);
-
-FLINT_DLL void _TEMPLATE(T, poly_compose_horner)(TEMPLATE(T, struct) *rop,
-                                  const TEMPLATE(T, struct) *op1, slong len1,
-                                  const TEMPLATE(T, struct) *op2, slong len2,
-                                  const TEMPLATE(T, ctx_t) ctx);
-
-FLINT_DLL void TEMPLATE(T, poly_compose_horner)(TEMPLATE(T, poly_t) rop,
-                                 const TEMPLATE(T, poly_t) op1,
-                                 const TEMPLATE(T, poly_t) op2,
-                                 const TEMPLATE(T, ctx_t) ctx);
-
 FLINT_DLL void _TEMPLATE(T, poly_compose)(TEMPLATE(T, struct) *rop,
                            const TEMPLATE(T, struct) *op1, slong len1,
                            const TEMPLATE(T, struct) *op2, slong len2,

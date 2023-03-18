@@ -9,47 +9,20 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fmpz_mod_poly.h"
+#include "gr_poly.h"
 
-void _fmpz_mod_poly_compose_horner(fmpz *res, const fmpz *poly1, slong len1, 
+void _fmpz_mod_poly_compose(fmpz *res, const fmpz *poly1, slong len1, 
                                               const fmpz *poly2, slong len2, 
                                               const fmpz_t p)
 {
-    if (len1 == 1 || len2 == 0)
-    {
-        fmpz_set(res, poly1);
-    }
-    else
-    {
-        const slong alloc = (len1 - 1) * (len2 - 1) + 1;
-        slong i = len1 - 1, lenr = len2;
-        fmpz * t = _fmpz_vec_init(alloc);
-        
-        /*
-           Perform the first two steps as one, 
-             "res = a(m) * poly2 + a(m-1)".
-         */
-        {
-            _fmpz_mod_poly_scalar_mul_fmpz(res, poly2, len2, poly1 + i, p);
-            i--;
-            fmpz_add(res, res, poly1 + i);
-            if (fmpz_cmpabs(res, p) >= 0)
-                fmpz_sub(res, res, p);
-        }
-        while (i > 0)
-        {
-            i--;
-            _fmpz_mod_poly_mul(t, res, lenr, poly2, len2, p);
-            lenr += len2 - 1;
-            _fmpz_mod_poly_add(res, t, lenr, poly1 + i, 1, p);
-        }
-
-        _fmpz_vec_clear(t, alloc);
-    }
+    gr_ctx_t ctx;
+    gr_ctx_init_fmpz_mod(ctx, p);       /* todo: from ref */
+    GR_MUST_SUCCEED(_gr_poly_compose(res, poly1, len1, poly2, len2, ctx));
+    gr_ctx_clear(ctx);
 }
 
-void fmpz_mod_poly_compose_horner(fmpz_mod_poly_t res,
+void fmpz_mod_poly_compose(fmpz_mod_poly_t res,
                     const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2,
                                                       const fmpz_mod_ctx_t ctx)
 {
@@ -71,14 +44,14 @@ void fmpz_mod_poly_compose_horner(fmpz_mod_poly_t res,
         if ((res != poly1) && (res != poly2))
         {
             fmpz_mod_poly_fit_length(res, lenr, ctx);
-            _fmpz_mod_poly_compose_horner(res->coeffs, poly1->coeffs, len1, 
+            _fmpz_mod_poly_compose(res->coeffs, poly1->coeffs, len1, 
                                poly2->coeffs, len2, fmpz_mod_ctx_modulus(ctx));
         }
         else
         {
             fmpz *t = _fmpz_vec_init(lenr);
 
-            _fmpz_mod_poly_compose_horner(t, poly1->coeffs, len1,
+            _fmpz_mod_poly_compose(t, poly1->coeffs, len1,
                                poly2->coeffs, len2, fmpz_mod_ctx_modulus(ctx));
             _fmpz_vec_clear(res->coeffs, res->alloc);
             res->coeffs = t;

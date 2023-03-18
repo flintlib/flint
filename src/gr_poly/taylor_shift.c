@@ -13,7 +13,7 @@
 
 /* todo: algorithm selection */
 int
-_gr_poly_taylor_shift(gr_ptr res, gr_srcptr poly, slong len, gr_srcptr c, gr_ctx_t ctx)
+_gr_poly_taylor_shift_generic(gr_ptr res, gr_srcptr poly, slong len, gr_srcptr c, gr_ctx_t ctx)
 {
     if (len <= 20)
         return _gr_poly_taylor_shift_horner(res, poly, len, c, ctx);

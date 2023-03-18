@@ -335,8 +335,16 @@ Composition
               int gr_poly_taylor_shift_horner(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
               int _gr_poly_taylor_shift_divconquer(gr_ptr res, gr_srcptr poly, slong len, gr_srcptr c, gr_ctx_t ctx)
               int gr_poly_taylor_shift_divconquer(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
+              int _gr_poly_taylor_shift_convolution(gr_ptr res, gr_srcptr poly, slong len, gr_srcptr c, gr_ctx_t ctx)
+              int gr_poly_taylor_shift_convolution(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
               int _gr_poly_taylor_shift(gr_ptr res, gr_srcptr poly, slong len, gr_srcptr c, gr_ctx_t ctx)
               int gr_poly_taylor_shift(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
+
+    Sets *res* to the Taylor shift `f(x+c)`, where *f* is given by
+    *poly*, computed respectively using
+    an optimized form of Horner's rule, divide-and-conquer, a single
+    convolution, and an automatic choice between the three algorithms.
+    The underscore methods support aliasing.
 
 .. function:: int _gr_poly_compose_horner(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
               int gr_poly_compose_horner(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx)
@@ -344,6 +352,14 @@ Composition
               int gr_poly_compose_divconquer(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx)
               int _gr_poly_compose(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
               int gr_poly_compose(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx)
+
+    Sets *res* to the composition `f(g(x))` where *f* is given by *poly1*
+    and *g* is given by *poly2*, respectively using Horner's rule,
+    divide-and-conquer, and an automatic choice between the two algorithms.
+    The default algorithm also handles special-form input `g = ax^n + c`
+    efficiently by performing a Taylor shift followed by a rescaling.
+    The underscore methods do not support aliasing of the output
+    with either input polynomial.
 
 Power series composition and reversion
 -------------------------------------------------------------------------------

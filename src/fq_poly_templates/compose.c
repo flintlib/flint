@@ -13,6 +13,7 @@
 #ifdef T
 
 #include "templates.h"
+#include "gr_poly.h"
 
 void
 _TEMPLATE(T, poly_compose) (TEMPLATE(T, struct) * rop,
@@ -20,15 +21,9 @@ _TEMPLATE(T, poly_compose) (TEMPLATE(T, struct) * rop,
                             const TEMPLATE(T, struct) * op2, slong len2,
                             const TEMPLATE(T, ctx_t) ctx)
 {
-    if (len1 == 1)
-        TEMPLATE(T, set) (rop + 0, op1 + 0, ctx);
-    else if (len2 == 1)
-        _TEMPLATE(T, TEMPLATE(poly_evaluate, T)) (rop + 0, op1, len1, op2 + 0,
-                                                  ctx);
-    else if (len1 <= 4)
-        _TEMPLATE(T, poly_compose_horner) (rop, op1, len1, op2, len2, ctx);
-    else
-        _TEMPLATE(T, poly_compose_divconquer) (rop, op1, len1, op2, len2, ctx);
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_compose(rop, op1, len1, op2, len2, gr_ctx));
 }
 
 void

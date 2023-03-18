@@ -22,7 +22,7 @@ main(void)
     fmpz_mod_ctx_t ctx;
     FLINT_TEST_INIT(state);
 
-    flint_printf("compose_horner....");
+    flint_printf("compose....");
     fflush(stdout);
 
     fmpz_mod_ctx_init_ui(ctx, 2);
@@ -44,8 +44,8 @@ main(void)
         fmpz_mod_poly_randtest(a, state, n_randint(state, 80), ctx);
         fmpz_mod_poly_randtest(b, state, n_randint(state, 30), ctx);
 
-        fmpz_mod_poly_compose_horner(c, a, b, ctx);
-        fmpz_mod_poly_compose_horner(a, a, b, ctx);
+        fmpz_mod_poly_compose(c, a, b, ctx);
+        fmpz_mod_poly_compose(a, a, b, ctx);
 
         result = (fmpz_mod_poly_equal(a, c, ctx));
         if (!result)
@@ -81,8 +81,8 @@ main(void)
         fmpz_mod_poly_randtest(a, state, n_randint(state, 80), ctx);
         fmpz_mod_poly_randtest(b, state, n_randint(state, 30), ctx);
 
-        fmpz_mod_poly_compose_horner(c, a, b, ctx);
-        fmpz_mod_poly_compose_horner(b, a, b, ctx);
+        fmpz_mod_poly_compose(c, a, b, ctx);
+        fmpz_mod_poly_compose(b, a, b, ctx);
 
         result = (fmpz_mod_poly_equal(b, c, ctx));
         if (!result)
@@ -126,7 +126,7 @@ main(void)
         fmpz_mod_poly_get_fmpz_poly(A, a, ctx);
         fmpz_mod_poly_get_fmpz_poly(B, b, ctx);
 
-        fmpz_mod_poly_compose_horner(c, a, b, ctx);
+        fmpz_mod_poly_compose(c, a, b, ctx);
         fmpz_poly_compose(C, A, B);
         fmpz_mod_poly_set_fmpz_poly(d, C, ctx);
 

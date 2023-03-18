@@ -32,8 +32,6 @@
 #include "fq_poly_templates/add_si.c"
 #include "fq_poly_templates/clear.c"
 #include "fq_poly_templates/compose.c"
-#include "fq_poly_templates/compose_divconquer.c"
-#include "fq_poly_templates/compose_horner.c"
 #include "fq_poly_templates/compose_mod_brent_kung.c"
 #include "fq_poly_templates/compose_mod_brent_kung_precomp_preinv.c"
 #include "fq_poly_templates/compose_mod_brent_kung_preinv.c"

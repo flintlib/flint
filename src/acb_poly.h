@@ -373,42 +373,10 @@ void _acb_poly_div_root(acb_ptr Q, acb_t R, acb_srcptr A,
 
 /* Composition */
 
-void _acb_poly_taylor_shift_horner(acb_ptr poly, const acb_t c, slong n, slong prec);
-
-void acb_poly_taylor_shift_horner(acb_poly_t g, const acb_poly_t f, const acb_t c, slong prec);
-
-void _acb_poly_taylor_shift_divconquer(acb_ptr poly, const acb_t c, slong n, slong prec);
-
-void acb_poly_taylor_shift_divconquer(acb_poly_t g, const acb_poly_t f, const acb_t c, slong prec);
-
-void _acb_poly_taylor_shift_convolution(acb_ptr poly, const acb_t c, slong n, slong prec);
-
-void acb_poly_taylor_shift_convolution(acb_poly_t g, const acb_poly_t f, const acb_t c, slong prec);
-
 void _acb_poly_taylor_shift(acb_ptr poly, const acb_t c, slong n, slong prec);
-
 void acb_poly_taylor_shift(acb_poly_t g, const acb_poly_t f, const acb_t c, slong prec);
-
-void _acb_poly_compose(acb_ptr res,
-    acb_srcptr poly1, slong len1,
-    acb_srcptr poly2, slong len2, slong prec);
-
-void acb_poly_compose(acb_poly_t res,
-              const acb_poly_t poly1, const acb_poly_t poly2, slong prec);
-
-void _acb_poly_compose_horner(acb_ptr res,
-    acb_srcptr poly1, slong len1,
-    acb_srcptr poly2, slong len2, slong prec);
-
-void acb_poly_compose_horner(acb_poly_t res,
-              const acb_poly_t poly1, const acb_poly_t poly2, slong prec);
-
-void _acb_poly_compose_divconquer(acb_ptr res,
-    acb_srcptr poly1, slong len1,
-    acb_srcptr poly2, slong len2, slong prec);
-
-void acb_poly_compose_divconquer(acb_poly_t res,
-              const acb_poly_t poly1, const acb_poly_t poly2, slong prec);
+void _acb_poly_compose(acb_ptr res, acb_srcptr poly1, slong len1, acb_srcptr poly2, slong len2, slong prec);
+void acb_poly_compose(acb_poly_t res, const acb_poly_t poly1, const acb_poly_t poly2, slong prec);
 
 void _acb_poly_compose_series(acb_ptr res, acb_srcptr poly1, slong len1,
                             acb_srcptr poly2, slong len2, slong n, slong prec);

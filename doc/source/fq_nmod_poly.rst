@@ -1171,41 +1171,6 @@ Composition
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fq_nmod_poly_compose_divconquer(fq_nmod_struct *rop, const fq_nmod_struct *op1, slong len1, const fq_nmod_struct *op2, slong len2, const fq_nmod_ctx_t ctx)
-
-    Computes the composition of ``(op1, len1)`` and ``(op2, len2)``
-    using a divide and conquer approach and places the result into ``rop``,
-    assuming ``rop`` can hold the output of length
-    ``(len1 - 1) * (len2 - 1) + 1``.
-
-    Assumes ``len1, len2 > 0``.  Does not support aliasing between
-    ``rop`` and any of ``(op1, len1)`` and ``(op2, len2)``.
-
-.. function:: void fq_nmod_poly_compose_divconquer(fq_nmod_poly_t rop, const fq_nmod_poly_t op1, const fq_nmod_poly_t op2, const fq_nmod_ctx_t ctx)
-
-    Sets ``rop`` to the composition of ``op1`` and ``op2``.
-    To be precise about the order of composition, denoting ``rop``,
-    ``op1``, and ``op2`` by `f`, `g`, and `h`, respectively,
-    sets `f(t) = g(h(t))`.
-
-.. function:: void _fq_nmod_poly_compose_horner(fq_nmod_struct *rop, const fq_nmod_struct *op1, slong len1, const fq_nmod_struct *op2, slong len2, const fq_nmod_ctx_t ctx)
-
-    Sets ``rop`` to the composition of ``(op1, len1)`` and
-    ``(op2, len2)``.
-
-    Assumes that ``rop`` has space for ``(len1-1)*(len2-1) + 1``
-    coefficients.  Assumes that ``op1`` and ``op2`` are non-zero
-    polynomials.  Does not support aliasing between any of the inputs and
-    the output.
-
-.. function:: void fq_nmod_poly_compose_horner(fq_nmod_poly_t rop, const fq_nmod_poly_t op1, const fq_nmod_poly_t op2, const fq_nmod_ctx_t ctx)
-
-    Sets ``rop`` to the composition of ``op1`` and ``op2``.
-    To be more precise, denoting ``rop``, ``op1``, and ``op2``
-    by `f`, `g`, and `h`, sets `f(t) = g(h(t))`.
-
-    This implementation uses Horner's method.
-
 .. function:: void _fq_nmod_poly_compose(fq_nmod_struct *rop, const fq_nmod_struct *op1, slong len1, const fq_nmod_struct *op2, slong len2, const fq_nmod_ctx_t ctx)
 
     Sets ``rop`` to the composition of ``(op1, len1)`` and

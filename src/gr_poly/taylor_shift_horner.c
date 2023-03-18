@@ -16,11 +16,9 @@
 int
 _gr_poly_taylor_shift_horner(gr_ptr res, gr_srcptr poly, slong len, gr_srcptr c, gr_ctx_t ctx)
 {
-    int status;
+    int status = GR_SUCCESS;
     slong i, j;
     slong sz = ctx->sizeof_elem;
-
-    status = GR_SUCCESS;
 
     if (res != poly)
         status |= _gr_vec_set(res, poly, len, ctx);

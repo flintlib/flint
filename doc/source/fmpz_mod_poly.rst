@@ -1494,50 +1494,6 @@ Composition
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fmpz_mod_poly_compose_horner(fmpz *res, const fmpz *poly1, slong len1, const fmpz *poly2, slong len2, const fmpz_t p)
-
-    Sets ``res`` to the composition of ``(poly1, len1)`` and
-    ``(poly2, len2)`` using Horner's algorithm.
-
-    Assumes that ``res`` has space for ``(len1-1)*(len2-1) + 1``
-    coefficients, although in `\mathbf{Z}_p[X]` this might not actually
-    be the length of the resulting polynomial when `p` is not a prime.
-
-    Assumes that ``poly1`` and ``poly2`` are non-zero polynomials.
-    Does not support aliasing between any of the inputs and the output.
-
-.. function:: void fmpz_mod_poly_compose_horner(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t ctx)
-
-    Sets ``res`` to the composition of ``poly1`` and ``poly2``
-    using Horner's algorithm.
-
-    To be precise about the order of composition, denoting ``res``,
-    ``poly1``, and ``poly2`` by `f`, `g`, and `h`, respectively,
-    sets `f(t) = g(h(t))`.
-
-.. function:: void _fmpz_mod_poly_compose_divconquer(fmpz *res, const fmpz *poly1, slong len1, const fmpz *poly2, slong len2, const fmpz_t p)
-
-    Sets ``res`` to the composition of ``(poly1, len1)`` and
-    ``(poly2, len2)`` using a divide and conquer algorithm which
-    takes out factors of ``poly2`` raised to `2^i` where possible.
-
-    Assumes that ``res`` has space for ``(len1-1)*(len2-1) + 1``
-    coefficients, although in `\mathbf{Z}_p[X]` this might not actually
-    be the length of the resulting polynomial when `p` is not a prime.
-
-    Assumes that ``poly1`` and ``poly2`` are non-zero polynomials.
-    Does not support aliasing between any of the inputs and the output.
-
-.. function:: void fmpz_mod_poly_compose_divconquer(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t ctx)
-
-    Sets ``res`` to the composition of ``poly1`` and ``poly2``
-    using a divide and conquer algorithm which takes out factors of
-    ``poly2`` raised to `2^i` where possible.
-
-    To be precise about the order of composition, denoting ``res``,
-    ``poly1``, and ``poly2`` by `f`, `g`, and `h`, respectively,
-    sets `f(t) = g(h(t))`.
-
 .. function:: void _fmpz_mod_poly_compose(fmpz *res, const fmpz *poly1, slong len1, const fmpz *poly2, slong len2, const fmpz_t p)
 
     Sets ``res`` to the composition of ``(poly1, len1)`` and
