@@ -20,7 +20,7 @@ main(void)
     int j, i, result;
     fq_zech_ctx_t ctx;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("sub... ");
     fflush(stdout);
 
@@ -194,7 +194,7 @@ main(void)
 
         }
 
-        fq_zech_ctx_clear(ctx); 
+        fq_zech_ctx_clear(ctx);
    }
 
     FLINT_TEST_CLEANUP(state);

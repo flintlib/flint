@@ -57,7 +57,7 @@ acb_dirichlet_zeta_rs_r(acb_t res, const acb_t s, slong K, slong prec)
                 continue;
 
             /* Asymptotic approximation of the error term */
-            log2err = 2.7889996532222537064 - 0.12022458674074695061 / K + 
+            log2err = 2.7889996532222537064 - 0.12022458674074695061 / K +
                 0.2419040680416126037 * K + 0.7213475204444817037 * K * log(K)
                 + (-0.7213475204444817037 - 0.7213475204444817037 * K) * log(t);
 

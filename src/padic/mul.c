@@ -11,10 +11,10 @@
 
 #include "padic.h"
 
-void padic_mul(padic_t rop, const padic_t op1, const padic_t op2, 
+void padic_mul(padic_t rop, const padic_t op1, const padic_t op2,
                const padic_ctx_t ctx)
 {
-    if (padic_is_zero(op1) || padic_is_zero(op2) || 
+    if (padic_is_zero(op1) || padic_is_zero(op2) ||
         padic_val(op1) + padic_val(op2) >= padic_prec(rop))
     {
         padic_zero(rop);

@@ -143,7 +143,7 @@ _gr_mat_charpoly_danilevsky_inplace(gr_ptr p, gr_mat_t A, gr_ctx_t ctx)
 
             status |= gr_set(h, MAT_ENTRY(n - i, n - i - 1), ctx);
         }
-      
+
         status |= gr_neg(h, h, ctx);
         status |= gr_inv(h, h, ctx);
 
@@ -197,7 +197,7 @@ _gr_mat_charpoly_danilevsky_inplace(gr_ptr p, gr_mat_t A, gr_ctx_t ctx)
             status |= add(MAT_ENTRY(n - i - 1, j - 1), MAT_ENTRY(n - i - 1, j - 1), GR_ENTRY(W, j, sz), ctx);
         }
 
-        status |= mul(MAT_ENTRY(n - i - 1, n - 1), 
+        status |= mul(MAT_ENTRY(n - i - 1, n - 1),
                         MAT_ENTRY(n - i - 1, n - 1), GR_ENTRY(W, n - i - 1, sz), ctx);
 
         /* todo: rewrite as dot */

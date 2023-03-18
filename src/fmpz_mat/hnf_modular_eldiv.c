@@ -44,4 +44,4 @@ fmpz_mat_hnf_modular_eldiv(fmpz_mat_t A, const fmpz_t D)
         }
     }
 }
-    
+

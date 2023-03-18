@@ -144,7 +144,7 @@ int main()
                 status |= gr_set(gr_mat_entry_ptr(A, j + n / 2, k + n / 2, ctx), gr_mat_entry_ptr(A, j, k, ctx), ctx);
             }
         }
-        
+
         status |= gr_mat_set(B, A, ctx);
         status |= gr_mat_minpoly_field(p1, A, ctx);
 
@@ -157,7 +157,7 @@ int main()
             }
 
             status |= gr_mat_minpoly_field(p2, B, ctx);
-            
+
             if (status == GR_SUCCESS && gr_poly_equal(p1, p2, ctx) == T_FALSE)
             {
                 flint_printf("FAIL:\n");

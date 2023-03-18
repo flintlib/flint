@@ -45,7 +45,7 @@ int gr_mat_reduce_row(slong * column, gr_mat_t A, slong * P, slong * L, slong m,
                     status |= gr_mul(h, GR_MAT_ENTRY(A, r, j, sz), GR_MAT_ENTRY(A, m, i, sz), ctx);
                     status |= gr_sub(GR_MAT_ENTRY(A, m, j, sz), GR_MAT_ENTRY(A, m, j, sz), h, ctx);
                 }
- 
+
                 status |= gr_zero(GR_MAT_ENTRY(A, m, i, sz), ctx);
             }
             else

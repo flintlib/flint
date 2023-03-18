@@ -46,7 +46,7 @@ void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
    }
 
    TMP_START;
-   
+
    i = 1;
    num_limbs = _nmod_vec_dot_bound_limbs(n, p->mod);
    nmod_poly_one(p);
@@ -105,14 +105,14 @@ void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
 
          h = A[n - i][n - i - 1];
       }
-      
+
       h = n_invmod(n_negmod(h, p->mod.n), p->mod.n);
-      
+
       for (j = 1; j <= n; j++)
       {
          V[j - 1] = n_mulmod2_preinv(A[n - i][j - 1], h, p->mod.n, p->mod.ninv);
          W[j - 1] = A[n - i][j - 1];
-      } 
+      }
 
       h = n_negmod(h, p->mod.n);
 
@@ -146,7 +146,7 @@ void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
       for (k = 1; k <= n - i; k++)
          T[k - 1] = A[k - 1][j - 1];
 
-      A[n - i - 1][n - 1] = _nmod_vec_dot(T, W, n - i, p->mod, num_limbs);      
+      A[n - i - 1][n - 1] = _nmod_vec_dot(T, W, n - i, p->mod, num_limbs);
 
       i++;
    }
@@ -157,9 +157,9 @@ void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
       nmod_poly_set_coeff_ui(b, i - 1, n_negmod(A[0][n - i], p->mod.n));
    _nmod_poly_set_length(b, n + 1);
    nmod_poly_mul(p, p, b);
- 
+
 cleanup:
-  
+
    nmod_mat_clear(M2);
    nmod_poly_clear(b);
    TMP_END;

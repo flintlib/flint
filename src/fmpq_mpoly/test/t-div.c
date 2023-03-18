@@ -175,7 +175,7 @@ main(void)
 
             if (!fmpq_mpoly_equal(k, h, ctx))
             {
-                printf("FAIL\n");                   
+                printf("FAIL\n");
                 flint_printf("Check output agrees with divrem\n"
                                                    "i = %wd, j = %wd\n", i, j);
                 fflush(stdout);
@@ -382,7 +382,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

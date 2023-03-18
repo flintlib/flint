@@ -36,7 +36,7 @@ main(void)
 {
     slong i, j, result;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("hgcd....");
     fflush(stdout);
@@ -77,8 +77,8 @@ main(void)
         nmod_poly_fit_length(c, a->length);
         nmod_poly_fit_length(d, b->length);
 
-        sgnM = _nmod_poly_hgcd(M, lenM, 
-                        c->coeffs, &(c->length), d->coeffs, &(d->length), 
+        sgnM = _nmod_poly_hgcd(M, lenM,
+                        c->coeffs, &(c->length), d->coeffs, &(d->length),
                         a->coeffs, a->length, b->coeffs, b->length, a->mod);
 
         nmod_poly_fit_length(s, 2 * a->length);
@@ -161,7 +161,7 @@ main(void)
         nmod_poly_init(q, p);
         nmod_poly_init(t, p);
 
-        /* prepare inputs a, b */    
+        /* prepare inputs a, b */
         nmod_poly_randtest_monic(a, state, 1 + n_randint(state, 10));
         nmod_poly_scalar_mul_nmod(a, a, 1 + n_randint(state, p - 1));
         nmod_poly_zero(b);
@@ -231,7 +231,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

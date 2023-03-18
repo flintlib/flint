@@ -137,11 +137,11 @@ main(void)
         fmpq_mpoly_clear(f, ctx);
         fmpq_mpoly_clear(g, ctx);
         fmpq_mpoly_clear(t, ctx);
-        fmpq_mpoly_ctx_clear(ctx);  
+        fmpq_mpoly_ctx_clear(ctx);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -53,7 +53,7 @@ slong _gr_mpoly_sub(
         {
             mpoly_monomial_set(Aexps + k*N, Cexps + j*N, N);
             status |= neg(GR_ENTRY(Acoeffs, k, sz), GR_ENTRY(Ccoeffs, j, sz), fctx);
-            j++;         
+            j++;
             k++;
         }
     }
@@ -124,7 +124,7 @@ int gr_mpoly_sub(
     {
         gr_mpoly_t T;
         gr_mpoly_init3(T, B->length + C->length, Abits, mctx, cctx);
-        status = _gr_mpoly_sub(&T->length, T->coeffs, T->exps, 
+        status = _gr_mpoly_sub(&T->length, T->coeffs, T->exps,
                                         B->coeffs, Bexps, B->length,
                                         C->coeffs, Cexps, C->length,
                                                       N, cmpmask, cctx);
@@ -134,7 +134,7 @@ int gr_mpoly_sub(
     else
     {
         gr_mpoly_fit_length_reset_bits(A, B->length + C->length, Abits, mctx, cctx);
-        status = _gr_mpoly_sub(&A->length, A->coeffs, A->exps, 
+        status = _gr_mpoly_sub(&A->length, A->coeffs, A->exps,
                                         B->coeffs, Bexps, B->length,
                                         C->coeffs, Cexps, C->length,
                                                       N, cmpmask, cctx);

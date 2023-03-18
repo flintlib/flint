@@ -11,9 +11,9 @@
 */
 
 #ifdef T
-	
+
 #include "templates.h"
-	
+
 void
 _TEMPLATE(T, poly_pow_trunc_binexp) (TEMPLATE(T, struct) * res,
                               const TEMPLATE(T, struct) * poly, ulong e,
@@ -26,17 +26,17 @@ _TEMPLATE(T, poly_pow_trunc_binexp) (TEMPLATE(T, struct) * res,
     /*
        Set bits to the bitmask with a 1 one place `lower than the msb of e
      */
-    
+
     while ((bit & e) == UWORD(0))
         bit >>= 1;
-    
+
     bit >>= 1;
-    
+
     /*
-       Trial run without any polynomial arithmetic to determine the parity 
+       Trial run without any polynomial arithmetic to determine the parity
        of the number of swaps;  then set R and S accordingly
      */
-    
+
     {
         unsigned int swaps = 0U;
         ulong bit2 = bit;
@@ -45,7 +45,7 @@ _TEMPLATE(T, poly_pow_trunc_binexp) (TEMPLATE(T, struct) * res,
         while (bit2 >>= 1)
             if ((bit2 & e) == UWORD(0))
                 swaps = ~swaps;
-        
+
         if (swaps == 0U)
         {
             R = res;
@@ -57,11 +57,11 @@ _TEMPLATE(T, poly_pow_trunc_binexp) (TEMPLATE(T, struct) * res,
             S = res;
         }
     }
-    
+
     /*
        We unroll the first step of the loop, referring to {poly, len}
      */
-    
+
     _TEMPLATE(T, poly_mullow) (R, poly, trunc, poly, trunc, trunc, ctx);
     if ((bit & e))
     {
@@ -70,7 +70,7 @@ _TEMPLATE(T, poly_pow_trunc_binexp) (TEMPLATE(T, struct) * res,
         R = S;
         S = T;
     }
-    
+
     while ((bit >>= 1))
     {
         if ((bit & e))
@@ -86,12 +86,12 @@ _TEMPLATE(T, poly_pow_trunc_binexp) (TEMPLATE(T, struct) * res,
             S = T;
         }
     }
-    
+
     _TEMPLATE(T, vec_clear) (v, trunc, ctx);
 }
 
 void
-TEMPLATE(T, poly_pow_trunc_binexp) (TEMPLATE(T, poly_t) res, 
+TEMPLATE(T, poly_pow_trunc_binexp) (TEMPLATE(T, poly_t) res,
                                const TEMPLATE(T, poly_t) poly, ulong e,
                                      slong trunc, const TEMPLATE(T, ctx_t) ctx)
 {

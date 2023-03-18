@@ -13,17 +13,17 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-fmpz ** 
+fmpz **
 _fmpz_poly_powers_precompute(const fmpz * B, slong len)
 {
    slong i;
    fmpz ** powers = flint_malloc(sizeof(fmpz *)*(2*len - 1));
    fmpz_poly_t pow, p;
-       
+
    fmpz_poly_init2(pow, len);
    fmpz_poly_one(pow);
    fmpz_poly_init2(p, len - 1);
-      
+
    for (i = 0; i < 2*len - 1; i++)
    {
       powers[i] = _fmpz_vec_init(len - 1);
@@ -48,7 +48,7 @@ _fmpz_poly_powers_precompute(const fmpz * B, slong len)
    return powers;
 }
 
-void fmpz_poly_powers_precompute(fmpz_poly_powers_precomp_t pinv, 
+void fmpz_poly_powers_precompute(fmpz_poly_powers_precomp_t pinv,
                                                           fmpz_poly_t poly)
 {
     if (poly->length == 0)

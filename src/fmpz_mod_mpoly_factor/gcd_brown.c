@@ -621,7 +621,7 @@ choose_prime:
     goto choose_prime;
 
 successful_fix_lc:
-    
+
     fmpz_set(temp, fmpz_mod_poly_lead(G->coeffs + 0, ctx->ffinfo));
     if (fmpz_is_one(temp))
         goto successful_put_content;

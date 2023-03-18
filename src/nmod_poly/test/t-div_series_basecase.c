@@ -18,7 +18,7 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("div_series_basecase....");
     fflush(stdout);
@@ -37,7 +37,7 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
-        
+
         nmod_poly_randtest(a, state, n_randint(state, 2000));
         do nmod_poly_randtest(b, state, n_randint(state, 2000));
         while (b->length == 0 || b->coeffs[0] == 0);
@@ -60,7 +60,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         nmod_poly_clear(q);
         nmod_poly_clear(a);
         nmod_poly_clear(b);
@@ -89,7 +89,7 @@ main(void)
 
         nmod_poly_div_series_basecase(q, a, b, m);
         nmod_poly_div_series_basecase(a, a, b, m);
-        
+
         result = (nmod_poly_equal(q, a));
         if (!result)
         {
@@ -129,7 +129,7 @@ main(void)
 
         nmod_poly_div_series_basecase(q, a, b, m);
         nmod_poly_div_series_basecase(b, a, b, m);
-        
+
         result = (nmod_poly_equal(q, b));
         if (!result)
         {
@@ -148,7 +148,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

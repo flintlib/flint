@@ -34,7 +34,7 @@ get_timings(double* s, slong degree, flint_bitcnt_t bits, slong length)
     slong i, l;
     int n, c, reps = 0;
     FLINT_TEST_INIT(state);
-    
+
     fmpz_init(p);
     fmpz_init(q);
 
@@ -49,7 +49,7 @@ get_timings(double* s, slong degree, flint_bitcnt_t bits, slong length)
     }
 
     flint_printf("Trying %d %d %d\n", degree, bits, length);
-    
+
     for (c = 0; c < nalgs; c++)
         s[c] = 0.0;
 
@@ -70,7 +70,7 @@ get_timings(double* s, slong degree, flint_bitcnt_t bits, slong length)
         fmpz_set_ui(p, n_randprime(state, bits, 1));
         fmpz_pow_ui(q, p, degree);
 #endif
-        
+
         TEMPLATE(T, ctx_init)(ctx, p, degree, "a");
         TEMPLATE(T, poly_init)(f, ctx);
         TEMPLATE(T, poly_init)(finv, ctx);
@@ -83,10 +83,10 @@ get_timings(double* s, slong degree, flint_bitcnt_t bits, slong length)
             flint_printf("Order too big for zech representation: ");
             fmpz_print(q);
             flint_printf("\n");
-            flint_abort();            
+            flint_abort();
         }
-#endif        
-        
+#endif
+
         for (i = 0; i < l + 1; i++)
             TEMPLATE(T, poly_init)(h[i], ctx);
 
@@ -98,7 +98,7 @@ get_timings(double* s, slong degree, flint_bitcnt_t bits, slong length)
             TEMPLATE(T, poly_reverse)(finv, f, f->length, ctx);
             TEMPLATE(T, poly_inv_series_newton)(finv, finv, f->length, ctx);
         }
-                
+
     loop:
 
         t[0] = 0.0;
@@ -118,7 +118,7 @@ get_timings(double* s, slong degree, flint_bitcnt_t bits, slong length)
         prof_stop();
         t[0] += get_clock(0);
 
-        
+
         t[1] = 0.0;
         init_clock(0);
         prof_start();
@@ -138,7 +138,7 @@ get_timings(double* s, slong degree, flint_bitcnt_t bits, slong length)
                 loops *= 2;
                 goto loop;
             }
-                
+
         for (c = 0; c < nalgs; c++)
             s[c] += t[c];
         reps += loops;
@@ -163,7 +163,7 @@ get_timings(double* s, slong degree, flint_bitcnt_t bits, slong length)
     flint_free(h);
 
     FLINT_TEST_CLEANUP(state);
-    
+
     return s[0] > s[1];
 }
 
@@ -176,7 +176,7 @@ a(fmpz_mat_t array, slong i, slong j)
 int
 file_exists(char *filename)
 {
-  struct stat buffer;   
+  struct stat buffer;
   return (stat (filename, &buffer) == 0);
 }
 
@@ -187,7 +187,7 @@ init_array(fmpz_mat_t array, slong max_degree, slong max_bits, slong max_length,
     fmpz_mat_t old_array;
     slong i, j;
     FILE * old_file;
-    
+
     if( file_exists(filename) )
     {
         flint_printf(filename);
@@ -213,7 +213,7 @@ init_array(fmpz_mat_t array, slong max_degree, slong max_bits, slong max_length,
             {
                 fmpz_set(fmpz_mat_entry(array, i, j),
                          fmpz_mat_entry(old_array, i, j));
-                         
+
             }
         }
         fmpz_mat_clear(old_array);
@@ -276,7 +276,7 @@ main(int argc, char** argv)
                 continue;
             }
 #endif
-            
+
             /* Set the initial state */
             if (bits == 2 || bits == 3)
             {
@@ -350,7 +350,7 @@ main(int argc, char** argv)
             }
 
             flint_printf("Min - Max: %d - %d\n", imin, imax);
-            
+
             while (imin < imax)
             {
                 imid = imin + ((imax - imin) / 2);
@@ -359,7 +359,7 @@ main(int argc, char** argv)
                     flint_printf("Error in computing midpoint\n");
                     flint_abort();
                 }
-                
+
                 is_hit = get_timings(s, degree, bits, imid);
 
                 if (is_hit)

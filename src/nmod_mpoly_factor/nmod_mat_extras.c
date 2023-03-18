@@ -17,7 +17,7 @@ int nmod_mat_is_reduced(const nmod_mat_t N)
     slong i, j, k = 0;
     slong r = nmod_mat_ncols(N);
     slong d = nmod_mat_nrows(N);
-    
+
     for (i = 0; i < d; i++)
     for (j = 0; j < r; j++)
     {
@@ -27,7 +27,7 @@ int nmod_mat_is_reduced(const nmod_mat_t N)
                 k++;
             else
                 return 0;
-        }   
+        }
     }
     return k == r;
 }

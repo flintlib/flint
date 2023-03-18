@@ -87,7 +87,7 @@ main(void)
 
         fmpz_mod_poly_add_series(c, a, b, n, ctx);
         fmpz_mod_poly_add_series(b, a, b, n, ctx);
-    
+
         result = (fmpz_mod_poly_equal(b, c, ctx));
         if (!result)
         {
@@ -128,7 +128,7 @@ main(void)
         fmpz_mod_poly_add(c, a, b, ctx);
         fmpz_mod_poly_truncate(c, n, ctx);
         fmpz_mod_poly_add_series(d, a, b, n, ctx);
-    
+
         result = (fmpz_mod_poly_equal(d, c, ctx));
         if (!result)
         {
@@ -150,7 +150,7 @@ main(void)
 
     fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -380,7 +380,7 @@ acb_modular_theta_sum(acb_ptr theta1,
         acb_add(theta2 + r, theta2 + r, (r % 2 == 0) ? tmp1 : tmp2, prec);
     }
 
-    /* 
+    /*
     Coefficient r in the z-expansion gains a factor: pi^r / r!
     times a sign:
 

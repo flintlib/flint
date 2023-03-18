@@ -19,7 +19,7 @@ int
 main(void)
 {
     int i;
-    
+
     FLINT_TEST_INIT(state);
 
     flint_printf("composition_matrix... ");
@@ -56,7 +56,7 @@ main(void)
 
         TEMPLATE(T, randtest)(a, state, ctx);
         TEMPLATE(T, embed_composition_matrix)(mat_a, a, ctx);
-        
+
         TEMPLATE(B, mat_mul)(res, mat_frob, mat_a);
 
         TEMPLATE(T, pow)(a, a, TEMPLATE(T, ctx_prime)(ctx), ctx);
@@ -71,7 +71,7 @@ main(void)
                 TEMPLATE(B, mat_print_pretty)(mat_a), flint_printf("\n"),
                 TEMPLATE(B, mat_print_pretty)(mat_aq), flint_printf("\n"),
                 TEMPLATE(B, mat_print_pretty)(res), flint_printf("\n");
-            
+
             fflush(stdout);
             flint_abort();
         }

@@ -23,14 +23,14 @@
 */
 void
 _fmpz_mod_poly_powers_mod_preinv_naive(fmpz ** res, const fmpz * f,
-                          slong flen, slong n, const fmpz * g, slong glen, 
+                          slong flen, slong n, const fmpz * g, slong glen,
                               const fmpz * ginv, slong ginvlen, const fmpz_t p)
 {
     slong i;
-    
+
     if (n == 0)
         return;
-        
+
     /* f^0 = 1 */
     if (glen > 1)
         fmpz_set_ui(res[0] + 0, 1);
@@ -40,7 +40,7 @@ _fmpz_mod_poly_powers_mod_preinv_naive(fmpz ** res, const fmpz * f,
         for (i = 1; i < glen - 1; i++)
            fmpz_zero(res[0] + i);
     }
-    
+
     if (n == 1)
        return;
 
@@ -51,7 +51,7 @@ _fmpz_mod_poly_powers_mod_preinv_naive(fmpz ** res, const fmpz * f,
 
     if (n == 2)
        return;
-   
+
     /* f^i = f^(i - 1)*f */
     if (glen == 2) /* special case, constant polys */
     {
@@ -77,7 +77,7 @@ fmpz_mod_poly_powers_mod_naive(fmpz_mod_poly_struct * res,
 
     fmpz_mod_poly_t ginv;
     fmpz ** res_arr;
-    
+
     if (fmpz_mod_poly_length(g, ctx) == 0)
     {
         flint_printf("Exception (fmpz_mod_poly_powers_mod_naive). Divide by zero.\n");
@@ -130,7 +130,7 @@ fmpz_mod_poly_powers_mod_naive(fmpz_mod_poly_struct * res,
 
     for (i = 0; i < n; i++)
        _fmpz_mod_poly_normalise(res + i);
-    
+
     fmpz_mod_poly_clear(ginv, ctx);
     flint_free(res_arr);
 }

@@ -29,7 +29,7 @@ int main(void)
         if (t != n_euler_phi(n))
         {
             flint_printf("FAIL:\n");
-            flint_printf("phi(%d) = %d, got %wu\n", n, t, n_euler_phi(n)); 
+            flint_printf("phi(%d) = %d, got %wu\n", n, t, n_euler_phi(n));
             fflush(stdout);
             flint_abort();
         }

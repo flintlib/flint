@@ -13,8 +13,8 @@
 
 #include "nmod_poly.h"
 
-int _nmod_poly_invmod(mp_limb_t *A, 
-                      const mp_limb_t *B, slong lenB, 
+int _nmod_poly_invmod(mp_limb_t *A,
+                      const mp_limb_t *B, slong lenB,
                       const mp_limb_t *P, slong lenP, const nmod_t mod)
 {
     mp_limb_t *G;
@@ -39,7 +39,7 @@ int _nmod_poly_invmod(mp_limb_t *A,
     return (lenG == 1);
 }
 
-int nmod_poly_invmod(nmod_poly_t A, 
+int nmod_poly_invmod(nmod_poly_t A,
                      const nmod_poly_t B, const nmod_poly_t P)
 {
     const slong lenB = B->length, lenP = P->length;

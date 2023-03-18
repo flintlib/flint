@@ -21,7 +21,7 @@ int main(void)
     mp_ptr dinv;
     mp_size_t size, size2;
     flint_bitcnt_t norm;
-    
+
     FLINT_TEST_INIT(state);
 
     flint_printf("divrem_preinvn....");
@@ -34,19 +34,19 @@ int main(void)
     /* don't init r2, q2 */
 
     gmp_randinit_default(st);
-    
+
 
     /* test flint_mpn_divrem_preinvn alias r and a */
     for (i = 0; i < 10000; i++)
     {
        size = n_randint(state, 200) + 1;
        size2 = n_randint(state, 200) + size;
-       
+
        mpz_rrandomb(a, st, size2*FLINT_BITS);
        do {
           mpz_rrandomb(d, st, size*FLINT_BITS);
        } while (mpz_sgn(d) == 0);
-       
+
        /* normalise */
        count_leading_zeros(norm, d->_mp_d[d->_mp_size - 1]);
        mpz_mul_2exp(d, d, norm);
@@ -54,25 +54,25 @@ int main(void)
        size2 = a->_mp_size;
 
        /* allocate space */
-       q2->_mp_size = size2 - size + 1;  
+       q2->_mp_size = size2 - size + 1;
        q2->_mp_d = flint_malloc(q2->_mp_size*sizeof(mp_limb_t));
-       
+
        /* reduce a mod d */
        mpz_fdiv_qr(q1, r1, a, d);
-       
+
        dinv = flint_malloc(size*sizeof(mp_limb_t));
        flint_mpn_preinvn(dinv, d->_mp_d, size);
 
-       q2->_mp_d[q2->_mp_size - 1] = flint_mpn_divrem_preinvn(q2->_mp_d, a->_mp_d, a->_mp_d, size2, d->_mp_d, size, dinv); 
+       q2->_mp_d[q2->_mp_size - 1] = flint_mpn_divrem_preinvn(q2->_mp_d, a->_mp_d, a->_mp_d, size2, d->_mp_d, size, dinv);
 
        /* normalise */
        while (size && a->_mp_d[size - 1] == 0) size--;
        a->_mp_size = size;
-       
+
        size2 = q2->_mp_size;
        while (size2 && q2->_mp_d[size2 - 1] == 0) size2--;
        q2->_mp_size = size2;
-       
+
        result = (mpz_cmp(r1, a) == 0 && mpz_cmp(q1, q2) == 0);
        if (!result)
        {
@@ -97,12 +97,12 @@ int main(void)
     {
        size = n_randint(state, 200) + 1;
        size2 = n_randint(state, 200) + size;
-       
+
        mpz_rrandomb(a, st, size2*FLINT_BITS);
        do {
           mpz_rrandomb(d, st, size*FLINT_BITS);
        } while (mpz_sgn(d) == 0);
-       
+
        /* normalise */
        count_leading_zeros(norm, d->_mp_d[d->_mp_size - 1]);
        mpz_mul_2exp(d, d, norm);
@@ -110,28 +110,28 @@ int main(void)
        size2 = a->_mp_size;
 
        /* allocate space */
-       q2->_mp_size = size2 - size + 1;  
+       q2->_mp_size = size2 - size + 1;
        q2->_mp_d = flint_malloc(q2->_mp_size*sizeof(mp_limb_t));
-       
-       r2->_mp_size = size2;  
+
+       r2->_mp_size = size2;
        r2->_mp_d = flint_malloc(r2->_mp_size*sizeof(mp_limb_t));
-       
+
        /* reduce a mod d */
        mpz_fdiv_qr(q1, r1, a, d);
-       
+
        dinv = flint_malloc(size*sizeof(mp_limb_t));
        flint_mpn_preinvn(dinv, d->_mp_d, size);
 
-       q2->_mp_d[q2->_mp_size - 1] = flint_mpn_divrem_preinvn(q2->_mp_d, r2->_mp_d, a->_mp_d, size2, d->_mp_d, size, dinv); 
+       q2->_mp_d[q2->_mp_size - 1] = flint_mpn_divrem_preinvn(q2->_mp_d, r2->_mp_d, a->_mp_d, size2, d->_mp_d, size, dinv);
 
        /* normalise */
        while (size && r2->_mp_d[size - 1] == 0) size--;
        r2->_mp_size = size;
-       
+
        size2 = q2->_mp_size;
        while (size2 && q2->_mp_d[size2 - 1] == 0) size2--;
        q2->_mp_size = size2;
-       
+
        result = (mpz_cmp(r1, r2) == 0 && mpz_cmp(q1, q2) == 0);
        if (!result)
        {
@@ -161,7 +161,7 @@ int main(void)
 
     gmp_randclear(st);
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -137,7 +137,7 @@ int fq_zech_mpoly_pfrac_init(
                 fq_zech_mpoly_to_mpolyv(I->prod_mbetas_coeffs + i*r + j,
                                  I->prod_mbetas + i*r + j, I->xalpha + i, ctx);
             }
-        }        
+        }
     }
 
     for (j = 0; j < r; j++)

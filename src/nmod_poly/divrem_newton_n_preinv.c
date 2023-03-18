@@ -88,7 +88,7 @@ void nmod_poly_divrem_newton_n_preinv(nmod_poly_t Q, nmod_poly_t R,
         nmod_poly_fit_length(Q, lenA - lenB + 1);
         q = Q->coeffs;
     }
-    
+
     if (R == A || R == B || R == Binv)
     {
         r = _nmod_vec_init(lenB - 1);
@@ -108,14 +108,14 @@ void nmod_poly_divrem_newton_n_preinv(nmod_poly_t Q, nmod_poly_t R,
         Q->coeffs = q;
         Q->alloc  = lenA - lenB + 1;
     }
-    
+
     if (R == A || R == B || R == Binv)
     {
         _nmod_vec_clear(R->coeffs);
         R->coeffs = r;
         R->alloc  = lenB - 1;
     }
-    
+
     Q->length = lenA - lenB + 1;
     R->length = lenB - 1;
 

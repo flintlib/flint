@@ -11,7 +11,7 @@
 
 #include "fmpz_poly_q.h"
 
-void fmpz_poly_q_scalar_mul_mpz(fmpz_poly_q_t rop, 
+void fmpz_poly_q_scalar_mul_mpz(fmpz_poly_q_t rop,
                                 const fmpz_poly_q_t op, const mpz_t x)
 {
     fmpz_t y;

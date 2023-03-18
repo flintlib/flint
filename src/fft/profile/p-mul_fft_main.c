@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2009, 2011 William Hart
 
     This file is part of FLINT.

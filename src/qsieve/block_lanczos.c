@@ -1,5 +1,5 @@
 /*
-    Copyright 2006 Jason Papadopoulos.    
+    Copyright 2006 Jason Papadopoulos.
     Copyright 2006, 2011 William Hart.
 
     This file is part of FLINT.
@@ -14,8 +14,8 @@
 
 Optionally, please be nice and tell me if you find this source to be
 useful. Again optionally, if you add to the functionality present here
-please consider making those additions public too, so that others may 
-benefit from your work.	
+please consider making those additions public too, so that others may
+benefit from your work.
        				   --jasonp@boo.net 9/8/06
 
 --------------------------------------------------------------------*/
@@ -46,11 +46,11 @@ static const uint64_t bitmask[64] = {
 
 /*--------------------------------------------------------------------*/
 uint64_t get_null_entry(uint64_t * nullrows, slong i, slong l) {
-   
+
    /* Returns true if the entry with indices i,l is 1 in the
       supplied 64xN matrix. This is used to read the nullspace
       vectors which are output by the Lanczos routine */
-      
+
     return nullrows[i]&bitmask[l];
 }
 
@@ -64,11 +64,11 @@ void reduce_matrix(qs_t qs_inf, slong *nrows, slong *ncols, la_col_t *cols) {
 	   columns than rows. Because deleting a column reduces
 	   the counts in several different rows, the process
 	   must iterate to convergence.
-	   
+
 	   Note that this step is not intended to make the Lanczos
 	   iteration run any faster (though it will); it's just
-	   that if we don't go to this trouble then there are 
-	   factorizations for which the matrix step will fail 
+	   that if we don't go to this trouble then there are
+	   factorizations for which the matrix step will fail
 	   outright  */
 
 	slong r, c, i, j, k;
@@ -105,7 +105,7 @@ void reduce_matrix(qs_t qs_inf, slong *nrows, slong *ncols, la_col_t *cols) {
 					if (counts[col->data[k]] < 2)
 						break;
 				}
-	
+
 				if (k < col->weight) {
 					for (k = 0; k < col->weight; k++) {
 						counts[col->data[k]]--;
@@ -120,7 +120,7 @@ void reduce_matrix(qs_t qs_inf, slong *nrows, slong *ncols, la_col_t *cols) {
 			}
 			reduced_cols = j;
 		} while (c != reduced_cols);
-	
+
 		/* count the number of rows that contain a
 		   nonzero entry */
 
@@ -161,7 +161,7 @@ void reduce_matrix(qs_t qs_inf, slong *nrows, slong *ncols, la_col_t *cols) {
 	} while (r != reduced_rows);
 
 #if QS_DEBUG
-	flint_printf("reduce to %wd x %wd in %wd passes\n", 
+	flint_printf("reduce to %wd x %wd in %wd passes\n",
 			reduced_rows, reduced_cols, passes);
 #endif
 
@@ -174,13 +174,13 @@ void reduce_matrix(qs_t qs_inf, slong *nrows, slong *ncols, la_col_t *cols) {
         for (i = 0; i < reduced_cols; i++)
         {
            la_col_t *col = cols + i;
-				
+
            for (j = 0; j < col->weight; j++)
               col->data[j] = counts[col->data[j]];
         }
 
 	flint_free(counts);
-    
+
 	*ncols = reduced_cols;
         *nrows = reduced_rows;
 }
@@ -225,7 +225,7 @@ static void precompute_Nx64_64x64(uint64_t *x, uint64_t *c) {
 
 	   	( i << (8*j) ) * x[][]
 
-	   where the quantity in parentheses is considered a 
+	   where the quantity in parentheses is considered a
 	   1 x 64 vector of elements in GF(2). The resulting
 	   table can dramatically speed up matrix multiplies
 	   by x[][]. */
@@ -254,13 +254,13 @@ static void precompute_Nx64_64x64(uint64_t *x, uint64_t *c) {
 }
 
 /*-------------------------------------------------------------------*/
-static void mul_Nx64_64x64_acc(uint64_t *v, uint64_t *x, uint64_t *c, 
+static void mul_Nx64_64x64_acc(uint64_t *v, uint64_t *x, uint64_t *c,
 				uint64_t *y, slong n) {
 
-	/* let v[][] be a n x 64 matrix with elements in GF(2), 
+	/* let v[][] be a n x 64 matrix with elements in GF(2),
 	   represented as an array of n 64-bit words. Let c[][]
 	   be an 8 x 256 scratch matrix of 64-bit words.
-	   This code multiplies v[][] by the 64x64 matrix 
+	   This code multiplies v[][] by the 64x64 matrix
 	   x[][], then XORs the n x 64 result into y[][] */
 
     slong i;
@@ -336,15 +336,15 @@ static void mul_64xN_Nx64(uint64_t *x, uint64_t *y,
 }
 
 /*-------------------------------------------------------------------*/
-static slong find_nonsingular_sub(uint64_t *t, slong *s, 
-				slong *last_s, slong last_dim, 
+static slong find_nonsingular_sub(uint64_t *t, slong *s,
+				slong *last_s, slong last_dim,
 				uint64_t *w) {
 
 	/* given a 64x64 matrix t[][] (i.e. sixty-four
-	   64-bit words) and a list of 'last_dim' column 
-	   indices enumerated in last_s[]: 
-	   
-	     - find a submatrix of t that is invertible 
+	   64-bit words) and a list of 'last_dim' column
+	   indices enumerated in last_s[]:
+
+	     - find a submatrix of t that is invertible
 	     - invert it and copy to w[][]
 	     - enumerate in s[] the columns represented in w[][] */
 
@@ -358,7 +358,7 @@ static slong find_nonsingular_sub(uint64_t *t, slong *s,
 	/* M = [t | I] for I the 64x64 identity matrix */
 
 	for (i = 0; i < 64; i++) {
-		M[i][0] = t[i]; 
+		M[i][0] = t[i];
 		M[i][1] = bitmask[i];
 	}
 
@@ -379,7 +379,7 @@ static slong find_nonsingular_sub(uint64_t *t, slong *s,
 	/* compute the inverse of t[][] */
 
 	for (i = dim = 0; i < 64; i++) {
-	
+
 		/* find the next pivot row and put in row i */
 
 		mask = bitmask[cols[i]];
@@ -392,12 +392,12 @@ static slong find_nonsingular_sub(uint64_t *t, slong *s,
 				m1 = row_j[1];
 				row_j[0] = row_i[0];
 				row_j[1] = row_i[1];
-				row_i[0] = m0; 
+				row_i[0] = m0;
 				row_i[1] = m1;
 				break;
 			}
 		}
-				
+
 		/* if a pivot row was found, eliminate the pivot
 		   column from all other rows */
 
@@ -410,7 +410,7 @@ static slong find_nonsingular_sub(uint64_t *t, slong *s,
 				}
 			}
 
-			/* add the pivot column to the list of 
+			/* add the pivot column to the list of
 			   accepted columns */
 
 			s[dim++] = cols[i];
@@ -427,12 +427,12 @@ static slong find_nonsingular_sub(uint64_t *t, slong *s,
 				m1 = row_j[1];
 				row_j[0] = row_i[0];
 				row_j[1] = row_i[1];
-				row_i[0] = m0; 
+				row_i[0] = m0;
 				row_i[1] = m1;
 				break;
 			}
 		}
-				
+
 		if (j == 64) {
 #if QS_DEBUG
 			flint_printf("lanczos error: submatrix "
@@ -440,7 +440,7 @@ static slong find_nonsingular_sub(uint64_t *t, slong *s,
 #endif
 			return 0;
 		}
-			
+
 		/* eliminate the pivot column from the other rows
 		   of the inverse */
 
@@ -458,12 +458,12 @@ static slong find_nonsingular_sub(uint64_t *t, slong *s,
 	}
 
 	/* the right-hand half of M[] is the desired inverse */
-	
-	for (i = 0; i < 64; i++) 
+
+	for (i = 0; i < 64; i++)
 		w[i] = M[i][1];
 
 	/* The block Lanczos recurrence depends on all columns
-	   of t[][] appearing in s[] and/or last_s[]. 
+	   of t[][] appearing in s[] and/or last_s[].
 	   Verify that condition here */
 
 	mask = 0;
@@ -495,7 +495,7 @@ void mul_MxN_Nx64(slong vsize, slong dense_rows,
 	slong i, j;
 
 	memset(b, 0, vsize * sizeof(uint64_t));
-	
+
 	for (i = 0; i < ncols; i++) {
 		la_col_t *col = A + i;
 		slong *row_entries = col->data;
@@ -511,9 +511,9 @@ void mul_MxN_Nx64(slong vsize, slong dense_rows,
 			la_col_t *col = A + i;
 			slong *row_entries = col->data + col->weight;
 			uint64_t tmp = x[i];
-	
+
 			for (j = 0; j < dense_rows; j++) {
-				if (row_entries[j / 32] & 
+				if (row_entries[j / 32] &
 						((slong)1 << (j % 32))) {
 					b[j] ^= tmp;
 				}
@@ -548,7 +548,7 @@ void mul_trans_MxN_Nx64(slong dense_rows, slong ncols,
 			la_col_t *col = A + i;
 			slong *row_entries = col->data + col->weight;
 			uint64_t accum = b[i];
-	
+
 			for (j = 0; j < dense_rows; j++) {
 				if (row_entries[j / 32] &
 						((slong)1 << (j % 32))) {
@@ -586,24 +586,24 @@ static void transpose_vector(slong ncols, uint64_t *v, uint64_t **trans) {
 }
 
 /*-----------------------------------------------------------------------*/
-void combine_cols(slong ncols, 
-		uint64_t *x, uint64_t *v, 
+void combine_cols(slong ncols,
+		uint64_t *x, uint64_t *v,
 		uint64_t *ax, uint64_t *av) {
 
-	/* Once the block Lanczos iteration has finished, 
+	/* Once the block Lanczos iteration has finished,
 	   x[] and v[] will contain mostly nullspace vectors
 	   between them, as well as possibly some columns
 	   that are linear combinations of nullspace vectors.
 	   Given vectors ax[] and av[] that are the result of
-	   multiplying x[] and v[] by the matrix, this routine 
-	   will use Gauss elimination on the columns of [ax | av] 
+	   multiplying x[] and v[] by the matrix, this routine
+	   will use Gauss elimination on the columns of [ax | av]
 	   to find all of the linearly dependent columns. The
 	   column operations needed to accomplish this are mir-
 	   rored in [x | v] and the columns that are independent
 	   are skipped. Finally, the dependent columns are copied
 	   back into x[] and represent the nullspace vector output
 	   of the block Lanczos code.
-	   
+
 	   v[] and av[] can be NULL, in which case the elimination
 	   process assumes 64 dependencies instead of 128 */
 
@@ -618,13 +618,13 @@ void combine_cols(slong ncols,
 	col_words = (ncols + 63) / 64;
 
 	for (i = 0; i < num_deps; i++) {
-		matrix[i] = (uint64_t *)flint_calloc((size_t)col_words, 
+		matrix[i] = (uint64_t *)flint_calloc((size_t)col_words,
 					     sizeof(uint64_t));
-		amatrix[i] = (uint64_t *)flint_calloc((size_t)col_words, 
+		amatrix[i] = (uint64_t *)flint_calloc((size_t)col_words,
 					      sizeof(uint64_t));
 	}
 
-	/* operations on columns can more conveniently become 
+	/* operations on columns can more conveniently become
 	   operations on rows if all the vectors are first
 	   transposed */
 
@@ -703,9 +703,9 @@ void combine_cols(slong ncols,
 }
 
 /*-----------------------------------------------------------------------*/
-uint64_t * block_lanczos(flint_rand_t state, slong nrows, 
+uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 			slong dense_rows, slong ncols, la_col_t *B) {
-	
+
 	/* Solve Bx = 0 for some nonzero x; the computed
 	   solution, containing up to 64 of these nullspace
 	   vectors, is returned */
@@ -758,7 +758,7 @@ uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 	   quantities, which start off empty (except for
 	   the past version of s[], which contains all
 	   the column indices */
-	   
+
 	memset(v[1], 0, vsize * sizeof(uint64_t));
 	memset(v[2], 0, vsize * sizeof(uint64_t));
 	for (i = 0; i < 64; i++) {
@@ -795,7 +795,7 @@ uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 		iter++;
 
 		/* multiply the current v[0] by a symmetrized
-		   version of B, or B'B (apostrophe means 
+		   version of B, or B'B (apostrophe means
 		   transpose). Use "A" to refer to B'B  */
 
 		mul_MxN_Nx64(vsize, dense_rows, ncols, B, v[0], scratch);
@@ -821,7 +821,7 @@ uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 		   of v0'*A*v0, invert it, and list the column
 		   indices present in the submatrix */
 
-		dim0 = find_nonsingular_sub(vt_a_v[0], s[0], 
+		dim0 = find_nonsingular_sub(vt_a_v[0], s[0],
 					    s[1], dim1, winv[0]);
 		if (dim0 == 0)
 			break;
@@ -861,7 +861,7 @@ uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 		mul_64x64_64x64(winv[2], f, f);
 
 		for (i = 0; i < 64; i++)
-			f2[i] = ((vt_a2_v[1][i] & mask1) ^ 
+			f2[i] = ((vt_a2_v[1][i] & mask1) ^
 				   vt_a_v[1][i]) & mask0;
 
 		mul_64x64_64x64(f, f2, f);
@@ -874,7 +874,7 @@ uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 		mul_Nx64_64x64_acc(v[0], d, scratch, vnext, n);
 		mul_Nx64_64x64_acc(v[1], e, scratch, vnext, n);
 		mul_Nx64_64x64_acc(v[2], f, scratch, vnext, n);
-		
+
 		/* update the computed solution 'x' */
 
 		mul_64xN_Nx64(v[0], v0, scratch, d, n);
@@ -883,19 +883,19 @@ uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 
 		/* rotate all the variables */
 
-		tmp = v[2]; 
-		v[2] = v[1]; 
-		v[1] = v[0]; 
-		v[0] = vnext; 
+		tmp = v[2];
+		v[2] = v[1];
+		v[1] = v[0];
+		v[0] = vnext;
 		vnext = tmp;
-		
-		tmp = winv[2]; 
-		winv[2] = winv[1]; 
-		winv[1] = winv[0]; 
+
+		tmp = winv[2];
+		winv[2] = winv[1];
+		winv[1] = winv[0];
 		winv[0] = tmp;
-		
+
 		tmp = vt_a_v[1]; vt_a_v[1] = vt_a_v[0]; vt_a_v[0] = tmp;
-		
+
 		tmp = vt_a2_v[1]; vt_a2_v[1] = vt_a2_v[0]; vt_a2_v[0] = tmp;
 
 		memcpy(s[1], s[0], 64 * sizeof(slong));
@@ -949,7 +949,7 @@ uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 	/* verify that these really are linear dependencies of B */
 
 	mul_MxN_Nx64(vsize, dense_rows, ncols, B, x, v[0]);
-	
+
 	for (i = 0; i < ncols; i++) {
 		if (v[0][i] != 0)
 			break;
@@ -958,7 +958,7 @@ uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 		flint_printf("lanczos error: dependencies don't work %wd\n",i);
 		flint_abort();
 	}
-	
+
 	flint_free(v[0]);
 	flint_free(v[1]);
 	flint_free(v[2]);

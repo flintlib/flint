@@ -39,7 +39,7 @@ int TEMPLATE(T, is_square)(const TEMPLATE(T, t) op,
 
     fmpz_clear(ord);
     TEMPLATE(T, clear)(pow, ctx);
-    
+
     return is_square;
 }
 

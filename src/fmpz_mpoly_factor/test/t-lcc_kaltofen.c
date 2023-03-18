@@ -277,7 +277,7 @@ main(void)
                 {
                     flint_printf("FAIL:\nbad divisor\n");
                     fflush(stdout);
-                    flint_abort();                    
+                    flint_abort();
                 }
             }
         }
@@ -311,7 +311,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

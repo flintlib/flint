@@ -16,7 +16,7 @@
 
 
 void
-_fmpz_poly_compose_series_horner(fmpz * res, const fmpz * poly1, slong len1, 
+_fmpz_poly_compose_series_horner(fmpz * res, const fmpz * poly1, slong len1,
                                       const fmpz * poly2, slong len2, slong n)
 {
     if (n == 1)
@@ -57,7 +57,7 @@ _fmpz_poly_compose_series_horner(fmpz * res, const fmpz * poly1, slong len1,
 }
 
 void
-fmpz_poly_compose_series_horner(fmpz_poly_t res, 
+fmpz_poly_compose_series_horner(fmpz_poly_t res,
                     const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)
 {
     slong len1 = poly1->length;
@@ -90,7 +90,7 @@ fmpz_poly_compose_series_horner(fmpz_poly_t res,
     if ((res != poly1) && (res != poly2))
     {
         fmpz_poly_fit_length(res, lenr);
-        _fmpz_poly_compose_series_horner(res->coeffs, poly1->coeffs, len1, 
+        _fmpz_poly_compose_series_horner(res->coeffs, poly1->coeffs, len1,
                                                poly2->coeffs, len2, lenr);
         _fmpz_poly_set_length(res, lenr);
         _fmpz_poly_normalise(res);

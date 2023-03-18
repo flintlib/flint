@@ -15,18 +15,18 @@
 /*
     Let i be such that 2^{i} < len1 <= 2^{i+1}.
 
-    Note that the jth step of the recursion requires temporary space 
-    of size no more than (len2 - 1)(2^j - 1) + 1.  Note the smallest 
-    step j=0 doesn't require any temporary space and the largest step 
-    has j = i, and hence the sum is 
+    Note that the jth step of the recursion requires temporary space
+    of size no more than (len2 - 1)(2^j - 1) + 1.  Note the smallest
+    step j=0 doesn't require any temporary space and the largest step
+    has j = i, and hence the sum is
 
         sum_{j=1}^i [(len2 - 1) (2^j - 1) + 1]
 
       = (len2 - 1)(2^{i+1} - 2) - (len2 - 2) i
  */
 
-void _fmpz_mod_poly_compose_divconquer_recursive(fmpz *res, 
-    const fmpz *poly1, slong len1, fmpz **pow2, slong len2, fmpz *v, 
+void _fmpz_mod_poly_compose_divconquer_recursive(fmpz *res,
+    const fmpz *poly1, slong len1, fmpz **pow2, slong len2, fmpz *v,
     const fmpz_t p)
 {
     if (len1 == 1)
@@ -45,23 +45,23 @@ void _fmpz_mod_poly_compose_divconquer_recursive(fmpz *res,
         const slong i = FLINT_BIT_COUNT(len1 - 1) - 1;
         fmpz *w = v + ((WORD(1) << i) - 1) * (len2 - 1) + 1;
 
-        _fmpz_mod_poly_compose_divconquer_recursive(v, 
+        _fmpz_mod_poly_compose_divconquer_recursive(v,
             poly1 + (WORD(1) << i), len1 - (WORD(1) << i), pow2, len2, w, p);
 
-        _fmpz_mod_poly_mul(res, pow2[i], (len2 - 1) * (WORD(1) << i) + 1, 
+        _fmpz_mod_poly_mul(res, pow2[i], (len2 - 1) * (WORD(1) << i) + 1,
                                 v, (len2 - 1) * (len1 - (WORD(1) << i) - 1) + 1, p);
 
-        _fmpz_mod_poly_compose_divconquer_recursive(v, poly1, WORD(1) << i, 
+        _fmpz_mod_poly_compose_divconquer_recursive(v, poly1, WORD(1) << i,
                                                        pow2, len2, w, p);
 
-        _fmpz_mod_poly_add(res, res, (len2 - 1) * ((WORD(1) << i) - 1) + 1, 
+        _fmpz_mod_poly_add(res, res, (len2 - 1) * ((WORD(1) << i) - 1) + 1,
                                   v, (len2 - 1) * ((WORD(1) << i) - 1) + 1, p);
     }
 }
 
-void _fmpz_mod_poly_compose_divconquer(fmpz *res, 
-                                       const fmpz *poly1, slong len1, 
-                                       const fmpz *poly2, slong len2, 
+void _fmpz_mod_poly_compose_divconquer(fmpz *res,
+                                       const fmpz *poly1, slong len1,
+                                       const fmpz *poly2, slong len2,
                                        const fmpz_t p)
 {
     if (len1 == 1 || len2 == 0)
@@ -88,11 +88,11 @@ void _fmpz_mod_poly_compose_divconquer(fmpz *res,
         _fmpz_vec_set(pow2[0], poly2, len2);
         for (i = 1; i < k; i++)
         {
-            _fmpz_mod_poly_sqr(pow2[i], 
+            _fmpz_mod_poly_sqr(pow2[i],
                                pow2[i-1], (len2 - 1) * (WORD(1) << (i - 1)) + 1, p);
         }
 
-        _fmpz_mod_poly_compose_divconquer_recursive(res, poly1, len1, 
+        _fmpz_mod_poly_compose_divconquer_recursive(res, poly1, len1,
                                                          pow2, len2, w, p);
 
         _fmpz_vec_clear(v, lenV + lenW);
@@ -122,7 +122,7 @@ void fmpz_mod_poly_compose_divconquer(fmpz_mod_poly_t res,
         if ((res != poly1) && (res != poly2))
         {
             fmpz_mod_poly_fit_length(res, lenr, ctx);
-            _fmpz_mod_poly_compose_divconquer(res->coeffs, poly1->coeffs, len1, 
+            _fmpz_mod_poly_compose_divconquer(res->coeffs, poly1->coeffs, len1,
                                poly2->coeffs, len2, fmpz_mod_ctx_modulus(ctx));
         }
         else

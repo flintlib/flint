@@ -23,7 +23,7 @@ main(void)
     flint_printf("dot....");
     fflush(stdout);
 
-    
+
 
     /* Check commutative law */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -36,7 +36,7 @@ main(void)
         b = _fmpq_vec_init(len);
         _fmpq_vec_randtest(a, state, len, 200);
         _fmpq_vec_randtest(b, state, len, 200);
-        
+
         fmpq_init(res1);
         fmpq_init(res2);
 
@@ -58,7 +58,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

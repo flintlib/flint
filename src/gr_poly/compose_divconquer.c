@@ -70,9 +70,9 @@ _gr_poly_compose_divconquer(gr_ptr res, gr_srcptr poly1, slong len1,
 
     pow = GR_ENTRY(v, alloc, sz);
     temp = GR_ENTRY(pow, powlen, sz);
-    
+
     /* Let's start the actual work */
-    
+
     for (i = 0, j = 0; i < len1 / 2; i++, j += 2)
     {
         if (gr_is_zero(GR_ENTRY(poly1, j + 1, sz), ctx) != T_TRUE)
@@ -109,7 +109,7 @@ _gr_poly_compose_divconquer(gr_ptr res, gr_srcptr poly1, slong len1,
             status |= _gr_poly_add(h[0], temp, templen, h[0], hlen[0], ctx);
             hlen[0] = FLINT_MAX(hlen[0], templen);
         }
-        
+
         for (i = 1; i < n / 2; i++)
         {
             if (hlen[2*i + 1] > 0)
@@ -130,7 +130,7 @@ _gr_poly_compose_divconquer(gr_ptr res, gr_srcptr poly1, slong len1,
             status |= _gr_vec_set(h[i], h[2*i], hlen[2*i], ctx);
             hlen[i] = hlen[2*i];
         }
-        
+
         status |= _gr_poly_mul(temp, pow, powlen, pow, powlen, ctx);
         powlen += powlen - 1;
 
@@ -157,7 +157,7 @@ int gr_poly_compose_divconquer(gr_poly_t res,
 {
     const slong len1 = poly1->length;
     const slong len2 = poly2->length;
-    
+
     if (len1 == 0)
     {
         return gr_poly_zero(res, ctx);

@@ -97,7 +97,7 @@ int main(void)
         params.algorithm = 4;
         prof_repeat(&min_strassen, &max, sample, &params);
 
-        flint_printf("dim = %wd, classical %.2f us strassen %.2f us\n", 
+        flint_printf("dim = %wd, classical %.2f us strassen %.2f us\n",
                                              dim, min_classical, min_strassen);
     }
 

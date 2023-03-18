@@ -19,7 +19,7 @@ int main(void)
    mp_limb_t upper_limit;
 
    FLINT_TEST_INIT(state);
-   
+
    flint_printf("n_rootrem....");
    fflush(stdout);
 
@@ -40,7 +40,7 @@ int main(void)
         mpz_init(f);
         mpz_init(g);
         mpz_init(h);
-      
+
         c = n_randint(state, 0);    /*number */
         flint_mpz_set_ui(g, c);
 
@@ -51,7 +51,7 @@ int main(void)
         a = n_rootrem(&b, c, d);
 
         mpz_rootrem(e, f, g, flint_mpz_get_ui(h));
-      
+
         val = flint_mpz_get_ui(e);
         j = flint_mpz_get_ui(f);
 
@@ -79,11 +79,11 @@ int main(void)
         mp_limb_t a, b, c, d, max_pow, base;
 
         base = n_randint(state, upper_limit - 2) + 2;     /* base form 2 to 2642245*/
-        max_pow = n_flog(UWORD_MAX, base);    
+        max_pow = n_flog(UWORD_MAX, base);
         d = n_randint(state, max_pow);       /* root */
         if (!d)
             d+=1;
-      
+
         c = n_pow(base, d);                  /* number */
         a = n_rootrem(&b, c, d);
         result = ((a == base) && (b == 0));
@@ -102,14 +102,14 @@ int main(void)
     }
 
     /* n of type a^b + 1 */
-   
+
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         mp_limb_t a, b, c, d, max_pow, base;
 
         base = n_randint(state, upper_limit - 2) + 2;     /* base between 2 to 2642245*/
-        max_pow = n_flog(UWORD_MAX, base);    
-        d = n_randint(state, max_pow);       
+        max_pow = n_flog(UWORD_MAX, base);
+        d = n_randint(state, max_pow);
         if (d < 2)                                /* root between 2 to max_pow */
             d = 2;
 
@@ -131,7 +131,7 @@ int main(void)
    }
 
     /* n of type a^b - 1 */
-   
+
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         mp_limb_t a, b, c, d, j, val, max_pow, base;
@@ -141,10 +141,10 @@ int main(void)
         mpz_init(f);
         mpz_init(g);
         mpz_init(h);
- 
+
         base = n_randint(state, upper_limit - 2) + 2;     /* base between 2 to 2642245*/
-        max_pow = n_flog(UWORD_MAX, base);    
-        d = n_randint(state, max_pow);       
+        max_pow = n_flog(UWORD_MAX, base);
+        d = n_randint(state, max_pow);
         if (d < 2)                                /* root between 2 to max_pow */
             d = 2;
 
@@ -153,7 +153,7 @@ int main(void)
         flint_mpz_set_ui(g, c);
         a = n_rootrem(&b, c, d);
         mpz_rootrem(e, f, g, flint_mpz_get_ui(h));
-      
+
         val = flint_mpz_get_ui(e);
         j = flint_mpz_get_ui(f);
 

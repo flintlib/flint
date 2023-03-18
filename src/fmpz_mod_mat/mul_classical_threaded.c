@@ -50,7 +50,7 @@ _fmpz_mod_mat_addmul_basic_op(fmpz ** D, fmpz ** const C, fmpz ** const A,
     fmpz_clear(c);
 }
 
-typedef struct 
+typedef struct
 {
     slong block;
     volatile slong * i;
@@ -85,7 +85,7 @@ _fmpz_mod_mat_addmul_transpose_worker(void * arg_ptr)
     fmpz * p = arg.p;
     int op = arg.op;
     fmpz_t c;
-    
+
     fmpz_init(c);
 
     while (1)
@@ -148,7 +148,7 @@ _fmpz_mod_mat_addmul_transpose_threaded_pool_op(fmpz ** D, fmpz ** const C,
 #endif
 
     tmp = _fmpz_vec_init(k*n);
-	    
+
     /* transpose B */
     for (i = 0; i < k; i++)
         for (j = 0; j < n; j++)
@@ -158,7 +158,7 @@ _fmpz_mod_mat_addmul_transpose_threaded_pool_op(fmpz ** D, fmpz ** const C,
 
     /* compute optimal block width */
     block = FLINT_MAX(FLINT_MIN(m/(num_threads + 1), n/(num_threads + 1)), 1);
-    
+
     while (2*block*k*nlimbs > FLINT_FMPZ_MUL_CLASSICAL_CACHE_SIZE && block > 1)
         block >>= 1;
 
@@ -220,7 +220,7 @@ _fmpz_mod_mat_mul_classical_threaded_pool_op(fmpz_mod_mat_t D, const fmpz_mod_ma
     k = A->mat->c;
     n = B->mat->c;
 
-    _fmpz_mod_mat_addmul_transpose_threaded_pool_op(D->mat->rows, 
+    _fmpz_mod_mat_addmul_transpose_threaded_pool_op(D->mat->rows,
                 (op == 0) ? NULL : C->mat->rows, A->mat->rows, B->mat->rows,
                                     m, k, n, op, D->mod, threads, num_threads);
 }
@@ -231,7 +231,7 @@ fmpz_mod_mat_mul_classical_threaded_op(fmpz_mod_mat_t D, const fmpz_mod_mat_t C,
 {
     thread_pool_handle * threads;
     slong num_threads;
-    
+
     if (A->mat->c == 0)
     {
         if (op == 0)

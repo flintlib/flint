@@ -36,8 +36,8 @@ main(void)
         slong j, n, npoints;
 
         fmpz_init(mod);
-        
-        do 
+
+        do
         {
            fmpz_randtest_unsigned(mod, state, 5);
            fmpz_add_ui(mod, mod, 2);
@@ -60,7 +60,7 @@ main(void)
 
         fmpz_mod_poly_evaluate_fmpz_vec_iter(y, P, x, npoints, ctx);
         fmpz_mod_poly_evaluate_fmpz_vec_fast(z, P, x, npoints, ctx);
-        
+
         result = _fmpz_vec_equal(y, z, npoints);
 
         if (!result)
@@ -89,7 +89,7 @@ main(void)
 
     fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

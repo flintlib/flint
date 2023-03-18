@@ -13,8 +13,8 @@
 #include "fmpq_poly.h"
 
 void
-_fmpq_poly_rescale(fmpz * res, fmpz_t denr, 
-                   const fmpz * poly, const fmpz_t den, slong len, 
+_fmpq_poly_rescale(fmpz * res, fmpz_t denr,
+                   const fmpz * poly, const fmpz_t den, slong len,
                    const fmpz_t xnum, const fmpz_t xden)
 {
     if (len < WORD(2))
@@ -29,9 +29,9 @@ _fmpq_poly_rescale(fmpz * res, fmpz_t denr,
     {
         slong i;
         fmpz_t t;
-        
+
         fmpz_init(t);
-        
+
         fmpz_one(t);
         fmpz_set(res, poly);
         for (i = WORD(1); i < len; i++)
@@ -46,9 +46,9 @@ _fmpq_poly_rescale(fmpz * res, fmpz_t denr,
             fmpz_mul(res + i, res + i, t);
         }
         fmpz_mul(denr, den, t);
-        
+
         fmpz_clear(t);
-        
+
         _fmpq_poly_canonicalise(res, denr, len);
     }
 }
@@ -66,8 +66,8 @@ void fmpq_poly_rescale(fmpq_poly_t res, const fmpq_poly_t poly, const fmpq_t x)
     else
     {
         fmpq_poly_fit_length(res, poly->length);
-        _fmpq_poly_rescale(res->coeffs, res->den, 
-                           poly->coeffs, poly->den, poly->length, 
+        _fmpq_poly_rescale(res->coeffs, res->den,
+                           poly->coeffs, poly->den, poly->length,
                            fmpq_numref(x), fmpq_denref(x));
         _fmpq_poly_set_length(res, poly->length);
     }

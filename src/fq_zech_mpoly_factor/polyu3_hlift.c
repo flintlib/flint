@@ -546,6 +546,6 @@ cleanup:
     fq_zech_poly_clear(modulus, ctx);
     fq_zech_clear(alpha, ctx);
     fq_zech_clear(c, ctx);
-    
+
     return success;
 }

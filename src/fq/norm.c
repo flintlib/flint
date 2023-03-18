@@ -28,7 +28,7 @@ _fq_norm(fmpz_t rop, const fmpz * op, slong len, const fq_ctx_t ctx)
     if (d == 1)
     {
         fmpz_set(rop, op + 0);
-    } 
+    }
     else if (len == 1)
     {
         fmpz_powm_ui(rop, op + 0, d, p);
@@ -38,7 +38,7 @@ _fq_norm(fmpz_t rop, const fmpz * op, slong len, const fq_ctx_t ctx)
         _fmpz_mod_poly_resultant(rop, ctx->modulus->coeffs, ctx->modulus->length,
                         op, len, p);
         /*
-           XXX:  This part of the code is currently untested as the Conway 
+           XXX:  This part of the code is currently untested as the Conway
            polynomials used for the extension Fq/Fp are monic.
 
            TODO: make polynomial monic!!!

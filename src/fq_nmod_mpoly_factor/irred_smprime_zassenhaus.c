@@ -361,7 +361,7 @@ got_alpha:
             FLINT_ASSERT(fq_nmod_mpoly_is_one(q, ctx));
         }
 
-        fq_nmod_mpolyv_swap(qfac, pfac, ctx);        
+        fq_nmod_mpolyv_swap(qfac, pfac, ctx);
     }
 
     success = 1;

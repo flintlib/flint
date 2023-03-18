@@ -36,7 +36,7 @@ static void
 acb_approx_mul(acb_t res, const acb_t x, const acb_t y, slong prec)
 {
     arf_complex_mul(arb_midref(acb_realref(res)), arb_midref(acb_imagref(res)),
-        arb_midref(acb_realref(x)), arb_midref(acb_imagref(x)), 
+        arb_midref(acb_realref(x)), arb_midref(acb_imagref(x)),
         arb_midref(acb_realref(y)), arb_midref(acb_imagref(y)), prec, ARF_RND_DOWN);
 }
 

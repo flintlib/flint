@@ -14,18 +14,18 @@
 #include "padic.h"
 
 /*
-    Carries out the finite series evaluation for the logarithm 
+    Carries out the finite series evaluation for the logarithm
     \begin{equation*}
     \sum_{i=1}^{n} a_i x^i
     = \sum_{j=0}^{\ceil{n/b} - 1} \Bigl( \sum_{i=1}^b a_{i+jb} x^i \Bigr) x^{jb}
     \end{equation*}
-    where $a_i = 1/i$ with the choice $b = \floor{\sqrt{n}}$, 
+    where $a_i = 1/i$ with the choice $b = \floor{\sqrt{n}}$,
     all modulo $p^N$, where also $P = p^N$.
 
     Does not support aliasing.
  */
-static void 
-_padic_log_rectangular_series(fmpz_t z, const fmpz_t y, slong n, 
+static void
+_padic_log_rectangular_series(fmpz_t z, const fmpz_t y, slong n,
                               const fmpz_t p, slong N, const fmpz_t P0)
 {
     if (n <= 2)

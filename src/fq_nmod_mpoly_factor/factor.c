@@ -343,7 +343,7 @@ static int _factor_irred_compressed(
         FLINT_ASSERT(fq_nmod_is_one(c, ctx->fqctx));
 
         fq_nmod_mpolyv_fit_length(Af, Auf->num, ctx);
-        Af->length = Auf->num; 
+        Af->length = Auf->num;
         for (i = 0; i < Auf->num; i++)
         {
             FLINT_ASSERT(Auf->exp[i] == 1);

@@ -64,7 +64,7 @@ _fmpz_mod_poly_powers_mod_preinv_worker(void * arg_ptr)
         {
             for (i = j + 1; i < j + k && i < n; i++)
                 _fmpz_mod_poly_mulmod_preinv(res[i], res[j],
-                  glen - 1, res[i - j], glen - 1, g, glen, ginv, ginvlen, p);	
+                  glen - 1, res[i - j], glen - 1, g, glen, ginv, ginvlen, p);
         }
     }
 }
@@ -90,7 +90,7 @@ _fmpz_mod_poly_powers_mod_preinv_threaded_pool(fmpz ** res, const fmpz * f,
 
     if (n == 0)
         return;
-    
+
     if (n == 1)
     {
         if (glen > 1)
@@ -114,7 +114,7 @@ _fmpz_mod_poly_powers_mod_preinv_threaded_pool(fmpz ** res, const fmpz * f,
 		                                  g, glen, ginv, ginvlen, p);
 
     /* compute giant steps */
-   
+
     /* f^(k*i) = f^(k*(i - 1))*f^k */
     if (glen == 2) /* special case, constant polys */
     {
@@ -237,7 +237,7 @@ fmpz_mod_poly_powers_mod_bsgs(fmpz_mod_poly_struct * res,
 
     for (i = 0; i < n; i++)
        _fmpz_mod_poly_normalise(res + i);
-    
+
     fmpz_mod_poly_clear(ginv, ctx);
     flint_free(res_arr);
 }

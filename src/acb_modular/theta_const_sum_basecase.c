@@ -161,7 +161,7 @@ acb_modular_theta_const_sum_basecase(acb_t theta2, acb_t theta3, acb_t theta4,
     acb_add_ui(theta3, theta3, 1, prec);
     acb_add_ui(theta4, theta4, 1, prec);
     acb_mul_2exp_si(theta2, s1, 1);
- 
+
     _acb_vec_clear(qpow, N);
     flint_free(tab);
 

@@ -32,7 +32,7 @@ void _fmpz_poly_sqrlow_classical(fmpz *rop, const fmpz *op, slong len, slong n)
         _fmpz_vec_scalar_mul_fmpz(rop + len, op + 1, n - len, op + len - 1);
 
         for (i = 1; i < len - 1; i++)
-            _fmpz_vec_scalar_addmul_fmpz(rop + i + 1, 
+            _fmpz_vec_scalar_addmul_fmpz(rop + i + 1,
                 op + 1, FLINT_MIN(i - 1, n - (i + 1)), op + i);
 
         for (i = 1; i < FLINT_MIN(2 * len - 2, n); i++)

@@ -66,8 +66,8 @@ char * _padic_get_str(char *str, const padic_t op, const fmpz_t p, enum padic_pr
 
         if (!str)
         {
-            slong b = (N - v) * (2 * fmpz_sizeinbase(p, 10) 
-                     + z_sizeinbase(FLINT_MAX(FLINT_ABS(v), FLINT_ABS(N)), 10) 
+            slong b = (N - v) * (2 * fmpz_sizeinbase(p, 10)
+                     + z_sizeinbase(FLINT_MAX(FLINT_ABS(v), FLINT_ABS(N)), 10)
                      + 5) + 1;
 
             str = flint_malloc(b);
@@ -147,7 +147,7 @@ char * _padic_get_str(char *str, const padic_t op, const fmpz_t p, enum padic_pr
                 }
             }
         }
-        
+
         fmpz_clear(x);
         fmpz_clear(d);
     }
@@ -155,7 +155,7 @@ char * _padic_get_str(char *str, const padic_t op, const fmpz_t p, enum padic_pr
     {
         if (!str)
         {
-            slong b = fmpz_sizeinbase(u, 10) + fmpz_sizeinbase(p, 10) 
+            slong b = fmpz_sizeinbase(u, 10) + fmpz_sizeinbase(p, 10)
                    + z_sizeinbase(v, 10) + 4;
 
             str = flint_malloc(b);
@@ -193,7 +193,7 @@ char * _padic_get_str(char *str, const padic_t op, const fmpz_t p, enum padic_pr
         }
     }
 
-    return str;   
+    return str;
 }
 
 char * padic_get_str(char *str, const padic_t op, const padic_ctx_t ctx)

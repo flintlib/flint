@@ -30,7 +30,7 @@ main(void)
         TEMPLATE(T, t) x;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
-        
+
         TEMPLATE(T, init)(x, ctx);
 
         TEMPLATE(T, gen)(x, ctx);

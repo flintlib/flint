@@ -39,7 +39,7 @@ static void
 _acb_approx_mul(acb_t res, const acb_t x, const acb_t y, slong prec)
 {
     arf_complex_mul(arb_midref(acb_realref(res)), arb_midref(acb_imagref(res)),
-        arb_midref(acb_realref(x)), arb_midref(acb_imagref(x)), 
+        arb_midref(acb_realref(x)), arb_midref(acb_imagref(x)),
         arb_midref(acb_realref(y)), arb_midref(acb_imagref(y)), prec, ARB_RND);
 }
 
@@ -71,10 +71,10 @@ _acb_vec_approx_scalar_addmul(acb_ptr res, acb_srcptr vec,
         _acb_approx_mul(t, vec + i, c, prec);
 
         arf_add(arb_midref(acb_realref(res + i)),
-            arb_midref(acb_realref(res + i)), 
+            arb_midref(acb_realref(res + i)),
             arb_midref(acb_realref(t)), prec, ARB_RND);
         arf_add(arb_midref(acb_imagref(res + i)),
-            arb_midref(acb_imagref(res + i)), 
+            arb_midref(acb_imagref(res + i)),
             arb_midref(acb_imagref(t)), prec, ARB_RND);
     }
 

@@ -18,7 +18,7 @@ main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("inv....");
     fflush(stdout);
@@ -136,7 +136,7 @@ main(void)
         mpq_clear(Y);
     }
 
-    
+
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

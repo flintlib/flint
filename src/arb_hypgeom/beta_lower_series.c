@@ -14,7 +14,7 @@
 
 void
 _arb_hypgeom_beta_lower_series(arb_ptr res,
-    const arb_t a, const arb_t b, arb_srcptr z, slong zlen, int regularized, 
+    const arb_t a, const arb_t b, arb_srcptr z, slong zlen, int regularized,
     slong len, slong prec)
 {
     arb_ptr t, u, v;
@@ -92,7 +92,7 @@ void arb_hypgeom_beta_lower_series(arb_poly_t res,
         arb_poly_zero(res);
         return;
     }
-        
+
     arb_poly_fit_length(res, len);
 
     if (z->length == 0)

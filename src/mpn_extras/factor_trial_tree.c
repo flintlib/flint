@@ -35,10 +35,10 @@ void _tree_mutex_init(void)
 void _cleanup_trial_tree(void)
 {
     slong i;
-    
+
     for (i = 0; i < 13 - (FLINT_BITS/32); i++)
 	flint_free(_factor_trial_tree[i]);
-    
+
     _factor_trial_tree_initialised = 0;
 }
 
@@ -59,7 +59,7 @@ _factor_trial_tree_init(void)
 
 	    flint_register_cleanup_function(_cleanup_trial_tree);
 
-        /* 
+        /*
 	        Initialise mpn's in tree, each of which is thought of as an array
 	        of products of primes
 	        Note there are 3512 primes less than 32768
@@ -132,7 +132,7 @@ int flint_mpn_factor_trial_tree(slong * factors,
     primes = n_primes_arr_readonly(num_primes);
 
     gtemp = (mp_ptr)
-	    flint_malloc((3*4096/(FLINT_BITS/16) + xsize)*sizeof(mp_limb_t)); 
+	    flint_malloc((3*4096/(FLINT_BITS/16) + xsize)*sizeof(mp_limb_t));
     temp = gtemp + 2*4096/(FLINT_BITS/16);
 
     /* compute gcd of x with top level in tree */
@@ -150,7 +150,7 @@ int flint_mpn_factor_trial_tree(slong * factors,
         flint_free(gtemp);
         return 0;
     }
-    
+
     rlimbs[m] = flint_mpn_gcd_full2(gtemp, x, xsize,
 		                                   _factor_trial_tree[m] + 0, n, temp);
 
@@ -173,20 +173,20 @@ int flint_mpn_factor_trial_tree(slong * factors,
         gcd1 = 0;
 	    n2 = nmax; /* number of words per entry */
         offset = 0; /* offset into gtemp */
-        
+
 	    /* compute gcd's down the tree for this i */
 	    for (j = m; j >= 0; j--)
-	    {  
+	    {
             /* must update indexes for current i */
 	        if ((idx[j] & 1) != ((i >> j) & 1))
                 idx[j]++;
-	            
+
             /* see if we need to compute new gcd for this level */
 	        if (!gcd1 && (valid_level > j || (idx[j] & 1) != ((i >> j) & 1)))
             {
 	            n = n2;
 	            MPN_NORM(_factor_trial_tree[j] + idx[j]*n2, n);
-	            
+
                 rlimbs[j] = flint_mpn_gcd_full2(gtemp + offset,
 		             _factor_trial_tree[j] + idx[j]*n2, n,
 		                               gtemp + offset - 2*n2, rlimbs[j + 1], temp);
@@ -194,7 +194,7 @@ int flint_mpn_factor_trial_tree(slong * factors,
                 valid_level = j;
 
 	            if (rlimbs[j] == 1 && gtemp[offset] == 1)
-		            gcd1 = 1;   
+		            gcd1 = 1;
             }
 
 	        offset += n2;
@@ -208,7 +208,7 @@ int flint_mpn_factor_trial_tree(slong * factors,
 
                 /* check divisibility by primes with index 4*i + j */
 	            if (flint_mpn_divisible_1_p(x, xsize, primes[(FLINT_BITS/16)*i + j]))
-	                factors[numfacs++] = (FLINT_BITS/16)*i + j; 
+	                factors[numfacs++] = (FLINT_BITS/16)*i + j;
 	        }
 	    }
     }

@@ -16,10 +16,10 @@ int main(void)
 {
     int i, j;
     FLINT_TEST_INIT(state);
-   
+
     flint_printf("unity_zpq_mul....");
     fflush(stdout);
-    
+
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         ulong p, q;
@@ -50,7 +50,7 @@ int main(void)
 
             x = n_randint(state, p);
             y = n_randint(state, q);
-            
+
             fmpz_randtest_not_zero(val1, state, 200);
             fmpz_randtest_not_zero(val2, state, 200);
 
@@ -66,7 +66,7 @@ int main(void)
 
         if (unity_zpq_equal(f, g) == 0)
         {
-            
+
             flint_printf("FAIL\n");
             fflush(stdout);
             flint_abort();

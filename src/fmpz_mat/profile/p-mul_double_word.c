@@ -56,7 +56,7 @@ int main(void)
             else
             {
                 fmpz_mat_randtest_unsigned(A, state, Abits);
-                fmpz_mat_randtest_unsigned(B, state, Bbits);                
+                fmpz_mat_randtest_unsigned(B, state, Bbits);
             }
 
             timeit_start(timer);

@@ -15,7 +15,7 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-int _fmpq_poly_equal_trunc(const fmpz * poly1, const fmpz_t den1, slong len1, 
+int _fmpq_poly_equal_trunc(const fmpz * poly1, const fmpz_t den1, slong len1,
                            const fmpz * poly2, const fmpz_t den2, slong len2, slong n)
 {
     int res = 1;
@@ -27,14 +27,14 @@ int _fmpq_poly_equal_trunc(const fmpz * poly1, const fmpz_t den1, slong len1,
     len1 = FLINT_MIN(len1, n);
     len2 = FLINT_MIN(len2, n);
 
-    if (len1 > len2) 
+    if (len1 > len2)
     {
         for (i = len2; i < len1; i++)
         {
            if (!fmpz_is_zero(poly1 + i))
               return 0;
         }
-        
+
         len1 = len2;
     } else if (len2 > len1)
     {
@@ -79,7 +79,7 @@ int _fmpq_poly_equal_trunc(const fmpz * poly1, const fmpz_t den1, slong len1,
              break;
           }
        }
-       
+
        fmpz_clear(d1);
        fmpz_clear(d2);
        fmpz_clear(p1);

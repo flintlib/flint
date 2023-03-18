@@ -181,7 +181,7 @@ acb_dft_crt_precomp(acb_ptr w, acb_srcptr v, const acb_dft_crt_t crt, slong prec
         if (crt->n == 1)
             acb_set(w, v);
     }
-    else 
+    else
     {
         acb_ptr t;
         t = _acb_vec_init(crt->n);

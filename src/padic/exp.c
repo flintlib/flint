@@ -27,7 +27,7 @@ slong _padic_exp_bound(slong v, slong N, const fmpz_t p)
         fmpz_mul_ui(n, f, N);
         fmpz_sub_ui(n, n, 1);
         fmpz_mul_ui(d, f, v);
-        fmpz_sub_ui(d, d, 1); 
+        fmpz_sub_ui(d, d, 1);
         fmpz_cdiv_q(f, n, d);
         i = fmpz_get_si(f);
 

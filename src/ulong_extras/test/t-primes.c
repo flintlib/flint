@@ -20,7 +20,7 @@ int main(void)
 
     flint_printf("primes....");
     fflush(stdout);
- 
+
     _flint_rand_init_gmp(state);
 
     /* compare with n_nextprime */
@@ -77,7 +77,7 @@ int main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

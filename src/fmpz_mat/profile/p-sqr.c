@@ -33,7 +33,7 @@ void sample(void * arg, ulong count)
     int algorithm = params->algorithm;
     fmpz_mat_t A, C;
     FLINT_TEST_INIT(state);
-    
+
 
     fmpz_mat_init(A, m, n);
     fmpz_mat_init(C, m, n);
@@ -48,13 +48,13 @@ void sample(void * arg, ulong count)
     else if (algorithm == 1)
         for (i = 0; i < count; i++)
             fmpz_mat_sqr(C, A);
-    
+
 
     prof_stop();
 
     fmpz_mat_clear(A);
     fmpz_mat_clear(C);
-    
+
     flint_randclear(state);
 }
 

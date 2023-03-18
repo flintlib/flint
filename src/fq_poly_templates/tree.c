@@ -31,7 +31,7 @@ _TEMPLATE(T, poly_tree_alloc)(slong len, const TEMPLATE(T, ctx_t) ctx)
             for (j = 0; j < len; j++)
                 TEMPLATE(T, poly_init)(tree[i] + j, ctx);
         }
-            
+
     }
 
     return tree;

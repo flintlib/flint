@@ -12,10 +12,10 @@
 #include "nmod_poly.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1, 
+void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1,
                                         const fmpz * poly2, slong len2)
 {
-    flint_bitcnt_t bound, pbits, curr_bits = 0; 
+    flint_bitcnt_t bound, pbits, curr_bits = 0;
     slong i, num_primes;
     fmpz_comb_t comb;
     fmpz_comb_temp_t comb_temp;
@@ -24,7 +24,7 @@ void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1,
     mp_ptr a, b, rarr, parr;
     mp_limb_t p;
     nmod_t mod;
-    
+
     /* special case, one of the polys is a constant */
     if (len2 == 1) /* if len1 == 1 then so does len2 */
     {
@@ -32,23 +32,23 @@ void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1,
 
         return;
     }
-    
+
     fmpz_init(ac);
     fmpz_init(bc);
-    
+
     /* compute content of poly1 and poly2 */
     _fmpz_vec_content(ac, poly1, len1);
     _fmpz_vec_content(bc, poly2, len2);
-    
+
     /* divide poly1 and poly2 by their content */
     A = _fmpz_vec_init(len1);
     B = _fmpz_vec_init(len2);
     _fmpz_vec_scalar_divexact_fmpz(A, poly1, len1, ac);
     _fmpz_vec_scalar_divexact_fmpz(B, poly2, len2, bc);
-    
+
     /* get product of leading coefficients */
     fmpz_init(l);
-    
+
     lead_A = A + len1 - 1;
     lead_B = B + len2 - 1;
     fmpz_mul(l, lead_A, lead_B);
@@ -101,7 +101,7 @@ void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1,
         p = n_nextprime(p, 0);
         if (fmpz_fdiv_ui(l, p) == 0)
             continue;
-        
+
         curr_bits += pbits;
 
         nmod_init(&mod, p);
@@ -117,34 +117,34 @@ void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1,
 
     fmpz_comb_init(comb, parr, num_primes);
     fmpz_comb_temp_init(comb_temp, comb);
-    
+
     fmpz_multi_CRT_ui(res, rarr, comb, comb_temp, 1);
-        
+
     fmpz_clear(modulus);
     fmpz_comb_temp_clear(comb_temp);
     fmpz_comb_clear(comb);
-        
+
     _nmod_vec_clear(a);
     _nmod_vec_clear(b);
 
     _nmod_vec_clear(parr);
     _nmod_vec_clear(rarr);
-    
+
     /* finally multiply by powers of content */
     if (!fmpz_is_one(ac))
     {
        fmpz_pow_ui(l, ac, len2 - 1);
        fmpz_mul(res, res, l);
     }
-    
+
     if (!fmpz_is_one(bc))
     {
        fmpz_pow_ui(l, bc, len1 - 1);
        fmpz_mul(res, res, l);
     }
 
-    fmpz_clear(l); 
-    
+    fmpz_clear(l);
+
     _fmpz_vec_clear(A, len1);
     _fmpz_vec_clear(B, len2);
 
@@ -158,14 +158,14 @@ fmpz_poly_resultant_modular(fmpz_t res, const fmpz_poly_t poly1,
 {
    slong len1 = poly1->length;
    slong len2 = poly2->length;
-   
+
    if (len1 == 0 || len2 == 0)
      fmpz_zero(res);
    else if (len1 >= len2)
         _fmpz_poly_resultant_modular(res, poly1->coeffs, len1, poly2->coeffs, len2);
    else
    {
-        _fmpz_poly_resultant_modular(res, poly2->coeffs, len2, poly1->coeffs, len1);  
+        _fmpz_poly_resultant_modular(res, poly2->coeffs, len2, poly1->coeffs, len1);
         if ((len1 > 1) && (!(len1 & WORD(1)) & !(len2 & WORD(1))))
             fmpz_neg(res, res);
    }

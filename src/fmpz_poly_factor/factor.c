@@ -90,7 +90,7 @@ void fmpz_poly_factor_deflation(fmpz_poly_factor_t fac, const fmpz_poly_t G, int
         }
         else
         {
-            /* Could make other tests for x-1 or simple things 
+            /* Could make other tests for x-1 or simple things
                maybe take advantage of the composition algorithm */
             fmpz_poly_factor_init(sq_fr_fac);
             fmpz_poly_factor_squarefree(sq_fr_fac, g);

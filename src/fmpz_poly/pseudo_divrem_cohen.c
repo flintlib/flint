@@ -15,13 +15,13 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_pseudo_divrem_cohen(fmpz * Q, fmpz * R, const fmpz * A, 
+_fmpz_poly_pseudo_divrem_cohen(fmpz * Q, fmpz * R, const fmpz * A,
                                slong lenA, const fmpz * B, slong lenB)
 {
     const fmpz * leadB = B + (lenB - 1);
     slong e, lenQ;
     fmpz_t pow;
-    
+
     if (lenB == 1)
     {
         fmpz_init(pow);
@@ -37,7 +37,7 @@ _fmpz_poly_pseudo_divrem_cohen(fmpz * Q, fmpz * R, const fmpz * A,
     if (R != A)
         _fmpz_vec_set(R, A, lenA);
     e = lenA - lenB;
-    
+
     /* Unroll the first run of the while loop */
     {
         fmpz_set(Q + (lenQ - 1), R + (lenA - 1));
@@ -72,12 +72,12 @@ _fmpz_poly_pseudo_divrem_cohen(fmpz * Q, fmpz * R, const fmpz * A,
 }
 
 void
-fmpz_poly_pseudo_divrem_cohen(fmpz_poly_t Q, fmpz_poly_t R, 
+fmpz_poly_pseudo_divrem_cohen(fmpz_poly_t Q, fmpz_poly_t R,
                               const fmpz_poly_t A, const fmpz_poly_t B)
 {
     slong lenq, lenr;
     fmpz *q, *r;
-    
+
     if (B->length == 0)
     {
         flint_printf("Exception (fmpz_poly_pseudo_divrem_cohen). Division by zero.\n");
@@ -95,7 +95,7 @@ fmpz_poly_pseudo_divrem_cohen(fmpz_poly_t Q, fmpz_poly_t R,
         fmpz_poly_set(R, A);
         return;
     }
-    
+
     lenq = A->length - B->length + 1;
     lenr = A->length;
     if ((Q == A) || (Q == B))
@@ -112,12 +112,12 @@ fmpz_poly_pseudo_divrem_cohen(fmpz_poly_t Q, fmpz_poly_t R,
         fmpz_poly_fit_length(R, lenr);
         r = R->coeffs;
     }
-    
+
     _fmpz_poly_pseudo_divrem_cohen(q, r, A->coeffs, A->length, B->coeffs, B->length);
-    
+
     for (lenr = B->length - 1; (lenr >= 0) && r[lenr] == WORD(0); lenr--) ;
     lenr++;
-    
+
     if ((Q == A) || (Q == B))
     {
         _fmpz_vec_clear(Q->coeffs, Q->alloc);

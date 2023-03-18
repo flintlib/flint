@@ -71,7 +71,7 @@ _gr_qqbar_randtest(qqbar_t res, flint_rand_t state, const gr_ctx_t ctx)
 {
     slong deg_limit, bits_limit;
     int rcase;
-    
+
     rcase = n_randint(state, 10);
 
     if (rcase == 0)

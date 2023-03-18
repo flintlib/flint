@@ -23,7 +23,7 @@ __mpz_struct * _fmpz_new_mpz(void)
 void _fmpz_clear_mpz(fmpz f)
 {
     mpz_clear(COEFF_TO_PTR(f));
-    flint_free(COEFF_TO_PTR(f));  
+    flint_free(COEFF_TO_PTR(f));
 }
 
 void _fmpz_cleanup_mpz_content(void)

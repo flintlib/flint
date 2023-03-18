@@ -13,8 +13,8 @@
 #define FQ_ZECH_EMBED_H
 
 #ifdef FQ_ZECH_EMBED_INLINES_C
-#define FQ_ZECH_EMBED_INLINE 
-#define FQ_EMBED_TEMPLATES_INLINE 
+#define FQ_ZECH_EMBED_INLINE
+#define FQ_EMBED_TEMPLATES_INLINE
 #else
 #define FQ_ZECH_EMBED_INLINE static __inline__
 #define FQ_EMBED_TEMPLATES_INLINE static __inline__
@@ -32,8 +32,8 @@ void TEMPLATE(T, modulus_pow_series_inv)(TEMPLATE(B, poly_t) res,
                                          const TEMPLATE(T, ctx_t) ctx,
                                          slong trunc)
 {
-    TEMPLATE(B, poly_reverse)(res, 
-                              TEMPLATE(T, ctx_modulus)(ctx), 
+    TEMPLATE(B, poly_reverse)(res,
+                              TEMPLATE(T, ctx_modulus)(ctx),
                               TEMPLATE(T, ctx_degree)(ctx) + 1);
     TEMPLATE(B, poly_inv_series)(res, res, trunc);
 }
@@ -48,12 +48,12 @@ FQ_ZECH_EMBED_INLINE void fq_zech_modulus_derivative_inv(fq_zech_t m_prime,
     fq_nmod_t m_nmod, m_inv_nmod;
     fq_nmod_init(m_nmod, ctx->fq_nmod_ctx);
     fq_nmod_init(m_inv_nmod, ctx->fq_nmod_ctx);
- 
+
     fq_nmod_modulus_derivative_inv(m_nmod, m_inv_nmod, ctx->fq_nmod_ctx);
-    
+
     fq_zech_set_fq_nmod(m_prime, m_nmod, ctx);
     fq_zech_set_fq_nmod(m_prime_inv, m_inv_nmod, ctx);
- 
+
     fq_nmod_clear(m_nmod, ctx->fq_nmod_ctx);
     fq_nmod_clear(m_inv_nmod, ctx->fq_nmod_ctx);
 }

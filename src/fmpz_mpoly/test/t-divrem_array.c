@@ -81,11 +81,11 @@ main(void)
           }
        }
 
-       fmpz_mpoly_clear(f, ctx);  
-       fmpz_mpoly_clear(g, ctx);  
-       fmpz_mpoly_clear(h, ctx);  
-       fmpz_mpoly_clear(k, ctx);  
-       fmpz_mpoly_clear(r, ctx);  
+       fmpz_mpoly_clear(f, ctx);
+       fmpz_mpoly_clear(g, ctx);
+       fmpz_mpoly_clear(h, ctx);
+       fmpz_mpoly_clear(k, ctx);
+       fmpz_mpoly_clear(r, ctx);
     }
 
     /* Check f = g*q + r for random polys */
@@ -98,7 +98,7 @@ main(void)
        slong coeff_bits;
 
        ord = mpoly_ordering_randtest(state);
-	   
+
        nvars = n_randint(state, 10) + 1;
 
        fmpz_mpoly_ctx_init(ctx, nvars, ord);
@@ -137,7 +137,7 @@ main(void)
              fmpz_mpoly_mul_johnson(k, h, g, ctx);
 			    fmpz_mpoly_add(k, k, r, ctx);
           }
-		  
+
           result = (ok1 == 0) || (ok1 == 1 && fmpz_mpoly_equal(f, k, ctx));
 
           if (!result)
@@ -149,11 +149,11 @@ main(void)
           }
        }
 
-       fmpz_mpoly_clear(f, ctx);  
-       fmpz_mpoly_clear(g, ctx);  
-       fmpz_mpoly_clear(h, ctx);  
-       fmpz_mpoly_clear(k, ctx);  
-       fmpz_mpoly_clear(r, ctx);  
+       fmpz_mpoly_clear(f, ctx);
+       fmpz_mpoly_clear(g, ctx);
+       fmpz_mpoly_clear(h, ctx);
+       fmpz_mpoly_clear(k, ctx);
+       fmpz_mpoly_clear(r, ctx);
     }
 
     /* Check aliasing of quotient with first argument */
@@ -208,7 +208,7 @@ main(void)
           if (ok2)
              fmpz_mpoly_remainder_test(r2, g, ctx);
 
-          result = (ok1 == 0 || ok2 == 0) || 
+          result = (ok1 == 0 || ok2 == 0) ||
                    (ok1 == 1 && ok2 == 1 && fmpz_mpoly_equal(h, f, ctx)
 				                         && fmpz_mpoly_equal(r1, r2, ctx));
 
@@ -221,11 +221,11 @@ main(void)
           }
        }
 
-       fmpz_mpoly_clear(f, ctx);  
-       fmpz_mpoly_clear(g, ctx);  
-       fmpz_mpoly_clear(h, ctx);  
-       fmpz_mpoly_clear(r1, ctx);  
-       fmpz_mpoly_clear(r2, ctx);  
+       fmpz_mpoly_clear(f, ctx);
+       fmpz_mpoly_clear(g, ctx);
+       fmpz_mpoly_clear(h, ctx);
+       fmpz_mpoly_clear(r1, ctx);
+       fmpz_mpoly_clear(r2, ctx);
     }
 
     /* Check aliasing of quotient with second argument */
@@ -278,7 +278,7 @@ main(void)
           fmpz_mpoly_assert_canonical(g, ctx);
           fmpz_mpoly_assert_canonical(r2, ctx);
 
-          result = (ok1 == 0 || ok2 == 0) || 
+          result = (ok1 == 0 || ok2 == 0) ||
                    (ok1 == 1 && ok2 == 1 && fmpz_mpoly_equal(h, g, ctx)
 				                         && fmpz_mpoly_equal(r1, r2, ctx));
 
@@ -291,13 +291,13 @@ main(void)
           }
        }
 
-       fmpz_mpoly_clear(f, ctx);  
-       fmpz_mpoly_clear(g, ctx);  
-       fmpz_mpoly_clear(h, ctx);  
-       fmpz_mpoly_clear(r1, ctx);  
-       fmpz_mpoly_clear(r2, ctx);  
+       fmpz_mpoly_clear(f, ctx);
+       fmpz_mpoly_clear(g, ctx);
+       fmpz_mpoly_clear(h, ctx);
+       fmpz_mpoly_clear(r1, ctx);
+       fmpz_mpoly_clear(r2, ctx);
     }
-	
+
     /* Check aliasing of remainder with first argument */
     for (i = 0; i < 5 * flint_test_multiplier(); i++)
     {
@@ -353,7 +353,7 @@ main(void)
           if (ok2)
              fmpz_mpoly_remainder_test(f, g, ctx);
 
-          result = (ok1 == 0 || ok2 == 0) || 
+          result = (ok1 == 0 || ok2 == 0) ||
                    (ok1 == 1 && ok2 == 1 && fmpz_mpoly_equal(h, k, ctx)
 				                         && fmpz_mpoly_equal(r1, f, ctx));
 
@@ -366,11 +366,11 @@ main(void)
           }
        }
 
-       fmpz_mpoly_clear(f, ctx);  
-       fmpz_mpoly_clear(g, ctx);  
-       fmpz_mpoly_clear(h, ctx);  
-       fmpz_mpoly_clear(k, ctx);  
-       fmpz_mpoly_clear(r1, ctx);  
+       fmpz_mpoly_clear(f, ctx);
+       fmpz_mpoly_clear(g, ctx);
+       fmpz_mpoly_clear(h, ctx);
+       fmpz_mpoly_clear(k, ctx);
+       fmpz_mpoly_clear(r1, ctx);
     }
 
     /* Check aliasing of remainder with second argument */
@@ -426,7 +426,7 @@ main(void)
           fmpz_mpoly_assert_canonical(k, ctx);
           fmpz_mpoly_assert_canonical(g, ctx);
 
-          result = (ok1 == 0 || ok2 == 0) || 
+          result = (ok1 == 0 || ok2 == 0) ||
                    (ok1 == 1 && ok2 == 1 && fmpz_mpoly_equal(h, k, ctx)
 				                         && fmpz_mpoly_equal(r1, g, ctx));
 
@@ -439,15 +439,15 @@ main(void)
           }
        }
 
-       fmpz_mpoly_clear(f, ctx);  
-       fmpz_mpoly_clear(g, ctx);  
-       fmpz_mpoly_clear(h, ctx);  
-       fmpz_mpoly_clear(k, ctx);  
-       fmpz_mpoly_clear(r1, ctx);  
+       fmpz_mpoly_clear(f, ctx);
+       fmpz_mpoly_clear(g, ctx);
+       fmpz_mpoly_clear(h, ctx);
+       fmpz_mpoly_clear(k, ctx);
+       fmpz_mpoly_clear(r1, ctx);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

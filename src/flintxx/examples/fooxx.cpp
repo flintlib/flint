@@ -252,7 +252,7 @@ FLINT_DEFINE_DOIT_COND2(assignment, FOOXX_COND_T, FOOXX_COND_S,
 // so we use the condition traits::fits_into_slong. Traits are defined all
 // throughout flintxx, but the most general purpose ones (like fits_into_slong,
 // is_unsigned_integer etc) can be found in flintxx/traits.h
-FLINT_DEFINE_DOIT_COND2(assignment, FOOXX_COND_T, traits::fits_into_slong, 
+FLINT_DEFINE_DOIT_COND2(assignment, FOOXX_COND_T, traits::fits_into_slong,
         foo_set_si(to._foo(), from, 1))
 
 // We now define evaluation rules. In full generality, the rule evaluation<...>

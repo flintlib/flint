@@ -13,7 +13,7 @@
 #include "fmpz_poly.h"
 #include "fmpq.h"
 
-void 
+void
 _fmpz_poly_evaluate_divconquer_fmpq(fmpz_t rnum, fmpz_t rden,
         const fmpz * poly, slong len, const fmpz_t xnum, const fmpz_t xden)
 {
@@ -112,7 +112,7 @@ _fmpz_poly_evaluate_divconquer_fmpq(fmpz_t rnum, fmpz_t rden,
 }
 
 void
-fmpz_poly_evaluate_divconquer_fmpq(fmpq_t res, const fmpz_poly_t f, 
+fmpz_poly_evaluate_divconquer_fmpq(fmpq_t res, const fmpz_poly_t f,
                                    const fmpq_t a)
 {
     if (fmpz_poly_is_zero(f))

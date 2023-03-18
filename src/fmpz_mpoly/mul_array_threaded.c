@@ -123,7 +123,7 @@ void _fmpz_mpoly_mul_array_threaded_worker_LEX(void * varg)
                 {
                     if (j < base->Bl)
                     {
-                        _fmpz_mpoly_addmul_array1_slong1((ulong *)coeff_array, 
+                        _fmpz_mpoly_addmul_array1_slong1((ulong *)coeff_array,
                             base->Acoeffs + base->Amain[i],
                                 base->Apexp + base->Amain[i],
                                 base->Amain[i + 1] - base->Amain[i],
@@ -132,7 +132,7 @@ void _fmpz_mpoly_mul_array_threaded_worker_LEX(void * varg)
                                 base->Bmain[j + 1] - base->Bmain[j]);
                     }
                 }
-                (base->Pchunks + base->perm[Pi])->len = 
+                (base->Pchunks + base->perm[Pi])->len =
                     fmpz_mpoly_append_array_sm1_LEX(
                         (base->Pchunks + base->perm[Pi])->poly, 0,
                         (ulong *)coeff_array, base->mults, base->nvars - 1,
@@ -144,7 +144,7 @@ void _fmpz_mpoly_mul_array_threaded_worker_LEX(void * varg)
                 {
                     if (j < base->Bl)
                     {
-                        _fmpz_mpoly_addmul_array1_slong2((ulong *)coeff_array, 
+                        _fmpz_mpoly_addmul_array1_slong2((ulong *)coeff_array,
                             base->Acoeffs + base->Amain[i],
                                 base->Apexp + base->Amain[i],
                                 base->Amain[i + 1] - base->Amain[i],
@@ -153,7 +153,7 @@ void _fmpz_mpoly_mul_array_threaded_worker_LEX(void * varg)
                                 base->Bmain[j + 1] - base->Bmain[j]);
                     }
                 }
-                (base->Pchunks + base->perm[Pi])->len = 
+                (base->Pchunks + base->perm[Pi])->len =
                     fmpz_mpoly_append_array_sm2_LEX(
                         (base->Pchunks + base->perm[Pi])->poly, 0,
                         (ulong *)coeff_array, base->mults, base->nvars - 1,
@@ -164,7 +164,7 @@ void _fmpz_mpoly_mul_array_threaded_worker_LEX(void * varg)
                 {
                     if (j < base->Bl)
                     {
-                        _fmpz_mpoly_addmul_array1_slong((ulong *)coeff_array, 
+                        _fmpz_mpoly_addmul_array1_slong((ulong *)coeff_array,
                             base->Acoeffs + base->Amain[i],
                                 base->Apexp + base->Amain[i],
                                 base->Amain[i + 1] - base->Amain[i],
@@ -173,7 +173,7 @@ void _fmpz_mpoly_mul_array_threaded_worker_LEX(void * varg)
                                 base->Bmain[j + 1] - base->Bmain[j]);
                     }
                 }
-                (base->Pchunks + base->perm[Pi])->len = 
+                (base->Pchunks + base->perm[Pi])->len =
                     fmpz_mpoly_append_array_sm3_LEX(
                         (base->Pchunks + base->perm[Pi])->poly, 0,
                         (ulong *)coeff_array, base->mults, base->nvars - 1,
@@ -185,7 +185,7 @@ void _fmpz_mpoly_mul_array_threaded_worker_LEX(void * varg)
             {
                 if (j < base->Bl)
                 {
-                    _fmpz_mpoly_addmul_array1_fmpz((fmpz *)coeff_array, 
+                    _fmpz_mpoly_addmul_array1_fmpz((fmpz *)coeff_array,
                         base->Acoeffs + base->Amain[i],
                             base->Apexp + base->Amain[i],
                             base->Amain[i + 1] - base->Amain[i],
@@ -194,7 +194,7 @@ void _fmpz_mpoly_mul_array_threaded_worker_LEX(void * varg)
                             base->Bmain[j + 1] - base->Bmain[j]);
                 }
             }
-            (base->Pchunks + base->perm[Pi])->len = 
+            (base->Pchunks + base->perm[Pi])->len =
                 fmpz_mpoly_append_array_fmpz_LEX(
                     (base->Pchunks + base->perm[Pi])->poly, 0,
                     (fmpz *)coeff_array, base->mults, base->nvars - 1,
@@ -480,10 +480,10 @@ void _fmpz_mpoly_mul_array_threaded_worker_DEG(void * varg)
     _worker_arg_struct * arg = (_worker_arg_struct *) varg;
     _base_struct * base = arg->base;
     ulong * coeff_array;
-    slong (* upack_sm1)(fmpz_mpoly_t, slong, ulong *, slong, slong, slong); 
-    slong (* upack_sm2)(fmpz_mpoly_t, slong, ulong *, slong, slong, slong); 
-    slong (* upack_sm3)(fmpz_mpoly_t, slong, ulong *, slong, slong, slong); 
-    slong (* upack_fmpz)(fmpz_mpoly_t, slong, fmpz *, slong, slong, slong); 
+    slong (* upack_sm1)(fmpz_mpoly_t, slong, ulong *, slong, slong, slong);
+    slong (* upack_sm2)(fmpz_mpoly_t, slong, ulong *, slong, slong, slong);
+    slong (* upack_sm3)(fmpz_mpoly_t, slong, ulong *, slong, slong, slong);
+    slong (* upack_fmpz)(fmpz_mpoly_t, slong, fmpz *, slong, slong, slong);
     TMP_INIT;
 
     upack_sm1  = &fmpz_mpoly_append_array_sm1_DEGLEX;
@@ -541,7 +541,7 @@ void _fmpz_mpoly_mul_array_threaded_worker_DEG(void * varg)
                 {
                     if (j < base->Bl)
                     {
-                        _fmpz_mpoly_addmul_array1_slong1((ulong *)coeff_array, 
+                        _fmpz_mpoly_addmul_array1_slong1((ulong *)coeff_array,
                             base->Acoeffs + base->Amain[i],
                                 base->Apexp + base->Amain[i],
                                 base->Amain[i + 1] - base->Amain[i],
@@ -550,7 +550,7 @@ void _fmpz_mpoly_mul_array_threaded_worker_DEG(void * varg)
                                 base->Bmain[j + 1] - base->Bmain[j]);
                     }
                 }
-                (base->Pchunks + base->perm[Pi])->len = 
+                (base->Pchunks + base->perm[Pi])->len =
                     upack_sm1((base->Pchunks + base->perm[Pi])->poly, 0,
                         (ulong *)coeff_array, base->Pl - base->perm[Pi] - 1,
                                                       base->nvars, base->degb);
@@ -561,7 +561,7 @@ void _fmpz_mpoly_mul_array_threaded_worker_DEG(void * varg)
                 {
                     if (j < base->Bl)
                     {
-                        _fmpz_mpoly_addmul_array1_slong2((ulong *)coeff_array, 
+                        _fmpz_mpoly_addmul_array1_slong2((ulong *)coeff_array,
                             base->Acoeffs + base->Amain[i],
                                 base->Apexp + base->Amain[i],
                                 base->Amain[i + 1] - base->Amain[i],
@@ -570,7 +570,7 @@ void _fmpz_mpoly_mul_array_threaded_worker_DEG(void * varg)
                                 base->Bmain[j + 1] - base->Bmain[j]);
                     }
                 }
-                (base->Pchunks + base->perm[Pi])->len = 
+                (base->Pchunks + base->perm[Pi])->len =
                     upack_sm2((base->Pchunks + base->perm[Pi])->poly, 0,
                         (ulong *)coeff_array, base->Pl - base->perm[Pi] - 1,
                                                       base->nvars, base->degb);
@@ -580,7 +580,7 @@ void _fmpz_mpoly_mul_array_threaded_worker_DEG(void * varg)
                 {
                     if (j < base->Bl)
                     {
-                        _fmpz_mpoly_addmul_array1_slong((ulong *)coeff_array, 
+                        _fmpz_mpoly_addmul_array1_slong((ulong *)coeff_array,
                             base->Acoeffs + base->Amain[i],
                                 base->Apexp + base->Amain[i],
                                 base->Amain[i + 1] - base->Amain[i],
@@ -589,7 +589,7 @@ void _fmpz_mpoly_mul_array_threaded_worker_DEG(void * varg)
                                 base->Bmain[j + 1] - base->Bmain[j]);
                     }
                 }
-                (base->Pchunks + base->perm[Pi])->len = 
+                (base->Pchunks + base->perm[Pi])->len =
                     upack_sm3((base->Pchunks + base->perm[Pi])->poly, 0,
                         (ulong *)coeff_array, base->Pl - base->perm[Pi] - 1,
                                                       base->nvars, base->degb);
@@ -600,7 +600,7 @@ void _fmpz_mpoly_mul_array_threaded_worker_DEG(void * varg)
             {
                 if (j < base->Bl)
                 {
-                    _fmpz_mpoly_addmul_array1_fmpz((fmpz *)coeff_array, 
+                    _fmpz_mpoly_addmul_array1_fmpz((fmpz *)coeff_array,
                         base->Acoeffs + base->Amain[i],
                             base->Apexp + base->Amain[i],
                             base->Amain[i + 1] - base->Amain[i],
@@ -609,7 +609,7 @@ void _fmpz_mpoly_mul_array_threaded_worker_DEG(void * varg)
                             base->Bmain[j + 1] - base->Bmain[j]);
                 }
             }
-            (base->Pchunks + base->perm[Pi])->len = 
+            (base->Pchunks + base->perm[Pi])->len =
                 upack_fmpz((base->Pchunks + base->perm[Pi])->poly, 0,
                     (fmpz *)coeff_array, base->Pl - base->perm[Pi] - 1,
                                                       base->nvars, base->degb);

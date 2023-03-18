@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2009, 2011 William Hart
 
     This file is part of FLINT.
@@ -11,21 +11,21 @@
 
 #include "flint.h"
 #include "fft.h"
-      
-void fft_negacyclic(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, 
+
+void fft_negacyclic(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w,
                     mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp)
 {
    mp_size_t i;
    mp_size_t limbs = (w*n)/FLINT_BITS;
-   
+
    /* first apply twiddle factors corresponding to shifts of w*i/2 bits */
    if (w & 1)
    {
-      for (i = 0; i < n; i++) 
-      {   
+      for (i = 0; i < n; i++)
+      {
           fft_adjust(*t1, ii[i], i/2, limbs, w);
           SWAP_PTRS(ii[i], *t1);
-            
+
           fft_adjust(*t2, ii[n+i], (n+i)/2, limbs, w);
           SWAP_PTRS(ii[n+i], *t2);
 
@@ -34,27 +34,27 @@ void fft_negacyclic(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w,
           SWAP_PTRS(ii[n+i], *t2);
 
           i++;
-          
+
           fft_adjust_sqrt2(*t1, ii[i], i, limbs, w, *temp);
           SWAP_PTRS(ii[i], *t1);
-          
+
           fft_adjust_sqrt2(*t2, ii[n+i], n+i, limbs, w, *temp);
           SWAP_PTRS(ii[n+i], *t2);
-          
+
           fft_butterfly(*t1, *t2, ii[i], ii[n+i], i, limbs, w);
           SWAP_PTRS(ii[i],   *t1);
           SWAP_PTRS(ii[n+i], *t2);
        }
    } else
    {
-       for (i = 0; i < n; i++) 
-       {   
+       for (i = 0; i < n; i++)
+       {
           fft_adjust(*t1, ii[i], i, limbs, w/2);
           SWAP_PTRS(ii[i], *t1);
-            
+
           fft_adjust(*t2, ii[n+i], n+i, limbs, w/2);
           SWAP_PTRS(ii[n+i], *t2);
-      
+
           fft_butterfly(*t1, *t2, ii[i], ii[n+i], i, limbs, w);
           SWAP_PTRS(ii[i],   *t1);
           SWAP_PTRS(ii[n+i], *t2);

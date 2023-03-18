@@ -27,14 +27,14 @@ fmpz_poly_mat_transpose(fmpz_poly_mat_t B, const fmpz_poly_mat_t A)
     {
         for (i = 0; i < A->r - 1; i++)
             for (j = i + 1; j < A->c; j++)
-                fmpz_poly_swap(fmpz_poly_mat_entry(B, i, j), 
+                fmpz_poly_swap(fmpz_poly_mat_entry(B, i, j),
                                fmpz_poly_mat_entry(B, j, i));
     }
     else  /* Not aliased; general case */
     {
         for (i = 0; i < B->r; i++)
             for (j = 0; j < B->c; j++)
-                fmpz_poly_set(fmpz_poly_mat_entry(B, i, j), 
+                fmpz_poly_set(fmpz_poly_mat_entry(B, i, j),
                               fmpz_poly_mat_entry(A, j, i));
     }
 }

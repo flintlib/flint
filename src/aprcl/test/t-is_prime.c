@@ -16,7 +16,7 @@ int main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
-   
+
     flint_printf("is_prime....");
     fflush(stdout);
 
@@ -32,7 +32,7 @@ int main(void)
 
         pbprime = fmpz_is_probabprime(n);
         cycloprime = aprcl_is_prime_jacobi(n);
-        
+
         if (pbprime != cycloprime)
         {
             flint_printf("FAIL\n");
@@ -47,7 +47,7 @@ int main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

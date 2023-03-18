@@ -14,7 +14,7 @@
 #include "nmod_vec.h"
 #include "nmod_mat.h"
 
-slong 
+slong
 nmod_mat_lu(slong * P, nmod_mat_t A, int rank_check)
 {
     slong nrows, ncols, n, cutoff;

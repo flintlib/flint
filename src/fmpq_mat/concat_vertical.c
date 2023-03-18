@@ -19,7 +19,7 @@ fmpq_mat_concat_vertical(fmpq_mat_t res, const fmpq_mat_t mat1, const fmpq_mat_t
     slong c1 = mat1->c;
     slong r2 = mat2->r;
     slong c2 = mat2->c;
-    
+
     for (i = 0; i < r1; i++)
     {
         for (j = 0; j < c1; j++)

@@ -13,7 +13,7 @@
 #define LONG_EXTRAS_H
 
 #ifdef LONG_EXTRAS_INLINES_C
-#define LONG_EXTRAS_INLINE 
+#define LONG_EXTRAS_INLINE
 #else
 #define LONG_EXTRAS_INLINE static __inline__
 #endif

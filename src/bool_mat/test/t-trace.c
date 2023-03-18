@@ -119,7 +119,7 @@ int main()
         bool_mat_randtest(A, state);
         bool_mat_randtest(B, state);
         bool_mat_add(C, A, B);
-        
+
         if (bool_mat_trace(C) != (bool_mat_trace(A) | bool_mat_trace(B)))
         {
             flint_printf("FAIL (trace(A+B) == trace(A) | trace(B))\n");
@@ -152,7 +152,7 @@ int main()
         bool_mat_randtest(B, state);
         bool_mat_mul(AB, A, B);
         bool_mat_mul(BA, B, A);
-        
+
         if (bool_mat_trace(AB) != bool_mat_trace(BA))
         {
             flint_printf("FAIL (trace(AB) == trace(BA))\n");

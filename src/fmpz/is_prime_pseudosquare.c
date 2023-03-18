@@ -13,8 +13,8 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-#ifndef FLINT64          
-mp_limb_t flint_fmpz_pseudosquares[][3] = 
+#ifndef FLINT64
+mp_limb_t flint_fmpz_pseudosquares[][3] =
 {
    { 17, 0, 0 },
    { 73, 0, 0 },
@@ -89,10 +89,10 @@ mp_limb_t flint_fmpz_pseudosquares[][3] =
    { 996692113u, 2949507147u, 16011u },
    { 996692113u, 2949507147u, 16011u },
    { 2616068761u, 328479117u, 198156u },
-   { 1411295841u, 761797252u, 229581u } 
+   { 1411295841u, 761797252u, 229581u }
 };
 #else
-mp_limb_t flint_fmpz_pseudosquares[][2] = 
+mp_limb_t flint_fmpz_pseudosquares[][2] =
 {
    { 17, 0 },
    { 73, 0 },
@@ -167,7 +167,7 @@ mp_limb_t flint_fmpz_pseudosquares[][2] =
    { 12668036736679956625u, 16011u },
    { 12668036736679956625u, 16011u },
    { 1410807067550026393u, 198156u },
-   { 3271894284933966433u, 229581u } 
+   { 3271894284933966433u, 229581u }
 };
 #endif
 
@@ -190,7 +190,7 @@ void fmpz_set_pseudosquare(fmpz_t f, unsigned int i)
       fmpz_add_ui(f, f, flint_fmpz_pseudosquares[i][1]);
       fmpz_mul_2exp(f, f, 32);
       fmpz_add_ui(f, f, flint_fmpz_pseudosquares[i][1]);
-   } 
+   }
 #else
    if (i < 58)
       fmpz_set_ui(f, flint_fmpz_pseudosquares[i][0]);
@@ -199,7 +199,7 @@ void fmpz_set_pseudosquare(fmpz_t f, unsigned int i)
       fmpz_set_ui(f, flint_fmpz_pseudosquares[i][1]);
       fmpz_mul_2exp(f, f, 64);
       fmpz_add_ui(f, f, flint_fmpz_pseudosquares[i][0]);
-   }      
+   }
 #endif
    else
    {
@@ -218,10 +218,10 @@ int fmpz_is_prime_pseudosquare(const fmpz_t n)
 
     ret = -1; /* silence compiler warning (not set when aborting) */
 
-    if (fmpz_sgn(n) <= 0) 
+    if (fmpz_sgn(n) <= 0)
        return 0;
 
-    if (fmpz_size(n) == 1) 
+    if (fmpz_size(n) == 1)
        return n_is_prime_pseudosquare(fmpz_get_ui(n));
 
     primes = n_primes_arr_readonly(FLINT_PSEUDOSQUARES_CUTOFF + 1);
@@ -229,7 +229,7 @@ int fmpz_is_prime_pseudosquare(const fmpz_t n)
     for (i = 0; i < FLINT_PSEUDOSQUARES_CUTOFF; i++)
     {
         p = primes[i];
-        if (fmpz_fdiv_ui(n, p) == 0) 
+        if (fmpz_fdiv_ui(n, p) == 0)
            return 0;
     }
 
@@ -238,18 +238,18 @@ int fmpz_is_prime_pseudosquare(const fmpz_t n)
     fmpz_init(exp);
     fmpz_init(mod);
     fmpz_init(nm1);
-    
+
     B  = primes[FLINT_PSEUDOSQUARES_CUTOFF];
     fmpz_sub_ui(nm1, n, 1);
     fmpz_fdiv_q_ui(NB, nm1, B);
     fmpz_add_ui(NB, NB, 1);
-    
+
     m1 = 0;
 
     for (i = 0; i < FLINT_NUM_FMPZ_PSEUDOSQUARES; i++)
     {
        fmpz_set_pseudosquare(f, i);
-       if (fmpz_cmp(f, NB) > 0) 
+       if (fmpz_cmp(f, NB) > 0)
           break;
     }
 
@@ -260,28 +260,28 @@ int fmpz_is_prime_pseudosquare(const fmpz_t n)
     }
 
     fmpz_fdiv_q_2exp(exp, nm1, 1);
-    
+
     for (j = 0; j <= i; j++)
     {
         fmpz_set_ui(mod, primes[j]);
         fmpz_powm(mod, mod, exp, n);
-        if (!fmpz_is_one(mod) && fmpz_cmp(mod, nm1) != 0) 
+        if (!fmpz_is_one(mod) && fmpz_cmp(mod, nm1) != 0)
         {
            ret = 0;
            goto cleanup;
         }
-        if (fmpz_cmp(mod, nm1) == 0) 
+        if (fmpz_cmp(mod, nm1) == 0)
            m1 = 1;
     }
 
     mod8 = fmpz_fdiv_ui(n, 8);
 
-    if ((mod8 == 3) || (mod8 == 7)) 
+    if ((mod8 == 3) || (mod8 == 7))
     {
        ret = 1;
        goto cleanup;
     }
-            
+
     if (mod8 == 5)
     {
         fmpz_set_ui(mod, 2);
@@ -298,12 +298,12 @@ int fmpz_is_prime_pseudosquare(const fmpz_t n)
     }
     else
     {
-        if (m1) 
+        if (m1)
         {
             ret = 1;
             goto cleanup;
         }
-            
+
         for (j = i + 1; j < FLINT_NUM_FMPZ_PSEUDOSQUARES + 1; j++)
         {
             fmpz_set_ui(mod, primes[j]);

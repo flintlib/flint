@@ -240,7 +240,7 @@ ulong dlog_mod2e(const dlog_modpe_t t, ulong b);
 #define DLOG_TABLE_MODPE_LIM 50
 #define DLOG_TABLE_PE_LIM 50
 #define DLOG_TABLE_N_LIM 50
-#define DLOG_BSGS_LIM  500 
+#define DLOG_BSGS_LIM  500
 
 #define DLOG_LOOP_MAX_FACTOR 6
 #define DLOG_G_SMALL 0

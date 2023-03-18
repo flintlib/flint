@@ -14,7 +14,7 @@
 #define MPF_VEC_H
 
 #ifdef MPF_VEC_INLINES_C
-#define MPF_VEC_INLINE 
+#define MPF_VEC_INLINE
 #else
 #define MPF_VEC_INLINE static __inline__
 #endif
@@ -35,7 +35,7 @@ void _mpf_vec_clear(mpf * vec, slong len);
 
 /*  Randomisation  ***********************************************************/
 
-void _mpf_vec_randtest(mpf * f, flint_rand_t state, 
+void _mpf_vec_randtest(mpf * f, flint_rand_t state,
                         slong len, flint_bitcnt_t bits);
 
 /*  Assignment and basic manipulation  ***************************************/

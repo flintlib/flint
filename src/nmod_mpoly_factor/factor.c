@@ -338,7 +338,7 @@ static int _factor_irred_compressed(
         nmod_poly_factor(Auf, Au);
 
         nmod_mpolyv_fit_length(Af, Auf->num, ctx);
-        Af->length = Auf->num; 
+        Af->length = Auf->num;
         for (i = 0; i < Auf->num; i++)
         {
             FLINT_ASSERT(Auf->exp[i] == 1);

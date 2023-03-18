@@ -22,7 +22,7 @@ main(void)
     slong i, m, n, d, r;
     mp_limb_t mod;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("rank....");
     fflush(stdout);
@@ -79,7 +79,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

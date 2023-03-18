@@ -19,9 +19,9 @@
     XXX: Currently supports aliasing between {A,a} and {B,b}.
  */
 
-slong _nmod_poly_hgcd(mp_ptr *M, slong *lenM, 
-                     mp_ptr A, slong *lenA, mp_ptr B, slong *lenB, 
-                     mp_srcptr a, slong lena, mp_srcptr b, slong lenb, 
+slong _nmod_poly_hgcd(mp_ptr *M, slong *lenM,
+                     mp_ptr A, slong *lenA, mp_ptr B, slong *lenB,
+                     mp_srcptr a, slong lena, mp_srcptr b, slong lenb,
                      nmod_t mod)
 {
     slong sgnM;

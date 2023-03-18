@@ -26,7 +26,7 @@ main(void)
     FLINT_TEST_INIT(state);
 
     flint_printf("evaluate_padic... ");
-    fflush(stdout);    
+    fflush(stdout);
 
     /* Compare with the computation over QQ */
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
@@ -37,7 +37,7 @@ main(void)
         fmpq_t aQQ, yQQ;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
-        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN)
             + PADIC_TEST_PREC_MIN;
         padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
@@ -79,7 +79,7 @@ main(void)
             slong N2 = N + (f->length - 1) * padic_val(a);
             padic_t y2, z2;
 
-            padic_init2(y2, N2); 
+            padic_init2(y2, N2);
             padic_init2(z2, N2);
 
             padic_set(y2, y, ctx);
@@ -116,7 +116,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

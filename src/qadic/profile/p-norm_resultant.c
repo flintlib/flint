@@ -12,8 +12,8 @@
 /*
     Benchmarks for the q-adic norm routine.
 
-    We consider the set-up with p = 17, N = 2^i, i = 0, ..., 19, 
-    and compute the norm of E = 1 + p A mod p^N, where 
+    We consider the set-up with p = 17, N = 2^i, i = 0, ..., 19,
+    and compute the norm of E = 1 + p A mod p^N, where
 
         A = [a{0},...,a{d-1}], where a{i} = (3+i)^{3N}.
  */
@@ -31,15 +31,15 @@ main(void)
 {
     slong l, len = 20;
     slong runs[] = {
-        1000000, 10000, 10000, 10000, 10000, 
-        10000, 10000, 1000, 1000, 1000, 
-        100, 100, 10, 10, 1, 
+        1000000, 10000, 10000, 10000, 10000,
+        10000, 10000, 1000, 1000, 1000,
+        100, 100, 10, 10, 1,
         1, 1, 1, 1, 1
     };
     slong N[] = {
-        1, 2, 4, 8, 16, 
-        32, 64, 128, 256, 512, 
-        1024, WORD(1) << 11, WORD(1) << 12, WORD(1) << 13, WORD(1) << 14, 
+        1, 2, 4, 8, 16,
+        32, 64, 128, 256, 512,
+        1024, WORD(1) << 11, WORD(1) << 12, WORD(1) << 13, WORD(1) << 14,
         WORD(1) << 15, WORD(1) << 16, WORD(1) << 17, WORD(1) << 18, WORD(1) << 19
     };
     slong T[20] = {0};
@@ -101,7 +101,7 @@ for (l = 0; l < len; l++)
 
     T[l] = (slong) (cputime * (1000000000 / runs[l]));
 
-    flint_printf("%2ld, %4XYXYXYXY, %8ld, %wd\n", 
+    flint_printf("%2ld, %4XYXYXYXY, %8ld, %wd\n",
         l, cputime, runs[l], T[l]);
 
     qadic_clear(e);

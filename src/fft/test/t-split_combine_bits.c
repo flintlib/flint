@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2009, 2011 William Hart
 
     This file is part of FLINT.
@@ -23,7 +23,7 @@ main(void)
     flint_printf("split/combine_bits....");
     fflush(stdout);
 
-    
+
     _flint_rand_init_gmp(state);
 
     for (i = 0; i < 10000; i++)
@@ -31,11 +31,11 @@ main(void)
         mp_size_t total_limbs = n_randint(state, 1000) + 1;
         mp_limb_t * in = flint_malloc(total_limbs*sizeof(mp_limb_t));
         mp_limb_t * out = flint_calloc(total_limbs, sizeof(mp_limb_t));
-        
+
         flint_bitcnt_t bits = n_randint(state, 200) + 1;
         mp_size_t limbs = (2*bits - 1)/FLINT_BITS + 1;
         slong length = (total_limbs*FLINT_BITS - 1)/bits + 1;
-        
+
         mp_limb_t ** poly;
         poly = flint_malloc(length*sizeof(mp_limb_t *));
         for (j = 0; j < length; j++)
@@ -45,7 +45,7 @@ main(void)
 
         fft_split_bits(poly, in, total_limbs, bits, limbs);
         fft_combine_bits(out, poly, length, bits, limbs, total_limbs);
-        
+
         for (j = 0; j < total_limbs; j++)
         {
            if (in[j] != out[j])
@@ -67,7 +67,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

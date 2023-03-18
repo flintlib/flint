@@ -12,8 +12,8 @@
 #include "fmpz_mat.h"
 #include "padic_mat.h"
 
-void padic_mat_scalar_div_fmpz(padic_mat_t B, 
-                               const padic_mat_t A, const fmpz_t c, 
+void padic_mat_scalar_div_fmpz(padic_mat_t B,
+                               const padic_mat_t A, const fmpz_t c,
                                const padic_ctx_t ctx)
 {
     if (padic_mat_is_empty(B))

@@ -20,8 +20,8 @@
 #include "templates.h"
 
 /*
-    Include routines for vectors over \code{fmpz_poly_struct}, 
-    for use in the classical multiplication routine in the 
+    Include routines for vectors over \code{fmpz_poly_struct},
+    for use in the classical multiplication routine in the
     $X$-direction.
  */
 

@@ -105,9 +105,9 @@ gr_mat_minpoly_field(gr_poly_t p, const gr_mat_t X, gr_ctx_t ctx)
         {
             r1++;
             r2 = indep ? r2 + 1 : r2;
-         
+
             status |= gr_mat_mul(v, X, v, ctx);
-         
+
             for (i = 0; i < n; i++)
                 status |= gr_set(GR_MAT_ENTRY(A, r1, i, sz), GR_MAT_ENTRY(v, i, 0, sz), ctx);
 

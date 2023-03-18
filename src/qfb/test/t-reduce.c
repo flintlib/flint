@@ -27,20 +27,20 @@ int main(void)
 
     flint_randinit(state);
 
-    for (i = 1; i < 100000; i++) 
+    for (i = 1; i < 100000; i++)
     {
         fmpz_t D;
         qfb_t r;
-        
+
         fmpz_init(D);
         qfb_init(r);
-            
+
         do
         {
            fmpz_randtest_unsigned(r->a, state, 100);
            if (fmpz_is_zero(r->a))
               fmpz_set_ui(r->a, 1);
- 
+
            fmpz_randtest(r->b, state, 100);
            fmpz_randtest(r->c, state, 100);
 
@@ -56,7 +56,7 @@ int main(void)
            qfb_print(r); printf("\n");
            flint_abort();
         }
-           
+
         fmpz_clear(D);
         qfb_clear(r);
     }

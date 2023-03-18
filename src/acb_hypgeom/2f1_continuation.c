@@ -84,7 +84,7 @@ bound(mag_t A, mag_t nu, mag_t N,
     mag_clear(u);
 }
 
-/* 
+/*
    F(x)  = c0   +     c1 x    +     c2 x^2   +     c3 x^3    +    [...]
    F'(x) = c1   +   2 c2 x    +   3 c3 x^2   +   4 c4 x^3    +    [...]
 */

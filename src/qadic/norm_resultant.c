@@ -12,8 +12,8 @@
 #include "qadic.h"
 
 /*
-    Computes the characteristic polynomial of the $n \times n$ matrix $M$ 
-    modulo \code{pN} using a division-free algorithm in $O(n^4)$ ring 
+    Computes the characteristic polynomial of the $n \times n$ matrix $M$
+    modulo \code{pN} using a division-free algorithm in $O(n^4)$ ring
     operations.
 
     Only returns the determinant.
@@ -21,7 +21,7 @@
     Assumes that $n$ is at least $2$.
  */
 
-static 
+static
 void _fmpz_mod_mat_det(fmpz_t rop, const fmpz *M, slong n, const fmpz_t pN)
 {
     fmpz *F;
@@ -73,7 +73,7 @@ void _fmpz_mod_mat_det(fmpz_t rop, const fmpz *M, slong n, const fmpz_t pN)
     }
 
     /*
-        Now [F{n-1}, F{n-2}, ..., F{0}, 1] is the 
+        Now [F{n-1}, F{n-2}, ..., F{0}, 1] is the
         characteristic polynomial of the matrix M.
      */
 
@@ -93,8 +93,8 @@ void _fmpz_mod_mat_det(fmpz_t rop, const fmpz *M, slong n, const fmpz_t pN)
     fmpz_clear(s);
 }
 
-void _qadic_norm_resultant(fmpz_t rop, const fmpz *op, slong len, 
-                           const fmpz *a, const slong *j, slong lena, 
+void _qadic_norm_resultant(fmpz_t rop, const fmpz *op, slong len,
+                           const fmpz *a, const slong *j, slong lena,
                            const fmpz_t p, slong N)
 {
     const slong d = j[lena - 1];
@@ -133,12 +133,12 @@ void _qadic_norm_resultant(fmpz_t rop, const fmpz *op, slong len,
             }
 
             _fmpz_mod_mat_det(rop, M, n, pN);
-            
+
             flint_free(M);
         }
 
         /*
-            XXX:  This part of the code is currently untested as the Conway 
+            XXX:  This part of the code is currently untested as the Conway
             polynomials used for the extension Qq/Qp are monic.
          */
         if (!fmpz_is_one(a + (lena - 1)))
@@ -169,8 +169,8 @@ void qadic_norm_resultant(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
     }
     else
     {
-        _qadic_norm_resultant(padic_unit(rop), op->coeffs, op->length, 
-                              ctx->a, ctx->j, ctx->len, (&ctx->pctx)->p, 
+        _qadic_norm_resultant(padic_unit(rop), op->coeffs, op->length,
+                              ctx->a, ctx->j, ctx->len, (&ctx->pctx)->p,
                               N - d * op->val);
         padic_val(rop) = d * op->val;
     }

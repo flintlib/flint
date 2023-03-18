@@ -69,7 +69,7 @@ static int _from_dense(
     outrange = 0;
     mpoly_monomial_zero(pcurexp, N);
     k = off;
-    for (j = nvars - 1; j >= 0; j--) 
+    for (j = nvars - 1; j >= 0; j--)
     {
         exps[j] = k % Adeg_bounds[j];
         rangemask[j] = UWORD(1) << j;

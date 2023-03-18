@@ -13,8 +13,8 @@
 #include "nmod_poly.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t, 
-                             const fmpz * poly1, slong len1, 
+void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
+                             const fmpz * poly1, slong len1,
                              const fmpz * poly2, slong len2)
 {
     mp_ptr G, S, T, A, B, T1, T2;
@@ -26,7 +26,7 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
     /* Compute resultant of input polys */
     _fmpz_poly_resultant(r, poly1, len1, poly2, len2);
 
-    if (fmpz_is_zero(r)) 
+    if (fmpz_is_zero(r))
         return;
 
     fmpz_init(prod);
@@ -49,7 +49,7 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
 
     first = 1;
 
-    for (;;) 
+    for (;;)
     {
         mp_limb_t R;
         nmod_t mod;
@@ -61,7 +61,7 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
         R = fmpz_fdiv_ui(r, p);
 
         /* If p divides resultant or either leading coeff, discard p */
-        if ((fmpz_fdiv_ui(poly1 + len1 - 1, p) == WORD(0)) || 
+        if ((fmpz_fdiv_ui(poly1 + len1 - 1, p) == WORD(0)) ||
             (fmpz_fdiv_ui(poly2 + len2 - 1, p) == WORD(0)) || (R == 0))
             continue;
 
@@ -79,7 +79,7 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
             _fmpz_vec_get_nmod_vec(S, s, len2, mod);
             _fmpz_vec_get_nmod_vec(T, t, len1, mod);
 
-            _nmod_poly_mul(T1, A, len1, S, len2, mod); 
+            _nmod_poly_mul(T1, A, len1, S, len2, mod);
             _nmod_poly_mul(T2, T, len1, B, len2, mod);
             _nmod_vec_add(T1, T1, T2, len1 + len2 - 1, mod);
             tlen = len1 + len2 - 1;
@@ -88,7 +88,7 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
             if (tlen == 1 && T1[0] == R) /* It is, so this prime is good */
                 fmpz_mul_ui(prod, prod, p);
             else
-                stabilised = 0; /* It's not, keep going with xgcds */   
+                stabilised = 0; /* It's not, keep going with xgcds */
         }
 
         if (!stabilised) /* Need to keep computing xgcds mod p */
@@ -132,15 +132,15 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
             }
         }
 
-        if (stabilised) 
+        if (stabilised)
         {
             slong bound1, bound2, bound;
 
-            bound1 = FLINT_BIT_COUNT(len2) 
-                    + FLINT_ABS(_fmpz_vec_max_bits(poly1, len1)) 
+            bound1 = FLINT_BIT_COUNT(len2)
+                    + FLINT_ABS(_fmpz_vec_max_bits(poly1, len1))
                     + FLINT_ABS(_fmpz_vec_max_bits(s, len2));
-            bound2 = FLINT_BIT_COUNT(len2) 
-                    + FLINT_ABS(_fmpz_vec_max_bits(poly2, len2)) 
+            bound2 = FLINT_BIT_COUNT(len2)
+                    + FLINT_ABS(_fmpz_vec_max_bits(poly2, len2))
                     + FLINT_ABS(_fmpz_vec_max_bits(t, len1));
 
             bound = 4 + FLINT_MAX(fmpz_bits(r), FLINT_MAX(bound1, bound2));
@@ -168,10 +168,10 @@ fmpz_poly_xgcd_modular(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
         fmpz *S, *T;
         fmpz_poly_t temp1, temp2;
 
-        if (len1 == 0 || len2 == 0) 
+        if (len1 == 0 || len2 == 0)
         {
             fmpz_zero(r);
-        } 
+        }
         else /* len1 >= len2 >= 1 */
         {
             if (s == poly1 || s == poly2)
@@ -184,7 +184,7 @@ fmpz_poly_xgcd_modular(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
                 fmpz_poly_fit_length(s, len2);
                 S = s->coeffs;
             }
-    
+
             if (t == poly1 || t == poly2)
             {
                 fmpz_poly_init2(temp2, len1);
@@ -195,10 +195,10 @@ fmpz_poly_xgcd_modular(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
                 fmpz_poly_fit_length(t, len1);
                 T = t->coeffs;
             }
-     
+
             _fmpz_poly_xgcd_modular(r, S, T, poly1->coeffs, len1,
                                         poly2->coeffs, len2);
-            
+
             if (s == poly1 || s == poly2)
             {
                 fmpz_poly_swap(s, temp1);
@@ -210,10 +210,10 @@ fmpz_poly_xgcd_modular(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
                 fmpz_poly_swap(t, temp2);
                 fmpz_poly_clear(temp2);
             }
- 
+
             _fmpz_poly_set_length(s, len2);
             _fmpz_poly_normalise(s);
- 
+
             _fmpz_poly_set_length(t, len1);
             _fmpz_poly_normalise(t);
         }

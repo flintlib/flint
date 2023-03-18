@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2009, 2011 William Hart
 
     This file is part of FLINT.
@@ -12,7 +12,7 @@
 #include "flint.h"
 #include "fft.h"
 
-void butterfly_rshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1, 
+void butterfly_rshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1,
                        mp_limb_t * i2, mp_size_t limbs, mp_size_t x, mp_size_t y)
 {
    mp_limb_t cy, cy1, cy2, cy3;
@@ -21,7 +21,7 @@ void butterfly_rshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1,
    {
       if (y == 0)
       {
-         cy = fft_sumdiff(t, u, i1, i2, limbs + 1);     
+         cy = fft_sumdiff(t, u, i1, i2, limbs + 1);
       } else /* y != 0 */
       {
          cy = fft_sumdiff(t, u, i1, i2 + y, limbs - y);
@@ -80,6 +80,6 @@ void butterfly_rshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1,
       mpn_addmod_2expp1_1(u + limbs - x, x, -(cy&1) + i1[limbs] + cy3);
       cy = fft_sumdiff(t, u, i1 + x, i2 + y, limbs - y);
       mpn_addmod_2expp1_1(t + limbs - y, y, (cy>>1) + i2[limbs]);
-      mpn_addmod_2expp1_1(u + limbs - y, y, -(cy&1) - i2[limbs]);      
+      mpn_addmod_2expp1_1(u + limbs - y, y, -(cy&1) - i2[limbs]);
    }
 }

@@ -43,7 +43,7 @@ main(void)
         nmod_poly_init(r, mod);
 
         nmod_mat_randtest(A, state);
-        
+
         nmod_mat_minpoly(f, A);
         nmod_mat_charpoly(g, A);
 
@@ -91,9 +91,9 @@ main(void)
               A->rows[i + n/2][j + n/2] = A->rows[i][j];
            }
         }
-        
+
         nmod_mat_minpoly(f, A);
-        
+
         for (i = 0; i < 10; i++)
            nmod_mat_similarity(A, n_randint(state, m), n_randint(state, mod));
 
@@ -115,7 +115,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

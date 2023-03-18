@@ -20,7 +20,7 @@ fmpz_poly_mat_concat_horizontal(fmpz_poly_mat_t res, const fmpz_poly_mat_t mat1,
     slong c1 = mat1->c;
     slong r2 = mat2->r;
     slong c2 = mat2->c;
-    
+
     for (i = 0; i < r1; i++)
     {
         for (j = 0; j < c1; j++)

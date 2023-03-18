@@ -241,7 +241,7 @@ got_alpha:
 
         fmpz_poly_factor(uf, u);
 
-        zassenhaus_prune_start_add_factors(Z);                
+        zassenhaus_prune_start_add_factors(Z);
         sqrfree = 1;
         for (i = 0; i < uf->num; i++)
         {

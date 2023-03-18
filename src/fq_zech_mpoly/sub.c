@@ -113,7 +113,7 @@ void fq_zech_mpoly_sub(fq_zech_mpoly_t poly1, const fq_zech_mpoly_t poly2,
         fq_zech_mpoly_fit_bits(temp, max_bits, ctx);
         temp->bits = max_bits;
 
-        len1 = _fq_zech_mpoly_sub(temp->coeffs, temp->exps, 
+        len1 = _fq_zech_mpoly_sub(temp->coeffs, temp->exps,
                     poly2->coeffs, exp2, poly2->length,
                     poly3->coeffs, exp3, poly3->length,
                                     N, cmpmask, ctx->fqctx);
@@ -128,12 +128,12 @@ void fq_zech_mpoly_sub(fq_zech_mpoly_t poly1, const fq_zech_mpoly_t poly2,
         fq_zech_mpoly_fit_bits(poly1, max_bits, ctx);
         poly1->bits = max_bits;
 
-        len1 = _fq_zech_mpoly_sub(poly1->coeffs, poly1->exps, 
+        len1 = _fq_zech_mpoly_sub(poly1->coeffs, poly1->exps,
                        poly2->coeffs, exp2, poly2->length,
                        poly3->coeffs, exp3, poly3->length,
                                     N, cmpmask, ctx->fqctx);
     }
-      
+
     if (free2)
         flint_free(exp2);
 

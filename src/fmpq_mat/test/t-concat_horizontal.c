@@ -24,7 +24,7 @@ int main(void)
 
     flint_printf("concat_horizontal....");
     fflush(stdout);
-    
+
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -40,11 +40,11 @@ int main(void)
 
         fmpq_mat_randtest(A, state, n_randint(state, 200) + 1);
         fmpq_mat_randtest(B, state, n_randint(state, 200) + 1);
-        
+
         fmpq_mat_randtest(C, state, n_randint(state, 200) + 1);
 
         fmpq_mat_concat_horizontal(C, A, B);
-        
+
         fmpq_mat_window_init(window1, C, 0, 0, r1, c1);
         fmpq_mat_window_init(window2, C, 0, c1, r1, (c1 + c2));
 
@@ -55,7 +55,7 @@ int main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         fmpq_mat_clear(A);
         fmpq_mat_clear(B);
         fmpq_mat_clear(C);
@@ -66,7 +66,7 @@ int main(void)
 
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

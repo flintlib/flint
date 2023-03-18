@@ -85,7 +85,7 @@ void sample_small(void * arg, ulong count)
     fmpz_init(b);
     fmpz_init(c);
     fmpz_init(d);
-    
+
     prof_start();
     for (ix = 0; ix < 1000000 * count; ix++)
     {
@@ -118,7 +118,7 @@ void sample_small_old(void * arg, ulong count)
     fmpz_init(b);
     fmpz_init(c);
     fmpz_init(d);
-    
+
     prof_start();
     for (ix = 0; ix < 1000000 * count; ix++)
     {
@@ -153,7 +153,7 @@ void sample_small_zeros(void * arg, ulong count)
     fmpz_init(d);
 
     fmpz_zero(c);
-    
+
     prof_start();
     for (ix = 0; ix < 1000000 * count; ix++)
     {
@@ -187,7 +187,7 @@ void sample_small_zeros_old(void * arg, ulong count)
     fmpz_init(d);
 
     fmpz_zero(c);
-    
+
     prof_start();
     for (ix = 0; ix < 1000000 * count; ix++)
     {
@@ -221,7 +221,7 @@ void sample_big_zeros(void * arg, ulong count)
     fmpz_init(d);
 
     fmpz_zero(c);
-    
+
     prof_start();
     for (ix = 0; ix < 1000000 * count; ix++)
     {
@@ -255,7 +255,7 @@ void sample_big_zeros_old(void * arg, ulong count)
     fmpz_init(d);
 
     fmpz_zero(c);
-    
+
     prof_start();
     for (ix = 0; ix < 1000000 * count; ix++)
     {

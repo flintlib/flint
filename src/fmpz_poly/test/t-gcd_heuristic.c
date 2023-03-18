@@ -16,11 +16,11 @@
 #include "ulong_extras.h"
 
 /*
-    Tests whether the polynomial is suitably normalised for the 
-    result of a GCD operation, that is, whether it's leading 
+    Tests whether the polynomial is suitably normalised for the
+    result of a GCD operation, that is, whether it's leading
     coefficient is non-negative.
  */
-static 
+static
 int _t_gcd_is_canonical(const fmpz_poly_t poly)
 {
     return fmpz_poly_is_zero(poly) || (fmpz_sgn(fmpz_poly_lead(poly)) > 0);
@@ -31,7 +31,7 @@ main(void)
 {
     int i, result, d1, d2;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("gcd_heuristic....");
     fflush(stdout);
 
@@ -49,7 +49,7 @@ main(void)
         d1 = fmpz_poly_gcd_heuristic(a, b, c);
         d2 = fmpz_poly_gcd_heuristic(b, b, c);
 
-        result = ((d1 == 0 && d2 == 0) || (fmpz_poly_equal(a, b) 
+        result = ((d1 == 0 && d2 == 0) || (fmpz_poly_equal(a, b)
                                            && _t_gcd_is_canonical(a)));
         if (!result)
         {
@@ -79,7 +79,7 @@ main(void)
         d1 = fmpz_poly_gcd_heuristic(a, b, c);
         d2 = fmpz_poly_gcd_heuristic(c, b, c);
 
-        result = ((d1 == 0 && d2 == 0) || (fmpz_poly_equal(a, c) 
+        result = ((d1 == 0 && d2 == 0) || (fmpz_poly_equal(a, c)
                                            && _t_gcd_is_canonical(a)));
         if (!result)
         {
@@ -176,7 +176,7 @@ main(void)
               fflush(stdout);
               flint_abort();
            }
-        } 
+        }
 
         fmpz_poly_clear(a);
         fmpz_poly_clear(d);
@@ -186,14 +186,14 @@ main(void)
         fmpz_poly_clear(r);
     }
 
-    /* 
+    /*
 	   Check that gcd(f, ga) divides f and ga for small generic f, g
 	   and a small linear factor a. Exercises a bug found by Anton Mellit.
 	*/
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, d, f, g, q, r;
-        
+
 		fmpz_poly_init(d);
         fmpz_poly_init(f);
         fmpz_poly_init(g);
@@ -207,9 +207,9 @@ main(void)
 		fmpz_poly_set_coeff_si(a, 0, n_randint(state, 2) ? 1 : -1);
 		fmpz_poly_set_coeff_si(a, 1, 1);
 		fmpz_poly_mul(g, g, a);
-		
+
         d1 = fmpz_poly_gcd_heuristic(d, f, g);
-		
+
         if (d1)
         {
            if (fmpz_poly_is_zero(d))
@@ -221,7 +221,7 @@ main(void)
               fmpz_poly_divrem_divconquer(q, r, g, d);
               result &= fmpz_poly_is_zero(r);
 		   }
-		   
+
            if (!result)
            {
               flint_printf("FAIL (gcd(f, g) | f and g):\n");
@@ -259,7 +259,7 @@ main(void)
        if (!result)
        {
           flint_printf("FAIL (check 1 == gcd(x^2, 24*x - 32):\n");
-          fmpz_poly_print(d); flint_printf("\n"); 
+          fmpz_poly_print(d); flint_printf("\n");
           fflush(stdout);
           flint_abort();
        }
@@ -273,26 +273,26 @@ main(void)
     {
        fmpz_poly_t a, b, d;
        int heuristic;
-	   
+
        fmpz_poly_init(a);
        fmpz_poly_init(b);
        fmpz_poly_init(d);
 
-	   /* 
-	       b = 3*q^12 - 8*q^11 - 24*q^10 - 48*q^9 - 84*q^8 - 92*q^7 - 92*q^6 - 
+	   /*
+	       b = 3*q^12 - 8*q^11 - 24*q^10 - 48*q^9 - 84*q^8 - 92*q^7 - 92*q^6 -
                70*q^5 - 50*q^4 - 27*q^3 - 13*q^2 - 4*q - 1
 		   a = q^13 - 2*q^12 + 2*q^10 - q^9
 	   */
        fmpz_poly_set_str(b, "13  -1 -4 -13 -27 -50 -70 -92 -92 -84 -48 -24 -8 3");
 	   fmpz_poly_set_str(a, "14  0 0 0 0 0 0 0 0 0 -1 2 0 -2 1");
-	   
+
        heuristic = fmpz_poly_gcd_heuristic(d, a, b);
 
        result = (heuristic == 0 || (d->length == 1 && fmpz_is_one(d->coeffs)));
        if (!result)
        {
           flint_printf("FAIL Mellit test case:\n");
-          fmpz_poly_print(d); flint_printf("\n"); 
+          fmpz_poly_print(d); flint_printf("\n");
           fflush(stdout);
           flint_abort();
        }
@@ -315,7 +315,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

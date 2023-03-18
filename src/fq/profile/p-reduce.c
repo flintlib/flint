@@ -24,12 +24,12 @@ main(int argc, char** argv)
     double dense;
 
     FLINT_TEST_INIT(state);
-    
+
     fmpz_init(p);
     fmpz_set_str(p, argv[1], 10);
 
     d = atoi(argv[2]);
-    
+
     fq_ctx_init(ctx,p,d,"a");
 
     fq_init(a, ctx);
@@ -50,7 +50,7 @@ main(int argc, char** argv)
         _fq_dense_reduce(a->coeffs, a->length, ctx);
     }
     prof_stop();
-    
+
     dense = get_clock(0);
 
     init_clock(0);
@@ -70,8 +70,8 @@ main(int argc, char** argv)
     {
         result = 0;
     }
-      
-    
+
+
     fmpz_print(p);
     flint_printf(" %d %d %d\n", ctx->len, ctx->modulus->length, result);
 

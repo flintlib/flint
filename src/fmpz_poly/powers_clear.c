@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void 
+void
 _fmpz_poly_powers_clear(fmpz ** powers, slong len)
 {
    slong i;
@@ -23,7 +23,7 @@ _fmpz_poly_powers_clear(fmpz ** powers, slong len)
    flint_free(powers);
 }
 
-void 
+void
 fmpz_poly_powers_clear(fmpz_poly_powers_precomp_t pinv)
 {
    _fmpz_poly_powers_clear(pinv->powers, pinv->len);

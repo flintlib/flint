@@ -23,7 +23,7 @@ fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus,
 
     fmpz_init(fq_nmod_ctx_prime(ctx));
     fmpz_set_ui(fq_nmod_ctx_prime(ctx), modulus->mod.n);
-    
+
     ctx->mod.n = modulus->mod.n;
     ctx->mod.ninv = modulus->mod.ninv;
     ctx->mod.norm = modulus->mod.norm;

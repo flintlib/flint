@@ -20,7 +20,7 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("sqrt_series....");
     fflush(stdout);
 
@@ -62,7 +62,7 @@ main(void)
                 fflush(stdout);
                 flint_abort();
             }
-        
+
             fmpz_mod_poly_clear(h, ctx);
             fmpz_mod_poly_clear(g, ctx);
             fmpz_mod_poly_clear(r, ctx);
@@ -84,7 +84,7 @@ main(void)
         {
             fmpz_mod_poly_init(h, ctx);
             fmpz_mod_poly_init(g, ctx);
-            
+
             do fmpz_mod_poly_randtest(h, state, n_randint(state, 500), ctx);
             while (h->length == 0);
             fmpz_mod_poly_set_coeff_ui(h, 0, 1, ctx);
@@ -115,7 +115,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2008, 2009, William Hart 
+    Copyright (C) 2008, 2009, William Hart
     Copyright (C) 2010 Fredrik Johansson
     Copyright (C) 2021 Daniel Schultz
 
@@ -188,7 +188,7 @@ void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
 
             C->crt_lu[i].i0 = nmod_mul(tt, C->crt_lu[i].i0, C->crt_lu[i].mod);
             C->crt_lu[i].i1 = nmod_mul(tt, C->crt_lu[i].i1, C->crt_lu[i].mod);
-            C->crt_lu[i].i2 = nmod_mul(tt, C->crt_lu[i].i2, C->crt_lu[i].mod);            
+            C->crt_lu[i].i2 = nmod_mul(tt, C->crt_lu[i].i2, C->crt_lu[i].mod);
         }
 
         C->crt_offsets[k - 1] = C->crt_offsets[k];

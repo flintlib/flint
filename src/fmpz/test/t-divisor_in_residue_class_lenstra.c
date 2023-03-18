@@ -34,7 +34,7 @@ main(void)
         fmpz_init(r);
         fmpz_init(s);
         fmpz_init(g);
- 
+
         do {
            do {
               fmpz_randbits(p, state, n_randint(state, 100) + 2);
@@ -42,17 +42,17 @@ main(void)
            do {
               fmpz_randbits(a, state, n_randint(state, 100) + 2);
            } while (fmpz_cmp_ui(a, 2) < 0);
-        
+
            fmpz_mul(p, p, a);
-           
+
            fmpz_root(s, p, 3); /* cube root of p */
            fmpz_randbits(r, state, (2*fmpz_bits(p))/3);
            fmpz_abs(r, r);
-           
+
            fmpz_mul(s, s, r); /* s now between cube root and p */
-        
+
            fmpz_mod(r, a, s);
-  
+
            fmpz_gcd(g, r, s);
         } while (!fmpz_is_one(g));
 
@@ -90,20 +90,20 @@ main(void)
         fmpz_init(r);
         fmpz_init(s);
         fmpz_init(g);
- 
+
         do {
            do {
               fmpz_randbits(p, state, n_randint(state, 100) + 2);
            } while (!fmpz_is_probabprime_BPSW(p));
-           
+
            fmpz_root(s, p, 3); /* cube root of p */
            fmpz_randbits(r, state, (2*fmpz_bits(p))/3);
            fmpz_abs(r, r);
-           
+
            fmpz_mul(s, s, r); /* s now between cube root and p */
-        
+
            fmpz_randm(r, state, s);
-  
+
            fmpz_gcd(g, r, s);
         } while (!fmpz_is_one(g) || fmpz_is_one(s));
 
@@ -128,7 +128,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

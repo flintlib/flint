@@ -29,16 +29,16 @@ main(void)
 {
     int len, e;
     fmpz_poly_t f, g[1];
-    
+
     FLINT_TEST_INIT(state);
-    
-   
+
+
     fmpz_poly_init2(f, lenhi);
     fmpz_poly_init2(g[0], ehi * (lenhi - 1) + 1);
     fmpz_poly_init2(g[1], ehi * (lenhi - 1) + 1);
-    
+
     flint_printf("| len | exp | binomial |\n");
-    
+
     for (len = lenlo; len <= lenhi; len += lenh)
     {
         /*
@@ -52,33 +52,33 @@ main(void)
                 fmpz_randtest_not_zero(f->coeffs + (len-1), state, bits);
             f->length = len;
         }
-        
+
         for (e = elo; e <= ehi; e += eh)
         {
             timeit_t t[1];
             int l, loops = 1, r = 0;
             slong s[1] = {0};
-            
+
           loop:
-            
+
             timeit_start(t[0]);
             for (l = 0; l < loops; l++)
                 fmpz_poly_pow_binomial(g[0], f, e);
             timeit_stop(t[0]);
-            
+
             if (t[0]->cpu <= cpumin)
             {
                 loops *= 10;
                 goto loop;
             }
-            
+
             s[0] += t[0]->cpu;
             r    += loops;
-            
+
             flint_printf("%d %d %lf\n", len, e, s[0] / (double) r);
         }
     }
-    
+
     fmpz_poly_clear(f);
     fmpz_poly_clear(g[0]);
 

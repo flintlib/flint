@@ -17,7 +17,7 @@ int main(void)
    int i, result;
    ulong count = UWORD(0);
    FLINT_TEST_INIT(state);
-   
+
 
    flint_printf("factor_SQUFOF....");
    fflush(stdout);
@@ -36,7 +36,7 @@ int main(void)
 #else
       n2 = n_factor_SQUFOF(n1, 2000);
 #endif
-      
+
       if (n2)
       {
          count++;
@@ -44,23 +44,23 @@ int main(void)
          if (!result)
          {
             flint_printf("FAIL:\n");
-            flint_printf("n1 = %wu, n2 = %wu\n", n1, n2); 
+            flint_printf("n1 = %wu, n2 = %wu\n", n1, n2);
             fflush(stdout);
             flint_abort();
          }
       }
    }
-   
+
    if (count < 280 * flint_test_multiplier())
    {
       flint_printf("FAIL:\n");
-      flint_printf("Only %wu numbers factored\n", count); 
+      flint_printf("Only %wu numbers factored\n", count);
       fflush(stdout);
       flint_abort();
    }
 
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

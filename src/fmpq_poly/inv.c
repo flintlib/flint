@@ -20,7 +20,7 @@ void fmpq_poly_inv(fmpq_poly_t poly1, const fmpq_poly_t poly2)
         flint_printf("Exception (fmpq_poly_inv). poly2 is not invertible.\n");
         flint_abort();
     }
-    
+
     if (poly1 == poly2)
     {
         fmpz_swap(poly1->coeffs, poly1->den);

@@ -93,7 +93,7 @@ slong n_bpoly_degree1(const n_bpoly_t A)
     slong i, len = 0;
     for (i = 0; i < A->length; i++)
         len = FLINT_MAX(len, A->coeffs[i].length);
-    return len - 1;    
+    return len - 1;
 }
 
 int n_bpoly_equal(const n_bpoly_t A, const n_bpoly_t B)

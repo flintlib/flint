@@ -11,7 +11,7 @@
 
 #include "padic_poly.h"
 
-int _padic_poly_is_reduced(const fmpz *op, slong val, slong len, slong N, 
+int _padic_poly_is_reduced(const fmpz *op, slong val, slong len, slong N,
                            const padic_ctx_t ctx)
 {
     slong w;
@@ -20,7 +20,7 @@ int _padic_poly_is_reduced(const fmpz *op, slong val, slong len, slong N,
     {
         return (val == 0);
     }
-    
+
     w = _fmpz_vec_ord_p(op, len, ctx->p);
 
     if (w != 0 || val >= N)

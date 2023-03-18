@@ -15,7 +15,7 @@
 #include "fmpq_poly.h"
 
 void
-_fmpq_poly_asinh_series(fmpz * g, fmpz_t gden, 
+_fmpq_poly_asinh_series(fmpz * g, fmpz_t gden,
                        const fmpz * h, const fmpz_t hden, slong hlen, slong n)
 {
     fmpz * t;

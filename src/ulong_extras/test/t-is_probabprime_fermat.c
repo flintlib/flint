@@ -20,11 +20,11 @@ int main(void)
    mp_limb_t d, j;
    mpz_t d_m;
    FLINT_TEST_INIT(state);
-   
+
    flint_printf("is_probabprime_fermat....");
    fflush(stdout);
-   
-   
+
+
 
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that primes pass the test */
    {
@@ -49,14 +49,14 @@ int main(void)
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("d = %wu is declared composite\n", d); 
+         flint_printf("d = %wu is declared composite\n", d);
          fflush(stdout);
          flint_abort();
       }
 
       mpz_clear(d_m);
    }
-         
+
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that not too many composites pass */
    {
       mpz_init(d_m);
@@ -75,7 +75,7 @@ int main(void)
       } while (n_gcd(d, j) != UWORD(1));
 
       if (n_is_probabprime_fermat(d, j)) count++;
-      
+
       mpz_clear(d_m);
    }
 
@@ -83,13 +83,13 @@ int main(void)
    if (!result)
    {
       flint_printf("FAIL:\n");
-      flint_printf("%wu composites declared prime\n", count); 
+      flint_printf("%wu composites declared prime\n", count);
       fflush(stdout);
       flint_abort();
    }
-   
+
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

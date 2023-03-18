@@ -22,7 +22,7 @@ int main(void)
 {
    int i, result;
    FLINT_TEST_INIT(state);
-   
+
    flint_printf("invert_limb....");
    fflush(stdout);
 
@@ -32,7 +32,7 @@ int main(void)
 
       n = n_randtest(state);
       n |= (UWORD(1) << (FLINT_BITS - 1));
-      
+
       invert_limb(ninv1, n);
       invert_limb_naive(ninv2, n);
 
@@ -40,14 +40,14 @@ int main(void)
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("n = %wx, ninv1 = %wx, ninv2 = %wx\n", n, ninv1, ninv2); 
+         flint_printf("n = %wx, ninv1 = %wx, ninv2 = %wx\n", n, ninv1, ninv2);
          fflush(stdout);
          flint_abort();
       }
    }
 
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

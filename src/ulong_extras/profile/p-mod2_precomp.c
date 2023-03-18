@@ -20,8 +20,8 @@ void sample(void * arg, ulong count)
    ulong i;
    mp_ptr array = (mp_ptr) flint_malloc(1024*sizeof(mp_limb_t));
    FLINT_TEST_INIT(state);
-   
-   
+
+
    for (i = 0; i < count; i++)
    {
       int j;
@@ -38,7 +38,7 @@ void sample(void * arg, ulong count)
       prof_start();
       for (j = 0; j < 10000; j++)
       {
-         r += n_mod2_precomp(array[j&1023], d, dpre);  
+         r += n_mod2_precomp(array[j&1023], d, dpre);
       }
       prof_stop();
    }
@@ -52,10 +52,10 @@ void sample(void * arg, ulong count)
 int main(void)
 {
    double min, max;
-   
+
    prof_repeat(&min, &max, sample, NULL);
-   
-   flint_printf("mod2_precomp min time is %.3f cycles, max time is %.3f cycles\n", 
+
+   flint_printf("mod2_precomp min time is %.3f cycles, max time is %.3f cycles\n",
            (min/(double)FLINT_CLOCK_SCALE_FACTOR)/10000.0, (max/(double)FLINT_CLOCK_SCALE_FACTOR)/10000.0);
 
    return 0;

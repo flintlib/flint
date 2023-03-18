@@ -16,8 +16,8 @@
 #include "fmpz_mod_poly.h"
 
 /* todo: change signature; use gr_poly */
-void 
-_fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n, 
+void
+_fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n,
                                  const fmpz_t cinv, const fmpz_t p)
 {
     if (n == 1)  /* {Q,1} * cinv == 1 mod (x) */
@@ -52,7 +52,7 @@ _fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n,
             fmpz_mod_ctx_clear(fctx);
             _fmpz_poly_reverse(Qinv, Qinv, n, n);
         }
-        
+
         for (i--; i >= 0; i--)
         {
             m = n;
@@ -68,7 +68,7 @@ _fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n,
     }
 }
 
-void fmpz_mod_poly_inv_series_newton(fmpz_mod_poly_t Qinv, 
+void fmpz_mod_poly_inv_series_newton(fmpz_mod_poly_t Qinv,
                     const fmpz_mod_poly_t Q, slong n, const fmpz_mod_ctx_t ctx)
 {
     const fmpz *p = fmpz_mod_ctx_modulus(ctx);

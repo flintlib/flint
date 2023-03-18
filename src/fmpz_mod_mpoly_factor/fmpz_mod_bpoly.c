@@ -152,7 +152,7 @@ slong fmpz_mod_bpoly_degree1(
     slong i, len = 0;
     for (i = 0; i < A->length; i++)
         len = FLINT_MAX(len, A->coeffs[i].length);
-    return len - 1;    
+    return len - 1;
 }
 
 

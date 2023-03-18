@@ -119,7 +119,7 @@ main(void)
         C = (fmpz_mpoly_struct **) flint_malloc(nvarsB * sizeof(fmpz_mpoly_struct *));
         for (v = 0; v < nvarsB; v++)
         {
-            C[v] = (fmpz_mpoly_struct *) flint_malloc(sizeof(fmpz_mpoly_struct)); 
+            C[v] = (fmpz_mpoly_struct *) flint_malloc(sizeof(fmpz_mpoly_struct));
             fmpz_mpoly_init(C[v], ctxAC);
         }
 
@@ -203,9 +203,9 @@ main(void)
                                                   sizeof(fmpz_mpoly_struct *));
         for (v = 0; v < ctx->minfo->nvars; v++)
         {
-            vals1[v] = (fmpz_mpoly_struct *) flint_malloc(sizeof(fmpz_mpoly_struct)); 
+            vals1[v] = (fmpz_mpoly_struct *) flint_malloc(sizeof(fmpz_mpoly_struct));
             fmpz_mpoly_init(vals1[v], ctx);
-            fmpz_mpoly_gen(vals1[v], v, ctx);            
+            fmpz_mpoly_gen(vals1[v], v, ctx);
         }
 
         fmpz_mpoly_init(f, ctx);
@@ -250,7 +250,7 @@ main(void)
         for (v = 0; v < ctx->minfo->nvars; v++)
         {
             fmpz_mpoly_clear(vals1[v], ctx);
-            flint_free(vals1[v]);            
+            flint_free(vals1[v]);
         }
         flint_free(vals1);
 
@@ -295,7 +295,7 @@ main(void)
         for (v = 0; v < nvars1; v++)
         {
             vals1[v] = (fmpz_mpoly_struct *) flint_malloc(
-                                                    sizeof(fmpz_mpoly_struct)); 
+                                                    sizeof(fmpz_mpoly_struct));
             fmpz_mpoly_init(vals1[v], ctx2);
             fmpz_mpoly_randtest_bound(vals1[v], state, len2,
                                                 coeff_bits2, exp_bound2, ctx2);
@@ -312,7 +312,7 @@ main(void)
         vals3 = (fmpz **) flint_malloc(nvars1*sizeof(fmpz*));
         for (v = 0; v < nvars1; v++)
         {
-            vals3[v] = (fmpz *) flint_malloc(sizeof(fmpz)); 
+            vals3[v] = (fmpz *) flint_malloc(sizeof(fmpz));
             fmpz_init(vals3[v]);
             if (!fmpz_mpoly_evaluate_all_fmpz(vals3[v], vals1[v], vals2, ctx2))
             {

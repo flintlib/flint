@@ -28,7 +28,7 @@ int fmpz_mod_mat_can_solve(fmpz_mod_mat_t X, const fmpz_mod_mat_t A,
     if (A->mat->r == 0 || B->mat->c == 0)
     {
         fmpz_mod_mat_zero(X);
-                
+
         return 1;
     }
 
@@ -128,7 +128,7 @@ int fmpz_mod_mat_can_solve(fmpz_mod_mat_t X, const fmpz_mod_mat_t A,
 cleanup:
 
     fmpz_mod_mat_clear(LU2);
-    
+
     PB->mat->r = B->mat->r;
     fmpz_mod_mat_window_clear(PB);
 

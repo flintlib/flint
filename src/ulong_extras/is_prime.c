@@ -15,7 +15,7 @@
 
 int n_is_prime(mp_limb_t n)
 {
-    /* flint's "BPSW" checked against Feitsma and Galway's database [1, 2] 
+    /* flint's "BPSW" checked against Feitsma and Galway's database [1, 2]
        up to 2^64 by Dana Jacobsen.
        [1]  http://www.janfeitsma.nl/math/psp2/database
        [2]  http://www.cecm.sfu.ca/Pseudoprimes/index-2-to-64.html

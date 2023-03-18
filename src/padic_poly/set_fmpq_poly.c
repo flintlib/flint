@@ -13,7 +13,7 @@
 #include "fmpq_poly.h"
 #include "padic_poly.h"
 
-void padic_poly_set_fmpq_poly(padic_poly_t f, 
+void padic_poly_set_fmpq_poly(padic_poly_t f,
                               const fmpq_poly_t g, const padic_ctx_t ctx)
 {
     const slong len = g->length;

@@ -16,7 +16,7 @@ int main(void)
 {
     int i, j, result;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("factor....");
     fflush(stdout);
@@ -42,7 +42,7 @@ int main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("n1 = %wu, n2 = %wu\n", n1, n2); 
+            flint_printf("n1 = %wu, n2 = %wu\n", n1, n2);
             fflush(stdout);
             flint_abort();
         }
@@ -67,14 +67,14 @@ int main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("n1 = %wu, n2 = %wu\n", n1, n2); 
+            flint_printf("n1 = %wu, n2 = %wu\n", n1, n2);
             fflush(stdout);
             flint_abort();
         }
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

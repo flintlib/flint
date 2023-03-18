@@ -16,7 +16,7 @@ char *
 fq_zech_get_str_pretty(const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
     char * s;
-    
+
     if (fq_zech_is_zero(op, ctx))
     {
         s = flint_malloc(2*sizeof(char));
@@ -27,6 +27,6 @@ fq_zech_get_str_pretty(const fq_zech_t op, const fq_zech_ctx_t ctx)
        s = flint_malloc((num_chars + strlen(ctx->fq_nmod_ctx->var) + 2) * sizeof(char));
        flint_sprintf(s, "%s^%wd", ctx->fq_nmod_ctx->var, op->value);
     }
-    
+
     return s;
 }

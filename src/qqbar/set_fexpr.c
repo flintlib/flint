@@ -88,7 +88,7 @@ _fexpr_parse_arf(arf_t res, const fexpr_t expr)
         if (fexpr_equal_ui(base, 2))
         {
             fmpz_t m, e;
-            int success;    
+            int success;
 
             fmpz_init(m);
             fmpz_init(e);
@@ -123,7 +123,7 @@ _fexpr_parse_arf(arf_t res, const fexpr_t expr)
             if (fexpr_equal_ui(base, 2))
             {
                 fmpz_t m, e;
-                int success;    
+                int success;
 
                 fmpz_init(m);
                 fmpz_init(e);
@@ -467,7 +467,7 @@ _fexpr_get_rational_arg_pi(fmpq_t res, const fexpr_t expr, int times_i)
                 fmpz_set(fmpq_denref(res), QQBAR_COEFFS(v) + 1);
             }
         }
-        
+
         fexpr_clear(tmp);
         fexpr_clear(pi);
         fexpr_clear(one);
@@ -684,7 +684,7 @@ qqbar_set_fexpr(qqbar_t res, const fexpr_t expr)
                             else if (success)
                                 fmpz_poly_swap(QQBAR_POLY(res), poly);
                         }
- 
+
                         fmpz_poly_clear(poly);
 
                         return success;

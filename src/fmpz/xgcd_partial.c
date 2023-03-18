@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-void fmpz_xgcd_partial(fmpz_t co2, fmpz_t co1, 
+void fmpz_xgcd_partial(fmpz_t co2, fmpz_t co1,
                                     fmpz_t r2, fmpz_t r1, const fmpz_t L)
 {
    fmpz_t q, r;
@@ -21,17 +21,17 @@ void fmpz_xgcd_partial(fmpz_t co2, fmpz_t co1,
    slong bits, bits1, bits2;
 
    fmpz_init(q); fmpz_init(r);
-   
+
    fmpz_zero(co2);
    fmpz_set_si(co1, -1);
-  
+
    while (!fmpz_is_zero(r1) && fmpz_cmp(r1, L) > 0)
    {
       bits2 = fmpz_bits(r2);
       bits1 = fmpz_bits(r1);
       bits = FLINT_MAX(bits2, bits1) - FLINT_BITS + 1;
       if (bits < 0) bits = 0;
-      
+
       fmpz_tdiv_q_2exp(r, r2, bits);
       rr2 = fmpz_get_ui(r);
       fmpz_tdiv_q_2exp(r, r1, bits);
@@ -46,14 +46,14 @@ void fmpz_xgcd_partial(fmpz_t co2, fmpz_t co1,
       {
          qq = rr2 / rr1;
 
-         t1 = rr2 - qq*rr1; 
-         t2 = aa2 - qq*aa1; 
-         t3 = bb2 - qq*bb1; 
+         t1 = rr2 - qq*rr1;
+         t2 = aa2 - qq*aa1;
+         t3 = bb2 - qq*bb1;
 
          if (i & 1)
          {
             if (t1 < -t3 || rr1 - t1 < t2 - aa1) break;
-         } else 
+         } else
          {
             if (t1 < -t2 || rr1 - t1 < t3 - bb1) break;
          }
@@ -102,7 +102,7 @@ void fmpz_xgcd_partial(fmpz_t co2, fmpz_t co1,
    }
 
    if (fmpz_sgn(r2) < 0)
-   { 
+   {
       fmpz_neg(co2, co2); fmpz_neg(co1, co1);
       fmpz_neg(r2, r2);
    }

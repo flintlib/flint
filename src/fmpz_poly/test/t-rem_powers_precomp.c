@@ -24,7 +24,7 @@ main(void)
     flint_printf("rem_powers_precomp....");
     fflush(stdout);
 
-    
+
 
     /* Compare with full division, no aliasing */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -45,7 +45,7 @@ main(void)
         fmpz_poly_divrem_basecase(q, r, a, b);
         fmpz_poly_powers_precompute(b_inv, b);
         fmpz_poly_rem_powers_precomp(r2, a, b, b_inv);
-        
+
         result = (fmpz_poly_equal(r, r2));
         if (!result)
         {
@@ -99,7 +99,7 @@ main(void)
         fmpz_poly_clear(b_inv);
         fmpz_poly_clear(q);
     }
-    
+
     /* Check q and b alias */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -135,7 +135,7 @@ main(void)
 
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

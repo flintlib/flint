@@ -20,7 +20,7 @@ void fmpz_sqrtrem(fmpz_t f, fmpz_t r, const fmpz_t g)
         flint_printf("Exception (fmpz_sqrtrem). g is negative.\n");
         flint_abort();
     }
-    
+
     if (!COEFF_IS_MPZ(*g))
     {
         if (COEFF_IS_MPZ(*r))

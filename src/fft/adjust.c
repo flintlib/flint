@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2009, 2011 William Hart
 
     This file is part of FLINT.
@@ -11,7 +11,7 @@
 
 #include "flint.h"
 #include "fft.h"
-      
+
 void fft_adjust(mp_limb_t * r, mp_limb_t * i1, mp_size_t i, mp_size_t limbs, flint_bitcnt_t w)
 {
    flint_bitcnt_t b1;
@@ -28,7 +28,7 @@ void fft_adjust(mp_limb_t * r, mp_limb_t * i1, mp_size_t i, mp_size_t limbs, fli
       r[limbs] = 0;
       cy = mpn_neg_n(r, i1 + limbs - x, x);
       mpn_addmod_2expp1_1(r + x, limbs - x, -i1[limbs]);
-      mpn_sub_1(r + x, r + x, limbs - x + 1, cy); 
+      mpn_sub_1(r + x, r + x, limbs - x + 1, cy);
       mpn_mul_2expmod_2expp1(r, r, limbs, b1);
    } else
       mpn_mul_2expmod_2expp1(r, i1, limbs, b1);

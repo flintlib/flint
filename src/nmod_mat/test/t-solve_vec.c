@@ -23,7 +23,7 @@ main(void)
     int solved;
     mp_limb_t mod;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("solve_vec....");
     fflush(stdout);
@@ -107,7 +107,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2009, 2011 William Hart
 
     This file is part of FLINT.
@@ -16,7 +16,7 @@
 
 static int fft_tuning_table[5][2] = FFT_TAB;
 
-void flint_mpn_mul_fft_main(mp_ptr r1, mp_srcptr i1, mp_size_t n1, 
+void flint_mpn_mul_fft_main(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
                         mp_srcptr i2, mp_size_t n2)
 {
    mp_size_t off, depth = 6;
@@ -37,7 +37,7 @@ void flint_mpn_mul_fft_main(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
    while (j1 + j2 - 1 > 4*n) /* find initial n, w */
    {
       if (w == 1) w = 2;
-      else 
+      else
       {
          depth++;
          w = 1;
@@ -48,16 +48,16 @@ void flint_mpn_mul_fft_main(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
       j1 = (bits1 - 1)/bits + 1;
       j2 = (bits2 - 1)/bits + 1;
    }
-   
+
    if (depth < 11)
    {
       mp_size_t wadj = 1;
-      
+
       off = fft_tuning_table[depth - 6][w - 1]; /* adjust n and w */
       depth -= off;
       n = ((mp_size_t) 1 << depth);
       w *= ((mp_size_t) 1 << (2*off));
-      
+
       if (depth < 6) wadj = ((mp_size_t) 1 << (6 - depth));
 
       if (w > wadj)
@@ -67,7 +67,7 @@ void flint_mpn_mul_fft_main(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
             bits = (n*w - (depth+1))/2;
             j1 = (bits1 - 1)/bits + 1;
             j2 = (bits2 - 1)/bits + 1;
-         } while (j1 + j2 - 1 <= 4*n && w > wadj);  
+         } while (j1 + j2 - 1 <= 4*n && w > wadj);
          w += wadj;
       }
 

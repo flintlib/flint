@@ -16,14 +16,14 @@
 void fmpz_mat_similarity(fmpz_mat_t A, slong r, fmpz_t d)
 {
    slong n = A->r, i, j;
-   
+
    for (i = 0; i < n; i++)
    {
       for (j = 0; j < r - 1; j++)
          fmpz_addmul(fmpz_mat_entry(A, i, j), fmpz_mat_entry(A, i, r), d);
-      
+
       for (j = r + 1; j < n; j++)
-         fmpz_addmul(fmpz_mat_entry(A, i, j), fmpz_mat_entry(A, i, r), d); 
+         fmpz_addmul(fmpz_mat_entry(A, i, j), fmpz_mat_entry(A, i, r), d);
    }
 
    for (i = 0; i < n; i++)
@@ -32,6 +32,6 @@ void fmpz_mat_similarity(fmpz_mat_t A, slong r, fmpz_t d)
          fmpz_submul(fmpz_mat_entry(A, r, i), fmpz_mat_entry(A, j, i), d);
 
       for (j = r + 1; j < n; j++)
-         fmpz_submul(fmpz_mat_entry(A, r, i), fmpz_mat_entry(A, j, i), d);      
+         fmpz_submul(fmpz_mat_entry(A, r, i), fmpz_mat_entry(A, j, i), d);
    }
 }

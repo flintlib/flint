@@ -51,14 +51,14 @@ nmod_mat_is_in_howell_form(const nmod_mat_t A)
     {
         prevrowzero = 1;
     }
-    
+
 
     for (i = 1; i < A->r; i++)
     {
         if (!nmod_mat_is_zero_row(A, i))
         {
             if (prevrowzero)
-            {  
+            {
                 flint_free(pivots);
                 return 0;
             }
@@ -103,7 +103,7 @@ nmod_mat_is_in_howell_form(const nmod_mat_t A)
     for (i = 0; i < numberpivots; i++)
     {
         g = n_gcd(A->mod.n, nmod_mat_entry(A, i, pivots[i]));
-        
+
         if (g == 1)
         {
             continue;
@@ -112,7 +112,7 @@ nmod_mat_is_in_howell_form(const nmod_mat_t A)
         g = A->mod.n/g;
 
         _nmod_vec_scalar_mul_nmod(extra_row, A->rows[i], A->c, g, A->mod);
-        
+
         for ( j = pivots[i] + 1; j < A->c; j++)
         {
             if (extra_row[j])
@@ -127,7 +127,7 @@ nmod_mat_is_in_howell_form(const nmod_mat_t A)
                             _nmod_vec_scalar_addmul_nmod(extra_row, A->rows[r],
                                 A->c, nmod_neg(g, A->mod), A->mod);
                         }
-                       
+
                     }
                 }
             }
@@ -136,7 +136,7 @@ nmod_mat_is_in_howell_form(const nmod_mat_t A)
         {
             _nmod_vec_clear(extra_row);
             flint_free(pivots);
-            return 0; 
+            return 0;
         }
     }
     _nmod_vec_clear(extra_row);
@@ -242,7 +242,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

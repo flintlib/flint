@@ -34,7 +34,7 @@ mp_limb_t n_factor_partial(n_factor_t * factors, mp_limb_t n, mp_limb_t limit, i
       return cofactor;
    }
 
-   if (is_prime2(cofactor, proved)) 
+   if (is_prime2(cofactor, proved))
    {
       n_factor_insert(factors, cofactor, UWORD(1));
       return 1;
@@ -57,14 +57,14 @@ mp_limb_t n_factor_partial(n_factor_t * factors, mp_limb_t n, mp_limb_t limit, i
             exp_arr[factors_left - 1] *= exp;
             factor_arr[factors_left - 1] = factor = cofactor;
          }
-           
+
          if ((factor >= cutoff) && !is_prime2(factor, proved))
 		   {
 		      if ((
 #if FLINT64
                  (factor < FLINT_FACTOR_ONE_LINE_MAX) &&
 #endif
-                 (cofactor = n_factor_one_line(factor, FLINT_FACTOR_ONE_LINE_ITERS))) 
+                 (cofactor = n_factor_one_line(factor, FLINT_FACTOR_ONE_LINE_ITERS)))
               || (cofactor = n_factor_SQUFOF(factor, FLINT_FACTOR_SQUFOF_ITERS)))
 				{
 					exp_arr[factors_left] = exp_arr[factors_left - 1];
@@ -88,7 +88,7 @@ mp_limb_t n_factor_partial(n_factor_t * factors, mp_limb_t n, mp_limb_t limit, i
          prod *= n_pow(factor, exp_arr[factors_left - 1]);
          factors_left--;
 		}
-   } 
+   }
 
    return n/prod;
 }

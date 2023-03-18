@@ -96,7 +96,7 @@ slong _fmpz_mpoly_mul_heap_part1(fmpz ** A_coeff, ulong ** A_exp, slong * A_allo
                                                          p[2], p[1], p[0]);
                 first_prod = 0;
                 while ((x = x->next) != NULL)
-                {          
+                {
                     smul_ppmm(p[1], p[0], Bcoeff[x->i], Ccoeff[x->j]);
                     p[2] = FLINT_SIGN_EXT(p[1]);
                     add_sssaaaaaa(acc[2], acc[1], acc[0], acc[2], acc[1], acc[0],
@@ -112,7 +112,7 @@ slong _fmpz_mpoly_mul_heap_part1(fmpz ** A_coeff, ulong ** A_exp, slong * A_allo
                     fmpz_mul(Acoeff + Alen, Bcoeff + x->i, Ccoeff + x->j);
                 else
                     fmpz_addmul(Acoeff + Alen, Bcoeff + x->i, Ccoeff + x->j);
-                first_prod = 0; 
+                first_prod = 0;
                 while ((x = x->next) != NULL)
                 {
                     fmpz_addmul(Acoeff + Alen, Bcoeff + x->i, Ccoeff + x->j);
@@ -306,7 +306,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc
                 }
             }
         }
-      
+
         /* for each node temporarily stored */
         while (store > store_base)
         {
@@ -362,7 +362,7 @@ slong _fmpz_mpoly_mul_heap_part(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc
                 exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
             }
-        }     
+        }
 
         /* set output poly coeff from temporary accumulation, if not multiprec */
         if (flint_small)

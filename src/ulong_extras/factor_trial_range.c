@@ -32,6 +32,6 @@ mp_limb_t n_factor_trial_range(n_factor_t * factors, mp_limb_t n, ulong start, u
       exp = n_remove2_precomp(&n, p, ppre);
       if (exp) n_factor_insert(factors, p, exp);
    }
-       
+
    return n;
 }

@@ -71,9 +71,9 @@ main(void)
           }
        }
 
-       fmpz_mpoly_clear(f, ctx);  
-       fmpz_mpoly_clear(g, ctx);  
-       fmpz_mpoly_clear(h, ctx);  
+       fmpz_mpoly_clear(f, ctx);
+       fmpz_mpoly_clear(g, ctx);
+       fmpz_mpoly_clear(h, ctx);
     }
 
     /* Check aliasing */
@@ -117,12 +117,12 @@ main(void)
           }
        }
 
-       fmpz_mpoly_clear(f, ctx);  
-       fmpz_mpoly_clear(g, ctx);  
+       fmpz_mpoly_clear(f, ctx);
+       fmpz_mpoly_clear(g, ctx);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

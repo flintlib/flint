@@ -18,7 +18,7 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("neg....");
     fflush(stdout);
@@ -28,11 +28,11 @@ main(void)
     {
         nmod_poly_t a, b;
         mp_limb_t n = n_randtest_not_zero(state);
-        
+
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_randtest(a, state, n_randint(state, 100));
-        
+
         nmod_poly_neg(b, a);
         nmod_poly_neg(b, b);
 
@@ -52,7 +52,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

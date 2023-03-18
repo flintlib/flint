@@ -20,7 +20,7 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
         GetSystemTimeAsFileTime(&ft);
         li.LowPart  = ft.dwLowDateTime;
         li.HighPart = ft.dwHighDateTime;
-        t  = li.QuadPart; 
+        t  = li.QuadPart;
         t -= EPOCHFILETIME;
         t /= 10;
         tv->tv_sec  = (long)(t / 1000000);

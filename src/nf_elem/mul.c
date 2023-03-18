@@ -68,7 +68,7 @@ void _nf_elem_mul_gaussian(fmpz * anum, fmpz * aden,
    fmpz_clear(t);
 }
 
-void _nf_elem_mul_red(nf_elem_t a, const nf_elem_t b, 
+void _nf_elem_mul_red(nf_elem_t a, const nf_elem_t b,
                                      const nf_elem_t c, const nf_t nf, int red)
 {
    if (nf->flag & NF_LINEAR)
@@ -79,7 +79,7 @@ void _nf_elem_mul_red(nf_elem_t a, const nf_elem_t b,
       const fmpz * const cden = LNF_ELEM_DENREF(c);
       fmpz * const anum = LNF_ELEM_NUMREF(a);
       fmpz * const aden = LNF_ELEM_DENREF(a);
-      
+
       fmpz_mul(anum, bnum, cnum);
       fmpz_mul(aden, bden, cden);
    }
@@ -101,7 +101,7 @@ void _nf_elem_mul_red(nf_elem_t a, const nf_elem_t b,
       if (red && !fmpz_is_zero(anum + 2))
       {
          fmpz * pnum = fmpq_poly_numref(nf->pol);
-           
+
          if (nf->flag & NF_MONIC)
          {
             fmpz_submul(anum + 1, anum + 2, pnum + 1);
@@ -110,7 +110,7 @@ void _nf_elem_mul_red(nf_elem_t a, const nf_elem_t b,
          {
             fmpz * prod = _fmpz_vec_init(3);
 
-            _fmpq_poly_scalar_mul_fmpq(prod, prod + 2, 
+            _fmpq_poly_scalar_mul_fmpq(prod, prod + 2,
                                   pnum, pnum + 2, 2, anum + 2, aden);
             _fmpq_poly_sub_can(anum, aden, anum, aden, 2, prod, prod + 2, 2, 0);
 
@@ -125,7 +125,7 @@ void _nf_elem_mul_red(nf_elem_t a, const nf_elem_t b,
       const slong len2 = NF_ELEM(c)->length;
       const slong len = nf->pol->length;
       slong plen = len1 + len2 - 1;
-      
+
       if (len1 == 0 || len2 == 0)
       {
          nf_elem_zero(a, nf);
@@ -161,34 +161,34 @@ void _nf_elem_mul_red(nf_elem_t a, const nf_elem_t b,
 
                _fmpq_poly_set_length(NF_ELEM(a), len - 1);
                _fmpq_poly_normalise(NF_ELEM(a));
-              
+
             } else
             {
                fmpz * q = _fmpz_vec_init(plen - len + 1);
                fmpz * r = _fmpz_vec_init(plen);
                slong i;
-               
+
                _fmpz_vec_set(r, NF_ELEM_NUMREF(a), plen);
 
-               _fmpz_poly_divrem(q, NF_ELEM_NUMREF(a), r, plen, 
+               _fmpz_poly_divrem(q, NF_ELEM_NUMREF(a), r, plen,
                   fmpq_poly_numref(nf->pol), len, 0);
 
                _fmpz_vec_clear(r, plen);
                _fmpz_vec_clear(q, plen - len + 1);
-          
+
                for (i = len - 2; i >= 0 && fmpz_is_zero(NF_ELEM_NUMREF(a) + i); i--);
-               NF_ELEM(a)->length = i + 1;      
+               NF_ELEM(a)->length = i + 1;
             }
          }
          else
          {
             fmpq_poly_t t;
-        
+
             if (len <= NF_POWERS_CUTOFF)
             {
-               _fmpq_poly_rem_powers_precomp(NF_ELEM_NUMREF(a), 
+               _fmpq_poly_rem_powers_precomp(NF_ELEM_NUMREF(a),
                   fmpq_poly_denref(NF_ELEM(a)), plen,
-                  fmpq_poly_numref(nf->pol), fmpq_poly_denref(nf->pol), 
+                  fmpq_poly_numref(nf->pol), fmpq_poly_denref(nf->pol),
                   len, nf->powers.qq->powers);
 
                _fmpq_poly_set_length(NF_ELEM(a), len - 1);
@@ -196,14 +196,14 @@ void _nf_elem_mul_red(nf_elem_t a, const nf_elem_t b,
             } else
             {
                fmpq_poly_init2(t, 2*len - 3);
-        
+
                _fmpq_poly_rem(t->coeffs, t->den,
-                  NF_ELEM(a)->coeffs, NF_ELEM(a)->den, plen, 
-                  nf->pol->coeffs, nf->pol->den, len, nf->pinv.qq); 
-           
+                  NF_ELEM(a)->coeffs, NF_ELEM(a)->den, plen,
+                  nf->pol->coeffs, nf->pol->den, len, nf->pinv.qq);
+
                _fmpq_poly_set_length(t, len - 1);
                _fmpq_poly_normalise(t);
-        
+
                fmpq_poly_swap(t, NF_ELEM(a));
                fmpq_poly_clear(t);
             }
@@ -212,20 +212,20 @@ void _nf_elem_mul_red(nf_elem_t a, const nf_elem_t b,
    }
 }
 
-void _nf_elem_mul(nf_elem_t a, const nf_elem_t b, 
+void _nf_elem_mul(nf_elem_t a, const nf_elem_t b,
                                      const nf_elem_t c, const nf_t nf)
 {
    _nf_elem_mul_red(a, b, c, nf, 1);
 }
 
-void nf_elem_mul_red(nf_elem_t a, const nf_elem_t b, 
+void nf_elem_mul_red(nf_elem_t a, const nf_elem_t b,
                                      const nf_elem_t c, const nf_t nf, int red)
 {
    nf_elem_t t;
-   
+
    if (nf->flag & NF_LINEAR)
    {
-      _fmpq_mul(LNF_ELEM_NUMREF(a), LNF_ELEM_DENREF(a), 
+      _fmpq_mul(LNF_ELEM_NUMREF(a), LNF_ELEM_DENREF(a),
                 LNF_ELEM_NUMREF(b), LNF_ELEM_DENREF(b),
                 LNF_ELEM_NUMREF(c), LNF_ELEM_DENREF(c));
    }
@@ -255,7 +255,7 @@ void nf_elem_mul_red(nf_elem_t a, const nf_elem_t b,
    }
 }
 
-void nf_elem_mul(nf_elem_t a, const nf_elem_t b, 
+void nf_elem_mul(nf_elem_t a, const nf_elem_t b,
                                               const nf_elem_t c, const nf_t nf)
 {
    nf_elem_mul_red(a, b, c, nf, 1);

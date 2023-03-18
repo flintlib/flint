@@ -277,7 +277,7 @@ namespace rules {
 
 FLINT_DEFINE_DOIT_COND2(assignment, FMPQXX_COND_T, FMPQXX_COND_S,
         fmpq_set(to._fmpq(), from._fmpq()))
-FLINT_DEFINE_DOIT_COND2(assignment, FMPQXX_COND_T, traits::fits_into_slong, 
+FLINT_DEFINE_DOIT_COND2(assignment, FMPQXX_COND_T, traits::fits_into_slong,
         fmpq_set_si(to._fmpq(), from, 1))
 // TODO mpq, mpfr?
 

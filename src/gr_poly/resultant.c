@@ -36,7 +36,7 @@ int gr_poly_resultant(gr_ptr r, const gr_poly_t f, const gr_poly_t g, gr_ctx_t c
     slong len2 = g->length;
     int status = GR_SUCCESS;
     slong sz = ctx->sizeof_elem;
-    
+
     if (len1 == 0 || len2 == 0)
     {
         return gr_zero(r, ctx);

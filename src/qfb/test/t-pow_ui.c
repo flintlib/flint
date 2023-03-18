@@ -27,7 +27,7 @@ int main(void)
 
     flint_randinit(state);
 
-    for (i = 1; i < 1000; i++) 
+    for (i = 1; i < 1000; i++)
     {
         fmpz_t D, L;
         qfb_t r, s, t;
@@ -38,13 +38,13 @@ int main(void)
         qfb_init(r);
         qfb_init(s);
         qfb_init(t);
-            
+
         do
         {
            fmpz_randtest_unsigned(r->a, state, 100);
            if (fmpz_is_zero(r->a))
               fmpz_set_ui(r->a, 1);
- 
+
            fmpz_randtest(r->b, state, 100);
            fmpz_randtest(r->c, state, 100);
 
@@ -55,7 +55,7 @@ int main(void)
         fmpz_root(L, L, 4);
 
         qfb_reduce(r, r, D);
-           
+
         exp = n_randint(state, 1000);
 
         qfb_pow_ui(s, r, D, exp);
@@ -78,7 +78,7 @@ int main(void)
            qfb_print(t); printf("\n");
            flint_abort();
         }
-         
+
         fmpz_clear(D);
         fmpz_clear(L);
         qfb_clear(r);

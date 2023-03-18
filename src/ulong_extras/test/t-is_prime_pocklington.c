@@ -20,11 +20,11 @@ int main(void)
    mp_limb_t d;
    mpz_t d_m;
    FLINT_TEST_INIT(state);
-   
-   
+
+
    flint_printf("is_prime_pocklington....");
    fflush(stdout);
-   
+
    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test that primes pass the test */
    {
       mpz_init(d_m);
@@ -43,14 +43,14 @@ int main(void)
       if (result == 0)
       {
          flint_printf("FAIL:\n");
-         flint_printf("d = %wu is declared composite\n", d); 
+         flint_printf("d = %wu is declared composite\n", d);
          fflush(stdout);
          flint_abort();
       }
 
       mpz_clear(d_m);
    }
-         
+
    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test that composites do not pass */
    {
       mpz_init(d_m);
@@ -68,7 +68,7 @@ int main(void)
       if (result == 1)
       {
          flint_printf("FAIL:\n");
-         flint_printf("d = %wu is declared prime\n", d); 
+         flint_printf("d = %wu is declared prime\n", d);
          fflush(stdout);
          flint_abort();
       }
@@ -84,7 +84,7 @@ int main(void)
    }
 
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

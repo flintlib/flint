@@ -24,7 +24,7 @@ _acb_dft_naive(acb_ptr w, acb_srcptr v, slong dv, acb_srcptr z, slong dz, slong 
         flint_printf("\n_acb_dft_naive: does not accept aliasing\n");
         flint_abort();
     }
- 
+
     for (i = 0, wi = w; i < len; i++, wi++)
     {
         acb_zero(wi);

@@ -19,7 +19,7 @@ int main(void)
     FLINT_TEST_INIT(state);
 
     flint_printf("bell_number_multi_mod....");
-    fflush(stdout);    
+    fflush(stdout);
 
     for (i = 0; i < 100; i++)
     {
@@ -47,7 +47,7 @@ int main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

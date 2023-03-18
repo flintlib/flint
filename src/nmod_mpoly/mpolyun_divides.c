@@ -156,7 +156,7 @@ int nmod_mpolyn_divides(
                     hind[x->i] = 2*(x->j + 1) + 0;
 
                     mpoly_monomial_add(exp_list[exp_next], B->exps + x->i*N,
-                                                           Q->exps + x->j*N, N);                      
+                                                           Q->exps + x->j*N, N);
 
                     exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
@@ -210,7 +210,7 @@ int nmod_mpolyn_divides(
                                              &next_loc, &heap_len, N, cmpmask);
         }
         s = 1;
-        Qlen++;     
+        Qlen++;
     }
 
     success = 1;
@@ -373,7 +373,7 @@ int _nmod_mpolyn_divides(
                     hind[x->i] = 2*(x->j + 1) + 0;
 
                     mpoly_monomial_add(exp_list[exp_next], B->exps + x->i*N,
-                                                           Q->exps + x->j*N, N);                      
+                                                           Q->exps + x->j*N, N);
 
                     exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
@@ -427,7 +427,7 @@ int _nmod_mpolyn_divides(
                                              &next_loc, &heap_len, N, cmpmask);
         }
         s = 1;
-        Qlen++;     
+        Qlen++;
     }
 
     success = 1;
@@ -489,7 +489,7 @@ void _nmod_mpolyn_add(
         {
             n_poly_set(A->coeffs + Alen, C->coeffs + j);
             mpoly_monomial_set(A->exps + Alen*N, C->exps + j*N, N);
-            j++;         
+            j++;
             Alen++;
         }
     }

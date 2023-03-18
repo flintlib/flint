@@ -70,7 +70,7 @@ fmpz_poly_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R,
 {
     slong lenq, lenr;
     fmpz *q, *r;
-    
+
     if (B->length == 0)
     {
         flint_printf("Exception (fmpz_poly_divrem_basecase). Division by zero.\n");

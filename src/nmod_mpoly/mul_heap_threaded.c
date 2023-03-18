@@ -82,7 +82,7 @@ void _nmod_mpoly_mul_heap_part1(
     while (heap_len > 1)
     {
         exp = heap[1].exp;
-      
+
         _nmod_mpoly_fit_length(&Acoeff, &A->coeffs_alloc,
                                &Aexp, &A->exps_alloc, 1, Alen + 1);
 

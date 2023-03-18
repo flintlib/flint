@@ -53,7 +53,7 @@ int main()
             l3 = dlog_crt(crt, k);
             l4 = dlog_precomp(pre1, k);
             l5 = dlog_precomp(pre100, k);
-            
+
             if (iter < 50 && k <= 7)
                 l0 = dlog_once(k, a, modp, p-1);
             else

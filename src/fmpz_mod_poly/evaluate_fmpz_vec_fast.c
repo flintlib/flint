@@ -41,7 +41,7 @@ _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, const fmpz * poly,
         else if (len != 0 && plen == 1)
             for (i = 0; i < len; i++)
                 fmpz_set(vs + i, poly);
-        
+
         fmpz_clear(temp);
         return;
     }
@@ -79,22 +79,22 @@ _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, const fmpz * poly,
         {
             fmpz_invmod(inv, pa->coeffs + pa->length - 1, mod);
             _fmpz_mod_poly_rem(pc, pb, 2 * pow, pa->coeffs, pa->length, inv, mod);
-            
+
             pa++;
             fmpz_invmod(inv, pa->coeffs + pa->length - 1, mod);
             _fmpz_mod_poly_rem(pc + pow, pb, 2 * pow, pa->coeffs, pa->length, inv, mod);
-            
+
             pa++;
             pb += 2 * pow;
             pc += 2 * pow;
             left -= 2 * pow;
         }
-        
+
         if (left > pow)
         {
             fmpz_invmod(inv, pa->coeffs + pa->length - 1, mod);
             _fmpz_mod_poly_rem(pc, pb, left, pa->coeffs, pa->length, inv, mod);
-            
+
             pa ++;
             fmpz_invmod(inv, pa->coeffs + pa->length - 1, mod);
             _fmpz_mod_poly_rem(pc + pow, pb, left, pa->coeffs, pa->length, inv, mod);

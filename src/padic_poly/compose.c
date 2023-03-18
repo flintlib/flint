@@ -39,9 +39,9 @@ static void __padic_reduce(fmpz_t u, slong *v, slong N, const padic_ctx_t ctx)
 
 /* Assumes that len1 > 0. */
 
-void _padic_poly_compose(fmpz *rop, slong *rval, slong N, 
-                         const fmpz *op1, slong val1, slong len1, 
-                         const fmpz *op2, slong val2, slong len2, 
+void _padic_poly_compose(fmpz *rop, slong *rval, slong N,
+                         const fmpz *op1, slong val1, slong len1,
+                         const fmpz *op2, slong val2, slong len2,
                          const padic_ctx_t ctx)
 {
     const slong lenr = (len1 - 1) * (len2 - 1) + 1;
@@ -132,8 +132,8 @@ void _padic_poly_compose(fmpz *rop, slong *rval, slong N,
     }
 }
 
-void padic_poly_compose(padic_poly_t rop, 
-                        const padic_poly_t op1, const padic_poly_t op2, 
+void padic_poly_compose(padic_poly_t rop,
+                        const padic_poly_t op1, const padic_poly_t op2,
                         const padic_ctx_t ctx)
 {
     const slong len1 = op1->length, len2 = op2->length;
@@ -158,8 +158,8 @@ void padic_poly_compose(padic_poly_t rop,
         if (rop != op1 && rop != op2)
         {
             padic_poly_fit_length(rop, lenr);
-            _padic_poly_compose(rop->coeffs, &(rop->val), rop->N, 
-                                op1->coeffs, op1->val, op1->length, 
+            _padic_poly_compose(rop->coeffs, &(rop->val), rop->N,
+                                op1->coeffs, op1->val, op1->length,
                                 op2->coeffs, op2->val, op2->length, ctx);
             _padic_poly_set_length(rop, lenr);
         }
@@ -167,8 +167,8 @@ void padic_poly_compose(padic_poly_t rop,
         {
             fmpz *t = _fmpz_vec_init(lenr);
 
-            _padic_poly_compose(t, &(rop->val), rop->N, 
-                                op1->coeffs, op1->val, op1->length, 
+            _padic_poly_compose(t, &(rop->val), rop->N,
+                                op1->coeffs, op1->val, op1->length,
                                 op2->coeffs, op2->val, op2->length, ctx);
             _fmpz_vec_clear(rop->coeffs, rop->alloc);
             rop->coeffs = t;

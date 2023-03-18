@@ -134,7 +134,7 @@ main(int argc, char * argv[])
     fmpz_clear(c);
     fmpz_clear(d);
 
-    flint_randclear(state);  
+    flint_randclear(state);
     flint_cleanup();
     return 0;
 }

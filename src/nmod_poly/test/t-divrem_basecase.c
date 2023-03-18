@@ -18,7 +18,7 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("divrem_basecase....");
     fflush(stdout);
@@ -39,7 +39,7 @@ main(void)
         nmod_poly_init(q, n);
         nmod_poly_init(r, n);
         nmod_poly_init(prod, n);
-        
+
         nmod_poly_randtest(a, state, n_randint(state, 200));
         do
         {
@@ -62,7 +62,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         nmod_poly_clear(a);
         nmod_poly_clear(b);
         nmod_poly_clear(q);
@@ -243,7 +243,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

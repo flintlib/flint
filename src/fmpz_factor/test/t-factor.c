@@ -93,13 +93,13 @@ void check(fmpz_t n)
 void randprime(fmpz_t p, flint_rand_t state, slong bits)
 {
     fmpz_randbits(p, state, bits);
- 
+
     if (fmpz_sgn(p) < 0)
        fmpz_neg(p, p);
 
     if (fmpz_is_even(p))
        fmpz_add_ui(p, p, 1);
- 
+
     while (!fmpz_is_probabprime(p))
        fmpz_add_ui(p, p, 2);
 }
@@ -280,7 +280,7 @@ int main(void)
     for (i = 0; i < 5; i++) /* Test random squares */
     {
        randprime(x, state, 40);
-      
+
        fmpz_mul(n, x, x);
 
        fmpz_factor_init(factors);
@@ -301,7 +301,7 @@ int main(void)
     for (i = 0; i < 5; i++) /* Test random cubes */
     {
        randprime(x, state, 40);
-      
+
        fmpz_mul(n, x, x);
        fmpz_mul(n, n, x);
 
@@ -324,7 +324,7 @@ int main(void)
        randprime(x, state, 40);
        randprime(y, state, 40);
        randprime(z, state, 40);
-      
+
        fmpz_mul(n, x, y);
        fmpz_mul(n, n, z);
        fmpz_mul(n, n, z);

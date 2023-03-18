@@ -76,9 +76,9 @@ int nmod_poly_fprint_pretty(FILE * f, const nmod_poly_t a, const char * x)
         }
     }
     if (r > 0 && i == 1)
-    {   
+    {
         switch (a->coeffs[1])
-        {   
+        {
             case UWORD(0):
                 break;
             case UWORD(1):

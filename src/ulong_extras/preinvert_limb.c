@@ -14,7 +14,7 @@
 
 #include "flint.h"
 #include "ulong_extras.h"
-    
+
 #if FLINT_BITS == 32
 
 /* rec_word_tab[i] = div(2^24 - 2^14 + 2^9, 2^9 + i) */

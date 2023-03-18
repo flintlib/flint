@@ -299,7 +299,7 @@ cleanup:
     fmpz_mpolyv_clear(lc_divs, ctx);
 
     fmpz_poly_factor_clear(Aufac);
-        
+
     _fmpz_vec_clear(alpha, n);
 
     for (i = 0; i < n; i++)

@@ -15,7 +15,7 @@
 mp_limb_t flint_mpn_preinv1(mp_limb_t d1, mp_limb_t d2)
 {
    mp_limb_t q, r[2], p[2], cy;
-   
+
    if (d2 + 1 == 0 && d1 + 1 == 0)
       return 0;
 
@@ -31,13 +31,13 @@ mp_limb_t flint_mpn_preinv1(mp_limb_t d1, mp_limb_t d2)
 
    umul_ppmm(p[1], p[0], q, ~d2);
    cy = mpn_add_n(r, r, p, 2);
- 
+
    p[0] = d2 + 1, p[1] = d1 + (d2 + 1 == 0);
    while (cy || mpn_cmp(r, p, 2) >= 0)
    {
       q++;
       cy -= mpn_sub_n(r, r, p, 2);
    }
-   
+
    return q;
 }

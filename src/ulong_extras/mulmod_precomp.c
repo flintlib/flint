@@ -19,7 +19,7 @@ mp_limb_t n_mulmod_precomp(mp_limb_t a, mp_limb_t b, mp_limb_t n, double npre)
 
     quot = (mp_limb_t) ((double) a * (double) b * npre);
     rem  = a * b - quot * n;
-    if (rem < 0) 
+    if (rem < 0)
     {
         rem += n;
         if (rem < 0) return rem + n;

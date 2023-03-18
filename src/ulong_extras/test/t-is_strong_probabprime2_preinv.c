@@ -19,7 +19,7 @@ int main(void)
    ulong count = UWORD(0);
    slong test_multiplier;
    FLINT_TEST_INIT(state);
-   
+
    flint_printf("is_strong_probabprime2_preinv....");
    fflush(stdout);
 
@@ -30,7 +30,7 @@ int main(void)
       mp_limb_t a, d, dinv, norm;
       mpz_t d_m;
       ulong j;
-      
+
       mpz_init(d_m);
 
       do
@@ -41,12 +41,12 @@ int main(void)
          d = flint_mpz_get_ui(d_m);
       } while (mpz_size(d_m) > 1);
       if (d == UWORD(2)) d++;
-         
+
       for (j = 0; j < 100; j++)
       {
          do a = n_randtest(state) % d;
          while (a == UWORD(0));
-      
+
          dinv = n_preinvert_limb(d);
          count_trailing_zeros(norm, d - 1);
          result = n_is_strong_probabprime2_preinv(d, dinv, a, (d - 1)>>norm);
@@ -54,7 +54,7 @@ int main(void)
          if (!result)
          {
             flint_printf("FAIL:\n");
-            flint_printf("a = %wu, d = %wu\n", a, d); 
+            flint_printf("a = %wu, d = %wu\n", a, d);
             fflush(stdout);
             flint_abort();
          }
@@ -62,13 +62,13 @@ int main(void)
 
       mpz_clear(d_m);
    }
-         
+
    for (i = 0; i < 100 * test_multiplier; i++) /* Test that not too many composites pass */
    {
       mp_limb_t a, d, dinv, norm;
       mpz_t d_m;
       ulong j;
-      
+
       mpz_init(d_m);
 
       do
@@ -82,7 +82,7 @@ int main(void)
       {
          do a = n_randtest(state) % d;
          while (a == UWORD(0));
-      
+
          dinv = n_preinvert_limb(d);
          count_trailing_zeros(norm, d - 1);
          result = !n_is_strong_probabprime2_preinv(d, dinv, a, (d - 1)>>norm);
@@ -94,7 +94,7 @@ int main(void)
    }
 
 #if FLINT64
-   if (count > 220 * test_multiplier) 
+   if (count > 220 * test_multiplier)
 #else
    if (count > 432 * test_multiplier)
 #endif
@@ -106,7 +106,7 @@ int main(void)
    }
 
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

@@ -298,7 +298,7 @@ _gr_ca_set_other(ca_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
     return GR_UNABLE;
 }
 
-int 
+int
 _gr_ca_get_arb_with_prec(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec)
 {
     int status = GR_UNABLE;
@@ -332,7 +332,7 @@ _gr_ca_get_arb_with_prec(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec)
     return status;
 }
 
-int 
+int
 _gr_ca_get_acb_with_prec(acb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec)
 {
     /* todo: when to use accurate_parts? */
@@ -399,7 +399,7 @@ _gr_ca_get_ui(ulong * res, const ca_t x, gr_ctx_t ctx)
     return status;
 }
 
-int 
+int
 _gr_ca_get_d(double * res, gr_srcptr x, gr_ctx_t ctx)
 {
     arb_t t;
@@ -1064,7 +1064,7 @@ _gr_ca_pi(ca_t res, gr_ctx_t ctx)
 int
 _gr_ca_exp(ca_t res, const ca_t x, gr_ctx_t ctx)
 {
-    if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA || 
+    if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA ||
         ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
     {
         truth_t ok = ca_check_is_zero(x, GR_CA_CTX(ctx));
@@ -1088,7 +1088,7 @@ _gr_ca_exp(ca_t res, const ca_t x, gr_ctx_t ctx)
 int
 _gr_ca_log(ca_t res, const ca_t x, gr_ctx_t ctx)
 {
-    if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA || 
+    if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA ||
         ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
     {
         truth_t ok = ca_check_is_one(x, GR_CA_CTX(ctx));
@@ -1125,7 +1125,7 @@ _gr_ca_log(ca_t res, const ca_t x, gr_ctx_t ctx)
 int
 _gr_ca_atan(ca_t res, const ca_t x, gr_ctx_t ctx)
 {
-    if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA || 
+    if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA ||
         ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
     {
         truth_t ok = ca_check_is_zero(x, GR_CA_CTX(ctx));

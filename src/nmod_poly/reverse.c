@@ -16,11 +16,11 @@ void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, slong len, slong m)
 {
     slong i, min;
     mp_limb_t temp;
-      
+
     if (input != output)
     {
         min = FLINT_MIN(m, len);
-        
+
         for (i = 0; i < min; i++)
             output[m - i - 1] = input[i];
 
@@ -31,7 +31,7 @@ void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, slong len, slong m)
         for (i = 0; i < m/2; i++)
         {
             temp = i < len ? input[i] : 0;
-         
+
             output[i] = m - i - 1 < len ? input[m - i - 1] : 0;
 
             output[m - i - 1] = temp;
@@ -43,7 +43,7 @@ void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, slong len, slong m)
 void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, slong m)
 {
     nmod_poly_fit_length(output, m);
-     
+
     _nmod_poly_reverse(output->coeffs, input->coeffs, input->length, m);
 
     output->length = m;

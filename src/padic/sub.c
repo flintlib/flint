@@ -11,7 +11,7 @@
 
 #include "padic.h"
 
-void padic_sub(padic_t rop, const padic_t op1, const padic_t op2, 
+void padic_sub(padic_t rop, const padic_t op1, const padic_t op2,
                const padic_ctx_t ctx)
 {
     if (padic_prec(rop) <= FLINT_MIN(padic_val(op1), padic_val(op2)))

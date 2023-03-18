@@ -57,7 +57,7 @@ void fmpq_mpoly_set_term_coeff_fmpq(fmpq_mpoly_t A,
         {
             fmpq_div_fmpz(A->content, A->content, fmpq_denref(t));
             _fmpz_vec_scalar_mul_fmpz(A->zpoly->coeffs, A->zpoly->coeffs,
-                                             A->zpoly->length, fmpq_denref(t));            
+                                             A->zpoly->length, fmpq_denref(t));
         }
         fmpz_mpoly_set_term_coeff_fmpz(A->zpoly, i, fmpq_numref(t), ctx->zctx);
         fmpq_clear(t);

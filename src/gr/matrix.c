@@ -224,7 +224,7 @@ matrix_set_other(gr_mat_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
             for (j = 0; j < xmat->c; j++)
             {
                 status = gr_set_other(GR_MAT_ENTRY(res, i, j, sz),
-                            GR_MAT_ENTRY(xmat, i, j, xsz), 
+                            GR_MAT_ENTRY(xmat, i, j, xsz),
                             MATRIX_CTX(x_ctx)->base_ring,
                             MATRIX_CTX(ctx)->base_ring);
 

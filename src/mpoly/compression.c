@@ -183,7 +183,7 @@ again:
             {
                 D[k] += best_min*V[k*n + i];
                 V[k*n + j] += -V[k*n + i];
-            }         
+            }
         }
         else
         {

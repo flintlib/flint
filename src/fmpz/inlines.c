@@ -58,7 +58,7 @@ void __free_fmpz(fmpz * f)
 {
    _fmpz_demote(f);
    flint_free(f);
-}   
+}
 
 void __fmpz_set_si(fmpz_t f, slong val)
 {

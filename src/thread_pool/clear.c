@@ -22,7 +22,7 @@ void thread_pool_clear(thread_pool_t T)
 #endif
     D = T->tdata;
     size = T->length;
-    
+
     for (i = 0; i < size; i++)
     {
 #if FLINT_USES_PTHREAD

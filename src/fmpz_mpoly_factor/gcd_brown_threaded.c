@@ -1102,7 +1102,7 @@ compute_split:
 #if FLINT_USES_PTHREAD
     pthread_mutex_destroy(&joinbase->mutex);
 #endif
-    
+
     /* free join data */
     fmpz_multi_CRT_clear(joinbase->CRT);
     for (i = 0; i < joinbase->chunks_length; i++)

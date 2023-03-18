@@ -20,7 +20,7 @@
     Returns 1 if a is a quadratic residue and 0 otherwise.
     Does not support aliasing.
  */
-static int _fmpz_sqrtmod(mpz_t rop, const mpz_t a, const mpz_t p) 
+static int _fmpz_sqrtmod(mpz_t rop, const mpz_t a, const mpz_t p)
 {
     slong i, r, m, iter;
     mpz_t p1, k, exp, b, g, bpow, gpow;
@@ -178,7 +178,7 @@ int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p)
         int ans;
         mpz_t t;
         __mpz_struct *bptr;
-        
+
         if (fmpz_is_even(p))
             return 0;
 

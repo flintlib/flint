@@ -24,7 +24,7 @@ main(void)
     flint_printf("zero_coeffs....");
     fflush(stdout);
 
-    
+
 
     /* Check that zeroing [0,len/2) and [len/2,len) sets a to zero */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -52,7 +52,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

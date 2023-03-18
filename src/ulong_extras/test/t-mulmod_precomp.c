@@ -16,11 +16,11 @@ int main(void)
 {
    int i, result;
    FLINT_TEST_INIT(state);
-   
+
    flint_printf("mulmod_precomp....");
    fflush(stdout);
 
-   
+
 
    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
    {
@@ -31,7 +31,7 @@ int main(void)
       d = n_randtest_bits(state, bits);
       a = n_randtest(state) % d;
       b = n_randtest(state) % d;
-      
+
       dpre = n_precompute_inverse(d);
 
       r1 = n_mulmod_precomp(a, b, d, dpre);
@@ -44,7 +44,7 @@ int main(void)
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("a = %wu, b = %wu, d = %wu, dinv = %f\n", a, b, d, dpre); 
+         flint_printf("a = %wu, b = %wu, d = %wu, dinv = %f\n", a, b, d, dpre);
          flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
          fflush(stdout);
          flint_abort();
@@ -52,7 +52,7 @@ int main(void)
    }
 
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

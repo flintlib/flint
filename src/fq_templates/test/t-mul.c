@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Sebastian Pancratz 
+    Copyright (C) 2012 Sebastian Pancratz
     Copyright (C) 2012 Andres Goens
     Copyright (C) 2013 Mike Hansen
 
@@ -35,7 +35,7 @@ main(void)
         TEMPLATE(T, t) a, b, c;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
-        
+
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(b, ctx);
         TEMPLATE(T, init)(c, ctx);
@@ -71,7 +71,7 @@ main(void)
         TEMPLATE(T, t) a, b, c;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
-        
+
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(b, ctx);
         TEMPLATE(T, init)(c, ctx);
@@ -108,7 +108,7 @@ main(void)
         TEMPLATE(T, t) a, c;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
-        
+
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(c, ctx);
 
@@ -180,7 +180,7 @@ main(void)
         TEMPLATE(T, t) a, b, c, lhs, rhs;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
-        
+
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(b, ctx);
         TEMPLATE(T, init)(c, ctx);

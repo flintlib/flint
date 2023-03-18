@@ -15,8 +15,8 @@
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_mullow(fmpz *res, const fmpz *poly1, slong len1, 
-                                      const fmpz *poly2, slong len2, 
+void _fmpz_mod_poly_mullow(fmpz *res, const fmpz *poly1, slong len1,
+                                      const fmpz *poly2, slong len2,
                                       const fmpz_t p, slong n)
 {
     _fmpz_poly_mullow(res, poly1, len1, poly2, len2, n);
@@ -42,10 +42,10 @@ void fmpz_mod_poly_mullow(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
         fmpz *t = _fmpz_vec_init(n);
 
         if (len1 >= len2)
-            _fmpz_mod_poly_mullow(t, poly1->coeffs, len1, 
+            _fmpz_mod_poly_mullow(t, poly1->coeffs, len1,
                             poly2->coeffs, len2, fmpz_mod_ctx_modulus(ctx), n);
         else
-            _fmpz_mod_poly_mullow(t, poly2->coeffs, len2, 
+            _fmpz_mod_poly_mullow(t, poly2->coeffs, len2,
                             poly1->coeffs, len1, fmpz_mod_ctx_modulus(ctx), n);
 
         _fmpz_vec_clear(res->coeffs, res->alloc);
@@ -59,10 +59,10 @@ void fmpz_mod_poly_mullow(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
         fmpz_mod_poly_fit_length(res, n, ctx);
 
         if (len1 >= len2)
-            _fmpz_mod_poly_mullow(res->coeffs, poly1->coeffs, len1, 
+            _fmpz_mod_poly_mullow(res->coeffs, poly1->coeffs, len1,
                             poly2->coeffs, len2, fmpz_mod_ctx_modulus(ctx), n);
         else
-            _fmpz_mod_poly_mullow(res->coeffs, poly2->coeffs, len2, 
+            _fmpz_mod_poly_mullow(res->coeffs, poly2->coeffs, len2,
                             poly1->coeffs, len1, fmpz_mod_ctx_modulus(ctx), n);
 
         _fmpz_mod_poly_set_length(res, n);

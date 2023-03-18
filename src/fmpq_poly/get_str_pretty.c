@@ -16,7 +16,7 @@
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len, 
+char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
                                  const char *var)
 {
     slong i;
@@ -27,7 +27,7 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
     mpz_t z;         /* op->den (if this is not 1)         */
     mpq_t q;
     char *str;
-    
+
     if (len == 0)  /* Zero polynomial */
     {
         str = flint_malloc(2);
@@ -62,9 +62,9 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
         fmpz_get_mpz(mpq_denref(a1), den);
         mpq_canonicalize(a1);
 
-        size0 = mpz_sizeinbase(mpq_numref(a0), 10) 
+        size0 = mpz_sizeinbase(mpq_numref(a0), 10)
               + mpz_sizeinbase(mpq_denref(a0), 10) + 2;
-        size1 = mpz_sizeinbase(mpq_numref(a1), 10) 
+        size1 = mpz_sizeinbase(mpq_numref(a1), 10)
               + mpz_sizeinbase(mpq_denref(a1), 10) + 2;
         size  = size0 + 1 + strlen(var) + 1 + size1 + 1;
         str   = flint_malloc(size);
@@ -102,9 +102,9 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
 
         return str;
     }
-    
+
     varsize = strlen(var);
-    
+
     /* Copy the denominator into an mpz_t */
     mpz_init(z);
     if (*den == WORD(1))
@@ -116,7 +116,7 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
         fmpz_get_mpz(z, den);
         densize = mpz_sizeinbase(z, 10);
     }
-    
+
     /* Estimate the length */
     size = 0;
     for (i = 0; i < len; i++)
@@ -128,17 +128,17 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
         size += 1 + varsize + 1;                         /* *, x and ^        */
         size += (size_t) ceil(log10((double) (i + 1)));  /* Exponent          */
     }
-    
+
     mpq_init(q);
     str = flint_malloc(size);
-    
+
     j = 0;
-    
+
     /* Print the leading term */
     fmpz_get_mpz(mpq_numref(q), poly + (len - 1));
     fmpz_get_mpz(mpq_denref(q), den);
     mpq_canonicalize(q);
-    
+
     if (flint_mpq_cmp_si(q, 1, 1) != 0)
     {
         if (flint_mpq_cmp_si(q, -1, 1) == 0)
@@ -153,19 +153,19 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
     j += flint_sprintf(str + j, "%s", var);
     str[j++] = '^';
     j += flint_sprintf(str + j, "%li", len - 1);
-    
+
     i = len - 1;
     while (i)
     {
         i--;
-        
+
         if (fmpz_is_zero(poly + i))
             continue;
-        
+
         fmpz_get_mpz(mpq_numref(q), poly + i);
         fmpz_get_mpz(mpq_denref(q), den);
         mpq_canonicalize(q);
-        
+
         str[j++] = ' ';
         if (mpq_sgn(q) < 0)
         {
@@ -175,10 +175,10 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
         else
             str[j++] = '+';
         str[j++] = ' ';
-        
+
         mpq_get_str(str + j, 10, q);
         j += strlen(str + j);
-        
+
         if (i > 0)
         {
             str[j++] = '*';
@@ -190,7 +190,7 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
             }
         }
     }
-    
+
     mpq_clear(q);
     mpz_clear(z);
     return str;
@@ -198,7 +198,7 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
 
 char * fmpq_poly_get_str_pretty(const fmpq_poly_t poly, const char * var)
 {
-    return _fmpq_poly_get_str_pretty(poly->coeffs, poly->den, poly->length, 
+    return _fmpq_poly_get_str_pretty(poly->coeffs, poly->den, poly->length,
                                      var);
 }
 

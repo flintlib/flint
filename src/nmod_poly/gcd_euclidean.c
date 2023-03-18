@@ -12,14 +12,14 @@
 #include "nmod_poly.h"
 #include "mpn_extras.h"
 
-slong _nmod_poly_gcd_euclidean(mp_ptr G, mp_srcptr A, slong lenA, 
+slong _nmod_poly_gcd_euclidean(mp_ptr G, mp_srcptr A, slong lenA,
                                         mp_srcptr B, slong lenB, nmod_t mod)
 {
     slong steps;
     slong lenR1, lenR2 = 0, lenG = 0;
 
     mp_ptr F, R1, R2, R3 = G, T;
-    
+
     if (lenB == 1)
     {
         G[0] = B[0];
@@ -67,7 +67,7 @@ slong _nmod_poly_gcd_euclidean(mp_ptr G, mp_srcptr A, slong lenA,
     if (lenR2 == 1)
     {
         lenG = 1;
-        if (steps % 3) 
+        if (steps % 3)
             G[0] = R2[0];
     }
     else
@@ -81,7 +81,7 @@ slong _nmod_poly_gcd_euclidean(mp_ptr G, mp_srcptr A, slong lenA,
     return lenG;
 }
 
-void nmod_poly_gcd_euclidean(nmod_poly_t G, 
+void nmod_poly_gcd_euclidean(nmod_poly_t G,
                              const nmod_poly_t A, const nmod_poly_t B)
 {
     if (A->length < B->length)
@@ -97,7 +97,7 @@ void nmod_poly_gcd_euclidean(nmod_poly_t G,
         if (lenA == 0) /* lenA = lenB = 0 */
         {
             nmod_poly_zero(G);
-        } 
+        }
         else if (lenB == 0) /* lenA > lenB = 0 */
         {
             nmod_poly_make_monic(G, A);

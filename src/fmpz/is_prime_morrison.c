@@ -22,11 +22,11 @@ void _fmpz_np1_trial_factors(const fmpz_t n, mp_ptr pp1, slong * num_pp1, ulong 
    ulong ppi, p;
    const ulong * primes;
    const double * pinv;
-   
+
    *num_pp1 = 0;
 
    /* number of primes multiplied that will fit in a word */
-  
+
    num = FLINT_BITS/FLINT_BIT_COUNT(limit);
 
    /* compute remainders of n mod p for primes p up to limit (approx.) */
@@ -34,11 +34,11 @@ void _fmpz_np1_trial_factors(const fmpz_t n, mp_ptr pp1, slong * num_pp1, ulong 
    n_prime_pi_bounds(&ppi, &ppi, limit); /* precompute primes */
    primes = n_primes_arr_readonly(ppi + FLINT_BITS);
    pinv = n_prime_inverses_arr_readonly(ppi + FLINT_BITS);
-   
+
    while (primes[0] < limit)
    {
       /* multiply batch of primes */
-      
+
       p = primes[0];
       for (i = 1; i < num; i++)
          p *= primes[i];
@@ -89,7 +89,7 @@ int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, mp_ptr pp1, slong
    fmpz_factor_init(fac);
 
    fmpz_add_ui(R, n, 1); /* start with n + 1 */
-   
+
    bits = fmpz_bits(R);
 
    for (i = 0; i < num_pp1; i++)
@@ -101,7 +101,7 @@ int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, mp_ptr pp1, slong
 
    srand(time(NULL));
 
-   if (!fmpz_is_probabprime_BPSW(R))  
+   if (!fmpz_is_probabprime_BPSW(R))
    {
       if (bits > 150 && (fac_found = fmpz_factor_pp1(p, R, bits + 1000, bits/20 + 1000, rand()%100 + 3)
                     && fmpz_is_prime(p)))
@@ -116,7 +116,7 @@ int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, mp_ptr pp1, slong
                _fmpz_factor_append(fac, R, 1);
                fmpz_set_ui(R, 1);
             }
-         } 
+         }
       }
    } else
    {
@@ -125,7 +125,7 @@ int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, mp_ptr pp1, slong
          _fmpz_factor_append(fac, R, 1);
          fmpz_set_ui(R, 1);
       }
-   } 
+   }
 
    /* compute product F of found primes */
    fmpz_set_ui(F, 1);
@@ -139,7 +139,7 @@ int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, mp_ptr pp1, slong
          fmpz_mul(F, F, ex);
       }
    }
-   
+
    /* Want D = A^2 - 4B where A = a, B = b, such that (D/n) = -1 */
    for (b = 1; ; b++)
    {

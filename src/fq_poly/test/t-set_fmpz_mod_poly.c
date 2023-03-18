@@ -44,7 +44,7 @@ main(void)
 
         fmpz_mod_poly_randtest(b, state, len, ctx->ctxp);
         fmpz_randtest(p, state, 10);
-        
+
         fq_poly_set_fmpz_mod_poly(a, b, ctx);
         fq_set_fmpz(r, p, ctx);
         fq_poly_evaluate_fq(r, a, r, ctx);

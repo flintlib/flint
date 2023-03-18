@@ -67,9 +67,9 @@ _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr)
 
         if (j >= arg.len2)
             return;
-            
+
         _fmpz_vec_set(res[j].coeffs, C->rows[(j + 1)*k - 1], n);
-    
+
         if (n == 1) /* special case, constant polynomials */
         {
             for (i = 2; i <= k; i++)
@@ -89,7 +89,7 @@ _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr)
                 _fmpz_mod_poly_add(res[j].coeffs, t, n,
                                                  C->rows[(j + 1)*k - i], n, p);
             }
-        }                                                
+        }
     }
 }
 
@@ -185,7 +185,7 @@ _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_str
     {
         thread_pool_wake(global_thread_pool, threads[i], 0,
            _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_worker, &args[i]);
-    }    
+    }
 
     _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_worker(&args[num_threads]);
 
@@ -220,7 +220,7 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_stru
                                                const fmpz_mod_ctx_t ctx,
                                             thread_pool_handle * threads,
                                             slong num_threads)
-{                                            
+{
     slong len2 = poly->length;
     slong i;
 
@@ -273,7 +273,7 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * 
     slong i, len2 = poly->length;
     thread_pool_handle * threads;
     slong num_threads;
-    
+
     for (i = 0; i < len1; i++)
     {
         if (polys[i].length >= len2)

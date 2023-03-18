@@ -18,7 +18,7 @@ void check(mp_limb_t n, int s1, int s2)
     if (s1 != s2)
     {
         flint_printf("FAIL:\n");
-        flint_printf("%wu: got %d instead of %d\n", n, s1, s2); 
+        flint_printf("%wu: got %d instead of %d\n", n, s1, s2);
         fflush(stdout);
         flint_abort();
     }
@@ -29,7 +29,7 @@ int main(void)
     int s, k;
 
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("is_squarefree....");
     fflush(stdout);
 

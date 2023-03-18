@@ -20,7 +20,7 @@
 #endif
 
 /* Only those with odd index */
-const ulong ULONG_PRIMORIALS[] = 
+const ulong ULONG_PRIMORIALS[] =
 {
     UWORD(6),
     UWORD(30),
@@ -89,7 +89,7 @@ mp_size_t mpn_prod_limbs_balanced(mp_limb_t * result, mp_limb_t * scratch,
 
     an = n/2;
     bn = n - an;
-    
+
     alen = mpn_prod_limbs_balanced(scratch, result, factors, an, bits);
     blen = mpn_prod_limbs_balanced(scratch + alen, result, factors + an, bn, bits);
     len = alen + blen;
@@ -101,7 +101,7 @@ mp_size_t mpn_prod_limbs_balanced(mp_limb_t * result, mp_limb_t * scratch,
 
     if (!top)
         len--;
-    
+
     return len;
 }
 
@@ -116,16 +116,16 @@ mp_size_t mpn_prod_limbs(mp_limb_t * result, const mp_limb_t * factors,
 {
     mp_size_t len, limbs;
     mp_limb_t * scratch;
-    
+
     if (n < PROD_LIMBS_DIRECT_CUTOFF)
         return mpn_prod_limbs_direct(result, factors, n);
 
-    limbs = (n * bits - 1)/FLINT_BITS + 2; 
+    limbs = (n * bits - 1)/FLINT_BITS + 2;
 
     scratch = flint_malloc(sizeof(mp_limb_t) * limbs);
     len = mpn_prod_limbs_balanced(result, scratch, factors, n, bits);
     flint_free(scratch);
-    
+
     return len;
 }
 
@@ -150,10 +150,10 @@ fmpz_primorial(fmpz_t res, ulong n)
 
     primes = n_primes_arr_readonly(pi);
     bits = FLINT_BIT_COUNT(primes[pi - 1]);
-    
+
     mres = _fmpz_promote(res);
     mpz_realloc2(mres, pi*bits);
-    
+
     len = mpn_prod_limbs(mres->_mp_d, primes, pi, bits);
     mres->_mp_size = len;
 }

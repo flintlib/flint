@@ -15,7 +15,7 @@
 #define GR_MPOLY_H
 
 #ifdef GR_MPOLY_INLINES_C
-#define GR_MPOLY_INLINE 
+#define GR_MPOLY_INLINE
 #else
 #define GR_MPOLY_INLINE static __inline__
 #endif
@@ -99,7 +99,7 @@ void gr_mpoly_fit_length_reset_bits(
 
 /* todo: when to zero out coefficients? */
 GR_MPOLY_INLINE
-void _gr_mpoly_set_length(gr_mpoly_t A, slong newlen, 
+void _gr_mpoly_set_length(gr_mpoly_t A, slong newlen,
                                                const mpoly_ctx_t mctx, gr_ctx_t cctx)
 {
     FLINT_ASSERT(newlen <= A->coeffs_alloc);

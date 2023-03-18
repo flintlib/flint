@@ -13,7 +13,7 @@
 #include "aprcl.h"
 
 /*
-    Computes f = g * g for p = 2^2. 
+    Computes f = g * g for p = 2^2.
     g must be reduced by F_4 cyclotomic polynomial.
     t is the memory for fmpz_t; size of t must be > 3.
     Resulting f reduced by F_4 cyclotomic polynomial.
@@ -44,7 +44,7 @@ unity_zp_sqr4(unity_zp f, const unity_zp g, fmpz_t * t)
 }
 
 /*
-    Computes f = g * g for p = 2^3. 
+    Computes f = g * g for p = 2^3.
     g must be reduced by F_8 cyclotomic polynomial.
     t is the memory for fmpz_t; size of t must be > 16.
     Resulting f reduced by F_8 cyclotomic polynomial.
@@ -70,7 +70,7 @@ unity_zp_sqr8(unity_zp f, const unity_zp g, fmpz_t * t)
     fmpz_mod_poly_get_coeff_fmpz(t[3], g->poly, 3, g->ctx);
 
     fmpz_sub(t[4], t[0], t[2]);             /*  m1 = x0 - x2    */
-    fmpz_add(t[5], t[0], t[2]);             /*  m2 = x0 + x2    */                     
+    fmpz_add(t[5], t[0], t[2]);             /*  m2 = x0 + x2    */
     fmpz_sub(t[6], t[1], t[3]);             /*  m3 = x1 - x3    */
     fmpz_add(t[7], t[1], t[3]);             /*  m4 = x1 + x3    */
     fmpz_add(t[8], t[0], t[0]);             /*  m5 = x0 + x0    */
@@ -102,7 +102,7 @@ unity_zp_sqr8(unity_zp f, const unity_zp g, fmpz_t * t)
 }
 
 /*
-    Computes f = g * g for p = 2^4. 
+    Computes f = g * g for p = 2^4.
     g must be reduced by F_16 cyclotomic polynomial.
     t is the memory for fmpz_t; size of t must be > 44.
     Resulting f reduced by F_16 cyclotomic polynomial.
@@ -141,7 +141,7 @@ unity_zp_sqr16(unity_zp f, const unity_zp g, fmpz_t * t)
     fmpz_sub(t[6], t[32], t[36]);           /*  b2 = x2 - x6    */
     fmpz_sub(t[7], t[33], t[37]);           /*  b3 = x3 - x7    */
 
-    /* 
+    /*
         apply auxiliary routine 2 with (a0, .. , a3) and (b0, .. , b3)
         store result in (c0, .. , c6)
     */
@@ -155,12 +155,12 @@ unity_zp_sqr16(unity_zp f, const unity_zp g, fmpz_t * t)
     fmpz_add(t[1], t[31], t[31]);           /*  a1 = x1 + x1    */
     fmpz_add(t[2], t[32], t[32]);           /*  a2 = x2 + x2    */
     fmpz_add(t[3], t[33], t[33]);           /*  a3 = x3 + x3    */
-    fmpz_set(t[4], t[34]);                  /*  set b0 = x4     */ 
+    fmpz_set(t[4], t[34]);                  /*  set b0 = x4     */
     fmpz_set(t[5], t[35]);                  /*  set b1 = x5     */
     fmpz_set(t[6], t[36]);                  /*  set b2 = x6     */
     fmpz_set(t[7], t[37]);                  /*  set b3 = x7     */
-    
-    /* 
+
+    /*
         apply auxiliary routine 2 with (a0, .. , a3) and (b0, .. , b3)
         store result in (c0, .. , c6)
     */

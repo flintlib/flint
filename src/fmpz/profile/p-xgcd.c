@@ -25,7 +25,7 @@ void sample_xgcd_small(void * arg, ulong count)
     fmpz_init(y);
     fmpz_init(a);
     fmpz_init(b);
-    
+
     fmpz_init(nmax);
     fmpz_set_d_2exp(nmax, 1.0, SMALL_FMPZ_BITCOUNT_MAX);
 
@@ -60,7 +60,7 @@ void sample_xgcd_mixed(void * arg, ulong count)
     fmpz_init(y);
     fmpz_init(a);
     fmpz_init(b);
-    
+
     fmpz_init(nmax);
     fmpz_set_d_2exp(nmax, 1.0, FLINT_BITS);
 
@@ -95,7 +95,7 @@ void sample_xgcd_big(void * arg, ulong count)
     fmpz_init(y);
     fmpz_init(a);
     fmpz_init(b);
-    
+
     fmpz_init(nmax);
     fmpz_set_d_2exp(nmax, 1.0, 512);
 
@@ -130,7 +130,7 @@ void sample_xgcd_canonical_bezout_small(void * arg, ulong count)
     fmpz_init(y);
     fmpz_init(a);
     fmpz_init(b);
-    
+
     fmpz_init(nmax);
     fmpz_set_d_2exp(nmax, 1.0, SMALL_FMPZ_BITCOUNT_MAX);
 
@@ -165,7 +165,7 @@ void sample_xgcd_canonical_bezout_mixed(void * arg, ulong count)
     fmpz_init(y);
     fmpz_init(a);
     fmpz_init(b);
-    
+
     fmpz_init(nmax);
     fmpz_set_d_2exp(nmax, 1.0, FLINT_BITS);
 
@@ -200,7 +200,7 @@ void sample_xgcd_canonical_bezout_big(void * arg, ulong count)
     fmpz_init(y);
     fmpz_init(a);
     fmpz_init(b);
-    
+
     fmpz_init(nmax);
     fmpz_set_d_2exp(nmax, 1.0, 512);
 

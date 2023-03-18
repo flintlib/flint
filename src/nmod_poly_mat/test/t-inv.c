@@ -22,7 +22,7 @@ main(void)
     FLINT_TEST_INIT(state);
 
     flint_printf("inv....");
-    fflush(stdout);    
+    fflush(stdout);
 
     /* Test aliasing */
     for (i = 0; i < 40 * flint_test_multiplier(); i++)
@@ -146,7 +146,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

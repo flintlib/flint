@@ -15,7 +15,7 @@
 /*
     Computes sum \zeta_{p^k}^{a * x + b * f(x)} for x = 1, 2, ..., q - 2.
 */
-void 
+void
 _unity_zp_jacobi_sum_pq_general(unity_zp f, const mp_ptr table,
         ulong p, ulong q, ulong k, ulong a, ulong b)
 {
@@ -30,7 +30,7 @@ _unity_zp_jacobi_sum_pq_general(unity_zp f, const mp_ptr table,
 
     for (i = 1; i < q - 1; i++)
     {
-        /* l = a * i + b * f[i] */ 
+        /* l = a * i + b * f[i] */
         ulong l = (a * (i) + b * table[i]) % pow;
 
         /* if l < (p - 1)p^{k - 1} increase f[l] by one */

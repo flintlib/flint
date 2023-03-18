@@ -46,16 +46,16 @@ void sample(void * arg, ulong count)
    slong length = info->length, i, j;
    int algo = info->algo;
    int scale;
-   
+
    fmpz_poly_t p1, p2, b, q, r;
    fmpz_poly_powers_precomp_t pinv;
-           
+
    FLINT_TEST_INIT(state);
 
    scale = 100;
    if (length >= 50) scale = 10;
    if (length >= 500) scale = 4;
-   
+
    fmpz_poly_init(p1);
    fmpz_poly_init(p2);
    fmpz_poly_init(b);
@@ -67,9 +67,9 @@ void sample(void * arg, ulong count)
       random_fmpz_poly(p1, state, 2*length - 1);
       random_fmpz_poly(p2, state, length);
       fmpz_set_ui(p2->coeffs + p2->length - 1, 1); /* p2 must be monic */
-      
+
       fmpz_poly_powers_precompute(pinv, p2);
-	
+
       if (algo)
       {
          prof_start();
@@ -90,7 +90,7 @@ void sample(void * arg, ulong count)
 
       fmpz_poly_powers_clear(pinv);
    }
-  
+
    fmpz_poly_clear(p1);
    fmpz_poly_clear(p2);
    fmpz_poly_clear(b);
@@ -117,20 +117,20 @@ int main(void)
       scale = 100;
       if (k >= 50) scale = 10;
       if (k >= 500) scale = 4;
-      
+
       prof_repeat(&min, &max, sample, (void *) &info);
-      
-      flint_printf("Standard: length %wd, min %.3g ms, max %.3g ms\n", 
+
+      flint_printf("Standard: length %wd, min %.3g ms, max %.3g ms\n",
            info.length,
 		   ((min/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,
            ((max/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0
 	     );
 
      info.algo = 1;
-     
+
      prof_repeat(&min, &max, sample, (void *) &info);
-         
-      flint_printf("With powers: length %wd, min %.3g ms, max %.3g ms\n\n", 
+
+      flint_printf("With powers: length %wd, min %.3g ms, max %.3g ms\n\n",
            info.length,
 		   ((min/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,
            ((max/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0

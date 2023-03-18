@@ -264,7 +264,7 @@ ideal_mixed_erfi(ca_field_t K, slong i, slong j, int have_i, slong index_i, ca_c
 }
 
 /*
-erf(x) - erf(x)            = 0 
+erf(x) - erf(x)            = 0
 erfc(x) - erfc(x)          = 0
 erfi(x) - erfi(x)          = 0
 erf(x) + erfc(x) - 1       = 0
@@ -338,7 +338,7 @@ ca_field_build_ideal_erf(ca_field_t K, ca_ctx_t ctx)
 
                         if (Fi == Fj || (Fi == CA_Erf && Fj == CA_Erfc) || (Fi == CA_Erfc && Fj == CA_Erf))
                         {
-                            if (ca_check_equal(CA_EXT_FUNC_ARGS(CA_FIELD_EXT_ELEM(K, i)), 
+                            if (ca_check_equal(CA_EXT_FUNC_ARGS(CA_FIELD_EXT_ELEM(K, i)),
                                                CA_EXT_FUNC_ARGS(CA_FIELD_EXT_ELEM(K, j)), ctx) == T_TRUE)
                             {
                                 /*

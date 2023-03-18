@@ -14,7 +14,7 @@
 void fq_nmod_mpoly_randtest_bounds(fq_nmod_mpoly_t A, flint_rand_t state,
                slong length, ulong * exp_bounds, const fq_nmod_mpoly_ctx_t ctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx->fqctx);    
+    slong d = fq_nmod_ctx_degree(ctx->fqctx);
     slong i, j, nvars = ctx->minfo->nvars;
     ulong * exp;
     TMP_INIT;

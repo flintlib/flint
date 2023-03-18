@@ -15,24 +15,24 @@
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_poly_hensel_lift(fmpz *G, fmpz *H, fmpz *A, fmpz *B, 
-    const fmpz *f, slong lenF, 
-    const fmpz *g, slong lenG, const fmpz *h, slong lenH, 
-    const fmpz *a, slong lenA, const fmpz *b, slong lenB, 
+void _fmpz_poly_hensel_lift(fmpz *G, fmpz *H, fmpz *A, fmpz *B,
+    const fmpz *f, slong lenF,
+    const fmpz *g, slong lenG, const fmpz *h, slong lenH,
+    const fmpz *a, slong lenA, const fmpz *b, slong lenB,
     const fmpz_t p, const fmpz_t p1)
 {
-    _fmpz_poly_hensel_lift_without_inverse(G, H, f, lenF, g, lenG, h, lenH, 
+    _fmpz_poly_hensel_lift_without_inverse(G, H, f, lenF, g, lenG, h, lenH,
         a, lenA, b, lenB, p, p1);
 
-    _fmpz_poly_hensel_lift_only_inverse(A, B, G, lenG, H, lenH, 
+    _fmpz_poly_hensel_lift_only_inverse(A, B, G, lenG, H, lenH,
         a, lenA, b, lenB, p, p1);
 }
 
-void fmpz_poly_hensel_lift(fmpz_poly_t G, fmpz_poly_t H, 
-    fmpz_poly_t A, fmpz_poly_t B, 
-    const fmpz_poly_t f, 
-    const fmpz_poly_t g, const fmpz_poly_t h, 
-    const fmpz_poly_t a, const fmpz_poly_t b, 
+void fmpz_poly_hensel_lift(fmpz_poly_t G, fmpz_poly_t H,
+    fmpz_poly_t A, fmpz_poly_t B,
+    const fmpz_poly_t f,
+    const fmpz_poly_t g, const fmpz_poly_t h,
+    const fmpz_poly_t a, const fmpz_poly_t b,
     const fmpz_t p, const fmpz_t p1)
 {
     const slong lenG = g->length;
@@ -43,8 +43,8 @@ void fmpz_poly_hensel_lift(fmpz_poly_t G, fmpz_poly_t H,
     fmpz_poly_fit_length(A, lenH - 1);
     fmpz_poly_fit_length(B, lenG - 1);
 
-    _fmpz_poly_hensel_lift(G->coeffs, H->coeffs, A->coeffs, B->coeffs, 
-        f->coeffs, f->length, g->coeffs, g->length, h->coeffs, h->length, 
+    _fmpz_poly_hensel_lift(G->coeffs, H->coeffs, A->coeffs, B->coeffs,
+        f->coeffs, f->length, g->coeffs, g->length, h->coeffs, h->length,
         a->coeffs, a->length, b->coeffs, b->length, p, p1);
 
     _fmpz_poly_set_length(G, lenG);

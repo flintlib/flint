@@ -40,7 +40,7 @@ slong _nmod_mpoly_add1(
         {
             Acoeffs[k] = Ccoeffs[j];
             Aexps[k] = Cexps[j];
-            j++;         
+            j++;
         }
         k++;
     }
@@ -97,7 +97,7 @@ slong _nmod_mpoly_add(mp_limb_t * Acoeffs,       ulong * Aexps,
         {
             Acoeffs[k] = Ccoeffs[j];
             mpoly_monomial_set(Aexps + k*N, Cexps + j*N, N);
-            j++;         
+            j++;
         }
         k++;
     }
@@ -167,7 +167,7 @@ void nmod_mpoly_add(nmod_mpoly_t A, const nmod_mpoly_t B,
     {
         nmod_mpoly_t T;
         nmod_mpoly_init3(T, B->length + C->length, Abits, ctx);
-        T->length = _nmod_mpoly_add(T->coeffs, T->exps, 
+        T->length = _nmod_mpoly_add(T->coeffs, T->exps,
                                     B->coeffs, Bexps, B->length,
                                     C->coeffs, Cexps, C->length,
                                                       N, cmpmask, ctx->mod);
@@ -177,7 +177,7 @@ void nmod_mpoly_add(nmod_mpoly_t A, const nmod_mpoly_t B,
     else
     {
         nmod_mpoly_fit_length_reset_bits(A, B->length + C->length, Abits, ctx);
-        A->length = _nmod_mpoly_add(A->coeffs, A->exps, 
+        A->length = _nmod_mpoly_add(A->coeffs, A->exps,
                                     B->coeffs, Bexps, B->length,
                                     C->coeffs, Cexps, C->length,
                                                       N, cmpmask, ctx->mod);

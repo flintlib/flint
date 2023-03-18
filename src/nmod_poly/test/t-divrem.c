@@ -18,7 +18,7 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("divrem....");
     fflush(stdout);
 
@@ -36,7 +36,7 @@ main(void)
         nmod_poly_init(q, n);
         nmod_poly_init(r, n);
         nmod_poly_init(prod, n);
-        
+
         nmod_poly_randtest(a, state, n_randint(state, 2000));
         do nmod_poly_randtest(b, state, n_randint(state, 2000));
         while (b->length == 0);
@@ -57,7 +57,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         nmod_poly_clear(a);
         nmod_poly_clear(b);
         nmod_poly_clear(q);
@@ -257,7 +257,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         nmod_poly_clear(a);
         nmod_poly_clear(b);
         nmod_poly_clear(q);
@@ -302,7 +302,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         nmod_poly_clear(a);
         nmod_poly_clear(b);
         nmod_poly_clear(q);
@@ -311,7 +311,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

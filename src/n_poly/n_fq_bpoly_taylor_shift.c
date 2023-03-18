@@ -50,7 +50,7 @@ void n_fq_bpoly_taylor_shift_gen1_fq_nmod(
     for (i = A->length - 1; i >= 0; i--)
         _n_fq_poly_taylor_shift_horner_n_fq(A->coeffs[i].coeffs, c, A->coeffs[i].length, ctx);
 
-    flint_free(c);  
+    flint_free(c);
 }
 
 void n_fq_bpoly_taylor_shift_gen0_fq_nmod(

@@ -109,7 +109,7 @@ void fmpz_mat_mul_strassen(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
     fmpz_mat_window_clear(C21);
     fmpz_mat_window_clear(C22);
 
-    if (c > 2*bnc) 
+    if (c > 2*bnc)
     {
         fmpz_mat_t Bc, Cc;
         fmpz_mat_window_init(Bc, B, 0, 2*bnc, b, c);
@@ -119,7 +119,7 @@ void fmpz_mat_mul_strassen(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
         fmpz_mat_window_clear(Cc);
     }
 
-    if (a > 2*anr) 
+    if (a > 2*anr)
     {
         fmpz_mat_t Ar, Cr;
         fmpz_mat_window_init(Ar, A, 2*anr, 0, a, b);
@@ -129,7 +129,7 @@ void fmpz_mat_mul_strassen(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
         fmpz_mat_window_clear(Cr);
     }
 
-    if (b > 2*anc) 
+    if (b > 2*anc)
     {
         fmpz_mat_t Ac, Br, Cb, tmp;
         slong mt, nt;
@@ -137,13 +137,13 @@ void fmpz_mat_mul_strassen(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
         fmpz_mat_window_init(Ac, A, 0, 2*anc, 2*anr, b);
         fmpz_mat_window_init(Br, B, 2*bnr, 0, b, 2*bnc);
         fmpz_mat_window_init(Cb, C, 0, 0, 2*anr, 2*bnc);
-        
+
         mt = Ac->r;
         nt = Br->c;
-        
+
         fmpz_mat_init(tmp, mt, nt);
         fmpz_mat_mul(tmp, Ac, Br);
-        fmpz_mat_add(Cb, Cb, tmp); 
+        fmpz_mat_add(Cb, Cb, tmp);
         fmpz_mat_clear(tmp);
         fmpz_mat_window_clear(Ac);
         fmpz_mat_window_clear(Br);

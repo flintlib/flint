@@ -38,7 +38,7 @@ _nmod_poly_div(mp_ptr Q, mp_srcptr A, slong lenA,  mp_srcptr B, slong lenB, nmod
 }
 
 void
-nmod_poly_div(nmod_poly_t Q, 
+nmod_poly_div(nmod_poly_t Q,
                  const nmod_poly_t A, const nmod_poly_t B)
 {
     nmod_poly_t tQ;
@@ -46,7 +46,7 @@ nmod_poly_div(nmod_poly_t Q,
     slong A_len, B_len;
 
     B_len = B->length;
-    
+
     if (B_len == 0)
     {
         if (nmod_poly_modulus(B) == 1)
@@ -54,14 +54,14 @@ nmod_poly_div(nmod_poly_t Q,
             nmod_poly_set(Q, A);
             return;
         } else
-        {                                                                                
+        {
             flint_printf("Exception (nmod_poly_divrem). Division by zero.\n");
             flint_abort();
         }
     }
 
     A_len = A->length;
-    
+
     if (A_len < B_len)
     {
         nmod_poly_zero(Q);
@@ -87,6 +87,6 @@ nmod_poly_div(nmod_poly_t Q,
         nmod_poly_swap(tQ, Q);
         nmod_poly_clear(tQ);
     }
-    
+
     Q->length = A_len - B_len + 1;
 }

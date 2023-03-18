@@ -15,7 +15,7 @@
 #endif
 
 #include <sys/types.h>
-#if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER) 
+#if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER)
 #include <unistd.h>
 #endif
 
@@ -36,7 +36,7 @@ int main(void)
     FLINT_TEST_INIT(state);
 
     flint_printf("print/ read....");
-    fflush(stdout);  
+    fflush(stdout);
 
     /* Randomise n polynomials, write to and read from a pipe */
     {
@@ -251,7 +251,7 @@ int main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

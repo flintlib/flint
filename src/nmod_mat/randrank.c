@@ -28,7 +28,7 @@ nmod_mat_randrank(nmod_mat_t mat, flint_rand_t state, slong rank)
     }
 
     diag = _nmod_vec_init(rank);
-    
+
     if (mat->mod.n != 1)
     {
         for (i = 0; i < rank; i++)

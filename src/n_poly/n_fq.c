@@ -318,7 +318,7 @@ void _n_fq_reduce(
     else
     {
 /*
-        _nmod_poly_divrem_newton_n_preinv(t, a, b, blen, 
+        _nmod_poly_divrem_newton_n_preinv(t, a, b, blen,
                                           ctx->modulus->coeffs, ctx->modulus->length,
                                           ctx->inv->coeffs, ctx->inv->length,
                                           ctx->mod);
@@ -540,7 +540,7 @@ void _n_fq_madd2_lazy1(
             t0 += b[d - 1 - j]*c[0 + j];
         }
         a[(d - 1) + 0] = t0;
-    }   
+    }
 }
 
 
@@ -575,7 +575,7 @@ void _n_fq_mul2_lazy1(
             t0 += b[d - 1 - j]*c[0 + j];
         }
         a[(d - 1) + 0] = t0;
-    }   
+    }
 }
 
 
@@ -629,7 +629,7 @@ void _n_fq_madd2_lazy2(
         }
         a[2*(d - 1) + 0] = t0;
         a[2*(d - 1) + 1] = t1;
-    }   
+    }
 }
 
 
@@ -667,7 +667,7 @@ void _n_fq_mul2_lazy2(
         }
         a[2*(d - 1) + 0] = t0;
         a[2*(d - 1) + 1] = t1;
-    }   
+    }
 }
 
 
@@ -676,7 +676,7 @@ void _n_fq_reduce2_lazy3(
     slong d,
     nmod_t ctx)
 {
-    slong i;    
+    slong i;
     for (i = 0; i < 2*d - 1; i++)
         NMOD_RED3(a[i], a[3*i + 2], a[3*i + 1], a[3*i + 0], ctx);
 }
@@ -727,7 +727,7 @@ void _n_fq_madd2_lazy3(
         a[3*(d - 1) + 0] = t0;
         a[3*(d - 1) + 1] = t1;
         a[3*(d - 1) + 2] = t2;
-    }   
+    }
 }
 
 
@@ -768,7 +768,7 @@ void _n_fq_mul2_lazy3(
         a[3*(d - 1) + 0] = t0;
         a[3*(d - 1) + 1] = t1;
         a[3*(d - 1) + 2] = t2;
-    }   
+    }
 }
 
 

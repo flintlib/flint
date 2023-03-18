@@ -18,7 +18,7 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("div_fmpz....");
     fflush(stdout);
@@ -88,7 +88,7 @@ main(void)
         fmpq_clear(z);
     }
 
-    
+
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

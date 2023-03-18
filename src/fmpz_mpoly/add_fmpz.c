@@ -62,7 +62,7 @@ void fmpz_mpoly_add_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
 
                 for (i = 0; i < Blen*N; i++)
                     A->exps[i] = B->exps[i];
-            } 
+            }
 
             for (i = 0; i < N; i++)
                 A->exps[Blen*N + i] = 0;

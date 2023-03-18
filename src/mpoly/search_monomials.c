@@ -137,7 +137,7 @@ void mpoly_search_monomials(
         } else
         {
             /* there is definitely a path between */
-            hind[maxind] = (gind[maxind] + find[maxind])/2;    
+            hind[maxind] = (gind[maxind] + find[maxind])/2;
         }
 
 
@@ -172,7 +172,7 @@ void mpoly_search_monomials(
                 }
             }
             hind[i] = x;
-            hscore += gind[i] - hind[i];            
+            hscore += gind[i] - hind[i];
         }
 
         /*
@@ -190,10 +190,10 @@ void mpoly_search_monomials(
                     break;
             }
             hind[i] = x;
-            hscore += gind[i] - hind[i];            
+            hscore += gind[i] - hind[i];
         }
 
-        if (hscore <= upper) 
+        if (hscore <= upper)
         {
             tind = gind; tscore = gscore; texp = gexp;
             gind = hind; gscore = hscore; gexp = hexp;

@@ -18,7 +18,7 @@ int main(void)
    slong num_iter;
    ulong count = UWORD(0);
    FLINT_TEST_INIT(state);
-   
+
    flint_printf("factor_one_line....");
    fflush(stdout);
 
@@ -27,7 +27,7 @@ int main(void)
    for (i = 0; i < num_iter; i++) /* Test random numbers */
    {
       mp_limb_t n1, n2, bits;
-      
+
       do
       {
 #if FLINT64
@@ -37,9 +37,9 @@ int main(void)
 #endif
          n1 = n_randtest_bits(state, bits + 1);
       } while (n_is_prime(n1) || (n1 == UWORD(1)));
-      
+
       n2 = n_factor_one_line(n1, 50000);
-      
+
       if (n2)
       {
          count++;
@@ -48,13 +48,13 @@ int main(void)
          if (!result)
          {
             flint_printf("FAIL:\n");
-            flint_printf("n1 = %wu, n2 = %wu\n", n1, n2); 
+            flint_printf("n1 = %wu, n2 = %wu\n", n1, n2);
             fflush(stdout);
             flint_abort();
          }
       }
    }
-   
+
    if (count < 0.9 * num_iter)
    {
       flint_printf("FAIL:\n");
@@ -64,7 +64,7 @@ int main(void)
    }
 
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

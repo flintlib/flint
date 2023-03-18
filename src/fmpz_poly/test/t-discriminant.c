@@ -85,11 +85,11 @@ main(void)
 
         fmpz_init(a);
         fmpz_poly_init(f);
-        
+
         fmpz_poly_randtest(f, state, 1, 100);
-        
+
         fmpz_poly_discriminant(a, f);
-        
+
         result = (fmpz_is_zero(a));
         if (!result)
         {
@@ -105,7 +105,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

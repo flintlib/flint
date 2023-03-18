@@ -25,7 +25,7 @@ main(void)
     flint_printf("derivative... ");
     fflush(stdout);
 
-    
+
 
     /* Check aliasing */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -101,7 +101,7 @@ main(void)
         fmpz_poly_q_mul(d, a, d);
         fmpz_poly_q_add(rhs, c, d);
 
-        result = fmpz_poly_q_equal(lhs, rhs) && fmpz_poly_q_is_canonical(lhs) 
+        result = fmpz_poly_q_equal(lhs, rhs) && fmpz_poly_q_is_canonical(lhs)
                                              && fmpz_poly_q_is_canonical(rhs);
         if (!result)
         {
@@ -123,7 +123,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

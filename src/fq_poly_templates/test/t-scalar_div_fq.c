@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Sebastian Pancratz 
+    Copyright (C) 2012 Sebastian Pancratz
     Copyright (C) 2013 Mike Hansen
     Copyright (C) 2020 William Hart
 

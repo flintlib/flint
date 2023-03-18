@@ -36,7 +36,7 @@ nmod_mat_can_solve_inner(slong * rank, slong * prm, slong * piv,
     if (A->r == 0 || B->c == 0)
     {
         nmod_mat_zero(X);
-    
+
         *rank = 0;
 
         return 1;
@@ -96,7 +96,7 @@ nmod_mat_can_solve_inner(slong * rank, slong * prm, slong * piv,
     if (A->r > *rank)
     {
         nmod_mat_t P;
-        
+
         LU->rows += *rank;
         LU->r = A->r - *rank;
         X->r = LU->c;

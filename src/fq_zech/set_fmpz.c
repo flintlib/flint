@@ -24,6 +24,6 @@ fq_zech_set_fmpz(fq_zech_t rop, const fmpz_t x, const fq_zech_ctx_t ctx)
     ux = fmpz_get_ui(y);
     fq_zech_one(rop, ctx);
     fq_zech_mul_ui(rop, rop, ux, ctx);
-    
+
     fmpz_clear(y);
 }

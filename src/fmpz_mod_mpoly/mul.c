@@ -44,7 +44,7 @@ static int _try_dense(
     dense_size = 1;
     for (i = 0; i < mctx->nvars; i++)
     {
-        if (n_add_checked(&t, Bdegs[i], Cdegs[i] + 1) || 
+        if (n_add_checked(&t, Bdegs[i], Cdegs[i] + 1) ||
             n_mul_checked(&dense_size, dense_size, t))
         {
             ret = 0;

@@ -11,7 +11,7 @@
 
 #include "qadic.h"
 
-void _qadic_trace(fmpz_t rop, const fmpz *op, slong len, 
+void _qadic_trace(fmpz_t rop, const fmpz *op, slong len,
                   const fmpz *a, const slong *j, slong lena, const fmpz_t pN)
 {
     const slong d = j[lena - 1];
@@ -65,7 +65,7 @@ void qadic_trace(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 
         alloc = _padic_ctx_pow_ui(pN, N - op->val, &ctx->pctx);
 
-        _qadic_trace(padic_unit(rop), op->coeffs, op->length, 
+        _qadic_trace(padic_unit(rop), op->coeffs, op->length,
                      ctx->a, ctx->j, ctx->len, pN);
         padic_val(rop) = op->val;
 

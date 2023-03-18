@@ -266,7 +266,7 @@ main(void)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t r, d, f, g;
-        const char* vars[] = 
+        const char* vars[] =
             {"x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10"};
 
         const char * example[][3] =

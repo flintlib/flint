@@ -14,7 +14,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_pseudo_rem(fmpz * R, ulong * d, const fmpz * A, slong lenA, 
+void _fmpz_poly_pseudo_rem(fmpz * R, ulong * d, const fmpz * A, slong lenA,
                           const fmpz * B, slong lenB, const fmpz_preinvn_t inv)
 {
     fmpz * Q = _fmpz_vec_init(lenA + lenB - 1);
@@ -22,7 +22,7 @@ void _fmpz_poly_pseudo_rem(fmpz * R, ulong * d, const fmpz * A, slong lenA,
     _fmpz_vec_clear(Q, lenA + lenB - 1);
 }
 
-void fmpz_poly_pseudo_rem(fmpz_poly_t R, ulong * d, const fmpz_poly_t A, 
+void fmpz_poly_pseudo_rem(fmpz_poly_t R, ulong * d, const fmpz_poly_t A,
                                                     const fmpz_poly_t B)
 {
     slong lenr;
@@ -49,7 +49,7 @@ void fmpz_poly_pseudo_rem(fmpz_poly_t R, ulong * d, const fmpz_poly_t A,
         r = R->coeffs;
     }
 
-    _fmpz_poly_pseudo_rem(r, d, A->coeffs, A->length, 
+    _fmpz_poly_pseudo_rem(r, d, A->coeffs, A->length,
                                 B->coeffs, B->length, NULL);
 
     for (lenr = B->length - 2; (lenr >= 0) && !r[lenr]; lenr--) ;

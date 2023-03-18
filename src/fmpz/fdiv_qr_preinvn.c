@@ -17,7 +17,7 @@
 #include "fmpz.h"
 
 /* these functions were adapted from similar functions in an old version of GMP */
-void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r, 
+void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
                           mpz_srcptr a, mpz_srcptr d, const fmpz_preinvn_t inv)
 {
     slong size1 = a->_mp_size, size2 = d->_mp_size;
@@ -53,28 +53,28 @@ void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
     {
         tp = TMP_ALLOC(usize2*FLINT_BITS);
         mpn_copyi(tp, dp, usize2);
-        dp = tp; 
+        dp = tp;
     }
 
     if (r == a || q == a) /* we have alias with a */
     {
         tp = TMP_ALLOC(usize1*FLINT_BITS);
         mpn_copyi(tp, ap, usize1);
-        ap = tp; 
+        ap = tp;
     }
 
-    /* 
-       TODO: speedup mpir's mullow and mulhigh and use in 
-       flint_mpn_divrem_preinvn so we can remove this first 
+    /*
+       TODO: speedup mpir's mullow and mulhigh and use in
+       flint_mpn_divrem_preinvn so we can remove this first
        case here
     */
-    if (usize2 == 2 || (usize2 > 15 && usize2 < 120)) 
+    if (usize2 == 2 || (usize2 > 15 && usize2 < 120))
         mpn_tdiv_qr(qp, rp, 0, ap, usize1, dp, usize2);
     else {
         if (nm) {
             tp = TMP_ALLOC(usize2*FLINT_BITS);
             mpn_lshift(tp, dp, usize2, inv->norm);
-            dp = tp; 
+            dp = tp;
 
             rp[usize1] = mpn_lshift(rp, ap, usize1, inv->norm);
             if (rp[usize1] != 0) usize1++, qsize++;
@@ -97,7 +97,7 @@ void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
     TMP_END;
 }
 
-void _mpz_fdiv_qr_preinvn(mpz_ptr q, mpz_ptr r, 
+void _mpz_fdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
                           mpz_srcptr a, mpz_srcptr d, const fmpz_preinvn_t inv)
 {
     slong size1 = a->_mp_size;
@@ -128,7 +128,7 @@ void _mpz_fdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
 }
 
 void
-fmpz_fdiv_qr_preinvn(fmpz_t f, fmpz_t s, const fmpz_t g, 
+fmpz_fdiv_qr_preinvn(fmpz_t f, fmpz_t s, const fmpz_t g,
                          const fmpz_t h, const fmpz_preinvn_t inv)
 {
     fmpz c1 = *g;

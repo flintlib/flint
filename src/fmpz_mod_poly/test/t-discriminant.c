@@ -45,7 +45,7 @@ main(void)
         fmpz_mod_poly_init(f, ctx);
         fmpz_mod_poly_init(g, ctx);
         fmpz_mod_poly_init(h, ctx);
-        
+
         do {
            fmpz_mod_poly_randtest(f, state, n_randint(state, 200), ctx);
         } while (f->length < 2);
@@ -76,7 +76,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         fmpz_mod_poly_clear(f, ctx);
         fmpz_mod_poly_clear(g, ctx);
         fmpz_mod_poly_clear(h, ctx);
@@ -102,11 +102,11 @@ main(void)
         fmpz_mod_ctx_set_modulus(ctx, n);
 
         fmpz_mod_poly_init(f, ctx);
-        
+
         fmpz_mod_poly_randtest(f, state, 1, ctx);
-        
+
         fmpz_mod_poly_discriminant(y, f, ctx);
-        
+
         result = fmpz_is_zero(y);
         if (!result)
         {
@@ -116,7 +116,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         fmpz_clear(n);
         fmpz_clear(y);
 
@@ -124,7 +124,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     fmpz_mod_ctx_clear(ctx);
     flint_printf("PASS\n");
     return 0;

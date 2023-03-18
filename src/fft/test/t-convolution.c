@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2009, 2011, 2020 William Hart
 
     This file is part of FLINT.
@@ -22,7 +22,7 @@ main(void)
     flint_printf("convolution....");
     fflush(stdout);
 
-    
+
     _flint_rand_init_gmp(state);
 
     for (depth = 6; depth <= 13; depth++)
@@ -37,13 +37,13 @@ main(void)
             mp_size_t i, len1, len2;
             mp_limb_t * ptr;
             mp_limb_t ** ii, ** jj, ** ii2, ** jj2, * t1, * t2, * s1, * tt;
-        
+
             trunc = 2*n1*((trunc + 2*n1 - 1)/(2*n1));
             len1 = n_randint(state, trunc);
 	    len2 = trunc - len1 + 1;
 
             ii = flint_malloc((4*(n + n*size) + 5*size)*sizeof(mp_limb_t));
-            for (i = 0, ptr = (mp_limb_t *) ii + 4*n; i < 4*n; i++, ptr += size) 
+            for (i = 0, ptr = (mp_limb_t *) ii + 4*n; i < 4*n; i++, ptr += size)
             {
                 ii[i] = ptr;
 		if (i < len1)
@@ -88,7 +88,7 @@ main(void)
             }
 
             fft_convolution(ii, jj, depth, limbs, trunc, &t1, &t2, &s1, &tt);
-            fft_convolution_basic(ii2, jj2, depth, limbs, trunc, &t1, &t2, &s1, &tt); 
+            fft_convolution_basic(ii2, jj2, depth, limbs, trunc, &t1, &t2, &s1, &tt);
 
             for (i = 0; i < trunc; i++)
             {
@@ -110,7 +110,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

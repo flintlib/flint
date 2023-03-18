@@ -20,7 +20,7 @@ main(void)
     int j, i, result;
     fq_zech_ctx_t ctx;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("trace... ");
     fflush(stdout);
 
@@ -36,7 +36,7 @@ main(void)
 
             fmpz_init(t1);
             fmpz_init(t2);
-            
+
             fq_nmod_init(aa, ctx->fq_nmod_ctx);
             fq_zech_init(a, ctx);
 

@@ -57,13 +57,13 @@ void nf_init(nf_t nf, const fmpq_poly_t pol)
     {
        if (nf->flag & NF_MONIC)
        {
-          nf->powers.zz->powers = _fmpz_poly_powers_precompute(fmpq_poly_numref(pol), 
+          nf->powers.zz->powers = _fmpz_poly_powers_precompute(fmpq_poly_numref(pol),
                                        len);
           nf->powers.zz->len = len;
        }
        else
        {
-          nf->powers.qq->powers = _fmpq_poly_powers_precompute(fmpq_poly_numref(pol), 
+          nf->powers.qq->powers = _fmpq_poly_powers_precompute(fmpq_poly_numref(pol),
                                        fmpq_poly_denref(pol), len);
           nf->powers.qq->len = len;
        }
@@ -71,8 +71,8 @@ void nf_init(nf_t nf, const fmpq_poly_t pol)
 
    /**** Set up precomputed traces S_k = \sum _i theta_i^k for roots theta_i of f(x) ****/
 
-   /* 
-      Uses the recursive formula from pp. 163 of "A Course in Computational Algebraic 
+   /*
+      Uses the recursive formula from pp. 163 of "A Course in Computational Algebraic
       Number Theory" by Henri Cohen
    */
 
@@ -81,19 +81,19 @@ void nf_init(nf_t nf, const fmpq_poly_t pol)
 
    for (i = 1; i < deg; i++)
    {
-      fmpz_mul_si(fmpq_poly_numref(nf->traces) + i, 
-         fmpq_poly_numref(pol) + deg - i, i); 
-      
+      fmpz_mul_si(fmpq_poly_numref(nf->traces) + i,
+         fmpq_poly_numref(pol) + deg - i, i);
+
       for (j = i - 1; j >= 1; j--)
       {
-         fmpz_mul(fmpq_poly_numref(nf->traces) + i, 
+         fmpz_mul(fmpq_poly_numref(nf->traces) + i,
             fmpq_poly_numref(nf->traces) + i, lead);
-         fmpz_addmul(fmpq_poly_numref(nf->traces) + i, 
-            fmpq_poly_numref(pol) + deg - j, 
+         fmpz_addmul(fmpq_poly_numref(nf->traces) + i,
+            fmpq_poly_numref(pol) + deg - j,
             fmpq_poly_numref(nf->traces) + i - j);
       }
-      
-      fmpz_neg(fmpq_poly_numref(nf->traces) + i, 
+
+      fmpz_neg(fmpq_poly_numref(nf->traces) + i,
          fmpq_poly_numref(nf->traces) + i);
    }
 

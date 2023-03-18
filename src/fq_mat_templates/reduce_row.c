@@ -12,7 +12,7 @@
 #ifdef T
 #include "templates.h"
 
-slong TEMPLATE(T, mat_reduce_row)(TEMPLATE(T, mat_t) A, slong * P, slong * L, 
+slong TEMPLATE(T, mat_reduce_row)(TEMPLATE(T, mat_t) A, slong * P, slong * L,
                                          slong m, const TEMPLATE(T, ctx_t) ctx)
 {
    slong n = A->c, i, j, r;
@@ -32,27 +32,27 @@ slong TEMPLATE(T, mat_reduce_row)(TEMPLATE(T, mat_t) A, slong * P, slong * L,
                TEMPLATE(T, mul) (h, TEMPLATE(T, mat_entry) (A, r, j), TEMPLATE(T, mat_entry) (A, m, i), ctx);
                TEMPLATE(T, sub) (TEMPLATE(T, mat_entry) (A, m, j), TEMPLATE(T, mat_entry) (A, m, j), h, ctx);
             }
- 
+
             TEMPLATE(T, zero) (TEMPLATE(T, mat_entry) (A, m, i), ctx);
          } else
          {
             TEMPLATE(T, inv) (h, TEMPLATE(T, mat_entry) (A, m, i), ctx);
             TEMPLATE(T, one) (TEMPLATE(T, mat_entry) (A, m, i), ctx);
-           
+
             for (j = i + 1; j < L[m]; j++)
                TEMPLATE(T, mul) (TEMPLATE(T, mat_entry) (A, m, j), TEMPLATE(T, mat_entry) (A, m, j), h, ctx);
-               
+
             P[i] = m;
 
             TEMPLATE(T, clear) (h, ctx);
-       
+
             return i;
          }
       }
    }
 
    TEMPLATE(T, clear) (h, ctx);
-   
+
    return -WORD(1);
 }
 

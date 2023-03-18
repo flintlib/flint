@@ -13,7 +13,7 @@
 
 #include "fmpz_poly_q.h"
 
-void fmpz_poly_q_div(fmpz_poly_q_t rop, 
+void fmpz_poly_q_div(fmpz_poly_q_t rop,
                      const fmpz_poly_q_t op1, const fmpz_poly_q_t op2)
 {
     if (fmpz_poly_q_is_zero(op2))
@@ -26,7 +26,7 @@ void fmpz_poly_q_div(fmpz_poly_q_t rop,
         fmpz_poly_q_zero(rop);
         return;
     }
-    
+
     if (op1 == op2)
     {
         fmpz_poly_q_one(rop);
@@ -42,36 +42,36 @@ void fmpz_poly_q_div(fmpz_poly_q_t rop,
         fmpz_poly_q_clear(t);
         return;
     }
-    
+
     /*
-        From here on, we know that rop, op1 and op2 refer to distinct objects 
+        From here on, we know that rop, op1 and op2 refer to distinct objects
         in memory, and that op1 and op2 are non-zero rational functions
      */
-    
+
     /*
         XXX:  Do not maintain the remaining part of the function separately!!!
-              Instead, note that this is the same as the corresponding part of 
+              Instead, note that this is the same as the corresponding part of
               the multiplication code, with op2->num and op2->den swapped.
 
-              The only caveat to this is that we cannot assume the leading 
-              coefficient of op2->num to be positive, and thus check for this 
+              The only caveat to this is that we cannot assume the leading
+              coefficient of op2->num to be positive, and thus check for this
               in the very end.
      */
-    
+
     /* Denominator/ numerator equal to one? */
     if (fmpz_poly_is_one(op1->den) && fmpz_poly_is_one(op2->num))
     {
         fmpz_poly_mul(rop->num, op1->num, op2->den);
         fmpz_poly_set_si(rop->den, 1);
         return;
-    } 
-    
+    }
+
     fmpz_poly_gcd(rop->num, op1->num, op2->num);
-    
+
     if (fmpz_poly_is_one(rop->num))
     {
         fmpz_poly_gcd(rop->den, op2->den, op1->den);
-        
+
         if (fmpz_poly_is_one(rop->den))
         {
             fmpz_poly_mul(rop->num, op1->num, op2->den);
@@ -88,7 +88,7 @@ void fmpz_poly_q_div(fmpz_poly_q_t rop,
     else
     {
         fmpz_poly_gcd(rop->den, op2->den, op1->den);
-        
+
         if (fmpz_poly_is_one(rop->den))
         {
             fmpz_poly_div(rop->den, op2->num, rop->num);
@@ -112,7 +112,7 @@ void fmpz_poly_q_div(fmpz_poly_q_t rop,
             fmpz_poly_clear(u);
         }
     }
-    
+
     /* XXX:  Check that the numerator has the appropriate sign. */
     if (fmpz_sgn(fmpz_poly_lead(rop->den)) < 0)
     {

@@ -44,7 +44,7 @@ int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
                 }
                 else
                 {
-                    v = A->val 
+                    v = A->val
                       + fmpz_remove(t, padic_mat_entry(A, i, j), ctx->p);
 
                     if (v == 0)
@@ -93,7 +93,7 @@ int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
                 }
                 else
                 {
-                    v = A->val 
+                    v = A->val
                       + fmpz_remove(t, padic_mat_entry(A, i, j), ctx->p);
 
                     if (v == 0)

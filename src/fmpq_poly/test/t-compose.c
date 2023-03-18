@@ -106,7 +106,7 @@ main(void)
         mpq_init(c);
         fmpq_poly_randtest(g, state, n_randint(state, 20), 65);
         fmpq_poly_randtest(h, state, n_randint(state, 20), 65);
-        
+
         fmpq_poly_zero(s);
         fmpq_poly_set_ui(t, UWORD(1));
         for (k = WORD(0); k < g->length; k++)
@@ -116,7 +116,7 @@ main(void)
             fmpq_poly_add(s, s, u);
             fmpq_poly_mul(t, t, h);
         }
-        
+
         fmpq_poly_compose(f, g, h);
 
         result = (fmpq_poly_equal(f, s));
@@ -141,7 +141,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

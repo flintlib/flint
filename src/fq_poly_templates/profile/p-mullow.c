@@ -28,14 +28,14 @@ main(int argc, char** argv)
     fmpz_t p, temp;
     TEMPLATE(T, poly_t) f, g, h;
     TEMPLATE(T, ctx_t) ctx;
-    
+
     FLINT_TEST_INIT(state);
-    
+
     fmpz_init(p);
     fmpz_set_str(p, argv[1], 10);
 
     fmpz_init(temp);
-       
+
     fmpz_set_str(temp, argv[2], 10);
     ext = fmpz_get_si(temp);
 
@@ -53,7 +53,7 @@ main(int argc, char** argv)
     {
         s[c] = 0.0;
     }
-       
+
     for (n = 0; n < ncases; n++)
     {
         double t[nalgs];
@@ -66,7 +66,7 @@ main(int argc, char** argv)
             TEMPLATE(T, poly_randtest_monic)(f, state, lenf, ctx);
             TEMPLATE(T, poly_randtest_monic)(g, state, leng, ctx);
         }
-        
+
     loop:
         t[0] = 0.0;
         init_clock(0);
@@ -94,19 +94,19 @@ main(int argc, char** argv)
                 loops *= 10;
                 goto loop;
             }
-        
+
         for (c = 0; c < nalgs; c++)
             s[c] += t[c];
         reps += loops;
     }
-        
+
     for (c = 0; c < nalgs; c++)
     {
         flint_printf("%20f ", s[c] / (double) reps);
         fflush(stdout);
     }
     printf("\n");
-        
+
     TEMPLATE(T, poly_clear)(h, ctx);
     TEMPLATE(T, poly_clear)(f, ctx);
     TEMPLATE(T, poly_clear)(g, ctx);
@@ -115,7 +115,7 @@ main(int argc, char** argv)
     fmpz_clear(temp);
 
     FLINT_TEST_CLEANUP(state);
-    
+
     return 0;
 }
 

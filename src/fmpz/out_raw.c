@@ -11,7 +11,7 @@
 
 #include "fmpz.h"
 
-size_t fmpz_out_raw( FILE *fout, const fmpz_t x ) 
+size_t fmpz_out_raw( FILE *fout, const fmpz_t x )
 {
     mpz_t v;
     size_t size;

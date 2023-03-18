@@ -14,25 +14,25 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
-fmpq_poly_struct * 
+fmpq_poly_struct *
 _fmpq_poly_powers_precompute(const fmpz * B, const fmpz_t denB, slong len)
 {
    slong i;
    fmpq_poly_struct * powers = flint_malloc(sizeof(fmpq_poly_struct)*(2*len - 1));
    fmpq_poly_t pow, p;
-       
+
    fmpq_poly_init2(pow, len);
    fmpq_poly_one(pow);
    fmpq_poly_init2(p, len - 1);
-      
+
    for (i = 0; i < 2*len - 1; i++)
    {
       fmpq_poly_init(powers + i);
-      
+
       if (pow->length == len) /* reduce pow mod B */
       {
          fmpz_mul(fmpq_poly_denref(p), B + len - 1, fmpq_poly_denref(pow));
-         _fmpz_vec_scalar_mul_fmpz(fmpq_poly_numref(p), B, len - 1, 
+         _fmpz_vec_scalar_mul_fmpz(fmpq_poly_numref(p), B, len - 1,
              fmpq_poly_numref(pow) + len - 1);
          _fmpq_poly_set_length(p, len - 1);
          _fmpq_poly_normalise(p);
@@ -53,7 +53,7 @@ _fmpq_poly_powers_precompute(const fmpz * B, const fmpz_t denB, slong len)
    return powers;
 }
 
-void fmpq_poly_powers_precompute(fmpq_poly_powers_precomp_t pinv, 
+void fmpq_poly_powers_precompute(fmpq_poly_powers_precomp_t pinv,
                                                           fmpq_poly_t poly)
 {
     if (poly->length == 0)
@@ -62,7 +62,7 @@ void fmpq_poly_powers_precompute(fmpq_poly_powers_precomp_t pinv,
         flint_abort();
     }
 
-    pinv->powers = _fmpq_poly_powers_precompute(fmpq_poly_numref(poly), 
+    pinv->powers = _fmpq_poly_powers_precompute(fmpq_poly_numref(poly),
                                          fmpq_poly_denref(poly), poly->length);
     pinv->len = poly->length;
 }

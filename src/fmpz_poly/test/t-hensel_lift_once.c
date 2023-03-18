@@ -24,7 +24,7 @@ main(void)
 
     flint_printf("hensel_lift_once....");
     fflush(stdout);
-   
+
     /* We check that lifting local factors of F yields factors */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -43,7 +43,7 @@ main(void)
         nmod_poly_factor_init(f_fac);
         fmpz_poly_factor_init(F_fac);
 
-        n = n_randprime(state, nbits, 0); 
+        n = n_randprime(state, nbits, 0);
         exp = bits / (FLINT_BIT_COUNT(n) - 1) + 1;
 
         /* Produce F as the product of random G and H */
@@ -88,7 +88,7 @@ main(void)
             result &= (R->length == 0);
         }
 
-        if (!result) 
+        if (!result)
         {
             flint_printf("FAIL:\n");
             flint_printf("bits = %wd, n = %wd, exp = %wd\n", bits, n, exp);
@@ -98,7 +98,7 @@ main(void)
             fmpz_poly_factor_print(F_fac); flint_printf("\n\n");
             fflush(stdout);
             flint_abort();
-        } 
+        }
 
         nmod_poly_factor_clear(f_fac);
         fmpz_poly_factor_clear(F_fac);
@@ -109,7 +109,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -41,7 +41,7 @@ main(void)
            fmpq_poly_get_coeff_fmpq(c, a, j);
            fmpq_poly_set_coeff_fmpq(b, j, c);
         }
-      
+
         result = (fmpq_poly_equal_trunc(a, b, n));
         if (!result)
         {
@@ -80,7 +80,7 @@ main(void)
            fmpq_poly_get_coeff_fmpq(c, a, j);
            fmpq_poly_set_coeff_fmpq(b, j, c);
         }
-      
+
         m = n_randint(state, n);
         fmpq_poly_get_coeff_fmpq(c, a, m);
         fmpq_add_si(c, c, 1);
@@ -106,7 +106,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -25,7 +25,7 @@ void fq_nmod_ctx_init(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const char *va
 	return;
     } else
         ctx->is_conway = 0;
-    
+
     flint_randinit(state);
 
     nmod_poly_init2(poly, fmpz_get_ui(p), d + 1);
@@ -34,5 +34,5 @@ void fq_nmod_ctx_init(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const char *va
     fq_nmod_ctx_init_modulus(ctx, poly, var);
 
     nmod_poly_clear(poly);
-    flint_randclear(state);    
+    flint_randclear(state);
 }

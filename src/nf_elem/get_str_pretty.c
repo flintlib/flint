@@ -16,7 +16,7 @@
 
 #include "nf_elem.h"
 
-char * nf_elem_get_str_pretty(const nf_elem_t a, 
+char * nf_elem_get_str_pretty(const nf_elem_t a,
                               const char * var, const nf_t nf)
 {
    if (nf->flag & NF_LINEAR)

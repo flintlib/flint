@@ -209,7 +209,7 @@ solve_n1(mp_limb_t n, mp_limb_t k1, mp_limb_t k2,
     u = n_mulmod2_preinv(k2, k2, k1, inv);
     u = n_invmod(n_mod2_preinv(u * d2 * e, k1, inv), k1);
     n1 = n_mulmod2_preinv(n1, u, k1, inv);
- 
+
     return n1;
 }
 
@@ -281,7 +281,7 @@ arith_hrr_expsum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n)
 
             n1 = solve_n1(n, k1, k2, d1, d2, e);
             n2 = solve_n1(n, k2, k1, d2, d1, e);
-            
+
             trigprod_mul_prime_power(prod, k1, n1, fac.p[i], fac.exp[i]);
             k = k2;
             n = n2;

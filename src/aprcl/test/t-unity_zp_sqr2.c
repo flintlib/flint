@@ -17,7 +17,7 @@ int main(void)
     int i, j;
     fmpz_t * t;
     FLINT_TEST_INIT(state);
-   
+
     flint_printf("unity_zp_sqr2....");
     fflush(stdout);
 
@@ -52,7 +52,7 @@ int main(void)
             fmpz_init(val);
 
             ind = n_randint(state, n_pow(p, k));
-            
+
             fmpz_randtest_unsigned(val, state, 200);
 
             unity_zp_coeff_set_fmpz(temp, ind, val);
@@ -70,7 +70,7 @@ int main(void)
             fflush(stdout);
             flint_abort();
         }
-    
+
         fmpz_clear(n);
         unity_zp_clear(f);
         unity_zp_clear(g);
@@ -104,7 +104,7 @@ int main(void)
             fmpz_init(val);
 
             ind = n_randint(state, n_pow(p, k));
-            
+
             fmpz_randtest_unsigned(val, state, 200);
 
             unity_zp_coeff_set_fmpz(temp, ind, val);
@@ -122,7 +122,7 @@ int main(void)
             fflush(stdout);
             flint_abort();
         }
-    
+
         fmpz_clear(n);
         unity_zp_clear(f);
         unity_zp_clear(g);
@@ -156,7 +156,7 @@ int main(void)
             fmpz_init(val);
 
             ind = n_randint(state, n_pow(p, k));
-            
+
             fmpz_randtest_unsigned(val, state, 200);
 
             unity_zp_coeff_set_fmpz(temp, ind, val);
@@ -174,7 +174,7 @@ int main(void)
             fflush(stdout);
             flint_abort();
         }
-    
+
         fmpz_clear(n);
         unity_zp_clear(f);
         unity_zp_clear(g);
@@ -186,7 +186,7 @@ int main(void)
     flint_free(t);
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

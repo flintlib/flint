@@ -90,7 +90,7 @@ main(void)
         fmpz_mpoly_get_fmpz_poly(bu, b, 0, ctx);
 
         fmpz_poly_resultant(ru, au, bu);
-            
+
         if (!fmpz_mpoly_resultant(r, a, b, 0, ctx) ||
             !fmpz_mpoly_equal_fmpz(r, ru, ctx))
         {
@@ -103,7 +103,7 @@ main(void)
         fmpz_mpoly_clear(a, ctx);
         fmpz_mpoly_clear(b, ctx);
         fmpz_mpoly_clear(r, ctx);
-        fmpz_poly_clear(au);       
+        fmpz_poly_clear(au);
         fmpz_poly_clear(bu);
         fmpz_clear(ru);
     }
@@ -124,8 +124,8 @@ main(void)
 
         fmpz_mpoly_init(a, ctx);
         fmpz_mpoly_init(b, ctx);
-        fmpz_mpoly_init(c, ctx);       
-        fmpz_mpoly_init(ab, ctx);       
+        fmpz_mpoly_init(c, ctx);
+        fmpz_mpoly_init(ab, ctx);
         fmpz_mpoly_init(ra, ctx);
         fmpz_mpoly_init(rb, ctx);
         fmpz_mpoly_init(rab, ctx);
@@ -171,8 +171,8 @@ main(void)
 
         fmpz_mpoly_clear(a, ctx);
         fmpz_mpoly_clear(b, ctx);
-        fmpz_mpoly_clear(c, ctx);       
-        fmpz_mpoly_clear(ab, ctx);       
+        fmpz_mpoly_clear(c, ctx);
+        fmpz_mpoly_clear(ab, ctx);
         fmpz_mpoly_clear(ra, ctx);
         fmpz_mpoly_clear(rb, ctx);
         fmpz_mpoly_clear(rab, ctx);
@@ -244,7 +244,7 @@ main(void)
 
         fmpz_mpoly_clear(a, ctx);
         fmpz_mpoly_clear(b, ctx);
-        fmpz_mpoly_clear(ab, ctx);       
+        fmpz_mpoly_clear(ab, ctx);
         fmpz_mpoly_clear(da, ctx);
         fmpz_mpoly_clear(db, ctx);
         fmpz_mpoly_clear(dab, ctx);

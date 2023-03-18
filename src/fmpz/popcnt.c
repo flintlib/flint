@@ -18,7 +18,7 @@
 static __inline__ flint_bitcnt_t shortCount(slong val)
 {
 #if defined(_WIN64) || defined(__mips64)
-   return __builtin_popcountll(val);  
+   return __builtin_popcountll(val);
 #else
    return __builtin_popcountl(val);
 #endif

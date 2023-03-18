@@ -15,8 +15,8 @@
 #include "fmpz_mod_poly.h"
 #include "gr_poly.h"
 
-void _fmpz_mod_poly_div(fmpz * Q, 
-    const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
+void _fmpz_mod_poly_div(fmpz * Q,
+    const fmpz *A, slong lenA, const fmpz *B, slong lenB,
     const fmpz_t invB, const fmpz_mod_ctx_t ctx)
 {
     gr_ctx_t gr_ctx;

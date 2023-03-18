@@ -194,7 +194,7 @@ try_alpha:
         total_cost += this_cost;
     }
 
-    return total_cost;  
+    return total_cost;
 }
 
 /* return x such that y = alpha^x mod p, alpha is the p.r. L->alpha*/

@@ -16,7 +16,7 @@
 #define MPN_EXTRAS_H
 
 #ifdef MPN_EXTRAS_INLINES_C
-#define MPN_EXTRAS_INLINE 
+#define MPN_EXTRAS_INLINE
 #else
 #define MPN_EXTRAS_INLINE static __inline__
 #endif
@@ -236,19 +236,19 @@ int flint_mpn_factor_trial_tree(slong * factors,
 mp_size_t flint_mpn_fmms1(mp_ptr y, mp_limb_t a1, mp_srcptr x1,
                                       mp_limb_t a2, mp_srcptr x2, mp_size_t n);
 
-int flint_mpn_divides(mp_ptr q, mp_srcptr array1, 
+int flint_mpn_divides(mp_ptr q, mp_srcptr array1,
          mp_size_t limbs1, mp_srcptr arrayg, mp_size_t limbsg, mp_ptr temp);
 
 mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg,
 		                 mp_srcptr array1, mp_size_t limbs1,
 			   mp_srcptr array2, mp_size_t limbs2, mp_ptr temp);
 
-mp_size_t flint_mpn_gcd_full(mp_ptr arrayg, 
+mp_size_t flint_mpn_gcd_full(mp_ptr arrayg,
     mp_srcptr array1, mp_size_t limbs1, mp_srcptr array2, mp_size_t limbs2);
 
 mp_limb_t flint_mpn_preinv1(mp_limb_t d, mp_limb_t d2);
 
-mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a, 
+mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a,
            mp_size_t m, mp_srcptr b, mp_size_t n, mp_limb_t dinv);
 
 #define flint_mpn_divrem21_preinv(q, a_hi, a_lo, dinv) \
@@ -260,23 +260,23 @@ mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a,
       add_ssaaaa((q), __q2, (q), __q2, (a_hi), (a_lo)); \
    } while (0)
 
-void flint_mpn_mulmod_preinv1(mp_ptr r, 
-        mp_srcptr a, mp_srcptr b, mp_size_t n, 
+void flint_mpn_mulmod_preinv1(mp_ptr r,
+        mp_srcptr a, mp_srcptr b, mp_size_t n,
         mp_srcptr d, mp_limb_t dinv, ulong norm);
 
 void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n);
 
-void flint_mpn_mod_preinvn(mp_ptr r, mp_srcptr a, mp_size_t m, 
+void flint_mpn_mod_preinvn(mp_ptr r, mp_srcptr a, mp_size_t m,
                                      mp_srcptr d, mp_size_t n, mp_srcptr dinv);
 
-mp_limb_t flint_mpn_divrem_preinvn(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t m, 
+mp_limb_t flint_mpn_divrem_preinvn(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t m,
                                      mp_srcptr d, mp_size_t n, mp_srcptr dinv);
 
-void flint_mpn_mulmod_preinvn(mp_ptr r, 
-        mp_srcptr a, mp_srcptr b, mp_size_t n, 
+void flint_mpn_mulmod_preinvn(mp_ptr r,
+        mp_srcptr a, mp_srcptr b, mp_size_t n,
         mp_srcptr d, mp_srcptr dinv, ulong norm);
 
-int flint_mpn_mulmod_2expp1_basecase(mp_ptr xp, mp_srcptr yp, mp_srcptr zp, 
+int flint_mpn_mulmod_2expp1_basecase(mp_ptr xp, mp_srcptr yp, mp_srcptr zp,
     int c, flint_bitcnt_t b, mp_ptr tp);
 
 MPN_EXTRAS_INLINE

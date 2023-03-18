@@ -34,9 +34,9 @@ _fmpz_mod_poly_reduce_matrix_mod_poly(fmpz_mat_t A, const fmpz_mat_t B,
 
     tmp1 = _fmpz_vec_init(2 * (B->c) - n);
     tmp2 = tmp1 + (B->c - n);
-    
+
     fmpz_one(A->rows[0]);
-    
+
     for (i= 1; i < m; i++)
     {
         _fmpz_mod_poly_divrem(tmp1, tmp2, B->rows[i], B->c, f->coeffs,
@@ -61,7 +61,7 @@ _fmpz_mod_poly_precompute_matrix(fmpz_mat_t A, const fmpz * poly1,
     m = n_sqrt(n) + 1;
 
     _fmpz_mod_poly_powers_mod_preinv_naive(A->rows, poly1, n, m,
-                                            poly2, len2, poly2inv, len2inv, p);    
+                                            poly2, len2, poly2inv, len2inv, p);
 }
 
 void

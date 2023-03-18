@@ -20,7 +20,7 @@ main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("add_si....");
     fflush(stdout);
@@ -37,7 +37,7 @@ main(void)
         fmpq_init(X);
         fmpq_init(Y);
         fmpq_init(Z);
-        
+
         fmpq_randtest(x, state, 200);
         fmpq_randtest(y, state, 200);
         z = z_randtest(state);
@@ -56,7 +56,7 @@ main(void)
         }
 
         fmpq_add(X, Y, Z);
-        
+
         if (!fmpq_equal(X, x))
         {
             flint_printf("FAIL: fmpq_add(x,y,z) != mpq_add(X,Y,Z)\n");
@@ -73,7 +73,7 @@ main(void)
 
         fmpq_clear(x);
         fmpq_clear(y);
-        
+
         fmpq_clear(X);
         fmpq_clear(Y);
         fmpq_clear(Z);
@@ -119,7 +119,7 @@ main(void)
         }
 
         fmpq_clear(x);
-        
+
         fmpq_clear(X);
         fmpq_clear(Y);
     }

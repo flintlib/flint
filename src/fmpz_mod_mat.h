@@ -14,7 +14,7 @@
 #define FMPZ_MOD_MAT_H
 
 #ifdef FMPZ_MOD_MAT_INLINES_C
-#define FMPZ_MOD_MAT_INLINE 
+#define FMPZ_MOD_MAT_INLINE
 #else
 #define FMPZ_MOD_MAT_INLINE static __inline__
 #endif
@@ -288,7 +288,7 @@ void fmpz_mod_mat_trace(fmpz_t trace, const fmpz_mod_mat_t mat);
 
 slong fmpz_mod_mat_rref(slong * perm, fmpz_mod_mat_t mat);
 
-slong _fmpz_mod_mat_reduce_row(fmpz_mod_mat_t A, slong * P, slong * L, 
+slong _fmpz_mod_mat_reduce_row(fmpz_mod_mat_t A, slong * P, slong * L,
                                             slong m, const fmpz_mod_ctx_t ctx);
 
 slong fmpz_mod_mat_reduce_row(fmpz_mod_mat_t A, slong * P, slong * L,

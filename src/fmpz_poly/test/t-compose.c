@@ -25,7 +25,7 @@ main(void)
     flint_printf("compose....");
     fflush(stdout);
 
-    
+
 
     /* Bill's bug */
     {
@@ -37,7 +37,7 @@ main(void)
         fmpz_poly_init(h);
         fmpz_poly_init(s);
         fmpz_poly_init(t);
-        
+
         fmpz_poly_set_str(g, "21  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 6");
         fmpz_poly_set_str(h, "8  -2411740686 -274861162464 -4294966273 -35167058005888 4261511676 -1 8589869056 -70334401183747");
 
@@ -47,7 +47,7 @@ main(void)
             fmpz_poly_scalar_addmul_fmpz(s, t, g->coeffs + k);
             fmpz_poly_mul(t, t, h);
         }
-        
+
         fmpz_poly_compose(f, g, h);
 
         result = (fmpz_poly_equal(f, s));
@@ -140,14 +140,14 @@ main(void)
         fmpz_poly_init(t);
         fmpz_poly_randtest(g, state, n_randint(state, 40), 80);
         fmpz_poly_randtest(h, state, n_randint(state, 20), 50);
-        
+
         fmpz_poly_set_ui(t, 1);
         for (k = 0; k < g->length; k++)
         {
             fmpz_poly_scalar_addmul_fmpz(s, t, g->coeffs + k);
             fmpz_poly_mul(t, t, h);
         }
-        
+
         fmpz_poly_compose(f, g, h);
 
         result = (fmpz_poly_equal(f, s));
@@ -189,7 +189,7 @@ main(void)
             fmpz_randtest(c, state, 50);
             fmpz_poly_set_coeff_fmpz(h, k, c);
         }
-        
+
         fmpz_poly_randtest(g, state, n_randint(state, 40), 80);
         fmpz_poly_set_ui(t, 1);
         for (k = 0; k < g->length; k++)
@@ -197,7 +197,7 @@ main(void)
             fmpz_poly_scalar_addmul_fmpz(s, t, g->coeffs + k);
             fmpz_poly_mul(t, t, h);
         }
-        
+
         fmpz_poly_compose(f, g, h);
 
         result = (fmpz_poly_equal(f, s));
@@ -217,10 +217,10 @@ main(void)
         fmpz_poly_clear(h);
         fmpz_poly_clear(s);
         fmpz_poly_clear(t);
-    }    
+    }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

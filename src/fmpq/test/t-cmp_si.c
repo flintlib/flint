@@ -3,7 +3,7 @@
     Copyright (C) 2016, 2020 William Hart
 
     This file is part of FLINT.
-    
+
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
@@ -21,7 +21,7 @@ main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("cmp_si....");
     fflush(stdout);
 
@@ -63,7 +63,7 @@ main(void)
         }
 
         fmpq_clear(x);
- 
+
         mpq_clear(X);
         mpq_clear(Y);
     }

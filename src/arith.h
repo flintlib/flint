@@ -13,7 +13,7 @@
 #define ARITH_H
 
 #ifdef ARITH_INLINES_C
-#define ARITH_INLINE 
+#define ARITH_INLINE
 #else
 #define ARITH_INLINE static __inline__
 #endif

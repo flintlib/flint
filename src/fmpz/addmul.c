@@ -161,7 +161,7 @@ void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 {
     fmpz c1, c2, c3;
     __mpz_struct * mf;
-	
+
     c1 = *g;
 	c2 = *h;
     c3 = *f;

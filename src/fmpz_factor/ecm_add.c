@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-/* Outer wrapper for ECM 
+/* Outer wrapper for ECM
    makes calls to stage I and stage II (two) */
 
 #include "flint.h"
@@ -18,13 +18,13 @@
 
 /* P (x : z) = P1 (x1 : z1) + P2 (x2 : z2) where P0 (x0 : zo) is P - Q */
 
-/*    Coordinates of P : 
+/*    Coordinates of P :
 
         x = 4 * z0 * (x1 * x2 - z1 * z2)^2 mod n
         z = 4 * x0 * (x2 * z1 - x1 * z2)^2 mod n
 */
 
-void 
+void
 fmpz_factor_ecm_add(mp_ptr x, mp_ptr z, mp_ptr x1, mp_ptr z1, mp_ptr x2,
                     mp_ptr z2, mp_ptr x0, mp_ptr z0, mp_ptr n, ecm_t ecm_inf)
 {
@@ -65,7 +65,7 @@ fmpz_factor_ecm_add(mp_ptr x, mp_ptr z, mp_ptr x1, mp_ptr z1, mp_ptr x2,
     /* v = (x1 - z1) * (x2 + z2) */
     flint_mpn_mulmod_preinvn(ecm_inf->v, ecm_inf->v, ecm_inf->w, ecm_inf->n_size,
                              n, ecm_inf->ninv, ecm_inf->normbits);
-    
+
     /* w = 2 * (x1 * x2 - z1 * z2) */
     fmpz_factor_ecm_addmod(ecm_inf->w, ecm_inf->u, ecm_inf->v, n, ecm_inf->n_size);
     /* v = 2 * (x2 * z1 - x1 * z2) */
@@ -83,5 +83,5 @@ fmpz_factor_ecm_add(mp_ptr x, mp_ptr z, mp_ptr x1, mp_ptr z1, mp_ptr x2,
                              ecm_inf->normbits);
     /* z = 4 * x0 * (x2 * z1 - x1 * z2)^2 */
     flint_mpn_mulmod_preinvn(z, x0, ecm_inf->v, ecm_inf->n_size, n, ecm_inf->ninv,
-                             ecm_inf->normbits);   
+                             ecm_inf->normbits);
 }

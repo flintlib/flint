@@ -38,14 +38,14 @@ int main(int argc, char *argv[])
     B1 = atol(argv[4]);
     B2 = atol(argv[5]);
 
-    for (i = 0; i < num; i++) 
+    for (i = 0; i < num; i++)
     {
         fmpz_t D, exponent;
         slong e;
-        
+
         fmpz_init(D);
         fmpz_init(exponent);
-        
+
         fmpz_set_ui(D, 10);
         fmpz_pow_ui(D, D, exp);
         fmpz_add_ui(D, D, val + i);
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
            printf("Discriminant: "); fmpz_print(D); printf("\n");
            printf("Exponent: "); fmpz_print(exponent); printf("\n\n");
         }
-        
+
         fmpz_clear(D);
         fmpz_clear(exponent);
     }

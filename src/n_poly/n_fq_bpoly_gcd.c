@@ -79,7 +79,7 @@ void n_fq_bpoly_mul_last(n_bpoly_t A, const n_poly_t b, const fq_nmod_ctx_t ctx)
 void n_fq_poly_eval2p_pow(
     mp_limb_t * vp,
     mp_limb_t * vm,
-    const n_fq_poly_t P, 
+    const n_fq_poly_t P,
     n_poly_t alphapow,
     slong d,
     nmod_t ctx)
@@ -364,7 +364,7 @@ int n_fq_bpoly_interp_crt_2psm_poly(
             unonzero |= u[d*1 + j];
             u[d*0 + j] = nmod_mul(malpha, t0, mod);
             unonzero |= u[d*0 + j];
-        }                
+        }
 
         if (unonzero)
         {
@@ -557,7 +557,7 @@ choose_prime:
         n_fq_bpoly_one(G, ctx);
         n_fq_bpoly_set(Abar, A, ctx);
         n_fq_bpoly_set(Bbar, B, ctx);
-        goto successful_put_content;    
+        goto successful_put_content;
     }
 
     if (n_fq_poly_degree(Gevalp) != n_fq_poly_degree(Gevalm))
@@ -962,7 +962,7 @@ choose_prime:
         n_fq_bpoly_one(G, ctx);
         n_fq_bpoly_set(Abar, A, ctx);
         n_fq_bpoly_set(Bbar, B, ctx);
-        goto successful_put_content;    
+        goto successful_put_content;
     }
 
     if (n_fq_poly_degree(modulus) > 0)

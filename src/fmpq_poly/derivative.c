@@ -15,7 +15,7 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-void _fmpq_poly_derivative(fmpz * rpoly, fmpz_t rden, 
+void _fmpq_poly_derivative(fmpz * rpoly, fmpz_t rden,
                            const fmpz * poly, const fmpz_t den, slong len)
 {
     _fmpz_poly_derivative(rpoly, poly, len);

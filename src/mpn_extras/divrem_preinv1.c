@@ -16,7 +16,7 @@
 #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif
 
-mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a, mp_size_t m, 
+mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a, mp_size_t m,
                                  mp_srcptr b, mp_size_t n, mp_limb_t dinv)
 {
    mp_limb_t ret;
@@ -25,7 +25,7 @@ mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a, mp_size_t m,
    /* ensure { a + i, n } < { b, n } */
    if ((ret = (mpn_cmp(a + m - n, b, n) >= 0)))
       mpn_sub_n(a + m - n, a + m - n, b, n);
-   
+
    for (i = m - 1; i >= n; i--)
    {
       flint_mpn_divrem21_preinv(q[i - n], a[i], a[i - 1], dinv);

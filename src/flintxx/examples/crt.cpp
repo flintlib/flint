@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
         flint_printf("Syntax: crt <integer>\n");
         return EXIT_FAILURE;
     }
-    
+
     fmpzxx x(argv[1]);
     slong bit_bound = bits(x) + 2;
 

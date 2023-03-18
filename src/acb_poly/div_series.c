@@ -11,7 +11,7 @@
 
 #include "acb_poly.h"
 
-void 
+void
 _acb_poly_div_series(acb_ptr Q, acb_srcptr A, slong Alen,
     acb_srcptr B, slong Blen, slong n, slong prec)
 {

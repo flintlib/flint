@@ -13,7 +13,7 @@
 #define N_POLY_H
 
 #ifdef N_POLY_INLINES_C
-#define N_POLY_INLINE 
+#define N_POLY_INLINE
 #else
 #define N_POLY_INLINE static __inline__
 #endif
@@ -471,7 +471,7 @@ mp_limb_t n_poly_mod_eval_pow(n_poly_t P, n_poly_t alphapow,
 void n_poly_mod_eval2_pow(mp_limb_t * vp, mp_limb_t * vm,
                               const n_poly_t P, n_poly_t alphapow, nmod_t ctx);
 
-mp_limb_t n_poly_mod_div_root(n_poly_t Q, 
+mp_limb_t n_poly_mod_div_root(n_poly_t Q,
                                     const n_poly_t A, mp_limb_t c, nmod_t ctx);
 
 N_POLY_INLINE
@@ -624,7 +624,7 @@ void _n_fq_zero(mp_limb_t * a, slong d)
     slong i;
     for (i = 0; i < d; i++)
         a[i] = 0;
-} 
+}
 
 N_POLY_INLINE
 int _n_fq_is_one(const mp_limb_t * a, slong d)
@@ -838,7 +838,7 @@ void _n_fq_neg(
 {
     FLINT_ASSERT(d > 0);
     _nmod_vec_neg(a, b, d, mod);
-}    
+}
 
 N_POLY_INLINE
 void _n_fq_mul_ui(
@@ -1270,7 +1270,7 @@ void n_fq_poly_divrem_divconquer_(
     const fq_nmod_ctx_t ctx,
     n_poly_stack_t St);
 
-N_POLY_INLINE 
+N_POLY_INLINE
 void n_fq_poly_divrem_(
     n_poly_t Q,
     n_poly_t R,

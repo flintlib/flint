@@ -151,7 +151,7 @@ mp_limb_t nmod_pow_cache_mulpow_neg_ui(
             n_poly_fit_length(neg, 2);
             neg->length = 2;
             neg->coeffs[0] = 1;
-            neg->coeffs[1] = nmod_inv(b, ctx);            
+            neg->coeffs[1] = nmod_inv(b, ctx);
         }
 
         n_poly_fit_length(neg, e + 1);

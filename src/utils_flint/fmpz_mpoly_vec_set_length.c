@@ -25,7 +25,7 @@ fmpz_mpoly_vec_set_length(fmpz_mpoly_vec_t vec, slong len, const fmpz_mpoly_ctx_
     else if (len < vec->length)
     {
         for (i = len; i < vec->length; i++)
-           fmpz_mpoly_zero(vec->p + i, ctx); 
+           fmpz_mpoly_zero(vec->p + i, ctx);
     }
 
     vec->length = len;

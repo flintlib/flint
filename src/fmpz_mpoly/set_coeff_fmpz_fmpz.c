@@ -40,7 +40,7 @@ void _fmpz_mpoly_set_coeff_fmpz_fmpz(fmpz_mpoly_t poly,
     if (!exists)
     {
         if (!fmpz_is_zero(c)) /* make new term only if coeff is nonzero*/
-        {       
+        {
 
             fmpz_mpoly_fit_length(poly, poly->length + 1, ctx);
 
@@ -67,10 +67,10 @@ void _fmpz_mpoly_set_coeff_fmpz_fmpz(fmpz_mpoly_t poly,
 
     } else /* term with that monomial exists, coeff is nonzero */
     {
-        fmpz_set(poly->coeffs + index, c);  
+        fmpz_set(poly->coeffs + index, c);
     }
 
-   TMP_END; 
+   TMP_END;
 }
 
 

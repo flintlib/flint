@@ -12,7 +12,7 @@
 #include "fmpz_poly_q.h"
 
 void fmpz_poly_q_randtest(fmpz_poly_q_t poly, flint_rand_t state,
-                          slong len1, flint_bitcnt_t bits1, 
+                          slong len1, flint_bitcnt_t bits1,
                           slong len2, flint_bitcnt_t bits2)
 {
     len2  = FLINT_MAX(len2, 1);
@@ -23,8 +23,8 @@ void fmpz_poly_q_randtest(fmpz_poly_q_t poly, flint_rand_t state,
     fmpz_poly_q_canonicalise(poly);
 }
 
-void fmpz_poly_q_randtest_not_zero(fmpz_poly_q_t poly, flint_rand_t state, 
-                                   slong len1, flint_bitcnt_t bits1, 
+void fmpz_poly_q_randtest_not_zero(fmpz_poly_q_t poly, flint_rand_t state,
+                                   slong len1, flint_bitcnt_t bits1,
                                    slong len2, flint_bitcnt_t bits2)
 {
     len1  = FLINT_MAX(len1, 1);

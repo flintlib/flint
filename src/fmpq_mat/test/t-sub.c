@@ -18,7 +18,7 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("sub....");
     fflush(stdout);
@@ -151,7 +151,7 @@ main(void)
         fmpq_mat_clear(D);
     }
 
-    
+
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

@@ -16,8 +16,8 @@
     Assumes that len > 0.
  */
 
-static void _padic_poly_get_fmpq_poly(fmpz *rop, fmpz_t den, 
-                                      const fmpz *op, slong val, slong len, 
+static void _padic_poly_get_fmpq_poly(fmpz *rop, fmpz_t den,
+                                      const fmpz *op, slong val, slong len,
                                       const fmpz_t p)
 {
     if (val == 0)
@@ -49,7 +49,7 @@ static void _padic_poly_get_fmpq_poly(fmpz *rop, fmpz_t den,
     }
 }
 
-void padic_poly_get_fmpq_poly(fmpq_poly_t rop, 
+void padic_poly_get_fmpq_poly(fmpq_poly_t rop,
                               const padic_poly_t op, const padic_ctx_t ctx)
 {
     const slong len = op->length;
@@ -61,7 +61,7 @@ void padic_poly_get_fmpq_poly(fmpq_poly_t rop,
     else
     {
         fmpq_poly_fit_length(rop, len);
-        _padic_poly_get_fmpq_poly(rop->coeffs, rop->den, 
+        _padic_poly_get_fmpq_poly(rop->coeffs, rop->den,
                                   op->coeffs, op->val, op->length, ctx->p);
         _fmpq_poly_set_length(rop, len);
     }

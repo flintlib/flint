@@ -73,7 +73,7 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
    {
       /* get exponent field of heap top */
       exp = heap[1].exp;
-      
+
       /* realloc output poly ready for next product term */
       k++;
       _fmpz_mpoly_fit_length(&p1, &e1, alloc, k + 1, 1);
@@ -89,7 +89,7 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
       {
          /* pop chain from heap */
          x = _mpoly_heap_pop1(heap, &heap_len, maskhi);
-         
+
          /* take node out of heap and put into store */
          hind[x->i] |= WORD(1);
          Q[Q_len++] = x->i;
@@ -106,7 +106,7 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
                /* set output monomial */
                e1[k] = exp;
-               first = 0; 
+               first = 0;
             } else /* addmul product of input poly coeffs */
             {
                smul_ppmm(p[1], p[0], poly2[x->i], poly3[x->j]);
@@ -132,9 +132,9 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
             if (first) /* compute product of input poly coeffs */
             {
                fmpz_mul(p1 + k, poly2 + x->i, poly3 + x->j);
-               
+
                e1[k] = exp;
-               first = 0; 
+               first = 0;
             } else
             {  /* addmul product of input poly coeffs */
                fmpz_addmul(p1 + k, poly2 + x->i, poly3 + x->j);
@@ -153,7 +153,7 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
             }
          }
       }
-      
+
       /* for each node temporarily stored */
       while (Q_len > 0)
       {
@@ -208,7 +208,7 @@ slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
    (*poly1) = p1;
    (*exp1) = e1;
-   
+
    TMP_END;
 
    return k;
@@ -334,14 +334,14 @@ slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
                /* set output monomial */
                mpoly_monomial_set(e1 + k*N, exp, N);
 
-               first = 0; 
+               first = 0;
             } else /* addmul product of input poly coeffs */
             {
                smul_ppmm(p[1], p[0], poly2[x->i], poly3[x->j]);
                add_sssaaaaaa(cy, c[1], c[0], 0, c[1], c[0], 0, p[1], p[0]);
                c[2] += (0 <= (slong) p[1]) ? cy : cy - 1;
             }
-      
+
             /* for every node in this chain */
             while ((x = x->next) != NULL)
             {
@@ -360,11 +360,11 @@ slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
             if (first) /* compute product of input poly coeffs */
             {
                fmpz_mul(p1 + k, poly2 + x->i, poly3 + x->j);
-               
+
                /* set output monomial */
                mpoly_monomial_set(e1 + k*N, exp, N);
 
-               first = 0; 
+               first = 0;
             } else
             {  /* addmul product of input poly coeffs */
                fmpz_addmul(p1 + k, poly2 + x->i, poly3 + x->j);
@@ -452,7 +452,7 @@ slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
    (*poly1) = p1;
    (*exp1) = e1;
-   
+
    TMP_END;
 
    return k;

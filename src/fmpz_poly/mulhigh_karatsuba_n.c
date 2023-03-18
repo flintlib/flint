@@ -20,12 +20,12 @@ void _fmpz_poly_mulhigh_kara_recursive(fmpz * out, const fmpz * pol1,
                                        slong length);
 
 /*
-   Multiplication using truncated karatsuba. Below length 7, classical 
-   truncated multiplication is always theoretically faster, so we switch 
+   Multiplication using truncated karatsuba. Below length 7, classical
+   truncated multiplication is always theoretically faster, so we switch
    to that as the basecase.
 
-   Above that we use the ordinary (left/right) karatsuba identity and 
-   recursively do one full karatsuba multiplication and two truncated 
+   Above that we use the ordinary (left/right) karatsuba identity and
+   recursively do one full karatsuba multiplication and two truncated
    karatsuba multiplications.
 */
 

@@ -13,7 +13,7 @@
 #define FQ_NMOD_MPOLY_H
 
 #ifdef FQ_NMOD_MPOLY_INLINES_C
-#define FQ_NMOD_MPOLY_INLINE 
+#define FQ_NMOD_MPOLY_INLINE
 #else
 #define FQ_NMOD_MPOLY_INLINE static __inline__
 #endif
@@ -287,7 +287,7 @@ void _fq_nmod_mpoly_fit_length(
 }
 
 FQ_NMOD_MPOLY_INLINE
-void _fq_nmod_mpoly_set_length(fq_nmod_mpoly_t A, slong newlen, 
+void _fq_nmod_mpoly_set_length(fq_nmod_mpoly_t A, slong newlen,
                                                  const fq_nmod_mpoly_ctx_t ctx)
 {
     FLINT_ASSERT(fq_nmod_ctx_degree(ctx->fqctx)*newlen <= A->coeffs_alloc);
@@ -296,7 +296,7 @@ void _fq_nmod_mpoly_set_length(fq_nmod_mpoly_t A, slong newlen,
 }
 
 FQ_NMOD_MPOLY_INLINE
-void fq_nmod_mpoly_truncate(fq_nmod_mpoly_t A, slong newlen, 
+void fq_nmod_mpoly_truncate(fq_nmod_mpoly_t A, slong newlen,
                                                  const fq_nmod_mpoly_ctx_t ctx)
 {
     if (A->length > newlen)
@@ -314,7 +314,7 @@ int fq_nmod_mpoly_set_str_pretty(fq_nmod_mpoly_t A, const char * str,
 char * fq_nmod_mpoly_get_str_pretty(const fq_nmod_mpoly_t A,
                                const char ** x, const fq_nmod_mpoly_ctx_t ctx);
 
-int fq_nmod_mpoly_fprint_pretty(FILE * file, 
+int fq_nmod_mpoly_fprint_pretty(FILE * file,
       const fq_nmod_mpoly_t A, const char ** x, const fq_nmod_mpoly_ctx_t ctx);
 
 FQ_NMOD_MPOLY_INLINE
@@ -563,7 +563,7 @@ void fq_nmod_mpoly_resize(fq_nmod_mpoly_t A, slong new_length,
 void fq_nmod_mpoly_get_term_coeff_fq_nmod(fq_nmod_t c,
               const fq_nmod_mpoly_t A, slong i, const fq_nmod_mpoly_ctx_t ctx);
 
-void fq_nmod_mpoly_set_term_coeff_fq_nmod(fq_nmod_mpoly_t A, 
+void fq_nmod_mpoly_set_term_coeff_fq_nmod(fq_nmod_mpoly_t A,
                     slong i, const fq_nmod_t c, const fq_nmod_mpoly_ctx_t ctx);
 
 FQ_NMOD_MPOLY_INLINE

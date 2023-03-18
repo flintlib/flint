@@ -14,7 +14,7 @@
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 
-void _nmod_vec_scalar_mul_nmod_shoup(mp_ptr res, mp_srcptr vec, 
+void _nmod_vec_scalar_mul_nmod_shoup(mp_ptr res, mp_srcptr vec,
                                slong len, mp_limb_t c, nmod_t mod)
 {
     slong i;

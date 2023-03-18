@@ -14,7 +14,7 @@
 #include "qqbar.h"
 
 static void
-_fmpq_poly_compose2(fmpz * res, const fmpz * poly1, const fmpz_t den1, 
+_fmpq_poly_compose2(fmpz * res, const fmpz * poly1, const fmpz_t den1,
                    slong len1, const fmpz * poly2, const fmpz_t den2, slong len2)
 {
     fmpz_t den;

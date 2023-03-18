@@ -572,7 +572,7 @@ _gr_nmod_vec_sub(ulong * res, const ulong * vec1, const ulong * vec2, slong len,
 }
 
 
-static __inline__ void _nmod_vec_scalar_mul_nmod_fullword_inline(mp_ptr res, mp_srcptr vec, 
+static __inline__ void _nmod_vec_scalar_mul_nmod_fullword_inline(mp_ptr res, mp_srcptr vec,
                                slong len, mp_limb_t c, nmod_t mod)
 {
     slong i;
@@ -581,7 +581,7 @@ static __inline__ void _nmod_vec_scalar_mul_nmod_fullword_inline(mp_ptr res, mp_
         NMOD_MUL_FULLWORD(res[i], vec[i], c, mod);
 }
 
-static __inline__ void _nmod_vec_scalar_mul_nmod_generic_inline(mp_ptr res, mp_srcptr vec, 
+static __inline__ void _nmod_vec_scalar_mul_nmod_generic_inline(mp_ptr res, mp_srcptr vec,
                                slong len, mp_limb_t c, nmod_t mod)
 {
     slong i;
@@ -590,14 +590,14 @@ static __inline__ void _nmod_vec_scalar_mul_nmod_generic_inline(mp_ptr res, mp_s
         NMOD_MUL_PRENORM(res[i], vec[i], c << mod.norm, mod);
 }
 
-static __inline__ void _nmod_vec_scalar_mul_nmod_inline(mp_ptr res, mp_srcptr vec, 
+static __inline__ void _nmod_vec_scalar_mul_nmod_inline(mp_ptr res, mp_srcptr vec,
                                slong len, mp_limb_t c, nmod_t mod)
 {
     if (NMOD_BITS(mod) == FLINT_BITS)
         _nmod_vec_scalar_mul_nmod_fullword_inline(res, vec, len, c, mod);
     else if (len > 10)
         _nmod_vec_scalar_mul_nmod_shoup(res, vec, len, c, mod);
-    else 
+    else
         _nmod_vec_scalar_mul_nmod_generic_inline(res, vec, len, c, mod);
 }
 
@@ -958,7 +958,7 @@ _gr_nmod_poly_mullow(ulong * res,
 /* fixme: duplicates _nmod_poly_divrem for error handling */
 /* todo: also overload div, rem */
 int
-_gr_nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA, 
+_gr_nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA,
                                   mp_srcptr B, slong lenB, gr_ctx_t ctx)
 {
     if (lenA <= 20 || lenB <= 8 || lenA - lenB <= 6 ||

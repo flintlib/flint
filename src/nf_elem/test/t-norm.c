@@ -37,11 +37,11 @@ main(void)
         fmpq_t anorm, bnorm, cnorm, cnorm2;
 
         nf_init_randtest(nf, state, 25, 200);
-        
+
         nf_elem_init(a, nf);
         nf_elem_init(b, nf);
         nf_elem_init(c, nf);
-        
+
         fmpq_init(anorm);
         fmpq_init(bnorm);
         fmpq_init(cnorm);
@@ -49,7 +49,7 @@ main(void)
 
         nf_elem_randtest(a, state, 200, nf);
         nf_elem_randtest(b, state, 200, nf);
-        
+
         nf_elem_mul(c, a, b, nf);
         nf_elem_norm(anorm, a, nf);
         nf_elem_norm(bnorm, b, nf);
@@ -79,10 +79,10 @@ main(void)
         nf_elem_clear(a, nf);
         nf_elem_clear(b, nf);
         nf_elem_clear(c, nf);
-         
+
         nf_clear(nf);
     }
-    
+
     flint_randclear(state);
     flint_cleanup();
     flint_printf("PASS\n");

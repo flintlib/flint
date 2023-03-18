@@ -15,14 +15,14 @@
 
 /* P (x : z) = P1 (x1 : z1) + P2 (x2 : z2) where P0 (x0 : zo) is P - Q */
 
-/*    Coordinates of P : 
+/*    Coordinates of P :
 
         x = 4 * z0 * (x1 * x2 - z1 * z2)^2 mod n
         z = 4 * x0 * (x2 * z1 - x1 * z2)^2 mod n
 */
 
-void 
-n_factor_ecm_add(mp_limb_t *x, mp_limb_t *z, mp_limb_t x1, mp_limb_t z1, 
+void
+n_factor_ecm_add(mp_limb_t *x, mp_limb_t *z, mp_limb_t x1, mp_limb_t z1,
                  mp_limb_t x2, mp_limb_t z2, mp_limb_t x0, mp_limb_t z0,
                  mp_limb_t n, n_ecm_t n_ecm_inf)
 {
@@ -50,28 +50,28 @@ n_factor_ecm_add(mp_limb_t *x, mp_limb_t *z, mp_limb_t x1, mp_limb_t z1,
 
     u = n_submod(x2, z2, n);        /* u = (x2 - z2) */
     v = n_addmod(x1, z1, n);        /* v = (x1 + z1) */
-    
+
     /* u = (x2 - z2) * (x1 + z1) */
     u = n_mulmod_preinv(u, v, n, n_ecm_inf->ninv, n_ecm_inf->normbits);
 
     v = n_submod(x1, z1, n);        /* v = (x1 - z1) */
     w = n_addmod(x2, z2, n);        /* w = (x2 + z2) */
-    
+
     /* v = (x1 - z1) * (x2 + z2) */
     v = n_mulmod_preinv(v, w, n, n_ecm_inf->ninv, n_ecm_inf->normbits);
 
     w = n_addmod(u, v, n);          /* w = 2 * (x1 * x2 - z1 * z2) */
     v = n_submod(v, u, n);          /* v = 2 * (x2 * z1 - x1 * z2) */
-    
+
     /* w = 4 * (x1 * x2 - z1 * z2)^2 */
     w = n_mulmod_preinv(w, w, n, n_ecm_inf->ninv, n_ecm_inf->normbits);
-    
+
     /* v = 4 * (x2 * z1 - x1 * z2)^2 */
     v = n_mulmod_preinv(v, v, n, n_ecm_inf->ninv, n_ecm_inf->normbits);
-    
+
     /* x = 4 * z0 * (x1 * x2 - z1 * z2)^2 */
     *x = n_mulmod_preinv(z0, w, n, n_ecm_inf->ninv, n_ecm_inf->normbits);
-    
+
     /* z = 4 * x0 * (x2 * z1 - x1 * z2)^2 */
     *z = n_mulmod_preinv(x0, v, n, n_ecm_inf->ninv, n_ecm_inf->normbits);
 }

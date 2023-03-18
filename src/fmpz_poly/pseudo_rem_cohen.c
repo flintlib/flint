@@ -15,7 +15,7 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_pseudo_rem_cohen(fmpz * R, const fmpz * A, slong lenA, 
+_fmpz_poly_pseudo_rem_cohen(fmpz * R, const fmpz * A, slong lenA,
                             const fmpz * B, slong lenB)
 {
     const fmpz * leadB = B + (lenB - 1);
@@ -55,7 +55,7 @@ fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t
 {
     slong lenr;
     fmpz *r;
-    
+
     if (B->length == 0)
     {
         flint_printf("Exception (fmpz_poly_pseudo_rem_cohen). Division by zero.\n");
@@ -66,7 +66,7 @@ fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t
         fmpz_poly_set(R, A);
         return;
     }
-    
+
     lenr = A->length;
     if (R == B)
         r = _fmpz_vec_init(lenr);
@@ -75,12 +75,12 @@ fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t
         fmpz_poly_fit_length(R, lenr);
         r = R->coeffs;
     }
-    
+
     _fmpz_poly_pseudo_rem_cohen(r, A->coeffs, A->length, B->coeffs, B->length);
-    
+
     for (lenr = B->length - 1; (lenr >= 0) && (r[lenr] == WORD(0)); lenr--) ;
     lenr++;
-    
+
     if (R == B)
     {
         _fmpz_vec_clear(R->coeffs, R->alloc);

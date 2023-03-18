@@ -58,9 +58,9 @@ _fmpz_mod_poly_mullow_classical_check(const fmpz * p,
     return res;
 }
 
-int _fmpz_mod_poly_divides_classical(fmpz * Q, const fmpz * A, slong lenA, 
+int _fmpz_mod_poly_divides_classical(fmpz * Q, const fmpz * A, slong lenA,
                           const fmpz * B, slong lenB, const fmpz_mod_ctx_t ctx)
-{    
+{
     slong lenQ = lenA - lenB + 1;
     int res;
     fmpz_t invB;
@@ -71,7 +71,7 @@ int _fmpz_mod_poly_divides_classical(fmpz * Q, const fmpz * A, slong lenA,
     _fmpz_mod_poly_div(Q, A, lenA, B, lenB, invB, ctx);
     /* check coefficients of product one at a time */
     res = _fmpz_mod_poly_mullow_classical_check(A, Q, lenQ, B, lenB - 1, ctx);
-		    
+
     if (!res)
         _fmpz_vec_zero(Q, lenQ);
 
@@ -116,7 +116,7 @@ int fmpz_mod_poly_divides_classical(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
         fmpz_mod_poly_swap(tQ, Q, ctx);
         fmpz_mod_poly_clear(tQ, ctx);
     }
-    
+
     _fmpz_mod_poly_set_length(Q, lenA - lenB + 1);
     _fmpz_mod_poly_normalise(Q);
 

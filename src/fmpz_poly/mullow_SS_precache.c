@@ -37,7 +37,7 @@ void fmpz_poly_mul_SS_precache_init(fmpz_poly_mul_precache_t pre,
     size2 = (pre->bits2 + FLINT_BITS - 1)/FLINT_BITS;
 
     /* Start with an upper bound on the number of bits needed */
-    output_bits = FLINT_BITS*(size1 + size2) + loglen2 + 1; 
+    output_bits = FLINT_BITS*(size1 + size2) + loglen2 + 1;
 
     /* round up for sqrt2 trick */
     output_bits = (((output_bits - 1) >> (pre->loglen - 2)) + 1) << (pre->loglen - 2);
@@ -52,7 +52,7 @@ void fmpz_poly_mul_SS_precache_init(fmpz_poly_mul_precache_t pre,
     N = flint_get_num_threads();
     pre->jj = (mp_limb_t **)
         flint_malloc((4*(pre->n + pre->n*size) + 3*size*N + 3*N)*sizeof(mp_limb_t));
-    for (i = 0, ptr = (mp_limb_t *) pre->jj + 4*pre->n; i < 4*pre->n; i++, ptr += size) 
+    for (i = 0, ptr = (mp_limb_t *) pre->jj + 4*pre->n; i < 4*pre->n; i++, ptr += size)
         pre->jj[i] = ptr;
     t1 = (mp_limb_t **) ptr;
     t2 = (mp_limb_t **) t1 + N;
@@ -113,7 +113,7 @@ void _fmpz_poly_mullow_SS_precache(fmpz * output, const fmpz * input1,
     N = flint_get_num_threads();
     ii = (mp_limb_t **)
         flint_malloc((4*(pre->n + pre->n*size) + 5*size*N + 4*N)*sizeof(mp_limb_t));
-    for (i = 0, ptr = (mp_limb_t *) ii + 4*pre->n; i < 4*pre->n; i++, ptr += size) 
+    for (i = 0, ptr = (mp_limb_t *) ii + 4*pre->n; i < 4*pre->n; i++, ptr += size)
         ii[i] = ptr;
     t1 = (mp_limb_t **) ptr;
     t2 = (mp_limb_t **) t1 + N;

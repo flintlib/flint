@@ -1312,7 +1312,7 @@ int static _random_check_sp(
         {
             fmpz_mpoly2_eval_nmod(Geval_sp, Bcur_sp, Binc_sp, Bcoeff_sp, H,
                  Hmarks->coeffs, Hmarks->length, alpha_caches_sp, ctx, ctx_sp);
-    
+
             return n_polyun_equal(Geval_sp, which_check == 1 ? Abareval_sp : Bbareval_sp);
         }
     }
@@ -1399,7 +1399,7 @@ int static _random_check_mp(
         {
             fmpz_mpoly2_eval_fmpz_mod(Geval_mp, Bcur_mp, Binc_mp, Bcoeff_mp, H,
                  Hmarks->coeffs, Hmarks->length, alpha_caches_mp, ctx, ctx_mp);
-    
+
             return fmpz_mod_polyun_equal(Geval_mp, which_check == 1 ?
                                             Abareval_mp : Bbareval_mp, ctx_mp);
         }
@@ -1410,7 +1410,7 @@ int static _random_check_mp(
 
 
 /*
-    return 
+    return
         -1: singular
         0:  inconsistent
         1:  success
@@ -1862,7 +1862,7 @@ pick_bma_prime:
             nmod_bma_mpoly_zero(GLambda_sp);
             nmod_bma_mpoly_zero(AbarLambda_sp);
             nmod_bma_mpoly_zero(BbarLambda_sp);
-            goto next_bma_image_sp;        
+            goto next_bma_image_sp;
         }
         else if (GdegboundXY > GevaldegXY)
         {
@@ -1980,7 +1980,7 @@ pick_bma_prime:
 
         FLINT_ASSERT(fmpz_is_one(sshift_mp));
         fmpz_mod_mpoly_bma_interpolate_alpha_powers(alphas_mp, sshift_mp, 2,
-                                                            Ictx, ctx, ctx_mp); 
+                                                            Ictx, ctx, ctx_mp);
         for (j = 2; j < nvars; j++)
             fmpz_mod_pow_cache_start(alphas_mp + j, alpha_caches_mp + j, ctx_mp);
 

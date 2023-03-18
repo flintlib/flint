@@ -14,7 +14,7 @@
 #define FMPZ_MPOLY_H
 
 #ifdef FMPZ_MPOLY_INLINES_C
-#define FMPZ_MPOLY_INLINE 
+#define FMPZ_MPOLY_INLINE
 #else
 #define FMPZ_MPOLY_INLINE static __inline__
 #endif
@@ -77,7 +77,7 @@ typedef fmpz_mpolyd_struct fmpz_mpolyd_t[1];
 
 /* Context object ************************************************************/
 
-void fmpz_mpoly_ctx_init(fmpz_mpoly_ctx_t ctx, 
+void fmpz_mpoly_ctx_init(fmpz_mpoly_ctx_t ctx,
                                             slong nvars, const ordering_t ord);
 
 void fmpz_mpoly_ctx_init_rand(fmpz_mpoly_ctx_t mctx, flint_rand_t state, slong max_nvars);
@@ -102,7 +102,7 @@ ordering_t fmpz_mpoly_ctx_ord(const fmpz_mpoly_ctx_t ctx)
 
 void fmpz_mpoly_init(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_init2(fmpz_mpoly_t A, slong alloc, 
+void fmpz_mpoly_init2(fmpz_mpoly_t A, slong alloc,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 void fmpz_mpoly_init3(fmpz_mpoly_t A, slong alloc, flint_bitcnt_t bits,
@@ -111,13 +111,13 @@ void fmpz_mpoly_init3(fmpz_mpoly_t A, slong alloc, flint_bitcnt_t bits,
 void _fmpz_mpoly_realloc(fmpz ** Acoeff, ulong ** Aexp,
                                            slong * Aalloc, slong len, slong N);
 
-void fmpz_mpoly_realloc(fmpz_mpoly_t A, slong alloc, 
+void fmpz_mpoly_realloc(fmpz_mpoly_t A, slong alloc,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 void _fmpz_mpoly_fit_length(fmpz ** Acoeff,
                             ulong ** Aexp, slong * Aalloc, slong len, slong N);
 
-void fmpz_mpoly_fit_length(fmpz_mpoly_t A, slong len, 
+void fmpz_mpoly_fit_length(fmpz_mpoly_t A, slong len,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 void fmpz_mpoly_fit_length_reset_bits(fmpz_mpoly_t A, slong len,
@@ -126,7 +126,7 @@ void fmpz_mpoly_fit_length_reset_bits(fmpz_mpoly_t A, slong len,
 void fmpz_mpoly_clear(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_INLINE
-void _fmpz_mpoly_set_length(fmpz_mpoly_t A, slong newlen, 
+void _fmpz_mpoly_set_length(fmpz_mpoly_t A, slong newlen,
                                                    const fmpz_mpoly_ctx_t ctx)
 {
     slong i;
@@ -137,7 +137,7 @@ void _fmpz_mpoly_set_length(fmpz_mpoly_t A, slong newlen,
 }
 
 FMPZ_MPOLY_INLINE
-void fmpz_mpoly_truncate(fmpz_mpoly_t A, slong newlen, 
+void fmpz_mpoly_truncate(fmpz_mpoly_t A, slong newlen,
                                                    const fmpz_mpoly_ctx_t ctx)
 {
     if (A->length > newlen)
@@ -148,7 +148,7 @@ void fmpz_mpoly_truncate(fmpz_mpoly_t A, slong newlen,
             _fmpz_demote(A->coeffs + i);
 
         A->length = newlen;
-    }  
+    }
 }
 
 void fmpz_mpoly_fit_bits(fmpz_mpoly_t A,
@@ -160,21 +160,21 @@ int fmpz_mpoly_set_str_pretty(fmpz_mpoly_t A, const char * str,
                                   const char ** x, const fmpz_mpoly_ctx_t ctx);
 
 char * _fmpz_mpoly_get_str_pretty(const fmpz * poly,
-                          const ulong * exps, slong len, const char ** x, 
+                          const ulong * exps, slong len, const char ** x,
                                            slong bits, const mpoly_ctx_t mctx);
 
 char * fmpz_mpoly_get_str_pretty(const fmpz_mpoly_t A,
                                   const char ** x, const fmpz_mpoly_ctx_t ctx);
 
-int _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly, 
+int _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
                         const ulong * exps, slong len, const char ** x_in,
                                      flint_bitcnt_t bits, const mpoly_ctx_t mctx);
 
-int fmpz_mpoly_fprint_pretty(FILE * file, 
+int fmpz_mpoly_fprint_pretty(FILE * file,
             const fmpz_mpoly_t A, const char ** x, const fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_INLINE
-int _fmpz_mpoly_print_pretty(const fmpz * poly, 
+int _fmpz_mpoly_print_pretty(const fmpz * poly,
                        const ulong * exps, slong len, const char ** x,
                                             slong bits, const mpoly_ctx_t mctx)
 {
@@ -210,7 +210,7 @@ int fmpz_mpoly_equal(const fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_INLINE
-void fmpz_mpoly_swap(fmpz_mpoly_t A, 
+void fmpz_mpoly_swap(fmpz_mpoly_t A,
                                 fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 {
    fmpz_mpoly_struct t = *A;
@@ -451,13 +451,13 @@ void fmpz_mpoly_resize(fmpz_mpoly_t A, slong new_length,
 void fmpz_mpoly_get_term_coeff_fmpz(fmpz_t c, const fmpz_mpoly_t A,
                                           slong i, const fmpz_mpoly_ctx_t ctx);
 
-ulong fmpz_mpoly_get_term_coeff_ui(           const fmpz_mpoly_t A, 
+ulong fmpz_mpoly_get_term_coeff_ui(           const fmpz_mpoly_t A,
                                           slong i, const fmpz_mpoly_ctx_t ctx);
 
-slong fmpz_mpoly_get_term_coeff_si(           const fmpz_mpoly_t A, 
+slong fmpz_mpoly_get_term_coeff_si(           const fmpz_mpoly_t A,
                                           slong i, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_set_term_coeff_fmpz(fmpz_mpoly_t A, 
+void fmpz_mpoly_set_term_coeff_fmpz(fmpz_mpoly_t A,
                           slong i, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
 
 void fmpz_mpoly_set_term_coeff_ui(fmpz_mpoly_t A,
@@ -711,13 +711,13 @@ void fmpz_mpoly_mul_johnson(fmpz_mpoly_t A,
 void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t A,
        const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
 
-int fmpz_mpoly_mul_array(fmpz_mpoly_t A, 
+int fmpz_mpoly_mul_array(fmpz_mpoly_t A,
        const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
 
 int fmpz_mpoly_mul_array_threaded(fmpz_mpoly_t A,
        const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
 
-int fmpz_mpoly_mul_dense(fmpz_mpoly_t A, 
+int fmpz_mpoly_mul_dense(fmpz_mpoly_t A,
        const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
 
 slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
@@ -789,7 +789,7 @@ slong _fmpz_mpoly_divides_array(fmpz ** poly1, ulong ** exp1,
                                          slong * mults, slong num, slong bits);
 
 int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1,
-                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, 
+                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 
@@ -836,7 +836,7 @@ void fmpz_mpoly_divexact(fmpz_mpoly_t Q, const fmpz_mpoly_t A,
 
 slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
            ulong ** expq, slong * allocq, const fmpz * poly2,
-   const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, 
+   const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3,
                        slong len3, slong bits, slong N, const ulong * cmpmask);
 
 void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q,
@@ -846,7 +846,7 @@ void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q,
 slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
   fmpz ** polyq, ulong ** expq, slong * allocq, fmpz ** polyr,
                   ulong ** expr, slong * allocr, const fmpz * poly2,
-   const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, 
+   const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3,
                        slong len3, slong bits, slong N, const ulong * cmpmask);
 
 void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
@@ -855,13 +855,13 @@ void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
 
 slong _fmpz_mpoly_divrem_array(slong * lenr,
        fmpz ** polyq, ulong ** expq, slong * allocq,
-              fmpz ** polyr, ulong ** expr, slong * allocr, 
-                const fmpz * poly2, const ulong * exp2, slong len2, 
-        const fmpz * poly3, const ulong * exp3, slong len3, slong * mults, 
+              fmpz ** polyr, ulong ** expr, slong * allocr,
+                const fmpz * poly2, const ulong * exp2, slong len2,
+        const fmpz * poly3, const ulong * exp3, slong len3, slong * mults,
                                                         slong num, slong bits);
 
 int fmpz_mpoly_divrem_array(fmpz_mpoly_t q, fmpz_mpoly_t r,
-                    const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, 
+                    const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 void fmpz_mpoly_quasidivrem_heap(fmpz_t scale,
@@ -897,7 +897,7 @@ slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq, ulong ** expq,
            slong * allocq, const fmpz * poly2, const ulong * exp2, slong len2,
                        flint_bitcnt_t bits, const mpoly_ctx_t mctx, int check);
 
-int fmpz_mpoly_sqrt_heap(fmpz_mpoly_t q, const fmpz_mpoly_t poly2, 
+int fmpz_mpoly_sqrt_heap(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
                                         const fmpz_mpoly_ctx_t ctx, int check);
 
 FMPZ_MPOLY_INLINE
@@ -1197,54 +1197,54 @@ void fmpz_mpoly_geobucket_sub(fmpz_mpoly_geobucket_t B,
 /* Helpers for array methods *************************************************/
 
 void _fmpz_mpoly_mul_array_chunked_DEG(fmpz_mpoly_t P,
-                             const fmpz_mpoly_t A, const fmpz_mpoly_t B, 
+                             const fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                        ulong degb, const fmpz_mpoly_ctx_t ctx);
 
 void _fmpz_mpoly_mul_array_chunked_LEX(fmpz_mpoly_t P,
-                             const fmpz_mpoly_t A, const fmpz_mpoly_t B, 
+                             const fmpz_mpoly_t A, const fmpz_mpoly_t B,
                               const ulong * mults, const fmpz_mpoly_ctx_t ctx);
 
-void _fmpz_mpoly_addmul_array1_slong1(ulong * poly1, 
+void _fmpz_mpoly_addmul_array1_slong1(ulong * poly1,
                  const slong * poly2, const ulong * exp2, slong len2,
                           const slong * poly3, const ulong * exp3, slong len3);
 
-void _fmpz_mpoly_addmul_array1_slong(ulong * poly1, 
+void _fmpz_mpoly_addmul_array1_slong(ulong * poly1,
                  const slong * poly2, const ulong * exp2, slong len2,
                           const slong * poly3, const ulong * exp3, slong len3);
 
-void _fmpz_mpoly_addmul_array1_slong2(ulong * poly1, 
+void _fmpz_mpoly_addmul_array1_slong2(ulong * poly1,
                  const slong * poly2, const ulong * exp2, slong len2,
                           const slong * poly3, const ulong * exp3, slong len3);
 
-void _fmpz_mpoly_addmul_array1_fmpz(fmpz * poly1, 
+void _fmpz_mpoly_addmul_array1_fmpz(fmpz * poly1,
                  const fmpz * poly2, const ulong * exp2, slong len2,
                            const fmpz * poly3, const ulong * exp3, slong len3);
 
-void _fmpz_mpoly_submul_array1_slong(ulong * poly1, 
+void _fmpz_mpoly_submul_array1_slong(ulong * poly1,
                   const slong * poly2, const ulong * exp2, slong len2,
                           const slong * poly3, const ulong * exp3, slong len3);
 
-void _fmpz_mpoly_submul_array1_slong2(ulong * poly1, 
+void _fmpz_mpoly_submul_array1_slong2(ulong * poly1,
                   const slong * poly2, const ulong * exp2, slong len2,
                           const slong * poly3, const ulong * exp3, slong len3);
 
-void _fmpz_mpoly_submul_array1_slong1(ulong * poly1, 
+void _fmpz_mpoly_submul_array1_slong1(ulong * poly1,
                  const slong * poly2, const ulong * exp2, slong len2,
                           const slong * poly3, const ulong * exp3, slong len3);
 
-void _fmpz_mpoly_submul_array1_fmpz(fmpz * poly1, 
+void _fmpz_mpoly_submul_array1_fmpz(fmpz * poly1,
                  const fmpz * poly2, const ulong * exp2, slong len2,
                            const fmpz * poly3, const ulong * exp3, slong len3);
 
-void _fmpz_mpoly_submul_array1_slong_1(ulong * poly1, 
+void _fmpz_mpoly_submul_array1_slong_1(ulong * poly1,
                           slong d, const ulong exp2,
                           const slong * poly3, const ulong * exp3, slong len3);
 
-void _fmpz_mpoly_submul_array1_slong2_1(ulong * poly1, 
+void _fmpz_mpoly_submul_array1_slong2_1(ulong * poly1,
                            slong d, const ulong exp2,
                           const slong * poly3, const ulong * exp3, slong len3);
 
-void _fmpz_mpoly_submul_array1_fmpz_1(fmpz * poly1, 
+void _fmpz_mpoly_submul_array1_fmpz_1(fmpz * poly1,
                           const fmpz_t d, ulong exp2,
                            const fmpz * poly3, const ulong * exp3, slong len3);
 
@@ -1284,7 +1284,7 @@ slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1,
                           const slong * mults, slong num, slong bits, slong k);
 
 slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1,
-                         ulong ** exp1, slong * alloc, ulong * poly2, 
+                         ulong ** exp1, slong * alloc, ulong * poly2,
                           const slong * mults, slong num, slong bits, slong k);
 
 slong _fmpz_mpoly_from_ulong_array1(fmpz ** poly1,

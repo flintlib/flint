@@ -36,7 +36,7 @@ slong _nmod_mpoly_sub1(mp_limb_t * coeff1,       ulong * exp1,
         {
             exp1[k] = exp3[j];
             coeff1[k] = nmod_neg(coeff3[j], fctx);
-            j++;         
+            j++;
         }
         k++;
     }
@@ -161,7 +161,7 @@ void nmod_mpoly_sub(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
     {
         nmod_mpoly_t temp;
         nmod_mpoly_init3(temp, poly2->length + poly3->length, max_bits, ctx);
-        len1 = _nmod_mpoly_sub(temp->coeffs, temp->exps, 
+        len1 = _nmod_mpoly_sub(temp->coeffs, temp->exps,
                                     poly2->coeffs, exp2, poly2->length,
                                     poly3->coeffs, exp3, poly3->length,
                                                       N, cmpmask, ctx->mod);
@@ -171,12 +171,12 @@ void nmod_mpoly_sub(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
     else
     {
         nmod_mpoly_fit_length_reset_bits(poly1, poly2->length + poly3->length, max_bits, ctx);
-        len1 = _nmod_mpoly_sub(poly1->coeffs, poly1->exps, 
+        len1 = _nmod_mpoly_sub(poly1->coeffs, poly1->exps,
                                     poly2->coeffs, exp2, poly2->length,
                                     poly3->coeffs, exp3, poly3->length,
                                                       N, cmpmask, ctx->mod);
     }
-      
+
     _nmod_mpoly_set_length(poly1, len1, ctx);
 
     if (free2)

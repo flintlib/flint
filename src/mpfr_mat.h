@@ -13,13 +13,13 @@
 #define MPFR_MAT_H
 
 #ifdef MPFR_MAT_INLINES_C
-#define MPFR_MAT_INLINE 
+#define MPFR_MAT_INLINE
 #else
 #define MPFR_MAT_INLINE static __inline__
 #endif
 
 #include "flint.h"
-#include <mpfr.h> 
+#include <mpfr.h>
 
 #ifdef __cplusplus
  extern "C" {

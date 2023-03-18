@@ -17,7 +17,7 @@ int main(void)
     int n;
 
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("prime_pi....");
     fflush(stdout);
 
@@ -26,7 +26,7 @@ int main(void)
         if ((n_prime_pi(n-1)+1 == n_prime_pi(n)) != n_is_prime(n))
         {
             flint_printf("FAIL:\n");
-            flint_printf("expected pi(%d) + 1 = pi(%d)\n", n-1, n); 
+            flint_printf("expected pi(%d) + 1 = pi(%d)\n", n-1, n);
             fflush(stdout);
             flint_abort();
         }
@@ -37,7 +37,7 @@ int main(void)
         if (n_prime_pi(n_nth_prime(n)) != n)
         {
             flint_printf("FAIL:\n");
-            flint_printf("expected pi(prime(%d)) = %d\n", n, n); 
+            flint_printf("expected pi(prime(%d)) = %d\n", n, n);
             fflush(stdout);
             flint_abort();
         }

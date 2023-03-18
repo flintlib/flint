@@ -54,14 +54,14 @@ main(void)
         }
 
         fmpz_mat_clear(C);
-	
+
 	fmpz_mod_mat_clear(A);
         fmpz_mod_mat_clear(B);
 	fmpz_clear(mod);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

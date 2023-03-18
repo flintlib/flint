@@ -35,9 +35,9 @@ int fmpz_poly_factor_van_hoeij_check_if_solved(fmpz_mat_t M,
    int num_facs, res = 0;
    slong i, j, r;
    slong * part;
- 
+
    r = lifted_fac->num;
-   
+
    part = (slong *) flint_calloc(r, sizeof(slong));
 
    fmpz_poly_factor_init(trial_factors);
@@ -63,8 +63,8 @@ int fmpz_poly_factor_van_hoeij_check_if_solved(fmpz_mat_t M,
       goto cleanup;
    }
 
-   /* 
-      there is a potential 0-1 basis, so make the potential factors 
+   /*
+      there is a potential 0-1 basis, so make the potential factors
    */
 
    fmpz_set(temp_lc, lc);
@@ -91,7 +91,7 @@ int fmpz_poly_factor_van_hoeij_check_if_solved(fmpz_mat_t M,
 
    /* sort factors by length */
 
-   qsort(trial_factors->p, trial_factors->num, 
+   qsort(trial_factors->p, trial_factors->num,
                             sizeof(fmpz_poly_struct), _compare_poly_lengths);
 
    /* trial divide potential factors */
@@ -105,7 +105,7 @@ int fmpz_poly_factor_van_hoeij_check_if_solved(fmpz_mat_t M,
       fmpz_poly_get_nmod_poly(g2, trial_factors->p + i);
 
       nmod_poly_rem(rem, f2, g2);
-   
+
       if (nmod_poly_is_zero(rem) && fmpz_poly_divides(q, f_copy, trial_factors->p + i))
       {
          fmpz_poly_swap(q, f_copy);
@@ -120,7 +120,7 @@ int fmpz_poly_factor_van_hoeij_check_if_solved(fmpz_mat_t M,
    {
       for (j = 0; j < i; j++)
          fmpz_poly_factor_insert(final_fac, trial_factors->p + j, exp);
-      
+
       fmpz_poly_factor_insert(final_fac, f_copy, exp);
 
       res = 1; /* we factorised f */

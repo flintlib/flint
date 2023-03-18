@@ -93,7 +93,7 @@ _fmpz_poly_mullow_tiny2(fmpz * res, const fmpz * poly1,
 }
 
 void
-_fmpz_poly_mullow(fmpz * res, const fmpz * poly1, slong len1, 
+_fmpz_poly_mullow(fmpz * res, const fmpz * poly1, slong len1,
                                 const fmpz * poly2, slong len2, slong n)
 {
     mp_size_t limbs1, limbs2;

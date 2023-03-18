@@ -55,7 +55,7 @@ void mpoly_monomial_evals_nmod(
         for (k = 0; k < num; k++)
         {
             ulong ei = (Aexps[N*i + off[k]] >> shift[k]) & mask;
-            p[i] = nmod_pow_cache_mulpow_ui(p[i], ei, alpha_caches + 3*k + 0, 
+            p[i] = nmod_pow_cache_mulpow_ui(p[i], ei, alpha_caches + 3*k + 0,
                                                 alpha_caches + 3*k + 1,
                                                 alpha_caches + 3*k + 2, fpctx);
         }

@@ -69,7 +69,7 @@ main(void)
         }
 
         fmpz_mod_mpoly_clear(f, ctx);
-        fmpz_clear(c);      
+        fmpz_clear(c);
         fmpz_clear(d);
         fmpz_mod_mpoly_ctx_clear(ctx);
     }

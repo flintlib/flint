@@ -16,10 +16,10 @@ int main(void)
 {
     int i, j;
     FLINT_TEST_INIT(state);
-   
+
     flint_printf("unity_zpq_gauss_sum....");
     fflush(stdout);
-    
+
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         int result;
@@ -50,7 +50,7 @@ int main(void)
         unity_zpq_init(gauss, q, p, n);
         unity_zpq_init(gausspower, q, p, n);
 
-        unity_zpq_gauss_sum(gauss, q, p); 
+        unity_zpq_gauss_sum(gauss, q, p);
         unity_zpq_gauss_sum_sigma_pow(gausssigma, q, p);
 
         unity_zpq_pow(gausspower, gauss, n);
@@ -60,12 +60,12 @@ int main(void)
         {
             unity_zpq_mul_unity_p_pow(gauss, gausspower, j);
             if (unity_zpq_equal(gauss, gausssigma))
-            { 
+            {
                 result = 1;
                 break;
             }
         }
-        
+
         if (result == 0)
         {
             flint_printf("FAIL\n");

@@ -67,7 +67,7 @@ arf_mul_rnd_any(arf_ptr z, arf_srcptr x, arf_srcptr y,
             else
                 mpn_mul_n(tmp, xptr, yptr, yn);
         }
-        else 
+        else
         {
             mpn_mul(tmp, xptr, xn, yptr, yn);
         }

@@ -21,7 +21,7 @@ int main(void)
     mp_ptr dinv;
     mp_size_t size, size2;
     flint_bitcnt_t norm;
-    
+
     FLINT_TEST_INIT(state);
 
     flint_printf("mod_preinvn....");
@@ -32,19 +32,19 @@ int main(void)
     mpz_init(r1);
     /* don't init r2 */
 
-    gmp_randinit_default(st); 
+    gmp_randinit_default(st);
 
     /* test flint_mpn_mod_preinvn */
     for (i = 0; i < 10000; i++)
     {
        size = n_randint(state, 200) + 1;
        size2 = n_randint(state, 200) + size;
-       
+
        mpz_rrandomb(a, st, size2*FLINT_BITS);
        do {
           mpz_rrandomb(d, st, size*FLINT_BITS);
        } while (mpz_sgn(d) == 0);
-       
+
        /* normalise */
        count_leading_zeros(norm, d->_mp_d[d->_mp_size - 1]);
        mpz_mul_2exp(d, d, norm);
@@ -57,16 +57,16 @@ int main(void)
 
        /* reduce a mod d */
        mpz_fdiv_r(r1, a, d);
-       
+
        dinv = flint_malloc(size*sizeof(mp_limb_t));
        flint_mpn_preinvn(dinv, d->_mp_d, size);
 
-       flint_mpn_mod_preinvn(r2->_mp_d, a->_mp_d, size2, d->_mp_d, size, dinv); 
+       flint_mpn_mod_preinvn(r2->_mp_d, a->_mp_d, size2, d->_mp_d, size, dinv);
 
        /* normalise */
        while (size && r2->_mp_d[size - 1] == 0) size--;
        r2->_mp_size = size;
-       
+
        result = (mpz_cmp(r1, r2) == 0);
        if (!result)
        {
@@ -89,12 +89,12 @@ int main(void)
     {
        size = n_randint(state, 200) + 1;
        size2 = n_randint(state, 200) + size;
-       
+
        mpz_rrandomb(a, st, size2*FLINT_BITS);
        do {
           mpz_rrandomb(d, st, size*FLINT_BITS);
        } while (mpz_sgn(d) == 0);
-       
+
        /* normalise */
        count_leading_zeros(norm, d->_mp_d[d->_mp_size - 1]);
        mpz_mul_2exp(d, d, norm);
@@ -103,16 +103,16 @@ int main(void)
 
        /* reduce a mod d */
        mpz_fdiv_r(r1, a, d);
-       
+
        dinv = flint_malloc(size*sizeof(mp_limb_t));
        flint_mpn_preinvn(dinv, d->_mp_d, size);
 
-       flint_mpn_mod_preinvn(a->_mp_d, a->_mp_d, size2, d->_mp_d, size, dinv); 
+       flint_mpn_mod_preinvn(a->_mp_d, a->_mp_d, size2, d->_mp_d, size, dinv);
 
        /* normalise */
        while (size && a->_mp_d[size - 1] == 0) size--;
        a->_mp_size = size;
-       
+
        result = (mpz_cmp(r1, a) == 0);
        if (!result)
        {
@@ -133,10 +133,10 @@ int main(void)
     mpz_clear(d);
     mpz_clear(r1);
     /* don't clear r2 */
-    
+
     gmp_randclear(st);
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

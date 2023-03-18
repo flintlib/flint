@@ -29,7 +29,7 @@ unity_zp_ar1(fmpz_t * t)
     /*
         a0 = t[0]; a1 = t[1]; a2 = t[2];
         b0 = t[3]; b1 = t[4]; b2 = t[5];
-        
+
         c0 = t[6]; c1 = t[7]; c2 = t[8];
         c3 = t[9]; c4 = t[10];
 
@@ -44,7 +44,7 @@ unity_zp_ar1(fmpz_t * t)
     fmpz_add(t[11], t[0], t[1]);        /* m1 = a0 + a1 */
     fmpz_add(t[12], t[3], t[4]);        /* m2 = b0 + b1 */
     fmpz_mul(t[15], t[11], t[12]);      /* d3 = m1 * m2 */
-    
+
     fmpz_add(t[11], t[0], t[2]);        /* m1 = a0 + a2 */
     fmpz_add(t[12], t[3], t[5]);        /* m2 = b0 + b2 */
     fmpz_mul(t[16], t[11], t[12]);      /* d4 = m1 * m2 */
@@ -136,7 +136,7 @@ unity_zp_ar2(fmpz_t * t)
 
 /*
     Input a0, ... , a4 store in t[0 .. 4] and b0, ..., b4 in t[5 .. 9].
-    
+
     Output c0, ..., c8 store in t[10 .. 18].
 
     Used t[0 .. 38].
@@ -205,7 +205,7 @@ unity_zp_ar3(fmpz_t * t)
 
     fmpz_add(t[15], t[23], t[24]);      /* m4 = a3 + a4 */
     fmpz_add(t[16], t[28], t[29]);      /* m5 = b3 + b4 */
-    
+
     fmpz_mul(t[11], t[23], t[28]);      /* d5 = a3 * b3 */
     fmpz_mul(t[38], t[24], t[29]);      /* c8 = a4 * b4 */
     fmpz_mul(t[12], t[15], t[16]);      /* d6 = m4 * m5 */

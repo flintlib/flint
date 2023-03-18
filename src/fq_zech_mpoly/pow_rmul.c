@@ -26,7 +26,7 @@ void fq_zech_mpoly_pow_rmul(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
 
     fq_zech_mpoly_one(A, ctx);
     while (k > 0)
-    { 
+    {
         fq_zech_mpoly_mul(T, A, B, ctx);
         fq_zech_mpoly_swap(A, T, ctx);
         k -= 1;

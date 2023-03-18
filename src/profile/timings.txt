@@ -1,6 +1,6 @@
-udiv_qrnnd(q, r, nh, nl, d) 
+udiv_qrnnd(q, r, nh, nl, d)
 
-   Core2 53.4 cycles 
+   Core2 53.4 cycles
    K8 74.3 cycles
    K10 80.6 cycles
 

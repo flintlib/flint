@@ -119,8 +119,8 @@ acb_hypgeom_airy_prop(acb_t ai, acb_t aip, acb_t bi, acb_t bip,
     acb_init(zz);
 
     real = acb_is_real(z);
-    arf_set(arb_midref(acb_realref(zz)), arb_midref(acb_realref(z))); 
-    arf_set(arb_midref(acb_imagref(zz)), arb_midref(acb_imagref(z))); 
+    arf_set(arb_midref(acb_realref(zz)), arb_midref(acb_realref(z)));
+    arf_set(arb_midref(acb_imagref(zz)), arb_midref(acb_imagref(z)));
     mag_hypot(rad, arb_radref(acb_realref(z)), arb_radref(acb_imagref(z)));
     acb_get_mag(zb, z);
 

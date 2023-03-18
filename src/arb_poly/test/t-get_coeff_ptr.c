@@ -35,8 +35,8 @@ main(void)
 
         arb_poly_get_coeff_arb(a, A, n);
 
-        result = n < arb_poly_length(A) ? 
-                     arb_equal(a, arb_poly_get_coeff_ptr(A, n)) : 
+        result = n < arb_poly_length(A) ?
+                     arb_equal(a, arb_poly_get_coeff_ptr(A, n)) :
                      arb_poly_get_coeff_ptr(A, n) == NULL;
         if (!result)
         {

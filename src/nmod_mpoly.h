@@ -13,7 +13,7 @@
 #define NMOD_MPOLY_H
 
 #ifdef NMOD_MPOLY_INLINES_C
-#define NMOD_MPOLY_INLINE 
+#define NMOD_MPOLY_INLINE
 #else
 #define NMOD_MPOLY_INLINE static __inline__
 #endif
@@ -112,9 +112,9 @@ typedef nmod_mpolyun_struct nmod_mpolyun_t[1];
 /*
     nmod_mpolyd_t
     A dense mpoly is stored as a flat array of coefficients.
-    Suppose deg_bounds = {r0, r1, r2}. The coefficient of the monomial with 
+    Suppose deg_bounds = {r0, r1, r2}. The coefficient of the monomial with
     exponents {e0, e1, e2} is stored at the coefficient of index
-        e2 + r2*(e1 + r1*(e0 + r0*0))    
+        e2 + r2*(e1 + r1*(e0 + r0*0))
 */
 typedef struct
 {
@@ -266,7 +266,7 @@ slong nmod_poly_stack_size_mpolyn(const nmod_poly_stack_t S)
 
 /* Context object ************************************************************/
 
-void nmod_mpoly_ctx_init(nmod_mpoly_ctx_t ctx, 
+void nmod_mpoly_ctx_init(nmod_mpoly_ctx_t ctx,
                          slong nvars, const ordering_t ord, mp_limb_t modulus);
 
 void nmod_mpoly_ctx_init_rand(nmod_mpoly_ctx_t ctx, flint_rand_t state,
@@ -370,7 +370,7 @@ void _nmod_mpoly_fit_length(
 }
 
 NMOD_MPOLY_INLINE
-void _nmod_mpoly_set_length(nmod_mpoly_t A, slong newlen, 
+void _nmod_mpoly_set_length(nmod_mpoly_t A, slong newlen,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     FLINT_ASSERT(newlen <= A->coeffs_alloc);
@@ -379,7 +379,7 @@ void _nmod_mpoly_set_length(nmod_mpoly_t A, slong newlen,
 }
 
 NMOD_MPOLY_INLINE
-void nmod_mpoly_truncate(nmod_mpoly_t A, slong newlen, 
+void nmod_mpoly_truncate(nmod_mpoly_t A, slong newlen,
                                                    const nmod_mpoly_ctx_t ctx)
 {
     if (A->length > newlen)
@@ -397,7 +397,7 @@ int nmod_mpoly_set_str_pretty(nmod_mpoly_t A, const char * str,
 char * nmod_mpoly_get_str_pretty(const nmod_mpoly_t A,
                                   const char ** x, const nmod_mpoly_ctx_t ctx);
 
-int nmod_mpoly_fprint_pretty(FILE * file, 
+int nmod_mpoly_fprint_pretty(FILE * file,
             const nmod_mpoly_t A, const char ** x, const nmod_mpoly_ctx_t ctx);
 
 NMOD_MPOLY_INLINE
@@ -733,13 +733,13 @@ void nmod_mpoly_set_nmod(nmod_mpoly_t poly,
 ulong nmod_mpoly_get_coeff_ui(nmod_t x,
                  const nmod_mpoly_t poly, slong n, const nmod_mpoly_ctx_t ctx);
 
-void nmod_mpoly_set_coeff_ui(nmod_mpoly_t poly, 
+void nmod_mpoly_set_coeff_ui(nmod_mpoly_t poly,
                           slong n, ulong x, const nmod_mpoly_ctx_t ctx);
 
-void nmod_mpoly_get_monomial(ulong * exps, const nmod_mpoly_t poly, 
+void nmod_mpoly_get_monomial(ulong * exps, const nmod_mpoly_t poly,
                                           slong n, const nmod_mpoly_ctx_t ctx);
 
-void nmod_mpoly_set_monomial(nmod_mpoly_t poly, 
+void nmod_mpoly_set_monomial(nmod_mpoly_t poly,
                       slong n, const ulong * exps, const nmod_mpoly_ctx_t ctx);
 
 
@@ -1209,11 +1209,11 @@ int nmod_mpoly_discriminant(nmod_mpoly_t R,
 /* Helpers for array methods *************************************************/
 
 void _nmod_mpoly_mul_array_chunked_LEX(nmod_mpoly_t P,
-                             const nmod_mpoly_t A, const nmod_mpoly_t B, 
+                             const nmod_mpoly_t A, const nmod_mpoly_t B,
                               const ulong * mults, const nmod_mpoly_ctx_t ctx);
 
 void _nmod_mpoly_mul_array_chunked_DEG(nmod_mpoly_t P,
-                             const nmod_mpoly_t A, const nmod_mpoly_t B, 
+                             const nmod_mpoly_t A, const nmod_mpoly_t B,
                                        ulong degb, const nmod_mpoly_ctx_t ctx);
 
 void _nmod_mpoly_addmul_array1_ulong1(ulong * poly1,
@@ -1443,7 +1443,7 @@ void nmod_mpolyn_set_mpoly(nmod_mpolyn_t A, const nmod_mpoly_t B,
 void nmod_mpoly_cvtfrom_mpolyn(nmod_mpoly_t A, const nmod_mpolyn_t B,
                                         slong var, const nmod_mpoly_ctx_t ctx);
 
-void nmod_mpolyn_mul_poly(nmod_mpolyn_t A, const nmod_mpolyn_t B, 
+void nmod_mpolyn_mul_poly(nmod_mpolyn_t A, const nmod_mpolyn_t B,
                                  const n_poly_t c, const nmod_mpoly_ctx_t ctx);
 
 void nmod_mpoly_cvtto_mpolyn(nmod_mpolyn_t A, const nmod_mpoly_t B,
@@ -1773,7 +1773,7 @@ int nmod_mpolyun_interp_crt_sm_mpolyu(slong * lastdeg,
              nmod_mpolyun_t F, nmod_mpolyun_t T, nmod_mpolyu_t A,
                 n_poly_t modulus, mp_limb_t alpha, const nmod_mpoly_ctx_t ctx);
 
-int nmod_mpolyn_interp_mcrt_sm_mpoly(slong * lastdeg_, 
+int nmod_mpolyn_interp_mcrt_sm_mpoly(slong * lastdeg_,
                 nmod_mpolyn_t F, const nmod_mpoly_t A, const n_poly_t modulus,
                                 n_poly_t alphapow, const nmod_mpoly_ctx_t ctx);
 

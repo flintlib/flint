@@ -12,7 +12,7 @@
 #include "fmpz_mat.h"
 
 /*
-    Assumes that \code{mat} is an $n \times n$ matrix and sets \code{(cp,n+1)} 
+    Assumes that \code{mat} is an $n \times n$ matrix and sets \code{(cp,n+1)}
     to its characteristic polynomial.
 
     Employs a division-free algorithm using $O(n^4)$ ring operations.

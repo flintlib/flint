@@ -43,7 +43,7 @@ void fmpq_poly_realloc(fmpq_poly_t poly, slong alloc)
     {
         poly->coeffs = (fmpz *) flint_calloc(alloc, sizeof(fmpz));
     }
-    
+
     poly->alloc = alloc;
 }
 

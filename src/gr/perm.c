@@ -131,7 +131,7 @@ _gr_perm_set_other(perm_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
             if (c == 0)
                 return GR_DOMAIN;
         }
-            
+
         for (i = 0; i < n; i++)
         {
             c = 0;

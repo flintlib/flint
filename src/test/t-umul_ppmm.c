@@ -16,7 +16,7 @@ int main(void)
 {
    int i, j, result;
    FLINT_TEST_INIT(state);
-   
+
 
    flint_printf("umul_ppmm....");
    fflush(stdout);
@@ -27,9 +27,9 @@ int main(void)
 
       m1 = n_randtest(state);
       m2 = n_randtest(state);
-      
+
       umul_ppmm(ph1, pl1, m1, m2);
-      
+
       pl2old = UWORD(0);
       pl2 = UWORD(0);
       ph2 = UWORD(0);
@@ -51,7 +51,7 @@ int main(void)
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("m1 = %wu, m2 = %wu\n", m1, m2); 
+         flint_printf("m1 = %wu, m2 = %wu\n", m1, m2);
          flint_printf("ph2 = %wu, ph1 = %wu, pl2 = %wu, pl1 = %wu\n", ph2, ph1, pl2, pl1);
          fflush(stdout);
          flint_abort();
@@ -59,7 +59,7 @@ int main(void)
    }
 
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

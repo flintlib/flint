@@ -63,7 +63,7 @@ main(void)
         do {
            fmpz_randbits(a, state, n_randint(state, 100) + 2);
         } while (fmpz_cmp_ui(a, 2) < 0);
-        
+
         fmpz_mul(p, p, a);
 
         result = !fmpz_is_probabprime_BPSW(p);
@@ -81,7 +81,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -20,7 +20,7 @@ main(void)
     int i, j, result;
     fq_zech_ctx_t ctx;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("neg... ");
     fflush(stdout);
 

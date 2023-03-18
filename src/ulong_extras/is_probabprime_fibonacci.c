@@ -104,7 +104,7 @@ n_is_probabprime_fibonacci(mp_limb_t n)
         return 0;
     }
 
-    m = (n - n_jacobi(WORD(5), n)) / 2;  /* cannot overflow 
+    m = (n - n_jacobi(WORD(5), n)) / 2;  /* cannot overflow
                                        as (5/n) = 0 for n = 2^64-1 */
 
     if (FLINT_BIT_COUNT(n) <= FLINT_D_BITS)

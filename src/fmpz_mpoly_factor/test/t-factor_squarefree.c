@@ -26,7 +26,7 @@ void check_it(const fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx)
     {
         flint_printf("FAIL:\ncheck factorization could be computed\n");
         fflush(stdout);
-        flint_abort();        
+        flint_abort();
     }
 
     for (i = 0; i < g->num; i++)
@@ -44,7 +44,7 @@ void check_it(const fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx)
     {
         flint_printf("FAIL:\nfactorization does not match original polynomial\n");
         fflush(stdout);
-        flint_abort();        
+        flint_abort();
     }
 
     for (i = 0; i < g->num; i++)
@@ -133,7 +133,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

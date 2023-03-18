@@ -18,8 +18,8 @@
 
 double
 n_cbrt_estimate(double a)
-{ 
-    typedef union { 
+{
+    typedef union {
         slong      uword_val;
 #if FLINT64
         double     double_val;

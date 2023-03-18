@@ -57,7 +57,7 @@ sample_new(void * arg, ulong count)
 
     fmpz_init(res);
     fmpz_init(a);
-   
+
     for (ix = 0; ix < count; ix++)
     {
         fmpz_randtest(a, state, bits + 20);
@@ -86,7 +86,7 @@ sample_old(void * arg, ulong count)
 
     fmpz_init(res);
     fmpz_init(a);
-   
+
     for (ix = 0; ix < count; ix++)
     {
         fmpz_randtest(a, state, bits + 20);
@@ -113,7 +113,7 @@ main(void)
     {
         prof_repeat(&minnew, &maxnew, sample_new, &bits);
         prof_repeat(&minold, &maxold, sample_old, &bits);
-        
+
         flint_printf("%d bits:      min %.2fx,    max %.2fx\n",
                 bits, minold / minnew, maxold / maxnew);
     }

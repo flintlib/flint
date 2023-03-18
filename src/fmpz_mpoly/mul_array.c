@@ -34,7 +34,7 @@
    The input polynomials are broken into blocks to improve
    cache efficiency.
 */
-void _fmpz_mpoly_addmul_array1_slong1(ulong * poly1, 
+void _fmpz_mpoly_addmul_array1_slong1(ulong * poly1,
                  const slong * poly2, const ulong * exp2, slong len2,
                            const slong * poly3, const ulong * exp3, slong len3)
 {
@@ -74,7 +74,7 @@ void _fmpz_mpoly_addmul_array1_slong1(ulong * poly1,
    The input polynomials are broken into blocks to improve
    cache efficiency.
 */
-void _fmpz_mpoly_addmul_array1_slong(ulong * poly1, 
+void _fmpz_mpoly_addmul_array1_slong(ulong * poly1,
                  const slong * poly2, const ulong * exp2, slong len2,
                            const slong * poly3, const ulong * exp3, slong len3)
 {
@@ -120,7 +120,7 @@ void _fmpz_mpoly_addmul_array1_slong(ulong * poly1,
    The input polynomials are broken into blocks to improve
    cache efficiency.
 */
-void _fmpz_mpoly_addmul_array1_slong2(ulong * poly1, 
+void _fmpz_mpoly_addmul_array1_slong2(ulong * poly1,
                  const slong * poly2, const ulong * exp2, slong len2,
                            const slong * poly3, const ulong * exp3, slong len3)
 {
@@ -164,7 +164,7 @@ void _fmpz_mpoly_addmul_array1_slong2(ulong * poly1,
    The input polynomials are broken into blocks to improve
    cache efficiency.
 */
-void _fmpz_mpoly_addmul_array1_fmpz(fmpz * poly1, 
+void _fmpz_mpoly_addmul_array1_fmpz(fmpz * poly1,
                  const fmpz * poly2, const ulong * exp2, slong len2,
                            const fmpz * poly3, const ulong * exp3, slong len3)
 {
@@ -192,7 +192,7 @@ void _fmpz_mpoly_addmul_array1_fmpz(fmpz * poly1,
    }
 }
 
-/* 
+/*
    Convert a polynomial in dense array format to an fmpz_mpoly with
    the given number of bits per exponent field. This function destroys
    poly2 and starts writing poly1 at index k. The function may reallocate
@@ -202,7 +202,7 @@ void _fmpz_mpoly_addmul_array1_fmpz(fmpz * poly1,
    mults. Exponents are assumed to be packed into a single word. The
    array, poly2 is assumed to have three words per coefficient.
 */
-slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1, ulong ** exp1, slong * alloc, 
+slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
               ulong * poly2, const slong * mults, slong num, slong bits, slong k)
 {
    slong i, j;
@@ -224,7 +224,7 @@ slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
    prods[0] = 1;
    for (i = 1; i <= num; i++)
      prods[i] = mults[i - 1]*prods[i - 1];
-   
+
    /* for each coeff in array */
    for (i = prods[num] - 1; i >= 0; i--)
    {
@@ -236,7 +236,7 @@ slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
          _fmpz_mpoly_fit_length(&p1, &e1, alloc, k + 1, 1);
 
          exp = 0;
-         
+
          /* compute exponent from index */
          for (j = 0; j < num; j++)
             exp += (i % prods[j + 1])/prods[j] << bits*j;
@@ -246,7 +246,7 @@ slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
          /* set coefficient */
          fmpz_set_signed_uiuiui(p1 + k, c[2], c[1], c[0]);
-         
+
          k++;
       }
    }
@@ -269,7 +269,7 @@ slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
    mults. Exponents are assumed to be packed into a single word. The
    array, poly2 is assumed to have two words per coefficient.
 */
-slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1, ulong ** exp1, slong * alloc, 
+slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1, ulong ** exp1, slong * alloc,
               ulong * poly2, const slong * mults, slong num, slong bits, slong k)
 {
    slong i, j;
@@ -291,7 +291,7 @@ slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1, ulong ** exp1, slong * alloc,
    prods[0] = 1;
    for (i = 1; i <= num; i++)
      prods[i] = mults[i - 1]*prods[i - 1];
-   
+
    /* for each coeff in array */
    for (i = prods[num] - 1; i >= 0; i--)
    {
@@ -303,7 +303,7 @@ slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1, ulong ** exp1, slong * alloc,
          _fmpz_mpoly_fit_length(&p1, &e1, alloc, k + 1, 1);
 
          exp = 0;
-         
+
          /* compute exponent from index */
          for (j = 0; j < num; j++)
             exp += (i % prods[j + 1])/prods[j] << bits*j;
@@ -313,7 +313,7 @@ slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
          /* set coefficient */
          fmpz_set_signed_uiui(p1 + k, c[1], c[0]);
-         
+
          k++;
       }
    }
@@ -336,7 +336,7 @@ slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1, ulong ** exp1, slong * alloc,
    mults. Exponents are assumed to be packed into a single word. The
    array, poly2 is assumed to have three words per coefficient.
 */
-slong _fmpz_mpoly_from_ulong_array1(fmpz ** poly1, ulong ** exp1, slong * alloc, 
+slong _fmpz_mpoly_from_ulong_array1(fmpz ** poly1, ulong ** exp1, slong * alloc,
               ulong * poly2, const slong * mults, slong num, slong bits, slong k)
 {
    slong i, j;
@@ -370,17 +370,17 @@ slong _fmpz_mpoly_from_ulong_array1(fmpz ** poly1, ulong ** exp1, slong * alloc,
          _fmpz_mpoly_fit_length(&p1, &e1, alloc, k + 1, 1);
 
          exp = 0;
-         
+
          /* compute exponent from index */
          for (j = 0; j < num; j++)
             exp += (i % prods[j + 1])/prods[j] << bits*j;
 
          /* shift exponent vector into place */
          e1[k] = exp;
-         
+
          /* set coefficient */
          fmpz_set_si(p1 + k, c[0]);
-         
+
          k++;
       }
    }
@@ -404,7 +404,7 @@ slong _fmpz_mpoly_from_ulong_array1(fmpz ** poly1, ulong ** exp1, slong * alloc,
    array, poly2 has no restrictions with respect to coefficients; they
    may be multiprecision integers.
 */
-slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1, ulong ** exp1, slong * alloc, 
+slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
                fmpz * poly2, const slong * mults, slong num, slong bits, slong k)
 {
    slong i, j;
@@ -438,14 +438,14 @@ slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
          _fmpz_mpoly_fit_length(&p1, &e1, alloc, k + 1, 1);
 
          exp = 0;
-         
+
          /* compute exponent from index */
          for (j = 0; j < num; j++)
             exp += (i % prods[j + 1])/prods[j] << bits*j;
 
          /* shift exponent vector into place */
          e1[k] = exp;
-         
+
          /* set coefficient */
          fmpz_set(p1 + k, poly2 + i);
          k++;
@@ -639,7 +639,7 @@ void _fmpz_mpoly_mul_array_chunked_LEX(
                 {
                     if (j < Bl)
                     {
-                        _fmpz_mpoly_addmul_array1_slong1(coeff_array, 
+                        _fmpz_mpoly_addmul_array1_slong1(coeff_array,
                             (slong *) A->coeffs + Amain[i],
                                 Apexp + Amain[i], Amain[i + 1] - Amain[i],
                             (slong *) B->coeffs + Bmain[j],
@@ -657,7 +657,7 @@ void _fmpz_mpoly_mul_array_chunked_LEX(
                 {
                     if (j < Bl)
                     {
-                        _fmpz_mpoly_addmul_array1_slong2(coeff_array, 
+                        _fmpz_mpoly_addmul_array1_slong2(coeff_array,
                             (slong *) A->coeffs + Amain[i],
                                     Apexp + Amain[i], Amain[i + 1] - Amain[i],
                             (slong *) B->coeffs + Bmain[j],
@@ -668,14 +668,14 @@ void _fmpz_mpoly_mul_array_chunked_LEX(
                 Plen = fmpz_mpoly_append_array_sm2_LEX(P, Plen, coeff_array,
                                           mults, num, array_size, Pl - Pi - 1);
 
-            } else 
+            } else
             {
                 /* fits into three word */
                 for (i = 0, j = Pi; i < Al && j >= 0; i++, j--)
                 {
                     if (j < Bl)
                     {
-                        _fmpz_mpoly_addmul_array1_slong(coeff_array, 
+                        _fmpz_mpoly_addmul_array1_slong(coeff_array,
                             (slong *) A->coeffs + Amain[i],
                                     Apexp + Amain[i], Amain[i + 1] - Amain[i],
                             (slong *) B->coeffs + Bmain[j],
@@ -702,7 +702,7 @@ void _fmpz_mpoly_mul_array_chunked_LEX(
             {
                 if (j < Bl)
                 {
-                    _fmpz_mpoly_addmul_array1_fmpz(coeff_array, 
+                    _fmpz_mpoly_addmul_array1_fmpz(coeff_array,
                         A->coeffs + Amain[i],
                             Apexp + Amain[i], Amain[i + 1] - Amain[i],
                         B->coeffs + Bmain[j],
@@ -1072,9 +1072,9 @@ void _fmpz_mpoly_mul_array_chunked_DEG(
     slong Abits, * Asum, * Amax, Bbits, * Bsum, * Bmax;
     slong * Amain, * Bmain;
     ulong * Apexp, * Bpexp;
-    slong (* upack_sm1)(fmpz_mpoly_t, slong, ulong *, slong, slong, slong); 
-    slong (* upack_sm2)(fmpz_mpoly_t, slong, ulong *, slong, slong, slong); 
-    slong (* upack_sm3)(fmpz_mpoly_t, slong, ulong *, slong, slong, slong); 
+    slong (* upack_sm1)(fmpz_mpoly_t, slong, ulong *, slong, slong, slong);
+    slong (* upack_sm2)(fmpz_mpoly_t, slong, ulong *, slong, slong, slong);
+    slong (* upack_sm3)(fmpz_mpoly_t, slong, ulong *, slong, slong, slong);
     slong (* upack_fmpz)(fmpz_mpoly_t, slong, fmpz *, slong, slong, slong);
     TMP_INIT;
 
@@ -1167,7 +1167,7 @@ void _fmpz_mpoly_mul_array_chunked_DEG(
                 {
                     if (j < Bl)
                     {
-                        _fmpz_mpoly_addmul_array1_slong1(coeff_array, 
+                        _fmpz_mpoly_addmul_array1_slong1(coeff_array,
                             (slong *) A->coeffs + Amain[i],
                                 Apexp + Amain[i], Amain[i + 1] - Amain[i],
                             (slong *) B->coeffs + Bmain[j],
@@ -1183,7 +1183,7 @@ void _fmpz_mpoly_mul_array_chunked_DEG(
                 {
                     if (j < Bl)
                     {
-                        _fmpz_mpoly_addmul_array1_slong2(coeff_array, 
+                        _fmpz_mpoly_addmul_array1_slong2(coeff_array,
                             (slong *) A->coeffs + Amain[i],
                                 Apexp + Amain[i], Amain[i + 1] - Amain[i],
                             (slong *) B->coeffs + Bmain[j],
@@ -1200,7 +1200,7 @@ void _fmpz_mpoly_mul_array_chunked_DEG(
                 {
                     if (j < Bl)
                     {
-                        _fmpz_mpoly_addmul_array1_slong(coeff_array, 
+                        _fmpz_mpoly_addmul_array1_slong(coeff_array,
                             (slong *) A->coeffs + Amain[i],
                                 Apexp + Amain[i], Amain[i + 1] - Amain[i],
                             (slong *) B->coeffs + Bmain[j],
@@ -1225,7 +1225,7 @@ void _fmpz_mpoly_mul_array_chunked_DEG(
             {
                 if (j < Bl)
                 {
-                    _fmpz_mpoly_addmul_array1_fmpz(coeff_array, 
+                    _fmpz_mpoly_addmul_array1_fmpz(coeff_array,
                         A->coeffs + Amain[i],
                             Apexp + Amain[i], Amain[i + 1] - Amain[i],
                         B->coeffs + Bmain[j],

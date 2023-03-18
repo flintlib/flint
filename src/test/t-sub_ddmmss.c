@@ -16,7 +16,7 @@ int main(void)
 {
    int i, result;
    FLINT_TEST_INIT(state);
-   
+
 
    flint_printf("sub_ddmmss....");
    fflush(stdout);
@@ -34,7 +34,7 @@ int main(void)
           sub_ddmmss(dh1, dl1, (slong) mh, (slong) ml, (slong) sh, (slong) sl);
       else
           sub_ddmmss(dh1, dl1, mh, ml, sh, sl);
-      
+
       dl2 = ml - sl;
       dh2 = -(sl > ml);
       dh2 += mh;
@@ -45,7 +45,7 @@ int main(void)
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("mh = %wu, ml = %wu, sh = %wu, sl = %wu\n", mh, ml, sh, sl); 
+         flint_printf("mh = %wu, ml = %wu, sh = %wu, sl = %wu\n", mh, ml, sh, sl);
          flint_printf("dh2 = %wu, dh1 = %wu, dl2 = %wu, dl1 = %wu\n", dh2, dh1, dl2, dl1);
          fflush(stdout);
          flint_abort();
@@ -53,7 +53,7 @@ int main(void)
    }
 
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

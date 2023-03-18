@@ -22,7 +22,7 @@ main(void)
 {
     int iter;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("factor_berlekamp....");
     fflush(stdout);
@@ -41,9 +41,9 @@ main(void)
         nmod_poly_init(poly, modulus);
         nmod_poly_init(quot, modulus);
         nmod_poly_init(rem, modulus);
-     
+
         length = n_randint(state, 10) + 2;
-        do 
+        do
         {
             nmod_poly_randtest(pol1, state, length);
             if (pol1->length)
@@ -54,10 +54,10 @@ main(void)
         num = n_randint(state, 5) + 1;
         for (i = 1; i < num; i++)
         {
-            do 
+            do
             {
                 length = n_randint(state, 10) + 2;
-                nmod_poly_randtest(poly, state, length); 
+                nmod_poly_randtest(poly, state, length);
                 if (poly->length)
                 {
                     nmod_poly_make_monic(poly, poly);
@@ -68,7 +68,7 @@ main(void)
                 || (rem->length == 0));
             nmod_poly_mul(pol1, pol1, poly);
         }
-     
+
         nmod_poly_factor_init(res);
         nmod_poly_factor_berlekamp(res, pol1);
 
@@ -79,7 +79,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-      
+
         nmod_poly_clear(quot);
         nmod_poly_clear(rem);
         nmod_poly_clear(pol1);
@@ -88,7 +88,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

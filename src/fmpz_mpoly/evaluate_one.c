@@ -194,7 +194,7 @@ static int _fmpz_mpoly_evaluate_one_fmpz_mp(
     TMP_START;
 
     fmpz_init(k);
-    
+
     if (A != B)
         fmpz_mpoly_fit_length_reset_bits(A, Blen, bits, ctx);
 

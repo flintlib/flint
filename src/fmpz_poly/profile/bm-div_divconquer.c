@@ -53,11 +53,11 @@ main(void)
     double X[rows][cols];
     fmpz_poly_t f, g, q, r;
     gmp_randstate_t state;
-    
+
     gmp_randinit_default(state);
     gmp_randseed_ui(state, UWORD(362436069));
     srand(UWORD(521288629));
-        
+
     fmpz_poly_init(f);
     fmpz_poly_init(g);
     fmpz_poly_init(q);
@@ -67,7 +67,7 @@ main(void)
     fmpz_poly_fit_length(g, lenhi);
     fmpz_poly_fit_length(q, lenhi);
     fmpz_poly_fit_length(r, 2 * lenhi - 1);
-    
+
     flint_printf("3 2 1");
     for (len = lenlo, j = 0; len <= lenhi; len += lenh, j++)
     {
@@ -75,12 +75,12 @@ main(void)
         {
             int n, reps = 0;
             slong s = WORD(0);
-            
+
             for (n = 0; n < ncases; n++)
             {
                 clock_t c0, c1;
                 int l, loops = 1;
-                
+
                 /*
                    Construct random polynomials f and g
                  */
@@ -88,7 +88,7 @@ main(void)
                     fmpz_poly_gmprand(f, state, 2*len - 1, bits);
                     fmpz_poly_gmprand(g, state, len, bits);
                 }
-                
+
               loop:
 
                 c0 = clock();
@@ -119,7 +119,7 @@ main(void)
     fmpz_poly_clear(g);
     fmpz_poly_clear(q);
     fmpz_poly_clear(r);
-    
+
     for (i = 0; i < rows; i++)
     {
         for (j = 0; j < cols; j++)

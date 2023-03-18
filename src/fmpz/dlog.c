@@ -32,7 +32,7 @@ fmpz_dlog(const fmpz_t x)
         slong e;
 #else
         long e;
-#endif        
+#endif
         s = mpz_get_d_2exp(&e, COEFF_TO_PTR(*x));
 #endif
         return log(s) + e * 0.69314718055994530942;

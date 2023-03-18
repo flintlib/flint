@@ -16,7 +16,7 @@ int main(void)
 {
    int i, result;
    FLINT_TEST_INIT(state);
-   
+
 
    flint_printf("add_ssaaaa....");
    fflush(stdout);
@@ -34,7 +34,7 @@ int main(void)
          add_ssaaaa(sh1, sl1, (slong) ah1, (slong) al1, (slong) ah2, (slong) al2);
       else
          add_ssaaaa(sh1, sl1, ah1, al1, ah2, al2);
-      
+
       sl2 = al1 + al2;
       sh2 = (sl1 < al1);
       sh2 += ah1;
@@ -44,7 +44,7 @@ int main(void)
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("ah1 = %wu, al1 = %wu, ah2 = %wu, al1 = %wu\n", ah1, al1, ah2, al1); 
+         flint_printf("ah1 = %wu, al1 = %wu, ah2 = %wu, al1 = %wu\n", ah1, al1, ah2, al1);
          flint_printf("sh2 = %wu, sh1 = %wu, sl2 = %wu, sl1 = %wu\n", sh2, sh1, sl2, sl1);
          fflush(stdout);
          flint_abort();
@@ -52,7 +52,7 @@ int main(void)
    }
 
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

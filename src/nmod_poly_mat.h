@@ -13,7 +13,7 @@
 #define NMOD_POLY_MAT_H
 
 #ifdef NMOD_POLY_MAT_INLINES_C
-#define NMOD_POLY_MAT_INLINE 
+#define NMOD_POLY_MAT_INLINE
 #else
 #define NMOD_POLY_MAT_INLINE static __inline__
 #endif

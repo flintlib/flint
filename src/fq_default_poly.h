@@ -14,7 +14,7 @@
 #define FQ_DEFAULT_POLY_H
 
 #ifdef FQ_DEFAULT_POLY_INLINES_C
-#define FQ_DEFAULT_POLY_INLINE 
+#define FQ_DEFAULT_POLY_INLINE
 #else
 #define FQ_DEFAULT_POLY_INLINE static __inline__
 #endif
@@ -67,7 +67,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_init(fq_default_poly_t poly,
     else
     {
         fq_poly_init(poly->fq, ctx->ctx.fq);
-    } 
+    }
 }
 
 FQ_DEFAULT_POLY_INLINE void fq_default_poly_init2(fq_default_poly_t poly,
@@ -757,7 +757,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_set_coeff(fq_default_poly_t poly,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void 
+FQ_DEFAULT_POLY_INLINE void
 fq_default_poly_set_coeff_fmpz(fq_default_poly_t poly,
                            slong n, const fmpz_t x, const fq_default_ctx_t ctx)
 {
@@ -1865,8 +1865,8 @@ fq_default_poly_inv_series(fq_default_poly_t Qinv,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_div_series(fq_default_poly_t Q, 
-               const fq_default_poly_t A, const fq_default_poly_t B, 
+FQ_DEFAULT_POLY_INLINE void fq_default_poly_div_series(fq_default_poly_t Q,
+               const fq_default_poly_t A, const fq_default_poly_t B,
                                            slong n, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
@@ -2033,7 +2033,7 @@ int fq_default_poly_sqrt(fq_default_poly_t rop,
         return fq_poly_sqrt(rop->fq, op->fq, ctx->ctx.fq);
     }
 }
-                                    
+
 /*  Evaluation  **************************************************************/
 
 FQ_DEFAULT_POLY_INLINE
@@ -2322,8 +2322,8 @@ void fq_default_mat_charpoly(fq_default_poly_t p,
 
 /* Minimal polynomial ********************************************************/
 
-FQ_DEFAULT_POLY_INLINE 
-void fq_default_mat_minpoly(fq_default_poly_t p, 
+FQ_DEFAULT_POLY_INLINE
+void fq_default_mat_minpoly(fq_default_poly_t p,
                           const fq_default_mat_t X, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)

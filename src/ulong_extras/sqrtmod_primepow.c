@@ -12,7 +12,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp) 
+slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
 {
     mp_limb_t r = (a & 1);
     mp_limb_t * s;
@@ -38,14 +38,14 @@ slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
     if (exp == 2) /* special case mod 4 */
     {
         r = (a & 3);
-        
+
         if (r < 2) /* 0, 1 mod 4 */
         {
            *sqrt = flint_malloc(sizeof(mp_limb_t)*2);
 
            (*sqrt)[0] = r;
            (*sqrt)[1] = r + 2;
-           
+
            return 2;
         } else /* 2, 3 mod 4 */
         {
@@ -72,25 +72,25 @@ slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
         for (ex = 3; ex < exp; ex++, pow *= 2) /* lift roots */
         {
             i = 0;
-            
+
             r = roots[0];
             if (((r*r) & (2*pow - 1)) == (a & (2*pow - 1)))
                roots[i++] = r;
-               
+
             r = pow - r;
             if (((r*r) & (2*pow - 1)) == (a & (2*pow - 1)))
             {
                roots[i++] = r;
                if (i == 2) continue;
             }
-               
+
             r = roots[1];
             if (((r*r) & (2*pow - 1)) == (a & (2*pow - 1)))
             {
                roots[i++] = r;
                if (i == 2) continue;
             }
-               
+
             r = pow - r;
             roots[i] = r;
         }
@@ -101,19 +101,19 @@ slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
         (*sqrt)[1] = pow - roots[0];
         (*sqrt)[2] = roots[1];
         (*sqrt)[3] = pow - roots[1];
-        
-        return 4;        
+
+        return 4;
     } else /* a is even */
     {
         slong i, k, num, pow;
-        
+
         for (k = 2; k <= exp; k++) /* find highest power of 2 dividing a */
         {
             if (a & ((UWORD(1)<<k) - 1))
                 break;
         }
         k--;
-        
+
         if (a == 0)
         {
            a = (UWORD(1)<<(exp - k/2));
@@ -131,17 +131,17 @@ slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
             *sqrt = NULL;
             return 0;
         }
-        
+
         pow = (UWORD(1)<<k);
 
         exp -= k;
         a /= pow;
 
         num = n_sqrtmod_2pow(&s, a, exp); /* divide through by 2^k and recurse */
-        
+
         a = (UWORD(1)<<(k/2));
         r = a*(UWORD(1)<<exp);
-        
+
         if (num == 0) /* check that roots were actually returned */
         {
             *sqrt = NULL;
@@ -186,7 +186,7 @@ slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
     }
 }
 
-slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp) 
+slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp)
 {
     mp_limb_t r, ex, pow, k, a1, pinv, powinv;
     mp_limb_t * s;
@@ -212,7 +212,7 @@ slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp)
     if (exp == 1) /* special case, roots mod p */
     {
         r = n_sqrtmod(a, p);
-        
+
         if (r == 0 && a != 0)
         {
             *sqrt = NULL;
@@ -222,7 +222,7 @@ slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp)
         *sqrt = flint_malloc(sizeof(mp_limb_t)*(1 + (r != 0)));
         (*sqrt)[0] = r;
         if (r) (*sqrt)[1] = p - r;
-       
+
         return 1 + (r != 0);
     }
 
@@ -235,7 +235,7 @@ slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp)
         *sqrt = NULL;
         return 0;
     }
-    
+
     if (r) /* gcd(a, p) = 1, p is odd, lift r and p - r */
     {
         for (ex = 1, pow = p; ex < exp; ex++, pow *= p) /* lift root */
@@ -270,7 +270,7 @@ slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp)
 
             if (a % pow2 != 0)
                 break;
-            
+
             pow = pow2;
         }
 
@@ -305,13 +305,13 @@ slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp)
 
         a = n_pow(p, k/2);
         r = a*n_pow(p, exp);
-        
+
         s[0] *= a; /* multiply roots by p^(k/2) */
         s[1] *= a;
-        
+
         s = flint_realloc(s, 2*a*sizeof(mp_limb_t));
 
-        for (i = 1; i < a; i++) 
+        for (i = 1; i < a; i++)
         {
             s[2*i] = s[2*i - 2] + r;
             s[2*i + 1] = s[2*i - 1] + r;

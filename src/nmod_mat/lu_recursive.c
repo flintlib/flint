@@ -40,7 +40,7 @@ _apply_permutation(slong * AP, nmod_mat_t A, slong * P,
 }
 
 
-slong 
+slong
 nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check)
 {
     slong i, j, m, n, r1, r2, n1;

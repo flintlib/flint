@@ -56,7 +56,7 @@ fmpz_mod_mat_is_in_howell_form(const fmpz_mod_mat_t A)
         if (!fmpz_mat_is_zero_row(A->mat, i))
         {
             if (prevrowzero)
-            {  
+            {
                 flint_free(pivots);
                 return 0;
             }
@@ -134,7 +134,7 @@ fmpz_mod_mat_is_in_howell_form(const fmpz_mod_mat_t A)
             _fmpz_vec_clear(extra_row, A->mat->c);
             flint_free(pivots);
             fmpz_clear(g);
-            return 0; 
+            return 0;
         }
     }
     _fmpz_vec_clear(extra_row, A->mat->c);
@@ -265,7 +265,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

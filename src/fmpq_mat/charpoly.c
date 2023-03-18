@@ -48,7 +48,7 @@ void _fmpq_mat_charpoly(fmpz * coeffs, fmpz_t den, const fmpq_mat_t mat)
    }
 
    fmpz_mul(coeffs + n, coeffs + n, den);
-      
+
    fmpz_mat_clear(zmat);
    fmpz_clear(p);
 }

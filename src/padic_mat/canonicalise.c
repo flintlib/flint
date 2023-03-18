@@ -13,7 +13,7 @@
 #include "padic_poly.h"
 #include "padic_mat.h"
 
-static void 
+static void
 _padic_mat_canonicalise_fmpz(fmpz *vec, slong len, slong *val, const fmpz_t p)
 {
     int nonzero = 0;
@@ -56,7 +56,7 @@ _padic_mat_canonicalise_fmpz(fmpz *vec, slong len, slong *val, const fmpz_t p)
     }
 }
 
-static void 
+static void
 _padic_mat_canonicalise_si(fmpz *vec, slong len, slong *val, slong p)
 {
     int nonzero = 0;
@@ -103,14 +103,14 @@ void _padic_mat_canonicalise(padic_mat_t A, const padic_ctx_t ctx)
 {
     if (COEFF_IS_MPZ(*(ctx->p)))
     {
-        _padic_mat_canonicalise_fmpz(padic_mat(A)->entries, 
-                                     padic_mat(A)->r * padic_mat(A)->c, 
+        _padic_mat_canonicalise_fmpz(padic_mat(A)->entries,
+                                     padic_mat(A)->r * padic_mat(A)->c,
                                      &(A->val), ctx->p);
     }
     else
     {
-        _padic_mat_canonicalise_si(padic_mat(A)->entries, 
-                                   padic_mat(A)->r * padic_mat(A)->c, 
+        _padic_mat_canonicalise_si(padic_mat(A)->entries,
+                                   padic_mat(A)->r * padic_mat(A)->c,
                                    &(A->val), *(ctx->p));
     }
 }

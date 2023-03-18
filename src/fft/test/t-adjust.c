@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2009, 2011 William Hart
 
     This file is part of FLINT.
@@ -32,20 +32,20 @@ main(void)
     mp_size_t c, bits, j, k, n, w, limbs;
     mpz_t p, m2a, m2b, mn1;
     mp_limb_t * nn1, * r1;
-   
+
     FLINT_TEST_INIT(state);
 
     flint_printf("adjust....");
     fflush(stdout);
 
-    
+
     _flint_rand_init_gmp(state);
 
     mpz_init(p);
     mpz_init(m2a);
     mpz_init(m2b);
     mpz_init(mn1);
-   
+
     for (bits = FLINT_BITS; bits < 20*FLINT_BITS; bits += FLINT_BITS)
     {
         for (j = 1; j < 10; j++)
@@ -60,20 +60,20 @@ main(void)
                 for (c = 0; c < n; c++)
                 {
                     set_p(p, n, w);
-                    
+
                     nn1 = flint_malloc((limbs+1)*sizeof(mp_limb_t));
                     r1 = flint_malloc((limbs+1)*sizeof(mp_limb_t));
 
-                    random_fermat(nn1, state, limbs); 
+                    random_fermat(nn1, state, limbs);
                     fermat_to_mpz(mn1, nn1, limbs);
                     ref_adjust(m2a, mn1, p, c, w);
-            
+
                     fft_adjust(r1, nn1, c, limbs, w);
                     fermat_to_mpz(m2b, r1, limbs);
-                    
+
                     mpz_mod(m2a, m2a, p);
                     mpz_mod(m2b, m2b, p);
-                    
+
                     if (mpz_cmp(m2a, m2a) != 0)
                     {
                         flint_printf("FAIL:\n");
@@ -85,7 +85,7 @@ main(void)
                         fflush(stdout);
                         flint_abort();
                     }
-                    
+
                     flint_free(nn1);
                     flint_free(r1);
                 }
@@ -99,7 +99,7 @@ main(void)
     mpz_clear(mn1);
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -28,7 +28,7 @@ compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_primes)
     n_primes_t iter;
 
     /* (re)allocate space for factor base */
-    
+
     factor_base = (prime_t *) flint_realloc(qs_inf->factor_base,
                                           num_primes*sizeof(prime_t));
     qs_inf->factor_base = factor_base;
@@ -121,7 +121,7 @@ mp_limb_t qsieve_primes_init(qs_t qs_inf)
 
     qs_inf->sieve_size = qsieve_tune[i][4]; /* size of sieve to use */
     qs_inf->small_primes = qsieve_tune[i][3]; /* number of primes to not sieve with */
-    
+
     bits = qsieve_tune[i][5];
     if (bits >= 64)
     {
@@ -140,12 +140,12 @@ mp_limb_t qsieve_primes_init(qs_t qs_inf)
     }
 
     /* build up FB */
-    factor_base = compute_factor_base(&small_factor, qs_inf, num_primes + qs_inf->ks_primes); 
+    factor_base = compute_factor_base(&small_factor, qs_inf, num_primes + qs_inf->ks_primes);
     if (small_factor)
         return small_factor;
 
     qs_inf->num_primes = num_primes;
-    
+
     /* calculating optimal A coefficient size for hypercube */
     fmpz_init(qs_inf->target_A);
     fmpz_mul_2exp(qs_inf->target_A, qs_inf->kn, 1);
@@ -169,17 +169,17 @@ mp_limb_t qsieve_primes_increment(qs_t qs_inf, mp_limb_t delta)
 {
     slong num_primes = qs_inf->num_primes + delta;
     mp_limb_t small_factor = 0;
-    
+
     compute_factor_base(&small_factor, qs_inf, num_primes + qs_inf->ks_primes);
 
     /* calculating optimal A coefficient size for hypercube */
     fmpz_init(qs_inf->target_A);
     fmpz_mul_2exp(qs_inf->target_A, qs_inf->kn, 1);
     fmpz_sqrt(qs_inf->target_A, qs_inf->target_A);
-    fmpz_tdiv_q_ui(qs_inf->target_A, qs_inf->target_A, qs_inf->sieve_size/2); 
+    fmpz_tdiv_q_ui(qs_inf->target_A, qs_inf->target_A, qs_inf->sieve_size/2);
 
     qs_inf->num_primes = num_primes;
-    
+
     if (small_factor)
         return small_factor;
 

@@ -23,7 +23,7 @@ main(void)
     flint_printf("bit_pack/bit_unpack....");
     fflush(stdout);
 
-    
+
 
     for (i = 0; i < 2000 * flint_test_multiplier(); i++)
     {
@@ -187,7 +187,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -107,7 +107,7 @@ int _padic_fprint(FILE * file, const fmpz_t u, slong v, const padic_ctx_t ctx)
                 }
             }
         }
-        
+
         fmpz_clear(x);
         fmpz_clear(d);
     }
@@ -123,7 +123,7 @@ int _padic_fprint(FILE * file, const fmpz_t u, slong v, const padic_ctx_t ctx)
             fputc('*', file);
             fmpz_fprint(file, p);
         }
-        else 
+        else
         {
             fmpz_fprint(file, u);
             fputc('*', file);

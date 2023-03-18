@@ -49,7 +49,7 @@ int main()
         GR_TMP_INIT4(fx, gx, hx, y, ctx);
 
         status |= _gr_vec_randtest(x, state, n, ctx);
- 
+
         fmpz_mpoly_randtest_bound(f, state, 1 + n_randint(state, 30), 10, 1 + n_randint(state, 6), mctx);
         fmpz_mpoly_randtest_bound(g, state, 1 + n_randint(state, 30), 10, 1 + n_randint(state, 6), mctx);
         fmpz_mpoly_add(h, f, g, mctx);

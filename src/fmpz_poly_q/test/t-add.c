@@ -24,7 +24,7 @@ main(void)
     flint_printf("add... ");
     fflush(stdout);
 
-    
+
 
     /* Check aliasing of a and c */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -101,7 +101,7 @@ main(void)
         fmpz_poly_q_add(c, a, b);
         fmpz_poly_q_add(d, b, a);
 
-        result = fmpz_poly_q_equal(c, d) && fmpz_poly_q_is_canonical(c) 
+        result = fmpz_poly_q_equal(c, d) && fmpz_poly_q_is_canonical(c)
                                          && fmpz_poly_q_is_canonical(d);
         if (!result)
         {
@@ -121,7 +121,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

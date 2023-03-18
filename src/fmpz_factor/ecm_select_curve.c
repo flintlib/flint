@@ -14,7 +14,7 @@
 #include "mpn_extras.h"
 
 /* Select Montgomery Elliptic Curve given a sigma
-   (Suyama's parameterization) 
+   (Suyama's parameterization)
    Returns 1 in case factor is found while selecting
    the curve. */
 
@@ -74,7 +74,7 @@ fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
                              n, ecm_inf->ninv, ecm_inf->normbits);
 
     mpn_sub_n(temp, temp, ecm_inf->one, ecm_inf->n_size); /* temp = (4 << norm) */
-    
+
     flint_mpn_mulmod_preinvn(ecm_inf->t, ecm_inf->w, temp, ecm_inf->n_size,
                              n, ecm_inf->ninv, ecm_inf->normbits);
 
@@ -113,7 +113,7 @@ fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
 
     gcdlimbs = mpn_gcdext(tempf, tempi, &invlimbs, tempv, sz, tempn, ecm_inf->n_size);
 
-    if (!(gcdlimbs == 1 && tempf[0] == ecm_inf->one[0]) && 
+    if (!(gcdlimbs == 1 && tempf[0] == ecm_inf->one[0]) &&
         !(gcdlimbs == ecm_inf->n_size && mpn_cmp(tempf, n, ecm_inf->n_size) == 0))
     {
         /* Found factor */
@@ -176,6 +176,6 @@ fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
     cleanup:
 
     TMP_END;
-    
+
     return ret;
 }

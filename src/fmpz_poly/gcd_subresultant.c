@@ -16,7 +16,7 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1, slong len1, 
+_fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1, slong len1,
                                         const fmpz * poly2, slong len2)
 {
     if (len2 == 1)
@@ -127,11 +127,11 @@ fmpz_poly_gcd_subresultant(fmpz_poly_t res, const fmpz_poly_t poly1,
     {
         const slong len1 = poly1->length;
         const slong len2 = poly2->length;
-        
+
         if (len1 == 0) /* len1 = len2 = 0 */
         {
             fmpz_poly_zero(res);
-        } 
+        }
         else if (len2 == 0) /* len1 > len2 = 0 */
         {
             if (fmpz_sgn(poly1->coeffs + (len1 - 1)) > 0)
@@ -142,12 +142,12 @@ fmpz_poly_gcd_subresultant(fmpz_poly_t res, const fmpz_poly_t poly1,
         else /* len1 >= len2 >= 1 */
         {
             /* underscore code automatically handles aliasing */
-           
+
             fmpz_poly_fit_length(res, len2);
-                
+
             _fmpz_poly_gcd_subresultant(res->coeffs, poly1->coeffs, len1,
                                     poly2->coeffs, len2);
-    
+
             _fmpz_poly_set_length(res, len2);
             _fmpz_poly_normalise(res);
         }

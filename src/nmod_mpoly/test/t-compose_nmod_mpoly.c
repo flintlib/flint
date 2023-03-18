@@ -123,7 +123,7 @@ main(void)
         C = (nmod_mpoly_struct **) flint_malloc(nvarsB * sizeof(nmod_mpoly_struct *));
         for (v = 0; v < nvarsB; v++)
         {
-            C[v] = (nmod_mpoly_struct *) flint_malloc(sizeof(nmod_mpoly_struct)); 
+            C[v] = (nmod_mpoly_struct *) flint_malloc(sizeof(nmod_mpoly_struct));
             nmod_mpoly_init(C[v], ctxAC);
         }
 
@@ -208,9 +208,9 @@ main(void)
         vals1 = (nmod_mpoly_struct **) flint_malloc(nvars*sizeof(nmod_mpoly_struct *));
         for (v = 0; v < nvars; v++)
         {
-            vals1[v] = (nmod_mpoly_struct *) flint_malloc(sizeof(nmod_mpoly_struct)); 
+            vals1[v] = (nmod_mpoly_struct *) flint_malloc(sizeof(nmod_mpoly_struct));
             nmod_mpoly_init(vals1[v], ctx);
-            nmod_mpoly_gen(vals1[v], v, ctx);            
+            nmod_mpoly_gen(vals1[v], v, ctx);
         }
 
         nmod_mpoly_init(f, ctx);
@@ -255,7 +255,7 @@ main(void)
         for (v = 0; v < nvars; v++)
         {
             nmod_mpoly_clear(vals1[v], ctx);
-            flint_free(vals1[v]);            
+            flint_free(vals1[v]);
         }
         flint_free(vals1);
 
@@ -300,7 +300,7 @@ main(void)
         for (v = 0; v < nvars1; v++)
         {
             vals1[v] = (nmod_mpoly_struct *) flint_malloc(
-                                                    sizeof(nmod_mpoly_struct)); 
+                                                    sizeof(nmod_mpoly_struct));
             nmod_mpoly_init(vals1[v], ctx2);
             nmod_mpoly_randtest_bound(vals1[v], state, len2, exp_bits2, ctx2);
         }
@@ -398,7 +398,7 @@ main(void)
         for (v = 0; v < nvars1; v++)
         {
             vals1[v] = (nmod_mpoly_struct *) flint_malloc(
-                                                    sizeof(nmod_mpoly_struct)); 
+                                                    sizeof(nmod_mpoly_struct));
             nmod_mpoly_init(vals1[v], ctx2);
             vals2[v] = n_randlimb(state);
             nmod_mpoly_set_ui(vals1[v], vals2[v], ctx2);

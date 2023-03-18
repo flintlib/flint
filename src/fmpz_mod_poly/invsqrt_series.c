@@ -15,8 +15,8 @@
 #include "fmpz.h"
 #include "ulong_extras.h"
 
-static void 
-__fmpz_mod_poly_invsqrt_series_prealloc(fmpz * g, 
+static void
+__fmpz_mod_poly_invsqrt_series_prealloc(fmpz * g,
                                     const fmpz * h, fmpz * t, fmpz * u,
                                     slong n, const fmpz_mod_ctx_t mod)
 {
@@ -111,7 +111,7 @@ void fmpz_mod_poly_invsqrt_series(fmpz_mod_poly_t g, const fmpz_mod_poly_t h, sl
         fmpz_mod_poly_swap(g, t1, ctx);
         fmpz_mod_poly_clear(t1, ctx);
     }
-    
+
     g->length = n;
 
     if (hlen < n)

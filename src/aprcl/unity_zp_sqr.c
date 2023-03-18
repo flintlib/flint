@@ -89,6 +89,6 @@ unity_zp_sqr_inplace(unity_zp f, const unity_zp g, fmpz_t * t)
     }
 
     /* traditional squaring */
-    unity_zp_sqr(f, g);      
+    unity_zp_sqr(f, g);
 }
 

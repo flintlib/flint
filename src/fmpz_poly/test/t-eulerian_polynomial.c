@@ -18,7 +18,7 @@ int main()
     ulong n, ix, mx;
     fmpz_t sum, fac;
     fmpz_poly_t poly;
-    
+
     FLINT_TEST_INIT(state);
 
     flint_printf("eulerian_polynomial....");

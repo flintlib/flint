@@ -135,7 +135,7 @@ _aprcl_config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n)
 
         if (ind == -1)
             break;
-        
+
         fmpz_pow_ui(p, conf->qs->p + ind, conf->qs->exp[ind]);
         fmpz_fdiv_q(new_s, conf->s, p);
         fmpz_set(conf->s, new_s);

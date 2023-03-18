@@ -34,7 +34,7 @@ void check_omega(
     {
         flint_printf("FAIL: %s\ncheck factorization could be computed\n", s);
         fflush(stdout);
-        flint_abort();        
+        flint_abort();
     }
 
     for (i = 0; i < g->num; i++)
@@ -55,7 +55,7 @@ void check_omega(
     {
         flint_printf("FAIL: %s\nfactorization has wrong number of factors\n", s);
         fflush(stdout);
-        flint_abort();        
+        flint_abort();
     }
 
     fmpz_mod_mpoly_factor_expand(q, g, ctx);
@@ -63,7 +63,7 @@ void check_omega(
     {
         flint_printf("FAIL: %s\nfactorization does not match\n", s);
         fflush(stdout);
-        flint_abort();        
+        flint_abort();
     }
 
     for (i = 0; i < g->num; i++)
@@ -176,7 +176,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -18,7 +18,7 @@ main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("inv_series_newton....");
     fflush(stdout);
@@ -36,14 +36,14 @@ main(void)
         nmod_poly_init(prod, n);
         nmod_poly_init(qinv, n);
         nmod_poly_init(q, n);
-        
+
         do nmod_poly_randtest(q, state, n_randint(state, 2000));
         while (q->length == 0 || q->coeffs[0] == 0);
 
         m = n_randint(state, q->length) + 1;
 
         nmod_poly_inv_series_newton(qinv, q, m);
-        
+
         nmod_poly_mul(prod, q, qinv);
         nmod_poly_truncate(prod, m);
 
@@ -58,7 +58,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         nmod_poly_clear(q);
         nmod_poly_clear(qinv);
         nmod_poly_clear(prod);
@@ -83,7 +83,7 @@ main(void)
 
         nmod_poly_inv_series_newton(qinv, q, m);
         nmod_poly_inv_series_newton(q, q, m);
-        
+
         result = (nmod_poly_equal(q, qinv));
         if (!result)
         {
@@ -101,7 +101,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

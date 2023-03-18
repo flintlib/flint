@@ -22,7 +22,7 @@ main(void)
     flint_printf("is_prime_pseudosquare....");
     fflush(stdout);
 
-    
+
 
     for (i = 0; i < 100000 * flint_test_multiplier(); i++)
     {
@@ -50,7 +50,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

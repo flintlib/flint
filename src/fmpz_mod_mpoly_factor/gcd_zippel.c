@@ -320,7 +320,7 @@ general_case:
         for (i = 1; i < l; i++)
         {
             _fmpz_mod_vec_mul(fmpz_mod_mat_row_ref(ML + s, i),
-                              fmpz_mod_mat_row_ref(ML + s, i - 1), 
+                              fmpz_mod_mat_row_ref(ML + s, i - 1),
                                          HG->coeffs[s].coeffs, n, ctx->ffinfo);
         }
 
@@ -678,7 +678,7 @@ outer_loop:
 
     Gdeg = fmpz_mod_mpoly_degree_si(Geval, 0, ctx);
 
-    if (Gdeg > Gdegbound)        
+    if (Gdeg > Gdegbound)
         goto outer_loop;
 
     if (Gdeg < Gdegbound)

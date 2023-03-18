@@ -24,7 +24,7 @@ main(void)
     flint_printf("set/equal... ");
     fflush(stdout);
 
-    
+
 
     /* Equal polynomials */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -89,7 +89,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

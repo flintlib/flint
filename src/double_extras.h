@@ -13,7 +13,7 @@
 #define DOUBLE_EXTRAS_H
 
 #ifdef DOUBLE_EXTRAS_INLINES_C
-#define DOUBLE_EXTRAS_INLINE 
+#define DOUBLE_EXTRAS_INLINE
 #else
 #define DOUBLE_EXTRAS_INLINE static __inline__
 #endif

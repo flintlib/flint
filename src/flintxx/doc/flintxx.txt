@@ -591,7 +591,7 @@ Fmpz_mat_expr::binary operation(??) const
 
     The following binary functions are made available as member functions:
     \code{det_modular}, \code{det_modular_accelerated}, \code{divexact},
-    \code{mul_classical}, \code{mul_multi_mod}, \code{pow}, 
+    \code{mul_classical}, \code{mul_multi_mod}, \code{pow},
     code{solve}, \code{solve_bound},
     \code{solve_cramer}, \code{solve_dixon}, \code{solve_fflu}.
 

@@ -19,7 +19,7 @@ void fmpz_poly_divhigh_smodp(fmpz * res, const fmpz_poly_t f,
    fmpz_t d, cinv;
    slong i = 0, k, start = 0, len_g = g->length;
    fmpz_poly_t tf;
-   
+
    fmpz_init(d);
    fmpz_init(cinv);
 
@@ -39,7 +39,7 @@ void fmpz_poly_divhigh_smodp(fmpz * res, const fmpz_poly_t f,
       if (i < f->length - n)
          start++;
 
-      fmpz_mul(res + k, tf->coeffs + i + len_g - 1, cinv); 
+      fmpz_mul(res + k, tf->coeffs + i + len_g - 1, cinv);
 
       fmpz_smod(res + k, res + k, p);
 
@@ -48,7 +48,7 @@ void fmpz_poly_divhigh_smodp(fmpz * res, const fmpz_poly_t f,
       _fmpz_vec_scalar_smod_fmpz(tf->coeffs + i + start,
                                      tf->coeffs + i + start, len_g - start, p);
    }
-   
+
    fmpz_poly_clear(tf);
    fmpz_clear(cinv);
    fmpz_clear(d);

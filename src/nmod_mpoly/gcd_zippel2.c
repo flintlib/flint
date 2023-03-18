@@ -785,7 +785,7 @@ choose_alphas:
                     nmod_mpoly_repack_bits_inplace(rG, bits, ctx);
                     nmod_mpoly_repack_bits_inplace(rBbar, bits, ctx);
                     break;
-                }                
+                }
             }
             else
             {
@@ -821,7 +821,7 @@ choose_alphas:
                     nmod_mpoly_repack_bits_inplace(rG, bits, ctx);
                     nmod_mpoly_repack_bits_inplace(rAbar, bits, ctx);
                     break;
-                }                
+                }
             }
             else
             {
@@ -953,7 +953,7 @@ choose_alphas:
                     goto choose_betas;
 
                 success = n_bpoly_mod_gcd_brown_smprime(Gev, Abarev, Bbarev,
-                                                            Aev, Bev, ctx->mod, St);        
+                                                            Aev, Bev, ctx->mod, St);
                 if (!success)
                     goto cleanup;
 
@@ -1177,7 +1177,7 @@ gcd_is_trivial:
     nmod_mpoly_set(rBbar, B, ctx);
 
     success = 1;
-    
+
     goto cleanup;
 }
 
@@ -1429,7 +1429,7 @@ got_alpha_last:
         if (GdegboundXY == 0)
             goto gcd_is_trivial;
     }
- 
+
     gammaev = fq_nmod_mpoly_get_nonzero_n_fq(gammaevals + m, lgctx);
     n_fq_bpoly_scalar_mul_n_fq(Gev, gammaev, lgctx->fqctx);
 
@@ -2196,7 +2196,7 @@ gcd_is_trivial:
     nmod_mpoly_set(rBbar, B, smctx);
 
     success = 1;
-    
+
     goto cleanup;
 }
 

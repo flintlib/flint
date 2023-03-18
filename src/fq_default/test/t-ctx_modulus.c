@@ -33,7 +33,7 @@ main(void)
 	fmpz_t p;
 
         fmpz_init(p);
-        
+
         fmpz_set_ui(p, 3);
 
         fq_default_ctx_init(ctx, p, 3, "x");
@@ -57,7 +57,7 @@ main(void)
 
         fq_default_ctx_clear(ctx);
     }
-    
+
     /* fq_nmod range */
     for (i = 0; i < 1 * flint_test_multiplier(); i++)
     {

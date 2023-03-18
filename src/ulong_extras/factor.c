@@ -29,7 +29,7 @@ void n_factor(n_factor_t * factors, mp_limb_t n, int proved)
 
    cofactor = n_factor_trial(factors, n, FLINT_FACTOR_TRIAL_PRIMES);
    if (cofactor == UWORD(1)) return;
-   if (is_prime(cofactor, proved)) 
+   if (is_prime(cofactor, proved))
    {
       n_factor_insert(factors, cofactor, UWORD(1));
       return;
@@ -52,7 +52,7 @@ void n_factor(n_factor_t * factors, mp_limb_t n, int proved)
             exp_arr[factors_left - 1] *= exp;
             factor_arr[factors_left - 1] = factor = cofactor;
          }
-           
+
          if ((factor >= cutoff) && !is_prime(factor, proved))
          {
         if ((
@@ -60,7 +60,7 @@ void n_factor(n_factor_t * factors, mp_limb_t n, int proved)
                  (factor < FLINT_FACTOR_ONE_LINE_MAX) &&
 #endif
                  (cofactor = n_factor_one_line(factor, FLINT_FACTOR_ONE_LINE_ITERS)))
-              || (cofactor = n_factor_pp1_wrapper(factor))	
+              || (cofactor = n_factor_pp1_wrapper(factor))
               || (cofactor = n_factor_SQUFOF(factor, FLINT_FACTOR_SQUFOF_ITERS)))
         {
            exp_arr[factors_left] = exp_arr[factors_left - 1];
@@ -82,5 +82,5 @@ void n_factor(n_factor_t * factors, mp_limb_t n, int proved)
      n_factor_insert(factors, factor, exp_arr[factors_left - 1]);
          factors_left--;
       }
-   } 
+   }
 }

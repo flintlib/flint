@@ -20,7 +20,7 @@ main(void)
     flint_printf("add/sub/neg....");
     fflush(stdout);
 
-    
+
 
     for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
     {
@@ -62,7 +62,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

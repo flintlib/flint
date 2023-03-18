@@ -13,7 +13,7 @@
 #define FMPZ_POLY_Q_H
 
 #ifdef FMPZ_POLY_Q_INLINES_C
-#define FMPZ_POLY_Q_INLINE 
+#define FMPZ_POLY_Q_INLINE
 #else
 #define FMPZ_POLY_Q_INLINE static __inline__
 #endif
@@ -43,11 +43,11 @@ void fmpz_poly_q_clear(fmpz_poly_q_t rop);
 /* Randomisation *************************************************************/
 
 void fmpz_poly_q_randtest(fmpz_poly_q_t poly, flint_rand_t state,
-                          slong len1, flint_bitcnt_t bits1, 
+                          slong len1, flint_bitcnt_t bits1,
                           slong len2, flint_bitcnt_t bits2);
 
-void fmpz_poly_q_randtest_not_zero(fmpz_poly_q_t poly, flint_rand_t state, 
-                                   slong len1, flint_bitcnt_t bits1, 
+void fmpz_poly_q_randtest_not_zero(fmpz_poly_q_t poly, flint_rand_t state,
+                                   slong len1, flint_bitcnt_t bits1,
                                    slong len2, flint_bitcnt_t bits2);
 
 /* Assignment ****************************************************************/
@@ -124,10 +124,10 @@ void fmpz_poly_q_scalar_div_mpq(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const
 
 /* Multiplication and division ***********************************************/
 
-void fmpz_poly_q_mul(fmpz_poly_q_t rop, 
+void fmpz_poly_q_mul(fmpz_poly_q_t rop,
                      const fmpz_poly_q_t op1, const fmpz_poly_q_t op2);
 
-void fmpz_poly_q_div(fmpz_poly_q_t rop, 
+void fmpz_poly_q_div(fmpz_poly_q_t rop,
                      const fmpz_poly_q_t op1, const fmpz_poly_q_t op2);
 
 /* Powering ******************************************************************/

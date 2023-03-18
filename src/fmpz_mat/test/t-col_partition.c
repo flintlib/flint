@@ -37,7 +37,7 @@ int main(void)
 
         fmpz_mat_init(A, m, n);
         fmpz_mat_init(B, n, m);
-        
+
         /* set first row */
         for (j = 0; j < n; j++)
            fmpz_randtest(A->rows[0] + j, state, 100);
@@ -72,7 +72,7 @@ int main(void)
            A->rows[r1] = A->rows[r2];
            A->rows[r2] = t;
         }
-           
+
         /* transpose so rows are now columns */
         fmpz_mat_transpose(B, A);
 
@@ -96,7 +96,7 @@ int main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

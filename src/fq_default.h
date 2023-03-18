@@ -14,7 +14,7 @@
 #define FQ_DEFAULT_H
 
 #ifdef FQ_DEFAULT_INLINES_C
-#define FQ_DEFAULT_INLINE 
+#define FQ_DEFAULT_INLINE
 #else
 #define FQ_DEFAULT_INLINE static __inline__
 #endif
@@ -1121,7 +1121,7 @@ FQ_DEFAULT_INLINE void fq_default_set_si(fq_default_t rop,
     }
 }
 
-FQ_DEFAULT_INLINE void fq_default_zero(fq_default_t rop, 
+FQ_DEFAULT_INLINE void fq_default_zero(fq_default_t rop,
 		                                    const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
@@ -1261,7 +1261,7 @@ FQ_DEFAULT_INLINE void fq_default_set_nmod_poly(fq_default_t op,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         op->nmod = nmod_poly_evaluate_nmod(poly, ctx->ctx.nmod.a);
-    }    
+    }
     else
     {
         flint_printf("Impossible conversion\n");
@@ -1403,7 +1403,7 @@ void fq_default_print(const fq_default_t op, const fq_default_ctx_t ctx)
     }
 }
 
-FQ_DEFAULT_INLINE 
+FQ_DEFAULT_INLINE
 int fq_default_fprint_pretty(FILE * file, const fq_default_t op,
 		                                    const fq_default_ctx_t ctx)
 {
@@ -1429,7 +1429,7 @@ int fq_default_fprint_pretty(FILE * file, const fq_default_t op,
     }
 }
 
-FQ_DEFAULT_INLINE 
+FQ_DEFAULT_INLINE
 void fq_default_print_pretty(const fq_default_t op, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)

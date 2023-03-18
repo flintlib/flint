@@ -84,7 +84,7 @@ int main(void)
 
     flint_printf("dedekind_sum....");
     fflush(stdout);
-    
+
     fmpz_init(hh);
     fmpz_init(kk);
     fmpq_init(s1);
@@ -246,7 +246,7 @@ int main(void)
     fmpq_clear(s2);
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

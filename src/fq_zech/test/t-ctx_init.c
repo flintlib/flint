@@ -26,11 +26,11 @@ main(void)
     fq_nmod_t lhs, rhs, one;
     fq_zech_ctx_t ctx;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("ctx_init... ");
 
     fflush(stdout);
-    
+
     fmpz_init(p);
     fmpz_init(e);
 

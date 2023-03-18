@@ -14,7 +14,7 @@
 #define MPF_MAT_H
 
 #ifdef MPF_MAT_INLINES_C
-#define MPF_MAT_INLINE 
+#define MPF_MAT_INLINE
 #else
 #define MPF_MAT_INLINE static __inline__
 #endif
@@ -129,7 +129,7 @@ mpf_mat_swap_rows(mpf_mat_t mat, slong r, slong s)
 
         u = mat->rows[s];
         mat->rows[s] = mat->rows[r];
-        mat->rows[r] = u; 
+        mat->rows[r] = u;
     }
 }
 

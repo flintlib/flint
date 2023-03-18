@@ -287,7 +287,7 @@ cleanup:
         fq_zech_mpolyv_clear(U + i, ctx);
     }
     flint_free(B);
-    
+
     fq_zech_mpoly_clear(t, ctx);
     fq_zech_mpoly_clear(t1, ctx);
     fq_zech_mpoly_clear(t2, ctx);

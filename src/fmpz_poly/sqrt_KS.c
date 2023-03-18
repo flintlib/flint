@@ -43,7 +43,7 @@ _fmpz_poly_sqrt_KS(fmpz *rop, const fmpz *op, slong len)
 
     /* check whether a square root exists modulo 2 */
     m = (len + 1) / 2;
-    
+
     for (i = ((m - 1) | 1); i < len; i += 2)
         if (!fmpz_is_even(op + i))
             return 0;
@@ -82,7 +82,7 @@ _fmpz_poly_sqrt_KS(fmpz *rop, const fmpz *op, slong len)
     rlimbs = mpn_sqrtrem(arr2, arr3, arr, limbs);
 
     loglen = FLINT_BIT_COUNT(len2);
-    
+
     if (rlimbs != 0)
         result = 0;
     else

@@ -209,7 +209,7 @@ void _n_fqp_zip_eval_step(
 /************** vandermonde solving ******************************************/
 
 /*
-    return 
+    return
         -1: singular
         0:  inconsistent
         1:  success

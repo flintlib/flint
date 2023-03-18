@@ -13,8 +13,8 @@
 #include "padic.h"
 
 /*
-    Set-up.  Currently we only test the logarithm for positive values of N. 
-    This is important as for negative N, exp(0) is 1, which is 0 mod p^N, 
+    Set-up.  Currently we only test the logarithm for positive values of N.
+    This is important as for negative N, exp(0) is 1, which is 0 mod p^N,
     and then log(0) does not converge.
  */
 static slong __rand_prec(flint_rand_t state, slong i)
@@ -35,7 +35,7 @@ main(void)
     flint_printf("log_rectangular... ");
     fflush(stdout);
 
-    
+
 
 /** p == 2 *******************************************************************/
 
@@ -344,7 +344,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -34,7 +34,7 @@ n_sqr_and_add_a(mp_limb_t y, mp_limb_t a, mp_limb_t n, mp_limb_t ninv,
 }
 
 int
-n_factor_pollard_brent_single(mp_limb_t *factor, mp_limb_t n, mp_limb_t ninv, 
+n_factor_pollard_brent_single(mp_limb_t *factor, mp_limb_t n, mp_limb_t ninv,
                               mp_limb_t ai, mp_limb_t xi, mp_limb_t normbits,
                               mp_limb_t max_iters)
 {
@@ -82,7 +82,7 @@ n_factor_pollard_brent_single(mp_limb_t *factor, mp_limb_t n, mp_limb_t ninv,
                 (*factor) = n;
             else
                 (*factor) = n_gcd(q, n);
-            
+
             k += m;
             j = ((*factor) == one_shift_norm);
         } while ((k < iter) && (j));
@@ -105,7 +105,7 @@ n_factor_pollard_brent_single(mp_limb_t *factor, mp_limb_t n, mp_limb_t ninv,
                 (*factor) = n;
             else
                 (*factor) = n_gcd(q, n);
-            
+
             (*factor) = n_gcd(subval, n);
         } while ((*factor) == one_shift_norm);   /* gcd == 1 */
     }
@@ -121,7 +121,7 @@ n_factor_pollard_brent_single(mp_limb_t *factor, mp_limb_t n, mp_limb_t ninv,
 }
 
 int
-n_factor_pollard_brent(mp_limb_t *factor, flint_rand_t state, mp_limb_t n_in, 
+n_factor_pollard_brent(mp_limb_t *factor, flint_rand_t state, mp_limb_t n_in,
                         mp_limb_t max_tries, mp_limb_t max_iters)
 {
     mp_limb_t normbits, a, x, n, ninv, max;
@@ -132,7 +132,7 @@ n_factor_pollard_brent(mp_limb_t *factor, flint_rand_t state, mp_limb_t n_in,
 
     count_leading_zeros(normbits, n_in);
     n = n_in;
-    n <<= normbits; 
+    n <<= normbits;
     ninv = n_preinvert_limb(n);
 
     while (max_tries--)
@@ -152,9 +152,9 @@ n_factor_pollard_brent(mp_limb_t *factor, flint_rand_t state, mp_limb_t n_in,
         {
             if (normbits)
                 (*factor) >>= normbits;
-            return 1; 
+            return 1;
         }
     }
 
-    return ret;    
+    return ret;
 }

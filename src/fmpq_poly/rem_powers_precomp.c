@@ -14,8 +14,8 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
-void _fmpq_poly_rem_powers_precomp(fmpz * A, fmpz_t denA, slong m, 
-                                 const fmpz * B, const fmpz_t denB, slong n, 
+void _fmpq_poly_rem_powers_precomp(fmpz * A, fmpz_t denA, slong m,
+                                 const fmpz * B, const fmpz_t denB, slong n,
                                  fmpq_poly_struct * const powers)
 {
    slong i;
@@ -42,16 +42,16 @@ void _fmpq_poly_rem_powers_precomp(fmpz * A, fmpz_t denA, slong m,
       return;
 
    fmpz_init(den);
-   
+
    fmpq_poly_init2(prod, n - 1);
    fmpz_set(den, denA);
 
    for (i = n - 1; i < m; i++)
    {
-      _fmpz_vec_scalar_mul_fmpz(fmpq_poly_numref(prod), 
+      _fmpz_vec_scalar_mul_fmpz(fmpq_poly_numref(prod),
          fmpq_poly_numref(powers + i), powers[i].length, A + i);
       fmpz_mul(fmpq_poly_denref(prod), fmpq_poly_denref(powers + i), den);
-      _fmpq_poly_add_can(A, denA, A, denA, n - 1, fmpq_poly_numref(prod), 
+      _fmpq_poly_add_can(A, denA, A, denA, n - 1, fmpq_poly_numref(prod),
          fmpq_poly_denref(prod), powers[i].length, 0);
    }
 
@@ -59,14 +59,14 @@ void _fmpq_poly_rem_powers_precomp(fmpz * A, fmpz_t denA, slong m,
    fmpz_clear(den);
 }
 
-void 
-fmpq_poly_rem_powers_precomp(fmpq_poly_t R, const fmpq_poly_t A, 
+void
+fmpq_poly_rem_powers_precomp(fmpq_poly_t R, const fmpq_poly_t A,
                     const fmpq_poly_t B, const fmpq_poly_powers_precomp_t B_inv)
 {
     fmpq_poly_t tR;
     fmpz * r, * d;
     slong len1 = A->length, len2 = B->length;
-    
+
     if (len1 < len2)
     {
         fmpq_poly_set(R, A);

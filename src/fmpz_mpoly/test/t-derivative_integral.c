@@ -128,14 +128,14 @@ main(void)
             }
         }
 
-        fmpz_mpoly_clear(f, ctx);  
-        fmpz_mpoly_clear(g, ctx);  
-        fmpz_mpoly_clear(h, ctx);  
-        fmpz_mpoly_clear(fp, ctx);  
-        fmpz_mpoly_clear(gp, ctx);  
-        fmpz_mpoly_clear(hp, ctx);  
-        fmpz_mpoly_clear(t1, ctx);  
-        fmpz_mpoly_clear(t2, ctx);  
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(h, ctx);
+        fmpz_mpoly_clear(fp, ctx);
+        fmpz_mpoly_clear(gp, ctx);
+        fmpz_mpoly_clear(hp, ctx);
+        fmpz_mpoly_clear(t1, ctx);
+        fmpz_mpoly_clear(t2, ctx);
     }
 
 
@@ -211,13 +211,13 @@ main(void)
            }
        }
 
-       fmpz_mpoly_clear(f, ctx);  
-       fmpz_mpoly_clear(g, ctx);  
-       fmpz_mpoly_clear(h, ctx);  
-       fmpz_mpoly_clear(fp, ctx);  
-       fmpz_mpoly_clear(gp, ctx); 
-       fmpz_mpoly_clear(t1, ctx);  
-       fmpz_mpoly_clear(t2, ctx);  
+       fmpz_mpoly_clear(f, ctx);
+       fmpz_mpoly_clear(g, ctx);
+       fmpz_mpoly_clear(h, ctx);
+       fmpz_mpoly_clear(fp, ctx);
+       fmpz_mpoly_clear(gp, ctx);
+       fmpz_mpoly_clear(t1, ctx);
+       fmpz_mpoly_clear(t2, ctx);
     }
 
     /* Check d(int(f)) = f with aliasing */
@@ -269,7 +269,7 @@ main(void)
             fmpz_mpoly_assert_canonical(f, ctx);
             fmpz_mpoly_scalar_mul_fmpz(g, g, s, ctx);
             result = result && fmpz_mpoly_equal(f, g, ctx);
-                                       
+
             if (!result)
             {
                 printf("FAIL\n");
@@ -282,9 +282,9 @@ main(void)
 
         fmpz_clear(s);
         fmpz_clear(s1);
-        fmpz_mpoly_clear(f, ctx);  
-        fmpz_mpoly_clear(g, ctx);  
-        fmpz_mpoly_clear(f1, ctx);  
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(f1, ctx);
     }
 
 

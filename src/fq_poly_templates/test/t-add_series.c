@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Sebastian Pancratz 
+    Copyright (C) 2012 Sebastian Pancratz
     Copyright (C) 2012 Andres Goens
     Copyright (C) 2013 Mike Hansen
     Copyright (C) 2014 William Hart
@@ -131,7 +131,7 @@ main(void)
 
         TEMPLATE(T, poly_add_series) (c, a, a, n, ctx);
         TEMPLATE(T, poly_add_series) (a, a, a, n, ctx);
-        
+
         result = (TEMPLATE(T, poly_equal) (a, c, ctx));
         if (!result)
         {
@@ -164,7 +164,7 @@ main(void)
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);
         TEMPLATE(T, poly_init) (d, ctx);
-        
+
         TEMPLATE(T, poly_randtest) (a, state, len, ctx);
         TEMPLATE(T, poly_randtest) (b, state, len, ctx);
         n = n_randint(state, 15);

@@ -14,7 +14,7 @@
 #include "ulong_extras.h"
 
 static void
-_padic_log_bsplit_series(fmpz_t P, fmpz_t B, fmpz_t T, 
+_padic_log_bsplit_series(fmpz_t P, fmpz_t B, fmpz_t T,
                          const fmpz_t x, slong a, slong b)
 {
     if (b - a == 1)
@@ -58,10 +58,10 @@ _padic_log_bsplit_series(fmpz_t P, fmpz_t B, fmpz_t T,
 }
 
 /*
-    Assumes that $y = 1 - x$ is such that $\log(x)$ 
+    Assumes that $y = 1 - x$ is such that $\log(x)$
     converges.
 
-    Assumes that $v = \ord_p(y)$ with $v < N$, which 
+    Assumes that $v = \ord_p(y)$ with $v < N$, which
     also forces $N$ to be positive.
 
     The result $z$ might not be reduced modulo $p^N$.
@@ -69,7 +69,7 @@ _padic_log_bsplit_series(fmpz_t P, fmpz_t B, fmpz_t T,
     Supports aliasing between $y$ and $z$.
  */
 
-static void 
+static void
 _padic_log_bsplit(fmpz_t z, const fmpz_t y, slong v, const fmpz_t p, slong N)
 {
     fmpz_t P, B, T;
@@ -96,7 +96,7 @@ _padic_log_bsplit(fmpz_t z, const fmpz_t y, slong v, const fmpz_t p, slong N)
     fmpz_clear(T);
 }
 
-void 
+void
 _padic_log_balanced(fmpz_t z, const fmpz_t y, slong v, const fmpz_t p, slong N)
 {
     fmpz_t pv, pN, r, t, u;

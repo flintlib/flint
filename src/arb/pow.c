@@ -70,7 +70,7 @@ arb_pow(arb_t z, const arb_t x, const arb_t y, slong prec)
             arf_is_int_2exp_si(ymid, -1))
         {
             fmpz_t e;
-            fmpz_init(e);            
+            fmpz_init(e);
 
             if (arf_is_int(ymid))
             {
@@ -138,7 +138,7 @@ arb_pow(arb_t z, const arb_t x, const arb_t y, slong prec)
 
         return;
     }
-    
+
     _arb_pow_exp(z, x, s, y, prec);
 }
 

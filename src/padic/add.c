@@ -11,7 +11,7 @@
 
 #include "padic.h"
 
-void padic_add(padic_t rop, const padic_t op1, const padic_t op2, 
+void padic_add(padic_t rop, const padic_t op1, const padic_t op2,
                const padic_ctx_t ctx)
 {
     if (padic_prec(rop) <= FLINT_MIN(padic_val(op1), padic_val(op2)))
@@ -93,7 +93,7 @@ void padic_add(padic_t rop, const padic_t op1, const padic_t op2,
             alloc = _padic_ctx_pow_ui(pow, padic_prec(rop) - padic_val(rop), ctx);
 
             fmpz_mod(padic_unit(rop), padic_unit(rop), pow);
-            
+
             if (fmpz_is_zero(padic_unit(rop)))
                 padic_val(rop) = 0;
 

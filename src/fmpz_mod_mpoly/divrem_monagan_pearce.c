@@ -34,7 +34,7 @@ static int _fmpz_mod_mpoly_divrem_monagan_pearce1_binomial(
 
     fmpz_init(lc_inv);
     fmpz_init(mBcoeff1);
-    
+
     fmpz_mod_inv(lc_inv, Bcoeffs + 0, fctx);
     fmpz_mod_neg(mBcoeff1, Bcoeffs + 1, fctx);
 
@@ -166,7 +166,7 @@ static int _fmpz_mod_mpoly_divrem_monagan_pearce1(
     mpz_t t, acc, modulus;
     ulong acc_sm[3];
     fmpz_t lc_minus_inv;
-    TMP_INIT;         
+    TMP_INIT;
 
     mpz_init(t);
     mpz_init(acc);
@@ -476,10 +476,10 @@ static int _fmpz_mod_mpoly_divrem_monagan_pearce(
 
     Qlen = 0;
     Rlen = 0;
-   
+
     /* s is the number of terms * (latest quotient) we should put into heap */
     s = Blen;
-   
+
     /* insert (-1, 0, Aexps[0]) into heap */
     x = chain + 0;
     x->i = -WORD(1);
@@ -488,7 +488,7 @@ static int _fmpz_mod_mpoly_divrem_monagan_pearce(
     heap[1].next = x;
     heap[1].exp = exp_list[exp_next++];
     mpoly_monomial_set(heap[1].exp, Aexps, N);
-   
+
     while (heap_len > 1)
     {
         _fmpz_mod_mpoly_fit_length(&Qcoeffs, &Q->coeffs_alloc,
@@ -799,13 +799,13 @@ void fmpz_mod_mpoly_divrem_monagan_pearce(
             flint_free(Aexps);
         Aexps = (ulong *) flint_malloc(N*A->length*sizeof(ulong));
         mpoly_repack_monomials(Aexps, QRbits, A->exps, A->bits, A->length, ctx->minfo);
-        freeAexps = 1; 
+        freeAexps = 1;
 
         if (freeBexps)
             flint_free(Bexps);
         Bexps = (ulong *) flint_malloc(N*B->length*sizeof(ulong));
         mpoly_repack_monomials(Bexps, QRbits, B->exps, B->bits, B->length, ctx->minfo);
-        freeBexps = 1; 
+        freeBexps = 1;
     }
 
     /* deal with aliasing */

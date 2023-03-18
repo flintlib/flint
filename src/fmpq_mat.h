@@ -13,7 +13,7 @@
 #define FMPQ_MAT_H
 
 #ifdef FMPQ_MAT_INLINES_C
-#define FMPQ_MAT_INLINE 
+#define FMPQ_MAT_INLINE
 #else
 #define FMPQ_MAT_INLINE static __inline__
 #endif
@@ -366,7 +366,7 @@ void fmpq_mat_similarity(fmpq_mat_t A, slong r, fmpq_t d);
 
 /* Characteristic polynomial *************************************************/
 
-void _fmpq_mat_charpoly(fmpz * coeffs, fmpz_t den, 
+void _fmpq_mat_charpoly(fmpz * coeffs, fmpz_t den,
                                                          const fmpq_mat_t mat);
 
 void fmpq_mat_charpoly(fmpq_poly_t pol, const fmpq_mat_t mat);

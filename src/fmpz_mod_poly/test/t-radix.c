@@ -15,7 +15,7 @@
 #include "fmpz_mod_poly.h"
 #include "ulong_extras.h"
 
-static int _check(fmpz_mod_poly_struct **B, 
+static int _check(fmpz_mod_poly_struct **B,
                   const fmpz_mod_poly_t F, const fmpz_mod_poly_t R,
                                             const fmpz_mod_ctx_t ctx)
 {
@@ -129,7 +129,7 @@ int main(void)
 
     fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

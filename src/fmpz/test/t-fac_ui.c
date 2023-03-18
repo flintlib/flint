@@ -22,7 +22,7 @@ main(void)
     fmpz_t y;
 
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("fac_ui....");
     fflush(stdout);
 

@@ -22,7 +22,7 @@ int
 main(void)
 {
     int i;
-    
+
     FLINT_TEST_INIT(state);
 
     flint_printf("mono_to/from_dual_matrix... ");
@@ -44,13 +44,13 @@ main(void)
         TEMPLATE(B, mat_init)(d2m, d, d, TEMPLATE(B, poly_modulus)(modulus));
         TEMPLATE(B, mat_init)(one, d, d, TEMPLATE(B, poly_modulus)(modulus));
         TEMPLATE(B, mat_init)(two, d, d, TEMPLATE(B, poly_modulus)(modulus));
-        
+
         TEMPLATE(T, embed_mono_to_dual_matrix)(m2d, ctx);
         TEMPLATE(T, embed_dual_to_mono_matrix)(d2m, ctx);
         TEMPLATE(B, mat_mul)(one, m2d, d2m);
 
         TEMPLATE(B, mat_one)(two);
-        
+
         if (!TEMPLATE(B, mat_equal)(one, two)) {
             flint_printf("FAIL:\n\n");
             flint_printf("CTX\n"), TEMPLATE(T, ctx_print)(ctx), flint_printf("\n");

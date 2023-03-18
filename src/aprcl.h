@@ -75,7 +75,7 @@ int aprcl_is_mul_coprime_ui_ui(ulong x, ulong y, const fmpz_t n);
 
 int aprcl_is_mul_coprime_ui_fmpz(ulong x, const fmpz_t y, const fmpz_t n);
 
-/* 
+/*
                             Primality tests
 --------------------------------------------------------------------------------
 */
@@ -283,8 +283,8 @@ void unity_zp_jacobi_sum_2q_one(unity_zp f, ulong q);
 void unity_zp_jacobi_sum_2q_two(unity_zp f, ulong q);
 
 
-/* 
-                Z[unity_root_q, unity_root_p]/(n) operations 
+/*
+                Z[unity_root_q, unity_root_p]/(n) operations
 --------------------------------------------------------------------------------
 */
 

@@ -16,7 +16,7 @@
 
 #include "nf_elem.h"
 
-void nf_elem_get_coeff_fmpz(fmpz_t a, const nf_elem_t b, 
+void nf_elem_get_coeff_fmpz(fmpz_t a, const nf_elem_t b,
                                                         slong i, const nf_t nf)
 {
    if (nf->flag & NF_LINEAR)
@@ -28,7 +28,7 @@ void nf_elem_get_coeff_fmpz(fmpz_t a, const nf_elem_t b,
    } else if (nf->flag & NF_QUADRATIC)
    {
       const fmpz * const bnum = QNF_ELEM_NUMREF(b);
-      
+
       if (i > 2) /* element may be unreduced */
          fmpz_zero(a);
       else

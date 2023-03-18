@@ -91,7 +91,7 @@ _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, slong len1,
           flint_mpn_mul(arr3, arr1, limbs1, arr2, limbs2);
     else
           flint_mpn_mul(arr3, arr2, limbs2, arr1, limbs1);
-    
+
     if (sign)
         _fmpz_poly_bit_unpack(res, n, arr3, bits, neg1 ^ neg2);
     else

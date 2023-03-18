@@ -26,15 +26,15 @@ static slong ecm_tuning[][3] =
 {
     {0, 0, 0}, {2, 1, 1}, {4, 3, 1}, {6, 5, 1}, {8, 7, 1},
     {10, 9, 2}, {12, 11, 2}, {14, 13, 2}, {16, 15, 2}, {18, 17, 2},
-    {20, 19, 5}, {22, 25, 8}, {24, 32, 10}, {26, 47, 11}, {28, 67, 13}, 
-    {30, 102, 13}, {32, 126, 13}, {34, 207, 15}, {36, 293, 16}, {38, 415, 17}, 
-    {40, 610, 18}, {42, 920, 18}, {44, 1270, 20}, {46, 1800, 20}, {48, 2650, 20}, 
-    {50, 3850, 21}, {52, 5300, 22}, {54, 8500, 22}, {56, 10000, 26}, {58, 12000, 33}, 
-    {60, 14000, 42}, {62, 15000, 57}, {64, 16500, 72}, {66, 18000, 87}, {68, 22000, 102}, 
-    {70, 26000, 117}, {72, 30000, 131}, {74, 40000, 146}, {76, 50000, 161}, {78, 60000, 175}, 
-    {80, 70000, 190}, {82, 80000, 205}, {84, 100000, 220}, {86, 140000, 240}, {88, 190000, 255}, 
-    {90, 240000, 291}, {92, 280000, 318}, {94, 320000, 345}, {96, 370000, 372}, {98, 420000, 400}, 
-    {100, 470000, 430} 
+    {20, 19, 5}, {22, 25, 8}, {24, 32, 10}, {26, 47, 11}, {28, 67, 13},
+    {30, 102, 13}, {32, 126, 13}, {34, 207, 15}, {36, 293, 16}, {38, 415, 17},
+    {40, 610, 18}, {42, 920, 18}, {44, 1270, 20}, {46, 1800, 20}, {48, 2650, 20},
+    {50, 3850, 21}, {52, 5300, 22}, {54, 8500, 22}, {56, 10000, 26}, {58, 12000, 33},
+    {60, 14000, 42}, {62, 15000, 57}, {64, 16500, 72}, {66, 18000, 87}, {68, 22000, 102},
+    {70, 26000, 117}, {72, 30000, 131}, {74, 40000, 146}, {76, 50000, 161}, {78, 60000, 175},
+    {80, 70000, 190}, {82, 80000, 205}, {84, 100000, 220}, {86, 140000, 240}, {88, 190000, 255},
+    {90, 240000, 291}, {92, 280000, 318}, {94, 320000, 345}, {96, 370000, 372}, {98, 420000, 400},
+    {100, 470000, 430}
 };
 
 int _is_prime(const fmpz_t n, int proved)
@@ -137,11 +137,11 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
     if (found)
     {
         primes = n_primes_arr_readonly(trial_stop);
-        
+
         for (i = 0; i < found; i++)
         {
             p = primes[idx[i]];
-        
+
             exp = 1;
             xsize = flint_mpn_divexact_1(xd, xsize, p);
 
@@ -163,7 +163,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
             _fmpz_factor_append_ui(factor, p, exp);
         }
     }
-    
+
     if (xsize == 1)
     {
         /* Any single-limb factor left? */
@@ -172,13 +172,13 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
 
         ret = 1;
     }
-    else 
+    else
     {
         fmpz_t n2, f;
         __mpz_struct * data;
 
         fmpz_init2(n2, xsize);
-        
+
         data = _fmpz_promote(n2);
         flint_mpn_copyi(data->_mp_d, xd, xsize);
         data->_mp_size = xsize;
@@ -186,7 +186,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
         if (proved != -1 && _is_prime(n2, proved))
         {
             _fmpz_factor_append(factor, n2, 1);
-            ret = 1; 
+            ret = 1;
         }
         else
         {
@@ -262,7 +262,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
 
                         i -= istride; /* redo with the same parameters if factor found */
                     }
-                }    
+                }
 
                 flint_randclear(state);
                 fmpz_clear(f);
@@ -273,7 +273,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
            _fmpz_factor_append(factor, n2, 1); /* place cofactor in factor struct */
         else
            ret = 1;
-        
+
         fmpz_clear(n2);
     }
 

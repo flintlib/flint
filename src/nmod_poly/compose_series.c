@@ -14,7 +14,7 @@
 #include "gr_poly.h"
 
 void
-_nmod_poly_compose_series(mp_ptr res, mp_srcptr poly1, slong len1, 
+_nmod_poly_compose_series(mp_ptr res, mp_srcptr poly1, slong len1,
                             mp_srcptr poly2, slong len2, slong n, nmod_t mod)
 {
     gr_ctx_t ctx;
@@ -23,7 +23,7 @@ _nmod_poly_compose_series(mp_ptr res, mp_srcptr poly1, slong len1,
 }
 
 void
-nmod_poly_compose_series(nmod_poly_t res, 
+nmod_poly_compose_series(nmod_poly_t res,
                     const nmod_poly_t poly1, const nmod_poly_t poly2, slong n)
 {
     slong len1 = poly1->length;
@@ -59,7 +59,7 @@ nmod_poly_compose_series(nmod_poly_t res,
     if ((res != poly1) && (res != poly2))
     {
         nmod_poly_fit_length(res, lenr);
-        _nmod_poly_compose_series(res->coeffs, poly1->coeffs, len1, 
+        _nmod_poly_compose_series(res->coeffs, poly1->coeffs, len1,
                                         poly2->coeffs, len2, lenr, res->mod);
         res->length = lenr;
         _nmod_poly_normalise(res);

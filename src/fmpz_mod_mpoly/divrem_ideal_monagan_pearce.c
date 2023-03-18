@@ -83,7 +83,7 @@ int _fmpz_mod_mpoly_divrem_ideal_monagan_pearce(
         s[w] = Bs[w]->length;
     }
     r_len = WORD(0);
-   
+
     x = chains[0] + 0;
     x->i = -WORD(1);
     x->j = 0;
@@ -219,7 +219,7 @@ int _fmpz_mod_mpoly_divrem_ideal_monagan_pearce(
                 x->p = w;
                 x->next = NULL;
                 hinds[w][x->i] = 2*(x->j + 1) + 0;
-                mpoly_monomial_add_mp(exp_list[exp_next], Bexps[w] + N*x->i, 
+                mpoly_monomial_add_mp(exp_list[exp_next], Bexps[w] + N*x->i,
                                                        Q[w]->exps + N*x->j, N);
                 exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
@@ -374,7 +374,7 @@ void fmpz_mod_mpoly_divrem_ideal_monagan_pearce(
     /* do division with remainder */
     while (1)
     {
-        fmpz_mod_mpoly_fit_length_reset_bits(r, len3, QRbits, ctx);        
+        fmpz_mod_mpoly_fit_length_reset_bits(r, len3, QRbits, ctx);
         for (i = 0; i < Blen; i++)
             fmpz_mod_mpoly_fit_length_reset_bits(Q[i], 1, QRbits, ctx);
 
@@ -394,7 +394,7 @@ void fmpz_mod_mpoly_divrem_ideal_monagan_pearce(
         Aexps = FLINT_ARRAY_ALLOC(N*A->length, ulong);
         mpoly_repack_monomials(Aexps, QRbits, A->exps, A->bits,
                                                         A->length, ctx->minfo);
-        freeAexps = 1; 
+        freeAexps = 1;
 
         for (i = 0; i < Blen; i++)
         {

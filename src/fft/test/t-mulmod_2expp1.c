@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2009, 2011 William Hart
 
     This file is part of FLINT.
@@ -23,7 +23,7 @@ main(void)
     flint_printf("mulmod_2expp1....");
     fflush(stdout);
 
-    
+
     _flint_rand_init_gmp(state);
 
     for (iters = 0; iters < 100; iters++)
@@ -37,7 +37,7 @@ main(void)
                 mp_size_t int_limbs = bits/FLINT_BITS;
                 mp_size_t j;
                 mp_limb_t c, * i1, * i2, * r1, * r2, * tt;
-        
+
                 i1 = flint_malloc(6*(int_limbs+1)*sizeof(mp_limb_t));
                 i2 = i1 + int_limbs + 1;
                 r1 = i2 + int_limbs + 1;
@@ -52,10 +52,10 @@ main(void)
                 fft_mulmod_2expp1(r2, i1, i2, n, w, tt);
                 c = 2*i1[int_limbs] + i2[int_limbs];
                 c = flint_mpn_mulmod_2expp1_basecase(r1, i1, i2, c, int_limbs*FLINT_BITS, tt);
-            
+
                 for (j = 0; j < int_limbs; j++)
                 {
-                    if (r1[j] != r2[j]) 
+                    if (r1[j] != r2[j])
                     {
                         flint_printf("error in limb %wd, %wx != %wx\n", j, r1[j], r2[j]);
                         fflush(stdout);
@@ -74,7 +74,7 @@ main(void)
             }
         }
     }
-    
+
     /* test squaring */
     for (iters = 0; iters < 100; iters++)
     {
@@ -87,7 +87,7 @@ main(void)
                 mp_size_t int_limbs = bits/FLINT_BITS;
                 mp_size_t j;
                 mp_limb_t c, * i1, * r1, * r2, * tt;
-        
+
                 i1 = flint_malloc(5*(int_limbs+1)*sizeof(mp_limb_t));
                 r1 = i1 + int_limbs + 1;
                 r2 = r1 + int_limbs + 1;
@@ -95,14 +95,14 @@ main(void)
 
                 random_fermat(i1, state, int_limbs);
                 mpn_normmod_2expp1(i1, int_limbs);
-                
+
                 fft_mulmod_2expp1(r2, i1, i1, n, w, tt);
                 c = i1[int_limbs] + 2*i1[int_limbs];
                 c = flint_mpn_mulmod_2expp1_basecase(r1, i1, i1, c, int_limbs*FLINT_BITS, tt);
-            
+
                 for (j = 0; j < int_limbs; j++)
                 {
-                    if (r1[j] != r2[j]) 
+                    if (r1[j] != r2[j])
                     {
                         flint_printf("error in limb %wd, %wx != %wx\n", j, r1[j], r2[j]);
                         fflush(stdout);
@@ -121,9 +121,9 @@ main(void)
             }
         }
     }
-    
+
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

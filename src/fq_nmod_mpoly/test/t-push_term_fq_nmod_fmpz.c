@@ -43,9 +43,9 @@ main(void)
         exp2 = (fmpz **) flint_malloc(nvars*sizeof(fmpz *));
         for (k = 0; k < nvars; k++)
         {
-            exp[k] = (fmpz *) flint_malloc(sizeof(fmpz)); 
+            exp[k] = (fmpz *) flint_malloc(sizeof(fmpz));
             fmpz_init(exp[k]);
-            exp2[k] = (fmpz *) flint_malloc(sizeof(fmpz)); 
+            exp2[k] = (fmpz *) flint_malloc(sizeof(fmpz));
             fmpz_init(exp2[k]);
         }
 
@@ -90,7 +90,7 @@ main(void)
                     printf("FAIL\n");
                     flint_printf("Check pushed exponent matches\ni=%wd, j=%wd\n", i, j);
                     fflush(stdout);
-                    flint_abort();                    
+                    flint_abort();
                 }
             }
         }
@@ -117,16 +117,16 @@ main(void)
         for (k = 0; k < nvars; k++)
         {
             fmpz_clear(exp2[k]);
-            flint_free(exp2[k]); 
+            flint_free(exp2[k]);
             fmpz_clear(exp[k]);
-            flint_free(exp[k]); 
+            flint_free(exp[k]);
         }
         flint_free(exp2);
         flint_free(exp);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -42,7 +42,7 @@ void nf_elem_set_fmpq_poly(nf_elem_t a, const fmpq_poly_t pol, const nf_t nf)
    } else if (nf->flag & NF_QUADRATIC)
    {
       fmpz * const anum = QNF_ELEM_NUMREF(a);
-      
+
       if (pol->length == 0)
 	  {
 	     fmpz_zero(anum);

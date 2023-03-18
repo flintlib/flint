@@ -13,7 +13,7 @@
 #define FQ_NMOD_MPOLY_FACTOR_H
 
 #ifdef FQ_NMOD_MPOLY_FACTOR_INLINES_C
-#define FQ_NMOD_MPOLY_FACTOR_INLINE 
+#define FQ_NMOD_MPOLY_FACTOR_INLINE
 #else
 #define FQ_NMOD_MPOLY_FACTOR_INLINE static __inline__
 #endif
@@ -517,7 +517,7 @@ int fq_nmod_mpoly_factor_zippel(fq_nmod_mpoly_factor_t f,
 int _fq_nmod_mpoly_eval_rest_n_fq_poly(n_poly_struct * E,
     slong * starts, slong * ends, slong * stops, ulong * es,
     const mp_limb_t * Acoeffs, const ulong * Aexps, slong Alen, slong var,
-    const n_fq_poly_struct * alphas, const slong * offsets, const slong * shifts, 
+    const n_fq_poly_struct * alphas, const slong * offsets, const slong * shifts,
                     slong N, ulong mask, slong nvars, const fq_nmod_ctx_t ctx);
 
 void _fq_nmod_mpoly_eval_rest_to_n_fq_bpoly(n_bpoly_t E,

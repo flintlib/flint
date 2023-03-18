@@ -88,7 +88,7 @@ void fmpz_mod_discrete_log_pohlig_hellman_clear(fmpz_mod_discrete_log_pohlig_hel
 static slong _pow_fmpz_cost(const fmpz_t pow)
 {
     slong cost = fmpz_bits(pow) + fmpz_popcnt(pow) - 2;
-    return FLINT_MAX(cost, 0);    
+    return FLINT_MAX(cost, 0);
 }
 
 /*
@@ -254,7 +254,7 @@ try_alpha:
         fmpz_clear(e);
     }
 
-    return total_cost;  
+    return total_cost;
 
 }
 

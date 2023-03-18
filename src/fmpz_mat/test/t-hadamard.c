@@ -34,7 +34,7 @@ main(void)
 {
     int n;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("hadamard....");
     fflush(stdout);
 

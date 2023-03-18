@@ -16,8 +16,8 @@ int main(void)
 {
    int i, result;
    FLINT_TEST_INIT(state);
-   
- 
+
+
    flint_printf("count_leading_zeros....");
    fflush(stdout);
 
@@ -35,14 +35,14 @@ int main(void)
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("n = %wu, count = %u\n", n, count); 
+         flint_printf("n = %wu, count = %u\n", n, count);
          fflush(stdout);
          flint_abort();
       }
    }
 
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

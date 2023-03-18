@@ -15,7 +15,7 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_resultant_euclidean(fmpz_t res, const fmpz * poly1, slong len1, 
+_fmpz_poly_resultant_euclidean(fmpz_t res, const fmpz * poly1, slong len1,
                                  const fmpz * poly2, slong len2)
 {
     if (len2 == 1)
@@ -107,7 +107,7 @@ _fmpz_poly_resultant_euclidean(fmpz_t res, const fmpz * poly1, slong len1,
 }
 
 void
-fmpz_poly_resultant_euclidean(fmpz_t res, const fmpz_poly_t poly1, 
+fmpz_poly_resultant_euclidean(fmpz_t res, const fmpz_poly_t poly1,
                                 const fmpz_poly_t poly2)
 {
     const slong len1 = poly1->length, len2 = poly2->length;

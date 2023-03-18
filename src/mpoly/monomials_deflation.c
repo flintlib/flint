@@ -39,7 +39,7 @@ void mpoly_monomials_deflation(fmpz * shift, fmpz * stride,
     exps = (fmpz *) TMP_ALLOC(nvars*sizeof(fmpz));
     for (j = 0; j < nvars; j++)
         fmpz_init(exps + j);
-    
+
     fmpz_init(d);
 
     NA = mpoly_words_per_exp(Abits, mctx);

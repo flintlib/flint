@@ -66,7 +66,7 @@ main(void)
         TEMPLATE(T, ctx_randtest)(ctx, state);
 
         if (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) != 0)
-        {   
+        {
             TEMPLATE(T, init)(a, ctx);
             TEMPLATE(T, init)(b, ctx);
 	    TEMPLATE(T, init)(z, ctx);

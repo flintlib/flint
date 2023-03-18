@@ -28,17 +28,17 @@ mp_limb_t n_factor_one_line(mp_limb_t n, ulong iters)
         sqrti++;
         square = sqrti*sqrti;
         mod = square - in;
-        if (n_is_square(mod)) 
+        if (n_is_square(mod))
         {
             factor = n_sqrt(mod);
             sqrti -= factor;
             factor = n_gcd(orig_n, sqrti);
-            if (factor != UWORD(1)) 
-            { 
+            if (factor != UWORD(1))
+            {
                 return factor;
             }
-        }     
-        factoring--;    
+        }
+        factoring--;
         iin = in;
         in += n;
     }

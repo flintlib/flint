@@ -16,7 +16,7 @@ int main(void)
 {
    int i, result;
    FLINT_TEST_INIT(state);
-   
+
 
    flint_printf("mod2_precomp....");
    fflush(stdout);
@@ -27,9 +27,9 @@ int main(void)
       double dpre;
 
       d = n_randtest_not_zero(state);
-      
+
       n = n_randtest(state);
-      
+
       dpre = n_precompute_inverse(d);
 
       r1 = n_mod2_precomp(n, d, dpre);
@@ -39,7 +39,7 @@ int main(void)
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("n = %wu, d = %wu, dpre = %f\n", n, d, dpre); 
+         flint_printf("n = %wu, d = %wu, dpre = %f\n", n, d, dpre);
          flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
          fflush(stdout);
          flint_abort();
@@ -47,7 +47,7 @@ int main(void)
    }
 
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

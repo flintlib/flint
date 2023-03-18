@@ -60,7 +60,7 @@ _TEMPLATE(T, poly_sqrt)(TEMPLATE(T, struct) * s, const TEMPLATE(T, struct) * p, 
     TEMPLATE(T, init)(d, ctx);
 
     TEMPLATE(T, set)(d, p + 0, ctx);
-    TEMPLATE(T, set)(c, d, ctx); 
+    TEMPLATE(T, set)(c, d, ctx);
 
     if (!TEMPLATE(T, is_one)(c, ctx))
     {

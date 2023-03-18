@@ -17,7 +17,7 @@ int main(void)
    int i, j, result;
    ulong count = UWORD(0);
    FLINT_TEST_INIT(state);
-   
+
 
    flint_printf("factor_pp1....");
    fflush(stdout);
@@ -36,7 +36,7 @@ int main(void)
          n2 = n_factor_pp1(n1, 1000000, n_randint(state, n1 - 3) + 3);
          if (n2 > 1) break;
       }
-      
+
       if (n2 > 1)
       {
          count++;
@@ -44,23 +44,23 @@ int main(void)
          if (!result)
          {
             flint_printf("FAIL:\n");
-            flint_printf("n1 = %wu, n2 = %wu\n", n1, n2); 
+            flint_printf("n1 = %wu, n2 = %wu\n", n1, n2);
             fflush(stdout);
             flint_abort();
          }
       }
    }
-   
+
    if (count < 295 * flint_test_multiplier())
    {
       flint_printf("FAIL:\n");
-      flint_printf("Only %wu numbers factored\n", count); 
+      flint_printf("Only %wu numbers factored\n", count);
       fflush(stdout);
       flint_abort();
    }
 
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

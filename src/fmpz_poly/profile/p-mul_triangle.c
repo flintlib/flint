@@ -20,7 +20,7 @@
 
 /*
    Definitions for the parameters of the timing process.
-   
+
    lenlo    Minimum length
    lenhi    Maximum length
    lenh     Factor by which length increases at each step
@@ -55,7 +55,7 @@
 /*
    Write a binary 24-bit ppm image.
  */
-int write_rgb_ppm(const char* file_name, unsigned char* pixels, 
+int write_rgb_ppm(const char* file_name, unsigned char* pixels,
                    unsigned int width, unsigned int height)
 {
     FILE* file = fopen(file_name, "wb");
@@ -74,18 +74,18 @@ main(void)
     int X[rows][cols];
     double T[rows][cols][nalgs];
     fmpz_poly_t f, g, h;
-    
+
     FLINT_TEST_INIT(state);
-    
-       
+
+
     fmpz_poly_init2(f, lenhi);
     fmpz_poly_init2(g, lenhi);
     fmpz_poly_init2(h, 2*lenhi - 1);
-    
+
     for (len = lenlo, j = 0; len <= lenhi; len *= lenh, j++)
     {
         slong s[nalgs], sum;
-        
+
         s[0] = 0;
         s[1] = 0;
         s[2] = 0;
@@ -94,15 +94,15 @@ main(void)
         for (bits = bitslo, i = 0; bits <= bitshi; bits *= bitsh, i++)
         {
             int c, n, reps = 0, none = 0;
-            
+
             for (c = 0; c < nalgs; c++)
                 s[c] = WORD(0);
-            
+
             for (n = 0; n < ncases; n++)
             {
                 timeit_t t[nalgs];
                 int l, loops = 1;
-                
+
                 if (bits*len <= cutoff)
                 {    /*
                        Construct random polynomials f and g
@@ -121,14 +121,14 @@ main(void)
                         f->length = len;
                         g->length = len;
                     }
-                
+
                   loop:
 
                     timeit_start(t[0]);
                     for (l = 0; l < loops; l++)
                         fmpz_poly_mul_KS(h, f, g);
                     timeit_stop(t[0]);
-                
+
                     timeit_start(t[1]);
                     for (l = 0; l < loops; l++)
                         fmpz_poly_mul_SS(h, f, g);
@@ -140,17 +140,17 @@ main(void)
                             loops *= 2;
                             goto loop;
                         }
-                
+
                     for (c = 0; c < nalgs; c++)
                         s[c] += t[c]->cpu;
                     reps += loops;
                 } else
                     none = 1;
             }
-            
+
             for (c = 0; c < nalgs; c++)
                 T[i][j][c] = s[c] / (double) reps;
-            
+
             if (none)
                 X[i][j] = -1;
             else if (s[0] <= s[1] && s[0] <= s[2])
@@ -170,9 +170,9 @@ main(void)
         flint_printf("len = %wd, time = %wdms\n", len, sum), fflush(stdout);
         for (k = 0; k < rows; k++)
         {
-            if (X[k][j] == -1) 
+            if (X[k][j] == -1)
                 flint_printf(" ");
-            else 
+            else
                 flint_printf("%d", X[k][j]);
         }
         flint_printf("\n");
@@ -180,22 +180,22 @@ main(void)
     fmpz_poly_clear(f);
     fmpz_poly_clear(g);
     fmpz_poly_clear(h);
-    
-    /* 
+
+    /*
        Print 2-D ASCII image of the winning algorithms
      */
     for (i = 0; i < rows; i++)
     {
         for (j = 0; j < cols; j++)
         {
-            if (X[i][j] == -1) 
+            if (X[i][j] == -1)
                 flint_printf(" ");
-            else 
+            else
                 flint_printf("%d", X[i][j]);
         }
         flint_printf("\n");
     }
-    
+
     /*
        Print 2-D coloured image to file
      */
@@ -203,7 +203,7 @@ main(void)
     {
         unsigned char * PIXELS;
         int k;
-        
+
         PIXELS = (unsigned char *) flint_malloc(3 * rows * cols * sizeof(unsigned char));
         k = 0;
         for (i = 0; i < rows; i++)
@@ -212,7 +212,7 @@ main(void)
             {
                 double max = DBL_MIN, v[nalgs];
                 int m;
-                
+
                 if (X[i][j] == -1)
                 {
                     for (m = 0; m < 3; m++)
@@ -238,7 +238,7 @@ main(void)
 
         k = write_rgb_ppm(imgname, PIXELS, cols, rows);
         flint_free(PIXELS);
-        
+
         if (k)
         {
             flint_printf("Exception:  writing ppm image failed\n");

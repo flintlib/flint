@@ -32,7 +32,7 @@ static void fmpz_mpoly_convert_perm(
     fmpz_mpoly_fit_length_reset_bits(A, B->length, Abits, Actx);
     A->length = B->length;
     for (i = 0; i < B->length; i++)
-    {        
+    {
         fmpz_set(A->coeffs + i, B->coeffs + i);
         mpoly_get_monomial_ui(Bexps, B->exps + NB*i, B->bits, Bctx->minfo);
         for (k = 0; k < m; k++)
@@ -41,7 +41,7 @@ static void fmpz_mpoly_convert_perm(
             Aexps[k] = l < 0 ? 0 : Bexps[l];
         }
         mpoly_set_monomial_ui(A->exps + NA*i, Aexps, Abits, Actx->minfo);
-     }  
+     }
     TMP_END;
     fmpz_mpoly_sort_terms(A, Actx);
 }

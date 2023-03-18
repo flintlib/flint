@@ -18,7 +18,7 @@ void _fmpq_poly_canonicalise(fmpz * poly, fmpz_t den, slong len)
 {
     if (*den == WORD(1))
         return;
-    
+
     if (*den == WORD(-1))
     {
         _fmpz_vec_neg(poly, poly, len);

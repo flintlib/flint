@@ -18,11 +18,11 @@ int main(void)
 {
     int i;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("init_set_readonly....");
     fflush(stdout);
-    
-    
+
+
 
     /* Create some small fmpq rationals, clear the mpq_t */
     for (i = 0; i < 100000; i++)
@@ -102,7 +102,7 @@ int main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

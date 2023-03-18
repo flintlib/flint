@@ -43,7 +43,7 @@ _TEMPLATE4(T, poly_evaluate, T, vec_fast_precomp)
         else if (len != 0 && plen == 1)
             for (i = 0; i < len; i++)
                 TEMPLATE(T, set)(vs + i, poly, ctx);
-        
+
         TEMPLATE(T, clear)(temp, ctx);
         TEMPLATE(T, clear)(inv, ctx);
         return;
@@ -82,22 +82,22 @@ _TEMPLATE4(T, poly_evaluate, T, vec_fast_precomp)
         {
             TEMPLATE(T, inv)(inv, pa->coeffs + pa->length - 1, ctx);
             _TEMPLATE(T, poly_rem)(pc, pb, 2 * pow, pa->coeffs, pa->length, inv, ctx);
-            
+
             pa++;
             TEMPLATE(T, inv)(inv, pa->coeffs + pa->length - 1, ctx);
             _TEMPLATE(T, poly_rem)(pc + pow, pb, 2 * pow, pa->coeffs, pa->length, inv, ctx);
-            
+
             pa++;
             pb += 2 * pow;
             pc += 2 * pow;
             left -= 2 * pow;
         }
-        
+
         if (left > pow)
         {
             TEMPLATE(T, inv)(inv, pa->coeffs + pa->length - 1, ctx);
             _TEMPLATE(T, poly_rem)(pc, pb, left, pa->coeffs, pa->length, inv, ctx);
-            
+
             pa ++;
             TEMPLATE(T, inv)(inv, pa->coeffs + pa->length - 1, ctx);
             _TEMPLATE(T, poly_rem)(pc + pow, pb, left, pa->coeffs, pa->length, inv, ctx);

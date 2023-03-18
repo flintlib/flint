@@ -47,7 +47,7 @@ int mpoly_monomial_exists1(slong * index, const ulong * poly_exps,
    {
       (*index) = i + 1;
       return 0;
-   } 
+   }
 }
 
 int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
@@ -95,5 +95,5 @@ int mpoly_monomial_exists(slong * index, const ulong * poly_exps,
    {
       (*index) = i + 1;
       return 0;
-   } 
+   }
 }

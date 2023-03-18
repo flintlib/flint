@@ -93,7 +93,7 @@ fmpq_mat_can_solve_fmpz_mat_dixon(fmpq_mat_t X,
 
         if (success)
         {
-            fmpq_mat_zero(X); 
+            fmpq_mat_zero(X);
 
             for (i = 0; i < rank; i++)
             {
@@ -103,7 +103,7 @@ fmpq_mat_can_solve_fmpz_mat_dixon(fmpq_mat_t X,
 
             result = _fmpq_mat_check_solution_fmpz_mat(X, A, B);
         }
- 
+
         fmpz_mat_clear(Arank);
         fmpz_mat_clear(Brank);
         fmpq_mat_clear(Xrank);

@@ -16,7 +16,7 @@ int main(void)
 {
     slong j, k, l;
 
-    FLINT_TEST_INIT(state);   
+    FLINT_TEST_INIT(state);
 
     flint_printf("primes_jump_after....");
     fflush(stdout);
@@ -54,7 +54,7 @@ int main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

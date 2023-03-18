@@ -79,7 +79,7 @@ void _fmpz_mod_mpoly_set_coeff_fmpz_fmpz(
 
     fmpz_clear(C);
 
-    TMP_END; 
+    TMP_END;
 }
 
 

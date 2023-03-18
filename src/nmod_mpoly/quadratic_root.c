@@ -82,7 +82,7 @@ static int _nmod_mpoly_quadratic_root_heap(
     heap[1].next = x;
     heap[1].exp = exp_list[exp_next++];
     mpoly_monomial_set(heap[1].exp, Bexps + N*0, N);
-   
+
     while (heap_len > 1)
     {
         FLINT_ASSERT(heap_len - 1 <= Alen + 2);

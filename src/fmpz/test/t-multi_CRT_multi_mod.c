@@ -300,7 +300,7 @@ main(void)
                     printf("FAIL\n");
                     flint_printf("Check lazy CRT failure i = %wd, j = %wd\n", i, j);
                     fflush(stdout);
-                    flint_abort();                    
+                    flint_abort();
                 }
             }
 

@@ -16,10 +16,10 @@ int main(void)
 {
     int i, j;
     FLINT_TEST_INIT(state);
-   
+
     flint_printf("unity_zpq_mul_unity_p....");
     fflush(stdout);
-    
+
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         ulong p, q;
@@ -60,7 +60,7 @@ int main(void)
             unity_zpq h1, h2;
             unity_zpq_init(h1, q, p, n);
             unity_zpq_init(h2, q, p, n);
-            
+
             unity_zpq_coeff_set_ui(h1, 0, j, 1);
             unity_zpq_mul(h2, g, h1);
             unity_zpq_mul_unity_p_pow(f, g, j);

@@ -16,7 +16,7 @@ void _fmpz_mod_vec_dot_rev(fmpz_t r, const fmpz * a,
 		           const fmpz * b, slong len, const fmpz_mod_ctx_t ctx)
 {
     slong i;
-    
+
     fmpz_zero(r);
 
     for (i = 0; i < len; i++)

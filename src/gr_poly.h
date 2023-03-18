@@ -13,7 +13,7 @@
 #define GR_POLY_H
 
 #ifdef GR_POLY_INLINES_C
-#define GR_POLY_INLINE 
+#define GR_POLY_INLINE
 #else
 #define GR_POLY_INLINE static __inline__
 #endif

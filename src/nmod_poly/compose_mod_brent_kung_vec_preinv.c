@@ -47,7 +47,7 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
 
         for (i = 0; i < len1/m; i++)
             _nmod_vec_set(B->rows[i + j*k], (polys + j)->coeffs + i*m, m);
-        
+
         _nmod_vec_set(B->rows[i + j*k], (polys + j)->coeffs + i*m, len1%m);
     }
 
@@ -67,7 +67,7 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
         _nmod_poly_mulmod_preinv(h, A->rows[m - 1], n, A->rows[1], n, poly,
                                                     len, polyinv, leninv, mod);
     }
-    
+
     for (j = 0; j < len2; j++)
     {
         _nmod_vec_set((res + j)->coeffs, C->rows[(j + 1)*k - 1], n);
@@ -112,7 +112,7 @@ nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
     for (i = 0; i < len1; i++)
     {
         len3 = (polys + i)->length;
-        
+
         if (len3 >= len2)
         {
             flint_printf("Exception (nmod_poly_compose_mod_brent_kung_vec_preinv)."

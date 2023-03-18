@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011, 2012 Sebastian Pancratz 
+    Copyright (C) 2011, 2012 Sebastian Pancratz
     Copyright (C) 2012 Andres Goens
 
     This file is part of FLINT.

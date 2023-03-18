@@ -26,7 +26,7 @@ void fmpz_mod_mpoly_pow_rmul(fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_t B,
 
     fmpz_mod_mpoly_one(A, ctx);
     while (k >= 1)
-    { 
+    {
         fmpz_mod_mpoly_mul(T, A, B, ctx);
         fmpz_mod_mpoly_swap(A, T, ctx);
         k -= 1;

@@ -25,7 +25,7 @@ main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, p, q;
-        
+
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(p);
@@ -56,7 +56,7 @@ main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, p;
-        
+
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(p);
@@ -84,7 +84,7 @@ main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, p;
-        
+
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(p);
@@ -112,7 +112,7 @@ main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, p, q, g, s;
-        
+
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(p);
@@ -150,9 +150,9 @@ main(void)
         fmpz_poly_clear(g);
     }
 
-    
+
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

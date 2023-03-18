@@ -34,7 +34,7 @@ slong _fmpz_mpoly_integral(fmpz_t s, fmpz * coeff1, ulong * exp1,
     {
         ulong c, mask;
 
-        mask = (-UWORD(1)) >> (FLINT_BITS - bits);        
+        mask = (-UWORD(1)) >> (FLINT_BITS - bits);
         mpoly_gen_monomial_offset_shift_sp(oneexp, &offset, &shift,
                                                               var, bits, mctx);
 

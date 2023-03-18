@@ -87,7 +87,7 @@ slong fq_nmod_mat_reduce_row_KS(fq_nmod_mat_t A, slong * P, slong * L,
    return res;
 }
 
-slong fq_nmod_mat_reduce_row(fq_nmod_mat_t A, slong * P, slong * L, 
+slong fq_nmod_mat_reduce_row(fq_nmod_mat_t A, slong * P, slong * L,
                                          slong m, const fq_nmod_ctx_t ctx)
 {
    slong n = A->c, i, j, r;
@@ -113,13 +113,13 @@ slong fq_nmod_mat_reduce_row(fq_nmod_mat_t A, slong * P, slong * L,
                nmod_poly_mul(h, fq_nmod_mat_entry(A, r, j), fq_nmod_mat_entry(A, m, i));
                nmod_poly_sub(fq_nmod_mat_entry(A, m, j), fq_nmod_mat_entry(A, m, j), h);
             }
- 
+
             fq_nmod_zero(fq_nmod_mat_entry(A, m, i), ctx);
          } else
          {
             fq_nmod_inv(h, fq_nmod_mat_entry(A, m, i), ctx);
             fq_nmod_one(fq_nmod_mat_entry(A, m, i), ctx);
-           
+
             for (j = i + 1; j < L[m]; j++)
             {
                fq_nmod_reduce(fq_nmod_mat_entry(A, m, j), ctx);
@@ -130,7 +130,7 @@ slong fq_nmod_mat_reduce_row(fq_nmod_mat_t A, slong * P, slong * L,
             P[i] = m;
 
             nmod_poly_clear(h);
-       
+
             return i;
          }
       }
@@ -140,7 +140,7 @@ slong fq_nmod_mat_reduce_row(fq_nmod_mat_t A, slong * P, slong * L,
       fq_nmod_reduce(fq_nmod_mat_entry(A, m, j), ctx);
 
    nmod_poly_clear(h);
-   
+
    return -WORD(1);
 }
 

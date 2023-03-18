@@ -25,7 +25,7 @@ main(void)
     flint_printf("scalar_div_si... ");
     fflush(stdout);
 
-    
+
 
     /* Check aliasing of a and b */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -66,9 +66,9 @@ main(void)
         fmpz_poly_q_init(c);
         fmpz_poly_q_init(d);
 
-        fmpz_poly_q_randtest(a, state, n_randint(state, 50), 50, 
+        fmpz_poly_q_randtest(a, state, n_randint(state, 50), 50,
                                        n_randint(state, 50), 50);
-        fmpz_poly_q_randtest(b, state, n_randint(state, 50), 50, 
+        fmpz_poly_q_randtest(b, state, n_randint(state, 50), 50,
                                        n_randint(state, 50), 50);
 
         x = z_randtest_not_zero(state);
@@ -100,7 +100,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

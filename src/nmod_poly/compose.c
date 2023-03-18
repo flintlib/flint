@@ -15,7 +15,7 @@
 #include "gr_poly.h"
 
 void
-_nmod_poly_compose(mp_ptr res, mp_srcptr poly1, slong len1, 
+_nmod_poly_compose(mp_ptr res, mp_srcptr poly1, slong len1,
                                mp_srcptr poly2, slong len2, nmod_t mod)
 {
     if (len1 == 1)
@@ -34,12 +34,12 @@ _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, slong len1,
     }
 }
 
-void nmod_poly_compose(nmod_poly_t res, 
+void nmod_poly_compose(nmod_poly_t res,
                        const nmod_poly_t poly1, const nmod_poly_t poly2)
 {
     const slong len1 = poly1->length;
     const slong len2 = poly2->length;
-    
+
     if (len1 == 0)
     {
         nmod_poly_zero(res);
@@ -53,7 +53,7 @@ void nmod_poly_compose(nmod_poly_t res,
     else
     {
         const slong lenr = (len1 - 1) * (len2 - 1) + 1;
-        
+
         if (res != poly1 && res != poly2)
         {
             nmod_poly_fit_length(res, lenr);

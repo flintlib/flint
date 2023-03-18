@@ -13,8 +13,8 @@
 #include "nmod_poly.h"
 #include "mpn_extras.h"
 
-slong _nmod_poly_xgcd_euclidean(mp_ptr G, mp_ptr S, mp_ptr T, 
-                               mp_srcptr A, slong lenA, 
+slong _nmod_poly_xgcd_euclidean(mp_ptr G, mp_ptr S, mp_ptr T,
+                               mp_srcptr A, slong lenA,
                                mp_srcptr B, slong lenB, nmod_t mod)
 {
     flint_mpn_zero(G, lenB);

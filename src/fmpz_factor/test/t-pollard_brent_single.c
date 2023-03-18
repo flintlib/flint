@@ -52,10 +52,10 @@ int main(void)
             fmpz_mul(primeprod, prime1, prime3);
 
             /* Assigning random values of y and a */
-            fmpz_sub_ui(maxa, primeprod, 3);    
-            fmpz_randm(a, state, maxa);  
+            fmpz_sub_ui(maxa, primeprod, 3);
+            fmpz_randm(a, state, maxa);
             fmpz_add_ui(a, a, 1);               /* 1 <= a <= n - 3 */
-            fmpz_sub_ui(maxa, primeprod, 1);               
+            fmpz_sub_ui(maxa, primeprod, 1);
             fmpz_randm(y, state, primeprod);
             fmpz_add_ui(y, y, 1);               /* 1 <= y <= n - 1 */
 

@@ -11,7 +11,7 @@
 
 #include "padic_poly.h"
 
-void padic_poly_set(padic_poly_t poly1, 
+void padic_poly_set(padic_poly_t poly1,
                     const padic_poly_t poly2, const padic_ctx_t ctx)
 {
     if (poly1 != poly2)         /* Aliasing is trivial */
@@ -22,7 +22,7 @@ void padic_poly_set(padic_poly_t poly1,
         {
             padic_poly_zero(poly1);
         }
-        else 
+        else
         {
             padic_poly_fit_length(poly1, len2);
             _padic_poly_set_length(poly1, len2);

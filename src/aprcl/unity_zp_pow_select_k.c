@@ -11,10 +11,10 @@
 
 #include "aprcl.h"
 
-/* 
+/*
     returns smallest integer k satisfies:
         log(n) < (k * (k + 1) * 2^(2 * k)) / (2^(k + 1) - k - 2) + 1
-*/        
+*/
 ulong
 _unity_zp_pow_select_k(const fmpz_t n)
 {

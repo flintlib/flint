@@ -14,7 +14,7 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-void _fmpq_poly_log_series(fmpz * g, fmpz_t gden, 
+void _fmpq_poly_log_series(fmpz * g, fmpz_t gden,
                        const fmpz * f, const fmpz_t fden, slong flen, slong n)
 {
     fmpz * f_diff;

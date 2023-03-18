@@ -94,14 +94,14 @@ main(void)
             }
         }
 
-        fmpq_mpoly_clear(f, ctx);  
-        fmpq_mpoly_clear(g, ctx);  
-        fmpq_mpoly_clear(h, ctx);  
-        fmpq_mpoly_clear(fp, ctx);  
-        fmpq_mpoly_clear(gp, ctx);  
-        fmpq_mpoly_clear(hp, ctx);  
-        fmpq_mpoly_clear(t1, ctx);  
-        fmpq_mpoly_clear(t2, ctx);  
+        fmpq_mpoly_clear(f, ctx);
+        fmpq_mpoly_clear(g, ctx);
+        fmpq_mpoly_clear(h, ctx);
+        fmpq_mpoly_clear(fp, ctx);
+        fmpq_mpoly_clear(gp, ctx);
+        fmpq_mpoly_clear(hp, ctx);
+        fmpq_mpoly_clear(t1, ctx);
+        fmpq_mpoly_clear(t2, ctx);
     }
 
 
@@ -177,13 +177,13 @@ main(void)
             }
        }
 
-       fmpq_mpoly_clear(f, ctx);  
-       fmpq_mpoly_clear(g, ctx);  
-       fmpq_mpoly_clear(h, ctx);  
-       fmpq_mpoly_clear(fp, ctx);  
-       fmpq_mpoly_clear(gp, ctx); 
-       fmpq_mpoly_clear(t1, ctx);  
-       fmpq_mpoly_clear(t2, ctx);  
+       fmpq_mpoly_clear(f, ctx);
+       fmpq_mpoly_clear(g, ctx);
+       fmpq_mpoly_clear(h, ctx);
+       fmpq_mpoly_clear(fp, ctx);
+       fmpq_mpoly_clear(gp, ctx);
+       fmpq_mpoly_clear(t1, ctx);
+       fmpq_mpoly_clear(t2, ctx);
     }
 
     /* Check d(int(f)) = f with aliasing */
@@ -231,7 +231,7 @@ main(void)
             fmpq_mpoly_derivative(f, f, idx, ctx);
             fmpq_mpoly_assert_canonical(f, ctx);
             result = result && fmpq_mpoly_equal(f, g, ctx);
-                                       
+
             if (!result)
             {
                 printf("FAIL\n");

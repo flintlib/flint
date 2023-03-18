@@ -230,7 +230,7 @@ fmpz_mod_mpoly_struct * _fmpz_mod_mpolyu_get_coeff(
 
     for (i = 0; i < A->length && A->exps[i] >= pow; i++)
     {
-        if (A->exps[i] == pow) 
+        if (A->exps[i] == pow)
         {
             return A->coeffs + i;
         }
@@ -243,7 +243,7 @@ fmpz_mod_mpoly_struct * _fmpz_mod_mpolyu_get_coeff(
         A->exps[j] = A->exps[j - 1];
         fmpz_mod_mpoly_swap(A->coeffs + j, A->coeffs + j - 1, uctx);
     }
-    
+
     A->length++;
     A->exps[i] = pow;
     xk = A->coeffs + i;
@@ -317,7 +317,7 @@ static int fmpz_mod_mpoly_from_zip(
 
     /* x is most significant in ctx, so keeping the lc_x in B is easy */
     FLINT_ASSERT(xvar == 0);
-    
+
     for (Bi = 0; Bi < B->length; Bi++)
     {
         x = (((B->exps + N*Bi)[xoff] >> xshift) & mask);
@@ -454,7 +454,7 @@ static void fmpz_mod_mpoly_set_eval_helper3(
         if (its_new)
         {
             n_poly_init2(Wc, 4);
-            Wc->coeffs[0] = i;                
+            Wc->coeffs[0] = i;
             Wc->length = 1;
         }
         else
@@ -592,7 +592,7 @@ static slong fmpz_mod_mpoly_set_eval_helper_and_zip_form3(
             if (its_new)
             {
                 n_poly_init2(Wc, 4);
-                Wc->coeffs[0] = i;                
+                Wc->coeffs[0] = i;
                 Wc->length = 1;
             }
             else
@@ -762,7 +762,7 @@ static void fmpz_mod_polyu3_add_zip_limit1(
             fmpz_mod_poly_fit_length(Zcoeffs + Zi, fit_length, ctx);
             Zcoeffs[Zi].length = cur_length;
             _fmpz_vec_zero(Zcoeffs[Zi].coeffs, cur_length);
-            goto in_both;            
+            goto in_both;
         }
         else if (Aexps[Ai] + ai < Zexps[Zi])
         {
@@ -970,7 +970,7 @@ next_zip_image:
     for (i = 0; i < r; i++)
     {
         fmpz_mod_polyu3_add_zip_limit1(Z + i, BBeval + i, Bdegs[i],
-                                   cur_zip_image, req_zip_images, ctx->ffinfo); 
+                                   cur_zip_image, req_zip_images, ctx->ffinfo);
     }
 
     cur_zip_image++;

@@ -36,7 +36,7 @@ main(void)
         nmod_poly_init(f, n);
         nmod_poly_init(g, n);
         nmod_poly_init(h, n);
-        
+
         do {
            nmod_poly_randtest(f, state, n_randint(state, 200));
         } while (f->length < 2);
@@ -67,7 +67,7 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         nmod_poly_clear(f);
         nmod_poly_clear(g);
         nmod_poly_clear(h);
@@ -84,11 +84,11 @@ main(void)
         while (!n_is_probabprime(n));
 
         nmod_poly_init(f, n);
-        
+
         nmod_poly_randtest(f, state, 1);
-        
+
         y = nmod_poly_discriminant(f);
-        
+
         result = (y == 0);
         if (!result)
         {
@@ -98,12 +98,12 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-        
+
         nmod_poly_clear(f);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

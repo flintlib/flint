@@ -16,7 +16,7 @@ int main(void)
 {
     int i, j;
     FLINT_TEST_INIT(state);
-   
+
     flint_printf("unity_zp_pow....");
     fflush(stdout);
 
@@ -28,7 +28,7 @@ int main(void)
 
         p = n_randprime(state, 2 + n_randint(state, 6), 0);
 
-        pow =  n_randint(state, 100);        
+        pow =  n_randint(state, 100);
 
         fmpz_init(n);
         fmpz_randtest_unsigned(n, state, 200);
@@ -83,7 +83,7 @@ int main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -24,7 +24,7 @@ main(void)
     flint_printf("pow_binomial....");
     fflush(stdout);
 
-    
+
 
     /* Check aliasing of a and b */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
@@ -38,7 +38,7 @@ main(void)
         fmpz_randtest(b->coeffs, state, 100);
         fmpz_randtest_not_zero(b->coeffs + 1, state, 100);
         _fmpz_poly_set_length(b, 2);
-        
+
         exp = n_randtest(state) % UWORD(100);
 
         fmpz_poly_pow_binomial(a, b, exp);
@@ -67,7 +67,7 @@ main(void)
 
         fmpz_poly_init(a);
         fmpz_poly_init2(b, 2);
-        
+
         fmpz_randtest(b->coeffs, state, 100);
         fmpz_randtest_not_zero(b->coeffs + 1, state, 100);
         _fmpz_poly_set_length(b, 2);
@@ -93,7 +93,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

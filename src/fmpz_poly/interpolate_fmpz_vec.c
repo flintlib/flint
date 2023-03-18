@@ -35,15 +35,15 @@ _fmpz_poly_interpolate_newton(fmpz * ys, const fmpz * xs, slong n)
             fmpz_sub(q, xs + j, xs + j - i);
             fmpz_set(t, ys + j);
             fmpz_fdiv_qr(ys + j, r, p, q);
-			
+
             if (!fmpz_is_zero(r))
             {
                 fmpz_clear(r);
                 fmpz_clear(t);
                 fmpz_clear(q);
                 fmpz_clear(p);
-				
-                flint_throw(FLINT_INEXACT, "Not an exact division in"     
+
+                flint_throw(FLINT_INEXACT, "Not an exact division in"
                     "fmpz_poly_interpolate_newton");
             }
         }

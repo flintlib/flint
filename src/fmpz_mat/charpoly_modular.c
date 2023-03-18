@@ -99,12 +99,12 @@ void _fmpz_mat_charpoly_modular(fmpz * rop, const fmpz_mat_t op)
     else
     {
         /*
-            If $A$ is an $n \times n$ matrix with $n \geq 4$ and 
-            coefficients bounded in absolute value by $B > 1$ then 
-            the coefficients of the characteristic polynomial have 
-            less than $\ceil{n/2 (\log_2(n) + \log_2(B^2) + 1.6669)}$ 
+            If $A$ is an $n \times n$ matrix with $n \geq 4$ and
+            coefficients bounded in absolute value by $B > 1$ then
+            the coefficients of the characteristic polynomial have
+            less than $\ceil{n/2 (\log_2(n) + \log_2(B^2) + 1.6669)}$
             bits.
-            See Lemma 4.1 in Dumas, Pernet, and Wan, "Efficient computation 
+            See Lemma 4.1 in Dumas, Pernet, and Wan, "Efficient computation
             of the characteristic polynomial", 2008.
          */
         slong bound;
@@ -134,7 +134,7 @@ void _fmpz_mat_charpoly_modular(fmpz * rop, const fmpz_mat_t op)
                 return;
             }
 
-            t = (fmpz_bits(ptr) <= FLINT_D_BITS) ? 
+            t = (fmpz_bits(ptr) <= FLINT_D_BITS) ?
                 _log2(FLINT_ABS(fmpz_get_d(ptr))) : fmpz_bits(ptr);
 
             bound = ceil( (n / 2.0) * (_log2(n) + 2.0 * t + 1.6669) );

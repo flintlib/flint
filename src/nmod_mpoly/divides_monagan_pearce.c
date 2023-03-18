@@ -309,7 +309,7 @@ int _nmod_mpoly_divides_monagan_pearce(
                 {
                     hind[x->i] |= WORD(1);
                     umul_ppmm(pp1, pp0, coeff3[x->i], q_coeff[x->j]);
-                    add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);                    
+                    add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), pp1, pp0);
                 }
             } while ((x = x->next) != NULL);
         } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
@@ -416,7 +416,7 @@ int _nmod_mpoly_divides_monagan_pearce(
             exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
         }
-        s = 1;      
+        s = 1;
         q_len++;
     }
 

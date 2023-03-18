@@ -11,9 +11,9 @@
 
 #include "padic_poly.h"
 
-int _padic_poly_fprint_pretty(FILE *file, 
-                              const fmpz *poly, slong len, slong val, 
-                              const char *var, 
+int _padic_poly_fprint_pretty(FILE *file,
+                              const fmpz *poly, slong len, slong val,
+                              const char *var,
                               const padic_ctx_t ctx)
 {
     slong i;
@@ -150,11 +150,11 @@ int _padic_poly_fprint_pretty(FILE *file,
     return 1;
 }
 
-int padic_poly_fprint_pretty(FILE *file, 
-                             const padic_poly_t poly, const char *var, 
+int padic_poly_fprint_pretty(FILE *file,
+                             const padic_poly_t poly, const char *var,
                              const padic_ctx_t ctx)
 {
-    return _padic_poly_fprint_pretty(file, 
+    return _padic_poly_fprint_pretty(file,
         poly->coeffs, poly->length, poly->val, var, ctx);
 }
 

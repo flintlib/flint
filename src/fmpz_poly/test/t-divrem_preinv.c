@@ -23,7 +23,7 @@ main(void)
     flint_printf("divrem_preinv....");
     fflush(stdout);
 
-    
+
 
     /* Check q*b + r = a, no aliasing */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
@@ -64,7 +64,7 @@ main(void)
         fmpz_poly_clear(r);
         fmpz_poly_clear(prod);
     }
-    
+
     /* Check r and a alias */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -210,7 +210,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

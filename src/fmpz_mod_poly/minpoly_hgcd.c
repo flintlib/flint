@@ -9,7 +9,7 @@
 
 /******************************************************************************
 
-    Authored 2016 by Daniel S. Roche; US Government work in the public domain. 
+    Authored 2016 by Daniel S. Roche; US Government work in the public domain.
 
 ******************************************************************************/
 
@@ -19,7 +19,7 @@
 #include "fmpz_vec.h"
 #include "gr_poly.h"
 
-slong _fmpz_mod_poly_minpoly_hgcd(fmpz* poly, 
+slong _fmpz_mod_poly_minpoly_hgcd(fmpz* poly,
                                   const fmpz* seq, slong len, const fmpz_t p)
 {
     fmpz *buf, *f, *g, *A, *B;
@@ -70,9 +70,9 @@ slong _fmpz_mod_poly_minpoly_hgcd(fmpz* poly,
     {
         slong quo_len = lenA - lenB + 1;
         fmpz_invmod(buf, B + (lenB - 1), p);
-        _fmpz_mod_poly_divrem(M[2], M[3], A, lenA, B, lenB, buf, p); 
+        _fmpz_mod_poly_divrem(M[2], M[3], A, lenA, B, lenB, buf, p);
 
-        if (len_poly >= quo_len) 
+        if (len_poly >= quo_len)
         {
             _fmpz_mod_poly_mul(M[3], poly, len_poly, M[2], quo_len, p);
         }

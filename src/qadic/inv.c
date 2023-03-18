@@ -12,8 +12,8 @@
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
-void _qadic_inv(fmpz *rop, const fmpz *op, slong len, 
-                const fmpz *a, const slong *j, slong lena, 
+void _qadic_inv(fmpz *rop, const fmpz *op, slong len,
+                const fmpz *a, const slong *j, slong lena,
                 const fmpz_t p, slong N)
 {
     const slong d = j[lena - 1];
@@ -132,7 +132,7 @@ void qadic_inv(qadic_t x, const qadic_t y, const qadic_ctx_t ctx)
     }
 
     /*
-        If y = u p^v has negative valuation with N <= -v then the 
+        If y = u p^v has negative valuation with N <= -v then the
         exact inverse of y is zero when reduced modulo $p^N$
      */
     if (N + y->val <= 0)
@@ -154,7 +154,7 @@ void qadic_inv(qadic_t x, const qadic_t y, const qadic_ctx_t ctx)
             t = x->coeffs;
         }
 
-        _qadic_inv(t, y->coeffs, y->length, 
+        _qadic_inv(t, y->coeffs, y->length,
                    ctx->a, ctx->j, ctx->len, (&ctx->pctx)->p, N + y->val);
         x->val = - y->val;
 

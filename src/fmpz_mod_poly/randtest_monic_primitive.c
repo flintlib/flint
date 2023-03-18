@@ -20,7 +20,7 @@ fmpz_mod_poly_randtest_monic_primitive(fmpz_mod_poly_t f,
     fq_ctx_t fqctx;
     fq_t X;
     int primitive = 0;
-    
+
     while (!primitive)
     {
         fmpz_mod_poly_randtest_monic_irreducible(f, state, len, ctx);

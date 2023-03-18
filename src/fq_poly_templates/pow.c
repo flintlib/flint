@@ -35,7 +35,7 @@ _TEMPLATE(T, poly_pow) (TEMPLATE(T, struct) * rop,
     bit >>= 1;
 
     /*
-       Trial run without any polynomial arithmetic to determine the parity 
+       Trial run without any polynomial arithmetic to determine the parity
        of the number of swaps;  then set R and S accordingly
      */
 

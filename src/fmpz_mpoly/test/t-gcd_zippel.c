@@ -25,7 +25,7 @@ main(void)
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t r, d, f, g;
         int success;
-        const char* vars[] = 
+        const char* vars[] =
             {"x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10"};
 
         const char * example[][3] =
@@ -235,7 +235,7 @@ main(void)
             if (!fmpz_mpoly_equal_ui(cg, UWORD(1), ctx))
             {
                 printf("FAIL\n");
-                flint_printf("Check cofactors are relatively prime\ni = %wd, j = %wd\n", i ,j);                
+                flint_printf("Check cofactors are relatively prime\ni = %wd, j = %wd\n", i ,j);
                 fflush(stdout);
                 flint_abort();
             }

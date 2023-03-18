@@ -16,28 +16,28 @@
 #include "ulong_extras.h"
 
 /*
-   Implements karatsuba multiplication. There is no basecase crossover, so 
-   this is only efficient when the coefficients are large (the main usage 
+   Implements karatsuba multiplication. There is no basecase crossover, so
+   this is only efficient when the coefficients are large (the main usage
    case).
 
-   The algorithm is the "odd/even" Karatsuba algorithm. Let 
-   f(x) = f1(x^2) + x*f2(x^2), g(x) = g1(x^2) + x*g2(x^2), then 
-   
-   f(x)*g(x) = f1(x^2)*g1(x^2) + x^2*f2(x^2)*g2(x^2) 
-               + x*((f1(x^2) + f2(x^2))*(g1(x^2) + g2(x^2)) 
+   The algorithm is the "odd/even" Karatsuba algorithm. Let
+   f(x) = f1(x^2) + x*f2(x^2), g(x) = g1(x^2) + x*g2(x^2), then
+
+   f(x)*g(x) = f1(x^2)*g1(x^2) + x^2*f2(x^2)*g2(x^2)
+               + x*((f1(x^2) + f2(x^2))*(g1(x^2) + g2(x^2))
                     - f1(x^2)*g1(x^2) - f2(x^2)*g2(x^2)).
-   
-   Thus only three multiplications are performed (and numerous additions 
+
+   Thus only three multiplications are performed (and numerous additions
    and subtractions).
-   
-   Instead of working with polynomials with the usual ordering, reverse 
-   binary ordering is used, i.e. for length 2^3 (zero padded) terms of 
+
+   Instead of working with polynomials with the usual ordering, reverse
+   binary ordering is used, i.e. for length 2^3 (zero padded) terms of
    degree 110 and 011 in binary are swapped, etc.
 
-   The advantage of working in this format is that the first half of the 
-   coefficients of f will be the coefficients of f1, and the second half, 
-   those of f2, etc. This applies right down the recursion. The only tricky 
-   bit is when multiplying by x. One must undo the revbin to shift by one 
+   The advantage of working in this format is that the first half of the
+   coefficients of f will be the coefficients of f1, and the second half,
+   those of f2, etc. This applies right down the recursion. The only tricky
+   bit is when multiplying by x. One must undo the revbin to shift by one
    term to the left.
 */
 
@@ -45,7 +45,7 @@ void _fmpz_poly_mul_kara_recursive(fmpz * out, fmpz * rev1, fmpz * rev2,
                                    fmpz * temp, slong bits);
 
 /*
-   Switches the coefficients of poly in of length len into a 
+   Switches the coefficients of poly in of length len into a
    poly out of length 2^bits.
  */
 void
@@ -82,8 +82,8 @@ _fmpz_vec_add_rev(fmpz * in1, fmpz * in2, slong bits)
 
 /*
    Recursive Karatsuba assuming polynomials are in revbin format.
-   
-   Assumes rev1 and rev2 are both of length 2^bits and that temp has 
+
+   Assumes rev1 and rev2 are both of length 2^bits and that temp has
    space for 2^bits coefficients.
  */
 void

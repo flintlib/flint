@@ -11,8 +11,8 @@
 
 #include "padic_poly.h"
 
-void _padic_poly_scalar_mul_padic(fmpz *rop, slong *rval, slong N, 
-                                  const fmpz *op, slong val, slong len, 
+void _padic_poly_scalar_mul_padic(fmpz *rop, slong *rval, slong N,
+                                  const fmpz *op, slong val, slong len,
                                   const padic_t c, const padic_ctx_t ctx)
 {
     if (padic_is_zero(c) || val + padic_val(c) >= N)
@@ -34,11 +34,11 @@ void _padic_poly_scalar_mul_padic(fmpz *rop, slong *rval, slong N,
         _fmpz_vec_scalar_mod_fmpz(rop, rop, len, pow);
 
         if (alloc)
-            fmpz_clear(pow);    
+            fmpz_clear(pow);
     }
 }
 
-void padic_poly_scalar_mul_padic(padic_poly_t rop, const padic_poly_t op, 
+void padic_poly_scalar_mul_padic(padic_poly_t rop, const padic_poly_t op,
                                  const padic_t c, const padic_ctx_t ctx)
 {
     if (padic_poly_is_zero(op) || padic_is_zero(c) ||
@@ -51,7 +51,7 @@ void padic_poly_scalar_mul_padic(padic_poly_t rop, const padic_poly_t op,
         padic_poly_fit_length(rop, op->length);
         _padic_poly_set_length(rop, op->length);
 
-        _padic_poly_scalar_mul_padic(rop->coeffs, &(rop->val), rop->N, 
+        _padic_poly_scalar_mul_padic(rop->coeffs, &(rop->val), rop->N,
                                      op->coeffs, op->val, op->length, c, ctx);
     }
 }

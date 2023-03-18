@@ -23,7 +23,7 @@ main(void)
     flint_printf("equal....");
     fflush(stdout);
 
-    
+
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -77,7 +77,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

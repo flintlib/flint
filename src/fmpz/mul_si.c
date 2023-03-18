@@ -38,7 +38,7 @@ fmpz_mul_si(fmpz_t f, const fmpz_t g, slong x)
                 *f = 0;
                 return;
             }
-            
+
             mf = _fmpz_new_mpz();
             *f = PTR_TO_COEFF(mf);
         }

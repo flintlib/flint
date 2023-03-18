@@ -12,7 +12,7 @@
 #include "thread_pool.h"
 
 /*
-    given a range of jobs with numbers in [start, stop), 
+    given a range of jobs with numbers in [start, stop),
         where jobs with number in [0, Alen) belong to A and
         where jobs with number in [Alen, Blen + Alen) belong to B
 

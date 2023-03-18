@@ -24,7 +24,7 @@ main(void)
     TEMPLATE(T, ctx_t) ctx;
 
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("sqrt... ");
     fflush(stdout);
 
@@ -122,7 +122,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
 
     return 0;

@@ -13,7 +13,7 @@
 #define PADIC_MAT_H
 
 #ifdef PADIC_MAT_INLINES_C
-#define PADIC_MAT_INLINE 
+#define PADIC_MAT_INLINE
 #else
 #define PADIC_MAT_INLINE static __inline__
 #endif
@@ -39,7 +39,7 @@ typedef padic_mat_struct padic_mat_t[1];
 /* Macros  *******************************************************************/
 
 PADIC_MAT_INLINE
-fmpz_mat_struct * padic_mat(const padic_mat_t A) 
+fmpz_mat_struct * padic_mat(const padic_mat_t A)
 {
    return (fmpz_mat_struct *)(&(A->mat));
 }
@@ -103,7 +103,7 @@ padic_mat_is_square(const padic_mat_t A)
     return fmpz_mat_is_square(padic_mat(A));
 }
 
-PADIC_MAT_INLINE int 
+PADIC_MAT_INLINE int
 padic_mat_is_canonical(const padic_mat_t A, const padic_ctx_t ctx)
 {
     if (fmpz_mat_is_zero(padic_mat(A)))
@@ -123,7 +123,7 @@ padic_mat_is_canonical(const padic_mat_t A, const padic_ctx_t ctx)
     }
 }
 
-PADIC_MAT_INLINE int 
+PADIC_MAT_INLINE int
 padic_mat_is_reduced(const padic_mat_t A, const padic_ctx_t ctx)
 {
     if (padic_mat_is_empty(A))
@@ -188,19 +188,19 @@ void padic_mat_one(padic_mat_t A);
 
 /* Conversions ***************************************************************/
 
-void padic_mat_set_fmpq_mat(padic_mat_t B, 
+void padic_mat_set_fmpq_mat(padic_mat_t B,
                             const fmpq_mat_t A, const padic_ctx_t ctx);
 
-void padic_mat_get_fmpq_mat(fmpq_mat_t B, 
+void padic_mat_get_fmpq_mat(fmpq_mat_t B,
                             const padic_mat_t A, const padic_ctx_t ctx);
 
 /* Entries *******************************************************************/
 
-void padic_mat_get_entry_padic(padic_t rop, 
-                               const padic_mat_t op, slong i, slong j, 
+void padic_mat_get_entry_padic(padic_t rop,
+                               const padic_mat_t op, slong i, slong j,
                                const padic_ctx_t ctx);
 
-void padic_mat_set_entry_padic(padic_mat_t rop, slong i, slong j, 
+void padic_mat_set_entry_padic(padic_mat_t rop, slong i, slong j,
                                const padic_t op, const padic_ctx_t ctx);
 
 /* Comparison ****************************************************************/
@@ -211,10 +211,10 @@ int padic_mat_is_zero(const padic_mat_t A);
 
 /* Input and output  *********************************************************/
 
-int padic_mat_fprint(FILE * file, 
+int padic_mat_fprint(FILE * file,
                      const padic_mat_t A, const padic_ctx_t ctx);
 
-int padic_mat_fprint_pretty(FILE * file, const padic_mat_t A, 
+int padic_mat_fprint_pretty(FILE * file, const padic_mat_t A,
                                          const padic_ctx_t ctx);
 
 PADIC_MAT_INLINE
@@ -231,7 +231,7 @@ int padic_mat_print_pretty(const padic_mat_t A, const padic_ctx_t ctx)
 
 /* Random matrix generation  *************************************************/
 
-void padic_mat_randtest(padic_mat_t mat, flint_rand_t state, 
+void padic_mat_randtest(padic_mat_t mat, flint_rand_t state,
                         const padic_ctx_t ctx);
 
 /* Transpose *****************************************************************/
@@ -240,14 +240,14 @@ void padic_mat_transpose(padic_mat_t B, const padic_mat_t A);
 
 /* Addition and subtraction **************************************************/
 
-void _padic_mat_add(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
+void _padic_mat_add(padic_mat_t C, const padic_mat_t A, const padic_mat_t B,
                                    const padic_ctx_t ctx);
-void padic_mat_add(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
+void padic_mat_add(padic_mat_t C, const padic_mat_t A, const padic_mat_t B,
                                   const padic_ctx_t ctx);
 
-void _padic_mat_sub(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
+void _padic_mat_sub(padic_mat_t C, const padic_mat_t A, const padic_mat_t B,
                                    const padic_ctx_t ctx);
-void padic_mat_sub(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
+void padic_mat_sub(padic_mat_t C, const padic_mat_t A, const padic_mat_t B,
                                   const padic_ctx_t ctx);
 
 void _padic_mat_neg(padic_mat_t B, const padic_mat_t A);
@@ -255,27 +255,27 @@ void padic_mat_neg(padic_mat_t B, const padic_mat_t A, const padic_ctx_t ctx);
 
 /* Scalar operations *********************************************************/
 
-void _padic_mat_scalar_mul_padic(padic_mat_t B, 
-                                 const padic_mat_t A, const padic_t c, 
+void _padic_mat_scalar_mul_padic(padic_mat_t B,
+                                 const padic_mat_t A, const padic_t c,
                                  const padic_ctx_t ctx);
-void padic_mat_scalar_mul_padic(padic_mat_t B, 
-                                const padic_mat_t A, const padic_t c, 
+void padic_mat_scalar_mul_padic(padic_mat_t B,
+                                const padic_mat_t A, const padic_t c,
                                 const padic_ctx_t ctx);
 
-void _padic_mat_scalar_mul_fmpz(padic_mat_t B, 
-                                const padic_mat_t A, const fmpz_t c, 
+void _padic_mat_scalar_mul_fmpz(padic_mat_t B,
+                                const padic_mat_t A, const fmpz_t c,
                                 const padic_ctx_t ctx);
-void padic_mat_scalar_mul_fmpz(padic_mat_t B, 
-                               const padic_mat_t A, const fmpz_t c, 
+void padic_mat_scalar_mul_fmpz(padic_mat_t B,
+                               const padic_mat_t A, const fmpz_t c,
                                const padic_ctx_t ctx);
 
-void padic_mat_scalar_div_fmpz(padic_mat_t B, 
-                               const padic_mat_t A, const fmpz_t c, 
+void padic_mat_scalar_div_fmpz(padic_mat_t B,
+                               const padic_mat_t A, const fmpz_t c,
                                const padic_ctx_t ctx);
 
 /* Multiplication ************************************************************/
 
-void padic_mat_mul(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
+void padic_mat_mul(padic_mat_t C, const padic_mat_t A, const padic_mat_t B,
                                   const padic_ctx_t ctx);
 
 #ifdef __cplusplus

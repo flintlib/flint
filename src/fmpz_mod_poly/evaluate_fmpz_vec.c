@@ -17,7 +17,7 @@
 #include "fmpz_mod_poly.h"
 
 void
-_fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys, const fmpz * coeffs, 
+_fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys, const fmpz * coeffs,
                         slong len, const fmpz * xs, slong n, const fmpz_t mod)
 {
     if (len < 32)

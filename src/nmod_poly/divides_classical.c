@@ -38,7 +38,7 @@ _nmod_poly_mullow_classical_check(mp_srcptr p, mp_srcptr poly1, slong len1,
 	for (i = 0; i < n; i++)
         {
             c = 0;
-	    
+
 	    for (j = 0; j <= FLINT_MIN(i, len1 - 1); j++)
                 c += poly1[j] * poly2[i - j];
 
@@ -70,9 +70,9 @@ _nmod_poly_mullow_classical_check(mp_srcptr p, mp_srcptr poly1, slong len1,
     return 1;
 }
 
-int _nmod_poly_divides_classical(mp_ptr Q, mp_srcptr A, slong lenA, 
+int _nmod_poly_divides_classical(mp_ptr Q, mp_srcptr A, slong lenA,
                                            mp_srcptr B, slong lenB, nmod_t mod)
-{    
+{
     slong lenQ = lenA - lenB + 1;
     int res;
 
@@ -123,7 +123,7 @@ int nmod_poly_divides_classical(nmod_poly_t Q, const nmod_poly_t A,
         nmod_poly_swap(tQ, Q);
         nmod_poly_clear(tQ);
     }
-    
+
     Q->length = lenA - lenB + 1;
     _nmod_poly_normalise(Q);
 

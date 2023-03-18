@@ -13,7 +13,7 @@
 #define FMPQ_VEC_H
 
 #ifdef FMPQ_VEC_INLINES_C
-#define FMPQ_VEC_INLINE 
+#define FMPQ_VEC_INLINE
 #else
 #define FMPQ_VEC_INLINE static __inline__
 #endif
@@ -31,7 +31,7 @@ extern "C" {
 
 /*  Randomisation  ***********************************************************/
 
-void _fmpq_vec_randtest(fmpq * f, flint_rand_t state, 
+void _fmpq_vec_randtest(fmpq * f, flint_rand_t state,
                         slong len, flint_bitcnt_t bits);
 
 void _fmpq_vec_randtest_uniq_sorted(fmpq * vec,

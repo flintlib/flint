@@ -441,7 +441,7 @@ try_again:
     {
         for (i = a; i < b && (cmp = mpoly_monomial_cmp_nomask(A->exps + N*i, pow, N)) >= 0; i++)
         {
-            if (cmp == 0) 
+            if (cmp == 0)
             {
                 return A->coeffs + i;
             }
@@ -452,7 +452,7 @@ try_again:
     {
         i = a + (b - a)/2;
         cmp = mpoly_monomial_cmp_nomask(A->exps + N*i, pow, N);
-        if (cmp == 0) 
+        if (cmp == 0)
         {
             return A->coeffs + i;
         }
@@ -514,7 +514,7 @@ try_again:
     {
         for (i = a; i < b && A->exps[i] >= pow; i++)
         {
-            if (A->exps[i] == pow) 
+            if (A->exps[i] == pow)
             {
                 return A->coeffs + i;
             }
@@ -524,7 +524,7 @@ try_again:
     else
     {
         i = a + (b - a)/2;
-        if (A->exps[i] == pow) 
+        if (A->exps[i] == pow)
         {
             return A->coeffs + i;
         }
@@ -548,7 +548,7 @@ create_new:
         A->exps[j] = A->exps[j - 1];
         nmod_mpolyn_swap(A->coeffs + j, A->coeffs + j - 1);
     }
-    
+
     A->length++;
     A->exps[i] = pow;
     xk = A->coeffs + i;
@@ -1021,7 +1021,7 @@ void nmod_mpolyu_cvtto_mpolyun(nmod_mpolyun_t A, const nmod_mpolyu_t B,
         Aexp[i] = Bexp[i];
     }
 
-    A->length = Blen;  
+    A->length = Blen;
 }
 
 
@@ -1061,7 +1061,7 @@ void nmod_mpoly_cvtfrom_mpolyn(
             _nmod_mpoly_fit_length(&A->coeffs, &A->coeffs_alloc,
                                    &A->exps, &A->exps_alloc, N, k + 1);
             A->coeffs[k] = c;
-            mpoly_monomial_madd(A->exps + N*k, B->exps + N*i, j, genexp, N);                
+            mpoly_monomial_madd(A->exps + N*k, B->exps + N*i, j, genexp, N);
             k++;
         }
     }

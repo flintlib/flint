@@ -12,7 +12,7 @@
 #include "fq.h"
 #include "fq_mat.h"
 
-slong fq_mat_reduce_row(fq_mat_t A, slong * P, slong * L, 
+slong fq_mat_reduce_row(fq_mat_t A, slong * P, slong * L,
                                          slong m, const fq_ctx_t ctx)
 {
    slong n = A->c, i, j, r, res = -WORD(1);
@@ -35,13 +35,13 @@ slong fq_mat_reduce_row(fq_mat_t A, slong * P, slong * L,
                fmpz_poly_mul(h, fq_mat_entry(A, r, j), fq_mat_entry(A, m, i));
                fmpz_poly_sub(fq_mat_entry(A, m, j), fq_mat_entry(A, m, j), h);
             }
- 
+
             fq_zero(fq_mat_entry(A, m, i), ctx);
          } else
          {
             fq_inv(h, fq_mat_entry(A, m, i), ctx);
             fq_one(fq_mat_entry(A, m, i), ctx);
-           
+
             for (j = i + 1; j < L[m]; j++)
             {
                fq_reduce(fq_mat_entry(A, m, j), ctx);
@@ -59,7 +59,7 @@ slong fq_mat_reduce_row(fq_mat_t A, slong * P, slong * L,
    }
 
    fmpz_poly_clear(h);
-   
+
    return res;
 }
 

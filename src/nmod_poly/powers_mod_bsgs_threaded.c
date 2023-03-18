@@ -55,13 +55,13 @@ _nmod_poly_powers_mod_preinv_worker(void * arg_ptr)
         if (glen == 2) /* special case, constant polynomials */
         {
             for (i = j + 1; i < j + k && i < n; i++)
-                res[i][0] = n_mulmod2_preinv(res[j][0], res[i - j][0], 
+                res[i][0] = n_mulmod2_preinv(res[j][0], res[i - j][0],
 				                              mod.n, mod.ninv);
         } else
         {
             for (i = j + 1; i < j + k && i < n; i++)
                 _nmod_poly_mulmod_preinv(res[i], res[j],
-                  glen - 1, res[i - j], glen - 1, g, glen, ginv, ginvlen, mod);	
+                  glen - 1, res[i - j], glen - 1, g, glen, ginv, ginvlen, mod);
         }
     }
 }
@@ -87,7 +87,7 @@ _nmod_poly_powers_mod_preinv_threaded_pool(mp_ptr * res, mp_srcptr f,
 
     if (n == 0)
         return;
-    
+
     if (n == 1)
     {
         if (glen > 1)
@@ -107,7 +107,7 @@ _nmod_poly_powers_mod_preinv_threaded_pool(mp_ptr * res, mp_srcptr f,
 		                                  g, glen, ginv, ginvlen, mod);
 
     /* compute giant steps */
-   
+
     /* f^(k*i) = f^(k*(i - 1))*f^k */
     if (glen == 2) /* special case, constant polys */
     {
@@ -182,7 +182,7 @@ nmod_poly_powers_mod_bsgs(nmod_poly_struct * res,
 
     nmod_poly_t ginv;
     mp_ptr * res_arr;
-    
+
     if (nmod_poly_length(g) == 0)
     {
         flint_printf("Exception (nmod_poly_powers_mod_naive). Divide by zero.\n");
@@ -234,7 +234,7 @@ nmod_poly_powers_mod_bsgs(nmod_poly_struct * res,
 
     for (i = 0; i < n; i++)
        _nmod_poly_normalise(res + i);
-    
+
     nmod_poly_clear(ginv);
     flint_free(res_arr);
 }

@@ -43,7 +43,7 @@ void sample(void * arg, ulong count)
     slong size = info->limbs, i, j;
     int algo = info->algo;
     int scale = 200;
-   
+
     mpz_t a, b, d, r2;
 
     gmp_randstate_t st;
@@ -52,14 +52,14 @@ void sample(void * arg, ulong count)
     flint_bitcnt_t norm;
 
     FLINT_TEST_INIT(state);
-    
+
     mpz_init(a);
     mpz_init(b);
     mpz_init(d);
     /* don't init r2 */
 
     gmp_randinit_default(st);
-    
+
 
     for (i = 0; i < count; i++)
     {
@@ -68,7 +68,7 @@ void sample(void * arg, ulong count)
        do {
           mpz_rrandomb(d, st, size*FLINT_BITS);
        } while (mpz_sgn(d) == 0);
-       
+
        /* reduce a, b mod d */
        mpz_fdiv_r(a, a, d);
        mpz_fdiv_r(b, b, d);
@@ -83,19 +83,19 @@ void sample(void * arg, ulong count)
        flint_mpn_preinvn(dinv, d->_mp_d, size);
 
        r2->_mp_d = flint_malloc(size*sizeof(mp_limb_t));
-       
+
        prof_start();
        if (algo == 1)
        {
           for (j = 0; j < scale; j++)
           {
-             flint_mpn_mulmod_preinvn(r2->_mp_d, a->_mp_d, b->_mp_d, size, d->_mp_d, dinv, norm); 
+             flint_mpn_mulmod_preinvn(r2->_mp_d, a->_mp_d, b->_mp_d, size, d->_mp_d, dinv, norm);
           }
        } else
        {
           for (j = 0; j < scale; j++)
           {
-             mock_mulmod_preinvn(r2->_mp_d, a->_mp_d, b->_mp_d, size, d->_mp_d, dinv, norm); 
+             mock_mulmod_preinvn(r2->_mp_d, a->_mp_d, b->_mp_d, size, d->_mp_d, dinv, norm);
           }
        }
        prof_stop();
@@ -128,20 +128,20 @@ int main(void)
       info.algo = 1;
 
       scale = 200;
-   
+
       prof_repeat(&min, &max, sample, (void *) &info);
-         
-      flint_printf("1: limbs %wd, min %.3g ms, max %.3g ms\n", 
+
+      flint_printf("1: limbs %wd, min %.3g ms, max %.3g ms\n",
            info.limbs,
 		   ((min/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,
            ((max/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0
 	     );
 
      info.algo = 2;
-     
+
      prof_repeat(&min, &max, sample, (void *) &info);
-         
-      flint_printf("2: limbs %wd, min %.3g ms, max %.3g ms\n\n", 
+
+      flint_printf("2: limbs %wd, min %.3g ms, max %.3g ms\n\n",
            info.limbs,
 		   ((min/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0,
            ((max/(double)FLINT_CLOCK_SCALE_FACTOR)/scale)/2400000.0

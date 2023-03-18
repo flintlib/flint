@@ -551,7 +551,7 @@ static void _hensel_lift_fac(
         n_fq_poly_mul(p01, p0, p1, ctx);
         n_fq_bpoly_mul(t1, G, H, ctx);
         n_fq_bpoly_sub(c, f, t1, ctx);
-        for (i = 0; i < c->length; i++)        
+        for (i = 0; i < c->length; i++)
         {
             n_fq_poly_divrem(tq, tr, c->coeffs + i, p01, ctx);
             FLINT_ASSERT(n_poly_is_zero(tr));
@@ -660,7 +660,7 @@ static void _hensel_lift_inv(
             n_fq_poly_neg(c->coeffs + i, c->coeffs + i, ctx);
         n_fq_poly_add_si(c->coeffs + 0, c->coeffs + 0, 1, ctx);
         n_bpoly_normalise(c);
-        for (i = 0; i < c->length; i++)        
+        for (i = 0; i < c->length; i++)
         {
             n_fq_poly_divrem(tq, tr, c->coeffs + i, p01, ctx);
             FLINT_ASSERT(n_poly_is_zero(tr));

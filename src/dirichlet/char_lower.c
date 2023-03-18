@@ -15,7 +15,7 @@ void
 dirichlet_char_lower(dirichlet_char_t y, const dirichlet_group_t H, const dirichlet_char_t x, const dirichlet_group_t G)
 {
     slong k, l;
-    
+
     if (G->q % H->q != 0)
     {
         flint_printf("conrey_lower: lower modulus %wu does not divide %wu\n", H->q, G->q);

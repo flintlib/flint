@@ -92,7 +92,7 @@ slong _fmpz_mpoly_quasidiv_heap1(fmpz_t scale,
 
     while (heap_len > 1)
     {
-        /* make sure quotient array has space for q_len + 1 entries */ 
+        /* make sure quotient array has space for q_len + 1 entries */
         _fmpz_mpoly_fit_length(&q_coeff, &q_exp, allocq, q_len + 1, 1);
         if (q_len + 1 > qs_alloc)
         {
@@ -473,7 +473,7 @@ slong _fmpz_mpoly_quasidiv_heap(fmpz_t scale,
 
     while (heap_len > 1)
     {
-        /* make sure quotient array has space for q_len + 1 entries */ 
+        /* make sure quotient array has space for q_len + 1 entries */
         _fmpz_mpoly_fit_length(&q_coeff, &q_exp, allocq, q_len + 1, N);
         if (q_len + 1 > qs_alloc)
         {
@@ -884,7 +884,7 @@ void fmpz_mpoly_quasidiv_heap(fmpz_t scale, fmpz_mpoly_t q,
       if (free3)
          flint_free(old_exp3);
 
-      free2 = free3 = 1; 
+      free2 = free3 = 1;
 
       fmpz_mpoly_fit_bits(tq, exp_bits, ctx);
       tq->bits = exp_bits;
@@ -895,7 +895,7 @@ void fmpz_mpoly_quasidiv_heap(fmpz_t scale, fmpz_mpoly_t q,
    {
       fmpz_mpoly_swap(temp1, q, ctx);
       fmpz_mpoly_clear(temp1, ctx);
-   } 
+   }
 
    _fmpz_mpoly_set_length(q, lenq, ctx);
 

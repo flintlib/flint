@@ -63,7 +63,7 @@ void qsieve_linalg_init(qs_t qs_inf)
     qs_inf->table = flint_malloc(qs_inf->table_size * sizeof(hash_t));
 }
 
-/* 
+/*
     Increase size of linear algebra allocations after factor base increment
 */
 void qsieve_linalg_realloc(qs_t qs_inf)

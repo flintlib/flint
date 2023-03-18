@@ -274,7 +274,7 @@ nmod_gcds_ret_t nmod_mpolyu_gcds_zippel(nmod_mpolyu_t G,
     */
     for (i = 1; i<f->length; i++)
     {
-        for (j=i; j > 0 && (f->coeffs + d[j-1])->length 
+        for (j=i; j > 0 && (f->coeffs + d[j-1])->length
                          > (f->coeffs + d[j-0])->length; j--)
         {
             slong temp = d[j-1];
@@ -540,7 +540,7 @@ pick_evaluation_point:
                                                              ctx->mod);
         }
         success = nmod_vandsolve((G->coeffs + i)->coeffs,
-                                 (fevalsk1->coeffs + i)->coeffs, b, 
+                                 (fevalsk1->coeffs + i)->coeffs, b,
                                     (f->coeffs + i)->length, ctx->mod);
         if (!success)
         {
@@ -781,7 +781,7 @@ int nmod_mpolyu_gcdp_zippel_bivar(
             }
             else if (Geval->exps[0] < H->exps[0])
             {
-                n_poly_one(modulus);                
+                n_poly_one(modulus);
             }
         }
 
@@ -1003,7 +1003,7 @@ int nmod_mpolyu_gcdp_zippel(
             success = 0;
             goto finished;
         }
-        
+
         degbound = Geval->exps[0];
 
         if (nmod_mpolyu_is_one(Geval, ctx))
@@ -1026,7 +1026,7 @@ int nmod_mpolyu_gcdp_zippel(
             }
             else if (Geval->exps[0] < H->exps[0])
             {
-                n_poly_one(modulus);                
+                n_poly_one(modulus);
             }
         }
 

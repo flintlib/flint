@@ -16,7 +16,7 @@ int main(void)
 {
    int i, result;
    FLINT_TEST_INIT(state);
-   
+
 
    flint_printf("smul_ppmm....");
    fflush(stdout);
@@ -28,25 +28,25 @@ int main(void)
 
       n1 = n_randtest(state);
       n2 = n_randtest(state);
-      
+
       smul_ppmm(ph1, pl1, n1, n2);
 
       m1 = n1;
       m2 = n2;
 
       sign = 1;
-      if ((mp_limb_signed_t) m1 < WORD(0)) 
+      if ((mp_limb_signed_t) m1 < WORD(0))
       {
          sign = -1;
          m1 = -m1;
       }
-      
-      if ((mp_limb_signed_t) m2 < WORD(0)) 
+
+      if ((mp_limb_signed_t) m2 < WORD(0))
       {
          sign = -sign;
          m2 = -m2;
       }
-      
+
       pl2old = UWORD(0);
       pl2 = UWORD(0);
       ph2 = UWORD(0);
@@ -71,7 +71,7 @@ int main(void)
       if (!result)
       {
          flint_printf("FAIL:\n");
-         flint_printf("m1 = %wu, m2 = %wu\n", n1, n2); 
+         flint_printf("m1 = %wu, m2 = %wu\n", n1, n2);
          flint_printf("ph2 = %wu, ph1 = %wu, pl2 = %wu, pl1 = %wu\n", ph2, ph1, pl2, pl1);
          fflush(stdout);
          flint_abort();
@@ -79,7 +79,7 @@ int main(void)
    }
 
    FLINT_TEST_CLEANUP(state);
-   
+
    flint_printf("PASS\n");
    return 0;
 }

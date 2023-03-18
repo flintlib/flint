@@ -30,16 +30,16 @@ void sample(void * arg, ulong count)
    ulong i, ninv, sum = 0;
    slong j;
    algo_s * alg = (algo_s *) arg;
-   
+
    FLINT_TEST_INIT(state);
 
    for (i = 0; i < count; i++)
    {
       for (j = 0; j < 200; j++)
       {
-         array[j] = n_randlimb(state) | (UWORD(1) << (FLINT_BITS - 1));  
+         array[j] = n_randlimb(state) | (UWORD(1) << (FLINT_BITS - 1));
       }
-      
+
       prof_start();
       if (alg->algo == 0)
       {
@@ -73,15 +73,15 @@ int main(void)
    alg.algo = 0;
 
    prof_repeat(&min, &max, sample, &alg);
-   
-   flint_printf("invert_limb min time is %.3f cycles, max time is %.3f cycles\n", 
+
+   flint_printf("invert_limb min time is %.3f cycles, max time is %.3f cycles\n",
            min/FLINT_CLOCK_SCALE_FACTOR/200, max/FLINT_CLOCK_SCALE_FACTOR/200);
 
    alg.algo = 1;
 
    prof_repeat(&min, &max, sample, &alg);
-   
-   flint_printf("invert_limb_naive min time is %.3f cycles, max time is %.3f cycles\n", 
+
+   flint_printf("invert_limb_naive min time is %.3f cycles, max time is %.3f cycles\n",
            min/FLINT_CLOCK_SCALE_FACTOR/200, max/FLINT_CLOCK_SCALE_FACTOR/200);
 
    return 0;

@@ -12,9 +12,9 @@
 #include "fmpz_mod_poly.h"
 #include "padic_poly.h"
 
-void _padic_poly_add(fmpz *rop, slong *val, slong N, 
-                     const fmpz *op1, slong val1, slong len1, slong N1, 
-                     const fmpz *op2, slong val2, slong len2, slong N2, 
+void _padic_poly_add(fmpz *rop, slong *val, slong N,
+                     const fmpz *op1, slong val1, slong len1, slong N1,
+                     const fmpz *op2, slong val2, slong len2, slong N2,
                      const padic_ctx_t ctx)
 {
     const slong len = FLINT_MAX(len1, len2);
@@ -87,8 +87,8 @@ void _padic_poly_add(fmpz *rop, slong *val, slong N,
     }
 }
 
-void padic_poly_add(padic_poly_t f, 
-                    const padic_poly_t g, const padic_poly_t h, 
+void padic_poly_add(padic_poly_t f,
+                    const padic_poly_t g, const padic_poly_t h,
                     const padic_ctx_t ctx)
 {
     const slong lenG = g->length;
@@ -113,8 +113,8 @@ void padic_poly_add(padic_poly_t f,
 
     padic_poly_fit_length(f, lenF);
 
-    _padic_poly_add(f->coeffs, &(f->val), f->N, 
-                    g->coeffs, g->val, lenG, g->N, 
+    _padic_poly_add(f->coeffs, &(f->val), f->N,
+                    g->coeffs, g->val, lenG, g->N,
                     h->coeffs, h->val, lenH, h->N, ctx);
 
     _padic_poly_set_length(f, lenF);

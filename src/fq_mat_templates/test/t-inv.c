@@ -21,7 +21,7 @@ main(void)
     slong i, j, m, r;
     int result;
     FLINT_TEST_INIT(state);
-    
+
 
     flint_printf("inv....");
     fflush(stdout);
@@ -130,7 +130,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

@@ -20,7 +20,7 @@ int main(void)
     gmp_randstate_t st;
     mp_limb_t d1, d2, inv;
     slong s1, s2;
-    
+
     FLINT_TEST_INIT(state);
 
     flint_printf("divrem_preinv1....");
@@ -31,9 +31,9 @@ int main(void)
     mpz_init(b);
     mpz_init(q);
     mpz_init(r);
-    
+
     gmp_randinit_default(st);
-    
+
     for (i = 0; i < 10000; i++)
     {
        do {
@@ -45,9 +45,9 @@ int main(void)
           s1 = a->_mp_size;
           s2 = b->_mp_size;
        } while (s1 < s2 || s2 < 2);
-       
+
        mpz_set(a2, a);
-       
+
        /* normalise b */
        b->_mp_d[b->_mp_size - 1] |= ((mp_limb_t) 1 << (GMP_LIMB_BITS - 1));
 
@@ -59,8 +59,8 @@ int main(void)
        inv = flint_mpn_preinv1(d1, d2);
 
        q2->_mp_d = flint_malloc((s1 - s2 + 1)*sizeof(mp_limb_t));
-       
-       q2->_mp_d[s1 - s2] = flint_mpn_divrem_preinv1(q2->_mp_d, a2->_mp_d, a2->_mp_size, b->_mp_d, b->_mp_size, inv); 
+
+       q2->_mp_d[s1 - s2] = flint_mpn_divrem_preinv1(q2->_mp_d, a2->_mp_d, a2->_mp_size, b->_mp_d, b->_mp_size, inv);
 
        /* normalise */
        s1 -= (s2 - 1);
@@ -96,7 +96,7 @@ int main(void)
     /* don't clear g */
     gmp_randclear(st);
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

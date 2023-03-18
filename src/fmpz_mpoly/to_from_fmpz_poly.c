@@ -73,7 +73,7 @@ void fmpz_mpoly_from_fmpz_poly(fmpz_mpoly_t poly1, const fmpz_poly_t poly2,
     if (bits > FLINT_BITS)
         flint_throw(FLINT_EXPOF, "Exponent overflow in fmpz_mpoly_from_fmpz_poly");
     bits = mpoly_fix_bits(bits, ctx->minfo);
-    
+
     N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     one = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     mpoly_gen_monomial_sp(one, var,bits, ctx->minfo);

@@ -89,13 +89,13 @@ main(void)
             flint_abort();
         }
 
-        fq_nmod_mpoly_clear(f, ctx);  
+        fq_nmod_mpoly_clear(f, ctx);
         fq_nmod_mpoly_clear(g, ctx);
         fq_nmod_mpoly_ctx_clear(ctx);
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

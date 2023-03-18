@@ -160,7 +160,7 @@ _fmpq_sub_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q,
     Note (p - q*r, q) is in canonical form.
 
     */
-    
+
     fmpz_init(u);
 
     fmpz_mul(u, q, r);
@@ -207,7 +207,7 @@ _fmpq_sub_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q,
     Note (p - q*r, q) is in canonical form.
 
     */
-    
+
     fmpz_init(u);
 
     fmpz_mul_si(u, q, r);
@@ -250,7 +250,7 @@ _fmpq_sub_ui(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q,
     Note (p - q*r, q) is in canonical form.
 
     */
-    
+
     fmpz_init(u);
 
     fmpz_mul_ui(u, q, r);

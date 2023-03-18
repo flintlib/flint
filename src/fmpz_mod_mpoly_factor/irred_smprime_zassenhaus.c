@@ -351,7 +351,7 @@ next_alpha:
 
     fmpz_mod_mpolyv_swap(fac, pfac, ctx);
 
-cleanup: 
+cleanup:
 
     flint_free(subset);
     _fmpz_vec_clear(alphas, n);

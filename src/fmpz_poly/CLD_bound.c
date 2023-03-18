@@ -18,9 +18,9 @@
 
 #define CLD_EPS 0.00000001
 
-static double _log2(double n)  
-{  
-    return log(n)/log(2);  
+static double _log2(double n)
+{
+    return log(n)/log(2);
 }
 
 static int _d_cmp_2exp(double a, slong a_exp, double b, slong b_exp)
@@ -43,7 +43,7 @@ static int _d_cmp_2exp(double a, slong a_exp, double b, slong b_exp)
 
       t = 1 + (long) _log2(a);
 
-      if (t >= b_exp + 2) /* a, a_exp >= 2*(b, b_exp) */ 
+      if (t >= b_exp + 2) /* a, a_exp >= 2*(b, b_exp) */
          return 2;
       else if (b_exp >= t + 2) /* b, b_exp >= 2*(a, a_exp) */
          return -2;
@@ -53,7 +53,7 @@ static int _d_cmp_2exp(double a, slong a_exp, double b, slong b_exp)
       return -_d_cmp_2exp(b, b_exp, a, a_exp);
    else /* neither a_exp not b_exp is zero */
    {
-      if (a_exp >= b_exp + 2) /* a, a_exp >= 2*(b, b_exp) */ 
+      if (a_exp >= b_exp + 2) /* a, a_exp >= 2*(b, b_exp) */
          return 2;
       else if (b_exp >= a_exp + 2) /* b, b_exp >= 2*(a, a_exp) */
          return -2;
@@ -162,7 +162,7 @@ void fmpz_poly_CLD_bound(fmpz_t res, const fmpz_poly_t f, slong n)
          } else if (hi_eval != hi_eval || lo_eval != lo_eval)
          {
             /* doubles were insufficient after all */
-            too_much = 1; 
+            too_much = 1;
          } else /* we are done */
          {
             if (hi_eval > lo_eval)
@@ -177,7 +177,7 @@ void fmpz_poly_CLD_bound(fmpz_t res, const fmpz_poly_t f, slong n)
          }
       } else
       {
-         /* 
+         /*
             too big for doubles alone, so we represent in d*2^exp format
 
             _d_cmp_2exp will return 2 when 2*lo < hi, -2 when 2*hi < lo

@@ -12,8 +12,8 @@
 #include "fmpz_mat.h"
 #include "padic_mat.h"
 
-void _padic_mat_scalar_mul_fmpz(padic_mat_t B, 
-                                const padic_mat_t A, const fmpz_t c, 
+void _padic_mat_scalar_mul_fmpz(padic_mat_t B,
+                                const padic_mat_t A, const fmpz_t c,
                                 const padic_ctx_t ctx)
 {
     if (padic_mat_is_empty(B))
@@ -40,8 +40,8 @@ void _padic_mat_scalar_mul_fmpz(padic_mat_t B,
     }
 }
 
-void padic_mat_scalar_mul_fmpz(padic_mat_t B, 
-                               const padic_mat_t A, const fmpz_t c, 
+void padic_mat_scalar_mul_fmpz(padic_mat_t B,
+                               const padic_mat_t A, const fmpz_t c,
                                const padic_ctx_t ctx)
 {
     _padic_mat_scalar_mul_fmpz(B, A, c, ctx);

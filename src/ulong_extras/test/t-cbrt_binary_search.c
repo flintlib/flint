@@ -18,7 +18,7 @@ int main(void)
 {
     int i, result;
     FLINT_TEST_INIT(state);
-   
+
     flint_printf("cbrt_binary_search....");
     fflush(stdout);
 
@@ -31,19 +31,19 @@ int main(void)
 
         mpz_init(mpz_n);
         mpz_init(mpz_val);
-      
+
         n = n_randtest(state);
         val = n_cbrt_binary_search(n);
 
         flint_mpz_set_ui(mpz_n, n);
         mpz_root(mpz_val, mpz_n, 3);
         ans = flint_mpz_get_ui(mpz_val);
-      
+
         result = (val == ans);
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("n = %wu, val = %wd, ans = %wu\n", n, val, ans); 
+            flint_printf("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
             fflush(stdout);
             flint_abort();
         }
@@ -60,7 +60,7 @@ int main(void)
 
         mpz_init(mpz_n);
         mpz_init(mpz_val);
-      
+
         bits = n_randint(state, FLINT_BITS/3 + 1);
         n = n_randtest_bits(state, bits);
         n = n*n*n;
@@ -70,12 +70,12 @@ int main(void)
         flint_mpz_set_ui(mpz_n, n);
         mpz_root(mpz_val, mpz_n, 3);
         ans = flint_mpz_get_ui(mpz_val);
-      
+
         result = (val == ans);
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("n = %wu, val = %wd, ans = %wu\n", n, val, ans); 
+            flint_printf("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
             fflush(stdout);
             flint_abort();
         }
@@ -92,7 +92,7 @@ int main(void)
 
         mpz_init(mpz_n);
         mpz_init(mpz_val);
-        
+
         bits = n_randint(state, FLINT_BITS/3 + 1);
         n = n_randtest_bits(state, bits);
         n = n*n*n;
@@ -102,19 +102,19 @@ int main(void)
         flint_mpz_set_ui(mpz_n, n);
         mpz_root(mpz_val, mpz_n, 3);
         ans = flint_mpz_get_ui(mpz_val);
-      
+
         result = (val == ans);
         if (!result)
-        { 
+        {
             flint_printf("FAIL:\n");
-            flint_printf("n = %wu, val = %wd, ans = %wu\n", n, val, ans); 
+            flint_printf("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
             fflush(stdout);
             flint_abort();
         }
         mpz_clear(mpz_n);
         mpz_clear(mpz_val);
     }
-   
+
     /* type n^3 - 1 */
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -124,7 +124,7 @@ int main(void)
 
         mpz_init(mpz_n);
         mpz_init(mpz_val);
-      
+
         bits = n_randint(state, FLINT_BITS/3 + 1);
         n = n_randtest_bits(state, bits);
         n = n*n*n;
@@ -134,12 +134,12 @@ int main(void)
         flint_mpz_set_ui(mpz_n, n);
         mpz_root(mpz_val, mpz_n, 3);
         ans = flint_mpz_get_ui(mpz_val);
-      
+
         result = (val == ans);
         if (!result)
         {
             flint_printf("FAIL:\n");
-            flint_printf("n = %wu, val = %wd, ans = %wu\n", n, val, ans); 
+            flint_printf("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
             fflush(stdout);
             flint_abort();
         }

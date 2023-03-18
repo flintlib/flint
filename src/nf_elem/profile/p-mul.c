@@ -71,15 +71,15 @@ void sample(void * arg, ulong count)
    fmpq_poly_t pol;
    nf_t nf;
    nf_elem_t a, b, c;
-   
+
    flint_randinit(state);
 
    scale = 100;
    if (length >= 50) scale = 10;
    if (length >= 500) scale = 4;
-   
+
    fmpq_poly_init(pol);
-        
+
    for (i = 0; i < count; i++)
    {
       random_fmpq_poly(pol, state, length);
@@ -88,13 +88,13 @@ void sample(void * arg, ulong count)
          fmpz_one(fmpq_poly_denref(pol));
          fmpq_poly_set_coeff_ui(pol, length - 1, 1);
       }
-	
+
       nf_init(nf, pol);
-       
+
       nf_elem_init(a, nf);
       nf_elem_init(b, nf);
       nf_elem_init(c, nf);
-        
+
       random_nf_elem(a, state, nf);
       random_nf_elem(b, state, nf);
       if (monic)
@@ -102,7 +102,7 @@ void sample(void * arg, ulong count)
          fmpz_one(fmpq_poly_denref(NF_ELEM(a)));
          fmpz_one(fmpq_poly_denref(NF_ELEM(b)));
       }
-	
+
       prof_start();
       for (j = 0; j < scale; j++)
       {
@@ -110,11 +110,11 @@ void sample(void * arg, ulong count)
       }
 	   prof_stop();
    }
-  
+
    nf_elem_clear(a, nf);
    nf_elem_clear(b, nf);
    nf_elem_clear(c, nf);
-        
+
    nf_clear(nf);
 
    fmpq_poly_clear(pol);
@@ -139,20 +139,20 @@ int main(void)
       scale = 100;
       if (k >= 50) scale = 10;
       if (k >= 500) scale = 4;
-      
+
       prof_repeat(&min, &max, sample, (void *) &info);
-      
-      flint_printf("length %wd, min %.3e us, max %.3e us\n", 
+
+      flint_printf("length %wd, min %.3e us, max %.3e us\n",
            info.length,
 		   (min/scale),
            (max/scale)
 	     );
 
      info.monic = 1;
-     
+
      prof_repeat(&min, &max, sample, (void *) &info);
-         
-      flint_printf("length %wd, min %.3e us, max %.3e us\n", 
+
+      flint_printf("length %wd, min %.3e us, max %.3e us\n",
            info.length,
 		   (min/scale),
            (max/scale)

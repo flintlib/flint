@@ -12,10 +12,10 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-/* 
+/*
    Method of Niels Moller and Torbjorn Granlund, see "Improved Division by
    Invariant Integers: (Algorithm 4)
-   https://gmplib.org/~tege/division-paper.pdf 
+   https://gmplib.org/~tege/division-paper.pdf
 */
 
 ulong

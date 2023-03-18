@@ -87,7 +87,7 @@ void TEMPLATE(T, embed_trace_matrix)(TEMPLATE(B, mat_t) res,
                                const TEMPLATE(T, ctx_t) sub_ctx,
                                const TEMPLATE(T, ctx_t) sup_ctx)
 {
-    slong m = TEMPLATE(B, mat_ncols)(basis), 
+    slong m = TEMPLATE(B, mat_ncols)(basis),
           n = TEMPLATE(B, mat_nrows)(basis);
     const TEMPLATE(B, poly_struct) *modulus = TEMPLATE(T, ctx_modulus)(sub_ctx);
     TEMPLATE(B, mat_t) m2d, d2m, tmp;
@@ -116,7 +116,7 @@ int __fmpz_mod_inv_degree(fmpz_t invd, slong d, const fmpz_t p)
 }
 
 static __inline__
-int __nmod_inv_degree(fmpz_t invd, slong d, mp_limb_t p) 
+int __nmod_inv_degree(fmpz_t invd, slong d, mp_limb_t p)
 {
     mp_limb_t ud = d % p;
     if (!ud)
@@ -169,7 +169,7 @@ void TEMPLATE(T, embed_matrices)(TEMPLATE(B, mat_t) embed,
     /* If this is an isomorphism, there is no need for correction */
     if (d == 1) {}
     /* If the extension degree is invertible mod p, multiply trace by 1/d */
-    else if (__TEMPLATE(B, inv_degree)(invd, d, TEMPLATE(B, poly_modulus)(gen_minpoly))) 
+    else if (__TEMPLATE(B, inv_degree)(invd, d, TEMPLATE(B, poly_modulus)(gen_minpoly)))
     {
         TEMPLATE(B, mat_scalar_mul_fmpz)(sup2gen, sup2gen, invd);
     }
@@ -179,7 +179,7 @@ void TEMPLATE(T, embed_matrices)(TEMPLATE(B, mat_t) embed,
         int i;
         TEMPLATE(T, t) mul, trace;
         TEMPLATE(B, mat_t) column, tvec, mat_mul, tmp;
-        
+
         TEMPLATE(T, init)(mul, sup_ctx);
         TEMPLATE(T, init)(trace, sup_ctx);
         TEMPLATE(B, mat_init)(tvec, n, 1, TEMPLATE(B, poly_modulus)(gen_minpoly));
@@ -193,7 +193,7 @@ void TEMPLATE(T, embed_matrices)(TEMPLATE(B, mat_t) embed,
             if (!TEMPLATE(B, mat_entry_is_zero(sup2gen, 0, i)))
                 break;
         }
-        
+
         /* Set mul to x^i */
         TEMPLATE(T, gen)(mul, sup_ctx);
         TEMPLATE(T, pow_ui)(mul, mul, i, sup_ctx);
@@ -203,12 +203,12 @@ void TEMPLATE(T, embed_matrices)(TEMPLATE(B, mat_t) embed,
         TEMPLATE4(T, set, B, mat)(trace, tvec, sup_ctx);
         /* Get an element of trace 1 */
         TEMPLATE(T, div)(mul, mul, trace, sup_ctx);
-        
+
         /* Correct the matrix */
         TEMPLATE(T, embed_mul_matrix)(mat_mul, mul, sup_ctx);
         TEMPLATE(B, mat_mul)(tmp, sup2gen, mat_mul);
         TEMPLATE(B, mat_swap)(tmp, sup2gen);
-        
+
         TEMPLATE(B, mat_clear)(tmp);
         TEMPLATE(B, mat_clear)(mat_mul);
         TEMPLATE(B, mat_clear)(tvec);

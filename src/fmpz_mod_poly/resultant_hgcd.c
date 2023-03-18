@@ -14,7 +14,7 @@
 #include "fmpz_mod_poly.h"
 #include "gr_poly.h"
 
-void _fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz *A, slong lenA, 
+void _fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz *A, slong lenA,
                                const fmpz *B, slong lenB, const fmpz_t mod)
 {
     gr_ctx_t ctx;
@@ -23,10 +23,10 @@ void _fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz *A, slong lenA,
     gr_ctx_clear(ctx);
 }
 
-void fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz_mod_poly_t A, 
+void fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz_mod_poly_t A,
                              const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
 {
-    if (A->length == 0 || B->length == 0) 
+    if (A->length == 0 || B->length == 0)
     {
        fmpz_zero(res);
     }
@@ -40,7 +40,7 @@ void fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz_mod_poly_t A,
     else /* lenA >= lenB >= 0 */
     {
         slong lenA = A->length, lenB = B->length;
-        
+
         /* lenA >= lenB >= 1 */
         _fmpz_mod_poly_resultant_hgcd(res, A->coeffs, lenA,
                                    B->coeffs, lenB, fmpz_mod_ctx_modulus(ctx));

@@ -22,7 +22,7 @@ main(void)
     flint_printf("rfac_ui... ");
     fflush(stdout);
 
-    
+
 
     /* Check aliasing */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -101,7 +101,7 @@ main(void)
         fmpz_clear(r3);
     }
 
-    
+
     flint_printf("PASS\n");
     FLINT_TEST_CLEANUP(state);
     return 0;

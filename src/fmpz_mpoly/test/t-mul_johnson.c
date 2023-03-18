@@ -74,10 +74,10 @@ main(void)
           }
        }
 
-       fmpz_mpoly_clear(f, ctx);  
-       fmpz_mpoly_clear(g, ctx);  
-       fmpz_mpoly_clear(h, ctx);  
-       fmpz_mpoly_clear(k, ctx);  
+       fmpz_mpoly_clear(f, ctx);
+       fmpz_mpoly_clear(g, ctx);
+       fmpz_mpoly_clear(h, ctx);
+       fmpz_mpoly_clear(k, ctx);
     }
 
     /* Check f*(g + h) = f*g + f*h */
@@ -251,7 +251,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

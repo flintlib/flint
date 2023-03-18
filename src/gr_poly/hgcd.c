@@ -34,9 +34,9 @@ typedef gr_poly_res_struct gr_poly_res_t[1];
         (status) |= _gr_vec_normalise(&(lenR), (R), (lenR), (ctx)); \
     } while (0)
 /*
-    We define a whole bunch of macros here which essentially provide 
-    the gr_poly functionality as far as the setting of coefficient 
-    data and lengths is concerned, but which do not do any separate 
+    We define a whole bunch of macros here which essentially provide
+    the gr_poly functionality as far as the setting of coefficient
+    data and lengths is concerned, but which do not do any separate
     memory allocation.  None of these macros support aliasing.
  */
 
@@ -125,12 +125,12 @@ __mat_one(gr_ptr * M, slong * lenM, gr_ctx_t ctx)
 }
 
 /*
-    Computes the matrix product C of the two 2x2 matrices A and B, 
+    Computes the matrix product C of the two 2x2 matrices A and B,
     using classical multiplication.
 
     Does not support aliasing.
 
-    Expects T to be temporary space sufficient for any of the 
+    Expects T to be temporary space sufficient for any of the
     polynomial products involved.
  */
 
@@ -164,12 +164,12 @@ __mat_mul_classical(gr_ptr * C, slong * lenC,
 }
 
 /*
-    Computes the matrix product C of the two 2x2 matrices A and B, 
+    Computes the matrix product C of the two 2x2 matrices A and B,
     using Strassen multiplication.
 
     Does not support aliasing.
 
-    Expects T0, T1 to be temporary space sufficient for any of the 
+    Expects T0, T1 to be temporary space sufficient for any of the
     polynomial products involved.
  */
 
@@ -218,13 +218,13 @@ __mat_mul_strassen(gr_ptr * C, slong * lenC,
 }
 
 /*
-    Computs the matrix product C of the two 2x2 matrices A and B, 
-    using either classical or Strassen multiplication depending 
+    Computs the matrix product C of the two 2x2 matrices A and B,
+    using either classical or Strassen multiplication depending
     on the degrees of the input polynomials.
 
     Does not support aliasing.
 
-    Expects T0, T1 to be temporary space sufficient for any of the 
+    Expects T0, T1 to be temporary space sufficient for any of the
     polynomial products involved.
  */
 
@@ -262,15 +262,15 @@ __mat_mul(gr_ptr * C, slong * lenC,
 
     Assumes that lena > lenb > 0.
 
-    Assumes that the pointers {*A, *B, *T} as well as 
-    {M + 0, M + 1, M + 2, M + 3, t} may be swapped. 
-    With the underlying HGCD implementation in mind, 
-    this is to say that the blocks of memory implicitly 
-    reserved for these pointers probably should have 
+    Assumes that the pointers {*A, *B, *T} as well as
+    {M + 0, M + 1, M + 2, M + 3, t} may be swapped.
+    With the underlying HGCD implementation in mind,
+    this is to say that the blocks of memory implicitly
+    reserved for these pointers probably should have
     the same size.
 
-    Expects {*A, *B, *T} to be of size at least lena, 
-    {M + 0, M + 1, M + 2, M + 3, *t} and Q of size at 
+    Expects {*A, *B, *T} to be of size at least lena,
+    {M + 0, M + 1, M + 2, M + 3, *t} and Q of size at
     least (lena + 1)/2.
  */
 
@@ -322,7 +322,7 @@ _gr_poly_hgcd_recursive_iter(
                 }
                 else
                 {
-                    if (*lenB == 1) 
+                    if (*lenB == 1)
                     {
                         status |= gr_pow_ui(res->lc, res->lc, *lenA - 1, ctx);
                         status |= gr_mul(res->res, res->res, res->lc, ctx);
@@ -359,17 +359,17 @@ _gr_poly_hgcd_recursive_iter(
     return status;
 }
 
-/* 
+/*
     Assumes that lena > lenb > 0.
 
-    The current implementation requires P to point to a memory pool 
+    The current implementation requires P to point to a memory pool
     of size at least 6 lena + 10 (lena + 1)/2 just in this iteration.
 
     Supports aliasing only between {*A, a} and {*B, b}.
 
-    Only computes the matrix {M, lenM} if flag is non-zero, in 
-    which case these arrays are supposed to be sufficiently allocated. 
-    Does not permute the pointers in {M, lenM}.  When flag is zero, 
+    Only computes the matrix {M, lenM} if flag is non-zero, in
+    which case these arrays are supposed to be sufficiently allocated.
+    Does not permute the pointers in {M, lenM}.  When flag is zero,
     the first two arguments are allowed to be NULL.
  */
 
@@ -531,7 +531,7 @@ int _gr_poly_hgcd_recursive(
                     }
                     else
                     {
-                        if (res->len1 == 1) 
+                        if (res->len1 == 1)
                         {
                             status |= gr_pow_ui(res->lc, res->lc, res->len0 - 1, ctx);
                             status |= gr_mul(res->res, res->res, res->lc, ctx);
@@ -567,7 +567,7 @@ int _gr_poly_hgcd_recursive(
                     }
                     else
                     {
-                        if (lenb2 == 1) 
+                        if (lenb2 == 1)
                         {
                             status |= gr_pow_ui(res->lc, res->lc, lena2 - 1, ctx);
                             status |= gr_mul(res->res, res->res, res->lc, ctx);
@@ -717,7 +717,7 @@ int _gr_poly_hgcd(gr_ptr r, slong * sgn, gr_ptr * M, slong * lenM,
             }
             else
             {
-                if (res->len1 == 1) 
+                if (res->len1 == 1)
                 {
                     status |= gr_pow_ui(res->lc, res->lc, res->len0 - 1, ctx);
                     status |= gr_mul(res->res, res->res, res->lc, ctx);

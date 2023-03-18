@@ -13,7 +13,7 @@
 #include "aprcl.h"
 
 /*
-    Computes f = g * g for p = 7. 
+    Computes f = g * g for p = 7.
     g must be reduced by F_7 cyclotomic polynomial.
     t is the memory for fmpz_t; size of t must be > 31.
     Resulting f reduced by F_7 cyclotomic polynomial.
@@ -58,9 +58,9 @@ unity_zp_sqr7(unity_zp f, const unity_zp g, fmpz_t * t)
     fmpz_add(t[21], t[0], t[1]);            /*  m16 = x0 + x1   */
     fmpz_add(t[22], t[0], t[15]);           /*  m17 = m8 + m2   */
     fmpz_mul(t[24], t[3], t[22]);           /*  d1 = x3 * m17   */
-    
+
     fmpz_sub(t[22], t[19], t[4]);           /*  m17 = m14 - m9  */
-    fmpz_add(t[23], t[19], t[4]);           /*  m18 = m14 + m9  */ 
+    fmpz_add(t[23], t[19], t[4]);           /*  m18 = m14 + m9  */
     fmpz_mul(t[25], t[22], t[23]);          /*  d2 = m17 * m18  */
     fmpz_sub(t[22], t[13], t[7]);           /*  m17 = m8 - m2   */
     fmpz_mul(t[26], t[16], t[22]);          /*  d3 = m11 * m17  */
@@ -75,7 +75,7 @@ unity_zp_sqr7(unity_zp f, const unity_zp g, fmpz_t * t)
     fmpz_add(t[7], t[0], t[18]);            /*  m2 = x0 + m13   */
     fmpz_mul(t[30], t[22], t[10]);          /*  d7 = m17 * m5   */
     fmpz_add(t[31], t[24], t[25]);          /*  d8 = d1 + d2    */
-    fmpz_add(t[24], t[31], t[26]);          /*  d1 = d8 + d5    */ 
+    fmpz_add(t[24], t[31], t[26]);          /*  d1 = d8 + d5    */
     unity_zp_coeff_set_fmpz(f, 3, t[24]);   /*  y3 = d1 mod n   */
     fmpz_add(t[31], t[26], t[27]);          /*  d8 = d3 + d4    */
 
@@ -109,7 +109,7 @@ unity_zp_sqr7(unity_zp f, const unity_zp g, fmpz_t * t)
     fmpz_add(t[24], t[31], t[28]);          /*  d1 = d8 + d5    */
     unity_zp_coeff_set_fmpz(f, 5, t[24]);   /*  y5 = d1 mod n   */
     fmpz_add(t[31], t[27], t[29]);          /*  d8 = d4 + d6    */
-    fmpz_add(t[24], t[31], t[30]);          /*  d1 = d8 + d7    */ 
+    fmpz_add(t[24], t[31], t[30]);          /*  d1 = d8 + d7    */
     unity_zp_coeff_set_fmpz(f, 2, t[24]);   /*  y2 = d1 mod n   */
 }
 

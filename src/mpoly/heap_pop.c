@@ -43,5 +43,5 @@ void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N,
 
    heap[i] = heap[s];
 
-   return x; 
+   return x;
 }

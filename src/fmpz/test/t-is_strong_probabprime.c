@@ -100,8 +100,8 @@ main(void)
         do {
            fmpz_randbits(b, state, n_randint(state, 100) + 1);
            fmpz_abs(b, b);
-        } while (fmpz_is_zero(b) || fmpz_is_one(b)); 
-        
+        } while (fmpz_is_zero(b) || fmpz_is_one(b));
+
         result = fmpz_is_strong_probabprime(p, b);
         if (!result)
         {
@@ -133,12 +133,12 @@ main(void)
         do {
            fmpz_randbits(a, state, n_randint(state, 100) + 2);
         } while (fmpz_cmp_ui(a, 2) < 0);
-        
+
         do {
            fmpz_randbits(b, state, n_randint(state, 100) + 1);
            fmpz_abs(b, b);
-        } while (fmpz_cmp_ui(b, 2) < 0); 
-        
+        } while (fmpz_cmp_ui(b, 2) < 0);
+
         fmpz_mul(p, p, a);
 
         if (fmpz_is_strong_probabprime(p, b))
@@ -160,7 +160,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

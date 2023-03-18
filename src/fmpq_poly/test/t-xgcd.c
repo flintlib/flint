@@ -19,11 +19,11 @@ main(void)
 {
     int cflags = 0, i, result;
     FLINT_TEST_INIT(state);
-    
+
     flint_printf("xgcd....");
     fflush(stdout);
 
-    
+
 
     /* Generic case, where a and b are coprime *******************************/
 
@@ -253,7 +253,7 @@ main(void)
     }
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }

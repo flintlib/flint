@@ -22,12 +22,12 @@ int fmpz_is_prime(const fmpz_t n)
    ulong p, ppi, limit;
    ulong * pp1, * pm1;
    slong i, l, num, num_pp1, num_pm1;
-   const ulong * primes; 
+   const ulong * primes;
    const double * pinv;
 
    fmpz_t F1, Fsqr, Fcub, R, t;
    int res = -1;
-   
+
    if (fmpz_cmp_ui(n, 1) <= 0)
       return 0;
 
@@ -90,14 +90,14 @@ int fmpz_is_prime(const fmpz_t n)
       n_prime_pi_bounds(&ppi, &ppi, limit); /* precompute primes */
       primes = n_primes_arr_readonly(ppi + FLINT_BITS);
       pinv = n_prime_inverses_arr_readonly(ppi + FLINT_BITS);
-   
+
       pm1 = _nmod_vec_init(2 + (ulong) logd); /* space for primes dividing n - 1 */
       pp1 = _nmod_vec_init(2 + (ulong) logd); /* space for primes dividing n + 1 */
 
       while (primes[0] < limit)
       {
          /* multiply batch of primes */
-      
+
          p = primes[0];
          for (i = 1; i < num; i++)
             p *= primes[i];
@@ -158,10 +158,10 @@ int fmpz_is_prime(const fmpz_t n)
             } else /* p + 1 test */
             {
                fmpz_t F2, Fm1;
-         
+
                fmpz_init(F2);
                fmpz_init(Fm1);
-               
+
                res = fmpz_is_prime_morrison(F2, R, n, pp1, num_pp1);
 
                if (res == 1)
@@ -196,7 +196,7 @@ int fmpz_is_prime(const fmpz_t n)
                         /* check if x^2 + (r0 - F2)*x - r1 - 1 has positive integral root */
                         fmpz_sub(r0, r0, F2);
                         fmpz_add_ui(r1, r1, 1);
-                        
+
                         fmpz_mul(t, r0, r0); /* b = sqrt((r0 - F2)^2 - 4(-r1 - 1)) */
                         fmpz_addmul_ui(t, r1, 4);
                         fmpz_sqrtrem(b, r, t);
@@ -212,9 +212,9 @@ int fmpz_is_prime(const fmpz_t n)
                      } else /* Brillhart, Lehmer, Selfridge combined p-1, p+1 test */
                      {
                         fmpz_t F, nmodF;
-                        
+
                         fmpz_init(F);
-                        
+
                         fmpz_mul(F, F1, F2); /* F = lcm(F1, F2), F1 | n - 1, F2 | n + 1 */
                         if (fmpz_is_even(F1) && fmpz_is_even(F2))
                            fmpz_tdiv_q_2exp(F, F, 1);
@@ -224,10 +224,10 @@ int fmpz_is_prime(const fmpz_t n)
                         if (fmpz_cmp(Fsqr, n) > 0) /* lcm(F1, F2) > sqrt(n) */
                         {
                             fmpz_init(nmodF);
-                          
+
                             fmpz_mod(nmodF, n, F); /* check n mod F not factor of n */
-                            
-                            if (!fmpz_equal(nmodF, n) && !fmpz_is_one(nmodF) 
+
+                            if (!fmpz_equal(nmodF, n) && !fmpz_is_one(nmodF)
                               && fmpz_divisible(n, nmodF))
                                res = 0;
 
@@ -235,17 +235,17 @@ int fmpz_is_prime(const fmpz_t n)
                         } else
                         {
                            fmpz_t d;
-                           
+
                            fmpz_init(d);
-                              
+
                            fmpz_mul(Fcub, Fsqr, F);
-                           
+
                            if (fmpz_cmp(Fcub, n) > 0) /* Lenstra's divisors in residue class */
                            {
                               fmpz_t r;
 
                               fmpz_init(r);
-                              
+
                               fmpz_set_ui(r, 1);
                               if (fmpz_divisor_in_residue_class_lenstra(d, n, r, F))
                                  res = 0;
@@ -273,7 +273,7 @@ int fmpz_is_prime(const fmpz_t n)
                fmpz_clear(Fm1);
             }
          }
-      } 
+      }
 
       _nmod_vec_clear(pm1);
       _nmod_vec_clear(pp1);
@@ -295,5 +295,5 @@ int fmpz_is_prime(const fmpz_t n)
    fmpz_clear(Fsqr);
    fmpz_clear(Fcub);
 
-   return res;    
+   return res;
 }
