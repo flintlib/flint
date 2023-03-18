@@ -159,7 +159,7 @@ jobs:
   freebsd-gcc:
     name: FreeBSD Clang (x0.5)
 
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v3
@@ -171,6 +171,7 @@ jobs:
           version: '13.1'
           shell: bash
           run: |
+            yes | sudo pkg install pkgconf
             yes | sudo pkg install gmake
             yes | sudo pkg install gmp
             yes | sudo pkg install mpfr
@@ -183,7 +184,11 @@ jobs:
             libtool --version
             export FLINT_TEST_MULTIPLIER=0.5
             ./bootstrap.sh
-            ./configure CC=clang CFLAGS="-Wall" --disable-static --enable-shared
+            ./configure CC=clang CFLAGS="-Wall" --disable-static --enable-shared  \
+                --with-gmp-include=$(pkgconf --variable=includedir gmp)           \
+                --with-gmp-lib=$(pkgconf --variable=libdir gmp)                   \
+                --with-mpfr-include=$(pkgconf --variable=includedir mpfr)         \
+                --with-mpfr-lib=$(pkgconf --variable=libdir mpfr)
             gmake -j
             gmake -j check
 
