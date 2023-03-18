@@ -63,6 +63,20 @@ else()
     set(FLINT_USES_PTHREAD ON CACHE BOOL "Use POSIX Threads.")
 endif()
 
+if(MSVC)
+    foreach(CompilerFlag CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE)
+        if (BUILD_SHARED_LIBS)
+            set(${CompilerFlag} "${${CompilerFlag}} /DMSC_USE_DLL")
+        else ()
+            set(${CompilerFlag} "${${CompilerFlag}} /DPTW32_STATIC_LIB")
+        endif()
+    endforeach()
+
+    if(BUILD_SHARED_LIBS)
+        set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS yes)
+    endif()
+endif()
+
 # Find sources
 
 set(_BUILD_DIRS

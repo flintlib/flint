@@ -11,6 +11,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#define _STDC_FORMAT_MACROS
+
+#ifdef __GNUC__
+# define strcpy __builtin_strcpy
+#else
+# include <math.h>
+#endif
+
 /* try to get fdopen, mkstemp declared */
 #if defined __STRICT_ANSI__
 #undef __STRICT_ANSI__
@@ -21,18 +29,6 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "qsieve.h"
-
-#define _STDC_FORMAT_MACROS
-
-#if (defined(__WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__) && !defined(__MINGW64__)) || defined(_MSC_VER)
-# include <windows.h>
-#endif
-
-#ifdef __GNUC__
-# define strcpy __builtin_strcpy
-#else
-# include <math.h>
-#endif
 
 int compare_facs(const void * a, const void * b)
 {
@@ -61,7 +57,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     slong num_facs;
     fmpz * facs;
 #if (defined(__WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__) && !defined(__MINGW64__)) || defined(_MSC_VER)
-    char temp_path[MAX_PATH];
+    const char * tmpnam_ret;
 #else
     int fd;
 #endif
@@ -212,12 +208,11 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 #endif
 
 #if (defined(__WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__) && !defined(__MINGW64__)) || defined(_MSC_VER)
-    if (GetTempPathA(MAX_PATH, temp_path) == 0)
-        flint_throw(FLINT_ERROR, "GetTempPathA failed\n");
+    tmpnam_ret = tmpnam(NULL);
+    if (tmpnam_ret == NULL)
+        flint_throw(FLINT_ERROR, "tmpnam failed\n");
 
-    if (GetTempFileNameA(temp_path, "siqs", /*uUnique*/ TRUE, qs_inf->fname) == 0)
-        flint_throw(FLINT_ERROR, "GetTempFileNameA failed\n");
-
+    strcpy(qs_inf->fname, tmpnam_ret);
     qs_inf->siqs = fopen(qs_inf->fname, "w");
     if (qs_inf->siqs == NULL)
         flint_throw(FLINT_ERROR, "fopen failed\n");

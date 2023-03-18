@@ -27,20 +27,20 @@
 
 #define BLOCK_SIZE (4*65536) /* size of sieving cache block */
 
-typedef struct prime_t
+typedef struct
 {
    mp_limb_t pinv;     /* precomputed inverse */
    int p;              /* prime */
    char size;
 } prime_t;
 
-typedef struct fac_t    /* struct for factors of relations */
+typedef struct          /* struct for factors of relations */
 {
    slong ind;
    slong exp;
 } fac_t;
 
-typedef struct la_col_t  /* matrix column */
+typedef struct           /* matrix column */
 {
    slong * data;		/* The list of occupied rows in this column */
    slong weight;		/* Number of nonzero entries in this column */
@@ -48,14 +48,14 @@ typedef struct la_col_t  /* matrix column */
 } la_col_t;
 
 
-typedef struct hash_t   /* entry in hash table */
+typedef struct          /* entry in hash table */
 {
    mp_limb_t prime;    /* value of prime */
    mp_limb_t next;     /* next prime which have same hash value as 'prime' */
    mp_limb_t count;    /* number of occurrence of 'prime' */
 } hash_t;
 
-typedef struct relation_t  /* format for relation */
+typedef struct             /* format for relation */
 {
    mp_limb_t lp;          /* large prime, is 1, if relation is full */
    slong num_factors;     /* number of factors, excluding small factor */
@@ -65,7 +65,7 @@ typedef struct relation_t  /* format for relation */
    fmpz_t Y;              /* square root of sieve value for relation */
 } relation_t;
 
-typedef struct qs_poly_s
+typedef struct
 {
    fmpz_t B;          /* current B coeff of poly */
    int * soln1;       /* first start position in sieve per prime */
@@ -79,7 +79,7 @@ typedef struct qs_poly_s
 
 typedef qs_poly_s qs_poly_t[1];
 
-typedef struct qs_s
+typedef struct
 {
    volatile slong index_j;
 #if FLINT_USES_PTHREAD

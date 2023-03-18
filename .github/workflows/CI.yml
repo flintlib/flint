@@ -95,10 +95,9 @@ jobs:
           export FLINT_TEST_MULTIPLIER=2
           $MAKE check
 
-          # FIXME: Enable when this won't fail
-      # - if: failure()
-      #   name: "If failure, stop all other jobs"
-      #   uses: andymckay/cancel-action@0.3
+      - if: failure()
+        name: "If failure, stop all other jobs"
+        uses: andymckay/cancel-action@0.3
 
 
 
@@ -407,6 +406,61 @@ jobs:
       - if: failure()
         name: "If failure, stop all other jobs"
         uses: andymckay/cancel-action@0.3
+
+
+
+  ##############################################################################
+  # msvc
+  ##############################################################################
+  msvc:
+    name: MSVC
+
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: "Setup Conda"
+        uses: conda-incubator/setup-miniconda@v2.2.0
+        with:
+          miniconda-version: "latest"
+          channels: conda-forge
+
+      - name: "Install dependencies"
+        run: |
+          conda install --yes -c conda-forge mpfr
+          conda install --yes -c conda-forge pthreads-win32
+          conda info
+          conda list
+
+      - name: "Setup MSVC"
+        uses: ilammy/msvc-dev-cmd@v1.12.1
+        with:
+          arch: x86_64
+
+      - name: "Configure"
+        run: |
+          mkdir build
+          cd build
+          set "LIB=C:\Miniconda3\Library\lib;%LIB%"
+          set "CPATH=C:\Miniconda3\Library\include;%CPATH%"
+          cmake -G "Ninja" -DCMAKE_C_FLAGS="/wd4018 /wd4146 /wd4244 /wd4267 /wd4305 /wd4996" -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
+
+      - name: "Build"
+        run: |
+          cd build
+          cmake --build . -- -j4
+
+      - name: "Test"
+        run: |
+          cd build
+          set "FLINT_TEST_MULTIPLIER=1"
+          ctest -j4 --output-on-failure --timeout 180
+
+        # FIXME: Enable me when possible
+      # - if: failure()
+        # name: "If failure, stop all other jobs"
+        # uses: andymckay/cancel-action@0.3
 
 
 
