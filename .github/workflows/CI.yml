@@ -460,9 +460,10 @@ jobs:
       - name: "Set up Nemo.jl"
         run: |
           # Override FLINT_jll's libflint with ours
-          julia -e "import Pkg; Pkg.add(\"Nemo\");"
+          git clone https://github.com/Nemocas/Nemo.jl.git
+          julia -e "import Pkg; Pkg.develop(path=\"./Nemo.jl\");"
           echo -e "[e134572f-a0d5-539d-bddf-3cad8db41a82]\nFLINT = \"${LOCAL}\"" > ~/.julia/artifacts/Overrides.toml
-          touch ~/.julia/packages/Nemo/*/src/Nemo.jl
+          touch Nemo.jl/src/Nemo.jl
           julia -e "using Nemo; println(\"Path to Nemo's libflint:\", Nemo.libflint)"
 
       - name: "Check Nemo.jl"
