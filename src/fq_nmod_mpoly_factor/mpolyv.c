@@ -11,7 +11,6 @@
 
 #include "fq_nmod_mpoly_factor.h"
 
-
 void fq_nmod_mpolyv_clear(fq_nmod_mpolyv_t A, const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i;
@@ -22,22 +21,6 @@ void fq_nmod_mpolyv_clear(fq_nmod_mpolyv_t A, const fq_nmod_mpoly_ctx_t ctx)
         flint_free(A->coeffs);
     }
 }
-
-
-void fq_nmod_mpolyv_print_pretty(
-    const fq_nmod_mpolyv_t poly,
-    const char ** x,
-    const fq_nmod_mpoly_ctx_t ctx)
-{
-    slong i;
-    for (i = 0; i < poly->length; i++)
-    {
-        flint_printf("coeff[%wd]: ", i);
-        fq_nmod_mpoly_print_pretty(poly->coeffs + i, x, ctx);
-        flint_printf("\n");
-    }
-}
-
 
 void fq_nmod_mpolyv_fit_length(
     fq_nmod_mpolyv_t A,
@@ -182,4 +165,3 @@ void _fq_nmod_mpoly_vec_mul_mpoly(
     for (i = 0; i < Alen; i++)
         fq_nmod_mpoly_mul(A + i, A + i, c, ctx);
 }
-
