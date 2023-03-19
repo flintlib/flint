@@ -15,6 +15,7 @@
 
 ******************************************************************************/
 
+#include <stdio.h>
 #include "nf_elem.h"
 
 void nf_elem_print_pretty(const nf_elem_t a, const nf_t nf, const char * var)
