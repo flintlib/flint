@@ -9,8 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fmpq.h"
 #include "padic_mat.h"
+
+/* printing *******************************************************************/
 
 int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
 {
@@ -126,3 +129,39 @@ int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
     return 1;
 }
 
+int padic_mat_fprint_pretty(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
+{
+    const slong r = padic_mat(A)->r;
+    const slong c = padic_mat(A)->c;
+
+    slong i, j, v;
+    fmpz_t u;
+
+    fmpz_init(u);
+
+    fputc('[', file);
+    for (i = 0; i < r; i++)
+    {
+        fputc('[', file);
+        for (j = 0; j < c; j++)
+        {
+            v = A->val + fmpz_remove(u, padic_mat_entry(A, i, j), ctx->p);
+
+            _padic_fprint(file, u, v, ctx);
+
+            if (j != c - 1)
+                fputc(' ', file);
+        }
+        fputc(']', file);
+        if (i != r - 1)
+            fputc('\n', file);
+    }
+    fputc(']', file);
+
+    fmpz_clear(u);
+
+    return 1;
+}
+
+int padic_mat_print(const padic_mat_t A, const padic_ctx_t ctx) { return padic_mat_fprint(stdout, A, ctx); }
+int padic_mat_print_pretty(const padic_mat_t A, const padic_ctx_t ctx) { return padic_mat_fprint_pretty(stdout, A, ctx); }
