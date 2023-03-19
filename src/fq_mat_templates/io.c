@@ -14,6 +14,8 @@
 
 #include "templates.h"
 
+/* printing *******************************************************************/
+
 /*
     The macros xxx_putc, xxx_printf, and xxx_T_print are provided as
     wrappers to handle return values and error conditions.  While this
@@ -107,5 +109,8 @@ int TEMPLATE(T, mat_fprint_pretty) (FILE * file, const TEMPLATE(T, mat_t) mat,
 #undef xxx_putc
 #undef xxx_printf
 #undef xxx_T_print
+
+int TEMPLATE(T, mat_print)(const TEMPLATE(T, mat_t) mat, const TEMPLATE(T, ctx_t) ctx) { return TEMPLATE(T, mat_fprint)(stdout, mat, ctx); }
+int TEMPLATE(T, mat_print_pretty)(const TEMPLATE(T, mat_t) mat, const TEMPLATE(T, ctx_t) ctx) { return TEMPLATE(T, mat_fprint_pretty)(stdout, mat, ctx); }
 
 #endif
