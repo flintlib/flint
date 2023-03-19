@@ -1,4 +1,6 @@
 /*
+    Copyright (C) 2007 David Howden
+    Copyright (C) 2010 William Hart
     Copyright (C) 2014 Jean-Pierre Flori
 
     This file is part of FLINT.
@@ -9,11 +11,22 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
-#include <math.h>
-#include "flint.h"
+#include <stdio.h>
 #include "nmod_poly.h"
 
+/* printing *******************************************************************/
+
+int nmod_poly_fprint(FILE * f, const nmod_poly_t poly)
+{
+    char * s;
+    int r;
+
+    s = nmod_poly_get_str(poly);
+    r = fputs(s, f);
+    flint_free(s);
+
+    return (r < 0) ? r : 1;
+}
 
 int nmod_poly_fprint_pretty(FILE * f, const nmod_poly_t a, const char * x)
 {
@@ -97,3 +110,36 @@ int nmod_poly_fprint_pretty(FILE * f, const nmod_poly_t a, const char * x)
     return (int) r;
 }
 
+int nmod_poly_print(const nmod_poly_t a) { return nmod_poly_fprint(stdout, a); }
+int nmod_poly_print_pretty(const nmod_poly_t a, const char * x) { return nmod_poly_fprint_pretty(stdout, a, x); }
+
+/* reading ********************************************************************/
+
+int nmod_poly_fread(FILE * f, nmod_poly_t poly)
+{
+    slong i, length;
+    mp_limb_t n;
+
+    if (flint_fscanf(f, "%wd %wu", &length, &n) != 2)
+        return 0;
+
+    nmod_poly_clear(poly);
+    nmod_poly_init(poly,n);
+    nmod_poly_fit_length(poly, length);
+    poly->length = length;
+
+    for (i = 0; i < length; i++)
+    {
+        if (!flint_fscanf(f, "%wu", &poly->coeffs[i]))
+        {
+            poly->length = i;
+            return 0;
+        }
+    }
+
+    _nmod_poly_normalise(poly);
+
+    return 1;
+}
+
+int nmod_poly_read(nmod_poly_t poly) { return nmod_poly_fread(stdin, poly); }

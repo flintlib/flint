@@ -325,54 +325,17 @@ char * nmod_poly_get_str_pretty(const nmod_poly_t poly, const char * x);
 
 int nmod_poly_set_str(nmod_poly_t poly, const char * s);
 
-int nmod_poly_fread(FILE * f, nmod_poly_t poly);
-
-NMOD_POLY_INLINE
-int nmod_poly_fprint(FILE * f, const nmod_poly_t poly)
-{
-    char *s;
-    int r;
-
-    s = nmod_poly_get_str(poly);
-    r = fputs(s, f);
-    flint_free(s);
-
-    return (r < 0) ? r : 1;
-}
-
+#ifdef FLINT_HAVE_FILE
+int nmod_poly_fprint(FILE * f, const nmod_poly_t poly);
 int nmod_poly_fprint_pretty(FILE * f, const nmod_poly_t a, const char * x);
 
-NMOD_POLY_INLINE
-int nmod_poly_print(const nmod_poly_t a)
-{
-    size_t r;
-    slong i;
+int nmod_poly_fread(FILE * f, nmod_poly_t poly);
+#endif
 
-    r = flint_printf("%wd %wu", a->length, a->mod.n);
+int nmod_poly_print(const nmod_poly_t a);
+int nmod_poly_print_pretty(const nmod_poly_t a, const char * x);
 
-    if (a->length == 0)
-        return r;
-    else
-        if (r > 0)
-            r = flint_printf(" ");
-
-    for (i = 0; (r > 0) && (i < a->length); i++)
-        r = flint_printf(" %wu", a->coeffs[i]);
-
-    return (int) r;
-}
-
-NMOD_POLY_INLINE
-int nmod_poly_print_pretty(const nmod_poly_t a, const char * x)
-{
-    return nmod_poly_fprint_pretty(stdout, a, x);
-}
-
-NMOD_POLY_INLINE
-int nmod_poly_read(nmod_poly_t poly)
-{
-    return nmod_poly_fread(stdin, poly);
-}
+int nmod_poly_read(nmod_poly_t poly);
 
 /* Shifting  *****************************************************************/
 
