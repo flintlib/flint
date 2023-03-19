@@ -63,19 +63,6 @@ else()
     set(FLINT_USES_PTHREAD ON CACHE BOOL "Use POSIX Threads.")
 endif()
 
-if(MSVC)
-    foreach(CompilerFlag CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE)
-        if (BUILD_SHARED_LIBS)
-            set(${CompilerFlag} "${${CompilerFlag}} /DMSC_USE_DLL")
-        else ()
-            set(${CompilerFlag} "${${CompilerFlag}} /DPTW32_STATIC_LIB")
-        endif()
-    endforeach()
-
-    if(BUILD_SHARED_LIBS)
-        set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS yes)
-    endif()
-endif()
 
 # Find sources
 
@@ -284,8 +271,10 @@ if(FLINT_USES_BLAS)
     target_include_directories(flint PUBLIC ${CBLAS_INCLUDE_DIRS})
 endif()
 
-if(BUILD_SHARED_LIBS AND WIN32)
-    # Export flint's functions
+if(BUILD_SHARED_LIBS AND MSVC)
+    # Export all functions automatically (except global data)
+    set_target_properties(flint PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+    # Export flint's global data that are marked manually
     target_compile_definitions(flint PRIVATE "FLINT_BUILD_DLL")
     # Use MPIR's dll import functions
     target_compile_definitions(flint PUBLIC "MSC_USE_DLL")
@@ -324,14 +313,20 @@ if(NOT DEFINED IPO_SUPPORTED)
     message(STATUS "Checking for IPO")
     check_ipo_supported(RESULT ipo_supported LANGUAGES C)
     if(ipo_supported)
-        message(STATUS "Checking for IPO - found")
+	if (MSVC)
+            message(STATUS "Checking for IPO - found, but disabled for MSVC")
+            set(ipo_supported FALSE)
+        else()
+            message(STATUS "Checking for IPO - found")
+        endif()
     else()
         message(STATUS "Checking for IPO - not found")
     endif()
     set(IPO_SUPPORTED ${ipo_supported} CACHE INTERNAL "Introprocedural Optimization" FORCE)
 endif()
 
-if(IPO_SUPPORTED)
+# allow overriding IPO by setting -DCMAKE_INTERPROCEDURAL_OPTIMIZATION
+if (IPO_SUPPORTED AND "${CMAKE_INTERPROCEDURAL_OPTIMIZATION}" STREQUAL "")
     set_target_properties(flint PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()
 

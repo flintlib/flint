@@ -33,7 +33,7 @@ extern "C" {
                          __ARB_VERSION_MINOR * 100 + \
                          __ARB_VERSION_PATCHLEVEL)
 
-extern const char * arb_version;
+FLINT_DLL extern const char * arb_version;
 
 #define arb_midref(x) (&(x)->mid)
 #define arb_radref(x) (&(x)->rad)
@@ -857,10 +857,10 @@ _arb_vec_get_unique_fmpz_vec(fmpz * res,  arb_srcptr vec, slong len)
 #define ARB_ATAN_TAB2_PREC 4608
 #define ARB_ATAN_TAB2_LIMBS (ARB_ATAN_TAB2_PREC / FLINT_BITS)
 
-extern const mp_limb_t arb_atan_tab1[1 << ARB_ATAN_TAB1_BITS][ARB_ATAN_TAB1_LIMBS];
-extern const mp_limb_t arb_atan_tab21[1 << ARB_ATAN_TAB21_BITS][ARB_ATAN_TAB2_LIMBS];
-extern const mp_limb_t arb_atan_tab22[1 << ARB_ATAN_TAB22_BITS][ARB_ATAN_TAB2_LIMBS];
-extern const mp_limb_t arb_atan_pi2_minus_one[ARB_ATAN_TAB2_LIMBS];
+FLINT_DLL extern const mp_limb_t arb_atan_tab1[1 << ARB_ATAN_TAB1_BITS][ARB_ATAN_TAB1_LIMBS];
+FLINT_DLL extern const mp_limb_t arb_atan_tab21[1 << ARB_ATAN_TAB21_BITS][ARB_ATAN_TAB2_LIMBS];
+FLINT_DLL extern const mp_limb_t arb_atan_tab22[1 << ARB_ATAN_TAB22_BITS][ARB_ATAN_TAB2_LIMBS];
+FLINT_DLL extern const mp_limb_t arb_atan_pi2_minus_one[ARB_ATAN_TAB2_LIMBS];
 
 void
 _arb_atan_taylor_naive(mp_ptr y, mp_limb_t * error,
@@ -886,11 +886,11 @@ void arb_atan_arf_newton(arb_t res, const arf_t x, slong prec);
 #define ARB_LOG_TAB2_PREC 4608
 #define ARB_LOG_TAB2_LIMBS (ARB_LOG_TAB2_PREC / FLINT_BITS)
 
-extern const mp_limb_t arb_log_tab11[1 << ARB_LOG_TAB11_BITS][ARB_LOG_TAB1_LIMBS];
-extern const mp_limb_t arb_log_tab12[1 << ARB_LOG_TAB12_BITS][ARB_LOG_TAB1_LIMBS];
-extern const mp_limb_t arb_log_tab21[1 << ARB_LOG_TAB21_BITS][ARB_LOG_TAB2_LIMBS];
-extern const mp_limb_t arb_log_tab22[1 << ARB_LOG_TAB22_BITS][ARB_LOG_TAB2_LIMBS];
-extern const mp_srcptr arb_log_log2_tab;
+FLINT_DLL extern const mp_limb_t arb_log_tab11[1 << ARB_LOG_TAB11_BITS][ARB_LOG_TAB1_LIMBS];
+FLINT_DLL extern const mp_limb_t arb_log_tab12[1 << ARB_LOG_TAB12_BITS][ARB_LOG_TAB1_LIMBS];
+FLINT_DLL extern const mp_limb_t arb_log_tab21[1 << ARB_LOG_TAB21_BITS][ARB_LOG_TAB2_LIMBS];
+FLINT_DLL extern const mp_limb_t arb_log_tab22[1 << ARB_LOG_TAB22_BITS][ARB_LOG_TAB2_LIMBS];
+FLINT_DLL extern const mp_srcptr arb_log_log2_tab;
 
 void arb_log_newton(arb_t res, const arb_t x, slong prec);
 void arb_log_arf_newton(arb_t res, const arf_t x, slong prec);
@@ -899,7 +899,7 @@ void arb_log_arf_newton(arb_t res, const arf_t x, slong prec);
 
 #define ARB_LOG_PRIME_CACHE_NUM 13
 
-extern const mp_limb_t arb_log_p_tab[ARB_LOG_PRIME_CACHE_NUM][ARB_LOG_TAB2_LIMBS];
+FLINT_DLL extern const mp_limb_t arb_log_p_tab[ARB_LOG_PRIME_CACHE_NUM][ARB_LOG_TAB2_LIMBS];
 void arb_log_primes_vec_bsplit(arb_ptr res, slong n, slong prec);
 
 void _arb_log_p_ensure_cached(slong prec);
@@ -921,9 +921,9 @@ arb_srcptr _arb_log_p_cache_vec(void);
 #define ARB_EXP_TAB2_PREC 4608
 #define ARB_EXP_TAB2_LIMBS (ARB_EXP_TAB2_PREC / FLINT_BITS)
 
-extern const mp_limb_t arb_exp_tab1[ARB_EXP_TAB1_NUM][ARB_EXP_TAB1_LIMBS];
-extern const mp_limb_t arb_exp_tab21[ARB_EXP_TAB21_NUM][ARB_EXP_TAB2_LIMBS];
-extern const mp_limb_t arb_exp_tab22[ARB_EXP_TAB22_NUM][ARB_EXP_TAB2_LIMBS];
+FLINT_DLL extern const mp_limb_t arb_exp_tab1[ARB_EXP_TAB1_NUM][ARB_EXP_TAB1_LIMBS];
+FLINT_DLL extern const mp_limb_t arb_exp_tab21[ARB_EXP_TAB21_NUM][ARB_EXP_TAB2_LIMBS];
+FLINT_DLL extern const mp_limb_t arb_exp_tab22[ARB_EXP_TAB22_NUM][ARB_EXP_TAB2_LIMBS];
 
 void _arb_exp_taylor_naive(mp_ptr y, mp_limb_t * error,
     mp_srcptr x, mp_size_t xn, ulong N);
@@ -969,12 +969,12 @@ void arb_exp_arf(arb_t z, const arf_t x, slong prec, int minus_one, slong maglim
 #define ARB_SIN_COS_TAB2_PREC 4608
 #define ARB_SIN_COS_TAB2_LIMBS (ARB_SIN_COS_TAB2_PREC / FLINT_BITS)
 
-extern const mp_limb_t arb_sin_cos_tab1[2 * ARB_SIN_COS_TAB1_NUM][ARB_SIN_COS_TAB1_LIMBS];
-extern const mp_limb_t arb_sin_cos_tab21[2 * ARB_SIN_COS_TAB21_NUM][ARB_SIN_COS_TAB2_LIMBS];
-extern const mp_limb_t arb_sin_cos_tab22[2 * ARB_SIN_COS_TAB22_NUM][ARB_SIN_COS_TAB2_LIMBS];
+FLINT_DLL extern const mp_limb_t arb_sin_cos_tab1[2 * ARB_SIN_COS_TAB1_NUM][ARB_SIN_COS_TAB1_LIMBS];
+FLINT_DLL extern const mp_limb_t arb_sin_cos_tab21[2 * ARB_SIN_COS_TAB21_NUM][ARB_SIN_COS_TAB2_LIMBS];
+FLINT_DLL extern const mp_limb_t arb_sin_cos_tab22[2 * ARB_SIN_COS_TAB22_NUM][ARB_SIN_COS_TAB2_LIMBS];
 
 #define ARB_PI4_TAB_LIMBS (4608 / FLINT_BITS)
-extern const mp_limb_t arb_pi4_tab[ARB_PI4_TAB_LIMBS];
+FLINT_DLL extern const mp_limb_t arb_pi4_tab[ARB_PI4_TAB_LIMBS];
 
 void _arb_sin_cos_taylor_naive(mp_ptr ysin, mp_ptr ycos, mp_limb_t * error,
     mp_srcptr x, mp_size_t xn, ulong N);
@@ -1003,7 +1003,7 @@ void arb_atan_gauss_primes_vec_bsplit(arb_ptr res, slong n, slong prec);
 #define ARB_SIN_COS_ATAN_REDUCTION_DEFAULT_MAX_PREC 4000000
 #define ARB_SIN_COS_ATAN_REDUCTION_PREC 2600
 
-extern const mp_limb_t arb_atan_gauss_tab[ARB_ATAN_GAUSS_PRIME_CACHE_NUM][ARB_ATAN_TAB2_LIMBS];
+FLINT_DLL extern const mp_limb_t arb_atan_gauss_tab[ARB_ATAN_GAUSS_PRIME_CACHE_NUM][ARB_ATAN_TAB2_LIMBS];
 
 void _arb_atan_gauss_p_ensure_cached(slong prec);
 arb_srcptr _arb_atan_gauss_p_cache_vec(void);

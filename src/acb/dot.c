@@ -278,7 +278,7 @@ _arf_complex_mul_gauss(arf_t e, arf_t f, const arf_t a, const arf_t b,
 
 /* TODO: this could be much lower, but it's currently competing
    against mulhigh in the Karatsuba range. */
-slong acb_dot_gauss_dot_cutoff = 128;
+FLINT_DLL slong acb_dot_gauss_dot_cutoff = 128;
 #define GAUSS_CUTOFF acb_dot_gauss_dot_cutoff
 
 void

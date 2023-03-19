@@ -23,8 +23,6 @@ environment:
     VCVARSALL: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat"
   matrix:
     - COMPILER: cl
-      ARCH: 32
-    - COMPILER: cl
       ARCH: 64
 
 install:
@@ -47,7 +45,14 @@ before_build:
   - cmake -G "Ninja" -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
 
 build_script:
-  - cmake --build . -- -j2
+  - cmake --build . -- -j2 -k 0
 
 test_script:
   - ctest -j3 --output-on-failure --timeout 600
+
+# Enable this to be able to login to the build worker. You can use the
+# `remmina` program in Ubuntu, use the login information that the line below
+# prints into the log.
+#
+# on_finish:
+# - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))

@@ -28,7 +28,7 @@
 
 #if !defined(__MPIR_RELEASE ) || __MPIR_RELEASE < 20600
 #define mpn_sumdiff_n __MPN(sumdiff_n)
-extern
+FLINT_DLL extern
 mp_limb_t mpn_sumdiff_n(mp_ptr, mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 #endif
 

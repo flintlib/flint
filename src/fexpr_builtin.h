@@ -520,7 +520,7 @@ typedef struct
 }
 fexpr_symbol_info;
 
-extern const fexpr_symbol_info fexpr_builtin_table[FEXPR_BUILTIN_LENGTH];
+FLINT_DLL extern const fexpr_symbol_info fexpr_builtin_table[FEXPR_BUILTIN_LENGTH];
 
 #define FEXPR_SYMBOL_Pos  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Pos << 16))
 #define FEXPR_SYMBOL_Neg  (FEXPR_TYPE_SMALL_SYMBOL | (FEXPR_Neg << 16))

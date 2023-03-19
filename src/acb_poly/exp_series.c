@@ -20,7 +20,7 @@
 #endif
 
 /* allow changing this from the test code */
-slong acb_poly_newton_exp_cutoff = 0;
+FLINT_DLL slong acb_poly_newton_exp_cutoff = 0;
 
 /* with inverse=1 simultaneously computes g = exp(-x) to length n
 with inverse=0 uses g as scratch space, computing

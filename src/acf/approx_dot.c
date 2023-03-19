@@ -170,7 +170,7 @@ _arf_complex_mul_gauss(arf_t e, arf_t f, const arf_t a, const arf_t b,
     fmpz_clear(v);
 }
 
-extern slong acb_dot_gauss_dot_cutoff;
+FLINT_DLL extern slong acb_dot_gauss_dot_cutoff;
 #define GAUSS_CUTOFF acb_dot_gauss_dot_cutoff
 
 void

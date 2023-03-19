@@ -13,7 +13,7 @@
 #include "fmpq.h"
 #include "gr_poly.h"
 
-extern gr_static_method_table _ca_methods;
+FLINT_DLL extern gr_static_method_table _ca_methods;
 
 int
 test(flint_rand_t state, int which)

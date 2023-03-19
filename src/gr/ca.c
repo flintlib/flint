@@ -1209,7 +1209,7 @@ _gr_ca_mat_find_nonzero_pivot(slong * pivot_row, ca_mat_t mat, slong start_row, 
 
 int _ca_methods_initialized = 0;
 
-gr_static_method_table _ca_methods;
+FLINT_DLL gr_static_method_table _ca_methods;
 
 gr_method_tab_input _ca_methods_input[] =
 {

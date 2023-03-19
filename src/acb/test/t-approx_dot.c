@@ -11,7 +11,7 @@
 
 #include "acb.h"
 
-extern slong acb_dot_gauss_dot_cutoff;
+FLINT_DLL extern slong acb_dot_gauss_dot_cutoff;
 
 int main()
 {

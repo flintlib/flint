@@ -18,8 +18,8 @@
 
 #define FACTORIAL_TAB_SIZE 288
 
-extern const mp_limb_t factorial_tab_numer[FACTORIAL_TAB_SIZE];
-extern const mp_limb_t factorial_tab_denom[FACTORIAL_TAB_SIZE];
+FLINT_DLL extern const mp_limb_t factorial_tab_numer[FACTORIAL_TAB_SIZE];
+FLINT_DLL extern const mp_limb_t factorial_tab_denom[FACTORIAL_TAB_SIZE];
 
 void _arb_sin_cos_taylor_rs(mp_ptr ysin, mp_ptr ycos,
     mp_limb_t * error, mp_srcptr x, mp_size_t xn, ulong N,

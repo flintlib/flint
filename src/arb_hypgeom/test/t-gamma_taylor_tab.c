@@ -12,8 +12,6 @@
 #include "arb_poly.h"
 #include "arb_hypgeom.h"
 
-extern arb_hypgeom_gamma_coeff_t arb_hypgeom_gamma_coeffs[ARB_HYPGEOM_GAMMA_TAB_NUM];
-
 int main()
 {
     flint_rand_t state;
