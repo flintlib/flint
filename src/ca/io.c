@@ -9,9 +9,55 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "ca.h"
 #include "ca_ext.h"
 #include "ca_field.h"
+
+typedef struct
+{
+    ca_ext_ptr * ext;
+    const char ** ext_vars;
+    slong ext_len;
+    ulong flags;
+    slong digits;
+    int print_where;
+}
+ca_print_info_t;
+
+void _ca_print(calcium_stream_t out, const ca_t x, ca_print_info_t * info, ca_ctx_t ctx);
+void _ca_ext_print(calcium_stream_t out, ca_ext_t x, const char * var, ca_print_info_t * info, ca_ctx_t ctx);
+
+void ca_write(calcium_stream_t out, const ca_t x, ca_ctx_t ctx);
+
+void _ca_all_extensions(ca_ext_ptr ** extensions, slong * length, const ca_t x, ca_ctx_t ctx);
+
+/* strings ********************************************************************/
+
+char * ca_get_str(const ca_t x, ca_ctx_t ctx)
+{
+    calcium_stream_t out;
+    calcium_stream_init_str(out);
+    ca_write(out, x, ctx);
+    return out->s;
+}
+
+/* printing *******************************************************************/
+
+void
+ca_ctx_print(ca_ctx_t ctx)
+{
+    slong i;
+
+    flint_printf("Calcium context with %wd cached fields:\n", CA_CTX_FIELD_CACHE(ctx)->length);
+    for (i = 0; i < CA_CTX_FIELD_CACHE(ctx)->length; i++)
+    {
+        flint_printf("%wd   ", i);
+        ca_field_print(CA_CTX_FIELD_CACHE(ctx)->items[i], ctx);
+        flint_printf("\n");
+    }
+    flint_printf("\n");
+}
 
 void
 calcium_write_fmpz(calcium_stream_t out, const fmpz_t x)
@@ -106,20 +152,6 @@ fmpz_mpoly_q_write_pretty(calcium_stream_t out, const fmpz_mpoly_q_t f, const ch
         calcium_write(out, ")");
     }
 }
-
-typedef struct
-{
-    ca_ext_ptr * ext;
-    const char ** ext_vars;
-    slong ext_len;
-    ulong flags;
-    slong digits;
-    int print_where;
-}
-ca_print_info_t;
-
-void _ca_print(calcium_stream_t out, const ca_t x, ca_print_info_t * info, ca_ctx_t ctx);
-void _ca_ext_print(calcium_stream_t out, ca_ext_t x, const char * var, ca_print_info_t * info, ca_ctx_t ctx);
 
 void
 _ca_field_print(calcium_stream_t out, const ca_field_t K, ca_print_info_t * info, ca_ctx_t ctx)
@@ -459,9 +491,6 @@ _ca_ext_insert_extension(ca_ext_ptr ** extensions, slong * length, ca_ext_t x, c
 }
 
 void
-_ca_all_extensions(ca_ext_ptr ** extensions, slong * length, const ca_t x, ca_ctx_t ctx);
-
-void
 _ca_ext_all_extensions(ca_ext_ptr ** extensions, slong * length, ca_ext_t x, ca_ctx_t ctx)
 {
     slong i;
@@ -557,14 +586,6 @@ ca_write(calcium_stream_t out, const ca_t x, ca_ctx_t ctx)
     flint_free(ext);
 }
 
-char * ca_get_str(const ca_t x, ca_ctx_t ctx)
-{
-    calcium_stream_t out;
-    calcium_stream_init_str(out);
-    ca_write(out, x, ctx);
-    return out->s;
-}
-
 void
 ca_print(const ca_t x, ca_ctx_t ctx)
 {
@@ -585,4 +606,27 @@ ca_fprint(FILE * fp, const ca_t x, ca_ctx_t ctx)
     calcium_stream_t out;
     calcium_stream_init_file(out, fp);
     ca_write(out, x, ctx);
+}
+
+void
+ca_printn(const ca_t x, slong n, ca_ctx_t ctx)
+{
+    ulong save_flags;
+    save_flags = ctx->options[CA_OPT_PRINT_FLAGS];
+    ctx->options[CA_OPT_PRINT_FLAGS] = CA_PRINT_N | (CA_PRINT_DIGITS * n);
+    ca_print(x, ctx);
+    ctx->options[CA_OPT_PRINT_FLAGS] = save_flags;
+}
+
+void
+ca_factor_print(const ca_factor_t fac, ca_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < fac->length; i++)
+    {
+        flint_printf("(");
+        ca_print(fac->base + i, ctx); flint_printf(") ^ (");
+        ca_print(fac->exp + i, ctx); flint_printf(")\n");
+    }
 }
