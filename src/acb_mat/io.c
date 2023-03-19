@@ -10,7 +10,10 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "acb_mat.h"
+
+/* printing *******************************************************************/
 
 void
 acb_mat_fprintd(FILE * file, const acb_mat_t mat, slong digits)
@@ -32,3 +35,5 @@ acb_mat_fprintd(FILE * file, const acb_mat_t mat, slong digits)
         flint_fprintf(file, "]\n");
     }
 }
+
+void acb_mat_printd(const acb_mat_t mat, slong digits) { acb_mat_fprintd(stdout, mat, digits); }
