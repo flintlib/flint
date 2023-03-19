@@ -9,8 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fmpq.h"
 #include "fmpq_vec.h"
+
+/* printing *******************************************************************/
 
 int _fmpq_vec_fprint(FILE * file, const fmpq * vec, slong len)
 {
@@ -31,3 +34,5 @@ int _fmpq_vec_fprint(FILE * file, const fmpq * vec, slong len)
 
     return r;
 }
+
+int _fmpq_vec_print(const fmpq * vec, slong len) { return _fmpq_vec_fprint(stdout, vec, len); }
