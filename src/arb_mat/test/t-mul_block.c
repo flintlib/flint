@@ -12,7 +12,7 @@
 #include "fmpq_mat.h"
 #include "arb_mat.h"
 
-extern slong arb_mat_mul_block_min_block_size;
+FLINT_DLL extern slong arb_mat_mul_block_min_block_size;
 
 int main()
 {

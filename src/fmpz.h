@@ -36,8 +36,8 @@ typedef fmpz fmpz_t[1];
 
 typedef gmp_randstate_t fmpz_randstate_t;
 
-extern __mpz_struct * fmpz_arr;
-extern gmp_randstate_t fmpz_randstate;
+FLINT_DLL extern __mpz_struct * fmpz_arr;
+FLINT_DLL extern gmp_randstate_t fmpz_randstate;
 
 typedef struct
 {

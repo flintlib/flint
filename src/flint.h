@@ -22,6 +22,10 @@
 #include "longlong.h"
 #include "flint-config.h"
 
+#ifndef FLINT_DLL
+#define FLINT_DLL
+#endif
+
 #ifndef alloca
 # ifdef __GNUC__
 #  define alloca __builtin_alloca
@@ -76,7 +80,7 @@
     #define __inline__  inline
 #endif
 
-extern char flint_version[];
+FLINT_DLL extern char flint_version[];
 
 #define ulong mp_limb_t
 #define slong mp_limb_signed_t
@@ -335,7 +339,7 @@ ulong n_randtest_not_zero(flint_rand_t);
     ((shift == FLINT_BITS) ? WORD(0) : ((in) << (shift)))
 
 #ifdef NEED_CLZ_TAB
-extern const unsigned char __flint_clz_tab[128];
+FLINT_DLL extern const unsigned char __flint_clz_tab[128];
 #endif
 
 /* Beware when using the unsigned return value in signed arithmetic */

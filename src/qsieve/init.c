@@ -10,12 +10,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#if (defined(__WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__) && !defined(__MINGW64__)) || defined(_MSC_VER)
-# include <windows.h>
-#endif
-
 #include "fmpz.h"
 #include "qsieve.h"
+
+#if (defined(__WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__) && !defined(__MINGW64__)) || defined(_MSC_VER)
+# ifndef MAX_PATH
+#  define MAX_PATH 260
+# endif
+#endif
 
 void qsieve_init(qs_t qs_inf, const fmpz_t n)
 {

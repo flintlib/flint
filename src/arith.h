@@ -69,7 +69,7 @@ void arith_stirling_matrix_2(fmpz_mat_t mat);
 #define BELL_NUMBER_TAB_SIZE 16
 #endif
 
-extern const mp_limb_t bell_number_tab[];
+FLINT_DLL extern const mp_limb_t bell_number_tab[];
 
 double arith_bell_number_size(ulong n);
 
@@ -197,7 +197,7 @@ void arith_hrr_expsum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n);
 
 /* Number of partitions ******************************************************/
 
-extern const unsigned int partitions_lookup[128];
+FLINT_DLL extern const unsigned int partitions_lookup[128];
 
 void arith_number_of_partitions_nmod_vec(mp_ptr res, slong len, nmod_t mod);
 void arith_number_of_partitions_vec(fmpz * res, slong len);

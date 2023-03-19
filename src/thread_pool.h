@@ -57,8 +57,8 @@ typedef thread_pool_struct thread_pool_t[1];
 
 typedef int thread_pool_handle;
 
-extern thread_pool_t global_thread_pool;
-extern int global_thread_pool_initialized;
+FLINT_DLL extern thread_pool_t global_thread_pool;
+FLINT_DLL extern int global_thread_pool_initialized;
 
 void * thread_pool_idle_loop(void * varg);
 

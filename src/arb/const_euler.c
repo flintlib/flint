@@ -463,7 +463,7 @@ arb_const_euler_eval(arb_t res, slong prec)
 
 ARB_DEF_CACHED_CONSTANT(arb_const_euler_brent_mcmillan, arb_const_euler_eval)
 
-extern const mp_limb_t arb_hypgeom_gamma_tab_limbs[];
+FLINT_DLL extern const mp_limb_t arb_hypgeom_gamma_tab_limbs[];
 
 void
 arb_const_euler(arb_t res, slong prec)
