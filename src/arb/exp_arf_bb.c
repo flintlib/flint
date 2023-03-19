@@ -216,7 +216,7 @@ arb_exp_arf_bb(arb_t z, const arf_t x, slong prec, int minus_one)
     /* Start with z = 1. */
     arb_one(z);
 
-    num_threads = arb_flint_get_num_available_threads();
+    num_threads = flint_get_num_available_threads();
 
     /* We have two ways to parallelize the BB algorithm: run
        the main loop serially and rely on parallel binary splitting,

@@ -142,6 +142,8 @@ Thread functions
 
     Use :func:`thread_pool_wake` to set this number for a given worker thread.
 
+    See also: :func:`flint_get_num_available_threads`.
+
 .. function:: int flint_set_num_workers(int num_workers)
 
     Restricts the number of worker threads that can be started by the current

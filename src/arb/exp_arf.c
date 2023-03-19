@@ -10,6 +10,7 @@
 */
 
 #include "arb.h"
+#include "thread_support.h"
 
 #define TMP_ALLOC_LIMBS(__n) TMP_ALLOC((__n) * sizeof(mp_limb_t))
 
@@ -96,7 +97,6 @@ arb_exp_arf_generic(arb_t z, const arf_t x, slong prec, int minus_one)
     else
     {
         int want_rs;
-
         if (prec < 10000 || mag < -prec / 16)
         {
             want_rs = 1;
@@ -105,7 +105,7 @@ arb_exp_arf_generic(arb_t z, const arf_t x, slong prec, int minus_one)
         {
             want_rs = 0;
         }
-        else if (arb_flint_get_num_available_threads() == 1)
+        else if (flint_get_num_available_threads() == 1)
         {
             want_rs = (prec < 20000) || (prec < 1000000000 && mag < -prec / 800);
         }

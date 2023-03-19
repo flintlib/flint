@@ -314,7 +314,7 @@ arb_atan_arf_bb(arb_t z, const arf_t x, slong prec)
 
     /* s = 0, t = x */
 
-    if (arb_flint_get_num_available_threads() == 1 || prec >= 1000000000)
+    if (flint_get_num_available_threads() == 1 || prec >= 1000000000)
     {
         for (iter = 0, bits = start_bits; !fmpz_is_zero(t);
             iter++, bits *= 2)

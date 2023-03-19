@@ -10,9 +10,8 @@
 */
 
 #include "thread_pool.h"
-#include "fmpz_extras.h"
 
-slong arb_thread_pool_num_available(thread_pool_t T)
+slong flint_thread_pool_num_available(thread_pool_t T)
 {
     slong i, num = 0;
     thread_pool_entry_struct * D;
@@ -37,10 +36,10 @@ slong arb_thread_pool_num_available(thread_pool_t T)
     return num;
 }
 
-slong arb_flint_get_num_available_threads(void)
+slong flint_get_num_available_threads(void)
 {
     if (global_thread_pool_initialized)
-        return arb_thread_pool_num_available(global_thread_pool) + 1;
+        return flint_thread_pool_num_available(global_thread_pool) + 1;
 
     return flint_get_num_threads();
 }

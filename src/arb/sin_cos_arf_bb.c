@@ -230,7 +230,7 @@ _arb_sin_sum_bs_powtab(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
         }
     }
 
-    if (arb_flint_get_num_available_threads() == 1)
+    if (flint_get_num_available_threads() == 1)
         bsplit(T, Q, Qexp, xexp, xpow, r, 0, N);
     else
         bsplit2(T, Q, Qexp, xexp, xpow, r, 0, N);
@@ -480,7 +480,7 @@ arb_sin_cos_arf_bb(arb_t zsin, arb_t zcos, const arf_t x, slong prec)
        or compute all the sines/cosines in parallel. The latter is
        more efficient (empirically about 1.7x) but uses more memory,
        so we fall back on a serial main loop at high enough precision. */
-    if (arb_flint_get_num_available_threads() == 1 || prec >= 4e8)
+    if (flint_get_num_available_threads() == 1 || prec >= 4e8)
     {
         /* Bit-burst loop. */
         for (iter = 0, bits = start_bits; !fmpz_is_zero(t); iter++, bits *= 3)

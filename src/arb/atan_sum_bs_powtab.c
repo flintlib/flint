@@ -228,7 +228,7 @@ _arb_atan_sum_bs_powtab(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
         }
     }
 
-    if (arb_flint_get_num_available_threads() == 1)
+    if (flint_get_num_available_threads() == 1)
         bsplit(T, Q, Qexp, xexp, xpow, r, 0, N);
     else
         bsplit2(T, Q, Qexp, xexp, xpow, r, 0, N);

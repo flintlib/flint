@@ -28,6 +28,8 @@ slong flint_request_threads(thread_pool_handle ** handles,
 void flint_give_back_threads(thread_pool_handle * handles,
                                                             slong num_handles);
 
+slong flint_get_num_available_threads(void);
+
 #define FLINT_PARALLEL_UNIFORM 1
 #define FLINT_PARALLEL_STRIDED 2
 #define FLINT_PARALLEL_DYNAMIC 4

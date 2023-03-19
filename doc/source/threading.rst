@@ -74,6 +74,10 @@ The following convenience function are defined in ``thread_support.h``.
 They are currently experimental, and
 the interfaces might change in a future version.
 
+.. function:: slong flint_get_num_available_threads()
+
+    Returns the number of threads that are not currently in use.
+
 .. type:: void (* do_func_t)(slong i, void * args)
 
 .. function:: void flint_parallel_do(do_func_t f, void * args, slong n, int thread_limit, int flags)

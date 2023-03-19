@@ -138,7 +138,7 @@ void _acb_dirichlet_euler_product_real_ui(arb_t res, ulong s,
        which gives prec ^ 1.2956 here. */
     limit = 100 + prec * sqrt(prec);
 
-    num_threads = arb_flint_get_num_available_threads();
+    num_threads = flint_get_num_available_threads();
 
     if (num_threads > 1 && prec > 5000 && s > 5000)
     {

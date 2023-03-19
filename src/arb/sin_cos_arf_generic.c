@@ -10,6 +10,7 @@
 */
 
 #include "ulong_extras.h"
+#include "thread_support.h"
 #include "arb.h"
 
 #ifdef __GNUC__
@@ -295,7 +296,7 @@ arb_sin_cos_arf_generic(arb_t res_sin, arb_t res_cos, const arf_t x, slong prec)
         {
             want_rs = 0;
         }
-        else if (arb_flint_get_num_available_threads() == 1)
+        else if (flint_get_num_available_threads() == 1)
         {
             want_rs = (prec < 200000) || (prec < 1000000000 && mag < -prec / 5000);
         }
