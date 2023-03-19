@@ -99,6 +99,9 @@
 
 FLINT_DLL extern char flint_version[];
 
+struct __FLINT_FILE;
+typedef struct __FLINT_FILE FLINT_FILE;
+
 #define ulong mp_limb_t
 #define slong mp_limb_signed_t
 
