@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include <ctype.h>
 #include "gr_poly.h"
 

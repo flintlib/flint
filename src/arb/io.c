@@ -11,8 +11,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 #include "arb.h"
 #include "arf.h"
 #include "mag.h"

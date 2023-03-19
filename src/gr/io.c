@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fmpz.h"
 #include "gr.h"
 
@@ -23,7 +24,7 @@
 
 void gr_stream_init_file(gr_stream_t out, FILE * fp)
 {
-    out->fp = fp;
+    out->fp = (FLINT_FILE *) fp;
     out->s = NULL;
 }
 
@@ -40,7 +41,7 @@ void gr_stream_write(gr_stream_t out, const char * s)
 {
     if (out->fp != NULL)
     {
-        fprintf(out->fp, "%s", s);
+        fprintf((FILE *) out->fp, "%s", s);
     }
     else
     {
@@ -66,7 +67,7 @@ gr_stream_write_si(gr_stream_t out, slong x)
 {
     if (out->fp != NULL)
     {
-        flint_fprintf(out->fp, "%wd", x);
+        flint_fprintf((FILE *) out->fp, "%wd", x);
     }
     else
     {
@@ -84,7 +85,7 @@ gr_stream_write_ui(gr_stream_t out, ulong x)
 {
     if (out->fp != NULL)
     {
-        flint_fprintf(out->fp, "%wu", x);
+        flint_fprintf((FILE *) out->fp, "%wu", x);
     }
     else
     {
