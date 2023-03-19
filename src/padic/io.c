@@ -9,8 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fmpq.h"
 #include "padic.h"
+
+/* printing *******************************************************************/
 
 int _padic_fprint(FILE * file, const fmpz_t u, slong v, const padic_ctx_t ctx)
 {
@@ -140,8 +143,15 @@ int _padic_fprint(FILE * file, const fmpz_t u, slong v, const padic_ctx_t ctx)
     return 1;
 }
 
-int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx)
-{
-    return _padic_fprint(file, padic_unit(op), padic_val(op), ctx);
-}
+int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx) { return _padic_fprint(file, padic_unit(op), padic_val(op), ctx); }
+int _padic_print(const fmpz_t u, slong v, const padic_ctx_t ctx) { return _padic_fprint(stdout, u, v, ctx); }
+int padic_print(const padic_t op, const padic_ctx_t ctx) { return padic_fprint(stdout, op, ctx); }
 
+/* debugging ******************************************************************/
+
+void padic_debug(const padic_t op)
+{
+    flint_printf("(");
+    fmpz_print(padic_unit(op));
+    flint_printf(" %wd %wd)", padic_val(op), padic_prec(op));
+}
