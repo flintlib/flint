@@ -20,22 +20,6 @@ void nmod_mpolyv_clear(nmod_mpolyv_t A, const nmod_mpoly_ctx_t ctx)
     flint_free(A->coeffs);
 }
 
-
-void nmod_mpolyv_print_pretty(
-    const nmod_mpolyv_t poly,
-    const char ** x,
-    const nmod_mpoly_ctx_t ctx)
-{
-    slong i;
-    for (i = 0; i < poly->length; i++)
-    {
-        flint_printf("coeff[%wd]: ", i);
-        nmod_mpoly_print_pretty(poly->coeffs + i, x, ctx);
-        flint_printf("\n");
-    }
-}
-
-
 void nmod_mpolyv_fit_length(
     nmod_mpolyv_t A,
     slong length,
