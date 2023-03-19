@@ -10,7 +10,10 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "arb_poly.h"
+
+/* printing *******************************************************************/
 
 void
 arb_poly_fprintd(FILE * file, const arb_poly_t poly, slong digits)
@@ -31,3 +34,5 @@ arb_poly_fprintd(FILE * file, const arb_poly_t poly, slong digits)
 
     flint_fprintf(file, "]");
 }
+
+void arb_poly_printd(const arb_poly_t poly, slong digits) { arb_poly_fprintd(stdout, poly, digits); }
