@@ -10,7 +10,10 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "acb_poly.h"
+
+/* printing *******************************************************************/
 
 void
 acb_poly_fprintd(FILE * file, const acb_poly_t poly, slong digits)
@@ -28,3 +31,5 @@ acb_poly_fprintd(FILE * file, const acb_poly_t poly, slong digits)
 
     flint_fprintf(file, "]");
 }
+
+void acb_poly_printd(const acb_poly_t poly, slong digits) { acb_poly_fprintd(stdout, poly, digits); }
