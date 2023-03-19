@@ -91,14 +91,7 @@ void qfb_discriminant(fmpz_t D, qfb_t f)
    fmpz_clear(t);
 }
 
-QFB_INLINE
-void qfb_print(qfb_t q)
-{
-   printf("(");
-   fmpz_print(q->a); printf(", ");
-   fmpz_print(q->b); printf(", ");
-   fmpz_print(q->c); printf(")");
-}
+void qfb_print(qfb_t q);
 
 QFB_INLINE
 void qfb_array_clear(qfb ** forms, slong num)
