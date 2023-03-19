@@ -314,8 +314,6 @@ void fmpz_get_mpfr(mpfr_t x, const fmpz_t f, mpfr_rnd_t rnd);
 
 int fmpz_get_mpn(mp_ptr *n, fmpz_t n_in);
 
-int fmpz_set_str(fmpz_t f, const char * str, int b);
-
 void flint_mpz_init_set_readonly(mpz_t z, const fmpz_t f);
 
 void flint_mpz_clear_readonly(mpz_t z);
@@ -370,21 +368,21 @@ int fmpz_equal_si(const fmpz_t f, slong g);
 
 int fmpz_equal_ui(const fmpz_t f, ulong g);
 
-int fmpz_read(fmpz_t f);
-
-int fmpz_fread(FILE * file, fmpz_t f);
-
-size_t fmpz_inp_raw( fmpz_t x, FILE *fin );
-
-int fmpz_print(const fmpz_t x);
-
-int fmpz_fprint(FILE * file, const fmpz_t x);
-
-size_t fmpz_out_raw( FILE *fout, const fmpz_t x );
-
 size_t fmpz_sizeinbase(const fmpz_t f, int b);
 
+int fmpz_read(fmpz_t f);
+int fmpz_print(const fmpz_t x);
+
+int fmpz_set_str(fmpz_t f, const char * str, int b);
 char * fmpz_get_str(char * str, int b, const fmpz_t f);
+
+#ifdef FLINT_HAVE_FILE
+int fmpz_fread(FILE * file, fmpz_t f);
+int fmpz_fprint(FILE * file, const fmpz_t x);
+
+size_t fmpz_inp_raw(fmpz_t x, FILE * fin);
+size_t fmpz_out_raw(FILE * fout, const fmpz_t x);
+#endif
 
 FMPZ_INLINE
 void fmpz_swap(fmpz_t f, fmpz_t g)
