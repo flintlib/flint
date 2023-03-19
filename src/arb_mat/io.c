@@ -10,7 +10,10 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "arb_mat.h"
+
+/* printing *******************************************************************/
 
 void
 arb_mat_fprintd(FILE * file, const arb_mat_t mat, slong digits)
@@ -32,3 +35,5 @@ arb_mat_fprintd(FILE * file, const arb_mat_t mat, slong digits)
         flint_fprintf(file, "]\n");
     }
 }
+
+void arb_mat_printd(const arb_mat_t mat, slong digits) { arb_mat_fprintd(stdout, mat, digits); }

@@ -85,13 +85,11 @@ void arb_mat_randtest(arb_mat_t mat, flint_rand_t state, slong prec, slong mag_b
 
 /* I/O */
 
+#ifdef FLINT_HAVE_FILE
 void arb_mat_fprintd(FILE * file, const arb_mat_t mat, slong digits);
+#endif
 
-ARB_MAT_INLINE void
-arb_mat_printd(const arb_mat_t mat, slong digits)
-{
-    arb_mat_fprintd(stdout, mat, digits);
-}
+void arb_mat_printd(const arb_mat_t mat, slong digits);
 
 /* Comparisons */
 
