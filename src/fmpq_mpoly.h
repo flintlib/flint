@@ -163,16 +163,11 @@ int fmpq_mpoly_set_str_pretty(fmpq_mpoly_t A, const char * str,
 char * fmpq_mpoly_get_str_pretty(const fmpq_mpoly_t A,
                                   const char ** x, const fmpq_mpoly_ctx_t ctx);
 
-int fmpq_mpoly_fprint_pretty(FILE * file,
-            const fmpq_mpoly_t A, const char ** x, const fmpq_mpoly_ctx_t ctx);
+#ifdef FLINT_HAVE_FILE
+int fmpq_mpoly_fprint_pretty(FILE * file, const fmpq_mpoly_t A, const char ** x, const fmpq_mpoly_ctx_t ctx);
+#endif
 
-FMPQ_MPOLY_INLINE
-int fmpq_mpoly_print_pretty(const fmpq_mpoly_t A,
-                                   const char ** x, const fmpq_mpoly_ctx_t ctx)
-{
-    return fmpq_mpoly_fprint_pretty(stdout, A, x, ctx);
-}
-
+int fmpq_mpoly_print_pretty(const fmpq_mpoly_t A, const char ** x, const fmpq_mpoly_ctx_t ctx);
 
 /*  Basic manipulation *******************************************************/
 
@@ -868,18 +863,7 @@ void fmpq_mpoly_univar_swap_term_coeff(fmpq_mpoly_t c,
 
 ******************************************************************************/
 
-/*
-   test that r is a valid remainder upon division by g over Q
-   this means that no term of r is divisible by lt(g)
-*/
-FMPQ_MPOLY_INLINE
-void fmpq_mpoly_remainder_test(const fmpq_mpoly_t r, const fmpq_mpoly_t g,
-                                                    const fmpq_mpoly_ctx_t ctx)
-{
-    fmpz_mpoly_remainder_strongtest(r->zpoly, g->zpoly, ctx->zctx);
-}
-
-
+void fmpq_mpoly_remainder_test(const fmpq_mpoly_t r, const fmpq_mpoly_t g, const fmpq_mpoly_ctx_t ctx);
 
 #ifdef __cplusplus
 }

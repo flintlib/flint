@@ -9,9 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
+#include <stdio.h>
 #include "fmpq_mpoly.h"
 
+/* printing *******************************************************************/
 
 int
 fmpq_mpoly_fprint_pretty(FILE * file, const fmpq_mpoly_t A,
@@ -108,5 +109,16 @@ cleanup:
     return r;
 }
 
+int fmpq_mpoly_print_pretty(const fmpq_mpoly_t A, const char ** x, const fmpq_mpoly_ctx_t ctx) { return fmpq_mpoly_fprint_pretty(stdout, A, x, ctx); }
 
+/* debugging ******************************************************************/
 
+/*
+   test that r is a valid remainder upon division by g over Q
+   this means that no term of r is divisible by lt(g)
+*/
+
+void fmpq_mpoly_remainder_test(const fmpq_mpoly_t r, const fmpq_mpoly_t g, const fmpq_mpoly_ctx_t ctx)
+{
+    fmpz_mpoly_remainder_strongtest(r->zpoly, g->zpoly, ctx->zctx);
+}
