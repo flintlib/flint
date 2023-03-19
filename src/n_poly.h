@@ -734,14 +734,11 @@ char * n_fq_get_str_pretty(
     const mp_limb_t * a,
     const fq_nmod_ctx_t ctx);
 
-int n_fq_fprint_pretty(
-    FILE * file,
-    const mp_limb_t * a,
-    const fq_nmod_ctx_t ctx);
+#ifdef FLINT_HAVE_FILE
+int n_fq_fprint_pretty(FILE * file, const mp_limb_t * a, const fq_nmod_ctx_t ctx);
+#endif
 
-void n_fq_print_pretty(
-    const mp_limb_t * a,
-    const fq_nmod_ctx_t ctx);
+void n_fq_print_pretty(const mp_limb_t * a, const fq_nmod_ctx_t ctx);
 
 void n_fq_get_fq_nmod(
     fq_nmod_t a,

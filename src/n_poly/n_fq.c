@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "n_poly.h"
 #include "nmod_vec.h"
 
@@ -32,61 +33,6 @@
     mp_limb_t p1, p0;               \
     umul_ppmm(p1, p0, a, b);        \
     add_ssaaaa(h, l, h, l, p1, p0); \
-}
-
-char * n_fq_get_str_pretty(
-    const mp_limb_t * a,
-    const fq_nmod_ctx_t ctx)
-{
-    char * s;
-    fq_nmod_t A;
-    fq_nmod_init(A, ctx);
-    n_fq_get_fq_nmod(A, a, ctx);
-    s = fq_nmod_get_str_pretty(A, ctx);
-    fq_nmod_clear(A, ctx);
-    return s;
-}
-
-int n_fq_fprint_pretty(
-    FILE * file,
-    const mp_limb_t * a,
-    const fq_nmod_ctx_t ctx)
-{
-    slong d = fq_nmod_ctx_degree(ctx);
-    slong i;
-    int first;
-
-    first = 1;
-    for (i = d - 1; i >= 0; i--)
-    {
-        if (a[i] == 0)
-            continue;
-
-        if (!first)
-            flint_fprintf(file, "+");
-
-        first = 0;
-        flint_fprintf(file, "%wu", a[i]);
-
-        if (i > 0)
-        {
-            flint_fprintf(file, "*%s", ctx->var);
-            if (i > 1)
-                flint_fprintf(file, "^%wd", i);
-        }
-    }
-
-    if (first)
-        flint_fprintf(file, "0");
-
-    return 1;
-}
-
-void n_fq_print_pretty(
-    const mp_limb_t * a,
-    const fq_nmod_ctx_t ctx)
-{
-    n_fq_fprint_pretty(stdout, a, ctx);
 }
 
 void n_fq_randtest_not_zero(

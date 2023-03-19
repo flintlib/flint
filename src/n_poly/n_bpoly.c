@@ -58,36 +58,6 @@ void n_bpoly_realloc(n_bpoly_t A, slong len)
     A->alloc = len;
 }
 
-
-void n_bpoly_print_pretty(
-    const n_bpoly_t A,
-    const char * xvar,
-    const char * yvar)
-{
-    slong i;
-    int first;
-
-    first = 1;
-    for (i = A->length - 1; i >= 0; i--)
-    {
-        if (i < A->length - 1 && n_poly_is_zero(A->coeffs + i))
-            continue;
-
-        if (!first)
-            flint_printf(" + ");
-
-        first = 0;
-
-        flint_printf("(");
-        n_poly_print_pretty(A->coeffs + i, yvar);
-        flint_printf(")*%s^%wd", xvar, i);
-    }
-
-    if (first)
-        flint_printf("0");
-}
-
-
 slong n_bpoly_degree1(const n_bpoly_t A)
 {
     slong i, len = 0;
