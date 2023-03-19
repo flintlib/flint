@@ -9,8 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
+#include <stdio.h>
 #include "fq_zech_mpoly.h"
+
+/* printing *******************************************************************/
 
 int fq_zech_mpoly_fprint_pretty(FILE * file, const fq_zech_mpoly_t A,
                              const char ** x_in, const fq_zech_mpoly_ctx_t ctx)
@@ -95,3 +97,5 @@ done:
 
     return r;
 }
+
+int fq_zech_mpoly_print_pretty(const fq_zech_mpoly_t A, const char ** x, const fq_zech_mpoly_ctx_t ctx) { return fq_zech_mpoly_fprint_pretty(stdout, A, x, ctx); }
