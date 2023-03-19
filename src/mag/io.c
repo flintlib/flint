@@ -1,4 +1,6 @@
 /*
+    Copyright (C) 2014 Fredrik Johansson
+    Copyright (C) 2015 Arb authors
     Copyright (C) 2019 Julian Rüth
 
     This file is part of Arb.
@@ -9,11 +11,11 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
-#include <assert.h>
-
+#include <stdio.h>
 #include "mag.h"
 #include "arf.h"
+
+/* string *********************************************************************/
 
 static void
 mag_set_arf_dump(mag_t x, const arf_t y)
@@ -74,8 +76,57 @@ mag_load_str(mag_t x, const char* data)
     return err;
 }
 
+char *
+mag_dump_str(const mag_t x)
+{
+    char * res;
+    arf_t y;
+
+    arf_init_set_mag_shallow(y, x);
+
+    res = arf_dump_str(y);
+    return res;
+}
+
+/* printing *******************************************************************/
+
+void
+mag_fprint(FILE * file, const mag_t x)
+{
+    flint_fprintf(file, "(");
+    if (mag_is_zero(x))
+        flint_fprintf(file, "0");
+    else if (mag_is_inf(x))
+        flint_fprintf(file, "inf");
+    else
+    {
+        fmpz_t t;
+        fmpz_init(t);
+        fmpz_sub_ui(t, MAG_EXPREF(x), MAG_BITS);
+        flint_fprintf(file, "%wu * 2^", MAG_MAN(x));
+        fmpz_fprint(file, t);
+        fmpz_clear(t);
+    }
+    flint_fprintf(file, ")");
+}
+
+void
+mag_fprintd(FILE * file, const mag_t x, slong d)
+{
+    arf_t t;
+    arf_init(t);
+    arf_set_mag(t, x);
+    arf_fprintd(file, t, d);
+    arf_clear(t);
+}
+
+void mag_print(const mag_t x) { mag_fprint(stdout, x); }
+void mag_printd(const mag_t x, slong d) { mag_fprintd(stdout, x, d); }
+
+/* file I/O *******************************************************************/
+
 int
-mag_load_file(mag_t x, FILE* stream)
+mag_load_file(mag_t x, FILE * stream)
 {
     int err = 0;
     arf_t y;
@@ -94,4 +145,18 @@ mag_load_file(mag_t x, FILE* stream)
 
     arf_clear(y);
     return err;
+}
+
+int
+mag_dump_file(FILE * stream, const mag_t x)
+{
+    int nwrite;
+    char* data = mag_dump_str(x);
+
+    nwrite = fputs(data, stream);
+    if (nwrite == EOF)
+        return nwrite;
+
+    flint_free(data);
+    return 0;
 }
