@@ -10,9 +10,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "nmod_mat.h"
 
-int nmod_mat_fprint_pretty(FILE* file, const nmod_mat_t mat)
+int nmod_mat_fprint_pretty(FILE * file, const nmod_mat_t mat)
 {
     slong i, j;
     int z, width;
@@ -60,3 +61,6 @@ int nmod_mat_fprint_pretty(FILE* file, const nmod_mat_t mat)
     return z;
 }
 
+void nmod_mat_print_pretty(const nmod_mat_t mat) { nmod_mat_fprint_pretty(stdout, mat); }
+int nmod_mat_print(const nmod_mat_t mat) { return nmod_mat_fprint_pretty(stdout, mat); }
+int nmod_mat_fprint(FILE * f, const nmod_mat_t mat) { return nmod_mat_fprint_pretty(f, mat); }
