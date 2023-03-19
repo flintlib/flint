@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
 
     This file is part of FLINT.
 
@@ -9,7 +9,45 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "padic_poly.h"
+
+int _padic_poly_fprint(FILE *file, const fmpz *poly, slong val, slong len,
+                       const padic_ctx_t ctx)
+{
+    slong i, v;
+    fmpz_t u;
+
+    if (len == 0)
+    {
+        flint_fprintf(file, "0");
+        return 1;
+    }
+
+    fmpz_init(u);
+
+    flint_fprintf(file, "%wd ", len);
+
+    for (i = 0; i < len; i++)
+    {
+        flint_fprintf(file, " ");
+
+        if (fmpz_is_zero(poly + i))
+        {
+            flint_fprintf(file, "0");
+        }
+        else
+        {
+            v = val + fmpz_remove(u, poly + i, ctx->p);
+
+            _padic_fprint(file, u, v, ctx);
+        }
+    }
+
+    fmpz_clear(u);
+
+    return 1;
+}
 
 int _padic_poly_fprint_pretty(FILE *file,
                               const fmpz *poly, slong len, slong val,
@@ -150,11 +188,9 @@ int _padic_poly_fprint_pretty(FILE *file,
     return 1;
 }
 
-int padic_poly_fprint_pretty(FILE *file,
-                             const padic_poly_t poly, const char *var,
-                             const padic_ctx_t ctx)
-{
-    return _padic_poly_fprint_pretty(file,
-        poly->coeffs, poly->length, poly->val, var, ctx);
-}
-
+int padic_poly_fprint(FILE *file, const padic_poly_t poly, const padic_ctx_t ctx) { return _padic_poly_fprint(file, poly->coeffs, poly->val, poly->length, ctx); }
+int padic_poly_fprint_pretty(FILE * file, const padic_poly_t poly, const char * var, const padic_ctx_t ctx) { return _padic_poly_fprint_pretty(file, poly->coeffs, poly->length, poly->val, var, ctx); }
+int _padic_poly_print(const fmpz *poly, slong val, slong len, const padic_ctx_t ctx) { return _padic_poly_fprint(stdout, poly, val, len, ctx); }
+int padic_poly_print(const padic_poly_t poly, const padic_ctx_t ctx) { return padic_poly_fprint(stdout, poly, ctx); }
+int _padic_poly_print_pretty(const fmpz *poly, slong val, slong len, const char *var, const padic_ctx_t ctx) { return _padic_poly_fprint_pretty(stdout, poly, val, len, var, ctx); }
+int padic_poly_print_pretty(const padic_poly_t poly, const char *var, const padic_ctx_t ctx) { return padic_poly_fprint_pretty(stdout, poly, var, ctx); }
