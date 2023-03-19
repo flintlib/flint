@@ -41,7 +41,7 @@ const char * calcium_version(void);
 
 typedef struct
 {
-    FILE * fp;
+    FLINT_FILE * fp;
     char * s;
     slong len;
     slong alloc;
@@ -50,12 +50,9 @@ calcium_stream_struct;
 
 typedef calcium_stream_struct calcium_stream_t[1];
 
-CALCIUM_INLINE
-void calcium_stream_init_file(calcium_stream_t out, FILE * fp)
-{
-    out->fp = fp;
-    out->s = NULL;
-}
+#ifdef FLINT_HAVE_FILE
+void calcium_stream_init_file(calcium_stream_t out, FILE * fp);
+#endif
 
 CALCIUM_INLINE
 void calcium_stream_init_str(calcium_stream_t out)
