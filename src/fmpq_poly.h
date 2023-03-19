@@ -793,52 +793,23 @@ int fmpq_poly_is_squarefree(const fmpq_poly_t poly);
 
 /*  Input and output *********************************************************/
 
-int fmpq_poly_debug(const fmpq_poly_t poly);
-
-int _fmpq_poly_fprint(FILE * file,
-                      const fmpz * poly, const fmpz_t den, slong len);
-
+#ifdef FLINT_HAVE_FILE
+int _fmpq_poly_fprint(FILE * file, const fmpz * poly, const fmpz_t den, slong len);
 int fmpq_poly_fprint(FILE * file, const fmpq_poly_t poly);
-
-int _fmpq_poly_fprint_pretty(FILE * file,
-                             const fmpz *poly, const fmpz_t den, slong len,
-                             const char * x);
-
-int fmpq_poly_fprint_pretty(FILE * file,
-                            const fmpq_poly_t poly, const char * var);
-
-FMPQ_POLY_INLINE
-int _fmpq_poly_print(const fmpz * poly, const fmpz_t den, slong len)
-{
-    return _fmpq_poly_fprint(stdout, poly, den, len);
-}
-
-FMPQ_POLY_INLINE
-int fmpq_poly_print(const fmpq_poly_t poly)
-{
-    return fmpq_poly_fprint(stdout, poly);
-}
-
-FMPQ_POLY_INLINE
-int _fmpq_poly_print_pretty(const fmpz *poly, const fmpz_t den, slong len,
-                            const char * x)
-{
-    return _fmpq_poly_fprint_pretty(stdout, poly, den, len, x);
-}
-
-FMPQ_POLY_INLINE
-int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
-{
-    return fmpq_poly_fprint_pretty(stdout, poly, var);
-}
+int _fmpq_poly_fprint_pretty(FILE * file, const fmpz * poly, const fmpz_t den, slong len, const char * x);
+int fmpq_poly_fprint_pretty(FILE * file, const fmpq_poly_t poly, const char * var);
 
 int fmpq_poly_fread(FILE * file, fmpq_poly_t poly);
+#endif
 
-FMPQ_POLY_INLINE
-int fmpq_poly_read(fmpq_poly_t poly)
-{
-    return fmpq_poly_fread(stdin, poly);
-}
+int _fmpq_poly_print(const fmpz * poly, const fmpz_t den, slong len);
+int fmpq_poly_print(const fmpq_poly_t poly);
+int _fmpq_poly_print_pretty(const fmpz *poly, const fmpz_t den, slong len, const char * x);
+int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var);
+
+int fmpq_poly_read(fmpq_poly_t poly);
+
+int fmpq_poly_debug(const fmpq_poly_t poly);
 
 #ifdef __cplusplus
 }

@@ -9,8 +9,69 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
+#include "gmpcompat.h"
 #include "fmpq.h"
 #include "fmpq_poly.h"
+
+/* printing *******************************************************************/
+
+/*
+    Recall the return value conventions for fputc (of type int)
+
+    ``If there are no errors, the same character that has been written is
+    returned.  If an error occurs, EOF is returned and the error indicator
+    is set''
+
+    where the EOF macro expands to a negative int, and flint_fprintf (of type int)
+
+    ``On success, the total number of characters written is returned.
+    On failure, a negative number is returned.''
+ */
+
+int
+_fmpq_poly_fprint(FILE * file, const fmpz * poly, const fmpz_t den, slong len)
+{
+    int r;
+    slong i;
+    fmpz_t n, d, g;
+
+    fmpz_init(n);
+    fmpz_init(d);
+    fmpz_init(g);
+
+    r = flint_fprintf(file, "%wd", len);
+    if ((len > 0) && (r > 0))
+    {
+        r = fputc(' ', file);
+        for (i = 0; (i < len) && (r > 0); i++)
+        {
+            r = fputc(' ', file);
+            if (r > 0)
+            {
+                fmpz_gcd(g, poly + i, den);
+                fmpz_divexact(n, poly + i, g);
+                fmpz_divexact(d, den, g);
+                if (*d == WORD(1))
+                    r = fmpz_fprint(file, n);
+                else
+                {
+                    r = fmpz_fprint(file, n);
+                    if (r > 0)
+                        r = fputc('/', file);
+                    if (r > 0)
+                        r = fmpz_fprint(file, d);
+                }
+            }
+        }
+    }
+
+    fmpz_clear(n);
+    fmpz_clear(d);
+    fmpz_clear(g);
+
+    return r;
+}
 
 /*
     Macro wrapping _fmpq_fprint(file, x, y), ensuring that the printed
@@ -160,9 +221,72 @@ int _fmpq_poly_fprint_pretty(FILE * file,
 
 #undef __fmpq_fprint
 
-int fmpq_poly_fprint_pretty(FILE * file,
-                            const fmpq_poly_t poly, const char * var)
+int fmpq_poly_fprint(FILE * file, const fmpq_poly_t poly) { return _fmpq_poly_fprint(file, poly->coeffs, poly->den, poly->length); }
+int fmpq_poly_fprint_pretty(FILE * file, const fmpq_poly_t poly, const char * var) { return _fmpq_poly_fprint_pretty(file, poly->coeffs, poly->den, poly->length, var); }
+int _fmpq_poly_print(const fmpz * poly, const fmpz_t den, slong len) { return _fmpq_poly_fprint(stdout, poly, den, len); }
+int fmpq_poly_print(const fmpq_poly_t poly) { return fmpq_poly_fprint(stdout, poly); }
+int _fmpq_poly_print_pretty(const fmpz *poly, const fmpz_t den, slong len, const char * x) { return _fmpq_poly_fprint_pretty(stdout, poly, den, len, x); }
+int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var) { return fmpq_poly_fprint_pretty(stdout, poly, var); }
+
+/* reading ********************************************************************/
+
+int fmpq_poly_fread(FILE * file, fmpq_poly_t poly)
 {
-    return _fmpq_poly_fprint_pretty(file, poly->coeffs, poly->den, poly->length, var);
+    int r;
+    slong i, len;
+    mpz_t t;
+    mpq_t *a;
+
+    mpz_init(t);
+    r = mpz_inp_str(t, file, 10);
+    if (r == 0)
+    {
+        mpz_clear(t);
+        return 0;
+    }
+    if (!mpz_fits_slong_p(t))
+    {
+        flint_printf("Exception (fmpz_poly_fread). Length does not fit into a slong.\n");
+        flint_abort();
+    }
+    len = flint_mpz_get_si(t);
+    mpz_clear(t);
+
+    a = flint_malloc(len * sizeof(mpq_t));
+    for (i = 0; i < len; i++)
+        mpq_init(a[i]);
+
+    for (i = 0; (i < len) && r; i++)
+        r = mpq_inp_str(a[i], file, 10);
+
+    if (r > 0)
+        fmpq_poly_set_array_mpq(poly, (const mpq_t *) a, len);
+
+    for (i = 0; i < len; i++)
+        mpq_clear(a[i]);
+    flint_free(a);
+
+    return r;
+}
+
+int fmpq_poly_read(fmpq_poly_t poly) { return fmpq_poly_fread(stdin, poly); }
+
+/* debugging ******************************************************************/
+
+int fmpq_poly_debug(const fmpq_poly_t poly)
+{
+    slong i;
+
+    flint_printf("{alloc: %wd, length: %wd, coeffs:", poly->alloc, poly->length);
+    for (i = 0; i < poly->alloc; i++)
+    {
+        flint_printf(" ");
+        fmpz_print(poly->coeffs + i);
+    }
+    flint_printf(", den: ");
+    fmpz_print(poly->den);
+    flint_printf("}");
+
+    return 1;
 }
 
