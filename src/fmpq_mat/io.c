@@ -11,6 +11,8 @@
 
 #include "fmpq_mat.h"
 
+/* printing *******************************************************************/
+
 void fmpq_mat_print(const fmpq_mat_t mat)
 {
     slong i, j;
