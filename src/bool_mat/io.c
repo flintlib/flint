@@ -9,7 +9,10 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "bool_mat.h"
+
+/* printing *******************************************************************/
 
 void
 bool_mat_fprint(FILE * file, const bool_mat_t mat)
@@ -31,3 +34,5 @@ bool_mat_fprint(FILE * file, const bool_mat_t mat)
         flint_fprintf(file, "]\n");
     }
 }
+
+void bool_mat_print(const bool_mat_t mat) { bool_mat_fprint(stdout, mat); }
