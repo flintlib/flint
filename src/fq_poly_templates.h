@@ -1094,53 +1094,17 @@ void TEMPLATE(T, poly_compose_mod_brent_kung_precomp_preinv)(
 
 /*  Input and output  ********************************************************/
 
-int _TEMPLATE(T, poly_fprint_pretty)(FILE *file,
-                                 const TEMPLATE(T, struct) *poly, slong len,
-                                 const char *x,
-                                 const TEMPLATE(T, ctx_t) ctx);
+#ifdef FLINT_HAVE_FILE
+int _TEMPLATE(T, poly_fprint_pretty)(FILE *file, const TEMPLATE(T, struct) *poly, slong len, const char *x, const TEMPLATE(T, ctx_t) ctx);
+int TEMPLATE(T, poly_fprint_pretty)(FILE * file, const TEMPLATE(T, poly_t) poly, const char *x, const TEMPLATE(T, ctx_t) ctx);
+int _TEMPLATE(T, poly_fprint)(FILE * file, const TEMPLATE(T, struct) *poly, slong len, const TEMPLATE(T, ctx_t) ctx);
+int TEMPLATE(T, poly_fprint)(FILE * file, const TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx);
+#endif
 
-int TEMPLATE(T, poly_fprint_pretty)(FILE * file,
-                                const TEMPLATE(T, poly_t) poly,
-                                const char *x,
-                                const TEMPLATE(T, ctx_t) ctx);
-
-int _TEMPLATE(T, poly_fprint)(FILE * file,
-                          const TEMPLATE(T, struct) *poly, slong len,
-                          const TEMPLATE(T, ctx_t) ctx);
-
-int TEMPLATE(T, poly_fprint)(FILE * file,
-                         const TEMPLATE(T, poly_t) poly,
-                         const TEMPLATE(T, ctx_t) ctx);
-
-FQ_POLY_TEMPLATES_INLINE int
-_TEMPLATE(T, poly_print)(const TEMPLATE(T, struct) *poly, slong len,
-                         const TEMPLATE(T, ctx_t) ctx)
-{
-    return _TEMPLATE(T, poly_fprint)(stdout, poly, len, ctx);
-}
-
-FQ_POLY_TEMPLATES_INLINE int
-TEMPLATE(T, poly_print)(const TEMPLATE(T, poly_t) poly,
-                        const TEMPLATE(T, ctx_t) ctx)
-{
-    return TEMPLATE(T, poly_fprint)(stdout, poly, ctx);
-}
-
-
-FQ_POLY_TEMPLATES_INLINE int
-_TEMPLATE(T, poly_print_pretty)(const TEMPLATE(T, struct) *poly, slong len,
-                                const char *x, const TEMPLATE(T, ctx_t) ctx)
-{
-    return _TEMPLATE(T, poly_fprint_pretty)(stdout, poly, len, x, ctx);
-}
-
-FQ_POLY_TEMPLATES_INLINE int
-TEMPLATE(T, poly_print_pretty)(const TEMPLATE(T, poly_t) poly,
-                               const char *x,
-                               const TEMPLATE(T, ctx_t) ctx)
-{
-    return TEMPLATE(T, poly_fprint_pretty)(stdout, poly, x, ctx);
-}
+int _TEMPLATE(T, poly_print)(const TEMPLATE(T, struct) *poly, slong len, const TEMPLATE(T, ctx_t) ctx);
+int TEMPLATE(T, poly_print)(const TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx);
+int _TEMPLATE(T, poly_print_pretty)(const TEMPLATE(T, struct) *poly, slong len, const char *x, const TEMPLATE(T, ctx_t) ctx);
+int TEMPLATE(T, poly_print_pretty)(const TEMPLATE(T, poly_t) poly, const char *x, const TEMPLATE(T, ctx_t) ctx);
 
 char * _TEMPLATE(T, poly_get_str_pretty)(const TEMPLATE(T, struct) * poly, slong len,
                                   const char *x,

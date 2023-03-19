@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
     Copyright (C) 2013 Mike Hansen
 
     This file is part of FLINT.
@@ -13,6 +13,9 @@
 #ifdef T
 
 #include "templates.h"
+#include "fmpz.h"
+
+/* printing *******************************************************************/
 
 /*
     TODO:  When op has only one non-zero term, this
@@ -20,7 +23,7 @@
  */
 
 static void
-__TEMPLATE(T, print) (FILE * file, const TEMPLATE(T, struct) * op,
+__TEMPLATE(T, print)(FILE * file, const TEMPLATE(T, struct) * op,
                       const TEMPLATE(T, ctx_t) ctx)
 {
     fputc('(', file);
@@ -29,7 +32,34 @@ __TEMPLATE(T, print) (FILE * file, const TEMPLATE(T, struct) * op,
 }
 
 int
-_TEMPLATE(T, poly_fprint_pretty) (FILE * file,
+_TEMPLATE(T, poly_fprint)(FILE * file, const TEMPLATE(T, struct) * poly,
+                           slong len, const TEMPLATE(T, ctx_t) ctx)
+{
+    int r;
+    slong i;
+
+    r = flint_fprintf(file, "%wd ", len);
+    if (r <= 0)
+        return r;
+
+    if (len == 0)
+        return r;
+
+    for (i = 0; (r > 0) && (i < len); i++)
+    {
+        r = flint_fprintf(file, " ");
+        if (r <= 0)
+            return r;
+        r = TEMPLATE(T, fprint) (file, poly + i, ctx);
+        if (r <= 0)
+            return r;
+    }
+
+    return r;
+}
+
+int
+_TEMPLATE(T, poly_fprint_pretty)(FILE * file,
                                   const TEMPLATE(T, struct) * poly, slong len,
                                   const char *x, const TEMPLATE(T, ctx_t) ctx)
 {
@@ -111,13 +141,11 @@ _TEMPLATE(T, poly_fprint_pretty) (FILE * file,
     return 1;
 }
 
-int
-TEMPLATE(T, poly_fprint_pretty) (FILE * file, const TEMPLATE(T, poly_t) poly,
-                                 const char *x, const TEMPLATE(T, ctx_t) ctx)
-{
-    return _TEMPLATE(T, poly_fprint_pretty) (file, poly->coeffs, poly->length,
-                                             x, ctx);
-}
-
+int TEMPLATE(T, poly_fprint)(FILE * file, const TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx) { return _TEMPLATE(T, poly_fprint)(file, poly->coeffs, poly->length, ctx); }
+int TEMPLATE(T, poly_fprint_pretty)(FILE * file, const TEMPLATE(T, poly_t) poly, const char *x, const TEMPLATE(T, ctx_t) ctx) { return _TEMPLATE(T, poly_fprint_pretty)(file, poly->coeffs, poly->length, x, ctx); }
+int _TEMPLATE(T, poly_print)(const TEMPLATE(T, struct) *poly, slong len, const TEMPLATE(T, ctx_t) ctx) { return _TEMPLATE(T, poly_fprint)(stdout, poly, len, ctx); }
+int TEMPLATE(T, poly_print)(const TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx) { return TEMPLATE(T, poly_fprint)(stdout, poly, ctx); }
+int _TEMPLATE(T, poly_print_pretty)(const TEMPLATE(T, struct) *poly, slong len, const char *x, const TEMPLATE(T, ctx_t) ctx) { return _TEMPLATE(T, poly_fprint_pretty)(stdout, poly, len, x, ctx); }
+int TEMPLATE(T, poly_print_pretty)(const TEMPLATE(T, poly_t) poly, const char *x, const TEMPLATE(T, ctx_t) ctx) { return TEMPLATE(T, poly_fprint_pretty)(stdout, poly, x, ctx); }
 
 #endif
