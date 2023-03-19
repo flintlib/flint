@@ -35,17 +35,12 @@ void _TEMPLATE(T, vec_randtest)(TEMPLATE(T, struct) * f,
 /*  Norms  *******************************************************************/
 
 /*  Input and output  ********************************************************/
-int _TEMPLATE(T, vec_fprint)(FILE * file,
-                             const TEMPLATE(T, struct) * vec,
-                             slong len,
-                             const TEMPLATE(T, ctx_t) ctx);
 
-FQ_VEC_TEMPLATES_INLINE
-int _TEMPLATE(T, vec_print)(const TEMPLATE(T, struct) * vec, slong len,
-                            const TEMPLATE(T, ctx_t) ctx)
-{
-    return _TEMPLATE(T, vec_fprint)(stdout, vec, len, ctx);
-}
+#ifdef FLINT_HAVE_FILE
+int _TEMPLATE(T, vec_fprint)(FILE * file, const TEMPLATE(T, struct) * vec, slong len, const TEMPLATE(T, ctx_t) ctx);
+#endif
+
+int _TEMPLATE(T, vec_print)(const TEMPLATE(T, struct) * vec, slong len, const TEMPLATE(T, ctx_t) ctx);
 
 /*  Conversions  *************************************************************/
 

@@ -15,6 +15,7 @@
 
 #include "templates.h"
 
+/* printing *******************************************************************/
 
 /*
     Recall the return value conventions for fputc (of type int)
@@ -51,5 +52,6 @@ int _TEMPLATE(T, vec_fprint) (FILE * file,
     return r;
 }
 
+int _TEMPLATE(T, vec_print)(const TEMPLATE(T, struct) * vec, slong len, const TEMPLATE(T, ctx_t) ctx) { return _TEMPLATE(T, vec_fprint)(stdout, vec, len, ctx); }
 
 #endif
