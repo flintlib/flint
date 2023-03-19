@@ -166,28 +166,13 @@ char * _fmpz_mpoly_get_str_pretty(const fmpz * poly,
 char * fmpz_mpoly_get_str_pretty(const fmpz_mpoly_t A,
                                   const char ** x, const fmpz_mpoly_ctx_t ctx);
 
-int _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly,
-                        const ulong * exps, slong len, const char ** x_in,
-                                     flint_bitcnt_t bits, const mpoly_ctx_t mctx);
+#ifdef FLINT_HAVE_FILE
+int _fmpz_mpoly_fprint_pretty(FILE * file, const fmpz * poly, const ulong * exps, slong len, const char ** x_in, flint_bitcnt_t bits, const mpoly_ctx_t mctx);
+int fmpz_mpoly_fprint_pretty(FILE * file, const fmpz_mpoly_t A, const char ** x, const fmpz_mpoly_ctx_t ctx);
+#endif
 
-int fmpz_mpoly_fprint_pretty(FILE * file,
-            const fmpz_mpoly_t A, const char ** x, const fmpz_mpoly_ctx_t ctx);
-
-FMPZ_MPOLY_INLINE
-int _fmpz_mpoly_print_pretty(const fmpz * poly,
-                       const ulong * exps, slong len, const char ** x,
-                                            slong bits, const mpoly_ctx_t mctx)
-{
-    return _fmpz_mpoly_fprint_pretty(stdout, poly, exps, len, x, bits, mctx);
-}
-
-FMPZ_MPOLY_INLINE
-int fmpz_mpoly_print_pretty(const fmpz_mpoly_t A,
-                                   const char ** x, const fmpz_mpoly_ctx_t ctx)
-{
-   return fmpz_mpoly_fprint_pretty(stdout, A, x, ctx);
-}
-
+int _fmpz_mpoly_print_pretty(const fmpz * poly, const ulong * exps, slong len, const char ** x, slong bits, const mpoly_ctx_t mctx);
+int fmpz_mpoly_print_pretty(const fmpz_mpoly_t A, const char ** x, const fmpz_mpoly_ctx_t ctx);
 
 /*  Basic manipulation *******************************************************/
 
@@ -1382,113 +1367,8 @@ mpz_srcptr _fmpz_mpoly_get_mpz_signed_uiuiui(ulong * sm, fmpz x,
 
 ******************************************************************************/
 
-/*
-   test that r is a valid remainder upon division by g
-   this means that if c*x^a is a term of r and x^a is divisible by the leading
-   monomial of g, then |c| < |leading coefficient of g|
-*/
-FMPZ_MPOLY_INLINE
-void fmpz_mpoly_remainder_test(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
-                                                    const fmpz_mpoly_ctx_t ctx)
-{
-   slong i, N, bits;
-   ulong mask = 0;
-   ulong * rexp, * gexp;
-
-   bits = FLINT_MAX(r->bits, g->bits);
-   N = mpoly_words_per_exp(bits, ctx->minfo);
-
-   if (g->length == 0 )
-      flint_throw(FLINT_ERROR, "Zero denominator in remainder test");
-
-   if (r->length == 0 )
-      return;
-
-   rexp = (ulong *) flint_malloc(N*r->length*sizeof(ulong));
-   gexp = (ulong *) flint_malloc(N*1        *sizeof(ulong));
-   mpoly_repack_monomials(rexp, bits, r->exps, r->bits, r->length, ctx->minfo);
-   mpoly_repack_monomials(gexp, bits, g->exps, g->bits, 1,         ctx->minfo);
-
-    if (bits <= FLINT_BITS)
-        mask = mpoly_overflow_mask_sp(bits);
-    else
-        mask = 0;
-
-    for (i = 0; i < r->length; i++)
-    {
-        int divides;
-
-        if (bits <= FLINT_BITS)
-            divides = mpoly_monomial_divides_test(rexp + i*N, gexp + 0*N, N, mask);
-        else
-            divides = mpoly_monomial_divides_mp_test(rexp + i*N, gexp + 0*N, N, bits);
-
-        if (divides && fmpz_cmpabs(g->coeffs + 0, r->coeffs + i) <= 0)
-        {
-            flint_printf("fmpz_mpoly_remainder_test FAILED i = %wd\n", i);
-            flint_printf("rem ");fmpz_mpoly_print_pretty(r, NULL, ctx); printf("\n\n");
-            flint_printf("den ");fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
-            flint_abort();
-        }
-    }
-
-   flint_free(rexp);
-   flint_free(gexp);
-}
-
-
-/*
-   test that r is a valid remainder upon division by g over Q
-   this means that no term of r is divisible by lt(g)
-*/
-FMPZ_MPOLY_INLINE
-void fmpz_mpoly_remainder_strongtest(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
-                                                    const fmpz_mpoly_ctx_t ctx)
-{
-    slong i, N, bits;
-    ulong mask = 0;
-    ulong * rexp, * gexp;
-
-    bits = FLINT_MAX(r->bits, g->bits);
-    N = mpoly_words_per_exp(bits, ctx->minfo);
-
-    if (g->length == 0 )
-        flint_throw(FLINT_ERROR, "Zero denominator in remainder test");
-
-    if (r->length == 0 )
-        return;
-
-    rexp = (ulong *) flint_malloc(N*r->length*sizeof(ulong));
-    gexp = (ulong *) flint_malloc(N*1        *sizeof(ulong));
-    mpoly_repack_monomials(rexp, bits, r->exps, r->bits, r->length, ctx->minfo);
-    mpoly_repack_monomials(gexp, bits, g->exps, g->bits, 1,         ctx->minfo);
-
-    if (bits <= FLINT_BITS)
-        mask = mpoly_overflow_mask_sp(bits);
-    else
-        mask = 0;
-
-    for (i = 0; i < r->length; i++)
-    {
-        int divides;
-
-        if (bits <= FLINT_BITS)
-            divides = mpoly_monomial_divides_test(rexp + i*N, gexp + 0*N, N, mask);
-        else
-            divides = mpoly_monomial_divides_mp_test(rexp + i*N, gexp + 0*N, N, bits);
-
-        if (divides)
-        {
-            flint_printf("fmpz_mpoly_remainder_strongtest FAILED i = %wd\n", i);
-            flint_printf("rem ");fmpz_mpoly_print_pretty(r, NULL, ctx); printf("\n\n");
-            flint_printf("den ");fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
-            flint_abort();
-        }
-    }
-
-    flint_free(rexp);
-    flint_free(gexp);
-}
+void fmpz_mpoly_remainder_test(const fmpz_mpoly_t r, const fmpz_mpoly_t g, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_remainder_strongtest(const fmpz_mpoly_t r, const fmpz_mpoly_t g, const fmpz_mpoly_ctx_t ctx);
 
 #ifdef __cplusplus
 }
