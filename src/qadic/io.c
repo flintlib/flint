@@ -9,11 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fmpq_poly.h"
 #include "qadic.h"
 
-int _qadic_fprint_pretty(FILE * file, const fmpz *u, slong len, slong v,
-    const qadic_ctx_t ctx)
+/* printing *******************************************************************/
+
+int _qadic_fprint_pretty(FILE * file, const fmpz * u, slong len, slong v, const qadic_ctx_t ctx)
 {
     const fmpz *p = (&ctx->pctx)->p;
 
@@ -149,8 +151,9 @@ int _qadic_fprint_pretty(FILE * file, const fmpz *u, slong len, slong v,
     return 1;
 }
 
-int qadic_fprint_pretty(FILE *file, const qadic_t op, const qadic_ctx_t ctx)
-{
-    return _qadic_fprint_pretty(file, op->coeffs, op->length, op->val, ctx);
-}
+int qadic_fprint_pretty(FILE *file, const qadic_t op, const qadic_ctx_t ctx) { return _qadic_fprint_pretty(file, op->coeffs, op->length, op->val, ctx); }
+int qadic_print_pretty(const qadic_t op, const qadic_ctx_t ctx) { return qadic_fprint_pretty(stdout, op, ctx); }
 
+/* debugging ******************************************************************/
+
+int qadic_debug(const qadic_t op) { return padic_poly_debug(op); }
