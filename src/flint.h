@@ -12,11 +12,17 @@
 #ifndef FLINT_H
 #define FLINT_H
 
+#ifndef FLINT_NOSTDIO
+# include <stdio.h>
+#endif
+
+#ifndef FLINT_NOSTDARG
+# include <stdarg.h>
+#endif
+
 #if !defined(_MSC_VER)
 #include <sys/param.h> /* for BSD define */
 #endif
-#include <stdio.h>
-#include <stdarg.h>
 #include <gmp.h>
 #include "limits.h"
 #include "longlong.h"
@@ -37,6 +43,17 @@
 #   include <alloca.h> /* We assume then that you have alloca.h */
 #  endif
 # endif
+#endif
+
+#ifdef va_start
+# define FLINT_HAVE_VA_LIST
+#endif
+
+#if defined(FILE)       || defined(_FILE_DEFINED) || defined(__DEFINED_FILE) \
+ || defined(H_STDIO)    || defined(_H_STDIO)      || defined(_STDIO_H)       \
+ || defined(_STDIO_H_)  || defined(__STDIO_H)     || defined(__STDIO_H__)    \
+ || defined(__STDIO__)
+# define FLINT_HAVE_FILE
 #endif
 
 #ifdef FLINT_INLINES_C
@@ -437,13 +454,18 @@ mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
 int parse_fmt(int * floating, const char * fmt);
 
 int flint_printf(const char * str, ...); /* flint version of printf */
-int flint_vprintf(const char * str, va_list ap); /* va_list version of flint_printf */
-int flint_fprintf(FILE * f, const char * str, ...); /* flint version of fprintf */
 int flint_sprintf(char * s, const char * str, ...); /* flint version of sprintf */
-
 int flint_scanf(const char * str, ...); /* flint version of scanf */
-int flint_fscanf(FILE * f, const char * str, ...); /* flint version of fscanf */
 int flint_sscanf(const char * s, const char * str, ...); /* flint version of sscanf */
+
+#ifdef FLINT_HAVE_VA_LIST
+int flint_vprintf(const char * str, va_list ap); /* va_list version of flint_printf */
+#endif
+
+#ifdef FLINT_HAVE_FILE
+int flint_fprintf(FILE * f, const char * str, ...); /* flint version of fprintf */
+int flint_fscanf(FILE * f, const char * str, ...); /* flint version of fscanf */
+#endif
 
 FLINT_INLINE slong flint_mul_sizes(slong x, slong y)
 {
