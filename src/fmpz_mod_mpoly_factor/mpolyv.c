@@ -11,7 +11,6 @@
 
 #include "fmpz_mod_mpoly_factor.h"
 
-
 void fmpz_mod_mpolyv_clear(fmpz_mod_mpolyv_t A, const fmpz_mod_mpoly_ctx_t ctx)
 {
     slong i;
@@ -19,22 +18,6 @@ void fmpz_mod_mpolyv_clear(fmpz_mod_mpolyv_t A, const fmpz_mod_mpoly_ctx_t ctx)
         fmpz_mod_mpoly_clear(A->coeffs + i, ctx);
     flint_free(A->coeffs);
 }
-
-
-void fmpz_mod_mpolyv_print_pretty(
-    const fmpz_mod_mpolyv_t poly,
-    const char ** x,
-    const fmpz_mod_mpoly_ctx_t ctx)
-{
-    slong i;
-    for (i = 0; i < poly->length; i++)
-    {
-        flint_printf("coeff[%wd]: ", i);
-        fmpz_mod_mpoly_print_pretty(poly->coeffs + i, x, ctx);
-        flint_printf("\n");
-    }
-}
-
 
 void fmpz_mod_mpolyv_fit_length(
     fmpz_mod_mpolyv_t A,

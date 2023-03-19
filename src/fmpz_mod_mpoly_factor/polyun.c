@@ -13,7 +13,6 @@
 #include "mpn_extras.h"
 #include "fmpz_vec.h"
 
-
 int fmpz_mod_polyun_is_canonical(
     const fmpz_mod_polyun_t A,
     const fmpz_mod_ctx_t ctx)
@@ -64,57 +63,6 @@ void fmpz_mod_polyun_realloc(
     A->alloc = new_alloc;
 }
 
-
-void fmpz_mod_polyu2n_print_pretty(
-    const fmpz_mod_polyun_t A,
-    const char * var0,
-    const char * var1,
-    const char * varlast,
-    const fmpz_mod_ctx_t ctx)
-{
-    slong i;
-    int first = 1;
-
-    for (i = 0; i < A->length; i++)
-    {
-        if (!first)
-            printf(" + ");
-        first = 0;
-        flint_printf("(");
-        fmpz_mod_poly_print_pretty(A->coeffs + i, varlast, ctx);
-        flint_printf(")*%s^%wu*%s^%wu",
-            var0, extract_exp(A->exps[i], 1, 2),
-            var1, extract_exp(A->exps[i], 0, 2));
-    }
-
-    if (first)
-        flint_printf("0");
-}
-
-void fmpz_mod_polyu1n_print_pretty(
-    const fmpz_mod_polyun_t A,
-    const char * var0,
-    const char * varlast,
-    const fmpz_mod_ctx_t ctx)
-{
-    slong i;
-    int first = 1;
-
-    for (i = 0; i < A->length; i++)
-    {
-        if (!first)
-            flint_printf(" + ");
-        first = 0;
-        flint_printf("(");
-        fmpz_mod_poly_print_pretty(A->coeffs + i, varlast, ctx);
-        flint_printf(")*%s^%wu", var0, A->exps[i]);
-    }
-
-    if (first)
-        flint_printf("0");
-}
-
-
 int fmpz_mod_polyun_equal(
     fmpz_mod_polyun_t A,
     const fmpz_mod_polyun_t B,
@@ -149,36 +97,6 @@ void fmpz_mod_polyun_set(
     }
     A->length = B->length;
 }
-
-
-void fmpz_mod_polyu3n_print_pretty(
-    const fmpz_mod_polyun_t A,
-    const char * var0,
-    const char * var1,
-    const char * var2,
-    const char * varlast,
-    const fmpz_mod_ctx_t ctx)
-{
-    slong i;
-    int first = 1;
-
-    for (i = 0; i < A->length; i++)
-    {
-        if (!first)
-            flint_printf(" + ");
-        first = 0;
-        flint_printf("(");
-        fmpz_mod_poly_print_pretty(A->coeffs + i, varlast, ctx);
-        flint_printf(")*%s^%wu*%s^%wu*%s^%wu",
-            var0, extract_exp(A->exps[i], 2, 3),
-            var1, extract_exp(A->exps[i], 1, 3),
-            var2, extract_exp(A->exps[i], 0, 3));
-    }
-
-    if (first)
-        flint_printf("0");
-}
-
 
 void fmpz_mod_polyun_one(fmpz_mod_polyun_t A, const fmpz_mod_ctx_t ctx)
 {
@@ -229,8 +147,6 @@ void fmpz_mod_mpoly_get_polyu1n(
     FLINT_ASSERT(fmpz_mod_polyun_is_canonical(A, ctx->ffinfo));
 }
 
-
-
 void fmpz_mod_mpoly_set_polyu1n(
     fmpz_mod_mpoly_t B,
     const fmpz_mod_polyun_t A,
@@ -264,4 +180,3 @@ void fmpz_mod_mpoly_set_polyu1n(
 
     FLINT_ASSERT(fmpz_mod_mpoly_is_canonical(B, ctx));
 }
-

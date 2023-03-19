@@ -12,7 +12,6 @@
 #include "fmpz_mod_vec.h"
 #include "fmpz_mod_mpoly_factor.h"
 
-
 int fmpz_mod_bpoly_is_canonical(const fmpz_mod_bpoly_t A, const fmpz_mod_ctx_t ctx)
 {
     slong i;
@@ -38,35 +37,6 @@ void fmpz_mod_bpoly_clear(fmpz_mod_bpoly_t A, const fmpz_mod_ctx_t ctx)
         fmpz_mod_poly_clear(A->coeffs + i, ctx);
     if (A->alloc > 0)
         flint_free(A->coeffs);
-}
-
-void fmpz_mod_bpoly_print_pretty(
-    const fmpz_mod_bpoly_t A,
-    const char * xvar,
-    const char * yvar,
-    const fmpz_mod_ctx_t ctx)
-{
-    slong i;
-    int first;
-
-    first = 1;
-    for (i = A->length - 1; i >= 0; i--)
-    {
-        if (fmpz_mod_poly_is_zero(A->coeffs + i, ctx))
-            continue;
-
-        if (!first)
-            flint_printf(" + ");
-
-        first = 0;
-
-        flint_printf("(");
-        fmpz_mod_poly_print_pretty(A->coeffs + i, yvar, ctx);
-        flint_printf(")*%s^%wd", xvar, i);
-    }
-
-    if (first)
-        flint_printf("0");
 }
 
 void fmpz_mod_bpoly_fit_length(
