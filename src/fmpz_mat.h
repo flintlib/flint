@@ -144,29 +144,17 @@ FMPZ_MAT_INLINE void _fmpz_mat_read_only_window_clear(fmpz_mat_t A)
 
 /* Input and output  *********************************************************/
 
+#ifdef FLINT_HAVE_FILE
 int fmpz_mat_fprint(FILE * file, const fmpz_mat_t mat);
-
 int fmpz_mat_fprint_pretty(FILE * file, const fmpz_mat_t mat);
 
-FMPZ_MAT_INLINE
-int fmpz_mat_print(const fmpz_mat_t mat)
-{
-    return fmpz_mat_fprint(stdout, mat);
-}
-
-FMPZ_MAT_INLINE
-int fmpz_mat_print_pretty(const fmpz_mat_t mat)
-{
-    return fmpz_mat_fprint_pretty(stdout, mat);
-}
-
 int fmpz_mat_fread(FILE* file, fmpz_mat_t mat);
+#endif
 
-FMPZ_MAT_INLINE
-int fmpz_mat_read(fmpz_mat_t mat)
-{
-    return fmpz_mat_fread(stdin, mat);
-}
+int fmpz_mat_print(const fmpz_mat_t mat);
+int fmpz_mat_print_pretty(const fmpz_mat_t mat);
+
+int fmpz_mat_read(fmpz_mat_t mat);
 
 /* Random matrix generation  *************************************************/
 
