@@ -23,22 +23,6 @@ void fq_zech_mpolyv_clear(fq_zech_mpolyv_t A, const fq_zech_mpoly_ctx_t ctx)
     }
 }
 
-
-void fq_zech_mpolyv_print_pretty(
-    const fq_zech_mpolyv_t poly,
-    const char ** x,
-    const fq_zech_mpoly_ctx_t ctx)
-{
-    slong i;
-    for (i = 0; i < poly->length; i++)
-    {
-        flint_printf("coeff[%wd]: ", i);
-        fq_zech_mpoly_print_pretty(poly->coeffs + i, x, ctx);
-        flint_printf("\n");
-    }
-}
-
-
 void fq_zech_mpolyv_fit_length(
     fq_zech_mpolyv_t A,
     slong length,

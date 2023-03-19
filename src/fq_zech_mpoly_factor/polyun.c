@@ -40,60 +40,6 @@ void fq_zech_polyun_realloc(fq_zech_polyun_t A, slong len, const fq_zech_ctx_t c
     A->alloc = new_alloc;
 }
 
-void fq_zech_polyu2n_print_pretty(
-    const fq_zech_polyun_t A,
-    const char * var0,
-    const char * var1,
-    const char * varlast,
-    const fq_zech_ctx_t ctx)
-{
-    slong i;
-    int first = 1;
-
-    for (i = 0; i < A->length; i++)
-    {
-        if (!first)
-            flint_printf(" + ");
-        first = 0;
-        flint_printf("(");
-        fq_zech_poly_print_pretty(A->coeffs + i, varlast, ctx);
-        flint_printf(")*%s^%wu*%s^%wu",
-            var0, extract_exp(A->exps[i], 1, 2),
-            var1, extract_exp(A->exps[i], 0, 2));
-    }
-
-    if (first)
-        flint_printf("0");
-}
-
-void fq_zech_polyu3n_print_pretty(
-    const fq_zech_polyun_t A,
-    const char * var0,
-    const char * var1,
-    const char * var2,
-    const char * varlast,
-    const fq_zech_ctx_t ctx)
-{
-    slong i;
-    int first = 1;
-
-    for (i = 0; i < A->length; i++)
-    {
-        if (!first)
-            flint_printf(" + ");
-        first = 0;
-        flint_printf("(");
-        fq_zech_poly_print_pretty(A->coeffs + i, varlast, ctx);
-        flint_printf(")*%s^%wu*%s^%wu*%s^%wu",
-            var0, extract_exp(A->exps[i], 2, 3),
-            var1, extract_exp(A->exps[i], 1, 3),
-            var2, extract_exp(A->exps[i], 0, 3));
-    }
-
-    if (first)
-        flint_printf("0");
-}
-
 int fq_zech_polyun_is_canonical(
     const fq_zech_polyun_t A,
     const fq_zech_ctx_t ctx)
