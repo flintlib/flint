@@ -90,66 +90,11 @@ FQ_NMOD_INLINE void fq_nmod_ctx_order(fmpz_t f, const fq_nmod_ctx_t ctx)
     fmpz_pow_ui(f, f, fq_nmod_ctx_degree(ctx));
 }
 
-/* TODO */
-FQ_NMOD_INLINE int fq_nmod_ctx_fprint(FILE * file, const fq_nmod_ctx_t ctx)
-{
-    int r;
-    slong i, k;
+#ifdef FLINT_HAVE_FILE
+int fq_nmod_ctx_fprint(FILE * file, const fq_nmod_ctx_t ctx);
+#endif
 
-    r = flint_fprintf(file, "p = ");
-    if (r <= 0)
-        return r;
-
-    r = fmpz_fprint(file, fq_nmod_ctx_prime(ctx));
-    if (r <= 0)
-        return r;
-
-    r = flint_fprintf(file, "\nd = %wd\nf(X) = ", ctx->j[ctx->len - 1]);
-    if (r <= 0)
-        return r;
-
-    r = flint_fprintf(file, "%wu", ctx->a[0]);
-    if (r <= 0)
-        return r;
-
-    for (k = 1; k < ctx->len; k++)
-    {
-        i = ctx->j[k];
-        r = flint_fprintf(file, " + ");
-        if (r <= 0)
-            return r;
-
-        if (ctx->a[k] == UWORD(1))
-        {
-            if (i == 1)
-                r = flint_fprintf(file, "X");
-            else
-                r = flint_fprintf(file, "X^%wd", i);
-            if (r <= 0)
-                return r;
-        }
-        else
-        {
-            r = flint_fprintf(file, "%wu", ctx->a[k]);
-            if (r <= 0)
-                return r;
-
-            if (i == 1)
-                r = flint_fprintf(file, "*X");
-            else
-                r = flint_fprintf(file, "*X^%wd", i);
-            if (r <= 0)
-                return r;
-        }
-    }
-    r = flint_fprintf(file, "\n");
-    return r;
-}
-
-FQ_NMOD_INLINE void fq_nmod_ctx_print(const fq_nmod_ctx_t ctx)
-{
-    fq_nmod_ctx_fprint(stdout, ctx);
-}
+void fq_nmod_ctx_print(const fq_nmod_ctx_t ctx);
 
 /* Memory management  *********************************************************/
 
@@ -393,32 +338,15 @@ void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b,
 
 /* Output ********************************************************************/
 
-FQ_NMOD_INLINE
-int fq_nmod_fprint(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
-{
-    return nmod_poly_fprint(file, op);
-}
+#ifdef FLINT_HAVE_FILE
+int fq_nmod_fprint(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
+int fq_nmod_fprint_pretty(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
+#endif
 
-FQ_NMOD_INLINE
-void fq_nmod_print(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
-{
-    nmod_poly_print(op);
-}
-
-FQ_NMOD_INLINE
-int fq_nmod_fprint_pretty(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
-{
-    return nmod_poly_fprint_pretty(file, op, ctx->var);
-}
-
-FQ_NMOD_INLINE
-void fq_nmod_print_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
-{
-    nmod_poly_print_pretty(op, ctx->var);
-}
+void fq_nmod_print(const fq_nmod_t op, const fq_nmod_ctx_t ctx);
+void fq_nmod_print_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
 char * fq_nmod_get_str(const fq_nmod_t op, const fq_nmod_ctx_t ctx);
-
 char * fq_nmod_get_str_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
 /* Special functions *********************************************************/
