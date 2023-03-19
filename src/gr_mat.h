@@ -89,14 +89,7 @@ WARN_UNUSED_RESULT int gr_mat_concat_horizontal(gr_mat_t res, const gr_mat_t mat
 WARN_UNUSED_RESULT int gr_mat_concat_vertical(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx);
 
 int gr_mat_write(gr_stream_t out, const gr_mat_t mat, gr_ctx_t ctx);
-
-GR_MAT_INLINE int
-gr_mat_print(const gr_mat_t mat, gr_ctx_t ctx)
-{
-    gr_stream_t out;
-    gr_stream_init_file(out, stdout);
-    return gr_mat_write(out, mat, ctx);
-}
+int gr_mat_print(const gr_mat_t mat, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mat_randtest(gr_mat_t mat, flint_rand_t state, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_randops(gr_mat_t mat, flint_rand_t state, slong count, gr_ctx_t ctx);
