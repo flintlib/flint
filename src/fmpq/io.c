@@ -10,7 +10,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fmpq.h"
+
+/* printing *******************************************************************/
 
 /*
     Recall the return value conventions for fputc (of type int)
@@ -45,7 +48,6 @@ int _fmpq_fprint(FILE * file, const fmpz_t num, const fmpz_t den)
     }
 }
 
-int fmpq_fprint(FILE * file, const fmpq_t x)
-{
-    return _fmpq_fprint(file, &x->num, &x->den);
-}
+int fmpq_fprint(FILE * file, const fmpq_t x) { return _fmpq_fprint(file, &x->num, &x->den); }
+int _fmpq_print(const fmpz_t num, const fmpz_t den) { return _fmpq_fprint(stdout, num, den); }
+int fmpq_print(const fmpq_t x) { return fmpq_fprint(stdout, x); }
