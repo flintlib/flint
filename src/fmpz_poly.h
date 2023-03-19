@@ -1133,73 +1133,28 @@ void _fmpz_poly_signature(slong * r1, slong * r2, const fmpz * poly, slong len);
 void fmpz_poly_signature(slong * r1, slong * r2, const fmpz_poly_t poly);
 
 /*  Input and output  ********************************************************/
-int _fmpz_poly_fprint(FILE * file, const fmpz * poly, slong len);
 
+#ifdef FLINT_HAVE_FILE
+int _fmpz_poly_fprint(FILE * file, const fmpz * poly, slong len);
 int fmpz_poly_fprint(FILE * file, const fmpz_poly_t poly);
 
-int _fmpz_poly_fprint_pretty(FILE * file,
-                             const fmpz * poly, slong len, const char * x);
-
-int fmpz_poly_fprint_pretty(FILE * file,
-                                       const fmpz_poly_t poly, const char * x);
-
-FMPZ_POLY_INLINE
-int _fmpz_poly_print_pretty(const fmpz * poly, slong len, const char * x)
-{
-  return _fmpz_poly_fprint_pretty(stdout, poly, len, x);
-}
-
-FMPZ_POLY_INLINE
-int _fmpz_poly_print(const fmpz * poly, slong n)
-{
-  return _fmpz_poly_fprint(stdout, poly, n);
-}
-
-FMPZ_POLY_INLINE
-int fmpz_poly_print(const fmpz_poly_t poly)
-{
-    return fmpz_poly_fprint(stdout, poly);
-}
-
-FMPZ_POLY_INLINE
-int fmpz_poly_print_pretty(const fmpz_poly_t poly, const char * x)
-{
-    return fmpz_poly_fprint_pretty(stdout, poly, x);
-}
+int _fmpz_poly_fprint_pretty(FILE * file, const fmpz * poly, slong len, const char * x);
+int fmpz_poly_fprint_pretty(FILE * file, const fmpz_poly_t poly, const char * x);
 
 int fmpz_poly_fread(FILE * file, fmpz_poly_t poly);
 
 int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x);
+#endif
 
-FMPZ_POLY_INLINE
-int fmpz_poly_read(fmpz_poly_t poly)
-{
-    return fmpz_poly_fread(stdin, poly);
-}
+int _fmpz_poly_print_pretty(const fmpz * poly, slong len, const char * x);
+int fmpz_poly_print_pretty(const fmpz_poly_t poly, const char * x);
+int _fmpz_poly_print(const fmpz * poly, slong n);
+int fmpz_poly_print(const fmpz_poly_t poly);
 
-FMPZ_POLY_INLINE
-int fmpz_poly_read_pretty(fmpz_poly_t poly, char **x)
-{
-    return fmpz_poly_fread_pretty(stdin, poly, x);
-}
+int fmpz_poly_read(fmpz_poly_t poly);
+int fmpz_poly_read_pretty(fmpz_poly_t poly, char **x);
 
-FMPZ_POLY_INLINE
-void fmpz_poly_debug(const fmpz_poly_t poly)
-{
-    flint_printf("(alloc = %wd, length = %wd, vec = ", poly->alloc, poly->length);
-    if (poly->coeffs)
-    {
-        flint_printf("{");
-        _fmpz_vec_print(poly->coeffs, poly->alloc);
-        flint_printf("}");
-    }
-    else
-    {
-        flint_printf("NULL");
-    }
-    flint_printf(")");
-    fflush(stdout);
-}
+void fmpz_poly_debug(const fmpz_poly_t poly);
 
 /* Norms *********************************************************************/
 
