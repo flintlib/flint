@@ -227,24 +227,7 @@ int mpoly_ordering_isrev(const mpoly_ctx_t mctx)
    return mctx->ord == ORD_DEGREVLEX;
 }
 
-MPOLY_INLINE
-void mpoly_ordering_print(ordering_t ord)
-{
-   switch (ord)
-   {
-   case ORD_LEX:
-      printf("lex");
-      break;
-   case ORD_DEGLEX:
-      printf("deglex");
-      break;
-   case ORD_DEGREVLEX:
-      printf("degrevlex");
-      break;
-   default:
-      printf("Unknown ordering in mpoly_ordering_print.");
-   }
-}
+void mpoly_ordering_print(ordering_t ord);
 
 /*  Monomials ****************************************************************/
 
