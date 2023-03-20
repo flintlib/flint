@@ -31,7 +31,7 @@ do {                       \
 
 #define xxx_flint_printf()                       \
 do {                                       \
-    z = flint_fprintf(file, "%li %li  ", r, c);  \
+    z = flint_fprintf(file, "%wd %wd  ", r, c);  \
     if (z <= 0)                            \
         return z;                          \
 } while (0)

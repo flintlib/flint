@@ -152,7 +152,7 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
     }
     j += flint_sprintf(str + j, "%s", var);
     str[j++] = '^';
-    j += flint_sprintf(str + j, "%li", len - 1);
+    j += flint_sprintf(str + j, "%wd", len - 1);
 
     i = len - 1;
     while (i)
@@ -186,7 +186,7 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len,
             if (i > 1)
             {
                 str[j++] = '^';
-                j += flint_sprintf(str + j, "%li", i);
+                j += flint_sprintf(str + j, "%wd", i);
             }
         }
     }

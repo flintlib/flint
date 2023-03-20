@@ -32,7 +32,7 @@ int _fmpz_vec_fprint(FILE * file, const fmpz * vec, slong len)
     int r;
     slong i;
 
-    r = flint_fprintf(file, "%li", len);
+    r = flint_fprintf(file, "%wd", len);
     if ((len > 0) && (r > 0))
     {
         r = fputc(' ', file);
