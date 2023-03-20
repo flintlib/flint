@@ -234,7 +234,7 @@ int fmpz_is_perfect_power(fmpz_t root, const fmpz_t f)
        }
     } else
     {
-       unsigned long int nth;
+       ulong nth;
 
        /*
           we found some factors above and we just need to consider values of n
