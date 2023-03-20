@@ -17,7 +17,7 @@ int _fmpq_vec_fprint(FILE * file, const fmpq * vec, slong len)
     int r;
     slong i;
 
-    r = flint_fprintf(file, "%li", len);
+    r = flint_fprintf(file, "%wd", len);
     if ((len > 0) && (r > 0))
     {
         r = fputc(' ', file);

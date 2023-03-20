@@ -55,7 +55,7 @@ char * fmpq_poly_get_str(const fmpq_poly_t poly)
     mpq_init(q);
     str = (char *) flint_malloc(len * sizeof(char));
 
-    j = flint_sprintf(str, "%li", poly->length);
+    j = flint_sprintf(str, "%wd", poly->length);
     str[j++] = ' ';
     for (i = 0; i < poly->length; i++)
     {

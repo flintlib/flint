@@ -416,7 +416,7 @@ _platt_smk(acb_ptr table, acb_ptr startvec, acb_ptr stopvec,
 
         if (m < mstart || m > mstop)
         {
-            flint_printf("out of bounds error: m = %ld not in [%ld, %ld]\n",
+            flint_printf("out of bounds error: m = %wd not in [%wd, %wd]\n",
                           m, mstart, mstop);
             flint_abort();
         }

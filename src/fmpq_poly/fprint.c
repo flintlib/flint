@@ -39,7 +39,7 @@ _fmpq_poly_fprint(FILE * file, const fmpz * poly, const fmpz_t den, slong len)
     fmpz_init(d);
     fmpz_init(g);
 
-    r = flint_fprintf(file, "%li", len);
+    r = flint_fprintf(file, "%wd", len);
     if ((len > 0) && (r > 0))
     {
         r = fputc(' ', file);
