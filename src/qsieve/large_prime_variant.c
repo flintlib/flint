@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include "fmpz.h"
@@ -107,19 +108,19 @@ void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y, qs_poly_t poly
     slong * small = poly->small;
     fac_t * factor = poly->factor;
 
-    flint_fprintf(qs_inf->siqs, "%X ", prime); /* write large prime */
+    flint_fprintf((FILE *) qs_inf->siqs, "%X ", prime); /* write large prime */
 
     for (i = 0; i < qs_inf->small_primes; i++) /* write small primes */
-        flint_fprintf(qs_inf->siqs, "%X ", small[i]);
+        flint_fprintf((FILE *) qs_inf->siqs, "%X ", small[i]);
 
-    flint_fprintf(qs_inf->siqs, "%X ", num_factors); /* write number of factors */
+    flint_fprintf((FILE *) qs_inf->siqs, "%X ", num_factors); /* write number of factors */
 
     for (i = 0; i < num_factors; i++) /* write factor along with exponent */
-        flint_fprintf(qs_inf->siqs, "%wx %X ", factor[i].ind, factor[i].exp);
+        flint_fprintf((FILE *) qs_inf->siqs, "%wx %X ", factor[i].ind, factor[i].exp);
 
     str = fmpz_get_str(str, 16, Y); /* converting value of 'Y'  to hex */
 
-    flint_fprintf(qs_inf->siqs, "%s\n", str); /* write value of 'Y' */
+    flint_fprintf((FILE *) qs_inf->siqs, "%s\n", str); /* write value of 'Y' */
     flint_free(str);
 }
 
@@ -502,13 +503,13 @@ int qsieve_process_relation(qs_t qs_inf)
     relation_t * rlist;
     int done = 0;
 
-    qs_inf->siqs = fopen(qs_inf->fname, "r");
+    qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "r");
 
 #if QS_DEBUG & 64
     printf("Getting relations\n");
 #endif
 
-    while (fgets(buf, sizeof(buf), qs_inf->siqs) != NULL)
+    while (fgets(buf, sizeof(buf), (FILE *) qs_inf->siqs) != NULL)
     {
         prime = strtoul(buf, &str, 16);
         entry = qsieve_get_table_entry(qs_inf, prime);
@@ -527,7 +528,7 @@ int qsieve_process_relation(qs_t qs_inf)
         }
     }
 
-    fclose(qs_inf->siqs);
+    fclose((FILE *) qs_inf->siqs);
 
 #if QS_DEBUG & 64
     printf("Removing duplicates\n");
@@ -581,7 +582,7 @@ int qsieve_process_relation(qs_t qs_inf)
     {
        qs_inf->edges -= 100;
        done = 0;
-       qs_inf->siqs = fopen(qs_inf->fname, "a");
+       qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "a");
     } else
     {
        done = 1;

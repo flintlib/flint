@@ -55,32 +55,6 @@ void fq_zech_polyu_realloc(fq_zech_polyu_t A, slong len, const fq_zech_ctx_t ctx
     A->alloc = new_alloc;
 }
 
-void fq_zech_polyu3_print_pretty(
-    const fq_zech_polyu_t A,
-    const char * var0,
-    const char * var1,
-    const char * var2,
-    const fq_zech_ctx_t ctx)
-{
-    slong i;
-    int first = 1;
-
-    for (i = 0; i < A->length; i++)
-    {
-        if (!first)
-            printf(" + ");
-        first = 0;
-        fq_zech_print_pretty(A->coeffs + i, ctx);
-        flint_printf("%s^%wu*%s^%wu*%s^%wu",
-            var0, extract_exp(A->exps[i], 2, 3),
-            var1, extract_exp(A->exps[i], 1, 3),
-            var2, extract_exp(A->exps[i], 0, 3));
-    }
-
-    if (first)
-        flint_printf("0");
-}
-
 void fq_zech_polyu3_degrees(
     slong * deg0,
     slong * deg1,

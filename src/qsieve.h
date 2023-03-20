@@ -167,7 +167,7 @@ typedef struct
                        RELATION DATA
    ***************************************************************************/
 
-   FILE * siqs;           /* pointer to file for storing relations */
+   FLINT_FILE * siqs;           /* pointer to file for storing relations */
    char * fname;          /* name of file used for relations */
 
    slong full_relation;   /* number of full relations */

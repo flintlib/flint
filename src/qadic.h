@@ -436,18 +436,12 @@ int qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
 /* Output ********************************************************************/
 
-int qadic_fprint_pretty(FILE *file, const qadic_t op, const qadic_ctx_t ctx);
+#ifdef FLINT_HAVE_FILE
+int qadic_fprint_pretty(FILE * file, const qadic_t op, const qadic_ctx_t ctx);
+#endif
 
-QADIC_INLINE int
-qadic_print_pretty(const qadic_t op, const qadic_ctx_t ctx)
-{
-    return qadic_fprint_pretty(stdout, op, ctx);
-}
-
-QADIC_INLINE int qadic_debug(const qadic_t op)
-{
-    return padic_poly_debug(op);
-}
+int qadic_print_pretty(const qadic_t op, const qadic_ctx_t ctx);
+int qadic_debug(const qadic_t op);
 
 #ifdef __cplusplus
 }

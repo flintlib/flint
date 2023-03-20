@@ -227,25 +227,13 @@ void TEMPLATE(T, mat_concat_vertical)(TEMPLATE(T, mat_t) res,
 
 /* Input and output  *********************************************************/
 
-int TEMPLATE(T, mat_fprint)(FILE * file, const TEMPLATE(T, mat_t) mat,
-                            const TEMPLATE(T, ctx_t) ctx);
+#ifdef FLINT_HAVE_FILE
+int TEMPLATE(T, mat_fprint)(FILE * file, const TEMPLATE(T, mat_t) mat, const TEMPLATE(T, ctx_t) ctx);
+int TEMPLATE(T, mat_fprint_pretty)(FILE * file, const TEMPLATE(T, mat_t) mat, const TEMPLATE(T, ctx_t) ctx);
+#endif
 
-int TEMPLATE(T, mat_fprint_pretty)(FILE * file, const TEMPLATE(T, mat_t) mat,
-                                   const TEMPLATE(T, ctx_t) ctx);
-
-FQ_MAT_TEMPLATES_INLINE
-int TEMPLATE(T, mat_print)(const TEMPLATE(T, mat_t) mat,
-                           const TEMPLATE(T, ctx_t) ctx)
-{
-    return TEMPLATE(T, mat_fprint)(stdout, mat, ctx);
-}
-
-FQ_MAT_TEMPLATES_INLINE
-int TEMPLATE(T, mat_print_pretty)(const TEMPLATE(T, mat_t) mat,
-                                  const TEMPLATE(T, ctx_t) ctx)
-{
-    return TEMPLATE(T, mat_fprint_pretty)(stdout, mat, ctx);
-}
+int TEMPLATE(T, mat_print)(const TEMPLATE(T, mat_t) mat, const TEMPLATE(T, ctx_t) ctx);
+int TEMPLATE(T, mat_print_pretty)(const TEMPLATE(T, mat_t) mat, const TEMPLATE(T, ctx_t) ctx);
 
 /* TODO: Read functions */
 

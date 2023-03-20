@@ -482,21 +482,13 @@ void mag_randtest_special(mag_t x, flint_rand_t state, slong expbits);
 
 void mag_randtest(mag_t x, flint_rand_t state, slong expbits);
 
+#ifdef FLINT_HAVE_FILE
 void mag_fprint(FILE * file, const mag_t x);
-
 void mag_fprintd(FILE * file, const mag_t x, slong d);
+#endif
 
-MAG_INLINE void
-mag_print(const mag_t x)
-{
-    mag_fprint(stdout, x);
-}
-
-MAG_INLINE void
-mag_printd(const mag_t x, slong d)
-{
-    mag_fprintd(stdout, x, d);
-}
+void mag_print(const mag_t x);
+void mag_printd(const mag_t x, slong d);
 
 void mag_get_fmpq(fmpq_t y, const mag_t x);
 
@@ -701,12 +693,12 @@ MAG_INLINE slong mag_allocated_bytes(const mag_t x)
 }
 
 int mag_load_str(mag_t res, const char * data);
-
 char * mag_dump_str(const mag_t x);
 
-int mag_load_file(mag_t res, FILE *stream);
-
-int mag_dump_file(FILE* stream, const mag_t x);
+#ifdef FLINT_HAVE_FILE
+int mag_load_file(mag_t res, FILE * stream);
+int mag_dump_file(FILE * stream, const mag_t x);
+#endif
 
 #ifdef __cplusplus
 }

@@ -33,37 +33,6 @@ int n_fq_bpoly_is_canonical(const n_fq_bpoly_t A, const fq_nmod_ctx_t ctx)
     return 1;
 }
 
-
-void n_fq_bpoly_print_pretty(
-    const n_fq_bpoly_t A,
-    const char * xvar,
-    const char * yvar,
-    const fq_nmod_ctx_t ctx)
-{
-    slong i;
-    int first;
-
-    first = 1;
-    for (i = A->length - 1; i >= 0; i--)
-    {
-        if (i + 1 != A->length && n_fq_poly_is_zero(A->coeffs + i))
-            continue;
-
-        if (!first)
-            flint_printf(" + ");
-
-        first = 0;
-
-        flint_printf("(");
-        n_fq_poly_print_pretty(A->coeffs + i, yvar, ctx);
-        flint_printf(")*%s^%wd", xvar, i);
-    }
-
-    if (first)
-        flint_printf("0");
-}
-
-
 void n_fq_bpoly_one(n_fq_bpoly_t A, const fq_nmod_ctx_t ctx)
 {
     n_fq_bpoly_fit_length(A, 1);
@@ -105,7 +74,6 @@ int n_fq_bpoly_equal(
 
     return 1;
 }
-
 
 void n_fq_bpoly_get_coeff_n_fq(
     mp_limb_t * c,

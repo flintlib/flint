@@ -57,14 +57,11 @@ void _fmpq_vec_dot(fmpq_t res, const fmpq * vec1, const fmpq * vec2, slong len);
 
 /*  Input and output  ********************************************************/
 
+#ifdef FLINT_HAVE_FILE
 int _fmpq_vec_fprint(FILE * file, const fmpq * vec, slong len);
+#endif
 
-FMPQ_VEC_INLINE
-int _fmpq_vec_print(const fmpq * vec, slong len)
-{
-    return _fmpq_vec_fprint(stdout, vec, len);
-}
-
+int _fmpq_vec_print(const fmpq * vec, slong len);
 
 #ifdef __cplusplus
 }

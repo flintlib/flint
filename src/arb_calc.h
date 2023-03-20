@@ -84,21 +84,11 @@ arf_interval_get_arb(arb_t x, const arf_interval_t v, slong prec)
     arb_set_interval_arf(x, &v->a, &v->b, prec);
 }
 
-static __inline__ void
-arf_interval_fprintd(FILE * file, const arf_interval_t v, slong n)
-{
-    flint_fprintf(file, "[");
-    arf_fprintd(file, &v->a, n);
-    flint_fprintf(file, ", ");
-    arf_fprintd(file, &v->b, n);
-    flint_fprintf(file, "]");
-}
+#ifdef FLINT_HAVE_FILE
+void arf_interval_fprintd(FILE * file, const arf_interval_t v, slong n);
+#endif
 
-static __inline__ void
-arf_interval_printd(const arf_interval_t v, slong n)
-{
-    arf_interval_fprintd(stdout, v, n);
-}
+void arf_interval_printd(const arf_interval_t v, slong n);
 
 /* bisection */
 

@@ -58,35 +58,6 @@ void fq_zech_bpoly_realloc(fq_zech_bpoly_t A, slong len, const fq_zech_ctx_t ctx
     A->alloc = len;
 }
 
-void fq_zech_bpoly_print_pretty(
-    const fq_zech_bpoly_t A,
-    const char * var0,
-    const char * var1,
-    const fq_zech_ctx_t ctx)
-{
-    slong i;
-    int first;
-
-    first = 1;
-    for (i = A->length - 1; i >= 0; i--)
-    {
-        if (fq_zech_poly_is_zero(A->coeffs + i, ctx))
-            continue;
-
-        if (!first)
-            flint_printf(" + ");
-
-        first = 0;
-
-        flint_printf("(");
-        fq_zech_poly_print_pretty(A->coeffs + i, var1, ctx);
-        flint_printf(")*%s^%wd", var0, i);
-    }
-
-    if (first)
-        flint_printf("0");
-}
-
 int fq_zech_bpoly_is_canonical(const fq_zech_bpoly_t A, const fq_zech_ctx_t ctx)
 {
     slong i;

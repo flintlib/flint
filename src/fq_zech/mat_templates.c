@@ -12,6 +12,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fq_zech_poly.h"
 #include "fq_zech_mat.h"
 
@@ -29,10 +30,10 @@
 #include "fq_mat_templates/concat_horizontal.c"
 #include "fq_mat_templates/concat_vertical.c"
 #include "fq_mat_templates/equal.c"
-#include "fq_mat_templates/fprint.c"
 #include "fq_mat_templates/init.c"
 #include "fq_mat_templates/init_set.c"
 #include "fq_mat_templates/inv.c"
+#include "fq_mat_templates/io.c"
 #include "fq_mat_templates/is_one.c"
 #include "fq_mat_templates/is_zero.c"
 #include "fq_mat_templates/lu.c"

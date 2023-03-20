@@ -24,6 +24,7 @@
 #undef __STRICT_ANSI__
 #endif
 
+#include <stdio.h>
 #include <stdlib.h>
 #include "thread_support.h"
 #include "fmpz.h"
@@ -222,7 +223,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     if (fd == -1)
         flint_throw(FLINT_ERROR, "mkstemp failed\n");
 
-    qs_inf->siqs = fdopen(fd, "w");
+    qs_inf->siqs = (FLINT_FILE *) fdopen(fd, "w");
     if (qs_inf->siqs == NULL)
         flint_throw(FLINT_ERROR, "fdopen failed\n");
 #endif
@@ -267,7 +268,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
             {
                 int ok;
 
-                if (fclose(qs_inf->siqs))
+                if (fclose((FILE *) qs_inf->siqs))
                     flint_throw(FLINT_ERROR, "fclose fail\n");
                 qs_inf->siqs = NULL;
 
@@ -383,7 +384,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 
                     _fmpz_vec_clear(facs, 100);
 
-                    qs_inf->siqs = fopen(qs_inf->fname, "w");
+                    qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "w");
                     if (qs_inf->siqs == NULL)
                         flint_throw(FLINT_ERROR, "fopen fail\n");
                     qs_inf->num_primes = num_primes; /* linear algebra adjusts this */

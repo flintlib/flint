@@ -98,21 +98,15 @@ slong _fmpz_vec_height_index(const fmpz * vec, slong len);
 
 /*  Input and output  ********************************************************/
 
+#ifdef FLINT_HAVE_FILE
 int _fmpz_vec_fprint(FILE * file, const fmpz * vec, slong len);
 
-FMPZ_VEC_INLINE
-int _fmpz_vec_print(const fmpz * vec, slong len)
-{
-    return _fmpz_vec_fprint(stdout, vec, len);
-}
-
 int _fmpz_vec_fread(FILE * file, fmpz ** vec, slong * len);
+#endif
 
-FMPZ_VEC_INLINE
-int _fmpz_vec_read(fmpz ** vec, slong * len)
-{
-    return _fmpz_vec_fread(stdin, vec, len);
-}
+int _fmpz_vec_print(const fmpz * vec, slong len);
+
+int _fmpz_vec_read(fmpz ** vec, slong * len);
 
 /*  Conversions  *************************************************************/
 

@@ -345,8 +345,11 @@ int ca_set_fexpr(ca_t res, const fexpr_t expr, ca_ctx_t ctx);
 #define CA_PRINT_DEFAULT   (CA_PRINT_N | CA_PRINT_REPR)
 #define CA_PRINT_DEBUG     (CA_PRINT_N | CA_PRINT_REPR | CA_PRINT_FIELD)
 
-void ca_print(const ca_t x, ca_ctx_t ctx);
+#ifdef FLINT_HAVE_FILE
 void ca_fprint(FILE * fp, const ca_t x, ca_ctx_t ctx);
+#endif
+
+void ca_print(const ca_t x, ca_ctx_t ctx);
 void ca_printn(const ca_t x, slong n, ca_ctx_t ctx);
 char * ca_get_str(const ca_t x, ca_ctx_t ctx);
 

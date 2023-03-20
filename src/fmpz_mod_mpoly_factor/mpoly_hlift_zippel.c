@@ -47,32 +47,6 @@ void fmpz_mod_polyu_realloc(fmpz_mod_polyu_t A, slong len)
     A->alloc = new_alloc;
 }
 
-void fmpz_mod_polyu3_print_pretty(
-    const fmpz_mod_polyu_t A,
-    const char * var0,
-    const char * var1,
-    const char * var2,
-    const fmpz_mod_ctx_t ctx)
-{
-    slong i;
-    int first = 1;
-
-    for (i = 0; i < A->length; i++)
-    {
-        if (!first)
-            printf(" + ");
-        first = 0;
-        fmpz_print(A->coeffs + i);
-        flint_printf("*%s^%wu*%s^%wu*%s^%wu",
-            var0, extract_exp(A->exps[i], 2, 3),
-            var1, extract_exp(A->exps[i], 1, 3),
-            var2, extract_exp(A->exps[i], 0, 3));
-    }
-
-    if (first)
-        flint_printf("0");
-}
-
 void fmpz_mod_polyu3_degrees(
     slong * deg0,
     slong * deg1,
@@ -152,24 +126,6 @@ int fmpz_mod_mpolyu_is_one(
         return 0;
 
     return fmpz_mod_mpoly_is_one(A->coeffs + 0, uctx);
-}
-
-void fmpz_mod_mpolyu_print_pretty(
-    const fmpz_mod_mpolyu_t poly,
-    const char ** x,
-    const fmpz_mod_mpoly_ctx_t ctx)
-{
-    slong i;
-    if (poly->length == 0)
-        flint_printf("0");
-    for (i = 0; i < poly->length; i++)
-    {
-        if (i != 0)
-            flint_printf(" + ");
-        flint_printf("(");
-        fmpz_mod_mpoly_print_pretty(poly->coeffs + i,x,ctx);
-        flint_printf(")*X^%wd",poly->exps[i]);
-    }
 }
 
 void fmpz_mod_mpolyu_fit_length(

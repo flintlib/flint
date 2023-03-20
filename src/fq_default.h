@@ -229,63 +229,11 @@ FQ_DEFAULT_INLINE void fq_default_ctx_order(fmpz_t f,
     }
 }
 
-FQ_DEFAULT_INLINE int fq_default_ctx_fprint(FILE * file,
-		                                    const fq_default_ctx_t ctx)
-{
-    if (ctx->type == FQ_DEFAULT_FQ_ZECH)
-    {
-        return fq_zech_ctx_fprint(file, ctx->ctx.fq_zech);
-    }
-    else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
-    {
-        return fq_nmod_ctx_fprint(file, ctx->ctx.fq_nmod);
-    }
-    else if (ctx->type == FQ_DEFAULT_NMOD)
-    {
-        return flint_fprintf(file, "p = %wu\n", ctx->ctx.nmod.mod.n);
-    }
-    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
-    {
-        int z = flint_fprintf(file, "p = ");
-        if (z <= 0)
-            return z;
-        z = fmpz_fprint(file, fmpz_mod_ctx_modulus(ctx->ctx.fmpz_mod.mod));
-        if (z <= 0)
-            return z;
-        return flint_fprintf(file, "\n");
-    }
-    else
-    {
-        return fq_ctx_fprint(file, ctx->ctx.fq);
-    }
-}
+#ifdef FLINT_HAVE_FILE
+int fq_default_ctx_fprint(FILE * file, const fq_default_ctx_t ctx);
+#endif
 
-FQ_DEFAULT_INLINE void fq_default_ctx_print(const fq_default_ctx_t ctx)
-{
-    if (ctx->type == FQ_DEFAULT_FQ_ZECH)
-    {
-        fq_zech_ctx_print(ctx->ctx.fq_zech);
-    }
-    else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
-    {
-        fq_nmod_ctx_print(ctx->ctx.fq_nmod);
-    }
-    else if (ctx->type == FQ_DEFAULT_NMOD)
-    {
-        flint_printf("p = %wu\n", ctx->ctx.nmod.mod.n);
-    }
-    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
-    {
-        flint_printf("p = ");
-        fmpz_print(fmpz_mod_ctx_modulus(ctx->ctx.fmpz_mod.mod));
-        flint_printf("\n");
-    }
-    else
-    {
-        fq_ctx_print(ctx->ctx.fq);
-    }
-}
-
+void fq_default_ctx_print(const fq_default_ctx_t ctx);
 
 /* Memory management  *********************************************************/
 
@@ -1352,107 +1300,13 @@ FQ_DEFAULT_INLINE void fq_default_get_coeff_fmpz(fmpz_t c,
 
 /* Output ********************************************************************/
 
-FQ_DEFAULT_INLINE
-int fq_default_fprint(FILE * file, const fq_default_t op,
-		                                    const fq_default_ctx_t ctx)
-{
-    if (ctx->type == FQ_DEFAULT_FQ_ZECH)
-    {
-        return fq_zech_fprint(file, op->fq_zech, ctx->ctx.fq_zech);
-    }
-    else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
-    {
-        return fq_nmod_fprint(file, op->fq_nmod, ctx->ctx.fq_nmod);
-    }
-    else if (ctx->type == FQ_DEFAULT_NMOD)
-    {
-        return flint_fprintf(file, "%wu", op->nmod);
-    }
-    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
-    {
-        return fmpz_fprint(file, op->fmpz_mod);
-    }
-    else
-    {
-        return fq_fprint(file, op->fq, ctx->ctx.fq);
-    }
-}
+#ifdef FLINT_HAVE_FILE
+int fq_default_fprint(FILE * file, const fq_default_t op, const fq_default_ctx_t ctx);
+int fq_default_fprint_pretty(FILE * file, const fq_default_t op, const fq_default_ctx_t ctx);
+#endif
 
-FQ_DEFAULT_INLINE
-void fq_default_print(const fq_default_t op, const fq_default_ctx_t ctx)
-{
-    if (ctx->type == FQ_DEFAULT_FQ_ZECH)
-    {
-        fq_zech_print(op->fq_zech, ctx->ctx.fq_zech);
-    }
-    else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
-    {
-        fq_nmod_print(op->fq_nmod, ctx->ctx.fq_nmod);
-    }
-    else if (ctx->type == FQ_DEFAULT_NMOD)
-    {
-        flint_printf("%wu", op->nmod);
-    }
-    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
-    {
-        fmpz_print(op->fmpz_mod);
-    }
-    else
-    {
-        fq_print(op->fq, ctx->ctx.fq);
-    }
-}
-
-FQ_DEFAULT_INLINE
-int fq_default_fprint_pretty(FILE * file, const fq_default_t op,
-		                                    const fq_default_ctx_t ctx)
-{
-    if (ctx->type == FQ_DEFAULT_FQ_ZECH)
-    {
-        return fq_zech_fprint_pretty(file, op->fq_zech, ctx->ctx.fq_zech);
-    }
-    else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
-    {
-        return fq_nmod_fprint_pretty(file, op->fq_nmod, ctx->ctx.fq_nmod);
-    }
-    else if (ctx->type == FQ_DEFAULT_NMOD)
-    {
-        return flint_fprintf(file, "%wu", op->nmod);
-    }
-    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
-    {
-        return fmpz_fprint(file, op->fmpz_mod);
-    }
-    else
-    {
-        return fq_fprint_pretty(file, op->fq, ctx->ctx.fq);
-    }
-}
-
-FQ_DEFAULT_INLINE
-void fq_default_print_pretty(const fq_default_t op, const fq_default_ctx_t ctx)
-{
-    if (ctx->type == FQ_DEFAULT_FQ_ZECH)
-    {
-        fq_zech_print_pretty(op->fq_zech, ctx->ctx.fq_zech);
-    }
-    else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
-    {
-        fq_nmod_print_pretty(op->fq_nmod, ctx->ctx.fq_nmod);
-    }
-    else if (ctx->type == FQ_DEFAULT_NMOD)
-    {
-        flint_printf("%wu", op->nmod);
-    }
-    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
-    {
-        fmpz_print(op->fmpz_mod);
-    }
-    else
-    {
-        fq_print_pretty(op->fq, ctx->ctx.fq);
-    }
-}
+void fq_default_print(const fq_default_t op, const fq_default_ctx_t ctx);
+void fq_default_print_pretty(const fq_default_t op, const fq_default_ctx_t ctx);
 
 FQ_DEFAULT_INLINE char * fq_default_get_str(const fq_default_t op,
 		                                    const fq_default_ctx_t ctx)

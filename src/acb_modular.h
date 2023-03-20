@@ -76,21 +76,11 @@ psl2z_one(psl2z_t g)
     fmpz_one(&g->d);
 }
 
-static __inline__ void
-psl2z_fprint(FILE * file, const psl2z_t g)
-{
-    flint_fprintf(file, "[");
-    fmpz_fprint(file, &g->a); flint_fprintf(file, " ");
-    fmpz_fprint(file, &g->b); flint_fprintf(file, "; ");
-    fmpz_fprint(file, &g->c); flint_fprintf(file, " ");
-    fmpz_fprint(file, &g->d); flint_fprintf(file, "]");
-}
+#ifdef FLINT_HAVE_FILE
+void psl2z_fprint(FILE * file, const psl2z_t g);
+#endif
 
-static __inline__ void
-psl2z_print(const psl2z_t g)
-{
-    psl2z_fprint(stdout, g);
-}
+void psl2z_print(const psl2z_t g);
 
 static __inline__ int
 psl2z_equal(const psl2z_t f, const psl2z_t g)

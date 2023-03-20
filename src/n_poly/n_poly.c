@@ -44,26 +44,6 @@ void n_poly_realloc(n_poly_t A, slong len)
     A->alloc = new_alloc;
 }
 
-
-void n_poly_print_pretty(const n_poly_t A, const char * x)
-{
-    slong i;
-    int first = 1;
-
-    for (i = A->length - 1; i >= 0; i--)
-    {
-        if (i < A->length - 1 && A->coeffs[i] == 0)
-            continue;
-        if (!first)
-            flint_printf(" + ");
-        first = 0;
-        flint_printf("%wu*%s^%wd", A->coeffs[i], x, i);
-    }
-
-    if (first)
-        flint_printf("0");
-}
-
 void n_poly_set_coeff(n_poly_t poly, slong j, ulong c)
 {
     n_poly_fit_length(poly, j + 1);

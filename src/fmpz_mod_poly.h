@@ -1184,40 +1184,17 @@ char * fmpz_mod_poly_get_str_pretty(const fmpz_mod_poly_t poly, const char * x,
     return _fmpz_poly_get_str_pretty(poly->coeffs, poly->length, x);
 }
 
+#ifdef FLINT_HAVE_FILE
+int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, slong len, const fmpz_t p);
+int fmpz_mod_poly_fprint(FILE * file, const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx);
+int fmpz_mod_poly_fprint_pretty(FILE * file, const fmpz_mod_poly_t poly, const char * x, const fmpz_mod_ctx_t ctx);
 
-int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, slong len,
-                          const fmpz_t p);
+int fmpz_mod_poly_fread(FILE * file, fmpz_mod_poly_t poly, fmpz_mod_ctx_t ctx);
+#endif
 
-int fmpz_mod_poly_fprint(FILE * file, const fmpz_mod_poly_t poly,
-                                                     const fmpz_mod_ctx_t ctx);
-
-int fmpz_mod_poly_fread(FILE * file, fmpz_mod_poly_t poly,
-                                                           fmpz_mod_ctx_t ctx);
-
-FMPZ_MOD_POLY_INLINE
-int fmpz_mod_poly_fprint_pretty(FILE * file, const fmpz_mod_poly_t poly,
-                                      const char * x, const fmpz_mod_ctx_t ctx)
-{
-    return _fmpz_poly_fprint_pretty(file, poly->coeffs, poly->length, x);
-}
-
-FMPZ_MOD_POLY_INLINE
-int _fmpz_mod_poly_print(const fmpz *poly, slong len, const fmpz_t p)
-{
-    return _fmpz_mod_poly_fprint(stdout, poly, len, p);
-}
-
-FMPZ_MOD_POLY_INLINE
-int fmpz_mod_poly_print(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
-{
-    return fmpz_mod_poly_fprint(stdout, poly, ctx);
-}
-
-FMPZ_MOD_POLY_INLINE
-int fmpz_mod_poly_print_pretty(const fmpz_mod_poly_t poly, const char * x, const fmpz_mod_ctx_t ctx)
-{
-    return fmpz_mod_poly_fprint_pretty(stdout, poly, x, ctx);
-}
+int _fmpz_mod_poly_print(const fmpz *poly, slong len, const fmpz_t p);
+int fmpz_mod_poly_print(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx);
+int fmpz_mod_poly_print_pretty(const fmpz_mod_poly_t poly, const char * x, const fmpz_mod_ctx_t ctx);
 
 /* Products *****************************************************************/
 

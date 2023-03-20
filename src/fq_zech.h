@@ -105,21 +105,11 @@ fq_zech_ctx_order_ui(const fq_zech_ctx_t ctx)
 
 #define fq_zech_ctx_prime(ctx)  fq_nmod_ctx_prime(ctx->fq_nmod_ctx)
 
-FQ_ZECH_INLINE int
-fq_zech_ctx_fprint(FILE * file, const fq_zech_ctx_t ctx)
-{
-    int r;
-    r = flint_fprintf(file, "Zech Representation:\n");
-    if (r <= 0)
-        return r;
-    return fq_nmod_ctx_fprint(file, ctx->fq_nmod_ctx);
-}
+#ifdef FLINT_HAVE_FILE
+int fq_zech_ctx_fprint(FILE * file, const fq_zech_ctx_t ctx);
+#endif
 
-FQ_ZECH_INLINE void
-fq_zech_ctx_print(const fq_zech_ctx_t ctx)
-{
-    fq_zech_ctx_fprint(stdout, ctx);
-}
+void fq_zech_ctx_print(const fq_zech_ctx_t ctx);
 
 /* Memory management  *********************************************************/
 
@@ -305,32 +295,16 @@ void fq_zech_set_nmod_poly(fq_zech_t a, const nmod_poly_t b,
 
 
 /* Output ********************************************************************/
-FQ_ZECH_INLINE int
-fq_zech_fprint_pretty(FILE * file, const fq_zech_t op, const fq_zech_ctx_t ctx)
-{
-    return flint_fprintf(file, "%s^%wd", ctx->fq_nmod_ctx->var, op->value);
-}
 
-FQ_ZECH_INLINE void
-fq_zech_print_pretty(const fq_zech_t op, const fq_zech_ctx_t ctx)
-{
-    fq_zech_fprint_pretty(stdout, op, ctx);
-}
+#ifdef FLINT_HAVE_FILE
+int fq_zech_fprint(FILE * file, const fq_zech_t op, const fq_zech_ctx_t ctx);
+int fq_zech_fprint_pretty(FILE * file, const fq_zech_t op, const fq_zech_ctx_t ctx);
+#endif
 
-FQ_ZECH_INLINE int
-fq_zech_fprint(FILE * file, const fq_zech_t op, const fq_zech_ctx_t ctx)
-{
-    return flint_fprintf(file, "%wd", op->value);
-}
-
-FQ_ZECH_INLINE void
-fq_zech_print(const fq_zech_t op, const fq_zech_ctx_t ctx)
-{
-    fq_zech_fprint(stdout, op, ctx);
-}
+void fq_zech_print(const fq_zech_t op, const fq_zech_ctx_t ctx);
+void fq_zech_print_pretty(const fq_zech_t op, const fq_zech_ctx_t ctx);
 
 char * fq_zech_get_str(const fq_zech_t op, const fq_zech_ctx_t ctx);
-
 char * fq_zech_get_str_pretty(const fq_zech_t op, const fq_zech_ctx_t ctx);
 
 

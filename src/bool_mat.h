@@ -78,13 +78,11 @@ void bool_mat_randtest_nilpotent(bool_mat_t mat, flint_rand_t state);
 
 /* I/O */
 
+#ifdef FLINT_HAVE_FILE
 void bool_mat_fprint(FILE * file, const bool_mat_t mat);
+#endif
 
-BOOL_MAT_INLINE void
-bool_mat_print(const bool_mat_t mat)
-{
-    bool_mat_fprint(stdout, mat);
-}
+void bool_mat_print(const bool_mat_t mat);
 
 /* Comparisons */
 

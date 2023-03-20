@@ -351,49 +351,17 @@ PADIC_POLY_INLINE int padic_poly_debug(const padic_poly_t poly)
     return 1;
 }
 
-int _padic_poly_fprint(FILE *file, const fmpz *poly, slong val, slong len,
-                       const padic_ctx_t ctx);
+#ifdef FLINT_HAVE_FILE
+int _padic_poly_fprint(FILE * file, const fmpz * poly, slong val, slong len, const padic_ctx_t ctx);
+int padic_poly_fprint(FILE * file, const padic_poly_t poly, const padic_ctx_t ctx);
+int _padic_poly_fprint_pretty(FILE * file, const fmpz * poly, slong val, slong len, const char * var, const padic_ctx_t ctx);
+int padic_poly_fprint_pretty(FILE * file, const padic_poly_t poly, const char * var, const padic_ctx_t ctx);
+#endif
 
-int padic_poly_fprint(FILE *file, const padic_poly_t poly,
-                      const padic_ctx_t ctx);
-
-PADIC_POLY_INLINE
-int _padic_poly_print(const fmpz *poly, slong val, slong len,
-                      const padic_ctx_t ctx)
-{
-    return _padic_poly_fprint(stdout, poly, val, len, ctx);
-}
-
-PADIC_POLY_INLINE
-int padic_poly_print(const padic_poly_t poly, const padic_ctx_t ctx)
-{
-    return padic_poly_fprint(stdout, poly, ctx);
-}
-
-int _padic_poly_fprint_pretty(FILE *file,
-                              const fmpz *poly, slong val, slong len,
-                              const char *var,
-                              const padic_ctx_t ctx);
-
-int padic_poly_fprint_pretty(FILE *file,
-                             const padic_poly_t poly, const char *var,
-                             const padic_ctx_t ctx);
-
-PADIC_POLY_INLINE
-int _padic_poly_print_pretty(FILE *file,
-                             const fmpz *poly, slong val, slong len,
-                             const char *var,
-                             const padic_ctx_t ctx)
-{
-    return _padic_poly_fprint_pretty(stdout, poly, val, len, var, ctx);
-}
-
-PADIC_POLY_INLINE
-int padic_poly_print_pretty(const padic_poly_t poly, const char *var,
-                            const padic_ctx_t ctx)
-{
-    return padic_poly_fprint_pretty(stdout, poly, var, ctx);
-}
+int _padic_poly_print(const fmpz * poly, slong val, slong len, const padic_ctx_t ctx);
+int padic_poly_print(const padic_poly_t poly, const padic_ctx_t ctx);
+int _padic_poly_print_pretty(const fmpz * poly, slong val, slong len, const char * var, const padic_ctx_t ctx);
+int padic_poly_print_pretty(const padic_poly_t poly, const char * var, const padic_ctx_t ctx);
 
 /*  Testing  *****************************************************************/
 

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "calcium.h"
 
 void
@@ -16,7 +17,7 @@ calcium_write_si(calcium_stream_t out, slong x)
 {
     if (out->fp != NULL)
     {
-        flint_fprintf(out->fp, "%wd", x);
+        flint_fprintf((FILE *) out->fp, "%wd", x);
     }
     else
     {

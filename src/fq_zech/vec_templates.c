@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fq_zech_vec.h"
 
 #ifdef T
@@ -22,8 +23,8 @@
 #include "fq_vec_templates/clear.c"
 #include "fq_vec_templates/dot.c"
 #include "fq_vec_templates/equal.c"
-#include "fq_vec_templates/fprint.c"
 #include "fq_vec_templates/init.c"
+#include "fq_vec_templates/io.c"
 #include "fq_vec_templates/is_zero.c"
 #include "fq_vec_templates/neg.c"
 #include "fq_vec_templates/randtest.c"

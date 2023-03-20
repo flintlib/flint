@@ -52,36 +52,6 @@ void n_fq_poly_init2(
     A->length = 0;
 }
 
-void n_fq_poly_print_pretty(
-    const n_fq_poly_t A,
-    const char * x,
-    const fq_nmod_ctx_t ctx)
-{
-    slong d = fq_nmod_ctx_degree(ctx);
-    slong i;
-    int first;
-
-    first = 1;
-    for (i = A->length - 1; i >= 0; i--)
-    {
-        if (i + 1 != A->length && _n_fq_is_zero(A->coeffs + d*i, d))
-            continue;
-
-        if (!first)
-            flint_printf(" + ");
-
-        first = 0;
-
-        flint_printf("(");
-        n_fq_print_pretty(A->coeffs + d*i, ctx);
-        flint_printf(")*%s^%wd", x, i);
-    }
-
-    if (first)
-        flint_printf("0");
-}
-
-
 void n_fq_poly_randtest(
     n_poly_t A,
     flint_rand_t state,

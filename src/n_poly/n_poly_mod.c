@@ -12,7 +12,6 @@
 #include "n_poly.h"
 #include "mpn_extras.h"
 
-
 int n_poly_mod_is_canonical(const n_poly_t A, nmod_t mod)
 {
     slong i;
@@ -28,7 +27,6 @@ int n_poly_mod_is_canonical(const n_poly_t A, nmod_t mod)
     return 1;
 }
 
-
 void n_poly_mod_set_coeff_ui(
     n_poly_t poly,
     slong j,
@@ -40,7 +38,6 @@ void n_poly_mod_set_coeff_ui(
 
     n_poly_set_coeff(poly, j, c);
 }
-
 
 void n_poly_mod_add_ui(n_poly_t res, const n_poly_t poly, ulong c, nmod_t ctx)
 {
@@ -58,7 +55,6 @@ void n_poly_mod_add_ui(n_poly_t res, const n_poly_t poly, ulong c, nmod_t ctx)
         _n_poly_normalise(res);
    }
 }
-
 
 mp_limb_t n_poly_mod_div_root(n_poly_t Q,
                                      const n_poly_t A, mp_limb_t c, nmod_t ctx)
@@ -464,10 +460,8 @@ int n_poly_mod_invmod(n_poly_t A, const n_poly_t B, const n_poly_t P, nmod_t ctx
     int ans;
 
     if (lenP < 2)
-    {
-        printf("Exception (nmod_poly_invmod). lenP < 2.\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "lenP < 2 in %s\n", __FUNCTION__);
+
     if (lenB == 0)
     {
         n_poly_zero(A);

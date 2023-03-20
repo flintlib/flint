@@ -397,16 +397,11 @@ int nmod_mpoly_set_str_pretty(nmod_mpoly_t A, const char * str,
 char * nmod_mpoly_get_str_pretty(const nmod_mpoly_t A,
                                   const char ** x, const nmod_mpoly_ctx_t ctx);
 
-int nmod_mpoly_fprint_pretty(FILE * file,
-            const nmod_mpoly_t A, const char ** x, const nmod_mpoly_ctx_t ctx);
+#ifdef FLINT_HAVE_FILE
+int nmod_mpoly_fprint_pretty(FILE * file, const nmod_mpoly_t A, const char ** x, const nmod_mpoly_ctx_t ctx);
+#endif
 
-NMOD_MPOLY_INLINE
-int nmod_mpoly_print_pretty(const nmod_mpoly_t A,
-                                   const char ** x, const nmod_mpoly_ctx_t ctx)
-{
-   return nmod_mpoly_fprint_pretty(stdout, A, x, ctx);
-}
-
+int nmod_mpoly_print_pretty(const nmod_mpoly_t A, const char ** x, const nmod_mpoly_ctx_t ctx);
 
 /*  Basic manipulation *******************************************************/
 
@@ -1815,59 +1810,7 @@ void nmod_mpoly_geobucket_sub(nmod_mpoly_geobucket_t B,
 
 ******************************************************************************/
 
-/*
-   test that r is a valid remainder upon division by g
-   this means that no monomial of r is divisible by lm(g)
-*/
-NMOD_MPOLY_INLINE
-void nmod_mpoly_remainder_strongtest(const nmod_mpoly_t r, const nmod_mpoly_t g,
-                                                    const nmod_mpoly_ctx_t ctx)
-{
-   slong i, N, bits;
-   ulong mask = 0;
-   ulong * rexp, * gexp;
-
-   bits = FLINT_MAX(r->bits, g->bits);
-   N = mpoly_words_per_exp(bits, ctx->minfo);
-
-   if (g->length == 0 )
-      flint_throw(FLINT_ERROR, "Zero denominator in remainder test");
-
-   if (r->length == 0 )
-      return;
-
-   rexp = (ulong *) flint_malloc(N*r->length*sizeof(ulong));
-   gexp = (ulong *) flint_malloc(N*1        *sizeof(ulong));
-   mpoly_repack_monomials(rexp, bits, r->exps, r->bits, r->length, ctx->minfo);
-   mpoly_repack_monomials(gexp, bits, g->exps, g->bits, 1,         ctx->minfo);
-
-    if (bits <= FLINT_BITS)
-        mask = mpoly_overflow_mask_sp(bits);
-    else
-        mask = 0;
-
-    for (i = 0; i < r->length; i++)
-    {
-        int divides;
-
-        if (bits <= FLINT_BITS)
-            divides = mpoly_monomial_divides_test(rexp + i*N, gexp + 0*N, N, mask);
-        else
-            divides = mpoly_monomial_divides_mp_test(rexp + i*N, gexp + 0*N, N, bits);
-
-        if (divides)
-        {
-            flint_printf("nmod_mpoly_remainder_strongtest FAILED i = %wd\n", i);
-            flint_printf("rem ");nmod_mpoly_print_pretty(r, NULL, ctx); printf("\n\n");
-            flint_printf("den ");nmod_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
-            flint_abort();
-        }
-    }
-
-   flint_free(rexp);
-   flint_free(gexp);
-}
-
+void nmod_mpoly_remainder_strongtest(const nmod_mpoly_t r, const nmod_mpoly_t g, const nmod_mpoly_ctx_t ctx);
 
 #ifdef __cplusplus
 }

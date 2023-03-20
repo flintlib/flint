@@ -17,6 +17,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fq_poly.h"
 #include "fq_mat.h"
 
@@ -56,8 +57,6 @@
 #include "fq_poly_templates/evaluate_fq_vec_fast.c"
 #include "fq_poly_templates/evaluate_fq_vec_iter.c"
 #include "fq_poly_templates/fit_length.c"
-#include "fq_poly_templates/fprint.c"
-#include "fq_poly_templates/fprint_pretty.c"
 #include "fq_poly_templates/gcd.c"
 #include "fq_poly_templates/gcd_euclidean_f.c"
 #include "fq_poly_templates/gen.c"
@@ -69,6 +68,7 @@
 #include "fq_poly_templates/init.c"
 #include "fq_poly_templates/inv_series_newton.c"
 #include "fq_poly_templates/invsqrt_series.c"
+#include "fq_poly_templates/io.c"
 #include "fq_poly_templates/make_monic.c"
 #define USE_MUL_REORDER 1
 #include "fq_poly_templates/mul.c"

@@ -233,46 +233,6 @@ void fmpz_mpoly_convert_to_fmpz_mpolyd(
     TMP_END;
 }
 
-
-void fmpz_mpolyd_print(fmpz_mpolyd_t poly)
-{
-    int first = 0;
-    slong i, j;
-    slong degb_prod;
-
-    degb_prod = WORD(1);
-    for (j = 0; j < poly->nvars; j++) {
-        degb_prod *= poly->deg_bounds[j];
-    }
-
-    first = 1;
-    for (i = 0; i < degb_prod; i++) {
-        ulong k = i;
-
-        if (fmpz_is_zero(poly->coeffs + i))
-            continue;
-
-        if (!first)
-            printf(" + ");
-
-        fmpz_print(poly->coeffs + i);
-
-        for (j = poly->nvars - 1; j >= 0; j--)
-        {
-            ulong m = poly->deg_bounds[j];
-            ulong e = k % m;
-            k = k / m;
-            flint_printf("*x%d^%wd", j, e);
-        }
-        FLINT_ASSERT(k == 0);
-        first = 0;
-    }
-
-    if (first)
-        flint_printf("0");
-}
-
-
 void fmpz_mpoly_convert_from_fmpz_mpolyd(
                                   fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx,
                            const fmpz_mpolyd_t B, const fmpz_mpolyd_ctx_t dctx)

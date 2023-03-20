@@ -75,7 +75,7 @@ typedef int (*gr_funcptr)(void);
 
 typedef struct
 {
-    FILE * fp;
+    FLINT_FILE * fp;
     char * s;
     slong len;
     slong alloc;
@@ -84,7 +84,10 @@ gr_stream_struct;
 
 typedef gr_stream_struct gr_stream_t[1];
 
+#ifdef FLINT_HAVE_FILE
 void gr_stream_init_file(gr_stream_t out, FILE * fp);
+#endif
+
 void gr_stream_init_str(gr_stream_t out);
 void gr_stream_write(gr_stream_t out, const char * s);
 void gr_stream_write_si(gr_stream_t out, slong x);
