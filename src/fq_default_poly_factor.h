@@ -83,11 +83,11 @@ void fq_default_poly_factor_clear(fq_default_poly_factor_t fac,
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        nmod_poly_factor_init(fac->nmod);
+        nmod_poly_factor_clear(fac->nmod);
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_factor_init(fac->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_factor_clear(fac->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
