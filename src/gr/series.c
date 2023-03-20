@@ -1027,7 +1027,7 @@ gr_series_gamma_upper(gr_series_t res, const gr_series_t s, const gr_series_t x,
         arb_poly_get_coeff_arb(t, (arb_poly_struct *) &s->poly, 0);
         arb_hypgeom_gamma_upper_series((arb_poly_struct *) &res->poly, t, (arb_poly_struct *) &x->poly, regularized, len, prec);
         if (!_arb_vec_is_finite((arb_ptr) res->poly.coeffs, res->poly.length))
-            status = GR_UNABLE; \
+            status = GR_UNABLE;
         arb_clear(t);
     }
     else
@@ -1086,7 +1086,7 @@ gr_series_gamma_lower(gr_series_t res, const gr_series_t s, const gr_series_t x,
         arb_poly_get_coeff_arb(t, (arb_poly_struct *) &s->poly, 0);
         arb_hypgeom_gamma_lower_series((arb_poly_struct *) &res->poly, t, (arb_poly_struct *) &x->poly, regularized, len, prec);
         if (!_arb_vec_is_finite((arb_ptr) res->poly.coeffs, res->poly.length))
-            status = GR_UNABLE; \
+            status = GR_UNABLE;
         arb_clear(t);
     }
     else
@@ -1149,7 +1149,7 @@ gr_series_beta_lower(gr_series_t res, const gr_series_t a, const gr_series_t b, 
         arb_poly_get_coeff_arb(u, (arb_poly_struct *) &b->poly, 0);
         arb_hypgeom_beta_lower_series((arb_poly_struct *) &res->poly, t, u, (arb_poly_struct *) &x->poly, regularized, len, prec);
         if (!_arb_vec_is_finite((arb_ptr) res->poly.coeffs, res->poly.length))
-            status = GR_UNABLE; \
+            status = GR_UNABLE;
         arb_clear(t);
         arb_clear(u);
     }

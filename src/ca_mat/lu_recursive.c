@@ -47,6 +47,7 @@ ca_mat_lu_recursive(slong * rank, slong * P, ca_mat_t LU, const ca_mat_t A, int 
     slong *P1;
     int success;
 
+    r2 = 0;
     m = A->r;
     n = A->c;
 
