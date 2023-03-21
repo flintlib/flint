@@ -202,6 +202,7 @@ void fmpz_poly_factor_zassenhaus_recombination_with_prune(
                 if (subset[i] >= 0)
                     total += fmpz_poly_degree(lifted_fac->p + subset[i]);
 
+            flint_printf("mid1 fmpz_poly_factor_zassenhaus_recombination_with_prune\n"); fflush(stdout);
             if (!zassenhaus_prune_degree_is_possible(Z, total))
             {
                 if (!zassenhaus_subset_next(subset, len))
@@ -212,6 +213,7 @@ void fmpz_poly_factor_zassenhaus_recombination_with_prune(
             _fmpz_poly_product(tryme, lifted_fac->p, subset, len, P,
                                                 fmpz_poly_lead(f), stack, tmp);
             fmpz_poly_primitive_part(tryme, tryme);
+            flint_printf("mid2 fmpz_poly_factor_zassenhaus_recombination_with_prune\n"); fflush(stdout);
             if (fmpz_poly_divides(Q, f, tryme))
             {
                 fmpz_poly_factor_insert(final_fac, tryme, exp);
