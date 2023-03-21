@@ -36,6 +36,7 @@ exec_prefix:=@exec_prefix@
 INCLUDEDIR:=@includedir@
 LIBDIR:=@libdir@
 BINDIR:=@bindir@
+PKGCONFIGDIR:=$(LIBDIR)/pkgconfig
 
 HOST_OS:=@host_os@
 
@@ -94,8 +95,8 @@ EXE_LDFLAGS:=$(LDFLAGS) $(foreach path, $(ABS_FLINT_DIR) $(GMP_LIB_PATH) $(MPFR_
 ################################################################################
 
 CFG_FILES :=                                                                \
-        $(FLINT_DIR)/config.log         $(FLINT_DIR)/flint-config.h         \
-        $(SRC_DIR)/fft_tuning.h                                             \
+        $(FLINT_DIR)/config.log         $(SRC_DIR)/flint-config.h           \
+        $(SRC_DIR)/fft_tuning.h         $(FLINT_DIR)/flint.pc               \
         $(FLINT_DIR)/Makefile           $(SRC_DIR)/fmpz/fmpz.c
 
 ################################################################################
@@ -195,7 +196,7 @@ endif
 
 INSTALL_DIRS :=                                                             \
         $(LIBDIR)                       $(INCLUDEDIR)/flint                 \
-        $(INCLUDEDIR)/flint/flintxx
+        $(INCLUDEDIR)/flint/flintxx     $(PKGCONFIGDIR)
 ifneq ($(findstring $(HOST_OS),mingw32 mingw64 cygwin msys),)
 INSTALL_DIRS += $(BINDIR)
 endif
@@ -724,6 +725,7 @@ distclean: clean
 ################################################################################
 
 install: library | $(INSTALL_DIRS)
+	$(CP) flint.pc $(PKGCONFIGDIR)/flint.pc
 ifneq ($(SHARED), 0)
 ifeq ($(findstring $(HOST_OS),mingw32 mingw64 cygwin msys),)
 	$(CP_A) $(FLINT_DIR)/$(FLINT_LIBNAME)* $(LIBDIR)
@@ -746,6 +748,7 @@ endif
 endif
 
 uninstall:
+	$(RM_F) $(PKGCONFIGDIR)/flint.pc
 	$(RM_RF) $(INCLUDEDIR)/flint
 	$(RM_F) $(LIBDIR)/$(FLINT_LIB_STATIC)
 ifeq ($(findstring $(HOST_OS),mingw32 mingw64 cygwin msys),)
