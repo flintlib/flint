@@ -50,31 +50,35 @@ void _fmpz_poly_hensel_lift_without_inverse(fmpz *G, fmpz *H,
     const fmpz *a, slong lenA, const fmpz *b, slong lenB,
     const fmpz_t p, const fmpz_t p1)
 {
-    const fmpz one[1] = {1l};
-    const slong lenM = FLINT_MAX(lenG, lenH);
-    const slong lenE = FLINT_MAX(lenG + lenB - 2, lenH + lenA - 2);
-    const slong lenD = FLINT_MAX(lenE, lenF);
-    fmpz *C, *D, *E, *M;
+    flint_printf("enter _fmpz_poly_hensel_lift_without_inverse\n"); fflush(stdout);
+    {
+        const fmpz one[1] = {1l};
+        const slong lenM = FLINT_MAX(lenG, lenH);
+        const slong lenE = FLINT_MAX(lenG + lenB - 2, lenH + lenA - 2);
+        const slong lenD = FLINT_MAX(lenE, lenF);
+        fmpz *C, *D, *E, *M;
 
-    C = _fmpz_vec_init(lenF + lenD + lenE + lenM);
-    D = C + lenF;
-    E = D + lenD;
-    M = E + lenE;
+        C = _fmpz_vec_init(lenF + lenD + lenE + lenM);
+        D = C + lenF;
+        E = D + lenD;
+        M = E + lenE;
 
-    if (lenG >= lenH)
-        _fmpz_poly_mul(C, g,lenG, h, lenH);
-    else
-        _fmpz_poly_mul(C, h, lenH, g, lenG);
-    _fmpz_vec_sub(C, f, C, lenF);
-    _fmpz_vec_scalar_divexact_fmpz(D, C, lenF, p);
+        if (lenG >= lenH)
+            _fmpz_poly_mul(C, g,lenG, h, lenH);
+        else
+            _fmpz_poly_mul(C, h, lenH, g, lenG);
+        _fmpz_vec_sub(C, f, C, lenF);
+        _fmpz_vec_scalar_divexact_fmpz(D, C, lenF, p);
 
-    _fmpz_vec_scalar_mod_fmpz(C, D, lenF, p1);
+        _fmpz_vec_scalar_mod_fmpz(C, D, lenF, p1);
 
-    lift(G, g, lenG, b, lenB);
+        lift(G, g, lenG, b, lenB);
 
-    lift(H, h, lenH, a, lenA);
+        lift(H, h, lenH, a, lenA);
 
-    _fmpz_vec_clear(C, lenF + lenD + lenE + lenM);
+        _fmpz_vec_clear(C, lenF + lenD + lenE + lenM);
+    }
+    flint_printf("exit _fmpz_poly_hensel_lift_without_inverse\n"); fflush(stdout);
 }
 
 void fmpz_poly_hensel_lift_without_inverse(fmpz_poly_t Gout, fmpz_poly_t Hout,
@@ -82,6 +86,7 @@ void fmpz_poly_hensel_lift_without_inverse(fmpz_poly_t Gout, fmpz_poly_t Hout,
     const fmpz_poly_t a, const fmpz_poly_t b,
     const fmpz_t p, const fmpz_t p1)
 {
+    flint_printf("enter fmpz_poly_hensel_lift_without_inverse\n"); fflush(stdout);
     fmpz_poly_fit_length(Gout, g->length);
     fmpz_poly_fit_length(Hout, h->length);
     _fmpz_poly_set_length(Gout, g->length);
@@ -90,5 +95,6 @@ void fmpz_poly_hensel_lift_without_inverse(fmpz_poly_t Gout, fmpz_poly_t Hout,
     _fmpz_poly_hensel_lift_without_inverse(Gout->coeffs, Hout->coeffs,
         f->coeffs, f->length, g->coeffs, g->length, h->coeffs, h->length,
         a->coeffs, a->length, b->coeffs, b->length, p, p1);
+    flint_printf("exit fmpz_poly_hensel_lift_without_inverse\n"); fflush(stdout);
 }
 
