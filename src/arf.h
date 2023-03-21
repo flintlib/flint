@@ -18,8 +18,6 @@
 #define ARF_INLINE static __inline__
 #endif
 
-#include "flint.h"
-#include <mpfr.h>
 #include "fmpq.h"
 #include "mag.h"
 #include "arf_types.h"
@@ -28,12 +26,15 @@
 extern "C" {
 #endif
 
-typedef int arf_rnd_t;
-#define ARF_RND_DOWN 0
-#define ARF_RND_UP 1
-#define ARF_RND_FLOOR 2
-#define ARF_RND_CEIL 3
-#define ARF_RND_NEAR 4
+typedef enum
+{
+    ARF_RND_DOWN  = 0,
+    ARF_RND_UP    = 1,
+    ARF_RND_FLOOR = 2,
+    ARF_RND_CEIL  = 3,
+    ARF_RND_NEAR  = 4
+}
+arf_rnd_t;
 
 ARF_INLINE int
 arf_rounds_down(arf_rnd_t rnd, int sgnbit)
@@ -53,6 +54,7 @@ arf_rounds_up(arf_rnd_t rnd, int sgnbit)
     return !sgnbit;
 }
 
+#ifdef __MPFR_H
 ARF_INLINE mpfr_rnd_t
 arf_rnd_to_mpfr(arf_rnd_t rnd)
 {
@@ -62,6 +64,7 @@ arf_rnd_to_mpfr(arf_rnd_t rnd)
     else if (rnd == ARF_RND_CEIL) return MPFR_RNDU;
     else return MPFR_RNDN;
 }
+#endif
 
 /* Allow 'infinite' precision for operations where a result can be computed exactly. */
 #define ARF_PREC_EXACT WORD_MAX
@@ -529,9 +532,11 @@ int arf_set_round(arf_t y, const arf_t x, slong prec, arf_rnd_t rnd);
 
 int arf_neg_round(arf_t y, const arf_t x, slong prec, arf_rnd_t rnd);
 
+#ifdef __MPFR_H
 int arf_get_mpfr(mpfr_t x, const arf_t y, mpfr_rnd_t rnd);
 void arf_set_mpfr(arf_t x, const mpfr_t y);
 int _arf_call_mpfr_func(arf_ptr r1, arf_ptr r2, int (*func)(void), arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd);
+#endif
 
 int arf_equal(const arf_t x, const arf_t y);
 int arf_equal_si(const arf_t x, slong y);

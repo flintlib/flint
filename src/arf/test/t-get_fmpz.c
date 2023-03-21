@@ -9,8 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <mpfr.h>
 #include "arf.h"
-
 
 int main()
 {

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <mpfr.h>
 #include "arb.h"
 
 int mpfr_round_p(mp_srcptr, mp_size_t, mpfr_exp_t, mpfr_prec_t);
