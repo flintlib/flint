@@ -29,7 +29,7 @@ AH_TOP(FLINT_COPYRIGHT_C)
 
 AC_PREREQ(2.59)
 
-FLINT_VERSION="2.10.0-dev"
+define(FLINT_VERSION,[2.10.0-dev])
 
 AC_INIT(FLINT, FLINT_VERSION, [https://github.com/flintlib/flint2/issues/], flint, [https://flintlib.org/])
 AC_LANG(C)
@@ -64,12 +64,13 @@ AC_LANG(C)
 # 2.8.4 => 16.1.4
 # 2.8.5 => 16.1.5
 # 2.9.0 => 17.0.0
+# 2.10.0 => 18.0.0
 
 # NOTE: This must be after AC_INIT
 FLINT_MAJOR=2
 FLINT_MINOR=10
 FLINT_PATCH=0
-FLINT_MAJOR_SO=17
+FLINT_MAJOR_SO=18
 FLINT_MINOR_SO=0
 FLINT_PATCH_SO=0
 
@@ -896,7 +897,7 @@ fi
 # epilog
 ################################################################################ 
 
-AC_CONFIG_FILES([Makefile:Makefile.in])
+AC_CONFIG_FILES([Makefile flint.pc])
 AC_OUTPUT
 
 dnl Shorten the original help message
