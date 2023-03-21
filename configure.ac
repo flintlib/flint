@@ -767,7 +767,6 @@ dnl NOTE: The following flags shouldn't be default. They are leftovers from
 dnl previous configure script
 AX_CHECK_COMPILE_FLAG([-g],[DEFAULT_CFLAGS="-g $DEFAULT_CFLAGS"])
 AX_CHECK_COMPILE_FLAG([-funroll-loops],[DEFAULT_CFLAGS="-funroll-loops $DEFAULT_CFLAGS"])
-AX_CHECK_COMPILE_FLAG([-mpopcnt],[DEFAULT_CFLAGS="-mpopcnt $DEFAULT_CFLAGS"])
 
 if test "$cflags_set" = "no";
 then
