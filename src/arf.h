@@ -28,12 +28,15 @@
 extern "C" {
 #endif
 
-typedef int arf_rnd_t;
-#define ARF_RND_DOWN 0
-#define ARF_RND_UP 1
-#define ARF_RND_FLOOR 2
-#define ARF_RND_CEIL 3
-#define ARF_RND_NEAR 4
+typedef enum
+{
+    ARF_RND_DOWN  = 0,
+    ARF_RND_UP    = 1,
+    ARF_RND_FLOOR = 2,
+    ARF_RND_CEIL  = 3,
+    ARF_RND_NEAR  = 4
+}
+arf_rnd_t;
 
 ARF_INLINE int
 arf_rounds_down(arf_rnd_t rnd, int sgnbit)
