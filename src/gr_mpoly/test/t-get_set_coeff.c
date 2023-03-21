@@ -36,7 +36,8 @@ main(void)
         mpoly_ctx_init_rand(mctx, state, 20);
 
         gr_mpoly_init(f, mctx, cctx);
-        GR_TMP_INIT2(c, d, cctx);
+        c = gr_heap_init(cctx);
+        d = gr_heap_init(cctx);
 
         len = n_randint(state, 100);
         exp_bits = n_randint(state, 200) + 2;
@@ -73,7 +74,8 @@ main(void)
         }
 
         gr_mpoly_clear(f, mctx, cctx);
-        GR_TMP_CLEAR2(c, d, cctx);
+        gr_heap_clear(c, cctx);
+        gr_heap_clear(d, cctx);
 
         mpoly_ctx_clear(mctx);
         gr_ctx_clear(cctx);
@@ -93,7 +95,8 @@ main(void)
         mpoly_ctx_init_rand(mctx, state, 20);
 
         gr_mpoly_init(f, mctx, cctx);
-        GR_TMP_INIT2(c, d, cctx);
+        c = gr_heap_init(cctx);
+        d = gr_heap_init(cctx);
 
         len = n_randint(state, 100);
         exp_bits = n_randint(state, 200) + 2;
@@ -129,7 +132,8 @@ main(void)
         }
 
         gr_mpoly_clear(f, mctx, cctx);
-        GR_TMP_CLEAR2(c, d, cctx);
+        gr_heap_clear(c, cctx);
+        gr_heap_clear(d, cctx);
 
         mpoly_ctx_clear(mctx);
         gr_ctx_clear(cctx);

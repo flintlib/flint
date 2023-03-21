@@ -1284,6 +1284,20 @@ GR_INLINE void gr_heap_clear(gr_ptr x, gr_ctx_t ctx)
     flint_free(x);
 }
 
+GR_INLINE gr_ptr gr_heap_init_vec(slong len, gr_ctx_t ctx)
+{
+    gr_ptr ptr;
+    ptr = (gr_ptr) flint_malloc(len * ctx->sizeof_elem);
+    _gr_vec_init(ptr, len, ctx);
+    return ptr;
+}
+
+GR_INLINE void gr_heap_clear_vec(gr_ptr x, slong len, gr_ctx_t ctx)
+{
+    _gr_vec_clear(x, len, ctx);
+    flint_free(x);
+}
+
 /* Some generic implementations */
 
 truth_t gr_generic_ctx_predicate(gr_ctx_t ctx);

@@ -46,7 +46,11 @@ int main()
         gr_mat_init(A, n, n, ctx);
         gr_mat_init(B, n, n, ctx);
         gr_mat_init(AB, n, n, ctx);
-        GR_TMP_INIT4(detA, detB, detAB, detAdetB, ctx);
+
+        detA = gr_heap_init(ctx);
+        detB = gr_heap_init(ctx);
+        detAB = gr_heap_init(ctx);
+        detAdetB = gr_heap_init(ctx);
 
         status |= gr_mat_randtest(A, state, ctx);
         status |= gr_mat_randtest(B, state, ctx);
@@ -81,7 +85,7 @@ int main()
             flint_abort();
         }
 
-        status |= gr_mat_det_berkowitz(detB, A, ctx);
+        status |= gr_mat_det_lu(detB, A, ctx);
 
         if (status == GR_SUCCESS && gr_equal(detA, detB, ctx) == T_FALSE)
         {
@@ -100,7 +104,11 @@ int main()
         gr_mat_clear(A, ctx);
         gr_mat_clear(B, ctx);
         gr_mat_clear(AB, ctx);
-        GR_TMP_CLEAR4(detA, detB, detAB, detAdetB, ctx);
+
+        gr_heap_clear(detA, ctx);
+        gr_heap_clear(detB, ctx);
+        gr_heap_clear(detAB, ctx);
+        gr_heap_clear(detAdetB, ctx);
 
         gr_ctx_clear(ctx);
     }

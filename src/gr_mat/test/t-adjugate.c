@@ -47,7 +47,8 @@ int main()
         gr_mat_init(B, n, n, ctx);
         gr_mat_init(C, n, n, ctx);
 
-        GR_TMP_INIT2(d, e, ctx);
+        d = gr_heap_init(ctx);
+        e = gr_heap_init(ctx);
 
         GR_MUST_SUCCEED(gr_mat_randtest(A, state, ctx));
 
@@ -73,7 +74,8 @@ int main()
         gr_mat_clear(B, ctx);
         gr_mat_clear(C, ctx);
 
-        GR_TMP_CLEAR2(d, e, ctx);
+        gr_heap_clear(d, ctx);
+        gr_heap_clear(e, ctx);
 
         gr_ctx_clear(ctx);
     }

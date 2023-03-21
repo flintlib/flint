@@ -36,7 +36,10 @@ int main()
         gr_poly_init(Fc, ctx);
         gr_poly_init(Fcd1, ctx);
         gr_poly_init(Fcd2, ctx);
-        GR_TMP_INIT3(c, d, cd, ctx);
+
+        c = gr_heap_init(ctx);
+        d = gr_heap_init(ctx);
+        cd = gr_heap_init(ctx);
 
         status = GR_SUCCESS;
 
@@ -68,7 +71,10 @@ int main()
         gr_poly_clear(Fc, ctx);
         gr_poly_clear(Fcd1, ctx);
         gr_poly_clear(Fcd2, ctx);
-        GR_TMP_CLEAR3(c, d, cd, ctx);
+
+        gr_heap_clear(c, ctx);
+        gr_heap_clear(d, ctx);
+        gr_heap_clear(cd, ctx);
 
         gr_ctx_clear(ctx);
     }

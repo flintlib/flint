@@ -45,8 +45,11 @@ int main()
         fmpz_mpoly_init(g, mctx);
         fmpz_mpoly_init(h, mctx);
 
-        GR_TMP_INIT_VEC(x, n, ctx);
-        GR_TMP_INIT4(fx, gx, hx, y, ctx);
+        x = gr_heap_init_vec(n, ctx);
+        fx = gr_heap_init(ctx);
+        gx = gr_heap_init(ctx);
+        hx = gr_heap_init(ctx);
+        y = gr_heap_init(ctx);
 
         status |= _gr_vec_randtest(x, state, n, ctx);
 
@@ -85,8 +88,11 @@ int main()
         fmpz_mpoly_clear(h, mctx);
         fmpz_mpoly_ctx_clear(mctx);
 
-        GR_TMP_CLEAR_VEC(x, n, ctx);
-        GR_TMP_CLEAR4(fx, gx, hx, y, ctx);
+        gr_heap_clear_vec(x, n, ctx);
+        gr_heap_clear(fx, ctx);
+        gr_heap_clear(gx, ctx);
+        gr_heap_clear(hx, ctx);
+        gr_heap_clear(y, ctx);
 
         gr_ctx_clear(ctx);
     }

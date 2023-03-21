@@ -288,6 +288,16 @@ Memory management
     Free the single heap-allocated element *x* of *ctx* which should
     have been created with :func:`gr_heap_init`.
 
+.. function:: gr_ptr gr_heap_init_vec(slong len, gr_ctx_t ctx)
+
+    Return a pointer to a new heap-allocated vector of *len*
+    initialized elements.
+
+.. function:: void gr_heap_clear_vec(gr_ptr x, slong len, gr_ctx_t ctx)
+
+    Clear the *len* elements in the heap-allocated vector *len* and
+    free the vector itself.
+
 The following macros support allocating temporary variables efficiently.
 Data will be allocated on the stack using ``alloca`` unless
 the size is excessive (risking stack overflow), in which case

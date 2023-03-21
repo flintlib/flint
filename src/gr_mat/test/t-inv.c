@@ -56,7 +56,7 @@ int main()
             gr_ptr det;
             int status2;
 
-            GR_TMP_INIT(det, ctx);
+            det = gr_heap_init(ctx);
 
             status2 = gr_mat_det(det, A, ctx);
 
@@ -69,7 +69,7 @@ int main()
                 flint_abort();
             }
 
-            GR_TMP_CLEAR(det, ctx);
+            gr_heap_clear(det, ctx);
         }
 
         if (status == GR_SUCCESS)

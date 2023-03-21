@@ -74,7 +74,7 @@ int main()
             gr_ptr det;
             int status2;
 
-            GR_TMP_INIT(det, ctx);
+            det = gr_heap_init(ctx);
             status2 = gr_mat_det_berkowitz(det, A, ctx);
 
             if (status2 == GR_SUCCESS && gr_is_invertible(det, ctx) == T_TRUE)
@@ -86,7 +86,7 @@ int main()
                 flint_abort();
             }
 
-            GR_TMP_CLEAR(det, ctx);
+            gr_heap_clear(det, ctx);
         }
 
         count_success += (status == GR_SUCCESS);

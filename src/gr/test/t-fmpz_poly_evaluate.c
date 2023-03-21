@@ -71,7 +71,11 @@ int main()
         fmpz_poly_init(g);
         fmpz_poly_init(h);
 
-        GR_TMP_INIT5(x, fx, gx, hx, y, ctx);
+        x = gr_heap_init(ctx);
+        fx = gr_heap_init(ctx);
+        gx = gr_heap_init(ctx);
+        hx = gr_heap_init(ctx);
+        y = gr_heap_init(ctx);
 
         GR_MUST_SUCCEED(gr_randtest(x, state, ctx));
 
@@ -106,7 +110,11 @@ int main()
         fmpz_poly_clear(g);
         fmpz_poly_clear(h);
 
-        GR_TMP_CLEAR5(x, fx, gx, hx, y, ctx);
+        gr_heap_clear(x, ctx);
+        gr_heap_clear(fx, ctx);
+        gr_heap_clear(gx, ctx);
+        gr_heap_clear(hx, ctx);
+        gr_heap_clear(y, ctx);
 
         gr_ctx_clear(ctx);
     }
