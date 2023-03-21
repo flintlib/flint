@@ -207,6 +207,7 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
             fmpz_add_ui(T, T, 1);
             a = fmpz_clog_ui(T, p);
 
+            flint_printf("mid3 _fmpz_poly_factor_zassenhaus\n"); fflush(stdout);
             fmpz_poly_hensel_lift_once(lifted_fac, f, fac, a);
 
             #if TRACE_ZASSENHAUS == 1
@@ -217,6 +218,7 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
             fmpz_poly_factor_print(lifted_fac);
             #endif
 
+            flint_printf("mid4 _fmpz_poly_factor_zassenhaus\n"); fflush(stdout);
             fmpz_set_ui(T, p);
             fmpz_pow_ui(T, T, a);
             fmpz_poly_factor_zassenhaus_recombination_with_prune(
