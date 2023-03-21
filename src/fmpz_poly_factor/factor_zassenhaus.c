@@ -42,6 +42,7 @@ void _fmpz_poly_factor_mignotte(fmpz_t B, const fmpz *f, slong m)
     slong j;
     fmpz_t b, f2, lc, s, t;
 
+    flint_printf("enter _fmpz_poly_factor_mignotte\n"); fflush(stdout);
     fmpz_init(b);
     fmpz_init(f2);
     fmpz_init(lc);
@@ -81,6 +82,7 @@ void _fmpz_poly_factor_mignotte(fmpz_t B, const fmpz *f, slong m)
     fmpz_clear(lc);
     fmpz_clear(s);
     fmpz_clear(t);
+    flint_printf("exit _fmpz_poly_factor_mignotte\n"); fflush(stdout);
 }
 
 void fmpz_poly_factor_mignotte(fmpz_t B, const fmpz_poly_t f)

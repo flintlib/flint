@@ -60,6 +60,7 @@ void _fmpz_poly_hensel_lift_only_inverse(fmpz *A, fmpz *B,
     const slong lenD = FLINT_MAX(lenC, lenE);
     fmpz *C, *D, *E, *M;
 
+    flint_printf("enter _fmpz_poly_hensel_lift_only_inverse\n"); fflush(stdout);
     C = _fmpz_vec_init(lenC + lenD + lenD + lenM);
     D = C + lenC;
     E = D + lenD;
@@ -83,6 +84,7 @@ void _fmpz_poly_hensel_lift_only_inverse(fmpz *A, fmpz *B,
     liftinv(A, a, lenA, H, lenH);
 
     _fmpz_vec_clear(C, lenC + lenD + lenD + lenM);
+    flint_printf("exit _fmpz_poly_hensel_lift_only_inverse\n"); fflush(stdout);
 }
 
 void fmpz_poly_hensel_lift_only_inverse(fmpz_poly_t Aout, fmpz_poly_t Bout,
@@ -90,6 +92,8 @@ void fmpz_poly_hensel_lift_only_inverse(fmpz_poly_t Aout, fmpz_poly_t Bout,
     const fmpz_poly_t a, const fmpz_poly_t b,
     const fmpz_t p, const fmpz_t p1)
 {
+    flint_printf("enter fmpz_poly_hensel_lift_only_inverse\n"); fflush(stdout);
+
     fmpz_poly_fit_length(Aout, H->length - 1);
     fmpz_poly_fit_length(Bout, G->length - 1);
 
@@ -101,5 +105,6 @@ void fmpz_poly_hensel_lift_only_inverse(fmpz_poly_t Aout, fmpz_poly_t Bout,
     _fmpz_poly_set_length(Bout, G->length - 1);
     _fmpz_poly_normalise(Aout);
     _fmpz_poly_normalise(Bout);
+    flint_printf("exit fmpz_poly_hensel_lift_only_inverse\n"); fflush(stdout);
 }
 
