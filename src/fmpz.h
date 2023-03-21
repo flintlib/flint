@@ -34,11 +34,6 @@
 /* turns an fmpz into a pointer to an mpz */
 #define COEFF_TO_PTR(x) ((__mpz_struct *) (((ulong)x) << 2))
 
-typedef gmp_randstate_t fmpz_randstate_t;
-
-FLINT_DLL extern __mpz_struct * fmpz_arr;
-FLINT_DLL extern gmp_randstate_t fmpz_randstate;
-
 typedef struct
 {
    mp_ptr dinv;
