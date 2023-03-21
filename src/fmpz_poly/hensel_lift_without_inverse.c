@@ -52,7 +52,7 @@ void _fmpz_poly_hensel_lift_without_inverse(fmpz *G, fmpz *H,
 {
     flint_printf("enter _fmpz_poly_hensel_lift_without_inverse\n"); fflush(stdout);
     {
-        const fmpz one[1] = {1l};
+        const fmpz one[1] = {WORD(1)};
         const slong lenM = FLINT_MAX(lenG, lenH);
         const slong lenE = FLINT_MAX(lenG + lenB - 2, lenH + lenA - 2);
         const slong lenD = FLINT_MAX(lenE, lenF);
