@@ -413,7 +413,7 @@ jobs:
   # msvc
   ##############################################################################
   msvc:
-    name: MSVC
+    name: MSVC (x1)
 
     runs-on: windows-latest
 
@@ -428,7 +428,7 @@ jobs:
 
       - name: "Install dependencies"
         run: |
-          conda install --yes -c conda-forge mpfr
+          conda install --yes -c conda-forge m2w64-mpfr
           conda install --yes -c conda-forge pthreads-win32
           conda info
           conda list
@@ -457,10 +457,9 @@ jobs:
           set "FLINT_TEST_MULTIPLIER=1"
           ctest -j4 --output-on-failure --timeout 180
 
-        # FIXME: Enable me when possible
-      # - if: failure()
-        # name: "If failure, stop all other jobs"
-        # uses: andymckay/cancel-action@0.3
+      - if: failure()
+        name: "If failure, stop all other jobs"
+        uses: andymckay/cancel-action@0.3
 
 
 
