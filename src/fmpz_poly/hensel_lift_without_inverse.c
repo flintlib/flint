@@ -58,24 +58,32 @@ void _fmpz_poly_hensel_lift_without_inverse(fmpz *G, fmpz *H,
         const slong lenD = FLINT_MAX(lenE, lenF);
         fmpz *C, *D, *E, *M;
 
+        flint_printf("mid1 _fmpz_poly_hensel_lift_without_inverse\n"); fflush(stdout);
         C = _fmpz_vec_init(lenF + lenD + lenE + lenM);
         D = C + lenF;
         E = D + lenD;
         M = E + lenE;
 
+        flint_printf("mid2 _fmpz_poly_hensel_lift_without_inverse\n"); fflush(stdout);
         if (lenG >= lenH)
             _fmpz_poly_mul(C, g,lenG, h, lenH);
         else
             _fmpz_poly_mul(C, h, lenH, g, lenG);
+        flint_printf("mid3 _fmpz_poly_hensel_lift_without_inverse\n"); fflush(stdout);
         _fmpz_vec_sub(C, f, C, lenF);
+        flint_printf("mid4 _fmpz_poly_hensel_lift_without_inverse\n"); fflush(stdout);
         _fmpz_vec_scalar_divexact_fmpz(D, C, lenF, p);
 
+        flint_printf("mid5 _fmpz_poly_hensel_lift_without_inverse\n"); fflush(stdout);
         _fmpz_vec_scalar_mod_fmpz(C, D, lenF, p1);
 
+        flint_printf("mid6 _fmpz_poly_hensel_lift_without_inverse\n"); fflush(stdout);
         lift(G, g, lenG, b, lenB);
 
+        flint_printf("mid7 _fmpz_poly_hensel_lift_without_inverse\n"); fflush(stdout);
         lift(H, h, lenH, a, lenA);
 
+        flint_printf("mid8 _fmpz_poly_hensel_lift_without_inverse\n"); fflush(stdout);
         _fmpz_vec_clear(C, lenF + lenD + lenE + lenM);
     }
     flint_printf("exit _fmpz_poly_hensel_lift_without_inverse\n"); fflush(stdout);
