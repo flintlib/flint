@@ -89,6 +89,13 @@ else
     cflags_set="no"
 fi
 
+if test -n "${TESTCFLAGS+x}";
+then
+    testcflags_set="yes"
+else
+    testcflags_set="no"
+fi
+
 LT_INIT
 
 if test "$cflags_set" = "no";
@@ -414,7 +421,7 @@ AC_PROG_MKDIR_P
 # environment variables
 ################################################################################ 
 
-AC_ARG_VAR(TESTCFLAGS, [Choose different C compiler flags for tests [default=CFLAGS]. Can be useful to compile library at a specific optimization level while compiling tests fast.])
+AC_ARG_VAR([TESTCFLAGS], [Choose different C compiler flags for tests [default=CFLAGS]. Can be useful to compile library at a specific optimization level while compiling tests fast.])
 
 AC_ARG_VAR(ABI, [Desired ABI])
 
@@ -769,11 +776,12 @@ else
     AX_CHECK_COMPILE_FLAG([$CFLAGS],[],AC_MSG_ERROR([Couldn't compile with given CFLAGS!]))
 fi
 
-if test -n "${TESTCFLAGS+x}";
+if test "$testcflags_set" = "no";
 then
-    TESTCFLAGS=$CFLAGS
+    TESTCFLAGS="$CFLAGS"
+else
+    TESTCFLAGS="$TESTCFLAGS $save_CFLAGS"
 fi
-AC_SUBST(TESTCFLAGS)
 
 CPPFLAGS="-I./src $CPPFLAGS"
 
