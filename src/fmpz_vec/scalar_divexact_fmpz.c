@@ -39,6 +39,9 @@ _fmpz_vec_scalar_divexact_fmpz(fmpz * vec1, const fmpz * vec2,
     {
         slong i;
         for (i = 0; i < len2; i++)
+        {
+            flint_printf("i = %wd\n", i); fflush(stdout);
             fmpz_divexact(vec1 + i, vec2 + i, x);
+        }
     }
 }
