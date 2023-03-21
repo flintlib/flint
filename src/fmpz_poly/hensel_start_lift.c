@@ -89,6 +89,7 @@ slong _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, slong *link,
         Now everything is lifted to p^N, we just need to
         insert the factors into their correct places in lifted_fac.
      */
+    flint_printf("mid5 _fmpz_poly_hensel_start_lift\n"); fflush(stdout);
     fmpz_poly_factor_fit_length(lifted_fac, r);
 
     for (i = 0; i < 2*r - 2; i++)
