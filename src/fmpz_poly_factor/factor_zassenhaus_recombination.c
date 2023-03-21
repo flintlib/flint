@@ -174,6 +174,7 @@ void fmpz_poly_factor_zassenhaus_recombination_with_prune(
     fmpz_poly_struct ** stack;
     fmpz_poly_struct * f;
 
+    flint_printf("enter fmpz_poly_factor_zassenhaus_recombination_with_prune\n"); fflush(stdout);
     subset = (slong *) flint_malloc(r*sizeof(slong));
     for (k = 0; k < r; k++)
         subset[k] = k;
@@ -248,5 +249,6 @@ void fmpz_poly_factor_zassenhaus_recombination_with_prune(
     flint_free(tmp);
 
     flint_free(subset);
+    flint_printf("exit fmpz_poly_factor_zassenhaus_recombination_with_prune\n"); fflush(stdout);
 }
 
