@@ -761,6 +761,7 @@ AX_CHECK_COMPILE_FLAG([-Wno-stringop-overread],[DEFAULT_CFLAGS="-Wno-stringop-ov
 AX_CHECK_COMPILE_FLAG([-Wno-stringop-overflow],[DEFAULT_CFLAGS="-Wno-stringop-overflow $DEFAULT_CFLAGS"])
 AX_CHECK_COMPILE_FLAG([-O2],[DEFAULT_CFLAGS="-O2 $DEFAULT_CFLAGS"])
 AX_CHECK_COMPILE_FLAG([-std=c99],[DEFAULT_CFLAGS="-std=c99 $DEFAULT_CFLAGS"])
+AX_CHECK_COMPILE_FLAG([-pedantic],[DEFAULT_CFLAGS="-pedantic $DEFAULT_CFLAGS"])
 
 dnl NOTE: The following flags shouldn't be default. They are leftovers from
 dnl previous configure script
