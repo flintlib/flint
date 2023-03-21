@@ -25,6 +25,8 @@ void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac,
     slong *link;
     fmpz_poly_t *v, *w;
 
+    flint_printf("enter fmpz_poly_hensel_lift_once\n"); fflush(stdout);
+
     link = flint_malloc((2*r - 2) * sizeof(slong));
     v    = flint_malloc(2*(2*r - 2) * sizeof(fmpz_poly_t));
     w    = v + (2*r - 2);
@@ -44,5 +46,6 @@ void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac,
     }
     flint_free(link);
     flint_free(v);
+    flint_printf("exit fmpz_poly_hensel_lift_once\n"); fflush(stdout);
 }
 

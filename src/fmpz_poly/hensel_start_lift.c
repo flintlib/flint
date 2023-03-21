@@ -22,6 +22,7 @@ slong _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, slong *link,
     fmpz_t p, P;
     fmpz_poly_t monic_f;
 
+    flint_printf("enter _fmpz_poly_hensel_start_lift\n"); fflush(stdout);
     fmpz_init(p);
     fmpz_init(P);
     fmpz_poly_init(monic_f);
@@ -55,6 +56,7 @@ slong _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, slong *link,
         fmpz_clear(t);
     }
 
+    flint_printf("mid1 _fmpz_poly_hensel_start_lift\n"); fflush(stdout);
     fmpz_poly_hensel_build_tree(link, v, w, local_fac);
 
     {
@@ -64,17 +66,20 @@ slong _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, slong *link,
         for (e[i = 0] = N; e[i] > 1; i++)
             e[i + 1] = (e[i] + 1) / 2;
 
+        flint_printf("mid2 _fmpz_poly_hensel_start_lift\n"); fflush(stdout);
         for (i--; i > 0; i--)
         {
             fmpz_poly_hensel_lift_tree(link, v, w, monic_f, r,
                 p, e[i+1], e[i], 1);
         }
+        flint_printf("mid3 _fmpz_poly_hensel_start_lift\n"); fflush(stdout);
         if (N > 1)
         {
             fmpz_poly_hensel_lift_tree(link, v, w, monic_f, r,
                 p, e[i+1], e[i], 0);
         }
 
+        flint_printf("mid4 _fmpz_poly_hensel_start_lift\n"); fflush(stdout);
         preve = e[i+1];
 
         flint_free(e);
@@ -100,6 +105,7 @@ slong _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, slong *link,
     fmpz_clear(P);
     fmpz_poly_clear(monic_f);
 
+    flint_printf("exit _fmpz_poly_hensel_start_lift\n"); fflush(stdout);
     return preve;
 }
 
