@@ -18,6 +18,7 @@ void fmpz_poly_hensel_lift_tree(slong *link, fmpz_poly_t *v, fmpz_poly_t *w,
     fmpz_poly_t f, slong r, const fmpz_t p, slong e0, slong e1, slong inv)
 {
     fmpz_t p0, p1;
+    flint_printf("enter fmpz_poly_hensel_lift_tree\n"); fflush(stdout);
 
     fmpz_init(p0);
     fmpz_init(p1);
@@ -29,5 +30,6 @@ void fmpz_poly_hensel_lift_tree(slong *link, fmpz_poly_t *v, fmpz_poly_t *w,
 
     fmpz_clear(p0);
     fmpz_clear(p1);
+    flint_printf("exit fmpz_poly_hensel_lift_tree\n"); fflush(stdout);
 }
 
