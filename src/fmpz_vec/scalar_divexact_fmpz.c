@@ -20,6 +20,12 @@ _fmpz_vec_scalar_divexact_fmpz(fmpz * vec1, const fmpz * vec2,
 {
     fmpz c = *x;
 
+    flint_printf("\n_FMPZ_VEC_SCALAR_DIVEXACT_FMPZ\n");
+    flint_printf("len = %wd\n", len);
+    flint_printf("x = "); fmpz_print(x); flint_printf("\n");
+    flint_printf("vec = [ "); _fmpz_vec_print(vec2, len2); flint_printf(" ]\n\n");
+    fflush(stdout);
+
     if (!COEFF_IS_MPZ(c))
     {
         if (c == 1)
