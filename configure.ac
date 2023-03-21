@@ -749,10 +749,10 @@ then
             DEFAULT_CFLAGS="-O2 -Wall"
             ;;
         freebsd*|openbsd*)
-            DEFAULT_CFLAGS="-std=c99 -pedantic -O2 -Wall"
+            DEFAULT_CFLAGS="-std=c99 -O2 -Wall"
             ;;
         *)
-            DEFAULT_CFLAGS="-ansi -pedantic -O2 -Wall"
+            DEFAULT_CFLAGS="-ansi -O2 -Wall"
             ;;
     esac
     AC_MSG_RESULT([$DEFAULT_CFLAGS])
@@ -787,7 +787,7 @@ AC_SUBST(BLAS_LIB_PATH,$blas_lib_path)
 AC_SUBST(GC_LIB_PATH,$gc_lib_path)
 AC_SUBST(NTL_LIB_PATH,$ntl_lib_path)
 
-AC_SUBST(LIB_CPPFLAGS,[-DFLINT_NOSTDIO -DFLINT_NOSTDARG])
+AC_SUBST(LIB_CPPFLAGS,["-DFLINT_NOSTDIO -DFLINT_NOSTDARG"])
 
 # Configure fmpz's memory manager
 if test "$with_gc" = "yes";
