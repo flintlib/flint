@@ -160,7 +160,7 @@ endif()
 
 set(_HEADERS
     NTL-interface.h flint.h longlong.h flint-config.h gmpcompat.h fft_tuning.h
-    fmpz-conversions.h profiler.h templates.h exception.h hashmap.h
+    profiler.h templates.h exception.h hashmap.h
 )
 string(REGEX REPLACE "([A-Za-z0-9_-]+\.h;|[A-Za-z0-9_-]+\.h$)" "src/\\1" HEADERS "${_HEADERS}")
 
