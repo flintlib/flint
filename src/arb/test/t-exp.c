@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <mpfr.h>
 #include "arb.h"
 
 /* check accuracy compared to reference algorithm */
