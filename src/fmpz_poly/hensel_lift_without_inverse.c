@@ -66,12 +66,14 @@ void _fmpz_poly_hensel_lift_without_inverse(fmpz *G, fmpz *H,
     else
         _fmpz_poly_mul(C, h, lenH, g, lenG);
     _fmpz_vec_sub(C, f, C, lenF);
-    flint_printf("_fmpz_vec_scalar_divexact_fmpz"); fflush(stdout);
     _fmpz_vec_scalar_divexact_fmpz(D, C, lenF, p);
-    flint_printf("_fmpz_vec_scalar_mod_fmpz"); fflush(stdout);
+
+    flint_printf("Performing _fmpz_vec_scalar_mod_fmpz with:\n\n"); fflush(stdout);
+
     _fmpz_vec_scalar_mod_fmpz(C, D, lenF, p1);
 
-    flint_printf("lift"); fflush(stdout);
+    flint_printf("Proof that it passed!\n\n"); fflush(stdout);
+
     lift(G, g, lenG, b, lenB);
 
     lift(H, h, lenH, a, lenA);
