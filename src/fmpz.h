@@ -19,7 +19,6 @@
 #endif
 
 #include "fmpz_types.h"
-#include "fmpz-conversions.h"
 
 #if FLINT_USES_PTHREAD
 #include <pthread.h>
@@ -29,10 +28,11 @@
  extern "C" {
 #endif
 
-/* already defined in flint.h
-typedef slong fmpz;
-typedef fmpz fmpz_t[1];
-*/
+/* turn a pointer to an __mpz_struct into a fmpz_t */
+#define PTR_TO_COEFF(x) (((ulong) (x) >> 2) | (WORD(1) << (FLINT_BITS - 2)))
+
+/* turns an fmpz into a pointer to an mpz */
+#define COEFF_TO_PTR(x) ((__mpz_struct *) (((ulong)x) << 2))
 
 typedef gmp_randstate_t fmpz_randstate_t;
 
