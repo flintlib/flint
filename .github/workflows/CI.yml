@@ -50,5 +50,5 @@ jobs:
       - name: "Test"
         run: |
           cd build
-          cdb -c ".logopen logfile; .logg; g" bin\src-fmpz_poly_factor-test-t-test.exe
+          "C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\cdb.exe" -c ".logopen logfile; .logg; g" bin\src-fmpz_poly_factor-test-t-test.exe
           type logfile
