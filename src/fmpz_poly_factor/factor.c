@@ -16,6 +16,7 @@ void fmpz_poly_factor_deflation(fmpz_poly_factor_t fac, const fmpz_poly_t G, int
 {
     const slong lenG = G->length;
     fmpz_poly_t g;
+    flint_printf("enter fmpz_poly_factor_deflation\n"); fflush(stdout);
 
     fac->num = 0;
 
@@ -108,9 +109,12 @@ void fmpz_poly_factor_deflation(fmpz_poly_factor_t fac, const fmpz_poly_t G, int
         }
     }
     fmpz_poly_clear(g);
+    flint_printf("exit fmpz_poly_factor_deflation\n"); fflush(stdout);
 }
 
 void fmpz_poly_factor(fmpz_poly_factor_t fac, const fmpz_poly_t G)
 {
+    flint_printf("enter fmpz_poly_factor\n"); fflush(stdout);
     fmpz_poly_factor_deflation(fac, G, 1);
+    flint_printf("exit fmpz_poly_factor\n"); fflush(stdout);
 }

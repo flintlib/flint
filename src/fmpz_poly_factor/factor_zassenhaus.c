@@ -93,6 +93,8 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
 {
     const slong lenF = f->length;
 
+    flint_printf("enter _fmpz_poly_factor_zassenhaus\n"); fflush(stdout);
+
     #if TRACE_ZASSENHAUS == 1
     flint_printf("\n[Zassenhaus]\n");
     flint_printf("|f = "), fmpz_poly_print(f), flint_printf("\n");
@@ -125,6 +127,7 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
         nmod_poly_init_preinv(g, 1, 0);
 
         zassenhaus_prune_set_degree(Z, lenF - 1);
+        flint_printf("mid1 _fmpz_poly_factor_zassenhaus\n"); fflush(stdout);
 
         for (i = 0; i < 3; i++)
         {
@@ -188,6 +191,7 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
             fmpz_t T;
             fmpz_poly_factor_t lifted_fac;
 
+            flint_printf("mid2 _fmpz_poly_factor_zassenhaus\n"); fflush(stdout);
             fmpz_poly_factor_init(lifted_fac);
             fmpz_init(T);
 
@@ -225,6 +229,7 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
         nmod_poly_factor_clear(fac);
         zassenhaus_prune_clear(Z);
     }
+    flint_printf("exit _fmpz_poly_factor_zassenhaus\n"); fflush(stdout);
 }
 
 void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t fac, const fmpz_poly_t G)

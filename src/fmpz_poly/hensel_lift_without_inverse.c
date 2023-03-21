@@ -28,36 +28,20 @@
  */
 #define lift(G, g, lenG, b, lenB)                                     \
 do {                                                                  \
-    flint_printf("L1 Performing _fmpz_vec_scalar_mod_fmpz with:\n\n"); fflush(stdout); \
     _fmpz_vec_scalar_mod_fmpz(M, g, lenG, p1);                        \
-    flint_printf("L1 Proof that it passed!\n\n"); fflush(stdout);        \
-    flint_printf("L2 Performing _fmpz_mod_poly_rem\n\n"); fflush(stdout); \
     _fmpz_mod_poly_rem(D, C, lenF, M, lenG, one, p1);                 \
-    flint_printf("L2 Proof that it passed!\n\n"); fflush(stdout);        \
-    flint_printf("L3 In lift, performing _fmpz_mod_poly_mul\n\n"); fflush(stdout); \
     _fmpz_mod_poly_mul(E, D, lenG - 1, b, lenB, p1);                  \
-    flint_printf("L3 Proof that it passed!\n\n"); fflush(stdout);        \
     if (lenB > 1)                                                     \
     {                                                                 \
-        flint_printf("L4 In lift, performing _fmpz_mod_poly_rem\n\n"); fflush(stdout); \
         _fmpz_mod_poly_rem(D, E, lenG + lenB - 2, M, lenG, one, p1);  \
-        flint_printf("L4 Proof that it passed!\n\n"); fflush(stdout);        \
-        flint_printf("L5 In lift, performing _fmpz_vec_scalar_mul_fmpz\n\n"); fflush(stdout); \
         _fmpz_vec_scalar_mul_fmpz(M, D, lenG - 1, p);                 \
-        flint_printf("L5 Proof that it passed!\n\n"); fflush(stdout);        \
     }                                                                 \
     else                                                              \
     {                                                                 \
-        flint_printf("L6 In lift, performing _fmpz_vec_scalar_mul_fmpz\n\n"); fflush(stdout); \
         _fmpz_vec_scalar_mul_fmpz(M, E, lenG - 1, p);                 \
-        flint_printf("L6 Proof that it passed!\n\n"); fflush(stdout);        \
     }                                                                 \
-    flint_printf("L7 In lift, performing _fmpz_vec_add\n\n"); fflush(stdout); \
     _fmpz_vec_add(G, g, M, lenG - 1);                                 \
-    flint_printf("L7 Proof that it passed!\n\n"); fflush(stdout);        \
-    flint_printf("L8 In lift, performing fmpz_one\n\n"); fflush(stdout); \
     fmpz_one(G + lenG - 1);                                           \
-    flint_printf("L8 Proof that it passed!\n\n"); fflush(stdout);        \
 } while (0)
 
 void _fmpz_poly_hensel_lift_without_inverse(fmpz *G, fmpz *H,
@@ -84,11 +68,7 @@ void _fmpz_poly_hensel_lift_without_inverse(fmpz *G, fmpz *H,
     _fmpz_vec_sub(C, f, C, lenF);
     _fmpz_vec_scalar_divexact_fmpz(D, C, lenF, p);
 
-    flint_printf("Performing _fmpz_vec_scalar_mod_fmpz with:\n\n"); fflush(stdout);
-
     _fmpz_vec_scalar_mod_fmpz(C, D, lenF, p1);
-
-    flint_printf("Proof that it passed!\n\n"); fflush(stdout);
 
     lift(G, g, lenG, b, lenB);
 

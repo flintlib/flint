@@ -17,13 +17,7 @@ void _fmpz_vec_scalar_mod_fmpz(fmpz *res, const fmpz *vec, slong len, const fmpz
 {
     slong i;
 
-    /* flint_printf("modulus "); fmpz_print(p); flint_printf("\n\n"); */
-    /* flint_printf("length %wd\n\n", len); */
-
     for (i = 0; i < len; i++)
-    {
-        /* flint_printf("vec[%wd] = ", i); fmpz_print(vec + i); flint_printf("\n\n"); fflush(stdout); */
         fmpz_mod(res + i, vec + i, p);
-    }
 }
 
