@@ -414,6 +414,8 @@ AC_PROG_MKDIR_P
 # environment variables
 ################################################################################ 
 
+AC_ARG_VAR(TESTCFLAGS, [Choose different C compiler flags for tests [default=CFLAGS]. Can be useful to compile library at a specific optimization level while compiling tests fast.])
+
 AC_ARG_VAR(ABI, [Desired ABI],
 if test -n "$ABI";
 then
@@ -757,6 +759,12 @@ then
     dnl FIXME: -g -funroll-loops shouldn't be activated by default
     CFLAGS="$CFLAGS $DEFAULT_CFLAGS $FLINT_CFLAGS -g -funroll-loops"
 fi
+
+if test -n "${TESTCFLAGS+x}";
+then
+    TESTCFLAGS=$CFLAGS
+fi
+AC_SUBST(TESTCFLAGS)
 
 AX_CHECK_COMPILE_FLAG($CFLAGS,[],AC_MSG_ERROR([Couldn't compile with CFLAGS!]))
 
