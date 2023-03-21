@@ -89,6 +89,13 @@ else
     cflags_set="no"
 fi
 
+if test -n "${TESTCFLAGS+x}";
+then
+    testcflags_set="yes"
+else
+    testcflags_set="no"
+fi
+
 LT_INIT
 
 if test "$cflags_set" = "no";
@@ -414,14 +421,9 @@ AC_PROG_MKDIR_P
 # environment variables
 ################################################################################ 
 
-AC_ARG_VAR(ABI, [Desired ABI],
-if test -n "$ABI";
-then
-    AX_CHECK_COMPILE_FLAG(-m$ABI,
-    [CFLAGS="-m$ABI $CFLAGS"],
-    [AC_MSG_ERROR([$CC does not support the ABI flag -m$ABI])])
-fi)
-AC_SUBST(ABI_FLAG)
+AC_ARG_VAR([TESTCFLAGS], [Choose different C compiler flags for tests [default=CFLAGS]. Can be useful to compile library at a specific optimization level while compiling tests fast.])
+
+AC_ARG_VAR(ABI, [Desired ABI])
 
 AC_ARG_VAR(LDCONFIG, [ldconfig tool])
 
@@ -446,14 +448,6 @@ then
 fi
 
 AC_C_BIGENDIAN(flint_big_endian=yes)
-
-case $host_cpu in
-    sparc*)
-        AX_CHECK_COMPILE_FLAG(-mno-relax,[FLINT_CFLAGS="-mno-relax $FLINT_CFLAGS"])
-        ;;
-    *)
-        ;;
-esac
 
 case "$host_os" in
     darwin*)
@@ -716,49 +710,78 @@ AC_MSG_ERROR([Couldn't find alloca, which is required for FLINT. Please submit a
 report to <https://github.com/flintlib/flint2/issues/> and specify your
 operating system.])])
 
-if test "$enable_coverage" = "yes";
-then
-    AX_CHECK_COMPILE_FLAG([-fprofile-arcs -ftest-coverage],
-    [CFLAGS="-fprofile-arcs -ftest-coverage $CFLAGS"],
-    [AC_MSG_ERROR([$CC does not seem to support test coverage flags.])])
-fi
-
 AC_MSG_CHECKING([if $CC has popcount intrinsics])
 AC_COMPILE_IFELSE(
     [AC_LANG_PROGRAM([],[long int x = __builtin_popcountl(3);])],
     [AC_COMPILE_IFELSE(
         [AC_LANG_PROGRAM([],[long long int x = __builtin_popcountll(3);])],
         [AC_MSG_RESULT([yes])
-         AC_DEFINE(FLINT_USES_POPCNT,1,[Define if system has popcount intrinsics])
-         AX_CHECK_COMPILE_FLAG(-mpopcnt,[FLINT_CFLAGS="-mpopcnt $FLINT_CFLAGS"])],
+         has_popcount="yes"
+         AC_DEFINE(FLINT_USES_POPCNT,1,[Define if system has popcount intrinsics])],
         [AC_MSG_RESULT([no])]
     )],
     [AC_MSG_RESULT([no])]
 )
 
-if test "$cflags_set" = "no";
+################################################################################ 
+# CFLAGS
+################################################################################ 
+
+save_CFLAGS="$CFLAGS"
+CFLAGS=""
+
+# The following is needed for Clang to check for unknown options.
+AX_CHECK_COMPILE_FLAG([-Werror=unknown-warning-option], [CFLAGS="-Werror=unknown-warning-option"])
+
+if test "$enable_coverage" = "yes";
 then
-    AC_MSG_CHECKING([default CFLAGS])
-    case $host_os in
-        mingw*|msys)
-            DEFAULT_CFLAGS="-std=c99 -O2 -Wall"
-            ;;
-        cygwin)
-            DEFAULT_CFLAGS="-O2 -Wall"
-            ;;
-        freebsd*|openbsd*)
-            DEFAULT_CFLAGS="-std=c99 -pedantic -O2 -Wall"
-            ;;
-        *)
-            DEFAULT_CFLAGS="-ansi -pedantic -O2 -Wall"
-            ;;
-    esac
-    AC_MSG_RESULT([$DEFAULT_CFLAGS])
-    dnl FIXME: -g -funroll-loops shouldn't be activated by default
-    CFLAGS="$CFLAGS $DEFAULT_CFLAGS $FLINT_CFLAGS -g -funroll-loops"
+    AX_CHECK_COMPILE_FLAG([-fprofile-arcs -ftest-coverage],
+    [save_CFLAGS="-fprofile-arcs -ftest-coverage $save_CFLAGS"],
+    [AC_MSG_ERROR([$CC does not seem to support test coverage flags.])])
 fi
 
-AX_CHECK_COMPILE_FLAG($CFLAGS,[],AC_MSG_ERROR([Couldn't compile with CFLAGS!]))
+if test -n "$ABI";
+then
+    AX_CHECK_COMPILE_FLAG([-m$ABI],
+    [save_CFLAGS="-m$ABI $save_CFLAGS"],
+    [AC_MSG_ERROR([$CC does not support the ABI flag -m$ABI])])
+fi
+AC_SUBST(ABI_FLAG)
+
+case $host_cpu in
+    sparc*)
+        AX_CHECK_COMPILE_FLAG(-mno-relax,[DEFAULT_CFLAGS="-mno-relax $DEFAULT_CFLAGS"])
+        ;;
+    *)
+        ;;
+esac
+
+AX_CHECK_COMPILE_FLAG([-Wall],[DEFAULT_CFLAGS="-Wall $DEFAULT_CFLAGS"])
+AX_CHECK_COMPILE_FLAG([-Wno-stringop-overread],[DEFAULT_CFLAGS="-Wno-stringop-overread $DEFAULT_CFLAGS"])
+AX_CHECK_COMPILE_FLAG([-Wno-stringop-overflow],[DEFAULT_CFLAGS="-Wno-stringop-overflow $DEFAULT_CFLAGS"])
+AX_CHECK_COMPILE_FLAG([-O2],[DEFAULT_CFLAGS="-O2 $DEFAULT_CFLAGS"])
+AX_CHECK_COMPILE_FLAG([-std=c99],[DEFAULT_CFLAGS="-std=c99 $DEFAULT_CFLAGS"])
+AX_CHECK_COMPILE_FLAG([-pedantic],[DEFAULT_CFLAGS="-pedantic $DEFAULT_CFLAGS"])
+
+dnl NOTE: The following flags shouldn't be default. They are leftovers from
+dnl previous configure script
+AX_CHECK_COMPILE_FLAG([-g],[DEFAULT_CFLAGS="-g $DEFAULT_CFLAGS"])
+AX_CHECK_COMPILE_FLAG([-funroll-loops],[DEFAULT_CFLAGS="-funroll-loops $DEFAULT_CFLAGS"])
+
+if test "$cflags_set" = "no";
+then
+    CFLAGS="$save_CFLAGS $DEFAULT_CFLAGS"
+else
+    CFLAGS="$save_CFLAGS"
+    AX_CHECK_COMPILE_FLAG([$CFLAGS],[],AC_MSG_ERROR([Couldn't compile with given CFLAGS!]))
+fi
+
+if test "$testcflags_set" = "no";
+then
+    TESTCFLAGS="$CFLAGS"
+else
+    TESTCFLAGS="$TESTCFLAGS $save_CFLAGS"
+fi
 
 CPPFLAGS="-I./src $CPPFLAGS"
 
@@ -778,6 +801,8 @@ AC_SUBST(MPFR_LIB_PATH,$mpfr_lib_path)
 AC_SUBST(BLAS_LIB_PATH,$blas_lib_path)
 AC_SUBST(GC_LIB_PATH,$gc_lib_path)
 AC_SUBST(NTL_LIB_PATH,$ntl_lib_path)
+
+AC_SUBST(LIB_CPPFLAGS,["-DFLINT_NOSTDIO -DFLINT_NOSTDARG"])
 
 # Configure fmpz's memory manager
 if test "$with_gc" = "yes";
