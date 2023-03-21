@@ -787,6 +787,8 @@ AC_SUBST(BLAS_LIB_PATH,$blas_lib_path)
 AC_SUBST(GC_LIB_PATH,$gc_lib_path)
 AC_SUBST(NTL_LIB_PATH,$ntl_lib_path)
 
+AC_SUBST(LIB_CPPFLAGS,[-DFLINT_NOSTDIO -DFLINT_NOSTDARG])
+
 # Configure fmpz's memory manager
 if test "$with_gc" = "yes";
 then

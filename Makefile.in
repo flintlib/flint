@@ -73,6 +73,7 @@ CFLAGS:=@CFLAGS@
 TESTCFLAGS:=@TESTCFLAGS@
 CPPFLAGS:=@CPPFLAGS@
 CPPFLAGS2:=-L$(FLINT_DIR) $(CPPFLAGS)
+LIB_CPPFLAGS:=@LIB_CPPFLAGS@
 CXXFLAGS:=@CXXFLAGS@
 LIBS:=@LIBS@
 LIBS2:=$(LIBS) -lflint
@@ -505,7 +506,7 @@ ifneq ($(STATIC), 0)
 define xxx_OBJS_rule
 $(BUILD_DIR)/$(1)/%.o: $(SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(CPPFLAGS) -c $$< -o $$@ -MMD -MF $$(@:%=%.d)
+	@$(CC) $(CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ -MMD -MF $$(@:%=%.d)
 endef
 
 $(foreach dir, $(DIRS), $(eval $(call xxx_OBJS_rule,$(dir))))
@@ -513,7 +514,7 @@ $(foreach dir, $(DIRS), $(eval $(call xxx_OBJS_rule,$(dir))))
 ifneq ($(WANT_NTL), 0)
 $(BUILD_DIR)/interfaces/NTL-interface.o: $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp | $(BUILD_DIR)/interfaces
 	@echo "  CXX $(@:$(BUILD_DIR)/%=%)"
-	@$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@ -MMD -MF $(@:%=%.d)
+	@$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $< -o $@ -MMD -MF $(@:%=%.d)
 endif
 endif
 
@@ -525,7 +526,7 @@ ifneq ($(SHARED), 0)
 define xxx_LOBJS_rule
 $(BUILD_DIR)/$(1)/%.lo: $(SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(PIC_FLAG) $(CFLAGS) $(CPPFLAGS) -c $$< -o $$@ -MMD -MF $$(@:%=%.d)
+	@$(CC) $(PIC_FLAG) $(CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ -MMD -MF $$(@:%=%.d)
 endef
 
 $(foreach dir, $(DIRS), $(eval $(call xxx_LOBJS_rule,$(dir))))
@@ -533,7 +534,7 @@ $(foreach dir, $(DIRS), $(eval $(call xxx_LOBJS_rule,$(dir))))
 ifneq ($(WANT_NTL), 0)
 $(BUILD_DIR)/interfaces/NTL-interface.lo: $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp | $(BUILD_DIR)/interfaces
 	@echo "  CXX $(@:$(BUILD_DIR)/%=%)"
-	@$(CXX) $(PIC_FLAG) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@ -MMD -MF $(@:%=.d)
+	@$(CXX) $(PIC_FLAG) $(CXXFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $< -o $@ -MMD -MF $(@:%=.d)
 endif
 endif
 
