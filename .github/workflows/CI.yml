@@ -459,8 +459,7 @@ jobs:
 
     # The following permission is needed to properly cancel other actions in
     # case of failure
-    permissions:
-      actions: write
+    permissions: write-all
 
     steps:
       - uses: actions/checkout@v3
