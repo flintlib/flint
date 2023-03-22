@@ -13,7 +13,9 @@
 
 #if FLINT_USES_BLAS && FLINT_BITS == 64
 
-#include "thread_support.h"
+#include "thread_pool.h"
+#include "nmod.h"
+#include "fmpz.h"
 #include "cblas.h"
 
 /*
