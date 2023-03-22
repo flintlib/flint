@@ -480,6 +480,9 @@ jobs:
         run: |
           this_command_should_not_exist
 
+      - if: failure()
+        name: "If failure, stop all other jobs"
+        uses: andymckay/cancel-action@0.3
 
 
   ##############################################################################
