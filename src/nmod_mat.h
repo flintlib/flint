@@ -55,13 +55,8 @@ slong nmod_mat_ncols(const nmod_mat_t mat)
    return mat->c;
 }
 
-#define _nmod_mat_set_mod(_mat, _n) \
-do \
-{ \
-    (_mat)->mod.n = (_n); \
-    count_leading_zeros((_mat)->mod.norm, (_n)); \
-    invert_limb((_mat)->mod.ninv, (_n) << (_mat)->mod.norm); \
-} while (0)
+/* TODO: Document */
+void nmod_mat_set_mod(nmod_mat_t mat, mp_limb_t n);
 
 /* Memory management */
 void nmod_mat_init(nmod_mat_t mat, slong rows, slong cols, mp_limb_t n);

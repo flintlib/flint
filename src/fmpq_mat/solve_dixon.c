@@ -114,8 +114,8 @@ _fmpq_mat_solve_dixon(fmpq_mat_t X,
 #else
         for (j = 0; j < num_primes; j++)
         {
-            _nmod_mat_set_mod(y_mod, crt_primes[j]);
-            _nmod_mat_set_mod(Ay_mod, crt_primes[j]);
+            nmod_mat_set_mod(y_mod, crt_primes[j]);
+            nmod_mat_set_mod(Ay_mod, crt_primes[j]);
             nmod_mat_mul(Ay_mod, A_mod[j], y_mod);
             if (j == 0)
             {
@@ -130,7 +130,7 @@ _fmpq_mat_solve_dixon(fmpq_mat_t X,
         }
 #endif
 
-        _nmod_mat_set_mod(y_mod, p);
+        nmod_mat_set_mod(y_mod, p);
         fmpz_mat_sub(d, d, Ay);
         fmpz_mat_scalar_divexact_ui(d, d, p);
     }

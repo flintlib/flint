@@ -43,5 +43,5 @@ nmod_mat_init(nmod_mat_t mat, slong rows, slong cols, mp_limb_t n)
     mat->r = rows;
     mat->c = cols;
 
-    _nmod_mat_set_mod(mat, n);
+    nmod_mat_set_mod(mat, n);
 }

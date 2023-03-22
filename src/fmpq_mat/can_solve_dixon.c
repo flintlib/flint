@@ -47,8 +47,8 @@ fmpq_mat_can_solve_fmpz_mat_dixon(fmpq_mat_t X,
     while (1)
     {
         p = n_nextprime(p, 0);
-        _nmod_mat_set_mod(Ap, p);
-        _nmod_mat_set_mod(LU, p);
+        nmod_mat_set_mod(Ap, p);
+        nmod_mat_set_mod(LU, p);
 
         fmpz_mat_get_nmod_mat(Ap, A);
 

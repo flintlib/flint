@@ -150,9 +150,9 @@ _fmpq_mat_can_solve_multi_mod(fmpq_mat_t X,
         while (1)
         {
            p = n_nextprime(p, 1);
-           _nmod_mat_set_mod(Xmod, p);
-           _nmod_mat_set_mod(Amod, p);
-           _nmod_mat_set_mod(Bmod, p);
+           nmod_mat_set_mod(Xmod, p);
+           nmod_mat_set_mod(Amod, p);
+           nmod_mat_set_mod(Bmod, p);
            fmpz_mat_get_nmod_mat(Amod, A);
            fmpz_mat_get_nmod_mat(Bmod, B);
 
