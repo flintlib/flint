@@ -21,7 +21,7 @@ jobs:
     # The following permission is needed to properly cancel other actions in
     # case of failure
     permissions:
-      actions: read|write
+      actions: write
 
     steps:
       - uses: actions/checkout@v3
@@ -74,7 +74,7 @@ jobs:
     # The following permission is needed to properly cancel other actions in
     # case of failure
     permissions:
-      actions: read|write
+      actions: write
 
     steps:
       - uses: actions/checkout@v3
@@ -128,7 +128,7 @@ jobs:
     # The following permission is needed to properly cancel other actions in
     # case of failure
     permissions:
-      actions: read|write
+      actions: write
 
     steps:
       - uses: actions/checkout@v3
@@ -178,7 +178,7 @@ jobs:
     # The following permission is needed to properly cancel other actions in
     # case of failure
     permissions:
-      actions: read|write
+      actions: write
 
     steps:
       - uses: actions/checkout@v3
@@ -239,7 +239,7 @@ jobs:
     # The following permission is needed to properly cancel other actions in
     # case of failure
     permissions:
-      actions: read|write
+      actions: write
 
     steps:
       - uses: actions/checkout@v3
@@ -300,7 +300,7 @@ jobs:
     # The following permission is needed to properly cancel other actions in
     # case of failure
     permissions:
-      actions: read|write
+      actions: write
 
     steps:
       - uses: actions/checkout@v3
@@ -354,7 +354,7 @@ jobs:
     # The following permission is needed to properly cancel other actions in
     # case of failure
     permissions:
-      actions: read|write
+      actions: write
 
     steps:
       - uses: actions/checkout@v3
@@ -408,7 +408,7 @@ jobs:
     # The following permission is needed to properly cancel other actions in
     # case of failure
     permissions:
-      actions: read|write
+      actions: write
 
     steps:
       - uses: actions/checkout@v3
@@ -460,7 +460,7 @@ jobs:
     # The following permission is needed to properly cancel other actions in
     # case of failure
     permissions:
-      actions: read|write
+      actions: write
 
     steps:
       - uses: actions/checkout@v3
@@ -493,7 +493,7 @@ jobs:
     # The following permission is needed to properly cancel other actions in
     # case of failure
     permissions:
-      actions: read|write
+      actions: write
 
     steps:
       - uses: actions/checkout@v3
@@ -561,7 +561,7 @@ jobs:
     # The following permission is needed to properly cancel other actions in
     # case of failure
     permissions:
-      actions: read|write
+      actions: write
 
     steps:
       - uses: actions/checkout@v3
