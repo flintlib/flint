@@ -18,6 +18,11 @@ jobs:
       CC: "gcc"
       CFLAGS: "-Wall"
 
+    # The following permission is needed to properly cancel other actions in
+    # case of failure
+    permissions:
+      actions: read|write
+
     steps:
       - uses: actions/checkout@v3
 
@@ -65,6 +70,11 @@ jobs:
       MAKE: "make -j --output-sync=target"
       CC: "gcc"
       CFLAGS: "-Wall"
+
+    # The following permission is needed to properly cancel other actions in
+    # case of failure
+    permissions:
+      actions: read|write
 
     steps:
       - uses: actions/checkout@v3
@@ -115,6 +125,11 @@ jobs:
       EXTRA_OPTIONS: "--disable-static --enable-shared"
       CC: "gcc"
 
+    # The following permission is needed to properly cancel other actions in
+    # case of failure
+    permissions:
+      actions: read|write
+
     steps:
       - uses: actions/checkout@v3
 
@@ -159,6 +174,11 @@ jobs:
     name: FreeBSD Clang (x0.5)
 
     runs-on: macos-latest
+
+    # The following permission is needed to properly cancel other actions in
+    # case of failure
+    permissions:
+      actions: read|write
 
     steps:
       - uses: actions/checkout@v3
@@ -216,6 +236,11 @@ jobs:
       EXTRA_OPTIONS: "--enable-shared --disable-static"
       CC: "gcc"
 
+    # The following permission is needed to properly cancel other actions in
+    # case of failure
+    permissions:
+      actions: read|write
+
     steps:
       - uses: actions/checkout@v3
 
@@ -272,6 +297,11 @@ jobs:
       CC: "clang"
       EXTRA_OPTIONS: "--disable-static --enable-shared"
 
+    # The following permission is needed to properly cancel other actions in
+    # case of failure
+    permissions:
+      actions: read|write
+
     steps:
       - uses: actions/checkout@v3
 
@@ -320,6 +350,11 @@ jobs:
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: "-Wall"
+
+    # The following permission is needed to properly cancel other actions in
+    # case of failure
+    permissions:
+      actions: read|write
 
     steps:
       - uses: actions/checkout@v3
@@ -370,6 +405,11 @@ jobs:
       EXTRA_OPTIONS: "--enable-shared --disable-static"
       CC: "gcc"
 
+    # The following permission is needed to properly cancel other actions in
+    # case of failure
+    permissions:
+      actions: read|write
+
     steps:
       - uses: actions/checkout@v3
 
@@ -416,6 +456,11 @@ jobs:
     name: MSVC (x1, excl test)
 
     runs-on: windows-latest
+
+    # The following permission is needed to properly cancel other actions in
+    # case of failure
+    permissions:
+      actions: read|write
 
     steps:
       - uses: actions/checkout@v3
@@ -479,6 +524,11 @@ jobs:
       CFLAGS: ""
       EXTRA_OPTIONS: "--disable-static --enable-shared"
       CC: "gcc"
+
+    # The following permission is needed to properly cancel other actions in
+    # case of failure
+    permissions:
+      actions: read|write
 
     steps:
       - uses: actions/checkout@v3
