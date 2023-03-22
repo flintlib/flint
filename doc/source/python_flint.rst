@@ -57,17 +57,24 @@ API documentation
 -------------------------------------------------------------------------------
 
 ..
-    automodsumm:: flint_ctypes
+   automodsumm:: flint_ctypes
 
-.. autoclass:: flint_ctypes.FlintDomainError
+..
+   autoclass:: flint_ctypes.FlintDomainError
 
-.. autoclass:: flint_ctypes.FlintUnableError
+..
+   autoclass:: flint_ctypes.FlintUnableError
 
-.. automodule:: flint_ctypes
-  :members:
-  :undoc-members:
-  :special-members: __init__ , __bool__
-  :member-order: bysource
+..
+   automodule:: flint_ctypes
+..
+   :members:
+..
+   :undoc-members:
+..
+   :special-members: __init__ , __bool__
+..
+   :member-order: bysource
 
 
 
