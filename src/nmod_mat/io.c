@@ -11,6 +11,7 @@
 */
 
 #include <stdio.h>
+#include "ulong_extras.h"
 #include "nmod_mat.h"
 
 int nmod_mat_fprint_pretty(FILE * file, const nmod_mat_t mat)

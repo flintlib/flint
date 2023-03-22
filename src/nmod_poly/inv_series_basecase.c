@@ -9,10 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
-#include "ulong_extras.h"
 
 void
 _nmod_poly_inv_series_basecase(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod)

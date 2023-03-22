@@ -9,11 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "ulong_extras.h"
+#include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
-
 
 static void
 _interpolate_newton(mp_ptr ys, mp_srcptr xs, slong n, nmod_t mod)

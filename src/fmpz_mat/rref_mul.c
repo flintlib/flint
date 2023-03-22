@@ -11,6 +11,7 @@
 */
 
 #include "ulong_extras.h"
+#include "perm.h"
 #include "nmod_mat.h"
 #include "fmpz_mat.h"
 

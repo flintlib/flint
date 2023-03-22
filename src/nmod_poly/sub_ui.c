@@ -10,8 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "nmod_poly.h"
-
 
 void nmod_poly_sub_ui(nmod_poly_t res, const nmod_poly_t poly, ulong c)
 {

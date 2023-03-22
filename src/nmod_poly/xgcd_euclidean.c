@@ -10,8 +10,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly.h"
 #include "mpn_extras.h"
+#include "ulong_extras.h"
+#include "nmod_vec.h"
+#include "nmod_poly.h"
 
 slong _nmod_poly_xgcd_euclidean(mp_ptr G, mp_ptr S, mp_ptr T,
                                mp_srcptr A, slong lenA,

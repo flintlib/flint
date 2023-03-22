@@ -13,6 +13,13 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
+typedef struct
+{
+    ulong x;
+    ulong y;
+}
+n_pair_t;
+
 n_pair_t
 lchain_precomp(mp_limb_t m, mp_limb_t a, mp_limb_t n, double npre)
 {

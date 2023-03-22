@@ -24,6 +24,4 @@ nmod_mat_concat_horizontal(nmod_mat_t res, const nmod_mat_t mat1, const nmod_mat
     	flint_mpn_copyi(res->rows[i], mat1->rows[i], c1);
     	flint_mpn_copyi(res->rows[i] + c1, mat2->rows[i], c2);
     }
-
-
 }

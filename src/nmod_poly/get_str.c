@@ -11,7 +11,6 @@
 */
 
 #include <math.h>
-#include "flint.h"
 #include "nmod_poly.h"
 
 char * nmod_poly_get_str(const nmod_poly_t poly)

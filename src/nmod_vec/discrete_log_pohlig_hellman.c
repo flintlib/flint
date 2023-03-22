@@ -11,7 +11,7 @@
 
 #include <math.h>
 #include <stdlib.h>
-#include "flint.h"
+#include "nmod.h"
 #include "nmod_vec.h"
 #include "fmpz.h"
 

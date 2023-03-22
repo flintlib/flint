@@ -10,10 +10,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "ulong_extras.h"
+#include "nmod_mat.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
-#include "nmod_mat.h"
 
 int
 main(void)
@@ -23,8 +23,6 @@ main(void)
 
     flint_printf("CRT_ui_unsigned....");
     fflush(stdout);
-
-
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {

@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly.h"
 #include "ulong_extras.h"
+#include "nmod_poly.h"
 
 int
 main(void)

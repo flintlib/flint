@@ -9,10 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "ulong_extras.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
-#include "ulong_extras.h"
 
 /*
     compute f^0, f^1, ..., f^(n-1) mod g, where g has length glen and f is

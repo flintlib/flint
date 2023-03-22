@@ -22,6 +22,8 @@
 #define FQ_TEMPLATES_INLINE static __inline__
 #endif
 
+#include "nmod.h"
+#include "nmod_vec.h"
 #include "nmod_poly.h"
 
 /* Data types and context ****************************************************/
@@ -84,11 +86,7 @@ FQ_NMOD_INLINE slong fq_nmod_ctx_degree(const fq_nmod_ctx_t ctx)
 
 #define fq_nmod_ctx_prime(ctx)  (&((ctx)->p))
 
-FQ_NMOD_INLINE void fq_nmod_ctx_order(fmpz_t f, const fq_nmod_ctx_t ctx)
-{
-    fmpz_set(f, fq_nmod_ctx_prime(ctx));
-    fmpz_pow_ui(f, f, fq_nmod_ctx_degree(ctx));
-}
+void fq_nmod_ctx_order(fmpz_t f, const fq_nmod_ctx_t ctx);
 
 #ifdef FLINT_HAVE_FILE
 int fq_nmod_ctx_fprint(FILE * file, const fq_nmod_ctx_t ctx);
@@ -268,15 +266,7 @@ FQ_NMOD_INLINE void fq_nmod_set(fq_nmod_t rop, const fq_nmod_t op,
     nmod_poly_set(rop, op);
 }
 
-FQ_NMOD_INLINE void fq_nmod_set_fmpz(fq_nmod_t rop, const fmpz_t x, const fq_nmod_ctx_t ctx)
-{
-    fmpz_t rx;
-    fmpz_init(rx);
-    fmpz_mod(rx, x, fq_nmod_ctx_prime(ctx));
-    nmod_poly_zero(rop);
-    nmod_poly_set_coeff_ui(rop, 0, fmpz_get_ui(rx));
-    fmpz_clear(rx);
-}
+void fq_nmod_set_fmpz(fq_nmod_t rop, const fmpz_t x, const fq_nmod_ctx_t ctx);
 
 FQ_NMOD_INLINE void fq_nmod_set_si(fq_nmod_t rop, const slong x, const fq_nmod_ctx_t ctx)
 {

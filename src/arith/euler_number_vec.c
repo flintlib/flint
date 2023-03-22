@@ -9,8 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
+#include "nmod.h"
+#include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "fmpz.h"
 #include "arith.h"
 
 /* Computes length-m vector containing |E_{2k}| */

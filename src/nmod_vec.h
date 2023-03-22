@@ -19,8 +19,7 @@
 #define NMOD_VEC_INLINE static __inline__
 #endif
 
-
-#include "nmod.h"
+#include "flint.h"
 
 #ifdef __cplusplus
 extern "C" {

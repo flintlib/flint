@@ -19,7 +19,6 @@
 #define NMOD_INLINE static __inline__
 #endif
 
-
 #include "ulong_extras.h"
 #include "nmod_types.h"
 

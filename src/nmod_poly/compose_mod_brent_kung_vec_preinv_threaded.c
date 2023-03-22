@@ -14,12 +14,11 @@
 #if FLINT_USES_PTHREAD
 #include <pthread.h>
 #endif
-#include "flint.h"
+#include "thread_support.h"
+#include "ulong_extras.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "nmod_mat.h"
-#include "ulong_extras.h"
-#include "thread_support.h"
 
 typedef struct
 {

@@ -10,7 +10,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "nmod_vec.h"
 
 flint_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, slong len)

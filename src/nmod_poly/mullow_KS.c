@@ -10,10 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "nmod_vec.h"
-#include "nmod_poly.h"
 #include "mpn_extras.h"
+#include "nmod_poly.h"
 
 void
 _nmod_poly_mullow_KS(mp_ptr out, mp_srcptr in1, slong len1,

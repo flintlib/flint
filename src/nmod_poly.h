@@ -22,9 +22,7 @@
 #define NMOD_POLY_INLINE static __inline__
 #endif
 
-#include "nmod_vec.h"
 #include "nmod_types.h"
-#include "fmpz.h"
 #include "thread_pool.h"
 
 #ifdef __cplusplus
@@ -151,11 +149,7 @@ mp_limb_t nmod_poly_modulus(const nmod_poly_t poly)
     return poly->mod.n;
 }
 
-NMOD_POLY_INLINE
-flint_bitcnt_t nmod_poly_max_bits(const nmod_poly_t poly)
-{
-    return _nmod_vec_max_bits(poly->coeffs, poly->length);
-}
+flint_bitcnt_t nmod_poly_max_bits(const nmod_poly_t poly);
 
 NMOD_POLY_INLINE
 mp_ptr nmod_poly_lead(const nmod_poly_t poly)
@@ -222,32 +216,15 @@ void nmod_poly_truncate(nmod_poly_t poly, slong len)
     }
 }
 
-void nmod_poly_set_trunc(nmod_poly_t res,
-                                              const nmod_poly_t poly, slong n);
+void nmod_poly_set_trunc(nmod_poly_t res, const nmod_poly_t poly, slong n);
 
-void _nmod_poly_reverse(mp_ptr output,
-                                          mp_srcptr input, slong len, slong m);
-
-void nmod_poly_reverse(nmod_poly_t output,
-                                             const nmod_poly_t input, slong m);
+void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, slong len, slong m);
+void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, slong m);
 
 /* Comparison  ***************************************************************/
 
-NMOD_POLY_INLINE
-int nmod_poly_equal(const nmod_poly_t a, const nmod_poly_t b)
-{
-    if (a->length != b->length)
-        return 0;
-
-    if (a != b)
-        if (!_nmod_vec_equal(a->coeffs, b->coeffs, a->length))
-            return 0;
-
-   return 1;
-}
-
-int nmod_poly_equal_trunc(const nmod_poly_t poly1,
-                                             const nmod_poly_t poly2, slong n);
+int nmod_poly_equal(const nmod_poly_t a, const nmod_poly_t b);
+int nmod_poly_equal_trunc(const nmod_poly_t poly1, const nmod_poly_t poly2, slong n);
 
 NMOD_POLY_INLINE
 int nmod_poly_is_zero(const nmod_poly_t poly)
@@ -1251,6 +1228,7 @@ void nmod_poly_inflate(nmod_poly_t result, const nmod_poly_t input,
     ulong inflation);
 
 /* Characteristic polynomial and minimal polynomial */
+/* FIXME: These should be moved to nmod_mat.h. */
 
 void _nmod_mat_charpoly_berkowitz(mp_ptr p, const nmod_mat_t M, nmod_t mod);
 void nmod_mat_charpoly_berkowitz(nmod_poly_t p, const nmod_mat_t M);
@@ -1332,7 +1310,5 @@ NMOD_POLY_INLINE const nmod_poly_struct * nmod_berlekamp_massey_R_poly(
 #ifdef __cplusplus
 }
 #endif
-
-#include "nmod_poly_factor.h"
 
 #endif

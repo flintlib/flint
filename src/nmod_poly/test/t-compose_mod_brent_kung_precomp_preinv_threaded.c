@@ -12,9 +12,10 @@
 */
 
 #include "thread_support.h"
+#include "ulong_extras.h"
+#include "nmod_vec.h"
 #include "nmod_mat.h"
 #include "nmod_poly.h"
-#include "ulong_extras.h"
 
 int
 main(void)

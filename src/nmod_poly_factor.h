@@ -22,6 +22,7 @@
 #define NMOD_POLY_FACTOR_INLINE static __inline__
 #endif
 
+#include "limb_types.h"
 #include "nmod_poly.h"
 
 #ifdef __cplusplus

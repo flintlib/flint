@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "nmod_vec.h"
+#include "nmod.h"
 #include "nmod_mat.h"
-#include "nmod_poly.h"
 
 void nmod_mat_similarity(nmod_mat_t M, slong r, ulong d)
 {

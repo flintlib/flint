@@ -20,10 +20,7 @@
 #define NMOD_MAT_INLINE static __inline__
 #endif
 
-#include "perm.h"
-#include "ulong_extras.h"
-#include "nmod_vec.h"
-#include "fmpz.h"
+#include "nmod_types.h"
 #include "thread_pool.h"
 
 #ifdef __cplusplus
@@ -58,13 +55,13 @@ slong nmod_mat_ncols(const nmod_mat_t mat)
    return mat->c;
 }
 
-NMOD_MAT_INLINE
-void _nmod_mat_set_mod(nmod_mat_t mat, mp_limb_t n)
-{
-    mat->mod.n = n;
-    count_leading_zeros(mat->mod.norm, n);
-    invert_limb(mat->mod.ninv, n << mat->mod.norm);
-}
+#define _nmod_mat_set_mod(_mat, _n) \
+do \
+{ \
+    (_mat)->mod.n = (_n); \
+    count_leading_zeros((_mat)->mod.norm, (_n)); \
+    invert_limb((_mat)->mod.ninv, (_n) << (_mat)->mod.norm); \
+} while (0)
 
 /* Memory management */
 void nmod_mat_init(nmod_mat_t mat, slong rows, slong cols, mp_limb_t n);
@@ -120,14 +117,8 @@ int nmod_mat_equal(const nmod_mat_t mat1, const nmod_mat_t mat2);
 void nmod_mat_zero(nmod_mat_t mat);
 
 int nmod_mat_is_zero(const nmod_mat_t mat);
-
 int nmod_mat_is_one(const nmod_mat_t mat);
-
-NMOD_MAT_INLINE
-int nmod_mat_is_zero_row(const nmod_mat_t mat, slong i)
-{
-    return _nmod_vec_is_zero(mat->rows[i], mat->c);
-}
+int nmod_mat_is_zero_row(const nmod_mat_t mat, slong i);
 
 NMOD_MAT_INLINE
 int nmod_mat_is_empty(const nmod_mat_t mat)
@@ -158,15 +149,7 @@ void nmod_mat_scalar_addmul_ui(nmod_mat_t dest,
                        const nmod_mat_t X, const nmod_mat_t Y, const mp_limb_t b);
 
 
-NMOD_MAT_INLINE
-void nmod_mat_scalar_mul_fmpz(nmod_mat_t res, const nmod_mat_t M, const fmpz_t c)
-{
-    fmpz_t d;
-    fmpz_init(d);
-    fmpz_mod_ui(d, c, res->mod.n);
-    nmod_mat_scalar_mul(res, M, fmpz_get_ui(d));
-    fmpz_clear(d);
-}
+void nmod_mat_scalar_mul_fmpz(nmod_mat_t res, const nmod_mat_t M, const fmpz_t c);
 
 /* Matrix multiplication */
 
@@ -319,32 +302,7 @@ void nmod_mat_invert_cols(nmod_mat_t mat, slong * perm)
     }
 }
 
-/** Permute rows of a matrix `mat` according to `perm_act`, and propagate the
- * action on `perm_store`.
- * That is, performs for each appropriate index `i`, the operations
- * `perm_store[i] <- perm_store[perm_act[i]]`
- * `rows[i] <- rows[perm_act[i]]` */
-NMOD_MAT_INLINE void
-nmod_mat_permute_rows(nmod_mat_t mat,
-                      const slong * perm_act,
-                      slong * perm_store)
-{
-		slong i;
-    mp_limb_t ** mat_tmp = (mp_limb_t **) flint_malloc(mat->r * sizeof(mp_limb_t *));
-
-    /* perm_store[i] <- perm_store[perm_act[i]] */
-    if (perm_store)
-        _perm_compose(perm_store, perm_store, perm_act, mat->r);
-
-    /* rows[i] <- rows[perm_act[i]]  */
-    for (i = 0; i < mat->r; i++)
-        mat_tmp[i] = mat->rows[perm_act[i]];
-    for (i = 0; i < mat->r; i++)
-        mat->rows[i] = mat_tmp[i];
-
-    flint_free(mat_tmp);
-}
-
+void nmod_mat_permute_rows(nmod_mat_t mat, const slong * perm_act, slong * perm_store);
 
 /* Triangular solving */
 

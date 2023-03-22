@@ -10,8 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "ulong_extras.h"
+#include "nmod.h"
 #include "nmod_vec.h"
 
 void _nmod_vec_scalar_addmul_nmod_fullword(mp_ptr res, mp_srcptr vec,

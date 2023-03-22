@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "nmod_poly.h"
 
 slong _nmod_poly_gcd(mp_ptr G, mp_srcptr A, slong lenA,

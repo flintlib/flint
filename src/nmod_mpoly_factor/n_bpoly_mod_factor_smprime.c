@@ -10,6 +10,7 @@
 */
 
 #include "nmod_mat.h"
+#include "nmod_poly_factor.h"
 #include "nmod_mpoly_factor.h"
 
 static void n_bpoly_reverse_gens(n_bpoly_t a, const n_bpoly_t b)

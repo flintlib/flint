@@ -11,12 +11,11 @@
 
 #include <math.h>
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "fmpz_mat.h"
+#include "ulong_extras.h"
 #include "nmod_mat.h"
 #include "nmod_poly.h"
+#include "fmpz_poly.h"
+#include "fmpz_mat.h"
 
 #define CHARPOLY_M_LOG2E  1.44269504088896340736  /* log2(e) */
 

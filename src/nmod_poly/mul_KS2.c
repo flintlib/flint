@@ -10,10 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "mpn_extras.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
-#include "mpn_extras.h"
 
 /*
    Multiplication/squaring using Kronecker substitution at 2^b and -2^b.
