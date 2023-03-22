@@ -9,9 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "ulong_extras.h"
-#include "nmod_vec.h"
 #include "nmod_poly.h"
 
 void _nmod_poly_integral(mp_ptr res, mp_srcptr poly, slong len, nmod_t mod)

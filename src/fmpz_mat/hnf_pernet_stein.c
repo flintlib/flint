@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "perm.h"
+#include "nmod.h"
 #include "nmod_mat.h"
 #include "fmpz_mat.h"
 #include "fmpq_mat.h"
@@ -359,7 +361,7 @@ double_det(fmpz_t d1, fmpz_t d2, const fmpz_mat_t B, const fmpz_mat_t c,
             u2mod = fmpz_fdiv_ui(u2, p);
             if (!(u1mod || u2mod))
                 continue;
-            _nmod_mat_set_mod(Btmod, p);
+            nmod_mat_set_mod(Btmod, p);
             for (i = 0; i < n; i++)
             {
                 for (j = 0; j < n - 1; j++)

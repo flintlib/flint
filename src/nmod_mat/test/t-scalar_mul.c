@@ -9,11 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <limits.h>
-#include "flint.h"
+#include "nmod.h"
 #include "nmod_mat.h"
-#include "nmod_vec.h"
-#include "ulong_extras.h"
 
 int
 main(void)

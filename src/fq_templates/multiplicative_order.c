@@ -13,7 +13,7 @@
 
 #include "templates.h"
 
-int TEMPLATE(T, multiplicative_order)(fmpz_t ord, const TEMPLATE(T, t) op,
+int TEMPLATE(T, multiplicative_order)(fmpz * ord, const TEMPLATE(T, t) op,
                                       const TEMPLATE(T, ctx_t) ctx)
 {
     fmpz_t tmp;
@@ -21,6 +21,9 @@ int TEMPLATE(T, multiplicative_order)(fmpz_t ord, const TEMPLATE(T, t) op,
     TEMPLATE(T, t) one;
     slong i, j;
     int is_primitive = 1;
+
+    if (ord == NULL)
+        ord = tmp;
 
     if (TEMPLATE(T, is_zero)(op, ctx))
     {

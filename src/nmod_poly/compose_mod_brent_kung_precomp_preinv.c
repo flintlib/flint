@@ -11,11 +11,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "ulong_extras.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "nmod_mat.h"
-#include "ulong_extras.h"
 
 void
 _nmod_poly_reduce_matrix_mod_poly(nmod_mat_t A, const nmod_mat_t B,

@@ -9,9 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "fmpz_poly.h"
-
 
 void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, slong len1,
                                         const fmpz * poly2, slong len2)

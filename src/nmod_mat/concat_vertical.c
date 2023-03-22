@@ -24,5 +24,4 @@ nmod_mat_concat_vertical(nmod_mat_t res, const nmod_mat_t mat1, const nmod_mat_t
 
     for (i = 0; i < r2; i++)
     	flint_mpn_copyi(res->rows[i + r1], mat2->rows[i], c1);
-
 }

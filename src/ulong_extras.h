@@ -21,24 +21,11 @@
 #define ULONG_EXTRAS_INLINE static __inline__
 #endif
 
-#include "flint.h"
+#include "limb_types.h"
 
 #ifdef __cplusplus
  extern "C" {
 #endif
-
-typedef struct pair_s
-{
-    ulong x, y;
-} n_pair_t;
-
-#define FLINT_MAX_FACTORS_IN_LIMB 15
-
-typedef struct {
-   int num;
-   int exp[FLINT_MAX_FACTORS_IN_LIMB];
-   ulong p[FLINT_MAX_FACTORS_IN_LIMB];
-} n_factor_t;
 
 #define FLINT_ODDPRIME_SMALL_CUTOFF 4096
 #define FLINT_NUM_PRIMES_SMALL 172

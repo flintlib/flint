@@ -20,16 +20,25 @@
 # include <stdarg.h>
 #endif
 
-#if !defined(_MSC_VER)
-#include <sys/param.h> /* for BSD define */
+#if defined(__CYGWIN__)
+# include <sys/param.h>
 #endif
+
+#include <limits.h>
 #include <gmp.h>
-#include "limits.h"
 #include "longlong.h"
 #include "flint-config.h"
 
+#if FLINT_USES_GC
+# include "gc.h"
+#endif
+
+#if FLINT_WANT_ASSERT
+# include <assert.h>
+#endif
+
 #ifndef FLINT_DLL
-#define FLINT_DLL
+# define FLINT_DLL
 #endif
 
 #ifndef alloca
@@ -57,21 +66,13 @@
 #endif
 
 #ifdef FLINT_INLINES_C
-#define FLINT_INLINE
+# define FLINT_INLINE
 #else
-#define FLINT_INLINE static __inline__
-#endif
-
-#if FLINT_USES_GC
-#include "gc.h"
-#endif
-
-#if FLINT_WANT_ASSERT
-#include <assert.h>
+# define FLINT_INLINE static __inline__
 #endif
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* flint version number */
@@ -93,8 +94,8 @@
    the code to be compiled with the "-ansi" flag under GCC
  */
 #ifndef __GNUC__
-    #define __asm__     asm
-    #define __inline__  inline
+# define __asm__     asm
+# define __inline__  inline
 #endif
 
 FLINT_DLL extern char flint_version[];

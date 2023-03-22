@@ -10,7 +10,7 @@
 */
 
 #include <math.h>
-#include "nmod_poly.h"
+#include "nmod_poly_factor.h"
 
 void nmod_poly_factor_kaltofen_shoup(nmod_poly_factor_t res,
                                      const nmod_poly_t poly)

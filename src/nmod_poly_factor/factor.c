@@ -13,9 +13,7 @@
 */
 
 #include <math.h>
-#include "flint.h"
-#include "nmod_poly.h"
-#include "ulong_extras.h"
+#include "nmod_poly_factor.h"
 
 #define ZASSENHAUS 0
 #define BERLEKAMP 1

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_vec.h"
 #include "nmod_mat.h"
 #include "nmod_poly_mat.h"
 

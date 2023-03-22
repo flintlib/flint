@@ -1,6 +1,8 @@
 /*
     Copyright (C) 2020 Daniel Schultz
+
     This file is part of FLINT.
+
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
@@ -8,10 +10,12 @@
 */
 
 #include "nmod_mat.h"
-#include "thread_support.h"
 
 #if FLINT_USES_BLAS && FLINT_BITS == 64
 
+#include "thread_pool.h"
+#include "nmod.h"
+#include "fmpz.h"
 #include "cblas.h"
 
 /*

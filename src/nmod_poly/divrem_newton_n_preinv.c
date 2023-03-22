@@ -10,15 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-
-
-
-
-
-#include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
-#include "ulong_extras.h"
 
 void _nmod_poly_divrem_newton_n_preinv(mp_ptr Q, mp_ptr R, mp_srcptr A,
                                         slong lenA, mp_srcptr B, slong lenB,

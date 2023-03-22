@@ -26,7 +26,7 @@ int TEMPLATE(T, is_invertible_f)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op,
 void TEMPLATE(T, div)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op1,
                  const TEMPLATE(T, t) op2, const TEMPLATE(T, ctx_t) ctx);
 
-int TEMPLATE(T, multiplicative_order)(fmpz_t ord, const TEMPLATE(T, t) op,
+int TEMPLATE(T, multiplicative_order)(fmpz * ord, const TEMPLATE(T, t) op,
                              const TEMPLATE(T, ctx_t) ctx);
 
 #ifdef B
@@ -42,11 +42,8 @@ void TEMPLATE4(T, set, B, mat)(TEMPLATE(T, t) a,
 FQ_TEMPLATES_INLINE
 int TEMPLATE(T, is_primitive)(const TEMPLATE(T, t) op, const TEMPLATE(T, ctx_t) ctx)
 {
-    fmpz_t tmp;
     int ret;
-    fmpz_init(tmp);
-    ret = TEMPLATE(T, multiplicative_order)(tmp, op, ctx) == 1;
-    fmpz_clear(tmp);
+    ret = TEMPLATE(T, multiplicative_order)(NULL, op, ctx) == 1;
     return ret;
 }
 

@@ -11,6 +11,7 @@
 
 #include <string.h>
 
+#include "fmpz.h"
 #include "fq_nmod.h"
 #include "nmod_poly.h"
 

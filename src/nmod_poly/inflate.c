@@ -11,7 +11,6 @@
 */
 
 #include "nmod_poly.h"
-#include "ulong_extras.h"
 
 void
 nmod_poly_inflate(nmod_poly_t result, const nmod_poly_t input, ulong inflation)

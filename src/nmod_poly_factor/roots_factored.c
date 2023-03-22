@@ -9,10 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly.h"
-#include "nmod_poly_factor.h"
 #include "long_extras.h"
-#include "ulong_extras.h"
+#include "nmod.h"
+#include "fmpz.h"
+#include "nmod_poly_factor.h"
 
 typedef nmod_poly_t n_list_t;
 

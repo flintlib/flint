@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "nmod_poly.h"
 
 void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, slong len, slong m)

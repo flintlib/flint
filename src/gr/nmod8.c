@@ -11,6 +11,7 @@
 
 #include "fmpz.h"
 #include "fmpq.h"
+#include "nmod.h"
 #include "nmod_vec.h"
 #include "gr.h"
 

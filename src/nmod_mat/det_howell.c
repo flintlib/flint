@@ -10,10 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "nmod_vec.h"
+#include "nmod.h"
 #include "nmod_mat.h"
-#include "ulong_extras.h"
 
 /*
   We do no quite need the full Howell form. We just need to reduce to upper

@@ -3,7 +3,6 @@
     Copyright (C) 2013 Mike Hansen
     Copyright (C) 2017 Claus Fieker
 
-
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
@@ -12,8 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fq_nmod.h"
-#include "nmod_mat.h"
 
 /*
     This computes the norm on $\mathbf{F}_q$.

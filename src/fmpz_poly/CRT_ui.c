@@ -9,12 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
+#include "ulong_extras.h"
 #include "fmpz_poly.h"
-#include "nmod_poly.h"
-
 
 void
 _fmpz_poly_CRT_ui_precomp(fmpz * res, const fmpz * poly1, slong len1,

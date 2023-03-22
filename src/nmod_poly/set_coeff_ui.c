@@ -10,8 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "nmod_vec.h"
+#include "nmod.h"
 #include "nmod_poly.h"
 
 void nmod_poly_set_coeff_ui(nmod_poly_t poly, slong j, ulong c)

@@ -14,12 +14,11 @@
 
 #ifdef FQ_ZECH_INLINES_C
 #define FQ_ZECH_INLINE
-/* #define FQ_TEMPLATES_INLINE */
 #else
 #define FQ_ZECH_INLINE static __inline__
-/* #define FQ_TEMPLATES_INLINE static __inline__ */
 #endif
 
+#include "fmpz.h"
 #include "fq_nmod.h"
 
 /* Data types and context ****************************************************/

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "nmod_mat.h"
 #include "fmpz_mat.h"
 #include "fmpq_mat.h"
@@ -27,9 +28,9 @@ mp_limb_t fmpz_mat_find_good_prime_and_solve(nmod_mat_t Xmod,
     while (1)
     {
         p = n_nextprime(p, 0);
-        _nmod_mat_set_mod(Xmod, p);
-        _nmod_mat_set_mod(Amod, p);
-        _nmod_mat_set_mod(Bmod, p);
+        nmod_mat_set_mod(Xmod, p);
+        nmod_mat_set_mod(Amod, p);
+        nmod_mat_set_mod(Bmod, p);
         fmpz_mat_get_nmod_mat(Amod, A);
         fmpz_mat_get_nmod_mat(Bmod, B);
         if (nmod_mat_solve(Xmod, Amod, Bmod))

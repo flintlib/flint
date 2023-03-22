@@ -14,6 +14,7 @@
 
 ******************************************************************************/
 
+#include "ulong_extras.h"
 #include "nmod_poly.h"
 #include "nf_elem.h"
 

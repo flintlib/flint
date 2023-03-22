@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "nmod_mat.h"
 #include "fmpz_mat.h"
 
@@ -26,7 +27,7 @@ fmpz_mat_find_good_prime_and_invert(nmod_mat_t Ainv,
     while (1)
     {
         p = n_nextprime(p, 0);
-        _nmod_mat_set_mod(Ainv, p);
+        nmod_mat_set_mod(Ainv, p);
         fmpz_mat_get_nmod_mat(Ainv, A);
         if (nmod_mat_inv(Ainv, Ainv))
             break;
@@ -160,8 +161,8 @@ _fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
 #else
         for (i = 0; i < num_primes; i++)
         {
-            _nmod_mat_set_mod(y_mod, crt_primes[i]);
-            _nmod_mat_set_mod(Ay_mod, crt_primes[i]);
+            nmod_mat_set_mod(y_mod, crt_primes[i]);
+            nmod_mat_set_mod(Ay_mod, crt_primes[i]);
             nmod_mat_mul(Ay_mod, A_mod[i], y_mod);
             if (i == 0)
             {
@@ -176,7 +177,7 @@ _fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
         }
 #endif
 
-        _nmod_mat_set_mod(y_mod, p);
+        nmod_mat_set_mod(y_mod, p);
         fmpz_mat_sub(d, d, Ay);
         fmpz_mat_scalar_divexact_ui(d, d, p);
     }

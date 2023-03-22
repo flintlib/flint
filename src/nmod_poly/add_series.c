@@ -10,9 +10,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "ulong_extras.h"
-#include "nmod_vec.h"
 #include "nmod_poly.h"
 
 void nmod_poly_add_series(nmod_poly_t res,

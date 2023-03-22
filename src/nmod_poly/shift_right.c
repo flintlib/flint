@@ -9,8 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "nmod_vec.h"
 #include "nmod_poly.h"
 
 void _nmod_poly_shift_right(mp_ptr res, mp_srcptr poly, slong len, slong k)

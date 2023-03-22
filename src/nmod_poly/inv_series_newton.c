@@ -11,10 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
-#include "ulong_extras.h"
 
 #define MULLOW(z, x, xn, y, yn, nn, mod) \
     if ((xn) >= (yn)) \
