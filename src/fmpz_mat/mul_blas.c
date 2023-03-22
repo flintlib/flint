@@ -20,6 +20,7 @@
 
 #if FLINT_USES_BLAS && FLINT_BITS == 64
 
+#include "thread_pool.h"
 #include "cblas.h"
 
 
