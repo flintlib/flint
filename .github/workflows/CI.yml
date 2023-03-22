@@ -450,6 +450,39 @@ jobs:
 
 
   ##############################################################################
+  # TEMPORARY
+  ##############################################################################
+  tmp:
+    name: SHOULD CANCEL OTHER JOBS
+
+    runs-on: windows-latest
+
+    # The following permission is needed to properly cancel other actions in
+    # case of failure
+    permissions:
+      actions: read|write
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: "Setup Conda"
+        uses: conda-incubator/setup-miniconda@v2.2.0
+        with:
+          miniconda-version: "latest"
+          channels: conda-forge
+
+      - name: "Setup MSVC"
+        uses: ilammy/msvc-dev-cmd@v1.12.1
+        with:
+          arch: x86_64
+
+      - name: "Configure"
+        run: |
+          this_command_should_not_exist
+
+
+
+  ##############################################################################
   # msvc
   ##############################################################################
   msvc:
