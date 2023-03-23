@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include "nmod_poly.h"
 #include "fmpz_mat.h"
+#include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 
 int _compare_poly_lengths(const void * a, const void * b)

@@ -109,7 +109,7 @@ fmpz_mat_col_partition(slong * part, fmpz_mat_t M, int short_circuit)
         {
             if (part[col_h[upto].col] == -WORD(1))
             {
-                if (!fmpz_mat_col_equal(M, col_h[start].col, col_h[upto].col))
+                if (!fmpz_mat_equal_col(M, col_h[start].col, col_h[upto].col))
                 {
                     if (new_start == start)
                         new_start = upto;

@@ -11,6 +11,7 @@
 
 #include "nmod_vec.h"
 #include "nmod_mat.h"
+#include "fmpz.h"
 #include "fmpz_mat.h"
 
 void

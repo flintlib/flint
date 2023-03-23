@@ -10,6 +10,7 @@
 */
 
 #include "nmod_mat.h"
+#include "fmpz_poly_factor.h"
 #include "nmod_mpoly_factor.h"
 
 static void n_bpoly_eval_fq_nmod_poly(

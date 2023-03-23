@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_mat.h"
 
 void fmpz_mat_snf_kannan_bachem(fmpz_mat_t S, const fmpz_mat_t A)

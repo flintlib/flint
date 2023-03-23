@@ -12,9 +12,9 @@
 */
 
 #include "gmpcompat.h"
+#include "fmpz.h"
 #include "fmpz_mat.h"
 #include "mpf_mat.h"
-#include "ulong_extras.h"
 
 int
 main(void)

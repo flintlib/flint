@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_mat.h"
+#include "fmpz_poly.h"
 #include "fmpz_mpoly.h"
 
 static int _fmpz_poly_pow_fmpz_is_not_feasible(const fmpz_poly_t b, const fmpz_t e)

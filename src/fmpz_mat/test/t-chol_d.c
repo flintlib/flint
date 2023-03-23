@@ -10,7 +10,6 @@
 */
 
 #include "fmpz_mat.h"
-#include "ulong_extras.h"
 
 #define FMPZ_MAT_CHOL_EPS (1.0E-9)
 
