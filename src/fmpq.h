@@ -303,36 +303,11 @@ int _fmpq_mod_fmpz(fmpz_t res, const fmpz_t num, const fmpz_t den, const fmpz_t 
 
 int fmpq_mod_fmpz(fmpz_t res, const fmpq_t x, const fmpz_t mod);
 
-FMPQ_INLINE void
-_fmpq_gcd(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q,
-            const fmpz_t r, const fmpz_t s)
-{
-   fmpz_t a, b;
-   fmpz_init(a); fmpz_init(b);
-   fmpz_mul(a, p, s);
-   fmpz_mul(b, q, r);
-   fmpz_gcd(rnum, a, b);
-   fmpz_mul(rden, q, s);
-   _fmpq_canonicalise(rnum, rden);
-   fmpz_clear(a); fmpz_clear(b);
-}
+void _fmpq_gcd(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, const fmpz_t r, const fmpz_t s);
+void fmpq_gcd(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
 
-FMPQ_INLINE void
-fmpq_gcd(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
-{
-    _fmpq_gcd(fmpq_numref(res), fmpq_denref(res), fmpq_numref(op1),
-              fmpq_denref(op1), fmpq_numref(op2), fmpq_denref(op2));
-}
-
-void _fmpq_gcd_cofactors(fmpz_t ng, fmpz_t dg, fmpz_t A, fmpz_t B,
-           const fmpz_t na, const fmpz_t da, const fmpz_t nb, const fmpz_t db);
-
-FMPQ_INLINE void
-fmpq_gcd_cofactors(fmpq_t g, fmpz_t A, fmpz_t B, const fmpq_t a, const fmpq_t b)
-{
-    _fmpq_gcd_cofactors(fmpq_numref(g), fmpq_denref(g), A, B,
-               fmpq_numref(a), fmpq_denref(a), fmpq_numref(b), fmpq_denref(b));
-}
+void _fmpq_gcd_cofactors(fmpz_t ng, fmpz_t dg, fmpz_t A, fmpz_t B, const fmpz_t na, const fmpz_t da, const fmpz_t nb, const fmpz_t db);
+void fmpq_gcd_cofactors(fmpq_t g, fmpz_t A, fmpz_t B, const fmpq_t a, const fmpq_t b);
 
 int _fmpq_reconstruct_fmpz(fmpz_t num, fmpz_t den, const fmpz_t a, const fmpz_t m);
 
