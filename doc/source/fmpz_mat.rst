@@ -308,12 +308,12 @@ Comparison
 
     Returns a non-zero value if row `i` of ``mat`` is zero.
 
-.. function:: int fmpz_mat_col_equal(fmpz_mat_t M, slong m, slong n)
+.. function:: int fmpz_mat_equal_col(fmpz_mat_t M, slong m, slong n)
 
     Returns `1` if columns `m` and `n` of the matrix `M` are equal, otherwise
     returns `0`.
 
-.. function:: int fmpz_mat_row_equal(fmpz_mat_t M, slong m, slong n)
+.. function:: int fmpz_mat_equal_row(fmpz_mat_t M, slong m, slong n)
 
     Returns `1` if rows `m` and `n` of the matrix `M` are equal, otherwise
     returns `0`.
@@ -375,9 +375,12 @@ Modular reduction and reconstruction
 
 .. function:: void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres, const fmpz_mat_t mat, fmpz_comb_t comb, fmpz_comb_temp_t temp)
 
-    Sets each of the ``nres`` matrices in ``residues`` to ``mat``
-    reduced modulo the modulus of the respective matrix, given
-    precomputed ``comb`` and ``comb_temp`` structures.
+    Sets each of the ``nres`` matrices in ``residues`` to ``mat`` reduced modulo
+    the modulus of the respective matrix, given precomputed ``comb`` and
+    ``comb_temp`` structures.
+
+    Note: ``fmpz.h`` must be included **before** ``fmpz_mat.h`` in order for
+    this function to be declared.
 
 .. function:: void fmpz_mat_multi_mod_ui(nmod_mat_t * residues, slong nres, const fmpz_mat_t mat)
 
@@ -390,9 +393,11 @@ Modular reduction and reconstruction
 
 .. function:: void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat, nmod_mat_t * const residues, slong nres, fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign)
 
-    Reconstructs ``mat`` from its images modulo the ``nres`` matrices
-    in ``residues``, given precomputed ``comb`` and ``comb_temp``
-    structures.
+    Reconstructs ``mat`` from its images modulo the ``nres`` matrices in
+    ``residues``, given precomputed ``comb`` and ``comb_temp`` structures.
+
+    Note: ``fmpz.h`` must be included **before** ``fmpz_mat.h`` in order for
+    this function to be declared.
 
 .. function:: void fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues, slong nres, int sign)
 

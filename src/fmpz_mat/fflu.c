@@ -10,6 +10,7 @@
 */
 
 #include "ulong_extras.h"
+#include "fmpz.h"
 #include "fmpz_mat.h"
 
 #define E(j,k) fmpz_mat_entry(B,j,k)

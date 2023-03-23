@@ -10,6 +10,7 @@
 */
 
 #include "perm.h"
+#include "fmpz.h"
 #include "fmpz_mat.h"
 #include "gr.h"
 

@@ -79,3 +79,10 @@ void _fmpq_gcd_cofactors(
     fmpz_clear(nbbar);
     fmpz_clear(dbbar);
 }
+
+void
+fmpq_gcd_cofactors(fmpq_t g, fmpz_t A, fmpz_t B, const fmpq_t a, const fmpq_t b)
+{
+    _fmpq_gcd_cofactors(fmpq_numref(g), fmpq_denref(g), A, B,
+               fmpq_numref(a), fmpq_denref(a), fmpq_numref(b), fmpq_denref(b));
+}

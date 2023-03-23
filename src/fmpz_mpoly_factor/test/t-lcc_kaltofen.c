@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
 #include "fmpz_mpoly_factor.h"
 
 #define FLINT_ARRAY_ALLOC(n, T) (T *) flint_malloc((n)*sizeof(T))

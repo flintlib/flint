@@ -11,6 +11,7 @@
 
 #include "ulong_extras.h"
 #include "nmod_mat.h"
+#include "fmpz.h"
 #include "fmpz_mat.h"
 
 mp_limb_t

@@ -19,6 +19,7 @@
 #endif
 
 #include "fmpq.h"
+#include "fmpz_poly_factor.h"
 #include "fmpz_mpoly.h"
 #include "nmod_mpoly.h"
 

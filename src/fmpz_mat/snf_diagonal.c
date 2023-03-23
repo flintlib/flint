@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_mat.h"
 
 /* sets a to gcd(a,b) and b to lcm(a,b) using temporary fmpz_t t */

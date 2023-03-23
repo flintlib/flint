@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_mat.h"
 #include "bool_mat.h"
 

@@ -12,6 +12,7 @@
 */
 
 #include "thread_support.h"
+#include "fmpz.h"
 #include "fmpz_mat.h"
 
 static void _dot1(fmpz_t z, fmpz * a, slong * b, slong len)

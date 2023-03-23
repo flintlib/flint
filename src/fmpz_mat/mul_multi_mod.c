@@ -13,6 +13,7 @@
 #include "thread_support.h"
 #include "nmod.h"
 #include "nmod_mat.h"
+#include "fmpz.h"
 #include "fmpz_mat.h"
 
 typedef struct {

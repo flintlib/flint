@@ -12,6 +12,7 @@
 
 #include "fmpz_mat.h"
 #include "fmpz_lll.h"
+#include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 
 #ifdef __GNUC__

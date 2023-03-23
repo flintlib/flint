@@ -19,8 +19,6 @@
 #include <unistd.h>
 #endif
 
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
 
 #if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER)

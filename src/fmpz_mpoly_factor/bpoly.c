@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
 #include "fmpz_mpoly_factor.h"
-
 
 void fmpz_bpoly_clear(fmpz_bpoly_t A)
 {

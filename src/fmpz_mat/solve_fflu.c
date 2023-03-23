@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
 #include "perm.h"
+#include "fmpz.h"
+#include "fmpz_mat.h"
 
 int
 fmpz_mat_solve_fflu(fmpz_mat_t X, fmpz_t den,

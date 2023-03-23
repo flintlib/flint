@@ -12,6 +12,7 @@
 #include "gmpcompat.h"
 #include "mpn_extras.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 #include "fmpz_mat.h"
 #include "fft.h"
 

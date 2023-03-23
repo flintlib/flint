@@ -9,9 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz_mat.h"
 #include "perm.h"
+#include "fmpz.h"
+#include "fmpz_mat.h"
 
 int
 fmpz_mat_mod_is_in_howell_form(const fmpz_mat_t A, const fmpz_t mod)

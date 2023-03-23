@@ -11,6 +11,7 @@
 */
 
 #include "ulong_extras.h"
+#include "fmpz.h"
 #include "fmpz_mat.h"
 
 #define XX(ii,jj) fmpz_mat_entry(X,(ii),(jj))
