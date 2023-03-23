@@ -112,8 +112,6 @@ void fmpz_poly_set_si(fmpz_poly_t poly, slong c);
 
 void fmpz_poly_set_fmpz(fmpz_poly_t poly, const fmpz_t c);
 
-void fmpz_poly_set_mpz(fmpz_poly_t poly, const mpz_t c);
-
 int _fmpz_poly_set_str(fmpz * poly, const char * str);
 
 int fmpz_poly_set_str(fmpz_poly_t poly, const char * str);
@@ -891,10 +889,6 @@ void _fmpz_poly_evaluate_fmpq(fmpz_t rnum, fmpz_t rden,
 void fmpz_poly_evaluate_fmpq(fmpq_t res,
                                           const fmpz_poly_t f, const fmpq_t a);
 
-
-void fmpz_poly_evaluate_mpq(mpq_t res,
-                                           const fmpz_poly_t f, const mpq_t a);
-
 mp_limb_t _fmpz_poly_evaluate_mod(const fmpz * poly, slong len,
                                      mp_limb_t a, mp_limb_t n, mp_limb_t ninv);
 
@@ -1185,58 +1179,6 @@ void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac,
                                 const fmpz_poly_t f,
                                 const nmod_poly_factor_t local_fac, slong N);
 
-/* Some functions for backwards compatibility */
-
-FMPZ_POLY_INLINE
-void fmpz_poly_scalar_mul_mpz(fmpz_poly_t poly1,
-                               const fmpz_poly_t poly2, const mpz_t x)
-{
-    fmpz_t t;
-    fmpz_init_set_readonly(t, x);
-    fmpz_poly_scalar_mul_fmpz(poly1, poly2, t);
-    fmpz_clear_readonly(t);
-}
-
-FMPZ_POLY_INLINE
-void fmpz_poly_scalar_divexact_mpz(fmpz_poly_t poly1,
-                               const fmpz_poly_t poly2, const mpz_t x)
-{
-    fmpz_t t;
-    fmpz_init_set_readonly(t, x);
-    fmpz_poly_scalar_divexact_fmpz(poly1, poly2, t);
-    fmpz_clear_readonly(t);
-}
-
-FMPZ_POLY_INLINE
-void fmpz_poly_scalar_fdiv_mpz(fmpz_poly_t poly1,
-                               const fmpz_poly_t poly2, const mpz_t x)
-{
-    fmpz_t t;
-    fmpz_init_set_readonly(t, x);
-    fmpz_poly_scalar_fdiv_fmpz(poly1, poly2, t);
-    fmpz_clear_readonly(t);
-}
-
-FMPZ_POLY_INLINE
-void fmpz_poly_set_coeff_mpz(fmpz_poly_t poly, slong n,
-    const mpz_t x)
-{
-    fmpz_t t;
-    fmpz_init_set_readonly(t, x);
-    fmpz_poly_set_coeff_fmpz(poly, n, t);
-    fmpz_clear_readonly(t);
-}
-
-FMPZ_POLY_INLINE
-void fmpz_poly_get_coeff_mpz(mpz_t x, const fmpz_poly_t poly, slong n)
-{
-    fmpz_t t;
-    fmpz_init(t);
-    fmpz_poly_get_coeff_fmpz(t, poly, n);
-    fmpz_get_mpz(x, t);
-    fmpz_clear(t);
-}
-
 /* Roots */
 
 void _fmpz_poly_bound_roots(fmpz_t bound, const fmpz * poly, slong len);
@@ -1306,6 +1248,16 @@ void _fmpz_poly_theta_qexp(fmpz * f, slong e, slong n);
 void fmpz_poly_theta_qexp(fmpz_poly_t f, slong e, slong n);
 
 void fmpz_poly_eulerian_polynomial(fmpz_poly_t poly, ulong n);
+
+/* Declare some old functions dead */
+
+#define fmpz_poly_scalar_mul_mpz _Pragma("GCC error \"'fmpz_poly_scalar_mul_mpz' is deprecated. Use 'fmpz_poly_scalar_mul_fmpz' instead.\"")
+#define fmpz_poly_scalar_divexact_mpz _Pragma("GCC error \"'fmpz_poly_scalar_divexact_mpz' is deprecated. Use 'fmpz_poly_scalar_divexact_fmpz' instead.\"")
+#define fmpz_poly_scalar_fdiv_mpz _Pragma("GCC error \"'fmpz_poly_scalar_fdiv_mpz' is deprecated. Use 'fmpz_poly_scalar_fdiv_fmpz' instead.\"")
+#define fmpz_poly_set_coeff_mpz _Pragma("GCC error \"'fmpz_poly_set_coeff_mpz' is deprecated. Use 'fmpz_poly_set_coeff_fmpz' instead.\"")
+#define fmpz_poly_get_coeff_mpz _Pragma("GCC error \"'fmpz_poly_get_coeff_mpz' is deprecated. Use 'fmpz_poly_get_coeff_fmpz' instead.\"")
+#define fmpz_poly_set_mpz _Pragma("GCC error \"'fmpz_poly_set_mpz' is deprecated. Use 'fmpz_poly_set_fmpz' instead.\"")
+#define fmpz_poly_evaluate_mpq _Pragma("GCC error \"'fmpz_poly_evaluate_mpq' is deprecated. Use 'fmpz_poly_evaluate_fmpq' instead.\"")
 
 #ifdef __cplusplus
 }

@@ -117,10 +117,6 @@ Assignment and basic manipulation
 
     Sets ``poly`` to the integer ``c``.
 
-.. function:: void fmpz_poly_set_mpz(fmpz_poly_t poly, const mpz_t c)
-
-    Sets ``poly`` to the integer ``c``.
-
 .. function:: int _fmpz_poly_set_str(fmpz * poly, const char * str)
 
     Sets ``poly`` to the polynomial encoded in the null-terminated 
@@ -396,10 +392,6 @@ Scalar absolute value, multiplication and division
 
     Sets ``poly1`` to ``poly2`` times `x`.
 
-.. function:: void fmpz_poly_scalar_mul_mpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, const mpz_t x)
-
-    Sets ``poly1`` to ``poly2`` times the ``mpz_t`` `x`.
-
 .. function:: void fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, fmpz_poly_t poly2, slong x)
 
     Sets ``poly1`` to ``poly2`` times the signed ``slong x``.
@@ -427,11 +419,6 @@ Scalar absolute value, multiplication and division
 .. function:: void fmpz_poly_scalar_fdiv_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, const fmpz_t x)
 
     Sets ``poly1`` to ``poly2`` divided by the ``fmpz_t x``, 
-    rounding coefficients down toward `- \infty`.
-
-.. function:: void fmpz_poly_scalar_fdiv_mpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, const mpz_t x)
-
-    Sets ``poly1`` to ``poly2`` divided by the ``mpz_t x``, 
     rounding coefficients down toward `- \infty`.
 
 .. function:: void fmpz_poly_scalar_fdiv_si(fmpz_poly_t poly1, fmpz_poly_t poly2, slong x)
@@ -474,12 +461,7 @@ Scalar absolute value, multiplication and division
     Sets ``poly1`` to ``poly2`` divided by the ``fmpz_t x``, 
     assuming the division is exact for every coefficient.
 
-.. function:: void fmpz_poly_scalar_divexact_mpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, const mpz_t x)
-
-    Sets ``poly1`` to ``poly2`` divided by the ``mpz_t x``, 
-    assuming the coefficient is exact for every coefficient.
-
-.. function:: id fmpz_poly_scalar_divexact_si(fmpz_poly_t poly1, fmpz_poly_t poly2, slong x)
+.. function:: void fmpz_poly_scalar_divexact_si(fmpz_poly_t poly1, fmpz_poly_t poly2, slong x)
 
     Sets ``poly1`` to ``poly2`` divided by the ``slong x``, 
     assuming the coefficient is exact for every coefficient.
@@ -2210,11 +2192,6 @@ Evaluation
 
     Evaluates the polynomial `f` at the rational `a`, and 
     sets ``res`` to the result.
-
-.. function:: void fmpz_poly_evaluate_mpq(mpq_t res, const fmpz_poly_t f, const mpq_t a)
-
-    Evaluates the polynomial `f` at the rational `a` and sets ``res`` to 
-    the result.
 
 .. function:: mp_limb_t _fmpz_poly_evaluate_mod(const fmpz * poly, slong len, mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
 
