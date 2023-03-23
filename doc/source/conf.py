@@ -17,7 +17,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath('../..'))
 sys.path.append(os.path.abspath("."))
-sys.path.append(os.path.abspath('../../python'))
+sys.path.append(os.path.abspath('../../src/python'))
 
 # -- Project information -----------------------------------------------------
 
@@ -30,9 +30,9 @@ version = u''
 
 
 for _line in open("../../src/flint.h").readlines():
-    if _line.startswith("#define FLINT_VERSION"):
-        _i1 = _line.find('"')
-        _i2 = _line.find('"', _i1 + 1)
+    if _line.startswith("define(FLINT_VERSION,"):
+        _i1 = _line.find('[')
+        _i2 = _line.find(']', _i1 + 1)
         version = _line[_i1+1:_i2]
 
 # The full version, including alpha/beta/rc tags
