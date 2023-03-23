@@ -963,7 +963,4 @@ void __fmpz_neg(fmpz_t f1, const fmpz_t f2);
 }
 #endif
 
-#include "fmpz_factor.h"
-
 #endif
-
