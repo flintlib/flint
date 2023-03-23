@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
 void _fmpz_mat_read_only_window_init_strip_initial_zero_rows(

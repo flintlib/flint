@@ -19,7 +19,7 @@
 #define FMPZ_MAT_INLINE static __inline__
 #endif
 
-#include "fmpz_vec.h"
+#include "fmpz_types.h"
 #include "nmod_types.h"
 #include "d_mat.h"
 
@@ -63,12 +63,7 @@ int fmpz_mat_equal(const fmpz_mat_t mat1, const fmpz_mat_t mat2);
 int fmpz_mat_is_zero(const fmpz_mat_t mat);
 int fmpz_mat_is_one(const fmpz_mat_t mat);
 
-FMPZ_MAT_INLINE
-int
-fmpz_mat_is_zero_row(const fmpz_mat_t mat, slong i)
-{
-    return _fmpz_vec_is_zero(mat->rows[i], mat->c);
-}
+int fmpz_mat_is_zero_row(const fmpz_mat_t mat, slong i);
 
 #define fmpz_mat_col_equal(M, m, n) _Pragma("GCC warning \"'fmpz_mat_col_equal' is deprecated in favor for 'fmpz_mat_equal_col'\"") fmpz_mat_equal_col(M, m, n)
 #define fmpz_mat_row_equal(M, m, n) _Pragma("GCC warning \"'fmpz_mat_row_equal' is deprecated in favor for 'fmpz_mat_equal_row'\"") fmpz_mat_equal_row(M, m, n)

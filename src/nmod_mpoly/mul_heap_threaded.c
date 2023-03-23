@@ -11,6 +11,7 @@
 
 #include "thread_support.h"
 #include "long_extras.h"
+#include "fmpz_vec.h"
 #include "nmod_mpoly.h"
 
 /*

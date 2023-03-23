@@ -10,6 +10,7 @@
 */
 
 #include "d_vec.h"
+#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 #include "fmpz_lll.h"
 

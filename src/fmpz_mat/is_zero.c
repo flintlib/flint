@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
 int
@@ -26,4 +27,10 @@ fmpz_mat_is_zero(const fmpz_mat_t mat)
     }
 
     return 1;
+}
+
+int
+fmpz_mat_is_zero_row(const fmpz_mat_t mat, slong i)
+{
+    return _fmpz_vec_is_zero(mat->rows[i], mat->c);
 }

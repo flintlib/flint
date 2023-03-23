@@ -14,6 +14,7 @@
 #include <float.h>
 #include "gmpcompat.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 #include "fmpz_lll.h"
 #ifdef GM

@@ -10,6 +10,7 @@
 */
 
 #include "thread_support.h"
+#include "fmpz_vec.h"
 #include "nmod_mpoly.h"
 #include "fq_nmod_mpoly.h"
 #include "nmod_mpoly_factor.h"

@@ -10,6 +10,7 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
 static void _eliminate_col(fmpz_mat_t S, slong i, const fmpz_t mod)

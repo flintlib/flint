@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fq_zech_mpoly.h"
 
 void fq_zech_mpoly_univar_init(fq_zech_mpoly_univar_t A,
