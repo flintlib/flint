@@ -163,8 +163,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: "Set up FreeBSD"
+      - name: "Run tests on FreeBSD"
         uses: cross-platform-actions/action@v0.10.0
+        timeout-minutes: 25
+        continue-on-error: true
         with:
           operating_system: freebsd
           version: '13.1'
@@ -181,15 +183,56 @@ jobs:
             clang --version
             autoconf --version
             libtool --version
+            touch _is_installed
             export FLINT_TEST_MULTIPLIER=0.5
             ./bootstrap.sh
+            touch _is_bootstrapped
             ./configure CC=clang CFLAGS="-Wall" --disable-static --enable-shared  \
                 --with-gmp-include=$(pkgconf --variable=includedir gmp)           \
                 --with-gmp-lib=$(pkgconf --variable=libdir gmp)                   \
                 --with-mpfr-include=$(pkgconf --variable=includedir mpfr)         \
                 --with-mpfr-lib=$(pkgconf --variable=libdir mpfr)
+            touch _is_configured
             gmake -j
+            touch _is_built
             gmake -j check
+            touch _is_checked
+
+        # Sometimes the FreeBSD runner cannot exit properly. We created files
+        # for each step to show that it was able to run the tests.
+      - name: "Check that everything was okay"
+        run: |
+          if test -e _is_installed;
+          then
+            if test -e _is_bootstrapped;
+            then
+              if test -e _is_configured;
+              then
+                if test -e _is_built;
+                then
+                  if test -e _is_checked;
+                  then
+                    echo "All good!"
+                  else
+                    echo "Check failed!"
+                    exit 5
+                  fi
+                else
+                  echo "Building failed!"
+                  exit 4
+                fi
+              else
+                echo "Configuration failed!"
+                exit 3
+              fi
+            else
+              echo "Bootstrap failed!"
+              exit 2
+            fi
+          else
+            echo "Installation failed!"
+            exit 1
+          fi
 
       - if: failure()
         name: "If failure, stop all other jobs"
