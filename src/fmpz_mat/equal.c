@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_mat.h"
 
 int fmpz_mat_equal(const fmpz_mat_t mat1, const fmpz_mat_t mat2)
@@ -32,4 +33,30 @@ int fmpz_mat_equal(const fmpz_mat_t mat1, const fmpz_mat_t mat2)
     }
 
     return 1;
+}
+
+int fmpz_mat_equal_col(fmpz_mat_t M, slong m, slong n)
+{
+   slong i;
+
+   for (i = 0; i < M->r; i++)
+   {
+      if (!fmpz_equal(M->rows[i] + m, M->rows[i] + n))
+         return 0;
+   }
+
+   return 1;
+}
+
+int fmpz_mat_equal_row(fmpz_mat_t M, slong m, slong n)
+{
+   slong i;
+
+   for (i = 0; i < M->c; i++)
+   {
+      if (!fmpz_equal(M->rows[m] + i, M->rows[n] + i))
+         return 0;
+   }
+
+   return 1;
 }

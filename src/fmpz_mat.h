@@ -19,7 +19,6 @@
 #define FMPZ_MAT_INLINE static __inline__
 #endif
 
-#include "fmpz.h"
 #include "fmpz_vec.h"
 #include "nmod_types.h"
 #include "d_mat.h"
@@ -54,16 +53,8 @@ void fmpz_mat_init(fmpz_mat_t mat, slong rows, slong cols);
 void fmpz_mat_init_set(fmpz_mat_t mat, const fmpz_mat_t src);
 
 void fmpz_mat_swap(fmpz_mat_t mat1, fmpz_mat_t mat2);
-
-FMPZ_MAT_INLINE void
-fmpz_mat_swap_entrywise(fmpz_mat_t mat1, fmpz_mat_t mat2)
-{
-    slong i, j;
-
-    for (i = 0; i < fmpz_mat_nrows(mat1); i++)
-        for (j = 0; j < fmpz_mat_ncols(mat1); j++)
-            fmpz_swap(fmpz_mat_entry(mat2, i, j), fmpz_mat_entry(mat1, i, j));
-}
+void fmpz_mat_swap_entrywise(fmpz_mat_t mat1, fmpz_mat_t mat2);
+void fmpz_mat_swap_cols(fmpz_mat_t mat, slong * perm, slong r, slong s);
 
 void fmpz_mat_set(fmpz_mat_t mat1, const fmpz_mat_t mat2);
 void fmpz_mat_clear(fmpz_mat_t mat);
@@ -79,33 +70,10 @@ fmpz_mat_is_zero_row(const fmpz_mat_t mat, slong i)
     return _fmpz_vec_is_zero(mat->rows[i], mat->c);
 }
 
-FMPZ_MAT_INLINE
-int fmpz_mat_col_equal(fmpz_mat_t M, slong m, slong n)
-{
-   slong i;
-
-   for (i = 0; i < M->r; i++)
-   {
-      if (!fmpz_equal(M->rows[i] + m, M->rows[i] + n))
-         return 0;
-   }
-
-   return 1;
-}
-
-FMPZ_MAT_INLINE
-int fmpz_mat_row_equal(fmpz_mat_t M, slong m, slong n)
-{
-   slong i;
-
-   for (i = 0; i < M->c; i++)
-   {
-      if (!fmpz_equal(M->rows[m] + i, M->rows[n] + i))
-         return 0;
-   }
-
-   return 1;
-}
+#define fmpz_mat_col_equal(M, m, n) _Pragma("GCC warning \"'fmpz_mat_col_equal' is deprecated in favor for 'fmpz_mat_equal_col'\"") fmpz_mat_equal_col(M, m, n)
+#define fmpz_mat_row_equal(M, m, n) _Pragma("GCC warning \"'fmpz_mat_row_equal' is deprecated in favor for 'fmpz_mat_equal_row'\"") fmpz_mat_equal_row(M, m, n)
+int fmpz_mat_equal_col(fmpz_mat_t M, slong m, slong n);
+int fmpz_mat_equal_row(fmpz_mat_t M, slong m, slong n);
 
 FMPZ_MAT_INLINE
 int fmpz_mat_is_empty(const fmpz_mat_t mat)
@@ -313,65 +281,8 @@ void fmpz_mat_swap_rows(fmpz_mat_t mat, slong * perm, slong r, slong s)
     }
 }
 
-FMPZ_MAT_INLINE
-void fmpz_mat_invert_rows(fmpz_mat_t mat, slong * perm)
-{
-    slong i;
-
-    for (i = 0; i < mat->r/2; i++)
-        fmpz_mat_swap_rows(mat, perm, i, mat->r - i - 1);
-}
-
-FMPZ_MAT_INLINE
-void fmpz_mat_swap_cols(fmpz_mat_t mat, slong * perm, slong r, slong s)
-{
-    if (r != s && !fmpz_mat_is_empty(mat))
-    {
-        slong t;
-
-        if (perm)
-        {
-            t = perm[s];
-            perm[s] = perm[r];
-            perm[r] = t;
-        }
-
-       for (t = 0; t < mat->r; t++)
-       {
-           fmpz_swap(fmpz_mat_entry(mat, t, r), fmpz_mat_entry(mat, t, s));
-       }
-    }
-}
-
-FMPZ_MAT_INLINE
-void fmpz_mat_invert_cols(fmpz_mat_t mat, slong * perm)
-{
-    if (!fmpz_mat_is_empty(mat))
-    {
-        slong t;
-        slong i;
-        slong c = mat->c;
-        slong k = mat->c/2;
-
-        if (perm)
-        {
-            for (i = 0; i < k; i++)
-            {
-                t = perm[i];
-                perm[i] = perm[c - i - 1];
-                perm[c - i - 1] = t;
-            }
-        }
-
-        for (t = 0; t < mat->r; t++)
-        {
-            for (i = 0; i < k; i++)
-            {
-                fmpz_swap(fmpz_mat_entry(mat, t, i), fmpz_mat_entry(mat, t, c - i - 1));
-            }
-        }
-    }
-}
+void fmpz_mat_invert_rows(fmpz_mat_t mat, slong * perm);
+void fmpz_mat_invert_cols(fmpz_mat_t mat, slong * perm);
 
 /* Gaussian elimination *****************************************************/
 
@@ -558,26 +469,18 @@ int fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
 /* Modular reduction and reconstruction **************************************/
 
 void fmpz_mat_set_nmod_mat(fmpz_mat_t A, const nmod_mat_t Amod);
-
 void fmpz_mat_set_nmod_mat_unsigned(fmpz_mat_t A, const nmod_mat_t Amod);
-
 void fmpz_mat_get_nmod_mat(nmod_mat_t Amod, const fmpz_mat_t A);
 
-void fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
-                        const fmpz_t m1, const nmod_mat_t mat2, int sign);
+void fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_t m1, const nmod_mat_t mat2, int sign);
 
-void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres,
-    const fmpz_mat_t mat, const fmpz_comb_t comb, fmpz_comb_temp_t temp);
+#ifdef FMPZ_H
+void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres, const fmpz_mat_t mat, const fmpz_comb_t comb, fmpz_comb_temp_t temp);
+void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat, nmod_mat_t * const residues, slong nres, const fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign);
+#endif
 
 void fmpz_mat_multi_mod_ui(nmod_mat_t * residues, slong nres, const fmpz_mat_t mat);
-
-
-void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat,
-    nmod_mat_t * const residues, slong nres,
-    const fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign);
-
-void fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues,
-    slong nres, int sign);
+void fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues, slong nres, int sign);
 
 /* HNF and SNF **************************************************************/
 
