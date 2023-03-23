@@ -11,11 +11,9 @@
       (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
+#include "fmpz_factor.h"
 #include "qsieve.h"
-#include "thread_support.h"
 
 void randprime(fmpz_t p, flint_rand_t state, slong bits)
 {

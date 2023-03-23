@@ -14,10 +14,10 @@
    in the paper https://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf, pseudocode
    is available on page 182 of the same paper */
 
-#include "flint.h"
-#include "fmpz.h"
 #include "ulong_extras.h"
 #include "mpn_extras.h"
+#include "fmpz.h"
+#include "fmpz_factor.h"
 
 /* Sets y to (y^2 + a) % n */
 void

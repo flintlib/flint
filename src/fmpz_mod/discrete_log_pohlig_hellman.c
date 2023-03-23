@@ -11,6 +11,7 @@
 
 #include <stdlib.h>
 #include <math.h>
+#include "fmpz_factor.h"
 #include "fmpz_mod.h"
 
 /*

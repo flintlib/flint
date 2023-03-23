@@ -11,10 +11,9 @@
 
 #include <stdlib.h>
 #include <time.h>
-#include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
+#include "fmpz_factor.h"
 
 void _fmpz_np1_trial_factors(const fmpz_t n, mp_ptr pp1, slong * num_pp1, ulong limit)
 {

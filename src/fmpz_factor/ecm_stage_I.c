@@ -10,8 +10,8 @@
 */
 
 #include "ulong_extras.h"
-#include "fmpz.h"
 #include "mpn_extras.h"
+#include "fmpz_factor.h"
 
 /* Implementation of the stage I of ECM */
 

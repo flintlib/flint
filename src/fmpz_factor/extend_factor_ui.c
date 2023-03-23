@@ -10,10 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_factor.h"
 
 void
 _fmpz_factor_extend_factor_ui(fmpz_factor_t factor, mp_limb_t n)

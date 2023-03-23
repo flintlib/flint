@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_factor.h"
 #include "qqbar.h"
 
 /* Write |n| = A * B^2

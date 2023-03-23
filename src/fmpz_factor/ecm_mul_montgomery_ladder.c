@@ -10,7 +10,7 @@
 */
 
 #include "ulong_extras.h"
-#include "fmpz.h"
+#include "fmpz_factor.h"
 
 /* P (x0 : z0) <- kP using Montgomery ladder algorithm */
 

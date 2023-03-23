@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_factor.h"
 #include "fmpz_mpoly_factor.h"
 #include "ca.h"
 

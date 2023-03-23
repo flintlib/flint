@@ -15,6 +15,7 @@
 #include "ulong_extras.h"
 #include "mpn_extras.h"
 #include "fmpz.h"
+#include "fmpz_factor.h"
 
 static
 ulong n_ecm_primorial[] =
