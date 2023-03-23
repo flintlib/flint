@@ -64,7 +64,7 @@ jobs:
     env:
       MAKE: "make -j --output-sync=target"
       CC: "gcc"
-      CFLAGS: "-Wall"
+      CFLAGS: "-Wall -Werror=implicit-function-declaration"
 
     steps:
       - uses: actions/checkout@v3
