@@ -10,6 +10,7 @@
 */
 
 #include "ulong_extras.h"
+#include "fmpz_vec.h"
 #include "arb_poly.h"
 #include "arb_hypgeom.h"
 

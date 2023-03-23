@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpq.h"
 #include "arb_poly.h"
 #include "acb_poly.h"
 #include "arb_mat.h"

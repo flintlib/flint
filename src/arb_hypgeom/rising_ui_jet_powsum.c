@@ -10,6 +10,7 @@
 */
 
 #include "nmod_vec.h"
+#include "fmpz_vec.h"
 #include "arb_hypgeom.h"
 
 void

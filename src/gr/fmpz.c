@@ -14,6 +14,7 @@
 #include "fmpz_factor.h"
 #include "fmpz_poly.h"
 #include "fmpz_mat.h"
+#include "fmpq.h"
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_special.h"

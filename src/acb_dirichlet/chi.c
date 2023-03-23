@@ -11,6 +11,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpq.h"
 #include "acb_dirichlet.h"
 
 void

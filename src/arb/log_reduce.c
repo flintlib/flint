@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "arb.h"
 
 #ifdef __GNUC__

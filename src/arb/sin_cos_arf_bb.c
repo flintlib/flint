@@ -10,6 +10,7 @@
 */
 
 #include "thread_support.h"
+#include "fmpz_vec.h"
 #include "arb.h"
 #include "acb.h"
 

@@ -10,6 +10,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpq.h"
 #include "fmpz_mod_poly.h"
 #include "fmpz_poly_factor.h"
 #include "arb_fmpz_poly.h"
