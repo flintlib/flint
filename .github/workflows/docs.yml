@@ -19,7 +19,7 @@ jobs:
       - name: "Check for changes in documentation"
         id: check_doc_changes
         run: |
-          if test -z "$(git diff --name-only HEAD~1..HEAD -- doc/)";
+          if test -z "$(git diff --name-only HEAD~1 HEAD -- doc/)";
           then
             echo "No changes in doc/"
             echo "diff=false" >> $GITHUB_OUTPUT
