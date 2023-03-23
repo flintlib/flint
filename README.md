@@ -1,5 +1,8 @@
 # FLINT (Fast Library for Number Theory)
 
+[![Docs dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://flintlib.org/doc/index.html)
+[![Build Status](https://github.com/flintlib/flint2/workflows/CI/badge.svg)](https://github.com/flintlib/flint2/actions/workflows/CI.yml?query=branch%3Atrunk+workflow%3ACI)
+
 Website: https://flintlib.org
 
 Mailing list: https://groups.google.com/g/flint-devel
