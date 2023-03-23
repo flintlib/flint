@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "arb.h"
 
 /* With parameter n, the error is bounded by 3/(3+sqrt(8))^n */

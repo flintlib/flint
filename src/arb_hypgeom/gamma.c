@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpq.h"
 #include "acb.h"
 #include "arb_hypgeom.h"
 #include "bernoulli.h"

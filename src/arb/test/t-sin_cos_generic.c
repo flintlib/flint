@@ -10,6 +10,7 @@
 */
 
 #include <mpfr.h>
+#include "fmpq.h"
 #include "arb.h"
 
 int main()

@@ -509,6 +509,9 @@ fmpq;
 
 typedef fmpq fmpq_t[1];
 
+#define fmpq_numref(__x) (&(__x)->num)
+#define fmpq_denref(__y) (&(__y)->den)
+
 #ifdef __cplusplus
 }
 #endif

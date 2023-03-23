@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
+#include "fmpq.h"
 #include "arb.h"
 
 int main()

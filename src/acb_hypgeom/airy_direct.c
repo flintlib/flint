@@ -10,6 +10,7 @@
 */
 
 #include "ulong_extras.h"
+#include "fmpq.h"
 #include "acb.h"
 #include "acb_hypgeom.h"
 

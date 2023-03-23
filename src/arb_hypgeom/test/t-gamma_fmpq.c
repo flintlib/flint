@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpq.h"
 #include "ulong_extras.h"
 #include "arb_hypgeom.h"
 

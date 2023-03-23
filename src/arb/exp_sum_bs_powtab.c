@@ -10,6 +10,7 @@
 */
 
 #include "thread_support.h"
+#include "fmpz_vec.h"
 #include "arb.h"
 
 /* When splitting [a,b) into [a,m), [m,b), we need the power x^(m-a).

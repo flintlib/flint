@@ -10,6 +10,7 @@
 */
 
 #include "thread_support.h"
+#include "fmpz_vec.h"
 #include "arb.h"
 
 slong _arb_compute_bs_exponents(slong * tab, slong n);

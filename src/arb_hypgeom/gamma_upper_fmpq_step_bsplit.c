@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include "fmpq.h"
 #include "arb_mat.h"
 #include "arb_hypgeom.h"
 

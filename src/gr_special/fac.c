@@ -10,6 +10,7 @@
 */
 
 #include "ulong_extras.h"
+#include "fmpq.h"
 #include "arith.h"
 #include "arb.h"
 #include "gr_special.h"

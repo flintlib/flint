@@ -26,9 +26,6 @@
 extern "C" {
 #endif
 
-#define fmpq_numref(__x) (&(__x)->num)
-#define fmpq_denref(__y) (&(__y)->den)
-
 FMPQ_INLINE void fmpq_init(fmpq_t x)
 {
     x->num = WORD(0);
