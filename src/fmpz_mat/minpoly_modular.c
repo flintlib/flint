@@ -16,6 +16,7 @@
 #include "nmod_mat.h"
 #include "nmod_poly.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpz_mat.h"
 

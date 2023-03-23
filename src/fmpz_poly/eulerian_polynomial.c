@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2021 Albin Ahlbäck, Fredrik Johansson
+    Copyright (C) 2021 Albin Ahlbäck
+    Copyright (C) 2021 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -9,6 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 /* Up to this order the coefficients fit inside small fmpz */

@@ -11,8 +11,9 @@
 
 #define FMPZ_POLY_FACTOR_INLINES_C
 
-#include "flint.h"
+#include "fmpz.h"
 #include "fmpz_poly.h"
+#include "fmpz_poly_factor.h"
 
 void fmpz_poly_factor_get_fmpz_poly(fmpz_poly_t z, const fmpz_poly_factor_t F, slong i)
 {

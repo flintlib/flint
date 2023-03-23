@@ -11,10 +11,6 @@
 
 #define FQ_INLINES_C
 
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
 #include "fq.h"
 
 void __fq_ctx_prime(fmpz_t p, fq_ctx_t ctx)

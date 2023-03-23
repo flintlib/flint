@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include "fmpz_mod_poly.h"
 #include "fq.h"
 
 /* printing *******************************************************************/

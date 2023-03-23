@@ -12,6 +12,7 @@
 
 #include "fmpz.h"
 #include "fmpz_poly.h"
+#include "fmpz_poly_factor.h"
 
 #ifdef __GNUC__
 # define sqrt __builtin_sqrt

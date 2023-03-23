@@ -10,11 +10,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "mpn_extras.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
-#include "mpn_extras.h"
 
 void _fmpz_poly_sqrlow_KS(fmpz * res, const fmpz * poly, slong len, slong n)
 {

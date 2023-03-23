@@ -1974,6 +1974,9 @@ Pseudo division
     ``fmpz_preinvn_init`` can be supplied. Otherwise ``inv`` should be
     ``NULL``. 
 
+    Note: ``fmpz.h`` has to be included before ``fmpz_poly.h`` in order for
+    ``fmpz_poly.h`` to declare this function.
+
 .. function:: void fmpz_poly_pseudo_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R, ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
 
     If `\ell` is the leading coefficient of `B`, then computes `Q`, `R` such 
@@ -1993,6 +1996,9 @@ Pseudo division
     An optional precomputed inverse of the leading coefficient of `B` from
     ``fmpz_preinvn_init`` can be supplied. Otherwise ``inv`` should be
     ``NULL``. 
+
+    Note: ``fmpz.h`` has to be included before ``fmpz_poly.h`` in order for
+    ``fmpz_poly.h`` to declare this function.
 
 .. function:: void fmpz_poly_pseudo_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R, ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
 
@@ -2059,6 +2065,9 @@ Pseudo division
     ``fmpz_preinvn_init`` can be supplied. Otherwise ``inv`` should be
     ``NULL``. 
 
+    Note: ``fmpz.h`` has to be included before ``fmpz_poly.h`` in order for
+    ``fmpz_poly.h`` to declare this function.
+
 .. function:: void fmpz_poly_pseudo_divrem(fmpz_poly_t Q, fmpz_poly_t R, ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
 
     Computes `Q`, `R`, and `d` such that `\ell^d A = B Q + R`.
@@ -2067,6 +2076,9 @@ Pseudo division
 
     Pseudo-division, only returning the quotient.
 
+    Note: ``fmpz.h`` has to be included before ``fmpz_poly.h`` in order for
+    ``fmpz_poly.h`` to declare this function.
+
 .. function:: void fmpz_poly_pseudo_div(fmpz_poly_t Q, ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
 
     Pseudo-division, only returning the quotient.
@@ -2074,6 +2086,9 @@ Pseudo division
 .. function:: void _fmpz_poly_pseudo_rem(fmpz * R, ulong * d, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_preinvn_t inv)
 
     Pseudo-division, only returning the remainder.
+
+    Note: ``fmpz.h`` has to be included before ``fmpz_poly.h`` in order for
+    ``fmpz_poly.h`` to declare this function.
 
 .. function:: void fmpz_poly_pseudo_rem(fmpz_poly_t R, ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
 

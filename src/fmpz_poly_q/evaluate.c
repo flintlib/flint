@@ -9,8 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly_q.h"
 #include "gmpcompat.h"
+#include "fmpz.h"
+#include "fmpz_poly.h"
+#include "fmpz_poly_q.h"
 
 int fmpz_poly_q_evaluate(mpq_t rop, const fmpz_poly_q_t f, const mpq_t a)
 {

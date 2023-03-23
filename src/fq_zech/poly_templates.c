@@ -14,6 +14,7 @@
 */
 
 #include <stdio.h>
+#include "fmpz_vec.h"
 #include "fq_zech_poly.h"
 
 #ifdef T

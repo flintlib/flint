@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
@@ -29,4 +28,11 @@ fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2)
             return 0;
 
     return 1;
+}
+
+int
+fmpz_poly_equal_fmpz(const fmpz_poly_t poly, const fmpz_t c)
+{
+	return ((poly->length == 0) && fmpz_is_zero(c)) ||
+        ((poly->length == 1) && fmpz_equal(poly->coeffs, c));
 }

@@ -12,6 +12,8 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1,

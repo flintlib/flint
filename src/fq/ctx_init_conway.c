@@ -13,6 +13,7 @@
 
 #include <string.h>
 
+#include "fmpz_mod_poly.h"
 #include "fq.h"
 
 /* from qadic/ctx_init_conway.c */

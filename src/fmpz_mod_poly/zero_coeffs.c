@@ -9,8 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
 void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly, slong i, slong j,

@@ -13,6 +13,8 @@
 #include "thread_support.h"
 #include "nmod.h"
 #include "nmod_poly.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 typedef struct

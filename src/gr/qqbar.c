@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_poly.h"
+#include "fmpz_poly_factor.h"
 #include "fmpq.h"
 #include "fmpzi.h"
 #include "qqbar.h"

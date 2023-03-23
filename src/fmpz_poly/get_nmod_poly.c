@@ -9,11 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
 #include "nmod_poly.h"
+#include "fmpz.h"
+#include "fmpz_poly.h"
 
 void
 fmpz_poly_get_nmod_poly(nmod_poly_t res, const fmpz_poly_t poly)

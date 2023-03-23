@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_poly_q.h"
 
 void fmpz_poly_q_canonicalise(fmpz_poly_q_t rop)
