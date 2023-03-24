@@ -13,6 +13,26 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod_mpoly.h"
 
+#ifdef fmpz_mod_ctx_get_modulus_mpz_read_only
+# undef fmpz_mod_ctx_get_modulus_mpz_read_only
+#endif
+
+static __inline__ void
+fmpz_mod_ctx_get_modulus_mpz_read_only(mpz_t m, const fmpz_mod_ctx_t ctx)
+{
+    const fmpz * p = fmpz_mod_ctx_modulus(ctx);
+    if (COEFF_IS_MPZ(*p))
+    {
+        *m = *COEFF_TO_PTR(*p);
+    }
+    else
+    {
+        m->_mp_size = 1;
+        m->_mp_alloc = 1;
+        m->_mp_d = (mp_ptr) p;
+    }
+}
+
 void _fmpz_mod_mpoly_mul_johnson1(
     fmpz_mod_mpoly_t A,
     const fmpz * Bcoeffs, const ulong * Bexps, slong Blen,

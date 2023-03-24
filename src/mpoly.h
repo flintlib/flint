@@ -20,8 +20,9 @@
 #endif
 
 #include <string.h>
-#include "mpoly_types.h"
 #include "thread_pool.h"
+#include "mpoly_types.h"
+#include "fmpz.h"
 
 #ifdef __cplusplus
  extern "C" {

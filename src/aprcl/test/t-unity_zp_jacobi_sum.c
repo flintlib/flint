@@ -10,6 +10,7 @@
 */
 
 #include "nmod_vec.h"
+#include "fmpz.h"
 #include "aprcl.h"
 
 int main(void)

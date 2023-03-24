@@ -23,6 +23,7 @@
 #endif
 
 #include "fmpz_mod_types.h"
+#include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpz_mod.h"
 

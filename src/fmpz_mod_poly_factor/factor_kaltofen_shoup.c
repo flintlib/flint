@@ -10,9 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
-#include "thread_support.h"
+#include "fmpz_mod_poly_factor.h"
 
 void
 fmpz_mod_poly_factor_kaltofen_shoup(fmpz_mod_poly_factor_t res,

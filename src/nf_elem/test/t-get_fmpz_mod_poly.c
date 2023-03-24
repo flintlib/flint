@@ -15,9 +15,10 @@
 
  ******************************************************************************/
 
+#include "fmpz_mod.h"
+#include "fmpz_mod_poly.h"
 #include "nf.h"
 #include "nf_elem.h"
-#include "fmpz_mod_poly.h"
 
 int
 main(void)

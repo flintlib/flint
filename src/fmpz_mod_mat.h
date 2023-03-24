@@ -41,6 +41,7 @@ fmpz * fmpz_mod_mat_entry(const fmpz_mod_mat_t mat, slong i, slong j)
 }
 
 void fmpz_mod_mat_set_entry(fmpz_mod_mat_t mat, slong i, slong j, const fmpz_t val);
+void fmpz_mod_mat_get_entry(fmpz_t x, const fmpz_mod_mat_t mat, slong i, slong j);
 
 /* Memory management  ********************************************************/
 
@@ -307,10 +308,6 @@ void fmpz_mod_mat_invert_cols(fmpz_mod_mat_t mat, slong * perm)
 {
     fmpz_mat_invert_cols(mat->mat, perm);
 }
-
-/* Inlines *******************************************************************/
-
-void fmpz_mod_mat_get_entry(fmpz_t x, const fmpz_mod_mat_t mat, slong i, slong j);
 
 #ifdef __cplusplus
 }

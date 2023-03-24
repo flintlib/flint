@@ -9,10 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
 #include "fmpz_mpoly_factor.h"
 #include "nmod_mpoly_factor.h"
 #include "fmpz_mod_mpoly_factor.h"
-
 
 void fmpz_tpoly_print(fmpz_tpoly_t A, const char * xvar, const char * yvar, const char * zvar)
 {

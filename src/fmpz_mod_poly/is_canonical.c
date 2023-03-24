@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 
 int fmpz_mod_poly_is_canonical(const fmpz_mod_poly_t A, const fmpz_mod_ctx_t ctx)

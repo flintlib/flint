@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_vec.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 
 void _fmpz_mod_poly_scalar_mul_ui(fmpz *res, const fmpz *poly, slong len,

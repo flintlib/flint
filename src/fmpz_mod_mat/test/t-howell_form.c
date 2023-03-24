@@ -10,6 +10,7 @@
 */
 
 #include "perm.h"
+#include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mod_mat.h"
 

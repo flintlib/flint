@@ -9,11 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "long_extras.h"
+#include "fmpz.h"
+#include "fmpz_poly.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 #include "fmpz_mod_poly_factor.h"
-#include "fmpz.h"
-#include "fmpq.h"
-#include "long_extras.h"
 
 typedef fmpz_poly_t fmpz_list_t;
 

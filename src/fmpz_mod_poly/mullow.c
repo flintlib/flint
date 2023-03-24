@@ -12,6 +12,7 @@
 
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 
 void _fmpz_mod_poly_mullow(fmpz *res, const fmpz *poly1, slong len1,

@@ -12,6 +12,11 @@
 #include "fmpz_mod_poly.h"
 #include "aprcl.h"
 
+#ifdef FLINT_WANT_ASSERT
+# include "fmpz.h"
+# include "fmpz_mod.h"
+#endif
+
 void
 unity_zpq_scalar_mul_fmpz(unity_zpq f, const unity_zpq g, const fmpz_t s)
 {

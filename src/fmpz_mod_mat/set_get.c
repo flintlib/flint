@@ -12,6 +12,8 @@
 #include "fmpz.h"
 #include "fmpz_mod_mat.h"
 
+/* Setters ********************************************************************/
+
 void fmpz_mod_mat_set_entry(fmpz_mod_mat_t mat, slong i, slong j, const fmpz_t val)
 {
     fmpz_set(fmpz_mat_entry(mat->mat, i, j), val);
@@ -32,4 +34,16 @@ void fmpz_mod_mat_set(fmpz_mod_mat_t B, const fmpz_mod_mat_t A)
 {
     fmpz_set(B->mod, A->mod);
     fmpz_mat_set(B->mat, A->mat);
+}
+
+/* Getters ********************************************************************/
+
+void fmpz_mod_mat_get_entry(fmpz_t x, const fmpz_mod_mat_t mat, slong i, slong j)
+{
+  fmpz_set(x, fmpz_mod_mat_entry(mat, i, j));
+}
+
+void fmpz_mod_mat_get_fmpz_mat(fmpz_mat_t A, const fmpz_mod_mat_t B)
+{
+    fmpz_mat_set(A, B->mat);
 }

@@ -11,7 +11,9 @@
 */
 
 #include "ulong_extras.h"
+#include "fmpz.h"
 #include "fmpz_vec.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 
 int

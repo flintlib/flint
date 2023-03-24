@@ -10,6 +10,7 @@
 */
 
 #include "nmod_mat.h"
+#include "fmpz.h"
 #include "fq_nmod_mat.h"
 
 #ifdef T

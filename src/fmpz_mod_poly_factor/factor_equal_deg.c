@@ -15,7 +15,10 @@
 */
 
 #include "ulong_extras.h"
+#include "fmpz.h"
 #include "fmpz_mat.h"
+#include "fmpz_mod.h"
+#include "fmpz_mod_poly.h"
 #include "fmpz_mod_poly_factor.h"
 
 typedef struct {

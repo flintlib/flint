@@ -20,6 +20,7 @@
 #define FQ_NMOD_POLY_FACTOR_INLINE static __inline__
 #endif
 
+#include "fmpz.h"
 #include "fq_nmod_poly.h"
 
 FQ_NMOD_POLY_FACTOR_INLINE

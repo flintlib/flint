@@ -10,6 +10,7 @@
 */
 
 #include "nmod.h"
+#include "fmpz.h"
 #include "fmpz_mod.h"
 
 void fmpz_mod_ctx_init(fmpz_mod_ctx_t ctx, const fmpz_t n)

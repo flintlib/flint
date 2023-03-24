@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_mod.h"
 
 void fmpz_mod_ctx_init_rand_bits(fmpz_mod_ctx_t ctx,

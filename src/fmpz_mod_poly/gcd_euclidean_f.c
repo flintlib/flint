@@ -10,7 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_vec.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 
 slong _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz *G,

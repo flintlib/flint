@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <assert.h>
-
 #include "nmod_mat.h"
-
+#include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
@@ -113,7 +111,7 @@ _artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
 
     fmpz *e, *f;
     nmod_mat_t A;
-    slong i, k, rk, *P;
+    slong i, k, *P;
 
     e = _fmpz_vec_init(d);
     f = _fmpz_vec_init(2 * d - 1);
@@ -153,9 +151,11 @@ _artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
         LU x = Pb, hence L y = Pb and U x = y.
      */
 
-    rk = nmod_mat_lu(P, A, 0);
-
-    assert(rk == d-1);
+#ifdef FLINT_WANT_ASSERT
+    FLINT_ASSERT(nmod_mat_lu(P, A, 0) == d - 1);
+#else
+    nmod_mat_lu(P, A, 0);
+#endif
 
     /* Solve for a preimage of (op,len) ------------------------------------ */
 

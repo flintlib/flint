@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_mod_poly.h"
+#include "fmpz_mod_poly_factor.h"
 
 void fmpz_mod_poly_factor_print_pretty(const fmpz_mod_poly_factor_t fac,
                                     const char *var, const fmpz_mod_ctx_t ctx)
