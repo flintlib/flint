@@ -20,7 +20,6 @@
 #endif
 
 #include "fmpz.h"
-#include "fmpz_vec.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -303,14 +302,6 @@ void fmpq_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k);
 
 void _fmpq_harmonic_ui(fmpz_t num, fmpz_t den, ulong n);
 void fmpq_harmonic_ui(fmpq_t x, ulong n);
-
-fmpq * _fmpq_vec_init(slong len);
-
-FMPQ_INLINE
-void _fmpq_vec_clear(fmpq * vec, slong len)
-{
-    _fmpz_vec_clear((fmpz *) vec, 2 * len);
-}
 
 /*********************** 2x2 integer matrix **********************************/
 
