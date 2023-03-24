@@ -18,7 +18,6 @@
 #define FMPZ_MOD_INLINE static __inline__
 #endif
 
-#include "flint.h"
 #include "fmpz_mod_types.h"
 
 #ifdef __cplusplus
@@ -39,14 +38,9 @@ extern "C" {
 */
 
 void fmpz_mod_ctx_init(fmpz_mod_ctx_t ctx, const fmpz_t n);
-
 void fmpz_mod_ctx_init_ui(fmpz_mod_ctx_t ctx, ulong n);
-
-void fmpz_mod_ctx_init_rand_bits(fmpz_mod_ctx_t ctx,
-                                  flint_rand_t state, flint_bitcnt_t max_bits);
-
-void fmpz_mod_ctx_init_rand_bits_prime(fmpz_mod_ctx_t ctx,
-                                  flint_rand_t state, flint_bitcnt_t max_bits);
+void fmpz_mod_ctx_init_rand_bits(fmpz_mod_ctx_t ctx, flint_rand_t state, flint_bitcnt_t max_bits);
+void fmpz_mod_ctx_init_rand_bits_prime(fmpz_mod_ctx_t ctx, flint_rand_t state, flint_bitcnt_t max_bits);
 
 void fmpz_mod_ctx_clear(fmpz_mod_ctx_t ctx);
 
@@ -55,164 +49,85 @@ FMPZ_MOD_INLINE const fmpz * fmpz_mod_ctx_modulus(const fmpz_mod_ctx_t ctx)
     return ctx->n;
 }
 
-FMPZ_MOD_INLINE
-void fmpz_mod_ctx_get_modulus_mpz_read_only(mpz_t m, const fmpz_mod_ctx_t ctx)
-{
-    const fmpz * p = fmpz_mod_ctx_modulus(ctx);
-    if (COEFF_IS_MPZ(*p))
-    {
-        *m = *COEFF_TO_PTR(*p);
-    }
-    else
-    {
-        m->_mp_size = 1;
-        m->_mp_alloc = 1;
-        m->_mp_d = (mp_ptr) p;
-    }
-}
-
 void fmpz_mod_ctx_set_modulus(fmpz_mod_ctx_t ctx, const fmpz_t n);
-
 void fmpz_mod_ctx_set_modulus_ui(fmpz_mod_ctx_t ctx, ulong n);
 
-int fmpz_mod_is_canonical(const fmpz_t a,  const fmpz_mod_ctx_t ctx);
+int fmpz_mod_is_canonical(const fmpz_t a, const fmpz_mod_ctx_t ctx);
 
-void fmpz_mod_assert_canonical(const fmpz_t a,
-                                                     const fmpz_mod_ctx_t ctx);
+void fmpz_mod_assert_canonical(const fmpz_t a, const fmpz_mod_ctx_t ctx);
 
-FMPZ_MOD_INLINE int fmpz_mod_is_one(const fmpz_t a, const fmpz_mod_ctx_t ctx)
-{
-    return fmpz_is_one(a) || fmpz_is_one(ctx->n);
-}
+int fmpz_mod_is_one(const fmpz_t a, const fmpz_mod_ctx_t ctx);
 
-int fmpz_mod_equal_fmpz(const fmpz_t a, const fmpz_t b,
-                                                     const fmpz_mod_ctx_t ctx);
+int fmpz_mod_equal_fmpz(const fmpz_t a, const fmpz_t b, const fmpz_mod_ctx_t ctx);
+int fmpz_mod_equal_si(const fmpz_t a, slong b, const fmpz_mod_ctx_t ctx);
 
-int fmpz_mod_equal_si(const fmpz_t a, slong b,
-                                                     const fmpz_mod_ctx_t ctx);
-
-void fmpz_mod_set_fmpz(fmpz_t a, const fmpz_t b,
-                                                     const fmpz_mod_ctx_t ctx);
-
+void fmpz_mod_set_fmpz(fmpz_t a, const fmpz_t b, const fmpz_mod_ctx_t ctx);
 void fmpz_mod_set_ui(fmpz_t a, ulong b, const fmpz_mod_ctx_t ctx);
-
 void fmpz_mod_set_si(fmpz_t a, slong b, const fmpz_mod_ctx_t ctx);
 
-void _fmpz_mod_add1(fmpz_t a, const fmpz_t b, const fmpz_t c,
-                                                     const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_add1(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_add2s(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_add2(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_addN(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
 
-void _fmpz_mod_add2s(fmpz_t a, const fmpz_t b, const fmpz_t c,
-                                                     const fmpz_mod_ctx_t ctx);
-
-void _fmpz_mod_add2(fmpz_t a, const fmpz_t b, const fmpz_t c,
-                                                     const fmpz_mod_ctx_t ctx);
-
-void _fmpz_mod_addN(fmpz_t a, const fmpz_t b, const fmpz_t c,
-                                                     const fmpz_mod_ctx_t ctx);
-
-FMPZ_MOD_INLINE void fmpz_mod_add(fmpz_t a, const fmpz_t b, const fmpz_t c,
-                                                     const fmpz_mod_ctx_t ctx)
+FMPZ_MOD_INLINE
+void fmpz_mod_add(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx)
 {
     (ctx->add_fxn)(a, b, c, ctx);
 }
 
-void fmpz_mod_add_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t c,
-                                                     const fmpz_mod_ctx_t ctx);
+void fmpz_mod_add_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_add_ui(fmpz_t a, const fmpz_t b, ulong c, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_add_si(fmpz_t a, const fmpz_t b, slong c, const fmpz_mod_ctx_t ctx);
 
-void fmpz_mod_add_ui(fmpz_t a, const fmpz_t b, ulong c,
-                                                     const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_sub1(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_sub2s(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_sub2(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_subN(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
 
-void fmpz_mod_add_si(fmpz_t a, const fmpz_t b, slong c,
-                                                     const fmpz_mod_ctx_t ctx);
-
-void _fmpz_mod_sub1(fmpz_t a, const fmpz_t b, const fmpz_t c,
-                                                     const fmpz_mod_ctx_t ctx);
-
-void _fmpz_mod_sub2s(fmpz_t a, const fmpz_t b, const fmpz_t c,
-                                                     const fmpz_mod_ctx_t ctx);
-
-void _fmpz_mod_sub2(fmpz_t a, const fmpz_t b, const fmpz_t c,
-                                                     const fmpz_mod_ctx_t ctx);
-
-void _fmpz_mod_subN(fmpz_t a, const fmpz_t b, const fmpz_t c,
-                                                     const fmpz_mod_ctx_t ctx);
-
-FMPZ_MOD_INLINE void fmpz_mod_sub(fmpz_t a, const fmpz_t b, const fmpz_t c,
-                                                     const fmpz_mod_ctx_t ctx)
+FMPZ_MOD_INLINE
+void fmpz_mod_sub(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx)
 {
     (ctx->sub_fxn)(a, b, c, ctx);
 }
 
-void fmpz_mod_sub_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t c,
-                                                     const fmpz_mod_ctx_t ctx);
+void fmpz_mod_sub_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_sub_ui(fmpz_t a, const fmpz_t b, ulong c, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_sub_si(fmpz_t a, const fmpz_t b, slong c, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_fmpz_sub(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_ui_sub(fmpz_t a, ulong b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_si_sub(fmpz_t a, slong b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
 
-void fmpz_mod_sub_ui(fmpz_t a, const fmpz_t b, ulong c,
-                                                     const fmpz_mod_ctx_t ctx);
+void fmpz_mod_neg(fmpz_t a, const fmpz_t b, const fmpz_mod_ctx_t ctx);
 
-void fmpz_mod_sub_si(fmpz_t a, const fmpz_t b, slong c,
-                                                     const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_mul1(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_mul2s(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_mul2(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_mulN(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
 
-void fmpz_mod_fmpz_sub(fmpz_t a, const fmpz_t b, const fmpz_t c,
-                                                     const fmpz_mod_ctx_t ctx);
-
-void fmpz_mod_ui_sub(fmpz_t a, ulong b, const fmpz_t c,
-                                                     const fmpz_mod_ctx_t ctx);
-
-void fmpz_mod_si_sub(fmpz_t a, slong b, const fmpz_t c,
-                                                     const fmpz_mod_ctx_t ctx);
-
-void fmpz_mod_neg(fmpz_t a, const fmpz_t b,
-                                                     const fmpz_mod_ctx_t ctx);
-
-void _fmpz_mod_mul1(fmpz_t a, const fmpz_t b, const fmpz_t c,
-                                                     const fmpz_mod_ctx_t ctx);
-
-void _fmpz_mod_mul2s(fmpz_t a, const fmpz_t b, const fmpz_t c,
-                                                     const fmpz_mod_ctx_t ctx);
-
-void _fmpz_mod_mul2(fmpz_t a, const fmpz_t b, const fmpz_t c,
-                                                     const fmpz_mod_ctx_t ctx);
-
-void _fmpz_mod_mulN(fmpz_t a, const fmpz_t b, const fmpz_t c,
-                                                     const fmpz_mod_ctx_t ctx);
-
-FMPZ_MOD_INLINE void fmpz_mod_mul(fmpz_t a, const fmpz_t b, const fmpz_t c,
-                                                     const fmpz_mod_ctx_t ctx)
+FMPZ_MOD_INLINE
+void fmpz_mod_mul(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx)
 {
     (ctx->mul_fxn)(a, b, c, ctx);
 }
 
-void fmpz_mod_addmul(fmpz_t a, const fmpz_t b, const fmpz_t c,
-                                     const fmpz_t d, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_mul_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_mul_ui(fmpz_t a, const fmpz_t b, ulong c, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_mul_si(fmpz_t a, const fmpz_t b, slong c, const fmpz_mod_ctx_t ctx);
 
-void fmpz_mod_mul_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t c,
-                                                     const fmpz_mod_ctx_t ctx);
-
-void fmpz_mod_mul_ui(fmpz_t a, const fmpz_t b, ulong c,
-                                                     const fmpz_mod_ctx_t ctx);
-
-void fmpz_mod_mul_si(fmpz_t a, const fmpz_t b, slong c,
-                                                     const fmpz_mod_ctx_t ctx);
+void fmpz_mod_addmul(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_t d, const fmpz_mod_ctx_t ctx);
 
 int fmpz_mod_is_invertible(const fmpz_t a, const fmpz_mod_ctx_t ctx);
 
-void fmpz_mod_inv(fmpz_t a, const fmpz_t b,
-                                                     const fmpz_mod_ctx_t ctx);
+void fmpz_mod_inv(fmpz_t a, const fmpz_t b, const fmpz_mod_ctx_t ctx);
 
-int fmpz_mod_divides(fmpz_t a, const fmpz_t b, const fmpz_t c,
-                                                     const fmpz_mod_ctx_t ctx);
+int fmpz_mod_divides(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
 
-void fmpz_mod_pow_ui(fmpz_t a, const fmpz_t b, ulong pow,
-                                                     const fmpz_mod_ctx_t ctx);
+void fmpz_mod_pow_ui(fmpz_t a, const fmpz_t b, ulong pow, const fmpz_mod_ctx_t ctx);
+int fmpz_mod_pow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t pow, const fmpz_mod_ctx_t ctx);
 
-int fmpz_mod_pow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t pow,
-                                                     const fmpz_mod_ctx_t ctx);
-
-void fmpz_mod_rand(fmpz_t a, flint_rand_t state,
-                                                     const fmpz_mod_ctx_t ctx);
-
-void fmpz_mod_rand_not_zero(fmpz_t a, flint_rand_t state,
-                                                     const fmpz_mod_ctx_t ctx);
+void fmpz_mod_rand(fmpz_t a, flint_rand_t state, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_rand_not_zero(fmpz_t a, flint_rand_t state, const fmpz_mod_ctx_t ctx);
 
 /* discrete logs a la Pohlig - Hellman ***************************************/
 
@@ -245,29 +160,25 @@ typedef struct {
 } fmpz_mod_discrete_log_pohlig_hellman_struct;
 typedef fmpz_mod_discrete_log_pohlig_hellman_struct fmpz_mod_discrete_log_pohlig_hellman_t[1];
 
-void fmpz_mod_discrete_log_pohlig_hellman_init(
-                    fmpz_mod_discrete_log_pohlig_hellman_t L);
+void fmpz_mod_discrete_log_pohlig_hellman_init(fmpz_mod_discrete_log_pohlig_hellman_t L);
 
-void fmpz_mod_discrete_log_pohlig_hellman_clear(
-                    fmpz_mod_discrete_log_pohlig_hellman_t L);
+void fmpz_mod_discrete_log_pohlig_hellman_clear(fmpz_mod_discrete_log_pohlig_hellman_t L);
 
-double fmpz_mod_discrete_log_pohlig_hellman_precompute_prime(
-                    fmpz_mod_discrete_log_pohlig_hellman_t L,
-                    const fmpz_t p);
+double fmpz_mod_discrete_log_pohlig_hellman_precompute_prime(fmpz_mod_discrete_log_pohlig_hellman_t L, const fmpz_t p);
 
-void fmpz_mod_discrete_log_pohlig_hellman_run(
-                    fmpz_t x,
-                    const fmpz_mod_discrete_log_pohlig_hellman_t L,
-                    const fmpz_t y);
+void fmpz_mod_discrete_log_pohlig_hellman_run(fmpz_t x, const fmpz_mod_discrete_log_pohlig_hellman_t L, const fmpz_t y);
 
-FMPZ_MOD_INLINE const fmpz * fmpz_mod_discrete_log_pohlig_hellman_primitive_root(
-                    fmpz_mod_discrete_log_pohlig_hellman_t L)
+FMPZ_MOD_INLINE
+const fmpz * fmpz_mod_discrete_log_pohlig_hellman_primitive_root(fmpz_mod_discrete_log_pohlig_hellman_t L)
 {
     return L->alpha;
 }
 
 int fmpz_next_smooth_prime(fmpz_t a, const fmpz_t b);
 
+/* Declare dead functions *****************************************************/
+
+#define fmpz_mod_ctx_get_modulus_mpz_read_only _Pragma("GCC error \"'fmpz_mod_ctx_get_modulus_mpz_read_only' is deprecated. Use 'fmpz_mod_ctx_modulus' instead.\"")
 
 #ifdef __cplusplus
 }
