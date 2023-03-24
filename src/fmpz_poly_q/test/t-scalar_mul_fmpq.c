@@ -11,10 +11,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-
+#include "fmpz.h"
+#include "fmpq.h"
 #include "fmpz_poly_q.h"
-#include "long_extras.h"
-#include "ulong_extras.h"
 
 int
 main(void)
@@ -22,7 +21,7 @@ main(void)
     int i, result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("scalar_div_mpq... ");
+    flint_printf("scalar_mul_fmpq... ");
     fflush(stdout);
 
 
@@ -32,23 +31,23 @@ main(void)
     {
         fmpz_poly_q_t a, b;
         fmpz_t x1, x2;
-        mpq_t y;
+        fmpq_t y;
 
         fmpz_poly_q_init(a);
         fmpz_poly_q_init(b);
         fmpz_init(x1);
         fmpz_init(x2);
-        mpq_init(y);
+        fmpq_init(y);
 
         fmpz_poly_q_randtest(b, state, n_randint(state, 50), 50, n_randint(state, 50), 50);
-        fmpz_randtest_not_zero(x1, state, 50);
+        fmpz_randtest(x1, state, 50);
         fmpz_randtest_not_zero(x2, state, 50);
-        fmpz_get_mpz(mpq_numref(y), x1);
-        fmpz_get_mpz(mpq_denref(y), x2);
-        mpq_canonicalize(y);
+        fmpz_set(fmpq_numref(y), x1);
+        fmpz_set(fmpq_denref(y), x2);
+        fmpq_canonicalise(y);
 
-        fmpz_poly_q_scalar_div_mpq(a, b, y);
-        fmpz_poly_q_scalar_div_mpq(b, b, y);
+        fmpz_poly_q_scalar_mul_fmpq(a, b, y);
+        fmpz_poly_q_scalar_mul_fmpq(b, b, y);
 
         result = fmpz_poly_q_equal(a, b);
         if (!result)
@@ -64,7 +63,7 @@ main(void)
         fmpz_poly_q_clear(b);
         fmpz_clear(x1);
         fmpz_clear(x2);
-        mpq_clear(y);
+        fmpq_clear(y);
     }
 
     /* Check that x (a + b) == x * a + x * b */
@@ -72,7 +71,7 @@ main(void)
     {
         fmpz_poly_q_t a, b, c, d;
         fmpz_t x1, x2;
-        mpq_t y;
+        fmpq_t y;
 
         fmpz_poly_q_init(a);
         fmpz_poly_q_init(b);
@@ -80,22 +79,22 @@ main(void)
         fmpz_poly_q_init(d);
         fmpz_init(x1);
         fmpz_init(x2);
-        mpq_init(y);
+        fmpq_init(y);
 
         fmpz_poly_q_randtest(a, state, n_randint(state, 50), 50, n_randint(state, 50), 50);
         fmpz_poly_q_randtest(b, state, n_randint(state, 50), 50, n_randint(state, 50), 50);
-        fmpz_randtest_not_zero(x1, state, 50);
+        fmpz_randtest(x1, state, 50);
         fmpz_randtest_not_zero(x2, state, 50);
-        fmpz_get_mpz(mpq_numref(y), x1);
-        fmpz_get_mpz(mpq_denref(y), x2);
-        mpq_canonicalize(y);
+        fmpz_set(fmpq_numref(y), x1);
+        fmpz_set(fmpq_denref(y), x2);
+        fmpq_canonicalise(y);
 
-        fmpz_poly_q_scalar_div_mpq(c, a, y);
-        fmpz_poly_q_scalar_div_mpq(d, b, y);
+        fmpz_poly_q_scalar_mul_fmpq(c, a, y);
+        fmpz_poly_q_scalar_mul_fmpq(d, b, y);
         fmpz_poly_q_add(d, c, d);
 
         fmpz_poly_q_add(c, a, b);
-        fmpz_poly_q_scalar_div_mpq(c, c, y);
+        fmpz_poly_q_scalar_mul_fmpq(c, c, y);
 
         result = fmpz_poly_q_equal(c, d) && fmpz_poly_q_is_canonical(c);
         if (!result)
@@ -105,7 +104,7 @@ main(void)
             flint_printf("b = "), fmpz_poly_q_print(b), flint_printf("\n\n");
             flint_printf("c = "), fmpz_poly_q_print(c), flint_printf("\n\n");
             flint_printf("d = "), fmpz_poly_q_print(d), flint_printf("\n\n");
-            gmp_printf("y = %Qd\n\n", y);
+            flint_printf("y = "), fmpq_print(y), flint_printf("\n\n");
             fflush(stdout);
             flint_abort();
         }
@@ -116,7 +115,7 @@ main(void)
         fmpz_poly_q_clear(d);
         fmpz_clear(x1);
         fmpz_clear(x2);
-        mpq_clear(y);
+        fmpq_clear(y);
     }
 
     FLINT_TEST_CLEANUP(state);

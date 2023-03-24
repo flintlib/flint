@@ -148,30 +148,30 @@ Scalar multiplication and division
     Sets ``rop`` to the product of the rational function ``op`` 
     and the ``slong`` integer `x`.
 
-.. function:: void fmpz_poly_q_scalar_mul_mpz(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const mpz_t x)
+.. function:: void fmpz_poly_q_scalar_mul_fmpz(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const fmpz_t x)
 
     Sets ``rop`` to the product of the rational function ``op`` 
-    and the ``mpz_t`` integer `x`.
+    and the ``fmpz_t`` integer `x`.
 
-.. function:: void fmpz_poly_q_scalar_mul_mpq(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const mpq_t x)
+.. function:: void fmpz_poly_q_scalar_mul_fmpq(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const fmpq_t x)
 
     Sets ``rop`` to the product of the rational function ``op`` 
-    and the ``mpq_t`` rational `x`.
+    and the ``fmpq_t`` rational `x`.
 
 .. function:: void fmpz_poly_q_scalar_div_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, slong x)
 
     Sets ``rop`` to the quotient of the rational function ``op`` 
     and the ``slong`` integer `x`.
 
-.. function:: void fmpz_poly_q_scalar_div_mpz(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const mpz_t x)
+.. function:: void fmpz_poly_q_scalar_div_fmpz(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const fmpz_t x)
 
     Sets ``rop`` to the quotient of the rational function ``op`` 
-    and the ``mpz_t`` integer `x`.
+    and the ``fmpz_t`` integer `x`.
 
-.. function:: void fmpz_poly_q_scalar_div_mpq(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const mpq_t x)
+.. function:: void fmpz_poly_q_scalar_div_fmpq(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const fmpq_t x)
 
     Sets ``rop`` to the quotient of the rational function ``op`` 
-    and the ``mpq_t`` rational `x`.
+    and the ``fmpq_t`` rational `x`.
 
 
 Multiplication and division
@@ -212,7 +212,7 @@ Evaluation
 --------------------------------------------------------------------------------
 
 
-.. function:: int fmpz_poly_q_evaluate(mpq_t rop, const fmpz_poly_q_t f, const mpq_t a)
+.. function:: int fmpz_poly_q_evaluate_fmpq(fmpq_t rop, const fmpz_poly_q_t f, const fmpq_t a)
 
     Sets ``rop`` to `f` evaluated at the rational `a`.
 
