@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2010 Sebastian Pancratz
-    Copyright (C) 2013 Fredrik Johansson
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -10,18 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_poly.h"
-#include "fmpq.h"
 
-void
-fmpz_poly_evaluate_mpq(mpq_t res, const fmpz_poly_t f, const mpq_t a)
+void _fmpz_poly_set_length(fmpz_poly_t poly, slong newlen)
 {
-    fmpq_t r, b;
-    fmpq_init(r);
-    fmpq_init(b);
-    fmpq_set_mpq(b, a);
-    fmpz_poly_evaluate_fmpq(r, f, b);
-    fmpq_get_mpq(res, r);
-    fmpq_clear(r);
-    fmpq_clear(b);
+    if (poly->length > newlen)
+    {
+        slong i;
+        for (i = newlen; i < poly->length; i++)
+           _fmpz_demote(poly->coeffs + i);
+    }
+    poly->length = newlen;
 }

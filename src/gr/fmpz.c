@@ -13,6 +13,7 @@
 #include "qqbar.h"
 #include "fmpz_factor.h"
 #include "fmpz_poly.h"
+#include "fmpz_poly_factor.h"
 #include "fmpz_mat.h"
 #include "fmpq.h"
 #include "gr.h"

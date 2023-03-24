@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
 void fmpz_mod_poly_scalar_addmul_fmpz(fmpz_mod_poly_t A,
@@ -29,4 +30,3 @@ void fmpz_mod_poly_scalar_addmul_fmpz(fmpz_mod_poly_t A,
     _fmpz_mod_poly_set_length(A, len);
     _fmpz_mod_poly_normalise(A);
 }
-

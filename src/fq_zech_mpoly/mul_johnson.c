@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fq_zech_mpoly.h"
 
 slong _fq_zech_mpoly_mul_johnson(

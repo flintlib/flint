@@ -13,7 +13,7 @@
 */
 
 #include "fmpz_poly.h"
-
+#include "fmpz_poly_factor.h"
 
 static void _fmpz_poly_product(
     fmpz_poly_t res,

@@ -666,35 +666,9 @@ void fmpz_mod_poly_divrem_f(fmpz_t f, fmpz_mod_poly_t Q,
           fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
                                                      const fmpz_mod_ctx_t ctx);
 
-FMPZ_MOD_POLY_INLINE
-void _fmpz_mod_poly_rem(fmpz *R,
-                        const fmpz *A, slong lenA, const fmpz *B, slong lenB,
-                        const fmpz_t invB, const fmpz_t p)
-{
-    fmpz *Q = _fmpz_vec_init(lenA - lenB + 1);
-    _fmpz_mod_poly_divrem(Q, R, A, lenA, B, lenB, invB, p);
-    _fmpz_vec_clear(Q, lenA - lenB + 1);
-}
-
-FMPZ_MOD_POLY_INLINE
-void fmpz_mod_poly_rem(fmpz_mod_poly_t R, const fmpz_mod_poly_t A,
-                             const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
-{
-    fmpz_mod_poly_t Q;
-    fmpz_mod_poly_init(Q, ctx);
-    fmpz_mod_poly_divrem(Q, R, A, B, ctx);
-    fmpz_mod_poly_clear(Q, ctx);
-}
-
-FMPZ_MOD_POLY_INLINE
-void fmpz_mod_poly_rem_f(fmpz_t f, fmpz_mod_poly_t R, const fmpz_mod_poly_t A,
-                             const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
-{
-    fmpz_mod_poly_t Q;
-    fmpz_mod_poly_init(Q, ctx);
-    fmpz_mod_poly_divrem_f(f, Q, R, A, B, ctx);
-    fmpz_mod_poly_clear(Q, ctx);
-}
+void _fmpz_mod_poly_rem(fmpz *R, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invB, const fmpz_t p);
+void fmpz_mod_poly_rem(fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_poly_rem_f(fmpz_t f, fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx);
 
 /* Divisibility testing ******************************************************/
 

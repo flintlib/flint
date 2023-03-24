@@ -117,10 +117,6 @@ Assignment and basic manipulation
 
     Sets ``poly`` to the integer ``c``.
 
-.. function:: void fmpz_poly_set_mpz(fmpz_poly_t poly, const mpz_t c)
-
-    Sets ``poly`` to the integer ``c``.
-
 .. function:: int _fmpz_poly_set_str(fmpz * poly, const char * str)
 
     Sets ``poly`` to the polynomial encoded in the null-terminated 
@@ -396,10 +392,6 @@ Scalar absolute value, multiplication and division
 
     Sets ``poly1`` to ``poly2`` times `x`.
 
-.. function:: void fmpz_poly_scalar_mul_mpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, const mpz_t x)
-
-    Sets ``poly1`` to ``poly2`` times the ``mpz_t`` `x`.
-
 .. function:: void fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, fmpz_poly_t poly2, slong x)
 
     Sets ``poly1`` to ``poly2`` times the signed ``slong x``.
@@ -427,11 +419,6 @@ Scalar absolute value, multiplication and division
 .. function:: void fmpz_poly_scalar_fdiv_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, const fmpz_t x)
 
     Sets ``poly1`` to ``poly2`` divided by the ``fmpz_t x``, 
-    rounding coefficients down toward `- \infty`.
-
-.. function:: void fmpz_poly_scalar_fdiv_mpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, const mpz_t x)
-
-    Sets ``poly1`` to ``poly2`` divided by the ``mpz_t x``, 
     rounding coefficients down toward `- \infty`.
 
 .. function:: void fmpz_poly_scalar_fdiv_si(fmpz_poly_t poly1, fmpz_poly_t poly2, slong x)
@@ -474,12 +461,7 @@ Scalar absolute value, multiplication and division
     Sets ``poly1`` to ``poly2`` divided by the ``fmpz_t x``, 
     assuming the division is exact for every coefficient.
 
-.. function:: void fmpz_poly_scalar_divexact_mpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, const mpz_t x)
-
-    Sets ``poly1`` to ``poly2`` divided by the ``mpz_t x``, 
-    assuming the coefficient is exact for every coefficient.
-
-.. function:: id fmpz_poly_scalar_divexact_si(fmpz_poly_t poly1, fmpz_poly_t poly2, slong x)
+.. function:: void fmpz_poly_scalar_divexact_si(fmpz_poly_t poly1, fmpz_poly_t poly2, slong x)
 
     Sets ``poly1`` to ``poly2`` divided by the ``slong x``, 
     assuming the coefficient is exact for every coefficient.
@@ -1974,6 +1956,9 @@ Pseudo division
     ``fmpz_preinvn_init`` can be supplied. Otherwise ``inv`` should be
     ``NULL``. 
 
+    Note: ``fmpz.h`` has to be included before ``fmpz_poly.h`` in order for
+    ``fmpz_poly.h`` to declare this function.
+
 .. function:: void fmpz_poly_pseudo_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R, ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
 
     If `\ell` is the leading coefficient of `B`, then computes `Q`, `R` such 
@@ -1993,6 +1978,9 @@ Pseudo division
     An optional precomputed inverse of the leading coefficient of `B` from
     ``fmpz_preinvn_init`` can be supplied. Otherwise ``inv`` should be
     ``NULL``. 
+
+    Note: ``fmpz.h`` has to be included before ``fmpz_poly.h`` in order for
+    ``fmpz_poly.h`` to declare this function.
 
 .. function:: void fmpz_poly_pseudo_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R, ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
 
@@ -2059,6 +2047,9 @@ Pseudo division
     ``fmpz_preinvn_init`` can be supplied. Otherwise ``inv`` should be
     ``NULL``. 
 
+    Note: ``fmpz.h`` has to be included before ``fmpz_poly.h`` in order for
+    ``fmpz_poly.h`` to declare this function.
+
 .. function:: void fmpz_poly_pseudo_divrem(fmpz_poly_t Q, fmpz_poly_t R, ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
 
     Computes `Q`, `R`, and `d` such that `\ell^d A = B Q + R`.
@@ -2067,6 +2058,9 @@ Pseudo division
 
     Pseudo-division, only returning the quotient.
 
+    Note: ``fmpz.h`` has to be included before ``fmpz_poly.h`` in order for
+    ``fmpz_poly.h`` to declare this function.
+
 .. function:: void fmpz_poly_pseudo_div(fmpz_poly_t Q, ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
 
     Pseudo-division, only returning the quotient.
@@ -2074,6 +2068,9 @@ Pseudo division
 .. function:: void _fmpz_poly_pseudo_rem(fmpz * R, ulong * d, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_preinvn_t inv)
 
     Pseudo-division, only returning the remainder.
+
+    Note: ``fmpz.h`` has to be included before ``fmpz_poly.h`` in order for
+    ``fmpz_poly.h`` to declare this function.
 
 .. function:: void fmpz_poly_pseudo_rem(fmpz_poly_t R, ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
 
@@ -2195,11 +2192,6 @@ Evaluation
 
     Evaluates the polynomial `f` at the rational `a`, and 
     sets ``res`` to the result.
-
-.. function:: void fmpz_poly_evaluate_mpq(mpq_t res, const fmpz_poly_t f, const mpq_t a)
-
-    Evaluates the polynomial `f` at the rational `a` and sets ``res`` to 
-    the result.
 
 .. function:: mp_limb_t _fmpz_poly_evaluate_mod(const fmpz * poly, slong len, mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
 

@@ -12,6 +12,7 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_factor.h"
 #include "fq_nmod.h"
 
 #ifdef T

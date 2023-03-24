@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "nmod_mpoly.h"
 
 /* evaluate B(xbar) at xbar = C */

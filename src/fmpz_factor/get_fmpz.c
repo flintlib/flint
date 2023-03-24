@@ -9,13 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define FMPZ_FACTOR_INLINES_C
-
-#include "flint.h"
 #include "fmpz.h"
+#include "fmpz_factor.h"
 
 void fmpz_factor_get_fmpz(fmpz_t z, const fmpz_factor_t factor, slong i)
 {
     fmpz_set(z, factor->p + i);
 }
-

@@ -11,9 +11,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-
+#include "fmpz.h"
 #include "fmpz_poly_q.h"
-#include "ulong_extras.h"
 
 int
 main(void)

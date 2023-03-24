@@ -9,9 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_poly.h"
 
 void
@@ -31,4 +28,3 @@ fmpz_poly_taylor_shift(fmpz_poly_t g, const fmpz_poly_t f, const fmpz_t c)
 
     _fmpz_poly_taylor_shift(g->coeffs, c, g->length);
 }
-

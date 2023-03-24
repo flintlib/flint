@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
 #include "mpn_extras.h"
+#include "fmpz_factor.h"
 
 /* Select Montgomery Elliptic Curve given a sigma
    (Suyama's parameterization)

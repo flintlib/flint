@@ -10,7 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_poly.h"
+#include "fmpz_poly_factor.h"
 
 slong _fmpz_poly_hensel_continue_lift(fmpz_poly_factor_t lifted_fac,
     slong *link, fmpz_poly_t *v, fmpz_poly_t *w, const fmpz_poly_t f,

@@ -15,6 +15,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fq_poly.h"
 
 #ifdef T

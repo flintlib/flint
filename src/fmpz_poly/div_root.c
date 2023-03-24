@@ -9,10 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
-
 
 void
 _fmpz_poly_div_root(fmpz * Q, const fmpz * A, slong len, const fmpz_t c)

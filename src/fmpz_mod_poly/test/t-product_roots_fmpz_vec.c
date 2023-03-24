@@ -10,10 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
 #include "ulong_extras.h"
+#include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
 int

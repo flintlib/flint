@@ -11,7 +11,6 @@
 
 #include "fmpz_poly_factor.h"
 
-
 void zassenhaus_prune_clear(zassenhaus_prune_t Z)
 {
     if (Z->alloc > 0)

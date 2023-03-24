@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "nmod_mpoly_factor.h"
-
 
 static void nmod_mpoly_factor_mul_mpoly_fmpz(
 	nmod_mpoly_factor_t fac,

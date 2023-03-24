@@ -18,6 +18,7 @@
 */
 
 #include <stdio.h>
+#include "fmpz_vec.h"
 #include "fq_poly.h"
 #include "fq_mat.h"
 

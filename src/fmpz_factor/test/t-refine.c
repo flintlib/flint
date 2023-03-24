@@ -9,10 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "gmpcompat.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
+#include "fmpz_factor.h"
 
 void _fmpz_factor_randtest(fmpz_factor_t f, flint_rand_t state,
         slong num, flint_bitcnt_t bits);

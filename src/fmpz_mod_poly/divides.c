@@ -9,8 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz_mod_vec.h"
+#include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
 int _fmpz_mod_poly_divides(fmpz * Q, const fmpz * A, slong lenA,

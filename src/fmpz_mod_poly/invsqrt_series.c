@@ -10,10 +10,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_poly.h"
-#include "fmpz_mod_vec.h"
 #include "fmpz.h"
-#include "ulong_extras.h"
+#include "fmpz_vec.h"
+#include "fmpz_mod_vec.h"
+#include "fmpz_mod_poly.h"
 
 static void
 __fmpz_mod_poly_invsqrt_series_prealloc(fmpz * g,

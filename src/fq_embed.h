@@ -20,8 +20,9 @@
 #define FQ_EMBED_TEMPLATES_INLINE static __inline__
 #endif
 
+#include "fmpz_vec.h"
+#include "fmpz_mod_poly.h"
 #include "fq.h"
-#include "fmpz_mod_types.h"
 
 #define T fq
 #define B fmpz_mod

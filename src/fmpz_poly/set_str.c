@@ -13,7 +13,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
-#include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009, 2010, 2011 Sebastian Pancratz
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -115,12 +116,12 @@ void fmpz_poly_q_submul(fmpz_poly_q_t rop, const fmpz_poly_q_t op1, const fmpz_p
 /* Scalar multiplication and division ****************************************/
 
 void fmpz_poly_q_scalar_mul_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, slong x);
-void fmpz_poly_q_scalar_mul_mpz(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const mpz_t x);
-void fmpz_poly_q_scalar_mul_mpq(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const mpq_t x);
+void fmpz_poly_q_scalar_mul_fmpz(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const fmpz_t x);
+void fmpz_poly_q_scalar_mul_fmpq(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const fmpq_t x);
 
 void fmpz_poly_q_scalar_div_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, slong x);
-void fmpz_poly_q_scalar_div_mpz(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const mpz_t x);
-void fmpz_poly_q_scalar_div_mpq(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const mpq_t x);
+void fmpz_poly_q_scalar_div_fmpz(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const fmpz_t x);
+void fmpz_poly_q_scalar_div_fmpq(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const fmpq_t x);
 
 /* Multiplication and division ***********************************************/
 
@@ -140,7 +141,7 @@ void fmpz_poly_q_derivative(fmpz_poly_q_t rop, const fmpz_poly_q_t op);
 
 /* Evaluation ****************************************************************/
 
-int fmpz_poly_q_evaluate(mpq_t rop, const fmpz_poly_q_t f, const mpq_t a);
+int fmpz_poly_q_evaluate_fmpq(fmpq_t rop, const fmpz_poly_q_t f, const fmpq_t a);
 
 /* Input and output **********************************************************/
 
@@ -152,9 +153,16 @@ char * fmpz_poly_q_get_str_pretty(const fmpz_poly_q_t op, const char *x);
 int fmpz_poly_q_print(const fmpz_poly_q_t op);
 int fmpz_poly_q_print_pretty(const fmpz_poly_q_t op, const char *x);
 
+/* Declare old functions dead *************************************************/
+
+#define fmpz_poly_q_scalar_mul_mpz _Pragma("GCC error \"'fmpz_poly_q_scalar_mul_mpz' is deprecated. Use 'fmpz_poly_q_scalar_mul_fmpz' instead.\"")
+#define fmpz_poly_q_scalar_mul_mpq _Pragma("GCC error \"'fmpz_poly_q_scalar_mul_mpq' is deprecated. Use 'fmpz_poly_q_scalar_mul_fmpq' instead.\"")
+#define fmpz_poly_q_scalar_div_mpz _Pragma("GCC error \"'fmpz_poly_q_scalar_div_mpz' is deprecated. Use 'fmpz_poly_q_scalar_div_fmpz' instead.\"")
+#define fmpz_poly_q_scalar_div_mpq _Pragma("GCC error \"'fmpz_poly_q_scalar_div_mpq' is deprecated. Use 'fmpz_poly_q_scalar_div_fmpq' instead.\"")
+#define fmpz_poly_q_evaluate _Pragma("GCC error \"'fmpz_poly_q_evaluate' is deprecated. Use 'fmpz_poly_q_evaluate_fmpq' instead.\"")
+
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-

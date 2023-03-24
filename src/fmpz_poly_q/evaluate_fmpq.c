@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010, 2011 Sebastian Pancratz
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,30 +10,30 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpq.h"
 #include "fmpz_poly_q.h"
-#include "gmpcompat.h"
 
-int fmpz_poly_q_evaluate(mpq_t rop, const fmpz_poly_q_t f, const mpq_t a)
+int fmpz_poly_q_evaluate_fmpq(fmpq_t rop, const fmpz_poly_q_t f, const fmpq_t a)
 {
-    if (flint_mpz_cmp_si(mpq_denref(a), 1))  /* a is not an integer */
+    if (fmpz_cmp_si(fmpq_denref(a), 1))  /* a is not an integer */
     {
-        mpq_t mpqnum, mpqden;
+        fmpq_t fmpqnum, fmpqden;
 
-        mpq_init(mpqden);
-        fmpz_poly_evaluate_mpq(mpqden, f->den, a);
-        if (mpq_sgn(mpqden) == 0)
+        fmpq_init(fmpqden);
+        fmpz_poly_evaluate_fmpq(fmpqden, f->den, a);
+        if (fmpq_sgn(fmpqden) == 0)
         {
-            mpq_clear(mpqden);
+            fmpq_clear(fmpqden);
             return 1;
         }
 
-        mpq_init(mpqnum);
+        fmpq_init(fmpqnum);
 
-        fmpz_poly_evaluate_mpq(mpqnum, f->num, a);
-        mpq_div(rop, mpqnum, mpqden);
+        fmpz_poly_evaluate_fmpq(fmpqnum, f->num, a);
+        fmpq_div(rop, fmpqnum, fmpqden);
 
-        mpq_clear(mpqnum);
-        mpq_clear(mpqden);
+        fmpq_clear(fmpqnum);
+        fmpq_clear(fmpqden);
         return 0;
     }
     else  /* a is an integer */
@@ -43,7 +44,7 @@ int fmpz_poly_q_evaluate(mpq_t rop, const fmpz_poly_q_t f, const mpq_t a)
         fmpz_init(den);
         fmpz_init(a2);
 
-        fmpz_set_mpz(a2, mpq_numref(a));
+        fmpz_set(a2, fmpq_numref(a));
 
         fmpz_poly_evaluate_fmpz(den, f->den, a2);
         if (fmpz_is_zero(den))
@@ -56,9 +57,9 @@ int fmpz_poly_q_evaluate(mpq_t rop, const fmpz_poly_q_t f, const mpq_t a)
 
         fmpz_poly_evaluate_fmpz(num, f->num, a2);
 
-        fmpz_get_mpz(mpq_numref(rop), num);
-        fmpz_get_mpz(mpq_denref(rop), den);
-        mpq_canonicalize(rop);
+        fmpz_set(fmpq_numref(rop), num);
+        fmpz_set(fmpq_denref(rop), den);
+        _fmpq_canonicalise(fmpq_numref(rop), fmpq_denref(rop));
 
         fmpz_clear(a2);
         fmpz_clear(num);

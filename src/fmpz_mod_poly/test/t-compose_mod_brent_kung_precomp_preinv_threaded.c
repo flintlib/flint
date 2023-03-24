@@ -14,6 +14,7 @@
 
 #include "thread_support.h"
 #include "ulong_extras.h"
+#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 #include "fmpz_mod_poly.h"
 

@@ -10,10 +10,8 @@
 */
 
 #include <stdlib.h>
-#include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
-
+#include "fmpz_factor.h"
 
 #define fr_node_mref(x) (&(x)->m)
 

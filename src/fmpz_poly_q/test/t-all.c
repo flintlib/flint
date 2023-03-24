@@ -12,10 +12,8 @@
 */
 
 #include <string.h>
-
+#include "fmpq.h"
 #include "fmpz_poly_q.h"
-#include "gmpcompat.h"
-
 
 void test_set(char * in, char * out)
 {
@@ -555,7 +553,7 @@ void test_scalar_mul_si(char * in, slong x, char * out)
     flint_free(res);
 }
 
-void test_scalar_mul_mpz(char * in, mpz_t x, char * out)
+void test_scalar_mul_fmpz(char * in, fmpz_t x, char * out)
 {
     int ans;
     fmpz_poly_q_t rop, op;
@@ -565,14 +563,14 @@ void test_scalar_mul_mpz(char * in, mpz_t x, char * out)
     fmpz_poly_q_set_str(op, in);
 
     fmpz_poly_q_init(rop);
-    fmpz_poly_q_scalar_mul_mpz(rop, op, x);
+    fmpz_poly_q_scalar_mul_fmpz(rop, op, x);
 
     res = fmpz_poly_q_get_str(rop);
     ans = !strcmp(out, res);
 
     if (!ans)
     {
-        flint_printf("test_scalar_mul_mpz: failed\n");
+        flint_printf("test_scalar_mul_fmpz: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
         fflush(stdout);
         flint_abort();
@@ -583,7 +581,7 @@ void test_scalar_mul_mpz(char * in, mpz_t x, char * out)
     flint_free(res);
 }
 
-void test_scalar_mul_mpq(char * in, mpq_t x, char * out)
+void test_scalar_mul_fmpq(char * in, fmpq_t x, char * out)
 {
     int ans;
     fmpz_poly_q_t rop, op;
@@ -593,14 +591,14 @@ void test_scalar_mul_mpq(char * in, mpq_t x, char * out)
     fmpz_poly_q_set_str(op, in);
 
     fmpz_poly_q_init(rop);
-    fmpz_poly_q_scalar_mul_mpq(rop, op, x);
+    fmpz_poly_q_scalar_mul_fmpq(rop, op, x);
 
     res = fmpz_poly_q_get_str(rop);
     ans = !strcmp(out, res);
 
     if (!ans)
     {
-        flint_printf("test_scalar_mul_mpq: failed\n");
+        flint_printf("test_scalar_mul_fmpq: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
         fflush(stdout);
         flint_abort();
@@ -639,7 +637,7 @@ void test_scalar_div_si(char * in, slong x, char * out)
     flint_free(res);
 }
 
-void test_scalar_div_mpz(char * in, mpz_t x, char * out)
+void test_scalar_div_fmpz(char * in, fmpz_t x, char * out)
 {
     int ans;
     fmpz_poly_q_t rop, op;
@@ -649,14 +647,14 @@ void test_scalar_div_mpz(char * in, mpz_t x, char * out)
     fmpz_poly_q_set_str(op, in);
 
     fmpz_poly_q_init(rop);
-    fmpz_poly_q_scalar_div_mpz(rop, op, x);
+    fmpz_poly_q_scalar_div_fmpz(rop, op, x);
 
     res = fmpz_poly_q_get_str(rop);
     ans = !strcmp(out, res);
 
     if (!ans)
     {
-        flint_printf("test_scalar_div_mpz: failed\n");
+        flint_printf("test_scalar_div_fmpz: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
         fflush(stdout);
         flint_abort();
@@ -667,7 +665,7 @@ void test_scalar_div_mpz(char * in, mpz_t x, char * out)
     flint_free(res);
 }
 
-void test_scalar_div_mpq(char * in, mpq_t x, char * out)
+void test_scalar_div_fmpq(char * in, fmpq_t x, char * out)
 {
     int ans;
     fmpz_poly_q_t rop, op;
@@ -677,14 +675,14 @@ void test_scalar_div_mpq(char * in, mpq_t x, char * out)
     fmpz_poly_q_set_str(op, in);
 
     fmpz_poly_q_init(rop);
-    fmpz_poly_q_scalar_div_mpq(rop, op, x);
+    fmpz_poly_q_scalar_div_fmpq(rop, op, x);
 
     res = fmpz_poly_q_get_str(rop);
     ans = !strcmp(out, res);
 
     if (!ans)
     {
-        flint_printf("test_scalar_div_mpq: failed\n");
+        flint_printf("test_scalar_div_fmpq: failed\n");
         flint_printf("    Expected \"%s\", got \"%s\"\n", out, res);
         fflush(stdout);
         flint_abort();
@@ -1001,16 +999,16 @@ void test_evaluate(char * in, int numa, int numb, char * out)
 {
     int ans, pole;
     fmpz_poly_q_t op;
-    mpq_t rop, a;
+    fmpq_t rop, a;
     char *res = NULL;
 
     fmpz_poly_q_init(op);
     fmpz_poly_q_set_str(op, in);
 
-    mpq_init(a);
-    flint_mpq_set_si(a, numa, numb);
-    mpq_init(rop);
-    pole = fmpz_poly_q_evaluate(rop, op, a);
+    fmpq_init(a);
+    fmpq_set_si(a, numa, numb);
+    fmpq_init(rop);
+    pole = fmpz_poly_q_evaluate_fmpq(rop, op, a);
 
     if (pole && strcmp(out, "P"))
     {
@@ -1021,7 +1019,7 @@ void test_evaluate(char * in, int numa, int numb, char * out)
     }
     if (!pole && !strcmp(out, "P"))
     {
-        res = mpq_get_str(NULL, 10, rop);
+        res = fmpq_get_str(NULL, 10, rop);
         flint_printf("test_evaluate: failed\n");
         flint_printf("    Expected a pole, got \"%s\"\n", res);
         fflush(stdout);
@@ -1029,7 +1027,7 @@ void test_evaluate(char * in, int numa, int numb, char * out)
     }
     if (!pole)
     {
-        res = mpq_get_str(NULL, 10, rop);
+        res = fmpq_get_str(NULL, 10, rop);
         ans = (strcmp(out, res) == 0);
 
         if (!ans)
@@ -1042,8 +1040,8 @@ void test_evaluate(char * in, int numa, int numb, char * out)
     }
 
     fmpz_poly_q_clear(op);
-    mpq_clear(rop);
-    mpq_clear(a);
+    fmpq_clear(rop);
+    fmpq_clear(a);
     flint_free(res);
 }
 
@@ -1142,8 +1140,8 @@ int main(int argc, char *argv[])
     fmpz_poly_t zpoly;
     fmpz_poly_q_t qpoly1;
 
-    mpz_t mpzzero, mpzone, mpztwo;
-    mpq_t mpqzero, mpqone, mpqtwo, mpqtwoinv;
+    fmpz_t fmpzzero, fmpzone, fmpztwo;
+    fmpq_t fmpqzero, fmpqone, fmpqtwo, fmpqtwoinv;
 
     FLINT_TEST_INIT(state);
 
@@ -1428,14 +1426,14 @@ int main(int argc, char *argv[])
 
     /* Scalar multiplication and division ************************************/
 
-    flint_mpz_init_set_si(mpzzero, 0);
-    flint_mpz_init_set_si(mpzone, 1);
-    flint_mpz_init_set_si(mpztwo, 2);
+    fmpz_init_set_si(fmpzzero, 0);
+    fmpz_init_set_si(fmpzone, 1);
+    fmpz_init_set_si(fmpztwo, 2);
 
-    mpq_init(mpqzero); flint_mpq_set_si(mpqzero, 0, 1);
-    mpq_init(mpqone); flint_mpq_set_si(mpqone, 1, 1);
-    mpq_init(mpqtwo); flint_mpq_set_si(mpqtwo, 2, 1);
-    mpq_init(mpqtwoinv); flint_mpq_set_si(mpqtwoinv, 1, 2);
+    fmpq_init(fmpqzero); fmpq_set_si(fmpqzero, 0, 1);
+    fmpq_init(fmpqone); fmpq_set_si(fmpqone, 1, 1);
+    fmpq_init(fmpqtwo); fmpq_set_si(fmpqtwo, 2, 1);
+    fmpq_init(fmpqtwoinv); fmpq_set_si(fmpqtwoinv, 1, 2);
 
     test_scalar_mul_si("0", 1, "0");
     test_scalar_mul_si("0", 0, "0");
@@ -1444,16 +1442,16 @@ int main(int argc, char *argv[])
     test_scalar_mul_si("2  1 1/2  -2 3", 5, "2  5 5/2  -2 3");
     test_scalar_mul_si("2  1 1/2  -2 2", 3, "2  3 3/2  -2 2");
 
-    test_scalar_mul_mpz("0", mpzone, "0");
-    test_scalar_mul_mpz("0", mpzzero, "0");
-    test_scalar_mul_mpz("1  2", mpzzero, "0");
-    test_scalar_mul_mpz("1  1/1  2", mpztwo, "1  1");
+    test_scalar_mul_fmpz("0", fmpzone, "0");
+    test_scalar_mul_fmpz("0", fmpzzero, "0");
+    test_scalar_mul_fmpz("1  2", fmpzzero, "0");
+    test_scalar_mul_fmpz("1  1/1  2", fmpztwo, "1  1");
 
-    test_scalar_mul_mpq("0", mpqone, "0");
-    test_scalar_mul_mpq("0", mpqzero, "0");
-    test_scalar_mul_mpq("1  2", mpqzero, "0");
-    test_scalar_mul_mpq("1  1/1  2", mpqtwo, "1  1");
-    test_scalar_mul_mpq("1  -2/1  1", mpqtwoinv, "1  -1");
+    test_scalar_mul_fmpq("0", fmpqone, "0");
+    test_scalar_mul_fmpq("0", fmpqzero, "0");
+    test_scalar_mul_fmpq("1  2", fmpqzero, "0");
+    test_scalar_mul_fmpq("1  1/1  2", fmpqtwo, "1  1");
+    test_scalar_mul_fmpq("1  -2/1  1", fmpqtwoinv, "1  -1");
 
     test_scalar_div_si("0", 1, "0");
     test_scalar_div_si("1  2", 2, "1  1");
@@ -1463,22 +1461,22 @@ int main(int argc, char *argv[])
     test_scalar_div_si("3  2 8 4/2  0 1", -3, "3  -2 -8 -4/2  0 3");
     test_scalar_div_si("3  -27 0 9/2  0 1", -3, "3  9 0 -3/2  0 1");
 
-    test_scalar_div_mpz("0", mpzone, "0");
-    test_scalar_div_mpz("1  2", mpztwo, "1  1");
-    test_scalar_div_mpz("1  1/1  2", mpztwo, "1  1/1  4");
+    test_scalar_div_fmpz("0", fmpzone, "0");
+    test_scalar_div_fmpz("1  2", fmpztwo, "1  1");
+    test_scalar_div_fmpz("1  1/1  2", fmpztwo, "1  1/1  4");
 
-    test_scalar_div_mpq("0", mpqone, "0");
-    test_scalar_div_mpq("1  2", mpqone, "1  2");
-    test_scalar_div_mpq("1  1/1  2", mpqtwo, "1  1/1  4");
-    test_scalar_div_mpq("1  -2/1  1", mpqtwoinv, "1  -4");
+    test_scalar_div_fmpq("0", fmpqone, "0");
+    test_scalar_div_fmpq("1  2", fmpqone, "1  2");
+    test_scalar_div_fmpq("1  1/1  2", fmpqtwo, "1  1/1  4");
+    test_scalar_div_fmpq("1  -2/1  1", fmpqtwoinv, "1  -4");
 
-    mpz_clear(mpzzero);
-    mpz_clear(mpzone);
-    mpz_clear(mpztwo);
-    mpq_clear(mpqzero);
-    mpq_clear(mpqone);
-    mpq_clear(mpqtwo);
-    mpq_clear(mpqtwoinv);
+    fmpz_clear(fmpzzero);
+    fmpz_clear(fmpzone);
+    fmpz_clear(fmpztwo);
+    fmpq_clear(fmpqzero);
+    fmpq_clear(fmpqone);
+    fmpq_clear(fmpqtwo);
+    fmpq_clear(fmpqtwoinv);
 
     /* Multiplication, division and powing *********************************/
 

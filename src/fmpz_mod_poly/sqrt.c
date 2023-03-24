@@ -1,6 +1,6 @@
 /*
-    Copyright 2021 William Hart
     Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2021 William Hart
 
     This file is part of FLINT.
 
@@ -10,8 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz_poly.h"
+#include "fmpz_vec.h"
 #include "fmpz_mod_vec.h"
 #include "fmpz_mod_poly.h"
 

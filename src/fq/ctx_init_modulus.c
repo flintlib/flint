@@ -11,6 +11,8 @@
 
 #include <string.h>
 
+#include "fmpz_vec.h"
+#include "fmpz_mod_poly.h"
 #include "fq.h"
 
 void fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_mod_poly_t modulus,

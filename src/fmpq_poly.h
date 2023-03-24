@@ -22,6 +22,8 @@
 
 #include "fmpq_types.h"
 #include "nmod_types.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 #ifdef __cplusplus

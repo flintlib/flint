@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fq_nmod_mpoly.h"
-
 
 static int _fq_nmod_mpoly_divides_monagan_pearce1(
     fq_nmod_mpoly_t Q,

@@ -9,12 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz_vec.h"
-#include "fmpz_mod_poly.h"
-#include "fmpz_mod_poly_factor.h"
 #include "ulong_extras.h"
-
+#include "fmpz_factor.h"
+#include "fmpz_mod_poly_factor.h"
 
 void test_poly(
     fmpz_mod_poly_factor_t roots,

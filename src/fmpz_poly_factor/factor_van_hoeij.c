@@ -10,10 +10,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_mat.h"
-#include "fmpz_lll.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
+#include "fmpz_lll.h"
 
 #ifdef __GNUC__
 # define log __builtin_log

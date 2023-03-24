@@ -15,7 +15,8 @@
 #ifdef FMPZ_FACTOR_INLINES_C
 #define FMPZ_FACTOR_INLINE
 #else
-#define FMPZ_FACTOR_INLINE static __inline__
+#define FMPZ_FACTOR_INLINE static __inline__ \
+ error fmpz_factor/inline.c currently does not exist as no function has been inlined
 #endif
 
 #include "fmpz_types.h"

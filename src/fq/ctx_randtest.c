@@ -12,6 +12,7 @@
 */
 
 #include "ulong_extras.h"
+#include "fmpz_mod_poly.h"
 #include "fq.h"
 
 void
