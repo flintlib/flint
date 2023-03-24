@@ -12,7 +12,7 @@
 #ifndef FMPZ_MOD_TYPES_H
 #define FMPZ_MOD_TYPES_H
 
-#include "fmpz.h"
+#include "fmpz_types.h"
 
 #ifdef __cplusplus
 extern "C" {
