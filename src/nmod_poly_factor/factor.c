@@ -13,6 +13,7 @@
 */
 
 #include <math.h>
+#include "nmod_poly.h"
 #include "nmod_poly_factor.h"
 
 #define ZASSENHAUS 0

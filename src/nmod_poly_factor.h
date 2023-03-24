@@ -23,7 +23,7 @@
 #endif
 
 #include "limb_types.h"
-#include "nmod_poly.h"
+#include "nmod_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,12 +61,7 @@ void nmod_poly_factor_swap(nmod_poly_factor_t a, nmod_poly_factor_t b)
     *b = t;
 }
 
-NMOD_POLY_FACTOR_INLINE
-void nmod_poly_factor_get_poly(nmod_poly_t a, const nmod_poly_factor_t b,
-                                                                       slong i)
-{
-    nmod_poly_set(a, b->p + i);
-}
+void nmod_poly_factor_get_poly(nmod_poly_t a, const nmod_poly_factor_t b, slong i);
 
 void nmod_poly_factor_insert(nmod_poly_factor_t fac,
                              const nmod_poly_t poly, slong exp);
@@ -138,10 +133,9 @@ void nmod_poly_roots(nmod_poly_factor_t r,
 int nmod_poly_roots_factored(nmod_poly_factor_t r,
              const nmod_poly_t f, int with_multiplicity, const n_factor_t * n);
 
-/* Inlines *******************************************************************/
+/* Declare dead functions ****************************************************/
 
-/* this should be depreciated and then removed */
-void nmod_poly_factor_get_nmod_poly(nmod_poly_t z, nmod_poly_factor_t fac, slong i);
+#define nmod_poly_factor_get_nmod_poly _Pragma("GCC error \"'nmod_poly_factor_get_nmod_poly' is deprecated. Use 'nmod_poly_factor_get_poly' instead.\"")
 
 #ifdef __cplusplus
 }

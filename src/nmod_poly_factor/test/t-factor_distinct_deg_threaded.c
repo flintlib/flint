@@ -15,6 +15,7 @@
 */
 
 #include "ulong_extras.h"
+#include "nmod_poly.h"
 #include "nmod_poly_factor.h"
 
 #define MAX_DEG 7

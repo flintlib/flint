@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2021 Daniel Schultz
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -12,12 +12,8 @@
 #include "nmod_poly.h"
 #include "nmod_poly_factor.h"
 
-void nmod_poly_factor_print_pretty(const nmod_poly_factor_t fac, const char *var)
+void
+nmod_poly_factor_get_poly(nmod_poly_t a, const nmod_poly_factor_t b, slong i)
 {
-    slong i;
-    for (i = 0; i < fac->num; i++)
-    {
-        nmod_poly_print_pretty(fac->p + i, var);
-        flint_printf(" ^ %wd\n", fac->exp[i]);
-    }
+    nmod_poly_set(a, b->p + i);
 }

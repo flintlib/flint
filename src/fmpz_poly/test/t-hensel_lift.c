@@ -11,9 +11,10 @@
 */
 
 #include "ulong_extras.h"
+#include "nmod_poly.h"
+#include "nmod_poly_factor.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
-#include "nmod_poly_factor.h"
 
 int
 main(void)
