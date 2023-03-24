@@ -22,7 +22,6 @@ int main(void)
     fflush(stdout);
 
 
-
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong c1, c2, r1;

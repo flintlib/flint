@@ -11,9 +11,8 @@
 
 #include "ulong_extras.h"
 #include "nmod_poly.h"
-#include "nmod_vec.h"
 #include "fmpq.h"
-#include "fmpz_extras.h"
+#include "fmpq_vec.h"
 #include "bernoulli.h"
 
 int main()

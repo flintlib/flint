@@ -9,9 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpq.h"
 #include "fmpq_vec.h"
 #include "fmpq_mat.h"
-
 
 void fmpq_mat_mul_fmpq_vec(
     fmpq * c,

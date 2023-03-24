@@ -9,15 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq.h"
-#include "fmpz_mat.h"
-
 #ifdef __GNUC__
 # define ceil __builtin_ceil
 # define sqrt __builtin_sqrt
 #else
 # include <math.h>
 #endif
+
+#include "fmpz_vec.h"
+#include "fmpz_mat.h"
+#include "fmpq.h"
 
 void
 fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_t delta, const fmpq_t eta)
