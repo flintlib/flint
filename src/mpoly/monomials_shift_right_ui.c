@@ -28,7 +28,7 @@ void mpoly_monomials_shift_right_ui(ulong * Aexps, flint_bitcnt_t Abits,
 
     if (Abits <= FLINT_BITS)
     {
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
         ulong mask = mpoly_overflow_mask_sp(Abits);
 #endif
         for (i = 0; i < Alength; i++)
@@ -66,7 +66,7 @@ void mpoly_monomials_shift_right_ffmpz(ulong * Aexps, flint_bitcnt_t Abits,
 
     if (Abits <= FLINT_BITS)
     {
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
         ulong mask = mpoly_overflow_mask_sp(Abits);
 #endif
         for (i = 0; i < Alength; i++)

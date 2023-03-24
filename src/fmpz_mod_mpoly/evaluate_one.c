@@ -182,7 +182,7 @@ void fmpz_mod_mpoly_evaluate_one_fmpz(
     const fmpz_t val,
     const fmpz_mod_mpoly_ctx_t ctx)
 {
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     flint_bitcnt_t bits = B->bits;
 #endif
 

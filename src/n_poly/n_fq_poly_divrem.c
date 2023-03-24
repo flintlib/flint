@@ -313,7 +313,7 @@ void n_fq_poly_divrem_divconquer_(
     mp_limb_t * tmp, * invB;
     n_poly_t Qt, Rt;
     mp_limb_t * q, * r;
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fq_nmod_poly_t QQ, RR, AA, BB;
 #endif
 
@@ -324,7 +324,7 @@ void n_fq_poly_divrem_divconquer_(
         return;
     }
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fq_nmod_poly_init(QQ, ctx);
     fq_nmod_poly_init(RR, ctx);
     fq_nmod_poly_init(AA, ctx);
@@ -385,7 +385,7 @@ void n_fq_poly_divrem_divconquer_(
 
     n_poly_stack_vec_clear(St);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     n_fq_poly_get_fq_nmod_poly(AA, Q, ctx);
     n_fq_poly_get_fq_nmod_poly(BB, R, ctx);
     FLINT_ASSERT(fq_nmod_poly_equal(AA, QQ, ctx));

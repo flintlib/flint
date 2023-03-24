@@ -104,7 +104,7 @@ void _fmpz_mat22_shortest_l_infinity(
     fmpz_mul(v11, m->_11, c);
     fmpz_mul(v21, m->_12, c);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     {
         fmpz_t tt;
         fmpz_init(tt);

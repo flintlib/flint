@@ -51,7 +51,7 @@ int n_bpoly_mod_hlift2_cubic(
     n_bpoly_mod_taylor_shift_gen0(B1, alpha, ctx);
 
     /* check that A(alpha,x) = B0(alpha,x) * B1(alpha,x) */
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     {
         n_poly_t T;
         n_poly_init(T);
@@ -111,7 +111,7 @@ int n_bpoly_mod_hlift2_cubic(
         nmod_eval_interp_to_coeffs_poly(c, ce, E, ctx);
         n_poly_mod_sub(c, A->coeffs + j, c, ctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
         {
             n_poly_t c_check;
             n_poly_init(c_check);
@@ -172,7 +172,7 @@ int n_bpoly_mod_hlift2_cubic(
 
 cleanup:
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     if (success > 0)
     {
         n_bpoly_t tp1, tp2;
@@ -227,7 +227,7 @@ int n_bpoly_mod_hlift2(
     n_bpoly_mod_taylor_shift_gen0(B1, alpha, ctx);
 
     /* check that A(alpha,x) = B0(alpha,x) * B1(alpha,x) */
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     {
         n_poly_t T;
         n_poly_init(T);
@@ -304,7 +304,7 @@ int n_bpoly_mod_hlift2(
 
 cleanup:
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     if (success > 0)
     {
         n_bpoly_t tp1, tp2;
@@ -342,7 +342,7 @@ int n_bpoly_mod_hlift_cubic(
     n_poly_struct * p, * c, * t, * ce;
     n_poly_struct ** s, * vk, ** Binv, * vek;
     n_bpoly_struct ** Ue, ** Be;
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     n_bpoly_t Acopy;
     n_bpoly_struct * Bcqt;
     int successcqt;
@@ -364,7 +364,7 @@ int n_bpoly_mod_hlift_cubic(
 
     TMP_START;
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     n_bpoly_init(Acopy);
     n_bpoly_set(Acopy, A);
     Bcqt = FLINT_ARRAY_ALLOC(r, n_bpoly_struct);
@@ -404,7 +404,7 @@ int n_bpoly_mod_hlift_cubic(
         n_bpoly_mod_taylor_shift_gen0(B + i, alpha, ctx);
 
     /* check that A(alpha,x) = B0(alpha,x) * B1(alpha,x) * ... */
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     {
         n_poly_t T;
         n_poly_init(T);
@@ -537,7 +537,7 @@ int n_bpoly_mod_hlift_cubic(
 
 cleanup:
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     FLINT_ASSERT(success == successcqt);
     if (success > 0)
     {
@@ -632,7 +632,7 @@ int n_bpoly_mod_hlift(
         n_bpoly_mod_taylor_shift_gen0(B + i, alpha, ctx);
 
     /* check that A(alpha,x) = B0(alpha,x) * B1(alpha,x) * ... */
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     {
         n_poly_t T;
         n_poly_init(T);
@@ -761,7 +761,7 @@ int n_bpoly_mod_hlift(
 
 cleanup:
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     if (success > 0)
     {
         n_bpoly_t tp1, tp2;

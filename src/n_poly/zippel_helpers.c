@@ -315,7 +315,7 @@ int _n_fq_zip_vand_solve(
             _n_fq_add(V0, V0, p0, d, mod);
         }
         /* roots[i] should be a root of master */
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
         _n_fq_mul(p0, r, T, ctx, tmp);
         _n_fq_add(p0, p0, master + d*0, d, mod);
         FLINT_ASSERT(_n_fq_is_zero(p0, d));

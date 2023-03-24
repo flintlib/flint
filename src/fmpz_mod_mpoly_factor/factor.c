@@ -37,7 +37,7 @@ static int _factor_irred_compressed(
     slong nvars = ctx->minfo->nvars;
     flint_bitcnt_t Abits;
     flint_rand_t state;
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_mod_mpoly_t Aorg;
 #endif
 
@@ -62,7 +62,7 @@ static int _factor_irred_compressed(
         return 0;
     }
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_mod_mpoly_init(Aorg, ctx);
     fmpz_mod_mpoly_set(Aorg, A, ctx);
 #endif
@@ -136,7 +136,7 @@ static int _factor_irred_compressed(
         fmpz_mod_mpoly_init(lcA, ctx);
         fmpz_mod_mpoly_factor_init(lcAf, ctx);
 
-        #if FLINT_WANT_ASSERT
+        #ifdef FLINT_WANT_ASSERT
         {
             fmpz_mod_mpoly_t g;
             fmpz_mod_mpoly_init(g, ctx);
@@ -219,7 +219,7 @@ static int _factor_irred_compressed(
 
     flint_randclear(state);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     if (success)
     {
         fmpz_mod_mpoly_t prod;
@@ -354,7 +354,7 @@ static int _factor_irred(
     slong i, j;
     flint_bitcnt_t Abits;
     mpoly_compression_t M;
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_mod_mpoly_t Aorg;
 
     fmpz_mod_mpoly_init(Aorg, Actx);
@@ -459,7 +459,7 @@ static int _factor_irred(
 
 cleanup_less:
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     if (success)
     {
         fmpz_mod_mpoly_t prod;

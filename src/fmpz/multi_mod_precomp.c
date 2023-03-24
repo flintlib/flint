@@ -35,7 +35,7 @@ void _fmpz_multi_mod_precomp(
     */
     org = TMP_ARRAY_ALLOC(P->localsize, unsigned char);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     for (i = 0; i < P->localsize; i++)
         org[i] = 2;
 #endif

@@ -107,7 +107,7 @@ static void _compute_trace(
 {
     slong i;
     fmpz_mat_t H;
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_mod_poly_t a_check;
 
     fmpz_mod_poly_init(a_check, ctx);
@@ -210,7 +210,7 @@ static void _compute_trace(
     fmpz_mat_clear(H);
 
     FLINT_ASSERT(fmpz_mod_poly_equal(a, a_check, ctx));
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_mod_poly_clear(a_check, ctx);
 #endif
 }
@@ -300,7 +300,7 @@ next_queued:
     fmpz_mod_poly_reverse(finv, S->f, S->f->length, ctx);
     fmpz_mod_poly_inv_series_newton(finv, finv, S->f->length, ctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_mod_poly_powmod_x_fmpz_preinv(tq, p, S->f, finv, ctx);
     FLINT_ASSERT(fmpz_mod_poly_equal(S->xp, tq, ctx));
 #endif
@@ -354,7 +354,7 @@ next_alpha:
     /* S->g should be squarefree and factor into linears */
     FLINT_ASSERT(1 <= fmpz_mod_poly_degree(S->g, ctx));
     FLINT_ASSERT(fmpz_mod_poly_degree(S->g, ctx) <= r);
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_mod_poly_gen(t, ctx);
     fmpz_mod_poly_powmod_fmpz_binexp(tq, t, p, S->g, ctx);
     fmpz_mod_poly_sub(tq, tq, t, ctx);

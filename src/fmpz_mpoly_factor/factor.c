@@ -426,7 +426,7 @@ static int _factor_irred(
     slong i, j;
     flint_bitcnt_t Abits;
     mpoly_compression_t M;
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_mpoly_t Aorg;
 
     fmpz_mpoly_init(Aorg, Actx);
@@ -552,7 +552,7 @@ static int _factor_irred(
 
 cleanup_less:
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     if (success)
     {
         fmpz_mpoly_t prod;

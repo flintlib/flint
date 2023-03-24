@@ -12,7 +12,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod_mpoly.h"
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
 # include "fmpz_mat.h"
 #endif
 

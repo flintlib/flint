@@ -70,7 +70,7 @@ void _fmpz_mod_poly_split_rabin(
         _fmpz_mod_poly_set_length(a, 2);
         _fmpz_mod_poly_set_length(b, 2);
 
-    #if FLINT_WANT_ASSERT
+    #ifdef FLINT_WANT_ASSERT
         fmpz_mod_add(T, a->coeffs + 0, b->coeffs + 0, ctx);
         fmpz_mod_mul(T, T, f->coeffs + 2, ctx);
         FLINT_ASSERT(fmpz_equal(T, f->coeffs + 1));

@@ -308,7 +308,7 @@ cleanup:
     fmpz_mod_mpoly_clear(m, ctx);
     fmpz_mod_mpoly_clear(mpow, ctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     if (success)
     {
         fmpz_mod_mpoly_t prod;

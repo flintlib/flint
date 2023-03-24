@@ -212,7 +212,7 @@ static void _hensel_lift_fac(
 
     for (i = 0; i < c->length; i++)
     {
-    #if FLINT_WANT_ASSERT
+    #ifdef FLINT_WANT_ASSERT
         {
             slong j, d = fq_nmod_ctx_degree(ctx);
             for (j = 0; j < FLINT_MIN(p0, c->coeffs[i].length); j++)
@@ -245,7 +245,7 @@ static void _hensel_lift_fac(
     n_bpoly_swap(G, t1);
     n_bpoly_swap(H, t2);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     {
         slong j, d = fq_nmod_ctx_degree(ctx);
         n_fq_bpoly_mul(t1, G, H, ctx);
@@ -316,7 +316,7 @@ static void _hensel_lift_inv(
 
     for (i = 0; i < c->length; i++)
     {
-    #if FLINT_WANT_ASSERT
+    #ifdef FLINT_WANT_ASSERT
         {
             slong j, d = fq_nmod_ctx_degree(ctx);
             for (j = 0; j < p0; j++)
@@ -349,7 +349,7 @@ static void _hensel_lift_inv(
     n_bpoly_swap(t1, B);
     n_bpoly_swap(t2, A);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     n_fq_bpoly_mul(t1, G, A, ctx);
     n_fq_bpoly_mul(t2, H, B, ctx);
     n_fq_bpoly_add(c, t1, t2, ctx);
@@ -906,7 +906,7 @@ static void n_fq_bpoly_lift_continue(
     for (k = 0; k < r; k++)
         n_fq_bpoly_reverse_gens(Bfinal + k, B + k, ctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     {
         n_fq_bpoly_t t1, t2;
         n_fq_bpoly_init(t1);

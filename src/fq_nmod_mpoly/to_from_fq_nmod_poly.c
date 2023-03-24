@@ -60,7 +60,7 @@ void _fq_nmod_mpoly_to_fq_nmod_poly_deflate(
 
     fq_nmod_clear(cc, ctx->fqctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     for (i = 0; i < len; i++)
     {
         slong v;

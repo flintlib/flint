@@ -52,7 +52,7 @@ void _fmpz_mod_mpoly_to_fmpz_mod_poly_deflate(
         fmpz_mod_poly_set_coeff_fmpz(A, k, coeff + i, ctx->ffinfo);
     }
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     for (i = 0; i < len; i++)
     {
         slong v;

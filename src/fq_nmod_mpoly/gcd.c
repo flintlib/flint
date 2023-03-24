@@ -796,7 +796,7 @@ static int _try_missing_var(
 
     fq_nmod_mpoly_univar_init(Au, ctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fq_nmod_mpoly_to_univar(Au, B, var, ctx);
     FLINT_ASSERT(Au->length == 1);
 #endif
@@ -1434,7 +1434,7 @@ static int _fq_nmod_mpoly_gcd_algo_small(
     slong j;
     slong nvars = ctx->minfo->nvars;
     mpoly_gcd_info_t I;
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fq_nmod_mpoly_t T, Asave, Bsave;
 #endif
 
@@ -1443,7 +1443,7 @@ static int _fq_nmod_mpoly_gcd_algo_small(
     else if (B->length == 1)
         return _do_monomial_gcd(G, Abar, Bbar, A, B, ctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fq_nmod_mpoly_init(T, ctx);
     fq_nmod_mpoly_init(Asave, ctx);
     fq_nmod_mpoly_init(Bsave, ctx);
@@ -1783,7 +1783,7 @@ cleanup:
         FLINT_ASSERT(Bbar == NULL || fq_nmod_mpoly_equal(T, Bbar, ctx));
     }
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fq_nmod_mpoly_clear(T, ctx);
     fq_nmod_mpoly_clear(Asave, ctx);
     fq_nmod_mpoly_clear(Bsave, ctx);

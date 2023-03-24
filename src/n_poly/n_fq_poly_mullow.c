@@ -88,7 +88,7 @@ void n_fq_poly_mullow_(
     slong Blen = B->length;
     slong Clen = C->length;
     const slong m = FLINT_MIN(order, Blen + Clen - 1);
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fq_nmod_poly_t AA, BB, CC;
 #endif
 
@@ -111,7 +111,7 @@ void n_fq_poly_mullow_(
         return;
     }
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fq_nmod_poly_init(AA, ctx);
     fq_nmod_poly_init(BB, ctx);
     fq_nmod_poly_init(CC, ctx);
@@ -125,7 +125,7 @@ void n_fq_poly_mullow_(
     A->length = m;
     _n_fq_poly_normalise(A, d);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     n_fq_poly_get_fq_nmod_poly(BB, A, ctx);
     FLINT_ASSERT(fq_nmod_poly_equal(BB, AA, ctx));
     fq_nmod_poly_clear(AA, ctx);

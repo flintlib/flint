@@ -181,7 +181,7 @@ void _fq_nmod_mpoly_monomial_evals2_cache(
     flint_free(caches);
     flint_free(off);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     Ai = 0;
     for (i = 0; i < E->length; i++)
         Ai += E->coeffs[i].length;
@@ -599,7 +599,7 @@ int fq_nmod_mpolyl_gcd_zippel_smprime(
     fq_nmod_mpoly_fit_length_reset_bits(rAbar, 1, bits, ctx);
     fq_nmod_mpoly_fit_length_reset_bits(rBbar, 1, bits, ctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     {
         slong * tmp_degs = FLINT_ARRAY_ALLOC(nvars, slong);
 
@@ -1343,7 +1343,7 @@ static int newfq_nmod_mpolyn_interp_mcrt_lg_mpoly(
 {
     slong lgd = fq_nmod_ctx_degree(ectx->fqctx);
     slong i;
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
 #endif
     int changed = 0;
@@ -1447,7 +1447,7 @@ int fq_nmod_mpolyl_gcd_zippel_lgprime(
     fq_nmod_mpoly_fit_length_reset_bits(rAbar, 1, bits, smctx);
     fq_nmod_mpoly_fit_length_reset_bits(rBbar, 1, bits, smctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     {
         slong * tmp_degs = FLINT_ARRAY_ALLOC(nvars, slong);
 

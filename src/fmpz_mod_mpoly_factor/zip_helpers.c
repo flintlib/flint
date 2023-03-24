@@ -286,7 +286,7 @@ int _fmpz_mod_zip_vand_solve(
             fmpz_mod_addmul(V, V, T, evals + j - 1, ctx);
         }
         /* roots[i] should be a root of master */
-    #if FLINT_WANT_ASSERT
+    #ifdef FLINT_WANT_ASSERT
         fmpz_mod_addmul(T, master + 0, r, T, ctx);
         FLINT_ASSERT(fmpz_is_zero(T));
     #endif

@@ -56,7 +56,7 @@ typedef struct {
 
 typedef point2d_set_struct point2d_set_t[1];
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
 static int point2d_set_is_canonical(const point2d_set_t A)
 {
     slong i;
@@ -146,7 +146,7 @@ static int _is_in_polygon(
     point2d p)
 {
     slong i, a, b, c;
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     int check;
 
     i = nV - 1;
@@ -370,7 +370,7 @@ static void point2d_set_merge(
 
 
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
 static int point2d_set_contains(const point2d_set_t A, slong x, slong y)
 {
     slong lo = 0;
@@ -418,7 +418,7 @@ int point2d_set_disjoint(
     slong Blen = B->length;
     slong lo, mid, hi;
     int cmp;
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     int check = 1;
 
     for (lo = 0; lo < Blen; lo++)

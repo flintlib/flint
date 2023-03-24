@@ -199,7 +199,7 @@ void _nmod_mpoly_monomial_evals2_cache(
     flint_free(caches);
     flint_free(off);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     Ai = 0;
     for (i = 0; i < E->length; i++)
         Ai += E->coeffs[i].length;
@@ -528,7 +528,7 @@ int nmod_mpolyl_gcd_zippel_smprime(
     nmod_mpoly_fit_length_reset_bits(rAbar, 1, bits, ctx);
     nmod_mpoly_fit_length_reset_bits(rBbar, 1, bits, ctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     {
         slong * tmp_degs = FLINT_ARRAY_ALLOC(nvars, slong);
 
@@ -1236,7 +1236,7 @@ int nmod_mpolyl_gcd_zippel_lgprime(
     nmod_mpoly_fit_length_reset_bits(rAbar, 1, bits, smctx);
     nmod_mpoly_fit_length_reset_bits(rBbar, 1, bits, smctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     {
         slong * tmp_degs = FLINT_ARRAY_ALLOC(nvars, slong);
 

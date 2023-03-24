@@ -21,7 +21,7 @@ static int _quadratic_root_const(
     mp_limb_t * t, * p, * u, * cp, * ut, * up, * ct;
     int success;
     TMP_INIT;
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     mp_limb_t * c_org = FLINT_ARRAY_ALLOC(d, mp_limb_t);
     _n_fq_set(c_org, c, d);
 #endif
@@ -62,7 +62,7 @@ static int _quadratic_root_const(
     }
 
     success = _n_fq_is_zero(ct, d);
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     if (success)
     {
         _n_fq_add(ut, ut, up, d, fqctx->mod);
@@ -337,7 +337,7 @@ static int _fq_nmod_mpoly_quadratic_root_heap(
         */
         FLINT_ASSERT(Qs == 0 || Qs == 1);
         FLINT_ASSERT(As <= Alen);
-    #if FLINT_WANT_ASSERT
+    #ifdef FLINT_WANT_ASSERT
         {
             slong Asleft = Alen, Qsleft = 1;
             for (i = 1; i < heap_len; i++)

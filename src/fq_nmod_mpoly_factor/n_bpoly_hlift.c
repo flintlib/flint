@@ -65,7 +65,7 @@ int n_fq_bpoly_hlift2_cubic(
     n_fq_bpoly_taylor_shift_gen0_n_fq(B0, alpha, ctx);
     n_fq_bpoly_taylor_shift_gen0_n_fq(B1, alpha, ctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     {
         n_fq_poly_t T;
         n_fq_poly_init(T);
@@ -126,7 +126,7 @@ int n_fq_bpoly_hlift2_cubic(
         nmod_eval_interp_to_coeffs_n_fq_poly(c, ce, E, ctx);
         n_fq_poly_sub(c, A->coeffs + j, c, ctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
         {
             n_fq_poly_t c_check;
             n_fq_poly_init(c_check);
@@ -189,7 +189,7 @@ int n_fq_bpoly_hlift2_cubic(
 
 cleanup:
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     if (success > 0)
     {
         n_bpoly_t tp1, tp2;
@@ -253,7 +253,7 @@ int n_fq_bpoly_hlift2(
     n_fq_bpoly_taylor_shift_gen0_n_fq(B0, alpha, ctx);
     n_fq_bpoly_taylor_shift_gen0_n_fq(B1, alpha, ctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     {
         n_poly_t T;
         n_poly_init(T);
@@ -332,7 +332,7 @@ int n_fq_bpoly_hlift2(
 
 cleanup:
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     if (success > 0)
     {
         n_bpoly_t tp1, tp2;
@@ -421,7 +421,7 @@ int n_fq_bpoly_hlift(
         n_fq_bpoly_taylor_shift_gen0_fq_nmod(B + i, alpha, ctx);
 
     /* supposed to have A(alpha,x) = B0(alpha,x) * B1(alpha,x) * ... */
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     {
         n_poly_t T;
         n_poly_init(T);
@@ -548,7 +548,7 @@ int n_fq_bpoly_hlift(
 
 cleanup:
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     if (success > 0)
     {
         n_fq_bpoly_t tp1, tp2;

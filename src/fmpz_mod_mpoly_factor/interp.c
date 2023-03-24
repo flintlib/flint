@@ -347,7 +347,7 @@ int fmpz_mod_polyu1n_interp_crt_2sm_poly(
     Texps = T->exps;
     Ti = 0;
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_mod_poly_evaluate_fmpz(u, modulus, alphapow->coeffs + 1, ctx);
     fmpz_mod_mul(u, u, alphapow->coeffs + 1, ctx);
     fmpz_mod_add(u, u, u, ctx);
@@ -971,7 +971,7 @@ int fmpz_mod_mpolyn_interp_crt_2sm_mpolyn(
     fmpz_init(FvalueA);
     fmpz_init(FvalueB);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_mod_poly_evaluate_fmpz(u, modulus, alphapow->coeffs + 1, ctx->ffinfo);
     fmpz_mod_mul(u, u, alphapow->coeffs + 1, ctx->ffinfo);
     fmpz_mod_add(u, u, u, ctx->ffinfo);

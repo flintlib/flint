@@ -70,7 +70,7 @@ static int _hlift_quartic2(
         fmpz_mpoly_to_univar(Au, A, m, ctx);
         Aui = Au->length - 1;
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
         fmpz_mpoly_one(t2, ctx);
         for (i = 0; i < r; i++)
             fmpz_mpoly_mul(t2, t2, betas + i, ctx);
@@ -85,7 +85,7 @@ static int _hlift_quartic2(
         fmpz_mpoly_divrem(t2, t, A, xalpha, ctx);
         fmpz_mpoly_swap(Aq, t2, ctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
         fmpz_mpoly_one(t2, ctx);
         for (i = 0; i < r; i++)
             fmpz_mpoly_mul(t2, t2, betas + i, ctx);
@@ -248,7 +248,7 @@ static int _hlift_quartic(
         fmpz_mpoly_to_univar(Au, A, m, ctx);
         Aui = Au->length - 1;
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
         fmpz_mpoly_one(t2, ctx);
         for (i = 0; i < r; i++)
             fmpz_mpoly_mul(t2, t2, betas + i, ctx);
@@ -263,7 +263,7 @@ static int _hlift_quartic(
         fmpz_mpoly_divrem(t2, t, A, xalpha, ctx);
         fmpz_mpoly_swap(Aq, t2, ctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
         fmpz_mpoly_one(t2, ctx);
         for (i = 0; i < r; i++)
             fmpz_mpoly_mul(t2, t2, betas + i, ctx);

@@ -230,7 +230,7 @@ static int _nmod_mpoly_quadratic_root_heap(
         */
         FLINT_ASSERT(Qs == 0 || Qs == 1);
         FLINT_ASSERT(As <= Alen);
-    #if FLINT_WANT_ASSERT
+    #ifdef FLINT_WANT_ASSERT
         {
             slong Asleft = Alen, Qsleft = 1;
             for (i = 1; i < heap_len; i++)

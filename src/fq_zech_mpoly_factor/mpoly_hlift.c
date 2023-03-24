@@ -61,7 +61,7 @@ static int _hlift_quartic2(
 
     fq_zech_mpoly_divrem(Aq, t, A, xalpha, ctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fq_zech_mpoly_one(t2, ctx);
     for (i = 0; i < r; i++)
         fq_zech_mpoly_mul(t2, t2, betas + i, ctx);
@@ -193,7 +193,7 @@ static int _hlift_quartic(
 
     fq_zech_mpoly_divrem(Aq, t, A, xalpha, ctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fq_zech_mpoly_one(t2, ctx);
     for (i = 0; i < r; i++)
         fq_zech_mpoly_mul(t2, t2, betas + i, ctx);

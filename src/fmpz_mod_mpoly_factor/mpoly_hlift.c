@@ -63,7 +63,7 @@ static int _hlift_quartic2(
 
     fmpz_mod_mpoly_divrem(Aq, t, A, xalpha, ctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_mod_mpoly_one(t2, ctx);
     for (i = 0; i < r; i++)
         fmpz_mod_mpoly_mul(t2, t2, betas + i, ctx);
@@ -203,7 +203,7 @@ static int _hlift_quartic(
     fmpz_mod_mpoly_divrem(t2, t, A, xalpha, ctx);
     fmpz_mod_mpoly_swap(Aq, t2, ctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_mod_mpoly_one(t2, ctx);
     for (i = 0; i < r; i++)
         fmpz_mod_mpoly_mul(t2, t2, betas + i, ctx);

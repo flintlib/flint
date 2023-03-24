@@ -53,7 +53,7 @@ void _nmod_mpoly_to_nmod_poly_deflate(
         nmod_poly_set_coeff_ui(A, k, coeff[i]);
     }
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     for (i = 0; i < len; i++)
     {
         slong v;

@@ -24,7 +24,7 @@ static slong binary_sqrt(fmpz_t z, fmpz_t x, slong p)
     slong e, new_p, n;
     fmpz_t t, tx, s;
     fmpz two = 2;
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_t x_org;
 #endif
 
@@ -60,7 +60,7 @@ static slong binary_sqrt(fmpz_t z, fmpz_t x, slong p)
         return -WORD(1);
     }
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_init_set(x_org, x);
     fmpz_mul_2exp(x_org, x_org, e);
 #endif
@@ -81,7 +81,7 @@ static slong binary_sqrt(fmpz_t z, fmpz_t x, slong p)
     fmpz_fdiv_r_2exp(z, z, n + 1);
     fmpz_fdiv_q_2exp(z, z, 1);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_mul(t, z, z);
     fmpz_mul(t, t, x);
     fmpz_sub_ui(t, t, 1);
@@ -104,7 +104,7 @@ static slong binary_sqrt(fmpz_t z, fmpz_t x, slong p)
         fmpz_fdiv_r_2exp(t, t, n);
         fmpz_swap(z, t);
 
-    #if FLINT_WANT_ASSERT
+    #ifdef FLINT_WANT_ASSERT
         fmpz_mul(t, z, z);
         fmpz_mul(t, t, x);
         fmpz_sub_ui(t, t, 1);
@@ -118,7 +118,7 @@ static slong binary_sqrt(fmpz_t z, fmpz_t x, slong p)
     fmpz_mul_2exp(t, t, e/2);
     fmpz_swap(z, t);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_submul(x_org, z, z);
     fmpz_fdiv_r_2exp(t, x_org, new_p + e/2);
     FLINT_ASSERT(fmpz_is_zero(t));
@@ -269,7 +269,7 @@ static slong binary_cubic_lift(
             binary_cubic_lift_inv(inv, r2, r, s, e, n, t, d);
     }
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_mul(r2, r, r);
     fmpz_mul_2exp(c, r2, e);
     fmpz_add(c, c, a);
@@ -329,7 +329,7 @@ static slong binary_cubic_lift_continue(
 
     n *= 2;
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_mul(r2, r, r);
     fmpz_mul_2exp(c, r2, e);
     fmpz_add(c, c, a);
