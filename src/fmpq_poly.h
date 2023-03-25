@@ -22,9 +22,6 @@
 
 #include "fmpq_types.h"
 #include "nmod_types.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,19 +61,8 @@ void _fmpq_poly_normalise(fmpq_poly_t poly);
 
 #define fmpq_poly_denref(poly)  ((poly)->den)
 
-FMPQ_POLY_INLINE void
-fmpq_poly_get_numerator(fmpz_poly_t res, const fmpq_poly_t poly)
-{
-    fmpz_poly_fit_length(res, poly->length);
-    _fmpz_vec_set(res->coeffs, poly->coeffs, poly->length);
-    _fmpz_poly_set_length(res, poly->length);
-}
-
-FMPQ_POLY_INLINE void
-fmpq_poly_get_denominator(fmpz_t den, const fmpq_poly_t poly)
-{
-   fmpz_set(den, fmpq_poly_denref(poly));
-}
+void fmpq_poly_get_numerator(fmpz_poly_t res, const fmpq_poly_t poly);
+void fmpq_poly_get_denominator(fmpz_t den, const fmpq_poly_t poly);
 
 /*  Canonicalisation  *************************************/
 
@@ -148,14 +134,7 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly,
                                  const fmpz_t den, slong len, const char *var);
 
 void fmpq_poly_zero(fmpq_poly_t poly);
-
-FMPQ_POLY_INLINE void fmpq_poly_one(fmpq_poly_t poly)
-{
-    fmpq_poly_fit_length(poly, 1);
-    _fmpq_poly_set_length(poly, 1);
-    fmpz_one(poly->coeffs);
-    fmpz_one(poly->den);
-}
+void fmpq_poly_one(fmpq_poly_t poly);
 
 void fmpq_poly_neg(fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
@@ -163,18 +142,7 @@ void fmpq_poly_inv(fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
 void fmpq_poly_swap(fmpq_poly_t poly1, fmpq_poly_t poly2);
 
-FMPQ_POLY_INLINE
-void fmpq_poly_truncate(fmpq_poly_t poly, slong n)
-{
-    if (poly->length > n)
-    {
-        slong i;
-        for (i = n; i < poly->length; i++)
-            _fmpz_demote(poly->coeffs + i);
-        poly->length = n;
-        fmpq_poly_canonicalise(poly);
-    }
-}
+void fmpq_poly_truncate(fmpq_poly_t poly, slong n);
 
 void fmpq_poly_set_trunc(fmpq_poly_t res, const fmpq_poly_t poly, slong n);
 
@@ -211,17 +179,8 @@ int _fmpq_poly_equal_trunc(const fmpz * poly1, const fmpz_t den1, slong len1,
 
 int fmpq_poly_equal_trunc(const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n);
 
-FMPQ_POLY_INLINE
-int fmpq_poly_is_zero(const fmpq_poly_t poly)
-{
-    return poly->length == WORD(0);
-}
-
-FMPQ_POLY_INLINE
-int fmpq_poly_is_one(const fmpq_poly_t poly)
-{
-    return (poly->length == WORD(1)) && (fmpz_equal(poly->coeffs, poly->den));
-}
+int fmpq_poly_is_zero(const fmpq_poly_t poly);
+int fmpq_poly_is_one(const fmpq_poly_t poly);
 
 FMPQ_POLY_INLINE
 int fmpq_poly_is_gen(const fmpq_poly_t op)
@@ -403,26 +362,15 @@ void fmpq_poly_shift_right(fmpq_poly_t res, const fmpq_poly_t poly, slong n);
 
 /*  Euclidean division  ******************************************************/
 
-void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
-                       const fmpz * A, const fmpz_t a, slong lenA,
-  const fmpz * B, const fmpz_t b, slong lenB, const fmpz_preinvn_t inv);
+#ifdef FMPZ_H
+void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r, const fmpz * A, const fmpz_t a, slong lenA, const fmpz * B, const fmpz_t b, slong lenB, const fmpz_preinvn_t inv);
+void _fmpq_poly_div(fmpz * Q, fmpz_t q, const fmpz * A, const fmpz_t a, slong lenA, const fmpz * B, const fmpz_t b, slong lenB, const fmpz_preinvn_t inv);
+void _fmpq_poly_rem(fmpz * R, fmpz_t r, const fmpz * A, const fmpz_t a, slong lenA, const fmpz * B, const fmpz_t b, slong lenB, const fmpz_preinvn_t inv);
+#endif
 
-void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
-                      const fmpq_poly_t poly1, const fmpq_poly_t poly2);
-
-void _fmpq_poly_div(fmpz * Q, fmpz_t q,
-                       const fmpz * A, const fmpz_t a, slong lenA,
-  const fmpz * B, const fmpz_t b, slong lenB, const fmpz_preinvn_t inv);
-
-void fmpq_poly_div(fmpq_poly_t Q,
-                      const fmpq_poly_t poly1, const fmpq_poly_t poly2);
-
-void _fmpq_poly_rem(fmpz * R, fmpz_t r,
-                       const fmpz * A, const fmpz_t a, slong lenA,
-  const fmpz * B, const fmpz_t b, slong lenB, const fmpz_preinvn_t inv);
-
-void fmpq_poly_rem(fmpq_poly_t R,
-                      const fmpq_poly_t poly1, const fmpq_poly_t poly2);
+void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R, const fmpq_poly_t poly1, const fmpq_poly_t poly2);
+void fmpq_poly_div(fmpq_poly_t Q, const fmpq_poly_t poly1, const fmpq_poly_t poly2);
+void fmpq_poly_rem(fmpq_poly_t R, const fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
 /*  Precomputed inverse  *****************************************************/
 
