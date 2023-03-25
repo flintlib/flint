@@ -13,9 +13,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
 #include "fmpz_mod_poly.h"
-#include "ulong_extras.h"
+#include "fmpz_mod_poly_factor.h"
 
 int
 fmpz_mod_poly_is_irreducible(const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx)

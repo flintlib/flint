@@ -12,13 +12,4 @@
 
 #define FMPZ_MOD_MAT_INLINES_C
 
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
 #include "fmpz_mod_mat.h"
-
-void fmpz_mod_mat_get_entry(fmpz_t x, const fmpz_mod_mat_t mat, slong i, slong j)
-{
-  fmpz_set(x, fmpz_mod_mat_entry(mat, i, j));
-}
-

@@ -210,7 +210,7 @@ SINGLE_HEADERS :=                                                           \
         hashmap.h       profiler.h      templates.h    flint-config.h       \
         fft_tuning.h                                                        \
                                                                             \
-        mpoly_types.h                                                       \
+        limb_types.h                    mpoly_types.h                       \
         fmpz_types.h                    fmpq_types.h                        \
         nmod_types.h                    fmpz_mod_types.h                    \
         arf_types.h                     acf_types.h                         \

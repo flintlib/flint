@@ -10,10 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fmpz.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
-#include "ulong_extras.h"
 
 static int _check(fmpz_mod_poly_struct **B,
                   const fmpz_mod_poly_t F, const fmpz_mod_poly_t R,

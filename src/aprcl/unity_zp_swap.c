@@ -12,6 +12,11 @@
 #include "fmpz_mod_poly.h"
 #include "aprcl.h"
 
+#ifdef FLINT_WANT_ASSERT
+# include "fmpz.h"
+# include "fmpz_mod.h"
+#endif
+
 void
 unity_zp_swap(unity_zp f, unity_zp g)
 {

@@ -5,7 +5,7 @@
 #cmakedefine01 FLINT_REENTRANT
 
 /* Define if -DCMAKE_BUILD_TYPE=Debug was given, to enable some ASSERT()s */
-#cmakedefine01 FLINT_WANT_ASSERT
+#cmakedefine FLINT_WANT_ASSERT
 
 /* Define if you cpu_set_t in sched.h */
 #cmakedefine01 FLINT_USES_CPUSET

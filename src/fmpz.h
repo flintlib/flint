@@ -941,23 +941,24 @@ FMPZ_INLINE mp_limb_t nmod_pow_fmpz(mp_limb_t a, const fmpz_t exp, nmod_t mod)
     return n_powmod2_fmpz_preinv(a, exp, mod.n, mod.ninv);
 }
 
-/* Inlines *******************************************************************/
+/* Declare dead functions ****************************************************/
 
-fmpz * __new_fmpz();
-void __free_fmpz(fmpz * f);
-void __fmpz_set_si(fmpz_t f, slong val);
-void __fmpz_set_ui(fmpz_t f, ulong val);
-void __fmpz_init(fmpz_t f);
-void __fmpz_init_set_ui(fmpz_t f, ulong g);
-void __fmpz_clear(fmpz_t f);
-int __fmpz_lt(fmpz_t f, fmpz_t g);
-int __fmpz_gt(fmpz_t f, fmpz_t g);
-int __fmpz_lte(fmpz_t f, fmpz_t g);
-int __fmpz_gte(fmpz_t f, fmpz_t g);
-int __fmpz_eq(fmpz_t f, fmpz_t g);
-int __fmpz_neq(fmpz_t f, fmpz_t g);
-void __fmpz_init_set(fmpz_t f, const fmpz_t g);
-void __fmpz_neg(fmpz_t f1, const fmpz_t f2);
+#define __new_fmpz _Pragma("GCC error \"'__new_fmpz' is deprecated.\"")
+#define __free_fmpz _Pragma("GCC error \"'__free_fmpz' is deprecated.\"")
+#define __fmpz_lt _Pragma("GCC error \"'__fmpz_lt' is deprecated.\"")
+#define __fmpz_gt _Pragma("GCC error \"'__fmpz_gt' is deprecated.\"")
+#define __fmpz_lte _Pragma("GCC error \"'__fmpz_lte' is deprecated.\"")
+#define __fmpz_gte _Pragma("GCC error \"'__fmpz_gte' is deprecated.\"")
+#define __fmpz_neq _Pragma("GCC error \"'__fmpz_neq' is deprecated.\"")
+
+#define __fmpz_init _Pragma("GCC error \"'__fmpz_init' is deprecated. Use 'fmpz_init' instead.\"")
+#define __fmpz_init_set _Pragma("GCC error \"'__fmpz_init_set' is deprecated. Use 'fmpz_init_set' instead.\"")
+#define __fmpz_init_set_ui _Pragma("GCC error \"'__fmpz_init_set_ui' is deprecated. Use 'fmpz_init_set_ui' instead.\"")
+#define __fmpz_clear _Pragma("GCC error \"'__fmpz_clear' is deprecated. Use 'fmpz_clear' instead.\"")
+#define __fmpz_set_si _Pragma("GCC error \"'__fmpz_set_si' is deprecated. Use 'fmpz_set_si' instead.\"")
+#define __fmpz_set_ui _Pragma("GCC error \"'__fmpz_set_ui' is deprecated. Use 'fmpz_set_ui' instead.\"")
+#define __fmpz_eq _Pragma("GCC error \"'__fmpz_eq' is deprecated. Use 'fmpz_equal' instead.\"")
+#define __fmpz_neg _Pragma("GCC error \"'__fmpz_neg' is deprecated. Use 'fmpz_neg' instead.\"")
 
 #ifdef __cplusplus
 }

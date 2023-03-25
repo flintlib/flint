@@ -9,8 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_poly.h"
 #include "test_helpers.h"
+#include "fmpz.h"
+#include "fmpz_mod.h"
+#include "fmpz_mod_poly.h"
 
 int main(void)
 {

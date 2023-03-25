@@ -14,11 +14,10 @@
 
 ******************************************************************************/
 
-#include "flint.h"
-#include "fmpz_mod_poly.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
-#include "ulong_extras.h"
+#include "fmpz_mod.h"
+#include "fmpz_mod_poly.h"
 
 /* checks that poly actually annihilates the given sequence. */
 int check(const fmpz_mod_poly_t poly, const fmpz* seq, slong len,

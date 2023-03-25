@@ -798,7 +798,7 @@ static int _fmpz_mod_bma_get_fmpz_mpoly2(
             fmpz_mod_add(V, V, temp, fpctx);
         }
         /* roots[i] should be a root of master */
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
         fmpz_mod_mul(temp, roots + i, T, fpctx);
         fmpz_mod_add(temp, temp, I->V1->coeffs + 0, fpctx);
         FLINT_ASSERT(fmpz_is_zero(temp));
@@ -2015,7 +2015,7 @@ pick_bma_prime:
 
         FLINT_ASSERT(GLambda_sp->pointcount == AbarLambda_sp->pointcount);
         FLINT_ASSERT(GLambda_sp->pointcount == BbarLambda_sp->pointcount);
-    #if FLINT_WANT_ASSERT
+    #ifdef FLINT_WANT_ASSERT
         {
             fmpz_t t;
             fmpz_init(t);

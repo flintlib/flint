@@ -84,7 +84,7 @@ int fmpz_mpoly_interp_mcrt_p(
     const nmod_mpoly_ctx_t ctxp)
 {
     slong i;
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
 #endif
     int changed = 0;

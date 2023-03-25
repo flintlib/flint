@@ -300,7 +300,7 @@ cleanup:
     fq_nmod_mpoly_clear(m, ctx);
     fq_nmod_mpoly_clear(mpow, ctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     if (success)
     {
         fq_nmod_mpoly_t prod;

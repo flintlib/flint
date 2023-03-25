@@ -20,7 +20,7 @@
 #endif
 
 #include "thread_pool.h"
-#include "fmpz_mod_poly.h"
+#include "fmpz_mod_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,13 +65,7 @@ void fmpz_mod_poly_factor_swap(fmpz_mod_poly_factor_t a,
     *b = t;
 }
 
-FMPZ_MOD_POLY_FACTOR_INLINE
-void fmpz_mod_poly_factor_get_poly(fmpz_mod_poly_t a,
-             const fmpz_mod_poly_factor_t b, slong i, const fmpz_mod_ctx_t ctx)
-{
-    fmpz_mod_poly_set(a, b->poly + i, ctx);
-}
-
+void fmpz_mod_poly_factor_get_poly(fmpz_mod_poly_t a, const fmpz_mod_poly_factor_t b, slong i, const fmpz_mod_ctx_t ctx);
 
 void fmpz_mod_poly_factor_insert(fmpz_mod_poly_factor_t fac,
               const fmpz_mod_poly_t poly, slong exp, const fmpz_mod_ctx_t ctx);

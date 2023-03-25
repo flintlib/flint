@@ -33,7 +33,7 @@
 # include "gc.h"
 #endif
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
 # include <assert.h>
 #endif
 
@@ -290,7 +290,7 @@ ulong n_randtest_not_zero(flint_rand_t);
    flint_randclear(xxx); \
    flint_cleanup_master();
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
 #define FLINT_ASSERT(param) assert(param)
 #else
 #define FLINT_ASSERT(param)
@@ -422,7 +422,7 @@ mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
 #define TMP_START \
    __tmp_root = NULL
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
 #define TMP_ALLOC(size) \
    (__tpx = (__tmp_t *) alloca(sizeof(__tmp_t)), \
        __tpx->next = __tmp_root, \

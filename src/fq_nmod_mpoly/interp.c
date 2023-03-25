@@ -1177,7 +1177,7 @@ int nmod_mpolyn_interp_mcrt_lg_mpoly(
 {
     slong lastdeg = *lastdeg_;
     slong i, lgd = fq_nmod_ctx_degree(lgctx->fqctx);
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     slong N = mpoly_words_per_exp(A->bits, smctx->minfo);
 #endif
     int changed = 0;
@@ -1233,7 +1233,7 @@ int nmod_mpolyn_CRT_fq_nmod_mpoly(
 {
     slong d = fq_nmod_ctx_degree(ctxp->fqctx);
     slong i;
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     slong N;
 #endif
     int changed = 0;
@@ -1247,7 +1247,7 @@ int nmod_mpolyn_CRT_fq_nmod_mpoly(
 
     FLINT_ASSERT(H->length == A->length);
     FLINT_ASSERT(H->bits == A->bits);
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     N = mpoly_words_per_exp(A->bits, ctx->minfo);
 #endif
     for (i = 0; i < A->length; i++)
@@ -1857,7 +1857,7 @@ int fq_nmod_mpolyn_interp_mcrt_sm_mpoly(
     const fq_nmod_mpoly_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx->fqctx);
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
 #endif
     slong lastdeg = *lastdeg_;
@@ -3581,7 +3581,7 @@ int fq_nmod_mpolyn_interp_mcrt_lg_mpoly(
 {
     slong lgd = fq_nmod_ctx_degree(ectx->fqctx);
     slong i;
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
 #endif
     int changed = 0;

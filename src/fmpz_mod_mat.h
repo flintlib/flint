@@ -40,11 +40,8 @@ fmpz * fmpz_mod_mat_entry(const fmpz_mod_mat_t mat, slong i, slong j)
     return fmpz_mat_entry(mat->mat, i, j);
 }
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_set_entry(fmpz_mod_mat_t mat, slong i, slong j, const fmpz_t val)
-{
-    fmpz_set(fmpz_mat_entry(mat->mat, i, j), val);
-}
+void fmpz_mod_mat_set_entry(fmpz_mod_mat_t mat, slong i, slong j, const fmpz_t val);
+void fmpz_mod_mat_get_entry(fmpz_t x, const fmpz_mod_mat_t mat, slong i, slong j);
 
 /* Memory management  ********************************************************/
 
@@ -68,11 +65,7 @@ slong fmpz_mod_mat_ncols(const fmpz_mod_mat_t mat)
     return fmpz_mat_ncols(mat->mat);
 }
 
-FMPZ_MOD_MAT_INLINE
-void _fmpz_mod_mat_set_mod(fmpz_mod_mat_t mat, const fmpz_t n)
-{
-    fmpz_set(mat->mod, n);
-}
+void _fmpz_mod_mat_set_mod(fmpz_mod_mat_t mat, const fmpz_t n);
 
 FMPZ_MOD_MAT_INLINE
 void fmpz_mod_mat_one(fmpz_mod_mat_t mat)
@@ -98,32 +91,15 @@ int fmpz_mod_mat_is_square(const fmpz_mod_mat_t mat)
 	    return fmpz_mat_is_square(mat->mat);
 }
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_swap(fmpz_mod_mat_t mat1, fmpz_mod_mat_t mat2)
-{
-    if (mat1 != mat2)
-    {
-        fmpz_mod_mat_struct tmp;
-
-        tmp = *mat1;
-        *mat1 = *mat2;
-        *mat2 = tmp;
-    }
-}
-
-FMPZ_MOD_MAT_INLINE void
-fmpz_mod_mat_swap_entrywise(fmpz_mod_mat_t mat1, fmpz_mod_mat_t mat2)
-{
-    slong i, j;
-
-    for (i = 0; i < fmpz_mod_mat_nrows(mat1); i++)
-        for (j = 0; j < fmpz_mod_mat_ncols(mat1); j++)
-            fmpz_swap(fmpz_mod_mat_entry(mat2, i, j), fmpz_mod_mat_entry(mat1, i, j));
-}
+void fmpz_mod_mat_swap(fmpz_mod_mat_t mat1, fmpz_mod_mat_t mat2);
+void fmpz_mod_mat_swap_entrywise(fmpz_mod_mat_t mat1, fmpz_mod_mat_t mat2);
 
 void _fmpz_mod_mat_reduce(fmpz_mod_mat_t mat);
 
+void fmpz_mod_mat_set(fmpz_mod_mat_t B, const fmpz_mod_mat_t A);
+
 /* Random matrix generation */
+
 void fmpz_mod_mat_randtest(fmpz_mod_mat_t mat, flint_rand_t state);
 
 void fmpz_mod_mat_randrank(fmpz_mod_mat_t mat, flint_rand_t state,
@@ -176,32 +152,12 @@ int fmpz_mod_mat_print(const fmpz_mod_mat_t mat);
 void fmpz_mod_mat_print_pretty(const fmpz_mod_mat_t mat);
 
 /* Comparison */
-FMPZ_MOD_MAT_INLINE
-int fmpz_mod_mat_equal(const fmpz_mod_mat_t mat1, const fmpz_mod_mat_t mat2)
-{
-    return fmpz_equal(mat1->mod, mat2->mod) && fmpz_mat_equal(mat1->mat, mat2->mat);
-}
 
-FMPZ_MOD_MAT_INLINE
-int fmpz_mod_mat_is_zero(const fmpz_mod_mat_t mat)
-{
-    return fmpz_mat_is_zero(mat->mat);
-}
+int fmpz_mod_mat_equal(const fmpz_mod_mat_t mat1, const fmpz_mod_mat_t mat2);
+int fmpz_mod_mat_is_zero(const fmpz_mod_mat_t mat);
+int fmpz_mod_mat_is_one(const fmpz_mod_mat_t mat);
 
-FMPZ_MOD_MAT_INLINE
-int fmpz_mod_mat_is_one(const fmpz_mod_mat_t mat)
-{
-    return fmpz_is_one(mat->mod) || fmpz_mat_is_one(mat->mat);
-}
-
-
-/* Set and transpose */
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_set(fmpz_mod_mat_t B, const fmpz_mod_mat_t A)
-{
-    fmpz_set(B->mod, A->mod);
-    fmpz_mat_set(B->mat, A->mat);
-}
+/* Transpose */
 
 FMPZ_MOD_MAT_INLINE
 void fmpz_mod_mat_transpose(fmpz_mod_mat_t B, const fmpz_mod_mat_t A)
@@ -352,10 +308,6 @@ void fmpz_mod_mat_invert_cols(fmpz_mod_mat_t mat, slong * perm)
 {
     fmpz_mat_invert_cols(mat->mat, perm);
 }
-
-/* Inlines *******************************************************************/
-
-void fmpz_mod_mat_get_entry(fmpz_t x, const fmpz_mod_mat_t mat, slong i, slong j);
 
 #ifdef __cplusplus
 }

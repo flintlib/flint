@@ -9,7 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_vec.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 
 void fmpz_mod_poly_scalar_addmul_fmpz(fmpz_mod_poly_t A,

@@ -9,12 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "nmod_vec.h"
+#include "ulong_extras.h"
 #include "nmod_poly.h"
 #include "nmod_poly_factor.h"
-#include "ulong_extras.h"
-
 
 void test_poly(
     nmod_poly_factor_t roots,

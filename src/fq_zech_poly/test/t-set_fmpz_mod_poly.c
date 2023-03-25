@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 #include "fq_zech_poly.h"
 

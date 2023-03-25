@@ -10,6 +10,7 @@
 */
 
 #include "nmod.h"
+#include "nmod_poly.h"
 #include "nmod_poly_factor.h"
 
 /*

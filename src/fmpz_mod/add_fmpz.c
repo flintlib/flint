@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_mod.h"
 
 void fmpz_mod_add_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t c,

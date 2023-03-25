@@ -178,7 +178,7 @@ int n_bpoly_mod_gcd_brown_smprime(
     n_poly_struct * cA, * cB, * cG, * cAbar, * cBbar, * gamma;
     n_poly_struct * modulus, * alphapow, * r;
     int gstab, astab, bstab, use_stab;
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     n_poly_t leadA, leadB;
     const slong Sp_size_poly = n_poly_stack_size(Sp->poly_stack);
     const slong Sp_size_bpoly = n_bpoly_stack_size(Sp->bpoly_stack);
@@ -187,7 +187,7 @@ int n_bpoly_mod_gcd_brown_smprime(
     FLINT_ASSERT(A->length > 0);
     FLINT_ASSERT(B->length > 0);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     n_poly_init(leadA);
     n_poly_init(leadB);
     n_poly_set(leadA, A->coeffs + A->length - 1);
@@ -418,7 +418,7 @@ successful_put_content:
 
 cleanup:
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     if (success)
     {
         n_poly_struct * Glead = G->coeffs + G->length - 1;

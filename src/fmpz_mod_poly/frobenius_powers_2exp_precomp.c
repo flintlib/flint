@@ -9,9 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 
 void fmpz_mod_poly_frobenius_powers_2exp_precomp(

@@ -46,7 +46,7 @@ static void _fmpq_ball_print(const _fmpq_ball_t x)
 }
 #endif
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
 
 static int _fmpq_ball_is_ordered(const _fmpq_ball_t x)
 {
@@ -379,7 +379,7 @@ static slong _uiui_hgcd(
 
 fixed:
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
 
     /* should be ok */
 
@@ -443,7 +443,7 @@ fix:
     m22 = t2;
     det *= -1;
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     umul_ppmm(t1,t0, a0, q); t1 += a1*q;
     add_ssaaaa(t1,t0, t1,t0, b1,b0);
     b0 = a0;
@@ -857,7 +857,7 @@ void _fmpq_hgcd(_fmpq_cfrac_list_t s, _fmpz_mat22_t M, fmpz_t xa, fmpz_t xb)
     flint_bitcnt_t k, km, shift;
     fmpz_t ya, yb;
     _fmpz_mat22_t N;
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_t xa_org, xb_org;
     fmpz_init_set(xa_org, xa);
     fmpz_init_set(xb_org, xb);
@@ -946,7 +946,7 @@ split:
 
 cleanup:
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     FLINT_ASSERT(_hgcd_ok(M, xa, xb));
     fmpz_mul(ya, M->_11, xa);
     fmpz_addmul(ya, M->_12, xb);
@@ -991,7 +991,7 @@ void _fmpq_ball_get_cfrac(_fmpq_cfrac_list_t s, _fmpz_mat22_t M, int needM,
     fmpz_t q, r;
     _fmpq_ball_t y;
     _fmpz_mat22_t N;
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     _fmpq_ball_t xorg;
     _fmpq_ball_init(xorg);
     xorg->exact = x->exact;
@@ -1235,7 +1235,7 @@ chop:
 
 cleanup:
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     FLINT_ASSERT(!needM || (_fmpq_ball_apply_mat22_inv(y, M, xorg),
                                                        _fmpq_ball_equal(y, x)));
     _fmpq_ball_clear(xorg);

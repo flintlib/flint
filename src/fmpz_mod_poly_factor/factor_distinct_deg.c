@@ -13,7 +13,10 @@
 */
 
 #include "ulong_extras.h"
+#include "fmpz.h"
 #include "fmpz_mat.h"
+#include "fmpz_mod.h"
+#include "fmpz_mod_poly.h"
 #include "fmpz_mod_poly_factor.h"
 
 #ifdef __GNUC__
@@ -77,7 +80,7 @@ void fmpz_mod_poly_factor_distinct_deg_with_frob(
     fmpz_mod_poly_set_coeff_ui(h[0], 1, 1, ctx);
     fmpz_mod_poly_set(h[1], frob, ctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_mod_poly_powmod_x_fmpz_preinv(tmp, p, v, vinv, ctx);
     FLINT_ASSERT(fmpz_mod_poly_equal(tmp, h[1], ctx));
 #endif

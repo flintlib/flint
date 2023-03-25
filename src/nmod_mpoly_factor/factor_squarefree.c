@@ -32,7 +32,7 @@ static void nmod_mpoly_factor_mul_mpoly_fmpz(
 }
 
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
 /*
     return: 0 no
             1 yes

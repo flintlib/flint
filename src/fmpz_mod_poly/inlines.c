@@ -11,11 +11,11 @@
 
 #define FMPZ_MOD_POLY_INLINES_C
 
-#include "flint.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
+
+/* FIXME: These should be moved to their own files */
 
 void fmpz_mod_poly_add_si(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
                                              slong c, const fmpz_mod_ctx_t ctx)

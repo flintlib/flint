@@ -99,7 +99,7 @@ next_alpha:
 
 got_alpha:
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_mpoly_degrees_si(tdegs, A, ctx);
     for (i = 0; i < n + 1; i++)
         FLINT_ASSERT(degs[i] == tdegs[i]);
@@ -316,7 +316,7 @@ cleanup:
 
     fmpz_poly_clear(Au);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     if (success)
     {
         fmpz_mpoly_t prod;

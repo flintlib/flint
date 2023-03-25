@@ -12,7 +12,7 @@
 #include "fq_nmod_mpoly_factor.h"
 
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
 static void n_fq_polyu_set_n_fq_polyun(
     n_polyu_t A,
     const n_polyun_t B,
@@ -546,7 +546,7 @@ choose_prime:
 
 cleanup:
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     if (success == 1)
     {
         n_polyu_t T1, T2, T3;

@@ -12,6 +12,9 @@
 */
 
 #include <stdio.h>
+#include "fmpz.h"
+#include "fmpz_poly.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 
 /* printing *******************************************************************/

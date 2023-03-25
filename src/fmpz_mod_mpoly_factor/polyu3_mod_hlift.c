@@ -11,7 +11,7 @@
 
 #include "fmpz_mod_mpoly_factor.h"
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
 
 static void fmpz_mod_polyu_get_fmpz_mod_polyun(
     fmpz_mod_polyu_t A,
@@ -439,7 +439,7 @@ int fmpz_mod_polyu3n_interp_crt_2sm_bpoly(
     fmpz_init(FvalueA);
     fmpz_init(FvalueB);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_mod_poly_evaluate_fmpz(u, modulus, alphapow->coeffs + 1, ctx);
     fmpz_mod_mul(u, u, alphapow->coeffs + 1, ctx);
     fmpz_mod_add(u, u, u, ctx);
@@ -775,7 +775,7 @@ choose_prime:
 
 cleanup:
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     if (success == 1)
     {
         fmpz_mod_polyu_t T1, T2, T3;

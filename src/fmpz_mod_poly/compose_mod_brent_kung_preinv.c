@@ -12,11 +12,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz_vec.h"
-#include "fmpz_mod_poly.h"
-#include "fmpz_mat.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "fmpz_mat.h"
+#include "fmpz_mod.h"
+#include "fmpz_mod_poly.h"
 
 void
 _fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz * res, const fmpz * poly1,

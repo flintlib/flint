@@ -12,6 +12,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly_factor.h"
 #include "fmpz_mod_vec.h"
+#include "fmpz_mod_poly_factor.h"
 #include "fmpz_mod_mat.h"
 #include "fmpz_mod_mpoly_factor.h"
 
@@ -174,7 +175,7 @@ static void _hensel_lift_fac(
     fmpz_mod_bpoly_swap(G, t1, ctx);
     fmpz_mod_bpoly_swap(H, t2, ctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_mod_bpoly_mul(t1, G, H, ctx);
     fmpz_mod_bpoly_sub(c, f, t1, ctx);
     for (i = 0; i < c->length; i++)
@@ -250,7 +251,7 @@ static void _hensel_lift_inv(
     fmpz_mod_bpoly_swap(t1, B, ctx);
     fmpz_mod_bpoly_swap(t2, A, ctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_mod_bpoly_mul(t1, G, A, ctx);
     fmpz_mod_bpoly_mul(t2, H, B, ctx);
     fmpz_mod_bpoly_add(c, t1, t2, ctx);
@@ -608,7 +609,7 @@ void fmpz_mod_bpoly_lift_combine(
     FLINT_ASSERT(fmpz_mod_mat_is_reduced(N));
 
     /* on input we should have a factorization of monicA mod y^order */
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     {
         fmpz_mod_bpoly_t t1, t2;
         fmpz_mod_bpoly_init(t1, ctx);
@@ -707,7 +708,7 @@ void fmpz_mod_bpoly_lift_combine(
         fmpz_one(fmpz_mod_mat_entry(N, i, i));
 
     /* on output we should have a factorization of monicA mod y^order */
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     {
         fmpz_mod_bpoly_t t1, t2;
         fmpz_mod_bpoly_init(t1, ctx);
@@ -923,7 +924,7 @@ static void fmpz_mod_bpoly_lift_continue(
     for (k = 0; k < r; k++)
         fmpz_mod_bpoly_reverse_vars(Bfinal + k, B + k, ctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     {
         fmpz_mod_bpoly_t t1, t2;
         fmpz_mod_bpoly_init(t1, ctx);

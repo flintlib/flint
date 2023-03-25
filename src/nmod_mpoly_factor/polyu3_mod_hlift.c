@@ -12,7 +12,7 @@
 #include "nmod_mpoly_factor.h"
 
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
 
 /* take last variable out of dense storage */
 static void n_polyu_set_n_polyun(n_polyu_t A, const n_polyun_t B)
@@ -403,7 +403,7 @@ int n_polyu3n_mod_interp_crt_2sm_bpoly(
     int texp_set, cmp;
     mp_limb_t alpha = alphapow->coeffs[1];
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     u = n_poly_mod_evaluate_nmod(modulus, alpha, mod);
     u = nmod_mul(u, alpha, mod);
     u = nmod_mul(u, 2, mod);
@@ -709,7 +709,7 @@ choose_prime:
 
 cleanup:
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     if (success == 1)
     {
         n_polyu_t T1, T2, T3;
@@ -902,7 +902,7 @@ choose_prime:
 
 cleanup:
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     if (success == 1)
     {
         n_polyu_t T1, T2, T3;

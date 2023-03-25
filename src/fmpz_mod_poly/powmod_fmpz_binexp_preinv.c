@@ -13,13 +13,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-
-
-
-
-
-#include "flint.h"
+#include "fmpz.h"
 #include "fmpz_vec.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 
 void

@@ -126,7 +126,7 @@ void n_fq_poly_mul_(
     slong d = fq_nmod_ctx_degree(ctx);
     slong Blen = B->length;
     slong Clen = C->length;
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fq_nmod_poly_t AA, BB, CC;
 #endif
 
@@ -149,7 +149,7 @@ void n_fq_poly_mul_(
         return;
     }
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fq_nmod_poly_init(AA, ctx);
     fq_nmod_poly_init(BB, ctx);
     fq_nmod_poly_init(CC, ctx);
@@ -163,7 +163,7 @@ void n_fq_poly_mul_(
     A->length = Blen + Clen - 1;
     _n_fq_poly_normalise(A, d);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     n_fq_poly_get_fq_nmod_poly(BB, A, ctx);
     FLINT_ASSERT(fq_nmod_poly_equal(BB, AA, ctx));
     fq_nmod_poly_clear(AA, ctx);

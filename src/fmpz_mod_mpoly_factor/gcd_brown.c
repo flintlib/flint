@@ -47,7 +47,7 @@ int fmpz_mod_polyu1n_gcd_brown_smprime(
     fmpz_mod_poly_struct * cA, * cB, * cG, * cAbar, * cBbar, * gamma;
     fmpz_mod_poly_struct * modulus, * alphapow, * r;
     int gstab, astab, bstab, use_stab;
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_mod_poly_t leadA, leadB;
 #endif
 
@@ -56,7 +56,7 @@ int fmpz_mod_polyu1n_gcd_brown_smprime(
     fmpz_init(gammaevalp);
     fmpz_init(gammaevalm);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_mod_poly_init(leadA, ctx);
     fmpz_mod_poly_init(leadB, ctx);
     fmpz_mod_poly_set(leadA, A->coeffs + 0, ctx);
@@ -266,7 +266,7 @@ successful_put_content:
 
 cleanup:
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     if (success)
     {
         FLINT_ASSERT(fmpz_is_one(fmpz_mod_poly_lead(G->coeffs + 0, ctx)));
@@ -356,7 +356,7 @@ int fmpz_mod_mpolyn_gcd_brown_smprime(
     fmpz_mod_poly_struct * modulus, * alphapow, * t1;
     flint_bitcnt_t bits = A->bits;
     slong N = mpoly_words_per_exp_sp(bits, ctx->minfo);
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_mod_mpolyn_t Aorg, Borg;
     fmpz_mod_poly_t leadA, leadB;
 #endif
@@ -397,7 +397,7 @@ int fmpz_mod_mpolyn_gcd_brown_smprime(
 
     mpoly_gen_offset_shift_sp(&offset, &shift, var - 1, G->bits, ctx->minfo);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fmpz_mod_poly_init(leadA, ctx->ffinfo);
     fmpz_mod_poly_init(leadB, ctx->ffinfo);
     fmpz_mod_poly_set(leadA, A->coeffs + 0, ctx->ffinfo);
@@ -649,7 +649,7 @@ successful_put_content:
 
 cleanup:
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     if (success)
     {
         FLINT_ASSERT(fmpz_is_one(fmpz_mod_mpolyn_leadcoeff(G)));

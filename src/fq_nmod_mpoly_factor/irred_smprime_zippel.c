@@ -1042,7 +1042,7 @@ int fq_nmod_mpoly_hlift_zippel(
     FLINT_ASSERT(r > 1);
     FLINT_ASSERT(bits <= FLINT_BITS);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     {
         fq_nmod_mpoly_t T;
         slong j, * check_degs = FLINT_ARRAY_ALLOC(ctx->minfo->nvars, slong);
@@ -1569,7 +1569,7 @@ cleanup:
     fq_nmod_mpoly_clear(m, ctx);
     fq_nmod_mpoly_clear(mpow, ctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     if (success)
     {
         fq_nmod_mpoly_t prod;

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2021 William Hart
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,10 +9,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mat.h"
+#include "fmpz.h"
+#include "fmpz_mod_poly.h"
 
-void fmpz_mod_mat_set_fmpz_mat(fmpz_mod_mat_t A, const fmpz_mat_t B)
+void _fmpz_mod_poly_set_length(fmpz_mod_poly_t poly, slong len)
 {
-    fmpz_mat_set(A->mat, B);
-    _fmpz_mod_mat_reduce(A);
+    if (poly->length > len)
+    {
+        slong i;
+
+        for (i = len; i < poly->length; i++)
+            _fmpz_demote(poly->coeffs + i);
+    }
+    poly->length = len;
 }

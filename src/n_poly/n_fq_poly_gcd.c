@@ -151,7 +151,7 @@ void n_fq_poly_gcd_(
     slong d = fq_nmod_ctx_degree(ctx);
     slong n;
     mp_limb_t * a, * b, * t;
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     fq_nmod_poly_t GG, AA, BB;
     fq_nmod_poly_init(GG, ctx);
     fq_nmod_poly_init(AA, ctx);
@@ -192,7 +192,7 @@ void n_fq_poly_gcd_(
     n_poly_stack_vec_clear(St);
     n_poly_stack_vec_clear(St);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     FLINT_ASSERT(n_fq_poly_is_canonical(G, ctx));
     n_fq_poly_get_fq_nmod_poly(AA, G, ctx);
     FLINT_ASSERT(fq_nmod_poly_equal(AA, GG, ctx));

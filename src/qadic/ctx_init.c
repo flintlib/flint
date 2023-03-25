@@ -13,11 +13,9 @@
 
 #include <string.h>
 
-#include "fmpz_vec.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
-#include "padic.h"
 #include "qadic.h"
-
 
 extern int flint_conway_polynomials [];
 

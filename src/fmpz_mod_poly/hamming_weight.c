@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2021 William Hart
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,9 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mat.h"
+#include "fmpz_poly.h"
+#include "fmpz_mod_poly.h"
 
-void fmpz_mod_mat_get_fmpz_mat(fmpz_mat_t A, const fmpz_mod_mat_t B)
+slong
+fmpz_mod_poly_hamming_weight(const fmpz_mod_poly_t A, const fmpz_mod_ctx_t ctx)
 {
-    fmpz_mat_set(A, B->mat);
+    return _fmpz_poly_hamming_weight(A->coeffs, A->length);
 }

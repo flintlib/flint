@@ -91,7 +91,7 @@ static slong _hgcd_uiui_no_write(
 
 fixed:
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
 
     /* should be ok */
 
@@ -157,7 +157,7 @@ fix:
     m22 = t2;
     det *= -1;
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     umul_ppmm(t1,t0, a0, q); t1 += a1*q;
     add_ssaaaa(t1,t0, t1,t0, b1,b0);
     b0 = a0;
@@ -926,7 +926,7 @@ int _fmpq_reconstruct_fmpz_2(fmpz_t n, fmpz_t d,
     mp_size_t Asize, Nsize;
     fmpz_t Q, R, A, B;
     _fmpz_mat22_t M; /* only need first row of matrix M */
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     int cqt_success;
     fmpz_t cqt_n, cqt_d;
 
@@ -1047,7 +1047,7 @@ write_answer:
 
 cleanup_assert:
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     FLINT_ASSERT(success == cqt_success);
     if (success)
     {

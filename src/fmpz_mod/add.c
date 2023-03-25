@@ -10,6 +10,7 @@
 */
 
 #include "nmod.h"
+#include "fmpz.h"
 #include "fmpz_mod.h"
 
 void _fmpz_mod_add1(fmpz_t a, const fmpz_t b, const fmpz_t c,

@@ -143,7 +143,7 @@ static int n_polyu1n_mod_interp_crt_2sm_poly(
     n_polyun_fit_length(T, Flen + FLINT_MAX(Aexp, Bexp) + 1);
     Ti = 0;
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     u = n_poly_mod_evaluate_nmod(modulus, alphapow->coeffs[1], ctx);
     u = nmod_mul(u, alphapow->coeffs[1], ctx);
     u = nmod_add(u, u, ctx);
@@ -257,7 +257,7 @@ int n_polyu1n_mod_gcd_brown_smprime(
     n_poly_struct * cA, * cB, * cG, * cAbar, * cBbar, * gamma;
     n_poly_struct * modulus, * alphapow, * r;
     int gstab, astab, bstab, use_stab;
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     n_poly_t leadA, leadB;
 
     FLINT_ASSERT(A->length > 0);
@@ -476,7 +476,7 @@ successful_put_content:
 
 cleanup:
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     if (success)
     {
         FLINT_ASSERT(1 == n_poly_lead(G->coeffs + 0));

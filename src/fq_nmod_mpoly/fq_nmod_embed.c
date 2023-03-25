@@ -356,7 +356,7 @@ void bad_n_fq_embed_lg_to_sm(
     out->length = emb->h->length - 1;
     _n_fq_poly_normalise(out, smd);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     {
         fq_nmod_t in_;
         fq_nmod_poly_t out_, out_check;
@@ -454,7 +454,7 @@ void bad_n_fq_embed_sm_to_lg(
 
     n_poly_stack_clear(St);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     {
         fq_nmod_t out_, out_check;
         fq_nmod_poly_t in_;

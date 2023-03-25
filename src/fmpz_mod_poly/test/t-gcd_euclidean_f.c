@@ -10,8 +10,8 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
-#include "ulong_extras.h"
 
 int
 main(void)

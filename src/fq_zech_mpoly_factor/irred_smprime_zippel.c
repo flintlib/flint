@@ -268,7 +268,7 @@ int fq_zech_zip_find_coeffs_new(
             fq_zech_add(V0, V0, p0, ctx);
         }
         /* roots[i] should be a root of master */
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
         fq_zech_mul(p0, r, T, ctx);
         fq_zech_add(p0, p0, master + 0, ctx);
         FLINT_ASSERT(fq_zech_is_zero(p0, ctx));
@@ -892,7 +892,7 @@ int fq_zech_mpoly_hlift_zippel(
     FLINT_ASSERT(r > 1);
     FLINT_ASSERT(bits <= FLINT_BITS);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     {
         fq_zech_mpoly_t T;
         slong j, * check_degs = FLINT_ARRAY_ALLOC(ctx->minfo->nvars, slong);
@@ -1373,7 +1373,7 @@ cleanup:
     fq_zech_mpoly_clear(m, ctx);
     fq_zech_mpoly_clear(mpow, ctx);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     if (success)
     {
         fq_zech_mpoly_t prod;

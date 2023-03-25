@@ -149,7 +149,7 @@ static void _hensel_lift_fac(
     n_bpoly_swap(G, t1);
     n_bpoly_swap(H, t2);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     n_bpoly_mod_mul(t1, G, H, ctx);
     n_bpoly_mod_sub(c, f, t1, ctx);
     for (i = 0; i < c->length; i++)
@@ -222,7 +222,7 @@ static void _hensel_lift_inv(
     n_bpoly_swap(t1, B);
     n_bpoly_swap(t2, A);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     n_bpoly_mod_mul(t1, G, A, ctx);
     n_bpoly_mod_mul(t2, H, B, ctx);
     n_bpoly_mod_add(c, t1, t2, ctx);
@@ -617,7 +617,7 @@ void n_bpoly_mod_lift_combine(
     FLINT_ASSERT(nmod_mat_is_reduced(N));
 
     /* on input we should have a factorization of monicA mod y^order */
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     {
         n_bpoly_t t1, t2;
         n_bpoly_init(t1);
@@ -718,7 +718,7 @@ void n_bpoly_mod_lift_combine(
         nmod_mat_entry(N, i, i) = 1;
 
     /* on output we should have a factorization of monicA mod y^order */
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     {
         n_bpoly_t t1, t2;
         n_bpoly_init(t1);
@@ -1039,7 +1039,7 @@ static void n_bpoly_mod_lift_continue(
     for (k = 0; k < r; k++)
         n_bpoly_reverse_gens(Bfinal + k, B + k);
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     {
         n_bpoly_t t1, t2;
         n_bpoly_init(t1);

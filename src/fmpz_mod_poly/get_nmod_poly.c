@@ -10,6 +10,7 @@
 */
 
 #include "nmod_poly.h"
+#include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
 void fmpz_mod_poly_get_nmod_poly(nmod_poly_t f, const fmpz_mod_poly_t g)

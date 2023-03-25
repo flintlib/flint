@@ -21,7 +21,7 @@ slong fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t f, slong limit)
     _fmpq_cfrac_list_t s;
     _fmpz_mat22_t M;
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     int input_is_canonical;
 #endif
 
@@ -44,7 +44,7 @@ slong fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t f, slong limit)
         return 0;
     }
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     input_is_canonical = fmpq_is_canonical(f);
 #endif
 

@@ -14,6 +14,7 @@
 */
 
 #include "fmpz_mod_poly.h"
+#include "fmpz_mod_poly_factor.h"
 
 void
 fmpz_mod_poly_factor_insert(fmpz_mod_poly_factor_t fac,

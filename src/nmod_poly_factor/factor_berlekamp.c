@@ -14,6 +14,7 @@
 
 #include "ulong_extras.h"
 #include "nmod_mat.h"
+#include "nmod_poly.h"
 #include "nmod_poly_factor.h"
 
 static void
