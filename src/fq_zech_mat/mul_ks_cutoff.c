@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,10 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
-
 #include "fq_zech.h"
+#include "fq_zech_mat.h"
 
-void osxdummy2394872398429() /* OSX doesn't like empty files */
+int FQ_ZECH_MAT_MUL_KS_CUTOFF(slong r, slong c, const fq_zech_ctx_t ctx)
 {
+    if (5 * FLINT_MIN(r, c) > 8 * fq_zech_ctx_degree(ctx) + 29)
+        return 1;
+    else
+        return 0;
 }

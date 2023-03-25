@@ -10,7 +10,7 @@
 */
 
 #include <string.h>
-
+#include "fq_nmod.h"
 #include "fq_zech.h"
 
 void

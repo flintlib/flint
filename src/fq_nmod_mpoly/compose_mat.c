@@ -12,6 +12,10 @@
 #include "fmpz_vec.h"
 #include "fq_nmod_mpoly.h"
 
+#ifdef FLINT_WANT_ASSERT
+# include "fmpz_mat.h"
+#endif
+
 /* essentially exps(A) = M*exps(B) */
 void _fq_nmod_mpoly_compose_mat(
     fq_nmod_mpoly_t A,

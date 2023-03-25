@@ -12,7 +12,6 @@
 
 #include "fq.h"
 
-
 #ifdef T
 #undef T
 #endif
@@ -23,11 +22,9 @@
 #ifdef T
 
 #include "templates.h"
-
-
-#include "fmpz_mod_poly.h"
 #include "ulong_extras.h"
-#include "long_extras.h"
+#include "fmpz.h"
+#include "fmpz_mod_poly.h"
 
 int
 main(void)

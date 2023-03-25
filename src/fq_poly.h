@@ -22,9 +22,7 @@
 #define FQ_POLY_TEMPLATES_INLINE static __inline__
 #endif
 
-#include "fq.h"
-#include "fq_vec.h"
-#include "fq_mat.h"
+#include "fq_types.h"
 
 #define FQ_POLY_DIVREM_DIVCONQUER_CUTOFF  16
 #define FQ_COMPOSE_MOD_LENH_CUTOFF 6
@@ -46,7 +44,5 @@
 #include "fq_poly_templates.h"
 #undef CAP_T
 #undef T
-
-#include "fq_poly_factor.h"
 
 #endif

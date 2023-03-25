@@ -13,21 +13,13 @@
 
 #ifdef T
 
+#include "templates.h"
+#include "nmod_types.h"
+#include "fmpz_mod_types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/*  Type definitions *********************************************************/
-
-typedef struct
-{
-    TEMPLATE(T, struct) *coeffs;
-    slong alloc;
-    slong length;
-}
-TEMPLATE(T, poly_struct);
-
-typedef TEMPLATE(T, poly_struct) TEMPLATE(T, poly_t)[1];
 
 /*  Memory management ********************************************************/
 
@@ -57,19 +49,8 @@ void _TEMPLATE(T, poly_normalise)(TEMPLATE(T, poly_t) poly,
 void _TEMPLATE(T, poly_normalise2)(const TEMPLATE(T, struct) *poly, slong *length,
                               const TEMPLATE(T, ctx_t) ctx);
 
-FQ_POLY_TEMPLATES_INLINE void
-_TEMPLATE(T, poly_set_length)(TEMPLATE(T, poly_t) poly, slong len,
-                              const TEMPLATE(T, ctx_t) ctx)
-{
-    if (poly->length > len)
-    {
-        slong i;
-
-        for (i = len; i < poly->length; i++)
-            TEMPLATE(T, zero)(poly->coeffs + i, ctx);
-    }
-    poly->length = len;
-}
+void _TEMPLATE(T, poly_set_length)(TEMPLATE(T, poly_t) poly, slong len,
+                              const TEMPLATE(T, ctx_t) ctx);
 
 /*  Polynomial parameters  ***************************************************/
 
@@ -132,22 +113,8 @@ void TEMPLATE(T, poly_set_nmod_poly)(TEMPLATE(T, poly_t) rop,
 void TEMPLATE(T, poly_swap)(TEMPLATE(T, poly_t) op1, TEMPLATE(T, poly_t) op2,
                        const TEMPLATE(T, ctx_t) ctx);
 
-FQ_POLY_TEMPLATES_INLINE void
-_TEMPLATE(T, poly_zero)(TEMPLATE(T, struct) *rop, slong len,
-                        const TEMPLATE(T, ctx_t) ctx)
-{
-    slong i;
-
-    for (i = 0; i < len; i++)
-        TEMPLATE(T, zero)(rop + i, ctx);
-}
-
-FQ_POLY_TEMPLATES_INLINE void
-TEMPLATE(T, poly_zero)(TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx)
-{
-    _TEMPLATE(T, poly_set_length)(poly, 0, ctx);
-}
-
+void _TEMPLATE(T, poly_zero)(TEMPLATE(T, struct) *rop, slong len, const TEMPLATE(T, ctx_t) ctx);
+void TEMPLATE(T, poly_zero)(TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx);
 void TEMPLATE(T, poly_one)(TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_gen)(TEMPLATE(T, poly_t) f, const TEMPLATE(T, ctx_t) ctx);
@@ -188,27 +155,11 @@ void TEMPLATE(T, poly_set_coeff)(TEMPLATE(T, poly_t) poly, slong n,
                                  const TEMPLATE(T, t) x,
                                  const TEMPLATE(T, ctx_t) ctx);
 
-FQ_POLY_TEMPLATES_INLINE void
-TEMPLATE(T, poly_set_coeff_fmpz)(TEMPLATE(T, poly_t) poly, slong n,
-                                 const fmpz_t x, const TEMPLATE(T, ctx_t) ctx)
-{
-    TEMPLATE(T, poly_fit_length)(poly, n + 1, ctx);
-    TEMPLATE(T, set_fmpz)(poly->coeffs + n, x, ctx);
-    if (n + 1 > poly->length)
-    {
-        _TEMPLATE(T, poly_set_length)(poly, n + 1, ctx);
-    }
-    _TEMPLATE(T, poly_normalise)(poly, ctx);
-}
+void TEMPLATE(T, poly_set_coeff_fmpz)(TEMPLATE(T, poly_t) poly, slong n,
+                                 const fmpz_t x, const TEMPLATE(T, ctx_t) ctx);
 
-FQ_POLY_TEMPLATES_INLINE int
-TEMPLATE(T, poly_is_gen)(const TEMPLATE(T, poly_t) poly,
-                         const TEMPLATE(T, ctx_t) ctx)
-{
-    return ((poly->length == 2) &&
-            TEMPLATE(T, is_zero)(poly->coeffs, ctx) &&
-            TEMPLATE(T, is_one)(poly->coeffs + 1, ctx));
-}
+int TEMPLATE(T, poly_is_gen)(const TEMPLATE(T, poly_t) poly,
+                                const TEMPLATE(T, ctx_t) ctx);
 
 /*  Comparison  **************************************************************/
 
@@ -227,28 +178,9 @@ TEMPLATE(T, poly_is_zero)(const TEMPLATE(T, poly_t) poly,
     return (poly->length == 0);
 }
 
-FQ_POLY_TEMPLATES_INLINE int
-TEMPLATE(T, poly_is_one)(const TEMPLATE(T, poly_t) op,
-                         const TEMPLATE(T, ctx_t) ctx)
-{
-    return (op->length == 1) && (TEMPLATE(T, is_one)(op->coeffs + 0, ctx));
-}
-
-FQ_POLY_TEMPLATES_INLINE int
-TEMPLATE(T, poly_is_unit)(const TEMPLATE(T, poly_t) op,
-                          const TEMPLATE(T, ctx_t) ctx)
-{
-    return (op->length == 1) && (!(TEMPLATE(T, is_zero)(op->coeffs + 0, ctx)));
-}
-
-FQ_POLY_TEMPLATES_INLINE int
-TEMPLATE3(T, poly_equal, T)(const TEMPLATE(T, poly_t) poly,
-                            const TEMPLATE(T, t) c,
-                            const TEMPLATE(T, ctx_t) ctx)
-{
-    return ((poly->length == 0) && TEMPLATE(T, is_zero)(c, ctx)) ||
-        ((poly->length == 1) && TEMPLATE(T, equal)(poly->coeffs, c, ctx));
-}
+int TEMPLATE(T, poly_is_one)(const TEMPLATE(T, poly_t) op, const TEMPLATE(T, ctx_t) ctx);
+int TEMPLATE(T, poly_is_unit)(const TEMPLATE(T, poly_t) op, const TEMPLATE(T, ctx_t) ctx);
+int TEMPLATE3(T, poly_equal, T)(const TEMPLATE(T, poly_t) poly, const TEMPLATE(T, t) c, const TEMPLATE(T, ctx_t) ctx);
 
 /*  Addition and subtraction  ************************************************/
 
@@ -751,41 +683,15 @@ void TEMPLATE(T, poly_divrem)(TEMPLATE(T, poly_t) Q, TEMPLATE(T, poly_t) R,
                                   const TEMPLATE(T, poly_t) B,
                                   const TEMPLATE(T, ctx_t) ctx);
 
-FQ_POLY_TEMPLATES_INLINE void
-_TEMPLATE(T, poly_rem)(TEMPLATE(T, struct) *R,
+void _TEMPLATE(T, poly_rem)(TEMPLATE(T, struct) *R,
                        const TEMPLATE(T, struct) *A, slong lenA,
                        const TEMPLATE(T, struct) *B, slong lenB,
                        const TEMPLATE(T, t) invB,
-                       const TEMPLATE(T, ctx_t) ctx)
-{
-    TEMPLATE(T, struct) *Q = _TEMPLATE(T, vec_init)(lenA - lenB + 1, ctx);
+                       const TEMPLATE(T, ctx_t) ctx);
 
-    if (lenA < lenB)
-    {
-        _TEMPLATE(T, vec_set)(R, A, lenA, ctx);
-        _TEMPLATE(T, vec_zero)(R + lenA, lenB - 1 - lenA, ctx);
-    }
-    else
-    {
-        TEMPLATE(T, struct) *T = _TEMPLATE(T, vec_init)(lenA, ctx);
-       _TEMPLATE(T, poly_divrem)(Q, T, A, lenA, B, lenB, invB, ctx);
-       _TEMPLATE(T, vec_set)(R, T, lenB - 1, ctx);
-       _TEMPLATE(T, vec_clear)(T, lenA, ctx);
-    }
-
-    _TEMPLATE(T, vec_clear)(Q, lenA - lenB + 1, ctx);
-}
-
-FQ_POLY_TEMPLATES_INLINE void
-TEMPLATE(T, poly_rem)(TEMPLATE(T, poly_t) R,
+void TEMPLATE(T, poly_rem)(TEMPLATE(T, poly_t) R,
                       const TEMPLATE(T, poly_t) A, const TEMPLATE(T, poly_t) B,
-                      const TEMPLATE(T, ctx_t) ctx)
-{
-    TEMPLATE(T, poly_t) Q;
-    TEMPLATE(T, poly_init)(Q, ctx);
-    TEMPLATE(T, poly_divrem)(Q, R, A, B, ctx);
-    TEMPLATE(T, poly_clear)(Q, ctx);
-}
+                      const TEMPLATE(T, ctx_t) ctx);
 
 void _TEMPLATE(T, poly_inv_series_newton)(TEMPLATE(T, struct) * Qinv,
                                      const TEMPLATE(T, struct) * Q, slong n,
@@ -1126,25 +1032,8 @@ char * TEMPLATE(T, poly_get_str)(const TEMPLATE(T, poly_t) poly,
 void TEMPLATE(T, mat_charpoly_danilevsky) (TEMPLATE(T, poly_t) p,
                       const TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx);
 
-FQ_POLY_TEMPLATES_INLINE
 void TEMPLATE(T, mat_charpoly)(TEMPLATE(T, poly_t) p,
-                       const TEMPLATE(T, mat_t) M, const TEMPLATE(T, ctx_t) ctx)
-{
-   TEMPLATE(T, mat_t) A;
-
-   TEMPLATE(T, mat_init) (A, M->r, M->c, ctx);
-   TEMPLATE(T, mat_set) (A, M, ctx);
-
-   if (A->r != A->c)
-   {
-       flint_printf("Exception (fq_mat_charpoly).  Non-square matrix.\n");
-       flint_abort();
-   }
-
-   TEMPLATE(T, mat_charpoly_danilevsky) (p, A, ctx);
-
-   TEMPLATE(T, mat_clear) (A, ctx);
-}
+                       const TEMPLATE(T, mat_t) M, const TEMPLATE(T, ctx_t) ctx);
 
 /* Minimal polynomial ************************************************/
 

@@ -9,10 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-
 #include "fq_zech.h"
-#include "ulong_extras.h"
-#include "long_extras.h"
 
 int
 main(void)

@@ -9,14 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
-#include "fq_zech_mpoly.h"
-
 #ifdef __GNUC__
 # define sqrt __builtin_sqrt
 #else
 # include <math.h>
 #endif
+
+#include "nmod_mpoly.h"
+#include "fq_zech.h"
+#include "fq_zech_mpoly.h"
 
 static int _is_proved_not_square_medprime(
     int count,

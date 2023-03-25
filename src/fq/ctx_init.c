@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
-#include "fq_vec.h"
+#include "fq.h"
 
 void
 fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var)

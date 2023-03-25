@@ -11,9 +11,7 @@
 
 #ifdef T
 
-#include "flint.h"
 #include "templates.h"
-#include "ulong_extras.h"
 
 #ifdef __cplusplus
  extern "C" {

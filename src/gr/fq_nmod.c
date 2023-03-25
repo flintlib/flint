@@ -9,13 +9,17 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "nmod_vec.h"
+#include "nmod_poly.h"
+#include "fmpz.h"
+#include "fq.h"
+#include "fq_nmod.h"
+#include "fq_nmod_mat.h"
+#include "fq_nmod_poly.h"
+#include "fq_nmod_poly_factor.h"
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
-#include "fq.h"
-#include "fq_nmod_poly.h"
-#include "fq_nmod_mat.h"
-#include "fq_nmod_poly_factor.h"
 
 #define FQ_CTX(ring_ctx) ((fq_nmod_ctx_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
 

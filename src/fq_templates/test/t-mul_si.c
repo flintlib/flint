@@ -14,10 +14,8 @@
 #ifdef T
 
 #include "templates.h"
-
-#include "flint.h"
-#include "fmpz.h"
 #include "long_extras.h"
+#include "fmpz_poly.h"
 
 int
 main(void)

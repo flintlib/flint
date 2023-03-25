@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_vec.h"
+#include "fq_zech.h"
 #include "fq_zech_mpoly.h"
 
 slong _fq_zech_mpoly_mul_johnson(

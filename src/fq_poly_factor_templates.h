@@ -13,22 +13,11 @@
 
 #ifdef T
 
+#include "templates.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/*  Type definitions *********************************************************/
-
-typedef struct
-{
-    TEMPLATE(T, poly_struct) *poly;
-    slong *exp;
-    slong num;
-    slong alloc;
-} TEMPLATE(T, poly_factor_struct);
-
-typedef TEMPLATE(T, poly_factor_struct) TEMPLATE(T, poly_factor_t)[1];
-
 
 void TEMPLATE(T, poly_factor_init)(TEMPLATE(T, poly_factor_t) fac,
                               const TEMPLATE(T, ctx_t) ctx);

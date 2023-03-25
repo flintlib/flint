@@ -15,9 +15,8 @@
 #ifdef T
 
 #include "templates.h"
+#include "fmpz.h"
 
-#include "flint.h"
-#include "ulong_extras.h"
 int
 main(void)
 {

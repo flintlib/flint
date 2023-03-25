@@ -11,6 +11,4 @@
 
 #define FQ_MAT_INLINES_C
 
-#include "flint.h"
 #include "fq_mat.h"
-

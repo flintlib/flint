@@ -20,7 +20,7 @@
 #define FQ_NMOD_MAT_INLINE static __inline__
 #endif
 
-#include "fq_nmod.h"
+#include "fq_nmod_types.h"
 
 /* Cutoff between classical and recursive triangular solving */
 #define FQ_NMOD_MAT_SOLVE_TRI_ROWS_CUTOFF 64
@@ -29,16 +29,7 @@
 /* Cutoff between classical and recursive LU decomposition */
 #define FQ_NMOD_MAT_LU_RECURSIVE_CUTOFF 4
 
-FQ_NMOD_MAT_INLINE
-int FQ_NMOD_MAT_MUL_KS_CUTOFF(slong r, slong c, const fq_nmod_ctx_t ctx)
-{
-    slong d2 = FLINT_MAX(0, 12 - fq_nmod_ctx_degree(ctx));
-
-    if (2*(r + 1)*c > d2*d2)
-        return 1;
-    else
-        return 0;
-}
+int FQ_NMOD_MAT_MUL_KS_CUTOFF(slong r, slong c, const fq_nmod_ctx_t ctx);
 
 #define T fq_nmod
 #define CAP_T FQ_NMOD

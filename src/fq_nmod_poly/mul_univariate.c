@@ -9,6 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_poly.h"
+#include "fq_nmod.h"
+#include "fq_nmod_vec.h"
 #include "fq_nmod_poly.h"
 
 void

@@ -19,6 +19,10 @@
 #define FQ_DEFAULT_INLINE static __inline__
 #endif
 
+#include "nmod.h"
+#include "nmod_poly.h"
+#include "fmpz.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 #include "fq.h"
 #include "fq_nmod.h"

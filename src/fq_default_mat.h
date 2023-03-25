@@ -20,10 +20,11 @@
 #endif
 
 #include "nmod_mat.h"
-#include "fq_default.h"
+#include "fmpz_mod_mat.h"
 #include "fq_mat.h"
 #include "fq_nmod_mat.h"
 #include "fq_zech_mat.h"
+#include "fq_default.h"
 
 #ifdef __cplusplus
  extern "C" {

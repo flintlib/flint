@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_zech.h"
 #include "fq_zech_mpoly.h"
 
 int fq_zech_mpoly_is_one(const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ctx)

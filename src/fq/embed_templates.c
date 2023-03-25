@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_mod_mat.h"
+#include "fq.h"
 #include "fq_embed.h"
 
 #ifdef T

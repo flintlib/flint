@@ -10,6 +10,7 @@
 */
 
 #include "nmod_mat.h"
+#include "fq_nmod_poly_factor.h"
 #include "fq_nmod_mpoly.h"
 
 /*

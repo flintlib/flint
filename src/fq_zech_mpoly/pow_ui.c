@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_vec.h"
+#include "fq_zech.h"
 #include "fq_zech_mpoly.h"
 
 int fq_zech_mpoly_pow_ui(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,

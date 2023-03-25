@@ -13,7 +13,7 @@
 
 #include "templates.h"
 #include "test_helpers.h"
-
+#include "fmpz.h"
 
 int main(void)
 {

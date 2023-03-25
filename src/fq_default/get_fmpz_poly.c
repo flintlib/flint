@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
 #include "fq_default.h"
 
 void fq_default_get_fmpz_poly(fmpz_poly_t poly,

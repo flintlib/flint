@@ -9,6 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_nmod.h"
+#include "fq_nmod_embed.h"
+#include "fq_zech.h"
 #include "fq_zech_embed.h"
 
 void fq_zech_embed_composition_matrix_sub(nmod_mat_t matrix,
@@ -22,4 +25,11 @@ void fq_zech_embed_composition_matrix_sub(nmod_mat_t matrix,
     fq_zech_get_fq_nmod(gen_nmod, gen, ctx);
     fq_nmod_embed_composition_matrix_sub(matrix, gen_nmod, modulus, trunc);
     fq_nmod_clear(gen_nmod, modulus);
+}
+
+void fq_zech_embed_composition_matrix(nmod_mat_t matrix, const fq_zech_t gen,
+                                    const fq_zech_ctx_t ctx)
+{
+    fq_zech_embed_composition_matrix_sub(matrix, gen, ctx,
+                                        fq_zech_ctx_degree(ctx));
 }

@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include "fq_nmod.h"
 #include "fq_zech.h"
 
 /* printing *******************************************************************/

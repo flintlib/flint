@@ -14,6 +14,10 @@
 */
 
 #include <stdio.h>
+#include "fmpz.h"
+#include "fmpz_mod_mat.h"
+#include "fq_nmod.h"
+#include "fq_nmod_vec.h"
 #include "fq_nmod_mat.h"
 #include "fq_nmod_poly.h"
 
@@ -26,7 +30,7 @@
 
 #include "fq_mat_templates/add.c"
 #include "fq_mat_templates/can_solve.c"
-#include "fq_mat_templates/charpoly_danilevsky.c"
+#include "fq_mat_templates/charpoly.c"
 #include "fq_mat_templates/clear.c"
 #include "fq_mat_templates/concat_horizontal.c"
 #include "fq_mat_templates/concat_vertical.c"
@@ -40,6 +44,10 @@
 #include "fq_mat_templates/lu.c"
 #include "fq_mat_templates/lu_classical.c"
 #include "fq_mat_templates/lu_recursive.c"
+#include "fq_mat_templates/mat_entry_set.c"
+#include "fq_mat_templates/mat_invert_cols.c"
+#include "fq_mat_templates/mat_swap_cols.c"
+#include "fq_mat_templates/mat_swap_entrywise.c"
 #include "fq_mat_templates/minpoly.c"
 #include "fq_mat_templates/mul.c"
 #include "fq_mat_templates/mul_classical.c"

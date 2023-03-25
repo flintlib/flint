@@ -9,9 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_embed.h"
+#include "fmpz.h"
+#include "fmpz_mod.h"
+#include "fmpz_mod_mat.h"
+#include "fmpz_mod_poly.h"
+#include "fq.h"
 #include "fq_poly.h"
-
+#include "fq_embed.h"
 
 void fq_embed_mono_to_dual_matrix(fmpz_mod_mat_t res, const fq_ctx_t ctx)
 {

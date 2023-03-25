@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_vec.h"
+#include "fq_zech.h"
 #include "fq_zech_mpoly.h"
 
 static slong _fq_zech_mpoly_divides_monagan_pearce(

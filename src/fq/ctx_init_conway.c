@@ -13,6 +13,8 @@
 
 #include <string.h>
 
+#include "fmpz.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 #include "fq.h"
 

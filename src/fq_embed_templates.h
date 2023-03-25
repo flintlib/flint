@@ -62,14 +62,10 @@ void TEMPLATE(T, embed_composition_matrix_sub)(TEMPLATE(B, mat_t) matrix,
                                                    const TEMPLATE(T, t) gen,
                                                    const TEMPLATE(T, ctx_t) ctx,
                                                    slong trunc);
-FQ_EMBED_TEMPLATES_INLINE
+
 void TEMPLATE(T, embed_composition_matrix)(TEMPLATE(B, mat_t) matrix,
                                      const TEMPLATE(T, t) gen,
-                                     const TEMPLATE(T, ctx_t) ctx)
-{
-    TEMPLATE(T, embed_composition_matrix_sub)(matrix, gen, ctx,
-                                        TEMPLATE(T, ctx_degree(ctx)));
-}
+                                     const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, embed_mul_matrix)(TEMPLATE(B, mat_t) matrix,
                                        const TEMPLATE(T, t) gen,

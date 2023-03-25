@@ -200,4 +200,24 @@ cleanup:
    _TEMPLATE(T, vec_clear) (W, A->r, ctx);
 }
 
+void
+TEMPLATE(T, mat_charpoly)(TEMPLATE(T, poly_t) p,
+                       const TEMPLATE(T, mat_t) M, const TEMPLATE(T, ctx_t) ctx)
+{
+   TEMPLATE(T, mat_t) A;
+
+   TEMPLATE(T, mat_init) (A, M->r, M->c, ctx);
+   TEMPLATE(T, mat_set) (A, M, ctx);
+
+   if (A->r != A->c)
+   {
+       flint_printf("Exception (fq_mat_charpoly).  Non-square matrix.\n");
+       flint_abort();
+   }
+
+   TEMPLATE(T, mat_charpoly_danilevsky) (p, A, ctx);
+
+   TEMPLATE(T, mat_clear) (A, ctx);
+}
+
 #endif

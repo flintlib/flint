@@ -9,9 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_zech_mpoly.h"
 #include "fq_nmod_mpoly_factor.h"
-
+#include "fq_zech.h"
+#include "fq_zech_mpoly.h"
 
 void _fq_zech_mpoly_get_fq_nmod_mpoly(
     fq_nmod_mpoly_t A,

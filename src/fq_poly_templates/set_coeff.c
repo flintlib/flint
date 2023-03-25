@@ -47,5 +47,17 @@ TEMPLATE(T, poly_set_coeff) (TEMPLATE(T, poly_t) poly, slong n,
     TEMPLATE(T, set) (poly->coeffs + n, x, ctx);
 }
 
+void
+TEMPLATE(T, poly_set_coeff_fmpz)(TEMPLATE(T, poly_t) poly, slong n,
+                                 const fmpz_t x, const TEMPLATE(T, ctx_t) ctx)
+{
+    TEMPLATE(T, poly_fit_length)(poly, n + 1, ctx);
+    TEMPLATE(T, set_fmpz)(poly->coeffs + n, x, ctx);
+    if (n + 1 > poly->length)
+    {
+        _TEMPLATE(T, poly_set_length)(poly, n + 1, ctx);
+    }
+    _TEMPLATE(T, poly_normalise)(poly, ctx);
+}
 
 #endif

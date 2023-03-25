@@ -9,12 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "gr.h"
-#include "gr_vec.h"
-#include "fq.h"
+#include "fmpz.h"
+#include "fq_nmod.h"
+#include "fq_zech.h"
+#include "fq_zech_vec.h"
 #include "fq_zech_poly.h"
 #include "fq_zech_poly_factor.h"
 #include "fq_zech_mat.h"
+#include "gr.h"
+#include "gr_vec.h"
 
 #define FQ_CTX(ring_ctx) ((fq_zech_ctx_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
 

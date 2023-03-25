@@ -9,9 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "nmod_mat.h"
-#include "fq_zech_embed.h"
+#include "nmod_poly.h"
+#include "fmpz.h"
+#include "fq_zech.h"
 #include "fq_zech_poly.h"
+#include "fq_zech_poly_factor.h"
+#include "fq_zech_embed.h"
 
 #ifdef T
 #undef T

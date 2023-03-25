@@ -22,8 +22,9 @@
 #include "thread_pool.h"
 #include "nmod_mat.h"
 #include "fmpz_mod_poly_factor.h"
-#include "fq_nmod_poly.h"
-#include "fq_zech_poly.h"
+#include "fq_poly_factor.h"
+#include "fq_nmod_poly_factor.h"
+#include "fq_zech_poly_factor.h"
 #include "fq_default_poly.h"
 
 #ifdef __cplusplus

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_zech.h"
 #include "fq_zech_mpoly.h"
 
 void fq_zech_mpoly_clear(fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ctx)

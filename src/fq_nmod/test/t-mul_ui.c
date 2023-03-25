@@ -9,10 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fq_nmod.h"
 #include "long_extras.h"
+#include "nmod_poly.h"
+#include "fq_nmod.h"
 
 int
 main(void)

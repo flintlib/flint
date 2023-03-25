@@ -18,8 +18,11 @@
 #define N_POLY_INLINE static __inline__
 #endif
 
-#include "fq_nmod_poly.h"
+#include "nmod.h"
+#include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "fq_nmod.h"
+#include "fq_nmod_poly.h"
 
 #ifdef __cplusplus
  extern "C" {

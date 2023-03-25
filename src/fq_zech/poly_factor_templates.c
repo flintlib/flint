@@ -11,7 +11,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "fmpz.h"
+#include "fq_nmod.h"
+#include "fq_zech.h"
+#include "fq_zech_vec.h"
+#include "fq_zech_mat.h"
 #include "fq_zech_poly.h"
+#include "fq_zech_poly_factor.h"
 
 #ifdef T
 #undef T

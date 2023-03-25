@@ -10,6 +10,8 @@
 */
 
 #include <stdio.h>
+#include "fmpz_poly.h"
+#include "fq.h"
 #include "fq_vec.h"
 
 #ifdef T
