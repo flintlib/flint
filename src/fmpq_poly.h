@@ -179,7 +179,12 @@ int _fmpq_poly_equal_trunc(const fmpz * poly1, const fmpz_t den1, slong len1,
 
 int fmpq_poly_equal_trunc(const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n);
 
-int fmpq_poly_is_zero(const fmpq_poly_t poly);
+FMPQ_POLY_INLINE
+int fmpq_poly_is_zero(const fmpq_poly_t poly)
+{
+    return poly->length == WORD(0);
+}
+
 int fmpq_poly_is_one(const fmpq_poly_t poly);
 
 FMPQ_POLY_INLINE

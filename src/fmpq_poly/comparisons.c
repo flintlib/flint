@@ -12,11 +12,6 @@
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-int fmpq_poly_is_zero(const fmpq_poly_t poly)
-{
-    return poly->length == WORD(0);
-}
-
 int fmpq_poly_is_one(const fmpq_poly_t poly)
 {
     return (poly->length == WORD(1)) && (fmpz_equal(poly->coeffs, poly->den));
