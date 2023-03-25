@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,16 +9,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_set_mpq(fmpq_poly_t poly, const mpq_t x)
+void fmpq_poly_truncate(fmpq_poly_t poly, slong n)
 {
-    fmpq_poly_fit_length(poly, 1);
-    fmpz_set_mpz(poly->coeffs, mpq_numref(x));
-    fmpz_set_mpz(poly->den, mpq_denref(x));
-    _fmpq_poly_set_length(poly, 1);
-    _fmpq_poly_normalise(poly);
+    if (poly->length > n)
+    {
+        slong i;
+        for (i = n; i < poly->length; i++)
+            _fmpz_demote(poly->coeffs + i);
+        poly->length = n;
+        fmpq_poly_canonicalise(poly);
+    }
 }
-

@@ -18,7 +18,6 @@
 #define FMPQ_MAT_INLINE static __inline__
 #endif
 
-#include "fmpq.h"
 #include "fmpq_types.h"
 
 #ifdef __cplusplus
@@ -62,16 +61,7 @@ void fmpq_mat_init_set(fmpq_mat_t mat1, const fmpq_mat_t mat2);
 void fmpq_mat_clear(fmpq_mat_t mat);
 
 void fmpq_mat_swap(fmpq_mat_t mat1, fmpq_mat_t mat2);
-
-FMPQ_MAT_INLINE void
-fmpq_mat_swap_entrywise(fmpq_mat_t mat1, fmpq_mat_t mat2)
-{
-    slong i, j;
-
-    for (i = 0; i < fmpq_mat_nrows(mat1); i++)
-        for (j = 0; j < fmpq_mat_ncols(mat1); j++)
-            fmpq_swap(fmpq_mat_entry(mat2, i, j), fmpq_mat_entry(mat1, i, j));
-}
+void fmpq_mat_swap_entrywise(fmpq_mat_t mat1, fmpq_mat_t mat2);
 
 /* Windows and concatenation */
 
@@ -221,86 +211,11 @@ void fmpq_mat_kronecker_product(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat
 
 /* Permutations **************************************************************/
 
-FMPQ_MAT_INLINE
-void fmpq_mat_swap_rows(fmpq_mat_t mat, slong * perm, slong r, slong s)
-{
-    if (r != s && !fmpq_mat_is_empty(mat))
-    {
-        fmpq * u;
-        slong t;
+void fmpq_mat_swap_rows(fmpq_mat_t mat, slong * perm, slong r, slong s);
+void fmpq_mat_swap_cols(fmpq_mat_t mat, slong * perm, slong r, slong s);
 
-        if (perm)
-        {
-            t = perm[s];
-            perm[s] = perm[r];
-            perm[r] = t;
-        }
-
-        u = mat->rows[s];
-        mat->rows[s] = mat->rows[r];
-        mat->rows[r] = u;
-    }
-}
-
-FMPQ_MAT_INLINE
-void fmpq_mat_invert_rows(fmpq_mat_t mat, slong * perm)
-{
-    slong i;
-
-    for (i = 0; i < mat->r/2; i++)
-        fmpq_mat_swap_rows(mat, perm, i, mat->r - i - 1);
-}
-
-FMPQ_MAT_INLINE
-void fmpq_mat_swap_cols(fmpq_mat_t mat, slong * perm, slong r, slong s)
-{
-    if (r != s && !fmpq_mat_is_empty(mat))
-    {
-        slong t;
-
-        if (perm)
-        {
-            t = perm[s];
-            perm[s] = perm[r];
-            perm[r] = t;
-        }
-
-       for (t = 0; t < mat->r; t++)
-       {
-           fmpq_swap(fmpq_mat_entry(mat, t, r), fmpq_mat_entry(mat, t, s));
-       }
-    }
-}
-
-FMPQ_MAT_INLINE
-void fmpq_mat_invert_cols(fmpq_mat_t mat, slong * perm)
-{
-    if (!fmpq_mat_is_empty(mat))
-    {
-        slong t;
-        slong i;
-        slong c = mat->c;
-        slong k = mat->c/2;
-
-        if (perm)
-        {
-            for (i = 0; i < k; i++)
-            {
-                t = perm[i];
-                perm[i] = perm[c - i - 1];
-                perm[c - i - 1] = t;
-            }
-        }
-
-        for (t = 0; t < mat->r; t++)
-        {
-            for (i = 0; i < k; i++)
-            {
-                fmpq_swap(fmpq_mat_entry(mat, t, i), fmpq_mat_entry(mat, t, c - i - 1));
-            }
-        }
-    }
-}
+void fmpq_mat_invert_rows(fmpq_mat_t mat, slong * perm);
+void fmpq_mat_invert_cols(fmpq_mat_t mat, slong * perm);
 
 /* Trace *********************************************************************/
 

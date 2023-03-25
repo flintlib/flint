@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq.h"
+#include "fmpz.h"
+#include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
 void _fmpq_poly_content(fmpq_t res, const fmpz * poly,

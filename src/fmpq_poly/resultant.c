@@ -12,6 +12,8 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "fmpz_vec.h"
+#include "fmpz_poly.h"
 #include "fmpq.h"
 #include "fmpq_poly.h"
 

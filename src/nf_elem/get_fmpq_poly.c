@@ -14,6 +14,7 @@
 
 ******************************************************************************/
 
+#include "fmpz_vec.h"
 #include "nf_elem.h"
 
 void nf_elem_get_fmpq_poly(fmpq_poly_t pol, const nf_elem_t a, const nf_t nf)

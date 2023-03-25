@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_mat.h"
+#include "fmpq.h"
 #include "fmpq_mat.h"
 
 int

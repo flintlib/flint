@@ -14,6 +14,7 @@
 
 ******************************************************************************/
 
+#include "fmpz_vec.h"
 #include "nf_elem.h"
 
 void _nf_elem_inv(nf_elem_t a, const nf_elem_t b, const nf_t nf)

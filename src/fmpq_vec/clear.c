@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,15 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq.h"
-#include "fmpq_poly.h"
+#include "fmpz_vec.h"
+#include "fmpq_vec.h"
 
-void fmpq_poly_scalar_mul_mpq(fmpq_poly_t rop, const fmpq_poly_t op, const mpq_t c)
+void _fmpq_vec_clear(fmpq * vec, slong len)
 {
-    fmpq_t f;
-
-    fmpq_init_set_readonly(f, c);
-    fmpq_poly_scalar_mul_fmpq(rop, op, f);
-    fmpq_clear_readonly(f);
+    _fmpz_vec_clear((fmpz *) vec, 2 * len);
 }
-

@@ -9,14 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpn_extras.h"
+#include "fmpz.h"
 #include "fmpq_poly.h"
 #include "arith.h"
 
 int main()
 {
     fmpq_poly_t P, Q;
-    mpz_t t;
+    fmpz_t t;
 
     slong k, n;
 
@@ -30,13 +30,13 @@ int main()
         fmpq_poly_init(P);
         fmpq_poly_init(Q);
 
-        mpz_init(t);
+        fmpz_init(t);
 
         for (k = 0; k < n; k++)
         {
             arith_euler_polynomial(P, k);
-            flint_mpz_bin_uiui(t, n, k);
-            fmpq_poly_scalar_mul_mpz(P, P, t);
+            fmpz_bin_uiui(t, n, k);
+            fmpq_poly_scalar_mul_fmpz(P, P, t);
             fmpq_poly_add(Q, Q, P);
         }
 
@@ -45,7 +45,7 @@ int main()
         arith_euler_polynomial(P, n);
         fmpq_poly_add(Q, Q, P);
 
-        mpz_clear(t);
+        fmpz_clear(t);
 
         fmpq_poly_zero(P);
         fmpq_poly_set_coeff_ui(P, n, UWORD(1));

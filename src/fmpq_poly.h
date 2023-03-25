@@ -22,9 +22,6 @@
 
 #include "fmpq_types.h"
 #include "nmod_types.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -64,19 +61,8 @@ void _fmpq_poly_normalise(fmpq_poly_t poly);
 
 #define fmpq_poly_denref(poly)  ((poly)->den)
 
-FMPQ_POLY_INLINE void
-fmpq_poly_get_numerator(fmpz_poly_t res, const fmpq_poly_t poly)
-{
-    fmpz_poly_fit_length(res, poly->length);
-    _fmpz_vec_set(res->coeffs, poly->coeffs, poly->length);
-    _fmpz_poly_set_length(res, poly->length);
-}
-
-FMPQ_POLY_INLINE void
-fmpq_poly_get_denominator(fmpz_t den, const fmpq_poly_t poly)
-{
-   fmpz_set(den, fmpq_poly_denref(poly));
-}
+void fmpq_poly_get_numerator(fmpz_poly_t res, const fmpq_poly_t poly);
+void fmpq_poly_get_denominator(fmpz_t den, const fmpq_poly_t poly);
 
 /*  Canonicalisation  *************************************/
 
@@ -125,10 +111,6 @@ void fmpq_poly_set_fmpz(fmpq_poly_t poly, const fmpz_t x);
 
 void fmpq_poly_set_fmpq(fmpq_poly_t poly, const fmpq_t x);
 
-void fmpq_poly_set_mpz(fmpq_poly_t poly, const mpz_t x);
-
-void fmpq_poly_set_mpq(fmpq_poly_t poly, const mpq_t x);
-
 void fmpq_poly_set_fmpz_poly(fmpq_poly_t rop, const fmpz_poly_t op);
 
 void _fmpq_poly_get_nmod_poly(nmod_poly_t rop, const fmpq_poly_t op);
@@ -138,12 +120,6 @@ void fmpq_poly_get_nmod_poly_den(nmod_poly_t rop, const fmpq_poly_t op, int den)
 void fmpq_poly_get_nmod_poly(nmod_poly_t rop, const fmpq_poly_t op);
 
 void fmpq_poly_set_nmod_poly(fmpq_poly_t rop, const nmod_poly_t op);
-
-void _fmpq_poly_set_array_mpq(fmpz * poly,
-                                         fmpz_t den, const mpq_t * a, slong n);
-
-void fmpq_poly_set_array_mpq(fmpq_poly_t poly,
-                                                     const mpq_t * a, slong n);
 
 int _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str, slong len);
 
@@ -158,14 +134,7 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly,
                                  const fmpz_t den, slong len, const char *var);
 
 void fmpq_poly_zero(fmpq_poly_t poly);
-
-FMPQ_POLY_INLINE void fmpq_poly_one(fmpq_poly_t poly)
-{
-    fmpq_poly_fit_length(poly, 1);
-    _fmpq_poly_set_length(poly, 1);
-    fmpz_one(poly->coeffs);
-    fmpz_one(poly->den);
-}
+void fmpq_poly_one(fmpq_poly_t poly);
 
 void fmpq_poly_neg(fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
@@ -173,18 +142,7 @@ void fmpq_poly_inv(fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
 void fmpq_poly_swap(fmpq_poly_t poly1, fmpq_poly_t poly2);
 
-FMPQ_POLY_INLINE
-void fmpq_poly_truncate(fmpq_poly_t poly, slong n)
-{
-    if (poly->length > n)
-    {
-        slong i;
-        for (i = n; i < poly->length; i++)
-            _fmpz_demote(poly->coeffs + i);
-        poly->length = n;
-        fmpq_poly_canonicalise(poly);
-    }
-}
+void fmpq_poly_truncate(fmpq_poly_t poly, slong n);
 
 void fmpq_poly_set_trunc(fmpq_poly_t res, const fmpq_poly_t poly, slong n);
 
@@ -199,8 +157,6 @@ void fmpq_poly_get_coeff_fmpz(fmpz_t x, const fmpq_poly_t poly, slong n);
 
 void fmpq_poly_get_coeff_fmpq(fmpq_t x, const fmpq_poly_t poly, slong n);
 
-void fmpq_poly_get_coeff_mpq(mpq_t x, const fmpq_poly_t poly, slong n);
-
 void fmpq_poly_set_coeff_si(fmpq_poly_t poly, slong n, slong x);
 
 void fmpq_poly_set_coeff_ui(fmpq_poly_t poly, slong n, ulong x);
@@ -208,10 +164,6 @@ void fmpq_poly_set_coeff_ui(fmpq_poly_t poly, slong n, ulong x);
 void fmpq_poly_set_coeff_fmpz(fmpq_poly_t poly, slong n, const fmpz_t x);
 
 void fmpq_poly_set_coeff_fmpq(fmpq_poly_t poly, slong n, const fmpq_t x);
-
-void fmpq_poly_set_coeff_mpz(fmpq_poly_t poly, slong n, const mpz_t x);
-
-void fmpq_poly_set_coeff_mpq(fmpq_poly_t poly, slong n, const mpq_t x);
 
 /*  Comparison  **************************************************************/
 
@@ -233,11 +185,7 @@ int fmpq_poly_is_zero(const fmpq_poly_t poly)
     return poly->length == WORD(0);
 }
 
-FMPQ_POLY_INLINE
-int fmpq_poly_is_one(const fmpq_poly_t poly)
-{
-    return (poly->length == WORD(1)) && (fmpz_equal(poly->coeffs, poly->den));
-}
+int fmpq_poly_is_one(const fmpq_poly_t poly);
 
 FMPQ_POLY_INLINE
 int fmpq_poly_is_gen(const fmpq_poly_t op)
@@ -338,12 +286,6 @@ void fmpq_poly_scalar_mul_fmpz(fmpq_poly_t rop,
 void fmpq_poly_scalar_mul_fmpq(fmpq_poly_t rop,
                                const fmpq_poly_t op, const fmpq_t c);
 
-void fmpq_poly_scalar_mul_mpz(fmpq_poly_t rop,
-                              const fmpq_poly_t op, const mpz_t c);
-
-void fmpq_poly_scalar_mul_mpq(fmpq_poly_t rop,
-                              const fmpq_poly_t op, const mpq_t c);
-
 void _fmpq_poly_scalar_div_si(fmpz * rpoly, fmpz_t rden,
                        const fmpz * poly, const fmpz_t den, slong len, slong c);
 
@@ -365,12 +307,6 @@ void fmpq_poly_scalar_div_fmpz(fmpq_poly_t rop,
 
 void fmpq_poly_scalar_div_fmpq(fmpq_poly_t rop,
                                const fmpq_poly_t op, const fmpq_t c);
-
-void fmpq_poly_scalar_div_mpz(fmpq_poly_t rop,
-                              const fmpq_poly_t op, const mpz_t c);
-
-void fmpq_poly_scalar_div_mpq(fmpq_poly_t rop,
-                              const fmpq_poly_t op, const mpq_t c);
 
 /*  Multiplication  **********************************************************/
 
@@ -431,26 +367,15 @@ void fmpq_poly_shift_right(fmpq_poly_t res, const fmpq_poly_t poly, slong n);
 
 /*  Euclidean division  ******************************************************/
 
-void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
-                       const fmpz * A, const fmpz_t a, slong lenA,
-  const fmpz * B, const fmpz_t b, slong lenB, const fmpz_preinvn_t inv);
+#ifdef FMPZ_H
+void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r, const fmpz * A, const fmpz_t a, slong lenA, const fmpz * B, const fmpz_t b, slong lenB, const fmpz_preinvn_t inv);
+void _fmpq_poly_div(fmpz * Q, fmpz_t q, const fmpz * A, const fmpz_t a, slong lenA, const fmpz * B, const fmpz_t b, slong lenB, const fmpz_preinvn_t inv);
+void _fmpq_poly_rem(fmpz * R, fmpz_t r, const fmpz * A, const fmpz_t a, slong lenA, const fmpz * B, const fmpz_t b, slong lenB, const fmpz_preinvn_t inv);
+#endif
 
-void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
-                      const fmpq_poly_t poly1, const fmpq_poly_t poly2);
-
-void _fmpq_poly_div(fmpz * Q, fmpz_t q,
-                       const fmpz * A, const fmpz_t a, slong lenA,
-  const fmpz * B, const fmpz_t b, slong lenB, const fmpz_preinvn_t inv);
-
-void fmpq_poly_div(fmpq_poly_t Q,
-                      const fmpq_poly_t poly1, const fmpq_poly_t poly2);
-
-void _fmpq_poly_rem(fmpz * R, fmpz_t r,
-                       const fmpz * A, const fmpz_t a, slong lenA,
-  const fmpz * B, const fmpz_t b, slong lenB, const fmpz_preinvn_t inv);
-
-void fmpq_poly_rem(fmpq_poly_t R,
-                      const fmpq_poly_t poly1, const fmpq_poly_t poly2);
+void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R, const fmpq_poly_t poly1, const fmpq_poly_t poly2);
+void fmpq_poly_div(fmpq_poly_t Q, const fmpq_poly_t poly1, const fmpq_poly_t poly2);
+void fmpq_poly_rem(fmpq_poly_t R, const fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
 /*  Precomputed inverse  *****************************************************/
 
@@ -692,10 +617,6 @@ void _fmpq_poly_evaluate_fmpq(fmpz_t rnum, fmpz_t rden,
 
 void fmpq_poly_evaluate_fmpq(fmpq_t res, const fmpq_poly_t poly, const fmpq_t a);
 
-void fmpq_poly_evaluate_mpz(mpq_t res, const fmpq_poly_t poly, const mpz_t a);
-
-void fmpq_poly_evaluate_mpq(mpq_t res, const fmpq_poly_t poly, const mpq_t a);
-
 /*  Interpolation ************************************************************/
 
 void _fmpq_poly_interpolate_fmpz_vec(fmpz * poly, fmpz_t den,
@@ -812,6 +733,22 @@ int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var);
 int fmpq_poly_read(fmpq_poly_t poly);
 
 int fmpq_poly_debug(const fmpq_poly_t poly);
+
+/* Declare dead functions ****************************************************/
+
+#define fmpq_poly_set_mpz _Pragma("GCC error \"'fmpq_poly_set_mpz' is deprecated. Use 'fmpq_poly_set_fmpz' instead.\"")
+#define fmpq_poly_set_mpq _Pragma("GCC error \"'fmpq_poly_set_mpq' is deprecated. Use 'fmpq_poly_set_fmpq' instead.\"")
+#define _fmpq_poly_set_array_mpq _Pragma("GCC error \"'_fmpq_poly_set_array_mpq' is deprecated. Use 'fmpq_poly_set' instead.\"")
+#define fmpq_poly_set_array_mpq _Pragma("GCC error \"'fmpq_poly_set_array_mpq' is deprecated. Use 'fmpq_poly_set' instead.\"")
+#define fmpq_poly_get_coeff_mpq _Pragma("GCC error \"'fmpq_poly_get_coeff_mpq' is deprecated. Use 'fmpq_poly_get_coeff_fmpq' instead.\"")
+#define fmpq_poly_set_coeff_mpz _Pragma("GCC error \"'fmpq_poly_set_coeff_mpz' is deprecated. Use 'fmpq_poly_set_coeff_fmpz' instead.\"")
+#define fmpq_poly_set_coeff_mpq _Pragma("GCC error \"'fmpq_poly_set_coeff_mpq' is deprecated. Use 'fmpq_poly_set_coeff_fmpq' instead.\"")
+#define fmpq_poly_scalar_mul_mpz _Pragma("GCC error \"'fmpq_poly_scalar_mul_mpz' is deprecated. Use 'fmpq_poly_scalar_mul_fmpz' instead.\"")
+#define fmpq_poly_scalar_mul_mpq _Pragma("GCC error \"'fmpq_poly_scalar_mul_mpq' is deprecated. Use 'fmpq_poly_scalar_mul_fmpq' instead.\"")
+#define fmpq_poly_scalar_div_mpz _Pragma("GCC error \"'fmpq_poly_scalar_div_mpz' is deprecated. Use 'fmpq_poly_scalar_div_fmpz' instead.\"")
+#define fmpq_poly_scalar_div_mpq _Pragma("GCC error \"'fmpq_poly_scalar_div_mpq' is deprecated. Use 'fmpq_poly_scalar_div_fmpq' instead.\"")
+#define fmpq_poly_evaluate_mpz _Pragma("GCC error \"'fmpq_poly_evaluate_mpz' is deprecated. Use 'fmpq_poly_evaluate_fmpz' instead.\"")
+#define fmpq_poly_evaluate_mpq _Pragma("GCC error \"'fmpq_poly_evaluate_mpq' is deprecated. Use 'fmpq_poly_evaluate_fmpq' instead.\"")
 
 #ifdef __cplusplus
 }

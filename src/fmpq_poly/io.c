@@ -29,6 +29,50 @@
     On failure, a negative number is returned.''
  */
 
+/* TODO: Remove me! */
+static void
+___fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, const mpq_t * a, slong n)
+{
+    slong i;
+    mpz_t d, t;
+
+    flint_mpz_init_set_ui(d, 1);
+    mpz_init(t);
+    for (i = 0; i < n; i++)
+    {
+        mpz_lcm(d, d, mpq_denref(a[i]));
+    }
+
+    for (i = 0; i < n; i++)
+    {
+        __mpz_struct *ptr = _fmpz_promote(poly + i);
+
+        mpz_divexact(t, d, mpq_denref(a[i]));
+        mpz_mul(ptr, mpq_numref(a[i]), t);
+        _fmpz_demote_val(poly + i);
+    }
+
+    fmpz_set_mpz(den, d);
+    mpz_clear(d);
+    mpz_clear(t);
+}
+
+/* TODO: Remove me! */
+static void __fmpq_poly_set_array_mpq(fmpq_poly_t poly, const mpq_t * a, slong n)
+{
+    if (n == 0)
+    {
+        fmpq_poly_zero(poly);
+    }
+    else
+    {
+        fmpq_poly_fit_length(poly, n);
+        ___fmpq_poly_set_array_mpq(poly->coeffs, poly->den, a, n);
+        _fmpq_poly_set_length(poly, n);
+        _fmpq_poly_normalise(poly);
+    }
+}
+
 int
 _fmpq_poly_fprint(FILE * file, const fmpz * poly, const fmpz_t den, slong len)
 {
@@ -260,7 +304,7 @@ int fmpq_poly_fread(FILE * file, fmpq_poly_t poly)
         r = mpq_inp_str(a[i], file, 10);
 
     if (r > 0)
-        fmpq_poly_set_array_mpq(poly, (const mpq_t *) a, len);
+        __fmpq_poly_set_array_mpq(poly, (const mpq_t *) a, len);
 
     for (i = 0; i < len; i++)
         mpq_clear(a[i]);

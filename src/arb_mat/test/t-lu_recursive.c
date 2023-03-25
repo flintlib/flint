@@ -10,6 +10,7 @@
 */
 
 #include "perm.h"
+#include "fmpq.h"
 #include "fmpq_mat.h"
 #include "arb_mat.h"
 

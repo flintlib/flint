@@ -11,6 +11,9 @@
 */
 
 #include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
 static ulong _fmpz_gcd_big_small(const fmpz_t g, ulong h)

@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include "fmpz_poly.h"
 #include "fmpq_poly.h"
 #include "qadic.h"
 

@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2010 Sebastian Pancratz
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -10,16 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-
-#include "fmpq.h"
+#include "fmpz.h"
+#include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_set_coeff_mpq(fmpq_poly_t poly, slong n, const mpq_t x)
+void fmpq_poly_one(fmpq_poly_t poly)
 {
-    fmpq_t f;
-
-    fmpq_init_set_readonly(f, x);
-    fmpq_poly_set_coeff_fmpq(poly, n, f);
-    fmpq_clear_readonly(f);
+    fmpq_poly_fit_length(poly, 1);
+    _fmpq_poly_set_length(poly, 1);
+    fmpz_one(poly->coeffs);
+    fmpz_one(poly->den);
 }
-

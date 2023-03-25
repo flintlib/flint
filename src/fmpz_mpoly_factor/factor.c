@@ -9,11 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly_factor.h"
-#include "fmpq_poly.h"
-#include "fmpz_mod_mpoly.h"
 #include "nmod_mpoly_factor.h"
-
+#include "fmpz_poly.h"
+#include "fmpz_mpoly_factor.h"
+#include "fmpz_mod_mpoly.h"
+#include "fmpq_poly.h"
 
 /* A has degree 2 wrt gen(0) */
 static void _apply_quadratic(

@@ -12,13 +12,38 @@
 
 #include <stdlib.h>
 #include <errno.h>
-#include <string.h>
-#include <ctype.h>
-#include <math.h>
-#include "flint.h"
+#include "gmpcompat.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
+
+/* TODO: Remove me */
+static void
+__fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, const mpq_t * a, slong n)
+{
+    slong i;
+    mpz_t d, t;
+
+    flint_mpz_init_set_ui(d, 1);
+    mpz_init(t);
+    for (i = 0; i < n; i++)
+    {
+        mpz_lcm(d, d, mpq_denref(a[i]));
+    }
+
+    for (i = 0; i < n; i++)
+    {
+        __mpz_struct *ptr = _fmpz_promote(poly + i);
+
+        mpz_divexact(t, d, mpq_denref(a[i]));
+        mpz_mul(ptr, mpq_numref(a[i]), t);
+        _fmpz_demote_val(poly + i);
+    }
+
+    fmpz_set_mpz(den, d);
+    mpz_clear(d);
+    mpz_clear(t);
+}
 
 int
 _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str, slong len)
@@ -73,7 +98,7 @@ _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str, slong len)
         }
     }
 
-    _fmpq_poly_set_array_mpq(poly, den, (const mpq_t *) a, len);
+    __fmpq_poly_set_array_mpq(poly, den, (const mpq_t *) a, len);
 
     for (i = 0; i < len; i++)
         mpq_clear(a[i]);

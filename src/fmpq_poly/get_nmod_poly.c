@@ -11,6 +11,7 @@
 
 #include "ulong_extras.h"
 #include "nmod_poly.h"
+#include "fmpz.h"
 #include "fmpq_poly.h"
 
 void

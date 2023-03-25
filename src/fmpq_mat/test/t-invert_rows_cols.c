@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2019 Tommy Hofmann Johansson
+    Copyright (C) 2019 Tommy Hofmann
 
     This file is part of FLINT.
 
@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fmpq.h"
 #include "fmpq_mat.h"
-#include "ulong_extras.h"
 
 int
 main(void)

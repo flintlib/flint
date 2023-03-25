@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,18 +9,21 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
+#include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
 void
-fmpq_poly_scalar_mul_mpz(fmpq_poly_t rop, const fmpq_poly_t op, const mpz_t c)
+fmpq_poly_get_numerator(fmpz_poly_t res, const fmpq_poly_t poly)
 {
-    fmpz_t f;
-
-    fmpz_init_set_readonly(f, c);
-    fmpq_poly_scalar_mul_fmpz(rop, op, f);
-    fmpz_clear_readonly(f);
+    fmpz_poly_fit_length(res, poly->length);
+    _fmpz_vec_set(res->coeffs, poly->coeffs, poly->length);
+    _fmpz_poly_set_length(res, poly->length);
 }
 
+void
+fmpq_poly_get_denominator(fmpz_t den, const fmpq_poly_t poly)
+{
+   fmpz_set(den, fmpq_poly_denref(poly));
+}

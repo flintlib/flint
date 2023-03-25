@@ -26,8 +26,8 @@ extern "C" {
 
 /*  Memory management  *******************************************************/
 
-/* _fmpq_vec_init and _fmpq_vec_clear are declared in fmpq.h for backward
-   compatibility */
+fmpq * _fmpq_vec_init(slong len);
+void _fmpq_vec_clear(fmpq * vec, slong len);
 
 /*  Randomisation  ***********************************************************/
 

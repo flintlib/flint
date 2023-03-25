@@ -10,11 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "gmpcompat.h"
-#include "fmpz.h"
+#include "fmpq.h"
 #include "fmpq_poly.h"
-#include "ulong_extras.h"
 
 int
 main(void)
@@ -59,11 +56,11 @@ main(void)
     {
         fmpq_poly_t a, b;
         slong coeff = (slong) n_randint(state, 100);
-        mpq_t x1, x2;
+        fmpq_t x1, x2;
         fmpz_t x1fmpz;
 
-        mpq_init(x1);
-        mpq_init(x2);
+        fmpq_init(x1);
+        fmpq_init(x2);
         fmpz_init(x1fmpz);
         fmpq_poly_init(a);
         fmpq_poly_init(b);
@@ -71,14 +68,14 @@ main(void)
 
         fmpq_poly_set(b, a);
 
-        fmpq_poly_get_coeff_mpq(x2, b, coeff);
+        fmpq_poly_get_coeff_fmpq(x2, b, coeff);
         do
         {
             fmpz_randtest(x1fmpz, state, 200);
-            fmpz_get_mpz(mpq_numref(x1), x1fmpz);
-            flint_mpz_set_si(mpq_denref(x1), 1);
-        } while (mpq_equal(x1, x2));
-        fmpq_poly_set_coeff_mpq(b, coeff, x1);
+            fmpz_set(fmpq_numref(x1), x1fmpz);
+            fmpz_set_si(fmpq_denref(x1), 1);
+        } while (fmpq_equal(x1, x2));
+        fmpq_poly_set_coeff_fmpq(b, coeff, x1);
 
         result = (!fmpq_poly_equal(a, b));
         if (!result)
@@ -93,8 +90,8 @@ main(void)
             flint_abort();
         }
 
-        mpq_clear(x1);
-        mpq_clear(x2);
+        fmpq_clear(x1);
+        fmpq_clear(x2);
         fmpz_clear(x1fmpz);
         fmpq_poly_clear(a);
         fmpq_poly_clear(b);
