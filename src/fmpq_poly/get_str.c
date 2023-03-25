@@ -11,7 +11,6 @@
 
 #include <string.h>
 #include <math.h>
-#include "flint.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
 

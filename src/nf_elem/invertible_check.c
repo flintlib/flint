@@ -14,6 +14,7 @@
 
 ******************************************************************************/
 
+#include "fmpz_vec.h"
 #include "nf_elem.h"
 
 int _nf_elem_invertible_check(nf_elem_t a, const nf_t nf)

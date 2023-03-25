@@ -14,6 +14,7 @@
 
 ******************************************************************************/
 
+#include "fmpz_vec.h"
 #include "nf_elem.h"
 
 void _nf_elem_mul_gaussian(fmpz * anum, fmpz * aden,

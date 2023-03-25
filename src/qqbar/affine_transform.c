@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpq.h"
 #include "fmpq_poly.h"
 #include "arb_fmpz_poly.h"

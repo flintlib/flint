@@ -17,6 +17,7 @@
 #ifndef NF_H
 #define NF_H
 
+#include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 

@@ -9,9 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
 int _fmpq_poly_is_monic(const fmpz * poly, const fmpz_t den, slong len)

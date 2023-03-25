@@ -11,7 +11,4 @@
 
 #define FMPQ_POLY_INLINES_C
 
-#include "flint.h"
-#include "ulong_extras.h"
 #include "fmpq_poly.h"
-

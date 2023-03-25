@@ -12,6 +12,9 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "fmpz_poly.h"
 #include "fmpq_poly.h"
 #include "arith.h"
 

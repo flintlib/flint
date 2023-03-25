@@ -12,9 +12,6 @@
 
 #include <stdlib.h>
 #include <errno.h>
-#include <string.h>
-#include <ctype.h>
-#include <math.h>
 #include "gmpcompat.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"

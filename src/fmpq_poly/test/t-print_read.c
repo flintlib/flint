@@ -19,9 +19,6 @@
 #include <unistd.h>
 #endif
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
 #if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER)

@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpq_poly.h"
-
 #include "fmpz_poly_q.h"
 
 void fmpz_poly_q_div(fmpz_poly_q_t rop,

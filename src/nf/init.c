@@ -15,6 +15,7 @@
 
 ******************************************************************************/
 
+#include "fmpz.h"
 #include "nf.h"
 
 void nf_init(nf_t nf, const fmpq_poly_t pol)
