@@ -125,10 +125,6 @@ void fmpq_poly_set_fmpz(fmpq_poly_t poly, const fmpz_t x);
 
 void fmpq_poly_set_fmpq(fmpq_poly_t poly, const fmpq_t x);
 
-void fmpq_poly_set_mpz(fmpq_poly_t poly, const mpz_t x);
-
-void fmpq_poly_set_mpq(fmpq_poly_t poly, const mpq_t x);
-
 void fmpq_poly_set_fmpz_poly(fmpq_poly_t rop, const fmpz_poly_t op);
 
 void _fmpq_poly_get_nmod_poly(nmod_poly_t rop, const fmpq_poly_t op);
@@ -138,12 +134,6 @@ void fmpq_poly_get_nmod_poly_den(nmod_poly_t rop, const fmpq_poly_t op, int den)
 void fmpq_poly_get_nmod_poly(nmod_poly_t rop, const fmpq_poly_t op);
 
 void fmpq_poly_set_nmod_poly(fmpq_poly_t rop, const nmod_poly_t op);
-
-void _fmpq_poly_set_array_mpq(fmpz * poly,
-                                         fmpz_t den, const mpq_t * a, slong n);
-
-void fmpq_poly_set_array_mpq(fmpq_poly_t poly,
-                                                     const mpq_t * a, slong n);
 
 int _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str, slong len);
 
@@ -199,8 +189,6 @@ void fmpq_poly_get_coeff_fmpz(fmpz_t x, const fmpq_poly_t poly, slong n);
 
 void fmpq_poly_get_coeff_fmpq(fmpq_t x, const fmpq_poly_t poly, slong n);
 
-void fmpq_poly_get_coeff_mpq(mpq_t x, const fmpq_poly_t poly, slong n);
-
 void fmpq_poly_set_coeff_si(fmpq_poly_t poly, slong n, slong x);
 
 void fmpq_poly_set_coeff_ui(fmpq_poly_t poly, slong n, ulong x);
@@ -208,10 +196,6 @@ void fmpq_poly_set_coeff_ui(fmpq_poly_t poly, slong n, ulong x);
 void fmpq_poly_set_coeff_fmpz(fmpq_poly_t poly, slong n, const fmpz_t x);
 
 void fmpq_poly_set_coeff_fmpq(fmpq_poly_t poly, slong n, const fmpq_t x);
-
-void fmpq_poly_set_coeff_mpz(fmpq_poly_t poly, slong n, const mpz_t x);
-
-void fmpq_poly_set_coeff_mpq(fmpq_poly_t poly, slong n, const mpq_t x);
 
 /*  Comparison  **************************************************************/
 
@@ -338,12 +322,6 @@ void fmpq_poly_scalar_mul_fmpz(fmpq_poly_t rop,
 void fmpq_poly_scalar_mul_fmpq(fmpq_poly_t rop,
                                const fmpq_poly_t op, const fmpq_t c);
 
-void fmpq_poly_scalar_mul_mpz(fmpq_poly_t rop,
-                              const fmpq_poly_t op, const mpz_t c);
-
-void fmpq_poly_scalar_mul_mpq(fmpq_poly_t rop,
-                              const fmpq_poly_t op, const mpq_t c);
-
 void _fmpq_poly_scalar_div_si(fmpz * rpoly, fmpz_t rden,
                        const fmpz * poly, const fmpz_t den, slong len, slong c);
 
@@ -365,12 +343,6 @@ void fmpq_poly_scalar_div_fmpz(fmpq_poly_t rop,
 
 void fmpq_poly_scalar_div_fmpq(fmpq_poly_t rop,
                                const fmpq_poly_t op, const fmpq_t c);
-
-void fmpq_poly_scalar_div_mpz(fmpq_poly_t rop,
-                              const fmpq_poly_t op, const mpz_t c);
-
-void fmpq_poly_scalar_div_mpq(fmpq_poly_t rop,
-                              const fmpq_poly_t op, const mpq_t c);
 
 /*  Multiplication  **********************************************************/
 
@@ -692,10 +664,6 @@ void _fmpq_poly_evaluate_fmpq(fmpz_t rnum, fmpz_t rden,
 
 void fmpq_poly_evaluate_fmpq(fmpq_t res, const fmpq_poly_t poly, const fmpq_t a);
 
-void fmpq_poly_evaluate_mpz(mpq_t res, const fmpq_poly_t poly, const mpz_t a);
-
-void fmpq_poly_evaluate_mpq(mpq_t res, const fmpq_poly_t poly, const mpq_t a);
-
 /*  Interpolation ************************************************************/
 
 void _fmpq_poly_interpolate_fmpz_vec(fmpz * poly, fmpz_t den,
@@ -812,6 +780,22 @@ int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var);
 int fmpq_poly_read(fmpq_poly_t poly);
 
 int fmpq_poly_debug(const fmpq_poly_t poly);
+
+/* Declare dead functions ****************************************************/
+
+#define fmpq_poly_set_mpz _Pragma("GCC error \"'fmpq_poly_set_mpz' is deprecated. Use 'fmpq_poly_set_fmpz' instead.\"")
+#define fmpq_poly_set_mpq _Pragma("GCC error \"'fmpq_poly_set_mpq' is deprecated. Use 'fmpq_poly_set_fmpq' instead.\"")
+#define _fmpq_poly_set_array_mpq _Pragma("GCC error \"'_fmpq_poly_set_array_mpq' is deprecated. Use 'fmpq_poly_set' instead.\"")
+#define fmpq_poly_set_array_mpq _Pragma("GCC error \"'fmpq_poly_set_array_mpq' is deprecated. Use 'fmpq_poly_set' instead.\"")
+#define fmpq_poly_get_coeff_mpq _Pragma("GCC error \"'fmpq_poly_get_coeff_mpq' is deprecated. Use 'fmpq_poly_get_coeff_fmpq' instead.\"")
+#define fmpq_poly_set_coeff_mpz _Pragma("GCC error \"'fmpq_poly_set_coeff_mpz' is deprecated. Use 'fmpq_poly_set_coeff_fmpz' instead.\"")
+#define fmpq_poly_set_coeff_mpq _Pragma("GCC error \"'fmpq_poly_set_coeff_mpq' is deprecated. Use 'fmpq_poly_set_coeff_fmpq' instead.\"")
+#define fmpq_poly_scalar_mul_mpz _Pragma("GCC error \"'fmpq_poly_scalar_mul_mpz' is deprecated. Use 'fmpq_poly_scalar_mul_fmpz' instead.\"")
+#define fmpq_poly_scalar_mul_mpq _Pragma("GCC error \"'fmpq_poly_scalar_mul_mpq' is deprecated. Use 'fmpq_poly_scalar_mul_fmpq' instead.\"")
+#define fmpq_poly_scalar_div_mpz _Pragma("GCC error \"'fmpq_poly_scalar_div_mpz' is deprecated. Use 'fmpq_poly_scalar_div_fmpz' instead.\"")
+#define fmpq_poly_scalar_div_mpq _Pragma("GCC error \"'fmpq_poly_scalar_div_mpq' is deprecated. Use 'fmpq_poly_scalar_div_fmpq' instead.\"")
+#define fmpq_poly_evaluate_mpz _Pragma("GCC error \"'fmpq_poly_evaluate_mpz' is deprecated. Use 'fmpq_poly_evaluate_fmpz' instead.\"")
+#define fmpq_poly_evaluate_mpq _Pragma("GCC error \"'fmpq_poly_evaluate_mpq' is deprecated. Use 'fmpq_poly_evaluate_fmpq' instead.\"")
 
 #ifdef __cplusplus
 }

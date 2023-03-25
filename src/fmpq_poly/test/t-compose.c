@@ -10,10 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpq_poly.h"
 #include "ulong_extras.h"
+#include "fmpq.h"
+#include "fmpq_poly.h"
 
 int
 main(void)
@@ -94,7 +93,7 @@ main(void)
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t f, g, h, s, t, u;
-        mpq_t c;
+        fmpq_t c;
         slong k;
 
         fmpq_poly_init(f);
@@ -103,7 +102,7 @@ main(void)
         fmpq_poly_init(s);
         fmpq_poly_init(t);
         fmpq_poly_init(u);
-        mpq_init(c);
+        fmpq_init(c);
         fmpq_poly_randtest(g, state, n_randint(state, 20), 65);
         fmpq_poly_randtest(h, state, n_randint(state, 20), 65);
 
@@ -111,8 +110,8 @@ main(void)
         fmpq_poly_set_ui(t, UWORD(1));
         for (k = WORD(0); k < g->length; k++)
         {
-            fmpq_poly_get_coeff_mpq(c, g, k);
-            fmpq_poly_scalar_mul_mpq(u, t, c);
+            fmpq_poly_get_coeff_fmpq(c, g, k);
+            fmpq_poly_scalar_mul_fmpq(u, t, c);
             fmpq_poly_add(s, s, u);
             fmpq_poly_mul(t, t, h);
         }
@@ -137,7 +136,7 @@ main(void)
         fmpq_poly_clear(s);
         fmpq_poly_clear(t);
         fmpq_poly_clear(u);
-        mpq_clear(c);
+        fmpq_clear(c);
     }
 
     FLINT_TEST_CLEANUP(state);

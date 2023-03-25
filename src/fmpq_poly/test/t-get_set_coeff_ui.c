@@ -10,10 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "gmpcompat.h"
+#include "fmpq.h"
 #include "fmpq_poly.h"
-#include "ulong_extras.h"
 
 int
 main(void)
@@ -22,14 +21,14 @@ main(void)
     ulong cflags = UWORD(0);
 
     ulong n;
-    mpq_t n_mpq;
+    fmpq_t n_fmpq;
 
     FLINT_TEST_INIT(state);
 
     flint_printf("get/set_coeff_ui....");
     fflush(stdout);
 
-    mpq_init(n_mpq);
+    fmpq_init(n_fmpq);
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a;
@@ -44,11 +43,11 @@ main(void)
             n = n_randtest(state);
             coeff = n_randint(state, len);
             fmpq_poly_set_coeff_ui(a, coeff, n);
-            fmpq_poly_get_coeff_mpq(n_mpq, a, coeff);
+            fmpq_poly_get_coeff_fmpq(n_fmpq, a, coeff);
 
             cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
-            result = (flint_mpz_cmp_ui(mpq_denref(n_mpq), 1) == 0
-                   && flint_mpz_cmp_ui(mpq_numref(n_mpq), n) == 0
+            result = (fmpz_cmp_ui(fmpq_denref(n_fmpq), 1) == 0
+                   && fmpz_cmp_ui(fmpq_numref(n_fmpq), n) == 0
                    && !cflags);
             if (!result)
             {
@@ -58,7 +57,7 @@ main(void)
                 flint_printf("coeff  = %wd\n", coeff);
                 flint_printf("cflags = %wu\n", cflags);
                 flint_printf("n      = %wu\n", n);
-                gmp_printf("n_mpq  = %Qd\n", n_mpq);
+                flint_printf("n_fmpq  = "); fmpq_print(n_fmpq); flint_printf("\n");
                 fflush(stdout);
                 flint_abort();
             }
@@ -66,7 +65,7 @@ main(void)
 
         fmpq_poly_clear(a);
     }
-    mpq_clear(n_mpq);
+    fmpq_clear(n_fmpq);
 
     FLINT_TEST_CLEANUP(state);
 

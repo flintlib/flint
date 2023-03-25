@@ -193,15 +193,6 @@ Assignment, swap, negation
     Sets ``poly`` to the rational `x`, which is assumed to be 
     given in lowest terms.
 
-.. function:: void fmpq_poly_set_mpz(fmpq_poly_t poly, const mpz_t x)
-
-    Sets ``poly`` to the integer `x`.
-
-.. function:: void fmpq_poly_set_mpq(fmpq_poly_t poly, const mpq_t x)
-
-    Sets ``poly`` to the rational `x`, which is assumed to be 
-    given in lowest terms.
-
 .. function:: void fmpq_poly_set_fmpz_poly(fmpq_poly_t rop, const fmpz_poly_t op)
 
     Sets the rational polynomial ``rop`` to the same value 
@@ -225,23 +216,6 @@ Assignment, swap, negation
     of ``op``, reduced by the modulus of ``rop``. If ``den == 1``, the result is
     multiplied by the inverse of the denominator of ``op``. In this case it is
     assumed that the reduction of the denominator of ``op`` is invertible.
-
-.. function:: void _fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, const mpq_t * a, slong n)
-
-    Sets ``(poly, den)`` to the polynomial given by the 
-    first `n \geq 1` coefficients in the array `a`, from lowest 
-    degree to highest degree.
-
-    The result is only guaranteed to be in lowest terms if all 
-    input coefficients are given in lowest terms.
-
-.. function:: void fmpq_poly_set_array_mpq(fmpq_poly_t poly, const mpq_t * a, slong n)
-
-    Sets ``poly`` to the polynomial with coefficients as given in the 
-    array `a` of length `n \geq 0`, from lowest degree to highest degree.
-
-    The result is only guaranteed to be in canonical form if all 
-    input coefficients are given in lowest terms.
 
 .. function:: int _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str, slong len)
 
@@ -338,10 +312,6 @@ Getting and setting coefficients
 
     Retrieves the `n`\th coefficient of ``poly``, in lowest terms.
 
-.. function:: void fmpq_poly_get_coeff_mpq(mpq_t x, const fmpq_poly_t poly, slong n)
-
-    Retrieves the `n`\th coefficient of ``poly``, in lowest terms.
-
 .. function:: void fmpq_poly_set_coeff_si(fmpq_poly_t poly, slong n, slong x)
 
     Sets the `n`\th coefficient in ``poly`` to the integer `x`.
@@ -357,15 +327,6 @@ Getting and setting coefficients
 .. function:: void fmpq_poly_set_coeff_fmpq(fmpq_poly_t poly, slong n, const fmpq_t x)
 
     Sets the `n`\th coefficient in ``poly`` to the rational `x`.
-
-.. function:: void fmpq_poly_set_coeff_mpz(fmpq_poly_t rop, slong n, const mpz_t x)
-
-    Sets the `n`\th coefficient in ``poly`` to the integer `x`.
-
-.. function:: void fmpq_poly_set_coeff_mpq(fmpq_poly_t rop, slong n, const mpq_t x)
-
-    Sets the `n`\th coefficient in ``poly`` to the rational `x`, 
-    which is expected to be provided in lowest terms.
 
 
 Comparison
@@ -599,14 +560,6 @@ Scalar multiplication and division
     Sets ``rop`` to `c` times ``op``.  Assumes that the ``fmpz_t c`` 
     is not part of ``rop``.
 
-.. function:: void fmpq_poly_scalar_mul_fmpq(fmpq_poly_t rop, const fmpq_poly_t op, const mpq_t c)
-
-    Sets ``rop`` to `c` times ``op``.
-
-.. function:: void fmpq_poly_scalar_mul_mpz(fmpq_poly_t rop, const fmpq_poly_t op, const mpz_t c)
-
-    Sets ``rop`` to `c` times ``op``.
-
 .. function:: void fmpq_poly_scalar_mul_mpq(fmpq_poly_t rop, const fmpq_poly_t op, const fmpq_t c)
 
     Sets ``rop`` to `c` times ``op``.
@@ -650,8 +603,6 @@ Scalar multiplication and division
               void fmpq_poly_scalar_div_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c)
               void fmpq_poly_scalar_div_fmpz(fmpq_poly_t rop, const fmpq_poly_t op, const fmpz_t c)
               void fmpq_poly_scalar_div_fmpq(fmpq_poly_t rop, const fmpq_poly_t op, const fmpq_t c)
-              void fmpq_poly_scalar_div_mpz(fmpq_poly_t rop, const fmpq_poly_t op, const mpz_t c)
-              void fmpq_poly_scalar_div_mpq(fmpq_poly_t rop, const fmpq_poly_t op, const mpq_t c)
 
     Sets ``rop`` to ``op`` divided by the scalar ``c``.
 
@@ -756,6 +707,9 @@ Euclidean division
     ``fmpz_preinvn_init`` can be supplied. Otherwise ``inv`` should be
     ``NULL``. 
 
+    Note: ``fmpz.h`` has to be included before ``fmpq_poly.h`` in order for the
+    latter to declare this function.
+
 .. function:: void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R, const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
     Finds the quotient `Q` and remainder `R` of the Euclidean division of 
@@ -773,6 +727,9 @@ Euclidean division
     ``fmpz_preinvn_init`` can be supplied. Otherwise ``inv`` should be
     ``NULL``. 
 
+    Note: ``fmpz.h`` has to be included before ``fmpq_poly.h`` in order for the
+    latter to declare this function.
+
 .. function:: void fmpq_poly_div(fmpq_poly_t Q, const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
     Finds the quotient `Q` and remainder `R` of the Euclidean division 
@@ -789,6 +746,9 @@ Euclidean division
     An optional precomputed inverse of the leading coefficient of `B` from
     ``fmpz_preinvn_init`` can be supplied. Otherwise ``inv`` should be
     ``NULL``. 
+
+    Note: ``fmpz.h`` has to be included before ``fmpq_poly.h`` in order for the
+    latter to declare this function.
 
 .. function:: void fmpq_poly_rem(fmpq_poly_t R, const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
@@ -1391,16 +1351,6 @@ Evaluation
 
     Evaluates the polynomial ``poly`` at the rational `a` and 
     sets ``res`` to the result.
-
-.. function:: void fmpq_poly_evaluate_mpz(mpq_t res, const fmpq_poly_t poly, const mpz_t a)
-
-    Evaluates the polynomial ``poly`` at the integer `a` of type
-    ``mpz`` and sets ``res`` to the result.
-
-.. function:: void fmpq_poly_evaluate_mpq(mpq_t res, const fmpq_poly_t poly, const mpq_t a)
-
-    Evaluates the polynomial ``poly`` at the rational `a` of type
-    ``mpq`` and sets ``res`` to the result.
 
 
 Interpolation
