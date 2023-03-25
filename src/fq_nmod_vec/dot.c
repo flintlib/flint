@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_poly.h"
+#include "fq_nmod.h"
 #include "fq_nmod_vec.h"
 
 void _fq_nmod_vec_dot(fq_nmod_t res, const fq_nmod_struct * vec1,

@@ -15,8 +15,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "fmpz.h"
 #include "fmpz_vec.h"
+#include "fq.h"
+#include "fq_vec.h"
+#include "fq_mat.h"
 #include "fq_poly.h"
+#include "fq_poly_factor.h"
 
 #ifdef T
 #undef T

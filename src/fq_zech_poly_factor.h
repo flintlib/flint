@@ -20,22 +20,9 @@
 #define FQ_ZECH_POLY_FACTOR_INLINE static __inline__
 #endif
 
-#include "fq_zech_poly.h"
+#include "fq_zech_types.h"
 
-FQ_ZECH_POLY_FACTOR_INLINE
-int FQ_ZECH_POLY_ITERATED_FROBENIUS_CUTOFF(const fq_zech_ctx_t ctx, slong length)
-{
-    int result;
-    fmpz_t q;
-    fmpz_init(q);
-    fq_zech_ctx_order(q, ctx);
-    if ( 2 * fmpz_sizeinbase(q, 2) < 3 * (n_sqrt(length) + 1))
-        result = 1;
-    else
-        result = 0;
-    fmpz_clear(q);
-    return result;
-}
+int FQ_ZECH_POLY_ITERATED_FROBENIUS_CUTOFF(const fq_zech_ctx_t ctx, slong length);
 
 #ifdef T
 #undef T

@@ -10,6 +10,7 @@
 */
 
 #include "nmod_mat.h"
+#include "fq_zech.h"
 #include "fq_zech_mat.h"
 
 #ifdef T

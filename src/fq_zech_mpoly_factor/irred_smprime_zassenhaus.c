@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_poly_factor.h"
+#include "fq_zech_poly_factor.h"
 #include "fq_zech_mpoly_factor.h"
 
 /*

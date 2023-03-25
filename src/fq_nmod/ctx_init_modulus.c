@@ -10,7 +10,9 @@
 */
 
 #include <string.h>
-
+#include "ulong_extras.h"
+#include "nmod_vec.h"
+#include "nmod_poly.h"
 #include "fmpz.h"
 #include "fq_nmod.h"
 

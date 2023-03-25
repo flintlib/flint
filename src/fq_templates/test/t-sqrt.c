@@ -12,10 +12,7 @@
 #ifdef T
 
 #include "templates.h"
-
-
-#include "ulong_extras.h"
-#include "long_extras.h"
+#include "fmpz.h"
 
 int
 main(void)

@@ -10,6 +10,7 @@
 */
 
 #include "fq_zech_vec.h"
+#include "fq_zech.h"
 #include "fq_zech_mat.h"
 
 #ifdef T

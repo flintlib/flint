@@ -11,6 +11,4 @@
 
 #define FQ_NMOD_VEC_INLINES_C
 
-#include "flint.h"
 #include "fq_nmod_vec.h"
-

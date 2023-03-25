@@ -9,7 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod_poly.h"
 #include "fmpz_mod_mat.h"
+#include "fq.h"
 #include "fq_embed.h"
 
 int

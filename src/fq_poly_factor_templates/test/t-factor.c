@@ -16,6 +16,7 @@
 #ifdef T
 
 #include "templates.h"
+#include "fmpz.h"
 
 int
 main(void)

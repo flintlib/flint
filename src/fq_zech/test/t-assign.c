@@ -11,7 +11,6 @@
 
 #include "fq_zech.h"
 
-
 #ifdef T
 #undef T
 #endif

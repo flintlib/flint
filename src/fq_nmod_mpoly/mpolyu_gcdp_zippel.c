@@ -10,6 +10,7 @@
 */
 
 #include "nmod_mpoly.h"
+#include "fq_nmod_mat.h"
 #include "fq_nmod_mpoly.h"
 
 int fq_nmod_next(fq_nmod_t alpha, const fq_nmod_ctx_t fqctx)

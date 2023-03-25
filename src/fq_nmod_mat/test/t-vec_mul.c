@@ -10,6 +10,7 @@
 */
 
 #include "fq_nmod_vec.h"
+#include "fq_nmod.h"
 #include "fq_nmod_mat.h"
 
 #ifdef T

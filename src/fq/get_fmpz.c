@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fq.h"
 
 int fq_get_fmpz(fmpz_t a, const fq_t b, const fq_ctx_t ctx)

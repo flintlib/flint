@@ -10,7 +10,7 @@
 */
 
 #include <string.h>
-
+#include "ulong_extras.h"
 #include "fq_zech.h"
 
 void

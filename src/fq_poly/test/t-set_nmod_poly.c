@@ -10,6 +10,7 @@
 */
 
 #include "nmod_poly.h"
+#include "fq.h"
 #include "fq_poly.h"
 
 #ifdef T

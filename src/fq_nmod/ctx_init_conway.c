@@ -12,7 +12,7 @@
 */
 
 #include <string.h>
-
+#include "nmod_poly.h"
 #include "fmpz.h"
 #include "fq_nmod.h"
 

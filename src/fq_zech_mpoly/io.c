@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include "fq_zech.h"
 #include "fq_zech_mpoly.h"
 
 /* printing *******************************************************************/

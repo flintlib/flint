@@ -11,9 +11,11 @@
 
 #define FQ_INLINES_C
 
+#include "fmpz.h"
 #include "fq.h"
 
+/* TODO: Remove this */
 void __fq_ctx_prime(fmpz_t p, fq_ctx_t ctx)
 {
-   fmpz_set(p, fq_ctx_prime(ctx));
+    fmpz_set(p, fq_ctx_prime(ctx));
 }

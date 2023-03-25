@@ -11,6 +11,4 @@
 
 #define FQ_ZECH_MAT_INLINES_C
 
-#include "flint.h"
 #include "fq_zech_mat.h"
-

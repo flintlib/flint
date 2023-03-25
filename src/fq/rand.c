@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "fmpz_poly.h"
 #include "fq.h"
-
 
 void
 fq_rand(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)

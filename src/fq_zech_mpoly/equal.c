@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_zech.h"
 #include "fq_zech_mpoly.h"
 
 int _fq_zech_mpoly_equal(const fq_zech_struct * coeff1, const ulong * exp1,

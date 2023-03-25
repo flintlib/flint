@@ -15,10 +15,7 @@
 #ifdef T
 
 #include "templates.h"
-
-
-#include "ulong_extras.h"
-#include "long_extras.h"
+#include "fmpz_mod_mat.h"
 
 int
 main(void)

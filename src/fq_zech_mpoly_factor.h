@@ -18,6 +18,7 @@
 #define FQ_ZECH_MPOLY_FACTOR_INLINE static __inline__
 #endif
 
+#include "fq_zech.h"
 #include "fq_zech_mpoly.h"
 
 #ifdef __cplusplus

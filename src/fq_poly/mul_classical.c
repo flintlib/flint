@@ -10,6 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
+#include "fq.h"
 #include "fq_poly.h"
 
 void

@@ -12,24 +12,13 @@
 
 #ifdef T
 
-#include "flint.h"
+#include "nmod_types.h"
+#include "fmpz_mod_types.h"
 #include "templates.h"
-#include "ulong_extras.h"
-#include "fmpz_mod_mat.h"
 
 #ifdef __cplusplus
  extern "C" {
 #endif
-
-typedef struct
-{
-    TEMPLATE(T, struct) * entries;
-    slong r;
-    slong c;
-    TEMPLATE(T, struct) ** rows;
-} TEMPLATE(T, mat_struct);
-
-typedef TEMPLATE(T, mat_struct) TEMPLATE(T, mat_t)[1];
 
 /* Memory management  ********************************************************/
 
@@ -59,28 +48,15 @@ TEMPLATE(T, mat_entry)(const TEMPLATE(T, mat_t) mat, slong i, slong j)
     return mat->rows[i] + j;
 }
 
-FQ_MAT_TEMPLATES_INLINE void
-TEMPLATE(T, mat_entry_set)(TEMPLATE(T, mat_t) mat, slong i, slong j,
+void TEMPLATE(T, mat_entry_set)(TEMPLATE(T, mat_t) mat, slong i, slong j,
                            const TEMPLATE(T, t) x,
-                           const TEMPLATE(T, ctx_t) ctx)
-{
-    TEMPLATE(T, set)(TEMPLATE(T, mat_entry)(mat, i, j), x, ctx);
-}
+                           const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, mat_swap)(TEMPLATE(T, mat_t) mat1, TEMPLATE(T, mat_t) mat2,
                       const TEMPLATE(T, ctx_t) ctx);
 
-FQ_MAT_TEMPLATES_INLINE void
-TEMPLATE(T, mat_swap_entrywise)(TEMPLATE(T, mat_t) mat1,
-		         TEMPLATE(T, mat_t) mat2, const TEMPLATE(T, ctx_t) ctx)
-{
-    slong i, j;
-
-    for (i = 0; i < TEMPLATE(T, mat_nrows)(mat1, ctx); i++)
-        for (j = 0; j < TEMPLATE(T, mat_ncols)(mat1, ctx); j++)
-            TEMPLATE(T, swap)(TEMPLATE(T, mat_entry)(mat2, i, j),
-			      TEMPLATE(T, mat_entry)(mat1, i, j), ctx);
-}
+void TEMPLATE(T, mat_swap_entrywise)(TEMPLATE(T, mat_t) mat1,
+		         TEMPLATE(T, mat_t) mat2, const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, mat_set)(TEMPLATE(T, mat_t) mat1, const TEMPLATE(T, mat_t) mat2,
                      const TEMPLATE(T, ctx_t) ctx);
@@ -141,56 +117,9 @@ TEMPLATE(T, mat_invert_rows)(TEMPLATE(T, mat_t) mat, slong * perm, const TEMPLAT
         TEMPLATE(T, mat_swap_rows)(mat, perm, i, mat->r - i - 1, ctx);
 }
 
-FQ_MAT_TEMPLATES_INLINE void
-TEMPLATE(T, mat_swap_cols)(TEMPLATE(T, mat_t) mat, slong * perm, slong r, slong s, const TEMPLATE(T, ctx_t) ctx)
-{
-    if (r != s && !TEMPLATE(T, mat_is_empty)(mat, ctx))
-    {
-        slong t;
+void TEMPLATE(T, mat_swap_cols)(TEMPLATE(T, mat_t) mat, slong * perm, slong r, slong s, const TEMPLATE(T, ctx_t) ctx);
 
-        if (perm)
-        {
-            t = perm[s];
-            perm[s] = perm[r];
-            perm[r] = t;
-        }
-
-       for (t = 0; t < mat->r; t++)
-       {
-           TEMPLATE(T, swap)(TEMPLATE(T, mat_entry)(mat, t, r), TEMPLATE(T, mat_entry)(mat, t, s), ctx);
-       }
-    }
-}
-
-FQ_MAT_TEMPLATES_INLINE void
-TEMPLATE(T, mat_invert_cols)(TEMPLATE(T, mat_t) mat, slong * perm, const TEMPLATE(T, ctx_t) ctx)
-{
-    if (!TEMPLATE(T, mat_is_empty)(mat, ctx))
-    {
-        slong t;
-        slong i;
-        slong c = mat->c;
-        slong k = mat->c/2;
-
-        if (perm)
-        {
-            for (i = 0; i < k; i++)
-            {
-                t = perm[i];
-                perm[i] = perm[c - i - 1];
-                perm[c - i - 1] = t;
-            }
-        }
-
-        for (t = 0; t < mat->r; t++)
-        {
-            for (i = 0; i < k; i++)
-            {
-                TEMPLATE(T, swap)(TEMPLATE(T, mat_entry)(mat, t, i), TEMPLATE(T, mat_entry)(mat, t, c - i - 1), ctx);
-            }
-        }
-    }
-}
+void TEMPLATE(T, mat_invert_cols)(TEMPLATE(T, mat_t) mat, slong * perm, const TEMPLATE(T, ctx_t) ctx);
 
 /* Assignment  ***************************************************************/
 

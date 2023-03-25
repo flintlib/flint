@@ -20,7 +20,7 @@
 #define FQ_ZECH_MAT_INLINE static __inline__
 #endif
 
-#include "fq_zech.h"
+#include "fq_zech_types.h"
 
 /* Cutoff between classical and recursive triangular solving */
 #define FQ_ZECH_MAT_SOLVE_TRI_ROWS_CUTOFF 64
@@ -29,14 +29,7 @@
 /* Cutoff between classical and recursive LU decomposition */
 #define FQ_ZECH_MAT_LU_RECURSIVE_CUTOFF 4
 
-FQ_ZECH_MAT_INLINE
-int FQ_ZECH_MAT_MUL_KS_CUTOFF(slong r, slong c, const fq_zech_ctx_t ctx)
-{
-    if (5 * FLINT_MIN(r, c) > 8 * fq_zech_ctx_degree(ctx) + 29)
-        return 1;
-    else
-        return 0;
-}
+int FQ_ZECH_MAT_MUL_KS_CUTOFF(slong r, slong c, const fq_zech_ctx_t ctx);
 
 #define T fq_zech
 #define CAP_T FQ_ZECH

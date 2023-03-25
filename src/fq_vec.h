@@ -20,7 +20,7 @@
 #define FQ_VEC_INLINE static __inline__
 #endif
 
-#include "fq.h"
+#include "fq_types.h"
 
 #define FQ_VEC_NORM(vec, i, ctx)                    \
 do {                                                \

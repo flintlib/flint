@@ -14,44 +14,22 @@
 
 #ifdef FQ_ZECH_INLINES_C
 #define FQ_ZECH_INLINE
+#ifndef FQ_TEMPLATES_INLINE
+# define FQ_TEMPLATES_INLINE
+#endif
 #else
 #define FQ_ZECH_INLINE static __inline__
+#ifndef FQ_TEMPLATES_INLINE
+# define FQ_TEMPLATES_INLINE static __inline__
+#endif
 #endif
 
-#include "fmpz.h"
-#include "fq_nmod.h"
+#include "fq_zech_types.h"
 
 /* Data types and context ****************************************************/
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef struct
-{
-    mp_limb_t value;
-} fq_zech_struct;
-
-typedef fq_zech_struct fq_zech_t[1];
-
-typedef struct
-{
-    mp_limb_t qm1;              /* q - 1 */
-    mp_limb_t qm1o2;            /* (q - 1) / 2 or 1 when p == 2 */
-    mp_limb_t qm1opm1;          /* (q - 1) / (p - 1) */
-    mp_limb_t p;
-    double ppre;
-    mp_limb_t prime_root;       /* primitive root for prime subfield */
-    mp_limb_t *zech_log_table;
-    mp_limb_t *prime_field_table;
-    mp_limb_t *eval_table;
-
-    fq_nmod_ctx_struct *fq_nmod_ctx;
-    int owns_fq_nmod_ctx;
-    int is_conway; /* whether field was generated using Flint Conway tables (assures primitivity) */
-
-} fq_zech_ctx_struct;
-
-typedef fq_zech_ctx_struct fq_zech_ctx_t[1];
 
 void fq_zech_ctx_init(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var);
 
@@ -79,30 +57,17 @@ void fq_zech_ctx_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_t state);
 
 void fq_zech_ctx_clear(fq_zech_ctx_t ctx);
 
-FQ_ZECH_INLINE const nmod_poly_struct* fq_zech_ctx_modulus(const fq_zech_ctx_t ctx)
-{
-    return fq_nmod_ctx_modulus(ctx->fq_nmod_ctx);
-}
+const nmod_poly_struct * fq_zech_ctx_modulus(const fq_zech_ctx_t ctx);
 
-FQ_ZECH_INLINE slong
-fq_zech_ctx_degree(const fq_zech_ctx_t ctx)
-{
-    return fq_nmod_ctx_degree(ctx->fq_nmod_ctx);
-}
+slong fq_zech_ctx_degree(const fq_zech_ctx_t ctx);
 
-FQ_ZECH_INLINE void
-fq_zech_ctx_order(fmpz_t f, const fq_zech_ctx_t ctx)
-{
-    fq_nmod_ctx_order(f, ctx->fq_nmod_ctx);
-}
+void fq_zech_ctx_order(fmpz_t f, const fq_zech_ctx_t ctx);
 
 FQ_ZECH_INLINE mp_limb_t
 fq_zech_ctx_order_ui(const fq_zech_ctx_t ctx)
 {
     return ctx->qm1 + 1;
 }
-
-#define fq_zech_ctx_prime(ctx)  fq_nmod_ctx_prime(ctx->fq_nmod_ctx)
 
 #ifdef FLINT_HAVE_FILE
 int fq_zech_ctx_fprint(FILE * file, const fq_zech_ctx_t ctx);
@@ -231,23 +196,8 @@ fq_zech_set(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
 
 void fq_zech_set_fmpz(fq_zech_t rop, const fmpz_t x, const fq_zech_ctx_t ctx);
 
-FQ_ZECH_INLINE void
-fq_zech_set_si(fq_zech_t rop, const slong x, const fq_zech_ctx_t ctx)
-{
-    fmpz_t xx;
-    fmpz_init_set_si(xx, x);
-    fq_zech_set_fmpz(rop, xx, ctx);
-    fmpz_clear(xx);
-}
-
-FQ_ZECH_INLINE void
-fq_zech_set_ui(fq_zech_t rop, const ulong x, const fq_zech_ctx_t ctx)
-{
-    fmpz_t xx;
-    fmpz_init_set_ui(xx, x);
-    fq_zech_set_fmpz(rop, xx, ctx);
-    fmpz_clear(xx);
-}
+void fq_zech_set_si(fq_zech_t rop, const slong x, const fq_zech_ctx_t ctx);
+void fq_zech_set_ui(fq_zech_t rop, const ulong x, const fq_zech_ctx_t ctx);
 
 FQ_ZECH_INLINE void
 fq_zech_swap(fq_zech_t op1, fq_zech_t op2, const fq_zech_ctx_t ctx)
