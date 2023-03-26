@@ -212,15 +212,37 @@ esac],
 enable_dependency_tracking="yes")
 
 AC_ARG_ENABLE(gmp-internals,
-[AS_HELP_STRING([--enable-gmp-internals],[Enables optimization by calling GMP internals directly [default=yes]])],
+[AS_HELP_STRING([--enable-gmp-internals],[Enable calling GMP internals directly [default=yes]])],
 [case $enableval in
 yes|no)
     ;;
 *)
-    AC_MSG_ERROR([Bad value $enableval for --enable-dependency-tracking. Need yes or no.])
+    AC_MSG_ERROR([Bad value $enableval for --enable-gmp-internals. Need yes or no.])
     ;;
 esac],
 enable_gmp_internals="yes")
+
+AC_ARG_ENABLE(avx2,
+[AS_HELP_STRING([--enable-avx2],[Enable AVX2 instructions [default=no]])],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-avx2. Need yes or no.])
+    ;;
+esac],
+enable_avx2="no")
+
+AC_ARG_ENABLE(avx512,
+[AS_HELP_STRING([--enable-avx512],[Enable AVX512 instructions [default=no]])],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-avx512. Need yes or no.])
+    ;;
+esac],
+enable_avx512="no")
 
 ################################################################################ 
 # packages
@@ -805,6 +827,23 @@ then
     [AC_MSG_ERROR([$CC does not support the ABI flag -m$ABI])])
 fi
 AC_SUBST(ABI_FLAG)
+
+if test "$enable_avx2" = "yes";
+then
+    AX_CHECK_COMPILE_FLAG([-mavx2],
+    [save_CFLAGS="-mavx2 $save_CFLAGS"
+     AC_DEFINE(FLINT_HAVE_AVX2,1,[Define if system has AVX2])],
+    [AC_MSG_ERROR([$CC does not support -mavx2 needed for AVX2 instructions])])
+    AX_CHECK_COMPILE_FLAG([-mfma], [save_CFLAGS="-mfma $save_CFLAGS"])
+fi
+
+if test "$enable_avx512" = "yes";
+then
+    AX_CHECK_COMPILE_FLAG([-mavx512f],
+    [save_CFLAGS="-mavx512f $save_CFLAGS"
+     AC_DEFINE(FLINT_HAVE_AVX512,1,[Define if system has AVX512])],
+    [AC_MSG_ERROR([$CC does not support -mavx512f needed for AVX512 instructions])])
+fi
 
 case $host_cpu in
     sparc*)
