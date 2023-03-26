@@ -139,11 +139,7 @@ void __flint_get_memory_functions(void *(**alloc_func) (size_t),
 #define FLINT_SET_BUT_UNUSED(x) x __attribute__((unused))
 #define FLINT_NORETURN __attribute__ ((noreturn))
 #define FLINT_CONST __attribute__ ((const))
-#if __GNUC__ >= 4
 #define FLINT_WARN_UNUSED __attribute__((warn_unused_result))
-#else
-#define FLINT_WARN_UNUSED
-#endif
 #else
 #define __attribute__(x)
 #define FLINT_UNUSED(x) x
