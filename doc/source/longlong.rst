@@ -32,17 +32,16 @@ Auxiliary asm macros
     rounded towards `0`. Note that as the quotient is signed it must lie in 
     the range `[-2^63, 2^63)`.
 
-.. macro:: count_leading_zeros(count, x)
+.. macro:: flint_clz(x)
 
-    Counts the number of zero-bits from the msb to the first non-zero bit 
-    in the limb ``x``.  This is the number of steps ``x`` needs to 
-    be shifted left to set the msb. If ``x`` is `0` then count is 
-    undefined.
+    Returns the number of zero-bits from the msb to the first non-zero bit in
+    the limb ``x``.  This is the number of steps ``x`` needs to be shifted left
+    to set the msb. If ``x`` is `0` then the return value is undefined.
 
-.. macro:: count_trailing_zeros(count, x)
+.. macro:: flint_ctz(x)
 
-    As for ``count_leading_zeros()``, but counts from the least 
-    significant end. If ``x`` is zero then count is undefined.
+    As for ``flint_clz()``, but counts from the least significant end. If ``x``
+    is zero then the return value is undefined.
 
 .. macro:: add_ssaaaa(high_sum, low_sum, high_addend_1, low_addend_1, high_addend_2, low_addend_2)
 
