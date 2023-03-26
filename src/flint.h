@@ -116,24 +116,6 @@ typedef struct __FLINT_FILE FLINT_FILE;
 
 #include "longlong.h"
 
-void * flint_malloc(size_t size);
-void * flint_realloc(void * ptr, size_t size);
-void * flint_calloc(size_t num, size_t size);
-void flint_free(void * ptr);
-
-typedef void (*flint_cleanup_function_t)(void);
-void flint_register_cleanup_function(flint_cleanup_function_t cleanup_function);
-void flint_cleanup(void);
-void flint_cleanup_master(void);
-
-void __flint_set_memory_functions(void *(*alloc_func) (size_t),
-     void *(*calloc_func) (size_t, size_t), void *(*realloc_func) (void *, size_t),
-                                                              void (*free_func) (void *));
-
-void __flint_get_memory_functions(void *(**alloc_func) (size_t),
-     void *(**calloc_func) (size_t, size_t), void *(**realloc_func) (void *, size_t),
-                                                              void (**free_func) (void *));
-
 #if defined(__GNUC__)
 #define FLINT_UNUSED(x) UNUSED_ ## x __attribute__((unused))
 #define FLINT_SET_BUT_UNUSED(x) x __attribute__((unused))
@@ -149,14 +131,19 @@ void __flint_get_memory_functions(void *(**alloc_func) (size_t),
 #define FLINT_CONST
 #endif
 
-FLINT_NORETURN void flint_abort(void);
-void flint_set_abort(FLINT_NORETURN void (*func)(void));
-  /* flint_abort is calling abort by default
-   * if flint_set_abort is used, then instead of abort this function
-   * is called. EXPERIMENTALLY use at your own risk!
-   * May disappear in future versions.
-   */
-
+#if FLINT_USES_TLS
+# if defined(__GNUC__)
+#  define FLINT_TLS_PREFIX __thread
+# elif __STDC_VERSION__ >= 201112L
+#  define FLINT_TLS_PREFIX _Thread_local
+# elif defined(_MSC_VER)
+#  define FLINT_TLS_PREFIX __declspec(thread)
+# else
+#  error "thread local prefix defined in C11 or later"
+# endif
+#else
+# define FLINT_TLS_PREFIX
+#endif
 
 #if defined(_LONG_LONG_LIMB)
 # define WORD_FMT "%ll"
@@ -191,22 +178,28 @@ void flint_set_abort(FLINT_NORETURN void (*func)(void));
 # define FLINT_D_BITS 31
 #endif
 
-#if FLINT_USES_TLS
-#if defined(__GNUC__) && __STDC_VERSION__ >= 201112L && __GNUC__ == 4 && __GNUC_MINOR__ < 9
-/* GCC 4.7, 4.8 with -std=gnu11 purport to support C11 via __STDC_VERSION__ but lack _Thread_local */
-#define FLINT_TLS_PREFIX __thread
-#elif __STDC_VERSION__ >= 201112L
-#define FLINT_TLS_PREFIX _Thread_local
-#elif defined(_MSC_VER)
-#define FLINT_TLS_PREFIX __declspec(thread)
-#elif defined(__GNUC__)
-#define FLINT_TLS_PREFIX __thread
-#else
-#error "thread local prefix defined in C11 or later"
-#endif
-#else
-#define FLINT_TLS_PREFIX
-#endif
+void * flint_malloc(size_t size);
+void * flint_realloc(void * ptr, size_t size);
+void * flint_calloc(size_t num, size_t size);
+void flint_free(void * ptr);
+
+typedef void (*flint_cleanup_function_t)(void);
+void flint_register_cleanup_function(flint_cleanup_function_t cleanup_function);
+void flint_cleanup(void);
+void flint_cleanup_master(void);
+
+void __flint_set_memory_functions(void *(*alloc_func) (size_t),
+     void *(*calloc_func) (size_t, size_t), void *(*realloc_func) (void *, size_t),
+                                                              void (*free_func) (void *));
+
+void __flint_get_memory_functions(void *(**alloc_func) (size_t),
+     void *(**calloc_func) (size_t, size_t), void *(**realloc_func) (void *, size_t),
+                                                              void (**free_func) (void *));
+
+FLINT_NORETURN void flint_abort(void);
+
+/* If user want to set change abort function from `abort' */
+void flint_set_abort(FLINT_NORETURN void (*func)(void));
 
 int flint_get_num_threads(void);
 void flint_set_num_threads(int num_threads);
