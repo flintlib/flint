@@ -21,10 +21,18 @@
 #include <atomic.h>
 #endif
 
-
 #include "flint.h"
 #include "gmpcompat.h"
 #include "fmpz.h"
+
+typedef struct
+{
+   int count;
+#if FLINT_USES_PTHREAD
+   pthread_t thread;
+#endif
+   void * address;
+} fmpz_block_header_s;
 
 /* Always free larger mpz's to avoid wasting too much heap space */
 #define FLINT_MPZ_MAX_CACHE_LIMBS 64
