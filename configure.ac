@@ -724,6 +724,14 @@ AC_COMPILE_IFELSE(
     [AC_MSG_RESULT([no])]
 )
 
+AC_MSG_CHECKING([if $CC has __builtin_constant_p])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([], [int a = __builtin_constant_p(0 == 1);])],
+    [AC_MSG_RESULT([yes])
+     AC_DEFINE(FLINT_HAVE_CONSTANT_P,1,[Define if compiler has __builtin_constant_p])],
+    [AC_MSG_RESULT([no])]
+)
+
 ################################################################################ 
 # CFLAGS
 ################################################################################ 

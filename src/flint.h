@@ -65,6 +65,12 @@
 # define FLINT_HAVE_FILE
 #endif
 
+#ifdef FLINT_HAVE_CONSTANT_P
+# define FLINT_CONSTANT_P __builtin_constant_p
+#else
+# define FLINT_CONSTANT_P(x) 0
+#endif
+
 #ifdef FLINT_INLINES_C
 # define FLINT_INLINE
 #else
