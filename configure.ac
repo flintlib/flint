@@ -741,7 +741,33 @@ AC_COMPILE_IFELSE(
         [AC_LANG_PROGRAM([],[long long int x = __builtin_popcountll(3);])],
         [AC_MSG_RESULT([yes])
          has_popcount="yes"
-         AC_DEFINE(FLINT_USES_POPCNT,1,[Define if system has popcount intrinsics])],
+         AC_DEFINE(FLINT_HAS_POPCNT,1,[Define if compiler has popcount intrinsics])],
+        [AC_MSG_RESULT([no])]
+    )],
+    [AC_MSG_RESULT([no])]
+)
+
+AC_MSG_CHECKING([if $CC has CLZ intrinsics])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([],[long int x = __builtin_clzl(3);])],
+    [AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM([],[long long int x = __builtin_clzll(3);])],
+        [AC_MSG_RESULT([yes])
+         has_clz="yes"
+         AC_DEFINE(FLINT_HAS_CLZ,1,[Define if compiler has CLZ intrinsics])],
+        [AC_MSG_RESULT([no])]
+    )],
+    [AC_MSG_RESULT([no])]
+)
+
+AC_MSG_CHECKING([if $CC has CTZ intrinsics])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([],[long int x = __builtin_ctzl(3);])],
+    [AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM([],[long long int x = __builtin_ctzll(3);])],
+        [AC_MSG_RESULT([yes])
+         has_ctz="yes"
+         AC_DEFINE(FLINT_HAS_CTZ,1,[Define if compiler has CTZ intrinsics])],
         [AC_MSG_RESULT([no])]
     )],
     [AC_MSG_RESULT([no])]
