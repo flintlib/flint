@@ -374,6 +374,7 @@ ifeq ($(findstring $(HOST_OS),mingw32 mingw64 cygwin msys),)
 	$(LN_S) "$(FLINT_LIB)" "$(FLINT_LIBNAME)"
 	$(LN_S) "$(FLINT_LIB)" "$(FLINT_LIBNAME).$(FLINT_MAJOR_SO)"
 endif
+endif
 
 ifneq ($(STATIC), 0)
 static: $(FLINT_DIR)/$(FLINT_LIB_STATIC)
@@ -738,7 +739,6 @@ endif
 endif
 ifneq ($(STATIC), 0)
 	$(CP) $(FLINT_DIR)/$(FLINT_LIB_STATIC) $(LIBDIR)
-endif
 endif
 	$(CP) $(HEADERS) $(INCLUDEDIR)/flint
 	$(CP) $(SRC_DIR)/flintxx/*.h $(INCLUDEDIR)/flint/flintxx
