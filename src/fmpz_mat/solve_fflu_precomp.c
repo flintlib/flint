@@ -102,7 +102,7 @@ fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
                     dsgn = 0 > (slong)(diag[i - 1]);
                     if (uden != 0) /* see #1029 */
                     {
-                       count_leading_zeros(norm, uden);
+                       norm = flint_clz(uden);
                        invert_limb(dinv, uden << norm);
                     } else
                        dinv = 0;
@@ -235,7 +235,7 @@ fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
                     dsgn = 0 > (slong)(diag[l]);
                     if (uden != 0) /* see #1029 */
                     {
-                       count_leading_zeros(norm, uden);
+                       norm = flint_clz(uden);
                        invert_limb(dinv, uden << norm);
                     } else
                        dinv = 0;

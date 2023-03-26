@@ -362,7 +362,7 @@ arf_init_set_ui(arf_t x, ulong v)
     else
     {
         unsigned int c;
-        count_leading_zeros(c, v);
+        c = flint_clz(v);
         ARF_EXP(x) = FLINT_BITS - c;
         ARF_NOPTR_D(x)[0] = v << c;
         ARF_XSIZE(x) = ARF_MAKE_XSIZE(1, 0);
@@ -394,7 +394,7 @@ arf_set_ui(arf_t x, ulong v)
     else
     {
         unsigned int c;
-        count_leading_zeros(c, v);
+        c = flint_clz(v);
         ARF_EXP(x) = FLINT_BITS - c;
         ARF_NOPTR_D(x)[0] = v << c;
         ARF_XSIZE(x) = ARF_MAKE_XSIZE(1, 0);
@@ -581,7 +581,7 @@ arf_bits(const arf_t x)
         slong c;
 
         ARF_GET_MPN_READONLY(xp, xn, x);
-        count_trailing_zeros(c, xp[0]);
+        c = flint_ctz(xp[0]);
         return xn * FLINT_BITS - c;
     }
 }

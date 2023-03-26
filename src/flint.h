@@ -26,7 +26,6 @@
 
 #include <limits.h>
 #include <gmp.h>
-#include "longlong.h"
 #include "flint-config.h"
 
 #if FLINT_USES_GC
@@ -54,6 +53,11 @@
 # endif
 #endif
 
+#ifndef __GNUC__
+# define __asm__     asm
+# define __inline__  inline
+#endif
+
 #ifdef va_start
 # define FLINT_HAVE_VA_LIST
 #endif
@@ -63,6 +67,12 @@
  || defined(_STDIO_H_)  || defined(__STDIO_H)     || defined(__STDIO_H__)    \
  || defined(__STDIO__)
 # define FLINT_HAVE_FILE
+#endif
+
+#ifdef FLINT_HAVE_CONSTANT_P
+# define FLINT_CONSTANT_P __builtin_constant_p
+#else
+# define FLINT_CONSTANT_P(x) 0
 #endif
 
 #ifdef FLINT_INLINES_C
@@ -89,15 +99,6 @@ extern "C" {
 #error GMP 5.0.0 or MPIR 2.6.0 or later are required
 #endif
 
-/*
-   We define alternative key words for "asm" and "inline", allowing
-   the code to be compiled with the "-ansi" flag under GCC
- */
-#ifndef __GNUC__
-# define __asm__     asm
-# define __inline__  inline
-#endif
-
 FLINT_DLL extern char flint_version[];
 
 struct __FLINT_FILE;
@@ -105,6 +106,15 @@ typedef struct __FLINT_FILE FLINT_FILE;
 
 #define ulong mp_limb_t
 #define slong mp_limb_signed_t
+#define flint_bitcnt_t ulong
+
+#ifdef FLINT_WANT_ASSERT
+#define FLINT_ASSERT(param) assert(param)
+#else
+#define FLINT_ASSERT(param)
+#endif
+
+#include "longlong.h"
 
 void * flint_malloc(size_t size);
 void * flint_realloc(void * ptr, size_t size);
@@ -124,10 +134,21 @@ void __flint_get_memory_functions(void *(**alloc_func) (size_t),
      void *(**calloc_func) (size_t, size_t), void *(**realloc_func) (void *, size_t),
                                                               void (**free_func) (void *));
 
-#ifdef __GNUC__
+#if defined(__GNUC__)
+#define FLINT_UNUSED(x) UNUSED_ ## x __attribute__((unused))
+#define FLINT_SET_BUT_UNUSED(x) x __attribute__((unused))
 #define FLINT_NORETURN __attribute__ ((noreturn))
 #define FLINT_CONST __attribute__ ((const))
+#if __GNUC__ >= 4
+#define FLINT_WARN_UNUSED __attribute__((warn_unused_result))
 #else
+#define FLINT_WARN_UNUSED
+#endif
+#else
+#define __attribute__(x)
+#define FLINT_UNUSED(x) x
+#define FLINT_SET_BUT_UNUSED(x) x
+#define FLINT_WARN_UNUSED
 #define FLINT_NORETURN
 #define FLINT_CONST
 #endif
@@ -173,8 +194,6 @@ void flint_set_abort(FLINT_NORETURN void (*func)(void));
 # define FLINT_BITS 32
 # define FLINT_D_BITS 31
 #endif
-
-#define flint_bitcnt_t ulong
 
 #if FLINT_USES_TLS
 #if defined(__GNUC__) && __STDC_VERSION__ >= 201112L && __GNUC__ == 4 && __GNUC_MINOR__ < 9
@@ -290,27 +309,6 @@ ulong n_randtest_not_zero(flint_rand_t);
    flint_randclear(xxx); \
    flint_cleanup_master();
 
-#ifdef FLINT_WANT_ASSERT
-#define FLINT_ASSERT(param) assert(param)
-#else
-#define FLINT_ASSERT(param)
-#endif
-
-#if defined(__GNUC__)
-#define FLINT_UNUSED(x) UNUSED_ ## x __attribute__((unused))
-#define FLINT_SET_BUT_UNUSED(x) x __attribute__((unused))
-#if __GNUC__ >= 4
-#define FLINT_WARN_UNUSED __attribute__((warn_unused_result))
-#else
-#define FLINT_WARN_UNUSED
-#endif
-#else
-#define __attribute__(x)
-#define FLINT_UNUSED(x) x
-#define FLINT_SET_BUT_UNUSED(x) x
-#define FLINT_WARN_UNUSED
-#endif
-
 #define FLINT_MAX(x, y) ((x) > (y) ? (x) : (y))
 #define FLINT_MIN(x, y) ((x) > (y) ? (y) : (x))
 #define FLINT_ABS(x) ((slong)(x) < 0 ? (-(x)) : (x))
@@ -359,16 +357,12 @@ ulong n_randtest_not_zero(flint_rand_t);
 #define l_shift(in, shift) \
     ((shift == FLINT_BITS) ? WORD(0) : ((in) << (shift)))
 
-#ifdef NEED_CLZ_TAB
-FLINT_DLL extern const unsigned char __flint_clz_tab[128];
-#endif
-
 /* Beware when using the unsigned return value in signed arithmetic */
 static __inline__
 mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
 {
    mp_limb_t zeros = FLINT_BITS;
-   if (x) count_leading_zeros(zeros, x);
+   if (x) zeros = flint_clz(x);
    return FLINT_BITS - zeros;
 }
 

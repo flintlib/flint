@@ -23,7 +23,7 @@ nmod_poly_init_preinv(nmod_poly_t poly, mp_limb_t n, mp_limb_t ninv)
 
     poly->mod.n = n;
     poly->mod.ninv = ninv;
-    count_leading_zeros(poly->mod.norm, n);
+    poly->mod.norm = flint_clz(n);
 }
 
 void

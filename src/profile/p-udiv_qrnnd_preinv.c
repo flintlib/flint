@@ -23,7 +23,7 @@ void sample(void * arg, ulong count)
    FLINT_TEST_INIT(state);
 
    d = n_randtest_not_zero(state);
-   count_leading_zeros(norm, d);
+   norm = flint_clz(d);
    d <<= norm;
 
    for (i = 0; i < count; i++)

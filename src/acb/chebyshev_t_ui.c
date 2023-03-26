@@ -25,7 +25,7 @@ acb_chebyshev_t_ui(acb_t y, ulong n, const acb_t x, slong prec)
         return;
     }
 
-    count_trailing_zeros(r, n);
+    r = flint_ctz(n);
 
     if ((n >> r) == 1)
     {

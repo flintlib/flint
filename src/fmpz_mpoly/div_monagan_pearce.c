@@ -91,7 +91,7 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
     {
         lc_abs = FLINT_ABS(poly3[0]);
         lc_sign = FLINT_SIGN_EXT(poly3[0]);
-        count_leading_zeros(lc_norm, lc_abs);
+        lc_norm = flint_clz(lc_abs);
         lc_n = lc_abs << lc_norm;
         invert_limb(lc_i, lc_n);
     }
@@ -412,7 +412,7 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
     {
         lc_abs = FLINT_ABS(poly3[0]);
         lc_sign = FLINT_SIGN_EXT(poly3[0]);
-        count_leading_zeros(lc_norm, lc_abs);
+        lc_norm = flint_clz(lc_abs);
         lc_n = lc_abs << lc_norm;
         invert_limb(lc_i, lc_n);
     }

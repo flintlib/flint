@@ -211,7 +211,7 @@ void fmpz_mpoly_consume_fmpz_mpolyd_clear(fmpz_mpoly_t A, fmpz_mpolyd_t B,
         mpoly_get_cmpmask(ptempexp, N, bits, ctx->minfo);
         if (topmask != WORD(0))
         {
-            count_leading_zeros(msb, topmask);
+            msb = flint_clz(topmask);
             msb = (FLINT_BITS - 1)^msb;
         } else
         {

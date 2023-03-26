@@ -211,6 +211,17 @@ yes|no)
 esac],
 enable_dependency_tracking="yes")
 
+AC_ARG_ENABLE(gmp-internals,
+[AS_HELP_STRING([--enable-gmp-internals],[Enables optimization by calling GMP internals directly [default=yes]])],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-dependency-tracking. Need yes or no.])
+    ;;
+esac],
+enable_gmp_internals="yes")
+
 ################################################################################ 
 # packages
 ################################################################################ 
@@ -600,6 +611,18 @@ AC_CHECK_LIB(gmp,__gmpz_init,
 submit a bug report to <https://github.com/flintlib/flint2/issues/> so
 that we can either fix the issue or give a more proper error message.])])
 
+if test "$enable_gmp_internals" = "yes";
+then
+    AC_CHECK_LIB([gmp],[__gmpn_gcd_11],
+    [],
+    [AC_MSG_ERROR([`mpn_gcd_11' was not found in the GMP library. It is needed to enable GMP
+internals.])])
+    AC_CHECK_LIB([gmp],[__gmpn_div_q],
+    [],
+    [AC_MSG_ERROR([`mpn_div_q' was not found in the GMP library. It is needed to enable GMP
+internals.])])
+fi
+
 AC_CHECK_LIB(mpfr,mpfr_init,
 [LIBS="-lmpfr $LIBS"],
 [AC_MSG_ERROR([MPFR library was not found.  If you indeed have MPFR installed, please
@@ -718,9 +741,43 @@ AC_COMPILE_IFELSE(
         [AC_LANG_PROGRAM([],[long long int x = __builtin_popcountll(3);])],
         [AC_MSG_RESULT([yes])
          has_popcount="yes"
-         AC_DEFINE(FLINT_USES_POPCNT,1,[Define if system has popcount intrinsics])],
+         AC_DEFINE(FLINT_HAS_POPCNT,1,[Define if compiler has popcount intrinsics])],
         [AC_MSG_RESULT([no])]
     )],
+    [AC_MSG_RESULT([no])]
+)
+
+AC_MSG_CHECKING([if $CC has CLZ intrinsics])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([],[long int x = __builtin_clzl(3);])],
+    [AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM([],[long long int x = __builtin_clzll(3);])],
+        [AC_MSG_RESULT([yes])
+         has_clz="yes"
+         AC_DEFINE(FLINT_HAS_CLZ,1,[Define if compiler has CLZ intrinsics])],
+        [AC_MSG_RESULT([no])]
+    )],
+    [AC_MSG_RESULT([no])]
+)
+
+AC_MSG_CHECKING([if $CC has CTZ intrinsics])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([],[long int x = __builtin_ctzl(3);])],
+    [AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM([],[long long int x = __builtin_ctzll(3);])],
+        [AC_MSG_RESULT([yes])
+         has_ctz="yes"
+         AC_DEFINE(FLINT_HAS_CTZ,1,[Define if compiler has CTZ intrinsics])],
+        [AC_MSG_RESULT([no])]
+    )],
+    [AC_MSG_RESULT([no])]
+)
+
+AC_MSG_CHECKING([if $CC has __builtin_constant_p])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([], [int a = __builtin_constant_p(0 == 1);])],
+    [AC_MSG_RESULT([yes])
+     AC_DEFINE(FLINT_HAVE_CONSTANT_P,1,[Define if compiler has __builtin_constant_p])],
     [AC_MSG_RESULT([no])]
 )
 
@@ -892,6 +949,11 @@ fi
 if test "$enable_assert" = "yes";
 then
     AC_DEFINE(FLINT_WANT_ASSERT,1,[Define to enable use of asserts.])
+fi
+
+if test "$enable_gmp_internals" = "yes";
+then
+    AC_DEFINE(FLINT_WANT_GMP_INTERNALS,1,[Define to enable use of GMP internals.])
 fi
 
 ################################################################################ 

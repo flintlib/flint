@@ -103,7 +103,7 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
     }
 
     aexp = FLINT_BIT_COUNT(a);
-    count_trailing_zeros(trailing, a);
+    trailing = flint_ctz(a);
     awidth = aexp - trailing;
 
     /* a = power of two */
@@ -219,7 +219,7 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
             if (yn > wp_limbs)
             {
                 inexact = 1;
-                count_leading_zeros(leading, yman[yn - 1]);
+                leading = flint_clz(yman[yn - 1]);
                 yexp_lo = yexp_lo + yn * FLINT_BITS - leading;
 
                 if (leading == 0)

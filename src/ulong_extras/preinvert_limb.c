@@ -119,7 +119,7 @@ ulong n_preinvert_limb(ulong n)
 {
    ulong norm, ninv;
 
-   count_leading_zeros(norm, n);
+   norm = flint_clz(n);
    _invert_limb(ninv, n << norm);
 
    return ninv;

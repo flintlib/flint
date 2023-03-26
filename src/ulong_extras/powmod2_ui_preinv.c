@@ -31,7 +31,7 @@ n_powmod2_ui_preinv(ulong a, ulong exp, ulong n, ulong ninv)
     if (a >= n)
         a = n_mod2_preinv(a, n, ninv);
 
-    count_leading_zeros(norm, n);
+    norm = flint_clz(n);
     a <<= norm;
     n <<= norm;
 

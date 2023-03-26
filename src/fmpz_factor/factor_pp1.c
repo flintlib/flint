@@ -216,12 +216,12 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
    if (nn == 1)
    {
       n[0] = fmpz_get_ui(n_in);
-      count_leading_zeros(norm, n[0]);
+      norm = flint_clz(n[0]);
       n[0] <<= norm;
    } else
    {
       mp_ptr np = COEFF_TO_PTR(*n_in)->_mp_d;
-      count_leading_zeros(norm, np[nn - 1]);
+      norm = flint_clz(np[nn - 1]);
       if (norm)
          mpn_lshift(n, np, nn, norm);
       else

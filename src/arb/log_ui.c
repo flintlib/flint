@@ -31,8 +31,8 @@ atanh_bs(arb_t s, ulong p, ulong q, slong prec)
 static int n_width(ulong k)
 {
     int a, b;
-    count_leading_zeros(a, k);
-    count_trailing_zeros(b, k);
+    a = flint_clz(k);
+    b = flint_ctz(k);
     return FLINT_BITS - a - b;
 }
 

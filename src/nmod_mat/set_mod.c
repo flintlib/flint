@@ -15,6 +15,6 @@
 void nmod_mat_set_mod(nmod_mat_t mat, mp_limb_t n)
 {
     mat->mod.n = n;
-    count_leading_zeros(mat->mod.norm, n);
+    mat->mod.norm = flint_clz(n);
     mat->mod.ninv = n_preinvert_limb_prenorm(n << mat->mod.norm);
 }

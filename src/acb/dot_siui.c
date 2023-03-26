@@ -34,7 +34,7 @@ arf_shallow_set_siui(arf_t res, ulong vhi, ulong vlo)
         }
         else
         {
-            count_leading_zeros(bc, vlo);
+            bc = flint_clz(vlo);
             ARF_EXP(res) = FLINT_BITS - bc;
             ARF_NOPTR_D(res)[0] = vlo << bc;
             ARF_XSIZE(res) = ARF_MAKE_XSIZE(1, negative);
@@ -42,14 +42,14 @@ arf_shallow_set_siui(arf_t res, ulong vhi, ulong vlo)
     }
     else if (vlo == 0)
     {
-        count_leading_zeros(bc, vhi);
+        bc = flint_clz(vhi);
         ARF_EXP(res) = 2 * FLINT_BITS - bc;
         ARF_NOPTR_D(res)[0] = vhi << bc;
         ARF_XSIZE(res) = ARF_MAKE_XSIZE(1, negative);
     }
     else
     {
-        count_leading_zeros(bc, vhi);
+        bc = flint_clz(vhi);
         ARF_EXP(res) = 2 * FLINT_BITS - bc;
         ARF_NOPTR_D(res)[0] = vlo << bc;
         if (bc == 0)

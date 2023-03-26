@@ -439,7 +439,7 @@ int _fmpq_reconstruct_fmpz_2_ui_array(fmpz_t n, fmpz_t d,
     FLINT_ASSERT(n_len > 0);
     FLINT_ASSERT(d_len > 0);
     FLINT_ASSERT(n_ptr[n_len - 1] != 0);
-    count_leading_zeros(n_lzcnt, n_ptr[n_len - 1]);
+    n_lzcnt = flint_clz(n_ptr[n_len - 1]);
 
 again:
 
@@ -456,7 +456,7 @@ again:
         goto gauss;
     }
 
-    count_leading_zeros(a_lzcnt, A[Alen - 1]);
+    a_lzcnt = flint_clz(A[Alen - 1]);
 
     if (Alen - 1 > Blen)
     {
@@ -656,7 +656,7 @@ static int _lehmer(_fmpz_mat22_t M, fmpz_t A, fmpz_t B, const fmpz_t N,
     }
 
     FLINT_ASSERT(n_ptr[n_len - 1] != 0);
-    count_leading_zeros(n_lzcnt, n_ptr[n_len - 1]);
+    n_lzcnt = flint_clz(n_ptr[n_len - 1]);
 
     if (a->_mp_size < 3 || b->_mp_size <= n_len)
     {
@@ -707,7 +707,7 @@ again:
     }
 
     FLINT_ASSERT(a_ptr[a_len - 1] != 0);
-    count_leading_zeros(a_lzcnt, a_ptr[a_len - 1]);
+    a_lzcnt = flint_clz(a_ptr[a_len - 1]);
 
     if (a_len - 1 == n_len && n_lzcnt < a_lzcnt)
     {

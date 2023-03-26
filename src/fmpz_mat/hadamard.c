@@ -135,7 +135,7 @@ paley_construction(mp_limb_t * q, mp_limb_t n)
 {
     int i, v;
 
-    count_trailing_zeros(v, n);
+    v = flint_ctz(n);
 
     if (UWORD(1) << v == n)
         return 3;

@@ -150,7 +150,7 @@ void fmpz_mpoly_sort_terms(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
 
     if (himask != 0)
     {
-        count_leading_zeros(msb, himask);
+        msb = flint_clz(himask);
         msb = (FLINT_BITS - 1)^msb;
     } else
     {

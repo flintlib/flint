@@ -56,7 +56,7 @@ acb_dot_ui(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong xst
         }
         else
         {
-            count_leading_zeros(bc, v);
+            bc = flint_clz(v);
 
             ARF_EXP(arb_midref(t + i)) = FLINT_BITS - bc;
             ARF_NOPTR_D(arb_midref(t + i))[0] = v << bc;

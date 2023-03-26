@@ -380,8 +380,8 @@ t##subtract:                                                                \
         int t##ncnt, t##dcnt;                                               \
         mp_limb_t t##qq = 0;                                                \
                                                                             \
-        count_leading_zeros(t##ncnt, t##r1);                                \
-        count_leading_zeros(t##dcnt, t##b1);                                \
+        t##ncnt = flint_clz(t##r1);                                \
+        t##dcnt = flint_clz(t##b1);                                \
         t##dcnt -= t##ncnt;                                                 \
         if (t##dcnt <= 0)                                                   \
             goto t##subtract;                                               \

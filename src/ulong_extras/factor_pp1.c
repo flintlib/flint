@@ -130,7 +130,7 @@ mp_limb_t n_factor_pp1(mp_limb_t n, ulong B1, ulong c)
    sqrt = n_sqrt(B1);
    bits0 = FLINT_BIT_COUNT(B1);
 
-   count_leading_zeros(norm, n);
+   norm = flint_clz(n);
    n <<= norm;
 
    ninv = n_preinvert_limb(n);

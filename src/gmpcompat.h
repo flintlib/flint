@@ -237,7 +237,7 @@ double flint_mpn_get_d (mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp)
 
       m0 = ptr[size-1];			    /* high limb */
       m1 = (size >= 2 ? ptr[size-2] : 0);   /* second highest limb */
-      count_leading_zeros (lshift, m0);
+      lshift = flint_clz(m0);
 
       /* relative to just under high non-zero bit */
       exp -= lshift + 1;
@@ -1173,7 +1173,7 @@ double flint_mpf_get_d_2exp(slong * exp2, mpf_srcptr src)
 
   ptr = src->_mp_d;
   abs_size = FLINT_ABS(size);
-  count_leading_zeros (cnt, ptr[abs_size - 1]);
+  cnt = flint_clz(ptr[abs_size - 1]);
 
   exp = src->_mp_exp * FLINT_BITS - cnt;
   *exp2 = exp;

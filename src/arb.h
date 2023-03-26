@@ -1020,7 +1020,7 @@ _arb_mpn_leading_zeros(mp_srcptr d, mp_size_t n)
 
         if (t != 0)
         {
-            count_leading_zeros(bits, t);
+            bits = flint_clz(t);
             return bits + FLINT_BITS * zero_limbs;
         }
 

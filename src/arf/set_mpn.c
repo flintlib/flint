@@ -27,7 +27,7 @@ arf_set_mpn(arf_t y, mp_srcptr x, mp_size_t xn, int sgnbit)
         xn--;
     }
 
-    count_leading_zeros(leading, x[xn - 1]);
+    leading = flint_clz(x[xn - 1]);
 
     bot = x[0];
 

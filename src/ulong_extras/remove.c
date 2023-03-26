@@ -21,7 +21,7 @@ n_remove(mp_limb_t * n, mp_limb_t p)
 
     if (p == 2)
     {
-        count_trailing_zeros(exp, *n);
+        exp = flint_ctz(*n);
         if (exp)
             (*n) >>= exp;
 

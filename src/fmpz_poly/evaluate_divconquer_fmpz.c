@@ -34,7 +34,7 @@ _fmpz_poly_evaluate_divconquer_fmpz(fmpz_t res, const fmpz * poly, slong len,
         fmpz_mul(u, y + 0, poly + i + 1);
         fmpz_add(t, poly + i, u);
         i += 2;
-        count_trailing_zeros(c, i);
+        c = flint_ctz(i);
         for (k = 1; k < c; k++)
         {
             fmpz_mul(u, y + k, t);
@@ -45,7 +45,7 @@ _fmpz_poly_evaluate_divconquer_fmpz(fmpz_t res, const fmpz * poly, slong len,
     if (len & WORD(1))
     {
         fmpz_set(t, poly + (len - 1));
-        count_trailing_zeros(c, len + 1);
+        c = flint_ctz(len + 1);
         for (k = 1; k < c; k++)
         {
             fmpz_mul(u, y + k, t);

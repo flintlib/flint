@@ -25,7 +25,7 @@ n_ll_mod_preinv(ulong a_hi, ulong a_lo, ulong n, ulong ninv)
 
     FLINT_ASSERT(n != 0);
 
-    count_leading_zeros(norm, n);
+    norm = flint_clz(n);
 
     /* reduce a_hi modulo n */
     if (a_hi >= n)

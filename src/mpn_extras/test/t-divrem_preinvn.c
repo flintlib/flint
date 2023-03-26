@@ -48,7 +48,7 @@ int main(void)
        } while (mpz_sgn(d) == 0);
 
        /* normalise */
-       count_leading_zeros(norm, d->_mp_d[d->_mp_size - 1]);
+       norm = flint_clz(d->_mp_d[d->_mp_size - 1]);
        mpz_mul_2exp(d, d, norm);
        mpz_mul_2exp(a, a, norm);
        size2 = a->_mp_size;
@@ -104,7 +104,7 @@ int main(void)
        } while (mpz_sgn(d) == 0);
 
        /* normalise */
-       count_leading_zeros(norm, d->_mp_d[d->_mp_size - 1]);
+       norm = flint_clz(d->_mp_d[d->_mp_size - 1]);
        mpz_mul_2exp(d, d, norm);
        mpz_mul_2exp(a, a, norm);
        size2 = a->_mp_size;

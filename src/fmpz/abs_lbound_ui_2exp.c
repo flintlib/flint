@@ -41,7 +41,7 @@ fmpz_abs_lbound_ui_2exp(slong * exp, const fmpz_t x, int bits)
             /* top limb (which must be nonzero) */
             m = z->_mp_d[size - 1];
 
-            count_leading_zeros(shift, m);
+            shift = flint_clz(m);
             shift = FLINT_BITS - shift - bits;
             e += shift;
 
@@ -61,7 +61,7 @@ fmpz_abs_lbound_ui_2exp(slong * exp, const fmpz_t x, int bits)
         }
     }
 
-    count_leading_zeros(shift, m);
+    shift = flint_clz(m);
     e += FLINT_BITS - shift - bits;
     if (e >= 0)
         m >>= e;

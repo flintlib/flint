@@ -33,7 +33,7 @@ n_powmod2_preinv(ulong a, slong exp, ulong n, ulong ninv)
         exp = -exp;
     }
 
-    count_leading_zeros(norm, n);
+    norm = flint_clz(n);
 
     return n_powmod_ui_preinv(a << norm, exp, n << norm, ninv, norm) >> norm;
 }

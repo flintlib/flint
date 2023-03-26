@@ -4,6 +4,7 @@
 
    Copyright 2009, 2015, 2016 William Hart
    Copyright 2011 Fredrik Johansson
+   Copyright 2023 Albin Ahlbäck
 
    This file is free software; you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -29,13 +30,35 @@
 #define FLINT_LONGLONG_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
-/* Undefine to make the ifndef logic below for the fallback
-   work even if the symbols are already defined (e.g. by givaro).  */
-#undef count_leading_zeros
-#undef count_trailing_zeros
+#define count_leading_zeros _Pragma("GCC error \"'count_leading_zeros' is deprecated. Use 'flint_clz' instead.\"")
+#define count_trailing_zeros _Pragma("GCC error \"'count_trailing_zeros' is deprecated. Use 'flint_ctz' instead.\"")
+
+#ifdef FLINT_HAS_POPCNT
+# ifndef _LONG_LONG_LIMB
+#  define flint_popcount __builtin_popcountl
+# else
+#  define flint_popcount __builtin_popcountll
+# endif
+#endif
+
+#ifdef FLINT_HAS_CLZ
+# ifndef _LONG_LONG_LIMB
+#  define flint_clz __builtin_clzl
+# else
+#  define flint_clz __builtin_clzll
+# endif
+#endif
+
+#ifdef FLINT_HAS_CTZ
+# ifndef _LONG_LONG_LIMB
+#  define flint_ctz __builtin_ctzl
+# else
+#  define flint_ctz __builtin_ctzll
+# endif
+#endif
 
 /* 1 if we know that the hardware is strongly-ordered */
 #define FLINT_KNOW_STRONG_ORDER 0
@@ -100,22 +123,27 @@
        : "=a" (q), "=d" (r)                                                     \
        : "0" ((mp_limb_t)(n0)), "1" ((mp_limb_t)(n1)), "rm" ((mp_limb_t)(dx)))
 
-/* bsrq destination must be a 64-bit register, hence mp_limb_t for __cbtmp. */
-#define count_leading_zeros(count, x)                                 \
-  do {                                                                \
-    mp_limb_t __cbtmp;                                                \
-    FLINT_ASSERT ((x) != 0);                                          \
-    __asm__ ("bsrq %1,%0" : "=r" (__cbtmp) : "rm" ((mp_limb_t)(x)));  \
-    (count) = __cbtmp ^ (mp_limb_t) 63;                               \
-  } while (0)
+#ifndef FLINT_HAS_CLZ
+# define flint_clz flint_clz
+static __inline__ flint_bitcnt_t flint_clz(mp_limb_t x)
+{
+    mp_limb_t count;
+    FLINT_ASSERT(x != 0);
+    __asm__("bsrq %1,%0" : "=r" (count) : "rm" (x));
+    return count ^ (mp_limb_t) 63;
+}
+#endif
 
-/* bsfq destination must be a 64-bit register, "%q0" forces this in case
-   count is only an int. */
-#define count_trailing_zeros(count, x)                               \
-  do {                                                               \
-    FLINT_ASSERT ((x) != 0);                                         \
-    __asm__ ("bsfq %1,%q0" : "=r" (count) : "rm" ((mp_limb_t)(x)));  \
-  } while (0)
+#ifndef FLINT_HAS_CTZ
+# define flint_ctz flint_ctz
+static __inline__ flint_bitcnt_t flint_ctz(mp_limb_t x)
+{
+    mp_limb_t count;
+    FLINT_ASSERT(x != 0);
+    __asm__("bsfq %1,%0" : "=r" (count) : "rm" (x));
+    return count;
+}
+#endif
 
 #define byte_swap(x)                                                 \
   do {                                                               \
@@ -186,19 +214,27 @@
        : "=a" (q), "=d" (r)                                                     \
        : "0" ((mp_limb_t)(n0)), "1" ((mp_limb_t)(n1)), "rm" ((mp_limb_t)(dx)))
 
-#define count_leading_zeros(count, x)                                 \
-  do {                                                                \
-    mp_limb_t __cbtmp;                                                \
-    FLINT_ASSERT ((x) != 0);                                          \
-    __asm__ ("bsrl %1,%0" : "=r" (__cbtmp) : "rm" ((mp_limb_t)(x)));  \
-    (count) = __cbtmp ^ (mp_limb_t) 31;                               \
-  } while (0)
+#ifndef FLINT_HAS_CLZ
+# define flint_clz flint_clz
+static __inline__ flint_bitcnt_t flint_clz(mp_limb_t x)
+{
+    mp_limb_t count;
+    FLINT_ASSERT(x != 0);
+    __asm__("bsrl %1,%0" : "=r" (count) : "rm" (x));
+    return count ^ (mp_limb_t) 31;
+}
+#endif
 
-#define count_trailing_zeros(count, x)                              \
-  do {                                                              \
-    FLINT_ASSERT ((x) != 0);                                        \
-    __asm__ ("bsfl %1,%0" : "=r" (count) : "rm" ((mp_limb_t)(x)));  \
-  } while (0)
+#ifndef FLINT_HAS_CTZ
+# define flint_ctz flint_ctz
+static __inline__ flint_bitcnt_t flint_ctz(mp_limb_t x)
+{
+    mp_limb_t count;
+    FLINT_ASSERT(x != 0);
+    __asm__("bsfl %1,%0" : "=r" (count) : "rm" (x));
+    return count;
+}
+#endif
 
 #define byte_swap(x)                                                 \
   do {                                                               \
@@ -225,13 +261,17 @@
     (sl) = __x;                                 \
   } while (0)
 
-#define count_trailing_zeros(count, x)			   \
-  do {									               \
-    mp_limb_t __ctz_x = (x);		   		      \
-    __asm__ ("popcnt %0 = %1"						   \
-	     : "=r" (count)						         \
-	     : "r" ((__ctz_x-1) & ~__ctz_x));		   \
-  } while (0)
+#ifndef FLINT_HAS_CTZ
+# define flint_ctz(x)                       \
+({                                          \
+    mp_limb_t __ctz_x = (x);                \
+    mp_limb_t count;                        \
+    __asm__ ("popcnt %0 = %1"               \
+            : "=r" (count)                  \
+            : "r" ((__ctz_x-1) & ~__ctz_x));\
+    count;                                  \
+})
+#endif
 
 /* Do both product parts in assembly, since that gives better code with
    all gcc versions.  Some callers will just use the upper part, and in
@@ -468,40 +508,6 @@
   } while (0)
 #endif
 
-/* MIPS and ARM - Use clz builtins */
-/* NOTE: Apple clang version 12.0.5 miscompiles the count_leading_zeros fallback */
-#if (defined (__mips__) || defined (__arm__) || defined (__arm64__))
-
-#ifdef _LONG_LONG_LIMB
-#define count_leading_zeros(count,x)            \
-  do {                                          \
-    FLINT_ASSERT ((x) != 0);                    \
-    (count) = __builtin_clzll (x);              \
-  } while (0)
-#else
-#define count_leading_zeros(count,x)            \
-  do {                                          \
-    FLINT_ASSERT ((x) != 0);                    \
-    (count) = __builtin_clzl (x);               \
-  } while (0)
-#endif
-
-#ifdef _LONG_LONG_LIMB
-#define count_trailing_zeros(count,x)           \
-  do {                                          \
-    FLINT_ASSERT ((x) != 0);                    \
-    (count) = __builtin_ctzll (x);              \
-  } while (0)
-#else
-#define count_trailing_zeros(count,x)           \
-  do {                                          \
-    FLINT_ASSERT ((x) != 0);                    \
-    (count) = __builtin_ctzl (x);               \
-  } while (0)
-#endif
-
-#endif /* MIPS, ARM */
-
 #define udiv_qrnnd_int(q, r, n1, n0, d)                                \
   do {									                                      \
     mp_limb_t __d1, __d0, __q1, __q0, __r1, __r0, __m;			        \
@@ -542,50 +548,44 @@
     (r) = __r0;								                                \
   } while (0)
 
-#ifndef count_leading_zeros
-#define count_leading_zeros(count, x)                        \
-  do {									                            \
-    mp_limb_t __xr = (x);							                \
-    mp_limb_t __a;								                   \
-									                                  \
-    if (GMP_LIMB_BITS == 32)						       \
-      {									                            \
-	__a = __xr < ((mp_limb_t) 1 << 2*__BITS4)				       \
-	  ? (__xr < ((mp_limb_t) 1 << __BITS4) ? 1 : __BITS4 + 1) \
-	  : (__xr < ((mp_limb_t) 1 << 3*__BITS4) ? 2*__BITS4 + 1	 \
-	  : 3*__BITS4 + 1);						                      \
-      }									                            \
-    else								                               \
-      {									                            \
-	for (__a = GMP_LIMB_BITS - 8; __a > 0; __a -= 8) \
-	  if (((__xr >> __a) & 0xff) != 0)				             \
-	    break;							                            \
-	++__a;								                            \
-      }									                            \
-									                                  \
-    (count) = GMP_LIMB_BITS + 1 - __a - __flint_clz_tab[__xr >> __a]; \
-  } while (0)
+FLINT_DLL extern const unsigned char __flint_clz_tab[128];
+
+#ifndef flint_clz
+# define flint_clz flint_clz
+static __inline__ flint_bitcnt_t flint_clz(mp_limb_t x)
+{
+    mp_limb_t __a, __xr = x;
+    if (GMP_LIMB_BITS == 32)
+        __a = __xr < ((mp_limb_t) 1 << 2*__BITS4)
+        ? (__xr < ((mp_limb_t) 1 << __BITS4) ? 1 : __BITS4 + 1)
+        : (__xr < ((mp_limb_t) 1 << 3*__BITS4) ? 2*__BITS4 + 1
+        : 3*__BITS4 + 1);
+    else
+    {
+        for (__a = GMP_LIMB_BITS - 8; __a > 0; __a -= 8)
+            if (((__xr >> __a) & 0xff) != 0)
+                break;
+        ++__a;
+    }
+    return GMP_LIMB_BITS + 1 - __a - __flint_clz_tab[__xr >> __a];
+}
 #endif
 
 #if !(GMP_LIMB_BITS == 64 && defined (__ia64))
-
-#ifndef count_trailing_zeros
-#define count_trailing_zeros(count, x)                 \
-  do {									                      \
-    mp_limb_t __ctz_x = (x);						          \
-    mp_limb_t __ctz_c;							             \
-    FLINT_ASSERT (__ctz_x != 0);						       \
-    count_leading_zeros (__ctz_c, __ctz_x & -__ctz_x); \
-    (count) = GMP_LIMB_BITS - 1 - __ctz_c;	 \
-  } while (0)
-#endif
-
+# ifndef flint_ctz
+#  define flint_ctz flint_ctz
+static __inline__ flint_bitcnt_t flint_ctz(mp_limb_t x)
+{
+    mp_limb_t __ctz_x = (x);
+    FLINT_ASSERT (__ctz_x != 0);
+    return GMP_LIMB_BITS - 1 - flint_clz(__ctz_x & -__ctz_x);
+}
+# endif
 #endif
 
 #define udiv_qrnnd(q, r, n1, n0, d)                  \
     do {                                             \
-       mp_limb_t __norm;                             \
-       count_leading_zeros(__norm, (d));             \
+       mp_limb_t __norm = flint_clz(d);              \
        if (__norm)                                   \
        {                                             \
            udiv_qrnnd_int((q), (r), ((n1) << __norm) + ((n0) >> (GMP_LIMB_BITS - __norm)), (n0) << __norm, (d) << __norm); \

@@ -23,7 +23,7 @@ flint_bitcnt_t fmpz_val2(const fmpz_t x)
         if (c == 0)
             t = 0;
         else
-            count_trailing_zeros(t, FLINT_ABS(c));
+            t = flint_ctz(FLINT_ABS(c));
     }
     else
     {
@@ -37,7 +37,7 @@ flint_bitcnt_t fmpz_val2(const fmpz_t x)
             t += FLINT_BITS;
         }
 
-        count_trailing_zeros(u, *d);
+        u = flint_ctz(*d);
         t += u;
     }
 

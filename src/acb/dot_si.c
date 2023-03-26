@@ -58,7 +58,7 @@ acb_dot_si(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong xst
         else
         {
             av = FLINT_ABS(v);
-            count_leading_zeros(bc, av);
+            bc = flint_clz(av);
 
             ARF_EXP(arb_midref(t + i)) = FLINT_BITS - bc;
             ARF_NOPTR_D(arb_midref(t + i))[0] = av << bc;

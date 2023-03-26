@@ -51,7 +51,7 @@ _fmpz_poly_evaluate_divconquer_fmpq(fmpz_t rnum, fmpz_t rden,
         fmpz_set(tden, yden + 0);
 
         i += 2;
-        count_trailing_zeros(c, i);
+        c = flint_ctz(i);
 
         for (k = 1; k < c; k++)
         {
@@ -72,7 +72,7 @@ _fmpz_poly_evaluate_divconquer_fmpq(fmpz_t rnum, fmpz_t rden,
         fmpz_set(tnum, poly + (len - 1));
         fmpz_one(tden);
 
-        count_trailing_zeros(c, len + 1);
+        c = flint_ctz(len + 1);
 
         for (k = 1; k < c; k++)
         {

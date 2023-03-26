@@ -518,7 +518,7 @@ again:
     if (n == xd_len + 1)
         xd_ptr[n - 1] = 0;
 
-    count_leading_zeros(x_lzcnt, xn_ptr[n - 1]);
+    x_lzcnt = flint_clz(xn_ptr[n - 1]);
     A1 = MPN_LEFT_SHIFT_HI(xn_ptr[n - 1], xn_ptr[n - 2], x_lzcnt);
     A0 = MPN_LEFT_SHIFT_HI(xn_ptr[n - 2], xn_ptr[n - 3], x_lzcnt);
     B1 = MPN_LEFT_SHIFT_HI(xd_ptr[n - 1], xd_ptr[n - 2], x_lzcnt);
@@ -696,7 +696,7 @@ again:
     if (nr == xrd_len + 1)
         xrd_ptr[nr - 1] = 0;
 
-    count_leading_zeros(x_lzcnt, xln_ptr[nl - 1]);
+    x_lzcnt = flint_clz(xln_ptr[nl - 1]);
     A1 = MPN_LEFT_SHIFT_HI(xln_ptr[nl - 1], xln_ptr[nl - 2], x_lzcnt);
     A0 = MPN_LEFT_SHIFT_HI(xln_ptr[nl - 2], xln_ptr[nl - 3], x_lzcnt);
     B1 = MPN_LEFT_SHIFT_HI(xld_ptr[nl - 1], xld_ptr[nl - 2], x_lzcnt);
