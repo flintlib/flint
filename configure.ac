@@ -212,7 +212,7 @@ esac],
 enable_dependency_tracking="yes")
 
 AC_ARG_ENABLE(gmp-internals,
-[AS_HELP_STRING([--enable-gmp-internals],[Enables optimization by calling GMP internals directly [default=no]])],
+[AS_HELP_STRING([--enable-gmp-internals],[Enables optimization by calling GMP internals directly [default=yes]])],
 [case $enableval in
 yes|no)
     ;;
@@ -220,7 +220,7 @@ yes|no)
     AC_MSG_ERROR([Bad value $enableval for --enable-dependency-tracking. Need yes or no.])
     ;;
 esac],
-enable_gmp_internals="no")
+enable_gmp_internals="yes")
 
 ################################################################################ 
 # packages
@@ -611,6 +611,18 @@ AC_CHECK_LIB(gmp,__gmpz_init,
 submit a bug report to <https://github.com/flintlib/flint2/issues/> so
 that we can either fix the issue or give a more proper error message.])])
 
+if test "$enable_gmp_internals" = "yes";
+then
+    AC_CHECK_LIB([gmp],[__gmpn_gcd_11],
+    [],
+    [AC_MSG_ERROR([`mpn_gcd_11' was not found in the GMP library. It is needed to enable GMP
+internals.])])
+    AC_CHECK_LIB([gmp],[__gmpn_div_q],
+    [],
+    [AC_MSG_ERROR([`mpn_div_q' was not found in the GMP library. It is needed to enable GMP
+internals.])])
+fi
+
 AC_CHECK_LIB(mpfr,mpfr_init,
 [LIBS="-lmpfr $LIBS"],
 [AC_MSG_ERROR([MPFR library was not found.  If you indeed have MPFR installed, please
@@ -661,18 +673,6 @@ submit a bug report to <https://github.com/flintlib/flint2/issues/> so
 that we can either fix the issue or give a more proper error message.])])
     AC_LANG_POP
     LIBS="$SAVE_libs"
-fi
-
-if test "$enable_gmp_internals" = "yes";
-then
-    AC_CHECK_LIB([gmp],[__gmpn_gcd_11],
-    [],
-    [AC_MSG_ERROR([`mpn_gcd_11' was not found in the GMP library. It is needed to enable GMP
-internals.])])
-    AC_CHECK_LIB([gmp],[__gmpn_div_q],
-    [],
-    [AC_MSG_ERROR([`mpn_div_q' was not found in the GMP library. It is needed to enable GMP
-internals.])])
 fi
 
 ################################################################################ 
