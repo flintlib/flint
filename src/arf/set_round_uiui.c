@@ -15,7 +15,7 @@
    Writes inexact, v, exp. Warning: macro without parentheses. */
 #define ARF_NORMALISE_ROUND_LIMB(inexact, exp, v, sgnbit, prec, rnd) \
     do { \
-        count_leading_zeros(exp, v); \
+        exp = flint_clz(v); \
         v <<= exp; \
         exp = FLINT_BITS - exp; \
         if (prec >= exp) \
@@ -73,8 +73,8 @@ _arf_set_round_uiui(arf_t z, slong * fix, mp_limb_t hi, mp_limb_t lo, int sgnbit
     }
     else
     {
-        count_leading_zeros(leading, hi);
-        count_trailing_zeros(trailing, lo);
+        leading = flint_clz(hi);
+        trailing = flint_ctz(lo);
 
         bc = 2 * FLINT_BITS - leading - trailing;
 

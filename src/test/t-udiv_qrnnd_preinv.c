@@ -29,7 +29,7 @@ int main(void)
       {
          d = n_randtest_not_zero(state);
          nh = n_randtest(state);
-         count_leading_zeros(norm, d);
+         norm = flint_clz(d);
          d <<= norm;
       } while (nh >= d);
       nl = n_randtest(state);

@@ -33,7 +33,7 @@ n_powmod2_fmpz_preinv(ulong a, const fmpz_t exp, ulong n, ulong ninv)
     if (a == 0)
         return 0;
 
-    count_leading_zeros(norm, n);
+    norm = flint_clz(n);
     a <<= norm;
     n <<= norm;
 

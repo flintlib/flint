@@ -25,7 +25,7 @@ n_mod2_preinv(ulong a, ulong n, ulong ninv)
 
     FLINT_ASSERT(n != 0);
 
-    count_leading_zeros(norm, n);
+    norm = flint_clz(n);
     n <<= norm;
 
     {

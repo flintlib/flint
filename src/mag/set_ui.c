@@ -26,7 +26,7 @@ mag_set_ui(mag_t z, ulong x)
         slong bits;
         mp_limb_t overflow;
 
-        count_leading_zeros(bits, x);
+        bits = flint_clz(x);
         bits = FLINT_BITS - bits;
 
         if (bits <= MAG_BITS)
@@ -60,7 +60,7 @@ mag_set_ui_lower(mag_t z, ulong x)
     {
         unsigned int bits;
 
-        count_leading_zeros(bits, x);
+        bits = flint_clz(x);
         bits = FLINT_BITS - bits;
 
         if (bits <= MAG_BITS)

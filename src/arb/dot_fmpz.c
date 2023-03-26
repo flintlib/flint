@@ -63,7 +63,7 @@ arb_dot_fmpz(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong x
         else if (!COEFF_IS_MPZ(v))
         {
             av = FLINT_ABS(v);
-            count_leading_zeros(bc, av);
+            bc = flint_clz(av);
 
             ARF_EXP(arb_midref(t + i)) = FLINT_BITS - bc;
             ARF_NOPTR_D(arb_midref(t + i))[0] = av << bc;
@@ -77,7 +77,7 @@ arb_dot_fmpz(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong x
             size = FLINT_ABS(ssize);
 
             av = z->_mp_d[size - 1];
-            count_leading_zeros(bc, av);
+            bc = flint_clz(av);
 
             if (size == 1)
             {

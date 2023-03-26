@@ -20,7 +20,7 @@ n_remove2_precomp(mp_limb_t * n, mp_limb_t p, double ppre)
 
     if (p == 2)
     {
-        count_trailing_zeros(exp, *n);
+        exp = flint_ctz(*n);
         if (exp)
             (*n) >>= exp;
 

@@ -29,7 +29,7 @@ void fmpz_preinvn_init(fmpz_preinvn_t inv, const fmpz_t f)
    {
       inv->dinv = flint_malloc(sizeof(mp_limb_t));
       if (c < 0) c = -c;
-      count_leading_zeros(norm, c);
+      norm = flint_clz(c);
       if (norm) c <<= norm;
       flint_mpn_preinvn(inv->dinv, (mp_ptr) &c, 1);
       inv->n = 1;
@@ -38,7 +38,7 @@ void fmpz_preinvn_init(fmpz_preinvn_t inv, const fmpz_t f)
       __mpz_struct * mc = COEFF_TO_PTR(c);
       slong size = FLINT_ABS(mc->_mp_size);
       inv->dinv = flint_malloc(size*sizeof(mp_limb_t));
-      count_leading_zeros(norm, mc->_mp_d[size - 1]);
+      norm = flint_clz(mc->_mp_d[size - 1]);
       if (norm)
       {
          t = flint_malloc(size*sizeof(mp_limb_t));

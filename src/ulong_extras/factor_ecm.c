@@ -46,7 +46,7 @@ n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
 
     const mp_limb_t *prime_array;
 
-    count_leading_zeros(n_ecm_inf->normbits, n);
+    n_ecm_inf->normbits = flint_clz(n);
     n <<= n_ecm_inf->normbits;
     n_ecm_inf->ninv = n_preinvert_limb(n);
     n_ecm_inf->one = UWORD(1) << n_ecm_inf->normbits;

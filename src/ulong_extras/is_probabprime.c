@@ -48,7 +48,7 @@ int n_is_probabprime(mp_limb_t n)
 
     isprime = 0;
     d = n - 1;
-    count_trailing_zeros(norm, d);
+    norm = flint_ctz(d);
     d >>= norm;
 
 #if !FLINT64

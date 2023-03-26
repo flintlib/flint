@@ -186,7 +186,7 @@ fmpz_factor_pollard_brent_single(fmpz_t p_factor, fmpz_t n_in, fmpz_t yi,
     if (n_size == 1)
     {
         val = fmpz_get_ui(n_in);
-        count_leading_zeros(normbits, val);
+        normbits = flint_clz(val);
         val <<= normbits;
         valinv = n_preinvert_limb(val);
 
@@ -203,7 +203,7 @@ fmpz_factor_pollard_brent_single(fmpz_t p_factor, fmpz_t n_in, fmpz_t yi,
 
     mptr = COEFF_TO_PTR(*yi);
     temp = COEFF_TO_PTR(*n_in)->_mp_d;
-    count_leading_zeros(normbits, temp[n_size - 1]);
+    normbits = flint_clz(temp[n_size - 1]);
 
     TMP_START;
     a    = TMP_ALLOC(n_size * sizeof(mp_limb_t));
@@ -214,7 +214,7 @@ fmpz_factor_pollard_brent_single(fmpz_t p_factor, fmpz_t n_in, fmpz_t yi,
     /* copying n_in onto n, and normalizing */
 
     temp = COEFF_TO_PTR(*n_in)->_mp_d;
-    count_leading_zeros(normbits, temp[n_size - 1]);
+    normbits = flint_clz(temp[n_size - 1]);
     if (normbits)
         mpn_lshift(n, temp, n_size, normbits);
     else

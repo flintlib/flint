@@ -18,7 +18,7 @@ int main(void)
    FLINT_TEST_INIT(state);
 
 
-   flint_printf("count_leading_zeros....");
+   flint_printf("flint_clz....");
    fflush(stdout);
 
    for (i = 0; i < 1000000; i++)
@@ -29,7 +29,7 @@ int main(void)
       n = n_randtest(state);
 
       if (n != 0)
-         count_leading_zeros(count, n);
+         count = flint_clz(n);
 
       result = ((n == UWORD(0)) || (((slong)(n << count) < WORD(0)) && (r_shift(n, FLINT_BITS-count) == UWORD(0))));
       if (!result)

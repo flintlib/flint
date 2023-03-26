@@ -15,7 +15,7 @@
    Writes inexact, v, exp. Warning: macro without parentheses. */
 #define ARF_NORMALISE_ROUND_LIMB(inexact, exp, v, sgnbit, prec, rnd) \
     do { \
-        count_leading_zeros(exp, v); \
+        exp = flint_clz(v); \
         v <<= exp; \
         exp = FLINT_BITS - exp; \
         if (prec >= exp) \

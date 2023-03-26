@@ -63,7 +63,7 @@ fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
     /* copying n_in onto n, and normalizing */
 
     temp = COEFF_TO_PTR(*n_in)->_mp_d;
-    count_leading_zeros(normbits, temp[n_size - 1]);
+    normbits = flint_clz(temp[n_size - 1]);
     if (normbits)
         mpn_lshift(n, temp, n_size, normbits);
     else

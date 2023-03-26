@@ -25,7 +25,7 @@ nmod_poly_init2_preinv(nmod_poly_t poly,
     poly->mod.n = n;
     poly->mod.ninv = ninv;
 
-    count_leading_zeros(poly->mod.norm, n);
+    poly->mod.norm = flint_clz(n);
 
     poly->alloc = alloc;
     poly->length = 0;

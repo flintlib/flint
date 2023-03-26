@@ -27,7 +27,7 @@ arf_get_fmpz_2exp(fmpz_t man, fmpz_t exp, const arf_t x)
 
         ARF_GET_MPN_READONLY(xptr, xn, x);
 
-        count_trailing_zeros(shift, xptr[0]);
+        shift = flint_ctz(xptr[0]);
 
         fmpz_sub_ui(exp, ARF_EXPREF(x), xn * FLINT_BITS - shift);
 

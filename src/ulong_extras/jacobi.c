@@ -29,7 +29,7 @@ int _n_jacobi_unsigned(mp_limb_t x, mp_limb_t y, unsigned int r)
             return 0;
 
         /* x = odd part of x */
-        count_trailing_zeros(e, x);
+        e = flint_ctz(x);
         x >>= e;
         r ^= ((y ^ (y>>1)) & (2*e)); /* (2|y) = (-1)^((y^2-1)/8) */
 

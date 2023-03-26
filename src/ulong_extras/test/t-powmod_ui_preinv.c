@@ -38,7 +38,7 @@ main(void)
         } while (n_gcd(d, a) != UWORD(1));
         exp = n_randtest(state);
 
-        count_leading_zeros(norm, d);
+        norm = flint_clz(d);
 
         dinv = n_preinvert_limb(d);
         r1 = n_powmod_ui_preinv(a << norm, exp, d << norm, dinv, norm) >> norm;
@@ -70,7 +70,7 @@ main(void)
 
         d = n_randtest_not_zero(state);
 
-        count_leading_zeros(norm, d);
+        norm = flint_clz(d);
 
         dinv = n_preinvert_limb(d);
         r = n_powmod_ui_preinv(0, 0, d << norm, dinv, norm) >> norm;
@@ -93,7 +93,7 @@ main(void)
 
         exp = n_randtest(state);
 
-        count_leading_zeros(norm, 1);
+        norm = flint_clz(1);
 
         dinv = n_preinvert_limb(1);
         r = n_powmod_ui_preinv(0, exp, UWORD(1) << norm, dinv, norm) >> norm;

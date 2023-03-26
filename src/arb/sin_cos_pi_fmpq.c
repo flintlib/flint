@@ -23,7 +23,7 @@ use_algebraic(const fmpz_t v, const fmpz_t w, slong prec)
     if (q <= 6)
         return 1;
 
-    count_trailing_zeros(r, q);
+    r = flint_ctz(q);
     q >>= r;
 
     if (r >= 4 && prec < (r - 3) * 300)
@@ -122,8 +122,8 @@ reduce_octant(fmpz_t v, fmpz_t w, const fmpq_t x)
 
         if (vv != 0)
         {
-            count_trailing_zeros(vval, vv);
-            count_trailing_zeros(wval, ww);
+            vval = flint_ctz(vv);
+            wval = flint_ctz(ww);
             vval = FLINT_MIN(vval, wval);
             vv >>= vval;
             ww >>= vval;

@@ -23,7 +23,7 @@ _arf_set_round_mpn(arf_t y, slong * exp_shift, mp_srcptr x, mp_size_t xn,
     int increment, inexact;
 
     /* Compute the total bit length of x. */
-    count_leading_zeros(leading, x[xn - 1]);
+    leading = flint_clz(x[xn - 1]);
     exp = xn * FLINT_BITS - leading;
 
     /* Set exponent. */
@@ -33,7 +33,7 @@ _arf_set_round_mpn(arf_t y, slong * exp_shift, mp_srcptr x, mp_size_t xn,
     val_limbs = 0;
     while (x[val_limbs] == 0)
         val_limbs++;
-    count_trailing_zeros(val_bits, x[val_limbs]);
+    val_bits = flint_ctz(x[val_limbs]);
     val = val_limbs * FLINT_BITS + val_bits;
 
     if (exp - val <= prec)
@@ -92,7 +92,7 @@ _arf_set_round_mpn(arf_t y, slong * exp_shift, mp_srcptr x, mp_size_t xn,
                 t = x[val_limbs];
             }
 
-            count_trailing_zeros(val_bits, t);
+            val_bits = flint_ctz(t);
             val = val_limbs * FLINT_BITS + val_bits;
         }
         else
@@ -110,7 +110,7 @@ _arf_set_round_mpn(arf_t y, slong * exp_shift, mp_srcptr x, mp_size_t xn,
                     goto END_SCAN1;
                 }
             }
-            count_trailing_zeros(val_bits, t);
+            val_bits = flint_ctz(t);
             END_SCAN1:
             val = val_limbs * FLINT_BITS + val_bits;
 

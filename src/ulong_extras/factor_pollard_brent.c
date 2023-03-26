@@ -130,7 +130,7 @@ n_factor_pollard_brent(mp_limb_t *factor, flint_rand_t state, mp_limb_t n_in,
     ret = 0;
     max = n_in -3;    /* 1 <= a <= n - 3 */
 
-    count_leading_zeros(normbits, n_in);
+    normbits = flint_clz(n_in);
     n = n_in;
     n <<= normbits;
     ninv = n_preinvert_limb(n);

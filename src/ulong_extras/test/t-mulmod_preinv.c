@@ -29,7 +29,7 @@ main(void)
         a = n_randtest(state) % d;
         b = n_randtest(state) % d;
 
-        count_leading_zeros(norm, d);
+        norm = flint_clz(d);
 
         dinv = n_preinvert_limb(d << norm);
 

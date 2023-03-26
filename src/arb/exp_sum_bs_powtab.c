@@ -134,7 +134,7 @@ bsplit(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
 
     if (b - a == 1)
     {
-        count_trailing_zeros(cc, (a + 1));
+        cc = flint_ctz((a + 1));
         fmpz_set_ui(Q, (a + 1) >> cc);
         *Qexp = r + cc;
 
@@ -146,11 +146,11 @@ bsplit(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
         fmpz_mul_2exp(T, T, r);
         fmpz_add(T, T, xpow + 1);
 
-        count_trailing_zeros(cc, (a + 2));
+        cc = flint_ctz((a + 2));
         fmpz_set_ui(Q, (a + 2) >> cc);
         *Qexp = r + cc;
 
-        count_trailing_zeros(cc, (a + 1));
+        cc = flint_ctz((a + 1));
         fmpz_mul_ui(Q, Q, (a + 1) >> cc);
         *Qexp += r + cc;
     }

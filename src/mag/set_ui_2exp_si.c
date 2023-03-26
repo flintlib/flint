@@ -26,7 +26,7 @@ mag_set_ui_2exp_si(mag_t z, ulong x, slong e)
         slong bits;
         mp_limb_t overflow;
 
-        count_leading_zeros(bits, x);
+        bits = flint_clz(x);
         bits = FLINT_BITS - bits;
 
         if (bits <= MAG_BITS)

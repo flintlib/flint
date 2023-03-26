@@ -212,7 +212,7 @@ void nmod_init(nmod_t * mod, mp_limb_t n)
 {
    mod->n = n;
    mod->ninv = n_preinvert_limb(n);
-   count_leading_zeros(mod->norm, n);
+   mod->norm = flint_clz(n);
 }
 
 /* discrete logs a la Pohlig - Hellman ***************************************/

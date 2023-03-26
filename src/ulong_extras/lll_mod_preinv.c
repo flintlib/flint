@@ -23,7 +23,7 @@ n_lll_mod_preinv(ulong a_hi, ulong a_mi, ulong a_lo, ulong n, ulong ninv)
 {
     ulong q0, q1, r, norm;
 
-    count_leading_zeros(norm, n);
+    norm = flint_clz(n);
     n <<= norm;
 
     /*

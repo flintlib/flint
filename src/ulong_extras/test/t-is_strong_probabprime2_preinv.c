@@ -48,7 +48,7 @@ int main(void)
          while (a == UWORD(0));
 
          dinv = n_preinvert_limb(d);
-         count_trailing_zeros(norm, d - 1);
+         norm = flint_ctz(d - 1);
          result = n_is_strong_probabprime2_preinv(d, dinv, a, (d - 1)>>norm);
 
          if (!result)
@@ -84,7 +84,7 @@ int main(void)
          while (a == UWORD(0));
 
          dinv = n_preinvert_limb(d);
-         count_trailing_zeros(norm, d - 1);
+         norm = flint_ctz(d - 1);
          result = !n_is_strong_probabprime2_preinv(d, dinv, a, (d - 1)>>norm);
 
          if (!result) count++;

@@ -362,7 +362,7 @@ static __inline__
 mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
 {
    mp_limb_t zeros = FLINT_BITS;
-   if (x) count_leading_zeros(zeros, x);
+   if (x) zeros = flint_clz(x);
    return FLINT_BITS - zeros;
 }
 

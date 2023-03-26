@@ -226,7 +226,7 @@ slong qfb_reduced_forms(qfb ** forms, slong d)
     {
         b2 = ((mp_limb_t)(b*b - d))/4;
 
-        count_trailing_zeros(exp, b2); /* powers of 2 */
+        exp = flint_ctz(b2); /* powers of 2 */
         if (exp)
         {
             fac[b].p[fac[b].num] = 2;

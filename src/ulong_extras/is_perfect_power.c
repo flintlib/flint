@@ -118,7 +118,7 @@ int n_is_perfect_power(ulong * root, ulong n)
     }
 
     /* highest power of 2 */
-    count_trailing_zeros(count, n);
+    count = flint_ctz(n);
     n >>= count;
 
     if (n == 1)

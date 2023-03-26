@@ -27,7 +27,7 @@ arf_is_int(const arf_t x)
         return mpz_sgn(COEFF_TO_PTR(exp)) > 0;
 
     ARF_GET_MPN_READONLY(xp, xn, x);
-    count_trailing_zeros(c, xp[0]);
+    c = flint_ctz(xp[0]);
     return exp - xn * FLINT_BITS + c >= 0;
 }
 

@@ -996,7 +996,7 @@ slong _fmpz_mpoly_divides_stripe1(
         FLINT_ASSERT(!COEFF_IS_MPZ(Bcoeff[0]));
         lc_abs = FLINT_ABS(Bcoeff[0]);
         lc_sign = FLINT_SIGN_EXT(Bcoeff[0]);
-        count_leading_zeros(lc_norm, lc_abs);
+        lc_norm = flint_clz(lc_abs);
         lc_n = lc_abs << lc_norm;
         invert_limb(lc_i, lc_n);
     }
@@ -1347,7 +1347,7 @@ slong _fmpz_mpoly_divides_stripe(
         FLINT_ASSERT(!COEFF_IS_MPZ(Bcoeff[0]));
         lc_abs = FLINT_ABS(Bcoeff[0]);
         lc_sign = FLINT_SIGN_EXT(Bcoeff[0]);
-        count_leading_zeros(lc_norm, lc_abs);
+        lc_norm = flint_clz(lc_abs);
         lc_n = lc_abs << lc_norm;
         invert_limb(lc_i, lc_n);
     }

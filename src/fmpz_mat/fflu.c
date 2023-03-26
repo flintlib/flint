@@ -148,7 +148,7 @@ fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
         {
             uden = FLINT_ABS((slong)(*den));
             dsgn = 0 > (slong)(*den);
-            count_leading_zeros(norm, uden);
+            norm = flint_clz(uden);
             invert_limb(dinv, uden << norm);
 
             if (fmpz_sizeinbase(den, 2) > SMALL_FMPZ_BITCOUNT_MAX)

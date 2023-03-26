@@ -28,7 +28,7 @@ int z_kronecker(slong a, slong n)
     if (un == 0)
         return ua == 1;
 
-    count_trailing_zeros(en, un);
+    en = flint_ctz(un);
 
     /* make denominator positive */
     r = sa & sn;

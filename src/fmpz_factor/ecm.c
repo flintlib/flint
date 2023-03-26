@@ -75,14 +75,14 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
 
     if ((!COEFF_IS_MPZ(* n_in)))
     {
-        count_leading_zeros(ecm_inf->normbits, fmpz_get_ui(n_in));
+        ecm_inf->normbits = flint_clz(fmpz_get_ui(n_in));
         n[0] = fmpz_get_ui(n_in);
         n[0] <<= ecm_inf->normbits;
     }
     else
     {
         mptr = COEFF_TO_PTR(* n_in);
-        count_leading_zeros(ecm_inf->normbits, mptr->_mp_d[n_size - 1]);
+        ecm_inf->normbits = flint_clz(mptr->_mp_d[n_size - 1]);
         if (ecm_inf->normbits)
            mpn_lshift(n, mptr->_mp_d, n_size, ecm_inf->normbits);
         else

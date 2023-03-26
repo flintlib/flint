@@ -132,7 +132,7 @@ int nmod_mpoly_convert_from_nmod_mpolyd_degbound(
         mpoly_get_cmpmask(pcurexp, N, bits, ctx->minfo);
         if (topmask != UWORD(0))
         {
-            count_leading_zeros(msb, topmask);
+            msb = flint_clz(topmask);
             msb = (FLINT_BITS - 1)^msb;
         } else
         {

@@ -54,7 +54,7 @@ int main(void)
        mpz_fdiv_r(r1, r1, d);
 
        /* normalise */
-       count_leading_zeros(norm, d->_mp_d[size_d - 1]);
+       norm = flint_clz(d->_mp_d[size_d - 1]);
        mpz_mul_2exp(a, a, norm);
        mpz_mul_2exp(b, b, norm);
        mpz_mul_2exp(d, d, norm);
