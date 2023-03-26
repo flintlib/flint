@@ -316,7 +316,7 @@ ulong n_gcd(ulong x, ulong y)
         x >>= mx;
         y >>= my;
         res = (x != 1 && y != 1) ? mpn_gcd_11(x, y) : 1;
-        res <<= FLINT_MAX(mx, my);
+        res <<= FLINT_MIN(mx, my);
         return res;
 #else
         return mpn_gcd_1(&x, 1, y);
