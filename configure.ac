@@ -211,6 +211,17 @@ yes|no)
 esac],
 enable_dependency_tracking="yes")
 
+AC_ARG_ENABLE(gmp-internals,
+[AS_HELP_STRING([--enable-gmp-internals],[Enables optimization by calling GMP internals directly [default=no]])],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-dependency-tracking. Need yes or no.])
+    ;;
+esac],
+enable_gmp_internals="no")
+
 ################################################################################ 
 # packages
 ################################################################################ 
@@ -652,6 +663,18 @@ that we can either fix the issue or give a more proper error message.])])
     LIBS="$SAVE_libs"
 fi
 
+if test "$enable_gmp_internals" = "yes";
+then
+    AC_CHECK_LIB([gmp],[__gmpn_gcd_11],
+    [],
+    [AC_MSG_ERROR([`mpn_gcd_11' was not found in the GMP library. It is needed to enable GMP
+internals.])])
+    AC_CHECK_LIB([gmp],[__gmpn_div_q],
+    [],
+    [AC_MSG_ERROR([`mpn_div_q' was not found in the GMP library. It is needed to enable GMP
+internals.])])
+fi
+
 ################################################################################ 
 # check settings and environment
 ################################################################################ 
@@ -900,6 +923,11 @@ fi
 if test "$enable_assert" = "yes";
 then
     AC_DEFINE(FLINT_WANT_ASSERT,1,[Define to enable use of asserts.])
+fi
+
+if test "$enable_gmp_internals" = "yes";
+then
+    AC_DEFINE(FLINT_WANT_GMP_INTERNALS,1,[Define to enable use of GMP internals.])
 fi
 
 ################################################################################ 
