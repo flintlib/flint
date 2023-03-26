@@ -33,6 +33,9 @@
 extern "C" {
 #endif
 
+#define count_leading_zeros _Pragma("GCC error \"'count_leading_zeros' is deprecated. Use 'flint_clz' instead.\"")
+#define count_trailing_zeros _Pragma("GCC error \"'count_trailing_zeros' is deprecated. Use 'flint_ctz' instead.\"")
+
 #ifdef FLINT_HAS_POPCNT
 # ifndef _LONG_LONG_LIMB
 #  define flint_popcount __builtin_popcountl
