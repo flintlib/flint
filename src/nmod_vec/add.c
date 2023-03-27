@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010 William Hart
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -12,6 +13,9 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 
+FLINT_PUSH_OPTIONS
+FLINT_OPTIMIZE(-O3)
+
 void _nmod_vec_add(mp_ptr res, mp_srcptr vec1,
                    mp_srcptr vec2, slong len, nmod_t mod)
 {
@@ -19,11 +23,14 @@ void _nmod_vec_add(mp_ptr res, mp_srcptr vec1,
 
     if (mod.norm)
     {
-        for (i = 0 ; i < len; i++)
-        res[i] = _nmod_add(vec1[i], vec2[i], mod);
-    } else
+        for (i = 0; i < len; i++)
+            res[i] = _nmod_add(vec1[i], vec2[i], mod);
+    }
+    else
     {
-        for (i = 0 ; i < len; i++)
-        res[i] = nmod_add(vec1[i], vec2[i], mod);
+        for (i = 0; i < len; i++)
+            res[i] = nmod_add(vec1[i], vec2[i], mod);
     }
 }
+
+FLINT_POP_OPTIONS
