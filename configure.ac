@@ -636,11 +636,11 @@ that we can either fix the issue or give a more proper error message.])])
 if test "$enable_gmp_internals" = "yes";
 then
     AC_CHECK_LIB([gmp],[__gmpn_gcd_11],
-    [],
+    [dummyvar="blabla"],
     [AC_MSG_ERROR([`mpn_gcd_11' was not found in the GMP library. It is needed to enable GMP
 internals.])])
     AC_CHECK_LIB([gmp],[__gmpn_div_q],
-    [],
+    [dummyvar="blabla"],
     [AC_MSG_ERROR([`mpn_div_q' was not found in the GMP library. It is needed to enable GMP
 internals.])])
 fi
