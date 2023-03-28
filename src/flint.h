@@ -122,6 +122,7 @@ typedef struct __FLINT_FILE FLINT_FILE;
 #define FLINT_NORETURN __attribute__ ((noreturn))
 #define FLINT_CONST __attribute__ ((const))
 #define FLINT_WARN_UNUSED __attribute__((warn_unused_result))
+#define FLINT_NOINLINE __attribute__((noinline))
 #define FLINT_PUSH_OPTIONS _Pragma("GCC push_options")
 #define FLINT_POP_OPTIONS _Pragma("GCC pop_options")
 #define FLINT_OPTIMIZE_NESTED_3(part) _Pragma(#part)
@@ -132,9 +133,10 @@ typedef struct __FLINT_FILE FLINT_FILE;
 #define __attribute__(x)
 #define FLINT_UNUSED(x) x
 #define FLINT_SET_BUT_UNUSED(x) x
-#define FLINT_WARN_UNUSED
 #define FLINT_NORETURN
 #define FLINT_CONST
+#define FLINT_WARN_UNUSED
+#define FLINT_NOINLINE
 #define FLINT_PUSH_OPTIONS
 #define FLINT_POP_OPTIONS
 #define FLINT_OPTIMIZE(x)
