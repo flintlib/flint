@@ -45,7 +45,8 @@
 
 /* Memory management *********************************************************/
 
-mpz_ptr _fmpz_new_mpz(void);
+mpz_ptr _fmpz_new_mpz2(mp_size_t limbs);
+FMPZ_INLINE mpz_ptr _fmpz_new_mpz(void) { return _fmpz_new_mpz2(2); }
 
 void _fmpz_clear_mpz(fmpz f);
 void _fmpz_cleanup_mpz_content(void);

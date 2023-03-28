@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 William Hart
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -13,17 +14,32 @@
 #include "gmpcompat.h"
 #include "fmpz.h"
 
-__mpz_struct * _fmpz_new_mpz(void)
+__GMP_DECLSPEC extern void * (*__gmp_allocate_func) (size_t);
+__GMP_DECLSPEC extern void * (*__gmp_reallocate_func) (void *, size_t, size_t);
+__GMP_DECLSPEC extern void   (*__gmp_free_func) (void *, size_t);
+#define ALLOC(x) (x)->_mp_alloc
+#define SIZ(x) (x)->_mp_size
+#define PTR(x) (x)->_mp_d
+
+mpz_ptr _fmpz_new_mpz2(mp_size_t limbs)
 {
-    __mpz_struct * mf = (__mpz_struct *) flint_malloc(sizeof(__mpz_struct));
-    mpz_init2(mf, 2*FLINT_BITS);
+    mpz_ptr mf = (mpz_ptr) flint_malloc(sizeof(__mpz_struct));
+    /* mpz_init2(mf, 2*FLINT_BITS); */
+
+    limbs = FLINT_MAX(2, limbs);
+
+    ALLOC(mf) = limbs;
+    SIZ(mf) = 0;
+    PTR(mf) = __gmp_allocate_func(sizeof(mp_limb_t) * limbs);
     return mf;
 }
 
 void _fmpz_clear_mpz(fmpz f)
 {
-    mpz_clear(COEFF_TO_PTR(f));
-    flint_free(COEFF_TO_PTR(f));
+    mpz_ptr mf = COEFF_TO_PTR(f);
+    if (ALLOC(mf))
+        __gmp_free_func(PTR(mf), sizeof(mp_limb_t) * ALLOC(mf));
+    flint_free(mf);
 }
 
 void _fmpz_cleanup_mpz_content(void)
@@ -96,6 +112,7 @@ void _fmpz_clear_readonly_mpz(mpz_t z)
     if (((z->_mp_size == 1 || z->_mp_size == -1) && (z->_mp_d[0] <= COEFF_MAX))
         || (z->_mp_size == 0))
     {
-        mpz_clear(z);
+        if (ALLOC(z))
+            __gmp_free_func(PTR(z), sizeof(mp_limb_t) * ALLOC(z));
     }
 }

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009, 2013 William Hart
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -19,6 +20,13 @@
 static pthread_once_t fmpz_initialised = PTHREAD_ONCE_INIT;
 pthread_mutex_t fmpz_lock;
 #endif
+
+__GMP_DECLSPEC extern void * (*__gmp_allocate_func) (size_t);
+__GMP_DECLSPEC extern void * (*__gmp_reallocate_func) (void *, size_t, size_t);
+__GMP_DECLSPEC extern void   (*__gmp_free_func) (void *, size_t);
+#define ALLOC(x) (x)->_mp_alloc
+#define SIZ(x) (x)->_mp_size
+#define PTR(x) (x)->_mp_d
 
 /* Always free larger mpz's to avoid wasting too much heap space */
 #define FLINT_MPZ_MAX_CACHE_LIMBS 64
@@ -41,9 +49,11 @@ void fmpz_lock_init()
 }
 #endif
 
-__mpz_struct * _fmpz_new_mpz(void)
+__mpz_struct * _fmpz_new_mpz2(mp_size_t limbs)
 {
     __mpz_struct * z = NULL;
+
+    limbs = FLINT_MAX(2, limbs);
 
 #if FLINT_USES_PTHREAD
     pthread_once(&fmpz_initialised, fmpz_lock_init);
@@ -51,7 +61,16 @@ __mpz_struct * _fmpz_new_mpz(void)
 #endif
 
     if (mpz_free_num != 0)
+    {
         z = mpz_free_arr[--mpz_free_num];
+
+        if (limbs > ALLOC(z))
+        {
+            PTR(z) = __gmp_reallocate_func(PTR(z),
+                    sizeof(mp_limb_t) * ALLOC(z), sizeof(mp_limb_t) * limbs);
+            ALLOC(z) = limbs;
+        }
+    }
     else
     {
         z = flint_malloc(sizeof(__mpz_struct));
@@ -63,7 +82,10 @@ __mpz_struct * _fmpz_new_mpz(void)
         }
         mpz_arr[mpz_num++] = z;
 
-        mpz_init(z);
+        /* mpz_init(z); */
+        ALLOC(z) = limbs;
+        SIZ(z) = 0;
+        PTR(z) = __gmp_allocate_func(sizeof(mp_limb_t) * limbs);
     }
 
 #if FLINT_USES_PTHREAD
@@ -77,8 +99,21 @@ void _fmpz_clear_mpz(fmpz f)
 {
     __mpz_struct * ptr = COEFF_TO_PTR(f);
 
-    if (ptr->_mp_alloc > FLINT_MPZ_MAX_CACHE_LIMBS)
-        mpz_realloc2(ptr, 1);
+    if (ALLOC(ptr) > FLINT_MPZ_MAX_CACHE_LIMBS)
+    {
+        /* mpz_realloc2(ptr, 1); */
+        PTR(ptr) = __gmp_reallocate_func(PTR(ptr),
+                sizeof(mp_limb_t) * ALLOC(ptr), 2 * sizeof(mp_limb_t));
+        SIZ(ptr) = 0;
+        ALLOC(ptr) = 2;
+    }
+    else if (ALLOC(ptr) == 0)
+    {
+        /* NOTE: We do not allow recycling of mpz without allocated limbs */
+        ALLOC(ptr) = 2;
+        SIZ(ptr) = 0;
+        PTR(ptr) = __gmp_allocate_func(2 * sizeof(mp_limb_t));
+    }
 
 #if FLINT_USES_PTHREAD
     pthread_mutex_lock(&fmpz_lock);
@@ -103,7 +138,8 @@ void _fmpz_cleanup_mpz_content(void)
 
     for (i = 0; i < mpz_free_num; i++)
     {
-        mpz_clear(mpz_free_arr[i]);
+        /* mpz_clear(mpz_free_arr[i]); */
+       __gmp_free_func(PTR(mpz_free_arr[i]), sizeof(mp_limb_t) * ALLOC(mpz_free_arr[i]));
         flint_free(mpz_free_arr[i]);
     }
 
@@ -182,7 +218,9 @@ void _fmpz_init_readonly_mpz(fmpz_t f, const mpz_t z)
    *f = WORD(0);
    ptr = _fmpz_promote(f);
 
-   mpz_clear(ptr);
+   /* mpz_clear(ptr); */
+    if (ALLOC(ptr))
+       __gmp_free_func(PTR(ptr), sizeof(mp_limb_t) * ALLOC(ptr));
    *ptr = *z;
 }
 
@@ -191,7 +229,8 @@ void _fmpz_clear_readonly_mpz(mpz_t z)
     if (((z->_mp_size == 1 || z->_mp_size == -1) && (z->_mp_d[0] <= COEFF_MAX))
         || (z->_mp_size == 0))
     {
-        mpz_clear(z);
+        /* mpz_clear(z); */
+        if (ALLOC(z))
+           __gmp_free_func(PTR(z), sizeof(mp_limb_t) * ALLOC(z));
     }
-
 }
