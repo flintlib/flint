@@ -28,8 +28,8 @@ int _fmpz_mod_mpoly_divrem_ideal_monagan_pearce(
     slong len3;
     slong heap_len = 2; /* heap zero index unused */
     mpoly_heap_s * heap;
-    mpoly_nheap_t ** chains;
-    slong ** hinds;
+    mpoly_nheap_t ** chains, * chains_ptr;
+    slong ** hinds, * hinds_ptr;
     mpoly_nheap_t * x;
     fmpz * r_coeff = R->coeffs;
     ulong * r_exp = R->exps;
@@ -47,14 +47,21 @@ int _fmpz_mod_mpoly_divrem_ideal_monagan_pearce(
 
     fmpz_init(acc);
 
-    /* TODO figure out how to avoid TMP_ALLOC in a loop */
     chains = TMP_ARRAY_ALLOC(Blen, mpoly_nheap_t *);
     hinds = TMP_ARRAY_ALLOC(Blen, slong *);
+
+    /* chains[w], hinds[w] will be arrays of length Bs[w]->length; combine the allocations*/
+    len3 = 0;
+    for (w = 0; w < Blen; w++)
+        len3 += Bs[w]->length;
+    chains_ptr = TMP_ARRAY_ALLOC(len3, mpoly_nheap_t);
+    hinds_ptr = TMP_ARRAY_ALLOC(len3, slong);
+
     len3 = 0;
     for (w = 0; w < Blen; w++)
     {
-        chains[w] = TMP_ARRAY_ALLOC(Bs[w]->length, mpoly_nheap_t);
-        hinds[w] = TMP_ARRAY_ALLOC(Bs[w]->length, slong);
+        chains[w] = chains_ptr + len3;
+        hinds[w] = hinds_ptr + len3;
         len3 += Bs[w]->length;
         for (i = 0; i < Bs[w]->length; i++)
             hinds[w][i] = 1;
