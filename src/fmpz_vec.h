@@ -160,10 +160,10 @@ void _fmpz_vec_sort(fmpz * vec, slong len);
 void _fmpz_vec_add(fmpz * res, const fmpz * vec1, const fmpz * vec2, slong len2);
 
 #if defined(__AVX2__)
-void _fmpz_vec_add2(fmpz * rp, const fmpz * ip, slong len);
+void _fmpz_vec_inplace_add(fmpz * rp, const fmpz * ip, slong len);
 #else
 FMPZ_VEC_INLINE
-void _fmpz_vec_add2(fmpz * rp, const fmpz * ip, slong len)
+void _fmpz_vec_inplace_add(fmpz * rp, const fmpz * ip, slong len)
 {
     _fmpz_vec_add(rp, rp, ip, len);
 }

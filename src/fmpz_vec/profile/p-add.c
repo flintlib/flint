@@ -32,7 +32,7 @@ void profiler(void * arg)
     flint_bitcnt_t bits = info->bits;
     flint_bitcnt_t len = info->len;
     slong ix;
-    fmpz * r1, * r2, * v1, * v2;
+    fmpz * r1, * r2, * vec;
     ulong * timers = info->timers;
     ulong start;
     FLINT_TEST_INIT(state);
@@ -42,20 +42,18 @@ void profiler(void * arg)
     {
         r1 = _fmpz_vec_init(len);
         r2 = _fmpz_vec_init(len);
-        v1 = _fmpz_vec_init(len);
-        v2 = _fmpz_vec_init(len);
+        vec = _fmpz_vec_init(len);
 
-        _fmpz_vec_randtest(v1, state, len, bits);
-        _fmpz_vec_randtest(v2, state, len, bits);
-        _fmpz_vec_set(r2, v1, len);
+        _fmpz_vec_randtest(r1, state, len, bits);
+        _fmpz_vec_randtest(vec, state, len, bits);
+        _fmpz_vec_set(r2, r1, len);
 
-        _fmpz_vec_add(r1, v1, v2, len);
-        _fmpz_vec_add2(r2, v2, len);
+        _fmpz_vec_add(r1, r1, vec, len);
+        _fmpz_vec_inplace_add(r2, vec, len);
 
         _fmpz_vec_clear(r1, len);
         _fmpz_vec_clear(r2, len);
-        _fmpz_vec_clear(v1, len);
-        _fmpz_vec_clear(v2, len);
+        _fmpz_vec_clear(vec, len);
     }
 
     /* real deal */
@@ -63,25 +61,23 @@ void profiler(void * arg)
     {
         r1 = _fmpz_vec_init(len);
         r2 = _fmpz_vec_init(len);
-        v1 = _fmpz_vec_init(len);
-        v2 = _fmpz_vec_init(len);
+        vec = _fmpz_vec_init(len);
 
-        _fmpz_vec_randtest(v1, state, len, bits);
-        _fmpz_vec_randtest(v2, state, len, bits);
-        _fmpz_vec_set(r2, v1, len);
+        _fmpz_vec_randtest(r1, state, len, bits);
+        _fmpz_vec_randtest(vec, state, len, bits);
+        _fmpz_vec_set(r2, r1, len);
 
         start = clock();
-        _fmpz_vec_add(r1, v1, v2, len);
+        _fmpz_vec_add(r1, r1, vec, len);
         timers[0] += clock() - start;
 
         start = clock();
-        _fmpz_vec_add2(r2, v2, len);
+        _fmpz_vec_inplace_add(r2, vec, len);
         timers[1] += clock() - start;
 
         _fmpz_vec_clear(r1, len);
         _fmpz_vec_clear(r2, len);
-        _fmpz_vec_clear(v1, len);
-        _fmpz_vec_clear(v2, len);
+        _fmpz_vec_clear(vec, len);
     }
 
     flint_randclear(state);
@@ -94,7 +90,7 @@ int main(int argc, char ** argv)
     slong len;
     int ix;
 
-    printf("%15s%15s\n", "_fmpz_vec_add", "_fmpz_vec_add2");
+    printf("%15s%15s\n", "_fmpz_vec_add", "_fmpz_vec_inplace_add");
 
     for (bits = 3; bits <= 3 * FLINT_BITS; bits += 20)
     {

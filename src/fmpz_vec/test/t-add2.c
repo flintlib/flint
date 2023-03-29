@@ -19,7 +19,7 @@ main(void)
     int i, result;
     FLINT_TEST_INIT(state);
 
-    flint_printf("add2....");
+    flint_printf("inplace_add....");
     fflush(stdout);
 
     /* Check that result is equal to _fmpz_vec_add */
@@ -37,7 +37,7 @@ main(void)
 
         _fmpz_vec_add(res, ip1, ip2, len);
         _fmpz_vec_set(res2, ip1, len);
-        _fmpz_vec_add2(res2, ip2, len);
+        _fmpz_vec_inplace_add(res2, ip2, len);
 
         result = _fmpz_vec_equal(res, res2, len);
         if (!result)
@@ -72,7 +72,7 @@ main(void)
 int
 main(void)
 {
-    flint_printf("add2....SKIPPED\n");
+    flint_printf("inplace_add....SKIPPED\n");
     return 0;
 }
 #endif

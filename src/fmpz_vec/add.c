@@ -180,7 +180,7 @@ sub_1:
 #define simd_add _mm256_add_epi64
 
 void
-_fmpz_vec_add2(fmpz * rp, const fmpz * ip, slong len)
+_fmpz_vec_inplace_add(fmpz * rp, const fmpz * ip, slong len)
 {
     slong ix;
     simd_type simd_coeff_max, simd_offset, simd_cmp_got_large;
