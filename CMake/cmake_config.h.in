@@ -18,7 +18,7 @@
 
 #cmakedefine01 FLINT_USES_FENV
 
-#define FLINT_TMPPATH "@FLINT_TMPPATH@"
+#define FLINT_TMPDIR "@FLINT_TMPDIR@"
 
 #ifdef _MSC_VER
 #define access _access

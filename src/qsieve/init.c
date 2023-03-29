@@ -27,7 +27,7 @@ void qsieve_init(qs_t qs_inf, const fmpz_t n)
 #if (defined(__WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__) && !defined(__MINGW64__)) || defined(_MSC_VER)
     fname_alloc_size = MAX_PATH;
 #else
-    fname_alloc_size = sizeof(FLINT_TMPPATH "/siqsXXXXXX");
+    fname_alloc_size = sizeof(FLINT_TMPDIR "/siqsXXXXXX");
 #endif
     qs_inf->fname = (char *) flint_malloc(fname_alloc_size); /* space for filename */
 
