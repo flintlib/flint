@@ -219,7 +219,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     if (qs_inf->siqs == NULL)
         flint_throw(FLINT_ERROR, "fopen failed\n");
 #else
-    strcpy(qs_inf->fname, FLINT_TMPPATH "/siqsXXXXXX");
+    strcpy(qs_inf->fname, FLINT_TMPDIR "/siqsXXXXXX");
     fd = mkstemp(qs_inf->fname);
     if (fd == -1)
         flint_throw(FLINT_ERROR, "mkstemp failed\n");

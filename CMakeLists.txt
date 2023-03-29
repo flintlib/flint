@@ -55,10 +55,10 @@ if(CMAKE_BUILD_TYPE STREQUAL Debug)
 endif()
 
 # temporary directory
-if(NOT DEFINED TMPPATH)
-    set(FLINT_TMPPATH "/tmp" CACHE STRING "Path to a directory meant for temporary files for host system (NOTE: Will probably become redundant in the future). Only relevant if host do not have read and write access to /tmp [default=/tmp].")
+if(NOT DEFINED TMPDIR)
+    set(FLINT_TMPDIR "/tmp" CACHE STRING "Path to a directory meant for temporary files for host system. Only relevant if host do not have read and write access to /tmp [default=/tmp].")
 else()
-    set(FLINT_TMPPATH "${TMPPATH}" CACHE STRING "Path to a directory meant for temporary files for host system (NOTE: Will probably become redundant in the future). Only relevant if host do not have read and write access to /tmp [default=/tmp].")
+    set(FLINT_TMPDIR "${TMPDIR}" CACHE STRING "Path to a directory meant for temporary files for host system. Only relevant if host do not have read and write access to /tmp [default=/tmp].")
 endif()
 
 # pthread configuration
