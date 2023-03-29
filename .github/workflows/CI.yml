@@ -9,14 +9,14 @@ jobs:
   # ubuntu with gcc
   ##############################################################################
   ubuntu-gcc:
-    name: Ubuntu GCC (x10)
+    name: Ubuntu GCC, default flags with AVX2 (x10)
 
     runs-on: ubuntu-latest
 
     env:
       MAKE: "make -j --output-sync=target"
       CC: "gcc"
-      CFLAGS: "-Wall"
+      TESTCFLAGS: "-Wall -O1"
 
     steps:
       - uses: actions/checkout@v3
@@ -35,7 +35,7 @@ jobs:
       - name: "Configure"
         run: |
           ./bootstrap.sh
-          ./configure CC=${CC} CFLAGS="${CFLAGS}"
+          ./configure CC=${CC} --enable-avx2 TESTCFLAGS="${TESTCFLAGS}"
 
       - name: "Compile"
         run: |
