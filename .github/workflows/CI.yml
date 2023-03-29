@@ -35,7 +35,7 @@ jobs:
       - name: "Configure"
         run: |
           ./bootstrap.sh
-          ./configure CC=${CC} --enable-avx2 TESTCFLAGS="${TESTCFLAGS}"
+          ./configure CC=${CC} --enable-avx2 TESTCFLAGS="${TESTCFLAGS}" --disable-static
 
       - name: "Compile"
         run: |
