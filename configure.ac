@@ -233,16 +233,16 @@ yes|no)
 esac],
 enable_avx2="no")
 
-AC_ARG_ENABLE(avx512,
-[AS_HELP_STRING([--enable-avx512],[Enable AVX512 instructions [default=no]])],
-[case $enableval in
-yes|no)
-    ;;
-*)
-    AC_MSG_ERROR([Bad value $enableval for --enable-avx512. Need yes or no.])
-    ;;
-esac],
-enable_avx512="no")
+dnl AC_ARG_ENABLE(avx512,
+dnl [AS_HELP_STRING([--enable-avx512],[Enable AVX512 instructions [default=no]])],
+dnl [case $enableval in
+dnl yes|no)
+dnl     ;;
+dnl *)
+dnl     AC_MSG_ERROR([Bad value $enableval for --enable-avx512. Need yes or no.])
+dnl     ;;
+dnl esac],
+dnl enable_avx512="no")
 
 ################################################################################ 
 # packages
@@ -837,13 +837,13 @@ then
     AX_CHECK_COMPILE_FLAG([-mfma], [save_CFLAGS="-mfma $save_CFLAGS"])
 fi
 
-if test "$enable_avx512" = "yes";
-then
-    AX_CHECK_COMPILE_FLAG([-mavx512f],
-    [save_CFLAGS="-mavx512f $save_CFLAGS"
-     AC_DEFINE(FLINT_HAVE_AVX512,1,[Define if system has AVX512])],
-    [AC_MSG_ERROR([$CC does not support -mavx512f needed for AVX512 instructions])])
-fi
+dnl if test "$enable_avx512" = "yes";
+dnl then
+dnl     AX_CHECK_COMPILE_FLAG([-mavx512f],
+dnl     [save_CFLAGS="-mavx512f $save_CFLAGS"
+dnl      AC_DEFINE(FLINT_HAVE_AVX512,1,[Define if system has AVX512])],
+dnl     [AC_MSG_ERROR([$CC does not support -mavx512f needed for AVX512 instructions])])
+dnl fi
 
 case $host_cpu in
     sparc*)

@@ -21,7 +21,7 @@ _fmpz_vec_add(fmpz * res, const fmpz * vec1, const fmpz * vec2, slong len2)
         fmpz_add(res + i, vec1 + i, vec2 + i);
 }
 
-#if defined(__AVX2__) || defined(__AVX512F__)
+#if defined(__AVX2__)
 
 /* Note that the representation of an mpz in an fmpz is that the MSB is 0 while
  * the second MSB is 1. Hence we can simplify this check to just check if x >
@@ -170,24 +170,14 @@ sub_1:
 
 #include <immintrin.h>
 
-#ifdef __AVX512F__
-# define NUM 8
-# define simd_type __m512i
-# define simd_load_qword _mm512_set1_epi64
-# define simd_load_mem(x) _mm512_loadu_epi64(x)
-# define simd_store_mem(x, y) _mm512_storeu_epi64((x), (y))
-# define simd_cmpgt _mm512_cmpgt_epi64_mask
-# define simd_add _mm512_add_epi64
-#else
-# define NUM 4
-# define simd_type __m256i
-# define simd_load_qword _mm256_set1_epi64x
-# define simd_load_mem(x) _mm256_loadu_si256((simd_type *) (x))
-# define simd_store_mem(x, y) _mm256_storeu_si256((simd_type *) (x), (y))
-# define simd_cmpgt _mm256_cmpgt_epi64
-# define simd_testz _mm256_testz_si256
-# define simd_add _mm256_add_epi64
-#endif
+#define NUM 4
+#define simd_type __m256i
+#define simd_load_qword _mm256_set1_epi64x
+#define simd_load_mem(x) _mm256_loadu_si256((simd_type *) (x))
+#define simd_store_mem(x, y) _mm256_storeu_si256((simd_type *) (x), (y))
+#define simd_cmpgt _mm256_cmpgt_epi64
+#define simd_testz _mm256_testz_si256
+#define simd_add _mm256_add_epi64
 
 void
 _fmpz_vec_add2(fmpz * rp, const fmpz * ip, slong len)
@@ -228,34 +218,24 @@ _fmpz_vec_add2(fmpz * rp, const fmpz * ip, slong len)
     for (ix = 0; ix < len / NUM; ix++)
     {
         simd_type s1, s2;
-#ifdef __AVX512F__
-#else
         simd_type c1, c2;
-#endif
         int zf;
 
         s1 = simd_load_mem(rp);
         s2 = simd_load_mem(ip);
 
-#ifdef __AVX512F__
-        zf = !(simd_cmpgt(s1, simd_coeff_max) && simd_cmpgt(s2, simd_coeff_max));
-#else
         c1 = simd_cmpgt(s1, simd_coeff_max);
         c2 = simd_cmpgt(s2, simd_coeff_max);
 
         zf = simd_testz(c1, c1) && simd_testz(c2, c2);
-#endif
 
         if (zf)
         {
             s1 = simd_add(s1, s2);
             s2 = simd_add(s1, simd_offset);
-#ifdef __AVX512F__
-            zf = simd_cmpgt(s2, simd_cmp_got_large);
-#else
             c1 = simd_cmpgt(s2, simd_cmp_got_large);
             zf = simd_testz(c1, c1);
-#endif
+
             if (zf)
                 simd_store_mem(rp, s1);
             else
