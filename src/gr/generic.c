@@ -1350,141 +1350,6 @@ gr_generic_cmpabs_other(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_
 }
 
 int
-gr_generic_exp(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
-{
-    if (gr_is_zero(x, ctx) == T_TRUE)
-        return gr_one(res, ctx);
-
-    return GR_UNABLE;
-}
-
-int
-gr_generic_expm1(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
-{
-    int status = gr_exp(res, x, ctx);
-    status |= gr_sub_ui(res, res, 1, ctx);
-    return status;
-}
-
-int
-gr_generic_exp2(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
-{
-    gr_ptr t;
-    int status = GR_SUCCESS;
-
-    GR_TMP_INIT(t, ctx);
-    status |= gr_set_ui(t, 2, ctx);
-    status |= gr_pow(res, t, x, ctx);
-    GR_TMP_CLEAR(t, ctx);
-
-    return status;
-}
-
-int
-gr_generic_exp10(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
-{
-    gr_ptr t;
-    int status = GR_SUCCESS;
-
-    GR_TMP_INIT(t, ctx);
-    status |= gr_set_ui(t, 10, ctx);
-    status |= gr_pow(res, t, x, ctx);
-    GR_TMP_CLEAR(t, ctx);
-
-    return status;
-}
-
-int
-gr_generic_log(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
-{
-    if (gr_is_one(x, ctx) == T_TRUE)
-        return gr_zero(res, ctx);
-
-    return GR_UNABLE;
-}
-
-int
-gr_generic_log1p(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
-{
-    int status = gr_add_ui(res, x, 1, ctx);
-    status |= gr_log(res, res, ctx);
-    return status;
-}
-
-int
-gr_generic_sin(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
-{
-    if (gr_is_zero(x, ctx) == T_TRUE)
-        return gr_zero(res, ctx);
-
-    return GR_UNABLE;
-}
-
-int
-gr_generic_cos(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
-{
-    if (gr_is_zero(x, ctx) == T_TRUE)
-        return gr_one(res, ctx);
-
-    return GR_UNABLE;
-}
-
-int
-gr_generic_sin_cos(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_ctx_t ctx)
-{
-    if (gr_is_zero(x, ctx) == T_TRUE)
-        return gr_zero(res1, ctx) | gr_one(res2, ctx);
-    else
-        return GR_UNABLE;
-}
-
-int
-gr_generic_tan(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
-{
-    if (gr_is_zero(x, ctx) == T_TRUE)
-        return gr_zero(res, ctx);
-
-    return GR_UNABLE;
-}
-
-int
-gr_generic_asin(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
-{
-    if (gr_is_zero(x, ctx) == T_TRUE)
-        return gr_zero(res, ctx);
-
-    return GR_UNABLE;
-}
-
-int
-gr_generic_asinh(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
-{
-    if (gr_is_zero(x, ctx) == T_TRUE)
-        return gr_zero(res, ctx);
-
-    return GR_UNABLE;
-}
-
-int
-gr_generic_atan(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
-{
-    if (gr_is_zero(x, ctx) == T_TRUE)
-        return gr_zero(res, ctx);
-
-    return GR_UNABLE;
-}
-
-int
-gr_generic_atanh(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
-{
-    if (gr_is_zero(x, ctx) == T_TRUE)
-        return gr_zero(res, ctx);
-
-    return GR_UNABLE;
-}
-
-
-int
 gr_generic_bernoulli_ui(gr_ptr res, ulong n, gr_ctx_t ctx)
 {
     if (ctx->which_ring == GR_CTX_FMPQ)
@@ -2833,6 +2698,13 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_ASINH,                   (gr_funcptr) gr_generic_asinh},
     {GR_METHOD_ATANH,                   (gr_funcptr) gr_generic_atanh},
 
+    {GR_METHOD_ACOT,                    (gr_funcptr) gr_generic_acot},
+    {GR_METHOD_ASEC,                    (gr_funcptr) gr_generic_asec},
+    {GR_METHOD_ACSC,                    (gr_funcptr) gr_generic_acsc},
+    {GR_METHOD_ACOTH,                   (gr_funcptr) gr_generic_acoth},
+    {GR_METHOD_ASECH,                   (gr_funcptr) gr_generic_asech},
+    {GR_METHOD_ACSCH,                   (gr_funcptr) gr_generic_acsch},
+
     {GR_METHOD_FAC,                     (gr_funcptr) gr_generic_fac},
     {GR_METHOD_FAC_UI,                  (gr_funcptr) gr_generic_fac_ui},
     {GR_METHOD_FAC_FMPZ,                (gr_funcptr) gr_generic_fac_fmpz},
@@ -2888,6 +2760,8 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_STIRLING_S1U_UI_VEC,     (gr_funcptr) gr_generic_stirling_s1u_ui_vec},
     {GR_METHOD_STIRLING_S1_UI_VEC,      (gr_funcptr) gr_generic_stirling_s1_ui_vec},
     {GR_METHOD_STIRLING_S2_UI_VEC,      (gr_funcptr) gr_generic_stirling_s2_ui_vec},
+
+    {GR_METHOD_ERFCX,                   (gr_funcptr) gr_generic_erfcx},
 
     {GR_METHOD_CHEBYSHEV_T_FMPZ,        (gr_funcptr) gr_generic_chebyshev_t_fmpz},
     {GR_METHOD_CHEBYSHEV_U_FMPZ,        (gr_funcptr) gr_generic_chebyshev_u_fmpz},

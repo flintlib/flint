@@ -703,8 +703,15 @@ gr_series_ ## func(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, g
 UNARY_POLY_WRAPPER(exp)
 UNARY_POLY_WRAPPER(log)
 UNARY_POLY_WRAPPER(rsqrt)
+UNARY_POLY_WRAPPER(tan)
+
+UNARY_POLY_WRAPPER(asin)
+UNARY_POLY_WRAPPER(acos)
 UNARY_POLY_WRAPPER(atan)
+UNARY_POLY_WRAPPER(asinh)
+UNARY_POLY_WRAPPER(acosh)
 UNARY_POLY_WRAPPER(atanh)
+
 
 #include "arb_poly.h"
 #include "acb_poly.h"
@@ -1755,7 +1762,12 @@ static int _gr_gr_series_sqrt(gr_series_t res, const gr_series_t x, gr_ctx_t ctx
 static int _gr_gr_series_rsqrt(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_rsqrt(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_exp(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_exp(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_log(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_log(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_tan(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_tan(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_asin(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_asin(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_acos(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_acos(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_atan(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_atan(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_asinh(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_asinh(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_acosh(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_acosh(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_atanh(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_atanh(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 
 static int _gr_gr_series_gamma(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_gamma(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
@@ -1904,7 +1916,12 @@ gr_method_tab_input _gr_series_methods_input[] =
     {GR_METHOD_RSQRT,       (gr_funcptr) _gr_gr_series_rsqrt},
     {GR_METHOD_EXP,         (gr_funcptr) _gr_gr_series_exp},
     {GR_METHOD_LOG,         (gr_funcptr) _gr_gr_series_log},
+    {GR_METHOD_TAN,         (gr_funcptr) _gr_gr_series_tan},
+    {GR_METHOD_ASIN,        (gr_funcptr) _gr_gr_series_asin},
+    {GR_METHOD_ACOS,        (gr_funcptr) _gr_gr_series_acos},
     {GR_METHOD_ATAN,        (gr_funcptr) _gr_gr_series_atan},
+    {GR_METHOD_ASINH,       (gr_funcptr) _gr_gr_series_asinh},
+    {GR_METHOD_ACOSH,       (gr_funcptr) _gr_gr_series_acosh},
     {GR_METHOD_ATANH,       (gr_funcptr) _gr_gr_series_atanh},
     {GR_METHOD_GAMMA,       (gr_funcptr) _gr_gr_series_gamma},
     {GR_METHOD_RGAMMA,      (gr_funcptr) _gr_gr_series_rgamma},

@@ -332,6 +332,28 @@ GR_SPECIAL_DEF int gr_weierstrass_sigma(gr_ptr res, gr_srcptr z, gr_srcptr tau, 
 
 /* generic implementations */
 
+WARN_UNUSED_RESULT int gr_generic_exp(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_expm1(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_exp2(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_exp10(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_log(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_log1p(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_sin(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_cos(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_sin_cos(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_tan(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_asin(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_asinh(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_atan(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_atanh(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_generic_acot(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_asec(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_acsc(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_acoth(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_asech(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_acsch(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+
 WARN_UNUSED_RESULT int gr_generic_fac(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_fac_fmpz(gr_ptr res, const fmpz_t n, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_fac_ui(gr_ptr res, ulong n, gr_ctx_t ctx);
@@ -378,6 +400,8 @@ WARN_UNUSED_RESULT int gr_generic_chebyshev_t2_fmpz(gr_ptr a, gr_ptr b, const fm
 WARN_UNUSED_RESULT int gr_generic_chebyshev_t_fmpz(gr_ptr y, const fmpz_t n, gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_chebyshev_u2_fmpz(gr_ptr a, gr_ptr b, const fmpz_t n, gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_chebyshev_u_fmpz(gr_ptr y, const fmpz_t n, gr_srcptr x, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_generic_erfcx(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_generic_hilbert_class_poly(gr_ptr res, slong D, gr_srcptr x, gr_ctx_t ctx);
 

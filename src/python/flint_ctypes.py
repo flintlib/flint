@@ -829,9 +829,29 @@ class gr_ctx:
         return ctx._constant(ctx, libgr.gr_glaisher, "glaisher")
 
     def inv(ctx, x):
+        """
+        Multiplicative inverse.
+
+            >>> ZZ.inv(2)
+            Traceback (most recent call last):
+              ...
+            FlintDomainError: inv(x) is not an element of {Integer ring (fmpz)} for {x = 2}
+            >>> QQ.inv(2)
+            1/2
+            >>> RR.inv(2)
+            0.5000000000000000
+        """
         return ctx._unary_op(x, libgr.gr_inv, "inv($x)")
 
     def sqrt(ctx, x):
+        """
+        Square root.
+
+            >>> ZZ(25).sqrt()
+            5
+            >>> RR(10).sqrt()
+            [3.162277660168379 +/- 5.23e-16]
+        """
         return ctx._unary_op(x, libgr.gr_sqrt, "sqrt($x)")
 
     def rsqrt(ctx, x):
@@ -904,6 +924,14 @@ class gr_ctx:
         return ctx._unary_unary_op(x, libgr.gr_sin_cos, "sin_cos($x)")
 
     def tan(ctx, x):
+        """
+            >>> RR.tan(1)
+            [1.557407724654902 +/- 3.26e-16]
+            >>> CC.tan(1+1j)
+            ([0.2717525853195117 +/- 9.11e-17] + [1.083923327338694 +/- 5.77e-16]*I)
+            >>> x = RRser.gen(); RRser.tan(x)
+            1.000000000000000*x + [0.333333333333333 +/- 3.99e-16]*x^3 + [0.1333333333333333 +/- 8.32e-17]*x^5 + O(x^6)
+        """
         return ctx._unary_op(x, libgr.gr_tan, "tan($x)")
 
     def cot(ctx, x):
@@ -943,30 +971,84 @@ class gr_ctx:
         return ctx._unary_op(x, libgr.gr_sinc_pi, "sinc_pi($x)")
 
     def sinh(ctx, x):
+        """
+            >>> RR.sinh(1)
+            [1.175201193643801 +/- 6.18e-16]
+            >>> CC.sinh(1+1j)
+            ([0.634963914784736 +/- 4.68e-16] + [1.298457581415977 +/- 7.11e-16]*I)
+        """
         return ctx._unary_op(x, libgr.gr_sinh, "sinh($x)")
 
     def cosh(ctx, x):
+        """
+            >>> RR.cosh(1)
+            [1.543080634815244 +/- 5.28e-16]
+            >>> CC.cosh(1+1j)
+            ([0.833730025131149 +/- 5.04e-16] + [0.988897705762865 +/- 4.92e-16]*I)
+        """
         return ctx._unary_op(x, libgr.gr_cosh, "cosh($x)")
 
     def sinh_cosh(ctx, x):
+        """
+            >>> RR.sinh_cosh(1)
+            ([1.175201193643801 +/- 6.18e-16], [1.543080634815244 +/- 5.28e-16])
+            >>> CC.sinh_cosh(1j)
+            ([0.841470984807897 +/- 6.08e-16]*I, [0.540302305868140 +/- 4.59e-16])
+        """
         return ctx._unary_unary_op(x, libgr.gr_sinh_cosh, "sinh_cos($x)")
 
     def tanh(ctx, x):
+        """
+            >>> RR.tanh(1)
+            [0.761594155955765 +/- 2.81e-16]
+            >>> CC.tanh(1+1j)
+            ([1.083923327338694 +/- 5.77e-16] + [0.2717525853195117 +/- 9.11e-17]*I)
+        """
         return ctx._unary_op(x, libgr.gr_tanh, "tanh($x)")
 
     def coth(ctx, x):
+        """
+            >>> RR.coth(1)
+            [1.313035285499331 +/- 4.97e-16]
+            >>> CC.coth(1+1j)
+            ([0.868014142895925 +/- 1.88e-16] + [-0.2176215618544027 +/- 9.31e-17]*I)
+        """
         return ctx._unary_op(x, libgr.gr_coth, "coth($x)")
 
     def sech(ctx, x):
+        """
+            >>> RR.sech(1)
+            [0.648054273663885 +/- 4.67e-16]
+        """
         return ctx._unary_op(x, libgr.gr_sech, "sech($x)")
 
     def csch(ctx, x):
+        """
+            >>> RR.csch(1)
+            [0.850918128239321 +/- 5.70e-16]
+        """
         return ctx._unary_op(x, libgr.gr_csch, "csch($x)")
 
     def asin(ctx, x):
+        """
+            >>> RR.asin(0.5)
+            [0.523598775598299 +/- 3.79e-16]
+            >>> CC.asin(1+1j)
+            ([0.66623943249252 +/- 5.40e-15] + [1.06127506190504 +/- 5.04e-15]*I)
+            >>> x = RRser.gen(); RRser.asin(x)
+            1.000000000000000*x + [0.1666666666666667 +/- 7.04e-17]*x^3 + [0.0750000000000000 +/- 1.67e-17]*x^5 + O(x^6)
+        """
         return ctx._unary_op(x, libgr.gr_asin, "asin($x)")
 
     def acos(ctx, x):
+        """
+            >>> RR.acos(0.5)
+            [1.047197551196598 +/- 8.97e-16]
+            >>> CC.acos(1+1j)
+            ([0.90455689430238 +/- 2.07e-15] + [-1.06127506190504 +/- 5.04e-15]*I)
+            >>> x = RRser.gen(); RRser.acos(x)
+            [1.570796326794897 +/- 5.54e-16] - 1.000000000000000*x + [-0.1666666666666667 +/- 7.04e-17]*x^3 + [-0.0750000000000000 +/- 1.67e-17]*x^5 + O(x^6)
+        """
         return ctx._unary_op(x, libgr.gr_acos, "acos($x)")
 
     def atan(ctx, x):
@@ -985,6 +1067,8 @@ class gr_ctx:
             Traceback (most recent call last):
               ...
             FlintDomainError: atan(x) is not an element of {Complex numbers (acb, prec = 53)} for {x = 1.000000000000000*I}
+            >>> x = RRser.gen(); RRser.atan(x)
+            1.000000000000000*x + [-0.3333333333333333 +/- 7.04e-17]*x^3 + [0.2000000000000000 +/- 4.45e-17]*x^5 + O(x^6)
 
         """
         return ctx._unary_op(x, libgr.gr_atan, "atan($x)")
@@ -997,12 +1081,32 @@ class gr_ctx:
         return ctx._binary_op(y, x, libgr.gr_atan2, "atan2($y, $x)")
 
     def acot(ctx, x):
+        """
+            >>> RR.acot(2)
+            [0.4636476090008061 +/- 6.22e-17]
+            >>> CC.acot(1+1j)
+            ([0.553574358897045 +/- 5.74e-16] + [-0.402359478108525 +/- 4.46e-16]*I)
+            >>> x = RRser.gen(); RRser.acot(1+x)
+            [0.7853981633974483 +/- 7.66e-17] - 0.5000000000000000*x + 0.2500000000000000*x^2 + [-0.0833333333333333 +/- 4.26e-17]*x^3 + [0.02500000000000000 +/- 5.56e-18]*x^5 + O(x^6)
+        """
         return ctx._unary_op(x, libgr.gr_acot, "acot($x)")
 
     def asec(ctx, x):
+        """
+            >>> RR.asec(2)
+            [1.047197551196598 +/- 8.97e-16]
+            >>> CC.asec(1+1j)
+            ([1.118517879643706 +/- 7.12e-16] + [0.530637530952518 +/- 6.32e-16]*I)
+        """
         return ctx._unary_op(x, libgr.gr_asec, "asec($x)")
 
     def acsc(ctx, x):
+        """
+            >>> RR.acsc(2)
+            [0.523598775598299 +/- 3.79e-16]
+            >>> CC.acsc(1+1j)
+            ([0.452278447151191 +/- 5.95e-16] + [-0.530637530952518 +/- 6.32e-16]*I)
+        """
         return ctx._unary_op(x, libgr.gr_acsc, "acsc($x)")
 
     def asin_pi(ctx, x):
@@ -1024,21 +1128,64 @@ class gr_ctx:
         return ctx._unary_op(x, libgr.gr_acsc_pi, "acsc_pi($x)")
 
     def asinh(ctx, x):
+        """
+            >>> RR.asinh(1)
+            [0.881373587019543 +/- 1.87e-16]
+            >>> CC.asinh(1+1j)
+            ([1.06127506190504 +/- 5.04e-15] + [0.66623943249252 +/- 5.40e-15]*I)
+            >>> x = RRser.gen(); RRser.asinh(x)
+            1.000000000000000*x + [-0.1666666666666667 +/- 7.04e-17]*x^3 + [0.0750000000000000 +/- 1.67e-17]*x^5 + O(x^6)
+        """
         return ctx._unary_op(x, libgr.gr_asinh, "asinh($x)")
 
     def acosh(ctx, x):
+        """
+            >>> RR.acosh(2)
+            [1.316957896924817 +/- 6.61e-16]
+            >>> CC.acosh(1+1j)
+            ([1.061275061905035 +/- 8.44e-16] + [0.904556894302381 +/- 8.22e-16]*I)
+            >>> x = RRser.gen(); RRser.acosh(2+x)
+            [1.316957896924817 +/- 6.61e-16] + [0.577350269189626 +/- 4.54e-16]*x + [-0.192450089729875 +/- 4.24e-16]*x^2 + [0.096225044864938 +/- 6.92e-16]*x^3 + [-0.058804194084128 +/- 7.16e-16]*x^4 + [0.040450157748779 +/- 4.91e-16]*x^5 + O(x^6)
+        """
         return ctx._unary_op(x, libgr.gr_acosh, "acosh($x)")
 
     def atanh(ctx, x):
+        """
+            >>> RR.atanh(0.5)
+            [0.549306144334055 +/- 3.32e-16]
+            >>> CC.atanh(1+1j)
+            ([0.4023594781085251 +/- 8.52e-17] + [1.017221967897851 +/- 4.37e-16]*I)
+            >>> x = RRser.gen(); RRser.atanh(x)
+            1.000000000000000*x + [0.3333333333333333 +/- 7.04e-17]*x^3 + [0.2000000000000000 +/- 4.45e-17]*x^5 + O(x^6)
+
+        """
         return ctx._unary_op(x, libgr.gr_atanh, "atanh($x)")
 
     def acoth(ctx, x):
+        """
+            >>> RR.acoth(2)
+            [0.549306144334055 +/- 3.32e-16]
+            >>> CC.acoth(1+1j)
+            ([0.4023594781085251 +/- 8.52e-17] + [-0.553574358897045 +/- 3.16e-16]*I)
+        """
         return ctx._unary_op(x, libgr.gr_acoth, "acoth($x)")
 
     def asech(ctx, x):
+        """
+            >>> RR.asech(0.5)
+            [1.316957896924817 +/- 6.61e-16]
+            >>> CC.asech(1+1j)
+            ([0.530637530952518 +/- 9.50e-16] + [-1.118517879643706 +/- 9.45e-16]*I)
+        """
         return ctx._unary_op(x, libgr.gr_asech, "asech($x)")
 
     def acsch(ctx, x):
+        """
+            >>> RR.acsch(0.5)
+            [1.443635475178810 +/- 5.32e-16]
+            >>> CC.acsch(1+1j)
+            ([0.530637530952518 +/- 5.66e-16] + [-0.452278447151191 +/- 7.14e-16]*I)
+        """
         return ctx._unary_op(x, libgr.gr_acsch, "acsch($x)")
 
     def erf(ctx, x):
@@ -1063,6 +1210,10 @@ class gr_ctx:
         return ctx._unary_op(x, libgr.gr_erfi, "erfi($x)")
 
     def erfcx(ctx, x):
+        """
+            >>> RR.erfcx(100)
+            [0.00564161378298943 +/- 3.69e-18]
+        """
         return ctx._unary_op(x, libgr.gr_erfcx, "erfcx($x)")
 
     def erfinv(ctx, x):

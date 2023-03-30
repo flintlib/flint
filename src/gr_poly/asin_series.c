@@ -23,7 +23,7 @@ _gr_poly_inv_trig_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_
     flen = FLINT_MIN(flen, len);
 
     if (flen == 0)
-        return _gr_vec_zero(res, len, ctx);
+        return GR_UNABLE;
 
     GR_TMP_INIT(c, ctx);
 
