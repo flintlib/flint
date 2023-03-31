@@ -85,6 +85,10 @@ gr_generic_set_shallow(gr_ptr res, gr_srcptr x, const gr_ctx_t ctx)
     memcpy(res, x, ctx->sizeof_elem);
 }
 
+int gr_generic_write_n(gr_stream_t out, gr_srcptr x, slong n, gr_ctx_t ctx)
+{
+    return gr_write(out, x, ctx);
+}
 
 int gr_generic_randtest_not_zero(gr_ptr x, flint_rand_t state, gr_ctx_t ctx)
 {
@@ -2578,7 +2582,9 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_CLEAR,                   (gr_funcptr) gr_generic_clear},
     {GR_METHOD_SWAP,                    (gr_funcptr) gr_generic_swap},
     {GR_METHOD_SET_SHALLOW,             (gr_funcptr) gr_generic_set_shallow},
+
     {GR_METHOD_WRITE,                   (gr_funcptr) gr_generic_write},
+    {GR_METHOD_WRITE_N,                 (gr_funcptr) gr_generic_write_n},
 
     {GR_METHOD_RANDTEST,                (gr_funcptr) gr_generic_randtest},
     {GR_METHOD_RANDTEST_NOT_ZERO,       (gr_funcptr) gr_generic_randtest_not_zero},
@@ -2689,6 +2695,8 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_EXP10,                   (gr_funcptr) gr_generic_exp10},
     {GR_METHOD_LOG,                     (gr_funcptr) gr_generic_log},
     {GR_METHOD_LOG1P,                   (gr_funcptr) gr_generic_log1p},
+    {GR_METHOD_LOG2,                    (gr_funcptr) gr_generic_log2},
+    {GR_METHOD_LOG10,                   (gr_funcptr) gr_generic_log10},
     {GR_METHOD_SIN,                     (gr_funcptr) gr_generic_sin},
     {GR_METHOD_COS,                     (gr_funcptr) gr_generic_cos},
     {GR_METHOD_SIN_COS,                 (gr_funcptr) gr_generic_sin_cos},

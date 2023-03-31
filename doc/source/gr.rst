@@ -381,6 +381,12 @@ Input, output and string conversion
 
     Sets *res* to the string description in *x*.
 
+.. function:: int gr_write_n(gr_stream_t out, gr_srcptr x, slong n, gr_ctx_t ctx)
+              int gr_get_str_n(char ** s, gr_srcptr x, slong n, gr_ctx_t ctx)
+
+    String conversion where real and complex numbers may be rounded
+    to *n* digits.
+
 Assignment and conversions
 ................................................................................
 

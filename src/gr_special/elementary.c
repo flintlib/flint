@@ -74,6 +74,44 @@ gr_generic_log1p(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 }
 
 int
+gr_generic_log2(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+    status |= gr_set_ui(t, 2, ctx);
+    status |= gr_log(t, t, ctx);
+    status |= gr_log(res, x, ctx);
+    status |= gr_div(res, res, t, ctx);
+    GR_TMP_CLEAR(t, ctx);
+
+    if (status != GR_SUCCESS)
+        status = GR_UNABLE;
+
+    return status;
+}
+
+int
+gr_generic_log10(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+    status |= gr_set_ui(t, 10, ctx);
+    status |= gr_log(t, t, ctx);
+    status |= gr_log(res, x, ctx);
+    status |= gr_div(res, res, t, ctx);
+    GR_TMP_CLEAR(t, ctx);
+
+    if (status != GR_SUCCESS)
+        status = GR_UNABLE;
+
+    return status;
+}
+
+int
 gr_generic_sin(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 {
     if (gr_is_zero(x, ctx) == T_TRUE)

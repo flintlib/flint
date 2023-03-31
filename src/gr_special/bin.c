@@ -221,7 +221,7 @@ gr_generic_bin(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 
     status |= gr_falling(t, x, y, ctx);
     status |= gr_fac(res, y, ctx);
-    status |= gr_div(res, t, y, ctx);
+    status |= gr_div(res, t, res, ctx);
 
     if (status != GR_SUCCESS)
         status = GR_UNABLE;

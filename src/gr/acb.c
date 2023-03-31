@@ -93,13 +93,9 @@ _gr_acb_randtest(acb_t res, flint_rand_t state, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-/* todo */
 int
-_gr_acb_write(gr_stream_t out, const acb_t x, const gr_ctx_t ctx)
+__gr_acb_write(gr_stream_t out, const acb_t x, slong digits, int flags, const gr_ctx_t ctx)
 {
-    slong digits = ACB_CTX_PREC(ctx) * 0.30102999566398 + 1;
-    int flags = 0 /* ARB_STR_NO_RADIUS */;
-
     if (arb_is_zero(acb_imagref(x)))
     {
         gr_stream_write_free(out, arb_get_str(acb_realref(x), digits, flags));
@@ -134,6 +130,17 @@ _gr_acb_write(gr_stream_t out, const acb_t x, const gr_ctx_t ctx)
     }
 
     return GR_SUCCESS;
+}
+int
+_gr_acb_write(gr_stream_t out, const acb_t x, const gr_ctx_t ctx)
+{
+    return __gr_acb_write(out, x, ACB_CTX_PREC(ctx) * 0.30102999566398 + 1, 0, ctx);
+}
+
+int
+_gr_acb_write_n(gr_stream_t out, gr_srcptr x, slong n, gr_ctx_t ctx)
+{
+    return __gr_acb_write(out, x, FLINT_MAX(n, 1), ARB_STR_NO_RADIUS, ctx);
 }
 
 int
@@ -868,6 +875,7 @@ _gr_acb_pi(acb_t res, const gr_ctx_t ctx)
 
 DEF_FUNC(exp)
 DEF_FUNC(expm1)
+DEF_FUNC(exp_pi_i)
 
 int
 _gr_acb_log(acb_t res, const acb_t x, const gr_ctx_t ctx)
@@ -897,12 +905,39 @@ _gr_acb_log1p(acb_t res, const acb_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_acb_log_pi_i(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    acb_t t;
+
+    if (acb_contains_zero(x))
+    {
+        if (acb_is_zero(x))
+            return GR_DOMAIN;
+        return GR_UNABLE;
+    }
+
+    acb_log(res, x, ACB_CTX_PREC(ctx));
+
+    acb_init(t);
+    acb_const_pi(t, ACB_CTX_PREC(ctx));
+    acb_mul_onei(t, t);
+    acb_div(res, res, t, ACB_CTX_PREC(ctx));
+    acb_clear(t);
+
+    return GR_SUCCESS;
+}
+
+
 DEF_FUNC(sin)
 DEF_FUNC(sin_pi)
 DEF_FUNC(cos)
 DEF_FUNC(cos_pi)
 DEF_FUNC_SING(tan)
 DEF_FUNC_SING(cot)
+
+DEF_FUNC(sinc)
+DEF_FUNC(sinc_pi)
 
 DEF_FUNC(sinh)
 DEF_FUNC(cosh)
@@ -938,6 +973,23 @@ DEF_FUNC(asinh)
 DEF_FUNC(acosh)
 
 DEF_FUNC_SING(atanh)
+
+int
+_gr_acb_lambertw(acb_t res, const acb_t x, const gr_ctx_t ctx)
+{
+    fmpz_t k;
+    fmpz_init(k);
+    acb_lambertw(res, x, k, 0, ACB_CTX_PREC(ctx));
+    fmpz_clear(k);
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
+
+int
+_gr_acb_lambertw_fmpz(acb_t res, const acb_t x, const fmpz_t k, const gr_ctx_t ctx)
+{
+    acb_lambertw(res, x, k, 0, ACB_CTX_PREC(ctx));
+    return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
+}
 
 int
 _gr_acb_erf(acb_t res, const acb_t x, const gr_ctx_t ctx)
@@ -1943,6 +1995,7 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_SET_SHALLOW,     (gr_funcptr) _gr_acb_set_shallow},
     {GR_METHOD_RANDTEST,        (gr_funcptr) _gr_acb_randtest},
     {GR_METHOD_WRITE,           (gr_funcptr) _gr_acb_write},
+    {GR_METHOD_WRITE_N,         (gr_funcptr) _gr_acb_write_n},
     {GR_METHOD_ZERO,            (gr_funcptr) _gr_acb_zero},
     {GR_METHOD_ONE,             (gr_funcptr) _gr_acb_one},
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_acb_is_zero},
@@ -2009,8 +2062,10 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_PI,              (gr_funcptr) _gr_acb_pi},
     {GR_METHOD_EXP,             (gr_funcptr) _gr_acb_exp},
     {GR_METHOD_EXPM1,           (gr_funcptr) _gr_acb_expm1},
+    {GR_METHOD_EXP_PI_I,        (gr_funcptr) _gr_acb_exp_pi_i},
     {GR_METHOD_LOG,             (gr_funcptr) _gr_acb_log},
     {GR_METHOD_LOG1P,           (gr_funcptr) _gr_acb_log1p},
+    {GR_METHOD_LOG_PI_I,        (gr_funcptr) _gr_acb_log_pi_i},
     {GR_METHOD_SIN,             (gr_funcptr) _gr_acb_sin},
     {GR_METHOD_COS,             (gr_funcptr) _gr_acb_cos},
     {GR_METHOD_SIN_COS,         (gr_funcptr) _gr_acb_sin_cos},
@@ -2019,6 +2074,8 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_SIN_COS_PI,      (gr_funcptr) _gr_acb_sin_cos_pi},
     {GR_METHOD_TAN,             (gr_funcptr) _gr_acb_tan},
     {GR_METHOD_COT,             (gr_funcptr) _gr_acb_cot},
+    {GR_METHOD_SINC,            (gr_funcptr) _gr_acb_sinc},
+    {GR_METHOD_SINC_PI,         (gr_funcptr) _gr_acb_sinc_pi},
     {GR_METHOD_SINH,            (gr_funcptr) _gr_acb_sinh},
     {GR_METHOD_COSH,            (gr_funcptr) _gr_acb_cosh},
     {GR_METHOD_SINH_COSH,       (gr_funcptr) _gr_acb_sinh_cosh},
@@ -2030,6 +2087,8 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_ASINH,           (gr_funcptr) _gr_acb_asinh},
     {GR_METHOD_ACOSH,           (gr_funcptr) _gr_acb_acosh},
     {GR_METHOD_ATANH,           (gr_funcptr) _gr_acb_atanh},
+    {GR_METHOD_LAMBERTW,        (gr_funcptr) _gr_acb_lambertw},
+    {GR_METHOD_LAMBERTW_FMPZ,   (gr_funcptr) _gr_acb_lambertw_fmpz},
     {GR_METHOD_FAC_UI,          (gr_funcptr) _gr_acb_fac_ui},
     {GR_METHOD_FAC_FMPZ,        (gr_funcptr) _gr_acb_fac_fmpz},
     {GR_METHOD_RISING_UI,       (gr_funcptr) _gr_acb_rising_ui},

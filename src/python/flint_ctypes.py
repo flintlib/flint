@@ -273,6 +273,7 @@ libgr.gr_set_d.argtypes = (ctypes.c_void_p, ctypes.c_double, ctypes.POINTER(gr_c
 
 libgr.gr_set_str.argtypes = (ctypes.c_void_p, ctypes.c_char_p, ctypes.POINTER(gr_ctx_struct))
 libgr.gr_get_str.argtypes = (ctypes.POINTER(ctypes.c_char_p), ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
+libgr.gr_get_str_n.argtypes = (ctypes.POINTER(ctypes.c_char_p), ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
 libgr.gr_cmp.argtypes = (ctypes.POINTER(ctypes.c_int), ctypes.c_void_p, ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
 libgr.gr_cmpabs.argtypes = (ctypes.POINTER(ctypes.c_int), ctypes.c_void_p, ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
 
@@ -563,7 +564,7 @@ class gr_ctx:
         status = op(res1._ref, res2._ref, x._ref, y._ref, ctx._ref)
         if status:
             _handle_error(ctx, status, rstr, x, y)
-        return res
+        return res1, res2
 
     def _binary_op_with_flag(ctx, x, y, flag, op, rstr):
         x = ctx._as_elem(x)
@@ -900,27 +901,100 @@ class gr_ctx:
         return ctx._unary_op(x, libgr.gr_exp10, "exp10($x)")
 
     def expm1(ctx, x):
+        """
+            >>> RR.expm1(1)
+            [1.718281828459045 +/- 3.19e-16]
+        """
         return ctx._unary_op(x, libgr.gr_expm1, "expm1($x)")
 
     def exp_pi_i(ctx, x):
+        """
+            >>> QQbar.exp_pi_i(QQ(1) / 3)
+            Root a = 0.500000 + 0.866025*I of a^2-a+1
+            >>> CC.exp_pi_i(QQ(1) / 3)
+            ([0.500000000000000 +/- 3.94e-16] + [0.866025403784439 +/- 6.79e-16]*I)
+        """
         return ctx._unary_op(x, libgr.gr_exp_pi_i, "exp_pi_i($x)")
 
     def log(ctx, x):
+        """
+            >>> QQ.log(1)
+            0
+            >>> QQ.log(2)
+            Traceback (most recent call last):
+              ...
+            FlintUnableError: failed to compute log(x) in {Rational field (fmpq)} for {x = 2}
+            >>> RR.log(2)
+            [0.693147180559945 +/- 4.12e-16]
+            >>> CC.log(1j)
+            [1.570796326794897 +/- 5.54e-16]*I
+        """
         return ctx._unary_op(x, libgr.gr_log, "log($x)")
 
     def log1p(ctx, x):
+        """
+            >>> RR.log1p(1)
+            [0.693147180559945 +/- 4.12e-16]
+            >>> CC.log1p(1j)
+            ([0.346573590279973 +/- 4.20e-16] + [0.7853981633974483 +/- 7.66e-17]*I)
+        """
         return ctx._unary_op(x, libgr.gr_log1p, "log1p($x)")
 
     def log_pi_i(ctx, x):
+        """
+            >>> QQbar.log_pi_i(-1j)
+            -1/2
+            >>> CC.log_pi_i(1j)
+            [0.5000000000000000 +/- 7.07e-17]
+
+        """
         return ctx._unary_op(x, libgr.gr_log_pi_i, "log_pi_i($x)")
 
+    def log2(ctx, x):
+        """
+            >>> RR.log2(16)
+            [4.00000000000000 +/- 1.45e-15]
+        """
+        return ctx._unary_op(x, libgr.gr_log2, "log2($x)")
+
+    def log10(ctx, x):
+        """
+            >>> RR.log10(100)
+            [2.000000000000000 +/- 7.72e-16]
+        """
+        return ctx._unary_op(x, libgr.gr_log10, "log10($x)")
+
     def sin(ctx, x):
+        """
+            >>> QQ.sin(0)
+            0
+            >>> QQ.sin(1)
+            Traceback (most recent call last):
+              ...
+            FlintUnableError: failed to compute sin(x) in {Rational field (fmpq)} for {x = 1}
+            >>> RR.sin(1)
+            [0.841470984807897 +/- 6.08e-16]
+        """
         return ctx._unary_op(x, libgr.gr_sin, "sin($x)")
 
     def cos(ctx, x):
+        """
+            >>> QQ.cos(0)
+            1
+            >>> QQ.cos(1)
+            Traceback (most recent call last):
+              ...
+            FlintUnableError: failed to compute cos(x) in {Rational field (fmpq)} for {x = 1}
+            >>> RR.cos(1)
+            [0.540302305868140 +/- 4.59e-16]
+        """
         return ctx._unary_op(x, libgr.gr_cos, "cos($x)")
 
     def sin_cos(ctx, x):
+        """
+            >>> RR.sin_cos(1)
+            ([0.841470984807897 +/- 6.08e-16], [0.540302305868140 +/- 4.59e-16])
+        """
         return ctx._unary_unary_op(x, libgr.gr_sin_cos, "sin_cos($x)")
 
     def tan(ctx, x):
@@ -935,39 +1009,87 @@ class gr_ctx:
         return ctx._unary_op(x, libgr.gr_tan, "tan($x)")
 
     def cot(ctx, x):
+        """
+            >>> RR.cot(1)
+            [0.642092615934331 +/- 4.79e-16]
+        """
         return ctx._unary_op(x, libgr.gr_cot, "cot($x)")
 
     def sec(ctx, x):
+        """
+            >>> RR.sec(1)
+            [1.850815717680925 +/- 7.00e-16]
+        """
         return ctx._unary_op(x, libgr.gr_sec, "sec($x)")
 
     def csc(ctx, x):
+        """
+            >>> RR.csc(1)
+            [1.188395105778121 +/- 2.52e-16]
+        """
         return ctx._unary_op(x, libgr.gr_csc, "csc($x)")
 
     def sin_pi(ctx, x):
+        """
+            >>> QQbar.sin_pi(QQ(1) / 3)
+            Root a = 0.866025 of 4*a^2-3
+        """
         return ctx._unary_op(x, libgr.gr_sin_pi, "sin_pi($x)")
 
     def cos_pi(ctx, x):
+        """
+            >>> QQbar.cos_pi(QQ(1) / 3)
+            1/2
+        """
         return ctx._unary_op(x, libgr.gr_cos_pi, "cos_pi($x)")
 
     def sin_cos_pi(ctx, x):
         return ctx._unary_unary_op(x, libgr.gr_sin_cos_pi, "sin_cos_pi($x)")
 
     def tan_pi(ctx, x):
+        """
+            >>> QQbar.tan_pi(QQ(1) / 3)
+            Root a = 1.73205 of a^2-3
+        """
         return ctx._unary_op(x, libgr.gr_tan_pi, "tan_pi($x)")
 
     def cot_pi(ctx, x):
+        """
+            >>> QQbar.cot_pi(QQ(1) / 3)
+            Root a = 0.577350 of 3*a^2-1
+        """
         return ctx._unary_op(x, libgr.gr_cot_pi, "cot_pi($x)")
 
     def sec_pi(ctx, x):
+        """
+            >>> QQbar.sec_pi(QQ(1) / 3)
+            2
+        """
         return ctx._unary_op(x, libgr.gr_sec_pi, "sec_pi($x)")
 
     def csc_pi(ctx, x):
+        """
+            >>> QQbar.csc_pi(QQ(1) / 3)
+            Root a = 1.15470 of 3*a^2-4
+        """
         return ctx._unary_op(x, libgr.gr_csc_pi, "csc_pi($x)")
 
     def sinc(ctx, x):
+        """
+            >>> RR.sinc(2)
+            [0.4546487134128408 +/- 7.07e-17]
+            >>> CC.sinc(1j)
+            [1.175201193643801 +/- 6.61e-16]
+        """
         return ctx._unary_op(x, libgr.gr_sinc, "sinc($x)")
 
     def sinc_pi(ctx, x):
+        """
+            >>> RR.sinc_pi(0.5)
+            [0.636619772367581 +/- 4.04e-16]
+            >>> CC.sinc_pi(1j)
+            [3.67607791037498 +/- 3.11e-15]
+        """
         return ctx._unary_op(x, libgr.gr_sinc_pi, "sinc_pi($x)")
 
     def sinh(ctx, x):
@@ -1110,21 +1232,45 @@ class gr_ctx:
         return ctx._unary_op(x, libgr.gr_acsc, "acsc($x)")
 
     def asin_pi(ctx, x):
+        """
+            >>> QQbar.asin_pi(QQ(1) / 2)
+            1/6
+        """
         return ctx._unary_op(x, libgr.gr_asin_pi, "asin_pi($x)")
 
     def acos_pi(ctx, x):
+        """
+            >>> QQbar.acos_pi(QQ(1) / 2)
+            1/3
+        """
         return ctx._unary_op(x, libgr.gr_acos_pi, "acos_pi($x)")
 
     def atan_pi(ctx, x):
+        """
+            >>> QQbar.atan_pi(QQbar(2).sqrt() - 1)
+            1/8
+        """
         return ctx._unary_op(x, libgr.gr_atan_pi, "atan_pi($x)")
 
     def acot_pi(ctx, x):
+        """
+            >>> QQbar.acot_pi(QQbar(2).sqrt() - 1)
+            3/8
+        """
         return ctx._unary_op(x, libgr.gr_acot_pi, "acot_pi($x)")
 
     def asec_pi(ctx, x):
+        """
+            >>> QQbar.asec_pi(2)
+            1/3
+        """
         return ctx._unary_op(x, libgr.gr_asec_pi, "asec_pi($x)")
 
     def acsc_pi(ctx, x):
+        """
+            >>> QQbar.acsc_pi(2)
+            1/6
+        """
         return ctx._unary_op(x, libgr.gr_acsc_pi, "acsc_pi($x)")
 
     def asinh(ctx, x):
@@ -1381,32 +1527,48 @@ class gr_ctx:
             return ctx._binary_op(x, y, libgr.gr_bessel_k, "bessel_k($n, $x)")
 
     def bessel_j_y(ctx, x, y):
-        return ctx._binary_binary_op(x, y, libgr.gr_bessel_k, "bessel_j_y($n, $x)")
+        """
+            >>> RR.bessel_j_y(1, 1)
+            ([0.4400505857449335 +/- 5.91e-17], [-0.78121282130029 +/- 4.55e-15])
+            >>> CC.bessel_j_y(1, 1j)
+            ([0.565159103992485 +/- 1.89e-16]*I, ([-0.56515910399248 +/- 8.81e-15] + [0.38318604387456 +/- 8.19e-15]*I))
+        """
+        return ctx._binary_binary_op(x, y, libgr.gr_bessel_j_y, "bessel_j_y($n, $x)")
 
     def airy(ctx, x):
+        """
+            >>> RR.airy(1)
+            ([0.1352924163128814 +/- 4.17e-17], [-0.1591474412967932 +/- 2.95e-17], [1.207423594952871 +/- 3.27e-16], [0.932435933392776 +/- 5.83e-16])
+            >>> CC.airy(1)
+            ([0.1352924163128814 +/- 4.17e-17], [-0.1591474412967932 +/- 2.95e-17], [1.207423594952871 +/- 3.27e-16], [0.932435933392776 +/- 5.83e-16])
+        """
         return ctx._quaternary_unary_op(x, libgr.gr_airy, "airy($x)")
 
     def airy_ai(ctx, x):
         """
+            >>> RR.airy_ai(1)
             [0.1352924163128814 +/- 4.17e-17]
         """
         return ctx._unary_op(x, libgr.gr_airy_ai, "airy_ai($x)")
 
     def airy_bi(ctx, x):
         """
-            [-0.1591474412967932 +/- 2.95e-17]
+            >>> RR.airy_bi(1)
+            [1.207423594952871 +/- 3.27e-16]
         """
         return ctx._unary_op(x, libgr.gr_airy_bi, "airy_bi($x)")
 
 
     def airy_ai_prime(ctx, x):
         """
-            [1.207423594952871 +/- 3.27e-16]
+            >>> RR.airy_ai_prime(1)
+            [-0.1591474412967932 +/- 2.95e-17]
         """
         return ctx._unary_op(x, libgr.gr_airy_ai_prime, "airy_ai_prime($x)")
 
     def airy_bi_prime(ctx, x):
         """
+            >>> RR.airy_bi_prime(1)
             [0.932435933392776 +/- 5.83e-16]
         """
         return ctx._unary_op(x, libgr.gr_airy_bi_prime, "airy_bi_prime($x)")
@@ -1534,13 +1696,29 @@ class gr_ctx:
     def legendre_p(ctx, n, m, x, typ=0):
         """
         Associated Legendre function of the first kind.
+
+            >>> RR.legendre_p(3, 1, 0.5)
+            [-0.324759526419164 +/- 5.23e-16]
+            >>> CC.legendre_p(3, 1, 0.5)
+            [-0.324759526419164 +/- 5.23e-16]
+            >>> CC.legendre_p(3, 1, 0.5, 1)
+            [0.324759526419164 +/- 5.52e-16]*I
         """
+        assert typ in (0, 1)
         return ctx._ternary_op_with_flag(n, m, x, typ, libgr.gr_legendre_p, rstr="legendre_p($n, $m, $x, $typ)")
 
     def legendre_q(ctx, n, m, x, typ=0):
         """
         Associated Legendre function of the second kind.
+
+            >>> RR.legendre_q(3, 1, 0.5)
+            [2.4918525917090 +/- 5.45e-14]
+            >>> CC.legendre_q(3, 1, 0.5)
+            [2.4918525917090 +/- 5.45e-14]
+            >>> CC.legendre_q(3, 1, 0.5, 1)
+            ([0.51013107119087 +/- 4.02e-15] + [-2.4918525917090 +/- 5.73e-14]*I)
         """
+        assert typ in (0, 1)
         return ctx._ternary_op_with_flag(n, m, x, typ, libgr.gr_legendre_q, rstr="legendre_q($n, $m, $x, $typ)")
 
     def spherical_y(ctx, n, m, theta, phi):
@@ -1774,6 +1952,9 @@ class gr_ctx:
             24*x - 50*x^2 + 35*x^3 - 10*x^4 + x^5
             >>> RR.log(RR.falling(RR.pi(), 10**7))
             [151180898.7174084 +/- 9.72e-8]
+            >>> RR.falling(10.5, 3.5)
+            [2360.99664364330 +/- 4.00e-12]
+
         """
         return ctx._binary_op_with_overloads(x, n, libgr.gr_falling, op_ui=libgr.gr_falling_ui, rstr="falling($x, $n)")
 
@@ -1791,6 +1972,9 @@ class gr_ctx:
             5763493550349629692
             >>> ZZp64.bin(10**30, 2)
             998763921924463582
+            >>> RR.bin(1.5, 0.75)
+            [1.57378746535479 +/- 5.62e-15]
+
         """
         try:
             x = ctx._as_ui(x)
@@ -1815,7 +1999,12 @@ class gr_ctx:
             [1, 4, 6, 4, 1, 0, 0, 0]
             >>> QQ.bin_vec(QQ(1)/2, 5)
             [1, 1/2, -1/8, 1/16, -5/128]
-
+            >>> ZZmod(7).bin_vec(10)
+            [1, 3, 3, 1, 0, 0, 0, 1, 3, 3, 1]
+            >>> ZZmod(7).bin_vec(3)
+            [1, 3, 3, 1]
+            >>> ZZmod(7).bin_vec(10, 1)
+            [1]
         """
         try:
             n = ctx._as_ui(n)
@@ -1825,17 +2014,44 @@ class gr_ctx:
             length = n + 1
         return ctx._op_vec_ui_len(n, length, libgr.gr_bin_ui_vec, "bin_vec($n, $length)")
 
-
     def gamma(ctx, x):
+        """
+            >>> RR.gamma(10)
+            362880.0000000000
+            >>> RR.gamma(0.5)
+            [1.772453850905516 +/- 3.41e-16]
+            >>> RR.gamma(QQ(1) / 3)
+            [2.678938534707747 +/- 8.99e-16]
+            >>> CC.gamma(1+1j) / CC.gamma(1j)
+            ([+/- 6.32e-16] + [1.0000000000000 +/- 1.03e-15]*I)
+        """
         return ctx._unary_op_with_fmpz_fmpq_overloads(x, libgr.gr_gamma, op_fmpz=libgr.gr_gamma_fmpz, op_fmpq=libgr.gr_gamma_fmpq, rstr="gamma($x)")
 
     def lgamma(ctx, x):
+        """
+            >>> RR.lgamma(10)
+            [12.80182748008147 +/- 2.69e-15]
+            >>> CC.lgamma(10j)
+            ([-15.94031728124131 +/- 6.90e-15] + [12.23211664743500 +/- 4.89e-15]*I)
+        """
         return ctx._unary_op(x, libgr.gr_lgamma, "lgamma($x)")
 
     def rgamma(ctx, x):
+        """
+            >>> RR.rgamma(10)
+            [2.755731922398589e-6 +/- 5.96e-22]
+            >>> CC.rgamma(10+1j)
+            ([-1.83246026966323e-6 +/- 5.08e-21] + [-2.25314671311995e-6 +/- 5.78e-21]*I)
+        """
         return ctx._unary_op(x, libgr.gr_rgamma, "lgamma($x)")
 
     def digamma(ctx, x):
+        """
+            >>> RR.digamma(2)
+            [0.4227843350984671 +/- 4.84e-17]
+            >>> CC.digamma(2j)
+            ([0.714591515373977 +/- 6.06e-16] + [1.820807282642230 +/- 3.65e-16]*I)
+        """
         return ctx._unary_op(x, libgr.gr_digamma, "digamma($x)")
 
     def doublefac(ctx, x):
@@ -1861,6 +2077,8 @@ class gr_ctx:
             [21.30048150234794 +/- 8.48e-15]
             >>> ZZp64.harmonic(1000)
             6514760847963681162
+            >>> RR.harmonic(10.5)
+            [2.97545479443731 +/- 5.16e-15]
         """
         return ctx._unary_op_with_fmpz_fmpq_overloads(x, libgr.gr_harmonic, op_ui=libgr.gr_harmonic_ui, rstr="harmonic($x)")
 
@@ -1898,9 +2116,25 @@ class gr_ctx:
         return ctx._unary_op(x, libgr.gr_log_barnes_g, "log_barnes_g($x)")
 
     def zeta(ctx, s):
+        """
+        Riemann zeta function.
+
+            >>> RR.zeta(2)
+            [1.644934066848226 +/- 4.57e-16]
+            >>> CC.zeta(1+1j)
+            ([0.5821580597520036 +/- 5.17e-17] + [-0.9268485643308071 +/- 2.75e-17]*I)
+        """
         return ctx._unary_op(s, libgr.gr_zeta, "zeta($s)")
 
     def hurwitz_zeta(ctx, s, a):
+        """
+        Hurwitz zeta function.
+
+            >>> RR.hurwitz_zeta(2, 2)
+            [0.6449340668482264 +/- 3.72e-17]
+            >>> CC.hurwitz_zeta(1j, 1)
+            ([0.0033002236853241 +/- 2.42e-17] + [-0.4181554491413217 +/- 4.51e-17]*I)
+        """
         return ctx._binary_op(s, a, libgr.gr_hurwitz_zeta, "hurwitz_zeta($s, $a)")
 
     def stieltjes(ctx, n, a=1):
@@ -1968,6 +2202,18 @@ class gr_ctx:
         return ctx._unary_op(x, libgr.gr_riemann_xi, "riemann_xi($x)")
 
     def lambertw(ctx, x, k=None):
+        """
+            >>> RR.lambertw(1)
+            [0.567143290409784 +/- 2.72e-16]
+            >>> RR.lambertw(-0.25)
+            [-0.3574029561813889 +/- 5.91e-17]
+            >>> RR.lambertw(-0.25, -1)
+            [-2.153292364110349 +/- 8.59e-16]
+            >>> CC.lambertw(-1)
+            ([-0.318131505204764 +/- 1.92e-16] + [1.337235701430689 +/- 5.99e-16]*I)
+            >>> CC.lambertw(1, 5)
+            ([-3.398692196764719 +/- 6.76e-16] + [29.73131070782852 +/- 7.03e-15]*I)
+        """
         if k is None:
             return ctx._unary_op(x, libgr.gr_lambertw, "lambertw($x)")
         else:
@@ -2384,6 +2630,26 @@ class gr_ctx:
             _handle_error(ctx, status, "dirichlet_chi($n, $chi)", n, chi)
         return res
 
+    def dirichlet_chi_vec(ctx, chi, n):
+        """
+        Vector of values of the given Dirichlet character.
+
+            >>> CC.dirichlet_chi_vec(DirichletGroup(4)(3), 5)
+            [0, 1.000000000000000, 0, -1.000000000000000, 0]
+        """
+        n = ctx._as_si(n)
+        assert n >= 0
+        assert n <= HUGE_LENGTH
+        assert isinstance(chi, dirichlet_char)
+        libgr.gr_dirichlet_chi_vec.argtypes = (ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.c_void_p)
+        G = libgr.gr_ctx_data_as_ptr(chi.parent()._ref)
+        res = Vec(ctx)()
+        assert not libgr.gr_vec_set_length(res._ref, n, ctx._ref)
+        status = libgr.gr_dirichlet_chi_vec(libgr.gr_vec_entry_ptr(res._ref, 0, ctx._ref), G, chi._ref, n, ctx._ref)
+        if status:
+            _handle_error(ctx, status, "dirichlet_chi_vec($chi, $n)", chi, n)
+        return res
+
     def modular_j(ctx, tau):
         """
         j-invariant j(tau).
@@ -2706,6 +2972,37 @@ class gr_elem:
             return ctypes.cast(arr, ctypes.c_char_p).value.decode("ascii")
         finally:
             libflint.flint_free(arr)
+
+    def nstr(self, n):
+        """
+        Return a string representation of this element, where
+        real and complex numbers may be rounded to n digits.
+
+            >>> RR.pi().nstr(10)
+            '3.141592654'
+            >>> CC(1+1j).exp().nstr(10)
+            '(1.468693940 + 2.287355287*I)'
+        """
+        arr = ctypes.c_char_p()
+        n = self._ctx_python._as_si(n)
+        if libgr.gr_get_str_n(ctypes.byref(arr), self._ref, n, self._ctx) != GR_SUCCESS:
+            raise NotImplementedError
+        try:
+            return ctypes.cast(arr, ctypes.c_char_p).value.decode("ascii")
+        finally:
+            libflint.flint_free(arr)
+
+    def nprint(self, n):
+        """
+        Print a string representation of this element, where
+        real and complex numbers may be rounded to *n* digits.
+
+            >>> RR.pi().nprint(10)
+            3.141592654
+            >>> CC(1+1j).exp().nprint(10)
+            (1.468693940 + 2.287355287*I)
+        """
+        print(self.nstr(n))
 
     @staticmethod
     def _binary_coercion(self, other):

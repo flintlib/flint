@@ -168,3 +168,13 @@ gr_get_str(char ** s, gr_srcptr x, gr_ctx_t ctx)
     *s = out->s;
     return GR_SUCCESS;
 }
+
+int
+gr_get_str_n(char ** s, gr_srcptr x, slong n, gr_ctx_t ctx)
+{
+    gr_stream_t out;
+    gr_stream_init_str(out);
+    gr_write_n(out, x, n, ctx);
+    *s = out->s;
+    return GR_SUCCESS;
+}
