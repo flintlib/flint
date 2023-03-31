@@ -1689,6 +1689,14 @@ class gr_ctx:
 
             >>> ZZmod(10**7 + 19).fac(10**7)
             2343096
+
+        More tests:
+
+            >>> RF.fac(10**6)
+            8.263931688331239e+5565708
+            >>> RF.fac(10**20)
+            1.932849514310098e+1956570551809674817245
+
         """
         return ctx._unary_op_with_fmpz_fmpq_overloads(x, libgr.gr_fac, op_fmpz=libgr.gr_fac_fmpz, rstr="fac($x)")
 
@@ -2314,6 +2322,8 @@ class gr_ctx:
 
             >>> CC.hardy_theta(10)
             [-3.06707439628989 +/- 6.66e-15]
+            >>> RR.hardy_theta(2)
+            [-2.525910918816132 +/- 9.34e-16]
             >>> CC.hardy_theta(10, DirichletGroup(4)(3))
             [4.64979557270698 +/- 4.41e-15]
         """
@@ -2336,6 +2346,8 @@ class gr_ctx:
         Hardy Z-function.
 
             >>> CC.hardy_z(2)
+            [-0.539633125646145 +/- 8.59e-16]
+            >>> RR.hardy_z(2)
             [-0.539633125646145 +/- 8.59e-16]
             >>> CC.hardy_z(2, DirichletGroup(4)(3))
             [1.15107760668266 +/- 5.01e-15]
