@@ -15,6 +15,8 @@
 #include "ca_poly.h"
 #include "fexpr.h"
 #include "gr.h"
+#include "gr_vec.h"
+#include "gr_poly.h"
 
 #define GR_CA_CTX(ring_ctx) ((ca_ctx_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
 
@@ -1158,6 +1160,110 @@ _gr_ca_poly_mullow(ca_ptr res,
     return GR_SUCCESS;
 }
 
+/* hidden feature: also works with arb ctx */
+int
+_gr_ca_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
+{
+    int status = GR_SUCCESS;
+    ca_vec_t ca_roots;
+    ulong * exp;
+    slong deg;
+    gr_ctx_t ZZ;
+    slong i;
+    fmpz_t exp_z;
+
+    if (poly->length == 0)
+        return GR_DOMAIN;
+
+    deg = poly->length - 1;
+
+    gr_ctx_init_fmpz(ZZ);
+    fmpz_init(exp_z);
+
+    ca_vec_init(ca_roots, 0, GR_CA_CTX(ctx));
+    exp = flint_malloc(sizeof(ulong) * deg);
+
+    if (ca_poly_roots(ca_roots, exp, (const ca_poly_struct *) poly, GR_CA_CTX(ctx)))
+    {
+        gr_vec_set_length(roots, 0, ctx);
+        gr_vec_set_length(mult, 0, ZZ);
+
+        for (i = 0; i < ca_roots->length; i++)
+        {
+            if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA || ctx->which_ring == GR_CTX_RR_CA)
+            {
+                truth_t is_real = ca_check_is_real(ca_roots->entries + i, GR_CA_CTX(ctx));
+
+                if (is_real == T_FALSE)
+                    continue;
+
+                if (is_real == T_UNKNOWN)
+                {
+                    status = GR_UNABLE;
+                    break;
+                }
+            }
+
+            fmpz_set_ui(exp_z, exp[i]);
+            status |= gr_vec_append(roots, ca_roots->entries + i, ctx);
+            status |= gr_vec_append(mult, exp_z, ZZ);
+        }
+    }
+    else
+    {
+        status = GR_UNABLE;
+        gr_vec_set_length(roots, 0, ctx);
+        gr_vec_set_length(mult, 0, ZZ);
+    }
+
+    ca_vec_clear(ca_roots, GR_CA_CTX(ctx));
+    flint_free(exp);
+
+    gr_ctx_clear(ZZ);
+    fmpz_clear(exp_z);
+
+/*
+    if (status == GR_SUCCESS)
+    {
+        _acb_vec_sort_pretty(croots, deg);
+
+        if (arb_roots)
+        {
+
+            for (i = 0; i < deg; i++)
+            {
+                if (arb_contains_zero(acb_imagref(croots + i)))
+                {
+                    fmpz one = 1;
+                    arb_set_round(acb_realref(croots + i), acb_realref(croots + i), target_prec);
+                    GR_MUST_SUCCEED(gr_vec_append(roots, acb_realref(croots + i), ctx));
+                    GR_MUST_SUCCEED(gr_vec_append(mult, &one, ZZ));
+                }
+            }
+        }
+        else
+        {
+            gr_vec_set_length(roots, deg, ctx);
+            gr_vec_set_length(mult, deg, ZZ);
+
+            for (i = 0; i < deg; i++)
+            {
+                acb_set_round(((acb_ptr) roots->entries) + i, croots + i, target_prec);
+                fmpz_one(((fmpz *) mult->entries) + i);
+            }
+        }
+    }
+
+    acb_poly_clear(tmp);
+    _acb_vec_clear(croots, deg);
+    gr_ctx_clear(ZZ);
+
+    return status;
+*/
+
+    return status;
+}
+
 int
 _gr_ca_mat_mul(ca_mat_t res, const ca_mat_t x, const ca_mat_t y, gr_ctx_t ctx)
 {
@@ -1325,6 +1431,8 @@ gr_method_tab_input _ca_methods_input[] =
     {GR_METHOD_ATAN,            (gr_funcptr) _gr_ca_atan},
 
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_ca_poly_mullow},
+    {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_ca_poly_roots},
+    /* {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_ca_poly_roots_other}, */
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_ca_mat_mul},
     {GR_METHOD_MAT_DET,         (gr_funcptr) _gr_ca_mat_det},
     {GR_METHOD_MAT_FIND_NONZERO_PIVOT,      (gr_funcptr) _gr_ca_mat_find_nonzero_pivot},

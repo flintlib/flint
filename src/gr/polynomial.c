@@ -339,6 +339,11 @@ polynomial_pow_si(gr_poly_t res, const gr_poly_t poly, slong exp, gr_ctx_t ctx)
     return status;
 }
 
+int
+polynomial_gcd(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, const gr_ctx_t ctx)
+{
+    return gr_poly_gcd(res, x, y, POLYNOMIAL_ELEM_CTX(ctx));
+}
 
 
 int _gr_poly_methods_initialized = 0;
@@ -393,6 +398,8 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_EUCLIDEAN_DIV,         (gr_funcptr) polynomial_euclidean_div},
     {GR_METHOD_EUCLIDEAN_REM,         (gr_funcptr) polynomial_euclidean_rem},
     {GR_METHOD_EUCLIDEAN_DIVREM,      (gr_funcptr) polynomial_euclidean_divrem},
+
+    {GR_METHOD_GCD,         (gr_funcptr) polynomial_gcd},
 
     {0,                     (gr_funcptr) NULL},
 };
