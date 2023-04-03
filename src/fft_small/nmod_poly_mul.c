@@ -870,7 +870,7 @@ int _nmod_poly_mul_mid_precomp(
 {
     ulong bn = M->bn;
     ulong zn = an + bn - 1;
-    ulong atrunc, btrunc = M->btrunc, ztrunc;
+    ulong atrunc, ztrunc;
     ulong depth = M->depth;
     ulong N = n_pow2(depth);
     ulong i, np = M->np;
@@ -878,7 +878,7 @@ int _nmod_poly_mul_mid_precomp(
 
     FLINT_ASSERT(an > 0);
     FLINT_ASSERT(bn > 0);
-    FLINT_ASSERT(btrunc <= N);
+    FLINT_ASSERT(M->btrunc <= N);
 
     if (zl >= zh)
         return 1;
