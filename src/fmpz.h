@@ -768,15 +768,6 @@ int fmpz_moebius_mu(const fmpz_t n);
 
 void fmpz_divisor_sigma(fmpz_t res, ulong k, const fmpz_t n);
 
-/* Functions that should be in ulong extras */
-
-ulong n_powmod2_fmpz_preinv(ulong a, const fmpz_t exp, ulong n, ulong ninv);
-
-FMPZ_INLINE mp_limb_t nmod_pow_fmpz(mp_limb_t a, const fmpz_t exp, nmod_t mod)
-{
-    return n_powmod2_fmpz_preinv(a, exp, mod.n, mod.ninv);
-}
-
 /* Declare dead functions ****************************************************/
 
 #define __new_fmpz _Pragma("GCC error \"'__new_fmpz' is deprecated.\"")

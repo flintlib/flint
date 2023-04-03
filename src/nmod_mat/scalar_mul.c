@@ -12,6 +12,8 @@
 #include "ulong_extras.h"
 #include "nmod_mat.h"
 
+#define UWORD_HALF (UWORD_MAX / 2 + 1)
+
 void
 nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, mp_limb_t c)
 {
