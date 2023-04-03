@@ -113,8 +113,9 @@ then
     AC_MSG_ERROR([FLINT does not support the use of specifying --target.])
 fi
 
-# Get system triplet
-AC_CANONICAL_HOST
+dnl Get system triplet
+dnl NOTE: This is already invoked from LT_INIT
+dnl AC_CANONICAL_HOST
 
 ################################################################################ 
 # configure headers
@@ -453,7 +454,7 @@ fi
 # programs
 ################################################################################ 
 
-dnl NOTE: This is invoked earlier. My guess it is from AC_INIT(C)
+dnl NOTE: This is invoked from LT_INIT
 dnl AC_PROG_CC
 
 if test "$with_ntl" = "yes" || test "$enable_cxx" = "yes";
@@ -595,11 +596,15 @@ AC_SUBST(LDCONFIG)
 ################################################################################ 
 
 # Mandatory headers
-AC_CHECK_HEADERS([stdarg.h stdio.h stdlib.h stdint.h string.h math.h float.h errno.h gmp.h mpfr.h],,
+# The following headers are checked previously:
+#   stdio.h stdlib.h stdint.h string.h
+AC_CHECK_HEADERS([stdarg.h math.h float.h errno.h gmp.h mpfr.h],,
                  AC_MSG_ERROR([Could not find a mandatory header!]))
 
 # Optional headers
-AC_CHECK_HEADERS([fenv.h alloca.h malloc.h sys/param.h unistd.h windows.h])
+# The following headers are checked previously:
+#   unistd.h
+AC_CHECK_HEADERS([fenv.h alloca.h malloc.h sys/param.h windows.h])
 
 if test "$enable_pthread" = "yes";
 then
