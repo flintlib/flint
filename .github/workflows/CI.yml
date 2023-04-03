@@ -119,9 +119,8 @@ jobs:
 
     runs-on: macos-latest
 
-    # NOTE: macOS only has a maximum of 256 allowed open file descriptors
     env:
-      MAKE: "gmake -j --output-sync=target --max-load=220"
+      MAKE: "gmake -j -l 10 --output-sync=target"
       CFLAGS: "-Wall"
       EXTRA_OPTIONS: "--disable-static --enable-shared"
       CC: "gcc"
