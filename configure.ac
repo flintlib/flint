@@ -601,19 +601,19 @@ then
                     AC_MSG_ERROR([Could not find assert.h!]))
 fi
 
-if test "$enable_blas" = "yes";
+if test "$with_blas" = "yes";
 then
     AC_CHECK_HEADER([cblas.h],,
                     AC_MSG_ERROR([Could not find cblas.h!]))
 fi
 
-if test "$enable_gc" = "yes";
+if test "$with_gc" = "yes";
 then
     AC_CHECK_HEADER([gc.h],,
                     AC_MSG_ERROR([Could not find gc.h!]))
 fi
 
-if test "$enable_ntl" = "yes";
+if test "$with_ntl" = "yes";
 then
     AC_CHECK_HEADER([NTL/ZZ.h],,
                     AC_MSG_ERROR([Could not find NTL/ZZ.h!]))
