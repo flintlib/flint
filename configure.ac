@@ -453,7 +453,8 @@ fi
 # programs
 ################################################################################ 
 
-AC_PROG_CC
+dnl NOTE: This is invoked earlier. My guess it is from AC_INIT(C)
+dnl AC_PROG_CC
 
 if test "$with_ntl" = "yes" || test "$enable_cxx" = "yes";
 then
@@ -841,9 +842,12 @@ AC_SUBST(ABI_FLAG)
 
 if test "$enable_debug" = "yes";
 then
-    AX_CHECK_COMPILE_FLAG([-g],
-    [save_CFLAGS="-g $save_CFLAGS"],
-    [AC_MSG_ERROR([$CC does not support the flag -g needed to generate debug information])])
+    if test "$ac_cv_prog_cc_g" = "yes";
+    then
+        save_CFLAGS="-g $save_CFLAGS"
+    else
+        AC_MSG_ERROR([$CC does not support the flag -g needed to generate debug information])
+    fi
 fi
 
 if test "$enable_avx2" = "yes";
