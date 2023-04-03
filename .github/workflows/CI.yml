@@ -37,10 +37,15 @@ jobs:
           ./bootstrap.sh
           ./configure CC=${CC} --enable-avx2 TESTCFLAGS="${TESTCFLAGS}" --disable-static
 
-      - name: "Compile"
+      - name: "Compile library"
         run: |
           $MAKE
           ldd libflint.so
+
+      - name: "Compile tests"
+        run: |
+          export FLINT_TEST_MULTIPLIER=10
+          $MAKE tests
 
       - name: "Check"
         run: |
@@ -85,10 +90,15 @@ jobs:
           ./bootstrap.sh
           ./configure CC=${CC} CFLAGS="${CFLAGS}" --with-gmp=/usr --with-mpfr=/usr --enable-assert --disable-static
 
-      - name: "Compile"
+      - name: "Compile library"
         run: |
           $MAKE
           ldd libflint.so
+
+      - name: "Compile tests"
+        run: |
+          export FLINT_TEST_MULTIPLIER=2
+          $MAKE tests
 
       - name: "Check"
         run: |
@@ -102,15 +112,16 @@ jobs:
 
 
   ##############################################################################
-  # macos with gcc
+  # macos with gcc and blas
   ##############################################################################
   macos-gcc:
-    name: macOS GCC (x3)
+    name: macOS GCC with BLAS (x3)
 
     runs-on: macos-latest
 
+    # NOTE: macOS only has a maximum of 256 allowed open file descriptors
     env:
-      MAKE: "gmake -j --output-sync=target"
+      MAKE: "gmake -j --output-sync=target --max-load=220"
       CFLAGS: "-Wall"
       EXTRA_OPTIONS: "--disable-static --enable-shared"
       CC: "gcc"
@@ -127,6 +138,7 @@ jobs:
           brew install autoconf
           brew install libtool
           brew install automake
+          brew install openblas
           gcc --version
           gmake --version
           autoconf --version
@@ -134,12 +146,20 @@ jobs:
       - name: "Configure"
         run: |
           ./bootstrap.sh
-          ./configure CC=${CC} CFLAGS="${CFLAGS}" --with-gmp=$(brew --prefix) \
-              --with-mpfr=$(brew --prefix) ${EXTRA_OPTIONS}
+          ./configure CC=${CC} CFLAGS="${CFLAGS}" \
+              --with-gmp=$(brew --prefix) \
+              --with-mpfr=$(brew --prefix) \
+              --with-blas=$(brew --prefix)/opt/openblas \
+              ${EXTRA_OPTIONS}
 
-      - name: "Compile"
+      - name: "Compile library"
         run: |
           $MAKE
+
+      - name: "Compile tests"
+        run: |
+          export FLINT_TEST_MULTIPLIER=3
+          $MAKE tests
 
       - name: "Check"
         run: |
@@ -282,10 +302,16 @@ jobs:
           ./bootstrap.sh
           ./configure CC=${CC} CFLAGS="${CFLAGS}" ${EXTRA_OPTIONS}
 
-      - name: "Compile"
+      - name: "Compile library"
         run: |
           cd ${REPO}
           ${MAKE}
+
+      - name: "Compile tests"
+        run: |
+          cd ${REPO}
+          export FLINT_TEST_MULTIPLIER=1
+          $MAKE tests
 
       - name: "Check"
         run: |
@@ -334,10 +360,15 @@ jobs:
           ./bootstrap.sh
           ./configure CC=${CC} CFLAGS="${CFLAGS}" ${EXTRA_OPTIONS}
 
-      - name: "Compile"
+      - name: "Compile library"
         run: |
           $MAKE
           ldd libflint.so
+
+      - name: "Compile tests"
+        run: |
+          export FLINT_TEST_MULTIPLIER=5
+          $MAKE tests
 
       - name: "Check"
         run: |
@@ -383,7 +414,7 @@ jobs:
           cmake -G"Unix Makefiles" -DWITH_NTL=no -DBUILD_TESTING=yes \
               -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=${LOCAL} ..
 
-      - name: "Compile"
+      - name: "Compile library"
         run: |
           cd build
           $MAKE
@@ -437,9 +468,14 @@ jobs:
           # CI's /tmp directory.
           ./configure CC=${CC} CFLAGS="${CFLAGS}" TMPDIR="." ${EXTRA_OPTIONS}
 
-      - name: "Compile"
+      - name: "Compile library"
         run: |
           ${MAKE}
+
+      - name: "Compile tests"
+        run: |
+          export FLINT_TEST_MULTIPLIER=0.5
+          ${MAKE} tests
 
       - name: "Check"
         run: |

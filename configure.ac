@@ -601,19 +601,19 @@ then
                     AC_MSG_ERROR([Could not find assert.h!]))
 fi
 
-if test "$enable_blas" = "yes";
+if test "$with_blas" = "yes";
 then
     AC_CHECK_HEADER([cblas.h],,
                     AC_MSG_ERROR([Could not find cblas.h!]))
 fi
 
-if test "$enable_gc" = "yes";
+if test "$with_gc" = "yes";
 then
     AC_CHECK_HEADER([gc.h],,
                     AC_MSG_ERROR([Could not find gc.h!]))
 fi
 
-if test "$enable_ntl" = "yes";
+if test "$with_ntl" = "yes";
 then
     AC_CHECK_HEADER([NTL/ZZ.h],,
                     AC_MSG_ERROR([Could not find NTL/ZZ.h!]))
@@ -636,11 +636,11 @@ that we can either fix the issue or give a more proper error message.])])
 if test "$enable_gmp_internals" = "yes";
 then
     AC_CHECK_LIB([gmp],[__gmpn_gcd_11],
-    [],
+    [dummy_var="x"],
     [AC_MSG_ERROR([`mpn_gcd_11' was not found in the GMP library. It is needed to enable GMP
 internals.])])
     AC_CHECK_LIB([gmp],[__gmpn_div_q],
-    [],
+    [dummy_var="x"],
     [AC_MSG_ERROR([`mpn_div_q' was not found in the GMP library. It is needed to enable GMP
 internals.])])
 fi
@@ -665,8 +665,8 @@ fi
 
 if test "$with_blas" = "yes";
 then
-    AC_CHECK_LIB(blas,cblas_dgemm,
-    [LIBS="-lblas $LIBS"],
+    AC_CHECK_LIB(cblas,cblas_dgemm,
+    [LIBS="-lcblas $LIBS"],
     [AC_MSG_ERROR([BLAS library was not found.  If you indeed have BLAS installed, please
 submit a bug report to <https://github.com/flintlib/flint2/issues/> so
 that we can either fix the issue or give a more proper error message.])])
