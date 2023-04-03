@@ -12,51 +12,26 @@
 #ifndef MACHINE_VECTORS_H
 #define MACHINE_VECTORS_H
 
-
-#define FLINT_AVX 1
-#define FLINT_NEON 0
-
 #define ALIGN_STRUCT(x) __attribute__((aligned(x)))
 
-
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
 #include <stdlib.h>
 #include <math.h>
 
-#if FLINT_AVX
-
-#include <x86intrin.h>
-#include <immintrin.h>
-
-#elif FLINT_NEON
-
-#include <arm_neon.h>
-
+#if defined(__AVX2__)
+# include <x86intrin.h>
+# include <immintrin.h>
+#elif defined(__ARM_NEON)
+# include <arm_neon.h>
 #endif
-
-
-#undef ulong
-#define ulong mp_limb_t
 
 #include "flint.h"
 #include "templates.h"
 
-#define FLINT_INLINE static __inline__
-#define FLINT_FORCE_INLINE static __attribute__((always_inline)) __inline__
-#define FLINT_STATIC_NOINLINE static __attribute__((noinline)) 
-
-#define UNLIKELY(x) __builtin_expect((x),0)
-#define LIKELY(x)   __builtin_expect((x),1)
-
-
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
-
-
-#if FLINT_AVX
+#if defined(__AVX2__)
 /*
     In general the machine vector types should either be passed by const ref or
     the whole function should be forced inline as some platforms have buggy
@@ -766,7 +741,7 @@ FLINT_FORCE_INLINE vec8n vec8n_bit_and(vec8n a, vec8n b) {
 }
 
 
-#elif FLINT_NEON
+#elif defined(__ARM_NEON)
 
 typedef ulong vec1n;
 typedef int64x2_t vec2n;
@@ -1434,4 +1409,3 @@ FLINT_FORCE_INLINE vec4n vec4d_convert_limited_vec4n(vec4d a) {
 #endif
 
 #endif
-
