@@ -104,13 +104,6 @@ void mpoly_parse_clear(mpoly_parse_t E)
     flint_free(E->terminal_values);
 }
 
-#define PTR_SWAP(T, a, b)   \
-    do {                    \
-        T * _tmp_ = a;      \
-        a = b;              \
-        b = _tmp_;          \
-    } while (0);
-
 void mpoly_parse_add_terminal(mpoly_parse_t E, const char * s, const void * val)
 {
     slong l, n = E->terminals_len;
