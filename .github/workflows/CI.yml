@@ -102,10 +102,10 @@ jobs:
 
 
   ##############################################################################
-  # macos with gcc
+  # macos with gcc and blas
   ##############################################################################
   macos-gcc:
-    name: macOS GCC (x3)
+    name: macOS GCC with BLAS (x3)
 
     runs-on: macos-latest
 
@@ -127,6 +127,7 @@ jobs:
           brew install autoconf
           brew install libtool
           brew install automake
+          brew install openblas
           gcc --version
           gmake --version
           autoconf --version
@@ -134,8 +135,11 @@ jobs:
       - name: "Configure"
         run: |
           ./bootstrap.sh
-          ./configure CC=${CC} CFLAGS="${CFLAGS}" --with-gmp=$(brew --prefix) \
-              --with-mpfr=$(brew --prefix) ${EXTRA_OPTIONS}
+          ./configure CC=${CC} CFLAGS="${CFLAGS}" \
+              --with-gmp=$(brew --prefix) \
+              --with-mpfr=$(brew --prefix) \
+              --with-blas=$(brew --prefix)/opt/openblas \
+              ${EXTRA_OPTIONS}
 
       - name: "Compile"
         run: |
