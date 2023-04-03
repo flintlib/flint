@@ -42,6 +42,6 @@ int main(int argc, char* argv[])
     fmpz_poly_q_clear(f);
     fmpz_poly_q_clear(g);
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 

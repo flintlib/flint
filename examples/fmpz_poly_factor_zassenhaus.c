@@ -54,6 +54,6 @@ int main(void)
     fmpz_poly_clear(f);
     fmpz_poly_factor_clear(facs);
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 

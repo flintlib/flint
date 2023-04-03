@@ -145,6 +145,6 @@ int main(void)
     padic_ctx_clear(ctx);
     fmpz_clear(p);
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 

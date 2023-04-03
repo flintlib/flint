@@ -1,0 +1,66 @@
+name: Deploy
+
+on:
+  push:
+    branches: [trunk]
+
+jobs:
+  ##############################################################################
+  # build documentation
+  ##############################################################################
+  build-doc:
+    name: Push documentation to website
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: "Check for changes in documentation"
+        id: check_doc_changes
+        run: |
+          if test -z "$(git diff --name-only HEAD~1..HEAD -- doc/)";
+          then
+            echo "No changes in doc/"
+            echo "diff=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes in doc/ detected"
+            echo "diff=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: "Setup"
+        if: success() && steps.check_doc_changes.outputs.diff == 'true'
+        run: |
+          sudo apt install -y python3-sphinx
+          sphinx-build --version
+
+      - name: "Build documentation"
+        if: success() && steps.check_doc_changes.outputs.diff == 'true'
+        run: |
+          cd doc
+          make html SPHINXOPTS="-W -j auto"
+
+      - name: "Create a tarball of the documentation"
+        if: success() && steps.check_doc_changes.outputs.diff == 'true'
+        run: |
+          cd doc/build
+          mv html doc
+          tar -czvf doc.tar.gz doc
+
+      - name: "Setup SSH key"
+        if: success() && steps.check_doc_changes.outputs.diff == 'true'
+        uses: shimataro/ssh-key-action@v2.5.0
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          name: id_ed25519
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+
+      - name: "Push documentation to server"
+        if: success() && steps.check_doc_changes.outputs.diff == 'true'
+        run: |
+          cd doc/build
+          ssh -t wbhart@opal6.opalstack.com 'mkdir ~/tmp'
+          scp doc.tar.gz wbhart@opal6.opalstack.com:~/tmp
+          ssh -t wbhart@opal6.opalstack.com 'cd ~/tmp && tar -xf doc.tar.gz && rm -rf ~/apps/flintlib_org/doc && mv doc ~/apps/flintlib_org && cd ~ && rm -rf ~/tmp'

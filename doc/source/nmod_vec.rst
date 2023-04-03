@@ -115,9 +115,12 @@ Dot products
         for (i = 0; i < len; i++)
             res += (expr1) * (expr2);
 
-    but with the arithmetic performed modulo ``mod``.
-    The ``nlimbs`` parameter should be 0, 1, 2 or 3, specifying the
-    number of limbs needed to represent the unreduced result.
+    but with the arithmetic performed modulo ``mod``. The ``nlimbs`` parameter
+    should be 0, 1, 2 or 3, specifying the number of limbs needed to represent
+    the unreduced result.
+
+    ``nmod.h`` has to be included in order for this macro to work (order of
+    inclusions does not matter).
 
 .. function:: mp_limb_t _nmod_vec_dot(mp_srcptr vec1, mp_srcptr vec2, slong len, nmod_t mod, int nlimbs)
 

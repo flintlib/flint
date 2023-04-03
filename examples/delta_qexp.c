@@ -50,6 +50,6 @@ int main(int argc, char* argv[])
     fmpz_clear(c);
     fmpz_clear(n);
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 

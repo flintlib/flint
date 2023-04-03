@@ -1,6 +1,6 @@
 .. _building:
 
-**Configuring and building**
+**Building, testing and installing**
 ===============================================================================
 
 Configuring Flint
@@ -207,6 +207,20 @@ FLINT has an assert system. If you want a debug build you can pass
 ``--enable-assert`` to configure. However, this will slow FLINT considerably,
 so asserts should not be enabled (``--disable-assert``, the default) for
 deployment.
+
+Test coverage
+-------------------------------------------------------------------------------
+
+To obtain coverage statistics for the FLINT test suite, assuming
+that ``gcov`` and ``lcov`` are installed, configure
+FLINT with ``--enable-coverage``. Then run:
+
+.. code-block:: bash
+
+    make -j check
+    make coverage
+
+This will place a coverage report in ``build/coverage``.
 
 Exceptions
 -------------------------------------------------------------------------------

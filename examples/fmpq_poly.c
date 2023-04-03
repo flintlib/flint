@@ -38,6 +38,6 @@ int main(int argc, char* argv[])
     fmpq_poly_clear(f);
     fmpq_poly_clear(g);
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 

@@ -123,5 +123,5 @@ int main(void)
 
     flint_randclear(state);
 
-    return EXIT_SUCCESS;
+    return 0;
 }

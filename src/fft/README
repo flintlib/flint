@@ -1,0 +1,296 @@
+FFT Integer Multiplication code
+===============================
+
+License: BSD
+
+(Note the FLINT library of which this is a part is overall LGPL v2.1+ and the
+latest version of GMP/MPIR on which this currently depends is LGPL v3+. But
+the files in this implementation of the FFT are individually licensed BSD.)
+
+Introduction
+------------
+
+Many bignum libraries and programming languages do not contain fast code for
+multiplication of huge integers. It is important to have this when computing
+millions of digits of Pi, multiplying polynomials using Kronecker segmentation
+(or the Schoenhage-Strassen technique using an FFT directly) and a variety of
+other problems.
+
+Here we introduce fast FFT code for multiplication of huge integers.
+
+Currently the code depends on GMP/MPIR, however, any sufficiently well
+developed bignum library should have equivalent primitives for bignums. (There
+is also a dependence on the flint function n_revbin, which is found in the
+ulong_extras directory of flint -- I hereby license it under the BSD
+license as per the remainder of the FFT implementation.)
+
+To use the FFT for multiplying large integers, one needs to use the function
+flint_mpn_mul_fft_main as documented in the doc directory. This relies on tuning
+values supplied in fft_tuning.h in the top level source directory.
+
+Features:
+--------
+
+* Cache friendly up to huge transforms (integers of billions of bits)
+* Truncated -- no uglytwit performance jumps at power of 2 lengths and no problem
+  with unbalanced multiplications
+* Extremely fast
+* Easy to tune
+* Truncated FFT/IFFT functions can be used for polynomial multiplication
+
+Performance Data
+----------------
+
+Here are timings for multiplication of two integers of the given number of
+bits, comparing MPIR 2.4.0, this code and GMP 5.0.2 respectively. The timings
+are for varying numbers of iterations as specified. The timings were done on
+a 2.2GHz AMD K10-2 Mangy Cours machine.
+
+The tuning values used are specified in the final two columns.
+
+The first part of the table uses mul_truncate_sqrt2, the second half uses
+mul_mfa_truncate_sqrt2.
+
+bits          iters mpir   this   gmp     n w
+
+195840        1000  1.149s 1.105s 0.997s  7 16
+261120        1000  1.483s 1.415s 1.396s  7 16
+391296        100   0.261s 0.248s 0.282s  8 8
+521728        100   0.344s 0.315s 0.411s  8 8
+782592        100   0.577s 0.539s 0.628s  9 4
+1043456       100   0.706s 0.688s 0.848s  9 4
+1569024       100   1.229s 1.153s 1.317s  9 8
+
+2092032       100   1.543s 1.440s 2.765s  9 8
+3127296       10    0.283s 0.266s 0.408s 11 1
+4169728       10    0.357s 0.335s 0.543s 11 1
+6273024       10    0.621s 0.597s 0.843s 11 2
+8364032       10    0.831s 0.742s 1.156s 11 2
+12539904      10    1.441s 1.394s 1.798s 12 1
+16719872      1     0.230s 0.205s 0.288s 12 1
+25122816      1     0.379s 0.336s 0.434s 12 2
+33497088      1     0.524s 0.428s 0.646s 12 2
+50245632      1     0.833s 0.693s 1.035s 13 1
+66994176      1     1.596s 0.896s 1.358s 13 1
+100577280     1     1.906s 1.552s 2.177s 13 2
+134103040     1     2.784s 2.076s 2.984s 13 2
+201129984     1     3.971s 3.158s 4.536s 14 1
+268173312     1     5.146s 4.137s 5.781s 14 1
+402456576     1     7.548s 6.443s 9.867s 14 2
+536608768     1     9.841s 8.365s 12.71s 14 2
+804913152     1     15.48s 13.29s 20.06s 15 1
+1073217536    1     21.17s 17.16s 27.19s 15 1
+1610219520    1     31.64s 28.60s 43.37s 15 2
+2146959360    1     43.25s 37.02s 57.66s 15 2
+3220340736    1     70.14s 58.09s 92.94s 16 1
+4293787648    1     96.00s 74.26s 146.1s 16 1
+6441566208    1     150.2s 131.1s 217.5s 16 2
+8588754944    1     208.4s 175.0s 312.8s 16 2
+12883132416   1     327.4s 278.6s 447.7s 17 1
+17177509888   1     485.0s 360.ss 614.2s 17 1
+
+
+Additional tuning
+-----------------
+
+Technically one should tune the values that appear in fft_tuning.h. The
+mulmod_2expp1 tuning array indices correspond to (n, w) pairs starting
+at n = 12, w = 1. The values in the array should be nonnegative and less
+than 6. The length of the array is given by FFT_N_NUM. The cutoff
+FFT_MULMOD_2EXPP1_CUTOFF should also be tuned. It must be bigger than
+128. The function that these values tunes is in the file mulmod_2expp1.c.
+See the corresponding test function for an example of how to call it.
+
+The fft tuning array indices correspond to (n, w) pairs starting at
+n = 6, w = 1. The values in the array should be nonnegative and less
+than 6. The function that is tuned is in the file mpn_mul_fft_main.c.
+See the corresponding test function for an example of how to call it.
+The function implementation itself is the best reference for which
+inputs will use which table entries.
+
+Strategy
+--------
+
+Let's suppose we wish to compute a convolution of length 2n where n is a power of 2. We do this with a standard Fermat transform with coefficients mod p = 2^wn + 1. Note 2^w is a 2n-th root of unity.
+
+We assume wn is divisible by GMP_LIMB_BITS (either 32 or 64). In practice n is always divisible by this constant.
+
+Write l = wn/GMP_LIMB_BITS. Each coeff is stored in a block of l+1 limbs in twos complement form. We accumulate carries in the top limb meaning reduction mod p does not need to be done after an addition or subtraction.
+
+Coefficients are also accessed via one level of indirection so that coefficients can be swapped by swapping pointers.
+
+A couple of extra temporary coefficients are allocated for operations which cannot be done entirely in-place.
+
+1. Efficient butterflies
+
+The FFT butterfly step is:
+
+[a{i}, b{i}] => [a{i}+b{i}, z^i*(a{i}-b{i})]
+
+We use MPIR's sumdiff to simultaneously perform the addition and subtraction. The multiplication by z^i is a shift by iw bits which we decompose into a shift by b bits and x limbs. The output is written in a location with an offset of x limbs. To handle the wraparound we split the operation into two parts. Finally we shift by the remaining b bits. An additional negation needs to occur when i >= n as nw = -1 mod p.
+
+The IFFT butterfly is:
+
+[a{i}, b{i}] => [a{i}+z^-i*b{i}, a{i}-z^-i*b{i}]
+
+We first decompose iw into b bits and x limbs. We perform the bit shift first, in-place. Then we use sumdiff, this time reading at an offset of x limbs, splitting the operation into two parts as before.
+
+2. Cache locality
+
+We use the Matrix Fourier Algorithm. To perform an FFT of length m = RC we:
+
+  * Split the coefficients into R rows of C columns
+  * Perform a length R FFT on each column, i.e. with an input stride of C
+  * Multiply each coefficient by z^{r*c} where z = exp(2*Pi*I/m),
+note z corresponds to a shift of w bits
+  * Perform a length C FFT on each row, i.e. with an input stride of 1
+  * Transpose the matrix of coefficients
+
+To perform an IFFT we complete the steps in reverse, using IFFT's instead of FFT's.
+
+We set R, C to be both around sqrt(m) to minimise the maximum size of FFT which is in cache at any one time. When the FFT is followed by the IFFT as in the convolution we do not perform the transposes of the matrix coefficients as they cancel each other out.
+
+We do not perform the twiddles by z^{rc} in a separate pass over the data. We combine them with the length R FFT's and IFFT's. They are combined with the butterflies at the very bottom level of the FFT's and IFFT's. They essentially cost nothing as they just increase the bit shifts already being performed.
+
+The algorithm expects the FFT's to output their coefficients in reverse binary order, thus we have to revbin the coefficient order after the column FFTs and before the column IFFTs.
+
+3. Truncation
+
+When performing a convolution where we know that many of the output coefficients will be zero (this happens when multiplying integers that are not of an optimal split-into-a-nice-power-of-two length) we can use Van der Hoeven's truncated FFT.
+
+There are two cases: a) less than or equal to half of the FFT output coeffs
+are non-zero and b) more than half the coefficients are non-zero:
+
+a) A 0 0 0
+
+b) A A A 0
+
+In the first case, the first layer of the FFT would do nothing. As we
+only care about the left half, we recurse on only the left half A 0,
+ignoring the remaining zeros.
+
+In the second case we compute the first layer of the FFT. We then do
+an ordinary FFT on the left half and recurse with a truncated FFT on
+the right half.
+
+Of course we need to be careful in that the first layer of the FFT
+will have replaced our zeroes with non-zero coefficients, so we don't
+recurse to the above two cases.
+
+We start instead with an FFT with non-zero coefficients (labelled B).
+
+A B B B
+
+or
+
+A A A B
+
+But the cases can be dealt with in a similar way to the cases where
+there are zeros. The saving comes in that we repeatedly ignore
+coefficients on the right hand side when they are all past the
+truncation point.
+
+The IFFT is slightly more involved. We know that we are going to
+*end up with* zeroes on the right hand side. We start with the results
+of the pointwise mults, though we do not perform all the pointwise
+mults. If we are going to end up with c zeroes, we do not perform the
+last c pointwise mults.
+
+So we want our IFFT to get to
+
+A A A 0
+
+starting from
+
+P P P ?
+
+Again there are two cases, depending on how many zeros we will end up with:
+
+a) A 0 0 0
+
+b) A A A 0
+
+In case (a) , by working backwards from what we know we will get, the
+next to last level must be
+
+A/2 0 (A/2)~ 0 where ~ is the opposite of the twiddle that will be
+applied by the IFFT butterfly.
+
+But I can compute the LHS, A/2 0, simply by recursing on the truncated
+IFFT. Then it is just a matter of multiplying by 2 to get A 0 which is
+what I was after.
+
+In case (b) an ordinary IFFT can compute the left hand of the
+penultimate layer, as we have all the necessary pointwise mults for
+that.
+
+A A A 0
+B B ? ?
+
+The right hand side we compute by recursing on the truncated IFFT. But
+we don't know what the final question mark is. To get it we have to
+reverse the steps of the IFFT to find it. As we have the second B we
+can compute the second A simply by performing some IFFT butterflies.
+Now we can compute the second ? by reversing the IFFT butterflies. So
+we are left with:
+
+A A' A 0'
+B' B' ? C'
+
+where I wrote a dash on the coefficients we actually now know.
+
+Now we can recurse using the truncated IFFT on the right hand side.
+
+Although the coefficients C' are not zero, the principles are the same
+and we split into two cases as above.
+
+This allows us to get the question mark, yielding:
+
+A A' A 0'
+B' B' C' C'
+
+and clearly now we can compute the A's we don't know from the known
+coefficients.
+
+To combine the MFA with truncation we simply truncate at one level of the MFA, i.e. set the truncation length to be a multiple of the length of the inner FFT's. When we are at the lower levels computing row FFT's we don't compute those which lie past the truncation point.
+
+We need to take care to perform the right pointwise mults because we do not transpose the matrix or output coefficients in revbin order.
+
+4. Negacyclic convolution
+
+The pointwise multiplications mod p are sometimes large enough to make use of an FFT. For this purpose we use a negacyclic convolution which naturally performs integer multiplication mod p.
+
+If we do this naively we break up into coefficients whose sizes are multiples of half the negacyclic FFT lengths. This becomes inefficient.
+
+In order to get around this we must perform two multiplications, one via a negacyclic FFT with big coefficients and one naively with very small coefficients and CRT them together. This gives more flexibility in the size of coefficients we use in the negacyclic FFT allowing the large pointwise multication mod p to be done efficiently (not implemented yet).
+
+5. Sqrt 2 trick
+
+In the ring Z/pZ where p = 2^S + 1 the value 2^(2S/4)-2^(S/4) is a
+square root of 2. This allows us to perform a convolution of twice
+the length without twice the cost. To perform the operations we need
+to be able to perform twiddles by powers of sqrt2. These are decomposed
+and the operations are combined as much as possible with the
+multiplications by powers of 2.
+
+Acknowledgements
+----------------
+
+"Matters Computational: ideas, algorithms and source code", by Jorg
+Arndt, see https://www.jjj.de/fxt/fxtbook.pdf
+
+"Primes numbers: a computational perspective", by Richard Crandall and
+Carl Pomerance, 2nd ed., 2005, Springer.
+
+"A GMP-based implementation of Schonhage-Strassen's Large Integer
+Multiplication Algorithm" by Pierrick Gaudry, Alexander Kruppa and
+Paul Zimmermann, ISAAC 2007 proceedings, pp 167-174. See
+http://www.loria.fr/~gaudry/publis/issac07.pdf
+
+"Multidigit multiplication for mathematicians" by Dan Bernstein (to
+appear). see https://cr.yp.to/papers/m3.pdf
+
+"A cache-friendly truncated FFT" by David Harvey, Theor. Comput. Sci. 410 (2009), 2649.2658. See http://web.maths.unsw.edu.au/~davidharvey/papers/cache-trunc-fft/
+
+"The truncated Fourier transform and applications" by Joris van der Hoeven, J. Gutierrez, editor, Proc. ISSAC 2004, pages 290.296, Univ. of Cantabria, Santander, Spain, July 4.7 2004.
+

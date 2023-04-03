@@ -1,308 +1,778 @@
-QUIET_CC  = @echo '   ' CC  ' ' $@;
-QUIET_CXX = @echo '   ' CXX ' ' $@;
-QUIET_AR  = @echo '   ' AR  ' ' $@;
+#
+# Copyright (C) 2023 Albin Ahlbäck
+#
+# This file is part of FLINT.
+#
+# FLINT is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Lesser General Public License (LGPL) as published
+# by the Free Software Foundation; either version 2.1 of the License, or
+# (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+#
 
-AT=@
+FLINT_DIR:=.
+SRC_DIR:=src
+BUILD_DIR:=build
+ABS_FLINT_DIR:=$(patsubst %/,%, $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
+ABS_SRC_DIR:=$(ABS_FLINT_DIR)/$(SRC_DIR)
+ABS_BUILD_DIR:=$(ABS_FLINT_DIR)/$(SRC_DIR)
 
-BUILD_DIRS= thread_pool                     thread_support                  \
-            ulong_extras                                                    \
-            long_extras                                                     \
-            perm                                                            \
-            double_extras   d_vec           d_mat                           \
-            mpn_extras                                                      \
-            mpf_vec                         mpf_mat                         \
-            mpfr_vec                        mpfr_mat                        \
-            nmod            nmod_vec        nmod_mat        nmod_poly       \
-            fmpz            fmpz_vec        fmpz_mat        fmpz_poly       \
-            fmpz_mod        fmpz_mod_vec    fmpz_mod_mat    fmpz_mod_poly   \
-            fmpq            fmpq_vec        fmpq_mat        fmpq_poly       \
+FLINT_MAJOR:=@FLINT_MAJOR@
+FLINT_MINOR:=@FLINT_MINOR@
+FLINT_PATCH:=@FLINT_PATCH@
+FLINT_MAJOR_SO:=@FLINT_MAJOR_SO@
+FLINT_MINOR_SO:=@FLINT_MINOR_SO@
+FLINT_PATCH_SO:=@FLINT_PATCH_SO@
+
+FLINT_LIB:=@FLINT_LIB@
+FLINT_IMPLIB:=@FLINT_IMPLIB@
+FLINT_LIBNAME:=@FLINT_LIBNAME@
+FLINT_LIB_STATIC:=@FLINT_LIB_STATIC@
+
+FLINT_SOLIB:=@FLINT_SOLIB@
+
+prefix:=@prefix@
+exec_prefix:=@exec_prefix@
+
+INCLUDEDIR:=@includedir@
+LIBDIR:=@libdir@
+BINDIR:=@bindir@
+PKGCONFIGDIR:=$(LIBDIR)/pkgconfig
+
+HOST_OS:=@host_os@
+
+EXEEXT:=@EXEEXT@
+
+AR:=@AR@
+CC:=@CC@
+CXX:=@CC@
+DLLTOOL:=@DLLTOOL@
+LD:=@LD@
+LDCONFIG:=@LDCONFIG@
+LN_S:=@LN_S@
+MKDIR_P:=@MKDIR_P@
+STRIP:=@STRIP@
+RM_F:=rm -f
+RM_RF:=rm -rf
+CP:=cp
+CP_A:=cp -a
+
+STATIC:=@STATIC@
+SHARED:=@SHARED@
+
+COVERAGE:=@COVERAGE@
+WANT_NTL:=@WANT_NTL@
+
+WANT_DEPS:=@WANT_DEPS@
+
+GMP_LIB_PATH:=@GMP_LIB_PATH@
+MPFR_LIB_PATH:=@MPFR_LIB_PATH@
+BLAS_LIB_PATH:=@BLAS_LIB_PATH@
+GC_LIB_PATH:=@GC_LIB_PATH@
+NTL_LIB_PATH:=@NTL_LIB_PATH@
+
+CFLAGS:=@CFLAGS@
+TESTCFLAGS:=@TESTCFLAGS@
+CPPFLAGS:=@CPPFLAGS@
+CPPFLAGS2:=-L$(FLINT_DIR) $(CPPFLAGS)
+LIB_CPPFLAGS:=@LIB_CPPFLAGS@
+CXXFLAGS:=@CXXFLAGS@
+LIBS:=@LIBS@
+LIBS2:=$(LIBS) -lflint
+PIC_FLAG:=@PIC_FLAG@
+
+LDFLAGS:=@LDFLAGS@
+EXTRA_SHARED_FLAGS:=@EXTRA_SHARED_FLAGS@ $(foreach path, $(GMP_LIB_PATH) $(MPFR_LIB_PATH) $(BLAS_LIB_PATH) $(GC_LIB_PATH) $(NTL_LIB_PATH), @WL@-rpath,$(path))
+EXE_LDFLAGS:=$(LDFLAGS) $(foreach path, $(ABS_FLINT_DIR) $(GMP_LIB_PATH) $(MPFR_LIB_PATH) $(BLAS_LIB_PATH) $(GC_LIB_PATH) $(NTL_LIB_PATH), @WL@-rpath,$(path))
+
+################################################################################
+################################################################################
+# files and directories
+################################################################################
+################################################################################
+
+################################################################################
+# configuration files
+################################################################################
+
+CFG_FILES :=                                                                \
+        $(FLINT_DIR)/config.log         $(SRC_DIR)/flint-config.h           \
+        $(SRC_DIR)/fft_tuning.h         $(FLINT_DIR)/flint.pc               \
+        $(FLINT_DIR)/Makefile           $(SRC_DIR)/fmpz/fmpz.c
+
+################################################################################
+# directories
+################################################################################
+
+HEADLESS_DIRS := generic_files
+
+HEADER_DIRS :=                                                              \
+        thread_pool                     thread_support                      \
                                                                             \
-            nf nf_elem qfb                                                  \
+        ulong_extras                                                        \
+        long_extras                                                         \
+        perm                                                                \
+        double_extras   d_vec           d_mat                               \
+        mpn_extras                                                          \
+        mpf_vec                         mpf_mat                             \
+        mpfr_vec                        mpfr_mat                            \
+        nmod            nmod_vec        nmod_mat        nmod_poly           \
+        fmpz            fmpz_vec        fmpz_mat        fmpz_poly           \
+        fmpz_mod        fmpz_mod_vec    fmpz_mod_mat    fmpz_mod_poly       \
+        fmpq            fmpq_vec        fmpq_mat        fmpq_poly           \
                                                                             \
-            fq              fq_vec          fq_mat          fq_poly         \
-            fq_nmod         fq_nmod_vec     fq_nmod_mat     fq_nmod_poly    \
-            fq_zech         fq_zech_vec     fq_zech_mat     fq_zech_poly    \
-            fq_default                      fq_default_mat  fq_default_poly \
-            fq_embed                                                        \
-            fq_nmod_embed                                                   \
-            fq_zech_embed                                                   \
-            padic                           padic_mat       padic_poly      \
-            qadic                                                           \
+        fq              fq_vec          fq_mat          fq_poly             \
+        fq_nmod         fq_nmod_vec     fq_nmod_mat     fq_nmod_poly        \
+        fq_zech         fq_zech_vec     fq_zech_mat     fq_zech_poly        \
+        fq_default                      fq_default_mat  fq_default_poly     \
+        fq_embed                                                            \
+        fq_nmod_embed                                                       \
+        fq_zech_embed                                                       \
+        padic                           padic_mat       padic_poly          \
+        qadic                                                               \
                                                                             \
-            nmod_poly_factor                fmpz_factor                     \
-            fmpz_poly_factor                fmpz_mod_poly_factor            \
-            fq_poly_factor                  fq_nmod_poly_factor             \
-            fq_zech_poly_factor             fq_default_poly_factor          \
+        nmod_poly_factor                fmpz_factor                         \
+        fmpz_poly_factor                fmpz_mod_poly_factor                \
+        fq_poly_factor                  fq_nmod_poly_factor                 \
+        fq_zech_poly_factor             fq_default_poly_factor              \
                                                                             \
-            nmod_poly_mat                    fmpz_poly_mat                  \
+        nmod_poly_mat                   fmpz_poly_mat                       \
                                                                             \
-            mpoly           nmod_mpoly      fmpz_mpoly      fmpz_mod_mpoly  \
-            fmpq_mpoly      fq_nmod_mpoly   fq_zech_mpoly                   \
+        mpoly           nmod_mpoly      fmpz_mpoly      fmpz_mod_mpoly      \
+        fmpq_mpoly      fq_nmod_mpoly   fq_zech_mpoly                       \
                                                                             \
-            nmod_mpoly_factor               fmpz_mpoly_factor               \
-            fmpz_mod_mpoly_factor           fmpq_mpoly_factor               \
-            fq_nmod_mpoly_factor            fq_zech_mpoly_factor            \
+        nmod_mpoly_factor               fmpz_mpoly_factor                   \
+        fmpz_mod_mpoly_factor           fmpq_mpoly_factor                   \
+        fq_nmod_mpoly_factor            fq_zech_mpoly_factor                \
                                                                             \
-            fft             fft_small       fmpz_poly_q     fmpz_lll        \
-            n_poly          arith           qsieve          aprcl           \
-            $(EXTRA_BUILD_DIRS)
+        fft             fft_small       fmpz_poly_q     fmpz_lll            \
+        n_poly          arith           qsieve          aprcl               \
+                                                                            \
+        nf              nf_elem         qfb                                 \
+                                                                            \
+        double_interval dlog                                                \
+        fmpz_extras     fmpzi                                               \
+        bool_mat        partitions                                          \
+        mag                                                                 \
+        arf             acf             arb             acb                 \
+        arb_mat         arb_poly        arb_calc        arb_hypgeom         \
+        acb_mat         acb_poly        acb_calc        acb_hypgeom         \
+        arb_fmpz_poly   arb_fpwrap                                          \
+        acb_dft         acb_elliptic    acb_modular     acb_dirichlet       \
+        dirichlet       bernoulli       hypgeom                             \
+                                                                            \
+        gr              gr_vec          gr_mat          gr_poly             \
+        gr_mpoly        gr_special                                          \
+                                                                            \
+        calcium                                                             \
+        utils_flint     fmpz_mpoly_q                                        \
+        fexpr           fexpr_builtin                                       \
+        qqbar                                                               \
+        ca              ca_ext          ca_field        ca_vec              \
+        ca_poly         ca_mat
 
-TEMPLATE_DIRS = fq_vec_templates fq_mat_templates fq_poly_templates \
-   fq_poly_factor_templates fq_embed_templates fq_templates
+DIRS := $(HEADLESS_DIRS) $(HEADER_DIRS)
 
-export
+TEMPLATE_DIRS :=                                                            \
+        fq_vec_templates                fq_mat_templates                    \
+        fq_poly_templates               fq_poly_factor_templates            \
+        fq_embed_templates              fq_templates
 
-SOURCES = printf.c fprintf.c sprintf.c scanf.c fscanf.c sscanf.c clz_tab.c memory_manager.c version.c profiler.c exception.c hashmap.c inlines.c
-LIB_SOURCES = $(wildcard $(patsubst %, %/*.c, $(BUILD_DIRS)))  $(patsubst %, %/*.c, $(TEMPLATE_DIRS))
+BUILD_DIRS :=                                                               \
+		$(BUILD_DIR)                                                        \
+        $(patsubst %, $(BUILD_DIR)/%, $(DIRS))                              \
+        $(patsubst %, $(BUILD_DIR)/%/profile, $(DIRS))                      \
+        $(patsubst %, $(BUILD_DIR)/%/test, $(DIRS))                         \
+        $(patsubst %, $(BUILD_DIR)/%/tune, $(DIRS))                         \
+        $(BUILD_DIR)/examples           $(BUILD_DIR)/profile                \
+        $(BUILD_DIR)/test               $(BUILD_DIR)/tune
+ifneq ($(WANT_NTL), 0)
+BUILD_DIRS +=                                                               \
+        $(BUILD_DIR)/interfaces         $(BUILD_DIR)/interfaces/test
+endif
+ifneq ($(COVERAGE), 0)
+BUILD_DIRS +=                                                               \
+        $(BUILD_DIR)/coverage
+endif
 
-HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) NTL-interface.h flint.h longlong.h flint-config.h gmpcompat.h fft_tuning.h fmpz-conversions.h profiler.h templates.h exception.h hashmap.h $(patsubst %, %.h, $(TEMPLATE_DIRS))
+INSTALL_DIRS :=                                                             \
+        $(LIBDIR)                       $(INCLUDEDIR)/flint                 \
+        $(INCLUDEDIR)/flint/flintxx     $(PKGCONFIGDIR)
+ifneq ($(findstring $(HOST_OS),mingw32 mingw64 cygwin msys),)
+INSTALL_DIRS += $(BINDIR)
+endif
 
-OBJS = $(patsubst %.c, build/%.o, $(SOURCES))
-LIB_OBJS = $(patsubst %, build/%/*.o, $(BUILD_DIRS))
+################################################################################
+# headers
+################################################################################
 
-LOBJS = $(patsubst %.c, build/%.lo, $(SOURCES))
-LIB_LOBJS = $(patsubst %, build/%/*.lo, $(BUILD_DIRS))
-MOD_LOBJS = $(patsubst %, build/%.lo, $(BUILD_DIRS))
+SINGLE_HEADERS :=                                                           \
+        flint.h         longlong.h      exception.h    gmpcompat.h          \
+        hashmap.h       profiler.h      templates.h    flint-config.h       \
+        fft_tuning.h                                                        \
+                                                                            \
+        limb_types.h                    mpoly_types.h                       \
+        fmpz_types.h                    fmpq_types.h                        \
+        nmod_types.h                    fmpz_mod_types.h                    \
+        fq_types.h                      fq_nmod_types.h                     \
+        fq_zech_types.h                                                     \
+        arf_types.h                     acf_types.h                         \
+        arb_types.h                     acb_types.h
+ifneq ($(WANT_NTL), 0)
+SINGLE_HEADERS += NTL-interface.h
+endif
 
-EXMP_SOURCES = $(wildcard examples/*.c)
-EXMPS = $(patsubst %.c, %, $(EXMP_SOURCES))
+HEADERS :=  $(patsubst %,$(SRC_DIR)/%,                                      \
+                $(patsubst %,%,$(SINGLE_HEADERS))                           \
+                $(patsubst %,%.h,$(HEADER_DIRS))                            \
+                $(patsubst %,%.h,$(TEMPLATE_DIRS))                          \
+            )
 
-TEST_SOURCES = $(wildcard test/*.c)
-TESTS = $(patsubst %.c, build/%$(EXEEXT), $(TEST_SOURCES))
+################################################################################
+# sources
+################################################################################
 
-PROF_SOURCES = $(wildcard profile/*.c)
-PROFS = $(patsubst %.c, %$(EXEEXT), $(PROF_SOURCES))
+define xxx_SOURCES
+$(1)_SOURCES := $(wildcard $(SRC_DIR)/$(1)/*.c)
+endef
+$(foreach dir, $(DIRS), $(eval $(call xxx_SOURCES,$(dir))))
+SOURCES := $(foreach dir,$(DIRS),$($(dir)_SOURCES))
+# NOTE: We do not add CPP files to C files in SOURCES in order to not screw up
+# the `patsubst' in the object files.
+ifneq ($(WANT_NTL), 0)
+interfaces_SOURCES := $(SRC_DIR)/interfaces/NTL-interface.cpp
+endif
 
-TUNE_SOURCES = $(wildcard tune/*.c)
-TUNE = $(patsubst %.c, %$(EXEEXT), $(TUNE_SOURCES))
+define xxx_PROF_SOURCES
+$(1)_PROF_SOURCES := $(wildcard $(SRC_DIR)/$(1)/profile/*.c)
+endef
+_PROF_SOURCES := $(wildcard $(SRC_DIR)/profile/*.c)
+$(foreach dir, $(DIRS), $(eval $(call xxx_PROF_SOURCES,$(dir))))
+PROF_SOURCES := $(foreach dir,$(DIRS),$($(dir)_PROF_SOURCES)) $(_PROF_SOURCES)
 
-EXT_SOURCES = $(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), $(wildcard $(ext)/$(dir)/*.c)))
-EXT_TEST_SOURCES = $(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), $(wildcard $(ext)/$(dir)/test/t-*.c)))
-EXT_TUNE_SOURCES = $(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), $(wildcard $(ext)/$(dir)/tune/*.c)))
-EXT_PROF_SOURCES = $(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), $(wildcard $(ext)/$(dir)/profile/p-*.c)))
-EXT_OBJS = $(foreach ext, $(EXTENSIONS), $(foreach dir, $(filter-out %templates, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h))), build/$(dir).lo))
-EXT_HEADERS = $(foreach ext, $(EXTENSIONS), $(wildcard $(ext)/*.h))
-EXT_EXMP_SOURCES = $(foreach ext, $(EXTENSIONS), $(wildcard $(ext)/examples/*.c))
+define xxx_TEST_SOURCES
+$(1)_TEST_SOURCES := $(wildcard $(SRC_DIR)/$(1)/test/*.c)
+endef
+_TEST_SOURCES := $(wildcard $(SRC_DIR)/test/*.c)
+$(foreach dir, $(DIRS), $(eval $(call xxx_TEST_SOURCES,$(dir))))
+TEST_SOURCES := $(foreach dir,$(DIRS),$($(dir)_TEST_SOURCES)) $(_TEST_SOURCES)
+ifneq ($(WANT_NTL), 0)
+interfaces_TEST_SOURCES := $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp
+endif
+
+define xxx_TUNE_SOURCES
+$(1)_TUNE_SOURCES := $(wildcard $(SRC_DIR)/$(1)/tune/*.c)
+endef
+_TUNE_SOURCES := $(wildcard $(SRC_DIR)/tune/*.c)
+$(foreach dir, $(DIRS), $(eval $(call xxx_TUNE_SOURCES,$(dir))))
+TUNE_SOURCES := $(foreach dir,$(DIRS),$($(dir)_TUNE_SOURCES)) $(_TUNE_SOURCES)
+
+EXMP_SOURCES := $(wildcard $(FLINT_DIR)/examples/*.c)
+
+################################################################################
+# objects
+################################################################################
+
+ifneq ($(STATIC), 0)
+define xxx_OBJS
+$(1)_OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$($(1)_SOURCES))
+endef
+$(foreach dir, $(DIRS), $(eval $(call xxx_OBJS,$(dir))))
+OBJS := $(foreach dir, $(DIRS), $($(dir)_OBJS))
+ifneq ($(WANT_NTL), 0)
+OBJS += $(BUILD_DIR)/interfaces/NTL-interface.o
+endif
+endif
+
+################################################################################
+# library objects
+################################################################################
+
+ifneq ($(SHARED), 0)
+define xxx_LOBJS
+$(1)_LOBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.lo,$($(1)_SOURCES))
+endef
+$(foreach dir, $(DIRS), $(eval $(call xxx_LOBJS,$(dir))))
+LOBJS := $(foreach dir, $(DIRS), $($(dir)_LOBJS))
+ifneq ($(WANT_NTL), 0)
+LOBJS += $(BUILD_DIR)/interfaces/NTL-interface.lo
+endif
+endif
+
+################################################################################
+# executables
+################################################################################
+
+define xxx_PROFS
+$(1)_PROFS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$($(1)_PROF_SOURCES))
+endef
+_PROFS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$(_PROF_SOURCES))
+$(foreach dir, $(DIRS), $(eval $(call xxx_PROFS,$(dir))))
+PROFS := $(foreach dir,$(DIRS),$($(dir)_PROFS)) $(_PROFS)
+
+define xxx_TESTS
+$(1)_TESTS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$($(1)_TEST_SOURCES))
+endef
+_TESTS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$(_TEST_SOURCES))
+ifneq ($(WANT_NTL), 0)
+interfaces_TESTS := $(BUILD_DIR)/interfaces/test/t-NTL-interface$(EXEEXT)
+endif
+$(foreach dir, $(DIRS), $(eval $(call xxx_TESTS,$(dir))))
+TESTS := $(foreach dir,$(DIRS),$($(dir)_TESTS)) $(_TESTS) $(interfaces_TESTS)
+
+define xxx_TUNES
+$(1)_TUNES := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$($(1)_TUNE_SOURCES))
+endef
+_TUNES := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$(_TUNE_SOURCES))
+$(foreach dir, $(DIRS), $(eval $(call xxx_TUNES,$(dir))))
+TUNES := $(foreach dir,$(DIRS),$($(dir)_TUNES)) $(_TUNES)
+
+EXMPS := $(patsubst $(FLINT_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$(EXMP_SOURCES))
+
+################################################################################
+################################################################################
+# recipes
+################################################################################
+################################################################################
+
+################################################################################
+# main recipe
+################################################################################
 
 all: library
 
-quiet: library
+################################################################################
+# library
+################################################################################
 
-verbose:
-	$(eval VERBOSE := 1)
-	$(MAKE) AT= QUIET_CC= QUIET_CXX= QUIET_AR=
+ifneq ($(SHARED), 0)
+library: shared
+endif
+ifneq ($(STATIC), 0)
+library: static
+endif
+
+ifneq ($(SHARED), 0)
+shared: $(FLINT_DIR)/$(FLINT_LIB)
+
+# The following is to avoid reaching the maximum length of command line
+# arguments, mainly present on MinGW.
+define xxx_merged_lobj_rule
+$(BUILD_DIR)/$(1)_merged.lo: $($(1)_LOBJS) | $(BUILD_DIR)
+	@$(LD) -r $($(1)_LOBJS) -o $(BUILD_DIR)/$(1)_merged.lo
+endef
+$(foreach dir, $(DIRS), $(eval $(call xxx_merged_lobj_rule,$(dir))))
+MERGED_LOBJS:=$(foreach dir, $(DIRS),$(BUILD_DIR)/$(dir)_merged.lo)
+
+$(FLINT_DIR)/$(FLINT_LIB): $(MERGED_LOBJS)
+	$(CC) $(CFLAGS) -shared $(EXTRA_SHARED_FLAGS) $(MERGED_LOBJS) -o $(FLINT_LIB) $(LDFLAGS) $(LIBS)
+ifneq ($(FLINT_SOLIB), 0)
+	$(LDCONFIG) -n .
+endif
+ifeq ($(findstring $(HOST_OS),mingw32 mingw64 cygwin msys),)
+	$(RM_F) "$(FLINT_LIBNAME)"
+	$(RM_F) "$(FLINT_LIBNAME).$(FLINT_MAJOR_SO)"
+	$(LN_S) "$(FLINT_LIB)" "$(FLINT_LIBNAME)"
+	$(LN_S) "$(FLINT_LIB)" "$(FLINT_LIBNAME).$(FLINT_MAJOR_SO)"
+endif
+endif
+
+ifneq ($(STATIC), 0)
+static: $(FLINT_DIR)/$(FLINT_LIB_STATIC)
+
+# The following is to avoid reaching the maximum length of command line
+# arguments, mainly present on MinGW.
+define xxx_merged_obj_rule
+$(BUILD_DIR)/$(1)_merged.o: $($(1)_OBJS) | $(BUILD_DIR)
+	@$(LD) -r $($(1)_OBJS) -o $(BUILD_DIR)/$(1)_merged.o
+endef
+$(foreach dir, $(DIRS), $(eval $(call xxx_merged_obj_rule,$(dir))))
+MERGED_OBJS:=$(foreach dir, $(DIRS),$(BUILD_DIR)/$(dir)_merged.o)
+
+$(FLINT_DIR)/$(FLINT_LIB_STATIC): $(MERGED_OBJS)
+	$(AR) rcs $(FLINT_DIR)/$(FLINT_LIB_STATIC) $(MERGED_OBJS)
+endif
+
+################################################################################
+# directories
+################################################################################
+
+$(BUILD_DIRS) $(INSTALL_DIRS):
+	$(MKDIR_P) $@
+
+################################################################################
+# inclusions
+################################################################################
+
+ifneq ($(WANT_DEPS), 0)
+
+ifeq ($(words $(MAKECMDGOALS)), 0)
+
+-include $(BUILD_DIR)/*/*.o.d
+-include $(BUILD_DIR)/*/*.lo.d
+
+else ifeq ($(words $(MAKECMDGOALS)), 1)
+
+ifeq ($(MAKECMDGOALS), clean)
+# Include nothing
+else ifeq ($(MAKECMDGOALS), dist)
+# Include nothing
+else ifeq ($(MAKECMDGOALS), distclean)
+# Include nothing
+else ifeq ($(MAKECMDGOALS), uninstall)
+# Include nothing
+else ifeq ($(findstring print-,$(MAKECMDGOALS)), print-)
+# Include nothing
+else ifeq ($(MAKECMDGOALS), static)
+-include $(BUILD_DIR)/*/*.o.d
+else ifeq ($(MAKECMDGOALS), shared)
+-include $(BUILD_DIR)/*/*.lo.d
+else ifeq ($(MAKECMDGOALS), library)
+-include $(BUILD_DIR)/*/*.o.d
+-include $(BUILD_DIR)/*/*.lo.d
+else ifeq ($(MAKECMDGOALS), install)
+-include $(BUILD_DIR)/*/*.o.d
+-include $(BUILD_DIR)/*/*.lo.d
+else ifeq ($(MAKECMDGOALS), examples)
+-include $(BUILD_DIR)/*/*.o.d
+-include $(BUILD_DIR)/*/*.lo.d
+-include $(BUILD_DIR)/examples/*.d
+else ifeq ($(MAKECMDGOALS), profile)
+ifdef MOD
+$(warning Dependency tracking only set to cover the profile executables of $(MOD).)
+-include $(foreach dir, $(MOD), $(BUILD_DIR)/$(dir)/profile/*.d)
+else
+-include $(BUILD_DIR)/*/*.o.d
+-include $(BUILD_DIR)/*/*.lo.d
+-include $(BUILD_DIR)/profile/*.d
+-include $(BUILD_DIR)/*/profile/*.d
+endif
+else ifeq ($(MAKECMDGOALS), tests)
+-include $(BUILD_DIR)/*/*.o.d
+-include $(BUILD_DIR)/*/*.lo.d
+-include $(BUILD_DIR)/test/*.d
+-include $(BUILD_DIR)/*/test/*.d
+else ifeq ($(MAKECMDGOALS), check)
+ifdef MOD
+$(warning Dependency tracking only set to cover the test executables of $(MOD).)
+-include $(foreach dir, $(MOD), $(BUILD_DIR)/$(dir)/test/*.d)
+else
+-include $(BUILD_DIR)/*/*.o.d
+-include $(BUILD_DIR)/*/*.lo.d
+-include $(BUILD_DIR)/test/*.d
+-include $(BUILD_DIR)/*/test/*.d
+endif
+else ifeq ($(MAKECMDGOALS), tune)
+-include $(BUILD_DIR)/*/*.o.d
+-include $(BUILD_DIR)/*/*.lo.d
+-include $(BUILD_DIR)/tune/*.d
+-include $(BUILD_DIR)/*/tune/*.d
+else ifeq ($(MAKECMDGOALS), valgrind)
+ifdef MOD
+$(warning Dependency tracking only set to cover the test executables of $(MOD).)
+-include $(foreach dir, $(MOD), $(BUILD_DIR)/$(dir)/test/*.d)
+else
+-include $(BUILD_DIR)/*/*.o.d
+-include $(BUILD_DIR)/*/*.lo.d
+-include $(BUILD_DIR)/test/*.d
+-include $(BUILD_DIR)/*/test/*.d
+endif
+else
+# Cannot recognize the command, so we simply include everything
+-include $(BUILD_DIR)/*/*.o.d
+-include $(BUILD_DIR)/*/*.lo.d
+-include $(BUILD_DIR)/test/*.d
+-include $(BUILD_DIR)/*/test/*.d
+-include $(BUILD_DIR)/profile/*.d
+-include $(BUILD_DIR)/*/profile/*.d
+-include $(BUILD_DIR)/examples/*.d
+endif
+
+else
+
+# Multiple goals. Not currently implemented, so simply include everything.
+-include $(BUILD_DIR)/*/*.o.d
+-include $(BUILD_DIR)/*/*.lo.d
+-include $(BUILD_DIR)/test/*.d
+-include $(BUILD_DIR)/*/test/*.d
+-include $(BUILD_DIR)/profile/*.d
+-include $(BUILD_DIR)/*/profile/*.d
+-include $(BUILD_DIR)/examples/*.d
+
+endif
+
+endif
+
+################################################################################
+# objects
+################################################################################
+
+ifneq ($(STATIC), 0)
+define xxx_OBJS_rule
+$(BUILD_DIR)/$(1)/%.o: $(SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
+	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
+	@$(CC) $(CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ -MMD -MF $$(@:%=%.d)
+endef
+
+$(foreach dir, $(DIRS), $(eval $(call xxx_OBJS_rule,$(dir))))
+
+ifneq ($(WANT_NTL), 0)
+$(BUILD_DIR)/interfaces/NTL-interface.o: $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp | $(BUILD_DIR)/interfaces
+	@echo "  CXX $(@:$(BUILD_DIR)/%=%)"
+	@$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $< -o $@ -MMD -MF $(@:%=%.d)
+endif
+endif
+
+################################################################################
+# library objects
+################################################################################
+
+ifneq ($(SHARED), 0)
+define xxx_LOBJS_rule
+$(BUILD_DIR)/$(1)/%.lo: $(SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
+	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
+	@$(CC) $(PIC_FLAG) $(CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ -MMD -MF $$(@:%=%.d)
+endef
+
+$(foreach dir, $(DIRS), $(eval $(call xxx_LOBJS_rule,$(dir))))
+
+ifneq ($(WANT_NTL), 0)
+$(BUILD_DIR)/interfaces/NTL-interface.lo: $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp | $(BUILD_DIR)/interfaces
+	@echo "  CXX $(@:$(BUILD_DIR)/%=%)"
+	@$(CXX) $(PIC_FLAG) $(CXXFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $< -o $@ -MMD -MF $(@:%=.d)
+endif
+endif
+
+################################################################################
+# executables
+################################################################################
+
+ifeq ($(SHARED), 0)
+$(BUILD_DIR)/profile/%$(EXEEXT): $(SRC_DIR)/profile/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/profile
+	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
+else
+$(BUILD_DIR)/profile/%$(EXEEXT): $(SRC_DIR)/profile/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/profile
+	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
+endif
+
+ifeq ($(SHARED), 0)
+define xxx_PROFS_rule
+$(BUILD_DIR)/$(1)/profile/%$(EXEEXT): $(SRC_DIR)/$(1)/profile/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/$(1)/profile
+	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $$(@:%=%.d)
+endef
+else
+define xxx_PROFS_rule
+$(BUILD_DIR)/$(1)/profile/%$(EXEEXT): $(SRC_DIR)/$(1)/profile/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/$(1)/profile
+	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $$(@:%=%.d)
+endef
+endif
+
+$(foreach dir, $(DIRS), $(eval $(call xxx_PROFS_rule,$(dir))))
+
+ifeq ($(SHARED), 0)
+$(BUILD_DIR)/test/%$(EXEEXT): $(SRC_DIR)/test/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/test
+	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
+else
+$(BUILD_DIR)/test/%$(EXEEXT): $(SRC_DIR)/test/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/test
+	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
+endif
+
+ifeq ($(SHARED), 0)
+define xxx_TESTS_rule
+$(BUILD_DIR)/$(1)/test/%$(EXEEXT): $(SRC_DIR)/$(1)/test/%.c $(FLINT_DIR)/libflint.a | $(BUILD_DIR)/$(1)/test
+	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $$(@:%=%.d)
+endef
+else
+define xxx_TESTS_rule
+$(BUILD_DIR)/$(1)/test/%$(EXEEXT): $(SRC_DIR)/$(1)/test/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/$(1)/test
+	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $$(@:%=%.d)
+endef
+endif
+
+$(foreach dir, $(DIRS), $(eval $(call xxx_TESTS_rule,$(dir))))
+
+ifneq ($(WANT_NTL), 0)
+ifeq ($(SHARED), 0)
+$(BUILD_DIR)/interfaces/test/t-NTL-interface$(EXEEXT): $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/interfaces/test
+	@echo "  CXX $(@:$(BUILD_DIR)/%=%)"
+	@$(CXX) $(CXXFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
+else
+$(BUILD_DIR)/interfaces/test/t-NTL-interface$(EXEEXT): $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/interfaces/test
+	@echo "  CXX $(@:$(BUILD_DIR)/%=%)"
+	@$(CXX) $(CXXFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
+endif
+endif
+
+ifeq ($(SHARED), 0)
+$(BUILD_DIR)/tune/%$(EXEEXT): $(SRC_DIR)/tune/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/tune
+	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
+else
+$(BUILD_DIR)/tune/%$(EXEEXT): $(SRC_DIR)/tune/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/tune
+	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
+endif
+
+ifeq ($(SHARED), 0)
+define xxx_TUNES_rule
+$(BUILD_DIR)/$(1)/tune/%$(EXEEXT): $(SRC_DIR)/$(1)/tune/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/$(1)/tune
+	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $$(@:%=%.d)
+endef
+else
+define xxx_TUNES_rule
+$(BUILD_DIR)/$(1)/tune/%$(EXEEXT): $(SRC_DIR)/$(1)/tune/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/$(1)/tune
+	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $$(@:%=%.d)
+endef
+endif
+
+$(foreach dir, $(DIRS), $(eval $(call xxx_TUNES_rule,$(dir))))
+
+ifeq ($(SHARED), 0)
+$(BUILD_DIR)/examples/%$(EXEEXT): $(FLINT_DIR)/examples/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/examples
+	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
+else
+$(BUILD_DIR)/examples/%$(EXEEXT): $(FLINT_DIR)/examples/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/examples
+	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
+endif
+
+################################################################################
+# examples
+################################################################################
+
+examples: library $(EXMPS)
+
+################################################################################
+# profiling
+################################################################################
+
+ifdef MOD
+profile: library $(foreach dir, $(MOD), $($(dir)_PROFS))
+else
+profile: library $(PROFS)
+endif
+
+################################################################################
+# tests
+################################################################################
+
+tests: library $(TESTS)
+
+# NOTE: File has to be located in another directory in order for this to work.
+%_TEST_RUN: %
+	@$<
+
+ifdef PYTHON
+check: library
+	PYTHONPATH=$(FLINT_DIR) python3 $(SRC_DIR)/python/flint_ctypes.py
+else ifdef MOD
+check: library $(patsubst %,%_TEST_RUN,$(foreach dir, $(MOD), $($(dir)_TESTS)))
+else
+check: library $(TESTS:%=%_TEST_RUN)
+endif
+
+################################################################################
+# tuning
+################################################################################
+
+tune: library $(TUNES)
+
+################################################################################
+# valgrind
+################################################################################
+
+%_VALGRIND_RUN: %
+	valgrind --track-origins=yes --leak-check=full --show-reachable=yes --log-file="$*.valgrind" $<
+
+ifdef MOD
+valgrind: library $(patsubst %,%_VALGRIND_RUN,$(foreach dir, $(MOD), $($(dir)_TESTS)))
+else
+valgrind: library $(TESTS:%=%_VALGRIND_RUN)
+endif
+
+################################################################################
+# coverage
+################################################################################
+
+ifneq ($(COVERAGE), 0)
+coverage: | $(BUILD_DIR)/coverage
+	lcov --capture --exclude "*test/t-*.c" --exclude "/usr/*" --directory $(BUILD_DIR) --output-file $(BUILD_DIR)/coverage/coverage.info
+	genhtml $(BUILD_DIR)/coverage/coverage.info --output-directory $(BUILD_DIR)/coverage
+endif
+
+################################################################################
+# clean
+################################################################################
 
 clean:
-	$(AT)$(foreach dir, $(BUILD_DIRS), WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=../build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) clean || exit $$?;)
-	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(filter-out %templates, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h))), BUILD_DIR=$(CURDIR)/build/$(dir); WANTDEPS=$(WANT_DEPS); export WANTDEPS; export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) clean || exit $$?;))
-	rm -rf test_helpers.o profiler.o
-	rm -f $(OBJS) $(LOBJS) $(TESTS) $(PROFS) $(EXMPS)
-	rm -f libflint.a
-	rm -f $(wildcard $(FLINT_LIBNAME)*)
-	rm -f $(wildcard $(FLINT_LIB)*)
-	rm -rf build
+	$(RM_F) $(FLINT_DIR)/libflint.a
+	$(RM_F) $(FLINT_DIR)/$(FLINT_LIBNAME)*
+	$(RM_F) $(FLINT_DIR)/$(FLINT_LIB)*
+	$(RM_RF) $(BUILD_DIR)
 
 distclean: clean
-	rm -f flint-config.h config.log fft_tuning.h fmpz-conversions.h Makefile fmpz/fmpz.c
+	$(RM_F) $(CFG_FILES)
 
-dist:
-	git archive --format tar --prefix flint-2.10.0/ origin/flint-2.10 > ../flint-2.10.0.tar; gzip ../flint-2.10.0.tar
-	git archive --format zip --prefix flint-2.10.0/ origin/flint-2.10 > ../flint-2.10.0.zip 
+################################################################################
+# install and uninstall
+################################################################################
 
-profile: library $(PROF_SOURCES) $(EXT_PROF_SOURCES) build/profiler.o
-	mkdir -p build/profile
-ifndef MOD
-	$(AT)$(foreach prog, $(PROFS), $(CC) $(CFLAGS) -std=gnu99 $(INCS) $(prog).c build/profiler.o -o build/$(prog) $(LIBS) || exit $$?;)
-	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/profile; WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=../build/$(dir); export BUILD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) profile || exit $$?;)
-	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(filter-out %templates, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h))), mkdir -p build/$(dir)/profile; WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) profile || exit $$?;))
+install: library | $(INSTALL_DIRS)
+	$(CP) flint.pc $(PKGCONFIGDIR)/flint.pc
+ifneq ($(SHARED), 0)
+ifeq ($(findstring $(HOST_OS),mingw32 mingw64 cygwin msys),)
+	$(CP_A) $(FLINT_DIR)/$(FLINT_LIBNAME)* $(LIBDIR)
 else
-	$(AT)$(foreach dir, $(MOD), mkdir -p build/$(dir)/profile; WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=../build/$(dir); export BUILD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) profile || exit $$?;)
+	$(CP_A) $(FLINT_DIR)/$(FLINT_LIBNAME)* $(BINDIR)
+	$(CP) $(FLINT_DIR)/$(FLINT_IMPLIB) $(LIBDIR)
 endif
-
-tune: library $(TUNE_SOURCES) $(EXT_TUNE_SOURCES)
-	mkdir -p build/tune
-	$(AT)$(foreach prog, $(TUNE), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS) || exit $$?;)
-	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/tune; WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=../build/$(dir); export BUILD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) tune || exit $$?;)
-	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir)/tune; WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) tune || exit $$?;))
-
-examples: library $(EXMP_SOURCES) $(EXT_EXMP_SOURCES) $(EXT_HEADERS)
-	mkdir -p build/examples
-	$(AT)$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS) || exit $$?;)
-	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach prog, $(patsubst $(ext)/examples/%.c, %, $(wildcard $(ext)/examples/*.c)), $(CC) $(CFLAGS) $(INCS) $(ext)/examples/$(prog).c -o build/examples/$(prog) $(LIBS) || exit $$?;))
-
-$(FLINT_LIB): $(LOBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) | build build/interfaces
-	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(filter-out %templates, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h))), mkdir -p build/$(dir); WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) shared || exit $$?;))
-	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=../build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) shared || exit $$?;)
-	$(AT)if [ "$(WANT_NTL)" -eq "1" ]; then \
-	  $(MAKE) build/interfaces/NTL-interface.lo; \
-	  $(CXX) $(CXXFLAGS) $(ABI_FLAG) -shared $(EXTRA_SHARED_FLAGS) build/interfaces/NTL-interface.lo $(LOBJS) $(MOD_LOBJS) $(EXT_OBJS) -o $(FLINT_LIB) $(LDFLAGS) $(LIBS2); \
-	fi
-	$(AT)if [ "$(WANT_NTL)" -ne "1" ]; then \
-	  $(CC) $(CFLAGS) $(ABI_FLAG) -shared $(EXTRA_SHARED_FLAGS) $(LOBJS) $(MOD_LOBJS) $(EXT_OBJS) -o $(FLINT_LIB) $(LDFLAGS) $(LIBS2); \
-	fi
-	-$(AT)if [ "$(FLINT_SOLIB)" -eq "1" ]; then \
-		$(LDCONFIG) -n "$(CURDIR)"; \
-	fi
-	$(AT)if [ "$(OS)" != "MINGW64" ] && [ "$(OS)" != "MINGW32" ] && [ "$(OS)" != "CYGWIN64" ] && [ "$(OS)" != "CYGWIN32" ]; then \
-	   ln -sf "$(FLINT_LIB)" "$(FLINT_LIBNAME)"; \
-	   ln -sf "$(FLINT_LIB)" "$(FLINT_LIBNAME).$(FLINT_MAJOR)"; \
-	fi
-
-libflint.a: $(OBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) | build build/interfaces
-	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(filter-out %templates, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h))), mkdir -p build/$(dir); WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) static || exit $$?;))
-	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=../build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) static || exit $$?;)
-	$(AT)if [ "$(FLINT_SHARED)" -eq "0" ]; then \
-		touch test/t-*.c; \
-		$(foreach dir, $(BUILD_DIRS), touch $(dir)/test/t-*.c;) \
-		$(foreach ext, $(EXTENSIONS), $(foreach mod, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), touch $(ext)/$(mod)/test/t-*.c;)) \
-	fi
-	$(AT)if [ "$(WANT_NTL)" -eq "1" ]; then \
-		$(MAKE) build/interfaces/NTL-interface.o; \
-		$(AR) rcs libflint.a build/interfaces/NTL-interface.o; \
-	fi
-	$(QUIET_AR) $(AR) rcs libflint.a $(OBJS);
-	$(AT)$(foreach mod, $(BUILD_DIRS), $(AR) rcs libflint.a build/$(mod)/*.o || exit $$?;)
-	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach mod, $(filter-out %templates, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h))), $(AR) rcs libflint.a build/$(mod)/*.o || exit $$?;))
-
-library: build/CPimport.h
-	$(AT)if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-		$(MAKE) shared; \
-	fi
-	$(AT)if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-		$(MAKE) static; \
-	fi
-
-shared: $(FLINT_LIB)
-
-static: libflint.a
-
-tests: library test_helpers.o $(TESTS)
-	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=../build/$(dir); export BUILD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) tests || exit $$?;)
-	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir)/test; WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) tests || exit $$?;))
-	mkdir -p build/interfaces/test
-	$(AT)if [ "$(WANT_NTL)" -eq "1" ]; then \
-		$(MAKE) build/interfaces/test/t-NTL-interface$(EXEEXT); \
-	fi
-
-define test_mod
-	$(eval vl := $(subst :, ,$(1)))
-	$(eval dir := $(firstword $(vl)))
-	$(eval uset_tests :=$(wordlist 2,$(words $(vl)),$(vl)))
-	$(eval USER_SET_TESTS_VAR := USER_SET_TESTS=$(uset_tests))
-	$(AT)test ! -d $(dir) || mkdir -p build/$(dir)/test; WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=../build/$(dir); export BUILD_DIR; test ! -d $(dir)  || $(MAKE) $(USER_SET_TESTS_VAR) -f ../Makefile.subdirs -C $(dir) check
-endef
-
-define test_mod_ext
-	$(eval vl := $(subst :, ,$(1)))
-	$(eval ext := $(2))
-	$(eval dir := $(firstword $(vl)))
-	$(eval uset_tests :=$(wordlist 2,$(words $(vl)),$(vl)))
-	$(eval USER_SET_TESTS_VAR := USER_SET_TESTS=$(uset_tests))
-	$(AT)MOD_DIR=$(dir); export MOD_DIR; test ! -d $(ext)/$(dir) || mkdir -p build/$(dir)/test; WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; test ! -d $(ext)/$(dir) || $(MAKE) $(USER_SET_TESTS_VAR) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) check
-endef
-
-check: LDFLAGS:=$(LDFLAGS) -Wl,-rpath,$(GMP_LIB_DIR) -Wl,-rpath,$(MPFR_LIB_DIR) -Wl,-rpath,$(CURDIR)
-check: library test_helpers.o
-ifndef MOD
-	$(AT)$(MAKE) $(TESTS)
-	$(AT)(WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=build; export BUILD_DIR; $(MAKE) -f Makefile.subdirs -C . check || exit $$?;)
-	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir)/test; WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) check || exit $$?;))
-	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=../build/$(dir); export BUILD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) check || exit $$?;)
-	mkdir -p build/interfaces/test
-	$(AT)if [ "$(WANT_NTL)" -eq "1" ]; then \
-		$(MAKE) build/interfaces/test/t-NTL-interface$(EXEEXT); \
-		build/interfaces/test/t-NTL-interface$(EXEEXT); \
-	fi
-else
-	$(AT)$(foreach mod, $(MOD), $(call test_mod,$(mod)) || exit $$?;)
-	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach mod, $(MOD), $(call test_mod_ext,$(mod),$(ext)) || exit $$?;))
 endif
-
-valgrind: library
-ifndef MOD
-	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=../build/$(dir); export BUILD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) valgrind || exit $$?;)
-	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir)/test; WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=$(CURDIR)/build/$(dir); export BUILD_DIR; MOD_DIR=$(dir); export MOD_DIR; $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) valgrind || exit $$?;))
-else
-	$(AT)$(foreach dir, $(MOD), mkdir -p build/$(dir)/test; WANTDEPS=$(WANT_DEPS); export WANTDEPS; BUILD_DIR=../build/$(dir); export BUILD_DIR; $(MAKE) -f ../Makefile.subdirs -C $(dir) valgrind || exit $$?;)
+ifneq ($(STATIC), 0)
+	$(CP) $(FLINT_DIR)/$(FLINT_LIB_STATIC) $(LIBDIR)
 endif
-
-install: library
-	mkdir -p "$(DESTDIR)$(PREFIX)/$(LIBDIR)"
-	$(AT)if [ "$(OS)" = "MINGW64" ] || [ "$(OS)" = "MINGW32" ] || [ "$(OS)" = "CYGWIN64" ] || [ "$(OS)" = "CYGWIN32" ]; then \
-	   mkdir -p "$(DESTDIR)$(PREFIX)/lib"; \
-	fi
-	mkdir -p "$(DESTDIR)$(PREFIX)/include/flint"
-	$(AT)if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-	   cp $(FLINT_LIB) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
-	   cp -a $(shell ls $(FLINT_LIBNAME)*) "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
-	   if [ "$(OS)" = "MINGW64" ] || [ "$(OS)" = "MINGW32" ] || [ "$(OS)" = "CYGWIN64" ] || [ "$(OS)" = "CYGWIN32" ]; then \
-	      cp libflint.dll.a "$(DESTDIR)$(PREFIX)/lib"; \
-	   fi \
-	fi 
-	$(AT)if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-		if [ "$(OS)" = "MINGW64" ] || [ "$(OS)" = "MINGW32" ] || [ "$(OS)" = "CYGWIN64" ] || [ "$(OS)" = "CYGWIN32" ]; then \
-		   cp libflint.a "$(DESTDIR)$(PREFIX)/lib"; \
-		else \
-		   cp libflint.a "$(DESTDIR)$(PREFIX)/$(LIBDIR)"; \
-		fi \
-	fi
-	cp $(HEADERS) "$(DESTDIR)$(PREFIX)/include/flint"
-	$(AT)if [ ! -z "$(EXT_HEADERS)" ]; then \
-	   cp $(EXT_HEADERS) "$(DESTDIR)$(PREFIX)/include/flint"; \
-	fi
-	mkdir -p "$(DESTDIR)$(PREFIX)/include/flint/flintxx"
-	cp flintxx/*.h "$(DESTDIR)$(PREFIX)/include/flint/flintxx"
-	cp *xx.h "$(DESTDIR)$(PREFIX)/include/flint"
-	$(AT)if [ "$(OS)" = "Darwin" ] && [ "$(FLINT_SHARED)" -eq "1" ]; then \
-	   install_name_tool -id "$(PREFIX)/$(LIBDIR)/$(FLINT_LIB)" "$(DESTDIR)$(PREFIX)/$(LIBDIR)/$(FLINT_LIBNAME)"; \
-	fi
+	$(CP) $(HEADERS) $(INCLUDEDIR)/flint
+	$(CP) $(SRC_DIR)/flintxx/*.h $(INCLUDEDIR)/flint/flintxx
+	$(CP) $(SRC_DIR)/flintxx_public/*xx.h $(INCLUDEDIR)/flint
+ifeq ($(findstring darwin,$(HOST_OS)),darwin)
+ifneq ($(SHARED), 0)
+	install_name_tool -id $(LIBDIR)/$(FLINT_LIB) $(LIBDIR)/$(FLINT_LIBNAME)
+endif
+endif
 
 uninstall:
-	rm -rf "$(DESTDIR)$(PREFIX)/include/flint"
-	rm -rf "$(DESTDIR)$(PREFIX)/$(LIBDIR)/$(FLINT_LIB)"
-	rm -rf $(shell ls $(DESTDIR)$(PREFIX)/$(LIBDIR)/$(FLINT_LIBNAME)*)
-	$(AT)if [ "$(OS)" = "MINGW64" ] || [ "$(OS)" = "MINGW32" ] || [ "$(OS)" = "CYGWIN64" ] || [ "$(OS)" = "CYGWIN32" ]; then \
-	   rm -rf "$(DESTDIR)$(PREFIX)/lib/libflint.a"; \
-       rm -rf "$(DESTDIR)$(PREFIX)/lib/libflint.dll.a"; \
-	else \
-	   rm -rf "$(DESTDIR)$(PREFIX)/$(LIBDIR)/libflint.a"; \
-	fi
+	$(RM_F) $(PKGCONFIGDIR)/flint.pc
+	$(RM_RF) $(INCLUDEDIR)/flint
+	$(RM_F) $(LIBDIR)/$(FLINT_LIB_STATIC)
+ifeq ($(findstring $(HOST_OS),mingw32 mingw64 cygwin msys),)
+	$(RM_F) $(LIBDIR)/$(FLINT_LIBNAME)*
+else
+	$(RM_F) $(BINDIR)/$(FLINT_LIBNAME)*
+	$(RM_F) $(LIBDIR)/$(FLINT_IMPLIB)
+endif
 
-build:
-	mkdir -p build
+################################################################################
+# maintainer stuff
+################################################################################
 
-build/CPimport.h: qadic/CPimport.txt build
-	$(AT)sed "s/ /,/g;s/.*/&,/g" $< > $@
+dist:
+	git archive --format tar --prefix flint-$(FLINT_MAJOR).$(FLINT_MINOR).$(FLINT_PATCH)/ origin/flint-$(FLINT_MAJOR).$(FLINT_MINOR) > ../flint-$(FLINT_MAJOR).$(FLINT_MINOR).$(FLINT_PATCH).tar; gzip ../flint-$(FLINT_MAJOR).$(FLINT_MINOR).$(FLINT_PATCH).tar
+	git archive --format zip --prefix flint-$(FLINT_MAJOR).$(FLINT_MINOR).$(FLINT_PATCH)/ origin/flint-$(FLINT_MAJOR).$(FLINT_MINOR) > ../flint-$(FLINT_MAJOR).$(FLINT_MINOR).$(FLINT_PATCH).zip 
 
-build/%.lo: %.c $(HEADERS) | build
-	$(QUIET_CC) $(CC) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@;
-
-build/%.o: %.c $(HEADERS) | build
-	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) -c $< -o $@;
-
-build/test/%$(EXEEXT): test/%.c $(HEADERS) test_helpers.o | build/test
-	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) test_helpers.o $< -o $@ $(LIBS) $(LDFLAGS)
-
-build/test:
-	mkdir -p build/test
-
-build/interfaces:
-	mkdir -p build/interfaces
-
-build/interfaces/NTL-interface.lo: interfaces/NTL-interface.cpp NTL-interface.h
-	$(QUIET_CXX) $(CXX) $(PIC_FLAG) $(CXXFLAGS) $(INCS) -c $< -o $@
-
-build/interfaces/NTL-interface.o: interfaces/NTL-interface.cpp NTL-interface.h
-	$(QUIET_CXX) $(CXX) $(CXXFLAGS) $(INCS) -c $< -o $@
-
-build/interfaces/test/t-NTL-interface$(EXEEXT): interfaces/test/t-NTL-interface.cpp build/interfaces/NTL-interface.o
-	$(QUIET_CXX) $(CXX) $(CXXFLAGS) $(INCS) $< build/interfaces/NTL-interface.o -o $@ $(LIBS) $(LDFLAGS)
+################################################################################
+# debugging
+################################################################################
 
 print-%:
-	@echo '$*=$($*)'
+	@echo "$*=$($*)"
 
-test_helpers.o: test_helpers.c
-	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) -c test_helpers.c -o test_helpers.o
-
-.PHONY: profile library shared static clean examples tune check tests distclean dist install all valgrind
-
+.PHONY: all library shared static examples profile tests check tune valgrind clean distclean install uninstall dist %_TEST_RUN %_VALGRIND_RUN print-% coverage

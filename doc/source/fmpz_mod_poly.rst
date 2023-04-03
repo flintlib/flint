@@ -746,46 +746,6 @@ Division
     The algorithm used is to call :func:`div_newton_n` and then multiply out
     and compute the remainder.
 
-.. function:: void _fmpz_mod_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_t p)
-
-    Notationally, computes `Q`, `R` such that `A = B Q + R` with
-    `0 \leq \operatorname{len}(R) < \operatorname{len}(B)` but only sets ``(Q, lenA - lenB + 1)``.
-
-    Requires temporary space ``(R, lenA)``.  Allows aliasing
-    only between `A` and `R`.  Allows zero-padding in `A` but
-    not in `B`.  Assumes that the leading coefficient of `B`
-    is a unit modulo `p`.
-
-.. function:: void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
-
-    Notationally, computes `Q`, `R` such that `A = B Q + R` with
-    `0 \leq \operatorname{len}(R) < \operatorname{len}(B)` assuming that the leading term
-    of `B` is a unit.
-
-.. function:: void _fmpz_mod_poly_div_divconquer_recursive(fmpz * Q, fmpz * W, const fmpz * A, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_t p)
-
-   Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R)` less than
-    ``lenB``, where ``A`` is of length ``2 * lenB - 1`` and ``B``
-    is of length ``lenB``. We require that ``Q`` have space for
-    ``lenB`` coefficients and that ``W`` be temporary space of size
-    ``2*lenB ``. 
-
-.. function:: void _fmpz_mod_poly_div_newton(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t p)
-
-    Notationally, computes `Q`, `R` such that `A = B Q + R` with
-    `0 \leq \operatorname{len}(R) < \operatorname{len}(B)` but only sets ``(Q, lenA - lenB + 1)``.
-
-    Assumes that the leading coefficient of `B` is a unit modulo `p`.
-
-    Reverses the polynomials, divides the resulting series using Newton
-    iteration, then reverses the result.
-
-.. function:: void fmpz_mod_poly_div_newton(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
-
-    Notationally, computes `Q`, `R` such that `A = B Q + R` with
-    `0 \leq \operatorname{len}(R) < \operatorname{len}(B)` assuming that the leading term
-    of `B` is a unit.
-
 .. function:: void _fmpz_mod_poly_div_newton_n_preinv (fmpz* Q, const fmpz* A, slong lenA, const fmpz* B, slong lenB, const fmpz* Binv, slong lenBinv, const fmpz_t mod)
 
     Notionally computes polynomials `Q` and `R` such that `A = BQ + R` with
@@ -833,54 +793,7 @@ Division
     `0 \leq \operatorname{len}(R) < \operatorname{len}(B)` assuming that the leading term
     of `B` is a unit.
 
-.. function:: void _fmpz_mod_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W, const fmpz * A, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_t p)
-
-    Computes ``(Q, lenB)``, ``(BQ, 2 lenB - 1)`` such that
-    `BQ = B \times Q` and `A = B Q + R` where `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
-
-    Assumes that the leading coefficient of `B` is invertible
-    modulo `p`, and that ``invB`` is the inverse.
-
-    Assumes `\operatorname{len}(B) > 0`.  Allows zero-padding in ``(A, lenA)``.  Requires
-    a temporary array ``(W, 2 lenB - 1)``.  No aliasing of input and output
-    operands is allowed.
-
-    This function does not read the bottom `\operatorname{len}(B) - 1` coefficients from
-    `A`, which means that they might not even need to exist in allocated
-    memory.
-
-.. function:: void _fmpz_mod_poly_divrem_divconquer(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_t p)
-
-    Computes ``(Q, lenA - lenB + 1)``, ``(R, lenB - 1)`` such that
-    `A = B Q + R` and `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
-
-    Assumes that the leading coefficient of `B` is invertible
-    modulo `p`, and that ``invB`` is the inverse.
-
-    Assumes `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`.  Allows zero-padding in
-    ``(A, lenA)``.  No aliasing of input and output operands is
-    allowed.
-
-.. function:: void _fmpz_mod_poly_div_divconquer(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_t p)
-
-    Notionally computes polynomials `Q` and `R` such that `A = BQ + R` with
-    `\operatorname{len}(R)` less than ``lenB``, where ``A`` is of length ``lenA``
-    and ``B`` is of length ``lenB``, but returns only ``Q``. We
-    require that ``Q`` have space for ``lenA - lenB + 1`` coefficients.
-
-.. function:: void fmpz_mod_poly_div_divconquer(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
-
-    Notionally computes `Q` and `R` such that `A = BQ + R` with
-    `\operatorname{len}(R) < \operatorname{len}(B)`, but returns only `Q`.
-
-.. function:: void fmpz_mod_poly_divrem_divconquer(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
-
-    Computes `Q`, `R` such that `A = B Q + R` and `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
-
-    Assumes that `B` is non-zero and that the leading coefficient
-    of `B` is invertible modulo `p`.
-
-.. function:: void _fmpz_mod_poly_div(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t p)
+.. function:: void _fmpz_mod_poly_div(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_mod_ctx_t ctx)
 
     Notationally, computes `Q`, `R` such that `A = B Q + R` with
     `0 \leq \operatorname{len}(R) < \operatorname{len}(B)` but only sets ``(Q, lenA - lenB + 1)``.
@@ -1058,28 +971,6 @@ Greatest common divisor
     coefficient or set `f` to a nontrivial factor of `p` and leave ``res``
     undefined.
 
-.. function:: slong _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invB, const fmpz_t p)
-
-    Sets `G` to the greatest common divisor of `(A, \operatorname{len}(A))`
-    and `(B, \operatorname{len}(B))` and returns its length.
-
-    Assumes that `\operatorname{len}(A) \geq \operatorname{len}(B) > 0` and that the vector `G` has
-    space for sufficiently many coefficients.
-
-    Assumes that ``invB`` is the inverse of the leading coefficients
-    of `B` modulo the prime number `p`.
-
-.. function:: void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
-
-    Sets `G` to the greatest common divisor of `A` and `B`.
-
-    The algorithm used to compute `G` is the classical Euclidean
-    algorithm.
-
-    In general, the greatest common divisor is defined in the polynomial
-    ring `(\mathbf{Z}/(p \mathbf{Z}))[X]` if and only if `p` is a prime
-    number.  Thus, this function assumes that `p` is prime.
-
 .. function:: slong _fmpz_mod_poly_gcd(fmpz *G, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invB, const fmpz_t p)
 
     Sets `G` to the greatest common divisor of `(A, \operatorname{len}(A))`
@@ -1150,10 +1041,7 @@ Greatest common divisor
 
     .. math ::
 
-
         (A,B)^t = \sigma M^{-1} (a,b)^t.
-
-
 
     Assumes that `\operatorname{len}(a) > \operatorname{len}(b) > 0`.
 
@@ -1164,91 +1052,17 @@ Greatest common divisor
     Assumes that ``M[0]``, ``M[1]``, ``M[2]``, and ``M[3]``
     each point to a vector of size at least `\operatorname{len}(a)`.
 
-.. function:: slong _fmpz_mod_poly_gcd_hgcd(fmpz *G, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t mod)
-
-    Computes the monic GCD of `A` and `B`, assuming that
-    `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`.
-
-    Assumes that `G` has space for `\operatorname{len}(B)` coefficients and
-    returns the length of `G` on output.
-
-.. function:: void fmpz_mod_poly_gcd_hgcd(fmpz_mod_poly_t G, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
-
-    Computes the monic GCD of `A` and `B` using the HGCD algorithm.
-
-    As a special case, the GCD of two zero polynomials is defined to be
-    the zero polynomial.
-
-    The time complexity of the algorithm is `\mathcal{O}(n \log^2 n)`
-    ring operations. For further details, see [ThullYap1990]_.
-
-.. function:: slong _fmpz_mod_poly_xgcd_euclidean(fmpz *G, fmpz *S, fmpz *T, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invB, const fmpz_t p)
-
-    Computes the GCD of `A` and `B` together with cofactors `S` and `T`
-    such that `S A + T B = G`.  Returns the length of `G`.
-
-    Assumes that `\operatorname{len}(A) \geq \operatorname{len}(B) \geq 1` and
-    `(\operatorname{len}(A),\operatorname{len}(B)) \neq (1,1)`.
-
-    No attempt is made to make the GCD monic.
-
-    Requires that `G` have space for `\operatorname{len}(B)` coefficients.  Writes
-    `\operatorname{len}(B)-1` and `\operatorname{len}(A)-1` coefficients to `S` and `T`, respectively.
-    Note that, in fact, `\operatorname{len}(S) \leq \max(\operatorname{len}(B) - \operatorname{len}(G), 1)` and
-    `\operatorname{len}(T) \leq \max(\operatorname{len}(A) - \operatorname{len}(G), 1)`.
-
-    No aliasing of input and output operands is permitted.
-
 .. function:: slong _fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz *G, fmpz *S, fmpz *T, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invB, const fmpz_t p)
 
     If `f` returns with the value `1` then the function operates as per
     ``_fmpz_mod_poly_xgcd_euclidean``, otherwise `f` is set to a nontrivial
     factor of `p`.
 
-.. function:: void fmpz_mod_poly_xgcd_euclidean(fmpz_mod_poly_t G, fmpz_mod_poly_t S, fmpz_mod_poly_t T, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
-
-    Computes the GCD of `A` and `B`. The GCD of zero polynomials is
-    defined to be zero, whereas the GCD of the zero polynomial and some other
-    polynomial `P` is defined to be `P`. Except in the case where
-    the GCD is zero, the GCD `G` is made monic.
-
-    Polynomials ``S`` and ``T`` are computed such that
-    ``S*A + T*B = G``. The length of ``S`` will be at most
-    ``lenB`` and the length of ``T`` will be at most ``lenA``.
-
 .. function:: void fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G, fmpz_mod_poly_t S, fmpz_mod_poly_t T, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
 
     If `f` returns with the value `1` then the function operates as per
     ``fmpz_mod_poly_xgcd_euclidean``, otherwise `f` is set to a nontrivial
     factor of `p`.
-
-.. function:: slong _fmpz_mod_poly_xgcd_hgcd(fmpz *G, fmpz *S, fmpz *T, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t mod)
-
-    Computes the GCD of `A` and `B`, where `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`,
-    together with cofactors `S` and `T` such that `S A + T B = G`. Returns
-    the length of `G`.
-
-    No attempt is made to make the GCD monic.
-
-    Requires that `G` have space for `\operatorname{len}(B)` coefficients.  Writes
-    `\operatorname{len}(B) - 1` and `\operatorname{len}(A) - 1` coefficients to `S` and `T`,
-    respectively.  Note that, in fact, `\operatorname{len}(S) \leq \operatorname{len}(B) - \operatorname{len}(G)`
-    and `\operatorname{len}(T) \leq \operatorname{len}(A) - \operatorname{len}(G)`.
-
-    Both `S` and `T` must have space for at least `2` coefficients.
-
-    No aliasing of input and output operands is permitted.
-
-.. function:: void fmpz_mod_poly_xgcd_hgcd(fmpz_mod_poly_t G, fmpz_mod_poly_t S, fmpz_mod_poly_t T, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
-
-    Computes the GCD of `A` and `B`. The GCD of zero polynomials is
-    defined to be zero, whereas the GCD of the zero polynomial and some other
-    polynomial `P` is defined to be `P`. Except in the case where
-    the GCD is zero, the GCD `G` is made monic.
-
-    Polynomials ``S`` and ``T`` are computed such that
-    ``S*A + T*B = G``. The length of ``S`` will be at most
-    ``lenB`` and the length of ``T`` will be at most ``lenA``.
 
 .. function:: slong _fmpz_mod_poly_xgcd(fmpz *G, fmpz *S, fmpz *T, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invB, const fmpz_t p)
 
@@ -1679,50 +1493,6 @@ Multipoint evaluation
 Composition
 --------------------------------------------------------------------------------
 
-
-.. function:: void _fmpz_mod_poly_compose_horner(fmpz *res, const fmpz *poly1, slong len1, const fmpz *poly2, slong len2, const fmpz_t p)
-
-    Sets ``res`` to the composition of ``(poly1, len1)`` and
-    ``(poly2, len2)`` using Horner's algorithm.
-
-    Assumes that ``res`` has space for ``(len1-1)*(len2-1) + 1``
-    coefficients, although in `\mathbf{Z}_p[X]` this might not actually
-    be the length of the resulting polynomial when `p` is not a prime.
-
-    Assumes that ``poly1`` and ``poly2`` are non-zero polynomials.
-    Does not support aliasing between any of the inputs and the output.
-
-.. function:: void fmpz_mod_poly_compose_horner(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t ctx)
-
-    Sets ``res`` to the composition of ``poly1`` and ``poly2``
-    using Horner's algorithm.
-
-    To be precise about the order of composition, denoting ``res``,
-    ``poly1``, and ``poly2`` by `f`, `g`, and `h`, respectively,
-    sets `f(t) = g(h(t))`.
-
-.. function:: void _fmpz_mod_poly_compose_divconquer(fmpz *res, const fmpz *poly1, slong len1, const fmpz *poly2, slong len2, const fmpz_t p)
-
-    Sets ``res`` to the composition of ``(poly1, len1)`` and
-    ``(poly2, len2)`` using a divide and conquer algorithm which
-    takes out factors of ``poly2`` raised to `2^i` where possible.
-
-    Assumes that ``res`` has space for ``(len1-1)*(len2-1) + 1``
-    coefficients, although in `\mathbf{Z}_p[X]` this might not actually
-    be the length of the resulting polynomial when `p` is not a prime.
-
-    Assumes that ``poly1`` and ``poly2`` are non-zero polynomials.
-    Does not support aliasing between any of the inputs and the output.
-
-.. function:: void fmpz_mod_poly_compose_divconquer(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t ctx)
-
-    Sets ``res`` to the composition of ``poly1`` and ``poly2``
-    using a divide and conquer algorithm which takes out factors of
-    ``poly2`` raised to `2^i` where possible.
-
-    To be precise about the order of composition, denoting ``res``,
-    ``poly1``, and ``poly2`` by `f`, `g`, and `h`, respectively,
-    sets `f(t) = g(h(t))`.
 
 .. function:: void _fmpz_mod_poly_compose(fmpz *res, const fmpz *poly1, slong len1, const fmpz *poly2, slong len2, const fmpz_t p)
 

@@ -818,27 +818,6 @@ Euclidean division
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fq_nmod_poly_divrem_basecase(fq_nmod_struct *Q, fq_nmod_struct *R, const fq_nmod_struct *A, slong lenA, const fq_nmod_struct *B, slong lenB, const fq_nmod_t invB, const fq_nmod_ctx_t ctx)
-
-    Computes ``(Q, lenA - lenB + 1)``, ``(R, lenA)`` such that
-    `A = B Q + R` with `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
-
-    Assumes that the leading coefficient of `B` is invertible
-    and that ``invB`` is its inverse.
-
-    Assumes that `\operatorname{len}(A), \operatorname{len}(B) > 0`.  Allows zero-padding in
-    ``(A, lenA)``.  `R` and `A` may be aliased, but apart from
-    this no aliasing of input and output operands is allowed.
-
-.. function:: void fq_nmod_poly_divrem_basecase(fq_nmod_poly_t Q, fq_nmod_poly_t R, const fq_nmod_poly_t A, const fq_nmod_poly_t B, const fq_nmod_ctx_t ctx)
-
-    Computes `Q`, `R` such that `A = B Q + R` with
-    `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
-
-    Assumes that the leading coefficient of `B` is invertible.  This can
-    be taken for granted the context is for a finite field, that is, when
-    `p` is prime and `f(X)` is irreducible.
-
 .. function:: void _fq_nmod_poly_divrem(fq_nmod_struct *Q, fq_nmod_struct *R, const fq_nmod_struct *A, slong lenA, const fq_nmod_struct *B, slong lenB, const fq_nmod_t invB, const fq_nmod_ctx_t ctx)
 
     Computes ``(Q, lenA - lenB + 1)``, ``(R, lenA)`` such that
@@ -884,57 +863,19 @@ Euclidean division
     Sets ``R`` to the remainder of the division of ``A`` by
     ``B`` in the context described by ``ctx``.
 
-.. function:: void _fq_nmod_poly_div_basecase(fq_nmod_struct *Q, fq_nmod_struct *R, const fq_nmod_struct *A, slong lenA, const fq_nmod_struct *B, slong lenB, const fq_nmod_t invB, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_poly_div(fq_nmod_struct *Q, const fq_nmod_struct *A, slong lenA, const fq_nmod_struct *B, slong lenB, const fq_nmod_t invB, const fq_nmod_ctx_t ctx)
 
     Notationally, computes `Q`, `R` such that `A = B Q + R` with `0
     \leq \operatorname{len}(R) < \operatorname{len}(B)` but only sets ``(Q, lenA - lenB + 1)``.
 
-    Requires temporary space ``(R, lenA)``.  If ``R`` is
-    ``NULL``, then the temporary space will be allocated.  Allows
-    aliasing only between `A` and `R`.  Allows zero-padding in `A` but
-    not in `B`.  Assumes that the leading coefficient of `B` is a
+    Allows zero-padding in `A` but not in `B`.  Assumes that the leading coefficient of `B` is a
     unit.
 
-.. function:: void fq_nmod_poly_div_basecase(fq_nmod_poly_t Q, const fq_nmod_poly_t A, const fq_nmod_poly_t B, const fq_nmod_ctx_t ctx)
+.. function:: void fq_nmod_poly_div(fq_nmod_poly_t Q, const fq_nmod_poly_t A, const fq_nmod_poly_t B, const fq_nmod_ctx_t ctx)
 
     Notionally finds polynomials `Q` and `R` such that `A = B Q + R` with
     `\operatorname{len}(R) < \operatorname{len}(B)`, but returns only ``Q``. If `\operatorname{len}(B) = 0` an
     exception is raised.
-
-.. function:: void _fq_nmod_poly_divrem_divconquer_recursive(fq_nmod_struct * Q, fq_nmod_struct * BQ, fq_nmod_struct * W, const fq_nmod_struct * A, const fq_nmod_struct * B, slong lenB, const fq_nmod_t invB, const fq_nmod_ctx_t ctx)
-
-    Computes ``(Q, lenB)``, ``(BQ, 2 lenB - 1)`` such that
-    `BQ = B \times Q` and `A = B Q + R` where `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
-
-    Assumes that the leading coefficient of `B` is invertible and that
-    ``invB`` is the inverse.
-
-    Assumes `\operatorname{len}(B) > 0`.  Allows zero-padding in ``(A, lenA)``.  Requires
-    a temporary array ``(W, 2 lenB - 1)``.  No aliasing of input and output
-    operands is allowed.
-
-    This function does not read the bottom `\operatorname{len}(B) - 1` coefficients from
-    `A`, which means that they might not even need to exist in allocated
-    memory.
-
-.. function:: void _fq_nmod_poly_divrem_divconquer(fq_nmod_struct * Q, fq_nmod_struct * R, const fq_nmod_struct * A, slong lenA, const fq_nmod_struct * B, slong lenB, const fq_nmod_t invB, const fq_nmod_ctx_t ctx)
-
-    Computes ``(Q, lenA - lenB + 1)``, ``(R, lenA)`` such that
-    `A = B Q + R` and `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
-
-    Assumes that the leading coefficient of `B` is invertible and that
-    ``invB`` is the inverse.
-
-    Assumes `\operatorname{len}(A) \geq \operatorname{len}(B) > 0`.  Allows zero-padding in
-    ``(A, lenA)``.  No aliasing of input and output operands is
-    allowed.
-
-.. function:: void fq_nmod_poly_divrem_divconquer(fq_nmod_poly_t Q, fq_nmod_poly_t R, const fq_nmod_poly_t A, const fq_nmod_poly_t B, const fq_nmod_ctx_t ctx)
-
-    Computes `Q`, `R` such that `A = B Q + R` and `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
-
-    Assumes that `B` is non-zero and that the leading coefficient of
-    `B` is invertible.
 
 .. function:: void _fq_nmod_poly_div_newton_n_preinv(fq_nmod_struct* Q, const fq_nmod_struct* A, slong lenA, const fq_nmod_struct* B, slong lenB, const fq_nmod_struct* Binv, slong lenBinv, const fq_nmod_struct ctx_t)
 
@@ -1049,62 +990,6 @@ Greatest common divisor
     made to make the GCD monic. It is required that `G` have space for
     ``lenB`` coefficients.
 
-.. function:: void fq_nmod_poly_gcd_euclidean(fq_nmod_poly_t rop, const fq_nmod_poly_t op1, const fq_nmod_poly_t op2, const fq_nmod_ctx_t ctx)
-
-    Sets ``rop`` to the greatest common divisor of ``op1`` and
-    ``op2``, using the Euclidean algorithm. The GCD of zero
-    polynomials is defined to be zero, whereas the GCD of the zero
-    polynomial and some other polynomial `P` is defined to be
-    `P`. Except in the case where the GCD is zero, the GCD `G` is made
-    monic.
-
-.. function:: long _fq_nmod_poly_gcd_euclidean(fq_nmod_struct* G, const fq_nmod_struct* A, slong lenA, const fq_nmod_struct* B, slong lenB, const fq_nmod_ctx_t ctx)
-
-    Computes the GCD of `A` of length ``lenA`` and `B` of length
-    ``lenB``, where ``lenA >= lenB > 0`` and sets `G` to it. The
-    length of the GCD `G` is returned by the function. No attempt is
-    made to make the GCD monic. It is required that `G` have space for
-    ``lenB`` coefficients.
-
-.. function:: slong _fq_nmod_poly_hgcd(fq_nmod_struct **M, slong *lenM, fq_nmod_struct *A, slong *lenA, fq_nmod_struct *B, slong *lenB, const fq_nmod_struct * a, slong lena, const fq_nmod_struct *b, slong lenb, const fq_nmod_ctx_t ctx)
-
-    Computes the HGCD of `a` and `b`, that is, a matrix `M`, a sign `\sigma`
-    and two polynomials `A` and `B` such that
-
-    .. math ::
-
-
-        (A,B)^t = \sigma M^{-1} (a,b)^t.
-
-
-
-    Assumes that `\operatorname{len}(a) > \operatorname{len}(b) > 0`.
-
-    Assumes that `A` and `B` have space of size at least `\operatorname{len}(a)`
-    and `\operatorname{len}(b)`, respectively.  On exit, ``*lenA`` and ``*lenB``
-    will contain the correct lengths of `A` and `B`.
-
-    Assumes that ``M[0]``, ``M[1]``, ``M[2]``, and ``M[3]``
-    each point to a vector of size at least `\operatorname{len}(a)`.
-
-.. function:: void fq_nmod_poly_gcd_hgcd(fq_nmod_poly_t rop, const fq_nmod_poly_t op1, const fq_nmod_poly_t op2, const fq_nmod_ctx_t ctx)
-
-    Sets ``rop`` to the greatest common divisor of ``op1`` and
-    ``op2``, using the HGCD algorithm. The GCD of zero
-    polynomials is defined to be zero, whereas the GCD of the zero
-    polynomial and some other polynomial `P` is defined to be
-    `P`. Except in the case where the GCD is zero, the GCD `G` is made
-    monic.
-
-.. function:: long _fq_nmod_poly_gcd_hgcd(fq_nmod_struct* G, const fq_nmod_struct* A, slong lenA, const fq_nmod_struct* B, slong lenB, const fq_nmod_ctx_t ctx)
-
-    Computes the GCD of `A` of length ``lenA`` and `B` of length
-    ``lenB`` using the HGCD algorithm, where
-    ``lenA >= lenB > 0`` and sets `G` to it. The length of the GCD
-    `G` is returned by the function. No attempt is made to make the
-    GCD monic. It is required that `G` have space for ``lenB``
-    coefficients.
-
 .. function:: slong _fq_nmod_poly_gcd_euclidean_f(fq_nmod_t f, fq_nmod_struct *G, const fq_nmod_struct *A, slong lenA, const fq_nmod_struct *B, slong lenB, const fq_nmod_ctx_t ctx)
 
     Either sets `f = 1` and `G` to the greatest common divisor of
@@ -1120,35 +1005,7 @@ Greatest common divisor
     Either sets `f = 1` and `G` to the greatest common divisor of `A`
     and `B` or sets `f` to a factor of the modulus of ``ctx``.
 
-.. function:: slong _fq_nmod_poly_xgcd_euclidean(fq_nmod_struct *G, fq_nmod_struct *S, fq_nmod_struct *T, const fq_nmod_struct *A, slong lenA, const fq_nmod_struct *B, slong lenB, const fmpz_t invB, const fq_nmod_ctx_t ctx)
-
-    Computes the GCD of `A` and `B` together with cofactors `S` and `T`
-    such that `S A + T B = G`.  Returns the length of `G`.
-
-    Assumes that `\operatorname{len}(A) \geq \operatorname{len}(B) \geq 1` and
-    `(\operatorname{len}(A),\operatorname{len}(B)) \neq (1,1)`.
-
-    No attempt is made to make the GCD monic.
-
-    Requires that `G` have space for `\operatorname{len}(B)` coefficients.  Writes
-    `\operatorname{len}(B)-1` and `\operatorname{len}(A)-1` coefficients to `S` and `T`, respectively.
-    Note that, in fact, `\operatorname{len}(S) \leq \max(\operatorname{len}(B) - \operatorname{len}(G), 1)` and
-    `\operatorname{len}(T) \leq \max(\operatorname{len}(A) - \operatorname{len}(G), 1)`.
-
-    No aliasing of input and output operands is permitted.
-
-.. function:: void fq_nmod_poly_xgcd_euclidean(fq_nmod_poly_t G, fq_nmod_poly_t S, fq_nmod_poly_t T, const fq_nmod_poly_t A, const fq_nmod_poly_t B, const fq_nmod_ctx_t ctx)
-
-    Computes the GCD of `A` and `B`. The GCD of zero polynomials is
-    defined to be zero, whereas the GCD of the zero polynomial and some other
-    polynomial `P` is defined to be `P`. Except in the case where
-    the GCD is zero, the GCD `G` is made monic.
-
-    Polynomials ``S`` and ``T`` are computed such that
-    ``S*A + T*B = G``. The length of ``S`` will be at most
-    ``lenB`` and the length of ``T`` will be at most ``lenA``.
-
-.. function:: slong _fq_nmod_poly_xgcd(fq_nmod_struct *G, fq_nmod_struct *S, fq_nmod_struct *T, const fq_nmod_struct *A, slong lenA, const fq_nmod_struct *B, slong lenB, const fmpz_t invB, const fq_nmod_ctx_t ctx)
+.. function:: slong _fq_nmod_poly_xgcd(fq_nmod_struct *G, fq_nmod_struct *S, fq_nmod_struct *T, const fq_nmod_struct *A, slong lenA, const fq_nmod_struct *B, slong lenB, const fq_nmod_ctx_t ctx)
 
     Computes the GCD of `A` and `B` together with cofactors `S` and `T`
     such that `S A + T B = G`.  Returns the length of `G`.
@@ -1313,41 +1170,6 @@ Evaluation
 Composition
 --------------------------------------------------------------------------------
 
-
-.. function:: void _fq_nmod_poly_compose_divconquer(fq_nmod_struct *rop, const fq_nmod_struct *op1, slong len1, const fq_nmod_struct *op2, slong len2, const fq_nmod_ctx_t ctx)
-
-    Computes the composition of ``(op1, len1)`` and ``(op2, len2)``
-    using a divide and conquer approach and places the result into ``rop``,
-    assuming ``rop`` can hold the output of length
-    ``(len1 - 1) * (len2 - 1) + 1``.
-
-    Assumes ``len1, len2 > 0``.  Does not support aliasing between
-    ``rop`` and any of ``(op1, len1)`` and ``(op2, len2)``.
-
-.. function:: void fq_nmod_poly_compose_divconquer(fq_nmod_poly_t rop, const fq_nmod_poly_t op1, const fq_nmod_poly_t op2, const fq_nmod_ctx_t ctx)
-
-    Sets ``rop`` to the composition of ``op1`` and ``op2``.
-    To be precise about the order of composition, denoting ``rop``,
-    ``op1``, and ``op2`` by `f`, `g`, and `h`, respectively,
-    sets `f(t) = g(h(t))`.
-
-.. function:: void _fq_nmod_poly_compose_horner(fq_nmod_struct *rop, const fq_nmod_struct *op1, slong len1, const fq_nmod_struct *op2, slong len2, const fq_nmod_ctx_t ctx)
-
-    Sets ``rop`` to the composition of ``(op1, len1)`` and
-    ``(op2, len2)``.
-
-    Assumes that ``rop`` has space for ``(len1-1)*(len2-1) + 1``
-    coefficients.  Assumes that ``op1`` and ``op2`` are non-zero
-    polynomials.  Does not support aliasing between any of the inputs and
-    the output.
-
-.. function:: void fq_nmod_poly_compose_horner(fq_nmod_poly_t rop, const fq_nmod_poly_t op1, const fq_nmod_poly_t op2, const fq_nmod_ctx_t ctx)
-
-    Sets ``rop`` to the composition of ``op1`` and ``op2``.
-    To be more precise, denoting ``rop``, ``op1``, and ``op2``
-    by `f`, `g`, and `h`, sets `f(t) = g(h(t))`.
-
-    This implementation uses Horner's method.
 
 .. function:: void _fq_nmod_poly_compose(fq_nmod_struct *rop, const fq_nmod_struct *op1, slong len1, const fq_nmod_struct *op2, slong len2, const fq_nmod_ctx_t ctx)
 
