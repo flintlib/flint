@@ -15,7 +15,11 @@
 
 void * flint_aligned_alloc(ulong alignment, ulong size)
 {
-    void * p = aligned_alloc(alignment, size);
+    void * p;
+
+    FLINT_ASSERT(size % alignment == 0);
+
+    p = aligned_alloc(alignment, size);
 
     if (p == NULL)
         flint_throw(FLINT_ERROR, "Unable to allocate %wu bytes with alignment %wu in %s\n", size, alignment, __FUNCTION__);
