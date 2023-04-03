@@ -12,16 +12,6 @@
 #ifndef FFT_SMALL_H
 #define FFT_SMALL_H
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <stdlib.h>
-#include <stdio.h>
-#undef ulong
-
-#include <gmp.h>
-#define ulong mp_limb_t
-#include "flint.h"
-#include "longlong.h"
 #include "mpn_extras.h"
 #include "machine_vectors.h"
 #include "nmod.h"
@@ -30,9 +20,8 @@
 #define BLK_SZ 256
 #define BLK_SHIFT 10
 
-
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 FLINT_INLINE ulong n_pow2(int k)
@@ -81,11 +70,11 @@ FLINT_INLINE ulong n_next_pow2m1(ulong a)
 }
 
 FLINT_INLINE ulong n_leading_zeros(ulong x) {
-    return x == 0 ? FLINT_BITS : __builtin_clzll(x);
+    return x == 0 ? FLINT_BITS : flint_clz(x);
 }
 
 FLINT_INLINE ulong n_trailing_zeros(ulong x) {
-    return x == 0 ? FLINT_BITS : __builtin_ctzll(x);
+    return x == 0 ? FLINT_BITS : flint_ctz(x);
 }
 
 /*
@@ -104,22 +93,20 @@ FLINT_INLINE ulong n_trailing_zeros(ulong x) {
 FLINT_INLINE ulong n_nbits(ulong x) {
     if (x == 0)
         return 0;
-    return FLINT_BITS - __builtin_clzll(x);
+    return FLINT_BITS - flint_clz(x);
 }
 
 FLINT_INLINE ulong n_nbits_nz(ulong x) {
     FLINT_ASSERT(x != 0);
-    ulong count;
-    count_leading_zeros(count, x);
-    return (count^(FLINT_BITS-1)) + 1;
+    return (flint_clz(x)^(FLINT_BITS-1)) + 1;
 }
 
 FLINT_INLINE ulong n_clog2(ulong x) {
-    return (x <= 2) ? (x == 2) : FLINT_BITS - __builtin_clzll(x - 1);
+    return (x <= 2) ? (x == 2) : FLINT_BITS - flint_clz(x - 1);
 }
 
 FLINT_INLINE ulong n_flog2(ulong x) {
-    return (x <= 2) ? (x == 2) : FLINT_BITS - __builtin_clzll(x);
+    return (x <= 2) ? (x == 2) : FLINT_BITS - flint_clz(x);
 }
 
 FLINT_INLINE slong z_min(slong a, slong b) {return FLINT_MIN(a, b);}
@@ -527,4 +514,3 @@ int _nmod_poly_divrem_precomp(
 #endif
 
 #endif
-
