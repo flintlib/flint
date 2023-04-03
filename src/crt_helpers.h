@@ -1,4 +1,31 @@
-#if FLINT_AVX
+/*
+    Copyright (C) 2022 Daniel Schultz
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+*/
+
+#ifndef CRT_HELPERS_H
+#define CRT_HELPERS_H
+
+#if defined (__AVX2__)
+# include <x86intrin.h>
+#else
+# include <arm_neon.h>
+#endif
+
+#include "flint.h"
+#include "templates.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#if defined(__AVX2__)
 
 FLINT_FORCE_INLINE unsigned char _addcarry_ulong(unsigned char cf, ulong x, ulong y, ulong* s)
 {
@@ -41,7 +68,7 @@ FLINT_FORCE_INLINE unsigned char _subborrow_ulong(unsigned char cf, ulong x, ulo
 
 #if 1
 
-#if FLINT_AVX
+#if defined(__AVX2__)
 
 #define add_sssssaaaaaaaaaa(s4,s3,s2,s1,s0, a4,a3,a2,a1,a0, b4,b3,b2,b1,b0)  \
   __asm__ ("addq %14,%q4\n\tadcq %12,%q3\n\tadcq %10,%q2\n\tadcq %8,%q1\n\tadcq %6,%q0"    \
@@ -136,8 +163,7 @@ FLINT_FORCE_INLINE unsigned char _subborrow_ulong(unsigned char cf, ulong x, ulo
          "6"  ((mp_limb_t)(a1)), "rme" ((mp_limb_t)(b1)),                 \
          "7"  ((mp_limb_t)(a0)), "rme" ((mp_limb_t)(b0)))
 
-#elif FLINT_NEON
-
+#elif defined(__ARM_NEON)
 
 #define add_sssssaaaaaaaaaa(s4, s3, s2, s1, s0, a4, a3, a2, a1, a0, b4, b3, b2, b1, b0)      \
   __asm__ ("adds %4,%9,%14\n\tadcs %3,%8,%13\n\tadcs %2,%7,%12\n\tadc %1,%6,%11\n\tadc %0,%5,%10"\
@@ -204,7 +230,7 @@ FLINT_FORCE_INLINE unsigned char _subborrow_ulong(unsigned char cf, ulong x, ulo
        : "cc")
 
 #else
-#error oops
+# error crt_helpers.h requires AVX2 or Neon instructions
 #endif
 
 FLINT_FORCE_INLINE void multi_add_0(ulong z[], const ulong a[])
@@ -461,7 +487,7 @@ FLINT_FORCE_INLINE void CAT(_reduce_big_sum, n)(ulong r[], ulong t[], const ulon
 check: \
     for (ulong k = n; k > 1; k--) \
     { \
-        if (LIKELY(r[k-1] > limit[k-1])) \
+        if (FLINT_LIKELY(r[k-1] > limit[k-1])) \
             goto sub; \
         if (r[k-1] < limit[k-1]) \
             return; \
@@ -481,3 +507,9 @@ DEFINE_IT(5, 4)
 DEFINE_IT(6, 5)
 DEFINE_IT(7, 6)
 #undef DEFINE_IT
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* CRT_HELPERS_H */
