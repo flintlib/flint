@@ -45,13 +45,20 @@ GR_MAT_INLINE gr_ptr gr_mat_entry_ptr(gr_mat_t mat, slong i, slong j, gr_ctx_t c
     return GR_MAT_ENTRY(mat, i, j, ctx->sizeof_elem);
 }
 
+GR_MAT_INLINE gr_srcptr gr_mat_entry_srcptr(const gr_mat_t mat, slong i, slong j, gr_ctx_t ctx)
+{
+    return GR_MAT_ENTRY(mat, i, j, ctx->sizeof_elem);
+}
+
 /* Generics */
 typedef int ((*gr_method_mat_unary_op_get_scalar)(gr_ptr, const gr_mat_t, gr_ctx_ptr));
+typedef int ((*gr_method_mat_unary_op)(gr_mat_t, const gr_mat_t, gr_ctx_ptr));
 typedef int ((*gr_method_mat_binary_op)(gr_mat_t, const gr_mat_t, const gr_mat_t, gr_ctx_ptr));
 typedef int ((*gr_method_mat_pivot_op)(slong *, gr_mat_t, slong, slong, slong, gr_ctx_ptr));
 typedef int ((*gr_method_mat_diagonalization_op)(gr_vec_t, gr_mat_t, gr_mat_t, const gr_mat_t, int, gr_ctx_ptr));
 
 #define GR_MAT_UNARY_OP_GET_SCALAR(ctx, NAME) (((gr_method_mat_unary_op_get_scalar *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_MAT_UNARY_OP(ctx, NAME) (((gr_method_mat_unary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_MAT_BINARY_OP(ctx, NAME) (((gr_method_mat_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_MAT_PIVOT_OP(ctx, NAME) (((gr_method_mat_pivot_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_MAT_DIAGONALIZATION_OP(ctx, NAME) (((gr_method_mat_diagonalization_op *) ctx->methods)[GR_METHOD_ ## NAME])
@@ -262,6 +269,11 @@ WARN_UNUSED_RESULT int gr_mat_diagonalization_precomp(gr_vec_t D, gr_mat_t L, gr
 WARN_UNUSED_RESULT int gr_mat_diagonalization_generic(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A, int flags, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_diagonalization(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A, int flags, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int gr_mat_set_jordan_blocks(gr_mat_t mat, const gr_vec_t lambda, slong num_blocks, slong * block_lambda, slong * block_size, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_jordan_blocks(gr_vec_t lambda, slong * num_blocks, slong * block_lambda, slong * block_size, const gr_mat_t A, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_jordan_transformation(gr_mat_t mat, const gr_vec_t lambda, slong num_blocks, slong * block_lambda, slong * block_size, const gr_mat_t A, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_jordan_form(gr_mat_t J, gr_mat_t P, const gr_mat_t A, gr_ctx_t ctx);
+
 truth_t gr_mat_is_scalar(const gr_mat_t mat, gr_ctx_t ctx);
 truth_t gr_mat_is_diagonal(const gr_mat_t mat, gr_ctx_t ctx);
 truth_t gr_mat_is_lower_triangular(const gr_mat_t mat, gr_ctx_t ctx);
@@ -269,6 +281,13 @@ truth_t gr_mat_is_upper_triangular(const gr_mat_t mat, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mat_mul_diag(gr_mat_t C, const gr_mat_t A, const gr_vec_t D, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_diag_mul(gr_mat_t C, const gr_vec_t D, const gr_mat_t A, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_mat_exp_jordan(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_exp(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_mat_log_jordan(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_log(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx);
+
 
 #ifdef __cplusplus
 }

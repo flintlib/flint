@@ -633,6 +633,23 @@ Eigenvalues
     with corresponding multiplicites, which can be computed
     with :func:`gr_mat_eigenvalues`.
 
+Jordan decomposition
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_set_jordan_blocks(gr_mat_t mat, const gr_vec_t lambda, slong num_blocks, slong * block_lambda, slong * block_size, gr_ctx_t ctx)
+              int gr_mat_jordan_blocks(gr_vec_t lambda, slong * num_blocks, slong * block_lambda, slong * block_size, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_jordan_transformation(gr_mat_t mat, const gr_vec_t lambda, slong num_blocks, slong * block_lambda, slong * block_size, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_jordan_form(gr_mat_t J, gr_mat_t P, const gr_mat_t A, gr_ctx_t ctx)
+
+Matrix functions
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_exp_jordan(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_exp(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
+
+.. function:: int gr_mat_log_jordan(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_log(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
+
 Hessenberg form
 -------------------------------------------------------------------------------
 

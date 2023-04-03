@@ -467,6 +467,24 @@ matrix_inv(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
     return gr_mat_inv(res, mat, MATRIX_CTX(ctx)->base_ring);
 }
 
+int
+matrix_exp(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    if (res->r != mat->r || res->c != mat->c)
+        _gr_mat_resize(res, mat->r, mat->c, MATRIX_CTX(ctx)->base_ring);
+
+    return gr_mat_exp(res, mat, MATRIX_CTX(ctx)->base_ring);
+}
+
+int
+matrix_log(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    if (res->r != mat->r || res->c != mat->c)
+        _gr_mat_resize(res, mat->r, mat->c, MATRIX_CTX(ctx)->base_ring);
+
+    return gr_mat_log(res, mat, MATRIX_CTX(ctx)->base_ring);
+}
+
 
 int _gr_mat_methods_initialized = 0;
 
@@ -502,6 +520,8 @@ gr_method_tab_input _gr_mat_methods_input[] =
     {GR_METHOD_MUL_OTHER,   (gr_funcptr) matrix_mul_other},
     {GR_METHOD_DIV_OTHER,   (gr_funcptr) matrix_div_other},
     {GR_METHOD_INV,         (gr_funcptr) matrix_inv},
+    {GR_METHOD_EXP,         (gr_funcptr) matrix_exp},
+    {GR_METHOD_LOG,         (gr_funcptr) matrix_log},
     {0,                     (gr_funcptr) NULL},
 };
 

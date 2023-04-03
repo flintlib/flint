@@ -1,3 +1,4 @@
+#include "fmpq_mat.h"
 #include "gr_vec.h"
 #include "gr_mat.h"
 
@@ -13,7 +14,7 @@ int main()
 
     /* todo: test non-diagonalizable matrices */
     /* todo: test aliasing */
-    for (iter = 0; iter < 10000; iter++)
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         gr_ctx_t ctx;
         gr_mat_t A, L, R, B, LR;
@@ -34,7 +35,18 @@ int main()
         gr_mat_init(B, n, n, ctx);
         gr_mat_init(LR, n, n, ctx);
 
-        status |= gr_mat_randtest(A, state, ctx);
+        if (n <= 2)
+        {
+            status |= gr_mat_randtest(A, state, ctx);
+        }
+        else
+        {
+            fmpq_mat_t T;
+            fmpq_mat_init(T, n, n);
+            fmpq_mat_randtest(T, state, 1);
+            status |= gr_mat_set_fmpq_mat(A, T, ctx);
+            fmpq_mat_clear(T);
+        }
         /* status |= gr_vec_randtest(D, state, ctx); */
         status |= gr_mat_randtest(L, state, ctx);
         status |= gr_mat_randtest(R, state, ctx);

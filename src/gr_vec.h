@@ -35,6 +35,13 @@ gr_vec_entry_ptr(gr_vec_t vec, slong i, gr_ctx_t ctx)
     return GR_VEC_ENTRY(vec, i, ctx->sizeof_elem);
 }
 
+GR_VEC_INLINE gr_srcptr
+gr_vec_entry_srcptr(const gr_vec_t vec, slong i, gr_ctx_t ctx)
+{
+    return GR_VEC_ENTRY(vec, i, ctx->sizeof_elem);
+}
+
+
 GR_VEC_INLINE slong gr_vec_length(const gr_vec_t vec, gr_ctx_t ctx)
 {
     return vec->length;

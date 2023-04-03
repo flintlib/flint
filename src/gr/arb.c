@@ -1748,6 +1748,16 @@ _gr_arb_mat_det(arb_t res, const arb_mat_t x, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_arb_mat_exp(arb_mat_t res, const arb_mat_t x, gr_ctx_t ctx)
+{
+    if (x->r != x->c)
+        return GR_DOMAIN;
+
+    arb_mat_exp(res, x, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
 int _arb_methods_initialized = 0;
 
 gr_static_method_table _arb_methods;
@@ -1976,6 +1986,7 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_arb_poly_roots_other},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_arb_mat_mul},
     {GR_METHOD_MAT_DET,         (gr_funcptr) _gr_arb_mat_det},
+    {GR_METHOD_MAT_EXP,         (gr_funcptr) _gr_arb_mat_exp},
     {0,                         (gr_funcptr) NULL},
 };
 

@@ -10,42 +10,13 @@
 */
 
 #include "ca_mat.h"
+#include "gr_mat.h"
 
 int
 ca_mat_jordan_form(ca_mat_t J, ca_mat_t P, const ca_mat_t A, ca_ctx_t ctx)
 {
-    ca_vec_t lambda;
-    slong n;
-    slong num_blocks, * block_size, * block_lambda;
+    gr_ctx_t cctx;
     int success;
-
-    n = ca_mat_nrows(A);
-
-    if (J == A || P == A)
-    {
-        ca_mat_t T;
-        ca_mat_init(T, n, n, ctx);
-        ca_mat_set(T, A, ctx);
-        success = ca_mat_jordan_form(J, P, T, ctx);
-        ca_mat_clear(T, ctx);
-        return success;
-    }
-
-    ca_vec_init(lambda, 0, ctx);
-    block_lambda = flint_malloc(sizeof(slong) * n);
-    block_size = flint_malloc(sizeof(slong) * n);
-
-    success = ca_mat_jordan_blocks(lambda, &num_blocks, block_lambda, block_size, A, ctx);
-
-    if (success && P != NULL)
-        success = ca_mat_jordan_transformation(P, lambda, num_blocks, block_lambda, block_size, A, ctx);
-
-    if (success)
-        ca_mat_set_jordan_blocks(J, lambda, num_blocks, block_lambda, block_size, ctx);
-
-    ca_vec_clear(lambda, ctx);
-    flint_free(block_lambda);
-    flint_free(block_size);
-
-    return success;
-}
+    _gr_ctx_init_ca_from_ref(cctx, GR_CTX_CC_CA, ctx);
+    success = (gr_mat_jordan_form((gr_mat_struct *) J, (gr_mat_struct *) P, (const gr_mat_struct *) A, cctx) == GR_SUCCESS);
+    return success;}

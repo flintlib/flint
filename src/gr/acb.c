@@ -1935,6 +1935,16 @@ _gr_acb_mat_det(acb_t res, const acb_mat_t x, gr_ctx_t ctx)
 }
 
 int
+_gr_acb_mat_exp(acb_mat_t res, const acb_mat_t x, gr_ctx_t ctx)
+{
+    if (x->r != x->c)
+        return GR_DOMAIN;
+
+    acb_mat_exp(res, x, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+int
 _gr_acb_mat_diagonalization(gr_vec_t D, acb_mat_t L, acb_mat_t R, const acb_mat_t A, int flags, gr_ctx_t ctx)
 {
     int status;
@@ -2213,6 +2223,7 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_acb_poly_roots_other},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_acb_mat_mul},
     {GR_METHOD_MAT_DET,         (gr_funcptr) _gr_acb_mat_det},
+    {GR_METHOD_MAT_EXP,         (gr_funcptr) _gr_acb_mat_exp},
     {GR_METHOD_MAT_DIAGONALIZATION,     (gr_funcptr) _gr_acb_mat_diagonalization},
     {0,                         (gr_funcptr) NULL},
 };

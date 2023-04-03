@@ -1362,6 +1362,44 @@ class gr_ctx:
         return ctx._binary_op_fmpz(x, y, libgr.gr_mul_2exp_fmpz, "mul_2exp($x, $y)")
 
     def exp(ctx, x):
+        """
+        Exponential function.
+
+            >>> RR.exp(1)
+            [2.718281828459045 +/- 5.41e-16]
+            >>> RR(1).exp()
+            [2.718281828459045 +/- 5.41e-16]
+
+        Matrix exponentials:
+
+            >>> MatRR.exp([[1,2],[3,4]])
+            [[[51.96895619870500 +/- 8.39e-15], [74.7365645670032 +/- 1.48e-14]],
+            [[112.1048468505048 +/- 2.77e-14], [164.0738030492098 +/- 2.90e-14]]]
+            >>> MatCC.exp([[1,2+1j],[3,4]])
+            [[([44.75490138773069 +/- 7.60e-15] + [36.14044247515163 +/- 7.33e-15]*I), ([58.81526453925295 +/- 7.84e-15] + [61.26937858302805 +/- 7.52e-15]*I)],
+            [([107.3399445969204 +/- 3.89e-14] + [38.23409557608189 +/- 8.58e-15]*I), ([152.0948459846510 +/- 7.30e-14] + [74.3745380512335 +/- 2.88e-14]*I)]]
+            >>> Mat(CC_ca)([[1,2],[0,3]]).exp()
+            [[2.71828 {a where a = 2.71828 [Exp(1)]}, 17.3673 {b^3-b where a = 20.0855 [Exp(3)], b = 2.71828 [Exp(1)]}],
+            [0, 20.0855 {a where a = 20.0855 [Exp(3)]}]]
+            >>> Mat(CC_ca)([[1,2],[3,4]]).exp()[0,0]
+            51.9690 {(-a*c+11*a+b*c+11*b)/22 where a = 215.354 [Exp(5.37228 {(c+5)/2})], b = 0.689160 [Exp(-0.372281 {(-c+5)/2})], c = 5.74456 [c^2-33=0]}
+            >>> Mat(CC_ca)([[0,0,1],[1,0,0],[0,1,0]]).exp().det()
+            1
+            >>> Mat(CC_ca)([[0,1,0,0,0],[0,0,2,0,0],[0,0,0,3,0],[0,0,0,0,4],[0,0,0,0,0]]).exp()
+            [[1, 1, 1, 1, 1],
+            [0, 1, 2, 3, 4],
+            [0, 0, 1, 3, 6],
+            [0, 0, 0, 1, 4],
+            [0, 0, 0, 0, 1]]
+            >>> MatQQ([[0,1,0,0,0],[0,0,2,0,0],[0,0,0,3,0],[0,0,0,0,4],[0,0,0,0,0]]).exp()
+            [[1, 1, 1, 1, 1],
+            [0, 1, 2, 3, 4],
+            [0, 0, 1, 3, 6],
+            [0, 0, 0, 1, 4],
+            [0, 0, 0, 0, 1]]
+
+
+        """
         return ctx._unary_op(x, libgr.gr_exp, "exp($x)")
 
     def exp2(ctx, x):
@@ -1388,6 +1426,8 @@ class gr_ctx:
 
     def log(ctx, x):
         """
+        Natural logarithm:
+
             >>> QQ.log(1)
             0
             >>> QQ.log(2)
@@ -1398,6 +1438,33 @@ class gr_ctx:
             [0.693147180559945 +/- 4.12e-16]
             >>> CC.log(1j)
             [1.570796326794897 +/- 5.54e-16]*I
+
+        Matrix logarithms:
+
+            >>> Mat(CC_ca)([[4,2],[2,4]]).log().det() == CC_ca.log(2)*CC_ca.log(6)
+            True
+            >>> Mat(QQ)([[1,1],[0,1]]).log()
+            [[0, 1],
+            [0, 0]]
+            >>> Mat(QQ)([[0,1],[0,0]]).log()
+            Traceback (most recent call last):
+              ...
+            FlintDomainError: log(x) is not an element of {Matrices (any shape) over Rational field (fmpq)} for {x = [[0, 1],
+            [0, 0]]}
+            >>> Mat(CC_ca)([[0,1],[0,0]]).log()
+            Traceback (most recent call last):
+              ...
+            FlintDomainError: log(x) is not an element of {Matrices (any shape) over Complex numbers (ca)} for {x = [[0, 1],
+            [0, 0]]}
+            >>> Mat(CC_ca)([[0,0,1],[0,1,0],[1,0,0]]).log() / (CC_ca.pi() * CC_ca.i())
+            [[0.500000 {1/2}, 0, -0.500000 {-1/2}],
+            [0, 0, 0],
+            [-0.500000 {-1/2}, 0, 0.500000 {1/2}]]
+            >>> Mat(CC_ca)([[0,0,1],[0,1,0],[1,0,0]]).log().exp()
+            [[0, 0, 1],
+            [0, 1, 0],
+            [1, 0, 0]]
+
         """
         return ctx._unary_op(x, libgr.gr_log, "log($x)")
 
@@ -5702,6 +5769,7 @@ class gr_mat(gr_elem):
             if status & GR_UNABLE: raise NotImplementedError
             if status & GR_DOMAIN: raise ValueError
         return (D, L, R)
+
 
     #def __getitem__(self, i):
     #    pass

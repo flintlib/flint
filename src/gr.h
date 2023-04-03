@@ -661,6 +661,8 @@ typedef enum
     /* Matrix methods (todo: rename -> GR_MAT) */
     GR_METHOD_MAT_MUL,
     GR_METHOD_MAT_DET,
+    GR_METHOD_MAT_EXP,
+    GR_METHOD_MAT_LOG,
     GR_METHOD_MAT_FIND_NONZERO_PIVOT,
     GR_METHOD_MAT_DIAGONALIZATION,
 
