@@ -10,7 +10,6 @@
 */
 
 #include "fft_small.h"
-#include "machine_vectors.h"
 
 /*
     N is supposed to be a good fit for the number of points to process per loop
@@ -86,15 +85,9 @@ static void CAT4(radix_2_moth_inv_trunc_block, nn, zz, ff)( \
     int l = 2; \
     flint_printf("function l = %d, n = %d, z = %d, f = %d", l, nn, zz, ff); \
     if (1 <= zz && zz <= 2 && nn <= zz && 1 <= nn+ff && nn+ff <= l) \
-    { \
-        flint_printf(" is not implemented\n"); \
-    } \
+        flint_throw(FLINT_ERROR, " is not implemented\n"); \
     else \
-    { \
-        flint_printf(" does not exist and should not be called\n"); \
-    } \
-    fflush(stdout); \
-    flint_abort(); \
+        flint_throw(FLINT_ERROR, " does not exist and should not be called\n"); \
 }
 
 DEFINE_IT(0,1,0)
@@ -514,14 +507,14 @@ static void radix_4_moth_inv_trunc_block_3_4_1(
     ulong j_r = j & (n_pow2(j_bits)/2 - 1);
     VECMD n    = VECMOP(set_d)(Q->p);
     VECMD ninv = VECMOP(set_d)(Q->pinv);
-    double W  = UNLIKELY(j == 0) ? -1.0 : Q->w2tab[1+j_bits][2*j_mr+1];
-    double W2 = UNLIKELY(j == 0) ? -1.0 : Q->w2tab[0+j_bits][j_mr];
+    double W  = FLINT_UNLIKELY(j == 0) ? -1.0 : Q->w2tab[1+j_bits][2*j_mr+1];
+    double W2 = FLINT_UNLIKELY(j == 0) ? -1.0 : Q->w2tab[0+j_bits][j_mr];
     double twoW = vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p);
     VECMD f0 = VECMOP(set_d)(Q->w2tab[0][1]);         /* r */
     VECMD f1 = VECMOP(set_d)(twoW);                   /* 2*w^-1 */
     VECMD f2 = VECMOP(set_d)(2);
     VECMD f3 = VECMOP(set_d)(W2);                     /* -w^-2 */
-    double rw = UNLIKELY(j == 0) ? Q->w2tab[0][1] : Q->w2tab[1+j_bits][2*j_r+1];
+    double rw = FLINT_UNLIKELY(j == 0) ? Q->w2tab[0][1] : Q->w2tab[1+j_bits][2*j_r+1];
     VECMD fr = VECMOP(set_d)(rw);                         /* r*w */
     VECMD fq = VECMOP(set_d)(Q->w2tab[0+j_bits][j_r]);    /* w^2 */
     VECMD fp_ = VECMOP(mulmod)(fr, fq, n, ninv);
@@ -569,14 +562,14 @@ static void radix_4_moth_inv_trunc_block_3_4_0(
     ulong j_r = j & (n_pow2(j_bits)/2 - 1);
     VECMD n    = VECMOP(set_d)(Q->p);
     VECMD ninv = VECMOP(set_d)(Q->pinv);
-    double W  = UNLIKELY(j == 0) ? -1.0 : Q->w2tab[1+j_bits][2*j_mr+1];
-    double W2 = UNLIKELY(j == 0) ? -1.0 : Q->w2tab[0+j_bits][j_mr];
+    double W  = FLINT_UNLIKELY(j == 0) ? -1.0 : Q->w2tab[1+j_bits][2*j_mr+1];
+    double W2 = FLINT_UNLIKELY(j == 0) ? -1.0 : Q->w2tab[0+j_bits][j_mr];
     double twoW = vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p);
     VECMD f0 = VECMOP(set_d)(Q->w2tab[0][1]);         /* r */
     VECMD f1 = VECMOP(set_d)(twoW);                   /* 2*w^-1 */
     VECMD f2 = VECMOP(set_d)(2);
     VECMD f3 = VECMOP(set_d)(W2);                     /* -w^-2 */
-    double rw = UNLIKELY(j == 0) ? Q->w2tab[0][1] : Q->w2tab[1+j_bits][2*j_r+1];
+    double rw = FLINT_UNLIKELY(j == 0) ? Q->w2tab[0][1] : Q->w2tab[1+j_bits][2*j_r+1];
     VECMD fr = VECMOP(set_d)(rw);                         /* r*w */
     VECMD fq = VECMOP(set_d)(Q->w2tab[0+j_bits][j_r]);    /* w^2 */
     VECMD fp_ = VECMOP(mulmod)(fr, fq, n, ninv);
@@ -723,8 +716,8 @@ static void radix_4_moth_inv_trunc_block_2_4_1(
     ulong j_r = j & (n_pow2(j_bits)/2 - 1);
     VECMD n    = VECMOP(set_d)(Q->p);
     VECMD ninv = VECMOP(set_d)(Q->pinv);
-    double W = UNLIKELY(j == 0) ? -1.0 : Q->w2tab[1+j_bits][2*j_mr+1];
-    double rw = UNLIKELY(j == 0) ? Q->w2tab[0][1] : Q->w2tab[1+j_bits][2*j_r+1];
+    double W = FLINT_UNLIKELY(j == 0) ? -1.0 : Q->w2tab[1+j_bits][2*j_mr+1];
+    double rw = FLINT_UNLIKELY(j == 0) ? Q->w2tab[0][1] : Q->w2tab[1+j_bits][2*j_r+1];
     double w = Q->w2tab[j_bits][j_r];
     double twoW = vec1d_reduce_pm1n_to_pmhn(-2*W, Q->p);
     double rw3 = vec1d_mulmod(w, rw, Q->p, Q->pinv);
@@ -774,7 +767,7 @@ static void radix_4_moth_inv_trunc_block_2_4_0(
     ulong j_r = j & (n_pow2(j_bits)/2 - 1);
     VECND n    = VECNOP(set_d)(Q->p);
     VECND ninv = VECNOP(set_d)(Q->pinv);
-    double wi = UNLIKELY(j == 0) ? -1.0 : Q->w2tab[1+j_bits][2*j_mr+1];
+    double wi = FLINT_UNLIKELY(j == 0) ? -1.0 : Q->w2tab[1+j_bits][2*j_mr+1];
     VECND w2 = VECNOP(set_d)(Q->w2tab[j_bits][j_r]);
     VECND twowi = VECNOP(set_d)(vec1d_reduce_pm1n_to_pmhn(-2*wi, Q->p));
     ulong i = 0; do {
@@ -880,7 +873,7 @@ static void radix_4_moth_inv_trunc_block_1_4_1(
 {
     ulong j_r = j & (n_pow2(j_bits)/2 - 1);
     double W2 = Q->w2tab[j_bits][j_r];
-    double W  = UNLIKELY(j == 0) ? 1.0 : Q->w2tab[1+j_bits][2*j_r];
+    double W  = FLINT_UNLIKELY(j == 0) ? 1.0 : Q->w2tab[1+j_bits][2*j_r];
     VECMD n    = VECMOP(set_d)(Q->p);
     VECMD ninv = VECMOP(set_d)(Q->pinv);
     VECMD f2 = VECMOP(set_d)(2);
@@ -923,7 +916,7 @@ static void radix_4_moth_inv_trunc_block_1_4_0(
     VECND ninv = VECNOP(set_d)(Q->pinv);
     VECND f1 = VECNOP(set_d)(4.0);
     VECND w2 = VECNOP(set_d)(Q->w2tab[0+j_bits][j_r]);
-    VECND w  = VECNOP(set_d)(UNLIKELY(j == 0) ? 1.0 : Q->w2tab[1+j_bits][2*j_r]);
+    VECND w  = VECNOP(set_d)(FLINT_UNLIKELY(j == 0) ? 1.0 : Q->w2tab[1+j_bits][2*j_r]);
     ulong i = 0; do {
         VECND a, b, c, d;
         a = VECNOP(load)(X0+i);
@@ -1001,7 +994,7 @@ static void radix_4_moth_inv_trunc_block_0_4_1(
     VECND ninv = VECNOP(set_d)(Q->pinv);
     VECND one4th = VECNOP(set_d)(vec1d_fnmadd(0.25, Q->p, 0.25));
     VECND w2 = VECNOP(set_d)(Q->w2tab[j_bits][j_r]);
-    VECND w  = VECNOP(set_d)(UNLIKELY(j == 0) ? 1.0 : Q->w2tab[1+j_bits][2*j_r]);
+    VECND w  = VECNOP(set_d)(FLINT_UNLIKELY(j == 0) ? 1.0 : Q->w2tab[1+j_bits][2*j_r]);
     ulong i = 0; do {
         VECND a, b, c, d;
         a = VECNOP(load)(X0+i);
@@ -1058,7 +1051,7 @@ void sd_ifft_main_block(
         double* X1 = sd_fft_lctx_blk_index(Q, I + S*1);
         double* X2 = sd_fft_lctx_blk_index(Q, I + S*2);
         double* X3 = sd_fft_lctx_blk_index(Q, I + S*3);
-        if (UNLIKELY(j_bits == 0))
+        if (FLINT_UNLIKELY(j_bits == 0))
         {
             _RADIX_4_REVERSE_PARAM_J_IS_Z(VECND, Q)
             ulong i = 0; do {
@@ -1077,7 +1070,7 @@ void sd_ifft_main_block(
     {
         double* X0 = sd_fft_lctx_blk_index(Q, I + S*0);
         double* X1 = sd_fft_lctx_blk_index(Q, I + S*1);
-        if (UNLIKELY(j_bits == 0))
+        if (FLINT_UNLIKELY(j_bits == 0))
         {
             _RADIX_2_REVERSE_PARAM_J_IS_Z(VECND, Q)
             ulong i = 0; do {
@@ -1175,7 +1168,7 @@ void sd_ifft_trunc_block(
 
         static void (*fxn)(const sd_fft_lctx_t, ulong, ulong, double*, double*, double*, double*);
         fxn = LOOKUP_IT(n,z,f);
-        if (LIKELY(fxn != NULL))
+        if (FLINT_LIKELY(fxn != NULL))
         {
             fxn(Q, j, n_nbits(j), sd_fft_lctx_blk_index(Q, I + S*0),
                                   sd_fft_lctx_blk_index(Q, I + S*1),

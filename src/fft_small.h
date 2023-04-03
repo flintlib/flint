@@ -12,9 +12,7 @@
 #ifndef FFT_SMALL_H
 #define FFT_SMALL_H
 
-#include "mpn_extras.h"
 #include "machine_vectors.h"
-#include "nmod.h"
 
 #define LG_BLK_SZ 8
 #define BLK_SZ 256

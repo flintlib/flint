@@ -9,13 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdint.h>
+#include <string.h>
+#include "thread_support.h"
+#include "ulong_extras.h"
+#include "nmod.h"
 #include "fft_small.h"
-#include "machine_vectors.h"
-#include "profiler.h"
-#include<stdint.h>
-#include<string.h>
 #include "crt_helpers.h"
-
 
 void crt_data_init(crt_data_t C, ulong prime, ulong coeff_len, ulong nprimes)
 {
@@ -1065,7 +1065,7 @@ static void mpn_ctx_best_profile(
         function and use the slow generic one instead.
     */
 
-    if (UNLIKELY(bn > R->profiles[i].bn_bound))
+    if (FLINT_UNLIKELY(bn > R->profiles[i].bn_bound))
     {
         P->np = n_max(n_min(P->nthreads, 8), 4);
         P->bits = crt_data_find_bits(R->crts + P->np - 1, bn);

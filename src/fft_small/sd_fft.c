@@ -10,7 +10,6 @@
 */
 
 #include "fft_small.h"
-#include "machine_vectors.h"
 
 /*
     N is supposed to be a good fit for the number of points to process per loop
@@ -317,7 +316,7 @@ static void sd_fft_base_1(const sd_fft_lctx_t Q, ulong I, ulong j)
 
     SET_J_BITS_AND_J_R(j_bits, j_r, j);
 
-    if (UNLIKELY(j == 0))
+    if (FLINT_UNLIKELY(j == 0))
         sd_fft_basecase_8_1(Q, x, j_r, j_bits);
     else
         sd_fft_basecase_8_0(Q, x, j_r, j_bits);
@@ -463,7 +462,7 @@ void sd_fft_main_block(
         ulong l2 = n_pow2(k2);
 
         /* column ffts */
-        if (UNLIKELY(j_bits == 0))
+        if (FLINT_UNLIKELY(j_bits == 0))
         {
             _RADIX_4_FORWARD_PARAM_J_IS_Z(VECND, Q)
             ulong a = 0; do {
@@ -503,7 +502,7 @@ void sd_fft_main_block(
     {
         double* X0 = sd_fft_lctx_blk_index(Q, I + S*0);
         double* X1 = sd_fft_lctx_blk_index(Q, I + S*1);
-        if (UNLIKELY(j_bits == 0))
+        if (FLINT_UNLIKELY(j_bits == 0))
         {
             _RADIX_2_FORWARD_PARAM_J_IS_Z(VECND, Q)
             ulong i = 0; do {
@@ -678,7 +677,7 @@ void sd_fft_trunc_block(
         double* X1 = sd_fft_lctx_blk_index(Q, I + S*1);
         FLINT_ASSERT(itrunc == 2);
         FLINT_ASSERT(otrunc == 1);
-        if (UNLIKELY(j_bits == 0))
+        if (FLINT_UNLIKELY(j_bits == 0))
         {
             _RADIX_2_FORWARD_PARAM_J_IS_Z(VECND, Q)
             ulong i = 0; do {

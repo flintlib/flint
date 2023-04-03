@@ -14,7 +14,6 @@
 
 #define ALIGN_STRUCT(x) __attribute__((aligned(x)))
 
-#include <stdlib.h>
 #include <math.h>
 
 #if defined(__AVX2__)

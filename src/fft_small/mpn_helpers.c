@@ -10,7 +10,6 @@
 */
 
 #include "fft_small.h"
-#include "machine_vectors.h"
 #include "crt_helpers.h"
 
 /* transpose a block */

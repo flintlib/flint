@@ -9,13 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "thread_support.h"
+#include "nmod.h"
+#include "nmod_vec.h"
+#include "nmod_poly.h"
 #include "fft_small.h"
-#include "machine_vectors.h"
-#include "profiler.h"
-#include <stdint.h>
-#include <string.h>
 #include "crt_helpers.h"
-
 
 static void _mod_red(
     double* abuf, ulong atrunc,

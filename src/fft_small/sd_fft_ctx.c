@@ -9,29 +9,20 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#undef ulong
-#define ulong ulongxx /* interferes with system includes */
-#include <string.h> /* for memcpy */
-#undef ulong
-
 #include "fft_small.h"
-#include "machine_vectors.h"
-#include "profiler.h"
+#include "nmod.h"
 
-void* flint_aligned_alloc(ulong alignment, ulong size)
+void * flint_aligned_alloc(ulong alignment, ulong size)
 {
-    void* p = NULL;
-    if (posix_memalign(&p, alignment, size))
-    {
-        flint_printf("Exception (FLINT memory_manager). Unable to allocate "
-                     "%wu bytes with alignment %wu.\n", size, alignment);
-        fflush(stdout);
-        flint_abort();
-    }
+    void * p = aligned_alloc(alignment, size);
+
+    if (p == NULL)
+        flint_throw(FLINT_ERROR, "Unable to allocate %wu bytes with alignment %wu in %s\n", size, alignment, __FUNCTION__);
+
     return p;
 }
 
-void flint_aligned_free(void* p)
+void flint_aligned_free(void * p)
 {
     free(p);
 }
@@ -47,7 +38,7 @@ void sd_fft_ctx_clear(sd_fft_ctx_t Q)
 void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
 {
     ulong N, i, k, l;
-    double* t;
+    double * t;
     double n, ninv;
 
     Q->blk_sz = BLK_SZ;
