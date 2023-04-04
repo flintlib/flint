@@ -113,8 +113,9 @@ then
     AC_MSG_ERROR([FLINT does not support the use of specifying --target.])
 fi
 
-# Get system triplet
-AC_CANONICAL_HOST
+dnl Get system triplet
+dnl NOTE: This is already invoked from LT_INIT
+dnl AC_CANONICAL_HOST
 
 ################################################################################ 
 # configure headers
@@ -176,6 +177,17 @@ yes|no)
     ;;
 esac],
 enable_assert="no")
+
+AC_ARG_ENABLE(debug,
+[AS_HELP_STRING([--enable-debug],[Compile FLINT with debug information [default=yes]])],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-debug. Need yes or no.])
+    ;;
+esac],
+enable_debug="yes")
 
 AC_ARG_ENABLE(coverage,
 [AS_HELP_STRING([--enable-coverage],[Enable test coverage [default=no]])],
@@ -442,7 +454,8 @@ fi
 # programs
 ################################################################################ 
 
-AC_PROG_CC
+dnl NOTE: This is invoked from LT_INIT
+dnl AC_PROG_CC
 
 if test "$with_ntl" = "yes" || test "$enable_cxx" = "yes";
 then
@@ -583,11 +596,15 @@ AC_SUBST(LDCONFIG)
 ################################################################################ 
 
 # Mandatory headers
-AC_CHECK_HEADERS([stdarg.h stdio.h stdlib.h stdint.h string.h math.h float.h errno.h gmp.h mpfr.h],,
+# The following headers are checked previously:
+#   stdio.h stdlib.h stdint.h string.h
+AC_CHECK_HEADERS([stdarg.h math.h float.h errno.h gmp.h mpfr.h],,
                  AC_MSG_ERROR([Could not find a mandatory header!]))
 
 # Optional headers
-AC_CHECK_HEADERS([fenv.h alloca.h malloc.h sys/param.h unistd.h windows.h])
+# The following headers are checked previously:
+#   unistd.h
+AC_CHECK_HEADERS([fenv.h alloca.h malloc.h sys/param.h windows.h])
 
 if test "$enable_pthread" = "yes";
 then
@@ -828,12 +845,22 @@ then
 fi
 AC_SUBST(ABI_FLAG)
 
+if test "$enable_debug" = "yes";
+then
+    if test "$ac_cv_prog_cc_g" = "yes";
+    then
+        save_CFLAGS="-g $save_CFLAGS"
+    else
+        AC_MSG_ERROR([$CC does not support the flag -g needed to generate debug information])
+    fi
+fi
+
 if test "$enable_avx2" = "yes";
 then
     AX_CHECK_COMPILE_FLAG([-mavx2],
     [save_CFLAGS="-mavx2 $save_CFLAGS"
      AC_DEFINE(FLINT_HAVE_AVX2,1,[Define if system has AVX2])],
-    [AC_MSG_ERROR([$CC does not support -mavx2 needed for AVX2 instructions])])
+    [AC_MSG_ERROR([$CC does not support the flag -mavx2 needed for AVX2 instructions])])
     AX_CHECK_COMPILE_FLAG([-mfma], [save_CFLAGS="-mfma $save_CFLAGS"])
 fi
 
@@ -842,7 +869,7 @@ then
     AX_CHECK_COMPILE_FLAG([-mavx512f],
     [save_CFLAGS="-mavx512f $save_CFLAGS"
      AC_DEFINE(FLINT_HAVE_AVX512,1,[Define if system has AVX512])],
-    [AC_MSG_ERROR([$CC does not support -mavx512f needed for AVX512 instructions])])
+    [AC_MSG_ERROR([$CC does not support the flag -mavx512f needed for AVX512 instructions])])
 fi
 
 case $host_cpu in
@@ -863,7 +890,6 @@ AX_CHECK_COMPILE_FLAG([-pedantic],[DEFAULT_CFLAGS="-pedantic $DEFAULT_CFLAGS"])
 
 dnl NOTE: The following flags shouldn't be default. They are leftovers from
 dnl previous configure script
-AX_CHECK_COMPILE_FLAG([-g],[DEFAULT_CFLAGS="-g $DEFAULT_CFLAGS"])
 AX_CHECK_COMPILE_FLAG([-funroll-loops],[DEFAULT_CFLAGS="-funroll-loops $DEFAULT_CFLAGS"])
 
 if test "$cflags_set" = "no";
