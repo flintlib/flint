@@ -9,7 +9,7 @@ jobs:
   # ubuntu with gcc
   ##############################################################################
   ubuntu-gcc:
-    name: Ubuntu GCC, default flags with AVX2 (x10)
+    name: Ubuntu GCC, default flags with AVX2, Code Coverage (x10)
 
     runs-on: ubuntu-latest
 
@@ -27,6 +27,7 @@ jobs:
           sudo apt install -y libmpfr-dev
           sudo apt install -y autoconf
           sudo apt install -y libtool-bin
+          sudo apt install -y gcovr
           gcc --version
           make --version
           autoconf --version
@@ -35,7 +36,7 @@ jobs:
       - name: "Configure"
         run: |
           ./bootstrap.sh
-          ./configure CC=${CC} --enable-avx2 TESTCFLAGS="${TESTCFLAGS}" --disable-static
+          ./configure CC=${CC} --enable-avx2 TESTCFLAGS="${TESTCFLAGS}" --disable-static --enable-coverage
 
       - name: "Compile library"
         run: |
@@ -51,6 +52,14 @@ jobs:
         run: |
           export FLINT_TEST_MULTIPLIER=10
           $MAKE check
+
+      - name: "Gather coverage data"
+        run: dev/gather_coverage.sh
+
+      - name: "Upload coverage data"
+        uses: codecov/codecov-action@v3.1.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - if: failure()
         name: "If failure, stop all other jobs"
