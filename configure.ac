@@ -202,7 +202,7 @@ enable_coverage="no")
 
 dnl TODO: This is currently not working because of the makefile.
 AC_ARG_ENABLE(cxx,
-[AS_HELP_STRING([--enable-cxx],[Enable C++ wrapper tests [default=no]])],
+[AS_HELP_STRING([--enable-cxx],[Enable C++ wrappers, including tests [default=no]])],
 [case $enableval in
 yes|no)
     ;;
@@ -498,20 +498,25 @@ AC_C_BIGENDIAN(flint_big_endian=yes)
 
 case "$host_os" in
     darwin*)
-        flint_lib="libflint-$FLINT_MAJOR_SO.dylib"
-        flint_libname="libflint.dylib"
-        extra_shared_flags="-install_name `pwd`/$flint_lib -compatibility_version $FLINT_MAJOR_SO.$FLINT_MINOR_SO -current_version $FLINT_MAJOR_SO.$FLINT_MINOR_SO.$FLINT_PATCH_SO"
+        flint_lib="libflint.dylib"
+        flint_lib_major="libflint.$FLINT_MAJOR_SO.dylib"
+        flint_lib_full="libflint.$FLINT_MAJOR_SO.$FLINT_MINOR_SO.dylib"
+        extra_shared_flags="-install_name `pwd`/$flint_lib_full -compatibility_version $FLINT_MAJOR_SO.$FLINT_MINOR_SO -current_version $FLINT_MAJOR_SO.$FLINT_MINOR_SO.$FLINT_PATCH_SO"
+        flint_dylib="yes"
         ;;
     cygwin|mingw*|msys)
-        flint_lib="libflint-$FLINT_MAJOR_SO.dll"
-        flint_libname="libflint.dll"
-        flint_implib="$flint_libname.$libext"
-        extra_shared_flags="-static-libgcc $wl--export-all-symbols,--out-implib,$flint_libname.a"
+        flint_lib="libflint.dll"
+        flint_lib_major="libflint.$FLINT_MAJOR_SO.dll"
+        flint_lib_full="libflint.$FLINT_MAJOR_SO.$FLINT_MINOR_SO.$FLINT_PATCH_SO.dll"
+        flint_implib="$flint_lib.$libext"
+        extra_shared_flags="-static-libgcc $wl--export-all-symbols,--out-implib,$flint_implib"
+        flint_dlllib="yes"
         ;;
     *)
-        flint_lib="libflint.so.$FLINT_MAJOR_SO.$FLINT_MINOR_SO.$FLINT_PATCH_SO"
-        flint_libname="libflint.so"
-        extra_shared_flags="$wl-soname,libflint.so.$FLINT_MAJOR_SO"
+        flint_lib="libflint.so"
+        flint_lib_major="libflint.so.$FLINT_MAJOR_SO"
+        flint_lib_full="libflint.so.$FLINT_MAJOR_SO.$FLINT_MINOR_SO.$FLINT_PATCH_SO"
+        extra_shared_flags="$wl-soname,$flint_lib_major"
         flint_solib="yes"
         ;;
 esac
@@ -520,16 +525,31 @@ flint_lib_static="libflint.$libext"
 
 if test "`uname -s`" = "android";
 then
-    extra_shared_flags="$wl-soname,libflint.so"
+    extra_shared_flags="$wl-soname,$flint_lib"
 fi
 
 AC_SUBST(WL,$wl)
 
 AC_SUBST(FLINT_LIB,$flint_lib)
-AC_SUBST(FLINT_LIBNAME,$flint_libname)
+AC_SUBST(FLINT_LIB_MAJOR,$flint_lib_major)
+AC_SUBST(FLINT_LIB_FULL,$flint_lib_full)
 AC_SUBST(FLINT_IMPLIB,$flint_implib)
 AC_SUBST(FLINT_LIB_STATIC,$flint_lib_static)
 AC_SUBST(EXTRA_SHARED_FLAGS,$extra_shared_flags)
+
+if test "$flint_dlllib" = "yes";
+then
+    AC_SUBST(FLINT_DLLLIB,1)
+else
+    AC_SUBST(FLINT_DLLLIB,0)
+fi
+
+if test "$flint_dylib" = "yes";
+then
+    AC_SUBST(FLINT_DYLIB,1)
+else
+    AC_SUBST(FLINT_DYLIB,0)
+fi
 
 if test "$flint_solib" = "yes";
 then
@@ -972,6 +992,13 @@ then
     AC_SUBST(WANT_DEPS,1)
 else
     AC_SUBST(WANT_DEPS,0)
+fi
+
+if test "$enable_cxx" = "yes";
+then
+    AC_SUBST(WANT_CXX,1)
+else
+    AC_SUBST(WANT_CXX,0)
 fi
 
 if test "$with_ntl" = "yes";
