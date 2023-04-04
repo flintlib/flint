@@ -1,22 +1,20 @@
 /*
     Copyright (C) 2019 Daniel Schultz
+
     This file is part of FLINT.
+
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "ulong_extras.h"
+#include "test_helpers.h"
 
-int main(void)
+TEST_FUNCTION_START(add_ssssaaaaaaaa)
 {
     int i, j, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("add_ssssaaaaaaaa....");
-    fflush(stdout);
 
     for (i = 0; i < 1000000; i++)
     {
@@ -73,8 +71,5 @@ int main(void)
         }
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }

@@ -9,17 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "ulong_extras.h"
+#include "test_helpers.h"
 
-int main(void)
+TEST_FUNCTION_START(flint_clz)
 {
    int i, result;
-   FLINT_TEST_INIT(state);
-
-
-   flint_printf("flint_clz....");
-   fflush(stdout);
 
    for (i = 0; i < 1000000; i++)
    {
@@ -41,8 +36,5 @@ int main(void)
       }
    }
 
-   FLINT_TEST_CLEANUP(state);
-
-   flint_printf("PASS\n");
-   return 0;
+   TEST_FUNCTION_END;
 }

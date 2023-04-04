@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2021 Daniel Schultz
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -12,6 +13,8 @@
 #ifndef TEST_HELPERS_H
 #define TEST_HELPERS_H
 
+#include "templates.h"
+
 /* easy way to test a condition in test code */
 #define FLINT_TEST(e)                                   \
     do {                                                \
@@ -23,5 +26,21 @@
         }                                               \
     } while (0)
 
-#endif
+/* test function macro *******************************************************/
 
+#define TEST_FUNCTION(label) TEMPLATE(test, label)
+
+#define TEST_FUNCTION_START(label)                      \
+int TEMPLATE(test, label)(void)                         \
+{                                                       \
+    FLINT_TEST_INIT(state);                             \
+    printf(TEMPLATE_STR(label) "....");                 \
+    fflush(stdout);                                     \
+
+#define TEST_FUNCTION_END                               \
+    FLINT_TEST_CLEANUP(state);                          \
+    printf("PASS\n");                                   \
+    return 0;                                           \
+}
+
+#endif
