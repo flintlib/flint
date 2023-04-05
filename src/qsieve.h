@@ -415,6 +415,7 @@ hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime);
 void qsieve_add_to_hashtable(qs_t qs_inf, mp_limb_t prime);
 
 #define qsieve_parse_relation _Pragma("GCC error \"'qsieve_parse_relation' is deprecated.\"")
+relation_t _qsieve_parse_relation(qs_t qs_inf, mp_srcptr mem);
 
 relation_t qsieve_merge_relation(qs_t qs_inf, relation_t  a, relation_t  b);
 

@@ -15,7 +15,6 @@
 
 void qsieve_init(qs_t qs_inf, const fmpz_t n)
 {
-    size_t fname_alloc_size;
     slong i;
 
     /* store n in struct */

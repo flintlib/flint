@@ -22,7 +22,6 @@
 
 void qsieve_write_relation(qs_t qs_inf, mp_limb_t prime, const fmpz_t Y, const qs_poly_t poly)
 {
-    slong i;
     slong num_factors = poly->num_factors;
     slong * small = poly->small;
     fac_t * factor = poly->factor;
@@ -34,7 +33,6 @@ void qsieve_write_relation(qs_t qs_inf, mp_limb_t prime, const fmpz_t Y, const q
     if (!COEFF_IS_MPZ(*Y))
     {
         Y_size = FLINT_SGN(*Y);
-        Y_limbs = (mp_srcptr) Y;
     }
     else
     {
@@ -64,27 +62,45 @@ void qsieve_write_relation(qs_t qs_inf, mp_limb_t prime, const fmpz_t Y, const q
 
         We then append with a zero to mark that the next sequence of memory has
         not been filled.
-
-        We will assume that sizeof(fac_t) == 2 * sizeof(mp_limb_t).
     */
 
     size_of_write = 1 + qs_inf->small_primes + 1
-                    + 2 * num_factors + 1 + FLINT_ABS(Y_size);
+                    + 2 * num_factors + 1 + FLINT_MAX(FLINT_ABS(Y_size), 1);
     QS_STORAGE_ENSURE_SIZE(qs_inf->storage, size_of_write + 1);
-
     mem = qs_inf->storage.curpos;
+
     mem[0] = size_of_write;
-    mem[1] = prime;
-    memcpy(mem + 2, small, sizeof(mp_limb_t) * qs_inf->small_primes);
-    mem += 2 + qs_inf->small_primes;
+    mem += 1;
+
+    mem[0] = prime;
+    mem += 1;
+
+    memcpy(mem, small, sizeof(mp_limb_t) * qs_inf->small_primes);
+    mem += qs_inf->small_primes;
 
     mem[0] = num_factors;
-    memcpy(mem + 1, factor, 2 * sizeof(mp_limb_t) * num_factors);
-    mem += 1 + 2 * num_factors;
+    mem += 1;
+
+    memcpy(mem, factor, sizeof(fac_t) * num_factors);
+    mem += (sizeof(fac_t) / sizeof(mp_limb_t)) * num_factors;
 
     mem[0] = Y_size;
-    memcpy(mem + 1, Y_limbs, sizeof(mp_limb_t) * FLINT_ABS(Y_size));
-    mem += 1 + FLINT_ABS(Y_size);
+    mem += 1;
+
+    if (FLINT_ABS(Y_size) <= 1)
+    {
+        if (!COEFF_IS_MPZ(*Y))
+            mem[0] = FLINT_ABS(*Y);
+        else
+            mem[0] = Y_limbs[0];
+
+        mem += 1;
+    }
+    else
+    {
+        memcpy(mem, Y_limbs, sizeof(mp_limb_t) * FLINT_MAX(FLINT_ABS(Y_size), 1));
+        mem += FLINT_ABS(Y_size);
+    }
 
     mem[0] = 0;
 }
@@ -396,9 +412,8 @@ void qsieve_insert_relation(qs_t qs_inf, relation_t * rel_list, slong num_relati
     qs_inf->columns = qs_inf->num_relations;
 }
 
-static relation_t _qsieve_parse_relation(qs_t qs_inf, mp_srcptr mem)
+relation_t _qsieve_parse_relation(qs_t qs_inf, mp_srcptr mem)
 {
-    slong i;
     slong sizeY;
     relation_t rel;
 
@@ -435,7 +450,7 @@ static relation_t _qsieve_parse_relation(qs_t qs_inf, mp_srcptr mem)
     fmpz_init(rel.Y);
     if (FLINT_ABS(sizeY) <= 1)
     {
-        fmpz_set_ui(rel.Y, mem[1]);
+        fmpz_set_ui(rel.Y, mem[0]);
         if (sizeY < 0)
             fmpz_neg(rel.Y, rel.Y);
     }
@@ -463,7 +478,7 @@ int qsieve_process_relation(qs_t qs_inf)
     printf("Getting relations\n");
 #endif
 
-    while (mem[0] != WORD(0))
+    while (mem[0] != UWORD(0))
     {
         prime = mem[1];
         entry = qsieve_get_table_entry(qs_inf, prime);
@@ -480,7 +495,7 @@ int qsieve_process_relation(qs_t qs_inf)
             num_relations++;
         }
 
-        mem += *mem;
+        mem += mem[0];
     }
 
 #if QS_DEBUG & 64
