@@ -859,9 +859,10 @@ AX_CHECK_COMPILE_FLAG([-Werror=unknown-warning-option], [CFLAGS="-Werror=unknown
 
 if test "$enable_coverage" = "yes";
 then
-    AX_CHECK_COMPILE_FLAG([-fprofile-arcs -ftest-coverage],
-    [save_CFLAGS="-fprofile-arcs -ftest-coverage $save_CFLAGS"],
+    AX_CHECK_COMPILE_FLAG([--coverage],
+    [save_CFLAGS="--coverage $save_CFLAGS"],
     [AC_MSG_ERROR([$CC does not to support test coverage flags])])
+    LDFLAGS="--coverage $LDFLAGS"
 fi
 
 if test "$enable_debug" = "yes" || test "$enable_coverage" = "yes";
@@ -935,13 +936,6 @@ else
 fi
 
 CPPFLAGS="-I./src $CPPFLAGS"
-
-# Remove unnecessary whitespaces
-LDFLAGS="`$ECHO \"$LDFLAGS\" | $SED 's/ \+/ /g; s/ $//'`"
-LIBS="`$ECHO \"$LIBS\" | $SED 's/ \+/ /g; s/ $//'`"
-CFLAGS="`$ECHO \"$CFLAGS\" | $SED 's/ \+/ /g; s/ $//'`"
-CPPFLAGS="`$ECHO \"$CPPFLAGS\" | $SED 's/ \+/ /g; s/ $//'`"
-TESTCFLAGS="`$ECHO \"$TESTCFLAGS\" | $SED 's/ \+/ /g; s/ $//'`"
 
 ################################################################################ 
 # substitutions and definitions
