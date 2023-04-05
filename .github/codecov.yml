@@ -18,3 +18,5 @@ comment: false
 
 ignore:
  - "src/*/inlines.c"
+ - "src/test/t-*.c"
+ - "src/*/test/t-*.c"
