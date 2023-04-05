@@ -22,9 +22,7 @@
 #endif
 
 #define QS_DEBUG 0 /* level of debug information printed, 0 = none */
-
 #define BITS_ADJUST 25 /* add to sieve entries to compensate approximations */
-
 #define BLOCK_SIZE (4*65536) /* size of sieving cache block */
 
 typedef struct
@@ -47,7 +45,6 @@ typedef struct           /* matrix column */
    slong orig;         /* Original relation number */
 } la_col_t;
 
-
 typedef struct          /* entry in hash table */
 {
    mp_limb_t prime;    /* value of prime */
@@ -55,15 +52,70 @@ typedef struct          /* entry in hash table */
    mp_limb_t count;    /* number of occurrence of 'prime' */
 } hash_t;
 
-typedef struct             /* format for relation */
+struct qsieve_storage
 {
-   mp_limb_t lp;          /* large prime, is 1, if relation is full */
-   slong num_factors;     /* number of factors, excluding small factor */
-   slong small_primes;   /* number of small factors */
-   slong * small;         /* exponent of small factors */
-   fac_t * factor;        /* factor of relation */
-   fmpz_t Y;              /* square root of sieve value for relation */
-} relation_t;
+    mp_ptr mem;
+    mp_ptr curpos;
+    ulong alloc;
+};
+
+#define QS_STORAGE_ALLOC_START_SIZE 8192
+
+#define QS_STORAGE_INIT(storage)    \
+do                                  \
+{                                   \
+    (storage).mem = NULL;           \
+    (storage).alloc = 0;            \
+}                                   \
+while (0)
+
+#define QS_STORAGE_CLEAR(storage)   \
+do                                  \
+{                                   \
+    if ((storage).mem)              \
+        flint_free((storage).mem);  \
+    (storage).alloc = 0;            \
+}                                   \
+while (0)
+
+#define QS_STORAGE_ALLOC(storage)                               \
+do                                                              \
+{                                                               \
+    FLINT_ASSERT((storage).mem == NULL);                        \
+    (storage).mem = flint_malloc(QS_STORAGE_ALLOC_START_SIZE);  \
+    (storage).curpos = (storage).mem;                           \
+    (storage).alloc = QS_STORAGE_ALLOC_START_SIZE;              \
+}                                                               \
+while (0)
+
+#define QS_STORAGE_RESET(storage)       \
+do                                      \
+{                                       \
+    (storage).curpos = (storage).mem;   \
+}                                       \
+while (0)
+
+#define QS_STORAGE_REALLOC(storage, alloc_size)                                     \
+do                                                                                  \
+{                                                                                   \
+    ulong diff = (storage).curpos - (storage).mem;                                  \
+    (storage).mem = flint_realloc((storage).mem, sizeof(mp_limb_t) * (alloc_size)); \
+    (storage).curpos = (storage).mem + diff;                                        \
+    (storage).alloc = (alloc_size);                                                 \
+}                                                                                   \
+while (0)
+
+#define QS_STORAGE_ENSURE_SIZE(storage, size)       \
+do                                                  \
+{                                                   \
+    ulong diff = (storage).curpos - (storage).mem;  \
+    if ((size) >= ((storage).alloc - diff))         \
+        QS_STORAGE_REALLOC(storage, 2 * (size));    \
+}                                                   \
+while (0)
+
+struct relation_struct;
+typedef struct relation_struct * relation_t;
 
 typedef struct
 {
@@ -167,8 +219,7 @@ typedef struct
                        RELATION DATA
    ***************************************************************************/
 
-   FLINT_FILE * siqs;           /* pointer to file for storing relations */
-   char * fname;          /* name of file used for relations */
+   struct qsieve_storage storage;
 
    slong full_relation;   /* number of full relations */
    slong num_cycles;      /* number of possible full relations from partials */
@@ -357,7 +408,7 @@ hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime);
 
 void qsieve_add_to_hashtable(qs_t qs_inf, mp_limb_t prime);
 
-relation_t qsieve_parse_relation(qs_t qs_inf, char * str);
+#define qsieve_parse_relation _Pragma("GCC error \"'qsieve_parse_relation' is deprecated.\"")
 
 relation_t qsieve_merge_relation(qs_t qs_inf, relation_t  a, relation_t  b);
 
