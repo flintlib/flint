@@ -854,7 +854,17 @@ if test "$enable_coverage" = "yes";
 then
     AX_CHECK_COMPILE_FLAG([-fprofile-arcs -ftest-coverage],
     [save_CFLAGS="-fprofile-arcs -ftest-coverage $save_CFLAGS"],
-    [AC_MSG_ERROR([$CC does not seem to support test coverage flags.])])
+    [AC_MSG_ERROR([$CC does not to support test coverage flags])])
+fi
+
+if test "$enable_debug" = "yes" || test "$enable_coverage" = "yes";
+then
+    if test "$ac_cv_prog_cc_g" = "yes";
+    then
+        save_CFLAGS="-g $save_CFLAGS"
+    else
+        AC_MSG_ERROR([$CC does not support the flag -g needed to generate debug information])
+    fi
 fi
 
 if test -n "$ABI";
@@ -864,16 +874,6 @@ then
     [AC_MSG_ERROR([$CC does not support the ABI flag -m$ABI])])
 fi
 AC_SUBST(ABI_FLAG)
-
-if test "$enable_debug" = "yes";
-then
-    if test "$ac_cv_prog_cc_g" = "yes";
-    then
-        save_CFLAGS="-g $save_CFLAGS"
-    else
-        AC_MSG_ERROR([$CC does not support the flag -g needed to generate debug information])
-    fi
-fi
 
 if test "$enable_avx2" = "yes";
 then
@@ -928,6 +928,13 @@ else
 fi
 
 CPPFLAGS="-I./src $CPPFLAGS"
+
+# Remove unnecessary whitespaces
+LDFLAGS="`$ECHO \"$LDFLAGS\" | $SED 's/ \+/ /g; s/ $//'`"
+LIBS="`$ECHO \"$LIBS\" | $SED 's/ \+/ /g; s/ $//'`"
+CFLAGS="`$ECHO \"$CFLAGS\" | $SED 's/ \+/ /g; s/ $//'`"
+CPPFLAGS="`$ECHO \"$CPPFLAGS\" | $SED 's/ \+/ /g; s/ $//'`"
+TESTCFLAGS="`$ECHO \"$TESTCFLAGS\" | $SED 's/ \+/ /g; s/ $//'`"
 
 ################################################################################ 
 # substitutions and definitions
