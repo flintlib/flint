@@ -24,7 +24,7 @@ arf_sub_si_naive(arf_t z, const arf_t x, slong y, slong prec, arf_rnd_t rnd)
     return r;
 }
 
-int main()
+int main(void)
 {
     slong iter, iter2;
     flint_rand_t state;

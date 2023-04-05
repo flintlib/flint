@@ -34,7 +34,7 @@ arf_max2(arf_t res, const arf_t x, const arf_t y)
         arf_max(res, x, y);
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

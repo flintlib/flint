@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 
 void
-n_cleanup_primes()
+n_cleanup_primes(void)
 {
     int i;
 

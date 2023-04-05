@@ -14,7 +14,7 @@
 #include "fmpq.h"
 #include "arith.h"
 
-int main()
+int main(void)
 {
     fmpz * num1;
     fmpz * den1;

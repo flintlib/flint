@@ -42,7 +42,7 @@ void _sample_arf_in_arb(arf_t x, arb_t y, flint_rand_t state)
     arf_clear(b);
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

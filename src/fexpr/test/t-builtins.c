@@ -19,7 +19,7 @@
 # include <string.h>
 #endif
 
-int main()
+int main(void)
 {
     flint_rand_t state;
 

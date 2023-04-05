@@ -13,7 +13,7 @@
 #include "fmpq_poly.h"
 #include "arith.h"
 
-int main()
+int main(void)
 {
     fmpq_poly_t P, Q;
     fmpz_t t;

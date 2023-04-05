@@ -15,7 +15,7 @@
 
 #define NRATS 20
 
-int main()
+int main(void)
 {
     fmpq_poly_t T0, T1, T2, t, tt;
     fmpq_t a, rat;

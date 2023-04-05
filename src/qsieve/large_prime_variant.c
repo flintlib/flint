@@ -492,7 +492,7 @@ int qsieve_process_relation(qs_t qs_inf)
 {
     char buf[1024];
     char * str;
-    slong i, num_relations = 0, num_relations2, full = 0;
+    slong i, num_relations = 0, num_relations2;
     slong rel_list_length;
     slong rlist_length;
     mp_limb_t prime;
@@ -551,7 +551,6 @@ int qsieve_process_relation(qs_t qs_inf)
         if (rel_list[i].lp == UWORD(1))
         {
             rlist[rlist_length++] = rel_list[i];
-            full++;
         }
         else
         {

@@ -33,7 +33,7 @@ static const double answers[10] = {
   2815.70144392142227
 };
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

@@ -15,7 +15,7 @@
 #include "fmpz.h"
 
 
-int main()
+int main(void)
 {
     slong i, j;
     mp_limb_t n;

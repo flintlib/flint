@@ -13,7 +13,7 @@
 #include "fmpq.h"
 #include "arb.h"
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

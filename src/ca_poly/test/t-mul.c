@@ -29,7 +29,7 @@ ca_poly_randtest_same_nf(ca_poly_t res, flint_rand_t state, const ca_t x, slong 
     fmpz_clear(t);
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

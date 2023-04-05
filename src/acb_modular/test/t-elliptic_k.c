@@ -42,7 +42,7 @@ const double k_testdata[NUM_TESTS][10] = {
         -0.01044301570409968822, -0.0013811810360989366762, -0.0011248246747562196271}
 };
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

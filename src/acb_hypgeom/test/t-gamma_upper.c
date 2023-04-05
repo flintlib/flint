@@ -35,7 +35,7 @@ _accuracy_regression_test(const acb_t s, const acb_t z,
 }
 
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

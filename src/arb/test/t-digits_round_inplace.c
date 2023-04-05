@@ -12,7 +12,7 @@
 #include <string.h>
 #include "arb.h"
 
-int main()
+int main(void)
 {
     flint_rand_t state;
 

@@ -13,7 +13,7 @@
 #include "fmpz_vec.h"
 #include "arith.h"
 
-int main()
+int main(void)
 {
     fmpz * num1;
     fmpz * num2;

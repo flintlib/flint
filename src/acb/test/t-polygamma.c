@@ -19,7 +19,7 @@ static const char *testdata[5] = {
     "-2.404113806319188570799476323022899981529972584680997763584543110683676411572626180372911747218670516 +/- 1e-90",
 };
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

@@ -14,7 +14,7 @@
 void acb_dirichlet_stieltjes_integral(acb_t res, const fmpz_t n, const acb_t a, slong prec);
 void acb_dirichlet_stieltjes_em(acb_t res, const fmpz_t n, const acb_t a, slong prec);
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

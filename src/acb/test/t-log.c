@@ -128,7 +128,7 @@ acb_log_old(acb_t r, const acb_t z, slong prec)
 #undef b
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

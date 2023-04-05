@@ -42,7 +42,7 @@ d_randtest2(flint_rand_t state)
     return t;
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

@@ -44,7 +44,7 @@ acb_hypgeom_ei_fallback(acb_t res, const acb_t z, slong prec)
     acb_clear(u);
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

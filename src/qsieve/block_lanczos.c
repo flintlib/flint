@@ -72,10 +72,12 @@ void reduce_matrix(qs_t qs_inf, slong *nrows, slong *ncols, la_col_t *cols) {
 	   outright  */
 
 	slong r, c, i, j, k;
-	slong passes;
 	slong *counts;
 	slong reduced_rows;
 	slong reduced_cols;
+#if QS_DEBUG
+	slong passes = 0;
+#endif
 
 	/* count the number of nonzero entries in each row */
 
@@ -87,7 +89,6 @@ void reduce_matrix(qs_t qs_inf, slong *nrows, slong *ncols, la_col_t *cols) {
 
 	reduced_rows = *nrows;
 	reduced_cols = *ncols;
-	passes = 0;
 
 	do {
 		r = reduced_rows;
@@ -155,8 +156,9 @@ void reduce_matrix(qs_t qs_inf, slong *nrows, slong *ncols, la_col_t *cols) {
 		   then the matrix is less dense and more columns
 		   can be deleted; iterate until no further deletions
 		   are possible */
-
+#if QS_DEBUG
 		passes++;
+#endif
 
 	} while (r != reduced_rows);
 
@@ -717,7 +719,7 @@ uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 	uint64_t *d, *e, *f, *f2;
 	uint64_t *tmp;
 	slong s[2][64];
-	slong i, iter;
+	slong i;
 	slong n = ncols;
 	slong dim0, dim1;
 	uint64_t mask0, mask1;
@@ -771,7 +773,10 @@ uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 	dim0 = 0;
 	dim1 = 64;
 	mask1 = (uint64_t)(-1);
-	iter = 0;
+	
+#if QS_DEBUG
+	slong iter = 0;
+#endif
 
 	/* The computed solution 'x' starts off random,
 	   and v[0] starts off as B*x. This initial copy
@@ -792,7 +797,9 @@ uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 	/* perform the iteration */
 
 	while (1) {
+#if QS_DEBUG
 		iter++;
+#endif
 
 		/* multiply the current v[0] by a symmetrized
 		   version of B, or B'B (apostrophe means

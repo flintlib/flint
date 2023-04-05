@@ -33,7 +33,7 @@ rising_algorithm(arb_t res, const arb_t x, ulong n, ulong m, slong prec, int alg
         arb_hypgeom_rising_ui(res, x, n, prec);
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

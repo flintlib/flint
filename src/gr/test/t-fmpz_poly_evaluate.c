@@ -46,7 +46,7 @@ evaluate(flint_rand_t state, gr_ptr res, const fmpz_poly_t f, gr_srcptr x, gr_ct
     return status;
 }
 
-int main()
+int main(void)
 {
     slong iter;
     slong count_success = 0, count_unable = 0, count_domain = 0;

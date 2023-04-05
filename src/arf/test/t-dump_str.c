@@ -12,7 +12,7 @@
 #include <string.h>
 #include "arf.h"
 
-int main()
+int main(void)
 {
     flint_rand_t state;
     slong iter;

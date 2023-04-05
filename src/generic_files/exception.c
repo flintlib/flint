@@ -20,7 +20,7 @@
 static pthread_once_t abort_func_init = PTHREAD_ONCE_INIT;
 pthread_mutex_t abort_func_lock;
 
-void __flint_set_abort_init()
+void __flint_set_abort_init(void)
 {
    pthread_mutex_init(&abort_func_lock, NULL);
 }
@@ -42,7 +42,7 @@ void flint_set_abort(FLINT_NORETURN void (*func)(void))
 #endif
 }
 
-FLINT_NORETURN void flint_abort()
+FLINT_NORETURN void flint_abort(void)
 {
     fflush(stdout);
     fflush(stderr);

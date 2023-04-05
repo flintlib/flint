@@ -52,7 +52,7 @@ void cyclotomic_naive(fmpz_poly_t poly, ulong n)
     fmpz_poly_clear(t);
 }
 
-int main()
+int main(void)
 {
     fmpz_poly_t A, B;
     slong n;

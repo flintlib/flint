@@ -14,7 +14,7 @@
 void arb_sin_cos_fmpz_div_2exp_bsplit(arb_t wsin, arb_t wcos,
     const fmpz_t x, flint_bitcnt_t r, slong prec);
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

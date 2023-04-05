@@ -26,7 +26,7 @@ sin_x(acb_ptr out, const acb_t inp, void * params, slong order, slong prec)
     return 0;
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

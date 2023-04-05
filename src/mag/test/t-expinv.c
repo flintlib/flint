@@ -18,7 +18,7 @@ arf_exp(arf_t y, const arf_t x, slong prec, arf_rnd_t rnd)
 {
     _arf_call_mpfr_func(y, NULL, (int (*)(void)) mpfr_exp, x, NULL, prec, rnd);
 }
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

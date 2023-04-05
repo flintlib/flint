@@ -1,7 +1,7 @@
 
 #include "gr_mat.h"
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

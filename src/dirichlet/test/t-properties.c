@@ -35,7 +35,7 @@ random_divisor(flint_rand_t state, const dirichlet_group_t G)
     return d;
 }
 
-int main()
+int main(void)
 {
     slong iter, bits;
     flint_rand_t state;

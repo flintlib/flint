@@ -50,7 +50,7 @@ check_vec_eq_prec(acb_srcptr w1, acb_srcptr w2, slong len, slong prec, slong dig
     }
 }
 
-int main()
+int main(void)
 {
 
     slong k;

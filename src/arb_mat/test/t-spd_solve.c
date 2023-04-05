@@ -28,7 +28,7 @@ _fmpq_mat_randtest_positive_semidefinite(fmpq_mat_t mat, flint_rand_t state, fli
     fmpq_mat_clear(RT);
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

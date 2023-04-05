@@ -21,7 +21,7 @@ vec_diff(ulong * v, ulong * ref, ulong nv)
     return 0;
 }
 
-int main()
+int main(void)
 {
     ulong q;
 

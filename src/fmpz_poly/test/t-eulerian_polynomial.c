@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-int main()
+int main(void)
 {
     ulong n, ix, mx;
     fmpz_t sum, fac;

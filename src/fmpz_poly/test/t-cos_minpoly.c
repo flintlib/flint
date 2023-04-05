@@ -52,7 +52,7 @@ static const short testdata[] = {
 };
 
 
-int main()
+int main(void)
 {
     fmpz_poly_t p;
     slong n;

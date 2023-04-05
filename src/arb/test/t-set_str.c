@@ -147,7 +147,7 @@ const char * testdata_invalid[] = {
     NULL,
 };
 
-int main()
+int main(void)
 {
     flint_rand_t state;
     arb_t t, u, v;

@@ -12,7 +12,7 @@
 #include "fmpq_poly.h"
 
 
-int main()
+int main(void)
 {
     fmpq_poly_t Pn, Pn1, Pn2, R;
 

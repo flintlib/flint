@@ -12,7 +12,7 @@
 #include "fmpz_extras.h"
 #include "fmpzi.h"
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

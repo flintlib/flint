@@ -11,7 +11,7 @@
 
 #include "arb.h"
 
-int main()
+int main(void)
 {
     flint_printf("fib....");
     fflush(stdout);

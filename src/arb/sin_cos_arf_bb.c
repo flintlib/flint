@@ -411,7 +411,7 @@ _acb_vec_prod_bsplit_threaded(acb_t res, acb_ptr vec, slong len, slong prec)
 void
 arb_sin_cos_arf_bb(arb_t zsin, arb_t zcos, const arf_t x, slong prec)
 {
-    slong k, iter, bits, r, xmag, q, wp;
+    slong k, bits, r, xmag, q, wp;
     slong argred_bits, start_bits;
     int inexact, negative;
     fmpz_t t, u;
@@ -484,7 +484,7 @@ arb_sin_cos_arf_bb(arb_t zsin, arb_t zcos, const arf_t x, slong prec)
     if (flint_get_num_available_threads() == 1 || prec >= 4e8)
     {
         /* Bit-burst loop. */
-        for (iter = 0, bits = start_bits; !fmpz_is_zero(t); iter++, bits *= 3)
+        for (bits = start_bits; !fmpz_is_zero(t); bits *= 3)
         {
             /* Extract bits. */
             r = FLINT_MIN(bits, wp);
@@ -521,8 +521,7 @@ arb_sin_cos_arf_bb(arb_t zsin, arb_t zcos, const arf_t x, slong prec)
         rs = flint_malloc(sizeof(slong) * FLINT_BITS);
 
         /* Bit-burst loop. */
-        for (iter = 0, bits = start_bits; !fmpz_is_zero(t);
-            iter++, bits *= 3)
+        for (bits = start_bits; !fmpz_is_zero(t); bits *= 3)
         {
             /* Extract bits. */
             r = FLINT_MIN(bits, wp);

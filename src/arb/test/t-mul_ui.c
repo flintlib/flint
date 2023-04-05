@@ -12,7 +12,7 @@
 #include "arb.h"
 #include "ulong_extras.h"
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

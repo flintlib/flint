@@ -11,7 +11,7 @@
 
 #include "acb_dirichlet.h"
 
-int main()
+int main(void)
 {
     fmpz_t n;
     acb_ptr pa, pb;

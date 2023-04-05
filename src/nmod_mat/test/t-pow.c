@@ -13,7 +13,7 @@
 #include "nmod_mat.h"
 
 int
-main()
+main(void)
 {
     slong i;
     FLINT_TEST_INIT(state);

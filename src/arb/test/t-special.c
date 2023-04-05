@@ -13,7 +13,7 @@
 
 #define ASSERT(cond) if (!(cond)) { flint_printf("FAIL: %d\n", __LINE__); flint_abort(); }
 
-int main()
+int main(void)
 {
     arb_t zero, pos, neg, pos_inf, neg_inf, pos_inf_err, neg_inf_err,
       zero_pm_inf, pos_pm_inf, neg_pm_inf,

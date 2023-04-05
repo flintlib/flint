@@ -14,7 +14,7 @@
 #include "mpn_extras.h"
 #include "fmpz.h"
 
-int main()
+int main(void)
 {
 
     fmpz_t a, b, mmin;

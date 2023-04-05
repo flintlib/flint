@@ -43,7 +43,7 @@ void test_bern_modp_pow2(ulong p, ulong k)
     }
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

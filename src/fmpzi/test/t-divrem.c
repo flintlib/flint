@@ -62,7 +62,7 @@ fmpzi_divrem_ref(fmpzi_t q, fmpzi_t r, const fmpzi_t x, const fmpzi_t y)
 }
 
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

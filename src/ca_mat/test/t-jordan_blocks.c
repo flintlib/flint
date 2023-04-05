@@ -62,7 +62,7 @@ check_jordan_forms(ca_vec_t lambda1, slong num_blocks1, slong * block_lambda1, s
     return result;
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

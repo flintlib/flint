@@ -134,7 +134,7 @@ _brute_force_all_pairs_longest_walk(fmpz_mat_t B, const bool_mat_t A)
 }
 
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

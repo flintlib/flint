@@ -22,7 +22,7 @@ char *_TEMPLATE(T, poly_get_str) (const TEMPLATE(T, struct) * poly, slong len,
 {
     char *str, **coeffstrs;
     size_t off;
-    slong i, bound, nz;
+    slong i, bound;
 
     if (len == 0)
     {
@@ -34,7 +34,6 @@ char *_TEMPLATE(T, poly_get_str) (const TEMPLATE(T, struct) * poly, slong len,
 
     coeffstrs = (char **)flint_malloc(len * sizeof(char *));
 
-    nz = 0;
     bound = (slong) (ceil(log10((double)(len + 1)))) + 2;
     for (i = 0; i < len; i++)
     {
@@ -42,7 +41,6 @@ char *_TEMPLATE(T, poly_get_str) (const TEMPLATE(T, struct) * poly, slong len,
         {
             coeffstrs[i] = TEMPLATE(T, get_str) (poly + i, ctx);
             bound += 1 + strlen(coeffstrs[i]);
-            nz++;
         }
         else
         {

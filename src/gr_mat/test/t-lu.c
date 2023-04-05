@@ -86,7 +86,7 @@ _gr_mat_randrank(gr_mat_t mat, flint_rand_t state, slong rank, slong bits, gr_ct
     fmpz_mat_clear(A);
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

@@ -1,6 +1,6 @@
 #include "gr.h"
 
-int main()
+int main(void)
 {
     gr_ctx_t RR, MatRR;
     slong n;

@@ -14,7 +14,7 @@
 
 double _flint_test_multiplier = -1.0;
 
-double flint_test_multiplier()
+double flint_test_multiplier(void)
 {
     if (_flint_test_multiplier == -1.0)
     {

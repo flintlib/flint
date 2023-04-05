@@ -12,7 +12,7 @@
 #include "calcium.h"
 #include "fmpz_mpoly_q.h"
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;
