@@ -36,7 +36,7 @@ int main(void)
         ca_randtest_special(x, state, 10, 100, ctx);
         s = ca_get_str(x, ctx);
         slen = strlen(s);
-        slen = slen;
+        (void)slen;
         flint_free(s);
 
         ca_clear(x, ctx);

@@ -121,7 +121,7 @@ int main(void)
 
         s = fexpr_get_str_latex(expr, flags);
         len = strlen(s);
-        len = len;
+        (void)len;
         flint_free(s);
 
         fexpr_clear(expr);
