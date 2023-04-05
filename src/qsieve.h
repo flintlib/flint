@@ -234,14 +234,14 @@ do                                  \
 }                                   \
 while (0)
 
-#define QS_STORAGE_ALLOC(storage)                               \
-do                                                              \
-{                                                               \
-    FLINT_ASSERT((storage).mem == NULL);                        \
-    (storage).mem = flint_malloc(QS_STORAGE_ALLOC_START_SIZE);  \
-    (storage).curpos = (storage).mem;                           \
-    (storage).alloc = QS_STORAGE_ALLOC_START_SIZE;              \
-}                                                               \
+#define QS_STORAGE_ALLOC(storage)                                                   \
+do                                                                                  \
+{                                                                                   \
+    FLINT_ASSERT((storage).mem == NULL);                                            \
+    (storage).mem = flint_malloc(sizeof(mp_limb_t) * QS_STORAGE_ALLOC_START_SIZE);  \
+    (storage).curpos = (storage).mem;                                               \
+    (storage).alloc = QS_STORAGE_ALLOC_START_SIZE;                                  \
+}                                                                                   \
 while (0)
 
 #define QS_STORAGE_RESET(storage)       \
