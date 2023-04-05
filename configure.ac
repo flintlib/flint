@@ -855,6 +855,7 @@ then
     AX_CHECK_COMPILE_FLAG([--coverage],
     [save_CFLAGS="--coverage $save_CFLAGS"],
     [AC_MSG_ERROR([$CC does not to support test coverage flags])])
+    LDFLAGS="--coverage $LDFLAGS"
 fi
 
 if test "$enable_debug" = "yes" || test "$enable_coverage" = "yes";
