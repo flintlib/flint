@@ -254,20 +254,20 @@ while (0)
 #define QS_STORAGE_REALLOC(storage, alloc_size)                                     \
 do                                                                                  \
 {                                                                                   \
-    ulong diff = (storage).curpos - (storage).mem;                                  \
+    ulong __diff = (storage).curpos - (storage).mem;                                \
     (storage).mem = flint_realloc((storage).mem, sizeof(mp_limb_t) * (alloc_size)); \
-    (storage).curpos = (storage).mem + diff;                                        \
+    (storage).curpos = (storage).mem + __diff;                                      \
     (storage).alloc = (alloc_size);                                                 \
 }                                                                                   \
 while (0)
 
-#define QS_STORAGE_ENSURE_SIZE(storage, size)       \
-do                                                  \
-{                                                   \
-    ulong diff = (storage).curpos - (storage).mem;  \
-    if ((size) >= ((storage).alloc - diff))         \
-        QS_STORAGE_REALLOC(storage, 2 * (size));    \
-}                                                   \
+#define QS_STORAGE_ENSURE_SIZE(storage, size)                   \
+do                                                              \
+{                                                               \
+    ulong __diff = (ulong) ((storage).curpos - (storage).mem);  \
+    if ((size) > ((storage).alloc - __diff))                    \
+        QS_STORAGE_REALLOC(storage, 2 * ((size) + __diff));     \
+}                                                               \
 while (0)
 
 /*

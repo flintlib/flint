@@ -64,8 +64,9 @@ void qsieve_write_relation(qs_t qs_inf, mp_limb_t prime, const fmpz_t Y, const q
         not been filled.
     */
 
-    size_of_write = 1 + qs_inf->small_primes + 1
-                    + 2 * num_factors + 1 + FLINT_MAX(FLINT_ABS(Y_size), 1);
+    size_of_write = 1 + 1 + qs_inf->small_primes
+                    + 1 + (sizeof(fac_t) / sizeof(mp_limb_t)) * num_factors
+                    + 1 + FLINT_MAX(FLINT_ABS(Y_size), 1);
     QS_STORAGE_ENSURE_SIZE(qs_inf->storage, size_of_write + 1);
     mem = qs_inf->storage.curpos;
 
@@ -427,8 +428,8 @@ relation_t _qsieve_parse_relation(qs_t qs_inf, mp_srcptr mem)
     /* small_primes -- not stored in qs_inf->storage */
     rel.small_primes = qs_inf->small_primes;
 
-    /* prime */
-    rel.lp = mem[0];
+    /* prime is overwritten after call in qsieve_process_relation */
+    rel.lp = UWORD(1);
     mem += 1;
 
     /* the array small */
@@ -492,6 +493,7 @@ int qsieve_process_relation(qs_t qs_inf)
         if (prime == 1 || entry->count >= 2)
         {
             rel_list[num_relations] = _qsieve_parse_relation(qs_inf, mem);
+            rel_list[num_relations].lp = prime;
             num_relations++;
         }
 
