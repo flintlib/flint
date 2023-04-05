@@ -11,20 +11,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define _STDC_FORMAT_MACROS
-
-#ifdef __GNUC__
-# define strcpy __builtin_strcpy
-#else
-# include <math.h>
-#endif
-
-/* try to get fdopen, mkstemp declared */
-#if defined __STRICT_ANSI__
-#undef __STRICT_ANSI__
-#endif
-
-#include <stdio.h>
 #include <stdlib.h>
 #include "thread_support.h"
 #include "fmpz.h"
@@ -58,11 +44,6 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     fmpz_t temp, temp2, X, Y;
     slong num_facs;
     fmpz * facs;
-#if (defined(__WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__) && !defined(__MINGW64__)) || defined(_MSC_VER)
-    const char * tmpnam_ret;
-#else
-    int fd;
-#endif
 
     if (fmpz_sgn(n) < 0)
     {
@@ -209,26 +190,6 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     pthread_mutex_init(&qs_inf->mutex, NULL);
 #endif
 
-#if (defined(__WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__) && !defined(__MINGW64__)) || defined(_MSC_VER)
-    tmpnam_ret = tmpnam(NULL);
-    if (tmpnam_ret == NULL)
-        flint_throw(FLINT_ERROR, "tmpnam failed\n");
-
-    strcpy(qs_inf->fname, tmpnam_ret);
-    qs_inf->siqs = fopen(qs_inf->fname, "w");
-    if (qs_inf->siqs == NULL)
-        flint_throw(FLINT_ERROR, "fopen failed\n");
-#else
-    strcpy(qs_inf->fname, FLINT_TMPDIR "/siqsXXXXXX");
-    fd = mkstemp(qs_inf->fname);
-    if (fd == -1)
-        flint_throw(FLINT_ERROR, "mkstemp failed\n");
-
-    qs_inf->siqs = (FLINT_FILE *) fdopen(fd, "w");
-    if (qs_inf->siqs == NULL)
-        flint_throw(FLINT_ERROR, "fdopen failed\n");
-#endif
-
     for (j = qs_inf->small_primes; j < qs_inf->num_primes; j++)
     {
         if (qs_inf->factor_base[j].p > BLOCK_SIZE)
@@ -240,6 +201,8 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 #if QS_DEBUG
     flint_printf("second prime index = %wd\n", qs_inf->second_prime);
 #endif
+
+    QS_STORAGE_ALLOC(qs_inf->storage);
 
     while (1)
     {
@@ -268,10 +231,6 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
                 ((slong) (1.10*qs_inf->num_primes) + qs_inf->ks_primes + qs_inf->extra_rels))
             {
                 int ok;
-
-                if (fclose((FILE *) qs_inf->siqs))
-                    flint_throw(FLINT_ERROR, "fclose fail\n");
-                qs_inf->siqs = NULL;
 
                 ok = qsieve_process_relation(qs_inf);
 
@@ -385,9 +344,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 
                     _fmpz_vec_clear(facs, 100);
 
-                    qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "w");
-                    if (qs_inf->siqs == NULL)
-                        flint_throw(FLINT_ERROR, "fopen fail\n");
+                    QS_STORAGE_RESET(qs_inf->storage);
                     qs_inf->num_primes = num_primes; /* linear algebra adjusts this */
                     goto more_primes; /* factoring failed, may need more primes */
                 }
@@ -465,8 +422,6 @@ cleanup:
     flint_give_back_threads(qs_inf->handles, qs_inf->num_handles);
 
     flint_free(sieve);
-    if (remove(qs_inf->fname))
-        flint_throw(FLINT_ERROR, "remove fail\n");
     qsieve_clear(qs_inf);
     qsieve_linalg_clear(qs_inf);
     qsieve_poly_clear(qs_inf);
