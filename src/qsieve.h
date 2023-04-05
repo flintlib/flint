@@ -52,70 +52,15 @@ typedef struct          /* entry in hash table */
    mp_limb_t count;    /* number of occurrence of 'prime' */
 } hash_t;
 
-struct qsieve_storage
+typedef struct             /* format for relation */
 {
-    mp_ptr mem;
-    mp_ptr curpos;
-    ulong alloc;
-};
-
-#define QS_STORAGE_ALLOC_START_SIZE 8192
-
-#define QS_STORAGE_INIT(storage)    \
-do                                  \
-{                                   \
-    (storage).mem = NULL;           \
-    (storage).alloc = 0;            \
-}                                   \
-while (0)
-
-#define QS_STORAGE_CLEAR(storage)   \
-do                                  \
-{                                   \
-    if ((storage).mem)              \
-        flint_free((storage).mem);  \
-    (storage).alloc = 0;            \
-}                                   \
-while (0)
-
-#define QS_STORAGE_ALLOC(storage)                               \
-do                                                              \
-{                                                               \
-    FLINT_ASSERT((storage).mem == NULL);                        \
-    (storage).mem = flint_malloc(QS_STORAGE_ALLOC_START_SIZE);  \
-    (storage).curpos = (storage).mem;                           \
-    (storage).alloc = QS_STORAGE_ALLOC_START_SIZE;              \
-}                                                               \
-while (0)
-
-#define QS_STORAGE_RESET(storage)       \
-do                                      \
-{                                       \
-    (storage).curpos = (storage).mem;   \
-}                                       \
-while (0)
-
-#define QS_STORAGE_REALLOC(storage, alloc_size)                                     \
-do                                                                                  \
-{                                                                                   \
-    ulong diff = (storage).curpos - (storage).mem;                                  \
-    (storage).mem = flint_realloc((storage).mem, sizeof(mp_limb_t) * (alloc_size)); \
-    (storage).curpos = (storage).mem + diff;                                        \
-    (storage).alloc = (alloc_size);                                                 \
-}                                                                                   \
-while (0)
-
-#define QS_STORAGE_ENSURE_SIZE(storage, size)       \
-do                                                  \
-{                                                   \
-    ulong diff = (storage).curpos - (storage).mem;  \
-    if ((size) >= ((storage).alloc - diff))         \
-        QS_STORAGE_REALLOC(storage, 2 * (size));    \
-}                                                   \
-while (0)
-
-struct relation_struct;
-typedef struct relation_struct * relation_t;
+   slong small_primes;    /* number of small factors */
+   mp_limb_t lp;          /* large prime, is 1, if relation is full */
+   slong * small;         /* exponent of small factors */
+   slong num_factors;     /* number of factors, excluding small factor */
+   fac_t * factor;        /* factor of relation */
+   fmpz_t Y;              /* square root of sieve value for relation */
+} relation_t;
 
 typedef struct
 {
@@ -130,6 +75,13 @@ typedef struct
 } qs_poly_s;
 
 typedef qs_poly_s qs_poly_t[1];
+
+struct qsieve_storage
+{
+    mp_ptr mem;
+    mp_ptr curpos;
+    ulong alloc;
+};
 
 typedef struct
 {
@@ -262,6 +214,61 @@ typedef struct
 } qs_s;
 
 typedef qs_s qs_t[1];
+
+#define QS_STORAGE_ALLOC_START_SIZE 8192
+
+#define QS_STORAGE_INIT(storage)    \
+do                                  \
+{                                   \
+    (storage).mem = NULL;           \
+    (storage).alloc = 0;            \
+}                                   \
+while (0)
+
+#define QS_STORAGE_CLEAR(storage)   \
+do                                  \
+{                                   \
+    if ((storage).mem)              \
+        flint_free((storage).mem);  \
+    (storage).alloc = 0;            \
+}                                   \
+while (0)
+
+#define QS_STORAGE_ALLOC(storage)                               \
+do                                                              \
+{                                                               \
+    FLINT_ASSERT((storage).mem == NULL);                        \
+    (storage).mem = flint_malloc(QS_STORAGE_ALLOC_START_SIZE);  \
+    (storage).curpos = (storage).mem;                           \
+    (storage).alloc = QS_STORAGE_ALLOC_START_SIZE;              \
+}                                                               \
+while (0)
+
+#define QS_STORAGE_RESET(storage)       \
+do                                      \
+{                                       \
+    (storage).curpos = (storage).mem;   \
+}                                       \
+while (0)
+
+#define QS_STORAGE_REALLOC(storage, alloc_size)                                     \
+do                                                                                  \
+{                                                                                   \
+    ulong diff = (storage).curpos - (storage).mem;                                  \
+    (storage).mem = flint_realloc((storage).mem, sizeof(mp_limb_t) * (alloc_size)); \
+    (storage).curpos = (storage).mem + diff;                                        \
+    (storage).alloc = (alloc_size);                                                 \
+}                                                                                   \
+while (0)
+
+#define QS_STORAGE_ENSURE_SIZE(storage, size)       \
+do                                                  \
+{                                                   \
+    ulong diff = (storage).curpos - (storage).mem;  \
+    if ((size) >= ((storage).alloc - diff))         \
+        QS_STORAGE_REALLOC(storage, 2 * (size));    \
+}                                                   \
+while (0)
 
 /*
    Tuning parameters { bits, ks_primes, fb_primes, small_primes, sieve_size}
@@ -401,8 +408,7 @@ int qsieve_relations_cmp(const void * a, const void * b);
 
 slong qsieve_merge_relations(qs_t qs_inf);
 
-void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime,
-                                                     fmpz_t Y, qs_poly_t poly);
+void qsieve_write_relation(qs_t qs_inf, mp_limb_t prime, const fmpz_t Y, const qs_poly_t poly);
 
 hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime);
 

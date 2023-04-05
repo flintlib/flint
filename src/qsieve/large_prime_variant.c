@@ -12,116 +12,81 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 #include "fmpz.h"
 #include "qsieve.h"
 
-#ifdef __GNUC__
-# define memset __builtin_memset
-#else
-# include <string.h>
-#endif
-
 #define HASH_MULT (2654435761U)       /* hash function, taken from 'msieve' */
 #define HASH(a) ((ulong)((((unsigned int) a) * HASH_MULT) >> (12)))
 
-/******************************************************************************
- *
- *  Some helper function, used for debugging
- *
- *****************************************************************************/
-
-/*
-    Display a relation for debugging purposes
-*/
-void qsieve_display_relation(qs_t qs_inf, relation_t a)
+void qsieve_write_relation(qs_t qs_inf, mp_limb_t prime, const fmpz_t Y, const qs_poly_t poly)
 {
     slong i;
-
-    flint_printf("%wu ", a.lp);
-
-    for (i = 0; i < qs_inf->small_primes; i++)
-        flint_printf("%wd ", a.small[i]);
-
-    flint_printf("%wd ", a.num_factors);
-
-    for (i = 0; i < a.num_factors; i++)
-        flint_printf("%wd %wu ", a.factor[i].ind, a.factor[i].exp);
-
-    fmpz_print(a.Y);
-    flint_printf("\n");
-}
-
-/*
-    Check a relation is valid (debugging)
-*/
-int qsieve_is_relation(qs_t qs_inf, relation_t a)
-{
-    slong i;
-    fmpz_t temp, temp2;
-    fmpz_init(temp);
-    fmpz_init_set_ui(temp2, 1);
-
-    for (i = 0; i < qs_inf->small_primes; i++)
-    {
-        fmpz_set_si(temp, qs_inf->factor_base[i].p);
-        fmpz_pow_ui(temp, temp, a.small[i]);
-        fmpz_mul(temp2, temp2, temp);
-    }
-
-    if (a.num_factors > qs_inf->max_factors)
-    {
-        return 0;
-    }
-
-    for (i = 0; i < a.num_factors; i++)
-    {
-        fmpz_set_ui(temp, qs_inf->factor_base[a.factor[i].ind].p);
-        fmpz_pow_ui(temp, temp, a.factor[i].exp);
-        fmpz_mul(temp2, temp2, temp);
-    }
-
-    fmpz_mul_ui(temp2, temp2, a.lp);
-    fmpz_pow_ui(temp, a.Y, UWORD(2));
-    fmpz_mod(temp, temp, qs_inf->kn);
-    fmpz_mod(temp2, temp2, qs_inf->kn);
-
-    if (fmpz_cmp(temp, temp2) != 0)
-    {
-        return 0;
-    }
-
-    fmpz_clear(temp);
-    fmpz_clear(temp2);
-
-    return 1;
-}
-
-/*
-    Write partial or full relation to file
-*/
-void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y, qs_poly_t poly)
-{
-    slong i;
-    char * str = NULL;
     slong num_factors = poly->num_factors;
     slong * small = poly->small;
     fac_t * factor = poly->factor;
+    slong Y_size;
+    mp_srcptr Y_limbs;
+    ulong size_of_write; /* in terms of mp_limb_t */
+    mp_ptr mem;
 
-    flint_fprintf((FILE *) qs_inf->siqs, "%X ", prime); /* write large prime */
+    if (!COEFF_IS_MPZ(*Y))
+    {
+        Y_size = FLINT_SGN(*Y);
+        Y_limbs = (mp_srcptr) Y;
+    }
+    else
+    {
+        mpz_srcptr mY = COEFF_TO_PTR(*Y);
+        Y_size = mY->_mp_size;
+        Y_limbs = mY->_mp_d;
+    }
 
-    for (i = 0; i < qs_inf->small_primes; i++) /* write small primes */
-        flint_fprintf((FILE *) qs_inf->siqs, "%X ", small[i]);
+    /*
+        We print the following to the file (in order):
 
-    flint_fprintf((FILE *) qs_inf->siqs, "%X ", num_factors); /* write number of factors */
+        - The number of **limbs** contained in this write, which includes this
+          number.
 
-    for (i = 0; i < num_factors; i++) /* write factor along with exponent */
-        flint_fprintf((FILE *) qs_inf->siqs, "%wx %X ", factor[i].ind, factor[i].exp);
+        - prime
 
-    str = fmpz_get_str(str, 16, Y); /* converting value of 'Y'  to hex */
+        - the array small
 
-    flint_fprintf((FILE *) qs_inf->siqs, "%s\n", str); /* write value of 'Y' */
-    flint_free(str);
+        - num_factors
+
+        - the array factor
+
+        - size of Y (can be negative, and can be zero)
+
+        - the limb(s) of Y (absolute value of Y if Y is small, so stored value is
+          always positive)
+
+        We then append with a zero to mark that the next sequence of memory has
+        not been filled.
+
+        We will assume that sizeof(fac_t) == 2 * sizeof(mp_limb_t).
+    */
+
+    size_of_write = 1 + qs_inf->small_primes + 1
+                    + 2 * num_factors + 1 + FLINT_ABS(Y_size);
+    QS_STORAGE_ENSURE_SIZE(qs_inf->storage, size_of_write + 1);
+
+    mem = qs_inf->storage.curpos;
+    mem[0] = size_of_write;
+    mem[1] = prime;
+    memcpy(mem + 2, small, sizeof(mp_limb_t) * qs_inf->small_primes);
+    mem += 2 + qs_inf->small_primes;
+
+    mem[0] = num_factors;
+    memcpy(mem + 1, factor, 2 * sizeof(mp_limb_t) * num_factors);
+    mem += 1 + 2 * num_factors;
+
+    mem[0] = Y_size;
+    memcpy(mem + 1, Y_limbs, sizeof(mp_limb_t) * FLINT_ABS(Y_size));
+    mem += 1 + FLINT_ABS(Y_size);
+
+    mem[0] = 0;
 }
 
 /******************************************************************************
@@ -201,60 +166,6 @@ void qsieve_add_to_hashtable(qs_t qs_inf, mp_limb_t prime)
  *  Large prime functionality
  *
  *****************************************************************************/
-
-/*
-   given a string representing a relation, parse it to
-   obtain relation
-*/
-relation_t qsieve_parse_relation(qs_t qs_inf, char * str)
-{
-    slong i;
-    char * next;
-    relation_t rel;
-
-    rel.lp = UWORD(1);
-    rel.small = flint_malloc(qs_inf->small_primes * sizeof(slong));
-    rel.factor = flint_malloc(qs_inf->max_factors * sizeof(fac_t));
-
-    for (i = 0; i < qs_inf->small_primes; i++)
-    {
-        while (isspace(*str))
-            str++;
-
-        rel.small[i] = strtoul(str, &next, 16);
-        str = next;
-    }
-
-    while (isspace(*str))
-        str++;
-
-    rel.num_factors = strtoul(str, &next, 16);
-    rel.small_primes = qs_inf->small_primes;
-    str = next;
-
-    for (i = 0; i < rel.num_factors; i++)
-    {
-        while (isspace(*str))
-            str++;
-
-        rel.factor[i].ind = strtoul(str, &next, 16);
-        str = next;
-
-        while (isspace(*str))
-            str++;
-
-        rel.factor[i].exp = strtoul(str, &next, 16);
-        str = next;
-    }
-
-    while (isspace(*str))
-        str++;
-
-    fmpz_init(rel.Y);
-    fmpz_set_str(rel.Y, str, 16);
-
-    return rel;
-}
 
 /*
    given two partials with same large prime, merge them to
@@ -485,13 +396,57 @@ void qsieve_insert_relation(qs_t qs_inf, relation_t * rel_list, slong num_relati
     qs_inf->columns = qs_inf->num_relations;
 }
 
-/*
-   process relations from the file
-*/
+static relation_t _qsieve_parse_relation(qs_t qs_inf, mp_srcptr mem)
+{
+    slong i;
+    slong sizeY;
+    relation_t rel;
+
+    /* allocate space */
+    rel.small = flint_malloc(qs_inf->small_primes * sizeof(slong));
+    rel.factor = flint_malloc(qs_inf->max_factors * sizeof(fac_t));
+
+    /* Skip size of relation */
+    mem += 1;
+
+    /* small_primes -- not stored in qs_inf->storage */
+    rel.small_primes = qs_inf->small_primes;
+
+    /* prime */
+    rel.lp = mem[0];
+    mem += 1;
+
+    /* the array small */
+    memcpy(rel.small, mem, sizeof(mp_limb_t) * qs_inf->small_primes);
+    mem += qs_inf->small_primes;
+
+    /* num_factors */
+    rel.num_factors = mem[0];
+    mem += 1;
+
+    /* factor */
+    memcpy(rel.factor, mem, sizeof(fac_t) * rel.num_factors);
+    mem += rel.num_factors;
+
+    /* Y */
+    sizeY = mem[0];
+    mem += 1;
+
+    fmpz_init(rel.Y);
+    if (FLINT_ABS(sizeY) <= 1)
+    {
+        fmpz_set_ui(rel.Y, mem[1]);
+        if (sizeY < 0)
+            fmpz_neg(rel.Y, rel.Y);
+    }
+    else
+        fmpz_set_ui_array(rel.Y, mem, FLINT_ABS(sizeY));
+
+    return rel;
+}
+
 int qsieve_process_relation(qs_t qs_inf)
 {
-    char buf[1024];
-    char * str;
     slong i, num_relations = 0, num_relations2, full = 0;
     slong rel_list_length;
     slong rlist_length;
@@ -502,16 +457,15 @@ int qsieve_process_relation(qs_t qs_inf)
     relation_t * rel_list = (relation_t *) flint_malloc(rel_size * sizeof(relation_t));
     relation_t * rlist;
     int done = 0;
-
-    qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "r");
+    mp_srcptr mem = qs_inf->storage.mem;
 
 #if QS_DEBUG & 64
     printf("Getting relations\n");
 #endif
 
-    while (fgets(buf, sizeof(buf), (FILE *) qs_inf->siqs) != NULL)
+    while (mem[0] != WORD(0))
     {
-        prime = strtoul(buf, &str, 16);
+        prime = mem[1];
         entry = qsieve_get_table_entry(qs_inf, prime);
 
         if (num_relations == rel_size)
@@ -522,13 +476,12 @@ int qsieve_process_relation(qs_t qs_inf)
 
         if (prime == 1 || entry->count >= 2)
         {
-            rel_list[num_relations] = qsieve_parse_relation(qs_inf, str);
-            rel_list[num_relations].lp = prime;
+            rel_list[num_relations] = _qsieve_parse_relation(qs_inf, mem);
             num_relations++;
         }
-    }
 
-    fclose((FILE *) qs_inf->siqs);
+        mem += *mem;
+    }
 
 #if QS_DEBUG & 64
     printf("Removing duplicates\n");
@@ -582,13 +535,14 @@ int qsieve_process_relation(qs_t qs_inf)
     {
        qs_inf->edges -= 100;
        done = 0;
-       qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "a");
-    } else
+    }
+    else
     {
        done = 1;
        num_relations2 = qs_inf->num_primes + qs_inf->ks_primes + qs_inf->extra_rels;
        qsort(rlist, (size_t) num_relations2, sizeof(relation_t), qsieve_compare_relation);
        qsieve_insert_relation(qs_inf, rlist, num_relations2);
+       QS_STORAGE_RESET(qs_inf->storage);
     }
 
 cleanup:
