@@ -23,12 +23,9 @@ int TEMPLATE(T, multiplicative_order)(fmpz * ord, const TEMPLATE(T, t) op,
     int is_primitive = 1;
 
     if (ord == NULL)
-    {
-        fmpz_init(tmp);
-        is_primitive = TEMPLATE(T, multiplicative_order)(tmp, op, ctx);
-        fmpz_clear(tmp);
-        return is_primitive;
-    }
+        ord = tmp;
+
+    fmpz_init(tmp);
 
     if (TEMPLATE(T, is_zero)(op, ctx))
     {
@@ -36,7 +33,6 @@ int TEMPLATE(T, multiplicative_order)(fmpz * ord, const TEMPLATE(T, t) op,
         return 0;
     }
 
-    fmpz_init(tmp);
     fmpz_factor_init(ord_fact);
     TEMPLATE(T, init)(one, ctx);
 
