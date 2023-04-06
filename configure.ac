@@ -1,6 +1,6 @@
-################################################################################ 
+################################################################################
 # preamble
-################################################################################ 
+################################################################################
 
 define(FLINT_COPYRIGHT,[[
 Copyright (C) 2023 Albin Ahlbäck
@@ -77,9 +77,9 @@ FLINT_PATCH_SO=0
 # Make sure that we are in the right directory
 AC_CONFIG_SRCDIR(src/fmpz/link/fmpz_reentrant.c)
 
-################################################################################ 
+################################################################################
 # initialize libtool
-################################################################################ 
+################################################################################
 
 # Later we want to overwrite the default CFLAGS. Check now whether they are set
 # or not as Libtool overwrites CFLAGS.
@@ -104,9 +104,9 @@ then
     CFLAGS=
 fi
 
-################################################################################ 
+################################################################################
 # build system
-################################################################################ 
+################################################################################
 
 if test -n "$target_alias";
 then
@@ -117,15 +117,15 @@ dnl Get system triplet
 dnl NOTE: This is already invoked from LT_INIT
 dnl AC_CANONICAL_HOST
 
-################################################################################ 
+################################################################################
 # configure headers
-################################################################################ 
+################################################################################
 
 AC_CONFIG_HEADERS(src/flint-config.h:src/config.h.in)
 
-################################################################################ 
+################################################################################
 # features
-################################################################################ 
+################################################################################
 
 AC_ARG_ENABLE(pthread,
 [AS_HELP_STRING([--enable-pthread],[Enable pthread [default=yes]])],
@@ -256,9 +256,9 @@ yes|no)
 esac],
 enable_avx512="no")
 
-################################################################################ 
+################################################################################
 # packages
-################################################################################ 
+################################################################################
 
 AC_ARG_WITH(gmp_include,
 [AS_HELP_STRING([--with-gmp-include=DIR],[GMP include directory])],
@@ -450,9 +450,9 @@ then
     with_ntl="yes"
 fi
 
-################################################################################ 
+################################################################################
 # programs
-################################################################################ 
+################################################################################
 
 dnl NOTE: This is invoked from LT_INIT
 dnl AC_PROG_CC
@@ -464,9 +464,9 @@ fi
 
 AC_PROG_MKDIR_P
 
-################################################################################ 
+################################################################################
 # environment variables
-################################################################################ 
+################################################################################
 
 AC_ARG_VAR([TESTCFLAGS], [Choose different C compiler flags for tests [default=CFLAGS]. Can be useful to compile library at a specific optimization level while compiling tests fast.])
 
@@ -483,9 +483,9 @@ fi
 
 AC_DEFINE_UNQUOTED([FLINT_TMPDIR], ["$TMPDIR"], [Define to set the default directory for temporary files])
 
-################################################################################ 
+################################################################################
 # check programs and system
-################################################################################ 
+################################################################################
 
 AC_C_INLINE
 
@@ -611,9 +611,9 @@ then
 fi
 AC_SUBST(LDCONFIG)
 
-################################################################################ 
+################################################################################
 # check headers
-################################################################################ 
+################################################################################
 
 # Mandatory headers
 # The following headers are checked previously:
@@ -624,7 +624,7 @@ AC_CHECK_HEADERS([stdarg.h math.h float.h errno.h gmp.h mpfr.h],,
 # Optional headers
 # The following headers are checked previously:
 #   unistd.h
-AC_CHECK_HEADERS([fenv.h alloca.h malloc.h sys/param.h windows.h])
+AC_CHECK_HEADERS([fenv.h alloca.h malloc.h sys/param.h windows.h arm_neon.h x86intrin.h immintrin.h])
 
 if test "$enable_pthread" = "yes";
 then
@@ -656,9 +656,9 @@ then
                     AC_MSG_ERROR([Could not find NTL/ZZ.h!]))
 fi
 
-################################################################################ 
+################################################################################
 # check libraries
-################################################################################ 
+################################################################################
 
 AC_CHECK_LIB(m,fabs,
 [LIBS="-lm $LIBS"],
@@ -741,9 +741,9 @@ that we can either fix the issue or give a more proper error message.])])
     LIBS="$SAVE_libs"
 fi
 
-################################################################################ 
+################################################################################
 # check settings and environment
-################################################################################ 
+################################################################################
 
 AC_SUBST(PIC_FLAG,$pic_flag)
 
@@ -847,9 +847,9 @@ AC_COMPILE_IFELSE(
     [AC_MSG_RESULT([no])]
 )
 
-################################################################################ 
+################################################################################
 # CFLAGS
-################################################################################ 
+################################################################################
 
 save_CFLAGS="$CFLAGS"
 CFLAGS=""
@@ -913,7 +913,7 @@ AX_CHECK_COMPILE_FLAG([-Wno-stringop-overread],[DEFAULT_CFLAGS="-Wno-stringop-ov
 AX_CHECK_COMPILE_FLAG([-Wno-stringop-overflow],[DEFAULT_CFLAGS="-Wno-stringop-overflow $DEFAULT_CFLAGS"])
 AX_CHECK_COMPILE_FLAG([-Werror=implicit-function-declaration],[DEFAULT_CFLAGS="-Werror=implicit-function-declaration $DEFAULT_CFLAGS"])
 AX_CHECK_COMPILE_FLAG([-O2],[DEFAULT_CFLAGS="-O2 $DEFAULT_CFLAGS"])
-AX_CHECK_COMPILE_FLAG([-std=c99],[DEFAULT_CFLAGS="-std=c99 $DEFAULT_CFLAGS"])
+AX_CHECK_COMPILE_FLAG([-std=c11],[DEFAULT_CFLAGS="-std=c11 $DEFAULT_CFLAGS"])
 AX_CHECK_COMPILE_FLAG([-pedantic],[DEFAULT_CFLAGS="-pedantic $DEFAULT_CFLAGS"])
 
 dnl NOTE: The following flags shouldn't be default. They are leftovers from
@@ -937,9 +937,69 @@ fi
 
 CPPFLAGS="-I./src $CPPFLAGS"
 
-################################################################################ 
+################################################################################
+# fft_small module
+################################################################################
+
+enable_fft_small="no"
+
+AC_MSG_CHECKING([whether fft_small module is available])
+
+if test "$ac_cv_header_arm_neon_h" = "yes";
+then
+    AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM([],[
+#ifndef __ARM_NEON
+#error Dead man
+error
+#endif
+         ])],
+        [AC_COMPILE_IFELSE(
+            [AC_LANG_PROGRAM([],[
+#ifndef __GNUC__
+#error Dead man
+error
+#endif
+             ])],
+            [enable_fft_small="yes"]
+        )]
+    )
+fi
+
+if test "$ac_cv_header_x86intrin_h" = "yes" && test "$ac_cv_header_immintrin_h" = "yes";
+then
+    AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM([],[
+#ifndef __AVX2__
+#error Dead man
+error
+#endif
+         ])],
+        [AC_COMPILE_IFELSE(
+            [AC_LANG_PROGRAM([],[
+#ifndef __GNUC__
+#error Dead man
+error
+#endif
+             ])],
+            [enable_fft_small="yes"]
+        )]
+    )
+fi
+
+AC_MSG_RESULT([$enable_fft_small])
+
+if test "$enable_fft_small" = "yes";
+then
+    AC_SUBST(FFT_SMALL, [fft_small\ \ \ ])
+    AC_DEFINE(FLINT_HAVE_FFT_SMALL, 1, [Define to use the fft_small module])
+else
+    AC_SUBST(FFT_SMALL, [\ \ \ \ \ \ \ \ \ \ \ \ ])
+fi
+
+################################################################################
 # substitutions and definitions
-################################################################################ 
+################################################################################
 
 AC_SUBST(FLINT_MAJOR)
 AC_SUBST(FLINT_MINOR)
@@ -1056,9 +1116,9 @@ then
     AC_DEFINE(FLINT_WANT_GMP_INTERNALS,1,[Define to enable use of GMP internals.])
 fi
 
-################################################################################ 
+################################################################################
 # epilog
-################################################################################ 
+################################################################################
 
 AC_CONFIG_FILES([Makefile flint.pc])
 AC_OUTPUT

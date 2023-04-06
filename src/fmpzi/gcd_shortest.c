@@ -283,14 +283,6 @@ cleanup_stage1:
     fmpz_clear(ay_copy);
 }
 
-#define PTR_SWAP(T, A, B)   \
-    do {                    \
-        T* __t_m_p = A;     \
-        A = B;              \
-        B = __t_m_p;        \
-    } while (0)
-
-
 /*
      ax ay           g*1 g*B            g = gcd(gx, gy)
     -ay ax  row ops   0  g*A        g^2*A = norm(gx + i*gy)

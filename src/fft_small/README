@@ -1,0 +1,206 @@
+FFT over F_p
+===============================
+
+    Elements of Z/nZ are represented as integral doubles. Floating point numbers
+    in general in these notes will be viewed at exact rationals, and operations
+    on them that produce a rounded (to some nearest) answer will be denoted by
+    add, mul, ... etc. The + , *, / always denote the true exact rational value.
+
+
+The reduction mod n
+-------------------
+
+    For arithmetic mod n, the product a*b is represented exactly as the usual
+    double-double format h + l where h and l are prec-bit floating point
+    numbers. a*b will be roughly the size of n^2, but since one or both of a or
+    b may not be reduced modulo n, it is common for the product a*b to be a
+    reasonable multiple of n^2. Since this is calculated as
+
+        h = mul(a, b)
+        l = fmsub(a, b, h),
+
+    if we have |a*b| < 2^e <= 2^(2*prec), then
+
+        |l| <= 2^(e - prec - 1).
+
+    First, ninv is an floating approximation of 1/n with some error epsilon
+
+        ninv := 1/n + epsilon.
+
+    Next, we would like to approximate the true quotient a*b/n as
+
+        q = round(mul(h, ninv)),
+
+    so that h + l can be reduced mod n. Since
+
+        h*ninv = (a*b - l)*(1/n + epsilon)
+               = a*b/n + a*b*epsilon - l*ninv,
+
+    we have
+
+        |a*b/n - q| <= |a*b*epsilon| + 2^(e - prec - 1)*ninv + 1/2.
+
+    When the quantity on the rhs is <= k, we can guarantee that
+
+        |h + l - q*n| <= k*n,
+
+    while h + l - q*n can be calculated exactly as add(l, fnmadd(q, n, h)).
+
+
+Analysis for 2^(prec - 4) < n < 2^(prec - 3) (aka 50 bit primes)
+----------------------------------------------------------------
+
+    In this case we have |epsilon| < 2^(3 - 2*prec) and ninv < 2^(4 - prec).
+
+    For |a*b| < 2*n^2, we can take e = 2*prec - 5. Then,
+
+        |a*b*epsilon| + 2^(e - prec - 1)*ninv + 1/2 < 2^-2 + 2^-2 + 1/2 = 1
+
+    Similarly for |a*b| < 4*n^2, we can take e = 2*prec - 4 and find that
+
+        |a*b*epsilon| + 2^(e - prec - 1)*ninv + 1/2 < 2^-1 + 2^-1 + 1/2 = 3/2
+
+    Therefore,
+
+(1)  Products in the range (-2*n^2, 2*n^2) are reduced to the range (-n, n).
+(2)  Products in the range (-4*n^2, 4*n^2) are reduced to the range (-3/2*n, 3/2*n).
+
+
+Analysis of the forward butterfiles for 50 bit primes
+-----------------------------------------------------
+
+        b0 = 1*a0 + w^2*a2 +   w*(a1 + w^2*a3)
+        b1 = 1*a0 + w^2*a2 -   w*(a1 + w^2*a3)
+        b2 = 1*a0 - w^2*a2 + i*w*(a1 - w^2*a3)
+        b3 = 1*a0 - w^2*a2 - i*w*(a1 - w^2*a3)
+
+    Each of w^2, w, and i*w is in (-n/2, n/2). As part of this operation, the
+    multiplication 1*a0 reduces a0 to the range (-n, n) and the other
+    multiplications use the above. In practice, a0 does not get large even
+    without this reduction, but this is needed to prove things stay bounded.
+    The following claim is trivial from (1):
+
+(*)     If the ai in (-3*n, 3*n), then the bi are also in (-3*n, 3*n).
+
+
+Analysis of the truncated forward butterfiles for 50 bit primes
+---------------------------------------------------------------
+
+    Trivial because some of the ai are just 0.
+
+
+Analysis of the pointwise muls
+------------------------------
+
+    The output of one fft in the range (-3*n, 3*n) is multiplied with a
+    multiplier (2^-depth) in the range (-n/2, n/2). This produces a product x
+    in the range (-n, n). Then, x is multiplied by the output of another fft
+    in the range (-3*n, 3*n). Thus,
+
+(*)     The outputs of the pointwise muls are in the range (-3/2*n, 3/2*n).
+
+
+Analysis of the reverse butterflies for 50 bit primes
+-----------------------------------------------------
+
+        4a0 =    1*(     (b0 + b1) +        (b2 + b3))
+        4a2 = w^-2*(     (b0 + b1) -        (b2 + b3))
+        4a1 =       w^-1*(b0 - b1) - i*w^-1*(b2 - b3)
+        4a3 = w^-2*(w^-1*(b0 - b1) + i*w^-1*(b2 - b3))
+
+    As before, each of w^-2, w^-1, and i*w^-1 is in (-n/2, n/2). As part of
+    this operation, 1*(b0 + b1 + b2 + b3) reduces 4a0 to the range (-n, n),
+    and the other multiplications are as before.
+    The following claim is trivial from (1) and (2):
+
+(*)     If the bi are in (-2*n, 2*n), then the 4ai are also in (-2*n, 2*n).
+
+    The bound n < 2^50 guarantees that |(b0 + b1) +- (b2 + b3)| < 2^53 so that
+    no bits are lost.
+
+
+Analysis of the truncated reverse butterflies for 50 bit primes
+---------------------------------------------------------------
+
+    *** TODO ***
+    A bit tedious because there are so many formulas, but we just need make
+    sure that output is in the range (-2*n, 2*n) if input is.
+
+
+Specific bounds for the chosen primes
+-------------------------------------
+
+The bounds (1) and (2) are actually a bit pessimistic.
+For the primes here, epsilon is a bit smaller, and we have
+
+for n = 0x0003f00000000001, epsilon = 2.484444775828405e-32
+products in the range +-1*n^2 are reduced to the range +-0.5940096416170644*n
+products in the range +-2*n^2 are reduced to the range +-0.6880192832341288*n
+products in the range +-3*n^2 are reduced to the range +-0.8455209883432566*n
+products in the range +-4*n^2 are reduced to the range +-0.8760385664682575*n
+
+for n = 0x0002580000000001, epsilon = 2.843405307262943e-32
+products in the range +-1*n^2 are reduced to the range +-0.5657082112630193*n
+products in the range +-2*n^2 are reduced to the range +-0.6314164225260386*n
+products in the range +-3*n^2 are reduced to the range +-0.7504579671223911*n
+products in the range +-4*n^2 are reduced to the range +-0.762832845052077*n
+
+for n = 0x0003dc0000000001, epsilon = 6.811649508604047e-32
+products in the range +-1*n^2 are reduced to the range +-0.6451606287164718*n
+products in the range +-2*n^2 are reduced to the range +-0.7903212574329437*n
+products in the range +-3*n^2 are reduced to the range +-1.0002592140846382*n
+products in the range +-4*n^2 are reduced to the range +-1.0806425148658874*n
+
+for n = 0x00033c0000000001, epsilon = 2.9157237243432387e-32
+products in the range +-1*n^2 are reduced to the range +-0.6014607931680735*n
+products in the range +-2*n^2 are reduced to the range +-0.7029215863361472*n
+products in the range +-3*n^2 are reduced to the range +-0.7270876935138827*n
+products in the range +-4*n^2 are reduced to the range +-0.9058431726722944*n
+
+for n = 0x00027c0000000001, epsilon = 4.7499842291553306e-32
+products in the range +-1*n^2 are reduced to the range +-0.5735421570591971*n
+products in the range +-2*n^2 are reduced to the range +-0.6470843141183942*n
+products in the range +-3*n^2 are reduced to the range +-0.7709409365863962*n
+products in the range +-4*n^2 are reduced to the range +-0.7941686282367884*n
+
+for n = 0x0003a20000000001, epsilon = 3.053563908647828e-32
+products in the range +-1*n^2 are reduced to the range +-0.600745266740041*n
+products in the range +-2*n^2 are reduced to the range +-0.7014905334800822*n
+products in the range +-3*n^2 are reduced to the range +-0.8710530045211985*n
+products in the range +-4*n^2 are reduced to the range +-0.9029810669601643*n
+
+for n = 0x00039a0000000001, epsilon = 1.649948345672754e-32
+products in the range +-1*n^2 are reduced to the range +-0.5863706460485221*n
+products in the range +-2*n^2 are reduced to the range +-0.6727412920970441*n
+products in the range +-3*n^2 are reduced to the range +-0.828526254848386*n
+products in the range +-4*n^2 are reduced to the range +-0.8454825841940883*n
+
+for n = 0x0003160000000001, epsilon = 3.3640032256934724e-32
+products in the range +-1*n^2 are reduced to the range +-0.6063937464846851*n
+products in the range +-2*n^2 are reduced to the range +-0.7127874929693703*n
+products in the range +-3*n^2 are reduced to the range +-0.7381685812262074*n
+products in the range +-4*n^2 are reduced to the range +-0.9255749859387407*n
+
+
+==========================
+
+8x8 transpose with avx512
+
+x0[0] ... x0[7]
+...       ...
+x7[0] ... x7[7]
+
+t0 = unpacklo(x0, x1) // x0[0],x1[0], x0[2],x1[2], x0[4],x1[4], x0[6],x1[6]
+t1 = unpacklo(x2, x3) // x2[0],x3[0], x2[2],x3[2], x2[4],x3[4], x2[6],x3[6]
+t2 = unpacklo(x4, x5) // x4[0],x5[0], x4[2],x5[2], x4[4],x5[4], x4[6],x5[6]
+t3 = unpacklo(x6, x7) // x6[0],x7[0], x6[2],x7[2], x6[4],x7[4], x6[6],x7[6]
+t4 = unpackhi(x0, x1) // x0[1],x1[1], x0[3],x1[3], x0[5],x1[5], x0[7],x1[7]
+t5 = unpackhi(x2, x3) // x2[1],x3[1], x2[3],x3[3], x2[5],x3[5], x2[7],x3[7]
+t6 = unpackhi(x4, x5) // x4[1],x5[1], x4[3],x5[3], x4[5],x5[5], x4[7],x5[7]
+t7 = unpackhi(x6, x7) // x6[1],x7[1], x6[3],x7[3], x6[5],x7[5], x6[7],x7[7]
+
+
+s0 = (t0, t1) // x0[0],x1[0],x2[0],x3[0], 
+
+
+

@@ -117,27 +117,35 @@ typedef struct __FLINT_FILE FLINT_FILE;
 #include "longlong.h"
 
 #if defined(__GNUC__)
-#define FLINT_UNUSED(x) UNUSED_ ## x __attribute__((unused))
-#define FLINT_SET_BUT_UNUSED(x) x __attribute__((unused))
-#define FLINT_NORETURN __attribute__ ((noreturn))
-#define FLINT_CONST __attribute__ ((const))
-#define FLINT_WARN_UNUSED __attribute__((warn_unused_result))
-#define FLINT_PUSH_OPTIONS _Pragma("GCC push_options")
-#define FLINT_POP_OPTIONS _Pragma("GCC pop_options")
-#define FLINT_OPTIMIZE_NESTED_3(part) _Pragma(#part)
-#define FLINT_OPTIMIZE_NESTED_2(part) FLINT_OPTIMIZE_NESTED_3(GCC optimize part)
-#define FLINT_OPTIMIZE_NESTED_1(part) FLINT_OPTIMIZE_NESTED_2(#part)
-#define FLINT_OPTIMIZE(x) FLINT_OPTIMIZE_NESTED_1(x)
+# define FLINT_FORCE_INLINE static __attribute__((always_inline)) __inline__
+# define FLINT_STATIC_NOINLINE static __attribute__((noinline)) 
+# define FLINT_UNUSED(x) UNUSED_ ## x __attribute__((unused))
+# define FLINT_SET_BUT_UNUSED(x) x __attribute__((unused))
+# define FLINT_NORETURN __attribute__ ((noreturn))
+# define FLINT_CONST __attribute__ ((const))
+# define FLINT_WARN_UNUSED __attribute__((warn_unused_result))
+# define FLINT_UNLIKELY(x) __builtin_expect((x),0)
+# define FLINT_LIKELY(x) __builtin_expect((x),1)
+# define FLINT_PUSH_OPTIONS _Pragma("GCC push_options")
+# define FLINT_POP_OPTIONS _Pragma("GCC pop_options")
+# define FLINT_OPTIMIZE_NESTED_3(part) _Pragma(#part)
+# define FLINT_OPTIMIZE_NESTED_2(part) FLINT_OPTIMIZE_NESTED_3(GCC optimize part)
+# define FLINT_OPTIMIZE_NESTED_1(part) FLINT_OPTIMIZE_NESTED_2(#part)
+# define FLINT_OPTIMIZE(x) FLINT_OPTIMIZE_NESTED_1(x)
 #else
-#define __attribute__(x)
-#define FLINT_UNUSED(x) x
-#define FLINT_SET_BUT_UNUSED(x) x
-#define FLINT_WARN_UNUSED
-#define FLINT_NORETURN
-#define FLINT_CONST
-#define FLINT_PUSH_OPTIONS
-#define FLINT_POP_OPTIONS
-#define FLINT_OPTIMIZE(x)
+# define __attribute__(x)
+# define FLINT_FORCE_INLINE static __inline__
+# define FLINT_STATIC_NOINLINE static
+# define FLINT_UNUSED(x) x
+# define FLINT_SET_BUT_UNUSED(x) x
+# define FLINT_WARN_UNUSED
+# define FLINT_NORETURN
+# define FLINT_CONST
+# define FLINT_UNLIKELY(x) (x)
+# define FLINT_LIKELY(x) (x)
+# define FLINT_PUSH_OPTIONS
+# define FLINT_POP_OPTIONS
+# define FLINT_OPTIMIZE(x)
 #endif
 
 #if FLINT_USES_TLS
@@ -347,6 +355,13 @@ ulong n_randtest_not_zero(flint_rand_t);
         double __t_m_p_ = A; \
         A = B;               \
         B = __t_m_p_;        \
+    } while (0)
+
+#define PTR_SWAP(T, A, B)    \
+    do {                    \
+        T* __t_m_p_ = A; \
+        A = B;              \
+        B = __t_m_p_;       \
     } while (0)
 
 #define r_shift(in, shift) \

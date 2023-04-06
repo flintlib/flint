@@ -15,6 +15,8 @@
 #define CAT(X,Y) X##_##Y
 #define CAT3(X,Y,Z) X##_##Y##_##Z
 #define CAT4(X,Y,Z,A) X##_##Y##_##Z##_##A
+#define CAT5(X,Y,Z,A,B) X##_##Y##_##Z##_##A##_##B
+#define CAT6(X,Y,Z,A,B,C) X##_##Y##_##Z##_##A##_##B##_##C
 #define _CAT(X,Y) _##X##_##Y
 #define _CAT3(X,Y,Z) _##X##_##Y##_##Z
 #define _CAT4(X,Y,Z,A) _##X##_##Y##_##Z##_##A
