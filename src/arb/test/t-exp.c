@@ -33,7 +33,7 @@ void arb_exp_simple(arb_t res, const arb_t x, slong prec)
     mag_clear(u);
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

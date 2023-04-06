@@ -63,7 +63,7 @@ arb_submul_naive(arb_t z, const arb_t x, const arb_t y, slong prec)
     arb_clear(t);
 }
 
-int main()
+int main(void)
 {
     slong iter, iter2;
     flint_rand_t state;

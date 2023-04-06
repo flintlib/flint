@@ -24,10 +24,13 @@ FLINT_MINOR_SO:=@FLINT_MINOR_SO@
 FLINT_PATCH_SO:=@FLINT_PATCH_SO@
 
 FLINT_LIB:=@FLINT_LIB@
+FLINT_LIB_MAJOR:=@FLINT_LIB_MAJOR@
+FLINT_LIB_FULL:=@FLINT_LIB_FULL@
 FLINT_IMPLIB:=@FLINT_IMPLIB@
-FLINT_LIBNAME:=@FLINT_LIBNAME@
 FLINT_LIB_STATIC:=@FLINT_LIB_STATIC@
 
+FLINT_DLLLIB:=@FLINT_DLLLIB@
+FLINT_DYLIB:=@FLINT_DYLIB@
 FLINT_SOLIB:=@FLINT_SOLIB@
 
 prefix:=@prefix@
@@ -63,6 +66,8 @@ COVERAGE:=@COVERAGE@
 WANT_NTL:=@WANT_NTL@
 
 WANT_DEPS:=@WANT_DEPS@
+
+WANT_CXX:=@WANT_CXX@
 
 GMP_LIB_PATH:=@GMP_LIB_PATH@
 MPFR_LIB_PATH:=@MPFR_LIB_PATH@
@@ -196,8 +201,11 @@ endif
 
 INSTALL_DIRS :=                                                             \
         $(LIBDIR)                       $(INCLUDEDIR)/flint                 \
-        $(INCLUDEDIR)/flint/flintxx     $(PKGCONFIGDIR)
-ifneq ($(findstring $(HOST_OS),mingw32 mingw64 cygwin msys),)
+        $(PKGCONFIGDIR)
+ifneq ($(WANT_CXX),0)
+INSTALL_DIRS += $(INCLUDEDIR)/flint/flintxx
+endif
+ifneq ($(FLINT_DLLLIB),0)
 INSTALL_DIRS += $(BINDIR)
 endif
 
@@ -352,7 +360,7 @@ library: static
 endif
 
 ifneq ($(SHARED), 0)
-shared: $(FLINT_DIR)/$(FLINT_LIB)
+shared: $(FLINT_DIR)/$(FLINT_LIB_FULL)
 
 # The following is to avoid reaching the maximum length of command line
 # arguments, mainly present on MinGW.
@@ -363,17 +371,15 @@ endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_merged_lobj_rule,$(dir))))
 MERGED_LOBJS:=$(foreach dir, $(DIRS),$(BUILD_DIR)/$(dir)_merged.lo)
 
-$(FLINT_DIR)/$(FLINT_LIB): $(MERGED_LOBJS)
-	$(CC) $(CFLAGS) -shared $(EXTRA_SHARED_FLAGS) $(MERGED_LOBJS) -o $(FLINT_LIB) $(LDFLAGS) $(LIBS)
+$(FLINT_DIR)/$(FLINT_LIB_FULL): $(MERGED_LOBJS)
+	$(CC) $(CFLAGS) -shared $(EXTRA_SHARED_FLAGS) $(MERGED_LOBJS) -o $(FLINT_LIB_FULL) $(LDFLAGS) $(LIBS)
 ifneq ($(FLINT_SOLIB), 0)
 	$(LDCONFIG) -n .
 endif
-ifeq ($(findstring $(HOST_OS),mingw32 mingw64 cygwin msys),)
-	$(RM_F) "$(FLINT_LIBNAME)"
-	$(RM_F) "$(FLINT_LIBNAME).$(FLINT_MAJOR_SO)"
-	$(LN_S) "$(FLINT_LIB)" "$(FLINT_LIBNAME)"
-	$(LN_S) "$(FLINT_LIB)" "$(FLINT_LIBNAME).$(FLINT_MAJOR_SO)"
-endif
+	$(RM_F) $(FLINT_LIB)
+	$(RM_F) $(FLINT_LIB_MAJOR)
+	$(LN_S) $(FLINT_LIB_FULL) $(FLINT_LIB)
+	$(LN_S) $(FLINT_LIB_FULL) $(FLINT_LIB_MAJOR)
 endif
 
 ifneq ($(STATIC), 0)
@@ -551,7 +557,7 @@ $(BUILD_DIR)/profile/%$(EXEEXT): $(SRC_DIR)/profile/%.c $(FLINT_DIR)/$(FLINT_LIB
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
 else
-$(BUILD_DIR)/profile/%$(EXEEXT): $(SRC_DIR)/profile/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/profile
+$(BUILD_DIR)/profile/%$(EXEEXT): $(SRC_DIR)/profile/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/profile
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
 endif
@@ -564,7 +570,7 @@ $(BUILD_DIR)/$(1)/profile/%$(EXEEXT): $(SRC_DIR)/$(1)/profile/%.c $(FLINT_DIR)/$
 endef
 else
 define xxx_PROFS_rule
-$(BUILD_DIR)/$(1)/profile/%$(EXEEXT): $(SRC_DIR)/$(1)/profile/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/$(1)/profile
+$(BUILD_DIR)/$(1)/profile/%$(EXEEXT): $(SRC_DIR)/$(1)/profile/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/$(1)/profile
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $$(@:%=%.d)
 endef
@@ -577,7 +583,7 @@ $(BUILD_DIR)/test/%$(EXEEXT): $(SRC_DIR)/test/%.c $(FLINT_DIR)/$(FLINT_LIB_STATI
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
 else
-$(BUILD_DIR)/test/%$(EXEEXT): $(SRC_DIR)/test/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/test
+$(BUILD_DIR)/test/%$(EXEEXT): $(SRC_DIR)/test/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/test
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
 endif
@@ -590,7 +596,7 @@ $(BUILD_DIR)/$(1)/test/%$(EXEEXT): $(SRC_DIR)/$(1)/test/%.c $(FLINT_DIR)/libflin
 endef
 else
 define xxx_TESTS_rule
-$(BUILD_DIR)/$(1)/test/%$(EXEEXT): $(SRC_DIR)/$(1)/test/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/$(1)/test
+$(BUILD_DIR)/$(1)/test/%$(EXEEXT): $(SRC_DIR)/$(1)/test/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/$(1)/test
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $$(@:%=%.d)
 endef
@@ -604,7 +610,7 @@ $(BUILD_DIR)/interfaces/test/t-NTL-interface$(EXEEXT): $(SRC_DIR)/interfaces/tes
 	@echo "  CXX $(@:$(BUILD_DIR)/%=%)"
 	@$(CXX) $(CXXFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
 else
-$(BUILD_DIR)/interfaces/test/t-NTL-interface$(EXEEXT): $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/interfaces/test
+$(BUILD_DIR)/interfaces/test/t-NTL-interface$(EXEEXT): $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/interfaces/test
 	@echo "  CXX $(@:$(BUILD_DIR)/%=%)"
 	@$(CXX) $(CXXFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
 endif
@@ -615,7 +621,7 @@ $(BUILD_DIR)/tune/%$(EXEEXT): $(SRC_DIR)/tune/%.c $(FLINT_DIR)/$(FLINT_LIB_STATI
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
 else
-$(BUILD_DIR)/tune/%$(EXEEXT): $(SRC_DIR)/tune/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/tune
+$(BUILD_DIR)/tune/%$(EXEEXT): $(SRC_DIR)/tune/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/tune
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
 endif
@@ -628,7 +634,7 @@ $(BUILD_DIR)/$(1)/tune/%$(EXEEXT): $(SRC_DIR)/$(1)/tune/%.c $(FLINT_DIR)/$(FLINT
 endef
 else
 define xxx_TUNES_rule
-$(BUILD_DIR)/$(1)/tune/%$(EXEEXT): $(SRC_DIR)/$(1)/tune/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/$(1)/tune
+$(BUILD_DIR)/$(1)/tune/%$(EXEEXT): $(SRC_DIR)/$(1)/tune/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/$(1)/tune
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $$(@:%=%.d)
 endef
@@ -641,7 +647,7 @@ $(BUILD_DIR)/examples/%$(EXEEXT): $(FLINT_DIR)/examples/%.c $(FLINT_DIR)/$(FLINT
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
 else
-$(BUILD_DIR)/examples/%$(EXEEXT): $(FLINT_DIR)/examples/%.c | $(FLINT_DIR)/$(FLINT_LIB) $(BUILD_DIR)/examples
+$(BUILD_DIR)/examples/%$(EXEEXT): $(FLINT_DIR)/examples/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/examples
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
 endif
@@ -715,9 +721,13 @@ endif
 ################################################################################
 
 clean:
-	$(RM_F) $(FLINT_DIR)/libflint.a
-	$(RM_F) $(FLINT_DIR)/$(FLINT_LIBNAME)*
-	$(RM_F) $(FLINT_DIR)/$(FLINT_LIB)*
+	$(RM_F) $(FLINT_DIR)/$(FLINT_LIB)
+	$(RM_F) $(FLINT_DIR)/$(FLINT_LIB_MAJOR)
+	$(RM_F) $(FLINT_DIR)/$(FLINT_LIB_FULL)
+ifneq ($(FLINT_DLLLIB), 0)
+	$(RM_F) $(FLINT_DIR)/$(FLINT_IMPLIB)
+endif
+	$(RM_F) $(FLINT_DIR)/$(FLINT_LIB_STATIC)
 	$(RM_RF) $(BUILD_DIR)
 
 distclean: clean
@@ -730,35 +740,43 @@ distclean: clean
 install: library | $(INSTALL_DIRS)
 	$(CP) flint.pc $(PKGCONFIGDIR)/flint.pc
 ifneq ($(SHARED), 0)
-ifeq ($(findstring $(HOST_OS),mingw32 mingw64 cygwin msys),)
-	$(CP_A) $(FLINT_DIR)/$(FLINT_LIBNAME)* $(LIBDIR)
-else
-	$(CP_A) $(FLINT_DIR)/$(FLINT_LIBNAME)* $(BINDIR)
+ifneq ($(FLINT_DLLLIB),0)
+	$(CP_A) $(FLINT_DIR)/$(FLINT_LIB) $(BINDIR)
+	$(CP_A) $(FLINT_DIR)/$(FLINT_LIB_MAJOR) $(BINDIR)
+	$(CP_A) $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BINDIR)
 	$(CP) $(FLINT_DIR)/$(FLINT_IMPLIB) $(LIBDIR)
+else
+	$(CP_A) $(FLINT_DIR)/$(FLINT_LIB) $(LIBDIR)
+	$(CP_A) $(FLINT_DIR)/$(FLINT_LIB_MAJOR) $(LIBDIR)
+	$(CP_A) $(FLINT_DIR)/$(FLINT_LIB_FULL) $(LIBDIR)
+endif
+ifneq ($(FLINT_DYLIB),0)
+	install_name_tool -id $(LIBDIR)/$(FLINT_LIB_FULL) $(LIBDIR)/$(FLINT_LIB)
 endif
 endif
 ifneq ($(STATIC), 0)
 	$(CP) $(FLINT_DIR)/$(FLINT_LIB_STATIC) $(LIBDIR)
 endif
 	$(CP) $(HEADERS) $(INCLUDEDIR)/flint
+ifneq ($(WANT_CXX), 0)
 	$(CP) $(SRC_DIR)/flintxx/*.h $(INCLUDEDIR)/flint/flintxx
 	$(CP) $(SRC_DIR)/flintxx_public/*xx.h $(INCLUDEDIR)/flint
-ifeq ($(findstring darwin,$(HOST_OS)),darwin)
-ifneq ($(SHARED), 0)
-	install_name_tool -id $(LIBDIR)/$(FLINT_LIB) $(LIBDIR)/$(FLINT_LIBNAME)
-endif
 endif
 
 uninstall:
 	$(RM_F) $(PKGCONFIGDIR)/flint.pc
-	$(RM_RF) $(INCLUDEDIR)/flint
-	$(RM_F) $(LIBDIR)/$(FLINT_LIB_STATIC)
-ifeq ($(findstring $(HOST_OS),mingw32 mingw64 cygwin msys),)
-	$(RM_F) $(LIBDIR)/$(FLINT_LIBNAME)*
-else
-	$(RM_F) $(BINDIR)/$(FLINT_LIBNAME)*
+ifneq ($(FLINT_DLLLIB),0)
+	$(RM_F) $(BINDIR)/$(FLINT_LIB)
+	$(RM_F) $(BINDIR)/$(FLINT_LIB_MAJOR)
+	$(RM_F) $(BINDIR)/$(FLINT_LIB_FULL)
 	$(RM_F) $(LIBDIR)/$(FLINT_IMPLIB)
+else
+	$(RM_F) $(LIBDIR)/$(FLINT_LIB)
+	$(RM_F) $(LIBDIR)/$(FLINT_LIB_MAJOR)
+	$(RM_F) $(LIBDIR)/$(FLINT_LIB_FULL)
 endif
+	$(RM_F) $(LIBDIR)/$(FLINT_LIB_STATIC)
+	$(RM_RF) $(INCLUDEDIR)/flint
 
 ################################################################################
 # maintainer stuff

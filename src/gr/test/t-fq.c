@@ -1,7 +1,7 @@
 #include "fmpz.h"
 #include "gr.h"
 
-int main()
+int main(void)
 {
     gr_ctx_t Fq;
     fmpz_t p;

@@ -35,7 +35,7 @@ arb_exp_arf_via_mpfr(arb_t z, const arf_t x, slong prec)
     mpfr_clear(u);
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

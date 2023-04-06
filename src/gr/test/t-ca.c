@@ -1,6 +1,6 @@
 #include "gr.h"
 
-int main()
+int main(void)
 {
     gr_ctx_t RR, CC, QQbar_real, QQbar;
     int flags = 0;

@@ -13,7 +13,7 @@
 #include "fmpq.h"
 #include "fmpq_vec.h"
 
-int main()
+int main(void)
 {
     slong iter;
 

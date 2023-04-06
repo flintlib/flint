@@ -39,7 +39,7 @@ gl_cache_struct;
 
 FLINT_TLS_PREFIX gl_cache_struct * gl_cache = NULL;
 
-void gl_cleanup()
+void gl_cleanup(void)
 {
     slong i;
 
@@ -59,7 +59,7 @@ void gl_cleanup()
     gl_cache = NULL;
 }
 
-void gl_init()
+void gl_init(void)
 {
     gl_cache = flint_calloc(1, sizeof(gl_cache_struct));
     flint_register_cleanup_function(gl_cleanup);

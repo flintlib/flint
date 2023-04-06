@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "arith.h"
 
-int main()
+int main(void)
 {
     fmpz_t s, t;
     slong n;

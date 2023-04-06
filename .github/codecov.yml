@@ -1,0 +1,22 @@
+coverage:
+  precision: 2
+  round: down
+  range: 70...95 # FIXME: We should set this one to about 90...95
+
+  status:
+    project:
+      default:
+        informational: true
+    patch:
+      default:
+        informational: true
+    changes:
+      default:
+        informational: true
+
+comment: false
+
+ignore:
+ - "src/*/inlines.c"
+ - "src/test/t-*.c"
+ - "src/*/test/t-*.c"

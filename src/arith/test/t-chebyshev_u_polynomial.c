@@ -12,7 +12,7 @@
 #include "fmpz_poly.h"
 #include "arith.h"
 
-int main()
+int main(void)
 {
     fmpz_poly_t T, U;
 

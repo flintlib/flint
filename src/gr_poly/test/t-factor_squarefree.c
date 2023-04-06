@@ -15,7 +15,7 @@
 
 FLINT_DLL extern gr_static_method_table _ca_methods;
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

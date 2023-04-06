@@ -11,7 +11,7 @@
 
 #include "acb_dirichlet.h"
 
-int main()
+int main(void)
 {
     /* Check a specific combination of parameter values that is relatively fast
      * to evaluate and that has relatively tight bounds. */

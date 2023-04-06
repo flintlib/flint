@@ -18,7 +18,7 @@ double log2bern_approx(double n)
     return 1 + ((n+0.5)*log(n) - n - (n-0.5)*log(2*3.14159265358979323)) * (1. / log(2));
 }
 
-int main()
+int main(void)
 {
     slong i, bound;
     double a, b;

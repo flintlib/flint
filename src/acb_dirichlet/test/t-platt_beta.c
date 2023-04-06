@@ -30,7 +30,7 @@ _arb_lt_d(const arb_t a, double d)
     return result;
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

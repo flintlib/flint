@@ -117,7 +117,7 @@ arb_richcmp_fallback(const arb_t x, const arb_t y, int op)
     return res;
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

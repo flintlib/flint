@@ -60,7 +60,7 @@ static const double laurent_data[TESTQ][TESTLEN] = {
         0.024624650443138705595, -0.004951850872731033514, -0.00020178815459414925709}
 };
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

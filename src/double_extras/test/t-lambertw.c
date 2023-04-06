@@ -17,7 +17,7 @@
 #define ONE_OVER_E ldexp(6627126856707895.0, -54)
 
 int
-main()
+main(void)
 {
     double x, w, tol;
     slong iter, prec = 70;

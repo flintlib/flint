@@ -14,7 +14,7 @@
 #define nq 5
 #define nx 3
 
-int main()
+int main(void)
 {
 
     slong i, j;

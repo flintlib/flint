@@ -1,7 +1,7 @@
 
 #include "gr_mat.h"
 
-int main()
+int main(void)
 {
     slong iter;
     slong count_success = 0, count_unable = 0, count_domain = 0;

@@ -11,7 +11,7 @@
 
 #include "arf.h"
 
-int main()
+int main(void)
 {
     slong iter, iter2;
     flint_rand_t state;

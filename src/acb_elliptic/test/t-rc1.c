@@ -13,7 +13,7 @@
 #include "acb_elliptic.h"
 #include "acb_hypgeom.h"
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

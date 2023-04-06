@@ -94,7 +94,7 @@ ca_mat_randrank(ca_mat_t mat, flint_rand_t state, slong rank, slong bits, ca_ctx
     fmpz_mat_clear(A);
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

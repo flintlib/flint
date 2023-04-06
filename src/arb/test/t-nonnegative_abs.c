@@ -117,7 +117,7 @@ int nearly_equal(const arb_t x, const arb_t y)
     return res;
 }
 
-int main()
+int main(void)
 {
     slong iter, wide;
     flint_rand_t state;

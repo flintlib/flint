@@ -59,7 +59,7 @@ _check_containment(const char *name, const arb_t x, const char *s)
     arb_clear(u);
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

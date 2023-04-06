@@ -753,7 +753,7 @@ typedef gr_ctx_struct gr_ctx_t[1];
 GR_INLINE void * gr_ctx_data_ptr(gr_ctx_t ctx) { return (void *) ctx->data; }
 GR_INLINE void * gr_ctx_data_as_ptr(gr_ctx_t ctx) { return (void *) GR_CTX_DATA_AS_PTR(ctx); }
 
-GR_INLINE slong gr_ctx_sizeof_ctx()
+GR_INLINE slong gr_ctx_sizeof_ctx(void)
 {
     return sizeof(gr_ctx_struct);
 }

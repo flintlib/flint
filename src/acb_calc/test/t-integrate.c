@@ -334,7 +334,7 @@ f_min(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
 }
 
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

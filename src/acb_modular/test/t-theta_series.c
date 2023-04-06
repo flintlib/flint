@@ -13,7 +13,7 @@
 #include "acb_poly.h"
 #include "acb_modular.h"
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

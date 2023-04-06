@@ -11,7 +11,7 @@
 
 #include "acb_dirichlet.h"
 
-int main()
+int main(void)
 {
     slong prec = 128;
     ulong q;

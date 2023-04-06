@@ -1,7 +1,7 @@
 #include "ulong_extras.h"
 #include "gr.h"
 
-int main()
+int main(void)
 {
     gr_ctx_t ZZn, ZZnx;
     slong iter;

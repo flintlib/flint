@@ -77,7 +77,7 @@ test_chebyshev_fmpz_rec1(flint_rand_t state)
     return status;
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

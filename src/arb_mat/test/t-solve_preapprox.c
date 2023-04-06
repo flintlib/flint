@@ -68,7 +68,7 @@ _fmpq_mat_inf_norm(fmpq_t res, const fmpq_mat_t mat)
     fmpq_clear(q);
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

@@ -80,7 +80,7 @@ arf_pow_binexp_si(arf_t y, const arf_t b, slong e, slong prec, arf_rnd_t rnd)
 }
 
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

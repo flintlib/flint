@@ -27,7 +27,7 @@ arf_fma_naive(arf_t res, const arf_t x, const arf_t y, const arf_t z, slong prec
     return inexact;
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

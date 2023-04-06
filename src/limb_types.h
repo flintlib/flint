@@ -28,6 +28,22 @@ typedef struct
 }
 n_factor_t;
 
+typedef struct
+{
+    slong small_i;
+    slong small_num;
+    unsigned int * small_primes;
+
+    ulong sieve_a;
+    ulong sieve_b;
+    slong sieve_i;
+    slong sieve_num;
+    char * sieve;
+}
+n_primes_struct;
+
+typedef n_primes_struct n_primes_t[1];
+
 #ifdef __cplusplus
 }
 #endif

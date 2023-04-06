@@ -23,7 +23,7 @@ acb_hypgeom_u_asymp_proper(acb_t res, const acb_t a, const acb_t b, const acb_t 
     acb_clear(t);
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

@@ -22,7 +22,7 @@ arb_fma_naive(arb_t res, const arb_t x, const arb_t y, const arb_t z, slong prec
     arb_clear(t);
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

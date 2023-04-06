@@ -25,7 +25,7 @@ rising_algorithm(acb_ptr res, const acb_t x, ulong n, ulong m, slong len, slong 
         acb_hypgeom_rising_ui_jet(res, x, n, len, prec);
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

@@ -12,7 +12,7 @@
 #include "arf.h"
 #include "double_interval.h"
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

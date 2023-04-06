@@ -12,7 +12,7 @@
 #include "dirichlet.h"
 #include "arb.h" /* for test_multiplier */
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

@@ -91,7 +91,7 @@ check_roots(const fmpz_poly_t poly, acb_srcptr roots, slong prec)
     arb_clear(lead);
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

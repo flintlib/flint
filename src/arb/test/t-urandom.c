@@ -13,7 +13,7 @@
 
 #define N 10000
 
-int main()
+int main(void)
 {
     slong iter;
     slong prec;

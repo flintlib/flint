@@ -56,7 +56,7 @@ _spd_solve(arb_mat_t X, const arb_mat_t A, const arb_mat_t B, slong prec)
 }
 
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

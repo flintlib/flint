@@ -12,7 +12,7 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-int main()
+int main(void)
 {
 	int i;
 	fmpz_mat_t A,B;

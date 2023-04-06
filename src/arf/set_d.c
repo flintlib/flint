@@ -9,6 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "flint.h"
+
+#if FLINT_BITS != 64
+# include <mpfr.h>
+#endif
+
 #include "double_extras.h"
 #include "arf.h"
 

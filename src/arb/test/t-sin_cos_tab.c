@@ -12,7 +12,7 @@
 #include <mpfr.h>
 #include "arb.h"
 
-int main()
+int main(void)
 {
     slong i, which;
 

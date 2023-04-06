@@ -63,7 +63,7 @@ const double agm_testdata[NUM_TESTS][10] = {
         92537341636.835656296},
 };
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

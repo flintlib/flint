@@ -46,7 +46,7 @@ _check_interval(const arf_t a, const arf_t b, const fmpz_t n)
     arb_clear(v);
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

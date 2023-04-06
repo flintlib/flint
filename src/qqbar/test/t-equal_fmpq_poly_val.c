@@ -24,7 +24,7 @@ qqbar_equal_fmpq_poly_val2(const qqbar_t x, const fmpq_poly_t f, const qqbar_t y
     return found;
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

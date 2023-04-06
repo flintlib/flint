@@ -32,7 +32,7 @@ _arb_vec_overlaps(arb_srcptr a, arb_srcptr b, slong len)
     return 1;
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

@@ -40,7 +40,7 @@ fallback(arb_mat_t C, mag_srcptr A, mag_srcptr B, slong ar, slong ac, slong bc)
     }
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

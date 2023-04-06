@@ -15,7 +15,7 @@
 #include "fmpz_extras.h"
 #include "bernoulli.h"
 
-int main()
+int main(void)
 {
     flint_rand_t state;
     slong nmax, n, bound, count;

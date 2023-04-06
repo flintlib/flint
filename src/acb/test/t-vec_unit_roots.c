@@ -12,7 +12,7 @@
 #include "fmpq.h"
 #include "acb.h"
 
-int main()
+int main(void)
 {
     slong len;
     flint_rand_t state;

@@ -23,7 +23,7 @@ TEST(const arb_t x1, const arb_t x2, const char * s)
     }
 }
 
-int main()
+int main(void)
 {
     flint_rand_t state;
 

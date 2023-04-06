@@ -12,7 +12,7 @@
 #include "arb_poly.h"
 #include "arb_hypgeom.h"
 
-int main()
+int main(void)
 {
     flint_rand_t state;
 

@@ -1,6 +1,6 @@
 #include "gr.h"
 
-int main()
+int main(void)
 {
     gr_ctx_t ZZx;
     int flags = GR_TEST_ALWAYS_ABLE;
