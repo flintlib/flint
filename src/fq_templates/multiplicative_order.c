@@ -23,47 +23,43 @@ int TEMPLATE(T, multiplicative_order)(fmpz * ord, const TEMPLATE(T, t) op,
     int is_primitive = 1;
 
     if (ord == NULL)
-    {
-        fmpz_init(tmp);
-        is_primitive = TEMPLATE(T, multiplicative_order)(tmp, op, ctx);
-        fmpz_clear(tmp);
-        return is_primitive;
-    }
+        ord = tmp;
+
+    fmpz_init(tmp);
 
     if (TEMPLATE(T, is_zero)(op, ctx))
     {
-        fmpz_set_ui(ord, 0);
-        return 0;
+        fmpz_zero(ord);
+        is_primitive = 0;
     }
-
-    fmpz_init(tmp);
-    fmpz_factor_init(ord_fact);
-    TEMPLATE(T, init)(one, ctx);
-
-    TEMPLATE(T, ctx_order)(ord, ctx);
-    fmpz_sub_ui(ord, ord, 1);
-    fmpz_factor(ord_fact, ord);
-
-    for (i = 0; i < ord_fact->num; i++)
+    else
     {
-        fmpz_set(tmp, ord);
-        for (j = ord_fact->exp[i]; j > 0; j--)
+        fmpz_factor_init(ord_fact);
+        TEMPLATE(T, init)(one, ctx);
+
+        TEMPLATE(T, ctx_order)(ord, ctx);
+        fmpz_sub_ui(ord, ord, 1);
+        fmpz_factor(ord_fact, ord);
+
+        for (i = 0; i < ord_fact->num; i++)
         {
-            fmpz_cdiv_q(tmp, tmp, ord_fact->p + i);
-            TEMPLATE(T, pow)(one, op, tmp, ctx);
-            if (!TEMPLATE(T, is_one)(one, ctx))
-                break;
-            is_primitive = -1;
+            for (j = ord_fact->exp[i]; j > 0; j--)
+            {
+                fmpz_cdiv_q(ord, ord, ord_fact->p + i);
+                TEMPLATE(T, pow)(one, op, ord, ctx);
+                if (!TEMPLATE(T, is_one)(one, ctx))
+                    break;
+                is_primitive = -1;
+            }
+            if (j > 0)
+                fmpz_mul(ord, ord, ord_fact->p + i);
         }
-        if (j > 0)
-            fmpz_mul(ord, tmp, ord_fact->p + i);
-        else
-            fmpz_set(ord, tmp);
+
+        fmpz_factor_clear(ord_fact);
+        TEMPLATE(T, clear)(one, ctx);
     }
 
     fmpz_clear(tmp);
-    fmpz_factor_clear(ord_fact);
-    TEMPLATE(T, clear)(one, ctx);
 
     return is_primitive;
 }
