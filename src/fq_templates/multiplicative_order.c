@@ -23,7 +23,12 @@ int TEMPLATE(T, multiplicative_order)(fmpz * ord, const TEMPLATE(T, t) op,
     int is_primitive = 1;
 
     if (ord == NULL)
-        ord = tmp;
+    {
+        fmpz_init(tmp);
+        is_primitive = TEMPLATE(T, multiplicative_order)(tmp, op, ctx);
+        fmpz_clear(tmp);
+        return is_primitive;
+    }
 
     if (TEMPLATE(T, is_zero)(op, ctx))
     {
