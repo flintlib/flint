@@ -37,7 +37,7 @@ arf_sqrt_naive(arf_t z, const arf_t x, slong prec, arf_rnd_t rnd)
     }
 }
 
-int main()
+int main(void)
 {
     slong iter, iter2;
     flint_rand_t state;

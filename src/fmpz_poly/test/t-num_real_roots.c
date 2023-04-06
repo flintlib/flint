@@ -12,7 +12,7 @@
 #include "flint.h"
 #include "fmpz_poly.h"
 
-int main()
+int main(void)
 {
     int iter;
 

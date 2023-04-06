@@ -14,7 +14,7 @@
 
 FLINT_DLL extern gr_static_method_table _ca_methods;
 
-int main()
+int main(void)
 {
     slong iter;
     slong count_success = 0, count_unable = 0, count_domain = 0;

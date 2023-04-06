@@ -38,7 +38,7 @@ dlog_vec_diff(ulong * v, ulong * ref, ulong nv)
     return 0;
 }
 
-int main()
+int main(void)
 {
     slong bits, nv, iter;
     flint_rand_t state;

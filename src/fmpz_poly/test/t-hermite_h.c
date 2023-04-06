@@ -12,7 +12,7 @@
 #include "fmpz_poly.h"
 
 int
-main()
+main(void)
 {
     fmpz_poly_t T0, T1, t1, t2;
     slong n;

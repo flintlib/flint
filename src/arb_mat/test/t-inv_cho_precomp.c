@@ -53,7 +53,7 @@ _spd_inv(arb_mat_t X, const arb_mat_t A, slong prec)
     return result;
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

@@ -24,7 +24,7 @@ arf_mul_ui_naive(arf_t z, const arf_t x, ulong y, slong prec, arf_rnd_t rnd)
     return r;
 }
 
-int main()
+int main(void)
 {
     slong iter, iter2;
     flint_rand_t state;

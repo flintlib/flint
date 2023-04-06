@@ -59,7 +59,7 @@ const double testdata[NUM_TESTS][8] = {
     { -3.0, 0.0, -2.0, 0.0, -2.0, 0.0, 1.84375, 0.0 },
 };
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

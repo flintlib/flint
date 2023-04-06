@@ -39,7 +39,7 @@ const double L10[8] = {
   0.999007468458940084215357132419
 };
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

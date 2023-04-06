@@ -39,7 +39,7 @@ static const double testdata_pi[17][6] = {
   {2.0, 1.0, 2.0, 0.0, 2.78474654927885845, 2.02204728966993314},
 };
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

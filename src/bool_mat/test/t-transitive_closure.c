@@ -47,7 +47,7 @@ _bool_mat_transitive_closure_powering(bool_mat_t B, const bool_mat_t A)
     bool_mat_clear(T);
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

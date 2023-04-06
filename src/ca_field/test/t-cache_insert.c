@@ -27,7 +27,7 @@ static int _ca_field_equal_ext(const ca_field_t K, ca_ext_struct ** x, slong len
     return 1;
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

@@ -111,7 +111,7 @@ slong hyperbolic_machin_formulas[NUM_FORMULAS2][4][2] = {
 
 
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

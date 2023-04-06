@@ -612,7 +612,7 @@ FUNC_HEAD
 
 #else
 
-void osxdummy9283479238479() /* OSX doesn't like empty files */
+void osxdummy9283479238479(void) /* OSX doesn't like empty files */
 {
 }
 

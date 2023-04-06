@@ -40,7 +40,7 @@ pthread_mutex_t register_lock;
 static pthread_once_t alloc_func_init = PTHREAD_ONCE_INIT;
 pthread_mutex_t alloc_func_lock;
 
-void __flint_set_memory_functions_init()
+void __flint_set_memory_functions_init(void)
 {
    pthread_mutex_init(&alloc_func_lock, NULL);
 }
@@ -186,7 +186,7 @@ FLINT_TLS_PREFIX size_t flint_num_cleanup_functions = 0;
 FLINT_TLS_PREFIX flint_cleanup_function_t * flint_cleanup_functions = NULL;
 
 #if FLINT_REENTRANT && !FLINT_USES_TLS
-void register_init()
+void register_init(void)
 {
    pthread_mutex_init(&register_lock, NULL);
 }
@@ -211,9 +211,9 @@ void flint_register_cleanup_function(flint_cleanup_function_t cleanup_function)
 #endif
 }
 
-void _fmpz_cleanup();
+void _fmpz_cleanup(void);
 
-void _flint_cleanup()
+void _flint_cleanup(void)
 {
     size_t i;
 
@@ -237,14 +237,14 @@ void _flint_cleanup()
 
 }
 
-void flint_cleanup()
+void flint_cleanup(void)
 {
 #if !FLINT_REENTRANT || FLINT_USES_TLS
    _flint_cleanup();
 #endif
 }
 
-void flint_cleanup_master()
+void flint_cleanup_master(void)
 {
     if (global_thread_pool_initialized)
     {

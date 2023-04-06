@@ -97,7 +97,7 @@ static const double testdata[] = {
     0.00051935757617903067671, -0.0014726339944978705874,
 };
 
-int main()
+int main(void)
 {
     flint_printf("spherical_y....");
     fflush(stdout);

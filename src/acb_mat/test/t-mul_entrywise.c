@@ -28,7 +28,7 @@ _fmpq_mat_mul_entrywise(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B)
     }
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

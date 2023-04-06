@@ -27,7 +27,7 @@ fmpq_poly_randtest_small(fmpq_poly_t A, flint_rand_t state, slong len, slong bit
     }
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

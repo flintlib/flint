@@ -49,7 +49,7 @@ static const double testdata_rd[6][8] = {
     {-2.0, -1.0, 0.0, -1.0, -1.0, 1.0, 1.8249027393703805305, -1.2218475784827035855},
 };
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

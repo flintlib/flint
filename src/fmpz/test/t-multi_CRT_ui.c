@@ -16,7 +16,7 @@
 #include "fmpz_vec.h"
 
 
-int main()
+int main(void)
 {
     fmpz_t input, temp, prod;
     mp_limb_t * output;

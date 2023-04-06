@@ -34,7 +34,7 @@ _fmpq_mat_randtest_for_exp(fmpq_mat_t mat, flint_rand_t state, flint_bitcnt_t bi
     }
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

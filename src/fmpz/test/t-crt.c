@@ -15,7 +15,7 @@
 #include "ulong_extras.h"
 
 
-int main()
+int main(void)
 {
     slong i, j;
     int sign;

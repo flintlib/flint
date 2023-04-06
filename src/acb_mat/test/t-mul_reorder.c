@@ -27,7 +27,7 @@ _acb_mat_nprintd(const char * name, acb_mat_t mat)
     flint_printf("\n\n");
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

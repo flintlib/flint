@@ -111,7 +111,7 @@ void print_arf_and_type(arf_t x, const char *s, const value_type t)
     flint_printf(" of type: %d\n", t);
 }
 
-int main()
+int main(void)
 {
     slong i, j, k, prec;
     arb_t t, u, v, w;

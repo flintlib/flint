@@ -12,7 +12,7 @@
 #include <string.h>
 #include "ca.h"
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;
@@ -36,7 +36,7 @@ int main()
         ca_randtest_special(x, state, 10, 100, ctx);
         s = ca_get_str(x, ctx);
         slen = strlen(s);
-        slen = slen;
+        (void)slen;
         flint_free(s);
 
         ca_clear(x, ctx);

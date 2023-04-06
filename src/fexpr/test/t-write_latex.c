@@ -90,7 +90,7 @@ fexpr_randtest_gibberish(fexpr_t expr, flint_rand_t state, slong max_leaves, slo
     }
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;
@@ -121,7 +121,7 @@ int main()
 
         s = fexpr_get_str_latex(expr, flags);
         len = strlen(s);
-        len = len;
+        (void)len;
         flint_free(s);
 
         fexpr_clear(expr);

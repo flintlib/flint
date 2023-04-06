@@ -122,7 +122,7 @@ arb_mul_naive(arb_t z, const arb_t x, const arb_t y, slong prec)
     arf_clear(u);
 }
 
-int main()
+int main(void)
 {
     slong iter, iter2;
     flint_rand_t state;

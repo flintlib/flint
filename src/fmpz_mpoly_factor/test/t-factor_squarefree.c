@@ -92,7 +92,6 @@ main(void)
 
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
-        slong lower;
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t a, t;
         flint_bitcnt_t coeff_bits;
@@ -109,7 +108,6 @@ main(void)
         powbound = 1 + n_randint(state, 5);
         expbound = 2 + 50/nfacs/n/powbound;
 
-        lower = 0;
         fmpz_mpoly_one(a, ctx);
         for (j = 0; j < nfacs; j++)
         {
@@ -119,8 +117,6 @@ main(void)
             if (fmpz_mpoly_is_zero(t, ctx))
                 fmpz_mpoly_one(t, ctx);
             pow = 1 + n_randint(state, powbound);
-            if (!fmpz_mpoly_is_fmpz(t, ctx))
-                lower += pow;
             fmpz_mpoly_pow_ui(t, t, pow, ctx);
             fmpz_mpoly_mul(a, a, t, ctx);
         }

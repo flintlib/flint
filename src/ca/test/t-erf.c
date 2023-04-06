@@ -34,7 +34,7 @@ ca_randtest_zero(ca_t x, flint_rand_t state, ca_ctx_t ctx)
     }
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

@@ -52,7 +52,7 @@ acb_inv_naive(acb_t z, const acb_t x, slong prec)
 #undef d
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

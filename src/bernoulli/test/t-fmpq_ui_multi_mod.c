@@ -15,7 +15,7 @@
 #include "arith.h"
 #include "bernoulli.h"
 
-int main()
+int main(void)
 {
     flint_rand_t state;
     fmpz * num1;

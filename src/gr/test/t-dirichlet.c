@@ -1,7 +1,7 @@
 #include "ulong_extras.h"
 #include "gr.h"
 
-int main()
+int main(void)
 {
     gr_ctx_t G;
     int flags = GR_TEST_ALWAYS_ABLE;

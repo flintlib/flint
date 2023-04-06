@@ -33,7 +33,7 @@ sin_pi2_x(arb_ptr out, const arb_t inp, void * params, slong order, slong prec)
     return 0;
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

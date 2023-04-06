@@ -27,7 +27,7 @@ _fmpq_mat_sum_of_squares(fmpq_t res, const fmpq_mat_t Q)
     }
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

@@ -134,7 +134,7 @@ _acb_modular_hilbert_class_poly(fmpz_poly_t res, slong D,
 void
 acb_modular_hilbert_class_poly(fmpz_poly_t res, slong D)
 {
-    slong i, a, b, c, ac, h, qbf_alloc, qbf_len, prec;
+    slong i, a, b, c, ac, qbf_alloc, qbf_len, prec;
     slong * qbf;
     double lgh;
 
@@ -147,7 +147,6 @@ acb_modular_hilbert_class_poly(fmpz_poly_t res, slong D)
     qbf_alloc = qbf_len = 0;
     qbf = NULL;
     b = D & 1;
-    h = 0;
 
     /* Cohen algorithm 5.3.5 */
     do
@@ -172,7 +171,6 @@ acb_modular_hilbert_class_poly(fmpz_poly_t res, slong D)
                     qbf[3 * qbf_len + 0] = a;
                     qbf[3 * qbf_len + 1] = b;
                     qbf[3 * qbf_len + 2] = c;
-                    h += 1;
                 }
                 else
                 {
@@ -180,7 +178,6 @@ acb_modular_hilbert_class_poly(fmpz_poly_t res, slong D)
                     qbf[3 * qbf_len + 0] = a;
                     qbf[3 * qbf_len + 1] = -b;
                     qbf[3 * qbf_len + 2] = c;
-                    h += 2;
                 }
 
                 qbf_len++;

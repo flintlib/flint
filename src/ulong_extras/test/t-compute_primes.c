@@ -13,7 +13,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-int main()
+int main(void)
 {
     slong i, lim = 1000000;
     n_primes_t pg;

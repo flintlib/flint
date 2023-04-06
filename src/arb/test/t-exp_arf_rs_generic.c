@@ -15,7 +15,7 @@
    but it still makes sense to test them explicitly */
 void arb_exp_taylor_sum_rs_generic(arb_t s, const arb_t x, slong N, slong prec);
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

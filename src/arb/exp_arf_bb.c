@@ -151,7 +151,7 @@ _arb_vec_prod_bsplit_threaded(arb_t res, arb_srcptr vec, slong len, slong prec)
 void
 arb_exp_arf_bb(arb_t z, const arf_t x, slong prec, int minus_one)
 {
-    slong k, iter, bits, r, mag, q, wp, N;
+    slong k, bits, r, mag, q, wp, N;
     slong argred_bits, start_bits;
     slong num_threads;
     flint_bitcnt_t Qexp[1];
@@ -227,8 +227,7 @@ arb_exp_arf_bb(arb_t z, const arf_t x, slong prec, int minus_one)
     if (num_threads == 1 || prec >= 1e9)
     {
         /* Bit-burst loop. */
-        for (iter = 0, bits = start_bits; !fmpz_is_zero(t);
-            iter++, bits *= 2)
+        for (bits = start_bits; !fmpz_is_zero(t); bits *= 2)
         {
             /* Extract bits. */
             r = FLINT_MIN(bits, wp);
@@ -281,8 +280,7 @@ arb_exp_arf_bb(arb_t z, const arf_t x, slong prec, int minus_one)
         rs = flint_malloc(sizeof(slong) * FLINT_BITS);
 
         /* Bit-burst loop. */
-        for (iter = 0, bits = start_bits; !fmpz_is_zero(t);
-            iter++, bits *= 2)
+        for (bits = start_bits; !fmpz_is_zero(t); bits *= 2)
         {
             /* Extract bits. */
             r = FLINT_MIN(bits, wp);

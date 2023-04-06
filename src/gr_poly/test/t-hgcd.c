@@ -37,7 +37,7 @@ do {                                                            \
     }                                                           \
 } while (0)
 
-int main()
+int main(void)
 {
     int i, result;
     flint_rand_t state;

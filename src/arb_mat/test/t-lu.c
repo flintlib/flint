@@ -25,7 +25,7 @@ int fmpq_mat_is_invertible(const fmpq_mat_t A)
     return r;
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

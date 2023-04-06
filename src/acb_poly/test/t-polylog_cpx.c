@@ -248,7 +248,7 @@ const double polylog_testdata[NUM_TESTS][10] = {
     0.0780220225006149953, 0.0215283250955342792},
 };
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

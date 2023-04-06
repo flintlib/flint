@@ -216,7 +216,7 @@ void _flint_set_num_workers(int num_workers);
 int flint_set_num_workers(int num_workers);
 void flint_reset_num_workers(int max_workers);
 int flint_set_thread_affinity(int * cpus, slong length);
-int flint_restore_thread_affinity();
+int flint_restore_thread_affinity(void);
 
 FLINT_CONST double flint_test_multiplier(void);
 

@@ -22,7 +22,7 @@ static const signed char small_gaussian_primes[] = {
     5, 26, 15, 22, 2, 27, 9, 26
 };
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

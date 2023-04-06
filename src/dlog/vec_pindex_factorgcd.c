@@ -35,7 +35,7 @@ factor_until(ulong * n, ulong nlim, const ulong * p, ulong pmax, ulong * fp, int
 ulong
 dlog_vec_pindex_factorgcd(ulong * v, ulong nv, ulong p, nmod_t mod, ulong a, ulong na, ulong loga, ulong logm1, nmod_t order, int maxtry)
 {
-    int nm = 0, ng = 0;
+    int nm = 0;
     ulong pm, logm, pmax;
     ulong u[2], r[2], t;
     ulong up[15], rp[15];
@@ -64,7 +64,6 @@ dlog_vec_pindex_factorgcd(ulong * v, ulong nv, ulong p, nmod_t mod, ulong a, ulo
         i = 1; j = 0; /* flip flap */
         while (r[i] > u[i])
         {
-            ng++;
             if (r[i] < nv && v[r[i]] != DLOG_NOT_FOUND && u[i] < nv && v[u[i]] != DLOG_NOT_FOUND)
             {
                 /* early smooth detection: occurs for primes < 30 bits */

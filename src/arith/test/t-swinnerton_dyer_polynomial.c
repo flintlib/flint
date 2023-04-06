@@ -27,7 +27,7 @@ static const mp_limb_t known_values[] =
     UWORD(394942914)
 };
 
-int main()
+int main(void)
 {
     fmpz_poly_t S;
     mp_limb_t r;

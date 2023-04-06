@@ -271,7 +271,7 @@ const double agm_testdata[NUM_TESTS][6] = {
     {2, 2, 2, 2, 2.00000000000000, 2.00000000000000},
 };
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

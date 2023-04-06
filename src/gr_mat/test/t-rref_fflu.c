@@ -29,7 +29,7 @@ gr_mat_randrowops(gr_mat_t mat, flint_rand_t state, slong count, gr_ctx_t ctx)
     return status;
 }
 
-int main()
+int main(void)
 {
     slong iter;
     slong count_success = 0, count_unable = 0, count_domain = 0;

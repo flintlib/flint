@@ -16,7 +16,7 @@
 void arb_sin_cos_arf_rs_generic(arb_t res_sin, arb_t res_cos, const arf_t x, slong prec);
 void arb_sin_cos_taylor_sum_rs(arb_t s, const arb_t x, slong N, int cosine, slong prec);
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

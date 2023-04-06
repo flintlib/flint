@@ -26,7 +26,7 @@ _gr_vec_write(gr_stream_t out, gr_srcptr vec, slong len, gr_ctx_t ctx)
             gr_stream_write(out, ", ");
     }
     gr_stream_write(out, "]");
-    return GR_SUCCESS;
+    return status;
 }
 
 int

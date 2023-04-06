@@ -18,7 +18,7 @@ void _acb_hypgeom_legendre_q_single(acb_t res, const acb_t n, const acb_t m,
 void _acb_hypgeom_legendre_q_double(acb_t res, const acb_t n, const acb_t m,
     const acb_t z, slong prec);
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

@@ -25,7 +25,7 @@ ca_poly_truncate(ca_poly_t poly, slong newlen, ca_ctx_t ctx)
     }
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

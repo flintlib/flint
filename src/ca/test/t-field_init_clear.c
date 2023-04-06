@@ -13,7 +13,7 @@
 #include "ca_ext.h"
 #include "ca_field.h"
 
-int main()
+int main(void)
 {
     flint_rand_t state;
 

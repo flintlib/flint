@@ -49,7 +49,7 @@ acb_modular_epsilon_arg_naive(fmpq_t arg, const psl2z_t g)
 #undef d
 }
 
-int main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

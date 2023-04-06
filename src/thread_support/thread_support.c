@@ -17,7 +17,7 @@
 /* Automatically initialised to zero when threads are started */
 FLINT_TLS_PREFIX int _flint_num_workers = 0;
 
-int flint_get_num_threads()
+int flint_get_num_threads(void)
 {
     return _flint_num_workers + 1;
 }
@@ -78,7 +78,7 @@ int flint_set_thread_affinity(int * cpus, slong length)
 }
 
 /* return zero for success, nonzero for error */
-int flint_restore_thread_affinity()
+int flint_restore_thread_affinity(void)
 {
     if (!global_thread_pool_initialized)
         return 1;

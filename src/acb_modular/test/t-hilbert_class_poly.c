@@ -114,7 +114,7 @@ static const int hilbert_poly_values_2[] = {
     0, 0,
 };
 
-int main()
+int main(void)
 {
     flint_printf("hilbert_class_poly....");
     fflush(stdout);
