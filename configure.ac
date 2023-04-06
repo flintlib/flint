@@ -938,6 +938,7 @@ AC_MSG_RESULT([$enable_fft_small])
 if test "$enable_fft_small" = "yes";
 then
     AC_SUBST(FFT_SMALL, [fft_small\ \ \ ])
+    AC_DEFINE(FLINT_HAVE_FFT_SMALL, 1, [Define to use the fft_small module])
 else
     AC_SUBST(FFT_SMALL, [\ \ \ \ \ \ \ \ \ \ \ \ ])
 fi
