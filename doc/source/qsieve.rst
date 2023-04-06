@@ -91,14 +91,6 @@
     Call for initialization of polynomial, sieving, and scanning of sieve
     for all the possible polynomials for particular hypercube i.e. `A`.
 
-.. function:: void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y)
-
-    Write a relation to the file. Format is as follows,
-    first write large prime, in case of full relation it is 1, then write exponent
-    of small primes, then write number of factor followed by offset of factor in
-    factor base and their exponent and at last value of `Q(x)` for particular relation.
-    each relation is written in new line.
-
 .. function:: hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime)
 
     Return the pointer to the location of 'prime' is hash table if it exist, else
@@ -107,11 +99,6 @@
 .. function:: void qsieve_add_to_hashtable(qs_t qs_inf, mp_limb_t prime)
     
     Add 'prime' to the hast table.
-
-.. function:: relation_t qsieve_parse_relation(qs_t qs_inf, char * str)
-
-    Given a string representation of relation from the file, parse it to obtain
-    all the parameters of relation.
 
 .. function:: relation_t qsieve_merge_relation(qs_t qs_inf, relation_t  a, relation_t  b)
 

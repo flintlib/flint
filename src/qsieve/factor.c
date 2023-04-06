@@ -229,6 +229,13 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
         flint_throw(FLINT_ERROR, "fdopen failed\n");
 #endif
 
+    /* Initialize file */
+    {
+        mp_limb_t zero = 0;
+        fwrite(&zero, sizeof(mp_limb_t), 1, (FILE *) qs_inf->siqs);
+        fseek((FILE *) qs_inf->siqs, 0, SEEK_SET);
+    }
+
     for (j = qs_inf->small_primes; j < qs_inf->num_primes; j++)
     {
         if (qs_inf->factor_base[j].p > BLOCK_SIZE)
@@ -388,6 +395,14 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
                     qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "w");
                     if (qs_inf->siqs == NULL)
                         flint_throw(FLINT_ERROR, "fopen fail\n");
+
+                    /* Initialize file */
+                    {
+                        mp_limb_t zero = 0;
+                        fwrite(&zero, sizeof(mp_limb_t), 1, (FILE *) qs_inf->siqs);
+                        fseek((FILE *) qs_inf->siqs, 0, SEEK_SET);
+                    }
+
                     qs_inf->num_primes = num_primes; /* linear algebra adjusts this */
                     goto more_primes; /* factoring failed, may need more primes */
                 }

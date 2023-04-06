@@ -25,103 +25,46 @@
 #define HASH_MULT (2654435761U)       /* hash function, taken from 'msieve' */
 #define HASH(a) ((ulong)((((unsigned int) a) * HASH_MULT) >> (12)))
 
-/******************************************************************************
- *
- *  Some helper function, used for debugging
- *
- *****************************************************************************/
-
-/*
-    Display a relation for debugging purposes
-*/
-void qsieve_display_relation(qs_t qs_inf, relation_t a)
-{
-    slong i;
-
-    flint_printf("%wu ", a.lp);
-
-    for (i = 0; i < qs_inf->small_primes; i++)
-        flint_printf("%wd ", a.small[i]);
-
-    flint_printf("%wd ", a.num_factors);
-
-    for (i = 0; i < a.num_factors; i++)
-        flint_printf("%wd %wu ", a.factor[i].ind, a.factor[i].exp);
-
-    fmpz_print(a.Y);
-    flint_printf("\n");
-}
-
-/*
-    Check a relation is valid (debugging)
-*/
-int qsieve_is_relation(qs_t qs_inf, relation_t a)
-{
-    slong i;
-    fmpz_t temp, temp2;
-    fmpz_init(temp);
-    fmpz_init_set_ui(temp2, 1);
-
-    for (i = 0; i < qs_inf->small_primes; i++)
-    {
-        fmpz_set_si(temp, qs_inf->factor_base[i].p);
-        fmpz_pow_ui(temp, temp, a.small[i]);
-        fmpz_mul(temp2, temp2, temp);
-    }
-
-    if (a.num_factors > qs_inf->max_factors)
-    {
-        return 0;
-    }
-
-    for (i = 0; i < a.num_factors; i++)
-    {
-        fmpz_set_ui(temp, qs_inf->factor_base[a.factor[i].ind].p);
-        fmpz_pow_ui(temp, temp, a.factor[i].exp);
-        fmpz_mul(temp2, temp2, temp);
-    }
-
-    fmpz_mul_ui(temp2, temp2, a.lp);
-    fmpz_pow_ui(temp, a.Y, UWORD(2));
-    fmpz_mod(temp, temp, qs_inf->kn);
-    fmpz_mod(temp2, temp2, qs_inf->kn);
-
-    if (fmpz_cmp(temp, temp2) != 0)
-    {
-        return 0;
-    }
-
-    fmpz_clear(temp);
-    fmpz_clear(temp2);
-
-    return 1;
-}
-
 /*
     Write partial or full relation to file
 */
-void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y, qs_poly_t poly)
+void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, const fmpz_t Y, const qs_poly_t poly)
 {
-    slong i;
-    char * str = NULL;
     slong num_factors = poly->num_factors;
     slong * small = poly->small;
     fac_t * factor = poly->factor;
+    mp_limb_t writesize;
+    mp_srcptr limbs;
+    mp_limb_t limb[1];
+    slong sz;
 
-    flint_fprintf((FILE *) qs_inf->siqs, "%X ", prime); /* write large prime */
+    if (!COEFF_IS_MPZ(*Y))
+    {
+        *limb = FLINT_ABS(*Y);
+        limbs = limb;
+        sz = FLINT_SGN(*Y);
+    }
+    else
+    {
+        mpz_srcptr mY = COEFF_TO_PTR(*Y);
+        sz = mY->_mp_size;
+        limbs = mY->_mp_d;
+    }
 
-    for (i = 0; i < qs_inf->small_primes; i++) /* write small primes */
-        flint_fprintf((FILE *) qs_inf->siqs, "%X ", small[i]);
+    writesize = 1 + 1 + qs_inf->small_primes + 1 + num_factors + 1 + FLINT_MAX(FLINT_ABS(sz), 1);
+    fwrite(&writesize, sizeof(mp_limb_t), 1, (FILE *) qs_inf->siqs);
 
-    flint_fprintf((FILE *) qs_inf->siqs, "%X ", num_factors); /* write number of factors */
+    fwrite(&prime, sizeof(mp_limb_t), 1, (FILE *) qs_inf->siqs); /* write large prime */
+    fwrite(small, sizeof(mp_limb_t), qs_inf->small_primes, (FILE *) qs_inf->siqs); /* write small primes */
+    fwrite(&num_factors, sizeof(mp_limb_t), 1, (FILE *) qs_inf->siqs); /* write number of factors */
+    fwrite(factor, sizeof(fac_t), num_factors, (FILE *) qs_inf->siqs); /* write factor along with exponent */
 
-    for (i = 0; i < num_factors; i++) /* write factor along with exponent */
-        flint_fprintf((FILE *) qs_inf->siqs, "%wx %X ", factor[i].ind, factor[i].exp);
+    fwrite(&sz, sizeof(mp_limb_t), 1, (FILE *) qs_inf->siqs);
+    fwrite(limbs, sizeof(mp_limb_t), FLINT_MAX(FLINT_ABS(sz), 1), (FILE *) qs_inf->siqs);
 
-    str = fmpz_get_str(str, 16, Y); /* converting value of 'Y'  to hex */
-
-    flint_fprintf((FILE *) qs_inf->siqs, "%s\n", str); /* write value of 'Y' */
-    flint_free(str);
+    sz = 0;
+    fwrite(&sz, sizeof(mp_limb_t), 1, (FILE *) qs_inf->siqs);
+    fseek((FILE *) qs_inf->siqs, -((long int) sizeof(mp_limb_t)), SEEK_CUR);
 }
 
 /******************************************************************************
@@ -206,52 +149,58 @@ void qsieve_add_to_hashtable(qs_t qs_inf, mp_limb_t prime)
    given a string representing a relation, parse it to
    obtain relation
 */
-relation_t qsieve_parse_relation(qs_t qs_inf, char * str)
+relation_t qsieve_parse_relation(qs_t qs_inf, mp_limb_t writesize)
 {
-    slong i;
-    char * next;
     relation_t rel;
 
-    rel.lp = UWORD(1);
+    /* allocate */
     rel.small = flint_malloc(qs_inf->small_primes * sizeof(slong));
     rel.factor = flint_malloc(qs_inf->max_factors * sizeof(fac_t));
 
-    for (i = 0; i < qs_inf->small_primes; i++)
-    {
-        while (isspace(*str))
-            str++;
+    /* write_size and prime has already been read */
 
-        rel.small[i] = strtoul(str, &next, 16);
-        str = next;
-    }
+    /* read small */
+    fread(rel.small, sizeof(mp_limb_t), qs_inf->small_primes, (FILE *) qs_inf->siqs);
 
-    while (isspace(*str))
-        str++;
+    /* read num_factors */
+    fread(&(rel.num_factors), sizeof(mp_limb_t), 1, (FILE *) qs_inf->siqs);
 
-    rel.num_factors = strtoul(str, &next, 16);
+    /* set small_primes from qs_inf */
     rel.small_primes = qs_inf->small_primes;
-    str = next;
 
-    for (i = 0; i < rel.num_factors; i++)
-    {
-        while (isspace(*str))
-            str++;
+    /* read factor */
+    fread(rel.factor, sizeof(fac_t), rel.num_factors, (FILE *) qs_inf->siqs);
 
-        rel.factor[i].ind = strtoul(str, &next, 16);
-        str = next;
-
-        while (isspace(*str))
-            str++;
-
-        rel.factor[i].exp = strtoul(str, &next, 16);
-        str = next;
-    }
-
-    while (isspace(*str))
-        str++;
-
+    /* read Y */
     fmpz_init(rel.Y);
-    fmpz_set_str(rel.Y, str, 16);
+    {
+        slong sz = 0;
+        fread(&sz, sizeof(mp_limb_t), 1, (FILE *) qs_inf->siqs);
+        if (sz == 0)
+        {
+            fmpz_zero(rel.Y);
+            fseek((FILE *) qs_inf->siqs, sizeof(mp_limb_t), SEEK_CUR);
+        }
+        else if (sz == 1)
+        {
+            mp_limb_t limb = 0;
+            fread(&limb, sizeof(mp_limb_t), 1, (FILE *) qs_inf->siqs);
+            fmpz_set_ui(rel.Y, limb);
+        }
+        else if (sz == -1)
+        {
+            mp_limb_t limb = 0;
+            fread(&limb, sizeof(mp_limb_t), 1, (FILE *) qs_inf->siqs);
+            fmpz_neg_ui(rel.Y, limb);
+        }
+        else
+        {
+            mpz_ptr mY = _fmpz_promote(rel.Y);
+            mpz_realloc2(mY, FLINT_BITS * FLINT_ABS(sz));
+            fread(mY->_mp_d, sizeof(mp_limb_t), FLINT_ABS(sz), (FILE *) qs_inf->siqs);
+            mY->_mp_size = sz;
+        }
+    }
 
     return rel;
 }
@@ -490,8 +439,6 @@ void qsieve_insert_relation(qs_t qs_inf, relation_t * rel_list, slong num_relati
 */
 int qsieve_process_relation(qs_t qs_inf)
 {
-    char buf[1024];
-    char * str;
     slong i, num_relations = 0, num_relations2;
     slong rel_list_length;
     slong rlist_length;
@@ -509,9 +456,17 @@ int qsieve_process_relation(qs_t qs_inf)
     printf("Getting relations\n");
 #endif
 
-    while (fgets(buf, sizeof(buf), (FILE *) qs_inf->siqs) != NULL)
+    while (1)
     {
-        prime = strtoul(buf, &str, 16);
+        mp_limb_t write_size = 0;
+
+        if (!fread(&write_size, sizeof(mp_limb_t), 1, (FILE *) qs_inf->siqs))
+            break;
+
+        if (write_size == 0)
+            break;
+
+        fread(&prime, sizeof(mp_limb_t), 1, (FILE *) qs_inf->siqs);
         entry = qsieve_get_table_entry(qs_inf, prime);
 
         if (num_relations == rel_size)
@@ -522,7 +477,7 @@ int qsieve_process_relation(qs_t qs_inf)
 
         if (prime == 1 || entry->count >= 2)
         {
-            rel_list[num_relations] = qsieve_parse_relation(qs_inf, str);
+            rel_list[num_relations] = qsieve_parse_relation(qs_inf, write_size);
             rel_list[num_relations].lp = prime;
             num_relations++;
         }
