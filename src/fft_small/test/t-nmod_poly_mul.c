@@ -1,4 +1,6 @@
-
+#include "ulong_extras.h"
+#include "nmod.h"
+#include "nmod_poly.h"
 #include "fft_small.h"
 #include "profiler.h"
 

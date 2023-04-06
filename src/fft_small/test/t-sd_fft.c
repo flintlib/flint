@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "ulong_extras.h"
 #include "fft_small.h"
 #include "machine_vectors.h"
 
