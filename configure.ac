@@ -708,12 +708,22 @@ then
      [LIBS="-lopenblas $LIBS"],
      [AC_CHECK_LIB(blas,cblas_dgemm,
       [LIBS="-lblas $LIBS"],
-      [AC_MSG_ERROR([BLAS library was not found.  If you indeed have BLAS installed, please
+       [AC_CHECK_LIB(cblas,cblas_dgemm,
+       [LIBS="-lcblas -fopenmp $LIBS"],
+       [AC_CHECK_LIB(openblas,cblas_dgemm,
+        [LIBS="-lopenblas -fopenmp $LIBS"],
+        [AC_CHECK_LIB(blas,cblas_dgemm,
+         [LIBS="-lblas -fopenmp $LIBS"],
+         [AC_MSG_ERROR([BLAS library was not found.  If you indeed have BLAS installed, please
 submit a bug report to <https://github.com/flintlib/flint2/issues/> so
 that we can either fix the issue or give a more proper error message.])]
+         ,[-fopenmp])]
+        ,[-fopenmp])]
+       ,[-fopenmp])]
       )]
      )]
     )
+
 fi
 
 if test "$with_ntl" = "yes";
