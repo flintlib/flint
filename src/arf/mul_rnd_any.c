@@ -56,9 +56,9 @@ arf_mul_rnd_any(arf_ptr z, arf_srcptr x, arf_srcptr y,
         {
             tmp[zn - 1] = mpn_mul_1(tmp, xptr, xn, yptr[0]);
         }
-        else if ((yn) >= FLINT_FFT_MUL_THRESHOLD)
+        else if (yn >= FLINT_MPN_MUL_THRESHOLD)
         {
-            flint_mpn_mul_fft_main(tmp, xptr, xn, yptr, yn);
+            flint_mpn_mul_large(tmp, xptr, xn, yptr, yn);
         }
         else if (xn == yn)
         {

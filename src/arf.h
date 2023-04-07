@@ -723,7 +723,12 @@ void arf_randtest_special(arf_t x, flint_rand_t state, slong bits, slong mag_bit
 void arf_urandom(arf_t x, flint_rand_t state, slong bits, arf_rnd_t rnd);
 
 #define MUL_MPFR_MIN_LIMBS 25
+
+#ifdef FLINT_HAVE_FFT_SMALL
+#define MUL_MPFR_MAX_LIMBS 800
+#else
 #define MUL_MPFR_MAX_LIMBS 10000
+#endif
 
 #define ARF_MUL_STACK_ALLOC 40
 #define ARF_MUL_TLS_ALLOC 1000

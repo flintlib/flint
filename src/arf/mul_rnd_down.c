@@ -195,9 +195,9 @@ arf_mul_rnd_down(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec)
         alloc = zn = xn + yn;
         ARF_MUL_TMP_ALLOC(tmp, alloc)
 
-        if (yn >= FLINT_FFT_MUL_THRESHOLD)
+        if (yn >= FLINT_MPN_MUL_THRESHOLD)
         {
-            flint_mpn_mul_fft_main(tmp, xptr, xn, yptr, yn);
+            flint_mpn_mul_large(tmp, xptr, xn, yptr, yn);
         }
         else if (xn == yn)
         {
