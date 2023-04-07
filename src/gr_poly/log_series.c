@@ -61,11 +61,11 @@ _gr_poly_log_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx
         gr_ptr a;
         slong alloc;
 
-        alloc = len + (flen - 1) + 1;
+        alloc = (len - 1) + (flen - 1) + 1;
 
         GR_TMP_INIT_VEC(f_inv, alloc, ctx);
 
-        f_diff = GR_ENTRY(f_inv, len, sz);
+        f_diff = GR_ENTRY(f_inv, len - 1, sz);
 
         a = GR_ENTRY(f_diff, flen - 1, sz);
 
@@ -74,7 +74,7 @@ _gr_poly_log_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx
         if (status == GR_SUCCESS)
         {
             status |= _gr_poly_derivative(f_diff, f, flen, ctx);
-            status |= _gr_poly_div_series(f_inv, f_diff, flen - 1, f, flen, len, ctx);
+            status |= _gr_poly_div_series(f_inv, f_diff, flen - 1, f, flen, len - 1, ctx);
             status |= _gr_poly_integral(res, f_inv, len, ctx);
             gr_swap(res, a, ctx);
         }
