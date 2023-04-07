@@ -124,7 +124,10 @@ unsigned char flint_mpn_add_inplace_c(ulong* z, ulong zn, ulong* a, ulong an, un
     } while (i++, i < an);
 
     while (i < zn && cf != 0)
+    {
         cf = _addcarry_ulong(cf, z[i], 0, &z[i]);
+        i++;
+    }
 
     return cf;    
 }
