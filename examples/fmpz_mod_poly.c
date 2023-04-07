@@ -16,8 +16,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <gmp.h>
-
 #include "flint.h"
+#include "fmpz.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 
 int main(int argc, char* argv[])
