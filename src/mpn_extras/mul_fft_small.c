@@ -19,6 +19,7 @@
 #define FLINT_FFT_MUL_THRESHOLD 32000
 
 #define FLINT_FFT_SMALL_MUL_THRESHOLD 400
+#define FLINT_FFT_SMALL_SQR_THRESHOLD 800
 
 #ifdef FLINT_HAVE_FFT_SMALL
 
@@ -40,7 +41,7 @@ mpn_ctx_cleanup(void)
 mp_limb_t flint_mpn_mul_large(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
                         mp_srcptr i2, mp_size_t n2)
 {
-    if (n2 < FLINT_FFT_SMALL_MUL_THRESHOLD)
+    if (n2 < FLINT_FFT_SMALL_MUL_THRESHOLD || (i1 == i2 && n1 == n2 && n2 < FLINT_FFT_SMALL_SQR_THRESHOLD))
     {
         if (n1 == n2)
             if (i1 == i2)

@@ -92,6 +92,20 @@ void test_mul(mpn_ctx_t R, ulong minsize, ulong maxsize, ulong nreps, flint_rand
             }
         }
 
+        mpn_ctx_mpn_mul(R, d, b, bn, b, bn);
+        mpn_sqr(c, b, bn);
+        for (ulong i = 0; i < 2 * bn; i++)
+        {
+            if (c[i] != d[i])
+            {
+                flint_printf("\nFAILED (squaring)\n");
+                flint_printf("bn = %wu\n", bn);
+                flint_printf("limb[%wu] = 0x%wx should be 0x%wx\n", i, d[i], c[i]);
+                fflush(stdout);
+                flint_abort();
+            }
+        }
+
         flint_set_num_threads(1 + n_randint(state, 10));
     }
 
