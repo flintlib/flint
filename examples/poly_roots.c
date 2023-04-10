@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include "fmpz_poly_factor.h"
 #include "fmpq_poly.h"
 #include "acb.h"
 #include "arb_fmpz_poly.h"

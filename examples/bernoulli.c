@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include "fmpq.h"
 #include "arb.h"
 #include "bernoulli.h"
 #include "profiler.h"

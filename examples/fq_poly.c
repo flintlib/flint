@@ -16,6 +16,7 @@
 
 #include <time.h>
 #include <stdlib.h>
+#include "fmpz.h"
 #include "fq.h"
 #include "fq_poly.h"
 
@@ -30,10 +31,6 @@ int main(void)
 
     FLINT_TEST_INIT(state);
 
-    fq_poly_init(f, ctx);
-    fq_poly_init(g, ctx);
-    fq_poly_init(h, ctx);
-
     printf("Polynomial multiplication over GF(q)\n");
     printf("------------------------------------\n");
 
@@ -43,6 +40,10 @@ int main(void)
         fmpz_init_set_ui(p, 3);
         d = 2;
         fq_ctx_init_conway(ctx, p, d, "X");
+
+        fq_poly_init(f, ctx);
+        fq_poly_init(g, ctx);
+        fq_poly_init(h, ctx);
 
         fq_poly_randtest(g, state, 10000, ctx);
         fq_poly_randtest(h, state, 10000, ctx);
@@ -67,6 +68,10 @@ int main(void)
         c  = (double) (c1 - c0) / CLOCKS_PER_SEC;
         printf("KS: %fms\n", 10 * c);
 
+        fq_poly_clear(f, ctx);
+        fq_poly_clear(g, ctx);
+        fq_poly_clear(h, ctx);
+
         fq_ctx_clear(ctx);
         fmpz_clear(p);
     }
@@ -76,6 +81,10 @@ int main(void)
         fmpz_init_set_ui(p, 3);
         d = 263;
         fq_ctx_init_conway(ctx, p, d, "X");
+
+        fq_poly_init(f, ctx);
+        fq_poly_init(g, ctx);
+        fq_poly_init(h, ctx);
 
         fq_poly_randtest(g, state, 500, ctx);
         fq_poly_randtest(h, state, 500, ctx);
@@ -99,6 +108,10 @@ int main(void)
         c  = (double) (c1 - c0) / CLOCKS_PER_SEC;
         printf("KS: %fms\n", 10 * c);
 
+        fq_poly_clear(f, ctx);
+        fq_poly_clear(g, ctx);
+        fq_poly_clear(h, ctx);
+
         fq_ctx_clear(ctx);
         fmpz_clear(p);
     }
@@ -108,6 +121,10 @@ int main(void)
         fmpz_init_set_ui(p, 109987);
         d = 4;
         fq_ctx_init_conway(ctx, p, d, "X");
+
+        fq_poly_init(f, ctx);
+        fq_poly_init(g, ctx);
+        fq_poly_init(h, ctx);
 
         fq_poly_randtest(g, state, 4, ctx);
         fq_poly_randtest(h, state, 4, ctx);
@@ -132,6 +149,10 @@ int main(void)
         c1 = clock();
         c  = (double) (c1 - c0) / CLOCKS_PER_SEC;
         printf("KS: %f\xb5s\n", 10 * c);
+
+        fq_poly_clear(f, ctx);
+        fq_poly_clear(g, ctx);
+        fq_poly_clear(h, ctx);
 
         fq_ctx_clear(ctx);
         fmpz_clear(p);

@@ -68,42 +68,35 @@
         r3 += r2 < t1;                                      \
     } while (0)
 
-/* FLINT's FFT can beat GMP below this threshold but apparently
-   not consistently. Something needs retuning? */
-#define FLINT_FFT_MUL_THRESHOLD 32000
+#define FLINT_MPN_MUL_THRESHOLD 400
 
-/* Defined in fft.h */
-void flint_mpn_mul_fft_main(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
-                        mp_srcptr i2, mp_size_t n2);
+mp_limb_t flint_mpn_mul_large(mp_ptr r1, mp_srcptr i1, mp_size_t n1, mp_srcptr i2, mp_size_t n2);
 
 MPN_EXTRAS_INLINE mp_limb_t
 flint_mpn_mul(mp_ptr z, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn)
 {
-    if (yn < FLINT_FFT_MUL_THRESHOLD)
+    if (yn < FLINT_MPN_MUL_THRESHOLD)
         return mpn_mul(z, x, xn, y, yn);
     else
-    {
-        flint_mpn_mul_fft_main(z, x, xn, y, yn);
-        return z[xn + yn - 1];
-    }
+        return flint_mpn_mul_large(z, x, xn, y, yn);
 }
 
 MPN_EXTRAS_INLINE void
 flint_mpn_mul_n(mp_ptr z, mp_srcptr x, mp_srcptr y, mp_size_t n)
 {
-    if (n < FLINT_FFT_MUL_THRESHOLD)
+    if (n < FLINT_MPN_MUL_THRESHOLD)
         mpn_mul_n(z, x, y, n);
     else
-        flint_mpn_mul_fft_main(z, x, n, y, n);
+        flint_mpn_mul_large(z, x, n, y, n);
 }
 
 MPN_EXTRAS_INLINE void
 flint_mpn_sqr(mp_ptr z, mp_srcptr x, mp_size_t n)
 {
-    if (n < FLINT_FFT_MUL_THRESHOLD)
+    if (n < FLINT_MPN_MUL_THRESHOLD)
         mpn_sqr(z, x, n);
     else
-        flint_mpn_mul_fft_main(z, x, n, x, n);
+        flint_mpn_mul_large(z, x, n, x, n);
 }
 
 #define FLINT_MPN_MUL_WITH_SPECIAL_CASES(_z, _x, _xn, _y, _yn) \
@@ -122,8 +115,8 @@ flint_mpn_sqr(mp_ptr z, mp_srcptr x, mp_size_t n)
             __tt_y1 = (_y)[1]; \
             flint_mpn_mul_2x2((_z)[3], (_z)[2], (_z)[1], (_z)[0], __tt_x1, __tt_x0, __tt_y1, __tt_y0); \
         } \
-        else if ((_xn) >= FLINT_FFT_MUL_THRESHOLD) \
-            flint_mpn_mul_fft_main((_z), (_x), (_xn), (_y), (_yn)); \
+        else if ((_xn) >= FLINT_MPN_MUL_THRESHOLD) \
+            flint_mpn_mul_large((_z), (_x), (_xn), (_y), (_yn)); \
         else if ((_x) == (_y)) \
             mpn_sqr((_z), (_x), (_xn)); \
         else \
@@ -133,8 +126,8 @@ flint_mpn_sqr(mp_ptr z, mp_srcptr x, mp_size_t n)
     { \
         if ((_yn) == 1) \
             (_z)[(_xn) + (_yn) - 1] = mpn_mul_1((_z), (_x), (_xn), (_y)[0]); \
-        else if ((_yn) >= FLINT_FFT_MUL_THRESHOLD) \
-            flint_mpn_mul_fft_main((_z), (_x), (_xn), (_y), (_yn)); \
+        else if ((_yn) >= FLINT_MPN_MUL_THRESHOLD) \
+            flint_mpn_mul_large((_z), (_x), (_xn), (_y), (_yn)); \
         else \
             mpn_mul((_z), (_x), (_xn), (_y), (_yn)); \
     } \
@@ -142,11 +135,12 @@ flint_mpn_sqr(mp_ptr z, mp_srcptr x, mp_size_t n)
     { \
         if ((_xn) == 1) \
             (_z)[(_xn) + (_yn) - 1] = mpn_mul_1((_z), (_y), (_yn), (_x)[0]); \
-        else if ((_xn) >= FLINT_FFT_MUL_THRESHOLD) \
-            flint_mpn_mul_fft_main((_z), (_y), (_yn), (_x), (_xn)); \
+        else if ((_xn) >= FLINT_MPN_MUL_THRESHOLD) \
+            flint_mpn_mul_large((_z), (_y), (_yn), (_x), (_xn)); \
         else \
             mpn_mul((_z), (_y), (_yn), (_x), (_xn)); \
     }
+
 
 /*
     return the high limb of a two limb left shift by n < GMP_LIMB_BITS bits.

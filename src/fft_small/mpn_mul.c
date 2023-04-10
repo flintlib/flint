@@ -1043,15 +1043,15 @@ static void mpn_ctx_best_profile(
     ulong thread_limit = 8;
     ulong zn = an + bn;
 
-    if (zn < n_pow2(16-6))
+    if (zn < 2048)
         thread_limit = 1;
-    else if (zn < n_pow2(17-6))
+    else if (zn < 4096)
         thread_limit = 4;
-    else if (zn < n_pow2(18-6))
+    else if (zn < 8192)
         thread_limit = 5;
-    else if (zn < n_pow2(19-6))
+    else if (zn < 16384)
         thread_limit = 6;
-    else if (zn < n_pow2(20-6))
+    else if (zn < 32768)
         thread_limit = 7;
 
     P->nhandles = flint_request_threads(&P->handles, thread_limit);
@@ -1169,6 +1169,33 @@ void sd_fft_lctx_point_mul(
     }
 }
 
+void sd_fft_lctx_point_sqr(
+    const sd_fft_lctx_t Q,
+    double* a,
+    ulong m_,
+    ulong depth)
+{
+    vec8d m = vec8d_set_d(vec1d_reduce_0n_to_pmhn((slong)m_, Q->p));
+    vec8d n    = vec8d_set_d(Q->p);
+    vec8d ninv = vec8d_set_d(Q->pinv);
+    FLINT_ASSERT(depth >= LG_BLK_SZ);
+
+    for (ulong I = 0; I < n_pow2(depth - LG_BLK_SZ); I++)
+    {
+        double* ax = a + sd_fft_ctx_blk_offset(I);
+        ulong j = 0; do {
+            vec8d x0, x1;
+            x0 = vec8d_load(ax+j+0);
+            x1 = vec8d_load(ax+j+8);
+            x0 = vec8d_mulmod(x0, x0, n, ninv);
+            x1 = vec8d_mulmod(x1, x1, n, ninv);
+            x0 = vec8d_mulmod(x0, m, n, ninv);
+            x1 = vec8d_mulmod(x1, m, n, ninv);
+            vec8d_store(ax+j+0, x0);
+            vec8d_store(ax+j+8, x1);
+        } while (j += 16, j < BLK_SZ);
+    }
+}
 
 typedef struct {
     to_ffts_func to_ffts;
@@ -1191,6 +1218,7 @@ typedef struct {
     ulong b_stop_easy;
     ulong b_start_hard;
     ulong b_stop_hard;
+    int squaring;
 } mod_worker_struct;
 
 void mod_worker_func(void* varg)
@@ -1200,8 +1228,11 @@ void mod_worker_func(void* varg)
     X->to_ffts(X->ffts, X->abuf, X->stride, X->a, X->an, X->atrunc, X->two_pow_tab,
              X->a_start_easy, X->a_stop_easy, X->a_start_hard, X->a_stop_hard);
 
-    X->to_ffts(X->ffts, X->bbuf, X->stride, X->b, X->bn, X->btrunc, X->two_pow_tab,
-             X->b_start_easy, X->b_stop_easy, X->b_start_hard, X->b_stop_hard);
+    if (!X->squaring)
+    {
+        X->to_ffts(X->ffts, X->bbuf, X->stride, X->b, X->bn, X->btrunc, X->two_pow_tab,
+                 X->b_start_easy, X->b_stop_easy, X->b_start_hard, X->b_stop_hard);
+    }
 }
 
 typedef struct fft_worker_struct {
@@ -1214,6 +1245,7 @@ typedef struct fft_worker_struct {
     double* bbuf;
     ulong btrunc;
     struct fft_worker_struct* next;
+    int squaring;
 } fft_worker_struct;
 
 void fft_worker_func(void* varg)
@@ -1224,11 +1256,19 @@ void fft_worker_func(void* varg)
 
     do {
         sd_fft_lctx_init(Q, X->fctx, X->depth);
-        sd_fft_lctx_fft_trunc(Q, X->bbuf, X->depth, X->btrunc, X->ztrunc);
+
+        if (!X->squaring)
+            sd_fft_lctx_fft_trunc(Q, X->bbuf, X->depth, X->btrunc, X->ztrunc);
+
         sd_fft_lctx_fft_trunc(Q, X->abuf, X->depth, X->atrunc, X->ztrunc);
         NMOD_RED2(m, X->cop >> (64 - X->depth), X->cop << X->depth, X->fctx->mod);
         m = nmod_inv(m, X->fctx->mod);
-        sd_fft_lctx_point_mul(Q, X->abuf, X->bbuf, m, X->depth);
+
+        if (X->squaring)
+            sd_fft_lctx_point_sqr(Q, X->abuf, m, X->depth);
+        else
+            sd_fft_lctx_point_mul(Q, X->abuf, X->bbuf, m, X->depth);
+
         sd_fft_lctx_ifft_trunc(Q, X->abuf, X->depth, X->ztrunc);
         sd_fft_lctx_clear(Q, X->fctx);
     } while (X = X->next, X != NULL);
@@ -1250,6 +1290,7 @@ typedef struct mod_fft_worker_struct {
     double* bbuf;
     ulong btrunc;
     struct mod_fft_worker_struct* next;
+    int squaring;
 } mod_fft_worker_struct;
 
 void mod_fft_worker_func(void* varg)
@@ -1260,13 +1301,24 @@ void mod_fft_worker_func(void* varg)
 
     do {
         sd_fft_lctx_init(Q, X->fctx, X->depth);
-        slow_mpn_to_fft(Q, X->bbuf, X->btrunc, X->b, X->bn, X->bits, X->two_pow_tab);
-        sd_fft_lctx_fft_trunc(Q, X->bbuf, X->depth, X->btrunc, X->ztrunc);
+
+        if (!X->squaring)
+        {
+            slow_mpn_to_fft(Q, X->bbuf, X->btrunc, X->b, X->bn, X->bits, X->two_pow_tab);
+            sd_fft_lctx_fft_trunc(Q, X->bbuf, X->depth, X->btrunc, X->ztrunc);
+        }
+
         slow_mpn_to_fft(Q, X->abuf, X->atrunc, X->a, X->an, X->bits, X->two_pow_tab);
         sd_fft_lctx_fft_trunc(Q, X->abuf, X->depth, X->atrunc, X->ztrunc);
+
         NMOD_RED2(m, X->cop >> (64 - X->depth), X->cop << X->depth, X->fctx->mod);
         m = nmod_inv(m, X->fctx->mod);
-        sd_fft_lctx_point_mul(Q, X->abuf, X->bbuf, m, X->depth);
+
+        if (X->squaring)
+            sd_fft_lctx_point_mul(Q, X->abuf, X->abuf, m, X->depth);
+        else
+            sd_fft_lctx_point_mul(Q, X->abuf, X->bbuf, m, X->depth);
+
         sd_fft_lctx_ifft_trunc(Q, X->abuf, X->depth, X->ztrunc);
         sd_fft_lctx_clear(Q, X->fctx);
     } while (X = X->next, X != NULL);
@@ -1304,6 +1356,7 @@ void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong* z, ulong* a, ulong an, ulong* b, ulong 
     profile_entry P;
     ulong sz;
     void* worker_struct_buffer;
+    int squaring;
 
     mpn_ctx_best_profile(R, &P, an, bn);
 
@@ -1313,6 +1366,7 @@ void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong* z, ulong* a, ulong an, ulong* b, ulong 
     sz = n_max(sz, sizeof(crt_worker_struct)*P.nthreads);
     worker_struct_buffer = flint_malloc(sz);
 
+    squaring = (a == b) && (an == bn);
     zn = an + bn;
     alen = n_cdiv(FLINT_BITS*an, P.bits);
     blen = n_cdiv(FLINT_BITS*bn, P.bits);
@@ -1393,6 +1447,7 @@ timeit_start(timer);
             X->a_stop_hard  = (i + 1 == nthreads) ? a_stop_hard : atrunc;
             X->b_start_hard = (i + 1 == nthreads) ? b_stop_easy : btrunc;
             X->b_stop_hard  = (i + 1 == nthreads) ? b_stop_hard : btrunc;
+            X->squaring = squaring;
         }
 
         for (slong i = P.nhandles; i > 0; i--)
@@ -1442,6 +1497,7 @@ timeit_start(timer);
             X->bbuf = bbuf + l*stride;
             X->btrunc = btrunc;
             X->next = (l + nthreads < P.np) ? X + nthreads : NULL;
+            X->squaring = squaring;
         }
 
         for (ulong i = n_min(P.nhandles, P.np - 1); i > 0; i--)
@@ -1490,6 +1546,7 @@ timeit_start(timer);
             X->btrunc = btrunc;
             X->two_pow_tab = R->slow_two_pow_tab[l];
             X->next = (l + nthreads < np) ? X + nthreads : NULL;
+            X->squaring = squaring;
         }
 
         for (ulong i = n_min(P.nhandles, P.np - 1); i > 0; i--)

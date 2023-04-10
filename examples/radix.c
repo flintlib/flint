@@ -19,8 +19,9 @@
 #include <stdio.h>
 #include <time.h>
 #include <gmp.h>
-
 #include "flint.h"
+#include "fmpz.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 
 int main(void)
