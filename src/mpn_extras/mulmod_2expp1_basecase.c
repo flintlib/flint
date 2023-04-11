@@ -12,6 +12,8 @@
 #include "flint.h"
 #include "mpn_extras.h"
 
+int using_the_fft = 0;
+
 /* ret + (xp,n) = (yp,n)*(zp,n) % 2^b+1
    needs (tp,2n) temp space, everything reduced mod 2^b
    inputs, outputs are fully reduced
@@ -27,7 +29,17 @@ flint_mpn_mulmod_2expp1_internal(mp_ptr xp, mp_srcptr yp, mp_srcptr zp,
     n = BITS_TO_LIMBS(b);
     k = GMP_NUMB_BITS * n - b;
 
-    mpn_mul_n(tp, yp, zp, n);
+    if (using_the_fft)
+    {
+        flint_mpn_mul_large(tp, yp, n, zp, n);
+    }
+    else
+    {
+        if (yp == zp)
+            mpn_sqr(tp, yp, n);
+        else
+            mpn_mul_n(tp, yp, zp, n);
+    }
 
     if (k == 0)
     {
