@@ -745,9 +745,6 @@ _gr_acb_rsqrt(acb_t res, const acb_t x, const gr_ctx_t ctx)
     }
 }
 
-int _arb_trunc(arb_t res, const arb_t x, slong prec);
-int _arb_nint(arb_t res, const arb_t x, slong prec);
-
 int
 _gr_acb_floor(acb_t res, const acb_t x, const gr_ctx_t ctx)
 {
@@ -767,15 +764,17 @@ _gr_acb_ceil(acb_t res, const acb_t x, const gr_ctx_t ctx)
 int
 _gr_acb_trunc(acb_t res, const acb_t x, const gr_ctx_t ctx)
 {
+    arb_trunc(acb_realref(res), acb_realref(x), ACB_CTX_PREC(ctx));
     arb_zero(acb_imagref(res));
-    return _arb_trunc(acb_realref(res), acb_realref(x), ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
 }
 
 int
 _gr_acb_nint(acb_t res, const acb_t x, const gr_ctx_t ctx)
 {
     arb_zero(acb_imagref(res));
-    return _arb_nint(acb_realref(res), acb_realref(x), ACB_CTX_PREC(ctx));
+    arb_nint(acb_realref(res), acb_realref(x), ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
 }
 
 int
