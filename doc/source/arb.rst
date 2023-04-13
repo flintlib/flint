@@ -545,11 +545,13 @@ Radius and interval operations
     within a reasonable range before calling this method.
 
 .. function:: void arb_floor(arb_t y, const arb_t x, slong prec)
+              void arb_ceil(arb_t y, const arb_t x, slong prec)
+              void arb_trunc(arb_t y, const arb_t x, slong prec)
+              void arb_nint(arb_t y, const arb_t x, slong prec)
 
-.. function:: void arb_ceil(arb_t y, const arb_t x, slong prec)
-
-    Sets *y* to a ball containing `\lfloor x \rfloor` and `\lceil x \rceil`
-    respectively, with the midpoint of *y* rounded to at most *prec* bits.
+    Sets *y* to a ball containing respectively, `\lfloor x \rfloor` and
+    `\lceil x \rceil`, `\operatorname{trunc}(x)`, `\operatorname{nint}(x)`,
+    with the midpoint of *y* rounded to at most *prec* bits.
 
 .. function:: void arb_get_fmpz_mid_rad_10exp(fmpz_t mid, fmpz_t rad, fmpz_t exp, const arb_t x, slong n)
 

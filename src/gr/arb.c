@@ -769,93 +769,17 @@ _gr_arb_ceil(arb_t res, const arb_t x, const gr_ctx_t ctx)
 }
 
 int
-_arb_trunc(arb_t res, const arb_t x, slong prec)
-{
-    if (arb_contains_zero(x))
-    {
-        arb_t a;
-        arb_init(a);
-
-        mag_one(arb_radref(a));
-
-        if (arb_contains(a, x))
-        {
-            arb_zero(res);
-        }
-        else
-        {
-            arb_t b;
-            arb_init(b);
-            arb_floor(a, x, prec);
-            arb_ceil(b, x, prec);
-            arb_union(res, a, b, prec);
-            arb_clear(b);
-        }
-
-        arb_clear(a);
-    }
-    else if (arf_sgn(arb_midref(x)) > 0)
-    {
-        arb_floor(res, x, prec);
-    }
-    else
-    {
-        arb_ceil(res, x, prec);
-    }
-
-    return GR_SUCCESS;
-}
-
-int
-_arb_nint(arb_t res, const arb_t x, slong prec)
-{
-    if (arb_is_int(x))
-    {
-        arb_set(res, x);
-    }
-    else
-    {
-        arb_t t, u;
-        arb_init(t);
-        arb_init(u);
-
-        arb_set_d(t, 0.5);
-        arb_add(t, x, t, prec);
-
-        arb_mul_2exp_si(u, x, 1);
-        arb_sub_ui(u, u, 1, prec);
-        arb_mul_2exp_si(u, u, -2);
-
-        arb_floor(res, t, prec);
-
-        /* nint(x) = floor(x+0.5) - isint((2*x-1)/4) */
-
-        if (arb_is_int(u))
-        {
-            arb_sub_ui(res, res, 1, prec);
-        }
-        else if (arb_contains_int(u))
-        {
-            arf_one(arb_midref(u));
-            mag_one(arb_radref(u));
-            arb_mul_2exp_si(u, u, -1);
-            arb_sub_ui(res, res, 1, prec);
-        }
-    }
-
-    return GR_SUCCESS;
-}
-
-int
 _gr_arb_trunc(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
-    return _arb_trunc(res, x, ARB_CTX_PREC(ctx));
+    arb_trunc(res, x, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
 }
 
 int
 _gr_arb_nint(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
-    return _arb_nint(res, x, ARB_CTX_PREC(ctx));
+    arb_nint(res, x, ARB_CTX_PREC(ctx));
+    return GR_SUCCESS;
 }
 
 int

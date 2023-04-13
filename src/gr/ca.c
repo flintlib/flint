@@ -858,9 +858,6 @@ _gr_ca_ceil(ca_t res, const ca_t x, gr_ctx_t ctx)
 
 /* todo: trunc, nint in calcium */
 
-int _arb_trunc(arb_t res, const arb_t x, slong prec);
-int _arb_nint(arb_t res, const arb_t x, slong prec);
-
 int
 _gr_ca_trunc(ca_t res, const ca_t x, gr_ctx_t ctx)
 {
