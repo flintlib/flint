@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014, 2018 Fredrik Johansson
+    Copyright (C) 2014, 2018, 2024 Fredrik Johansson
 
     This file is part of Arb.
 
@@ -10,6 +10,153 @@
 */
 
 #include "arb.h"
+
+/* We do Newton iteration in floating-point arithmetic with some
+   guard bits. With GUARD_BITS = 32 the result is certainly accurate
+   to more than GUARD_BITS / 2 extra bits. With a detailed error
+   analysis this could be set much more conservatively
+   (see e.g. MPFR's algorithms documentation), but currently
+   we only care about extremely high precision and we always
+   start from an extremely high precision initial value,
+   so fine-tuning the precision management isn't going to help
+   performance a whole lot. */
+#define GUARD_BITS 32
+#define INV_NEWTON_CUTOFF 24000
+#define DIV_NEWTON_CUTOFF 70000
+
+#ifdef FLINT_HAVE_FFT_SMALL
+#define WANT_NEWTON(prec, xbits, ybits) (prec) >= INV_NEWTON_CUTOFF && (ybits) > (prec) * 0.5 && ((xbits) < (prec) * 0.01 || (prec) >= DIV_NEWTON_CUTOFF)
+#else
+#define WANT_NEWTON(prec, xbits, ybits) 0
+#endif
+
+void
+_arf_inv_newton(arf_t res, const arf_t x, slong prec)
+{
+    slong wp = prec + GUARD_BITS;
+    slong hp = prec / 2 + GUARD_BITS;
+
+    if (prec < INV_NEWTON_CUTOFF)
+    {
+        arf_set_round(res, x, wp, ARF_RND_DOWN);
+        arf_ui_div(res, 1, res, wp, ARF_RND_DOWN);
+    }
+    else
+    {
+        arf_t r, t;
+
+        arf_init(r);
+        arf_init(t);
+
+        _arf_inv_newton(r, x, hp);
+
+        /* r - r*(x*r - 1) */
+
+        if (arf_bits(x) <= wp)
+        {
+            arf_mul(t, x, r, wp, ARF_RND_DOWN);
+        }
+        else
+        {
+            arf_set_round(t, x, wp, ARF_RND_DOWN);
+            arf_mul(t, t, r, wp, ARF_RND_DOWN);
+        }
+
+        arf_sub_ui(t, t, 1, hp, ARF_RND_DOWN);
+        arf_mul(t, t, r, hp, ARF_RND_DOWN);
+        arf_sub(res, r, t, wp, ARF_RND_DOWN);
+
+        arf_clear(r);
+        arf_clear(t);
+    }
+}
+
+/* Karp-Markstein */
+void
+_arf_div_newton(arf_t res, const arf_t x, const arf_t y, slong prec)
+{
+    arf_t xn, yn, t;
+
+    slong wp = prec + GUARD_BITS;
+    slong hp = prec / 2 + GUARD_BITS;
+
+    arf_init(xn);
+    arf_init(yn);
+    arf_init(t);
+
+    _arf_inv_newton(xn, y, hp);
+    arf_set_round(t, x, hp, ARF_RND_DOWN);
+    arf_mul(yn, xn, t, hp, ARF_RND_DOWN);
+    arf_mul(t, y, yn, wp, ARF_RND_DOWN);
+    arf_sub(t, x, t, hp, ARF_RND_DOWN);
+    arf_mul(t, t, xn, hp, ARF_RND_DOWN);
+    arf_add(res, yn, t, wp, ARF_RND_DOWN);
+
+    arf_clear(xn);
+    arf_clear(yn);
+    arf_clear(t);
+}
+
+void
+arb_div_newton(arb_t res, const arb_t x, const arb_t y, slong prec)
+{
+    mag_t zr, xm, ym, yl, yw;
+
+    if (arf_is_special(arb_midref(x)) || arf_is_special(arb_midref(y)))
+    {
+        arb_indeterminate(res);
+        return;
+    }
+
+    mag_init_set_arf(xm, arb_midref(x));
+    mag_init_set_arf(ym, arb_midref(y));
+    mag_init(zr);
+    mag_init(yl);
+    mag_init(yw);
+
+    /* (|x|*yrad + |y|*xrad)/(|y|*(|y|-yrad)) */
+    mag_mul(zr, xm, arb_radref(y));
+    mag_addmul(zr, ym, arb_radref(x));
+    arb_get_mag_lower(yw, y);
+    arf_get_mag_lower(yl, arb_midref(y));
+    mag_mul_lower(yl, yl, yw);
+    mag_div(zr, zr, yl);
+
+    _arf_div_newton(arb_midref(res), arb_midref(x), arb_midref(y), prec);
+    arf_mag_add_ulp(arb_radref(res), zr, arb_midref(res), prec + GUARD_BITS / 2);
+    arb_set_round(res, res, prec);
+
+    mag_clear(xm);
+    mag_clear(ym);
+    mag_clear(zr);
+    mag_clear(yl);
+    mag_clear(yw);
+}
+
+void
+arb_div_arf_newton(arb_t res, const arb_t x, const arf_t y, slong prec)
+{
+    mag_t zr, ym;
+
+    if (arf_is_special(arb_midref(x)) || arf_is_special(y))
+    {
+        arb_indeterminate(res);
+        return;
+    }
+
+    mag_init(ym);
+    mag_init(zr);
+
+    arf_get_mag_lower(ym, y);
+    mag_div(zr, arb_radref(x), ym);
+
+    _arf_div_newton(arb_midref(res), arb_midref(x), y, prec);
+    arf_mag_add_ulp(arb_radref(res), zr, arb_midref(res), prec + GUARD_BITS / 2);
+    arb_set_round(res, res, prec);
+
+    mag_clear(ym);
+    mag_clear(zr);
+}
 
 void
 arb_div_arf(arb_t z, const arb_t x, const arf_t y, slong prec)
@@ -50,6 +197,10 @@ arb_div_arf(arb_t z, const arb_t x, const arf_t y, slong prec)
             arf_mag_set_ulp(arb_radref(z), arb_midref(z), prec);
         else
             mag_zero(arb_radref(z));
+    }
+    else if (WANT_NEWTON(prec, arb_bits(x), arf_bits(y)))
+    {
+        arb_div_arf_newton(z, x, y, prec);
     }
     else
     {
@@ -175,6 +326,10 @@ arb_div(arb_t z, const arb_t x, const arb_t y, slong prec)
         if (acc <= 20)
         {
             arb_div_wide(z, x, y, prec);
+        }
+        else if (WANT_NEWTON(prec, arb_bits(x), arb_bits(y)))
+        {
+            arb_div_newton(z, x, y, prec);
         }
         else
         {
@@ -332,18 +487,27 @@ arb_div_fmpz(arb_t z, const arb_t x, const fmpz_t y, slong prec)
     }
 }
 
-
 void
 arb_fmpz_div_fmpz(arb_t z, const fmpz_t x, const fmpz_t y, slong prec)
 {
-    int inexact;
-
-    inexact = arf_fmpz_div_fmpz(arb_midref(z), x, y, prec, ARB_RND);
-
-    if (inexact)
-        arf_mag_set_ulp(arb_radref(z), arb_midref(z), prec);
+    if (WANT_NEWTON(prec, fmpz_bits(x), fmpz_bits(y)))
+    {
+        arb_t t;
+        arb_init(t);
+        arb_set_round_fmpz(t, y, prec + 10);
+        arb_set_round_fmpz(z, x, prec + 10);
+        arb_div_newton(z, z, t, prec);
+        arb_clear(t);
+    }
     else
-        mag_zero(arb_radref(z));
+    {
+        int inexact = arf_fmpz_div_fmpz(arb_midref(z), x, y, prec, ARB_RND);
+
+        if (inexact)
+            arf_mag_set_ulp(arb_radref(z), arb_midref(z), prec);
+        else
+            mag_zero(arb_radref(z));
+    }
 }
 
 void
@@ -356,3 +520,57 @@ arb_ui_div(arb_t z, ulong x, const arb_t y, slong prec)
     arb_clear(t);
 }
 
+void
+_arb_fmpz_divapprox_newton(fmpz_t res, const fmpz_t x, const fmpz_t y)
+{
+    slong xb, yb, zb, prec;
+    arf_t t, u;
+
+    xb = fmpz_bits(x);
+    yb = fmpz_bits(y);
+    zb = xb - yb;
+    prec = FLINT_MAX(zb, 0) + 16;
+
+    arf_init(t);
+    arf_init(u);
+
+    arf_set_round_fmpz(t, x, prec, ARF_RND_NEAR);
+    arf_set_round_fmpz(u, y, prec, ARF_RND_NEAR);
+    _arf_div_newton(t, t, u, prec);
+    arf_get_fmpz(res, t, ARF_RND_NEAR);
+
+    arf_clear(t);
+    arf_clear(u);
+}
+
+void
+arb_fmpz_divapprox(fmpz_t res, const fmpz_t x, const fmpz_t y)
+{
+#ifdef FLINT_HAVE_FFT_SMALL
+    if (!COEFF_IS_MPZ(*x) || !COEFF_IS_MPZ(*y))
+    {
+        fmpz_tdiv_q(res, x, y);
+    }
+    else
+    {
+        slong xb, yb;
+
+        xb = mpz_size(COEFF_TO_PTR(*x));
+        yb = mpz_size(COEFF_TO_PTR(*y));
+
+        xb *= FLINT_BITS;
+        yb *= FLINT_BITS;
+
+        if (xb - yb >= DIV_NEWTON_CUTOFF && yb >= DIV_NEWTON_CUTOFF)
+        {
+            _arb_fmpz_divapprox_newton(res, x, y);
+        }
+        else
+        {
+            fmpz_tdiv_q(res, x, y);
+        }
+    }
+#else
+    fmpz_tdiv_q(res, x, y);
+#endif
+}
