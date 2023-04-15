@@ -1315,7 +1315,7 @@ void mod_fft_worker_func(void* varg)
         m = nmod_inv(m, X->fctx->mod);
 
         if (X->squaring)
-            sd_fft_lctx_point_mul(Q, X->abuf, X->abuf, m, X->depth);
+            sd_fft_lctx_point_sqr(Q, X->abuf, m, X->depth);
         else
             sd_fft_lctx_point_mul(Q, X->abuf, X->bbuf, m, X->depth);
 

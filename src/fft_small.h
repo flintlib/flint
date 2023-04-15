@@ -268,6 +268,9 @@ FLINT_INLINE void sd_fft_lctx_clear(sd_fft_lctx_t LQ, sd_fft_ctx_t Q)
 
 FLINT_DLL void sd_fft_lctx_point_mul(const sd_fft_lctx_t Q,
                             double* a, const double* b, ulong m_, ulong depth);
+FLINT_DLL void sd_fft_lctx_point_sqr(const sd_fft_lctx_t Q,
+                            double* a, ulong m_, ulong depth);
+
 
 FLINT_INLINE void sd_fft_lctx_fft_trunc(sd_fft_lctx_t Q, double* d, ulong depth, ulong itrunc, ulong otrunc)
 {

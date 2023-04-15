@@ -38,6 +38,23 @@ mpn_ctx_cleanup(void)
     }
 }
 
+#include "nmod.h"
+#include "nmod_poly.h"
+
+void
+flint_nmod_poly_mul_mid_fft_small(mp_ptr res, slong zl, slong zh, mp_srcptr a, slong an, mp_srcptr b, slong bn, nmod_t mod)
+{
+    if (!default_mpn_ctx_initialized)
+    {
+        mpn_ctx_init(default_mpn_ctx, UWORD(0x0003f00000000001));
+        flint_register_cleanup_function(mpn_ctx_cleanup);
+        default_mpn_ctx_initialized = 1;
+    }
+
+    _nmod_poly_mul_mid_mpn_ctx(res, zl, zh, a, an, b, bn, mod, default_mpn_ctx);
+}
+
+
 mp_limb_t flint_mpn_mul_large(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
                         mp_srcptr i2, mp_size_t n2)
 {
