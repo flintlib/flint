@@ -100,3 +100,14 @@ nmod_poly_inv_series_newton(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
     _nmod_poly_normalise(Qinv);
 }
 
+void
+_nmod_poly_inv_series(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
+{
+    _nmod_poly_inv_series_newton(Qinv, Q, Qlen, n, mod);
+}
+
+void
+nmod_poly_inv_series(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
+{
+    nmod_poly_inv_series_newton(Qinv, Q, n);
+}

@@ -637,18 +637,8 @@ void _nmod_poly_inv_series_newton(mp_ptr Qinv,
 void nmod_poly_inv_series_newton(nmod_poly_t Qinv,
                                                  const nmod_poly_t Q, slong n);
 
-NMOD_POLY_INLINE
-void _nmod_poly_inv_series(mp_ptr Qinv, mp_srcptr Q,
-                                               slong Qlen, slong n, nmod_t mod)
-{
-    _nmod_poly_inv_series_newton(Qinv, Q, Qlen, n, mod);
-}
-
-NMOD_POLY_INLINE
-void nmod_poly_inv_series(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
-{
-    nmod_poly_inv_series_newton(Qinv, Q, n);
-}
+void _nmod_poly_inv_series(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod);
+void nmod_poly_inv_series(nmod_poly_t Qinv, const nmod_poly_t Q, slong n);
 
 void _nmod_poly_div_series_basecase(mp_ptr Q, mp_srcptr A,
                      slong Alen, mp_srcptr B, slong Blen, slong n, nmod_t mod);

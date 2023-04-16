@@ -14,20 +14,15 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_div_series_basecase(mp_ptr Qinv, mp_srcptr P, slong Plen,
-                                mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
+_nmod_poly_div_series_basecase_preinv1(mp_ptr Qinv, mp_srcptr P, slong Plen,
+                                mp_srcptr Q, slong Qlen, slong n, mp_limb_t q, nmod_t mod)
 {
-    mp_limb_t q;
     slong i, j, l;
     int nlimbs;
     mp_limb_t s;
 
     Plen = FLINT_MIN(Plen, n);
     Qlen = FLINT_MIN(Qlen, n);
-
-    q = Q[0];
-    if (q != 1)
-        q = n_invmod(q, mod.n);
 
     if (Qlen == 1)
     {
@@ -36,7 +31,7 @@ _nmod_poly_div_series_basecase(mp_ptr Qinv, mp_srcptr P, slong Plen,
     }
     else
     {
-        Qinv[0] = n_mulmod2_preinv(q, P[0], mod.n, mod.ninv);
+        Qinv[0] = nmod_mul(q, P[0], mod);
 
         nlimbs = _nmod_vec_dot_bound_limbs(FLINT_MIN(n, Qlen), mod);
 
@@ -47,16 +42,29 @@ _nmod_poly_div_series_basecase(mp_ptr Qinv, mp_srcptr P, slong Plen,
             NMOD_VEC_DOT(s, j, l, Q[j + 1], Qinv[i - 1 - j], mod, nlimbs);
 
             if (i < Plen)
-                s = n_submod(P[i], s, mod.n);
+                s = nmod_sub(P[i], s, mod);
             else
-                s = n_negmod(s, mod.n);
+                s = nmod_neg(s, mod);
 
             if (q != 1)
-                Qinv[i] = n_mulmod2_preinv(s, q, mod.n, mod.ninv);
+                Qinv[i] = nmod_mul(s, q, mod);
             else
                 Qinv[i] = s;
         }
     }
+}
+
+void
+_nmod_poly_div_series_basecase(mp_ptr Qinv, mp_srcptr P, slong Plen,
+                                mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
+{
+    mp_limb_t q;
+
+    q = Q[0];
+    if (q != 1)
+        q = n_invmod(q, mod.n);
+
+    _nmod_poly_div_series_basecase_preinv1(Qinv, P, Plen, Q, Qlen, n, q, mod);
 }
 
 void

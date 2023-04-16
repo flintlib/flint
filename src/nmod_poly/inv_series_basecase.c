@@ -14,14 +14,10 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_inv_series_basecase(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
+_nmod_poly_inv_series_basecase_preinv1(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, mp_limb_t q, nmod_t mod)
 {
-    mp_limb_t q;
-
     Qlen = FLINT_MIN(Qlen, n);
 
-    q = Q[0];
-    if (q != 1) q = n_invmod(q, mod.n);
     Qinv[0] = q;
 
     if (Qlen == 1)
@@ -42,11 +38,23 @@ _nmod_poly_inv_series_basecase(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nm
             NMOD_VEC_DOT(s, j, l, Q[j + 1], Qinv[i - 1 - j], mod, nlimbs);
 
             if (q == 1)
-                Qinv[i] = n_negmod(s, mod.n);
+                Qinv[i] = nmod_neg(s, mod);
             else
-                Qinv[i] = n_negmod(n_mulmod2_preinv(s, q, mod.n, mod.ninv), mod.n);
+                Qinv[i] = nmod_neg(nmod_mul(s, q, mod), mod);
         }
     }
+}
+
+void
+_nmod_poly_inv_series_basecase(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
+{
+    mp_limb_t q;
+
+    q = Q[0];
+    if (q != 1)
+        q = nmod_inv(q, mod);
+
+    _nmod_poly_inv_series_basecase_preinv1(Qinv, Q, Qlen, n, q, mod);
 }
 
 void
@@ -79,4 +87,3 @@ nmod_poly_inv_series_basecase(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
     Qinv->length = n;
     _nmod_poly_normalise(Qinv);
 }
-

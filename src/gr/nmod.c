@@ -987,6 +987,17 @@ _gr_nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA,
 }
 
 /* todo: unbalanced cutoffs */
+
+#ifdef FLINT_HAVE_FFT_SMALL
+
+static const short inv_series_cutoff_tab[64] = {36, 37, 40, 44, 42, 46, 50, 81, 97,
+  106, 133, 152, 292, 279, 279, 191, 191, 191, 191, 200, 191, 407, 388, 407, 407,
+  407, 407, 407, 266, 292, 292, 292, 231, 242, 279, 279, 292, 292, 279, 292,
+  292, 279, 292, 292, 292, 370, 370, 370, 370, 370, 370, 388, 407, 448,
+  427, 407, 427, 427, 427, 427, 388, 370, 370, 353, };
+
+#else
+
 static const short inv_series_cutoff_tab[64] = {38, 36, 38, 36, 41, 48, 49, 54, 60,
   102, 112, 150, 165, 172, 210, 272, 339, 378, 385, 442, 468, 557, 596,
   621, 710, 746, 756, 978, 768, 679, 700, 696, 620, 619, 642, 766, 901,
@@ -994,56 +1005,44 @@ static const short inv_series_cutoff_tab[64] = {38, 36, 38, 36, 41, 48, 49, 54, 
   1381, 1418, 1513, 1540, 1598, 1692, 1846, 1883, 1942, 1963, 1803,
   1788, 1861, 1881, 1920, };
 
-#if 0
+#endif
 
-static int
-_nmod_poly_inv_series_basecase_1(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
+void _nmod_poly_inv_series_basecase_preinv1(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, mp_limb_t q, nmod_t mod);
+void _nmod_poly_div_series_basecase_preinv1(mp_ptr Qinv, mp_srcptr P, slong Plen, mp_srcptr Q, slong Qlen, slong n, mp_limb_t q, nmod_t mod);
+
+int
+_gr_nmod_poly_inv_series_basecase(ulong * res,
+    const ulong * f, slong flen, slong n, gr_ctx_t ctx)
 {
     mp_limb_t q;
 
-    Qlen = FLINT_MIN(Qlen, n);
-
-    if (Q[0] == 1)
-        q = 1;
-    else if (n_gcdinv(&q, Q[0], mod.n) != 1)
-        return GR_DOMAIN;
-
-    Qinv[0] = q;
-
-    if (Qlen == 1)
+    q = f[0];
+    if (q != 1)
     {
-        _nmod_vec_zero(Qinv + 1, n - 1);
-    }
-    else
-    {
-        slong i, j, l;
-        int nlimbs;
-        mp_limb_t s;
-
-        nlimbs = _nmod_vec_dot_bound_limbs(FLINT_MIN(n, Qlen), mod);
-
-        for (i = 1; i < n; i++)
-        {
-            l = FLINT_MIN(i, Qlen - 1);
-            NMOD_VEC_DOT(s, j, l, Q[j + 1], Qinv[i - 1 - j], mod, nlimbs);
-
-            if (q == 1)
-                Qinv[i] = n_negmod(s, mod.n);
-            else
-                Qinv[i] = n_negmod(n_mulmod2_preinv(s, q, mod.n, mod.ninv), mod.n);
-        }
+        if (n_gcdinv(&q, q, NMOD_CTX(ctx).n) != 1)
+            return GR_DOMAIN;
     }
 
+    _nmod_poly_inv_series_basecase_preinv1(res, f, flen, n, q, NMOD_CTX(ctx));
     return GR_SUCCESS;
 }
 
-#define INV_SERIES_BASECASE _nmod_poly_inv_series_basecase_1(res, f, flen, n, NMOD_CTX(ctx))
+int
+_gr_nmod_poly_div_series_basecase(ulong * res,
+    const ulong * f, slong flen, const ulong * g, slong glen, slong n, gr_ctx_t ctx)
+{
+    mp_limb_t q;
 
-#else
+    q = g[0];
+    if (q != 1)
+    {
+        if (n_gcdinv(&q, q, NMOD_CTX(ctx).n) != 1)
+            return GR_DOMAIN;
+    }
 
-#define INV_SERIES_BASECASE _gr_poly_inv_series_basecase(res, f, flen, n, ctx)
-
-#endif
+    _nmod_poly_div_series_basecase_preinv1(res, f, flen, g, glen, n, q, NMOD_CTX(ctx));
+    return GR_SUCCESS;
+}
 
 int
 _gr_nmod_poly_inv_series(ulong * res,
@@ -1056,18 +1055,31 @@ _gr_nmod_poly_inv_series(ulong * res,
     cutoff = inv_series_cutoff_tab[NMOD_BITS(NMOD_CTX(ctx)) - 1];
 
     if (flen < cutoff)
-        return INV_SERIES_BASECASE;
+        return _gr_poly_inv_series_basecase(res, f, flen, n, ctx);
     else
         return _gr_poly_inv_series_newton(res, f, flen, n, cutoff, ctx);
 }
 
 /* todo: unbalanced cutoffs */
+
+#ifdef FLINT_HAVE_FFT_SMALL
+
+static const short div_series_cutoff_tab[64] = {
+  85, 81, 85, 89, 106, 145, 166, 182, 210, 337, 321, 321, 306, 321, 321, 306, 321, 321,
+  321, 306, 626, 597, 597, 597, 597, 597, 597, 597, 370, 388, 388, 407, 321, 321, 321,
+  321, 321, 337, 321, 337, 321, 321, 337, 321, 337, 427, 427, 448, 427, 427, 448, 448,
+  470, 470, 470, 470, 470, 470, 493, 470, 427, 470, 448, 448, };
+
+#else
+
 static const short div_series_cutoff_tab[64] = {
   64, 64, 63, 65, 77, 84, 140, 158, 197, 208, 276, 243, 348, 358, 450, 560, 585, 692,
   749, 787, 864, 922, 914, 1239, 1454, 1424, 1449, 1327, 1115, 1174, 1250, 1282, 961,
   981, 1000, 1091, 1138, 1222, 1205, 1374, 1397, 1420, 1446, 1486, 1513, 1763, 1782,
   1890, 2047, 2071, 2075, 2271, 2192, 2307, 2407, 2324, 2308, 2958, 3001, 2816,
   2747, 2985, 2970, 2871, };
+
+#endif
 
 int
 _gr_nmod_poly_div_series(ulong * res,
@@ -1088,11 +1100,24 @@ _gr_nmod_poly_div_series(ulong * res,
 
 
 /* todo: unbalanced cutoffs */
+
+#ifdef FLINT_HAVE_FFT_SMALL
+
+static const short rsqrt_series_cutoff_tab[64] = {3, 22, 24, 42, 36, 40, 44,
+    52, 89, 106, 139, 166, 174, 200, 191, 200, 191, 191, 191, 200, 306, 370,
+    353, 337, 337, 370, 370, 370, 292, 292, 279, 292, 231, 231, 220, 279,
+    292, 292, 279, 292, 292, 279, 292, 292, 292, 370, 370, 370, 370, 370,
+    370, 388, 407, 448, 427, 407, 427, 427, 427, 427, 388, 370, 370, 353, };
+
+#else
+
 static const short rsqrt_series_cutoff_tab[64] = {6, 22, 22, 24, 27, 28, 28, 58,
   77, 96, 116, 160, 232, 270, 315, 387, 402, 472, 502, 580, 627, 760, 824, 940,
   988, 1018, 1155, 1182, 938, 932, 925, 1016, 836, 891, 915, 960, 1038, 1101,
   1203, 1236, 1255, 1311, 1386, 1422, 1489, 1592, 1624, 1879, 1828, 2055, 2227,
   2369, 2156, 2361, 2415, 2472, 2581, 2719, 2679, 2302, 2199, 2455, 2440, 2356, };
+
+#endif
 
 int
 _gr_nmod_poly_rsqrt_series(ulong * res,
@@ -1110,6 +1135,18 @@ _gr_nmod_poly_rsqrt_series(ulong * res,
         return _gr_poly_rsqrt_series_newton(res, f, flen, n, cutoff, ctx);
 }
 
+#ifdef FLINT_HAVE_FFT_SMALL
+
+static const short sqrt_series_cutoff_tab[] = { 32767, 1353, 1353, 919,
+    1289, 1228, 1491, 1228, 1491, 1289, 1420, 1420, 1228, 1289, 1420,
+    1353, 1289, 1289, 1353, 4345, 4345, 2423, 2544, 4345, 4562, 2423,
+    4345, 2671, 1725, 1811, 1725, 3577, 1643, 1643, 1725, 1725, 1725,
+    3407, 3407, 1725, 1643, 1811, 3407, 3407, 4562, 3755, 3755, 3577,
+    3577, 4562, 3755, 3942, 3755, 3755, 4562, 4562, 4562, 4562, 3755,
+    3245, 3245, 2944, 3091, 2423, };
+
+#else
+
 static const short sqrt_series_cutoff_tab[] = { 32767, 632, 732, 928, 1443,
   1731, 2364, 2490, 2893, 3173, 5316, 5412, 5727, 6123, 6613, 7290, 7572,
   8023, 9114, 9105, 8656, 10645, 11290, 13223, 11507, 15489, 12328, 9338,
@@ -1117,6 +1154,8 @@ static const short sqrt_series_cutoff_tab[] = { 32767, 632, 732, 928, 1443,
   11623, 11971, 12577, 12207, 13886, 14160, 12200, 13207, 15943, 15320,
   14290, 15933, 15463, 14281, 15457, 15302, 17929, 18106, 17058, 14844,
   17740, 17916, 18640, 18093, 18638, };
+
+#endif
 
 /* todo: unbalanced cutoffs */
 int
@@ -1135,6 +1174,17 @@ _gr_nmod_poly_sqrt_series(ulong * res,
         return _gr_poly_sqrt_series_newton(res, f, flen, n, cutoff, ctx);
 }
 
+#ifdef FLINT_HAVE_FFT_SMALL
+
+static const short exp_series_mul_cutoff_tab[] = { 470, 470, 470, 470,
+    470, 470, 470, 470, 470, 266, 266, 231, 279, 292, 292, 266, 266,
+    254, 266, 266, 448, 470, 470, 448, 448, 470, 493, 470, 337, 321,
+    427, 321, 292, 292, 292, 292, 292, 292, 279, 292, 292, 292, 279,
+    279, 292, 448, 448, 427, 448, 448, 448, 448, 448, 448, 427, 448,
+    427, 448, 448, 448, 353, 407, 407, 353, };
+
+#else
+
 static const short exp_series_mul_cutoff_tab[] = {
     4, 4, 6, 12, 18, 38, 56, 57, 97, 121, 144, 145, 187, 228, 216, 286,
     315, 426, 505, 547, 620, 631, 649, 781, 931, 810, 950, 1066, 838, 714,
@@ -1142,6 +1192,20 @@ static const short exp_series_mul_cutoff_tab[] = {
     1046, 1040, 1203, 1296, 1342, 1327, 1389, 1555, 1568, 1644, 1676, 1725,
     1692, 1793, 2014, 1904, 2021, 2086, 2030, 2198,
 };
+
+#endif
+
+#ifdef FLINT_HAVE_FFT_SMALL
+
+static const short exp_series_newton_cutoff_tab[64] = { 470, 470, 470,
+    470, 470, 470, 517, 597, 689, 759, 689, 723, 626, 723, 723, 723,
+    723, 723, 723, 723, 1289, 1491, 1353, 1353, 1353, 1353, 1353, 1353,
+    964, 964, 1115, 1115, 835, 876, 876, 919, 876, 919, 919, 876, 919,
+    876, 835, 919, 919, 1228, 1170, 1289, 1228, 1228, 1353, 1353,
+    1353, 1228, 1228, 1228, 1289, 1353, 1228, 1170, 1115, 1115, 1170,
+    1353, };
+
+#else
 
 static const short exp_series_newton_cutoff_tab[64] = {
     4, 4, 6, 12, 18, 38, 68, 132, 258, 522, 1033, 1288, 1322, 1494, 1775,
@@ -1151,6 +1215,8 @@ static const short exp_series_newton_cutoff_tab[64] = {
     5341, 6363, 6415, 6343, 6395, 6444, 6433, 6358, 6939, 6794, 6782, 6837,
     6758, 6680,
 };
+
+#endif
 
 int
 _gr_nmod_poly_exp_series(ulong * res,
@@ -1347,7 +1413,9 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_nmod_poly_mullow},
     {GR_METHOD_POLY_DIVREM,     (gr_funcptr) _gr_nmod_poly_divrem},
     {GR_METHOD_POLY_INV_SERIES, (gr_funcptr) _gr_nmod_poly_inv_series},
+    {GR_METHOD_POLY_INV_SERIES_BASECASE, (gr_funcptr) _gr_nmod_poly_inv_series_basecase},
     {GR_METHOD_POLY_DIV_SERIES, (gr_funcptr) _gr_nmod_poly_div_series},
+    {GR_METHOD_POLY_DIV_SERIES_BASECASE, (gr_funcptr) _gr_nmod_poly_div_series_basecase},
     {GR_METHOD_POLY_RSQRT_SERIES, (gr_funcptr) _gr_nmod_poly_rsqrt_series},
     {GR_METHOD_POLY_SQRT_SERIES,  (gr_funcptr) _gr_nmod_poly_sqrt_series},
     {GR_METHOD_POLY_EXP_SERIES,  (gr_funcptr) _gr_nmod_poly_exp_series},

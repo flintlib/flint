@@ -197,19 +197,25 @@ WARN_UNUSED_RESULT int gr_poly_rem(gr_poly_t R, const gr_poly_t A, const gr_poly
 
 WARN_UNUSED_RESULT int _gr_poly_inv_series_newton(gr_ptr Qinv, gr_srcptr Q, slong Qlen, slong len, slong cutoff, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_inv_series_newton(gr_poly_t Qinv, const gr_poly_t Q, slong len, slong cutoff, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int _gr_poly_inv_series_basecase(gr_ptr Qinv, gr_srcptr Q, slong Qlen, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_inv_series_basecase_generic(gr_ptr Qinv, gr_srcptr Q, slong Qlen, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_inv_series_basecase(gr_poly_t Qinv, const gr_poly_t Q, slong len, gr_ctx_t ctx);
+
+GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_poly_inv_series_basecase(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx) { return GR_POLY_UNARY_TRUNC_OP(ctx, POLY_INV_SERIES_BASECASE)(res, f, flen, len, ctx); }
 GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_poly_inv_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx) { return GR_POLY_UNARY_TRUNC_OP(ctx, POLY_INV_SERIES)(res, f, flen, len, ctx); }
+
 WARN_UNUSED_RESULT int _gr_poly_inv_series_generic(gr_ptr Qinv, gr_srcptr Q, slong Qlen, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_inv_series(gr_poly_t Qinv, const gr_poly_t Q, slong len, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int _gr_poly_div_series_newton(gr_ptr res, gr_srcptr B, slong Blen, gr_srcptr A, slong Alen, slong len, slong cutoff, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_div_series_newton(gr_poly_t Q, const gr_poly_t A, const gr_poly_t B, slong len, slong cutoff, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int _gr_poly_div_series_basecase(gr_ptr Q, gr_srcptr A, slong Alen, gr_srcptr B, slong Blen, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_div_series_basecase_generic(gr_ptr Q, gr_srcptr A, slong Alen, gr_srcptr B, slong Blen, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_div_series_basecase(gr_poly_t Q, const gr_poly_t A, const gr_poly_t B, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_poly_div_series_invmul(gr_ptr Q, gr_srcptr A, slong Alen, gr_srcptr B, slong Blen, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_div_series_invmul(gr_poly_t Q, const gr_poly_t A, const gr_poly_t B, slong len, gr_ctx_t ctx);
+
+GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_poly_div_series_basecase(gr_ptr res, gr_srcptr f, slong flen, gr_srcptr g, slong glen, slong len, gr_ctx_t ctx) { return GR_POLY_BINARY_TRUNC_OP(ctx, POLY_DIV_SERIES_BASECASE)(res, f, flen, g, glen, len, ctx); }
 GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_poly_div_series(gr_ptr res, gr_srcptr f, slong flen, gr_srcptr g, slong glen, slong len, gr_ctx_t ctx) { return GR_POLY_BINARY_TRUNC_OP(ctx, POLY_DIV_SERIES)(res, f, flen, g, glen, len, ctx); }
+
 WARN_UNUSED_RESULT int _gr_poly_div_series_generic(gr_ptr Q, gr_srcptr A, slong Alen, gr_srcptr B, slong Blen, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_div_series(gr_poly_t Q, const gr_poly_t A, const gr_poly_t B, slong len, gr_ctx_t ctx);
 
