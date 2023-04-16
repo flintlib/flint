@@ -10,7 +10,24 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "nmod_poly.h"
+
+#ifdef FLINT_HAVE_FFT_SMALL
+
+void flint_nmod_poly_mul_mid_fft_small(mp_ptr res, slong zl, slong zh, mp_srcptr a, slong an, mp_srcptr b, slong bn, nmod_t mod);
+
+/* todo: separate squaring table */
+
+static short fft_mullow_tab[] = {1115, 1115, 597, 569, 407, 321, 306, 279, 191,
+182, 166, 159, 152, 145, 139, 89, 85, 78, 75, 75, 69, 174, 174, 166, 159,
+152, 152, 152, 97, 101, 106, 111, 101, 101, 101, 139, 145, 145, 139, 145,
+145, 139, 145, 145, 145, 182, 182, 182, 182, 182, 182, 191, 200, 220, 210,
+200, 210, 210, 210, 210, 191, 182, 182, 174, };
+
+#endif
+
+
 
 void _nmod_poly_mullow(mp_ptr res, mp_srcptr poly1, slong len1,
                              mp_srcptr poly2, slong len2, slong n, nmod_t mod)
@@ -26,7 +43,23 @@ void _nmod_poly_mullow(mp_ptr res, mp_srcptr poly1, slong len1,
         return;
     }
 
-    bits = FLINT_BITS - (slong) mod.norm;
+    if (n == len1 + len2 - 1)
+    {
+        _nmod_poly_mul(res, poly1, len1, poly2, len2, mod);
+        return;
+    }
+
+    bits = NMOD_BITS(mod);
+
+#ifdef FLINT_HAVE_FFT_SMALL
+
+    if (len2 >= fft_mullow_tab[bits - 1])
+    {
+        flint_nmod_poly_mul_mid_fft_small(res, 0, n, poly1, len1, poly2, len2, mod);
+        return;
+    }
+
+#endif
 
     if (n < 10 + bits * bits / 10)
         _nmod_poly_mullow_classical(res, poly1, len1, poly2, len2, n, mod);
