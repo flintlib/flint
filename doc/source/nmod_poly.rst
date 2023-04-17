@@ -2185,27 +2185,6 @@ of polynomial multiplication.
     Set `g = \log(h) + O(x^n)`. The case `h = 1+cx^r` is automatically
     detected and handled efficiently.
 
-.. function:: void _nmod_poly_exp_series_monomial_ui(mp_ptr g, mp_limb_t c, ulong r, slong n, nmod_t mod)
-
-    Set `g = \exp(cx^r) + O(x^n)`. Assumes `n > 0`, `r > 0`, and that
-    the coefficient is reduced by the modulus. Works efficiently
-    in linear time.
-
-.. function:: void nmod_poly_exp_series_monomial_ui(nmod_poly_t g, mp_limb_t c, ulong r, slong n)
-
-    Set `g = \exp(cx^r) + O(x^n)`. Works efficiently in linear time.
-
-.. function:: void _nmod_poly_exp_series_basecase(mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod)
-
-    Set `g = \exp(h) + O(x^n)` using a simple `O(n^2)` algorithm.
-    Assumes `n > 0` and `\operatorname{hlen} > 0`. Only the first
-    `\operatorname{hlen}` coefficients of `h` will be read.
-    Aliasing of `f` and `h` is allowed.
-
-.. function:: void nmod_poly_exp_series_basecase(nmod_poly_t g, const nmod_poly_t h, slong n)
-
-    Set `g = \exp(h) + O(x^n)` using a simple `O(n^2)` algorithm.
-
 .. function:: void _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, slong hlen, slong n, nmod_t mod)
 
     Set `f = \exp(h) + O(x^n)` where ``h`` is a polynomial. Assume

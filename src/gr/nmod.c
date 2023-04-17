@@ -957,7 +957,6 @@ _gr_nmod_poly_mullow(ulong * res,
 }
 
 /* fixme: duplicates _nmod_poly_divrem for error handling */
-/* todo: also overload div, rem */
 int
 _gr_nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA,
                                   mp_srcptr B, slong lenB, gr_ctx_t ctx)
@@ -979,14 +978,19 @@ _gr_nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA,
     }
     else
     {
+#ifdef FLINT_HAVE_FFT_SMALL
+        return _gr_poly_divrem_newton(Q, R, A, lenA, B, lenB, ctx);
+#else
         if (NMOD_BITS(NMOD_CTX(ctx)) >= 16 && lenB >= 1024 && lenA <= 16384)
             return _gr_poly_divrem_divconquer(Q, R, A, lenA, B, lenB, 16, ctx);
         else
             return _gr_poly_divrem_newton(Q, R, A, lenA, B, lenB, ctx);
+#endif
     }
 }
 
-/* todo: unbalanced cutoffs */
+/* basecase -> Newton cutoffs */
+/* todo: better unbalanced tuning */
 
 #ifdef FLINT_HAVE_FFT_SMALL
 
@@ -1008,7 +1012,6 @@ static const short inv_series_cutoff_tab[64] = {38, 36, 38, 36, 41, 48, 49, 54, 
 #endif
 
 void _nmod_poly_inv_series_basecase_preinv1(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, mp_limb_t q, nmod_t mod);
-void _nmod_poly_div_series_basecase_preinv1(mp_ptr Qinv, mp_srcptr P, slong Plen, mp_srcptr Q, slong Qlen, slong n, mp_limb_t q, nmod_t mod);
 
 int
 _gr_nmod_poly_inv_series_basecase(ulong * res,
@@ -1028,6 +1031,25 @@ _gr_nmod_poly_inv_series_basecase(ulong * res,
 }
 
 int
+_gr_nmod_poly_inv_series(ulong * res,
+    const ulong * f, slong flen, slong n, gr_ctx_t ctx)
+{
+    slong cutoff;
+
+    flen = FLINT_MIN(flen, n);
+
+    cutoff = inv_series_cutoff_tab[NMOD_BITS(NMOD_CTX(ctx)) - 1];
+
+    if (flen < cutoff)
+        return _gr_poly_inv_series_basecase(res, f, flen, n, ctx);
+    else
+        return _gr_poly_inv_series_newton(res, f, flen, n, cutoff, ctx);
+}
+
+
+void _nmod_poly_div_series_basecase_preinv1(mp_ptr Qinv, mp_srcptr P, slong Plen, mp_srcptr Q, slong Qlen, slong n, mp_limb_t q, nmod_t mod);
+
+int
 _gr_nmod_poly_div_series_basecase(ulong * res,
     const ulong * f, slong flen, const ulong * g, slong glen, slong n, gr_ctx_t ctx)
 {
@@ -1042,22 +1064,6 @@ _gr_nmod_poly_div_series_basecase(ulong * res,
 
     _nmod_poly_div_series_basecase_preinv1(res, f, flen, g, glen, n, q, NMOD_CTX(ctx));
     return GR_SUCCESS;
-}
-
-int
-_gr_nmod_poly_inv_series(ulong * res,
-    const ulong * f, slong flen, slong n, gr_ctx_t ctx)
-{
-    slong cutoff;
-
-    flen = FLINT_MIN(flen, n);
-
-    cutoff = inv_series_cutoff_tab[NMOD_BITS(NMOD_CTX(ctx)) - 1];
-
-    if (flen < cutoff)
-        return _gr_poly_inv_series_basecase(res, f, flen, n, ctx);
-    else
-        return _gr_poly_inv_series_newton(res, f, flen, n, cutoff, ctx);
 }
 
 /* todo: unbalanced cutoffs */

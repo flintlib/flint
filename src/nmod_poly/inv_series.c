@@ -1,5 +1,7 @@
 /*
-    Copyright (C) 2016 Fredrik Johansson
+    Copyright (C) 2011 William Hart
+    Copyright (C) 2011, 2016, 2023 Fredrik Johansson
+    Copyright (C) 2011 Sebastian Pancratz
 
     This file is part of FLINT.
 
@@ -12,6 +14,7 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "gr_poly.h"
 
 void
 _nmod_poly_inv_series_basecase_preinv1(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, mp_limb_t q, nmod_t mod)
@@ -58,6 +61,54 @@ _nmod_poly_inv_series_basecase(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nm
 }
 
 void
+_nmod_poly_inv_series(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
+{
+    Qlen = FLINT_MIN(Qlen, n);
+
+    if (Qlen <= 10)
+    {
+        _nmod_poly_inv_series_basecase(Qinv, Q, Qlen, n, mod);
+    }
+    else
+    {
+        gr_ctx_t ctx;
+        _gr_ctx_init_nmod(ctx, &mod);
+        GR_MUST_SUCCEED(_gr_poly_inv_series(Qinv, Q, Qlen, n, ctx));
+    }
+}
+
+void
+nmod_poly_inv_series(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
+{
+    slong Qlen = Q->length;
+
+    Qlen = FLINT_MIN(Qlen, n);
+
+    if (Qlen == 0)
+    {
+        flint_printf("Exception (nmod_poly_inv_series). Division by zero.\n");
+        flint_abort();
+    }
+
+    if (Qinv != Q)
+    {
+        nmod_poly_fit_length(Qinv, n);
+        _nmod_poly_inv_series(Qinv->coeffs, Q->coeffs, Qlen, n, Qinv->mod);
+    }
+    else
+    {
+        nmod_poly_t t;
+        nmod_poly_init2(t, Qinv->mod.n, n);
+        _nmod_poly_inv_series(t->coeffs, Q->coeffs, Qlen, n, Qinv->mod);
+        nmod_poly_swap(Qinv, t);
+        nmod_poly_clear(t);
+    }
+
+    Qinv->length = n;
+    _nmod_poly_normalise(Qinv);
+}
+
+void
 nmod_poly_inv_series_basecase(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
 {
     slong Qlen = Q->length;
@@ -86,4 +137,16 @@ nmod_poly_inv_series_basecase(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
 
     Qinv->length = n;
     _nmod_poly_normalise(Qinv);
+}
+
+void
+_nmod_poly_inv_series_newton(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
+{
+    _nmod_poly_inv_series(Qinv, Q, Qlen, n, mod);
+}
+
+void
+nmod_poly_inv_series_newton(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
+{
+    nmod_poly_inv_series(Qinv, Q, n);
 }
