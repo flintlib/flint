@@ -41,6 +41,7 @@ General utilities
    profiler.rst
    thread_pool.rst
    mpoly.rst
+   machine_vectors.rst
 
 Generic rings
 -----------------------------------------------------------------------
