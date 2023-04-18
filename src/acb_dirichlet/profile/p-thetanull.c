@@ -9,6 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
+#include <math.h>
 #include <string.h>
 #include "acb_dirichlet.h"
 

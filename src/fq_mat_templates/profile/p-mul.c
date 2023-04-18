@@ -11,7 +11,10 @@
 
 #ifdef T
 
+#include <stdlib.h>
+
 #include "flint.h"
+#include "fmpz.h"
 #include "templates.h"
 
 #include <math.h>

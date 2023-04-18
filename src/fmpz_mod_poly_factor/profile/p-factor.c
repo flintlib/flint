@@ -15,7 +15,10 @@
 
 #include "flint.h"
 #include "gmpcompat.h"
+#include "fmpz.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
+#include "fmpz_mod_poly_factor.h"
 
 #define NP 20  /* number of moduli */
 #define ND 8   /* number of degrees */

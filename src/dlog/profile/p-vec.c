@@ -10,6 +10,8 @@
 */
 
 #include <string.h>
+#include "nmod.h"
+#include "nmod_vec.h"
 #include "dlog.h"
 #include "profiler.h"
 

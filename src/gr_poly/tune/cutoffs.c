@@ -12,6 +12,7 @@
 #include "gr_special.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "ulong_extras.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 #include "nmod_poly.h"
@@ -19,6 +20,8 @@
 #include "fq_nmod.h"
 #include "fq_zech.h"
 #include "profiler.h"
+
+void _nmod_poly_mul_mid_default_mpn_ctx(mp_ptr res, slong zl, slong zh, mp_srcptr a, slong an, mp_srcptr b, slong bn, nmod_t mod);
 
 #define TIMEIT_END_REPEAT3(__timer, __reps, __min_time) \
             } \
@@ -35,7 +38,7 @@
         (twall) = __timer->wall*0.001 / __reps; \
     } while (0);
 
-#if 0
+#if 1
 #define INIT_CTX gr_ctx_init_nmod(ctx, n_nextprime(UWORD(1) << (bits - 1), 0));
 #define RANDCOEFF(t, ctx) GR_IGNORE(gr_set_ui(t, n_randlimb(state), ctx))
 #define STEP_BITS for (bits = 1, j = 0; bits <= 64; bits++, j++)
@@ -47,7 +50,7 @@
 #define STEP_BITS for (bits = 32, j = 0; bits <= 8192; bits *= 2, j++)
 #endif
 
-#if 1
+#if 0
 #define INIT_CTX fmpz_t t; fmpz_init(t); fmpz_ui_pow_ui(t, 2, bits - 1); fmpz_nextprime(t, t, 0); gr_ctx_init_fq(ctx, t, 2, "a"); fmpz_clear(t);
 #define RANDCOEFF(t, ctx) fq_rand(t, state, gr_ctx_data_as_ptr(ctx));
 #define STEP_BITS for (bits = 100, j = 1; bits <= 100; bits *= 2, j++)
@@ -135,7 +138,6 @@
 #define CASE_B GR_IGNORE(gr_poly_divrem_newton(C, D, A, B, ctx));
 #endif
 
-
 #if 0
 #define INFO "divrem (fmpz_mod basecase)"
 #define SETUP random_input(A, state, 2 * len, ctx); \
@@ -143,6 +145,36 @@
               GR_IGNORE(gr_poly_set_coeff_si(B, len - 1, 1, ctx));
 #define CASE_A GR_IGNORE(gr_poly_set(D, A, ctx)); fmpz_mod_poly_divrem_basecase(C, D, D, B, gr_ctx_data_as_ptr(ctx));
 #define CASE_B GR_IGNORE(gr_poly_set(D, A, ctx)); GR_IGNORE(gr_poly_divrem_newton(C, D, D, B, ctx));
+#endif
+
+#if 0
+#define INFO "mul (nmod)"
+#define SETUP random_input(A, state, len, ctx); \
+              random_input(B, state, len, ctx);
+#define CASE_A gr_poly_fit_length(C, A->length + B->length - 1, ctx); \
+               _nmod_poly_mul(C->coeffs, A->coeffs, A->length, B->coeffs, B->length, ((nmod_t *) gr_ctx_data_ptr(ctx))[0]);
+#define CASE_B gr_poly_fit_length(C, A->length + B->length - 1, ctx); \
+               flint_nmod_poly_mul_mid_fft_small(C->coeffs, 0, A->length + B->length - 1, A->coeffs, A->length, B->coeffs, B->length, ((nmod_t *) gr_ctx_data_ptr(ctx))[0]);
+#endif
+
+#if 0
+#define INFO "sqr (nmod)"
+#define SETUP random_input(A, state, len, ctx); \
+              random_input(B, state, len, ctx);
+#define CASE_A gr_poly_fit_length(C, A->length + A->length - 1, ctx); \
+               _nmod_poly_mul(C->coeffs, A->coeffs, A->length, A->coeffs, A->length, ((nmod_t *) gr_ctx_data_ptr(ctx))[0]);
+#define CASE_B gr_poly_fit_length(C, A->length + A->length - 1, ctx); \
+               flint_nmod_poly_mul_mid_fft_small(C->coeffs, 0, A->length + A->length - 1, A->coeffs, A->length, A->coeffs, A->length, ((nmod_t *) gr_ctx_data_ptr(ctx))[0]);
+#endif
+
+#if 0
+#define INFO "mullow (nmod)"
+#define SETUP random_input(A, state, len, ctx); \
+              random_input(B, state, len, ctx);
+#define CASE_A gr_poly_fit_length(C, A->length + B->length - 1, ctx); \
+               _nmod_poly_mullow(C->coeffs, A->coeffs, A->length, B->coeffs, B->length, B->length, ((nmod_t *) gr_ctx_data_ptr(ctx))[0]);
+#define CASE_B gr_poly_fit_length(C, A->length + B->length - 1, ctx); \
+               _nmod_poly_mul_mid_default_mpn_ctx(C->coeffs, 0, B->length, A->coeffs, A->length, B->coeffs, B->length, ((nmod_t *) gr_ctx_data_ptr(ctx))[0]);
 #endif
 
 
@@ -220,7 +252,7 @@ get_tuning(gr_ctx_t ctx, slong from)
 
     do
     {
-        for (len = from; len <= 32767; len = FLINT_MAX(len+1, len*1.01))
+        for (len = from; len <= 32767; len = FLINT_MAX(len+1, len*1.05))
         {
             speedup = get_profile(ctx, len);
 
@@ -231,7 +263,7 @@ get_tuning(gr_ctx_t ctx, slong from)
                 if (consecutive == 1)
                     cutoff = len;
 
-                if (consecutive == 3)
+                if (consecutive == 30)
                     break;
             }
             else
@@ -249,16 +281,17 @@ int main()
 {
     gr_ctx_t ctx;
     slong i, results[64], j;
-    slong bits, cutoff, prev_cutoff = 0;
+    slong bits, cutoff /*, prev_cutoff = 0 */;
 
     printf("%s\n", INFO);
 
     STEP_BITS
     {
         INIT_CTX
-        cutoff = get_tuning(ctx, FLINT_MAX(prev_cutoff * 0.75 - 5, 2));
+        /* cutoff = get_tuning(ctx, FLINT_MAX(prev_cutoff * 0.75 - 5, 2)); */
+        cutoff = get_tuning(ctx, 2);
         results[j] = cutoff;
-        prev_cutoff = cutoff;
+        /* prev_cutoff = cutoff; */
         flint_printf("bits = %wd  cutoff = %wd  accuracy = %f\n", bits, cutoff, get_profile(ctx, cutoff));
         flint_printf("tab[] = {");
         for (i = 0; i <= j; i++)

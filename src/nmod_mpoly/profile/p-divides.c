@@ -19,6 +19,7 @@ p-divides nthreads sparse m n:
                 (1+u+t+2*z^2+3*y^3+5*x^5)^n)
 */
 
+#include <stdlib.h>
 #include "profiler.h"
 #include "nmod_mpoly.h"
 

@@ -10,6 +10,7 @@
 */
 
 #include "flint.h"
+#include "ulong_extras.h"
 #include "fmpz.h"
 #include "mpoly.h"
 #include "fmpz_mpoly.h"

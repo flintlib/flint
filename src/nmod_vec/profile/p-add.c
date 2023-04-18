@@ -17,11 +17,11 @@
 
 void _nmod_vec_add_fast(mp_ptr res, mp_srcptr vec1, mp_srcptr vec2, slong len, nmod_t mod);
 
-#define NUMTYPES 2
+#define NUMTYPES 1
 
-void (* funcs[])(mp_ptr, mp_srcptr, mp_srcptr, slong, nmod_t) = {_nmod_vec_add, _nmod_vec_add_fast};
+void (* funcs[])(mp_ptr, mp_srcptr, mp_srcptr, slong, nmod_t) = {_nmod_vec_add /*, _nmod_vec_add_fast */};
 
-char * str[] = {"_nmod_vec_add", "_nmod_vec_add_fast"};
+char * str[] = {"_nmod_vec_add" /*, "_nmod_vec_add_fast" */};
 
 typedef struct
 {

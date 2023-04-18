@@ -20,7 +20,7 @@ void
 fmpz_mul_old(fmpz_t f, const fmpz_t g, const fmpz_t h)
 {
     fmpz c1, c2;
-    __mpz_struct *mpz_ptr;
+    __mpz_struct *z;
 
     c1 = *g;
 
@@ -38,12 +38,12 @@ fmpz_mul_old(fmpz_t f, const fmpz_t g, const fmpz_t h)
         return;
     }
 
-    mpz_ptr = _fmpz_promote(f); /* h is saved, g is already large */
+    z = _fmpz_promote(f); /* h is saved, g is already large */
 
     if (!COEFF_IS_MPZ(c2))      /* g is large, h is small */
-        flint_mpz_mul_si(mpz_ptr, COEFF_TO_PTR(c1), c2);
+        flint_mpz_mul_si(z, COEFF_TO_PTR(c1), c2);
     else                        /* c1 and c2 are large */
-        mpz_mul(mpz_ptr, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+        mpz_mul(z, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
 }
 
 void

@@ -10,6 +10,7 @@
 */
 
 #include "profiler.h"
+#include "fmpz.h"
 #include "aprcl.h"
 
 void p_is_prime_repeat(fmpz_t n)

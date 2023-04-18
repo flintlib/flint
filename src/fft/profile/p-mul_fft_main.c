@@ -11,6 +11,7 @@
 
 #include "flint.h"
 #include "ulong_extras.h"
+#include "mpn_extras.h"
 #include "fft.h"
 #include "profiler.h"
 

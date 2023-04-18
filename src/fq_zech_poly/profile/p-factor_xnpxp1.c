@@ -9,7 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
+#include "flint.h"
+#include "fmpz.h"
+#include "fq_zech.h"
 #include "fq_zech_poly.h"
+#include "fq_zech_poly_factor.h"
 
 #ifdef T
 #undef T

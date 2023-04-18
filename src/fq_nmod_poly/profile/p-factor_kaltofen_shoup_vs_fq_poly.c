@@ -15,8 +15,14 @@
 #include "ulong_extras.h"
 #include "profiler.h"
 
+#include "nmod_poly.h"
+#include "fmpz_poly.h"
+#include "fq.h"
 #include "fq_poly.h"
+#include "fq_poly_factor.h"
+#include "fq_nmod.h"
 #include "fq_nmod_poly.h"
+#include "fq_nmod_poly_factor.h"
 
 #define nalgs 2
 #define ncases 1

@@ -13,8 +13,10 @@
 
 #include "profiler.h"
 #include "flint.h"
-#include "fmpz_lll.h"
 #include "fmpz.h"
+#include "fmpz_mat.h"
+#include "fmpz_lll.h"
+#include "fmpq.h"
 #include "ulong_extras.h"
 
 typedef struct

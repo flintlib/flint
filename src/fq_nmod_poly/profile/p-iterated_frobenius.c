@@ -9,6 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
+#include "ulong_extras.h"
+#include "fmpz.h"
+#include "fq_nmod.h"
+#include "fq_nmod_mat.h"
 #include "fq_nmod_poly.h"
 
 #ifdef T

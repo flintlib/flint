@@ -14,6 +14,7 @@
 #include "profiler.h"
 #include "flint.h"
 #include "ulong_extras.h"
+#include "fq.h"
 #include "fq_poly.h"
 
 typedef struct

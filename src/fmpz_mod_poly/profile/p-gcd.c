@@ -14,6 +14,7 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 #include "ulong_extras.h"
 #include "profiler.h"
@@ -127,12 +128,14 @@ main(void)
 
                 timeit_start(t[0]);
                 for (l = 0; l < loops; l++)
-                    fmpz_mod_poly_gcd_euclidean(h, f, g, ctx);
+                    /* fmpz_mod_poly_gcd_euclidean(h, f, g, ctx); */
+                    fmpz_mod_poly_gcd(h, f, g, ctx);
                 timeit_stop(t[0]);
 
                 timeit_start(t[1]);
                 for (l = 0; l < loops; l++)
-                    fmpz_mod_poly_gcd_hgcd(h, f, g, ctx);
+                    /* fmpz_mod_poly_gcd_hgcd(h, f, g, ctx); */
+                    fmpz_mod_poly_gcd(h, f, g, ctx);
                 timeit_stop(t[1]);
 
                 for (c = 0; c < nalgs; c++)

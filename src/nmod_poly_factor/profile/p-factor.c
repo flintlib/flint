@@ -14,7 +14,9 @@
 #include <unistd.h>
 
 #include "flint.h"
+#include "ulong_extras.h"
 #include "nmod_poly.h"
+#include "nmod_poly_factor.h"
 
 #define NP 100  /* number of moduli */
 #define ND 8   /* number of degrees */
