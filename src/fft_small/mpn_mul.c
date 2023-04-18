@@ -1315,7 +1315,7 @@ void mod_fft_worker_func(void* varg)
         m = nmod_inv(m, X->fctx->mod);
 
         if (X->squaring)
-            sd_fft_lctx_point_mul(Q, X->abuf, X->abuf, m, X->depth);
+            sd_fft_lctx_point_sqr(Q, X->abuf, m, X->depth);
         else
             sd_fft_lctx_point_mul(Q, X->abuf, X->bbuf, m, X->depth);
 
@@ -1349,7 +1349,7 @@ void crt_worker_func(void* varg)
 }
 
 
-void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong* z, ulong* a, ulong an, ulong* b, ulong bn)
+void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong* z, const ulong* a, ulong an, const ulong* b, ulong bn)
 {
     ulong zn, alen, blen, zlen, atrunc, btrunc, ztrunc, depth, stride;
     double* abuf;

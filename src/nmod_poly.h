@@ -637,18 +637,8 @@ void _nmod_poly_inv_series_newton(mp_ptr Qinv,
 void nmod_poly_inv_series_newton(nmod_poly_t Qinv,
                                                  const nmod_poly_t Q, slong n);
 
-NMOD_POLY_INLINE
-void _nmod_poly_inv_series(mp_ptr Qinv, mp_srcptr Q,
-                                               slong Qlen, slong n, nmod_t mod)
-{
-    _nmod_poly_inv_series_newton(Qinv, Q, Qlen, n, mod);
-}
-
-NMOD_POLY_INLINE
-void nmod_poly_inv_series(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
-{
-    nmod_poly_inv_series_newton(Qinv, Q, n);
-}
+void _nmod_poly_inv_series(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod);
+void nmod_poly_inv_series(nmod_poly_t Qinv, const nmod_poly_t Q, slong n);
 
 void _nmod_poly_div_series_basecase(mp_ptr Q, mp_srcptr A,
                      slong Alen, mp_srcptr B, slong Blen, slong n, nmod_t mod);
@@ -1134,13 +1124,6 @@ void nmod_poly_tanh_series(nmod_poly_t g, const nmod_poly_t h, slong n);
 void _nmod_poly_log_series(mp_ptr res, mp_srcptr f, slong flen, slong n, nmod_t mod);
 void nmod_poly_log_series(nmod_poly_t res, const nmod_poly_t f, slong n);
 
-void _nmod_poly_exp_series_monomial_ui(mp_ptr res, mp_limb_t coeff,
-                ulong power, slong n, nmod_t mod);
-void nmod_poly_exp_series_monomial_ui(nmod_poly_t res, mp_limb_t coeff,
-                ulong power, slong n);
-
-void _nmod_poly_exp_series_basecase(mp_ptr f, mp_srcptr h, slong hlen, slong n, nmod_t mod);
-void nmod_poly_exp_series_basecase(nmod_poly_t f, const nmod_poly_t h, slong n);
 void  _nmod_poly_exp_expinv_series(mp_ptr f, mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod);
 void _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, slong hlen, slong n, nmod_t mod);
 void nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, slong n);

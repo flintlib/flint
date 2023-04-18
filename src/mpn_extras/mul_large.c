@@ -11,7 +11,6 @@
 
 #include "flint.h"
 #include "mpn_extras.h"
-
 #include "fft.h"
 
 /* FLINT's FFT can beat GMP below this threshold but apparently
@@ -21,22 +20,12 @@
 #define FLINT_FFT_SMALL_MUL_THRESHOLD 400
 #define FLINT_FFT_SMALL_SQR_THRESHOLD 800
 
+
+
+
 #ifdef FLINT_HAVE_FFT_SMALL
 
 #include "fft_small.h"
-
-FLINT_TLS_PREFIX mpn_ctx_t default_mpn_ctx;
-FLINT_TLS_PREFIX int default_mpn_ctx_initialized = 0;
-
-void
-mpn_ctx_cleanup(void)
-{
-    if (default_mpn_ctx_initialized)
-    {
-        default_mpn_ctx_initialized = 0;
-        mpn_ctx_clear(default_mpn_ctx);
-    }
-}
 
 mp_limb_t flint_mpn_mul_large(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
                         mp_srcptr i2, mp_size_t n2)
@@ -53,14 +42,7 @@ mp_limb_t flint_mpn_mul_large(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
     }
     else
     {
-        if (!default_mpn_ctx_initialized)
-        {
-            mpn_ctx_init(default_mpn_ctx, UWORD(0x0003f00000000001));
-            flint_register_cleanup_function(mpn_ctx_cleanup);
-            default_mpn_ctx_initialized = 1;
-        }
-
-        mpn_ctx_mpn_mul(default_mpn_ctx, r1, i1, n1, i2, n2);
+        mpn_mul_default_mpn_ctx(r1, i1, n1, i2, n2);
     }
 
     return r1[n1 + n2 - 1];
@@ -90,3 +72,4 @@ mp_limb_t flint_mpn_mul_large(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
 }
 
 #endif
+

@@ -344,6 +344,7 @@ typedef struct {
     crt_data_struct* crts;
     nmod_t mod;
     ulong ioff;
+    int squaring;
 } s1worker_struct;
 
 
@@ -377,27 +378,37 @@ void s1worker_func(void* varg)
 
         sd_fft_lctx_init(Q, X->ffts + ioff, X->depth);
 
-        if (nworkers > 0)
+        if (!X->squaring)
         {
-            X->ioff = ioff;
-            thread_pool_wake(global_thread_pool, handles[0], 0, extra_func, X);
-        }
-        else
-        {
-            _mod(bbuf, X->btrunc, X->b, X->bn, X->ffts + ioff, X->mod);
-            sd_fft_lctx_fft_trunc(Q, bbuf, X->depth, X->btrunc, X->ztrunc);
+            if (nworkers > 0)
+            {
+                X->ioff = ioff;
+                thread_pool_wake(global_thread_pool, handles[0], 0, extra_func, X);
+            }
+            else
+            {
+                _mod(bbuf, X->btrunc, X->b, X->bn, X->ffts + ioff, X->mod);
+                sd_fft_lctx_fft_trunc(Q, bbuf, X->depth, X->btrunc, X->ztrunc);
+            }
         }
 
         _mod(abuf, X->atrunc, X->a, X->an, X->ffts + ioff, X->mod);
         sd_fft_lctx_fft_trunc(Q, abuf, X->depth, X->atrunc, X->ztrunc);
 
-        if (nworkers > 0)
-            thread_pool_wait(global_thread_pool, handles[0]);
+        if (!X->squaring)
+        {
+            if (nworkers > 0)
+                thread_pool_wait(global_thread_pool, handles[0]);
+        }
 
         ulong cop = X->np == 1 ? 1 : *crt_data_co_prime_red(X->crts + X->np - 1, ioff);
         NMOD_RED2(m, cop >> (FLINT_BITS - X->depth), cop << X->depth, X->ffts[ioff].mod);
         m = nmod_inv(m, X->ffts[ioff].mod);
-        sd_fft_lctx_point_mul(Q, abuf, bbuf, m, X->depth);
+
+        if (X->squaring)
+            sd_fft_lctx_point_sqr(Q, abuf, m, X->depth);
+        else
+            sd_fft_lctx_point_mul(Q, abuf, bbuf, m, X->depth);
 
         sd_fft_lctx_ifft_trunc(Q, abuf, X->depth, X->ztrunc);
 
@@ -446,6 +457,7 @@ void _nmod_poly_mul_mid_mpn_ctx(
     ulong atrunc, btrunc, ztrunc;
     ulong i, np, depth, stride;
     double* buf;
+    int squaring;
 
     FLINT_ASSERT(an > 0);
     FLINT_ASSERT(bn > 0);
@@ -464,6 +476,8 @@ void _nmod_poly_mul_mid_mpn_ctx(
         flint_mpn_zero(z + zn - zl, zh - zn);
         zh = zn;
     }
+
+    squaring = (a == b) && (an == bn);
 
     FLINT_ASSERT(zl < zh);
     FLINT_ASSERT(zh <= zn);
@@ -520,8 +534,15 @@ got_np_and_offset:
 
     stride = n_round_up(sd_fft_ctx_data_size(depth), 128);
 
+    ulong want_threads;
+
+    if (bn < 1500)
+        want_threads = 1;
+    else
+        want_threads = np;
+
     thread_pool_handle* handles;
-    slong nworkers = flint_request_threads(&handles, np);
+    slong nworkers = flint_request_threads(&handles, want_threads);
     ulong nthreads = nworkers + 1;
 
     buf = (double*) mpn_ctx_fit_buffer(R, (np+nthreads)*stride*sizeof(double));
@@ -548,6 +569,7 @@ got_np_and_offset:
         X->ffts = R->ffts;
         X->crts = R->crts;
         X->mod = mod;
+        X->squaring = squaring;
     }
 
     for (i = nworkers; i > 0; i--)
@@ -674,8 +696,15 @@ got_np_and_offset:
 
     stride = n_round_up(sd_fft_ctx_data_size(depth), 128);
 
+    ulong want_threads;
+
+    if (bn < 1500)
+        want_threads = 1;
+    else
+        want_threads = np;
+
     thread_pool_handle* handles;
-    slong nworkers = flint_request_threads(&handles, np);
+    slong nworkers = flint_request_threads(&handles, want_threads);
     ulong nthreads = nworkers + 1;
 
     buf = (double*) mpn_ctx_fit_buffer(R, (np+nthreads)*stride*sizeof(double));
@@ -702,6 +731,7 @@ got_np_and_offset:
         X->ffts = R->ffts;
         X->crts = R->crts;
         X->mod = mod;
+        X->squaring = 0;
     }
 
     for (i = nworkers; i > 0; i--)
@@ -913,8 +943,15 @@ int _nmod_poly_mul_mid_precomp(
         return 0;
     }
 
+    ulong want_threads;
+
+    if (bn < 1500)
+        want_threads = 1;
+    else
+        want_threads = np;
+
     thread_pool_handle* handles;
-    slong nworkers = flint_request_threads(&handles, np);
+    slong nworkers = flint_request_threads(&handles, want_threads);
     ulong nthreads = nworkers + 1;
 
     buf = (double*) mpn_ctx_fit_buffer(R, np*M->stride*sizeof(double));
@@ -989,8 +1026,15 @@ void _nmod_poly_mul_mod_xpnm1_precomp(
 
     FLINT_ASSERT(an > 0);
 
+    ulong want_threads;
+
+    if (an < 1500)
+        want_threads = 1;
+    else
+        want_threads = np;
+
     thread_pool_handle* handles;
-    slong nworkers = flint_request_threads(&handles, np);
+    slong nworkers = flint_request_threads(&handles, want_threads);
     ulong nthreads = nworkers + 1;
 
     buf = (double*) mpn_ctx_fit_buffer(R, np*M->stride*sizeof(double));

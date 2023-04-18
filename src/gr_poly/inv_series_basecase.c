@@ -13,7 +13,7 @@
 #include "gr_poly.h"
 
 int
-_gr_poly_inv_series_basecase(gr_ptr Qinv, gr_srcptr Q, slong Qlen, slong len, gr_ctx_t ctx)
+_gr_poly_inv_series_basecase_generic(gr_ptr Qinv, gr_srcptr Q, slong Qlen, slong len, gr_ctx_t ctx)
 {
     slong sz = ctx->sizeof_elem;
     int status = GR_SUCCESS;

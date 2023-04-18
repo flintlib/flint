@@ -268,6 +268,9 @@ FLINT_INLINE void sd_fft_lctx_clear(sd_fft_lctx_t LQ, sd_fft_ctx_t Q)
 
 FLINT_DLL void sd_fft_lctx_point_mul(const sd_fft_lctx_t Q,
                             double* a, const double* b, ulong m_, ulong depth);
+FLINT_DLL void sd_fft_lctx_point_sqr(const sd_fft_lctx_t Q,
+                            double* a, ulong m_, ulong depth);
+
 
 FLINT_INLINE void sd_fft_lctx_fft_trunc(sd_fft_lctx_t Q, double* d, ulong depth, ulong itrunc, ulong otrunc)
 {
@@ -434,7 +437,7 @@ unsigned char flint_mpn_add_inplace_c(ulong* z, ulong zn, ulong* a, ulong an, un
 void mpn_ctx_init(mpn_ctx_t R, ulong p);
 void mpn_ctx_clear(mpn_ctx_t R);
 void* mpn_ctx_fit_buffer(mpn_ctx_t R, ulong n);
-void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong* z, ulong* a, ulong an, ulong* b, ulong bn);
+void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong* z, const ulong* a, ulong an, const ulong* b, ulong bn);
 
 void _nmod_poly_mul_mid_mpn_ctx(
     ulong* z, ulong zl, ulong zh,
@@ -505,6 +508,11 @@ int _nmod_poly_divrem_precomp(
     nmod_poly_divrem_precomp_struct* M,
     nmod_t mod,
     mpn_ctx_t R);
+
+mpn_ctx_struct * get_default_mpn_ctx(void);
+
+void mpn_mul_default_mpn_ctx(mp_ptr r1, mp_srcptr i1, mp_size_t n1, mp_srcptr i2, mp_size_t n2);
+void _nmod_poly_mul_mid_default_mpn_ctx(mp_ptr res, slong zl, slong zh, mp_srcptr a, slong an, mp_srcptr b, slong bn, nmod_t mod);
 
 
 #ifdef __cplusplus

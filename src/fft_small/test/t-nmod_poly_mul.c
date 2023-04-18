@@ -19,6 +19,62 @@ int main(void)
 
     for (nbits = 1; nbits <= FLINT_BITS; nbits ++)
     {
+        ulong * a, *b, * c, * d;
+        ulong an, zn, zl, zh, sz, i, reps;
+
+        flint_printf("sqr nbits: %02wu", nbits);
+        fflush(stdout);
+
+        for (reps = 0; reps < 100; reps++)
+        {
+            flint_set_num_threads(1 + n_randint(state, 10));
+
+            nmod_init(&mod, n_randbits(state, nbits));
+
+            an = 1 + n_randint(state, 7000);
+            zn = an + an - 1;
+            zl = n_randint(state, zn+10);
+            zh = n_randint(state, zn+20);
+
+            sz = FLINT_MAX(zl, zh);
+            sz = FLINT_MAX(sz, zn);
+
+            a = FLINT_ARRAY_ALLOC(an, ulong);
+            b = FLINT_ARRAY_ALLOC(an, ulong);
+            c = FLINT_ARRAY_ALLOC(sz, ulong);
+            d = FLINT_ARRAY_ALLOC(sz, ulong);
+
+            for (i = 0; i < an; i++)
+                b[i] = a[i] = n_randint(state, mod.n);
+
+            flint_mpn_zero(c, sz);
+            _nmod_poly_mul(c, a, an, a, an, mod);
+            _nmod_poly_mul_mid_mpn_ctx(d, zl, zh, a, an, b, an, mod, R);
+
+            for (i = zl; i < zh; i++)
+            {
+                if (c[i] != d[i-zl])
+                {
+                    flint_printf("(squaring) mulmid error at index %wu\n", i);
+                    flint_printf("zl=%wu, zh=%wu, an=%wu\n", zl, zh, an);
+                    flint_printf("mod: %wu\n", mod.n);
+                    flint_abort();
+                }
+            }
+
+            flint_free(a);
+            flint_free(b);
+            flint_free(c);
+            flint_free(d);
+        }
+
+        for (i = 0; i < 13; i++)
+            flint_printf("%c", '\b');
+        fflush(stdout);
+    }
+
+    for (nbits = 1; nbits <= FLINT_BITS; nbits ++)
+    {
         ulong * a, * b, * c, * d;
         ulong an, bn, zn, zl, zh, sz, i, reps;
 
@@ -27,6 +83,8 @@ int main(void)
 
         for (reps = 0; reps < 100; reps++)
         {
+            flint_set_num_threads(1 + n_randint(state, 10));
+
             nmod_init(&mod, n_randbits(state, nbits));
 
             an = 1 + n_randint(state, 7000);
@@ -87,6 +145,8 @@ int main(void)
 
         for (reps = 0; reps < 100; reps++)
         {
+            flint_set_num_threads(1 + n_randint(state, 10));
+
             nmod_init(&mod, n_randbits(state, nbits));
 
             bn = 2 + n_randint(state, 5000);

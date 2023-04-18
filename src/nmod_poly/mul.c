@@ -10,7 +10,28 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "nmod_poly.h"
+
+#ifdef FLINT_HAVE_FFT_SMALL
+
+#include "fft_small.h"
+
+/* todo: check unbalanced cutoffs */
+
+static const short fft_mul_tab[] = {1326, 1326, 1095, 802, 674, 537, 330, 306, 290,
+274, 200, 192, 182, 173, 163, 99, 97, 93, 90, 82, 80, 438, 414, 324, 393,
+298, 298, 268, 187, 185, 176, 176, 168, 167, 158, 158, 97, 96, 93, 92, 89,
+89, 85, 85, 80, 81, 177, 172, 163, 162, 164, 176, 171, 167, 167, 164, 163,
+163, 160, 165, 95, 96, 90, 94, };
+
+static const short fft_sqr_tab[] = {1420, 1420, 1353, 964, 689, 569, 407, 353, 321,
+321, 292, 279, 200, 182, 182, 159, 159, 152, 145, 139, 723, 626, 626, 569,
+597, 448, 542, 292, 292, 200, 191, 191, 182, 182, 166, 166, 166, 159, 159,
+159, 152, 152, 145, 145, 93, 200, 191, 182, 182, 182, 182, 191, 191, 191,
+182, 182, 174, 182, 182, 182, 152, 152, 152, 145, };
+
+#endif
 
 void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, slong len1,
                              mp_srcptr poly2, slong len2, nmod_t mod)
@@ -23,8 +44,29 @@ void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, slong len1,
         return;
     }
 
-    bits = FLINT_BITS - (slong) mod.norm;
+    bits = NMOD_BITS(mod);
     cutoff_len = FLINT_MIN(len1, 2 * len2);
+
+#ifdef FLINT_HAVE_FFT_SMALL
+
+    if (poly1 == poly2 && len1 == len2)
+    {
+        if (cutoff_len >= fft_sqr_tab[bits - 1])
+        {
+            _nmod_poly_mul_mid_default_mpn_ctx(res, 0, len1 + len2 - 1, poly1, len1, poly2, len2, mod);
+            return;
+        }
+    }
+    else
+    {
+        if (cutoff_len >= fft_mul_tab[bits - 1])
+        {
+            _nmod_poly_mul_mid_default_mpn_ctx(res, 0, len1 + len2 - 1, poly1, len1, poly2, len2, mod);
+            return;
+        }
+    }
+
+#endif
 
     if (3 * cutoff_len < 2 * FLINT_MAX(bits, 10))
         _nmod_poly_mul_classical(res, poly1, len1, poly2, len2, mod);
