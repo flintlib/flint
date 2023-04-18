@@ -15,7 +15,7 @@
 
 #ifdef FLINT_HAVE_FFT_SMALL
 
-void flint_nmod_poly_mul_mid_fft_small(mp_ptr res, slong zl, slong zh, mp_srcptr a, slong an, mp_srcptr b, slong bn, nmod_t mod);
+#include "fft_small.h"
 
 /* todo: check unbalanced cutoffs */
 
@@ -53,7 +53,7 @@ void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, slong len1,
     {
         if (cutoff_len >= fft_sqr_tab[bits - 1])
         {
-            flint_nmod_poly_mul_mid_fft_small(res, 0, len1 + len2 - 1, poly1, len1, poly2, len2, mod);
+            _nmod_poly_mul_mid_default_mpn_ctx(res, 0, len1 + len2 - 1, poly1, len1, poly2, len2, mod);
             return;
         }
     }
@@ -61,7 +61,7 @@ void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, slong len1,
     {
         if (cutoff_len >= fft_mul_tab[bits - 1])
         {
-            flint_nmod_poly_mul_mid_fft_small(res, 0, len1 + len2 - 1, poly1, len1, poly2, len2, mod);
+            _nmod_poly_mul_mid_default_mpn_ctx(res, 0, len1 + len2 - 1, poly1, len1, poly2, len2, mod);
             return;
         }
     }

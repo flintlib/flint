@@ -15,7 +15,7 @@
 
 #ifdef FLINT_HAVE_FFT_SMALL
 
-void flint_nmod_poly_mul_mid_fft_small(mp_ptr res, slong zl, slong zh, mp_srcptr a, slong an, mp_srcptr b, slong bn, nmod_t mod);
+#include "fft_small.h"
 
 /* todo: separate squaring table */
 /* todo: check unbalanced cutoffs */
@@ -55,7 +55,7 @@ void _nmod_poly_mullow(mp_ptr res, mp_srcptr poly1, slong len1,
 
     if (len2 >= fft_mullow_tab[bits - 1])
     {
-        flint_nmod_poly_mul_mid_fft_small(res, 0, n, poly1, len1, poly2, len2, mod);
+        _nmod_poly_mul_mid_default_mpn_ctx(res, 0, n, poly1, len1, poly2, len2, mod);
         return;
     }
 

@@ -1349,7 +1349,7 @@ void crt_worker_func(void* varg)
 }
 
 
-void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong* z, ulong* a, ulong an, ulong* b, ulong bn)
+void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong* z, const ulong* a, ulong an, const ulong* b, ulong bn)
 {
     ulong zn, alen, blen, zlen, atrunc, btrunc, ztrunc, depth, stride;
     double* abuf;
