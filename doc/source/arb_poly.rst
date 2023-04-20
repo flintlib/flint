@@ -619,6 +619,15 @@ Differentiation
 
     Sets *res* to the derivative of *poly*.
 
+.. function:: void _arb_poly_nth_derivative(arb_ptr res, arb_srcptr poly, ulong n, slong len, slong prec)
+
+    Sets *{res, len - n}* to the nth derivative of *{poly, len}*. Does
+    nothing if *len <= n*. Allows aliasing of the input and output.
+
+.. function:: void arb_poly_nth_derivative(arb_poly_t res, const arb_poly_t poly, slong prec)
+
+    Sets *res* to the nth derivative of *poly*.
+
 .. function:: void _arb_poly_integral(arb_ptr res, arb_srcptr poly, slong len, slong prec)
 
     Sets *{res, len}* to the integral of *{poly, len - 1}*.
