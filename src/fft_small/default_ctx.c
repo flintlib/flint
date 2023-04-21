@@ -44,8 +44,32 @@ mpn_mul_default_mpn_ctx(mp_ptr r1, mp_srcptr i1, mp_size_t n1, mp_srcptr i2, mp_
     mpn_ctx_mpn_mul(get_default_mpn_ctx(), r1, i1, n1, i2, n2);
 }
 
+#if defined(__AVX2__)
+
 void
 _nmod_poly_mul_mid_default_mpn_ctx(mp_ptr res, slong zl, slong zh, mp_srcptr a, slong an, mp_srcptr b, slong bn, nmod_t mod)
 {
     _nmod_poly_mul_mid_mpn_ctx(res, zl, zh, a, an, b, bn, mod, get_default_mpn_ctx());
 }
+
+#else
+
+void _nmod_poly_divrem_mpn_ctx(
+    ulong* q,
+    ulong* r,
+    const ulong* a, ulong an,
+    const ulong* b, ulong bn,
+    nmod_t mod,
+    mpn_ctx_t R)
+{
+    flint_abort();
+}
+
+void
+_nmod_poly_mul_mid_default_mpn_ctx(mp_ptr res, slong zl, slong zh, mp_srcptr a, slong an, mp_srcptr b, slong bn, nmod_t mod)
+{
+    flint_abort();
+}
+
+#endif
+

@@ -743,7 +743,7 @@ FLINT_FORCE_INLINE vec8n vec8n_bit_and(vec8n a, vec8n b) {
 #elif defined(__ARM_NEON)
 
 typedef ulong vec1n;
-typedef int64x2_t vec2n;
+typedef uint64x2_t vec2n;
 typedef struct {vec2n e1, e2;} vec4n;
 typedef struct {vec4n e1, e2;} vec8n;
 
@@ -989,15 +989,15 @@ FLINT_FORCE_INLINE vec2d vec2d_max(vec2d a, vec2d b)
 }
 
 FLINT_FORCE_INLINE vec2d vec2d_cmp_lt(vec2d a, vec2d b) {
-    return vcltq_f64(a, b);
+    return vcvtq_f64_u64(vcltq_f64(a, b));
 }
 
 FLINT_FORCE_INLINE vec2d vec2d_cmp_gt(vec2d a, vec2d b) {
-    return vcgtq_f64(a, b);
+    return vcvtq_f64_u64(vcgtq_f64(a, b));
 }
 
 FLINT_FORCE_INLINE vec2d vec2d_blendv(vec2d a, vec2d b, vec2d c) {
-    return vbslq_f64(c, b, a);
+    return vbslq_f64(vcvtq_u64_f64(c), b, a);
 }
 
 FLINT_FORCE_INLINE vec2d vec2d_add(vec2d a, vec2d b)
@@ -1347,11 +1347,7 @@ EXTEND_VEC_DEF3(vec4d, vec8d, _blendv)
 EXTEND_VEC_DEF4(vec4d, vec8d, _mulmod)
 EXTEND_VEC_DEF4(vec4d, vec8d, _nmulmod)
 
-#undef EXTEND_VEC_DEF4
-#undef EXTEND_VEC_DEF3
-#undef EXTEND_VEC_DEF2
-#undef EXTEND_VEC_DEF1
-#undef EXTEND_VEC_DEF0
+
 
 
 FLINT_FORCE_INLINE int vec2d_same(vec2d a, vec2d b) {
@@ -1374,7 +1370,7 @@ FLINT_FORCE_INLINE void vec1n_store_unaligned(ulong* z, vec1n a) {
 }
 
 FLINT_FORCE_INLINE void vec2n_store_unaligned(ulong* z, vec2n a) {
-   vst1q_s64((long long *)z, a);
+   vst1q_u64(z, a);
 }
 
 FLINT_FORCE_INLINE void vec4n_store_unaligned(ulong* z, vec4n a) {
@@ -1387,7 +1383,7 @@ FLINT_FORCE_INLINE vec1n vec1d_convert_limited_vec1n(vec1d a) {
 }
 
 FLINT_FORCE_INLINE vec2n vec2d_convert_limited_vec2n(vec2d a) {
-    return vcvtnq_s64_f64(a);
+    return vcvtnq_u64_f64(a);
 }
 
 FLINT_FORCE_INLINE vec4n vec4d_convert_limited_vec4n(vec4d a) {
@@ -1395,6 +1391,74 @@ FLINT_FORCE_INLINE vec4n vec4d_convert_limited_vec4n(vec4d a) {
     vec2n z2 = vec2d_convert_limited_vec2n(a.e2);
     vec4n z = {z1, z2}; return z;
 }
+
+
+#if 0
+FLINT_FORCE_INLINE vec2n vec2n_set_n(ulong a) {
+    vec2n x = vdupq_n_u64(a);
+    return x;
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_set_n(ulong a) {
+    vec2n x = vec2n_set_n(a);
+    vec4n z = {x, x};
+    return z;
+}
+
+FLINT_FORCE_INLINE vec8n vec8n_set_n(ulong a) {
+    vec4n x = vec4n_set_n(a);
+    vec8n z = {x, x};
+    return z;
+}
+
+FLINT_FORCE_INLINE vec2n vec2n_load_unaligned(const ulong* a)
+{
+    return vld1q_u64(a);
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_load_unaligned(const ulong* a)
+{
+    vec2n z1 = vec2n_load_unaligned(a+0);
+    vec2n z2 = vec2n_load_unaligned(a+2);
+    vec4n z = {z1, z2}; return z;
+}
+
+FLINT_FORCE_INLINE vec8n vec8n_load_unaligned(const ulong* a)
+{
+    vec4n z1 = vec4n_load_unaligned(a+0);
+    vec4n z2 = vec4n_load_unaligned(a+4);
+    vec8n z = {z1, z2}; return z;
+}
+
+/* todo: implement using intrinsics */
+
+FLINT_FORCE_INLINE vec1n vec1n_addmod(vec1n a, vec1n b, vec1n n)
+{
+    return n - b > a ? a + b : a + b - n;
+}
+
+FLINT_FORCE_INLINE vec2n vec2n_addmod(vec2n a, vec2n b, vec2n n)
+{
+    vec2n z = {vec1n_addmod(a[0], b[0], n[0]), vec1n_addmod(a[1], b[1], n[1])};
+    return z;
+}
+
+EXTEND_VEC_DEF3(vec2n, vec4n, _addmod)
+EXTEND_VEC_DEF3(vec4n, vec8n, _addmod)
+
+FLINT_FORCE_INLINE vec8n vec8n_addmod_limited(vec8n a, vec8n b, vec8n n)
+{
+    return vec8n_addmod(a, b, n);
+}
+#endif
+
+
+#undef EXTEND_VEC_DEF4
+#undef EXTEND_VEC_DEF3
+#undef EXTEND_VEC_DEF2
+#undef EXTEND_VEC_DEF1
+#undef EXTEND_VEC_DEF0
+
 
 #else
 

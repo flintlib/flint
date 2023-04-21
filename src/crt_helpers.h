@@ -51,22 +51,38 @@ FLINT_FORCE_INLINE unsigned char _subborrow_ulong(unsigned char cf, ulong x, ulo
 
 FLINT_FORCE_INLINE unsigned char _addcarry_ulong(unsigned char cf, ulong x, ulong y, ulong* s)
 {
+#if 0
     ulong cf2;
     *s = __builtin_addcl(x, y, cf, &cf2);
     return cf2;
+#else
+    ulong hi, lo;
+    add_ssaaaa(hi, lo, 0, x, 0, y);
+    add_ssaaaa(hi, lo, hi, lo, 0, (ulong) cf);
+    *s = lo;
+    return hi;
+#endif
 }
 
 FLINT_FORCE_INLINE unsigned char _subborrow_ulong(unsigned char cf, ulong x, ulong y, ulong* s)
 {
+#if 0
     ulong cf2;
     *s = __builtin_subcl(x, y, cf, &cf2);
     return cf2;
+#else
+    ulong hi, lo;
+    sub_ddmmss(hi, lo, 0, x, 0, y);
+    sub_ddmmss(hi, lo, hi, lo, 0, (ulong) cf);
+    *s = lo;
+    return hi != 0;
+#endif
 }
 
 #endif
 
 
-#if 1
+#if 0
 
 #if defined(__AVX2__)
 
@@ -361,6 +377,7 @@ FLINT_FORCE_INLINE void CAT(multi_add, n)(ulong z[], const ulong a[]) \
         cf = _addcarry_ulong(cf, z[i], a[i], &z[i]); \
 }
 
+DEFINE_IT(0)
 DEFINE_IT(1)
 DEFINE_IT(2)
 DEFINE_IT(3)
@@ -379,6 +396,7 @@ FLINT_FORCE_INLINE void CAT(multi_sub, n)(ulong z[], const ulong a[]) \
         cf = _subborrow_ulong(cf, z[i], a[i], &z[i]); \
 }
 
+DEFINE_IT(0)
 DEFINE_IT(1)
 DEFINE_IT(2)
 DEFINE_IT(3)
