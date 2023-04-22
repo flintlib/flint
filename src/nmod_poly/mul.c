@@ -48,7 +48,6 @@ void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, slong len1,
     cutoff_len = FLINT_MIN(len1, 2 * len2);
 
 #ifdef FLINT_HAVE_FFT_SMALL
-#if defined(__AVX2__)
 
     if (poly1 == poly2 && len1 == len2)
     {
@@ -67,7 +66,6 @@ void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, slong len1,
         }
     }
 
-#endif
 #endif
 
     if (3 * cutoff_len < 2 * FLINT_MAX(bits, 10))

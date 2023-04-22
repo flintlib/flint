@@ -16,8 +16,6 @@
 #include "fft_small.h"
 #include "crt_helpers.h"
 
-#if defined(__AVX2__)
-
 static void _mod_red(
     double* abuf, ulong atrunc,
     const ulong* a, ulong an,
@@ -1466,5 +1464,4 @@ void _nmod_poly_mul_mid(
     return;
 }
 
-#endif
 

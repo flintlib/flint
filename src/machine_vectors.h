@@ -1393,7 +1393,6 @@ FLINT_FORCE_INLINE vec4n vec4d_convert_limited_vec4n(vec4d a) {
 }
 
 
-#if 0
 FLINT_FORCE_INLINE vec2n vec2n_set_n(ulong a) {
     vec2n x = vdupq_n_u64(a);
     return x;
@@ -1446,11 +1445,59 @@ FLINT_FORCE_INLINE vec2n vec2n_addmod(vec2n a, vec2n b, vec2n n)
 EXTEND_VEC_DEF3(vec2n, vec4n, _addmod)
 EXTEND_VEC_DEF3(vec4n, vec8n, _addmod)
 
+/* todo: optimized version */
 FLINT_FORCE_INLINE vec8n vec8n_addmod_limited(vec8n a, vec8n b, vec8n n)
 {
     return vec8n_addmod(a, b, n);
 }
-#endif
+
+FLINT_FORCE_INLINE vec2d vec2n_convert_limited_vec2d(vec2n a)
+{
+    float64x2_t t = vdupq_n_f64(0x1.0p52);
+    return vsubq_f64(vreinterpretq_f64_u64(vorrq_u64(a, vreinterpretq_u64_f64(t))), t);
+}
+
+FLINT_FORCE_INLINE vec4d vec4n_convert_limited_vec4d(vec4n a)
+{
+    return vec4d_set_vec2d2(vec2n_convert_limited_vec2d(a.e1),
+                            vec2n_convert_limited_vec2d(a.e2));
+}
+
+FLINT_FORCE_INLINE vec8d vec8d_set_vec4d2(vec4d a, vec4d b)
+{
+    vec8d z = {a, b}; return z;
+}
+
+FLINT_FORCE_INLINE vec8d vec8n_convert_limited_vec8d(vec8n a)
+{
+    return vec8d_set_vec4d2(vec4n_convert_limited_vec4d(a.e1),
+                            vec4n_convert_limited_vec4d(a.e2));
+}
+
+FLINT_FORCE_INLINE vec2n vec2n_bit_and(vec2n a, vec2n b)
+{
+    return vandq_u64(a, b);
+}
+
+EXTEND_VEC_DEF2(vec2n, vec4n, _bit_and)
+EXTEND_VEC_DEF2(vec4n, vec8n, _bit_and)
+
+FLINT_FORCE_INLINE vec2n vec2n_bit_shift_right(vec2n a, ulong n)
+{
+    return vshrq_n_u64(a, n);
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_bit_shift_right(vec4n a, ulong n)
+{
+    vec4n z = {vec2n_bit_shift_right(a.e1, n), vec2n_bit_shift_right(a.e2, n)};
+    return z;
+}
+
+FLINT_FORCE_INLINE vec8n vec8n_bit_shift_right(vec8n a, ulong n)
+{
+    vec8n z = {vec4n_bit_shift_right(a.e1, n), vec4n_bit_shift_right(a.e2, n)};
+    return z;
+}
 
 
 #undef EXTEND_VEC_DEF4

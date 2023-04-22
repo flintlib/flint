@@ -1,5 +1,3 @@
-#if defined(__AVX2__)
-
 #include "ulong_extras.h"
 #include "nmod.h"
 #include "nmod_poly.h"
@@ -226,11 +224,4 @@ int main(void)
     flint_printf("PASS\n");
     return 0;
 }
-#else
 
-int main()
-{
-    return 0;
-}
-
-#endif

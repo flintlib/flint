@@ -52,7 +52,6 @@ void _nmod_poly_mullow(mp_ptr res, mp_srcptr poly1, slong len1,
     bits = NMOD_BITS(mod);
 
 #ifdef FLINT_HAVE_FFT_SMALL
-#if defined(__AVX2__)
 
     if (len2 >= fft_mullow_tab[bits - 1])
     {
@@ -60,7 +59,6 @@ void _nmod_poly_mullow(mp_ptr res, mp_srcptr poly1, slong len1,
         return;
     }
 
-#endif
 #endif
 
     if (n < 10 + bits * bits / 10)
