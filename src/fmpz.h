@@ -501,7 +501,7 @@ void fmpz_set_d_2exp(fmpz_t f, double m, slong exp);
 #ifdef FLINT_HAVE_FFT_SMALL
 #define MPZ_WANT_FLINT_DIVISION(a, b) (mpz_size(b) >= 1250 && mpz_size(a) - mpz_size(b) >= 1250)
 #else
-#define MPZ_WANT_FLINT_DIVISION(a, b)
+#define MPZ_WANT_FLINT_DIVISION(a, b) 0
 #endif
 
 void _fmpz_tdiv_q_newton(fmpz_t q, const fmpz_t a, const fmpz_t b);
