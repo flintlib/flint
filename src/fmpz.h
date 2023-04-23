@@ -498,6 +498,24 @@ slong fmpz_flog_ui(const fmpz_t x, ulong b);
 double fmpz_get_d_2exp(slong * exp, const fmpz_t f);
 void fmpz_set_d_2exp(fmpz_t f, double m, slong exp);
 
+#ifdef FLINT_HAVE_FFT_SMALL
+#define MPZ_WANT_FLINT_DIVISION(a, b) (mpz_size(b) >= 1250 && mpz_size(a) - mpz_size(b) >= 1250)
+#else
+#define MPZ_WANT_FLINT_DIVISION(a, b)
+#endif
+
+void _fmpz_tdiv_q_newton(fmpz_t q, const fmpz_t a, const fmpz_t b);
+void _fmpz_fdiv_q_newton(fmpz_t q, const fmpz_t a, const fmpz_t b);
+void _fmpz_cdiv_q_newton(fmpz_t q, const fmpz_t a, const fmpz_t b);
+void _fmpz_tdiv_qr_newton(fmpz_t q, fmpz_t r, const fmpz_t a, const fmpz_t b);
+void _fmpz_fdiv_qr_newton(fmpz_t q, fmpz_t r, const fmpz_t a, const fmpz_t b);
+void _fmpz_cdiv_qr_newton(fmpz_t q, fmpz_t r, const fmpz_t a, const fmpz_t b);
+void _fmpz_tdiv_r_newton(fmpz_t r, const fmpz_t a, const fmpz_t b);
+void _fmpz_fdiv_r_newton(fmpz_t r, const fmpz_t a, const fmpz_t b);
+void _fmpz_cdiv_r_newton(fmpz_t r, const fmpz_t a, const fmpz_t b);
+void _fmpz_mod_newton(fmpz_t r, const fmpz_t a, const fmpz_t b);
+void _fmpz_divexact_newton(fmpz_t q, const fmpz_t a, const fmpz_t b);
+
 /* Bitwise operations ********************************************************/
 
 void fmpz_setbit(fmpz_t f, ulong i);

@@ -57,10 +57,13 @@ fmpz_fdiv_r(fmpz_t f, const fmpz_t g, const fmpz_t h)
     }
     else                        /* g is large */
     {
-        __mpz_struct * mf = _fmpz_promote(f);
+        __mpz_struct * mf;
 
         if (!COEFF_IS_MPZ(c2))  /* h is small */
         {
+            /* todo: should not create an mpz */
+            mf = _fmpz_promote(f);
+
             if (c2 > 0)         /* h > 0 */
             {
                 flint_mpz_fdiv_r_ui(mf, COEFF_TO_PTR(c1), c2);
@@ -69,11 +72,21 @@ fmpz_fdiv_r(fmpz_t f, const fmpz_t g, const fmpz_t h)
             {
                 flint_mpz_cdiv_r_ui(mf, COEFF_TO_PTR(c1), -c2);
             }
+
+            _fmpz_demote_val(f);    /* division by h may result in small value */
         }
         else                    /* both are large */
         {
-            mpz_fdiv_r(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+            if (MPZ_WANT_FLINT_DIVISION(COEFF_TO_PTR(c1), COEFF_TO_PTR(c2)))
+            {
+                _fmpz_fdiv_r_newton(f, g, h);
+            }
+            else
+            {
+                mf = _fmpz_promote(f);
+                mpz_fdiv_r(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+                _fmpz_demote_val(f);    /* division by h may result in small value */
+            }
         }
-        _fmpz_demote_val(f);    /* division by h may result in small value */
     }
 }

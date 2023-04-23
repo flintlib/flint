@@ -51,8 +51,7 @@ main(void)
         fmpz_get_mpz(d, a);
         fmpz_get_mpz(e, b);
 
-        for (j = 1; j < 100; j++)
-           fmpz_fdiv_qr(c, r, a, b);
+        fmpz_fdiv_qr(c, r, a, b);
         mpz_fdiv_qr(f, s, d, e);
 
         fmpz_get_mpz(g, c);
