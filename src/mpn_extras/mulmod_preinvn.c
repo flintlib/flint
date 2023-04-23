@@ -84,17 +84,17 @@ void flint_mpn_mulmod_preinvn(mp_ptr r,
    } else
    {
       if (a == b)
-         mpn_sqr(t, a, n);
+         flint_mpn_sqr(t, a, n);
       else
-         mpn_mul_n(t, a, b, n);
+         flint_mpn_mul_n(t, a, b, n);
 
       if (norm)
          mpn_rshift(t, t, 2*n, norm);
 
-      mpn_mul_n(t + 3*n, t + n, dinv, n);
+      flint_mpn_mul_n(t + 3*n, t + n, dinv, n);
       mpn_add_n(t + 4*n, t + 4*n, t + n, n);
 
-      mpn_mul_n(t + 2*n, t + 4*n, d, n);
+      flint_mpn_mul_n(t + 2*n, t + 4*n, d, n);
       cy = t[n] - t[3*n] - mpn_sub_n(r, t, t + 2*n, n);
 
       while (cy > 0)

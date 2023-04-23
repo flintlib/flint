@@ -11,6 +11,7 @@
 */
 
 #include "fmpz.h"
+#include "mpn_extras.h"
 #include "ulong_extras.h"
 
 #if FLINT64
@@ -95,9 +96,9 @@ mp_size_t mpn_prod_limbs_balanced(mp_limb_t * result, mp_limb_t * scratch,
     len = alen + blen;
 
     if (alen <= blen)
-        top = mpn_mul(result, scratch + alen, blen, scratch, alen);
+        top = flint_mpn_mul(result, scratch + alen, blen, scratch, alen);
     else
-        top = mpn_mul(result, scratch, alen, scratch + alen, blen);
+        top = flint_mpn_mul(result, scratch, alen, scratch + alen, blen);
 
     if (!top)
         len--;
@@ -157,4 +158,3 @@ fmpz_primorial(fmpz_t res, ulong n)
     len = mpn_prod_limbs(mres->_mp_d, primes, pi, bits);
     mres->_mp_size = len;
 }
-

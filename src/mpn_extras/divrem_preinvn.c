@@ -43,10 +43,10 @@ mp_limb_t flint_mpn_divrem_preinvn(mp_ptr qp, mp_ptr rp, mp_srcptr ap, mp_size_t
    /* 2n by n division */
    while (m >= 2*n)
    {
-      mpn_mul_n(t, dinv, r + n, n);
+      flint_mpn_mul_n(t, dinv, r + n, n);
       cy = mpn_add_n(q, t + n, r + n, n);
 
-      mpn_mul_n(t, d, q, n);
+      flint_mpn_mul_n(t, d, q, n);
       cy = r[n] - t[n] - mpn_sub_n(r, a, t, n);
 
       while (cy > 0)
@@ -75,10 +75,10 @@ mp_limb_t flint_mpn_divrem_preinvn(mp_ptr qp, mp_ptr rp, mp_srcptr ap, mp_size_t
       if (rp != ap)
          mpn_copyi(rp, ap, size);
 
-      mpn_mul(t, dinv, n, rp + n, size);
+      flint_mpn_mul(t, dinv, n, rp + n, size);
       cy = mpn_add_n(qp, t + n, rp + n, size);
 
-      mpn_mul(t, d, n, qp, size);
+      flint_mpn_mul(t, d, n, qp, size);
       if (cy)
          mpn_add_n(t + size, t + size, d, n + 1 - size);
 
