@@ -12,6 +12,28 @@
 #include "ulong_extras.h"
 #include "mpn_extras.h"
 #include "fft_small.h"
+#include "crt_helpers.h"
+
+#define TEST_ADD(n) \
+        flint_mpn_copyi(a, d, n); \
+        mpn_add_n(c, a, b, n); \
+        multi_add_ ## n(a, b); \
+        if (mpn_cmp(a, c, n) != 0) \
+        { \
+            flint_printf("FAIL: add_%i\n", n); \
+            flint_abort(); \
+        }
+
+#define TEST_SUB(n) \
+        flint_mpn_copyi(a, d, n); \
+        mpn_sub_n(c, a, b, n); \
+        multi_sub_ ## n(a, b); \
+        if (mpn_cmp(a, c, n) != 0) \
+        { \
+            flint_printf("FAIL: sub_%i\n", n); \
+            flint_abort(); \
+        }
+
 
 int main(void)
 {
@@ -47,6 +69,34 @@ int main(void)
             flint_printf("FAIL\n");
             flint_abort();
         }
+    }
+
+    for (iter = 0; iter < 1000; iter++)
+    {
+        mp_limb_t a[8], b[8], c[8], d[8];
+
+        flint_mpn_rrandom(a, state->gmp_state, 8);
+        flint_mpn_rrandom(b, state->gmp_state, 8);
+        flint_mpn_copyi(c, a, 8);
+        flint_mpn_copyi(d, a, 8);
+
+        TEST_ADD(1)
+        TEST_ADD(2)
+        TEST_ADD(3)
+        TEST_ADD(4)
+        TEST_ADD(5)
+        TEST_ADD(6)
+        TEST_ADD(7)
+        TEST_ADD(8)
+
+        TEST_SUB(1)
+        TEST_SUB(2)
+        TEST_SUB(3)
+        TEST_SUB(4)
+        TEST_SUB(5)
+        TEST_SUB(6)
+        TEST_SUB(7)
+        TEST_SUB(8)
     }
 
     FLINT_TEST_CLEANUP(state);

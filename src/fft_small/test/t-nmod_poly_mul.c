@@ -7,6 +7,7 @@
 
 int main(void)
 {
+
     flint_bitcnt_t nbits;
     mpn_ctx_t R;
     nmod_t mod;
@@ -219,7 +220,7 @@ int main(void)
     mpn_ctx_clear(R);
 
     FLINT_TEST_CLEANUP(state);
-    
+
     flint_printf("PASS\n");
     return 0;
 }
