@@ -39,10 +39,10 @@ void flint_mpn_mod_preinvn(mp_ptr rp, mp_srcptr ap, mp_size_t m,
    /* 2n by n division */
    while (m >= 2*n)
    {
-      mpn_mul_n(t, dinv, r + n, n);
+      flint_mpn_mul_n(t, dinv, r + n, n);
       cy = mpn_add_n(t + 2*n, t + n, r + n, n);
 
-      mpn_mul_n(t, d, t + 2*n, n);
+      flint_mpn_mul_n(t, d, t + 2*n, n);
       cy = r[n] - t[n] - mpn_sub_n(r, a, t, n);
 
       while (cy > 0)
@@ -64,10 +64,10 @@ void flint_mpn_mod_preinvn(mp_ptr rp, mp_srcptr ap, mp_size_t m,
       if (rp != ap)
          mpn_copyi(rp, ap, size);
 
-      mpn_mul(t, dinv, n, rp + n, size);
+      flint_mpn_mul(t, dinv, n, rp + n, size);
       cy = mpn_add_n(t + 2*n, t + n, rp + n, size);
 
-      mpn_mul(t, d, n, t + 2*n, size);
+      flint_mpn_mul(t, d, n, t + 2*n, size);
       if (cy)
          mpn_add_n(t + size, t + size, d, n + 1 - size);
 

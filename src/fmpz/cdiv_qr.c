@@ -63,12 +63,12 @@ void fmpz_cdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
     {
         __mpz_struct * mf, * ms;
 
-        _fmpz_promote(f); /* must not hang on to ptr whilst promoting s */
-        ms = _fmpz_promote(s);
-        mf  = COEFF_TO_PTR(*f);
-
         if (!COEFF_IS_MPZ(c2))  /* h is small */
         {
+            _fmpz_promote(f); /* must not hang on to ptr whilst promoting s */
+            ms = _fmpz_promote(s);
+            mf  = COEFF_TO_PTR(*f);
+
             if (c2 > 0)         /* h > 0 */
             {
                 flint_mpz_cdiv_qr_ui(mf, ms, COEFF_TO_PTR(c1), c2);
@@ -78,12 +78,27 @@ void fmpz_cdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
                 flint_mpz_fdiv_qr_ui(mf, ms, COEFF_TO_PTR(c1), -c2);
                 mpz_neg(mf, mf);
             }
+
+            _fmpz_demote_val(f);    /* division by h may result in small value */
+            _fmpz_demote_val(s);    /* division by h may result in small value */
         }
         else                    /* both are large */
         {
-            mpz_cdiv_qr(mf, ms, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+            if (MPZ_WANT_FLINT_DIVISION(COEFF_TO_PTR(c1), COEFF_TO_PTR(c2)))
+            {
+                _fmpz_cdiv_qr_newton(f, s, g, h);
+            }
+            else
+            {
+                _fmpz_promote(f); /* must not hang on to ptr whilst promoting s */
+                ms = _fmpz_promote(s);
+                mf  = COEFF_TO_PTR(*f);
+
+                mpz_cdiv_qr(mf, ms, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+
+                _fmpz_demote_val(f);    /* division by h may result in small value */
+                _fmpz_demote_val(s);    /* division by h may result in small value */
+            }
         }
-        _fmpz_demote_val(f);    /* division by h may result in small value */
-        _fmpz_demote_val(s);    /* division by h may result in small value */
     }
 }

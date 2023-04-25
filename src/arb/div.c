@@ -520,21 +520,23 @@ arb_ui_div(arb_t z, ulong x, const arb_t y, slong prec)
     arb_clear(t);
 }
 
+/* important: must be a valid divexact */
 void
-_arb_fmpz_divapprox_newton(fmpz_t res, const fmpz_t x, const fmpz_t y)
+_arb_fmpz_divapprox_newton(fmpz_t res, const fmpz_t x, const fmpz_t y, slong exp)
 {
     slong xb, yb, zb, prec;
     arf_t t, u;
 
     xb = fmpz_bits(x);
     yb = fmpz_bits(y);
-    zb = xb - yb;
+    zb = xb - yb + exp;
     prec = FLINT_MAX(zb, 0) + 16;
 
     arf_init(t);
     arf_init(u);
 
     arf_set_round_fmpz(t, x, prec, ARF_RND_NEAR);
+    arf_mul_2exp_si(t, t, exp);
     arf_set_round_fmpz(u, y, prec, ARF_RND_NEAR);
     _arf_div_newton(t, t, u, prec);
     arf_get_fmpz(res, t, ARF_RND_NEAR);
@@ -563,7 +565,7 @@ arb_fmpz_divapprox(fmpz_t res, const fmpz_t x, const fmpz_t y)
 
         if (xb - yb >= DIV_NEWTON_CUTOFF && yb >= DIV_NEWTON_CUTOFF)
         {
-            _arb_fmpz_divapprox_newton(res, x, y);
+            _arb_fmpz_divapprox_newton(res, x, y, 0);
         }
         else
         {

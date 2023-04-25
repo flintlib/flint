@@ -24,9 +24,7 @@ fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h)
     if (fmpz_is_zero(h))
     {
         res = fmpz_is_zero(g);
-
         fmpz_zero(q);
-
         return res;
     }
 
@@ -65,11 +63,13 @@ fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h)
     }
     else                        /* g is large */
     {
-        __mpz_struct * mq = _fmpz_promote(q);
+        __mpz_struct * mq;
 
         if (!COEFF_IS_MPZ(c2))  /* h is small */
         {
             mp_limb_t r;
+
+            mq = _fmpz_promote(q);
 
             if (c2 < 0)
             {
@@ -80,28 +80,25 @@ fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h)
             r = flint_mpz_tdiv_q_ui(mq, COEFF_TO_PTR(c1), c2);
 
             res = (r == 0);
+
+            if (negate)
+                mpz_neg(mq, mq);
+
+            if (!res)
+                mpz_set_ui(mq, 0);
+
+            _fmpz_demote_val(q);
         }
         else                    /* both are large */
         {
-            mpz_t r;
-            mq  = _fmpz_promote(q);
-
-            mpz_init(r);
-
-            mpz_tdiv_qr(mq, r, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
-
-            res = mpz_sgn(r) == 0;
-
-            mpz_clear(r);
+            fmpz_t r;
+            fmpz_init(r);
+            fmpz_tdiv_qr(q, r, g, h);
+            res = fmpz_is_zero(r);
+            if (!res)
+                fmpz_zero(q);
+            fmpz_clear(r);
         }
-
-        if (!res)
-            mpz_set_ui(mq, 0);
-
-        _fmpz_demote_val(q);
-
-        if (negate)
-            fmpz_neg(q, q);
 
         return res;
     }
