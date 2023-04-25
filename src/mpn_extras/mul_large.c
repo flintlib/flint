@@ -30,6 +30,30 @@
 mp_limb_t flint_mpn_mul_large(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
                         mp_srcptr i2, mp_size_t n2)
 {
+    /* Experimental: strip trailing zeros. Normally this should
+       be handled by the caller where appropriate, but there can be
+       situations where it helps to do so here. */
+#if 0
+    while (n1 > 1 && i1[0] == 0)
+    {
+        n1--;
+        i1++;
+        r1[0] = 0;
+        r1++;
+    }
+
+    while (n2 > 1 && i2[0] == 0)
+    {
+        n2--;
+        i2++;
+        r1[0] = 0;
+        r1++;
+    }
+
+    if (n1 < n2)
+        return flint_mpn_mul_large(r1, i2, n2, i1, n1);
+#endif
+
     if (n2 < FLINT_FFT_SMALL_MUL_THRESHOLD || (i1 == i2 && n1 == n2 && n2 < FLINT_FFT_SMALL_SQR_THRESHOLD))
     {
         if (n1 == n2)
