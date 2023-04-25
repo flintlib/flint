@@ -80,7 +80,7 @@ main(void)
         if (n_randint(state, 2))
             str1 = fmpz_get_str(NULL, base, a);
         else
-            str1 = _fmpz_get_str_bsplit_threaded(NULL, a);
+            str1 = fmpz_get_str_bsplit_threaded(NULL, a);
 
         str2 = mpz_get_str(NULL, base, b);
 

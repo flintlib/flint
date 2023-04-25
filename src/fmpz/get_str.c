@@ -177,7 +177,8 @@ fmpz_get_str_bsplit_threaded(char * s, const fmpz_t f)
         *g = PTR_TO_COEFF(u);
         u->_mp_size = -u->_mp_size;
         s[0] = '-';
-        return fmpz_get_str_bsplit_threaded(s + 1, g);
+        fmpz_get_str_bsplit_threaded(s + 1, g);
+        return s;
     }
 
     n = fmpz_sizeinbase(f, 10);
