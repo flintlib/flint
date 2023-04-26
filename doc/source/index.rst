@@ -87,6 +87,7 @@ Integers
    aprcl.rst
    arith.rst
    fft.rst
+   fft_small.rst
    qsieve.rst
 
 .. toctree::
