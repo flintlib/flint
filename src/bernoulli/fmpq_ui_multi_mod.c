@@ -194,7 +194,7 @@ _bernoulli_fmpq_ui_multi_mod(fmpz_t num, fmpz_t den, ulong n, double alpha)
     }
 
 #if DEBUG
-    printf("\nn = %lu, bits = %lu, num_primes = %ld\n", n, bits, num_primes);
+    flint_printf("\nn = %lu, bits = %lu, num_primes = %ld\n", n, bits, num_primes);
 #endif
 
     primes = flint_malloc(sizeof(mp_limb_t) * num_primes);
@@ -216,8 +216,8 @@ _bernoulli_fmpq_ui_multi_mod(fmpz_t num, fmpz_t den, ulong n, double alpha)
 
 #if TIMING
     t2 = clock();
-    printf("init time = %f\n", (t2 - t1) / (double) CLOCKS_PER_SEC);
-    printf("num_primes = %ld\n", num_primes);
+    flint_printf("init time = %f\n", (t2 - t1) / (double) CLOCKS_PER_SEC);
+    flint_printf("num_primes = %ld\n", num_primes);
 #endif
 
     {
@@ -231,8 +231,8 @@ _bernoulli_fmpq_ui_multi_mod(fmpz_t num, fmpz_t den, ulong n, double alpha)
 
 #if TIMING
     t2 = clock();
-    printf("mod time = %f\n", (t2 - t1) / (double) CLOCKS_PER_SEC);
-    printf("start CRT\n");
+    flint_printf("mod time = %f\n", (t2 - t1) / (double) CLOCKS_PER_SEC);
+    flint_printf("start CRT\n");
     t1 = clock();
 #endif
 
@@ -248,9 +248,9 @@ _bernoulli_fmpq_ui_multi_mod(fmpz_t num, fmpz_t den, ulong n, double alpha)
     }
 
 #if TIMING
-    printf("end CRT\n");
+    flint_printf("end CRT\n");
     t2 = clock();
-    printf("CRT time = %f\n", (t2 - t1) / (double) CLOCKS_PER_SEC);
+    flint_printf("CRT time = %f\n", (t2 - t1) / (double) CLOCKS_PER_SEC);
     t1 = clock();
 #endif
 
@@ -284,9 +284,9 @@ _bernoulli_fmpq_ui_multi_mod(fmpz_t num, fmpz_t den, ulong n, double alpha)
     }
 
 #if TIMING
-    printf("end zeta\n");
+    flint_printf("end zeta\n");
     t2 = clock();
-    printf("zeta time = %f\n", (t2 - t1) / (double) CLOCKS_PER_SEC);
+    flint_printf("zeta time = %f\n", (t2 - t1) / (double) CLOCKS_PER_SEC);
 #endif
 
     flint_free(primes);
