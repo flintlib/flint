@@ -7,7 +7,6 @@
 
 int main(void)
 {
-
     flint_bitcnt_t nbits;
     mpn_ctx_t R;
     nmod_t mod;
@@ -17,6 +16,56 @@ int main(void)
     fflush(stdout);
 
     mpn_ctx_init(R, UWORD(0x0003f00000000001));
+
+    /* (slow) test bug where 3 instead of 4 primes were used */
+#if 0
+    {
+        ulong * a, *b, * c, * d;
+        ulong an, zn, zl, zh, sz, i;
+
+        nbits = FLINT_BITS;
+
+        {
+            nmod_init(&mod, UWORD(18446744073709551557));
+
+            an = 25000000;
+            zn = an + an - 1;
+            zl = n_randint(state, zn+10);
+            zh = n_randint(state, zn+20);
+
+            sz = FLINT_MAX(zl, zh);
+            sz = FLINT_MAX(sz, zn);
+
+            a = FLINT_ARRAY_ALLOC(an, ulong);
+            b = FLINT_ARRAY_ALLOC(an, ulong);
+            c = FLINT_ARRAY_ALLOC(sz, ulong);
+            d = FLINT_ARRAY_ALLOC(sz, ulong);
+
+            for (i = 0; i < an; i++)
+                b[i] = a[i] = n_randint(state, mod.n);
+
+            flint_mpn_zero(c, sz);
+            _nmod_poly_mul_KS(c, a, an, a, an, 0, mod);
+            _nmod_poly_mul_mid_mpn_ctx(d, zl, zh, a, an, b, an, mod, R);
+
+            for (i = zl; i < zh; i++)
+            {
+                if (c[i] != d[i-zl])
+                {
+                    flint_printf("(huge) mulmid error at index %wu\n", i);
+                    flint_printf("zl=%wu, zh=%wu, an=%wu\n", zl, zh, an);
+                    flint_printf("mod: %wu\n", mod.n);
+                    flint_abort();
+                }
+            }
+
+            flint_free(a);
+            flint_free(b);
+            flint_free(c);
+            flint_free(d);
+        }
+    }
+#endif
 
     for (nbits = 1; nbits <= FLINT_BITS; nbits ++)
     {
@@ -49,7 +98,7 @@ int main(void)
                 b[i] = a[i] = n_randint(state, mod.n);
 
             flint_mpn_zero(c, sz);
-            _nmod_poly_mul(c, a, an, a, an, mod);
+            _nmod_poly_mul_KS(c, a, an, a, an, 0, mod);
             _nmod_poly_mul_mid_mpn_ctx(d, zl, zh, a, an, b, an, mod, R);
 
             for (i = zl; i < zh; i++)
@@ -109,7 +158,7 @@ int main(void)
                 b[i] = n_randint(state, mod.n);
 
             flint_mpn_zero(c, sz);
-            _nmod_poly_mul(c, a, an, b, bn, mod);
+            _nmod_poly_mul_KS(c, a, an, b, bn, 0, mod);
             _nmod_poly_mul_mid_mpn_ctx(d, zl, zh, a, an, b, bn, mod, R);
 
             for (i = zl; i < zh; i++)

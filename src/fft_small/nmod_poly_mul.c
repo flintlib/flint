@@ -497,7 +497,7 @@ void _nmod_poly_mul_mid_mpn_ctx(
     }
 
     /* need prod_of_primes >= blen * 4^modbits */
-    for (np = 1; np < 3; np++)
+    for (np = 1; np < 4; np++)
     {
         if (flint_mpn_cmp_ui_2exp(crt_data_prod_primes(R->crts + np - 1),
               R->crts[np - 1].coeff_len, bn, 2*modbits) >= 0)
