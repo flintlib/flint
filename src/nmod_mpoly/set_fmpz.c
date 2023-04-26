@@ -40,6 +40,6 @@ void nmod_mpoly_set_fmpz(
     const fmpz_t c,
     const nmod_mpoly_ctx_t ctx)
 {
-    nmod_mpoly_set_ui(A, fmpz_fdiv_ui(c, ctx->mod.n), ctx);
+    nmod_mpoly_set_ui(A, fmpz_get_nmod(c, ctx->mod), ctx);
 }
 

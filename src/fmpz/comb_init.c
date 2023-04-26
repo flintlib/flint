@@ -21,10 +21,10 @@
 #define FMPZ_CRT_UI_CUTOFF 50
 
 /*
-    The better fmpz_fdiv_ui (mpn_mod_1) is, the larger FMPZ_MOD_UI_CUTOFF can
+    The better fmpz_get_nmod (mpn_mod_1) is, the larger FMPZ_MOD_UI_CUTOFF can
     be. Very poor implementations of mpn_mod_1 can have 10, and anything up to
     100 is reasonable.
-*/
+]*/
 #define FMPZ_MOD_UI_CUTOFF 75
 
 /* minimal number of basecase chunks in which to partition */
@@ -152,7 +152,7 @@ void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
         for ( ; i < j; i++)
         {
             fmpz_divexact_ui(Mm->coeffs + i, M->coeffs + k, C->crt_lu[i].mod.n);
-            tt = fmpz_fdiv_ui(Mm->coeffs + i, C->crt_lu[i].mod.n);
+            tt = fmpz_get_nmod(Mm->coeffs + i, C->crt_lu[i].mod);
 
             success = (1 == n_gcdinv(&tt, tt, C->crt_lu[i].mod.n));
             if (!success)
@@ -179,7 +179,7 @@ void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
             int last = (i >= C->crt_offsets[k - 1]);
 
             fmpz_mul(Mm->coeffs + i, Mm->coeffs + i, M->coeffs + k - last);
-            tt = fmpz_fdiv_ui(M->coeffs + k - last, C->crt_lu[i].mod.n);
+            tt = fmpz_get_nmod(M->coeffs + k - last, C->crt_lu[i].mod);
 
             success = (1 == n_gcdinv(&tt, tt, C->crt_lu[i].mod.n));
             if (!success)

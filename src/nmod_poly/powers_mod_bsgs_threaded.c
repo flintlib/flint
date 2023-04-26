@@ -209,7 +209,7 @@ nmod_poly_powers_mod_bsgs(nmod_poly_struct * res,
         nmod_poly_init_mod(r, f->mod);
 
         nmod_poly_divrem(q, r, f, g);
-        nmod_poly_powers_mod_naive(res, r, n, g);
+        nmod_poly_powers_mod_bsgs(res, r, n, g);
 
         nmod_poly_clear(q);
         nmod_poly_clear(r);

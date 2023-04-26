@@ -11,6 +11,7 @@
 
 #include "nmod_poly.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void
@@ -24,10 +25,8 @@ fmpz_poly_get_nmod_poly(nmod_poly_t res, const fmpz_poly_t poly)
     }
     else
     {
-        slong i;
         nmod_poly_fit_length(res, len);
-        for (i = 0; i < len; i++)
-            res->coeffs[i] = fmpz_fdiv_ui(poly->coeffs + i, res->mod.n);
+        _fmpz_vec_get_nmod_vec(res->coeffs, poly->coeffs, len, res->mod);
         _nmod_poly_set_length(res, len);
         _nmod_poly_normalise(res);
     }

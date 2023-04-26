@@ -142,7 +142,7 @@ void fmpz_mpoly_interp_reduce_p_mpolyn(
     Ei = 0;
     for (Ai = 0; Ai < Alen; Ai++)
     {
-        v = fmpz_fdiv_ui(Acoeff + Ai, pctx->mod.n);
+        v = fmpz_get_nmod(Acoeff + Ai, pctx->mod);
         k = ((Aexp + N*Ai)[offset] >> shift) & mask;
         if (v == 0)
         {

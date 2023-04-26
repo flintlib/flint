@@ -364,8 +364,8 @@ static mp_limb_t eval_product_mod_n(
 
     nmod_init(&ctx, prime_product);
 
-    A = fmpz_fdiv_ui(a, ctx.n);
-    B = fmpz_fdiv_ui(b, ctx.n);
+    A = fmpz_get_nmod(a, ctx);
+    B = fmpz_get_nmod(b, ctx);
     A = nmod_add(A, nmod_add(A, A, ctx), ctx);
 
     /*

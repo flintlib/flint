@@ -16,7 +16,7 @@ void
 fmpz_mat_get_nmod_mat(nmod_mat_t Amod, const fmpz_mat_t A)
 {
     slong i, j;
-    mp_limb_t m = Amod->mod.n;
+    nmod_t mod = Amod->mod;
 
     if (fmpz_mat_is_square(A))
     {
@@ -24,21 +24,21 @@ fmpz_mat_get_nmod_mat(nmod_mat_t Amod, const fmpz_mat_t A)
 
        for (i = 0; i < A->r; i++)
        {
-           Amod->rows[i][i] = fmpz_fdiv_ui(A->rows[i]+i, m);
+           Amod->rows[i][i] = fmpz_get_nmod(A->rows[i]+i, mod);
 
 	   for (j = i + 1; j < A->c; j++)
 	   {
-               Amod->rows[i][j] = fmpz_fdiv_ui(A->rows[i] + j, m);
+               Amod->rows[i][j] = fmpz_get_nmod(A->rows[i] + j, mod);
                if ((symmetric &= fmpz_equal(A->rows[j] + i, A->rows[i] + j)))
 	           Amod->rows[j][i] = Amod->rows[i][j];
                else
-                   Amod->rows[j][i] = fmpz_fdiv_ui(A->rows[j] + i, m);
+                   Amod->rows[j][i] = fmpz_get_nmod(A->rows[j] + i, mod);
 	   }
         }
     } else
     {
         for (i = 0; i < A->r; i++)
             for (j = 0; j < A->c; j++)
-                Amod->rows[i][j] = fmpz_fdiv_ui(A->rows[i] + j, m);
+                Amod->rows[i][j] = fmpz_get_nmod(A->rows[i] + j, mod);
     }
 }

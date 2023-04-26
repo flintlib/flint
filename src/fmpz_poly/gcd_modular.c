@@ -178,7 +178,7 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, slong len1,
         else
         {
             h_inv = n_invmod(h[hlen - 1], mod.n);
-            g_mod = fmpz_fdiv_ui(g, mod.n);
+            g_mod = fmpz_get_nmod(g, mod);
             h_inv = n_mulmod2_preinv(h_inv, g_mod, mod.n, mod.ninv);
             _nmod_vec_scalar_mul_nmod(h, h, hlen, h_inv, mod);
         }

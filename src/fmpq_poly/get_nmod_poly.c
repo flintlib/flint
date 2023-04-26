@@ -12,6 +12,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
 void
@@ -25,10 +26,8 @@ _fmpq_poly_get_nmod_poly(nmod_poly_t rop, const fmpq_poly_t op)
     }
     else
     {
-        slong i;
         nmod_poly_fit_length(rop, len);
-        for (i = 0; i < len; i++)
-            rop->coeffs[i] = fmpz_fdiv_ui(op->coeffs + i, rop->mod.n);
+        _fmpz_vec_get_nmod_vec(rop->coeffs, op->coeffs, len, rop->mod);
         _nmod_poly_set_length(rop, len);
         _nmod_poly_normalise(rop);
     }
@@ -43,7 +42,7 @@ fmpq_poly_get_nmod_poly_den(nmod_poly_t rop, const fmpq_poly_t op, int den)
     {
         if (!fmpz_is_one(op->den))
         {
-            nmod_poly_scalar_mul_nmod(rop, rop, n_invmod(fmpz_fdiv_ui(op->den, rop->mod.n), rop->mod.n));
+            nmod_poly_scalar_mul_nmod(rop, rop, n_invmod(fmpz_get_nmod(op->den, rop->mod), rop->mod.n));
         }
     }
 }

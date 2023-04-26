@@ -110,7 +110,7 @@ void fmpz_mpoly_evals(
 
         for (i = 0; i < A->length; i++)
         {
-            meval = fmpz_fdiv_ui(Acoeff + i, out->mod.n);
+            meval = fmpz_get_nmod(Acoeff + i, out->mod);
 
             for (j = 0; j < nvars; j++)
             {
@@ -185,7 +185,7 @@ void fmpz_mpoly_evals(
 
         for (i = 0; i < A->length; i++)
         {
-            meval = fmpz_fdiv_ui(Acoeff + i, (out + 0)->mod.n);
+            meval = fmpz_get_nmod(Acoeff + i, (out + 0)->mod);
 
             for (j = 0; j < LUTlen; j++)
             {

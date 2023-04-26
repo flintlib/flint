@@ -21,5 +21,5 @@ _fmpz_vec_get_nmod_vec(mp_ptr res, const fmpz * poly, slong len, nmod_t mod)
     slong i;
 
     for (i = 0; i < len; i++)
-       res[i] = fmpz_fdiv_ui(poly + i, mod.n);
+       res[i] = fmpz_get_nmod(poly + i, mod);
 }

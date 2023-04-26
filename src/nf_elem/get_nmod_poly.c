@@ -29,7 +29,7 @@ void _nf_elem_get_nmod_poly(nmod_poly_t pol, const nf_elem_t a, const nf_t nf)
     {
         {
             nmod_poly_fit_length(pol, 1);
-            pol->coeffs[0] = fmpz_fdiv_ui(LNF_ELEM_NUMREF(a), pol->mod.n);
+            pol->coeffs[0] = fmpz_get_nmod(LNF_ELEM_NUMREF(a), pol->mod);
             _nmod_poly_set_length(pol, 1);
             _nmod_poly_normalise(pol);
 
@@ -37,9 +37,9 @@ void _nf_elem_get_nmod_poly(nmod_poly_t pol, const nf_elem_t a, const nf_t nf)
     } else if (nf->flag & NF_QUADRATIC)
     {
         nmod_poly_fit_length(pol, 3);
-        pol->coeffs[0] = fmpz_fdiv_ui(QNF_ELEM_NUMREF(a), pol->mod.n);
-        pol->coeffs[1] = fmpz_fdiv_ui(QNF_ELEM_NUMREF(a) + 1, pol->mod.n);
-        pol->coeffs[2] = fmpz_fdiv_ui(QNF_ELEM_NUMREF(a) + 2, pol->mod.n);
+        pol->coeffs[0] = fmpz_get_nmod(QNF_ELEM_NUMREF(a), pol->mod);
+        pol->coeffs[1] = fmpz_get_nmod(QNF_ELEM_NUMREF(a) + 1, pol->mod);
+        pol->coeffs[2] = fmpz_get_nmod(QNF_ELEM_NUMREF(a) + 2, pol->mod);
         _nmod_poly_set_length(pol, 3);
         _nmod_poly_normalise(pol);
     } else
@@ -48,7 +48,7 @@ void _nf_elem_get_nmod_poly(nmod_poly_t pol, const nf_elem_t a, const nf_t nf)
         slong i;
         nmod_poly_fit_length(pol, len);
         for (i = 0; i < len; i++)
-            pol->coeffs[i] = fmpz_fdiv_ui(NF_ELEM(a)->coeffs + i, pol->mod.n);
+            pol->coeffs[i] = fmpz_get_nmod(NF_ELEM(a)->coeffs + i, pol->mod);
         _nmod_poly_set_length(pol, len);
         _nmod_poly_normalise(pol);
     }
@@ -60,11 +60,11 @@ void nf_elem_get_nmod_poly_den(nmod_poly_t pol, const nf_elem_t a, const nf_t nf
     if (den)
     {
         if (nf->flag & NF_LINEAR)
-            nmod_poly_scalar_mul_nmod(pol, pol, n_invmod(fmpz_fdiv_ui(LNF_ELEM_DENREF(a), pol->mod.n), pol->mod.n));
+            nmod_poly_scalar_mul_nmod(pol, pol, n_invmod(fmpz_get_nmod(LNF_ELEM_DENREF(a), pol->mod), pol->mod.n));
         else if (nf->flag & NF_QUADRATIC)
-            nmod_poly_scalar_mul_nmod(pol, pol, n_invmod(fmpz_fdiv_ui(QNF_ELEM_DENREF(a), pol->mod.n), pol->mod.n));
+            nmod_poly_scalar_mul_nmod(pol, pol, n_invmod(fmpz_get_nmod(QNF_ELEM_DENREF(a), pol->mod), pol->mod.n));
         else
-            nmod_poly_scalar_mul_nmod(pol, pol, n_invmod(fmpz_fdiv_ui(NF_ELEM_DENREF(a), pol->mod.n), pol->mod.n));
+            nmod_poly_scalar_mul_nmod(pol, pol, n_invmod(fmpz_get_nmod(NF_ELEM_DENREF(a), pol->mod), pol->mod.n));
     }
 }
 

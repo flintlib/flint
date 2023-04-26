@@ -20,6 +20,7 @@ _fmpz_CRT_ui_precomp(fmpz_t out, const fmpz_t r1, const fmpz_t m1, ulong r2,
 {
     mp_limb_t r1mod, s;
     fmpz_t tmp;
+    nmod_t mod;
 
     fmpz_init(tmp);
 
@@ -28,7 +29,11 @@ _fmpz_CRT_ui_precomp(fmpz_t out, const fmpz_t r1, const fmpz_t m1, ulong r2,
     else
         fmpz_set(tmp, r1);
 
-    r1mod = fmpz_fdiv_ui(tmp, m2);
+    mod.n = m2;
+    mod.ninv = m2inv;
+    mod.norm = flint_clz(m2);
+    r1mod = fmpz_get_nmod(tmp, mod);
+
     s = n_submod(r2, r1mod, m2);
     s = n_mulmod2_preinv(s, c, m2, m2inv);
     fmpz_addmul_ui(tmp, m1, s);

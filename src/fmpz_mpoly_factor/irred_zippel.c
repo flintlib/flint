@@ -306,7 +306,7 @@ static void _nmod_mpoly_set_fmpz_mpoly(
     Ap_len = 0;
     for (i = 0; i < A->length; i++)
     {
-        Ap->coeffs[Ap_len] = fmpz_fdiv_ui(A->coeffs + i, ctxp->mod.n);
+        Ap->coeffs[Ap_len] = fmpz_get_nmod(A->coeffs + i, ctxp->mod);
         if (Ap->coeffs[Ap_len] == 0)
             continue;
         mpoly_monomial_set(Ap->exps + N*Ap_len, A->exps + N*i, N);
@@ -335,7 +335,7 @@ static void _fmpz_mpoly_modpk_taylor_coeff(
     {
         FLINT_ASSERT(fmpz_divisible(E->coeffs + i, pk)); /* TODO !!! */
         fmpz_divexact(t, E->coeffs + i, pk);
-        T->coeffs[Tlen] = fmpz_fdiv_ui(t, ctxp->mod.n);
+        T->coeffs[Tlen] = fmpz_get_nmod(t, ctxp->mod);
         if (T->coeffs[Tlen] == 0)
             continue;
         mpoly_monomial_set(T->exps + N*Tlen, E->exps + N*i, N);
@@ -647,16 +647,6 @@ cleanup:
 }
 
 
-void nmod_poly_set_fmpz_poly(nmod_poly_t a, const fmpz_poly_t b)
-{
-    slong i;
-    nmod_poly_fit_length(a, b->length);
-    for (i = 0; i < b->length; i++)
-        a->coeffs[i] = fmpz_fdiv_ui(b->coeffs + i, a->mod.n);
-    a->length = b->length;
-    _nmod_poly_normalise(a);
-}
-
 /*
     return 1: success
            0: failed
@@ -957,7 +947,7 @@ next_zip_prime:
     }
 
     Aup->mod = ctxp->mod;
-    nmod_poly_set_fmpz_poly(Aup, Au);
+    fmpz_poly_get_nmod_poly(Aup, Au);
     if (Aup->length != Au->length || !nmod_poly_is_squarefree(Aup))
         goto next_zip_prime;
 
@@ -979,7 +969,7 @@ next_zip_prime:
 
     for (i = 0; i < n; i++)
     {
-        alphap[i] = fmpz_fdiv_ui(alpha + i, ctxp->mod.n);
+        alphap[i] = fmpz_get_nmod(alpha + i, ctxp->mod);
         if (alphap[i] == 0)
             goto next_zip_prime;
     }

@@ -41,7 +41,7 @@ __bernoulli_number_vec_mod_p(mp_ptr res, mp_ptr tmp, const fmpz * den,
     c = n_negmod(UWORD(1), mod.n);
     for (k = 1; k < m; k++)
     {
-        t = fmpz_fdiv_ui(den + 2*k, mod.n);
+        t = fmpz_get_nmod(den + 2*k, mod);
         t = n_mulmod2_preinv(c, t, mod.n, mod.ninv);
         res[k] = n_mulmod2_preinv(res[k], t, mod.n, mod.ninv);
         c = n_mulmod2_preinv(c, 2*(k+1)*(2*k-1), mod.n, mod.ninv);
