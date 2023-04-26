@@ -432,6 +432,10 @@ void _arb_poly_derivative(arb_ptr res, arb_srcptr poly, slong len, slong prec);
 
 void arb_poly_derivative(arb_poly_t res, const arb_poly_t poly, slong prec);
 
+void _arb_poly_nth_derivative(arb_ptr res, arb_srcptr poly, ulong n, slong len, slong prec);
+
+void arb_poly_nth_derivative(arb_poly_t res, const arb_poly_t poly, ulong n, slong prec);
+
 void _arb_poly_integral(arb_ptr res, arb_srcptr poly, slong len, slong prec);
 
 void arb_poly_integral(arb_poly_t res, const arb_poly_t poly, slong prec);

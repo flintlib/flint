@@ -153,6 +153,10 @@ void _acb_poly_derivative(acb_ptr res, acb_srcptr poly, slong len, slong prec);
 
 void acb_poly_derivative(acb_poly_t res, const acb_poly_t poly, slong prec);
 
+void _acb_poly_nth_derivative(acb_ptr res, acb_srcptr poly, ulong n, slong len, slong prec);
+
+void acb_poly_nth_derivative(acb_poly_t res, const acb_poly_t poly, ulong n, slong prec);
+
 void _acb_poly_integral(acb_ptr res, acb_srcptr poly, slong len, slong prec);
 
 void acb_poly_integral(acb_poly_t res, const acb_poly_t poly, slong prec);

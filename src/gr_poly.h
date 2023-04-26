@@ -285,6 +285,9 @@ WARN_UNUSED_RESULT int gr_poly_compose_series(gr_poly_t res, const gr_poly_t pol
 WARN_UNUSED_RESULT int _gr_poly_derivative(gr_ptr res, gr_srcptr poly, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_derivative(gr_poly_t res, const gr_poly_t poly, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int _gr_poly_nth_derivative(gr_ptr res, gr_srcptr poly, ulong n, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_nth_derivative(gr_poly_t res, const gr_poly_t poly, ulong n, gr_ctx_t ctx);
+
 WARN_UNUSED_RESULT int _gr_poly_integral(gr_ptr res, gr_srcptr poly, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_integral(gr_poly_t res, const gr_poly_t poly, gr_ctx_t ctx);
 

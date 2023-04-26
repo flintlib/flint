@@ -391,6 +391,9 @@ Derivative and integral
 .. function:: int _gr_poly_derivative(gr_ptr res, gr_srcptr poly, slong len, gr_ctx_t ctx)
               int gr_poly_derivative(gr_poly_t res, const gr_poly_t poly, gr_ctx_t ctx)
 
+.. function:: int _gr_poly_nth_derivative(gr_ptr res, gr_srcptr poly, ulong n, slong len, gr_ctx_t ctx)
+              int gr_poly_nth_derivative(gr_poly_t res, const gr_poly_t poly, ulong n, gr_ctx_t ctx)
+
 .. function:: int _gr_poly_integral(gr_ptr res, gr_srcptr poly, slong len, gr_ctx_t ctx)
               int gr_poly_integral(gr_poly_t res, const gr_poly_t poly, gr_ctx_t ctx)
 

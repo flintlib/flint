@@ -157,6 +157,7 @@ mp_limb_t n_mulmod_shoup(mp_limb_t w, mp_limb_t t, mp_limb_t w_precomp, mp_limb_
 
     umul_ppmm(p_hi, p_lo, w_precomp, t);
     q = p_hi;
+    (void) p_lo; /* unused */
 
     r = w * t;
     r -= q * p;

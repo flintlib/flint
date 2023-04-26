@@ -49,3 +49,4 @@ _nmod_poly_mul_mid_default_mpn_ctx(mp_ptr res, slong zl, slong zh, mp_srcptr a, 
 {
     _nmod_poly_mul_mid_mpn_ctx(res, zl, zh, a, an, b, bn, mod, get_default_mpn_ctx());
 }
+
