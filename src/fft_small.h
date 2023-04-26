@@ -477,10 +477,24 @@ typedef struct {
     double* bbuf;
 } mul_precomp_struct;
 
+void _mul_precomp_init(
+    mul_precomp_struct* M,
+    const ulong * b, ulong bn, ulong btrunc,
+    ulong depth,
+    nmod_t mod,
+    mpn_ctx_t R);
+
 FLINT_INLINE void _mul_precomp_clear(mul_precomp_struct* M)
 {
     flint_aligned_free(M->bbuf);
 }
+
+int _nmod_poly_mul_mid_precomp(
+    ulong* z, ulong zl, ulong zh,
+    const ulong* a, ulong an,
+    mul_precomp_struct* M,
+    nmod_t mod,
+    mpn_ctx_t R);
 
 typedef struct {
     mul_precomp_struct quo_maker[1];
