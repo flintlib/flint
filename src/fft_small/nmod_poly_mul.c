@@ -678,7 +678,7 @@ void _nmod_poly_mul_mod_xpnm1(
     }
 
     /* need prod_of_primes >= N * 4^modbits */
-    for (np = 1; np < 3; np++)
+    for (np = 1; np < 4; np++)
     {
         if (flint_mpn_cmp_ui_2exp(crt_data_prod_primes(R->crts + np - 1),
               R->crts[np - 1].coeff_len, N, 2*modbits) >= 0)
@@ -850,7 +850,7 @@ void _mul_precomp_init(
     }
 
     /* need prod_of_primes >= N * 4^modbits */
-    for (np = 1; np < 3; np++)
+    for (np = 1; np < 4; np++)
     {
         if (flint_mpn_cmp_ui_2exp(crt_data_prod_primes(R->crts + np - 1),
               R->crts[np - 1].coeff_len, N, 2*modbits) >= 0)
@@ -945,6 +945,7 @@ int _nmod_poly_mul_mid_precomp(
 
     ulong want_threads;
 
+    /* todo: even with np == 1, we may want threads for the conversion to fft */
     if (bn < 1500)
         want_threads = 1;
     else
