@@ -367,7 +367,7 @@ void s1worker_func(void* varg)
     thread_pool_handle* handles = NULL;
     slong nworkers = 0;
 
-    if (X->bn > 5000)
+    if (X->bn > 5000 && !X->squaring)
         nworkers = flint_request_threads(&handles, 2);
 
     for (i = X->start_pi; i < X->stop_pi; i++)
