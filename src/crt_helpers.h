@@ -365,6 +365,64 @@ FLINT_FORCE_INLINE void multi_sub_8(ulong z[], const ulong a[])
                                  a[7],a[6],a[5],a[4],a[3],a[2],a[1],a[0]);
 }
 
+FLINT_FORCE_INLINE void multi_rsub_0(ulong z[], const ulong a[])
+{
+}
+
+FLINT_FORCE_INLINE void multi_rsub_1(ulong z[], const ulong a[])
+{
+    z[0] = a[0] - z[0];
+}
+
+FLINT_FORCE_INLINE void multi_rsub_2(ulong z[], const ulong a[])
+{
+    sub_ddmmss(z[1],z[0],
+               a[1],a[0],
+               z[1],z[0]);
+}
+
+FLINT_FORCE_INLINE void multi_rsub_3(ulong z[], const ulong a[])
+{
+    sub_dddmmmsss(z[2],z[1],z[0],
+                  a[2],a[1],a[0],
+                  z[2],z[1],z[0]);
+}
+
+FLINT_FORCE_INLINE void multi_rsub_4(ulong z[], const ulong a[])
+{
+    sub_ddddmmmmssss(z[3],z[2],z[1],z[0],
+                     a[3],a[2],a[1],a[0],
+                     z[3],z[2],z[1],z[0]);
+}
+
+FLINT_FORCE_INLINE void multi_rsub_5(ulong z[], const ulong a[])
+{
+    sub_dddddmmmmmsssss(z[4],z[3],z[2],z[1],z[0],
+                        a[4],a[3],a[2],a[1],a[0],
+                        z[4],z[3],z[2],z[1],z[0]);
+}
+
+FLINT_FORCE_INLINE void multi_rsub_6(ulong z[], const ulong a[])
+{
+    sub_ddddddmmmmmmssssss(z[5],z[4],z[3],z[2],z[1],z[0],
+                           a[5],a[4],a[3],a[2],a[1],a[0],
+                           z[5],z[4],z[3],z[2],z[1],z[0]);
+}
+
+FLINT_FORCE_INLINE void multi_rsub_7(ulong z[], const ulong a[])
+{
+    sub_dddddddmmmmmmmsssssss(z[6],z[5],z[4],z[3],z[2],z[1],z[0],
+                              a[6],a[5],a[4],a[3],a[2],a[1],a[0],
+                              z[6],z[5],z[4],z[3],z[2],z[1],z[0]);
+}
+
+FLINT_FORCE_INLINE void multi_rsub_8(ulong z[], const ulong a[])
+{
+    sub_ddddddddmmmmmmmmssssssss(z[7],z[6],z[5],z[4],z[3],z[2],z[1],z[0],
+                                 a[7],a[6],a[5],a[4],a[3],a[2],a[1],a[0],
+                                 z[7],z[6],z[5],z[4],z[3],z[2],z[1],z[0]);
+}
+
 #else
 
 

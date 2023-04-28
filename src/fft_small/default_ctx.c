@@ -50,3 +50,9 @@ _nmod_poly_mul_mid_default_mpn_ctx(mp_ptr res, slong zl, slong zh, mp_srcptr a, 
     _nmod_poly_mul_mid_mpn_ctx(res, zl, zh, a, an, b, bn, mod, get_default_mpn_ctx());
 }
 
+int
+_fmpz_poly_mul_mid_default_mpn_ctx(fmpz * res, slong zl, slong zh, const fmpz * a, slong an, const fmpz * b, slong bn)
+{
+    return _fmpz_poly_mul_mid_mpn_ctx(res, zl, zh, a, an, b, bn, get_default_mpn_ctx());
+}
+

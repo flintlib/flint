@@ -14,6 +14,10 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
+#ifdef FLINT_HAVE_FFT_SMALL
+#include "fft_small.h"
+#endif
+
 void
 _fmpz_poly_mullow_tiny1(fmpz * res, const fmpz * poly1,
                          slong len1, const fmpz * poly2, slong len2, slong n)
@@ -117,6 +121,12 @@ _fmpz_poly_mullow(fmpz * res, const fmpz * poly1, slong len1,
     bits2 = _fmpz_vec_max_bits(poly2, len2);
     bits1 = FLINT_ABS(bits1);
     bits2 = FLINT_ABS(bits2);
+
+#ifdef FLINT_HAVE_FFT_SMALL
+    if (len2 >= 100 && (bits1 + bits2 <= 40 || bits1 + bits2 >= 128 || len2 >= 200))
+        if (_fmpz_poly_mul_mid_default_mpn_ctx(res, 0, n, poly1, len1, poly2, len2))
+            return;
+#endif
 
     if (bits1 <= SMALL_FMPZ_BITCOUNT_MAX && bits2 <= SMALL_FMPZ_BITCOUNT_MAX &&
         (len2 < 50 || (4 * len2 >= 3 * n && n < 150 + bits1 + bits2)))

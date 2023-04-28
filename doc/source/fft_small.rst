@@ -48,6 +48,13 @@ Polynomial arithmetic
     respectively using a given context object ``R`` or the default thread-local object.
     Assumes that `an \ge bn \ge 1`.
 
+.. function:: int _fmpz_poly_mul_mid_mpn_ctx(fmpz * z, ulong zl, ulong zh, const fmpz * a, ulong an, const fmpz * b, ulong bn, mpn_ctx_t R)
+              int _fmpz_poly_mul_mid_default_mpn_ctx(fmpz * z, ulong zl, ulong zh, const fmpz * a, ulong an, const fmpz * b, ulong bn)
+
+    Like the ``nmod`` functions. Performs the multiplication and returns 1
+    if there are sufficiently many primes ``R`` to compute the result;
+    otherwise returns 0 without touching the output.
+
 .. function:: void _nmod_poly_divrem_mpn_ctx(ulong * q, ulong * r, const ulong * a, ulong an, const ulong * b, ulong bn, nmod_t mod, mpn_ctx_t R)
 
     Polynomial division with remainder.
