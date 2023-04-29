@@ -529,6 +529,17 @@ void mpn_mul_default_mpn_ctx(mp_ptr r1, mp_srcptr i1, mp_size_t n1, mp_srcptr i2
 void _nmod_poly_mul_mid_default_mpn_ctx(mp_ptr res, slong zl, slong zh, mp_srcptr a, slong an, mp_srcptr b, slong bn, nmod_t mod);
 
 
+int _fmpz_poly_mul_mid_mpn_ctx(
+    fmpz * z, ulong zl, ulong zh,
+    const fmpz * a, ulong an,
+    const fmpz * b, ulong bn,
+    mpn_ctx_t R);
+
+int _fmpz_poly_mul_mid_default_mpn_ctx(
+    fmpz * z, slong zl, slong zh,
+    const fmpz * a, slong an,
+    const fmpz * b, slong bn);
+
 #ifdef __cplusplus
 }
 #endif
