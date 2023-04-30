@@ -381,6 +381,9 @@ void _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1,
 void _fmpz_poly_mullow_karatsuba_n(fmpz * res, const fmpz * poly1,
                                                 const fmpz * poly2, slong n);
 
+void _fmpz_poly_mullow_karatsuba(fmpz * res, const fmpz * poly1, slong len1,
+                              const fmpz * poly2, slong len2, slong n);
+
 void fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res,
                   const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n);
 
@@ -476,6 +479,8 @@ void _fmpz_poly_sqrlow_KS(fmpz * res, const fmpz * poly, slong len, slong n);
 void fmpz_poly_sqrlow_KS(fmpz_poly_t res, const fmpz_poly_t poly, slong n);
 
 void _fmpz_poly_sqrlow_karatsuba_n(fmpz * res, const fmpz * poly, slong n);
+
+void _fmpz_poly_sqrlow_karatsuba(fmpz * res, const fmpz * poly, slong len, slong n);
 
 void fmpz_poly_sqrlow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly, slong n);
 

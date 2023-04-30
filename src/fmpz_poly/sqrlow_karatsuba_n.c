@@ -78,14 +78,34 @@ void _fmpz_poly_sqrlow_karatsuba_n(fmpz * res, const fmpz * poly, slong n)
     _fmpz_vec_clear(temp, 2 * len + 2);
 }
 
+void _fmpz_poly_sqrlow_karatsuba(fmpz * res, const fmpz * poly, slong len, slong n)
+{
+    int clear = 0;
+    slong i;
+    fmpz *copy;
+
+    if (len >= n)
+        copy = (fmpz *) poly;
+    else
+    {
+        copy = flint_malloc(n * sizeof(fmpz));
+        for (i = 0; i < len; i++)
+            copy[i] = poly[i];
+        flint_mpn_zero((mp_ptr) copy + len, n - len);
+        clear = 1;
+    }
+
+    _fmpz_poly_sqrlow_karatsuba_n(res, copy, n);
+
+    if (clear)
+        flint_free(copy);
+}
+
 void
 fmpz_poly_sqrlow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
 {
     const slong len = FLINT_MIN(poly->length, n);
-    slong i, lenr;
-
-    int clear = 0;
-    fmpz *copy;
+    slong lenr;
 
     if (len == 0)
     {
@@ -94,37 +114,21 @@ fmpz_poly_sqrlow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
     }
 
     lenr = 2 * len - 1;
-    if (n > lenr)
-        n = lenr;
-
-    if (len >= n)
-        copy = poly->coeffs;
-    else
-    {
-        copy = flint_malloc(n * sizeof(fmpz));
-        for (i = 0; i < len; i++)
-            copy[i] = poly->coeffs[i];
-        flint_mpn_zero((mp_ptr) copy + len, n - len);
-        clear = 1;
-    }
+    n = FLINT_MIN(n, lenr);
 
     if (res != poly)
     {
         fmpz_poly_fit_length(res, n);
-        _fmpz_poly_sqrlow_karatsuba_n(res->coeffs, copy, n);
+        _fmpz_poly_sqrlow_karatsuba(res->coeffs, poly->coeffs, len, n);
     }
     else
     {
         fmpz_poly_t t;
         fmpz_poly_init2(t, n);
-        _fmpz_poly_sqrlow_karatsuba_n(t->coeffs, copy, n);
+        _fmpz_poly_sqrlow_karatsuba(t->coeffs, poly->coeffs, len, n);
         fmpz_poly_swap(res, t);
         fmpz_poly_clear(t);
     }
     _fmpz_poly_set_length(res, n);
     _fmpz_poly_normalise(res);
-
-    if (clear)
-        flint_free(copy);
 }
-

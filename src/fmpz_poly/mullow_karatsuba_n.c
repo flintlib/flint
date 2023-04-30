@@ -91,15 +91,50 @@ _fmpz_poly_mullow_karatsuba_n(fmpz * res, const fmpz * poly1,
 }
 
 void
+_fmpz_poly_mullow_karatsuba(fmpz * res, const fmpz * poly1, slong len1,
+                              const fmpz * poly2, slong len2, slong n)
+{
+    int clear = 0;
+    slong i;
+    fmpz *copy1, *copy2;
+
+    if (len1 >= n)
+        copy1 = (fmpz *) poly1;
+    else
+    {
+        copy1 = (fmpz *) flint_malloc(n * sizeof(fmpz));
+        for (i = 0; i < len1; i++)
+            copy1[i] = poly1[i];
+        flint_mpn_zero((mp_ptr) copy1 + len1, n - len1);
+        clear |= 1;
+    }
+
+    if (len2 >= n)
+        copy2 = (fmpz *) poly2;
+    else
+    {
+        copy2 = (fmpz *) flint_malloc(n * sizeof(fmpz));
+        for (i = 0; i < len2; i++)
+            copy2[i] = poly2[i];
+        flint_mpn_zero((mp_ptr) copy2 + len2, n - len2);
+        clear |= 2;
+    }
+
+    _fmpz_poly_mullow_karatsuba_n(res, copy1, copy2, n);
+
+    if (clear & 1)
+        flint_free(copy1);
+    if (clear & 2)
+        flint_free(copy2);
+}
+
+void
 fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly1,
                              const fmpz_poly_t poly2, slong n)
 {
     const slong len1 = FLINT_MIN(poly1->length, n);
     const slong len2 = FLINT_MIN(poly2->length, n);
-    slong i, lenr;
-
-    int clear = 0;
-    fmpz *copy1, *copy2;
+    slong lenr;
 
     if (len1 == 0 || len2 == 0)
     {
@@ -108,49 +143,21 @@ fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly1,
     }
 
     lenr = len1 + len2 - 1;
-    if (n > lenr)
-        n = lenr;
-
-    if (len1 >= n)
-        copy1 = poly1->coeffs;
-    else
-    {
-        copy1 = (fmpz *) flint_malloc(n * sizeof(fmpz));
-        for (i = 0; i < len1; i++)
-            copy1[i] = poly1->coeffs[i];
-        flint_mpn_zero((mp_ptr) copy1 + len1, n - len1);
-        clear |= 1;
-    }
-
-    if (len2 >= n)
-        copy2 = poly2->coeffs;
-    else
-    {
-        copy2 = (fmpz *) flint_malloc(n * sizeof(fmpz));
-        for (i = 0; i < len2; i++)
-            copy2[i] = poly2->coeffs[i];
-        flint_mpn_zero((mp_ptr) copy2 + len2, n - len2);
-        clear |= 2;
-    }
+    n = FLINT_MIN(n, lenr);
 
     if (res != poly1 && res != poly2)
     {
         fmpz_poly_fit_length(res, n);
-        _fmpz_poly_mullow_karatsuba_n(res->coeffs, copy1, copy2, n);
+        _fmpz_poly_mullow_karatsuba(res->coeffs, poly1->coeffs, len1, poly2->coeffs, len2, n);
     }
     else
     {
         fmpz_poly_t t;
         fmpz_poly_init2(t, n);
-        _fmpz_poly_mullow_karatsuba_n(t->coeffs, copy1, copy2, n);
+        _fmpz_poly_mullow_karatsuba(t->coeffs, poly1->coeffs, len1, poly2->coeffs, len2, n);
         fmpz_poly_swap(res, t);
         fmpz_poly_clear(t);
     }
     _fmpz_poly_set_length(res, n);
     _fmpz_poly_normalise(res);
-
-    if (clear & 1)
-        flint_free(copy1);
-    if (clear & 2)
-        flint_free(copy2);
 }

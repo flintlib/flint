@@ -99,7 +99,6 @@ void
 _fmpz_poly_mul(fmpz * res, const fmpz * poly1,
                          slong len1, const fmpz * poly2, slong len2)
 {
-    mp_size_t limbs1, limbs2;
     slong bits1, bits2, rbits;
 
     if (len2 == 1)
@@ -142,25 +141,47 @@ _fmpz_poly_mul(fmpz * res, const fmpz * poly1,
         }
     }
 
+#ifdef FLINT_HAVE_FFT_SMALL
+
+    if (len2 <= 6 && FLINT_MIN(bits1, bits2) <= 5000)
+        _fmpz_poly_mul_classical(res, poly1, len1, poly2, len2);
+    else if (len2 <= 4 || (len2 <= 8 && bits1 + bits2 >= 1500 && bits1 + bits2 <= 10000))
+        _fmpz_poly_mul_karatsuba(res, poly1, len1, poly2, len2);
+    else if
+        /* The fft_small-based KS is so efficient that SS currently
+           only wins in a specific medium-size region and for
+           huge products when using many threads. */
+        ((len2 >= 8 && len2 <= 75 && bits1 + bits2 >= 800 && bits1 + bits2 <= 4000) ||
+            (len1 + len2 >= 5000 && bits1 + bits2 >= 5000 + (len1 + len2) / 10 && flint_get_num_threads() >= 4))
+        _fmpz_poly_mul_SS(res, poly1, len1, poly2, len2);
+    else
+        _fmpz_poly_mul_KS(res, poly1, len1, poly2, len2);
+
+#else
+
     if (len2 < 7)
     {
         _fmpz_poly_mul_classical(res, poly1, len1, poly2, len2);
-        return;
     }
-
-    limbs1 = (bits1 + FLINT_BITS - 1) / FLINT_BITS;
-    limbs2 = (bits2 + FLINT_BITS - 1) / FLINT_BITS;
-
-    if (len1 < 16 && (limbs1 > 12 || limbs2 > 12))
-        _fmpz_poly_mul_karatsuba(res, poly1, len1, poly2, len2);
-    else if (limbs1 + limbs2 <= 8)
-        _fmpz_poly_mul_KS(res, poly1, len1, poly2, len2);
-    else if ((limbs1+limbs2)/2048 > len1 + len2)
-        _fmpz_poly_mul_KS(res, poly1, len1, poly2, len2);
-    else if ((limbs1 + limbs2)*FLINT_BITS*4 < len1 + len2)
-       _fmpz_poly_mul_KS(res, poly1, len1, poly2, len2);
     else
-       _fmpz_poly_mul_SS(res, poly1, len1, poly2, len2);
+    {
+        mp_size_t limbs1, limbs2;
+
+        limbs1 = (bits1 + FLINT_BITS - 1) / FLINT_BITS;
+        limbs2 = (bits2 + FLINT_BITS - 1) / FLINT_BITS;
+
+        if (len1 < 16 && (limbs1 > 12 || limbs2 > 12))
+            _fmpz_poly_mul_karatsuba(res, poly1, len1, poly2, len2);
+        else if (limbs1 + limbs2 <= 8)
+            _fmpz_poly_mul_KS(res, poly1, len1, poly2, len2);
+        else if ((limbs1+limbs2)/2048 > len1 + len2)
+            _fmpz_poly_mul_KS(res, poly1, len1, poly2, len2);
+        else if ((limbs1 + limbs2)*FLINT_BITS*4 < len1 + len2)
+           _fmpz_poly_mul_KS(res, poly1, len1, poly2, len2);
+        else
+           _fmpz_poly_mul_SS(res, poly1, len1, poly2, len2);
+    }
+#endif
 }
 
 void
