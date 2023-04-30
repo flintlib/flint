@@ -21,8 +21,10 @@ _fmpq_poly_asin_series(fmpz * g, fmpz_t gden,
     fmpz * u;
     fmpz_t tden;
     fmpz_t uden;
+    slong h2len;
 
     hlen = FLINT_MIN(hlen, n);
+    h2len = FLINT_MIN(2 * hlen - 1, n);
 
     if (hlen == 1)
     {
@@ -37,11 +39,11 @@ _fmpq_poly_asin_series(fmpz * g, fmpz_t gden,
     fmpz_init(uden);
 
     /* asin(h(x)) = integral(h'(x)/sqrt(1-h(x)^2)) */
-    _fmpq_poly_mullow(u, uden, h, hden, hlen, h, hden, hlen, n);
-    _fmpq_poly_canonicalise(u, uden, n);
-    _fmpz_vec_neg(u, u, n);
+    _fmpq_poly_mullow(u, uden, h, hden, hlen, h, hden, hlen, h2len);
+    _fmpq_poly_canonicalise(u, uden, h2len);
+    _fmpz_vec_neg(u, u, h2len);
     fmpz_set(u, uden);  /* u += 1 */
-    _fmpq_poly_invsqrt_series(t, tden, u, uden, n, n);
+    _fmpq_poly_invsqrt_series(t, tden, u, uden, h2len, n);
     _fmpq_poly_derivative(u, uden, h, hden, hlen);
     _fmpq_poly_mullow(g, gden, t, tden, n, u, uden, hlen - 1, n);
     _fmpq_poly_canonicalise(g, gden, n - 1);
