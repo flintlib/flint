@@ -23,7 +23,24 @@ _arb_poly_compose_series(arb_ptr res, arb_srcptr poly1, slong len1,
     }
     else if (!_arb_vec_is_finite(poly1, len1) || !_arb_vec_is_finite(poly2, len2))
     {
-        _arb_vec_indeterminate(res, n);
+        /* find k such that the first k coefficients of both poly1 and
+         * poly2 are finite */
+        slong k = 0;
+
+        while (arb_is_finite(poly1 + k) && arb_is_finite(poly2 + k))
+            k += 1;
+
+        if (k > 0)
+        {
+            gr_ctx_t ctx;
+            gr_ctx_init_real_arb(ctx, prec);
+            GR_MUST_SUCCEED(_gr_poly_compose_series(res, poly1, k, poly2, k, FLINT_MIN(n, k), ctx));
+            _arb_vec_indeterminate(res + k, n - k);
+        }
+        else
+        {
+            _arb_vec_indeterminate(res, n);
+        }
     }
     else
     {
