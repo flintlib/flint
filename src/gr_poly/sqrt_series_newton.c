@@ -21,7 +21,7 @@ _gr_poly_sqrt_series_newton(gr_ptr g,
     slong a[FLINT_BITS];
     slong i, m, n, alloc;
     gr_ptr t, u, v;
-    slong tlen;
+    slong tlen, ulen;
 
     hlen = FLINT_MIN(hlen, len);
 
@@ -53,9 +53,11 @@ _gr_poly_sqrt_series_newton(gr_ptr g,
         n = a[i];
 
         tlen = FLINT_MIN(2 * m - 1, n);
+        ulen = FLINT_MIN(n, m + tlen - 1);
+
         status |= _gr_poly_mullow(t, g, m, g, m, tlen, ctx);
-        status |= _gr_poly_mullow(u, g, m, t, tlen, n, ctx);
-        status |= _gr_poly_mullow(t, u, n, h, FLINT_MIN(hlen, n), n, ctx);   /* should be mulmid */
+        status |= _gr_poly_mullow(u, g, m, t, tlen, ulen, ctx);
+        status |= _gr_poly_mullow(t, u, ulen, h, FLINT_MIN(hlen, n), n, ctx);   /* should be mulmid */
         status |= _gr_vec_mul_scalar_2exp_si(GR_ENTRY(g, m, sz), GR_ENTRY(t, m, sz), n - m, -1, ctx);
         status |= _gr_vec_neg(GR_ENTRY(g, m, sz), GR_ENTRY(g, m, sz), n - m, ctx);
     }

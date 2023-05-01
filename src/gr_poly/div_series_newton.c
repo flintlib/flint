@@ -59,9 +59,9 @@ _gr_poly_div_series_newton(gr_ptr res, gr_srcptr B, slong Blen, gr_srcptr A, slo
         Anlen = FLINT_MIN(Alen, n);
         Wlen = FLINT_MIN(Anlen + m - 1, n);
         W2len = Wlen - m;
-
         status |= _gr_poly_mullow(W, A, Anlen, res, m, Wlen, ctx);
-        status |= _gr_poly_mullow(GR_ENTRY(res, m, sz), res, m, GR_ENTRY(W, m, sz), W2len, n - m, ctx);
+        if (W2len != 0)
+            status |= _gr_poly_mullow(GR_ENTRY(res, m, sz), res, m, GR_ENTRY(W, m, sz), W2len, n - m, ctx);
         status |= _gr_vec_neg(GR_ENTRY(res, m, sz), GR_ENTRY(res, m, sz), n - m, ctx);
     }
 
@@ -70,7 +70,6 @@ _gr_poly_div_series_newton(gr_ptr res, gr_srcptr B, slong Blen, gr_srcptr A, slo
 
     Anlen = FLINT_MIN(Alen, n);
     Wlen = FLINT_MIN(Anlen + m - 1, n);
-    W2len = Wlen - m;
 
     /* Karp-Markstein */
     status |= _gr_poly_mullow(T, res, m, B, Blen, m, ctx);
