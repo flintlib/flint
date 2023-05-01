@@ -21,8 +21,10 @@ _fmpq_poly_atan_series(fmpz * g, fmpz_t gden,
     fmpz * u;
     fmpz_t tden;
     fmpz_t uden;
+    slong h2len;
 
     hlen = FLINT_MIN(hlen, n);
+    h2len = FLINT_MIN(2 * hlen - 1, n);
 
     if (hlen == 1)
     {
@@ -37,11 +39,11 @@ _fmpq_poly_atan_series(fmpz * g, fmpz_t gden,
     fmpz_init(uden);
 
     /* atan(h(x)) = integral(h'(x)/(1+h(x)^2)) */
-    _fmpq_poly_mullow(u, uden, h, hden, hlen, h, hden, hlen, n);
-    _fmpq_poly_canonicalise(u, uden, n);
+    _fmpq_poly_mullow(u, uden, h, hden, hlen, h, hden, hlen, h2len);
+    _fmpq_poly_canonicalise(u, uden, h2len);
     fmpz_set(u, uden);  /* u += 1 */
     _fmpq_poly_derivative(t, tden, h, hden, hlen);
-    _fmpq_poly_div_series(g, gden, t, tden, hlen - 1, u, uden, n, n);
+    _fmpq_poly_div_series(g, gden, t, tden, hlen - 1, u, uden, h2len, n);
     _fmpq_poly_canonicalise(g, gden, n - 1);
     _fmpq_poly_integral(g, gden, g, gden, n);
 

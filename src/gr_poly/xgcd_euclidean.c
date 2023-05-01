@@ -120,6 +120,7 @@ _gr_poly_xgcd_euclidean(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A,
             status |= _gr_vec_set(G, D, lenD, ctx);
             status |= _gr_vec_set(S, U, lenU, ctx);
 
+            if (status == GR_SUCCESS)
             {
                 lenQ = lenA + lenU - 1;
 

@@ -108,7 +108,6 @@ void _fmpz_poly_sqrlow_tiny2(fmpz * res, const fmpz * poly, slong len, slong n)
 
 void _fmpz_poly_sqrlow(fmpz * res, const fmpz * poly, slong len, slong n)
 {
-    mp_size_t limbs;
     slong bits, rbits;
 
     len = FLINT_MIN(len, n);
@@ -145,36 +144,45 @@ void _fmpz_poly_sqrlow(fmpz * res, const fmpz * poly, slong len, slong n)
         }
     }
 
+#ifdef FLINT_HAVE_FFT_SMALL
+
+    /* same as in mul.c */
+    if (len <= 6 && bits <= 5000)
+        _fmpz_poly_sqrlow_classical(res, poly, len, n);
+    else if (len <= 4 || (len <= 8 && 2 * bits >= 1500 && 2 * bits <= 10000))
+        _fmpz_poly_sqrlow_karatsuba(res, poly, len, n);
+    else if
+        ((len >= 8 && len <= 75 && 2 * bits >= 800 && 2 * bits <= 4000) ||
+            (len >= 5000 && 2 * bits >= 5000 + (2 * len) / 10 && flint_get_num_threads() >= 4))
+        _fmpz_poly_mullow_SS(res, poly, len, poly, len, n);
+    else
+        _fmpz_poly_sqrlow_KS(res, poly, len, n);
+
+#else
+
     if (n < 7)
     {
         _fmpz_poly_sqrlow_classical(res, poly, len, n);
-        return;
     }
-
-    limbs = (bits + FLINT_BITS - 1) / FLINT_BITS;
-
-    if (n < 16 && limbs > 12)
-    {
-        int i;
-        fmpz *copy;
-
-        copy = flint_malloc(n * sizeof(fmpz));
-        for (i = 0; i < len; i++)
-            copy[i] = poly[i];
-        flint_mpn_zero((mp_ptr) copy + len, n - len);
-
-        _fmpz_poly_sqrlow_karatsuba_n(res, copy, n);
-
-        flint_free(copy);
-    }
-    else if (limbs <= 4)
-        _fmpz_poly_sqrlow_KS(res, poly, len, n);
-    else if (limbs/2048 > len)
-        _fmpz_poly_sqrlow_KS(res, poly, len, n);
-    else if (limbs*FLINT_BITS*4 < len)
-       _fmpz_poly_sqrlow_KS(res, poly, len, n);
     else
-       _fmpz_poly_mullow_SS(res, poly, len, poly, len, n);
+    {
+        mp_size_t limbs;
+
+        limbs = (bits + FLINT_BITS - 1) / FLINT_BITS;
+
+        if (n < 16 && limbs > 12)
+            _fmpz_poly_sqrlow_karatsuba(res, poly, len, n);
+        else if (limbs <= 4)
+            _fmpz_poly_sqrlow_KS(res, poly, len, n);
+        else if (limbs/2048 > len)
+            _fmpz_poly_sqrlow_KS(res, poly, len, n);
+        else if (limbs*FLINT_BITS*4 < len)
+           _fmpz_poly_sqrlow_KS(res, poly, len, n);
+        else
+           _fmpz_poly_mullow_SS(res, poly, len, poly, len, n);
+    }
+
+#endif
 }
 
 void fmpz_poly_sqrlow(fmpz_poly_t res, const fmpz_poly_t poly, slong n)

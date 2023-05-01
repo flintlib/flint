@@ -22,10 +22,13 @@ _fmpz_poly_divrem_preinv(fmpz * Q, fmpz * A, slong len1,
 
    _fmpz_poly_div_preinv(Q, A, len1, B, B_inv, len2);
 
-   if (len2 - 1 > n)
-      _fmpz_poly_mullow(P, B, len2 - 1, Q, n, len2 - 1);
-   else
-      _fmpz_poly_mullow(P, Q, n, B, len2 - 1, len2 - 1);
+   if (len2 - 1 > 0)
+   {
+       if (len2 - 1 > n)
+          _fmpz_poly_mullow(P, B, len2 - 1, Q, n, len2 - 1);
+       else
+          _fmpz_poly_mullow(P, Q, n, B, len2 - 1, len2 - 1);
+    }
 
    _fmpz_poly_sub(A, A, len2 - 1, P, len2 - 1);
 

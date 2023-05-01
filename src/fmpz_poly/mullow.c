@@ -99,15 +99,25 @@ void
 _fmpz_poly_mullow(fmpz * res, const fmpz * poly1, slong len1,
                                 const fmpz * poly2, slong len2, slong n)
 {
-    mp_size_t limbs1, limbs2;
     slong bits1, bits2, rbits;
 
     len1 = FLINT_MIN(len1, n);
     len2 = FLINT_MIN(len2, n);
 
+    FLINT_ASSERT(n > 0);
+    FLINT_ASSERT(len1 > 0);
+    FLINT_ASSERT(len2 > 0);
+    FLINT_ASSERT(n <= len1 + len2 - 1);
+
     if (len2 == 1)
     {
         _fmpz_vec_scalar_mul_fmpz(res, poly1, len1, poly2);
+        return;
+    }
+
+    if (len1 < len2)
+    {
+        _fmpz_poly_mullow(res, poly2, len2, poly1, len1, n);
         return;
     }
 
@@ -145,57 +155,46 @@ _fmpz_poly_mullow(fmpz * res, const fmpz * poly1, slong len1,
         }
     }
 
+#ifdef FLINT_HAVE_FFT_SMALL
+
+    /* same as in mul.c */
+    if (len2 <= 6 && FLINT_MIN(bits1, bits2) <= 5000)
+        _fmpz_poly_mullow_classical(res, poly1, len1, poly2, len2, n);
+    else if (len2 <= 4 || (len2 <= 8 && bits1 + bits2 >= 1500 && bits1 + bits2 <= 10000))
+        _fmpz_poly_mullow_karatsuba(res, poly1, len1, poly2, len2, n);
+    else if
+        ((len2 >= 8 && len2 <= 75 && bits1 + bits2 >= 800 && bits1 + bits2 <= 4000) ||
+            (len1 + len2 >= 5000 && bits1 + bits2 >= 5000 + (len1 + len2) / 10 && flint_get_num_threads() >= 4))
+        _fmpz_poly_mullow_SS(res, poly1, len1, poly2, len2, n);
+    else
+        _fmpz_poly_mullow_KS(res, poly1, len1, poly2, len2, n);
+
+#else
+
     if (len2 < 7)
     {
         _fmpz_poly_mullow_classical(res, poly1, len1, poly2, len2, n);
-        return;
     }
-
-    limbs1 = (bits1 + FLINT_BITS - 1) / FLINT_BITS;
-    limbs2 = (bits2 + FLINT_BITS - 1) / FLINT_BITS;
-
-    if (n < 16 && (limbs1 > 12 || limbs2 > 12))
-    {
-        int clear = 0, i;
-        fmpz *copy1, *copy2;
-
-        if (len1 >= n)
-            copy1 = (fmpz *) poly1;
-        else
-        {
-            copy1 = (fmpz *) flint_malloc(n * sizeof(fmpz));
-            for (i = 0; i < len1; i++)
-                copy1[i] = poly1[i];
-            flint_mpn_zero((mp_ptr) copy1 + len1, n - len1);
-            clear |= 1;
-        }
-
-        if (len2 >= n)
-            copy2 = (fmpz *) poly2;
-        else
-        {
-            copy2 = (fmpz *) flint_malloc(n * sizeof(fmpz));
-            for (i = 0; i < len2; i++)
-                copy2[i] = poly2[i];
-            flint_mpn_zero((mp_ptr) copy2 + len2, n - len2);
-            clear |= 2;
-        }
-
-        _fmpz_poly_mullow_karatsuba_n(res, copy1, copy2, n);
-
-        if (clear & 1)
-            flint_free(copy1);
-        if (clear & 2)
-            flint_free(copy2);
-    }
-    else if (limbs1 + limbs2 <= 8)
-        _fmpz_poly_mullow_KS(res, poly1, len1, poly2, len2, n);
-    else if ((limbs1+limbs2)/2048 > len1 + len2)
-        _fmpz_poly_mullow_KS(res, poly1, len1, poly2, len2, n);
-    else if ((limbs1 + limbs2)*FLINT_BITS*4 < len1 + len2)
-        _fmpz_poly_mullow_KS(res, poly1, len1, poly2, len2, n);
     else
-        _fmpz_poly_mullow_SS(res, poly1, len1, poly2, len2, n);
+    {
+        mp_size_t limbs1, limbs2;
+
+        limbs1 = (bits1 + FLINT_BITS - 1) / FLINT_BITS;
+        limbs2 = (bits2 + FLINT_BITS - 1) / FLINT_BITS;
+
+        if (n < 16 && (limbs1 > 12 || limbs2 > 12))
+            _fmpz_poly_mullow_karatsuba(res, poly1, len1, poly2, len2, n);
+        else if (limbs1 + limbs2 <= 8)
+            _fmpz_poly_mullow_KS(res, poly1, len1, poly2, len2, n);
+        else if ((limbs1+limbs2)/2048 > len1 + len2)
+            _fmpz_poly_mullow_KS(res, poly1, len1, poly2, len2, n);
+        else if ((limbs1 + limbs2)*FLINT_BITS*4 < len1 + len2)
+            _fmpz_poly_mullow_KS(res, poly1, len1, poly2, len2, n);
+        else
+            _fmpz_poly_mullow_SS(res, poly1, len1, poly2, len2, n);
+    }
+
+#endif
 }
 
 void
