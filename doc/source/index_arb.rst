@@ -16,7 +16,6 @@
        using.rst
        issues.rst
        contributing.rst
-       credits.rst
 
     Example programs
     ::::::::::::::::::::
