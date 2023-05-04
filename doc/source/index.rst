@@ -26,6 +26,7 @@ Introduction
    introduction.rst
    building.rst
    bug_reporting.rst
+   contributing.rst
    contributors.rst
    examples.rst
    memory.rst
@@ -206,8 +207,6 @@ Real and complex numbers
    polylogarithms.rst
    hypergeometric.rst
    agm.rst
-   setup.rst
-   contributing.rst
 
 .. toctree::
    :maxdepth: 1

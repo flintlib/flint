@@ -12,10 +12,8 @@
        :maxdepth: 2
 
        overview.rst
-       setup.rst
        using.rst
        issues.rst
-       contributing.rst
 
     Example programs
     ::::::::::::::::::::

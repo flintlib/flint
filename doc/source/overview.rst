@@ -3,17 +3,10 @@
 Feature overview
 ===============================================================================
 
-Arb builds upon `FLINT <http://flintlib.org/>`_, which deals with
-efficient computation over exact domains such as the rational numbers and
-finite fields. Arb extends FLINT to cover computations with real
-and complex numbers. The problem when computing with real and complex numbers
-is that approximations (typically floating-point numbers) must be used,
-potentially leading to incorrect results.
-
 Ball arithmetic, also known as mid-rad interval arithmetic, is an
 extension of floating-point arithmetic in which an error bound is
-attached to each variable. This allows computing rigorously with
-real and complex numbers.
+attached to each variable. This allows computing with real and
+complex numbers in a mathematically rigorous way.
 
 With plain floating-point arithmetic, the user must do an error analysis
 to guarantee that results are correct. Manual error analysis is time-consuming
@@ -40,14 +33,11 @@ the user full access to the internals. Finally, it implements a wider
 range of transcendental functions, covering a large portion of the
 special functions in standard reference works such as [NIST2012]_.
 
-Arb is designed for computer algebra and computational number
+The ball arithmetic routines in FLINT (formerly the standalone Arb
+library) are designed for computer algebra and computational number
 theory, but may be useful in any area demanding
 reliable or precise numerical computing.
-Arb scales seamlessly from tens of digits up to billions of digits.
-Efficiency is achieved by low level optimizations and use of
-asymptotically fast algorithms.
-
-Arb contains:
+The contents include:
 
 * A module (:ref:`arf <arf>`) for correctly rounded arbitrary-precision
   floating-point arithmetic. Arb's floating-point numbers have a few special
@@ -78,18 +68,3 @@ Arb contains:
 * Functions for high-precision evaluation of various
   mathematical constants and special functions, implemented using
   ball arithmetic with rigorous error bounds.
-
-Arb 1.x used a different set of numerical base types (*fmpr*, *fmprb*
-and *fmpcb*). These types had a slightly simpler internal representation,
-but generally had worse performance. All methods for the Arb 1.x types
-have now been ported to faster equivalents for the Arb 2.x types.
-The last version to include both the Arb 1.x and Arb 2.x types and methods
-was Arb 2.2. As of Arb 2.9, only a small set of *fmpr*
-methods are left for fallback and testing purposes.
-
-Arb uses `GMP <http://mpir.org>`_ / `MPIR <http://mpir.org>`_ and
-`FLINT <http://flintlib.org/>`_
-for the underlying integer arithmetic and various utility functions.
-Arb also uses `MPFR <http://mpfr.org/>`_ for testing purposes
-and internally to evaluate some functions.
-

@@ -1,7 +1,7 @@
 @import url("pygments.css");
 @import url("classic.css");
 
-body { font-family: "georgia", serif; }
+body { font-family: "arial", sans-serif; }
 
 div .toctree-wrapper { column-count: 2; }
 

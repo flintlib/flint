@@ -180,6 +180,19 @@ If your system supports parallel builds, FLINT will build in parallel, e.g.:
 
 On some systems, parallel builds appear to be available but buggy.
 
+Test iterations
+-------------------------------------------------------------------------------
+
+The number of test iterations can be changed with the
+``FLINT_TEST_MULTIPLIER`` environment variable. For example, the
+following will only run 10% of the default iterations::
+
+    export FLINT_TEST_MULTIPLIER=0.1
+    make check
+
+Conversely, ``FLINT_TEST_MULTIPLIER=10`` will stress test FLINT
+by performing 10x the default number of iterations.
+
 Testing a single module or file
 -------------------------------------------------------------------------------
 
@@ -331,4 +344,42 @@ you need to use FLINT2 are placed in the directories:
 
 depending on the version(s) that have been built.
 
+Running code
+-------------------------------------------------------------------------------
 
+Here is an example program to get started using FLINT:
+
+.. code-block:: c
+
+    #include "flint/arb.h"
+
+    int main()
+    {
+        arb_t x;
+        arb_init(x);
+        arb_const_pi(x, 50 * 3.33);
+        arb_printn(x, 50, 0); flint_printf("\n");
+        flint_printf("Computed with FLINT-%s\n", flint_version);
+        arb_clear(x);
+    }
+
+Compile it with::
+
+    gcc test.c -lflint
+
+Depending on the environment, you may also have to pass
+the flags ``-lmpfr`` and ``-lgmp`` to the compiler.
+If the FLINT header and library files are not in a standard location
+such as ``/usr/local``, you may also have to provide flags such as::
+
+    -I/path/to/flint -L/path/to/flint
+
+Finally, to run the program, make sure that the linker
+can find ``libflint``. If it is installed in a
+nonstandard location, you can for example add this path to the
+``LD_LIBRARY_PATH`` environment variable.
+
+The output of the example program should be something like the following::
+
+    [3.1415926535897932384626433832795028841971693993751 +/- 4.43e-50]
+    Computed with flint-3.0.0
