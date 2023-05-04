@@ -42,8 +42,6 @@ Use the following checklist regarding code style:
 Test code
 -------------------------------------------------------------------------------
 
-See :ref:`setup` for instructions on running test code.
-
 The easiest way to write a test program for a new function
 is to adapt the test code for an existing, similar function.
 
