@@ -133,7 +133,6 @@
 
        arb_fpwrap.rst
 
-
     Extra utility modules
     ::::::::::::::::::::::::::::::::::::
 
@@ -165,12 +164,3 @@
        polylogarithms.rst
        hypergeometric.rst
        agm.rst
-
-    Version history
-    :::::::::::::::::::::::::::::::::
-
-    .. toctree::
-       :maxdepth: 1
-
-       history.rst
-

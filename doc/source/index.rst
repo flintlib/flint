@@ -316,6 +316,14 @@ References
 
    references.rst
 
+Version history
+-----------------------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   history.rst
+
 Authors
 -----------------------------------
 

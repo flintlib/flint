@@ -3,41 +3,1758 @@
 History and changes
 ===============================================================================
 
-For more details, view the commit log
-in the git repository https://github.com/fredrik-johansson/arb
+FLINT version history
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-Old releases of the code can be accessed from
-https://github.com/fredrik-johansson/arb/releases
-
-Old versions of the documentation
+2023-??-?? -- FLINT 3.0
 -------------------------------------------------------------------------------
 
-* http://arblib.org/arb-2.23.0.pdf
-* http://arblib.org/arb-2.22.0.pdf
-* http://arblib.org/arb-2.21.0.pdf
-* http://arblib.org/arb-2.20.0.pdf
-* http://arblib.org/arb-2.19.0.pdf
-* http://arblib.org/arb-2.18.1.pdf
-* http://arblib.org/arb-2.18.0.pdf
-* http://arblib.org/arb-2.17.0.pdf
-* http://arblib.org/arb-2.16.0.pdf
-* http://arblib.org/arb-2.15.0.pdf
-* http://arblib.org/arb-2.14.0.pdf
-* http://arblib.org/arb-2.13.0.pdf
-* http://arblib.org/arb-2.12.0.pdf
-* http://arblib.org/arb-2.11.1.pdf
-* http://arblib.org/arb-2.11.0.pdf
-* http://arblib.org/arb-2.10.0.pdf
-* http://arblib.org/arb-2.9.0.pdf
-* http://arblib.org/arb-2.8.1.pdf
-* http://arblib.org/arb-2.8.0.pdf
-* http://arblib.org/arb-2.7.0.pdf
-* http://arblib.org/arb-2.6.0.pdf
-* http://arblib.org/arb-2.5.0.pdf
-* http://arblib.org/arb-2.4.0.pdf
-* http://arblib.org/arb-2.3.0.pdf
+Merged libraries
+..................
 
-2022-06-29 -- version 2.23.0
+Arb 2.24, Calcium 0.4 and Antic 0.2.5 have been merged into FLINT,
+adding support for arbitrary-precision ball arithmetic,
+exact real and complex arithmetic, and number fields.
+Arb, Calcium and Antic will no longer be maintained as separate
+libraries.
+Users upgrading to FLINT 3.0 should ensure that they
+no longer link to the
+old Arb, Calcium or Antic library files or include any header files
+from those libraries which may be incompatible.
+Note that
+header files belonging to Arb, Calcium and Antic
+now appear in the ``flint/`` subdirectory.
+For example, instead of ``#include "arb.h"``, it is necessary to
+``#include "flint/arb.h"`` (unless ``<INCLUDE_DIR>/flint`` has
+been added to the include path).
+
+Generic rings
+..................
+
+Small-prime FFT
+..................
+
+Other changes
+..................
+
+List of additions
+.................
+
+FLINT 3.0 includes all functions in FLINT 2.9, Arb 2.24, Calcium 0.4
+and Antic 0.2.5 except those listed in the deprecated section.
+On top of this, outside of the fft_small module,
+the following functions have been added (omitting
+functions starting with an underscore):
+
+* acb_poly_nth_derivative, arb_div_arf_newton, arb_div_newton, arb_fmpz_divapprox, arb_nint, arb_poly_nth_derivative, arb_rsqrt_arf, arb_rsqrt_arf_newton, arb_sqrt_arf_newton, arb_sqrt_newton, arb_trunc, ca_set_fmpzi, flint_aligned_alloc, flint_aligned_free, flint_get_num_available_threads, flint_mpn_add_inplace_c, flint_mpn_cmp_ui_2exp, flint_mpn_mul_large, flint_mpn_nbits, flint_test_multiplier, flint_thread_pool_num_available, fmpz_get_str_bsplit_threaded, fmpz_mat_equal_col, fmpz_mat_equal_row, fmpz_neg_ui_array, fmpz_poly_q_evaluate_fmpq, fmpz_poly_q_scalar_div_fmpq, fmpz_poly_q_scalar_div_fmpz, fmpz_poly_q_scalar_mul_fmpq, fmpz_poly_q_scalar_mul_fmpz, fmpz_ui_pow_ui, fmpzi_set_qqbar, get_default_mpn_ctx, gr_abs, gr_acos, gr_acos_pi, gr_acosh, gr_acot, gr_acot_pi, gr_acoth, gr_acsc, gr_acsc_pi, gr_acsch, gr_add, gr_add_fmpq, gr_add_fmpz, gr_add_other, gr_add_si, gr_add_ui, gr_addmul, gr_addmul_fmpq, gr_addmul_fmpz, gr_addmul_other, gr_addmul_si, gr_addmul_ui, gr_agm, gr_agm1, gr_airy, gr_airy_ai, gr_airy_ai_prime, gr_airy_ai_prime_zero, gr_airy_ai_zero, gr_airy_bi, gr_airy_bi_prime, gr_airy_bi_prime_zero, gr_airy_bi_zero, gr_asec, gr_asec_pi, gr_asech, gr_asin, gr_asin_pi, gr_asinh, gr_atan, gr_atan2, gr_atan_pi, gr_atanh, gr_barnes_g, gr_bellnum_fmpz, gr_bellnum_ui, gr_bellnum_vec, gr_bernoulli_fmpz, gr_bernoulli_ui, gr_bernoulli_vec, gr_bernpoly_ui, gr_bessel_i, gr_bessel_i_scaled, gr_bessel_j, gr_bessel_j_y, gr_bessel_k, gr_bessel_k_scaled, gr_bessel_y, gr_beta, gr_beta_lower, gr_bin, gr_bin_ui, gr_bin_ui_vec, gr_bin_uiui, gr_bin_vec, gr_carlson_rc, gr_carlson_rd, gr_carlson_rf, gr_carlson_rg, gr_carlson_rj, gr_catalan, gr_ceil, gr_chebyshev_t, gr_chebyshev_t_fmpz, gr_chebyshev_u, gr_chebyshev_u_fmpz, gr_clear, gr_cmp, gr_cmp_other, gr_cmpabs, gr_cmpabs_other, gr_conj, gr_cos, gr_cos_integral, gr_cos_pi, gr_cosh, gr_cosh_integral, gr_cot, gr_cot_pi, gr_coth, gr_coulomb, gr_coulomb_f, gr_coulomb_g, gr_coulomb_hneg, gr_coulomb_hpos, gr_csc, gr_csc_pi, gr_csch, gr_csgn, gr_ctx_ca_get_option, gr_ctx_ca_set_option, gr_ctx_clear, gr_ctx_cmp_coercion, gr_ctx_data_as_ptr, gr_ctx_data_ptr, gr_ctx_fmpz_mod_set_primality, gr_ctx_fq_degree, gr_ctx_fq_order, gr_ctx_fq_prime, gr_ctx_get_real_prec, gr_ctx_get_str, gr_ctx_has_real_prec, gr_ctx_init_complex_acb, gr_ctx_init_complex_algebraic_ca, gr_ctx_init_complex_ca, gr_ctx_init_complex_float_acf, gr_ctx_init_complex_qqbar, gr_ctx_init_dirichlet_group, gr_ctx_init_fmpq, gr_ctx_init_fmpz, gr_ctx_init_fmpz_mod, gr_ctx_init_fmpz_poly, gr_ctx_init_fmpzi, gr_ctx_init_fq, gr_ctx_init_fq_nmod, gr_ctx_init_fq_zech, gr_ctx_init_gr_series, gr_ctx_init_gr_series_mod, gr_ctx_init_matrix_domain, gr_ctx_init_matrix_ring, gr_ctx_init_matrix_space, gr_ctx_init_mpoly, gr_ctx_init_nmod, gr_ctx_init_nmod8, gr_ctx_init_perm, gr_ctx_init_polynomial, gr_ctx_init_psl2z, gr_ctx_init_random, gr_ctx_init_real_algebraic_ca, gr_ctx_init_real_arb, gr_ctx_init_real_ca, gr_ctx_init_real_float_arf, gr_ctx_init_real_qqbar, gr_ctx_init_vector_gr_vec, gr_ctx_init_vector_space_gr_vec, gr_ctx_is_algebraically_closed, gr_ctx_is_canonical, gr_ctx_is_commutative_ring, gr_ctx_is_exact, gr_ctx_is_field, gr_ctx_is_finite, gr_ctx_is_finite_characteristic, gr_ctx_is_integral_domain, gr_ctx_is_multiplicative_group, gr_ctx_is_ordered_ring, gr_ctx_is_ring, gr_ctx_is_threadsafe, gr_ctx_is_unique_factorization_domain, gr_ctx_matrix_is_fixed_size, gr_ctx_print, gr_ctx_println, gr_ctx_set_real_prec, gr_ctx_sizeof_ctx, gr_ctx_sizeof_elem, gr_ctx_vector_gr_vec_is_fixed_size, gr_ctx_write, gr_dedekind_eta, gr_dedekind_eta_q, gr_digamma, gr_dilog, gr_dirichlet_beta, gr_dirichlet_chi_fmpz, gr_dirichlet_chi_vec, gr_dirichlet_eta, gr_dirichlet_hardy_theta, gr_dirichlet_hardy_z, gr_dirichlet_l, gr_div, gr_div_fmpq, gr_div_fmpz, gr_div_other, gr_div_si, gr_div_ui, gr_divexact, gr_divexact_fmpq, gr_divexact_fmpz, gr_divexact_other, gr_divexact_si, gr_divexact_ui, gr_divides, gr_dot_other, gr_doublefac, gr_doublefac_ui, gr_eisenstein_e, gr_eisenstein_g, gr_eisenstein_g_vec, gr_elliptic_e, gr_elliptic_e_inc, gr_elliptic_f, gr_elliptic_invariants, gr_elliptic_k, gr_elliptic_pi, gr_elliptic_pi_inc, gr_elliptic_roots, gr_equal, gr_erf, gr_erfc, gr_erfcinv, gr_erfcx, gr_erfi, gr_erfinv, gr_euclidean_div, gr_euclidean_divrem, gr_euclidean_rem, gr_euler, gr_eulernum_fmpz, gr_eulernum_ui, gr_eulernum_vec, gr_eulerpoly_ui, gr_evaluate_fmpz_mpoly_iter, gr_exp, gr_exp10, gr_exp2, gr_exp_integral, gr_exp_integral_ei, gr_exp_pi_i, gr_expm1, gr_fac, gr_fac_fmpz, gr_fac_ui, gr_fac_vec, gr_factor, gr_falling, gr_falling_ui, gr_fib_fmpz, gr_fib_ui, gr_fib_vec, gr_floor, gr_fmms, gr_fmpz_mpoly_evaluate, gr_fmpz_mpoly_evaluate_horner, gr_fmpz_poly_evaluate, gr_fmpz_poly_evaluate_horner, gr_fmpz_poly_evaluate_rectangular, gr_fq_frobenius, gr_fq_gen, gr_fq_is_primitive, gr_fq_multiplicative_order, gr_fq_norm, gr_fq_pth_root, gr_fq_trace, gr_fresnel, gr_fresnel_c, gr_fresnel_s, gr_gamma, gr_gamma_fmpq, gr_gamma_fmpz, gr_gamma_lower, gr_gamma_upper, gr_gcd, gr_gegenbauer_c, gr_gen, gr_generic_acot, gr_generic_acoth, gr_generic_acsc, gr_generic_acsch, gr_generic_add_fmpq, gr_generic_add_fmpz, gr_generic_add_other, gr_generic_add_si, gr_generic_add_ui, gr_generic_addmul, gr_generic_addmul_fmpq, gr_generic_addmul_fmpz, gr_generic_addmul_other, gr_generic_addmul_si, gr_generic_addmul_ui, gr_generic_asec, gr_generic_asech, gr_generic_asin, gr_generic_asinh, gr_generic_atan, gr_generic_atanh, gr_generic_bellnum_fmpz, gr_generic_bellnum_ui, gr_generic_bellnum_vec, gr_generic_bernoulli_fmpz, gr_generic_bernoulli_ui, gr_generic_bernoulli_vec, gr_generic_beta, gr_generic_bin, gr_generic_bin_ui, gr_generic_bin_ui_vec, gr_generic_bin_uiui, gr_generic_bin_vec, gr_generic_chebyshev_t2_fmpz, gr_generic_chebyshev_t_fmpz, gr_generic_chebyshev_u2_fmpz, gr_generic_chebyshev_u_fmpz, gr_generic_cmp, gr_generic_cmp_other, gr_generic_cmpabs, gr_generic_cmpabs_other, gr_generic_cos, gr_generic_ctx_clear, gr_generic_ctx_predicate, gr_generic_ctx_predicate_false, gr_generic_ctx_predicate_true, gr_generic_div_fmpq, gr_generic_div_fmpz, gr_generic_div_other, gr_generic_div_si, gr_generic_div_ui, gr_generic_divexact, gr_generic_doublefac, gr_generic_doublefac_ui, gr_generic_erfcx, gr_generic_eulernum_fmpz, gr_generic_eulernum_ui, gr_generic_eulernum_vec, gr_generic_exp, gr_generic_exp10, gr_generic_exp2, gr_generic_expm1, gr_generic_fac, gr_generic_fac_fmpz, gr_generic_fac_ui, gr_generic_fac_vec, gr_generic_falling, gr_generic_falling_ui, gr_generic_fib2_fmpz, gr_generic_fib_fmpz, gr_generic_fib_ui, gr_generic_fib_vec, gr_generic_get_fmpz_2exp_fmpz, gr_generic_harmonic, gr_generic_harmonic_ui, gr_generic_hilbert_class_poly, gr_generic_inv, gr_generic_is_invertible, gr_generic_is_neg_one, gr_generic_is_one, gr_generic_is_square, gr_generic_is_zero, gr_generic_log, gr_generic_log10, gr_generic_log1p, gr_generic_log2, gr_generic_mul_2exp_fmpz, gr_generic_mul_2exp_si, gr_generic_mul_fmpq, gr_generic_mul_fmpz, gr_generic_mul_other, gr_generic_mul_si, gr_generic_mul_two, gr_generic_mul_ui, gr_generic_mul_ui_via_ZZ, gr_generic_neg_one, gr_generic_other_add, gr_generic_other_add_vec, gr_generic_other_div, gr_generic_other_div_vec, gr_generic_other_divexact_vec, gr_generic_other_mul, gr_generic_other_mul_vec, gr_generic_other_pow, gr_generic_other_pow_vec, gr_generic_other_sub, gr_generic_other_sub_vec, gr_generic_partitions_fmpz, gr_generic_partitions_ui, gr_generic_partitions_vec, gr_generic_pow_fmpq, gr_generic_pow_fmpz, gr_generic_pow_fmpz_binexp, gr_generic_pow_other, gr_generic_pow_si, gr_generic_pow_ui, gr_generic_pow_ui_binexp, gr_generic_randtest_not_zero, gr_generic_rfac, gr_generic_rfac_fmpz, gr_generic_rfac_ui, gr_generic_rfac_vec, gr_generic_rising, gr_generic_rising_ui, gr_generic_rsqrt, gr_generic_scalar_add_vec, gr_generic_scalar_div_vec, gr_generic_scalar_divexact_vec, gr_generic_scalar_mul_vec, gr_generic_scalar_other_add_vec, gr_generic_scalar_other_div_vec, gr_generic_scalar_other_divexact_vec, gr_generic_scalar_other_mul_vec, gr_generic_scalar_other_pow_vec, gr_generic_scalar_other_sub_vec, gr_generic_scalar_pow_vec, gr_generic_scalar_sub_vec, gr_generic_set_fmpq, gr_generic_set_fmpz_2exp_fmpz, gr_generic_set_other, gr_generic_set_shallow, gr_generic_sin, gr_generic_sin_cos, gr_generic_sqr, gr_generic_sqrt, gr_generic_stirling_s1_ui_vec, gr_generic_stirling_s1_uiui, gr_generic_stirling_s1u_ui_vec, gr_generic_stirling_s1u_uiui, gr_generic_stirling_s2_ui_vec, gr_generic_stirling_s2_uiui, gr_generic_sub_fmpq, gr_generic_sub_fmpz, gr_generic_sub_other, gr_generic_sub_si, gr_generic_sub_ui, gr_generic_submul, gr_generic_submul_fmpq, gr_generic_submul_fmpz, gr_generic_submul_other, gr_generic_submul_si, gr_generic_submul_ui, gr_generic_tan, gr_generic_vec_add, gr_generic_vec_add_other, gr_generic_vec_add_scalar, gr_generic_vec_add_scalar_fmpq, gr_generic_vec_add_scalar_fmpz, gr_generic_vec_add_scalar_other, gr_generic_vec_add_scalar_si, gr_generic_vec_add_scalar_ui, gr_generic_vec_clear, gr_generic_vec_div, gr_generic_vec_div_other, gr_generic_vec_div_scalar, gr_generic_vec_div_scalar_fmpq, gr_generic_vec_div_scalar_fmpz, gr_generic_vec_div_scalar_other, gr_generic_vec_div_scalar_si, gr_generic_vec_div_scalar_ui, gr_generic_vec_divexact, gr_generic_vec_divexact_other, gr_generic_vec_divexact_scalar, gr_generic_vec_divexact_scalar_fmpq, gr_generic_vec_divexact_scalar_fmpz, gr_generic_vec_divexact_scalar_other, gr_generic_vec_divexact_scalar_si, gr_generic_vec_divexact_scalar_ui, gr_generic_vec_dot, gr_generic_vec_dot_fmpz, gr_generic_vec_dot_rev, gr_generic_vec_dot_si, gr_generic_vec_dot_ui, gr_generic_vec_equal, gr_generic_vec_init, gr_generic_vec_is_zero, gr_generic_vec_mul, gr_generic_vec_mul_other, gr_generic_vec_mul_scalar, gr_generic_vec_mul_scalar_2exp_si, gr_generic_vec_mul_scalar_fmpq, gr_generic_vec_mul_scalar_fmpz, gr_generic_vec_mul_scalar_other, gr_generic_vec_mul_scalar_si, gr_generic_vec_mul_scalar_ui, gr_generic_vec_neg, gr_generic_vec_normalise, gr_generic_vec_normalise_weak, gr_generic_vec_pow, gr_generic_vec_pow_other, gr_generic_vec_pow_scalar, gr_generic_vec_pow_scalar_fmpq, gr_generic_vec_pow_scalar_fmpz, gr_generic_vec_pow_scalar_other, gr_generic_vec_pow_scalar_si, gr_generic_vec_pow_scalar_ui, gr_generic_vec_reciprocals, gr_generic_vec_scalar_addmul, gr_generic_vec_scalar_addmul_si, gr_generic_vec_scalar_submul, gr_generic_vec_scalar_submul_si, gr_generic_vec_set, gr_generic_vec_set_powers, gr_generic_vec_sub, gr_generic_vec_sub_other, gr_generic_vec_sub_scalar, gr_generic_vec_sub_scalar_fmpq, gr_generic_vec_sub_scalar_fmpz, gr_generic_vec_sub_scalar_other, gr_generic_vec_sub_scalar_si, gr_generic_vec_sub_scalar_ui, gr_generic_vec_swap, gr_generic_vec_zero, gr_generic_write_n, gr_get_d, gr_get_fmpq, gr_get_fmpz, gr_get_fmpz_2exp_fmpz, gr_get_si, gr_get_str, gr_get_str_n, gr_get_ui, gr_glaisher, gr_harmonic, gr_harmonic_ui, gr_heap_clear, gr_heap_clear_vec, gr_heap_init, gr_heap_init_vec, gr_hermite_h, gr_hilbert_class_poly, gr_hurwitz_zeta, gr_hypgeom_0f1, gr_hypgeom_1f1, gr_hypgeom_2f1, gr_hypgeom_pfq, gr_hypgeom_u, gr_i, gr_im, gr_init, gr_inv, gr_is_invertible, gr_is_neg_one, gr_is_one, gr_is_square, gr_is_zero, gr_jacobi_p, gr_jacobi_theta, gr_jacobi_theta_1, gr_jacobi_theta_2, gr_jacobi_theta_3, gr_jacobi_theta_4, gr_khinchin, gr_laguerre_l, gr_lambertw, gr_lambertw_fmpz, gr_lcm, gr_legendre_p, gr_legendre_p_root_ui, gr_legendre_q, gr_lerch_phi, gr_lgamma, gr_log, gr_log10, gr_log1p, gr_log2, gr_log_barnes_g, gr_log_integral, gr_log_pi_i, gr_mat_add, gr_mat_add_scalar, gr_mat_addmul_scalar, gr_mat_adjugate, gr_mat_adjugate_charpoly, gr_mat_adjugate_cofactor, gr_mat_apply_row_similarity, gr_mat_charpoly, gr_mat_charpoly_berkowitz, gr_mat_charpoly_danilevsky, gr_mat_charpoly_faddeev, gr_mat_charpoly_faddeev_bsgs, gr_mat_charpoly_from_hessenberg, gr_mat_charpoly_gauss, gr_mat_charpoly_householder, gr_mat_clear, gr_mat_concat_horizontal, gr_mat_concat_vertical, gr_mat_det, gr_mat_det_berkowitz, gr_mat_det_cofactor, gr_mat_det_fflu, gr_mat_det_generic, gr_mat_det_generic_field, gr_mat_det_generic_integral_domain, gr_mat_det_lu, gr_mat_diag_mul, gr_mat_diagonalization, gr_mat_diagonalization_generic, gr_mat_diagonalization_precomp, gr_mat_div_scalar, gr_mat_eigenvalues, gr_mat_eigenvalues_other, gr_mat_entry_ptr, gr_mat_entry_srcptr, gr_mat_equal, gr_mat_exp, gr_mat_exp_jordan, gr_mat_fflu, gr_mat_find_nonzero_pivot, gr_mat_find_nonzero_pivot_generic, gr_mat_find_nonzero_pivot_large_abs, gr_mat_gr_poly_evaluate, gr_mat_hadamard, gr_mat_hessenberg, gr_mat_hessenberg_gauss, gr_mat_hessenberg_householder, gr_mat_hilbert, gr_mat_init, gr_mat_init_set, gr_mat_inv, gr_mat_invert_cols, gr_mat_invert_rows, gr_mat_is_diagonal, gr_mat_is_empty, gr_mat_is_hessenberg, gr_mat_is_lower_triangular, gr_mat_is_neg_one, gr_mat_is_one, gr_mat_is_scalar, gr_mat_is_square, gr_mat_is_upper_triangular, gr_mat_is_zero, gr_mat_jordan_blocks, gr_mat_jordan_form, gr_mat_jordan_transformation, gr_mat_log, gr_mat_log_jordan, gr_mat_lu, gr_mat_lu_classical, gr_mat_lu_recursive, gr_mat_minpoly_field, gr_mat_mul, gr_mat_mul_classical, gr_mat_mul_diag, gr_mat_mul_generic, gr_mat_mul_scalar, gr_mat_neg, gr_mat_nonsingular_solve, gr_mat_nonsingular_solve_den, gr_mat_nonsingular_solve_den_fflu, gr_mat_nonsingular_solve_fflu, gr_mat_nonsingular_solve_fflu_precomp, gr_mat_nonsingular_solve_lu, gr_mat_nonsingular_solve_lu_precomp, gr_mat_nonsingular_solve_tril, gr_mat_nonsingular_solve_tril_classical, gr_mat_nonsingular_solve_tril_recursive, gr_mat_nonsingular_solve_triu, gr_mat_nonsingular_solve_triu_classical, gr_mat_nonsingular_solve_triu_recursive, gr_mat_nullspace, gr_mat_one, gr_mat_ones, gr_mat_pascal, gr_mat_print, gr_mat_randops, gr_mat_randpermdiag, gr_mat_randrank, gr_mat_randtest, gr_mat_rank, gr_mat_rank_fflu, gr_mat_rank_lu, gr_mat_reduce_row, gr_mat_rref, gr_mat_rref_den, gr_mat_rref_den_fflu, gr_mat_rref_fflu, gr_mat_rref_lu, gr_mat_set, gr_mat_set_fmpq, gr_mat_set_fmpq_mat, gr_mat_set_fmpz, gr_mat_set_fmpz_mat, gr_mat_set_jordan_blocks, gr_mat_set_scalar, gr_mat_set_si, gr_mat_set_ui, gr_mat_solve_field, gr_mat_sqr, gr_mat_stirling, gr_mat_sub, gr_mat_sub_scalar, gr_mat_submul_scalar, gr_mat_swap, gr_mat_swap_cols, gr_mat_swap_entrywise, gr_mat_swap_rows, gr_mat_trace, gr_mat_trace_prod2, gr_mat_transpose, gr_mat_transpose_resize, gr_mat_window_clear, gr_mat_window_init, gr_mat_write, gr_mat_zero, gr_method_tab_init, gr_modular_delta, gr_modular_j, gr_modular_lambda, gr_mpoly_add, gr_mpoly_assert_canonical, gr_mpoly_clear, gr_mpoly_combine_like_terms, gr_mpoly_equal, gr_mpoly_fit_bits, gr_mpoly_fit_length, gr_mpoly_fit_length_fit_bits, gr_mpoly_fit_length_reset_bits, gr_mpoly_gen, gr_mpoly_get_coeff_scalar_fmpz, gr_mpoly_get_coeff_scalar_ui, gr_mpoly_init, gr_mpoly_init2, gr_mpoly_init3, gr_mpoly_is_canonical, gr_mpoly_is_gen, gr_mpoly_is_one, gr_mpoly_is_zero, gr_mpoly_mul, gr_mpoly_mul_fmpq, gr_mpoly_mul_fmpz, gr_mpoly_mul_johnson, gr_mpoly_mul_monomial, gr_mpoly_mul_scalar, gr_mpoly_mul_si, gr_mpoly_mul_ui, gr_mpoly_neg, gr_mpoly_one, gr_mpoly_print_pretty, gr_mpoly_push_term_scalar_fmpz, gr_mpoly_push_term_scalar_ui, gr_mpoly_randtest_bits, gr_mpoly_randtest_bound, gr_mpoly_set, gr_mpoly_set_coeff_fmpq_fmpz, gr_mpoly_set_coeff_fmpq_ui, gr_mpoly_set_coeff_fmpz_fmpz, gr_mpoly_set_coeff_fmpz_ui, gr_mpoly_set_coeff_scalar_fmpz, gr_mpoly_set_coeff_scalar_ui, gr_mpoly_set_coeff_si_fmpz, gr_mpoly_set_coeff_si_ui, gr_mpoly_set_coeff_ui_fmpz, gr_mpoly_set_coeff_ui_ui, gr_mpoly_set_fmpq, gr_mpoly_set_fmpz, gr_mpoly_set_scalar, gr_mpoly_set_si, gr_mpoly_set_ui, gr_mpoly_sort_terms, gr_mpoly_sub, gr_mpoly_swap, gr_mpoly_write_pretty, gr_mpoly_zero, gr_mul, gr_mul_2exp_fmpz, gr_mul_2exp_si, gr_mul_fmpq, gr_mul_fmpz, gr_mul_other, gr_mul_si, gr_mul_two, gr_mul_ui, gr_neg, gr_neg_one, gr_nint, gr_not_equal, gr_not_implemented, gr_not_in_domain, gr_one, gr_other_add, gr_other_div, gr_other_divexact, gr_other_mul, gr_other_pow, gr_other_sub, gr_partitions_fmpz, gr_partitions_ui, gr_partitions_vec, gr_pi, gr_poly_acos_series, gr_poly_acosh_series, gr_poly_add, gr_poly_add_series, gr_poly_asin_series, gr_poly_asinh_series, gr_poly_atan_series, gr_poly_atanh_series, gr_poly_clear, gr_poly_compose, gr_poly_compose_divconquer, gr_poly_compose_horner, gr_poly_compose_series, gr_poly_compose_series_brent_kung, gr_poly_compose_series_divconquer, gr_poly_compose_series_horner, gr_poly_derivative, gr_poly_div, gr_poly_div_basecase, gr_poly_div_divconquer, gr_poly_div_newton, gr_poly_div_series, gr_poly_div_series_basecase, gr_poly_div_series_invmul, gr_poly_div_series_newton, gr_poly_divrem, gr_poly_divrem_basecase, gr_poly_divrem_divconquer, gr_poly_divrem_newton, gr_poly_entry_ptr, gr_poly_equal, gr_poly_evaluate, gr_poly_evaluate_horner, gr_poly_evaluate_other, gr_poly_evaluate_other_horner, gr_poly_evaluate_other_rectangular, gr_poly_evaluate_rectangular, gr_poly_evaluate_vec_fast, gr_poly_evaluate_vec_iter, gr_poly_exp_series, gr_poly_exp_series_basecase, gr_poly_exp_series_basecase_mul, gr_poly_exp_series_newton, gr_poly_factor_squarefree, gr_poly_fit_length, gr_poly_gcd, gr_poly_gcd_euclidean, gr_poly_gcd_hgcd, gr_poly_gen, gr_poly_get_coeff_scalar, gr_poly_init, gr_poly_init2, gr_poly_integral, gr_poly_inv, gr_poly_inv_series, gr_poly_inv_series_basecase, gr_poly_inv_series_newton, gr_poly_is_gen, gr_poly_is_monic, gr_poly_is_one, gr_poly_is_zero, gr_poly_length, gr_poly_log1p_series, gr_poly_log_series, gr_poly_make_monic, gr_poly_mul, gr_poly_mul_scalar, gr_poly_mullow, gr_poly_neg, gr_poly_neg_one, gr_poly_nth_derivative, gr_poly_one, gr_poly_pow_fmpz, gr_poly_pow_series_fmpq_recurrence, gr_poly_pow_series_ui, gr_poly_pow_series_ui_binexp, gr_poly_pow_ui, gr_poly_pow_ui_binexp, gr_poly_print, gr_poly_randtest, gr_poly_rem, gr_poly_resultant, gr_poly_resultant_euclidean, gr_poly_resultant_hgcd, gr_poly_resultant_small, gr_poly_resultant_sylvester, gr_poly_reverse, gr_poly_roots, gr_poly_roots_other, gr_poly_rsqrt_series, gr_poly_rsqrt_series_basecase, gr_poly_rsqrt_series_miller, gr_poly_rsqrt_series_newton, gr_poly_set, gr_poly_set_coeff_fmpq, gr_poly_set_coeff_fmpz, gr_poly_set_coeff_scalar, gr_poly_set_coeff_si, gr_poly_set_coeff_ui, gr_poly_set_fmpq, gr_poly_set_fmpq_poly, gr_poly_set_fmpz, gr_poly_set_fmpz_poly, gr_poly_set_gr_poly_other, gr_poly_set_scalar, gr_poly_set_si, gr_poly_set_ui, gr_poly_shift_left, gr_poly_shift_right, gr_poly_sin_cos_series_basecase, gr_poly_sin_cos_series_tangent, gr_poly_sqrt_series, gr_poly_sqrt_series_basecase, gr_poly_sqrt_series_miller, gr_poly_sqrt_series_newton, gr_poly_squarefree_part, gr_poly_sub, gr_poly_sub_series, gr_poly_swap, gr_poly_tan_series, gr_poly_tan_series_basecase, gr_poly_tan_series_newton, gr_poly_taylor_shift, gr_poly_taylor_shift_convolution, gr_poly_taylor_shift_divconquer, gr_poly_taylor_shift_horner, gr_poly_truncate, gr_poly_write, gr_poly_xgcd_euclidean, gr_poly_xgcd_hgcd, gr_poly_zero, gr_polygamma, gr_polylog, gr_pow, gr_pow_fmpq, gr_pow_fmpz, gr_pow_other, gr_pow_si, gr_pow_ui, gr_print, gr_println, gr_randtest, gr_randtest_not_zero, gr_re, gr_rfac, gr_rfac_fmpz, gr_rfac_ui, gr_rfac_vec, gr_rgamma, gr_riemann_xi, gr_rising, gr_rising_ui, gr_rising_ui_forward, gr_rsqrt, gr_sec, gr_sec_pi, gr_sech, gr_series_acos, gr_series_acosh, gr_series_add, gr_series_agm1, gr_series_airy, gr_series_airy_ai, gr_series_airy_ai_prime, gr_series_airy_bi, gr_series_airy_bi_prime, gr_series_asin, gr_series_asinh, gr_series_atan, gr_series_atanh, gr_series_beta_lower, gr_series_clear, gr_series_cos_integral, gr_series_cosh_integral, gr_series_digamma, gr_series_dirichlet_hardy_theta, gr_series_dirichlet_hardy_z, gr_series_dirichlet_l, gr_series_div, gr_series_elliptic_k, gr_series_equal, gr_series_erf, gr_series_erfc, gr_series_erfi, gr_series_exp, gr_series_exp_integral_ei, gr_series_fresnel, gr_series_fresnel_c, gr_series_fresnel_s, gr_series_gamma, gr_series_gamma_lower, gr_series_gamma_upper, gr_series_gen, gr_series_hurwitz_zeta, gr_series_hypgeom_pfq, gr_series_init, gr_series_inv, gr_series_is_one, gr_series_is_zero, gr_series_jacobi_theta, gr_series_jacobi_theta_1, gr_series_jacobi_theta_2, gr_series_jacobi_theta_3, gr_series_jacobi_theta_4, gr_series_lgamma, gr_series_log, gr_series_log_integral, gr_series_make_exact, gr_series_mul, gr_series_neg, gr_series_one, gr_series_polylog, gr_series_randtest, gr_series_rgamma, gr_series_rsqrt, gr_series_set, gr_series_set_fmpq, gr_series_set_fmpz, gr_series_set_gr_poly, gr_series_set_scalar, gr_series_set_si, gr_series_set_ui, gr_series_sin_integral, gr_series_sinh_integral, gr_series_sqrt, gr_series_sub, gr_series_swap, gr_series_tan, gr_series_weierstrass_p, gr_series_write, gr_series_zero, gr_set, gr_set_d, gr_set_fmpq, gr_set_fmpz, gr_set_fmpz_2exp_fmpz, gr_set_other, gr_set_shallow, gr_set_si, gr_set_str, gr_set_ui, gr_sgn, gr_sin, gr_sin_cos, gr_sin_cos_pi, gr_sin_integral, gr_sin_pi, gr_sinc, gr_sinc_pi, gr_sinh, gr_sinh_cosh, gr_sinh_integral, gr_spherical_y_si, gr_sqr, gr_sqrt, gr_stieltjes, gr_stirling_s1_ui_vec, gr_stirling_s1_uiui, gr_stirling_s1u_ui_vec, gr_stirling_s1u_uiui, gr_stirling_s2_ui_vec, gr_stirling_s2_uiui, gr_stream_init_file, gr_stream_init_str, gr_stream_write, gr_stream_write_fmpz, gr_stream_write_free, gr_stream_write_si, gr_stream_write_ui, gr_sub, gr_sub_fmpq, gr_sub_fmpz, gr_sub_other, gr_sub_si, gr_sub_ui, gr_submul, gr_submul_fmpq, gr_submul_fmpz, gr_submul_other, gr_submul_si, gr_submul_ui, gr_swap, gr_swap2, gr_tan, gr_tan_pi, gr_tanh, gr_test_add_aliasing, gr_test_add_associative, gr_test_add_commutative, gr_test_add_type_variants, gr_test_addmul_submul, gr_test_addmul_type_variants, gr_test_binary_op_aliasing, gr_test_binary_op_associative, gr_test_binary_op_commutative, gr_test_binary_op_left_distributive, gr_test_binary_op_right_distributive, gr_test_binary_op_type_variants, gr_test_complex_parts, gr_test_div_right_distributive, gr_test_div_then_mul, gr_test_div_type_variants, gr_test_divexact, gr_test_divexact_type_variants, gr_test_equal, gr_test_field, gr_test_get_fmpq, gr_test_get_fmpz, gr_test_get_fmpz_2exp_fmpz, gr_test_get_si, gr_test_get_ui, gr_test_init_clear, gr_test_integral_domain, gr_test_inv_involution, gr_test_inv_multiplication, gr_test_iter, gr_test_mat_mul_classical_associative, gr_test_mul_2exp_fmpz, gr_test_mul_2exp_si, gr_test_mul_aliasing, gr_test_mul_associative, gr_test_mul_commutative, gr_test_mul_left_distributive, gr_test_mul_right_distributive, gr_test_mul_then_div, gr_test_mul_type_variants, gr_test_multiplicative_group, gr_test_neg, gr_test_one, gr_test_ordered_ring_cmp, gr_test_ordered_ring_cmpabs, gr_test_pow_fmpz_exponent_addition, gr_test_pow_ui_aliasing, gr_test_pow_ui_base_multiplication, gr_test_pow_ui_base_scalar_multiplication, gr_test_pow_ui_exponent_addition, gr_test_randtest_not_zero, gr_test_ring, gr_test_rsqrt, gr_test_set_fmpq, gr_test_set_fmpz, gr_test_set_si, gr_test_set_ui, gr_test_sqrt, gr_test_sub_aliasing, gr_test_sub_equal_neg_add, gr_test_sub_type_variants, gr_test_submul_type_variants, gr_test_swap, gr_test_vec_add, gr_test_vec_binary_op, gr_test_vec_div, gr_test_vec_divexact, gr_test_vec_dot, gr_test_vec_mul, gr_test_vec_pow, gr_test_vec_sub, gr_test_zero_one, gr_trunc, gr_vec_append, gr_vec_clear, gr_vec_entry_ptr, gr_vec_entry_srcptr, gr_vec_fit_length, gr_vec_init, gr_vec_length, gr_vec_print, gr_vec_set, gr_vec_set_length, gr_vec_write, gr_weierstrass_p, gr_weierstrass_p_inv, gr_weierstrass_p_prime, gr_weierstrass_sigma, gr_weierstrass_zeta, gr_write, gr_write_n, gr_zero, gr_zeta, gr_zeta_nzeros, gr_zeta_ui, gr_zeta_zero, gr_zeta_zero_vec, qqbar_set_fmpzi
+
+List of removals
+................
+
+The following functions that were present in FLINT 2.9, Arb 2.24 or
+Calcium 0.4 have been removed, deprecated, or replaced.
+Most are algorithms obsoleted by new gr implementations,
+functions dealing with removed types (fmpr) or GMP types (mpz, etc.),
+and internal functions that are no longer needed.
+
+* __fmpz_clear, __fmpz_eq, __fmpz_gt, __fmpz_gte, __fmpz_init, __fmpz_init_set, __fmpz_init_set_ui, __fmpz_lt, __fmpz_lte, __fmpz_mod_poly_div_divconquer, __fmpz_mod_poly_divrem_divconquer, __fmpz_neg, __fmpz_neq, __fmpz_set_si, __fmpz_set_ui, __fq_nmod_poly_divrem_divconquer, __fq_poly_divrem_divconquer, __fq_zech_poly_divrem_divconquer, __nmod_poly_div_divconquer, __nmod_poly_divrem_divconquer, __nmod_poly_invsqrt_series_prealloc, _acb_poly_compose_axnc, _acb_poly_compose_divconquer, _acb_poly_compose_horner, _acb_poly_compose_series_brent_kung, _acb_poly_compose_series_horner, _acb_poly_sin_cos_series_basecase, _acb_poly_sin_cos_series_tangent, _acb_poly_taylor_shift_convolution, _acb_poly_taylor_shift_divconquer, _acb_poly_taylor_shift_horner, _arb_poly_compose_axnc, _arb_poly_compose_divconquer, _arb_poly_compose_horner, _arb_poly_compose_series_brent_kung, _arb_poly_compose_series_horner, _arb_poly_sin_cos_series_basecase, _arb_poly_sin_cos_series_tangent, _arb_poly_taylor_shift_convolution, _arb_poly_taylor_shift_divconquer, _arb_poly_taylor_shift_horner, _arb_test_multiplier, _arith_bernoulli_number_vec_zeta, _arith_bernoulli_number_zeta, _arith_cos_minpoly, _arith_euler_number_zeta, _arith_number_of_partitions_mpfr, _ca_poly_atan_series, _ca_poly_compose_divconquer, _ca_poly_compose_horner, _calcium_test_multiplier, _fmpq_poly_set_array_mpq, _fmpr_add_1x1, _fmpr_add_eps, _fmpr_add_mpn, _fmpr_mul_1x1, _fmpr_mul_mpn, _fmpr_normalise_naive, _fmpr_set_round, _fmpr_set_round_mpn, _fmpz_deprecated_multi_crt_local_size, _fmpz_deprecated_multi_crt_run, _fmpz_deprecated_multi_crt_run_p, _fmpz_mod_poly_compose_divconquer, _fmpz_mod_poly_compose_divconquer_recursive, _fmpz_mod_poly_compose_horner, _fmpz_mod_poly_div_basecase, _fmpz_mod_poly_div_divconquer, _fmpz_mod_poly_div_divconquer_recursive, _fmpz_mod_poly_div_newton, _fmpz_mod_poly_divrem_divconquer, _fmpz_mod_poly_divrem_divconquer_recursive, _fmpz_mod_poly_gcd_cofactors, _fmpz_mod_poly_gcd_euclidean, _fmpz_mod_poly_gcd_hgcd, _fmpz_mod_poly_hgcd_recursive, _fmpz_mod_poly_hgcd_recursive_iter, _fmpz_mod_poly_hgcd_res, _fmpz_mod_poly_xgcd_euclidean, _fmpz_mod_poly_xgcd_hgcd, _fmpz_poly_evaluate_mpfr, _fmpz_ui_pow_ui, _fmpz_vec_get_mpf_vec, _fq_nmod_poly_compose_divconquer, _fq_nmod_poly_compose_horner, _fq_nmod_poly_div_basecase, _fq_nmod_poly_divrem_basecase, _fq_nmod_poly_divrem_divconquer, _fq_nmod_poly_divrem_divconquer_recursive, _fq_nmod_poly_gcd_euclidean, _fq_nmod_poly_gcd_hgcd, _fq_nmod_poly_hgcd, _fq_nmod_poly_hgcd_recursive, _fq_nmod_poly_hgcd_recursive_iter, _fq_nmod_poly_xgcd_euclidean, _fq_poly_compose_divconquer, _fq_poly_compose_horner, _fq_poly_div_basecase, _fq_poly_divrem_basecase, _fq_poly_divrem_divconquer, _fq_poly_divrem_divconquer_recursive, _fq_poly_gcd_euclidean, _fq_poly_gcd_hgcd, _fq_poly_hgcd, _fq_poly_hgcd_recursive, _fq_poly_hgcd_recursive_iter, _fq_poly_xgcd_euclidean, _fq_zech_poly_compose_divconquer, _fq_zech_poly_compose_horner, _fq_zech_poly_div_basecase, _fq_zech_poly_divrem_basecase, _fq_zech_poly_divrem_divconquer, _fq_zech_poly_divrem_divconquer_recursive, _fq_zech_poly_gcd_euclidean, _fq_zech_poly_gcd_hgcd, _fq_zech_poly_hgcd, _fq_zech_poly_hgcd_recursive, _fq_zech_poly_hgcd_recursive_iter, _fq_zech_poly_xgcd_euclidean, _nmod_mat_set_mod, _nmod_poly_compose_divconquer, _nmod_poly_compose_series_brent_kung, _nmod_poly_compose_series_divconquer, _nmod_poly_compose_series_horner, _nmod_poly_div_basecase, _nmod_poly_div_basecase_1, _nmod_poly_div_basecase_2, _nmod_poly_div_basecase_3, _nmod_poly_div_divconquer, _nmod_poly_div_divconquer_recursive, _nmod_poly_div_newton, _nmod_poly_divrem_basecase_1, _nmod_poly_divrem_basecase_2, _nmod_poly_divrem_basecase_3, _nmod_poly_divrem_divconquer, _nmod_poly_divrem_divconquer_recursive, _nmod_poly_divrem_newton, _nmod_poly_divrem_q0, _nmod_poly_divrem_q1, _nmod_poly_exp_series_basecase, _nmod_poly_exp_series_monomial_ui, _nmod_poly_exp_series_newton, _nmod_poly_hgcd_recursive, _nmod_poly_hgcd_recursive_iter, _nmod_poly_hgcd_res, _nmod_poly_integral_offset, _nmod_poly_log_series_monomial_ui, _nmod_poly_rem_basecase, _nmod_poly_rem_basecase_1, _nmod_poly_rem_basecase_2, _nmod_poly_rem_basecase_3, acb_poly_compose_divconquer, acb_poly_compose_horner, acb_poly_compose_series_brent_kung, acb_poly_compose_series_horner, acb_poly_sin_cos_series_basecase, acb_poly_sin_cos_series_tangent, acb_poly_taylor_shift_convolution, acb_poly_taylor_shift_divconquer, acb_poly_taylor_shift_horner, arb_flint_get_num_available_threads, arb_poly_compose_divconquer, arb_poly_compose_horner, arb_poly_compose_series_brent_kung, arb_poly_compose_series_horner, arb_poly_sin_cos_series_basecase, arb_poly_sin_cos_series_tangent, arb_poly_taylor_shift_convolution, arb_poly_taylor_shift_divconquer, arb_poly_taylor_shift_horner, arb_test_multiplier, arb_thread_pool_num_available, arf_get_fmpr, arf_set_fmpr, arith_cos_minpoly, arith_number_of_partitions_mpfr, ca_mat_transpose_resize, ca_poly_atan_series, ca_poly_compose_divconquer, ca_poly_compose_horner, calcium_test_multiplier, cos_minpoly, cos_pi_pq, fmpq_poly_evaluate_mpq, fmpq_poly_evaluate_mpz, fmpq_poly_get_coeff_mpq, fmpq_poly_scalar_div_mpq, fmpq_poly_scalar_div_mpz, fmpq_poly_scalar_mul_mpq, fmpq_poly_scalar_mul_mpz, fmpq_poly_set_array_mpq, fmpq_poly_set_coeff_mpq, fmpq_poly_set_coeff_mpz, fmpq_poly_set_mpq, fmpq_poly_set_mpz, fmpr_add, fmpr_add_fmpz, fmpr_add_naive, fmpr_add_si, fmpr_add_ui, fmpr_addmul, fmpr_addmul_fmpz, fmpr_addmul_si, fmpr_addmul_ui, fmpr_check_ulp, fmpr_cmp, fmpr_cmp_2exp_si, fmpr_cmpabs, fmpr_cmpabs_2exp_si, fmpr_cmpabs_ui, fmpr_div, fmpr_div_fmpz, fmpr_div_si, fmpr_div_ui, fmpr_exp, fmpr_expm1, fmpr_fmpz_div, fmpr_fmpz_div_fmpz, fmpr_get_d, fmpr_get_fmpq, fmpr_get_fmpz, fmpr_get_fmpz_2exp, fmpr_get_fmpz_fixed_fmpz, fmpr_get_fmpz_fixed_si, fmpr_get_mpfr, fmpr_get_si, fmpr_log, fmpr_log1p, fmpr_mul, fmpr_mul_fmpz, fmpr_mul_naive, fmpr_mul_si, fmpr_mul_ui, fmpr_pow_sloppy_fmpz, fmpr_pow_sloppy_si, fmpr_pow_sloppy_ui, fmpr_print, fmpr_printd, fmpr_randtest, fmpr_randtest_not_zero, fmpr_randtest_special, fmpr_root, fmpr_rsqrt, fmpr_set_d, fmpr_set_fmpq, fmpr_set_fmpz_2exp, fmpr_set_mpfr, fmpr_set_round_ui_2exp_fmpz, fmpr_set_round_uiui_2exp_fmpz, fmpr_si_div, fmpr_sqrt, fmpr_sub, fmpr_sub_fmpz, fmpr_sub_si, fmpr_sub_ui, fmpr_submul, fmpr_submul_fmpz, fmpr_submul_si, fmpr_submul_ui, fmpr_ui_div, fmpr_ulp, fmpz_deprecated_multi_crt, fmpz_deprecated_multi_crt_clear, fmpz_deprecated_multi_crt_init, fmpz_deprecated_multi_crt_precomp, fmpz_deprecated_multi_crt_precomp_p, fmpz_deprecated_multi_crt_precompute, fmpz_deprecated_multi_crt_precompute_p, fmpz_mat_col_equal, fmpz_mat_get_mpf_mat, fmpz_mat_row_equal, fmpz_mod_ctx_get_modulus_mpz_read_only, fmpz_mod_poly_compose_divconquer, fmpz_mod_poly_compose_horner, fmpz_mod_poly_div_basecase, fmpz_mod_poly_div_divconquer, fmpz_mod_poly_div_newton, fmpz_mod_poly_divrem_divconquer, fmpz_mod_poly_gcd_euclidean, fmpz_mod_poly_gcd_hgcd, fmpz_mod_poly_get_coeff_mpz, fmpz_mod_poly_set_coeff_mpz, fmpz_mod_poly_xgcd_euclidean, fmpz_mod_poly_xgcd_hgcd, fmpz_poly_evaluate_mpfr, fmpz_poly_evaluate_mpq, fmpz_poly_get_coeff_mpz, fmpz_poly_q_evaluate, fmpz_poly_q_scalar_div_mpq, fmpz_poly_q_scalar_div_mpz, fmpz_poly_q_scalar_mul_mpq, fmpz_poly_q_scalar_mul_mpz, fmpz_poly_scalar_divexact_mpz, fmpz_poly_scalar_fdiv_mpz, fmpz_poly_scalar_mul_mpz, fmpz_poly_set_coeff_mpz, fmpz_poly_set_mpz, fq_nmod_poly_compose_divconquer, fq_nmod_poly_compose_horner, fq_nmod_poly_divrem_basecase, fq_nmod_poly_divrem_divconquer, fq_nmod_poly_gcd_euclidean, fq_nmod_poly_gcd_hgcd, fq_nmod_poly_xgcd_euclidean, fq_poly_compose_divconquer, fq_poly_compose_horner, fq_poly_divrem_basecase, fq_poly_divrem_divconquer, fq_poly_gcd_euclidean, fq_poly_gcd_hgcd, fq_poly_xgcd_euclidean, fq_zech_poly_compose_divconquer, fq_zech_poly_compose_horner, fq_zech_poly_divrem_basecase, fq_zech_poly_divrem_divconquer, fq_zech_poly_gcd_euclidean, fq_zech_poly_gcd_hgcd, fq_zech_poly_xgcd_euclidean, mag_get_fmpr, mag_set_fmpr, mpfr_cos_pi_pq, mpfr_zeta_inv_euler_product, nmod_poly_compose_divconquer, nmod_poly_compose_series_brent_kung, nmod_poly_compose_series_divconquer, nmod_poly_compose_series_horner, nmod_poly_div_basecase, nmod_poly_div_divconquer, nmod_poly_div_newton, nmod_poly_divrem_divconquer, nmod_poly_divrem_newton, nmod_poly_exp_series_basecase, nmod_poly_exp_series_monomial_ui, nmod_poly_factor_get_nmod_poly, nmod_poly_log_series_monomial_ui, nmod_poly_rem_basecase, nmod_poly_set_fmpz_poly, sinh_cosh_divk_precomp
+
+2022-06-24 -- FLINT 2.9.0
+-------------------------------------------------------------------------------
+
+* Add fmpz_mod_poly_div function
+* Add _flint_get_memory function
+* Add Eulerian polynomials
+* Support "multivariate" polynomials with zero variables
+* Improve Stirling numbers of both kinds
+* Speed up numerous fmpz functions for small inputs
+* Improve Bell numbers
+* Speedups to nmod arithmetic
+* Improve nmod_mat LU decomposition
+* Fully separate nmod module from nmod_vec
+* Speed up Hermite polynomials
+* Add n-th derivative for Z[x] and Q[x]
+* Improve fq_default module (nmod is now used where optimal)
+* Add sqrt functions for numerous polynomial/series modules and finite fields
+* Add FFT matrix multiplication
+* Improve CI
+* Improve LLL for general use
+* Add matrix-vector products over Q
+* Add can_solve function for fmpq_mat, handling non-square/singular matrices
+* Document fmpz_mod_vec module
+* Fix and document qadic_sqrt function
+* Add parallel programming helpers
+
+2022-04-25 -- FLINT 2.8.5
+-------------------------------------------------------------------------------
+
+* Fix a serious bug in LLL
+
+2021-11-17 -- FLINT 2.8.4
+-------------------------------------------------------------------------------
+
+* Fix a serious bug in fmpz_mod_poly_xgcd for polynomials of large length
+* Fix an assertion failure in fmpz_mat_solve_fflu (only relevant if asserts enabled)
+* Fix some bugs on 32 bit machines
+* Work around a compiler bug on Apple M1
+* Fix bug in nmod_mpoly_factor (returned 0 for some factorisations)
+* Fix some documentation build errors and some doc formatting issues
+
+2021-11-03 -- FLINT 2.8.3
+-------------------------------------------------------------------------------
+
+* Fix a serious bug in nmod_poly_xgcd_hgcd, nmod_poly_xgcd, fmpz_poly_xgcd_modular, fmpz_poly_xgcd,
+  fmpq_poly_xgcd for polynomials of length >= 340.
+* Fix some copyright assignments
+* Fix some documentation errors
+
+2021-10-15 -- FLINT 2.8.2
+-------------------------------------------------------------------------------
+
+* Fix an issue with --disable-dependency-tracking on some distributions
+
+2021-10-01 -- FLINT 2.8.1
+-------------------------------------------------------------------------------
+
+* Numerous bug fixes
+* Adjust soname on android
+* Allow disabling of dependency tracking
+
+2021-07-23 -- FLINT 2.8.0
+-------------------------------------------------------------------------------
+
+* New fq_default module which combines existing finite fields
+* Speedups for linear algebra when using BLAS and/or threading
+* New series expansions with coefficients in QQ
+* Faster CRT
+* New fmpz_mod_mpoly module
+* Polynomial factoring improvements over ZZ
+* Fixed bugs in gmpcompat on Windows
+* Add fmpz_mat_can_solve_fflu and fmpz_mat_can_solve
+* Cleanup of the nmod_poly and nmod_poly_factor code
+* Implement nmod_mat_det_howell
+* Add fmpz_mod_poly_divides, fmpz_divides, n_divides, nmod_poly_divides
+* Interface for multiplying matrices by vectors and arrays
+* Nearest Euclidean division
+* Subresultant GCD
+* XGCD over ZZ with canonical Bezout coefficients
+* Add fmpz_mpoly resultant and discriminant
+* Add deprecations list
+* Add FLINT_SGN macro
+* Speedups for series computations
+* Switch to GitHub Actions for CI
+* Improve Taylor shift
+* Numerous bug fixes and speedups
+
+2021-01-18 -- FLINT 2.7.1
+-------------------------------------------------------------------------------
+
+* Fix build bug due to missing test files
+* Fix bug in fmpz_mod_poly_factor when there are more than five factors
+* Fix issue when using MPIR 3.0.0 on Win64 with command line build
+* Fix bug in fmpz_mod_poly_div_series
+* Fix some broken asserts
+* Support standard GNU installation directories in CMake build
+* Fix stack overflow with ICC
+
+2020-12-18 -- FLINT 2.7.0
+-------------------------------------------------------------------------------
+
+* Multivariate factorisation
+* Square root and square testing for finite fields
+* Square root and square testing for multivariates
+* Zassenhaus factoring speedups (incl. degree pruning)
+* Fast factorisation of cubic univariate polynomials
+* Add context objects to fmpz_mod_poly functions
+* Use BLAS for matrix multiplication over Z/nZ (small n)
+* Linear solving for non-square/singular matrices (can_solve)
+* Speed up factorisation over Z/nZ (for multiprecision n)
+
+2020-08-12 -- FLINT 2.6.3
+-------------------------------------------------------------------------------
+
+* Fix a bug in generator of finite field in characteristic 2
+* Allow Flint to work with GMP 6.1.2 and 6.2.0 interchangeably
+* Fix some old license headers
+
+2020-07-31 -- FLINT 2.6.2
+-------------------------------------------------------------------------------
+
+* Fix for choice of generator in an fq finite field of degree one
+* Fix an incorrectly written test
+
+2020-07-23 -- FLINT 2.6.1
+-------------------------------------------------------------------------------
+
+* Fix issues on Debian major architectures
+* Fix numerous reported bugs (mpoly, fq_poly, mpn_mul_1, mod 2 code, etc.)
+
+2020-06-05 -- FLINT 2.6.0
+-------------------------------------------------------------------------------
+
+* multivariate polynomials over most standard rings (sparse distributed)
+* APR-CL primality proving
+* elliptic curve integer factoring
+* minpoly and charpoly
+* improved quadratic sieve for integer factoring
+* embeddings of finite fields
+* pollard rho integer factoring
+* p+1 integer factoring
+* best of breed smooth integer factoring routine
+* best of breed general integer factoring routine
+* howell and strong echelon form
+* large speedups for solve and hence inverse over Z and Q
+* randprime and nextprime functions
+* pernet-stein HNF improvements
+* moller-granlund precomputed inverses
+* resultant_modular_div
+* fibonacci polynomials
+* exception mechanism/flint_abort
+* sqrt of series and polynomials
+* division of series over Z
+* power sums
+* improved base cases of various power series functions
+* ability to switch memory allocators
+* fast recurrence for Hermite polys
+* shifted Legendre polynomials
+* Laguerre polynomials
+* Gegenbauer polys
+* sphinx documentation
+* van hoeij with gradual feeding implementation of polynomial factoring over Z
+* perfect power detection
+* divisibility testing for polynomials
+* fast block based memory manager for bundling fmpz allocations
+* uniform random generation
+* CMake build system
+* linear algebra speedups when everything can be kept in longs
+* nmod module for integers mod (small) n
+* fmpz_mod_mat module for matrices over integers mod multiprecision n
+* kronecker product (tensor product)
+* random primitive polys (for finite fields)
+* thread pool implementation
+* threading of FFT for integer and polynomial multiplication over Z
+* threading of quadratic sieve for integer factoring
+* improved threading of factoring of polynomials mod p
+* threading for multivariate polynomial multiplication, division and GCD
+* threaded multiplication of matrices mod p
+* Berlekamp-Massey (nmod)
+* fmpz_mod module for integers mod multiprecision n
+* Pohlig-Hellman (discrete log)
+* farey_neighbours
+* remove openMP option
+* additional integer division variants
+* speed up mpn_mulmod_preinv
+* fft precaching
+* cyclotomic polynomial detection
+* polynomial root finding over finite fields
+* GMP 6.2 support
+* MPIR 3.0.0 support
+* many small speedups and additional convenience functions added
+
+2015-08-13 -- FLINT 2.5.2
+-------------------------------------------------------------------------------
+
+* Fix further issues with soname versioning and ldconfig
+* Fix a bug when using GMP instead of MPIR.
+
+2015-08-12 -- FLINT 2.5.1
+-------------------------------------------------------------------------------
+
+* Fix some build bugs related to soname versioning and ldconfig
+* Fix issue with Windows MSVC build
+
+2015-08-07 -- FLINT 2.5.0
+-------------------------------------------------------------------------------
+
+* LLL (rational, Nguyen-Stehle, from Gram matrix, with_removal, Storjohann/ULLL)
+* Hermite normal form (naive, xgcd, Domich-Kannan-Trotter, Kannan-Bachem, Pernet-Stein)
+* Smith normal form (diagonal, Kannan-Bachem, Iliopoulos)
+* Paterson-Stockmeyer algorithm
+* modular resultant
+* hgcd resultant
+* polynomial discriminant
+* multithreaded multimodular Taylor shift
+* multithreaded Brent-Kung composition
+* multithreaded Kaltofen-Shoup distinct degree factorisation
+* multiplication based reduced row echelon form
+* place inline functions in library for foreign function interfaces
+* Primality tests for large integers (Pocklington, Morrison)
+* Probable prime tests for large integers (Lucas, Baillie-PSW, strong-psp, Brillhart-Lehmer-Selfridge)
+* CRT for large integers
+* Dixon algorithm for nullspace
+* Brent-Kung composition in irreducibility and distinct degree factorisation
+* floating point QR decomposition
+* Schwarz-Rutishauser Gram-Schmidt algorithm
+* Ogita-Rump-Oishi dot product
+* matrix window functions
+* MSVC support (Brian Gladman)
+* fast cube/nth-root (Newton, Kahan, magic number, Chebyshev)
+* Bodrato matrix squaring
+* matrix concatenation functions
+* matrix content
+* faster n_gcd
+* faster n_sqrtmod and fmpz_sqrtmod
+* additional functions for returning factor of modulus in polys over Z/nZ
+* Hadamard matrix construction
+* series addition/subtraction
+* faster prime_pi bounds
+* speedup creation of sparse polynomials
+* speedup n_isprime n_nextprime
+* speedup n_isprime_pocklington
+* speedups to fmpq_poly and fmpz_poly arithmetic
+* speedup polynomial irreducibility testing over Z/pZ
+* speedup of rank computation over ZZ
+* made CPimport compile time dependency only
+* teach flint_printf/sprintf about explicit width format specifiers
+* support relative paths in configure
+* library soname versioning
+* ARM64 patches
+* Support MSYS2
+* Progress towards supporting MIPS64
+* Fix a serious bug in fmpz_poly_signature
+
+????-??-?? -- FLINT 2.4.5
+-------------------------------------------------------------------------------
+
+* fixed a severe bug in flint's fmpz_poly_gcd_heuristic, reported by
+  Anton Mellit.
+
+????-??-?? -- FLINT 2.4.4
+-------------------------------------------------------------------------------
+
+* fixed a severe bug in flint's primality code (n_is_prime() affecting n_factor())
+
+2014-04-01 -- FLINT 2.4.3
+-------------------------------------------------------------------------------
+
+* Fix a linker issue on Mac OSX.
+
+2014-03-11 -- FLINT 2.4.2
+-------------------------------------------------------------------------------
+
+* Fix bug in ARM assembly
+
+2012-11-20 -- FLINT 2.4
+-------------------------------------------------------------------------------
+
+* C++ expressions template wrapper
+* Fast factorisation of polynomials over Z/nZ
+* improved p-adics
+* polynomials/matrices over p-adics
+* qadics
+* Finite fields (small and large F_q), polynomials/matrices over F_q
+* Finite fields with Zech logarithm representation
+* Fast factorisation of polynomials over F_q
+* Faster Brent-Kung modular composition
+* New prime sieving code
+* Lambert-W function
+* Precomputed inverses for polynomials and large integers
+* Williams' P+1 integer factoring algorithm
+* Harvey's KS2/KS4 polynomial multiplication  
+* Faster primality testing up to 64 bits
+* Support for Cygwin64 and MinGW64
+* Support for Clang
+* Support for GMP
+* Support for Boehm-Demers-Weiser GC
+* Support for flint extension modules
+
+2012-07-01 -- FLINT 2.3
+-------------------------------------------------------------------------------
+
+* general
+
+  * many changes to the build system
+  * added NTL interface
+  * switched to custom memory allocation functions flint_malloc etc
+  * in addition to the entries below, fixed a large number of memory leaks,
+    problems with the test code, and bugs in corner cases of various functions
+  * added _fmpz_cleanup_mpz_content as an alternative to _fmpz_cleanup
+  * support MinGW32
+  * support Cygwin
+  * bugfix on ia64
+  * support sparc32/sparc64
+  * support OSX
+  * support Solaris, NetBSD, OpenBSD, etc (if bash, GNU Make present)
+
+* ulong_extras
+
+  * implemented the improved Lehman algorithm
+  * added n_jacobi_unsigned to allow n > WORD_MAX
+  * fixed n_sqrtmod for n > WORD_MAX
+  * fixed bug causing n_sqrtmod to hang
+  * added sublinear algorithm for computing factorials mod p
+  * added n_sqrtmod_primepow, n_sqrtmodn and associated functions for
+    computing square roots modulo composite integers
+  * fixed bugs in n_is_prime_pocklington
+  * fixed UWORD_MAX case in powmod and powmod2
+  * fixed problems with the random number generators
+  * fixed rare bug in n_mod_precomp
+  * fixed rare bug in n_is_prime_pseudosquare
+
+* long_extras
+
+  * added z_sizeinbase
+
+* qsieve
+
+  * new module implementing a quadratic sieve for numbers up to two limbs
+
+* fft
+
+  * new module providing an efficient Schoenhage-Strassen FFT
+
+* longlong
+
+  * added assembly code for ia64 and ARM
+  * fixed bug in fallback version of add_sssaaaaaa
+
+* fmpz
+
+  * added fmpz_fib_ui
+  * added double precision natural logarithm
+  * added fmpz_val2 for 2-valuation
+  * added mul_2exp, div_2exp, cdiv_q_2exp, tdiv_q_2exp, fdiv_r, fdiv_r_2exp,
+    tdiv_ui, mul_tdiv_q_2exp
+  * added get_d/set_d
+  * added fmpz_divisible, divisible_si
+  * optimised fmpz_powm and fmpz_powm_ui
+  * added clog, clog_ui, flog, flog_ui for computing logarithms
+  * added abs_lbound_ui_2exp, ubound_ui_2exp
+  * added fmpz_rfac_ui and fmpz_rfac_uiui for rising factorials
+  * added functions to obtain read-only fmpz_t's from mpz_t's
+  * added fmpz_init_set, init_set_ui
+  * added fmpz_gcdinv
+  * added fmpz_is_square
+  * added fmpz_tstbit, setbit, clrbit, complement, combit, and, or, xor, popcnt
+  * added a sign flag for CRT instead of using separate methods
+  * fixed bugs in fmpz_sqrtmod
+  * fixed a bug in fmpz_bit_unpack that could cause corruption of the global
+    fmpz array when compiled in single mode
+  * fixed a bug in fmpz_sub_ui that could cause memory corruption
+
+* fmpz_vec
+
+  * added functions for obtaining the largest absolute value coefficient
+  * added functions for computing the sum and product of an integer vector
+  * made max_bits much faster
+  * added _fmpz_vec_mod_fmpz
+  * made randtest produce sparse output
+
+* fmpz_poly
+
+  * added fmpz_poly_sqr, fmpz_poly_sqrlow for squaring a polynomial
+  * added fmpz_poly_lcm
+  * made multipoint interpolation faster by using the Newton basis
+  * added a function for fast division by a linear polynomial
+  * added power series composition (classical and Brent-Kung)
+  * added power series reversion (classical, Newton, fast Lagrange)
+  * added a function for obtaining the largest absolute value coefficient
+  * fixed quadratic memory usage and stack overflow when performing
+    unbalanced division or pseudo division using the divconquer algorithm
+  * fixed a bug in poly_zero_coeffs
+  * fixed a bug in xgcd_modular
+  * allowing +/-1 in the constant term of power series inversion
+  * fixed aliasing bug in divrem
+  * added restartable Hensel lifting and associated utility functions
+  * fixed rem, which used to only call the basecase algorithm
+  * fixed pseudo_divrem, which used to only call the basecase algorithm
+  * implemented Schoenhage-Strassen multiplication (mul_SS, mullow_SS)
+    and enabled this by default
+  * fixed a bug in the heuristic GCD algorithm
+  * added functions for Newton basis conversion
+  * added functions for fast Taylor shift
+  * added fmpz_poly_sqrt implementing a basecase algorithm
+  * added scalar mul_2exp, fdiv_2exp, tdiv_2exp
+  * made randtest produce sparse output
+  * added fmpz_poly_equal_fmpz
+  * improved performance by always using basecase multiplication
+    when one polynomial is short
+  * improved algorithm selection for fmpz_poly_gcd
+  * fixed several bugs in gcd_modular
+  * improved performance of gcd_modular
+
+* fmpz_poly_factor
+
+  * new module for factorisation of fmpz_polys
+  * added a naive implementation of the Zassenhaus algorithm
+
+* fmpz_mod_poly
+
+  * new module for polynomials modulo over Z/nZ for arbitrary-precision n
+  * multiplication, powering
+  * classical and divconquer division
+  * series inversion
+  * Euclidean GCD and XGCD
+  * invmod
+  * radix conversion
+  * divconquer composition
+  * GCD and division functions that test invertibility of the
+    leading coefficient
+
+* fmpz_mat
+
+  * added det_divisor for computing a random divisor of the determinant
+  * faster determinant computation using divisor trick
+  * faster determinant computation by using multimodular updates
+  * fixed n x 0 x m product not zeroing the result
+  * various interface improvements
+  * faster implementation of Cramer's rule for multiple right hand sides
+  * added fmpz_mat_fread and read
+  * added multi CRT/mod functions
+  * added trace
+
+* fmpz_poly_mat
+
+  * fixed n x 0 x m product not zeroing the result
+  * added inverse
+  * added rank computation
+  * added reduced row echelon form and nullspace computation
+  * added more utility functions
+  * added squaring and exponentiation
+  * added balanced product of a sequence of matrices
+  * added truncate, mullow, sqrlow, pow_trunc
+  * added trace
+
+* fmpz_factor
+
+  * new module providing interface for integer factorisation
+  * fast expansion of a factored integer
+
+* fmpq
+
+  * cleaned up and improved performance of rational reconstruction code
+  * allow separate numerator and denominator bounds for rational
+    reconstruction
+  * added continued fraction expansion
+  * added functions for summation using binary splitting
+  * added fmpq_swap
+  * added fmpq_print, fmpq_get_str
+  * added fmpq_pow_si
+  * added functions to obtain read-only fmpq_t's from mpq_t's
+  * added fmpq_cmp
+
+* fmpq_mat
+
+  * fixed n x 0 x m product not zeroing the result
+  * added fmpq_mat_transpose
+  * added trace
+
+* fmpq_poly
+
+  * improved speed of multipoint interpolation using _fmpz_poly_div_root
+  * fmpq_poly: added power series composition (classical and Brent-Kung)
+  * fmpq_poly: added power series reversion (classical, Newton, fast Lagrange)
+  * fixed bug wherein set_array_mpq modified the input
+  * added gcd, xgcd, lcm, resultant
+  * added fmpq_poly_set_fmpq
+  * added fmpq_poly_get_slice, fmpq_poly_reverse
+  * fixed aliasing bug in divrem
+  * changed some functions to use FLINT scalar types instead of MPIR data types
+  * added fmpq_poly_get_numerator
+
+* nmod_poly
+
+  * implemented the half gcd algorithm for subquadratic gcd and xgcd
+  * added multipoint evaluation and interpolation
+  * added asymptotically fast multipoint evaluation and interpolation
+  * added a function for forming the product of linear factors
+  * added a function for fast division by a linear polynomial
+  * added power series composition (classical and Brent-Kung)
+  * added power series reversion (classical, Newton, fast Lagrange)
+  * added nmod_poly_mulmod, powmod and related functions
+    (ported from flint1)
+  * added squarefree, irreducibility tests (ported from flint1)
+  * added Berlekamp and Cantor-Zassenhaus factoring (ported from flint1)
+  * fixed quadratic memory usage and stack overflow when performing
+    unbalanced division using the divconquer algorithm
+  * added compose_series_divconquer
+  * added resultant
+  * fixed aliasing bug in divrem
+  * added rem functions
+  * added divrem_q0, q1 for special cases of division
+  * added functions for fast Taylor shift
+  * added nmod_poly_sqrt
+  * made fread read the modulus from the file
+  * made randtest produce sparse output
+  * fixed bug in xgcd_euclidean with scalar inputs
+
+* nmod_vec
+
+  * added functions and macros for computing dot products
+  * made randtest produce sparse output
+
+* nmod_mat
+
+  * added addmul/submul functions
+  * asymptotically fast solving of triangular systems
+  * asymptotically fast LUP decomposition
+  * asymptotically fast determinant and rank computation
+  * asymptotically fast reduced row echelon form and nullspace
+  * asymptotically fast nonsingular solving
+  * asymptotically fast inverse
+  * tidied some interfaces
+  * fixed n x 0 x m product not zeroing the result
+  * added trace
+  * made multiplication faster for tiny moduli by means of bit packing
+
+* nmod_poly_mat
+
+  * new module for matrices over Z/nZ[x], with similar
+    functionality as the fmpz_poly_mat module
+  * determinant, rank, solving, reduced echelon form, nullspace
+  * fraction-free Gaussian elimination
+  * multiplication using bit packing
+  * multiplication using evaluation-interpolation
+  * determinant using evaluation-interpolation
+
+* padic
+
+  * restructured and improved much of the code
+  * added padic_log
+  * improved log and exp using rectangular splitting
+  * added asymptotically fast log and exp based on binary splitting
+
+* perm
+
+  * added the perm module for permutation matrices
+  * computing the parity of a permutation
+  * inverting a permutation
+
+* arith
+
+  * added generation of cyclotomic polynomials
+  * added functions for evaluating Dedekind sums
+  * fast computation of the partition function
+  * added a function for factoring a Hardy-Ramanujan-Rademacher
+    type exponential sum
+  * added Chebyshev polynomials T and U
+  * added computation of the minimal polynomial of cos(2pi/n)
+  * added asymptotically fast high-precision approximation of zeta(n)
+  * added asymptotically fast computation of Euler's constant
+  * added new algorithms and functions for computing Bell numbers
+  * fast computation of pi (adapting code written by Hanhong Xue)
+  * added functions for computing the number of sum of squares
+    representations of an integer
+  * renamed functions to have an arith prefix
+
+2011-06-04 -- FLINT 2.2
+-------------------------------------------------------------------------------
+
+* fmpq (multiprecision rational numbers)
+
+  * Basic arithmetic functions
+  * Utility functions
+  * Rational reconstruction
+  * Functions for enumerating the rationals
+
+* fmpq_mat (matrices over Q)
+
+  * Basic arithmetic functions
+  * Utility functions
+  * Fast multiplication
+  * Classical and fraction-free reduced row echelon form
+  * Determinants
+  * Fast non-singular solving
+
+* fmpz_poly_mat (matrices over Z[x]
+
+  * Basic arithmetic functions
+  * Utility functions
+  * Fraction-free row reduction and determinants
+  * Fast determinants (experimental)
+
+* fmpz_mat
+
+  * Added more utility functions (scalar multiplication, etc)
+  * Added Dixon's p-adic algorithm (used by fast nonsingular rational system
+    solving)
+  * Added reduced row echelon form
+  * Added conversions between fmpz_mat and nmod_mat
+  * Added CRT functions for fmpz_mats
+  * Faster matrix multiplication for small to medium dimensions
+
+* longlong.h
+
+  * Added x86 assembly macros for accumulating sums of two limb operands
+
+* nmod_mat
+
+  * Sped up arithmetic for moduli close to FLINT_BITS
+
+* arith
+
+  * Changed interface of various functions to use new fmpq type
+
+* fmpz
+
+  * Added fmpz_set_ui_mod
+  * Inlined fmpz_neg, fmpz_set_si, fmpz_set_ui for better performance
+  * Added fmpz_lcm
+  * Small performance improvement to fmpz_CRT_ui
+
+* fmpz_vec
+
+  * Added _fmpz_vec_lcm
+
+* fmpz_poly_q (rational functions over Q, modeled as quotients of fmpz_polys)
+
+  * Basic arithmetic functions
+  * Conversion and IO functions
+  * Evaluation
+
+* padic (p-adic numbers -- experimental)
+
+  * Basic arithmetic
+  * Data conversion and IO
+  * Inverse and square root using Newton iteration
+  * Teichmuller lifts (not optimised)
+  * p-adic exponential function (not optimised)
+
+* fmpz_poly
+
+  * Added fmpz_poly_gcd_modular (and fmpz_poly_gcd wrapper)
+  * Added fmpz_poly_xgcd_modular (and fmpz_poly_xgcd wrapper)
+  * Added conversions between fmpz_poly and nmod_poly
+  * Added CRT functions
+  * Added multipoint evaluation and interpolation
+
+* nmod_poly
+
+  * Added nmod_poly_xgcd_euclidean (and nmod_poly_xgcd wrapper)
+  * nmod_poly_gcd wrapper
+
+* mpn_extras
+
+  * Added MPN_NORM and MPN_SWAP macros.
+  * Added mpn_gcd_full to remove some of the restrictions from the usual mpn_gcd
+
+* build fixes
+
+  * fixed make install to create nonexistent dirs (reported by Serge Torres)
+  * -L use /usr instead of /usr/local by default (reported by Serge Torres)
+  * guards for system headers because of flint's use of ulong
+
+2011-03-09 -- FLINT 2.1
+-------------------------------------------------------------------------------
+
+* fmpz
+
+  * Simplified interface for fast multimodular reduction and CRT reconstruction
+  * Fixed segmentation fault in fmpz_multi_mod_ui when the input exceeds the product of the moduli
+  * Added simple incremental CRT functions (fmpz_CRT_ui, fmpz_CRT_ui_unsigned) to complement the existing fast ones
+  * Added example programs for CRT
+  * Added random number generators designed for testing modular code (fmpz_randtest_mod, fmpz_randtest_mod_signed)
+  * Added fmpz_fdiv_ui for remainder on division by an ulong
+  * Added fmpz_bin_uiui for computing binomial coefficients
+  * Added fmpz_mul2_uiui and fmpz_divexact2_uiui for multiplying or dividing an fmpz by a pair of ulongs (efficiently when their product fits in a single limb)
+
+* fmpz_mat
+
+  * Added utility functions for basic arithmetic and creating unit matrices
+  * Added multimodular determinant computation (certified or heuristic)
+  * Added support for computing right nullspaces (fmpz_mat_kernel). Fast only for small matrices.
+  * Some internal code cleanup and various small fixes
+
+* nmod_mat
+
+  * Faster Gaussian elimination for small moduli
+  * Faster determinants
+  * Faster matrix inversion and nonsingular solving
+
+* nmod_poly
+
+  * Added nmod_poly_integral for computing integrals
+  * Added fast square root and inverse square root of power series
+  * Added fast transcendental functions of power series (log, exp, sin, cos, tan, sinh, cosh, tanh, asin, atan, asinh, atanh)
+  * Made nmod_poly_inv_series_newton more memory efficient
+
+* fmpq_poly
+
+  * Added fmpq_poly_integral for computing integrals
+  * Added fast transcendental functions of power series (log, exp, sin, cos, tan, sinh, cosh, tanh, asin, atan, asinh, atanh)
+
+* arith
+
+  * Made computation of vectors of Bernoulli numbers faster
+  * Added fast computation of single Bernoulli numbers
+  * Added a separate function for computing denominators of Bernoulli numbers
+  * Added fast computation of Bell numbers (vector and single)
+  * Added fast computation of Euler numbers (vector and single)
+  * Added fast computation of Euler polynomials
+  * Added fast computation of Swinnerton-Dyer polynomials
+  * Added fast computation of Legendre polynomials
+  * Added fast vector computation of the partition function
+  * Added fast vector computation of Landau's function
+
+* ulong_extras
+
+  * Added a function for computing factorials mod n
+
+* build system
+
+  * Added support for building static and shared libraries
+  * All object files and test/profile/example binaries now build in separate build directory
+
+* documentation
+
+  * Large number of corrections
+
+2011-01-16 -- FLINT 2.0
+-------------------------------------------------------------------------------
+
+N.B: FLINT 2 is  a complete rewrite of flint from scratch
+It includes the following modules:
+
+* ulong_extras: (word sized integers and modular arithmetic)
+
+  * random numbers (randint, randbits, randprime, randint)
+  * powering
+  * reverse binary
+  * mod, divrem, mulmod all with precomputed inverses
+  * gcd, invgcd, xgcd
+  * jacobi symbols
+  * addmod, submod, invmod, powmod
+  * prime sieve, nextprime, prime-pi, nth-prime
+  * primality testing (small, binary search, Pocklington-Lehmer, Pseudosquare)
+  * probably prime tests (strong base-a, Fermat, Fibonacci, BPSW, Lucas)
+  * sqrt, sqrtrem, is-square, perfect-power (2,3,5)
+  * remove, is-squarefree
+  * factorisation (trial-range, trial, power (2,3,5), one-line, SQUFOF)
+  * Moebius mu, Euler phi
+   
+* fmpz: (memory managed multiple precision integers)
+
+  * memory management (init, clear)
+  * random numbers (randbits, randm)
+  * conversion to and from long, ulong, doubles, mpz's, strings
+  * read/write to file, stdin, stdout
+  * sizeinbase, bits, size, sgn, swap, set, zero
+  * cmp, cmp-ui, cmpabs, equal, is-zero, is-one
+  * neg, abs, add, add-ui, sub, sub-ui, mul, mul-si, mul-ui, mul-2exp
+  * addmul, addmul-ui, submul, submul-ui
+  * cdiv-q, cdiv-q-si, cdiv-q-ui
+  * fdiv-q, fdiv-q-si, fdiv-q-ui, fdiv-qr, fdiv-q-2exp
+  * tdiv-q, tdiv-q-si
+  * divexact, divexact-si, divexact-ui
+  * mod, mod-ui
+  * powering
+  * sqrt, sqrt-rem
+  * factorial
+  * gcd, invmod
+  * bit-pack, bit-unpack
+  * multimodular reduction, CRT 
+
+* fmpz_vec: (vectors over fmpz's)
+
+  * memory management (init, clear)
+  * random vectors
+  * max-bits, max-limbs
+  * read/write to file/stdin/stdout
+  * set, swap, zero, neg
+  * equal, is-zero
+  * sort
+  * add, sub
+  * scalar multiplication by fmpz, ulong, long, 2exp
+  * exact division by fmpz, long, ulong
+  * fdiv-q by fmpz, long, ulong, 2exp
+  * tdiv-q by fmpq, long, ulong
+  * addmul by fmpz, long, long by 2exp
+  * submul by fmpz, long, long by 2exp
+  * Gaussian content
+
+* fmpz_poly: (polys over fmpz's)
+
+  * memory management (init, realloc, fit-length, clear)
+  * random polys
+  * normalise, set-length, truncate
+  * length, degree, max-limbs, max-bits
+  * set, set-si, set-ui, set-fmpz, set-str
+  * get-str, get-str-pretty
+  * zero, one, zero-coeffs
+  * swap, reverse
+  * get/set coeffs from fmpz, long, ulong
+  * get-coeff-ptr, lead
+  * equal, is-zero
+  * add, sub
+  * scalar multiplication by fmpz, long, ulong
+  * scalar addmul/submul by fmpz
+  * scalar fdiv by fmpz, long, ulong
+  * scalar tdiv by fmpz, long, ulong
+  * scalar divexact by fmpz, long, ulong
+  * bit pack, bit unpack
+  * multiplication (classical, karatsuba, KS)
+  * mullow (classical, karatsuba, KS)
+  * mulhigh (classical, karatsuba)
+  * middle product (classical)
+  * powering (small, binary exponent, binomial, multinomial, addition chains)
+  * truncated powering (binary exponent)
+  * shift left/right
+  * euclidean norm
+  * gcd (subresultant)
+  * resultant
+  * content, primitive part
+  * divrem (basecase, divide-and-conquer)
+  * div (basecase, divide-and-conquer)
+  * rem (basecase)
+  * invert series (basecase, Newton)
+  * div series
+  * pseudo divrem (basecase, divide-and-conquer, Cohen)
+  * rem (Cohen)
+  * div
+  * evaluate (Horner) at fmpz, mpq, a mod n
+  * composition (Horner, divide-and-conquer)
+  * signature
+  * read/write to file/stdin/stdout
+
+* fmpq_poly: (polynomials over Q stored as poly over fmpz with fmpz denominator)
+
+  * memory management (init, realloc, fit-length, clear)
+  * random polys
+  * set-length, canonicalise, normalise, truncate
+  * is-canonical, length, degree
+  * reference to numerator, denominator
+  * set, set-si, set-ui, set-fmpz, set-mpz, set-mpq
+  * set-array-mpq, set-str
+  * get-str, get-str-pretty
+  * zero, neg, swap
+  * invert
+  * set coefficient to mpq, long, ulong, fmpz, mpz
+  * get coefficient as mpq
+  * equal, cmp, is-one, is-zero
+  * add, sub
+  * scalar multiplication by long, ulong, fmpz, mpq
+  * scalar division by fmpz, long, ulong, mpq
+  * multiplication, mullow
+  * powering 
+  * shift left/right
+  * divrem, div, rem
+  * invert series (Newton iteration)
+  * divide series
+  * derivative
+  * evaluate at fmpz, mpq
+  * composition, scale by constant
+  * content, primitive part
+  * make-monic, is-monic
+  * is-squarefree
+  * read/write to file/stdin/stdout
+
+* nmod_vec: (vectors over Z/nZ for n fitting in a machine word)
+
+  * memory management (init/clear)
+  * macros for efficient reduction of 1, 2 and 3 limb integers mod n
+  * macro for addmul mod n
+  * add/sub/neg individual coefficients mod n
+  * random vectors
+  * set, zero, swap
+  * reduce, max-bits
+  * equal
+  * add, sub, neg
+  * scalar multiplication by a value reduced mod n
+  * scalar addmul by a value reduced mod n
+
+* nmod_poly: (polynomials over Z/nZ for n fitting in a machine word)
+
+  * memory management (init, realloc, fit-length, clear)
+  * random polys
+  * normalise, truncate
+  * length, degree, modulus, max-bits
+  * set, swap, zero, reverse
+  * get/set coefficients as ulongs, strings
+  * read/write to file, stdin, stdout
+  * equal, is-zero
+  * shift left/right
+  * add, sub, neg
+  * scalar multiplication by a value reduced mod n
+  * make-monic
+  * bit pack, bit unpack
+  * multiplication (classical, KS)
+  * mullow (classical, KS)
+  * mulhigh (classical)
+  * powering (binary exponent)
+  * pow-trunc (binary exponent)
+  * divrem (basecase, divide-and-conquer, Newton iteration)
+  * div (basecase, divide-and-conquer, Newton iteration)
+  * invert series (basecase, Newton iteration)
+  * divide series (Newton iteration)
+  * derivative
+  * evaluation at a value taken mod n
+  * composition (Horner, divide-and-conquer)
+  * gcd (euclidean)
+
+* fmpz_mat: (matrices over fmpz's)
+
+  * memory management (init, clear)
+  * random matrices (bits, integer relations, simultaneous diophantine equations
+    NTRU-like, ajtai, permutation of rows and cols of a diagonal matrix, random
+    of given rank, random of given determinant, random elementary operations)
+  * set, init-set, swap, entry pointer
+  * write to file or stdout
+  * equal
+  * transpose
+  * multiplication (classical, multimodular)
+  * inverse
+  * determinant
+  * row reduce (Gaussian and Gauss-Jordan fraction-free elimination)
+  * rank
+  * solve Ax = b, solve AX = B
+  * fraction free LU decomposition
+
+* nmod_mat: (matrices over Z/nZ for n fitting in a machine word)
+
+  * memory management (init, clear)
+  * random matrices (uniform, full, permutations of diagonal matrix, random of 
+    given rank, random elementary operations)
+  * set, equal
+  * print to stdout
+  * add
+  * transpose
+  * multiplication (classical, Strassen, A*B^T)
+  * row reduction (Gaussian and Gauss-Jordan)
+  * determinant
+  * rank
+  * solve (Ax = b, AX = B, solve with precomputed LU)
+  * invert
+
+* arith: (arithmetic functions)
+
+  * Bernoulli numbers
+  * Bernoulli polynomials
+  * primorials (product of primes up to n)
+  * harmonic numbers
+  * Stirling numbers
+  * Euler phi function
+  * Moebius mu function
+  * Sigma (sum of powers of divisors)
+  * Ramanujan tau function
+
+* examples: (example programs)
+
+  * compute coefficients of q-series of Delta function
+
+* mpfr_vec: (vectors over mpfr reals)
+
+  * memory management (init, clear)
+  * add
+  * set, zero
+  * scalar multiplication by mpfr, 2exp
+  * scalar product
+
+* mpfr_mat: (matrices over mpfr reals)
+
+  * memory management (init, clear)
+
+2010-12-24 -- FLINT 1.6.0
+-------------------------------------------------------------------------------
+
+* Bugs:
+
+  * Fixed a memory leak in mpz_poly_to_string_pretty
+  * Fixed a bug inherited from an old version of fpLLL 
+  * Makefile to respect CC and CXX
+  * Fixed bug in F_mpz_set_si
+  * Fixed bug in F_mpz_equal
+  * Most for loops to C90 standard (for easier MSVC porting)
+  * Better Cygwin support
+  * Fixed a bug in zmod_poly_resultant
+  * Fixed bug in F_mpz_mul_KS/2
+  * Fixed bug in tinyQS
+  * Worked around some known bugs in older GMP/MPIR's
+
+* Major new functionality
+
+  * F_mpz_poly_factor_zassenhaus 
+  * F_mpz_poly_factor (incl. fmpz_poly_factor wrapper) using new vH-N approach
+    (see the paper of van Hoeij and Novocin and the paper of van Hoeij, Novocin 
+    and Hart)
+  * Implementation of new CLD bounds function for polynomial factors
+    (see the paper of van Hoeij, Novocin and Hart
+  * Restartable Hensel lifting
+  * Heuristic LLL implementations using doubles and mpfr
+  * LLL implementations optimised for knapsack lattices
+  * New (probably subquadratic) LLL implementation (ULLL)
+  * zmod_poly_factor_cantor_zassenhaus
+  * New F_mpz_mod_poly module for polynomials over Z/pZ for multiprec. p
+
+* Some of the other new functions added
+
+  * F_mpz
+
+   * F_mpz_gcd
+   * F_mpz_smod
+   * F_mpz_mod_preinv
+   * F_mpz_fdiv_qr
+   * F_mpz_get/set_mpfr/2exp
+   * F_mpz_sscanf
+   * F_mpz_set_d
+
+  * F_mpz_poly:
+
+   * read F_mpz_poly to_string/from_string/fprint/print/fread/pretty
+   * F_mpz_poly_to/from_zmod_poly
+   * F_mpz_poly_scalar_div_exact
+   * F_mpz_poly_smod
+   * F_mpz_poly_derivative, F_mpz_poly_content, F_mpz_poly_eval_horner_d/2exp
+   * F_mpz_poly_scalar_abs
+   * F_mpz_poly_set_d_2exp
+   * F_mpz_poly_div/divrem
+   * F_mpz_poly_gcd
+   * F_mpz_poly_is_squarefree
+   * F_mpz_poly_factor_squarefree
+   * F_mpz_poly_mul_trunc_left
+   * F_mpz_poly_pseudo_div
+   * F_mpz_poly_set_coeff
+   * F_mpz_poly_pow_ui
+   * Inflation/deflation trick for factorisation
+
+ * zmod_poly:
+
+   * Inflation/deflation trick for factorisation
+
+  * mpz_mat:
+
+   * mpz_mat_from_string/to_string/fprint/fread/pretty
+
+  * mpq_mat:
+
+   * mpq_mat_init/clear
+   * Gramm-schmidt Orthogonalisation
+
+  * F_mpz_mat:
+
+   * F_mpz_mat_print/fprint/fread/pretty
+   * F_mpz_mat_mul_classical
+   * F_mpz_mat_max_bits/2
+   * F_mpz_mat_scalar_mul/div_2exp
+   * F_mpz_mat_col_equal
+   * F_mpz_mat_smod
+   * F_mpz_vec_scalar_product/norm
+   * F_mpz_vec_add/submul_ui/si/F_mpz/2exp
+
+  * zmod_mat:
+
+   * classical multiplication
+   * strassen multiplication
+   * scalar multiplication
+   * zmod_mat_equal
+   * zmod_mat_add/sub
+   * zmod_mat_addmul_classical
+
+  * d_mat:
+
+   * d_vec_norm, d_vec_scalar_product
+
+  * mpfr_mat:
+
+   * mpfr_vec_scalar_product/norm
+
+2009-09-22 -- FLINT 1.5.0
+-------------------------------------------------------------------------------
+
+* Added multimodular reduction and CRT to F_mpz module
+* Fixed some bugs in F_mpz module and numerous bugs in test code
+* Added zmod_poly_compose
+* Added zmod_poly_evaluate
+* Added functions for reduced evaluation and composition to fmpz_poly module (contributed by Burcin Erocal)
+* Fixed bugs in the primality tests in long_extras
+* Removed all polynomial multimodular multiplication functions
+* Added new thetaproduct code used in the 1 trillion triangles computation
+* Fixed a severe bug in the fmpz_poly_pseudo_div function reported by Sebastian Pancratz
+* Added fmpz_comb_temp_init/clear functions
+* Fixed a normalisation buglet in fmpz_poly_pack_bytes
+* Added F_mpz_pow_ui function (contributed by Andy Novocin)
+* Fixed a severe bug in the FFT reported by William Stein and Mariah Lennox (fix contributed by David Harvey)
+* Removed some memory leaks from F_mpz test code
+* Fixed bug in zmod_poly_evaluate test code
+
+2009-07-06 -- FLINT 1.4.0
+-------------------------------------------------------------------------------
+
+* Sped up zmod_poly division in case where operands are the same length
+* Sped up zmod_poly division in case where operands have lengths differing by 1
+* Fixed a bug in zmod_poly_gcd for polynomials of zero length
+* Sped up zmod_poly_gcd considerably (both euclidean and half gcd)
+* Sped up zmod_poly_gcd_invert and zmod_poly_xgcd considerably
+* Made zmod_poly_gcd_invert and zmod_poly_xgcd asymptotically fast
+* Made zmod_poly_resultant asymptotically fast
+* Added optimised zmod_poly_rem function
+* Fixed a divide by zero bug in zmod_poly_factor_berlekamp 
+* Added test code for z_factor_tinyQS and z_factor_HOLF
+* Fixed many bugs in the z_factor code, tinyQS and mpQS
+* Corrected numerous typos in the documentation and added missing descriptions
+* Added F_mpz_cmp function
+* Added documentation to the manual for the new F_mpz module
+
+2009-06-09 -- FLINT 1.3.0
+-------------------------------------------------------------------------------
+
+* Added new code for checking 2nd, 3rd and 5th roots
+* Fixed a bug in z_factor
+* Connected quadratic sieve for factoring large ulongs
+* Added one line factor algorithm
+* constructed best of breed factor algorithm
+* Fixed termination conditions for z_intcuberoot and z_intfifthroot which were broken
+* Added some code for special cases which cause infinite loops in cuberoot and fifthroot
+* Went back to ceil(pow(n, 0.33333333)) and ceil(pow(n, 0.2)) for initial guesses in cube and fifth root functions as these were about 50% faster than sqrt(n) and sqrt(sqrt(n)) respectively.
+* Added test code for z_intfifthroot
+* Added test code for z_factor_235power
+* Fixed some uninitialised data found by valgrind in intcuberoot and intfifthroot
+* Fixed multiply defined PRIME_COUNT in long_extras-test
+* Got rid of gotos in some functions in long_extras
+* Knocked optimisation level back to -O2 because it miscompiles on sage.math
+* Changed tables to use uint64_t's instead of ulongs which are not 64 bits on a 32 bit machine
+* Only checked MAX_HOLF on 64 bit machine
+* Changed MAX_SQUFOF to WORD(-1)
+* Check constant 0x3FFFFFFFFUL only on a 64 bit machine
+* Fixed a bug in z_oddprime_lt_4096 on 32 bit machines
+* Fixed some TLS issues with Cygwin
+* Fixed some typos in makefile
+* Fixed a wrong path in fmpz.c
+
+2009-04-18 -- FLINT 1.2.5
+-------------------------------------------------------------------------------
+
+* Upgraded to zn_poly-0.9 to avoid a serious error in squaring of large polynomials over Z/nZ
+
+2009-04-04 -- FLINT 1.2.4
+-------------------------------------------------------------------------------
+
+* Defined THREAD to be blank on Apple CC and __thread for thread local storage on other gcc's (where it's defined)
+* #undef ulong in profiler.h where time.h and other system time headers are included (both reported by M. Abshoff)
+
+2009-03-31 -- FLINT 1.2.3
+-------------------------------------------------------------------------------
+
+* Fixed bugs in all fmpz_poly evaluation functions, identified by Burcin Erocal. 
+
+2009-03-20 -- FLINT 1.2.2
+-------------------------------------------------------------------------------
+
+* Fixed a memory leak in zmod_poly_factor
+* Fixed zmod_poly-profile build
+
+2009-03-14 -- FLINT 1.2.1
+-------------------------------------------------------------------------------
+
+* Removed some FLINT 2.0 code which was interfering with the build of the NTL-interface
+* Removed an omp.h from fmpz_poly.c.
+
+2009-03-10 -- FLINT 1.2.0
+-------------------------------------------------------------------------------
+
+* made memory manager, fmpz and fmpz_poly threadsafe
+* Code for running tests in parallel (not activated)
+* Sped up fmpz_poly_scalar_div_ui/si when scalar is 1/-1
+* Parallelise _fmpz_poly_mul_modular 
+* fmpz_mul_modular_packed to pack coefficients to the byte before running _fmpz_poly_mul_modular 
+* fmpz_poly_pseudo_rem_cohen (not documented)
+* special case for leading coeff 1/-1 in fmpz_poly_pseudo_divrem_basecase
+* removed a memory allocation bug which caused a massive slowdown in fmpz_poly_pseudo_divrem_basecase
+* fmpz_poly_pseudo_rem_basecase (not documented)
+* fmpz_poly_pseudo_rem (not asymptotically fast)
+* fmpz_poly_signature (not asymptotically fast)
+* basic fmpz_poly_is_squarefree function
+* included zn_poly in trunk and made FLINT build zn_poly as part of its build process
+* switched to using zn_poly for polynomial multiplication, newton inversion, scalar multiplication in zmod_poly
+* Integer cube root of word sized integers
+* Fibonacci pseudoprime test
+* BSPW probable prime test
+* n - 1 primality test
+* Complete implementation of z_issquarefree
+* Significantly improved the thetaproduct example program. 
+* Fixed bug in fmpz_poly_byte_pack which is triggered when trying to pack into fields a multiple of 8 bytes (could cause a segfault)
+* Fixed a bug in fmpz_poly_pseudo_divrem (relied on an uninitialised poly to have length 0)
+* Fixed bug in fmpz_multi_CRT_ui (could segfault)
+* Fixed bug in fmpz_multi_mod_ui (could segfault)
+* Fixed memory leak in zmod_poly_factor_squarefree 
+* Fixed memory leak in zmod_poly_from_string
+
+2009-03-01 -- FLINT 1.1.3
+-------------------------------------------------------------------------------
+
+* Inserted some missing return values in zmod_poly test code.
+
+2009-03-01 -- FLINT 1.1.2
+-------------------------------------------------------------------------------
+
+* Fixed some memory allocation slowdowns and bugs in fmpz_poly division and pseudo division functions (reported by William Stein).
+  
+2009-02-11 -- FLINT 1.1.1
+-------------------------------------------------------------------------------
+
+* Fixed bugs in _fmpz_poly_scalar_mul_fmpz, fmpz_poly_gcd_heuristic and fmpz_poly_gcd_subresultant and fixed bugs in test__fmpz_poly_scalar_div_fmpz, test_fmpz_poly_scalar_div_fmpz and test_fmpz_poly_scalar_div_mpz.
+
+2008-12-21 -- FLINT 1.1.0
+-------------------------------------------------------------------------------
+
+Some of the following features were previewed in FLINT 1.0.11.
+
+* integer gcd (this just wraps the GMP gcd code)
+* polynomial content
+* primitive part
+* convert to and from FLINT and NTL integers and polynomials
+* get a coefficient of a polynomial efficiently as a read only mpz_t
+* print polynomials in a prettified format with a specified variable 
+* Sped up integer multiplication
+* Convert to and from zmod_polys from fmpz_polys
+* Chinese remainder for fmpz_polys
+* Leading coeff macro
+* Euclidean norm of polynomials
+* Exact division testing of polynomials
+* Polynomial GCD (subresultant, heuristic, modular)
+* Modular inversion of polynomials
+* Resultant
+* XGCD (Pohst-Zassenhaus)
+* Multimodular polynomial multiplication
+* Rewritten karatsuba_trunc function
+* Rewritten division functions
+* Polynomial derivative
+* Polynomial evaluation
+* Polynomial composition
+* Addition and subtraction of zmod_polys
+* Sped up multiplication of zmod_polys
+* Extended multiplication of zmod_polys to allow up to 63 bit moduli
+* zmod_poly subpolynomials
+* zmod_poly reverse
+* Truncated multiplication for zmod_polys (left, right, classical and KS)
+* Scalar multiplication
+* Division for zmod_polys (divrem and div, classical, divide and conquer and newton)
+* Series inversion for zmod_polys
+* Series division for zmod_polys
+* Resultant for zmod_polys
+* GCD for zmod_polys including half-gcd
+* Inversion modulo a polynomial for zmod_polys
+* XGCD for zmod_polys
+* Squarefree factorisation for zmod_polys
+* Berlekamp factorisation for zmod_polys
+* Irreducibility testing for zmod_polys
+* Derivative for zmod_polys
+* Middle product for zmod_polys (sped up newton division)
+* addmod, submod and divmod for ulongs
+* Sped up limb sized integer square root
+* Partial factoring of ulongs
+* z_randbits
+* Pocklington-Lehmer primality testing
+* BSPW pseudo-primality testing
+* Fermat pseudo-primality testing
+* Fast Legendre symbol computation
+* Chinese remainder for fmpzs
+* Square root with remainder for fmpzs
+* Left and right shift for fmpzs
+* Reduction modulo a ulong for fmpzs
+* Montgomery redc, mulmod, divmod and mod for fmpzs
+* Multimodular reduction and CRT for fmpzs
+* fmpz_mulmod and fmpz_divmod
+* fmpz_invert for inversion modulo an fmpz
+* Dramatically sped up gcd for small fmpzs
+* Computation of 1D, 2D and some 3D theta functions
+* Example program for multiplying theta functions
+* Test code now times test functions
+* Quick and dirty timing function for profiler
+* Tiny quadratic sieve for small one and two limb integers
+* Completely rewritten self initialising multiple polynomial quadratic sieve
+* Build fix for 64 bit OSX dylibs (reported by Michael Abshoff)
+
+2008-12-25 -- FLINT 1.0.21
+-------------------------------------------------------------------------------
+
+* Fixed the Christmas bug reported by Michael Abshoff which causes a test failure in fmpz_poly_gcd_modular and a hang in fmpz_poly_invmod_modular on 32 bit machines 
+
+2008-12-13 -- FLINT 1.0.20
+-------------------------------------------------------------------------------
+
+* Fixed some bugs in conversion of zmod_poly's to and from strings
+
+2008-12-12 -- FLINT 1.0.19
+-------------------------------------------------------------------------------
+
+* Fixed a bug in z_remove_precomp
+
+2008-12-05 -- FLINT 1.0.18
+-------------------------------------------------------------------------------
+
+* Fixed another bug in the fmpz_poly_set_coeff_* functions which resulted in dirty coefficients
+
+2008-11-30 -- FLINT 1.0.17
+-------------------------------------------------------------------------------
+
+* Fixed a segfault caused by left shifting of polynomials with zero limbs allocated in division and pseudo division functions.
+* Fixed a bound used in fmpz_gcd_modular to use a proven bound
+* Fixed a bug in fmpz_poly-profile where the top bit of random coefficients of n bits was always set
+
+2008-10-22 -- FLINT 1.0.16
+-------------------------------------------------------------------------------
+
+* Fixed a segfault when trying to truncate a polynomial to an longer length than it currently is, with the function fmpz_poly_truncate (reported by Craig Citro)
+
+2008-10-15 -- FLINT 1.0.15
+-------------------------------------------------------------------------------
+
+* Fixed a bug which causes a segfault when setting a coefficient of the zero polynomial to zero
+* Fixed build bug in longlong.h on s390 platform
+
+2008-09-23 -- FLINT 1.0.14
+-------------------------------------------------------------------------------
+
+* Update long_extras and test code for the sake of new quadratic sieve (new functions in long_extras remain undocumented)
+* Removed many bugs from tinyQS and mpQS and joined them into a single program for factoring integers
+
+2008-07-13 -- FLINT 1.0.13
+-------------------------------------------------------------------------------
+
+* Fixed memory leaks and dirty memory issues in test code for numerous modules.
+* Removed further issues with cache prefetching in mpn_extras.c
+
+2008-07-11 -- FLINT 1.0.12
+-------------------------------------------------------------------------------
+
+* Removed some Opteron tuning flags which cause illegal instruction errors on Pentium4
+* Fixed numerous memory leaks in fmpz_poly test code
+* Fixed memory leak in fmpz_poly_power_trunc_n
+* Fixed major memory leaks in fmpz_poly_xgcd_modular
+* Rewrote __fmpz_poly_mul_karatrunc_recursive and _fmpz_poly_mul_karatsuba_trunc to "prove code" and got rid of some dirty memory issues
+* Fixed some potential illegal memory accesses to do with cache prefetching in fmpz_poly.c
+
+2008-07-09 -- FLINT 1.0.11
+-------------------------------------------------------------------------------
+
+* Fixed a bug in z_ll_mod_precomp on ia64 (reported by Michael Abshoff and William Stein)
+
+2008-06-16 -- FLINT 1.0.10
+-------------------------------------------------------------------------------
+
+* integer gcd (this just wraps the GMP gcd code)
+* polynomial content
+* convert to and from FLINT and NTL integers and polynomials
+* get a coefficient of a polynomial efficiently as a read only mpz_t
+* print polynomials in a prettified format with a specified variable         
+
+2008-03-11 -- FLINT 1.0.9
+-------------------------------------------------------------------------------
+
+* Fixed a memory allocation bug in fmpz_poly_power
+
+2008-02-15 -- FLINT 1.0.8
+-------------------------------------------------------------------------------
+
+* Fixed a bug in fmpz_poly_right_shift (reported by Kiran Kedlaya)
+
+2008-01-22 -- FLINT 1.0.7
+-------------------------------------------------------------------------------
+
+* Made F_mpn_mul binary compatible with the way mpn_mul *operates* in practice.
+
+2008-01-17 -- FLINT 1.0.6
+-------------------------------------------------------------------------------
+
+* Fixed an issue with FLINT_BIT_COUNT on certain machines (probably due to arithmetic shift issues)
+
+2008-01-05 -- FLINT 1.0.5
+-------------------------------------------------------------------------------
+
+* Fixed some inline issues which cause problems because of the C99 inline rules (reported by David Harvey). 
+* Fixed a makefile issue reported (and solved) by David Harvey when *not* linking against NTL.
+
+2008-01-04 -- FLINT 1.0.4
+-------------------------------------------------------------------------------
+
+* Fixed a bug in the bernoulli_zmod example program and associated polynomial zmod code which caused memory corruption.
+* Fixed a bug in the fmpz-test code which manifested on 32 bit machines, reported by David Harvey.   
+* Fixed some bugs in the pari profiling code.     
+
+2007-12-16 -- FLINT 1.0.3
+-------------------------------------------------------------------------------
+
+* Fixed a bug in the polynomial memory management code which caused a segfault
+* Fixed a bug in the pseudo division code which caused a block overrun
+
+2007-12-10 -- FLINT 1.0.2
+-------------------------------------------------------------------------------
+
+* Rewrote tuning code for integer multiplication functions, making it more robust and fixing a bug
+  which showed up on 32 bit machines (reported by Michael Abshoff and Jaap Spies). Factored the tuning
+  code out into a number of macros.
+
+2007-12-07 -- FLINT 1.0.1
+-------------------------------------------------------------------------------
+
+* Fixed a bug in _fmpz_poly_maxbits1 on 32 bit machines, reported by Michael Abshoff and Carl Witty
+* Removed some instances of u_int64_t and replaced them with uint64_t, reported by Michael Abshoff
+* Replaced sys/types.h with stdint.h
+* Added FLINT macros to documentation
+* Corrected numerous typos in documentation   
+
+2007-12-02 -- FLINT 1.0
+-------------------------------------------------------------------------------
+
+* First version of FLINT, includes fmpz_poly, fmpz and mpQS
+
+
+Antic version history
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+2021-06-24 -- Antic 0.2.5
+-------------------------------------------------------------------------------
+
+* TODO: list changes here
+
+2021-04-15 -- Antic 0.2.4
+-------------------------------------------------------------------------------
+
+* TODO: list changes here
+
+2020-12-11 -- Antic 0.2.3
+-------------------------------------------------------------------------------
+
+* TODO: list changes here
+
+2020-06-30 -- Antic 0.2.2
+-------------------------------------------------------------------------------
+
+* TODO: list changes here
+
+2020-06-16 -- Antic 0.2.1
+-------------------------------------------------------------------------------
+
+* TODO: list changes here
+
+2019-02-12 -- Antic 0.2
+-------------------------------------------------------------------------------
+
+* Many bug fixes, standalone build system, continuous integration.
+
+2013-05-12 -- Antic 0.1
+-------------------------------------------------------------------------------
+
+* First version of antic, including a qfb module for (positive definite) binary quadratic forms.
+
+
+Calcium version history
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+2021-05-28 -- Calcium 0.4
+-------------------------------------------------------------------------------
+
+* Algebraic numbers
+
+  * Fixed bug in special-casing of roots of unity in qqbar_root_ui.
+  * Fixed qqbar_randtest with bits == 1.
+  * Faster qqbar_cmp_re for nearby reals.
+  * Faster qqbar polynomial evaluation and powering using linear algebra.
+  * Improved qqbar_abs, qqbar_abs2 to produce cleaner enclosures.
+  * Use a slightly better method to detect real numbers in qqbar_sgn_im.
+  * Added qqbar_hash.
+  * Added qqbar_get_fmpq, qqbar_get_fmpz.
+  * Added qqbar_pow_fmpq, qqbar_pow_fmpz, qqbar_pow_si.
+  * Added qqbar_numerator, qqbar_denominator.
+
+* Basic arithmetic and elementary functions
+
+  * Improved ca_condense_field: automatically demote to a simple number field
+    when the only used extension number is algebraic.
+  * Improved multivariate field arithmetic to automatically remove algebraic
+    or redundant monomial factors from denominators.
+  * Added ca_pow_si_arithmetic (guaranteed in-field exponentiation).
+  * Added polynomial evaluation functions (ca_fmpz_poly_evaluate,
+    ca_fmpq_poly_evaluate, ca_fmpz_poly_evaluate, ca_fmpz_mpoly_q_evaluate).
+  * Added several helper functions (ca_is_special, ca_is_qq_elem,
+    ca_is_qq_elem_zero, ca_is_qq_elem_one, ca_is_qq_elem_integer,
+    ca_is_nf_elem, ca_is_cyclotomic_nf_elem, ca_is_generic_elem).
+  * Added ca_rewrite_complex_normal_form.
+  * Perform direct complex conjugation in cyclotomic fields.
+  * Use ca_get_acb_raw instead of ca_get_acb when printing to avoid expensive
+    recomputations.
+  * Added alternative algorithms for various basic functions.
+  * Deep complex conjugation.
+  * Use complex conjugation in is_real, is_imaginary, is_negative_real.
+  * Added functions for unsafe inversion for internal use.
+  * Significantly stronger zero testing in mixed algebraic-transcendental fields.
+  * Added ca_arg.
+  * Added special case for testing equality between number field elements
+    and rationals.
+  * Added ca_sin_cos, ca_sin, ca_cos, ca_tan and variants.
+  * Added ca_atan, ca_asin, ca_acos and variants.
+  * Added ca_csgn.
+  * Improved ca_get_acb and ca_get_acb_accurate_parts to fall back on exact
+    zero tests when direct numerical evaluation does not give precise enclosures.
+  * Added ca_get_decimal_str.
+  * More automatic simplifications of logarithms (simplify logarithms of
+    exponentials, square roots and powers raised to integer powers).
+  * More automatic simplifications of square roots (simplify square roots of
+    exponentials, square roots and powers raised to integer powers).
+  * Improved order comparisons (ca_check_ge etc.) to handle special values
+    and to fall back on strong equality tests.
+  * Fixed a test failure in the ca_mat module.
+
+* Polynomials
+
+  * Added ca_poly_inv_series, ca_poly_div_series (power series division).
+  * Added ca_poly_exp_series (power series exponential).
+  * Added ca_poly_log_series (power series logarithm).
+  * Added ca_poly_atan_series (power series arctangent).
+
+* Other
+
+  * Added fmpz_mpoly_q_used_vars.
+  * Remove useless rpath line from configure (reported by Julien Puydt).
+  * Added missing declaration of fexpr_hash.
+  * Fixed crashes on OS X in Python interface (contributed by deinst).
+  * Fixed memory leaks in Python string conversions (contributed by deinst).
+  * Reserve I, E for symbolic expressions in Python interface.
+
+
+2021-04-23 -- Calcium 0.3
+-------------------------------------------------------------------------------
+
+* Symbolic expressions
+
+  * Added the fexpr module for flat-packed unevaluated symbolic expressions.
+  * LaTeX output.
+  * Basic manipulation (construction, replacement, accessing subexpressions).
+  * Numerical evaluation with Arb.
+  * Expanded normal form.
+  * Conversion methods for other types.
+  * Enable LaTeX rendering of objects in Jupyter notebooks.
+
+* Algebraic numbers
+
+  * Fix a major performance issue (slow root refinement) that made Calcium as a whole far slower than necessary.
+  * Added qqbar_cmp_root_order; sort polynomial roots consistently by default.
+  * Added qqbar_get_quadratic.
+  * Added qqbar_equal_fmpq_poly_val and use it to speed up checking guessed values.
+  * Conversion of qqbar_t to and from symbolic expression (qqbar_set_fexpr, qqbar_get_fexpr_repr, qqbar_get_fexpr_root_nearest, qqbar_get_fexpr_root_indexed, qqbar_get_fexpr_formula).
+  * Fixed bugs in qqbar_cmpabs_re, cmpabs_im.
+  * Optimized qqbar_cmp_im and qqbar_cmpabs_im for conjugates with mirror symmetry.
+  * Added qqbar_pow (taking a qqbar exponent).
+  * Special-case roots of unity in qqbar_pow_ui, qqbar_root_ui, qqbar_abs and qqbar_abs2.
+  * Wrapped qqbar in Python.
+
+* Polynomials
+
+  * Added several utility functions.
+  * Optimized polynomial multiplication with rational entries.
+  * Fast polynomial multiplication over number fields.
+
+* Matrices
+
+  * Fast matrix multiplication over number fields.
+  * Right kernel (ca_mat_right_kernel).
+  * Matrix diagonalization (ca_mat_diagonalization).
+  * Jordan normal form  (ca_mat_jordan_form, ca_mat_jordan_transformation, ca_mat_jordan_blocks).
+  * Matrix exponential (ca_mat_exp).
+  * Matrix logarithm (ca_mat_log).
+  * Polynomial evaluation (ca_mat_ca_poly_evaluate).
+  * Cofactor expansion algorithm for determinant and adjugate (ca_mat_adjugate_cofactor).
+  * Added several utility functions.
+  * Improved algorithm selection in ca_mat_inv.
+  * Solving using the adjugate matrix.
+  * Danilevsky characteristic polynomial algorithm (ca_mat_charpoly_danilevsky).
+
+* Field elements
+
+  * Use factoring in ca_sqrt to enable more simplifications.
+  * Simplify square roots and logarithms of negative real numbers.
+  * Optimized ca_sub.
+  * Conversion of ca_t to and from symbolic expressions (ca_set_fexpr, ca_get_fexpr).
+  * Added function for assigning elements between context objects (ca_transfer).
+  * Fixed a possible memory corruption bug when Vieta's formulas are used.
+  * Optimized constructing square roots of rational numbers.
+
+* Other
+
+  * Added demonstration notebook to documentation.
+  * Fixed OSX compatibility in Python wrapper (contributed by deinst).
+  * Fixed bug in calcium_write_acb.
+  * Fixed bug in fmpz_mpoly_vec_set_primitive_unique (contributed by gbunting).
+
+
+2020-10-16 -- Calcium 0.2
+-------------------------------------------------------------------------------
+
+* Basic arithmetic and expression simplification
+
+  * Use GrÃ¶bner basis for reduction ideals,  making simplification much more robust.
+  * Compute all linear relations with LLL simultaneously instead of piecemeal.
+  * Make monomial ordering configurable (default is lex as before).
+  * Use Vieta's formulas to simplify expressions involving conjugate algebraic numbers.
+  * Denest exponentials of symbolic logarithms.
+  * Denest logarithms of symbolic powers and square roots.
+  * Denest powers of symbolic powers.
+  * Simplify exponentials that evaluate to roots of unity.
+  * Simplify logarithms of roots of unity.
+  * Improve ideal reduction to avoid some unnecessary GCD computations.
+
+* Python wrapper
+
+  * Calcium now includes a minimal ctypes-based Python wrapper for testing.
+
+* New ca_mat module for matrices
+
+  * Mostly using naive basecase algorithms.
+  * Matrix arithmetic, basic manipulation.
+  * Construction of special matrices (Hilbert, Pascal, Stirling, DFT).
+  * LU factorization.
+  * Fraction-free LU decomposition.
+  * Nonsingular solving and inverse.
+  * Reduced row echelon form.
+  * Rank.
+  * Trace and determinant.
+  * Characteristic polynomial.
+  * Computation of eigenvalues with multiplicities.
+
+* New ca_poly module for polynomials
+
+  * Mostly using naive basecase algorithms.
+  * Polynomial arithmetic, basic manipulation.
+  * Polynomial division.
+  * Evaluation and composition.
+  * Derivative and integral.
+  * GCD (Euclidean algorithm).
+  * Squarefree factorization.
+  * Computation of roots with multiplicities.
+  * Construction from given roots.
+
+* New ca_vec module for vectors.
+
+  * Memory management and basic scalar operations.
+
+* Bug fixes
+
+  * Fix bug in powering number field elements.
+  * Fix bug in qqbar_log_pi_i.
+  * Fix aliasing bug in ca_pow.
+
+* New basic functions
+
+  * Conversion from double: ca_set_d, ca_set_d_d.
+  * Special functions: ca_erf, ca_erfi, ca_erfc, with algebraic relations.
+  * Special functions: ca_gamma (incomplete simplification algorithms).
+
+* New utils_flint module for Flint utilities
+
+  * Vectors of multivariate polynomials.
+  * Construction of elementary symmetric polynomials.
+  * GrÃ¶bner basis computation (naive Buchberger algorithm).
+
+* Documentation and presentation
+
+  * Various improvements to the documentation.
+  * DFT example program.
+
+
+2020-09-08 -- Calcium 0.1
+-------------------------------------------------------------------------------
+
+* Initial test release.
+* ca module (exact real and complex numbers).
+* fmpz_mpoly_q module (multivariate rational functions over Q).
+* qqbar module (algebraic numbers represented by minimal polynomials).
+* Example programs.
+
+
+Arb version history
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+2022-06-29 -- Arb 2.23.0
 -------------------------------------------------------------------------------
 
 * Performance
@@ -82,7 +1799,7 @@ Old versions of the documentation
   * Documentation fixes.
 
 
-2022-01-25 -- version 2.22.1
+2022-01-25 -- Arb 2.22.1
 -------------------------------------------------------------------------------
 
 * Fixed bugs causing some hypergeometric functions hang or crash for
@@ -90,7 +1807,7 @@ Old versions of the documentation
 * Fixed a minor bug in acb_hypgeom_m (NaN result sometimes only set the
   real part to NaN).
 
-2022-01-15 -- version 2.22.0
+2022-01-15 -- Arb 2.22.0
 -------------------------------------------------------------------------------
 
 * Special functions
@@ -128,7 +1845,7 @@ Old versions of the documentation
   * Added the double_interval module for fast machine-precision interval
     arithmetic (experimental, intended for internal use).
 
-2021-10-20 -- version 2.21.1
+2021-10-20 -- Arb 2.21.1
 -------------------------------------------------------------------------------
 
 * Fixed 32-bit test failures for arb_hypgeom_gamma_fmpq.
@@ -136,7 +1853,7 @@ Old versions of the documentation
 * Added missing header file includes.
 * Do not encode the library version in the SONAME on Android (contributed by Andreas Enge).
 
-2021-09-25 -- version 2.21.0
+2021-09-25 -- Arb 2.21.0
 -------------------------------------------------------------------------------
 
 * Experimental new arb_fpwrap module: accurate floating-point wrappers
@@ -156,7 +1873,7 @@ Old versions of the documentation
 * Fixed conflict with musl libc (reported by Gonzalo Tornaría).
 * Added acb_add_error_arb (contributed by Albin Ahlbäck).
 
-2021-07-25 -- version 2.20.0
+2021-07-25 -- Arb 2.20.0
 -------------------------------------------------------------------------------
 
 * Flint 2.8 support.
@@ -178,7 +1895,7 @@ Old versions of the documentation
   David Berghaus).
 * Documentation fixes (contributed by Joel Dahne, Hanno Rein).
 
-2020-12-06 -- version 2.19.0
+2020-12-06 -- Arb 2.19.0
 -------------------------------------------------------------------------------
 
 * Significant improvements to the implementation of Platt's algorithm for
@@ -199,13 +1916,13 @@ Old versions of the documentation
   (contributed by Joel-Dahne, p15-git-acc).
 
 
-2020-06-25 -- version 2.18.1
+2020-06-25 -- Arb 2.18.1
 -------------------------------------------------------------------------------
 
 * Support MinGW64.
 * Added version numbers (__ARB_VERSION, __ARB_RELEASE, ARB_VERSION) to arb.h.
 
-2020-06-09 -- version 2.18.0
+2020-06-09 -- Arb 2.18.0
 -------------------------------------------------------------------------------
 
 * General
@@ -239,7 +1956,7 @@ Old versions of the documentation
     workaround).
   * Optimized some special cases in acb_hurwitz_zeta.
 
-2019-10-16 -- version 2.17.0
+2019-10-16 -- Arb 2.17.0
 -------------------------------------------------------------------------------
 
 * General
@@ -282,7 +1999,7 @@ Old versions of the documentation
     at high precision (reported by Mark Watkins).
 
 
-2018-12-07 -- version 2.16.0
+2018-12-07 -- Arb 2.16.0
 -------------------------------------------------------------------------------
 
 * Linear algebra and arithmetic
@@ -309,12 +2026,12 @@ Old versions of the documentation
   * Updated hilbert_matrix example program.
 
 
-2018-10-25 -- version 2.15.1
+2018-10-25 -- Arb 2.15.1
 -------------------------------------------------------------------------------
 
 * Fixed precision issue leading to spurious NaN results in incomplete elliptic integrals
 
-2018-09-18 -- version 2.15.0
+2018-09-18 -- Arb 2.15.0
 -------------------------------------------------------------------------------
 
 * Arithmetic
@@ -338,7 +2055,7 @@ Old versions of the documentation
   * Fixed test failure for acb_dirichlet_stieltjes on ARM64 (reported by Gianfranco Costamagna). Special thanks to Julien Puydt for assistance with debugging.
   * Fixed crash in acb_dft_bluestein with zero length (reported by Gianfranco Costamagna).
 
-2018-07-22 -- version 2.14.0
+2018-07-22 -- Arb 2.14.0
 -------------------------------------------------------------------------------
 
 * Linear algebra
@@ -393,7 +2110,7 @@ Old versions of the documentation
   * Fixed issue with setting rpath in configure (contributed by Vincent Delecroix).
 
 
-2018-02-23 -- version 2.13.0
+2018-02-23 -- Arb 2.13.0
 -------------------------------------------------------------------------------
 
 * Major bugs
@@ -492,7 +2209,7 @@ Old versions of the documentation
   * Fixed Travis builds on Mac OS again (contributed by Isuru Fernando).
   * Added missing declaration for arb_bell_ui() (reported by numsys).
 
-2017-11-29 - version 2.12.0
+2017-11-29 -- Arb 2.12.0
 -------------------------------------------------------------------------------
 
 * Numerical integration
@@ -581,12 +2298,12 @@ Old versions of the documentation
     assembly functions (a workaround was added to the test code, and a proper
     fix for the assembly code has been added to FLINT).
 
-2017-07-10 - version 2.11.1
+2017-07-10 -- Arb 2.11.1
 -------------------------------------------------------------------------------
 
 * Avoid use of a function that was unavailable in the latest public FLINT release
 
-2017-07-09 - version 2.11.0
+2017-07-09 -- Arb 2.11.0
 -------------------------------------------------------------------------------
 
 * Special functions
@@ -612,7 +2329,7 @@ Old versions of the documentation
   * Made arb_nonnegative_part() a publicly documented method.
   * Arb now requires FLINT version 2.5 or later.
 
-2017-02-27 - version 2.10.0
+2017-02-27 -- Arb 2.10.0
 -------------------------------------------------------------------------------
 
 * General
@@ -652,7 +2369,7 @@ Old versions of the documentation
   * Added add acb_poly_exp_pi_i_series.
   * Added arb_poly_log1p_series, acb_poly_log1p_series.
 
-2016-12-02 - version 2.9.0
+2016-12-02 -- Arb 2.9.0
 -------------------------------------------------------------------------------
 
 * License
@@ -820,13 +2537,13 @@ Old versions of the documentation
   * Added .gitignore file.
   * Miscellaneous improvements to the documentation.
 
-2015-12-31 - version 2.8.1
+2015-12-31 -- Arb 2.8.1
 -------------------------------------------------------------------------------
 
 * Fixed 32-bit test failure for the Laguerre function.
 * Made the Laguerre function indeterminate at negative integer orders, to be consistent with the test code.
 
-2015-12-29 - version 2.8.0
+2015-12-29 -- Arb 2.8.0
 -------------------------------------------------------------------------------
 
 * Compatibility and build system
@@ -899,7 +2616,7 @@ Old versions of the documentation
   * Other minor patches were contributed by Alexander Kobel, Marc Mezzarobba, Julien Puydt.
   * Removed obsolete file config.h.
 
-2015-07-14 - version 2.7.0
+2015-07-14 -- Arb 2.7.0
 -------------------------------------------------------------------------------
 
 * Hypergeometric functions
@@ -932,7 +2649,7 @@ Old versions of the documentation
 
   * Added documentation for arb and acb vector functions.
 
-2015-04-19 - version 2.6.0
+2015-04-19 -- Arb 2.6.0
 -------------------------------------------------------------------------------
 
 * Special functions
@@ -971,7 +2688,7 @@ Old versions of the documentation
   * Added fix for static build on OS X (thanks Marcello Seri).
   * Miscellaneous corrections to the documentation.
 
-2015-01-28 - version 2.5.0
+2015-01-28 -- Arb 2.5.0
 -------------------------------------------------------------------------------
 
 * String conversion
@@ -1028,7 +2745,7 @@ Old versions of the documentation
   * Silenced a clang warning.
   * Made _acb_vec_sort_pretty a library function.
 
-2014-11-15 - version 2.4.0
+2014-11-15 -- Arb 2.4.0
 -------------------------------------------------------------------------------
 
 * Arithmetic and core functions
@@ -1067,7 +2784,7 @@ Old versions of the documentation
   * Added version number string (arb_version).
   * Various additions to the documentation.
 
-2014-09-25 - version 2.3.0
+2014-09-25 -- Arb 2.3.0
 -------------------------------------------------------------------------------
 
 * Removed most of the legacy (Arb 1.x) modules.
@@ -1082,7 +2799,7 @@ Old versions of the documentation
 * Prettier printing of complex numbers with negative imaginary part.
 * Changed some frequently-used functions from inline to non-inline to reduce code size.
 
-2014-08-01 - version 2.2.0
+2014-08-01 -- Arb 2.2.0
 -------------------------------------------------------------------------------
 
 * Added functions for computing polylogarithms and order expansions
@@ -1094,7 +2811,7 @@ Old versions of the documentation
 * Added mag_sqrt and mag_rsqrt functions.
 * Fixed various minor bugs and added missing tests and documentation entries.
 
-2014-06-20 - version 2.1.0
+2014-06-20 -- Arb 2.1.0
 -------------------------------------------------------------------------------
 
 * Ported most of the remaining functions to the new arb/acb types,
@@ -1111,7 +2828,7 @@ Old versions of the documentation
 
 * Added several missing utility functions to the arf and mag modules.
 
-2014-05-27 - version 2.0.0
+2014-05-27 -- Arb 2.0.0
 -------------------------------------------------------------------------------
 
 * New modules mag, arf, arb, arb_poly, arb_mat, acb, acb_poly,
@@ -1121,7 +2838,7 @@ Old versions of the documentation
 
 * Vector dot product and norm functions (contributed by Abhinav Baid).
 
-2014-05-03 - version 1.1.0
+2014-05-03 -- Arb 1.1.0
 -------------------------------------------------------------------------------
 
 * Faster and more accurate error bounds for polynomial multiplication
@@ -1148,7 +2865,7 @@ Old versions of the documentation
 * Removed the holonomic module for now, as it did not really do anything
   very useful.
 
-2013-12-21 - version 1.0.0
+2013-12-21 -- Arb 1.0.0
 -------------------------------------------------------------------------------
 
 * New example programs directory
@@ -1210,7 +2927,7 @@ Old versions of the documentation
   * Corrections for C++ compatibility (contributed by Jonathan Bober).
   * Several minor bugfixes and test code enhancements.
 
-2013-08-07 - version 0.7
+2013-08-07 -- Arb 0.7
 -------------------------------------------------------------------------------
 
 * Floating-point and ball functions
@@ -1254,7 +2971,7 @@ Old versions of the documentation
   * Introduced fmprb_ptr, fmprb_srcptr, fmpcb_ptr, fmpcb_srcptr typedefs for cleaner function signatures.
   * Various bug fixes and general cleanup.
 
-2013-05-31 - version 0.6
+2013-05-31 -- Arb 0.6
 -------------------------------------------------------------------------------
 
 * Made fast polynomial multiplication over the reals numerically stable by using a blockwise algorithm.
@@ -1273,7 +2990,7 @@ Old versions of the documentation
 * Slightly faster error bounding for the zeta function.
 * Added some other helper functions.
 
-2013-03-28 - version 0.5
+2013-03-28 -- Arb 0.5
 -------------------------------------------------------------------------------
 
 * Arithmetic and elementary functions
@@ -1332,7 +3049,7 @@ Old versions of the documentation
   * Fixed detection of flint header files.
   * Fixed various other small bugs.
 
-2013-01-26 - version 0.4
+2013-01-26 -- Arb 0.4
 -------------------------------------------------------------------------------
 
 * Much faster fmpr_mul, fmprb_mul and set_round, resulting in general speed improvements.
@@ -1351,7 +3068,7 @@ Old versions of the documentation
 * Improved thread safety.
 * More test code for core operations.
 
-2012-11-07 - version 0.3
+2012-11-07 -- Arb 0.3
 -------------------------------------------------------------------------------
 
 * Converted documentation to Sphinx.
@@ -1383,7 +3100,7 @@ Old versions of the documentation
 * Matrix powering.
 * Various other helper functions.
 
-2012-09-29 - version 0.2
+2012-09-29 -- Arb 0.2
 -------------------------------------------------------------------------------
 
 * Code for computing the gamma function (Karatsuba, Stirling's series).
@@ -1400,7 +3117,7 @@ Old versions of the documentation
 * Interval-aware LU decomposition, solving, inverse and determinant.
 * Many helper functions and small bugfixes.
 
-2012-09-14 - version 0.1
+2012-09-14 -- Arb 0.1
 -------------------------------------------------------------------------------
 
 * 2012-08-05 - Began simplified rewrite.
