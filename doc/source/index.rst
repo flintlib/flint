@@ -28,7 +28,6 @@ Introduction
    bug_reporting.rst
    contributors.rst
    examples.rst
-   macros.rst
    memory.rst
    portability.rst
    threading.rst
@@ -323,9 +322,3 @@ Version history
    :maxdepth: 1
 
    history.rst
-
-Authors
------------------------------------
-
-A complete list of authors is available on the FLINT website:
-https://flintlib.org/authors.html

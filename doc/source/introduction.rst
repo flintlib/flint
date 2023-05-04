@@ -26,7 +26,7 @@ FLINT is currently maintained by Fredrik Johansson of INRIA Bordeaux.
 FLINT was originally designed by William Hart and David Harvey. Since then
 FLINT was rewritten as FLINT 2 by William Hart, Fredrik Johansson and
 Sebastian Pancratz. Many other substantial contributions have been made
-by other authors, e.g. Tom Bachmann, Mike Hanson, Daniel Schultz and Andy
+by other authors, e.g. Tom Bachmann, Mike Hansen, Daniel Schultz and Andy
 Novocin. There have been a great number of other contributors, listed on
 the main Flint website and the contributors section of this documentation.
 

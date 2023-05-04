@@ -9,30 +9,87 @@ FLINT version history
 2023-??-?? -- FLINT 3.0
 -------------------------------------------------------------------------------
 
-Merged libraries
-..................
+Merged libraries and reorganisation
+...................................
 
-Arb 2.24, Calcium 0.4 and Antic 0.2.5 have been merged into FLINT,
-adding support for arbitrary-precision ball arithmetic,
-exact real and complex arithmetic, and number fields.
+The following libraries have been merged into FLINT:
+
+* Arb 2.24 (arbitrary-precision ball arithmetic)
+* Calcium 0.4 (exact real and complex arithmetic)
+* Antic 0.2.5 (number fields)
+
 Arb, Calcium and Antic will no longer be maintained as separate
-libraries.
-Users upgrading to FLINT 3.0 should ensure that they
+libraries. Users upgrading to FLINT 3.0 should ensure that they
 no longer link to the
 old Arb, Calcium or Antic library files or include any header files
 from those libraries which may be incompatible.
-Note that
-header files belonging to Arb, Calcium and Antic
-now appear in the ``flint/`` subdirectory.
-For example, instead of ``#include "arb.h"``, it is necessary to
-``#include "flint/arb.h"`` (unless ``<INCLUDE_DIR>/flint`` has
-been added to the include path).
+
+The FLINT 3.0 API is largely backwards-compatible with FLINT 2.9,
+Arb 2.24, Calcium 0.4 and Antic 0.2.5, except for changes to
+rarely-used functions documented below.
+However, the following changes to the handling of header files
+are likely to require (trivial) patches in many downstream codebases:
+
+* Header files belonging to Arb, Calcium and Antic
+  now appear in the ``flint/`` subdirectory.
+  For example, instead of ``#include "arb.h"``, it is necessary to
+  ``#include "flint/arb.h"`` (unless ``<INCLUDE_DIR>/flint`` has
+  been added to the include path).
+
+* Most header files no longer include their implicit dependencies.
+  For example, ``fmpz_poly.h`` no longer includes ``fmpz.h``.
+  Code that used functions from the ``fmpz`` module but only
+  included ``fmpz_poly.h`` may thus now need to include ``fmpz.h``
+  explicitly. Likewise, many inclusions of system libraries like
+  ``stdlib.h`` have been removed.
+
+The root directory has also been cleaned up by moving all source code
+into the ``src`` directory. This should not affect any users.
+
+The following people helped with the merge: Fredrik Johansson,
+Isuru Fernando, Albin Ahlbäck.
+
+New build system
+..................
+
+FLINT 3.0 has a new build system based on Autotools,
+contributed by Albin Ahlbäck.
+Among other improvements, parallel builds are much faster
+and it is possible to build individual targets.
+
+It is now necessary to run ``bootstrap.sh`` to generate the
+``configure`` script. Some ``configure`` options have changed: for
+example, ``--reentrant`` is now ``--enable-reentrant``.
 
 Generic rings
 ..................
 
 Small-prime FFT
 ..................
+
+The new ``fft_small`` module implements FFTs modulo word-size
+primes and multiplication based on such FFTs.
+This module requires AVX2 or NEON vector instructions and will not be
+built on targets that do not support them.
+The small-prime  FFT speeds up the following functions for huge input,
+sometimes by a factor 2x to 10x:
+
+* ``flint_mpn_mul`` and variants, and indirectly any function based on
+  FLINT's integer multiplication for large inputs. For example,
+  ``fmpz_mul`` and ``arb_mul`` are faster, but ``fmpz_gcd`` is
+  currently unaffected since it calls GMP.
+* ``nmod_poly_mul`` and variants, and indirectly any function based on
+  ``nmod_poly`` multiplication.
+* ``fmpz_poly_mul`` and variants, and indirectly any function based on
+  ``fmpz_poly`` multiplication.
+* Division functions for ``fmpz`` and ``arb``, which now use Newton
+  iteration instead of calling GMP for huge input.
+* Radix conversion functions like ``fmpz_get_str`` and ``arb_get_str``.
+
+The FFT was contributed by Daniel Schultz,
+with some final integration work and adaptations for other
+FLINT functions (Newton iteration implementations, etc.) done by
+Fredrik Johansson.
 
 Other changes
 ..................
