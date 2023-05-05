@@ -1484,7 +1484,10 @@ EXTEND_VEC_DEF2(vec4n, vec8n, _bit_and)
 
 FLINT_FORCE_INLINE vec2n vec2n_bit_shift_right(vec2n a, ulong n)
 {
-    return vshrq_n_u64(a, n);
+    /* vshrq_n_u64(a, n) cannot be used because n must be a compile-time
+       constant, and the compiler doesn't see that n is constant
+       even if the function is forced inline */
+    return vshlq_s64(a, vdupq_n_s64(-(slong) n));
 }
 
 FLINT_FORCE_INLINE vec4n vec4n_bit_shift_right(vec4n a, ulong n)

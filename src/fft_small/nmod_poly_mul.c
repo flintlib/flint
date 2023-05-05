@@ -874,7 +874,7 @@ got_np_and_offset:
     M->stride = stride;
     M->bn = bn;
     M->btrunc = btrunc;
-    M->bbuf = flint_aligned_alloc(4096, np*stride*sizeof(double));
+    M->bbuf = flint_aligned_alloc(4096, n_round_up(np*stride*sizeof(double), 4096));
 
     for (i = 0; i < np; i++)
     {
