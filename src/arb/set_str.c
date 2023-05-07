@@ -68,7 +68,12 @@ arb_set_float_str(arb_t res, const char * inp, slong prec)
                 error = fmpz_set_str(exp, emarker + 2, 10);
         }
         else
-            error = fmpz_set_str(exp, emarker + 1, 10);
+        {
+            if (emarker[1] == '-' && !(emarker[2] >= '0' && emarker[2] <= '9'))
+                error = 1;
+            else
+                error = fmpz_set_str(exp, emarker + 1, 10);
+        }
 
         if (error)
             goto cleanup;
