@@ -28,8 +28,6 @@ main(void)
     {
         fmpz_t a, b, c, r;
         mpz_t d, e, f, g, h, s;
-        slong j;
-
 
         fmpz_init(a);
         fmpz_init(b);
