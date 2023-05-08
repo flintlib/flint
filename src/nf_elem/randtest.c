@@ -57,6 +57,8 @@ void nf_elem_randtest(nf_elem_t a, flint_rand_t state,
                  fmpz_divexact(QNF_ELEM_DENREF(a), QNF_ELEM_DENREF(a), d);
               }
            }
+
+           fmpz_clear(d);
         } else
            fmpz_one(QNF_ELEM_DENREF(a));
     }
