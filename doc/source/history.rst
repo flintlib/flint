@@ -110,6 +110,7 @@ functions starting with an underscore):
 * flint_mpn_add_inplace_c, flint_mpn_cmp_ui_2exp, flint_mpn_mul_large, flint_mpn_nbits
 * fmpz_get_str_bsplit_threaded
 * fmpz_mat_equal_col, fmpz_mat_equal_row, fmpz_neg_ui_array
+* fmpz_poly_randtest_irreducible
 * fmpz_poly_q_evaluate_fmpq, fmpz_poly_q_scalar_div_fmpq, fmpz_poly_q_scalar_div_fmpz, fmpz_poly_q_scalar_mul_fmpq, fmpz_poly_q_scalar_mul_fmpz
 * fmpz_ui_pow_ui
 * fmpzi_set_qqbar

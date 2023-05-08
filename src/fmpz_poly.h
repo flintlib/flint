@@ -176,6 +176,10 @@ void fmpz_poly_randtest_not_zero(fmpz_poly_t f, flint_rand_t state,
 void fmpz_poly_randtest_no_real_root(fmpz_poly_t p, flint_rand_t state,
                                                 slong len, flint_bitcnt_t bits);
 
+void fmpz_poly_randtest_irreducible1(fmpz_poly_t pol, flint_rand_t state, slong len, mp_bitcnt_t bits);
+void fmpz_poly_randtest_irreducible2(fmpz_poly_t pol, flint_rand_t state, slong len, mp_bitcnt_t bits);
+void fmpz_poly_randtest_irreducible(fmpz_poly_t pol, flint_rand_t state, slong len, mp_bitcnt_t bits);
+
 /*  Getting and setting coefficients  ****************************************/
 
 slong fmpz_poly_get_coeff_si(const fmpz_poly_t poly, slong n);

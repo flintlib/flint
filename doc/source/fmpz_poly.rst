@@ -211,28 +211,36 @@ Randomisation
 
     Sets `f` to a random polynomial with up to the given length and where 
     each coefficient has up to the given number of bits. The coefficients 
-    are signed randomly. One must call :func:`flint_randinit` before 
-    calling this function.
+    are signed randomly.
 
 .. function:: void fmpz_poly_randtest_unsigned(fmpz_poly_t f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     Sets `f` to a random polynomial with up to the given length and where
-    each coefficient has up to the given number of bits. One must call 
-    :func:`flint_randinit` before calling this function.
+    each coefficient has up to the given number of bits.
 
 .. function:: void fmpz_poly_randtest_not_zero(fmpz_poly_t f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     As for :func:`fmpz_poly_randtest` except that ``len`` and bits may 
     not be zero and the polynomial generated is guaranteed not to be the 
-    zero polynomial.  One must call :func:`flint_randinit` before 
-    calling this function.
+    zero polynomial.
 
 .. function:: void fmpz_poly_randtest_no_real_root(fmpz_poly_t p, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     Sets ``p`` to a random polynomial without any real root, whose
     length is up to ``len`` and where each coefficient has up to the
-    given number of bits. One must call :func:`flint_randinit` before
-    calling this function.
+    given number of bits.
+
+.. function:: void fmpz_poly_randtest_irreducible1(fmpz_poly_t pol, flint_rand_t state, slong len, mp_bitcnt_t bits)
+              void fmpz_poly_randtest_irreducible2(fmpz_poly_t pol, flint_rand_t state, slong len, mp_bitcnt_t bits)
+              void fmpz_poly_randtest_irreducible(fmpz_poly_t pol, flint_rand_t state, slong len, mp_bitcnt_t bits)
+
+    Sets ``p`` to a random irreducible polynomial, whose
+    length is up to ``len`` and where each coefficient has up to the
+    given number of bits. There are two algorithms: *irreducible1*
+    generates an irreducible polynomial modulo a random prime number
+    and lifts it to the integers; *irreducible2* generates a random
+    integer polynomial, factors it, and returns a random factor.
+    The default function chooses randomly between these methods.
 
 
 Getting and setting coefficients
