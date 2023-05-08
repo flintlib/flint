@@ -3,6 +3,12 @@
 **nf.h** -- number fields
 ========================================================================================
 
+.. type:: nf_struct
+
+.. type:: nf_t
+
+    Represents a number field.
+
 .. function:: void nf_init(nf_t nf, fmpq_poly_t pol)
 
     Perform basic initialisation of a number field (for element arithmetic)

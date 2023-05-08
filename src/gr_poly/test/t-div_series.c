@@ -104,13 +104,13 @@ test_div_series(flint_rand_t state, int which)
         if (status == GR_SUCCESS && gr_poly_equal(D, E, ctx) == T_FALSE)
         {
             flint_printf("FAIL\n\n");
-            flint_printf("which = %d\n\n", which);
+            flint_printf("which = %d, n = %wd\n\n", which, n);
             gr_ctx_println(ctx);
-            flint_printf("A = "); gr_poly_print(A, ctx); flint_printf("\n");
-            flint_printf("B = "); gr_poly_print(B, ctx); flint_printf("\n");
-            flint_printf("C = "); gr_poly_print(C, ctx); flint_printf("\n");
-            flint_printf("D = "); gr_poly_print(D, ctx); flint_printf("\n");
-            flint_printf("E = "); gr_poly_print(E, ctx); flint_printf("\n");
+            flint_printf("A = "); gr_poly_print(A, ctx); flint_printf("\n\n");
+            flint_printf("B = "); gr_poly_print(B, ctx); flint_printf("\n\n");
+            flint_printf("C = "); gr_poly_print(C, ctx); flint_printf("\n\n");
+            flint_printf("D = "); gr_poly_print(D, ctx); flint_printf("\n\n");
+            flint_printf("E = "); gr_poly_print(E, ctx); flint_printf("\n\n");
             flint_abort();
         }
     }

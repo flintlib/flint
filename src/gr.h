@@ -699,6 +699,8 @@ typedef enum
     GR_CTX_FQ_NMOD,
     GR_CTX_FQ_ZECH,
 
+    GR_CTX_NF,
+
     GR_CTX_REAL_ALGEBRAIC_QQBAR,
     GR_CTX_COMPLEX_ALGEBRAIC_QQBAR,
 
@@ -1356,6 +1358,11 @@ void _gr_ctx_init_fq_zech_from_ref(gr_ctx_t ctx, const void * fq_zech_ctx);
 
 void gr_ctx_init_fmpz_poly(gr_ctx_t ctx);
 
+#ifdef FMPQ_POLY_H
+void gr_ctx_init_nf(gr_ctx_t ctx, const fmpq_poly_t poly);
+void gr_ctx_init_nf_fmpz_poly(gr_ctx_t ctx, const fmpz_poly_t poly);
+void _gr_ctx_init_nf_from_ref(gr_ctx_t ctx, const void * nfctx);
+#endif
 
 /* Groups */
 

@@ -10,6 +10,12 @@ Authors:
 Initialisation
 --------------------------------------------------------------------------------
 
+.. type:: nf_elem_struct
+
+.. type:: nf_elem_t
+
+    Represents a number field element.
+
 .. function:: void nf_elem_init(nf_elem_t a, const nf_t nf)
 
     Initialise a number field element to belong to the given number field

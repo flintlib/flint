@@ -10,7 +10,10 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_poly.h"
+#include "fmpq_poly.h"
 #include "ulong_extras.h"
+#include "long_extras.h"
 #include "gr.h"
 
 void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)
@@ -68,6 +71,28 @@ void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)
         gr_ctx_init_real_algebraic_ca(ctx);
     else if (which == 78)
         gr_ctx_init_complex_algebraic_ca(ctx);
+    else if (which == 79)
+    {
+        fmpz_poly_t g;
+        fmpq_poly_t f;
+
+        fmpz_poly_init(g);
+        fmpq_poly_init(f);
+
+        do
+        {
+            fmpz_poly_randtest_irreducible(g, state, 2 + n_randint(state, 5), 1 + n_randint(state, 10));
+        } while (g->length < 2);
+
+        fmpq_poly_set_fmpz_poly(f, g);
+        fmpq_poly_scalar_div_ui(f, f, 1 + n_randtest(state) % 256);
+
+        gr_ctx_init_nf(ctx, f);
+
+        fmpz_poly_clear(g);
+        fmpq_poly_clear(f);
+    }
+
 /*
 slow -- but should be ok with degree limits
 

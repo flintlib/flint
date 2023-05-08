@@ -132,6 +132,10 @@ class fmpq_poly_struct(ctypes.Structure):
                 ('length', c_slong),
                 ('den', c_slong)]
 
+# todo: actually a union
+class nf_elem_struct(ctypes.Structure):
+    _fields_ = [('poly', fmpq_poly_struct)]
+
 class arf_struct(ctypes.Structure):
     _fields_ = [('data', c_slong * 4)]
 
@@ -4658,6 +4662,18 @@ class fq_zech(fq_elem):
     _struct_type = fq_zech_struct
 
 
+class NumberField_nf(gr_ctx):
+    def __init__(self, pol):
+        pol = ZZx(pol)
+        # assert pol.is_irreducible()
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_nf_fmpz_poly(self._ref, pol._ref)
+        self._elem_type = nf_elem
+
+class nf_elem(gr_elem):
+    _struct_type = nf_elem_struct
+
+
 
 class gr_poly(gr_elem):
     _struct_type = gr_poly_struct
@@ -5926,6 +5942,8 @@ PolynomialRing = PolynomialRing_gr_poly
 PowerSeriesRing = PowerSeriesRing_gr_series
 PowerSeriesModRing = PowerSeriesModRing_gr_series
 
+NumberField = NumberField_nf
+
 ZZ = IntegerRing_fmpz()
 QQ = RationalField_fmpq()
 ZZi = GaussianIntegerRing_fmpzi()
@@ -6146,6 +6164,10 @@ def test_qq():
 def test_qqbar():
     a = (-23 + 5*ZZi.i())
     assert ZZi(QQbar(a**2).sqrt()) == -a
+
+def test_nf():
+    a = NumberField_nf(ZZx([1,2,3])).gen()
+    assert (a+5)**(-1) * (2*a+10) == 2
 
 def test_arb():
     a = arb(2.5)

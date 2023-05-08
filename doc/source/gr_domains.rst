@@ -136,6 +136,13 @@ Base rings and fields
     requires `q < 2^{64}` (and in practice a much smaller value
     than this).
 
+.. function:: void gr_ctx_init_nf(gr_ctx_t ctx, const fmpq_poly_t poly)
+              void gr_ctx_init_nf_fmpz_poly(gr_ctx_t ctx, const fmpz_poly_t poly)
+
+    Initializes *ctx* to the number field with defining polynomial
+    ``poly`` which *must* be irreducible (this is not checked).
+    The elements have type :type:`nf_elem_t`.
+
 .. function:: void gr_ctx_init_real_qqbar(gr_ctx_t ctx)
               void gr_ctx_init_complex_qqbar(gr_ctx_t ctx)
 

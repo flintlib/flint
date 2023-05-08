@@ -33,7 +33,7 @@ _gr_poly_div_series_newton(gr_ptr res, gr_srcptr B, slong Blen, gr_srcptr A, slo
     Blen = FLINT_MIN(Blen, len);
 
     /* not supported by the following code */
-    if (Blen == 1)
+    if (Alen == 1)
         return _gr_poly_div_series_basecase(res, B, Blen, A, Alen, len, ctx);
 
     cutoff = FLINT_MAX(cutoff, 2);
