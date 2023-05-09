@@ -1171,7 +1171,7 @@ void _nmod_poly_divrem_mpn_ctx(
     ulong N = n_pow2(lgN);
 
     ulong* B = FLINT_ARRAY_ALLOC(Bn, ulong);
-    ulong* t = FLINT_ARRAY_ALLOC(N, ulong);
+    ulong* t = FLINT_ARRAY_ALLOC(FLINT_MAX(N, bn), ulong);
 
     _nmod_poly_reverse(t, b, bn, bn);
     _nmod_poly_inv_series(B, t, bn, Bn, mod);
