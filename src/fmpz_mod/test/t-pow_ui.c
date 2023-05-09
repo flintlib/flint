@@ -44,7 +44,11 @@ main(void)
 
         for (j = 0; j < 100; j++)
         {
-            fmpz_randtest_unsigned(p, state, max_modulus_bits);
+            if (n_randint(state, 1000) == 0)
+                fmpz_randtest_unsigned(p, state, 100000);
+            else
+                fmpz_randtest_unsigned(p, state, max_modulus_bits);
+
             fmpz_add_ui(p, p, 1);
             fmpz_mod_ctx_set_modulus(fpctx, p);
 
