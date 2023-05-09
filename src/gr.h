@@ -1445,6 +1445,18 @@ int gr_ctx_cmp_coercion(gr_ctx_t ctx1, gr_ctx_t ctx2);
 void gr_test_ring(gr_ctx_t R, slong iters, int test_flags);
 void gr_test_multiplicative_group(gr_ctx_t R, slong iters, int test_flags);
 
+/* Various generic algorithms */
+
+int gr_generic_pow_fmpz_sliding(gr_ptr f, gr_srcptr g, const fmpz_t pow, gr_ctx_t ctx);
+int gr_generic_pow_ui_sliding(gr_ptr f, gr_srcptr g, ulong pow, gr_ctx_t ctx);
+
+int gr_generic_pow_fmpz_binexp(gr_ptr res, gr_srcptr x, const fmpz_t exp, gr_ctx_t ctx);
+int gr_generic_pow_ui_binexp(gr_ptr res, gr_srcptr x, ulong e, gr_ctx_t ctx);
+
+int gr_generic_pow_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t e, gr_ctx_t ctx);
+int gr_generic_pow_si(gr_ptr res, gr_srcptr x, slong e, gr_ctx_t ctx);
+int gr_generic_pow_ui(gr_ptr res, gr_srcptr x, ulong e, gr_ctx_t ctx);
+
 #ifdef __cplusplus
 }
 #endif
