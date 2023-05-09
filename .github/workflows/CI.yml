@@ -260,9 +260,9 @@ jobs:
             exit 1
           fi
 
-      - if: failure()
-        name: "If failure, stop all other jobs"
-        uses: andymckay/cancel-action@0.3
+      # - if: failure()
+      #   name: "If failure, stop all other jobs"
+      #   uses: andymckay/cancel-action@0.3
 
 
 
