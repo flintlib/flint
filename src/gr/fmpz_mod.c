@@ -506,7 +506,6 @@ _gr_fmpz_mod_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const fmpz_mod_poly_t 
             fmpz_factor_init(nfac);
             fmpz_factor(nfac, FMPZ_MOD_CTX(ctx)->n);
 
-            /* xxx: be able to pass reasonable limits to fmpz_mod_poly_roots_factored */
             num = 0;
             for (i = 0; i < nfac->num; i++)
                 num += nfac->exp[i];
@@ -517,7 +516,7 @@ _gr_fmpz_mod_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const fmpz_mod_poly_t 
             }
             else
             {
-                if (!fmpz_mod_poly_roots_factored(fac, poly, 1, nfac, FMPZ_MOD_CTX(ctx)))
+                if (!fmpz_mod_poly_roots_factored_with_length_limit(fac, poly, 1, 1000000, nfac, FMPZ_MOD_CTX(ctx)))
                     status = GR_UNABLE;
             }
 

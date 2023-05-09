@@ -161,6 +161,11 @@ int fmpz_mod_poly_roots_factored(fmpz_mod_poly_factor_t r,
         const fmpz_mod_poly_t f, int with_multiplicity, const fmpz_factor_t n,
                                                      const fmpz_mod_ctx_t ctx);
 
+int fmpz_mod_poly_roots_factored_with_length_limit(fmpz_mod_poly_factor_t x0,
+                           const fmpz_mod_poly_t f, int with_mult,
+                            slong length_limit,
+                             const fmpz_factor_t fac, const fmpz_mod_ctx_t ctx);
+
 /* Inlines *******************************************************************/
 
 void fmpz_mod_poly_factor_get_fmpz_mod_poly(fmpz_mod_poly_t z,

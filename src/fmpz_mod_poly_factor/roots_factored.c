@@ -213,8 +213,9 @@ cleanup:
 }
 
 
-int fmpz_mod_poly_roots_factored(fmpz_mod_poly_factor_t x0,
+int fmpz_mod_poly_roots_factored_with_length_limit(fmpz_mod_poly_factor_t x0,
                            const fmpz_mod_poly_t f, int with_mult,
+                            slong length_limit,
                              const fmpz_factor_t fac, const fmpz_mod_ctx_t ctx)
 {
     int success = 1;
@@ -263,7 +264,7 @@ int fmpz_mod_poly_roots_factored(fmpz_mod_poly_factor_t x0,
         }
 
         if (z_mul_checked(&new_length, x0->num, x1->num) ||
-            new_length >= LENGTH_LIMIT)
+            new_length >= length_limit)
         {
             goto almost_failed;
         }
@@ -327,4 +328,11 @@ almost_failed:
 
     success = 0;
     goto cleanup;
+}
+
+int fmpz_mod_poly_roots_factored(fmpz_mod_poly_factor_t x0,
+                           const fmpz_mod_poly_t f, int with_mult,
+                             const fmpz_factor_t fac, const fmpz_mod_ctx_t ctx)
+{
+    return fmpz_mod_poly_roots_factored_with_length_limit(x0, f, with_mult, LENGTH_LIMIT, fac, ctx);
 }
