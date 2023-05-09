@@ -15,7 +15,7 @@
 int
 main(void)
 {
-    flint_bitcnt_t max_bits = 200;
+    flint_bitcnt_t max_bits = 200, max_bits_huge = 500 * FLINT_BITS;
     slong i, j, k;
     FLINT_TEST_INIT(state);
 
@@ -61,6 +61,11 @@ main(void)
                 fmpz_one(p);
                 fmpz_mul_2exp(p, p, 1 + n_randint(state, max_bits));
                 fmpz_sub_ui(p, p, 1);
+            }
+            else if (j == 3 && n_randint(state, 30) == 0)
+            {
+                fmpz_randtest_unsigned(p, state, max_bits_huge);
+                fmpz_add_ui(p, p, 1);
             }
             else
             {

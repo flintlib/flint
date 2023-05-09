@@ -18,7 +18,11 @@ void fmpz_mod_mul_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t c,
     FLINT_ASSERT(fmpz_mod_is_canonical(b, ctx));
 
     fmpz_mul(a, b, c);
-    fmpz_mod(a, a, ctx->n);
+
+    if (ctx->ninv_huge == NULL)
+        fmpz_mod(a, a, ctx->n);
+    else
+        fmpz_fdiv_r_preinvn(a, a, ctx->n, ctx->ninv_huge);
 
     FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
 }

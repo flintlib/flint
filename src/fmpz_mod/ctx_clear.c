@@ -14,5 +14,11 @@
 
 void fmpz_mod_ctx_clear(fmpz_mod_ctx_t ctx)
 {
+    if (ctx->ninv_huge != NULL)
+    {
+        fmpz_preinvn_clear(ctx->ninv_huge);
+        flint_free(ctx->ninv_huge);
+    }
+
     fmpz_clear(ctx->n);
 }

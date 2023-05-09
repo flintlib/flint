@@ -31,6 +31,7 @@ void fmpz_mod_ctx_init(fmpz_mod_ctx_t ctx, const fmpz_t n)
     ctx->add_fxn = _fmpz_mod_addN;
     ctx->sub_fxn = _fmpz_mod_subN;
     ctx->mul_fxn = _fmpz_mod_mulN;
+    ctx->ninv_huge = NULL;
 
     bits = fmpz_bits(n);
     if (bits <= FLINT_BITS)
@@ -65,5 +66,10 @@ void fmpz_mod_ctx_init(fmpz_mod_ctx_t ctx, const fmpz_t n)
             ctx->sub_fxn = _fmpz_mod_sub2;
             ctx->mul_fxn = _fmpz_mod_mul2;
         }
+    }
+    else if (bits >= 300 * FLINT_BITS)
+    {
+        ctx->ninv_huge = flint_malloc(sizeof(fmpz_preinvn_struct));
+        fmpz_preinvn_init(ctx->ninv_huge, n);
     }
 }

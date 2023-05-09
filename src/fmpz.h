@@ -595,16 +595,8 @@ void fmpz_lcm(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 /* preinvn *******************************************************************/
 
-typedef struct
-{
-   mp_ptr dinv;
-   slong n;
-   flint_bitcnt_t norm;
-} fmpz_preinvn_struct;
-
-typedef fmpz_preinvn_struct fmpz_preinvn_t[1];
-
 void fmpz_fdiv_qr_preinvn(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h, const fmpz_preinvn_t inv);
+void fmpz_fdiv_r_preinvn(fmpz_t f, const fmpz_t g, const fmpz_t h, const fmpz_preinvn_t inv);
 
 void fmpz_preinvn_init(fmpz_preinvn_t inv, const fmpz_t f);
 void fmpz_preinvn_clear(fmpz_preinvn_t inv);
