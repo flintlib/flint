@@ -214,6 +214,37 @@ _gr_generic_pow_ui_binexp(gr_ptr res, gr_ptr tmp, gr_srcptr x, ulong exp, gr_ctx
     return status;
 }
 
+static int
+gr_generic_pow3(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    int status;
+
+    if (res == x)
+    {
+        gr_ptr t;
+        GR_TMP_INIT(t, ctx);
+        status = gr_sqr(t, x, ctx);
+        status |= gr_mul(res, t, x, ctx);
+        GR_TMP_CLEAR(t, ctx);
+    }
+    else
+    {
+        status = gr_sqr(res, x, ctx);
+        status |= gr_mul(res, res, x, ctx);
+    }
+
+    return status;
+}
+
+static int
+gr_generic_pow4(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    int status;
+    status = gr_sqr(res, x, ctx);
+    status |= gr_sqr(res, res, ctx);
+    return status;
+}
+
 /* todo: optimize swaps */
 int
 gr_generic_pow_fmpz_binexp(gr_ptr res, gr_srcptr x, const fmpz_t exp, gr_ctx_t ctx)
@@ -225,13 +256,19 @@ gr_generic_pow_fmpz_binexp(gr_ptr res, gr_srcptr x, const fmpz_t exp, gr_ctx_t c
     int status;
     slong i;
 
-    if (fmpz_sgn(exp) <= 0)
-    {
-        if (fmpz_is_zero(exp))
-            return gr_one(res, ctx);
-        else
-            return GR_UNABLE;
-    }
+    if (*exp == 0)
+        return gr_one(res, ctx);
+    else if (*exp == 1)
+        return gr_set(res, x, ctx);
+    else if (*exp == 2)
+        return gr_sqr(res, x, ctx);
+    else if (*exp == 3)
+        return gr_generic_pow3(res, x, ctx);
+    else if (*exp == 4)
+        return gr_generic_pow4(res, x, ctx);
+
+    if (fmpz_sgn(exp) < 0)
+        return GR_UNABLE;
 
     status = GR_SUCCESS;
 
@@ -260,45 +297,35 @@ int
 gr_generic_pow_ui_binexp(gr_ptr res, gr_srcptr x, ulong e, gr_ctx_t ctx)
 {
     int status;
+    gr_ptr t, u;
+
 
     if (e == 0)
-    {
         return gr_one(res, ctx);
-    }
     else if (e == 1)
-    {
         return gr_set(res, x, ctx);
-    }
     else if (e == 2)
-    {
         return gr_sqr(res, x, ctx);
-    }
+    else if (e == 3)
+        return gr_generic_pow3(res, x, ctx);
     else if (e == 4)
+        return gr_generic_pow4(res, x, ctx);
+
+    if (res == x)
     {
-        status = gr_sqr(res, x, ctx);
-        status |= gr_sqr(res, res, ctx);
-        return status;
+        GR_TMP_INIT2(t, u, ctx);
+        status = gr_set(u, x, ctx);
+        status |= _gr_generic_pow_ui_binexp(res, t, u, e, ctx);
+        GR_TMP_CLEAR2(t, u, ctx);
     }
     else
     {
-        gr_ptr t, u;
-
-        if (res == x)
-        {
-            GR_TMP_INIT2(t, u, ctx);
-            status = gr_set(u, x, ctx);
-            status |= _gr_generic_pow_ui_binexp(res, t, u, e, ctx);
-            GR_TMP_CLEAR2(t, u, ctx);
-        }
-        else
-        {
-            GR_TMP_INIT(t, ctx);
-            status = _gr_generic_pow_ui_binexp(res, t, x, e, ctx);
-            GR_TMP_CLEAR(t, ctx);
-        }
-
-        return status;
+        GR_TMP_INIT(t, ctx);
+        status = _gr_generic_pow_ui_binexp(res, t, x, e, ctx);
+        GR_TMP_CLEAR(t, ctx);
     }
+
+    return status;
 }
 
 int
@@ -307,7 +334,6 @@ gr_generic_pow_ui(gr_ptr res, gr_srcptr x, ulong e, gr_ctx_t ctx)
     return gr_generic_pow_ui_binexp(res, x, e, ctx);
 }
 
-/* todo: call gr_pow_ui instead of gr_generic_pow_ui? */
 int
 gr_generic_pow_si(gr_ptr res, gr_srcptr x, slong e, gr_ctx_t ctx)
 {
@@ -348,12 +374,5 @@ gr_generic_pow_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t e, gr_ctx_t ctx)
         return status;
     }
 
-    if (*e == 0)
-        return gr_one(res, ctx);
-    else if (*e == 1)
-        return gr_set(res, x, ctx);
-    else if (*e == 2)
-        return gr_sqr(res, x, ctx);
-    else
-        return gr_generic_pow_fmpz_binexp(res, x, e, ctx);
+    return gr_generic_pow_fmpz_binexp(res, x, e, ctx);
 }
