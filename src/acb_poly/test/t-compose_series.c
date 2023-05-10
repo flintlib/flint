@@ -93,11 +93,19 @@ int main(void)
             slong i, k, l, m;
 
             /* randomize coefficients to set to indeterminate value */
-            k = n_randint(state, a->length);
-            l = 1 + n_randint(state, b->length - 1);
+            /* if the value is equal to the length we don't set an indeterminate value */
+            k = n_randint(state, a->length + 1);
+            l = 1 + n_randint(state, b->length);
 
-            acb_indeterminate(a->coeffs + k);
-            acb_indeterminate(b->coeffs + l);
+            if (k < a->length)
+              acb_indeterminate(a->coeffs + k);
+            else
+              k = n; // k doesn't affect number of finite coefficients
+
+            if (l < b->length)
+              acb_indeterminate(b->coeffs + l);
+            else
+              l = n; // l doesn't affect number of finite coefficients
 
             acb_poly_compose_series(d, a, b, n, rbits3);
 

@@ -27,14 +27,14 @@ _acb_poly_compose_series(acb_ptr res, acb_srcptr poly1, slong len1,
          * poly2 are finite */
         slong k = 0;
 
-        while (acb_is_finite(poly1 + k) && acb_is_finite(poly2 + k))
+        while (((k >= len1) || acb_is_finite(poly1 + k)) && ((k >= len2) || acb_is_finite(poly2 + k)))
             k += 1;
 
         if (k > 0)
         {
             gr_ctx_t ctx;
             gr_ctx_init_complex_acb(ctx, prec);
-            GR_MUST_SUCCEED(_gr_poly_compose_series(res, poly1, k, poly2, k, FLINT_MIN(n, k), ctx));
+            GR_MUST_SUCCEED(_gr_poly_compose_series(res, poly1, FLINT_MIN(len1, k), poly2, FLINT_MIN(len2, k), FLINT_MIN(n, k), ctx));
             _acb_vec_indeterminate(res + k, n - k);
         }
         else
