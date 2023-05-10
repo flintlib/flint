@@ -87,6 +87,60 @@ int main(void)
             flint_abort();
         }
 
+        if (a->length > 0 && b->length > 0)
+        {
+            int any_finite;
+            slong i, k, l, m;
+
+            /* randomize coefficients to set to indeterminate value */
+            /* if the value is equal to the length we don't set an indeterminate value */
+            k = n_randint(state, a->length + 1);
+            l = 1 + n_randint(state, b->length);
+
+            if (k < a->length)
+              acb_indeterminate(a->coeffs + k);
+            else
+              k = n; // k doesn't affect number of finite coefficients
+
+            if (l < b->length)
+              acb_indeterminate(b->coeffs + l);
+            else
+              l = n; // l doesn't affect number of finite coefficients
+
+            acb_poly_compose_series(d, a, b, n, rbits3);
+
+            /* up to this all coefficients should be finite */
+            m = FLINT_MIN(FLINT_MIN(k, l), d->length);
+
+            /* check that coefficients after m are all non-finite */
+            any_finite = 0;
+            for (i = m; i < d->length; i++)
+                any_finite |= acb_is_finite(d->coeffs + i);
+
+            if (any_finite)
+            {
+                flint_printf("FAIL (non-finite 1)\n\n");
+                flint_abort();
+            }
+
+            /* check that coefficients up to m are all finite and
+               contain the expected result */
+            if (!_acb_vec_is_finite(d->coeffs, m))
+            {
+                flint_printf("FAIL (non-finite 2)\n\n");
+                flint_abort();
+            }
+
+            fmpq_poly_truncate(C, m);
+            acb_poly_truncate(d, m);
+
+            if (!acb_poly_contains_fmpq_poly(d, C))
+            {
+                flint_printf("FAIL (non-finite 3)\n\n");
+                flint_abort();
+            }
+        }
+
         fmpq_poly_clear(A);
         fmpq_poly_clear(B);
         fmpq_poly_clear(C);
