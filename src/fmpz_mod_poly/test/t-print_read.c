@@ -230,6 +230,7 @@ int main(void)
             }
 
             fmpz_mod_poly_init(t, ctx);
+            fmpz_mod_ctx_init_ui(newctx, 3);
 
             i = 0;
             /* Only four junk bytes are sent and our read
