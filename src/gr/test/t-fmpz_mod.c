@@ -24,6 +24,15 @@ int main(void)
         gr_ctx_clear(ZZn);
     }
 
+    /* test huge preinvn code */
+    {
+        fmpz_randbits(n, state, 72000);
+        fmpz_abs(n, n);
+        gr_ctx_init_fmpz_mod(ZZn, n);
+        gr_test_ring(ZZn, 10, flags);
+        gr_ctx_clear(ZZn);
+    }
+
     fmpz_clear(n);
     flint_randclear(state);
 
