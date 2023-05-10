@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2009 William Hart
     Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2023 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -14,6 +15,85 @@
 #include "gmpcompat.h"
 #include "fmpz.h"
 #include "ulong_extras.h"
+#include "gr.h"
+
+/* assumes e is large */
+static void
+_fmpz_powm(fmpz_t res, const fmpz_t x, const fmpz_t e, const fmpz_t m)
+{
+    if (!COEFF_IS_MPZ(*m))  /* m is small */
+    {
+        /* todo: make n_powmod2_fmpz_preinv faster than mpz_powm and use here */
+        ulong c1, c2;
+        mpz_t zx, zm;
+        __mpz_struct * zres;
+
+        c2 = *m;
+        c1 = fmpz_fdiv_ui(x, c2);
+
+        zx->_mp_d = &c1;
+        zx->_mp_size = (c1 != 0);
+        zx->_mp_alloc = 1;
+
+        zm->_mp_d = &c2;
+        zm->_mp_size = 1;
+        zm->_mp_alloc = 1;
+
+        zres = _fmpz_promote(res);
+        mpz_powm(zres, zx, COEFF_TO_PTR(*e), zm);
+        _fmpz_demote_val(res);
+    }
+    else if (fmpz_is_zero(x) || fmpz_is_one(x))
+    {
+        fmpz_set(res, x);
+    }
+#ifdef FLINT_HAVE_FFT_SMALL
+    else if (fmpz_bits(m) >= 70000)
+    {
+        gr_ctx_t gctx;
+        fmpz_t t;
+
+        gr_ctx_init_fmpz_mod(gctx, m);
+        fmpz_init(t);
+
+        /* fmpz_mod input must be reduced */
+        GR_MUST_SUCCEED(gr_set_fmpz(t, x, gctx));
+
+        if (!COEFF_IS_MPZ(*x))
+            GR_MUST_SUCCEED(gr_generic_pow_fmpz_binexp(res, t, e, gctx));
+        else
+            GR_MUST_SUCCEED(gr_generic_pow_fmpz_sliding(res, t, e, gctx));
+
+        fmpz_clear(t);
+        gr_ctx_clear(gctx);
+    }
+#endif
+    else
+    {
+        if (!COEFF_IS_MPZ(*x))  /* x is small */
+        {
+            mpz_t zx;
+            __mpz_struct * zres;
+            ulong c1;
+
+            c1 = FLINT_ABS(*x);
+
+            zx->_mp_d = &c1;
+            zx->_mp_size = (*x == 0) ? 0 : ((*x > 0) ? 1 : -1);
+            zx->_mp_alloc = 1;
+
+            zres = _fmpz_promote(res);
+            mpz_powm(zres, zx, COEFF_TO_PTR(*e), COEFF_TO_PTR(*m));
+            _fmpz_demote_val(res);
+        }
+        else  /* x is large */
+        {
+            __mpz_struct * zres = _fmpz_promote(res);
+            mpz_powm(zres, COEFF_TO_PTR(*x), COEFF_TO_PTR(*e), COEFF_TO_PTR(*m));
+            _fmpz_demote_val(res);
+        }
+    }
+}
 
 void fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m)
 {
@@ -47,46 +127,6 @@ void fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m)
     }
     else  /* e is large */
     {
-        if (!COEFF_IS_MPZ(*m))  /* m is small */
-        {
-            ulong g1 = fmpz_fdiv_ui(g, *m);
-            mpz_t g2, m2;
-            __mpz_struct * mf;
-
-            flint_mpz_init_set_ui(g2, g1);
-            flint_mpz_init_set_ui(m2, *m);
-            mf = _fmpz_promote(f);
-
-            mpz_powm(mf, g2, COEFF_TO_PTR(*e), m2);
-
-            mpz_clear(g2);
-            mpz_clear(m2);
-            _fmpz_demote_val(f);
-        }
-        else  /* m is large */
-        {
-            if (!COEFF_IS_MPZ(*g))  /* g is small */
-            {
-                mpz_t g2;
-                __mpz_struct * mf;
-
-                flint_mpz_init_set_si(g2, *g);
-                mf = _fmpz_promote(f);
-
-                mpz_powm(mf, g2, COEFF_TO_PTR(*e), COEFF_TO_PTR(*m));
-
-                mpz_clear(g2);
-                _fmpz_demote_val(f);
-            }
-            else  /* g is large */
-            {
-                __mpz_struct * mf = _fmpz_promote(f);
-
-                mpz_powm(mf,
-                    COEFF_TO_PTR(*g), COEFF_TO_PTR(*e), COEFF_TO_PTR(*m));
-                _fmpz_demote_val(f);
-            }
-        }
+        _fmpz_powm(f, g, e, m);
     }
 }
-

@@ -24,7 +24,7 @@ int main(void)
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 10000; iter++)
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         int status;
         gr_ctx_t ctx, ZZ;

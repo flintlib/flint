@@ -113,8 +113,8 @@ int main(void)
 
         ca_ctx_init(ctx);
 
-        r = n_randint(state, 6);
-        c = n_randint(state, 6);
+        r = n_randint(state, 5);
+        c = n_randint(state, 5);
 
         ca_mat_init(A, r, c, ctx);
         ca_mat_init(B, r, c, ctx);

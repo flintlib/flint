@@ -110,6 +110,7 @@ _ca_poly_check_coprime_numerical(ca_srcptr A, slong lenA, ca_srcptr B, slong len
 
 /* assumes lenA >= lenB >= 1, and both A and B have nonzero leading
    coefficient */
+
 slong
 _ca_poly_gcd(ca_ptr G, ca_srcptr A, slong lenA,
                                 ca_srcptr B, slong lenB, ca_ctx_t ctx)
@@ -118,7 +119,7 @@ _ca_poly_gcd(ca_ptr G, ca_srcptr A, slong lenA,
     {
         fmpz * zA, * zB, *zG;
         fmpz_t den;
-        slong i;
+        slong i, lenA2;
 
         fmpz_init(den);
         zA = _fmpz_vec_init(lenA);
@@ -130,17 +131,19 @@ _ca_poly_gcd(ca_ptr G, ca_srcptr A, slong lenA,
 
         _fmpz_poly_gcd(zG, zA, lenA, zB, lenB);
 
-        while (lenA > 1 && fmpz_is_zero(zG + lenA - 1))
-            lenA--;
+        lenA2 = lenA;
+        while (lenA2 > 1 && fmpz_is_zero(zG + lenA2 - 1))
+            lenA2--;
 
-        for (i = 0; i < lenA; i++)
+        for (i = 0; i < lenA2; i++)
             ca_set_fmpz(G + i, zG + i, ctx);
 
         _fmpz_vec_clear(zA, lenA);
         _fmpz_vec_clear(zB, lenB);
         _fmpz_vec_clear(zG, lenA);
+        fmpz_clear(den);
 
-        return lenA;
+        return lenA2;
     }
 
     if (_ca_poly_check_coprime_numerical(A, lenA, B, lenB, ctx))

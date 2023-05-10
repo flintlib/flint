@@ -182,3 +182,14 @@ fmpz_fdiv_qr_preinvn(fmpz_t f, fmpz_t s, const fmpz_t g,
         }
     }
 }
+
+/* todo: avoid the temporary variable */
+void
+fmpz_fdiv_r_preinvn(fmpz_t f, const fmpz_t g,
+                         const fmpz_t h, const fmpz_preinvn_t inv)
+{
+    fmpz_t q;
+    fmpz_init(q);
+    fmpz_fdiv_qr_preinvn(q, f, g, h, inv);
+    fmpz_clear(q);
+}
