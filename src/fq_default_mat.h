@@ -1132,7 +1132,7 @@ FQ_DEFAULT_MAT_INLINE slong fq_default_mat_rref(fq_default_mat_t A,
     {
         return nmod_mat_rref(A->nmod);
     }
-    else if (ctx->type == FQ_DEFAULT_NMOD)
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         return fmpz_mod_mat_rref(NULL, A->fmpz_mod);
     }
@@ -1182,7 +1182,7 @@ FQ_DEFAULT_MAT_INLINE slong fq_default_mat_rank(const fq_default_mat_t A,
     {
         return nmod_mat_rank(A->nmod);
     }
-    else if (ctx->type == FQ_DEFAULT_NMOD)
+    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         return fmpz_mod_mat_rank(A->fmpz_mod);
     }
