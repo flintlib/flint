@@ -396,12 +396,6 @@ Input, output and string conversion
 Assignment and conversions
 ................................................................................
 
-.. function:: int gr_zero(gr_ptr res, gr_ctx_t ctx)
-              int gr_one(gr_ptr res, gr_ctx_t ctx)
-              int gr_neg_one(gr_ptr res, gr_ctx_t ctx)
-
-    Sets *res* to the ring element 0, 1 or -1.
-
 .. function:: int gr_set(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 
     Sets *res* to a copy of the element *x*.
@@ -437,6 +431,20 @@ Assignment and conversions
               int gr_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, gr_srcptr x, gr_ctx_t ctx)
 
     Set or retrieve a dyadic number.
+
+Special values
+................................................................................
+
+.. function:: int gr_zero(gr_ptr res, gr_ctx_t ctx)
+              int gr_one(gr_ptr res, gr_ctx_t ctx)
+              int gr_neg_one(gr_ptr res, gr_ctx_t ctx)
+
+    Sets *res* to the ring element 0, 1 or -1.
+
+.. function:: int gr_gen(gr_ptr res, gr_ctx_t ctx)
+
+    Sets *res* to a generator of this domain. The meaning of
+    "generator" depends on the domain.
 
 Basic properties
 ........................................................................
