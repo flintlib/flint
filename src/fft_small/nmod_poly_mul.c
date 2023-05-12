@@ -59,7 +59,7 @@ static void _mod_red(
 
 
                 vec8d tlo = vec8n_convert_limited_vec8d(vec8n_bit_and(t, vec8n_set_n(n_pow2(32)-1)));
-                vec8d thi = vec8n_convert_limited_vec8d(vec8n_bit_shift_right(t, 32));
+                vec8d thi = vec8n_convert_limited_vec8d(vec8n_bit_shift_right_32(t));
                 vec8d_store_aligned(aI + j, vec8d_add(tlo, vec8d_mulmod(thi, vec8d_set_d(n_pow2(32)), n, ninv)));
             }
             else
@@ -125,7 +125,7 @@ static void _mod_red(
             {
                 vec8n t = vec8n_load_unaligned(a + i + j);
                 vec8d tlo = vec8n_convert_limited_vec8d(vec8n_bit_and(t, vec8n_set_n(n_pow2(32)-1)));
-                vec8d thi = vec8n_convert_limited_vec8d(vec8n_bit_shift_right(t, 32));
+                vec8d thi = vec8n_convert_limited_vec8d(vec8n_bit_shift_right_32(t));
                 vec8d_store_aligned(aI + j, vec8d_add(tlo, vec8d_mulmod(thi, vec8d_set_d(n_pow2(32)), n, ninv)));
             }
         }
@@ -137,7 +137,7 @@ static void _mod_red(
             {
                 vec8n t = vec8n_load_unaligned(a + i + j);
                 vec8d tlo = vec8n_convert_limited_vec8d(vec8n_bit_and(t, vec8n_set_n(n_pow2(32)-1)));
-                vec8d thi = vec8n_convert_limited_vec8d(vec8n_bit_shift_right(t, 32));
+                vec8d thi = vec8n_convert_limited_vec8d(vec8n_bit_shift_right_32(t));
                 vec8d s = vec8d_add(tlo, vec8d_mulmod(thi, vec8d_set_d(n_pow2(32)), n, ninv));
                 s = vec8d_add(s, vec8d_load_aligned(aI + j));
                 s = vec8d_reduce_2n_to_n(s, n);
@@ -196,7 +196,7 @@ FLINT_ASSERT(i+j < atrunc);
             {
                 vec8n t = vec8n_load_unaligned(a + i + j);
                 vec8d tlo = vec8n_convert_limited_vec8d(vec8n_bit_and(t, vec8n_set_n(n_pow2(32)-1)));
-                vec8d thi = vec8n_convert_limited_vec8d(vec8n_bit_shift_right(t, 32));
+                vec8d thi = vec8n_convert_limited_vec8d(vec8n_bit_shift_right_32(t));
                 vec8d_store_aligned(aI + j, vec8d_add(tlo, vec8d_mulmod(thi, vec8d_set_d(n_pow2(32)), n, ninv)));
             }
 #else

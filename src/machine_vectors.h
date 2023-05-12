@@ -729,6 +729,9 @@ FLINT_FORCE_INLINE vec8n vec8n_bit_shift_right(vec8n a, ulong b) {
     return z;
 }
 
+#define vec4n_bit_shift_right_32(a) vec4n_bit_shift_right((a), 32)
+#define vec8n_bit_shift_right_32(a) vec8n_bit_shift_right((a), 32)
+
 
 FLINT_FORCE_INLINE vec4n vec4n_bit_and(vec4n a, vec4n b) {
     return _mm256_and_si256(a, b);
@@ -738,6 +741,7 @@ FLINT_FORCE_INLINE vec8n vec8n_bit_and(vec8n a, vec8n b) {
     vec8n z = {vec4n_bit_and(a.e1, b.e1), vec4n_bit_and(a.e2, b.e2)};
     return z;
 }
+
 
 
 #elif defined(__ARM_NEON)
@@ -1482,12 +1486,17 @@ FLINT_FORCE_INLINE vec2n vec2n_bit_and(vec2n a, vec2n b)
 EXTEND_VEC_DEF2(vec2n, vec4n, _bit_and)
 EXTEND_VEC_DEF2(vec4n, vec8n, _bit_and)
 
+#if 0
+/*
+   vshrq_n_u64(a, n) cannot be used because n must be a compile-time
+   constant, and the compiler doesn't see that n is constant
+   even if the function is forced inline.
+   And vshlq_s64(a, vdupq_n_s64(-(slong) n)) cannot be used to emulate
+   vshrq_n_u64(a, n) as it propagates the sign bit.
+*/
 FLINT_FORCE_INLINE vec2n vec2n_bit_shift_right(vec2n a, ulong n)
 {
-    /* vshrq_n_u64(a, n) cannot be used because n must be a compile-time
-       constant, and the compiler doesn't see that n is constant
-       even if the function is forced inline */
-    return vshlq_s64(a, vdupq_n_s64(-(slong) n));
+    return vshrq_n_u64(a, n);
 }
 
 FLINT_FORCE_INLINE vec4n vec4n_bit_shift_right(vec4n a, ulong n)
@@ -1499,6 +1508,24 @@ FLINT_FORCE_INLINE vec4n vec4n_bit_shift_right(vec4n a, ulong n)
 FLINT_FORCE_INLINE vec8n vec8n_bit_shift_right(vec8n a, ulong n)
 {
     vec8n z = {vec4n_bit_shift_right(a.e1, n), vec4n_bit_shift_right(a.e2, n)};
+    return z;
+}
+#endif
+
+FLINT_FORCE_INLINE vec2n vec2n_bit_shift_right_32(vec2n a)
+{
+    return vshrq_n_u64(a, 32);
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_bit_shift_right_32(vec4n a)
+{
+    vec4n z = {vec2n_bit_shift_right_32(a.e1), vec2n_bit_shift_right_32(a.e2)};
+    return z;
+}
+
+FLINT_FORCE_INLINE vec8n vec8n_bit_shift_right_32(vec8n a)
+{
+    vec8n z = {vec4n_bit_shift_right_32(a.e1), vec4n_bit_shift_right_32(a.e2)};
     return z;
 }
 
