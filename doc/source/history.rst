@@ -14,7 +14,7 @@ Merged libraries and reorganisation
 
 The following libraries have been merged into FLINT:
 
-* Arb 2.24 (arbitrary-precision ball arithmetic)
+* Arb 2.23 (arbitrary-precision ball arithmetic)
 * Calcium 0.4 (exact real and complex arithmetic)
 * Antic 0.2.5 (number fields, binary quadratic forms)
 
@@ -25,7 +25,7 @@ old Arb, Calcium or Antic library files or include any header files
 from those libraries which may be incompatible.
 
 The FLINT 3.0 API is largely backwards-compatible with FLINT 2.9,
-Arb 2.24, Calcium 0.4 and Antic 0.2.5, except for changes to
+Arb 2.23, Calcium 0.4 and Antic 0.2.5, except for changes to
 rarely-used functions documented below.
 However, the following changes to the handling of header files
 are likely to require (trivial) patches in many downstream codebases:
@@ -94,14 +94,27 @@ Fredrik Johansson.
 Other changes
 ..................
 
+* Changed the order of the ``alloc`` and ``length`` fields in ``arb_poly_t``,
+  ``acb_poly_t`` and ``ca_poly_t`` to match the FLINT types.
+* Added ``fmpzi`` division, norm and GCD functions (gcd_shortest by Daniel Schultz).
+* Added an ``acf`` type for complex floating-point numbers.
+* Added error handling to ``dirichlet_group_init``.
+* Increased the prime factor limit in ``dirichlet_group_init`` from 1e12 to 1e16.
+* Added ``arb_nonnegative_abs`` (Erik Postma).
+* Fixed ``arb_pow`` for x just barely containing 0, y > 0 (Erik Postma).
+* Improved precision handling in arb_gamma for huge input.
+* Faster ``arb_contains_arf``, ``arb_overlaps``, ``arb_gt``, ``arb_lt``.
+
 List of additions
 .................
 
-FLINT 3.0 includes all functions in FLINT 2.9, Arb 2.24, Calcium 0.4
+FLINT 3.0 includes all functions in FLINT 2.9, Arb 2.23, Calcium 0.4
 and Antic 0.2.5 except those listed under "list of removals".
 On top of this, outside of the fft_small module,
-the following functions have been added (omitting
-functions starting with an underscore):
+the following functions have been added.
+
+The list may be incomplete. Functions starting with an
+underscore have been omitted.
 
 * acb_poly_nth_derivative, arb_div_arf_newton, arb_div_newton, arb_fmpz_divapprox, arb_nint, arb_poly_nth_derivative, arb_rsqrt_arf, arb_rsqrt_arf_newton, arb_sqrt_arf_newton, arb_sqrt_newton, arb_trunc
 * ca_set_fmpzi
@@ -121,7 +134,7 @@ functions starting with an underscore):
 List of removals
 ................
 
-The following functions that were present in FLINT 2.9, Arb 2.24 or
+The following functions that were present in FLINT 2.9, Arb 2.23 or
 Calcium 0.4 have been removed, deprecated, or replaced.
 Most are algorithms obsoleted by new gr implementations,
 functions dealing with removed types (fmpr) or GMP types (mpz, etc.),
