@@ -506,15 +506,8 @@ _gr_fmpz_poly_lcm(fmpz_poly_t res, const fmpz_poly_t x, const fmpz_poly_t y, con
 int
 _gr_fmpz_poly_pow_ui(fmpz_poly_t res, const fmpz_poly_t x, ulong exp, const gr_ctx_t ctx)
 {
-    if (exp > (ulong) WORD_MAX || exp >= ctx->size_limit)  /* todo: systematic size solution for test code */
-    {
-        return GR_UNABLE;
-    }
-    else
-    {
-        fmpz_poly_pow(res, x, exp);
-        return GR_SUCCESS;
-    }
+    fmpz_poly_pow(res, x, exp);
+    return GR_SUCCESS;
 }
 
 int

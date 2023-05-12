@@ -580,15 +580,8 @@ int _gr_fmpz_factor(gr_ptr c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x,
 int
 _gr_fmpz_pow_ui(fmpz_t res, const fmpz_t x, ulong exp, const gr_ctx_t ctx)
 {
-    if (exp > (ulong) WORD_MAX || exp >= ctx->size_limit)  /* todo: systematic size solution for test code */
-    {
-        return GR_UNABLE;
-    }
-    else
-    {
-        fmpz_pow_ui(res, x, exp);
-        return GR_SUCCESS;
-    }
+    fmpz_pow_ui(res, x, exp);
+    return GR_SUCCESS;
 }
 
 int

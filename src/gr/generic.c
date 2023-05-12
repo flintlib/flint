@@ -124,6 +124,25 @@ int gr_generic_randtest_not_zero(gr_ptr x, flint_rand_t state, gr_ctx_t ctx)
     return GR_UNABLE;
 }
 
+int gr_generic_randtest_small(gr_ptr x, flint_rand_t state, gr_ctx_t ctx)
+{
+    int status = GR_SUCCESS;
+
+    if (gr_gen(x, ctx) != GR_SUCCESS || n_randint(state, 2) == 0)
+        status |= gr_zero(x, ctx);
+
+    status |= gr_mul_si(x, x, -3 + (slong) n_randint(state, 7), ctx);
+    status |= gr_add_si(x, x, -3 + (slong) n_randint(state, 7), ctx);
+
+    if (n_randint(state, 4) == 0)
+        status |= gr_div_ui(x, x, 1 + n_randint(state, 4), ctx);
+
+    if (status != GR_SUCCESS)
+        status = gr_set_si(x, -3 + (slong) n_randint(state, 7), ctx);
+
+    return status;
+}
+
 /* Generic arithmetic functions */
 
 truth_t gr_generic_is_zero(gr_srcptr x, gr_ctx_t ctx)
@@ -2391,6 +2410,7 @@ const gr_method_tab_input _gr_generic_methods[] =
 
     {GR_METHOD_RANDTEST,                (gr_funcptr) gr_generic_randtest},
     {GR_METHOD_RANDTEST_NOT_ZERO,       (gr_funcptr) gr_generic_randtest_not_zero},
+    {GR_METHOD_RANDTEST_SMALL,          (gr_funcptr) gr_generic_randtest_small},
 
     {GR_METHOD_ZERO,                    (gr_funcptr) gr_generic_zero},
     {GR_METHOD_ONE,                     (gr_funcptr) gr_generic_one},

@@ -363,6 +363,12 @@ Random elements
     Sets *res* to a random nonzero element of the domain *ctx*.
     This operation will fail and return ``GR_DOMAIN`` in the zero ring.
 
+.. function:: int gr_randtest_small(gr_ptr res, flint_rand_t state, gr_ctx_t ctx)
+
+    Sets *res* to a "small" element of the domain *ctx*.
+    This is suitable for randomized testing where a "large" argument
+    could result in excessive computation time.
+
 Input, output and string conversion
 ................................................................................
 

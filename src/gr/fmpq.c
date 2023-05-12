@@ -320,15 +320,8 @@ _gr_fmpq_is_invertible(const fmpq_t x, const gr_ctx_t ctx)
 int
 _gr_fmpq_pow_ui(fmpq_t res, const fmpq_t x, ulong exp, const gr_ctx_t ctx)
 {
-    if (exp > (ulong) WORD_MAX || exp >= ctx->size_limit)  /* todo: systematic size solution for test code */
-    {
-        return GR_UNABLE;
-    }
-    else
-    {
-        fmpq_pow_si(res, x, exp);
-        return GR_SUCCESS;
-    }
+    fmpq_pow_si(res, x, exp);
+    return GR_SUCCESS;
 }
 
 int

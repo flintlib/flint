@@ -691,18 +691,10 @@ _gr_fmpzi_lcm(fmpzi_t res, const fmpzi_t x, const fmpzi_t y, const gr_ctx_t ctx)
 int
 _gr_fmpzi_pow_ui(fmpzi_t res, const fmpzi_t x, ulong exp, const gr_ctx_t ctx)
 {
-    if (exp > (ulong) WORD_MAX || exp >= ctx->size_limit)  /* todo: systematic size solution for test code */
-    {
-        return GR_UNABLE;
-    }
-    else
-    {
-        fmpzi_pow_ui(res, x, exp);
-        return GR_SUCCESS;
-    }
+    fmpzi_pow_ui(res, x, exp);
+    return GR_SUCCESS;
 }
 
-/* test me... */
 int
 _gr_fmpzi_pow_si(fmpzi_t res, const fmpzi_t x, slong exp, const gr_ctx_t ctx)
 {
@@ -736,15 +728,8 @@ _gr_fmpzi_pow_fmpz(fmpzi_t res, const fmpzi_t x, const fmpz_t exp, const gr_ctx_
             fmpzi_zero(res);
             return GR_SUCCESS;
         }
-        else if (fmpz_is_zero(exp))
-        {
-            fmpzi_one(res);
-            return GR_SUCCESS;
-        }
-        else
-        {
-            return GR_DOMAIN;
-        }
+
+        return GR_DOMAIN;
     }
     else if (fmpz_sgn(exp) < 0)
     {
@@ -981,6 +966,9 @@ gr_method_tab_input _fmpzi_methods_input[] =
     {GR_METHOD_TRUNC,           (gr_funcptr) _gr_fmpzi_trunc},
     {GR_METHOD_NINT,            (gr_funcptr) _gr_fmpzi_nint},
 */
+
+    {GR_METHOD_GEN,             (gr_funcptr) _gr_fmpzi_i},
+
     {GR_METHOD_I,               (gr_funcptr) _gr_fmpzi_i},
     {GR_METHOD_PI,              (gr_funcptr) gr_not_in_domain},
 /*
