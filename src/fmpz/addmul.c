@@ -73,6 +73,11 @@ _flint_mpz_addmul_large(mpz_ptr z, mpz_srcptr x, mpz_srcptr y, int negate)
     sgn ^= zn_signed;
     tn = xn + yn;
 
+    /* Currently unreachable because fmpz_addmul and fmpz_submul both
+       handle z == 0 specially. */
+#if 1
+    FLINT_ASSERT(zn != 0)
+#else
     if (zn == 0)
     {
         /* Cannot have aliasing here, because x and y are not
@@ -99,6 +104,7 @@ _flint_mpz_addmul_large(mpz_ptr z, mpz_srcptr x, mpz_srcptr y, int negate)
         z->_mp_size = (sgn >= 0) ? zn : -zn;
         return;
     }
+#endif
 
     TMP_START;
     td = TMP_ALLOC(tn * sizeof(mp_limb_t));
