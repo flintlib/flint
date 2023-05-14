@@ -76,7 +76,7 @@ _flint_mpz_addmul_large(mpz_ptr z, mpz_srcptr x, mpz_srcptr y, int negate)
     /* Currently unreachable because fmpz_addmul and fmpz_submul both
        handle z == 0 specially. */
 #if 1
-    FLINT_ASSERT(zn != 0)
+    FLINT_ASSERT(zn != 0);
 #else
     if (zn == 0)
     {
