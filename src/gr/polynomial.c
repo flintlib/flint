@@ -159,6 +159,14 @@ polynomial_set_other(gr_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
     {
         return gr_poly_set_gr_poly_other(res, x, POLYNOMIAL_ELEM_CTX(x_ctx), POLYNOMIAL_ELEM_CTX(ctx));
     }
+    else if (x_ctx->which_ring == GR_CTX_FMPZ_POLY)
+    {
+        return gr_poly_set_fmpz_poly(res, x, ctx);
+    }
+    else if (x_ctx->which_ring == GR_CTX_FMPQ_POLY)
+    {
+        return gr_poly_set_fmpq_poly(res, x, ctx);
+    }
     else if (x_ctx->which_ring == GR_CTX_GR_VEC)
     {
         gr_poly_t tmp;

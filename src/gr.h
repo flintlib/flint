@@ -718,8 +718,9 @@ typedef enum
     GR_CTX_COMPLEX_FLOAT_ACF,
 
     GR_CTX_FMPZ_POLY,
-
+    GR_CTX_FMPQ_POLY,
     GR_CTX_GR_POLY,
+
     GR_CTX_GR_MPOLY,
     GR_CTX_GR_MAT,
 
@@ -1359,6 +1360,7 @@ void _gr_ctx_init_fq_nmod_from_ref(gr_ctx_t ctx, const void * fq_nmod_ctx);
 void _gr_ctx_init_fq_zech_from_ref(gr_ctx_t ctx, const void * fq_zech_ctx);
 
 void gr_ctx_init_fmpz_poly(gr_ctx_t ctx);
+void gr_ctx_init_fmpq_poly(gr_ctx_t ctx);
 
 #ifdef FMPQ_POLY_H
 void gr_ctx_init_nf(gr_ctx_t ctx, const fmpq_poly_t poly);

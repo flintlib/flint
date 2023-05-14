@@ -5938,6 +5938,33 @@ class gr_vec(gr_elem):
         return res
 
 
+# todo
+class fmpz_poly(gr_elem):
+    _struct_type = fmpz_poly_struct
+
+class fmpq_poly(gr_elem):
+    _struct_type = fmpq_poly_struct
+
+
+class PolynomialRing_fmpz_poly(gr_ctx):
+
+    def __init__(self):
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_fmpz_poly(self._ref)
+        self._elem_type = fmpz_poly
+
+
+class PolynomialRing_fmpq_poly(gr_ctx):
+
+    def __init__(self):
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_fmpq_poly(self._ref)
+        self._elem_type = fmpq_poly
+
+
+# todo: def .one()
+
+
 PolynomialRing = PolynomialRing_gr_poly
 PowerSeriesRing = PowerSeriesRing_gr_series
 PowerSeriesModRing = PowerSeriesModRing_gr_series

@@ -245,6 +245,11 @@ Polynomial rings
     Initializes *ctx* to a ring of integer polynomials of
     type :type:`fmpz_poly_struct`.
 
+.. function:: void gr_ctx_init_fmpq_poly(gr_ctx_t ctx)
+
+    Initializes *ctx* to a ring of rational polynomials of
+    type :type:`fmpq_poly_struct`.
+
 .. function:: void gr_ctx_init_polynomial(gr_ctx_t ctx, gr_ctx_t base_ring)
 
     Initializes *ctx* to a ring of densely represented univariate polynomials

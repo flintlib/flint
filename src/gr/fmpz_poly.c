@@ -12,6 +12,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpz_mat.h"
+#include "fmpq.h"
 #include "gr.h"
 
 /* todo: _fmpz methods */
@@ -84,6 +85,14 @@ _gr_fmpz_poly_one(fmpz_poly_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_fmpz_poly_gen(fmpz_poly_t x, const gr_ctx_t ctx)
+{
+    fmpz_poly_zero(x);
+    fmpz_poly_set_coeff_ui(x, 1, 1);
+    return GR_SUCCESS;
+}
+
+int
 _gr_fmpz_poly_set_si(fmpz_poly_t res, slong v, const gr_ctx_t ctx)
 {
     fmpz_poly_set_si(res, v);
@@ -107,11 +116,10 @@ _gr_fmpz_poly_set_fmpz(fmpz_poly_t res, const fmpz_t v, const gr_ctx_t ctx)
 int
 _gr_fmpz_poly_set_other(fmpz_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
 {
-    switch (x_ctx->which_ring)
+    if (x_ctx->which_ring == GR_CTX_FMPZ)
     {
-        case GR_CTX_FMPZ:
-            fmpz_poly_set_fmpz(res, x);
-            return GR_SUCCESS;
+        fmpz_poly_set_fmpz(res, x);
+        return GR_SUCCESS;
     }
 
     return GR_UNABLE;
@@ -190,6 +198,24 @@ _gr_fmpz_poly_get_fmpz(fmpz_t res, const fmpz_poly_t x, const gr_ctx_t ctx)
     if (fmpz_poly_length(x) == 1)
     {
         fmpz_set(res, x->coeffs);
+        return GR_SUCCESS;
+    }
+
+    return GR_DOMAIN;
+}
+
+int
+_gr_fmpz_poly_get_fmpq(fmpq_t res, const fmpz_poly_t x, const gr_ctx_t ctx)
+{
+    if (fmpz_poly_length(x) == 0)
+    {
+        fmpq_zero(res);
+        return GR_SUCCESS;
+    }
+
+    if (fmpz_poly_length(x) == 1)
+    {
+        fmpq_set_fmpz(res, x->coeffs);
         return GR_SUCCESS;
     }
 
@@ -635,6 +661,7 @@ gr_method_tab_input _fmpz_poly_methods_input[] =
     {GR_METHOD_WRITE,           (gr_funcptr) _gr_fmpz_poly_write},
     {GR_METHOD_ZERO,            (gr_funcptr) _gr_fmpz_poly_zero},
     {GR_METHOD_ONE,             (gr_funcptr) _gr_fmpz_poly_one},
+    {GR_METHOD_GEN,             (gr_funcptr) _gr_fmpz_poly_gen},
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_fmpz_poly_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_fmpz_poly_is_one},
     {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) _gr_fmpz_poly_is_neg_one},
@@ -648,6 +675,7 @@ gr_method_tab_input _fmpz_poly_methods_input[] =
     {GR_METHOD_GET_UI,          (gr_funcptr) _gr_fmpz_poly_get_ui},
     {GR_METHOD_GET_SI,          (gr_funcptr) _gr_fmpz_poly_get_si},
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_fmpz_poly_get_fmpz},
+    {GR_METHOD_GET_FMPQ,        (gr_funcptr) _gr_fmpz_poly_get_fmpq},
     {GR_METHOD_NEG,             (gr_funcptr) _gr_fmpz_poly_neg},
     {GR_METHOD_ADD,             (gr_funcptr) _gr_fmpz_poly_add},
     {GR_METHOD_SUB,             (gr_funcptr) _gr_fmpz_poly_sub},
