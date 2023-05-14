@@ -133,8 +133,8 @@ set(_BUILD_DIRS
     acb_dft         acb_elliptic    acb_modular     acb_dirichlet
     dirichlet       bernoulli       hypgeom
 
-    gr              gr_vec          gr_mat          gr_poly
-    gr_mpoly        gr_special
+    gr              gr_generic      gr_vec          gr_mat
+    gr_poly         gr_mpoly        gr_special
 
     calcium
     utils_flint     fmpz_mpoly_q

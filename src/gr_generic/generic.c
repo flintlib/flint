@@ -14,6 +14,7 @@
 #include "arith.h"
 #include "bernoulli.h"
 #include "gr.h"
+#include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_mat.h"
 #include "gr_poly.h"
@@ -25,44 +26,11 @@
 # include <string.h>
 #endif
 
-#define DEBUG_RINGS 0
-
-/* todo: rings only */
-#if DEBUG_RINGS
-void gr_generic_init(void) { flint_printf("ctx must implement init()\n"); flint_abort(); }
-void gr_generic_clear(void) { flint_printf("ctx must implement clear()\n"); flint_abort(); }
-void gr_generic_swap(void) { flint_printf("ctx must implement swap()\n"); flint_abort(); }
-void gr_generic_randtest(void) { flint_printf("ctx must implement randtest()\n"); flint_abort(); }
-void gr_generic_write(void) { flint_printf("ctx must implement write()\n"); flint_abort(); }
-void gr_generic_zero(void) { flint_printf("ctx must implement zero()\n"); flint_abort(); }
-void gr_generic_one(void) { flint_printf("ctx must implement one()\n"); flint_abort(); }
-void gr_generic_equal(void) { flint_printf("ctx must implement equal()\n"); flint_abort(); }
-void gr_generic_set(void) { flint_printf("ctx must implement set()\n"); flint_abort(); }
-void gr_generic_set_si(void) { flint_printf("ctx must implement set_si()\n"); flint_abort(); }
-void gr_generic_set_ui(void) { flint_printf("ctx must implement set_ui()\n"); flint_abort(); }
-void gr_generic_set_fmpz(void) { flint_printf("ctx must implement set_fmpz()\n"); flint_abort(); }
-void gr_generic_neg(void) { flint_printf("ctx must implement neg()\n"); flint_abort(); }
-void gr_generic_add(void) { flint_printf("ctx must implement add()\n"); flint_abort(); }
-void gr_generic_sub(void) { flint_printf("ctx must implement sub()\n"); flint_abort(); }
-void gr_generic_mul(void) { flint_printf("ctx must implement mul()\n"); flint_abort(); }
-#else
-#define gr_generic_init gr_not_implemented
-#define gr_generic_clear gr_not_implemented
-#define gr_generic_swap gr_not_implemented
-#define gr_generic_randtest gr_not_implemented
-#define gr_generic_write gr_not_implemented
-#define gr_generic_zero gr_not_implemented
-#define gr_generic_one gr_not_implemented
-#define gr_generic_equal gr_not_implemented
-#define gr_generic_set gr_not_implemented
-#define gr_generic_set_si gr_not_implemented
-#define gr_generic_set_ui gr_not_implemented
-#define gr_generic_set_fmpz gr_not_implemented
-#define gr_generic_neg gr_not_implemented
-#define gr_generic_add gr_not_implemented
-#define gr_generic_sub gr_not_implemented
-#define gr_generic_mul gr_not_implemented
-#endif
+int
+gr_generic_ctx_clear(gr_ctx_t ctx)
+{
+    return GR_SUCCESS;
+}
 
 truth_t gr_generic_ctx_predicate(gr_ctx_t ctx)
 {
@@ -2369,13 +2337,6 @@ gr_generic_vec_reciprocals(gr_ptr res, slong len, gr_ctx_t ctx)
     }
 
     return status;
-}
-
-
-int
-gr_generic_ctx_clear(gr_ctx_t ctx)
-{
-    return GR_SUCCESS;
 }
 
 /* Generic method implementations */

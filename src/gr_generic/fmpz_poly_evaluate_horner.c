@@ -11,6 +11,7 @@
 
 #include "fmpz_poly.h"
 #include "gr.h"
+#include "gr_generic.h"
 
 int
 _gr_fmpz_poly_evaluate_horner(gr_ptr res, const fmpz * f, slong len, gr_srcptr x, gr_ctx_t ctx)

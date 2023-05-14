@@ -54,6 +54,7 @@ Generic rings
    gr.rst
    gr_implementing.rst
    gr_domains.rst
+   gr_generic.rst
    gr_special.rst
    gr_vec.rst
    gr_mat.rst

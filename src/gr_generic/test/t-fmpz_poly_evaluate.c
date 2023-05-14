@@ -12,6 +12,7 @@
 #include "fmpz_poly.h"
 #include "gr.h"
 #include "gr_vec.h"
+#include "gr_generic.h"
 
 static int
 evaluate(flint_rand_t state, gr_ptr res, const fmpz_poly_t f, gr_srcptr x, gr_ctx_t ctx)

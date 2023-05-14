@@ -13,6 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_mod.h"
 #include "gr.h"
+#include "gr_generic.h"
 
 #ifdef FLINT_HAVE_FFT_SMALL
 

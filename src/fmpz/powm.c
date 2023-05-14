@@ -16,6 +16,7 @@
 #include "fmpz.h"
 #include "ulong_extras.h"
 #include "gr.h"
+#include "gr_generic.h"
 
 /* assumes e is large */
 static void

@@ -13,6 +13,7 @@
 #include "acb_modular.h"
 #include "gr_special.h"
 #include "gr_poly.h"
+#include "gr_generic.h"
 
 int
 gr_generic_hilbert_class_poly(gr_ptr res, slong D, gr_srcptr x, gr_ctx_t ctx)

@@ -11,6 +11,8 @@
 
 #include "fmpz_poly.h"
 #include "gr.h"
+#include "gr_generic.h"
+
 
 /* todo: divconquer algorithm */
 /* todo: algorithm selection */

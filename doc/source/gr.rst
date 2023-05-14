@@ -558,22 +558,6 @@ Iterated arithmetic operations are best performed using vector
 functions.
 See in particular :func:`_gr_vec_dot` and :func:`_gr_vec_dot_rev`.
 
-.. function:: int _gr_fmpz_poly_evaluate_horner(gr_ptr res, const fmpz * f, slong len, gr_srcptr x, gr_ctx_t ctx)
-              int gr_fmpz_poly_evaluate_horner(gr_ptr res, const fmpz_poly_t f, gr_srcptr x, gr_ctx_t ctx)
-              int _gr_fmpz_poly_evaluate_rectangular(gr_ptr res, const fmpz * f, slong len, gr_srcptr x, gr_ctx_t ctx)
-              int gr_fmpz_poly_evaluate_rectangular(gr_ptr res, const fmpz_poly_t f, gr_srcptr x, gr_ctx_t ctx)
-              int _gr_fmpz_poly_evaluate(gr_ptr res, const fmpz * f, slong len, gr_srcptr x, gr_ctx_t ctx)
-              int gr_fmpz_poly_evaluate(gr_ptr res, const fmpz_poly_t f, gr_srcptr x, gr_ctx_t ctx)
-
-    Sets *res* to the value of the integer polynomial *f* evaluated
-    at the argument *x*.
-
-.. function:: int gr_fmpz_mpoly_evaluate(gr_ptr res, const fmpz_mpoly_t f, gr_srcptr x, const fmpz_mpoly_ctx_t mctx, gr_ctx_t ctx)
-
-    Sets *res* to value of the multivariate polynomial *f* (with
-    corresponding context object *mctx*) evaluated at the vector
-    of arguments in *x*.
-
 Division
 ........................................................................
 

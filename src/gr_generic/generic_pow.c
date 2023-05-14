@@ -12,6 +12,7 @@
 
 #include "fmpz.h"
 #include "gr.h"
+#include "gr_generic.h"
 
 /*
     Returns smallest integer k satisfying:

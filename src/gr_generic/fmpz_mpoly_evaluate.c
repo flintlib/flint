@@ -12,6 +12,7 @@
 
 #include "fmpz_mpoly.h"
 #include "gr.h"
+#include "gr_generic.h"
 
 /*
 The conversion to Horner form can be stated as recursive. However, the call

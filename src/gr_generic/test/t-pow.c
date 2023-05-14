@@ -1,6 +1,7 @@
 #include "fmpz.h"
 #include "ulong_extras.h"
 #include "gr.h"
+#include "gr_generic.h"
 
 /* todo: have a proper interface to test a given powering function */
 int gr_test_pow_ui_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flags);
@@ -19,7 +20,7 @@ int main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    flint_printf("generic_pow....");
+    flint_printf("pow....");
     fflush(stdout);
 
     for (n = 0; n < 1000 * flint_test_multiplier(); n++)

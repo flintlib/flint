@@ -12,6 +12,7 @@
 #include "fmpz_mpoly.h"
 #include "gr.h"
 #include "gr_vec.h"
+#include "gr_generic.h"
 
 int main(void)
 {
