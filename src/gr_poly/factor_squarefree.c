@@ -28,7 +28,7 @@ gr_poly_factor_squarefree(gr_ptr c, gr_vec_t fac, gr_vec_t exp, const gr_poly_t 
         return GR_UNABLE;
 
     /* for vector of polynomials */
-    gr_ctx_init_polynomial(poly_ctx, ctx);
+    gr_ctx_init_gr_poly(poly_ctx, ctx);
     /* for vector of exponents */
     gr_ctx_init_fmpz(fmpz_ctx);
 

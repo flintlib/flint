@@ -1387,7 +1387,7 @@ polynomial_ctx_t;
 #define POLYNOMIAL_CTX(ring_ctx) ((polynomial_ctx_t *)((ring_ctx)))
 #define POLYNOMIAL_ELEM_CTX(ring_ctx) (POLYNOMIAL_CTX(ring_ctx)->base_ring)
 
-void gr_ctx_init_polynomial(gr_ctx_t ctx, gr_ctx_t base_ring);
+void gr_ctx_init_gr_poly(gr_ctx_t ctx, gr_ctx_t base_ring);
 
 /* Generic series */
 
@@ -1433,7 +1433,7 @@ GR_INLINE void gr_ctx_init_matrix_ring(gr_ctx_t ctx, gr_ctx_t base_ring, slong n
 /* Multivariate */
 
 #ifdef MPOLY_H
-void gr_ctx_init_mpoly(gr_ctx_t ctx, gr_ctx_t base_ring, slong nvars, const ordering_t ord);
+void gr_ctx_init_gr_mpoly(gr_ctx_t ctx, gr_ctx_t base_ring, slong nvars, const ordering_t ord);
 #endif
 
 /* Coercions */

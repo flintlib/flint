@@ -4389,7 +4389,7 @@ class PolynomialRing_gr_poly(gr_ctx):
         gr_ctx.__init__(self)
         #if libgr.gr_ctx_is_ring(coefficient_ring._ref) != T_TRUE:
         #    raise ValueError("coefficient structure must be a ring")
-        libgr.gr_ctx_init_polynomial(self._ref, coefficient_ring._ref)
+        libgr.gr_ctx_init_gr_poly(self._ref, coefficient_ring._ref)
         coefficient_ring._refcount += 1
         self._coefficient_ring = coefficient_ring
         self._elem_type = gr_poly

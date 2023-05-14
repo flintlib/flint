@@ -250,13 +250,13 @@ Polynomial rings
     Initializes *ctx* to a ring of rational polynomials of
     type :type:`fmpq_poly_struct`.
 
-.. function:: void gr_ctx_init_polynomial(gr_ctx_t ctx, gr_ctx_t base_ring)
+.. function:: void gr_ctx_init_gr_poly(gr_ctx_t ctx, gr_ctx_t base_ring)
 
     Initializes *ctx* to a ring of densely represented univariate polynomials
     over the given *base_ring*.
     Elements have type :type:`gr_poly_struct`.
 
-.. function:: void gr_ctx_init_mpoly(gr_ctx_t ctx, gr_ctx_t base_ring, slong nvars, const ordering_t ord)
+.. function:: void gr_ctx_init_gr_mpoly(gr_ctx_t ctx, gr_ctx_t base_ring, slong nvars, const ordering_t ord)
 
     Initializes *ctx* to a ring of sparsely represented multivariate
     polynomials in *nvars* variables over the given *base_ring*,

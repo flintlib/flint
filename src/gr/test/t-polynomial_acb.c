@@ -9,7 +9,7 @@ int main(void)
     fflush(stdout);
 
     gr_ctx_init_complex_acb(CC, 64);
-    gr_ctx_init_polynomial(CCx, CC);
+    gr_ctx_init_gr_poly(CCx, CC);
     CCx->size_limit = 50;
     gr_test_ring(CCx, 1000, flags);
     gr_ctx_clear(CCx);

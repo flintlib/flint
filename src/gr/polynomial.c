@@ -413,7 +413,7 @@ gr_method_tab_input _gr_poly_methods_input[] =
 };
 
 void
-gr_ctx_init_polynomial(gr_ctx_t ctx, gr_ctx_t base_ring)
+gr_ctx_init_gr_poly(gr_ctx_t ctx, gr_ctx_t base_ring)
 {
     ctx->which_ring = GR_CTX_GR_POLY;
     ctx->sizeof_elem = sizeof(gr_poly_struct);

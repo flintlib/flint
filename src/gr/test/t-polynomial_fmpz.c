@@ -10,7 +10,7 @@ int main(void)
 
     gr_ctx_init_fmpz(ZZ);
     ZZ->size_limit = 200;
-    gr_ctx_init_polynomial(ZZx, ZZ);
+    gr_ctx_init_gr_poly(ZZx, ZZ);
     ZZx->size_limit = 30;
     gr_test_ring(ZZx, 1000, flags);
     gr_ctx_clear(ZZx);

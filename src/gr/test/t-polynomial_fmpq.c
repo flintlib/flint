@@ -10,7 +10,7 @@ int main(void)
 
     gr_ctx_init_fmpq(QQ);
     QQ->size_limit = 100;
-    gr_ctx_init_polynomial(QQx, QQ);
+    gr_ctx_init_gr_poly(QQx, QQ);
     QQx->size_limit = 30;
     gr_test_ring(QQx, 1000, flags);
     gr_ctx_clear(QQx);

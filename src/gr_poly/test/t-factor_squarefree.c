@@ -46,7 +46,7 @@ int main(void)
             gr_ctx_init_random(ctx, state);
         }
 
-        gr_ctx_init_polynomial(poly_ctx, ctx);
+        gr_ctx_init_gr_poly(poly_ctx, ctx);
         gr_ctx_init_fmpz(fmpz_ctx);
 
         gr_poly_init(A, ctx);

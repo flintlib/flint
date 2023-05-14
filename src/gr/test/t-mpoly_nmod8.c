@@ -17,7 +17,7 @@ int main(void)
     {
         gr_ctx_init_nmod8(ZZn, 1 + n_randtest(state) % 255);
 
-        gr_ctx_init_mpoly(ZZnx, ZZn, n_randint(state, 3), mpoly_ordering_randtest(state));
+        gr_ctx_init_gr_mpoly(ZZnx, ZZn, n_randint(state, 3), mpoly_ordering_randtest(state));
         ZZnx->size_limit = 100;
 
         gr_test_ring(ZZnx, 100, flags);
