@@ -11,8 +11,10 @@
 
 #include "fmpz.h"
 #include "fmpq.h"
+#include "fmpq_vec.h"
 #include "fmpq_poly.h"
 #include "gr.h"
+#include "gr_poly.h"
 
 int
 _gr_fmpq_poly_ctx_write(gr_stream_t out, gr_ctx_t ctx)
@@ -113,11 +115,85 @@ _gr_fmpq_poly_set_fmpz(fmpq_poly_t res, const fmpz_t v, const gr_ctx_t ctx)
 int
 _gr_fmpq_poly_set_other(fmpq_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
 {
-    switch (x_ctx->which_ring)
+    if (x_ctx->which_ring == GR_CTX_FMPZ)
     {
-        case GR_CTX_FMPZ:
-            fmpq_poly_set_fmpz(res, x);
+        fmpq_poly_set_fmpz(res, x);
+        return GR_SUCCESS;
+    }
+
+    if (x_ctx->which_ring == GR_CTX_FMPZ_POLY)
+    {
+        fmpq_poly_set_fmpz_poly(res, x);
+        return GR_SUCCESS;
+    }
+
+    if (x_ctx->which_ring == GR_CTX_FMPQ)
+    {
+        fmpq_poly_set_fmpq(res, x);
+        return GR_SUCCESS;
+    }
+
+    if (x_ctx->which_ring == GR_CTX_FMPQ_POLY)
+    {
+        fmpq_poly_set(res, x);
+        return GR_SUCCESS;
+    }
+
+    if (x_ctx->which_ring == GR_CTX_GR_POLY)
+    {
+        if (POLYNOMIAL_ELEM_CTX(x_ctx)->which_ring == GR_CTX_FMPZ)
+        {
+            fmpq_poly_set_fmpz_poly(res, x);
             return GR_SUCCESS;
+        }
+        else
+        {
+            gr_ctx_t QQ;
+            gr_poly_t poly;
+            int status;
+
+            gr_ctx_init_fmpq(QQ);  /* no need to free */
+            gr_poly_init(poly, QQ);
+
+            status = gr_poly_set_gr_poly_other(poly, x, POLYNOMIAL_ELEM_CTX(x_ctx), QQ);
+
+            if (status == GR_SUCCESS)
+            {
+                fmpq_poly_fit_length(res, poly->length);
+                _fmpq_vec_get_fmpz_vec_fmpz(res->coeffs, res->den, poly->coeffs, poly->length);
+                _fmpq_poly_set_length(res, poly->length);
+            }
+
+            gr_poly_clear(poly, QQ);
+
+            return status;
+        }
+    }
+
+    if (x_ctx->which_ring == GR_CTX_GR_VEC)
+    {
+        gr_ctx_t QQ;
+        gr_poly_t tmp, poly;
+        int status;
+
+        tmp->coeffs = ((gr_vec_struct *) x)->entries;
+        tmp->length = ((gr_vec_struct *) x)->length;
+
+        gr_ctx_init_fmpq(QQ);  /* no need to free */
+        gr_poly_init(poly, QQ);
+
+        status = gr_poly_set_gr_poly_other(poly, tmp, VECTOR_CTX(x_ctx)->base_ring, QQ);
+
+        if (status == GR_SUCCESS)
+        {
+            fmpq_poly_fit_length(res, poly->length);
+            _fmpq_vec_get_fmpz_vec_fmpz(res->coeffs, res->den, poly->coeffs, poly->length);
+            _fmpq_poly_set_length(res, poly->length);
+        }
+
+        gr_poly_clear(poly, QQ);
+
+        return status;
     }
 
     return GR_UNABLE;

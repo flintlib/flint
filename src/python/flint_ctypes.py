@@ -5938,12 +5938,19 @@ class gr_vec(gr_elem):
         return res
 
 
-# todo
 class fmpz_poly(gr_elem):
     _struct_type = fmpz_poly_struct
 
+    @staticmethod
+    def _default_context():
+        return ZZx_fmpz_poly
+
 class fmpq_poly(gr_elem):
     _struct_type = fmpq_poly_struct
+
+    @staticmethod
+    def _default_context():
+        return QQx_fmpq_poly
 
 
 class PolynomialRing_fmpz_poly(gr_ctx):
@@ -5953,13 +5960,17 @@ class PolynomialRing_fmpz_poly(gr_ctx):
         libgr.gr_ctx_init_fmpz_poly(self._ref)
         self._elem_type = fmpz_poly
 
-
 class PolynomialRing_fmpq_poly(gr_ctx):
 
     def __init__(self):
         gr_ctx.__init__(self)
         libgr.gr_ctx_init_fmpq_poly(self._ref)
         self._elem_type = fmpq_poly
+
+ZZx_fmpz_poly = PolynomialRing_fmpz_poly()
+QQx_fmpq_poly = PolynomialRing_fmpq_poly()
+
+
 
 
 # todo: def .one()
@@ -6009,8 +6020,8 @@ MatCC = Mat(CC)
 MatRF = Mat(RF)
 MatCF = Mat(CF)
 
-ZZx = PolynomialRing_gr_poly(ZZ)
-QQx = PolynomialRing_gr_poly(QQ)
+ZZx = ZZx_gr_poly = PolynomialRing_gr_poly(ZZ)
+QQx = QQx_gr_poly = PolynomialRing_gr_poly(QQ)
 RRx = RRx_arb = PolynomialRing_gr_poly(RR_arb)
 CCx = CCx_acb = PolynomialRing_gr_poly(CC_acb)
 RRx_ca = PolynomialRing_gr_poly(RR_ca)
@@ -6023,6 +6034,7 @@ CCser = CCser_acb = PowerSeriesRing(CC_acb)
 RRser_ca = PowerSeriesRing(RR_ca)
 CCser_ca = PowerSeriesRing(CC_ca)
 
+# QQx = QQx_fmpq_poly
 
 ModularGroup = ModularGroup_psl2z
 DirichletGroup = DirichletGroup_dirichlet_char
@@ -6083,6 +6095,16 @@ def test_psl2z():
     assert raises(lambda: PSL2Z(M([[1], [2]])), ValueError)
     assert raises(lambda: PSL2Z(M([[1, 3, 4], [4, 5, 6]])), ValueError)
     assert raises(lambda: PSL2Z(M([[1, 2], [3, 4]])), ValueError)
+
+def test_polynomial():
+    poly_types = [ZZx_fmpz_poly, ZZx_gr_poly, QQx_fmpq_poly, QQx_gr_poly]
+    a = ZZx_gr_poly([1,2,3])
+    for A in poly_types:
+        for B in poly_types:
+            for C in poly_types:
+                #assert A(B([1,2,3])) == C([1,2,3])
+                assert A(B(a)) == C(a)
+
 
 def test_matrix():
     M = Mat(ZZ, 2)
