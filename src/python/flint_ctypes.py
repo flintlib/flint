@@ -1222,17 +1222,21 @@ class gr_ctx:
 
     def gen(ctx):
         """
-        Generator of this domain.
+        Gives a generator of this ring.
 
-            >>> QQbar.i()
-            Root a = 1.00000*I of a^2+1
-            >>> QQ.i()
-            Traceback (most recent call last):
-              ...
-            FlintDomainError: i is not an element of {Rational field (fmpq)}
+            >>> ZZi.gen()
+            I
+            >>> ZZx.gen()
+            x
+            >>> FiniteField_fq(3, 5).gen() ** 9
+            2*a^4+a+2
+            >>> (1 + PowerSeriesModRing(QQ, 5).gen())**10
+            1 + 10*x + 45*x^2 + 120*x^3 + 210*x^4 (mod x^5)
+            >>> (1 + PowerSeriesRing(QQ, 5).gen())**10
+            1 + 10*x + 45*x^2 + 120*x^3 + 210*x^4 + O(x^5)
+
         """
         return ctx._constant(ctx, libgr.gr_gen, "gen")
-
 
     def i(ctx):
         """
@@ -4631,9 +4635,6 @@ class FiniteField_fq_zech(FiniteField_base):
 
 class fq_elem(gr_elem):
 
-    def gen(self):
-        return self._constant(self, libgr.gr_fq_gen, "gen")
-
     #def frobenius(self):
     #    return self._binary_op_si(self, libgr.gr_fq_frobenius, "frobenius")
 
@@ -4793,7 +4794,6 @@ class gr_poly(gr_elem):
             if status & GR_UNABLE: raise NotImplementedError
             if status & GR_DOMAIN: raise ValueError
         return res
-
 
     def roots(self, domain=None):
         """
@@ -5938,12 +5938,18 @@ class gr_vec(gr_elem):
         return res
 
 
-class fmpz_poly(gr_elem):
+class fmpz_poly(gr_poly):
     _struct_type = fmpz_poly_struct
 
     @staticmethod
     def _default_context():
         return ZZx_fmpz_poly
+
+    def __init__(self, val=None, context=None):
+        if isinstance(val, (list, tuple)):
+            gr_elem.__init__(self, ZZx_gr_poly(val), context)
+        else:
+            gr_elem.__init__(self, val, context)
 
 class fmpq_poly(gr_elem):
     _struct_type = fmpq_poly_struct
@@ -5952,6 +5958,12 @@ class fmpq_poly(gr_elem):
     def _default_context():
         return QQx_fmpq_poly
 
+    def __init__(self, val=None, context=None):
+        if isinstance(val, (list, tuple)):
+            gr_elem.__init__(self, QQx_gr_poly(val), context)
+        else:
+            gr_elem.__init__(self, val, context)
+
 
 class PolynomialRing_fmpz_poly(gr_ctx):
 
@@ -5959,6 +5971,11 @@ class PolynomialRing_fmpz_poly(gr_ctx):
         gr_ctx.__init__(self)
         libgr.gr_ctx_init_fmpz_poly(self._ref)
         self._elem_type = fmpz_poly
+
+    @property
+    def _coefficient_ring(self):
+        return ZZ
+
 
 class PolynomialRing_fmpq_poly(gr_ctx):
 
@@ -6098,12 +6115,10 @@ def test_psl2z():
 
 def test_polynomial():
     poly_types = [ZZx_fmpz_poly, ZZx_gr_poly, QQx_fmpq_poly, QQx_gr_poly]
-    a = ZZx_gr_poly([1,2,3])
     for A in poly_types:
-        for B in poly_types:
+        for B in poly_types + [VecZZ, VecQQ]:
             for C in poly_types:
-                #assert A(B([1,2,3])) == C([1,2,3])
-                assert A(B(a)) == C(a)
+                assert A(B([1,2,3])) == C([1,2,3])
 
 
 def test_matrix():

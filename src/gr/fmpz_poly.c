@@ -175,7 +175,7 @@ _gr_fmpz_poly_set_other(fmpz_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_c
         tmp->length = ((gr_vec_struct *) x)->length;
 
         gr_ctx_init_fmpz(ZZ);  /* no need to free */
-        return gr_poly_set_gr_poly_other(res, tmp, VECTOR_CTX(x_ctx)->base_ring, ZZ);
+        return gr_poly_set_gr_poly_other((fmpz_poly_struct *) res, tmp, VECTOR_CTX(x_ctx)->base_ring, ZZ);
     }
 
     return GR_UNABLE;
