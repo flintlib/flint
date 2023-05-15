@@ -612,10 +612,8 @@ Vectors
 
 .. function:: void _fexpr_vec_sort_fast(fexpr_ptr vec, slong len)
 
-    Sorts the *len* entries in *vec* using 
-    the comparison function :func:`fexpr_cmp_fast`. If you want the inlined
-    version, make sure that ``stdlib.h`` is included before you include any
-    FLINT headers.
+    Sorts the *len* entries in *vec* using
+    the comparison function :func:`fexpr_cmp_fast`.
 
 .. raw:: latex
 
