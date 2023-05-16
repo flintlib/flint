@@ -12,6 +12,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpz_mod.h"
+#include "fmpz_mod_vec.h"
 #include "fmpz_mod_poly.h"
 
 void fmpz_mod_poly_mulhigh(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
@@ -62,8 +63,7 @@ void fmpz_mod_poly_mulhigh(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
                                          poly1->coeffs, len1, start);
     }
 
-    _fmpz_vec_scalar_mod_fmpz(res->coeffs, res->coeffs, len_out,
-                                                    fmpz_mod_ctx_modulus(ctx));
+    _fmpz_mod_vec_set_fmpz_vec(res->coeffs, res->coeffs, len_out, ctx);
     _fmpz_mod_poly_set_length(res, len_out);
     _fmpz_mod_poly_normalise(res);
 }

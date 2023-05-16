@@ -15,10 +15,10 @@
 
 void _fmpz_mod_poly_rem(fmpz *R,
                         const fmpz *A, slong lenA, const fmpz *B, slong lenB,
-                        const fmpz_t invB, const fmpz_t p)
+                        const fmpz_t invB, const fmpz_mod_ctx_t ctx)
 {
     fmpz * Q = _fmpz_vec_init(lenA - lenB + 1);
-    _fmpz_mod_poly_divrem(Q, R, A, lenA, B, lenB, invB, p);
+    _fmpz_mod_poly_divrem(Q, R, A, lenA, B, lenB, invB, ctx);
     _fmpz_vec_clear(Q, lenA - lenB + 1);
 }
 

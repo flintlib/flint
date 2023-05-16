@@ -39,7 +39,6 @@ static slong _reduce_inplace(
     slong Blen = B->length;
     fmpz * Bcoeffs = B->coeffs;
     fmpz * Qcoeffs, * Rcoeffs;
-    const fmpz * p = fmpz_mod_ctx_modulus(ctx);
 
     if (Alen < Blen)
         return Alen;
@@ -57,12 +56,8 @@ static slong _reduce_inplace(
         slong Qlen = (Alen-1) - n - (Blen-1) + 1;
         FLINT_ASSERT(Qlen < Blen);
 
-        _fmpz_mod_poly_div_newton_n_preinv(Qcoeffs + n, Acoeffs + n, Alen - n,
-                                 Bcoeffs, Blen, Binv->coeffs, Binv->length, p);
-
-        _fmpz_mod_poly_mullow(Rcoeffs, Bcoeffs, Blen - 1, Qcoeffs + n, Qlen,
-                                                                  p, Blen - 1);
-
+        _fmpz_mod_poly_div_newton_n_preinv(Qcoeffs + n, Acoeffs + n, Alen - n, Bcoeffs, Blen, Binv->coeffs, Binv->length, ctx);
+        _fmpz_mod_poly_mullow(Rcoeffs, Bcoeffs, Blen - 1, Qcoeffs + n, Qlen, Blen - 1, ctx);
         _fmpz_mod_vec_sub(Acoeffs + n, Acoeffs + n, Rcoeffs, Blen - 1, ctx);
 
         Alen = n + Blen - 1;
@@ -302,8 +297,7 @@ again:
             clen = I->T->length + I->invBprod[i].length - 1;
             fmpz_poly_fit_length(c + i, clen);
             _fmpz_mod_poly_mul(c[i].coeffs, I->T->coeffs, I->T->length,
-                               I->invBprod[i].coeffs, I->invBprod[i].length,
-                                            fmpz_mod_ctx_modulus(I->ctxs + i));
+                               I->invBprod[i].coeffs, I->invBprod[i].length, I->ctxs + i);
             while (clen > 0 && fmpz_is_zero(c[i].coeffs + clen - 1))
                 clen--;
         }
@@ -355,9 +349,11 @@ more_prec:
     fmpz_fdiv_q_2exp(I->halfpks + i, fmpz_mod_ctx_modulus(I->ctxs + i), 1);
 
     fmpz_mod_poly_set_fmpz_poly(I->T, I->bprod + i, I->ctxs + i);
+
     /* lift_only_inverses wants monic bases */
     fmpz_mod_poly_scalar_div_fmpz(I->T, I->T,
                                     fmpz_poly_lead(I->bprod + i), I->ctxs + i);
+
     fmpz_mod_poly_scalar_mul_fmpz(I->invBprod + i, I->invBprod + i,
                                     fmpz_poly_lead(I->bprod + i), I->ctxs + i);
 
@@ -383,6 +379,15 @@ more_prec:
     /* correct monic bases */
     fmpz_mod_poly_scalar_mul_fmpz(I->T, I->T,
                                     fmpz_poly_lead(I->bprod + i), I->ctxs + i);
+
+    /* Need not be reduced after Hensel lifting, but we have to
+       reduce it before subsequently calling fmpz_mod_poly functions */
+    if (!fmpz_mod_poly_is_canonical(I->invBprod + i, I->ctxs + i))
+    {
+        _fmpz_mod_vec_set_fmpz_vec((I->invBprod + i)->coeffs,
+            (I->invBprod + i)->coeffs, (I->invBprod + i)->length, I->ctxs + i);
+        _fmpz_mod_poly_normalise(I->invBprod + i);
+    }
 
     fmpz_mod_poly_scalar_div_fmpz(I->invBprod + i, I->invBprod + i,
                                     fmpz_poly_lead(I->bprod + i), I->ctxs + i);

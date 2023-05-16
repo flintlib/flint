@@ -17,7 +17,7 @@
 
 void
 _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, const fmpz * poly,
-    slong plen, fmpz_poly_struct * const * tree, slong len, const fmpz_t mod)
+    slong plen, fmpz_poly_struct * const * tree, slong len, const fmpz_mod_ctx_t ctx)
 {
     slong height, i, j, pow, left;
     slong tree_height;
@@ -33,8 +33,8 @@ _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, const fmpz * poly,
     {
         if (len == 1)
         {
-            fmpz_negmod(temp, tree[0]->coeffs, mod);
-            _fmpz_mod_poly_evaluate_fmpz(vs, poly, plen, temp, mod);
+            fmpz_mod_neg(temp, tree[0]->coeffs, ctx);
+            _fmpz_mod_poly_evaluate_fmpz(vs, poly, plen, temp, ctx);
         } else if (len != 0 && plen == 0)
             _fmpz_vec_zero(vs, len);
         else if (len != 0 && plen == 1)
@@ -61,8 +61,8 @@ _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, const fmpz * poly,
     for (i = j = 0; i < len; i += pow, j++)
     {
         pa = tree[height] + j;
-        fmpz_invmod(inv, pa->coeffs + pa->length - 1, mod);
-        _fmpz_mod_poly_rem(t + i, poly, plen, pa->coeffs, pa->length, inv, mod);
+        fmpz_mod_inv(inv, pa->coeffs + pa->length - 1, ctx);
+        _fmpz_mod_poly_rem(t + i, poly, plen, pa->coeffs, pa->length, inv, ctx);
     }
 
     for (i = height - 1; i >= 0; i--)
@@ -76,12 +76,12 @@ _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, const fmpz * poly,
         left = len;
         while (left >= 2 * pow)
         {
-            fmpz_invmod(inv, pa->coeffs + pa->length - 1, mod);
-            _fmpz_mod_poly_rem(pc, pb, 2 * pow, pa->coeffs, pa->length, inv, mod);
+            fmpz_mod_inv(inv, pa->coeffs + pa->length - 1, ctx);
+            _fmpz_mod_poly_rem(pc, pb, 2 * pow, pa->coeffs, pa->length, inv, ctx);
 
             pa++;
-            fmpz_invmod(inv, pa->coeffs + pa->length - 1, mod);
-            _fmpz_mod_poly_rem(pc + pow, pb, 2 * pow, pa->coeffs, pa->length, inv, mod);
+            fmpz_mod_inv(inv, pa->coeffs + pa->length - 1, ctx);
+            _fmpz_mod_poly_rem(pc + pow, pb, 2 * pow, pa->coeffs, pa->length, inv, ctx);
 
             pa++;
             pb += 2 * pow;
@@ -91,12 +91,12 @@ _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, const fmpz * poly,
 
         if (left > pow)
         {
-            fmpz_invmod(inv, pa->coeffs + pa->length - 1, mod);
-            _fmpz_mod_poly_rem(pc, pb, left, pa->coeffs, pa->length, inv, mod);
+            fmpz_mod_inv(inv, pa->coeffs + pa->length - 1, ctx);
+            _fmpz_mod_poly_rem(pc, pb, left, pa->coeffs, pa->length, inv, ctx);
 
             pa ++;
-            fmpz_invmod(inv, pa->coeffs + pa->length - 1, mod);
-            _fmpz_mod_poly_rem(pc + pow, pb, left, pa->coeffs, pa->length, inv, mod);
+            fmpz_mod_inv(inv, pa->coeffs + pa->length - 1, ctx);
+            _fmpz_mod_poly_rem(pc + pow, pb, left, pa->coeffs, pa->length, inv, ctx);
         }
         else if (left > 0)
            _fmpz_vec_set(pc, pb, left);
@@ -116,13 +116,13 @@ _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, const fmpz * poly,
 }
 
 void _fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys, const fmpz * poly, slong plen,
-    const fmpz * xs, slong n, const fmpz_t mod)
+    const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx)
 {
     fmpz_poly_struct ** tree;
 
     tree = _fmpz_mod_poly_tree_alloc(n);
-    _fmpz_mod_poly_tree_build(tree, xs, n, mod);
-    _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(ys, poly, plen, tree, n, mod);
+    _fmpz_mod_poly_tree_build(tree, xs, n, ctx);
+    _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(ys, poly, plen, tree, n, ctx);
     _fmpz_mod_poly_tree_free(tree, n);
 }
 
@@ -130,5 +130,5 @@ void fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys, const fmpz_mod_poly_t poly,
                             const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx)
 {
     _fmpz_mod_poly_evaluate_fmpz_vec_fast(ys, poly->coeffs,
-                               poly->length, xs, n, fmpz_mod_ctx_modulus(ctx));
+                               poly->length, xs, n, ctx);
 }

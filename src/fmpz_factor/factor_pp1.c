@@ -16,6 +16,7 @@
 #include "fmpz_factor.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 
 #define DEBUG 0 /* turn on some trace information */
@@ -517,12 +518,16 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
       flint_printf("normalised roots\n");
 #endif
 
+        fmpz_mod_ctx_t ctx;
+        fmpz_mod_ctx_init(ctx, n_in);
+
       tree = _fmpz_mod_poly_tree_alloc(num_roots);
-      _fmpz_mod_poly_tree_build(tree, roots, num_roots, n_in);
+      _fmpz_mod_poly_tree_build(tree, roots, num_roots, ctx);
 
       tree2 = _fmpz_mod_poly_tree_alloc(num_roots);
-      _fmpz_mod_poly_tree_build(tree2, roots2, num_roots, n_in);
+      _fmpz_mod_poly_tree_build(tree2, roots2, num_roots, ctx);
 
+      /* todo: use fmpz_mod_poly_mul */
       fmpz_poly_mul(tree2[FLINT_CLOG2(num_roots)], tree2[FLINT_CLOG2(num_roots)-1], tree2[FLINT_CLOG2(num_roots)-1]+1);
       fmpz_poly_scalar_mod_fmpz(tree2[FLINT_CLOG2(num_roots)], tree2[FLINT_CLOG2(num_roots)], n_in);
 
@@ -530,9 +535,11 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
       flint_printf("built trees\n");
 #endif
 
-      _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(evals, tree2[FLINT_CLOG2(num_roots)]->coeffs, tree2[FLINT_CLOG2(num_roots)]->length, tree, num_roots, n_in);
+      _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(evals, tree2[FLINT_CLOG2(num_roots)]->coeffs, tree2[FLINT_CLOG2(num_roots)]->length, tree, num_roots, ctx);
       _fmpz_mod_poly_tree_free(tree, num_roots);
       _fmpz_mod_poly_tree_free(tree2, num_roots);
+
+        fmpz_mod_ctx_clear(ctx);
 
 #if DEBUG
       flint_printf("evaluated at roots\n");

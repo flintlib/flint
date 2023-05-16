@@ -18,6 +18,5 @@ void fmpz_mod_poly_get_fmpz_poly(fmpz_poly_t f, const fmpz_mod_poly_t g,
 {
     fmpz_poly_fit_length(f, g->length);
     _fmpz_poly_set_length(f, g->length);
-
     _fmpz_vec_set(f->coeffs, g->coeffs, g->length);
 }

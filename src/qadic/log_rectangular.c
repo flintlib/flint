@@ -14,6 +14,40 @@
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
+static void __fmpz_mod_poly_neg(fmpz *res, const fmpz *poly, slong len, const fmpz_t p)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+    {
+        if (!fmpz_is_zero(poly + i))
+            fmpz_sub(res + i, p, poly + i);
+        else
+            fmpz_zero(res + i);
+    }
+}
+
+static void __fmpz_mod_poly_add(fmpz *res, const fmpz *poly1, slong len1,
+                                   const fmpz *poly2, slong len2, const fmpz_t p)
+{
+    slong i, len = FLINT_MAX(len1, len2);
+
+    _fmpz_poly_add(res, poly1, len1, poly2, len2);
+
+    for (i = 0; i < len; i++)
+    {
+        if (fmpz_cmpabs(res + i, p) >= 0)
+		    fmpz_sub(res + i, res + i, p);
+    }
+}
+
+static void __fmpz_mod_poly_mul(fmpz *res, const fmpz *poly1, slong len1,
+                                   const fmpz *poly2, slong len2, const fmpz_t p)
+{
+    _fmpz_poly_mul(res, poly1, len1, poly2, len2);
+    _fmpz_vec_scalar_mod_fmpz(res, res, len1 + len2 - 1, p);
+}
+
 /*
     Carries out the finite series evaluation for the logarithm
     \begin{equation*}
@@ -63,7 +97,7 @@ _qadic_log_rectangular_series(fmpz *z, const fmpz *y, slong len, slong n,
                     fmpz_fdiv_q_2exp(t + i, t + i, 1);
                 }
             _fmpz_mod_poly_reduce(t, 2 * len - 1, a, j, lena, pN);
-            _fmpz_mod_poly_add(z, y, len, t, FLINT_MIN(d, 2 * len - 1), pN);
+            __fmpz_mod_poly_add(z, y, len, t, FLINT_MIN(d, 2 * len - 1), pN);
 
             _fmpz_vec_clear(t, 2 * len - 1);
         }
@@ -89,7 +123,7 @@ _qadic_log_rectangular_series(fmpz *z, const fmpz *y, slong len, slong n,
         _fmpz_vec_set(ypow + d, y, len);
         for (i = 2; i <= b; i++)
         {
-            _fmpz_mod_poly_mul(ypow + i * d, ypow + (i - 1) * d, d, y, len, pNk);
+            __fmpz_mod_poly_mul(ypow + i * d, ypow + (i - 1) * d, d, y, len, pNk);
             _fmpz_mod_poly_reduce(ypow + i * d, d + len - 1, a, j, lena, pNk);
         }
 
@@ -126,7 +160,7 @@ _qadic_log_rectangular_series(fmpz *z, const fmpz *y, slong len, slong n,
             _fmpz_vec_scalar_mul_fmpz(c, c, d, f);
 
             /* Set z = z y^b + c */
-            _fmpz_mod_poly_mul(t, z, d, ypow + b * d, d, pNk);
+            __fmpz_mod_poly_mul(t, z, d, ypow + b * d, d, pNk);
             _fmpz_mod_poly_reduce(t, 2 * d - 1, a, j, lena, pNk);
             _fmpz_vec_add(z, c, t, d);
             _fmpz_vec_scalar_mod_fmpz(z, z, d, pNk);
@@ -152,7 +186,7 @@ void _qadic_log_rectangular(fmpz *z, const fmpz *y, slong v, slong len,
     const slong n = _padic_log_bound(v, N, p) - 1;
 
     _qadic_log_rectangular_series(z, y, len, n, a, j, lena, p, N, pN);
-    _fmpz_mod_poly_neg(z, z, d, pN);
+    __fmpz_mod_poly_neg(z, z, d, pN);
 }
 
 int qadic_log_rectangular(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)

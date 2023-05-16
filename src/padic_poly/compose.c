@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 #include "padic_poly.h"
 
@@ -78,7 +79,12 @@ void _padic_poly_compose(fmpz *rop, slong *rval, slong N,
 
             _fmpz_vec_scalar_mod_fmpz(vec1, op1, len1, pow);
             _fmpz_vec_scalar_mod_fmpz(vec2, vec2, len2, pow);
-            _fmpz_mod_poly_compose(rop, op1, len1, vec2, len2, pow);
+
+            fmpz_mod_ctx_t nctx;
+            fmpz_mod_ctx_init(nctx, pow);
+            _fmpz_mod_poly_compose(rop, vec1, len1, vec2, len2, nctx);
+            fmpz_mod_ctx_clear(nctx);
+
             *rval= val1;
 
             _padic_poly_canonicalise(rop, rval, lenr, ctx->p);
@@ -125,7 +131,12 @@ void _padic_poly_compose(fmpz *rop, slong *rval, slong N,
 
             _fmpz_vec_scalar_mod_fmpz(vec1, vec1, len1, pow);
             _fmpz_vec_scalar_mod_fmpz(vec2, op2, len2, pow);
-            _fmpz_mod_poly_compose(rop, vec1, len1, vec2, len2, pow);
+
+            fmpz_mod_ctx_t nctx;
+            fmpz_mod_ctx_init(nctx, pow);
+            _fmpz_mod_poly_compose(rop, vec1, len1, vec2, len2, nctx);
+            fmpz_mod_ctx_clear(nctx);
+
             *rval = val1 + n*val2;
 
             _padic_poly_canonicalise(rop, rval, lenr, ctx->p);

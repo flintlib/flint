@@ -17,12 +17,11 @@
 #include "gr_poly.h"
 
 void _fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz *A, slong lenA,
-                               const fmpz *B, slong lenB, const fmpz_t mod)
+                               const fmpz *B, slong lenB, const fmpz_mod_ctx_t ctx)
 {
-    gr_ctx_t ctx;
-    gr_ctx_init_fmpz_mod(ctx, mod);  /* todo: by ref */
-    GR_MUST_SUCCEED(_gr_poly_resultant_hgcd(res, A, lenA, B, lenB, FMPZ_MOD_POLY_HGCD_CUTOFF, FMPZ_MOD_POLY_GCD_CUTOFF, ctx));
-    gr_ctx_clear(ctx);
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_resultant_hgcd(res, A, lenA, B, lenB, FMPZ_MOD_POLY_HGCD_CUTOFF, FMPZ_MOD_POLY_GCD_CUTOFF, gr_ctx));
 }
 
 void fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz_mod_poly_t A,
@@ -44,7 +43,6 @@ void fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz_mod_poly_t A,
         slong lenA = A->length, lenB = B->length;
 
         /* lenA >= lenB >= 1 */
-        _fmpz_mod_poly_resultant_hgcd(res, A->coeffs, lenA,
-                                   B->coeffs, lenB, fmpz_mod_ctx_modulus(ctx));
+        _fmpz_mod_poly_resultant_hgcd(res, A->coeffs, lenA, B->coeffs, lenB, ctx);
     }
 }

@@ -14,7 +14,7 @@
 #include "fmpz_mod_poly.h"
 
 void _fmpz_mod_poly_derivative(fmpz *res, const fmpz *poly, slong len,
-                               const fmpz_t p)
+                               const fmpz_mod_ctx_t ctx)
 {
     slong j, k = 1;
 
@@ -25,12 +25,9 @@ void _fmpz_mod_poly_derivative(fmpz *res, const fmpz *poly, slong len,
         else if (k == 1)
             fmpz_set(res + (j - 1), poly + j);
         else
-        {
-            fmpz_mul_ui(res + (j - 1), poly + j, k);
-            fmpz_mod(res + (j - 1), res + (j - 1), p);
-        }
+            fmpz_mod_mul_ui(res + (j - 1), poly + j, k, ctx);
 
-        if (fmpz_equal_ui(p, ++k))
+        if (fmpz_equal_ui(fmpz_mod_ctx_modulus(ctx), ++k))
             k = 0;
 	}
 }
@@ -47,8 +44,7 @@ void fmpz_mod_poly_derivative(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
     else
     {
         fmpz_mod_poly_fit_length(res, len - 1, ctx);
-        _fmpz_mod_poly_derivative(res->coeffs, poly->coeffs, len,
-                                                    fmpz_mod_ctx_modulus(ctx));
+        _fmpz_mod_poly_derivative(res->coeffs, poly->coeffs, len, ctx);
         _fmpz_mod_poly_set_length(res, len - 1);
         _fmpz_mod_poly_normalise(res);
     }

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 #include "padic_poly.h"
 
@@ -23,7 +24,19 @@ void _padic_poly_pow(fmpz *rop, slong *rval, slong N,
 
     alloc = _padic_ctx_pow_ui(pow, N - *rval, ctx);
 
-    _fmpz_mod_poly_pow(rop, op, len, e, pow);
+    {
+        fmpz * t;
+        fmpz_mod_ctx_t mod;
+
+        fmpz_mod_ctx_init(mod, pow);
+        t = _fmpz_vec_init(len);
+
+        _fmpz_vec_scalar_mod_fmpz(t, op, len, pow);
+        _fmpz_mod_poly_pow(rop, op, len, e, mod);
+
+        fmpz_mod_ctx_clear(mod);
+        _fmpz_vec_clear(t, len);
+    }
 
     if (alloc)
         fmpz_clear(pow);

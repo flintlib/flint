@@ -29,8 +29,7 @@ _fq_inv(fmpz * rop, const fmpz * op, slong len, const fq_ctx_t ctx)
     }
     else
     {
-        _fmpz_mod_poly_invmod(rop, op, len, ctx->modulus->coeffs, d + 1,
-                              fq_ctx_prime(ctx));
+        _fmpz_mod_poly_invmod(rop, op, len, ctx->modulus->coeffs, d + 1, ctx->ctxp);
     }
 }
 

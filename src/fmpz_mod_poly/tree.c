@@ -54,7 +54,7 @@ void _fmpz_mod_poly_tree_free(fmpz_poly_struct ** tree, slong len)
 }
 
 void
-_fmpz_mod_poly_tree_build(fmpz_poly_struct ** tree, const fmpz * roots, slong len, const fmpz_t mod)
+_fmpz_mod_poly_tree_build(fmpz_poly_struct ** tree, const fmpz * roots, slong len, const fmpz_mod_ctx_t ctx)
 {
     slong height, pow, left, i;
     fmpz_poly_struct * pa, * pb;
@@ -68,7 +68,7 @@ _fmpz_mod_poly_tree_build(fmpz_poly_struct ** tree, const fmpz * roots, slong le
     for (i = 0; i < len; i++)
     {
         fmpz_poly_set_coeff_ui(tree[0] + i, 1, 1);
-        fmpz_negmod((tree[0] + i)->coeffs, roots + i, mod);
+        fmpz_negmod((tree[0] + i)->coeffs, roots + i, fmpz_mod_ctx_modulus(ctx));
     }
 
     for (i = 0; i < height - 1; i++)
@@ -81,7 +81,7 @@ _fmpz_mod_poly_tree_build(fmpz_poly_struct ** tree, const fmpz * roots, slong le
         while (left >= 2 * pow)
         {
             fmpz_poly_fit_length(pb, pa->length + (pa + 1)->length - 1);
-            _fmpz_mod_poly_mul(pb->coeffs, pa->coeffs, pa->length, (pa + 1)->coeffs, (pa + 1)->length, mod);
+            _fmpz_mod_poly_mul(pb->coeffs, pa->coeffs, pa->length, (pa + 1)->coeffs, (pa + 1)->length, ctx);
             _fmpz_poly_set_length(pb, pa->length + (pa + 1)->length - 1);
             left -= 2 * pow;
             pa += 2;
@@ -91,7 +91,7 @@ _fmpz_mod_poly_tree_build(fmpz_poly_struct ** tree, const fmpz * roots, slong le
         if (left > pow)
         {
             fmpz_poly_fit_length(pb, pa->length + (pa + 1)->length - 1);
-            _fmpz_mod_poly_mul(pb->coeffs, pa->coeffs, pa->length, (pa + 1)->coeffs, (pa + 1)->length, mod);
+            _fmpz_mod_poly_mul(pb->coeffs, pa->coeffs, pa->length, (pa + 1)->coeffs, (pa + 1)->length, ctx);
             _fmpz_poly_set_length(pb, pa->length + (pa + 1)->length - 1);
         } else if (left > 0)
             fmpz_poly_set(pb, pa);

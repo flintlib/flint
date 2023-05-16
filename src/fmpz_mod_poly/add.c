@@ -11,22 +11,23 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpz_mod.h"
+#include "fmpz_mod_vec.h"
 #include "fmpz_mod_poly.h"
 
 void _fmpz_mod_poly_add(fmpz *res, const fmpz *poly1, slong len1,
-                                   const fmpz *poly2, slong len2, const fmpz_t p)
+                                   const fmpz *poly2, slong len2, const fmpz_mod_ctx_t ctx)
 {
-    slong i, len = FLINT_MAX(len1, len2);
+    slong len3 = FLINT_MIN(len1, len2);
 
-    _fmpz_poly_add(res, poly1, len1, poly2, len2);
+    _fmpz_mod_vec_add(res, poly1, poly2, len3, ctx);
 
-    for (i = 0; i < len; i++)
-    {
-        if (fmpz_cmpabs(res + i, p) >= 0)
-		    fmpz_sub(res + i, res + i, p);
-    }
+    if (len1 > len3)
+        _fmpz_vec_set(res + len3, poly1 + len3, len1 - len3);
+    if (len2 > len3)
+        _fmpz_vec_set(res + len3, poly2 + len3, len2 - len3);
 }
 
 void fmpz_mod_poly_add(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
@@ -37,7 +38,7 @@ void fmpz_mod_poly_add(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
     fmpz_mod_poly_fit_length(res, max, ctx);
 
     _fmpz_mod_poly_add(res->coeffs, poly1->coeffs, poly1->length,
-                      poly2->coeffs, poly2->length, fmpz_mod_ctx_modulus(ctx));
+                      poly2->coeffs, poly2->length, ctx);
 
     _fmpz_mod_poly_set_length(res, max);
     _fmpz_mod_poly_normalise(res);

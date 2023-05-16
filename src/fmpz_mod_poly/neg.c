@@ -11,19 +11,12 @@
 
 #include "fmpz.h"
 #include "fmpz_mod.h"
+#include "fmpz_mod_vec.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_neg(fmpz *res, const fmpz *poly, slong len, const fmpz_t p)
+void _fmpz_mod_poly_neg(fmpz *res, const fmpz *poly, slong len, const fmpz_mod_ctx_t ctx)
 {
-    slong i;
-
-    for (i = 0; i < len; i++)
-    {
-        if (!fmpz_is_zero(poly + i))
-            fmpz_sub(res + i, p, poly + i);
-        else
-            fmpz_zero(res + i);
-    }
+    _fmpz_mod_vec_neg(res, poly, len, ctx);
 }
 
 void fmpz_mod_poly_neg(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
@@ -34,7 +27,6 @@ void fmpz_mod_poly_neg(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
     fmpz_mod_poly_fit_length(res, len, ctx);
     _fmpz_mod_poly_set_length(res, len);
 
-    _fmpz_mod_poly_neg(res->coeffs, poly->coeffs, poly->length,
-                                                    fmpz_mod_ctx_modulus(ctx));
+    _fmpz_mod_poly_neg(res->coeffs, poly->coeffs, poly->length, ctx);
 }
 

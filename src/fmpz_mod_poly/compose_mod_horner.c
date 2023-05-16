@@ -17,7 +17,7 @@
 
 void
 _fmpz_mod_poly_compose_mod_horner(fmpz * res, const fmpz * f, slong lenf, const fmpz * g,
-                                              const fmpz * h, slong lenh, const fmpz_t p)
+                                              const fmpz * h, slong lenh, const fmpz_mod_ctx_t ctx)
 {
     slong i, len;
     fmpz * t;
@@ -33,7 +33,7 @@ _fmpz_mod_poly_compose_mod_horner(fmpz * res, const fmpz * f, slong lenf, const 
 
     if (lenh == 2)
     {
-        _fmpz_mod_poly_evaluate_fmpz(res, f, lenf, g, p);
+        _fmpz_mod_poly_evaluate_fmpz(res, f, lenf, g, ctx);
         return;
     }
 
@@ -41,19 +41,16 @@ _fmpz_mod_poly_compose_mod_horner(fmpz * res, const fmpz * f, slong lenf, const 
     i = lenf - 1;
     t = _fmpz_vec_init(2 * lenh - 3);
 
-    _fmpz_mod_poly_scalar_mul_fmpz(res, g, len, f + i, p);
+    _fmpz_mod_poly_scalar_mul_fmpz(res, g, len, f + i, ctx);
     i--;
     if (i >= 0)
-    {
-        fmpz_add(res, res, f + i);
-        fmpz_mod(res, res, p);
-    }
+        fmpz_mod_add(res, res, f + i, ctx);
 
     while (i > 0)
     {
         i--;
-        _fmpz_mod_poly_mulmod(t, res, len, g, len, h, lenh, p);
-        _fmpz_mod_poly_add(res, t, len, f + i, 1, p);
+        _fmpz_mod_poly_mulmod(t, res, len, g, len, h, lenh, ctx);
+        _fmpz_mod_poly_add(res, t, len, f + i, 1, ctx);
     }
 
     _fmpz_vec_clear(t, 2 * lenh - 3);
@@ -112,13 +109,13 @@ void fmpz_mod_poly_compose_mod_horner(fmpz_mod_poly_t res,
         fmpz_init(inv3);
         fmpz_invmod(inv3, poly3->coeffs + len, fmpz_mod_ctx_modulus(ctx));
         _fmpz_mod_poly_rem(ptr2, poly2->coeffs, len2,
-                         poly3->coeffs, len3, inv3, fmpz_mod_ctx_modulus(ctx));
+                         poly3->coeffs, len3, inv3, ctx);
         fmpz_clear(inv3);
     }
 
     fmpz_mod_poly_fit_length(res, len, ctx);
     _fmpz_mod_poly_compose_mod_horner(res->coeffs, poly1->coeffs, len1,
-                         ptr2, poly3->coeffs, len3, fmpz_mod_ctx_modulus(ctx));
+                         ptr2, poly3->coeffs, len3, ctx);
     _fmpz_mod_poly_set_length(res, len);
     _fmpz_mod_poly_normalise(res);
 

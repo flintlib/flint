@@ -52,9 +52,9 @@ static void _fmpz_mod_poly_powmod_linear_fmpz_preinv(
 
     for (i = fmpz_sizeinbase(e, 2) - 2; i >= 0; i--)
     {
-        _fmpz_mod_poly_sqr(T, res, lenf - 1, fmpz_mod_ctx_modulus(ctx));
+        _fmpz_mod_poly_sqr(T, res, lenf - 1, ctx);
         _fmpz_mod_poly_divrem_newton_n_preinv(Q, res, T, 2 * lenf - 3, f, lenf,
-                                     finv, lenfinv, fmpz_mod_ctx_modulus(ctx));
+                                     finv, lenfinv, ctx);
         if (fmpz_tstbit(e, i))
         {
             j = lenf - 1;
@@ -65,11 +65,11 @@ static void _fmpz_mod_poly_powmod_linear_fmpz_preinv(
                 fmpz_mul(t, a, res + j);
                 fmpz_addmul(t, lcinv, f + j);
                 fmpz_add(t, t, res + j - 1);
-                fmpz_mod(res + j, t, fmpz_mod_ctx_modulus(ctx));
+                fmpz_mod_set_fmpz(res + j, t, ctx);
             }
             fmpz_mul(t, a, res + j);
             fmpz_addmul(t, lcinv, f + j);
-            fmpz_mod(res + j, t, fmpz_mod_ctx_modulus(ctx));
+            fmpz_mod_set_fmpz(res + j, t, ctx);
         }
     }
 

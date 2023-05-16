@@ -10,8 +10,35 @@
 */
 
 #include "fmpz_poly.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
+
+static int __fmpz_mod_poly_invmod(fmpz *A,
+                          const fmpz *B, slong lenB,
+                          const fmpz *P, slong lenP, const fmpz_t p)
+{
+    fmpz * t, * u;
+    fmpz_mod_ctx_t mod;
+    int res;
+
+    t = _fmpz_vec_init(lenB);
+    u = _fmpz_vec_init(lenP);
+
+    fmpz_mod_ctx_init(mod, p);
+
+    _fmpz_vec_scalar_mod_fmpz(t, B, lenB, p);
+    _fmpz_vec_scalar_mod_fmpz(u, P, lenP, p);
+
+    res = _fmpz_mod_poly_invmod(A, t, lenB, u, lenP, mod);
+
+    fmpz_mod_ctx_clear(mod);
+
+    _fmpz_vec_clear(t, lenB);
+    _fmpz_vec_clear(u, lenP);
+
+    return res;
+}
 
 void _qadic_inv(fmpz *rop, const fmpz *op, slong len,
                 const fmpz *a, const slong *j, slong lena,
@@ -32,7 +59,7 @@ void _qadic_inv(fmpz *rop, const fmpz *op, slong len,
         for (k = 0; k < lena; k++)
             fmpz_set(P + j[k], a + k);
 
-        _fmpz_mod_poly_invmod(rop, op, len, P, d + 1, p);
+        __fmpz_mod_poly_invmod(rop, op, len, P, d + 1, p);
 
         _fmpz_vec_clear(P, d + 1);
     }
@@ -97,7 +124,7 @@ void _qadic_inv(fmpz *rop, const fmpz *op, slong len,
             for (k = 0; k < lena; k++)
                 fmpz_set(P + j[k], a + k);
 
-            _fmpz_mod_poly_invmod(rop, u + i * len, len, P, d + 1, pow + i);
+            __fmpz_mod_poly_invmod(rop, u + i * len, len, P, d + 1, pow + i);
 
             _fmpz_vec_clear(P, d + 1);
         }

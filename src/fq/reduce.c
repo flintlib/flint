@@ -12,6 +12,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "fmpz_mod_vec.h"
 #include "fmpz_mod_poly.h"
 #include "fq.h"
 
@@ -35,7 +36,7 @@ void _fq_sparse_reduce(fmpz *R, slong lenR, const fq_ctx_t ctx)
         }
     }
 
-    _fmpz_vec_scalar_mod_fmpz(R, R, FLINT_MIN(d, lenR), fq_ctx_prime(ctx));
+    _fmpz_mod_vec_set_fmpz_vec(R, R, FLINT_MIN(d, lenR), ctx->ctxp);
 }
 
 void _fq_dense_reduce(fmpz* R, slong lenR, const fq_ctx_t ctx)
@@ -44,17 +45,18 @@ void _fq_dense_reduce(fmpz* R, slong lenR, const fq_ctx_t ctx)
 
     if (lenR < ctx->modulus->length)
     {
-        _fmpz_vec_scalar_mod_fmpz(R, R, lenR, fq_ctx_prime(ctx));
+        _fmpz_mod_vec_set_fmpz_vec(R, R, lenR, ctx->ctxp);
         return;
     }
 
     q = _fmpz_vec_init(lenR - ctx->modulus->length + 1);
     r = _fmpz_vec_init(ctx->modulus->length - 1);
 
+    _fmpz_mod_vec_set_fmpz_vec(R, R, lenR, ctx->ctxp);
     _fmpz_mod_poly_divrem_newton_n_preinv(q, r, R, lenR,
                                         ctx->modulus->coeffs, ctx->modulus->length,
                                         ctx->inv->coeffs, ctx->inv->length,
-                                        fq_ctx_prime(ctx));
+                                        ctx->ctxp);
 
     _fmpz_vec_set(R, r, ctx->modulus->length - 1);
     _fmpz_vec_clear(q, lenR - ctx->modulus->length + 1);

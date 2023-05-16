@@ -13,6 +13,8 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "fmpz_mod.h"
+#include "fmpz_mod_vec.h"
 #include "fmpz_mod_poly.h"
 
 /*
@@ -33,12 +35,12 @@
  */
 #define liftinv(B, b, lenB, g, lenG)                                  \
 do {                                                                  \
-    _fmpz_vec_scalar_mod_fmpz(M, g, lenG, p1);                        \
-    _fmpz_mod_poly_rem(D, C, lenC, M, lenG, one, p1);                 \
-    _fmpz_mod_poly_mul(E, D, lenG - 1, b, lenB, p1);                  \
+    _fmpz_mod_vec_set_fmpz_vec(M, g, lenG, p1ctx);                    \
+    _fmpz_mod_poly_rem(D, C, lenC, M, lenG, one, p1ctx);              \
+    _fmpz_mod_poly_mul(E, D, lenG - 1, b, lenB, p1ctx);               \
     if (lenB > 1)                                                     \
     {                                                                 \
-        _fmpz_mod_poly_rem(D, E, lenG + lenB - 2, M, lenG, one, p1);  \
+        _fmpz_mod_poly_rem(D, E, lenG + lenB - 2, M, lenG, one, p1ctx);  \
         _fmpz_vec_scalar_mul_fmpz(M, D, lenG - 1, p);                 \
     }                                                                 \
     else                                                              \
@@ -59,6 +61,7 @@ void _fmpz_poly_hensel_lift_only_inverse(fmpz *A, fmpz *B,
     const slong lenE = FLINT_MAX(lenG + lenB - 2, lenH + lenA - 2);
     const slong lenD = FLINT_MAX(lenC, lenE);
     fmpz *C, *D, *E, *M;
+    fmpz_mod_ctx_t p1ctx;
 
     C = _fmpz_vec_init(lenC + lenD + lenD + lenM);
     D = C + lenC;
@@ -77,10 +80,15 @@ void _fmpz_poly_hensel_lift_only_inverse(fmpz *A, fmpz *B,
     fmpz_sub_ui(C, C, 1);
     _fmpz_vec_neg(C, C, lenC);
     _fmpz_vec_scalar_divexact_fmpz(D, C, lenC, p);
-    _fmpz_vec_scalar_mod_fmpz(C, D, lenC, p1);
+
+    fmpz_mod_ctx_init(p1ctx, p1);
+
+    _fmpz_mod_vec_set_fmpz_vec(C, D, lenC, p1ctx);
 
     liftinv(B, b, lenB, G, lenG);
     liftinv(A, a, lenA, H, lenH);
+
+    fmpz_mod_ctx_clear(p1ctx);
 
     _fmpz_vec_clear(C, lenC + lenD + lenD + lenM);
 }

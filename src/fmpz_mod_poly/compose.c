@@ -16,12 +16,11 @@
 
 void _fmpz_mod_poly_compose(fmpz *res, const fmpz *poly1, slong len1,
                                               const fmpz *poly2, slong len2,
-                                              const fmpz_t p)
+                                              const fmpz_mod_ctx_t ctx)
 {
-    gr_ctx_t ctx;
-    gr_ctx_init_fmpz_mod(ctx, p);       /* todo: from ref */
-    GR_MUST_SUCCEED(_gr_poly_compose(res, poly1, len1, poly2, len2, ctx));
-    gr_ctx_clear(ctx);
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_compose(res, poly1, len1, poly2, len2, gr_ctx));
 }
 
 void fmpz_mod_poly_compose(fmpz_mod_poly_t res,
@@ -47,14 +46,14 @@ void fmpz_mod_poly_compose(fmpz_mod_poly_t res,
         {
             fmpz_mod_poly_fit_length(res, lenr, ctx);
             _fmpz_mod_poly_compose(res->coeffs, poly1->coeffs, len1,
-                               poly2->coeffs, len2, fmpz_mod_ctx_modulus(ctx));
+                               poly2->coeffs, len2, ctx);
         }
         else
         {
             fmpz *t = _fmpz_vec_init(lenr);
 
             _fmpz_mod_poly_compose(t, poly1->coeffs, len1,
-                               poly2->coeffs, len2, fmpz_mod_ctx_modulus(ctx));
+                               poly2->coeffs, len2, ctx);
             _fmpz_vec_clear(res->coeffs, res->alloc);
             res->coeffs = t;
             res->alloc  = lenr;

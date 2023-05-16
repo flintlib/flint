@@ -13,11 +13,12 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mod.h"
+#include "fmpz_mod_vec.h"
 #include "fmpz_mod_poly.h"
 
 void _fmpz_mod_poly_divrem_basecase(fmpz *Q, fmpz *R,
     const fmpz *A, slong lenA, const fmpz *B, slong lenB,
-    const fmpz_t invB, const fmpz_t p)
+    const fmpz_t invB, const fmpz_mod_ctx_t ctx)
 {
     slong iQ, iR;
     fmpz * W;
@@ -45,15 +46,15 @@ void _fmpz_mod_poly_divrem_basecase(fmpz *Q, fmpz *R,
         else
         {
             fmpz_mul(Q + iQ, W + iR, invB);
-            fmpz_mod(Q + iQ, Q + iQ, p);
-
+            fmpz_mod_set_fmpz(Q + iQ, Q + iQ, ctx);
             _fmpz_vec_scalar_submul_fmpz(W + iQ, B, lenB, Q + iQ);
         }
+
         if (iQ > 0)
-            fmpz_mod(W + iR - 1, W + iR - 1, p);
+            fmpz_mod_set_fmpz(W + iR - 1, W + iR - 1, ctx);
     }
 
-	_fmpz_vec_scalar_mod_fmpz(W, W, lenB - 1, p);
+	_fmpz_mod_vec_set_fmpz_vec(W, W, lenB - 1, ctx);
 
     if (R != A)
     {
@@ -115,8 +116,7 @@ void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
         r = R->coeffs;
     }
 
-    _fmpz_mod_poly_divrem_basecase(q, r, A->coeffs, lenA,
-                             B->coeffs, lenB, invB, fmpz_mod_ctx_modulus(ctx));
+    _fmpz_mod_poly_divrem_basecase(q, r, A->coeffs, lenA, B->coeffs, lenB, invB, ctx);
 
     if (Q == A || Q == B)
     {

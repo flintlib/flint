@@ -13,12 +13,13 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mod.h"
+#include "fmpz_mod_vec.h"
 #include "fmpz_mod_poly.h"
 
 slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S,
                                    const fmpz *A, slong lenA,
                                    const fmpz *B, slong lenB,
-                                   const fmpz_t invA, const fmpz_t p)
+                                   const fmpz_t invA, const fmpz_mod_ctx_t ctx)
 {
 	_fmpz_vec_zero(G, lenA);
     _fmpz_vec_zero(S, lenB - 1);
@@ -40,7 +41,7 @@ slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S,
         FMPZ_VEC_TMP_INIT(Q, 2*lenB);
         R = Q + lenB;
 
-        _fmpz_mod_poly_divrem_f(f, Q, R, B, lenB, A, lenA, p);
+        _fmpz_mod_poly_divrem_f(f, Q, R, B, lenB, A, lenA, ctx);
         if (!fmpz_is_one(f))
             goto cleanup2;
 
@@ -65,7 +66,7 @@ slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S,
 
 			_fmpz_vec_swap(G, R, lenR);
             _fmpz_vec_swap(S, Q, lenQ);
-		    _fmpz_vec_neg(S, S, lenQ);
+		    _fmpz_mod_vec_neg(S, S, lenQ, ctx);
 
             FMPZ_VEC_TMP_CLEAR(Q, 2*lenB);
 
@@ -92,17 +93,17 @@ slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S,
 			lenU1 = 1;
             _fmpz_vec_set(D, A, lenA);
             lenD = lenA;
-            _fmpz_vec_neg(U2, Q, lenQ);
+            _fmpz_mod_vec_neg(U2, Q, lenQ, ctx);
             lenU2 = lenQ;
             lenV3 = 0;
             FMPZ_VEC_SWAP(V3, lenV3, R, lenR);
 
             do {
-                fmpz_gcdinv(f, inv, V3 + (lenV3 - 1), p);
+                fmpz_gcdinv(f, inv, V3 + (lenV3 - 1), fmpz_mod_ctx_modulus(ctx));
                 if (!fmpz_is_one(f))
 					goto cleanup;
 
-				_fmpz_mod_poly_divrem_basecase(Q, D, D, lenD, V3, lenV3, inv, p);
+				_fmpz_mod_poly_divrem_basecase(Q, D, D, lenD, V3, lenV3, inv, ctx);
                 lenQ = lenD - lenV3 + 1;
                 lenD = lenV3 - 1;
                 FMPZ_VEC_NORM(D, lenD);
@@ -110,12 +111,12 @@ slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S,
                 if (lenV3 != 0)
 				{
 				    if (lenU2 >= lenQ)
-                        _fmpz_mod_poly_mul(W, U2, lenU2, Q, lenQ, p);
+                        _fmpz_mod_poly_mul(W, U2, lenU2, Q, lenQ, ctx);
                     else
-                        _fmpz_mod_poly_mul(W, Q, lenQ, U2, lenU2, p);
+                        _fmpz_mod_poly_mul(W, Q, lenQ, U2, lenU2, ctx);
                     lenW = lenQ + lenU2 - 1;
 
-                    _fmpz_mod_poly_sub(U1, U1, lenU1, W, lenW, p);
+                    _fmpz_mod_poly_sub(U1, U1, lenU1, W, lenW, ctx);
                     lenU1 = FLINT_MAX(lenU1, lenW);
                     FMPZ_VEC_NORM(U1, lenU1);
                 }
@@ -203,7 +204,7 @@ fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
         }
 
 	    lenG = _fmpz_mod_poly_gcdinv_euclidean_f(f, g, s,
-                                     A->coeffs, lenA, B->coeffs, lenB, inv, p);
+                                     A->coeffs, lenA, B->coeffs, lenB, inv, ctx);
 
         if (G == A || G == B)
         {

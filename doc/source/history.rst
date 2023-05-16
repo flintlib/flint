@@ -26,7 +26,7 @@ from those libraries which may be incompatible.
 
 The FLINT 3.0 API is largely backwards-compatible with FLINT 2.9,
 Arb 2.23, Calcium 0.4 and Antic 0.2.5, except for changes to
-rarely-used functions documented below.
+rarely-used and internal functions documented below.
 However, the following changes to the handling of header files
 are likely to require (trivial) patches in many downstream codebases:
 
@@ -104,6 +104,10 @@ Other changes
 * Fixed ``arb_pow`` for x just barely containing 0, y > 0 (Erik Postma).
 * Improved precision handling in arb_gamma for huge input.
 * Faster ``arb_contains_arf``, ``arb_overlaps``, ``arb_gt``, ``arb_lt``.
+* Changed the argument order of ``_fmpz_mod_poly_mullow`` and
+  ``_fmpz_mod_poly_div_series``.
+* Changed the call signature of many ``_fmpz_mod_poly`` methods to
+  take a context object as input instead of the raw modulus.
 
 List of additions
 .................

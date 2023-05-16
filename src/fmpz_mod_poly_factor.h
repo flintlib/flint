@@ -94,10 +94,10 @@ int fmpz_mod_poly_is_irreducible_rabin(const fmpz_mod_poly_t f,
 int fmpz_mod_poly_is_irreducible_rabin_f(fmpz_t fac,
                             const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx);
 
-int _fmpz_mod_poly_is_squarefree(const fmpz * f, slong len, const fmpz_t p);
+int _fmpz_mod_poly_is_squarefree(const fmpz * f, slong len, const fmpz_mod_ctx_t ctx);
 
 int _fmpz_mod_poly_is_squarefree_f(fmpz_t fac,
-                                    const fmpz * f, slong len, const fmpz_t p);
+                                    const fmpz * f, slong len, const fmpz_mod_ctx_t ctx);
 
 int fmpz_mod_poly_is_squarefree(const fmpz_mod_poly_t f,
                                                      const fmpz_mod_ctx_t ctx);

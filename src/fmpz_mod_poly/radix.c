@@ -17,7 +17,7 @@
 
 void _fmpz_mod_poly_radix_init(fmpz **Rpow, fmpz **Rinv,
                     const fmpz *R, slong lenR, slong k,
-                    const fmpz_t invL, const fmpz_t p)
+                    const fmpz_t invL, const fmpz_mod_ctx_t ctx)
 {
     const slong degR = lenR - 1;
     slong i;
@@ -30,7 +30,7 @@ void _fmpz_mod_poly_radix_init(fmpz **Rpow, fmpz **Rinv,
     _fmpz_vec_set(Rpow[0], R, lenR);
     for (i = 1; i < k; i++)
     {
-        _fmpz_mod_poly_sqr(Rpow[i], Rpow[i - 1], degR * (WORD(1) << (i - 1)) + 1, p);
+        _fmpz_mod_poly_sqr(Rpow[i], Rpow[i - 1], degR * (WORD(1) << (i - 1)) + 1, ctx);
     }
 
     for (i = 0; i < k; i++)
@@ -44,14 +44,11 @@ void _fmpz_mod_poly_radix_init(fmpz **Rpow, fmpz **Rinv,
             W[j] = Rpow[i][lenQ - j];
         }
 
-        _fmpz_mod_poly_inv_series_newton(Rinv[i], W, lenQ, invLP, p);
+        _fmpz_mod_poly_inv_series_newton(Rinv[i], W, lenQ, invLP, ctx);
 
         /* invLP := inv{lead{R^{2^i}}} */
         if (i != k - 1)
-        {
-            fmpz_mul(invLP, invLP, invLP);
-            fmpz_mod(invLP, invLP, p);
-        }
+            fmpz_mod_mul(invLP, invLP, invLP, ctx);
     }
 
     fmpz_clear(invLP);
@@ -93,7 +90,7 @@ void fmpz_mod_poly_radix_init(fmpz_mod_poly_radix_t D,
         fmpz_invmod(&(D->invL), R->coeffs + degR, fmpz_mod_ctx_modulus(ctx));
 
         _fmpz_mod_poly_radix_init(D->Rpow, D->Rinv, R->coeffs, degR + 1,
-                                  k, &(D->invL), fmpz_mod_ctx_modulus(ctx));
+                                  k, &(D->invL), ctx);
 
         D->k = k;
         D->degR = degR;
@@ -117,7 +114,7 @@ void fmpz_mod_poly_radix_clear(fmpz_mod_poly_radix_t D)
 }
 
 void _fmpz_mod_poly_radix(fmpz **B, const fmpz *F, fmpz **Rpow, fmpz **Rinv,
-                          slong degR, slong k, slong i, fmpz *W, const fmpz_t p)
+                          slong degR, slong k, slong i, fmpz *W, const fmpz_mod_ctx_t ctx)
 {
     if (i == -1)
     {
@@ -132,15 +129,15 @@ void _fmpz_mod_poly_radix(fmpz **B, const fmpz *F, fmpz **Rpow, fmpz **Rinv,
         fmpz *S    = W;
 
         _fmpz_poly_reverse(Frev, F + lenQ, lenQ, lenQ);
-        _fmpz_mod_poly_mullow(Q, Frev, lenQ, Rinv[i], lenQ, p, lenQ);
+        _fmpz_mod_poly_mullow(Q, Frev, lenQ, Rinv[i], lenQ, lenQ, ctx);
         _fmpz_poly_reverse(Q, Q, lenQ, lenQ);
 
-        _fmpz_mod_poly_radix(B, Q, Rpow, Rinv, degR, k + (WORD(1) << i), i-1, W, p);
+        _fmpz_mod_poly_radix(B, Q, Rpow, Rinv, degR, k + (WORD(1) << i), i-1, W, ctx);
 
-        _fmpz_mod_poly_mullow(S, Rpow[i], lenQ, Q, lenQ, p, lenQ);
-        _fmpz_mod_poly_sub(S, F, lenQ, S, lenQ, p);
+        _fmpz_mod_poly_mullow(S, Rpow[i], lenQ, Q, lenQ, lenQ, ctx);
+        _fmpz_mod_poly_sub(S, F, lenQ, S, lenQ, ctx);
 
-        _fmpz_mod_poly_radix(B, S, Rpow, Rinv, degR, k, i-1, W + lenQ, p);
+        _fmpz_mod_poly_radix(B, S, Rpow, Rinv, degR, k, i-1, W + lenQ, ctx);
     }
 }
 
@@ -197,8 +194,7 @@ void fmpz_mod_poly_radix(fmpz_mod_poly_struct **B, const fmpz_mod_poly_t F,
 
         W = _fmpz_vec_init(lenG);
 
-        _fmpz_mod_poly_radix(C, G, D->Rpow, D->Rinv, degR, 0, k-1, W,
-                                                    fmpz_mod_ctx_modulus(ctx));
+        _fmpz_mod_poly_radix(C, G, D->Rpow, D->Rinv, degR, 0, k-1, W, ctx);
 
         _fmpz_vec_clear(W, lenG);
 

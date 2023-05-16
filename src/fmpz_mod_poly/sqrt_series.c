@@ -14,12 +14,13 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
+/* todo: change signature; use gr */
 void
 _fmpz_mod_poly_sqrt_series(fmpz * g, const fmpz * h, slong n, fmpz_mod_ctx_t mod)
 {
     fmpz * t = _fmpz_vec_init(n);
     _fmpz_mod_poly_invsqrt_series(t, h, n, mod);
-    _fmpz_mod_poly_mullow(g, t, n, h, n, mod->n, n);
+    _fmpz_mod_poly_mullow(g, t, n, h, n, n, mod);
     _fmpz_vec_clear(t, n);
 }
 
