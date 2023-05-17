@@ -94,13 +94,13 @@ Factorisation
     `\mathbb{Z}/p\mathbb{Z}`, even for composite `f`, or it finds a factor
     of `p`.
 
-.. function:: int _fmpz_mod_poly_is_squarefree(const fmpz * f, slong len, const fmpz_t p)
+.. function:: int _fmpz_mod_poly_is_squarefree(const fmpz * f, slong len, const fmpz_mod_ctx_t ctx)
 
     Returns 1 if ``(f, len)`` is squarefree, and 0 otherwise. As a
     special case, the zero polynomial is not considered squarefree.
     There are no restrictions on the length.
 
-.. function:: int _fmpz_mod_poly_is_squarefree_f(fmpz_t fac, const fmpz * f, slong len, const fmpz_t p)
+.. function:: int _fmpz_mod_poly_is_squarefree_f(fmpz_t fac, const fmpz * f, slong len, const fmpz_mod_ctx_t ctx)
 
     If `fac` returns with the value `1` then the function operates as per
     :func:`_fmpz_mod_poly_is_squarefree`, otherwise `f` is set to a nontrivial
