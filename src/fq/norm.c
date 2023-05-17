@@ -12,6 +12,7 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 #include "fq.h"
 
@@ -24,21 +25,18 @@ _fq_norm(fmpz_t rop, const fmpz * op, slong len, const fq_ctx_t ctx)
 {
     const slong d = fq_ctx_degree(ctx);
 
-    const fmpz *p = fq_ctx_prime(ctx);
-
-
     if (d == 1)
     {
         fmpz_set(rop, op + 0);
     }
     else if (len == 1)
     {
-        fmpz_powm_ui(rop, op + 0, d, p);
+        fmpz_mod_pow_ui(rop, op + 0, d, ctx->ctxp);
     }
     else
     {
         _fmpz_mod_poly_resultant(rop, ctx->modulus->coeffs, ctx->modulus->length,
-                        op, len, p);
+                        op, len, ctx->ctxp);
         /*
            XXX:  This part of the code is currently untested as the Conway
            polynomials used for the extension Fq/Fp are monic.
@@ -51,10 +49,9 @@ _fq_norm(fmpz_t rop, const fmpz * op, slong len, const fq_ctx_t ctx)
             fmpz_t f;
 
             fmpz_init(f);
-            fmpz_powm_ui(f, ctx->modulus->coeffs + d, len - 1, p);
-            fmpz_invmod(f, f, p);
-            fmpz_mul(rop, f, rop);
-            fmpz_mod(rop, rop, p);
+            fmpz_mod_pow_ui(f, ctx->modulus->coeffs + d, len - 1, ctx->ctxp);
+            fmpz_mod_inv(f, f, ctx->ctxp);
+            fmpz_mod_mul(rop, f, rop, ctx->ctxp);
             fmpz_clear(f);
         }
     }

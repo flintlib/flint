@@ -443,11 +443,10 @@ _gr_fmpz_mod_poly_mullow(fmpz * res,
     const fmpz * poly1, slong len1,
     const fmpz * poly2, slong len2, slong n, gr_ctx_t ctx)
 {
-    /* weird argument order? */
     if (len1 >= len2)
-        _fmpz_mod_poly_mullow(res, poly1, len1, poly2, len2, FMPZ_MOD_CTX(ctx)->n, n);
+        _fmpz_mod_poly_mullow(res, poly1, len1, poly2, len2, n, FMPZ_MOD_CTX(ctx));
     else
-        _fmpz_mod_poly_mullow(res, poly2, len2, poly1, len1, FMPZ_MOD_CTX(ctx)->n, n);
+        _fmpz_mod_poly_mullow(res, poly2, len2, poly1, len1, n, FMPZ_MOD_CTX(ctx));
 
     return GR_SUCCESS;
 }
@@ -466,7 +465,7 @@ _gr_fmpz_mod_poly_divrem(fmpz * Q, fmpz * R, const fmpz * A, slong lenA,
         fmpz_init(invB);
         status = _gr_fmpz_mod_inv(invB, B + lenB - 1, ctx);
         if (status == GR_SUCCESS)
-            _fmpz_mod_poly_divrem_basecase(Q, R, A, lenA, B, lenB, invB, FMPZ_MOD_CTX(ctx)->n);
+            _fmpz_mod_poly_divrem_basecase(Q, R, A, lenA, B, lenB, invB, FMPZ_MOD_CTX(ctx));
 
         fmpz_clear(invB);
         return status;

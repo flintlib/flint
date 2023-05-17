@@ -777,8 +777,6 @@ Finite field methods
 
 .. function:: int gr_ctx_fq_order(fmpz_t q, gr_ctx_t ctx)
 
-.. function:: int gr_fq_gen(gr_ptr res, gr_ctx_t ctx)
-
 .. function:: int gr_fq_frobenius(gr_ptr res, gr_srcptr x, slong e, gr_ctx_t ctx)
 
 .. function:: int gr_fq_multiplicative_order(fmpz_t res, gr_srcptr x, gr_ctx_t ctx)

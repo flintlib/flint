@@ -12,6 +12,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mod.h"
+#include "fmpz_mod_vec.h"
 #include "fmpz_mod_poly.h"
 
 void fmpz_mod_poly_scalar_addmul_fmpz(fmpz_mod_poly_t A,
@@ -27,8 +28,9 @@ void fmpz_mod_poly_scalar_addmul_fmpz(fmpz_mod_poly_t A,
     if (B->length > A->length)
         _fmpz_vec_zero(A->coeffs + A->length, B->length - A->length);
 
-    _fmpz_vec_scalar_mod_fmpz(A->coeffs, A->coeffs, len,
-                                                    fmpz_mod_ctx_modulus(ctx));
+    _fmpz_vec_scalar_addmul_fmpz(A->coeffs, B->coeffs, B->length, x);
+    _fmpz_mod_vec_set_fmpz_vec(A->coeffs, A->coeffs, len, ctx);
+
     _fmpz_mod_poly_set_length(A, len);
     _fmpz_mod_poly_normalise(A);
 }

@@ -25,7 +25,7 @@ typedef struct
    const fmpz * g;
    const fmpz * ginv;
    fmpz ** res;
-   const fmpz * p;
+   const fmpz_mod_ctx_struct * ctx;
 #if FLINT_USES_PTHREAD
    pthread_mutex_t * mutex;
 #endif
@@ -39,7 +39,7 @@ _fmpz_mod_poly_powers_mod_preinv_worker(void * arg_ptr)
     slong glen = arg.glen, ginvlen = arg.ginvlen;
     fmpz ** res = arg.res;
     const fmpz * g = arg.g, * ginv = arg.ginv;
-    const fmpz * p = arg.p;
+    const fmpz_mod_ctx_struct * ctx = arg.ctx;
 
     while (1)
     {
@@ -59,14 +59,13 @@ _fmpz_mod_poly_powers_mod_preinv_worker(void * arg_ptr)
         {
             for (i = j + 1; i < j + k && i < n; i++)
             {
-                fmpz_mul(res[i] + 0, res[j] + 0, res[i - j] + 0);
-                fmpz_mod(res[i] + 0, res[i] + 0, p);
+                fmpz_mod_mul(res[i] + 0, res[j] + 0, res[i - j] + 0, ctx);
             }
         } else
         {
             for (i = j + 1; i < j + k && i < n; i++)
                 _fmpz_mod_poly_mulmod_preinv(res[i], res[j],
-                  glen - 1, res[i - j], glen - 1, g, glen, ginv, ginvlen, p);
+                  glen - 1, res[i - j], glen - 1, g, glen, ginv, ginvlen, ctx);
         }
     }
 }
@@ -81,7 +80,7 @@ _fmpz_mod_poly_powers_mod_preinv_worker(void * arg_ptr)
 void
 _fmpz_mod_poly_powers_mod_preinv_threaded_pool(fmpz ** res, const fmpz * f,
 		 slong flen, slong n, const fmpz * g, slong glen,
-           const fmpz * ginv, slong ginvlen, const fmpz_t p,
+           const fmpz * ginv, slong ginvlen, const fmpz_mod_ctx_t ctx,
 	                       thread_pool_handle * threads, slong num_threads)
 {
     slong i, k, shared_j = 0;
@@ -113,7 +112,7 @@ _fmpz_mod_poly_powers_mod_preinv_threaded_pool(fmpz ** res, const fmpz * f,
     /* compute baby steps */
 
     _fmpz_mod_poly_powers_mod_preinv_naive(res, f, flen, k + 1,
-		                                  g, glen, ginv, ginvlen, p);
+		                                  g, glen, ginv, ginvlen, ctx);
 
     /* compute giant steps */
 
@@ -122,14 +121,14 @@ _fmpz_mod_poly_powers_mod_preinv_threaded_pool(fmpz ** res, const fmpz * f,
     {
         for (i = 2*k; i < n; i += k)
         {
-            fmpz_mul(res[i] + 0, res[i - k] + 0, res[k] + 0);
-            fmpz_mod(res[i] + 0, res[i] + 0, p);
+            fmpz_mod_mul(res[i] + 0, res[i - k] + 0, res[k] + 0, ctx);
         }
-    } else
+    }
+    else
     {
         for (i = 2*k; i < n; i += k)
             _fmpz_mod_poly_mulmod_preinv(res[i], res[i - k], glen - 1,
-			        res[k], glen - 1, g, glen, ginv, ginvlen, p);
+			        res[k], glen - 1, g, glen, ginv, ginvlen, ctx);
     }
 
     args = (fmpz_powers_preinv_arg_t *)
@@ -145,7 +144,7 @@ _fmpz_mod_poly_powers_mod_preinv_threaded_pool(fmpz ** res, const fmpz * f,
         args[i].g       = g;
         args[i].ginv    = ginv;
         args[i].res     = res;
-        args[i].p       = p;
+        args[i].ctx     = ctx;
 #if FLINT_USES_PTHREAD
         args[i].mutex   = &mutex;
 #endif
@@ -233,7 +232,7 @@ fmpz_mod_poly_powers_mod_bsgs(fmpz_mod_poly_struct * res,
 
     _fmpz_mod_poly_powers_mod_preinv_threaded_pool(res_arr, f->coeffs,
     	       f->length, n, g->coeffs, g->length, ginv->coeffs, ginv->length,
-                              fmpz_mod_ctx_modulus(ctx), threads, num_threads);
+                              ctx, threads, num_threads);
 
     flint_give_back_threads(threads, num_threads);
 

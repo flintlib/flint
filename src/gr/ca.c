@@ -1157,7 +1157,6 @@ _gr_ca_poly_mullow(ca_ptr res,
     return GR_SUCCESS;
 }
 
-/* hidden feature: also works with arb ctx */
 int
 _gr_ca_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
 {

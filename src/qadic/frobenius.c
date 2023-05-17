@@ -14,6 +14,71 @@
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
+static void __fmpz_mod_poly_neg(fmpz *res, const fmpz *poly, slong len, const fmpz_t p)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+    {
+        if (!fmpz_is_zero(poly + i))
+            fmpz_sub(res + i, p, poly + i);
+        else
+            fmpz_zero(res + i);
+    }
+}
+
+static void __fmpz_mod_poly_sub(fmpz *res, const fmpz *poly1, slong len1,
+                                   const fmpz *poly2, slong len2, const fmpz_t p)
+{
+    slong i, len = FLINT_MAX(len1, len2);
+
+    _fmpz_poly_sub(res, poly1, len1, poly2, len2);
+
+    for (i = 0; i < len; i++)
+    {
+        if (fmpz_sgn(res + i) < 0)
+            fmpz_add(res + i, res + i, p);
+    }
+}
+
+static void __fmpz_mod_poly_mul(fmpz *res, const fmpz *poly1, slong len1,
+                                   const fmpz *poly2, slong len2, const fmpz_t p)
+{
+    _fmpz_poly_mul(res, poly1, len1, poly2, len2);
+    _fmpz_vec_scalar_mod_fmpz(res, res, len1 + len2 - 1, p);
+}
+
+static void __fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz *poly, slong len,
+                                  const fmpz_t a, const fmpz_t p)
+{
+    if (len == 0)
+    {
+        fmpz_zero(res);
+    }
+    else if (len == 1 || fmpz_is_zero(a))
+    {
+        fmpz_set(res, poly);
+    }
+    else
+    {
+        slong i = len - 1;
+        fmpz_t t;
+
+        fmpz_init(t);
+        fmpz_set(res, poly + i);
+        for (i = len - 2; i >= 0; i--)
+        {
+            fmpz_mul(t, res, a);
+            fmpz_mod(t, t, p);
+            fmpz_add(res, poly + i, t);
+        }
+        fmpz_clear(t);
+
+        if (fmpz_cmpabs(res, p) >= 0)
+            fmpz_sub(res, res, p);
+    }
+}
+
 /*
     Assumes that \code{len1} and \code{len2} are positive but at
     most~$d$, and also that \code{len1} is at least $6$.
@@ -33,7 +98,7 @@ _fmpz_mod_poly_compose_smod_rectangular(fmpz *rop,
 
     if (len2 == 1)
     {
-        _fmpz_mod_poly_evaluate_fmpz(rop, op1, len1, op2, p);
+        __fmpz_mod_poly_evaluate_fmpz(rop, op1, len1, op2, p);
         _fmpz_vec_zero(rop + 1, d - 1);
     }
     else
@@ -92,7 +157,7 @@ _fmpz_mod_poly_compose_smod_horner(fmpz *rop,
     }
     else if (len2 == 1)
     {
-        _fmpz_mod_poly_evaluate_fmpz(rop, op1, len1, op2, p);
+        __fmpz_mod_poly_evaluate_fmpz(rop, op1, len1, op2, p);
         _fmpz_vec_zero(rop + 1, d - 1);
     }
     else
@@ -216,20 +281,20 @@ void _qadic_frobenius_a(fmpz *rop, slong exp,
     for (i--; i >= 0; i--)
     {
         _fmpz_mod_poly_compose_smod(s, f1, d + 1, rop, d, a, j, lena, pow + i);
-        _fmpz_mod_poly_mul(t, s, d, inv, d, pow + i);
+        __fmpz_mod_poly_mul(t, s, d, inv, d, pow + i);
         _fmpz_mod_poly_reduce(t, 2*d - 1, a, j, lena, pow + i);
-        _fmpz_mod_poly_sub(rop, rop, d, t, d, pow + i);
+        __fmpz_mod_poly_sub(rop, rop, d, t, d, pow + i);
 
         if (i > 0)
         {
             _fmpz_mod_poly_compose_smod(s, f2, d, rop, d, a, j, lena, pow + i);
-            _fmpz_mod_poly_mul(t, inv, d, s, d, pow + i);
+            __fmpz_mod_poly_mul(t, inv, d, s, d, pow + i);
             _fmpz_mod_poly_reduce(t, 2*d - 1, a, j, lena, pow + i);
             fmpz_sub_ui(t, t, 2);
             if (fmpz_sgn(t) < 0)
                 fmpz_add(t, t, pow + i);
-            _fmpz_mod_poly_neg(t, t, d, pow + i);
-            _fmpz_mod_poly_mul(s, inv, d, t, d, pow + i);
+            __fmpz_mod_poly_neg(t, t, d, pow + i);
+            __fmpz_mod_poly_mul(s, inv, d, t, d, pow + i);
             _fmpz_mod_poly_reduce(s, 2*d - 1, a, j, lena, pow + i);
 
             /* SWAP(inv, s).  Requires the arrays to be of the same size. */

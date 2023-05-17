@@ -15,13 +15,13 @@
 #include "fmpz_mod_poly.h"
 
 void
-_fmpz_mod_poly_discriminant(fmpz_t d, const fmpz *poly, slong len, const fmpz_t mod)
+_fmpz_mod_poly_discriminant(fmpz_t d, const fmpz *poly, slong len, const fmpz_mod_ctx_t ctx)
 {
    fmpz *der = _fmpz_vec_init(len - 1);
    slong dlen = len - 1, exp;
    fmpz_t pow;
 
-   _fmpz_mod_poly_derivative(der, poly, len, mod);
+   _fmpz_mod_poly_derivative(der, poly, len, ctx);
    FMPZ_VEC_NORM(der, dlen);
 
    if (dlen == 0)
@@ -31,19 +31,18 @@ _fmpz_mod_poly_discriminant(fmpz_t d, const fmpz *poly, slong len, const fmpz_t 
    {
       fmpz_init(pow);
 
-      _fmpz_mod_poly_resultant(d, poly, len, der, dlen, mod);
+      _fmpz_mod_poly_resultant(d, poly, len, der, dlen, ctx);
       exp = len - dlen - 2;
 
       if (exp >= 0)
-         fmpz_powm_ui(pow, poly + len - 1, exp, mod);
+         fmpz_mod_pow_ui(pow, poly + len - 1, exp, ctx);
       else
-         fmpz_invmod(pow, poly + len - 1, mod);
+         fmpz_mod_inv(pow, poly + len - 1, ctx);
 
-      fmpz_mul(d, d, pow);
-      fmpz_mod(d, d, mod);
+      fmpz_mod_mul(d, d, pow, ctx);
 
       if ((len & 3) == 0 || (len & 3) == 3) /* degree is not 0, 1 mod 4 */
-         fmpz_negmod(d, d, mod);
+         fmpz_mod_neg(d, d, ctx);
 
       fmpz_clear(pow);
    }
@@ -59,6 +58,6 @@ void fmpz_mod_poly_discriminant(fmpz_t d, const fmpz_mod_poly_t f,
     if (len <= 1)
         fmpz_zero(d);
     else
-       _fmpz_mod_poly_discriminant(d, f->coeffs, len, fmpz_mod_ctx_modulus(ctx));
+       _fmpz_mod_poly_discriminant(d, f->coeffs, len, ctx);
 }
 

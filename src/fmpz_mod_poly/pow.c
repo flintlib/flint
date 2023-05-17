@@ -15,7 +15,7 @@
 #include "fmpz_mod_poly.h"
 
 void _fmpz_mod_poly_pow(fmpz *res, const fmpz *poly, slong len, ulong e,
-                        const fmpz_t p)
+            const fmpz_mod_ctx_t ctx)
 {
     ulong bit = ~((~UWORD(0)) >> 1);
     slong rlen;
@@ -62,11 +62,11 @@ void _fmpz_mod_poly_pow(fmpz *res, const fmpz *poly, slong len, ulong e,
        We unroll the first step of the loop, referring to {poly, len}
      */
 
-    _fmpz_mod_poly_sqr(R, poly, len, p);
+    _fmpz_mod_poly_sqr(R, poly, len, ctx);
     rlen = 2 * len - 1;
     if ((bit & e))
     {
-        _fmpz_mod_poly_mul(S, R, rlen, poly, len, p);
+        _fmpz_mod_poly_mul(S, R, rlen, poly, len, ctx);
         rlen += len - 1;
         T = R;
         R = S;
@@ -77,14 +77,14 @@ void _fmpz_mod_poly_pow(fmpz *res, const fmpz *poly, slong len, ulong e,
     {
         if ((bit & e))
         {
-            _fmpz_mod_poly_sqr(S, R, rlen, p);
+            _fmpz_mod_poly_sqr(S, R, rlen, ctx);
             rlen += rlen - 1;
-            _fmpz_mod_poly_mul(R, S, rlen, poly, len, p);
+            _fmpz_mod_poly_mul(R, S, rlen, poly, len, ctx);
             rlen += len - 1;
         }
         else
         {
-            _fmpz_mod_poly_sqr(S, R, rlen, p);
+            _fmpz_mod_poly_sqr(S, R, rlen, ctx);
             rlen += rlen - 1;
             T = R;
             R = S;
@@ -110,7 +110,7 @@ void fmpz_mod_poly_pow(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e,
         else if (len == 1)
         {
             fmpz_mod_poly_fit_length(rop, 1, ctx);
-            fmpz_powm_ui(rop->coeffs, op->coeffs, e, fmpz_mod_ctx_modulus(ctx));
+            fmpz_mod_pow_ui(rop->coeffs, op->coeffs, e, ctx);
             _fmpz_mod_poly_set_length(rop, 1);
             _fmpz_mod_poly_normalise(rop);
         }
@@ -126,14 +126,14 @@ void fmpz_mod_poly_pow(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e,
     if (rop != op)
     {
         fmpz_mod_poly_fit_length(rop, rlen, ctx);
-        _fmpz_mod_poly_pow(rop->coeffs, op->coeffs, len, e, fmpz_mod_ctx_modulus(ctx));
+        _fmpz_mod_poly_pow(rop->coeffs, op->coeffs, len, e, ctx);
         _fmpz_mod_poly_set_length(rop, rlen);
     }
     else
     {
         fmpz *t = _fmpz_vec_init(rlen);
 
-        _fmpz_mod_poly_pow(t, op->coeffs, len, e, fmpz_mod_ctx_modulus(ctx));
+        _fmpz_mod_poly_pow(t, op->coeffs, len, e, ctx);
 
         _fmpz_vec_clear(rop->coeffs, rop->alloc);
         rop->coeffs = t;

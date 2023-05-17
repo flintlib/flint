@@ -16,7 +16,7 @@
 #include "fmpz_mod_poly_factor.h"
 
 int
-_fmpz_mod_poly_is_squarefree(const fmpz * f, slong len, const fmpz_t p)
+_fmpz_mod_poly_is_squarefree(const fmpz * f, slong len, const fmpz_mod_ctx_t ctx)
 {
     fmpz * fd, * g;
     slong dlen;
@@ -28,17 +28,12 @@ _fmpz_mod_poly_is_squarefree(const fmpz * f, slong len, const fmpz_t p)
     fd = _fmpz_vec_init(2 * (len - 1));
     g = fd + len - 1;
 
-    _fmpz_mod_poly_derivative(fd, f, len, p);
+    _fmpz_mod_poly_derivative(fd, f, len, ctx);
     dlen = len - 1;
     FMPZ_VEC_NORM(fd, dlen);
 
     if (dlen)
-    {
-        fmpz_mod_ctx_t ctx;
-        fmpz_mod_ctx_init(ctx, p);  /* todo: do not recompute context object */
         res = (_fmpz_mod_poly_gcd(g, f, len, fd, dlen, ctx) == 1);
-        fmpz_mod_ctx_clear(ctx);
-    }
     else
         res = 0;   /* gcd(f, 0) = f, and len(f) > 2 */
 
@@ -49,6 +44,5 @@ _fmpz_mod_poly_is_squarefree(const fmpz * f, slong len, const fmpz_t p)
 int fmpz_mod_poly_is_squarefree(const fmpz_mod_poly_t f,
                                                       const fmpz_mod_ctx_t ctx)
 {
-    return _fmpz_mod_poly_is_squarefree(f->coeffs, f->length,
-                                                    fmpz_mod_ctx_modulus(ctx));
+    return _fmpz_mod_poly_is_squarefree(f->coeffs, f->length, ctx);
 }

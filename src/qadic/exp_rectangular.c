@@ -14,6 +14,27 @@
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
+static void __fmpz_mod_poly_add(fmpz *res, const fmpz *poly1, slong len1,
+                                   const fmpz *poly2, slong len2, const fmpz_t p)
+{
+    slong i, len = FLINT_MAX(len1, len2);
+
+    _fmpz_poly_add(res, poly1, len1, poly2, len2);
+
+    for (i = 0; i < len; i++)
+    {
+        if (fmpz_cmpabs(res + i, p) >= 0)
+		    fmpz_sub(res + i, res + i, p);
+    }
+}
+
+static void __fmpz_mod_poly_mul(fmpz *res, const fmpz *poly1, slong len1,
+                                   const fmpz *poly2, slong len2, const fmpz_t p)
+{
+    _fmpz_poly_mul(res, poly1, len1, poly2, len2);
+    _fmpz_vec_scalar_mod_fmpz(res, res, len1 + len2 - 1, p);
+}
+
 void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, slong v, slong len,
                             const fmpz *a, const slong *j, slong lena,
                             const fmpz_t p, slong N, const fmpz_t pN)
@@ -50,7 +71,7 @@ void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, slong v, slong len,
             fmpz_pow_ui(x + len, p, v);
             _fmpz_vec_scalar_mul_fmpz(x, op, len, x + len);
 
-            _fmpz_poly_sqr(rop, x, len);
+            _fmpz_poly_mul(rop, x, len, x, len);
             if (*p != WORD(2))
             {
                 for (i = 0; i < 2 * len - 1; i++)
@@ -60,7 +81,7 @@ void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, slong v, slong len,
             _fmpz_vec_scalar_fdiv_q_2exp(rop, rop, 2 * len - 1, 1);
             _fmpz_mod_poly_reduce(rop, 2 * len - 1, a, j, lena, pN);
             _fmpz_vec_zero(rop + (2 * len - 1), d - (2 * len - 1));
-            _fmpz_mod_poly_add(rop, rop, d, x, len, pN);
+            __fmpz_mod_poly_add(rop, rop, d, x, len, pN);
             fmpz_add_ui(rop, rop, 1);
             if (fmpz_equal(rop, pN))
                 fmpz_zero(rop);
@@ -95,7 +116,7 @@ void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, slong v, slong len,
         _fmpz_vec_zero(x + d + len, d - len);
         for (i = 2; i <= b; i++)
         {
-            _fmpz_mod_poly_mul(x + i * d, x + (i - 1) * d, d, x + d, d, pNk);
+            __fmpz_mod_poly_mul(x + i * d, x + (i - 1) * d, d, x + d, d, pNk);
             _fmpz_mod_poly_reduce(x + i * d, 2 * d - 1, a, j, lena, pNk);
         }
 

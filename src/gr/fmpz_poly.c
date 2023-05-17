@@ -13,7 +13,9 @@
 #include "fmpz_poly.h"
 #include "fmpz_mat.h"
 #include "fmpq.h"
+#include "fmpq_poly.h"
 #include "gr.h"
+#include "gr_poly.h"
 
 /* todo: _fmpz methods */
 
@@ -120,6 +122,60 @@ _gr_fmpz_poly_set_other(fmpz_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_c
     {
         fmpz_poly_set_fmpz(res, x);
         return GR_SUCCESS;
+    }
+
+    if (x_ctx->which_ring == GR_CTX_FMPZ_POLY)
+    {
+        fmpz_poly_set(res, x);
+        return GR_SUCCESS;
+    }
+
+    if (x_ctx->which_ring == GR_CTX_FMPQ)
+    {
+        if (fmpz_is_one(fmpq_denref((fmpq *) x)))
+        {
+            fmpz_poly_set_fmpz(res, fmpq_numref((fmpq *) x));
+            return GR_SUCCESS;
+        }
+
+        return GR_DOMAIN;
+    }
+
+    if (x_ctx->which_ring == GR_CTX_FMPQ_POLY)
+    {
+        if (fmpz_is_one(((fmpq_poly_struct *) x)->den))
+        {
+            fmpq_poly_get_numerator(res, x);
+            return GR_SUCCESS;
+        }
+
+        return GR_DOMAIN;
+    }
+
+    if (x_ctx->which_ring == GR_CTX_GR_POLY)
+    {
+        if (POLYNOMIAL_ELEM_CTX(x_ctx)->which_ring == GR_CTX_FMPZ)
+        {
+            fmpz_poly_set(res, x);
+            return GR_SUCCESS;
+        }
+        else
+        {
+            gr_ctx_t ZZ;
+            gr_ctx_init_fmpz(ZZ);  /* no need to free */
+            return gr_poly_set_gr_poly_other((gr_poly_struct *) res, x, POLYNOMIAL_ELEM_CTX(x_ctx), ZZ);
+        }
+    }
+
+    if (x_ctx->which_ring == GR_CTX_GR_VEC)
+    {
+        gr_ctx_t ZZ;
+        gr_poly_t tmp;
+        tmp->coeffs = ((gr_vec_struct *) x)->entries;
+        tmp->length = ((gr_vec_struct *) x)->length;
+
+        gr_ctx_init_fmpz(ZZ);  /* no need to free */
+        return gr_poly_set_gr_poly_other((fmpz_poly_struct *) res, tmp, VECTOR_CTX(x_ctx)->base_ring, ZZ);
     }
 
     return GR_UNABLE;

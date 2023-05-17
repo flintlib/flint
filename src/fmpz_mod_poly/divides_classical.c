@@ -28,16 +28,16 @@ _fmpz_mod_poly_mullow_classical_check(const fmpz * p,
     len1 = FLINT_MIN(len1, n);
 
     if (n == 0)
-	return 1;
+        return 1;
 
     fmpz_init(c);
 
     if (n == 1)
     {
         fmpz_mod_mul(c, poly1 + 0, poly2 + 0, mod);
-
         res = fmpz_equal(p + 0, c);
-    } else
+    }
+    else
     {
         for (i = 0; i < n; i++)
         {
@@ -56,7 +56,6 @@ _fmpz_mod_poly_mullow_classical_check(const fmpz * p,
     }
 
     fmpz_clear(c);
-
     return res;
 }
 
@@ -96,7 +95,7 @@ int fmpz_mod_poly_divides_classical(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
     if (lenB == 0 || lenA < lenB)
     {
         fmpz_mod_poly_zero(Q, ctx);
-	return lenA == 0;
+        return lenA == 0;
     }
 
     if (Q == A || Q == B)

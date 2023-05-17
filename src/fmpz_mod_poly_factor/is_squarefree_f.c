@@ -17,7 +17,7 @@
 #include "fmpz_mod_poly_factor.h"
 
 int
-_fmpz_mod_poly_is_squarefree_f(fmpz_t fac, const fmpz * f, slong len, const fmpz_t p)
+_fmpz_mod_poly_is_squarefree_f(fmpz_t fac, const fmpz * f, slong len, const fmpz_mod_ctx_t ctx)
 {
     fmpz * fd, * g;
     fmpz_t invd;
@@ -30,16 +30,16 @@ _fmpz_mod_poly_is_squarefree_f(fmpz_t fac, const fmpz * f, slong len, const fmpz
     fd = _fmpz_vec_init(2 * (len - 1));
     g = fd + len - 1;
 
-    _fmpz_mod_poly_derivative(fd, f, len, p);
+    _fmpz_mod_poly_derivative(fd, f, len, ctx);
     dlen = len - 1;
     FMPZ_VEC_NORM(fd, dlen);
 
     if (dlen)
     {
         fmpz_init(invd);
-        fmpz_gcdinv(fac, invd, fd + dlen - 1, p);
+        fmpz_gcdinv(fac, invd, fd + dlen - 1, fmpz_mod_ctx_modulus(ctx));
         if (fmpz_is_one(fac))
-           res = (_fmpz_mod_poly_gcd_euclidean_f(fac, g, f, len, fd, dlen, p) == 1);
+           res = (_fmpz_mod_poly_gcd_euclidean_f(fac, g, f, len, fd, dlen, ctx) == 1);
         fmpz_clear(invd);
     }
     /* else gcd(f, 0) = f, and len(f) > 2 */
@@ -51,6 +51,5 @@ _fmpz_mod_poly_is_squarefree_f(fmpz_t fac, const fmpz * f, slong len, const fmpz
 int fmpz_mod_poly_is_squarefree_f(fmpz_t fac, const fmpz_mod_poly_t f,
                                                       const fmpz_mod_ctx_t ctx)
 {
-        return _fmpz_mod_poly_is_squarefree_f(fac, f->coeffs, f->length,
-                                                    fmpz_mod_ctx_modulus(ctx));
+        return _fmpz_mod_poly_is_squarefree_f(fac, f->coeffs, f->length, ctx);
 }

@@ -46,14 +46,13 @@ void fmpz_mod_poly_inv_series_newton_f(fmpz_t f, fmpz_mod_poly_t Qinv,
     if (Qinv != Q)
     {
         fmpz_mod_poly_fit_length(Qinv, n, ctx);
-        _fmpz_mod_poly_inv_series_newton(Qinv->coeffs, Qcopy, n, cinv, p);
+        _fmpz_mod_poly_inv_series_newton(Qinv->coeffs, Qcopy, n, cinv, ctx);
     }
     else
     {
         fmpz *t = _fmpz_vec_init(n);
 
-        _fmpz_mod_poly_inv_series_newton(t, Qcopy, n, cinv, p);
-
+        _fmpz_mod_poly_inv_series_newton(t, Qcopy, n, cinv, ctx);
         _fmpz_vec_clear(Qinv->coeffs, Qinv->alloc);
         Qinv->coeffs = t;
         Qinv->alloc  = n;

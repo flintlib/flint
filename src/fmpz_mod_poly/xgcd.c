@@ -20,7 +20,7 @@
 slong _fmpz_mod_poly_xgcd(fmpz *G, fmpz *S, fmpz *T,
                                    const fmpz *A, slong lenA,
                                    const fmpz *B, slong lenB,
-                                   const fmpz_t invB, const fmpz_t p)
+                                   const fmpz_t invB, const fmpz_mod_ctx_t ctx)
 {
     if (lenB == 1)
     {
@@ -33,7 +33,7 @@ slong _fmpz_mod_poly_xgcd(fmpz *G, fmpz *S, fmpz *T,
     {
         slong lenG;
         gr_ctx_t gr_ctx;
-        gr_ctx_init_fmpz_mod(gr_ctx, p);   /* todo: from ref */
+        _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
                                            /* todo: use invB */
 
         if (FLINT_MIN(lenA, lenB) < FMPZ_MOD_POLY_GCD_CUTOFF)
@@ -41,7 +41,6 @@ slong _fmpz_mod_poly_xgcd(fmpz *G, fmpz *S, fmpz *T,
         else
             GR_MUST_SUCCEED(_gr_poly_xgcd_hgcd(&lenG, G, S, T, A, lenA, B, lenB, FMPZ_MOD_POLY_HGCD_CUTOFF, FMPZ_MOD_POLY_GCD_CUTOFF, gr_ctx));
 
-        gr_ctx_clear(gr_ctx);
         return lenG;
     }
 }
@@ -109,7 +108,7 @@ void fmpz_mod_poly_xgcd(fmpz_mod_poly_t G, fmpz_mod_poly_t S,
 
             fmpz_invmod(inv, fmpz_mod_poly_lead(B, ctx), p);
             lenG = _fmpz_mod_poly_xgcd(g, s, t,
-                                     A->coeffs, lenA, B->coeffs, lenB, inv, p);
+                                     A->coeffs, lenA, B->coeffs, lenB, inv, ctx);
 
             if (G == A || G == B)
             {

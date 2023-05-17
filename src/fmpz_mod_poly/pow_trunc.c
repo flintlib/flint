@@ -18,9 +18,9 @@
 
 void
 _fmpz_mod_poly_pow_trunc(fmpz * res, const fmpz * poly,
-                         ulong e, slong trunc, const fmpz_t p)
+                         ulong e, slong trunc, const fmpz_mod_ctx_t ctx)
 {
-    _fmpz_mod_poly_pow_trunc_binexp(res, poly, e, trunc, p);
+    _fmpz_mod_poly_pow_trunc_binexp(res, poly, e, trunc, ctx);
 }
 
 void
@@ -76,13 +76,13 @@ fmpz_mod_poly_pow_trunc(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
     if (res != poly || qcopy)
     {
         fmpz_mod_poly_fit_length(res, trunc, ctx);
-        _fmpz_mod_poly_pow_trunc(res->coeffs, q, e, trunc, fmpz_mod_ctx_modulus(ctx));
+        _fmpz_mod_poly_pow_trunc(res->coeffs, q, e, trunc, ctx);
     }
     else
     {
         fmpz_mod_poly_t t;
         fmpz_mod_poly_init2(t, trunc, ctx);
-        _fmpz_mod_poly_pow_trunc(t->coeffs, q, e, trunc, fmpz_mod_ctx_modulus(ctx));
+        _fmpz_mod_poly_pow_trunc(t->coeffs, q, e, trunc, ctx);
         fmpz_mod_poly_swap(res, t, ctx);
         fmpz_mod_poly_clear(t, ctx);
     }

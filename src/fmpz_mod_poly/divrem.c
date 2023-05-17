@@ -19,18 +19,17 @@
 
 void _fmpz_mod_poly_divrem(fmpz *Q, fmpz *R,
     const fmpz *A, slong lenA, const fmpz *B, slong lenB,
-    const fmpz_t invB, const fmpz_t p)
+    const fmpz_t invB, const fmpz_mod_ctx_t ctx)
 {
     if (lenB <= 30 || lenA - lenB <= 10)
     {
-        _fmpz_mod_poly_divrem_basecase(Q, R, A, lenA, B, lenB, invB, p);
+        _fmpz_mod_poly_divrem_basecase(Q, R, A, lenA, B, lenB, invB, ctx);
     }
     else
     {
         gr_ctx_t gr_ctx;
-        gr_ctx_init_fmpz_mod(gr_ctx, p);   /* todo: ref from ctx */
-        GR_MUST_SUCCEED(_gr_poly_divrem_newton(Q, R, A, lenA, B, lenB, gr_ctx));  /* todo: pass invB as input */
-        gr_ctx_clear(gr_ctx);
+        _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
+        GR_MUST_SUCCEED(_gr_poly_divrem_newton(Q, R, A, lenA, B, lenB, gr_ctx));
     }
 }
 
@@ -97,8 +96,7 @@ fmpz_mod_poly_divrem(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
         r = R->coeffs;
     }
 
-    _fmpz_mod_poly_divrem(q, r, A->coeffs, lenA,
-                             B->coeffs, lenB, invB, fmpz_mod_ctx_modulus(ctx));
+    _fmpz_mod_poly_divrem(q, r, A->coeffs, lenA, B->coeffs, lenB, invB, ctx);
 
     if (Q == A || Q == B)
     {

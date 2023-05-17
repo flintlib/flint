@@ -12,22 +12,23 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mod.h"
+#include "fmpz_mod_vec.h"
 #include "fmpz_mod_poly.h"
 
 void _fmpz_mod_poly_scalar_div_fmpz(fmpz *res, const fmpz *poly, slong len,
-                                    const fmpz_t x, const fmpz_t p)
+                                    const fmpz_t x, const fmpz_mod_ctx_t ctx)
 {
     fmpz_t g, xinv;
 
     fmpz_init(g);
     fmpz_init(xinv);
 
-    if (fmpz_sgn(x) < 0 || fmpz_cmp(x, p) >= 0)
+    if (fmpz_sgn(x) < 0 || fmpz_cmp(x, fmpz_mod_ctx_modulus(ctx)) >= 0)
     {
-       fmpz_mod(xinv, x, p);
-       fmpz_gcdinv(g, xinv, xinv, p);
+       fmpz_mod(xinv, x, fmpz_mod_ctx_modulus(ctx));
+       fmpz_gcdinv(g, xinv, xinv, fmpz_mod_ctx_modulus(ctx));
     } else
-       fmpz_gcdinv(g, xinv, x, p);
+       fmpz_gcdinv(g, xinv, x, fmpz_mod_ctx_modulus(ctx));
 
     if (!fmpz_is_one(g))
     {
@@ -35,8 +36,7 @@ void _fmpz_mod_poly_scalar_div_fmpz(fmpz *res, const fmpz *poly, slong len,
         flint_abort();
     }
 
-    _fmpz_vec_scalar_mul_fmpz(res, poly, len, xinv);
-    _fmpz_vec_scalar_mod_fmpz(res, res, len, p);
+    _fmpz_mod_vec_scalar_mul_fmpz_mod(res, poly, len, xinv, ctx);
 
     fmpz_clear(xinv);
     fmpz_clear(g);
@@ -61,8 +61,7 @@ void fmpz_mod_poly_scalar_div_fmpz(fmpz_mod_poly_t res,
     }
 
     fmpz_mod_poly_fit_length(res, poly->length, ctx);
-    _fmpz_mod_poly_scalar_div_fmpz(res->coeffs, poly->coeffs, poly->length,
-                                                 x, fmpz_mod_ctx_modulus(ctx));
+    _fmpz_mod_poly_scalar_div_fmpz(res->coeffs, poly->coeffs, poly->length, x, ctx);
 
     _fmpz_mod_poly_set_length(res, poly->length);
     _fmpz_mod_poly_normalise(res);

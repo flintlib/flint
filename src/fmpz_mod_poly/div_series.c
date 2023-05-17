@@ -18,7 +18,7 @@
 
 void
 _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
-    const fmpz * B, slong Blen, const fmpz_t p, slong n)
+    const fmpz * B, slong Blen, slong n, const fmpz_mod_ctx_t ctx)
 {
     fmpz_t u, d;
 
@@ -27,13 +27,13 @@ _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
 
     if (!fmpz_is_one(B + 0))
     {
-       fmpz_gcdinv(d, u, B + 0, p);
+       fmpz_gcdinv(d, u, B + 0, fmpz_mod_ctx_modulus(ctx));
 
        if (!fmpz_is_one(d)) /* check for invertibility */
            flint_throw(FLINT_ERROR, "Impossible inverse in %s\n", __FUNCTION__);
     }
     else
-       fmpz_set_ui(u, 1);
+       fmpz_one(u);
 
     Alen = FLINT_MIN(Alen, n);
     Blen = FLINT_MIN(Blen, n);
@@ -43,7 +43,7 @@ _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
         if (fmpz_is_one(B + 0))
             _fmpz_vec_set(Q, A, Alen);
         else
-           _fmpz_mod_poly_scalar_mul_fmpz(Q, A, Alen, u, p);
+           _fmpz_mod_poly_scalar_mul_fmpz(Q, A, Alen, u, ctx);
 
         _fmpz_vec_zero(Q + Alen, n - Alen);
     }
@@ -55,8 +55,7 @@ _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
             fmpz_set(Q + 0, A + 0);
         else
         {
-           fmpz_mul(Q + 0, u, A + 0);
-           fmpz_mod(Q + 0, Q + 0, p);
+           fmpz_mod_mul(Q + 0, u, A + 0, ctx);
         }
 
         for (i = 1; i < n; i++)
@@ -74,7 +73,7 @@ _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
             if (!fmpz_is_one(B + 0))
                fmpz_mul(Q + i, Q + i, u);
 
-            fmpz_mod(Q + i, Q + i, p);
+            fmpz_mod_set_fmpz(Q + i, Q + i, ctx);
         }
     }
     else
@@ -88,8 +87,8 @@ _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
         } else
            B2 = (fmpz *) B;
 
-        _fmpz_mod_poly_inv_series(Binv, B2, n, u, p);
-        _fmpz_mod_poly_mullow(Q, Binv, n, A, Alen, p, n);
+        _fmpz_mod_poly_inv_series(Binv, B2, n, u, ctx);
+        _fmpz_mod_poly_mullow(Q, Binv, n, A, Alen, n, ctx);
 
         _fmpz_vec_clear(Binv, n);
         if (n > Blen)
@@ -120,7 +119,7 @@ void fmpz_mod_poly_div_series(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
         fmpz_mod_poly_t t;
         fmpz_mod_poly_init2(t, n, ctx);
         _fmpz_mod_poly_div_series(t->coeffs, A->coeffs, Alen,
-                                B->coeffs, Blen, fmpz_mod_ctx_modulus(ctx), n);
+                                B->coeffs, Blen, n, ctx);
         fmpz_mod_poly_swap(Q, t, ctx);
         fmpz_mod_poly_clear(t, ctx);
     }
@@ -128,7 +127,7 @@ void fmpz_mod_poly_div_series(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
     {
         fmpz_mod_poly_fit_length(Q, n, ctx);
         _fmpz_mod_poly_div_series(Q->coeffs, A->coeffs, Alen,
-                                B->coeffs, Blen, fmpz_mod_ctx_modulus(ctx), n);
+                                B->coeffs, Blen, n, ctx);
     }
 
     _fmpz_mod_poly_set_length(Q, n);

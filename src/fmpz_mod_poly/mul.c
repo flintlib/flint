@@ -14,13 +14,14 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpz_mod.h"
+#include "fmpz_mod_vec.h"
 #include "fmpz_mod_poly.h"
 
 void _fmpz_mod_poly_mul(fmpz *res, const fmpz *poly1, slong len1,
-                                   const fmpz *poly2, slong len2, const fmpz_t p)
+                                   const fmpz *poly2, slong len2, const fmpz_mod_ctx_t ctx)
 {
     _fmpz_poly_mul(res, poly1, len1, poly2, len2);
-    _fmpz_vec_scalar_mod_fmpz(res, res, len1 + len2 - 1, p);
+    _fmpz_mod_vec_set_fmpz_vec(res, res, len1 + len2 - 1, ctx);
 }
 
 void fmpz_mod_poly_mul(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
@@ -41,11 +42,9 @@ void fmpz_mod_poly_mul(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
         fmpz *t = _fmpz_vec_init(lenr);
 
         if (len1 >= len2)
-            _fmpz_mod_poly_mul(t, poly1->coeffs, len1,
-                               poly2->coeffs, len2, fmpz_mod_ctx_modulus(ctx));
+            _fmpz_mod_poly_mul(t, poly1->coeffs, len1, poly2->coeffs, len2, ctx);
         else
-            _fmpz_mod_poly_mul(t, poly2->coeffs, len2,
-                               poly1->coeffs, len1, fmpz_mod_ctx_modulus(ctx));
+            _fmpz_mod_poly_mul(t, poly2->coeffs, len2, poly1->coeffs, len1, ctx);
 
         _fmpz_vec_clear(res->coeffs, res->alloc);
         res->alloc  = lenr;
@@ -57,11 +56,9 @@ void fmpz_mod_poly_mul(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
         fmpz_mod_poly_fit_length(res, lenr, ctx);
 
         if (len1 >= len2)
-            _fmpz_mod_poly_mul(res->coeffs, poly1->coeffs, len1,
-                               poly2->coeffs, len2, fmpz_mod_ctx_modulus(ctx));
+            _fmpz_mod_poly_mul(res->coeffs, poly1->coeffs, len1, poly2->coeffs, len2, ctx);
         else
-            _fmpz_mod_poly_mul(res->coeffs, poly2->coeffs, len2,
-                               poly1->coeffs, len1, fmpz_mod_ctx_modulus(ctx));
+            _fmpz_mod_poly_mul(res->coeffs, poly2->coeffs, len2, poly1->coeffs, len1, ctx);
 
         _fmpz_mod_poly_set_length(res, lenr);
     }

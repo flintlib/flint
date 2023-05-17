@@ -17,14 +17,13 @@
 slong _fmpz_mod_poly_hgcd(fmpz **M, slong *lenM,
                      fmpz *A, slong *lenA, fmpz *B, slong *lenB,
                      const fmpz *a, slong lena, const fmpz *b, slong lenb,
-                     const fmpz_t mod)
+                     const fmpz_mod_ctx_t ctx)
 {
     slong sgnM;
-    gr_ctx_t ctx;
+    gr_ctx_t gr_ctx;
 
-    gr_ctx_init_fmpz_mod(ctx, mod);
-    GR_MUST_SUCCEED(_gr_poly_hgcd(NULL, &sgnM, (gr_ptr *) M, lenM, A, lenA, B, lenB, a, lena, b, lenb, FMPZ_MOD_POLY_HGCD_CUTOFF, ctx));
-    gr_ctx_clear(ctx);
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_hgcd(NULL, &sgnM, (gr_ptr *) M, lenM, A, lenA, B, lenB, a, lena, b, lenb, FMPZ_MOD_POLY_HGCD_CUTOFF, gr_ctx));
 
     return sgnM;
 }

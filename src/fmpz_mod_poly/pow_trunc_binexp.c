@@ -18,7 +18,7 @@
 
 void
 _fmpz_mod_poly_pow_trunc_binexp(fmpz * res, const fmpz * poly,
-                                ulong e, slong trunc, const fmpz_t p)
+                                ulong e, slong trunc, const fmpz_mod_ctx_t ctx)
 {
     ulong bit = ~((~UWORD(0)) >> 1);
     fmpz * v = _fmpz_vec_init(trunc);
@@ -63,10 +63,10 @@ _fmpz_mod_poly_pow_trunc_binexp(fmpz * res, const fmpz * poly,
        We unroll the first step of the loop, referring to {poly, len}
      */
 
-    _fmpz_mod_poly_mullow(R, poly, trunc, poly, trunc, p, trunc);
+    _fmpz_mod_poly_mullow(R, poly, trunc, poly, trunc, trunc, ctx);
     if ((bit & e))
     {
-        _fmpz_mod_poly_mullow(S, R, trunc, poly, trunc, p, trunc);
+        _fmpz_mod_poly_mullow(S, R, trunc, poly, trunc, trunc, ctx);
         T = R;
         R = S;
         S = T;
@@ -76,12 +76,12 @@ _fmpz_mod_poly_pow_trunc_binexp(fmpz * res, const fmpz * poly,
     {
         if ((bit & e))
         {
-            _fmpz_mod_poly_mullow(S, R, trunc, R, trunc, p, trunc);
-            _fmpz_mod_poly_mullow(R, S, trunc, poly, trunc, p, trunc);
+            _fmpz_mod_poly_mullow(S, R, trunc, R, trunc, trunc, ctx);
+            _fmpz_mod_poly_mullow(R, S, trunc, poly, trunc, trunc, ctx);
         }
         else
         {
-            _fmpz_mod_poly_mullow(S, R, trunc, R, trunc, p, trunc);
+            _fmpz_mod_poly_mullow(S, R, trunc, R, trunc, trunc, ctx);
             T = R;
             R = S;
             S = T;
@@ -141,15 +141,13 @@ fmpz_mod_poly_pow_trunc_binexp(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
     if (res != poly || qcopy)
     {
         fmpz_mod_poly_fit_length(res, trunc, ctx);
-        _fmpz_mod_poly_pow_trunc_binexp(res->coeffs, q, e, trunc,
-                                                    fmpz_mod_ctx_modulus(ctx));
+        _fmpz_mod_poly_pow_trunc_binexp(res->coeffs, q, e, trunc, ctx);
     }
     else
     {
         fmpz_mod_poly_t t;
         fmpz_mod_poly_init2(t, trunc, ctx);
-        _fmpz_mod_poly_pow_trunc_binexp(t->coeffs, q, e, trunc,
-                                                    fmpz_mod_ctx_modulus(ctx));
+        _fmpz_mod_poly_pow_trunc_binexp(t->coeffs, q, e, trunc, ctx);
         fmpz_mod_poly_swap(res, t, ctx);
         fmpz_mod_poly_clear(t, ctx);
     }

@@ -15,6 +15,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "fmpz_mod_vec.h"
 #include "fmpz_mod_poly.h"
 #include "fq.h"
 
@@ -55,7 +56,7 @@ fq_gcdinv(fq_t rop, fq_t inv, const fq_t op, const fq_ctx_t ctx)
 
     lenG = _fmpz_mod_poly_gcdinv_f(f, g, s, op->coeffs, op->length,
                                  ctx->modulus->coeffs, ctx->modulus->length,
-                                 fq_ctx_prime(ctx));
+                                 ctx->ctxp);
     if (rop == op)
     {
         _fmpz_vec_clear(rop->coeffs, rop->alloc);
@@ -88,10 +89,9 @@ fq_gcdinv(fq_t rop, fq_t inv, const fq_t op, const fq_ctx_t ctx)
         fq_zero(rop, ctx);
         goto cleanup;
     }
-    _fmpz_mod_poly_scalar_mul_fmpz(rop->coeffs, rop->coeffs, rop->length,
-                                   f, fq_ctx_prime(ctx));
-    _fmpz_mod_poly_scalar_mul_fmpz(inv->coeffs, inv->coeffs, inv->length,
-                                   f, fq_ctx_prime(ctx));
+
+    _fmpz_mod_vec_scalar_mul_fmpz_mod(rop->coeffs, rop->coeffs, rop->length, f, ctx->ctxp);
+    _fmpz_mod_vec_scalar_mul_fmpz_mod(inv->coeffs, inv->coeffs, inv->length, f, ctx->ctxp);
 cleanup:
 
     fmpz_clear(f);

@@ -83,6 +83,12 @@ int main(void)
 
         fq_default_poly_set(a, b, ctx);
         fq_default_poly_scalar_addmul_fq_default(a, c, t, ctx);
+        fq_default_poly_scalar_mul_fq_default(d, c, t, ctx);
+        fq_default_poly_add(d, d, b, ctx);
+        FLINT_TEST(fq_default_poly_equal(a, d, ctx));
+
+        fq_default_poly_set(a, b, ctx);
+        fq_default_poly_scalar_addmul_fq_default(a, c, t, ctx);
         fq_default_poly_scalar_submul_fq_default(a, c, t, ctx);
         FLINT_TEST(fq_default_poly_equal(a, b, ctx));
 

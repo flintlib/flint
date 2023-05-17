@@ -13,12 +13,13 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mod.h"
+#include "fmpz_mod_vec.h"
 #include "fmpz_mod_poly.h"
 
 slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
                                    const fmpz *A, slong lenA,
                                    const fmpz *B, slong lenB,
-                                   const fmpz_t invA, const fmpz_t p)
+                                   const fmpz_t invA, const fmpz_mod_ctx_t ctx)
 {
 	_fmpz_vec_zero(G, lenA);
     _fmpz_vec_zero(S, lenB - 1);
@@ -39,7 +40,7 @@ slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
         FMPZ_VEC_TMP_INIT(Q, 2*lenB);
         R = Q + lenB;
 
-        _fmpz_mod_poly_divrem(Q, R, B, lenB, A, lenA, invA, p);
+        _fmpz_mod_poly_divrem(Q, R, B, lenB, A, lenA, invA, ctx);
         lenR = lenA - 1;
         FMPZ_VEC_NORM(R, lenR);
 
@@ -47,33 +48,25 @@ slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
         {
             _fmpz_vec_set(G, A, lenA);
             fmpz_one(S + 0);
-
             FMPZ_VEC_TMP_CLEAR(Q, 2*lenB);
-
 			TMP_END;
-
             return lenA;
-        } else if (lenR == 1)
+        }
+        else if (lenR == 1)
 		{
 			lenQ = lenB - lenA + 1;
 			FMPZ_VEC_NORM(Q, lenQ);
 
 			_fmpz_vec_swap(G, R, lenR);
             _fmpz_vec_swap(S, Q, lenQ);
-		    _fmpz_vec_neg(S, S, lenQ);
-
-            for (i = 0; i < lenQ; i++)
-            {
-                if (fmpz_sgn(S + i) < 0)
-                    fmpz_add(S + i, S + i, p);
-            }
+		    _fmpz_mod_vec_neg(S, S, lenQ, ctx);
 
             FMPZ_VEC_TMP_CLEAR(Q, 2*lenB);
-
 			TMP_END;
 
 			return 1;
-		} else
+		}
+        else
         {
             fmpz_t inv;
             fmpz *D, *U1, *U2, *V3, *W;
@@ -93,14 +86,14 @@ slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
 			lenU1 = 1;
             _fmpz_vec_set(D, A, lenA);
             lenD = lenA;
-            _fmpz_vec_neg(U2, Q, lenQ);
+            _fmpz_mod_vec_neg(U2, Q, lenQ, ctx);
             lenU2 = lenQ;
             lenV3 = 0;
             FMPZ_VEC_SWAP(V3, lenV3, R, lenR);
 
             do {
-                fmpz_invmod(inv, V3 + (lenV3 - 1), p);
-                _fmpz_mod_poly_divrem_basecase(Q, D, D, lenD, V3, lenV3, inv, p);
+                fmpz_invmod(inv, V3 + (lenV3 - 1), fmpz_mod_ctx_modulus(ctx));
+                _fmpz_mod_poly_divrem_basecase(Q, D, D, lenD, V3, lenV3, inv, ctx);
                 lenQ = lenD - lenV3 + 1;
                 lenD = lenV3 - 1;
                 FMPZ_VEC_NORM(D, lenD);
@@ -108,12 +101,12 @@ slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
                 if (lenV3 != 0)
 				{
 				    if (lenU2 >= lenQ)
-                        _fmpz_mod_poly_mul(W, U2, lenU2, Q, lenQ, p);
+                        _fmpz_mod_poly_mul(W, U2, lenU2, Q, lenQ, ctx);
                     else
-                        _fmpz_mod_poly_mul(W, Q, lenQ, U2, lenU2, p);
+                        _fmpz_mod_poly_mul(W, Q, lenQ, U2, lenU2, ctx);
                     lenW = lenQ + lenU2 - 1;
 
-                    _fmpz_mod_poly_sub(U1, U1, lenU1, W, lenW, p);
+                    _fmpz_mod_poly_sub(U1, U1, lenU1, W, lenW, ctx);
                     lenU1 = FLINT_MAX(lenU1, lenW);
                     FMPZ_VEC_NORM(U1, lenU1);
                 }
@@ -128,7 +121,7 @@ slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S,
             for (i = 0; i < lenU1; i++)
             {
                 if (fmpz_sgn(S + i) < 0)
-                    fmpz_add(S + i, S + i, p);
+                    fmpz_add(S + i, S + i, fmpz_mod_ctx_modulus(ctx));
             }
 
             FMPZ_VEC_TMP_CLEAR(W, 3*lenB + 2*lenA);
@@ -198,7 +191,7 @@ void fmpz_mod_poly_gcdinv_euclidean(fmpz_mod_poly_t G, fmpz_mod_poly_t S,
 
         fmpz_invmod(inv, fmpz_mod_poly_lead(A, ctx), fmpz_mod_ctx_modulus(ctx));
         lenG = _fmpz_mod_poly_gcdinv_euclidean(g, s, A->coeffs, lenA,
-                              B->coeffs, lenB, inv, fmpz_mod_ctx_modulus(ctx));
+                              B->coeffs, lenB, inv, ctx);
 
         if (G == A || G == B)
         {

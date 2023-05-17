@@ -17,7 +17,7 @@
 
 int _fmpz_mod_poly_invmod_f(fmpz_t f, fmpz *A,
                           const fmpz *B, slong lenB,
-                          const fmpz *P, slong lenP, const fmpz_t p)
+                          const fmpz *P, slong lenP, const fmpz_mod_ctx_t ctx)
 {
     fmpz *G;
     slong lenG;
@@ -26,15 +26,15 @@ int _fmpz_mod_poly_invmod_f(fmpz_t f, fmpz *A,
 
     G = _fmpz_vec_init(lenB);
 
-    lenG = _fmpz_mod_poly_gcdinv_f(f, G, A, B, lenB, P, lenP, p);
+    lenG = _fmpz_mod_poly_gcdinv_f(f, G, A, B, lenB, P, lenP, ctx);
 
     if (fmpz_is_one(f) && lenG == 1 && !fmpz_is_one(G + 0))
     {
         fmpz_t invG;
 
         fmpz_init(invG);
-        fmpz_gcdinv(f, invG, G + 0, p);
-        _fmpz_mod_poly_scalar_mul_fmpz(A, A, lenP - 1, invG, p);
+        fmpz_gcdinv(f, invG, G + 0, fmpz_mod_ctx_modulus(ctx));
+        _fmpz_mod_poly_scalar_mul_fmpz(A, A, lenP - 1, invG, ctx);
         fmpz_clear(invG);
     }
 
@@ -83,8 +83,7 @@ int fmpz_mod_poly_invmod_f(fmpz_t f, fmpz_mod_poly_t A,
         t = _fmpz_vec_init(lenP);
     }
 
-    ans = _fmpz_mod_poly_invmod_f(f, t, B->coeffs, lenB,
-                                   P->coeffs, lenP, fmpz_mod_ctx_modulus(ctx));
+    ans = _fmpz_mod_poly_invmod_f(f, t, B->coeffs, lenB, P->coeffs, lenP, ctx);
 
     if (A == B || A == P)
     {

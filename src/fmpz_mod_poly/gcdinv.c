@@ -17,25 +17,23 @@
 
 slong _fmpz_mod_poly_gcdinv(fmpz *G, fmpz *S,
                            const fmpz *A, slong lenA, const fmpz *B, slong lenB,
-                           const fmpz_t p)
+                           const fmpz_mod_ctx_t ctx)
 {
     fmpz *T;
     fmpz_t inv;
     slong ans;
 
     fmpz_init(inv);
-    fmpz_invmod(inv, A + (lenA - 1), p);
+    fmpz_invmod(inv, A + (lenA - 1), fmpz_mod_ctx_modulus(ctx));
 
     if (lenB < 16)
 	{
 	    ans = _fmpz_mod_poly_gcdinv_euclidean(G, S,
-		                                   A, lenA, B, lenB, inv, p);
+		                                   A, lenA, B, lenB, inv, ctx);
 	} else
 	{
 	    T = _fmpz_vec_init(lenA - 1);
-
-	    ans = _fmpz_mod_poly_xgcd(G, T, S, B, lenB, A, lenA, inv, p);
-
+	    ans = _fmpz_mod_poly_xgcd(G, T, S, B, lenB, A, lenA, inv, ctx);
 		_fmpz_vec_clear(T, lenA - 1);
     }
 
@@ -96,7 +94,7 @@ void fmpz_mod_poly_gcdinv(fmpz_mod_poly_t G, fmpz_mod_poly_t S,
             s = S->coeffs;
         }
 
-        lenG = _fmpz_mod_poly_gcdinv(g, s, A->coeffs, lenA, B->coeffs, lenB, p);
+        lenG = _fmpz_mod_poly_gcdinv(g, s, A->coeffs, lenA, B->coeffs, lenB, ctx);
 
         if (G == A || G == B)
         {

@@ -11,8 +11,35 @@
 
 #include "nmod_mat.h"
 #include "fmpz_poly.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
+
+static int __fmpz_mod_poly_invmod(fmpz *A,
+                          const fmpz *B, slong lenB,
+                          const fmpz *P, slong lenP, const fmpz_t p)
+{
+    fmpz * t, * u;
+    fmpz_mod_ctx_t mod;
+    int res;
+
+    t = _fmpz_vec_init(lenB);
+    u = _fmpz_vec_init(lenP);
+
+    fmpz_mod_ctx_init(mod, p);
+
+    _fmpz_vec_scalar_mod_fmpz(t, B, lenB, p);
+    _fmpz_vec_scalar_mod_fmpz(u, P, lenP, p);
+
+    res = _fmpz_mod_poly_invmod(A, t, lenB, u, lenP, mod);
+
+    fmpz_mod_ctx_clear(mod);
+
+    _fmpz_vec_clear(t, lenB);
+    _fmpz_vec_clear(u, lenP);
+
+    return res;
+}
 
 /*
     FILE DOCUMENTATION.
@@ -318,7 +345,8 @@ _fmpz_mod_poly_sqrtmod_p(fmpz *rop, const fmpz *op, slong len,
 
                 fmpz_powm(f, two, g, p);
 
-                _fmpz_mod_poly_scalar_mul_fmpz(rop, w, d, f, p);
+                _fmpz_vec_scalar_mul_fmpz(rop, w, d, f);
+                _fmpz_vec_scalar_mod_fmpz(rop, rop, d, p);
             }
             _fmpz_vec_zero(rop + d, d - 1);
             ans = 1;
@@ -549,7 +577,7 @@ _qadic_sqrt_p(fmpz *rop, const fmpz *op, slong len,
             /* Dense copy of f, used for inversion */
             for (k = 0; k < lena; k++)
                 fmpz_set(f + j[k], a + k);
-            _fmpz_mod_poly_invmod(rop, t, d, f, d + 1, p);
+            __fmpz_mod_poly_invmod(rop, t, d, f, d + 1, p);
         }
         for (i--; i >= 1; i--)  /* z := z - z (a z^2 - 1) / 2 */
         {

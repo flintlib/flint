@@ -12,6 +12,37 @@
 #include "fmpz_mod_poly.h"
 #include "padic_poly.h"
 
+static void _fmpz_mod_poly_evaluate_fmpz_horner(fmpz_t res, const fmpz *poly, slong len,
+                                  const fmpz_t a, const fmpz_t p)
+{
+    if (len == 0)
+    {
+        fmpz_zero(res);
+    }
+    else if (len == 1 || fmpz_is_zero(a))
+    {
+        fmpz_set(res, poly);
+    }
+    else
+    {
+        slong i = len - 1;
+        fmpz_t t;
+
+        fmpz_init(t);
+        fmpz_set(res, poly + i);
+        for (i = len - 2; i >= 0; i--)
+        {
+            fmpz_mul(t, res, a);
+            fmpz_mod(t, t, p);
+            fmpz_add(res, poly + i, t);
+        }
+        fmpz_clear(t);
+
+        if (fmpz_cmpabs(res, p) >= 0)
+            fmpz_sub(res, res, p);
+    }
+}
+
 /*
     TODO:  Move this bit of code into "padic".
  */
@@ -93,7 +124,7 @@ void _padic_poly_evaluate_padic(fmpz_t u, slong *v, slong N,
             fmpz_pow_ui(x, ctx->p, b);
             fmpz_mul(x, x, a);
 
-            _fmpz_mod_poly_evaluate_fmpz(u, poly, len, x, pow);
+            _fmpz_mod_poly_evaluate_fmpz_horner(u, poly, len, x, pow);
             if (!fmpz_is_zero(u))
                 *v = val + _fmpz_remove(u, ctx->p, ctx->pinv);
             else
@@ -135,7 +166,7 @@ void _padic_poly_evaluate_padic(fmpz_t u, slong *v, slong N,
                 fmpz_mul(vec + i, poly + i, t);
             }
 
-            _fmpz_mod_poly_evaluate_fmpz(u, vec, len, a, pow);
+            _fmpz_mod_poly_evaluate_fmpz_horner(u, vec, len, a, pow);
             if (!fmpz_is_zero(u))
                 *v = val + n*b + _fmpz_remove(u, ctx->p, ctx->pinv);
             else

@@ -15,16 +15,16 @@
 
 void
 _fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys, const fmpz * coeffs, slong len,
-    const fmpz * xs, slong n, const fmpz_t mod)
+    const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx)
 {
     slong i;
     for (i = 0; i < n; i++)
-        _fmpz_mod_poly_evaluate_fmpz(ys + i, coeffs, len, xs + i, mod);
+        _fmpz_mod_poly_evaluate_fmpz(ys + i, coeffs, len, xs + i, ctx);
 }
 
 void fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys, const fmpz_mod_poly_t poly,
                            const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx)
 {
     _fmpz_mod_poly_evaluate_fmpz_vec_iter(ys, poly->coeffs,
-                               poly->length, xs, n, fmpz_mod_ctx_modulus(ctx));
+                               poly->length, xs, n, ctx);
 }

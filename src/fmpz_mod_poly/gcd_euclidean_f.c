@@ -17,7 +17,7 @@
 
 slong _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz *G,
                                     const fmpz *A, slong lenA,
-                                    const fmpz *B, slong lenB, const fmpz_t p)
+                                    const fmpz *B, slong lenB, const fmpz_mod_ctx_t ctx)
 {
     slong lenG = 0;
 
@@ -25,7 +25,7 @@ slong _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz *G,
     {
         fmpz_t invB;
         fmpz_init(invB);
-        fmpz_gcdinv(f, invB, B, p);
+        fmpz_gcdinv(f, invB, B, fmpz_mod_ctx_modulus(ctx));
         if (fmpz_is_one(f))
         {
             fmpz_one(G);
@@ -48,7 +48,7 @@ slong _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz *G,
         R2 = R1 + lenA;
         R3 = R2 + lenB;
 
-        _fmpz_mod_poly_divrem_f(f, Q, R1, A, lenA, B, lenB, p);
+        _fmpz_mod_poly_divrem_f(f, Q, R1, A, lenA, B, lenB, ctx);
         if (!fmpz_is_one(f))
             goto exit;
 
@@ -74,11 +74,11 @@ slong _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz *G,
 
             do
             {
-                fmpz_gcdinv(f, inv, R3 + (lenR3 - 1), p);
+                fmpz_gcdinv(f, inv, R3 + (lenR3 - 1), fmpz_mod_ctx_modulus(ctx));
                 if (!fmpz_is_one(f))
                     goto cleanup;
 
-                _fmpz_mod_poly_divrem_basecase(Q, R2, R2, lenR2, R3, lenR3, inv, p);
+                _fmpz_mod_poly_divrem_basecase(Q, R2, R2, lenR2, R3, lenR3, inv, ctx);
 
                 lenR2 = lenR3 - 1;
                 FMPZ_VEC_NORM(R2, lenR2);
@@ -144,7 +144,7 @@ void fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
             }
 
             lenG = _fmpz_mod_poly_gcd_euclidean_f(f, g, A->coeffs, lenA,
-                                   B->coeffs, lenB, fmpz_mod_ctx_modulus(ctx));
+                                   B->coeffs, lenB, ctx);
 
             if (fmpz_is_one(f))
             {

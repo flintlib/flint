@@ -80,7 +80,7 @@ void fmpz_mod_poly_set_coeff_fmpz(fmpz_mod_poly_t poly, slong n, const fmpz_t x,
             poly->length = n + 1;
         }
 
-        fmpz_mod(poly->coeffs + n, x, fmpz_mod_ctx_modulus(ctx));
+        fmpz_mod_set_fmpz(poly->coeffs + n, x, ctx);
     }
 
     if (n == poly->length - 1)

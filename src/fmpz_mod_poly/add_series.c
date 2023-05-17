@@ -29,7 +29,7 @@ void fmpz_mod_poly_add_series(fmpz_mod_poly_t res,
     fmpz_mod_poly_fit_length(res, max, ctx);
 
     _fmpz_mod_poly_add(res->coeffs, poly1->coeffs, len1,
-                              poly2->coeffs, len2, fmpz_mod_ctx_modulus(ctx));
+                              poly2->coeffs, len2, ctx);
 
     _fmpz_mod_poly_set_length(res, max);
     _fmpz_mod_poly_normalise(res);

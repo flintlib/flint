@@ -19,7 +19,7 @@
 
 void _fmpz_mod_poly_div_newton_n_preinv (fmpz* Q, const fmpz* A, slong lenA,
                                    const fmpz* B, slong lenB, const fmpz* Binv,
-                                   slong lenBinv, const fmpz_t mod)
+                                   slong lenBinv, const fmpz_mod_ctx_t ctx)
 {
     const slong lenQ = lenA - lenB + 1;
     fmpz * Arev;
@@ -27,10 +27,7 @@ void _fmpz_mod_poly_div_newton_n_preinv (fmpz* Q, const fmpz* A, slong lenA,
     Arev = _fmpz_vec_init(lenQ);
 
     _fmpz_poly_reverse(Arev, A + (lenA - lenQ), lenQ, lenQ);
-
-    _fmpz_mod_poly_mullow(Q, Arev, lenQ, Binv, FLINT_MIN(lenQ, lenBinv), mod,
-                          lenQ);
-
+    _fmpz_mod_poly_mullow(Q, Arev, lenQ, Binv, FLINT_MIN(lenQ, lenBinv), lenQ, ctx);
     _fmpz_poly_reverse(Q, Q, lenQ, lenQ);
 
     _fmpz_vec_clear(Arev, lenQ);
@@ -82,7 +79,7 @@ void fmpz_mod_poly_div_newton_n_preinv(fmpz_mod_poly_t Q,
     }
 
     _fmpz_mod_poly_div_newton_n_preinv (q, A->coeffs, lenA, B->coeffs, lenB,
-                             Binv->coeffs, lenBinv, fmpz_mod_ctx_modulus(ctx));
+                             Binv->coeffs, lenBinv, ctx);
 
     if (Q == A || Q == B || Q == Binv)
     {

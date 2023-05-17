@@ -18,7 +18,7 @@
 /* todo: change signature; use gr_poly */
 void
 _fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n,
-                                 const fmpz_t cinv, const fmpz_t p)
+                                 const fmpz_t cinv, const fmpz_mod_ctx_t ctx)
 {
     if (n == 1)  /* {Q,1} * cinv == 1 mod (x) */
     {
@@ -41,15 +41,12 @@ _fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n,
 
         /* Base case */
         {
-            fmpz_mod_ctx_t fctx;
             fmpz *Qrev = W + 2 * FMPZ_MOD_POLY_INV_NEWTON_CUTOFF;
 
             _fmpz_poly_reverse(Qrev, Q, n, n);
             _fmpz_vec_zero(W, 2*n - 2);
             fmpz_one(W + (2*n - 2));
-            fmpz_mod_ctx_init(fctx, p);
-            _fmpz_mod_poly_div(Qinv, W, 2*n - 1, Qrev, n, cinv, fctx);
-            fmpz_mod_ctx_clear(fctx);
+            _fmpz_mod_poly_div(Qinv, W, 2*n - 1, Qrev, n, cinv, ctx);
             _fmpz_poly_reverse(Qinv, Qinv, n, n);
         }
 
@@ -58,9 +55,9 @@ _fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n,
             m = n;
             n = a[i];
 
-            _fmpz_mod_poly_mullow(W, Q, n, Qinv, m, p, n);
-            _fmpz_mod_poly_mullow(Qinv + m, Qinv, m, W + m, n - m, p, n - m);
-            _fmpz_mod_poly_neg(Qinv + m, Qinv + m, n - m, p);
+            _fmpz_mod_poly_mullow(W, Q, n, Qinv, m, n, ctx);
+            _fmpz_mod_poly_mullow(Qinv + m, Qinv, m, W + m, n - m, n - m, ctx);
+            _fmpz_mod_poly_neg(Qinv + m, Qinv + m, n - m, ctx);
         }
 
         _fmpz_vec_clear(W, alloc);
@@ -97,13 +94,13 @@ void fmpz_mod_poly_inv_series_newton(fmpz_mod_poly_t Qinv,
     if (Qinv != Q)
     {
         fmpz_mod_poly_fit_length(Qinv, n, ctx);
-        _fmpz_mod_poly_inv_series_newton(Qinv->coeffs, Qcopy, n, cinv, p);
+        _fmpz_mod_poly_inv_series_newton(Qinv->coeffs, Qcopy, n, cinv, ctx);
     }
     else
     {
         fmpz *t = _fmpz_vec_init(n);
 
-        _fmpz_mod_poly_inv_series_newton(t, Qcopy, n, cinv, p);
+        _fmpz_mod_poly_inv_series_newton(t, Qcopy, n, cinv, ctx);
 
         _fmpz_vec_clear(Qinv->coeffs, Qinv->alloc);
         Qinv->coeffs = t;

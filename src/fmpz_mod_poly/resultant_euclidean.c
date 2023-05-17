@@ -18,7 +18,7 @@
 
 void
 _fmpz_mod_poly_resultant_euclidean(fmpz_t res, const fmpz *poly1, slong len1,
-                               const fmpz *poly2, slong len2, const fmpz_t mod)
+                               const fmpz *poly2, slong len2, const fmpz_mod_ctx_t ctx)
 {
     if (poly1 == poly2)
     {
@@ -36,7 +36,7 @@ _fmpz_mod_poly_resultant_euclidean(fmpz_t res, const fmpz *poly1, slong len1,
         }
         else
         {
-            fmpz_powm_ui(res, poly2 + 0, len1 - 1, mod);
+            fmpz_mod_pow_ui(res, poly2 + 0, len1 - 1, ctx);
         }
     }
     else  /* len1 >= len2 >= 2 */
@@ -68,8 +68,8 @@ _fmpz_mod_poly_resultant_euclidean(fmpz_t res, const fmpz *poly1, slong len1,
             l1 = l2;
             fmpz_set(lc, v + l1 - 1);
 
-            fmpz_invmod(invB, v + l1 - 1, mod);
-            _fmpz_mod_poly_rem(r, u, l0, v, l1, invB, mod);
+            fmpz_mod_inv(invB, v + l1 - 1, ctx);
+            _fmpz_mod_poly_rem(r, u, l0, v, l1, invB, ctx);
             l2 = l1 - 1;
             FMPZ_VEC_NORM(r, l2);
             {
@@ -81,22 +81,20 @@ _fmpz_mod_poly_resultant_euclidean(fmpz_t res, const fmpz *poly1, slong len1,
 
             if (l2 >= 1)
             {
-                fmpz_powm_ui(lc, lc, l0 - l2, mod);
-                fmpz_mul(res, res, lc);
-                fmpz_mod(res, res, mod);
+                fmpz_mod_pow_ui(lc, lc, l0 - l2, ctx);
+                fmpz_mod_mul(res, res, lc, ctx);
 
                 if (((l0 | l1) & 1) == 0)
                 {
-                    fmpz_negmod(res, res, mod);
+                    fmpz_mod_neg(res, res, ctx);
                 }
             }
             else
             {
                 if (l1 == 1)
                 {
-                    fmpz_powm_ui(lc, lc, l0 - 1, mod);
-                    fmpz_mul(res, res, lc);
-                    fmpz_mod(res, res, mod);
+                    fmpz_mod_pow_ui(lc, lc, l0 - 1, ctx);
+                    fmpz_mod_mul(res, res, lc, ctx);
                 }
                 else
                 {
@@ -130,12 +128,12 @@ void fmpz_mod_poly_resultant_euclidean(fmpz_t r, const fmpz_mod_poly_t f,
         if (len1 >= len2)
         {
             _fmpz_mod_poly_resultant_euclidean(r, f->coeffs, len1,
-                                   g->coeffs, len2, fmpz_mod_ctx_modulus(ctx));
+                                   g->coeffs, len2, ctx);
         }
         else
         {
             _fmpz_mod_poly_resultant_euclidean(r, g->coeffs, len2,
-                                   f->coeffs, len1, fmpz_mod_ctx_modulus(ctx));
+                                   f->coeffs, len1, ctx);
 
             if (((len1 | len2) & WORD(1)) == WORD(0))
                 fmpz_mod_neg(r, r, ctx);

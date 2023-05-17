@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2011, 2021 William Hart
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011, 2023 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -14,57 +14,15 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod_vec.h"
 #include "fmpz_mod_poly.h"
+#include "gr.h"
+#include "gr_poly.h"
 
-static void
-__fmpz_mod_poly_invsqrt_series_prealloc(fmpz * g,
-                                    const fmpz * h, fmpz * t, fmpz * u,
-                                    slong n, const fmpz_mod_ctx_t mod)
-{
-    const int alloc = (t == NULL);
-    const slong m   = (n + 1) / 2;
-    fmpz_t c;
-
-    if (n == 1)
-    {
-        fmpz_set_ui(g + 0, 1);
-        return;
-    }
-
-    if (alloc)
-    {
-        t = _fmpz_vec_init(n);
-        u = _fmpz_vec_init(n);
-    }
-
-    fmpz_init(c);
-
-    __fmpz_mod_poly_invsqrt_series_prealloc(g, h, t, u, m, mod);
-
-    _fmpz_vec_zero(g + m, n - m);
-
-    _fmpz_mod_poly_mul(t, g, m, g, m, mod->n);
-    if (2*m - 1 < n)
-        fmpz_zero(t + n - 1);
-
-    _fmpz_mod_poly_mullow(u, t, n, g, n, mod->n, n);
-    _fmpz_mod_poly_mullow(t, u, n, h, n, mod->n, n);
-
-    fmpz_sub_ui(c, mod->n, 1);
-    fmpz_fdiv_q_2exp(c, c, 1);
-    _fmpz_mod_vec_scalar_mul_fmpz_mod(g + m, t + m, n - m, c, mod);
-
-    if (alloc)
-    {
-        _fmpz_vec_clear(t, n);
-        _fmpz_vec_clear(u, n);
-    }
-
-    fmpz_clear(c);
-}
-
+/* todo: change signature */
 void _fmpz_mod_poly_invsqrt_series(fmpz * g, const fmpz * h, slong n, fmpz_mod_ctx_t mod)
 {
-    __fmpz_mod_poly_invsqrt_series_prealloc(g, h, NULL, NULL, n, mod);
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, mod);
+    GR_MUST_SUCCEED(_gr_poly_rsqrt_series(g, h, n, n, gr_ctx));
 }
 
 void fmpz_mod_poly_invsqrt_series(fmpz_mod_poly_t g, const fmpz_mod_poly_t h, slong n, fmpz_mod_ctx_t ctx)

@@ -16,16 +16,16 @@
 
 void _fmpz_mod_poly_divrem_f(fmpz_t f, fmpz *Q, fmpz *R,
                              const fmpz *A, slong lenA,
-                             const fmpz *B, slong lenB, const fmpz_t p)
+                             const fmpz *B, slong lenB, const fmpz_mod_ctx_t ctx)
 {
     fmpz_t invB;
 
     fmpz_init(invB);
-    fmpz_gcdinv(f, invB, B + lenB - 1, p);
+    fmpz_gcdinv(f, invB, B + lenB - 1, fmpz_mod_ctx_modulus(ctx));
 
     if (fmpz_is_one(f))
     {
-        _fmpz_mod_poly_divrem(Q, R, A, lenA, B, lenB, invB, p);
+        _fmpz_mod_poly_divrem(Q, R, A, lenA, B, lenB, invB, ctx);
     }
 
     fmpz_clear(invB);
@@ -86,8 +86,7 @@ void fmpz_mod_poly_divrem_f(fmpz_t f, fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
         r = R->coeffs;
     }
 
-    _fmpz_mod_poly_divrem(q, r, A->coeffs, lenA,
-                             B->coeffs, lenB, invB, fmpz_mod_ctx_modulus(ctx));
+    _fmpz_mod_poly_divrem(q, r, A->coeffs, lenA, B->coeffs, lenB, invB, ctx);
 
     if (Q == A || Q == B)
     {

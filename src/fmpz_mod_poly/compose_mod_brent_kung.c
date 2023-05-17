@@ -15,16 +15,17 @@
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
 #include "fmpz_mod.h"
+#include "fmpz_mod_vec.h"
 #include "fmpz_mod_poly.h"
 
 void
 _fmpz_mod_poly_compose_mod_brent_kung(fmpz * res, const fmpz * poly1, slong len1,
                               const fmpz * poly2, const fmpz * poly3, slong len3,
-                                                                    const fmpz_t p)
+                                                                    const fmpz_mod_ctx_t ctx)
 {
     fmpz_mat_t A, B, C;
     fmpz * t, * h, * tmp;
-    slong i, j, n, m;
+    slong i, n, m;
 
     n = len3 - 1;
 
@@ -39,7 +40,7 @@ _fmpz_mod_poly_compose_mod_brent_kung(fmpz * res, const fmpz * poly1, slong len1
 
     if (len3 == 2)
     {
-        _fmpz_mod_poly_evaluate_fmpz(res, poly1, len1, poly2, p);
+        _fmpz_mod_poly_evaluate_fmpz(res, poly1, len1, poly2, ctx);
         return;
     }
 
@@ -64,24 +65,23 @@ _fmpz_mod_poly_compose_mod_brent_kung(fmpz * res, const fmpz * poly1, slong len1
     tmp = _fmpz_vec_init(2 * n - 1);
     for (i = 2; i < m; i++)
     {
-        _fmpz_mod_poly_mulmod(tmp, A->rows[i - 1], n, poly2, n, poly3, len3, p);
+        _fmpz_mod_poly_mulmod(tmp, A->rows[i - 1], n, poly2, n, poly3, len3, ctx);
         _fmpz_vec_set(A->rows[i], tmp, n);
     }
     _fmpz_vec_clear(tmp, 2 * n - 1);
 
     fmpz_mat_mul(C, B, A);
     for (i = 0; i < m; i++)
-        for (j = 0; j < n; j++)
-            fmpz_mod(C->rows[i] + j, C->rows[i] + j, p);
+        _fmpz_mod_vec_set_fmpz_vec(C->rows[i], C->rows[i], n, ctx);
 
     /* Evaluate block composition using the Horner scheme */
     _fmpz_vec_set(res, C->rows[m - 1], n);
-    _fmpz_mod_poly_mulmod(h, A->rows[m - 1], n, poly2, n, poly3, len3, p);
+    _fmpz_mod_poly_mulmod(h, A->rows[m - 1], n, poly2, n, poly3, len3, ctx);
 
     for (i = m - 2; i >= 0; i--)
     {
-        _fmpz_mod_poly_mulmod(t, res, n, h, n, poly3, len3, p);
-        _fmpz_mod_poly_add(res, t, n, C->rows[i], n, p);
+        _fmpz_mod_poly_mulmod(t, res, n, h, n, poly3, len3, ctx);
+        _fmpz_mod_poly_add(res, t, n, C->rows[i], n, ctx);
     }
 
     _fmpz_vec_clear(h, 2 * n - 1);
@@ -153,13 +153,13 @@ void fmpz_mod_poly_compose_mod_brent_kung(fmpz_mod_poly_t res,
         fmpz_init(inv3);
         fmpz_invmod(inv3, poly3->coeffs + len, fmpz_mod_ctx_modulus(ctx));
         _fmpz_mod_poly_rem(ptr2, poly2->coeffs, len2,
-                         poly3->coeffs, len3, inv3, fmpz_mod_ctx_modulus(ctx));
+                         poly3->coeffs, len3, inv3, ctx);
         fmpz_clear(inv3);
     }
 
     fmpz_mod_poly_fit_length(res, len, ctx);
     _fmpz_mod_poly_compose_mod_brent_kung(res->coeffs, poly1->coeffs, len1,
-                         ptr2, poly3->coeffs, len3, fmpz_mod_ctx_modulus(ctx));
+                         ptr2, poly3->coeffs, len3, ctx);
     _fmpz_mod_poly_set_length(res, len);
     _fmpz_mod_poly_normalise(res);
 

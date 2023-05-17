@@ -90,4 +90,3 @@ void fmpz_mod_poly_gcd(fmpz_mod_poly_t G, const fmpz_mod_poly_t A,
         }
     }
 }
-

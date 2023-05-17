@@ -24,7 +24,7 @@
 void
 _fmpz_mod_poly_powers_mod_preinv_naive(fmpz ** res, const fmpz * f,
                           slong flen, slong n, const fmpz * g, slong glen,
-                              const fmpz * ginv, slong ginvlen, const fmpz_t p)
+                              const fmpz * ginv, slong ginvlen, const fmpz_mod_ctx_t ctx)
 {
     slong i;
 
@@ -57,14 +57,13 @@ _fmpz_mod_poly_powers_mod_preinv_naive(fmpz ** res, const fmpz * f,
     {
         for (i = 2; i < n; i++)
         {
-             fmpz_mul(res[i] + 0, res[i - 1] + 0, res[1] + 0);
-             fmpz_mod(res[i] + 0, res[i] + 0, p);
+             fmpz_mod_mul(res[i] + 0, res[i - 1] + 0, res[1] + 0, ctx);
         }
     } else
     {
         for (i = 2; i < n; i++)
             _fmpz_mod_poly_mulmod_preinv(res[i], res[i - 1], glen - 1, res[1],
-                                        glen - 1, g, glen, ginv, ginvlen, p);
+                                        glen - 1, g, glen, ginv, ginvlen, ctx);
     }
 }
 
@@ -125,8 +124,7 @@ fmpz_mod_poly_powers_mod_naive(fmpz_mod_poly_struct * res,
     fmpz_mod_poly_inv_series(ginv, ginv, fmpz_mod_poly_length(g, ctx), ctx);
 
     _fmpz_mod_poly_powers_mod_preinv_naive(res_arr, f->coeffs, f->length, n,
-                             g->coeffs, g->length, ginv->coeffs, ginv->length,
-                                                    fmpz_mod_ctx_modulus(ctx));
+                             g->coeffs, g->length, ginv->coeffs, ginv->length, ctx);
 
     for (i = 0; i < n; i++)
        _fmpz_mod_poly_normalise(res + i);

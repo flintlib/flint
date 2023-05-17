@@ -21,7 +21,7 @@
 void
 _fmpz_mod_poly_powmod_ui_binexp_preinv(fmpz * res, const fmpz * poly,
                                ulong e, const fmpz * f, slong lenf,
-                               const fmpz * finv, slong lenfinv, const fmpz_t p)
+                               const fmpz * finv, slong lenfinv, const fmpz_mod_ctx_t ctx)
 {
     fmpz * T, * Q;
     slong lenT, lenQ;
@@ -29,7 +29,7 @@ _fmpz_mod_poly_powmod_ui_binexp_preinv(fmpz * res, const fmpz * poly,
 
     if (lenf == 2)
     {
-        fmpz_powm_ui(res, poly, e, p);
+        fmpz_mod_pow_ui(res, poly, e, ctx);
         return;
     }
 
@@ -43,15 +43,13 @@ _fmpz_mod_poly_powmod_ui_binexp_preinv(fmpz * res, const fmpz * poly,
 
     for (i = ((int) FLINT_BIT_COUNT(e) - 2); i >= 0; i--)
     {
-        _fmpz_mod_poly_sqr(T, res, lenf - 1, p);
-        _fmpz_mod_poly_divrem_newton_n_preinv(Q, res, T, 2 * lenf - 3, f, lenf,
-                                              finv, lenfinv, p);
+        _fmpz_mod_poly_sqr(T, res, lenf - 1, ctx);
+        _fmpz_mod_poly_divrem_newton_n_preinv(Q, res, T, 2 * lenf - 3, f, lenf, finv, lenfinv, ctx);
 
         if (e & (UWORD (1) << i))
         {
-            _fmpz_mod_poly_mul(T, res, lenf - 1, poly, lenf - 1, p);
-            _fmpz_mod_poly_divrem_newton_n_preinv(Q, res, T, 2 * lenf - 3, f,
-                                                  lenf, finv, lenfinv, p);
+            _fmpz_mod_poly_mul(T, res, lenf - 1, poly, lenf - 1, ctx);
+            _fmpz_mod_poly_divrem_newton_n_preinv(Q, res, T, 2 * lenf - 3, f, lenf, finv, lenfinv, ctx);
         }
     }
 
@@ -138,7 +136,7 @@ fmpz_mod_poly_powmod_ui_binexp_preinv(fmpz_mod_poly_t res,
         fmpz_mod_poly_t t;
         fmpz_mod_poly_init2(t, 2*lenf - 3, ctx);
         _fmpz_mod_poly_powmod_ui_binexp_preinv(t->coeffs, q, e, f->coeffs,
-                  lenf, finv->coeffs, finv->length, fmpz_mod_ctx_modulus(ctx));
+                  lenf, finv->coeffs, finv->length, ctx);
         fmpz_mod_poly_swap(res, t, ctx);
         fmpz_mod_poly_clear(t, ctx);
     }
@@ -146,7 +144,7 @@ fmpz_mod_poly_powmod_ui_binexp_preinv(fmpz_mod_poly_t res,
     {
         fmpz_mod_poly_fit_length(res, 2*lenf - 3, ctx);
         _fmpz_mod_poly_powmod_ui_binexp_preinv(res->coeffs, q, e, f->coeffs,
-                  lenf, finv->coeffs, finv->length, fmpz_mod_ctx_modulus(ctx));
+                  lenf, finv->coeffs, finv->length, ctx);
     }
 
     if (qcopy)

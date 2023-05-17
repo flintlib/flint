@@ -102,7 +102,7 @@ _fmpz_mod_poly_sqrt(fmpz * s, const fmpz * p, slong len, fmpz_mod_ctx_t mod)
     for (i = 0; i < slen; i++)
         fmpz_zero(t + i);
 
-    _fmpz_vec_scalar_mod_fmpz(t + slen, t + slen, slen - 1, mod->n);
+    _fmpz_mod_vec_set_fmpz_vec(t + slen, t + slen, slen - 1, mod);
 
     result = _fmpz_vec_equal(t + slen, p + slen, len - slen);
 

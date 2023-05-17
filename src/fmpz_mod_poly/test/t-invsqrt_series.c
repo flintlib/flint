@@ -32,39 +32,42 @@ main(void)
 
         fmpz_mod_ctx_init_rand_bits_prime(ctx, state, FLINT_BITS);
 
-        fmpz_mod_poly_init(h, ctx);
-        fmpz_mod_poly_init(g, ctx);
-        fmpz_mod_poly_init(r, ctx);
-
-        do fmpz_mod_poly_randtest(h, state, n_randint(state, 1000), ctx);
-        while (h->length == 0);
-        fmpz_mod_poly_set_coeff_ui(h, 0, 1, ctx);
-
-        m = n_randint(state, h->length) + 1;
-
-        fmpz_mod_poly_invsqrt_series(g, h, m, ctx);
-
-        fmpz_mod_poly_mullow(r, g, g, m, ctx);
-        fmpz_mod_poly_inv_series(r, r, m, ctx);
-        fmpz_mod_poly_truncate(h, m, ctx);
-
-        result = (fmpz_cmp_ui(ctx->n, 2) == 0) || (fmpz_mod_poly_equal(r, h, ctx));
-        if (!result)
+        if (!fmpz_equal_ui(fmpz_mod_ctx_modulus(ctx), 2))
         {
-            flint_printf("FAIL:\n");
-            fmpz_mod_poly_print(h, ctx), flint_printf("\n\n");
-            fmpz_mod_poly_print(g, ctx), flint_printf("\n\n");
-            fmpz_mod_poly_print(r, ctx), flint_printf("\n\n");
-            flint_printf("n = ");
-            fmpz_print(ctx->n);
-            flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            fmpz_mod_poly_init(h, ctx);
+            fmpz_mod_poly_init(g, ctx);
+            fmpz_mod_poly_init(r, ctx);
 
-        fmpz_mod_poly_clear(h, ctx);
-        fmpz_mod_poly_clear(g, ctx);
-        fmpz_mod_poly_clear(r, ctx);
+            do fmpz_mod_poly_randtest(h, state, n_randint(state, 1000), ctx);
+            while (h->length == 0);
+            fmpz_mod_poly_set_coeff_ui(h, 0, 1, ctx);
+
+            m = n_randint(state, h->length) + 1;
+
+            fmpz_mod_poly_invsqrt_series(g, h, m, ctx);
+
+            fmpz_mod_poly_mullow(r, g, g, m, ctx);
+            fmpz_mod_poly_inv_series(r, r, m, ctx);
+            fmpz_mod_poly_truncate(h, m, ctx);
+
+            result = (fmpz_cmp_ui(ctx->n, 2) == 0) || (fmpz_mod_poly_equal(r, h, ctx));
+            if (!result)
+            {
+                flint_printf("FAIL:\n");
+                fmpz_mod_poly_print(h, ctx), flint_printf("\n\n");
+                fmpz_mod_poly_print(g, ctx), flint_printf("\n\n");
+                fmpz_mod_poly_print(r, ctx), flint_printf("\n\n");
+                flint_printf("n = ");
+                fmpz_print(ctx->n);
+                flint_printf("\n");
+                fflush(stdout);
+                flint_abort();
+            }
+
+            fmpz_mod_poly_clear(h, ctx);
+            fmpz_mod_poly_clear(g, ctx);
+            fmpz_mod_poly_clear(r, ctx);
+        }
 
         fmpz_mod_ctx_clear(ctx);
     }
@@ -78,35 +81,38 @@ main(void)
 
         fmpz_mod_ctx_init_rand_bits_prime(ctx, state, FLINT_BITS);
 
-        fmpz_mod_poly_init(h, ctx);
-        fmpz_mod_poly_init(g, ctx);
-
-        do fmpz_mod_poly_randtest(h, state, n_randint(state, 500), ctx);
-        while (h->length == 0);
-
-        fmpz_mod_poly_set_coeff_ui(h, 0, 1, ctx);
-
-        m = n_randint(state, h->length) + 1;
-
-        fmpz_mod_poly_invsqrt_series(g, h, m, ctx);
-        fmpz_mod_poly_invsqrt_series(h, h, m, ctx);
-
-        result = (fmpz_cmp_ui(ctx->n, 2) == 0) || fmpz_mod_poly_equal(g, h, ctx);
-        if (!result)
+        if (!fmpz_equal_ui(fmpz_mod_ctx_modulus(ctx), 2))
         {
-            flint_printf("FAIL:\n");
-            fmpz_mod_poly_print(h, ctx), flint_printf("\n\n");
-            fmpz_mod_poly_print(g, ctx), flint_printf("\n\n");
-            flint_printf("n = ");
-            fmpz_print(ctx->n);
-            flint_printf("\n");
-            flint_printf("m = %wd\n", m);
-            fflush(stdout);
-            flint_abort();
-        }
+            fmpz_mod_poly_init(h, ctx);
+            fmpz_mod_poly_init(g, ctx);
 
-        fmpz_mod_poly_clear(g, ctx);
-        fmpz_mod_poly_clear(h, ctx);
+            do fmpz_mod_poly_randtest(h, state, n_randint(state, 500), ctx);
+            while (h->length == 0);
+
+            fmpz_mod_poly_set_coeff_ui(h, 0, 1, ctx);
+
+            m = n_randint(state, h->length) + 1;
+
+            fmpz_mod_poly_invsqrt_series(g, h, m, ctx);
+            fmpz_mod_poly_invsqrt_series(h, h, m, ctx);
+
+            result = (fmpz_cmp_ui(ctx->n, 2) == 0) || fmpz_mod_poly_equal(g, h, ctx);
+            if (!result)
+            {
+                flint_printf("FAIL:\n");
+                fmpz_mod_poly_print(h, ctx), flint_printf("\n\n");
+                fmpz_mod_poly_print(g, ctx), flint_printf("\n\n");
+                flint_printf("n = ");
+                fmpz_print(ctx->n);
+                flint_printf("\n");
+                flint_printf("m = %wd\n", m);
+                fflush(stdout);
+                flint_abort();
+            }
+
+            fmpz_mod_poly_clear(g, ctx);
+            fmpz_mod_poly_clear(h, ctx);
+        }
 
         fmpz_mod_ctx_clear(ctx);
     }

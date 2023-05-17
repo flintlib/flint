@@ -30,9 +30,7 @@ void fmpz_mod_poly_make_monic_f(fmpz_t f, fmpz_mod_poly_t res,
 
     fmpz_mod_poly_fit_length(res, len, ctx);
     _fmpz_mod_poly_set_length(res, len);
-
-    _fmpz_mod_poly_scalar_mul_fmpz(res->coeffs, poly->coeffs, len,
-                                               inv, fmpz_mod_ctx_modulus(ctx));
+    _fmpz_mod_poly_scalar_mul_fmpz(res->coeffs, poly->coeffs, len, inv, ctx);
 
     fmpz_clear(inv);
 }
