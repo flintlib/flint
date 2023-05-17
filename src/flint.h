@@ -87,10 +87,10 @@ extern "C" {
 
 /* flint version number */
 
-#define __FLINT_VERSION 2
-#define __FLINT_VERSION_MINOR 10
+#define __FLINT_VERSION 3
+#define __FLINT_VERSION_MINOR 0
 #define __FLINT_VERSION_PATCHLEVEL 0
-#define FLINT_VERSION "2.10.0"
+#define FLINT_VERSION "3.0.0-dev"
 #define __FLINT_RELEASE (__FLINT_VERSION * 10000 + \
                          __FLINT_VERSION_MINOR * 100 + \
                          __FLINT_VERSION_PATCHLEVEL)
