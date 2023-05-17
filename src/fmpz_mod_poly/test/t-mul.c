@@ -105,7 +105,18 @@ main(void)
         fmpz_t p;
 
         fmpz_init(p);
-        fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);
+
+        if (n_randint(state, 100) == 0)
+        {
+            flint_set_num_threads(2 + n_randint(state, 3));
+            fmpz_randtest_unsigned(p, state, 40000);
+        }
+        else
+        {
+            flint_set_num_threads(1);
+            fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);
+        }
+
         fmpz_add_ui(p, p, 2);
         fmpz_mod_ctx_set_modulus(ctx, p);
 
