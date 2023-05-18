@@ -30,7 +30,7 @@ acb_rising_get_mag2_right(mag_t bound, const arb_t a, const arb_t b, ulong n)
 
     for (k = 1; k < n; k++)
     {
-        mag_add_ui_2exp_si(u, u, 2 * k - 1, 0);
+        mag_add_ui(u, u, 2 * k - 1);
         mag_add(u, u, t);
         mag_mul(bound, bound, u);
     }
