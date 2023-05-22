@@ -208,7 +208,7 @@ if(cxx_thread_local IN_LIST CMAKE_CXX_COMPILE_FEATURES)
 endif()
 
 # Memory manager configuration
-set(MEMORY_MANAGER "reentrant" CACHE STRING "The FLINT memory manager.")
+set(MEMORY_MANAGER "single" CACHE STRING "The FLINT memory manager.")
 set_property(CACHE MEMORY_MANAGER PROPERTY STRINGS single reentrant gc)
 message(STATUS "Using FLINT memory manager: ${MEMORY_MANAGER}")
 
