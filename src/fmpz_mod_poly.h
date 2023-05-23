@@ -633,13 +633,13 @@ int fmpz_mod_poly_invmod_f(fmpz_t f, fmpz_mod_poly_t A,
 /* Square root ***************************************************************/
 
 void _fmpz_mod_poly_invsqrt_series(fmpz * g,
-                                  const fmpz * h, slong n, fmpz_mod_ctx_t mod);
+                                  const fmpz * h, slong hlen, slong n, fmpz_mod_ctx_t mod);
 
 void fmpz_mod_poly_invsqrt_series(fmpz_mod_poly_t g,
                          const fmpz_mod_poly_t h, slong n, fmpz_mod_ctx_t ctx);
 
 void _fmpz_mod_poly_sqrt_series(fmpz * g,
-                                  const fmpz * h, slong n, fmpz_mod_ctx_t mod);
+                                  const fmpz * h, slong hlen, slong n, fmpz_mod_ctx_t mod);
 
 void fmpz_mod_poly_sqrt_series(fmpz_mod_poly_t g,
                          const fmpz_mod_poly_t h, slong n, fmpz_mod_ctx_t ctx);

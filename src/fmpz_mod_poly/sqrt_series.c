@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2011, 2021 William Hart
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011, 2023 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -11,71 +11,50 @@
 */
 
 #include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
+#include "gr.h"
+#include "gr_poly.h"
 
-/* todo: change signature; use gr */
-void
-_fmpz_mod_poly_sqrt_series(fmpz * g, const fmpz * h, slong n, fmpz_mod_ctx_t mod)
+void _fmpz_mod_poly_sqrt_series(fmpz * g, const fmpz * h, slong hlen, slong n, fmpz_mod_ctx_t mod)
 {
-    fmpz * t = _fmpz_vec_init(n);
-    _fmpz_mod_poly_invsqrt_series(t, h, n, mod);
-    _fmpz_mod_poly_mullow(g, t, n, h, n, n, mod);
-    _fmpz_vec_clear(t, n);
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, mod);
+    GR_MUST_SUCCEED(_gr_poly_sqrt_series(g, h, hlen, n, gr_ctx));
 }
 
-void
-fmpz_mod_poly_sqrt_series(fmpz_mod_poly_t g, const fmpz_mod_poly_t h, slong n, fmpz_mod_ctx_t ctx)
+void fmpz_mod_poly_sqrt_series(fmpz_mod_poly_t g, const fmpz_mod_poly_t h, slong n, fmpz_mod_ctx_t ctx)
 {
-    fmpz * g_coeffs, * h_coeffs;
-    fmpz_mod_poly_t t1;
-    slong hlen;
+    const slong hlen = h->length;
 
-    hlen = h->length;
-
-    if (n == 0)
+    if (n == 0 || h->length == 0)
     {
-        flint_printf("Exception (fmpz_mod_poly_sqrt_series). Division by zero.\n");
+        fmpz_mod_poly_zero(g, ctx);
+        return;
+    }
+
+    if (!fmpz_is_one(h->coeffs + 0))
+    {
+        flint_printf("Exception (fmpz_mod_poly_sqrt_series). Constant term != 1.\n");
         flint_abort();
     }
 
-    if (h->length == 0 || !fmpz_is_one(h->coeffs + 0))
-    {
-        flint_printf("Exception (fmpz_mod_poly_sqrt_series). Requires constant term 1.\n");
-        flint_abort();
-    }
+    if (hlen == 1)
+        n = 1;
 
-    if (hlen < n)
+    if (g == h)
     {
-        h_coeffs = _fmpz_vec_init(n);
-        _fmpz_vec_set(h_coeffs, h->coeffs, hlen);
-    }
-    else
-        h_coeffs = h->coeffs;
-
-    if (h == g && hlen >= n)
-    {
-        fmpz_mod_poly_init2(t1, n, ctx);
-        g_coeffs = t1->coeffs;
+        fmpz_mod_poly_t t;
+        fmpz_mod_poly_init2(t, n, ctx);
+        _fmpz_mod_poly_sqrt_series(t->coeffs, h->coeffs, hlen, n, ctx);
+        _fmpz_mod_poly_set_length(t, n);
+        _fmpz_mod_poly_normalise(t);
+        fmpz_mod_poly_swap(g, t, ctx);
     }
     else
     {
-        fmpz_mod_poly_fit_length(g, n, ctx);
-        g_coeffs = g->coeffs;
+        _fmpz_mod_poly_fit_length(g, n);
+        _fmpz_mod_poly_sqrt_series(g->coeffs, h->coeffs, hlen, n, ctx);
+        _fmpz_mod_poly_set_length(g, n);
+        _fmpz_mod_poly_normalise(g);
     }
-
-    _fmpz_mod_poly_sqrt_series(g_coeffs, h_coeffs, n, ctx);
-
-    if (h == g && hlen >= n)
-    {
-        fmpz_mod_poly_swap(g, t1, ctx);
-        fmpz_mod_poly_clear(t1, ctx);
-    }
-
-    g->length = n;
-
-    if (hlen < n)
-        _fmpz_vec_clear(h_coeffs, n);
-
-    _fmpz_mod_poly_normalise(g);
 }
