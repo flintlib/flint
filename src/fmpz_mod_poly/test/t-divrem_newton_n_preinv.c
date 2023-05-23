@@ -69,7 +69,7 @@ main(void)
         }
 
         fmpz_mod_poly_reverse (binv, b, b->length, ctx);
-        fmpz_mod_poly_inv_series_newton (binv, binv, b->length, ctx);
+        fmpz_mod_poly_inv_series (binv, binv, b->length, ctx);
 
         fmpz_mod_poly_divrem_newton_n_preinv (q, r, a, b, binv, ctx);
         fmpz_mod_poly_mul(t, q, b, ctx);
@@ -154,7 +154,7 @@ main(void)
         }
 
         fmpz_mod_poly_reverse (binv, b, b->length, ctx);
-        fmpz_mod_poly_inv_series_newton (binv, binv, b->length, ctx);
+        fmpz_mod_poly_inv_series (binv, binv, b->length, ctx);
 
         fmpz_mod_poly_divrem_newton_n_preinv(q, r, a, b, binv, ctx);
         fmpz_mod_poly_divrem_newton_n_preinv(a, b, a, b, binv, ctx);
@@ -218,7 +218,7 @@ main(void)
         }
 
         fmpz_mod_poly_reverse (binv, b, b->length, ctx);
-        fmpz_mod_poly_inv_series_newton (binv, binv, b->length, ctx);
+        fmpz_mod_poly_inv_series (binv, binv, b->length, ctx);
 
         fmpz_mod_poly_divrem_newton_n_preinv(q, r, a, b, binv, ctx);
         fmpz_mod_poly_divrem_newton_n_preinv(b, a, a, b, binv, ctx);
@@ -282,7 +282,7 @@ main(void)
         }
 
         fmpz_mod_poly_reverse (binv, b, b->length, ctx);
-        fmpz_mod_poly_inv_series_newton (binv, binv, b->length, ctx);
+        fmpz_mod_poly_inv_series (binv, binv, b->length, ctx);
 
         fmpz_mod_poly_divrem_newton_n_preinv(q, r, a, b, binv, ctx);
         fmpz_mod_poly_divrem_newton_n_preinv(binv, a, a, b, binv, ctx);
@@ -347,7 +347,7 @@ main(void)
         }
 
         fmpz_mod_poly_reverse (binv, b, b->length, ctx);
-        fmpz_mod_poly_inv_series_newton (binv, binv, b->length, ctx);
+        fmpz_mod_poly_inv_series (binv, binv, b->length, ctx);
 
         fmpz_mod_poly_divrem_newton_n_preinv(q, r, a, b, binv, ctx);
         fmpz_mod_poly_divrem_newton_n_preinv(binv, b, a, b, binv, ctx);
@@ -412,7 +412,7 @@ main(void)
         }
 
         fmpz_mod_poly_reverse (binv, b, b->length, ctx);
-        fmpz_mod_poly_inv_series_newton (binv, binv, b->length, ctx);
+        fmpz_mod_poly_inv_series (binv, binv, b->length, ctx);
 
         fmpz_mod_poly_divrem_newton_n_preinv(q, r, a, b, binv, ctx);
         fmpz_mod_poly_divrem_newton_n_preinv(a, binv, a, b, binv, ctx);
@@ -477,7 +477,7 @@ main(void)
         }
 
         fmpz_mod_poly_reverse (binv, b, b->length, ctx);
-        fmpz_mod_poly_inv_series_newton (binv, binv, b->length, ctx);
+        fmpz_mod_poly_inv_series (binv, binv, b->length, ctx);
 
         fmpz_mod_poly_divrem_newton_n_preinv(q, r, a, b, binv, ctx);
         fmpz_mod_poly_divrem_newton_n_preinv(b, binv, a, b, binv, ctx);

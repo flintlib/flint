@@ -15,14 +15,14 @@
 #include "gr.h"
 #include "gr_poly.h"
 
-void _fmpz_mod_poly_invsqrt_series(fmpz * g, const fmpz * h, slong hlen, slong n, fmpz_mod_ctx_t mod)
+void _fmpz_mod_poly_invsqrt_series(fmpz * g, const fmpz * h, slong hlen, slong n, const fmpz_mod_ctx_t mod)
 {
     gr_ctx_t gr_ctx;
     _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, mod);
     GR_MUST_SUCCEED(_gr_poly_rsqrt_series(g, h, hlen, n, gr_ctx));
 }
 
-void fmpz_mod_poly_invsqrt_series(fmpz_mod_poly_t g, const fmpz_mod_poly_t h, slong n, fmpz_mod_ctx_t ctx)
+void fmpz_mod_poly_invsqrt_series(fmpz_mod_poly_t g, const fmpz_mod_poly_t h, slong n, const fmpz_mod_ctx_t ctx)
 {
     const slong hlen = h->length;
 

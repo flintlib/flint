@@ -44,7 +44,13 @@ void _fmpz_mod_poly_radix_init(fmpz **Rpow, fmpz **Rinv,
             W[j] = Rpow[i][lenQ - j];
         }
 
-        _fmpz_mod_poly_inv_series_newton(Rinv[i], W, lenQ, invLP, ctx);
+/*
+        TODO: _fmpz_mod_poly_inv_series no longer accepts a precomputed
+              inverse leading coefficient; add back a version that does this.
+
+        _fmpz_mod_poly_inv_series(Rinv[i], W, lenQ, invLP, ctx);
+*/
+        _fmpz_mod_poly_inv_series(Rinv[i], W, lenQ, lenQ, ctx);
 
         /* invLP := inv{lead{R^{2^i}}} */
         if (i != k - 1)

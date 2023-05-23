@@ -69,7 +69,7 @@ void fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_mod_poly_t modulus,
     /* Precompute the inverse of the modulus */
     fmpz_mod_poly_init(ctx->inv, ctx->ctxp);
     fmpz_mod_poly_reverse(ctx->inv, ctx->modulus, ctx->modulus->length, ctx->ctxp);
-    fmpz_mod_poly_inv_series_newton(ctx->inv, ctx->inv, ctx->modulus->length, ctx->ctxp);
+    fmpz_mod_poly_inv_series(ctx->inv, ctx->inv, ctx->modulus->length, ctx->ctxp);
 
     ctx->is_conway = 0;
 }

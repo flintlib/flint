@@ -71,7 +71,7 @@ int fmpz_mod_poly_is_irreducible_ddf(const fmpz_mod_poly_t poly,
     fmpz_mod_poly_make_monic(v, poly, ctx);
 
     fmpz_mod_poly_reverse(vinv, v, v->length, ctx);
-    fmpz_mod_poly_inv_series_newton(vinv, vinv, v->length, ctx);
+    fmpz_mod_poly_inv_series(vinv, vinv, v->length, ctx);
     /* compute baby steps: h[i]=x^{p^i}mod v */
     fmpz_mod_poly_set_coeff_ui(h[0], 1, 1, ctx);
     fmpz_mod_poly_powmod_x_fmpz_preinv(h[1], p, v, vinv, ctx);

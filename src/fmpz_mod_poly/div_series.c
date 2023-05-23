@@ -15,6 +15,8 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
+#include "gr.h"
+#include "gr_poly.h"
 
 void
 _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
@@ -66,33 +68,21 @@ _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
                 fmpz_addmul(Q + i, B + j, Q + i - j);
 
             if (i < Alen)
-               fmpz_sub(Q + i, A + i, Q + i);
+                fmpz_sub(Q + i, A + i, Q + i);
             else
-               fmpz_neg(Q + i, Q + i);
+                fmpz_neg(Q + i, Q + i);
 
             if (!fmpz_is_one(B + 0))
-               fmpz_mul(Q + i, Q + i, u);
+                fmpz_mul(Q + i, Q + i, u);
 
             fmpz_mod_set_fmpz(Q + i, Q + i, ctx);
         }
     }
     else
     {
-        fmpz * B2, * Binv = _fmpz_vec_init(n);
-
-        if (n > Blen)
-        {
-           B2 = _fmpz_vec_init(n);
-           _fmpz_vec_set(B2, B, Blen);
-        } else
-           B2 = (fmpz *) B;
-
-        _fmpz_mod_poly_inv_series(Binv, B2, n, u, ctx);
-        _fmpz_mod_poly_mullow(Q, Binv, n, A, Alen, n, ctx);
-
-        _fmpz_vec_clear(Binv, n);
-        if (n > Blen)
-           _fmpz_vec_clear(B2, n);
+        gr_ctx_t gr_ctx;
+        _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
+        GR_MUST_SUCCEED(_gr_poly_div_series(Q, A, Alen, B, Blen, n, gr_ctx));
     }
 
     fmpz_clear(d);

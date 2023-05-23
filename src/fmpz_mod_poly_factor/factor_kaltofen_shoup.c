@@ -47,7 +47,7 @@ fmpz_mod_poly_factor_kaltofen_shoup(fmpz_mod_poly_factor_t res,
         fmpz_mod_poly_struct * f = SF->poly + i;
 
         fmpz_mod_poly_reverse(t, f, f->length, ctx);
-        fmpz_mod_poly_inv_series_newton(t, t, f->length, ctx);
+        fmpz_mod_poly_inv_series(t, t, f->length, ctx);
         fmpz_mod_poly_powmod_x_fmpz_preinv(DDxp, fmpz_mod_ctx_modulus(ctx), f, t, ctx);
 
         /*

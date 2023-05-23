@@ -14,7 +14,7 @@
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 
-void fmpz_mod_poly_inv_series_newton_f(fmpz_t f, fmpz_mod_poly_t Qinv,
+void fmpz_mod_poly_inv_series_f(fmpz_t f, fmpz_mod_poly_t Qinv,
                     const fmpz_mod_poly_t Q, slong n, const fmpz_mod_ctx_t ctx)
 {
     const fmpz *p = fmpz_mod_ctx_modulus(ctx);
@@ -46,13 +46,21 @@ void fmpz_mod_poly_inv_series_newton_f(fmpz_t f, fmpz_mod_poly_t Qinv,
     if (Qinv != Q)
     {
         fmpz_mod_poly_fit_length(Qinv, n, ctx);
-        _fmpz_mod_poly_inv_series_newton(Qinv->coeffs, Qcopy, n, cinv, ctx);
+
+/*
+        TODO: _fmpz_mod_poly_inv_series no longer accepts a precomputed
+              inverse leading coefficient; add back a version that does this.
+*/
+        /* _fmpz_mod_poly_inv_series(Qinv->coeffs, Qcopy, n, cinv, ctx); */
+        _fmpz_mod_poly_inv_series(Qinv->coeffs, Qcopy, n, n, ctx);
     }
     else
     {
         fmpz *t = _fmpz_vec_init(n);
 
-        _fmpz_mod_poly_inv_series_newton(t, Qcopy, n, cinv, ctx);
+        /* _fmpz_mod_poly_inv_series(t, Qcopy, n, cinv, ctx); */
+
+        _fmpz_mod_poly_inv_series(Qinv->coeffs, Qcopy, n, n, ctx);
         _fmpz_vec_clear(Qinv->coeffs, Qinv->alloc);
         Qinv->coeffs = t;
         Qinv->alloc  = n;

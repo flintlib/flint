@@ -94,7 +94,7 @@ static void _fmpz_mod_poly_push_roots(
 
     FLINT_ASSERT(!fmpz_is_zero(f->coeffs + 0));
     fmpz_mod_poly_reverse(t, f, f->length, ctx);
-    fmpz_mod_poly_inv_series_newton(t2, t, t->length, ctx);
+    fmpz_mod_poly_inv_series(t2, t, t->length, ctx);
 
     a = stack + 0;
     fmpz_mod_poly_powmod_x_fmpz_preinv(t, halfp, f, t2, ctx);

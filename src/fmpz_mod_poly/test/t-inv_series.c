@@ -57,7 +57,7 @@ main(void)
 
         fmpz_mod_poly_set_ui(one, 1, ctx);
 
-        fmpz_mod_poly_inv_series_newton(b, a, n, ctx);
+        fmpz_mod_poly_inv_series(b, a, n, ctx);
         fmpz_mod_poly_mullow(c, a, b, n, ctx);
 
         result = (fmpz_mod_poly_equal(c, one, ctx));

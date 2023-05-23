@@ -13,6 +13,7 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 #include "nmod_poly.h"
@@ -20,6 +21,14 @@
 #include "fq_nmod.h"
 #include "fq_zech.h"
 #include "profiler.h"
+
+slong next_powhalf2(slong n)
+{
+    if ((n & (n - 1)) == 0)
+        return n * 1.414213562373095 + 0.5;
+    else
+        return WORD(1) << FLINT_BIT_COUNT(n);
+}
 
 void _nmod_poly_mul_mid_default_mpn_ctx(mp_ptr res, slong zl, slong zh, mp_srcptr a, slong an, mp_srcptr b, slong bn, nmod_t mod);
 
@@ -38,16 +47,16 @@ void _nmod_poly_mul_mid_default_mpn_ctx(mp_ptr res, slong zl, slong zh, mp_srcpt
         (twall) = __timer->wall*0.001 / __reps; \
     } while (0);
 
-#if 1
+#if 0
 #define INIT_CTX gr_ctx_init_nmod(ctx, n_nextprime(UWORD(1) << (bits - 1), 0));
 #define RANDCOEFF(t, ctx) GR_IGNORE(gr_set_ui(t, n_randlimb(state), ctx))
 #define STEP_BITS for (bits = 1, j = 0; bits <= 64; bits++, j++)
 #endif
 
-#if 0
-#define INIT_CTX fmpz_t t; fmpz_init(t); fmpz_ui_pow_ui(t, 2, bits - 1); fmpz_nextprime(t, t, 0); gr_ctx_init_fmpz_mod(ctx, t); fmpz_clear(t);
+#if 1
+#define INIT_CTX fmpz_t t; fmpz_init(t); fmpz_ui_pow_ui(t, 2, bits - 1); fmpz_add_ui(t, t, 1); /* fmpz_nextprime(t, t, 0); */ gr_ctx_init_fmpz_mod(ctx, t); fmpz_clear(t);
 #define RANDCOEFF(t, ctx) fmpz_mod_rand(t, state, gr_ctx_data_as_ptr(ctx));
-#define STEP_BITS for (bits = 32, j = 0; bits <= 8192; bits *= 2, j++)
+#define STEP_BITS for (bits = 32, j = 0; bits <= 65536; bits = next_powhalf2(bits), j++)
 #endif
 
 #if 0
@@ -69,7 +78,7 @@ void _nmod_poly_mul_mid_default_mpn_ctx(mp_ptr res, slong zl, slong zh, mp_srcpt
 #endif
 
 
-#if 1
+#if 0
 #define INFO "inv_series"
 #define SETUP random_input(A, state, len, ctx); \
               GR_IGNORE(gr_poly_set_coeff_si(A, 0, 1, ctx));

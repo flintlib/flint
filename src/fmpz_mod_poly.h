@@ -466,41 +466,15 @@ int fmpz_mod_poly_divides(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
 
 /*  Power series inversion ***************************************************/
 
-void _fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n,
-                                 const fmpz_t cinv, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_poly_inv_series(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_poly_inv_series(fmpz_mod_poly_t Qinv, const fmpz_mod_poly_t Q, slong n, const fmpz_mod_ctx_t ctx);
 
-void fmpz_mod_poly_inv_series_newton(fmpz_mod_poly_t Qinv,
-                   const fmpz_mod_poly_t Q, slong n, const fmpz_mod_ctx_t ctx);
-
-void fmpz_mod_poly_inv_series_newton_f(fmpz_t f, fmpz_mod_poly_t Qinv,
-                   const fmpz_mod_poly_t Q, slong n, const fmpz_mod_ctx_t ctx);
-
-FMPZ_MOD_POLY_INLINE void
-_fmpz_mod_poly_inv_series(fmpz * Qinv, const fmpz * Q, slong n,
-                                 const fmpz_t cinv, const fmpz_mod_ctx_t ctx)
-{
-   _fmpz_mod_poly_inv_series_newton(Qinv, Q, n, cinv, ctx);
-}
-
-FMPZ_MOD_POLY_INLINE void
-fmpz_mod_poly_inv_series(fmpz_mod_poly_t Qinv, const fmpz_mod_poly_t Q,
-                                             slong n, const fmpz_mod_ctx_t ctx)
-{
-   fmpz_mod_poly_inv_series_newton(Qinv, Q, n, ctx);
-}
-
-FMPZ_MOD_POLY_INLINE void
+void
 fmpz_mod_poly_inv_series_f(fmpz_t f, fmpz_mod_poly_t Qinv,
-                    const fmpz_mod_poly_t Q, slong n, const fmpz_mod_ctx_t ctx)
-{
-   fmpz_mod_poly_inv_series_newton_f(f, Qinv, Q, n, ctx);
-}
-
-/*  Power series division ***************************************************/
+                    const fmpz_mod_poly_t Q, slong n, const fmpz_mod_ctx_t ctx);
 
 void _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
                       const fmpz * B, slong Blen, slong n, const fmpz_mod_ctx_t ctx);
-
 void fmpz_mod_poly_div_series(fmpz_mod_poly_t Q,
                     const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, slong n,
                                                      const fmpz_mod_ctx_t ctx);
@@ -633,22 +607,22 @@ int fmpz_mod_poly_invmod_f(fmpz_t f, fmpz_mod_poly_t A,
 /* Square root ***************************************************************/
 
 void _fmpz_mod_poly_invsqrt_series(fmpz * g,
-                                  const fmpz * h, slong hlen, slong n, fmpz_mod_ctx_t mod);
+                                  const fmpz * h, slong hlen, slong n, const fmpz_mod_ctx_t mod);
 
 void fmpz_mod_poly_invsqrt_series(fmpz_mod_poly_t g,
-                         const fmpz_mod_poly_t h, slong n, fmpz_mod_ctx_t ctx);
+                         const fmpz_mod_poly_t h, slong n, const fmpz_mod_ctx_t ctx);
 
 void _fmpz_mod_poly_sqrt_series(fmpz * g,
-                                  const fmpz * h, slong hlen, slong n, fmpz_mod_ctx_t mod);
+                                  const fmpz * h, slong hlen, slong n, const fmpz_mod_ctx_t mod);
 
 void fmpz_mod_poly_sqrt_series(fmpz_mod_poly_t g,
-                         const fmpz_mod_poly_t h, slong n, fmpz_mod_ctx_t ctx);
+                         const fmpz_mod_poly_t h, slong n, const fmpz_mod_ctx_t ctx);
 
 int _fmpz_mod_poly_sqrt(fmpz * s,
-                                const fmpz * p, slong len, fmpz_mod_ctx_t mod);
+                                const fmpz * p, slong len, const fmpz_mod_ctx_t mod);
 
 int fmpz_mod_poly_sqrt(fmpz_mod_poly_t b,
-                                  const fmpz_mod_poly_t a, fmpz_mod_ctx_t ctx);
+                                  const fmpz_mod_poly_t a, const fmpz_mod_ctx_t ctx);
 
 /*  Minpoly  *****************************************************************/
 

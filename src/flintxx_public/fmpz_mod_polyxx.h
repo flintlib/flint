@@ -655,7 +655,7 @@ FLINT_DEFINE_BINARY_EXPR_COND2(rem_basecase_op, fmpz_mod_polyxx,
 
 FLINT_DEFINE_BINARY_EXPR_COND2(inv_series_newton_op, fmpz_mod_polyxx,
     FMPZ_MOD_POLYXX_COND_S, traits::fits_into_slong,
-    fmpz_mod_poly_inv_series_newton(to._poly(), e1._poly(), e2, to._ctx()))
+    fmpz_mod_poly_inv_series(to._poly(), e1._poly(), e2, to._ctx()))
 
 FLINT_DEFINE_BINARY_EXPR_COND2(gcd_op, fmpz_mod_polyxx,
     FMPZ_MOD_POLYXX_COND_S, FMPZ_MOD_POLYXX_COND_S,

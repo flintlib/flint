@@ -41,7 +41,7 @@ fmpz_mod_poly_is_irreducible_rabin_f(fmpz_t fac, const fmpz_mod_poly_t f,
         /* Compute x^q mod f */
         fmpz_mod_poly_reverse(finv, f, f->length, ctx);
 
-        fmpz_mod_poly_inv_series_newton_f(fac, finv, finv, f->length, ctx);
+        fmpz_mod_poly_inv_series_f(fac, finv, finv, f->length, ctx);
 
         if (!fmpz_is_one(fac))
            goto cleanup;

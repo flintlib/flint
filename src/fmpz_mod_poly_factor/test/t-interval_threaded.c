@@ -89,7 +89,7 @@ main(void)
             fmpz_mod_poly_randtest_not_zero(tmp + j, state, n_randint(state, 20) + 1, ctx);
 
         fmpz_mod_poly_reverse(cinv, c, c->length, ctx);
-        fmpz_mod_poly_inv_series_newton(cinv, cinv, c->length, ctx);
+        fmpz_mod_poly_inv_series(cinv, cinv, c->length, ctx);
 
         fmpz_mod_poly_set_ui(b, 1, ctx);
 

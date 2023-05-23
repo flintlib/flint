@@ -154,7 +154,7 @@ void fmpz_mod_poly_factor_distinct_deg_with_frob(
         {
             fmpz_mod_poly_divrem(v, tmp, v, I[j], ctx);
             fmpz_mod_poly_reverse(vinv, v, v->length, ctx);
-            fmpz_mod_poly_inv_series_newton(vinv, vinv, v->length, ctx);
+            fmpz_mod_poly_inv_series(vinv, vinv, v->length, ctx);
         }
         if (v->length - 1 < 2 * d)
         {
@@ -240,7 +240,7 @@ void fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
     fmpz_mod_poly_make_monic(v, poly, ctx);
 
     fmpz_mod_poly_reverse(vinv, v, v->length, ctx);
-    fmpz_mod_poly_inv_series_newton(vinv, vinv, v->length, ctx);
+    fmpz_mod_poly_inv_series(vinv, vinv, v->length, ctx);
     fmpz_mod_poly_powmod_x_fmpz_preinv(xp, fmpz_mod_ctx_modulus(ctx), v, vinv, ctx);
 
     fmpz_mod_poly_factor_distinct_deg_with_frob(res, v, vinv, xp, ctx);

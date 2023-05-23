@@ -54,7 +54,7 @@ fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor, flint_rand_t state,
     fmpz_mod_poly_init(polinv, ctx);
 
     fmpz_mod_poly_reverse(polinv, pol, pol->length, ctx);
-    fmpz_mod_poly_inv_series_newton(polinv, polinv, polinv->length, ctx);
+    fmpz_mod_poly_inv_series(polinv, polinv, polinv->length, ctx);
 
     fmpz_init(exp);
     if (fmpz_cmp_ui(p, 2) > 0)

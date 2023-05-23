@@ -50,7 +50,7 @@ main(void)
         k = 1 + n_randint(state, l);
 
         fmpz_mod_poly_reverse(ainv, a, a->length, ctx);
-        fmpz_mod_poly_inv_series_newton(ainv, ainv, a->length, ctx);
+        fmpz_mod_poly_inv_series(ainv, ainv, a->length, ctx);
         pow = (fmpz_mod_poly_struct *) flint_malloc((l + k)*sizeof(fmpz_mod_poly_struct));
         res = pow + l;
 

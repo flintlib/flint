@@ -57,7 +57,7 @@ int fmpz_mod_poly_is_irreducible_rabin(const fmpz_mod_poly_t f,
         /* Compute x^q mod f */
         fmpz_mod_poly_reverse(finv, f, f->length, ctx);
 
-        fmpz_mod_poly_inv_series_newton(finv, finv, f->length, ctx);
+        fmpz_mod_poly_inv_series(finv, finv, f->length, ctx);
 
         fmpz_mod_poly_frobenius_powers_2exp_precomp(pow, f, finv, n, ctx);
 

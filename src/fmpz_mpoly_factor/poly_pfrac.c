@@ -223,7 +223,7 @@ next_p:
 
         fmpz_mod_poly_reverse(I->B_inv + i, I->B + i,
                                                      I->B[i].length, I->ctxp);
-        fmpz_mod_poly_inv_series_newton(I->B_inv + i, I->B_inv + i,
+        fmpz_mod_poly_inv_series(I->B_inv + i, I->B_inv + i,
                                                      I->B[i].length, I->ctxp);
     }
 
@@ -393,7 +393,7 @@ more_prec:
                                     fmpz_poly_lead(I->bprod + i), I->ctxs + i);
 
     fmpz_mod_poly_reverse(I->B_inv + i, I->B + i, I->B[i].length, I->ctxs + i);
-    fmpz_mod_poly_inv_series_newton(I->B_inv + i, I->B_inv + i,
+    fmpz_mod_poly_inv_series(I->B_inv + i, I->B_inv + i,
                                                   I->B[i].length, I->ctxs + i);
     goto again;
 }

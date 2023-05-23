@@ -60,7 +60,7 @@ main(void)
     timeit_start(t);
 
     for (iter = 0; iter < 10; iter++)
-        fmpz_mod_poly_inv_series_newton(q, f, len, ctx);
+        fmpz_mod_poly_inv_series(q, f, len, ctx);
 
     timeit_stop(t);
 

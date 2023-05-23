@@ -451,8 +451,7 @@ _gr_fmpz_mod_poly_mullow(fmpz * res,
     return GR_SUCCESS;
 }
 
-/* fixme: duplicates _fmpz_mod_poly_divrem for error handling */
-/* todo: better tuning */
+/* fixme: duplicate _fmpz_mod_poly methods for error handling */
 int
 _gr_fmpz_mod_poly_divrem(fmpz * Q, fmpz * R, const fmpz * A, slong lenA,
                                   const fmpz * B, slong lenB, gr_ctx_t ctx)
@@ -475,6 +474,63 @@ _gr_fmpz_mod_poly_divrem(fmpz * Q, fmpz * R, const fmpz * A, slong lenA,
         return _gr_poly_divrem_newton(Q, R, A, lenA, B, lenB, ctx);
     }
 }
+
+#define TUNE_TAB_SIZE 23
+
+static const int tuning_bit_steps[TUNE_TAB_SIZE] = { 32, 45, 64, 91, 128, 181, 256, 362, 512, 724, 1024, 1448, 2048, 2896, 4096, 5793, 8192, 11585, 16384, 23170, 32768, 46341, 65536};
+static const short inv_series_cutoff_tab[TUNE_TAB_SIZE] = {21, 14, 40, 39, 48, 60, 89, 72, 72, 54, 48, 39, 32, 24, 24, 20, 17, 18, 16, 15, 13, 12, 14, };
+static const short div_series_cutoff_tab[TUNE_TAB_SIZE] = {23, 21, 52, 50, 66, 101, 106, 97, 106, 72, 60, 50, 44, 35, 38, 30, 26, 22, 20, 18, 16, 14, 22, };
+
+static const slong find_cutoff(const short * tab, slong b)
+{
+    slong i;
+
+    i = 0;
+    while (i + 1 < TUNE_TAB_SIZE && tuning_bit_steps[i + 1] <= b)
+        i++;
+
+    return tab[i];
+}
+
+int
+_gr_fmpz_mod_poly_inv_series(fmpz * Q, const fmpz * B, slong lenB, slong len, gr_ctx_t ctx)
+{
+    slong cutoff, bits;
+    lenB = FLINT_MIN(len, lenB);
+
+    if (lenB <= 20)
+        return _gr_poly_inv_series_basecase(Q, B, lenB, len, ctx);
+
+    bits = fmpz_bits(fmpz_mod_ctx_modulus(FMPZ_MOD_CTX(ctx)));
+    cutoff  = find_cutoff(inv_series_cutoff_tab, bits);
+
+    if (lenB <= cutoff)
+        return _gr_poly_inv_series_basecase(Q, B, lenB, len, ctx);
+    else
+        return _gr_poly_inv_series_newton(Q, B, lenB, len, cutoff, ctx);
+}
+
+/* todo: the fmpz_mod_poly module has better basecase code */
+int
+_gr_fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB, slong len, gr_ctx_t ctx)
+{
+    slong cutoff, bits;
+
+    lenA = FLINT_MIN(len, lenA);
+    lenB = FLINT_MIN(len, lenB);
+
+    if (lenB <= 20)
+        return _gr_poly_div_series_basecase(Q, A, lenA, B, lenB, len, ctx);
+
+    bits = fmpz_bits(fmpz_mod_ctx_modulus(FMPZ_MOD_CTX(ctx)));
+    cutoff  = find_cutoff(div_series_cutoff_tab, bits);
+
+    if (lenB <= cutoff)
+        return _gr_poly_div_series_basecase(Q, A, lenA, B, lenB, len, ctx);
+    else
+        return _gr_poly_div_series_newton(Q, A, lenA, B, lenB, len, cutoff, ctx);
+}
+
 
 /* todo: also need the _other version ... ? */
 /* todo: implement generically */
@@ -620,6 +676,8 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_fmpz_mod_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_fmpz_mod_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpz_mod_poly_mullow},
+    {GR_METHOD_POLY_INV_SERIES, (gr_funcptr) _gr_fmpz_mod_poly_inv_series},
+    {GR_METHOD_POLY_DIV_SERIES, (gr_funcptr) _gr_fmpz_mod_poly_div_series},
     {GR_METHOD_POLY_DIVREM,     (gr_funcptr) _gr_fmpz_mod_poly_divrem},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fmpz_mod_roots_gr_poly},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fmpz_mod_mat_mul},

@@ -298,7 +298,7 @@ next_queued:
     fmpz_mod_poly_swap(S->f, Q[Qlen].f, ctx);
     fmpz_mod_poly_swap(S->xp, Q[Qlen].xp, ctx);
     fmpz_mod_poly_reverse(finv, S->f, S->f->length, ctx);
-    fmpz_mod_poly_inv_series_newton(finv, finv, S->f->length, ctx);
+    fmpz_mod_poly_inv_series(finv, finv, S->f->length, ctx);
 
 #ifdef FLINT_WANT_ASSERT
     fmpz_mod_poly_powmod_x_fmpz_preinv(tq, p, S->f, finv, ctx);
@@ -395,7 +395,7 @@ next_alpha:
         if (fmpz_mod_poly_is_zero(finv, ctx))
         {
             fmpz_mod_poly_reverse(finv, S[k].f, S[k].f->length, ctx);
-            fmpz_mod_poly_inv_series_newton(finv, finv, S[k].f->length, ctx);
+            fmpz_mod_poly_inv_series(finv, finv, S[k].f->length, ctx);
         }
 
         fmpz_mod_poly_swap(t, S[k].g, ctx);
@@ -503,7 +503,7 @@ void fmpz_mod_poly_factor_equal_deg(
         fmpz_mod_poly_init(xp, ctx);
         fmpz_mod_poly_init(t, ctx);
         fmpz_mod_poly_reverse(t, f, f->length, ctx);
-        fmpz_mod_poly_inv_series_newton(t, t, f->length, ctx);
+        fmpz_mod_poly_inv_series(t, t, f->length, ctx);
         fmpz_mod_poly_powmod_x_fmpz_preinv(xp, fmpz_mod_ctx_modulus(ctx), f, t, ctx);
         fmpz_mod_poly_clear(t, ctx);
         _fmpz_mod_poly_factor_equal_deg_via_trace(factors, f, d, xp, ctx);

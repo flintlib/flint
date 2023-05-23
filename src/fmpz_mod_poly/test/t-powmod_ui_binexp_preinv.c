@@ -50,7 +50,7 @@ main(void)
         fmpz_mod_poly_randtest_not_zero(f, state, n_randint(state, 50) + 1, ctx);
 
         fmpz_mod_poly_reverse (finv, f, f->length, ctx);
-        fmpz_mod_poly_inv_series_newton (finv, finv, f->length, ctx);
+        fmpz_mod_poly_inv_series (finv, finv, f->length, ctx);
 
         fmpz_mod_poly_powmod_ui_binexp_preinv(res, a, exp, f, finv, ctx);
         fmpz_mod_poly_powmod_ui_binexp_preinv(a, a, exp, f, finv, ctx);
@@ -94,7 +94,7 @@ main(void)
         fmpz_mod_poly_randtest_not_zero(f, state, n_randint(state, 50) + 1, ctx);
 
         fmpz_mod_poly_reverse (finv, f, f->length, ctx);
-        fmpz_mod_poly_inv_series_newton (finv, finv, f->length, ctx);
+        fmpz_mod_poly_inv_series (finv, finv, f->length, ctx);
 
         fmpz_mod_poly_powmod_ui_binexp_preinv(res, a, exp, f, finv, ctx);
         fmpz_mod_poly_powmod_ui_binexp_preinv(f, a, exp, f, finv, ctx);
@@ -139,7 +139,7 @@ main(void)
 
 
         fmpz_mod_poly_reverse (finv, f, f->length, ctx);
-        fmpz_mod_poly_inv_series_newton (finv, finv, f->length, ctx);
+        fmpz_mod_poly_inv_series (finv, finv, f->length, ctx);
 
         fmpz_mod_poly_powmod_ui_binexp_preinv(res, a, exp, f, finv, ctx);
         fmpz_mod_poly_powmod_ui_binexp_preinv(finv, a, exp, f, finv, ctx);
@@ -186,7 +186,7 @@ main(void)
         fmpz_mod_poly_randtest_not_zero(f, state, n_randint(state, 50) + 1, ctx);
 
         fmpz_mod_poly_reverse (finv, f, f->length, ctx);
-        fmpz_mod_poly_inv_series_newton (finv, finv, f->length, ctx);
+        fmpz_mod_poly_inv_series (finv, finv, f->length, ctx);
 
         fmpz_mod_poly_powmod_ui_binexp_preinv(res1, a, exp, f, finv, ctx);
 
@@ -243,7 +243,7 @@ main(void)
         fmpz_mod_poly_randtest_not_zero(f, state, n_randint(state, 50) + 1, ctx);
 
         fmpz_mod_poly_reverse (finv, f, f->length, ctx);
-        fmpz_mod_poly_inv_series_newton (finv, finv, f->length, ctx);
+        fmpz_mod_poly_inv_series (finv, finv, f->length, ctx);
 
         fmpz_mod_poly_powmod_ui_binexp_preinv(res1, a, exp1, f, finv, ctx);
         fmpz_mod_poly_powmod_ui_binexp_preinv(res2, a, exp2, f, finv, ctx);

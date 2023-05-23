@@ -52,7 +52,7 @@ main(void)
         fmpz_init_set_ui(expz, exp);
 
         fmpz_mod_poly_reverse (finv, f, f->length, ctx);
-        fmpz_mod_poly_inv_series_newton (finv, finv, f->length, ctx);
+        fmpz_mod_poly_inv_series (finv, finv, f->length, ctx);
 
         fmpz_mod_poly_init2(a, f->length-1, ctx);
         fmpz_mod_poly_set_coeff_ui (a, 1, 1, ctx);
@@ -103,7 +103,7 @@ main(void)
         fmpz_mod_poly_randtest_not_zero(f, state, n_randint(state, 50) + 1, ctx);
 
         fmpz_mod_poly_reverse (finv, f, f->length, ctx);
-        fmpz_mod_poly_inv_series_newton (finv, finv, f->length, ctx);
+        fmpz_mod_poly_inv_series (finv, finv, f->length, ctx);
 
         fmpz_mod_poly_powmod_x_fmpz_preinv(res, expz, f, finv, ctx);
         fmpz_mod_poly_powmod_x_fmpz_preinv(f, expz, f, finv, ctx);
@@ -149,7 +149,7 @@ main(void)
 
 
         fmpz_mod_poly_reverse (finv, f, f->length, ctx);
-        fmpz_mod_poly_inv_series_newton (finv, finv, f->length, ctx);
+        fmpz_mod_poly_inv_series (finv, finv, f->length, ctx);
 
         fmpz_mod_poly_powmod_x_fmpz_preinv(res, expz, f, finv, ctx);
         fmpz_mod_poly_powmod_x_fmpz_preinv(finv, expz, f, finv, ctx);
@@ -201,7 +201,7 @@ main(void)
         fmpz_mod_poly_randtest_not_zero(f, state, n_randint(state, 50) + 1, ctx);
 
         fmpz_mod_poly_reverse (finv, f, f->length, ctx);
-        fmpz_mod_poly_inv_series_newton (finv, finv, f->length, ctx);
+        fmpz_mod_poly_inv_series (finv, finv, f->length, ctx);
 
         fmpz_mod_poly_powmod_x_fmpz_preinv(res1, exp1, f, finv, ctx);
         fmpz_mod_poly_powmod_x_fmpz_preinv(res2, exp2, f, finv, ctx);

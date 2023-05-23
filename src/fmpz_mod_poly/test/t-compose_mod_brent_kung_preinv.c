@@ -51,7 +51,7 @@ main(void)
         fmpz_mod_poly_randtest_not_zero(c, state, n_randint(state, 20) + 1, ctx);
 
         fmpz_mod_poly_reverse (cinv, c, c->length, ctx);
-        fmpz_mod_poly_inv_series_newton (cinv, cinv, c->length, ctx);
+        fmpz_mod_poly_inv_series (cinv, cinv, c->length, ctx);
 
         fmpz_mod_poly_rem(a, a, c, ctx);
         fmpz_mod_poly_compose_mod_brent_kung_preinv(d, a, b, c, cinv, ctx);
@@ -100,7 +100,7 @@ main(void)
         fmpz_mod_poly_randtest_not_zero(c, state, n_randint(state, 20) + 1, ctx);
 
         fmpz_mod_poly_reverse (cinv, c, c->length, ctx);
-        fmpz_mod_poly_inv_series_newton (cinv, cinv, c->length, ctx);
+        fmpz_mod_poly_inv_series (cinv, cinv, c->length, ctx);
 
         fmpz_mod_poly_rem(a, a, c, ctx);
         fmpz_mod_poly_compose_mod_brent_kung_preinv(d, a, b, c, cinv, ctx);
@@ -146,7 +146,7 @@ main(void)
         fmpz_mod_poly_randtest_not_zero(c, state, n_randint(state, 20) + 1, ctx);
 
         fmpz_mod_poly_reverse (cinv, c, c->length, ctx);
-        fmpz_mod_poly_inv_series_newton (cinv, cinv, c->length, ctx);
+        fmpz_mod_poly_inv_series (cinv, cinv, c->length, ctx);
 
         fmpz_mod_poly_rem(a, a, c, ctx);
         fmpz_mod_poly_compose_mod_brent_kung_preinv(d, a, b, c, cinv, ctx);
@@ -192,7 +192,7 @@ main(void)
         fmpz_mod_poly_randtest_not_zero(c, state, n_randint(state, 20) + 1, ctx);
 
         fmpz_mod_poly_reverse (cinv, c, c->length, ctx);
-        fmpz_mod_poly_inv_series_newton (cinv, cinv, c->length, ctx);
+        fmpz_mod_poly_inv_series (cinv, cinv, c->length, ctx);
 
         fmpz_mod_poly_rem(a, a, c, ctx);
         fmpz_mod_poly_compose_mod_brent_kung_preinv(d, a, b, c, cinv, ctx);
@@ -238,7 +238,7 @@ main(void)
         fmpz_mod_poly_randtest_not_zero(c, state, n_randint(state, 20) + 1, ctx);
 
         fmpz_mod_poly_reverse (cinv, c, c->length, ctx);
-        fmpz_mod_poly_inv_series_newton (cinv, cinv, c->length, ctx);
+        fmpz_mod_poly_inv_series (cinv, cinv, c->length, ctx);
 
         fmpz_mod_poly_rem(a, a, c, ctx);
         fmpz_mod_poly_compose_mod_brent_kung_preinv(d, a, b, c, cinv, ctx);

@@ -83,7 +83,7 @@ void _fmpz_mod_poly_split_rabin(
     }
 
     fmpz_mod_poly_reverse(t, f, f->length, ctx);
-    fmpz_mod_poly_inv_series_newton(t2, t, t->length, ctx);
+    fmpz_mod_poly_inv_series(t2, t, t->length, ctx);
 
 try_again:
 
@@ -174,7 +174,7 @@ int fmpz_mod_poly_find_distinct_nonzero_roots(
 
     fmpz_mod_poly_make_monic(f, P, ctx);
     fmpz_mod_poly_reverse(t, f, f->length, ctx);
-    fmpz_mod_poly_inv_series_newton(t2, t, f->length, ctx);
+    fmpz_mod_poly_inv_series(t2, t, f->length, ctx);
 
     a = stack + 0;
     fmpz_sub_ui(halfp, fmpz_mod_ctx_modulus(ctx), 1);

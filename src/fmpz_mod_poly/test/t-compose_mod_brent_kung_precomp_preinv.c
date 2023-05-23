@@ -52,7 +52,7 @@ main(void)
         fmpz_mod_poly_randtest_not_zero(c, state, n_randint(state, 20) + 1, ctx);
 
         fmpz_mod_poly_reverse (cinv, c, c->length, ctx);
-        fmpz_mod_poly_inv_series_newton (cinv, cinv, c->length, ctx);
+        fmpz_mod_poly_inv_series (cinv, cinv, c->length, ctx);
         fmpz_mat_init (B, n_sqrt (c->length-1)+1, c->length-1);
         fmpz_mod_poly_precompute_matrix (B, b, c, cinv, ctx);
 
@@ -105,7 +105,7 @@ main(void)
         fmpz_mod_poly_randtest_not_zero(c, state, n_randint(state, 20) + 1, ctx);
 
         fmpz_mod_poly_reverse (cinv, c, c->length, ctx);
-        fmpz_mod_poly_inv_series_newton (cinv, cinv, c->length, ctx);
+        fmpz_mod_poly_inv_series (cinv, cinv, c->length, ctx);
         fmpz_mat_init (B, n_sqrt (c->length-1)+1, c->length-1);
         fmpz_mod_poly_precompute_matrix (B, b, c, cinv, ctx);
 
@@ -155,7 +155,7 @@ main(void)
         fmpz_mod_poly_randtest_not_zero(c, state, n_randint(state, 20) + 1, ctx);
 
         fmpz_mod_poly_reverse (cinv, c, c->length, ctx);
-        fmpz_mod_poly_inv_series_newton (cinv, cinv, c->length, ctx);
+        fmpz_mod_poly_inv_series (cinv, cinv, c->length, ctx);
         fmpz_mat_init (B, n_sqrt (c->length-1)+1, c->length-1);
         fmpz_mod_poly_precompute_matrix (B, b, c, cinv, ctx);
 
@@ -205,7 +205,7 @@ main(void)
         fmpz_mod_poly_randtest_not_zero(c, state, n_randint(state, 20) + 1, ctx);
 
         fmpz_mod_poly_reverse (cinv, c, c->length, ctx);
-        fmpz_mod_poly_inv_series_newton (cinv, cinv, c->length, ctx);
+        fmpz_mod_poly_inv_series (cinv, cinv, c->length, ctx);
         fmpz_mat_init (B, n_sqrt (c->length-1)+1, c->length-1);
         fmpz_mod_poly_precompute_matrix (B, b, c, cinv, ctx);
 

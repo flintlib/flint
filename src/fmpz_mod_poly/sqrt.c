@@ -32,7 +32,7 @@ int _fmpz_mod_poly_sqrt_2(fmpz * s, const fmpz * p, slong len)
 }
 
 int
-_fmpz_mod_poly_sqrt(fmpz * s, const fmpz * p, slong len, fmpz_mod_ctx_t mod)
+_fmpz_mod_poly_sqrt(fmpz * s, const fmpz * p, slong len, const fmpz_mod_ctx_t mod)
 {
     slong slen, i;
     int result;
@@ -117,7 +117,7 @@ cleanup:
 }
 
 int
-fmpz_mod_poly_sqrt(fmpz_mod_poly_t b, const fmpz_mod_poly_t a, fmpz_mod_ctx_t ctx)
+fmpz_mod_poly_sqrt(fmpz_mod_poly_t b, const fmpz_mod_poly_t a, const fmpz_mod_ctx_t ctx)
 {
     slong blen, len = a->length;
     int result;
