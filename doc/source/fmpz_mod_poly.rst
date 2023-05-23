@@ -917,24 +917,6 @@ Power series inversion
     ``Qinv`` undefined, or sets ``Qinv`` to the inverse of ``Q``
     modulo `x^n`, where `n \geq 1`.
 
-.. function:: void _fmpz_mod_poly_inv_series(fmpz * Qinv, const fmpz * Q, slong n, const fmpz_t cinv, const fmpz_mod_ctx_t ctx)
-
-    Sets ``(Qinv, n)`` to the inverse of ``(Q, n)`` modulo `x^n`,
-    where `n \geq 1`, assuming that the bottom coefficient of `Q` is
-    invertible modulo `p` and that its inverse is ``cinv``.
-
-.. function:: void fmpz_mod_poly_inv_series(fmpz_mod_poly_t Qinv, const fmpz_mod_poly_t Q, slong n, const fmpz_mod_ctx_t ctx)
-
-    Sets ``Qinv`` to the inverse of ``Q`` modulo `x^n`,
-    where `n \geq 1`, assuming that the bottom coefficient of
-    `Q` is a unit.
-
-.. function:: void fmpz_mod_poly_inv_series_f(fmpz_t f, fmpz_mod_poly_t Qinv, const fmpz_mod_poly_t Q, slong n, const fmpz_mod_ctx_t ctx)
-
-    Either sets `f` to a nontrivial factor of `p` with the value of
-    ``Qinv`` undefined, or sets ``Qinv`` to the inverse of ``Q``
-    modulo `x^n`, where `n \geq 1`.
-
 
 Power series division
 --------------------------------------------------------------------------------
