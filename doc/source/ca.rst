@@ -349,6 +349,10 @@ Special values
     Sets *res* to Euler's constant `\gamma`. This creates an element
     of the (transcendental?) number field `\mathbb{Q}(\gamma)`.
 
+.. function:: void ca_tribonacci_constant(ca_t res, ca_ctx_t ctx)
+
+    Sets *res* to the Tribonacci constant `T_c`.
+
 .. function:: void ca_unknown(ca_t res, ca_ctx_t ctx)
 
     Sets *res* to the meta-value *Unknown*.
