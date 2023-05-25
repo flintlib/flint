@@ -29,9 +29,9 @@ bound_I(arb_ptr I, const arb_t A, const arb_t B, const arb_t C, slong len, slong
     arb_one(L);
 
     /* T = 1 / (A^Bm1 * Bm1) */
-    arb_inv(T, A, wp);
-    arb_pow(T, T, Bm1, wp);
-    arb_div(T, T, Bm1, wp);
+    arb_pow(T, A, Bm1, wp);
+    arb_mul(T, T, Bm1, wp);
+    arb_inv(T, T, wp);
 
     if (len > 1)
     {
@@ -47,11 +47,14 @@ bound_I(arb_ptr I, const arb_t A, const arb_t B, const arb_t C, slong len, slong
         {
             arb_mul_ui(L, L, k, wp);
             arb_add(L, L, Dk, wp);
-            arb_mul(Dk, Dk, D, wp);
+            if (k < len - 1)
+              arb_mul(Dk, Dk, D, wp);
         }
 
         arb_mul(I + k, L, T, wp);
-        arb_div(T, T, Bm1, wp);
+
+        if (k < len - 1)
+          arb_div(T, T, Bm1, wp);
     }
 
     arb_clear(D);
