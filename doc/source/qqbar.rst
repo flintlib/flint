@@ -199,6 +199,10 @@ Special values
 
     Sets *res* to the golden ratio `\varphi = \tfrac{1}{2}(\sqrt{5} + 1)`.
 
+.. function:: void qqbar_tribonacci_constant(qqbar_t res)
+
+    Sets *res* to the Tribonacci constant `T_c = \tfrac{1}{3}(1 + \sqrt[3]{19 + 3\sqrt{33}} + \sqrt[3]{19 - 3\sqrt{33}})`.
+
 Input and output
 -------------------------------------------------------------------------------
 
@@ -811,7 +815,7 @@ Symbolic expressions and conversion to radicals
     * Arithmetic operations with algebraic operands
     * Square roots of algebraic numbers
     * Powers with algebraic base and exponent an explicit rational number
-    * NumberI, GoldenRatio, RootOfUnity
+    * NumberI, GoldenRatio, TribonacciConstant, RootOfUnity
     * Floor, Ceil, Abs, Sign, Csgn, Conjugate, Re, Im, Max, Min
     * Trigonometric functions with argument an explicit rational number times Pi
     * Exponentials with argument an explicit rational number times Pi * NumberI
