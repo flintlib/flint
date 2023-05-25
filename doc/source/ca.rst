@@ -351,7 +351,8 @@ Special values
 
 .. function:: void ca_tribonacci_constant(ca_t res, ca_ctx_t ctx)
 
-    Sets *res* to the Tribonacci constant `T_c`.
+    Sets *res* to the Tribonacci constant `T_c`. This creates an element
+    of the algebraic number field `\mathbb{Q}(T_c)`.
 
 .. function:: void ca_unknown(ca_t res, ca_ctx_t ctx)
 
