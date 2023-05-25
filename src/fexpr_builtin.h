@@ -433,6 +433,7 @@ typedef enum
     FEXPR_Tanh,
     FEXPR_Theta,
     FEXPR_Theta_,
+    FEXPR_TribonacciConstant,
     FEXPR_True,
     FEXPR_Tuple,
     FEXPR_Tuples,
