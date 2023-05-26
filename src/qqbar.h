@@ -202,6 +202,8 @@ void qqbar_i(qqbar_t res);
 
 void qqbar_phi(qqbar_t res);
 
+void qqbar_tetranacci_constant(qqbar_t res);
+
 /* Random generation */
 
 void qqbar_randtest(qqbar_t res, flint_rand_t state, slong deg, slong bits);
