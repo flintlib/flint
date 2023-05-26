@@ -413,6 +413,7 @@ const fexpr_symbol_info fexpr_builtin_table[FEXPR_BUILTIN_LENGTH] = {
     { FEXPR_SymmetricPolynomial, "SymmetricPolynomial", "e", fexpr_write_latex_subscript_call, },
     { FEXPR_Tan, "Tan", "\\tan", NULL, },
     { FEXPR_Tanh, "Tanh", "\\tanh", NULL, },
+    { FEXPR_TetranacciConstant, "TetranacciConstant", "T_t", NULL, },
     { FEXPR_Theta, "Theta", "\\Theta", NULL },
     { FEXPR_Theta_, "Theta_", "\\Theta", fexpr_write_latex_subscript },
     { FEXPR_True, "True", "\\operatorname{True}", NULL, },
