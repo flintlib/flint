@@ -15,7 +15,11 @@
 void
 ca_phi(ca_t res, ca_ctx_t ctx)
 {
-    ca_sqrt_ui(res, 5, ctx);
-    ca_add_ui(res, res, 1, ctx);
-    ca_div_ui(res, res, 2, ctx);
+    qqbar_t phi;
+    qqbar_init(phi);
+    qqbar_phi(phi);
+
+    ca_set_qqbar(res, phi, ctx);
+
+    qqbar_clear(phi);
 }
