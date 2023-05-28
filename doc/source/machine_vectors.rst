@@ -62,7 +62,6 @@ Access and conversions
               void vec8d_store_unaligned(double* z, vec8d a)
 
 .. function:: double vec4d_get_index(vec4d a, const int i)
-              ulong vec4n_get_index(vec4n a, const int i)
               double vec8d_get_index(vec8d a, int i)
 
     Extract the entry at index `i`.

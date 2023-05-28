@@ -100,11 +100,12 @@ FLINT_FORCE_INLINE vec8d _vec8i32_convert_vec8d(__m256i a)
     return z;
 }
 
-
+/* this does not work because i must be a compile-time constant
 FLINT_FORCE_INLINE ulong vec4n_get_index(vec4n a, const int i)
 {
     return _mm256_extract_epi64(a, i);
 }
+*/
 
 FLINT_FORCE_INLINE vec4n vec4n_set_n4(ulong a0, ulong a1, ulong a2, ulong a3) {
     return _mm256_set_epi64x(a3, a2, a1, a0);
