@@ -446,6 +446,12 @@ Special values
     Sets *res* to a generator of this domain. The meaning of
     "generator" depends on the domain.
 
+.. function:: int gr_gens(gr_vec_t res, gr_ctx_t ctx)
+
+    Sets *res* to a vector containing the generators of this domain
+    where this makes sense, for example in a multivariate polynomial
+    ring.
+
 Basic properties
 ........................................................................
 

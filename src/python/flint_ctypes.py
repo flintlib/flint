@@ -1176,6 +1176,14 @@ class gr_ctx:
             _handle_error(ctx, status, rstr, x, y)
         return res
 
+    def _op_vec_ctx(ctx, op, rstr):
+        op.argtypes = (ctypes.c_void_p, ctypes.c_void_p)
+        res = Vec(ctx)()
+        status = op(res._ref, ctx._ref)
+        if status:
+            _handle_error(ctx, status, rstr)
+        return res
+
     def _op_vec_len(ctx, n, op, rstr):
         n = ctx._as_si(n)
         assert n >= 0
@@ -1244,6 +1252,9 @@ class gr_ctx:
 
         """
         return ctx._constant(ctx, libgr.gr_gen, "gen")
+
+    def gens(ctx):
+        return ctx._op_vec_ctx(libgr.gr_gens, "gens")
 
     def i(ctx):
         """
@@ -6391,6 +6402,14 @@ def test_special():
         assert QQ.fib(i) == QQ.fib(i-1) + QQ.fib(i-2)
         assert F.fib(i) == F.fib(i-1) + F.fib(i-2)
 
+def test_mpoly():
+    ZZxyz = PolynomialRing_fmpz_mpoly(3)
+    x, y, z = ZZxyz.gens()
+    f = (-72 * (1+x)**2 * (y+z+1))
+    c, fac, exp = f.factor()
+    assert c == -72
+    assert ((fac, exp) == ([1+x, y+z+1], [2, 1])) or ((fac, exp) == ([y+z+1, 1+x], [1, 2]))
+    assert f.gcd(-100-100*x) == 4+4*x
 
 if __name__ == "__main__":
     from time import time

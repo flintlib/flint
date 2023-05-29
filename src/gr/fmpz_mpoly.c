@@ -139,6 +139,20 @@ _gr_fmpz_mpoly_one(fmpz_mpoly_t res, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+truth_t
+_gr_fmpz_mpoly_gens(gr_vec_t res, gr_ctx_t ctx)
+{
+    slong i, n;
+
+    n = MPOLYNOMIAL_MCTX(ctx)->minfo->nvars;
+
+    gr_vec_set_length(res, n, ctx);
+    for (i = 0; i < n; i++)
+        fmpz_mpoly_gen(((fmpz_mpoly_struct *) res->entries) + i, i, MPOLYNOMIAL_MCTX(ctx));
+
+    return GR_SUCCESS;
+}
+
 int
 _gr_fmpz_mpoly_set(fmpz_mpoly_t res, const fmpz_mpoly_t mat, gr_ctx_t ctx)
 {
@@ -487,6 +501,7 @@ gr_method_tab_input _gr_fmpz_mpoly_methods_input[] =
     {GR_METHOD_ONE,         (gr_funcptr) _gr_fmpz_mpoly_one},
     {GR_METHOD_IS_ZERO,     (gr_funcptr) _gr_fmpz_mpoly_is_zero},
     {GR_METHOD_IS_ONE,      (gr_funcptr) _gr_fmpz_mpoly_is_one},
+    {GR_METHOD_GENS,        (gr_funcptr) _gr_fmpz_mpoly_gens},
     {GR_METHOD_EQUAL,       (gr_funcptr) _gr_fmpz_mpoly_equal},
     {GR_METHOD_SET,         (gr_funcptr) _gr_fmpz_mpoly_set},
     {GR_METHOD_SET_UI,      (gr_funcptr) _gr_fmpz_mpoly_set_ui},
