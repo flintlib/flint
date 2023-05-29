@@ -15,7 +15,9 @@
 #include "fmpq.h"
 #include "fmpq_poly.h"
 #include "gr.h"
+#include "gr_vec.h"
 #include "gr_poly.h"
+#include "fmpz_poly_factor.h"
 
 /* todo: _fmpz methods */
 
@@ -175,7 +177,7 @@ _gr_fmpz_poly_set_other(fmpz_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_c
         tmp->length = ((gr_vec_struct *) x)->length;
 
         gr_ctx_init_fmpz(ZZ);  /* no need to free */
-        return gr_poly_set_gr_poly_other((fmpz_poly_struct *) res, tmp, VECTOR_CTX(x_ctx)->base_ring, ZZ);
+        return gr_poly_set_gr_poly_other((gr_poly_struct *) res, tmp, VECTOR_CTX(x_ctx)->base_ring, ZZ);
     }
 
     return GR_UNABLE;
@@ -684,6 +686,36 @@ _gr_fmpz_poly_rsqrt(fmpz_poly_t res, const fmpz_poly_t x, const gr_ctx_t ctx)
     }
 }
 
+int
+_gr_fmpz_poly_factor(fmpz_poly_t c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx)
+{
+    fmpz_poly_factor_t fac;
+    gr_ctx_t ZZ;
+    slong i;
+
+    fmpz_poly_factor_init(fac);
+    fmpz_poly_factor(fac, x);
+
+    fmpz_poly_set_fmpz(c, &fac->c);
+
+    gr_ctx_init_fmpz(ZZ);
+
+    gr_vec_set_length(factors, fac->num, ctx);
+    gr_vec_set_length(exponents, fac->num, ZZ);
+
+    for (i = 0; i < fac->num; i++)
+    {
+        fmpz_poly_swap((fmpz_poly_struct *) (factors->entries) + i, fac->p + i);
+        fmpz_set_ui((fmpz *) (exponents->entries) + i, fac->exp[i]);
+    }
+
+    gr_ctx_clear(ZZ);
+
+    fmpz_poly_factor_clear(fac);
+
+    return GR_SUCCESS;
+}
+
 
 int _fmpz_poly_methods_initialized = 0;
 
@@ -766,6 +798,7 @@ gr_method_tab_input _fmpz_poly_methods_input[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpz_poly_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_fmpz_poly_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_fmpz_poly_rsqrt},
+    {GR_METHOD_FACTOR,          (gr_funcptr) _gr_fmpz_poly_factor},
     {0,                         (gr_funcptr) NULL},
 };
 

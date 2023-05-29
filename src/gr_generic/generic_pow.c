@@ -340,16 +340,16 @@ gr_generic_pow_si(gr_ptr res, gr_srcptr x, slong e, gr_ctx_t ctx)
 {
     if (e >= 0)
     {
-        return gr_generic_pow_ui(res, x, e, ctx);
+        return gr_pow_ui(res, x, e, ctx);
     }
     else
     {
         int status;
 
-        /* todo: some heuristic for when we want to invert before/after powering */
         status = gr_inv(res, x, ctx);
-        if (status == GR_SUCCESS)
-            status = gr_generic_pow_ui(res, res, -e, ctx);
+
+        if (status == GR_SUCCESS && e != -1)
+            status = gr_pow_ui(res, res, -e, ctx);
 
         return status;
     }

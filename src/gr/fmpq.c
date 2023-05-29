@@ -523,7 +523,7 @@ int _gr_fmpq_factor(gr_ptr c, gr_vec_t factors, gr_vec_t exponents, const fmpq_t
     {
         fmpz_swap(fmpq_numref(fmpq_factors + num_num + i), dfac->p + i);
         fmpz_one(fmpq_denref(fmpq_factors + num_num + i));
-        fmpz_neg_ui((fmpz *) (exponents->entries) + dfac->num + i, dfac->exp[i]);
+        fmpz_neg_ui((fmpz *) (exponents->entries) + num_num + i, dfac->exp[i]);
     }
 
     fmpz_factor_clear(nfac);

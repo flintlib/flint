@@ -256,6 +256,13 @@ Polynomial rings
     over the given *base_ring*.
     Elements have type :type:`gr_poly_struct`.
 
+.. function:: void gr_ctx_init_fmpz_mpoly(gr_ctx_t ctx, slong nvars, const ordering_t ord)
+
+    Initializes *ctx* to a ring of sparsely represented multivariate
+    polynomials in *nvars* variables over the integers,
+    with monomial ordering *ord*.
+    Elements have type :type:`fmpz_mpoly_struct`.
+
 .. function:: void gr_ctx_init_gr_mpoly(gr_ctx_t ctx, gr_ctx_t base_ring, slong nvars, const ordering_t ord)
 
     Initializes *ctx* to a ring of sparsely represented multivariate

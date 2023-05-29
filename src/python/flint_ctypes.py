@@ -132,6 +132,13 @@ class fmpq_poly_struct(ctypes.Structure):
                 ('length', c_slong),
                 ('den', c_slong)]
 
+class fmpz_mpoly_struct(ctypes.Structure):
+    _fields_ = [('coeffs', ctypes.c_void_p),
+                ('exp', ctypes.c_void_p),
+                ('alloc', c_slong),
+                ('length', c_slong),
+                ('bits', c_slong)]
+
 # todo: actually a union
 class nf_elem_struct(ctypes.Structure):
     _fields_ = [('poly', fmpq_poly_struct)]
@@ -5986,6 +5993,37 @@ class PolynomialRing_fmpq_poly(gr_ctx):
 
 ZZx_fmpz_poly = PolynomialRing_fmpz_poly()
 QQx_fmpq_poly = PolynomialRing_fmpq_poly()
+
+
+class fmpz_poly(gr_poly):
+    _struct_type = fmpz_poly_struct
+
+    @staticmethod
+    def _default_context():
+        return ZZx_fmpz_poly
+
+    def __init__(self, val=None, context=None):
+        if isinstance(val, (list, tuple)):
+            gr_elem.__init__(self, ZZx_gr_poly(val), context)
+        else:
+            gr_elem.__init__(self, val, context)
+
+
+class fmpz_mpoly(gr_elem):
+    _struct_type = fmpz_mpoly_struct
+
+class PolynomialRing_fmpz_mpoly(gr_ctx):
+
+    def __init__(self, nvars):
+        gr_ctx.__init__(self)
+        nvars = gr_ctx._as_si(nvars)
+        assert nvars >= 0
+        libgr.gr_ctx_init_fmpz_mpoly(self._ref, nvars, 0)
+        self._elem_type = fmpz_mpoly
+
+    @property
+    def _coefficient_ring(self):
+        return ZZ
 
 
 
