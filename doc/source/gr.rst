@@ -707,7 +707,7 @@ Factorization
 
     where `f_k` will be irreducible or prime (depending on `R`).
 
-    The prefactor `c` stores a unit or sign, e.g.\ the
+    The prefactor `c` stores a unit, sign, or coefficient, e.g.\ the
     sign `-1`, `0` or `+1` in `\mathbb{Z}`, or a sign multiplied
     by the coefficient content in `\mathbb{Z}[x]`.
     Note that this function outputs `c` as an element of the
