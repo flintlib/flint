@@ -395,6 +395,52 @@ _gr_nf_pow_ui(nf_elem_t res, const nf_elem_t x, ulong exp, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_nf_numerator(nf_elem_t res, const nf_elem_t x, const gr_ctx_t ctx)
+{
+    if (NF_CTX(ctx)->flag & NF_LINEAR)
+    {
+        fmpz_set(LNF_ELEM_NUMREF(res), LNF_ELEM_NUMREF(x));
+        fmpz_one(LNF_ELEM_DENREF(res));
+    }
+    else if (NF_CTX(ctx)->flag & NF_QUADRATIC)
+    {
+        fmpz_set(QNF_ELEM_NUMREF(res), QNF_ELEM_NUMREF(x));
+        fmpz_set(QNF_ELEM_NUMREF(res) + 1, QNF_ELEM_NUMREF(x) + 1);
+        fmpz_one(QNF_ELEM_DENREF(res));
+    }
+    else
+    {
+        fmpq_poly_set(NF_ELEM(res), NF_ELEM(x));
+        fmpz_one(NF_ELEM_DENREF(res));
+    }
+
+    return GR_SUCCESS;
+}
+
+int
+_gr_nf_denominator(nf_elem_t res, const nf_elem_t x, const gr_ctx_t ctx)
+{
+    if (NF_CTX(ctx)->flag & NF_LINEAR)
+    {
+        fmpz_set(LNF_ELEM_NUMREF(res), LNF_ELEM_DENREF(x));
+        fmpz_one(LNF_ELEM_DENREF(res));
+    }
+    else if (NF_CTX(ctx)->flag & NF_QUADRATIC)
+    {
+        fmpz_set(QNF_ELEM_NUMREF(res), QNF_ELEM_DENREF(x));
+        fmpz_zero(QNF_ELEM_NUMREF(res) + 1);
+        fmpz_one(QNF_ELEM_DENREF(res));
+    }
+    else
+    {
+        fmpq_poly_set_fmpz(NF_ELEM(res), NF_ELEM_DENREF(x));
+        fmpz_one(NF_ELEM_DENREF(res));
+    }
+
+    return GR_SUCCESS;
+}
+
 /* todo: dot products, without intermediate reductions? */
 /* todo: polynomial multiplication, etc. */
 
@@ -471,6 +517,9 @@ gr_method_tab_input _nf_methods_input[] =
     {GR_METHOD_INV,             (gr_funcptr) _gr_nf_inv},
 
     {GR_METHOD_POW_UI,          (gr_funcptr) _gr_nf_pow_ui},
+
+    {GR_METHOD_NUMERATOR,       (gr_funcptr) _gr_nf_numerator},
+    {GR_METHOD_DENOMINATOR,     (gr_funcptr) _gr_nf_denominator},
 
     {0,                         (gr_funcptr) NULL},
 };

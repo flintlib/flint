@@ -602,6 +602,21 @@ _gr_fmpq_poly_pow_fmpz(fmpq_poly_t res, const fmpq_poly_t x, const fmpz_t exp, g
     }
 }
 
+int
+_gr_fmpq_poly_numerator(fmpq_poly_t res, const fmpq_poly_t x, const gr_ctx_t ctx)
+{
+    fmpq_poly_set(res, x);
+    fmpz_one(fmpq_poly_denref(res));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpq_poly_denominator(fmpq_poly_t res, const fmpq_poly_t x, const gr_ctx_t ctx)
+{
+    fmpq_poly_set_fmpz(res, fmpq_poly_denref(x));
+    return GR_SUCCESS;
+}
+
 /*
 todo: fmpq_poly_sqrt, fmpq_poly_is_square
 
@@ -716,6 +731,8 @@ gr_method_tab_input _fmpq_poly_methods_input[] =
     {GR_METHOD_POW_UI,          (gr_funcptr) _gr_fmpq_poly_pow_ui},
     {GR_METHOD_POW_SI,          (gr_funcptr) _gr_fmpq_poly_pow_si},
     {GR_METHOD_POW_FMPZ,        (gr_funcptr) _gr_fmpq_poly_pow_fmpz},
+    {GR_METHOD_NUMERATOR,       (gr_funcptr) _gr_fmpq_poly_numerator},
+    {GR_METHOD_DENOMINATOR,     (gr_funcptr) _gr_fmpq_poly_denominator},
 /*
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpq_poly_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_fmpq_poly_sqrt},

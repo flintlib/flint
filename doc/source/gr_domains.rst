@@ -270,6 +270,15 @@ Polynomial rings
     with monomial ordering *ord*.
     Elements have type :type:`gr_mpoly_struct`.
 
+Fraction fields
+-------------------------------------------------------------------------------
+
+.. function:: void gr_ctx_init_fmpz_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord)
+
+    Initializes *ctx* to a ring of sparsely represented multivariate
+    fractions in *nvars* variables over the integers (equivalently, rationals),
+    with monomial ordering *ord*.
+    Elements have type :type:`fmpz_mpoly_q_struct`.
 
 .. raw:: latex
 

@@ -726,6 +726,19 @@ Factorization
     but they are not guaranteed to be sorted in any particular
     order.
 
+Fractions
+........................................................................
+
+.. function:: int gr_numerator(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_denominator(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+    Return a numerator `p` and denominator `q` such that `x = p/q`.
+    For typical fraction fields, the denominator will be minimal
+    and canonical.
+    However, some rings may return an arbitrary denominator as long
+    as the numerator matches.
+    The default implementations simply return `p = x` and `q = 1`.
+
 Integer and complex parts
 ........................................................................
 

@@ -1354,6 +1354,12 @@ class gr_ctx:
     def rsqrt(ctx, x):
         return ctx._unary_op(x, libgr.gr_rsqrt, "rsqrt($x)")
 
+    def numerator(ctx, x):
+        return ctx._unary_op(x, libgr.gr_numerator, "numerator($x)")
+
+    def denominator(ctx, x):
+        return ctx._unary_op(x, libgr.gr_denominator, "denominator($x)")
+
     def floor(ctx, x):
         return ctx._unary_op(x, libgr.gr_floor, "floor($x)")
 
@@ -3945,6 +3951,38 @@ class gr_elem:
             1/5
         """
         return self._unary_op(self, libgr.gr_rsqrt, "rsqrt($x)")
+
+    def numerator(self):
+        r"""
+        Numerator of this element.
+
+            >>> (QQ(-2) / 3).numerator()
+            -2
+            >>> ZZ(5).numerator()
+            5
+        """
+        return self._unary_op(self, libgr.gr_numerator, "numerator($x)")
+
+    def denominator(self):
+        r"""
+        Denominator of this element.
+
+            >>> (QQ(-2) / 3).denominator()
+            3
+            >>> ZZ(5).denominator()
+            1
+
+        Depending on the ring, the denominator need not be minimal.
+        This is currently not the case for algebraic numbers:
+
+            >>> a = ((2 + QQbar.i()) / 4)
+            >>> a.numerator()
+            Root a = 8.00000 + 4.00000*I of a^2-16*a+80
+            >>> a.denominator()
+            16
+
+        """
+        return self._unary_op(self, libgr.gr_denominator, "denominator($x)")
 
     def floor(self):
         r"""

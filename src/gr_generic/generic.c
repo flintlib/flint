@@ -1045,6 +1045,15 @@ int gr_generic_other_pow(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, g
     return status;
 }
 
+int gr_generic_numerator(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    return gr_set(res, x, ctx);
+}
+
+int gr_generic_denominator(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    return gr_one(res, ctx);
+}
 
 truth_t
 gr_generic_is_square(gr_srcptr x, gr_ctx_t ctx)
@@ -2467,6 +2476,9 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_IS_SQUARE,               (gr_funcptr) gr_generic_is_square},
     {GR_METHOD_SQRT,                    (gr_funcptr) gr_generic_sqrt},
     {GR_METHOD_RSQRT,                   (gr_funcptr) gr_generic_rsqrt},
+
+    {GR_METHOD_NUMERATOR,               (gr_funcptr) gr_generic_numerator},
+    {GR_METHOD_DENOMINATOR,             (gr_funcptr) gr_generic_denominator},
 
     {GR_METHOD_CMP,                     (gr_funcptr) gr_generic_cmp},
     {GR_METHOD_CMPABS,                  (gr_funcptr) gr_generic_cmpabs},

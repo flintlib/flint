@@ -2618,6 +2618,48 @@ gr_test_gcd(gr_ctx_t R, flint_rand_t state, int test_flags)
 }
 
 int
+gr_test_numerator_denominator(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status;
+    gr_ptr a, p, q, aq;
+
+    GR_TMP_INIT4(a, p, q, aq, R);
+
+    status = GR_SUCCESS;
+    status |= gr_randtest(a, state, R);
+    status |= gr_randtest(p, state, R);
+    status |= gr_randtest(q, state, R);
+    status |= gr_numerator(p, a, R);
+    status |= gr_denominator(q, a, R);
+
+    if (status == GR_SUCCESS)
+    {
+        status |= gr_mul(aq, a, q, R);
+
+        if (status == GR_SUCCESS && gr_equal(aq, p, R) == T_FALSE)
+        {
+            status = GR_TEST_FAIL;
+        }
+    }
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        flint_printf("numerator_denominator\n");
+        gr_ctx_println(R);
+        flint_printf("a = "); gr_println(a, R);
+        flint_printf("p = "); gr_println(p, R);
+        flint_printf("q = "); gr_println(q, R);
+        flint_printf("aq = "); gr_println(aq, R);
+        flint_printf("\n");
+    }
+
+    GR_TMP_CLEAR4(a, p, q, aq, R);
+
+    return status;
+}
+
+
+int
 gr_test_factor(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -3172,6 +3214,7 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
         gr_test_iter(R, state, "ordered_ring_cmpabs", gr_test_ordered_ring_cmpabs, iters, test_flags);
     }
 
+    gr_test_iter(R, state, "numerator_denominator", gr_test_numerator_denominator, iters, test_flags);
     gr_test_iter(R, state, "complex_parts", gr_test_complex_parts, iters, test_flags);
 
     if (gr_ctx_is_unique_factorization_domain(R) == T_TRUE)

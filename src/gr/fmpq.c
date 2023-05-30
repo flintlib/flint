@@ -534,6 +534,22 @@ int _gr_fmpq_factor(gr_ptr c, gr_vec_t factors, gr_vec_t exponents, const fmpq_t
 }
 
 int
+_gr_fmpq_numerator(fmpq_t res, const fmpq_t x, const gr_ctx_t ctx)
+{
+    fmpz_set(fmpq_numref(res), fmpq_numref(x));
+    fmpz_one(fmpq_denref(res));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpq_denominator(fmpq_t res, const fmpq_t x, const gr_ctx_t ctx)
+{
+    fmpz_set(fmpq_numref(res), fmpq_denref(x));
+    fmpz_one(fmpq_denref(res));
+    return GR_SUCCESS;
+}
+
+int
 _gr_fmpq_floor(fmpq_t res, const fmpq_t x, const gr_ctx_t ctx)
 {
     fmpz_fdiv_q(fmpq_numref(res), fmpq_numref(x), fmpq_denref(x));
@@ -1046,6 +1062,8 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_fmpq_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_fmpq_rsqrt},
     {GR_METHOD_FACTOR,          (gr_funcptr) _gr_fmpq_factor},
+    {GR_METHOD_NUMERATOR,       (gr_funcptr) _gr_fmpq_numerator},
+    {GR_METHOD_DENOMINATOR,     (gr_funcptr) _gr_fmpq_denominator},
     {GR_METHOD_FLOOR,           (gr_funcptr) _gr_fmpq_floor},
     {GR_METHOD_CEIL,            (gr_funcptr) _gr_fmpq_ceil},
     {GR_METHOD_TRUNC,           (gr_funcptr) _gr_fmpq_trunc},

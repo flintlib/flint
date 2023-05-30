@@ -170,6 +170,9 @@ WARN_UNUSED_RESULT int gr_generic_pow_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t
 WARN_UNUSED_RESULT int gr_generic_pow_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_other_pow(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int gr_generic_numerator(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_denominator(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+
 WARN_UNUSED_RESULT truth_t gr_generic_is_square(gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_sqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_rsqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);

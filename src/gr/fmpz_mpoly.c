@@ -10,7 +10,6 @@
 */
 
 #include <stdio.h>
-#define DEFINE_MPOLY_METHODS
 #include "gr.h"
 #include "gr_vec.h"
 #include "fmpz_mpoly.h"

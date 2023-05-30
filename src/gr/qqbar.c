@@ -703,6 +703,24 @@ _gr_qqbar_rsqrt(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
     }
 }
 
+int
+_gr_qqbar_numerator(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    qqbar_numerator(res, x);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_denominator(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    fmpz_t t;
+    fmpz_init(t);
+    qqbar_denominator(t, x);
+    qqbar_set_fmpz(res, t);
+    fmpz_clear(t);
+    return GR_SUCCESS;
+}
+
 /* todo: could special-case rationals */
 int
 _gr_qqbar_floor(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
@@ -1136,6 +1154,9 @@ gr_method_tab_input _qqbar_methods_input[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_qqbar_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_qqbar_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_qqbar_rsqrt},
+
+    {GR_METHOD_NUMERATOR,       (gr_funcptr) _gr_qqbar_numerator},
+    {GR_METHOD_DENOMINATOR,     (gr_funcptr) _gr_qqbar_denominator},
 
     {GR_METHOD_FLOOR,           (gr_funcptr) _gr_qqbar_floor},
     {GR_METHOD_CEIL,            (gr_funcptr) _gr_qqbar_ceil},

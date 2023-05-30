@@ -132,6 +132,9 @@
 
     Currently these methods check for the special values 0 and 1.
 
+.. function:: int gr_generic_numerator(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_generic_denominator(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
 .. function:: int gr_generic_cmp(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
               int gr_generic_cmpabs(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
               int gr_generic_cmp_other(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
