@@ -82,7 +82,7 @@ Comparisons
 
     Returns whether *A* and *B* are equal.
 
-Input and output
+Random generation
 -------------------------------------------------------------------------------
 
 .. function:: int gr_mpoly_randtest_bits(gr_mpoly_t A, flint_rand_t state, slong length, flint_bitcnt_t exp_bits, const mpoly_ctx_t mctx, gr_ctx_t cctx)
