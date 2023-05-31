@@ -12,6 +12,19 @@
 #include "fmpz_mod_poly.h"
 #include "padic_poly.h"
 
+static void
+_fmpz_vec_neg_mod(fmpz * a, const fmpz * b, slong len, const fmpz_t m)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+    {
+        fmpz_neg(a + i, b + i);
+        if (fmpz_sgn(a + i) < 0)
+            fmpz_add(a + i, a + i, m);
+    }
+}
+
 void padic_poly_neg(padic_poly_t f, const padic_poly_t g,
                     const padic_ctx_t ctx)
 {
@@ -34,12 +47,12 @@ void padic_poly_neg(padic_poly_t f, const padic_poly_t g,
 
         if (padic_poly_prec(f) >= padic_poly_prec(g))  /* No reduction */
         {
-            _fmpz_mod_poly_neg(f->coeffs, g->coeffs, len, pow);
+            _fmpz_vec_neg_mod(f->coeffs, g->coeffs, len, pow);
         }
         else  /* Reduction necessary? */
         {
             _fmpz_vec_scalar_mod_fmpz(f->coeffs, g->coeffs, len, pow);
-            _fmpz_mod_poly_neg(f->coeffs, f->coeffs, len, pow);
+            _fmpz_vec_neg_mod(f->coeffs, f->coeffs, len, pow);
             _padic_poly_normalise(f);
         }
 
@@ -47,4 +60,3 @@ void padic_poly_neg(padic_poly_t f, const padic_poly_t g,
             fmpz_clear(pow);
     }
 }
-
