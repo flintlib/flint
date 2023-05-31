@@ -17,7 +17,7 @@
 #include "fmpz_mat.h"
 #include "fmpz_lll.h"
 #include "qqbar.h"
-#include "utils_flint.h"
+#include "fmpz_mpoly.h"
 
 int qqbar_mul_checked(qqbar_t res, const qqbar_t x, const qqbar_t y, slong deg_limit, slong bits_limit);
 int qqbar_pow_fmpz_checked(qqbar_t res, const qqbar_t x, const fmpz_t y, slong deg_limit, slong bits_limit);

@@ -231,7 +231,6 @@ Exact real and complex numbers
    ca_field.rst
    fexpr.rst
    fexpr_builtin.rst
-   utils_flint.rst
 
 Finite fields
 ---------------

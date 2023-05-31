@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "utils_flint.h"
+#include "fmpz_mpoly.h"
 
 void
 fmpz_mpoly_vec_set_primitive_unique(fmpz_mpoly_vec_t G, const fmpz_mpoly_vec_t F, const fmpz_mpoly_ctx_t ctx)

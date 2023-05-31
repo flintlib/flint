@@ -22,7 +22,7 @@
 #include "fmpz_mpoly_q.h"
 #include "nf_elem.h"
 #include "qqbar.h"
-#include "utils_flint.h"
+#include "fmpz_mpoly.h"
 #include "fexpr.h"
 
 #ifdef __cplusplus

@@ -10,7 +10,7 @@
 */
 
 #include "fmpz_poly.h"
-#include "utils_flint.h"
+#include "fmpz_mpoly.h"
 
 void
 fmpz_mpoly_set_gen_fmpz_poly(fmpz_mpoly_t res, slong var, const fmpz_poly_t pol, const fmpz_mpoly_ctx_t ctx)

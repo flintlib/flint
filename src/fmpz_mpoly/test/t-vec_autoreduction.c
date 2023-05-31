@@ -10,7 +10,7 @@
 */
 
 #include "calcium.h"
-#include "utils_flint.h"
+#include "fmpz_mpoly.h"
 
 int main(void)
 {

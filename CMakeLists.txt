@@ -137,7 +137,7 @@ set(_BUILD_DIRS
     gr_poly         gr_mpoly        gr_special
 
     calcium
-    utils_flint     fmpz_mpoly_q
+    fmpz_mpoly_q
     fexpr           fexpr_builtin
     qqbar
     ca              ca_ext          ca_field        ca_vec
