@@ -1,3 +1,4 @@
+.. _fq-embed:
 
 **fq_embed.h** -- Computing isomorphisms and embeddings of finite fields
 --------------------------------------------------------------------------------
