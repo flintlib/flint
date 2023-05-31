@@ -129,15 +129,32 @@ void fmpz_mpoly_set_fmpz_poly(
 {
     flint_bitcnt_t bits;
 
-    if (B->length < 1)
+    if (B->length == 0)
     {
         fmpz_mpoly_zero(A, ctx);
-        return;
+    }
+    else if (B->length == 1)
+    {
+        fmpz_mpoly_set_fmpz(A, B->coeffs, ctx);
+    }
+    else
+    {
+        bits = mpoly_gen_pow_exp_bits_required(v, B->length - 1, ctx->minfo);
+        bits = mpoly_fix_bits(bits, ctx->minfo);
+        _fmpz_mpoly_set_fmpz_poly(A, bits, B->coeffs, B->length, v, ctx);
+    }
+}
+
+void
+fmpz_mpoly_set_gen_fmpz_poly(fmpz_mpoly_t res, slong var, const fmpz_poly_t pol, const fmpz_mpoly_ctx_t ctx)
+{
+    if (ctx->minfo->nvars == 0)
+    {
+        flint_printf("fmpz_mpoly_set_gen_fmpz_poly: require nvars >= 1");
+        flint_abort();
     }
 
-    bits = mpoly_gen_pow_exp_bits_required(v, B->length - 1, ctx->minfo);
-    bits = mpoly_fix_bits(bits, ctx->minfo);
-    _fmpz_mpoly_set_fmpz_poly(A, bits, B->coeffs, B->length, v, ctx);
+    fmpz_mpoly_set_fmpz_poly(res, pol, var, ctx);
 }
 
 /*

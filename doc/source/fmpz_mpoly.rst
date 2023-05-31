@@ -272,6 +272,23 @@ Comparison
     This ordering agrees with the usual ordering of monomials when *A* and *B* are both monomials.
 
 
+Conversion
+--------------------------------------------------------------------------------
+
+.. function:: int fmpz_mpoly_is_fmpz_poly(const fmpz_mpoly_t A, slong var, const fmpz_mpoly_ctx_t ctx)
+
+    Return whether *A* is a univariate polynomial in the variable with index *var*.
+
+.. function:: int fmpz_mpoly_get_fmpz_poly(fmpz_poly_t A, const fmpz_mpoly_t B, slong var, const fmpz_mpoly_ctx_t ctx)
+
+    If *B* is a univariate polynomial in the variable with index *var*,
+    set *A* to this polynomial and return 1; otherwise return 0.
+
+.. function:: void fmpz_mpoly_set_fmpz_poly(fmpz_mpoly_t A, const fmpz_poly_t B, slong var, const fmpz_mpoly_ctx_t ctx)
+              void fmpz_mpoly_set_gen_fmpz_poly(fmpz_mpoly_t A, slong var, const fmpz_poly_t B, const fmpz_mpoly_ctx_t ctx)
+
+    Set *A* to the univariate polynomial *B* in the variable with index *var*.
+
 Container operations
 --------------------------------------------------------------------------------
 

@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include "gr.h"
 #include "gr_vec.h"
+#include "gr_generic.h"
 #include "fmpz_mpoly.h"
 #include "fmpz_mpoly.h"
 #include "fmpz_mpoly_factor.h"
@@ -188,6 +189,23 @@ _gr_fmpz_mpoly_set_fmpq(fmpz_mpoly_t res, const fmpq_t v, gr_ctx_t ctx)
 
     fmpz_mpoly_set_fmpz(res, fmpq_numref(v), MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_mpoly_set_other(fmpz_mpoly_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
+{
+    if (x_ctx->which_ring == GR_CTX_FMPZ_MPOLY)
+    {
+        /* fmpz_mpoly_set_fmpz_poly */
+        if (MPOLYNOMIAL_MCTX(ctx)->minfo->nvars == MPOLYNOMIAL_MCTX(x_ctx)->minfo->nvars &&
+            MPOLYNOMIAL_MCTX(ctx)->minfo->ord == MPOLYNOMIAL_MCTX(x_ctx)->minfo->ord)
+        {
+            fmpz_mpoly_set(res, x, MPOLYNOMIAL_MCTX(ctx));
+            return GR_SUCCESS;
+        }
+    }
+
+    return gr_generic_set_other(res, x, x_ctx, ctx);
 }
 
 int
@@ -507,6 +525,7 @@ gr_method_tab_input _gr_fmpz_mpoly_methods_input[] =
     {GR_METHOD_SET_SI,      (gr_funcptr) _gr_fmpz_mpoly_set_si},
     {GR_METHOD_SET_FMPZ,    (gr_funcptr) _gr_fmpz_mpoly_set_fmpz},
     {GR_METHOD_SET_FMPQ,    (gr_funcptr) _gr_fmpz_mpoly_set_fmpq},
+    {GR_METHOD_SET_OTHER,   (gr_funcptr) _gr_fmpz_mpoly_set_other},
     {GR_METHOD_NEG,         (gr_funcptr) _gr_fmpz_mpoly_neg},
     {GR_METHOD_ADD,         (gr_funcptr) _gr_fmpz_mpoly_add},
     {GR_METHOD_ADD_SI,      (gr_funcptr) _gr_fmpz_mpoly_add_si},
