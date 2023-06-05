@@ -102,18 +102,18 @@ _gr_fmpz_mpoly_q_write(gr_stream_t out, fmpz_mpoly_q_t f, gr_ctx_t ctx)
     }
     else if (fmpz_mpoly_is_fmpz(fmpz_mpoly_q_denref(f), MPOLYNOMIAL_MCTX(ctx)))
     {
-        flint_printf("(");
+        gr_stream_write(out, "(");
         gr_stream_write_free(out, fmpz_mpoly_get_str_pretty(fmpz_mpoly_q_numref(f), NULL, MPOLYNOMIAL_MCTX(ctx)));
-        flint_printf(")/");
+        gr_stream_write(out, ")/");
         gr_stream_write_free(out, fmpz_mpoly_get_str_pretty(fmpz_mpoly_q_denref(f), NULL, MPOLYNOMIAL_MCTX(ctx)));
     }
     else
     {
-        flint_printf("(");
+        gr_stream_write(out, "(");
         gr_stream_write_free(out, fmpz_mpoly_get_str_pretty(fmpz_mpoly_q_numref(f), NULL, MPOLYNOMIAL_MCTX(ctx)));
-        flint_printf(")/(");
+        gr_stream_write(out, ")/(");
         gr_stream_write_free(out, fmpz_mpoly_get_str_pretty(fmpz_mpoly_q_denref(f), NULL, MPOLYNOMIAL_MCTX(ctx)));
-        flint_printf(")");
+        gr_stream_write(out, ")");
     }
 
     return GR_SUCCESS;

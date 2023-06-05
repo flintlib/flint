@@ -139,6 +139,11 @@ class fmpz_mpoly_struct(ctypes.Structure):
                 ('length', c_slong),
                 ('bits', c_slong)]
 
+class fmpz_mpoly_q_struct(ctypes.Structure):
+    _fields_ = [('num', fmpz_mpoly_struct),
+                ('den', fmpz_mpoly_struct)]
+
+
 # todo: actually a union
 class nf_elem_struct(ctypes.Structure):
     _fields_ = [('poly', fmpq_poly_struct)]
@@ -6074,6 +6079,22 @@ class PolynomialRing_fmpz_mpoly(gr_ctx):
     def _coefficient_ring(self):
         return ZZ
 
+
+class fmpz_mpoly_q(gr_elem):
+    _struct_type = fmpz_mpoly_q_struct
+
+class FractionField_fmpz_mpoly_q(gr_ctx):
+
+    def __init__(self, nvars):
+        gr_ctx.__init__(self)
+        nvars = gr_ctx._as_si(nvars)
+        assert nvars >= 0
+        libgr.gr_ctx_init_fmpz_mpoly_q(self._ref, nvars, 0)
+        self._elem_type = fmpz_mpoly_q
+
+    @property
+    def _coefficient_ring(self):
+        return QQ
 
 
 
