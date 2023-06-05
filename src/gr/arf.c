@@ -500,6 +500,27 @@ _gr_arf_sqrt(arf_t res, const arf_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_arf_pos_inf(arf_t res, const gr_ctx_t ctx)
+{
+    arf_pos_inf(res);
+    return GR_SUCCESS;
+}
+
+int
+_gr_arf_neg_inf(arf_t res, const gr_ctx_t ctx)
+{
+    arf_neg_inf(res);
+    return GR_SUCCESS;
+}
+
+int
+_gr_arf_nan(arf_t res, const gr_ctx_t ctx)
+{
+    arf_nan(res);
+    return GR_SUCCESS;
+}
+
+int
 _gr_arf_abs(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     arf_abs(res, x);
@@ -1312,6 +1333,12 @@ gr_method_tab_input _arf_methods_input[] =
 */
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_arf_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_arf_rsqrt},
+
+    {GR_METHOD_POS_INF,         (gr_funcptr) _gr_arf_pos_inf},
+    {GR_METHOD_NEG_INF,         (gr_funcptr) _gr_arf_neg_inf},
+    {GR_METHOD_UINF,            (gr_funcptr) gr_not_in_domain},
+    {GR_METHOD_UNDEFINED,       (gr_funcptr) _gr_arf_nan},
+    {GR_METHOD_UNKNOWN,         (gr_funcptr) _gr_arf_nan},
 
     {GR_METHOD_FLOOR,           (gr_funcptr) _gr_arf_floor},
     {GR_METHOD_CEIL,            (gr_funcptr) _gr_arf_ceil},

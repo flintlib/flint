@@ -1395,6 +1395,72 @@ class gr_ctx:
     def csgn(ctx, x):
         return ctx._unary_op(x, libgr.gr_csgn, "csgn($x)")
 
+    def arg(ctx, x):
+        return ctx._unary_op(x, libgr.gr_arg, "arg($x)")
+
+    def inf(ctx):
+        """
+        Positive infinity (for extended number sets which support it).
+
+            >>> CF.inf()
+            +inf
+            >>> ComplexExtended_ca().inf()
+            +Infinity
+            >>> RR.inf()
+            Traceback (most recent call last):
+              ...
+            FlintUnableError: failed to compute inf in {Real numbers (arb, prec = 53)}
+        """
+        return ctx._constant(ctx, libgr.gr_pos_inf, "inf")
+
+    def neg_inf(ctx):
+        """
+        Negative infinity (for extended number sets which support it).
+
+            >>> CF.neg_inf()
+            -inf
+            >>> ComplexExtended_ca().neg_inf()
+            -Infinity
+            >>> RR.neg_inf()
+            Traceback (most recent call last):
+              ...
+            FlintUnableError: failed to compute neg_inf in {Real numbers (arb, prec = 53)}
+        """
+        return ctx._constant(ctx, libgr.gr_neg_inf, "neg_inf")
+
+    def uinf(ctx):
+        """
+        Unsigned infinity (for extended number sets which support it).
+
+            >>> CF.uinf()
+            Traceback (most recent call last):
+              ...
+            FlintDomainError: uinf is not an element of {Complex floating-point numbers (acf, prec = 53)}
+            >>> ComplexExtended_ca().uinf()
+            UnsignedInfinity
+        """
+        return ctx._constant(ctx, libgr.gr_uinf, "uinf")
+
+    def undefined(ctx):
+        """
+        Undefined value (for extended number sets which support it).
+
+            >>> CF.undefined()
+            (nan + nan*I)
+            >>> ComplexExtended_ca().undefined()
+            Undefined
+        """
+        return ctx._constant(ctx, libgr.gr_undefined, "undefined")
+
+    def unknown(ctx):
+        """
+        Unknown value (for enclosures and other types which support it).
+
+            >>> ComplexExtended_ca().unknown()
+            Unknown
+        """
+        return ctx._constant(ctx, libgr.gr_unknown, "unknown")
+
     def mul_2exp(ctx, x, y):
         return ctx._binary_op_fmpz(x, y, libgr.gr_mul_2exp_fmpz, "mul_2exp($x, $y)")
 
@@ -4094,6 +4160,21 @@ class gr_elem:
         """
         return self._unary_op(self, libgr.gr_csgn, "csgn($x)")
 
+    def arg(self):
+        """
+        >>> RR(1).arg()
+        0
+        >>> RR(-1).arg()
+        [3.141592653589793 +/- 3.39e-16]
+        >>> CC(1j).arg()
+        [1.570796326794897 +/- 5.54e-16]
+        >>> CC_ca.i().arg()
+        1.57080 {(a)/2 where a = 3.14159 [Pi]}
+        >>> RR("+/- 0.1").arg()
+        [+/- 3.15]
+        """
+        return self._unary_op(self, libgr.gr_arg, "arg($x)")
+
     def mul_2exp(self, other):
         """
         Exact multiplication by a dyadic number `2^y`.
@@ -4444,6 +4525,13 @@ class ComplexField_ca(gr_ctx_ca):
     def __init__(self, **kwargs):
         gr_ctx.__init__(self)
         libgr.gr_ctx_init_complex_ca(self._ref)
+        self._elem_type = ca
+        self._set_options(kwargs)
+
+class ComplexExtended_ca(gr_ctx_ca):
+    def __init__(self, **kwargs):
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_complex_extended_ca(self._ref)
         self._elem_type = ca
         self._set_options(kwargs)
 
@@ -6340,6 +6428,20 @@ def test_qqbar():
 def test_nf():
     a = NumberField_nf(ZZx([1,2,3])).gen()
     assert (a+5)**(-1) * (2*a+10) == 2
+
+def test_ca():
+    R = ComplexField_ca()
+    X = ComplexExtended_ca()
+    assert X.inf() == -X.neg_inf()
+    assert 1 / X(0) == X.uinf()
+    assert 0 / X(0) == X.undefined()
+    assert X(0).log() == X.neg_inf()
+    assert X.inf().exp() == X.inf()
+    assert raises(lambda: R(X.inf()), FlintDomainError)
+    assert raises(lambda: R(X.undefined()), FlintDomainError)
+    assert raises(lambda: R(X.unknown()), FlintUnableError)
+    assert X(R(1)) == 1
+    assert R(X(1)) == 1
 
 def test_arb():
     a = arb(2.5)

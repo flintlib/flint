@@ -316,6 +316,12 @@ typedef enum
     GR_METHOD_CSGN, /* todo: implement */
     GR_METHOD_ARG,
 
+    GR_METHOD_POS_INF,
+    GR_METHOD_NEG_INF,
+    GR_METHOD_UINF,
+    GR_METHOD_UNDEFINED,
+    GR_METHOD_UNKNOWN,
+
     GR_METHOD_IS_INTEGER,
     GR_METHOD_IS_RATIONAL,
     GR_METHOD_IS_REAL,
@@ -329,6 +335,7 @@ typedef enum
     GR_METHOD_IS_NONPOSITIVE_REAL,
 
     /* Roots of unity */
+    /* todo: implement */
     GR_METHOD_IS_ROOT_OF_UNITY,
     GR_METHOD_ROOT_OF_UNITY_UI,
     GR_METHOD_ROOT_OF_UNITY_UI_VEC,
@@ -713,6 +720,8 @@ typedef enum
 
     GR_CTX_RR_CA,
     GR_CTX_CC_CA,
+
+    GR_CTX_COMPLEX_EXTENDED_CA,
 
     GR_CTX_RR_ARB,
     GR_CTX_CC_ACB,
@@ -1126,6 +1135,13 @@ GR_INLINE WARN_UNUSED_RESULT int gr_re(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { 
 GR_INLINE WARN_UNUSED_RESULT int gr_im(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, IM)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_sgn(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SGN)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_csgn(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, CSGN)(res, x, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_arg(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ARG)(res, x, ctx); }
+
+GR_INLINE WARN_UNUSED_RESULT int gr_pos_inf(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, POS_INF)(res, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_neg_inf(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, NEG_INF)(res, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_uinf(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, UINF)(res, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_undefined(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, UNDEFINED)(res, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_unknown(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, UNKNOWN)(res, ctx); }
 
 GR_INLINE WARN_UNUSED_RESULT int gr_cmp(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP_GET_INT(ctx, CMP)(res, x, y, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_cmpabs(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP_GET_INT(ctx, CMPABS)(res, x, y, ctx); }
@@ -1345,6 +1361,7 @@ void gr_ctx_init_real_ca(gr_ctx_t ctx);
 void gr_ctx_init_complex_ca(gr_ctx_t ctx);
 void gr_ctx_init_real_algebraic_ca(gr_ctx_t ctx);
 void gr_ctx_init_complex_algebraic_ca(gr_ctx_t ctx);
+void gr_ctx_init_complex_extended_ca(gr_ctx_t ctx);
 void _gr_ctx_init_ca_from_ref(gr_ctx_t ctx, int which_ring, void * ca_ctx);
 
 void gr_ctx_init_fq(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var);

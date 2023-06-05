@@ -765,9 +765,19 @@ Integer and complex parts
               int gr_im(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
               int gr_sgn(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
               int gr_csgn(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_arg(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 
     These methods may return the flag ``GR_DOMAIN`` (or ``GR_UNABLE``)
     when the ring is not a subring of the real or complex numbers.
+
+Infinities and extended values
+........................................................................
+
+.. function:: int gr_pos_inf(gr_ptr res, gr_ctx_t ctx)
+              int gr_neg_inf(gr_ptr res, gr_ctx_t ctx)
+              int gr_uinf(gr_ptr res, gr_ctx_t ctx)
+              int gr_undefined(gr_ptr res, gr_ctx_t ctx)
+              int gr_unknown(gr_ptr res, gr_ctx_t ctx)
 
 Ordering methods
 ........................................................................

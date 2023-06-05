@@ -29,8 +29,10 @@ _gr_ca_ctx_write(gr_stream_t out, gr_ctx_t ctx)
         gr_stream_write(out, "Complex numbers (ca)");
     else if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA)
         gr_stream_write(out, "Real algebraic numbers (ca)");
-    else
+    else if (ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
         gr_stream_write(out, "Complex algebraic numbers (ca)");
+    else if (ctx->which_ring == GR_CTX_COMPLEX_EXTENDED_CA)
+        gr_stream_write(out, "Complex numbers + extended values (ca)");
     return GR_SUCCESS;
 }
 
@@ -78,28 +80,35 @@ _gr_ca_set_shallow(ca_t res, const ca_t x, const gr_ctx_t ctx)
 int
 _gr_ca_randtest(ca_t res, flint_rand_t state, gr_ctx_t ctx)
 {
-    ca_randtest(res, state, 2, 10, GR_CA_CTX(ctx));
+    if (ctx->which_ring == GR_CTX_COMPLEX_EXTENDED_CA)
+    {
+        ca_randtest_special(res, state, 2, 10, GR_CA_CTX(ctx));
+    }
+    else
+    {
+        ca_randtest(res, state, 2, 10, GR_CA_CTX(ctx));
 
-    if (ctx->which_ring == GR_CTX_RR_CA)
-    {
-        if (ca_check_is_real(res, GR_CA_CTX(ctx)) != T_TRUE)
+        if (ctx->which_ring == GR_CTX_RR_CA)
         {
-            ca_randtest_rational(res, state, 10, GR_CA_CTX(ctx));
+            if (ca_check_is_real(res, GR_CA_CTX(ctx)) != T_TRUE)
+            {
+                ca_randtest_rational(res, state, 10, GR_CA_CTX(ctx));
+            }
         }
-    }
-    else if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA)
-    {
-        if (ca_check_is_real(res, GR_CA_CTX(ctx)) != T_TRUE ||
-            ca_check_is_algebraic(res, GR_CA_CTX(ctx)) != T_TRUE)
+        else if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA)
         {
-            ca_randtest_rational(res, state, 10, GR_CA_CTX(ctx));
+            if (ca_check_is_real(res, GR_CA_CTX(ctx)) != T_TRUE ||
+                ca_check_is_algebraic(res, GR_CA_CTX(ctx)) != T_TRUE)
+            {
+                ca_randtest_rational(res, state, 10, GR_CA_CTX(ctx));
+            }
         }
-    }
-    else if (ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
-    {
-        if (ca_check_is_algebraic(res, GR_CA_CTX(ctx)) != T_TRUE)
+        else if (ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
         {
-            ca_randtest_rational(res, state, 10, GR_CA_CTX(ctx));
+            if (ca_check_is_algebraic(res, GR_CA_CTX(ctx)) != T_TRUE)
+            {
+                ca_randtest_rational(res, state, 10, GR_CA_CTX(ctx));
+            }
         }
     }
 
@@ -187,7 +196,8 @@ _gr_ca_set_other(ca_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
             return GR_SUCCESS;
 
         case GR_CTX_FMPZI:
-            if (target == GR_CTX_CC_CA || target == GR_CTX_COMPLEX_ALGEBRAIC_CA || fmpz_is_zero(fmpzi_imagref((const fmpzi_struct *) x)))
+            if (target == GR_CTX_CC_CA || target == GR_CTX_COMPLEX_ALGEBRAIC_CA || target == GR_CTX_COMPLEX_EXTENDED_CA ||
+                fmpz_is_zero(fmpzi_imagref((const fmpzi_struct *) x)))
             {
                 ca_set_fmpzi(res, x, GR_CA_CTX(ctx));
                 return GR_SUCCESS;
@@ -204,6 +214,7 @@ _gr_ca_set_other(ca_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
         case GR_CTX_COMPLEX_ALGEBRAIC_QQBAR:
             if (target == GR_CTX_CC_CA ||
                 target == GR_CTX_COMPLEX_ALGEBRAIC_CA ||
+                target == GR_CTX_COMPLEX_EXTENDED_CA ||
                 qqbar_is_real(x))
             {
                 ca_set_qqbar(res, x, GR_CA_CTX(ctx));
@@ -222,7 +233,7 @@ _gr_ca_set_other(ca_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
             {
                 truth_t ok = T_UNKNOWN;
 
-                if (target == GR_CTX_CC_CA || target == GR_CTX_COMPLEX_ALGEBRAIC_CA)
+                if (target == GR_CTX_CC_CA || target == GR_CTX_COMPLEX_ALGEBRAIC_CA || target == GR_CTX_COMPLEX_EXTENDED_CA)
                 {
                     ok = T_TRUE;
                 }
@@ -248,7 +259,7 @@ _gr_ca_set_other(ca_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
             {
                 truth_t ok = T_UNKNOWN;
 
-                if (target == GR_CTX_RR_CA || target == GR_CTX_CC_CA)
+                if (target == GR_CTX_RR_CA || target == GR_CTX_CC_CA || target == GR_CTX_COMPLEX_EXTENDED_CA)
                 {
                     ok = T_TRUE;
                 }
@@ -270,19 +281,19 @@ _gr_ca_set_other(ca_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
             {
                 truth_t ok = T_UNKNOWN;
 
-                if (ctx->which_ring == GR_CTX_CC_CA)
+                if (target == GR_CTX_CC_CA || target == GR_CTX_COMPLEX_EXTENDED_CA)
                 {
                     ok = T_TRUE;
                 }
-                else if (ctx->which_ring == GR_CTX_RR_CA)
+                else if (target == GR_CTX_RR_CA)
                 {
                     ok = ca_check_is_real(x, GR_CA_CTX(x_ctx));
                 }
-                else if (ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
+                else if (target == GR_CTX_COMPLEX_ALGEBRAIC_CA)
                 {
                     ok = ca_check_is_algebraic(x, GR_CA_CTX(x_ctx));
                 }
-                else if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA)
+                else if (target == GR_CTX_REAL_ALGEBRAIC_CA)
                 {
                     ok = truth_and(ca_check_is_algebraic(x, GR_CA_CTX(x_ctx)), ca_check_is_real(x, GR_CA_CTX(x_ctx)));
                 }
@@ -295,6 +306,56 @@ _gr_ca_set_other(ca_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 
                 return (ok == T_FALSE) ? GR_DOMAIN : GR_UNABLE;
             }
+
+        case GR_CTX_COMPLEX_EXTENDED_CA:
+            {
+                truth_t ok = T_UNKNOWN;
+
+                if (target == GR_CTX_COMPLEX_EXTENDED_CA)
+                {
+                    ok = T_TRUE;
+                }
+                else
+                {
+                    if (ca_check_is_undefined(x, GR_CA_CTX(x_ctx)) == T_TRUE ||
+                         ca_check_is_infinity(x, GR_CA_CTX(x_ctx)) == T_TRUE)
+                    {
+                        ok = T_FALSE;
+                    }
+                    else if (ca_is_unknown(x, GR_CA_CTX(x_ctx)))
+                    {
+                        ok = T_UNKNOWN;
+                    }
+                    else
+                    {
+                        if (target == GR_CTX_RR_CA)
+                        {
+                            ok = ca_check_is_real(x, GR_CA_CTX(x_ctx));
+                        }
+                        else if (target == GR_CTX_COMPLEX_ALGEBRAIC_CA)
+                        {
+                            ok = ca_check_is_algebraic(x, GR_CA_CTX(x_ctx));
+                        }
+                        else if (target == GR_CTX_REAL_ALGEBRAIC_CA)
+                        {
+                            ok = truth_and(ca_check_is_algebraic(x, GR_CA_CTX(x_ctx)), ca_check_is_real(x, GR_CA_CTX(x_ctx)));
+                        }
+                        else
+                        {
+                            ok = T_TRUE;
+                        }
+                    }
+                }
+
+                if (ok == T_TRUE)
+                {
+                    ca_transfer(res, GR_CA_CTX(ctx), x, GR_CA_CTX(x_ctx));
+                    return GR_SUCCESS;
+                }
+
+                return (ok == T_FALSE) ? GR_DOMAIN : GR_UNABLE;
+            }
+
     }
 
     return GR_UNABLE;
@@ -337,6 +398,16 @@ _gr_ca_get_arb_with_prec(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec)
 int
 _gr_ca_get_acb_with_prec(acb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec)
 {
+    if (x_ctx->which_ring == GR_CTX_COMPLEX_EXTENDED_CA)
+    {
+        if (ca_check_is_undefined(x, GR_CA_CTX(x_ctx)) == T_TRUE ||
+             ca_check_is_infinity(x, GR_CA_CTX(x_ctx)) == T_TRUE)
+            return GR_DOMAIN;
+
+        if (ca_is_unknown(x, GR_CA_CTX(x_ctx)))
+            return GR_UNABLE;
+    }
+
     /* todo: when to use accurate_parts? */
     ca_get_acb(res, x, prec, GR_CA_CTX(x_ctx));
     acb_set_round(res, res, prec);
@@ -574,88 +645,80 @@ _gr_ca_mul_fmpq(ca_t res, const ca_t x, const fmpq_t y, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
-_gr_ca_inv(ca_t res, const ca_t x, gr_ctx_t ctx)
+static int
+handle_possible_special_value(ca_t res, gr_ctx_t ctx)
 {
-    ca_inv(res, x, GR_CA_CTX(ctx));
+    if (ctx->which_ring == GR_CTX_COMPLEX_EXTENDED_CA)
+        return GR_SUCCESS;
 
     if (ca_is_unknown(res, GR_CA_CTX(ctx)))
         return GR_UNABLE;
 
     if (ca_is_special(res, GR_CA_CTX(ctx)))
+    {
+        ca_unknown(res, GR_CA_CTX(ctx));   /* don't output an invalid element */
         return GR_DOMAIN;
+    }
 
     return GR_SUCCESS;
+}
+
+#define DEF_SPECIAL(name) \
+int \
+_gr_ca_ ## name(ca_t res, gr_ctx_t ctx) \
+{ \
+    if (ctx->which_ring != GR_CTX_COMPLEX_EXTENDED_CA) \
+        return GR_DOMAIN; \
+    ca_ ## name(res, GR_CA_CTX(ctx)); \
+    return GR_SUCCESS; \
+}
+
+DEF_SPECIAL(pos_inf)
+DEF_SPECIAL(neg_inf)
+DEF_SPECIAL(uinf)
+DEF_SPECIAL(undefined)
+DEF_SPECIAL(unknown)
+
+int
+_gr_ca_inv(ca_t res, const ca_t x, gr_ctx_t ctx)
+{
+    ca_inv(res, x, GR_CA_CTX(ctx));
+    return handle_possible_special_value(res, ctx);
 }
 
 int
 _gr_ca_div(ca_t res, const ca_t x, const ca_t y, gr_ctx_t ctx)
 {
     ca_div(res, x, y, GR_CA_CTX(ctx));
-
-    if (ca_is_unknown(res, GR_CA_CTX(ctx)))
-        return GR_UNABLE;
-
-    if (ca_is_special(res, GR_CA_CTX(ctx)))
-        return GR_DOMAIN;
-
-    return GR_SUCCESS;
+    return handle_possible_special_value(res, ctx);
 }
 
 int
 _gr_ca_div_si(ca_t res, const ca_t x, slong y, gr_ctx_t ctx)
 {
-    if (y == 0)
-    {
-        return GR_DOMAIN;
-    }
-    else
-    {
-        ca_div_si(res, x, y, GR_CA_CTX(ctx));
-        return GR_SUCCESS;
-    }
+    ca_div_si(res, x, y, GR_CA_CTX(ctx));
+    return handle_possible_special_value(res, ctx);
 }
 
 int
 _gr_ca_div_ui(ca_t res, const ca_t x, ulong y, gr_ctx_t ctx)
 {
-    if (y == 0)
-    {
-        return GR_DOMAIN;
-    }
-    else
-    {
-        ca_div_ui(res, x, y, GR_CA_CTX(ctx));
-        return GR_SUCCESS;
-    }
+    ca_div_ui(res, x, y, GR_CA_CTX(ctx));
+    return handle_possible_special_value(res, ctx);
 }
 
 int
 _gr_ca_div_fmpz(ca_t res, const ca_t x, const fmpz_t y, gr_ctx_t ctx)
 {
-    if (fmpz_is_zero(y))
-    {
-        return GR_DOMAIN;
-    }
-    else
-    {
-        ca_div_fmpz(res, x, y, GR_CA_CTX(ctx));
-        return GR_SUCCESS;
-    }
+    ca_div_fmpz(res, x, y, GR_CA_CTX(ctx));
+    return handle_possible_special_value(res, ctx);
 }
 
 int
 _gr_ca_div_fmpq(ca_t res, const ca_t x, const fmpq_t y, gr_ctx_t ctx)
 {
-    if (fmpq_is_zero(y))
-    {
-        return GR_DOMAIN;
-    }
-    else
-    {
-        ca_div_fmpq(res, x, y, GR_CA_CTX(ctx));
-        return GR_SUCCESS;
-    }
+    ca_div_fmpq(res, x, y, GR_CA_CTX(ctx));
+    return handle_possible_special_value(res, ctx);
 }
 
 truth_t
@@ -668,35 +731,21 @@ int
 _gr_ca_pow_ui(ca_t res, const ca_t x, ulong exp, gr_ctx_t ctx)
 {
     ca_pow_ui(res, x, exp, GR_CA_CTX(ctx));
-    return GR_SUCCESS;
+    return handle_possible_special_value(res, ctx);
 }
 
 int
 _gr_ca_pow_si(ca_t res, const ca_t x, slong exp, gr_ctx_t ctx)
 {
     ca_pow_si(res, x, exp, GR_CA_CTX(ctx));
-
-    if (ca_is_unknown(res, GR_CA_CTX(ctx)))
-        return GR_UNABLE;
-
-    if (ca_is_special(res, GR_CA_CTX(ctx)))
-        return GR_DOMAIN;
-
-    return GR_SUCCESS;
+    return handle_possible_special_value(res, ctx);
 }
 
 int
 _gr_ca_pow_fmpz(ca_t res, const ca_t x, const fmpz_t exp, gr_ctx_t ctx)
 {
     ca_pow_fmpz(res, x, exp, GR_CA_CTX(ctx));
-
-    if (ca_is_unknown(res, GR_CA_CTX(ctx)))
-        return GR_UNABLE;
-
-    if (ca_is_special(res, GR_CA_CTX(ctx)))
-        return GR_DOMAIN;
-
-    return GR_SUCCESS;
+    return handle_possible_special_value(res, ctx);
 }
 
 int
@@ -717,13 +766,7 @@ _gr_ca_pow_fmpq(ca_t res, const ca_t x, const fmpq_t exp, gr_ctx_t ctx)
             return GR_DOMAIN;
     }
 
-    if (ca_is_unknown(res, GR_CA_CTX(ctx)))
-        return GR_UNABLE;
-
-    if (ca_is_special(res, GR_CA_CTX(ctx)))
-        return GR_DOMAIN;
-
-    return GR_SUCCESS;
+    return handle_possible_special_value(res, ctx);
 }
 
 int
@@ -757,13 +800,7 @@ _gr_ca_pow(ca_t res, const ca_t x, const ca_t exp, gr_ctx_t ctx)
             return GR_DOMAIN;
     }
 
-    if (ca_is_unknown(res, GR_CA_CTX(ctx)))
-        return GR_UNABLE;
-
-    if (ca_is_special(res, GR_CA_CTX(ctx)))
-        return GR_DOMAIN;
-
-    return GR_SUCCESS;
+    return handle_possible_special_value(res, ctx);
 }
 
 truth_t
@@ -797,13 +834,7 @@ _gr_ca_sqrt(ca_t res, const ca_t x, gr_ctx_t ctx)
             return GR_DOMAIN;
     }
 
-    if (ca_is_unknown(res, GR_CA_CTX(ctx)))
-        return GR_UNABLE;
-
-    if (ca_is_special(res, GR_CA_CTX(ctx)))
-        return GR_DOMAIN;
-
-    return GR_SUCCESS;
+    return handle_possible_special_value(res, ctx);
 }
 
 int
@@ -825,13 +856,7 @@ _gr_ca_rsqrt(ca_t res, const ca_t x, gr_ctx_t ctx)
             return GR_DOMAIN;
     }
 
-    if (ca_is_unknown(res, GR_CA_CTX(ctx)))
-        return GR_UNABLE;
-
-    if (ca_is_special(res, GR_CA_CTX(ctx)))
-        return GR_DOMAIN;
-
-    return GR_SUCCESS;
+    return handle_possible_special_value(res, ctx);
 }
 
 int
@@ -1023,6 +1048,17 @@ _gr_ca_csgn(ca_t res, const ca_t x, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_ca_arg(ca_t res, const ca_t x, gr_ctx_t ctx)
+{
+    ca_arg(res, x, GR_CA_CTX(ctx));
+
+    if (ca_is_unknown(res, GR_CA_CTX(ctx)))
+        return GR_UNABLE;
+
+    return GR_SUCCESS;
+}
+
 
 #define CMP_UNDEFINED -2
 #define CMP_UNKNOWN -3
@@ -1053,11 +1089,7 @@ _gr_ca_pi(ca_t res, gr_ctx_t ctx)
         return GR_DOMAIN;
 
     ca_pi(res, GR_CA_CTX(ctx));
-
-    if (ca_is_unknown(res, GR_CA_CTX(ctx)))
-        return GR_UNABLE;
-
-    return GR_SUCCESS;
+    return handle_possible_special_value(res, ctx);
 }
 
 int
@@ -1076,11 +1108,7 @@ _gr_ca_exp(ca_t res, const ca_t x, gr_ctx_t ctx)
     else
     {
         ca_exp(res, x, GR_CA_CTX(ctx));
-
-        if (ca_is_unknown(res, GR_CA_CTX(ctx)))
-            return GR_UNABLE;
-
-        return GR_SUCCESS;
+        return handle_possible_special_value(res, ctx);
     }
 }
 
@@ -1111,13 +1139,7 @@ _gr_ca_log(ca_t res, const ca_t x, gr_ctx_t ctx)
             return (ok == T_FALSE) ? GR_DOMAIN : GR_UNABLE;
         }
 
-        if (ca_check_is_infinity(res, GR_CA_CTX(ctx)) == T_TRUE)
-            return GR_DOMAIN;
-
-        if (ca_is_unknown(res, GR_CA_CTX(ctx)))
-            return GR_UNABLE;
-
-        return GR_SUCCESS;
+        return handle_possible_special_value(res, ctx);
     }
 }
 
@@ -1137,14 +1159,7 @@ _gr_ca_atan(ca_t res, const ca_t x, gr_ctx_t ctx)
     else
     {
         ca_atan(res, x, GR_CA_CTX(ctx));
-
-        if (ca_check_is_infinity(res, GR_CA_CTX(ctx)) == T_TRUE)
-            return GR_DOMAIN;
-
-        if (ca_is_unknown(res, GR_CA_CTX(ctx)))
-            return GR_UNABLE;
-
-        return GR_SUCCESS;
+        return handle_possible_special_value(res, ctx);
     }
 }
 
@@ -1317,21 +1332,17 @@ gr_method_tab_input _ca_methods_input[] =
 {
     {GR_METHOD_CTX_CLEAR,       (gr_funcptr) _gr_ca_ctx_clear},
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_ca_ctx_write},
+
     {GR_METHOD_CTX_IS_RING,     (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) gr_generic_ctx_predicate_true},
 
-    {GR_METHOD_CTX_IS_UNIQUE_FACTORIZATION_DOMAIN,
-                                (gr_funcptr) gr_generic_ctx_predicate_true},
-    {GR_METHOD_CTX_IS_FINITE,
-                                (gr_funcptr) gr_generic_ctx_predicate_false},
-    {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,
-                                (gr_funcptr) gr_generic_ctx_predicate_false},
-    {GR_METHOD_CTX_IS_ALGEBRAICALLY_CLOSED,
-                                (gr_funcptr) _gr_ca_ctx_is_algebraically_closed},
-    {GR_METHOD_CTX_IS_ORDERED_RING,
-                                (gr_funcptr) _gr_ca_ctx_is_ordered_ring},
+    {GR_METHOD_CTX_IS_UNIQUE_FACTORIZATION_DOMAIN, (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_IS_FINITE, (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC, (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_ALGEBRAICALLY_CLOSED, (gr_funcptr) _gr_ca_ctx_is_algebraically_closed},
+    {GR_METHOD_CTX_IS_ORDERED_RING, (gr_funcptr) _gr_ca_ctx_is_ordered_ring},
 
     /* important */
     {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr) gr_generic_ctx_predicate_false},
@@ -1406,6 +1417,12 @@ gr_method_tab_input _ca_methods_input[] =
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_ca_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_ca_rsqrt},
 
+    {GR_METHOD_POS_INF,         (gr_funcptr) _gr_ca_pos_inf},
+    {GR_METHOD_NEG_INF,         (gr_funcptr) _gr_ca_neg_inf},
+    {GR_METHOD_UINF,            (gr_funcptr) _gr_ca_uinf},
+    {GR_METHOD_UNDEFINED,       (gr_funcptr) _gr_ca_undefined},
+    {GR_METHOD_UNKNOWN,         (gr_funcptr) _gr_ca_unknown},
+
     {GR_METHOD_FLOOR,           (gr_funcptr) _gr_ca_floor},
     {GR_METHOD_CEIL,            (gr_funcptr) _gr_ca_ceil},
     {GR_METHOD_TRUNC,           (gr_funcptr) _gr_ca_trunc},
@@ -1418,6 +1435,7 @@ gr_method_tab_input _ca_methods_input[] =
     {GR_METHOD_IM,              (gr_funcptr) _gr_ca_im},
     {GR_METHOD_SGN,             (gr_funcptr) _gr_ca_sgn},
     {GR_METHOD_CSGN,            (gr_funcptr) _gr_ca_csgn},
+    {GR_METHOD_ARG,             (gr_funcptr) _gr_ca_arg},
 
     {GR_METHOD_CMP,              (gr_funcptr) _gr_ca_cmp},
 
@@ -1496,4 +1514,10 @@ void
 gr_ctx_init_complex_algebraic_ca(gr_ctx_t ctx)
 {
     _gr_ctx_init_ca(ctx, GR_CTX_COMPLEX_ALGEBRAIC_CA);
+}
+
+void
+gr_ctx_init_complex_extended_ca(gr_ctx_t ctx)
+{
+    _gr_ctx_init_ca(ctx, GR_CTX_COMPLEX_EXTENDED_CA);
 }

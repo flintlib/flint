@@ -176,6 +176,14 @@ Base rings and fields
 
     Sets or retrieves options of a Calcium context object.
 
+Extended number sets
+-------------------------------------------------------------------------------
+
+.. function:: void gr_ctx_init_complex_extended_ca(gr_ctx_t ctx)
+
+    Like :func:`gr_ctx_init_complex_ca` but allows special values
+    (infinities, undefined).
+
 Floating-point arithmetic
 -------------------------------------------------------------------------------
 

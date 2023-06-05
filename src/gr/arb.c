@@ -811,6 +811,29 @@ _gr_arb_sgn(arb_t res, const arb_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_arb_arg(arb_t res, const arb_t x, const gr_ctx_t ctx)
+{
+    if (arb_is_nonnegative(x))
+    {
+        arb_zero(res);
+    }
+    else if (arb_is_negative(x))
+    {
+        arb_const_pi(res, ARB_CTX_PREC(ctx));
+    }
+    else
+    {
+        arb_t t;
+        arb_init(t);
+        arb_const_pi(res, 2 * MAG_BITS);
+        arb_union(res, res, t, ARB_CTX_PREC(ctx));
+        arb_clear(t);
+    }
+
+    return GR_SUCCESS;
+}
+
+int
 _gr_arb_cmp(int * res, const arb_t x, const arb_t y, const gr_ctx_t ctx)
 {
     if ((arb_is_exact(x) && arb_is_exact(y)) || !arb_overlaps(x, y))
@@ -1780,6 +1803,7 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_IM,              (gr_funcptr) _gr_arb_im},
     {GR_METHOD_SGN,             (gr_funcptr) _gr_arb_sgn},
     {GR_METHOD_CSGN,            (gr_funcptr) _gr_arb_sgn},
+    {GR_METHOD_ARG,             (gr_funcptr) _gr_arb_arg},
     {GR_METHOD_CMP,             (gr_funcptr) _gr_arb_cmp},
     {GR_METHOD_CMPABS,          (gr_funcptr) _gr_arb_cmpabs},
     {GR_METHOD_I,               (gr_funcptr) gr_not_in_domain},
