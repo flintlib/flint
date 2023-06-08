@@ -9,20 +9,47 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
+#include <string.h>
+#include "fexpr.h"
 #include "fmpz.h"
 #include "nf.h"
 #include "nf_elem.h"
 #include "gr.h"
+#include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
 
-#define NF_CTX(ring_ctx) ((nf_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
+typedef struct
+{
+    nf_struct * nf;
+    char * var;
+}
+_gr_nf_ctx_t;
+
+#define NF_CTX(ctx) (((_gr_nf_ctx_t *)(ctx))->nf)
+#define NF_VAR(ctx) (((_gr_nf_ctx_t *)(ctx))->var)
+
+static const char * default_var = "a";
 
 int
 _gr_nf_ctx_write(gr_stream_t out, const gr_ctx_t ctx)
 {
     gr_stream_write(out, "Number field ");
-    gr_stream_write_free(out, fmpq_poly_get_str_pretty(NF_CTX(ctx)->pol, "a"));
+    gr_stream_write_free(out, fmpq_poly_get_str_pretty(NF_CTX(ctx)->pol, NF_VAR(ctx)));
+    return GR_SUCCESS;
+}
+
+int _gr_nf_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
+{
+    slong len;
+    len = strlen(s);
+
+    if (NF_VAR(ctx) == default_var)
+        NF_VAR(ctx) = NULL;
+
+    NF_VAR(ctx) = flint_realloc(NF_VAR(ctx), len + 1);
+    memcpy(NF_VAR(ctx), s, len + 1);
     return GR_SUCCESS;
 }
 
@@ -31,6 +58,8 @@ _gr_nf_ctx_clear(gr_ctx_t ctx)
 {
     nf_clear(NF_CTX(ctx));
     flint_free(NF_CTX(ctx));
+    if (NF_VAR(ctx) != default_var)
+        flint_free(NF_VAR(ctx));
 }
 
 void
@@ -78,7 +107,7 @@ _gr_nf_randtest(nf_elem_t res, flint_rand_t state, const gr_ctx_t ctx)
 int
 _gr_nf_write(gr_stream_t out, const nf_elem_t x, const gr_ctx_t ctx)
 {
-    gr_stream_write_free(out, nf_elem_get_str_pretty(x, "a", NF_CTX(ctx)));
+    gr_stream_write_free(out, nf_elem_get_str_pretty(x, NF_VAR(ctx), NF_CTX(ctx)));
     return GR_SUCCESS;
 }
 
@@ -160,6 +189,44 @@ _gr_nf_set_other(nf_elem_t res, gr_ptr v, gr_ctx_t v_ctx, gr_ctx_t ctx)
     }
 
     return gr_generic_set_other(res, v, v_ctx, ctx);
+}
+
+void fexpr_set_nf_elem(fexpr_t res, const nf_elem_t a, const nf_t nf, const fexpr_t var);
+
+int
+_gr_nf_get_fexpr(fexpr_t res, const nf_elem_t a, const gr_ctx_t ctx)
+{
+    fexpr_t var;
+    fexpr_init(var);
+    fexpr_set_symbol_str(var, NF_VAR(ctx));
+    fexpr_set_nf_elem(res, a, NF_CTX(ctx), var);
+    fexpr_clear(var);
+    return GR_SUCCESS;
+}
+
+int
+_gr_nf_set_fexpr(nf_elem_t res, fexpr_vec_t inp, gr_vec_t out, const fexpr_t expr, gr_ctx_t ctx)
+{
+    fexpr_t var;
+    nf_elem_t gen;
+    int status;
+
+    fexpr_init(var);
+
+    fexpr_set_symbol_str(var, NF_VAR(ctx));
+    nf_elem_init(gen, NF_CTX(ctx));
+    nf_elem_gen(gen, NF_CTX(ctx));
+
+    /* todo: pop after use? */
+    fexpr_vec_append(inp, var);
+    GR_MUST_SUCCEED(gr_vec_append(out, gen, ctx));
+
+    fexpr_clear(var);
+    nf_elem_clear(gen, NF_CTX(ctx));
+
+    status = gr_generic_set_fexpr(res, inp, out, expr, ctx);
+
+    return status;
 }
 
 truth_t
@@ -466,6 +533,7 @@ gr_method_tab_input _nf_methods_input[] =
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_CANONICAL,
                                 (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_SET_GEN_NAME, (gr_funcptr) _gr_nf_ctx_set_gen_name},
     {GR_METHOD_INIT,            (gr_funcptr) _gr_nf_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_nf_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) _gr_nf_swap},
@@ -484,6 +552,11 @@ gr_method_tab_input _nf_methods_input[] =
     {GR_METHOD_SET_UI,          (gr_funcptr) _gr_nf_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_nf_set_fmpz},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_nf_set_other},
+
+    {GR_METHOD_SET_FEXPR,       (gr_funcptr) _gr_nf_set_fexpr},
+    {GR_METHOD_GET_FEXPR,       (gr_funcptr) _gr_nf_get_fexpr},
+
+
     {GR_METHOD_NEG,             (gr_funcptr) _gr_nf_neg},
 
     {GR_METHOD_ADD,             (gr_funcptr) _gr_nf_add},
@@ -530,11 +603,11 @@ gr_ctx_init_nf(gr_ctx_t ctx, const fmpq_poly_t poly)
 {
     ctx->which_ring = GR_CTX_NF;
     ctx->sizeof_elem = sizeof(nf_elem_struct);
-
-    ((nf_struct **)(ctx))[0] = flint_malloc(sizeof(nf_struct));
-    nf_init(NF_CTX(ctx), poly);
-
     ctx->size_limit = WORD_MAX;
+
+    NF_CTX(ctx) = flint_malloc(sizeof(nf_struct));
+    nf_init(NF_CTX(ctx), poly);
+    NF_VAR(ctx) = (char *) default_var;
 
     ctx->methods = _nf_methods;
 
@@ -563,10 +636,10 @@ _gr_ctx_init_nf_from_ref(gr_ctx_t ctx, const void * nfctx)
 {
     ctx->which_ring = GR_CTX_NF;
     ctx->sizeof_elem = sizeof(nf_elem_struct);
-
-    ((nf_struct **)(ctx))[0] = (nf_struct *) nfctx;
-
     ctx->size_limit = WORD_MAX;
+
+    NF_CTX(ctx) = (nf_struct *) nfctx;
+    NF_VAR(ctx) = (char *) default_var;
 
     ctx->methods = _nf_methods;
 

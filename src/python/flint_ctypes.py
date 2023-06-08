@@ -391,6 +391,7 @@ class gr_ctx:
 
     def _set_gen_name(self, s):
         status = libflint.gr_ctx_set_gen_name(self._ref, ctypes.c_char_p(str(s).encode('ascii')))
+        self._str = None
         assert not status
 
     def __call__(self, *args, **kwargs):

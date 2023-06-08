@@ -34,6 +34,36 @@
     } \
     return GR_DOMAIN; \
 
+#define BINARY_OP_WITH_FMPZ(gr_func, gr_func_fmpz) \
+    if (nargs == 2) \
+    { \
+        GR_TMP_INIT(t, ctx); \
+        fexpr_view_arg(arg, expr, 0); \
+        status = gr_set_fexpr(res, inputs, outputs, arg, ctx); \
+        if (status == GR_SUCCESS) \
+        { \
+            fexpr_view_next(arg); \
+            if (fexpr_is_integer(arg)) \
+            { \
+                fmpz_t n; \
+                fmpz_init(n); \
+                fexpr_get_fmpz(n, arg); \
+                status = gr_func_fmpz(res, res, n, ctx); \
+                fmpz_clear(n); \
+            } \
+            else \
+            { \
+                status = gr_set_fexpr(t, inputs, outputs, arg, ctx); \
+                if (status == GR_SUCCESS) \
+                    status = gr_func(res, res, t, ctx); \
+            } \
+        } \
+        GR_TMP_CLEAR(t, ctx); \
+        return status; \
+    } \
+    return GR_DOMAIN; \
+
+
 #define UNARY_OP(gr_func) \
     if (nargs == 1) \
     { \
@@ -228,7 +258,7 @@ gr_generic_set_fexpr(gr_ptr res, fexpr_vec_t inputs, gr_vec_t outputs, const fex
             case FEXPR_Neg: UNARY_OP(gr_neg)
             case FEXPR_Sub: BINARY_OP(gr_sub)
             case FEXPR_Div: BINARY_OP(gr_div)
-            case FEXPR_Pow: BINARY_OP(gr_pow)
+            case FEXPR_Pow: BINARY_OP_WITH_FMPZ(gr_pow, gr_pow_fmpz)
             case FEXPR_Sqrt: UNARY_OP(gr_sqrt)
             case FEXPR_Exp: UNARY_OP(gr_exp)
             case FEXPR_Log: UNARY_OP(gr_log)

@@ -98,6 +98,7 @@ main(void)
 
         nf_elem_clear(a, nf);
         nf_elem_clear(b, nf);
+        nf_elem_clear(c, nf);
 
         nf_clear(nf);
     }
@@ -141,6 +142,7 @@ main(void)
 
         nf_elem_clear(a, nf);
         nf_elem_clear(b, nf);
+        nf_elem_clear(c, nf);
 
         nf_clear(nf);
 
