@@ -32,6 +32,7 @@ AC_PREREQ(2.59)
 define(FLINT_VERSION,[3.0.0-dev])
 
 AC_INIT(FLINT, FLINT_VERSION, [https://github.com/flintlib/flint2/issues/], flint, [https://flintlib.org/])
+AC_CONFIG_AUX_DIR([config])
 AC_LANG(C)
 
 # Every major version of Flint (1.0, 1.1, 1.2, etc.) gets
