@@ -40,7 +40,7 @@ want_parens(const char * s)
 }
 
 int
-gr_poly_write(gr_stream_t out, const gr_poly_t poly, gr_ctx_t ctx)
+gr_poly_write(gr_stream_t out, const gr_poly_t poly, const char * x, gr_ctx_t ctx)
 {
     int status;
     slong i, n;
@@ -70,7 +70,7 @@ gr_poly_write(gr_stream_t out, const gr_poly_t poly, gr_ctx_t ctx)
             if (printed_previously)
                 gr_stream_write(out, " + ");
 
-            gr_stream_write(out, "x");
+            gr_stream_write(out, x);
 
             if (i >= 2)
             {
@@ -81,9 +81,11 @@ gr_poly_write(gr_stream_t out, const gr_poly_t poly, gr_ctx_t ctx)
         else if (i >= 1 && !strcmp(s, "-1"))
         {
             if (printed_previously)
-                gr_stream_write(out, " - x");
+                gr_stream_write(out, " - ");
             else
-                gr_stream_write(out, "-x");
+                gr_stream_write(out, "-");
+
+            gr_stream_write(out, x);
 
             if (i >= 2)
             {
@@ -122,11 +124,14 @@ gr_poly_write(gr_stream_t out, const gr_poly_t poly, gr_ctx_t ctx)
 
             if (i == 1)
             {
-                gr_stream_write(out, "*x");
+                gr_stream_write(out, "*");
+                gr_stream_write(out, x);
             }
             else if (i >= 2)
             {
-                gr_stream_write(out, "*x^");
+                gr_stream_write(out, "*");
+                gr_stream_write(out, x);
+                gr_stream_write(out, "^");
                 gr_stream_write_si(out, i);
             }
         }
@@ -160,5 +165,5 @@ gr_poly_print(const gr_poly_t poly, gr_ctx_t ctx)
 {
     gr_stream_t out;
     gr_stream_init_file(out, stdout);
-    return gr_poly_write(out, poly, ctx);
+    return gr_poly_write(out, poly, "x", ctx);
 }

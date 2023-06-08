@@ -9,6 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
+#include <string.h>
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpz_mat.h"
@@ -19,7 +21,30 @@
 #include "gr_poly.h"
 #include "fmpz_poly_factor.h"
 
-/* todo: _fmpz methods */
+#define FMPZ_POLY_CTX(ctx) POLYNOMIAL_CTX(ctx)
+#define FMPZ_POLY_CTX_VAR(ctx) (FMPZ_POLY_CTX(ctx)->var)
+
+static const char * default_var = "x";
+
+void
+_gr_fmpz_poly_ctx_clear(gr_ctx_t ctx)
+{
+    if (FMPZ_POLY_CTX_VAR(ctx) != default_var)
+        flint_free(FMPZ_POLY_CTX_VAR(ctx));
+}
+
+int _gr_fmpz_poly_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
+{
+    slong len;
+    len = strlen(s);
+
+    if (FMPZ_POLY_CTX_VAR(ctx) == default_var)
+        FMPZ_POLY_CTX_VAR(ctx) = NULL;
+
+    FMPZ_POLY_CTX_VAR(ctx) = flint_realloc(FMPZ_POLY_CTX_VAR(ctx), len + 1);
+    memcpy(FMPZ_POLY_CTX_VAR(ctx), s, len + 1);
+    return GR_SUCCESS;
+}
 
 int
 _gr_fmpz_poly_ctx_write(gr_stream_t out, gr_ctx_t ctx)
@@ -70,7 +95,12 @@ _gr_fmpz_poly_randtest(fmpz_poly_t res, flint_rand_t state, const gr_ctx_t ctx)
 int
 _gr_fmpz_poly_write(gr_stream_t out, const fmpz_poly_t x, const gr_ctx_t ctx)
 {
-    gr_stream_write_free(out, fmpz_poly_get_str_pretty(x, "x"));
+    const char * var = FMPZ_POLY_CTX_VAR(ctx);
+
+    if (var == NULL)
+        var = "x";
+
+    gr_stream_write_free(out, fmpz_poly_get_str_pretty(x, var));
     return GR_SUCCESS;
 }
 
@@ -716,7 +746,6 @@ _gr_fmpz_poly_factor(fmpz_poly_t c, gr_vec_t factors, gr_vec_t exponents, gr_src
     return GR_SUCCESS;
 }
 
-
 int _fmpz_poly_methods_initialized = 0;
 
 gr_static_method_table _fmpz_poly_methods;
@@ -741,6 +770,9 @@ gr_method_tab_input _fmpz_poly_methods_input[] =
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_CANONICAL,
                                 (gr_funcptr) gr_generic_ctx_predicate_true},
+
+    {GR_METHOD_CTX_SET_GEN_NAME,    (gr_funcptr) _gr_fmpz_poly_ctx_set_gen_name},
+
     {GR_METHOD_INIT,            (gr_funcptr) _gr_fmpz_poly_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_fmpz_poly_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) _gr_fmpz_poly_swap},
@@ -808,8 +840,11 @@ gr_ctx_init_fmpz_poly(gr_ctx_t ctx)
     ctx->which_ring = GR_CTX_FMPZ_POLY;
     ctx->sizeof_elem = sizeof(fmpz_poly_struct);
     ctx->size_limit = WORD_MAX;
-
     ctx->methods = _fmpz_poly_methods;
+
+    POLYNOMIAL_CTX(ctx)->base_ring = NULL;
+    POLYNOMIAL_CTX(ctx)->degree_limit = WORD_MAX;
+    POLYNOMIAL_CTX(ctx)->var = (char *) default_var;
 
     if (!_fmpz_poly_methods_initialized)
     {

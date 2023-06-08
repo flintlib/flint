@@ -389,6 +389,10 @@ class gr_ctx:
                 libflint.flint_free(arr)
         return self._str
 
+    def _set_gen_name(self, s):
+        status = libflint.gr_ctx_set_gen_name(self._ref, ctypes.c_char_p(str(s).encode('ascii')))
+        assert not status
+
     def __call__(self, *args, **kwargs):
         kwargs['context'] = self
         return self._elem_type(*args, **kwargs)
@@ -1815,7 +1819,7 @@ class gr_ctx:
             >>> RR.chebyshev_t(0.5, 0.75)
             [0.935414346693485 +/- 5.18e-16]
             >>> ZZx.chebyshev_t(4, [0, 1])
-            1 - 8*x^2 + 8*x^4
+            8*x^4-8*x^2+1
         """
         return ctx._binary_op_with_overloads(n, x, libgr.gr_chebyshev_t, fmpz_op=libgr.gr_chebyshev_t_fmpz, rstr="chebyshev_t($n, $x)")
 
@@ -1828,7 +1832,7 @@ class gr_ctx:
             >>> RR.chebyshev_u(0.5, 0.75)
             [1.33630620956212 +/- 2.68e-15]
             >>> ZZx.chebyshev_u(4, [0, 1])
-            1 - 12*x^2 + 16*x^4
+            16*x^4-12*x^2+1
         """
         return ctx._binary_op_with_overloads(n, x, libgr.gr_chebyshev_u, fmpz_op=libgr.gr_chebyshev_u_fmpz, rstr="chebyshev_u($n, $x)")
 
@@ -2111,7 +2115,7 @@ class gr_ctx:
             >>> [ZZ.rising(3, k) for k in range(5)]
             [1, 3, 12, 60, 360]
             >>> ZZx.rising(ZZx([0,1]), 5)
-            24*x + 50*x^2 + 35*x^3 + 10*x^4 + x^5
+            x^5+10*x^4+35*x^3+50*x^2+24*x
             >>> RR.rising(1, 10**7)
             [1.202423400515903e+65657059 +/- 5.57e+65657043]
         """
@@ -2124,7 +2128,7 @@ class gr_ctx:
             >>> [ZZ.falling(3, k) for k in range(5)]
             [1, 3, 6, 6, 0]
             >>> ZZx.falling(ZZx([0,1]), 5)
-            24*x - 50*x^2 + 35*x^3 - 10*x^4 + x^5
+            x^5-10*x^4+35*x^3-50*x^2+24*x
             >>> RR.log(RR.falling(RR.pi(), 10**7))
             [151180898.7174084 +/- 9.72e-8]
             >>> RR.falling(10.5, 3.5)
@@ -2868,13 +2872,13 @@ class gr_ctx:
         Hilbert class polynomial H_D(x) evaluated at x.
 
             >>> ZZx.hilbert_class_poly(-20, ZZx.gen())
-            -681472000 - 1264000*x + x^2
+            x^2-1264000*x-681472000
             >>> CC.hilbert_class_poly(-20, 1+1j)
             (-682736000.0000000 - 1263998.000000000*I)
             >>> ZZx.hilbert_class_poly(-21, ZZx.gen())
             Traceback (most recent call last):
               ...
-            FlintDomainError: hilbert_class_poly(D, x) is not an element of {Ring of polynomials over Integer ring (fmpz)} for {D = -21}, {x = x}
+            FlintDomainError: hilbert_class_poly(D, x) is not an element of {Polynomials over integers (fmpz_poly)} for {D = -21}, {x = x}
         """
         D = ctx._as_si(D)
         x = ctx._as_elem(x)
@@ -4600,11 +4604,11 @@ class gr_poly(gr_elem):
         truncated to length n.
 
             >>> ZZx([1,2,3]).inv_series(10)
-            1 - 2*x + x^2 + 4*x^3 - 11*x^4 + 10*x^5 + 13*x^6 - 56*x^7 + 73*x^8 + 22*x^9
+            22*x^9+73*x^8-56*x^7+13*x^6+10*x^5-11*x^4+4*x^3+x^2-2*x+1
             >>> ZZx([2,3,4]).inv_series(5)
             Traceback (most recent call last):
               ...
-            FlintDomainError: f.inv_series(n) is not an element of {Ring of polynomials over Integer ring (fmpz)} for {f = 2 + 3*x + 4*x^2}, {n = 5}
+            FlintDomainError: f.inv_series(n) is not an element of {Polynomials over integers (fmpz_poly)} for {f = 4*x^2+3*x+2}, {n = 5}
             >>> QQx([2,3,4]).inv_series(5)
             (1/2) + (-3/4)*x + (1/8)*x^2 + (21/16)*x^3 + (-71/32)*x^4
         """
@@ -6263,7 +6267,8 @@ MatCC = Mat(CC)
 MatRF = Mat(RF)
 MatCF = Mat(CF)
 
-ZZx = ZZx_gr_poly = PolynomialRing_gr_poly(ZZ)
+ZZx_gr_poly = PolynomialRing_gr_poly(ZZ)
+ZZx = ZZx_fmpz_poly
 QQx = QQx_gr_poly = PolynomialRing_gr_poly(QQ)
 RRx = RRx_arb = PolynomialRing_gr_poly(RR_arb)
 CCx = CCx_acb = PolynomialRing_gr_poly(CC_acb)

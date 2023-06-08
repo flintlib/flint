@@ -135,7 +135,7 @@ gr_series_randtest(gr_series_t res, flint_rand_t state, slong len, gr_series_ctx
 int
 gr_series_write(gr_stream_t out, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx_t cctx)
 {
-    gr_poly_write(out, &x->poly, cctx);
+    gr_poly_write(out, &x->poly, "x", cctx);
 
     if (x->error != SERIES_ERR_EXACT)
     {

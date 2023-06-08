@@ -255,6 +255,14 @@ Context operations
     the string with ``flint_free``).
     The *println* version prints a trailing newline.
 
+.. function:: int gr_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
+              int gr_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
+
+    Set the name of the generator (univariate polynomial ring,
+    finite field, etc.) or generators (multivariate).
+    The name is used when printing and may be used to choose
+    coercions.
+
 Element operations
 --------------------------------------------------------------------------------
 

@@ -155,6 +155,9 @@ typedef enum
     GR_METHOD_CTX_SET_REAL_PREC,
     GR_METHOD_CTX_GET_REAL_PREC,
 
+    GR_METHOD_CTX_SET_GEN_NAME,
+    GR_METHOD_CTX_SET_GEN_NAMES,
+
     GR_METHOD_INIT,
     GR_METHOD_CLEAR,
     GR_METHOD_SWAP,
@@ -762,6 +765,8 @@ typedef truth_t ((*gr_method_ctx_predicate)(gr_ctx_ptr));
 typedef int ((*gr_method_ctx_set_si)(gr_ctx_ptr, slong));
 typedef int ((*gr_method_ctx_get_si)(slong *, gr_ctx_ptr));
 typedef int ((*gr_method_ctx_stream)(gr_stream_t, gr_ctx_ptr));
+typedef int ((*gr_method_ctx_set_str)(gr_ctx_ptr, const char *));
+typedef int ((*gr_method_ctx_set_strs)(gr_ctx_ptr, const char **));
 typedef int ((*gr_method_stream_in)(gr_stream_t, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_stream_in_si)(gr_stream_t, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_randtest)(gr_ptr, flint_rand_t state, gr_ctx_ptr));
@@ -852,6 +857,8 @@ typedef int ((*gr_method_set_fexpr_op)(gr_ptr, fexpr_vec_t, gr_vec_t, const fexp
 #define GR_CTX_PREDICATE(ctx, NAME) (((gr_method_ctx_predicate *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_CTX_SET_SI(ctx, NAME) (((gr_method_ctx_set_si *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_CTX_GET_SI(ctx, NAME) (((gr_method_ctx_get_si *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_CTX_SET_STR(ctx, NAME) (((gr_method_ctx_set_str *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_CTX_SET_STRS(ctx, NAME) (((gr_method_ctx_set_strs *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_STREAM_IN(ctx, NAME) (((gr_method_stream_in *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_STREAM_IN_SI(ctx, NAME) (((gr_method_stream_in_si *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_RANDTEST(ctx, NAME) (((gr_method_randtest *) ctx->methods)[GR_METHOD_ ## NAME])
@@ -963,6 +970,9 @@ GR_INLINE truth_t gr_ctx_is_threadsafe(gr_ctx_t ctx) { return GR_CTX_PREDICATE(c
 GR_INLINE truth_t gr_ctx_has_real_prec(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_HAS_REAL_PREC)(ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_ctx_set_real_prec(gr_ctx_t ctx, slong prec) { return GR_CTX_SET_SI(ctx, CTX_SET_REAL_PREC)(ctx, prec); }
 GR_INLINE WARN_UNUSED_RESULT int gr_ctx_get_real_prec(slong * prec, gr_ctx_t ctx) { return GR_CTX_GET_SI(ctx, CTX_GET_REAL_PREC)(prec, ctx); }
+
+GR_INLINE WARN_UNUSED_RESULT int gr_ctx_set_gen_name(gr_ctx_t ctx, const char * s) { return GR_CTX_SET_STR(ctx, CTX_SET_GEN_NAME)(ctx, s); }
+GR_INLINE WARN_UNUSED_RESULT int gr_ctx_set_gen_names(gr_ctx_t ctx, const char ** s) { return GR_CTX_SET_STRS(ctx, CTX_SET_GEN_NAMES)(ctx, s); }
 
 GR_INLINE slong _gr_ctx_get_real_prec(gr_ctx_t ctx)
 {

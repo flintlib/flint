@@ -11,6 +11,8 @@
 
 /* Polynomials over generic rings */
 
+#include <stdlib.h>
+#include <string.h>
 #include "fmpz.h"
 #include "ulong_extras.h"
 #include "gr.h"
@@ -34,6 +36,19 @@ int polynomial_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
     gr_stream_write(out, "Ring of polynomials over ");
     gr_ctx_write(out, POLYNOMIAL_ELEM_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int _gr_gr_poly_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
+{
+    slong len;
+    len = strlen(s);
+
+    if (POLYNOMIAL_CTX(ctx)->var == default_var)
+        POLYNOMIAL_CTX(ctx)->var = NULL;
+
+    POLYNOMIAL_CTX(ctx)->var = flint_realloc(POLYNOMIAL_CTX(ctx)->var, len + 1);
+    memcpy(POLYNOMIAL_CTX(ctx)->var, s, len + 1);
     return GR_SUCCESS;
 }
 
@@ -99,7 +114,7 @@ polynomial_write(gr_stream_t out, gr_poly_t poly, gr_ctx_t ctx)
         return GR_SUCCESS;
     }
 
-    return gr_poly_write(out, poly, POLYNOMIAL_ELEM_CTX(ctx));
+    return gr_poly_write(out, poly, POLYNOMIAL_CTX(ctx)->var, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
 int
@@ -370,6 +385,7 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) polynomial_ctx_is_integral_domain},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr) polynomial_ctx_is_threadsafe},
+    {GR_METHOD_CTX_SET_GEN_NAME, (gr_funcptr) _gr_gr_poly_ctx_set_gen_name},
 
     {GR_METHOD_INIT,        (gr_funcptr) polynomial_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) polynomial_clear},
