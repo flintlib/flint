@@ -10,5 +10,6 @@
 */
 
 #define GR_INLINES_C
+#include "fexpr.h"
 #include "gr.h"
 #undef GR_INLINES_C

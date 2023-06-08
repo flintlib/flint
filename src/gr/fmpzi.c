@@ -11,6 +11,7 @@
 
 #include <math.h>
 #include "fmpq.h"
+#include "fexpr.h"
 #include "qqbar.h"
 #include "fmpzi.h"
 #include "gr.h"
@@ -258,6 +259,20 @@ _gr_fmpzi_get_fmpq(fmpq_t res, const fmpzi_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+/* todo: qqbar should call an fmpzi method rather than vice versa */
+void qqbar_set_fmpzi(qqbar_t res, const fmpzi_t x);
+
+int
+_gr_fmpzi_get_fexpr(fexpr_t res, const fmpzi_t x, const gr_ctx_t ctx)
+{
+    qqbar_t t;
+    int status;
+    qqbar_init(t);
+    qqbar_set_fmpzi(t, x);
+    status = qqbar_get_fexpr_formula(res, t, QQBAR_FORMULA_GAUSSIANS) ? GR_SUCCESS : GR_UNABLE;
+    qqbar_clear(t);
+    return status;
+}
 
 int
 _gr_fmpzi_get_ui(ulong * res, const fmpzi_t x, const gr_ctx_t ctx)
@@ -918,6 +933,7 @@ gr_method_tab_input _fmpzi_methods_input[] =
     {GR_METHOD_GET_UI,          (gr_funcptr) _gr_fmpzi_get_ui},
     {GR_METHOD_GET_SI,          (gr_funcptr) _gr_fmpzi_get_si},
     {GR_METHOD_GET_D,           (gr_funcptr) _gr_fmpzi_get_d},
+    {GR_METHOD_GET_FEXPR,       (gr_funcptr) _gr_fmpzi_get_fexpr},
     {GR_METHOD_NEG,             (gr_funcptr) _gr_fmpzi_neg},
     {GR_METHOD_ADD,             (gr_funcptr) _gr_fmpzi_add},
     {GR_METHOD_ADD_UI,          (gr_funcptr) _gr_fmpzi_add_ui},

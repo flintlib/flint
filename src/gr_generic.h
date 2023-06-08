@@ -102,6 +102,10 @@ WARN_UNUSED_RESULT int gr_generic_neg_one(gr_ptr res, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_set_other(gr_ptr res, gr_srcptr x, gr_ctx_t xctx, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_set_fmpq(gr_ptr res, const fmpq_t y, gr_ctx_t ctx);
 
+#ifdef FEXPR_H
+WARN_UNUSED_RESULT int gr_generic_set_fexpr(gr_ptr res, fexpr_vec_t inputs, gr_vec_t outputs, const fexpr_t expr, gr_ctx_t ctx);
+#endif
+
 WARN_UNUSED_RESULT int gr_generic_add_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_add_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_add_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx);

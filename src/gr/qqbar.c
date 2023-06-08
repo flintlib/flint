@@ -13,9 +13,10 @@
 #include "fmpz_poly_factor.h"
 #include "fmpq.h"
 #include "fmpzi.h"
-#include "qqbar.h"
 #include "fexpr.h"
+#include "qqbar.h"
 #include "gr.h"
+#include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
 
@@ -382,6 +383,38 @@ _gr_qqbar_get_d(double * res, const qqbar_t x, const gr_ctx_t ctx)
     *res = arf_get_d(arb_midref(t), ARF_RND_NEAR);
     arb_clear(t);
     return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_get_fexpr(fexpr_t res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    if (!qqbar_get_fexpr_formula(res, x, QQBAR_FORMULA_GAUSSIANS | QQBAR_FORMULA_QUADRATICS))
+        qqbar_get_fexpr_root_nearest(res, x);
+    return GR_SUCCESS;
+}
+
+int
+_gr_qqbar_get_fexpr_serialize(fexpr_t res, const qqbar_t x, const gr_ctx_t ctx)
+{
+    qqbar_get_fexpr_repr(res, x);
+    return GR_SUCCESS;
+}
+
+
+/* todo */
+int _gr_qqbar_set_fexpr(gr_ptr res, fexpr_vec_t inputs, gr_vec_t outputs, const fexpr_t x, gr_ctx_t ctx)
+{
+    if (qqbar_set_fexpr(res, x))
+    {
+        if (QQBAR_CTX(ctx)->real_only && !qqbar_is_real(res))
+            return GR_DOMAIN;
+        else
+            return GR_SUCCESS;
+    }
+    else
+    {
+        return gr_generic_set_fexpr(res, inputs, outputs, x, ctx);
+    }
 }
 
 int
@@ -1115,6 +1148,10 @@ gr_method_tab_input _qqbar_methods_input[] =
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_qqbar_get_fmpz},
     {GR_METHOD_GET_FMPQ,        (gr_funcptr) _gr_qqbar_get_fmpq},
     {GR_METHOD_GET_D,           (gr_funcptr) _gr_qqbar_get_d},
+
+    {GR_METHOD_GET_FEXPR,       (gr_funcptr) _gr_qqbar_get_fexpr},
+    {GR_METHOD_GET_FEXPR_SERIALIZE,       (gr_funcptr) _gr_qqbar_get_fexpr_serialize},
+    {GR_METHOD_SET_FEXPR,       (gr_funcptr) _gr_qqbar_set_fexpr},
 
     {GR_METHOD_NEG,             (gr_funcptr) _gr_qqbar_neg},
 

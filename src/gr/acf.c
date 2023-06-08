@@ -14,6 +14,7 @@
 #include "acb.h"
 #include "arb_fmpz_poly.h"
 #include "gr.h"
+#include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
 

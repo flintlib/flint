@@ -17,8 +17,10 @@
 #include "fmpz_poly_factor.h"
 #include "fmpq.h"
 #include "fmpq_mat.h"
+#include "fexpr.h"
 #include "qqbar.h"
 #include "gr.h"
+#include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
 
@@ -144,7 +146,7 @@ _gr_fmpq_set_d(fmpq_t res, double x, const gr_ctx_t ctx)
 }
 
 int
-_gr_fmpq_set_other(fmpq_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
+_gr_fmpq_set_other(fmpq_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 {
     switch (x_ctx->which_ring)
     {
@@ -157,7 +159,8 @@ _gr_fmpq_set_other(fmpq_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
             return GR_SUCCESS;
     }
 
-    return gr_get_fmpq(res, x, x_ctx);
+    /* handles fexpr */
+    return gr_generic_set_other(res, x, x_ctx, ctx);
 }
 
 int
@@ -200,6 +203,13 @@ int
 _gr_fmpq_get_d(double * res, const fmpq_t x, const gr_ctx_t ctx)
 {
     *res = fmpq_get_d(x);
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpq_get_fexpr(fexpr_t res, const fmpq_t x, const gr_ctx_t ctx)
+{
+    fexpr_set_fmpq(res, x);
     return GR_SUCCESS;
 }
 
@@ -1043,6 +1053,7 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_fmpq_get_fmpz},
     {GR_METHOD_GET_FMPQ,        (gr_funcptr) _gr_fmpq_set},
     {GR_METHOD_GET_D,           (gr_funcptr) _gr_fmpq_get_d},
+    {GR_METHOD_GET_FEXPR,       (gr_funcptr) _gr_fmpq_get_fexpr},
     {GR_METHOD_NEG,             (gr_funcptr) _gr_fmpq_neg},
     {GR_METHOD_ADD,             (gr_funcptr) _gr_fmpq_add},
     {GR_METHOD_ADD_UI,          (gr_funcptr) _gr_fmpq_add_ui},

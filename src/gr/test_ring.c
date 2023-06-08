@@ -13,6 +13,7 @@
 #include "profiler.h"
 #include "long_extras.h"
 
+#include "fexpr.h"
 #include "fmpq.h"
 #include "gr.h"
 #include "gr_vec.h"
@@ -560,6 +561,59 @@ gr_test_get_fmpz_2exp_fmpz(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     return status;
 }
+
+int
+gr_test_get_set_fexpr(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status = GR_SUCCESS;
+    gr_ptr x, y;
+    fexpr_t expr;
+
+    GR_TMP_INIT2(x, y, R);
+
+    GR_MUST_SUCCEED(gr_randtest(x, state, R));
+    GR_MUST_SUCCEED(gr_randtest(y, state, R));
+
+    fexpr_init(expr);
+
+    status |= gr_get_fexpr(expr, x, R);
+
+    if (status == GR_SUCCESS)
+    {
+        fexpr_vec_t inp;
+        gr_vec_t out;
+
+        fexpr_vec_init(inp, 0);
+        gr_vec_init(out, 0, R);
+
+        status |= gr_set_fexpr(y, inp, out, expr, R);
+
+        fexpr_vec_clear(inp);
+        gr_vec_clear(out, R);
+
+        if (status == GR_SUCCESS && gr_equal(x, y, R) == T_FALSE)
+        {
+            status = GR_TEST_FAIL;
+        }
+    }
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        flint_printf("get_set_fexpr\n");
+        gr_ctx_println(R);
+        flint_printf("x = \n"); gr_println(x, R);
+        fexpr_print(expr); flint_printf("\n");
+        flint_printf("y = \n"); gr_println(y, R);
+        flint_printf("\n");
+    }
+
+    GR_TMP_CLEAR2(x, y, R);
+
+    fexpr_clear(expr);
+
+    return status;
+}
+
 
 int
 gr_test_mul_2exp_si(gr_ctx_t R, flint_rand_t state, int test_flags)
@@ -3151,6 +3205,8 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
     gr_test_iter(R, state, "get_fmpq", gr_test_get_fmpq, iters, test_flags);
     gr_test_iter(R, state, "get_fmpz_2exp_fmpz", gr_test_get_fmpz_2exp_fmpz, iters, test_flags);
 
+    gr_test_iter(R, state, "get_set_fexpr", gr_test_get_set_fexpr, iters, test_flags);
+
     gr_test_iter(R, state, "add: associative", gr_test_add_associative, iters, test_flags);
     gr_test_iter(R, state, "add: commutative", gr_test_add_commutative, iters, test_flags);
     gr_test_iter(R, state, "add: aliasing", gr_test_add_aliasing, iters, test_flags);
@@ -3288,6 +3344,8 @@ gr_test_multiplicative_group(gr_ctx_t R, slong iters, int test_flags)
     gr_test_iter(R, state, "pow_ui: exponent addition", gr_test_pow_ui_exponent_addition, iters, test_flags);
     gr_test_iter(R, state, "pow_ui: aliasing", gr_test_pow_ui_exponent_addition, iters, test_flags);
     gr_test_iter(R, state, "pow_fmpz: exponent addition", gr_test_pow_fmpz_exponent_addition, iters, test_flags);
+
+    gr_test_iter(R, state, "get_set_fexpr", gr_test_get_set_fexpr, iters, test_flags);
 
     flint_randclear(state);
 

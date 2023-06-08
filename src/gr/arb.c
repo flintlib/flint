@@ -19,6 +19,7 @@
 #include "fmpzi.h"
 #include "qqbar.h"
 #include "gr.h"
+#include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
 
@@ -174,7 +175,7 @@ int
 _gr_ca_get_arb_with_prec(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec);
 
 int
-_gr_arb_set_other(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
+_gr_arb_set_other(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 {
     switch (x_ctx->which_ring)
     {
@@ -243,7 +244,7 @@ _gr_arb_set_other(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
             }
     }
 
-    return GR_UNABLE;
+    return gr_generic_set_other(res, x, x_ctx, ctx);
 }
 
 /* xxx: assumes that ctx are not read */

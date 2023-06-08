@@ -10,6 +10,7 @@
 */
 
 #include <math.h>
+#include "fexpr.h"
 #include "qqbar.h"
 #include "fmpz_factor.h"
 #include "fmpz_poly.h"
@@ -17,6 +18,7 @@
 #include "fmpz_mat.h"
 #include "fmpq.h"
 #include "gr.h"
+#include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_special.h"
 #include "gmpcompat.h"
@@ -141,7 +143,7 @@ _gr_fmpz_set_d(fmpz_t res, double x, const gr_ctx_t ctx)
 }
 
 int
-_gr_fmpz_set_other(fmpz_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
+_gr_fmpz_set_other(fmpz_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 {
     switch (x_ctx->which_ring)
     {
@@ -162,7 +164,8 @@ _gr_fmpz_set_other(fmpz_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
             return GR_DOMAIN;
     }
 
-    return GR_UNABLE;
+    /* handles fexpr */
+    return gr_generic_set_other(res, x, x_ctx, ctx);
 }
 
 int
@@ -208,6 +211,12 @@ _gr_fmpz_get_fmpq(fmpq_t res, const fmpz_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_fmpz_get_fexpr(fexpr_t res, const fmpz_t x, const gr_ctx_t ctx)
+{
+    fexpr_set_fmpz(res, x);
+    return GR_SUCCESS;
+}
 
 truth_t
 _gr_fmpz_is_zero(const fmpz_t x, const gr_ctx_t ctx)
@@ -1134,6 +1143,7 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_GET_UI,          (gr_funcptr) _gr_fmpz_get_ui},
     {GR_METHOD_GET_SI,          (gr_funcptr) _gr_fmpz_get_si},
     {GR_METHOD_GET_D,           (gr_funcptr) _gr_fmpz_get_d},
+    {GR_METHOD_GET_FEXPR,       (gr_funcptr) _gr_fmpz_get_fexpr},
     {GR_METHOD_NEG,             (gr_funcptr) _gr_fmpz_neg},
     {GR_METHOD_ADD,             (gr_funcptr) _gr_fmpz_add},
     {GR_METHOD_ADD_UI,          (gr_funcptr) _gr_fmpz_add_ui},

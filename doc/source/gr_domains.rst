@@ -288,6 +288,14 @@ Fraction fields
     with monomial ordering *ord*.
     Elements have type :type:`fmpz_mpoly_q_struct`.
 
+Symbolic expressions
+-------------------------------------------------------------------------------
+
+.. function:: void gr_ctx_init_fexpr(gr_ctx_t ctx)
+
+    Initializes *ctx* to handle symbolic expressions.
+    Elements have type :type:`fexpr_struct`.
+
 .. raw:: latex
 
     \newpage

@@ -13,6 +13,7 @@
 #include "arb.h"
 #include "arith.h"
 #include "bernoulli.h"
+#include "fexpr.h"
 #include "gr.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
@@ -180,6 +181,18 @@ int gr_generic_set_other(gr_ptr res, gr_srcptr x, gr_ctx_t xctx, gr_ctx_t ctx)
     else if (xctx->which_ring == GR_CTX_FMPQ)
     {
         return gr_set_fmpq(res, x, ctx);
+    }
+    else if (xctx->which_ring == GR_CTX_FEXPR)
+    {
+        gr_vec_t vec;
+        fexpr_vec_t fvec;
+        int status;
+        fexpr_vec_init(fvec, 0);
+        gr_vec_init(vec, 0, ctx);
+        status = gr_set_fexpr(res, fvec, vec, x, ctx);
+        gr_vec_clear(vec, ctx);
+        fexpr_vec_clear(fvec);
+        return status;
     }
     else
     {
@@ -795,6 +808,11 @@ int gr_generic_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, gr_ptr x, gr_ctx_t c
     fmpq_clear(v);
 
     return status;
+}
+
+int gr_generic_get_fexpr_serialize(fexpr_t res, gr_srcptr x, gr_ctx_t ctx)
+{
+    return gr_get_fexpr(res, x, ctx);
 }
 
 int gr_generic_inv(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
@@ -2399,6 +2417,9 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_SET_FMPQ,                (gr_funcptr) gr_generic_set_fmpq},
 
     {GR_METHOD_SET_OTHER,               (gr_funcptr) gr_generic_set_other},
+
+    {GR_METHOD_GET_FEXPR_SERIALIZE,     (gr_funcptr) gr_generic_get_fexpr_serialize},
+    {GR_METHOD_SET_FEXPR,               (gr_funcptr) gr_generic_set_fexpr},
 
     {GR_METHOD_NEG,                     (gr_funcptr) gr_generic_neg},
 

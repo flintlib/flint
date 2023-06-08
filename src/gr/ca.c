@@ -15,6 +15,7 @@
 #include "ca_poly.h"
 #include "fexpr.h"
 #include "gr.h"
+#include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
 
@@ -358,7 +359,7 @@ _gr_ca_set_other(ca_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 
     }
 
-    return GR_UNABLE;
+    return gr_generic_set_other(res, x, x_ctx, ctx);
 }
 
 int
@@ -501,6 +502,21 @@ _gr_ca_get_fmpq(fmpq_t res, const ca_t x, gr_ctx_t ctx)
     else
         return GR_UNABLE;
 }
+
+int
+_gr_ca_get_fexpr(fexpr_t res, const ca_t x, gr_ctx_t ctx)
+{
+    ca_get_fexpr(res, x, 0, GR_CA_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_ca_get_fexpr_serialize(fexpr_t res, const ca_t x, gr_ctx_t ctx)
+{
+    ca_get_fexpr(res, x, CA_FEXPR_SERIALIZATION, GR_CA_CTX(ctx));
+    return GR_SUCCESS;
+}
+
 
 truth_t
 _gr_ca_is_zero(const ca_t x, gr_ctx_t ctx)
@@ -1298,6 +1314,13 @@ _gr_ca_ctx_clear(gr_ctx_t ctx)
 }
 
 truth_t
+_gr_ca_ctx_is_field(gr_ctx_t ctx)
+{
+    return (ctx->which_ring == GR_CTX_COMPLEX_EXTENDED_CA) ? T_FALSE : T_TRUE;
+}
+
+
+truth_t
 _gr_ca_ctx_is_algebraically_closed(gr_ctx_t ctx)
 {
     return (ctx->which_ring == GR_CTX_CC_CA || ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA) ? T_TRUE : T_FALSE;
@@ -1333,12 +1356,12 @@ gr_method_tab_input _ca_methods_input[] =
     {GR_METHOD_CTX_CLEAR,       (gr_funcptr) _gr_ca_ctx_clear},
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_ca_ctx_write},
 
-    {GR_METHOD_CTX_IS_RING,     (gr_funcptr) gr_generic_ctx_predicate_true},
-    {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
-    {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) gr_generic_ctx_predicate_true},
-    {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_IS_RING,     (gr_funcptr) _gr_ca_ctx_is_field},
+    {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) _gr_ca_ctx_is_field},
+    {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) _gr_ca_ctx_is_field},
+    {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) _gr_ca_ctx_is_field},
 
-    {GR_METHOD_CTX_IS_UNIQUE_FACTORIZATION_DOMAIN, (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_IS_UNIQUE_FACTORIZATION_DOMAIN, (gr_funcptr) _gr_ca_ctx_is_field},
     {GR_METHOD_CTX_IS_FINITE, (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC, (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_ALGEBRAICALLY_CLOSED, (gr_funcptr) _gr_ca_ctx_is_algebraically_closed},
@@ -1347,9 +1370,8 @@ gr_method_tab_input _ca_methods_input[] =
     /* important */
     {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr) gr_generic_ctx_predicate_false},
 
-    {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) gr_generic_ctx_predicate_true},
-    {GR_METHOD_CTX_IS_CANONICAL,
-                                (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_EXACT,     (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_IS_CANONICAL, (gr_funcptr) gr_generic_ctx_predicate_false},
 
     {GR_METHOD_INIT,            (gr_funcptr) _gr_ca_init},
 
@@ -1376,7 +1398,11 @@ gr_method_tab_input _ca_methods_input[] =
     {GR_METHOD_GET_SI,          (gr_funcptr) _gr_ca_get_si},
     {GR_METHOD_GET_UI,          (gr_funcptr) _gr_ca_get_ui},
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_ca_get_fmpz},
+    {GR_METHOD_GET_FMPQ,        (gr_funcptr) _gr_ca_get_fmpq},
     {GR_METHOD_GET_D,           (gr_funcptr) _gr_ca_get_d},
+
+    {GR_METHOD_GET_FEXPR,       (gr_funcptr) _gr_ca_get_fexpr},
+    {GR_METHOD_GET_FEXPR_SERIALIZE,       (gr_funcptr) _gr_ca_get_fexpr_serialize},
 
     {GR_METHOD_NEG,             (gr_funcptr) _gr_ca_neg},
 

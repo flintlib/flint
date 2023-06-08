@@ -432,6 +432,22 @@ Assignment and conversions
 
     Set or retrieve a dyadic number.
 
+.. function:: int gr_get_fexpr(fexpr_t res, gr_srcptr x, gr_ctx_t ctx)
+              int gr_get_fexpr_serialize(fexpr_t res, gr_srcptr x, gr_ctx_t ctx)
+
+    Sets *res* to a symbolic expression representing *x*.
+    The *serialize* version may generate a representation of the
+    internal representation which is not intended to be human-readable.
+
+.. function:: int gr_set_fexpr(gr_ptr res, fexpr_vec_t inputs, gr_vec_t outputs, const fexpr_t x, gr_ctx_t ctx)
+
+    Sets *res* to the evaluation of the expression *x* in the
+    given ring or structure.
+    The user must provide vectors *inputs* and *outputs* which
+    may be empty initially and which may be used as scratch space
+    during evaluation. Non-empty vectors may be given to map symbols
+    to predefined values.
+
 Special values
 ................................................................................
 

@@ -192,6 +192,10 @@ typedef enum
     GR_METHOD_GET_FMPQ,
     GR_METHOD_GET_D,
 
+    GR_METHOD_GET_FEXPR,
+    GR_METHOD_GET_FEXPR_SERIALIZE,
+    GR_METHOD_SET_FEXPR,
+
     GR_METHOD_NEG,
 
     GR_METHOD_ADD,
@@ -305,15 +309,14 @@ typedef enum
     GR_METHOD_MIN,
     GR_METHOD_MAX,
 
-    /* todo: test the following */
     GR_METHOD_ABS,
     GR_METHOD_ABS2,
     GR_METHOD_I,
     GR_METHOD_CONJ,
     GR_METHOD_RE,
     GR_METHOD_IM,
-    GR_METHOD_SGN,  /* todo: implement */
-    GR_METHOD_CSGN, /* todo: implement */
+    GR_METHOD_SGN,
+    GR_METHOD_CSGN,
     GR_METHOD_ARG,
 
     GR_METHOD_POS_INF,
@@ -334,8 +337,7 @@ typedef enum
     GR_METHOD_IS_NEGATIVE_REAL,
     GR_METHOD_IS_NONPOSITIVE_REAL,
 
-    /* Roots of unity */
-    /* todo: implement */
+    /* todo: roots of unity */
     GR_METHOD_IS_ROOT_OF_UNITY,
     GR_METHOD_ROOT_OF_UNITY_UI,
     GR_METHOD_ROOT_OF_UNITY_UI_VEC,
@@ -698,59 +700,25 @@ void gr_method_tab_init(gr_funcptr * methods, gr_method_tab_input * tab);
 
 typedef enum
 {
-    GR_CTX_FMPZ,
-    GR_CTX_FMPQ,
-    GR_CTX_FMPZI,
-
-    GR_CTX_FMPZ_MOD,
-    GR_CTX_NMOD,
-    GR_CTX_NMOD8,
-
-    GR_CTX_FQ,
-    GR_CTX_FQ_NMOD,
-    GR_CTX_FQ_ZECH,
-
+    GR_CTX_FMPZ, GR_CTX_FMPQ, GR_CTX_FMPZI,
+    GR_CTX_FMPZ_MOD, GR_CTX_NMOD, GR_CTX_NMOD8,
+    GR_CTX_FQ, GR_CTX_FQ_NMOD, GR_CTX_FQ_ZECH,
     GR_CTX_NF,
-
-    GR_CTX_REAL_ALGEBRAIC_QQBAR,
-    GR_CTX_COMPLEX_ALGEBRAIC_QQBAR,
-
-    GR_CTX_REAL_ALGEBRAIC_CA,
-    GR_CTX_COMPLEX_ALGEBRAIC_CA,
-
-    GR_CTX_RR_CA,
-    GR_CTX_CC_CA,
-
+    GR_CTX_REAL_ALGEBRAIC_QQBAR, GR_CTX_COMPLEX_ALGEBRAIC_QQBAR,
+    GR_CTX_REAL_ALGEBRAIC_CA, GR_CTX_COMPLEX_ALGEBRAIC_CA,
+    GR_CTX_RR_CA, GR_CTX_CC_CA,
     GR_CTX_COMPLEX_EXTENDED_CA,
-
-    GR_CTX_RR_ARB,
-    GR_CTX_CC_ACB,
-
-    GR_CTX_REAL_FLOAT_ARF,
-    GR_CTX_COMPLEX_FLOAT_ACF,
-
-    GR_CTX_FMPZ_POLY,
-    GR_CTX_FMPQ_POLY,
-    GR_CTX_GR_POLY,
-
-    GR_CTX_FMPZ_MPOLY,
-    GR_CTX_GR_MPOLY,
-
+    GR_CTX_RR_ARB, GR_CTX_CC_ACB,
+    GR_CTX_REAL_FLOAT_ARF, GR_CTX_COMPLEX_FLOAT_ACF,
+    GR_CTX_FMPZ_POLY, GR_CTX_FMPQ_POLY, GR_CTX_GR_POLY,
+    GR_CTX_FMPZ_MPOLY, GR_CTX_GR_MPOLY,
     GR_CTX_FMPZ_MPOLY_Q,
-
-    GR_CTX_GR_SERIES,
-    GR_CTX_GR_SERIES_MOD,
-
+    GR_CTX_GR_SERIES, GR_CTX_GR_SERIES_MOD,
     GR_CTX_GR_MAT,
-
     GR_CTX_GR_VEC,
-
-    GR_CTX_PSL2Z,
-    GR_CTX_DIRICHLET_GROUP,
-    GR_CTX_PERM,
-
+    GR_CTX_PSL2Z, GR_CTX_DIRICHLET_GROUP, GR_CTX_PERM,
+    GR_CTX_FEXPR,
     GR_CTX_UNKNOWN_DOMAIN,
-
     GR_CTX_WHICH_STRUCTURE_TAB_SIZE
 }
 gr_which_structure;
@@ -873,6 +841,10 @@ typedef int ((*gr_method_poly_binary_binary_op)(gr_ptr, gr_ptr, gr_srcptr, slong
 typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, slong, slong, gr_ctx_ptr));
 typedef int ((*gr_method_vec_ctx_op)(gr_vec_t, gr_ctx_ptr));
 
+#ifdef FEXPR_H
+typedef int ((*gr_method_get_fexpr_op)(fexpr_t, gr_srcptr, gr_ctx_ptr));
+typedef int ((*gr_method_set_fexpr_op)(gr_ptr, fexpr_vec_t, gr_vec_t, const fexpr_t, gr_ctx_ptr));
+#endif
 
 /* Macros to retrieve methods (with correct call signature) from context object. */
 #define GR_CTX_OP(ctx, NAME) (((gr_method_ctx *) ctx->methods)[GR_METHOD_ ## NAME])
@@ -960,7 +932,10 @@ typedef int ((*gr_method_vec_ctx_op)(gr_vec_t, gr_ctx_ptr));
 #define GR_POLY_BINARY_BINARY_OP(ctx, NAME) (((gr_method_poly_binary_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_BINARY_TRUNC_OP(ctx, NAME) (((gr_method_poly_binary_trunc_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_CTX_OP(ctx, NAME) (((gr_method_vec_ctx_op *) ctx->methods)[GR_METHOD_ ## NAME])
-
+#ifdef FEXPR_H
+#define GR_GET_FEXPR_OP(ctx, NAME) (((gr_method_get_fexpr_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_SET_FEXPR_OP(ctx, NAME) (((gr_method_set_fexpr_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#endif
 
 /* Wrappers to call methods. */
 
@@ -1024,6 +999,15 @@ GR_INLINE WARN_UNUSED_RESULT int gr_get_ui(ulong * res, gr_srcptr x, gr_ctx_t ct
 GR_INLINE WARN_UNUSED_RESULT int gr_get_fmpz(fmpz_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_FMPZ(ctx, GET_FMPZ)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_get_fmpq(fmpq_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_FMPQ(ctx, GET_FMPQ)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_get_d(double * res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_D(ctx, GET_D)(res, x, ctx); }
+
+#define GR_FEXPR_SERIALIZE (UWORD(1) << 31)
+#define GR_FEXPR_COMPACT (UWORD(1) << 30)
+
+#ifdef FEXPR_H
+GR_INLINE WARN_UNUSED_RESULT int gr_get_fexpr(fexpr_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_GET_FEXPR_OP(ctx, GET_FEXPR)(res, x, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_get_fexpr_serialize(fexpr_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_GET_FEXPR_OP(ctx, GET_FEXPR_SERIALIZE)(res, x, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_set_fexpr(gr_ptr res, fexpr_vec_t inputs, gr_vec_t outputs, const fexpr_t x, gr_ctx_t ctx) { return GR_SET_FEXPR_OP(ctx, SET_FEXPR)(res, inputs, outputs, x, ctx); }
+#endif
 
 GR_INLINE truth_t gr_is_zero(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_ZERO)(x, ctx); }
 GR_INLINE truth_t gr_is_one(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_ONE)(x, ctx); }
@@ -1450,6 +1434,10 @@ GR_INLINE void gr_ctx_init_matrix_ring(gr_ctx_t ctx, gr_ctx_t base_ring, slong n
 {
     gr_ctx_init_matrix_space(ctx, base_ring, n, n);
 }
+
+/* Expressions */
+
+void gr_ctx_init_fexpr(gr_ctx_t ctx);
 
 /* Coercions */
 
