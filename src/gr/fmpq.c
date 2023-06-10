@@ -157,6 +157,15 @@ _gr_fmpq_set_other(fmpq_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
         case GR_CTX_FMPQ:
             fmpq_set(res, x);
             return GR_SUCCESS;
+
+        case GR_CTX_REAL_ALGEBRAIC_QQBAR:
+        case GR_CTX_COMPLEX_ALGEBRAIC_QQBAR:
+            if (qqbar_is_rational(x))
+            {
+                qqbar_get_fmpq(res, x);
+                return GR_SUCCESS;
+            }
+            return GR_DOMAIN;
     }
 
     /* handles fexpr */
