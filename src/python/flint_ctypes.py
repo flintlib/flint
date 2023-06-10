@@ -4163,11 +4163,51 @@ class fmpzi(gr_elem):
         return ZZi
 
 class qqbar(gr_elem):
+    """
+    Wrapper around the qqbar type, representing an algebraic number.
+
+        >>> (qqbar(2).sqrt() / qqbar(-2).sqrt()) ** 2
+        -1
+        >>> qqbar(0.5) == qqbar(1) / 2
+        True
+        >>> qqbar(0.1) == qqbar(1) / 10
+        False
+        >>> qqbar(3+4j)
+        Root a = 3.00000 + 4.00000*I of a^2-6*a+25
+        >>> qqbar(3+4j).root(5)
+        Root a = 1.35607 + 0.254419*I of a^10-6*a^5+25
+        >>> qqbar(3+4j).root(5) ** 5
+        Root a = 3.00000 + 4.00000*I of a^2-6*a+25
+
+    The constructor can evaluate fexpr symbolic expressions
+    provided that the expressions are constant and composed strictly
+    of algebraic-valued basic operations applied to algebraic numbers.
+
+        >>> fexpr.inject()
+        >>> qqbar(Pow(0, 0))
+        1
+        >>> qqbar(Sqrt(2) * Abs(1+1j) + (+Re(3-4j)) + (-Im(5+6j)))
+        -1
+        >>> qqbar((Floor(Sqrt(1000)) + Ceil(Sqrt(1000)) + Sign(1+1j) / Sign(1-1j) + Csgn(1j) + Conjugate(1j)) ** Div(-1, 3))
+        1/4
+        >>> [qqbar(RootOfUnity(3)), qqbar(RootOfUnity(3,2))]
+        [Root a = -0.500000 + 0.866025*I of a^2+a+1, Root a = -0.500000 - 0.866025*I of a^2+a+1]
+        >>> qqbar(Decimal("0.125")) == qqbar(125)/1000
+        True
+        >>> qqbar(Decimal("-2.7e5")) == -270000
+        True
+
+    """
+
     _struct_type = qqbar_struct
 
     @staticmethod
     def _default_context():
         return QQbar
+
+    # todo: generic
+    def root(self, n):
+        return self ** (qqbar(1) / n)
 
     def fexpr(self, formula=True, root_index=False, serialize=False,
             gaussians=True, quadratics=True, cyclotomics=True, cubics=True,
@@ -5825,12 +5865,16 @@ class fexpr(gr_elem):
                     libflint.fexpr_set_symbol_str(self, ("True").encode('ascii'))
                 else:
                     libflint.fexpr_set_symbol_str(self, ("False").encode('ascii'))
-            elif typ is qqbar:
-                #libflint.qqbar_get_fexpr_repr(self, val, val._ctx)
-                tmp = val.fexpr()
-                libflint.fexpr_set(self, tmp)
-            elif typ is ca:
-                libflint.ca_get_fexpr(self, val, 0, val._ctx)
+            elif issubclass(typ, gr_elem):
+                status = libflint.gr_get_fexpr(self, val._ref, val._ctx)
+                if status:
+                    _handle_error(context, status, "fexpr($x)", val)
+            #elif typ is qqbar:
+            #    #libflint.qqbar_get_fexpr_repr(self, val, val._ctx)
+            #    tmp = val.fexpr()
+            #    libflint.fexpr_set(self, tmp)
+            #elif typ is ca:
+            #    libflint.ca_get_fexpr(self, val, 0, val._ctx)
             #elif typ is ca_mat:
             #    libflint.ca_mat_get_fexpr(self, val, 0, val._ctx)
             #elif typ is ca_poly:
@@ -6460,6 +6504,9 @@ def test_qq():
 def test_qqbar():
     a = (-23 + 5*ZZi.i())
     assert ZZi(QQbar(a**2).sqrt()) == -a
+    x = (1 + 100*qqbar(2)**(-1000)).root(100)
+    y = (1 + 101*qqbar(2)**(-1000)).root(101)
+    assert x > y
 
 def test_nf():
     a = NumberField_nf(ZZx([1,2,3])).gen()
@@ -6478,6 +6525,144 @@ def test_ca():
     assert raises(lambda: R(X.unknown()), FlintUnableError)
     assert X(R(1)) == 1
     assert R(X(1)) == 1
+
+def test_ca_improved_zero_recognition():
+    sqrt = CC_ca.sqrt
+    exp = CC_ca.exp
+    log = CC_ca.log
+    tan = CC_ca.tan
+    sin = CC_ca.sin
+    cos = CC_ca.cos
+    acos = CC_ca.acos
+    sqrt = CC_ca.sqrt
+    arg = CC_ca.arg
+    atan = CC_ca.atan
+    re = CC_ca.re
+    im = CC_ca.im
+    pi = CC_ca.pi()
+    i = CC_ca.i()
+
+    assert sqrt(2)*(1+i)/2 * pi - exp(pi*i/4) * pi == 0
+    assert (sqrt(3) + i)/2  * pi - exp(pi*i/6) * pi == 0
+    assert arg(sqrt(-pi*i)) == -pi/4
+    assert (pi + sqrt(2) + sqrt(3)) / (pi + sqrt(5 + 2*sqrt(6))) == 1
+    assert log(1/exp(sqrt(2)+1)) == -sqrt(2)-1
+    assert abs(exp(sqrt(1+i))) == exp(re(sqrt(1+i)))
+    assert tan(pi*sqrt(2))*tan(pi*sqrt(3)) == (cos(pi*sqrt(5-2*sqrt(6))) - cos(pi*sqrt(5+2*sqrt(6))))/(cos(pi*sqrt(5-2*sqrt(6))) + cos(pi*sqrt(5+2*sqrt(6))))
+    assert log(exp(i) / exp(-i)) == 2*i
+
+    v = cos(acos(sqrt(2) - sqrt(3))/3)
+    assert 1 - 90*v**2 + 321*v**4 - 592*v**6 + 864*v**8 - 768*v**10 + 256*v**12 == 0
+
+    def expect_not_implemented(f):
+        try:
+            v = f()
+            assert v
+        except NotImplementedError:
+            return
+        raise AssertionError
+
+    expect_not_implemented(lambda: acos(cos(1)) == 1)
+    expect_not_implemented(lambda: acos(cos(sqrt(2) - 1)) == sqrt(2) - 1)
+    expect_not_implemented(lambda: tan(sqrt(pi*2))*tan(sqrt(pi*3)) == \
+        (cos(sqrt(pi*(5-2*sqrt(6)))) - cos(sqrt(pi*(5+2*sqrt(6)))))/(cos(sqrt(pi*(5-2*sqrt(6)))) + cos(sqrt(pi*(5+2*sqrt(6))))))
+    expect_not_implemented(lambda: sqrt(exp(2*sqrt(2)) + exp(-2*sqrt(2)) - 2) == (exp(2*sqrt(2))-1)/sqrt(exp(2*sqrt(2))))
+
+    # Some examples from Stoutemyer
+    z = pi
+    assert str(i*((3-5*i)*z+1)/(((5+3*i)*z+i)*z)) == "0.318310 {(1)/(a) where a = 3.14159 [Pi], b = I [b^2+1=0]}"
+    assert str(ca(-1)**(ca(1)/8) * sqrt(i+1) / ca(2)**(ca(3)/4) + i*exp(i*pi/2)) == "-0.500000 + 0.500000*I {(a-1)/2 where a = I [a^2+1=0]}"
+    assert sin(2*atan(z)) + (15*sqrt(3)+26)**(ca(1)/3) == 2*z/(z**2+1) + sqrt(3) + 2
+
+
+def test_a_trigonometric():
+
+    def expect_not_implemented(f):
+        try:
+            v = f()
+            assert v
+        except NotImplementedError:
+            return
+        raise AssertionError
+
+    sqrt = CC_ca.sqrt
+    pi = CC_ca.pi()
+    xsin = CC_ca.sin
+    xcos = CC_ca.cos
+    xtan = CC_ca.tan
+
+    a = 1+sqrt(2)
+    b = 2+sqrt(2)
+
+    assert xsin(a)**2 + xcos(a)**2 == 1
+    assert xsin(-a)**2 + xcos(a)**2 == 1
+    assert xsin(a) == -xsin(-a)
+    assert xcos(a) == xcos(-a)
+    assert xtan(a) == -xtan(-a)
+    assert xsin(a+2*pi) == xsin(a)
+    assert xcos(a+2*pi) == xcos(a)
+    assert xtan(a+pi) == xtan(a)
+    assert xsin(a+pi) == -xsin(a)
+    assert xcos(a+pi) == -xcos(a)
+    assert xtan(a+pi/2) == -1/xtan(a)
+    assert xsin(a+pi/2) == xcos(a)
+    assert xcos(a+pi/2) == -xsin(a)
+    assert xsin(a-pi/2) == -xcos(a)
+    assert xcos(a-pi/2) == xsin(a)
+    assert xtan(a+pi/4) == (xtan(a)+1)/(1-xtan(a))
+    assert xtan(a-pi/4) == (xtan(a)-1)/(1+xtan(a))
+    assert xsin(pi/2 - a) == xcos(a)
+    assert xcos(pi/2 - a) == xsin(a)
+    assert xtan(pi/2 - a) == 1 / xtan(a)
+    assert xsin(pi - a) == xsin(a)
+    assert xcos(pi - a) == -xcos(a)
+    assert xtan(pi - a) == -xtan(a)
+    assert xsin(2*pi - a) == -xsin(a)
+    assert xcos(2*pi - a) == xcos(a)
+    assert xsin(a+b) == xsin(a)*xcos(b) + xcos(a)*xsin(b)
+    assert xsin(a-b) == xsin(a)*xcos(b) - xcos(a)*xsin(b)
+    assert xcos(a+b) == xcos(a)*xcos(b) - xsin(a)*xsin(b)
+    assert xcos(a-b) == xcos(a)*xcos(b) + xsin(a)*xsin(b)
+    assert xtan(a+b) == (xtan(a)+xtan(b)) / (1 - xtan(a)*xtan(b))
+    assert xtan(a-b) == (xtan(a)-xtan(b)) / (1 + xtan(a)*xtan(b))
+    assert xsin(2*a) == 2*xsin(a)*xcos(a)
+    assert xsin(2*a) == 2*xtan(a)/(1+xtan(a)**2)
+    assert xcos(2*a) == xcos(a)**2 - xsin(a)**2
+    assert xcos(2*a) == 2*xcos(a)**2 - 1
+    assert xcos(2*a) == 1 - 2*xsin(a)**2
+    assert xcos(2*a) == (1 - xtan(a)**2) / (1 + xtan(a)**2)
+    assert xtan(2*a) == (2*xtan(a)) / (1 - xtan(a)**2)
+
+    assert xsin(3*a) == 3*xsin(a) - 4*xsin(a)**3
+    assert xcos(3*a) == 4*xcos(a)**3 - 3*xcos(a)
+    assert xtan(3*a) == (3*xtan(a) - xtan(a)**3) / (1 - 3*xtan(a)**2)
+    assert xsin(a/2)**2 == (1-xcos(a))/2
+    assert xcos(a/2)**2 == (1+xcos(a))/2
+    assert xtan((a-b)/2) == (xsin(a) - xsin(b)) / (xcos(a) + xcos(b))
+
+    assert 2*xcos(a)*xcos(b) == xcos(a-b) + xcos(a+b)
+    assert 2*xsin(a)*xsin(b) == xcos(a-b) - xcos(a+b)
+    assert 2*xsin(a)*xcos(b) == xsin(a+b) + xsin(a-b)
+    assert 2*xcos(a)*xsin(b) == xsin(a+b) - xsin(a-b)
+
+    assert xsin(a) + xsin(b) == 2*xsin((a+b)/2)*xcos((a-b)/2)
+    assert xsin(a) - xsin(b) == 2*xsin((a-b)/2)*xcos((a+b)/2)
+
+    assert xcos(a) + xcos(b) == 2*xcos((a+b)/2)*xcos((a-b)/2)
+    assert xcos(a) - xcos(b) == -2*xsin((a+b)/2)*xsin((a-b)/2)
+    assert xsin(a) == sqrt(1 - xcos(a)**2)
+
+    for N in range(1,17):
+        assert sum(xcos(n*a) for n in range(1,N+1)) == xsin((N+ca(1)/2)*a)/(2*xsin(a/2)) - ca(1)/2
+
+    assert xcos(a) == -sqrt(1 - xsin(a)**2)
+    assert xsin(a/2) == sqrt((1-xcos(a))/2)
+
+    expect_not_implemented(lambda: xsin(3*a) == 4*xsin(a)*xsin(pi/3-a)*xsin(pi/3+a))
+    assert xtan((a+b)/2) == (xsin(a) + xsin(b)) / (xcos(a) + xcos(b))
+    assert xtan((a+b)/2) == (xsin(a) + xsin(b)) / (xcos(a) + xcos(b))
+    assert xtan(a)*xtan(b) == ((xcos(a-b)-xcos(a+b))/(xcos(a-b)+xcos(a+b)))
+
 
 def test_arb():
     a = arb(2.5)
@@ -6506,6 +6691,8 @@ def test_vec():
     assert b + ZZ(1) == VecQQ([3,4,5])
     assert ZZ(1) + b == VecQQ([3,4,5])
     assert b ** -5 == 1 / b ** 5
+
+
 
 def test_all():
 
@@ -6607,6 +6794,41 @@ def test_mpoly():
     assert c == -72
     assert ((fac, exp) == ([1+x, y+z+1], [2, 1])) or ((fac, exp) == ([y+z+1, 1+x], [1, 2]))
     assert f.gcd(-100-100*x) == 4+4*x
+
+
+def test_ca_notebook_examples():
+    # algebraic number identity
+    NumberI = fexpr("NumberI")
+    Sqrt = fexpr("Sqrt")
+    Div = fexpr("Div")
+    I = NumberI
+    lhs = Sqrt(36 + 3*(-54+35*I*Sqrt(3))**Div(1,3)*3**Div(1,3) + \
+                117/(-162+105*I*Sqrt(3))**Div(1,3))/3 + \
+                Sqrt(5)*(1296*I+840*Sqrt(3)-35*3**Div(5,6)*(-54+35*I*Sqrt(3))**Div(1,3)-\
+                54*I*(-162+105*I*Sqrt(3))**Div(1,3)+13*I*(-162+105*I*Sqrt(3))**Div(2,3))/(5*(162*I+105*Sqrt(3)))
+    rhs = Sqrt(5) + Sqrt(7)
+    i = CC_ca.i()
+    pi = CC_ca.pi()
+    exp = CC_ca.exp
+    log = CC_ca.log
+    sqrt = CC_ca.sqrt
+    assert qqbar(lhs) == qqbar(rhs)
+    assert ca(lhs) == ca(rhs)
+    assert fexpr(ca(lhs) - ca(rhs)) == fexpr(0)
+    # misc
+    assert fexpr(exp(pi) * exp(-pi + log(2))) == fexpr(2)
+    assert i**i - exp(pi / ((sqrt(-2)**sqrt(2)) ** sqrt(2))) == 0
+    assert log(sqrt(2)+sqrt(3)) / log(5 + 2*sqrt(6)) == ca(1)/2
+    assert ca(10)**-30 < (640320**3 + 744)/exp(pi*sqrt(163)) - 1 < ca(10)**-29
+    M = Mat(CC_ca, 2, 2)
+    A = M([[5, pi], [1, -1]])**4
+    assert A.charpoly()(A) == M([[0,0],[0,0]])
+    # comparison with higher precision
+    ctx = ComplexField_ca()
+    ctx._set_options({"prec_limit":65536})
+    eps = ca(10, context=ctx) ** (-10000)
+    assert (eps.exp() == 1) == False
+
 
 if __name__ == "__main__":
     from time import time

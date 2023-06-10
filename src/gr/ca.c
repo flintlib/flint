@@ -1180,6 +1180,199 @@ _gr_ca_atan(ca_t res, const ca_t x, gr_ctx_t ctx)
 }
 
 int
+_gr_ca_sin(ca_t res, const ca_t x, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA ||
+        ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
+    {
+        truth_t ok = ca_check_is_zero(x, GR_CA_CTX(ctx));
+
+        if (ok == T_TRUE)
+            return _gr_ca_zero(res, ctx);
+
+        return (ok == T_FALSE) ? GR_DOMAIN : GR_UNABLE;
+    }
+    else
+    {
+        ca_sin(res, x, GR_CA_CTX(ctx));
+        return handle_possible_special_value(res, ctx);
+    }
+}
+
+int
+_gr_ca_cos(ca_t res, const ca_t x, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA ||
+        ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
+    {
+        truth_t ok = ca_check_is_zero(x, GR_CA_CTX(ctx));
+
+        if (ok == T_TRUE)
+            return _gr_ca_one(res, ctx);
+
+        return (ok == T_FALSE) ? GR_DOMAIN : GR_UNABLE;
+    }
+    else
+    {
+        ca_cos(res, x, GR_CA_CTX(ctx));
+        return handle_possible_special_value(res, ctx);
+    }
+}
+
+int
+_gr_ca_tan(ca_t res, const ca_t x, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA ||
+        ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
+    {
+        truth_t ok = ca_check_is_zero(x, GR_CA_CTX(ctx));
+
+        if (ok == T_TRUE)
+            return _gr_ca_zero(res, ctx);
+
+        return (ok == T_FALSE) ? GR_DOMAIN : GR_UNABLE;
+    }
+    else
+    {
+        ca_tan(res, x, GR_CA_CTX(ctx));
+        return handle_possible_special_value(res, ctx);
+    }
+}
+
+int
+_gr_ca_cot(ca_t res, const ca_t x, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA ||
+        ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
+    {
+        return GR_DOMAIN;
+    }
+    else
+    {
+        ca_cot(res, x, GR_CA_CTX(ctx));
+        return handle_possible_special_value(res, ctx);
+    }
+}
+
+int
+_gr_ca_asin(ca_t res, const ca_t x, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA ||
+        ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
+    {
+        truth_t ok = ca_check_is_zero(x, GR_CA_CTX(ctx));
+
+        if (ok == T_TRUE)
+            return _gr_ca_zero(res, ctx);
+
+        return (ok == T_FALSE) ? GR_DOMAIN : GR_UNABLE;
+    }
+    else
+    {
+        ca_asin(res, x, GR_CA_CTX(ctx));
+        return handle_possible_special_value(res, ctx);
+    }
+}
+
+int
+_gr_ca_acos(ca_t res, const ca_t x, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA ||
+        ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
+    {
+        truth_t ok = ca_check_is_one(x, GR_CA_CTX(ctx));
+
+        if (ok == T_TRUE)
+            return _gr_ca_zero(res, ctx);
+
+        return (ok == T_FALSE) ? GR_DOMAIN : GR_UNABLE;
+    }
+    else
+    {
+        ca_acos(res, x, GR_CA_CTX(ctx));
+        return handle_possible_special_value(res, ctx);
+    }
+}
+
+int
+_gr_ca_erf(ca_t res, const ca_t x, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA ||
+        ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
+    {
+        truth_t ok = ca_check_is_zero(x, GR_CA_CTX(ctx));
+
+        if (ok == T_TRUE)
+            return _gr_ca_zero(res, ctx);
+
+        return GR_UNABLE;
+    }
+    else
+    {
+        ca_erf(res, x, GR_CA_CTX(ctx));
+        return handle_possible_special_value(res, ctx);
+    }
+}
+
+int
+_gr_ca_erfi(ca_t res, const ca_t x, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA ||
+        ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
+    {
+        truth_t ok = ca_check_is_zero(x, GR_CA_CTX(ctx));
+
+        if (ok == T_TRUE)
+            return _gr_ca_zero(res, ctx);
+
+        return GR_UNABLE;
+    }
+    else
+    {
+        ca_erfi(res, x, GR_CA_CTX(ctx));
+        return handle_possible_special_value(res, ctx);
+    }
+}
+
+int
+_gr_ca_erfc(ca_t res, const ca_t x, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA ||
+        ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
+    {
+        truth_t ok = ca_check_is_zero(x, GR_CA_CTX(ctx));
+
+        if (ok == T_TRUE)
+            return _gr_ca_one(res, ctx);
+
+        return GR_UNABLE;
+    }
+    else
+    {
+        ca_erfc(res, x, GR_CA_CTX(ctx));
+        return handle_possible_special_value(res, ctx);
+    }
+}
+
+int
+_gr_ca_gamma(ca_t res, const ca_t x, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA ||
+        ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
+    {
+        truth_t ok = ca_check_is_integer(x, GR_CA_CTX(ctx));
+
+        if (ok != T_TRUE)
+            return GR_UNABLE;
+    }
+
+    {
+        ca_gamma(res, x, GR_CA_CTX(ctx));
+        return handle_possible_special_value(res, ctx);
+    }
+}
+
+int
 _gr_ca_poly_mullow(ca_ptr res,
     ca_srcptr poly1, slong len1,
     ca_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
@@ -1401,7 +1594,7 @@ gr_method_tab_input _ca_methods_input[] =
     {GR_METHOD_GET_FMPQ,        (gr_funcptr) _gr_ca_get_fmpq},
     {GR_METHOD_GET_D,           (gr_funcptr) _gr_ca_get_d},
 
-    {GR_METHOD_GET_FEXPR,       (gr_funcptr) _gr_ca_get_fexpr},
+    {GR_METHOD_GET_FEXPR,                 (gr_funcptr) _gr_ca_get_fexpr},
     {GR_METHOD_GET_FEXPR_SERIALIZE,       (gr_funcptr) _gr_ca_get_fexpr_serialize},
 
     {GR_METHOD_NEG,             (gr_funcptr) _gr_ca_neg},
@@ -1468,7 +1661,21 @@ gr_method_tab_input _ca_methods_input[] =
     {GR_METHOD_PI,              (gr_funcptr) _gr_ca_pi},
     {GR_METHOD_EXP,             (gr_funcptr) _gr_ca_exp},
     {GR_METHOD_LOG,             (gr_funcptr) _gr_ca_log},
+
+    {GR_METHOD_SIN,             (gr_funcptr) _gr_ca_sin},
+    {GR_METHOD_COS,             (gr_funcptr) _gr_ca_cos},
+    {GR_METHOD_TAN,             (gr_funcptr) _gr_ca_tan},
+    {GR_METHOD_COT,             (gr_funcptr) _gr_ca_cot},
+
     {GR_METHOD_ATAN,            (gr_funcptr) _gr_ca_atan},
+    {GR_METHOD_ASIN,            (gr_funcptr) _gr_ca_asin},
+    {GR_METHOD_ACOS,            (gr_funcptr) _gr_ca_acos},
+
+    {GR_METHOD_ERF,             (gr_funcptr) _gr_ca_erf},
+    {GR_METHOD_ERFC,            (gr_funcptr) _gr_ca_erfc},
+    {GR_METHOD_ERFI,            (gr_funcptr) _gr_ca_erfi},
+
+    {GR_METHOD_GAMMA,            (gr_funcptr) _gr_ca_gamma},
 
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_ca_poly_mullow},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_ca_poly_roots},

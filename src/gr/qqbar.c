@@ -269,7 +269,7 @@ qqbar_set_fmpzi(qqbar_t res, const fmpzi_t x)
 }
 
 int
-_gr_qqbar_set_other(qqbar_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
+_gr_qqbar_set_other(qqbar_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 {
     switch (x_ctx->which_ring)
     {
@@ -295,7 +295,7 @@ _gr_qqbar_set_other(qqbar_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx
             return GR_SUCCESS;
     }
 
-    return GR_UNABLE;
+    return gr_generic_set_other(res, x, x_ctx, ctx);
 }
 
 int
