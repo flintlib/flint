@@ -1003,10 +1003,6 @@ _acb_vec_scalar_div_fmpz(acb_ptr res, acb_srcptr vec, slong len, const fmpz_t c,
         acb_div_fmpz(res + i, vec + i, c, prec);
 }
 
-<<<<<<< HEAD:src/acb.h
-#ifdef FLINT_HAVE_FILE
-void acb_fprint(FILE * file, const acb_t x);
-=======
 ACB_INLINE void
 _acb_vec_sqr(acb_ptr res, acb_srcptr vec, slong len, slong prec)
 {
@@ -1015,23 +1011,8 @@ _acb_vec_sqr(acb_ptr res, acb_srcptr vec, slong len, slong prec)
         acb_sqr(res + i, vec + i, prec);
 }
 
-ACB_INLINE void
-acb_fprint(FILE * file, const acb_t x)
-{
-    flint_fprintf(file, "(");
-    arb_fprint(file, acb_realref(x));
-    flint_fprintf(file, ", ");
-    arb_fprint(file, acb_imagref(x));
-    flint_fprintf(file, ")");
-}
-
-ACB_INLINE void
-acb_print(const acb_t x)
-{
-    acb_fprint(stdout, x);
-}
-
->>>>>>> fda3602630dcee519f3a9bbd01e6eadceb650a79:acb.h
+#ifdef FLINT_HAVE_FILE
+void acb_fprint(FILE * file, const acb_t x);
 void acb_fprintd(FILE * file, const acb_t z, slong digits);
 void acb_fprintn(FILE * fp, const acb_t z, slong digits, ulong flags);
 #endif
