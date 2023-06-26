@@ -43,7 +43,7 @@ acb_theta_agm_conv_rate(arf_t c, arf_t r, const arf_t eps, slong prec)
         arb_mul_2exp_si(e, e, -1); /* eps + eps^2/2 */
         arb_add(t, t, e, prec);
         arb_neg(t, t);
-        arb_add_si(t, t, 1);
+        arb_add_si(t, t, 1, prec);
         
         arb_set_arf(e, eps);
         arb_sqr(e, e, prec); /* eps^2 */        

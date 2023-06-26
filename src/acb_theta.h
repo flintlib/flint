@@ -13,8 +13,8 @@
 #define ACB_THETA_H
 
 #include <stdio.h>
-#include "flint/fmpz_mat.h"
-#include "flint/fmpz_lll.h"
+#include "fmpz_mat.h"
+#include "fmpz_lll.h"
 #include "arb.h"
 #include "acb.h"
 #include "arb_mat.h"
@@ -35,7 +35,7 @@ extern "C" {
 
 /* The Siegel modular group */
 
-static __inline__ void
+static __inline__ slong
 sp2gz_dim(const fmpz_mat_t mat)
 {
     return fmpz_mat_nrows(mat) / 2;
