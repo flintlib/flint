@@ -247,50 +247,6 @@ void acb_theta_naive_all_const(acb_ptr th, const acb_mat_t tau, slong prec);
 void acb_theta_naive_ind(acb_t th, ulong ab, acb_srcptr z, const acb_mat_t tau, slong prec);
 void acb_theta_naive_ind_const(acb_t th, ulong ab, const acb_mat_t tau, slong prec);
 
-/* Naive algorithms for derivatives */
-
-typedef struct
-{
-    slong dim;
-    slong ord;
-    slong nb;
-    fmpz_mat_struct binomials;
-    acb_ptr val;
-} acb_theta_deriv_struct;
-
-typedef acb_theta_deriv_struct acb_theta_deriv_t[1];
-
-#define acb_theta_deriv_dim(D) ((D)->dim)
-#define acb_theta_deriv_ord(D) ((D)->ord)
-#define acb_theta_deriv_nb(D) ((D)->nb)
-#define acb_theta_deriv_binomial(D, k, n) (fmpz_mat_entry(&(D)->binomials, (k), (n)))
-#define acb_theta_deriv_val(D, k) (&(D)->val[(k)])
-
-void acb_theta_deriv_init(acb_theta_deriv_t D, slong g, slong ord, slong nb);
-void acb_theta_deriv_clear(acb_theta_deriv_t D);
-
-void acb_theta_deriv_get_dz(acb_t v, const acb_theta_deriv_t D, slong ab,
-    slong ord, slong* indices);
-void acb_theta_deriv_get_dtau(acb_t v, const acb_theta_deriv_t D, slong ab,
-    slong ord, slong* indices);
-
-void acb_theta_deriv_jet_z(acb_ptr th, const acb_theta_deriv_t D,
-    acb_srcptr dz, slong ord, slong prec);
-void acb_theta_deriv_jet_tau(acb_ptr th, const acb_theta_deriv_t D,
-    const acb_mat_t dtau, slong ord, slong prec);
-
-slong acb_theta_nb_partials(slong ord, slong nvars);
-
-void acb_theta_partial(slong* tup, slong k, slong ord, slong nvars);
-
-slong acb_theta_partial_index(slong* tup, slong ord, slong nvars);
-
-void acb_theta_jet_naive(acb_mat_struct* th, acb_srcptr z, const acb_mat_t tau,
-        slong ord, slong prec);
-
-void acb_theta_const_jet_naive(acb_mat_struct* dth, const acb_mat_t tau,
-        slong ord, slong prec);
-
 
 /* Conversions */
 
