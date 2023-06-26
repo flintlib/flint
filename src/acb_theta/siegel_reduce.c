@@ -12,8 +12,7 @@
 #include "acb_theta.h"
 
 void
-acb_siegel_reduce(acb_mat_t res, fmpz_mat_t mat, const acb_mat_t tau,
-                  slong prec)
+acb_siegel_reduce(acb_mat_t res, fmpz_mat_t mat, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     fmpz_mat_t m;
@@ -51,9 +50,9 @@ acb_siegel_reduce(acb_mat_t res, fmpz_mat_t mat, const acb_mat_t tau,
         j0 = -1;
         arb_one(t);
 
-        for (j = 0; j < fmpz_mat_nb_siegel_fund(g); j++)
+        for (j = 0; j < sp2gz_nb_fundamental(g); j++)
         {
-            fmpz_mat_siegel_fund(m, j);
+            sp2gz_fundamental(m, j);
             acb_siegel_cocycle(star, m, cur, prec);
             acb_mat_det(det, star, prec);
             acb_abs(abs, det, prec);
@@ -68,7 +67,7 @@ acb_siegel_reduce(acb_mat_t res, fmpz_mat_t mat, const acb_mat_t tau,
         /* Apply fundamental matrix if found */
         if (j0 != -1)
         {
-            fmpz_mat_siegel_fund(m, j0);
+            sp2gz_fundamental(m, j0);
             fmpz_mat_mul(mat, m, mat);
             acb_siegel_transform(cur, mat, tau, prec);
         }

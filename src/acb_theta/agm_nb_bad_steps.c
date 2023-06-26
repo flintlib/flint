@@ -30,7 +30,7 @@ acb_theta_agm_nb_bad_steps(const acb_mat_t tau, slong prec)
 
     /* Get lambda = smallest eigenvalue of Pi Im(tau) */
     acb_mat_get_imag(im, tau);
-    arb_mat_pos_lambda(lambda, im, prec);
+    arb_mat_spd_lbound_eig_arf(arb_midref(lambda), im, prec);
     arb_const_pi(lambda0, prec);
     arb_mul(lambda, lambda, lambda0, prec);
 
@@ -46,13 +46,13 @@ acb_theta_agm_nb_bad_steps(const acb_mat_t tau, slong prec)
 
     if (!arf_is_finite(up))
     {
-        flint_printf("agm_nb_bad_steps: Error (infinite value)\n");
-        fflush(stdout);
-        flint_abort();
+        res = -1;
     }
-
-    arf_frexp(up, e, up);
-    res = fmpz_get_si(e);
+    else
+    {
+        arf_frexp(up, e, up);
+        res = FLINT_MAX(0, fmpz_get_si(e));
+    }
 
     arb_mat_clear(im);
     arb_clear(lambda);

@@ -12,8 +12,8 @@
 #include "acb_theta.h"
 
 void
-acb_theta_eld_interval(slong * min, slong * mid, slong * max,
-                       const arb_t ctr, const arf_t rad, int a, slong prec)
+acb_theta_eld_interval(slong* min, slong* mid, slong* max, const arb_t ctr,
+    const arf_t rad, int a, slong prec)
 {
     arb_t x, y;
     arf_t b;

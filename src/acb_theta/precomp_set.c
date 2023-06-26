@@ -22,7 +22,9 @@ acb_theta_precomp_set(acb_theta_precomp_t D, acb_srcptr z,
     slong nb_pow;
 
     if (acb_theta_eld_nb_pts(E) == 0)
+    {
         return;
+    }
 
     arb_init(pi4);
     acb_init(c);
@@ -40,7 +42,9 @@ acb_theta_precomp_set(acb_theta_precomp_t D, acb_srcptr z,
             acb_mul_arb(c, acb_mat_entry(tau, k, j), pi4, prec);
             acb_mul_onei(c, c);
             if (k != j)
+            {
                 acb_mul_2exp_si(c, c, 1);
+            }
             acb_exp(c, c, prec);
             acb_set(acb_mat_entry(acb_theta_precomp_exp_mat(D), k, j), c);
         }
@@ -76,8 +80,7 @@ acb_theta_precomp_set(acb_theta_precomp_t D, acb_srcptr z,
     {
         for (j = 0; j < g; j++)
         {
-            acb_exp_pi_i(acb_theta_precomp_exp_z(D, k, j), &z[k * g + j],
-                         prec);
+            acb_exp_pi_i(acb_theta_precomp_exp_z(D, k, j), &z[k * g + j], prec);
         }
     }
 

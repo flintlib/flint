@@ -509,6 +509,28 @@ acb_div_onei(acb_t z, const acb_t x)
     }
 }
 
+ACB_INLINE void
+acb_mul_powi(acb_t z, const acb_t x, slong k)
+{
+    k = ((k % 4) + 4) % 4;
+    if (k == 0)
+    {
+        acb_set(z, x);
+    }
+    else if (k == 1)
+    {
+        acb_mul_onei(z, x);
+    }
+    else if (k == 2)
+    {
+        acb_neg(z, x);
+    }
+    else
+    {
+        acb_div_onei(z, x);
+    }
+}
+
 void acb_mul(acb_t z, const acb_t x, const acb_t y, slong prec);
 
 void acb_mul_naive(acb_t z, const acb_t x, const acb_t y, slong prec);
@@ -981,8 +1003,35 @@ _acb_vec_scalar_div_fmpz(acb_ptr res, acb_srcptr vec, slong len, const fmpz_t c,
         acb_div_fmpz(res + i, vec + i, c, prec);
 }
 
+<<<<<<< HEAD:src/acb.h
 #ifdef FLINT_HAVE_FILE
 void acb_fprint(FILE * file, const acb_t x);
+=======
+ACB_INLINE void
+_acb_vec_sqr(acb_ptr res, acb_srcptr vec, slong len, slong prec)
+{
+    slong i;
+    for (i = 0; i < len; i++)
+        acb_sqr(res + i, vec + i, prec);
+}
+
+ACB_INLINE void
+acb_fprint(FILE * file, const acb_t x)
+{
+    flint_fprintf(file, "(");
+    arb_fprint(file, acb_realref(x));
+    flint_fprintf(file, ", ");
+    arb_fprint(file, acb_imagref(x));
+    flint_fprintf(file, ")");
+}
+
+ACB_INLINE void
+acb_print(const acb_t x)
+{
+    acb_fprint(stdout, x);
+}
+
+>>>>>>> fda3602630dcee519f3a9bbd01e6eadceb650a79:acb.h
 void acb_fprintd(FILE * file, const acb_t z, slong digits);
 void acb_fprintn(FILE * fp, const acb_t z, slong digits, ulong flags);
 #endif

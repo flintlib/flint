@@ -9,19 +9,24 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb_mat.h"
+#include "arb_mat.h"
 
-void
-acb_mat_set_real_imag(acb_mat_t mat, const arb_mat_t re, const arb_mat_t im)
+int
+arb_mat_is_symmetric(const arb_mat_t mat)
 {
-    slong i, j;
+    arb_mat_t tp;
+    slong nrows = arb_mat_nrows(mat);
+    int res;
 
-    for (i = 0; i < acb_mat_nrows(re); i++)
+    if (nrows != arb_mat_ncols(mat))
     {
-        for (j = 0; j < acb_mat_ncols(re); j++)
-        {
-            acb_set_arb_arb(acb_mat_entry(mat, i, j),
-                            arb_mat_entry(re, i, j), arb_mat_entry(im, i, j));
-        }
+        return 0;
     }
+
+    arb_mat_init(tp, nrows, nrows);
+    arb_mat_transpose(tp, mat);
+    res = arb_mat_eq(tp, mat);
+    arb_mat_clear(tp);
+
+    return res;
 }

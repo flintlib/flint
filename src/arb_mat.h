@@ -41,6 +41,12 @@ void arb_mat_init(arb_mat_t mat, slong r, slong c);
 
 void arb_mat_clear(arb_mat_t mat);
 
+ARB_MAT_INLINE slong
+arb_mat_allocated_bytes(const arb_mat_t x)
+{
+    return _arb_vec_allocated_bytes(x->entries, x->r * x->c) + x->r * sizeof(arb_ptr);
+}
+
 ARB_MAT_INLINE void
 arb_mat_swap(arb_mat_t mat1, arb_mat_t mat2)
 {
@@ -82,6 +88,8 @@ void arb_mat_set_fmpq_mat(arb_mat_t dest, const fmpq_mat_t src, slong prec);
 /* Random generation */
 
 void arb_mat_randtest(arb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits);
+
+void arb_mat_randtest_cho(arb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits);
 
 /* I/O */
 
@@ -132,6 +140,9 @@ arb_mat_is_diag(const arb_mat_t mat)
     return arb_mat_is_tril(mat) && arb_mat_is_triu(mat);
 }
 
+int arb_mat_is_symmetric(const arb_mat_t mat);
+int arb_mat_is_nonsymmetric(const arb_mat_t mat);
+
 /* Radius and interval operations */
 
 ARB_MAT_INLINE void
@@ -152,6 +163,16 @@ arb_mat_add_error_mag(arb_mat_t mat, const mag_t err)
     for (i = 0; i < arb_mat_nrows(mat); i++)
         for (j = 0; j < arb_mat_ncols(mat); j++)
             arb_add_error_mag(arb_mat_entry(mat, i, j), err);
+}
+
+ARB_MAT_INLINE void
+arb_mat_add_error_arf(arb_mat_t mat, const arf_t err)
+{
+    slong i, j;
+
+    for (i = 0; i < arb_mat_nrows(mat); i++)
+        for (j = 0; j < arb_mat_ncols(mat); j++)
+            arb_add_error_arf(arb_mat_entry(mat, i, j), err);
 }
 
 /* Special matrices */
@@ -175,6 +196,10 @@ void arb_mat_dct(arb_mat_t mat, int type, slong prec);
 void arb_mat_transpose(arb_mat_t mat1, const arb_mat_t mat2);
 
 /* Norms */
+
+void arb_mat_max_norm(arb_t res, const arb_mat_t A, slong prec);
+
+void arb_mat_inf_norm(arb_t res, const arb_mat_t A, slong prec);
 
 void arb_mat_bound_inf_norm(mag_t b, const arb_mat_t A);
 
@@ -429,11 +454,15 @@ arb_mat_count_not_is_zero(const arb_mat_t mat)
     return size - arb_mat_count_is_zero(mat);
 }
 
-ARB_MAT_INLINE slong
-arb_mat_allocated_bytes(const arb_mat_t x)
-{
-    return _arb_vec_allocated_bytes(x->entries, x->r * x->c) + x->r * sizeof(arb_ptr);
-}
+/* Eigenvalues and eigenvectors */
+
+void arb_mat_spd_eig_lbound_arf(arf_t b, const arb_mat_t mat, slong prec);
+
+void arb_mat_spd_neighborhood(arf_t r, const arb_mat_t mat, slong prec);
+
+/* LLL reduction */
+
+void arb_mat_spd_lll_reduce(fmpz_mat_t U, const arb_mat_t A, slong prec);
 
 #ifdef __cplusplus
 }

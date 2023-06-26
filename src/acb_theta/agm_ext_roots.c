@@ -14,7 +14,7 @@
 
 void
 acb_theta_agm_ext_roots(acb_ptr roots, acb_srcptr z, const acb_mat_t tau,
-                        slong nb_bad, slong prec)
+    slong nb_bad, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;

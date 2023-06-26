@@ -22,9 +22,8 @@ acb_siegel_reduce_imag(fmpz_mat_t mat, const acb_mat_t tau, slong prec)
     fmpz_mat_init(U, g, g);
 
     acb_mat_get_imag(im, tau);
-    arb_mat_reduce(U, im, prec);
-
-    fmpz_mat_diag_sp(mat, U);
+    arb_mat_spd_lll_reduce(U, im, prec);
+    sp2gz_block_diag(mat, U);
 
     arb_mat_clear(im);
     fmpz_mat_clear(U);

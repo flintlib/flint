@@ -47,12 +47,16 @@ acb_theta_eld_contains(const acb_theta_eld_t E, slong * pt)
     slong k;
 
     if (acb_theta_eld_nb_pts(E) == 0)
+    {
         return 0;
+    }
 
     for (k = d; k < g; k++)
     {
         if (pt[k] != acb_theta_eld_coord(E, k))
+        {
             return 0;
+        }
     }
 
     return acb_theta_eld_contains_rec(E, pt);

@@ -13,7 +13,7 @@
 
 void
 acb_theta_agm_ext_rel_err(arf_t err, const arf_t c2, const arf_t r,
-                          slong nb_good, slong prec)
+    slong nb_good, slong prec)
 {
     fmpz_t exp;
     arb_t x, y, z;
@@ -22,46 +22,37 @@ acb_theta_agm_ext_rel_err(arf_t err, const arf_t c2, const arf_t r,
     arb_init(x);
     arb_init(y);
     arb_init(z);
-
-    if (nb_good < 1)
-    {
-        flint_printf
-            ("acb_theta_agm_ext_rel_err: Error (need at least 1 good step)\n");
-        fflush(stdout);
-        flint_abort();
-    }
+    
     arb_set_arf(x, r);
     arb_mul_2exp_si(x, x, 2);
     arb_sub_si(x, x, 1, prec);
-    if (!arb_is_negative(x))
+
+    if (nb_good < 1) /* Need at least 1 good step */
     {
-        flint_printf("acb_theta_agm_ext_rel_err: Error (decay too slow)\n");
-        arf_printd(r, 10);
-        flint_printf("\n");
-        fflush(stdout);
-        flint_abort();
+        arf_pos_inf(err);
     }
-
-    fmpz_one(exp);
-    fmpz_mul_2exp(exp, exp, FLINT_MAX(nb_good - 1, 0));
-    arb_set_arf(x, r);
-    arb_pow_fmpz(x, x, exp, prec);
-    arb_mul_arf(z, x, c2, prec);
-
-    arb_mul_si(y, x, -2, prec);
-    arb_add_si(y, y, 1, prec);
-    arb_div(x, x, y, prec);
-
-    arb_add_si(y, z, 2, prec);
-    arb_sub_si(z, z, 1, prec);
-    arb_mul_si(z, z, -2, prec);
-    arb_div(y, y, z, prec);
-    arb_mul(x, x, y, prec);
-
-    arb_mul_arf(x, x, c2, prec);
-
-    arb_expm1(x, x, prec);
-    arb_get_ubound_arf(err, x, prec);
+    else if (!arb_is_negative(x)) /* Convergence rate too slow */
+    {
+        arf_pos_inf(err);
+    }
+    else
+    {
+        fmpz_one(exp);
+        fmpz_mul_2exp(exp, exp, FLINT_MAX(nb_good - 1, 0));
+        arb_set_arf(x, r);
+        arb_pow_fmpz(x, x, exp, prec); /* x = r^(2^(n-1)) */
+        arb_mul_si(z, x, -2, prec);
+        arb_add_si(z, z, 1, prec);
+        arb_mul_arf(x, x, c2, prec); /* x = c2 r^(2^(n-1)) */
+        arb_neg(y, x);
+        arb_add_si(y, y, 1, prec);
+        arb_mul(z, z, y, prec); /* z = (1-c2 r^(2^(n-1)))(1 - 2r^(2^(n-1))) */
+        arb_mul_2exp_si(x, x, 1);
+        arb_div(z, x, z, prec);
+        
+        arb_expm1(z, z, prec);
+        arb_get_ubound_arf(err, z, prec);
+    }
 
     fmpz_clear(exp);
     arb_clear(x);

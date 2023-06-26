@@ -210,6 +210,11 @@ Random number generation
     Generates a random complex number, with very high probability of
     generating integers and half-integers.
 
+.. function:: void acb_urandom(acb_t z, flint_rand_t state, slong prec)
+
+    Generates a random complex number with precise real and imaginary parts,
+    uniformly chosen in the unit disk.
+
 Precision and comparisons
 -------------------------------------------------------------------------------
 
@@ -1204,7 +1209,11 @@ Vector functions
 
 .. function:: void _acb_vec_scalar_div_fmpz(acb_ptr res, acb_srcptr vec, slong len, const fmpz_t c, slong prec)
 
-   Performs the respective scalar operation elementwise.
+    Performs the respective scalar operation elementwise.
+
+.. function:: _acb_vec_sqr(acb_ptr res, acb_srcptr vec, slong len, slong prec)
+
+    Sets *res* to the squares of entries in *vec*.
 
 .. function:: slong _acb_vec_bits(acb_srcptr vec, slong len)
 

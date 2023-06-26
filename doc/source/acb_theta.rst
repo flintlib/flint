@@ -1,344 +1,16 @@
 .. _acb-theta:
 
-**acb_theta.h** -- theta functions and modular forms in genus 2 and above
+**acb_theta.h** -- Theta functions in any dimension
 ===============================================================================
 
-This module provides methods for numerical evaluation of theta functions and
-modular forms in genus `g=2` and above. All methods also accept `g=1`,
-duplicating functionality from :ref:`acb_modular.h <acb-modular>` (without the
-specific speed-ups).
+This module provides methods for numerical evaluation of theta functions in any
+dimension `g`. All methods also accept `g=1`, duplicating functionality from
+:ref:`acb_modular.h <acb-modular>` (without the specific speed-ups).
 
 In the context of this module, *tau* or `\tau` always denotes an element of the
 Siegel complex upper half-space `\mathbb{H}_g = \{\tau \in
 \operatorname{Mat}_{g\times g}(\mathbb{C}) : \tau^t = \tau, \quad
 \operatorname{Im}(\tau) \text{ is positive definite}\}`.
-
-As usual, the numerical functions in this module compute strict error bounds:
-if *tau* is represented by an :type:`acb_mat_t` which is not certainly positive
-definite, the output will have an infinite radius, or an error will be thrown.
-
-Helper functions for real/complex scalars and matrices
--------------------------------------------------------------------------------
-
-.. function:: void arb_randtest_pos(arb_t x, flint_rand_t state, slong prec,
-              slong mag_bits)
-
-    Generates a random positive number with radius around `2^{-\text{prec}}`
-    the magnitude of the midpoint.
-    
-.. function:: void acb_randtest_disk(acb_t x, const acb_t ctr, const arf_t rad,
-              flint_rand_t state, slong prec)
-
-    Generates a random complex number with radius around `2^{-\text{prec}}` the
-    magnitude of the midpoint, that is guaranteed to lie in a disk of radius
-    *rad* centered at the midpoint of *ctr*.
-
-.. function:: void acb_mat_get_real(arb_mat_t re, const acb_mat_t mat)
-
-    Sets *re* to the real part of *mat*.
-
-.. function:: void acb_mat_get_imag(arb_mat_t im, const acb_mat_t mat)
-
-    Sets *im* to the imaginary part of *mat*.
-
-.. function:: void arb_mat_add_error_arf(arb_mat_t mat, const arf_t err)
-    
-    Add *err* to the radius of all entries of *mat* in-place.
-
-.. function:: void acb_mat_set_arb_arb(acb_mat_t mat, const arb_mat_t re, const
-              arb_mat_t im)
-
-    Sets *mat* to the complex matrix with real and imaginary parts *re*, *im*.
-
-.. function:: void arb_mat_randtest_cho(arb_mat_t mat, flint_rand_t state,
-              slong prec, slong mag_bits)
-    
-    Sets the square matrix *mat* to a random upper triangular real matrix with
-    positive diagonal entries, calling :func:`arb_randtest_precise` or
-    :func:`arb_randtest_pos` on each relevant entry.
-
-.. function:: void arb_mat_randtest_sym_pos(arb_mat_t mat, flint_rand_t state,
-              slong prec, slong mag_bits)
-
-    Sets *mat* to a random symmetric, positive definite real matrix with
-    precise entries.
-
-.. function:: int arb_mat_is_nonsymmetric(const arb_mat_t mat)
-
-    Returns nonzero iff *mat* is certainly not symmetric.
-
-.. function:: void arb_mat_pos_lambda(arb_t lambda, const arb_mat_t mat, slong
-              prec)
-
-    Given a symmetric, positive definite real matrix *mat*, sets *lambda* to a
-    lower bound for the smallest eigenvalue of *mat*.
-
-.. function:: void arb_mat_pos_radius(arf_t rad, const arb_mat_t mat, slong prec)
-
-    Given a symmetric, positive definite real matrix *m*, computes a
-    nonnegative *rad* such that any symmetric matrix obtained from *m* by
-    adding an error of at most *rad* to each coefficient will still be positive
-    definite.
-
-.. function:: void arb_mat_reduce(arb_mat_t R, fmpz_mat_t U, const arb_mat_t M,
-              slong prec)
-
-    Given a symmetric, positive definite `g\times g` real matrix *M*, look for
-    `U \in \operatorname{GL}_g(\mathbb{Z})` such that `R = U^T M U` is "more
-    reduced" than *M*.
-
-    If `g=2`, uses the Minkowski reduction algorithm; otherwise, relies on
-    Flint's implementation of the LLL algorithm.
-
-.. function:: void acb_mat_ninf(arb_t norm, const acb_mat_t mat, slong prec)
-
-    Returns the infinity-operator norm of *mat*, defined as the maximum sum of
-    absolute values of all entries on any line of *mat*.
-
-Helper functions for integral matrices
--------------------------------------------------------------------------------
-
-We implement matrices in `\operatorname{GSp}_{2g}(\mathbb{Z})` acting on the Siegel
-upper half space as elements of type :type:`fmpz_mat_t`. As is usual in that
-context, we allow single lowercase letters as matrix names when convenient.
-
-.. function:: void fmpz_mat_get_a(fmpz_mat_t res, const fmpz_mat_t mat)
-
-.. function:: void fmpz_mat_get_b(fmpz_mat_t res, const fmpz_mat_t mat)
-
-.. function:: void fmpz_mat_get_c(fmpz_mat_t res, const fmpz_mat_t mat)
-
-.. function:: void fmpz_mat_get_d(fmpz_mat_t res, const fmpz_mat_t mat)
-
-    Sets *res* to the corresponding block of the `2g\times 2g` square matrix `m
-    = \left(\begin{textmatrix} a&b\\c&d \end{textmatrix}\right)`.
-
-.. function:: void fmpz_mat_set_abcd(fmpz_mat_t m, const fmpz_mat_t a, const
-              fmpz_mat_t b, const fmpz_mat_t c, const fmpz_mat_t d)
-
-    Sets the `2g\times 2g` matrix *mat* to `\left(\begin{textmatrix} a&b\\c&d
-    \end{textmatrix}\right)`, where `a,b,c,d` are `g\times g` blocks.
-
-.. function:: void fmpz_mat_J(fmpz_mat_t mat)
-
-    Sets the `2g\times 2g` matrix *mat* to the symplectic matrix
-    `\left(\begin{textmatrix} 0&I_g\\-I_g&0 \end{textmatrix}\right)`.
-
-.. function:: int fmpz_mat_is_scalar(const fmpz_mat_t mat)
-
-    Returns nonzero iff *m* is a square scalar matrix.
-
-.. function:: int fmpz_mat_is_sp(const fmpz_mat_t mat)
-
-.. function:: int fmpz_mat_is_gsp(const fmpz_mat_t mat)
-
-    Returns nonzero iff the `2g\times 2g` matrix *m* is symplectic,
-    resp. general symplectic.
-
-.. function:: void fmpz_mat_diag_sp(fmpz_mat_t mat, const fmpz_mat_t U)
-
-    Sets the `2g\times 2g` matrix *mat* to the symplectic matrix
-    `\left(\begin{textmatrix} U&0\\0&U^{-T} \end{textmatrix}\right)`. We
-    require `U\in \operatorname{GL}_g(\mathbb{Z})`.
-
-.. function:: void fmpz_mat_trig_sp(fmpz_mat_t mat, const fmpz_mat_t S)
-
-    Sets the `2g\times 2g` matrix *mat* to `\left(\begin{textmatrix}
-    I_g&S\\0&I_g \end{textmatrix}\right)`, which is symplectic iff *S* is
-    symmetric.
-
-.. function:: void fmpz_mat_randtest_sp(fmpz_mat_t mat, flint_rand_t state,
-              slong bits)
-
-    Sets *mat* to a random symplectic matrix whose coefficients have length
-    around *bits*.
-
-.. function:: void fmpz_mat_siegel_fund(fmpz_mat_t mat, slong j)
-
-    Sets the `2g\times 2g` matrix *mat* to the `j^{\text{th}}` matrix defining
-    the boundary of the Siegel fundamental domain (in an arbitrary
-    numbering). For `g=1`, we require `j=0`; for `g=2`, we require `0\leq j\leq
-    18`; results in an error for `g\geq 3` where such a set of matrices is not
-    explicitly known.
-
-The Siegel upper half space
--------------------------------------------------------------------------------
-
-We denote the Siegel upper half space by `\mathbb{H}_g`. It contains the
-standard fundamental domain `\mathbb{F}_g` as a closed subset, defined
-in... For `\varepsilon\geq 0`, closed neighborhoods `\mathcal{F}_g^\varepsilon`
-can be defined following...
-
-.. function:: void acb_siegel_randtest(acb_mat_t tau, flint_rand_t state, slong
-              prec, slong mag_bits)
-
-.. function:: void acb_siegel_randtest_fund(acb_mat_t tau, flint_rand_t state,
-              slong prec)
-
-    Sets the `g\times g` matrix *tau* to a random element of *\mathbb{H}_g*. In
-    the second version, *tau* is guaranteed to belong to *\mathcal{F}_g*.
-
-.. function:: void acb_siegel_cocycle(acb_mat_t res, const fmpz_mat_t mat,
-              const acb_mat_t tau, slong prec)
-
-    Sets *res* to `c\tau+d` where *c,d* are the lower `g\times g` blocks of
-    *mat*.
-
-.. function:: void acb_siegel_transform(acb_mat_t w, const fmpz_mat_t m, const
-              acb_mat_t tau, slong prec)
-
-    Sets *res* to `(a\tau + b)(c\tau + d)^{-1}` where *a,b,c,d* are the
-    `g\times g` blocks of *mat*.
-
-.. function:: int acb_siegel_is_real_reduced(const acb_mat_t tau, const arf_t
-              eps, slong prec)
-
-    Returns nonzero if each entry *z* of the square matrix *tau* satisfies
-    `|\operatorname{Re}(z)|\leq 1/2+\varepsilon`. Returns 0 if this is false or
-    cannot be determined.
-
-.. function:: int acb_siegel_not_real_reduced(const acb_mat_t tau, slong prec)
-
-    Returns nonzero if some entry *z* of the square matrix *tau* satisfies
-    `|\operatorname{Re}(z)|> 1/2`. Returns 0 if this is false or cannot be
-    determined.
-
-.. function:: void acb_siegel_reduce_real(acb_mat_t res, fmpz_mat_t mat, const
-              acb_mat_t tau, slong prec)
-
-    Given a `g\times g` square matrix *tau*, computes a symmetric integer
-    matrix *M* approximating `\operatorname{Re}(tau)`, sets *mat* to
-    `\left(\begin{textmatrix} U_g&-M\\0&I_g \end{textmatrix}\right)`, and sets
-    *res* to the image of *tau* under the action of *mat*, which should have a
-    more reduced real part.
-
-.. function:: void acb_siegel_reduce(acb_mat_t res, fmpz_mat_t mat, const
-              acb_mat_t tau, slong prec)
-
-    Given `\tau\in \mathbb{H}_g`, attempts to compute a symplectic matrix *mat*
-    such that the image *res* of *tau* under this matrix is closer to the
-    fundamental domain `\mathcal{F}_g`. We require `g\leq 2`.
-
-    As in :func:`acb_modular_fundamental_domain_approx`, the output *mat* is
-    always a valid symplectic matrix, but it us up to the user to check that
-    the output *res* is close enough to the fundamental domain.
-
-.. function:: int acb_siegel_is_reduced(const acb_mat_t tau, const arf_t eps,
-              slong prec)
-
-    Returns nonzero if the `g\times g` matrix *tau* belongs to
-    `\mathcal{F}_g^\varepsilon`. We require `g\leq 2`. Returns 0 if this is
-    false or cannot be determined.
-
-
-AGM sequences
--------------------------------------------------------------------------------
-
-The classical arithmetic-geometric mean (AGM) of two positive real numbers
-admits a generalization to tuples of `2^g` complex numbers: see for
-instance... We look at sequences in which each step takes the form
-
-    .. math::
-
-        (x_b)_{b\in (\mathbb{Z}/2\mathbb{Z})^g \mapsto (y_b)_{b\in (\mathbb{Z}/2\mathbb{Z})^g}
-
-where
-
-    .. math::
-        
-        y_b = \sum_{b'\in (\mathbb{Z}/2\mathbb{Z})^g} r_{b'} r_{b+b'}
-
-for some choice of square roots `(r_b)` of the tuple `(x_b)`. In this
-generality, AGM sequences converge quadratically if and only if the chosen
-square roots `r_b` are eventually always in *good position*, i.e. they all
-belong to a common quarter plane seen from the origin.
-
-Following..., we will also be interested in *extended Borchardt sequences*,
-defined by similar formulas for a tuple of `2^{g+1}` complex numbers.
-
-The formulas for steps in (extended) AGM sequences replicate the duplication
-formulas for theta functions (see below). This remark is at the heart of
-quasi-linear algorithms to evaluate theta functions; see below.
-
-.. function:: void acb_theta_agm_hadamard(acb_ptr r, acb_srcptr a, slong g,
-              slong prec)
-
-    Sets *r* to the image of *a* under multiplication by *H*, the `2^g\times
-    2^g` Hadamard matrix. We require `g\geq 0`; moreover *r* and *a* must be
-    initialized with at least `2^g` elements.
-
-.. function:: void acb_theta_agm_sqrt_lowprec(acb_t r, const acb_t a, const
-              acb_t root, slong prec)
-
-    Sets *r* to a square root of *a* to high precision that is contained in the
-    (low-precision) approximation *root*. Unlike :func:`acb_sqrt`, no special
-    precision losses happen when *a* touches the negative real axis.
-
-.. function:: void acb_theta_agm_step_sqrt(acb_ptr r, acb_srcptr a, slong g,
-              slong prec)
-
-.. function:: void acb_theta_agm_step_bad(acb_ptr r, acb_srcptr a, acb_srcptr
-              roots, slong g, slong prec)
-
-.. function:: void acb_theta_agm_step_good(acb_ptr r, acb_srcptr a, slong g,
-              slong prec)
-
-    Sets *r* to the result of an AGM step starting from *a*. In the
-    :func:`sqrt` version, *a* is the vector of square roots. In the :func:`bad`
-    version, a low-precision approximation of the roots is given. In the
-    :func:`good` version, we assume that all entries of *a* have positive real
-    parts, and a good choice of square roots is made. We require `g\geq 0`; all
-    vectors must be initialized with at least `2^g` elements.
-
-.. function:: void acb_theta_agm_ext_step_sqrt(acb_ptr r, acb_srcptr a, slong
-              g, slong prec)
-
-.. function:: void acb_theta_agm_ext_step_bad(acb_ptr r, acb_srcptr a,
-              acb_srcptr roots, slong g, slong prec)
-
-.. function:: void acb_theta_agm_ext_step_good(acb_ptr r, acb_srcptr a, slong
-              g, slong prec)
-    
-    Analogous functions for extended Borchardt sequences. All vectors must be
-    initialized with at least `2^{g+1}` elements.
-
-.. function:: void acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr all_roots,
-              const arf_t rel_err, slong nb_bad, slong nb_good, slong g,
-              slong prec)
-
-.. function:: void acb_theta_agm_ext(acb_t r, acb_srcptr a, acb_srcptr
-              all_roots, const arf_t rel_err, slong nb_bad, slong nb_good,
-              slong g, slong prec)
-
-    Evaluates the limit of an AGM sequence starting from *a*. First takes
-    *nb_bad* bad steps using low-precision square roots stored in *all_roots*
-    of length *nb_bad* `\times 2^g`; then, renormalizes and takes *nb_good*
-    good steps.
-
-    The first entry of the resulting vector is an approximation of the
-    limit. We finally add some relative error specified by *rel_err* to account
-    for the mathematical convergence error. This error must be computed by the
-    user in terms of the starting data: while general formulas predict suitable
-    values of *nb_bad*, *nb_good* and *rel_err* in terms of *a*, they are
-    overly pessimistic for our applications.
-
-.. function:: slong acb_theta_agm_nb_bad_steps(const acb_mat_t tau, slong prec)
-
-    Given `\tau\in \mathcal{H}_g`, computes *n\geq 0* such that theta constants
-    at `2^n\tau` lie in a disk centered at `1` with radius `1/20`. The result
-    is intended for use as *nb_bad* in :func:`acb_theta_agm`.
-
-.. function:: slong acb_theta_agm_nb_good_steps(arf_t rel_err, slong g, slong prec)
-
-    Computes the number of good AGM steps, starting from a configuration of
-    complex numbers within the disk centered at `1` with radius `1/20`, to
-    approximate the limit value up to a relative error of
-    `2^{-\text{prec}}`. Also sets *rel_err* to this value. The result is
-    intended for use as *nb_good* and *rel_err* in :func:`acb_theta_agm`.
-
-
-Conventions on theta functions
--------------------------------------------------------------------------------
 
 For each `a,b\in \{0,1\}^g`, the Riemann theta function is the following
 analytic function in two variables `\tau\in \mathbb{H}_g` and `z\in
@@ -383,57 +55,391 @@ categories:
 7. Also compute derivatives of theta functions up to some order: suffix
    :func:`jet`.
 
+As usual, the numerical functions in this module compute strict error bounds:
+if *tau* is represented by an :type:`acb_mat_t` which is not certainly positive
+definite, the output will have an infinite radius.
+
+The Siegel modular group
+-------------------------------------------------------------------------------
+
+We use the type `fmpz_mat_t` directly for matrices in `\operatorname{Sp}_{2g}(\mathbb{Z})`
+or `\operatorname{GSp}_{2g}(\mathbb{Z})`. We always assume that the input
+matrix *mat* is square of even size `2g`.
+
+.. function:: void sp2gz_dim(const fmpz_mat_t mat)
+
+    Returns the dimension `g`, which is half the number of rows (or columns)
+    of *mat*.
+
+.. function:: void sp2gz_get_a(fmpz_mat_t res, const fmpz_mat_t mat)
+
+.. function:: void sp2gz_get_b(fmpz_mat_t res, const fmpz_mat_t mat)
+
+.. function:: void sp2gz_get_c(fmpz_mat_t res, const fmpz_mat_t mat)
+
+.. function:: void sp2gz_get_d(fmpz_mat_t res, const fmpz_mat_t mat)
+
+    Sets *res* to the corresponding block of *mat*, written as `\left(\begin{textmatrix} a&b\\c&d \end{textmatrix}\right)`.
+
+.. function:: void sp2gz_set_abcd(fmpz_mat_t m, const fmpz_mat_t a, const
+              fmpz_mat_t b, const fmpz_mat_t c, const fmpz_mat_t d)
+
+    Sets *mat* to `\left(\begin{textmatrix} a&b\\c&d \end{textmatrix}\right)`,
+    where `a,b,c,d` are `g\times g` blocks.
+
+.. function:: int sp2gz_is_correct(const fmpz_mat_t mat)
+
+.. function:: int sp2gz_is_gsp(const fmpz_mat_t mat)
+
+    Returns whether *mat* is an element of `\operatorname{Sp}_{2g}(\mathbb{Z})`
+    or `\operatorname{GSp}_{2g}(\mathbb{Z})`, respectively.
+
+.. function:: int sp2gz_is_scalar(const fmpz_mat_t mat)
+
+    Returns whether *mat* is a scalar matrix, i.e. diagonal with equal entries.
+    
+.. function:: void sp2gz_j(fmpz_mat_t mat)
+
+    Sets *mat* to the symplectic matrix
+    `J = \left(\begin{textmatrix} 0&I_g\\-I_g&0 \end{textmatrix}\right)`.
+
+.. function:: void sp2gz_block_diag(fmpz_mat_t mat, const fmpz_mat_t U)
+
+    Sets *mat* to the symplectic matrix
+    `\left(\begin{textmatrix} U&0\\0&U^{-T} \end{textmatrix}\right)`.
+    Requires that `U\in \operatorname{GL}_g(\mathbb{Z})`.
+
+.. function:: void sp2gz_trig(fmpz_mat_t mat, const fmpz_mat_t S)
+
+    Sets *mat* to `\left(\begin{textmatrix} I_g&S\\0&I_g \end{textmatrix}\right)`,
+    which is symplectic if and only if *S* is symmetric.
+
+.. function:: void sp2gz_randtest(fmpz_mat_t mat, flint_rand_t state, slong bits)
+
+    Sets *mat* to a random symplectic matrix whose coefficients have length
+    approximately *bits*.
+
+.. function:: sp2gz_nb_fundamental(slong g)
+
+    Returns the number of fundamental symplectic matrices used in the reduction
+    algorithm on `\mathbb{H}_g`. This number is currently `19` when `g=2` and
+    `1` otherwise.
+
+.. function:: void sp2gz_fundamental(fmpz_mat_t mat, slong j)
+
+    Sets *mat* to the `j^{\text{th}}` fundamental symplectic matrix as defined
+    above.
+
+The Siegel upper half space
+-------------------------------------------------------------------------------
+
+The Siegel upper half space `\mathbb{H}_g` contains the standard fundamental
+domain `\mathcal{F}_g`, defined in..., as a closed subset.
+
+.. function:: void acb_siegel_cocycle(acb_mat_t res, const fmpz_mat_t mat, const acb_mat_t tau, slong prec)
+
+    Sets *res* to `c\tau+d` where *c,d* are the lower `g\times g` blocks of
+    *mat*.
+
+.. function:: void acb_siegel_transform(acb_mat_t w, const fmpz_mat_t m, const acb_mat_t tau, slong prec)
+
+    Sets *res* to `(a\tau + b)(c\tau + d)^{-1}` where *a,b,c,d* are the
+    `g\times g` blocks of *mat*.
+
+.. function:: void acb_siegel_transform_ext(acb_ptr r, acb_mat_t w, const fmpz_mat_t mat, acb_srcptr z, const acb_mat_t tau, slong prec)
+
+    Sets *r* and *w* to `(c\tau + d)^{-T} z` and `(a\tau + b)(c\tau + d)^{-1}`
+    respectively, where *a,b,c,d* are the `g\times g` blocks of *mat*.
+
+.. function:: void acb_siegel_reduce_imag(fmpz_mat_t mat, const acb_mat_t tau, slong prec)
+
+    Reduces the imaginary part of *tau* by calling :func:`arb_mat_spd_lll_reduce`
+    and sets *mat* to the corresponding unimodular transformation.
+
+.. function:: void acb_siegel_reduce_real(fmpz_mat_t mat, const acb_mat_t tau, slong prec)
+
+    Computes a symmetric, integral matrix *mat* such that *tau+mat* has a small
+    real part, ideally at most `1/2` in absolute value for each coefficient.
+
+.. function:: void acb_siegel_reduce(acb_mat_t res, fmpz_mat_t mat, const acb_mat_t tau, slong prec)
+
+    Computes a symplectic matrix *mat* such that the result *res* of *mat*
+    acting on *tau* is closer to `\mathcal{F}_g`, by repeatedly reducing its
+    real and imaginary parts and applying fundamental symplectic matrices.
+    
+.. function:: void acb_siegel_randtest(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits)
+
+    Generates a random matrix *tau* in `\mathbb{H}_g`, possibly far from the
+    fundamental domain.
+
+.. function:: void acb_siegel_randtest_reduced(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits)
+
+    Generates a random matrix *tau* in `\mathbb{H}_g` that is close to the
+    fundamental domain by calling :func:`acb_siegel_reduce` on a random matrix.
+
+.. function:: void acb_siegel_randtest_nice(acb_mat_t tau, flint_rand_t state, slong prec)
+
+    Generates a random matrix that is well in the interior of `\mathcal{F}_g`.
+
+AGM sequences
+-------------------------------------------------------------------------------
+
+The classical arithmetic-geometric mean (AGM) of two positive real numbers
+admits a generalization to tuples of `2^g` complex numbers: see for
+instance... We look at sequences in which each step takes the form
+
+    .. math::
+
+        (x_b)_{b\in (\mathbb{Z}/2\mathbb{Z})^g \mapsto (y_b)_{b\in (\mathbb{Z}/2\mathbb{Z})^g}
+
+where
+
+    .. math::
+        
+        y_b = \sum_{b'\in (\mathbb{Z}/2\mathbb{Z})^g} r_{b'} r_{b+b'}
+
+for some choice of square roots `(r_b)` of the tuple `(x_b)`. In this
+generality, AGM sequences converge quadratically if and only if the chosen
+square roots `r_b` are eventually always in *good position*, i.e. they all
+belong to a common quarter plane seen from the origin.
+
+Following..., we also compute *extended Borchardt sequences*, defined by
+similar formulas for a tuple of `2^{g+1}` complex numbers.
+
+.. function:: void acb_theta_agm_hadamard(acb_ptr r, acb_srcptr a, slong g, slong prec)
+
+    Sets *r* to the image of *a* under multiplication by *H*, the `2^g\times
+    2^g` Hadamard matrix (see ...). Requires that `g\geq 0` and *r* and *a* are
+    initialized with at least `2^g` elements.
+
+.. function:: void acb_theta_agm_sqrt_lowprec(acb_t r, const acb_t a, const acb_t root, slong prec)
+
+    Sets *r* to a square root of *a*. Unlike :func:`acb_sqrt`, no special
+    precision losses happen when *a* touches the negative real axis. The sign
+    of the output is determined: it must overlap *root*, which is a
+    (low-precision) complex ball containing either `\sqrt{a}` or `-\sqrt{a}`.
+    Returns indeterminate if the correct sign cannot be determined.
+
+.. function:: void acb_theta_agm_step_sqrt(acb_ptr r, acb_srcptr a, slong g,
+              slong prec)
+
+.. function:: void acb_theta_agm_step_bad(acb_ptr r, acb_srcptr a, acb_srcptr
+              roots, slong g, slong prec)
+
+.. function:: void acb_theta_agm_step_good(acb_ptr r, acb_srcptr a, slong g,
+              slong prec)
+
+    Sets *r* to the result of an AGM step starting from *a*. In the
+    :func:`sqrt` version, *a* is the vector of square roots. In the :func:`bad`
+    version, a low-precision approximation of the roots is given. In the
+    :func:`good` version, we assume that all entries of *a* have positive real
+    parts, and a good choice of square roots is made. We require that `g\geq 0`
+    and all vectors are initialized with at least `2^g` elements.
+
+.. function:: void acb_theta_agm_ext_step_sqrt(acb_ptr r, acb_srcptr a, slong
+              g, slong prec)
+
+.. function:: void acb_theta_agm_ext_step_bad(acb_ptr r, acb_srcptr a,
+              acb_srcptr roots, slong g, slong prec)
+
+.. function:: void acb_theta_agm_ext_step_good(acb_ptr r, acb_srcptr a, slong
+              g, slong prec)
+    
+    Analogous functions for extended Borchardt sequences. All vectors must be
+    initialized with at least `2^{g+1}` elements.
+    
+.. function:: void acb_theta_agm_step_last(acb_t r, acb_srcptr a, slong g, slong prec)
+
+    Sets *r* to the average of the first `2^g` entries of *a*.
+
+.. function:: void acb_theta_agm_ext_step_last(acb_t r, const acb_t s, acb_srcptr a, slong g, slong prec)
+
+    Computes an extended Borchardt mean *r* given the last term of the
+    associated AGM sequence and the associated (regular) Borchardt mean *s*.
+    
+.. function:: void acb_theta_agm_max_abs(arb_t max, acb_srcptr a, slong nb, slong prec)
+              
+.. function:: void acb_theta_agm_min_abs(arb_t min, acb_srcptr a, slong nb, slong prec)
+
+    Sets *max* (resp. *min*) to the maximum (resp. minimum) absolute value of
+    the first *nb* entries of *a*.    
+              
+.. function:: void acb_theta_agm_abs_dist(arb_t eps, acb_srcptr a, slong nb, slong lowprec, slong prec)
+    
+    Computes `\varepsilon = \max_{0< i< nb} |a_i - a_0|`. Differences are
+    computed at precision *prec* and absolute values at precision *lowprec*.
+
+.. function:: void acb_theta_agm_rel_dist(arb_t eps, acb_srcptr a, slong nb, slong lowprec, slong prec)
+
+    Computes `1|a_0|` times the output of :func:`acb_theta_agm_abs_dist`.
+
+.. function:: void acb_theta_agm_conv_rate(arf_t c, arf_t r, const arf_t eps, slong prec)
+
+    Computes the convergence rate of an AGM sequence consisting of good steps
+    only, i.e. *c* and *r<1* such that the `i\text{th}` term of the sequence
+    satisfies `|a_0 - m|\leq c r^i |a_0|` for all `i\geq 0`. The input *eps* is
+    an upper bound on the relative distance for the term `i=0`, as computed by
+    :func:`acb_theta_agm_rel_dist`, and must be less than *1/4*. Otherwise
+    *c,r* are set to infinite values.
+
+.. function:: slong acb_theta_agm_nb_good_steps(const arf_t c, const arf_t r, slong prec)
+
+    Given the convergence rate *c,r* of an AGM sequence with good steps as,
+    above, returns the (nonnegative) number of steps to compute before the
+    equality `|a_0-m|\leq 2^{-\mathrm{prec}}|a_0|` holds. Returns negative if
+    this number is infinite or cannot be computed from the given
+    *c,r*. Computations are performed at a low precision specified by...
+
+.. function:: void acb_theta_agm(acb_t r, acb_srcptr a, acb_srcptr roots, slong nb_bad, slong g, slong prec)
+
+    Computes the limit of an AGM sequence starting from `2^g` complex
+    numbers. The input data is as follows: *a* is the first term; *nb_bad* is
+    the number of (possibly) bad steps; and *roots* consists of low-precision
+    approximations of the correct roots for the first *nb_bad* steps, as in
+    :func:`acb_theta_agm_sqrt_lowprec`. Returns an indeterminate result if a
+    suitable convergence rate cannot be determined after *nb_bad* steps.
+
+.. function:: void acb_theta_agm_ext_conv_rate(arf_t c1, arf_t c2, arf_t r, const arf_t eps, const arf_t m, const arf_t M, slong prec)
+
+    Computes the convergence rate of an extended AGM sequence consisting of
+    good steps only, i.e. *c1, c2* and *r<1* such that *c1,r* is the
+    convergence rate of the regular AGM and for all `n\geq 1`, the inequality
+    `|q_{n+1}-1|\leq c_2 r^{2^{n-1}}` holds. The input is as follows: *eps* is
+    an upper bound on the relative distance for the term `i=0`, as computed by
+    :func:`acb_theta_agm_rel_dist`, and must be less than *1/4*; and *m*
+    (resp. *M*) is a lower (resp. upper) bound on the modulus of all entries of
+    the initial extended AGM vector, which must be finite, with *m>0*. If these
+    conditions are not satisfied then *c1, c2, r* are set to infinite values.
+
+.. function:: void acb_theta_agm_ext_rel_err(arf_t err, const arf_t c2, const arf_t r, slong nb_good, slong prec)
+    
+    Computes the relative error for an extended AGM computation with
+    convergence rate given by *c1, c2, r* and *nb_good* steps: the extended AGM
+    is equal to `(u_n^{(0)}/\mu\cdot (1+\delta))^{2^n}` where *n* is given by
+    *nb_good* and *err* is an upper bound on `|\delta|`. Requires that
+    *nb_good* is at least `1` and `r < 1/2`, otherwise sets *err* to an
+    infinite value.
+              
+.. function:: void acb_theta_agm_ext(acb_t r, acb_t s, acb_srcptr a, acb_srcptr roots, slong nb_bad, slong g, slong prec)
+
+    Computes the extended Borchardt mean starting from `2^(g+1)` complex
+    numbers. The input data is as follows: *a* is the first term; *nb_bad* is
+    the number of (possibly) bad steps; and *roots* consists of low-precision
+    approximations of the correct roots for the first *nb_bad* steps, as in
+    :func:`acb_theta_agm_sqrt_lowprec`. Returns an indeterminate result if a
+    suitable convergence rate cannot be determined after *nb_bad* steps.
+
+.. function:: slong acb_theta_agm_nb_bad_steps(const acb_mat_t tau, slong prec)
+
+.. function:: slong acb_theta_agm_ext_nb_bad_steps(acb_srcptr z, const acb_mat_t tau, slong prec)
+
+    Given `\tau\in \mathcal{H}_g` and `z\in \mathbb{C}^g`, computes a
+    nonnegative upper bound on the number of bad steps for the (extended) AGM
+    sequence formed by theta values at `(z, 2^n\tau)` as *n* grows. A return
+    value of -1 indicates that this bound cannot be computed.
+
+.. function:: void acb_theta_agm_roots(acb_ptr roots, const acb_mat_t tau, slong nb_bad, slong prec)
+
+.. function:: void acb_theta_agm_ext_roots(acb_ptr roots, acb_srcptr z, const acb_mat_t tau, slong nb_bad, slong prec)
+    
+    Given `\tau\in \mathcal{H}_g`, `z\in \mathbb{C}^g` and a number of bad
+    steps *nb_bad*, computes an approximation of the required square root as
+    required by :func:`acb_theta_agm` and :func:`acb_theta_agm_ext`
+    respectively, using the naive algorithm for theta functions.
+
+.. function:: void acb_theta_agm_radius(arf_t rad, const arf_struct* mi, const arf_struct* Mi, const arf_t abs_dist, slong nb, slong prec)
+
+    Sets *rad* to the radius of a polydisk where a certain Borchardt mean
+    function is surely analytic. The input data is as follows: *nb* is the
+    number of (possibly) bad steps; *abs_dist* is the output of
+    :func:`acb_theta_agm_abs_dist` for the vector obtained after *nb* steps;
+    and *mi* (resp. *Mi*) contains a lower (resp. upper) bound for the absolute
+    values of all entries in the `i\text{th}` term of the sequence for each *i*
+    between *0* and *nb-1*.
+
 Transformation formulas
 -------------------------------------------------------------------------------
+
+.. function:: ulong acb_theta_char_a(slong* coords, slong g)
+
+    Returns *a* such that the *i*-th bit of *a* is 1 iff the *i*-th entry of
+    *coords* is odd, for each `1\leq i\leq g`.
 
 .. function:: slong acb_theta_char_dot(ulong a, ulong b, slong g)
 
     Returns *a^T b* mod *2*.
 
-.. function:: slong acb_theta_dot(ulong a, slong* n, slong g)
+.. function:: slong acb_theta_char_dot_slong(ulong a, slong* n, slong g)
 
     Returns *a^T n* mod *8*.
 
-.. function:: void acb_theta_dupl_const(acb_ptr th2, acb_srcptr th, slong g,
-              slong prec)
+.. function:: void acb_theta_dupl_const(acb_ptr th2, acb_srcptr th, slong g, slong prec)
 
     Applies the duplication formula to compute `(\theta_{0,b}^2(0,2\tau))_{b\in
     \{0,1\}^g}` from `(\theta_{0,b}(0,\tau))_{b\in \{0,1\}^g}`. If the input is
-    projective (i.e. given up to a common scalar factor), so is the output.
+    projective (i.e. given up to a common scalar factor), then so is the
+    output.
 
     This function simply calls :func:`acb_theta_agm_step_sqrt`.
 
-.. function:: void acb_theta_dupl_all_const(acb_ptr th2, acb_srcptr th, slong
-              g, slong prec)
+.. function:: void acb_theta_dupl_all_const(acb_ptr th2, acb_srcptr th, slong g, slong prec)
 
     Applies the duplication formula to compute to
     `(\theta_{a,b}^2(0,2\tau))_{a,b\in \{0,1\}^g}` from
-    `(\theta_{0,b}(0,\tau))_{b\in \{0,1\}^g}`. If the input is projective, so
-    is the output.
+    `(\theta_{0,b}(0,\tau))_{b\in \{0,1\}^g}`. If the input is projective, then
+    so is the output.
 
 .. function:: void acb_theta_dupl(acb_ptr th2, acb_srcptr th, slong g, slong prec)
 
 .. function:: void acb_theta_dupl_all(acb_ptr th2, acb_srcptr th, slong g, slong prec)
 
     Analogues of the above to compute `(theta^2(z,2\tau), \theta^2(0,2\tau))`
-    from `(theta(z,\tau),\theta(0,\tau))`.
+    from `(theta(z,\tau),\theta(0,\tau))`. The first function simply calls
+    :func:`acb_theta_agm_ext_step_sqrt`.
+
+.. function:: void acb_theta_dupl_z(acb_ptr r, acb_srcptr th, slong g, slong prec)
+
+    Computes `(\theta_{a,b}(2z,\tau))` from `(\theta_{a,b}(z,\tau))`.
         
-.. function:: ulong acb_theta_transform_image_char(fmpz_t eps, ulong ab, const
-              fmpz_mat_t mat)
+.. function:: ulong acb_theta_transform_image_char(fmpz_t eps, ulong ab, const fmpz_mat_t mat)
 
     Computes the theta characteristic *a',b'* and an integer `\varepsilon` such
     that `\theta_{a,b}(0,N\tau) = \exp(i\pi \varepsilon/4) \theta_{a',b'}(0,\tau)`
     up to a scalar factor depending only on *N* and `\tau`. The matrix *N* must
     be symplectic. See also :func:`acb_modular_theta_transform`.
 
-.. function:: void acb_theta_transform_sqr_proj(acb_ptr res, acb_srcptr th2,
-              const fmpz_mat_t mat, slong prec)
+.. function:: void acb_theta_transform_proj(acb_ptr res, acb_srcptr th, const fmpz_mat_t mat, slong prec)
 
-    Applies the transformation formula to compute the projective vector
-    `(\theta_{0,b}^2(0,N\tau)_{b\in \{0,1\}^g}` from the projective vector
-    `(\theta_{a,b}(0,\tau))_{a,b\in \{0,1\}^g}`.
+.. function:: void acb_theta_transform_sqr_proj(acb_ptr res, acb_srcptr th2, const fmpz_mat_t mat, slong prec)
 
-Naive algorithms
+.. function:: void acb_theta_transform_all_sqr_proj(acb_ptr res, acb_srcptr th2, const fmpz_mat_t mat, slong prec)
+    
+    Computes projective vectors of theta values at `(Nz,N\tau)` starting from
+    the projective vector `(\theta_{a,b}(0,\tau))_{a,b\in \{0,1\}^g}`. Exactly
+    what is computed depends on the suffix, as explained above.
+
+.. function:: void acb_theta_transform_scal_const(acb_t scal, const acb_mat_t tau, const fmpz_mat_t mat, slong k2, slong prec)
+
+.. function:: void acb_theta_transform_scal(acb_t scal_z, acb_t scal_0, acb_srcptr z, const acb_mat_t tau, const fmpz_mat_t mat, slong k2, slong prec)
+
+    Computes the scalar factor appearing in the transformation formula for
+    theta values at `(z,\tau)`. The input `k2` can be computed by
+    :func:`sp2gz_k2`.
+
+.. function:: void acb_theta_dupl_radius(arf_t rho, const arf_t r, acb_srcptr th, slong nb, slong prec)
+              
+.. function:: void acb_theta_transform_radius(arf_t rho, const arf_t r, acb_srcptr th, const fmpz_mat_t mat, slong prec)
+
+.. function:: void acb_theta_dupl_transform_const_radius(arf_t rho, const arf_t r, acb_srcptr th, const fmpz_mat_t mat, slong prec)
+
+.. function:: void acb_theta_dupl_transform_radius(arf_t rho, const arf_t r, acb_srcptr th, const fmpz_mat_t mat, slong prec)
+
+    Computes a radius *rho* such that adding a deformation of entrywise modulus
+    at most *rho* to the input vector leads to a deformation of radius at most
+    *r* for the output. The operation is: either duplication, transformation,
+    duplication+transformation for either theta constants or all theta values.
+
+Ellipsoids
 -------------------------------------------------------------------------------
 
 The principle in naive algorithms to compute theta constants is to compute
@@ -444,19 +450,7 @@ series. Following..., we consider partial sums over points `n` in the lattice
 In the :func:`acb_theta_naive` functions, we first compute the relevant
 ellipsoid using low-precision computations; our representation uses
 `O(R^{g-1})` space for an ellipsoid of radius `R`, containing approximately
-`R^g` points, gathered in one-dimensional lines. The partial sum of exponential
-terms is then computed at high precision. Some precomputation occurs for each
-line so that, on average as `R\to\infty`, the code uses only two
-multiplications per exponential term. Further, many of these multiplications
-are performed only at a fraction of the full precision, resulting in
-considerable speedups. Note that using short addition sequences as in
-:func:`acb_modular_addseq_theta` does not seem to further accelerate the
-computations in genus `g\geq 2`.
-
-Many similar :func:`theta_naive` functions are provided; they essentially
-differ by their way of handling individual lattice points. Using function
-pointers for this last step allows us to factor out significant amounts of
-code.
+`R^g` points, gathered in one-dimensional lines.
 
 .. type:: acb_theta_eld_struct
 
@@ -465,9 +459,9 @@ code.
     Represents a *d*-dimensional sheet in an ellipsoid of ambient dimension
     *g*, i.e. a set of points of the form `n = (n_0,\ldots,n_{g-1})\in
     2\mathbb{Z}^g + a` such that `v + Yn` has `L^2` norm bounded by `R`, for
-    some Cholesky matrix `Y`, some radius `R>0`, and some offset `v\in
-    \mathbb{R}^g`, and finally `(n_{d},\ldots,n_{g-1})` have fixed values. This is
-    a recursive type: we store
+    some (upper-triangular) Cholesky matrix `Y`, some radius `R>0`, and some
+    offset `v\in \mathbb{R}^g`, and finally `(n_{d},\ldots,n_{g-1})` have fixed
+    values. This is a recursive type: we store
     * the interval of values for `n_{d-1}`,
     * the midpoint of that interval,
     * in the case `d\geq 2`, a number of *d-1* dimensional children of *E*,
@@ -480,43 +474,33 @@ code.
 
 .. function::  void acb_theta_eld_init(acb_theta_eld_t E, slong d, slong g)
 
-    Initializes *E* as a *d*-dimensional ellipsoid sheet in ambient dimension
-    *g*.
+    Initializes *E* as a *d*-dimensional ellipsoid in ambient dimension *g*.
 
 .. function:: void acb_theta_eld_clear(acb_theta_eld_t E)
 
     Clears *E* as well as any recursive data contained in it.
 
-.. function:: void acb_theta_eld_interval(slong* min, slong* mid, slong* max,
-              const arb_t ctr, const arf_t rad, int a, slong prec)
+.. function:: void acb_theta_eld_interval(slong* min, slong* mid, slong* max, const arb_t ctr, const arf_t rad, int a, slong prec)
 
     Computes the minimum, middle point, and maximum of a subinterval of
     `2\mathbb{Z} + a` that is guaranteed to contain all points within a
     distance *rad* of the real number *ctr*. Both *ctr* and *rad* must be
-    finite values.
+    finite values, otherwise an error is thrown.
 
-.. function:: void acb_theta_eld_fill(acb_theta_eld_t E, const arb_mat_t Y,
-              const arf_t R2, arb_srcptr offset, slong* last_coords, ulong
-              a, slong prec)
+.. function:: void acb_theta_eld_round(slong* r, const arb_mat_t v)
 
-    Sets *E* to represent lattice points in an ellipsoid as defined above,
-    where *R2* indicates `R^2` and *offset* contains the vector `v`. The matrix
-    *Y* must be a valid Cholesky matrix, i.e. an upper triangular matrix with
-    positive diagonal entries, and *R2* must be finite.
+    Given a `g\times 1` matrix *v*, computes a vector *r* of length *g* with
+    integer entries that is close to *v*. The entries of *v* must be finite,
+    otherwise an error is thrown.
 
-.. function:: void acb_theta_eld_points(slong* pts, const acb_theta_eld_t E)
+.. function:: void acb_theta_eld_fill(acb_theta_eld_t E, const arb_mat_t Y, const arf_t R2, arb_srcptr offset, slong* last_coords, ulong a, slong prec)
 
-    Sets *pts* to the list of lattice points contained in *E*.
+    Sets *E* to represent an ellipsoid as defined above, where *R2* indicates
+    `R^2` and *offset* contains the vector `v`. The matrix *Y* must be a valid
+    Cholesky matrix, i.e. an upper triangular matrix with positive diagonal
+    entries, and *R2* must be finite, otherwise an error is thrown.
 
-.. function:: int acb_theta_eld_contains(const acb_theta_eld_t E, slong* pt)
-
-    Returns nonzero iff *pt* is contained in the ellipsoid sheet *E*.
-
-.. function:: void acb_theta_eld_print(const acb_theta_eld_t E)
-
-    Prints a compact representation of *E* to :type:`stdout`.
-
-In addition, the following macros are available after the function
+The following macros return meaningful values after the function
 :func:`arb_eld_fill` has been called, with no computational cost.
 
 .. macro:: acb_theta_eld_dim(E)
@@ -536,12 +520,13 @@ In addition, the following macros are available after the function
 .. macro:: acb_theta_eld_mid(E)
 .. macro:: acb_theta_eld_max(E)
     
-    Returns the minimum, midpoint, and maximum of `n_{d-1}` in the ellipsoid sheet `E`.
+    Returns the minimum, midpoint, and maximum of `n_{d-1}` in the ellipsoid
+    sheet `E`.
 
 .. macro:: acb_theta_eld_nr(E) ((E)->nr)
 .. macro:: acb_theta_eld_nl(E) ((E)->nl)
 
-    Returns the number of right and left children of *E*, respectively
+    Returns the number of right and left children of *E*, respectively.
 
 .. macro:: acb_theta_eld_rchild(E, k)
 .. macro:: acb_theta_eld_lchild(E, k)
@@ -558,8 +543,88 @@ In addition, the following macros are available after the function
     Returns an integer `M_k` such that all lattice points `n` inside the
     ellipsoid sheet *E* satisfy `|n_k|\leq M_k`.
 
-.. function:: void acb_theta_naive_tail(arf_t bound, const arf_t R2, const
-              arb_mat_t Y, slong ord, slong prec)
+Finally, the following functions are available for convenience.
+
+.. function:: void acb_theta_eld_points(slong* pts, const acb_theta_eld_t E)
+
+    Sets *pts* to the list of lattice points contained in *E* (as a
+    concatenation of vectors of length *g*).
+
+.. function:: int acb_theta_eld_contains(const acb_theta_eld_t E, slong* pt)
+
+    Returns nonzero iff *pt* is contained in the ellipsoid sheet *E*.
+
+.. function:: void acb_theta_eld_print(const acb_theta_eld_t E)
+
+    Prints a compact representation of *E* to :type:`stdout`.
+
+Precomputations in naive algorithms
+-------------------------------------------------------------------------------
+
+.. type:: acb_theta_precomp_struct
+
+.. type:: acb_theta_precomp_t
+
+    Structure containing precomputed data in the context of naive algorithms.
+
+.. function:: void acb_theta_precomp_init(acb_theta_precomp_t D, slong nb_z, slong g)
+
+    Initializes *D* for precomputations on *nb_z* vectors `z\in \mathbb{C}^g`.
+
+.. function:: void acb_theta_precomp_clear(acb_theta_precomp_t D)
+
+    Clears *D*.
+
+.. function:: void acb_theta_precomp_set(acb_theta_precomp_t D, acb_srcptr z, const acb_mat_t tau, const acb_theta_eld_t E, slong prec)
+
+    Precomputes data attached to `(z,tau)` for all the vectors *z* in the
+    provided list, for a given ellipsoid *E*.
+
+After :func:`acb_theta_precomp_set` has been called, the following macros
+return meaningful values:
+
+.. macro:: acb_theta_precomp_dim(D)
+
+    Macro giving access to the ambient dimension *g*.
+
+.. macro:: acb_theta_precomp_exp_mat(D)
+
+    Macro giving a pointer to the matrix whose entry `(j,k)` contains
+    `\exp(i\pi/4 \tau_{j,j})` if `j=k`, and `\exp(i\pi/2 \tau_{j,k})`
+    otherwise.
+
+.. macro:: acb_theta_precomp_sqr_pow(D, k, j)
+
+    Macro giving a pointer to the complex number `\exp(i\pi/4 (2j + t)^2
+    \tau_{k,k})`, where `t=1` if the lattice points in *E* have odd coordinates
+    `n_k`, and `t=0` if these coordinates are even.
+
+.. macro:: acb_theta_precomp_nb_z(D)
+
+    Macro giving the number of vectors *z* stored in *D*.
+
+.. macro:: acb_theta_precomp_exp_z(D, k, j)
+
+    Macro giving a pointer to the complex number `exp(\pi i z_j)`, where *z* is
+    the `k^\text{th}` vector stored in *D*.
+    
+Naive algorithms
+-------------------------------------------------------------------------------
+
+After computing a suitable ellipsoid, we can evaluate partial sums of the
+series defining theta functions at high precisions. Some precomputation occurs
+for each line in the ellipsoid, so that, on average as `R\to\infty`, the code
+uses only two multiplications per exponential term. Further, many of these
+multiplications are performed only at a fraction of the full precision,
+resulting in considerable speedups. Note that using short addition sequences as
+in :func:`acb_modular_addseq_theta` does not seem to further accelerate the
+computations in genus `g\geq 2`.
+
+The different :func:`theta_naive` functions only differ by their way of
+handling individual lattice points. Using function pointers thus allows us to
+factor out significant amounts of code.
+
+.. function:: void acb_theta_naive_tail(arf_t bound, const arf_t R2, const arb_mat_t Y, slong ord, slong prec)
 
     Computes an upper bound for the following sum, where `p` stands for *ord*:
 
@@ -574,16 +639,14 @@ In addition, the following macros are available after the function
 
         2^{2g+2} R^{g-1+2p} e^{-R^2} \prod_{i=1}^g (1 + \gamma_i^{-1})
 
-    where the `gamma_i` are the entries on the diagonal of `Y`.
+    where the `gamma_i` are the diagonal entries of `Y`.
 
-.. function:: void acb_theta_naive_radius(arf_t R2, const arb_mat_t Y, slong ord,
-              const arf_t eps, slong prec)
+.. function:: void acb_theta_naive_radius(arf_t R2, const arb_mat_t Y, slong ord, const arf_t eps, slong prec)
 
-    Returns `R^2` such that the above upper bound is at most `\varepsilon`.
+    Returns `R^2` such that the upper bound from :func:`acb_theta_naive_tail`
+    is at most `\varepsilon`.
 
-.. function:: void acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_struct*
-              eps, acb_ptr c, acb_ptr new_z, ulong ab, int all, slong ord,
-              acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
+.. function:: void acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_struct* eps, acb_ptr c, acb_ptr new_z, ulong ab, int all, slong ord, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
 
     Sets the ellipsoid *E* and `\varepsilon` *c*, *new_z*, `\varepsilon` such
     that summing exponential terms involving *new_z* over points of *E* and
@@ -598,74 +661,24 @@ In addition, the following macros are available after the function
     If *all=0*, the ellipsoid consists of lattice points in `2\mathbb{Z}^g+a`
     only, where *a* is specified by the theta characteristic *ab*. If *all* is
     nonzero, the ellipsoid consists of lattice points in `2\mathbb{Z}^g` and
-    the radius is doubled, making *E* suitable for evaluating
+    the radius is doubled, thus making *E* suitable for evaluating
     `\theta_{a,b}(z,\tau)` for all *a*.
 
-.. function:: slong acb_theta_naive_newprec(slong prec, slong coord, slong
-              dist, slong max_dist, slong ord)
+.. function:: slong acb_theta_naive_newprec(slong prec, slong coord, slong dist, slong max_dist, slong ord)
 
     Returns a good choice of precision to process the next ellipsoid
     sheet. Here *coord* should be `n_{d-1}`, *dist* should be the distance to the
     midpoint of the interval, *max_dist* the half-length of the interval, and
     *ord* is the order of derivation.
 
-.. function:: slong acb_theta_naive_fullprec(const acb_theta_eld_t E, slong
-              prec)
+.. function:: slong acb_theta_naive_fullprec(const acb_theta_eld_t E, slong prec)
 
     Returns a good choice of full precision for the summation phase.
-
-.. type:: acb_theta_precomp_struct
-
-.. type:: acb_theta_precomp_t
-
-    Data structure containing precomputed data in the context of naive
-    algorithms.
-
-.. function:: void acb_theta_precomp_init(acb_theta_precomp_t D, slong nb_z,
-              slong g)
-
-    Initializes *D* to contain precomputations about *nb_z* vectors `z\in
-    \mathbb{C}^g`.
-
-.. function:: void acb_theta_precomp_clear(acb_theta_precomp_t D)
-
-    Clears *D*.
-
-.. function:: void acb_theta_precomp_set(acb_theta_precomp_t D, acb_srcptr z,
-              const acb_mat_t tau, const acb_theta_eld_t E, slong prec)
-
-    Precomputes the necessary data to evaluate theta functions at `(z,tau)` for
-    all the vectors *z* in the provided list, using naive algorithms with
-    lattice points contained in the ellipsoid *E*.
-
-After :func:`acb_theta_precomp_set` has been called, the following macros are
-available.
-
-.. macro:: acb_theta_precomp_exp_mat(D)
-
-    Macro giving a pointer to the matrix whose entry `(j,k)` contains
-    `\exp(i\pi/4 \tau_{j,j})` if `j=k`, and `\exp(i\pi/2 \tau_{j,k})`
-    otherwise.
-
-.. macro:: acb_theta_precomp_sqr_pow(D, k, j)
-
-    Macro giving a pointer to the complex number `\exp(i\pi/4 (2j + t)^2
-    \tau_{k,k})`, where `t=1` if the lattice points in *E* has odd coordinates
-    `n_k`, and `t=0` if these coordinates are even.
-
-.. macro:: acb_theta_precomp_nb_z(D)
-
-    Macro giving the number of vectors *z* stored in *D*.
-
-.. macro:: acb_theta_precomp_exp_z(D, k, j)
-
-    Macro giving a pointer to the complex number `exp(\pi i z_j)`, where *z* is
-    the `k^\text{th}` vector stored in *D*.
 
 .. type:: acb_theta_naive_worker_t
 
     Represents a function pointer to the "dimension 0" worker in different
-    kinds of naive algorithm. A function :func:`worker_dim0` of this type has
+    kinds of naive algorithms. A function :func:`worker_dim0` of this type has
     the following signature:
 
     .. function:: void worker_dim0(acb_ptr th, const acb_t term, slong* coords,
@@ -682,35 +695,27 @@ available.
     * *prec* is the (relative) precision at which *term* was computed,
     * *fullprec* is the desired full precision in the summation phase.
 
-.. function:: acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const
-              arf_t eps, const acb_theta_eld_t E, const acb_theta_precomp_t D,
-              slong k, ulong ab, slong ord, slong prec,
-              acb_theta_naive_worker_t worker_dim0)
+.. function:: acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arf_t eps, const acb_theta_eld_t E, const acb_theta_precomp_t D, slong k, ulong ab, slong ord, slong prec, acb_theta_naive_worker_t worker_dim0)
 
     Run the naive algorithm on the ellipsoid *E* to evaluate `\theta(z,\tau)`
     using precomputed data stored in *D*, where *z* is the `k^\text{th}` vector
     in the data structure.
 
-.. function:: void acb_theta_naive(acb_ptr th, acb_srcptr z, slong nb_z, const
-              acb_mat_t tau, slong prec);
+.. function:: void acb_theta_naive(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
 
-.. function:: void acb_theta_naive_const(acb_ptr th, const acb_mat_t tau, slong
-              prec);
+.. function:: void acb_theta_naive_proj(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
 
-.. function:: void acb_theta_naive_const_proj(acb_ptr th, const acb_mat_t tau,
-              slong prec);
+.. function:: void acb_theta_naive_const(acb_ptr th, const acb_mat_t tau, slong prec)
 
-.. function:: void acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z,
-              const acb_mat_t tau, slong prec);
+.. function:: void acb_theta_naive_const_proj(acb_ptr th, const acb_mat_t tau, slong prec)
 
-.. function:: void acb_theta_naive_all_const(acb_ptr th, const acb_mat_t tau,
-              slong prec);
+.. function:: void acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
 
-.. function:: void acb_theta_naive_ind(acb_t th, ulong ab, acb_srcptr z, const
-              acb_mat_t tau, slong prec);
+.. function:: void acb_theta_naive_all_const(acb_ptr th, const acb_mat_t tau, slong prec)
 
-.. function:: void acb_theta_naive_ind_const(acb_t th, ulong ab, const
-              acb_mat_t tau, slong prec);
+.. function:: void acb_theta_naive_ind(acb_t th, ulong ab, acb_srcptr z, const acb_mat_t tau, slong prec)
+
+.. function:: void acb_theta_naive_ind_const(acb_t th, ulong ab, const acb_mat_t tau, slong prec)
 
     Evaluates theta functions using the naive algorithm. See above for the
     meaning of different suffixes.
@@ -764,7 +769,7 @@ for all inputs in the Siegel fundamental domain.
     `|\theta_{a,b}(0,\tau')|` is at most *bound*.
 
 .. function:: void acb_theta_cauchy(arf_t bound_der, const arf_t rad, const
-              arf_t bound, slong ord, slong dim, slong prec);
+              arf_t bound, slong ord, slong dim, slong prec)
 
     Applies Cauchy's formula to compute *bound_der* with the following
     property: if *f* is an analytic function defined on a disk of radius *rad*
@@ -856,7 +861,7 @@ for all inputs in the Siegel fundamental domain.
               acb_srcptr z, slong prec)
 
 .. function:: void acb_theta_newton_const_sqr(acb_ptr th2, const acb_mat_t tau,
-              slong prec);
+              slong prec)
 
 .. function:: void acb_theta_newton_all_const_sqr(acb_ptr th, const acb_mat_t
               tau, slong prec)

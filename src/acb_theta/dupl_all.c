@@ -31,7 +31,9 @@ acb_theta_dupl_all(acb_ptr th2, acb_srcptr th, slong g, slong prec)
         {
             acb_set(&v3[b], &th[b + n]);
             if (acb_theta_char_dot(a, b, g) == 1)
+            {
                 acb_neg(&v3[b], &v3[b]);
+            }
         }
         acb_theta_agm_hadamard(v1, th, g, prec);
         acb_theta_agm_hadamard(v2, th + n, g, prec);

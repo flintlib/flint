@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 static void
-agm_get_conv_rates(arf_t c, arf_t r, acb_srcptr v, slong n, slong prec)
+agm_get_conv_rate(arf_t c, arf_t r, acb_srcptr v, slong n, slong prec)
 {
     arb_t eps;
     slong lowprec = ACB_THETA_AGM_LOWPREC;
@@ -52,10 +52,10 @@ acb_theta_agm(acb_t res, acb_srcptr a, acb_srcptr roots, slong nb_bad,
     }
 
     /* Get convergence rate */
-    agm_get_conv_rates(c, r, v, n, prec);
+    agm_get_conv_rate(c, r, v, n, prec);
     nb_good = acb_theta_agm_nb_good_steps(c, r, prec);
 
-    /* Perform half the steps */
+    /* Perform half the steps (nothing if nb_good=-1) */
     acb_set(scal, &v[0]);
     _acb_vec_scalar_div(v, v, n, scal, prec);
 
@@ -65,7 +65,7 @@ acb_theta_agm(acb_t res, acb_srcptr a, acb_srcptr roots, slong nb_bad,
     }
 
     /* Readjust convergence rate */
-    agm_get_conv_rates(c, r, v, n, prec);
+    agm_get_conv_rate(c, r, v, n, prec);
     nb_good = acb_theta_agm_nb_good_steps(c, r, prec);
 
     /* Perform remaining steps */
@@ -75,9 +75,17 @@ acb_theta_agm(acb_t res, acb_srcptr a, acb_srcptr roots, slong nb_bad,
     }
 
     if (nb_good > 0)
+    {
         acb_theta_agm_step_last(res, v, g, prec);
-    else
+    }
+    else if (nb_good == 0)
+    {
         acb_set(res, &v[0]);
+    }
+    else /* Convergence rate undetermined */
+    {
+        acb_indeterminate(res);
+    }
 
     /* Rescale, add relative error */
     acb_mul(res, res, scal, prec);

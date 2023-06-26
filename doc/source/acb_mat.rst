@@ -96,6 +96,18 @@ Conversions
 
     Sets *dest* to *src*. The operands must have identical dimensions.
 
+.. function:: void acb_mat_get_real(arb_mat_t re, const arb_mat_t mat)
+
+.. function:: void acb_mat_get_imag(arb_mat_t im, const arb_mat_t mat)
+
+    Sets *re* or *im* to the real or imaginary part of *mat*, respectively.
+    The operands must have identical dimensions.
+
+.. function:: void acb_mat_set_real_imag(acb_mat_t mat, const arb_mat_t re, const arb_mat_t im)
+
+    Sets *mat* to the complex matrix with real and imaginary parts *re*, *im*.
+    The operands must have identical dimensions.
+
 Random generation
 -------------------------------------------------------------------------------
 
@@ -247,6 +259,15 @@ Transpose
 
 Norms
 -------------------------------------------------------------------------------
+
+.. function:: void acb_mat_max_norm(arb_t res, const acb_mat_t A, slong prec)
+
+    Sets *res* to the maximum absolute value of the entries of *A*.
+
+.. function:: void acb_mat_inf_norm(arb_t res, const acb_mat_t A, slong prec)
+
+    Sets *res* to the infinity norm (i.e. the largest row sum of absolute
+    values) of *A*.    
 
 .. function:: void acb_mat_bound_inf_norm(mag_t b, const acb_mat_t A)
 

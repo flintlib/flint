@@ -13,9 +13,9 @@
 
 void
 acb_theta_transform_scal_const(acb_t scal, const acb_mat_t tau,
-                               const fmpz_mat_t mat, slong k2, slong prec)
+    const fmpz_mat_t mat, slong k2, slong prec)
 {
-    slong g = acb_mat_nrows(tau);
+    slong g = sp2gz_dim(mat);
     acb_t mu;
     acb_t det;
     acb_mat_t w;

@@ -13,7 +13,7 @@
 
 void
 acb_theta_agm_ext_step_bad(acb_ptr r, acb_srcptr a, acb_srcptr roots, slong g,
-                           slong prec)
+    slong prec)
 {
     slong k;
 

@@ -13,7 +13,7 @@
 
 void
 acb_theta_naive_tail(arf_t bound, const arf_t R2, const arb_mat_t Y, slong ord,
-                     slong prec)
+    slong prec)
 {
     arb_t res, temp;
     arb_t Rmod;

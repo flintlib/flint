@@ -38,7 +38,9 @@ acb_theta_dupl_z(acb_ptr r, acb_srcptr th, slong g, slong prec)
                     s = (acb_theta_char_dot(a, bb, g)
                          + acb_theta_char_dot(a, bb & b, g)) % 2;
                     if (s == 1)
+                    {
                         acb_neg(c, c);
+                    }
                     acb_add(&v[n * a + b], &v[n * a + b], c, prec);
                 }
             }

@@ -13,11 +13,11 @@
 
 slong
 acb_theta_naive_newprec(slong prec, slong coord, slong dist,
-                        slong max_dist, slong ord)
+    slong max_dist, slong ord)
 {
     double r = ((double) dist) / (max_dist + 2);
     double neg = ACB_THETA_NAIVE_NEWPREC_MARGIN * r * r * prec;
     double pos = ord * n_clog(1 + FLINT_ABS(coord), 2);
 
-    return ceil((double) prec - neg + pos);
+    return FLINT_MAX(2, ceil((double) prec - neg + pos));
 }

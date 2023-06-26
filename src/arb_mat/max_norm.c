@@ -9,19 +9,23 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb_mat.h"
+#include "arb_mat.h"
 
 void
-acb_mat_set_real_imag(acb_mat_t mat, const arb_mat_t re, const arb_mat_t im)
+arb_mat_max_norm(arb_t res, const arb_mat_t A, slong prec)
 {
     slong i, j;
+    arb_t abs;
 
-    for (i = 0; i < acb_mat_nrows(re); i++)
+    arb_init(abs);
+    arb_zero(res);
+    for (i = 0; i < arb_mat_nrows(A); i++)
     {
-        for (j = 0; j < acb_mat_ncols(re); j++)
+        for (j = 0; j < arb_mat_ncols(A); j++)
         {
-            acb_set_arb_arb(acb_mat_entry(mat, i, j),
-                            arb_mat_entry(re, i, j), arb_mat_entry(im, i, j));
+            arb_abs(abs, arb_mat_entry(mat, i, j));
+            arb_max(res, res, abs, prec);
         }
     }
+    arb_clear(abs);
 }

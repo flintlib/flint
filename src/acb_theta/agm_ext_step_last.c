@@ -13,7 +13,7 @@
 
 void
 acb_theta_agm_ext_step_last(acb_t r, const acb_t s, acb_srcptr a, slong g,
-                            slong prec)
+    slong prec)
 {
     slong n = 1 << g;
     slong k;
