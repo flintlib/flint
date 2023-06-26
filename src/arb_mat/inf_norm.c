@@ -26,7 +26,7 @@ arb_mat_inf_norm(arb_t res, const arb_mat_t A, slong prec)
         arb_zero(sum);
         for (j = 0; j < arb_mat_ncols(A); j++)
         {
-            arb_abs(abs, arb_mat_entry(A, i, j), prec);
+            arb_abs(abs, arb_mat_entry(A, i, j));
             arb_add(sum, sum, abs, prec);
         }
         arb_max(res, res, sum, prec);

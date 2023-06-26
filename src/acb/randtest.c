@@ -63,8 +63,8 @@ acb_urandom(acb_t z, flint_rand_t state, slong prec)
     
     while (!stop)
     {
-        arb_urandom(x);
-        arb_urandom(y);
+        arb_urandom(x, state, prec);
+        arb_urandom(y, state, prec);
         if (n_randint(state, 2) == 0) arb_neg(x, x);
         if (n_randint(state, 2) == 0) arb_neg(y, y);
         acb_set_arb_arb(z, x, y);

@@ -14,13 +14,11 @@
 void
 arb_mat_spd_neighborhood(arf_t r, const arb_mat_t mat, slong prec)
 {
-    slong g = acb_mat_nrows(mat);
+    slong g = arb_mat_nrows(mat);
     arb_t norm;
     arf_t b;
     fmpz_t e;
     arb_mat_t test;
-    slong j, k;
-    int valid;
 
     arb_init(norm);
     arf_init(b);

@@ -23,7 +23,7 @@ arb_mat_max_norm(arb_t res, const arb_mat_t A, slong prec)
     {
         for (j = 0; j < arb_mat_ncols(A); j++)
         {
-            arb_abs(abs, arb_mat_entry(mat, i, j));
+            arb_abs(abs, arb_mat_entry(A, i, j));
             arb_max(res, res, abs, prec);
         }
     }

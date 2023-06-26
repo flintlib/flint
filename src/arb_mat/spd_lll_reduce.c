@@ -9,13 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mat.h"
+#include "fmpz_lll.h"
 #include "arb_mat.h"
 
 static void
 get_symmetric_fmpz_mat(fmpz_mat_t N, const arb_mat_t A, slong prec)
 {
     slong j, k;
-    slong g = acb_mat_nrows(A);
+    slong g = arb_mat_nrows(A);
 
     for (j = 0; j < g; j++)
     {
@@ -37,7 +39,7 @@ arb_mat_spd_lll_reduce(fmpz_mat_t U, const arb_mat_t A, slong prec)
 {
     fmpz_lll_t fl;
     fmpz_mat_t N;
-    slong g = acb_mat_nrows(A);
+    slong g = arb_mat_nrows(A);
     
     fmpz_mat_init(N, g, g);    
     fmpz_mat_one(U);
