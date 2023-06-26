@@ -306,7 +306,7 @@ void acb_theta_renormalize_sqr(acb_t scal_z, acb_t scal_0, acb_srcptr th2_z,
 
 slong acb_theta_k2(const fmpz_mat_t mat);
 
-/* Newton iterations */
+/* Upper bounds on theta functions */
 
 void acb_theta_bound(arf_t rad, arf_t bound, acb_srcptr z, const acb_mat_t tau,
         slong prec);
@@ -316,119 +316,6 @@ void acb_theta_bound_const(arf_t rad, arf_t bound, const acb_mat_t tau,
 
 void acb_theta_cauchy(arf_t bound_der, const arf_t rad, const arf_t bound,
         slong ord, slong dim, slong prec);
-
-#define ACB_THETA_AGM_NB_MATRIX_SETUPS 10
-#define ACB_THETA_AGM_BASEPREC 2000
-#define ACB_THETA_AGM_BASEPREC_MAXQ 4
-#define ACB_THETA_AGM_GUARD 5
-
-typedef struct
-{
-    int is_ext;
-    slong dim;
-    acb_mat_struct tau;
-    acb_struct* z;
-    acb_struct* th;
-    slong nb;
-    
-    fmpz_mat_struct* mat;
-    slong* k2;
-    ulong* ab;
-    fmpz* eps;
-    slong* nb_bad;
-    acb_ptr* roots;
-    
-    slong log_th;
-    slong log_rho;
-    slong log_M;
-    slong log_B1;
-    slong log_B2;
-    slong log_B3;
-    
-} acb_theta_agm_ctx_struct;
-
-typedef acb_theta_agm_ctx_struct acb_theta_agm_ctx_t[1];
-
-#define acb_theta_agm_ctx_is_ext(ctx) ((ctx)->is_ext)
-#define acb_theta_agm_ctx_dim(ctx) ((ctx)->dim)
-#define acb_theta_agm_ctx_tau(ctx) (&(ctx)->tau)
-#define acb_theta_agm_ctx_z(ctx) ((ctx)->z)
-#define acb_theta_agm_ctx_th(ctx) ((ctx)->th)
-#define acb_theta_agm_ctx_g(ctx) (acb_mat_nrows(acb_theta_agm_ctx_tau(ctx)))
-#define acb_theta_agm_ctx_nb(ctx) ((ctx)->nb)
-
-#define acb_theta_agm_ctx_mat(ctx, k) (&(ctx)->mat[(k)])
-#define acb_theta_agm_ctx_k2(ctx, k) ((ctx)->k2[(k)])
-#define acb_theta_agm_ctx_ab(ctx, k) ((ctx)->ab[(k)])
-#define acb_theta_agm_ctx_eps(ctx, k) (&(ctx)->eps[(k)])
-#define acb_theta_agm_ctx_nb_bad(ctx, k) ((ctx)->nb_bad[(k)])
-#define acb_theta_agm_ctx_roots(ctx, k) ((ctx)->roots[(k)])
-
-#define acb_theta_agm_ctx_log_th(ctx) ((ctx)->log_th)
-#define acb_theta_agm_ctx_log_rho(ctx) ((ctx)->log_rho)
-#define acb_theta_agm_ctx_log_M(ctx) ((ctx)->log_M)
-#define acb_theta_agm_ctx_log_B1(ctx) ((ctx)->log_B1)
-#define acb_theta_agm_ctx_log_B2(ctx) ((ctx)->log_B2)
-#define acb_theta_agm_ctx_log_B3(ctx) ((ctx)->log_B3)
-
-void acb_theta_agm_ctx_init_internal(acb_theta_agm_ctx_t ctx, slong nb,
-        slong g);
-
-void acb_theta_agm_ctx_init(acb_theta_agm_ctx_t ctx, const acb_mat_t tau);
-
-void acb_theta_agm_ctx_init_ext(acb_theta_agm_ctx_t ctx, acb_srcptr z,
-        const acb_mat_t tau);
-
-void acb_theta_agm_ctx_clear(acb_theta_agm_ctx_t ctx);
-
-void acb_theta_agm_ctx_reset_steps(acb_theta_agm_ctx_t ctx, slong k, slong m);
-
-int acb_theta_agm_ctx_set(acb_theta_agm_ctx_t ctx, slong prec);
-
-void acb_theta_newton_eval(acb_ptr r, acb_srcptr th,
-        const acb_theta_agm_ctx_t ctx, slong prec);
-
-void acb_theta_newton_fd(acb_ptr r, acb_mat_t fd, acb_srcptr th,
-        const arb_t eta, const acb_theta_agm_ctx_t ctx, slong prec);
-
-void acb_theta_newton_run(acb_ptr r, const acb_theta_agm_ctx_t ctx, slong prec);
-
-void acb_theta_newton_const_half_proj(acb_ptr th, const acb_mat_t tau,
-        slong prec);
-
-void acb_theta_newton_const_sqr(acb_ptr th2, const acb_mat_t tau, slong prec);
-
-void acb_theta_newton_all_const_sqr(acb_ptr th2, const acb_mat_t tau,
-        slong prec);
-
-void acb_theta_newton_half_proj(acb_ptr th, acb_srcptr z, const acb_mat_t tau,
-        slong prec);
-
-void acb_theta_newton_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau,
-        slong prec);
-
-void acb_theta_newton_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau,
-        slong prec);
-
-/* Mixed Newton/naive algorithms */
-
-#define ACB_THETA_NAIVE_CONST_THRESHOLD 500
-#define ACB_THETA_NAIVE_THRESHOLD 500
-#define ACB_THETA_BALANCE_LOWPREC_MUL 10
-#define ACB_THETA_BALANCE_THRESHOLD 4
-#define ACB_THETA_REDUCE_Z 4
-
-void acb_theta_balance(acb_ptr z2, acb_mat_t tau2, fmpz_mat_t mat,
-    acb_srcptr z, const acb_mat_t tau, slong j);
-
-int acb_theta_is_balanced(slong* j0, const acb_mat_t tau, slong prec);
-
-slong acb_theta_balance_lowprec(slong g, slong prec);
-
-void acb_theta_all_const_sqr(acb_ptr th2, const acb_mat_t tau, slong prec);
-
-void acb_theta_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau,
-    slong prec);
 
 #ifdef __cplusplus
 }
