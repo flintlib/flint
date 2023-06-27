@@ -3,6 +3,11 @@
 **flint_ctypes** - Python interface
 ===============================================================================
 
+There is a Python wrapper (``flint_ctypes``) included with FLINT
+available in the ``src/python`` directory. This wrapper is not currently
+officially supported and should not be used in production, but it can be
+useful for experimenting with FLINT.
+
 .. highlight:: python3
 
 Introduction
@@ -10,7 +15,7 @@ Introduction
 
 Examples::
 
-    >>> from flint2 import *
+    >>> from flint_ctypes import *
     >>> QQ.bernoulli(50)
     495057205241079648212477525/66
     >>> sign, primes, exponents = _.factor()
