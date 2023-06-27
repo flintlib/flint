@@ -18,6 +18,7 @@
 #include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "gr_special.h"
 
 #define GR_CA_CTX(ring_ctx) ((ca_ctx_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
 
@@ -1129,6 +1130,107 @@ _gr_ca_exp(ca_t res, const ca_t x, gr_ctx_t ctx)
 }
 
 int
+_gr_ca_sinh(ca_t res, const ca_t x, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA ||
+        ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
+    {
+        truth_t ok = ca_check_is_zero(x, GR_CA_CTX(ctx));
+
+        if (ok == T_TRUE)
+            return _gr_ca_zero(res, ctx);
+
+        return (ok == T_FALSE) ? GR_DOMAIN : GR_UNABLE;
+    }
+    else
+    {
+        int status = GR_SUCCESS;
+
+        gr_ptr t, u;
+
+        GR_TMP_INIT2(t, u, ctx);
+
+        status |= gr_exp(t, x, ctx);
+        status |= gr_inv(u, t, ctx);
+        status |= gr_sub(res, t, u, ctx);
+        status |= gr_mul_2exp_si(res, res, -1, ctx);
+
+        GR_TMP_CLEAR2(t, u, ctx);
+
+        return handle_possible_special_value(res, ctx);
+    }
+}
+
+int
+_gr_ca_cosh(ca_t res, const ca_t x, gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA ||
+        ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
+    {
+        truth_t ok = ca_check_is_zero(x, GR_CA_CTX(ctx));
+
+        if (ok == T_TRUE)
+            return _gr_ca_one(res, ctx);
+
+        return (ok == T_FALSE) ? GR_DOMAIN : GR_UNABLE;
+    }
+    else
+    {
+        int status = GR_SUCCESS;
+
+        gr_ptr t, u;
+
+        GR_TMP_INIT2(t, u, ctx);
+
+        status |= gr_exp(t, x, ctx);
+        status |= gr_inv(u, t, ctx);
+        status |= gr_add(res, t, u, ctx);
+        status |= gr_mul_2exp_si(res, res, -1, ctx);
+
+        GR_TMP_CLEAR2(t, u, ctx);
+
+        return handle_possible_special_value(res, ctx);
+    }
+}
+
+int
+_gr_ca_tanh(ca_t res, const ca_t x, gr_ctx_t ctx)
+{
+    int status = GR_SUCCESS;
+
+    gr_ptr t, u;
+
+    GR_TMP_INIT2(t, u, ctx);
+
+    status |= gr_sinh(t, x, ctx);
+    status |= gr_cosh(u, x, ctx);
+    status |= gr_div(res, t, u, ctx);
+
+    GR_TMP_CLEAR2(t, u, ctx);
+
+    return handle_possible_special_value(res, ctx);
+}
+
+int
+_gr_ca_coth(ca_t res, const ca_t x, gr_ctx_t ctx)
+{
+    int status = GR_SUCCESS;
+
+    gr_ptr t, u;
+
+    GR_TMP_INIT2(t, u, ctx);
+
+    status |= gr_sinh(t, x, ctx);
+    status |= gr_cosh(u, x, ctx);
+    status |= gr_div(res, u, t, ctx);
+
+    GR_TMP_CLEAR2(t, u, ctx);
+
+    return handle_possible_special_value(res, ctx);
+}
+
+
+int
 _gr_ca_log(ca_t res, const ca_t x, gr_ctx_t ctx)
 {
     if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA ||
@@ -1666,6 +1768,11 @@ gr_method_tab_input _ca_methods_input[] =
     {GR_METHOD_COS,             (gr_funcptr) _gr_ca_cos},
     {GR_METHOD_TAN,             (gr_funcptr) _gr_ca_tan},
     {GR_METHOD_COT,             (gr_funcptr) _gr_ca_cot},
+
+    {GR_METHOD_SINH,             (gr_funcptr) _gr_ca_sinh},
+    {GR_METHOD_COSH,             (gr_funcptr) _gr_ca_cosh},
+    {GR_METHOD_TANH,             (gr_funcptr) _gr_ca_tanh},
+    {GR_METHOD_COTH,             (gr_funcptr) _gr_ca_coth},
 
     {GR_METHOD_ATAN,            (gr_funcptr) _gr_ca_atan},
     {GR_METHOD_ASIN,            (gr_funcptr) _gr_ca_asin},
