@@ -82,7 +82,6 @@ API documentation
    :member-order: bysource
 
 
-
 .. raw:: latex
 
     \newpage
