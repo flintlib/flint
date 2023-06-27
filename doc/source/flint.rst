@@ -242,3 +242,17 @@ Input/Output
      These are equivalent to the standard library functions ``scanf``,
      ``fscanf``, and ``sscanf`` with an additional length modifier "w" for
      reading an :type:`mp_limb_t` type.
+
+Exceptions
+-----------------
+
+When FLINT encounters a problem, mostly illegal input, it currently aborts.
+There is an experimental interface for generating proper exceptions
+``flint_throw``, but this is currently rarely used and experimental - you
+should expect this to change.
+
+At the end, all of FLINT's exceptions call ``abort()`` to terminate
+the program. Using ``flint_set_abort(void (*abort_func)(void))``, the
+user can install a function that will be called instead. Similar
+to the exceptions, this should be regarded as experimental.
+
