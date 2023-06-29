@@ -22,7 +22,7 @@ worker_dim0(acb_ptr th, const acb_t term, slong* coords, slong g, ulong ab,
     acb_init(x);
     for (b = 0; b < n; b++)
     {
-        acb_mul_powi(x, term, acb_theta_dot(b, coords, g));
+        acb_mul_powi(x, term, acb_theta_char_dot_slong(b, coords, g));
         acb_add(&th[b], &th[b], x, fullprec);
     }
     acb_clear(x);

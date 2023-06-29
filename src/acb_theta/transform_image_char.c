@@ -38,10 +38,10 @@ acb_theta_transform_image_char(fmpz_t eps, ulong ab, const fmpz_mat_t mat)
     fmpz_mat_init(Lvec, 1, g);
     fmpz_mat_init(coef, 1, 1);
 
-    fmpz_mat_get_a(a, mat);
-    fmpz_mat_get_b(b, mat);
-    fmpz_mat_get_c(c, mat);
-    fmpz_mat_get_d(d, mat);
+    sp2gz_get_a(a, mat);
+    sp2gz_get_b(b, mat);
+    sp2gz_get_c(c, mat);
+    sp2gz_get_d(d, mat);
     fmpz_mat_transpose(mat_tp, mat);
 
     /* Compute blocks and substract diagonals in alphabeta */

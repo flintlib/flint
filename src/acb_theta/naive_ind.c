@@ -18,7 +18,7 @@ worker_dim0(acb_ptr th, const acb_t term, slong* coords, slong g, ulong ab,
     acb_t x;
 
     acb_init(x);
-    acb_mul_powi(x, term, acb_theta_dot(ab, coords, g));
+    acb_mul_powi(x, term, acb_theta_char_dot_slong(ab, coords, g));
     acb_add(th, th, x, fullprec);
     acb_clear(x);
 }

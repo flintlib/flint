@@ -91,6 +91,8 @@ void arb_mat_randtest(arb_mat_t mat, flint_rand_t state, slong prec, slong mag_b
 
 void arb_mat_randtest_cho(arb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits);
 
+void arb_mat_randtest_spd(arb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits);
+
 /* I/O */
 
 #ifdef FLINT_HAVE_FILE

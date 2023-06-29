@@ -17,14 +17,14 @@ worker_dim0(acb_ptr th, const acb_t term, slong * coords, slong g,
 {
     acb_t x;
     slong sgn;
-    ulong a = acb_theta_naive_a(coords, g);
+    ulong a = acb_theta_char_a(coords, g);
     ulong b;
 
     acb_init(x);
 
     for (b = 0; b < n_pow(2, g); b++)
     {
-        sgn = acb_theta_dot(b, coords, g) / 2;
+        sgn = acb_theta_char_dot_slong(b, coords, g) / 2;
 
         acb_set(x, term);
         if (sgn == 1)

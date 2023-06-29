@@ -33,7 +33,10 @@ acb_siegel_randtest_nice(acb_mat_t tau, flint_rand_t state, slong prec)
     {
         for (j = k + 1; j < g; j++)
         {
-            acb_urandom(c, state, prec);
+            arb_urandom(acb_realref(c), state, prec);
+            arb_sub_si(acb_realref(c), acb_realref(c), 1, prec);
+            arb_urandom(acb_imagref(c), state, prec);
+            arb_sub_si(acb_imagref(c), acb_imagref(c), 1, prec);
             acb_div_si(c, c, 2*g, prec);
             acb_add(acb_mat_entry(tau, k, j),
                     acb_mat_entry(tau, k, j), c, prec);
