@@ -72,7 +72,9 @@ acb_siegel_reduce(acb_mat_t res, fmpz_mat_t mat, const acb_mat_t tau, slong prec
             acb_siegel_transform(cur, mat, tau, prec);
         }
         else
+        {
             stop = 1;
+        }
     }
 
     acb_siegel_transform(res, mat, tau, prec);

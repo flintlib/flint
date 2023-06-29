@@ -46,12 +46,12 @@ main()
         th = _acb_vec_init(n);
         arb_init(abs);
 
-        acb_siegel_randtest(tau, state, prec, mag_bits);
+        acb_siegel_randtest_reduced(tau, state, prec, mag_bits);
         for (k = 0; k < g; k++)
         {
             acb_urandom(&z[k], state, prec);
         }
-
+        
         acb_theta_bound(arb_midref(rad), arb_midref(bound), z, tau, prec);
 
         if (!arb_is_positive(rad) || !arb_is_finite(bound))

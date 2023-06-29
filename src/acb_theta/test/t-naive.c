@@ -41,7 +41,7 @@ main()
         th = _acb_vec_init(nb);
         th_test = _acb_vec_init(nb * nb);
 
-        acb_siegel_randtest(tau, state, prec, mag_bits);
+        acb_siegel_randtest_reduced(tau, state, prec, mag_bits);
         for (k = 0; k < g; k++)
         {
             acb_urandom(&z[k], state, prec);

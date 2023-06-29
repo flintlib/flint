@@ -49,6 +49,7 @@ main()
         for (k = 0; k < g; k++)
         {
             acb_siegel_randtest(tau11, state, prec, mag_bits);
+            acb_set(acb_mat_entry(tau, k, k), acb_mat_entry(tau11, 0, 0));
         }
         for (k = 0; k < g; k++)
         {
@@ -67,7 +68,7 @@ main()
             for (k = 0; k < g; k++)
             {
                 acb_set(acb_mat_entry(tau11, 0, 0), acb_mat_entry(tau, k, k));
-                acb_theta_naive(&th_g1[4 * k], &z[k], 1, tau11, prec);
+                acb_theta_naive_all(&th_g1[4 * k], &z[k], 1, tau11, prec);
             }
             /* Could use a more efficient recursive algorithm here */
             for (ab = 0; ab < n_pow(2, 2 * g); ab++)

@@ -21,15 +21,15 @@ get_symmetric_fmpz_mat(fmpz_mat_t N, const arb_mat_t A, slong prec)
 
     for (j = 0; j < g; j++)
     {
-        /* Ensure N is symmetric */
-        for (k = 0; k < j; k++)
-        {
-            fmpz_set(fmpz_mat_entry(N, j, k), fmpz_mat_entry(N, k, j));
-        }
         for (k = j; k < g; k++)
         {
             arf_get_fmpz_fixed_si(fmpz_mat_entry(N, j, k),
                                   arb_midref(arb_mat_entry(A, j, k)), -prec);
+        }
+        /* Ensure N is symmetric */
+        for (k = 0; k < j; k++)
+        {
+            fmpz_set(fmpz_mat_entry(N, j, k), fmpz_mat_entry(N, k, j));
         }
     }
 }
@@ -48,7 +48,7 @@ arb_mat_spd_lll_reduce(fmpz_mat_t U, const arb_mat_t A, slong prec)
     {
         get_symmetric_fmpz_mat(N, A, prec);
         /* Default Flint LLL values, except Gram */
-        fmpz_lll_context_init(fl, 0.99, 0.51, GRAM, EXACT);
+        fmpz_lll_context_init(fl, 0.99, 0.51, GRAM, EXACT);        
         fmpz_lll(N, U, fl);
     }
     fmpz_mat_clear(N);

@@ -28,7 +28,7 @@ main()
     {
         slong g = 1 + n_randint(state, 4);
         slong prec = 100 + n_randint(state, 500);
-        slong mag_bits = 1 + n_randint(state, 5);
+        slong mag_bits = n_randint(state, 5);
 
         acb_mat_t tau;
         acb_mat_t res;

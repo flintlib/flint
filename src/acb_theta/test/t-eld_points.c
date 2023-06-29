@@ -55,6 +55,7 @@ main()
         arb_init(sum);
 
         arb_mat_randtest_cho(Y, state, prec, mag_bits);
+        arb_mat_transpose(Y, Y);
         arb_randtest_positive(sqr, state, prec, mag_bits);   /* Use as temp */
         arf_set(R2, arb_midref(sqr));
         arf_mul_si(R2, R2, 1 + n_randint(state, 10), prec, ARF_RND_UP);

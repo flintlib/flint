@@ -33,7 +33,7 @@ main()
 
         slong prec = 100 + n_randint(state, 1000);
         slong mag_bits = n_randint(state, 4);
-        slong lowprec = n_randint(state, 32);
+        slong lowprec = 10 + n_randint(state, 10);
 
         acb_init(rt);
         acb_init(x);

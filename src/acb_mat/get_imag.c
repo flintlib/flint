@@ -20,7 +20,7 @@ acb_mat_get_imag(arb_mat_t im, const acb_mat_t mat)
     {
         for (j = 0; j < acb_mat_ncols(mat); j++)
         {
-            acb_get_real(arb_mat_entry(im, i, j), acb_mat_entry(mat, i, j));
+            acb_get_imag(arb_mat_entry(im, i, j), acb_mat_entry(mat, i, j));
         }
     }
 }

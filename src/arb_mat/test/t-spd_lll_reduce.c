@@ -17,7 +17,7 @@ main()
     slong iter;
     flint_rand_t state;
 
-    flint_printf("siegel_reduce_imag....");
+    flint_printf("spd_lll_reduce....");
     fflush(stdout);
 
     flint_randinit(state);

@@ -64,7 +64,9 @@ acb_theta_bound(arf_t rad, arf_t bound, acb_srcptr z, const acb_mat_t tau,
     }
     res = arb_mat_inv(im, im, prec);
     if (!res)
+    {
         arf_pos_inf(bound);
+    }
 
     arb_mat_mul(z_pert, im, z_pert, prec);
     arb_mat_mul(prod, z_pert_t, z_pert, prec);
