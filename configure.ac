@@ -653,8 +653,10 @@ fi
 
 if test "$with_ntl" = "yes";
 then
+    AC_LANG_PUSH([C++])
     AC_CHECK_HEADER([NTL/ZZ.h],,
                     AC_MSG_ERROR([Could not find NTL/ZZ.h!]))
+    AC_LANG_POP([C++])
 fi
 
 ################################################################################
