@@ -17,13 +17,13 @@ main()
     slong iter;
     flint_rand_t state;
 
-    flint_printf("reduce....");
+    flint_printf("siegel_reduce_imag....");
     fflush(stdout);
 
     flint_randinit(state);
 
     /* Test: is almost Minkowski reduction for g=2 */
-    for (iter = 0; iter < 500 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
     {
         slong g = 2;
         slong prec = 100 + n_randint(state, 500);
@@ -41,9 +41,8 @@ main()
         fmpz_mat_init(U, g, g);
         arb_init(test);
 
-        arb_mat_randtest_sym_pos(M, state, prec, mag_bits);
-
-        arb_mat_reduce(U, M, prec);
+        arb_mat_randtest_spd(M, state, prec, mag_bits);
+        arb_mat_spd_lll_reduce(U, M, prec);
 
         arb_mat_set_fmpz_mat(T, U);
         arb_mat_mul(R, T, M, prec);
@@ -80,5 +79,5 @@ main()
     flint_randclear(state);
     flint_cleanup();
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }

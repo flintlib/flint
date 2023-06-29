@@ -29,12 +29,7 @@ extern "C" {
 
 /* Tuning */
 
-#define ACB_THETA_AGM_LOWPREC 50 /* Low precision in AGM computations */
-
-#define ACB_THETA_ELD_DEFAULT_PREC 50 /* Low precision in ellipsoid computations */
-#define ACB_THETA_NAIVE_EPS_2EXP 0 /* Change the choice of epsilon? */
-#define ACB_THETA_NAIVE_FULLPREC_ADDLOG 1.1 /* Slightly more than 1 */
-#define ACB_THETA_NAIVE_NEWPREC_MARGIN 1.0 /* Margin with choice of new precision */
+#define ACB_THETA_ELD_DEFAULT_PREC 32 /* Low precision in ellipsoid computations */
 
 /* The Siegel modular group */
 
@@ -63,7 +58,7 @@ void sp2gz_fundamental(fmpz_mat_t mat, slong j);
 
 void sp2gz_randtest(fmpz_mat_t mat, flint_rand_t state, slong bits);
 
-/* Siegel space */
+/* The Siegel half space */
 
 void acb_siegel_cocycle(acb_mat_t res, const fmpz_mat_t mat,
     const acb_mat_t tau, slong prec);
@@ -80,7 +75,7 @@ void acb_siegel_randtest(acb_mat_t tau, flint_rand_t state, slong prec, slong ma
 void acb_siegel_randtest_reduced(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits);
 void acb_siegel_randtest_nice(acb_mat_t tau, flint_rand_t state, slong prec);
 
-/* Transformation formulas */
+/* Transformation formulas for theta functions */
 
 void acb_theta_agm_hadamard(acb_ptr r, acb_srcptr a, slong g, slong prec);
 void acb_theta_agm_sqrt_lowprec(acb_t r, const acb_t a, const acb_t root, slong prec);
@@ -112,7 +107,7 @@ void acb_theta_bound_const(arf_t rad, arf_t bound, const acb_mat_t tau, slong pr
 void acb_theta_cauchy(arf_t bound_der, const arf_t rad, const arf_t bound,
     slong ord, slong dim, slong prec);
 
-/* Ellipsoids */
+/* Ellipsoids in naive algorithms */
 
 struct acb_theta_eld_struct
 {
@@ -201,9 +196,7 @@ void acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arf_t eps
     slong ord, slong prec, acb_theta_naive_worker_t worker_dim0);
 
 void acb_theta_naive(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec);
-void acb_theta_naive_proj(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec);
 void acb_theta_naive_const(acb_ptr th, const acb_mat_t tau, slong prec);
-void acb_theta_naive_const_proj(acb_ptr th, const acb_mat_t tau, slong prec);
 void acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec);
 void acb_theta_naive_all_const(acb_ptr th, const acb_mat_t tau, slong prec);
 void acb_theta_naive_ind(acb_t th, ulong ab, acb_srcptr z, const acb_mat_t tau, slong prec);

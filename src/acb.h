@@ -1021,8 +1021,6 @@ void acb_print(const acb_t x);
 void acb_printd(const acb_t z, slong digits);
 void acb_printn(const acb_t x, slong digits, ulong flags);
 
-void _acb_vec_printn(acb_srcptr vec, slong len, slong ndigits, ulong flags);
-
 void acb_randtest(acb_t z, flint_rand_t state, slong prec, slong mag_bits);
 
 void acb_randtest_special(acb_t z, flint_rand_t state, slong prec, slong mag_bits);
@@ -1030,6 +1028,8 @@ void acb_randtest_special(acb_t z, flint_rand_t state, slong prec, slong mag_bit
 void acb_randtest_precise(acb_t z, flint_rand_t state, slong prec, slong mag_bits);
 
 void acb_randtest_param(acb_t z, flint_rand_t state, slong prec, slong mag_bits);
+
+void acb_urandom(acb_t z, flint_rand_t state, slong prec);
 
 slong acb_rel_error_bits(const acb_t x);
 
@@ -1074,6 +1074,34 @@ ACB_INLINE int
 _acb_vec_is_finite(acb_srcptr vec, slong len)
 {
     return _arb_vec_is_finite((arb_srcptr) vec, 2 * len);
+}
+
+ACB_INLINE int
+_acb_vec_overlaps(acb_srcptr vec1, acb_srcptr vec2, slong len)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+    {
+        if (!acb_overlaps(vec1 + i, vec2 + i))
+            return 0;
+    }
+
+    return 1;
+}
+
+ACB_INLINE int
+_acb_vec_contains(acb_srcptr vec1, acb_srcptr vec2, slong len)
+{
+    slong i;
+    
+    for (i = 0; i < len; i++)
+    {
+        if (!acb_contains(vec1 + i, vec2 + i))
+            return 0;
+    }
+
+    return 1;    
 }
 
 ACB_INLINE slong
@@ -1153,6 +1181,12 @@ _acb_vec_estimate_allocated_bytes(slong len, slong prec)
 {
     return 2 * _arb_vec_estimate_allocated_bytes(len, prec);
 }
+
+void _acb_vec_printd(acb_srcptr vec, slong len, slong digits);
+
+void _acb_vec_printn(acb_srcptr vec, slong len, slong digits, ulong flags);
+
+void _acb_vec_ninf(arb_t ninf, acb_srcptr vec, slong len, slong prec);
 
 #ifdef __cplusplus
 }

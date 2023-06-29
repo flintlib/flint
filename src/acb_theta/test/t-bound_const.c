@@ -23,30 +23,28 @@ main()
     flint_randinit(state);
 
     /* Test: value of theta should be less than bound */
-    for (iter = 0; iter < 10 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
         slong prec = 100 + n_randint(state, 100);
         slong mag_bits = n_randint(state, 2);
         slong n = 1 << (2 * g);
         acb_mat_t tau;
-        arf_t rad;
-        arf_t bound;
+        acb_t err;
+        arb_t rad;
+        arb_t bound;
         acb_ptr th;
         arb_t abs;
-        arb_t cmp;
         slong j, k;
-        int res;
 
         acb_mat_init(tau, g, g);
-        arf_init(rad);
-        arf_init(bound);
+        arb_init(rad);
+        arb_init(bound);
         th = _acb_vec_init(n);
         arb_init(abs);
-        arb_init(cmp);
 
         acb_siegel_randtest(tau, state, prec, mag_bits);
-        acb_theta_bound_const(rad, bound, tau, prec);
+        acb_theta_bound_const(arb_midref(rad), arb_midref(bound), tau, prec);
 
         /*
            flint_printf("g = %wd, prec = %wd, tau:\n", g, prec);
@@ -55,7 +53,7 @@ main()
            flint_printf("bound: "); arf_printd(bound, 10); flint_printf("\n");
          */
 
-        if (arf_cmp_si(rad, 0) <= 0 || !arf_is_finite(bound))
+        if (!arb_is_positive(rad) || !arb_is_finite(bound))
         {
             flint_printf("Warning: not finite\n");
         }
@@ -63,26 +61,20 @@ main()
         {
             for (j = 0; j < g; j++)
             {
-                for (k = 0; k < g; k++)
+                for (k = j; k < g; k++)
                 {
-                    acb_randtest_disk(acb_mat_entry(tau, j, k),
-                                      acb_mat_entry(tau, j, k), rad, state,
-                                      prec);
+                    acb_urandom(err, state, prec);
+                    acb_mul_arb(err, err, rad, prec);
+                    acb_add(acb_mat_entry(tau, j, k), acb_mat_entry(tau, j, k),
+                        err, prec);
+                    acb_set(acb_mat_entry(tau, k, j), acb_mat_entry(tau, j, k));
                 }
             }
         }
         acb_theta_naive_all_const(th, tau, prec);
 
-        arb_set_arf(cmp, bound);
-        res = 1;
-        for (k = 0; k < n; k++)
-        {
-            acb_abs(abs, &th[k], prec);
-            if (arb_gt(abs, cmp))
-                res = 0;
-        }
-
-        if (!res)
+        _acb_vec_ninf(abs, th, n, prec);
+        if (arb_gt(abs, bound))
         {
             flint_printf("FAIL: theta value is too large\n");
             fflush(stdout);
@@ -90,15 +82,14 @@ main()
         }
 
         acb_mat_clear(tau);
-        arf_clear(rad);
-        arf_clear(bound);
+        arb_clear(rad);
+        arb_clear(bound);
         _acb_vec_clear(th, n);
         arb_clear(abs);
-        arb_clear(cmp);
     }
 
     flint_randclear(state);
     flint_cleanup();
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }

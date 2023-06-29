@@ -23,11 +23,12 @@ main()
     flint_randinit(state);
 
     /* Test: agrees with naive algorithm */
-    for (iter = 0; iter < 5 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 5 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
         slong n = 1 << (2 * g);
         slong prec = 200 + n_randint(state, 1000);
+        slong mag_bits = n_randint(state, 2);
 
         acb_mat_t tau;
         acb_ptr z;
@@ -36,7 +37,6 @@ main()
         acb_ptr test;
         arf_t rad;
         slong k;
-        int res;
 
         acb_mat_init(tau, g, g);
         z = _acb_vec_init(2 * g);
@@ -45,51 +45,30 @@ main()
         test = _acb_vec_init(2 * n);
         arf_init(rad);
 
-        acb_siegel_randtest_fund(tau, state, prec);
+        acb_siegel_randtest(tau, state, prec, mag_bits);
         arf_one(rad);
         for (k = 0; k < g; k++)
         {
-            acb_randtest_disk(&z[k], &z[k], rad, state, prec);
+            acb_urandom(&z[k], state, prec);
         }
 
         acb_theta_naive_all(th, z, 2, tau, prec);
         acb_theta_dupl_z(dupl, th, g, prec);
-
         _acb_vec_scalar_mul_2exp_si(z, z, g, 1);
         acb_theta_naive_all(test, z, 2, tau, prec);
 
-        res = 1;
-        for (k = 0; k < 2 * n; k++)
-        {
-            if (!acb_overlaps(&dupl[k], &test[k]))
-                res = 0;
-        }
-        if (!res)
+        if (!_acb_vec_overlaps(dupl, test, 2 * n))
         {
             flint_printf("FAIL (overlap)\n");
             flint_printf("tau:\n");
             acb_mat_printd(tau, 10);
             flint_printf("z:\n");
-            for (k = 0; k < g; k++)
-            {
-                acb_printd(&z[k], 10);
-                flint_printf("\n");
-            }
+            _acb_vec_printd(z, g, 10);
             flint_printf("Before dupl:\n");
-            for (k = 0; k < 2 * n; k++)
-            {
-                acb_printd(&th[k], 10);
-                flint_printf("\n");
-            }
+            _acb_vec_printd(th, 2 * n, 10);
             flint_printf("Comparison:\n");
-            for (k = 0; k < 2 * n; k++)
-            {
-                acb_printd(&test[k], 10);
-                flint_printf("\n");
-                acb_printd(&dupl[k], 10);
-                flint_printf("\n");
-            }
-
+            _acb_vec_printd(test, 2 * n, 10);
+            _acb_vec_printd(dupl, 2 * n, 10);
             fflush(stdout);
             flint_abort();
         }
@@ -105,5 +84,5 @@ main()
     flint_randclear(state);
     flint_cleanup();
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }

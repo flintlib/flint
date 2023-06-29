@@ -23,7 +23,7 @@ main()
     flint_randinit(state);
 
     /* Test: real part <= 1 in large precision */
-    for (iter = 0; iter < 500 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 4);
         slong prec = 100 + n_randint(state, 500);
@@ -61,5 +61,5 @@ main()
     flint_randclear(state);
     flint_cleanup();
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }

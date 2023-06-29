@@ -22,7 +22,7 @@ main()
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 2000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 2000 * flint_test_multiplier(); iter++)
     {
         int a = n_randint(state, 2);
         slong prec = ACB_THETA_ELD_DEFAULT_PREC;
@@ -88,5 +88,5 @@ main()
     flint_randclear(state);
     flint_cleanup();
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }

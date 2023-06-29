@@ -162,7 +162,7 @@ acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_struct * eps, acb_ptr c,
     offset = _arb_vec_init(g);
 
     arf_one(bound);
-    arf_mul_2exp_si(bound, bound, -prec + ACB_THETA_NAIVE_EPS_2EXP);
+    arf_mul_2exp_si(bound, bound, -prec);
 
     if (all)
     {

@@ -9,19 +9,22 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb_theta.h"
+#include "acb.h"
 
 void
-acb_theta_naive_proj(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
+_acb_vec_ninf(arb_t ninf, acb_srcptr vec, slong len, slong prec)
 {
-    slong g = acb_mat_nrows(tau);
-    slong n = 1 << g;
-    slong k;
+    arb_t abs;
+    slong i;
+    
+    arb_init(abs);
+    arb_zero(ninf);
 
-    acb_theta_naive(th, z, nb_z, tau, prec);
-    for (k = 0; k < nb_z; k++)
+    for (i = 0; i < len; i++)
     {
-        _acb_vec_scalar_div(&th[k * n + 1], &th[k * n + 1], n - 1, &th[k * n], prec);
-        acb_one(&th[k * n]);
+        acb_abs(abs, vec + i, prec);
+        arb_max(ninf, ninf, abs, prec);
     }
+
+    arb_clear(abs);
 }

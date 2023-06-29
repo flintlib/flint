@@ -23,7 +23,7 @@ main()
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 1000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 4);
         slong d = 1 + n_randint(state, g);
@@ -55,7 +55,7 @@ main()
         arb_init(sum);
 
         arb_mat_randtest_cho(Y, state, prec, mag_bits);
-        arb_randtest_pos(sqr, state, prec, mag_bits);   /* Use as temp */
+        arb_randtest_positive(sqr, state, prec, mag_bits);   /* Use as temp */
         arf_set(R2, arb_midref(sqr));
         arf_mul_si(R2, R2, 1 + n_randint(state, 10), prec, ARF_RND_UP);
 
@@ -231,5 +231,5 @@ main()
     flint_randclear(state);
     flint_cleanup();
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }

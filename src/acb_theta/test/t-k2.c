@@ -23,7 +23,7 @@ main()
     flint_randinit(state);
 
     /* Test: value on [u, 0; 0, u^-t] is det(u) */
-    for (iter = 0; iter < 50 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
         fmpz_mat_t U, mat;
@@ -37,10 +37,12 @@ main()
 
         fmpz_mat_one(U);
         if (iter % 2 == 0)
+        {
             fmpz_set_si(fmpz_mat_entry(U, 0, 0), -1);
+        }
 
         fmpz_mat_randops(U, state, 2 * bits);
-        fmpz_mat_diag_sp(mat, U);
+        sp2gz_block_diag(mat, U);
         fmpz_mat_det(det, U);
         k2 = acb_theta_k2(mat);
 
@@ -63,5 +65,5 @@ main()
     flint_randclear(state);
     flint_cleanup();
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }

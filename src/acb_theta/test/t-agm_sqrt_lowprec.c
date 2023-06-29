@@ -23,7 +23,7 @@ main()
     flint_randinit(state);
 
     /* Test: value of square root should agree; precision remains high */
-    for (iter = 0; iter < 1000 * arb_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         acb_t rt;
         acb_t x;
@@ -33,7 +33,7 @@ main()
 
         slong prec = 100 + n_randint(state, 1000);
         slong mag_bits = n_randint(state, 4);
-        slong lowprec = ACB_THETA_AGM_LOWPREC;
+        slong lowprec = n_randint(state, 32);
 
         acb_init(rt);
         acb_init(x);
@@ -60,8 +60,7 @@ main()
         acb_get_mid(x, test);
         acb_sub(test, test, x, prec);
         acb_abs(err, test, prec);
-        arb_mul_2exp_si(err, err,
-                        prec - n_pow(2, mag_bits) - ACB_THETA_AGM_GUARD);
+        arb_mul_2exp_si(err, err, prec - n_pow(2, mag_bits) - 10);
         arb_add_si(err, err, -1, prec);
 
         if (!arb_is_negative(err))
@@ -80,5 +79,5 @@ main()
     flint_randclear(state);
     flint_cleanup();
     flint_printf("PASS\n");
-    return EXIT_SUCCESS;
+    return 0;
 }

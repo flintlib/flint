@@ -50,30 +50,3 @@ acb_randtest_param(acb_t z, flint_rand_t state, slong prec, slong size)
         acb_randtest(z, state, prec, size);
     }
 }
-
-void
-acb_urandom(acb_t z, flint_rand_t state, slong prec)
-{
-    arb_t x, y, r;
-    int stop = 0;
-    
-    arb_init(x);
-    arb_init(y);
-    arb_init(r);
-    
-    while (!stop)
-    {
-        arb_urandom(x, state, prec);
-        arb_urandom(y, state, prec);
-        if (n_randint(state, 2) == 0) arb_neg(x, x);
-        if (n_randint(state, 2) == 0) arb_neg(y, y);
-        acb_set_arb_arb(z, x, y);
-        acb_abs(r, z, prec);
-        arb_sub_si(r, r, 1, prec);
-        stop = arb_is_nonpositive(r);
-    }
-
-    arb_clear(x);
-    arb_clear(y);
-    arb_clear(r);
-}
