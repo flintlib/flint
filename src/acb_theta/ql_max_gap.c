@@ -11,8 +11,9 @@
 
 #include "acb_theta.h"
 
-void
-acb_theta_dupl(acb_ptr th2, acb_srcptr th, slong g, slong prec)
+static slong
+acb_theta_ql_roots_max_gap(slong g)
 {
-    acb_theta_agm_ext_step_sqrt(th2, th, g, prec);
+    return 10;
 }
+

@@ -11,16 +11,18 @@
 
 #include "acb_theta.h"
 
-void
-acb_theta_naive_const(acb_ptr th, const acb_mat_t tau, slong prec)
-{
-    slong g = acb_mat_nrows(tau);
-    acb_ptr z;
+static void
+acb_theta_get_a0(acb_ptr r, acb_srcptr th, slong g)
+{    
+    acb_ptr v;
+    slong a, b;
+    slong n = 1 << g;
 
-    z = _acb_vec_init(g);
-
-    _acb_vec_zero(z, g);
-    acb_theta_naive(th, z, 1, tau, prec);
-
-    _acb_vec_clear(z, g);
+    v = _acb_vec_init(n);    
+    for (a = 0; a < n; a++)
+    {
+        acb_set(&v[a], &th[n * a]);
+    }
+    _acb_vec_set(r, v, n);
+    _acb_vec_clear(v, n);
 }

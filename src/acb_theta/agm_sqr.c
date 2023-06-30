@@ -12,7 +12,17 @@
 #include "acb_theta.h"
 
 void
-acb_theta_dupl_const(acb_ptr th2, acb_srcptr th, slong g, slong prec)
+acb_theta_agm_sqr(acb_ptr r, acb_srcptr a, slong g, slong prec)
 {
-    acb_theta_agm_step_sqrt(th2, th, g, prec);
+    acb_ptr v;
+    slong n = 1 << g;
+
+    v = _acb_vec_init(n);
+
+    acb_theta_agm_hadamard(v, a, g, prec);
+    _acb_vec_sqr(v, v, n);
+    acb_theta_agm_hadamard(r, v, g, prec);
+    _acb_vec_scalar_mul_2exp_si(r, r, n, -2 * g);
+    
+    _acb_vec_clear(v, n);
 }

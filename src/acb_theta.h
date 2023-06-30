@@ -78,19 +78,14 @@ void acb_siegel_randtest_nice(acb_mat_t tau, flint_rand_t state, slong prec);
 /* Transformation formulas for theta functions */
 
 void acb_theta_agm_hadamard(acb_ptr r, acb_srcptr a, slong g, slong prec);
-void acb_theta_agm_sqrt_lowprec(acb_t r, const acb_t a, const acb_t root, slong prec);
-void acb_theta_agm_step_sqrt(acb_ptr r, acb_srcptr a, slong g, slong prec);
-void acb_theta_agm_ext_step_sqrt(acb_ptr r, acb_srcptr a, slong g, slong prec);
+void acb_theta_agm_sqrt(acb_ptr r, acb_srcptr a, acb_srcptr roots, slong nb, slong prec);
+void acb_theta_agm_sqr(acb_ptr r, acb_srcptr a, slong g, slong prec);
+void acb_theta_agm_mul(acb_ptr r, acb_srcptr a1, acb_srcptr a2, slong g, slong prec);
 
 ulong acb_theta_char_a(slong* coords, slong g);
 slong acb_theta_char_dot(ulong a, ulong b, slong g);
 slong acb_theta_char_dot_slong(ulong a, slong* n, slong g);
-
-void acb_theta_dupl_const(acb_ptr th2, acb_srcptr th, slong g, slong prec);
-void acb_theta_dupl_all_const(acb_ptr th2, acb_srcptr th, slong g, slong prec);
-void acb_theta_dupl(acb_ptr th2, acb_srcptr th, slong g, slong prec);
-void acb_theta_dupl_all(acb_ptr th2, acb_srcptr th, slong g, slong prec);
-void acb_theta_dupl_z(acb_ptr r, acb_srcptr th, slong g, slong prec);
+void acb_theta_get_a0(acb_ptr r, acb_srcptr th, slong g);
 
 ulong acb_theta_transform_image_char(fmpz_t eps, ulong ab, const fmpz_mat_t mat);
 void acb_theta_transform_proj(acb_ptr res, acb_srcptr th, const fmpz_mat_t mat, slong prec);
@@ -196,11 +191,31 @@ void acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arf_t eps
     slong ord, slong prec, acb_theta_naive_worker_t worker_dim0);
 
 void acb_theta_naive(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec);
-void acb_theta_naive_const(acb_ptr th, const acb_mat_t tau, slong prec);
 void acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec);
-void acb_theta_naive_all_const(acb_ptr th, const acb_mat_t tau, slong prec);
 void acb_theta_naive_ind(acb_t th, ulong ab, acb_srcptr z, const acb_mat_t tau, slong prec);
-void acb_theta_naive_ind_const(acb_t th, ulong ab, const acb_mat_t tau, slong prec);
+void acb_theta_naive_a0(acb_t th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec);
+
+/* Quasi-linear algorithms on the reduced domain */
+
+#define ACB_THETA_UQL_TRY 100
+
+slong acb_theta_ql_max_gap(slong g);
+slong acb_theta_ql_nb_steps(const acb_mat_t tau, slong prec);
+
+slong acb_theta_ql_roots(acb_ptr r, acb_srcptr z, slong nb_z,
+    const acb_mat_t tau, slong nb_steps, slong prec);
+slong acb_theta_uql_roots(acb_ptr r, acb_ptr t, acb_srcptr z, slong nb_z,
+    const acb_mat_t tau, slong nb_steps, slong prec);
+
+void acb_theta_uql(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec);
+void acb_theta_uql_const(acb_ptr th, const acb_mat_t tau, slong prec);
+
+/* User functions */
+
+void acb_theta(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec);
+void acb_theta_const(acb_ptr th, const acb_mat_t tau, slong prec);
+void acb_theta_all(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec);
+void acb_theta_all_const(acb_ptr th, const acb_mat_t tau, slong prec);
 
 #ifdef __cplusplus
 }
