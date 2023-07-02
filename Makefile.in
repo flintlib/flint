@@ -82,6 +82,9 @@ CPPFLAGS2:=-L$(FLINT_DIR) $(CPPFLAGS)
 LIB_CPPFLAGS:=@LIB_CPPFLAGS@
 CXXFLAGS:=@CXXFLAGS@
 LIBS:=@LIBS@
+ifneq ($(WANT_NTL), 0)
+LIBS += -lstdc++ -lntl
+endif
 LIBS2:=$(LIBS) -lflint
 PIC_FLAG:=@PIC_FLAG@
 
@@ -305,10 +308,6 @@ define xxx_LOBJS
 $(1)_LOBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.lo,$($(1)_SOURCES))
 endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_LOBJS,$(dir))))
-LOBJS := $(foreach dir, $(DIRS), $($(dir)_LOBJS))
-ifneq ($(WANT_NTL), 0)
-LOBJS += $(BUILD_DIR)/interfaces/NTL-interface.lo
-endif
 endif
 
 ################################################################################
@@ -375,6 +374,9 @@ $(BUILD_DIR)/$(1)_merged.lo: $($(1)_LOBJS) | $(BUILD_DIR)
 endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_merged_lobj_rule,$(dir))))
 MERGED_LOBJS:=$(foreach dir, $(DIRS),$(BUILD_DIR)/$(dir)_merged.lo)
+ifneq ($(WANT_NTL), 0)
+MERGED_LOBJS += $(BUILD_DIR)/interfaces/NTL-interface.lo
+endif
 
 $(FLINT_DIR)/$(FLINT_LIB_FULL): $(MERGED_LOBJS)
 	$(CC) $(CFLAGS) -shared $(EXTRA_SHARED_FLAGS) $(MERGED_LOBJS) -o $(FLINT_LIB_FULL) $(LDFLAGS) $(LIBS)
@@ -527,7 +529,7 @@ endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_OBJS_rule,$(dir))))
 
 ifneq ($(WANT_NTL), 0)
-$(BUILD_DIR)/interfaces/NTL-interface.o: $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp | $(BUILD_DIR)/interfaces
+$(BUILD_DIR)/interfaces/NTL-interface.o: $(SRC_DIR)/interfaces/NTL-interface.cpp | $(BUILD_DIR)/interfaces
 	@echo "  CXX $(@:$(BUILD_DIR)/%=%)"
 	@$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $< -o $@ -MMD -MF $(@:%=%.d)
 endif
@@ -547,7 +549,7 @@ endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_LOBJS_rule,$(dir))))
 
 ifneq ($(WANT_NTL), 0)
-$(BUILD_DIR)/interfaces/NTL-interface.lo: $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp | $(BUILD_DIR)/interfaces
+$(BUILD_DIR)/interfaces/NTL-interface.lo: $(SRC_DIR)/interfaces/NTL-interface.cpp | $(BUILD_DIR)/interfaces
 	@echo "  CXX $(@:$(BUILD_DIR)/%=%)"
 	@$(CXX) $(PIC_FLAG) $(CXXFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $< -o $@ -MMD -MF $(@:%=.d)
 endif
