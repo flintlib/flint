@@ -51,6 +51,13 @@ int main(void)
             flint_abort();
             flint_printf("\n\n");
         }
+
+        fmpz_mat_clear(a);
+        fmpz_mat_clear(b);
+        fmpz_mat_clear(c);
+        fmpz_mat_clear(d);
+        fmpz_mat_clear(m);
+        fmpz_mat_clear(n);
     }
 
     flint_randclear(state);

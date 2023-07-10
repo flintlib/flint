@@ -49,12 +49,12 @@ int main(void)
         
         /* Test: agrees with transform */
         acb_siegel_transform(tau2, m, tau1, prec);
-        if (!acb_mat_overlaps(tau2, r))
+        if (!acb_mat_overlaps(tau2, w))
         {            
             flint_printf("FAIL (transform)\n\n");
-            acb_mat_printd(r, 10);
+            acb_mat_printd(w, 10);
             flint_printf("\n");
-            acb_mat_printf(tau2, 10);
+            acb_mat_printd(tau2, 10);
             flint_printf("\n");
             flint_abort();
         }
@@ -67,19 +67,19 @@ int main(void)
             flint_printf("FAIL (inverse)\n\n");
             acb_mat_printd(tau1, 10);
             flint_printf("\n");
-            acb_mat_printf(tau2, 10);
+            acb_mat_printd(tau2, 10);
             flint_printf("\n");
             flint_abort();
         }
 
         /* Test: aliasing */
         acb_siegel_transform_ext(r, w, m, r, w, prec);
-        if (!acb_mat_overlaps(tau2, r) || !_acb_vec_contains(z2, w, g))
+        if (!acb_mat_overlaps(tau2, w) || !_acb_vec_contains(z2, r, g))
         {
             flint_printf("FAIL\n\n");
-            acb_mat_printd(r, 10);
+            acb_mat_printd(w, 10);
             flint_printf("\n");
-            acb_mat_printf(tau2, 10);
+            acb_mat_printd(tau2, 10);
             flint_printf("\n");
             flint_abort();
         }

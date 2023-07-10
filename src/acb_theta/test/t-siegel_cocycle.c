@@ -21,7 +21,7 @@ int main(void)
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 10);
         fmpz_mat_t m1, m2, m3;
@@ -58,7 +58,7 @@ int main(void)
             flint_printf("FAIL\n\n");
             acb_mat_printd(c3, 10);
             flint_printf("\n");
-            acb_mat_printf(t, 10);
+            acb_mat_printd(t, 10);
             flint_printf("\n");
             flint_abort();
         }

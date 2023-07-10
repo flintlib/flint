@@ -35,7 +35,7 @@ int main(void)
         {
             sp2gz_j(m);
         }
-        else if (iter <= siegel_nb_fundamental(g))
+        else if (iter <= sp2gz_nb_fundamental(g))
         {
             sp2gz_fundamental(m, iter - 1);
         }

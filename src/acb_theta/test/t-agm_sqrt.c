@@ -47,7 +47,7 @@ int main(void)
         acb_set(rt_low, rt);
         acb_add_error_arb(rt_low, err);
 
-        acb_theta_agm_sqrt_lowprec(test, x, rt_low, prec);
+        acb_theta_agm_sqrt(test, x, rt_low, 1, prec);
 
         if (!acb_overlaps(test, rt))
         {
