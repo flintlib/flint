@@ -1021,8 +1021,8 @@ void acb_print(const acb_t x);
 void acb_printd(const acb_t z, slong digits);
 void acb_printn(const acb_t x, slong digits, ulong flags);
 
-void _acb_vec_printd(acb_srcptr vec, slong len, slong digits);
-void _acb_vec_printn(acb_srcptr vec, slong len, slong digits, ulong flags);
+void _acb_vec_printd(acb_srcptr vec, slong len, slong ndigits);
+void _acb_vec_printn(acb_srcptr vec, slong len, slong ndigits, ulong flags);
 
 void acb_randtest(acb_t z, flint_rand_t state, slong prec, slong mag_bits);
 

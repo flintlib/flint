@@ -95,24 +95,24 @@ void acb_printd(const acb_t z, slong digits) { acb_fprintd(stdout, z, digits); }
 void acb_printn(const acb_t x, slong digits, ulong flags) { acb_fprintn(stdout, x, digits, flags); }
 
 void
-_acb_vec_printn(acb_srcptr vec, slong len, slong digits, ulong flags)
+_acb_vec_printn(acb_srcptr vec, slong len, slong ndigits, ulong flags)
 {
     slong i;
     for (i = 0; i < len; i++)
     {
-        acb_printn(vec + i, digits, flags);
+        acb_printn(vec + i, ndigits, flags);
         if (i < len - 1)
             flint_printf(", ");
     }
 }
 
 void
-_acb_vec_printd(acb_srcptr vec, slong len, slong digits)
+_acb_vec_printd(acb_srcptr vec, slong len, slong ndigits)
 {
     slong i;
     for (i = 0; i < len; i++)
     {
-        acb_printd(vec + i, digits);
+        acb_printd(vec + i, ndigits);
         if (i < len - 1)
         {
             flint_printf(", ");
