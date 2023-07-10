@@ -21,7 +21,7 @@ int main(void)
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 10);
         acb_mat_t tau1, w, tau2;
@@ -37,6 +37,7 @@ int main(void)
         z1 = _acb_vec_init(g);
         r = _acb_vec_init(g);
         z2 = _acb_vec_init(g);
+        fmpz_mat_init(m, 2 * g, 2 * g);
 
         acb_siegel_randtest(tau1, state, prec, bits);
         for (k = 0; k < g; k++)
@@ -68,6 +69,10 @@ int main(void)
             acb_mat_printd(tau1, 10);
             flint_printf("\n");
             acb_mat_printd(tau2, 10);
+            flint_printf("\n\n");
+            _acb_vec_printd(z1, g, 10);
+            flint_printf("\n\n");
+            _acb_vec_printd(z2, g, 10);
             flint_printf("\n");
             flint_abort();
         }
@@ -90,6 +95,7 @@ int main(void)
         _acb_vec_clear(z1, g);
         _acb_vec_clear(r, g);
         _acb_vec_clear(z2, g);
+        fmpz_mat_clear(m);
     }
 
     flint_randclear(state);

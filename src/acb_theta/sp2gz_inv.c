@@ -23,6 +23,7 @@ sp2gz_inv(fmpz_mat_t inv, const fmpz_mat_t mat)
     fmpz_mat_transpose(inv, mat);
     fmpz_mat_mul(inv, inv, j);
     fmpz_mat_mul(inv, j, inv);
+    fmpz_mat_neg(inv, inv);
 
     fmpz_mat_clear(j);
 }
