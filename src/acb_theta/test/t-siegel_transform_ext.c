@@ -1,0 +1,99 @@
+/*
+    Copyright (C) 2023 Jean Kieffer
+
+    This file is part of Arb.
+
+    Arb is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
+
+#include "acb_theta.h"
+
+int main(void)
+{
+    slong iter;
+    flint_rand_t state;
+
+    flint_printf("siegel_transform_ext....");
+    fflush(stdout);
+
+    flint_randinit(state);
+
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
+    {
+        slong g = 1 + n_randint(state, 10);
+        acb_mat_t tau1, w, tau2;
+        acb_ptr z1, r, z2;
+        fmpz_mat_t m;
+        slong prec = 100 + n_randint(state, 200);
+        slong bits = n_randint(state, 10);
+        slong k;
+
+        acb_mat_init(tau1, g, g);
+        acb_mat_init(w, g, g);
+        acb_mat_init(tau2, g, g);
+        z1 = _acb_vec_init(g);
+        r = _acb_vec_init(g);
+        z2 = _acb_vec_init(g);
+
+        acb_siegel_randtest(tau1, state, prec, bits);
+        for (k = 0; k < g; k++)
+        {
+            acb_randtest_precise(&z1[k], state, prec, bits);
+        }
+                 
+        sp2gz_randtest(m, state, bits);
+        acb_siegel_transform_ext(r, w, m, z1, tau1, prec);
+        
+        /* Test: agrees with transform */
+        acb_siegel_transform(tau2, m, tau1, prec);
+        if (!acb_mat_overlaps(tau2, r))
+        {            
+            flint_printf("FAIL (transform)\n\n");
+            acb_mat_printd(r, 10);
+            flint_printf("\n");
+            acb_mat_printf(tau2, 10);
+            flint_printf("\n");
+            flint_abort();
+        }
+
+        /* Test: inverse transformation */ 
+        sp2gz_inv(m, m);
+        acb_siegel_transform_ext(z2, tau2, m, r, w, prec);
+        if (!acb_mat_contains(tau2, tau1) || !_acb_vec_contains(z2, z1, g))
+        {
+            flint_printf("FAIL (inverse)\n\n");
+            acb_mat_printd(tau1, 10);
+            flint_printf("\n");
+            acb_mat_printf(tau2, 10);
+            flint_printf("\n");
+            flint_abort();
+        }
+
+        /* Test: aliasing */
+        acb_siegel_transform_ext(r, w, m, r, w, prec);
+        if (!acb_mat_overlaps(tau2, r) || !_acb_vec_contains(z2, w, g))
+        {
+            flint_printf("FAIL\n\n");
+            acb_mat_printd(r, 10);
+            flint_printf("\n");
+            acb_mat_printf(tau2, 10);
+            flint_printf("\n");
+            flint_abort();
+        }
+        
+        acb_mat_clear(tau1);
+        acb_mat_clear(w);
+        acb_mat_clear(tau2);
+        _acb_vec_clear(z1, g);
+        _acb_vec_clear(r, g);
+        _acb_vec_clear(z2, g);
+    }
+
+    flint_randclear(state);
+    flint_cleanup();
+    flint_printf("PASS\n");
+    return 0;
+}

@@ -22,6 +22,7 @@
 #include "acb.h"
 #include "arb_mat.h"
 #include "acb_mat.h"
+#include "acb_modular.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,15 +47,14 @@ void sp2gz_get_d(fmpz_mat_t res, const fmpz_mat_t mat);
 void sp2gz_set_abcd(fmpz_mat_t mat, const fmpz_mat_t a, const fmpz_mat_t b,
     const fmpz_mat_t c, const fmpz_mat_t d);
 
-int sp2gz_is_correct(const fmpz_mat_t mat);
-int sp2gz_is_pm_one(const fmpz_mat_t mat);
-
 void sp2gz_j(fmpz_mat_t mat);
 void sp2gz_block_diag(fmpz_mat_t mat, const fmpz_mat_t U);
 void sp2gz_trig(fmpz_mat_t mat, const fmpz_mat_t S);
 slong sp2gz_nb_fundamental(slong g);
 void sp2gz_fundamental(fmpz_mat_t mat, slong j);
 
+void sp2gz_inv(fmpz_mat_t inv, const fmpz_mat_t mat);
+int sp2gz_is_correct(const fmpz_mat_t mat);
 void sp2gz_randtest(fmpz_mat_t mat, flint_rand_t state, slong bits);
 
 /* The Siegel half space */
@@ -73,26 +73,6 @@ void acb_siegel_reduce(acb_mat_t res, fmpz_mat_t mat, const acb_mat_t tau, slong
 void acb_siegel_randtest(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits);
 void acb_siegel_randtest_reduced(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits);
 void acb_siegel_randtest_nice(acb_mat_t tau, flint_rand_t state, slong prec);
-
-/* Transformation formulas for theta functions */
-
-void acb_theta_agm_hadamard(acb_ptr r, acb_srcptr a, slong g, slong prec);
-void acb_theta_agm_sqrt(acb_ptr r, acb_srcptr a, acb_srcptr roots, slong nb, slong prec);
-void acb_theta_agm_sqr(acb_ptr r, acb_srcptr a, slong g, slong prec);
-void acb_theta_agm_mul(acb_ptr r, acb_srcptr a1, acb_srcptr a2, slong g, slong prec);
-
-ulong acb_theta_char_a(slong* coords, slong g);
-slong acb_theta_char_dot(ulong a, ulong b, slong g);
-slong acb_theta_char_dot_slong(ulong a, slong* n, slong g);
-void acb_theta_get_a0(acb_ptr r, acb_srcptr th, slong g);
-
-ulong acb_theta_transform_image_char(fmpz_t eps, ulong ab, const fmpz_mat_t mat);
-void acb_theta_transform_proj(acb_ptr res, acb_srcptr th, const fmpz_mat_t mat, slong prec);
-void acb_theta_transform_scal_const(acb_t scal, const acb_mat_t tau,
-    const fmpz_mat_t mat, slong k2, slong prec);
-void acb_theta_transform_scal(acb_t scal_z, acb_t scal_0, acb_srcptr z,
-    const acb_mat_t tau, const fmpz_mat_t mat, slong k2, slong prec);
-slong acb_theta_k2(const fmpz_mat_t mat);
 
 /* Ellipsoids in naive algorithms */
 
@@ -182,6 +162,11 @@ void acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arf_t eps
     const acb_theta_eld_t E, const acb_theta_precomp_t D, slong k, ulong ab,
     slong ord, slong prec, acb_theta_naive_worker_t worker_dim0);
 
+ulong acb_theta_char_a(slong* coords, slong g);
+slong acb_theta_char_dot(ulong a, ulong b, slong g);
+slong acb_theta_char_dot_slong(ulong a, slong* n, slong g);
+void acb_theta_get_a0(acb_ptr r, acb_srcptr th, slong g);
+
 void acb_theta_naive(acb_ptr th, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec);
 void acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z,
@@ -190,6 +175,21 @@ void acb_theta_naive_ind(acb_t th, ulong ab, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec);
 void acb_theta_naive_a0(acb_t th, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec);
+
+/* Transformation formulas for theta functions */
+
+void acb_theta_agm_hadamard(acb_ptr r, acb_srcptr a, slong g, slong prec);
+void acb_theta_agm_sqrt(acb_ptr r, acb_srcptr a, acb_srcptr roots, slong nb, slong prec);
+void acb_theta_agm_sqr(acb_ptr r, acb_srcptr a, slong g, slong prec);
+void acb_theta_agm_mul(acb_ptr r, acb_srcptr a1, acb_srcptr a2, slong g, slong prec);
+
+ulong acb_theta_transform_image_char(fmpz_t eps, ulong ab, const fmpz_mat_t mat);
+void acb_theta_transform_proj(acb_ptr res, acb_srcptr th, const fmpz_mat_t mat, slong prec);
+void acb_theta_transform_scal_const(acb_t scal, const acb_mat_t tau,
+    const fmpz_mat_t mat, slong k2, slong prec);
+void acb_theta_transform_scal(acb_t scal_z, acb_t scal_0, acb_srcptr z,
+    const acb_mat_t tau, const fmpz_mat_t mat, slong k2, slong prec);
+slong acb_theta_k2(const fmpz_mat_t mat);
 
 /* Quasi-linear algorithms on the reduced domain */
 

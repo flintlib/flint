@@ -11,13 +11,12 @@
 
 #include "acb_theta.h"
 
-int
-main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;
 
-    flint_printf("agm_sqrt_lowprec....");
+    flint_printf("agm_sqrt....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -76,6 +75,7 @@ main()
         acb_clear(rt_low);
         acb_clear(test);
     }
+    
     flint_randclear(state);
     flint_cleanup();
     flint_printf("PASS\n");
