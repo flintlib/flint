@@ -768,14 +768,14 @@ Component and error operations
 
 .. function:: void arb_mat_add_error_mag(arb_mat_t mat, const mag_t err)
 
-    Adds the absolute value of *err* in-place to the radii of the entries of *mat*.
+    Adds *err* in-place to the radii of the entries of *mat*.
 
 Eigenvalues and eigenvectors
 -------------------------------------------------------------------------------
 
 To compute eigenvalues and eigenvectors, one can convert to an
 :type:`acb_mat_t` and use the functions in :ref:`acb_mat.h: Eigenvalues and eigenvectors<acb-mat-eigenvalues>`.
-In the future, further dedicated methods for real matrices will be added here.
+In the future dedicated methods for real matrices will be added here.
 
 LLL reduction
 -------------------------------------------------------------------------------

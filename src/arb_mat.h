@@ -41,12 +41,6 @@ void arb_mat_init(arb_mat_t mat, slong r, slong c);
 
 void arb_mat_clear(arb_mat_t mat);
 
-ARB_MAT_INLINE slong
-arb_mat_allocated_bytes(const arb_mat_t x)
-{
-    return _arb_vec_allocated_bytes(x->entries, x->r * x->c) + x->r * sizeof(arb_ptr);
-}
-
 ARB_MAT_INLINE void
 arb_mat_swap(arb_mat_t mat1, arb_mat_t mat2)
 {
@@ -442,11 +436,12 @@ arb_mat_count_not_is_zero(const arb_mat_t mat)
     return size - arb_mat_count_is_zero(mat);
 }
 
-/* Eigenvalues and eigenvectors */
 
-/* void arb_mat_spd_eig_lbound_arf(arf_t b, const arb_mat_t mat, slong prec); */
-
-/* void arb_mat_spd_neighborhood(arf_t r, const arb_mat_t mat, slong prec); */
+ARB_MAT_INLINE slong
+arb_mat_allocated_bytes(const arb_mat_t x)
+{
+    return _arb_vec_allocated_bytes(x->entries, x->r * x->c) + x->r * sizeof(arb_ptr);
+}
 
 /* LLL reduction */
 
