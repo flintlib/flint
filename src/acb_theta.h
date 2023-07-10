@@ -47,8 +47,7 @@ void sp2gz_set_abcd(fmpz_mat_t mat, const fmpz_mat_t a, const fmpz_mat_t b,
     const fmpz_mat_t c, const fmpz_mat_t d);
 
 int sp2gz_is_correct(const fmpz_mat_t mat);
-int sp2gz_is_gsp(const fmpz_mat_t mat);
-int sp2gz_is_scalar(const fmpz_mat_t mat);
+int sp2gz_is_pm_one(const fmpz_mat_t mat);
 
 void sp2gz_j(fmpz_mat_t mat);
 void sp2gz_block_diag(fmpz_mat_t mat, const fmpz_mat_t U);
@@ -94,13 +93,6 @@ void acb_theta_transform_scal_const(acb_t scal, const acb_mat_t tau,
 void acb_theta_transform_scal(acb_t scal_z, acb_t scal_0, acb_srcptr z,
     const acb_mat_t tau, const fmpz_mat_t mat, slong k2, slong prec);
 slong acb_theta_k2(const fmpz_mat_t mat);
-
-/* Upper bounds on theta functions */
-
-void acb_theta_bound(arf_t rad, arf_t bound, acb_srcptr z, const acb_mat_t tau, slong prec);
-void acb_theta_bound_const(arf_t rad, arf_t bound, const acb_mat_t tau, slong prec);
-void acb_theta_cauchy(arf_t bound_der, const arf_t rad, const arf_t bound,
-    slong ord, slong dim, slong prec);
 
 /* Ellipsoids in naive algorithms */
 

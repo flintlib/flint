@@ -21,6 +21,11 @@ sp2gz_is_scalar(const fmpz_mat_t mat)
     {
         return 0;
     }
+    if (!fmpz_equal_si(fmpz_mat_entry(mat, 0, 0), 1)
+        && !fmpz_equal_si(fmpz_mat_entry(mat, 0, 0), -1))
+    {
+        return 0;
+    }
     for (j = 0; j < n; j++)
     {
         for (k = 0; k < n; k++)

@@ -167,16 +167,6 @@ arb_mat_add_error_mag(arb_mat_t mat, const mag_t err)
             arb_add_error_mag(arb_mat_entry(mat, i, j), err);
 }
 
-ARB_MAT_INLINE void
-arb_mat_add_error_arf(arb_mat_t mat, const arf_t err)
-{
-    slong i, j;
-
-    for (i = 0; i < arb_mat_nrows(mat); i++)
-        for (j = 0; j < arb_mat_ncols(mat); j++)
-            arb_add_error_arf(arb_mat_entry(mat, i, j), err);
-}
-
 /* Special matrices */
 
 void arb_mat_zero(arb_mat_t mat);
@@ -199,9 +189,9 @@ void arb_mat_transpose(arb_mat_t mat1, const arb_mat_t mat2);
 
 /* Norms */
 
-void arb_mat_max_norm(arb_t res, const arb_mat_t A, slong prec);
+/* void arb_mat_max_norm(arb_t res, const arb_mat_t A, slong prec); */
 
-void arb_mat_inf_norm(arb_t res, const arb_mat_t A, slong prec);
+/* void arb_mat_inf_norm(arb_t res, const arb_mat_t A, slong prec); */
 
 void arb_mat_bound_inf_norm(mag_t b, const arb_mat_t A);
 
@@ -458,9 +448,9 @@ arb_mat_count_not_is_zero(const arb_mat_t mat)
 
 /* Eigenvalues and eigenvectors */
 
-void arb_mat_spd_eig_lbound_arf(arf_t b, const arb_mat_t mat, slong prec);
+/* void arb_mat_spd_eig_lbound_arf(arf_t b, const arb_mat_t mat, slong prec); */
 
-void arb_mat_spd_neighborhood(arf_t r, const arb_mat_t mat, slong prec);
+/* void arb_mat_spd_neighborhood(arf_t r, const arb_mat_t mat, slong prec); */
 
 /* LLL reduction */
 

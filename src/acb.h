@@ -1021,6 +1021,9 @@ void acb_print(const acb_t x);
 void acb_printd(const acb_t z, slong digits);
 void acb_printn(const acb_t x, slong digits, ulong flags);
 
+void _acb_vec_printd(acb_srcptr vec, slong len, slong digits);
+void _acb_vec_printn(acb_srcptr vec, slong len, slong digits, ulong flags);
+
 void acb_randtest(acb_t z, flint_rand_t state, slong prec, slong mag_bits);
 
 void acb_randtest_special(acb_t z, flint_rand_t state, slong prec, slong mag_bits);
@@ -1181,12 +1184,6 @@ _acb_vec_estimate_allocated_bytes(slong len, slong prec)
 {
     return 2 * _arb_vec_estimate_allocated_bytes(len, prec);
 }
-
-void _acb_vec_printd(acb_srcptr vec, slong len, slong digits);
-
-void _acb_vec_printn(acb_srcptr vec, slong len, slong digits, ulong flags);
-
-void _acb_vec_ninf(arb_t ninf, acb_srcptr vec, slong len, slong prec);
 
 #ifdef __cplusplus
 }
