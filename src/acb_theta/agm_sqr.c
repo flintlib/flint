@@ -20,7 +20,7 @@ acb_theta_agm_sqr(acb_ptr r, acb_srcptr a, slong g, slong prec)
     v = _acb_vec_init(n);
 
     acb_theta_agm_hadamard(v, a, g, prec);
-    _acb_vec_sqr(v, v, n);
+    _acb_vec_sqr(v, v, n, prec);
     acb_theta_agm_hadamard(r, v, g, prec);
     _acb_vec_scalar_mul_2exp_si(r, r, n, -2 * g);
     

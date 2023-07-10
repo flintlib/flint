@@ -16,6 +16,7 @@ acb_theta_uql_roots(acb_ptr r, acb_ptr w, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong nb_steps, slong prec)
 {
     slong g = acb_mat_nrows(tau);
+    slong n = 1 << g;
     flint_rand_t state;
     acb_ptr x;
     acb_ptr res;
@@ -23,6 +24,7 @@ acb_theta_uql_roots(acb_ptr r, acb_ptr w, acb_srcptr z, slong nb_z,
     slong hprec = -1;
 
     x = _acb_vec_init((nb_z + 1) * g);
+    res = _acb_vec_init((nb_z + 1) * n * nb_steps);
     flint_randinit(state);
 
     for (j = 0; j < ACB_THETA_UQL_TRY; j++)
@@ -38,11 +40,10 @@ acb_theta_uql_roots(acb_ptr r, acb_ptr w, acb_srcptr z, slong nb_z,
         /* Get roots */
         for (k = 0; k < nb_z; k++)
         {
-            _acb_vec_set(x + (k + 1) * 2 * g, x, 2 * g);
-            _acb_vec_add(x + (k + 1) * 2 * g, z + k * g, g, prec);
-            _acb_vec_add(x + (k + 1) * 2 * g + g, z + k * g, g, prec);
+            _acb_vec_add(x + (k + 1) * 2 * g, x, z + k * g, g, prec);
+            _acb_vec_add(x + (k + 1) * 2 * g + g, x + g, z + k * g, g, prec);
         }
-        hprec = acb_theta_ql_roots(r, x, nb_z + 1, tau, nb_steps, prec);
+        hprec = acb_theta_ql_roots(res, x, nb_z + 1, tau, nb_steps, prec);
         if (hprec >= 0)
         {
             break;
@@ -51,6 +52,7 @@ acb_theta_uql_roots(acb_ptr r, acb_ptr w, acb_srcptr z, slong nb_z,
     _acb_vec_set(w, x, g);
     
     _acb_vec_clear(x, (nb_z + 1) * g);
+    _acb_vec_clear(res, (nb_z + 1) * n * nb_steps);
     flint_randclear(state);
     return hprec;
 }

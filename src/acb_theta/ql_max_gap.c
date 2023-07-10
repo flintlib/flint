@@ -11,8 +11,8 @@
 
 #include "acb_theta.h"
 
-static slong
-acb_theta_ql_roots_max_gap(slong g)
+slong
+acb_theta_ql_max_gap(slong g)
 {
     return 10;
 }

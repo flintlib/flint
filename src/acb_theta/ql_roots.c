@@ -11,7 +11,7 @@
 
 #include "acb_theta.h"
 
-static void
+static int
 _acb_vec_entry_contains_zero(acb_srcptr v, slong len)
 {
     slong k;
@@ -32,7 +32,7 @@ acb_theta_ql_roots(acb_ptr r, acb_srcptr z, slong nb_z, const acb_mat_t tau,
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
-    slong gap = acb_theta_ql_roots_max_gap(g);
+    slong gap = acb_theta_ql_max_gap(g);
     acb_mat_t w;
     acb_ptr x;
     slong hprec;

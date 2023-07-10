@@ -33,6 +33,7 @@ acb_theta_k2(const fmpz_mat_t mat)
     fmpz_mat_t inv;
     acb_mat_t tau;
     acb_mat_t w;
+    acb_ptr z;
     acb_t scal1, scal2, temp;
     fmpz_t eps;
     ulong ab;
@@ -44,6 +45,7 @@ acb_theta_k2(const fmpz_mat_t mat)
     fmpz_mat_init(inv, 2 * g, 2 * g);
     acb_mat_init(tau, g, g);
     acb_mat_init(w, g, g);
+    z = _acb_vec_init(g);
     fmpz_init(eps);
     acb_init(scal1);
     acb_init(scal2);
@@ -60,12 +62,12 @@ acb_theta_k2(const fmpz_mat_t mat)
         {
             acb_onei(acb_mat_entry(tau, j, j));
         }
-        acb_theta_naive_ind_const(scal1, 0, tau, prec);
+        acb_theta_naive_ind(scal1, 0, z, 1, tau, prec);
         acb_sqr(scal1, scal1, prec);
 
         acb_siegel_cocycle(w, mat, tau, prec);
         acb_siegel_transform(tau, mat, tau, prec);
-        acb_theta_naive_ind_const(scal2, ab, tau, prec);
+        acb_theta_naive_ind(scal2, ab, z, 1, tau, prec);
         acb_sqr(scal2, scal2, prec);
 
         acb_mat_det(temp, w, prec);
@@ -86,6 +88,7 @@ acb_theta_k2(const fmpz_mat_t mat)
     fmpz_mat_clear(inv);
     acb_mat_clear(tau);
     acb_mat_clear(w);
+    _acb_vec_clear(z, g);
     fmpz_clear(eps);
     acb_clear(scal1);
     acb_clear(scal2);

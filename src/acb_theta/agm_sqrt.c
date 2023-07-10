@@ -69,6 +69,6 @@ acb_theta_agm_sqrt(acb_ptr r, acb_srcptr a, acb_srcptr roots, slong nb, slong pr
 
     for (k = 0; k < nb; k++)
     {
-        acb_theta_agm_sqrt_entry(&r[k], &a[k], &roots[k], nb, prec);
+        acb_theta_agm_sqrt_entry(&r[k], &a[k], &roots[k], prec);
     }
 }

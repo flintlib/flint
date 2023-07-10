@@ -190,10 +190,14 @@ void acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arf_t eps
     const acb_theta_eld_t E, const acb_theta_precomp_t D, slong k, ulong ab,
     slong ord, slong prec, acb_theta_naive_worker_t worker_dim0);
 
-void acb_theta_naive(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec);
-void acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec);
-void acb_theta_naive_ind(acb_t th, ulong ab, acb_srcptr z, const acb_mat_t tau, slong prec);
-void acb_theta_naive_a0(acb_t th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec);
+void acb_theta_naive(acb_ptr th, acb_srcptr z, slong nb_z,
+    const acb_mat_t tau, slong prec);
+void acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z,
+    const acb_mat_t tau, slong prec);
+void acb_theta_naive_ind(acb_t th, ulong ab, acb_srcptr z, slong nb_z,
+    const acb_mat_t tau, slong prec);
+void acb_theta_naive_a0(acb_t th, acb_srcptr z, slong nb_z,
+    const acb_mat_t tau, slong prec);
 
 /* Quasi-linear algorithms on the reduced domain */
 

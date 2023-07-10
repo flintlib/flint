@@ -62,7 +62,9 @@ acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
     acb_theta_precomp_init(D, nb_z, g);
     eps = flint_malloc(nb_z * sizeof(arf_struct));
     for (k = 0; k < nb_z; k++)
+    {        
         arf_init(&eps[k]);
+    }
     c = _acb_vec_init(nb_z);
     acb_mat_init(tau_adj, g, g);
     z_adj = _acb_vec_init(g * nb_z);
@@ -84,7 +86,9 @@ acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
     acb_theta_eld_clear(E);
     acb_theta_precomp_clear(D);
     for (k = 0; k < nb_z; k++)
+    {
         arf_clear(&eps[k]);
+    }
     flint_free(eps);
     _acb_vec_clear(c, nb_z);
     acb_mat_clear(tau_adj);
