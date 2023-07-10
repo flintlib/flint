@@ -260,15 +260,6 @@ Transpose
 Norms
 -------------------------------------------------------------------------------
 
-.. function:: void acb_mat_max_norm(arb_t res, const acb_mat_t A, slong prec)
-
-    Sets *res* to the maximum absolute value of the entries of *A*.
-
-.. function:: void acb_mat_inf_norm(arb_t res, const acb_mat_t A, slong prec)
-
-    Sets *res* to the infinity norm (i.e. the largest row sum of absolute
-    values) of *A*.    
-
 .. function:: void acb_mat_bound_inf_norm(mag_t b, const acb_mat_t A)
 
     Sets *b* to an upper bound for the infinity norm (i.e. the largest

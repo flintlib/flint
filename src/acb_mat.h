@@ -199,10 +199,6 @@ acb_mat_conjugate_transpose(acb_mat_t mat1, const acb_mat_t mat2)
 
 /* Norms */
 
-/* void acb_mat_max_norm(arb_t res, const acb_mat_t A, slong prec);
-
-   void acb_mat_inf_norm(arb_t res, const acb_mat_t A, slong prec); */
-
 void acb_mat_bound_inf_norm(mag_t b, const acb_mat_t A);
 
 void acb_mat_frobenius_norm(arb_t res, const acb_mat_t A, slong prec);
