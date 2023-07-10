@@ -39,13 +39,13 @@ computes `3^{100}` in the ring of integers and prints the value::
         gr_ptr x;                /* an element */
 
         gr_ctx_init_fmpz(ZZ);    /* ZZ = ring of integers with fmpz_t elements */
-        GR_TMP_INIT(x, ctx)      /* allocate element on the stack */
+        GR_TMP_INIT(x, ZZ)       /* allocate element on the stack */
 
-        status = gr_set_ui(x, 3, ctx);           /* x = 3 */
-        status |= gr_pow_ui(x, x, 100, ctx);     /* x = x ^ 100 */
-        status |= gr_println(x, ctx);
+        status = gr_set_ui(x, 3, ZZ);           /* x = 3 */
+        status |= gr_pow_ui(x, x, 100, ZZ);     /* x = x ^ 100 */
+        status |= gr_println(x, ZZ);
 
-        GR_TMP_CLEAR(x, ctx)
+        GR_TMP_CLEAR(x, ZZ)
         gr_ctx_clear(ZZ);
 
         return status;

@@ -68,8 +68,8 @@ AC_LANG(C)
 # 3.0.0 => 18.0.0
 
 # NOTE: This must be after AC_INIT
-FLINT_MAJOR=2
-FLINT_MINOR=10
+FLINT_MAJOR=3
+FLINT_MINOR=0
 FLINT_PATCH=0
 FLINT_MAJOR_SO=18
 FLINT_MINOR_SO=0
@@ -653,8 +653,10 @@ fi
 
 if test "$with_ntl" = "yes";
 then
+    AC_LANG_PUSH([C++])
     AC_CHECK_HEADER([NTL/ZZ.h],,
                     AC_MSG_ERROR([Could not find NTL/ZZ.h!]))
+    AC_LANG_POP([C++])
 fi
 
 ################################################################################

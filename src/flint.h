@@ -91,9 +91,8 @@ extern "C" {
 #define __FLINT_VERSION_MINOR 0
 #define __FLINT_VERSION_PATCHLEVEL 0
 #define FLINT_VERSION "3.0.0-dev"
-#define __FLINT_RELEASE (__FLINT_VERSION * 10000 + \
-                         __FLINT_VERSION_MINOR * 100 + \
-                         __FLINT_VERSION_PATCHLEVEL)
+#define __FLINT_RELEASE_NUM(a,b,c) ((a)*10000 + (b)*100 + (c))
+#define __FLINT_RELEASE __FLINT_RELEASE_NUM(__FLINT_VERSION, __FLINT_VERSION_MINOR, __FLINT_VERSION_PATCHLEVEL)
 
 #if __GNU_MP_VERSION < 5
 #error GMP 5.0.0 or MPIR 2.6.0 or later are required

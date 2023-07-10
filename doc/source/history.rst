@@ -61,6 +61,29 @@ Merged libraries and reorganisation
 Generic rings
 ..................
 
+* The new ``gr`` module supports generic programming.
+  It provides wrappers for most builtin FLINT types and allows
+  constructing generic structures (polynomials, matrices, etc.) over
+  arbitrary base rings.
+  The following modules are available:
+
+  * ``gr_generic`` (various generic algorithms)
+  * ``gr_mat`` (matrices with generic elements)
+  * ``gr_mpoly`` (multivariate polynomials with generic elements)
+  * ``gr_poly`` (univariate polynomials with generic elements)
+  * ``gr_special`` (special functions for generic elements)
+  * ``gr_vec`` (vectors with generic elements)
+
+  This feature is experimental: it is highly likely that some interfaces
+  will change in a future FLINT release.
+
+* There is also a Python wrapper (``flint_ctypes``) included with FLINT
+  available in the ``src/python`` directory.
+  Unlike other third-party FLINT wrappers available currently, this wrapper
+  uses the ``gr`` interface to wrap (nearly) all FLINT types
+  at once. This wrapper is not currently
+  officially supported, but it can be useful for experimenting with FLINT.
+
 Small-prime FFT
 ..................
 
@@ -143,10 +166,10 @@ List of additions
 
 * FLINT 3.0 includes all functions in FLINT 2.9, Arb 2.23, Calcium 0.4
   and Antic 0.2.5 except those listed under "list of removals".
-  On top of this, outside of the ``fft_small`` module,
-  the following functions have been added.
-  The list may be incomplete. Functions starting with an
-  underscore have been omitted.
+  On top of this, the following functions have been added.
+  This list is incomplete; many internal functions and functions
+  starting with an underscore have been omitted.
+* ``mpn_mul_default_mpn_ctx``, ``_nmod_poly_mul_mid_default_mpn_ctx``, ``_fmpz_poly_mul_mid_default_mpn_ctx`` and many internal functions in the new ``fft_small`` module
 * ``acb_poly_nth_derivative, arb_div_arf_newton, arb_div_newton, arb_fmpz_divapprox, arb_nint, arb_poly_nth_derivative, arb_rsqrt_arf, arb_rsqrt_arf_newton, arb_sqrt_arf_newton, arb_sqrt_newton, arb_trunc``
 * ``ca_set_fmpzi``
 * ``flint_aligned_alloc, flint_aligned_free``

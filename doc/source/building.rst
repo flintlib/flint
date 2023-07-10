@@ -3,48 +3,136 @@
 **Building, testing and installing**
 ===============================================================================
 
-Configuring Flint
+Quick start
 -------------------------------------------------------------------------------
 
-There are three ways to build Flint. One way is through a standard set of CMake
-files provided in the distribution. A second way is with a custom build
-system based on a configuration script and Makefiles also provided in the
-distribution. A third way using MSVC solution files is documented in a section
-further down.
+Building FLINT requires:
 
-The easiest way to use FLINT is to build a shared library. Simply download
-the FLINT tarball and untar it on your system.
+* GMP (https://gmplib.org/)
+* MPFR (https://mpfr.org/)
+* Either of the following build systems:
 
-FLINT requires either MPIR (version 2.6.0 or later) or GMP (version 5.1.1 or
-later). If MPIR is used, MPIR must be built with the ``--enable-gmpcompat``
-option. FLINT also requires MPFR 3.0.0 or later and a pthread implementation.
+  * GNU Make together with GNU Autotools
+  * CMake
 
-Some of the input/output tests require ``fork`` and ``pipe``, however
-these are disabled on Windows when a posix implementation is not provided.
-
-If it happens that GMP/MPIR and MPFR are not in a standard location on your
-system (e.g. not in ``/usr/include/`` and ``/usr/lib/``), you need to tell the
-configure script where they are with the options ``--with-gmp=/path/to/gmp``
-or ``--with-mpir=/path/to/mpir`` and ``--with-mpfr=/path/to/mpfr``, e.g.
+On a typical Linux or Unix-like system where Autotools is available (see below
+for instructions using CMake), FLINT can be built and installed as follows:
 
 .. code-block:: bash
 
-   ./configure --with-gmp=/home/user1/local --with-mpfr=/home/user1/local
+    ./bootstrap.sh
+    ./configure --disable-static
+    make -j
+    make install
 
-FLINT can also build against a source build of GMP/MPIR and MPFR. Though
-programs using FLINT may require GMP/MPIR and MPFR to be installed (via
-``make install`` if built from sources).
+We also recommend that you run ``make check`` before installing.
 
-Note that FLINT builds static and shared libraries by default, except on
+For a complete list of build settings, write
+
+.. code-block:: bash
+
+    ./configure --help
+
+An example of a custom configuration command would be
+
+.. code-block:: bash
+
+    ./configure                                         \
+        --enable-assert                                 \
+        --enable-avx2                                   \
+        --disable-static                                \
+        --with-gmp-include=/home/user1/builds/includes/ \
+        --with-gmp-lib=/home/user1/builds/lib/          \
+        --with-mpfr=/usr                                \
+        --prefix=/home/user1/installations/             \
+        CC=clang                                        \
+        CFLAGS="-Wall -O3 -march=alderlake"
+
+Library and install paths
+-------------------------------------------------------------------------------
+
+If you intend to install the FLINT library and header files, you can specify
+where they should be placed by passing ``--prefix=path`` to ``configure``, where
+``path`` is the directory under which the ``lib`` and ``include`` directories
+exist into which you wish to place the FLINT files when it is installed.
+
+If GMP and MPFR are not installed in the default search path of your compiler
+(e.g. ``/usr/include/`` and ``/usr/lib/``), you must specify where they are by
+passing their location to configure ``--with-gmp=ABSOLUTE_PATH`` for GMP and
+``--with-mpfr=ABSOLUTE_PATH`` for MPFR.
+Note that the FLINT build system can handle GMP and MPFR as installed at some
+location and as source builds (built from source but not installed).  Though, to
+run the FLINT tests, GMP and MPFR needs to be properly installed.
+
+Testing FLINT
+-------------------------------------------------------------------------------
+
+The full FLINT test suite can be run using
+
+.. code-block:: bash
+
+    make check
+
+or in parallel on a multicore system using
+
+.. code-block:: bash
+
+    make -j check
+
+Number of test iterations
+...............................................................................
+
+The number of test iterations can be changed with the
+``FLINT_TEST_MULTIPLIER`` environment variable. For example, the
+following will only run 10% of the default iterations::
+
+    export FLINT_TEST_MULTIPLIER=0.1
+    make check
+
+Conversely, ``FLINT_TEST_MULTIPLIER=10`` will stress test FLINT
+by performing 10x the default number of iterations.
+
+Testing single modules
+...............................................................................
+
+If you wish to simply check a single module of FLINT you can pass the option
+``MOD=modname`` to ``make check``. You can also pass a list of module names:
+
+.. code-block:: bash
+
+    make check MOD=ulong_extras
+    make check MOD="fft fmpz_mat"
+
+Test coverage
+...............................................................................
+
+To obtain coverage statistics for the FLINT test suite, assuming
+that ``gcov`` and ``lcov`` are installed, configure
+FLINT with ``--enable-coverage``. Then run:
+
+.. code-block:: bash
+
+    make -j check
+    make coverage
+
+This will place a coverage report in ``build/coverage``.
+
+
+Static or dynamic library only
+-------------------------------------------------------------------------------
+
+FLINT builds static and shared libraries by default, except on
 platforms where this is not supported. If you do not require either a shared
 or static library then you may pass ``--disable-static`` or
 ``--disable-shared`` to ``configure``. This can substantially speed up the
 build.
 
-If you intend to install the FLINT library and header files, you can specify
-where they should be placed by passing ``--prefix=path`` to configure, where
-``path`` is the directory under which the ``lib`` and ``include`` directories
-exist into which you wish to place the FLINT files when it is installed.
+AVX2 instructions
+-------------------------------------------------------------------------------
+
+On x86-64 machines with AVX2 support, compiling FLINT with the ``--enable-avx2``
+option can improve performance substantially, notably by enabling
+the small-prime FFT. Currently this option is not enabled by default.
 
 TLS, reentrancy and single mode
 -------------------------------------------------------------------------------
@@ -101,27 +189,8 @@ this option is selected. It is disabled by default (``--disable-cxx``)
 because some ``C++`` compilers internally segfault when compiling the
 tests, or exhaust memory due to the complexity of the ``C++`` code.
 
-Building, testing, installing and using FLINT
+CMake build
 -------------------------------------------------------------------------------
-
-Once FLINT is configured, in the main directory of the FLINT directory
-tree simply type:
-
-.. code-block:: bash
-
-    make
-    make check
-
-GNU make or CMake is required to build FLINT. For GNU make, this is simply
-``make`` on Linux, Darwin, MinGW and Cygwin systems. However, on some unixes
-the command is ``gmake``. For CMake, this is ``cmake``, which may need
-to be installed with your package manager.
-
-If you wish to install FLINT with GNU make, simply type:
-
-.. code-block:: bash
-
-    make install
 
 If you wish to install FLINT with CMake, simply type:
 
@@ -131,10 +200,8 @@ If you wish to install FLINT with CMake, simply type:
     cmake .. -DBUILD_SHARED_LIBS=ON
     cmake --build . --target install
 
-Now to use FLINT, simply include the appropriate header files for the FLINT
-modules you wish to use in your C program.  Then compile your program,
-linking against the FLINT library, GMP/MPIR, MPFR and pthreads with the
-options ``-lflint -lmpfr -lgmp -lpthread``.
+Uninstalling FLINT
+-------------------------------------------------------------------------------
 
 To uninstall FLINT with GNU make, type:
 
@@ -142,76 +209,17 @@ To uninstall FLINT with GNU make, type:
 
     make uninstall
 
-Note that you may have to set ``LD_LIBRARY_PATH`` or equivalent for your
-system to let the linker know where to find these libraries. Please refer to
-your system documentation for how to do this.
+Now to use FLINT, simply include the appropriate header files for the FLINT
+modules you wish to use in your C program.  Then compile your program,
+linking against the FLINT library, GMP/MPIR, MPFR and pthreads with the
+options ``-lflint -lmpfr -lgmp -lpthread``.
 
-If you have any difficulties with conflicts with system headers on your
-machine, you can do the following in your code:
-
-.. code-block:: C
-
-    #undef ulong
-    #define ulong ulongxx
-    #include <stdio.h>
-    // other system headers
-    #undef ulong
-    #define ulong mp_limb_t
-
-This prevents FLINT's definition of ``ulong`` interfering with your system
-headers.
-
-The FLINT custom make system responds to the standard commands
+To clean up the local build files, use:
 
 .. code-block:: bash
 
-    make
-    make library
-    make check
     make clean
     make distclean
-    make install
-
-If your system supports parallel builds, FLINT will build in parallel, e.g.:
-
-.. code-block:: bash
-
-    make -j4 check
-
-On some systems, parallel builds appear to be available but buggy.
-
-Test iterations
--------------------------------------------------------------------------------
-
-The number of test iterations can be changed with the
-``FLINT_TEST_MULTIPLIER`` environment variable. For example, the
-following will only run 10% of the default iterations::
-
-    export FLINT_TEST_MULTIPLIER=0.1
-    make check
-
-Conversely, ``FLINT_TEST_MULTIPLIER=10`` will stress test FLINT
-by performing 10x the default number of iterations.
-
-Testing a single module or file
--------------------------------------------------------------------------------
-
-If you wish to simply check a single module of FLINT you can pass the option
-``MOD=modname`` to ``make check``. You can also pass a list of module names in
-inverted commas, e.g.:
-
-.. code-block:: bash
-
-    make check MOD=ulong_extras
-    make check MOD="fft fmpz_mat"
-
-To specify an individual test(s) for any module you can add it (or comma
-separated test list) after chosen module name followed by the colon, e.g.:
-
-.. code-block:: bash
-
-    make check MOD=ulong_extras:clog,factor,is_prime
-    make check MOD="fft fmpz_mat:add_sub,charpoly fq_vec:add"
 
 Assertion checking
 -------------------------------------------------------------------------------
@@ -221,136 +229,14 @@ FLINT has an assert system. If you want a debug build you can pass
 so asserts should not be enabled (``--disable-assert``, the default) for
 deployment.
 
-Test coverage
--------------------------------------------------------------------------------
-
-To obtain coverage statistics for the FLINT test suite, assuming
-that ``gcov`` and ``lcov`` are installed, configure
-FLINT with ``--enable-coverage``. Then run:
-
-.. code-block:: bash
-
-    make -j check
-    make coverage
-
-This will place a coverage report in ``build/coverage``.
-
-Exceptions
--------------------------------------------------------------------------------
-
-When FLINT encounters a problem, mostly illegal input, it currently aborts.
-There is an experimental interface for generating proper exceptions
-``flint_throw``, but this is currently rarely used and experimental - you
-should expect this to change.
-
-At the end, all of FLINT's exceptions call ``abort()`` to terminate
-the program. Using ``flint_set_abort(void (*abort_func)(void))``, the
-user can install a function that will be called instead. Similar
-to the exceptions, this should be regarded as experimental.
-
-Building FLINT2 with Microsoft Visual Studio using solution files
--------------------------------------------------------------------------------
-
-Brian Gladman has kindly provided the build scripts for building
-Flint with Microsoft Visual Studio.
-
-Building FLINT2 with Microsoft Visual Studio requires 
-Visual Studio 2015 Community (or higher version) and:
-
-- an installed version of Python 3
-
-- an installed version of Python Tools for Visual Studio
-  <https://github.com/Microsoft/PTVS>
-
-Obtain FLINT2 by cloning it using Git from Brian Gladman's repository:
-
-  ``git@github.com:BrianGladman/flint.git``
-
-FLINT2 depends on the MPIR, MPFR and PTHREADS libraries that have
-to be installed and built using Visual Studio before FLINT2 can
-be built.  The application directories are assumed to be in the
-same root directory with the names and layouts:
-
-.. code ::
-
-    mpir
-       lib
-       dll
-    mpfr  
-       lib
-       dll
-    pthreads  
-       lib
-       dll
-    flint
-       build.vc
-       lib
-       dll
-   
-Here the ``lib`` and ``dll`` sub-directories for each application hold
-the  static and dynamic link library outputs which will be used when 
-Flint is built.  They each contain up to four sub-directories for
-the normal configurations for building on Windows:
-
-    ``Win32\Release``
-
-    ``Win32\Debug``
-
-    ``x64\Release``
-
-    ``x64\Debug``
-    
-To build FLINT2 for a particular configuration requires that each of the 
-three libraries on which FLINT2 depends must have been previously built
-for the same configuration.
-
-Opening the solution file ``flint\build.vc\flint.sln`` provides the
-following build projects:
-
-    ``flint_config``  - a Python program for creating the Visual Studio build files
-
-    ``build_tests``   - a Python program for building the FLINT2 tests (after they have been created)
-
-    ``run_tests``     - a Python program for running the FLINT2 tests (after they have been built)
-
-The first step in building FLINT2 is to generate the Visual Studio build
-files for the version of Visual Studio being used. This is done by
-running the Python application ``flint_config.py``, either from within
-Visual Studio or on the command line. It is run with a single input
-parameter which is the last two digits of the Visual Studio version
-selected for building FLINT2 (the default is 19 if no input is given).
-
-This creates a build directory in the Flint root directory, for 
-example:
-
-   ``flint\build.vs19``
-   
-that contains the file ``flint.sln`` which can now be loaded into
-Visual Studio and used to build the FLINT2 library.
-
-Once the FLINT2 library has been built, the FLINT2 tests can now be 
-built and run by returning to the Visual Studio solution:
-
-  ``flint\build.vc\flint.sln``
-  
-and running the ``build_tests`` and ``run_tests`` Python applications.
-  
-After building FLINT2, the libraries and the header files that 
-you need to use FLINT2 are placed in the directories:
-
-- ``lib\<Win32|x64>\<Debug|Release>``
-
-- ``dll\<Win32|x64>\<Debug|Release>``
-
-depending on the version(s) that have been built.
-
-Running code
+Linking and running code
 -------------------------------------------------------------------------------
 
 Here is an example program to get started using FLINT:
 
 .. code-block:: c
 
+    #include "flint/flint.h"
     #include "flint/arb.h"
 
     int main()
@@ -367,8 +253,7 @@ Compile it with::
 
     gcc test.c -lflint
 
-Depending on the environment, you may also have to pass
-the flags ``-lmpfr`` and ``-lgmp`` to the compiler.
+You may also have to pass the flags ``-lmpfr`` and ``-lgmp`` to the compiler.
 If the FLINT header and library files are not in a standard location
 such as ``/usr/local``, you may also have to provide flags such as::
 
@@ -383,3 +268,22 @@ The output of the example program should be something like the following::
 
     [3.1415926535897932384626433832795028841971693993751 +/- 4.43e-50]
     Computed with flint-3.0.0
+
+Header file conflicts
+-------------------------------------------------------------------------------
+
+If you have any difficulties with conflicts with system headers on your
+machine, you can do the following in your code:
+
+.. code-block:: C
+
+    #undef ulong
+    #define ulong ulongxx
+    #include <stdio.h>
+    // other system headers
+    #undef ulong
+    #define ulong mp_limb_t
+
+This prevents FLINT's definition of ``ulong`` interfering with your system
+headers.
+

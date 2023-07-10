@@ -3208,6 +3208,12 @@ class gr_elem:
             _handle_error(self.parent(), status, "fexpr($x)")
         return res
 
+    def latex(self):
+        return self.fexpr(serialize=False).latex()
+
+    def _repr_latex_(self):
+        return "$$" + self.latex() + "$$"
+
     @staticmethod
     def _binary_coercion(self, other):
         elem_type = type(self)
