@@ -19,7 +19,7 @@ int main(void)
     slong iter;
     slong prec;
     flint_rand_t state;
-    arb_ptr rand;
+    acb_ptr rand;
     acb_t m; /* mean */
     acb_t mp;
     arb_t tol;

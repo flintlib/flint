@@ -33,7 +33,7 @@ int main(void)
         arb_mat_init(re, m, n);
         arb_mat_init(im, m, n);
         arb_mat_init(x, m, n);
-        arb_mat_init(x, m, n);
+        arb_mat_init(y, m, n);
         acb_mat_init(z, m, n);
 
         arb_mat_randtest(re, state, 2 + n_randint(state, 100), 10);
