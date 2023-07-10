@@ -9,11 +9,9 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb_modular.h"
 #include "acb_theta.h"
 
-int
-main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;

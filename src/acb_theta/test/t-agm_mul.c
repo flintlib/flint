@@ -11,18 +11,17 @@
 
 #include "acb_theta.h"
 
-int
-main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;
 
-    flint_printf("dupl....");
+    flint_printf("agm_mul....");
     fflush(stdout);
 
     flint_randinit(state);
 
-    /* Test: compare with naive algorithm */
+    /* Test: duplication formula */
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
@@ -61,21 +60,9 @@ main()
         acb_mat_scalar_mul_2exp_si(tau, tau, 1);
         acb_theta_naive(th_dupl, z, 2, tau, prec);
         _acb_vec_sqr(th_dupl, th_dupl, 2 * n, prec);
-        acb_theta_dupl(test, th, g, prec);
 
-        /*
-           flint_printf("g = %wd, prec = %wd, tau, z:\n", g, prec);
-           acb_mat_printd(tau, 10);
-           for (k = 0; k < g; k++)
-           {
-           acb_printd(&z[k], 10); flint_printf("\n");
-           }
-           flint_printf("theta:\n");
-           for (k = 0; k < 2*n; k++)
-           {
-           acb_printd(&th[k], 10); flint_printf("\n");
-           }
-         */
+        acb_theta_agm_mul(test, th, th + n, g, prec);
+        acb_theta_agm_mul(test + n, th + n, th + n, g, prec);
 
         if (!_acb_vec_overlaps(test, th_dupl, 2 * n))
         {

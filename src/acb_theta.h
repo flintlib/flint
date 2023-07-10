@@ -28,10 +28,6 @@
 extern "C" {
 #endif
 
-/* Tuning */
-
-#define ACB_THETA_ELD_DEFAULT_PREC 32 /* Low precision in ellipsoid computations */
-
 /* The Siegel modular group */
 
 static __inline__ slong
@@ -76,6 +72,8 @@ void acb_siegel_randtest_nice(acb_mat_t tau, flint_rand_t state, slong prec);
 
 /* Ellipsoids in naive algorithms */
 
+#define ACB_THETA_ELD_DEFAULT_PREC 32
+
 struct acb_theta_eld_struct
 {
     slong dim;
@@ -110,7 +108,6 @@ void acb_theta_eld_clear(acb_theta_eld_t E);
 
 void acb_theta_eld_interval(slong* min, slong* mid, slong* max,
     const arb_t ctr, const arf_t rad, int a, slong prec);
-void acb_theta_eld_round(slong* r, const arb_mat_t v);
 void acb_theta_eld_fill(acb_theta_eld_t E, const arb_mat_t Y, const arf_t R2,
     arb_srcptr offset, slong* last_coords, ulong a, slong prec);
 void acb_theta_eld_points(slong* pts, const acb_theta_eld_t E);

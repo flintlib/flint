@@ -9,11 +9,9 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb_modular.h"
 #include "acb_theta.h"
 
-int
-main()
+int main(void)
 {
     slong iter;
     flint_rand_t state;
@@ -23,7 +21,7 @@ main()
 
     flint_randinit(state);
 
-    /* Test: agrees with naive_all */
+    /* Test: other naive functions agree with naive_all */
     for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
@@ -34,6 +32,7 @@ main()
         acb_ptr th_test;
         slong prec = 20 + n_randint(state, 500);
         slong mag_bits = n_randint(state, 2);
+        ulong ab = n_randint(state, nb * nb);
         slong k;
 
         acb_mat_init(tau, g, g);
@@ -47,12 +46,12 @@ main()
             acb_urandom(&z[k], state, prec);
         }
         
-        acb_theta_naive(th, z, 1, tau, prec);
         acb_theta_naive_all(th_test, z, 1, tau, prec);
-
+        
+        acb_theta_naive(th, z, 1, tau, prec);
         if (!_acb_vec_overlaps(th, th_test, nb))
         {
-            flint_printf("FAIL: overlap\n");
+            flint_printf("FAIL (naive)\n");
             flint_printf("g = %wd, prec = %wd, tau:\n", g, prec);
             acb_mat_printd(tau, 10);
             flint_printf("z:\n");
@@ -61,6 +60,21 @@ main()
             _acb_vec_printd(th, nb, 10);
             _acb_vec_printd(th_test, nb * nb, 10);
             fflush(stdout);
+            flint_abort();
+        }
+
+        acb_theta_naive_ind(&th[0], ab, z, 1, tau, prec);
+        if (!acb_overlaps(&th[0], &th_test[ab]))
+        {
+            flint_printf("FAIL (naive_ind)\n");
+            flint_abort();
+        }
+
+        acb_theta_get_a0(th_test, th_test, g);
+        acb_theta_naive_a0(th, z, 1, tau, prec);
+        if (!_acb_vec_overlaps(th, th_test, nb))
+        {            
+            flint_printf("FAIL (naive_a0)\n");
             flint_abort();
         }
 
