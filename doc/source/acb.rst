@@ -1232,7 +1232,7 @@ Vector functions
 
 .. function:: _acb_vec_sqr(acb_ptr res, acb_srcptr vec, slong len, slong prec)
 
-    Sets *res* to the squares of entries in *vec*.
+    Sets *res* to the square of *vec* elementwise.
 
 .. function:: slong _acb_vec_bits(acb_srcptr vec, slong len)
 
