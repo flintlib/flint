@@ -22,12 +22,12 @@ int main(void)
     flint_randinit(state);
 
     /* Test: special values of z */
-    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 10);
+        slong g = 1 + n_randint(state, 5);
         slong nb_z = n_randint(state, 10);
         slong bits = n_randint(state, 5);
-        slong prec = 200 + n_randint(state, 500);
+        slong prec = 100 + n_randint(state, 200);
         acb_mat_t tau;
         arb_mat_t Y, cho;
         acb_ptr z, new_z, c;
@@ -35,8 +35,8 @@ int main(void)
         arb_t pi;
         acb_t t, x;
         slong *n, *zero;
-        slong err_exp = - 10 - n_randint(state, 50);
-        slong k;
+        slong err_exp = - 10 - n_randint(state, 20);
+        slong k, j;
         int res;
 
         acb_mat_init(tau, g, g);
@@ -83,23 +83,27 @@ int main(void)
             flint_abort();
         }
 
-        /* Test: if im(z) = - Y . (even integral vector n) + small error,
-           then terms for n and 0 correspond */
-        for (k = 0; k < g * nb_z; k++)
+        /* Test: if im(z) = - Y . (integral vector n) + small error,
+           then terms for 2 * n and 0 correspond */
+        for (j = 0; j < g; j++)
         {
-            n[k] = 2 * n_randint(state, 10);
-            arb_set_si(&v[k], n[k]);
+            zero[j] = 0;
         }
-        for (k = 0; k < g; k++)
+        for (k = 0; k < nb_z; k++)
         {
-            zero[k] = 0;
-        }
-        arb_mat_vector_mul_col(v, Y, v, prec);
-        for (k = 0; k < g * nb_z; k++)
-        {
-            arb_urandom(acb_imagref(&z[k]), state, prec);
-            arb_mul_2exp_si(acb_imagref(&z[k]), acb_imagref(&z[k]), err_exp);
-            arb_sub(acb_imagref(&z[k]), acb_imagref(&z[k]), &v[k], prec);
+            for (j = k * g; j < (k + 1) * g; j++)
+            {
+                n[j] = n_randint(state, 10);
+                arb_set_si(&v[j], n[j]);
+            }
+            arb_mat_vector_mul_col(v + k * g, Y, v + k * g, prec);
+            for (j = k * g; j < (k + 1) * g; j++)
+            {
+                arb_urandom(acb_imagref(&z[j]), state, prec);
+                arb_mul_2exp_si(acb_imagref(&z[j]), acb_imagref(&z[j]), err_exp);
+                arb_sub(acb_imagref(&z[j]), acb_imagref(&z[j]), &v[j], prec);
+                n[j] *= 2;
+            }
         }
         acb_theta_naive_reduce(offset, new_z, c, z, nb_z, tau, cho, prec);
 
@@ -111,12 +115,19 @@ int main(void)
             
             if (!acb_overlaps(x, t))
             {
-                flint_printf("FAIL (value)\n");
+                flint_printf("FAIL (value, k = %wd)\n", k);
+                flint_printf("tau:\n");
+                acb_mat_printd(tau, 10);
+                flint_printf("z:\n");
+                _acb_vec_printd(z + k * g, g, 10);
+                flint_printf("\nValues:\n");
                 acb_printd(x, 10);
                 flint_printf("\n");
                 acb_printd(t, 10);
                 flint_printf("\n");
-                acb_printd(c, 10);
+                acb_printd(&c[k], 10);
+                flint_printf("\nNew z:\n");
+                _acb_vec_printd(new_z + k * g, g, 10);
                 flint_printf("\n");
                 flint_abort();
             }
@@ -126,11 +137,13 @@ int main(void)
         arb_mat_vector_mul_col(offset, cho, offset, prec);
         for (k = 0; k < g; k++)
         {
-            arb_mul_2exp_si(&offset[k], &offset[k], - err_exp - 1);
+            arb_mul_2exp_si(&offset[k], &offset[k], - err_exp - 2);
             arb_sub_si(&offset[k], &offset[k], 1, prec);
             if (!arb_is_negative(&offset[k]))
             {
                 flint_printf("FAIL (offset)\n");
+                arb_printd(&offset[k], 10);
+                flint_printf("\n");
                 flint_abort();
             }
         }

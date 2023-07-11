@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 static void
-acb_theta_eld_round(arb_ptr a, arb_srcptr v, slong g)
+acb_theta_naive_round(arb_ptr a, arb_srcptr v, slong g)
 {
     slong j;
     
@@ -62,17 +62,12 @@ acb_theta_naive_reduce_one(arb_ptr offset, acb_ptr new_z, acb_t c, acb_srcptr z,
     _acb_vec_get_real(x, z, g);
     _acb_vec_get_imag(y, z, g);
     
-    /* Get center v = Yinv y of ellipsoid, set c = i y^T Yinv y */
+    /* Get center v = Yinv y of ellipsoid, set c = - i y^T Yinv y */
     arb_mat_vector_mul_col(v, Yinv, y, prec);
     arb_dot(acb_imagref(c), acb_imagref(c), 1, y, 1, v, 1, g, prec);
     
-    /* Round to nearest even integer vector a */
-    _arb_vec_scalar_mul_2exp_si(v, v, g, -1);
-    acb_theta_eld_round(a, v, g);
-    _arb_vec_scalar_mul_2exp_si(a, a, g, 1);
-    _arb_vec_scalar_mul_2exp_si(v, v, g, 1);
-    
-    /* Get r = v - a and offset = cho.r */
+    /* Round to nearest integer vector a; get r = v - a and offset = cho.r */
+    acb_theta_naive_round(a, v, g);
     _arb_vec_sub(r, v, a, g, prec);
     arb_mat_vector_mul_col(offset, cho, r, prec);
 
@@ -82,8 +77,9 @@ acb_theta_naive_reduce_one(arb_ptr offset, acb_ptr new_z, acb_t c, acb_srcptr z,
     arb_mat_vector_mul_col(new_y, Y, r, prec);
     _acb_vec_set_real_imag(new_z, new_x, new_y, g);
 
-    /* add a^T X a - a^T x + i r^T Y r to c */
+    /* add a^T X a - 2 a^T x + i r^T Y r to c */
     arb_dot(acb_realref(c), acb_realref(c), 0, a, 1, v, 1, g, prec);
+    _arb_vec_scalar_mul_2exp_si(a, a, g, 1);
     arb_dot(acb_realref(c), acb_realref(c), 1, a, 1, x, 1, g, prec);
     arb_dot(acb_imagref(c), acb_imagref(c), 0, r, 1, new_y, 1, g, prec);
         
@@ -125,7 +121,7 @@ acb_theta_naive_reduce(arb_ptr offset, acb_ptr new_z, acb_ptr c, acb_srcptr z,
             _arb_vec_set(offset, offset_z, g);
         }
         else
-        {
+        {            
             _arb_vec_union(offset, offset, offset_z, g, prec);
         }
     }

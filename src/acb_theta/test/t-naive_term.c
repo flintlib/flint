@@ -42,6 +42,7 @@ int main(void)
 
         acb_theta_naive_term(x, z, tau, &n, prec);
         acb_mul_si(t, acb_mat_entry(tau, 0, 0), n, prec);
+        acb_mul_2exp_si(t, t, -2);
         acb_add(t, t, z, prec);
         acb_mul_si(t, t, n, prec);
         acb_exp_pi_i(t, t, prec);

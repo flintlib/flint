@@ -34,9 +34,11 @@ acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau,
     {
         arb_set_si(&v[k], n[k]);
     }
-    
+
+    acb_zero(res);
     arb_mat_bilinear_form(acb_realref(res), X, v, v, prec);
     arb_mat_bilinear_form(acb_imagref(res), Y, v, v, prec);
+    acb_mul_2exp_si(res, res, -2); /* n is twice the actual lattice point */
     arb_dot(acb_realref(res), acb_realref(res), 0, v, 1, x, 1, g, prec);
     arb_dot(acb_imagref(res), acb_imagref(res), 0, v, 1, y, 1, g, prec);
     acb_exp_pi_i(res, res, prec);
