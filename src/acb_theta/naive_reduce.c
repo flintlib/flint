@@ -66,8 +66,13 @@ acb_theta_naive_reduce_one(arb_ptr offset, acb_ptr new_z, acb_t c, acb_srcptr z,
     arb_mat_vector_mul_col(v, Yinv, y, prec);
     arb_dot(acb_imagref(c), acb_imagref(c), 1, y, 1, v, 1, g, prec);
     
-    /* Round to nearest integer vector a; get r = v - a and offset = cho.r */
+    /* Round to nearest integer even vector a to not mess with characteristics */
+    _arb_vec_scalar_mul_2exp_si(v, v, g, -1);
     acb_theta_naive_round(a, v, g);
+    _arb_vec_scalar_mul_2exp_si(a, a, g, 1);
+    _arb_vec_scalar_mul_2exp_si(v, v, g, 1);
+
+    /* Get r = v - a and offset = cho.r */
     _arb_vec_sub(r, v, a, g, prec);
     arb_mat_vector_mul_col(offset, cho, r, prec);
 

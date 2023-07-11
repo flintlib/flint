@@ -83,7 +83,7 @@ int main(void)
             flint_abort();
         }
 
-        /* Test: if im(z) = - Y . (integral vector n) + small error,
+        /* Test: if im(z) = - Y . (even integral vector n) + small error,
            then terms for 2 * n and 0 correspond */
         for (j = 0; j < g; j++)
         {
@@ -93,7 +93,7 @@ int main(void)
         {
             for (j = k * g; j < (k + 1) * g; j++)
             {
-                n[j] = n_randint(state, 10);
+                n[j] = 2 * n_randint(state, 10);
                 arb_set_si(&v[j], n[j]);
             }
             arb_mat_vector_mul_col(v + k * g, Y, v + k * g, prec);
