@@ -141,15 +141,17 @@ void acb_theta_precomp_set(acb_theta_precomp_t D, acb_srcptr z,
 
 /* Naive algorithms */
 
+void acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau,
+    slong* n, slong prec);
 void acb_theta_naive_tail(arf_t bound, const arf_t R2, const arb_mat_t Y,
     slong ord, slong prec);
 void acb_theta_naive_radius(arf_t R2, const arb_mat_t Y, slong ord,
     const arf_t eps, slong prec);
-void acb_theta_naive_ellipsoid(acb_theta_eld_t E, arf_struct* eps, acb_ptr c,
-    acb_ptr new_z, ulong ab, int all, slong ord, acb_srcptr z, slong nb_z,
-    const acb_mat_t tau, slong prec);
-slong acb_theta_naive_newprec(slong prec, slong coord, slong dist,
-    slong max_dist, slong ord);
+void acb_theta_naive_reduce(arb_ptr offset, acb_ptr new_z, acb_ptr c, acb_srcptr z,
+    slong nb_z, const acb_mat_t tau, const arb_mat_t cho, slong prec);
+void acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr c, acb_ptr new_z,
+    ulong ab, int all, slong ord, acb_srcptr z, slong nb_z,
+    const acb_mat_t tau, const arf_t eps, slong prec);
 slong acb_theta_naive_fullprec(const acb_theta_eld_t E, slong prec);
 
 typedef void (*acb_theta_naive_worker_t)(acb_ptr, const acb_t, slong*, slong,
@@ -168,9 +170,9 @@ void acb_theta_naive(acb_ptr th, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec);
 void acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec);
-void acb_theta_naive_ind(acb_t th, ulong ab, acb_srcptr z, slong nb_z,
+void acb_theta_naive_ind(acb_ptr th, ulong ab, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec);
-void acb_theta_naive_a0(acb_t th, acb_srcptr z, slong nb_z,
+void acb_theta_naive_a0(acb_ptr th, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec);
 
 /* Transformation formulas for theta functions */

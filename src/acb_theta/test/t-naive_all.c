@@ -91,9 +91,11 @@ int main(void)
             acb_mat_printd(tau, 10);
             flint_printf("z:\n");
             _acb_vec_printd(z, g, 10);
-            flint_printf("th, th_test:\n");
+            flint_printf("\nth, th_test:\n");
             _acb_vec_printd(th, nb, 10);
+            flint_printf("\n");
             _acb_vec_printd(th_test, nb, 10);
+            flint_printf("\n");
             fflush(stdout);
             flint_abort();
         }

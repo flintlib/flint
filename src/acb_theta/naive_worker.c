@@ -11,6 +11,16 @@
 
 #include "acb_theta.h"
 
+static slong
+acb_theta_naive_newprec(slong prec, slong coord, slong dist, slong max_dist, slong ord)
+{    
+    double r = ((double) dist) / (max_dist + 2);
+    double neg = r * r * prec;
+    double pos = ord * n_clog(1 + FLINT_ABS(coord), 2);
+
+    return FLINT_MAX(ACB_THETA_ELD_DEFAULT_PREC, ceil((double) prec - neg + pos));
+}
+
 /* Work in dimension 1: compute exponentiel terms with two
    multiplications per term only, at just the necessary precision.
    Each term is: cofactor * lin^k * x^(k^2), and square
@@ -240,8 +250,8 @@ acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arf_t eps,
 
     for (j = 0; j < nb; j++)
     {
-        acb_mul(&th[j], &th[j], c, prec);
         acb_add_error_arf(&th[j], eps);
+        acb_mul(&th[j], &th[j], c, prec);
     }
 
     acb_mat_clear(lin_powers);

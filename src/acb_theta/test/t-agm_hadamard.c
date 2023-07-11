@@ -50,7 +50,6 @@ int main(void)
             flint_printf("FAIL (overlap):\n");
             _acb_vec_printd(s, n, 10);
             _acb_vec_printd(test, n, 10);
-            fflush(stdout);
             flint_abort();
         }
 

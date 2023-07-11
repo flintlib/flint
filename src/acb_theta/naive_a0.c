@@ -11,7 +11,8 @@
 
 #include "acb_theta.h"
 
-void acb_theta_naive_a0(acb_t th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
+void
+acb_theta_naive_a0(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;

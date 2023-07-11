@@ -18,20 +18,6 @@ _arb_div_si_si(arb_t res, slong a, slong b, slong prec)
     arb_div_si(res, res, b, prec);
 }
 
-static int
-_arb_vec_overlaps(arb_srcptr a, arb_srcptr b, slong len)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-    {
-        if (!arb_overlaps(a + i, b + i))
-        {
-            return 0;
-        }
-    }
-    return 1;
-}
-
 int main(void)
 {
     slong iter;

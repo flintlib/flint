@@ -693,6 +693,47 @@ _arb_vec_is_finite(arb_srcptr x, slong len)
     return 1;
 }
 
+ARB_INLINE int
+_arb_vec_equal(arb_srcptr vec1, arb_srcptr vec2, slong len)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+    {
+        if (!arb_equal(vec1 + i, vec2 + i))
+            return 0;
+    }
+    return 1;
+}
+
+ARB_INLINE int
+_arb_vec_overlaps(arb_srcptr vec1, arb_srcptr vec2, slong len)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+    {
+        if (!arb_overlaps(vec1 + i, vec2 + i))
+            return 0;
+    }
+
+    return 1;
+}
+
+ARB_INLINE int
+_arb_vec_contains(arb_srcptr vec1, arb_srcptr vec2, slong len)
+{
+    slong i;
+    
+    for (i = 0; i < len; i++)
+    {
+        if (!arb_contains(vec1 + i, vec2 + i))
+            return 0;
+    }
+
+    return 1;    
+}
+
 ARB_INLINE void
 _arb_vec_set(arb_ptr res, arb_srcptr vec, slong len)
 {

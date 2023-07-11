@@ -34,7 +34,7 @@ acb_theta_naive(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong
     slong g = acb_mat_nrows(tau);
     acb_theta_eld_t E;
     acb_theta_precomp_t D;
-    arf_struct *eps;
+    arf_t eps;
     acb_ptr c;
     acb_ptr new_z;
     int all = 0;
@@ -45,31 +45,25 @@ acb_theta_naive(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong
 
     acb_theta_eld_init(E, g, g);
     acb_theta_precomp_init(D, nb_z, g);
-    eps = flint_malloc(nb_z * sizeof(arf_struct));
-    for (k = 0; k < nb_z; k++)
-    {
-        arf_init(&eps[k]);
-    }
+    arf_init(eps);
     c = _acb_vec_init(nb_z);
     new_z = _acb_vec_init(nb_z * g);
 
-    acb_theta_naive_ellipsoid(E, eps, c, new_z, ab, all, ord, z, nb_z, tau, prec);
+    arf_one(eps);
+    arf_mul_2exp_si(eps, eps, -prec);
+    acb_theta_naive_ellipsoid(E, c, new_z, ab, all, ord, z, nb_z, tau, eps, prec);
     prec = acb_theta_naive_fullprec(E, prec);
     acb_theta_precomp_set(D, new_z, tau, E, prec);
 
     for (k = 0; k < nb_z; k++)
     {
-        acb_theta_naive_worker(&th[k * nb], nb, &c[k], &eps[k], E, D, k, ab,
+        acb_theta_naive_worker(&th[k * nb], nb, &c[k], eps, E, D, k, ab,
             ord, prec, worker_dim0);
     }
 
     acb_theta_eld_clear(E);
     acb_theta_precomp_clear(D);
-    for (k = 0; k < nb_z; k++)
-    {
-        arf_clear(&eps[k]);
-    }
-    flint_free(eps);
+    arf_clear(eps);
     _acb_vec_clear(c, nb_z);
     _acb_vec_clear(new_z, nb_z * g);
 }
