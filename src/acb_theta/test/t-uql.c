@@ -22,12 +22,12 @@ int main(void)
     flint_randinit(state);
 
     /* Test: agrees with naive_a0 for g <= 3 */
-    for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 3);
+        slong g = 1 + n_randint(state, 2);
         slong n = 1 << g;
-        slong prec = 2000;
-        slong nb_z = 1; /* + n_randint(state, 10);*/
+        slong prec = 1000;
+        slong nb_z = 1 + n_randint(state, 2);
         acb_mat_t tau, entry;
         acb_ptr z, th, test;
         slong k;

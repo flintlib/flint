@@ -62,6 +62,7 @@ acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr c, acb_ptr new_z,
     /* Get radius for error of at most eps and fill ellipsoid */
     acb_theta_naive_radius(R2, cho, ord, eps, eld_prec);
     arb_mat_scalar_mul_2exp_si(cho, cho, scl);
+    arf_mul_2exp_si(R2, R2, 1); /* TODO: debug later */
     acb_theta_eld_fill(E, cho, R2, offset, NULL, ab >> g, eld_prec);
 
     arb_clear(pi);

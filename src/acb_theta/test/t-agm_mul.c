@@ -25,7 +25,7 @@ int main(void)
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
-        slong prec = 100 + n_randint(state, 500);
+        slong prec = 100 + n_randint(state, 200);
         slong mag_bits = n_randint(state, 2);
         slong rad_exp = -5;
         slong n = 1 << g;

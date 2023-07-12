@@ -32,9 +32,9 @@ agm_direct(acb_ptr th, acb_srcptr roots, acb_srcptr z, slong nb_z,
 
     for (k = nb_steps - 1; k >= 0; k--)
     {
-        flint_printf("(uql) at step number %wd\n", k);
-        _acb_vec_printd(cur, (nb_z + 1) * n, 10);
-        flint_printf("\n");
+        /*flint_printf("(uql) at step number %wd\n", k);
+          _acb_vec_printd(cur, (nb_z + 1) * n, 10);
+          flint_printf("\n"); */
         for (j = 0; j < nb_z; j++)
         {
             acb_theta_agm_mul(cur + (j + 1) * n, cur, cur + (j + 1) * n, g, prec);
@@ -42,12 +42,12 @@ agm_direct(acb_ptr th, acb_srcptr roots, acb_srcptr z, slong nb_z,
         acb_theta_agm_sqr(cur, cur, g, prec);
         _acb_vec_scalar_mul_2exp_si(cur, cur, (nb_z + 1) * n, g);
         
-        flint_printf("(uql) after duplication:\n");
-        _acb_vec_printd(cur, (nb_z + 1) * n, 10);
-        flint_printf("\n");        
-        flint_printf("(uql) square roots:\n");
-        _acb_vec_printd(roots + k * (nb_z + 1) * n, (nb_z + 1) * n, 10);
-        flint_printf("\n");
+        /* flint_printf("(uql) after duplication:\n");
+           _acb_vec_printd(cur, (nb_z + 1) * n, 10);
+           flint_printf("\n");        
+           flint_printf("(uql) square roots:\n");
+           _acb_vec_printd(roots + k * (nb_z + 1) * n, (nb_z + 1) * n, 10);
+           flint_printf("\n"); */
         
         acb_theta_agm_sqrt(cur, cur, roots + k * (nb_z + 1) * n, (nb_z + 1) * n, prec);
     }
@@ -90,9 +90,9 @@ agm_aux(acb_ptr th, acb_srcptr roots, acb_srcptr t, acb_srcptr z, slong nb_z,
 
     for (k = nb_steps - 1; k >= 0; k--)
     {
-        flint_printf("(uql) at step number %wd\n", k);
+        /* flint_printf("(uql) at step number %wd\n", k);
         _acb_vec_printd(cur, 3 * (nb_z + 1) * n, 10);
-        flint_printf("\n");
+        flint_printf("\n"); */
         
         /* Duplication using square roots for t, 2t, zi + t, zi + 2t */
         for (j = 0; j < nb_z + 1; j++)
@@ -102,12 +102,12 @@ agm_aux(acb_ptr th, acb_srcptr roots, acb_srcptr t, acb_srcptr z, slong nb_z,
             _acb_vec_scalar_mul_2exp_si(next + (3 * j + 1) * n,
                 next + (3 * j + 1) * n, 2 * n, g);
         
-            flint_printf("(uql) after duplication:\n");
-            _acb_vec_printd(next + (3 * j + 1) * n, 2 * n, 10);
-            flint_printf("\n");        
-            flint_printf("(uql) square roots:\n");
-            _acb_vec_printd(roots + k * 2 * (nb_z + 1) * n + j * 2 * n, 2 * n, 10);
-            flint_printf("\n");
+            /* flint_printf("(uql) after duplication:\n");
+               _acb_vec_printd(next + (3 * j + 1) * n, 2 * n, 10);
+               flint_printf("\n");        
+               flint_printf("(uql) square roots:\n");
+               _acb_vec_printd(roots + k * 2 * (nb_z + 1) * n + j * 2 * n, 2 * n, 10);
+               flint_printf("\n"); */
             
             acb_theta_agm_sqrt(next + (3 * j + 1) * n, next + (3 * j + 1) * n,
                 roots + k * 2 * (nb_z + 1) * n + j * 2 * n, 2 * n, prec);
@@ -126,9 +126,9 @@ agm_aux(acb_ptr th, acb_srcptr roots, acb_srcptr t, acb_srcptr z, slong nb_z,
             }                
         }
         _acb_vec_set(cur, next, 3 * (nb_z + 1) * n);
-        flint_printf("(uql) after step number %wd\n", k);
+        /*flint_printf("(uql) after step number %wd\n", k);
         _acb_vec_printd(cur, 3 * (nb_z + 1) * n, 10);
-        flint_printf("\n");
+        flint_printf("\n");*/
     }
     
     for (j = 0; j < nb_z; j++)
@@ -161,12 +161,10 @@ acb_theta_uql(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong p
     hprec = acb_theta_ql_roots(r, x, nb_z + 1, tau, nb_steps, prec);
     if (hprec >= 0)
     {
-        flint_printf("(uql) Generic algorithm\n");
         agm_direct(th, r, z, nb_z, tau, nb_steps, hprec);
     }
     else
     {
-        flint_printf("(uql) Special algorithm\n");
         hprec = acb_theta_uql_roots(r, t, z, nb_z, tau, nb_steps, prec);
         if (hprec >= 0)
         {
