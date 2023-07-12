@@ -42,37 +42,22 @@ acb_theta_uql_cut(const arb_mat_t cho, const arf_t R2, slong prec)
     return res;
 }
 
-static void
-acb_theta_uql_a0_rec(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
-    const arb_mat_t cho, const arf_t R2, slong g, slong d, slong prec)
+static void acb_theta_uql_a0_basecase(acb_ptr th, acb_srcptr z, slong nb_z,
+    const acb_mat_t tau, slong g, slong prec)
 {
-    acb_ptr th_rec, z_rec, fac;
-    arb_mat_t Yinv;
-    arb_ptr v;
-    arb_t c, x;
-    arf_t rad;
-    slong* ind_z_rec;
-    slong nb_z_rec;
-    slong n;
-    ulong a;
-    slong min, mid, max;
-    slong k, j;
+    acb_mat_t tau_rec;
+    acb_mat_t tau_win;
+    slong k;
 
     if (g == 0)
     {
-        /* Initialize with one's */
         for (k = 0; k < nb_z; k++)
         {
             acb_one(&th[k]);
         }
-        return;
     }
-    else if (d == g)
+    else
     {
-        acb_mat_t tau_rec;
-        acb_mat_t tau_win;
-        
-        /* Initialize with ql_a0 */
         acb_mat_init(tau_rec, g, g);
         acb_mat_window_init(tau_win, tau, 0, g, 0, g);
         
@@ -81,6 +66,78 @@ acb_theta_uql_a0_rec(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
         
         acb_mat_clear(tau_rec);
         acb_mat_window_clear(tau_win);
+    }
+}
+
+static int
+acb_theta_uql_a0_has_pt(slong *pt, acb_srcptr z, const arb_mat_t Yinv,
+    const arb_mat_t cho, const arf_t R2, ulong a, slong prec)
+{
+    slong g = arb_mat_nrows(Yinv);
+    arb_ptr v;
+    arb_t c, x;
+    arf_t rad;
+    slong min, mid, max;
+    int res;
+
+    v = _arb_vec_init(g);
+    arb_init(c);
+    arb_init(x);
+    arf_init(rad);
+
+    /* Lattice is Z^g with offset Y^-1 z and Gram matrix Y */
+    /* Get center */
+    _acb_vec_get_imag(v, z, g);
+    arb_mat_vector_mul_col(v, Yinv, v, prec);
+    arb_neg(c, &v[g - 1]);
+    
+    /* Get radius */
+    arb_set_arf(x, R2);
+    arb_sqrt(x, x, prec);
+    arb_div(x, x, arb_mat_entry(cho, g - 1, g - 1), prec);
+    arb_get_ubound_arf(rad, x, prec);
+
+    /* Get points */
+    acb_theta_eld_interval(&min, &mid, &max, c, rad, a, prec);
+    if (min < max)
+    {
+        /* This should not happen. */
+        flint_printf("(uql_a0) Error: found several lattice points\n");
+        flint_abort(); /* Replace by indeterminate */
+    }
+    else if (min == max)
+    {
+        res = 1;
+        *pt = min;
+    }
+    else
+    {
+        res = 0;
+    }
+
+    _arb_vec_clear(v, g);
+    arb_clear(c);
+    arb_clear(x);
+    arf_clear(rad);
+    return res;
+}
+
+static void
+acb_theta_uql_a0_rec(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
+    const arb_mat_t cho, const arf_t R2, slong g, slong d, slong prec)
+{
+    acb_ptr th_rec, z_rec, fac;
+    arb_mat_t Yinv;
+    slong* ind_z_rec;
+    slong nb_z_rec;
+    slong n, pt;
+    ulong a;
+    slong k, j;
+    int has_pt;
+
+    if (d == g)
+    {
+        acb_theta_uql_a0_basecase(th, z, nb_z, tau, g, prec);
         return;
     }
     
@@ -91,16 +148,12 @@ acb_theta_uql_a0_rec(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
     nb_z_rec = 0;
     ind_z_rec = flint_malloc(2 * nb_z * sizeof(slong));
     fac = _acb_vec_init(2 * nb_z);
-    arb_mat_init(Yinv, g - 1, g - 1);
-    v = _arb_vec_init(g);
-    arb_init(c);
-    arb_init(x);
-    arf_init(rad);
+    arb_mat_init(Yinv, g, g);
 
     /* Set Yinv */
-    for (k = 0; k < g - 1; k++)
+    for (k = 0; k < g; k++)
     {
-        for (j = 0; j < g - 1; j++)
+        for (j = 0; j < g; j++)
         {
             arb_set(arb_mat_entry(Yinv, j, k), acb_imagref(acb_mat_entry(tau, j, k)));
         }
@@ -110,29 +163,13 @@ acb_theta_uql_a0_rec(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
     /* Collect z_rec and cofactors */
     for (k = 0; k < nb_z; k++)
     {        
-        /* Lattice is Z^g with offset Y^-1 z and Gram matrix Y */
-        /* Get center */
-        _acb_vec_get_imag(v, z + k * g, g);
-        arb_mat_vector_mul_col(v, Yinv, v, prec);
-        arb_neg(c, &v[g - 1]);
-        /* Get radius */
-        arb_set_arf(x, R2);
-        arb_sqrt(x, x, prec);
-        arb_div(x, x, arb_mat_entry(cho, g - 1, g - 1), prec);
-        arb_get_ubound_arf(rad, x, prec);
-
         for (a = 0; a <= 1; a++)
         {
             /* Get lattice points */
-            acb_theta_eld_interval(&min, &mid, &max, c, rad, a, prec);
+            has_pt = acb_theta_uql_a0_has_pt(&pt, z + k * g, Yinv, cho, R2, a,
+                ACB_THETA_ELD_DEFAULT_PREC);
             
-            if (min < max)
-            {
-                /* This should not happen. */
-                flint_printf("(uql_a0) Error: found several lattice points\n");
-                flint_abort(); /* Replace by indeterminate */
-            }
-            else if (min == max)
+            if (has_pt)
             {
                 ind_z_rec[2 * k + a] = nb_z_rec;
                 
@@ -141,17 +178,17 @@ acb_theta_uql_a0_rec(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
                 for (j = 0; j < g - 1; j++)
                 {
                     acb_addmul_si(z_rec + (g - 1) * nb_z_rec + j,
-                        acb_mat_entry(tau, j, g), min, prec);
+                        acb_mat_entry(tau, j, g), pt, prec);
                 }
                 /* Get cofactor */
-                acb_mul_si(&fac[2 * k + a], acb_mat_entry(tau, g - 1, g - 1), min, prec);
+                acb_mul_si(&fac[2 * k + a], acb_mat_entry(tau, g - 1, g - 1), pt, prec);
                 acb_addmul_si(&fac[2 * k + a], &z[k * g + (g - 1)], 2, prec);
-                acb_mul_si(&fac[2 * k + a], &fac[2 * k + a], min, prec);
+                acb_mul_si(&fac[2 * k + a], &fac[2 * k + a], pt, prec);
                 acb_exp_pi_i(&fac[2 * k + a], &fac[2 * k + a], prec);
                 
                 nb_z_rec += 1;
             }
-            else /* min > max, ie no lattice point; set theta values to zero */
+            else
             {
                 ind_z_rec[2 * k + a] = -1;
                 
@@ -187,10 +224,6 @@ acb_theta_uql_a0_rec(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
     flint_free(ind_z_rec);
     _acb_vec_clear(fac, 2 * nb_z);
     arb_mat_clear(Yinv);
-    _arb_vec_clear(v, g);
-    arb_clear(c);
-    arb_clear(x);
-    arf_clear(rad);
 }
 
 void
