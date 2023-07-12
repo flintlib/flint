@@ -143,8 +143,7 @@ agm_aux(acb_ptr th, acb_srcptr roots, acb_srcptr t, acb_srcptr z, slong nb_z,
 }
 
 void
-acb_theta_ql_a0(acb_ptr th, acb_ptr th0, acb_srcptr z, slong nb_z,
-    const acb_mat_t tau, slong prec)
+acb_theta_ql_a0(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
@@ -154,13 +153,23 @@ acb_theta_ql_a0(acb_ptr th, acb_ptr th0, acb_srcptr z, slong nb_z,
     acb_ptr r;
     acb_ptr res;
     slong hprec;
+    int has_zero = ((nb_z >= 1) && _acb_vec_is_zero(z, g));
     
     t = _acb_vec_init(g);
     x = _acb_vec_init((nb_z + 1) * g);
     r = _acb_vec_init(nb_steps * 2 * (nb_z + 1) * n);
     res = _acb_vec_init((nb_z + 1) * n);
 
-    _acb_vec_set(x + g, z, nb_z * g);
+    if (has_zero)
+    {
+        _acb_vec_set(x, z, nb_z * g);
+        nb_z -= 1;
+    }
+    else
+    {
+        _acb_vec_set(x + g, z, nb_z * g);
+    }
+    
     hprec = acb_theta_ql_roots(r, x, nb_z + 1, tau, nb_steps, prec);
     if (hprec >= 0)
     {
@@ -178,8 +187,16 @@ acb_theta_ql_a0(acb_ptr th, acb_ptr th0, acb_srcptr z, slong nb_z,
             _acb_vec_indeterminate(res, (nb_z + 1) * n);
         }
     }
-    _acb_vec_set(th0, res, n);
-    _acb_vec_set(th, res + n, n * nb_z);
+
+    if (has_zero)
+    {
+        _acb_vec_set(th, res, n * (nb_z + 1));
+        nb_z += 1;
+    }
+    else
+    {
+        _acb_vec_set(th, res + n, n * nb_z);
+    }
     
     _acb_vec_clear(t, g);
     _acb_vec_clear(x, (nb_z + 1) * g);

@@ -20,12 +20,12 @@ acb_theta_uql_cut(const arb_mat_t cho, const arf_t R2, slong prec)
     slong res = g;
 
     arb_init(x);
-    arb_init(bound);
+    arf_init(bound);
 
     while (res > 0)
     {
         arb_sqr(x, arb_mat_entry(cho, res - 1, res - 1), prec);
-        arb_mul_2exp_si(x, x, -2, prec);
+        arb_mul_2exp_si(x, x, -2);
         arb_get_ubound_arf(bound, x, prec);
         if (arf_cmp(bound, R2) < 0)
         {
@@ -38,25 +38,25 @@ acb_theta_uql_cut(const arb_mat_t cho, const arf_t R2, slong prec)
     }
 
     arb_clear(x);
-    arb_clear(bound);
+    arf_clear(bound);
     return res;
 }
 
 static void
 acb_theta_uql_a0_rec(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
-    const arb_mat_t Yinv, const arb_mat_t cho, const arf_t R2, slong g, slong d, slong prec)
+    const arb_mat_t cho, const arf_t R2, slong g, slong d, slong prec)
 {
     acb_ptr th_rec, z_rec, fac;
-    arb_mat_t Yinv_win;
+    arb_mat_t Yinv;
     arb_ptr v;
-    arb_t c;
+    arb_t c, x;
     arf_t rad;
     slong* ind_z_rec;
     slong nb_z_rec;
     slong n;
     ulong a;
     slong min, mid, max;
-    slong k;
+    slong k, j;
 
     if (g == 0)
     {
@@ -91,8 +91,21 @@ acb_theta_uql_a0_rec(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
     nb_z_rec = 0;
     ind_z_rec = flint_malloc(2 * nb_z * sizeof(slong));
     fac = _acb_vec_init(2 * nb_z);
-    arb_mat_init_window(Yinv_win, Yinv, 0, g - 1, 0, g - 1);
-    v = _acb_vec_init(g);
+    arb_mat_init(Yinv, g - 1, g - 1);
+    v = _arb_vec_init(g);
+    arb_init(c);
+    arb_init(x);
+    arf_init(rad);
+
+    /* Set Yinv */
+    for (k = 0; k < g - 1; k++)
+    {
+        for (j = 0; j < g - 1; j++)
+        {
+            arb_set(arb_mat_entry(Yinv, j, k), acb_imagref(acb_mat_entry(tau, j, k)));
+        }
+    }
+    arb_mat_inv(Yinv, Yinv, prec);
 
     /* Collect z_rec and cofactors */
     for (k = 0; k < nb_z; k++)
@@ -100,7 +113,7 @@ acb_theta_uql_a0_rec(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
         /* Lattice is Z^g with offset Y^-1 z and Gram matrix Y */
         /* Get center */
         _acb_vec_get_imag(v, z + k * g, g);
-        arb_mat_vector_mul_row(v, Yinv_win, v, prec);
+        arb_mat_vector_mul_col(v, Yinv, v, prec);
         arb_neg(c, &v[g - 1]);
         /* Get radius */
         arb_set_arf(x, R2);
@@ -111,7 +124,7 @@ acb_theta_uql_a0_rec(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
         for (a = 0; a <= 1; a++)
         {
             /* Get lattice points */
-            acb_theta_eld_interval(min, mid, max, c, rad, a, prec);
+            acb_theta_eld_interval(&min, &mid, &max, c, rad, a, prec);
             
             if (min < max)
             {
@@ -140,7 +153,7 @@ acb_theta_uql_a0_rec(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
             }
             else /* min > max, ie no lattice point; set theta values to zero */
             {
-                ind_z_rec[2 * k + a] == -1;
+                ind_z_rec[2 * k + a] = -1;
                 
                 for (j = 0; j < n; j++)
                 {
@@ -150,10 +163,9 @@ acb_theta_uql_a0_rec(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
         }
     }
     
-    /* Recursive call */
-    acb_theta_uql_a0_rec(th_rec, z_rec, nb_z_rec, tau, Y, cho, g - 1, d, prec);
+    /* Recursive call and reconstruct theta values */
+    acb_theta_uql_a0_rec(th_rec, z_rec, nb_z_rec, tau, cho, R2, g - 1, d, prec);
 
-    /* Reconstruct theta values */
     for (k = 0; k < nb_z; k++)
     {
         for (a = 0; a <= 1; a++)
@@ -170,12 +182,15 @@ acb_theta_uql_a0_rec(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
         }
     }
     
-    th_rec = _acb_vec_clear(th_rec, 2 * nb_z * n);
-    z_rec = _acb_vec_clear(z_rec, 2 * (g - 1) * nb_z);
+    _acb_vec_clear(th_rec, 2 * nb_z * n);
+    _acb_vec_clear(z_rec, 2 * (g - 1) * nb_z);
     flint_free(ind_z_rec);
     _acb_vec_clear(fac, 2 * nb_z);
-    arb_mat_window_clear(Yinv_win);
-    _acb_vec_clear(v, g);
+    arb_mat_clear(Yinv);
+    _arb_vec_clear(v, g);
+    arb_clear(c);
+    arb_clear(x);
+    arf_clear(rad);
 }
 
 void
@@ -183,14 +198,13 @@ acb_theta_uql_a0(acb_ptr th, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
-    acb_mat_t win;
     arb_mat_t Y;
     arb_mat_t cho;
     arb_t pi;
     arf_t R2;
     arf_t eps;
     slong ord = 0;
-    slong d, k;
+    slong d;
 
     arb_mat_init(Y, g, g);
     arb_mat_init(cho, g, g);
@@ -209,12 +223,11 @@ acb_theta_uql_a0(acb_ptr th, acb_srcptr z, slong nb_z,
     acb_theta_naive_radius(R2, Y, ord, eps, prec);
 
     d = acb_theta_uql_cut(cho, R2, ACB_THETA_ELD_DEFAULT_PREC);
-    arb_mat_inv(Y, Y, prec);
-    acb_theta_uql_a0_rec(th, z, nb_z, tau, Y, cho, R2, g, d, prec);
+    acb_theta_uql_a0_rec(th, z, nb_z, tau, cho, R2, g, d, prec);
 
     arb_mat_clear(Y);
     arb_mat_clear(cho);
-    acb_clear(pi);
+    arb_clear(pi);
     arf_clear(R2);
     arf_clear(eps);
 }
