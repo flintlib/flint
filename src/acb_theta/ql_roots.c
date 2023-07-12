@@ -51,7 +51,7 @@ acb_theta_ql_roots(acb_ptr r, acb_srcptr z, slong nb_z, const acb_mat_t tau,
         fail = 1;
         for (j = 0; j < gap; j++)
         {
-            acb_theta_naive_a0(r + k * n * nb_z, z, nb_z, w, hprec);
+            acb_theta_naive_a0(r + k * n * nb_z, x, nb_z, w, hprec);
             if (!_acb_vec_entry_contains_zero(r + k * n * nb_z, n * nb_z))
             {
                 fail = 0;

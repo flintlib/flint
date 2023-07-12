@@ -49,7 +49,7 @@ acb_theta_agm_sqrt_entry(acb_t r, const acb_t a, const acb_t root, slong prec)
     else /* (!acb_overlaps(root, res)) */
     {
         if (!acb_overlaps(root, neg))
-        {
+        {            
             acb_indeterminate(r);
         }
         else
