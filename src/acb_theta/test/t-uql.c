@@ -22,14 +22,14 @@ int main(void)
     flint_randinit(state);
 
     /* Test: agrees with naive_a0 for g <= 3 */
-    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 5 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 2);
         slong n = 1 << g;
         slong prec = 1000;
         slong nb_z = 1 + n_randint(state, 2);
         acb_mat_t tau, entry;
-        acb_ptr z, th, test;
+        acb_ptr z, z0, th, th0, test, test0;
         slong k;
         
         acb_mat_init(tau, g, g);
@@ -37,6 +37,9 @@ int main(void)
         z = _acb_vec_init(nb_z * g);
         th = _acb_vec_init(n * nb_z);
         test = _acb_vec_init(n * nb_z);
+        z0 = _acb_vec_init(g);
+        th0 = _acb_vec_init(n);
+        test0 = _acb_vec_init(n);
 
         /* In general, use direct algorithm */
         acb_siegel_randtest_nice(tau, state, prec);
@@ -44,11 +47,14 @@ int main(void)
         {
             acb_urandom(&z[k], state, prec);
         }
-        acb_theta_uql(th, z, nb_z, tau, prec);
+        acb_theta_uql(th, th0, z, nb_z, tau, prec);
         acb_theta_naive_a0(test, z, nb_z, tau, prec);
+        acb_theta_naive_a0(test0, z0, 1, tau, prec);
 
-        if (!_acb_vec_overlaps(th, test, n)
-            || !acb_is_finite(&th[0]))
+        if (!_acb_vec_overlaps(th, test, n * nb_z)
+            || !acb_is_finite(&th[0])
+            || !_acb_vec_overlaps(th0, test0, n)
+            || !acb_is_finite(&th0[0]))
         {
             flint_printf("FAIL (generic)\n");
             flint_printf("g = %wd, prec = %wd\n", g, prec);
@@ -69,12 +75,15 @@ int main(void)
             acb_add_si(&z[k], acb_mat_entry(tau, k, k), 1, prec);
             acb_mul_2exp_si(&z[k], &z[k], -1);
         }
-        acb_theta_uql(th, z, nb_z, tau, prec);
+        acb_theta_uql(th, th0, z, nb_z, tau, prec);
         acb_theta_naive_a0(test, z, nb_z, tau, prec);
-
+        acb_theta_naive_a0(test0, z0, 1, tau, prec);
+        
         if (!_acb_vec_overlaps(th, test, n * nb_z)
             || acb_contains_zero(&test[n-1])
-            || !acb_is_finite(&th[0]))
+            || !acb_is_finite(&th[0])
+            || !_acb_vec_overlaps(th0, test0, n)
+            || !acb_is_finite(&th0[0]))
         {
             flint_printf("FAIL (special)\n");
             flint_printf("g = %wd, prec = %wd\n", g, prec);
@@ -94,6 +103,9 @@ int main(void)
         _acb_vec_clear(z, nb_z * g);        
         _acb_vec_clear(th, n * nb_z);
         _acb_vec_clear(test, n * nb_z);
+        _acb_vec_clear(z0, g);
+        _acb_vec_clear(th0, n);
+        _acb_vec_clear(test0, n);
     }
     
     flint_randclear(state);

@@ -204,9 +204,9 @@ slong acb_theta_ql_roots(acb_ptr r, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong nb_steps, slong prec);
 slong acb_theta_uql_roots(acb_ptr r, acb_ptr t, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong nb_steps, slong prec);
+void acb_theta_uql(acb_ptr th, acb_ptr th0, acb_srcptr z, slong nb_z,
+    const acb_mat_t tau, slong prec);
 
-void acb_theta_uql(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec);
-void acb_theta_uql_const(acb_ptr th, const acb_mat_t tau, slong prec);
 
 /* User functions */
 

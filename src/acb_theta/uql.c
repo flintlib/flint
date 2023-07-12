@@ -51,7 +51,7 @@ agm_direct(acb_ptr th, acb_srcptr roots, acb_srcptr z, slong nb_z,
         
         acb_theta_agm_sqrt(cur, cur, roots + k * (nb_z + 1) * n, (nb_z + 1) * n, prec);
     }
-    _acb_vec_set(th, cur + n, nb_z * n);
+    _acb_vec_set(th, cur, (nb_z + 1) * n);
 
     acb_mat_clear(w);
     _acb_vec_clear(x, (nb_z + 1) * g);
@@ -131,9 +131,9 @@ agm_aux(acb_ptr th, acb_srcptr roots, acb_srcptr t, acb_srcptr z, slong nb_z,
         flint_printf("\n");*/
     }
     
-    for (j = 0; j < nb_z; j++)
+    for (j = 0; j < nb_z + 1; j++)
     {
-        _acb_vec_set(th + j * n, cur + 3 * (j + 1) * n, n);
+        _acb_vec_set(th + j * n, cur + 3 * j * n, n);
     }
     
     acb_mat_clear(w);
@@ -143,7 +143,8 @@ agm_aux(acb_ptr th, acb_srcptr roots, acb_srcptr t, acb_srcptr z, slong nb_z,
 }
 
 void
-acb_theta_uql(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
+acb_theta_uql(acb_ptr th, acb_ptr th0, acb_srcptr z, slong nb_z,
+    const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
@@ -151,32 +152,37 @@ acb_theta_uql(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong p
     acb_ptr t;
     acb_ptr x;
     acb_ptr r;
+    acb_ptr res;
     slong hprec;
     
     t = _acb_vec_init(g);
     x = _acb_vec_init((nb_z + 1) * g);
     r = _acb_vec_init(nb_steps * 2 * (nb_z + 1) * n);
+    res = _acb_vec_init((nb_z + 1) * n);
 
     _acb_vec_set(x + g, z, nb_z * g);
     hprec = acb_theta_ql_roots(r, x, nb_z + 1, tau, nb_steps, prec);
     if (hprec >= 0)
     {
-        agm_direct(th, r, z, nb_z, tau, nb_steps, hprec);
+        agm_direct(res, r, z, nb_z, tau, nb_steps, hprec);
     }
     else
     {
         hprec = acb_theta_uql_roots(r, t, z, nb_z, tau, nb_steps, prec);
         if (hprec >= 0)
         {
-            agm_aux(th, r, t, z, nb_z, tau, nb_steps, hprec);
+            agm_aux(res, r, t, z, nb_z, tau, nb_steps, hprec);
         }
         else
         {
-            _acb_vec_indeterminate(th, nb_z * n);
+            _acb_vec_indeterminate(res, (nb_z + 1) * n);
         }
     }
+    _acb_vec_set(th0, res, n);
+    _acb_vec_set(th, res + n, n * nb_z);
     
     _acb_vec_clear(t, g);
     _acb_vec_clear(x, (nb_z + 1) * g);
-    _acb_vec_clear(r, nb_steps * 2 * nb_z * n);    
+    _acb_vec_clear(r, nb_steps * 2 * (nb_z + 1) * n);
+    _acb_vec_clear(res, (nb_z + 1) * n);
 }
