@@ -163,6 +163,7 @@ acb_theta_eld_fill_recursive(acb_theta_eld_t E, const arb_mat_t Y,
     
     /* Set children recursively */
     acb_theta_eld_nb_pts(E) = 0;
+    acb_theta_eld_nb_border(E) = 0;
     acb_theta_eld_box(E, d - 1) = FLINT_MAX(max, -min);
     for (k = 0; k < d - 1; k++)
     {
@@ -180,6 +181,7 @@ acb_theta_eld_fill_recursive(acb_theta_eld_t E, const arb_mat_t Y,
             next_coords, a, prec);
 
         acb_theta_eld_nb_pts(E) += acb_theta_eld_nb_pts(acb_theta_eld_rchild(E, k));
+        acb_theta_eld_nb_border(E) += acb_theta_eld_nb_border(acb_theta_eld_rchild(E, k));
         slong_vec_max(E->box, E->box, acb_theta_eld_rchild(E, k)->box, d - 1);
         if (k < nr)
         {
@@ -200,6 +202,7 @@ acb_theta_eld_fill_recursive(acb_theta_eld_t E, const arb_mat_t Y,
             next_coords, a, prec);
 
         acb_theta_eld_nb_pts(E) += acb_theta_eld_nb_pts(acb_theta_eld_lchild(E, k));
+        acb_theta_eld_nb_border(E) += acb_theta_eld_nb_border(acb_theta_eld_lchild(E, k));
         slong_vec_max(E->box, E->box, acb_theta_eld_lchild(E, k)->box, d - 1);
     }
 
@@ -226,12 +229,21 @@ acb_theta_eld_fill(acb_theta_eld_t E, const arb_mat_t Y, const arf_t R2,
     if (min > max)
     {
         acb_theta_eld_nb_pts(E) = 0;
+        if (d == 1)
+        {
+            acb_theta_eld_nb_border(E) = 2;
+        }
+        else
+        {
+            acb_theta_eld_nb_border(E) = 0;
+        }
         for (k = 0; k < d; k++)
             acb_theta_eld_box(E, k) = 0;
     }
     else if (d == 1)
     {
         acb_theta_eld_nb_pts(E) = (max - min) / 2 + 1;
+        acb_theta_eld_nb_border(E) = 2;
         acb_theta_eld_box(E, 0) = FLINT_MAX(max, -min);
     }
     else

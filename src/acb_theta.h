@@ -85,6 +85,7 @@ struct acb_theta_eld_struct
     struct acb_theta_eld_struct* lchildren;
     slong nl;
     slong nb_pts;
+    slong nb_border;
     slong* box;
 };
 
@@ -101,6 +102,7 @@ typedef struct acb_theta_eld_struct acb_theta_eld_t[1];
 #define acb_theta_eld_rchild(E, k) (&(E)->rchildren[(k)])
 #define acb_theta_eld_lchild(E, k) (&(E)->lchildren[(k)])
 #define acb_theta_eld_nb_pts(E) ((E)->nb_pts)
+#define acb_theta_eld_nb_border(E) ((E)->nb_border)
 #define acb_theta_eld_box(E, k) ((E)->box[(k)])
 
 void acb_theta_eld_init(acb_theta_eld_t E, slong d, slong g);
@@ -111,6 +113,7 @@ void acb_theta_eld_interval(slong* min, slong* mid, slong* max,
 void acb_theta_eld_fill(acb_theta_eld_t E, const arb_mat_t Y, const arf_t R2,
     arb_srcptr offset, slong* last_coords, ulong a, slong prec);
 void acb_theta_eld_points(slong* pts, const acb_theta_eld_t E);
+void acb_theta_eld_border(slong* pts, const acb_theta_eld_t E);
 int acb_theta_eld_contains(const acb_theta_eld_t E, slong* pt);
 void acb_theta_eld_print(const acb_theta_eld_t E);
 
