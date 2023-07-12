@@ -74,7 +74,8 @@ agm_aux(acb_ptr th, acb_srcptr roots, acb_srcptr t, acb_srcptr z, slong nb_z,
     x = _acb_vec_init(3 * (nb_z + 1) * g);
     cur = _acb_vec_init(3 * (nb_z + 1) * n);
     next = _acb_vec_init(3 * (nb_z + 1) * n);
-        
+
+    /* w = 2^k tau; x = 2^k (0, t, 2t, z1, z1 + t, z1 + 2t, ...) */
     acb_mat_scalar_mul_2exp_si(w, tau, nb_steps);
     _acb_vec_set(x + g, t, g);
     _acb_vec_scalar_mul_2exp_si(x + 2 * g, t, g, 1);
@@ -93,7 +94,7 @@ agm_aux(acb_ptr th, acb_srcptr roots, acb_srcptr t, acb_srcptr z, slong nb_z,
         _acb_vec_printd(cur, 3 * (nb_z + 1) * n, 10);
         flint_printf("\n");
         
-        /* Duplication using square roots */
+        /* Duplication using square roots for t, 2t, zi + t, zi + 2t */
         for (j = 0; j < nb_z + 1; j++)
         {
             acb_theta_agm_mul(next + (3 * j + 1) * n, cur, cur + (3 * j + 1) * n, g, prec);
@@ -105,17 +106,19 @@ agm_aux(acb_ptr th, acb_srcptr roots, acb_srcptr t, acb_srcptr z, slong nb_z,
             _acb_vec_printd(next + (3 * j + 1) * n, 2 * n, 10);
             flint_printf("\n");        
             flint_printf("(uql) square roots:\n");
-            _acb_vec_printd(roots + k * 2 * j * n, 2 * n, 10);
+            _acb_vec_printd(roots + k * 2 * (nb_z + 1) * n + j * 2 * n, 2 * n, 10);
             flint_printf("\n");
             
             acb_theta_agm_sqrt(next + (3 * j + 1) * n, next + (3 * j + 1) * n,
-                roots + k * 2 * j * n, 2 * n, prec);
+                roots + k * 2 * (nb_z + 1) * n + j * 2 * n, 2 * n, prec);
         }
 
-        /* Duplication using divisions */
+        /* Duplication using divisions for 0 and zi */
         for (j = 0; j < nb_z + 1; j++)
         {
-            acb_theta_agm_sqr(next + 3 * j * n, cur + (3 * j + 1) * n, g, prec);
+            acb_theta_agm_mul(next + 3 * j * n, cur + (3 * j + 1) * n,
+                cur + n, g, prec);
+            _acb_vec_scalar_mul_2exp_si(next + 3 * j * n, next + 3 * j * n, n, g);
             for (a = 0; a < n; a++)
             {
                 acb_div(&next[3 * j * n + a], &next[3 * j * n + a],
@@ -123,11 +126,14 @@ agm_aux(acb_ptr th, acb_srcptr roots, acb_srcptr t, acb_srcptr z, slong nb_z,
             }                
         }
         _acb_vec_set(cur, next, 3 * (nb_z + 1) * n);
+        flint_printf("(uql) after step number %wd\n", k);
+        _acb_vec_printd(cur, 3 * (nb_z + 1) * n, 10);
+        flint_printf("\n");
     }
     
     for (j = 0; j < nb_z; j++)
     {
-        _acb_vec_set(th + j * n, cur + 3 * j * n, n);
+        _acb_vec_set(th + j * n, cur + 3 * (j + 1) * n, n);
     }
     
     acb_mat_clear(w);

@@ -56,13 +56,11 @@ acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr c, acb_ptr new_z,
     }
     arb_mat_transpose(cho, cho);
 
-    /* Get radius for error of at most eps */
-    acb_theta_naive_radius(R2, cho, ord, eps, eld_prec);
-
     /* Reduce all z, set offset */
     acb_theta_naive_reduce(offset, new_z, c, z, nb_z, tau, cho, prec);
-
-    /* Fill ellipsoid */
+    
+    /* Get radius for error of at most eps and fill ellipsoid */
+    acb_theta_naive_radius(R2, cho, ord, eps, eld_prec);
     arb_mat_scalar_mul_2exp_si(cho, cho, scl);
     acb_theta_eld_fill(E, cho, R2, offset, NULL, ab >> g, eld_prec);
 

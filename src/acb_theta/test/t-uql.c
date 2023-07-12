@@ -21,12 +21,12 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: agrees with naive_a0 for g <= 4 */
-    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
+    /* Test: agrees with naive_a0 for g <= 3 */
+    for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
-        slong g = 1; /* + n_randint(state, 4);*/
+        slong g = 1 + n_randint(state, 3);
         slong n = 1 << g;
-        slong prec = 1000 + n_randint(state, 1000);
+        slong prec = 2000;
         slong nb_z = 1; /* + n_randint(state, 10);*/
         acb_mat_t tau, entry;
         acb_ptr z, th, test;
@@ -72,8 +72,8 @@ int main(void)
         acb_theta_uql(th, z, nb_z, tau, prec);
         acb_theta_naive_a0(test, z, nb_z, tau, prec);
 
-        if (!_acb_vec_overlaps(th, test, n)
-            || !acb_contains_zero(&test[n-1])
+        if (!_acb_vec_overlaps(th, test, n * nb_z)
+            || acb_contains_zero(&test[n-1])
             || !acb_is_finite(&th[0]))
         {
             flint_printf("FAIL (special)\n");
@@ -82,6 +82,9 @@ int main(void)
             _acb_vec_printd(th, n * nb_z, 10);
             flint_printf("\n");
             _acb_vec_printd(test, n * nb_z, 10);
+            flint_printf("\nDifference:\n");
+            _acb_vec_sub(th, th, test, n * nb_z, prec);
+            _acb_vec_printd(th, n * nb_z, 10);
             flint_printf("\n");
             flint_abort();
         }
