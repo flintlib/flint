@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("uql_roots....");
+    flint_printf("ql_roots_aux....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -47,7 +47,7 @@ int main(void)
             acb_urandom(&z[k], state, prec);
         }
 
-        res = acb_theta_uql_roots(r, t, z, nb_z, tau, nb_steps, prec);
+        res = acb_theta_ql_roots_aux(r, t, z, nb_z, tau, nb_steps, prec);
 
         if (res < 0)
         {

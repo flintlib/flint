@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("uql....");
+    flint_printf("ql_a0....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -47,7 +47,7 @@ int main(void)
         {
             acb_urandom(&z[k], state, prec);
         }
-        acb_theta_uql(th, th0, z, nb_z, tau, prec);
+        acb_theta_ql_a0(th, th0, z, nb_z, tau, prec);
         acb_theta_naive_a0(test, z, nb_z, tau, prec);
         acb_theta_naive_a0(test0, z0, 1, tau, prec);
 
@@ -66,7 +66,7 @@ int main(void)
             flint_abort();
         }
 
-        /* Construct example with uql_roots: tau diagonal, z = (1+tau)/2 */
+        /* Construct example with ql_roots_aux: tau diagonal, z = (1+tau)/2 */
         acb_mat_zero(tau);
         for (k = 0; k < g; k++)
         {
@@ -75,7 +75,7 @@ int main(void)
             acb_add_si(&z[k], acb_mat_entry(tau, k, k), 1, prec);
             acb_mul_2exp_si(&z[k], &z[k], -1);
         }
-        acb_theta_uql(th, th0, z, nb_z, tau, prec);
+        acb_theta_ql_a0(th, th0, z, nb_z, tau, prec);
         acb_theta_naive_a0(test, z, nb_z, tau, prec);
         acb_theta_naive_a0(test0, z0, 1, tau, prec);
         

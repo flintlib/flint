@@ -143,7 +143,7 @@ agm_aux(acb_ptr th, acb_srcptr roots, acb_srcptr t, acb_srcptr z, slong nb_z,
 }
 
 void
-acb_theta_uql(acb_ptr th, acb_ptr th0, acb_srcptr z, slong nb_z,
+acb_theta_ql_a0(acb_ptr th, acb_ptr th0, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
@@ -168,7 +168,7 @@ acb_theta_uql(acb_ptr th, acb_ptr th0, acb_srcptr z, slong nb_z,
     }
     else
     {
-        hprec = acb_theta_uql_roots(r, t, z, nb_z, tau, nb_steps, prec);
+        hprec = acb_theta_ql_roots_aux(r, t, z, nb_z, tau, nb_steps, prec);
         if (hprec >= 0)
         {
             agm_aux(res, r, t, z, nb_z, tau, nb_steps, hprec);
