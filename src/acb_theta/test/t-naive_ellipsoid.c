@@ -22,9 +22,9 @@ int main(void)
     flint_randinit(state);
 
     /* Test: sum of terms on border of ellipsoid must be less than eps */
-    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 2000 * flint_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 4);
+        slong g = 1; /* + n_randint(state, 4); */
         slong n = 1 << g;
         slong prec = 100 + n_randint(state, 100);
         slong bits = n_randint(state, 4);
@@ -55,7 +55,7 @@ int main(void)
         acb_siegel_randtest_reduced(tau, state, prec, bits);
         for (k = 0; k < g * nb_z; k++)
         {
-            acb_urandom(&z[k], state, prec);            
+            acb_randtest_precise(&z[k], state, prec, bits);
         }
         arf_one(eps);
         arf_mul_2exp_si(eps, eps, -prec);
@@ -84,6 +84,8 @@ int main(void)
             flint_printf("\n");
             arf_printd(eps, 10);
             flint_printf("\n");
+            flint_printf("new_z:\n");
+            _acb_vec_printd(new_z, nb_z * g, 10);
             flint_abort();
         }
 

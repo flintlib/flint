@@ -59,9 +59,18 @@ acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr c, acb_ptr new_z,
 
     /* Reduce all z, set offset */
     acb_theta_naive_reduce(offset, new_z, c, z, nb_z, tau, cho, prec);
+
+    flint_printf("(naive_ellipsoid) computed offset:\n");
+    _arb_vec_printn(offset, g, 10, 0);
+    flint_printf("\n");
     
     /* Get radius for error of at most eps and fill ellipsoid */
     acb_theta_naive_radius(R2, cho, ord, eps, eld_prec);
+    
+    flint_printf("(naive_ellipsoid) computed square radius:\n");
+    arf_printd(R2, 10);
+    flint_printf("\n");
+    
     arb_mat_scalar_mul_2exp_si(cho, cho, scl);
     acb_theta_eld_fill(E, cho, R2, offset, NULL, ab >> g, eld_prec);
 

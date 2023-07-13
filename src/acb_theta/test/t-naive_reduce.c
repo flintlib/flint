@@ -84,7 +84,7 @@ int main(void)
         }
 
         /* Test: if im(z) = - Y . (even integral vector n) + small error,
-           then terms for 2 * n and 0 correspond */
+           then terms for 2 * n and 0 correspond and offset is small */
         for (j = 0; j < g; j++)
         {
             zero[j] = 0;
