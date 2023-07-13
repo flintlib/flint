@@ -33,9 +33,9 @@ agm_direct(acb_ptr th, acb_srcptr roots, acb_srcptr z, slong nb_z,
 
     for (k = nb_steps - 1; k >= 0; k--)
     {
-        /* flint_printf("(ql_a0_direct) at step number %wd\n", k);
-           _acb_vec_printd(cur, nb_z * n, 10);
-           flint_printf("\n"); */
+         flint_printf("(ql_a0_direct) at step number %wd\n", k);
+         _acb_vec_printd(cur, nb_z * n, 10);
+         flint_printf("\n");
         
         for (j = 1; j < nb_z; j++)
         {
@@ -44,12 +44,12 @@ agm_direct(acb_ptr th, acb_srcptr roots, acb_srcptr z, slong nb_z,
         acb_theta_agm_sqr(cur, cur, g, prec);
         _acb_vec_scalar_mul_2exp_si(cur, cur, nb_z * n, g);
         
-        /* flint_printf("(ql_a0) after duplication:\n");
-           _acb_vec_printd(cur, nb_z * n, 10);
-           flint_printf("\n");        
-           flint_printf("(ql_a0) square roots:\n");
-           _acb_vec_printd(roots + k * nb_z * n, nb_z * n, 10);
-           flint_printf("\n"); */
+        flint_printf("(ql_a0) after duplication:\n");
+        _acb_vec_printd(cur, nb_z * n, 10);
+        flint_printf("\n");        
+        flint_printf("(ql_a0) square roots:\n");
+        _acb_vec_printd(roots + k * nb_z * n, nb_z * n, 10);
+        flint_printf("\n");
         
         acb_theta_agm_sqrt(cur, cur, roots + k * nb_z * n, nb_z * n, prec);
     }
@@ -92,9 +92,9 @@ agm_aux(acb_ptr th, acb_srcptr roots, acb_srcptr t, acb_srcptr z, slong nb_z,
 
     for (k = nb_steps - 1; k >= 0; k--)
     {
-        /*flint_printf("(ql_a0_aux) at step number %wd\n", k);
-          _acb_vec_printd(cur, 3 * nb_z * n, 10);
-          flint_printf("\n"); */
+        flint_printf("(ql_a0_aux) at step number %wd\n", k);
+        _acb_vec_printd(cur, 3 * nb_z * n, 10);
+        flint_printf("\n");
         
         /* Duplication using square roots for t, 2t, zi + t, zi + 2t */
         for (j = 0; j < nb_z; j++)
@@ -104,12 +104,12 @@ agm_aux(acb_ptr th, acb_srcptr roots, acb_srcptr t, acb_srcptr z, slong nb_z,
             _acb_vec_scalar_mul_2exp_si(next + (3 * j + 1) * n,
                 next + (3 * j + 1) * n, 2 * n, g);
         
-            /* flint_printf("(ql_a0) after duplication:\n");
-               _acb_vec_printd(next + (3 * j + 1) * n, 2 * n, 10);
-               flint_printf("\n");        
-               flint_printf("(ql_a0) square roots:\n");
-               _acb_vec_printd(roots + k * 2 * nb_z * n + j * 2 * n, 2 * n, 10);
-               flint_printf("\n"); */
+            flint_printf("(ql_a0) after duplication:\n");
+            _acb_vec_printd(next + (3 * j + 1) * n, 2 * n, 10);
+            flint_printf("\n");        
+            flint_printf("(ql_a0) square roots:\n");
+            _acb_vec_printd(roots + k * 2 * nb_z * n + j * 2 * n, 2 * n, 10);
+            flint_printf("\n");
             
             acb_theta_agm_sqrt(next + (3 * j + 1) * n, next + (3 * j + 1) * n,
                 roots + k * 2 * nb_z * n + j * 2 * n, 2 * n, prec);

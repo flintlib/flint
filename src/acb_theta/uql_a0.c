@@ -136,6 +136,8 @@ acb_theta_uql_a0_rec(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
     slong k, j;
     int has_pt;
 
+    flint_printf("(uql_a0_rec) calling with d = %wd, g = %wd, nb_z = %wd\n", d, g, nb_z);
+
     if (d == g)
     {
         acb_theta_uql_a0_basecase(th, z, nb_z, tau, g, prec);
@@ -173,7 +175,7 @@ acb_theta_uql_a0_rec(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
             if (has_pt)
             {
                 ind_z_rec[2 * k + a] = nb_z_rec;
-                flint_printf("pt = %wd\n", pt);
+                flint_printf("(uql_a0) pt = %wd\n", pt);
                 
                 /* Get new vector z */
                 _acb_vec_set(z_rec + (g - 1) * nb_z_rec, z + k * g, g - 1);
@@ -205,9 +207,9 @@ acb_theta_uql_a0_rec(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
     /* Recursive call and reconstruct theta values */
     acb_theta_uql_a0_rec(th_rec, z_rec, nb_z_rec, tau, cho, R2, g - 1, d, prec);
     
-    /* flint_printf("th_rec:\n");
-       _acb_vec_printd(th_rec, nb_z_rec * n, 10);
-       flint_printf("\n"); */
+    flint_printf("th_rec:\n");
+    _acb_vec_printd(th_rec, nb_z_rec * n, 10);
+    flint_printf("\n");
 
     for (k = 0; k < nb_z; k++)
     {

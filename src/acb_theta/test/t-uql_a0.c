@@ -38,7 +38,7 @@ int main(void)
         th = _acb_vec_init(n * nb_z);
         test = _acb_vec_init(n * nb_z);
 
-        /* Possibly generate large imaginary parts */
+        /* Possibly generate large imaginary parts for tau and z */
         acb_siegel_randtest_reduced(tau, state, prec, bits);
         if (iter % 2 == 0)
         {
@@ -47,7 +47,7 @@ int main(void)
         }
         for (k = 0; k < nb_z * g; k++)
         {
-            acb_randtest_precise(&z[k], state, prec, bits);
+            acb_urandom(&z[k], state, prec);
         }
         acb_theta_uql_a0(th, z, nb_z, tau, prec);
         acb_theta_naive_a0(test, z, nb_z, tau, prec);
@@ -56,8 +56,11 @@ int main(void)
             || !acb_is_finite(&th[0]))
         {
             flint_printf("FAIL\n");
-            flint_printf("g = %wd, prec = %wd\n", g, prec);
+            flint_printf("g = %wd, prec = %wd, nb_z = %wd, tau:\n", g, prec, nb_z);
             acb_mat_printd(tau, 10);
+            flint_printf("z:\n");
+            _acb_vec_printd(z, g * nb_z, 10);
+            flint_printf("\nvalues:\n");
             _acb_vec_printd(th, n * nb_z, 10);
             flint_printf("\n");
             _acb_vec_printd(test, n * nb_z, 10);
