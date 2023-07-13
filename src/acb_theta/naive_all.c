@@ -57,7 +57,7 @@ acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
         acb_theta_precomp_init(D, nb_z, g);
         acb_theta_naive_ellipsoid(E, c, new_z, a << g, all, ord, z, nb_z, tau, eps, prec);
         prec = acb_theta_naive_fullprec(E, prec);
-        acb_theta_precomp_set(D, new_z, tau, E, prec);
+        acb_theta_precomp_set(D, new_z, tau, E, prec);        
         for (k = 0; k < nb_z; k++)
         {
             acb_theta_naive_worker(&th[k * n * n + (a << g)], n, &c[k], eps, E, D, k, a << g,

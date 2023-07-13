@@ -51,6 +51,7 @@ acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr c, acb_ptr new_z,
     {
         flint_printf("acb_theta_naive_ellipsoid: Error ");
         flint_printf("(imaginary part is not positive definite)\n");
+        acb_mat_printd(tau, 5);
         fflush(stdout);
         flint_abort();
     }

@@ -35,16 +35,16 @@ int main(void)
         slong k, j;
 
         acb_mat_init(tau, g, g);
-        r = _acb_vec_init(2 * (nb_z + 1) * n * nb_steps);
+        r = _acb_vec_init(2 * nb_z * n * nb_steps);
         z = _acb_vec_init(g * nb_z);
         t = _acb_vec_init(g);
         th = _acb_vec_init(n);
         x = _acb_vec_init(g);
 
         acb_siegel_randtest_nice(tau, state, prec);
-        for (k = 0; k < g * nb_z; k++)
+        for (k = g; k < g * nb_z; k++)
         {
-            acb_urandom(&z[k], state, prec);
+            acb_urandom(&z[k], state, prec); /* z starts with 0 */
         }
 
         res = acb_theta_ql_roots_aux(r, t, z, nb_z, tau, nb_steps, prec);
@@ -66,7 +66,7 @@ int main(void)
         _acb_vec_scalar_mul_2exp_si(x, t, g, k);
         acb_theta_naive_a0(th, x, 1, tau, prec);
 
-        if (!_acb_vec_overlaps(th, r + 2 * (nb_z + 1) * n * k, n))
+        if (!_acb_vec_overlaps(th, r + 2 * nb_z * n * k, n))
         {
             flint_printf("FAIL (values at 2^k t)\n");
             flint_printf("g = %wd, nb_z = %wd, nb_steps = %wd, prec = %wd, tau:\n",
@@ -75,7 +75,7 @@ int main(void)
             flint_printf("Values:\n");
             _acb_vec_printd(th, n, 10);
             flint_printf("\n");
-            _acb_vec_printd(r + 2 * (nb_z + 1) * n * k, n, 10);
+            _acb_vec_printd(r + 2 * nb_z * n * k, n, 10);
             flint_printf("\n");
             flint_abort();
         }
@@ -85,7 +85,7 @@ int main(void)
         _acb_vec_add(x, z + j * g, t, g, prec);
         _acb_vec_scalar_mul_2exp_si(x, x, g, k);
         acb_theta_naive_a0(th, x, 1, tau, prec);
-        j = 2 * (nb_z + 1) * n * k + 2 * (j + 1) * n + n;
+        j = 2 * nb_z * n * k + 2 * j * n + n;
 
         if (!_acb_vec_overlaps(th, r + j, n))
         {
@@ -102,7 +102,7 @@ int main(void)
         }
 
         acb_mat_clear(tau);
-        _acb_vec_clear(r, 2 * (nb_z + 1) * n * nb_steps);
+        _acb_vec_clear(r, 2 * nb_z * n * nb_steps);
         _acb_vec_clear(z, g * nb_z);
         _acb_vec_clear(t, g);
         _acb_vec_clear(th, n);

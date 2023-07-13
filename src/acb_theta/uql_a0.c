@@ -46,8 +46,7 @@ static void acb_theta_uql_a0_basecase(acb_ptr th, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong g, slong prec)
 {
     acb_mat_t tau_rec;
-    acb_mat_t tau_win;
-    slong k;
+    slong k, j;
 
     if (g == 0)
     {
@@ -59,13 +58,15 @@ static void acb_theta_uql_a0_basecase(acb_ptr th, acb_srcptr z, slong nb_z,
     else
     {
         acb_mat_init(tau_rec, g, g);
-        acb_mat_window_init(tau_win, tau, 0, g, 0, g);
-        
-        acb_mat_set(tau_rec, tau_win);
-        acb_theta_ql_a0(th, z, nb_z, tau, prec);
-        
+        for (k = 0; k < g; k++)
+        {
+            for (j = 0; j < g; j++)
+            {
+                acb_set(acb_mat_entry(tau_rec, j, k), acb_mat_entry(tau, j, k));
+            }
+        }
+        acb_theta_ql_a0(th, z, nb_z, tau_rec, prec);        
         acb_mat_clear(tau_rec);
-        acb_mat_window_clear(tau_win);
     }
 }
 
@@ -135,6 +136,8 @@ acb_theta_uql_a0_rec(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
     slong k, j;
     int has_pt;
 
+    flint_printf("(uql_a0_rec) calling with d = %wd, g = %wd, nb_z = %wd\n", d, g, nb_z);
+
     if (d == g)
     {
         acb_theta_uql_a0_basecase(th, z, nb_z, tau, g, prec);
@@ -202,18 +205,23 @@ acb_theta_uql_a0_rec(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
     
     /* Recursive call and reconstruct theta values */
     acb_theta_uql_a0_rec(th_rec, z_rec, nb_z_rec, tau, cho, R2, g - 1, d, prec);
+    
+    flint_printf("th_rec:\n");
+    _acb_vec_printd(th_rec, nb_z_rec * n, 10);
+    flint_printf("\n");
 
     for (k = 0; k < nb_z; k++)
     {
         for (a = 0; a <= 1; a++)
         {
+            flint_printf("k = %wd, a = %wd, ind = %wd\n", k, a, ind_z_rec[2*k+a]);
             if (ind_z_rec[2 * k + a] == -1)
             {
                 continue;
             }
             for (j = 0; j < n; j++)
             {
-                acb_mul(&th[k * 2 * n + 2 * j + a], &fac[k],
+                acb_mul(&th[k * 2 * n + 2 * j + a], &fac[2 * k + a],
                     &th_rec[ind_z_rec[2 * k + a] * n + j], prec);
             }
         }
