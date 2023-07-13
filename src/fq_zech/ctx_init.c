@@ -183,7 +183,15 @@ fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx,
         nmod_poly_evaluate_fmpz(result, r, fq_nmod_ctx_prime(fq_nmod_ctx));
         result_ui = fmpz_get_ui(result);
         if (n_reverse_table[result_ui] != ctx->qm1)
+        {   /* clean up... */
+            fq_nmod_clear(r, fq_nmod_ctx);
+            fq_nmod_clear(gen, fq_nmod_ctx);
+            flint_free(n_reverse_table);
+            fmpz_clear(result);
+            fmpz_clear(order);
+            fq_zech_ctx_clear(ctx);
             return 0; /* failure: modulus not primitive */
+        }
         n_reverse_table[result_ui] = i;
         ctx->eval_table[i] = result_ui;
         if (r->length == 1)
