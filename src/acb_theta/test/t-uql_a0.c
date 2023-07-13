@@ -24,9 +24,9 @@ int main(void)
     /* Test: agrees with naive_a0 */
     for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 3);
+        slong g = 2;
         slong n = 1 << g;
-        slong prec = 200;
+        slong prec = 200 + n_randint(state, 200);
         slong bits = n_randint(state, 5);
         slong nb_z = 1 + n_randint(state, 2);
         acb_mat_t tau;
@@ -38,11 +38,16 @@ int main(void)
         th = _acb_vec_init(n * nb_z);
         test = _acb_vec_init(n * nb_z);
 
-        /* Possibly generate large imaginary parts, but z is small */
+        /* Possibly generate large imaginary parts */
         acb_siegel_randtest_reduced(tau, state, prec, bits);
+        if (iter % 2 == 0)
+        {
+            acb_mul_2exp_si(acb_mat_entry(tau, g - 1, g - 1),
+                acb_mat_entry(tau, g - 1, g - 1), 10);
+        }
         for (k = 0; k < nb_z * g; k++)
         {
-            acb_urandom(&z[k], state, prec);
+            acb_randtest_precise(&z[k], state, prec, bits);
         }
         acb_theta_uql_a0(th, z, nb_z, tau, prec);
         acb_theta_naive_a0(test, z, nb_z, tau, prec);

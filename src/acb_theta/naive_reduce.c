@@ -43,8 +43,8 @@ _arb_vec_union(arb_ptr res, arb_srcptr v1, arb_srcptr v2, slong len, slong prec)
 }
 
 static void
-acb_theta_naive_reduce_one(arb_ptr offset, acb_ptr new_z, acb_t c, acb_srcptr z,
-    const arb_mat_t X, const arb_mat_t Y,  const arb_mat_t Yinv,
+acb_theta_naive_reduce_one(arb_ptr offset, acb_ptr new_z, acb_t c, arb_t u,
+    acb_srcptr z, const arb_mat_t X, const arb_mat_t Y,  const arb_mat_t Yinv,
     const arb_mat_t cho, slong prec)
 {
     slong g = arb_mat_nrows(X);
@@ -62,9 +62,14 @@ acb_theta_naive_reduce_one(arb_ptr offset, acb_ptr new_z, acb_t c, acb_srcptr z,
     _acb_vec_get_real(x, z, g);
     _acb_vec_get_imag(y, z, g);
     
-    /* Get center v = Yinv y of ellipsoid, set c = - i y^T Yinv y */
+    /* Get center v = Yinv y of ellipsoid, set c = - i y^T Yinv y and u */
     arb_mat_vector_mul_col(v, Yinv, y, prec);
     arb_dot(acb_imagref(c), acb_imagref(c), 1, y, 1, v, 1, g, prec);
+    
+    arb_const_pi(u, prec);
+    arb_mul(u, u, acb_imagref(c), prec);
+    arb_neg(u, u);
+    arb_exp(u, u, prec);
     
     /* Round to nearest integer even vector a to not mess with characteristics */
     _arb_vec_scalar_mul_2exp_si(v, v, g, -1);
@@ -100,8 +105,8 @@ acb_theta_naive_reduce_one(arb_ptr offset, acb_ptr new_z, acb_t c, acb_srcptr z,
 }
 
 void
-acb_theta_naive_reduce(arb_ptr offset, acb_ptr new_z, acb_ptr c, acb_srcptr z,
-    slong nb_z, const acb_mat_t tau, const arb_mat_t cho, slong prec)
+acb_theta_naive_reduce(arb_ptr offset, acb_ptr new_z, acb_ptr c, arb_ptr u,
+    acb_srcptr z, slong nb_z, const acb_mat_t tau, const arb_mat_t cho, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     arb_mat_t X, Y, Yinv;
@@ -119,7 +124,7 @@ acb_theta_naive_reduce(arb_ptr offset, acb_ptr new_z, acb_ptr c, acb_srcptr z,
 
     for (k = 0; k < nb_z; k++)
     {
-        acb_theta_naive_reduce_one(offset_z, new_z + k * g, &c[k],
+        acb_theta_naive_reduce_one(offset_z, new_z + k * g, &c[k], &u[k],
             z + k * g, X, Y, Yinv, cho, prec);
         if (k == 0)
         {

@@ -104,7 +104,6 @@ acb_theta_eld_init_interval(acb_theta_eld_t E, const arb_mat_t Y,
 
     arb_div(ctr, &offset[d - 1], arb_mat_entry(Y, d - 1, d - 1), prec);
     arb_neg(ctr, ctr);
-
     acb_theta_eld_interval(&min, &mid, &max, ctr, rad, (a >> (g - d)) % 2, prec);
 
     acb_theta_eld_min(E) = min;

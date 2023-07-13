@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 void
-acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr c, acb_ptr new_z,
+acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr new_z, acb_ptr c, arb_ptr u,
     ulong ab, int all, slong ord, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, const arf_t eps, slong prec)
 {
@@ -24,6 +24,7 @@ acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr c, acb_ptr new_z,
     arb_mat_t cho;
     arb_ptr offset;
     int res;
+    slong k;
 
     arb_init(pi);
     arf_init(R2);
@@ -57,20 +58,15 @@ acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr c, acb_ptr new_z,
     }
     arb_mat_transpose(cho, cho);
 
-    /* Reduce all z, set offset */
-    acb_theta_naive_reduce(offset, new_z, c, z, nb_z, tau, cho, prec);
-
-    flint_printf("(naive_ellipsoid) computed offset:\n");
-    _arb_vec_printn(offset, g, 10, 0);
-    flint_printf("\n");
+    /* Reduce all z, set offset and upper bounds */
+    acb_theta_naive_reduce(offset, new_z, c, u, z, nb_z, tau, cho, prec);
+    for (k = 0; k < nb_z; k++)
+    {
+        arb_mul_arf(&u[k], &u[k], eps, prec);
+    }
     
     /* Get radius for error of at most eps and fill ellipsoid */
     acb_theta_naive_radius(R2, cho, ord, eps, eld_prec);
-    
-    flint_printf("(naive_ellipsoid) computed square radius:\n");
-    arf_printd(R2, 10);
-    flint_printf("\n");
-    
     arb_mat_scalar_mul_2exp_si(cho, cho, scl);
     acb_theta_eld_fill(E, cho, R2, offset, NULL, ab >> g, eld_prec);
 

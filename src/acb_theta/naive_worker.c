@@ -225,7 +225,7 @@ acb_theta_naive_worker_rec(acb_ptr th, acb_mat_t lin_powers,
 /* User function */
 
 void
-acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arf_t eps,
+acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arb_t u,
     const acb_theta_eld_t E, const acb_theta_precomp_t D, slong k, ulong ab,
     slong ord, slong prec, acb_theta_naive_worker_t worker_dim0)
 {
@@ -250,8 +250,8 @@ acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arf_t eps,
 
     for (j = 0; j < nb; j++)
     {
-        acb_add_error_arf(&th[j], eps);
         acb_mul(&th[j], &th[j], c, prec);
+        acb_add_error_arb(&th[j], u);
     }
 
     acb_mat_clear(lin_powers);

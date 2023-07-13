@@ -150,17 +150,17 @@ void acb_theta_naive_tail(arf_t bound, const arf_t R2, const arb_mat_t Y,
     slong ord, slong prec);
 void acb_theta_naive_radius(arf_t R2, const arb_mat_t Y, slong ord,
     const arf_t eps, slong prec);
-void acb_theta_naive_reduce(arb_ptr offset, acb_ptr new_z, acb_ptr c, acb_srcptr z,
-    slong nb_z, const acb_mat_t tau, const arb_mat_t cho, slong prec);
-void acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr c, acb_ptr new_z,
-    ulong ab, int all, slong ord, acb_srcptr z, slong nb_z,
+void acb_theta_naive_reduce(arb_ptr offset, acb_ptr new_z, acb_ptr c, arb_ptr u,
+    acb_srcptr z, slong nb_z, const acb_mat_t tau, const arb_mat_t cho, slong prec);
+void acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr new_z, acb_ptr c,
+    arb_ptr u, ulong ab, int all, slong ord, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, const arf_t eps, slong prec);
 slong acb_theta_naive_fullprec(const acb_theta_eld_t E, slong prec);
 
 typedef void (*acb_theta_naive_worker_t)(acb_ptr, const acb_t, slong*, slong,
     ulong, slong, slong, slong);
 
-void acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arf_t eps,
+void acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arb_t u,
     const acb_theta_eld_t E, const acb_theta_precomp_t D, slong k, ulong ab,
     slong ord, slong prec, acb_theta_naive_worker_t worker_dim0);
 

@@ -32,6 +32,7 @@ int main(void)
         arb_mat_t Y, cho;
         acb_ptr z, new_z, c;
         arb_ptr v, offset;
+        arb_ptr u;
         arb_t pi;
         acb_t t, x;
         slong *n, *zero;
@@ -47,6 +48,7 @@ int main(void)
         c = _acb_vec_init(nb_z);
         v = _arb_vec_init(g * nb_z);
         offset = _arb_vec_init(g);
+        u = _arb_vec_init(nb_z);
         arb_init(pi);
         acb_init(t);
         acb_init(x);
@@ -62,17 +64,18 @@ int main(void)
         arb_mat_transpose(cho, cho);
         acb_mat_get_imag(Y, tau);
 
-        /* Test: if z are real, new_z = z, c = 1 and offset = 0 */
+        /* Test: if z are real, new_z = z, c = 1, u = 1 and offset = 0 */
         for (k = 0; k < g * nb_z; k++)
         {
             arb_randtest_precise(acb_realref(&z[k]), state, prec, bits);
         }
-        acb_theta_naive_reduce(offset, new_z, c, z, nb_z, tau, cho, prec);
+        acb_theta_naive_reduce(offset, new_z, c, u, z, nb_z, tau, cho, prec);
 
         res = 1;
         for (k = 0; k < nb_z; k++)
         {
-            res = res && acb_is_one(&c[k]);            
+            res = res && acb_is_one(&c[k]);
+            res = res && arb_is_one(&u[k]);
         }
 
         if (!_arb_vec_is_zero(offset, g)
@@ -105,7 +108,7 @@ int main(void)
                 n[j] *= 2;
             }
         }
-        acb_theta_naive_reduce(offset, new_z, c, z, nb_z, tau, cho, prec);
+        acb_theta_naive_reduce(offset, new_z, c, u, z, nb_z, tau, cho, prec);
 
         for (k = 0; k < nb_z; k++)
         {
@@ -156,6 +159,7 @@ int main(void)
         _acb_vec_clear(c, nb_z);
         _arb_vec_clear(v, g * nb_z);
         _arb_vec_clear(offset, g);
+        _arb_vec_clear(u, nb_z);
         arb_clear(pi);
         acb_clear(t);
         acb_clear(x);

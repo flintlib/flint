@@ -36,6 +36,7 @@ acb_theta_naive(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong
     acb_theta_precomp_t D;
     arf_t eps;
     acb_ptr c;
+    arb_ptr u;
     acb_ptr new_z;
     int all = 0;
     slong ord = 0;
@@ -47,17 +48,18 @@ acb_theta_naive(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong
     acb_theta_precomp_init(D, nb_z, g);
     arf_init(eps);
     c = _acb_vec_init(nb_z);
+    u = _arb_vec_init(nb_z);
     new_z = _acb_vec_init(nb_z * g);
 
     arf_one(eps);
     arf_mul_2exp_si(eps, eps, -prec);
-    acb_theta_naive_ellipsoid(E, c, new_z, ab, all, ord, z, nb_z, tau, eps, prec);
+    acb_theta_naive_ellipsoid(E, new_z, c, u, ab, all, ord, z, nb_z, tau, eps, prec);
     prec = acb_theta_naive_fullprec(E, prec);
     acb_theta_precomp_set(D, new_z, tau, E, prec);
 
     for (k = 0; k < nb_z; k++)
     {
-        acb_theta_naive_worker(&th[k * nb], nb, &c[k], eps, E, D, k, ab,
+        acb_theta_naive_worker(&th[k * nb], nb, &c[k], &u[k], E, D, k, ab,
             ord, prec, worker_dim0);
     }
 
@@ -65,5 +67,6 @@ acb_theta_naive(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong
     acb_theta_precomp_clear(D);
     arf_clear(eps);
     _acb_vec_clear(c, nb_z);
+    _arb_vec_clear(u, nb_z);
     _acb_vec_clear(new_z, nb_z * g);
 }

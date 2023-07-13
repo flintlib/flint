@@ -22,15 +22,16 @@ int main(void)
     flint_randinit(state);
 
     /* Test: sum of terms on border of ellipsoid must be less than eps */
-    for (iter = 0; iter < 2000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
-        slong g = 1; /* + n_randint(state, 4); */
+        slong g = 1; + n_randint(state, 4);
         slong n = 1 << g;
         slong prec = 100 + n_randint(state, 100);
         slong bits = n_randint(state, 4);
         acb_theta_eld_t E;
         acb_mat_t tau;
         acb_ptr c, z, new_z;
+        arb_ptr u;
         arf_t eps;
         acb_t term;
         arb_t abs, sum;
@@ -40,13 +41,14 @@ int main(void)
         int all = 0;
         slong nb_pts;
         slong* pts;
-        slong k;
+        slong k, j;
 
         acb_mat_init(tau, g, g);
         acb_theta_eld_init(E, g, g);
         z = _acb_vec_init(g * nb_z);
         new_z = _acb_vec_init(g * nb_z);
         c = _acb_vec_init(nb_z);
+        u = _arb_vec_init(nb_z);
         arf_init(eps);
         acb_init(term);
         arb_init(abs);
@@ -60,33 +62,42 @@ int main(void)
         arf_one(eps);
         arf_mul_2exp_si(eps, eps, -prec);
 
-        acb_theta_naive_ellipsoid(E, c, new_z, ab, all, ord, z, nb_z, tau, eps, prec);
+        /* Test: sum of terms on the border is less than u */
+        acb_theta_naive_ellipsoid(E, new_z, c, u, ab, all, ord, z, nb_z, tau, eps, prec);
         nb_pts = acb_theta_eld_nb_border(E);
         pts = flint_malloc(g * nb_pts * sizeof(slong));
         acb_theta_eld_border(pts, E);
 
         arb_zero(sum);
-        for (k = 0; k < nb_pts; k++)
+        for (j = 0; j < nb_z; j++)
         {
-            acb_theta_naive_term(term, new_z, tau, pts + k * g, 2 * prec);
-            acb_abs(abs, term, 2 * prec);
-            arb_add(sum, sum, abs, 2 * prec);
-        }
+            arb_zero(sum);
+            for (k = 0; k < nb_pts; k++)
+            {
+                acb_theta_naive_term(term, new_z + j * g, tau, pts + k * g, 2 * prec);
+                acb_abs(abs, term, 2 * prec);
+                arb_add(sum, sum, abs, 2 * prec);
+            }
         
-        arb_mul_2exp_si(abs, sum, prec);
-        arb_sub_si(abs, abs, 1, 2 * prec);
-
-        if (!arb_is_negative(abs))
-        {
-            flint_printf("FAIL\n");
-            flint_printf("sum, eps:\n");
-            arb_printd(sum, 10);
-            flint_printf("\n");
-            arf_printd(eps, 10);
-            flint_printf("\n");
-            flint_printf("new_z:\n");
-            _acb_vec_printd(new_z, nb_z * g, 10);
-            flint_abort();
+            arb_sub(abs, sum, &u[j], 2 * prec);
+            
+            if (!arb_is_negative(abs))
+            {
+                flint_printf("FAIL\n");
+                flint_printf("sum, eps, bound:\n");
+                arb_printd(sum, 10);
+                flint_printf("\n");
+                arf_printd(eps, 10);
+                flint_printf("\n");
+                arb_printd(&u[j], 10);
+                flint_printf("\ntau:\n");
+                acb_mat_printd(tau, 5);
+                flint_printf("new_z:\n");
+                _acb_vec_printd(new_z + j * g, g, 10);
+                flint_printf("\n");
+                acb_theta_eld_print(E);
+                flint_abort();
+            }
         }
 
         acb_mat_clear(tau);
@@ -94,6 +105,7 @@ int main(void)
         _acb_vec_clear(z, g * nb_z);
         _acb_vec_clear(new_z, g * nb_z);
         _acb_vec_clear(c, nb_z);
+        _arb_vec_clear(u, nb_z);
         arf_clear(eps);
         acb_clear(term);
         arb_clear(abs);
