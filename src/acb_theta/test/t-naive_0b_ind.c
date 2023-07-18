@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("naive....");
+    flint_printf("naive_0b_ind....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -52,7 +52,7 @@ int main(void)
         {
             _acb_vec_set(th_test + k * nb, th_all + k * nb * nb, nb);
         }
-        acb_theta_naive(th, z, nb_z, tau, prec);
+        acb_theta_naive_0b(th, z, nb_z, tau, prec);
         if (!_acb_vec_overlaps(th, th_test, nb * nb_z))
         {
             flint_printf("FAIL (naive)\n");
@@ -87,17 +87,6 @@ int main(void)
             _acb_vec_printd(th_test, nb_z, 10);
             flint_printf("\nth_all:\n");
             _acb_vec_printd(th_all, nb * nb * nb_z, 10);
-            flint_abort();
-        }
-
-        for (k = 0; k < nb_z; k++)
-        {
-            acb_theta_get_a0(th_test + k * nb, th_all + k * nb * nb, g);
-        }
-        acb_theta_naive_a0(th, z, nb_z, tau, prec);
-        if (!_acb_vec_overlaps(th, th_test, nb * nb_z))
-        {            
-            flint_printf("FAIL (naive_a0)\n");
             flint_abort();
         }
 

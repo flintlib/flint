@@ -33,6 +33,7 @@ int main(void)
         acb_ptr r, z, t, th, x;
         slong res;
         slong k, j;
+        ulong a;
 
         acb_mat_init(tau, g, g);
         r = _acb_vec_init(2 * nb_z * n * nb_steps);
@@ -64,7 +65,10 @@ int main(void)
         /* Test: roots for 2^k t */
         acb_mat_scalar_mul_2exp_si(tau, tau, k);
         _acb_vec_scalar_mul_2exp_si(x, t, g, k);
-        acb_theta_naive_a0(th, x, 1, tau, prec);
+        for (a = 0; a < n; a++)
+        {
+            acb_theta_naive_ind(th + a, a << g, x, 1, tau, prec);
+        }
 
         if (!_acb_vec_overlaps(th, r + 2 * nb_z * n * k, n))
         {
@@ -84,7 +88,10 @@ int main(void)
         _acb_vec_scalar_mul_2exp_si(t, t, g, 1);
         _acb_vec_add(x, z + j * g, t, g, prec);
         _acb_vec_scalar_mul_2exp_si(x, x, g, k);
-        acb_theta_naive_a0(th, x, 1, tau, prec);
+        for (a = 0; a < n; a++)
+        {
+            acb_theta_naive_ind(th + a, a << g, x, 1, tau, prec);
+        }
         j = 2 * nb_z * n * k + 2 * j * n + n;
 
         if (!_acb_vec_overlaps(th, r + j, n))

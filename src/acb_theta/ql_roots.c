@@ -36,7 +36,8 @@ acb_theta_ql_roots(acb_ptr r, acb_srcptr z, slong nb_z, const acb_mat_t tau,
     acb_mat_t w;
     acb_ptr x;
     slong hprec;
-    slong k, j;
+    slong k, j, l;
+    ulong a;
     int fail;
 
     acb_mat_init(w, g, g);
@@ -51,7 +52,14 @@ acb_theta_ql_roots(acb_ptr r, acb_srcptr z, slong nb_z, const acb_mat_t tau,
         fail = 1;
         for (j = 0; j < gap; j++)
         {
-            acb_theta_naive_a0(r + k * n * nb_z, x, nb_z, w, hprec);
+            for (a = 0; a < n; a++)
+            {
+                for (l = 0; l < nb_z; l++)
+                {
+                    acb_theta_naive_ind(r + k * n * nb_z + l * n + a,
+                        a << g, x + l * g, 1, w, hprec);
+                }
+            }
             if (!_acb_vec_entry_contains_zero(r + k * n * nb_z, n * nb_z))
             {
                 fail = 0;

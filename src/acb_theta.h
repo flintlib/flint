@@ -167,15 +167,12 @@ void acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arb_t u,
 ulong acb_theta_char_a(slong* coords, slong g);
 slong acb_theta_char_dot(ulong a, ulong b, slong g);
 slong acb_theta_char_dot_slong(ulong a, slong* n, slong g);
-void acb_theta_get_a0(acb_ptr r, acb_srcptr th, slong g);
 
-void acb_theta_naive(acb_ptr th, acb_srcptr z, slong nb_z,
+void acb_theta_naive_0b(acb_ptr th, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec);
 void acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec);
 void acb_theta_naive_ind(acb_ptr th, ulong ab, acb_srcptr z, slong nb_z,
-    const acb_mat_t tau, slong prec);
-void acb_theta_naive_a0(acb_ptr th, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec);
 
 /* Transformation formulas for theta functions */

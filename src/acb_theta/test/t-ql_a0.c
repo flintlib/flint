@@ -21,7 +21,7 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: agrees with naive_a0 */
+    /* Test: agrees with naive_ind */
     for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 2);
@@ -31,6 +31,7 @@ int main(void)
         acb_mat_t tau, entry;
         acb_ptr z, th, test;
         slong k;
+        ulong a;
         
         acb_mat_init(tau, g, g);
         acb_mat_init(entry, 1, 1);
@@ -49,7 +50,14 @@ int main(void)
             _acb_vec_zero(z, g);
         }
         acb_theta_ql_a0(th, z, nb_z, tau, prec);
-        acb_theta_naive_a0(test, z, nb_z, tau, prec);
+        for (a = 0; a < n; a++)
+        {
+            for (k = 0; k < nb_z; k++)
+            {
+                acb_theta_naive_ind(test + k * n + a, a << g,
+                    z + k * g, 1, tau, prec);
+            }
+        }
 
         if (!_acb_vec_overlaps(th, test, n * nb_z)
             || !acb_is_finite(&th[0]))
@@ -78,7 +86,14 @@ int main(void)
             _acb_vec_zero(z, g);
         }
         acb_theta_ql_a0(th, z, nb_z, tau, prec);
-        acb_theta_naive_a0(test, z, nb_z, tau, prec);
+        for (a = 0; a < n; a++)
+        {
+            for (k = 0; k < nb_z; k++)
+            {
+                acb_theta_naive_ind(test + k * n + a, a << g,
+                    z + k * g, 1, tau, prec);
+            }
+        }
         
         if (!_acb_vec_overlaps(th, test, n * nb_z)
             || acb_contains_zero(&test[n-1])

@@ -56,9 +56,9 @@ int main(void)
         }
         _acb_vec_scalar_mul_2exp_si(z, z, g, rad_exp);
 
-        acb_theta_naive(th, z, 2, tau, prec);
+        acb_theta_naive_0b(th, z, 2, tau, prec);
         acb_mat_scalar_mul_2exp_si(tau, tau, 1);
-        acb_theta_naive(th_dupl, z, 2, tau, prec);
+        acb_theta_naive_0b(th_dupl, z, 2, tau, prec);
         _acb_vec_sqr(th_dupl, th_dupl, 2 * n, prec);
 
         acb_theta_agm_mul(test, th, th + n, g, prec);

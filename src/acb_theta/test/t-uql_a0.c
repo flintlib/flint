@@ -21,7 +21,7 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: agrees with naive_a0 */
+    /* Test: agrees with naive_ind */
     for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
         slong g = 2;
@@ -32,7 +32,8 @@ int main(void)
         acb_mat_t tau;
         acb_ptr z, th, test;
         slong k;
-
+        ulong a;
+        
         acb_mat_init(tau, g, g);
         z = _acb_vec_init(g * nb_z);
         th = _acb_vec_init(n * nb_z);
@@ -50,7 +51,13 @@ int main(void)
             acb_urandom(&z[k], state, prec);
         }
         acb_theta_uql_a0(th, z, nb_z, tau, prec);
-        acb_theta_naive_a0(test, z, nb_z, tau, prec);
+        for (a = 0; a < n; a++)
+        {
+            for (k = 0; k < nb_z; k++)
+            {
+                acb_theta_naive_ind(test + k * n + a, a << g, z + k * g, 1, tau, prec);
+            }
+        }
 
         if (!_acb_vec_overlaps(th, test, n * nb_z)
             || !acb_is_finite(&th[0]))

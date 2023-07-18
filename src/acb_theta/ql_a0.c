@@ -22,6 +22,7 @@ agm_direct(acb_ptr th, acb_srcptr roots, acb_srcptr z, slong nb_z,
     acb_ptr x;
     acb_ptr cur;
     slong k, j;
+    ulong a;
 
     acb_mat_init(w, g, g);
     x = _acb_vec_init(nb_z * g);
@@ -29,7 +30,14 @@ agm_direct(acb_ptr th, acb_srcptr roots, acb_srcptr z, slong nb_z,
 
     acb_mat_scalar_mul_2exp_si(w, tau, nb_steps);
     _acb_vec_scalar_mul_2exp_si(x, z, nb_z * g, nb_steps);
-    acb_theta_naive_a0(cur, x, nb_z, w, prec);
+
+    for (a = 0; a < n; a++)
+    {
+        for (j = 0; j < nb_z; j++)
+        {
+            acb_theta_naive_ind(cur + n * j + a, a << g,  x + j * g, 1, w, prec);
+        }
+    }
 
     for (k = nb_steps - 1; k >= 0; k--)
     {
@@ -88,7 +96,14 @@ agm_aux(acb_ptr th, acb_srcptr roots, acb_srcptr t, acb_srcptr z, slong nb_z,
         _acb_vec_add(x + (3 * k + 2) * g, x + 2 * g, z + k * g, g, prec);
     }
     _acb_vec_scalar_mul_2exp_si(x, x, 3 * nb_z * g, nb_steps);
-    acb_theta_naive_a0(cur, x, 3 * nb_z, w, prec);
+
+    for (a = 0; a < n; a++)
+    {
+        for (j = 0; j < 3 * nb_z; j++)
+        {
+            acb_theta_naive_ind(cur + j * n + a, a << g, x + j * g, 1, w, prec);
+        }
+    }
 
     for (k = nb_steps - 1; k >= 0; k--)
     {

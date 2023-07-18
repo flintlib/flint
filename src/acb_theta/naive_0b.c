@@ -29,7 +29,7 @@ worker_dim0(acb_ptr th, const acb_t term, slong* coords, slong g, ulong ab,
 }
 
 void
-acb_theta_naive(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
+acb_theta_naive_0b(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     acb_theta_eld_t E;
