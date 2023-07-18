@@ -28,15 +28,16 @@ int main(void)
         slong n = 1 << g;
         slong prec = 200 + n_randint(state, 200);
         slong bits = n_randint(state, 5);
+        slong nb_z = 1 + n_randint(state, 2);
         acb_mat_t tau;
         acb_ptr z, th, test;
         slong k;
         ulong a;
         
         acb_mat_init(tau, g, g);
-        z = _acb_vec_init(g);
-        th = _acb_vec_init(n);
-        test = _acb_vec_init(n);
+        z = _acb_vec_init(g * nb_z);
+        th = _acb_vec_init(n * nb_z);
+        test = _acb_vec_init(n * nb_z);
 
         /* Possibly generate large imaginary parts for tau and z */
         acb_siegel_randtest_reduced(tau, state, prec, bits);
@@ -45,36 +46,39 @@ int main(void)
             acb_mul_2exp_si(acb_mat_entry(tau, g - 1, g - 1),
                 acb_mat_entry(tau, g - 1, g - 1), 10);
         }
-        for (k = 0; k < g; k++)
+        for (k = 0; k < nb_z * g; k++)
         {
             acb_urandom(&z[k], state, prec);
         }
-        acb_theta_uql_a0(th, z, tau, prec);
+        acb_theta_uql_a0(th, z, nb_z, tau, prec);
         for (a = 0; a < n; a++)
         {
-            acb_theta_naive_ind(&test[a], a << g, z, 1, tau, prec);
+            for (k = 0; k < nb_z; k++)
+            {
+                acb_theta_naive_ind(test + k * n + a, a << g, z + k * g, 1, tau, prec);
+            }
         }
 
-        if (!_acb_vec_overlaps(th, test, n)
+        if (!_acb_vec_overlaps(th, test, n * nb_z)
             || !acb_is_finite(&th[0]))
         {
             flint_printf("FAIL\n");
-            flint_printf("g = %wd, prec = %wd, tau:\n", g, prec);
+            flint_printf("g = %wd, prec = %wd, nb_z = %wd, tau:\n", g, prec, nb_z);
             acb_mat_printd(tau, 10);
             flint_printf("z:\n");
-            _acb_vec_printd(z, g, 10);
+            _acb_vec_printd(z, g * nb_z, 10);
             flint_printf("\nvalues:\n");
-            _acb_vec_printd(th, n, 10);
+            _acb_vec_printd(th, n * nb_z, 10);
             flint_printf("\n");
-            _acb_vec_printd(test, n, 10);
+            _acb_vec_printd(test, n * nb_z, 10);
             flint_printf("\n");
             flint_abort();
         }
         
         acb_mat_clear(tau);
-        _acb_vec_clear(z, g);
-        _acb_vec_clear(th, n);
-        _acb_vec_clear(test, n);
+        _acb_vec_clear(z, g * nb_z);
+        _acb_vec_clear(th, n * nb_z);
+        _acb_vec_clear(test, n * nb_z);
     }
     
     flint_randclear(state);
