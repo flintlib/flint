@@ -192,20 +192,67 @@ slong acb_theta_k2(const fmpz_mat_t mat);
 
 /* Quasi-linear algorithms on the reduced domain */
 
+/* Do it for one z. There is a number of steps (either direct or aux), we
+   arrive at a cut; we need all theta_{a,0}(z) to relative precision
+   N. (Precision depends on z and a.) Make an ellipsoid; this gives a bunch of
+   new z's, for each a_2, and the relative precision needed is the same or
+   smaller. (We will make a sum.) The list of new z's, for various a_2's, do
+   not overlap in general. There might be more than 2. (Like a sphere packing
+   shape.) We cannot really say which vectors will need less precision, unless
+   we compute distances again. (Distance is a recursive function.) Anyway, we
+   can call theta_ql recursively and sum/multiply the values we obtain. (BTW
+   distance computations are a good argument for storing things in a ql_t
+   structure)
+ */
+
+#define ACB_THETA_QL_CUT 16
+
+slong acb_theta_ql_cuts(slong* cuts, const arb_mat_t cho, slong prec);
+slong acb_theta_ql_new_nb_steps(const arb_mat_t cho, slong d, slong prec);
+
+struct acb_theta_ql_tree_struct
+{
+    slong g;
+    slong d;
+    acb_ptr z;
+    slong nb_steps;
+    struct acb_theta_eld_struct* eld;
+    slong* nb_children;
+    slong* index_children;
+    slong total_children;
+    struct acb_theta_ql_tree_struct* children;
+};
+
+typedef struct acb_theta_ql_tree_struct acb_theta_ql_tree_t[1];
+
+#define acb_theta_ql_tree_ambient_dim(T) ((T)->g)
+#define acb_theta_ql_tree_dim(T) ((T)->d)
+#define acb_theta_ql_tree_z(T) ((T)->z)
+#define acb_theta_ql_tree_eld(T, a) (&(T)->eld[a])
+#define acb_theta_ql_tree_nb_steps(T) ((T)->nb_steps)
+#define acb_theta_ql_tree_nb_children(T, a) ((T)->nb_children[a])
+#define acb_theta_ql_tree_index_children(T, a) ((T)->index_children[a])
+#define acb_theta_ql_tree_total_children(T) ((T)->total_children)
+#define acb_theta_ql_tree_child(T, k) (&(T)->children[(k)])
+
+void acb_theta_ql_tree_init(acb_theta_ql_tree_t T, acb_srcptr z,
+    const acb_mat_t tau, slong prec);
+void acb_theta_ql_tree_clear(acb_theta_ql_tree_t T);
+
+/* Old QL functions */
+
 #define ACB_THETA_UQL_TRY 100
 
 slong acb_theta_ql_max_gap(slong g);
 slong acb_theta_ql_nb_steps(const acb_mat_t tau, slong prec);
-
 slong acb_theta_ql_roots(acb_ptr r, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong nb_steps, slong prec);
-slong acb_theta_ql_roots_aux(acb_ptr r, acb_ptr t, acb_srcptr z, slong nb_z,
+slong acb_theta_ql_roots_aux(acb_ptr r, acb_ptr w, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong nb_steps, slong prec);
 void acb_theta_ql_a0(acb_ptr th, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec);
 void acb_theta_uql_a0(acb_ptr th, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec);
-
 
 /* User functions */
 
