@@ -20,6 +20,7 @@ acb_theta_char_dot_acb(acb_t x, ulong a, acb_srcptr z, slong g, slong prec)
     
     acb_theta_char_get_slong(v, a, g);
     acb_dot_si(x, NULL, 0, z, 1, v, 1, g, prec);
+    acb_mul_2exp_si(x, x, -1);
     
     flint_free(v);
 }

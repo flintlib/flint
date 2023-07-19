@@ -87,7 +87,7 @@ int main(void)
         }
 
         /* Test: if im(z) = - Y . (even integral vector n) + small error,
-           then terms for 2 * n and 0 correspond and offset is small */
+           then terms for n and 0 correspond and offset is small */
         for (j = 0; j < g; j++)
         {
             zero[j] = 0;
@@ -105,7 +105,6 @@ int main(void)
                 arb_urandom(acb_imagref(&z[j]), state, prec);
                 arb_mul_2exp_si(acb_imagref(&z[j]), acb_imagref(&z[j]), err_exp);
                 arb_sub(acb_imagref(&z[j]), acb_imagref(&z[j]), &v[j], prec);
-                n[j] *= 2;
             }
         }
         acb_theta_naive_reduce(offset, new_z, c, u, z, nb_z, tau, cho, prec);

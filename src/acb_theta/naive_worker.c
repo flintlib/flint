@@ -77,7 +77,7 @@ acb_theta_naive_worker_dim1(acb_ptr th, const acb_theta_eld_t E,
 
     acb_set(aff, start);
     acb_inv(diff, diff, prec);
-    for (k = mid - 2; k >= min; k--)
+    for (k = mid - 1; k >= min; k--)
     {
         coords[0] = k;
         newprec = acb_theta_naive_newprec(prec, k, mid - k, mid - min, ord);

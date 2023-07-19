@@ -55,6 +55,11 @@ int main(void)
             || !acb_overlaps(x3, x4))
         {
             flint_printf("FAIL\n");
+            flint_printf("x1 = %wd, x2 = %wd, x3, x4:\n", x1, x2);
+            acb_printd(x3, 10);
+            flint_printf("\n");
+            acb_printd(x4, 10);
+            flint_printf("\n");
             flint_abort();
         }
 

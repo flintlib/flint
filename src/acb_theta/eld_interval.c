@@ -15,7 +15,7 @@ void
 acb_theta_eld_interval(slong* min, slong* mid, slong* max, const arb_t ctr,
     const arf_t rad, slong prec)
 {
-    arb_t x, y;
+    arb_t y;
     arf_t b;
 
     if (!arb_is_finite(ctr) || !arf_is_finite(rad))
@@ -29,23 +29,21 @@ acb_theta_eld_interval(slong* min, slong* mid, slong* max, const arb_t ctr,
         flint_abort();
     }
 
-    arb_init(x);
     arb_init(y);
     arf_init(b);
 
-    *mid = arf_get_si(arb_midref(x), ARF_RND_NEAR);
+    *mid = arf_get_si(arb_midref(ctr), ARF_RND_NEAR);
 
     arb_set_arf(y, rad);
-    arb_add(y, x, y, prec);
+    arb_add(y, ctr, y, prec);
     arb_get_ubound_arf(b, y, prec);
     *max = arf_get_si(b, ARF_RND_FLOOR);
 
     arb_set_arf(y, rad);
-    arb_sub(y, x, y, prec);
+    arb_sub(y, ctr, y, prec);
     arb_get_lbound_arf(b, y, prec);
     *min = arf_get_si(b, ARF_RND_CEIL);
 
-    arb_clear(x);
     arb_clear(y);
     arf_clear(b);
 }

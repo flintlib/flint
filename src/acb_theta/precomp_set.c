@@ -80,7 +80,7 @@ acb_theta_precomp_set(acb_theta_precomp_t D, acb_srcptr z,
     {
         for (j = 0; j < g; j++)
         {
-            acb_mul_2exp_si(acb_theta_precomp_exp_z(D, k, j), &z[k * g + 1], 1);
+            acb_mul_2exp_si(acb_theta_precomp_exp_z(D, k, j), &z[k * g + j], 1);
             acb_exp_pi_i(acb_theta_precomp_exp_z(D, k, j),
                 acb_theta_precomp_exp_z(D, k, j), prec);
         }

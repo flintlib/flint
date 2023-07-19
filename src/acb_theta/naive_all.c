@@ -12,8 +12,7 @@
 #include "acb_theta.h"
 
 void
-acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
-                    slong prec)
+acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
@@ -38,7 +37,7 @@ acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
     }
 
     acb_theta_naive_0b(th, all_z, n * nb_z, tau, prec);
-
+    
     for (a = 0; a < n; a++)
     {
         /* Factors depending on z, not on b */
@@ -52,7 +51,7 @@ acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
                 th + k * n * n + a * n, n, c, prec);
         }
         /* Factors depending on b, not on z */
-        for (b = 0; b < n; k++)
+        for (b = 0; b < n; b++)
         {
             d = acb_theta_char_dot(a, b, g);
             for (k = 0; k < nb_z; k++)
