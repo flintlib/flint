@@ -34,7 +34,7 @@ acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
         {
             _acb_vec_add(all_z + k * g * n + a * g, z + k * g, v, g, prec);
         }
-        acb_char_dot_acb(&ata[a], a, v, g, prec);
+        acb_theta_char_dot_acb(&ata[a], a, v, g, prec);
     }
 
     acb_theta_naive_0b(th, all_z, n * nb_z, tau, prec);
@@ -48,7 +48,7 @@ acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau,
             acb_mul_2exp_si(c, c, 1);
             acb_add(c, c, &ata[a], prec);
             acb_exp_pi_i(c, c, prec);
-            _acb_vec_scalar_mul_acb(th + k * n * n + a * n,
+            _acb_vec_scalar_mul(th + k * n * n + a * n,
                 th + k * n * n + a * n, n, c, prec);
         }
         /* Factors depending on b, not on z */

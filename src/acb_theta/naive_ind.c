@@ -16,16 +16,18 @@ acb_theta_naive_ind(acb_ptr th, ulong ab, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
+    ulong a = ab >> g;
+    ulong b = ab;
     acb_ptr new_z;
     acb_ptr v, w;
-    arb_t c, x;
+    acb_t c, x;
     slong k;
 
     new_z = _acb_vec_init(nb_z * g);
     v = _acb_vec_init(g);
     w = _acb_vec_init(g);
-    arb_init(c);
-    arb_init(x);
+    acb_init(c);
+    acb_init(x);
 
     acb_theta_char_get_acb(v, a, g);
     acb_mat_vector_mul_col(v, tau, v, prec); /* tau.a/2 */
@@ -33,7 +35,7 @@ acb_theta_naive_ind(acb_ptr th, ulong ab, acb_srcptr z, slong nb_z,
     _acb_vec_add(w, v, w, g, prec);
     for (k = 0; k < nb_z; k++)
     {
-        _acb_vec_add(new_z + k * g, z + k * g, w, prec);
+        _acb_vec_add(new_z + k * g, z + k * g, w, g, prec);
     }
 
     acb_theta_naive_00(th, new_z, nb_z, tau, prec);
@@ -53,6 +55,6 @@ acb_theta_naive_ind(acb_ptr th, ulong ab, acb_srcptr z, slong nb_z,
     _acb_vec_clear(new_z, nb_z * g);
     _acb_vec_clear(v, g);
     _acb_vec_clear(w, g);
-    arb_clear(c);
-    arb_clear(x);    
+    acb_clear(c);
+    acb_clear(x);    
 }

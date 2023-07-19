@@ -86,8 +86,8 @@ acb_theta_ql_tree_init_rec(acb_theta_ql_tree_t T, slong* cuts, slong nb_cuts,
     for (a = 0; a < n; a++)
     {
         acb_theta_eld_init(acb_theta_ql_tree_eld(T, a), g - d, g - d);
-        acb_theta_eld_fill(acb_theta_ql_tree_eld(T, a), Y, R2, offset, NULL, a,
-            ACB_THETA_ELD_DEFAULT_PREC);
+        acb_theta_eld_fill(acb_theta_ql_tree_eld(T, a), Y, R2, offset,
+            ACB_THETA_ELD_DEFAULT_PREC); /* This is wrong; need a? */
         acb_theta_ql_tree_nb_children(T, a) = acb_theta_eld_nb_pts(acb_theta_ql_tree_eld(T, a));
     }
 

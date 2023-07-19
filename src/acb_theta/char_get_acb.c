@@ -21,5 +21,5 @@ acb_theta_char_get_acb(acb_ptr v, ulong a, slong g)
         acb_set_si(&v[k], a & 1);
         a = a >> 1;
     }
-    _acb_vec_scalar_mul_2exp_si(v, v, -1);
+    _acb_vec_scalar_mul_2exp_si(v, v, g, -1);
 }

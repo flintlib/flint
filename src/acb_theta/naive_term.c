@@ -42,7 +42,7 @@ acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau,
     arb_mat_bilinear_form(acb_imagref(res), Y, v, v, prec);
     arb_dot(acb_realref(dot), NULL, 0, v, 1, x, 1, g, prec);
     arb_dot(acb_imagref(dot), NULL, 0, v, 1, y, 1, g, prec);
-    arb_mul_2exp_si(dot, dot, 1);
+    acb_mul_2exp_si(dot, dot, 1);
     acb_add(res, res, dot, prec);
     acb_exp_pi_i(res, res, prec);
 

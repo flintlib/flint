@@ -64,7 +64,7 @@ int main(void)
         /* Test: ellipsoid must have points; distance is indeed the minimum
            distance */
         arb_mat_scalar_mul_2exp_si(cho, cho, -1);
-        acb_theta_eld_fill(E, cho, R2, offset, NULL, 0, lowprec);
+        acb_theta_eld_fill(E, cho, R2, offset, lowprec);
 
         if (acb_theta_eld_nb_pts(E) == 0)
         {
@@ -80,7 +80,7 @@ int main(void)
         {
             for (j = 0; j < g; j++)
             {
-                arb_set_si(&y[j], &pts[k * g + j]);
+                arb_set_si(&y[j], pts[k * g + j]);
             }
             arb_mat_vector_mul_col(y, cho, y, prec);
             _arb_vec_add(y, y, offset, g, prec);

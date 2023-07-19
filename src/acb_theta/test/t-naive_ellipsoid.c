@@ -25,7 +25,6 @@ int main(void)
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         slong g = 1; + n_randint(state, 4);
-        slong n = 1 << g;
         slong prec = 100 + n_randint(state, 100);
         slong bits = n_randint(state, 4);
         acb_theta_eld_t E;
@@ -36,9 +35,7 @@ int main(void)
         acb_t term;
         arb_t abs, sum;
         slong nb_z = 1 + n_randint(state, 4);
-        ulong ab = n_randint(state, n) << g;
         slong ord = 0;
-        int all = 0;
         slong nb_pts;
         slong* pts;
         slong k, j;
@@ -63,7 +60,7 @@ int main(void)
         arf_mul_2exp_si(eps, eps, -prec);
 
         /* Test: sum of terms on the border is less than u */
-        acb_theta_naive_ellipsoid(E, new_z, c, u, ab, all, ord, z, nb_z, tau, eps, prec);
+        acb_theta_naive_ellipsoid(E, new_z, c, u, ord, z, nb_z, tau, eps, prec);
         nb_pts = acb_theta_eld_nb_border(E);
         pts = flint_malloc(g * nb_pts * sizeof(slong));
         acb_theta_eld_border(pts, E);

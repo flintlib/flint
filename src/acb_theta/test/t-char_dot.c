@@ -32,14 +32,13 @@ int main(void)
         fmpz_t m;
         slong x1, x2;
         acb_t x3, x4;
-        slong k;
         int res;
 
         n = flint_malloc(g * sizeof(slong));
         v = _acb_vec_init(g);
         w = _acb_vec_init(g);
-        a = n_randint(1 << g);
-        b = n_randint(1 << g);
+        a = n_randint(state, 1 << g);
+        b = n_randint(state, 1 << g);
         acb_init(x3);
         acb_init(x4);
         fmpz_init(m);
@@ -60,7 +59,7 @@ int main(void)
         }
 
         acb_mul_2exp_si(x3, x3, 2);
-        res = arb_get_unique_fmpz(m, x3);
+        res = acb_get_unique_fmpz(m, x3);
         fmpz_sub_si(m, m, x1);
         if (!res || !fmpz_divisible_si(m, 4))
         {
@@ -69,8 +68,8 @@ int main(void)
         }            
         
         flint_free(n);
-        _acb_vec_clear(v);
-        _acb_vec_clear(w);
+        _acb_vec_clear(v, g);
+        _acb_vec_clear(w, g);
         acb_clear(x3);
         acb_clear(x4);
         fmpz_clear(m);

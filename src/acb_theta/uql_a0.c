@@ -99,7 +99,7 @@ acb_theta_uql_a0_has_pt(slong *pt, acb_srcptr z, const arb_mat_t Yinv,
     arb_get_ubound_arf(rad, x, prec);
 
     /* Get points */
-    acb_theta_eld_interval(&min, &mid, &max, c, rad, a, prec);
+    acb_theta_eld_interval(&min, &mid, &max, c, rad, prec); /* This is wrong; must involve a */
     if (min < max)
     {
         /* This should not happen. */

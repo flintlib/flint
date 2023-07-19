@@ -23,7 +23,6 @@ int main(void)
 
     for (iter = 0; iter < 2000 * flint_test_multiplier(); iter++)
     {
-        int a = n_randint(state, 2);
         slong prec = ACB_THETA_ELD_DEFAULT_PREC;
         slong mag_bits = n_randint(state, 5);
         int guaranteed_pt = iter % 2;
@@ -45,24 +44,26 @@ int main(void)
 
         if (guaranteed_pt)
         {
-            arf_set_si(arb_midref(ctr), a);
+            arf_set_si(arb_midref(ctr), n_randint(state, 10));
             arf_abs(rad, rad);
         }
 
-        acb_theta_eld_interval(&min, &mid, &max, ctr, rad, a, prec);
-        arb_set_si(tmax, max + 3);
+        acb_theta_eld_interval(&min, &mid, &max, ctr, rad, prec);
+        arb_set_si(tmax, max + 1);
         arb_sub_arf(tmax, tmax, rad, prec);
-        arb_set_si(tmin, min - 3);
+        arb_set_si(tmin, min - 1);
         arb_add_arf(tmin, tmin, rad, prec);
 
-        fail = ((min > max) && guaranteed_pt)
-            || ((min <= max) &&
-                (FLINT_ABS(min) % 2 != a
-                 || FLINT_ABS(mid) % 2 != a
-                 || FLINT_ABS(max) % 2 != a
-                 || mid < min
-                 || mid > max || !arb_gt(tmax, ctr) || !arb_lt(tmin, ctr)));
-
+        if (min > max)
+        {
+            fail = guaranteed_pt;
+        }
+        else
+        {
+            fail = mid < min || mid > max
+                || !arb_gt(tmax, ctr) || !arb_lt(tmin, ctr);
+        }
+        
         if (fail)
         {
             flint_printf("FAIL\n");
@@ -71,9 +72,7 @@ int main(void)
             flint_printf("\n");
             arf_printd(rad, 10);
             flint_printf("\n");
-            flint_printf("a = %i, min = %wd, mid = %wd, max = %wd\n", a, min,
-                         mid, max);
-            fflush(stdout);
+            flint_printf("min = %wd, mid = %wd, max = %wd\n", min, mid, max);
             flint_abort();
         }
 

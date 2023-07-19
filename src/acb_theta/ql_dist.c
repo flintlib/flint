@@ -68,11 +68,7 @@ acb_theta_ql_dist_rec(arb_t x, arb_srcptr offset, const arb_mat_t cho, slong d, 
 
     acb_theta_ql_dist_fixed_coord(y, offset, mid, cho, d, prec);
     arb_get_ubound_arf(rad, y, prec);
-
-    /* eld_interval uses even integers only */
-    arb_mul_2exp_si(c, c, 1);
-    arf_mul_2exp_si(rad, rad, 1);
-    acb_theta_eld_interval(&min, &mid, &max, c, rad, 0, prec);
+    acb_theta_eld_interval(&min, &mid, &max, c, rad, prec);
 
     arb_set(x, y);
     for (k = min/2; k <= max/2; k++)

@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 static void
-worker_dim0(acb_ptr th, const acb_t term, slong* coords, slong g, ulong ab,
+worker_dim0(acb_ptr th, const acb_t term, slong* coords, slong g,
     slong ord, slong prec, slong fullprec)
 {
     acb_t x;
@@ -57,7 +57,7 @@ acb_theta_naive_0b(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, sl
 
     for (k = 0; k < nb_z; k++)
     {
-        acb_theta_naive_worker(&th[k * nb], nb, &c[k], &u[k], E, D, k, ab,
+        acb_theta_naive_worker(&th[k * nb], nb, &c[k], &u[k], E, D, k,
             ord, prec, worker_dim0);
     }
 
