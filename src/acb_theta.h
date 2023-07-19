@@ -207,6 +207,7 @@ slong acb_theta_k2(const fmpz_mat_t mat);
 
 #define ACB_THETA_QL_CUT 16
 
+void acb_theta_ql_dist(arb_t x, arb_srcptr offset, const arb_mat_t cho, slong prec);
 slong acb_theta_ql_cuts(slong* cuts, const arb_mat_t cho, slong prec);
 slong acb_theta_ql_new_nb_steps(const arb_mat_t cho, slong d, slong prec);
 

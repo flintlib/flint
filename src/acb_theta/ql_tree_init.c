@@ -148,7 +148,6 @@ acb_theta_ql_tree_init(acb_theta_ql_tree_t T, acb_srcptr z,
     arb_mat_transpose(cho, cho);
 
     nb_cuts = acb_theta_ql_cuts(cuts, cho, prec);
-
     acb_theta_ql_tree_init_rec(T, cuts, nb_cuts, g, z, cho, tau, prec);
     
     arb_mat_clear(cho);
