@@ -13,14 +13,12 @@
 
 void
 acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr new_z, acb_ptr c, arb_ptr u,
-    ulong ab, int all, slong ord, acb_srcptr z, slong nb_z,
-    const acb_mat_t tau, const arf_t eps, slong prec)
+    slong ord, acb_srcptr z, slong nb_z, const acb_mat_t tau, const arf_t eps, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong eld_prec = ACB_THETA_ELD_DEFAULT_PREC;
     arb_t pi;
     arf_t R2;
-    slong scl = -1;
     arb_mat_t cho;
     arb_ptr offset;
     int res;
@@ -31,12 +29,6 @@ acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr new_z, acb_ptr c, arb_ptr u
     arb_mat_init(cho, g, g);
     offset = _arb_vec_init(g);
     
-    if (all)
-    {
-        ab = 0;
-        scl = -2;
-    }
-
     acb_mat_get_imag(cho, tau);
     arb_const_pi(pi, prec);
     arb_mat_scalar_mul_arb(cho, cho, pi, prec);
@@ -67,8 +59,7 @@ acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr new_z, acb_ptr c, arb_ptr u
     
     /* Get radius for error of at most eps and fill ellipsoid */
     acb_theta_naive_radius(R2, cho, ord, eps, eld_prec);
-    arb_mat_scalar_mul_2exp_si(cho, cho, scl);
-    acb_theta_eld_fill(E, cho, R2, offset, NULL, ab >> g, eld_prec);
+    acb_theta_eld_fill(E, cho, R2, offset, eld_prec);
 
     arb_clear(pi);
     arf_clear(R2);

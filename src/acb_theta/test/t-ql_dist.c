@@ -21,7 +21,7 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: agrees with naive_ind */
+    /* Test: make ellipsoid to check it is indeed the minimal distance */
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 6);

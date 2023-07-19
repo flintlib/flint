@@ -22,10 +22,10 @@ acb_theta_char_dot_slong(ulong a, slong* n, slong g)
     {
         if (a_shift & 1)
         {
-            sgn += 8 + n[g - 1 - k] % 8;
+            sgn += 4 + n[g - 1 - k] % 4;
         }
         a_shift = a_shift >> 1;
     }
 
-    return sgn % 8;
+    return sgn % 4;
 }

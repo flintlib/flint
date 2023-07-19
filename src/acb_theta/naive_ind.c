@@ -11,57 +11,48 @@
 
 #include "acb_theta.h"
 
-static void
-worker_dim0(acb_ptr th, const acb_t term, slong* coords, slong g, ulong ab,
-    slong ord, slong prec, slong fullprec)
-{
-    acb_t x;
-
-    acb_init(x);
-    acb_mul_powi(x, term, acb_theta_char_dot_slong(ab, coords, g));
-    acb_add(th, th, x, fullprec);
-    acb_clear(x);
-}
-
 void
 acb_theta_naive_ind(acb_ptr th, ulong ab, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
-    acb_theta_eld_t E;
-    acb_theta_precomp_t D;
-    arf_t eps;
-    acb_ptr c;
-    arb_ptr u;
     acb_ptr new_z;
-    int all = 0;
-    slong ord = 0;
-    slong nb = 1;
+    acb_ptr v, w;
+    arb_t c, x;
     slong k;
 
-    acb_theta_eld_init(E, g, g);
-    acb_theta_precomp_init(D, nb_z, g);
-    arf_init(eps);
-    c = _acb_vec_init(nb_z);
-    u = _arb_vec_init(nb_z);
-    new_z = _acb_vec_init(g * nb_z);
+    new_z = _acb_vec_init(nb_z * g);
+    v = _acb_vec_init(g);
+    w = _acb_vec_init(g);
+    arb_init(c);
+    arb_init(x);
 
-    arf_one(eps);
-    arf_mul_2exp_si(eps, eps, -prec);
-    acb_theta_naive_ellipsoid(E, new_z, c, u, ab, all, ord, z, nb_z, tau, eps, prec);
-    prec = acb_theta_naive_fullprec(E, prec);
-    acb_theta_precomp_set(D, new_z, tau, E, prec);
-
+    acb_theta_char_get_acb(v, a, g);
+    acb_mat_vector_mul_col(v, tau, v, prec); /* tau.a/2 */
+    acb_theta_char_get_acb(w, b, g);
+    _acb_vec_add(w, v, w, g, prec);
     for (k = 0; k < nb_z; k++)
     {
-        acb_theta_naive_worker(&th[k], nb, &c[k], &u[k], E, D, k, ab, ord,
-            prec, worker_dim0);
+        _acb_vec_add(new_z + k * g, z + k * g, w, prec);
     }
 
-    acb_theta_eld_clear(E);
-    acb_theta_precomp_clear(D);
-    arf_clear(eps);
-    _acb_vec_clear(c, nb_z);
-    _arb_vec_clear(u, nb_z);
-    _acb_vec_clear(new_z, g * nb_z);
+    acb_theta_naive_00(th, new_z, nb_z, tau, prec);
+
+    acb_theta_char_dot_acb(c, a, v, g, prec);
+    for (k = 0; k < nb_z; k++)
+    {
+        acb_theta_char_get_acb(w, b, g);
+        _acb_vec_add(w, w, z + k * g, g, prec);
+        acb_theta_char_dot_acb(x, a, w, g, prec);
+        acb_mul_2exp_si(x, x, 1);
+        acb_add(x, x, c, prec);
+        acb_exp_pi_i(x, x, prec);
+        acb_mul(&th[k], &th[k], x, prec);
+    }
+
+    _acb_vec_clear(new_z, nb_z * g);
+    _acb_vec_clear(v, g);
+    _acb_vec_clear(w, g);
+    arb_clear(c);
+    arb_clear(x);    
 }

@@ -18,6 +18,7 @@ acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau,
     slong g = acb_mat_nrows(tau);
     arb_ptr x, y, v;
     arb_mat_t X, Y;
+    acb_t dot;
     slong k;
 
     x = _arb_vec_init(g);
@@ -25,6 +26,7 @@ acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau,
     v = _arb_vec_init(g);
     arb_mat_init(X, g, g);
     arb_mat_init(Y, g, g);
+    acb_init(dot);
 
     _acb_vec_get_real(x, z, g);
     _acb_vec_get_imag(y, z, g);
@@ -38,9 +40,10 @@ acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau,
     acb_zero(res);
     arb_mat_bilinear_form(acb_realref(res), X, v, v, prec);
     arb_mat_bilinear_form(acb_imagref(res), Y, v, v, prec);
-    acb_mul_2exp_si(res, res, -2); /* n is twice the actual lattice point */
-    arb_dot(acb_realref(res), acb_realref(res), 0, v, 1, x, 1, g, prec);
-    arb_dot(acb_imagref(res), acb_imagref(res), 0, v, 1, y, 1, g, prec);
+    arb_dot(acb_realref(dot), NULL, 0, v, 1, x, 1, g, prec);
+    arb_dot(acb_imagref(dot), NULL, 0, v, 1, y, 1, g, prec);
+    arb_mul_2exp_si(dot, dot, 1);
+    acb_add(res, res, dot, prec);
     acb_exp_pi_i(res, res, prec);
 
     _arb_vec_clear(x, g);
@@ -48,4 +51,5 @@ acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau,
     _arb_vec_clear(v, g);
     arb_mat_clear(X);
     arb_mat_clear(Y);
+    acb_clear(dot);
 }

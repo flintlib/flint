@@ -12,12 +12,12 @@
 #include "acb_theta.h"
 
 void
-acb_theta_naive_tail(arf_t bound, const arf_t R2, const arb_mat_t Y, slong ord,
+acb_theta_naive_tail(arf_t bound, const arf_t R2, const arb_mat_t cho, slong ord,
     slong prec)
 {
     arb_t res, temp;
     arb_t Rmod;
-    slong g = arb_mat_nrows(Y);
+    slong g = arb_mat_nrows(cho);
     slong k;
 
     arb_init(res);
@@ -43,7 +43,7 @@ acb_theta_naive_tail(arf_t bound, const arf_t R2, const arb_mat_t Y, slong ord,
 
     for (k = 0; k < g; k++)
     {
-        arb_inv(temp, arb_mat_entry(Y, k, k), prec);
+        arb_inv(temp, arb_mat_entry(cho, k, k), prec);
         arb_add_si(temp, temp, 1, prec);
         arb_mul(res, res, temp, prec);
     }

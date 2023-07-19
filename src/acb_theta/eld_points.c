@@ -23,7 +23,7 @@ acb_theta_eld_points(slong* pts, const acb_theta_eld_t E)
     if (d == 1)
     {
         i = 0;
-        for (k = acb_theta_eld_min(E); k <= acb_theta_eld_max(E); k += 2)
+        for (k = acb_theta_eld_min(E); k <= acb_theta_eld_max(E); k++)
         {
             pts[i] = k;
             for (j = 1; j < g; j++)

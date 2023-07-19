@@ -27,8 +27,8 @@ acb_theta_eld_print(const acb_theta_eld_t E)
     {
         flint_printf(", %wd", acb_theta_eld_coord(E, k + d));
     }
-    flint_printf("): from %wd to %wd by %wd (mid: %wd)\n",
-        acb_theta_eld_min(E), acb_theta_eld_max(E), 2, acb_theta_eld_mid(E));
+    flint_printf("): from %wd to %wd (mid: %wd)\n",
+        acb_theta_eld_min(E), acb_theta_eld_max(E), acb_theta_eld_mid(E));
     if (d > 1)
     {
         for (k = 0; k < acb_theta_eld_nr(E); k++)

@@ -11,20 +11,15 @@
 
 #include "acb_theta.h"
 
-slong
-acb_theta_char_dot(ulong a, ulong b, slong g)
+void
+acb_theta_char_get_acb(acb_ptr v, ulong a, slong g)
 {
-    int sgn = 0;
     slong k;
-    ulong and = a & b;
-
-    for (k = 0; k < g; k++)
+    
+    for (k = g - 1; k >= 0; k--)
     {
-        if (and & 1)
-        {
-            sgn++;
-        }
-        and = and >> 1;
+        acb_set_si(&v[k], a & 1);
+        a = a >> 1;
     }
-    return sgn % 4;
+    _acb_vec_scalar_mul_2exp_si(v, v, -1);
 }

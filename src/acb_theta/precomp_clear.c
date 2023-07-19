@@ -20,6 +20,8 @@ acb_theta_precomp_clear(acb_theta_precomp_t D)
     acb_mat_clear(acb_theta_precomp_exp_mat(D));
     flint_free(D->indices);
     if (nb_pow > 0)
+    {
         _acb_vec_clear(D->sqr_powers, nb_pow);
+    }
     _acb_vec_clear(D->exp_z, g * acb_theta_precomp_nb_z(D));
 }

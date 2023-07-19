@@ -11,20 +11,16 @@
 
 #include "acb_theta.h"
 
-slong
-acb_theta_char_dot(ulong a, ulong b, slong g)
+void
+acb_theta_char_dot_acb(acb_t x, ulong a, acb_srcptr z, slong g, slong prec)
 {
-    int sgn = 0;
+    slong* v;
     slong k;
-    ulong and = a & b;
 
-    for (k = 0; k < g; k++)
-    {
-        if (and & 1)
-        {
-            sgn++;
-        }
-        and = and >> 1;
-    }
-    return sgn % 4;
+    v = flint_malloc(g * sizeof(slong));
+    
+    acb_theta_char_get_slong(v, a, g);
+    acb_dot_si(x, NULL, 0, z, 1, v, 1, g, prec);
+    
+    flint_free(v);
 }

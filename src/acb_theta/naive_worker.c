@@ -60,10 +60,10 @@ acb_theta_naive_worker_dim1(acb_ptr th, const acb_theta_eld_t E,
 
     acb_pow_si(start, lin, mid, prec);
     acb_mul(start, start, cofactor, prec);
-    acb_pow_si(diff, lin, 2, prec);
+    acb_set(diff, lin);
 
     acb_set(aff, start);
-    for (k = mid; k <= max; k += 2)
+    for (k = mid; k <= max; k++)
     {
         coords[0] = k;
         newprec = acb_theta_naive_newprec(prec, k, k - mid, max - mid, ord);
@@ -72,19 +72,19 @@ acb_theta_naive_worker_dim1(acb_ptr th, const acb_theta_eld_t E,
             acb_mul(aff, aff, diff, newprec);
         }
 
-        acb_mul(term, aff, acb_theta_precomp_sqr_pow(D, 0, FLINT_ABS(k) / 2), newprec);
+        acb_mul(term, aff, acb_theta_precomp_sqr_pow(D, 0, FLINT_ABS(k)), newprec);
         worker_dim0(th, term, coords, g, ab, ord, newprec, fullprec);
     }
 
     acb_set(aff, start);
     acb_inv(diff, diff, prec);
-    for (k = mid - 2; k >= min; k -= 2)
+    for (k = mid - 2; k >= min; k--)
     {
         coords[0] = k;
         newprec = acb_theta_naive_newprec(prec, k, mid - k, mid - min, ord);
         acb_mul(aff, aff, diff, newprec);
 
-        acb_mul(term, aff, acb_theta_precomp_sqr_pow(D, 0, FLINT_ABS(k) / 2), newprec);
+        acb_mul(term, aff, acb_theta_precomp_sqr_pow(D, 0, FLINT_ABS(k)), newprec);
         worker_dim0(th, term, coords, g, ab, ord, newprec, fullprec);
     }
 
@@ -149,15 +149,12 @@ acb_theta_naive_worker_rec(acb_ptr th, acb_mat_t lin_powers,
     }
     acb_pow_si(start_cf, diff_cf, mid, prec);
     acb_mul(start_cf, start_cf, cofactor, prec);
-    acb_pow_si(diff_cf, diff_cf, 2, prec);
 
     /* Set up things to update entries (k,d) of lin_powers, k < d */
     for (k = 0; k < d - 1; k++)
     {
-        acb_pow_si(&diff_lin_powers[k],
-            acb_mat_entry(acb_theta_precomp_exp_mat(D), k, d - 1), 2, prec);
-        acb_pow_si(&start_lin_powers[k],
-            acb_mat_entry(acb_theta_precomp_exp_mat(D), k, d - 1), mid, prec);
+        acb_set(&diff_lin_powers[k], acb_mat_entry(acb_theta_precomp_exp_mat(D), k, d - 1));
+        acb_pow_si(&start_lin_powers[k], &diff_lin_powers[k], mid, prec);
     }
 
     /* Right loop */
@@ -168,7 +165,7 @@ acb_theta_naive_worker_rec(acb_ptr th, acb_mat_t lin_powers,
     }
     for (k = 0; k < nr; k++)
     {
-        c = mid + k * 2;
+        c = mid + k;
         newprec = acb_theta_naive_newprec(prec, c, c - mid, max - mid, ord);
         if (k > 0) /* Update lin_cf, lin_powers using diff */
         {
@@ -181,7 +178,7 @@ acb_theta_naive_worker_rec(acb_ptr th, acb_mat_t lin_powers,
         }
 
         acb_mul(full_cf, lin_cf,
-            acb_theta_precomp_sqr_pow(D, d - 1, FLINT_ABS(c) / 2), newprec);
+            acb_theta_precomp_sqr_pow(D, d - 1, FLINT_ABS(c)), newprec);
         acb_theta_naive_worker_rec(th, lin_powers, acb_theta_eld_rchild(E, k),
             D, exp_z, full_cf, ab, ord, newprec, fullprec, worker_dim0);
     }
@@ -199,7 +196,7 @@ acb_theta_naive_worker_rec(acb_ptr th, acb_mat_t lin_powers,
     }
     for (k = 0; k < nl; k++)
     {
-        c = mid - (k + 1) * 2;
+        c = mid - (k + 1);
         newprec = acb_theta_naive_newprec(prec, c, mid - c, mid - min, ord);
         for (j = 0; j < d - 1; j++)
         {
@@ -209,7 +206,7 @@ acb_theta_naive_worker_rec(acb_ptr th, acb_mat_t lin_powers,
         acb_mul(lin_cf, lin_cf, diff_cf, newprec);
 
         acb_mul(full_cf, lin_cf,
-            acb_theta_precomp_sqr_pow(D, d - 1, FLINT_ABS(c) / 2), newprec);
+            acb_theta_precomp_sqr_pow(D, d - 1, FLINT_ABS(c)), newprec);
         acb_theta_naive_worker_rec(th, lin_powers, acb_theta_eld_lchild(E, k),
             D, exp_z, full_cf, ab, ord, newprec, fullprec, worker_dim0);
     }

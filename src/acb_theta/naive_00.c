@@ -15,21 +15,11 @@ static void
 worker_dim0(acb_ptr th, const acb_t term, slong* coords, slong g, ulong ab,
     slong ord, slong prec, slong fullprec)
 {
-    acb_t x;
-    ulong b;
-    slong n = 1 << g;
-
-    acb_init(x);
-    for (b = 0; b < n; b++)
-    {
-        acb_mul_powi(x, term, acb_theta_char_dot_slong(b, coords, g));
-        acb_add(&th[b], &th[b], x, fullprec);
-    }
-    acb_clear(x);
+    acb_add(th, th, x, fullprec);
 }
 
 void
-acb_theta_naive_0b(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
+acb_theta_naive_00(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     acb_theta_eld_t E;
@@ -39,7 +29,7 @@ acb_theta_naive_0b(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, sl
     arb_ptr u;
     acb_ptr new_z;
     slong ord = 0;
-    slong nb = 1 << g;
+    slong nb = 1;
     slong k;
 
     acb_theta_eld_init(E, g, g);
@@ -47,7 +37,7 @@ acb_theta_naive_0b(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, sl
     arf_init(eps);
     c = _acb_vec_init(nb_z);
     u = _arb_vec_init(nb_z);
-    new_z = _acb_vec_init(nb_z * g);
+    new_z = _acb_vec_init(g * nb_z);
 
     arf_one(eps);
     arf_mul_2exp_si(eps, eps, -prec);
@@ -57,8 +47,8 @@ acb_theta_naive_0b(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, sl
 
     for (k = 0; k < nb_z; k++)
     {
-        acb_theta_naive_worker(&th[k * nb], nb, &c[k], &u[k], E, D, k, ab,
-            ord, prec, worker_dim0);
+        acb_theta_naive_worker(&th[k], nb, &c[k], &u[k], E, D, k, ab, ord,
+            prec, worker_dim0);
     }
 
     acb_theta_eld_clear(E);
@@ -66,5 +56,5 @@ acb_theta_naive_0b(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, sl
     arf_clear(eps);
     _acb_vec_clear(c, nb_z);
     _arb_vec_clear(u, nb_z);
-    _acb_vec_clear(new_z, nb_z * g);
+    _acb_vec_clear(new_z, g * nb_z);
 }

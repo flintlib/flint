@@ -19,7 +19,7 @@ acb_theta_eld_contains_rec(const acb_theta_eld_t E, slong * pt)
     slong k;
 
     if (c < acb_theta_eld_min(E)
-        || c > acb_theta_eld_max(E) || (acb_theta_eld_max(E) - c) % 2 != 0)
+        || c > acb_theta_eld_max(E))
     {
         return 0;
     }
@@ -29,12 +29,12 @@ acb_theta_eld_contains_rec(const acb_theta_eld_t E, slong * pt)
     }
     else if (c >= acb_theta_eld_mid(E))
     {
-        k = (c - acb_theta_eld_mid(E)) / 2;
+        k = c - acb_theta_eld_mid(E);
         return acb_theta_eld_contains_rec(acb_theta_eld_rchild(E, k), pt);
     }
     else
     {
-        k = (acb_theta_eld_mid(E) - 2 - c) / 2;
+        k = acb_theta_eld_mid(E) - 1 - c;
         return acb_theta_eld_contains_rec(acb_theta_eld_lchild(E, k), pt);
     }
 }

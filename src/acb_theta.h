@@ -70,6 +70,15 @@ void acb_siegel_randtest(acb_mat_t tau, flint_rand_t state, slong prec, slong ma
 void acb_siegel_randtest_reduced(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits);
 void acb_siegel_randtest_nice(acb_mat_t tau, flint_rand_t state, slong prec);
 
+/* Theta characteristics */
+
+void acb_theta_char_get_slong(slong* n, ulong a, slong g);
+void acb_theta_char_get_acb(acb_ptr v, ulong a, slong g);
+
+slong acb_theta_char_dot(ulong a, ulong b, slong g);
+slong acb_theta_char_dot_slong(ulong a, slong* n, slong g);
+void acb_theta_char_dot_acb(acb_t x, ulong a, acb_srcptr z, slong g, slong prec);
+
 /* Ellipsoids in naive algorithms */
 
 #define ACB_THETA_ELD_DEFAULT_PREC 32
@@ -109,9 +118,9 @@ void acb_theta_eld_init(acb_theta_eld_t E, slong d, slong g);
 void acb_theta_eld_clear(acb_theta_eld_t E);
 
 void acb_theta_eld_interval(slong* min, slong* mid, slong* max,
-    const arb_t ctr, const arf_t rad, int a, slong prec);
-void acb_theta_eld_fill(acb_theta_eld_t E, const arb_mat_t Y, const arf_t R2,
-    arb_srcptr offset, slong* last_coords, ulong a, slong prec);
+    const arb_t ctr, const arf_t rad, slong prec);
+void acb_theta_eld_fill(acb_theta_eld_t E, const arb_mat_t cho, const arf_t R2,
+    arb_srcptr offset, slong prec);
 void acb_theta_eld_points(slong* pts, const acb_theta_eld_t E);
 void acb_theta_eld_border(slong* pts, const acb_theta_eld_t E);
 int acb_theta_eld_contains(const acb_theta_eld_t E, slong* pt);
@@ -146,15 +155,15 @@ void acb_theta_precomp_set(acb_theta_precomp_t D, acb_srcptr z,
 
 void acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau,
     slong* n, slong prec);
-void acb_theta_naive_tail(arf_t bound, const arf_t R2, const arb_mat_t Y,
+void acb_theta_naive_tail(arf_t bound, const arf_t R2, const arb_mat_t cho,
     slong ord, slong prec);
-void acb_theta_naive_radius(arf_t R2, const arb_mat_t Y, slong ord,
+void acb_theta_naive_radius(arf_t R2, const arb_mat_t cho, slong ord,
     const arf_t eps, slong prec);
 void acb_theta_naive_reduce(arb_ptr offset, acb_ptr new_z, acb_ptr c, arb_ptr u,
     acb_srcptr z, slong nb_z, const acb_mat_t tau, const arb_mat_t cho, slong prec);
 void acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr new_z, acb_ptr c,
-    arb_ptr u, ulong ab, int all, slong ord, acb_srcptr z, slong nb_z,
-    const acb_mat_t tau, const arf_t eps, slong prec);
+    arb_ptr u, slong ord, acb_srcptr z, slong nb_z, const acb_mat_t tau,
+    const arf_t eps, slong prec);
 slong acb_theta_naive_fullprec(const acb_theta_eld_t E, slong prec);
 
 typedef void (*acb_theta_naive_worker_t)(acb_ptr, const acb_t, slong*, slong,
@@ -164,10 +173,8 @@ void acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arb_t u,
     const acb_theta_eld_t E, const acb_theta_precomp_t D, slong k, ulong ab,
     slong ord, slong prec, acb_theta_naive_worker_t worker_dim0);
 
-ulong acb_theta_char_a(slong* coords, slong g);
-slong acb_theta_char_dot(ulong a, ulong b, slong g);
-slong acb_theta_char_dot_slong(ulong a, slong* n, slong g);
-
+void acb_theta_naive_00(acb_ptr th, acb_srcptr z, slong nb_z,
+    const acb_mat_t tau, slong prec);
 void acb_theta_naive_0b(acb_ptr th, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec);
 void acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z,
