@@ -218,35 +218,6 @@ void acb_theta_ql_sqr_dist(arb_t x, arb_srcptr offset, const arb_mat_t cho, slon
 slong acb_theta_ql_cuts(slong* cuts, const arb_mat_t cho, slong prec);
 slong acb_theta_ql_new_nb_steps(const arb_mat_t cho, slong d, slong prec);
 
-struct acb_theta_ql_tree_struct
-{
-    slong g;
-    slong d;
-    acb_ptr z;
-    slong nb_steps;
-    struct acb_theta_eld_struct* eld;
-    slong* nb_children;
-    slong* index_children;
-    slong total_children;
-    struct acb_theta_ql_tree_struct* children;
-};
-
-typedef struct acb_theta_ql_tree_struct acb_theta_ql_tree_t[1];
-
-#define acb_theta_ql_tree_ambient_dim(T) ((T)->g)
-#define acb_theta_ql_tree_dim(T) ((T)->d)
-#define acb_theta_ql_tree_z(T) ((T)->z)
-#define acb_theta_ql_tree_eld(T, a) (&(T)->eld[a])
-#define acb_theta_ql_tree_nb_steps(T) ((T)->nb_steps)
-#define acb_theta_ql_tree_nb_children(T, a) ((T)->nb_children[a])
-#define acb_theta_ql_tree_index_children(T, a) ((T)->index_children[a])
-#define acb_theta_ql_tree_total_children(T) ((T)->total_children)
-#define acb_theta_ql_tree_child(T, k) (&(T)->children[(k)])
-
-void acb_theta_ql_tree_init(acb_theta_ql_tree_t T, acb_srcptr z,
-    const acb_mat_t tau, slong prec);
-void acb_theta_ql_tree_clear(acb_theta_ql_tree_t T);
-
 /* Old QL functions */
 
 #define ACB_THETA_UQL_TRY 100
