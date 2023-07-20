@@ -183,38 +183,15 @@ void acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z,
 void acb_theta_naive_ind(acb_ptr th, ulong ab, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec);
 
-/* Transformation formulas for theta functions */
+/* Quasi-linear algorithms on the reduced domain */
+
+#define ACB_THETA_QL_CUT 16
+#define ACB_THETA_QL_TRY 100
 
 void acb_theta_agm_hadamard(acb_ptr r, acb_srcptr a, slong g, slong prec);
 void acb_theta_agm_sqrt(acb_ptr r, acb_srcptr a, acb_srcptr roots, slong nb, slong prec);
 void acb_theta_agm_sqr(acb_ptr r, acb_srcptr a, slong g, slong prec);
 void acb_theta_agm_mul(acb_ptr r, acb_srcptr a1, acb_srcptr a2, slong g, slong prec);
-
-ulong acb_theta_transform_image_char(fmpz_t eps, ulong ab, const fmpz_mat_t mat);
-void acb_theta_transform_proj(acb_ptr res, acb_srcptr th, const fmpz_mat_t mat, slong prec);
-void acb_theta_transform_scal_const(acb_t scal, const acb_mat_t tau,
-    const fmpz_mat_t mat, slong k2, slong prec);
-void acb_theta_transform_scal(acb_t scal_z, acb_t scal_0, acb_srcptr z,
-    const acb_mat_t tau, const fmpz_mat_t mat, slong k2, slong prec);
-slong acb_theta_k2(const fmpz_mat_t mat);
-
-/* Quasi-linear algorithms on the reduced domain */
-
-/* Do it for one z. There is a number of steps (either direct or aux), we
-   arrive at a cut; we need all theta_{a,0}(z) to relative precision
-   N. (Precision depends on z and a.) Make an ellipsoid; this gives a bunch of
-   new z's, for each a_2, and the relative precision needed is the same or
-   smaller. (We will make a sum.) The list of new z's, for various a_2's, do
-   not overlap in general. There might be more than 2. (Like a sphere packing
-   shape.) We cannot really say which vectors will need less precision, unless
-   we compute distances again. (Distance is a recursive function.) Anyway, we
-   can call theta_ql recursively and sum/multiply the values we obtain. (BTW
-   distance computations are a good argument for storing things in a ql_t
-   structure)
- */
-
-#define ACB_THETA_QL_CUT 16
-#define ACB_THETA_QL_TRY 100
 
 void acb_theta_ql_sqr_dist(arb_t x, arb_srcptr offset, const arb_mat_t cho, slong prec);
 void acb_theta_ql_sqr_dists_a(arb_ptr dist, acb_srcptr z, const acb_mat_t tau, slong prec);
@@ -225,6 +202,17 @@ int acb_theta_ql_new_roots(acb_ptr r, acb_srcptr z, arb_srcptr dist,
     const acb_mat_t tau, slong nb_steps, slong prec);
 void acb_theta_ql_new_roots_aux(acb_ptr r, acb_ptr t, acb_srcptr z, slong nb_z,
     arb_srcptr dist, const acb_mat_t tau, slong nb_steps, slong guard, slong prec);
+void acb_theta_ql_step(acb_ptr r, acb_srcptr th, acb_srcptr th0,
+    acb_srcptr roots, arb_srcptr dist, slong g, slong prec);
+void acb_theta_ql_step_aux(acb_ptr r, acb_srcptr th, acb_srcptr th0,
+    acb_srcptr roots, arb_srcptr dist, slong g, slong prec);
+
+int acb_theta_ql_a0_direct(acb_ptr r, acb_srcptr z, slong nb_z,
+    arb_srcptr dist, const acb_mat_t tau, slong prec);
+int acb_theta_ql_a0_aux(acb_ptr r, acb_srcptr t, acb_srcptr z, slong nb_z,
+    arb_srcptr dist, const acb_mat_t tau, slong prec);
+void acb_theta_new_ql_a0(acb_ptr r, acb_srcptr z, slong nb_z, const acb_mat_t tau,
+    slong prec);
 
 /* Old QL functions */
 
@@ -239,6 +227,17 @@ void acb_theta_ql_a0(acb_ptr th, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec);
 void acb_theta_uql_a0(acb_ptr th, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec);
+
+
+/* Transformation formulas for theta functions */
+
+ulong acb_theta_transform_image_char(fmpz_t eps, ulong ab, const fmpz_mat_t mat);
+void acb_theta_transform_proj(acb_ptr res, acb_srcptr th, const fmpz_mat_t mat, slong prec);
+void acb_theta_transform_scal_const(acb_t scal, const acb_mat_t tau,
+    const fmpz_mat_t mat, slong k2, slong prec);
+void acb_theta_transform_scal(acb_t scal_z, acb_t scal_0, acb_srcptr z,
+    const acb_mat_t tau, const fmpz_mat_t mat, slong k2, slong prec);
+slong acb_theta_k2(const fmpz_mat_t mat);
 
 /* User functions */
 
