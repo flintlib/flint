@@ -35,10 +35,16 @@ acb_theta_ql_new_roots(acb_ptr r, acb_srcptr z, arb_srcptr dist,
 
         for (a = 0; a < n; a++)
         {
-            arb_mul_2exp_si(d, &dist[a], k);
-            arb_log(d, d, ACB_THETA_ELD_DEFAULT_PREC);
+            arb_const_log2(d, prec);
+            arb_div(d, &dist[a], d, prec);
+            arb_mul_2exp_si(d, d, k);
             hprec = prec + arf_get_si(arb_midref(d), ARF_RND_NEAR);
             acb_theta_naive_ind(&r[k * n + a], a << g, x, 1, w, hprec);
+
+            flint_printf("(ql_new_roots) k = %wd, a = %wd, hprec = %wd, get:\n", k, a, hprec);
+            acb_printd(&r[k * n + a], 10);
+            flint_printf("\n");
+            
             if (acb_contains_zero(&r[k * n + a]))
             {
                 res = 0;

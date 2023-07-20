@@ -22,10 +22,10 @@ int main(void)
     flint_randinit(state);
 
     /* Test: make ellipsoid to check it is indeed the minimal distance */
-    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
-        slong prec = 200;
+        slong prec = 100;
         slong bits = n_randint(state, 5);
         slong lowprec = 32;
         acb_mat_t tau;

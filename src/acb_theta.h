@@ -74,6 +74,7 @@ void acb_siegel_randtest_nice(acb_mat_t tau, flint_rand_t state, slong prec);
 
 void acb_theta_char_get_slong(slong* n, ulong a, slong g);
 void acb_theta_char_get_acb(acb_ptr v, ulong a, slong g);
+void acb_theta_char_get_arb(arb_ptr v, ulong a, slong g);
 
 slong acb_theta_char_dot(ulong a, ulong b, slong g);
 slong acb_theta_char_dot_slong(ulong a, slong* n, slong g);
@@ -215,6 +216,7 @@ slong acb_theta_k2(const fmpz_mat_t mat);
 #define ACB_THETA_QL_CUT 16
 
 void acb_theta_ql_sqr_dist(arb_t x, arb_srcptr offset, const arb_mat_t cho, slong prec);
+void acb_theta_ql_sqr_dists_a(arb_ptr dist, acb_srcptr z, const acb_mat_t tau, slong prec);
 slong acb_theta_ql_cuts(slong* cuts, const arb_mat_t cho, slong prec);
 slong acb_theta_ql_new_nb_steps(const arb_mat_t cho, slong d, slong prec);
 
