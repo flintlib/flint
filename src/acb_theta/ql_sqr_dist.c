@@ -12,10 +12,11 @@
 #include "acb_theta.h"
 
 static void
-acb_theta_ql_dist_rec(arb_t x, arb_srcptr offset, const arb_mat_t cho, slong d, slong prec);
+acb_theta_ql_sqr_dist_rec(arb_t x, arb_srcptr offset, const arb_mat_t cho,
+    slong d, slong prec);
 
 static void
-acb_theta_ql_dist_fixed_coord(arb_t x, arb_srcptr offset, slong n,
+acb_theta_ql_sqr_dist_fixed_coord(arb_t x, arb_srcptr offset, slong n,
     const arb_mat_t cho, slong d, slong prec)
 {    
     arb_ptr new_offset;
@@ -25,18 +26,15 @@ acb_theta_ql_dist_fixed_coord(arb_t x, arb_srcptr offset, slong n,
     new_offset = _arb_vec_init(d - 1);
     arb_init(c);
 
-    arb_set(c, &offset[d - 1]);
-    arb_div(c, c, arb_mat_entry(cho, d - 1, d - 1), prec);
-    arb_sub_si(c, c, n, prec);
-
     for (k = 0; k < d - 1; k++)
     {
-        arb_mul(&new_offset[k], arb_mat_entry(cho, k, d - 1), c, prec);
+        arb_mul_si(&new_offset[k], arb_mat_entry(cho, k, d - 1), n, prec);
     }
-    _arb_vec_sub(new_offset, offset, new_offset, d - 1, prec);
-    
-    acb_theta_ql_dist_rec(x, new_offset, cho, d - 1, prec);
-    arb_mul(c, c, arb_mat_entry(cho, d - 1, d - 1), prec);
+    _arb_vec_sub(new_offset, offset, new_offset, d - 1, prec);    
+    acb_theta_ql_sqr_dist_rec(x, new_offset, cho, d - 1, prec);
+
+    arb_mul_si(c, arb_mat_entry(cho, d - 1, d - 1), n, prec);
+    arb_sub(c, &offset[d - 1], c, prec);
     arb_sqr(c, c, prec);
     arb_add(x, x, c, prec);
     
@@ -45,7 +43,8 @@ acb_theta_ql_dist_fixed_coord(arb_t x, arb_srcptr offset, slong n,
 }
 
 static void
-acb_theta_ql_dist_rec(arb_t x, arb_srcptr offset, const arb_mat_t cho, slong d, slong prec)
+acb_theta_ql_sqr_dist_rec(arb_t x, arb_srcptr offset, const arb_mat_t cho,
+    slong d, slong prec)
 {
     arb_t c, y;
     arf_t rad;
@@ -66,14 +65,30 @@ acb_theta_ql_dist_rec(arb_t x, arb_srcptr offset, const arb_mat_t cho, slong d, 
     arb_div(c, c, arb_mat_entry(cho, d - 1, d - 1), prec);
     mid = arf_get_si(arb_midref(c), ARF_RND_NEAR);
 
-    acb_theta_ql_dist_fixed_coord(y, offset, mid, cho, d, prec);
+    acb_theta_ql_sqr_dist_fixed_coord(y, offset, mid, cho, d, prec);
+    arb_set(x, y);
+
+    arb_get_ubound_arf(rad, y, prec);
+    arb_set_arf(y, rad);
+    arb_sqrt(y, y, prec);
+    arb_div(y, y, arb_mat_entry(cho, d - 1, d - 1), prec);
     arb_get_ubound_arf(rad, y, prec);
     acb_theta_eld_interval(&min, &mid, &max, c, rad, prec);
 
-    arb_set(x, y);
-    for (k = min/2; k <= max/2; k++)
+    if (min > mid || mid > max)
     {
-        acb_theta_ql_dist_fixed_coord(y, offset, k, cho, d, prec);
+        /* This should never happen. */
+        flint_printf("(ql_sqr_dist) Error: impossible values\n");
+        flint_abort();
+    }
+    
+    for (k = min; k <= max; k++)
+    {
+        if (k == mid)
+        {
+            continue;
+        }
+        acb_theta_ql_sqr_dist_fixed_coord(y, offset, k, cho, d, prec);
         arb_min(x, x, y, prec);
     }
 
@@ -83,8 +98,8 @@ acb_theta_ql_dist_rec(arb_t x, arb_srcptr offset, const arb_mat_t cho, slong d, 
 }
 
 void
-acb_theta_ql_dist(arb_t x, arb_srcptr offset, const arb_mat_t cho, slong prec)
+acb_theta_ql_sqr_dist(arb_t x, arb_srcptr offset, const arb_mat_t cho, slong prec)
 {
     slong g = arb_mat_nrows(cho);
-    acb_theta_ql_dist_rec(x, offset, cho, g, prec);
+    acb_theta_ql_sqr_dist_rec(x, offset, cho, g, prec);
 }

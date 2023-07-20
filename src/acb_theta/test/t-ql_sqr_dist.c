@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
     
-    flint_printf("ql_dist....");
+    flint_printf("ql_sqr_dist....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -24,8 +24,8 @@ int main(void)
     /* Test: make ellipsoid to check it is indeed the minimal distance */
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 6);
-        slong prec = 100;
+        slong g = 1 + n_randint(state, 3);
+        slong prec = 200;
         slong bits = n_randint(state, 5);
         slong lowprec = 32;
         acb_mat_t tau;
@@ -51,28 +51,34 @@ int main(void)
         acb_siegel_randtest_reduced(tau, state, prec, bits);
         acb_mat_get_imag(cho, tau);
         arb_mat_cho(cho, cho, prec);
-        arb_mat_transpose(cho, cho);
+        arb_mat_transpose(cho, cho); /* Get reduced thing. */
         for (k = 0; k < g; k++)
         {
             arb_randtest_precise(&offset[k], state, prec, bits);
         }
 
-        acb_theta_ql_dist(dist, offset, cho, lowprec);
-        arb_sqr(x, dist, lowprec);
-        arb_get_ubound_arf(R2, x, lowprec);
-
+        acb_theta_ql_sqr_dist(dist, offset, cho, lowprec);
+        arb_get_ubound_arf(R2, dist, lowprec);
+        
         /* Test: ellipsoid must have points; distance is indeed the minimum
            distance */
-        arb_mat_scalar_mul_2exp_si(cho, cho, -1);
         acb_theta_eld_fill(E, cho, R2, offset, lowprec);
 
         if (acb_theta_eld_nb_pts(E) == 0)
         {
             flint_printf("FAIL (no points)\n");
+            flint_printf("g = %wd, cho:\n", g);
+            arb_mat_printd(cho, 10);
+            flint_printf("offset:\n");
+            _arb_vec_printn(offset, g, 10, 0);
+            flint_printf("\n");
+            flint_printf("Distance: ");
+            arf_printd(R2, 10);
+            flint_printf("\n");
             flint_abort();            
         }
 
-        pts = flint_malloc(acb_theta_eld_nb_pts(E) * sizeof(slong));
+        pts = flint_malloc(acb_theta_eld_nb_pts(E) * sizeof(slong) * g);
         acb_theta_eld_points(pts, E);
         
         arb_pos_inf(test);
@@ -97,11 +103,20 @@ int main(void)
         if (!arb_overlaps(dist, test))
         {
             flint_printf("FAIL (wrong distance)\n");
+            flint_printf("g = %wd, cho:\n", g);
+            arb_mat_printd(cho, 10);
+            flint_printf("offset:\n");
+            _arb_vec_printn(offset, g, 10, 0);
+            flint_printf("\n");
+            flint_printf("Distance: ");
+            arf_printd(R2, 10);
+            flint_printf("\n");
             flint_abort();
         }
 
         acb_mat_clear(tau);
         arb_mat_clear(cho);
+        _arb_vec_clear(offset, g);
         _arb_vec_clear(y, g);
         arb_clear(dist);
         arb_clear(test);
