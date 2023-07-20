@@ -214,6 +214,7 @@ slong acb_theta_k2(const fmpz_mat_t mat);
  */
 
 #define ACB_THETA_QL_CUT 16
+#define ACB_THETA_QL_TRY 100
 
 void acb_theta_ql_sqr_dist(arb_t x, arb_srcptr offset, const arb_mat_t cho, slong prec);
 void acb_theta_ql_sqr_dists_a(arb_ptr dist, acb_srcptr z, const acb_mat_t tau, slong prec);
@@ -222,12 +223,11 @@ slong acb_theta_ql_new_nb_steps(const arb_mat_t cho, slong d, slong prec);
 
 int acb_theta_ql_new_roots(acb_ptr r, acb_srcptr z, arb_srcptr dist,
     const acb_mat_t tau, slong nb_steps, slong prec);
-void acb_theta_ql_new_roots_aux(acb_ptr r, acb_ptr t, acb_srcptr z, arb_srcptr dist,
-    const acb_mat_t tau, slong nb_steps, slong prec);
+void acb_theta_ql_new_roots_aux(acb_ptr r, acb_ptr t, acb_srcptr z, slong nb_z,
+    arb_srcptr dist, const acb_mat_t tau, slong nb_steps, slong guard, slong prec);
 
 /* Old QL functions */
 
-#define ACB_THETA_UQL_TRY 100
 
 slong acb_theta_ql_max_gap(slong g);
 slong acb_theta_ql_nb_steps(const acb_mat_t tau, slong prec);
