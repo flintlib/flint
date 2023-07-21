@@ -198,16 +198,21 @@ void acb_theta_ql_sqr_dist_pt(arb_t x, arb_srcptr offset, const arb_mat_t cho,
     slong* pt, slong prec);
 void acb_theta_ql_sqr_dist(arb_t x, arb_srcptr offset, const arb_mat_t cho, slong prec);
 void acb_theta_ql_sqr_dists_a(arb_ptr dist, acb_srcptr z, const acb_mat_t tau, slong prec);
+slong acb_theta_ql_addprec(const arb_t dist);
+
+slong acb_theta_ql_cut(const arb_mat_t cho);
 slong acb_theta_ql_cuts(slong* cuts, const arb_mat_t cho, slong prec);
 void acb_theta_ql_blocks(acb_mat_t tau0, acb_mat_t x, acb_mat_t tau1,
     const acb_mat_t tau, slong d);
-slong acb_theta_ql_addprec(const arb_t dist);
 slong acb_theta_ql_new_nb_steps(const arb_mat_t cho, slong d, slong prec);
 
 int acb_theta_ql_new_roots(acb_ptr r, acb_srcptr z, arb_srcptr dist,
     const acb_mat_t tau, slong nb_steps, slong prec);
 void acb_theta_ql_new_roots_aux(acb_ptr r, acb_ptr t, acb_srcptr z, slong nb_z,
     arb_srcptr dist, const acb_mat_t tau, slong nb_steps, slong guard, slong prec);
+int acb_theta_ql_any_roots(acb_ptr r, acb_srcptr t, acb_srcptr z, slong nb_z,
+    arb_srcptr dist, const acb_mat_t tau, slong nb_steps, slong guard, slong prec);
+    
 void acb_theta_ql_step(acb_ptr r, acb_srcptr th, acb_srcptr th0,
     acb_srcptr roots, arb_srcptr dist, slong g, slong prec);
 void acb_theta_ql_step_aux(acb_ptr r, acb_srcptr th, acb_srcptr th0,
@@ -222,13 +227,11 @@ typedef int (*acb_theta_ql_worker_t)(acb_ptr, acb_srcptr, acb_srcptr,
 
 int acb_theta_ql_use_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     const acb_mat_t tau, slong d, slong prec, acb_theta_ql_worker_t worker_d);
-
-int acb_theta_ql_a0_direct(acb_ptr r, acb_srcptr z, slong nb_z,
-    arb_srcptr dist, const acb_mat_t tau, slong prec);
-int acb_theta_ql_a0_aux(acb_ptr r, acb_srcptr t, acb_srcptr z, slong nb_z,
-    arb_srcptr dist, const acb_mat_t tau, slong prec);
-void acb_theta_new_ql_a0(acb_ptr r, acb_srcptr z, slong nb_z,
-    const acb_mat_t tau, slong prec);
+int acb_theta_ql_use_steps(acb_ptr r, acb_srcptr t, acb_srcptr z, slong nb_z,
+    arb_srcptr dist, const acb_mat_t tau, slong guard, slong prec,
+    acb_theta_ql_worker_t worker_d);
+int acb_theta_ql_a0_with_t(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
+    const acb_mat_t tau, slong d, slong prec, acb_theta_ql_worker_t worker_d);
 
 /* Old QL functions */
 
