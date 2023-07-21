@@ -194,11 +194,14 @@ void acb_theta_agm_sqrt(acb_ptr r, acb_srcptr a, acb_srcptr roots, slong nb, slo
 void acb_theta_agm_sqr(acb_ptr r, acb_srcptr a, slong g, slong prec);
 void acb_theta_agm_mul(acb_ptr r, acb_srcptr a1, acb_srcptr a2, slong g, slong prec);
 
+void acb_theta_ql_sqr_dist_pt(arb_t x, arb_srcptr offset, const arb_mat_t cho,
+    slong* pt, slong prec);
 void acb_theta_ql_sqr_dist(arb_t x, arb_srcptr offset, const arb_mat_t cho, slong prec);
 void acb_theta_ql_sqr_dists_a(arb_ptr dist, acb_srcptr z, const acb_mat_t tau, slong prec);
 slong acb_theta_ql_cuts(slong* cuts, const arb_mat_t cho, slong prec);
-void acb_theta_ql_blocks(acb_mat_t tau0, acb_mat_t x, acb_mat_t tau1, slong d);
-slong acb_theta_ql_fullprec(const arb_t dist, slong prec);
+void acb_theta_ql_blocks(acb_mat_t tau0, acb_mat_t x, acb_mat_t tau1,
+    const acb_mat_t tau, slong d);
+slong acb_theta_ql_addprec(const arb_t dist);
 slong acb_theta_ql_new_nb_steps(const arb_mat_t cho, slong d, slong prec);
 
 int acb_theta_ql_new_roots(acb_ptr r, acb_srcptr z, arb_srcptr dist,
@@ -217,7 +220,7 @@ void acb_theta_ql_step_aux(acb_ptr r, acb_srcptr th, acb_srcptr th0,
 typedef int (*acb_theta_ql_worker_t)(acb_ptr, acb_srcptr, acb_srcptr,
     arb_srcptr, const acb_mat_t, slong prec);
 
-void acb_theta_ql_use_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, acb_srcptr dist,
+int acb_theta_ql_use_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     const acb_mat_t tau, slong d, slong prec, acb_theta_ql_worker_t worker_d);
 
 int acb_theta_ql_a0_direct(acb_ptr r, acb_srcptr z, slong nb_z,

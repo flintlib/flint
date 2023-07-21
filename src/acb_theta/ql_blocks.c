@@ -11,7 +11,8 @@
 
 #include "acb_theta.h"
 
-void acb_theta_ql_get_blocks(acb_mat_t tau0, acb_mat_t x, acb_mat_t tau1, slong d)
+void acb_theta_ql_get_blocks(acb_mat_t tau0, acb_mat_t x, acb_mat_t tau1,
+    const acb_mat_t tau, slong d)
 {
     slong g = acb_mat_nrows(tau);
     slong j, k;

@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 int
-acb_theta_ql_use_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, acb_srcptr dist,
+acb_theta_ql_use_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     const acb_mat_t tau, slong d, slong prec, acb_theta_ql_worker_t worker_d)
 {
     slong g = acb_mat_nrows(tau);
@@ -22,14 +22,14 @@ acb_theta_ql_use_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, acb_srcptr dist,
     slong nb_t = (_acb_vec_is_zero(t, g) ? 1 : 3);
     arb_mat_t Yinv, cho, cho1;
     acb_mat_t tau0, star, tau1;
-    arb_ptr offset, z_offset;
+    arb_ptr offset, z_offset, new_dist;
     acb_ptr v, w, new_z, new_th;
     arf_t eps, R2;
-    arb_t max_dist;
+    arb_t max_dist, x;
     acb_t c, f;
     acb_theta_eld_t E;
     slong* pts;
-    slong new_prec, full_prec;
+    slong newprec, fullprec;
     ulong a;
     slong j, k, l;
     int res = 1;
@@ -48,12 +48,14 @@ acb_theta_ql_use_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, acb_srcptr dist,
     acb_mat_init(tau1, g - d, g - d);
     offset = _arb_vec_init(g - d);
     z_offset = _arb_vec_init(g);
+    new_dist = _arb_vec_init(nb_th);
     v = _acb_vec_init(g - d);
     w = _acb_vec_init(g - d);
     new_z = _acb_vec_init(d);
-    new_th = _acb_vec_init(nb_th * nb);
+    new_th = _acb_vec_init(nb_th * nb_t);
     arf_init(R2);
     arb_init(max_dist);
+    arb_init(x);
     acb_init(c);
     acb_init(f);
 
@@ -66,7 +68,7 @@ acb_theta_ql_use_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, acb_srcptr dist,
     _acb_vec_get_imag(z_offset, z, g);
     arb_mat_vector_mul_col(z_offset, Yinv, z_offset, prec);
 
-    _acb_vec_zero(r, n * nb);
+    _acb_vec_zero(r, n * nb_t);
     for (a = 0; a < nb_a; a++)
     {
         /* Get R2 */
@@ -78,11 +80,11 @@ acb_theta_ql_use_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, acb_srcptr dist,
         fullprec = prec + acb_theta_ql_addprec(max_dist);
         arf_one(eps);
         arf_mul_2exp_si(eps, eps, -fullprec);
-        acb_theta_ql_radius(R2, max_dist, cho, eps, prec);
+        acb_theta_naive_radius(R2, cho, 0, eps, prec);
 
         /* Get offset */
         acb_theta_char_get_arb(offset, a, g - d);
-        _arb_vec_add(offset, offset, offset_z + d, g - d, prec);
+        _arb_vec_add(offset, offset, z_offset + d, g - d, prec);
         
         /* Make ellipsoid and list points */
         acb_theta_eld_init(E, g - d, g - d);
@@ -107,9 +109,21 @@ acb_theta_ql_use_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, acb_srcptr dist,
             acb_mul_2exp_si(f, f, 1);
             acb_mat_vector_mul_col(w, tau1, v, prec);
             acb_dot(f, f, 0, w, 1, v, 1, d, prec);
+
+            /* Get new distances and relative precision */
+            acb_theta_ql_sqr_dists_a(new_dist, new_z, tau0, prec);
+            acb_theta_ql_sqr_dist_pt(max_dist, offset, cho1, pts + k * (g - d), prec);
+            newprec = prec;
+            for (j = 0; j < nb_th; j++)
+            {
+                arb_sub(x, &dist[a + j * nb_a], max_dist, prec);
+                arb_sub(x, x, &new_dist[j], prec);
+                newprec = FLINT_MIN(newprec, acb_theta_ql_addprec(x)); /* <= prec */
+                newprec = FLINT_MAX(newprec, ACB_THETA_ELD_DEFAULT_PREC);
+            }            
             
             /* Call worker */
-            res = worker_d(new_th, t, new_z, new_tau, new_prec);
+            res = worker_d(new_th, t, new_z, new_dist, tau0, newprec);
 
             /* Rescale to set r; cofactor depends on t */
             for (l = 0; l < nb_t; l++)
@@ -149,12 +163,15 @@ acb_theta_ql_use_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, acb_srcptr dist,
     acb_mat_clear(tau1);
     _arb_vec_clear(offset, g - d);
     _arb_vec_clear(z_offset, g);
+    _arb_vec_clear(new_dist, nb_th);
     _acb_vec_clear(v, g - d);
     _acb_vec_clear(w, g - d);
-    new_z = _acb_vec_clear(d);
-    new_th = _acb_vec_clear(nb_th * nb);
+    _acb_vec_clear(new_z, d);
+    _acb_vec_clear(new_th, nb_th * nb_t);
     arf_clear(R2);
     arb_clear(max_dist);
+    arb_clear(x);
+    acb_clear(c);
     acb_clear(f);
     return res;
 }
