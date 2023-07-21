@@ -120,6 +120,7 @@ void acb_theta_eld_clear(acb_theta_eld_t E);
 
 void acb_theta_eld_interval(slong* min, slong* mid, slong* max,
     const arb_t ctr, const arf_t rad, slong prec);
+void acb_theta_eld_cho(arb_mat_t cho, const acb_mat_t tau, slong prec);
 void acb_theta_eld_fill(acb_theta_eld_t E, const arb_mat_t cho, const arf_t R2,
     arb_srcptr offset, slong prec);
 void acb_theta_eld_points(slong* pts, const acb_theta_eld_t E);
@@ -196,6 +197,8 @@ void acb_theta_agm_mul(acb_ptr r, acb_srcptr a1, acb_srcptr a2, slong g, slong p
 void acb_theta_ql_sqr_dist(arb_t x, arb_srcptr offset, const arb_mat_t cho, slong prec);
 void acb_theta_ql_sqr_dists_a(arb_ptr dist, acb_srcptr z, const acb_mat_t tau, slong prec);
 slong acb_theta_ql_cuts(slong* cuts, const arb_mat_t cho, slong prec);
+void acb_theta_ql_blocks(acb_mat_t tau0, acb_mat_t x, acb_mat_t tau1, slong d);
+slong acb_theta_ql_fullprec(const arb_t dist, slong prec);
 slong acb_theta_ql_new_nb_steps(const arb_mat_t cho, slong d, slong prec);
 
 int acb_theta_ql_new_roots(acb_ptr r, acb_srcptr z, arb_srcptr dist,
@@ -207,12 +210,22 @@ void acb_theta_ql_step(acb_ptr r, acb_srcptr th, acb_srcptr th0,
 void acb_theta_ql_step_aux(acb_ptr r, acb_srcptr th, acb_srcptr th0,
     acb_srcptr roots, arb_srcptr dist, slong g, slong prec);
 
+/* worker(r, t, z, dist, tau, prec) */
+/* If t is zero, this should only compute theta_{a,0}(z, tau) recursively,
+   otherwise at z, z + t, z + 2t */
+
+typedef int (*acb_theta_ql_worker_t)(acb_ptr, acb_srcptr, acb_srcptr,
+    arb_srcptr, const acb_mat_t, slong prec);
+
+void acb_theta_ql_use_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, acb_srcptr dist,
+    const acb_mat_t tau, slong d, slong prec, acb_theta_ql_worker_t worker_d);
+
 int acb_theta_ql_a0_direct(acb_ptr r, acb_srcptr z, slong nb_z,
     arb_srcptr dist, const acb_mat_t tau, slong prec);
 int acb_theta_ql_a0_aux(acb_ptr r, acb_srcptr t, acb_srcptr z, slong nb_z,
     arb_srcptr dist, const acb_mat_t tau, slong prec);
-void acb_theta_new_ql_a0(acb_ptr r, acb_srcptr z, slong nb_z, const acb_mat_t tau,
-    slong prec);
+void acb_theta_new_ql_a0(acb_ptr r, acb_srcptr z, slong nb_z,
+    const acb_mat_t tau, slong prec);
 
 /* Old QL functions */
 
