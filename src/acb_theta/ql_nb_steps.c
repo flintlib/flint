@@ -11,18 +11,42 @@
 
 #include "acb_theta.h"
 
-slong
-acb_theta_ql_nb_steps(const acb_mat_t tau, slong prec)
-{
-    slong g = acb_mat_nrows(tau);
-    slong n = n_clog(FLINT_MAX(1, prec), 2);
+slong acb_theta_ql_nb_steps(const arb_mat_t cho, slong d, slong prec)
+{    
+    slong g = arb_mat_nrows(cho);
+    slong lp = ACB_THETA_ELD_DEFAULT_PREC;
+    arb_t x, t;
+    slong res;
+
+    arb_init(x);
+    arb_init(t);
     
-    if (g == 1)
+    arb_sqr(x, arb_mat_entry(cho, d, d), lp);
+    arb_const_log2(t, lp);
+    arb_div(x, x, t, lp);
+    arb_div_si(x, x, prec, lp);
+    arb_log(x, x, lp);
+    arb_div(x, x, t, lp);
+
+    res = arf_get_si(arb_midref(x), ARF_RND_NEAR);
+    if (d == 0)
     {
-        return FLINT_MAX(0, n-8);
+        if (g == 1)
+        {
+            res -= 8;
+        }
+        else if (g == 2)
+        {
+            res -= 4;
+        }
+        else
+        {
+            res -= 2;
+        }
     }
-    else
-    {
-        return FLINT_MAX(0, n-4);
-    }
+    res = FLINT_MAX(0, res);
+    
+    arb_clear(x);
+    arb_clear(t);
+    return res;    
 }

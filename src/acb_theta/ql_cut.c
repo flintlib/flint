@@ -11,25 +11,24 @@
 
 #include "acb_theta.h"
 
-slong acb_theta_ql_cuts(slong* cuts, const arb_mat_t cho, slong prec)
+slong acb_theta_ql_cut(const arb_mat_t cho)
 {
-    slong k;
     slong g = arb_mat_nrows(cho);
-    slong nb_cuts = 0;
     arb_t cmp;
+    slong k;
 
     arb_init(cmp);
 
-    for (k = 1; k < g; k++)
+    for (k = g - 1; k >= 1; k--)
     {
-        arb_mul_si(cmp, arb_mat_entry(cho, k - 1, k - 1),
-            ACB_THETA_QL_CUT, prec);
+        arb_mul_2exp_si(cmp, arb_mat_entry(cho, k - 1, k - 1),
+            ACB_THETA_QL_CUT);
         if (arb_lt(cmp, arb_mat_entry(cho, k, k)))
         {
-            cuts[nb_cuts] = k;
-            nb_cuts += 1;
+            break;
         }
     }
 
-    return nb_cuts;
+    arb_clear(cmp);
+    return k - 1;
 }

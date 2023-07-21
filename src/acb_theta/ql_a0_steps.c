@@ -11,6 +11,29 @@
 
 #include "acb_theta.h"
 
+static slong
+acb_theta_ql_cut(const arb_mat_t cho)
+{
+    slong g = arb_mat_nrows(cho);
+    arb_t cmp;
+    slong k;
+
+    arb_init(cmp);
+
+    for (k = g - 1; k >= 1; k--)
+    {
+        arb_mul_2exp_si(cmp, arb_mat_entry(cho, k - 1, k - 1),
+            ACB_THETA_QL_CUT);
+        if (arb_lt(cmp, arb_mat_entry(cho, k, k)))
+        {
+            break;
+        }
+    }
+
+    arb_clear(cmp);
+    return k - 1;
+}
+
 static void
 ql_use_step_1(acb_ptr r, slong nb_z, acb_srcptr roots, arb_srcptr dist,
     slong g, slong prec)
@@ -83,7 +106,7 @@ acb_theta_ql_use_steps(acb_ptr r, acb_srcptr t, acb_srcptr z, slong nb_z,
         for (k = 0; (k < nb_z) && res; k++)
         {
             res = acb_theta_ql_use_naive(r, t, x + k * g, new_dist + k * n, w,
-                d, prec, worker_d);
+                d, guard, prec, worker_d);
         }
     }
 

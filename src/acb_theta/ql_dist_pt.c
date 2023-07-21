@@ -11,8 +11,8 @@
 
 #include "acb_theta.h"
 
-void acb_theta_ql_sqr_dist_pt(arb_t x, arb_srcptr offset, const arb_mat_t cho,
-    slong* pt, slong prec)
+void
+acb_theta_ql_dist_pt(arb_t d2, arb_srcptr offset, const arb_mat_t cho, slong* pt, slong prec)
 {
     slong g = arb_mat_nrows(cho);
     arb_ptr v;
@@ -29,11 +29,11 @@ void acb_theta_ql_sqr_dist_pt(arb_t x, arb_srcptr offset, const arb_mat_t cho,
     arb_mat_vector_mul_col(v, cho, v, prec);
     _arb_vec_add(v, v, offset, g, prec);
 
-    arb_zero(x);
+    arb_zero(d2);
     for (k = 0; k < g; k++)
     {
         arb_sqr(s, &v[k], prec);
-        arb_add(x, x, s, prec);
+        arb_add(d2, d2, s, prec);
     }
 
     _arb_vec_clear(v, g);

@@ -11,9 +11,42 @@
 
 #include "acb_theta.h"
 
+static void
+acb_theta_ql_get_blocks(acb_mat_t t0, acb_mat_t x, acb_mat_t t1,
+    const acb_mat_t tau, slong d)
+{
+    slong g = acb_mat_nrows(tau);
+    slong j, k;
+
+    for (j = 0; j < d; j++)
+    {
+        for (k = 0; k < d; k++)
+        {
+            acb_set(acb_mat_entry(t0, j, k), acb_mat_entry(tau, j, k));
+        }
+    }
+
+    for (j = 0; j < d; j++)
+    {
+        for (k = 0; k < (g - d); k++)
+        {
+            acb_set(acb_mat_entry(x, j, k), acb_mat_entry(tau, j, k + d));
+        }
+    }
+
+    for (j = 0; j < (g - d); j++)
+    {
+        for (k = 0; k < (g - d); k++)
+        {
+            acb_set(acb_mat_entry(t1, j, k), acb_mat_entry(tau, j + d, k + d));
+        }
+    }
+}
+
 int
 acb_theta_ql_use_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
-    const acb_mat_t tau, slong d, slong prec, acb_theta_ql_worker_t worker_d)
+    const acb_mat_t tau, slong d, slong guard, slong prec,
+    acb_theta_ql_worker_t worker_d)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
@@ -36,7 +69,7 @@ acb_theta_ql_use_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
 
     if (d == 0)
     {
-        res = worker_d(r, t, z, dist, tau, prec);
+        res = worker_d(r, t, z, dist, tau, guard, prec);
         return res;
     }
 
@@ -123,7 +156,7 @@ acb_theta_ql_use_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
             }            
             
             /* Call worker */
-            res = worker_d(new_th, t, new_z, new_dist, tau0, newprec);
+            res = worker_d(new_th, t, new_z, new_dist, tau0, guard, newprec);
 
             /* Rescale to set r; cofactor depends on t */
             for (l = 0; l < nb_t; l++)
