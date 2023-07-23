@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 void
-acb_theta_ql_dist_pt(arb_t d2, arb_srcptr offset, const arb_mat_t cho, slong* pt, slong prec)
+acb_theta_dist_pt(arb_t d2, arb_srcptr offset, const arb_mat_t cho, slong* pt, slong prec)
 {
     slong g = arb_mat_nrows(cho);
     arb_ptr v;

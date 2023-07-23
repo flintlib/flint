@@ -11,7 +11,7 @@
 
 #include "acb_theta.h"
 
-slong acb_theta_ql_addprec(const arb_t dist)
+slong acb_theta_dist_addprec(const arb_t dist)
 {
     arb_t x;
     slong prec = ACB_THETA_ELD_DEFAULT_PREC;

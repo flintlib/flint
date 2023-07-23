@@ -11,8 +11,8 @@
 
 #include "acb_theta.h"
 
-void
-acb_theta_ql_dist_ubound(arf_t u, arb_srcptr v, const arb_mat_t cho, slong prec)
+static void
+acb_theta_dist_ubound(arf_t u, arb_srcptr v, const arb_mat_t cho, slong prec)
 {
     slong g = acb_mat_nrows(cho);
     slong nb = 1 << g;
@@ -32,7 +32,7 @@ acb_theta_ql_dist_ubound(arf_t u, arb_srcptr v, const arb_mat_t cho, slong prec)
     arf_init(b);
     
     arb_mat_inv(m, cho, prec);
-    acb_mat_vector_mul_col(x, m, v, prec); /* use mat_solve? */
+    arb_mat_vector_mul_col(x, m, v, prec); /* use mat_solve? */
     for (k = 0; k < g; k++)
     {
         approx[2 * k] = - arf_get_si(arb_midref(x), ARF_RND_FLOOR);
@@ -42,15 +42,18 @@ acb_theta_ql_dist_ubound(arf_t u, arb_srcptr v, const arb_mat_t cho, slong prec)
     arf_zero(u);
     for (k = 0; k < nb; k++)
     {
-        if (k & (1 << j))
+        for (j = 0; j < g; j++)
         {
-            pt[j] = approx[2 * j];
+            if (k & (1 << j))
+            {
+                pt[j] = approx[2 * j];
+            }
+            else
+            {
+                pt[j] = approx[2 * j + 1];
+            }
         }
-        else
-        {
-            pt[j] = approx[2 * j + 1];
-        }
-        acb_theta_ql_dist_pt(d2, v, cho, pt, prec);
+        acb_theta_dist_pt(d2, v, cho, pt, prec);
         arb_get_ubound_arf(b, d2, prec);
         arf_max(u, u, b);
     }
@@ -62,4 +65,38 @@ acb_theta_ql_dist_ubound(arf_t u, arb_srcptr v, const arb_mat_t cho, slong prec)
     arb_clear(d2);
     arf_clear(b);    
 }
-    
+
+void
+acb_theta_dist_lat(arb_t d2, arb_srcptr v, const arb_mat_t cho, slong prec)
+{
+    slong g = arb_mat_nrows(cho);
+    acb_theta_eld_t E;
+    slong nb;
+    slong* pts;
+    arf_t u;
+    arb_t x;
+    slong k;
+
+    acb_theta_eld_init(E, g, g);
+    arf_init(u);
+    arb_init(x);
+
+    acb_theta_dist_ubound(u, v, cho, prec);
+    acb_theta_eld_fill(E, cho, u, v, prec);
+    nb = acb_theta_eld_nb_pts(E);
+
+    pts = flint_malloc(nb * g * sizeof(slong));
+    acb_theta_eld_points(pts, E);
+
+    arb_pos_inf(d2);
+    for (k = 0; k < nb; k++)
+    {
+        acb_theta_dist_pt(x, v, cho, pts + k * g, prec);
+        arb_min(d2, d2, x, prec);
+    }
+
+    acb_theta_eld_clear(E);
+    arf_clear(u);
+    arb_clear(x);
+    flint_free(pts);    
+}

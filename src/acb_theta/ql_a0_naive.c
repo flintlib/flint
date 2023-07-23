@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 static void
-acb_theta_ql_get_blocks(acb_mat_t t0, acb_mat_t x, acb_mat_t t1,
+acb_theta_ql_blocks(acb_mat_t t0, acb_mat_t x, acb_mat_t t1,
     const acb_mat_t tau, slong d)
 {
     slong g = acb_mat_nrows(tau);
@@ -44,9 +44,8 @@ acb_theta_ql_get_blocks(acb_mat_t t0, acb_mat_t x, acb_mat_t t1,
 }
 
 int
-acb_theta_ql_use_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
-    const acb_mat_t tau, slong d, slong guard, slong prec,
-    acb_theta_ql_worker_t worker_d)
+acb_theta_ql_a0_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
+    const acb_mat_t tau, slong d, slong guard, slong prec, acb_theta_ql_worker_t worker)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
@@ -69,7 +68,7 @@ acb_theta_ql_use_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
 
     if (d == 0)
     {
-        res = worker_d(r, t, z, dist, tau, guard, prec);
+        res = worker(r, t, z, dist, tau, guard, prec);
         return res;
     }
 
@@ -110,7 +109,7 @@ acb_theta_ql_use_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
         {
             arb_max(max_dist, max_dist, &dist[k], prec);
         }
-        fullprec = prec + acb_theta_ql_addprec(max_dist);
+        fullprec = prec + acb_theta_dist_addprec(max_dist);
         arf_one(eps);
         arf_mul_2exp_si(eps, eps, -fullprec);
         acb_theta_naive_radius(R2, cho, 0, eps, prec);
@@ -123,7 +122,7 @@ acb_theta_ql_use_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
         acb_theta_eld_init(E, g - d, g - d);
         acb_theta_eld_fill(E, cho1, R2, offset, prec);
         pts = flint_malloc(acb_theta_eld_nb_pts(E) * (g - d) * sizeof(slong));
-        acb_theta_eld_points(pts, E);        
+        acb_theta_eld_points(pts, E);
 
         /* Compute th_rec at each point using worker and sum */
         for (k = 0; (k < acb_theta_eld_nb_pts(E)) && res; k++)
@@ -144,19 +143,19 @@ acb_theta_ql_use_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
             acb_dot(f, f, 0, w, 1, v, 1, d, prec);
 
             /* Get new distances and relative precision */
-            acb_theta_ql_sqr_dists_a(new_dist, new_z, tau0, prec);
-            acb_theta_ql_sqr_dist_pt(max_dist, offset, cho1, pts + k * (g - d), prec);
+            acb_theta_dist_a0(new_dist, new_z, tau0, prec);
+            acb_theta_dist_pt(max_dist, offset, cho1, pts + k * (g - d), prec);
             newprec = prec;
             for (j = 0; j < nb_th; j++)
             {
                 arb_sub(x, &dist[a + j * nb_a], max_dist, prec);
                 arb_sub(x, x, &new_dist[j], prec);
-                newprec = FLINT_MIN(newprec, acb_theta_ql_addprec(x)); /* <= prec */
+                newprec = FLINT_MIN(newprec, acb_theta_dist_addprec(x)); /* <= prec */
                 newprec = FLINT_MAX(newprec, ACB_THETA_ELD_DEFAULT_PREC);
-            }            
+            }
             
             /* Call worker */
-            res = worker_d(new_th, t, new_z, new_dist, tau0, guard, newprec);
+            res = worker(new_th, t, new_z, new_dist, tau0, guard, newprec);
 
             /* Rescale to set r; cofactor depends on t */
             for (l = 0; l < nb_t; l++)
