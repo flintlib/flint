@@ -11,3 +11,9 @@
 
 #include "acb_theta.h"
 
+int
+acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
+    const acb_mat_t tau, slong guard, slong prec)
+{
+    return 0;
+}

@@ -21,40 +21,43 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: does not fail for z = 0, g <= 2 and nice tau */
+    /* Test: does not fail for z = 0, t = 0, g <= 2 and nice tau */
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 2);
         slong n = 1 << g;
         slong prec = 1000 + n_randint(state, 1000);
-        slong nb_steps;
-        slong nb_z = n_randint(state, 10);
+        slong guard = ACB_THETA_LOW_PREC;
         acb_mat_t tau;
-        acb_ptr r, z;
-        slong res;
-        
+        acb_ptr r, t, z;
+        arb_ptr dist;
+        slong nb_steps = n_randint(state, 10);
+        int res;
+
         acb_mat_init(tau, g, g);
+        r = _acb_vec_init(n * nb_steps);
+        z = _acb_vec_init(g);
+        t = _acb_vec_init(g);
+        dist = _arb_vec_init(n);
+
         acb_siegel_randtest_nice(tau, state, prec);
-        nb_steps = acb_theta_ql_nb_steps(tau, prec);
-            
-        r = _acb_vec_init(n * nb_steps * nb_z);
-        z = _acb_vec_init(nb_z * g);
+        acb_theta_dist_a0(dist, z, tau, prec);
+        res = acb_theta_ql_roots(r, t, z, dist, tau, nb_steps, guard, prec);
 
-        res = acb_theta_ql_roots(r, z, nb_z, tau, nb_steps, prec);
-
-        if (res <= 0)
+        if (!res)
         {
             flint_printf("FAIL\n");
             acb_mat_printd(tau, 10);
-            flint_printf("nb_z = %wd, prec = %wd\n", nb_z, prec);
             flint_abort();
         }
 
         acb_mat_clear(tau);
-        _acb_vec_clear(r, n * nb_steps * nb_z);
-        _acb_vec_clear(z, nb_z * g);
+        _acb_vec_clear(r, n * nb_steps);
+        _acb_vec_clear(t, g);
+        _acb_vec_clear(z, g);
+        _arb_vec_clear(dist, n);
     }
-    
+
     flint_randclear(state);
     flint_cleanup();
     flint_printf("PASS\n");

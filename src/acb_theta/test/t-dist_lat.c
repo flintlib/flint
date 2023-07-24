@@ -15,8 +15,8 @@ int main(void)
 {
     slong iter;
     flint_rand_t state;
-    
-    flint_printf("ql_sqr_dist....");
+
+    flint_printf("dist_lat....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -24,10 +24,9 @@ int main(void)
     /* Test: make ellipsoid to check it is indeed the minimal distance */
     for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 3);
-        slong prec = 100;
+        slong g = 1 + n_randint(state, 6);
+        slong prec = ACB_THETA_LOW_PREC;
         slong bits = n_randint(state, 5);
-        slong lowprec = 32;
         acb_mat_t tau;
         arb_mat_t cho;
         arb_ptr offset, y;
@@ -35,7 +34,7 @@ int main(void)
         arf_t R2;
         acb_theta_eld_t E;
         slong *pts;
-        slong k, j;
+        slong k;
 
         acb_mat_init(tau, g, g);
         arb_mat_init(cho, g, g);
@@ -48,21 +47,19 @@ int main(void)
         acb_theta_eld_init(E, g, g);
         arf_init(R2);
 
+        /* Get reduced cho */
         acb_siegel_randtest_reduced(tau, state, prec, bits);
-        acb_mat_get_imag(cho, tau);
-        arb_mat_cho(cho, cho, prec);
-        arb_mat_transpose(cho, cho); /* Get reduced thing. */
+        acb_theta_eld_cho(cho, tau, prec);
         for (k = 0; k < g; k++)
         {
             arb_randtest_precise(&offset[k], state, prec, bits);
         }
 
-        acb_theta_ql_sqr_dist(dist, offset, cho, lowprec);
-        arb_get_ubound_arf(R2, dist, lowprec);
-        
-        /* Test: ellipsoid must have points; distance is indeed the minimum
-           distance */
-        acb_theta_eld_fill(E, cho, R2, offset, lowprec);
+        acb_theta_dist_lat(dist, offset, cho, prec);
+        arb_get_ubound_arf(R2, dist, prec);
+
+        /* Test: ellipsoid has points and dist is the minimum distance */
+        acb_theta_eld_fill(E, cho, R2, offset, prec);
 
         if (acb_theta_eld_nb_pts(E) == 0)
         {
@@ -75,28 +72,16 @@ int main(void)
             flint_printf("Distance: ");
             arf_printd(R2, 10);
             flint_printf("\n");
-            flint_abort();            
+            flint_abort();
         }
 
         pts = flint_malloc(acb_theta_eld_nb_pts(E) * sizeof(slong) * g);
         acb_theta_eld_points(pts, E);
-        
+
         arb_pos_inf(test);
         for (k = 0; k < acb_theta_eld_nb_pts(E); k++)
         {
-            for (j = 0; j < g; j++)
-            {
-                arb_set_si(&y[j], pts[k * g + j]);
-            }
-            arb_mat_vector_mul_col(y, cho, y, prec);
-            _arb_vec_add(y, y, offset, g, prec);
-
-            arb_zero(x);
-            for (j = 0; j < g; j++)
-            {
-                arb_sqr(s, &y[j], prec);
-                arb_add(x, x, s, prec);
-            }
+            acb_theta_dist_pt(x, offset, cho, pts + k * g, prec);
             arb_min(test, test, x, prec);
         }
 
@@ -126,7 +111,7 @@ int main(void)
         arf_clear(R2);
         flint_free(pts);
     }
-    
+
     flint_randclear(state);
     flint_cleanup();
     flint_printf("PASS\n");
