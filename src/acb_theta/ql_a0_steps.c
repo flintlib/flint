@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 static slong
-acb_theta_ql_cut(const arb_mat_t cho)
+acb_theta_ql_split(const arb_mat_t cho)
 {
     slong g = arb_mat_nrows(cho);
     arb_t cmp;
@@ -23,7 +23,7 @@ acb_theta_ql_cut(const arb_mat_t cho)
     for (k = g - 1; k >= 1; k--)
     {
         arb_mul_2exp_si(cmp, arb_mat_entry(cho, k - 1, k - 1),
-            ACB_THETA_QL_CUT);
+            ACB_THETA_QL_SPLIT);
         if (arb_lt(cmp, arb_mat_entry(cho, k, k)))
         {
             break;
@@ -91,7 +91,7 @@ acb_theta_ql_a0_steps(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     acb_mat_t w;
     arb_mat_t cho;
     acb_ptr x, roots;
-    arb_ptr new_dist;    
+    arb_ptr new_dist;
     slong d, nb_steps;
     slong k;
     int res = 1;
@@ -100,11 +100,11 @@ acb_theta_ql_a0_steps(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     arb_mat_init(cho, g, g);
     x = _acb_vec_init(g);
     new_dist = _arb_vec_init(n);
-    
+
     acb_theta_eld_cho(cho, tau, ACB_THETA_LOW_PREC);
-    d = acb_theta_ql_cut(cho);
+    d = acb_theta_ql_split(cho);
     nb_steps = acb_theta_ql_nb_steps(cho, d, prec);
-    
+
     roots = _acb_vec_init(nb_z * nb_t * n * nb_steps);
 
     /* Get roots */
@@ -120,14 +120,14 @@ acb_theta_ql_a0_steps(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
         /* Call a0_naive at 0 */
         acb_mat_scalar_mul_2exp_si(w, tau, nb_steps);
         _arb_vec_scalar_mul_2exp_si(new_dist, dist0, n, nb_steps);
-        res = acb_theta_ql_a0_naive(r, t, x, new_dist, w, d, guard, prec, worker);
+        res = acb_theta_ql_a0_split(r, t, x, new_dist, w, d, guard, prec, worker);
     }
     if (res && has_z)
     {
         /* Call a0_naive at z */
         _acb_vec_scalar_mul_2exp_si(x, z, g, nb_steps);
         _arb_vec_scalar_mul_2exp_si(new_dist, dist, n, nb_steps);
-        res = acb_theta_ql_a0_naive(r + nb_t * n, t, x, new_dist, w, d,
+        res = acb_theta_ql_a0_split(r + nb_t * n, t, x, new_dist, w, d,
             guard, prec, worker);
     }
 
