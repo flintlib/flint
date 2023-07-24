@@ -211,7 +211,7 @@ void acb_theta_ql_step_3(acb_ptr r, acb_srcptr th, acb_srcptr th0,
     acb_srcptr roots, arb_srcptr dist, arb_srcptr dist0, slong g, slong prec);
 
 /* Use as worker(r, t, z, dist, tau, guard, prec). Should compute theta_{a,0}
-   z, z + t, z + 2t; just z if z = 0 */
+   z, z + t, z + 2t; just z if t = 0 */
 
 typedef int (*acb_theta_ql_worker_t)(acb_ptr, acb_srcptr, acb_srcptr,
     arb_srcptr, const acb_mat_t, slong, slong);

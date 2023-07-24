@@ -20,7 +20,7 @@ arb_mat_bilinear_form(arb_t x, const arb_mat_t A, arb_srcptr v1, arb_srcptr v2, 
     slong k;
 
     arb_mat_init(col, ncol, 1);
-    arb_mat_init(row, 1, nrow);    
+    arb_mat_init(row, 1, nrow);
     arb_mat_init(prod, nrow, 1);
     arb_mat_init(scal, 1, 1);
 
@@ -39,5 +39,5 @@ arb_mat_bilinear_form(arb_t x, const arb_mat_t A, arb_srcptr v1, arb_srcptr v2, 
     arb_mat_clear(col);
     arb_mat_clear(row);
     arb_mat_clear(prod);
-    arb_mat_clear(scal);    
+    arb_mat_clear(scal);
 }

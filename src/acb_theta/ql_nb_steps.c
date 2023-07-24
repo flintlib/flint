@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 slong acb_theta_ql_nb_steps(const arb_mat_t cho, slong d, slong prec)
-{    
+{
     slong g = arb_mat_nrows(cho);
     slong lp = ACB_THETA_ELD_DEFAULT_PREC;
     arb_t x, t;
@@ -20,7 +20,7 @@ slong acb_theta_ql_nb_steps(const arb_mat_t cho, slong d, slong prec)
 
     arb_init(x);
     arb_init(t);
-    
+
     arb_sqr(x, arb_mat_entry(cho, d, d), lp);
     arb_const_log2(t, lp);
     arb_div(x, x, t, lp);
@@ -45,8 +45,8 @@ slong acb_theta_ql_nb_steps(const arb_mat_t cho, slong d, slong prec)
         }
     }
     res = FLINT_MAX(0, res);
-    
+
     arb_clear(x);
     arb_clear(t);
-    return res;    
+    return res;
 }
