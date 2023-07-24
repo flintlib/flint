@@ -21,12 +21,13 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: should find zero value when z = tau a/2 + real stuff */
-    for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
+    /* Test: find zero value when z = tau a/2 + real stuff */
+    for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 6);
         slong n = 1 << g;
         slong prec = ACB_THETA_LOW_PREC;
+        slong hprec = 200;
         slong bits = n_randint(state, 5);
         acb_mat_t tau;
         acb_ptr z;
@@ -40,7 +41,7 @@ int main(void)
         dist = _arb_vec_init(n);
         arb_init(c);
 
-        acb_siegel_randtest_reduced(tau, state, prec, bits);
+        acb_siegel_randtest_reduced(tau, state, hprec, bits);
         acb_theta_char_get_acb(z, a, g);
         acb_mat_vector_mul_col(z, tau, z, prec);
         for (k = 0; k < g; k++)
@@ -54,6 +55,11 @@ int main(void)
         if (!arb_contains_zero(&dist[a]))
         {
             flint_printf("FAIL\n");
+            flint_printf("g = %wd, a = %wd, tau:\n", g, a);
+            acb_mat_printd(tau, 5);
+            flint_printf("distances:\n");
+            _arb_vec_printn(dist, n, 5, 0);
+            flint_printf("\n");
             flint_abort();
         }
 

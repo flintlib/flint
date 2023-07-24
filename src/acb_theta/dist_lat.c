@@ -30,16 +30,16 @@ acb_theta_dist_ubound(arf_t u, arb_srcptr v, const arb_mat_t cho, slong prec)
     pt = flint_malloc(g * sizeof(slong));
     arb_init(d2);
     arf_init(b);
-    
+
     arb_mat_inv(m, cho, prec);
-    arb_mat_vector_mul_col(x, m, v, prec); /* use mat_solve? */
+    arb_mat_vector_mul_col(x, m, v, prec);
     for (k = 0; k < g; k++)
     {
-        approx[2 * k] = - arf_get_si(arb_midref(x), ARF_RND_FLOOR);
-        approx[2 * k] = - arf_get_si(arb_midref(x), ARF_RND_CEIL);
+        approx[2 * k] = - arf_get_si(arb_midref(&x[k]), ARF_RND_FLOOR);
+        approx[2 * k + 1] = - arf_get_si(arb_midref(&x[k]), ARF_RND_CEIL);
     }
 
-    arf_zero(u);
+    arf_pos_inf(u);
     for (k = 0; k < nb; k++)
     {
         for (j = 0; j < g; j++)
@@ -55,7 +55,7 @@ acb_theta_dist_ubound(arf_t u, arb_srcptr v, const arb_mat_t cho, slong prec)
         }
         acb_theta_dist_pt(d2, v, cho, pt, prec);
         arb_get_ubound_arf(b, d2, prec);
-        arf_max(u, u, b);
+        arf_min(u, u, b);
     }
 
     arb_mat_clear(m);
@@ -63,7 +63,7 @@ acb_theta_dist_ubound(arf_t u, arb_srcptr v, const arb_mat_t cho, slong prec)
     flint_free(approx);
     flint_free(pt);
     arb_clear(d2);
-    arf_clear(b);    
+    arf_clear(b);
 }
 
 void
@@ -98,5 +98,5 @@ acb_theta_dist_lat(arb_t d2, arb_srcptr v, const arb_mat_t cho, slong prec)
     acb_theta_eld_clear(E);
     arf_clear(u);
     arb_clear(x);
-    flint_free(pts);    
+    flint_free(pts);
 }

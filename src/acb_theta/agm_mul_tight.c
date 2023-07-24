@@ -11,47 +11,6 @@
 
 #include "acb_theta.h"
 
-static void
-acb_theta_agm_rel_mag_err(arf_t m, arf_t eps, acb_srcptr a, arb_srcptr dist,
-    slong n, slong prec)
-{
-    acb_t x, err;
-    arb_t y;
-    arf_t abs;
-    slong k;
-
-    acb_init(x);
-    acb_init(err);
-    arb_init(y);
-    arf_init(abs);
-
-    arf_zero(m);
-    arf_zero(eps);
-    
-    for (k = 0; k < n; k++)
-    {
-        arb_neg(y, &dist[k]);
-        arb_exp(y, y, prec);
-        acb_mul_arb(x, &a[k], y, prec);
-
-        acb_abs(y, x, prec);
-        arb_get_ubound_arf(abs, y, prec);
-        arf_max(m, m, abs);
-
-        acb_zero(err);
-        arf_set_mag(arb_midref(acb_realref(err)), arb_radref(acb_realref(x)));
-        arf_set_mag(arb_midref(acb_imagref(err)), arb_radref(acb_imagref(x)));
-        acb_abs(y, err, prec);
-        arb_get_ubound_arf(abs, y, prec);
-        arf_max(eps, eps, abs);
-    }
-
-    acb_clear(x);
-    acb_clear(err);
-    arb_clear(y);
-    arf_clear(abs);
-}
-
 /* This is assuming a1 corresponds to theta constants */
 void
 acb_theta_agm_mul_tight(acb_ptr r, acb_srcptr a1, acb_srcptr a2,
@@ -75,8 +34,9 @@ acb_theta_agm_mul_tight(acb_ptr r, acb_srcptr a1, acb_srcptr a2,
     arf_init(t);
     arb_init(err);
 
-    acb_theta_agm_rel_mag_err(m1, eps1, a1, d1, n, lp);
-    acb_theta_agm_rel_mag_err(m2, eps2, a2, d2, n, lp);
+    acb_theta_agm_rel_mag_err(m1, eps1, a1, d1, n, prec);
+    acb_theta_agm_rel_mag_err(m2, eps2, a2, d2, n, prec);
+
     for (a = 0; a < n; a++)
     {
         hprec = FLINT_MAX(hprec, prec + acb_theta_dist_addprec(&d2[a]));
@@ -100,20 +60,22 @@ acb_theta_agm_mul_tight(acb_ptr r, acb_srcptr a1, acb_srcptr a2,
     arf_add(eps, eps, t, lp, ARF_RND_CEIL);
     arf_mul(t, eps2, eps1, lp, ARF_RND_CEIL);
     arf_add(eps, eps, t, lp, ARF_RND_CEIL);
-    
+
     for (a = 0; a < n; a++)
     {
-        arb_mul_arf(err, &d2[a], eps, lp);
+        arb_neg(err, &d2[a]);
+        arb_exp(err, err, prec);
+        arb_mul_arf(err, err, eps, lp);
         acb_add_error_arb(&r[a], err);
     }
 
-    _acb_vec_clear(v1, g);
-    _acb_vec_clear(v2, g);
+    _acb_vec_clear(v1, n);
+    _acb_vec_clear(v2, n);
     arf_clear(m1);
     arf_clear(m2);
     arf_clear(eps1);
     arf_clear(eps2);
     arf_clear(eps);
     arf_clear(t);
-    arb_clear(err);    
+    arb_clear(err);
 }

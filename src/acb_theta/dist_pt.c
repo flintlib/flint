@@ -18,7 +18,7 @@ acb_theta_dist_pt(arb_t d2, arb_srcptr offset, const arb_mat_t cho, slong* pt, s
     arb_ptr v;
     arb_t s;
     slong k;
-    
+
     v = _arb_vec_init(g);
     arb_init(s);
 

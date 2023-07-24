@@ -184,8 +184,7 @@ void acb_theta_naive_ind(acb_ptr th, ulong ab, acb_srcptr z, slong nb_z,
 
 /* Quasi-linear algorithms on the reduced domain */
 
-void acb_theta_dist_pt(arb_t d2, arb_srcptr v, const arb_mat_t cho,
-    slong* pt, slong prec);
+void acb_theta_dist_pt(arb_t d2, arb_srcptr v, const arb_mat_t cho, slong* pt, slong prec);
 void acb_theta_dist_lat(arb_t d2, arb_srcptr v, const arb_mat_t cho, slong prec);
 void acb_theta_dist_a0(arb_ptr dist, acb_srcptr z, const acb_mat_t tau, slong prec);
 slong acb_theta_dist_addprec(const arb_t d2);
@@ -194,6 +193,8 @@ void acb_theta_agm_hadamard(acb_ptr r, acb_srcptr a, slong g, slong prec);
 void acb_theta_agm_sqrt(acb_ptr r, acb_srcptr a, acb_srcptr roots, slong nb, slong prec);
 void acb_theta_agm_mul(acb_ptr r, acb_srcptr a1, acb_srcptr a2, slong g, slong prec);
 void acb_theta_agm_sqr(acb_ptr r, acb_srcptr a, slong g, slong prec);
+void acb_theta_agm_rel_mag_err(arf_t m, arf_t eps, acb_srcptr a,
+    arb_srcptr dist, slong n, slong prec);
 void acb_theta_agm_mul_tight(acb_ptr r, acb_srcptr a1, acb_srcptr a2,
     arb_srcptr d1, arb_srcptr d2, slong g, slong prec);
 

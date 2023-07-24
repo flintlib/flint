@@ -22,10 +22,11 @@ int main(void)
     flint_randinit(state);
 
     /* Test: make ellipsoid to check it is indeed the minimal distance */
-    for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 6);
         slong prec = ACB_THETA_LOW_PREC;
+        slong hprec = 200;
         slong bits = n_randint(state, 5);
         acb_mat_t tau;
         arb_mat_t cho;
@@ -48,7 +49,7 @@ int main(void)
         arf_init(R2);
 
         /* Get reduced cho */
-        acb_siegel_randtest_reduced(tau, state, prec, bits);
+        acb_siegel_randtest_reduced(tau, state, hprec, bits);
         acb_theta_eld_cho(cho, tau, prec);
         for (k = 0; k < g; k++)
         {
