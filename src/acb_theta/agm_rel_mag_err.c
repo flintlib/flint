@@ -30,7 +30,9 @@ acb_theta_agm_rel_mag_err(arf_t m, arf_t eps, acb_srcptr a, arb_srcptr dist,
 
     for (k = 0; k < n; k++)
     {
-        arb_exp(y, &dist[k], prec);
+        arb_zero(y);
+        arb_get_ubound_arf(arb_midref(y), &dist[k], prec);
+        arb_exp(y, y, prec);
         acb_mul_arb(x, &a[k], y, prec);
 
         acb_abs(y, x, prec);

@@ -20,7 +20,7 @@ acb_theta_ql_step_3(acb_ptr r, acb_srcptr th, acb_srcptr th0, acb_srcptr roots,
     ulong a;
 
     res = _acb_vec_init(3 * n);
-    
+
     flint_printf("(ql_step) input:");
     _acb_vec_printd(th, 3 * n, 10);
     flint_printf("\n");
