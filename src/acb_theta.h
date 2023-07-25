@@ -198,7 +198,7 @@ void acb_theta_agm_rel_mag_err(arf_t m, arf_t eps, acb_srcptr a,
 void acb_theta_agm_mul_tight(acb_ptr r, acb_srcptr a1, acb_srcptr a2,
     arb_srcptr d1, arb_srcptr d2, slong g, slong prec);
 
-#define ACB_THETA_QL_SPLIT 4
+#define ACB_THETA_QL_SPLIT 2
 #define ACB_THETA_QL_TRY 100
 /* See also acb_theta_ql_nb_steps for more tuning */
 

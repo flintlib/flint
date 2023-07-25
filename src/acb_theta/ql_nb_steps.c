@@ -28,7 +28,7 @@ slong acb_theta_ql_nb_steps(const arb_mat_t cho, slong d, slong prec)
     arb_log(x, x, lp);
     arb_div(x, x, t, lp);
 
-    res = arf_get_si(arb_midref(x), ARF_RND_NEAR);
+    res =  -arf_get_si(arb_midref(x), ARF_RND_NEAR);
     if (d == 0)
     {
         if (g == 1)

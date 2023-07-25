@@ -61,14 +61,14 @@ acb_theta_agm_sqrt_entry(acb_t r, const acb_t a, const acb_t root, slong prec)
             acb_set(r, neg);
         }
     }
-    
+
     acb_clear(res);
     acb_clear(neg);
 }
 
 void
 acb_theta_agm_sqrt(acb_ptr r, acb_srcptr a, acb_srcptr roots, slong nb, slong prec)
-{    
+{
     slong k;
 
     for (k = 0; k < nb; k++)

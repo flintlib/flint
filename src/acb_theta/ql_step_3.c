@@ -35,6 +35,6 @@ acb_theta_ql_step_3(acb_ptr r, acb_srcptr th, acb_srcptr th0, acb_srcptr roots,
         acb_div(&res[a], &res[a], &res[2 * n + a], prec);
     }
     _acb_vec_set(r, res, 3 * n);
-    
+
     _acb_vec_clear(res, 3 * n);
 }

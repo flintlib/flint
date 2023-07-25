@@ -94,8 +94,8 @@ acb_theta_ql_roots(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
         {
             _acb_vec_scalar_mul_ui(x, t, g, k, prec);
             _acb_vec_add(x, x, z, g, prec);
-            res = acb_theta_ql_roots_one(r + k * nb_steps * n, x, dist, f, tau,
-                nb_steps, guard);
+            res = acb_theta_ql_roots_one(r + (k - 1) * nb_steps * n, x, dist,
+                f, tau, nb_steps, guard);
         }
     }
 
