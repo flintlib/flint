@@ -61,7 +61,7 @@ acb_theta_ql_a0_step(acb_ptr r, acb_srcptr roots, arb_srcptr dist, arb_srcptr di
 
     if (has_t)
     {
-        acb_theta_ql_step_3(next, r, r, rts, d, d0, g, prec);
+        acb_theta_ql_step_3(next, r, r, rts, d0, d0, g, prec);
         if (has_z)
         {
             acb_theta_ql_step_3(next + nb_t * n, r + nb_t * n, r,
@@ -70,7 +70,7 @@ acb_theta_ql_a0_step(acb_ptr r, acb_srcptr roots, arb_srcptr dist, arb_srcptr di
     }
     else
     {
-        acb_theta_ql_step_1(next, r, r, rts, d, d0, g, prec);
+        acb_theta_ql_step_1(next, r, r, rts, d0, d0, g, prec);
         if (has_z)
         {
             acb_theta_ql_step_1(next + nb_t * n, r + nb_t * n, r,

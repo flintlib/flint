@@ -23,19 +23,15 @@ acb_theta_ql_all_sqr(acb_ptr r, acb_srcptr z, const acb_mat_t tau, slong prec)
     arb_ptr dist;
     acb_ptr t;
     slong k, j;
-    slong nb_z = 1; /* Adjust if z is zero */
     int res = 0;
 
     flint_randinit(state);
     arb_mat_init(cho, g, g);
-    dist = _arb_vec_init(n * nb_z);
+    dist = _arb_vec_init(n);
     t = _acb_vec_init(g);
-    
+
     acb_theta_eld_cho(cho, tau, lp);
-    for (k = 0; k < nb_z; k++)
-    {
-        acb_theta_dist_a0(dist + k * n, z + k * g, tau, lp);
-    }
+    acb_theta_dist_a0(dist, z, tau, lp);
 
     for (j = 0; (j < ACB_THETA_QL_TRY) && !res; j++)
     {
@@ -47,11 +43,8 @@ acb_theta_ql_all_sqr(acb_ptr r, acb_srcptr z, const acb_mat_t tau, slong prec)
         guard += ACB_THETA_LOW_PREC;
     }
 
-    /* Should actually be at 2tau; last duplication step, but solve the ql_step
-       problems first */
-   
     flint_randclear(state);
     arb_mat_clear(cho);
-    _arb_vec_clear(dist, n * nb_z);
+    _arb_vec_clear(dist, n);
     _acb_vec_clear(t, g);
 }
