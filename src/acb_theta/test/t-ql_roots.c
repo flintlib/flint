@@ -42,7 +42,7 @@ int main(void)
 
         acb_siegel_randtest_nice(tau, state, prec);
         acb_theta_dist_a0(dist, z, tau, prec);
-        res = acb_theta_ql_roots(r, t, z, dist, tau, nb_steps, guard, prec);
+        res = acb_theta_ql_roots(r, t, z, dist, dist, tau, nb_steps, guard, prec);
 
         if (!res)
         {

@@ -52,10 +52,11 @@ acb_theta_ql_a0_split(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     slong nb_a = 1 << (g - d);
     slong nb_th = 1 << d;
     slong nb_t = (_acb_vec_is_zero(t, g) ? 1 : 3);
+    slong nb_z = (_acb_vec_is_zero(z, g) ? 1 : 2);
     slong lp = ACB_THETA_LOW_PREC;
     arb_mat_t Yinv, cho, cho1;
     acb_mat_t tau0, star, tau1;
-    arb_ptr offset, z_offset, new_dist;
+    arb_ptr offset, z_offset, new_dist, new_dist0;
     acb_ptr v, w, new_z, new_th;
     arf_t eps, R2;
     arb_t max_dist, x;
@@ -67,13 +68,10 @@ acb_theta_ql_a0_split(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     slong j, k, l;
     int res = 1;
 
-    if (d == g)
+    if (d <= 0 || d >= g)
     {
-        return worker(r, t, z, dist, tau, guard, prec);
-    }
-    else if (d == 0)
-    {
-        return acb_theta_ql_a0_naive(r, t, z, dist, tau, guard, prec);
+        flint_printf("(ql_a0_split) Error: must have 1 < d < g - 1\n");
+        flint_abort();
     }
 
     arb_mat_init(Yinv, g, g);
@@ -85,10 +83,11 @@ acb_theta_ql_a0_split(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     offset = _arb_vec_init(g - d);
     z_offset = _arb_vec_init(g);
     new_dist = _arb_vec_init(nb_th);
+    new_dist0 = _arb_vec_init(nb_th);
     v = _acb_vec_init(g - d);
     w = _acb_vec_init(g - d);
     new_z = _acb_vec_init(d);
-    new_th = _acb_vec_init(nb_th * nb_t);
+    new_th = _acb_vec_init(nb_th * nb_t * nb_z);
     arf_init(R2);
     arf_init(eps);
     arb_init(max_dist);
@@ -99,6 +98,7 @@ acb_theta_ql_a0_split(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     acb_theta_ql_blocks(tau0, star, tau1, tau, d);
     acb_theta_eld_cho(cho, tau, prec);
     acb_theta_eld_cho(cho1, tau1, prec);
+    acb_theta_dist_a0(new_dist0, z, tau0, lp);
 
     acb_mat_get_imag(Yinv, tau);
     arb_mat_inv(Yinv, Yinv, prec);
@@ -184,7 +184,13 @@ acb_theta_ql_a0_split(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
             arb_printd(max_dist, 5);
             flint_printf("\n"); */
 
-            res = worker(new_th, t, new_z, new_dist, tau0, guard, newprec);
+            res = worker(new_th, t, new_z, new_dist0, new_dist, tau0, guard, newprec);
+            if (nb_z > 1)
+            {
+                /* We are only interested in the values at z */
+                _acb_vec_set(new_th, new_th + nb_th * nb_t, nb_th * nb_t);
+            }
+
             /*flint_printf("output from worker:\n");
             _acb_vec_printd(new_th, nb_th * nb_t, 5);
             flint_printf("\n");*/
@@ -233,10 +239,11 @@ acb_theta_ql_a0_split(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     _arb_vec_clear(offset, g - d);
     _arb_vec_clear(z_offset, g);
     _arb_vec_clear(new_dist, nb_th);
+    _arb_vec_clear(new_dist0, nb_th);
     _acb_vec_clear(v, g - d);
     _acb_vec_clear(w, g - d);
     _acb_vec_clear(new_z, d);
-    _acb_vec_clear(new_th, nb_th * nb_t);
+    _acb_vec_clear(new_th, nb_th * nb_t * nb_z);
     arf_clear(R2);
     arf_clear(eps);
     arb_clear(max_dist);

@@ -72,12 +72,8 @@ int main(void)
         acb_theta_dist_a0(dist, z, tau, lp);
         acb_theta_dist_a0(dist0, zero, tau, lp);
 
-        acb_theta_ql_a0_steps(r, t, z, dist, dist0, tau, guard, prec, &acb_theta_ql_a0_naive);
-        acb_theta_ql_a0_naive(test, t, zero, dist0, tau, guard, hprec);
-        if (has_z)
-        {
-            acb_theta_ql_a0_naive(test + nbt * n, t, z, dist, tau, guard, hprec);
-        }
+        acb_theta_ql_a0_steps(r, t, z, dist0, dist, tau, guard, prec, &acb_theta_ql_a0_naive);
+        acb_theta_ql_a0_naive(test, t, z, dist0, dist, tau, guard, hprec);
 
         if (!_acb_vec_overlaps(r, test, nbz * nbt * n))
         {

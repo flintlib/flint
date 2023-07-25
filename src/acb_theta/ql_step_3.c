@@ -12,8 +12,8 @@
 #include "acb_theta.h"
 
 void
-acb_theta_ql_step_3(acb_ptr r, acb_srcptr th, acb_srcptr th0, acb_srcptr roots,
-    arb_srcptr dist, arb_srcptr dist0, slong g, slong prec)
+acb_theta_ql_step_3(acb_ptr r, acb_srcptr th0, acb_srcptr th, acb_srcptr roots,
+    arb_srcptr dist0, arb_srcptr dist, slong g, slong prec)
 {
     slong n = 1 << g;
     acb_ptr res;

@@ -18,33 +18,53 @@ acb_theta_ql_all_sqr(acb_ptr r, acb_srcptr z, const acb_mat_t tau, slong prec)
     slong n = 1 << g;
     slong lp = ACB_THETA_LOW_PREC;
     slong guard = ACB_THETA_LOW_PREC;
+    int has_z = !_acb_vec_is_zero(z, g);
+    slong nb_z = (has_z ? 2 : 1);
+    slong nb_t = 1;
     flint_rand_t state;
-    arb_mat_t cho;
-    arb_ptr dist;
-    acb_ptr t;
-    slong k, j;
-    int res = 0;
+    acb_mat_t w;
+    arb_ptr dist, dist0;
+    acb_ptr t, x, th;
+    slong j;
+    int res;
 
     flint_randinit(state);
-    arb_mat_init(cho, g, g);
+    acb_mat_init(w, g, g);
+    x = _acb_vec_init(g);
     dist = _arb_vec_init(n);
+    dist0 = _arb_vec_init(n);
     t = _acb_vec_init(g);
+    th = _acb_vec_init(n * nb_t * nb_z);
 
-    acb_theta_eld_cho(cho, tau, lp);
-    acb_theta_dist_a0(dist, z, tau, lp);
+    acb_mat_scalar_mul_2exp_si(w, tau, 1);
+    _acb_vec_scalar_mul_2exp_si(x, z, g, 1);
+
+    acb_theta_dist_a0(dist, x, w, lp);
+    acb_theta_dist_a0(dist0, t, w, lp);
+
+    res = acb_theta_ql_a0(th, t, x, dist0, dist, w, guard, prec);
 
     for (j = 0; (j < ACB_THETA_QL_TRY) && !res; j++)
     {
-        for (k = 0; k < g; k++)
-        {
-            arb_urandom(acb_realref(&t[k]), state, prec);
-        }
-        res = acb_theta_ql_a0(r, t, z, dist, tau, guard, prec);
+        nb_t = 3;
         guard += ACB_THETA_LOW_PREC;
+        res = acb_theta_ql_a0(th, t, x, dist0, dist, w, guard, prec);
+    }
+
+    if (has_z)
+    {
+        acb_theta_agm_mul_tight(r, th, th + nb_t * n, dist0, dist, g, prec);
+    }
+    else
+    {
+        acb_theta_agm_mul_tight(r, th, th, dist0, dist0, g, prec);
     }
 
     flint_randclear(state);
-    arb_mat_clear(cho);
+    acb_mat_clear(w);
+    _acb_vec_clear(x, g);
     _arb_vec_clear(dist, n);
+    _arb_vec_clear(dist0, n);
     _acb_vec_clear(t, g);
+    _acb_vec_clear(th, n * nb_t * nb_z);
 }

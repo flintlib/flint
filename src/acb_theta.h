@@ -195,36 +195,37 @@ void acb_theta_agm_mul(acb_ptr r, acb_srcptr a1, acb_srcptr a2, slong g, slong p
 void acb_theta_agm_sqr(acb_ptr r, acb_srcptr a, slong g, slong prec);
 void acb_theta_agm_rel_mag_err(arf_t m, arf_t eps, acb_srcptr a,
     arb_srcptr dist, slong n, slong prec);
-void acb_theta_agm_mul_tight(acb_ptr r, acb_srcptr a1, acb_srcptr a2,
-    arb_srcptr d1, arb_srcptr d2, slong g, slong prec);
+void acb_theta_agm_mul_tight(acb_ptr r, acb_srcptr a0, acb_srcptr a,
+    arb_srcptr d0, arb_srcptr d, slong g, slong prec);
 
 #define ACB_THETA_QL_SPLIT 2
 #define ACB_THETA_QL_TRY 100
 /* See also acb_theta_ql_nb_steps for more tuning */
 
 slong acb_theta_ql_nb_steps(const arb_mat_t cho, slong d, slong prec);
-int acb_theta_ql_roots(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
-    const acb_mat_t tau, slong nb_steps, slong guard, slong prec);
-void acb_theta_ql_step_1(acb_ptr r, acb_srcptr th, acb_srcptr th0,
-    acb_srcptr roots, arb_srcptr dist, arb_srcptr dist0, slong g, slong prec);
-void acb_theta_ql_step_3(acb_ptr r, acb_srcptr th, acb_srcptr th0,
-    acb_srcptr roots, arb_srcptr dist, arb_srcptr dist0, slong g, slong prec);
+void acb_theta_ql_log_rescale(acb_t f, acb_srcptr z, const acb_mat_t tau, slong prec);
+int acb_theta_ql_roots(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
+    arb_srcptr dist, const acb_mat_t tau, slong nb_steps, slong guard, slong prec);
+void acb_theta_ql_step_1(acb_ptr r, acb_srcptr th0, acb_srcptr th,
+    acb_srcptr roots, arb_srcptr dist0, arb_srcptr dist, slong g, slong prec);
+void acb_theta_ql_step_3(acb_ptr r, acb_srcptr th0, acb_srcptr th,
+    acb_srcptr roots, arb_srcptr dist0, arb_srcptr dist, slong g, slong prec);
 
-/* Use as worker(r, t, z, dist, tau, guard, prec). Should compute theta_{a,0}
-   z, z + t, z + 2t; just z if t = 0. acb_theta_ql_a0_naive is such a worker */
+/* Use as worker(r, t, z, dist0, dist, tau, guard, prec). Computes theta_{a,0}
+   at 0, t, 2t, z, z + t, z + 2t (less values if z = 0 or t = 0 or both) */
 
 typedef int (*acb_theta_ql_worker_t)(acb_ptr, acb_srcptr, acb_srcptr,
-    arb_srcptr, const acb_mat_t, slong, slong);
+    arb_srcptr, arb_srcptr, const acb_mat_t, slong, slong);
 
-int acb_theta_ql_a0_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
-    const acb_mat_t tau, slong guard, slong prec);
+int acb_theta_ql_a0_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
+    arb_srcptr dist, const acb_mat_t tau, slong guard, slong prec);
 int acb_theta_ql_a0_split(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     const acb_mat_t tau, slong d, slong guard, slong prec, acb_theta_ql_worker_t worker);
-int acb_theta_ql_a0_steps(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
-    arb_srcptr dist0, const acb_mat_t tau, slong guard, slong prec,
+int acb_theta_ql_a0_steps(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
+    arb_srcptr dist, const acb_mat_t tau, slong guard, slong prec,
     acb_theta_ql_worker_t worker);
-int acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
-    const acb_mat_t tau, slong guard, slong prec);
+int acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
+    arb_srcptr dist, const acb_mat_t tau, slong guard, slong prec);
 
 void acb_theta_ql_all_sqr(acb_ptr r, acb_srcptr z, const acb_mat_t tau, slong prec);
 

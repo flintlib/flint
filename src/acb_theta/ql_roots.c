@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 static int
-acb_theta_ql_roots_one(acb_ptr r, acb_srcptr z, arb_srcptr dist,
+acb_theta_ql_roots_1(acb_ptr r, acb_srcptr z, arb_srcptr dist,
     const acb_t f, const acb_mat_t tau, slong nb_steps, slong prec)
 {
     slong g = acb_mat_nrows(tau);
@@ -60,33 +60,25 @@ acb_theta_ql_roots_one(acb_ptr r, acb_srcptr z, arb_srcptr dist,
     return res;
 }
 
-int
-acb_theta_ql_roots(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
+static int
+acb_theta_ql_roots_3(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     const acb_mat_t tau, slong nb_steps, slong guard, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
-    arb_mat_t Yinv;
-    arb_ptr y;
     acb_ptr x;
     acb_t f;
     slong k;
     int res = 1;
 
-    arb_mat_init(Yinv, g, g);
-    y = _arb_vec_init(g);
     x = _acb_vec_init(g);
     acb_init(f);
 
-    /* Get i y Y^{-1} y */
-    acb_mat_get_imag(Yinv, tau);
-    arb_mat_inv(Yinv, Yinv, prec);
-    _acb_vec_get_imag(y, z, g);
-    arb_mat_bilinear_form(acb_imagref(f), Yinv, y, y, prec);
+    acb_theta_ql_log_rescale(f, z, tau, prec);
 
     if (_acb_vec_is_zero(t, g))
     {
-        res = acb_theta_ql_roots_one(r, z, dist, f, tau, nb_steps, guard);
+        res = acb_theta_ql_roots_1(r, z, dist, f, tau, nb_steps, guard);
     }
     else
     {
@@ -94,14 +86,37 @@ acb_theta_ql_roots(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
         {
             _acb_vec_scalar_mul_ui(x, t, g, k, prec);
             _acb_vec_add(x, x, z, g, prec);
-            res = acb_theta_ql_roots_one(r + (k - 1) * nb_steps * n, x, dist,
+            res = acb_theta_ql_roots_1(r + (k - 1) * nb_steps * n, x, dist,
                 f, tau, nb_steps, guard);
         }
     }
 
-    arb_mat_clear(Yinv);
-    _arb_vec_clear(y, g);
     _acb_vec_clear(x, g);
     acb_clear(f);
+    return res;
+}
+
+int
+acb_theta_ql_roots(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
+    arb_srcptr dist, const acb_mat_t tau, slong nb_steps, slong guard, slong prec)
+{
+    slong g = acb_mat_nrows(tau);
+    slong n = 1 << g;
+    int has_z = _acb_vec_is_zero(z, g);
+    int has_t = _acb_vec_is_zero(t, g);
+    slong nb_r = (has_t ? 2 : 1);
+    acb_ptr x;
+    int res;
+
+    x = _acb_vec_init(g);
+
+    res = acb_theta_ql_roots_3(r, t, x, dist0, tau, nb_steps, guard, prec);
+    if (res && has_z)
+    {
+        res = acb_theta_ql_roots_3(r + nb_r * n * nb_steps, t, z, dist, tau,
+            nb_steps, guard, prec);
+    }
+
+    _acb_vec_clear(x, g);
     return res;
 }

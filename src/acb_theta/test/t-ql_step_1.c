@@ -74,7 +74,7 @@ int main(void)
             acb_set_round(&roots[k], &test[k], lp);
         }
 
-        acb_theta_ql_step_1(r, th, th0, roots, dist, dist0, g, prec);
+        acb_theta_ql_step_1(r, th0, th, roots, dist0, dist, g, prec);
 
         if (!acb_is_finite(&r[0]) || !_acb_vec_overlaps(r, test, n))
         {
