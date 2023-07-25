@@ -52,8 +52,8 @@ acb_theta_ql_a0_step(acb_ptr r, acb_srcptr roots, arb_srcptr dist, arb_srcptr di
     next = _acb_vec_init(nb_z * nb_t * n);
     rts = _acb_vec_init(nb_r * nb_z * n);
 
-    _arb_vec_scalar_mul_2exp_si(d, dist, n, k);
-    _arb_vec_scalar_mul_2exp_si(d0, dist0, n, k);
+    _arb_vec_scalar_mul_2exp_si(d, dist, n, k + 1);
+    _arb_vec_scalar_mul_2exp_si(d0, dist0, n, k + 1);
     for (j = 0; j < nb_z * nb_r; j++)
     {
         _acb_vec_set(rts + j * n, roots + j * nb_steps * n + k * n, n);
@@ -126,13 +126,11 @@ acb_theta_ql_a0_steps(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     /* Get nb_steps and dimension in ql_a0_split */
     acb_theta_eld_cho(cho, tau, ACB_THETA_LOW_PREC);
     d = acb_theta_ql_split(cho);
-
-    flint_printf("(ql_a0_steps) d =  %wd, has_z = %wd, has_t = %wd, cho:\n", d, has_z, has_t);
-    arb_mat_printd(cho, 5);
-
     nb_steps = acb_theta_ql_nb_steps(cho, d, prec);
 
-    flint_printf("(ql_a0_steps) Using d = %wd, nb_steps = %wd\n", d, nb_steps);
+    /* flint_printf("(ql_a0_steps) d =  %wd, has_z = %wd, has_t = %wd, cho:\n", d, has_z, has_t);
+       arb_mat_printd(cho, 5); */
+    /* flint_printf("(ql_a0_steps) Using d = %wd, nb_steps = %wd\n", d, nb_steps); */
 
     roots = _acb_vec_init(nb_z * nb_r * n * nb_steps);
 
@@ -149,19 +147,37 @@ acb_theta_ql_a0_steps(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
         /* Call a0_split at 0 */
         acb_mat_scalar_mul_2exp_si(w, tau, nb_steps);
         _arb_vec_scalar_mul_2exp_si(new_dist, dist0, n, nb_steps);
+
+        /* flint_printf("(ql_a0_steps) distances near cusp:\n");
+        _arb_vec_printn(new_dist, n, 5, 0);
+        flint_printf("\n"); */
+
         _acb_vec_scalar_mul_2exp_si(u, t, g, nb_steps);
         res = acb_theta_ql_a0_split(r, u, x, new_dist, w, d, guard, prec, worker);
+
+        /* flint_printf("(ql_a0_steps) result of a0_split:\n");
+        _acb_vec_printd(r, n * nb_t, 10);
+        flint_printf("\n");*/
     }
     if (res && has_z)
     {
         /* Call a0_split at z and rescale */
         _acb_vec_scalar_mul_2exp_si(x, z, g, nb_steps);
         _arb_vec_scalar_mul_2exp_si(new_dist, dist, n, nb_steps);
+
+        /*flint_printf("(ql_a0_steps) distances near cusp:\n");
+        _arb_vec_printn(new_dist, n, 5, 0);
+        flint_printf("\n");*/
+
         res = acb_theta_ql_a0_split(r + nb_t * n, u, x, new_dist, w, d,
             guard, prec, worker);
         acb_mul_2exp_si(c, f, nb_steps);
         acb_exp_pi_i(c, c, prec);
         _acb_vec_scalar_mul(r + nb_t * n, r + nb_t * n, n * nb_t, c, prec);
+
+        /*flint_printf("(ql_a0_steps) result of a0_split and rescale:\n");
+        _acb_vec_printd(r, n * nb_t, 10);
+        flint_printf("\n");*/
     }
 
     if (res)
@@ -169,9 +185,9 @@ acb_theta_ql_a0_steps(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
         for (k = nb_steps - 1; k >= 0; k--)
         {
             acb_theta_ql_a0_step(r, roots, dist, dist0, k, nb_steps, has_t, has_z, g, prec);
-            flint_printf("after step %wd\n", k);
+            /*flint_printf("after step %wd\n", k);
             _acb_vec_printd(r, nb_z * nb_t * n, 5);
-            flint_printf("\n");
+            flint_printf("\n");*/
         }
     }
 

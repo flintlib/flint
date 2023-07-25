@@ -79,6 +79,9 @@ int main(void)
             acb_theta_ql_a0_naive(test + nbt * n, t, z, dist, tau, guard, hprec);
         }
 
+        if (!_acb_vec_overlaps(r, test, nbz * nbt * n))
+        {
+            flint_printf("FAIL\n");
             flint_printf("g = %wd, prec = %wd, d = %wd, has_z = %wd, has_t = %wd, tau:\n",
                 g, prec, d, has_z, has_t);
             acb_mat_printd(tau, 5);
@@ -87,10 +90,6 @@ int main(void)
             flint_printf("\n");
             _acb_vec_printd(test, nbz * nbt * n, 5);
             flint_printf("\n");
-
-        if (!_acb_vec_overlaps(r, test, nbz * nbt * n))
-        {
-            flint_printf("FAIL\n");
             flint_abort();
         }
 
