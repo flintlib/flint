@@ -21,102 +21,69 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: agrees with naive_ind */
-    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
+    /* Test: agrees with ql_a0_naive */
+    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
-        /* slong g = 1 + n_randint(state, 2); */
-        /* slong n = 1 << g; */
-        /* slong prec = (g > 1 ? 200 : 1000); */
-        /* slong nb_z = 1 + n_randint(state, 2); */
-        /* acb_mat_t tau, entry; */
-        /* acb_ptr z, th, test; */
-        /* slong k; */
-        /* ulong a; */
+        slong g = 1 + n_randint(state, 3);
+        slong n = 1 << g;
+        slong prec = (g > 1 ? 200 : 2000) + n_randint(state, 1000);
+        slong bits = n_randint(state, 5);
+        slong hprec = prec + 50;
+        int has_t = iter % 2;
+        int has_z = (iter % 4) / 2;
+        slong nbt = (has_t ? 3 : 1);
+        slong guard = ACB_THETA_LOW_PREC;
+        slong lp = ACB_THETA_LOW_PREC;
+        acb_mat_t tau;
+        acb_ptr z, t, r, test;
+        arb_ptr dist;
+        slong k;
 
-        /* acb_mat_init(tau, g, g); */
-        /* acb_mat_init(entry, 1, 1); */
-        /* z = _acb_vec_init(nb_z * g); */
-        /* th = _acb_vec_init(n * nb_z); */
-        /* test = _acb_vec_init(n * nb_z); */
+        acb_mat_init(tau, g, g);
+        z = _acb_vec_init(g);
+        t = _acb_vec_init(g);
+        r = _acb_vec_init(nbt * n);
+        test = _acb_vec_init(nbt * n);
+        dist = _arb_vec_init(n);
 
-        /* /\* In general, use direct algorithm *\/ */
-        /* acb_siegel_randtest_nice(tau, state, prec); */
-        /* for (k = 0; k < nb_z * g; k++) */
-        /* { */
-        /*     acb_urandom(&z[k], state, prec); */
-        /* } */
-        /* if (iter % 2 == 0) */
-        /* { */
-        /*     _acb_vec_zero(z, g); */
-        /* } */
-        /* acb_theta_ql_a0(th, z, nb_z, tau, prec); */
-        /* for (a = 0; a < n; a++) */
-        /* { */
-        /*     for (k = 0; k < nb_z; k++) */
-        /*     { */
-        /*         acb_theta_naive_ind(test + k * n + a, a << g, */
-        /*             z + k * g, 1, tau, prec); */
-        /*     } */
-        /* } */
+        acb_siegel_randtest_reduced(tau, state, prec, bits);
+        for (k = 0; k < g; k++)
+        {
+            if (has_z)
+            {
+                acb_urandom(&z[k], state, hprec);
+            }
+            if (has_t)
+            {
+                arb_urandom(acb_realref(&t[k]), state, hprec);
+            }
+        }
+        acb_theta_dist_a0(dist, z, tau, lp);
 
-        /* if (!_acb_vec_overlaps(th, test, n * nb_z) */
-        /*     || !acb_is_finite(&th[0])) */
-        /* { */
-        /*     flint_printf("FAIL (generic)\n"); */
-        /*     flint_printf("g = %wd, prec = %wd\n", g, prec); */
-        /*     acb_mat_printd(tau, 10); */
-        /*     _acb_vec_printd(th, n * nb_z, 10); */
-        /*     flint_printf("\n"); */
-        /*     _acb_vec_printd(test, n * nb_z, 10); */
-        /*     flint_printf("\n"); */
-        /*     flint_abort(); */
-        /* } */
+        acb_theta_ql_a0(r, t, z, dist, tau, guard, prec);
+        acb_theta_ql_a0_naive(test, t, z, dist, tau, guard, hprec);
 
-        /* /\* Construct example with ql_roots_aux: tau diagonal, z = (1+tau)/2 *\/ */
-        /* acb_mat_zero(tau); */
-        /* for (k = 0; k < g; k++) */
-        /* { */
-        /*     acb_siegel_randtest_nice(entry, state, prec); */
-        /*     acb_set(acb_mat_entry(tau, k, k), acb_mat_entry(entry, 0, 0)); */
-        /*     acb_add_si(&z[k], acb_mat_entry(tau, k, k), 1, prec); */
-        /*     acb_mul_2exp_si(&z[k], &z[k], -1); */
-        /* } */
-        /* if ((iter % 2 == 0) && (nb_z > 1)) */
-        /* { */
-        /*     _acb_vec_zero(z, g); */
-        /* } */
-        /* acb_theta_ql_a0(th, z, nb_z, tau, prec); */
-        /* for (a = 0; a < n; a++) */
-        /* { */
-        /*     for (k = 0; k < nb_z; k++) */
-        /*     { */
-        /*         acb_theta_naive_ind(test + k * n + a, a << g, */
-        /*             z + k * g, 1, tau, prec); */
-        /*     } */
-        /* } */
+            flint_printf("g = %wd, prec = %wd, has_z = %wd, has_t = %wd, tau:\n",
+                g, prec, has_z, has_t);
+            acb_mat_printd(tau, 5);
+            flint_printf("output:\n");
+            _acb_vec_printd(r, nbt * n, 5);
+            flint_printf("\n");
+            _acb_vec_printd(test, nbt * n, 5);
+            flint_printf("\n");
 
-        /* if (!_acb_vec_overlaps(th, test, n * nb_z) */
-        /*     || acb_contains_zero(&test[n-1]) */
-        /*     || !acb_is_finite(&th[0])) */
-        /* { */
-        /*     flint_printf("FAIL (special)\n"); */
-        /*     flint_printf("g = %wd, prec = %wd\n", g, prec); */
-        /*     acb_mat_printd(tau, 10); */
-        /*     _acb_vec_printd(th, n * nb_z, 10); */
-        /*     flint_printf("\n"); */
-        /*     _acb_vec_printd(test, n * nb_z, 10); */
-        /*     flint_printf("\nDifference:\n"); */
-        /*     _acb_vec_sub(th, th, test, n * nb_z, prec); */
-        /*     _acb_vec_printd(th, n * nb_z, 10); */
-        /*     flint_printf("\n"); */
-        /*     flint_abort(); */
-        /* } */
+        if (!_acb_vec_overlaps(r, test, nbt * n))
+        {
+            flint_printf("FAIL\n");
+            flint_abort();
+        }
 
-        /* acb_mat_clear(tau); */
-        /* acb_mat_clear(entry); */
-        /* _acb_vec_clear(z, nb_z * g);         */
-        /* _acb_vec_clear(th, n * nb_z); */
-        /* _acb_vec_clear(test, n * nb_z); */
+        acb_mat_clear(tau);
+        _acb_vec_clear(z, g);
+        _acb_vec_clear(t, g);
+        _acb_vec_clear(r, nbt * n);
+        _acb_vec_clear(test, nbt * n);
+        _arb_vec_clear(dist, n);
     }
 
     flint_randclear(state);
@@ -124,4 +91,3 @@ int main(void)
     flint_printf("PASS\n");
     return 0;
 }
-
