@@ -17,6 +17,9 @@ int main(void)
     flint_rand_t state;
 
     flint_printf("transform_sqr_proj....");
+    fflush(stdout);
+
+    flint_randinit(state);
 
     /* Test: inverse matrix gives back the same projective point */
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
@@ -38,6 +41,7 @@ int main(void)
         th = _acb_vec_init(n2);
         aux = _acb_vec_init(n2);
         test = _acb_vec_init(n2);
+        acb_init(scal);
 
         acb_siegel_randtest_nice(tau, state, prec);
         for (k = 0; k < g; k++)
@@ -52,19 +56,11 @@ int main(void)
         acb_theta_transform_sqr_proj(th, aux, inv, prec);
         acb_div(scal, &test[0], &th[0], prec);
         _acb_vec_scalar_mul(th, th, n2, scal, prec);
-        
-            flint_printf("g = %wd, tau:\n");
-            acb_mat_printd(tau, 5);
-            flint_printf("test, th:\n");
-            _acb_vec_printd(test, n2, 5);
-            flint_printf("\n");
-            _acb_vec_printd(th, n2, 5);
-            flint_printf("\n");
 
         if (!_acb_vec_overlaps(th, test, n2))
         {
             flint_printf("FAIL\n");
-            flint_printf("g = %wd, tau:\n");
+            flint_printf("g = %wd, tau:\n", g);
             acb_mat_printd(tau, 5);
             flint_printf("test, th:\n");
             _acb_vec_printd(test, n2, 5);
@@ -81,6 +77,7 @@ int main(void)
         _acb_vec_clear(th, n2);
         _acb_vec_clear(aux, n2);
         _acb_vec_clear(test, n2);
+        acb_clear(scal);
     }
 
     flint_randclear(state);

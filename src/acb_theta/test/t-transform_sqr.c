@@ -19,8 +19,10 @@ int main(void)
     flint_printf("transform_sqr....");
     fflush(stdout);
 
+    flint_randinit(state);
+
     /* Test: compatible with transformation in genus 1 */
-    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         slong g = 1;
         slong n2 = 1 << (2 * g);
@@ -71,6 +73,7 @@ int main(void)
             _acb_vec_printd(th, n2, 5);
             flint_printf("\n");
             _acb_vec_printd(test, n2, 5);
+            flint_printf("\n");
         }
 
         acb_mat_clear(tau);

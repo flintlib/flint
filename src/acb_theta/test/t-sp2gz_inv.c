@@ -39,7 +39,7 @@ int main(void)
         if (!fmpz_mat_equal(m1, m2) || !fmpz_is_one(den))
         {
             flint_printf("FAIL\n\n");
-            flint_abort();            
+            flint_abort();
         }
 
         fmpz_mat_clear(m1);

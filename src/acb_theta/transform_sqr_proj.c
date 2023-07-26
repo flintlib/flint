@@ -16,28 +16,28 @@ acb_theta_transform_sqr_proj(acb_ptr res, acb_srcptr th2, const fmpz_mat_t mat, 
 {
     acb_ptr aux;
     slong g = sp2gz_dim(mat);
-    ulong n = 1 << g;
+    ulong n2 = 1 << (2 * g);
     ulong ab;
     ulong image_ab;
     fmpz_t eps;
     acb_t c;
 
-    aux = _acb_vec_init(n);
+    aux = _acb_vec_init(n2);
     fmpz_init(eps);
     acb_init(c);
 
-    for (ab = 0; ab < n; ab++)
+    for (ab = 0; ab < n2; ab++)
     {
         image_ab = acb_theta_transform_char(eps, ab, mat);
-        acb_unit_root(c, 8, prec);
+        acb_unit_root(c, 4, prec); /* 8 for theta values, 4 for squares */
         acb_pow_fmpz(c, c, eps, prec);
         acb_mul(c, c, &th2[image_ab], prec);
         acb_set(&aux[ab], c);
     }
 
-    _acb_vec_set(res, aux, n);
+    _acb_vec_set(res, aux, n2);
 
-    _acb_vec_clear(aux, n);
+    _acb_vec_clear(aux, n2);
     fmpz_clear(eps);
     acb_clear(c);
 }

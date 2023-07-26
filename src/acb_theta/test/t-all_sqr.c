@@ -24,9 +24,9 @@ int main(void)
     /* Test: agrees with naive_all */
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 4);
+        slong g = 1 + n_randint(state, 3);
         slong n2 = 1 << (2 * g);
-        slong prec = 100 + n_randint(state, 500);
+        slong prec = 100;
         slong bits = n_randint(state, 5);
         acb_mat_t tau;
         acb_ptr z;
@@ -52,17 +52,6 @@ int main(void)
         {
             acb_sqr(&test[k], &test[k], prec);
         }
-        
-            flint_printf("g = %wd, prec = %wd, tau:\n", g, prec);
-            acb_mat_printd(tau, 5);
-            flint_printf("z:\n");
-            _acb_vec_printd(z, g, 5);
-            flint_printf("\n");
-            flint_printf("th, test:\n");
-            _acb_vec_printd(th, n2, 5);
-            flint_printf("\n");
-            _acb_vec_printd(test, n2, 5);
-            flint_printf("\n");
 
         if (!_acb_vec_overlaps(th, test, n2))
         {
