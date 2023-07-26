@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 void
-acb_theta_transform_proj(acb_ptr res, acb_srcptr th2, const fmpz_mat_t mat, slong prec)
+acb_theta_transform_sqr_proj(acb_ptr res, acb_srcptr th2, const fmpz_mat_t mat, slong prec)
 {
     acb_ptr aux;
     slong g = sp2gz_dim(mat);

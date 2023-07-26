@@ -37,7 +37,7 @@ get_power_of_i(const acb_t x)
 }
 
 slong
-acb_theta_k2(const fmpz_mat_t mat)
+acb_theta_transform_k2(const fmpz_mat_t mat)
 {
     slong g = acb_mat_nrows(mat) / 2;
     fmpz_mat_t inv;
