@@ -14,14 +14,24 @@
 void acb_theta_eld_cho(arb_mat_t cho, const acb_mat_t tau, slong prec)
 {
     arb_t pi;
+    int res;
 
     arb_init(pi);
     arb_const_pi(pi, prec);
 
     acb_mat_get_imag(cho, tau);
     arb_mat_scalar_mul_arb(cho, cho, pi, prec);
-    arb_mat_cho(cho, cho, prec);
+    res = arb_mat_cho(cho, cho, prec);
     arb_mat_transpose(cho, cho);
+
+    if (!res)
+    {
+        flint_printf("acb_theta_eld_cho: Error ");
+        flint_printf("(imaginary part is not positive enough)\n");
+        acb_mat_printd(tau, 5);
+        fflush(stdout);
+        flint_abort();
+    }
 
     arb_clear(pi);
 }

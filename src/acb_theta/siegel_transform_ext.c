@@ -13,7 +13,7 @@
 
 void
 acb_siegel_transform_ext(acb_ptr r, acb_mat_t w, const fmpz_mat_t mat,
-                         acb_srcptr z, const acb_mat_t tau, slong prec)
+    acb_srcptr z, const acb_mat_t tau, slong prec)
 {
     slong g = sp2gz_dim(mat);
     fmpz_mat_t a;

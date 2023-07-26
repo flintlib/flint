@@ -169,7 +169,6 @@ acb_theta_ql_a0_steps(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     acb_init(f);
     acb_init(c);
 
-    /* Get nb_steps and dimension in ql_a0_split */
     acb_theta_eld_cho(cho, tau, ACB_THETA_LOW_PREC);
     sp = acb_theta_ql_split(cho);
     nb_steps = acb_theta_ql_nb_steps(cho, sp, prec);
@@ -180,7 +179,6 @@ acb_theta_ql_a0_steps(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     /* arb_mat_printd(cho, 5); */
     /* flint_printf("(ql_a0_steps) Using nb_steps = %wd\n", nb_steps); */
 
-    /* Get roots */
     acb_theta_ql_log_rescale(f, z, tau, prec);
     res = acb_theta_ql_roots(roots, t, z, dist0, dist, tau, nb_steps, guard, prec);
 

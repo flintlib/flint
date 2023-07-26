@@ -30,7 +30,7 @@ sp2gz_block_diag(fmpz_mat_t mat, const fmpz_mat_t U)
         fmpz_neg(den, den);
         fmpz_mat_neg(D, D);
     }
-    
+
     sp2gz_set_abcd(mat, U, zero, zero, D);
 
     fmpz_mat_clear(D);

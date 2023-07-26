@@ -47,7 +47,7 @@ acb_theta_agm_mul_tight(acb_ptr r, acb_srcptr a0, acb_srcptr a,
     /* Perform agm_mul or agm_sqr at high precision */
     if (a0 == a)
     {
-        acb_theta_agm_sqr(r, v0, g, hprec);
+        acb_theta_agm_mul(r, v0, v0, g, hprec);
     }
     else
     {

@@ -39,69 +39,55 @@ get_power_of_i(const acb_t x)
 slong
 acb_theta_transform_k2(const fmpz_mat_t mat)
 {
-    slong g = acb_mat_nrows(mat) / 2;
+    slong g = sp2gz_dim(mat);
     fmpz_mat_t inv;
     acb_mat_t tau;
-    acb_mat_t w;
     acb_ptr z;
-    acb_t scal1, scal2, temp;
+    acb_t scal1, scal2, t;
     fmpz_t eps;
     ulong ab;
-    slong j;
-    slong k2;
+    slong k2 = -1;
     slong prec = ACB_THETA_LOW_PREC;
-    int stop = 0;
 
     fmpz_mat_init(inv, 2 * g, 2 * g);
     acb_mat_init(tau, g, g);
-    acb_mat_init(w, g, g);
     z = _acb_vec_init(g);
     fmpz_init(eps);
     acb_init(scal1);
     acb_init(scal2);
-    acb_init(temp);
+    acb_init(t);
 
-    fmpz_mat_inv(inv, eps, mat);
+    sp2gz_inv(inv, mat);
     ab = acb_theta_transform_char(eps, 0, inv);
     acb_theta_transform_char(eps, ab, mat);
 
-    while (!stop)
+    while (k2 == -1)
     {
-        acb_mat_zero(tau);
-        for (j = 0; j < g; j++)
-        {
-            acb_onei(acb_mat_entry(tau, j, j));
-        }
+        acb_mat_onei(tau);
         acb_theta_naive_00(scal1, z, 1, tau, prec);
         acb_sqr(scal1, scal1, prec);
 
-        acb_siegel_cocycle(w, mat, tau, prec);
         acb_siegel_transform(tau, mat, tau, prec);
         acb_theta_naive_ind(scal2, ab, z, 1, tau, prec);
         acb_sqr(scal2, scal2, prec);
 
-        acb_mat_det(temp, w, prec);
-        acb_mul(scal1, scal1, temp, prec);
-        acb_onei(temp);
-        acb_pow_fmpz(temp, temp, eps, prec);
-        acb_mul(scal1, scal1, temp, prec);
+        acb_siegel_cocycle_det(t, mat, tau, prec);
+        acb_mul(scal1, scal1, t, prec);
+        acb_onei(t);
+        acb_pow_fmpz(t, t, eps, prec);
+        acb_mul(scal1, scal1, t, prec);
         acb_div(scal1, scal2, scal1, prec);
 
         k2 = get_power_of_i(scal1);
-        if (k2 != -1)
-        {
-            stop = 1;
-        }
         prec += ACB_THETA_LOW_PREC;
     }
 
     fmpz_mat_clear(inv);
     acb_mat_clear(tau);
-    acb_mat_clear(w);
     _acb_vec_clear(z, g);
     fmpz_clear(eps);
     acb_clear(scal1);
     acb_clear(scal2);
-    acb_clear(temp);
+    acb_clear(t);
     return k2;
 }

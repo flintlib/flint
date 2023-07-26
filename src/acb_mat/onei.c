@@ -9,17 +9,26 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb_theta.h"
+#include "acb_mat.h"
 
 void
-acb_theta_char_get_acb(acb_ptr v, ulong a, slong g)
+acb_mat_onei(acb_mat_t mat)
 {
-    slong k;
+    slong i, j;
 
-    for (k = g - 1; k >= 0; k--)
+    for (i = 0; i < acb_mat_nrows(mat); i++)
     {
-        acb_set_si(&v[k], a & 1);
-        a = a >> 1;
+        for (j = 0; j < acb_mat_ncols(mat); j++)
+        {
+            if (i == j)
+            {
+                acb_onei(acb_mat_entry(mat, i, j));
+            }
+            else
+            {
+                acb_zero(acb_mat_entry(mat, i, j));
+            }
+        }
     }
-    _acb_vec_scalar_mul_2exp_si(v, v, g, -1);
 }
+

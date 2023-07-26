@@ -12,8 +12,7 @@
 #include "acb_theta.h"
 
 void
-acb_theta_naive_tail(arf_t bound, const arf_t R2, const arb_mat_t cho, slong ord,
-    slong prec)
+acb_theta_naive_tail(arf_t bound, const arf_t R2, const arb_mat_t cho, slong ord, slong prec)
 {
     arb_t res, temp;
     arb_t Rmod;
@@ -29,7 +28,7 @@ acb_theta_naive_tail(arf_t bound, const arf_t R2, const arb_mat_t cho, slong ord
     arb_set_si(temp, FLINT_MAX(4, 2 * ord));
     arb_max(Rmod, Rmod, temp, prec);
 
-    /* Evaluate upper bound on tail */
+    /* Evaluate 2^(2*g+2) R^(g-1 + 2*ord) exp(-R^2) \prod(1 + gamma_i^{-1}) */
     arb_one(res);
     arb_mul_2exp_si(res, res, 2 * g + 2);
 

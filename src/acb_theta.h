@@ -56,6 +56,7 @@ void sp2gz_randtest(fmpz_mat_t mat, flint_rand_t state, slong bits);
 /* The Siegel half space */
 
 void acb_siegel_cocycle(acb_mat_t res, const fmpz_mat_t mat, const acb_mat_t tau, slong prec);
+void acb_siegel_cocycle_det(acb_t det, const fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 void acb_siegel_transform(acb_mat_t res, const fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 void acb_siegel_transform_ext(acb_ptr r, acb_mat_t w, const fmpz_mat_t mat,
     acb_srcptr z, const acb_mat_t tau, slong prec);
@@ -81,7 +82,6 @@ void acb_theta_char_dot_acb(acb_t x, ulong a, acb_srcptr z, slong g, slong prec)
 /* Ellipsoids in naive algorithms */
 
 #define ACB_THETA_LOW_PREC 32
-#define ACB_THETA_ELD_DEFAULT_PREC 32
 
 struct acb_theta_eld_struct
 {
@@ -190,7 +190,6 @@ slong acb_theta_dist_addprec(const arb_t d2);
 void acb_theta_agm_hadamard(acb_ptr r, acb_srcptr a, slong g, slong prec);
 void acb_theta_agm_sqrt(acb_ptr r, acb_srcptr a, acb_srcptr roots, slong nb, slong prec);
 void acb_theta_agm_mul(acb_ptr r, acb_srcptr a1, acb_srcptr a2, slong g, slong prec);
-void acb_theta_agm_sqr(acb_ptr r, acb_srcptr a, slong g, slong prec);
 void acb_theta_agm_rel_mag_err(arf_t m, arf_t eps, acb_srcptr a,
     arb_srcptr dist, slong n, slong prec);
 void acb_theta_agm_mul_tight(acb_ptr r, acb_srcptr a0, acb_srcptr a,

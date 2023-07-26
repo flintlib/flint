@@ -19,37 +19,36 @@ acb_theta_transform_scal(acb_t scal, acb_srcptr z,
     fmpz_mat_t c;
     acb_mat_t w;
     acb_ptr Nz, v;
-    acb_t mu, det;
+    acb_t mu, x;
 
     fmpz_mat_init(c, g, g);
     acb_mat_init(w, g, g);
     v = _acb_vec_init(g);
     Nz = _acb_vec_init(g);
     acb_init(mu);
-    acb_init(det);
+    acb_init(x);
 
     acb_onei(mu);
     acb_pow_si(mu, mu, k2, prec);
-    acb_siegel_cocycle(w, mat, tau, prec);
-    acb_mat_det(det, w, prec);
-    acb_mul(scal, det, mu, prec);
+    acb_siegel_cocycle_det(x, mat, tau, prec);
+    acb_mul(scal, x, mu, prec);
 
     acb_siegel_transform_ext(Nz, w, mat, z, tau, prec);
     sp2gz_get_c(c, mat);
     acb_mat_set_fmpz_mat(w, c);
     acb_mat_vector_mul_col(v, w, z, prec);
 
-    acb_dot(det, NULL, 0, v, 1, Nz, 1, g, prec);
-    acb_mul_2exp_si(det, det, 1);
-    acb_exp_pi_i(det, det, prec);
-    acb_mul(scal, scal, det, prec);
+    acb_dot(x, NULL, 0, v, 1, Nz, 1, g, prec);
+    acb_mul_2exp_si(x, x, 1);
+    acb_exp_pi_i(x, x, prec);
+    acb_mul(scal, scal, x, prec);
 
     fmpz_mat_clear(c);
     acb_mat_clear(w);
     _acb_vec_clear(v, g);
     _acb_vec_clear(Nz, g);
     acb_clear(mu);
-    acb_clear(det);
+    acb_clear(x);
 }
 
 void

@@ -16,11 +16,9 @@ acb_theta_dist_pt(arb_t d2, arb_srcptr offset, const arb_mat_t cho, slong* pt, s
 {
     slong g = arb_mat_nrows(cho);
     arb_ptr v;
-    arb_t s;
     slong k;
 
     v = _arb_vec_init(g);
-    arb_init(s);
 
     for (k = 0; k < g; k++)
     {
@@ -28,14 +26,7 @@ acb_theta_dist_pt(arb_t d2, arb_srcptr offset, const arb_mat_t cho, slong* pt, s
     }
     arb_mat_vector_mul_col(v, cho, v, prec);
     _arb_vec_add(v, v, offset, g, prec);
-
-    arb_zero(d2);
-    for (k = 0; k < g; k++)
-    {
-        arb_sqr(s, &v[k], prec);
-        arb_add(d2, d2, s, prec);
-    }
+    arb_dot(d2, NULL, 0, v, 1, v, 1, g, prec);
 
     _arb_vec_clear(v, g);
-    arb_clear(s);
 }

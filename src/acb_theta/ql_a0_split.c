@@ -45,6 +45,52 @@ acb_theta_ql_blocks(acb_mat_t t0, acb_mat_t x, acb_mat_t t1,
     }
 }
 
+static void
+acb_theta_ql_a0_eld_points(slong** pts, slong* nb_pts, arb_ptr offset,
+    slong* fullprec, arf_t eps, arb_srcptr dist, ulong a, arb_srcptr z_offset,
+    const arb_mat_t cho, const arb_mat_t cho1, slong prec)
+{
+    slong g = arb_mat_nrows(cho);
+    slong d = g - arb_mat_nrows(cho1);
+    slong n = 1 << g;
+    slong nb_a = 1 << (g - d);
+    slong lp = ACB_THETA_LOW_PREC;
+    arb_t max_dist;
+    arf_t R2;
+    acb_theta_eld_t E;
+    slong k;
+
+    acb_theta_eld_init(E, g - d, g - d);
+    arf_init(R2);
+    arb_init(max_dist);
+
+    /* Get offset */
+    acb_theta_char_get_arb(offset, a, g - d);
+    _arb_vec_add(offset, offset, z_offset + d, g - d, prec);
+    arb_mat_vector_mul_col(offset, cho1, offset, prec);
+
+    /* Get R2 */
+    arb_zero(max_dist);
+    for (k = a; k < n; k += nb_a)
+    {
+        arb_max(max_dist, max_dist, &dist[k], lp);
+    }
+    *fullprec = prec + acb_theta_dist_addprec(max_dist);
+    arf_one(eps);
+    arf_mul_2exp_si(eps, eps, - *fullprec);
+    acb_theta_naive_radius(R2, cho, 0, eps, lp);
+
+    /* List points in ellipsoid */
+    acb_theta_eld_fill(E, cho1, R2, offset, prec);
+    *nb_pts = acb_theta_eld_nb_pts(E);
+    *pts = flint_malloc(acb_theta_eld_nb_pts(E) * (g - d) * sizeof(slong));
+    acb_theta_eld_points(*pts, E);
+
+    acb_theta_eld_clear(E);
+    arf_clear(R2);
+    arb_init(max_dist);
+}
+
 int
 acb_theta_ql_a0_split(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     const acb_mat_t tau, slong d, slong guard, slong prec, acb_theta_ql_worker_t worker)
@@ -59,19 +105,18 @@ acb_theta_ql_a0_split(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     acb_mat_t tau0, star, tau1;
     arb_ptr offset, z_offset, new_dist, new_dist0;
     acb_ptr v, w, new_z, new_th;
-    arf_t eps, R2;
+    arf_t eps;
     arb_t max_dist, x;
     acb_t c, f;
-    acb_theta_eld_t E;
     slong* pts;
-    slong newprec, fullprec;
+    slong newprec, fullprec, nb_pts;
     ulong a;
     slong j, k, l;
     int res = 1;
 
     if (d <= 0 || d >= g)
     {
-        flint_printf("(ql_a0_split) Error: must have 1 < d < g - 1\n");
+        flint_printf("ql_a0_split: Error (must have 1 < d < g - 1)\n");
         flint_abort();
     }
 
@@ -89,7 +134,6 @@ acb_theta_ql_a0_split(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     w = _acb_vec_init(g - d);
     new_z = _acb_vec_init(d);
     new_th = _acb_vec_init(2 * nb_th * nb_t);
-    arf_init(R2);
     arf_init(eps);
     arb_init(max_dist);
     arb_init(x);
@@ -109,40 +153,12 @@ acb_theta_ql_a0_split(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     _acb_vec_zero(r, n * nb_t);
     for (a = 0; a < nb_a; a++)
     {
-        /* Get R2 */
-        arb_zero(max_dist);
-        for (k = a; k < n; k += nb_a)
-        {
-            arb_max(max_dist, max_dist, &dist[k], lp);
-        }
-        fullprec = prec + acb_theta_dist_addprec(max_dist);
-        arf_one(eps);
-        arf_mul_2exp_si(eps, eps, -fullprec);
-        acb_theta_naive_radius(R2, cho, 0, eps, lp);
-
-        /* Get offset */
-        acb_theta_char_get_arb(offset, a, g - d);
-        _arb_vec_add(offset, offset, z_offset + d, g - d, prec);
-        arb_mat_vector_mul_col(offset, cho1, offset, prec);
-
-        /*flint_printf("a = %wd, R2, offset, max_dist:\n", a);
-        arf_printd(R2, 10);
-        flint_printf("\n");
-        _arb_vec_printn(offset, g - d, 5, 0);
-        flint_printf("\n");
-        arb_printd(max_dist, 5);
-        flint_printf("\n");*/
-
-        /* Make ellipsoid and list points */
-        acb_theta_eld_init(E, g - d, g - d);
-        acb_theta_eld_fill(E, cho1, R2, offset, prec);
-        pts = flint_malloc(acb_theta_eld_nb_pts(E) * (g - d) * sizeof(slong));
-        acb_theta_eld_points(pts, E);
-
-        /*flint_printf("nb_pts = %wd\n", acb_theta_eld_nb_pts(E));*/
+        /* Get offset and list points in ellipsoid */
+        acb_theta_ql_a0_eld_points(&pts, &nb_pts, offset, &fullprec, eps,
+            dist, a, z_offset, cho, cho1, prec);
 
         /* Compute th_rec at each point using worker and sum */
-        for (k = 0; (k < acb_theta_eld_nb_pts(E)) && res; k++)
+        for (k = 0; (k < nb_pts) && res; k++)
         {
             /* Set v to pt + a1/2 */
             acb_theta_char_get_acb(v, a, g - d);
@@ -227,7 +243,6 @@ acb_theta_ql_a0_split(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
             }
         }
 
-        acb_theta_eld_clear(E);
         flint_free(pts);
     }
 
@@ -245,7 +260,6 @@ acb_theta_ql_a0_split(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     _acb_vec_clear(w, g - d);
     _acb_vec_clear(new_z, d);
     _acb_vec_clear(new_th, 2 * nb_th * nb_t);
-    arf_clear(R2);
     arf_clear(eps);
     arb_clear(max_dist);
     arb_clear(x);

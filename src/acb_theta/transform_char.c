@@ -14,7 +14,7 @@
 ulong
 acb_theta_transform_char(fmpz_t eps, ulong ab, const fmpz_mat_t mat)
 {
-    slong g = fmpz_mat_nrows(mat) / 2;
+    slong g = sp2gz_dim(mat);
     fmpz_mat_t a, b, c, d;
     fmpz_mat_t mat_tp;
     fmpz_mat_t block;           /* CD^t or AB^t */
@@ -56,8 +56,7 @@ acb_theta_transform_char(fmpz_t eps, ulong ab, const fmpz_mat_t mat)
     for (i = 0; i < g; i++)
     {
         fmpz_sub(fmpz_mat_entry(alphabeta, g + i, 0),
-                 fmpz_mat_entry(alphabeta, g + i, 0), fmpz_mat_entry(block, i,
-                                                                     i));
+                 fmpz_mat_entry(alphabeta, g + i, 0), fmpz_mat_entry(block, i, i));
     }
 
     /* Turn ab into a 2g x 1 fmpz matrix, and update alphabeta */

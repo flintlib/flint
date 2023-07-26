@@ -21,7 +21,7 @@ acb_theta_naive_round(arb_ptr a, arb_srcptr v, slong g)
         if (!arb_is_finite(&v[j])
             || arf_cmpabs_ui(arb_midref(&v[j]), WORD_MAX) > 0)
         {
-            flint_printf("acb_theta_naive_ellipsoid: Error (impossible rounding)\n");
+            flint_printf("acb_theta_naive_reduce: Error (impossible rounding)\n");
             arb_printd(&v[j], 10);
             flint_printf("\n");
             fflush(stdout);

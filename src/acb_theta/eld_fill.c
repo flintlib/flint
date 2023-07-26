@@ -131,12 +131,12 @@ acb_theta_eld_fill_rec(acb_theta_eld_t E, const arb_mat_t cho,
     arb_ptr next_offset;
     slong c;
     slong nr, nl;
-    
+
     acb_theta_eld_init_interval(E, cho, R2, offset, last_coords, prec);
     min = acb_theta_eld_min(E);
     mid = acb_theta_eld_mid(E);
     max = acb_theta_eld_max(E);
-    
+
     /* Induction only if d > 1 and min <= max */
     if (min > max)
     {
@@ -186,7 +186,7 @@ acb_theta_eld_fill_rec(acb_theta_eld_t E, const arb_mat_t cho,
     {
         next_coords[k + 1] = last_coords[k];
     }
-    
+
     /* Set children recursively */
     acb_theta_eld_nb_pts(E) = 0;
     acb_theta_eld_nb_border(E) = 0;
@@ -196,6 +196,7 @@ acb_theta_eld_fill_rec(acb_theta_eld_t E, const arb_mat_t cho,
         acb_theta_eld_box(E, k) = 0;
     }
 
+    /* Right loop */
     _arb_vec_set(next_offset, offset_mid, d - 1);
     for (k = 0; k < nr; k++)
     {
@@ -215,6 +216,7 @@ acb_theta_eld_fill_rec(acb_theta_eld_t E, const arb_mat_t cho,
         }
     }
 
+    /* Left loop */
     _arb_vec_set(next_offset, offset_mid, d - 1);
     for (k = 0; k < nl; k++)
     {

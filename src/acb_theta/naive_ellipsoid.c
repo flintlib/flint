@@ -16,39 +16,17 @@ acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr new_z, acb_ptr c, arb_ptr u
     slong ord, acb_srcptr z, slong nb_z, const acb_mat_t tau, const arf_t eps, slong prec)
 {
     slong g = acb_mat_nrows(tau);
-    slong eld_prec = ACB_THETA_ELD_DEFAULT_PREC;
-    arb_t pi;
+    slong lp = ACB_THETA_LOW_PREC;
     arf_t R2;
     arb_mat_t cho;
     arb_ptr offset;
-    int res;
     slong k;
 
-    arb_init(pi);
     arf_init(R2);
     arb_mat_init(cho, g, g);
     offset = _arb_vec_init(g);
-    
-    acb_mat_get_imag(cho, tau);
-    arb_const_pi(pi, prec);
-    arb_mat_scalar_mul_arb(cho, cho, pi, prec);
 
-    /* Get Cholesky for pi Y, possibly at high precision */
-    res = arb_mat_cho(cho, cho, eld_prec);
-    if (!res)
-    {
-        eld_prec = prec;
-        res = arb_mat_cho(cho, cho, eld_prec);
-    }
-    if (!res)
-    {
-        flint_printf("acb_theta_naive_ellipsoid: Error ");
-        flint_printf("(imaginary part is not positive definite)\n");
-        acb_mat_printd(tau, 5);
-        fflush(stdout);
-        flint_abort();
-    }
-    arb_mat_transpose(cho, cho);
+    acb_theta_eld_cho(cho, tau, prec);
 
     /* Reduce all z, set offset and upper bounds */
     acb_theta_naive_reduce(offset, new_z, c, u, z, nb_z, tau, cho, prec);
@@ -56,12 +34,11 @@ acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr new_z, acb_ptr c, arb_ptr u
     {
         arb_mul_arf(&u[k], &u[k], eps, prec);
     }
-    
-    /* Get radius for error of at most eps and fill ellipsoid */
-    acb_theta_naive_radius(R2, cho, ord, eps, eld_prec);
-    acb_theta_eld_fill(E, cho, R2, offset, eld_prec);
 
-    arb_clear(pi);
+    /* Get radius for error of at most eps and fill ellipsoid */
+    acb_theta_naive_radius(R2, cho, ord, eps, lp);
+    acb_theta_eld_fill(E, cho, R2, offset, lp);
+
     arf_clear(R2);
     arb_mat_clear(cho);
     _arb_vec_clear(offset, g);

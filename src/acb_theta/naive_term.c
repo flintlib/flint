@@ -31,7 +31,7 @@ acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau,
     _acb_vec_get_real(x, z, g);
     _acb_vec_get_imag(y, z, g);
     acb_mat_get_real(X, tau);
-    acb_mat_get_imag(Y, tau);    
+    acb_mat_get_imag(Y, tau);
     for (k = 0; k < g; k++)
     {
         arb_set_si(&v[k], n[k]);

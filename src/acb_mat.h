@@ -182,6 +182,8 @@ void acb_mat_one(acb_mat_t mat);
 
 void acb_mat_ones(acb_mat_t mat);
 
+void acb_mat_onei(acb_mat_t mat);
+
 void acb_mat_indeterminate(acb_mat_t mat);
 
 void acb_mat_dft(acb_mat_t res, int kind, slong prec);

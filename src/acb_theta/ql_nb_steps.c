@@ -14,7 +14,7 @@
 slong acb_theta_ql_nb_steps(const arb_mat_t cho, slong d, slong prec)
 {
     slong g = arb_mat_nrows(cho);
-    slong lp = ACB_THETA_ELD_DEFAULT_PREC;
+    slong lp = ACB_THETA_LOW_PREC;
     arb_t x, t;
     slong res;
 

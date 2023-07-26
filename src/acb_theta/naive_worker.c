@@ -13,19 +13,18 @@
 
 static slong
 acb_theta_naive_newprec(slong prec, slong coord, slong dist, slong max_dist, slong ord)
-{    
+{
     double r = ((double) dist) / (max_dist + 2);
     double neg = r * r * prec;
     double pos = ord * n_clog(1 + FLINT_ABS(coord), 2);
 
-    return FLINT_MAX(ACB_THETA_ELD_DEFAULT_PREC, ceil((double) prec - neg + pos));
+    return FLINT_MAX(ACB_THETA_LOW_PREC, ceil((double) prec - neg + pos));
 }
 
 /* Work in dimension 1: compute exponentiel terms with two
    multiplications per term only, at just the necessary precision.
    Each term is: cofactor * lin^k * x^(k^2), and square
-   powers of x are precomputed.
-*/
+   powers of x are precomputed. */
 
 static void
 acb_theta_naive_worker_dim1(acb_ptr th, const acb_theta_eld_t E,
@@ -61,6 +60,7 @@ acb_theta_naive_worker_dim1(acb_ptr th, const acb_theta_eld_t E,
     acb_mul(start, start, cofactor, prec);
     acb_set(diff, lin);
 
+    /* Right loop */
     acb_set(aff, start);
     for (k = mid; k <= max; k++)
     {
@@ -75,6 +75,7 @@ acb_theta_naive_worker_dim1(acb_ptr th, const acb_theta_eld_t E,
         worker_dim0(th, term, coords, g, ord, newprec, fullprec);
     }
 
+    /* Left loop */
     acb_set(aff, start);
     acb_inv(diff, diff, prec);
     for (k = mid - 1; k >= min; k--)

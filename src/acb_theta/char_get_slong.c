@@ -15,7 +15,7 @@ void
 acb_theta_char_get_slong(slong* n, ulong a, slong g)
 {
     slong k;
-    
+
     for (k = g - 1; k >= 0; k--)
     {
         n[k] = a & 1;

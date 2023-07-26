@@ -66,6 +66,7 @@ acb_theta_ql_roots_3(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
+    int has_t = !_acb_vec_is_zero(t, g);
     acb_ptr x;
     acb_t f;
     slong k;
@@ -76,7 +77,7 @@ acb_theta_ql_roots_3(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
 
     acb_theta_ql_log_rescale(f, z, tau, prec);
 
-    if (_acb_vec_is_zero(t, g))
+    if (!has_t)
     {
         res = acb_theta_ql_roots_1(r, z, dist, f, tau, nb_steps, guard);
     }

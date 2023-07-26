@@ -11,9 +11,16 @@
 
 #include "acb_theta.h"
 
-slong
-acb_theta_naive_fullprec(const acb_theta_eld_t E, slong prec)
+void
+acb_siegel_cocycle_det(acb_t det, const fmpz_mat_t mat, const acb_mat_t tau, slong prec)
 {
-    return FLINT_MAX(prec + ceil(n_flog(1 + acb_theta_eld_nb_pts(E), 2)),
-            ACB_THETA_LOW_PREC);
+    slong g = sp2gz_dim(mat);
+    acb_mat_t w;
+
+    acb_mat_init(w, g, g);
+
+    acb_siegel_cocycle(w, mat, tau, prec);
+    acb_mat_det(det, w, prec);
+
+    acb_mat_clear(w);
 }

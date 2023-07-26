@@ -15,7 +15,7 @@ void
 acb_theta_char_get_arb(arb_ptr v, ulong a, slong g)
 {
     slong k;
-    
+
     for (k = g - 1; k >= 0; k--)
     {
         arb_set_si(&v[k], a & 1);

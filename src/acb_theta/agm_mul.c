@@ -21,11 +21,23 @@ acb_theta_agm_mul(acb_ptr r, acb_srcptr a1, acb_srcptr a2, slong g, slong prec)
     v = _acb_vec_init(2 * n);
 
     acb_theta_agm_hadamard(v, a1, g, prec);
-    acb_theta_agm_hadamard(v + n, a2, g, prec);
-    for (k = 0; k < n; k++)
+
+    if (a1 == a2)
     {
-        acb_mul(&v[k], &v[k], &v[k + n], prec);
+        for (k = 0; k < n; k++)
+        {
+            acb_sqr(&v[k], &v[k], prec);
+        }
     }
+    else
+    {
+        acb_theta_agm_hadamard(v + n, a2, g, prec);
+        for (k = 0; k < n; k++)
+        {
+            acb_mul(&v[k], &v[k], &v[k + n], prec);
+        }
+    }
+
     acb_theta_agm_hadamard(r, v, g, prec);
     _acb_vec_scalar_mul_2exp_si(r, r, n, -2 * g);
 
