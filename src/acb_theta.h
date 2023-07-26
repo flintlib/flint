@@ -55,10 +55,8 @@ void sp2gz_randtest(fmpz_mat_t mat, flint_rand_t state, slong bits);
 
 /* The Siegel half space */
 
-void acb_siegel_cocycle(acb_mat_t res, const fmpz_mat_t mat,
-    const acb_mat_t tau, slong prec);
-void acb_siegel_transform(acb_mat_t res, const fmpz_mat_t mat,
-    const acb_mat_t tau, slong prec);
+void acb_siegel_cocycle(acb_mat_t res, const fmpz_mat_t mat, const acb_mat_t tau, slong prec);
+void acb_siegel_transform(acb_mat_t res, const fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 void acb_siegel_transform_ext(acb_ptr r, acb_mat_t w, const fmpz_mat_t mat,
     acb_srcptr z, const acb_mat_t tau, slong prec);
 
@@ -231,17 +229,15 @@ void acb_theta_ql_all_sqr(acb_ptr r, acb_srcptr z, const acb_mat_t tau, slong pr
 
 /* Transformation formulas for theta functions */
 
-ulong acb_theta_transform_image_char(fmpz_t eps, ulong ab, const fmpz_mat_t mat);
-void acb_theta_transform_proj(acb_ptr res, acb_srcptr th, const fmpz_mat_t mat, slong prec);
-void acb_theta_transform_scal_const(acb_t scal, const acb_mat_t tau,
-    const fmpz_mat_t mat, slong k2, slong prec);
-void acb_theta_transform_scal(acb_t scal_z, acb_t scal_0, acb_srcptr z,
+ulong acb_theta_transform_char(fmpz_t eps, ulong ab, const fmpz_mat_t mat);
+void acb_theta_transform_sqr_proj(acb_ptr res, acb_srcptr th2, const fmpz_mat_t mat, slong prec);
+slong acb_theta_transform_k2(const fmpz_mat_t mat);
+void acb_theta_transform_sqr(acb_ptr res, acb_srcptr th2, acb_srcptr z,
     const acb_mat_t tau, const fmpz_mat_t mat, slong k2, slong prec);
-slong acb_theta_k2(const fmpz_mat_t mat);
 
-/* User function */
+/* Main function */
 
-void acb_theta_all_sqr(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec);
+void acb_theta_all_sqr(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec);
 
 #ifdef __cplusplus
 }

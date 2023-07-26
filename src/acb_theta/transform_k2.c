@@ -15,15 +15,25 @@ static slong
 get_power_of_i(const acb_t x)
 {
     if (arb_is_positive(acb_realref(x)))
+    {
         return 0;
+    }
     else if (arb_is_positive(acb_imagref(x)))
+    {
         return 1;
+    }
     else if (arb_is_negative(acb_realref(x)))
+    {
         return 2;
+    }
     else if (arb_is_negative(acb_imagref(x)))
+    {
         return 3;
+    }
     else
+    {
         return -1;
+    }
 }
 
 slong
@@ -39,7 +49,7 @@ acb_theta_k2(const fmpz_mat_t mat)
     ulong ab;
     slong j;
     slong k2;
-    slong prec = 50;
+    slong prec = ACB_THETA_LOW_PREC;
     int stop = 0;
 
     fmpz_mat_init(inv, 2 * g, 2 * g);
@@ -52,8 +62,8 @@ acb_theta_k2(const fmpz_mat_t mat)
     acb_init(temp);
 
     fmpz_mat_inv(inv, eps, mat);
-    ab = acb_theta_transform_image_char(eps, 0, inv);
-    acb_theta_transform_image_char(eps, ab, mat);
+    ab = acb_theta_transform_char(eps, 0, inv);
+    acb_theta_transform_char(eps, ab, mat);
 
     while (!stop)
     {
@@ -62,7 +72,7 @@ acb_theta_k2(const fmpz_mat_t mat)
         {
             acb_onei(acb_mat_entry(tau, j, j));
         }
-        acb_theta_naive_ind(scal1, 0, z, 1, tau, prec);
+        acb_theta_naive_00(scal1, z, 1, tau, prec);
         acb_sqr(scal1, scal1, prec);
 
         acb_siegel_cocycle(w, mat, tau, prec);
@@ -82,7 +92,7 @@ acb_theta_k2(const fmpz_mat_t mat)
         {
             stop = 1;
         }
-        prec *= 2;
+        prec += ACB_THETA_LOW_PREC;
     }
 
     fmpz_mat_clear(inv);

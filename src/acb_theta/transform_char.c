@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 ulong
-acb_theta_transform_image_char(fmpz_t eps, ulong ab, const fmpz_mat_t mat)
+acb_theta_transform_char(fmpz_t eps, ulong ab, const fmpz_mat_t mat)
 {
     slong g = fmpz_mat_nrows(mat) / 2;
     fmpz_mat_t a, b, c, d;
@@ -22,7 +22,6 @@ acb_theta_transform_image_char(fmpz_t eps, ulong ab, const fmpz_mat_t mat)
     fmpz_mat_t alpha, beta;     /* These are windows, not initialized or freed */
     fmpz_mat_t Cvec_1, Cvec_2, Lvec;
     fmpz_mat_t coef;
-
     ulong res = 0;
     slong i;
 

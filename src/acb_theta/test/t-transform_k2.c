@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("k2....");
+    flint_printf("transform_k2....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -43,7 +43,7 @@ int main(void)
         fmpz_mat_randops(U, state, 2 * bits);
         sp2gz_block_diag(mat, U);
         fmpz_mat_det(det, U);
-        k2 = acb_theta_k2(mat);
+        k2 = acb_theta_transform_k2(mat);
 
         /* det is 1 or -1; k2 is 0 or 2 */
         if (k2 != 1 - fmpz_get_si(det))

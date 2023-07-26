@@ -12,8 +12,7 @@
 #include "acb_theta.h"
 
 void
-acb_theta_transform_proj(acb_ptr res, acb_srcptr th2, const fmpz_mat_t mat,
-    slong prec)
+acb_theta_transform_proj(acb_ptr res, acb_srcptr th2, const fmpz_mat_t mat, slong prec)
 {
     acb_ptr aux;
     slong g = sp2gz_dim(mat);
@@ -29,7 +28,7 @@ acb_theta_transform_proj(acb_ptr res, acb_srcptr th2, const fmpz_mat_t mat,
 
     for (ab = 0; ab < n; ab++)
     {
-        image_ab = acb_theta_transform_image_char(eps, ab, mat);
+        image_ab = acb_theta_transform_char(eps, ab, mat);
         acb_unit_root(c, 8, prec);
         acb_pow_fmpz(c, c, eps, prec);
         acb_mul(c, c, &th2[image_ab], prec);
