@@ -39,6 +39,7 @@ int main(void)
         acb_ptr z, zero, t, r, test;
         arb_ptr dist, dist0;
         slong j, k;
+        int res;
 
         acb_mat_init(tau, g, g);
         z = _acb_vec_init(g);
@@ -72,10 +73,11 @@ int main(void)
         acb_theta_dist_a0(dist, z, tau, lp);
         acb_theta_dist_a0(dist0, zero, tau, lp);
 
-        acb_theta_ql_a0_steps(r, t, z, dist0, dist, tau, guard, prec, &acb_theta_ql_a0_naive);
+        res = acb_theta_ql_a0_steps(r, t, z, dist0, dist, tau, guard, prec,
+            &acb_theta_ql_a0_naive);
         acb_theta_ql_a0_naive(test, t, z, dist0, dist, tau, guard, hprec);
 
-        if (!_acb_vec_overlaps(r, test, nbz * nbt * n))
+        if (res && !_acb_vec_overlaps(r, test, nbz * nbt * n))
         {
             flint_printf("FAIL\n");
             flint_printf("g = %wd, prec = %wd, d = %wd, has_z = %wd, has_t = %wd, tau:\n",

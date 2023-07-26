@@ -239,12 +239,9 @@ void acb_theta_transform_scal(acb_t scal_z, acb_t scal_0, acb_srcptr z,
     const acb_mat_t tau, const fmpz_mat_t mat, slong k2, slong prec);
 slong acb_theta_k2(const fmpz_mat_t mat);
 
-/* User functions */
+/* User function */
 
-void acb_theta(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec);
-void acb_theta_const(acb_ptr th, const acb_mat_t tau, slong prec);
-void acb_theta_all(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec);
-void acb_theta_all_const(acb_ptr th, const acb_mat_t tau, slong prec);
+void acb_theta_all_sqr(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec);
 
 #ifdef __cplusplus
 }
