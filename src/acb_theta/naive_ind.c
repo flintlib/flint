@@ -56,5 +56,5 @@ acb_theta_naive_ind(acb_ptr th, ulong ab, acb_srcptr z, slong nb_z,
     _acb_vec_clear(v, g);
     _acb_vec_clear(w, g);
     acb_clear(c);
-    acb_clear(x);    
+    acb_clear(x);
 }

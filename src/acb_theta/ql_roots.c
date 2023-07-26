@@ -102,8 +102,8 @@ acb_theta_ql_roots(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
-    int has_z = _acb_vec_is_zero(z, g);
-    int has_t = _acb_vec_is_zero(t, g);
+    int has_z = !_acb_vec_is_zero(z, g);
+    int has_t = !_acb_vec_is_zero(t, g);
     slong nb_r = (has_t ? 2 : 1);
     acb_ptr x;
     int res;

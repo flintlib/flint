@@ -11,6 +11,8 @@
 
 #include "acb_theta.h"
 
+/* Todo: make function a0_split_term */
+
 static void
 acb_theta_ql_blocks(acb_mat_t t0, acb_mat_t x, acb_mat_t t1,
     const acb_mat_t tau, slong d)
@@ -52,7 +54,6 @@ acb_theta_ql_a0_split(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     slong nb_a = 1 << (g - d);
     slong nb_th = 1 << d;
     slong nb_t = (_acb_vec_is_zero(t, g) ? 1 : 3);
-    slong nb_z = (_acb_vec_is_zero(z, g) ? 1 : 2);
     slong lp = ACB_THETA_LOW_PREC;
     arb_mat_t Yinv, cho, cho1;
     acb_mat_t tau0, star, tau1;
@@ -87,7 +88,7 @@ acb_theta_ql_a0_split(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     v = _acb_vec_init(g - d);
     w = _acb_vec_init(g - d);
     new_z = _acb_vec_init(d);
-    new_th = _acb_vec_init(nb_th * nb_t * nb_z);
+    new_th = _acb_vec_init(2 * nb_th * nb_t);
     arf_init(R2);
     arf_init(eps);
     arb_init(max_dist);
@@ -185,7 +186,7 @@ acb_theta_ql_a0_split(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
             flint_printf("\n"); */
 
             res = worker(new_th, t, new_z, new_dist0, new_dist, tau0, guard, newprec);
-            if (nb_z > 1)
+            if (!_acb_vec_is_zero(new_z, d))
             {
                 /* We are only interested in the values at z */
                 _acb_vec_set(new_th, new_th + nb_th * nb_t, nb_th * nb_t);
@@ -243,7 +244,7 @@ acb_theta_ql_a0_split(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     _acb_vec_clear(v, g - d);
     _acb_vec_clear(w, g - d);
     _acb_vec_clear(new_z, d);
-    _acb_vec_clear(new_th, nb_th * nb_t * nb_z);
+    _acb_vec_clear(new_th, 2 * nb_th * nb_t);
     arf_clear(R2);
     arf_clear(eps);
     arb_clear(max_dist);

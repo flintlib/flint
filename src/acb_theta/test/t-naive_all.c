@@ -92,7 +92,7 @@ int main(void)
                 }
             }
         }
-        
+
         if (!_acb_vec_overlaps(th, th_test, nb * nb_z))
         {
             flint_printf("FAIL: overlap\n");

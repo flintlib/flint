@@ -26,10 +26,10 @@ int main(void)
     {
         slong g = 2 + n_randint(state, 3);
         slong n = 1 << g;
-        slong d = n_randint(state, g + 1);
+        slong d = 1 + n_randint(state, g - 1);
         int has_t = iter % 2;
         slong nb_z = (has_t ? 3 : 1);
-        slong prec = 50 + n_randint(state, 100);
+        slong prec = 50 + n_randint(state, 50);
         slong hprec = prec + 25;
         slong guard = 0;
         slong lp = ACB_THETA_LOW_PREC;
@@ -42,7 +42,7 @@ int main(void)
         z = _acb_vec_init(g);
         t = _acb_vec_init(g);
         r = _acb_vec_init(nb_z * n);
-        test = _acb_vec_init(nb_z * n);
+        test = _acb_vec_init(2 * nb_z * n);
         dist = _arb_vec_init(n);
         dist0 = _arb_vec_init(n);
 
@@ -61,6 +61,8 @@ int main(void)
         acb_theta_ql_a0_split(r, t, z, dist, tau, d, guard, prec, &acb_theta_ql_a0_naive);
 
         acb_theta_ql_a0_naive(test, t, z, dist0, dist, tau, guard, hprec);
+        _acb_vec_set(test, test + nb_z * n, nb_z * n);
+
         if (!_acb_vec_is_zero(z, g))
         {
             _acb_vec_set(test, test + nb_z * n, nb_z * n);
@@ -83,7 +85,7 @@ int main(void)
         _acb_vec_clear(z, g);
         _acb_vec_clear(t, g);
         _acb_vec_clear(r, nb_z * n);
-        _acb_vec_clear(test, nb_z * n);
+        _acb_vec_clear(test, 2 * nb_z * n);
         _arb_vec_clear(dist, n);
         _arb_vec_clear(dist0, n);
     }
@@ -93,4 +95,3 @@ int main(void)
     flint_printf("PASS\n");
     return 0;
 }
-

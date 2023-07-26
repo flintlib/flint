@@ -19,12 +19,12 @@ acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, s
     acb_ptr all_z, ata, v;
     acb_t c;
     slong a, b, d, k;
-    
+
     all_z = _acb_vec_init(g * n * nb_z);
     ata = _acb_vec_init(n);
     v = _acb_vec_init(g);
     acb_init(c);
-    
+
     for (a = 0; a < n; a++)
     {
         acb_theta_char_get_acb(v, a, g);
@@ -37,7 +37,7 @@ acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, s
     }
 
     acb_theta_naive_0b(th, all_z, n * nb_z, tau, prec);
-    
+
     for (a = 0; a < n; a++)
     {
         /* Factors depending on z, not on b */

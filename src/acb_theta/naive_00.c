@@ -18,8 +18,8 @@ worker_dim0(acb_ptr th, const acb_t term, slong* coords, slong g,
     acb_add(th, th, term, fullprec);
 }
 
-void
-acb_theta_naive_00(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
+static void
+acb_theta_naive_00_gen(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     acb_theta_eld_t E;
@@ -57,4 +57,28 @@ acb_theta_naive_00(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, sl
     _acb_vec_clear(c, nb_z);
     _arb_vec_clear(u, nb_z);
     _acb_vec_clear(new_z, g * nb_z);
+}
+
+void
+acb_theta_naive_00(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
+{
+    slong g = acb_mat_nrows(tau);
+    slong k;
+    acb_ptr res;
+
+    if (g == 1)
+    {
+        res = _acb_vec_init(4);
+        for (k = 0; k < nb_z; k++)
+        {
+            acb_modular_theta(&res[0], &res[1], &res[2], &res[3], z + k * g,
+                acb_mat_entry(tau, 0, 0), prec);
+            acb_set(&th[k], &res[2]);
+        }
+        _acb_vec_clear(res, 4);
+    }
+    else
+    {
+        acb_theta_naive_00_gen(th, z, nb_z, tau, prec);
+    }
 }
