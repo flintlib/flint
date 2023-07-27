@@ -114,7 +114,7 @@ int main(void)
             acb_theta_naive_term(x, z + k * g, tau, n + k * g, prec);
             acb_theta_naive_term(t, new_z + k * g, tau, zero, prec);
             acb_mul(t, t, &c[k], prec);
-            
+
             if (!acb_overlaps(x, t))
             {
                 flint_printf("FAIL (value, k = %wd)\n", k);
@@ -122,7 +122,7 @@ int main(void)
                 acb_mat_printd(tau, 10);
                 flint_printf("z:\n");
                 _acb_vec_printd(z + k * g, g, 10);
-                flint_printf("\nValues:\n");
+                flint_printf("values:\n");
                 acb_printd(x, 10);
                 flint_printf("\n");
                 acb_printd(t, 10);
@@ -130,11 +130,10 @@ int main(void)
                 acb_printd(&c[k], 10);
                 flint_printf("\nNew z:\n");
                 _acb_vec_printd(new_z + k * g, g, 10);
-                flint_printf("\n");
                 flint_abort();
             }
         }
-        
+
         arb_mat_inv(cho, cho, prec);
         arb_mat_vector_mul_col(offset, cho, offset, prec);
         for (k = 0; k < g; k++)
@@ -149,7 +148,7 @@ int main(void)
                 flint_abort();
             }
         }
-                
+
         acb_mat_clear(tau);
         arb_mat_clear(Y);
         arb_mat_clear(cho);
@@ -165,7 +164,7 @@ int main(void)
         flint_free(n);
         flint_free(zero);
     }
-    
+
     flint_randclear(state);
     flint_cleanup();
     flint_printf("PASS\n");

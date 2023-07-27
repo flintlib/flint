@@ -118,4 +118,5 @@ _acb_vec_printd(acb_srcptr vec, slong len, slong ndigits)
             flint_printf(", ");
         }
     }
+    flint_printf("\n");
 }

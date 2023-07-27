@@ -83,12 +83,9 @@ int main(void)
             acb_mat_printd(tau, 5);
             flint_printf("input:\n");
             _acb_vec_printd(th, n, 5);
-            flint_printf("\n");
             _acb_vec_printd(th0, n, 5);
-            flint_printf("\n");
             flint_printf("output:\n");
             _acb_vec_printd(r, n, 5);
-            flint_printf("\n");
             flint_abort();
         }
 

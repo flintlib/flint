@@ -18,7 +18,7 @@ int main(void)
 
     flint_printf("agm_hadamard....");
     fflush(stdout);
-    
+
     flint_randinit(state);
 
     /* Test: twice Hadamard should be multiplication by 2^g */

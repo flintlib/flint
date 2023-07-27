@@ -67,11 +67,11 @@ acb_theta_transform_k2(const fmpz_mat_t mat)
         acb_theta_naive_00(scal1, z, 1, tau, prec);
         acb_sqr(scal1, scal1, prec);
 
+        acb_siegel_cocycle_det(t, mat, tau, prec);
         acb_siegel_transform(tau, mat, tau, prec);
         acb_theta_naive_ind(scal2, ab, z, 1, tau, prec);
         acb_sqr(scal2, scal2, prec);
 
-        acb_siegel_cocycle_det(t, mat, tau, prec);
         acb_mul(scal1, scal1, t, prec);
         acb_onei(t);
         acb_pow_fmpz(t, t, eps, prec);

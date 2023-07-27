@@ -75,9 +75,9 @@ int main(void)
                 acb_abs(abs, term, 2 * prec);
                 arb_add(sum, sum, abs, 2 * prec);
             }
-        
+
             arb_sub(abs, sum, &u[j], 2 * prec);
-            
+
             if (!arb_is_negative(abs))
             {
                 flint_printf("FAIL\n");
@@ -91,7 +91,6 @@ int main(void)
                 acb_mat_printd(tau, 5);
                 flint_printf("new_z:\n");
                 _acb_vec_printd(new_z + j * g, g, 10);
-                flint_printf("\n");
                 acb_theta_eld_print(E);
                 flint_abort();
             }

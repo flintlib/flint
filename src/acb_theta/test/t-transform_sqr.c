@@ -63,7 +63,7 @@ int main(void)
         if (!_acb_vec_overlaps(test, th, n2))
         {
             flint_printf("FAIL\n");
-            flint_printf("g = %wd, mat:\n");
+            flint_printf("g = %wd, mat:\n", g);
             fmpz_mat_print_pretty(mat);
             flint_printf("\n");
             flint_printf("image tau: ");
@@ -71,9 +71,8 @@ int main(void)
             flint_printf("\n");
             flint_printf("th, test:\n");
             _acb_vec_printd(th, n2, 5);
-            flint_printf("\n");
             _acb_vec_printd(test, n2, 5);
-            flint_printf("\n");
+            flint_abort();
         }
 
         acb_mat_clear(tau);

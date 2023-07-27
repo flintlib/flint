@@ -54,19 +54,16 @@ int main(void)
         {
             acb_sqr(&test[k], &test[k], hprec);
         }
-        
+
+        if (!acb_is_finite(&th[0]) || !_acb_vec_overlaps(th, test, n * n))
+        {
+            flint_printf("FAIL\n");
             flint_printf("g = %wd, prec = %wd, has_z = %wd, tau:\n",
                 g, prec, has_z);
             acb_mat_printd(tau, 5);
             flint_printf("output:\n");
             _acb_vec_printd(th, n * n, 5);
-            flint_printf("\n");
             _acb_vec_printd(test, n * n, 5);
-            flint_printf("\n");
-
-        if (!acb_is_finite(&th[0]) || !_acb_vec_overlaps(th, test, n * n))
-        {
-            flint_printf("FAIL\n");
             flint_abort();
         }
 

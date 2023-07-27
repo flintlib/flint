@@ -54,7 +54,7 @@ int main(void)
         acb_mat_mul(t, c2, c1, prec);
 
         if (!acb_mat_overlaps(t, c3))
-        {            
+        {
             flint_printf("FAIL\n\n");
             acb_mat_printd(c3, 10);
             flint_printf("\n");

@@ -23,7 +23,7 @@ int main(void)
 
     for (iter = 0; iter < 2000 * flint_test_multiplier(); iter++)
     {
-        slong prec = ACB_THETA_ELD_DEFAULT_PREC;
+        slong prec = ACB_THETA_LOW_PREC;
         slong mag_bits = n_randint(state, 5);
         int guaranteed_pt = iter % 2;
 
@@ -63,7 +63,7 @@ int main(void)
             fail = mid < min || mid > max
                 || !arb_gt(tmax, ctr) || !arb_lt(tmin, ctr);
         }
-        
+
         if (fail)
         {
             flint_printf("FAIL\n");

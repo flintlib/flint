@@ -58,8 +58,7 @@ int main(void)
             flint_printf("g = %wd, a = %wd, tau:\n", g, a);
             acb_mat_printd(tau, 5);
             flint_printf("distances:\n");
-            _arb_vec_printn(dist, n, 5, 0);
-            flint_printf("\n");
+            _arb_vec_printd(dist, n, 5);
             flint_abort();
         }
 

@@ -44,14 +44,14 @@ int main(void)
         {
             acb_randtest_precise(&z1[k], state, prec, bits);
         }
-                 
+
         sp2gz_randtest(m, state, bits);
         acb_siegel_transform_ext(r, w, m, z1, tau1, prec);
-        
+
         /* Test: agrees with transform */
         acb_siegel_transform(tau2, m, tau1, prec);
         if (!acb_mat_overlaps(tau2, w))
-        {            
+        {
             flint_printf("FAIL (transform)\n\n");
             acb_mat_printd(w, 10);
             flint_printf("\n");
@@ -60,7 +60,7 @@ int main(void)
             flint_abort();
         }
 
-        /* Test: inverse transformation */ 
+        /* Test: inverse transformation */
         sp2gz_inv(m, m);
         acb_siegel_transform_ext(z2, tau2, m, r, w, prec);
         if (!acb_mat_contains(tau2, tau1) || !_acb_vec_contains(z2, z1, g))
@@ -88,7 +88,7 @@ int main(void)
             flint_printf("\n");
             flint_abort();
         }
-        
+
         acb_mat_clear(tau1);
         acb_mat_clear(w);
         acb_mat_clear(tau2);

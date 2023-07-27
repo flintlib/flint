@@ -28,7 +28,7 @@ int main(void)
         arb_mat_t cho;
         arf_t R2;
         arb_ptr offset;
-        slong prec = ACB_THETA_ELD_DEFAULT_PREC;
+        slong prec = ACB_THETA_LOW_PREC;
         slong mag_bits = n_randint(state, 2);
         slong k, j;
         slong try;
@@ -52,7 +52,7 @@ int main(void)
         arb_randtest_positive(sqr, state, prec, mag_bits);   /* Use as temp */
         arf_set(R2, arb_midref(sqr));
         arf_mul_si(R2, R2, 1 + n_randint(state, 10), prec, ARF_RND_UP);
-        
+
         for (k = 0; k < g; k++)
         {
             arb_randtest_precise(&offset[k], state, prec, mag_bits);

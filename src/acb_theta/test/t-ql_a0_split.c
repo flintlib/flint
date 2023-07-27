@@ -37,6 +37,7 @@ int main(void)
         acb_ptr z, t, r, test;
         arb_ptr dist, dist0;
         slong k;
+        int res;
 
         acb_mat_init(tau, g, g);
         z = _acb_vec_init(g);
@@ -58,26 +59,23 @@ int main(void)
         }
         acb_theta_dist_a0(dist, z, tau, lp);
 
-        acb_theta_ql_a0_split(r, t, z, dist, tau, d, guard, prec, &acb_theta_ql_a0_naive);
-
+        res = acb_theta_ql_a0_split(r, t, z, dist, tau, d, guard, prec,
+            &acb_theta_ql_a0_naive);
         acb_theta_ql_a0_naive(test, t, z, dist0, dist, tau, guard, hprec);
-        _acb_vec_set(test, test + nb_z * n, nb_z * n);
 
         if (!_acb_vec_is_zero(z, g))
         {
             _acb_vec_set(test, test + nb_z * n, nb_z * n);
         }
 
-        if (!_acb_vec_overlaps(r, test, nb_z * n))
+        if (res && !_acb_vec_overlaps(r, test, nb_z * n))
         {
             flint_printf("FAIL\n");
             flint_printf("g = %wd, prec = %wd, tau:\n", g, prec);
             acb_mat_printd(tau, 5);
             flint_printf("output:\n");
             _acb_vec_printd(r, nb_z * n, 5);
-            flint_printf("\n");
             _acb_vec_printd(test, nb_z * n, 5);
-            flint_printf("\n");
             flint_abort();
         }
 

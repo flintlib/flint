@@ -50,7 +50,7 @@ int main(void)
         acb_theta_char_dot_acb(x3, a, v, g, prec);
         acb_theta_char_get_acb(w, a, g);
         acb_dot(x4, NULL, 0, v, 1, w, 1, g, prec);
-        
+
         if (x1 != x2
             || !acb_overlaps(x3, x4))
         {
@@ -70,8 +70,8 @@ int main(void)
         {
             flint_printf("FAIL (mod 4)\n");
             flint_abort();
-        }            
-        
+        }
+
         flint_free(n);
         _acb_vec_clear(v, g);
         _acb_vec_clear(w, g);

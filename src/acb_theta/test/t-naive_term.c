@@ -51,13 +51,13 @@ int main(void)
             flint_printf("FAIL\n");
             flint_abort();
         }
-        
+
         acb_mat_clear(tau);
         acb_clear(z);
         acb_clear(x);
         acb_clear(t);
     }
-    
+
     flint_randclear(state);
     flint_cleanup();
     flint_printf("PASS\n");

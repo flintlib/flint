@@ -26,7 +26,7 @@ int main(void)
     {
         slong g = 1 + n_randint(state, 3);
         slong n = 1 << g;
-        slong prec = (g > 1 ? 200 : 2000) + n_randint(state, 1000);
+        slong prec = (g > 1 ? 200 : 1000) + n_randint(state, 1000);
         slong bits = n_randint(state, 5);
         slong hprec = prec + 50;
         int has_t = iter % 2;
@@ -75,9 +75,7 @@ int main(void)
             acb_mat_printd(tau, 5);
             flint_printf("output:\n");
             _acb_vec_printd(r, nbz * nbt * n, 5);
-            flint_printf("\n");
             _acb_vec_printd(test, nbz * nbt * n, 5);
-            flint_printf("\n");
             flint_abort();
         }
 
@@ -87,6 +85,7 @@ int main(void)
         _acb_vec_clear(r, nbz * nbt * n);
         _acb_vec_clear(test, nbz * nbt * n);
         _arb_vec_clear(dist, n);
+        _arb_vec_clear(dist0, n);
     }
 
     flint_randclear(state);

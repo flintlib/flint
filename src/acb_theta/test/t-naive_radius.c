@@ -26,7 +26,7 @@ int main(void)
     {
         slong g = 1 + n_randint(state, 10);
         slong ord = n_randint(state, 10);
-        slong prec = ACB_THETA_ELD_DEFAULT_PREC;
+        slong prec = ACB_THETA_LOW_PREC;
         slong bits = n_randint(state, 5);
         arb_mat_t Y;
         arf_t R2;
@@ -46,11 +46,11 @@ int main(void)
 
         acb_theta_naive_radius(R2, Y, ord, eps, prec);
         acb_theta_naive_tail(bound, R2, Y, ord, prec);
-        
+
         if (arf_cmp(bound, eps) > 0)
         {
             flint_printf("FAIL\n\n");
-            flint_abort();            
+            flint_abort();
         }
 
         arb_mat_clear(Y);

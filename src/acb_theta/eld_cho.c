@@ -28,6 +28,7 @@ void acb_theta_eld_cho(arb_mat_t cho, const acb_mat_t tau, slong prec)
     {
         flint_printf("acb_theta_eld_cho: Error ");
         flint_printf("(imaginary part is not positive enough)\n");
+        flint_printf("prec = %wd, tau:\n", prec);
         acb_mat_printd(tau, 5);
         fflush(stdout);
         flint_abort();

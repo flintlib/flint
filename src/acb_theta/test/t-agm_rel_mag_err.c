@@ -83,11 +83,9 @@ int main(void)
         {
             flint_printf("FAIL\n");
             flint_printf("n = %wd, distances:\n", n);
-            _arb_vec_printn(dist, n, 5, 0);
-            flint_printf("\n");
+            _arb_vec_printd(dist, n, 5);
             flint_printf("values:\n");
             _acb_vec_printd(a, n, 5);
-            flint_printf("\n");
             flint_printf("m, eps, t_m, t_eps: ");
             arf_printd(m, 5);
             flint_printf(", ");

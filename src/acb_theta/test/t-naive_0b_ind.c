@@ -81,11 +81,10 @@ int main(void)
             acb_mat_printd(tau, 10);
             flint_printf("z:\n");
             _acb_vec_printd(z, g * nb_z, 10);
-            flint_printf("\nth, th_test:\n");
+            flint_printf("th, th_test:\n");
             _acb_vec_printd(th, nb_z, 10);
-            flint_printf("\n");
             _acb_vec_printd(th_test, nb_z, 10);
-            flint_printf("\nth_all:\n");
+            flint_printf("th_all:\n");
             _acb_vec_printd(th_all, nb * nb * nb_z, 10);
             flint_abort();
         }
