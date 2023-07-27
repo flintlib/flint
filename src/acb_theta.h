@@ -180,6 +180,17 @@ void acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z,
 void acb_theta_naive_ind(acb_ptr th, ulong ab, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec);
 
+/* Derivatives */
+
+slong acb_theta_deriv_nb(slong ord, slong g);
+void acb_theta_deriv_orders(slong* orders, slong ord, slong g);
+slong acb_theta_deriv_index(const slong* orders, slong g);
+
+void acb_theta_naive_0b_jet(acb_ptr dth, slong ord, acb_srcptr z,
+    const acb_mat_t tau, slong prec);
+void acb_theta_naive_all_jet(acb_ptr dth, slong ord, acb_srcptr z,
+    const acb_mat_t tau, slong prec);
+
 /* Quasi-linear algorithms on the reduced domain */
 
 void acb_theta_dist_pt(arb_t d2, arb_srcptr v, const arb_mat_t cho, slong* pt, slong prec);
