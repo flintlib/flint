@@ -186,9 +186,9 @@ slong acb_theta_deriv_nb(slong ord, slong g);
 void acb_theta_deriv_orders(slong* orders, slong ord, slong g);
 slong acb_theta_deriv_index(const slong* orders, slong g);
 
-void acb_theta_naive_0b_jet(acb_ptr dth, slong ord, acb_srcptr z,
+void acb_theta_naive_0b_jet(acb_ptr dth, slong ord, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec);
-void acb_theta_naive_all_jet(acb_ptr dth, slong ord, acb_srcptr z,
+void acb_theta_naive_all_jet(acb_ptr dth, slong ord, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec);
 
 /* Quasi-linear algorithms on the reduced domain */

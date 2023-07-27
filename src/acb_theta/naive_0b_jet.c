@@ -77,7 +77,8 @@ worker_dim0(acb_ptr dth, const acb_t term, slong* coords, slong g,
 }
 
 static void
-acb_theta_naive_0b_jet_gen(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau, slong prec)
+acb_theta_naive_0b_jet_gen(acb_ptr dth, slong ord, acb_srcptr z, slong nb_z,
+    const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
@@ -87,7 +88,6 @@ acb_theta_naive_0b_jet_gen(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t
     acb_ptr c;
     arb_ptr u;
     acb_ptr new_z;
-    slong nb_z = 1;
     slong nb = n * acb_theta_deriv_nb(ord, g + 1);
     slong k;
 
@@ -119,11 +119,11 @@ acb_theta_naive_0b_jet_gen(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t
 }
 
 void
-acb_theta_naive_0b_jet(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau, slong prec)
+acb_theta_naive_0b_jet(acb_ptr dth, slong ord, acb_srcptr z, slong nb_z,
+    const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong nb = acb_theta_deriv_nb(ord, g + 1);
-    slong nb_z = 1;
     acb_ptr res;
     slong k;
 
@@ -141,6 +141,6 @@ acb_theta_naive_0b_jet(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau
     }
     else
     {
-        acb_theta_naive_0b_jet_gen(dth, ord, z, tau, prec);
+        acb_theta_naive_0b_jet_gen(dth, ord, z, nb_z, tau, prec);
     }
 }
