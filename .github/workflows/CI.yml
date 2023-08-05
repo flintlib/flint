@@ -470,9 +470,7 @@ jobs:
       - name: "Configure"
         run: |
           ./bootstrap.sh
-          # We need to specify TMPDIR as we do not have write access to the
-          # CI's /tmp directory.
-          ./configure CC=${CC} CFLAGS="${CFLAGS}" TMPDIR="." ${EXTRA_OPTIONS}
+          ./configure CC=${CC} CFLAGS="${CFLAGS}" ${EXTRA_OPTIONS}
 
       - name: "Compile library"
         run: |
