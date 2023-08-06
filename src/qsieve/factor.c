@@ -489,9 +489,6 @@ cleanup:
     if (qs_inf->siqs != NULL && fclose((FILE *) qs_inf->siqs))
         flint_throw(FLINT_ERROR, "fclose fail\n");
     if (remove(qs_inf->fname)) {
-        perror("qsieve/factor.c: remove failed. perror says");
-        printf("qs_inf->fname is %s\n", qs_inf->fname);
-        printf("qs_inf->siqs != NULL is %d\n", qs_inf->siqs != NULL);
         flint_throw(FLINT_ERROR, "remove fail\n");
     }
     qsieve_clear(qs_inf);
