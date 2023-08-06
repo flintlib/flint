@@ -24,11 +24,6 @@
 #undef __STRICT_ANSI__
 #endif
 
-/* Use Windows API for temporary files under MSVC */
-#if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(_MSC_VER)
-#include <windows.h>
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include "thread_support.h"
@@ -36,6 +31,11 @@
 #include "fmpz_factor.h"
 #include "fmpz_vec.h"
 #include "qsieve.h"
+
+/* Use Windows API for temporary files under MSVC and MinGW */
+#if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(_MSC_VER)
+#include <windows.h>
+#endif
 
 int compare_facs(const void * a, const void * b)
 {
@@ -65,6 +65,8 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     fmpz * facs;
 #if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(_MSC_VER)
     char temp_path[MAX_PATH];
+#else
+    int fd;
 #endif
 
     if (fmpz_sgn(n) < 0)
@@ -223,11 +225,29 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
         flint_printf("Exception (qsieve_factor). GetTempFileNameA() failed.\n");
         flint_abort();
     }
-    qs_inf->siqs = fopen(qs_inf->fname, "w");
+    qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "w");
+    if (qs_inf->siqs == NULL)
+        flint_throw(FLINT_ERROR, "fopen failed\n");
 #else
     strcpy(qs_inf->fname, "/tmp/siqsXXXXXX"); /* must be shorter than fname_alloc_size in init.c */
-    qs_inf->siqs = (FLINT_FILE *) fdopen(mkstemp(qs_inf->fname), "w");
+    fd = mkstemp(qs_inf->fname);
+    if (fd == -1)
+        flint_throw(FLINT_ERROR, "mkstemp failed\n");
+
+    qs_inf->siqs = (FLINT_FILE *) fdopen(fd, "w");
+    if (qs_inf->siqs == NULL)
+        flint_throw(FLINT_ERROR, "fdopen failed\n");
 #endif
+    /*
+     * The code here and in large_prime_variant.c opens and closes the file
+     * qs_inf->fname in several different places. On Windows all file handles
+     * need to be closed before the file can be removed in cleanup at function
+     * exit. The invariant that needs to be preserved at each open/close is
+     * that either
+     *    qs_inf->siqs is NULL and there are no open handles to the file,
+     * or
+     *    qs_inf->siqs is not NULL and is the *only* open handle to the file.
+     */
 
     for (j = qs_inf->small_primes; j < qs_inf->num_primes; j++)
     {
@@ -465,6 +485,8 @@ cleanup:
     flint_give_back_threads(qs_inf->handles, qs_inf->num_handles);
 
     flint_free(sieve);
+    if (qs_inf->siqs != NULL && fclose((FILE *) qs_inf->siqs))
+        flint_throw(FLINT_ERROR, "fclose fail\n");
     if (remove(qs_inf->fname))
         flint_throw(FLINT_ERROR, "remove fail\n");
     qsieve_clear(qs_inf);
