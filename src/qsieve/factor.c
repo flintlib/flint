@@ -220,7 +220,8 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
         flint_printf("Exception (qsieve_factor). GetTempPathA() failed.\n");
         flint_abort();
     }
-    if (GetTempFileNameA(temp_path, "siqs", /*uUnique*/ TRUE, qs_inf->fname) == 0)
+    /* uUnique = 0 means the we *do* want a unique filename (obviously!). */
+    if (GetTempFileNameA(temp_path, "siq", /*uUnique*/ 0, qs_inf->fname) == 0)
     {
         flint_printf("Exception (qsieve_factor). GetTempFileNameA() failed.\n");
         flint_abort();
