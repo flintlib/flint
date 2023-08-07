@@ -475,15 +475,6 @@ AC_ARG_VAR(ABI, [Desired ABI])
 
 AC_ARG_VAR(LDCONFIG, [ldconfig tool])
 
-AC_ARG_VAR(TMPDIR, [Specify directory meant for temporary files for host system. Only relevant if host do not have read and write access to /tmp [default=/tmp].])
-
-if test -z "$TMPDIR";
-then
-    TMPDIR="/tmp"
-fi
-
-AC_DEFINE_UNQUOTED([FLINT_TMPDIR], ["$TMPDIR"], [Define to set the default directory for temporary files])
-
 ################################################################################
 # check programs and system
 ################################################################################

@@ -32,6 +32,11 @@
 #include "fmpz_vec.h"
 #include "qsieve.h"
 
+/* Use Windows API for temporary files under MSVC and MinGW */
+#if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(_MSC_VER)
+#include <windows.h>
+#endif
+
 int compare_facs(const void * a, const void * b)
 {
    fmpz * x = (fmpz *) a;
@@ -58,8 +63,8 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     fmpz_t temp, temp2, X, Y;
     slong num_facs;
     fmpz * facs;
-#if (defined(__WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__) && !defined(__MINGW64__)) || defined(_MSC_VER)
-    const char * tmpnam_ret;
+#if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(_MSC_VER)
+    char temp_path[MAX_PATH];
 #else
     int fd;
 #endif
@@ -209,17 +214,23 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     pthread_mutex_init(&qs_inf->mutex, NULL);
 #endif
 
-#if (defined(__WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__) && !defined(__MINGW64__)) || defined(_MSC_VER)
-    tmpnam_ret = tmpnam(NULL);
-    if (tmpnam_ret == NULL)
-        flint_throw(FLINT_ERROR, "tmpnam failed\n");
-
-    strcpy(qs_inf->fname, tmpnam_ret);
-    qs_inf->siqs = fopen(qs_inf->fname, "w");
+#if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(_MSC_VER)
+    if (GetTempPathA(MAX_PATH, temp_path) == 0)
+    {
+        flint_printf("Exception (qsieve_factor). GetTempPathA() failed.\n");
+        flint_abort();
+    }
+    /* uUnique = 0 means the we *do* want a unique filename (obviously!). */
+    if (GetTempFileNameA(temp_path, "siq", /*uUnique*/ 0, qs_inf->fname) == 0)
+    {
+        flint_printf("Exception (qsieve_factor). GetTempFileNameA() failed.\n");
+        flint_abort();
+    }
+    qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "w");
     if (qs_inf->siqs == NULL)
         flint_throw(FLINT_ERROR, "fopen failed\n");
 #else
-    strcpy(qs_inf->fname, FLINT_TMPDIR "/siqsXXXXXX");
+    strcpy(qs_inf->fname, "/tmp/siqsXXXXXX"); /* must be shorter than fname_alloc_size in init.c */
     fd = mkstemp(qs_inf->fname);
     if (fd == -1)
         flint_throw(FLINT_ERROR, "mkstemp failed\n");
@@ -228,6 +239,16 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     if (qs_inf->siqs == NULL)
         flint_throw(FLINT_ERROR, "fdopen failed\n");
 #endif
+    /*
+     * The code here and in large_prime_variant.c opens and closes the file
+     * qs_inf->fname in several different places. On Windows all file handles
+     * need to be closed before the file can be removed in cleanup at function
+     * exit. The invariant that needs to be preserved at each open/close is
+     * that either
+     *    qs_inf->siqs is NULL and there are no open handles to the file,
+     * or
+     *    qs_inf->siqs is not NULL and is the *only* open handle to the file.
+     */
 
     for (j = qs_inf->small_primes; j < qs_inf->num_primes; j++)
     {
@@ -465,8 +486,11 @@ cleanup:
     flint_give_back_threads(qs_inf->handles, qs_inf->num_handles);
 
     flint_free(sieve);
-    if (remove(qs_inf->fname))
+    if (qs_inf->siqs != NULL && fclose((FILE *) qs_inf->siqs))
+        flint_throw(FLINT_ERROR, "fclose fail\n");
+    if (remove(qs_inf->fname)) {
         flint_throw(FLINT_ERROR, "remove fail\n");
+    }
     qsieve_clear(qs_inf);
     qsieve_linalg_clear(qs_inf);
     qsieve_poly_clear(qs_inf);
