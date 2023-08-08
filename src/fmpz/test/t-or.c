@@ -26,17 +26,17 @@ main(void)
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        fmpz_t a, b, c;
-        mpz_t d, e, f, g;
+        fmpz_t a, b, c, g;
+        mpz_t d, e, f;
 
         fmpz_init(a);
         fmpz_init(b);
         fmpz_init(c);
+        fmpz_init(g);
 
         mpz_init(d);
         mpz_init(e);
         mpz_init(f);
-        mpz_init(g);
 
         fmpz_randtest(a, state, 200);
         fmpz_randtest(b, state, 200);
@@ -47,14 +47,14 @@ main(void)
         fmpz_or(c, a, b);
         mpz_ior(f, d, e);
 
-        fmpz_get_mpz(g, c);
+        fmpz_set_mpz(g, f);
 
-        result = (mpz_cmp(f, g) == 0);
+        result = (fmpz_equal(c, g));
 
         if (!result)
         {
             flint_printf("FAIL:\n");
-            gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
+            gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = ", d, e, f); fmpz_print(g); flint_printf("\n");
             fflush(stdout);
             flint_abort();
         }
@@ -62,11 +62,11 @@ main(void)
         fmpz_clear(a);
         fmpz_clear(b);
         fmpz_clear(c);
+        fmpz_clear(g);
 
         mpz_clear(d);
         mpz_clear(e);
         mpz_clear(f);
-        mpz_clear(g);
     }
 
     /* Check aliasing of a and b */
