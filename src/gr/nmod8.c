@@ -305,7 +305,7 @@ _nmod8_vec_dot(nmod8_t res, const nmod8_t initial, int subtract, const nmod8_str
     else
     {
         if (subtract)
-            s = (n - initial[0]);
+            s = n_negmod(initial[0], n);
         else
             s = initial[0];
     }
@@ -370,7 +370,7 @@ _nmod8_vec_dot_rev(nmod8_t res, const nmod8_t initial, int subtract, const nmod8
     else
     {
         if (subtract)
-            s = (n - initial[0]);
+            s = n_negmod(initial[0], n);
         else
             s = initial[0];
     }

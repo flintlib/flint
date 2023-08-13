@@ -306,7 +306,7 @@ _nmod32_vec_dot(nmod32_t res, const nmod32_t initial, int subtract, const nmod32
     else
     {
         if (subtract)
-            s = (n - initial[0]);
+            s = n_negmod(initial[0], n);
         else
             s = initial[0];
     }
@@ -353,7 +353,7 @@ _nmod32_vec_dot_rev(nmod32_t res, const nmod32_t initial, int subtract, const nm
     else
     {
         if (subtract)
-            s = (n - initial[0]);
+            s = n_negmod(initial[0], n);
         else
             s = initial[0];
     }
