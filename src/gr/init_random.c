@@ -24,6 +24,8 @@ void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)
         gr_ctx_init_fmpz(ctx);
     else if (which < 40)
         gr_ctx_init_nmod8(ctx, n_randtest(state) % 255 + 1);
+    else if (which < 42)
+        gr_ctx_init_nmod32(ctx, n_randtest(state) % UWORD(4294967295) + 1);
     else if (which < 45)
         gr_ctx_init_nmod(ctx, n_randtest_not_zero(state));
     else if (which < 50)

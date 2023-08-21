@@ -54,13 +54,6 @@ if(CMAKE_BUILD_TYPE STREQUAL Debug)
   set(FLINT_WANT_ASSERT ON)
 endif()
 
-# temporary directory
-if(NOT DEFINED TMPDIR)
-    set(FLINT_TMPDIR "/tmp" CACHE STRING "Path to a directory meant for temporary files for host system. Only relevant if host do not have read and write access to /tmp [default=/tmp].")
-else()
-    set(FLINT_TMPDIR "${TMPDIR}" CACHE STRING "Path to a directory meant for temporary files for host system. Only relevant if host do not have read and write access to /tmp [default=/tmp].")
-endif()
-
 # pthread configuration
 
 if(MSVC)

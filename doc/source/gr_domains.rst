@@ -100,10 +100,12 @@ Base rings and fields
     `\mathbb{Z}[i]` with elements of type :type:`fmpzi_t`.
 
 .. function:: void gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n)
+              void gr_ctx_init_nmod32(gr_ctx_t ctx, unsigned int n)
 
     Initializes *ctx* to the ring `\mathbb{Z}/n\mathbb{Z}`
     of integers modulo *n* where
-    elements have type :type:`uint8`. We require `1 \le n \le 255`.
+    elements have type :type:`uint8` or :type:`uint32`. The modulus must be
+    nonzero.
 
 .. function:: void gr_ctx_init_nmod(gr_ctx_t ctx, ulong n)
 

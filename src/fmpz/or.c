@@ -41,6 +41,7 @@ void fmpz_or(fmpz_t f, const fmpz_t g, const fmpz_t h)
                 __mpz_struct *mpz3 = _fmpz_promote(f);
                 flint_mpz_init_set_si(tmp,c2);
                 mpz_ior(mpz3, COEFF_TO_PTR(c1), tmp);
+                _fmpz_demote_val(f);
                 mpz_clear(tmp);
             } else /* g and h are large */
             {
@@ -48,6 +49,7 @@ void fmpz_or(fmpz_t f, const fmpz_t g, const fmpz_t h)
                 __mpz_struct * mpz1 = COEFF_TO_PTR(c1);
                 __mpz_struct * mpz2 = COEFF_TO_PTR(c2);
                 mpz_ior(mpz3, mpz1, mpz2);
+                _fmpz_demote_val(f);
             }
         }
 }
