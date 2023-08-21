@@ -132,10 +132,10 @@ acb_theta_naive_0b_jet(acb_ptr dth, slong ord, acb_srcptr z, slong nb_z,
         res = _acb_vec_init(4 * nb);
         for (k = 0; k < nb_z; k++)
         {
-            acb_modular_theta(res, res + nb, res + 2 * nb, res + 3 * nb,
-                z + k * g, acb_mat_entry(tau, 0, 0), prec);
+            acb_modular_theta_jet(res, res + nb, res + 2 * nb, res + 3 * nb,
+                z + k * g, acb_mat_entry(tau, 0, 0), nb, prec);
             _acb_vec_set(dth + 2 * k * nb, res + 2 * nb, nb);
-            _acb_vec_neg(dth + (2 * k + 1) * nb, res + 3 * nb, nb);
+            _acb_vec_set(dth + (2 * k + 1) * nb, res + 3 * nb, nb);
         }
         _acb_vec_clear(res, 4 * nb);
     }

@@ -72,6 +72,7 @@ void acb_siegel_randtest_nice(acb_mat_t tau, flint_rand_t state, slong prec);
 /* Theta characteristics */
 
 void acb_theta_char_get_slong(slong* n, ulong a, slong g);
+ulong acb_theta_char_get_a(slong* n, slong g);
 void acb_theta_char_get_acb(acb_ptr v, ulong a, slong g);
 void acb_theta_char_get_arb(arb_ptr v, ulong a, slong g);
 

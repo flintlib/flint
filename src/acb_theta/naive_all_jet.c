@@ -11,91 +11,144 @@
 
 #include "acb_theta.h"
 
+static void
+worker_dim0(acb_ptr dth, const acb_t term, slong* coords, slong g,
+    slong ord, slong prec, slong fullprec)
+{
+    slong n = 1 << g;
+    slong nb_max = acb_theta_deriv_nb(ord, g);
+    acb_t x;
+    fmpz_t m;
+    acb_ptr f;
+    ulong a, b;
+    slong k, j, i, nb, ind;
+    slong* orders;
 
-/* This is complicated. */
+    acb_init(x);
+    fmpz_init(m);
+    orders = flint_malloc(g * nb_max * sizeof(slong));
+    f = _acb_vec_init(nb_max);
 
-/* void */
-/* acb_theta_naive_all_jet(acb_ptr th, slong ord, acb_srcptr z, const acb_mat_t tau, slong prec) */
-/* { */
-/*     slong g = acb_mat_nrows(tau); */
-/*     slong n = 1 << g; */
-/*     slong n2 = n * n; */
-/*     slong nb = acb_theta_deriv_nb(ord, g + 1); */
-/*     slong nb_z = 1; */
-/*     acb_ptr all_z, ata, v; */
-/*     acb_t c; */
-/*     slong a, b, d, k; */
+    ind = 0;
+    for (k = 0; k <= ord; k++)
+    {
+        /* Get list of orders */
+        nb = acb_theta_deriv_nb(k, g);
+        acb_theta_deriv_orders(orders, k, g);
 
-/*     all_z = _acb_vec_init(g * n * nb_z); */
-/*     ata = _acb_vec_init(n); */
-/*     v = _acb_vec_init(g); */
-/*     acb_init(c); */
+        /* Compute factor for each tuple */
+        for (j = 0; j < nb; j++)
+        {
+            acb_one(&f[j]);
+            for (i = 0; i < g; i++)
+            {
+                fmpz_set_si(m, coords[i]);
+                fmpz_pow_ui(m, m, orders[j * g + i]);
+                acb_mul_fmpz(&f[j], &f[j], m, prec);
+            }
+        }
+        acb_const_pi(x, prec);
+        acb_mul_onei(x, x);
+        acb_pow_ui(x, x, ord, prec);
+        _acb_vec_scalar_mul(f, f, nb, x, prec);
 
-/*     /\* Set all_z and ata *\/ */
-/*     for (a = 0; a < n; a++) */
-/*     { */
-/*         acb_theta_char_get_acb(v, a, g); */
-/*         acb_mat_vector_mul_col(v, tau, v, prec); */
-/*         for (k = 0; k < nb_z; k++) */
-/*         { */
-/*             _acb_vec_add(all_z + k * g * n + a * g, z + k * g, v, g, prec); */
-/*         } */
-/*         acb_theta_char_dot_acb(&ata[a], a, v, g, prec); */
-/*     } */
+        /* Get a */
+        a = acb_theta_char_get_a(coords, g);
 
-/*     /\* Call jet for 0b *\/ */
-/*     acb_theta_naive_0b_jet(th, all_z, n * nb_z, tau, prec); */
+        /* Loop over b */
+        for (b = 0; b < n; b++)
+        {
+            acb_mul_powi(x, term, acb_theta_char_dot_slong(b, coords, g) % 4);
+            for (j = 0; j < nb; j++)
+            {
+                acb_addmul(&dth[n * n * ind + n * n * j + n * a + b], x, &f[j], fullprec);
+            }
+        }
 
-/*     /\* Factors independent of z *\/ */
-/*     for (a = 0; a < n; a++) */
-/*     { */
-/*         acb_exp_pi_i(c, &ata[a], prec); */
-/*         for (k = 0; k < nb_z; k++) */
-/*         { */
-/*             _acb_vec_scalar_mul(th + k * n2 * nb + a * n * nb, */
-/*                 th + k * n2 * nb + a * n * nb, n * nb, c, prec); */
-/*         } */
-/*         for (b = 0; b < n; b++) */
-/*         { */
-/*             d = acb_theta_char_dot(a, b, g); */
-/*             for (k = 0; k < nb_z; k++) */
-/*             { */
-/*                 acb_one(c); */
-/*                 acb_mul_powi(c, c, d); */
-/*                 _acb_vec_scalar_mul(th + k * n2 * nb + a * n * nb + b * nb, */
-/*                     th + k * n2 * nb + a * n * nb + b * nb, nb, c, prec); */
-/*             } */
-/*         } */
-/*     } */
+        ind += nb;
+    }
 
-/*     /\* Now theta_{a,b}(z) = c(tau,a,b) e^{2*pi*i*a*z} theta_{0,b}(z+tau.a/2) *\/ */
-/*     for (a = 0; a < n; a++) */
-/*     { */
-/*         /\* Multiply by exponential *\/ */
-/*         for (k = 0; k < nb_z; k++) */
-/*         { */
-/*             acb_theta_char_dot_acb(c, a, z + k * g, g, prec); */
-/*             acb_mul_2exp_si(c, c, 1); */
-/*             acb_exp_pi_i(c, c, prec); */
-/*             _acb_vec_scalar_mul(th + k * n2 * nb + a * n * nb, */
-/*                 th + k * n2 * nb + a * n * nb, n * nb, c, prec); */
-/*         } */
-/*         /\* Sum necessary terms *\/ */
-/*     } */
-/*         /\* Factors depending on b, not on z *\/ */
-/*         for (b = 0; b < n; b++) */
-/*         { */
-/*             d = acb_theta_char_dot(a, b, g); */
-/*             for (k = 0; k < nb_z; k++) */
-/*             { */
-/*                 acb_mul_powi(&th[k * n * n + a * n + b], */
-/*                     &th[k * n * n + a * n + b], d); */
-/*             } */
-/*         } */
-/*     } */
+    acb_clear(x);
+    fmpz_clear(m);
+    flint_free(orders);
+    _acb_vec_clear(f, nb_max);
+}
 
-/*     _acb_vec_clear(all_z, g * n * nb_z); */
-/*     _acb_vec_clear(ata, n); */
-/*     _acb_vec_clear(v, g); */
-/*     acb_clear(c); */
-/* } */
+/* Use a big ellipsoid to avoid complicated formulas for derivatives */
+
+static void
+acb_theta_naive_all_jet_gen(acb_ptr dth, slong ord, acb_srcptr z, slong nb_z,
+    const acb_mat_t tau, slong prec)
+{
+    slong g = acb_mat_nrows(tau);
+    slong n = 1 << g;
+    acb_theta_eld_t E;
+    acb_theta_precomp_t D;
+    arf_t eps;
+    acb_ptr c;
+    arb_ptr u;
+    acb_mat_t new_tau;
+    acb_ptr new_z;
+    slong nb = n * n * acb_theta_deriv_nb(ord, g + 1);
+    slong k;
+
+    acb_theta_eld_init(E, g, g);
+    acb_theta_precomp_init(D, nb_z, g);
+    arf_init(eps);
+    c = _acb_vec_init(nb_z);
+    u = _arb_vec_init(nb_z);
+    acb_mat_init(new_tau, g, g);
+    new_z = _acb_vec_init(nb_z * g);
+
+    arf_one(eps);
+    arf_mul_2exp_si(eps, eps, -prec);
+    _acb_vec_scalar_mul_2exp_si(new_z, z, nb_z * g, -1);
+    acb_mat_scalar_mul_2exp_si(new_tau, tau, -2);
+
+    acb_theta_naive_ellipsoid(E, new_z, c, u, ord, new_z, nb_z, new_tau, eps, prec);
+    prec = acb_theta_naive_fullprec(E, prec);
+    acb_theta_precomp_set(D, new_z, tau, E, prec);
+
+    for (k = 0; k < nb_z; k++)
+    {
+        acb_theta_naive_worker(&dth[k * nb], nb, &c[k], &u[k], E, D, k,
+            ord, prec, worker_dim0);
+    }
+
+    acb_theta_eld_clear(E);
+    acb_theta_precomp_clear(D);
+    arf_clear(eps);
+    _acb_vec_clear(c, nb_z);
+    _arb_vec_clear(u, nb_z);
+    acb_mat_clear(new_tau);
+    _acb_vec_clear(new_z, nb_z * g);
+}
+
+void
+acb_theta_naive_all_jet(acb_ptr dth, slong ord, acb_srcptr z, slong nb_z,
+    const acb_mat_t tau, slong prec)
+{
+    slong g = acb_mat_nrows(tau);
+    slong nb = acb_theta_deriv_nb(ord, g + 1);
+    acb_ptr res;
+    slong k;
+
+    if (g == 1)
+    {
+        res = _acb_vec_init(4 * nb);
+        for (k = 0; k < nb_z; k++)
+        {
+            acb_modular_theta_jet(res, res + nb, res + 2 * nb, res + 3 * nb,
+                z + k * g, acb_mat_entry(tau, 0, 0), nb, prec);
+            _acb_vec_set(dth + 4 * k * nb, res + 2 * nb, nb);
+            _acb_vec_set(dth + (4 * k + 1) * nb, res + 3 * nb, nb);
+            _acb_vec_set(dth + (4 * k + 2) * nb, res + nb, nb);
+            _acb_vec_neg(dth + (4 * k + 3) * nb, res, nb);
+        }
+        _acb_vec_clear(res, 4 * nb);
+    }
+    else
+    {
+        acb_theta_naive_all_jet_gen(dth, ord, z, nb_z, tau, prec);
+    }
+}
