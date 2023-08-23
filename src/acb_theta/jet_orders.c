@@ -11,7 +11,7 @@
 
 #include "acb_theta.h"
 
-void acb_theta_deriv_orders(slong* orders, slong ord, slong g)
+void acb_theta_jet_orders(slong* orders, slong ord, slong g)
 {
     slong nb_max, nb_rec;
     slong* rec;
@@ -23,14 +23,14 @@ void acb_theta_deriv_orders(slong* orders, slong ord, slong g)
         return;
     }
 
-    nb_max = acb_theta_deriv_nb(ord, g - 1);
+    nb_max = acb_theta_jet_nb(ord, g - 1);
     rec = flint_malloc(nb_max * (g - 1) * sizeof(slong));
 
     ind = 0;
     for (k = 0; k <= ord; k++)
     {
-        nb_rec = acb_theta_deriv_nb(k, g - 1);
-        acb_theta_deriv_orders(rec, k, g - 1);
+        nb_rec = acb_theta_jet_nb(k, g - 1);
+        acb_theta_jet_orders(rec, k, g - 1);
         for (j = 0; j < nb_rec; j++)
         {
             orders[ind] = ord - k;

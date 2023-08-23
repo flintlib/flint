@@ -11,7 +11,7 @@
 
 #include "acb_theta.h"
 
-slong acb_theta_deriv_nb(slong ord, slong g)
+slong acb_theta_jet_nb(slong ord, slong g)
 {
     fmpz_t x;
     slong res;

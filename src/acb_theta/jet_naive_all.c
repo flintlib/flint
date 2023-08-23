@@ -16,7 +16,7 @@ worker_dim0(acb_ptr dth, const acb_t term, slong* coords, slong g,
     slong ord, slong prec, slong fullprec)
 {
     slong n = 1 << g;
-    slong nb_max = acb_theta_deriv_nb(ord, g);
+    slong nb_max = acb_theta_jet_nb(ord, g);
     acb_t x;
     fmpz_t m;
     acb_ptr f;
@@ -33,8 +33,8 @@ worker_dim0(acb_ptr dth, const acb_t term, slong* coords, slong g,
     for (k = 0; k <= ord; k++)
     {
         /* Get list of orders */
-        nb = acb_theta_deriv_nb(k, g);
-        acb_theta_deriv_orders(orders, k, g);
+        nb = acb_theta_jet_nb(k, g);
+        acb_theta_jet_orders(orders, k, g);
 
         /* Compute factor for each tuple */
         for (j = 0; j < nb; j++)
@@ -77,7 +77,7 @@ worker_dim0(acb_ptr dth, const acb_t term, slong* coords, slong g,
 /* Use a big ellipsoid to avoid complicated formulas for derivatives */
 
 static void
-acb_theta_naive_all_jet_gen(acb_ptr dth, slong ord, acb_srcptr z, slong nb_z,
+acb_theta_jet_naive_all_gen(acb_ptr dth, slong ord, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
@@ -89,7 +89,7 @@ acb_theta_naive_all_jet_gen(acb_ptr dth, slong ord, acb_srcptr z, slong nb_z,
     arb_ptr u;
     acb_mat_t new_tau;
     acb_ptr new_z;
-    slong nb = n * n * acb_theta_deriv_nb(ord, g + 1);
+    slong nb = n * n * acb_theta_jet_nb(ord, g + 1);
     slong k;
 
     acb_theta_eld_init(E, g, g);
@@ -125,11 +125,11 @@ acb_theta_naive_all_jet_gen(acb_ptr dth, slong ord, acb_srcptr z, slong nb_z,
 }
 
 void
-acb_theta_naive_all_jet(acb_ptr dth, slong ord, acb_srcptr z, slong nb_z,
+acb_theta_jet_naive_all(acb_ptr dth, slong ord, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
-    slong nb = acb_theta_deriv_nb(ord, g + 1);
+    slong nb = acb_theta_jet_nb(ord, g + 1);
     acb_ptr res;
     slong k;
 
@@ -149,6 +149,6 @@ acb_theta_naive_all_jet(acb_ptr dth, slong ord, acb_srcptr z, slong nb_z,
     }
     else
     {
-        acb_theta_naive_all_jet_gen(dth, ord, z, nb_z, tau, prec);
+        acb_theta_jet_naive_all_gen(dth, ord, z, nb_z, tau, prec);
     }
 }

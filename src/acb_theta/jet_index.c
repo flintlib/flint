@@ -11,7 +11,7 @@
 
 #include "acb_theta.h"
 
-slong acb_theta_deriv_index(const slong* orders, slong g)
+slong acb_theta_jet_index(const slong* orders, slong g)
 {
     slong ord, res, k;
     slong j;
@@ -33,10 +33,10 @@ slong acb_theta_deriv_index(const slong* orders, slong g)
     /* First count all tuples with first entry g, ..., k+1 */
     for (j = 0; j < ord - k; j++)
     {
-        res += acb_theta_deriv_nb(j, g - 1);
+        res += acb_theta_jet_nb(j, g - 1);
     }
     /* Now it is the same as index as orders[1] in g - 1 variables */
-    res += acb_theta_deriv_index(orders + 1, g - 1);
+    res += acb_theta_jet_index(orders + 1, g - 1);
 
     return res;
 }

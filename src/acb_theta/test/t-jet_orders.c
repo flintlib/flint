@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("deriv_orders....");
+    flint_printf("jet_orders....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -26,7 +26,7 @@ int main(void)
     {
         slong g = 1 + n_randint(state, 6);
         slong ord = n_randint(state, 6);
-        slong nb = acb_theta_deriv_nb(ord, g);
+        slong nb = acb_theta_jet_nb(ord, g);
         slong *orders;
         slong i = n_randint(state, nb);
         slong test;
@@ -34,8 +34,8 @@ int main(void)
 
         orders = flint_malloc(nb * g * sizeof(slong));
 
-        acb_theta_deriv_orders(orders, ord, g);
-        test = acb_theta_deriv_index(orders + i * g, g);
+        acb_theta_jet_orders(orders, ord, g);
+        test = acb_theta_jet_index(orders + i * g, g);
 
         if (test != i)
         {
