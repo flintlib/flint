@@ -12,32 +12,53 @@
 #include "acb_theta.h"
 
 static slong
-get_power_of_i(const acb_t x)
+get_power_of_zeta8(const acb_t x)
 {
-    if (arb_is_positive(acb_realref(x)))
+    acb_t y;
+    arb_t abs;
+    slong prec = ACB_THETA_LOW_PREC;
+    slong k;
+
+    acb_init(y);
+    arb_init(abs);
+
+    acb_exp_pi_i(zeta, y, prec);
+
+    for (k = 0; k < 8; k++)
     {
-        return 0;
+        acb_one(y);
+        acb_mul_2exp_si(y, y, -2);
+        acb_mul_si(y, y, -k, prec);
+        acb_exp_pi_i(y, y, prec);
+        acb_mul(y, y, x, prec);
+        arb_abs(abs, acb_imagref(y), prec);
+        if (arb_lt(abs, acb_realref(y)))
+        {
+            /* y is in correct quadrant */
+            break;
+        }
     }
-    else if (arb_is_positive(acb_imagref(x)))
+
+    if (k < 8 && !acb_contains_one(y))
     {
-        return 1;
+        flint_printf("(acb_theta_transform_k) Error: not a power of zeta8\n");
+        flint_printf("k = %wd, y:\n", k);
+        acb_printd(y, 10);
+        flint_printf("\n");
+        flint_abort();
     }
-    else if (arb_is_negative(acb_realref(x)))
+    else if (k == 8)
     {
-        return 2;
+        k = -1; /* insufficient precision */
     }
-    else if (arb_is_negative(acb_imagref(x)))
-    {
-        return 3;
-    }
-    else
-    {
-        return -1;
-    }
+
+    acb_clear(y);
+    acb_clear(abs);
+    return k;
 }
 
 slong
-acb_theta_transform_k2(const fmpz_mat_t mat)
+acb_theta_transform_kappa(const fmpz_mat_t mat)
 {
     slong g = sp2gz_dim(mat);
     fmpz_mat_t inv;
@@ -46,7 +67,7 @@ acb_theta_transform_k2(const fmpz_mat_t mat)
     acb_t scal1, scal2, t;
     fmpz_t eps;
     ulong ab;
-    slong k2 = -1;
+    slong kappa = -1;
     slong prec = ACB_THETA_LOW_PREC;
 
     fmpz_mat_init(inv, 2 * g, 2 * g);
@@ -61,24 +82,24 @@ acb_theta_transform_k2(const fmpz_mat_t mat)
     ab = acb_theta_transform_char(eps, 0, inv);
     acb_theta_transform_char(eps, ab, mat);
 
-    while (k2 == -1)
+    while (kappa == -1)
     {
         acb_mat_onei(tau);
         acb_theta_naive_00(scal1, z, 1, tau, prec);
-        acb_sqr(scal1, scal1, prec);
 
-        acb_siegel_cocycle_det(t, mat, tau, prec);
+        acb_siegel_cocycle_sqrtdet(t, mat, tau, prec);
         acb_siegel_transform(tau, mat, tau, prec);
         acb_theta_naive_ind(scal2, ab, z, 1, tau, prec);
-        acb_sqr(scal2, scal2, prec);
 
         acb_mul(scal1, scal1, t, prec);
-        acb_onei(t);
+        acb_one(t);
+        acb_mul_2exp_si(t, t, -2);
+        acb_exp_pi_i(t, t, prec);
         acb_pow_fmpz(t, t, eps, prec);
         acb_mul(scal1, scal1, t, prec);
         acb_div(scal1, scal2, scal1, prec);
 
-        k2 = get_power_of_i(scal1);
+        kappa = get_power_of_zeta8(scal1);
         prec *= 2;
     }
 
@@ -89,5 +110,5 @@ acb_theta_transform_k2(const fmpz_mat_t mat)
     acb_clear(scal1);
     acb_clear(scal2);
     acb_clear(t);
-    return k2;
+    return kappa;
 }

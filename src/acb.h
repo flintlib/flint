@@ -1110,14 +1110,14 @@ ACB_INLINE int
 _acb_vec_contains(acb_srcptr vec1, acb_srcptr vec2, slong len)
 {
     slong i;
-    
+
     for (i = 0; i < len; i++)
     {
         if (!acb_contains(vec1 + i, vec2 + i))
             return 0;
     }
 
-    return 1;    
+    return 1;
 }
 
 ACB_INLINE void

@@ -11,14 +11,14 @@
 
 #include "acb_theta.h"
 
-void acb_theta_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec)
+void acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
     fmpz_mat_t mat;
     acb_mat_t w;
     acb_ptr x, aux;
-    slong k2;
+    slong kappa;
 
     fmpz_mat_init(mat, 2 * g, 2 * g);
     acb_mat_init(w, g, g);
@@ -27,11 +27,11 @@ void acb_theta_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong pre
 
     acb_siegel_reduce(w, mat, tau, prec);
     acb_siegel_transform_ext(x, w, mat, z, tau, prec);
-    acb_theta_ql_all_sqr(aux, x, w, prec);
+    acb_theta_ql_all(aux, x, w, prec);
 
     sp2gz_inv(mat, mat);
-    k2 = acb_theta_transform_k2(mat);
-    acb_theta_transform_sqr(th2, aux, x, w, mat, k2, prec);
+    kappa = acb_theta_transform_kappa(mat);
+    acb_theta_transform(th, aux, x, w, mat, kappa, prec);
 
     fmpz_mat_clear(mat);
     acb_mat_clear(w);

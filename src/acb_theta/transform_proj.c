@@ -11,8 +11,8 @@
 
 #include "acb_theta.h"
 
-void
-acb_theta_transform_sqr_proj(acb_ptr res, acb_srcptr th2, const fmpz_mat_t mat, slong prec)
+static void
+acb_theta_transform_aux(acb_ptr res, acb_srcptr th, const fmpz_mat_t mat, slong k, slong prec)
 {
     acb_ptr aux;
     slong g = sp2gz_dim(mat);
@@ -29,9 +29,9 @@ acb_theta_transform_sqr_proj(acb_ptr res, acb_srcptr th2, const fmpz_mat_t mat, 
     for (ab = 0; ab < n2; ab++)
     {
         image_ab = acb_theta_transform_char(eps, ab, mat);
-        acb_unit_root(c, 4, prec); /* 8 for theta values, 4 for squares */
+        acb_unit_root(c, k, prec);
         acb_pow_fmpz(c, c, eps, prec);
-        acb_mul(c, c, &th2[image_ab], prec);
+        acb_mul(c, c, &th[image_ab], prec);
         acb_set(&aux[ab], c);
     }
 
@@ -40,4 +40,16 @@ acb_theta_transform_sqr_proj(acb_ptr res, acb_srcptr th2, const fmpz_mat_t mat, 
     _acb_vec_clear(aux, n2);
     fmpz_clear(eps);
     acb_clear(c);
+}
+
+void
+acb_theta_transform_proj(acb_ptr res, acb_srcptr th, const fmpz_mat_t mat, slong prec)
+{
+    acb_theta_transform_aux(res, th, mat, 8, prec);
+}
+
+void
+acb_theta_transform_sqr_proj(acb_ptr res, acb_srcptr th2, const fmpz_mat_t mat, slong prec)
+{
+    acb_theta_transform_aux(res, th2, mat, 4, prec);
 }
