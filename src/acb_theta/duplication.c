@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 void
-acb_theta_duplication(acb_t th2, acb_srcptr th0, acb_srcptr th,
+acb_theta_duplication(acb_ptr th2, acb_srcptr th0, acb_srcptr th,
     arb_srcptr dist0, arb_srcptr dist, slong g, slong prec)
 {
     slong n = 1 << g;

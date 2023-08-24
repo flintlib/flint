@@ -20,6 +20,7 @@
 #include "fmpz_lll.h"
 #include "arb.h"
 #include "acb.h"
+#include "acb_poly.h"
 #include "arb_mat.h"
 #include "acb_mat.h"
 #include "acb_modular.h"
@@ -258,11 +259,11 @@ slong acb_theta_jet_nb(slong ord, slong g);
 void acb_theta_jet_orders(slong* orders, slong ord, slong g);
 slong acb_theta_jet_index(const slong* orders, slong g);
 
-void acb_theta_jet_bounds(arb_t eps, arb_t c, arb_t rho, const acb_ptr z,
+void acb_theta_jet_bounds(arb_t eps, arb_t c, arb_t rho, acb_srcptr z,
     const acb_mat_t tau, slong ord, slong hprec, slong prec);
 void acb_theta_jet_fourier(acb_ptr res, acb_srcptr val, slong ord, slong g, slong prec);
 void acb_theta_jet_fd(acb_ptr dth, const arb_t eps, const arb_t c,
-    const arb_t rho, arb_srcptr val, slong ord, slong g, slong prec);
+    const arb_t rho, acb_srcptr val, slong ord, slong g, slong prec);
 
 void acb_theta_jet_naive_all(acb_ptr dth, slong ord, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec);

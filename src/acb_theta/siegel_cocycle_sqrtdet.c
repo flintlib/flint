@@ -37,7 +37,7 @@ acb_siegel_sqrtdet_i(acb_t r, const fmpz_mat_t mat)
     acb_mat_init(tau, g, g);
 
     acb_mat_onei(tau);
-    acb_siegel_cocycle_det(r, tau, mat, prec);
+    acb_siegel_cocycle_det(r, mat, tau, prec);
 
     /* r should be exact */
     if (!acb_is_exact(r))
@@ -75,7 +75,7 @@ acb_siegel_sqrtdet_propagate(acb_t r, acb_t r0, const acb_mat_t tau, const acb_m
         {
             acb_sub(x, acb_mat_entry(tau, j, k), acb_mat_entry(ball, j, k), prec);
             arb_add_error(acb_realref(acb_mat_entry(ball, j, k)), acb_realref(x));
-            arb_add_error(acb_imagreg(acb_mat_entry(ball, j, k)), acb_realref(x));
+            arb_add_error(acb_imagref(acb_mat_entry(ball, j, k)), acb_imagref(x));
         }
     }
     if (!acb_mat_contains(ball, tau) || !acb_mat_contains(ball, tau0))
@@ -109,7 +109,7 @@ acb_siegel_sqrtdet_propagate(acb_t r, acb_t r0, const acb_mat_t tau, const acb_m
         }
 
         /* Get the right square root det at tau */
-        acb_siegel_cocycle_det(r, tau, mat, prec);
+        acb_siegel_cocycle_det(r, mat, tau, prec);
         acb_sqrt_no_cut(r, r, prec);
         if (!acb_contains(x, r))
         {
@@ -133,8 +133,8 @@ acb_siegel_sqrtdet_propagate(acb_t r, acb_t r0, const acb_mat_t tau, const acb_m
 
     else /* x contains zero and no overlap: recursion */
     {
-        acb_siegel_sqrt_propagate(x, r0, ctr, tau0, mat, prec);
-        acb_siegel_sqrt_propagate(r, x, tau, ctr, mat, prec);
+        acb_siegel_sqrtdet_propagate(x, r0, ctr, tau0, mat, prec);
+        acb_siegel_sqrtdet_propagate(r, x, tau, ctr, mat, prec);
     }
 
     acb_mat_clear(ctr);
@@ -147,31 +147,52 @@ acb_siegel_cocycle_sqrtdet(acb_t r, const fmpz_mat_t mat, const acb_mat_t tau, s
 {
     slong g = acb_mat_nrows(tau);
     acb_mat_t tau0;
-    slong prec = ACB_THETA_LOW_PREC;
+    acb_t x;
+    slong lp = ACB_THETA_LOW_PREC;
     slong max = 16;
     slong k;
 
-    /* Estimate necessary precision; abort if too high */
+    acb_mat_init(tau0, g, g);
+    acb_init(x);
+
+    /* Estimate necessary low precision; abort if too high */
     for (k = 0; k < max; k++)
     {
-        acb_siegel_cocycle_det(r, mat, tau, prec);
-        if (!acb_contains_zero(r))
+        acb_siegel_cocycle_det(x, mat, tau, lp);
+        lp *= 2;
+        if (!acb_contains_zero(x))
         {
             break;
         }
-        prec *= 2;
     }
+
     if (k == max)
     {
         acb_indeterminate(r);
-        return;
+    }
+    else
+    {
+        acb_mat_onei(tau0);
+        acb_siegel_sqrtdet_i(x, mat);
+        acb_siegel_sqrtdet_propagate(x, x, tau, tau0, mat, lp);
+
+        acb_siegel_cocycle_det(r, mat, tau, prec);
+        acb_sqrt_no_cut(r, r, prec);
+        if (!acb_contains(x, r))
+        {
+            acb_neg(r, r);
+        }
+        if (!acb_contains(x, r))
+        {
+            flint_printf("(acb_siegel_cocycle_sqrtdet) Error: final r not contained\n");
+            acb_printd(x, 10);
+            flint_printf("\n");
+            acb_printd(r, 10);
+            flint_printf("\n");
+            flint_abort();
+        }
     }
 
-    acb_mat_init(tau0, g, g);
-
-    acb_mat_onei(tau0);
-    acb_siegel_sqrtdet_i(r, mat);
-    acb_siegel_sqrtdet_propagate(r, r, tau, tau0, mat, prec);
-
     acb_mat_clear(tau0);
+    acb_clear(x);
 }

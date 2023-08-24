@@ -39,16 +39,17 @@ acb_theta_ql_all_with_t(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr dist0
     slong nb_z = (has_z ? 2 : 1);
     slong nb_t = (has_t ? 3 : 1);
     acb_mat_t new_tau;
-    acb_ptr roots, new_z, th_a0;
+    acb_ptr roots, new_z, th_a0, aux;
     arb_ptr new_dist0, new_dist;
     slong hprec;
-    slong k;
+    slong k, a;
     int res = 1;
 
     acb_mat_init(new_tau, g, g);
     roots = _acb_vec_init(n * n);
     new_z = _acb_vec_init(g);
     th_a0 = _acb_vec_init(n * nb_z * nb_t);
+    aux = _acb_vec_init(n * n);
     new_dist0 = _arb_vec_init(n);
     new_dist = _arb_vec_init(n);
 
@@ -95,10 +96,11 @@ acb_theta_ql_all_with_t(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr dist0
         }
     }
 
-    acb_mat_clear(new_tau, g, g);
+    acb_mat_clear(new_tau);
     _acb_vec_clear(roots, n * n);
     _acb_vec_clear(new_z, g);
     _acb_vec_clear(th_a0, n * nb_z * nb_t);
+    _acb_vec_clear(aux, n * n);
     _arb_vec_clear(new_dist0, n);
     _arb_vec_clear(new_dist, n);
     return res;
@@ -111,7 +113,6 @@ acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
     slong n = 1 << g;
     slong lp = ACB_THETA_LOW_PREC;
     slong guard = ACB_THETA_LOW_PREC;
-    slong nb_t = 1;
     flint_rand_t state;
     arb_ptr dist, dist0;
     acb_ptr t;
@@ -130,8 +131,7 @@ acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
 
     for (j = 0; (j < ACB_THETA_QL_TRY) && !res; j++)
     {
-        nb_t = 3;
-        res = acb_theta_ql_a0_with_t(th, t, z, dist0, dist, tau, guard, prec);
+        res = acb_theta_ql_all_with_t(th, t, z, dist0, dist, tau, guard, prec);
         guard += ACB_THETA_LOW_PREC;
     }
     if (!res)

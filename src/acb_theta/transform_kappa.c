@@ -22,8 +22,6 @@ get_power_of_zeta8(const acb_t x)
     acb_init(y);
     arb_init(abs);
 
-    acb_exp_pi_i(zeta, y, prec);
-
     for (k = 0; k < 8; k++)
     {
         acb_one(y);
@@ -31,15 +29,16 @@ get_power_of_zeta8(const acb_t x)
         acb_mul_si(y, y, -k, prec);
         acb_exp_pi_i(y, y, prec);
         acb_mul(y, y, x, prec);
-        arb_abs(abs, acb_imagref(y), prec);
+        arb_abs(abs, acb_imagref(y));
         if (arb_lt(abs, acb_realref(y)))
         {
             /* y is in correct quadrant */
             break;
         }
     }
+    acb_sub_si(y, y, 1, prec);
 
-    if (k < 8 && !acb_contains_one(y))
+    if (k < 8 && !acb_contains_zero(y))
     {
         flint_printf("(acb_theta_transform_k) Error: not a power of zeta8\n");
         flint_printf("k = %wd, y:\n", k);
@@ -53,7 +52,7 @@ get_power_of_zeta8(const acb_t x)
     }
 
     acb_clear(y);
-    acb_clear(abs);
+    arb_clear(abs);
     return k;
 }
 

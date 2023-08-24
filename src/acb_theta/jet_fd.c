@@ -16,7 +16,7 @@
 
 void
 acb_theta_jet_fd(acb_ptr dth, const arb_t eps, const arb_t c,
-    const arb_t rho, arb_srcptr val, slong ord, slong g, slong prec)
+    const arb_t rho, acb_srcptr val, slong ord, slong g, slong prec)
 {
     acb_ptr aux;
     acb_t t;

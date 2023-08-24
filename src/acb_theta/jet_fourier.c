@@ -28,7 +28,7 @@ acb_theta_jet_fourier(acb_ptr res, acb_srcptr val, slong ord, slong g, slong pre
     y = _acb_vec_init(b);
     acb_poly_init(pol);
 
-    _acb_vec_init_roots(zetas, -b, b, prec);
+    _acb_vec_unit_roots(zetas, -b, b, prec);
     _acb_vec_set(aux, val, n_pow(b, g));
 
     for (k = 0; k < g; k++)
@@ -42,15 +42,15 @@ acb_theta_jet_fourier(acb_ptr res, acb_srcptr val, slong ord, slong g, slong pre
             {
                 l = (j % n_pow(b, k)) + i * n_pow(b, k)
                     + b * (j / n_pow(b, k));
-                acb_poly_set_coeff_acb(pol, i, &val[l]);
+                acb_poly_set_coeff_acb(pol, i, &aux[l]);
             }
             /* Evaluate and update aux */
-            acb_poly_evaluate_vec_fast(y, poly, zetas, b, prec);
+            acb_poly_evaluate_vec_fast(y, pol, zetas, b, prec);
             for (i = 0; i < b; i++)
             {
                 l = (j % n_pow(b, k)) + i * n_pow(b, k)
                     + b * (j / n_pow(b, k));
-                acb_set(&val[l], &y[i]);
+                acb_set(&aux[l], &y[i]);
             }
         }
     }
