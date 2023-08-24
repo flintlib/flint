@@ -767,6 +767,7 @@ void acb_pow(acb_t r, const acb_t x, const acb_t y, slong prec);
 
 void acb_sqrt(acb_t y, const acb_t x, slong prec);
 void acb_rsqrt(acb_t y, const acb_t x, slong prec);
+void acb_sqrts(acb_t y1, acb_t y2, const acb_t x, slong prec);
 
 void acb_root_ui(acb_t y, const acb_t x, ulong k, slong prec);
 

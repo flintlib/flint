@@ -11,6 +11,38 @@
 
 #include "acb_theta.h"
 
+static void
+acb_siegel_sqrtdet_i(acb_t r, const fmpz_mat_t mat)
+{
+    slong g = sp2gz_dim(mat);
+    slong prec = ACB_THETA_LOW_PREC;
+    acb_mat_t tau;
+    acb_t x;
+    fmpz_t re, im;
+    int done = 0;
+
+    acb_mat_init(tau, g, g);
+    acb_mat_onei(tau);
+    acb_init(x);
+    fmpz_init(re);
+    fmpz_init(im);
+
+    while (!done)
+    {
+        prec *= 2;
+        acb_siegel_cocycle_det(x, mat, tau, prec);
+        done = arb_get_unique_fmpz(re, acb_realref(r))
+            && arb_get_unique_fmpz(im, acb_imagref(r));
+    }
+    arb_set_fmpz(acb_realref(r), re);
+    arb_set_fmpz(acb_imagref(r), im);
+    acb_sqrts(r, x, x, prec);
+
+    acb_mat_clear(tau);
+    fmpz_clear(re);
+    fmpz_clear(im);
+}
+
 static slong
 get_power_of_zeta8(const acb_t x)
 {
@@ -86,15 +118,14 @@ acb_theta_transform_kappa(const fmpz_mat_t mat)
         acb_mat_onei(tau);
         acb_theta_naive_00(scal1, z, 1, tau, prec);
 
-        acb_siegel_cocycle_sqrtdet(t, mat, tau, prec);
+        acb_siegel_sqrtdet_i(t, mat);
         acb_siegel_transform(tau, mat, tau, prec);
         acb_theta_naive_ind(scal2, ab, z, 1, tau, prec);
 
         acb_mul(scal1, scal1, t, prec);
-        acb_one(t);
+        acb_set_fmpz(t, eps);
         acb_mul_2exp_si(t, t, -2);
         acb_exp_pi_i(t, t, prec);
-        acb_pow_fmpz(t, t, eps, prec);
         acb_mul(scal1, scal1, t, prec);
         acb_div(scal1, scal2, scal1, prec);
 

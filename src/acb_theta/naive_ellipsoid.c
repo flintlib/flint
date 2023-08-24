@@ -28,16 +28,32 @@ acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr new_z, acb_ptr c, arb_ptr u
 
     acb_theta_eld_cho(cho, tau, prec);
 
-    /* Reduce all z, set offset and upper bounds */
-    acb_theta_naive_reduce(offset, new_z, c, u, z, nb_z, tau, cho, prec);
-    for (k = 0; k < nb_z; k++)
+    if (arb_mat_is_finite(cho))
     {
-        arb_mul_arf(&u[k], &u[k], eps, prec);
-    }
+        /* Reduce all z, set offset and upper bounds */
+        acb_theta_naive_reduce(offset, new_z, c, u, z, nb_z, tau, cho, prec);
+        for (k = 0; k < nb_z; k++)
+        {
+            arb_mul_arf(&u[k], &u[k], eps, prec);
+        }
 
-    /* Get radius for error of at most eps and fill ellipsoid */
-    acb_theta_naive_radius(R2, cho, ord, eps, lp);
-    acb_theta_eld_fill(E, cho, R2, offset, lp);
+        /* Get radius for error of at most eps and fill ellipsoid */
+        acb_theta_naive_radius(R2, cho, ord, eps, lp);
+        acb_theta_eld_fill(E, cho, R2, offset, lp);
+    }
+    else
+    {
+        /* Cannot compute cho, result will be nan */
+        _acb_vec_zero(new_z, nb_z);
+        arb_mat_one(cho);
+        arf_zero(R2);
+        acb_theta_eld_fill(E, cho, R2, offset, lp);
+        for (k = 0; k < nb_z; k++)
+        {
+            acb_indeterminate(&c[k]);
+            arb_pos_inf(&u[k]);
+        }
+    }
 
     arf_clear(R2);
     arb_mat_clear(cho);

@@ -14,56 +14,36 @@
 static void
 acb_theta_agm_sqrt_entry(acb_t r, const acb_t a, const acb_t root, slong prec)
 {
-    acb_t res;
-    acb_t neg;
+    acb_t y1, y2;
 
-    acb_init(res);
-    acb_init(neg);
+    acb_init(y1);
+    acb_init(y2);
 
-    /* Take any square root, avoiding potentially massive precision loss
-       if a intersects the default branch cut */
+    acb_sqrts(y1, y2, a, prec);
 
-    if (arb_contains_zero(acb_imagref(a)) && arb_is_negative(acb_realref(a)))
+    if (acb_overlaps(root, y1) && acb_overlaps(root, y2))
     {
-        acb_neg(res, a);
-        acb_sqrt(res, res, prec);
-        acb_mul_onei(res, res);
+        acb_indeterminate(r);
+    }
+    else if (acb_overlaps(root, y1))
+    {
+        acb_set(r, y1);
+    }
+    else if (acb_overlaps(root, y2))
+    {
+        acb_set(r, y2);
     }
     else
     {
-        acb_sqrt(res, a, prec);
-    }
-    acb_neg(neg, res);
-
-    if (acb_overlaps(root, res))
-    {
-        if (acb_overlaps(root, neg))
-        {
-            acb_indeterminate(r);
-        }
-        else
-        {
-            acb_set(r, res);
-        }
-    }
-    else /* (!acb_overlaps(root, res)) */
-    {
-        if (!acb_overlaps(root, neg))
-        {
-            flint_printf("(agm_sqrt) Error: indeterminate\n");
-            acb_printd(a, 10); flint_printf("\n");
-            acb_printd(root, 10); flint_printf("\n");
-            flint_abort();
-            acb_indeterminate(r);
-        }
-        else
-        {
-            acb_set(r, neg);
-        }
+        flint_printf("(agm_sqrt) Error: no overlap\n");
+        acb_printd(a, 10); flint_printf("\n");
+        acb_printd(root, 10); flint_printf("\n");
+        flint_abort();
+        acb_indeterminate(r);
     }
 
-    acb_clear(res);
-    acb_clear(neg);
+    acb_clear(y1);
+    acb_clear(y2);
 }
 
 void

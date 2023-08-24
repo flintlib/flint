@@ -60,7 +60,6 @@ void sp2gz_randtest(fmpz_mat_t mat, flint_rand_t state, slong bits);
 
 void acb_siegel_cocycle(acb_mat_t res, const fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 void acb_siegel_cocycle_det(acb_t det, const fmpz_mat_t mat, const acb_mat_t tau, slong prec);
-void acb_siegel_cocycle_sqrtdet(acb_t r, const fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 void acb_siegel_transform(acb_mat_t res, const fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 void acb_siegel_transform_ext(acb_ptr r, acb_mat_t w, const fmpz_mat_t mat,
     acb_srcptr z, const acb_mat_t tau, slong prec);
@@ -242,6 +241,7 @@ void acb_theta_transform_proj(acb_ptr res, acb_srcptr th, const fmpz_mat_t mat, 
 void acb_theta_transform_sqr_proj(acb_ptr res, acb_srcptr th2, const fmpz_mat_t mat, slong prec);
 
 slong acb_theta_transform_kappa(const fmpz_mat_t mat);
+void acb_theta_transform_sqrtdet(acb_t r, const fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 slong acb_theta_transform_k2(const fmpz_mat_t mat);
 void acb_theta_transform(acb_ptr res, acb_srcptr th, acb_srcptr z,
     const acb_mat_t tau, const fmpz_mat_t mat, slong kappa, slong prec);
