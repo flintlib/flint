@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <stdint.h>
 #include "gr_vec.h"
 #include "gr_mat.h"
 
@@ -66,9 +67,37 @@ gr_mat_mul_classical(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ct
         TMP_START;
         tmp = TMP_ALLOC(sz * br * bc);
 
+        /* Make a shallow transpose so that we can use dot products.
+           Inline common sizes. (Caution: are we sure about the alignment?
+           Some asserts would be nice here.)
+           Todo: we may want inlining in nonsingular_solve etc. as well. */
         for (i = 0; i < br; i++)
+        {
             for (j = 0; j < bc; j++)
-                set_shallow(GR_ENTRY(tmp, j * br + i, sz), GR_MAT_ENTRY(B, i, j, sz), ctx);
+            {
+                switch (sz)
+                {
+#if 0
+                    case 1:
+                        ((int8_t *) GR_ENTRY(tmp, j * br + i, 1))[0] = ((int8_t *) GR_MAT_ENTRY(B, i, j, 1))[0];
+                        break;
+                    case 2:
+                        ((int16_t *) GR_ENTRY(tmp, j * br + i, 2))[0] = ((int16_t *) GR_MAT_ENTRY(B, i, j, 2))[0];
+                        break;
+                    case 4:
+                        ((int32_t *) GR_ENTRY(tmp, j * br + i, 4))[0] = ((int32_t *) GR_MAT_ENTRY(B, i, j, 4))[0];
+                        break;
+#if FLINT_BITS == 64
+                    case 8:
+                        ((int64_t *) GR_ENTRY(tmp, j * br + i, 8))[0] = ((int64_t *) GR_MAT_ENTRY(B, i, j, 8))[0];
+                        break;
+#endif
+#endif
+                    default:
+                        set_shallow(GR_ENTRY(tmp, j * br + i, sz), GR_MAT_ENTRY(B, i, j, sz), ctx);
+                }
+            }
+        }
 
         for (i = 0; i < ar; i++)
         {
