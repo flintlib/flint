@@ -84,7 +84,6 @@ acb_theta_jet_naive_all_gen(acb_ptr dth, slong ord, acb_srcptr z, slong nb_z,
     slong n = 1 << g;
     acb_theta_eld_t E;
     acb_theta_precomp_t D;
-    arf_t eps;
     acb_ptr c;
     arb_ptr u;
     acb_mat_t new_tau;
@@ -94,18 +93,15 @@ acb_theta_jet_naive_all_gen(acb_ptr dth, slong ord, acb_srcptr z, slong nb_z,
 
     acb_theta_eld_init(E, g, g);
     acb_theta_precomp_init(D, nb_z, g);
-    arf_init(eps);
     c = _acb_vec_init(nb_z);
     u = _arb_vec_init(nb_z);
     acb_mat_init(new_tau, g, g);
     new_z = _acb_vec_init(nb_z * g);
 
-    arf_one(eps);
-    arf_mul_2exp_si(eps, eps, -prec);
     _acb_vec_scalar_mul_2exp_si(new_z, z, nb_z * g, -1);
     acb_mat_scalar_mul_2exp_si(new_tau, tau, -2);
 
-    acb_theta_naive_ellipsoid(E, new_z, c, u, ord, new_z, nb_z, new_tau, eps, prec);
+    acb_theta_naive_ellipsoid(E, new_z, c, u, ord, new_z, nb_z, new_tau, prec);
     prec = acb_theta_naive_fullprec(E, prec);
     acb_theta_precomp_set(D, new_z, tau, E, prec);
 
@@ -117,7 +113,6 @@ acb_theta_jet_naive_all_gen(acb_ptr dth, slong ord, acb_srcptr z, slong nb_z,
 
     acb_theta_eld_clear(E);
     acb_theta_precomp_clear(D);
-    arf_clear(eps);
     _acb_vec_clear(c, nb_z);
     _arb_vec_clear(u, nb_z);
     acb_mat_clear(new_tau);

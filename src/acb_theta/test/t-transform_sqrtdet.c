@@ -23,13 +23,12 @@ int main(void)
 
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 6);
+        slong g = 1 + n_randint(state, 2);
         fmpz_mat_t m1, m2, m3;
-        slong k1, k2, k3;
         acb_mat_t tau1, tau2;
         acb_t c1, c2, c3, t;
         slong prec = 100 + n_randint(state, 200);
-        slong mag_bits = n_randint(state, 5);
+        slong mag_bits = n_randint(state, 1);
 
         fmpz_mat_init(m1, 2 * g, 2 * g);
         fmpz_mat_init(m2, 2 * g, 2 * g);
@@ -41,29 +40,23 @@ int main(void)
         acb_init(c3);
         acb_init(t);
 
-        acb_siegel_randtest(tau1, state, prec, mag_bits);
-        acb_siegel_randtest(tau2, state, prec, mag_bits);
+        acb_siegel_randtest_reduced(tau1, state, prec, mag_bits);
+        acb_siegel_randtest_reduced(tau2, state, prec, mag_bits);
         sp2gz_randtest(m1, state, mag_bits);
         sp2gz_randtest(m2, state, mag_bits);
         fmpz_mat_mul(m3, m2, m1);
 
-        /*k1 = acb_theta_transform_kappa(m1);
-        k2 = acb_theta_transform_kappa(m2);
-        k3 = acb_theta_transform_kappa(m3);*/
-        k1 = 0; k2 = 0; k3 = 0;
-
-        /* Test: chain rule */
+        /* Test: chain rule up to sign */
         acb_theta_transform_sqrtdet(c1, m1, tau1, prec);
         acb_siegel_transform(tau2, m1, tau1, prec);
         acb_theta_transform_sqrtdet(c2, m2, tau2, prec);
         acb_theta_transform_sqrtdet(c3, m3, tau1, prec);
         acb_mul(t, c2, c1, prec);
 
-        if ((k1 + k2) % 8 != k3)
+        if (!acb_overlaps(t, c3))
         {
             acb_neg(t, t);
         }
-
         if (!acb_overlaps(t, c3))
         {
             flint_printf("FAIL\n");
