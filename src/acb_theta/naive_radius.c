@@ -91,20 +91,9 @@ acb_theta_naive_radius(arf_t R2, arf_t eps, const arb_mat_t cho, slong p, slong 
     arb_init(temp);
     arf_init(cmp);
 
-    /* Divide eps by right factors to reduce to invert_lin_plus_log */
     arf_one(eps);
     arf_mul_2exp_si(eps, eps, -prec - 2 * g - 2);
-
-    arb_one(b);
-    for (k = 0; k < g; k++)
-    {
-        arb_inv(temp, arb_mat_entry(cho, k, k), lp);
-        arb_add_si(temp, temp, 1, lp);
-        arb_mul(b, b, temp, lp);
-    }
-    arb_inv(b, b, lp);
-    arb_mul_arf(b, b, eps, lp);
-    arb_get_ubound_arf(eps, b, lp);
+    arb_set_arf(b, eps);
 
     /* Solve R2^((g-1)/2+p) exp(-R2) \leq b */
     arb_log(b, b, lp);
@@ -114,6 +103,17 @@ acb_theta_naive_radius(arf_t R2, arf_t eps, const arb_mat_t cho, slong p, slong 
     /* Max with 4, 2*p for formula to be valid */
     arf_set_si(cmp, FLINT_MAX(4, 2 * p));
     arf_max(R2, R2, cmp);
+
+    /* Set error */
+    arb_one(b);
+    for (k = 0; k < g; k++)
+    {
+        arb_inv(temp, arb_mat_entry(cho, k, k), lp);
+        arb_add_si(temp, temp, 1, lp);
+        arb_mul(b, b, temp, lp);
+    }
+    arb_mul_arf(b, b, eps, lp);
+    arb_get_ubound_arf(eps, b, lp);
 
     arb_clear(b);
     arb_clear(temp);

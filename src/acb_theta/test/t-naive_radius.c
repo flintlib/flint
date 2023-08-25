@@ -41,10 +41,8 @@ int main(void)
 
         arb_mat_randtest_cho(Y, state, prec, bits);
         arb_mat_transpose(Y, Y);
-        arf_one(eps);
-        arf_mul_2exp_si(eps, eps, -exp);
 
-        acb_theta_naive_radius(R2, Y, ord, eps, prec);
+        acb_theta_naive_radius(R2, eps, Y, ord, exp);
         acb_theta_naive_tail(bound, R2, Y, ord, prec);
 
         if (arf_cmp(bound, eps) > 0)

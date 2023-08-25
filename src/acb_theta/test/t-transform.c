@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("transform_sqr....");
+    flint_printf("transform....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -28,11 +28,12 @@ int main(void)
         slong n2 = 1 << (2 * g);
         slong prec = 100;
         slong bits = n_randint(state, 5);
+        int sqr = iter % 2;
         acb_mat_t tau;
         acb_ptr z;
         fmpz_mat_t mat;
         acb_ptr th, test;
-        slong k2;
+        slong kappa;
         slong k;
 
         acb_mat_init(tau, g, g);
@@ -47,17 +48,27 @@ int main(void)
             acb_urandom(&z[k], state, prec);
         }
         sp2gz_randtest(mat, state, bits);
-        k2 = acb_theta_transform_k2(mat);
+        kappa = acb_theta_transform_kappa(mat);
 
-        acb_theta_ql_all_sqr(th, z, tau, prec);
-        acb_theta_transform_sqr(th, mat, th, z, tau, k2, prec);
+        if (sqr)
+        {
+            acb_theta_ql_all_sqr(th, z, tau, prec);
+        }
+        else
+        {
+            acb_theta_ql_all(th, z, tau, prec);
+        }
+        acb_theta_transform(th, mat, th, z, tau, kappa, sqr, prec);
 
         acb_siegel_transform_ext(z, tau, mat, z, tau, prec);
         acb_modular_theta(&test[3], &test[2], &test[0], &test[1], z,
             acb_mat_entry(tau, 0, 0), prec);
-        for (k = 0; k < n2; k++)
+        if (sqr)
         {
-            acb_sqr(&test[k], &test[k], prec);
+            for (k = 0; k < n2; k++)
+            {
+                acb_sqr(&test[k], &test[k], prec);
+            }
         }
 
         if (!_acb_vec_overlaps(test, th, n2))

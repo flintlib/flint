@@ -210,6 +210,8 @@ void acb_theta_ql_step_1(acb_ptr r, acb_srcptr th0, acb_srcptr th,
     acb_srcptr roots, arb_srcptr dist0, arb_srcptr dist, slong g, slong prec);
 void acb_theta_ql_step_3(acb_ptr r, acb_srcptr th0, acb_srcptr th,
     acb_srcptr roots, arb_srcptr dist0, arb_srcptr dist, slong g, slong prec);
+void acb_theta_ql_dupl(acb_ptr th2, acb_srcptr th0, acb_srcptr th,
+    arb_srcptr dist0, arb_srcptr dist, slong g, slong prec);
 
 /* Use as worker(r, t, z, dist0, dist, tau, guard, prec). Computes theta_{a,0}
    at 0, t, 2t, z, z + t, z + 2t (less values if z = 0 or t = 0 or both) */
@@ -227,29 +229,20 @@ int acb_theta_ql_a0_steps(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist
 int acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
     arb_srcptr dist, const acb_mat_t tau, slong guard, slong prec);
 
-void acb_theta_duplication(acb_ptr th2, acb_srcptr th0, acb_srcptr th,
-    arb_srcptr dist0, arb_srcptr dist, slong g, slong prec);
 void acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec);
 void acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec);
 
-/* Transformation formulas for theta functions */
+/* Transformation formulas */
 
 ulong acb_theta_transform_char(fmpz_t eps, const fmpz_mat_t mat, ulong ab);
-void acb_theta_transform_proj(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th, slong prec);
-void acb_theta_transform_proj_sqr(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th2, slong prec);
-
 slong acb_theta_transform_kappa(const fmpz_mat_t mat);
 void acb_theta_transform_sqrtdet(acb_t r, const fmpz_mat_t mat, const acb_mat_t tau, slong prec);
-slong acb_theta_transform_k2(const fmpz_mat_t mat);
+void acb_theta_transform_proj(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th,
+    int sqr, slong prec);
 void acb_theta_transform(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th,
-    acb_srcptr z, const acb_mat_t tau, slong kappa, slong prec);
-void acb_theta_transform_sqr(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th2,
-    acb_srcptr z, const acb_mat_t tau, slong k2, slong prec);
+    acb_srcptr z, const acb_mat_t tau, slong kappa, int sqr, slong prec);
 
-/* Main functions */
-
-void acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec);
-void acb_theta_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec);
+void acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec);
 
 /* Derivatives/jets */
 

@@ -52,7 +52,7 @@ acb_theta_jet_all(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau, slo
         }
         _acb_vec_scalar_mul_arb(new_z, new_z, g, eps, hprec);
         _acb_vec_add(new_z, new_z, z, g, prec); /* todo: need to get mid and adjust errors */
-        acb_theta_all(all_val + k * n * n, new_z, tau, prec);
+        acb_theta_all(all_val + k * n * n, new_z, tau, 0, prec);
     }
 
     /* Call jet_fd on each theta_{a,b} */

@@ -57,11 +57,11 @@ acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec)
     }
     else if (has_z)
     {
-        acb_theta_duplication(th2, th, th + nb_t * n, dist0, dist, g, prec);
+        acb_theta_ql_dupl(th2, th, th + nb_t * n, dist0, dist, g, prec);
     }
     else
     {
-        acb_theta_duplication(th2, th, th, dist0, dist0, g, prec);
+        acb_theta_ql_dupl(th2, th, th, dist0, dist0, g, prec);
     }
 
     flint_randclear(state);

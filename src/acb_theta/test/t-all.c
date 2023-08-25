@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("all_sqr....");
+    flint_printf("all....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -28,6 +28,7 @@ int main(void)
         slong n2 = 1 << (2 * g);
         slong prec = 100;
         slong bits = n_randint(state, 5);
+        int sqr = iter % 2;
         acb_mat_t tau;
         acb_ptr z;
         acb_ptr th, test;
@@ -46,11 +47,14 @@ int main(void)
             acb_randtest_precise(z, state, prec, bits);
         }
 
-        acb_theta_all_sqr(th, z, tau, prec);
+        acb_theta_all(th, z, tau, sqr, prec);
         acb_theta_naive_all(test, z, 1, tau, prec);
-        for (k = 0; k < n2; k++)
+        if (sqr)
         {
-            acb_sqr(&test[k], &test[k], prec);
+            for (k = 0; k < n2; k++)
+            {
+                acb_sqr(&test[k], &test[k], prec);
+            }
         }
 
         if (!_acb_vec_overlaps(th, test, n2))

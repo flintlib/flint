@@ -80,14 +80,14 @@ acb_theta_ql_all_with_t(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr dist0
     if (res)
     {
         /* Get theta_{a,b}(z + t, tau) from square roots */
-        acb_theta_duplication(th, th_a0, th_a0 + (nb_z * nb_t - 1) * n,
+        acb_theta_ql_dupl(th, th_a0, th_a0 + (nb_z * nb_t - 1) * n,
             new_dist0, new_dist, g, prec);
         acb_theta_agm_sqrt(th, th, roots, n * n, prec);
 
         if (has_t)
         {
             /* Get theta_{a,b}(z, tau) from division */
-            acb_theta_duplication(aux, th_a0 + n, th_a0 + (3 * nb_z - 2) * n,
+            acb_theta_ql_dupl(aux, th_a0 + n, th_a0 + (3 * nb_z - 2) * n,
                 new_dist0, new_dist, g, prec);
             for (k = 0; k < n * n; k++)
             {

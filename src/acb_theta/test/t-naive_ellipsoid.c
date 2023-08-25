@@ -21,7 +21,7 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: sum of terms on border of ellipsoid must be less than eps */
+    /* Test: sum of terms on border of ellipsoid must be less than bound */
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         slong g = 1; + n_randint(state, 4);
@@ -31,7 +31,6 @@ int main(void)
         acb_mat_t tau;
         acb_ptr c, z, new_z;
         arb_ptr u;
-        arf_t eps;
         acb_t term;
         arb_t abs, sum;
         slong nb_z = 1 + n_randint(state, 4);
@@ -46,7 +45,6 @@ int main(void)
         new_z = _acb_vec_init(g * nb_z);
         c = _acb_vec_init(nb_z);
         u = _arb_vec_init(nb_z);
-        arf_init(eps);
         acb_init(term);
         arb_init(abs);
         arb_init(sum);
@@ -56,11 +54,9 @@ int main(void)
         {
             acb_randtest_precise(&z[k], state, prec, bits);
         }
-        arf_one(eps);
-        arf_mul_2exp_si(eps, eps, -prec);
 
         /* Test: sum of terms on the border is less than u */
-        acb_theta_naive_ellipsoid(E, new_z, c, u, ord, z, nb_z, tau, eps, prec);
+        acb_theta_naive_ellipsoid(E, new_z, c, u, ord, z, nb_z, tau, prec);
         nb_pts = acb_theta_eld_nb_border(E);
         pts = flint_malloc(g * nb_pts * sizeof(slong));
         acb_theta_eld_border(pts, E);
@@ -81,10 +77,8 @@ int main(void)
             if (!arb_is_negative(abs))
             {
                 flint_printf("FAIL\n");
-                flint_printf("sum, eps, bound:\n");
+                flint_printf("sum, bound:\n");
                 arb_printd(sum, 10);
-                flint_printf("\n");
-                arf_printd(eps, 10);
                 flint_printf("\n");
                 arb_printd(&u[j], 10);
                 flint_printf("\ntau:\n");
@@ -102,7 +96,6 @@ int main(void)
         _acb_vec_clear(new_z, g * nb_z);
         _acb_vec_clear(c, nb_z);
         _arb_vec_clear(u, nb_z);
-        arf_clear(eps);
         acb_clear(term);
         arb_clear(abs);
         arb_clear(sum);
