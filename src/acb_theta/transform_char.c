@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 ulong
-acb_theta_transform_char(fmpz_t eps, const fmpz_mat_t mat, ulong ab)
+acb_theta_transform_char(slong* e, const fmpz_mat_t mat, ulong ab)
 {
     slong g = sp2gz_dim(mat);
     fmpz_mat_t a, b, c, d;
@@ -22,6 +22,7 @@ acb_theta_transform_char(fmpz_t eps, const fmpz_mat_t mat, ulong ab)
     fmpz_mat_t alpha, beta;     /* These are windows, not initialized or freed */
     fmpz_mat_t Cvec_1, Cvec_2, Lvec;
     fmpz_mat_t coef;
+    fmpz_t eps, x;
     ulong res = 0;
     slong i;
 
@@ -36,6 +37,8 @@ acb_theta_transform_char(fmpz_t eps, const fmpz_mat_t mat, ulong ab)
     fmpz_mat_init(Cvec_2, g, 1);
     fmpz_mat_init(Lvec, 1, g);
     fmpz_mat_init(coef, 1, 1);
+    fmpz_init(eps);
+    fmpz_init(x);
 
     sp2gz_get_a(a, mat);
     sp2gz_get_b(b, mat);
@@ -107,17 +110,25 @@ acb_theta_transform_char(fmpz_t eps, const fmpz_mat_t mat, ulong ab)
     fmpz_mat_mul(coef, Lvec, Cvec_1);
     fmpz_addmul_ui(eps, fmpz_mat_entry(coef, 0, 0), 2);
 
-    fmpz_mod_ui(eps, eps, 8);   /* Formula involves zeta_8^eps */
-
     fmpz_mat_window_clear(alpha);
     fmpz_mat_window_clear(beta);
 
-    /* Reduce alphabeta mod 2 & convert to ulong */
+    /* Convert alphabeta mod 2 to ulong */
     for (i = 0; i < 2 * g; i++)
     {
         res = res << 1;
         res += fmpz_tstbit(fmpz_mat_entry(alphabeta, i, 0), 0);
     }
+    /* Adjust sign of eps and reduce mod 8 */
+    for (i = 0; i < g; i++)
+    {
+        if (fmpz_mod_ui(x, fmpz_mat_entry(alphabeta, i, 0), 2) == 1
+            && fmpz_mod_ui(x, fmpz_mat_entry(alphabeta, i + g, 0), 4) > 1)
+        {
+            fmpz_add_ui(eps, eps, 4);
+        }
+    }
+    *e = fmpz_mod_ui(eps, eps, 8);
 
     fmpz_mat_clear(a);
     fmpz_mat_clear(b);
@@ -130,6 +141,8 @@ acb_theta_transform_char(fmpz_t eps, const fmpz_mat_t mat, ulong ab)
     fmpz_mat_clear(Cvec_2);
     fmpz_mat_clear(Lvec);
     fmpz_mat_clear(coef);
+    fmpz_clear(eps);
+    fmpz_clear(x);
 
     return res;
 }
