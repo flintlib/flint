@@ -59,6 +59,9 @@ acb_theta_ql_all_with_t(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr dist0
     {
         hprec = guard + acb_theta_dist_addprec(&dist[a]);
         acb_theta_naive_fixed_a(roots + a * n, a << g, new_z, 1, tau, hprec);
+        
+        flint_printf("(ql_all) roots:\n");
+        _acb_vec_printd(roots, n * n, 5);
 
         if (_acb_vec_contains_zero(roots + a * n, n))
         {
@@ -75,6 +78,10 @@ acb_theta_ql_all_with_t(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr dist0
         _arb_vec_scalar_mul_2exp_si(new_dist, dist, n, 1);
         _arb_vec_scalar_mul_2exp_si(new_dist0, dist0, n, 1);
         res = acb_theta_ql_a0(th_a0, t, new_z, new_dist0, new_dist, new_tau, guard, prec);
+
+        flint_printf("(ql_all) has_t = %wd, has_z = %wd, guard = %wd, prec = %wd, th_a0:\n",
+            has_t, has_z, guard, prec);
+        _acb_vec_printd(th_a0, nb_z * nb_t * n, 5);
     }
 
     if (res)
