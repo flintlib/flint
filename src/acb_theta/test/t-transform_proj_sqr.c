@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("transform_sqr_proj....");
+    flint_printf("transform_proj_sqr....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -52,8 +52,8 @@ int main(void)
         sp2gz_inv(inv, mat);
         acb_theta_ql_all_sqr(test, z, tau, prec);
 
-        acb_theta_transform_sqr_proj(aux, test, mat, prec);
-        acb_theta_transform_sqr_proj(th, aux, inv, prec);
+        acb_theta_transform_proj_sqr(aux, mat, test, prec);
+        acb_theta_transform_proj_sqr(th, inv, aux, prec);
         acb_div(scal, &test[0], &th[0], prec);
         _acb_vec_scalar_mul(th, th, n2, scal, prec);
 

@@ -50,7 +50,7 @@ int main(void)
         k2 = acb_theta_transform_k2(mat);
 
         acb_theta_ql_all_sqr(th, z, tau, prec);
-        acb_theta_transform_sqr(th, th, z, tau, mat, k2, prec);
+        acb_theta_transform_sqr(th, mat, th, z, tau, k2, prec);
 
         acb_siegel_transform_ext(z, tau, mat, z, tau, prec);
         acb_modular_theta(&test[3], &test[2], &test[0], &test[1], z,

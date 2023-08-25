@@ -110,8 +110,8 @@ acb_theta_transform_kappa(const fmpz_mat_t mat)
     acb_init(t);
 
     sp2gz_inv(inv, mat);
-    ab = acb_theta_transform_char(eps, 0, inv);
-    acb_theta_transform_char(eps, ab, mat);
+    ab = acb_theta_transform_char(eps, inv, 0);
+    acb_theta_transform_char(eps, mat, ab);
 
     while (kappa == -1)
     {

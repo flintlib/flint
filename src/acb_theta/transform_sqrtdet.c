@@ -14,7 +14,7 @@
 /* Use theta relation at low precision */
 
 static void
-acb_theta_transform_sqrtdet_lowprec(acb_t r, const acb_mat_t tau, const fmpz_mat_t mat)
+acb_theta_transform_sqrtdet_lowprec(acb_t r, const fmpz_mat_t mat, const acb_mat_t tau)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
@@ -51,7 +51,7 @@ acb_theta_transform_sqrtdet_lowprec(acb_t r, const acb_mat_t tau, const fmpz_mat
         }
     }
 
-    ab = acb_theta_transform_char(eps, b, mat);
+    ab = acb_theta_transform_char(eps, mat, b);
     acb_zero(r);
 
     while (acb_contains_zero(r))
@@ -89,15 +89,15 @@ acb_theta_transform_sqrtdet(acb_t r, const fmpz_mat_t mat, const acb_mat_t tau, 
 
     if (acb_overlaps(y1, x) && acb_overlaps(y2, x))
     {
-        arb_union(r, y1, y2, prec);
+        acb_union(r, y1, y2, prec);
     }
     else if (acb_overlaps(y1, x))
     {
-        arb_set(r, y1);
+        acb_set(r, y1);
     }
     else if (acb_overlaps(y2, x))
     {
-        arb_set(r, y2);
+        acb_set(r, y2);
     }
     else
     {

@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 ulong
-acb_theta_transform_char(fmpz_t eps, ulong ab, const fmpz_mat_t mat)
+acb_theta_transform_char(fmpz_t eps, const fmpz_mat_t mat, ulong ab)
 {
     slong g = sp2gz_dim(mat);
     fmpz_mat_t a, b, c, d;

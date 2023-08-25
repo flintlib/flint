@@ -31,7 +31,7 @@ void acb_theta_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong pre
 
     sp2gz_inv(mat, mat);
     k2 = acb_theta_transform_k2(mat);
-    acb_theta_transform_sqr(th2, aux, x, w, mat, k2, prec);
+    acb_theta_transform_sqr(th2, mat, aux, x, w, k2, prec);
 
     fmpz_mat_clear(mat);
     acb_mat_clear(w);

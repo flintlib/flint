@@ -12,8 +12,8 @@
 #include "acb_theta.h"
 
 static void
-acb_theta_transform_scal(acb_t scal, acb_srcptr z,
-    const acb_mat_t tau, const fmpz_mat_t mat, slong kappa, slong prec)
+acb_theta_transform_scal(acb_t scal, const fmpz_mat_t mat, acb_srcptr z,
+    const acb_mat_t tau, const slong kappa, slong prec)
 {
     slong g = sp2gz_dim(mat);
     fmpz_mat_t c;
@@ -32,7 +32,7 @@ acb_theta_transform_scal(acb_t scal, acb_srcptr z,
     acb_mul_2exp_si(mu, mu, -2);
     acb_exp_pi_i(mu, mu, prec);
     acb_pow_si(mu, mu, kappa, prec);
-    acb_siegel_cocycle_sqrtdet(x, mat, tau, prec);
+    acb_theta_transform_sqrtdet(x, mat, tau, prec);
     acb_mul(scal, x, mu, prec);
 
     acb_siegel_transform_ext(Nz, w, mat, z, tau, prec);
@@ -53,8 +53,8 @@ acb_theta_transform_scal(acb_t scal, acb_srcptr z,
 }
 
 void
-acb_theta_transform(acb_ptr res, acb_srcptr th, acb_srcptr z,
-    const acb_mat_t tau, const fmpz_mat_t mat, slong kappa, slong prec)
+acb_theta_transform(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th, acb_srcptr z,
+    const acb_mat_t tau, slong kappa, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
@@ -62,16 +62,16 @@ acb_theta_transform(acb_ptr res, acb_srcptr th, acb_srcptr z,
 
     acb_init(scal);
 
-    acb_theta_transform_scal(scal, z, tau, mat, kappa, prec);
-    acb_theta_transform_proj(res, th, mat, prec);
+    acb_theta_transform_scal(scal, mat, z, tau, kappa, prec);
+    acb_theta_transform_proj(res, mat, th, prec);
     _acb_vec_scalar_mul(res, res, n * n, scal, prec);
 
     acb_clear(scal);
 }
 
 void
-acb_theta_transform_sqr_new(acb_ptr res, acb_srcptr th2, acb_srcptr z,
-    const acb_mat_t tau, const fmpz_mat_t mat, slong kappa, slong prec)
+acb_theta_transform_sqr_new(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th2,
+    acb_srcptr z, const acb_mat_t tau, slong kappa, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
@@ -79,9 +79,9 @@ acb_theta_transform_sqr_new(acb_ptr res, acb_srcptr th2, acb_srcptr z,
 
     acb_init(scal);
 
-    acb_theta_transform_scal(scal, z, tau, mat, kappa, prec);
+    acb_theta_transform_scal(scal, mat, z, tau, kappa, prec);
     acb_sqr(scal, scal, prec);
-    acb_theta_transform_sqr_proj(res, th2, mat, prec);
+    acb_theta_transform_proj_sqr(res, mat, th2, prec);
     _acb_vec_scalar_mul(res, res, n * n, scal, prec);
 
     acb_clear(scal);

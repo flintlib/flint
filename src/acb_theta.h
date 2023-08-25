@@ -236,17 +236,17 @@ void acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong 
 
 /* Transformation formulas for theta functions */
 
-ulong acb_theta_transform_char(fmpz_t eps, ulong ab, const fmpz_mat_t mat);
-void acb_theta_transform_proj(acb_ptr res, acb_srcptr th, const fmpz_mat_t mat, slong prec);
-void acb_theta_transform_sqr_proj(acb_ptr res, acb_srcptr th2, const fmpz_mat_t mat, slong prec);
+ulong acb_theta_transform_char(fmpz_t eps, const fmpz_mat_t mat, ulong ab);
+void acb_theta_transform_proj(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th, slong prec);
+void acb_theta_transform_proj_sqr(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th2, slong prec);
 
 slong acb_theta_transform_kappa(const fmpz_mat_t mat);
 void acb_theta_transform_sqrtdet(acb_t r, const fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 slong acb_theta_transform_k2(const fmpz_mat_t mat);
-void acb_theta_transform(acb_ptr res, acb_srcptr th, acb_srcptr z,
-    const acb_mat_t tau, const fmpz_mat_t mat, slong kappa, slong prec);
-void acb_theta_transform_sqr(acb_ptr res, acb_srcptr th2, acb_srcptr z,
-    const acb_mat_t tau, const fmpz_mat_t mat, slong k2, slong prec);
+void acb_theta_transform(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th,
+    acb_srcptr z, const acb_mat_t tau, slong kappa, slong prec);
+void acb_theta_transform_sqr(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th2,
+    acb_srcptr z, const acb_mat_t tau, slong k2, slong prec);
 
 /* Main functions */
 

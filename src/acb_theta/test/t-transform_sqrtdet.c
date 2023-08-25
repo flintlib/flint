@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("siegel_cocycle_sqrtdet....");
+    flint_printf("transform_sqrtdet....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -53,10 +53,10 @@ int main(void)
         k1 = 0; k2 = 0; k3 = 0;
 
         /* Test: chain rule */
-        acb_siegel_cocycle_sqrtdet(c1, m1, tau1, prec);
+        acb_theta_transform_sqrtdet(c1, m1, tau1, prec);
         acb_siegel_transform(tau2, m1, tau1, prec);
-        acb_siegel_cocycle_sqrtdet(c2, m2, tau2, prec);
-        acb_siegel_cocycle_sqrtdet(c3, m3, tau1, prec);
+        acb_theta_transform_sqrtdet(c2, m2, tau2, prec);
+        acb_theta_transform_sqrtdet(c3, m3, tau1, prec);
         acb_mul(t, c2, c1, prec);
 
         if ((k1 + k2) % 8 != k3)
