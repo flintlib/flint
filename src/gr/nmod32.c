@@ -325,7 +325,7 @@ _nmod32_vec_add(nmod32_struct * res, const nmod32_struct * vec1, const nmod32_st
     nmod_t mod = NMOD32_CTX(ctx);
 
     for (i = 0; i < len; i++)
-        res[i] = nmod_add(vec1[i], vec2[i], mod);
+        res[i] = _nmod_add(vec1[i], vec2[i], mod);
 
     return GR_SUCCESS;
 }

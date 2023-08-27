@@ -318,12 +318,6 @@ _nmod8_vec_neg(nmod8_struct * res, const nmod8_struct * vec, slong len, gr_ctx_t
     return GR_SUCCESS;
 }
 
-#pragma GCC push_options
-/*
-#pragma GCC optimize "O1"
-#pragma GCC optimize ("unroll-loops")
-*/
-
 int
 _nmod8_vec_add(nmod8_struct * res, const nmod8_struct * vec1, const nmod8_struct * vec2, slong len, gr_ctx_t ctx)
 {
@@ -348,8 +342,6 @@ _nmod8_vec_sub(nmod8_struct * res, const nmod8_struct * vec1, const nmod8_struct
 
     return GR_SUCCESS;
 }
-
-#pragma GCC pop_options
 
 int
 _nmod8_vec_dot(nmod8_t res, const nmod8_t initial, int subtract, const nmod8_struct * vec1, const nmod8_struct * vec2, slong len, gr_ctx_t ctx)

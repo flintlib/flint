@@ -25,7 +25,12 @@ _gr_poly_divrem_divconquer_recursive(gr_ptr Q, gr_ptr BQ, gr_ptr W,
     {
         status |= _gr_vec_zero(BQ, lenB - 1, ctx);
         status |= _gr_vec_set(GR_ENTRY(BQ, lenB - 1, sz), GR_ENTRY(A, lenB - 1, sz), lenB, ctx);
-        status |= _gr_poly_divrem_basecase_preinv1(Q, BQ, BQ, 2 * lenB - 1, B, lenB, invB, ctx);
+
+        if (invB == NULL)
+            status |= _gr_poly_divrem_basecase_noinv(Q, BQ, BQ, 2 * lenB - 1, B, lenB, ctx);
+        else
+            status |= _gr_poly_divrem_basecase_preinv1(Q, BQ, BQ, 2 * lenB - 1, B, lenB, invB, ctx);
+
         status |= _gr_vec_neg(BQ, BQ, lenB - 1, ctx);
         status |= _gr_vec_set(GR_ENTRY(BQ, lenB - 1, sz), GR_ENTRY(A, lenB - 1, sz), lenB, ctx);
     }
@@ -227,6 +232,12 @@ _gr_poly_divrem_divconquer_preinv1(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, 
 }
 
 int
+_gr_poly_divrem_divconquer_noinv(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, slong cutoff, gr_ctx_t ctx)
+{
+    return _gr_poly_divrem_divconquer_preinv1(Q, R, A, lenA, B, lenB, NULL, cutoff, ctx);
+}
+
+int
 _gr_poly_divrem_divconquer(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, slong cutoff, gr_ctx_t ctx)
 {
     slong sz = ctx->sizeof_elem;
@@ -240,7 +251,7 @@ _gr_poly_divrem_divconquer(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcpt
     if (status == GR_SUCCESS)
         status = _gr_poly_divrem_divconquer_preinv1(Q, R, A, lenA, B, lenB, invB, cutoff, ctx);
     else
-        status = GR_UNABLE;
+        status = _gr_poly_divrem_divconquer_noinv(Q, R, A, lenA, B, lenB, cutoff, ctx);
 
     GR_TMP_CLEAR(invB, ctx);
 
