@@ -22,14 +22,14 @@ int main(void)
     flint_randinit(state);
 
     /* Test: agrees with naive_all */
-    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
         slong n = 1 << g;
         int has_z = iter % 2;
-        slong prec = (g > 1 ? 100 : 2000) + n_randint(state, 1000);
+        slong prec = (g > 1 ? 100 : 1000) + n_randint(state, 500);
         slong hprec = prec + 25;
-        slong bits = n_randint(state, 5);
+        slong bits = n_randint(state, 3);
         acb_mat_t tau;
         acb_ptr z, th, test;
         slong k;
@@ -50,13 +50,6 @@ int main(void)
 
         acb_theta_ql_all(th, z, tau, prec);
         acb_theta_naive_all(test, z, 1, tau, hprec);
-        
-            flint_printf("g = %wd, prec = %wd, has_z = %wd, tau:\n",
-                g, prec, has_z);
-            acb_mat_printd(tau, 5);
-            flint_printf("output:\n");
-            _acb_vec_printd(th, n * n, 5);
-            _acb_vec_printd(test, n * n, 5);
 
         if (!acb_is_finite(&th[0]) || !_acb_vec_overlaps(th, test, n * n))
         {

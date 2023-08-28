@@ -25,7 +25,7 @@ acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec)
     acb_mat_t w;
     arb_ptr dist, dist0;
     acb_ptr t, x, th;
-    slong j;
+    slong j, k;
     int res;
 
     flint_randinit(state);
@@ -47,6 +47,11 @@ acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec)
     for (j = 0; (j < ACB_THETA_QL_TRY) && !res; j++)
     {
         nb_t = 3;
+        for (k = 0; k < g; k++)
+        {
+            arb_urandom(acb_realref(&t[k]), state, prec);
+        }
+        _acb_vec_scalar_mul_2exp_si(t, t, g, 1);
         res = acb_theta_ql_a0(th, t, x, dist0, dist, w, guard, prec);
         guard += ACB_THETA_LOW_PREC;
     }
