@@ -113,16 +113,8 @@ acb_theta_transform_kappa(const fmpz_mat_t mat)
     ab = acb_theta_transform_char(eps, inv, 0);
     acb_theta_transform_char(eps, mat, ab);
 
-    flint_printf("(transform_kappa) Matrix:\n");
-    fmpz_mat_print_pretty(mat);
-    flint_printf("\n");
-    flint_printf("(transform_kappa) eps: ");
-    fmpz_print(eps);
-    flint_printf("\n");
-
     while (kappa == -1)
     {
-        flint_printf("(transform_kappa) trying prec = %wd\n", prec);
         acb_mat_onei(tau);
         acb_theta_naive_00(scal1, z, 1, tau, prec);
 

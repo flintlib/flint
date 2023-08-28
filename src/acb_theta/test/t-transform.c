@@ -63,6 +63,8 @@ int main(void)
         acb_siegel_transform_ext(z, tau, mat, z, tau, prec);
         acb_modular_theta(&test[3], &test[2], &test[0], &test[1], z,
             acb_mat_entry(tau, 0, 0), prec);
+        acb_neg(&test[3], &test[3]);
+
         if (sqr)
         {
             for (k = 0; k < n2; k++)
@@ -74,7 +76,7 @@ int main(void)
         if (!_acb_vec_overlaps(test, th, n2))
         {
             flint_printf("FAIL\n");
-            flint_printf("g = %wd, mat:\n", g);
+            flint_printf("g = %wd, sqr = %wd, mat:\n", g, sqr);
             fmpz_mat_print_pretty(mat);
             flint_printf("\n");
             flint_printf("image tau: ");
