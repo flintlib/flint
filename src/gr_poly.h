@@ -93,6 +93,7 @@ truth_t gr_poly_equal(const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx
 truth_t gr_poly_is_zero(const gr_poly_t poly, gr_ctx_t ctx);
 truth_t gr_poly_is_one(const gr_poly_t poly, gr_ctx_t ctx);
 truth_t gr_poly_is_gen(const gr_poly_t poly, gr_ctx_t ctx);
+truth_t gr_poly_is_scalar(const gr_poly_t poly, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_poly_set_scalar(gr_poly_t poly, gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_set_si(gr_poly_t poly, slong x, gr_ctx_t ctx);
