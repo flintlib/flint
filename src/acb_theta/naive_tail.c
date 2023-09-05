@@ -12,14 +12,13 @@
 #include "acb_theta.h"
 
 void
-acb_theta_naive_tail(arf_t bound, const arf_t R2, const arb_mat_t cho, slong ord, slong prec)
+acb_theta_naive_tail(arb_t bound, const arf_t R2, const arb_mat_t cho, slong ord, slong prec)
 {
-    arb_t res, temp;
+    arb_t temp;
     arb_t Rmod;
     slong g = arb_mat_nrows(cho);
     slong k;
 
-    arb_init(res);
     arb_init(temp);
     arb_init(Rmod);
 
@@ -29,26 +28,24 @@ acb_theta_naive_tail(arf_t bound, const arf_t R2, const arb_mat_t cho, slong ord
     arb_max(Rmod, Rmod, temp, prec);
 
     /* Evaluate 2^(2*g+2) R^(g-1 + 2*ord) exp(-R^2) \prod(1 + gamma_i^{-1}) */
-    arb_one(res);
-    arb_mul_2exp_si(res, res, 2 * g + 2);
+    arb_one(bound);
+    arb_mul_2exp_si(bound, bound, 2 * g + 2);
 
     arb_sqrt(temp, Rmod, prec);
     arb_pow_ui(temp, temp, g - 1 + 2 * ord, prec);
-    arb_mul(res, res, temp, prec);
+    arb_mul(bound, bound, temp, prec);
 
     arb_neg(temp, Rmod);
     arb_exp(temp, temp, prec);
-    arb_mul(res, res, temp, prec);
+    arb_mul(bound, bound, temp, prec);
 
     for (k = 0; k < g; k++)
     {
         arb_inv(temp, arb_mat_entry(cho, k, k), prec);
         arb_add_si(temp, temp, 1, prec);
-        arb_mul(res, res, temp, prec);
+        arb_mul(bound, bound, temp, prec);
     }
-    arb_get_ubound_arf(bound, res, prec);
 
-    arb_clear(res);
     arb_clear(temp);
     arb_clear(Rmod);
 }

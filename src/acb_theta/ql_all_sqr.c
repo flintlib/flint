@@ -11,8 +11,8 @@
 
 #include "acb_theta.h"
 
-void
-acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec)
+static void
+acb_theta_ql_all_sqr_red(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
@@ -76,4 +76,84 @@ acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec)
     _arb_vec_clear(dist0, n);
     _acb_vec_clear(t, g);
     _acb_vec_clear(th, n * 3 * nb_z);
+}
+
+void
+acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec)
+{
+    slong g = acb_mat_nrows(tau);
+    slong n2 = 1 << (2 * g);
+    acb_mat_t w;
+    acb_ptr x, aux;
+    acb_t c;
+    arb_t u, v;
+    slong d, j, k;
+    ulong ab, a0, a1, b0;
+
+    acb_init(c);
+    arb_init(u);
+    arb_init(v);
+    x = _acb_vec_init(g);
+
+    d = acb_theta_ql_reduce(x, c, u, z, tau, prec);
+    acb_sqr(c, c, prec);
+    arb_sqr(u, u, prec);
+
+    acb_mat_init(w, d, d);
+    aux = _acb_vec_init(1 << (2 * d));
+
+    for (j = 0; j < d; j++)
+    {
+        for (k = 0; k < d; k++)
+        {
+            acb_set(acb_mat_entry(w, j, k), acb_mat_entry(tau, j, k));
+        }
+    }
+
+    if (acb_is_finite(c))
+    {
+        if (d > 0)
+        {
+            acb_theta_ql_all_sqr_red(aux, x, w, prec);
+        }
+        else
+        {
+            acb_one(&aux[0]);
+        }
+        _acb_vec_scalar_mul(aux, aux, 1 << (2 * d), c, prec);
+    }
+    else
+    {
+        _acb_vec_indeterminate(aux, 1 << (2 * d));
+    }
+
+    for (ab = 0; ab < n2; ab++)
+    {
+        /* Write ab as a0 a1 b0 b1 */
+        a0 = ab >> (g + (g - d));
+        a1 = (ab >> g) % (1 << (g - d));
+        b0 = (ab >> (g - d)) % (1 << d);
+
+        if (a1 == 0)
+        {
+            acb_set(&th2[ab], &aux[(a0 << d) + b0]);
+            acb_abs(v, &th2[ab], prec);
+            arb_mul(v, v, u, prec);
+            arb_sqrt(v, v, prec);
+            arb_mul_2exp_si(v, v, 1);
+            acb_add_error_arb(&th2[ab], v);
+        }
+        else
+        {
+            acb_zero(&th2[ab]);
+            acb_add_error_arb(&th2[ab], u);
+        }
+    }
+
+    _acb_vec_clear(x, g);
+    acb_clear(c);
+    arb_clear(u);
+    arb_clear(v);
+    acb_mat_clear(w);
+    _acb_vec_clear(aux, 1 << (2 * d));
 }

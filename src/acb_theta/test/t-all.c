@@ -26,7 +26,7 @@ int main(void)
     {
         slong g = 1 + n_randint(state, 3);
         slong n2 = 1 << (2 * g);
-        slong prec = 100;
+        slong prec = 100 + n_randint(state, 500);
         slong bits = n_randint(state, 5);
         int sqr = iter % 2;
         acb_mat_t tau;
@@ -44,7 +44,7 @@ int main(void)
         acb_mat_scalar_mul_2exp_si(tau, tau, -2);
         for (k = 0; k < g; k++)
         {
-            acb_randtest_precise(z, state, prec, bits);
+            acb_urandom(z, state, prec);
         }
 
         acb_theta_all(th, z, tau, sqr, prec);
@@ -60,7 +60,7 @@ int main(void)
         if (!_acb_vec_overlaps(th, test, n2))
         {
             flint_printf("FAIL\n");
-            flint_printf("g = %wd, prec %wd, tau:\n");
+            flint_printf("g = %wd, prec = %wd, sqr = %wd, tau:\n", g, prec, sqr);
             acb_mat_printd(tau, 5);
             flint_printf("th, test:\n");
             _acb_vec_printd(th, n2, 5);

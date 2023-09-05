@@ -155,7 +155,7 @@ void acb_theta_precomp_set(acb_theta_precomp_t D, acb_srcptr z,
 
 void acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau,
     slong* n, slong prec);
-void acb_theta_naive_tail(arf_t bound, const arf_t R2, const arb_mat_t cho,
+void acb_theta_naive_tail(arb_t bound, const arf_t R2, const arb_mat_t cho,
     slong ord, slong prec);
 void acb_theta_naive_radius(arf_t R2, arf_t eps, const arb_mat_t cho, slong ord, slong prec);
 void acb_theta_naive_reduce(arb_ptr offset, acb_ptr new_z, acb_ptr c, arb_ptr u,
@@ -229,6 +229,8 @@ int acb_theta_ql_a0_steps(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist
 int acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
     arb_srcptr dist, const acb_mat_t tau, slong guard, slong prec);
 
+slong acb_theta_ql_reduce(acb_ptr x, acb_t c, arb_t u, acb_srcptr z,
+    const acb_mat_t tau, slong prec);
 void acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec);
 void acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec);
 

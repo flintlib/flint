@@ -17,12 +17,13 @@
 static void
 invert_lin_plus_log(arf_t R2, slong a, const arb_t b, slong prec)
 {
-    arb_t x, y;
+    arb_t x, y, t;
     arf_t z;
     slong k;
 
     arb_init(x);
     arb_init(y);
+    arb_init(t);
     arf_init(z);
 
     if (a == 0)
@@ -49,9 +50,13 @@ invert_lin_plus_log(arf_t R2, slong a, const arb_t b, slong prec)
         goto exit;
     }
 
-    /* Otherwise, x = max(a, 2*(b - min)) is always large enough; then
-       iterate function a few times */
+    /* Otherwise, x = max(a, 2*(b - min) + a log 2) is always large enough;
+       then iterate function a few times */
     arb_sub(y, b, y, prec);
+    arb_const_log2(t, prec);
+    arb_mul_2exp_si(t, t, -1);
+    arb_mul_si(t, t, a, prec);
+    arb_add(y, y, t, prec);
     arb_max(y, y, x, prec);
     arb_mul_si(x, y, 2, prec);
     arb_get_ubound_arf(z, x, prec);
@@ -74,12 +79,13 @@ invert_lin_plus_log(arf_t R2, slong a, const arb_t b, slong prec)
     {
         arb_clear(x);
         arb_clear(y);
+        arb_clear(t);
         arf_clear(z);
     }
 }
 
 void
-acb_theta_naive_radius(arf_t R2, arf_t eps, const arb_mat_t cho, slong p, slong prec)
+acb_theta_naive_radius(arf_t R2, arf_t eps, const arb_mat_t cho, slong ord, slong prec)
 {
     slong g = arb_mat_nrows(cho);
     slong lp = ACB_THETA_LOW_PREC;
@@ -92,16 +98,17 @@ acb_theta_naive_radius(arf_t R2, arf_t eps, const arb_mat_t cho, slong p, slong 
     arf_init(cmp);
 
     arf_one(eps);
-    arf_mul_2exp_si(eps, eps, -prec - 2 * g - 2);
+    arf_mul_2exp_si(eps, eps, -prec);
     arb_set_arf(b, eps);
+    arb_mul_2exp_si(b, b, -2 * g - 2);
 
-    /* Solve R2^((g-1)/2+p) exp(-R2) \leq b */
+    /* Solve R2^((g-1)/2+ord) exp(-R2) \leq b */
     arb_log(b, b, lp);
     arb_neg(b, b);
-    invert_lin_plus_log(R2, g - 1 + 2 * p, b, lp);
+    invert_lin_plus_log(R2, g - 1 + 2 * ord, b, lp);
 
-    /* Max with 4, 2*p for formula to be valid */
-    arf_set_si(cmp, FLINT_MAX(4, 2 * p));
+    /* Max with 4, 2*ord for formula to be valid */
+    arf_set_si(cmp, FLINT_MAX(4, 2 * ord));
     arf_max(R2, R2, cmp);
 
     /* Set error */

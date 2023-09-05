@@ -28,33 +28,43 @@ int main(void)
         slong ord = n_randint(state, 10);
         slong prec = ACB_THETA_LOW_PREC;
         slong bits = n_randint(state, 5);
-        arb_mat_t Y;
-        arf_t R2;
-        arf_t eps;
         slong exp = 10 + n_randint(state, 100);
-        arf_t bound;
+        arb_mat_t Y;
+        arf_t R2, eps, t;
+        arb_t bound;
 
         arb_mat_init(Y, g, g);
         arf_init(R2);
         arf_init(eps);
-        arf_init(bound);
+        arf_init(t);
+        arb_init(bound);
 
         arb_mat_randtest_cho(Y, state, prec, bits);
         arb_mat_transpose(Y, Y);
 
         acb_theta_naive_radius(R2, eps, Y, ord, exp);
         acb_theta_naive_tail(bound, R2, Y, ord, prec);
+        arb_get_lbound_arf(t, bound, prec);
 
-        if (arf_cmp(bound, eps) > 0)
+        if (arf_cmp(t, eps) > 0)
         {
-            flint_printf("FAIL\n\n");
+            flint_printf("FAIL\n");
+            arb_mat_printd(Y, 5);
+            flint_printf("exp = %wd, ord = %wd, eps, R2:\n", exp, ord);
+            arf_printd(eps, 10);
+            flint_printf("\n");
+            arf_printd(R2, 10);
+            flint_printf("\nbound:\n");
+            arb_printd(bound, 10);
+            flint_printf("\n");
             flint_abort();
         }
 
         arb_mat_clear(Y);
         arf_clear(R2);
         arf_clear(eps);
-        arf_clear(bound);
+        arf_clear(t);
+        arb_clear(bound);
     }
 
     flint_randclear(state);

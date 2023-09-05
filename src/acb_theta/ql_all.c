@@ -106,8 +106,8 @@ acb_theta_ql_all_with_t(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr dist0
     return res;
 }
 
-void
-acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
+static void
+acb_theta_ql_all_red(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
@@ -148,4 +148,75 @@ acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
     _arb_vec_clear(dist, n);
     _arb_vec_clear(dist0, n);
     _acb_vec_clear(t, g);
+}
+
+void
+acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
+{
+    slong g = acb_mat_nrows(tau);
+    slong n2 = 1 << (2 * g);
+    acb_mat_t w;
+    acb_ptr x, aux;
+    acb_t c;
+    arb_t u;
+    slong d, j, k;
+    ulong ab, a0, a1, b0;
+
+    acb_init(c);
+    arb_init(u);
+    x = _acb_vec_init(g);
+
+    d = acb_theta_ql_reduce(x, c, u, z, tau, prec);
+
+    acb_mat_init(w, d, d);
+    aux = _acb_vec_init(1 << (2 * d));
+
+    for (j = 0; j < d; j++)
+    {
+        for (k = 0; k < d; k++)
+        {
+            acb_set(acb_mat_entry(w, j, k), acb_mat_entry(tau, j, k));
+        }
+    }
+
+    if (acb_is_finite(c))
+    {
+        if (d > 0)
+        {
+            acb_theta_ql_all_red(aux, x, w, prec);
+        }
+        else
+        {
+            acb_one(&aux[0]);
+        }
+        _acb_vec_scalar_mul(aux, aux, 1 << (2 * d), c, prec);
+    }
+    else
+    {
+        _acb_vec_indeterminate(aux, 1 << (2 * d));
+    }
+
+    for (ab = 0; ab < n2; ab++)
+    {
+        /* Write ab as a0 a1 b0 b1 */
+        a0 = ab >> (g + (g - d));
+        a1 = (ab >> g) % (1 << (g - d));
+        b0 = (ab >> (g - d)) % (1 << d);
+
+        if (a1 == 0)
+        {
+            acb_set(&th[ab], &aux[(a0 << d) + b0]);
+        }
+        else
+        {
+            acb_zero(&th[ab]);
+        }
+        acb_add_error_arb(&th[ab], u);
+    }
+
+    _acb_vec_clear(x, g);
+    acb_clear(c);
+    arb_clear(u);
+    acb_mat_clear(w);
+    _acb_vec_clear(aux, 1 << (2 * d));
 }
