@@ -46,12 +46,13 @@ acb_theta_jet_bounds_ci(arb_t c0, arb_t c1, arb_t c2, acb_srcptr z,
         arb_mul(c0, c0, t, prec);
     }
 
-    /* c1 is \pi y Y^{-1} y */
+    /* c1 is sqrt(\pi y Y^{-1} y) */
     arb_const_pi(t, prec);
     arb_mat_scalar_mul_arb(Yinv, Yinv, t, prec);
     arb_mat_bilinear_form(c1, Yinv, y, y, prec);
+    arb_sqrt(c1, c1, prec);
 
-    /* c2 is max of \pi x Y^{-1} x where |x| \leq rho */
+    /* c2 is sqrt(max of \pi x Y^{-1} x where |x| \leq 1) */
     arb_zero(c2);
     arb_mat_cho(cho, Yinv, prec);
     arb_mat_transpose(cho, cho);
@@ -66,6 +67,7 @@ acb_theta_jet_bounds_ci(arb_t c0, arb_t c1, arb_t c2, acb_srcptr z,
         arb_sqr(s, s, prec);
         arb_add(c2, c2, s, prec);
     }
+    arb_sqrt(c2, c2, prec);
 
     arb_mat_clear(Yinv);
     arb_mat_clear(cho);
@@ -105,6 +107,9 @@ acb_theta_jet_bounds(arb_t eps, arb_t c, arb_t rho, acb_srcptr z,
     arb_sqrt(rho, rho, prec);
     arb_mul(t, c1, c2, prec);
     arb_submul_si(rho, t, 2, prec);
+    arb_sqr(t, c2, prec);
+    arb_mul_2exp_si(t, t, 2);
+    arb_div(rho, rho, t, prec);
 
     /* Set c to corresponding bound */
     arb_mul(c, c2, rho, prec);
