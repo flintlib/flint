@@ -211,9 +211,9 @@ _gr_poly_div_series_basecase_generic(gr_ptr Q,
         status = gr_inv(q, B, ctx);
 
         if (status == GR_SUCCESS)
-            status |= _gr_poly_div_series_basecase_preinv1(Q, A, Alen, B, Blen, q, len, ctx);
+            status = _gr_poly_div_series_basecase_preinv1(Q, A, Alen, B, Blen, q, len, ctx);
         else
-            status |= _gr_poly_div_series_basecase_noinv(Q, A, Alen, B, Blen, len, ctx);
+            status = _gr_poly_div_series_basecase_noinv(Q, A, Alen, B, Blen, len, ctx);
 
         GR_TMP_CLEAR(q, ctx);
     }

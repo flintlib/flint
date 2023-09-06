@@ -91,6 +91,18 @@ test_div_series(flint_rand_t state, int which)
             status |= gr_poly_div_series_invmul(C, A, C, n, ctx);
             break;
 
+        case 12:
+            status |= gr_poly_div_series_divconquer(C, A, B, n, n_randint(state, 20), ctx);
+            break;
+        case 13:
+            status |= gr_poly_set(C, A, ctx);
+            status |= gr_poly_div_series_divconquer(C, C, B, n, n_randint(state, 20), ctx);
+            break;
+        case 14:
+            status |= gr_poly_set(C, B, ctx);
+            status |= gr_poly_div_series_divconquer(C, A, C, n, n_randint(state, 20), ctx);
+            break;
+
 
         default:
             flint_abort();
@@ -138,7 +150,7 @@ int main(void)
 
     for (iter = 0; iter < 10000; iter++)
     {
-        test_div_series(state, n_randint(state, 12));
+        test_div_series(state, n_randint(state, 15));
     }
 
     flint_randclear(state);
