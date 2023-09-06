@@ -30,6 +30,8 @@ acb_theta_jet_fd(acb_ptr dth, const arf_t eps, const arb_t c,
     orders = flint_malloc(g * nb_max * sizeof(slong));
 
     acb_theta_jet_fourier(aux, val, ord, g, prec);
+    arb_set_si(t, n_pow(b, g));
+    _acb_vec_scalar_div_arb(aux, aux, n_pow(b, g), t, prec);
 
     ind = 0;
     for (k = 0; k <= ord; k++)

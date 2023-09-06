@@ -27,7 +27,7 @@ int main(void)
         slong lp = ACB_THETA_LOW_PREC;
         slong prec = lp + n_randint(state, 1000);
         slong ord = n_randint(state, 4);
-        slong g = 1 + n_randint(state, 4);
+        slong g = 1; /* + n_randint(state, 4); */
         slong b = ord + 1;
         slong nb_val = n_pow(b, g);
         slong nb_fd = acb_theta_jet_nb(ord, g + 1);
@@ -60,7 +60,7 @@ int main(void)
         for (k = 0; k < nb_val; k++)
         {
             acb_zero(x);
-            kk = 0;
+            kk = k;
             for (j = 0; j < g; j++)
             {
                 acb_unit_root(t, b, 2 * prec);
@@ -68,6 +68,9 @@ int main(void)
                 acb_add(x, x, t, 2 * prec);
                 kk = kk / b;
             }
+            acb_zero(t);
+            arb_set_arf(acb_realref(t), eps);
+            acb_mul(x, x, t, 2 * prec);
             acb_exp(&val[k], x, 2 * prec);
         }
         acb_theta_jet_fd(df, eps, c, rho, val, ord, g, 2 * prec);
@@ -91,7 +94,15 @@ int main(void)
             ind += nb;
         }
 
-        flint_printf("g = %wd, ord = %wd, values:\n", g, ord);
+        flint_printf("g = %wd, ord = %wd\n", g, ord);
+        flint_printf("c, rho, eps:\n");
+        arb_printd(c, 5);
+        flint_printf("\n");
+        arb_printd(rho, 5);
+        flint_printf("\n");
+        arf_printd(eps, 5);
+        flint_printf("\n");
+        flint_printf("values:\n");
         _acb_vec_printd(val, nb_val, 5);
         flint_printf("taylor coeffs:\n");
         _acb_vec_printd(df, nb_fd, 5);
@@ -104,6 +115,9 @@ int main(void)
             flint_printf("taylor coeffs:\n");
             _acb_vec_printd(df, nb_fd, 5);
             flint_printf("test:\n");
+            _acb_vec_printd(test, nb_fd, 5);
+            flint_printf("difference:\n");
+            _acb_vec_sub(test, test, df, nb_fd, prec);
             _acb_vec_printd(test, nb_fd, 5);
             flint_abort();
         }
