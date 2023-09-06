@@ -277,8 +277,8 @@ Division uses the Karp-Markstein algorithm.
 
 .. function:: int _gr_poly_div_series_newton(gr_ptr res, gr_srcptr A, slong Alen, gr_srcptr B, slong Blen, slong len, slong cutoff, gr_ctx_t ctx)
               int gr_poly_div_series_newton(gr_poly_t res, const gr_poly_t A, const gr_poly_t B, slong len, slong cutoff, gr_ctx_t ctx)
-              int _gr_poly_div_series_divconquer(gr_ptr res, gr_srcptr B, slong Blen, gr_srcptr A, slong Alen, slong len, slong cutoff, gr_ctx_t ctx);
-              int gr_poly_div_series_divconquer(gr_poly_t Q, const gr_poly_t A, const gr_poly_t B, slong len, slong cutoff, gr_ctx_t ctx);
+              int _gr_poly_div_series_divconquer(gr_ptr res, gr_srcptr B, slong Blen, gr_srcptr A, slong Alen, slong len, slong cutoff, gr_ctx_t ctx)
+              int gr_poly_div_series_divconquer(gr_poly_t Q, const gr_poly_t A, const gr_poly_t B, slong len, slong cutoff, gr_ctx_t ctx)
               int _gr_poly_div_series_invmul(gr_ptr res, gr_srcptr B, slong Blen, gr_srcptr A, slong Alen, slong len, gr_ctx_t ctx)
               int gr_poly_div_series_invmul(gr_poly_t res, const gr_poly_t A, const gr_poly_t B, slong len, gr_ctx_t ctx)
               int _gr_poly_div_series_basecase_preinv1(gr_ptr Q, gr_srcptr A, slong Alen, gr_srcptr B, slong Blen, gr_srcptr Binv, slong len, gr_ctx_t ctx)
@@ -291,14 +291,29 @@ Division uses the Karp-Markstein algorithm.
 Exact division
 --------------------------------------------------------------------------------
 
-These functions compute a quotient `A / B` which is known to be exact
+These functions compute a quotient `Q = A / B` which is known to be exact
 (without remainder) in `R[x]` (or in `R[[x]] / x^n` in the case of series
-division). Given a nonexact division, they may return gibberish instead of
-returning an error flag.
-For checked exact division, use the ``div`` functions instead.
+division). Given a nonexact division, they are allowed to set `Q` to
+an arbitrary polynomial and return ``GR_SUCCESS`` instead of returning an
+error flag.
 
-There are no ``preinv1`` versions because those are identical to the
-``div`` counterparts.
+`R` is assumed to be an integral domain (this is not checked).
+
+For exact division, we have the choice of starting the division
+from the most significant terms (classical division) or the least significant
+(power series division). Which direction is more efficient depends
+in part on whether the leading or trailing coefficient of `B` is cheaper
+to use for divisions. In a generic setting, this is hard to predict.
+
+The *bidirectional* algorithms combine two half-divisions from both ends.
+This halves the number of operations in the basecase regime, though an
+extra coefficient inversion may be needed.
+
+The ``noinv`` versions perform repeated ``divexact`` operations in the
+scalar domain without attempting to invert the leading (or trailing) coefficient,
+while other versions check invertibility first.
+There are no ``divexact_preinv1`` versions because those are identical to the
+``div_preinv1`` counterparts.
 
 .. function:: int _gr_poly_divexact_basecase_bidirectional(gr_ptr Q, gr_srcptr A, slong Alen, gr_srcptr B, slong Blen, gr_ctx_t ctx)
               int gr_poly_divexact_basecase_bidirectional(gr_poly_t Q, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
@@ -500,8 +515,8 @@ GCD
 .. function:: int _gr_poly_xgcd_euclidean(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_srcptr invB, gr_ctx_t ctx)
               int gr_poly_xgcd_euclidean(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
 
-.. function:: int _gr_poly_xgcd_hgcd(slong * Glen, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, slong hgcd_cutoff, slong cutoff, gr_ctx_t ctx);
-              int gr_poly_xgcd_hgcd(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, const gr_poly_t B, slong hgcd_cutoff, slong cutoff, gr_ctx_t ctx);
+.. function:: int _gr_poly_xgcd_hgcd(slong * Glen, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, slong hgcd_cutoff, slong cutoff, gr_ctx_t ctx)
+              int gr_poly_xgcd_hgcd(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, const gr_poly_t B, slong hgcd_cutoff, slong cutoff, gr_ctx_t ctx)
 
 Resultant
 -------------------------------------------------------------------------------

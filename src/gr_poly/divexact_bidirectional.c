@@ -61,13 +61,13 @@ __gr_poly_divexact_bidirectional(gr_ptr Q, gr_srcptr A, slong lenA, gr_srcptr B,
 
     if (basecase)
     {
-        status |= _gr_poly_div_series(Q, A, lenA, B, lenB, len_lo, ctx);
-        status |= _gr_poly_div(GR_ENTRY(Q, len_lo, sz), GR_ENTRY(A, len_lo, sz), lenA - len_lo, B, lenB, ctx);
+        status |= _gr_poly_divexact_series_basecase(Q, A, lenA, B, lenB, len_lo, ctx);
+        status |= _gr_poly_divexact_basecase(GR_ENTRY(Q, len_lo, sz), GR_ENTRY(A, len_lo, sz), lenA - len_lo, B, lenB, ctx);
     }
     else
     {
-        status |= _gr_poly_divexact_series_basecase(Q, A, lenA, B, lenB, len_lo, ctx);
-        status |= _gr_poly_divexact_basecase(GR_ENTRY(Q, len_lo, sz), GR_ENTRY(A, len_lo, sz), lenA - len_lo, B, lenB, ctx);
+        status |= _gr_poly_div_series(Q, A, lenA, B, lenB, len_lo, ctx);
+        status |= _gr_poly_div(GR_ENTRY(Q, len_lo, sz), GR_ENTRY(A, len_lo, sz), lenA - len_lo, B, lenB, ctx);
     }
 
     return status;
