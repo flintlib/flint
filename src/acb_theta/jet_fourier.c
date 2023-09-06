@@ -41,7 +41,7 @@ acb_theta_jet_fourier(acb_ptr res, acb_srcptr val, slong ord, slong g, slong pre
             for (i = 0; i < b; i++)
             {
                 l = (j % n_pow(b, k)) + i * n_pow(b, k)
-                    + b * (j / n_pow(b, k));
+                    + n_pow(b, k + 1) * (j / n_pow(b, k));
                 acb_poly_set_coeff_acb(pol, i, &aux[l]);
             }
             /* Evaluate and update aux */
@@ -49,7 +49,7 @@ acb_theta_jet_fourier(acb_ptr res, acb_srcptr val, slong ord, slong g, slong pre
             for (i = 0; i < b; i++)
             {
                 l = (j % n_pow(b, k)) + i * n_pow(b, k)
-                    + b * (j / n_pow(b, k));
+                    + n_pow(b, k + 1) * (j / n_pow(b, k));
                 acb_set(&aux[l], &y[i]);
             }
         }
