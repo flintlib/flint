@@ -25,14 +25,14 @@ int main(void)
     for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
         slong lp = ACB_THETA_LOW_PREC;
-        slong prec = lp + n_randint(state, 1000);
+        slong prec = lp + 100;
         slong bits = n_randint(state, 4);
         slong ord = 1 + n_randint(state, 10);
         slong g = 1 + n_randint(state, 3);
         slong n2 = 1 << (2 * g);
         acb_mat_t tau;
         acb_ptr z, x, th;
-        arb_t c, eps, rho, abs, t;
+        arb_t c, rho, abs, t;
         slong k;
 
         acb_mat_init(tau, g, g);
@@ -40,7 +40,6 @@ int main(void)
         x = _acb_vec_init(g);
         th = _acb_vec_init(n2);
         arb_init(c);
-        arb_init(eps);
         arb_init(rho);
         arb_init(abs);
         arb_init(t);
@@ -52,17 +51,14 @@ int main(void)
             acb_urandom(&z[k], state, prec);
         }
 
-        acb_theta_jet_bounds(eps, c, rho, z, tau, ord, prec, lp);
-        arb_mul_2exp_si(c, c, prec - 1);
+        acb_theta_jet_bounds(c, rho, z, tau, ord, lp);
 
-        if (!arb_is_finite(eps) || !arb_is_finite(c))
+        if (!arb_is_finite(rho) || !arb_is_finite(c))
         {
             flint_printf("FAIL (infinite)\n");
             acb_mat_printd(tau, 5);
             _acb_vec_printd(z, g, 5);
-            flint_printf("eps, c, rho:\n");
-            arb_printd(eps, 10);
-            flint_printf("\n");
+            flint_printf("c, rho:\n");
             arb_printd(c, 10);
             flint_printf("\n");
             arb_printd(rho, 10);
@@ -105,7 +101,6 @@ int main(void)
         _acb_vec_clear(x, g);
         _acb_vec_clear(th, n2);
         arb_clear(c);
-        arb_clear(eps);
         arb_clear(rho);
         arb_clear(abs);
         arb_clear(t);

@@ -81,10 +81,10 @@ acb_theta_jet_bounds_ci(arb_t c0, arb_t c1, arb_t c2, acb_srcptr z,
    order ord */
 
 void
-acb_theta_jet_bounds(arb_t eps, arb_t c, arb_t rho, acb_srcptr z,
-    const acb_mat_t tau, slong ord, slong hprec, slong prec)
+acb_theta_jet_bounds(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau,
+    slong ord, slong prec)
 {
-    slong g = acb_mat_nrows(tau);
+    slong b = ord + 1;
     arb_t t, c0, c1, c2;
     arf_t x;
 
@@ -97,12 +97,12 @@ acb_theta_jet_bounds(arb_t eps, arb_t c, arb_t rho, acb_srcptr z,
     /* Get ci */
     acb_theta_jet_bounds_ci(c0, c1, c2, z, tau, prec);
 
-    /* Set rho to positive root of 2 c_2 rho (c_1 + c_2 rho) = 2 ord */
+    /* Set rho to positive root of 2 c_2 rho (c_1 + c_2 rho) = 2 b */
     arb_mul(t, c1, c2, prec);
     arb_mul_2exp_si(t, t, 1);
     arb_sqr(rho, t, prec);
     arb_sqr(t, c2, prec);
-    arb_mul_si(t, t, 64 * ord, prec);
+    arb_mul_si(t, t, 64 * b, prec);
     arb_add(rho, rho, t, prec);
     arb_sqrt(rho, rho, prec);
     arb_mul(t, c1, c2, prec);
@@ -117,22 +117,6 @@ acb_theta_jet_bounds(arb_t eps, arb_t c, arb_t rho, acb_srcptr z,
     arb_sqr(c, c, prec);
     arb_exp(c, c, prec);
     arb_mul(c, c, c0, prec);
-
-    /* Set eps to minimum of rho/g^(1/ord) and (2^(-hprec)/cg)^{1/n} rho^2 */
-    arb_set_si(eps, g);
-    arb_root_ui(eps, eps, ord, prec);
-    arb_mul_si(t, c, g, prec);
-    arb_inv(t, t, prec);
-    arb_mul_2exp_si(t, t, -hprec);
-    arb_root_ui(t, t, ord, prec);
-    arb_mul(t, t, rho, prec);
-    arb_min(eps, eps, t, prec);
-    arb_mul(eps, eps, rho, prec);
-    arb_get_lbound_arf(x, eps, prec);
-    arb_set_arf(eps, x); /* eps is exact */
-
-    /* Set c to c * 2^(- hprec + 1) */
-    arb_mul_2exp_si(c, c, -hprec + 1);
 
     arb_clear(t);
     arb_clear(c0);

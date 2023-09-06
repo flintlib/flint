@@ -15,20 +15,18 @@
    Fourier transforms to get Taylor coefficients and add error bound */
 
 void
-acb_theta_jet_fd(acb_ptr dth, const arb_t eps, const arb_t c,
+acb_theta_jet_fd(acb_ptr dth, const arf_t eps, const arb_t c,
     const arb_t rho, acb_srcptr val, slong ord, slong g, slong prec)
 {
     acb_ptr aux;
-    acb_t t;
-    arb_t e;
+    arb_t t;
     slong nb_max = acb_theta_jet_nb(ord, g);
     slong b = ord + 1;
     slong* orders;
     slong k, j, i, l, nb, ind;
 
     aux = _acb_vec_init(n_pow(b, g));
-    acb_init(t);
-    arb_init(e);
+    arb_init(t);
     orders = flint_malloc(g * nb_max * sizeof(slong));
 
     acb_theta_jet_fourier(aux, val, ord, g, prec);
@@ -51,23 +49,22 @@ acb_theta_jet_fd(acb_ptr dth, const arb_t eps, const arb_t c,
             }
             acb_set(&dth[ind + j], &aux[l]);
         }
-        acb_set_arb(t, eps);
-        acb_pow_ui(t, t, k, prec);
-        _acb_vec_scalar_div(dth + ind, dth + ind, nb, t, prec);
+        arb_set_arf(t, eps);
+        arb_pow_ui(t, t, k, prec);
+        _acb_vec_scalar_div_arb(dth + ind, dth + ind, nb, t, prec);
 
         /* Add error bound */
-        arb_pow_ui(e, rho, b - k, prec);
-        arb_mul(e, e, c, prec);
+        arb_one(t);
+        arb_mul_2exp_si(t, t, -prec);
         for (j = 0; j < nb; j++)
         {
-            acb_add_error_arb(&dth[ind + j], e);
+            acb_add_error_arb(&dth[ind + j], t);
         }
 
         ind += nb;
     }
 
     _acb_vec_clear(aux, n_pow(b, g));
-    acb_clear(t);
-    arb_clear(e);
+    arb_clear(t);
     flint_free(orders);
 }

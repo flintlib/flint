@@ -20,11 +20,12 @@ acb_theta_jet_all(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau, slo
     slong hprec;
     slong lp = ACB_THETA_LOW_PREC;
     slong nb_jet = acb_theta_jet_nb(ord, g + 1);
-    arb_t eps, c, rho, t;
+    arb_t c, rho, t;
+    arf_t eps;
     acb_ptr zetas, new_z, all_val, val, jet;
     slong k, kmod, j;
 
-    arb_init(eps);
+    arf_init(eps);
     arb_init(c);
     arb_init(rho);
     arb_init(t);
@@ -35,8 +36,10 @@ acb_theta_jet_all(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau, slo
     jet = _acb_vec_init(nb_jet);
 
     /* Get bounds and precision */
-    acb_theta_jet_bounds(eps, c, rho, z, tau, ord, prec, lp);
-    arb_log_base_ui(t, eps, 2, lp);
+    acb_theta_jet_bounds(c, rho, z, tau, ord, lp);
+    acb_theta_jet_radius(eps, c, rho, ord, g, prec, lp);
+    arb_set_arf(t, eps);
+    arb_log_base_ui(t, t, 2, lp);
     arb_neg(t, t);
     hprec = prec + arf_get_si(arb_midref(t), ARF_RND_CEIL);
 
@@ -50,7 +53,8 @@ acb_theta_jet_all(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau, slo
             acb_set(&new_z[j], &zetas[kmod % b]);
             kmod = kmod / b;
         }
-        _acb_vec_scalar_mul_arb(new_z, new_z, g, eps, hprec);
+        arb_set_arf(t, eps);
+        _acb_vec_scalar_mul_arb(new_z, new_z, g, t, hprec);
         _acb_vec_add(new_z, new_z, z, g, prec); /* todo: need to get mid and adjust errors */
         acb_theta_all(all_val + k * n * n, new_z, tau, 0, prec);
     }
@@ -69,7 +73,7 @@ acb_theta_jet_all(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau, slo
         }
     }
 
-    arb_clear(eps);
+    arf_clear(eps);
     arb_clear(c);
     arb_clear(rho);
     arb_clear(t);
