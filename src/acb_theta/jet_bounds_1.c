@@ -81,7 +81,7 @@ acb_theta_jet_bounds_ci(arb_t c0, arb_t c1, arb_t c2, acb_srcptr z,
    order ord */
 
 void
-acb_theta_jet_bounds(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau,
+acb_theta_jet_bounds_1(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau,
     slong ord, slong prec)
 {
     slong b = ord + 1;

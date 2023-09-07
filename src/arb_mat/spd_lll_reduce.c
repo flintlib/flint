@@ -40,15 +40,15 @@ arb_mat_spd_lll_reduce(fmpz_mat_t U, const arb_mat_t A, slong prec)
     fmpz_lll_t fl;
     fmpz_mat_t N;
     slong g = arb_mat_nrows(A);
-    
-    fmpz_mat_init(N, g, g);    
+
+    fmpz_mat_init(N, g, g);
     fmpz_mat_one(U);
 
     if (arb_mat_is_finite(A))
     {
         get_symmetric_fmpz_mat(N, A, prec);
         /* Default Flint LLL values, except Gram */
-        fmpz_lll_context_init(fl, 0.99, 0.51, GRAM, EXACT);        
+        fmpz_lll_context_init(fl, 0.99, 0.51, GRAM, EXACT);
         fmpz_lll(N, U, fl);
     }
     fmpz_mat_clear(N);

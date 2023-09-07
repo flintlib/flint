@@ -252,8 +252,9 @@ slong acb_theta_jet_nb(slong ord, slong g);
 void acb_theta_jet_orders(slong* orders, slong ord, slong g);
 slong acb_theta_jet_index(const slong* orders, slong g);
 
-void acb_theta_jet_bounds(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau,
+void acb_theta_jet_bounds_1(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau,
     slong ord, slong prec);
+void acb_theta_jet_bounds_2(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong prec);
 void acb_theta_jet_radius(arf_t eps, arf_t err, const arb_t c, const arb_t rho,
     slong ord, slong g, slong hprec, slong prec);
 void acb_theta_jet_fourier(acb_ptr res, acb_srcptr val, slong ord, slong g, slong prec);

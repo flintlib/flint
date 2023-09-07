@@ -37,7 +37,7 @@ acb_theta_jet_all(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau, slo
     jet = _acb_vec_init(nb_jet);
 
     /* Get bounds and precision */
-    acb_theta_jet_bounds(c, rho, z, tau, ord, lp);
+    acb_theta_jet_bounds_1(c, rho, z, tau, ord, lp);
     acb_theta_jet_radius(eps, err, c, rho, ord, g, prec, lp);
     arb_set_arf(t, eps);
     arb_log_base_ui(t, t, 2, lp);
