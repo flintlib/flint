@@ -15,8 +15,8 @@
    Fourier transforms to get Taylor coefficients and add error bound */
 
 void
-acb_theta_jet_fd(acb_ptr dth, const arf_t eps, const arb_t c,
-    const arb_t rho, acb_srcptr val, slong ord, slong g, slong prec)
+acb_theta_jet_fd(acb_ptr dth, const arf_t eps, const arf_t err, acb_srcptr val,
+    slong ord, slong g, slong prec)
 {
     acb_ptr aux;
     arb_t t;
@@ -55,12 +55,10 @@ acb_theta_jet_fd(acb_ptr dth, const arf_t eps, const arb_t c,
         arb_pow_ui(t, t, k, prec);
         _acb_vec_scalar_div_arb(dth + ind, dth + ind, nb, t, prec);
 
-        /* Add error bound */
-        arb_one(t);
-        arb_mul_2exp_si(t, t, -prec);
+        /* Add error */
         for (j = 0; j < nb; j++)
         {
-            acb_add_error_arb(&dth[ind + j], t);
+            acb_add_error_arf(&dth[ind + j], err);
         }
 
         ind += nb;

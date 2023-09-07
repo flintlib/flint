@@ -27,13 +27,13 @@ int main(void)
         slong lp = ACB_THETA_LOW_PREC;
         slong prec = lp + n_randint(state, 1000);
         slong ord = n_randint(state, 4);
-        slong g = 1; /* + n_randint(state, 4); */
+        slong g = 1 + n_randint(state, 4);
         slong b = ord + 1;
         slong nb_val = n_pow(b, g);
         slong nb_fd = acb_theta_jet_nb(ord, g + 1);
         slong *orders;
         arb_t c, rho;
-        arf_t eps;
+        arf_t eps, err;
         acb_ptr val, df, test;
         acb_t x, t;
         fmpz_t m;
@@ -43,6 +43,7 @@ int main(void)
         arb_init(c);
         arb_init(rho);
         arf_init(eps);
+        arf_init(err);
         val = _acb_vec_init(nb_val);
         df = _acb_vec_init(nb_fd);
         test = _acb_vec_init(nb_fd);
@@ -50,13 +51,13 @@ int main(void)
         acb_init(t);
         fmpz_init(m);
 
-        /* Get c, rho, eps */
+        /* Get c, rho, eps, err */
         arb_one(rho);
         arb_set_si(c, g);
         arb_exp(c, c, lp);
-        acb_theta_jet_radius(eps, c, rho, ord, g, prec, lp);
+        acb_theta_jet_radius(eps, err, c, rho, ord, g, prec, lp);
 
-        /* Fill in values, apply jet_fd */
+        /* Fill in values, apply jet_fd at 2*prec */
         for (k = 0; k < nb_val; k++)
         {
             acb_zero(x);
@@ -73,7 +74,7 @@ int main(void)
             acb_mul(x, x, t, 2 * prec);
             acb_exp(&val[k], x, 2 * prec);
         }
-        acb_theta_jet_fd(df, eps, c, rho, val, ord, g, 2 * prec);
+        acb_theta_jet_fd(df, eps, err, val, ord, g, 2 * prec);
 
         /* Fill in test */
         ind = 0;
@@ -94,19 +95,6 @@ int main(void)
             ind += nb;
         }
 
-        flint_printf("g = %wd, ord = %wd\n", g, ord);
-        flint_printf("c, rho, eps:\n");
-        arb_printd(c, 5);
-        flint_printf("\n");
-        arb_printd(rho, 5);
-        flint_printf("\n");
-        arf_printd(eps, 5);
-        flint_printf("\n");
-        flint_printf("values:\n");
-        _acb_vec_printd(val, nb_val, 5);
-        flint_printf("taylor coeffs:\n");
-        _acb_vec_printd(df, nb_fd, 5);
-
         if (!_acb_vec_overlaps(df, test, nb_fd))
         {
             flint_printf("FAIL\n");
@@ -126,6 +114,7 @@ int main(void)
         arb_clear(c);
         arb_clear(rho);
         arf_clear(eps);
+        arf_clear(err);
         _acb_vec_clear(val, nb_val);
         _acb_vec_clear(df, nb_fd);
         _acb_vec_clear(test, nb_fd);

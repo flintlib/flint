@@ -12,8 +12,8 @@
 #include "acb_theta.h"
 
 void
-acb_theta_jet_radius(arf_t eps, const arb_t c, const arb_t rho, slong ord,
-    slong g, slong hprec, slong prec)
+acb_theta_jet_radius(arf_t eps, arf_t err, const arb_t c, const arb_t rho,
+    slong ord, slong g, slong hprec, slong prec)
 {
     slong b = ord + 1;
     arb_t t, x;
@@ -35,6 +35,10 @@ acb_theta_jet_radius(arf_t eps, const arb_t c, const arb_t rho, slong ord,
     arb_min(x, x, t, prec);
     arb_mul(x, x, rho, prec);
     arb_get_lbound_arf(eps, x, prec);
+
+    /* Set error */
+    arf_one(err);
+    arf_mul_2exp_si(err, err, -hprec);
 
     arb_clear(t);
     arb_clear(x);

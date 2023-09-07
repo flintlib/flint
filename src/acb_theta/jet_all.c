@@ -21,11 +21,12 @@ acb_theta_jet_all(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau, slo
     slong lp = ACB_THETA_LOW_PREC;
     slong nb_jet = acb_theta_jet_nb(ord, g + 1);
     arb_t c, rho, t;
-    arf_t eps;
+    arf_t eps, err;
     acb_ptr zetas, new_z, all_val, val, jet;
     slong k, kmod, j;
 
     arf_init(eps);
+    arf_init(err);
     arb_init(c);
     arb_init(rho);
     arb_init(t);
@@ -37,7 +38,7 @@ acb_theta_jet_all(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau, slo
 
     /* Get bounds and precision */
     acb_theta_jet_bounds(c, rho, z, tau, ord, lp);
-    acb_theta_jet_radius(eps, c, rho, ord, g, prec, lp);
+    acb_theta_jet_radius(eps, err, c, rho, ord, g, prec, lp);
     arb_set_arf(t, eps);
     arb_log_base_ui(t, t, 2, lp);
     arb_neg(t, t);
@@ -66,7 +67,7 @@ acb_theta_jet_all(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau, slo
         {
             acb_set(&val[j], &all_val[j * n * n + k]);
         }
-        acb_theta_jet_fd(jet, eps, c, rho, val, ord, g, prec);
+        acb_theta_jet_fd(jet, eps, err, val, ord, g, prec);
         for (j = 0; j < nb_jet; j++)
         {
             acb_set(&dth[j * n * n + k], &jet[j]);
@@ -74,6 +75,7 @@ acb_theta_jet_all(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau, slo
     }
 
     arf_clear(eps);
+    arf_clear(err);
     arb_clear(c);
     arb_clear(rho);
     arb_clear(t);
