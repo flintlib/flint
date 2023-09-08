@@ -544,6 +544,7 @@ main(void)
         fmpz_clear(G);
     }
 
+    fmpz_clear(maxval);
     fmpz_clear(nd);
     fmpz_clear(na);
     fmpz_clear(nb);
