@@ -18,13 +18,14 @@
 void arb_mat_spd_radius(arf_t r, const arb_mat_t A, slong prec)
 {
     slong g = arb_mat_nrows(A);
-    arb_mat_t cho;
+    arb_mat_t cho, inv;
     mag_t b, binv;
     arf_t t;
     int res;
     slong k, j;
 
     arb_mat_init(cho, g, g);
+    arb_mat_init(inv, g, g);
     mag_init(b);
     mag_init(binv);
     arf_init(t);
@@ -56,8 +57,9 @@ void arb_mat_spd_radius(arf_t r, const arb_mat_t A, slong prec)
 
         /* Get induced norms */
         arb_mat_bound_inf_norm(b, cho);
-        arb_mat_inv(cho, cho, prec);
-        arb_mat_bound_inf_norm(binv, cho);
+        arb_mat_one(inv);
+        arb_mat_solve_tril(inv, cho, inv, 0, prec);
+        arb_mat_bound_inf_norm(binv, inv);
 
         /* Propagate bound */
         arf_set_mag(t, b);
@@ -68,6 +70,7 @@ void arb_mat_spd_radius(arf_t r, const arb_mat_t A, slong prec)
     }
 
     arb_mat_clear(cho);
+    arb_mat_clear(inv);
     mag_clear(b);
     mag_clear(binv);
     arf_clear(t);

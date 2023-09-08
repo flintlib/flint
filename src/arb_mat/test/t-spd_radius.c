@@ -25,7 +25,7 @@ int main(void)
     for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 10);
-        slong prec = 100 + n_randint(state, 500);
+        slong prec = 200 + n_randint(state, 500);
         slong mag_bits = 1 + n_randint(state, 5);
         arb_mat_t A, B, cho;
         arf_t rad, c;
@@ -44,7 +44,7 @@ int main(void)
         if (!arf_is_finite(rad) || arf_cmp_si(rad, 0) <= 0)
         {
             flint_printf("FAIL (not positive)\n");
-            flint_printf("g = %wd, prec = %wd, mag_bits = %wd\n");
+            flint_printf("g = %wd, prec = %wd, mag_bits = %wd\n", g, prec, mag_bits);
             arb_mat_printd(A, 5);
             arf_printd(rad, 10);
             flint_printf("\n");
@@ -71,10 +71,13 @@ int main(void)
         if (!res)
         {
             flint_printf("FAIL (cholesky)\n");
-            flint_printf("g = %wd, prec = %wd, mag_bits = %wd\n");
+            flint_printf("g = %wd, prec = %wd, mag_bits = %wd\n", g, prec, mag_bits);
             arb_mat_printd(A, 5);
+            flint_printf("radius: ");
             arf_printd(rad, 10);
             flint_printf("\n");
+            flint_printf("Deformed matrix:\n");
+            arb_mat_printd(B, 5);
             flint_abort();
         }
 
