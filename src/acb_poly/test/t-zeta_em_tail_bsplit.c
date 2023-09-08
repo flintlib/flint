@@ -63,6 +63,7 @@ int main(void)
 
         acb_clear(Na);
         acb_clear(s);
+        _acb_vec_clear(Nasx, len);
         _acb_vec_clear(z1, len);
         _acb_vec_clear(z2, len);
     }

@@ -46,6 +46,7 @@ void fmpz_mod_poly_inv_series(fmpz_mod_poly_t g, const fmpz_mod_poly_t h, slong 
         _fmpz_mod_poly_set_length(t, n);
         _fmpz_mod_poly_normalise(t);
         fmpz_mod_poly_swap(g, t, ctx);
+        fmpz_mod_poly_clear(t, ctx);
     }
     else
     {
