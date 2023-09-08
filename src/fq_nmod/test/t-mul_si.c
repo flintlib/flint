@@ -50,6 +50,8 @@ main(void)
             }
         }
 
+        fq_nmod_clear(rop, ctx);
+
         fq_nmod_ctx_clear(ctx);
         fmpz_clear(p);
         fmpz_clear(f);

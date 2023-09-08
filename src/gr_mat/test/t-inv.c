@@ -93,6 +93,7 @@ int main(void)
 
         gr_mat_clear(A, ctx);
         gr_mat_clear(B, ctx);
+        gr_mat_clear(AB, ctx);
 
         gr_ctx_clear(ctx);
     }
