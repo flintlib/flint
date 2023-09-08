@@ -11,8 +11,8 @@
 
 #include "acb_theta.h"
 
-void
-acb_theta_jet_all(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau, slong prec)
+static void
+acb_theta_jet_all_mid(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
@@ -56,8 +56,8 @@ acb_theta_jet_all(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau, slo
         }
         arb_set_arf(t, eps);
         _acb_vec_scalar_mul_arb(new_z, new_z, g, t, hprec);
-        _acb_vec_add(new_z, new_z, z, g, prec); /* todo: need to get mid and adjust errors */
-        acb_theta_all(all_val + k * n * n, new_z, tau, 0, prec);
+        _acb_vec_add(new_z, new_z, z, g, hprec);
+        acb_theta_all(all_val + k * n * n, new_z, tau, 0, hprec);
     }
 
     /* Call jet_fd on each theta_{a,b} */
@@ -84,4 +84,86 @@ acb_theta_jet_all(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau, slo
     _acb_vec_clear(all_val, n * n * n_pow(b, g));
     _acb_vec_clear(val, n_pow(b, g));
     _acb_vec_clear(jet, nb_jet);
+}
+
+void
+acb_theta_jet_all(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau, slong prec)
+{
+    slong g = acb_mat_nrows(tau);
+    slong nb = acb_theta_jet_nb(ord, g + 1);
+    slong lp = ACB_THETA_LOW_PREC;
+    acb_mat_t w;
+    acb_ptr x;
+    arb_t c, rho, b;
+    arf_t eps, t;
+    fmpz_t m;
+    slong k, j;
+
+    acb_mat_init(w, g, g);
+    x = _acb_vec_init(g);
+    arb_init(c);
+    arb_init(rho);
+    arb_init(b);
+    arf_init(eps);
+    arf_init(t);
+    fmpz_init(m);
+
+    /* Get bounds */
+    acb_theta_jet_bounds_2(c, rho, z, tau, prec);
+
+    /* Call jet_all_mid on midpoint */
+    acb_mat_get_mid(w, tau);
+    for (k = 0; k < g; k++)
+    {
+        acb_get_mid(&x[k], &z[k]);
+    }
+    acb_theta_jet_all_mid(dth, ord, x, w, prec);
+
+    /* Add error bounds */
+    arf_zero(eps);
+    for (k = 0; k < g; k++)
+    {
+        arf_set_mag(t, arb_radref(acb_realref(&z[k])));
+        arf_max(eps, eps, t);
+        arf_set_mag(t, arb_radref(acb_imagref(&z[k])));
+        arf_max(eps, eps, t);
+        for (j = 0; j < g; j++)
+        {
+            arf_set_mag(t, arb_radref(acb_realref(acb_mat_entry(tau, k, j))));
+            arf_max(eps, eps, t);
+            arf_set_mag(t, arb_radref(acb_imagref(acb_mat_entry(tau, k, j))));
+            arf_max(eps, eps, t);
+        }
+    }
+    arb_get_lbound_arf(t, rho, lp);
+
+    if (arf_cmp(t, eps) <= 0)
+    {
+        _acb_vec_indeterminate(dth, nb);
+    }
+    else
+    {
+        arb_sub_arf(b, rho, eps, lp);
+        arb_pow_ui(b, b, ord + 1, lp);
+        arb_div(b, c, b, lp);
+        fmpz_fac_ui(m, ord + 1);
+        arb_mul_fmpz(b, b, m, lp);
+        fmpz_bin_uiui(m, ord + 1 + g + (g * g + g)/2, ord + 1);
+        arb_mul_fmpz(b, b, m, lp);
+        arb_mul_arf(b, b, eps, prec);
+        for (k = 0; k < nb; k++)
+        {
+            acb_add_error_arb(&dth[k], b);
+        }
+    }
+
+    acb_mat_clear(w);
+    _acb_vec_clear(x, g);
+    arb_clear(c);
+    arb_clear(rho);
+    arb_clear(b);
+    arf_clear(eps);
+    arf_clear(t);
+    fmpz_clear(m);
+
 }
