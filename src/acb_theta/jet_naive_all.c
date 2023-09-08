@@ -17,6 +17,7 @@ worker_dim0(acb_ptr dth, const acb_t term, slong* coords, slong g,
 {
     slong n = 1 << g;
     slong nb_max = acb_theta_jet_nb(ord, g);
+    slong nb_tot = acb_theta_jet_nb(ord, g + 1);
     acb_t x;
     fmpz_t m;
     acb_ptr f;
@@ -29,6 +30,7 @@ worker_dim0(acb_ptr dth, const acb_t term, slong* coords, slong g,
     orders = flint_malloc(g * nb_max * sizeof(slong));
     f = _acb_vec_init(nb_max);
 
+    a = acb_theta_char_get_a(coords, g);
     ind = 0;
     for (k = 0; k <= ord; k++)
     {
@@ -49,11 +51,8 @@ worker_dim0(acb_ptr dth, const acb_t term, slong* coords, slong g,
         }
         acb_const_pi(x, prec);
         acb_mul_onei(x, x);
-        acb_pow_ui(x, x, ord, prec);
+        acb_pow_ui(x, x, k, prec);
         _acb_vec_scalar_mul(f, f, nb, x, prec);
-
-        /* Get a */
-        a = acb_theta_char_get_a(coords, g);
 
         /* Loop over b */
         for (b = 0; b < n; b++)
@@ -61,7 +60,7 @@ worker_dim0(acb_ptr dth, const acb_t term, slong* coords, slong g,
             acb_mul_powi(x, term, acb_theta_char_dot_slong(b, coords, g) % 4);
             for (j = 0; j < nb; j++)
             {
-                acb_addmul(&dth[n * n * ind + n * n * j + n * a + b], x, &f[j], fullprec);
+                acb_addmul(&dth[(n * a + b) * nb_tot + ind + j], x, &f[j], fullprec);
             }
         }
 
@@ -103,7 +102,7 @@ acb_theta_jet_naive_all_gen(acb_ptr dth, slong ord, acb_srcptr z, slong nb_z,
 
     acb_theta_naive_ellipsoid(E, new_z, c, u, ord, new_z, nb_z, new_tau, prec);
     prec = acb_theta_naive_fullprec(E, prec);
-    acb_theta_precomp_set(D, new_z, tau, E, prec);
+    acb_theta_precomp_set(D, new_z, new_tau, E, prec);
 
     for (k = 0; k < nb_z; k++)
     {

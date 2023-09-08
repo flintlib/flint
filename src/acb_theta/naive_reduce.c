@@ -71,11 +71,11 @@ acb_theta_naive_reduce_one(arb_ptr offset, acb_ptr new_z, acb_t c, arb_t u,
     arb_neg(u, u);
     arb_exp(u, u, prec);
 
-    /* Round to nearest integer even vector a to not mess with characteristics */
-    _arb_vec_scalar_mul_2exp_si(v, v, g, -1);
+    /* Round to nearest integer 0-mod-4 vector a to not mess with characteristics */
+    _arb_vec_scalar_mul_2exp_si(v, v, g, -2);
     acb_theta_naive_round(a, v, g);
-    _arb_vec_scalar_mul_2exp_si(a, a, g, 1);
-    _arb_vec_scalar_mul_2exp_si(v, v, g, 1);
+    _arb_vec_scalar_mul_2exp_si(a, a, g, 2);
+    _arb_vec_scalar_mul_2exp_si(v, v, g, 2);
 
     /* Get r = v - a and offset = cho.r */
     _arb_vec_sub(r, v, a, g, prec);

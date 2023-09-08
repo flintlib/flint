@@ -15,7 +15,7 @@ static void
 acb_theta_jet_all_mid(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
-    slong n = 1 << g;
+    slong n2 = 1 << (2 * g);
     slong b = ord + 1;
     slong hprec;
     slong lp = ACB_THETA_LOW_PREC;
@@ -32,7 +32,7 @@ acb_theta_jet_all_mid(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau,
     arb_init(t);
     zetas = _acb_vec_init(b);
     new_z = _acb_vec_init(g);
-    all_val = _acb_vec_init(n * n * n_pow(b, g));
+    all_val = _acb_vec_init(n2 * n_pow(b, g));
     val = _acb_vec_init(n_pow(b, g));
     jet = _acb_vec_init(nb_jet);
 
@@ -57,20 +57,20 @@ acb_theta_jet_all_mid(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau,
         arb_set_arf(t, eps);
         _acb_vec_scalar_mul_arb(new_z, new_z, g, t, hprec);
         _acb_vec_add(new_z, new_z, z, g, hprec);
-        acb_theta_all(all_val + k * n * n, new_z, tau, 0, hprec);
+        acb_theta_all(all_val + k * n2, new_z, tau, 0, hprec);
     }
 
     /* Call jet_fd on each theta_{a,b} */
-    for (k = 0; k < n * n; k++)
+    for (k = 0; k < n2; k++)
     {
         for (j = 0; j < n_pow(b, g); j++)
         {
-            acb_set(&val[j], &all_val[j * n * n + k]);
+            acb_set(&val[j], &all_val[j * n2 + k]);
         }
         acb_theta_jet_fd(jet, eps, err, val, ord, g, prec);
         for (j = 0; j < nb_jet; j++)
         {
-            acb_set(&dth[j * n * n + k], &jet[j]);
+            acb_set(&dth[j * n2 + k], &jet[j]);
         }
     }
 
@@ -81,7 +81,7 @@ acb_theta_jet_all_mid(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau,
     arb_clear(t);
     _acb_vec_clear(zetas, b);
     _acb_vec_clear(new_z, g);
-    _acb_vec_clear(all_val, n * n * n_pow(b, g));
+    _acb_vec_clear(all_val, n2 * n_pow(b, g));
     _acb_vec_clear(val, n_pow(b, g));
     _acb_vec_clear(jet, nb_jet);
 }
@@ -91,6 +91,7 @@ acb_theta_jet_all(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau, slo
 {
     slong g = acb_mat_nrows(tau);
     slong nb = acb_theta_jet_nb(ord, g + 1);
+    slong n2 = 1 << (2 * g);
     slong lp = ACB_THETA_LOW_PREC;
     acb_mat_t w;
     acb_ptr x;
@@ -139,7 +140,7 @@ acb_theta_jet_all(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau, slo
 
     if (arf_cmp(t, eps) <= 0)
     {
-        _acb_vec_indeterminate(dth, nb);
+        _acb_vec_indeterminate(dth, nb * n2);
     }
     else
     {
@@ -151,7 +152,7 @@ acb_theta_jet_all(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau, slo
         fmpz_bin_uiui(m, ord + 1 + g + (g * g + g)/2, ord + 1);
         arb_mul_fmpz(b, b, m, lp);
         arb_mul_arf(b, b, eps, prec);
-        for (k = 0; k < nb; k++)
+        for (k = 0; k < nb * n2; k++)
         {
             acb_add_error_arb(&dth[k], b);
         }
