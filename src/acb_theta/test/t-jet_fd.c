@@ -55,7 +55,7 @@ int main(void)
         arb_one(rho);
         arb_set_si(c, g);
         arb_exp(c, c, lp);
-        acb_theta_jet_radius(eps, err, c, rho, ord, g, prec, lp);
+        acb_theta_jet_fd_radius(eps, err, c, rho, ord, g, prec, lp);
 
         /* Fill in values, apply jet_fd at 2*prec */
         for (k = 0; k < nb_val; k++)

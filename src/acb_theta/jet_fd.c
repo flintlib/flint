@@ -20,6 +20,7 @@ acb_theta_jet_fd(acb_ptr dth, const arf_t eps, const arf_t err, acb_srcptr val,
 {
     acb_ptr aux;
     arb_t t;
+    fmpz_t m, n;
     slong nb_max = acb_theta_jet_nb(ord, g);
     slong b = ord + 1;
     slong* orders;
@@ -27,6 +28,8 @@ acb_theta_jet_fd(acb_ptr dth, const arf_t eps, const arf_t err, acb_srcptr val,
 
     aux = _acb_vec_init(n_pow(b, g));
     arb_init(t);
+    fmpz_init(m);
+    fmpz_init(n);
     orders = flint_malloc(g * nb_max * sizeof(slong));
 
     acb_theta_jet_fourier(aux, val, ord, g, prec);
@@ -60,11 +63,12 @@ acb_theta_jet_fd(acb_ptr dth, const arf_t eps, const arf_t err, acb_srcptr val,
         {
             acb_add_error_arf(&dth[ind + j], err);
         }
-
         ind += nb;
     }
 
     _acb_vec_clear(aux, n_pow(b, g));
     arb_clear(t);
+    fmpz_clear(m);
+    fmpz_clear(n);
     flint_free(orders);
 }

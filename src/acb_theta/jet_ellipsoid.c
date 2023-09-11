@@ -12,51 +12,57 @@
 #include "acb_theta.h"
 
 void
-acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr new_z, acb_ptr c, arb_ptr u,
-    slong ord, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
+acb_theta_jet_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z,
+    const acb_mat_t tau, slong ord, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong lp = ACB_THETA_LOW_PREC;
-    arf_t R2;
-    arf_t eps;
-    arb_mat_t cho;
+    arf_t R2, eps;
+    arb_t t;
+    arb_mat_t cho, invt;
     arb_ptr offset;
-    slong k;
 
     arf_init(R2);
     arf_init(eps);
     arb_mat_init(cho, g, g);
+    arb_mat_init(invt, g, g);
     offset = _arb_vec_init(g);
+    arb_init(t);
 
     acb_theta_eld_cho(cho, tau, prec);
 
     if (arb_mat_is_finite(cho))
     {
+        /* Get offset and bound on leading factor */
+        arb_mat_one(invt);
+        arb_mat_solve_triu(invt, cho, invt, 0, prec);
+        arb_mat_transpose(invt, invt);
+        _acb_vec_get_imag(offset, z, g);
+        arb_mat_vector_mul_col(offset, invt, offset, prec);
+        arb_const_pi(t, prec);
+        _arb_vec_scalar_mul(offset, offset, g, t, prec);
+        arb_zero(u);
+        arb_dot(u, u, 0, offset, 1, offset, 1, g, prec);
+        arb_exp(u, u, prec);
+
         /* Get radius, fill ellipsoid */
-        acb_theta_naive_radius(R2, eps, cho, ord, prec);
-        acb_theta_naive_reduce(offset, new_z, c, u, z, nb_z, tau, cho, prec);
-        for (k = 0; k < nb_z; k++)
-        {
-            arb_mul_arf(&u[k], &u[k], eps, prec);
-        }
+        acb_theta_jet_naive_radius(R2, eps, offset, cho, ord, prec);
         acb_theta_eld_fill(E, cho, R2, offset, lp);
+        arb_mul_arf(u, u, eps, prec);
     }
     else
     {
         /* Cannot compute cho, result will be nan */
-        _acb_vec_zero(new_z, nb_z);
         arb_mat_one(cho);
         arf_zero(R2);
         acb_theta_eld_fill(E, cho, R2, offset, lp);
-        for (k = 0; k < nb_z; k++)
-        {
-            acb_indeterminate(&c[k]);
-            arb_pos_inf(&u[k]);
-        }
+        arb_indeterminate(u);
     }
 
     arf_clear(R2);
     arf_clear(eps);
     arb_mat_clear(cho);
+    arb_mat_clear(invt);
     _arb_vec_clear(offset, g);
+    arb_clear(t);
 }

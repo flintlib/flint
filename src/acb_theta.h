@@ -158,6 +158,7 @@ void acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau,
 void acb_theta_naive_tail(arb_t bound, const arf_t R2, const arb_mat_t cho,
     slong ord, slong prec);
 void acb_theta_naive_radius(arf_t R2, arf_t eps, const arb_mat_t cho, slong ord, slong prec);
+
 void acb_theta_naive_reduce(arb_ptr offset, acb_ptr new_z, acb_ptr c, arb_ptr u,
     acb_srcptr z, slong nb_z, const acb_mat_t tau, const arb_mat_t cho, slong prec);
 void acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr new_z, acb_ptr c,
@@ -252,18 +253,23 @@ slong acb_theta_jet_nb(slong ord, slong g);
 void acb_theta_jet_orders(slong* orders, slong ord, slong g);
 slong acb_theta_jet_index(const slong* orders, slong g);
 
+void acb_theta_jet_naive_radius(arf_t R2, arf_t eps, arb_srcptr offset,
+    const arb_mat_t cho, slong ord, slong prec);
+void acb_theta_jet_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z,
+    const acb_mat_t tau, slong ord, slong prec);
+void acb_theta_jet_naive_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
+    slong ord, slong prec);
+
 void acb_theta_jet_bounds_1(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau,
     slong ord, slong prec);
 void acb_theta_jet_bounds_2(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong prec);
-void acb_theta_jet_radius(arf_t eps, arf_t err, const arb_t c, const arb_t rho,
+void acb_theta_jet_fd_radius(arf_t eps, arf_t err, const arb_t c, const arb_t rho,
     slong ord, slong g, slong hprec, slong prec);
 void acb_theta_jet_fourier(acb_ptr res, acb_srcptr val, slong ord, slong g, slong prec);
 void acb_theta_jet_fd(acb_ptr dth, const arf_t eps, const arf_t err, acb_srcptr val,
     slong ord, slong g, slong prec);
 
-void acb_theta_jet_naive_all(acb_ptr dth, slong ord, acb_srcptr z, slong nb_z,
-    const acb_mat_t tau, slong prec);
-void acb_theta_jet_all(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau, slong prec);
+void acb_theta_jet_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec);
 
 #ifdef __cplusplus
 }

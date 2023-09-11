@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 static void
-acb_theta_jet_all_mid(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau, slong prec)
+acb_theta_jet_all_mid(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n2 = 1 << (2 * g);
@@ -38,7 +38,7 @@ acb_theta_jet_all_mid(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau,
 
     /* Get bounds and precision */
     acb_theta_jet_bounds_1(c, rho, z, tau, ord, lp);
-    acb_theta_jet_radius(eps, err, c, rho, ord, g, prec, lp);
+    acb_theta_jet_fd_radius(eps, err, c, rho, ord, g, prec, lp);
     arb_set_arf(t, eps);
     arb_log_base_ui(t, t, 2, lp);
     arb_neg(t, t);
@@ -49,7 +49,7 @@ acb_theta_jet_all_mid(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau,
     for (k = 0; k < n_pow(b, g); k++)
     {
         kmod = k;
-        for (j = 0; j < g; j++)
+        for (j = g - 1; j >= 0; j--)
         {
             acb_set(&new_z[j], &zetas[kmod % b]);
             kmod = kmod / b;
@@ -68,10 +68,7 @@ acb_theta_jet_all_mid(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau,
             acb_set(&val[j], &all_val[j * n2 + k]);
         }
         acb_theta_jet_fd(jet, eps, err, val, ord, g, prec);
-        for (j = 0; j < nb_jet; j++)
-        {
-            acb_set(&dth[j * n2 + k], &jet[j]);
-        }
+        _acb_vec_set(dth + k * nb_jet, jet, nb_jet);
     }
 
     arf_clear(eps);
@@ -87,7 +84,7 @@ acb_theta_jet_all_mid(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau,
 }
 
 void
-acb_theta_jet_all(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau, slong prec)
+acb_theta_jet_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong nb = acb_theta_jet_nb(ord, g + 1);
@@ -118,7 +115,7 @@ acb_theta_jet_all(acb_ptr dth, slong ord, acb_srcptr z, const acb_mat_t tau, slo
     {
         acb_get_mid(&x[k], &z[k]);
     }
-    acb_theta_jet_all_mid(dth, ord, x, w, prec);
+    acb_theta_jet_all_mid(dth, x, w, ord, prec);
 
     /* Add error bounds */
     arf_zero(eps);
