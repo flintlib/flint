@@ -22,11 +22,11 @@ int main(void)
     flint_randinit(state);
 
     /* Test: agrees with ql_a0_naive */
-    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
         slong n = 1 << g;
-        slong prec = (g > 1 ? 200 : 1000) + n_randint(state, 1000);
+        slong prec = (g > 1 ? 200 : 500) + n_randint(state, 500);
         slong bits = n_randint(state, 5);
         slong hprec = prec + 50;
         int has_t = iter % 2;

@@ -41,11 +41,15 @@ int main(void)
         acb_init(test);
 
         acb_randtest_precise(rt, state, prec, mag_bits);
+        while (acb_contains_zero(rt))
+        {
+            acb_randtest_precise(rt, state, prec, mag_bits);
+        }
         acb_sqr(x, rt, prec);
         arb_one(err);
         arb_mul_2exp_si(err, err, -lowprec);
-        acb_set(rt_low, rt);
-        acb_add_error_arb(rt_low, err);
+        arb_add_si(err, err, 1, lowprec);
+        acb_mul_arb(rt_low, rt, err, lowprec);
 
         acb_theta_agm_sqrt(test, x, rt_low, 1, prec);
 
@@ -65,6 +69,12 @@ int main(void)
         if (!arb_is_negative(err))
         {
             flint_printf("FAIL (precision)\n");
+            flint_printf("prec = %wd, mag_bits = %wd, difference:\n", prec, mag_bits);
+            acb_printd(test, 10);
+            flint_printf("\n");
+            flint_printf("rt_low:\n");
+            acb_printd(rt_low, 10);
+            flint_printf("\n");
             fflush(stdout);
             flint_abort();
         }

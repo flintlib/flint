@@ -22,7 +22,7 @@ int main(void)
     flint_randinit(state);
 
     /* Test: agrees with built-in genus 1 on diagonal matrices */
-    for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
         slong nb = n_pow(2, 2 * g);

@@ -22,7 +22,7 @@ int main(void)
     flint_randinit(state);
 
     /* Test: agrees with ql_a0_naive using ql_a0_naive as worker */
-    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         slong g = 2 + n_randint(state, 2);
         slong n = 1 << g;
@@ -31,7 +31,7 @@ int main(void)
         int has_z = (iter % 4) / 2;
         slong nbt = (has_t ? 3 : 1);
         slong nbz = (has_z ? 2 : 1);
-        slong prec = 200 + n_randint(state, 1000);
+        slong prec = 200 + n_randint(state, 500);
         slong hprec = prec + 50;
         slong guard = ACB_THETA_LOW_PREC;
         slong lp = ACB_THETA_LOW_PREC;

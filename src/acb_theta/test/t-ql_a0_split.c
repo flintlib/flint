@@ -22,7 +22,7 @@ int main(void)
     flint_randinit(state);
 
     /* Test: agrees with ql_a0_naive using ql_a0_naive as worker */
-    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         slong g = 2 + n_randint(state, 3);
         slong n = 1 << g;

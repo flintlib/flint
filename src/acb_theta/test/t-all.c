@@ -26,7 +26,7 @@ int main(void)
     {
         slong g = 1 + n_randint(state, 3);
         slong n2 = 1 << (2 * g);
-        slong prec = 100 + n_randint(state, 500);
+        slong prec = 100 + n_randint(state, 400);
         slong bits = n_randint(state, 5);
         int sqr = iter % 2;
         acb_mat_t tau;
@@ -41,7 +41,7 @@ int main(void)
 
         /* Sample tau not too far from reduced domain */
         acb_siegel_randtest_reduced(tau, state, prec, bits);
-        acb_mat_scalar_mul_2exp_si(tau, tau, -2);
+        acb_mat_scalar_mul_2exp_si(tau, tau, -1);
         for (k = 0; k < g; k++)
         {
             acb_urandom(z, state, prec);

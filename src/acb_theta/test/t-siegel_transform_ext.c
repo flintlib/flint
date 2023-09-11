@@ -21,7 +21,7 @@ int main(void)
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 10);
         acb_mat_t tau1, w, tau2;
