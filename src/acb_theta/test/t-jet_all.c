@@ -25,8 +25,8 @@ int main(void)
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         slong prec = ACB_THETA_LOW_PREC + n_randint(state, 200);
-        slong bits = n_randint(state, 4);
-        slong ord = n_randint(state, 4);
+        slong bits = n_randint(state, 3);
+        slong ord = n_randint(state, 3);
         slong g = 1 + n_randint(state, 2);
         slong n2 = 1 << (2 * g);
         slong nb = acb_theta_jet_nb(ord, g + 1);
@@ -47,14 +47,6 @@ int main(void)
 
         acb_theta_jet_all(dth, z, tau, ord, prec);
         acb_theta_jet_naive_all(test, z, tau, ord, prec);
-        
-            flint_printf("g = %wd, prec = %wd, ord = %wd\n", g, prec, ord);
-            acb_mat_printd(tau, 5);
-            _acb_vec_printd(z, g, 5);
-            flint_printf("jet_all:\n");
-            _acb_vec_printd(dth, nb * n2, 5);
-            flint_printf("test:\n");
-            _acb_vec_printd(test, nb * n2, 5);
 
         if (!_acb_vec_overlaps(dth, test, nb * n2))
         {

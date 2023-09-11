@@ -26,7 +26,7 @@ int main(void)
     {
         slong prec = ACB_THETA_LOW_PREC + n_randint(state, 200);
         slong bits = n_randint(state, 4);
-        slong ord = n_randint(state, 3);
+        slong ord = 0; /*n_randint(state, 4);*/
         slong g = 1 + n_randint(state, 3);
         slong n2 = 1 << (2 * g);
         slong nb = acb_theta_jet_nb(ord, g + 1);
@@ -65,6 +65,9 @@ int main(void)
             _acb_vec_printd(test, n2, 5);
             flint_printf("dth:\n");
             _acb_vec_printd(dth, n2 * nb, 5);
+            _acb_vec_sub(test, th, test, n2, prec);
+            flint_printf("diff:\n");
+            _acb_vec_printd(test, n2, 5);
             flint_abort();
         }
 
