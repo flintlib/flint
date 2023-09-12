@@ -83,6 +83,10 @@ slong acb_theta_char_dot(ulong a, ulong b, slong g);
 slong acb_theta_char_dot_slong(ulong a, slong* n, slong g);
 void acb_theta_char_dot_acb(acb_t x, ulong a, acb_srcptr z, slong g, slong prec);
 
+int acb_theta_char_is_even(ulong ab, slong g);
+int acb_theta_char_is_goepel(ulong ch1, ulong ch2, ulong ch3, ulong ch4, slong g);
+int acb_theta_char_is_syzygous(ulong ch1, ulong ch2, ulong ch3, slong g);
+
 /* Ellipsoids in naive algorithms */
 
 struct acb_theta_eld_struct
@@ -270,6 +274,16 @@ void acb_theta_jet_fd(acb_ptr dth, const arf_t eps, const arf_t err, acb_srcptr 
     slong ord, slong g, slong prec);
 
 void acb_theta_jet_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec);
+
+/* Genus 2 */
+
+void acb_theta_g2_psi4(acb_t r, acb_srcptr th2, slong prec);
+void acb_theta_g2_psi6(acb_t r, acb_srcptr th2, slong prec);
+void acb_theta_g2_chi10(acb_t r, acb_srcptr th2, slong prec);
+void acb_theta_g2_chi12(acb_t r, acb_srcptr th2, slong prec);
+void acb_theta_g2_chi5(acb_t r, acb_srcptr th, slong prec);
+void acb_theta_g2_chi35(acb_t r, acb_srcptr th, slong prec);
+void acb_theta_g2_chi63(acb_poly_t r, acb_srcptr dth, slong prec);
 
 #ifdef __cplusplus
 }
