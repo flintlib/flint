@@ -15,7 +15,7 @@ void
 acb_theta_g2_chi12(acb_t r, acb_srcptr th2, slong prec)
 {
     slong g = 2;
-    ulong ch1, ch2, ch3, ch4, ch;
+    ulong ch1, ch2, ch3, ch4, ab;
     ulong n = 1 << (2 * g);
     acb_t res, aux;
 
@@ -35,7 +35,7 @@ acb_theta_g2_chi12(acb_t r, acb_srcptr th2, slong prec)
                         acb_one(aux);
                         for (ab = 0; ab < n; ab++)
                         {
-                            if (theta_char_is_even(ab, g)
+                            if (acb_theta_char_is_even(ab, g)
                                 && (ab != ch1)
                                 && (ab != ch2)
                                 && (ab != ch3)
@@ -51,7 +51,7 @@ acb_theta_g2_chi12(acb_t r, acb_srcptr th2, slong prec)
             }
         }
     }
-    acb_mul_2exp_si(h12, res, -15);
+    acb_mul_2exp_si(r, res, -15);
 
     acb_clear(res);
     acb_clear(aux);

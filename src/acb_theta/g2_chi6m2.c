@@ -12,25 +12,26 @@
 #include "acb_theta.h"
 
 void
-acb_theta_g2_chi5(acb_t r, acb_srcptr th, slong prec)
+acb_theta_g2_chi6m2(acb_ptr r, acb_srcptr dth, slong prec)
 {
     slong g = 2;
     slong n = 1 << (2 * g);
-    ulong ab;
-    acb_t res;
+    slong nb = acb_theta_jet_nb(1, g + 1);
+    acb_ptr th;
+    acb_t den;
+    slong k;
 
-    acb_init(res);
-    acb_one(res);
+    th = _acb_vec_init(n);
+    acb_init(den);
 
-    for (ab = 0; ab < n; ab++)
+    for (k = 0; k < n; k++)
     {
-        if (acb_theta_char_is_even(ab, g))
-        {
-            acb_mul(res, res, &th[ab], prec);
-        }
+        acb_set(&th[k], &dth[k * nb]);
     }
-    acb_neg(r, res);
-    acb_mul_2exp_si(r, r, -6);
+    acb_theta_g2_chi63(r, dth, prec);
+    acb_theta_g2_chi5(den, th, prec);
+    _acb_vec_scalar_div(r, r, 6, den, prec);
 
-    acb_clear(res);
+    _acb_vec_clear(th, n);
+    acb_clear(den);
 }

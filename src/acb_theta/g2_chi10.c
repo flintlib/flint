@@ -24,13 +24,13 @@ acb_theta_g2_chi10(acb_t r, acb_srcptr th2, slong prec)
 
     for (ab = 0; ab < n; ab++)
     {
-        if (theta_char_is_even(ab, g))
+        if (acb_theta_char_is_even(ab, g))
         {
             acb_mul(res, res, &th2[ab], prec);
         }
     }
-    acb_neg(h10, res);
-    acb_scalar_mul_2exp_si(h10, h10, -12);
+    acb_neg(r, res);
+    acb_mul_2exp_si(r, r, -12);
 
     acb_clear(res);
 }

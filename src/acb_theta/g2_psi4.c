@@ -25,7 +25,7 @@ acb_theta_g2_psi4(acb_t r, acb_srcptr th2, slong prec)
     {
         if (acb_theta_char_is_even(ab, g))
         {
-            acb_pow_ui(aux, &theta2[ab], 4, prec);
+            acb_pow_ui(aux, &th2[ab], 4, prec);
             acb_add(res, res, aux, prec);
         }
     }

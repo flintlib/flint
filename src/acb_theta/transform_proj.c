@@ -33,7 +33,6 @@ acb_theta_transform_proj(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th, int s
         acb_mul(c, c, &th[image_ab], prec);
         acb_set(&aux[ab], c);
     }
-
     _acb_vec_set(res, aux, n2);
 
     _acb_vec_clear(aux, n2);

@@ -84,7 +84,7 @@ bolza_E(acb_t E, acb_srcptr th, slong prec)
     acb_one(P);
     for (k = 0; k < 16; k++)
     {
-        if (theta_char_is_even(k, 2))
+        if (acb_theta_char_is_even(k, 2))
         {
             acb_mul(P, P, &th[k], prec);
         }

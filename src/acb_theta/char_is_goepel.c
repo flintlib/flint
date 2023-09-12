@@ -11,7 +11,8 @@
 
 #include "acb_theta.h"
 
-int theta_char_is_goepel(ulong ch1, ulong ch2, ulong ch3, ulong ch4, slong g)
+int
+acb_theta_char_is_goepel(ulong ch1, ulong ch2, ulong ch3, ulong ch4, slong g)
 {
     if (ch1 == ch2 || ch1 == ch3 || ch1 == ch4
         || ch2 == ch3 || ch2 == ch4 || ch3 == ch4)

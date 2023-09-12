@@ -15,7 +15,7 @@
    Goepel relation, then check if it is even, etc. */
 
 int
-theta_char_is_syzygous(ulong ch1, ulong ch2, ulong ch3, slong g)
+acb_theta_char_is_syzygous(ulong ch1, ulong ch2, ulong ch3, slong g)
 {
     ulong n = 1 << (2 * g);
     ulong ch;
@@ -27,7 +27,7 @@ theta_char_is_syzygous(ulong ch1, ulong ch2, ulong ch3, slong g)
 
     for (ch = 0; ch < n; ch++)
     {
-        if (theta_char_is_even(ch, g)
+        if (acb_theta_char_is_even(ch, g)
             && (ch != ch1)
             && (ch != ch2)
             && (ch != ch3)

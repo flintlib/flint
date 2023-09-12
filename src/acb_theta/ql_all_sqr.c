@@ -87,12 +87,14 @@ acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec)
     acb_ptr x, aux;
     acb_t c;
     arb_t u, v;
+    arf_t b;
     slong d, j, k;
     ulong ab, a0, a1, b0;
 
     acb_init(c);
     arb_init(u);
     arb_init(v);
+    arf_init(b);
     x = _acb_vec_init(g);
 
     d = acb_theta_ql_reduce(x, c, u, z, tau, prec);
@@ -139,6 +141,8 @@ acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec)
             acb_set(&th2[ab], &aux[(a0 << d) + b0]);
             acb_abs(v, &th2[ab], prec);
             arb_mul(v, v, u, prec);
+            arb_get_ubound_arf(b, v, prec);
+            arb_set_arf(v, b);
             arb_sqrt(v, v, prec);
             arb_mul_2exp_si(v, v, 1);
             acb_add_error_arb(&th2[ab], v);
@@ -154,6 +158,7 @@ acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec)
     acb_clear(c);
     arb_clear(u);
     arb_clear(v);
+    arf_clear(b);
     acb_mat_clear(w);
     _acb_vec_clear(aux, 1 << (2 * d));
 }
