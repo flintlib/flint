@@ -30,7 +30,7 @@ acb_theta_g2_chi6m2(acb_ptr r, acb_srcptr dth, slong prec)
     }
     acb_theta_g2_chi63(r, dth, prec);
     acb_theta_g2_chi5(den, th, prec);
-    _acb_vec_scalar_div(r, r, 6, den, prec);
+    _acb_vec_scalar_div(r, r, 7, den, prec);
 
     _acb_vec_clear(th, n);
     acb_clear(den);

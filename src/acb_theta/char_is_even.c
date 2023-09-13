@@ -14,5 +14,5 @@
 int acb_theta_char_is_even(ulong ab, slong g)
 {
     ulong a = ab >> g;
-    return (acb_theta_char_dot(a, ab, g) % 2);
+    return (acb_theta_char_dot(a, ab, g) % 2 == 0);
 }
