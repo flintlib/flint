@@ -103,8 +103,6 @@ set(HEADERS
 foreach (build_dir IN LISTS BUILD_DIRS TEMPLATE_DIRS)
     file(GLOB TEMP RELATIVE "${CMAKE_SOURCE_DIR}" "${build_dir}/*.c")
     list(APPEND SOURCES ${TEMP})
-    file(GLOB TEMP RELATIVE "${CMAKE_SOURCE_DIR}" "${build_dir}/*.h")
-    list(APPEND HEADERS ${TEMP})
 endforeach ()
 
 execute_process(
@@ -221,6 +219,7 @@ endforeach()
 
 file(GLOB TEMP "${CMAKE_SOURCE_DIR}/*.h")
 list(APPEND HEADERS ${TEMP})
+file(GLOB CXX_HEADERS "${CMAKE_SOURCE_DIR}/flintxx/*.h")
 
 add_library(flint ${SOURCES})
 target_link_libraries(flint PUBLIC
@@ -307,6 +306,7 @@ install(TARGETS flint
         )
 
 install(FILES ${HEADERS} DESTINATION include/flint)
+install(FILES ${CXX_HEADERS} DESTINATION include/flint/flintxx)
 
 set_target_properties(flint
     PROPERTIES
