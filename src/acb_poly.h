@@ -19,6 +19,7 @@
 #endif
 
 #include "fmpq_types.h"
+#include "fmpz_mpoly.h"
 #include "acb.h"
 
 #ifdef __cplusplus
@@ -689,6 +690,10 @@ void acb_poly_elliptic_p_series(acb_poly_t res, const acb_poly_t z, const acb_t 
 
 void _acb_poly_erf_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec);
 void acb_poly_erf_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec);
+
+/* evaluate multivariate polynomials */
+void acb_poly_eval_fmpz_mpoly(acb_poly_t res, const fmpz_mpoly_t pol,
+    const acb_poly_struct* val, const fmpz_mpoly_ctx_t ctx, slong prec);
 
 ACB_POLY_INLINE slong
 acb_poly_allocated_bytes(const acb_poly_t x)

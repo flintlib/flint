@@ -19,11 +19,11 @@
    'Co150'] */
 
 static char* g2_covariants_str[] = {
-#include "acb_theta/g2_covariants.in"
+#include "acb_theta/g2_basic_covariants.in"
 };
 
 static void
-g2_covariant_eval(acb_poly_t r, const fmpz_mpoly_t cov,
+g2_basic_covariant_eval(acb_poly_t r, const fmpz_mpoly_t cov,
     acb_srcptr chi, const fmpz_mpoly_ctx_t ctx, slong prec)
 {
     slong d = fmpz_mpoly_degree_si(cov, 7, ctx);
@@ -58,7 +58,7 @@ g2_covariant_eval(acb_poly_t r, const fmpz_mpoly_t cov,
 }
 
 static void
-g2_covariants_from_chi6m2(acb_poly_struct* r, acb_srcptr chi, slong prec)
+g2_basic_covariants_from_chi6m2(acb_poly_struct* r, acb_srcptr chi, slong prec)
 {
     char* vars[9] = {"a0", "a1", "a2", "a3", "a4", "a5", "a6", "x", "y"};
     fmpz_mpoly_ctx_t ctx;
@@ -71,7 +71,7 @@ g2_covariants_from_chi6m2(acb_poly_struct* r, acb_srcptr chi, slong prec)
     for (k = 0; k < 26; k++)
     {
         fmpz_mpoly_set_str_pretty(cov, g2_covariants_str[k], (const char**) vars, ctx);
-        g2_covariant_eval(&r[k], cov, chi, ctx, prec);
+        g2_basic_covariant_eval(&r[k], cov, chi, ctx, prec);
     }
 
     fmpz_mpoly_clear(cov, ctx);
@@ -79,7 +79,7 @@ g2_covariants_from_chi6m2(acb_poly_struct* r, acb_srcptr chi, slong prec)
 }
 
 void
-acb_theta_g2_covariants(acb_poly_struct* r, const acb_mat_t tau, slong prec)
+acb_theta_g2_basic_covariants(acb_poly_struct* r, const acb_mat_t tau, slong prec)
 {
     slong g = 2;
     slong n = 1 << (2 * g);
@@ -92,7 +92,7 @@ acb_theta_g2_covariants(acb_poly_struct* r, const acb_mat_t tau, slong prec)
 
     acb_theta_jet_all(dth, z, tau, 1, prec);
     acb_theta_g2_chi6m2(chi, dth, prec);
-    g2_covariants_from_chi6m2(r, chi, prec);
+    g2_basic_covariants_from_chi6m2(r, chi, prec);
 
     _acb_vec_clear(dth, n * nb_j);
     _acb_vec_clear(chi, 7);
