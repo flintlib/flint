@@ -284,7 +284,6 @@ void acb_theta_jet_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord
 #define ACB_THETA_G2_BASIC_J {6,0,4,8,2,6,8,12,0,4,6,10,2,4,8,0,6,6,2,4,2,4,0,2,2,0}
 
 void acb_theta_g2_jet_naive_1(acb_ptr dth, const acb_mat_t tau, slong prec);
-void acb_theta_g2_jet_naive_1_cube(acb_ptr dth, const acb_mat_t tau, slong p, slong prec);
 
 void acb_theta_g2_psi4(acb_t r, acb_srcptr th2, slong prec);
 void acb_theta_g2_psi6(acb_t r, acb_srcptr th2, slong prec);
