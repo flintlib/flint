@@ -37,7 +37,7 @@ slong acb_theta_ql_nb_steps(const arb_mat_t cho, slong d, slong prec)
         }
         else if (g == 2)
         {
-            res -= 4;
+            res -= 2;
         }
         else
         {

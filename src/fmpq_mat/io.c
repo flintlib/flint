@@ -33,3 +33,52 @@ void fmpq_mat_print(const fmpq_mat_t mat)
     }
     flint_printf("\n");
 }
+
+
+/* This is copied from flint/src/fmpz_mat/io.c */
+
+#ifdef FLINT_HAVE_FILE
+
+#define xxx_putc(c)        \
+do {                       \
+    z = fputc((c), file);  \
+    if (z <= 0)            \
+        return z;          \
+} while (0)
+
+#define xxx_fmpq_print(f)        \
+do {                             \
+    z = fmpq_fprint(file, (f));  \
+    if (z <= 0)                  \
+        return z;                \
+} while(0)
+
+int fmpq_mat_fprint_pretty(FILE * file, const fmpq_mat_t mat)
+{
+    int z;
+    slong i, j;
+    slong r = mat->r;
+    slong c = mat->c;
+
+    xxx_putc('[');
+    for (i = 0; i < r; i++)
+    {
+        xxx_putc('[');
+        for (j = 0; j < c; j++)
+        {
+            xxx_fmpq_print(mat->rows[i] + j);
+            if (j != c - 1)
+                xxx_putc(' ');
+        }
+        xxx_putc(']');
+        xxx_putc('\n');
+    }
+    xxx_putc(']');
+
+    return z;
+}
+
+#undef xxx_putc
+#undef xxx_fmpq_print
+
+#endif

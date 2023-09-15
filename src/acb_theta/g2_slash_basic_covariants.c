@@ -11,8 +11,18 @@
 
 #include "acb_theta.h"
 
-void acb_theta_g2_covariant(acb_poly_t r, const fmpz_mpoly_t pol,
-    const acb_poly_struct* basic, const fmpz_mpoly_ctx_t ctx, slong prec)
+void acb_theta_g2_slash_basic_covariants(acb_poly_struct* res, const acb_mat_t c,
+    const acb_poly_struct* cov, slong prec)
 {
-    acb_poly_eval_fmpz_mpoly(r, pol, basic, ctx, prec);
+    slong klist[] = ACB_THETA_G2_BASIC_K;
+    slong jlist[] = ACB_THETA_G2_BASIC_J;
+    slong nb = ACB_THETA_G2_BASIC_NB;
+    slong i;
+
+    for (i = 0; i < nb; i++)
+    {
+        acb_theta_g2_detk_symj(&res[i], c, &cov[i], klist[i], jlist[i], prec);
+    }
 }
+
+

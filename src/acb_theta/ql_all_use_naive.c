@@ -11,8 +11,14 @@
 
 #include "acb_theta.h"
 
-void acb_theta_g2_covariant(acb_poly_t r, const fmpz_mpoly_t pol,
-    const acb_poly_struct* basic, const fmpz_mpoly_ctx_t ctx, slong prec)
+int acb_theta_ql_all_use_naive(slong g, slong prec)
 {
-    acb_poly_eval_fmpz_mpoly(r, pol, basic, ctx, prec);
+    if (g <= 2)
+    {
+        return (prec <= 1500);
+    }
+    else
+    {
+        return 0;
+    }
 }

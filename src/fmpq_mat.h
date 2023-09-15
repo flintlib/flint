@@ -80,6 +80,10 @@ void fmpq_mat_concat_vertical(fmpq_mat_t res,
 
 void fmpq_mat_print(const fmpq_mat_t mat);
 
+#ifdef FLINT_HAVE_FILE
+int fmpq_mat_fprint_pretty(FILE * file, const fmpq_mat_t mat);
+#endif
+
 /* Random matrix generation **************************************************/
 
 void fmpq_mat_randbits(fmpq_mat_t mat, flint_rand_t state, flint_bitcnt_t bits);

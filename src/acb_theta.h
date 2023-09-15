@@ -169,7 +169,7 @@ void acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr new_z, acb_ptr c,
     arb_ptr u, slong ord, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec);
 slong acb_theta_naive_fullprec(const acb_theta_eld_t E, slong prec);
 
-typedef void (*acb_theta_naive_worker_t)(acb_ptr, const acb_t, slong*, slong,
+typedef void (*acb_theta_naive_worker_t)(acb_ptr, slong, const acb_t, slong*, slong,
     slong, slong, slong);
 
 void acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arb_t u,
@@ -236,6 +236,7 @@ int acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
 
 slong acb_theta_ql_reduce(acb_ptr x, acb_t c, arb_t u, acb_srcptr z,
     const acb_mat_t tau, slong prec);
+int acb_theta_ql_all_use_naive(slong g, slong prec);
 void acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec);
 void acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec);
 
@@ -277,20 +278,36 @@ void acb_theta_jet_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord
 
 /* Genus 2 specifics */
 
+#define ACB_THETA_G2_JET_NAIVE_THRESHOLD 10000
+#define ACB_THETA_G2_BASIC_NB 26
+#define ACB_THETA_G2_BASIC_K {1,2,2,2,3,3,3,3,4,4,4,4,5,5,5,6,6,6,7,7,8,9,10,10,12,15}
+#define ACB_THETA_G2_BASIC_J {6,0,4,8,2,6,8,12,0,4,6,10,2,4,8,0,6,6,2,4,2,4,0,2,2,0}
+
+void acb_theta_g2_jet_naive_1(acb_ptr dth, const acb_mat_t tau, slong prec);
+void acb_theta_g2_jet_naive_1_cube(acb_ptr dth, const acb_mat_t tau, slong p, slong prec);
+
 void acb_theta_g2_psi4(acb_t r, acb_srcptr th2, slong prec);
 void acb_theta_g2_psi6(acb_t r, acb_srcptr th2, slong prec);
 void acb_theta_g2_chi10(acb_t r, acb_srcptr th2, slong prec);
 void acb_theta_g2_chi12(acb_t r, acb_srcptr th2, slong prec);
-
 void acb_theta_g2_chi5(acb_t r, acb_srcptr th, slong prec);
 void acb_theta_g2_chi35(acb_t r, acb_srcptr th, slong prec);
+void acb_theta_g2_chi63(acb_poly_t r, acb_srcptr dth, slong prec);
+void acb_theta_g2_chi6m2(acb_poly_t r, acb_srcptr dth, slong prec);
 
-void acb_theta_g2_chi63(acb_ptr r, acb_srcptr dth, slong prec);
-void acb_theta_g2_chi6m2(acb_ptr r, acb_srcptr dth, slong prec);
+void acb_theta_g2_detk_symj(acb_poly_t r, const acb_mat_t m, const acb_poly_t s,
+    slong k, slong j, slong prec);
+void acb_theta_g2_fundamental_covariant(acb_poly_t r, const acb_mat_t tau, slong prec);
+void acb_theta_g2_basic_covariants(acb_poly_struct* cov, const acb_poly_t r, slong prec);
+void acb_theta_g2_slash_basic_covariants(acb_poly_struct* res, const acb_mat_t c,
+    const acb_poly_struct* cov, slong prec);
+void acb_theta_g2_basic_covariants_hecke(acb_poly_struct* cov, const acb_mat_t tau,
+    slong q, slong prec);
 
-void acb_theta_g2_basic_covariants(acb_poly_struct* r, const acb_mat_t tau, slong prec);
+void acb_theta_g2_covariant_weight(slong* k, slong* j, const fmpz_mpoly_t pol,
+    const fmpz_mpoly_ctx_t ctx);
 void acb_theta_g2_covariant(acb_poly_t r, const fmpz_mpoly_t pol,
-    acb_poly_struct* basic, const fmpz_mpoly_ctx_t ctx, slong prec);
+    const acb_poly_struct* basic, const fmpz_mpoly_ctx_t ctx, slong prec);
 
 #ifdef __cplusplus
 }

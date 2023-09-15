@@ -48,10 +48,13 @@ int main(void)
         acb_init(test);
 
         acb_siegel_randtest_nice(tau, state, prec);
+        acb_mat_scalar_mul_2exp_si(tau, tau, -2);
+
         acb_theta_all(th2, z, tau, 1, prec);
         acb_theta_g2_psi4(psi4, th2, prec);
 
-        acb_theta_g2_basic_covariants(r, tau, prec);
+        acb_theta_g2_fundamental_covariant(u, tau, prec);
+        acb_theta_g2_basic_covariants(r, u, prec);
         acb_poly_set_si(u, -3);
         acb_poly_mul(u, u, &r[8], prec);
         acb_poly_mul(v, &r[1], &r[1], prec);

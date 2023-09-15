@@ -9,10 +9,21 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb_theta.h"
+#include "acb.h"
 
-void acb_theta_g2_covariant(acb_poly_t r, const fmpz_mpoly_t pol,
-    const acb_poly_struct* basic, const fmpz_mpoly_ctx_t ctx, slong prec)
+int acb_get_approx_fmpq(fmpq_t y, const acb_t x, slong prec)
 {
-    acb_poly_eval_fmpz_mpoly(r, pol, basic, ctx, prec);
+    int res = 0;
+    mag_t im;
+
+    mag_init(im);
+    arb_get_mag(im, acb_imagref(x));
+
+    if (mag_cmp_2exp_si(im, -prec / 8) < 0)
+    {
+        res = arb_get_approx_fmpq(y, acb_realref(x), prec);
+    }
+
+    mag_clear(im);
+    return res;
 }

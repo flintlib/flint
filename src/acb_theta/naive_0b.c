@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 static void
-worker_dim0(acb_ptr th, const acb_t term, slong* coords, slong g,
+worker_dim0(acb_ptr th, slong nb, const acb_t term, slong* coords, slong g,
     slong ord, slong prec, slong fullprec)
 {
     acb_t x;

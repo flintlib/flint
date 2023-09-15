@@ -56,7 +56,8 @@ int main(void)
         acb_theta_g2_psi4(psi4, th2, prec);
         acb_mul_si(psi4, psi4, -20, prec);
 
-        acb_theta_g2_basic_covariants(r, tau, prec);
+        acb_theta_g2_fundamental_covariant(u, tau, prec);
+        acb_theta_g2_basic_covariants(r, u, prec);
         fmpz_mpoly_gen(pol, 1, ctx);
         fmpz_mpoly_mul(pol, pol, pol, ctx);
         fmpz_mpoly_gen(v, 8, ctx);

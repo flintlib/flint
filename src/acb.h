@@ -271,6 +271,8 @@ int acb_contains_int(const acb_t x);
 
 int acb_get_unique_fmpz(fmpz_t z, const acb_t x);
 
+int acb_get_approx_fmpq(fmpq_t y, const acb_t x, slong prec);
+
 ACB_INLINE void
 acb_set_fmpq(acb_t z, const fmpq_t c, slong prec)
 {
