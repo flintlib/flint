@@ -10,18 +10,7 @@
 */
 
 #include "acb_theta.h"
-
-static slong
-hecke_nb_cosets(slong p)
-{
-  return (n_pow(p, 4) - 1) / (p - 1);
-}
-
-static slong
-hecke_nb_T1_cosets(slong p)
-{
-    return p + n_pow(p, 2) + n_pow(p, 3) + n_pow(p, 4);
-}
+#include "profiler.h"
 
 static void
 hecke_coset(fmpz_mat_t m, slong k, slong p)
@@ -29,7 +18,7 @@ hecke_coset(fmpz_mat_t m, slong k, slong p)
     slong a, b, c;
     slong i;
 
-    if ((k < 0) || (k >= hecke_nb_cosets(p)))
+    if ((k < 0) || (k >= acb_theta_g2_hecke_nb(p)))
     {
         return;
     }
@@ -94,7 +83,7 @@ hecke_T1_coset(fmpz_mat_t m, slong k, slong p)
     slong a, b, c;
     slong i;
 
-    if ((k < 0) || (k >= hecke_nb_T1_cosets(p)))
+    if ((k < 0) || (k >= acb_theta_g2_hecke_nb(p * p)))
     {
         return;
     }
@@ -196,7 +185,7 @@ hecke_T1_covariants(acb_poly_struct* cov, const acb_mat_t tau, slong p, slong pr
     acb_mat_init(c, 2, 2);
     acb_poly_init(r);
 
-    for (k = 0; k < hecke_nb_T1_cosets(p); k++)
+    for (k = 0; k < acb_theta_g2_hecke_nb(p * p); k++)
     {
         hecke_T1_coset(mat, k, p);
         acb_siegel_transform(w, mat, tau, prec);
@@ -222,52 +211,56 @@ static void
 hecke_covariants(acb_poly_struct* cov, const acb_mat_t tau, slong p, slong prec)
 {
     slong nb = ACB_THETA_G2_BASIC_NB;
-    slong n = n_pow(p, 3) * 3 * 16;
     fmpz_mat_t mat;
     acb_mat_t w, c;
-    acb_ptr dth;
     acb_poly_t r;
     slong k;
     int res;
+    timeit_t t0, t1;
 
     fmpz_mat_init(mat, 4, 4);
     acb_mat_init(w, 2, 2);
     acb_mat_init(c, 2, 2);
-    dth = _acb_vec_init(n);
     acb_poly_init(r);
-
-    /* Use jet_naive_cuve for the first p^3 matrices */
-    acb_mat_scalar_div_si(w, tau, p, prec);
-    acb_mat_one(c);
-    acb_mat_scalar_div_si(c, c, p, prec);
-    acb_theta_g2_jet_naive_1_cube(dth, w, p, prec);
-    for (k = 0; k < n_pow(p, 3); k++)
+    
+    for (k = 0; k < acb_theta_g2_hecke_nb(p); k++)
     {
-        acb_theta_g2_chi6m2(r, dth + 3 * 16 * k, prec);
-        acb_theta_g2_basic_covariants(cov + nb * k, r, prec);
-        acb_theta_g2_slash_basic_covariants(cov + nb * k, c, cov + nb * k, prec);
-    }
-
-    for (k = n_pow(p, 3); k < hecke_nb_cosets(p); k++)
-    {
+        timeit_start(t0);
+        
+        flint_printf("k = %wd / %wd (p = %wd)\n", k+1, acb_theta_g2_hecke_nb(p), p);
         hecke_coset(mat, k, p);
         acb_siegel_transform(w, mat, tau, prec);
         acb_siegel_cocycle(c, mat, tau, prec);
+
+        timeit_start(t1);
         acb_theta_g2_fundamental_covariant(r, w, prec);
+        timeit_stop(t1);
+        flint_printf("fundamental covariant: cpu = %wd ms\n", t1->cpu);
+
+        timeit_start(t1);
         acb_theta_g2_basic_covariants(cov + nb * k, r, prec);
+        timeit_stop(t1);
+        flint_printf("basic: cpu = %wd ms\n", t1->cpu);
+        
 
         res = acb_mat_inv(c, c, prec);
         if (!res)
         {
             acb_mat_indeterminate(c);
         }
+        
+        timeit_start(t1);
         acb_theta_g2_slash_basic_covariants(cov + nb * k, c, cov + nb * k, prec);
+        timeit_stop(t1);
+        flint_printf("slash: cpu = %wd ms\n", t1->cpu);
+
+        timeit_stop(t0);
+        flint_printf("total cpu = %wd ms\n", t0->cpu);
     }
 
     fmpz_mat_clear(mat);
     acb_mat_clear(w);
     acb_mat_clear(c);
-    _acb_vec_clear(dth, n);
     acb_poly_clear(r);
 }
 
@@ -287,6 +280,7 @@ void acb_theta_g2_basic_covariants_hecke(acb_poly_struct* cov, const acb_mat_t t
     else
     {
         p = n_sqrt(q);
+        is_T1 = 1;
         if (p * p != q || !n_is_prime(p))
         {
             return;

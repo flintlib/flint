@@ -297,9 +297,13 @@ void acb_theta_g2_chi6m2(acb_poly_t r, acb_srcptr dth, slong prec);
 void acb_theta_g2_detk_symj(acb_poly_t r, const acb_mat_t m, const acb_poly_t s,
     slong k, slong j, slong prec);
 void acb_theta_g2_fundamental_covariant(acb_poly_t r, const acb_mat_t tau, slong prec);
+void acb_theta_g2_ueberschiebung(acb_poly_t r, const acb_poly_t g, const acb_poly_t h,
+    slong m, slong n, slong k, slong prec);
 void acb_theta_g2_basic_covariants(acb_poly_struct* cov, const acb_poly_t r, slong prec);
 void acb_theta_g2_slash_basic_covariants(acb_poly_struct* res, const acb_mat_t c,
     const acb_poly_struct* cov, slong prec);
+
+slong acb_theta_g2_hecke_nb(slong q);
 void acb_theta_g2_basic_covariants_hecke(acb_poly_struct* cov, const acb_mat_t tau,
     slong q, slong prec);
 

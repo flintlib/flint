@@ -10,6 +10,7 @@
 */
 
 #include "acb_theta.h"
+#include "profiler.h"
 
 /* Covariants are in 9 variables a0, ..., a6, x, y; to evaluate, we set y=1 and
    return polynomials in x as acb_poly's */
@@ -66,6 +67,7 @@ acb_theta_g2_basic_covariants(acb_poly_struct* cov, const acb_poly_t r, slong pr
     fmpz_mpoly_t pol;
     acb_ptr chi;
     slong k;
+    timeit_t t0;
 
     fmpz_mpoly_ctx_init(ctx, 9, ORD_LEX);
     fmpz_mpoly_init(pol, ctx);
@@ -78,8 +80,15 @@ acb_theta_g2_basic_covariants(acb_poly_struct* cov, const acb_poly_t r, slong pr
 
     for (k = 0; k < nb; k++)
     {
+        timeit_start(t0);
         fmpz_mpoly_set_str_pretty(pol, g2_covariants_str[k], (const char**) vars, ctx);
+        timeit_stop(t0);
+        flint_printf("reading: %wd ms\n", t0->cpu);
+
+        timeit_start(t0);
         g2_basic_covariant_eval(&cov[k], pol, chi, ctx, prec);
+        timeit_stop(t0);
+        flint_printf("eval: %wd ms\n", t0->cpu);
     }
 
     fmpz_mpoly_clear(pol, ctx);

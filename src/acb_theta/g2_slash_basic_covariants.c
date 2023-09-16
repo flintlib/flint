@@ -21,8 +21,7 @@ void acb_theta_g2_slash_basic_covariants(acb_poly_struct* res, const acb_mat_t c
 
     for (i = 0; i < nb; i++)
     {
-        acb_theta_g2_detk_symj(&res[i], c, &cov[i], klist[i], jlist[i], prec);
+        acb_theta_g2_detk_symj(&res[i], c, &cov[i], (klist[i] - jlist[i]/2),
+            jlist[i], prec);
     }
 }
-
-
