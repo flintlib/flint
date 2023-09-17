@@ -30,8 +30,8 @@ int main(void)
         acb_poly_struct* cov;
         acb_poly_t u, v;
         acb_t r, s, t;
-        slong prec = 2000;
-        slong primes[] = {101}; /*,3,5,7,11,13,17};*/
+        slong prec = 200;
+        slong primes[] = {53}; /*,3,5,7,11,13,17};*/
         slong nprimes = 1;
         slong k, p, l;
 

@@ -42,7 +42,7 @@ int main(void)
         }
         acb_poly_set_coeff_si(f, 6, 1);
 
-        acb_theta_g2_ueberschiebung(g, f, f, 6, 6, 6, prec);
+        acb_theta_g2_transvectant(g, f, f, 6, 6, 6, prec);
 
         if (acb_poly_degree(g) > 0)
         {

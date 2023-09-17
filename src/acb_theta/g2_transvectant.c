@@ -11,7 +11,7 @@
 
 #include "acb_theta.h"
 
-void acb_theta_g2_ueberschiebung(acb_poly_t r, const acb_poly_t g, const acb_poly_t h,
+void acb_theta_g2_transvectant(acb_poly_t r, const acb_poly_t g, const acb_poly_t h,
     slong m, slong n, slong k, slong prec)
 {
     acb_poly_t res, s, t;
@@ -29,31 +29,32 @@ void acb_theta_g2_ueberschiebung(acb_poly_t r, const acb_poly_t g, const acb_pol
 
     for (j = 0; j <= k; j++)
     {
-        /* Set s to d^k g / dx^{k-j} dy^j; g was of degree n */
+        /* Set s to d^k g / dx^{k-j} dy^j; g was of degree m */
         acb_poly_zero(s);
-        for (i = 0; i <= n - k; i++)
+        for (i = 0; i <= m - k; i++)
         {
-            fmpz_fac_ui(num, k - j + i);
+            fmpz_fac_ui(num, i + (k - j));
             fmpz_fac_ui(den, i);
-            fmpz_fac_ui(f, n - i - k + j);
+            fmpz_fac_ui(f, (m - k - i) + j);
             fmpz_mul(num, num, f);
-            fmpz_fac_ui(f, n - k - i);
+            fmpz_fac_ui(f, m - k - i);
             fmpz_mul(den, den, f);
 
-            acb_poly_get_coeff_acb(x, g, i + k - j);
+            acb_poly_get_coeff_acb(x, g, i + (k - j));
             acb_mul_fmpz(x, x, num, prec);
             acb_div_fmpz(x, x, den, prec);
             acb_poly_set_coeff_acb(s, i, x);
         }
-        /* Set t to d^k h / dx^j dy^{k-j} */
+
+        /* Set t to d^k h / dx^j dy^{k-j}; h was of degree n */
         acb_poly_zero(t);
-        for (i = 0; i <= m - k; i++)
+        for (i = 0; i <= n - k; i++)
         {
             fmpz_fac_ui(num, i + j);
             fmpz_fac_ui(den, i);
-            fmpz_fac_ui(f, m - i - j);
+            fmpz_fac_ui(f, (n - k - i) + (k - j));
             fmpz_mul(num, num, f);
-            fmpz_fac_ui(f, m - k - i);
+            fmpz_fac_ui(f, n - k - i);
             fmpz_mul(den, den, f);
 
             acb_poly_get_coeff_acb(x, h, i + j);
@@ -64,7 +65,7 @@ void acb_theta_g2_ueberschiebung(acb_poly_t r, const acb_poly_t g, const acb_pol
 
         acb_poly_mul(s, s, t, prec);
         fmpz_bin_uiui(f, k, j);
-        if (j % 2 == 1)
+        if ((k - j) % 2 == 1)
         {
             fmpz_neg(f, f);
         }
@@ -72,11 +73,12 @@ void acb_theta_g2_ueberschiebung(acb_poly_t r, const acb_poly_t g, const acb_pol
         acb_poly_scalar_mul(s, s, x, prec);
         acb_poly_add(res, res, s, prec);
     }
+
     fmpz_fac_ui(num, m - k);
     fmpz_fac_ui(f, n - k);
     fmpz_mul(num, num, f);
-    fmpz_fac_ui(den, n);
-    fmpz_fac_ui(f, m);
+    fmpz_fac_ui(den, m);
+    fmpz_fac_ui(f, n);
     fmpz_mul(den, den, f);
 
     acb_set_fmpz(x, num);
