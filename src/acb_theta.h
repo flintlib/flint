@@ -282,6 +282,9 @@ void acb_theta_jet_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord
 #define ACB_THETA_G2_BASIC_NB 26
 #define ACB_THETA_G2_BASIC_K {1,2,2,2,3,3,3,3,4,4,4,4,5,5,5,6,6,6,7,7,8,9,10,10,12,15}
 #define ACB_THETA_G2_BASIC_J {6,0,4,8,2,6,8,12,0,4,6,10,2,4,8,0,6,6,2,4,2,4,0,2,2,0}
+#define ACB_THETA_G2_MAX_K 15
+#define ACB_THETA_G2_NEG_EXP 3
+#define ACB_THETA_G2_MAX_J 12
 
 void acb_theta_g2_jet_naive_1(acb_ptr dth, const acb_mat_t tau, slong prec);
 
@@ -294,6 +297,8 @@ void acb_theta_g2_chi35(acb_t r, acb_srcptr th, slong prec);
 void acb_theta_g2_chi63(acb_poly_t r, acb_srcptr dth, slong prec);
 void acb_theta_g2_chi6m2(acb_poly_t r, acb_srcptr dth, slong prec);
 
+void acb_theta_g2_subst_covariant(acb_poly_t r, const acb_poly_struct* powers,
+    const acb_poly_t s, slong j, slong prec);
 void acb_theta_g2_detk_symj(acb_poly_t r, const acb_mat_t m, const acb_poly_t s,
     slong k, slong j, slong prec);
 void acb_theta_g2_fundamental_covariant(acb_poly_t r, const acb_mat_t tau, slong prec);

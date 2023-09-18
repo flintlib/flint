@@ -21,7 +21,7 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: agrees with g2_psi4 using psi4 = -(Co20 - 3*Co40)/20 */
+    /* Test: action of Sp4 */
     for (iter = 0; iter < 5 * flint_test_multiplier(); iter++)
     {
         slong prec = 100 + n_randint(state, 100);

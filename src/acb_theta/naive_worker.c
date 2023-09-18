@@ -21,7 +21,7 @@ acb_theta_naive_newprec(slong prec, slong coord, slong dist, slong max_dist, slo
     return FLINT_MAX(ACB_THETA_LOW_PREC, ceil((double) prec - neg + pos));
 }
 
-/* Work in dimension 1: compute exponentiel terms with two
+/* Work in dimension 1: compute exponential terms with two
    multiplications per term only, at just the necessary precision.
    Each term is: cofactor * lin^k * x^(k^2), and square
    powers of x are precomputed. */

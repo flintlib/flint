@@ -216,46 +216,44 @@ hecke_covariants(acb_poly_struct* cov, const acb_mat_t tau, slong p, slong prec)
     acb_poly_t r;
     slong k;
     int res;
-    timeit_t t0, t1;
 
     fmpz_mat_init(mat, 4, 4);
     acb_mat_init(w, 2, 2);
     acb_mat_init(c, 2, 2);
     acb_poly_init(r);
-    
+
     for (k = 0; k < acb_theta_g2_hecke_nb(p); k++)
     {
-        timeit_start(t0);
+        flint_printf("k = %wd / %wd (p = %wd, prec = %wd)\n",
+            k+1, acb_theta_g2_hecke_nb(p), p, prec);
+        flint_printf("Hecke transform and cocycle:\n");
         
-        flint_printf("k = %wd / %wd (p = %wd)\n", k+1, acb_theta_g2_hecke_nb(p), p);
+        TIMEIT_START
         hecke_coset(mat, k, p);
         acb_siegel_transform(w, mat, tau, prec);
         acb_siegel_cocycle(c, mat, tau, prec);
+        TIMEIT_STOP;
 
-        timeit_start(t1);
+        flint_printf("fundamental:\n");
+        TIMEIT_START
         acb_theta_g2_fundamental_covariant(r, w, prec);
-        timeit_stop(t1);
-        /*flint_printf("fundamental covariant: cpu = %wd ms\n", t1->cpu);*/
+        TIMEIT_STOP;
 
-        timeit_start(t1);
+        flint_printf("basic:\n");
+        TIMEIT_START
         acb_theta_g2_basic_covariants(cov + nb * k, r, prec);
-        timeit_stop(t1);
-        /*flint_printf("basic: cpu = %wd ms\n", t1->cpu);*/
-        
+        TIMEIT_STOP;
 
         res = acb_mat_inv(c, c, prec);
         if (!res)
         {
             acb_mat_indeterminate(c);
         }
-        
-        timeit_start(t1);
-        acb_theta_g2_slash_basic_covariants(cov + nb * k, c, cov + nb * k, prec);
-        timeit_stop(t1);
-        /*flint_printf("slash: cpu = %wd ms\n", t1->cpu);*/
 
-        timeit_stop(t0);
-        /*flint_printf("total cpu = %wd ms\n", t0->cpu);*/
+        flint_printf("slash:\n");
+        TIMEIT_START
+        acb_theta_g2_slash_basic_covariants(cov + nb * k, c, cov + nb * k, prec);
+        TIMEIT_STOP;
     }
 
     fmpz_mat_clear(mat);
