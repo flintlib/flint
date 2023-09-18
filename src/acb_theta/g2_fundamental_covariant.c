@@ -34,15 +34,15 @@ void acb_theta_g2_fundamental_covariant(acb_poly_t r, const acb_mat_t tau, slong
     {
         acb_theta_g2_jet_naive_1(dth, w, prec);
         acb_theta_g2_chi6m2(r, dth, prec);
-        acb_const_pi(c, prec);
-        acb_mul_onei(c, c);
-        acb_pow_ui(c, c, 6, prec);
-        acb_poly_scalar_mul(r, r, c, prec);
     }
     else
     {
         acb_theta_jet_all(dth, z, w, 1, prec);
         acb_theta_g2_chi6m2(r, dth, prec);
+        acb_const_pi(c, prec);
+        acb_mul_onei(c, c);
+        acb_pow_ui(c, c, 6, prec);
+        acb_poly_scalar_div(r, r, c, prec);
     }
 
     sp2gz_inv(mat, mat);

@@ -19,30 +19,41 @@ acb_theta_g2_chi63(acb_poly_t r, acb_srcptr dth, slong prec)
     slong orders[2] = {1, 0};
     slong i1 = acb_theta_jet_index(orders, g); /* 0 or 1 */
     slong nb = acb_theta_jet_nb(1, g + 1);
-    acb_poly_t res, aux;
-    acb_t t;
+    acb_poly_struct* aux;
+    acb_poly_t s;
     ulong ab;
+    slong k;
 
-    acb_poly_init(res);
-    acb_poly_init(aux);
-    acb_init(t);
+    aux = flint_malloc(6 * sizeof(acb_poly_struct));
+    acb_poly_init(s);
 
-    acb_poly_one(res);
+    for (k = 0; k < 6; k++)
+    {
+        acb_poly_init(&aux[k]);
+    }
+
+    k = 0;
     for (ab = 0; ab < n; ab++)
     {
         if (!acb_theta_char_is_even(ab, g))
         {
-            acb_poly_set_coeff_acb(aux, 1, &dth[nb * ab + 1 + i1]);
-            acb_poly_set_coeff_acb(aux, 0, &dth[nb * ab + 1 + (1 - i1)]);
-            acb_poly_mul(res, res, aux, prec);
+            acb_poly_set_coeff_acb(&aux[k], 1, &dth[nb * ab + 1 + i1]);
+            acb_poly_set_coeff_acb(&aux[k], 0, &dth[nb * ab + 1 + (1 - i1)]);
+            k++;
         }
     }
-    acb_poly_scalar_mul_2exp_si(res, res, -6);
-    acb_const_pi(t, prec);
-    acb_pow_ui(t, t, 6, prec);
-    acb_poly_scalar_div(r, res, t, prec);
+    acb_poly_mul(r, &aux[0], &aux[1], prec);
+    acb_poly_mul(r, r, &aux[2], prec);
+    acb_poly_mul(s, &aux[3], &aux[4], prec);
+    acb_poly_mul(s, s, &aux[5], prec);
+    acb_poly_mul(r, r, s, prec);
+    acb_poly_scalar_mul_2exp_si(r, r, -6);
+    /* Omit factor 1/pi^6 */
 
-    acb_poly_clear(res);
-    acb_poly_clear(aux);
-    acb_clear(t);
+    acb_poly_clear(s);
+    for (k = 0; k < 6; k++)
+    {
+        acb_poly_clear(&aux[k]);
+    }
+    flint_free(aux);
 }

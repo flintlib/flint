@@ -15,32 +15,13 @@ void
 acb_siegel_transform(acb_mat_t res, const fmpz_mat_t mat, const acb_mat_t tau, slong prec)
 {
     slong g = sp2gz_dim(mat);
-    fmpz_mat_t a;
-    acb_mat_t x, num, den;
-    int r;
+    acb_mat_t c, cinv;
 
-    fmpz_mat_init(a, g, g);
-    acb_mat_init(x, g, g);
-    acb_mat_init(num, g, g);
-    acb_mat_init(den, g, g);
+    acb_mat_init(c, g, g);
+    acb_mat_init(cinv, g, g);
 
-    sp2gz_get_a(a, mat);
-    acb_mat_set_fmpz_mat(x, a);
-    acb_mat_mul(num, x, tau, prec);
-    sp2gz_get_b(a, mat);
-    acb_mat_set_fmpz_mat(x, a);
-    acb_mat_add(num, num, x, prec);
+    acb_siegel_transform_cocycle_inv(res, c, cinv, mat, tau, prec);
 
-    acb_siegel_cocycle(den, mat, tau, prec);
-    r = acb_mat_inv(den, den, prec);
-    if (!r)
-    {
-        acb_mat_indeterminate(den);
-    }
-    acb_mat_mul(res, num, den, prec);
-
-    fmpz_mat_clear(a);
-    acb_mat_clear(x);
-    acb_mat_clear(num);
-    acb_mat_clear(den);
+    acb_mat_clear(c);
+    acb_mat_clear(cinv);
 }

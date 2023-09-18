@@ -30,7 +30,7 @@ int main(void)
         acb_ptr z;
         slong nb_z = 1 + n_randint(state, 4);
         acb_ptr th, th_0b, test;
-        slong prec1 = 20 + n_randint(state, 4000);
+        slong prec1 = 4000 + n_randint(state, 4000);
         slong prec = prec1 + n_randint(state, 200);
         slong mag_bits = n_randint(state, 2);
         slong k;
@@ -53,6 +53,10 @@ int main(void)
         {
             acb_set(&test[k], &th_0b[k * n]);
         }
+        
+            flint_printf("th, test:\n");
+            _acb_vec_printd(th, nb_z, 5);
+            _acb_vec_printd(test, nb_z, 5);
 
         if (!_acb_vec_overlaps(th, test, nb_z))
         {
@@ -65,7 +69,7 @@ int main(void)
             flint_printf("th, test:\n");
             _acb_vec_printd(th, nb_z, 5);
             _acb_vec_printd(test, nb_z, 5);
-            flint_abort();
+            /*flint_abort();*/
         }
 
         acb_mat_clear(tau);

@@ -63,6 +63,8 @@ void acb_siegel_cocycle_det(acb_t det, const fmpz_mat_t mat, const acb_mat_t tau
 void acb_siegel_transform(acb_mat_t res, const fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 void acb_siegel_transform_ext(acb_ptr r, acb_mat_t w, const fmpz_mat_t mat,
     acb_srcptr z, const acb_mat_t tau, slong prec);
+void acb_siegel_transform_cocycle_inv(acb_mat_t t, acb_mat_t c, acb_mat_t cinv,
+    const fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 
 void acb_siegel_reduce_imag(fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 void acb_siegel_reduce_real(fmpz_mat_t mat, const acb_mat_t tau, slong prec);
@@ -172,9 +174,16 @@ slong acb_theta_naive_fullprec(const acb_theta_eld_t E, slong prec);
 typedef void (*acb_theta_naive_worker_t)(acb_ptr, slong, const acb_t, slong*, slong,
     slong, slong, slong);
 
+/* Call as: new_worker_dim0(coefs, nb, coords, ord, g) */
+
+typedef void (*acb_theta_new_worker_t)(acb_ptr, slong, const slong*, slong, slong);
+
 void acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arb_t u,
     const acb_theta_eld_t E, const acb_theta_precomp_t D, slong k, slong ord,
     slong prec, acb_theta_naive_worker_t worker_dim0);
+void acb_theta_naive_worker_new(acb_ptr th, slong nb, const acb_t c, const arb_t u,
+    const acb_theta_eld_t E, const acb_theta_precomp_t D, slong k, slong ord,
+    slong prec, acb_theta_new_worker_t worker_dim0);
 
 void acb_theta_naive_00(acb_ptr th, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec);
@@ -304,14 +313,16 @@ void acb_theta_g2_detk_symj(acb_poly_t r, const acb_mat_t m, const acb_poly_t s,
 void acb_theta_g2_fundamental_covariant(acb_poly_t r, const acb_mat_t tau, slong prec);
 void acb_theta_g2_transvectant(acb_poly_t r, const acb_poly_t g, const acb_poly_t h,
     slong m, slong n, slong k, slong prec);
+void acb_theta_g2_transvectant_lead(acb_t r, const acb_poly_t g, const acb_poly_t h,
+    slong m, slong n, slong k, slong prec);
 void acb_theta_g2_basic_covariants(acb_poly_struct* cov, const acb_poly_t r, slong prec);
 void acb_theta_g2_basic_covariants_old(acb_poly_struct* cov, const acb_poly_t r, slong prec);
+void acb_theta_g2_basic_covariants_lead(acb_ptr res, const acb_poly_t r, slong prec);
 void acb_theta_g2_slash_basic_covariants(acb_poly_struct* res, const acb_mat_t c,
     const acb_poly_struct* cov, slong prec);
 
 slong acb_theta_g2_hecke_nb(slong q);
-void acb_theta_g2_basic_covariants_hecke(acb_poly_struct* cov, const acb_mat_t tau,
-    slong q, slong prec);
+void acb_theta_g2_basic_covariants_hecke(acb_ptr res, const acb_mat_t tau, slong q, slong prec);
 
 void acb_theta_g2_covariant_weight(slong* k, slong* j, const fmpz_mpoly_t pol,
     const fmpz_mpoly_ctx_t ctx);

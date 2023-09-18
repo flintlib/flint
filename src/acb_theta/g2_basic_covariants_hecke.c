@@ -171,99 +171,78 @@ hecke_T1_coset(fmpz_mat_t m, slong k, slong p)
 }
 
 static void
-hecke_T1_covariants(acb_poly_struct* cov, const acb_mat_t tau, slong p, slong prec)
+hecke_T1_covariants(acb_ptr res, const acb_mat_t tau, slong p, slong prec)
 {
     slong nb = ACB_THETA_G2_BASIC_NB;
     fmpz_mat_t mat;
-    acb_mat_t w, c;
+    acb_mat_t w, c, cinv;
     acb_poly_t r;
     slong k;
-    int res;
 
     fmpz_mat_init(mat, 4, 4);
     acb_mat_init(w, 2, 2);
     acb_mat_init(c, 2, 2);
+    acb_mat_init(cinv, 2, 2);
     acb_poly_init(r);
 
     for (k = 0; k < acb_theta_g2_hecke_nb(p * p); k++)
     {
         hecke_T1_coset(mat, k, p);
-        acb_siegel_transform(w, mat, tau, prec);
-        acb_siegel_cocycle(c, mat, tau, prec);
+        acb_siegel_transform_cocycle_inv(w, c, cinv, mat, tau, prec);
         acb_theta_g2_fundamental_covariant(r, w, prec);
-        acb_theta_g2_basic_covariants(cov + nb * k, r, prec);
-
-        res = acb_mat_inv(c, c, prec);
-        if (!res)
-        {
-            acb_mat_indeterminate(c);
-        }
-        acb_theta_g2_slash_basic_covariants(cov + nb * k, c, cov + nb * k, prec);
+        acb_theta_g2_detk_symj(r, cinv, r, -2, 6, prec);
+        acb_theta_g2_basic_covariants_lead(res + nb * k, r, prec);
     }
 
     fmpz_mat_clear(mat);
     acb_mat_clear(w);
     acb_mat_clear(c);
+    acb_mat_clear(cinv);
     acb_poly_clear(r);
 }
 
 static void
-hecke_covariants(acb_poly_struct* cov, const acb_mat_t tau, slong p, slong prec)
+hecke_covariants(acb_ptr res, const acb_mat_t tau, slong p, slong prec)
 {
     slong nb = ACB_THETA_G2_BASIC_NB;
     fmpz_mat_t mat;
-    acb_mat_t w, c;
+    acb_mat_t w, c, cinv;
     acb_poly_t r;
     slong k;
-    int res;
 
     fmpz_mat_init(mat, 4, 4);
     acb_mat_init(w, 2, 2);
     acb_mat_init(c, 2, 2);
+    acb_mat_init(cinv, 2, 2);
     acb_poly_init(r);
 
     for (k = 0; k < acb_theta_g2_hecke_nb(p); k++)
     {
         flint_printf("k = %wd / %wd (p = %wd, prec = %wd)\n",
             k+1, acb_theta_g2_hecke_nb(p), p, prec);
-        flint_printf("Hecke transform and cocycle:\n");
-        
-        TIMEIT_START
         hecke_coset(mat, k, p);
-        acb_siegel_transform(w, mat, tau, prec);
-        acb_siegel_cocycle(c, mat, tau, prec);
-        TIMEIT_STOP;
-
+        acb_siegel_transform_cocycle_inv(w, c, cinv, mat, tau, prec);
         flint_printf("fundamental:\n");
         TIMEIT_START
         acb_theta_g2_fundamental_covariant(r, w, prec);
         TIMEIT_STOP;
+        acb_theta_g2_detk_symj(r, cinv, r, -2, 6, prec);
 
         flint_printf("basic:\n");
         TIMEIT_START
-        acb_theta_g2_basic_covariants(cov + nb * k, r, prec);
-        TIMEIT_STOP;
-
-        res = acb_mat_inv(c, c, prec);
-        if (!res)
-        {
-            acb_mat_indeterminate(c);
-        }
-
-        flint_printf("slash:\n");
-        TIMEIT_START
-        acb_theta_g2_slash_basic_covariants(cov + nb * k, c, cov + nb * k, prec);
+        acb_theta_g2_basic_covariants_lead(res + nb * k, r, prec);
         TIMEIT_STOP;
     }
 
     fmpz_mat_clear(mat);
     acb_mat_clear(w);
     acb_mat_clear(c);
+    acb_mat_clear(cinv);
     acb_poly_clear(r);
 }
 
-void acb_theta_g2_basic_covariants_hecke(acb_poly_struct* cov, const acb_mat_t tau,
-    slong q, slong prec)
+void
+acb_theta_g2_basic_covariants_hecke(acb_ptr res, const acb_mat_t tau, slong q, slong prec)
 {
     slong nb = ACB_THETA_G2_BASIC_NB;
     slong p;
@@ -288,14 +267,14 @@ void acb_theta_g2_basic_covariants_hecke(acb_poly_struct* cov, const acb_mat_t t
     acb_poly_init(r);
 
     acb_theta_g2_fundamental_covariant(r, tau, prec);
-    acb_theta_g2_basic_covariants(cov, r, prec);
+    acb_theta_g2_basic_covariants_lead(res, r, prec);
     if (is_T1)
     {
-        hecke_T1_covariants(cov + nb, tau, p, prec);
+        hecke_T1_covariants(res + nb, tau, p, prec);
     }
     else
     {
-        hecke_covariants(cov + nb, tau, p, prec);
+        hecke_covariants(res + nb, tau, p, prec);
     }
 
     acb_poly_clear(r);

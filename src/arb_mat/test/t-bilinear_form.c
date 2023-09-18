@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb_theta.h"
+#include "arb_mat.h"
 
 int main(void)
 {
@@ -18,7 +18,7 @@ int main(void)
 
     flint_printf("bilinear_form....");
     fflush(stdout);
-    
+
     flint_randinit(state);
 
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)

@@ -16,7 +16,7 @@ void acb_theta_g2_transvectant(acb_poly_t r, const acb_poly_t g, const acb_poly_
 {
     acb_poly_t res, s, t;
     acb_t x;
-    fmpz_t num, den, f;
+    fmpz_t num, f;
     slong i, j;
 
     acb_poly_init(res);
@@ -24,7 +24,6 @@ void acb_theta_g2_transvectant(acb_poly_t r, const acb_poly_t g, const acb_poly_
     acb_poly_init(t);
     acb_init(x);
     fmpz_init(num);
-    fmpz_init(den);
     fmpz_init(f);
 
     for (j = 0; j <= k; j++)
@@ -34,15 +33,13 @@ void acb_theta_g2_transvectant(acb_poly_t r, const acb_poly_t g, const acb_poly_
         for (i = 0; i <= m - k; i++)
         {
             fmpz_fac_ui(num, i + (k - j));
-            fmpz_fac_ui(den, i);
             fmpz_fac_ui(f, (m - k - i) + j);
             fmpz_mul(num, num, f);
-            fmpz_fac_ui(f, m - k - i);
-            fmpz_mul(den, den, f);
+            fmpz_bin_uiui(f, m - k, i);
+            fmpz_mul(num, num, f);
 
             acb_poly_get_coeff_acb(x, g, i + (k - j));
             acb_mul_fmpz(x, x, num, prec);
-            acb_div_fmpz(x, x, den, prec);
             acb_poly_set_coeff_acb(s, i, x);
         }
 
@@ -51,15 +48,13 @@ void acb_theta_g2_transvectant(acb_poly_t r, const acb_poly_t g, const acb_poly_
         for (i = 0; i <= n - k; i++)
         {
             fmpz_fac_ui(num, i + j);
-            fmpz_fac_ui(den, i);
             fmpz_fac_ui(f, (n - k - i) + (k - j));
             fmpz_mul(num, num, f);
-            fmpz_fac_ui(f, n - k - i);
-            fmpz_mul(den, den, f);
+            fmpz_bin_uiui(f, n - k, i);
+            fmpz_mul(num, num, f);
 
             acb_poly_get_coeff_acb(x, h, i + j);
             acb_mul_fmpz(x, x, num, prec);
-            acb_div_fmpz(x, x, den, prec);
             acb_poly_set_coeff_acb(t, i, x);
         }
 
@@ -74,23 +69,18 @@ void acb_theta_g2_transvectant(acb_poly_t r, const acb_poly_t g, const acb_poly_
         acb_poly_add(res, res, s, prec);
     }
 
-    fmpz_fac_ui(num, m - k);
-    fmpz_fac_ui(f, n - k);
-    fmpz_mul(num, num, f);
-    fmpz_fac_ui(den, m);
+    fmpz_fac_ui(num, m);
     fmpz_fac_ui(f, n);
-    fmpz_mul(den, den, f);
+    fmpz_mul(num, num, f);
 
-    acb_set_fmpz(x, num);
-    acb_div_fmpz(x, x, den, prec);
-    acb_poly_scalar_mul(res, res, x, prec);
-    acb_poly_set(r, res);
+    acb_one(x);
+    acb_div_fmpz(x, x, num, prec);
+    acb_poly_scalar_mul(r, res, x, prec);
 
     acb_poly_clear(res);
     acb_poly_clear(s);
     acb_poly_clear(t);
     acb_clear(x);
     fmpz_clear(num);
-    fmpz_clear(den);
     fmpz_clear(f);
 }

@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb_theta.h"
+#include "arb_mat.h"
 
 int main(void)
 {

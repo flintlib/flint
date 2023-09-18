@@ -27,17 +27,16 @@ int main(void)
         slong g = 2;
         slong nb_cov = ACB_THETA_G2_BASIC_NB;
         acb_mat_t tau;
-        acb_poly_struct* cov;
-        acb_poly_t u, v;
-        acb_t r, s, t;
-        slong prec = 4000;
-        slong primes[] = {53}; /*,3,5,7,11,13,17};*/
+        acb_ptr cov;
+        acb_t r, s, t, u, v;
+        slong prec = 100;
+        slong primes[] = {23}; /*,3,5,7,11,13,17};*/
         slong nprimes = 1;
         slong k, p, l;
 
         acb_mat_init(tau, g, g);
-        acb_poly_init(u);
-        acb_poly_init(v);
+        acb_init(u);
+        acb_init(v);
         acb_init(r);
         acb_init(s);
         acb_init(t);
@@ -56,32 +55,22 @@ int main(void)
             p = primes[k];
             flint_printf("\n\n\n*** Start p = %wd ***\n\n", p);
 
-            cov = flint_malloc(nb_cov * (acb_theta_g2_hecke_nb(p) + 1)
-                * sizeof(acb_poly_struct));
-            for (l = 0; l < nb_cov * (acb_theta_g2_hecke_nb(p) + 1); l++)
-            {
-                acb_poly_init(&cov[l]);
-            }
-
+            cov = _acb_vec_init(nb_cov * (acb_theta_g2_hecke_nb(p) + 1));
             acb_theta_g2_basic_covariants_hecke(cov, tau, p, prec);
 
             /* Get Co20 - 3*Co40 at tau */
-            acb_poly_set_si(u, -3);
-            acb_poly_mul(u, u, &cov[8], prec);
-            acb_poly_mul(v, &cov[1], &cov[1], prec);
-            acb_poly_add(u, u, v, prec);
-            acb_poly_get_coeff_acb(s, u, 0);
+            acb_mul_si(u, &cov[8], -3, prec);
+            acb_sqr(v, &cov[1], prec);
+            acb_add(s, u, v, prec);
 
             /* Get sum of Co20 - 3*Co40 at images */
             acb_zero(r);
             for (l = 0; l < acb_theta_g2_hecke_nb(p); l++)
             {
-                acb_poly_set_si(u, -3);
-                acb_poly_mul(u, u, &cov[(l + 1) * nb_cov + 8], prec);
-                acb_poly_mul(v, &cov[(l + 1) * nb_cov + 1], &cov[(l + 1) * nb_cov + 1], prec);
-                acb_poly_add(u, u, v, prec);
-                acb_poly_get_coeff_acb(t, u, 0);
-                acb_add(r, r, t, prec);
+                acb_mul_si(u, &cov[(l + 1) * nb_cov + 8], -3, prec);
+                acb_sqr(v, &cov[(l + 1) * nb_cov + 1], prec);
+                acb_add(u, u, v, prec);
+                acb_add(r, r, u, prec);
             }
 
             acb_div(r, r, s, prec);
@@ -114,17 +103,13 @@ int main(void)
                 flint_printf("\n");
                 flint_abort();
             }
-
-            for (l = 0; l < nb_cov * (acb_theta_g2_hecke_nb(p) + 1); l++)
-            {
-                acb_poly_clear(&cov[l]);
-            }
-            flint_free(cov);
+            
+            _acb_vec_clear(cov, nb_cov * (acb_theta_g2_hecke_nb(p) + 1));
         }
 
         acb_mat_clear(tau);
-        acb_poly_clear(u);
-        acb_poly_clear(v);
+        acb_clear(u);
+        acb_clear(v);
         acb_clear(r);
         acb_clear(s);
         acb_clear(t);
