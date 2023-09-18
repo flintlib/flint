@@ -34,6 +34,33 @@ get_symmetric_fmpz_mat(fmpz_mat_t N, const arb_mat_t A, slong prec)
     }
 }
 
+static int
+fmpz_mat_is_pos_def(const fmpz_mat_t N)
+{
+    slong d = fmpz_mat_nrows(N);
+    fmpz_mat_t w;
+    fmpz_t det;
+    slong k;
+    int res = 1;
+
+    fmpz_init(det);
+
+    for (k = 1; k <= d; k++)
+    {
+        fmpz_mat_window_init(w, N, 0, 0, k, k);
+        fmpz_mat_det(det, w);
+        if (fmpz_cmp_si(det, 0) <= 0)
+        {
+            res = 0;
+            break;
+        }
+        fmpz_mat_window_clear(w);
+    }
+
+    fmpz_clear(det);
+    return res;
+}
+
 void
 arb_mat_spd_lll_reduce(fmpz_mat_t U, const arb_mat_t A, slong prec)
 {
@@ -41,15 +68,21 @@ arb_mat_spd_lll_reduce(fmpz_mat_t U, const arb_mat_t A, slong prec)
     fmpz_mat_t N;
     slong g = arb_mat_nrows(A);
 
+    if (!arb_mat_is_finite(A))
+    {
+        return;
+    }
+
     fmpz_mat_init(N, g, g);
     fmpz_mat_one(U);
 
-    if (arb_mat_is_finite(A))
+    get_symmetric_fmpz_mat(N, A, prec);
+    if (fmpz_mat_is_pos_def(N))
     {
-        get_symmetric_fmpz_mat(N, A, prec);
         /* Default Flint LLL values, except Gram */
         fmpz_lll_context_init(fl, 0.99, 0.51, GRAM, EXACT);
         fmpz_lll(N, U, fl);
     }
+
     fmpz_mat_clear(N);
 }
