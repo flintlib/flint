@@ -77,7 +77,7 @@ void acb_siegel_randtest_nice(acb_mat_t tau, flint_rand_t state, slong prec);
 /* Theta characteristics */
 
 void acb_theta_char_get_slong(slong* n, ulong a, slong g);
-ulong acb_theta_char_get_a(slong* n, slong g);
+ulong acb_theta_char_get_a(const slong* n, slong g);
 void acb_theta_char_get_acb(acb_ptr v, ulong a, slong g);
 void acb_theta_char_get_arb(arb_ptr v, ulong a, slong g);
 
@@ -174,17 +174,17 @@ slong acb_theta_naive_fullprec(const acb_theta_eld_t E, slong prec);
 typedef void (*acb_theta_naive_worker_t)(acb_ptr, slong, const acb_t, slong*, slong,
     slong, slong, slong);
 
-/* worker_dim1(th, v1, v2, precs, len, cofactor, coords, ord, g, fullprec); */
+/* Use as worker_dim1(th, v1, v2, precs, len, cofactor, coords, ord, g, prec, fullprec) */
 
 typedef void (*acb_theta_new_worker_t)(acb_ptr, acb_srcptr, acb_srcptr, const slong*,
-    slong, const acb_t, const slong*, slong, slong, slong);
+    slong, const acb_t, const slong*, slong, slong, slong, slong);
 
 void acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arb_t u,
     const acb_theta_eld_t E, const acb_theta_precomp_t D, slong k, slong ord,
     slong prec, acb_theta_naive_worker_t worker_dim0);
 void acb_theta_naive_worker_new(acb_ptr th, slong nb, const acb_t c, const arb_t u,
     const acb_theta_eld_t E, const acb_theta_precomp_t D, slong k, slong ord,
-    slong prec, acb_theta_new_worker_t worker_dim0);
+    slong prec, acb_theta_new_worker_t worker_dim1);
 
 void acb_theta_naive_00(acb_ptr th, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec);

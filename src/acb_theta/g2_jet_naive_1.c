@@ -42,6 +42,75 @@ worker_dim0(acb_ptr dth, slong nb, const acb_t term, slong* coords, slong g,
     acb_clear(x);
 }
 
+static void
+worker_dim1(acb_ptr dth, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong len,
+    const acb_t cofactor, const slong* coords, slong ord, slong g, slong prec, slong fullprec)
+{
+    slong n = 1 << g;
+    acb_ptr v3, aux;
+    acb_t x;
+    slong a0, a1, b;
+    slong* dots;
+    slong i, ind;
+
+    v3 = _acb_vec_init(len);
+    aux = _acb_vec_init(2 * 3 * n);
+    dots = flint_malloc(n * sizeof(slong));
+    acb_init(x);
+
+    /* Precompute a0, a1, dots and multiplications */
+    a0 = acb_theta_char_get_a(coords, g);
+    a1 = a0 ^ (1 << (g - 1));
+    for (b = 0; b < n; b++)
+    {
+        dots[b] = acb_theta_char_dot_slong(b, coords, g);
+    }
+    for (i = 0; i < len; i++)
+    {
+        acb_mul(&v3[i], &v1[i], &v2[i], precs[i]);
+    }
+
+    /* Main loop */
+    for (i = 0; i < len; i++)
+    {
+        for (b = 0; b < n; b++)
+        {
+            acb_mul_powi(x, &v3[i], (dots[b] + i * (b >> (g - 1))) % 4);
+            ind = 3 * n * (i % 2) + 3 * b;
+            if ((dots[b] + i * (b >> (g - 1))) % 2 == 0)
+            {
+                acb_add(&aux[ind], &aux[ind], x, prec);
+            }
+            else
+            {
+                acb_addmul_si(&aux[ind + 1], x, coords[0] + i, prec);
+                acb_addmul_si(&aux[ind + 2], x, coords[1], prec);
+            }
+        }
+    }
+
+    /* Multiply vector by cofactor and i*pi, then add to dth */
+    _acb_vec_scalar_mul(aux, aux, 2 * 3 * n, cofactor, prec);
+    acb_const_pi(x, prec);
+    acb_mul_onei(x, x);
+    for (i = 0; i < 2 * n; i++)
+    {
+        _acb_vec_scalar_mul(&aux[3 * i + 1], &aux[3 * i + 1], 2, x, prec);
+    }
+    for (b = 0; b < n; b++)
+    {
+        _acb_vec_add(&dth[3 * (n * a0 + b)], &dth[3 * (n * a0 + b)],
+            &aux[3 * b], 3, fullprec);
+        _acb_vec_add(&dth[3 * (n * a1 + b)], &dth[3 * (n * a1 + b)],
+            &aux[3 * (n + b)], 3, fullprec);
+    }
+
+    _acb_vec_clear(v3, len);
+    _acb_vec_clear(aux, 2 * 3 * n);
+    flint_free(dots);
+    acb_clear(x);
+}
+
 void
 acb_theta_g2_jet_naive_1(acb_ptr dth, const acb_mat_t tau, slong prec)
 {
@@ -69,7 +138,7 @@ acb_theta_g2_jet_naive_1(acb_ptr dth, const acb_mat_t tau, slong prec)
     acb_theta_precomp_set(D, z, new_tau, E, prec);
     acb_one(c);
 
-    acb_theta_naive_worker(dth, 3 * n2, c, u, E, D, 0, ord, prec, worker_dim0);
+    acb_theta_naive_worker_new(dth, 3 * n2, c, u, E, D, 0, ord, prec, worker_dim1);
 
     acb_theta_eld_clear(E);
     acb_theta_precomp_clear(D);

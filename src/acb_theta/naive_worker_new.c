@@ -89,7 +89,7 @@ acb_theta_naive_call_dim1(acb_ptr th, acb_ptr v1, acb_ptr v2, slong* precs,
             precs[k - min]);
     }
 
-    worker_dim1(th, v1, v2, precs, len, cofactor, coords, ord, g, fullprec);
+    worker_dim1(th, v1, v2, precs, len, cofactor, coords, ord, g, prec, fullprec);
 
     acb_clear(diff);
     acb_clear(diff_inv);

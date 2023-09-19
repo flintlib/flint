@@ -13,13 +13,13 @@
 
 static void
 worker_dim1(acb_ptr th, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong len,
-    const acb_t cofactor, const slong* coords, slong ord, slong g, slong fullprec)
+    const acb_t cofactor, const slong* coords, slong ord, slong g, slong prec, slong fullprec)
 {
     acb_t sum;
 
     acb_init(sum);
 
-    acb_dot(sum, NULL, 0, v1, 1, v2, 1, len, fullprec);
+    acb_dot(sum, NULL, 0, v1, 1, v2, 1, len, prec);
     acb_addmul(th, sum, cofactor, fullprec);
 
     acb_clear(sum);

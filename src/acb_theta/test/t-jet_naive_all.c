@@ -24,9 +24,9 @@ int main(void)
     /* Test: first values match naive_all */
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
-        slong prec = ACB_THETA_LOW_PREC + n_randint(state, 200);
+        slong prec = ACB_THETA_LOW_PREC + n_randint(state, 100);
         slong bits = n_randint(state, 4);
-        slong ord = 0; /*n_randint(state, 4);*/
+        slong ord = n_randint(state, 4);
         slong g = 1 + n_randint(state, 3);
         slong n2 = 1 << (2 * g);
         slong nb = acb_theta_jet_nb(ord, g + 1);

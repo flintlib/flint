@@ -27,11 +27,10 @@ int main(void)
         slong g = 2;
         slong n = 1 << (2 * g);
         slong nb = acb_theta_jet_nb(1, g + 1);
-        slong prec = 100 + n_randint(state, 100);
+        slong prec = 100 + n_randint(state, 200);
         slong bits = n_randint(state, 4);
         acb_mat_t tau;
         acb_ptr z, dth, test;
-        acb_t c;
         slong k;
         int res;
 
@@ -39,11 +38,8 @@ int main(void)
         z = _acb_vec_init(g);
         dth = _acb_vec_init(n * nb);
         test = _acb_vec_init(n * nb);
-        acb_init(c);
 
         acb_siegel_randtest_reduced(tau, state, prec, bits);
-        acb_const_pi(c, prec);
-        acb_mul_onei(c, c);
 
         acb_theta_g2_jet_naive_1(dth, tau, prec);
         acb_theta_jet_naive_all(test, z, tau, 1, prec);
@@ -56,7 +52,6 @@ int main(void)
             }
             else
             {
-                _acb_vec_scalar_mul(&dth[3 * k + 1], &dth[3 * k + 1], 2, c, prec);
                 res = _acb_vec_overlaps(&dth[3 * k + 1], &test[3 * k + 1], 2);
             }
 
@@ -75,7 +70,6 @@ int main(void)
         _acb_vec_clear(z, g);
         _acb_vec_clear(dth, n * nb);
         _acb_vec_clear(test, n * nb);
-        acb_clear(c);
     }
 
     flint_randclear(state);

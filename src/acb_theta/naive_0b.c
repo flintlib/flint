@@ -13,7 +13,7 @@
 
 static void
 worker_dim1(acb_ptr th, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong len,
-    const acb_t cofactor, const slong* coords, slong ord, slong g, slong fullprec)
+    const acb_t cofactor, const slong* coords, slong ord, slong g, slong prec, slong fullprec)
 {
     slong n = 1 << g;
     acb_t s0, s1, add, sub;
@@ -26,12 +26,12 @@ worker_dim1(acb_ptr th, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong 
     acb_init(sub);
 
     /* Compute alternate sums to adjust signs */
-    acb_dot(s0, NULL, 0, v1, 2, v2, 2, (len + 1) / 2, fullprec);
-    acb_dot(s1, NULL, 0, v1 + 1, 2, v2 + 1, 2, len / 2, fullprec);
-    acb_add(add, s0, s1, fullprec);
-    acb_sub(sub, s0, s1, fullprec);
-    acb_mul(add, add, cofactor, fullprec);
-    acb_mul(sub, sub, cofactor, fullprec);
+    acb_dot(s0, NULL, 0, v1, 2, v2, 2, (len + 1) / 2, prec);
+    acb_dot(s1, NULL, 0, v1 + 1, 2, v2 + 1, 2, len / 2, prec);
+    acb_add(add, s0, s1, prec);
+    acb_sub(sub, s0, s1, prec);
+    acb_mul(add, add, cofactor, prec);
+    acb_mul(sub, sub, cofactor, prec);
 
     for (b = 0; b < n; b++)
     {

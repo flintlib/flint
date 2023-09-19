@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 ulong
-acb_theta_char_get_a(slong* n, slong g)
+acb_theta_char_get_a(const slong* n, slong g)
 {
     slong k;
     ulong a = 0;

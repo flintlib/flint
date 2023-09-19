@@ -11,6 +11,9 @@
 
 #include "acb_theta.h"
 
+/* Use a big ellipsoid to avoid complicated formulas for derivatives; this
+   introduces powers of i in worker_dim1 */
+
 static void
 worker_dim0(acb_ptr dth, slong len, const acb_t term, slong* coords, slong g,
     slong ord, slong prec, slong fullprec)
@@ -75,7 +78,130 @@ worker_dim0(acb_ptr dth, slong len, const acb_t term, slong* coords, slong g,
     _acb_vec_clear(f, nb_max);
 }
 
-/* Use a big ellipsoid to avoid complicated formulas for derivatives */
+
+static void
+worker_dim1(acb_ptr dth, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong len,
+    const acb_t cofactor, const slong* coords, slong ord, slong g, slong prec, slong fullprec)
+{
+    slong n = 1 << g;
+    slong nb_max = acb_theta_jet_nb(ord, g);
+    slong nb_tot = acb_theta_jet_nb(ord, g + 1);
+    slong* orders;
+    slong a0, a1;
+    slong* dots;
+    acb_ptr v3, aux;
+    acb_t x, y;
+    fmpz_t num, den, t;
+    slong k, j, i, nb, ind;
+    ulong b;
+
+    orders = flint_malloc(g * nb_max * sizeof(slong));
+    dots = flint_malloc(n * sizeof(slong));
+    v3 = _acb_vec_init(len);
+    aux = _acb_vec_init(nb_tot * n * n);
+    acb_init(x);
+    acb_init(y);
+    fmpz_init(num);
+    fmpz_init(den);
+    fmpz_init(t);
+
+    /* Precompute a0, a1, dots */
+    a0 = acb_theta_char_get_a(coords, g);
+    a1 = a0 ^ (1 << (g - 1));
+    for (b = 0; b < n; b++)
+    {
+        dots[b] = acb_theta_char_dot_slong(b, coords, g);
+    }
+
+    /* Compute products in v3 */
+    for (i = 0; i < len; i++)
+    {
+        acb_mul(&v3[i], &v1[i], &v2[i], precs[i]);
+    }
+
+    ind = 0;
+    for (k = 0; k <= ord; k++)
+    {
+        /* Get list of orders */
+        nb = acb_theta_jet_nb(k, g);
+        acb_theta_jet_orders(orders, k, g);
+        _acb_vec_zero(aux, nb_tot * n * n);
+
+        /* Process each tuple of orders */
+        for (j = 0; j < nb; j++)
+        {
+            /* Set cofactors as fmpz's */
+            fmpz_one(num);
+            fmpz_one(den);
+            for (i = 1; i < g; i++)
+            {
+                fmpz_set_si(t, coords[i]);
+                fmpz_pow_ui(t, t, orders[j * g + i]);
+                fmpz_mul(num, num, t);
+            }
+            for (i = 0; i < g; i++)
+            {
+                fmpz_fac_ui(t, orders[j * g + i]);
+                fmpz_mul(den, den, t);
+            }
+
+            /* Now loop over coordinates; compute right cofactor */
+            for (i = 0; i < len; i++)
+            {
+                fmpz_set_si(t, coords[0] + i);
+                fmpz_pow_ui(t, t, orders[j * g]);
+                acb_mul_fmpz(x, &v3[i], t, precs[i]);
+                /* Now loop over b, adding coefficients in both a0b and a1b */
+                for (b = 0; b < n; b++)
+                {
+                    acb_mul_powi(y, x, (dots[b] + i * (b >> (g - 1))) % 4);
+                    if (i % 2 == 0)
+                    {
+                        acb_add(&aux[(n * a0 + b) * nb_tot + ind + j],
+                            &aux[(n * a0 + b) * nb_tot + ind + j], y, prec);
+                    }
+                    else
+                    {
+                        acb_add(&aux[(n * a1 + b) * nb_tot + ind + j],
+                            &aux[(n * a1 + b) * nb_tot + ind + j], y, prec);
+                    }
+                }
+            }
+
+            /* Finally, loop over b to multiply by num/den */
+            for (b = 0; b < n; b++)
+            {
+                acb_mul_fmpz(&aux[(n * a0 + b) * nb_tot + ind + j],
+                    &aux[(n * a0 + b) * nb_tot + ind + j], num, prec);
+                acb_mul_fmpz(&aux[(n * a1 + b) * nb_tot + ind + j],
+                    &aux[(n * a1 + b) * nb_tot + ind + j], num, prec);
+                acb_div_fmpz(&aux[(n * a0 + b) * nb_tot + ind + j],
+                    &aux[(n * a0 + b) * nb_tot + ind + j], den, prec);
+                acb_div_fmpz(&aux[(n * a1 + b) * nb_tot + ind + j],
+                    &aux[(n * a1 + b) * nb_tot + ind + j], den, prec);
+            }
+        }
+
+        /* Multiply the whole thing by cofactor * (i pi)^k and add to dth */
+        acb_const_pi(x, prec);
+        acb_mul_onei(x, x);
+        acb_pow_ui(x, x, k, prec);
+        acb_mul(x, x, cofactor, prec);
+        _acb_vec_scalar_mul(aux, aux, nb_tot * n * n, x, prec);
+        _acb_vec_add(dth, dth, aux, nb_tot * n * n, fullprec);
+        ind += nb;
+    }
+
+    flint_free(orders);
+    flint_free(dots);
+    _acb_vec_clear(v3, len);
+    _acb_vec_clear(aux, nb_tot * n * n);
+    acb_clear(x);
+    acb_clear(y);
+    fmpz_clear(num);
+    fmpz_clear(den);
+    fmpz_clear(t);
+}
 
 static void
 acb_theta_jet_naive_all_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
@@ -106,7 +232,7 @@ acb_theta_jet_naive_all_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
     acb_theta_precomp_set(D, new_z, new_tau, E, prec);
     acb_one(c);
 
-    acb_theta_naive_worker(dth, nb, c, u, E, D, 0, ord, prec, worker_dim0);
+    acb_theta_naive_worker_new(dth, nb, c, u, E, D, 0, ord, prec, worker_dim1);
 
     acb_theta_eld_clear(E);
     acb_theta_precomp_clear(D);
