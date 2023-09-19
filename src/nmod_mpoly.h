@@ -664,6 +664,9 @@ void nmod_mpoly_get_term_monomial(nmod_mpoly_t M, const nmod_mpoly_t A,
 void nmod_mpoly_push_term_ui_fmpz(nmod_mpoly_t A, ulong c,
                                fmpz * const * exp, const nmod_mpoly_ctx_t ctx);
 
+void nmod_mpoly_push_term_ui_ffmpz(nmod_mpoly_t A, ulong c,
+                               const fmpz * exp, const nmod_mpoly_ctx_t ctx);
+
 void nmod_mpoly_push_term_ui_ui(nmod_mpoly_t A, ulong c,
                                 const ulong * exp, const nmod_mpoly_ctx_t ctx);
 

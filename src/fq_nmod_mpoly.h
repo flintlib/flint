@@ -607,6 +607,9 @@ void fq_nmod_mpoly_get_term_monomial(fq_nmod_mpoly_t M,
 void fq_nmod_mpoly_push_term_fq_nmod_fmpz(fq_nmod_mpoly_t A,
          const fq_nmod_t c, fmpz * const * exp, const fq_nmod_mpoly_ctx_t ctx);
 
+void fq_nmod_mpoly_push_term_fq_nmod_ffmpz(fq_nmod_mpoly_t A,
+         const fq_nmod_t c, const fmpz * exp, const fq_nmod_mpoly_ctx_t ctx);
+
 void fq_nmod_mpoly_push_term_fq_nmod_ui(fq_nmod_mpoly_t A,
           const fq_nmod_t c, const ulong * exp, const fq_nmod_mpoly_ctx_t ctx);
 

@@ -310,6 +310,7 @@ Container operations
     Set *M* to the monomial of the term of index *i* in *A*. The coefficient of *M* will be one.
 
 .. function:: void fq_nmod_mpoly_push_term_fq_nmod_fmpz(fq_nmod_mpoly_t A, const fq_nmod_t c, fmpz * const * exp, const fq_nmod_mpoly_ctx_t ctx)
+              void fq_nmod_mpoly_push_term_fq_nmod_ffmpz(fq_nmod_mpoly_t A, const fq_nmod_t c, const fmpz * exp, const fq_nmod_mpoly_ctx_t ctx)
               void fq_nmod_mpoly_push_term_fq_nmod_ui(fq_nmod_mpoly_t A, const fq_nmod_t c, const ulong * exp, const fq_nmod_mpoly_ctx_t ctx)
 
     Append a term to *A* with coefficient *c* and exponent vector *exp*.

@@ -62,3 +62,14 @@ void fq_nmod_mpoly_push_term_fq_nmod_fmpz(
     FLINT_ASSERT(A->length > 0);
     n_fq_set_fq_nmod(A->coeffs + d*(A->length - 1), c, ctx->fqctx);
 }
+
+void fq_nmod_mpoly_push_term_fq_nmod_ffmpz(fq_nmod_mpoly_t A, const fq_nmod_t c,
+                                           const fmpz *exp,
+                                           const fq_nmod_mpoly_ctx_t ctx)
+{
+    slong d;
+    _fq_nmod_mpoly_push_exp_ffmpz(A, exp, ctx);
+    d = fq_nmod_ctx_degree(ctx->fqctx);
+    FLINT_ASSERT(A->length > 0);
+    n_fq_set_fq_nmod(A->coeffs + d * (A->length - 1), c, ctx->fqctx);
+}
