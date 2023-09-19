@@ -82,7 +82,7 @@ void acb_theta_char_get_acb(acb_ptr v, ulong a, slong g);
 void acb_theta_char_get_arb(arb_ptr v, ulong a, slong g);
 
 slong acb_theta_char_dot(ulong a, ulong b, slong g);
-slong acb_theta_char_dot_slong(ulong a, slong* n, slong g);
+slong acb_theta_char_dot_slong(ulong a, const slong* n, slong g);
 void acb_theta_char_dot_acb(acb_t x, ulong a, acb_srcptr z, slong g, slong prec);
 
 int acb_theta_char_is_even(ulong ab, slong g);
@@ -174,9 +174,10 @@ slong acb_theta_naive_fullprec(const acb_theta_eld_t E, slong prec);
 typedef void (*acb_theta_naive_worker_t)(acb_ptr, slong, const acb_t, slong*, slong,
     slong, slong, slong);
 
-/* Call as: new_worker_dim0(coefs, nb, coords, ord, g) */
+/* worker_dim1(th, v1, v2, precs, len, cofactor, coords, ord, g, fullprec); */
 
-typedef void (*acb_theta_new_worker_t)(acb_ptr, slong, const slong*, slong, slong);
+typedef void (*acb_theta_new_worker_t)(acb_ptr, acb_srcptr, acb_srcptr, const slong*,
+    slong, const acb_t, const slong*, slong, slong, slong);
 
 void acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arb_t u,
     const acb_theta_eld_t E, const acb_theta_precomp_t D, slong k, slong ord,

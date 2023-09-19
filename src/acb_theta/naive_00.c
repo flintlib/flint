@@ -10,21 +10,20 @@
 */
 
 #include "acb_theta.h"
-#include "profiler.h"
 
 static void
-worker_dim0(acb_ptr coefs, slong nb, const slong* coords, slong ord, slong g)
+worker_dim1(acb_ptr th, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong len,
+    const acb_t cofactor, const slong* coords, slong ord, slong g, slong fullprec)
 {
-    acb_one(&coefs[0]);
-}
+    acb_t sum;
 
-static void
-old_worker_dim0(acb_ptr th, slong nb, const acb_t term, slong* coords, slong g,
-    slong ord, slong prec, slong fullprec)
-{
-    acb_add(th, th, term, fullprec);
-}
+    acb_init(sum);
 
+    acb_dot(sum, NULL, 0, v1, 1, v2, 1, len, fullprec);
+    acb_addmul(th, sum, cofactor, fullprec);
+
+    acb_clear(sum);
+}
 
 static void
 acb_theta_naive_00_gen(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
@@ -49,23 +48,11 @@ acb_theta_naive_00_gen(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau
     prec = acb_theta_naive_fullprec(E, prec);
     acb_theta_precomp_set(D, new_z, tau, E, prec);
 
-    flint_printf("(naive_00) prec = %wd, time without acb_dot:\n", prec);
-    TIMEIT_START
-    for (k = 0; k < nb_z; k++)
-    {
-        acb_theta_naive_worker(&th[k], nb, &c[k], &u[k], E, D, k, ord,
-            prec, old_worker_dim0);
-    }
-    TIMEIT_STOP;
-
-    flint_printf("with acb_dot:\n");
-    TIMEIT_START
     for (k = 0; k < nb_z; k++)
     {
         acb_theta_naive_worker_new(&th[k], nb, &c[k], &u[k], E, D, k, ord,
-            prec, worker_dim0);
+            prec, worker_dim1);
     }
-    TIMEIT_STOP;
 
     acb_theta_eld_clear(E);
     acb_theta_precomp_clear(D);

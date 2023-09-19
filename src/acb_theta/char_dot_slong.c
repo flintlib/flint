@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 slong
-acb_theta_char_dot_slong(ulong a, slong* n, slong g)
+acb_theta_char_dot_slong(ulong a, const slong* n, slong g)
 {
     ulong a_shift = a;
     slong sgn = 0;

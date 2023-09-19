@@ -12,24 +12,52 @@
 #include "acb_theta.h"
 
 static void
-worker_dim0(acb_ptr th, slong nb, const acb_t term, slong* coords, slong g,
-    slong ord, slong prec, slong fullprec)
+worker_dim1(acb_ptr th, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong len,
+    const acb_t cofactor, const slong* coords, slong ord, slong g, slong fullprec)
 {
-    acb_t x;
-    ulong b;
     slong n = 1 << g;
+    acb_t s0, s1, add, sub;
+    ulong b;
+    slong dot;
 
-    acb_init(x);
+    acb_init(s0);
+    acb_init(s1);
+    acb_init(add);
+    acb_init(sub);
+
+    /* Compute alternate sums to adjust signs */
+    acb_dot(s0, NULL, 0, v1, 2, v2, 2, (len + 1) / 2, fullprec);
+    acb_dot(s1, NULL, 0, v1 + 1, 2, v2 + 1, 2, len / 2, fullprec);
+    acb_add(add, s0, s1, fullprec);
+    acb_sub(sub, s0, s1, fullprec);
+    acb_mul(add, add, cofactor, fullprec);
+    acb_mul(sub, sub, cofactor, fullprec);
+
     for (b = 0; b < n; b++)
     {
-        acb_set(x, term);
-        if (acb_theta_char_dot_slong(b, coords, g) % 2 == 1)
+        dot = acb_theta_char_dot_slong(b, coords, g) % 2;
+        if ((b >> (g - 1)) && dot)
         {
-            acb_neg(x, x);
+            acb_sub(&th[b], &th[b], sub, fullprec);
         }
-        acb_add(&th[b], &th[b], x, fullprec);
+        else if ((b >> (g - 1)))
+        {
+            acb_add(&th[b], &th[b], sub, fullprec);
+        }
+        else if (dot)
+        {
+            acb_sub(&th[b], &th[b], add, fullprec);
+        }
+        else
+        {
+            acb_add(&th[b], &th[b], add, fullprec);
+        }
     }
-    acb_clear(x);
+
+    acb_clear(s0);
+    acb_clear(s1);
+    acb_clear(add);
+    acb_clear(sub);
 }
 
 static void
@@ -57,8 +85,8 @@ acb_theta_naive_0b_gen(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau
 
     for (k = 0; k < nb_z; k++)
     {
-        acb_theta_naive_worker(&th[k * nb], nb, &c[k], &u[k], E, D, k,
-            ord, prec, worker_dim0);
+        acb_theta_naive_worker_new(&th[k * nb], nb, &c[k], &u[k], E, D, k,
+            ord, prec, worker_dim1);
     }
 
     acb_theta_eld_clear(E);
