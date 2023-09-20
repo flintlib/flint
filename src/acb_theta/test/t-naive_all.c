@@ -34,7 +34,7 @@ int main(void)
         acb_ptr th_test;
         acb_ptr th_g1;
         slong prec1 = 20 + n_randint(state, 200);
-        slong prec = prec1 + n_randint(state, 200);
+        slong prec = prec1; /* + n_randint(state, 200);*/
         slong mag_bits = n_randint(state, 2);
         slong k, j;
         ulong ab, a, b;

@@ -85,8 +85,7 @@ acb_theta_naive_0b_gen(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau
 
     for (k = 0; k < nb_z; k++)
     {
-        acb_theta_naive_worker_new(&th[k * nb], nb, &c[k], &u[k], E, D, k,
-            ord, prec, worker_dim1);
+        acb_theta_naive_worker(&th[k * nb], nb, &c[k], &u[k], E, D, k, ord, prec, worker_dim1);
     }
 
     acb_theta_eld_clear(E);

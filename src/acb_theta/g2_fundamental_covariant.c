@@ -20,13 +20,11 @@ void acb_theta_g2_fundamental_covariant(acb_poly_t r, const acb_mat_t tau, slong
     fmpz_mat_t mat;
     acb_mat_t w;
     acb_ptr z, dth;
-    acb_t c;
 
     fmpz_mat_init(mat, 2 * g, 2 * g);
     acb_mat_init(w, g, g);
     dth = _acb_vec_init(n2 * nb);
     z = _acb_vec_init(g);
-    acb_init(c);
 
     acb_siegel_reduce(w, mat, tau, prec);
 
@@ -39,10 +37,6 @@ void acb_theta_g2_fundamental_covariant(acb_poly_t r, const acb_mat_t tau, slong
     {
         acb_theta_jet_all(dth, z, w, 1, prec);
         acb_theta_g2_chi6m2(r, dth, prec);
-        acb_const_pi(c, prec);
-        acb_mul_onei(c, c);
-        acb_pow_ui(c, c, 6, prec);
-        acb_poly_scalar_div(r, r, c, prec);
     }
 
     sp2gz_inv(mat, mat);
@@ -53,5 +47,4 @@ void acb_theta_g2_fundamental_covariant(acb_poly_t r, const acb_mat_t tau, slong
     acb_mat_clear(w);
     _acb_vec_clear(dth, n2 * nb);
     _acb_vec_clear(z, g);
-    acb_clear(c);
 }

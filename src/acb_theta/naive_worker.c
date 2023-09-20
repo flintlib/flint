@@ -11,7 +11,7 @@
 
 #include "acb_theta.h"
 
-static slong
+ACB_INLINE slong
 acb_theta_naive_newprec(slong prec, slong coord, slong dist, slong max_dist, slong ord)
 {
     double r = ((double) dist) / (max_dist + 2);
@@ -21,87 +21,88 @@ acb_theta_naive_newprec(slong prec, slong coord, slong dist, slong max_dist, slo
     return FLINT_MAX(ACB_THETA_LOW_PREC, ceil((double) prec - neg + pos));
 }
 
-/* Work in dimension 1: compute exponential terms with two
-   multiplications per term only, at just the necessary precision.
-   Each term is: cofactor * lin^k * x^(k^2), and square
-   powers of x are precomputed. */
+/* Call worker in dimension 1: make vectors to use in acb_dot  */
 
 static void
-acb_theta_naive_worker_dim1(acb_ptr th, slong nb, const acb_theta_eld_t E,
-    const acb_theta_precomp_t D, const acb_t lin, const acb_t cofactor,
-    slong ord, slong prec, slong fullprec, acb_theta_naive_worker_t worker_dim0)
+acb_theta_naive_call_dim1(acb_ptr th, acb_ptr v1, acb_ptr v2, slong* precs,
+    const acb_theta_eld_t E, const acb_theta_precomp_t D, const acb_t lin,
+    const acb_t cofactor, slong ord, slong prec, slong fullprec,
+    acb_theta_naive_worker_t worker_dim1)
 {
-    acb_t start, diff, aff, term;
+    acb_t diff, diff_inv;
     slong *coords;
     slong g = acb_theta_eld_ambient_dim(E);
     slong min = acb_theta_eld_min(E);
     slong mid = acb_theta_eld_mid(E);
     slong max = acb_theta_eld_max(E);
-    slong newprec;
+    slong len = acb_theta_eld_nb_pts(E);
     slong k;
 
-    if (acb_theta_eld_nb_pts(E) == 0)
+    if (len == 0)
     {
         return;
     }
 
-    acb_init(start);
     acb_init(diff);
-    acb_init(aff);
-    acb_init(term);
+    acb_init(diff_inv);
     coords = flint_malloc(g * sizeof(slong));
 
+    coords[0] = min;
     for (k = 1; k < g; k++)
     {
         coords[k] = acb_theta_eld_coord(E, k);
     }
 
-    acb_pow_si(start, lin, mid, prec);
-    acb_mul(start, start, cofactor, prec);
+    /* Store lin^k in v1 and square powers in v2; then call worker_dim1 */
     acb_set(diff, lin);
-
-    /* Right loop */
-    acb_set(aff, start);
+    acb_inv(diff_inv, lin, prec);
     for (k = mid; k <= max; k++)
     {
-        coords[0] = k;
-        newprec = acb_theta_naive_newprec(prec, k, k - mid, max - mid, ord);
-        if (k > mid)
+        precs[k - min] = acb_theta_naive_newprec(prec, k, k - mid, max - mid, ord);
+        if (k == mid)
         {
-            acb_mul(aff, aff, diff, newprec);
+            acb_pow_si(&v1[mid - min], diff, mid, prec);
         }
-
-        acb_mul(term, aff, acb_theta_precomp_sqr_pow(D, 0, FLINT_ABS(k)), newprec);
-        worker_dim0(th, nb, term, coords, g, ord, newprec, fullprec);
+        else if ((k > FLINT_MAX(2 * mid, 0)) && (k % 2 == 0))
+        {
+            acb_sqr(&v1[k - min], &v1[(k / 2) - min], precs[k - min]);
+        }
+        else
+        {
+            acb_mul(&v1[k - min], &v1[k - 1 - min], diff, precs[k - min]);
+        }
+        acb_set_round(&v2[k - min], acb_theta_precomp_sqr_pow(D, 0, FLINT_ABS(k)),
+            precs[k - min]);
     }
-
-    /* Left loop */
-    acb_set(aff, start);
-    acb_inv(diff, diff, prec);
     for (k = mid - 1; k >= min; k--)
     {
-        coords[0] = k;
-        newprec = acb_theta_naive_newprec(prec, k, mid - k, mid - min, ord);
-        acb_mul(aff, aff, diff, newprec);
-
-        acb_mul(term, aff, acb_theta_precomp_sqr_pow(D, 0, FLINT_ABS(k)), newprec);
-        worker_dim0(th, nb, term, coords, g, ord, newprec, fullprec);
+        precs[k - min] = acb_theta_naive_newprec(prec, k, k - mid, max - mid, ord);
+        if ((k < FLINT_MIN(2 * mid, 0)) && (k % 2 == 0))
+        {
+            acb_sqr(&v1[k - min], &v1[(k / 2) - min], precs[k - min]);
+        }
+        else
+        {
+            acb_mul(&v1[k - min], &v1[k + 1 - min], diff_inv, precs[k - min]);
+        }
+        acb_set_round(&v2[k - min], acb_theta_precomp_sqr_pow(D, 0, FLINT_ABS(k)),
+            precs[k - min]);
     }
 
-    acb_clear(start);
+    worker_dim1(th, v1, v2, precs, len, cofactor, coords, ord, g, prec, fullprec);
+
     acb_clear(diff);
-    acb_clear(aff);
-    acb_clear(term);
+    acb_clear(diff_inv);
     flint_free(coords);
 }
 
 /* Recursive call to smaller dimension; fall back to dim1 when appropriate */
 
 static void
-acb_theta_naive_worker_rec(acb_ptr th, slong nb, acb_mat_t lin_powers,
-    const acb_theta_eld_t E, const acb_theta_precomp_t D, acb_srcptr exp_z,
-    const acb_t cofactor, slong ord, slong prec, slong fullprec,
-    acb_theta_naive_worker_t worker_dim0)
+acb_theta_naive_worker_rec(acb_ptr th, acb_ptr v1, acb_ptr v2, slong* precs,
+    acb_mat_t lin_powers, const acb_theta_eld_t E, const acb_theta_precomp_t D,
+    acb_srcptr exp_z, const acb_t cofactor, slong ord, slong prec, slong fullprec,
+    acb_theta_naive_worker_t worker_dim1)
 {
     slong d = acb_theta_eld_dim(E);
     slong g = acb_theta_eld_ambient_dim(E);
@@ -128,8 +129,8 @@ acb_theta_naive_worker_rec(acb_ptr th, slong nb, acb_mat_t lin_powers,
         {
             acb_mul(lin_cf, lin_cf, acb_mat_entry(lin_powers, 0, k), prec);
         }
-        acb_theta_naive_worker_dim1(th, nb, E, D, lin_cf, cofactor, ord, prec,
-            fullprec, worker_dim0);
+        acb_theta_naive_call_dim1(th, v1, v2, precs,
+            E, D, lin_cf, cofactor, ord, prec, fullprec, worker_dim1);
         acb_clear(lin_cf);
         return;
     }
@@ -179,8 +180,9 @@ acb_theta_naive_worker_rec(acb_ptr th, slong nb, acb_mat_t lin_powers,
 
         acb_mul(full_cf, lin_cf,
             acb_theta_precomp_sqr_pow(D, d - 1, FLINT_ABS(c)), newprec);
-        acb_theta_naive_worker_rec(th, nb, lin_powers, acb_theta_eld_rchild(E, k),
-            D, exp_z, full_cf, ord, newprec, fullprec, worker_dim0);
+        acb_theta_naive_worker_rec(th, v1, v2, precs,
+            lin_powers, acb_theta_eld_rchild(E, k),
+            D, exp_z, full_cf, ord, newprec, fullprec, worker_dim1);
     }
 
     /* Left loop */
@@ -207,8 +209,9 @@ acb_theta_naive_worker_rec(acb_ptr th, slong nb, acb_mat_t lin_powers,
 
         acb_mul(full_cf, lin_cf,
             acb_theta_precomp_sqr_pow(D, d - 1, FLINT_ABS(c)), newprec);
-        acb_theta_naive_worker_rec(th, nb, lin_powers, acb_theta_eld_lchild(E, k),
-            D, exp_z, full_cf, ord, newprec, fullprec, worker_dim0);
+        acb_theta_naive_worker_rec(th, v1, v2, precs,
+            lin_powers, acb_theta_eld_lchild(E, k),
+            D, exp_z, full_cf, ord, newprec, fullprec, worker_dim1);
     }
 
     acb_clear(start_cf);
@@ -224,15 +227,26 @@ acb_theta_naive_worker_rec(acb_ptr th, slong nb, acb_mat_t lin_powers,
 void
 acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arb_t u,
     const acb_theta_eld_t E, const acb_theta_precomp_t D, slong k,
-    slong ord, slong prec, acb_theta_naive_worker_t worker_dim0)
+    slong ord, slong prec, acb_theta_naive_worker_t worker_dim1)
 {
     slong g = acb_theta_eld_ambient_dim(E);
+    slong len = 0;
     acb_mat_t lin_powers;
+    acb_ptr v1, v2;
+    slong* precs;
     acb_t cofactor;
     slong j;
 
+    for (j = 0; j < g; j++)
+    {
+        len = FLINT_MAX(len, 2 * acb_theta_eld_box(E, j) + 1);
+    }
+
     acb_mat_init(lin_powers, g, g);
     acb_init(cofactor);
+    v1 = _acb_vec_init(len);
+    v2 = _acb_vec_init(len);
+    precs = flint_malloc(len * sizeof(slong));
 
     acb_mat_set(lin_powers, acb_theta_precomp_exp_mat(D));
     acb_one(cofactor);
@@ -242,8 +256,9 @@ acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arb_t u,
         acb_zero(&th[j]);
     }
 
-    acb_theta_naive_worker_rec(th, nb, lin_powers, E, D, acb_theta_precomp_exp_z(D, k, 0),
-        cofactor, ord, prec, prec, worker_dim0);
+    acb_theta_naive_worker_rec(th, v1, v2, precs,
+        lin_powers, E, D, acb_theta_precomp_exp_z(D, k, 0),
+        cofactor, ord, prec, prec, worker_dim1);
 
     for (j = 0; j < nb; j++)
     {
@@ -253,4 +268,7 @@ acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arb_t u,
 
     acb_mat_clear(lin_powers);
     acb_clear(cofactor);
+    _acb_vec_clear(v1, len);
+    _acb_vec_clear(v2, len);
+    flint_free(precs);
 }

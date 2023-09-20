@@ -171,20 +171,12 @@ void acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr new_z, acb_ptr c,
     arb_ptr u, slong ord, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec);
 slong acb_theta_naive_fullprec(const acb_theta_eld_t E, slong prec);
 
-typedef void (*acb_theta_naive_worker_t)(acb_ptr, slong, const acb_t, slong*, slong,
-    slong, slong, slong);
-
-/* Use as worker_dim1(th, v1, v2, precs, len, cofactor, coords, ord, g, prec, fullprec) */
-
-typedef void (*acb_theta_new_worker_t)(acb_ptr, acb_srcptr, acb_srcptr, const slong*,
+typedef void (*acb_theta_naive_worker_t)(acb_ptr, acb_srcptr, acb_srcptr, const slong*,
     slong, const acb_t, const slong*, slong, slong, slong, slong);
 
 void acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arb_t u,
     const acb_theta_eld_t E, const acb_theta_precomp_t D, slong k, slong ord,
-    slong prec, acb_theta_naive_worker_t worker_dim0);
-void acb_theta_naive_worker_new(acb_ptr th, slong nb, const acb_t c, const arb_t u,
-    const acb_theta_eld_t E, const acb_theta_precomp_t D, slong k, slong ord,
-    slong prec, acb_theta_new_worker_t worker_dim1);
+    slong prec, acb_theta_naive_worker_t worker_dim1);
 
 void acb_theta_naive_00(acb_ptr th, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec);

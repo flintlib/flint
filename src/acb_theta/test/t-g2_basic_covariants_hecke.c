@@ -30,8 +30,8 @@ int main(void)
         acb_ptr cov;
         acb_t r, s, t, u, v;
         slong prec = 100;
-        slong primes[] = {23}; /*,3,5,7,11,13,17};*/
-        slong nprimes = 1;
+        slong primes[] = {2,3,5}; /*,3,5,7,11,13,17};*/
+        slong nprimes = 3;
         slong k, p, l;
 
         acb_mat_init(tau, g, g);
@@ -53,7 +53,7 @@ int main(void)
         for (k = 0; k < nprimes; k++)
         {
             p = primes[k];
-            flint_printf("\n\n\n*** Start p = %wd ***\n\n", p);
+            /* flint_printf("\n\n\n*** Start p = %wd ***\n\n", p); */
 
             cov = _acb_vec_init(nb_cov * (acb_theta_g2_hecke_nb(p) + 1));
             acb_theta_g2_basic_covariants_hecke(cov, tau, p, prec);
@@ -89,11 +89,6 @@ int main(void)
                     + n_pow(p, 7) + p + n_pow(p, 2));
             }
 
-                acb_printd(r, 5);
-                flint_printf("\n");
-                acb_printd(t, 5);
-                flint_printf("\n");
-                
             if (!acb_overlaps(r, t))
             {
                 flint_printf("FAIL (p = %wd)\n", p);
@@ -103,7 +98,7 @@ int main(void)
                 flint_printf("\n");
                 flint_abort();
             }
-            
+
             _acb_vec_clear(cov, nb_cov * (acb_theta_g2_hecke_nb(p) + 1));
         }
 

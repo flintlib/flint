@@ -218,20 +218,11 @@ hecke_covariants(acb_ptr res, const acb_mat_t tau, slong p, slong prec)
 
     for (k = 0; k < acb_theta_g2_hecke_nb(p); k++)
     {
-        flint_printf("k = %wd / %wd (p = %wd, prec = %wd)\n",
-            k+1, acb_theta_g2_hecke_nb(p), p, prec);
         hecke_coset(mat, k, p);
         acb_siegel_transform_cocycle_inv(w, c, cinv, mat, tau, prec);
-        flint_printf("fundamental:\n");
-        TIMEIT_START
         acb_theta_g2_fundamental_covariant(r, w, prec);
-        TIMEIT_STOP;
         acb_theta_g2_detk_symj(r, cinv, r, -2, 6, prec);
-
-        flint_printf("basic:\n");
-        TIMEIT_START
         acb_theta_g2_basic_covariants_lead(res + nb * k, r, prec);
-        TIMEIT_STOP;
     }
 
     fmpz_mat_clear(mat);

@@ -10,40 +10,8 @@
 */
 
 #include "acb_theta.h"
-#include "profiler.h"
 
 #define ACB_THETA_G2_JET_NAIVE_1_THRESHOLD 100
-
-static void
-worker_dim0(acb_ptr dth, slong nb, const acb_t term, slong* coords, slong g,
-    slong ord, slong prec, slong fullprec)
-{
-    slong n = 1 << g;
-    acb_t x;
-    ulong a, b, ab;
-
-    acb_init(x);
-
-    a = acb_theta_char_get_a(coords, g);
-
-    for (b = 0; b < n; b++)
-    {
-        ab = (a << g) + b;
-        acb_mul_powi(x, term, acb_theta_char_dot_slong(b, coords, g) % 4);
-
-        if (acb_theta_char_is_even(ab, 2))
-        {
-            acb_add(&dth[3 * ab], &dth[3 * ab], x, fullprec);
-        }
-        else
-        {
-            acb_addmul_si(&dth[3 * ab + 1], x, coords[0], fullprec);
-            acb_addmul_si(&dth[3 * ab + 2], x, coords[1], fullprec);
-        }
-    }
-
-    acb_clear(x);
-}
 
 static void
 worker_dim1(acb_ptr dth, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong len,
@@ -232,7 +200,7 @@ acb_theta_g2_jet_naive_1(acb_ptr dth, const acb_mat_t tau, slong prec)
     acb_theta_precomp_set(D, z, new_tau, E, prec);
     acb_one(c);
 
-    acb_theta_naive_worker_new(dth, 3 * n2, c, u, E, D, 0, ord, prec, worker_dim1);
+    acb_theta_naive_worker(dth, 3 * n2, c, u, E, D, 0, ord, prec, worker_dim1);
 
     acb_theta_eld_clear(E);
     acb_theta_precomp_clear(D);

@@ -32,10 +32,10 @@ acb_theta_g2_chi6m2(acb_poly_t r, acb_srcptr dth, slong prec)
     acb_theta_g2_chi5(den, th, prec);
     acb_poly_scalar_div(r, r, den, prec);
 
-    if (acb_contains_zero(den))
-    {
-        flint_printf("(chi6m2) divided by zero!\n");
-    }
+    acb_const_pi(den, prec);
+    acb_mul_onei(den, den);
+    acb_pow_ui(den, den, 6, prec);
+    acb_poly_scalar_div(r, r, den, prec);
 
     _acb_vec_clear(th, n);
     acb_clear(den);
