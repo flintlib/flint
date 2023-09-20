@@ -42,7 +42,6 @@ acb_theta_ql_roots_1(acb_ptr r, acb_srcptr z, arb_srcptr dist,
             arb_mul_2exp_si(d, &dist[a], k);
             hprec = prec + acb_theta_dist_addprec(d);
             acb_theta_naive_ind(&r[k * n + a], a << g, x, 1, w, hprec);
-
             if (acb_contains_zero(&r[k * n + a]))
             {
                 res = 0;

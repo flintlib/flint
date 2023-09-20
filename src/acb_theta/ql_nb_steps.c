@@ -29,20 +29,17 @@ slong acb_theta_ql_nb_steps(const arb_mat_t cho, slong d, slong prec)
     arb_div(x, x, t, lp);
 
     res =  -arf_get_si(arb_midref(x), ARF_RND_NEAR);
-    if (d == 0)
+    if (g - d == 1)
     {
-        if (g == 1)
-        {
-            res -= 8;
-        }
-        else if (g == 2)
-        {
-            res -= 2;
-        }
-        else
-        {
-            res -= 2;
-        }
+        res -= 7;
+    }
+    else if (g - d == 2)
+    {
+        res -= 3;
+    }
+    else if (g - d <= 5)
+    {
+        res -= 1;
     }
     res = FLINT_MAX(0, res);
 
