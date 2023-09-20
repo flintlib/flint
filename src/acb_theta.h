@@ -229,10 +229,10 @@ typedef int (*acb_theta_ql_worker_t)(acb_ptr, acb_srcptr, acb_srcptr,
 int acb_theta_ql_a0_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
     arb_srcptr dist, const acb_mat_t tau, slong guard, slong prec);
 int acb_theta_ql_a0_split(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
-    const acb_mat_t tau, slong d, slong guard, slong prec, acb_theta_ql_worker_t worker);
+    const acb_mat_t tau, slong split, slong guard, slong prec, acb_theta_ql_worker_t worker);
 int acb_theta_ql_a0_steps(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
-    arb_srcptr dist, const acb_mat_t tau, slong guard, slong prec,
-    acb_theta_ql_worker_t worker);
+    arb_srcptr dist, const acb_mat_t tau, slong nb_steps, slong split,
+    slong guard, slong prec, acb_theta_ql_worker_t worker);
 int acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
     arb_srcptr dist, const acb_mat_t tau, slong guard, slong prec);
 

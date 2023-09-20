@@ -11,32 +11,9 @@
 
 #include "acb_theta.h"
 
-static slong
-acb_theta_ql_split(const arb_mat_t cho)
-{
-    slong g = arb_mat_nrows(cho);
-    arb_t cmp;
-    slong k;
-
-    arb_init(cmp);
-
-    for (k = g - 1; k >= 1; k--)
-    {
-        arb_mul_2exp_si(cmp, arb_mat_entry(cho, k - 1, k - 1),
-            ACB_THETA_QL_SPLIT);
-        if (arb_lt(cmp, arb_mat_entry(cho, k, k)))
-        {
-            break;
-        }
-    }
-
-    arb_clear(cmp);
-    return k;
-}
-
 static int
 acb_theta_ql_a0_start(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
-    arb_srcptr dist, slong sp, const acb_t f, slong nb_steps, const acb_mat_t tau,
+    arb_srcptr dist, const acb_t f, const acb_mat_t tau, slong nb_steps, slong split,
     slong guard, slong prec, acb_theta_ql_worker_t worker)
 {
     slong g = acb_mat_nrows(tau);
@@ -66,12 +43,12 @@ acb_theta_ql_a0_start(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
     acb_mul_2exp_si(c, f, nb_steps);
     acb_exp_pi_i(c, c, prec);
 
-    if (sp > 0)
+    if (split > 0)
     {
-        res = acb_theta_ql_a0_split(r, u, zero, d0, w, sp, guard, prec, worker);
+        res = acb_theta_ql_a0_split(r, u, zero, d0, w, split, guard, prec, worker);
         if (res && has_z)
         {
-            res = acb_theta_ql_a0_split(r + nb_t * n, u, x, d, w, sp, guard, prec, worker);
+            res = acb_theta_ql_a0_split(r + nb_t * n, u, x, d, w, split, guard, prec, worker);
         }
     }
     else
@@ -146,9 +123,9 @@ acb_theta_ql_a0_step(acb_ptr r, acb_srcptr roots, arb_srcptr dist0, arb_srcptr d
 }
 
 int
-acb_theta_ql_a0_steps(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
-    arb_srcptr dist0, const acb_mat_t tau, slong guard, slong prec,
-    acb_theta_ql_worker_t worker)
+acb_theta_ql_a0_steps(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
+    arb_srcptr dist, const acb_mat_t tau, slong nb_steps, slong split,
+    slong guard, slong prec, acb_theta_ql_worker_t worker)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
@@ -157,38 +134,23 @@ acb_theta_ql_a0_steps(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     slong nb_t = (has_t ? 3 : 1);
     slong nb_r = (has_t ? 2 : 1);
     slong nb_z = (has_z ? 2 : 1);
-    arb_mat_t cho;
     acb_ptr x, roots;
     acb_t f, c;
-    slong sp, nb_steps;
     slong k;
     int res = 1;
 
-    arb_mat_init(cho, g, g);
     x = _acb_vec_init(g);
+    roots = _acb_vec_init(nb_z * nb_r * n * nb_steps);
     acb_init(f);
     acb_init(c);
-
-    acb_theta_eld_cho(cho, tau, ACB_THETA_LOW_PREC);
-    sp = acb_theta_ql_split(cho);
-    nb_steps = acb_theta_ql_nb_steps(cho, sp, prec);
-    roots = _acb_vec_init(nb_z * nb_r * n * nb_steps);
-
-    /* flint_printf("(ql_a0_steps) sp =  %wd, has_z = %wd, has_t = %wd, cho:\n", */
-    /*     sp, has_z, has_t); */
-    /* arb_mat_printd(cho, 5); */
-    /* flint_printf("(ql_a0_steps) Using nb_steps = %wd\n", nb_steps); */
 
     acb_theta_ql_log_rescale(f, z, tau, prec);
     res = acb_theta_ql_roots(roots, t, z, dist0, dist, tau, nb_steps, guard, prec);
 
     if (res)
     {
-        res = acb_theta_ql_a0_start(r, t, z, dist0, dist, sp, f, nb_steps, tau,
+        res = acb_theta_ql_a0_start(r, t, z, dist0, dist,  f, tau, nb_steps, split,
             guard, prec, worker);
-        /* flint_printf("(ql_a0_steps) start:\n"); */
-        /* _acb_vec_printd(r, nb_z * nb_t * n, 5); */
-        /* flint_printf("\n"); */
     }
 
     if (res)
@@ -196,9 +158,6 @@ acb_theta_ql_a0_steps(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
         for (k = nb_steps - 1; k >= 0; k--)
         {
             acb_theta_ql_a0_step(r, roots, dist0, dist, k, nb_steps, has_t, has_z, g, prec);
-            /* flint_printf("after step %wd\n", k); */
-            /* _acb_vec_printd(r, nb_z * nb_t * n, 5); */
-            /* flint_printf("\n"); */
         }
     }
 
@@ -209,7 +168,6 @@ acb_theta_ql_a0_steps(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
         _acb_vec_scalar_mul(r + nb_t * n, r + nb_t * n, n * nb_t, c, prec);
     }
 
-    arb_mat_clear(cho);
     _acb_vec_clear(x, g);
     _acb_vec_clear(roots, nb_z * nb_r * n * nb_steps);
     acb_clear(f);

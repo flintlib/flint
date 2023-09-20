@@ -27,7 +27,7 @@ int main(void)
         slong g = 1 + n_randint(state, 3);
         slong n = 1 << g;
         int has_z = iter % 2;
-        slong prec = (g > 1 ? 100 : 1000) + n_randint(state, 500);
+        slong prec = (g > 1 ? 100 : 1000) + n_randint(state, 200);
         slong hprec = prec + 25;
         slong bits = n_randint(state, 3);
         acb_mat_t tau;

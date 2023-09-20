@@ -169,27 +169,12 @@ acb_theta_ql_a0_split_term(acb_ptr r, slong* pt, ulong a, acb_srcptr t, acb_srcp
     new_prec = FLINT_MAX(new_prec, lp);
 
     /* Call worker */
-    /* flint_printf("nb_t = %wd, nb_th = %wd, d = %wd\n", nb_t, nb_th, d);
-       flint_printf("new_prec = %wd, prec = %wd, fullprec = %wd, new_z:\n",
-       new_prec, prec, fullprec);
-       _acb_vec_printd(new_z, d, 5);
-       flint_printf("\n");
-       flint_printf("new_dist, orth_dist: ");
-       _arb_vec_printn(new_dist, nb_th, 5, 0);
-       flint_printf("\n");
-       arb_printd(orth_dist, 5);
-       flint_printf("\n"); */
-
     res = worker(new_th, t, new_z, new_dist0, new_dist, tau0, guard, new_prec);
     if (!_acb_vec_is_zero(new_z, d))
     {
         /* We are only interested in the values at z */
         _acb_vec_set(new_th, new_th + nb_th * nb_t, nb_th * nb_t);
     }
-
-    /* flint_printf("output from worker:\n");
-       _acb_vec_printd(new_th, nb_th * nb_t, 5);
-       flint_printf("\n"); */
 
     /* Rescale to set r; cofactor depends on t */
     for (k = 0; k < nb_t; k++)
@@ -198,11 +183,6 @@ acb_theta_ql_a0_split_term(acb_ptr r, slong* pt, ulong a, acb_srcptr t, acb_srcp
         acb_mul_si(c, c, 2 * k, prec);
         acb_add(c, c, f, prec);
         acb_exp_pi_i(c, c, prec);
-
-        /* flint_printf("cofactor for k = %wd: ", k);
-           acb_printd(c, 10);
-           flint_printf("\n");*/
-
         _acb_vec_scalar_mul(new_th + k * nb_th, new_th + k * nb_th,
             nb_th, c, prec);
         for (j = 0; j < nb_th; j++)
@@ -226,12 +206,12 @@ acb_theta_ql_a0_split_term(acb_ptr r, slong* pt, ulong a, acb_srcptr t, acb_srcp
 
 int
 acb_theta_ql_a0_split(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
-    const acb_mat_t tau, slong d, slong guard, slong prec, acb_theta_ql_worker_t worker)
+    const acb_mat_t tau, slong split, slong guard, slong prec, acb_theta_ql_worker_t worker)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
-    slong nb_a = 1 << (g - d);
-    slong nb_th = 1 << d;
+    slong nb_a = 1 << (g - split);
+    slong nb_th = 1 << split;
     slong nb_t = (_acb_vec_is_zero(t, g) ? 1 : 3);
     slong lp = ACB_THETA_LOW_PREC;
     arb_mat_t cho, cho1;
@@ -243,23 +223,23 @@ acb_theta_ql_a0_split(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     slong a, j, k;
     int res = 1;
 
-    if (d <= 0 || d >= g)
+    if (split <= 0 || split >= g)
     {
-        flint_printf("ql_a0_split: Error (must have 1 < d < g - 1)\n");
+        flint_printf("ql_a0_split: Error (must have 1 < split < g - 1)\n");
         flint_abort();
     }
 
     arb_mat_init(cho, g, g);
-    arb_mat_init(cho1, g - d, g - d);
-    acb_mat_init(tau0, d, d);
-    acb_mat_init(star, d, g - d);
-    acb_mat_init(tau1, g - d, g - d);
-    offset = _arb_vec_init(g - d);
+    arb_mat_init(cho1, g - split, g - split);
+    acb_mat_init(tau0, split, split);
+    acb_mat_init(star, split, g - split);
+    acb_mat_init(tau1, g - split, g - split);
+    offset = _arb_vec_init(g - split);
     nctr = _arb_vec_init(g);
     new_dist0 = _arb_vec_init(nb_th);
     arf_init(eps);
 
-    acb_theta_ql_blocks(tau0, star, tau1, tau, d);
+    acb_theta_ql_blocks(tau0, star, tau1, tau, split);
     acb_theta_eld_cho(cho, tau, prec);
     acb_theta_eld_cho(cho1, tau1, prec);
     acb_theta_dist_a0(new_dist0, z, tau0, lp);
@@ -275,7 +255,7 @@ acb_theta_ql_a0_split(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
         /* Sum terms at each point using worker */
         for (k = 0; (k < nb_pts) && res; k++)
         {
-            res = acb_theta_ql_a0_split_term(r, pts + k * (g - d), a, t, z,
+            res = acb_theta_ql_a0_split_term(r, pts + k * (g - split), a, t, z,
                 offset, dist, new_dist0, tau0, star, tau1, cho1, guard,
                 prec, fullprec,worker);
         }
@@ -297,7 +277,7 @@ acb_theta_ql_a0_split(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
     acb_mat_clear(tau0);
     acb_mat_clear(star);
     acb_mat_clear(tau1);
-    _arb_vec_clear(offset, g - d);
+    _arb_vec_clear(offset, g - split);
     _arb_vec_clear(nctr, g);
     _arb_vec_clear(new_dist0, nb_th);
     arf_clear(eps);

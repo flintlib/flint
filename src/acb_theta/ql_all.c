@@ -55,6 +55,7 @@ acb_theta_ql_all_with_t(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr dist0
 
     /* Collect roots: we only need theta_{a,b}(z + t, tau) */
     _acb_vec_add(new_z, z, t, g, prec);
+
     for (a = 0; a < n; a++)
     {
         hprec = guard + acb_theta_dist_addprec(&dist[a]);
@@ -74,6 +75,7 @@ acb_theta_ql_all_with_t(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr dist0
         _acb_vec_scalar_mul_2exp_si(new_z, z, g, 1);
         _arb_vec_scalar_mul_2exp_si(new_dist, dist, n, 1);
         _arb_vec_scalar_mul_2exp_si(new_dist0, dist0, n, 1);
+
         res = acb_theta_ql_a0(th_a0, t, new_z, new_dist0, new_dist, new_tau, guard, prec);
     }
 
