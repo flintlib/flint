@@ -10,6 +10,7 @@
 */
 
 #include "acb_theta.h"
+#include "profiler.h"
 
 static void
 worker_dim1(acb_ptr th, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong len,
@@ -37,6 +38,7 @@ acb_theta_naive_00_gen(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau
     slong ord = 0;
     slong nb = 1;
     slong k;
+    timeit_t txx;
 
     acb_theta_eld_init(E, g, g);
     acb_theta_precomp_init(D, nb_z, g);
@@ -44,15 +46,30 @@ acb_theta_naive_00_gen(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau
     u = _arb_vec_init(nb_z);
     new_z = _acb_vec_init(g * nb_z);
 
+    flint_printf("(naive_00) ellipsoid and precomp:\n");
+    timeit_start(txx);
+    acb_theta_eld_clear(E);
+    acb_theta_precomp_clear(D);
+    acb_theta_eld_init(E, g, g);
+    acb_theta_precomp_init(D, nb_z, g);
+
     acb_theta_naive_ellipsoid(E, new_z, c, u, ord, z, nb_z, tau, prec);
 
     prec = acb_theta_naive_fullprec(E, prec);
     acb_theta_precomp_set(D, new_z, tau, E, prec);
+    timeit_stop(txx);
+      flint_printf("%wd ms\n", txx->cpu);
+    
 
+    flint_printf("(naive_00) worker:\n");
+      timeit_start(txx);
+    
     for (k = 0; k < nb_z; k++)
     {
         acb_theta_naive_worker(&th[k], nb, &c[k], &u[k], E, D, k, ord, prec, worker_dim1);
     }
+    timeit_stop(txx);
+      flint_printf("%wd ms\n", txx->cpu);
 
     acb_theta_eld_clear(E);
     acb_theta_precomp_clear(D);
