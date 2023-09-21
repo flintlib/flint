@@ -26,7 +26,8 @@ int main(void)
     {
         slong g = 2 + n_randint(state, 2);
         slong n = 1 << g;
-        slong d = 1 + n_randint(state, g);
+        slong d = 1 + n_randint(state, g - 1);
+        slong nb_steps = n_randint(state, 5);
         int has_t = iter % 2;
         int has_z = (iter % 4) / 2;
         slong nbt = (has_t ? 3 : 1);
@@ -73,8 +74,8 @@ int main(void)
         acb_theta_dist_a0(dist, z, tau, lp);
         acb_theta_dist_a0(dist0, zero, tau, lp);
 
-        res = acb_theta_ql_a0_steps(r, t, z, dist0, dist, tau, guard, prec,
-            &acb_theta_ql_a0_naive);
+        res = acb_theta_ql_a0_steps(r, t, z, dist0, dist, tau, nb_steps, d,
+            guard, prec, &acb_theta_ql_a0_naive);
         acb_theta_ql_a0_naive(test, t, z, dist0, dist, tau, guard, hprec);
 
         if (res && !_acb_vec_overlaps(r, test, nbz * nbt * n))

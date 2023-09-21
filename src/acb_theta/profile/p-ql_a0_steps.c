@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
         int has_z = (iter % 4) / 2;
         slong nbt = (has_t ? 3 : 1);
         slong nbz = (has_z ? 2 : 1);
-        slong guard = ACB_THETA_LOW_PREC;
+        slong guard = 2 * ACB_THETA_LOW_PREC;
         slong lp = ACB_THETA_LOW_PREC;
         acb_mat_t tau;
         arb_mat_t cho;
@@ -102,6 +102,8 @@ int main(int argc, char *argv[])
             TIMEIT_STOP;
             if (res)
             {
+                flint_printf("result (expected prec loss %wd):\n",
+                    (guard + g) * (nb_steps + k));
                 acb_printd(&r[0], 5);
                 flint_printf("\n");
             }

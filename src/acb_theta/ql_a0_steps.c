@@ -145,14 +145,13 @@ acb_theta_ql_a0_steps(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
     acb_init(c);
 
     acb_theta_ql_log_rescale(f, z, tau, prec);
-    res = acb_theta_ql_roots(roots, t, z, dist0, dist, tau, nb_steps, guard, prec);
 
+    res = acb_theta_ql_roots(roots, t, z, dist0, dist, tau, nb_steps, guard, prec);
     if (res)
     {
         res = acb_theta_ql_a0_start(r, t, z, dist0, dist,  f, tau, nb_steps, split,
             guard, prec, worker);
     }
-
     if (res)
     {
         for (k = nb_steps - 1; k >= 0; k--)
