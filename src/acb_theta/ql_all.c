@@ -117,28 +117,50 @@ acb_theta_ql_all_red(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
     slong guard = ACB_THETA_LOW_PREC;
     flint_rand_t state;
     arb_ptr dist, dist0;
-    acb_ptr t;
-    slong j, k;
+    acb_mat_t tau_mid;
+    acb_ptr t, z_mid;
+    arb_ptr err;
+    slong j, k, nbz, nbt;
+    int has_z = !_acb_vec_is_zero(z, g);
+    int has_t = 0;
     int res;
 
     flint_randinit(state);
     dist = _arb_vec_init(n);
     dist0 = _arb_vec_init(n);
+    acb_mat_init(tau_mid, g, g);
     t = _acb_vec_init(g);
+    z_mid = _acb_vec_init(g);
+    err = _arb_vec_init(n * n);
 
     acb_theta_dist_a0(dist, z, tau, lp);
     acb_theta_dist_a0(dist0, t, tau, lp);
 
-    res = acb_theta_ql_all_with_t(th, t, z, dist0, dist, tau, guard, prec);
+    /* Get midpoints; ql_all_with_t is expected to lose guard+g bits of precision */
+    for (j = 0; j < g; j++)
+    {
+        for (k = j; k < g; k++)
+        {
+            acb_get_mid(acb_mat_entry(tau_mid, j, k), acb_mat_entry(tau, j, k));
+            acb_set(acb_mat_entry(tau_mid, k, j), acb_mat_entry(tau_mid, j, k));
+        }
+        acb_get_mid(&z_mid[j], &z[j]);
+    }
+
+    res = acb_theta_ql_all_with_t(th, t, z_mid, dist0, dist, tau_mid,
+        guard, prec + guard + g);
 
     for (j = 0; (j < ACB_THETA_QL_TRY) && !res; j++)
     {
         for (k = 0; k < g; k++)
         {
             arb_urandom(acb_realref(&t[k]), state, prec);
+            mag_zero(arb_radref(acb_realref(&t[k])));
         }
+        has_t = !_acb_vec_is_zero(t, g);
         _acb_vec_scalar_mul_2exp_si(t, t, g, 1);
-        res = acb_theta_ql_all_with_t(th, t, z, dist0, dist, tau, guard, prec);
+        res = acb_theta_ql_all_with_t(th, t, z_mid, dist0, dist, tau_mid,
+            guard, prec + guard + g);
         guard += ACB_THETA_LOW_PREC;
     }
     if (!res)
@@ -146,10 +168,34 @@ acb_theta_ql_all_red(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
         _acb_vec_indeterminate(th, n * n);
     }
 
+    /* Add error */
+    nbz = (has_z ? 2 : 1);
+    nbt = (has_t ? 3 : 1);
+    for (k = 0; (k < nbz * nbt) && res; k++)
+    {
+        _acb_vec_zero(z_mid, g);
+        if (has_t)
+        {
+            _acb_vec_scalar_mul_ui(z_mid, t, g, k % 3, prec);
+        }
+        if (has_z && (k >= nbt))
+        {
+            _acb_vec_add(z_mid, z_mid, z, g, prec);
+        }
+        acb_theta_jet_error_bounds(err, z_mid, tau, 0, ACB_THETA_LOW_PREC);
+        for (j = 0; j < n * n; j++)
+        {
+            acb_add_error_arb(&th[j], &err[j]);
+        }
+    }
+
     flint_randclear(state);
     _arb_vec_clear(dist, n);
     _arb_vec_clear(dist0, n);
+    acb_mat_clear(tau_mid);
     _acb_vec_clear(t, g);
+    _acb_vec_clear(z_mid, g);
+    _arb_vec_clear(err, n * n);
 }
 
 void

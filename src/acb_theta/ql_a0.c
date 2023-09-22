@@ -78,7 +78,7 @@ acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
     }
 
     res = acb_theta_ql_a0_steps(r, t_mid, z_mid, dist0, dist, tau_mid, nb_steps,
-        split, guard, prec + nb_steps * (guard/ACB_THETA_LOW_PREC + g), &acb_theta_ql_a0);
+        split, guard, prec + nb_steps * (guard/16 + g), &acb_theta_ql_a0);
 
     /* Add error */
     for (k = 0; (k < nbz * nbt) && res; k++)
