@@ -23,7 +23,7 @@ acb_theta_ql_split(const arb_mat_t cho)
     for (k = g - 1; k >= 1; k--)
     {
         arb_mul_2exp_si(cmp, arb_mat_entry(cho, k - 1, k - 1),
-            ACB_THETA_QL_SPLIT);
+            FLINT_MAX(1, 6 + k - 2 * g));
         if (arb_lt(cmp, arb_mat_entry(cho, k, k)))
         {
             break;
@@ -45,10 +45,11 @@ acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
     slong nbt = (has_t ? 3 : 1);
     slong nbz = (has_z ? 2 : 1);
     arb_mat_t cho;
-    slong split, nb_steps;
+    slong split, nb_steps, padding;
     acb_mat_t tau_mid;
     acb_ptr t_mid, z_mid;
     arb_ptr err;
+    arf_t e;
     slong k, j;
     int res;
 
@@ -57,10 +58,14 @@ acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
     t_mid = _acb_vec_init(g);
     z_mid = _acb_vec_init(g);
     err = _arb_vec_init(n * n);
+    arf_init(e);
 
     acb_theta_eld_cho(cho, tau, ACB_THETA_LOW_PREC);
     split = acb_theta_ql_split(cho);
     nb_steps = acb_theta_ql_nb_steps(cho, split, prec);
+    padding = nb_steps * (guard + g);
+    arf_one(e);
+    arf_mul_2exp_si(e, e, -prec - padding);
 
     /* Expect precision loss of (guard + g) * nb_steps, so call ql_a0_steps at midpoint */
     acb_mat_get_mid(tau_mid, tau);
@@ -68,6 +73,7 @@ acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
     {
         for (j = 0; j <= k; j++)
         {
+            acb_add_error_arf(acb_mat_entry(tau_mid, k, j), e);
             acb_set(acb_mat_entry(tau_mid, j, k), acb_mat_entry(tau_mid, k, j));
         }
     }
@@ -75,10 +81,18 @@ acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
     {
         acb_get_mid(&z_mid[k], &z[k]);
         acb_get_mid(&t_mid[k], &t[k]);
+        if (has_z)
+        {
+            acb_add_error_arf(&z_mid[k], e);
+        }
+        if (has_t)
+        {
+            arb_add_error_arf(acb_realref(&t_mid[k]), e);
+        }
     }
 
     res = acb_theta_ql_a0_steps(r, t_mid, z_mid, dist0, dist, tau_mid, nb_steps,
-        split, guard, prec + nb_steps * (guard/16 + g), &acb_theta_ql_a0);
+        split, guard, prec + padding, &acb_theta_ql_a0);
 
     /* Add error */
     for (k = 0; (k < nbz * nbt) && res; k++)
@@ -93,7 +107,7 @@ acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
         {
             _acb_vec_add(z_mid, z_mid, z, g, prec);
         }
-        acb_theta_jet_error_bounds(err, z_mid, tau, 0, ACB_THETA_LOW_PREC);
+        acb_theta_jet_error_bounds(err, z_mid, tau, 0, ACB_THETA_LOW_PREC/2);
         for (j = 0; j < n; j++)
         {
             acb_add_error_arb(&r[k * n + j], &err[n * j]);
@@ -105,5 +119,6 @@ acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
     _acb_vec_clear(t_mid, g);
     _acb_vec_clear(z_mid, g);
     _arb_vec_clear(err, n * n);
+    arf_clear(e);
     return res;
 }

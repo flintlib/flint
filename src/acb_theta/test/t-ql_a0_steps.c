@@ -57,7 +57,7 @@ int main(void)
             for (j = d; j < g; j++)
             {
                 acb_mul_2exp_si(acb_mat_entry(tau, j, k),
-                    acb_mat_entry(tau, j, k), 2 * ACB_THETA_QL_SPLIT + 1);
+                    acb_mat_entry(tau, j, k), 6);
             }
         }
         for (k = 0; k < g; k++)

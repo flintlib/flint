@@ -225,7 +225,7 @@ acb_theta_ql_a0_split(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
 
     if (split <= 0 || split >= g)
     {
-        flint_printf("ql_a0_split: Error (must have 1 < split < g - 1)\n");
+        flint_printf("ql_a0_split: Error (must have 1 < split < g)\n");
         flint_abort();
     }
 

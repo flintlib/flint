@@ -221,7 +221,6 @@ void acb_theta_agm_rel_mag_err(arf_t m, arf_t eps, acb_srcptr a,
 void acb_theta_agm_mul_tight(acb_ptr r, acb_srcptr a0, acb_srcptr a,
     arb_srcptr d0, arb_srcptr d, slong g, slong prec);
 
-#define ACB_THETA_QL_SPLIT 2
 #define ACB_THETA_QL_TRY 100
 
 slong acb_theta_ql_nb_steps(const arb_mat_t cho, slong d, slong prec);

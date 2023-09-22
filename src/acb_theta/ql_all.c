@@ -120,6 +120,7 @@ acb_theta_ql_all_red(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
     acb_mat_t tau_mid;
     acb_ptr t, z_mid;
     arb_ptr err;
+    arf_t e;
     slong j, k, nbz, nbt;
     int has_z = !_acb_vec_is_zero(z, g);
     int has_t = 0;
@@ -132,19 +133,27 @@ acb_theta_ql_all_red(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
     t = _acb_vec_init(g);
     z_mid = _acb_vec_init(g);
     err = _arb_vec_init(n * n);
+    arf_init(e);
 
     acb_theta_dist_a0(dist, z, tau, lp);
     acb_theta_dist_a0(dist0, t, tau, lp);
 
     /* Get midpoints; ql_all_with_t is expected to lose guard+g bits of precision */
+    arf_one(e);
+    arf_mul_2exp_si(e, e, -prec - guard - g);
     for (j = 0; j < g; j++)
     {
         for (k = j; k < g; k++)
         {
             acb_get_mid(acb_mat_entry(tau_mid, j, k), acb_mat_entry(tau, j, k));
+            acb_add_error_arf(acb_mat_entry(tau_mid, j, k), e);
             acb_set(acb_mat_entry(tau_mid, k, j), acb_mat_entry(tau_mid, j, k));
         }
         acb_get_mid(&z_mid[j], &z[j]);
+        if (has_z)
+        {
+            acb_add_error_arf(&z_mid[j], e);
+        }
     }
 
     res = acb_theta_ql_all_with_t(th, t, z_mid, dist0, dist, tau_mid,
@@ -154,8 +163,7 @@ acb_theta_ql_all_red(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
     {
         for (k = 0; k < g; k++)
         {
-            arb_urandom(acb_realref(&t[k]), state, prec);
-            mag_zero(arb_radref(acb_realref(&t[k])));
+            arb_urandom(acb_realref(&t[k]), state, prec + guard + g);
         }
         has_t = !_acb_vec_is_zero(t, g);
         _acb_vec_scalar_mul_2exp_si(t, t, g, 1);
@@ -196,6 +204,7 @@ acb_theta_ql_all_red(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
     _acb_vec_clear(t, g);
     _acb_vec_clear(z_mid, g);
     _arb_vec_clear(err, n * n);
+    arf_clear(e);
 }
 
 void
