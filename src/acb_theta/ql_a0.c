@@ -45,11 +45,10 @@ acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
     slong nbt = (has_t ? 3 : 1);
     slong nbz = (has_z ? 2 : 1);
     arb_mat_t cho;
-    slong split, nb_steps, tot_nb_steps;
+    slong split, nb_steps;
     acb_mat_t tau_mid;
     acb_ptr t_mid, z_mid;
-    arb_t c, rho;
-    arf_t rad, u;
+    arb_ptr err;
     slong k, j;
     int res;
 
@@ -57,19 +56,21 @@ acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
     acb_mat_init(tau_mid, g, g);
     t_mid = _acb_vec_init(g);
     z_mid = _acb_vec_init(g);
-    arb_init(c);
-    arb_init(rho);
-    arf_init(rad);
-    arf_init(u);
+    err = _arb_vec_init(n * n);
 
     acb_theta_eld_cho(cho, tau, ACB_THETA_LOW_PREC);
     split = acb_theta_ql_split(cho);
     nb_steps = acb_theta_ql_nb_steps(cho, split, prec);
-    tot_nb_steps = acb_theta_ql_nb_steps(cho, 0, prec);
 
-    /* We expect a precision loss of (guard + g) * nb_steps bits: ask for
-       ql_a0_steps at midpoint, then add error bound */
+    /* Expect precision loss of (guard + g) * nb_steps, so call ql_a0_steps at midpoint */
     acb_mat_get_mid(tau_mid, tau);
+    for (k = 0; k < g; k++)
+    {
+        for (j = 0; j <= k; j++)
+        {
+            acb_set(acb_mat_entry(tau_mid, j, k), acb_mat_entry(tau_mid, k, j));
+        }
+    }
     for (k = 0; k < g; k++)
     {
         acb_get_mid(&z_mid[k], &z[k]);
@@ -77,37 +78,25 @@ acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
     }
 
     res = acb_theta_ql_a0_steps(r, t_mid, z_mid, dist0, dist, tau_mid, nb_steps,
-        split, guard, prec + tot_nb_steps * (guard/ACB_THETA_LOW_PREC + g), &acb_theta_ql_a0);
+        split, guard, prec + nb_steps * (guard/ACB_THETA_LOW_PREC + g), &acb_theta_ql_a0);
 
     /* Add error */
-    acb_theta_jet_bounds_2(c, rho, z, tau, prec);
-    arf_zero(rad);
-    for (k = 0; k < g; k++)
+    for (k = 0; (k < nbz * nbt) && res; k++)
     {
-        for (j = 0; j < g; j++)
+        _acb_vec_zero(z_mid, g);
+        if (has_t)
         {
-            acb_get_rad_ubound_arf(u, acb_mat_entry(tau, k, j), prec);
-            arf_max(rad, rad, u);
+            _acb_vec_scalar_mul_ui(t_mid, t, g, k % 3, prec);
+            _acb_vec_add(z_mid, z_mid, t_mid, g, prec);
         }
-        acb_get_rad_ubound_arf(u, &z[k], prec);
-        arf_max(rad, rad, u);
-    }
-    arb_sub_arf(rho, rho, rad, prec);
-    if (!arb_is_positive(rho))
-    {
-        for (k = 0; k < n * nbt * nbz; k++)
+        if (has_z && (k >= nbt))
         {
-            acb_indeterminate(&r[k]);
+            _acb_vec_add(z_mid, z_mid, z, g, prec);
         }
-    }
-    else
-    {
-        arb_div(c, c, rho, prec);
-        arb_mul_arf(c, c, rad, prec);
-        arb_mul_si(c, c, g + (g * (g + 1))/2, prec);
-        for (k = 0; k < n * nbt * nbz; k++)
+        acb_theta_jet_error_bounds(err, z_mid, tau, 0, ACB_THETA_LOW_PREC);
+        for (j = 0; j < n; j++)
         {
-            acb_add_error_arb(&r[k], c);
+            acb_add_error_arb(&r[k * n + j], &err[n * j]);
         }
     }
 
@@ -115,9 +104,6 @@ acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
     acb_mat_clear(tau_mid);
     _acb_vec_clear(t_mid, g);
     _acb_vec_clear(z_mid, g);
-    arb_clear(c);
-    arb_clear(rho);
-    arf_clear(rad);
-    arf_clear(u);
+    _arb_vec_clear(err, n * n);
     return res;
 }

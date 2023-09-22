@@ -257,7 +257,7 @@ acb_theta_ql_a0_split(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
         {
             res = acb_theta_ql_a0_split_term(r, pts + k * (g - split), a, t, z,
                 offset, dist, new_dist0, tau0, star, tau1, cho1, guard,
-                prec, fullprec,worker);
+                prec, fullprec, worker);
         }
 
         /* Add error */

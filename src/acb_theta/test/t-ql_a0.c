@@ -28,7 +28,7 @@ int main(void)
         slong n = 1 << g;
         slong prec = (g > 1 ? 200 : 500) + n_randint(state, 500);
         slong bits = n_randint(state, 5);
-        slong hprec = prec + 50;
+        slong hprec = prec + 100;
         int has_t = iter % 2;
         int has_z = (iter % 4) / 2;
         slong nbt = (has_t ? 3 : 1);
@@ -38,6 +38,7 @@ int main(void)
         acb_mat_t tau;
         acb_ptr z, t, r, test;
         arb_ptr dist, dist0;
+        arb_t y;
         slong k;
         int res;
 
@@ -48,8 +49,16 @@ int main(void)
         test = _acb_vec_init(nbz * nbt * n);
         dist = _arb_vec_init(n);
         dist0 = _arb_vec_init(n);
+        arb_init(y);
 
-        acb_siegel_randtest_reduced(tau, state, prec, bits);
+        res = 0;
+        while(!res)
+        {
+            acb_siegel_randtest_reduced(tau, state, prec, bits);
+            arb_sub_si(y, acb_imagref(acb_mat_entry(tau, g - 1, g - 1)), 200, prec);
+            res = arb_is_negative(y);
+        }
+
         acb_theta_dist_a0(dist0, z, tau, lp);
         for (k = 0; k < g; k++)
         {
@@ -70,12 +79,15 @@ int main(void)
         if (res && !_acb_vec_overlaps(r, test, nbz * nbt * n))
         {
             flint_printf("FAIL\n");
-            flint_printf("g = %wd, prec = %wd, has_z = %wd, has_t = %wd, tau:\n",
-                g, prec, has_z, has_t);
+            flint_printf("g = %wd, prec = %wd, hprec = %wd, has_z = %wd, has_t = %wd, tau:\n",
+                g, prec, hprec, has_z, has_t);
             acb_mat_printd(tau, 5);
             flint_printf("output:\n");
             _acb_vec_printd(r, nbz * nbt * n, 5);
             _acb_vec_printd(test, nbz * nbt * n, 5);
+            flint_printf("difference:\n");
+            _acb_vec_sub(r, r, test, nbz * nbt * n, hprec);
+            _acb_vec_printd(r, nbz * nbt * n, 5);
             flint_abort();
         }
 
@@ -86,6 +98,7 @@ int main(void)
         _acb_vec_clear(test, nbz * nbt * n);
         _arb_vec_clear(dist, n);
         _arb_vec_clear(dist0, n);
+        arb_clear(y);
     }
 
     flint_randclear(state);

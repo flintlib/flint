@@ -71,7 +71,7 @@ void acb_theta_jet_error_bounds(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
             for (j = 0; j < nb; j++)
             {
                 arb_zero(&err[a * nb_tot + ind + j]);
-               /* Add error corresponding to entries of tau */
+                /* Add error corresponding to entries of tau */
                 for (l = 0; l < g; l++)
                 {
                     for (m = l; m < g; m++)
