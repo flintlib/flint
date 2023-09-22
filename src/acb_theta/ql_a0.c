@@ -77,7 +77,7 @@ acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
     }
 
     res = acb_theta_ql_a0_steps(r, t_mid, z_mid, dist0, dist, tau_mid, nb_steps,
-        split, guard, prec + tot_nb_steps * (guard + g), &acb_theta_ql_a0);
+        split, guard, prec + tot_nb_steps * (guard/ACB_THETA_LOW_PREC + g), &acb_theta_ql_a0);
 
     /* Add error */
     acb_theta_jet_bounds_2(c, rho, z, tau, prec);

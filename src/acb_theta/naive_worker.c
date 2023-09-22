@@ -14,7 +14,7 @@
 ACB_INLINE slong
 acb_theta_naive_newprec(slong prec, slong coord, slong dist, slong max_dist, slong ord)
 {
-    double r = ((double) dist) / (max_dist + 2);
+    double r = ((double) FLINT_MAX(0, dist - 1)) / (max_dist + 2);
     double neg = r * r * prec;
     double pos = ord * n_clog(1 + FLINT_ABS(coord), 2);
 

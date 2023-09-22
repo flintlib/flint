@@ -159,7 +159,6 @@ acb_theta_ql_a0_steps(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
             acb_theta_ql_a0_step(r, roots, dist0, dist, k, nb_steps, has_t, has_z, g, prec);
         }
     }
-
     if (res && has_z)
     {
         acb_neg(c, f);
