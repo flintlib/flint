@@ -190,6 +190,22 @@ void acb_theta_naive_fixed_a(acb_ptr th, ulong a, acb_srcptr z, slong nb_z,
 void acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z,
     const acb_mat_t tau, slong prec);
 
+/* Naive algorithms for derivatives */
+
+slong acb_theta_jet_nb(slong ord, slong g);
+void acb_theta_jet_orders(slong* orders, slong ord, slong g);
+slong acb_theta_jet_index(const slong* orders, slong g);
+
+void acb_theta_jet_naive_radius(arf_t R2, arf_t eps, arb_srcptr offset,
+    const arb_mat_t cho, slong ord, slong prec);
+void acb_theta_jet_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z,
+    const acb_mat_t tau, slong ord, slong prec);
+void acb_theta_jet_naive_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
+    slong ord, slong prec);
+
+void acb_theta_jet_error_bounds(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
+    slong ord, slong prec);
+
 /* Quasi-linear algorithms on the reduced domain */
 
 void acb_theta_dist_pt(arb_t d2, arb_srcptr v, const arb_mat_t cho, slong* pt, slong prec);
@@ -207,7 +223,6 @@ void acb_theta_agm_mul_tight(acb_ptr r, acb_srcptr a0, acb_srcptr a,
 
 #define ACB_THETA_QL_SPLIT 2
 #define ACB_THETA_QL_TRY 100
-/* See also acb_theta_ql_nb_steps for more tuning */
 
 slong acb_theta_ql_nb_steps(const arb_mat_t cho, slong d, slong prec);
 void acb_theta_ql_log_rescale(acb_t f, acb_srcptr z, const acb_mat_t tau, slong prec);
@@ -219,9 +234,6 @@ void acb_theta_ql_step_3(acb_ptr r, acb_srcptr th0, acb_srcptr th,
     acb_srcptr roots, arb_srcptr dist0, arb_srcptr dist, slong g, slong prec);
 void acb_theta_ql_dupl(acb_ptr th2, acb_srcptr th0, acb_srcptr th,
     arb_srcptr dist0, arb_srcptr dist, slong g, slong prec);
-
-/* Use as worker(r, t, z, dist0, dist, tau, guard, prec). Computes theta_{a,0}
-   at 0, t, 2t, z, z + t, z + 2t (less values if z = 0 or t = 0 or both) */
 
 typedef int (*acb_theta_ql_worker_t)(acb_ptr, acb_srcptr, acb_srcptr,
     arb_srcptr, arb_srcptr, const acb_mat_t, slong, slong);
@@ -254,18 +266,7 @@ void acb_theta_transform(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th,
 
 void acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec);
 
-/* Derivatives/jets */
-
-slong acb_theta_jet_nb(slong ord, slong g);
-void acb_theta_jet_orders(slong* orders, slong ord, slong g);
-slong acb_theta_jet_index(const slong* orders, slong g);
-
-void acb_theta_jet_naive_radius(arf_t R2, arf_t eps, arb_srcptr offset,
-    const arb_mat_t cho, slong ord, slong prec);
-void acb_theta_jet_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z,
-    const acb_mat_t tau, slong ord, slong prec);
-void acb_theta_jet_naive_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
-    slong ord, slong prec);
+/* Quasi-linear algorithms for derivatives */
 
 void acb_theta_jet_bounds_1(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau,
     slong ord, slong prec);
