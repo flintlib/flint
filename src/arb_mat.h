@@ -451,8 +451,6 @@ arb_mat_allocated_bytes(const arb_mat_t x)
 
 /* Quadratic forms */
 
-void arb_mat_spd_radius(arf_t r, const arb_mat_t A, slong prec);
-
 void arb_mat_spd_lll_reduce(fmpz_mat_t U, const arb_mat_t A, slong prec);
 
 void arb_mat_bilinear_form(arb_t x, const arb_mat_t A, arb_srcptr v1, arb_srcptr v2, slong prec);

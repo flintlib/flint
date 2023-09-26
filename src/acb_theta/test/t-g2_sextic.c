@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("g2_fundamental_covariant....");
+    flint_printf("g2_sextic....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -44,7 +44,7 @@ int main(void)
 
         acb_theta_jet_all(dth, z, tau, 1, prec);
         acb_theta_g2_chi6m2(test, dth, prec);
-        acb_theta_g2_fundamental_covariant(chi, tau, prec);
+        acb_theta_g2_sextic(chi, tau, prec);
 
         if (!acb_poly_overlaps(chi, test))
         {

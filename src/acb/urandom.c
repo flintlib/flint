@@ -19,7 +19,7 @@ acb_urandom(acb_t z, flint_rand_t state, slong prec)
     int done = 0;
 
     arb_init(abs);
-    
+
     while (!done)
     {
         arb_urandom(acb_realref(z), state, prec);
@@ -32,6 +32,6 @@ acb_urandom(acb_t z, flint_rand_t state, slong prec)
 
     k = n_randint(state, 4);
     acb_mul_powi(z, z, k);
-    
+
     arb_clear(abs);
 }

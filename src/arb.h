@@ -353,8 +353,6 @@ int arb_get_unique_fmpz(fmpz_t z, const arb_t x);
 
 void arb_get_fmpz_mid_rad_10exp(fmpz_t mid, fmpz_t rad, fmpz_t exp, const arb_t x, slong n);
 
-int arb_get_approx_fmpq(fmpq_t y, const arb_t x, slong prec);
-
 void arb_floor(arb_t z, const arb_t x, slong prec);
 void arb_ceil(arb_t z, const arb_t x, slong prec);
 void arb_nint(arb_t res, const arb_t x, slong prec);

@@ -20,7 +20,6 @@
 
 #include "arb.h"
 #include "acb_types.h"
-#include "fmpz_mpoly.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -270,8 +269,6 @@ acb_set_round_fmpz(acb_t z, const fmpz_t y, slong prec)
 int acb_contains_int(const acb_t x);
 
 int acb_get_unique_fmpz(fmpz_t z, const acb_t x);
-
-int acb_get_approx_fmpq(fmpq_t y, const acb_t x, slong prec);
 
 ACB_INLINE void
 acb_set_fmpq(acb_t z, const fmpq_t c, slong prec)
@@ -1216,10 +1213,6 @@ void _acb_vec_sort_pretty(acb_ptr vec, slong len);
 /* roots of unity */
 void acb_unit_root(acb_t res, ulong order, slong prec);
 void _acb_vec_unit_roots(acb_ptr z, slong order, slong len, slong prec);
-
-/* evaluate multivariate polynomials */
-void acb_eval_fmpz_mpoly(acb_t res, const fmpz_mpoly_t pol, acb_srcptr val,
-    const fmpz_mpoly_ctx_t ctx, slong prec);
 
 ACB_INLINE slong
 acb_allocated_bytes(const acb_t x)

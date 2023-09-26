@@ -18,7 +18,7 @@ acb_mat_vector_mul_row(acb_ptr res, acb_srcptr row, const acb_mat_t A, slong pre
     slong ncol = acb_mat_ncols(A);
     acb_mat_t r, p;
     slong k;
-    
+
     acb_mat_init(r, 1, nrow);
     acb_mat_init(p, 1, ncol);
 
@@ -38,12 +38,12 @@ acb_mat_vector_mul_row(acb_ptr res, acb_srcptr row, const acb_mat_t A, slong pre
 
 void
 acb_mat_vector_mul_col(acb_ptr res, const acb_mat_t A, acb_srcptr col, slong prec)
-{    
+{
     slong nrow = acb_mat_nrows(A);
     slong ncol = acb_mat_ncols(A);
     acb_mat_t c, p;
     slong k;
-    
+
     acb_mat_init(c, ncol, 1);
     acb_mat_init(p, nrow, 1);
 

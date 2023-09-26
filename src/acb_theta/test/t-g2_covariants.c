@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("g2_basic_covariants....");
+    flint_printf("g2_covariants....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -53,8 +53,8 @@ int main(void)
         acb_theta_all(th2, z, tau, 1, prec);
         acb_theta_g2_psi4(psi4, th2, prec);
 
-        acb_theta_g2_fundamental_covariant(u, tau, prec);
-        acb_theta_g2_basic_covariants(r, u, prec);
+        acb_theta_g2_sextic(u, tau, prec);
+        acb_theta_g2_covariants(r, u, prec);
         acb_poly_set_si(u, -3);
         acb_poly_mul(u, u, &r[8], prec);
         acb_poly_mul(v, &r[1], &r[1], prec);

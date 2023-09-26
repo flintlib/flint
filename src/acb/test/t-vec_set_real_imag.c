@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("set_real_imag....");
+    flint_printf("vec_set_real_imag....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -58,7 +58,7 @@ int main(void)
         _acb_vec_clear(z, len);
         _acb_vec_clear(t, len);
     }
-    
+
     flint_randclear(state);
     flint_cleanup();
     flint_printf("PASS\n");

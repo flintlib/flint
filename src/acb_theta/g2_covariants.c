@@ -12,7 +12,6 @@
 #include "acb_theta.h"
 
 /* Ordering is:
-
    [0, 'Co16'], [1, 'Co20'], [2, 'Co24'], [3, 'Co28'], [4, 'Co32'], [5,
    'Co36'], [6, 'Co38'], [7, 'Co312'], [8, 'Co40'], [9, 'Co44'], [10, 'Co46'],
    [11, 'Co410'], [12, 'Co52'], [13, 'Co54'], [14, 'Co58'], [15, 'Co60'], [16,
@@ -20,7 +19,7 @@
    'Co94'], [22, 'Co100'], [23, 'Co102'], [24, 'Co122'], [25, 'Co150'] */
 
 static void
-acb_theta_g2_basic_transvectants(acb_poly_struct* res, const acb_poly_t r, slong prec)
+acb_theta_g2_transvectants(acb_poly_struct* res, const acb_poly_t r, slong prec)
 {
     acb_poly_t s;
 
@@ -79,10 +78,10 @@ acb_theta_g2_basic_transvectants(acb_poly_struct* res, const acb_poly_t r, slong
    'Co94'], [22, 'Co100'], [23, 'Co102'], [24, 'Co122'], [25, 'Co150'] */
 
 void
-acb_theta_g2_basic_covariants(acb_poly_struct* res, const acb_poly_t r, slong prec)
+acb_theta_g2_covariants(acb_poly_struct* res, const acb_poly_t r, slong prec)
 {
     acb_t c;
-    slong cofactors[ACB_THETA_G2_BASIC_NB] = {1, 60, 75, 90, 2250, 2250, 450,
+    slong cofactors[ACB_THETA_G2_COV_NB] = {1, 60, 75, 90, 2250, 2250, 450,
         540, 11250, 67500, 13500, 13500, 168750, 67500, 405000, 10125000,
         2025000, 2700000, 151875000, 60750000, 15187500, 9112500000,
         227812500000, 13668750000, 8201250000000, 384433593750};
@@ -90,8 +89,8 @@ acb_theta_g2_basic_covariants(acb_poly_struct* res, const acb_poly_t r, slong pr
 
     acb_init(c);
 
-    acb_theta_g2_basic_transvectants(res, r, prec);
-    for (k = 0; k < ACB_THETA_G2_BASIC_NB; k++)
+    acb_theta_g2_transvectants(res, r, prec);
+    for (k = 0; k < ACB_THETA_G2_COV_NB; k++)
     {
         acb_set_si(c, cofactors[k]);
         acb_poly_scalar_mul(&res[k], &res[k], c, prec);
@@ -99,75 +98,3 @@ acb_theta_g2_basic_covariants(acb_poly_struct* res, const acb_poly_t r, slong pr
 
     acb_clear(c);
 }
-
-/* Old code that can be removed along with g2_basic_covariants.in */
-
-/* static char* g2_covariants_str[] = { */
-/* #include "acb_theta/g2_basic_covariants.in" */
-/* }; */
-
-/* static void */
-/* g2_basic_covariant_eval(acb_poly_t r, const fmpz_mpoly_t cov, */
-/*     acb_srcptr chi, const fmpz_mpoly_ctx_t ctx, slong prec) */
-/* { */
-/*     slong d = fmpz_mpoly_degree_si(cov, 7, ctx); */
-/*     acb_ptr val; */
-/*     fmpz_mpoly_univar_t u; */
-/*     fmpz_mpoly_t coef; */
-/*     acb_t c; */
-/*     slong k; */
-
-/*     val = _acb_vec_init(9); */
-/*     fmpz_mpoly_univar_init(u, ctx); */
-/*     fmpz_mpoly_init(coef, ctx); */
-/*     acb_init(c); */
-
-/*     _acb_vec_set(val, chi, 7); */
-/*     acb_one(&val[7]); */
-/*     acb_one(&val[8]); */
-/*     fmpz_mpoly_to_univar(u, cov, 8, ctx); */
-/*     acb_poly_zero(r); */
-
-/*     for (k = 0; k <= d; k++) */
-/*     { */
-/*         fmpz_mpoly_univar_get_term_coeff(coef, u, k, ctx); */
-/*         acb_eval_fmpz_mpoly(c, coef, val, ctx, prec); */
-/*         acb_poly_set_coeff_acb(r, k, c); */
-/*     } */
-
-/*     _acb_vec_clear(val, 9); */
-/*     fmpz_mpoly_univar_clear(u, ctx); */
-/*     fmpz_mpoly_clear(coef, ctx); */
-/*     acb_clear(c); */
-/* } */
-
-/* void */
-/* acb_theta_g2_basic_covariants_old(acb_poly_struct* cov, const acb_poly_t r, slong prec) */
-/* { */
-/*     slong nb = ACB_THETA_G2_BASIC_NB; */
-/*     char* vars[9] = {"a0", "a1", "a2", "a3", "a4", "a5", "a6", "x", "y"}; */
-/*     fmpz_mpoly_ctx_t ctx; */
-/*     fmpz_mpoly_t pol; */
-/*     acb_ptr chi; */
-/*     slong k; */
-
-/*     fmpz_mpoly_ctx_init(ctx, 9, ORD_LEX); */
-/*     fmpz_mpoly_init(pol, ctx); */
-/*     chi = _acb_vec_init(7); */
-
-/*     for (k = 0; k <= 6; k++) */
-/*     { */
-/*         acb_poly_get_coeff_acb(&chi[k], r, 6 - k); */
-/*     } */
-
-/*     for (k = 0; k < nb; k++) */
-/*     { */
-/*         fmpz_mpoly_set_str_pretty(pol, g2_covariants_str[k], (const char**) vars, ctx); */
-/*         g2_basic_covariant_eval(&cov[k], pol, chi, ctx, prec); */
-/*     } */
-
-/*     fmpz_mpoly_clear(pol, ctx); */
-/*     fmpz_mpoly_ctx_clear(ctx); */
-/*     _acb_vec_clear(chi, 7); */
-/* } */
-

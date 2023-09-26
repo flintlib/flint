@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 #include "profiler.h"
 
-void acb_theta_g2_fundamental_covariant(acb_poly_t r, const acb_mat_t tau, slong prec)
+void acb_theta_g2_sextic(acb_poly_t r, const acb_mat_t tau, slong prec)
 {
     slong g = 2;
     slong n2 = 1 << (2 * g);

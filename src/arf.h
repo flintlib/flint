@@ -1124,8 +1124,6 @@ arf_mag_set_ulp(mag_t z, const arf_t y, slong prec)
 
 void arf_get_fmpq(fmpq_t y, const arf_t x);
 
-int arf_get_approx_fmpq(fmpq_t y, const arf_t x, slong prec);
-
 ARF_INLINE int
 arf_set_fmpq(arf_t y, const fmpq_t x, slong prec, arf_rnd_t rnd)
 {

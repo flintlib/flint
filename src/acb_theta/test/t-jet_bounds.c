@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("jet_bounds_2....");
+    flint_printf("jet_bounds....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -27,18 +27,18 @@ int main(void)
         slong lp = ACB_THETA_LOW_PREC;
         slong prec = lp + 100;
         slong bits = n_randint(state, 4);
+        slong ord = 1 + n_randint(state, 10);
         slong g = 1 + n_randint(state, 3);
         slong n2 = 1 << (2 * g);
         acb_mat_t tau;
-        acb_ptr z, th;
-        acb_t e;
+        acb_ptr z, x, th;
         arb_t c, rho, abs, t;
-        slong k, j;
+        slong k;
 
         acb_mat_init(tau, g, g);
         z = _acb_vec_init(g);
+        x = _acb_vec_init(g);
         th = _acb_vec_init(n2);
-        acb_init(e);
         arb_init(c);
         arb_init(rho);
         arb_init(abs);
@@ -51,7 +51,7 @@ int main(void)
             acb_urandom(&z[k], state, prec);
         }
 
-        acb_theta_jet_bounds_2(c, rho, z, tau, lp);
+        acb_theta_jet_bounds(c, rho, z, tau, ord, lp);
 
         if (!arb_is_finite(rho) || !arb_is_finite(c))
         {
@@ -68,18 +68,11 @@ int main(void)
 
         for (k = 0; k < g; k++)
         {
-            acb_urandom(e, state, prec);
-            acb_mul_arb(e, e, rho, prec);
-            acb_add(&z[k], &z[k], e, prec);
-            for (j = 0; j <= k; j++)
-            {
-                acb_urandom(e, state, prec);
-                acb_mul_arb(e, e, rho, prec);
-                acb_add(acb_mat_entry(tau, k, j), acb_mat_entry(tau, k, j), e, prec);
-                acb_set(acb_mat_entry(tau, j, k), acb_mat_entry(tau, k, j));
-            }
+            acb_urandom(&x[k], state, prec);
         }
-        acb_theta_naive_all(th, z, 1, tau, lp);
+        _acb_vec_scalar_mul_arb(x, x, g, rho, prec);
+        _acb_vec_add(x, x, z, g, prec);
+        acb_theta_naive_all(th, x, 1, tau, lp);
 
         arb_zero(abs);
         for (k = 0; k < n2; k++)
@@ -105,8 +98,8 @@ int main(void)
 
         acb_mat_clear(tau);
         _acb_vec_clear(z, g);
+        _acb_vec_clear(x, g);
         _acb_vec_clear(th, n2);
-        acb_clear(e);
         arb_clear(c);
         arb_clear(rho);
         arb_clear(abs);

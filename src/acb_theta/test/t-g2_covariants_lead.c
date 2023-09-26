@@ -16,18 +16,18 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("g2_basic_covariants_lead....");
+    flint_printf("g2_covariants_lead....");
     fflush(stdout);
 
     flint_randinit(state);
 
-    /* Test: agrees with g2_basic_covariants */
+    /* Test: agrees with g2_covariants */
     for (iter = 0; iter < 5 * flint_test_multiplier(); iter++)
     {
         slong prec = 200 + n_randint(state, 100);
         slong bits = 2;
-        slong nb = ACB_THETA_G2_BASIC_NB;
-        slong jlist[] = ACB_THETA_G2_BASIC_J;
+        slong nb = ACB_THETA_G2_COV_NB;
+        slong jlist[] = ACB_THETA_G2_COV_J;
         acb_poly_struct* cov;
         acb_ptr res, test;
         acb_poly_t r;
@@ -44,8 +44,8 @@ int main(void)
 
         acb_poly_randtest(r, state, 7, prec, bits);
 
-        acb_theta_g2_basic_covariants(cov, r, prec);
-        acb_theta_g2_basic_covariants_lead(res, r, prec);
+        acb_theta_g2_covariants(cov, r, prec);
+        acb_theta_g2_covariants_lead(res, r, prec);
         for (k = 0; k < nb; k++)
         {
             acb_poly_get_coeff_acb(&test[k], &cov[k], jlist[k]);

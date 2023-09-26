@@ -273,9 +273,8 @@ void acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong
 
 /* Quasi-linear algorithms for derivatives */
 
-void acb_theta_jet_bounds_1(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau,
+void acb_theta_jet_bounds(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau,
     slong ord, slong prec);
-void acb_theta_jet_bounds_2(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong prec);
 void acb_theta_jet_fd_radius(arf_t eps, arf_t err, const arb_t c, const arb_t rho,
     slong ord, slong g, slong hprec, slong prec);
 void acb_theta_jet_fourier(acb_ptr res, acb_srcptr val, slong ord, slong g, slong prec);
@@ -287,14 +286,20 @@ void acb_theta_jet_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord
 /* Genus 2 specifics */
 
 #define ACB_THETA_G2_JET_NAIVE_THRESHOLD 10000
-#define ACB_THETA_G2_BASIC_NB 26
-#define ACB_THETA_G2_BASIC_K {1,2,2,2,3,3,3,3,4,4,4,4,5,5,5,6,6,6,7,7,8,9,10,10,12,15}
-#define ACB_THETA_G2_BASIC_J {6,0,4,8,2,6,8,12,0,4,6,10,2,4,8,0,6,6,2,4,2,4,0,2,2,0}
+#define ACB_THETA_G2_COV_NB 26
+#define ACB_THETA_G2_COV_K {1,2,2,2,3,3,3,3,4,4,4,4,5,5,5,6,6,6,7,7,8,9,10,10,12,15}
+#define ACB_THETA_G2_COV_J {6,0,4,8,2,6,8,12,0,4,6,10,2,4,8,0,6,6,2,4,2,4,0,2,2,0}
 #define ACB_THETA_G2_MAX_K 15
 #define ACB_THETA_G2_NEG_EXP 3
 #define ACB_THETA_G2_MAX_J 12
 
 void acb_theta_g2_jet_naive_1(acb_ptr dth, const acb_mat_t tau, slong prec);
+void acb_theta_g2_detk_symj(acb_poly_t r, const acb_mat_t m, const acb_poly_t s,
+    slong k, slong j, slong prec);
+void acb_theta_g2_transvectant(acb_poly_t r, const acb_poly_t g, const acb_poly_t h,
+    slong m, slong n, slong k, slong prec);
+void acb_theta_g2_transvectant_lead(acb_t r, const acb_poly_t g, const acb_poly_t h,
+    slong m, slong n, slong k, slong prec);
 
 void acb_theta_g2_psi4(acb_t r, acb_srcptr th2, slong prec);
 void acb_theta_g2_psi6(acb_t r, acb_srcptr th2, slong prec);
@@ -305,28 +310,9 @@ void acb_theta_g2_chi35(acb_t r, acb_srcptr th, slong prec);
 void acb_theta_g2_chi63(acb_poly_t r, acb_srcptr dth, slong prec);
 void acb_theta_g2_chi6m2(acb_poly_t r, acb_srcptr dth, slong prec);
 
-void acb_theta_g2_subst_covariant(acb_poly_t r, const acb_poly_struct* powers,
-    const acb_poly_t s, slong j, slong prec);
-void acb_theta_g2_detk_symj(acb_poly_t r, const acb_mat_t m, const acb_poly_t s,
-    slong k, slong j, slong prec);
-void acb_theta_g2_fundamental_covariant(acb_poly_t r, const acb_mat_t tau, slong prec);
-void acb_theta_g2_transvectant(acb_poly_t r, const acb_poly_t g, const acb_poly_t h,
-    slong m, slong n, slong k, slong prec);
-void acb_theta_g2_transvectant_lead(acb_t r, const acb_poly_t g, const acb_poly_t h,
-    slong m, slong n, slong k, slong prec);
-void acb_theta_g2_basic_covariants(acb_poly_struct* cov, const acb_poly_t r, slong prec);
-void acb_theta_g2_basic_covariants_old(acb_poly_struct* cov, const acb_poly_t r, slong prec);
-void acb_theta_g2_basic_covariants_lead(acb_ptr res, const acb_poly_t r, slong prec);
-void acb_theta_g2_slash_basic_covariants(acb_poly_struct* res, const acb_mat_t c,
-    const acb_poly_struct* cov, slong prec);
-
-slong acb_theta_g2_hecke_nb(slong q);
-void acb_theta_g2_basic_covariants_hecke(acb_ptr res, const acb_mat_t tau, slong q, slong prec);
-
-void acb_theta_g2_covariant_weight(slong* k, slong* j, const fmpz_mpoly_t pol,
-    const fmpz_mpoly_ctx_t ctx);
-void acb_theta_g2_covariant(acb_poly_t r, const fmpz_mpoly_t pol,
-    const acb_poly_struct* basic, const fmpz_mpoly_ctx_t ctx, slong prec);
+void acb_theta_g2_sextic(acb_poly_t r, const acb_mat_t tau, slong prec);
+void acb_theta_g2_covariants(acb_poly_struct* cov, const acb_poly_t r, slong prec);
+void acb_theta_g2_covariants_lead(acb_ptr res, const acb_poly_t r, slong prec);
 
 #ifdef __cplusplus
 }

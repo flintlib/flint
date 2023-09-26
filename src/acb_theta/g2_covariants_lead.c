@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 static void
-acb_theta_g2_basic_transvectants(acb_ptr res, const acb_poly_t r, slong prec)
+acb_theta_g2_transvectants(acb_ptr res, const acb_poly_t r, slong prec)
 {
     acb_poly_t s, r2, r3, r4, r5, r6;
 
@@ -72,16 +72,16 @@ acb_theta_g2_basic_transvectants(acb_ptr res, const acb_poly_t r, slong prec)
 }
 
 void
-acb_theta_g2_basic_covariants_lead(acb_ptr res, const acb_poly_t r, slong prec)
+acb_theta_g2_covariants_lead(acb_ptr res, const acb_poly_t r, slong prec)
 {
-    slong cofactors[ACB_THETA_G2_BASIC_NB] = {1, 60, 75, 90, 2250, 2250, 450,
+    slong cofactors[ACB_THETA_G2_COV_NB] = {1, 60, 75, 90, 2250, 2250, 450,
         540, 11250, 67500, 13500, 13500, 168750, 67500, 405000, 10125000,
         2025000, 2700000, 151875000, 60750000, 15187500, 9112500000,
         227812500000, 13668750000, 8201250000000, 384433593750};
     slong k;
 
-    acb_theta_g2_basic_transvectants(res, r, prec);
-    for (k = 0; k < ACB_THETA_G2_BASIC_NB; k++)
+    acb_theta_g2_transvectants(res, r, prec);
+    for (k = 0; k < ACB_THETA_G2_COV_NB; k++)
     {
         acb_mul_si(&res[k], &res[k], cofactors[k], prec);
     }
