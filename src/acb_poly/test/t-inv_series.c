@@ -117,6 +117,7 @@ int main(void)
         acb_poly_clear(a);
         acb_poly_clear(b);
         acb_poly_clear(ab);
+        fmpq_poly_clear(id);
     }
 
     flint_randclear(state);

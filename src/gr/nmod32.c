@@ -281,6 +281,67 @@ nmod32_is_invertible(const nmod32_t x, const gr_ctx_t ctx)
     return (g == 1) ? T_TRUE : T_FALSE;
 }
 
+void
+_nmod32_vec_init(nmod32_struct * res, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        res[i] = 0;
+}
+
+void
+_nmod32_vec_clear(nmod32_struct * res, slong len, gr_ctx_t ctx)
+{
+}
+
+int
+_nmod32_vec_set(nmod32_struct * res, const nmod32_struct * vec, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        res[i] = vec[i];
+
+    return GR_SUCCESS;
+}
+
+int
+_nmod32_vec_neg(nmod32_struct * res, const nmod32_struct * vec, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    nmod_t mod = NMOD32_CTX(ctx);
+
+    for (i = 0; i < len; i++)
+        res[i] = nmod_neg(vec[i], mod);
+
+    return GR_SUCCESS;
+}
+
+int
+_nmod32_vec_add(nmod32_struct * res, const nmod32_struct * vec1, const nmod32_struct * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    nmod_t mod = NMOD32_CTX(ctx);
+
+    for (i = 0; i < len; i++)
+        res[i] = _nmod_add(vec1[i], vec2[i], mod);
+
+    return GR_SUCCESS;
+}
+
+int
+_nmod32_vec_sub(nmod32_struct * res, const nmod32_struct * vec1, const nmod32_struct * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    nmod_t mod = NMOD32_CTX(ctx);
+
+    for (i = 0; i < len; i++)
+        res[i] = nmod_sub(vec1[i], vec2[i], mod);
+
+    return GR_SUCCESS;
+}
+
 /* todo: overflow checks */
 int
 _nmod32_vec_dot(nmod32_t res, const nmod32_t initial, int subtract, const nmod32_struct * vec1, const nmod32_struct * vec2, slong len, gr_ctx_t ctx)
@@ -434,6 +495,12 @@ gr_method_tab_input _nmod32_methods_input[] =
     {GR_METHOD_DIV_SI,          (gr_funcptr) nmod32_div_si},
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) nmod32_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) nmod32_inv},
+    {GR_METHOD_VEC_INIT,        (gr_funcptr) _nmod32_vec_init},
+    {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _nmod32_vec_clear},
+    {GR_METHOD_VEC_SET,         (gr_funcptr) _nmod32_vec_set},
+    {GR_METHOD_VEC_NEG,         (gr_funcptr) _nmod32_vec_neg},
+    {GR_METHOD_VEC_ADD,         (gr_funcptr) _nmod32_vec_add},
+    {GR_METHOD_VEC_SUB,         (gr_funcptr) _nmod32_vec_sub},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _nmod32_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _nmod32_vec_dot_rev},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _nmod32_mat_mul},

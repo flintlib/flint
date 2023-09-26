@@ -26,7 +26,10 @@ _gr_poly_div_divconquer_recursive(gr_ptr Q, gr_ptr W,
 
     if (lenB < FLINT_MAX(2, cutoff))
     {
-        return _gr_poly_div_basecase_preinv1(Q, A, 2 * lenB - 1, B, lenB, invB, ctx);
+        if (invB == NULL)
+            return _gr_poly_div_basecase_noinv(Q, A, 2 * lenB - 1, B, lenB, ctx);
+        else
+            return _gr_poly_div_basecase_preinv1(Q, A, 2 * lenB - 1, B, lenB, invB, ctx);
     }
     else
     {
@@ -192,6 +195,14 @@ _gr_poly_div_divconquer_preinv1(gr_ptr Q, gr_srcptr A, slong lenA,
 }
 
 int
+_gr_poly_div_divconquer_noinv(gr_ptr Q, gr_srcptr A, slong lenA,
+                  gr_srcptr B, slong lenB, slong cutoff, gr_ctx_t ctx)
+{
+    return _gr_poly_div_divconquer_preinv1(Q, A, lenA, B, lenB, NULL, cutoff, ctx);
+}
+
+
+int
 _gr_poly_div_divconquer(gr_ptr Q, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, slong cutoff, gr_ctx_t ctx)
 {
     slong sz = ctx->sizeof_elem;
@@ -205,7 +216,7 @@ _gr_poly_div_divconquer(gr_ptr Q, gr_srcptr A, slong lenA, gr_srcptr B, slong le
     if (status == GR_SUCCESS)
         status = _gr_poly_div_divconquer_preinv1(Q, A, lenA, B, lenB, invB, cutoff, ctx);
     else
-        status = GR_UNABLE;
+        status = _gr_poly_div_divconquer_noinv(Q, A, lenA, B, lenB, cutoff, ctx);
 
     GR_TMP_CLEAR(invB, ctx);
 

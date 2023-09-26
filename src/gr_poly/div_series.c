@@ -19,15 +19,24 @@ _gr_poly_div_series_generic(gr_ptr Q,
     gr_srcptr A, slong Alen,
     gr_srcptr B, slong Blen, slong len, gr_ctx_t ctx)
 {
+    int status;
+
     /* todo */
     if (FLINT_MIN(Blen, len) <= DEFAULT_CUTOFF || ctx->methods[GR_METHOD_POLY_MULLOW] == (gr_funcptr) _gr_poly_mullow_generic)
     {
-        return _gr_poly_div_series_basecase(Q, A, Alen, B, Blen, len, ctx);
+        status = _gr_poly_div_series_basecase(Q, A, Alen, B, Blen, len, ctx);
     }
     else
     {
-        return _gr_poly_div_series_newton(Q, A, Alen, B, Blen, len, DEFAULT_CUTOFF, ctx);
+        status = _gr_poly_div_series_newton(Q, A, Alen, B, Blen, len, DEFAULT_CUTOFF, ctx);
+
+        /* Newton requires invertible constant term of B; basecase and divide-and-conquer
+           may yet succeed without it. */
+        if (status == GR_DOMAIN)
+            status = _gr_poly_div_series_divconquer(Q, A, Alen, B, Blen, len, DEFAULT_CUTOFF, ctx);
     }
+
+    return status;
 }
 
 int

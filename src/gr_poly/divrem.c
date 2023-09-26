@@ -13,6 +13,9 @@
 
 #include "gr_poly.h"
 
+/* todo: tuning */
+#define DIVCONQUER_CUTOFF 10
+
 /* todo: distinguish rings / fields */
 int
 _gr_poly_divrem_generic(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
@@ -24,8 +27,15 @@ _gr_poly_divrem_generic(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B
 
     status = _gr_poly_divrem_newton(Q, R, A, lenA, B, lenB, ctx);
 
-    if (status != GR_SUCCESS)
-        status = _gr_poly_divrem_basecase(Q, R, A, lenA, B, lenB, ctx);
+    /* Newton requires invertible lc(B); basecase and divide-and-conquer
+       may yet succeed without it. */
+    if (status == GR_DOMAIN)
+    {
+        if (lenB <= DIVCONQUER_CUTOFF || lenA - lenB <= DIVCONQUER_CUTOFF)
+            status = _gr_poly_divrem_basecase_noinv(Q, R, A, lenA, B, lenB, ctx);
+        else
+            status = _gr_poly_divrem_divconquer_noinv(Q, R, A, lenA, B, lenB, DIVCONQUER_CUTOFF, ctx);
+    }
 
     return status;
 }
