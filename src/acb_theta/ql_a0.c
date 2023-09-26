@@ -44,20 +44,22 @@ acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
     int has_z = !_acb_vec_is_zero(z, g);
     slong nbt = (has_t ? 3 : 1);
     slong nbz = (has_z ? 2 : 1);
+    slong nb_der = acb_theta_jet_nb(2, g);
     arb_mat_t cho;
-    slong split, nb_steps, padding;
+    slong split, nb_steps, padding, lp;
     acb_mat_t tau_mid;
-    acb_ptr t_mid, z_mid;
-    arb_ptr err;
+    acb_ptr t_mid, z_mid, dth;
+    arb_t err;
     arf_t e;
-    slong k, j;
+    slong k, j, a;
     int res;
 
     arb_mat_init(cho, g, g);
     acb_mat_init(tau_mid, g, g);
     t_mid = _acb_vec_init(g);
     z_mid = _acb_vec_init(g);
-    err = _arb_vec_init(n * n);
+    dth = _acb_vec_init(nb_der);
+    arb_init(err);
     arf_init(e);
 
     acb_theta_eld_cho(cho, tau, ACB_THETA_LOW_PREC);
@@ -94,7 +96,7 @@ acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
     res = acb_theta_ql_a0_steps(r, t_mid, z_mid, dist0, dist, tau_mid, nb_steps,
         split, guard, prec + padding, &acb_theta_ql_a0);
 
-    /* Add error */
+    /* Add error, using z_mid as temp */
     for (k = 0; (k < nbz * nbt) && res; k++)
     {
         _acb_vec_zero(z_mid, g);
@@ -107,10 +109,19 @@ acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
         {
             _acb_vec_add(z_mid, z_mid, z, g, prec);
         }
-        acb_theta_jet_error_bounds(err, z_mid, tau, 0, ACB_THETA_LOW_PREC/2);
-        for (j = 0; j < n; j++)
+        for (a = 0; a < n; a++)
         {
-            acb_add_error_arb(&r[k * n + j], &err[n * j]);
+            if (has_z && (k >= nbt))
+            {
+                lp = FLINT_MAX(ACB_THETA_LOW_PREC, acb_theta_dist_addprec(&dist[a]));
+            }
+            else
+            {
+                lp = FLINT_MAX(ACB_THETA_LOW_PREC, acb_theta_dist_addprec(&dist0[a]));
+            }
+            acb_theta_jet_naive_ind(dth, a << g, z_mid, tau, 2, lp);
+            acb_theta_jet_error_bounds(err, z_mid, tau, dth, 0, lp);
+            acb_add_error_arb(&r[k * n + a], err);
         }
     }
 
@@ -118,7 +129,8 @@ acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
     acb_mat_clear(tau_mid);
     _acb_vec_clear(t_mid, g);
     _acb_vec_clear(z_mid, g);
-    _arb_vec_clear(err, n * n);
+    _acb_vec_clear(dth, nb_der);
+    arb_clear(err);
     arf_clear(e);
     return res;
 }

@@ -20,55 +20,45 @@ acb_theta_jet_fd(acb_ptr dth, const arf_t eps, const arf_t err, acb_srcptr val,
 {
     acb_ptr aux;
     arb_t t;
-    fmpz_t m, n;
-    slong nb_max = acb_theta_jet_nb(ord, g);
+    slong nb = acb_theta_jet_nb(ord, g);
     slong b = ord + 1;
     slong* orders;
-    slong k, j, i, l, nb, ind;
+    slong j, i, l;
+    slong k = 0;
 
     aux = _acb_vec_init(n_pow(b, g));
     arb_init(t);
-    fmpz_init(m);
-    fmpz_init(n);
-    orders = flint_malloc(g * nb_max * sizeof(slong));
+    orders = flint_malloc(g * nb * sizeof(slong));
 
     acb_theta_jet_fourier(aux, val, ord, g, prec);
     arb_set_si(t, n_pow(b, g));
     _acb_vec_scalar_div_arb(aux, aux, n_pow(b, g), t, prec);
 
-    ind = 0;
-    for (k = 0; k <= ord; k++)
+    acb_theta_jet_orders(orders, ord, g);
+
+    /* Get Taylor coefficients, divide by eps^k */
+    k = 0;
+    arb_one(t);
+    for (j = 0; j < nb; j++)
     {
-        /* Get list of orders */
-        nb = acb_theta_jet_nb(k, g);
-        acb_theta_jet_orders(orders, k, g);
-
-        /* Get Taylor coefficients, divide by eps^k */
-        for (j = 0; j < nb; j++)
+        l = 0;
+        for (i = 0; i < g; i++)
         {
-            l = 0;
-            for (i = 0; i < g; i++)
-            {
-                l *= b;
-                l += orders[j * g + i];
-            }
-            acb_set(&dth[ind + j], &aux[l]);
+            l *= b;
+            l += orders[j * g + i];
         }
-        arb_set_arf(t, eps);
-        arb_pow_ui(t, t, k, prec);
-        _acb_vec_scalar_div_arb(dth + ind, dth + ind, nb, t, prec);
+        acb_set(&dth[j], &aux[l]);
 
-        /* Add error */
-        for (j = 0; j < nb; j++)
+        if (acb_theta_jet_total_order(orders + j * g, g) > k)
         {
-            acb_add_error_arf(&dth[ind + j], err);
+            k++;
+            arb_mul_arf(t, t, eps, prec);
         }
-        ind += nb;
+        acb_div_arb(&dth[j], &dth[j], t, prec);
+        acb_add_error_arf(&dth[j], err);
     }
 
     _acb_vec_clear(aux, n_pow(b, g));
     arb_clear(t);
-    fmpz_clear(m);
-    fmpz_clear(n);
     flint_free(orders);
 }

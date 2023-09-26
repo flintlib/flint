@@ -29,7 +29,7 @@ int main(void)
         slong ord = n_randint(state, 4);
         slong g = 1 + n_randint(state, 3);
         slong n2 = 1 << (2 * g);
-        slong nb = acb_theta_jet_nb(ord, g + 1);
+        slong nb = acb_theta_jet_nb(ord, g);
         acb_mat_t tau;
         acb_ptr z, th, dth, test;
         slong k;
@@ -46,7 +46,7 @@ int main(void)
             acb_urandom(&z[k], state, prec);
         }
 
-        acb_theta_jet_naive_all(dth,z, tau, ord, prec);
+        acb_theta_jet_naive_all(dth, z, tau, ord, prec);
         acb_theta_naive_all(th, z, 1, tau, prec);
         for (k = 0; k < n2; k++)
         {

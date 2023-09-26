@@ -11,34 +11,37 @@
 
 #include "acb_theta.h"
 
-void acb_theta_jet_orders(slong* orders, slong ord, slong g)
+void
+acb_theta_jet_orders(slong* orders, slong ord, slong g)
 {
-    slong nb_max, nb_rec;
+    slong k, j, l, nb_rec, ind;
     slong* rec;
-    slong k, j, i, ind;
 
     if (g == 1)
     {
-        orders[0] = ord;
+        for (k = 0; k <= ord; k++)
+        {
+            orders[k] = k;
+        }
         return;
     }
 
-    nb_max = acb_theta_jet_nb(ord, g - 1);
-    rec = flint_malloc(nb_max * (g - 1) * sizeof(slong));
+    /* Generate orders in dimension g - 1 */
+    nb_rec = acb_theta_jet_nb(ord, g - 1);
+    rec = flint_malloc((g - 1) * nb_rec * sizeof(slong));
+    acb_theta_jet_orders(rec, ord, g - 1);
 
-    ind = 0;
     for (k = 0; k <= ord; k++)
     {
-        nb_rec = acb_theta_jet_nb(k, g - 1);
-        acb_theta_jet_orders(rec, k, g - 1);
-        for (j = 0; j < nb_rec; j++)
+        /* Construct orders of total order k from rec */
+        ind = acb_theta_jet_nb(k - 1, g);
+        for (j = 0; j < acb_theta_jet_nb(k, g - 1); j++)
         {
-            orders[ind] = ord - k;
-            for (i = 0; i < g - 1; i++)
+            orders[(ind + j) * g] = k - acb_theta_jet_total_order(rec + j * (g - 1), g - 1);
+            for (l = 0; l < g - 1; l++)
             {
-                orders[ind + 1 + i] = rec[j * (g - 1) + i];
+                orders[(ind + j) * g + l + 1] = rec[j * (g - 1) + l];
             }
-            ind += g;
         }
     }
 

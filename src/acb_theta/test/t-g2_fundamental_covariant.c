@@ -21,7 +21,7 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: agrees with chi6m2 up to Pi^6 */
+    /* Test: agrees with chi6m2 */
     for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         slong g = 2;

@@ -170,6 +170,7 @@ acb_theta_ql_a0_split_term(acb_ptr r, slong* pt, ulong a, acb_srcptr t, acb_srcp
 
     /* Call worker */
     res = worker(new_th, t, new_z, new_dist0, new_dist, tau0, guard, new_prec);
+
     if (!_acb_vec_is_zero(new_z, d))
     {
         /* We are only interested in the values at z */

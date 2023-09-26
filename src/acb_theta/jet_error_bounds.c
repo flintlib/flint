@@ -12,30 +12,25 @@
 #include "acb_theta.h"
 
 void acb_theta_jet_error_bounds(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
-    slong ord, slong prec)
+    acb_srcptr dth, slong ord, slong prec)
 {
     slong g = acb_mat_nrows(tau);
-    slong n = 1 << (2 * g);
-    acb_ptr der;
     arb_ptr abs_der;
     arb_mat_t tau_err;
     arb_ptr z_err;
     arb_t e, f;
-    slong nb_der = acb_theta_jet_nb(ord + 2, g + 1);
-    slong nb;
-    slong nb_max = acb_theta_jet_nb(ord, g);
-    slong nb_tot = acb_theta_jet_nb(ord, g + 1);
+    slong nb = acb_theta_jet_nb(ord, g);
+    slong nb_dth = acb_theta_jet_nb(ord + 2, g);
     slong* orders;
     slong* new_orders;
-    slong k, j, l, m, a, i, ind, ind1, ind2;
+    slong j, l, m, i;
 
-    der = _acb_vec_init(n * nb_der);
-    abs_der = _arb_vec_init(n * nb_der);
+    abs_der = _arb_vec_init(nb_dth);
     arb_mat_init(tau_err, g, g);
     z_err = _arb_vec_init(g);
     arb_init(e);
     arb_init(f);
-    orders = flint_malloc(nb_max * g * sizeof(slong));
+    orders = flint_malloc(nb * g * sizeof(slong));
     new_orders = flint_malloc(g * sizeof(slong));
 
     /* Get input errors on z, tau */
@@ -51,80 +46,63 @@ void acb_theta_jet_error_bounds(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
     }
 
     /* We need order ord + 2 to use the heat equation. */
-    acb_theta_jet_naive_all(der, z, tau, ord + 2, prec);
-    for (k = 0; k < n * nb_der; k++)
+    for (j = 0; j < nb_dth; j++)
     {
-        acb_get_abs_ubound_arf(arb_midref(&abs_der[k]), &der[k], prec);
+        acb_get_abs_ubound_arf(arb_midref(&abs_der[j]), &dth[j], prec);
     }
 
     /* Loop over orders to compute the correct bounds */
-    ind = 0;
-    ind1 = acb_theta_jet_nb(0, g);
-    ind2 = ind1 + acb_theta_jet_nb(1, g);
-    for (k = 0; k <= ord; k++)
+    acb_theta_jet_orders(orders, ord, g);
+    for (j = 0; j < nb; j++)
     {
-        nb = acb_theta_jet_nb(k, g);
-        acb_theta_jet_orders(orders, k, g);
-
-        for (a = 0; a < n; a++)
+        arb_zero(&err[j]);
+        /* Add error corresponding to entries of tau */
+        for (l = 0; l < g; l++)
         {
-            for (j = 0; j < nb; j++)
+            for (m = l; m < g; m++)
             {
-                arb_zero(&err[a * nb_tot + ind + j]);
-                /* Add error corresponding to entries of tau */
-                for (l = 0; l < g; l++)
+                /* Heat equation: d/dzl d/dzm = 2pi i (1 + delta) d/dtaulm */
+                for (i = 0; i < g; i++)
                 {
-                    for (m = l; m < g; m++)
-                    {
-                        /* Heat equation: d/dzl d/dzm = 2pi i (1 + delta) d/dtaulm */
-                        for (i = 0; i < g; i++)
-                        {
-                            new_orders[i] = orders[j * g + i];
-                        }
-                        new_orders[l] += 1;
-                        new_orders[m] += 1;
-                        i = ind2 + acb_theta_jet_index(new_orders, g);
-
-                        arb_mul(e, arb_mat_entry(tau_err, l, m), &abs_der[a * nb_der + i], prec);
-                        arb_const_pi(f, prec);
-                        if (l == m)
-                        {
-                            arb_mul_2exp_si(f, f, 2);
-                            arb_mul_si(e, e, new_orders[l] * (new_orders[l] - 1), prec);
-                        }
-                        else
-                        {
-                            arb_mul_2exp_si(f, f, 1);
-                            arb_mul_si(e, e, new_orders[l] * new_orders[m], prec);
-                        }
-                        arb_div(e, e, f, prec);
-                        arb_add(&err[a * nb_tot + ind + j], &err[a * nb_tot + ind + j], e, prec);
-                    }
+                    new_orders[i] = orders[j * g + i];
                 }
-                /* Add error corresponding to entries of z */
-                for (l = 0; l < g; l++)
+                new_orders[l] += 1;
+                new_orders[m] += 1;
+                i = acb_theta_jet_index(new_orders, g);
+
+                arb_mul(e, arb_mat_entry(tau_err, l, m), &abs_der[i], prec);
+                arb_const_pi(f, prec);
+                if (l == m)
                 {
-                    for (i = 0; i < g; i++)
-                    {
-                        new_orders[i] = orders[j * g + i];
-                    }
-                    new_orders[l] += 1;
-                    i = ind1 + acb_theta_jet_index(new_orders, g);
-
-                    arb_mul(e, &z_err[l], &abs_der[a * nb_der + i], prec);
-                    arb_mul_si(e, e, new_orders[l], prec);
-                    arb_add(&err[a * nb_tot + ind + j], &err[a * nb_tot + ind + j], e, prec);
+                    arb_mul_2exp_si(f, f, 2);
+                    arb_mul_si(e, e, new_orders[l] * (new_orders[l] - 1), prec);
                 }
+                else
+                {
+                    arb_mul_2exp_si(f, f, 1);
+                    arb_mul_si(e, e, new_orders[l] * new_orders[m], prec);
+                }
+                arb_div(e, e, f, prec);
+                arb_add(&err[j], &err[j], e, prec);
             }
         }
+        /* Add error corresponding to entries of z */
+        for (l = 0; l < g; l++)
+        {
+            for (i = 0; i < g; i++)
+            {
+                new_orders[i] = orders[j * g + i];
+            }
+            new_orders[l] += 1;
+            i = acb_theta_jet_index(new_orders, g);
 
-        ind += nb;
-        ind1 += acb_theta_jet_nb(k + 1, g);
-        ind2 += acb_theta_jet_nb(k + 2, g);
+            arb_mul(e, &z_err[l], &abs_der[i], prec);
+            arb_mul_si(e, e, new_orders[l], prec);
+            arb_add(&err[j], &err[j], e, prec);
+        }
     }
 
-    _acb_vec_clear(der, n * nb_der);
-    _arb_vec_clear(abs_der, n * nb_der);
+    _arb_vec_clear(abs_der, nb_dth);
     arb_mat_clear(tau_err);
     _arb_vec_clear(z_err, g);
     arb_clear(e);

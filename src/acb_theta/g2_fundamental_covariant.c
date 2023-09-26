@@ -16,7 +16,7 @@ void acb_theta_g2_fundamental_covariant(acb_poly_t r, const acb_mat_t tau, slong
 {
     slong g = 2;
     slong n2 = 1 << (2 * g);
-    slong nb = acb_theta_jet_nb(1, g + 1);
+    slong nb = acb_theta_jet_nb(1, g);
     fmpz_mat_t mat;
     acb_mat_t w;
     acb_ptr z, dth;

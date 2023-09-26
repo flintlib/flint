@@ -11,15 +11,15 @@
 
 #include "acb_theta.h"
 
-slong acb_theta_jet_nb(slong ord, slong g)
+slong acb_theta_jet_total_order(const slong* orders, slong g)
 {
-    fmpz_t x;
-    slong res;
+    slong k;
+    slong res = 0;
 
-    fmpz_init(x);
-    fmpz_bin_uiui(x, g + ord, g);
-    res = fmpz_get_si(x);
+    for (k = 0; k < g; k++)
+    {
+        res += orders[k];
+    }
 
-    fmpz_clear(x);
     return res;
 }

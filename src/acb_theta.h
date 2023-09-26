@@ -193,6 +193,7 @@ void acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z,
 /* Naive algorithms for derivatives */
 
 slong acb_theta_jet_nb(slong ord, slong g);
+slong acb_theta_jet_total_order(const slong* orders, slong g);
 void acb_theta_jet_orders(slong* orders, slong ord, slong g);
 slong acb_theta_jet_index(const slong* orders, slong g);
 
@@ -200,11 +201,16 @@ void acb_theta_jet_naive_radius(arf_t R2, arf_t eps, arb_srcptr offset,
     const arb_mat_t cho, slong ord, slong prec);
 void acb_theta_jet_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z,
     const acb_mat_t tau, slong ord, slong prec);
+
+void acb_theta_jet_naive_00(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
+    slong ord, slong prec);
+void acb_theta_jet_naive_ind(acb_ptr dth, ulong ab, acb_srcptr z, const acb_mat_t tau,
+    slong ord, slong prec);
 void acb_theta_jet_naive_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
     slong ord, slong prec);
 
 void acb_theta_jet_error_bounds(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
-    slong ord, slong prec);
+    acb_srcptr dth, slong ord, slong prec);
 
 /* Quasi-linear algorithms on the reduced domain */
 

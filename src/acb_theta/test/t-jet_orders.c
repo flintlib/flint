@@ -40,10 +40,10 @@ int main(void)
         if (test != i)
         {
             flint_printf("FAIL\n");
+            flint_printf("g = %wd, ord = %wd, nb = %wd\n", g, ord, nb);
             flint_printf("orders:\n");
             for (j = 0; j < nb; j++)
             {
-                flint_printf("g = %wd, ord = %wd, nb = %wd\n", g, ord, nb);
                 for (k = 0; k < g; k++)
                 {
                     flint_printf("%wd ", orders[j * g + k]);

@@ -30,14 +30,14 @@ int main(void)
         slong g = 1 + n_randint(state, 4);
         slong b = ord + 1;
         slong nb_val = n_pow(b, g);
-        slong nb_fd = acb_theta_jet_nb(ord, g + 1);
+        slong nb_fd = acb_theta_jet_nb(ord, g);
         slong *orders;
         arb_t c, rho;
         arf_t eps, err;
         acb_ptr val, df, test;
         acb_t x, t;
         fmpz_t m;
-        slong k, kk, j, i, ind, nb;
+        slong k, kk, j, i;
 
         orders = flint_malloc(g * nb_fd * sizeof(slong));
         arb_init(c);
@@ -77,22 +77,16 @@ int main(void)
         acb_theta_jet_fd(df, eps, err, val, ord, g, 2 * prec);
 
         /* Fill in test */
-        ind = 0;
-        for (k = 0; k <= ord; k++)
+        acb_theta_jet_orders(orders, ord, g);
+        for (j = 0; j < nb_fd; j++)
         {
-            nb = acb_theta_jet_nb(k, g);
-            acb_theta_jet_orders(orders, k, g);
-            for (j = 0; j < nb; j++)
+            acb_one(x);
+            for (i = 0; i < g; i++)
             {
-                acb_one(x);
-                for (i = 0; i < g; i++)
-                {
-                    fmpz_fac_ui(m, orders[j * g + i]);
-                    acb_div_fmpz(x, x, m, prec);
-                }
-                acb_set(&test[ind + j], x);
+                fmpz_fac_ui(m, orders[j * g + i]);
+                acb_div_fmpz(x, x, m, prec);
             }
-            ind += nb;
+            acb_set(&test[j], x);
         }
 
         if (!_acb_vec_overlaps(df, test, nb_fd))

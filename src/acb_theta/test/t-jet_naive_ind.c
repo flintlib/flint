@@ -16,19 +16,20 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("jet_all....");
+    flint_printf("jet_naive_ind....");
     fflush(stdout);
 
     flint_randinit(state);
 
-    /* Test: matches jet_naive_all */
-    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
+    /* Test: values match jet_naive_all */
+    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
-        slong prec = ACB_THETA_LOW_PREC + n_randint(state, 200);
-        slong bits = n_randint(state, 3);
+        slong prec = ACB_THETA_LOW_PREC + n_randint(state, 100);
+        slong bits = n_randint(state, 4);
         slong ord = n_randint(state, 3);
-        slong g = 1 + n_randint(state, 2);
+        slong g = 1 + n_randint(state, 3);
         slong n2 = 1 << (2 * g);
+        ulong ab = n_randint(state, n2);
         slong nb = acb_theta_jet_nb(ord, g);
         acb_mat_t tau;
         acb_ptr z, dth, test;
@@ -36,7 +37,7 @@ int main(void)
 
         acb_mat_init(tau, g, g);
         z = _acb_vec_init(g);
-        dth = _acb_vec_init(nb * n2);
+        dth = _acb_vec_init(nb);
         test = _acb_vec_init(nb * n2);
 
         acb_siegel_randtest_reduced(tau, state, prec, bits);
@@ -45,25 +46,25 @@ int main(void)
             acb_urandom(&z[k], state, prec);
         }
 
-        acb_theta_jet_all(dth, z, tau, ord, prec);
+        acb_theta_jet_naive_ind(dth, ab, z, tau, ord, prec);
         acb_theta_jet_naive_all(test, z, tau, ord, prec);
 
-        if (!_acb_vec_overlaps(dth, test, nb * n2))
+        if (!_acb_vec_overlaps(dth, test + ab * nb, nb))
         {
             flint_printf("FAIL (overlap)\n");
-            flint_printf("g = %wd, prec = %wd, ord = %wd\n", g, prec, ord);
+            flint_printf("g = %wd, prec = %wd, ord = %wd, ab = %wd\n", g, prec, ord, ab);
             acb_mat_printd(tau, 5);
             _acb_vec_printd(z, g, 5);
-            flint_printf("jet_all:\n");
-            _acb_vec_printd(dth, nb * n2, 5);
-            flint_printf("test:\n");
-            _acb_vec_printd(test, nb * n2, 5);
+            flint_printf("jet_naive_ind:\n");
+            _acb_vec_printd(dth, nb, 5);
+            flint_printf("jet_naive_all:\n");
+            _acb_vec_printd(test + ab * nb, nb, 5);
             flint_abort();
         }
 
         acb_mat_clear(tau);
         _acb_vec_clear(z, g);
-        _acb_vec_clear(dth, nb * n2);
+        _acb_vec_clear(dth, nb);
         _acb_vec_clear(test, nb * n2);
     }
 

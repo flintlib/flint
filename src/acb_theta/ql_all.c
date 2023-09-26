@@ -115,15 +115,15 @@ acb_theta_ql_all_red(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
     slong n = 1 << g;
     slong lp = ACB_THETA_LOW_PREC;
     slong guard = ACB_THETA_LOW_PREC;
+    slong nb_der = acb_theta_jet_nb(2, g);
     flint_rand_t state;
     arb_ptr dist, dist0;
     acb_mat_t tau_mid;
-    acb_ptr t, z_mid;
-    arb_ptr err;
+    acb_ptr t, z_mid, dth;
+    arb_t err;
     arf_t e;
-    slong j, k, nbz, nbt;
+    slong j, k;
     int has_z = !_acb_vec_is_zero(z, g);
-    int has_t = 0;
     int res;
 
     flint_randinit(state);
@@ -132,7 +132,8 @@ acb_theta_ql_all_red(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
     acb_mat_init(tau_mid, g, g);
     t = _acb_vec_init(g);
     z_mid = _acb_vec_init(g);
-    err = _arb_vec_init(n * n);
+    dth = _acb_vec_init(n * n * nb_der);
+    arb_init(err);
     arf_init(e);
 
     acb_theta_dist_a0(dist, z, tau, lp);
@@ -165,35 +166,23 @@ acb_theta_ql_all_red(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
         {
             arb_urandom(acb_realref(&t[k]), state, prec + guard + g);
         }
-        has_t = !_acb_vec_is_zero(t, g);
         _acb_vec_scalar_mul_2exp_si(t, t, g, 1);
         res = acb_theta_ql_all_with_t(th, t, z_mid, dist0, dist, tau_mid,
             guard, prec + guard + g);
         guard += ACB_THETA_LOW_PREC;
     }
+
     if (!res)
     {
         _acb_vec_indeterminate(th, n * n);
     }
-
-    /* Add error */
-    nbz = (has_z ? 2 : 1);
-    nbt = (has_t ? 3 : 1);
-    for (k = 0; (k < nbz * nbt) && res; k++)
+    else
     {
-        _acb_vec_zero(z_mid, g);
-        if (has_t)
-        {
-            _acb_vec_scalar_mul_ui(z_mid, t, g, k % 3, prec);
-        }
-        if (has_z && (k >= nbt))
-        {
-            _acb_vec_add(z_mid, z_mid, z, g, prec);
-        }
-        acb_theta_jet_error_bounds(err, z_mid, tau, 0, ACB_THETA_LOW_PREC);
+        acb_theta_jet_naive_all(dth, z, tau, 2, ACB_THETA_LOW_PREC);
         for (j = 0; j < n * n; j++)
         {
-            acb_add_error_arb(&th[j], &err[j]);
+            acb_theta_jet_error_bounds(err, z, tau, dth + j * nb_der, 0, ACB_THETA_LOW_PREC);
+            acb_add_error_arb(&th[j], err);
         }
     }
 
@@ -203,7 +192,8 @@ acb_theta_ql_all_red(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
     acb_mat_clear(tau_mid);
     _acb_vec_clear(t, g);
     _acb_vec_clear(z_mid, g);
-    _arb_vec_clear(err, n * n);
+    _acb_vec_clear(dth, n * n * nb_der);
+    arb_clear(err);
     arf_clear(e);
 }
 

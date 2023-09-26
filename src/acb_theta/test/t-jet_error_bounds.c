@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("jet_all....");
+    flint_printf("jet_error_bounds....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -28,14 +28,16 @@ int main(void)
         slong n = 1 << (2 * g);
         slong ord = n_randint(state, 3);
         slong bits = 2;
-        slong nb = acb_theta_jet_nb(ord, g + 1);
+        slong nb = acb_theta_jet_nb(ord, g);
+        slong nb_der = acb_theta_jet_nb(ord + 2, g);
+        slong lprec = ACB_THETA_LOW_PREC;
         acb_mat_t tau1, tau2, tau3;
-        acb_ptr z1, z2, z3;
+        acb_ptr z1, z2, z3, dth;
         arb_ptr err;
         acb_ptr d1, d2, test;
         acb_t x;
-        slong lprec = ACB_THETA_LOW_PREC + n_randint(state, 50);
-        slong hprec = lprec + n_randint(state, 50);
+        slong mprec = ACB_THETA_LOW_PREC + n_randint(state, 50);
+        slong hprec = mprec + n_randint(state, 50);
         slong j, k;
 
         acb_mat_init(tau1, g, g);
@@ -44,6 +46,7 @@ int main(void)
         z1 = _acb_vec_init(g);
         z2 = _acb_vec_init(g);
         z3 = _acb_vec_init(g);
+        dth = _acb_vec_init(n * nb_der);
         err = _arb_vec_init(n * nb);
         d1 = _acb_vec_init(n * nb);
         d2 = _acb_vec_init(n * nb);
@@ -62,7 +65,7 @@ int main(void)
             {
                 acb_set(acb_mat_entry(tau1, k, j), acb_mat_entry(tau1, j, k));
                 acb_urandom(x, state, hprec);
-                acb_mul_2exp_si(x, x, -lprec);
+                acb_mul_2exp_si(x, x, -mprec);
                 acb_add(acb_mat_entry(tau2, j, k), acb_mat_entry(tau1, j, k), x, hprec);
                 acb_set(acb_mat_entry(tau2, k, j), acb_mat_entry(tau2, j, k));
                 acb_union(acb_mat_entry(tau3, j, k), acb_mat_entry(tau1, j, k),
@@ -70,7 +73,7 @@ int main(void)
                 acb_set(acb_mat_entry(tau3, k, j), acb_mat_entry(tau3, j, k));
             }
             acb_urandom(x, state, hprec);
-            acb_mul_2exp_si(x, x, -lprec);
+            acb_mul_2exp_si(x, x, -mprec);
             acb_add(&z2[j], &z1[j], x, hprec);
             acb_union(&z3[j], &z1[j], &z2[j], hprec);
         }
@@ -79,7 +82,7 @@ int main(void)
             || !_acb_vec_contains(z3, z1, g) || !_acb_vec_contains(z3, z1, g))
         {
             flint_printf("FAIL (input)\n");
-            flint_printf("lprec = %wd, hprec = %wd\n", lprec, hprec);
+            flint_printf("mprec = %wd, hprec = %wd\n", mprec, hprec);
             acb_mat_printd(tau1, 5);
             acb_mat_printd(tau2, 5);
             acb_mat_printd(tau3, 5);
@@ -91,7 +94,11 @@ int main(void)
 
         acb_theta_jet_naive_all(d1, z1, tau1, ord, hprec);
         acb_theta_jet_naive_all(d2, z2, tau2, ord, hprec);
-        acb_theta_jet_error_bounds(err, z3, tau3, ord, ACB_THETA_LOW_PREC/2);
+        acb_theta_jet_naive_all(dth, z3, tau3, ord + 2, lprec);
+        for (k = 0; k < n; k++)
+        {
+            acb_theta_jet_error_bounds(err + k * nb, z3, tau3, dth + k * nb_der, ord, lprec);
+        }
          /* Errors are wrt midpoint, so multiply by 2 */
         _arb_vec_scalar_mul_2exp_si(err, err, n * nb, 1);
 
@@ -121,6 +128,7 @@ int main(void)
         _acb_vec_clear(z1, g);
         _acb_vec_clear(z2, g);
         _acb_vec_clear(z3, g);
+        _acb_vec_clear(dth, n * nb_der);
         _arb_vec_clear(err, n * nb);
         _acb_vec_clear(d1, n * nb);
         _acb_vec_clear(d2, n * nb);
