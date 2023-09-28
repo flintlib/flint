@@ -18,11 +18,13 @@ acb_theta_jet_naive_radius(arf_t R2, arf_t eps, arb_srcptr offset,
     slong g = arb_mat_nrows(cho);
     slong lp = ACB_THETA_LOW_PREC;
     arb_mat_t mat;
+    arb_ptr vec;
     arb_t na, nx, t, u;
     arf_t cmp;
     mag_t norm;
 
     arb_mat_init(mat, g, g);
+    vec = _arb_vec_init(g);
     arb_init(na);
     arb_init(nx);
     arb_init(t);
@@ -35,7 +37,9 @@ acb_theta_jet_naive_radius(arf_t R2, arf_t eps, arb_srcptr offset,
     arb_mat_solve_triu(mat, cho, mat, 0, lp);
     arb_mat_bound_inf_norm(norm, mat);
     arf_set_mag(arb_midref(na), norm);
-    _arb_vec_get_mag(norm, offset, g);
+
+    arb_mat_vector_mul_col(vec, mat, offset, prec);
+    _arb_vec_get_mag(norm, vec, g);
     arf_set_mag(arb_midref(nx), norm);
 
     /* Get R2, eps assuming R <= nx/na */
@@ -66,6 +70,7 @@ acb_theta_jet_naive_radius(arf_t R2, arf_t eps, arb_srcptr offset,
     }
 
     arb_mat_clear(mat);
+    _arb_vec_clear(vec, g);
     arb_clear(na);
     arb_clear(nx);
     arb_clear(t);

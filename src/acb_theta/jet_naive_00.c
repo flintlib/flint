@@ -19,7 +19,7 @@ worker_dim1(acb_ptr dth, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong
     slong* orders;
     acb_ptr v3, aux;
     acb_t x;
-    fmpz_t num, den, t;
+    fmpz_t num, t;
     slong j, i;
 
     orders = flint_malloc(g * nb * sizeof(slong));
@@ -27,7 +27,6 @@ worker_dim1(acb_ptr dth, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong
     aux = _acb_vec_init(nb);
     acb_init(x);
     fmpz_init(num);
-    fmpz_init(den);
     fmpz_init(t);
 
     /* Compute products in v3 */
@@ -40,17 +39,11 @@ worker_dim1(acb_ptr dth, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong
     for (j = 0; j < nb; j++)
     {
         fmpz_one(num);
-        fmpz_one(den);
         for (i = 1; i < g; i++)
         {
             fmpz_set_si(t, coords[i]);
             fmpz_pow_ui(t, t, orders[j * g + i]);
             fmpz_mul(num, num, t);
-        }
-        for (i = 0; i < g; i++)
-        {
-            fmpz_fac_ui(t, orders[j * g + i]);
-            fmpz_mul(den, den, t);
         }
 
         /* Loop over lattice points */
@@ -62,14 +55,8 @@ worker_dim1(acb_ptr dth, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong
             acb_add(&aux[j], &aux[j], x, prec);
         }
 
-        /* Get cofactor * (2 i pi)^k * num/den */
-        acb_const_pi(x, prec);
-        acb_mul_onei(x, x);
-        acb_mul_2exp_si(x, x, 1);
-        acb_pow_ui(x, x, acb_theta_jet_total_order(orders + j * g, g), prec);
-        acb_mul(x, x, cofactor, prec);
-        acb_mul_fmpz(x, x, num, prec);
-        acb_div_fmpz(x, x, den, prec);
+        /* Multiply by cofactor * num */
+        acb_mul_fmpz(x, cofactor, num, prec);
         acb_mul(&aux[j], &aux[j], x, prec);
     }
     _acb_vec_add(dth, dth, aux, nb, fullprec);
@@ -79,7 +66,6 @@ worker_dim1(acb_ptr dth, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong
     _acb_vec_clear(aux, nb);
     acb_clear(x);
     fmpz_clear(num);
-    fmpz_clear(den);
     fmpz_clear(t);
 }
 
@@ -88,16 +74,22 @@ acb_theta_jet_naive_00_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
     slong ord, slong prec)
 {
     slong g = acb_mat_nrows(tau);
+    slong nb = acb_theta_jet_nb(ord, g);
+    slong* orders;
     acb_theta_eld_t E;
     acb_theta_precomp_t D;
     acb_t c;
     arb_t u;
-    slong nb = acb_theta_jet_nb(ord, g);
+    fmpz_t m, t;
+    slong j, k;
 
+    orders = flint_malloc(g * nb * sizeof(slong));
     acb_theta_eld_init(E, g, g);
     acb_theta_precomp_init(D, 1, g);
     acb_init(c);
     arb_init(u);
+    fmpz_init(m);
+    fmpz_init(t);
 
     acb_theta_jet_ellipsoid(E, u, z, tau, ord, prec);
     prec = acb_theta_naive_fullprec(E, prec);
@@ -106,10 +98,30 @@ acb_theta_jet_naive_00_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
 
     acb_theta_naive_worker(dth, nb, c, u, E, D, 0, ord, prec, worker_dim1);
 
+    /* Multiply by factorials and powers of pi */
+    acb_theta_jet_orders(orders, ord, g);
+    for (k = 0; k < nb; k++)
+    {
+        acb_const_pi(c, prec);
+        acb_mul_2exp_si(c, c, 1);
+        acb_pow_ui(c, c, acb_theta_jet_total_orders(orders + k * g), prec);
+        fmpz_one(m);
+        for (j = 0; j < g; j++)
+        {
+            fmpz_fac_ui(t, orders[k * g + j]);
+            fmpz_mul(m, m, t);
+        }
+        acb_div_fmpz(c, c, m, prec);
+        acb_mul(&dth[k], &dth[k], c, prec);
+    }
+
+    flint_free(orders);
     acb_theta_eld_clear(E);
     acb_theta_precomp_clear(D);
     acb_clear(c);
     arb_clear(u);
+    fmpz_clear(m);
+    fmpz_clear(t);
 }
 
 void

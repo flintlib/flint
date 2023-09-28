@@ -59,7 +59,7 @@ acb_theta_precomp_set(acb_theta_precomp_t D, acb_srcptr z,
     }
 
     /* Init and set square powers; addition chains unnecessary */
-    /* Contain exp(i pi k^2 tau_{k,k}) for k up to box */
+    /* Contain exp(i pi j^2 tau_{k,k}) for j up to box */
     D->sqr_powers = _acb_vec_init(D->indices[g]);
     for (k = 0; k < g; k++)
     {
