@@ -190,7 +190,7 @@ the evaluation.
     otherwise chooses the number of terms automatically based on *s* and the
     precision.
 
-.. function:: void acb_dirichlet_zeta_jet_rs(acb_t res, const acb_t s, slong len, slong prec)
+.. function:: void acb_dirichlet_zeta_jet_rs(acb_ptr res, const acb_t s, slong len, slong prec)
 
     Computes the first *len* terms of the Taylor series of the Riemann zeta
     function at *s* using the Riemann Siegel formula. This function currently
@@ -214,7 +214,7 @@ Hurwitz zeta function precomputation
 
 .. type:: acb_dirichlet_hurwitz_precomp_t
 
-.. function:: void acb_dirichlet_hurwitz_precomp_init(acb_dirichlet_hurwitz_precomp_t pre, const acb_t s, int deflate, ulong A, ulong K, ulong N, slong prec)
+.. function:: void acb_dirichlet_hurwitz_precomp_init(acb_dirichlet_hurwitz_precomp_t pre, const acb_t s, int deflate, slong A, slong K, slong N, slong prec)
 
     Precomputes a grid of Taylor polynomials for fast evaluation of
     `\zeta(s,a)` on `a \in (0,1]` with fixed *s*.
@@ -256,7 +256,7 @@ Hurwitz zeta function precomputation
     scratch would be better than performing a precomputation, *A*, *K* and *N*
     are all set to 0.
 
-.. function:: void acb_dirichlet_hurwitz_precomp_bound(mag_t res, const acb_t s, ulong A, ulong K, ulong N)
+.. function:: void acb_dirichlet_hurwitz_precomp_bound(mag_t res, const acb_t s, slong A, slong K, slong N)
 
     Computes an upper bound for the truncation error (not accounting for
     roundoff error) when evaluating `\zeta(s,a)` with precomputation parameters
@@ -348,13 +348,12 @@ Dirichlet character Gauss, Jacobi and theta sums
 
 .. function:: void acb_dirichlet_gauss_sum_factor(acb_t res, const dirichlet_group_t G, const dirichlet_char_t chi, slong prec)
 
-.. function:: void acb_dirichlet_gauss_sum_order2(acb_t res, const dirichlet_char_t chi, slong prec)
+.. function:: void acb_dirichlet_gauss_sum_order2(acb_t res, const dirichlet_group_t G, const dirichlet_char_t chi, slong prec)
 
 .. function:: void acb_dirichlet_gauss_sum_theta(acb_t res, const dirichlet_group_t G, const dirichlet_char_t chi, slong prec)
 
 .. function:: void acb_dirichlet_gauss_sum(acb_t res, const dirichlet_group_t G, const dirichlet_char_t chi, slong prec)
 
-.. function:: void acb_dirichlet_gauss_sum_ui(acb_t res, const dirichlet_group_t G, ulong a, slong prec)
 
    Sets *res* to the Gauss sum
 
@@ -440,9 +439,9 @@ Dirichlet character Gauss, Jacobi and theta sums
    Compute the number of terms to be summed in the theta series of argument *t*
    so that the tail is less than `2^{-\mathrm{prec}}`.
 
-.. function:: void acb_dirichlet_qseries_powers_naive(acb_t res, const arb_t x, int p, const ulong * a, const acb_dirichlet_powers_t z, slong len, slong prec)
+.. function:: void acb_dirichlet_qseries_arb_powers_naive(acb_t res, const arb_t x, int p, const ulong * a, const acb_dirichlet_roots_t z, slong len, slong prec)
 
-.. function:: void acb_dirichlet_qseries_powers_smallorder(acb_t res, const arb_t x, int p, const ulong * a, const acb_dirichlet_powers_t z, slong len, slong prec)
+.. function:: void acb_dirichlet_qseries_arb_powers_smallorder(acb_t res, const arb_t x, int p, const ulong * a, const acb_dirichlet_roots_t z, slong len, slong prec)
 
    Compute the series `\sum n^p z^{a_n} x^{n^2}` for exponent list *a*,
    precomputed powers *z* and parity *p* (being 0 or 1).
@@ -633,7 +632,7 @@ Currently, these methods require *chi* to be a primitive character.
     is the root number as computed by :func:`acb_dirichlet_root_number`.
     The first *len* terms in the Taylor expansion are written to the output.
 
-.. function:: void acb_dirichlet_hardy_z(acb_t res, const acb_t t, const dirichlet_group_t G, const dirichlet_char_t chi, slong len, slong prec)
+.. function:: void acb_dirichlet_hardy_z(acb_ptr res, const acb_t t, const dirichlet_group_t G, const dirichlet_char_t chi, slong len, slong prec)
 
     Computes the Hardy Z-function, also known as the Riemann-Siegel Z-function
     `Z(t) = e^{i \theta(t)} L(1/2+it)`, which is real-valued for real *t*.

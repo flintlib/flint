@@ -66,7 +66,7 @@ Arithmetic modulo a generalised Fermat number
 --------------------------------------------------------------------------------
 
 
-.. function:: void mpn_negmod_2expp1(mp_limb_t* z, const mp_limb_t* a, mp_size_t limbs);
+.. function:: void mpn_negmod_2expp1(mp_limb_t* z, const mp_limb_t* a, mp_size_t limbs)
 
     Set ``z`` to the negation of the Fermat number `a` modulo ``B^limbs + 1``.
     The input ``a`` is expected to be fully reduced, and the output is fully reduced.
@@ -447,7 +447,7 @@ Matrix Fourier Transforms
 
     Just the outer layers of ``fft_mfa_truncate_sqrt2``.
 
-.. function:: void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc, mp_limb_t * tt)
+.. function:: void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc, mp_limb_t ** tt)
 
     The inner layers of ``fft_mfa_truncate_sqrt2`` and 
     ``ifft_mfa_truncate_sqrt2`` combined with pointwise mults.
@@ -550,7 +550,7 @@ Convolution
 --------------------------------------------------------------------------------
 
 
-.. function:: void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, slong depth, slong limbs, slong trunc, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t * tt)
+.. function:: void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, slong depth, slong limbs, slong trunc, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t ** tt)
 
     Perform an FFT convolution of ``ii`` with ``jj``, both of length 
     ``4*n`` where ``n = 2^depth``. Assume that all but the first 

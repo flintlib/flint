@@ -624,7 +624,7 @@ Differentiation
     Sets *{res, len - n}* to the nth derivative of *{poly, len}*. Does
     nothing if *len <= n*. Allows aliasing of the input and output.
 
-.. function:: void arb_poly_nth_derivative(arb_poly_t res, const arb_poly_t poly, slong prec)
+.. function:: void arb_poly_nth_derivative(arb_poly_t res, const arb_poly_t poly, ulong n, slong prec)
 
     Sets *res* to the nth derivative of *poly*.
 
@@ -692,7 +692,7 @@ Transforms
 
 .. function:: void _arb_poly_graeffe_transform(arb_ptr b, arb_srcptr a, slong len, slong prec)
 
-.. function:: void arb_poly_graeffe_transform(arb_poly_t b, arb_poly_t a, slong prec)
+.. function:: void arb_poly_graeffe_transform(arb_poly_t b, const arb_poly_t a, slong prec)
 
     Computes the Graeffe transform of input polynomial.
 

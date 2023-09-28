@@ -1933,7 +1933,7 @@ Vector functions
 
    Performs the respective scalar operation elementwise.
 
-.. function:: void _arb_vec_get_mag(mag_t bound, arb_srcptr vec, slong len, slong prec)
+.. function:: void _arb_vec_get_mag(mag_t bound, arb_srcptr vec, slong len)
 
     Sets *bound* to an upper bound for the entries in *vec*.
 

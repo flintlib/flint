@@ -172,7 +172,7 @@ Complete table
 
    Clears *t*.
 
-.. function:: ulong dlog_table(dlog_table_t t, ulong b)
+.. function:: ulong dlog_table(const dlog_table_t t, ulong b)
 
    Return `\log(b,a)` using the precomputed data *t*.
 
@@ -196,7 +196,7 @@ Baby-step giant-step table
 
    Clears *t*.
 
-.. function:: ulong dlog_bsgs(dlog_bsgs_t t, ulong b)
+.. function:: ulong dlog_bsgs(const dlog_bsgs_t t, ulong b)
 
    Return `\log(b,a)` using the precomputed data *t*.
 
@@ -219,7 +219,7 @@ Prime-power modulus decomposition
 
    Clears *t*.
 
-.. function:: ulong dlog_modpe(dlog_modpe_t t, ulong b)
+.. function:: ulong dlog_modpe(const dlog_modpe_t t, ulong b)
 
    Return `\log(b,a)` using the precomputed data *t*.
 
@@ -244,7 +244,7 @@ CRT decomposition
 
    Clears *t*.
 
-.. function:: ulong dlog_crt(dlog_crt_t t, ulong b)
+.. function:: ulong dlog_crt(const dlog_crt_t t, ulong b)
 
    Return `\log(b,a)` using the precomputed data *t*.
 
@@ -269,7 +269,7 @@ padic decomposition
 
    Clears *t*.
 
-.. function:: ulong dlog_power(dlog_power_t t, ulong b)
+.. function:: ulong dlog_power(const dlog_power_t t, ulong b)
 
    Return `\log(b,a)` using the precomputed data *t*.
 
@@ -285,7 +285,7 @@ Pollard rho method
    :type:`dlog_rho_struct`, permitting a :type:`dlog_rho_t` to be passed by
    reference.
 
-.. function:: ulong dlog_rho_init(dlog_rho_t t, ulong a, ulong mod, ulong n, ulong num)
+.. function:: void dlog_rho_init(dlog_rho_t t, ulong a, ulong mod, ulong n)
 
    Initialize random walks for evaluations of discrete logarithms in base *a* modulo *mod*,
    where *a* has order *n*.
@@ -294,6 +294,6 @@ Pollard rho method
 
    Clears *t*.
 
-.. function:: ulong dlog_rho(dlog_rho_t t, ulong b)
+.. function:: ulong dlog_rho(const dlog_rho_t t, ulong b)
 
    Return `\log(b,a)` by the rho method in the group described by *t*.

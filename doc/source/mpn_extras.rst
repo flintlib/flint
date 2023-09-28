@@ -218,7 +218,7 @@ GCD
 --------------------------------------------------------------------------------
 
 
-.. function:: mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg, mp_ptr array1, mp_size_t limbs1, mp_ptr array2, mp_size_t limbs2, mp_ptr temp)
+.. function:: mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg, mp_srcptr array1, mp_size_t limbs1, mp_srcptr array2, mp_size_t limbs2, mp_ptr temp)
 
     Sets ``(arrayg, retvalue)`` to the gcd of ``(array1, limbs1)`` and
         ``(array2, limbs2)``.
@@ -230,7 +230,7 @@ GCD
     space, or ``NULL`` must be passed to ``temp`` if the function should
     allocate its own space.
 
-.. function:: mp_size_t flint_mpn_gcd_full(mp_ptr arrayg, mp_ptr array1, mp_size_t limbs1, mp_ptr array2, mp_size_t limbs2)
+.. function:: mp_size_t flint_mpn_gcd_full(mp_ptr arrayg, mp_srcptr array1, mp_size_t limbs1, mp_srcptr array2, mp_size_t limbs2)
 
     Sets ``(arrayg, retvalue)`` to the gcd of ``(array1, limbs1)`` and
     ``(array2, limbs2)``. 

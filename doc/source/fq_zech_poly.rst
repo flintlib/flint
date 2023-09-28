@@ -71,7 +71,7 @@ Memory management
     zero.  This function is mainly used internally, as all functions
     guarantee normalisation.
 
-.. function:: void _fq_zech_poly_normalise2(fq_zech_struct *poly, slong *length, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_normalise2(const fq_zech_struct *poly, slong *length, const fq_zech_ctx_t ctx)
 
     Sets the length ``length`` of ``(poly,length)`` so that the
     top coefficient is non-zero. If all coefficients are zero, the
@@ -82,7 +82,7 @@ Memory management
 
     Truncates the polynomial to length at most `n`.
 
-.. function:: void fq_zech_poly_set_trunc(fq_zech_poly_t poly1, fq_zech_poly_t poly2, slong newlen, const fq_ctx_t ctx)
+.. function:: void fq_zech_poly_set_trunc(fq_zech_poly_t poly1, fq_zech_poly_t poly2, slong newlen, const fq_zech_ctx_t ctx)
 
     Sets ``poly1`` to ``poly2`` truncated to length `n`.
 
@@ -108,11 +108,11 @@ Polynomial parameters
 --------------------------------------------------------------------------------
 
 
-.. function:: long fq_zech_poly_degree(fq_zech_poly_t poly, const fq_zech_ctx_t ctx)
+.. function:: slong fq_zech_poly_degree(const fq_zech_poly_t poly, const fq_zech_ctx_t ctx)
 
     Returns the degree of the polynomial ``poly``.
 
-.. function:: long fq_zech_poly_length(fq_zech_poly_t poly, const fq_zech_ctx_t ctx)
+.. function:: slong fq_zech_poly_length(const fq_zech_poly_t poly, const fq_zech_ctx_t ctx)
 
     Returns the length of the polynomial ``poly``.
 
@@ -163,11 +163,11 @@ Assignment and basic manipulation
 
     Sets the polynomial ``poly`` to ``c``.
 
-.. function:: void fq_zech_poly_set_fmpz_mod_poly(fq_zech_poly_t rop, const fmpz_mod_poly_t op, fq_zech_ctx_t ctx)
+.. function:: void fq_zech_poly_set_fmpz_mod_poly(fq_zech_poly_t rop, const fmpz_mod_poly_t op, const fq_zech_ctx_t ctx)
 
     Sets the polynomial ``rop`` to the polynomial ``op``
 
-.. function:: void fq_zech_poly_set_nmod_poly(fq_zech_poly_t rop, const nmod_poly_t op, fq_zech_ctx_t ctx)
+.. function:: void fq_zech_poly_set_nmod_poly(fq_zech_poly_t rop, const nmod_poly_t op, const fq_zech_ctx_t ctx)
 
     Sets the polynomial ``rop`` to the polynomial ``op``
 
@@ -229,7 +229,7 @@ Comparison
     Returns nonzero if the two polynomials ``poly1`` and ``poly2``
     are equal, otherwise return zero.
 
-.. function:: int fq_zech_poly_equal_trunc(const fq_poly_t poly1, const fq_poly_t poly2, slong n, const fq_ctx_t ctx)
+.. function:: int fq_zech_poly_equal_trunc(const fq_zech_poly_t poly1, const fq_zech_poly_t poly2, slong n, const fq_zech_ctx_t ctx)
 
     Notionally truncate ``poly1`` and ``poly2`` to length `n` and
     return nonzero if they are equal, otherwise return zero.
@@ -238,7 +238,7 @@ Comparison
 
     Returns whether the polynomial ``poly`` is the zero polynomial.
 
-.. function:: int fq_zech_poly_is_one(const fq_zech_poly_t op)
+.. function:: int fq_zech_poly_is_one(const fq_zech_poly_t op, const fq_zech_ctx_t ctx)
 
     Returns whether the polynomial ``poly`` is equal
     to the constant polynomial `1`.
@@ -275,7 +275,7 @@ Addition and subtraction
 
     Sets ``res`` to the sum of ``poly1`` and ``c``.
 
-.. function:: void fq_zech_poly_add_series(fq_poly_t res, const fq_poly_t poly1, const fq_poly_t poly2, slong n, const fq_ctx_t ctx)
+.. function:: void fq_zech_poly_add_series(fq_zech_poly_t res, const fq_zech_poly_t poly1, const fq_zech_poly_t poly2, slong n, const fq_zech_ctx_t ctx)
 
     Notionally truncate ``poly1`` and ``poly2`` to length ``n`` and set
     ``res`` to the sum.
@@ -289,7 +289,7 @@ Addition and subtraction
 
     Sets ``res`` to the difference of ``poly1`` and ``poly2``.
 
-.. function:: void fq_zech_poly_sub_series(fq_poly_t res, const fq_poly_t poly1, const fq_poly_t poly2, slong n, const fq_ctx_t ctx)
+.. function:: void fq_zech_poly_sub_series(fq_zech_poly_t res, const fq_zech_poly_t poly1, const fq_zech_poly_t poly2, slong n, const fq_zech_ctx_t ctx)
 
     Notionally truncate ``poly1`` and ``poly2`` to length ``n`` and set
     ``res`` to the difference.
@@ -341,13 +341,13 @@ Scalar multiplication and division
     Subtracts from ``rop`` the product of ``op`` by the
     scalar ``x``, in the context defined by ``ctx``.
 
-.. function:: void _fq_zech_poly_scalar_div_fq(fq_zech_struct *rop, const fq_zech_struct *op, slong len, const fq_zech_t x, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_scalar_div_fq_zech(fq_zech_struct *rop, const fq_zech_struct *op, slong len, const fq_zech_t x, const fq_zech_ctx_t ctx)
 
     Sets ``(rop,len)`` to the quotient of ``(op,len)`` by the
     scalar ``x``, in the context defined by ``ctx``. An exception is raised
     if ``x`` is zero.
 
-.. function:: void fq_zech_poly_scalar_div_fq(fq_zech_poly_t rop, const fq_zech_poly_t op, const fq_zech_t x, const fq_zech_ctx_t ctx)
+.. function:: void fq_zech_poly_scalar_div_fq_zech(fq_zech_poly_t rop, const fq_zech_poly_t op, const fq_zech_t x, const fq_zech_ctx_t ctx)
 
     Sets ``rop`` to the quotient of ``op`` by the scalar ``x``, in the context
     defined by ``ctx``. An exception is raised if ``x`` is zero.
@@ -488,7 +488,7 @@ Multiplication
     ``res``, the remaining coefficients being arbitrary but reduced.
     Algorithm is classical multiplication.
 
-.. function:: void _fq_zech_poly_mulhigh(fq_zech_struct *res, const fq_zech_struct *poly1, slong len1, const fq_zech_struct *poly2, slong len2, slong start, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_mulhigh(fq_zech_struct *res, const fq_zech_struct *poly1, slong len1, const fq_zech_struct *poly2, slong len2, slong start, fq_zech_ctx_t ctx)
 
     Computes the product of ``(poly1, len1)`` and ``(poly2, len2)``
     and writes the coefficients from ``start`` onwards into the high
@@ -513,7 +513,7 @@ Multiplication
 
     Aliasing of ``f`` and ``res`` is not permitted.
 
-.. function:: void fq_zech_poly_mulmod(fq_zech_poly_t res,const fq_zech_poly_t poly1, const fq_zech_poly_t poly2, const fq_zech_poly_t f, const fq_zech_ctx_t ctx)
+.. function:: void fq_zech_poly_mulmod(fq_zech_poly_t res, const fq_zech_poly_t poly1, const fq_zech_poly_t poly2, const fq_zech_poly_t f, const fq_zech_ctx_t ctx)
 
     Sets ``res`` to the remainder of the product of ``poly1``
     and ``poly2`` upon polynomial division by ``f``.
@@ -630,7 +630,7 @@ Powering
     We require ``finv`` to be the inverse of the reverse of
     ``f``.
 
-.. function:: void _fq_zech_poly_powmod_fmpz_binexp(fq_zech_struct* res, const fq_zech_struct* poly, fmpz_t e, const fq_zech_struct* f, slong lenf, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_powmod_fmpz_binexp(fq_zech_struct* res, const fq_zech_struct* poly, const fmpz_t e, const fq_zech_struct* f, slong lenf, const fq_zech_ctx_t ctx)
 
     Sets ``res`` to ``poly`` raised to the power ``e`` modulo
     ``f``, using binary exponentiation. We require ``e > 0``.
@@ -640,12 +640,12 @@ Powering
     have length exactly ``lenf - 1``. The output ``res`` must
     have room for ``lenf - 1`` coefficients.
 
-.. function:: void fq_zech_poly_powmod_fmpz_binexp(fq_zech_poly_t res, const fq_zech_poly_t poly, fmpz_t e, const fq_zech_poly_t f, const fq_zech_ctx_t ctx)
+.. function:: void fq_zech_poly_powmod_fmpz_binexp(fq_zech_poly_t res, const fq_zech_poly_t poly, const fmpz_t e, const fq_zech_poly_t f, const fq_zech_ctx_t ctx)
 
     Sets ``res`` to ``poly`` raised to the power ``e`` modulo
     ``f``, using binary exponentiation. We require ``e >= 0``.
 
-.. function:: void _fq_zech_poly_powmod_fmpz_binexp_preinv(fq_zech_struct* res, const fq_zech_struct* poly, fmpz_t e, const fq_zech_struct* f, slong lenf, const fq_zech_struct* finv, slong lenfinv, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_powmod_fmpz_binexp_preinv(fq_zech_struct* res, const fq_zech_struct* poly, const fmpz_t e, const fq_zech_struct* f, slong lenf, const fq_zech_struct* finv, slong lenfinv, const fq_zech_ctx_t ctx)
 
     Sets ``res`` to ``poly`` raised to the power ``e`` modulo
     ``f``, using binary exponentiation. We require ``e > 0``.
@@ -657,14 +657,14 @@ Powering
     have length exactly ``lenf - 1``. The output ``res`` must
     have room for ``lenf - 1`` coefficients.
 
-.. function:: void fq_zech_poly_powmod_fmpz_binexp_preinv(fq_zech_poly_t res, const fq_zech_poly_t poly, fmpz_t e, const fq_zech_poly_t f, const fq_zech_poly_t finv, const fq_zech_ctx_t ctx)
+.. function:: void fq_zech_poly_powmod_fmpz_binexp_preinv(fq_zech_poly_t res, const fq_zech_poly_t poly, const fmpz_t e, const fq_zech_poly_t f, const fq_zech_poly_t finv, const fq_zech_ctx_t ctx)
 
     Sets ``res`` to ``poly`` raised to the power ``e`` modulo
     ``f``, using binary exponentiation. We require ``e >= 0``.
     We require ``finv`` to be the inverse of the reverse of
     ``f``.
 
-.. function:: void _fq_zech_poly_powmod_fmpz_sliding_preinv(fq_zech_struct* res, const fq_zech_struct* poly, fmpz_t e, ulong k, const fq_zech_struct* f, slong lenf, const fq_zech_struct* finv, slong lenfinv, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_powmod_fmpz_sliding_preinv(fq_zech_struct* res, const fq_zech_struct* poly, const fmpz_t e, ulong k, const fq_zech_struct* f, slong lenf, const fq_zech_struct* finv, slong lenfinv, const fq_zech_ctx_t ctx)
 
     Sets ``res`` to ``poly`` raised to the power ``e`` modulo
     ``f``, using sliding-window exponentiation with window size
@@ -678,7 +678,7 @@ Powering
     have length exactly ``lenf - 1``. The output ``res`` must
     have room for ``lenf - 1`` coefficients.
 
-.. function:: void fq_zech_poly_powmod_fmpz_sliding_preinv(fq_zech_poly_t res, const fq_zech_poly_t poly, fmpz_t e, ulong k, const fq_zech_poly_t f, const fq_zech_poly_t finv, const fq_zech_ctx_t ctx)
+.. function:: void fq_zech_poly_powmod_fmpz_sliding_preinv(fq_zech_poly_t res, const fq_zech_poly_t poly, const fmpz_t e, ulong k, const fq_zech_poly_t f, const fq_zech_poly_t finv, const fq_zech_ctx_t ctx)
 
     Sets ``res`` to ``poly`` raised to the power ``e`` modulo
     ``f``, using sliding-window exponentiation with window size
@@ -708,7 +708,7 @@ Powering
     Sets ``res`` to the low ``trunc`` coefficients of ``poly``
     (assumed to be zero padded if necessary to length ``trunc``) to                           the power ``e``. This is equivalent to doing a powering followed
     by a truncation. We require that ``res`` has enough space for
-    ``trunc`` coefficients, that ``trunc > 0`` and that                                       ``e > 1``. Aliasing is not permitted. Uses the binary                                     exponentiation method.                                                                
+    ``trunc`` coefficients, that ``trunc > 0`` and that                                       ``e > 1``. Aliasing is not permitted. Uses the binary                                     exponentiation method.
 
 .. function:: void fq_zech_poly_pow_trunc_binexp(fq_zech_poly_t res, const fq_zech_poly_t poly, ulong e, slong trunc, const fq_zech_ctx_t ctx)
 
@@ -725,7 +725,7 @@ Powering
     ``trunc`` coefficients, that ``trunc > 0`` and that
     ``e > 1``. Aliasing is not permitted.
 
-.. function:: void fq_zech_poly_pow_trunc(fq_zech_poly_t res, const fq_zech_poly_t poly, ulong e, slong trunc, fq_zech_ctx_t ctx)
+.. function:: void fq_zech_poly_pow_trunc(fq_zech_poly_t res, const fq_zech_poly_t poly, ulong e, slong trunc, const fq_zech_ctx_t ctx)
 
     Sets ``res`` to the low ``trunc`` coefficients of ``poly``
     to the power ``e``. This is equivalent to doing a powering
@@ -772,11 +772,11 @@ Norms
 --------------------------------------------------------------------------------
 
 
-.. function:: long _fq_zech_poly_hamming_weight(const fq_zech_poly *op, slong len, const fq_zech_ctx_t ctx)
+.. function:: slong _fq_zech_poly_hamming_weight(const fq_zech_struct *op, slong len, const fq_zech_ctx_t ctx)
 
     Returns the number of non-zero entries in ``(op, len)``.
 
-.. function:: long fq_zech_poly_hamming_weight(const fq_zech_poly_t op, const fq_zech_ctx_t ctx)
+.. function:: slong fq_zech_poly_hamming_weight(const fq_zech_poly_t op, const fq_zech_ctx_t ctx)
 
     Returns the number of non-zero entries in the polynomial ``op``.
 
@@ -844,7 +844,7 @@ Euclidean division
     `\operatorname{len}(R) < \operatorname{len}(B)`, but returns only ``Q``. If `\operatorname{len}(B) = 0` an
     exception is raised.
 
-.. function:: void _fq_zech_poly_div_newton_n_preinv(fq_zech_struct* Q, const fq_zech_struct* A, slong lenA, const fq_zech_struct* B, slong lenB, const fq_zech_struct* Binv, slong lenBinv, const fq_zech_struct ctx_t)
+.. function:: void _fq_zech_poly_div_newton_n_preinv(fq_zech_struct* Q, const fq_zech_struct* A, slong lenA, const fq_zech_struct* B, slong lenB, const fq_zech_struct* Binv, slong lenBinv, const fq_zech_ctx_t ctx)
 
     Notionally computes polynomials `Q` and `R` such that `A = BQ + R` with
     `\operatorname{len}(R)` less than ``lenB``, where ``A`` is of length ``lenA``
@@ -893,7 +893,7 @@ Euclidean division
     The algorithm used is to call :func:`div_newton` and then
     multiply out and compute the remainder.
 
-.. function:: void _fq_zech_poly_inv_series_newton(fq_zech_struct* Qinv, const fq_zech_struct* Q, slong n, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_inv_series_newton(fq_zech_struct* Qinv, const fq_zech_struct* Q, slong n, const fq_zech_t cinv, const fq_zech_ctx_t ctx)
 
     Given ``Q`` of length ``n`` whose constant coefficient is
     invertible modulo the given modulus, find a polynomial ``Qinv``
@@ -909,7 +909,7 @@ Euclidean division
     raised if this is not the case or if ``n = 0``. This function
     can be viewed as inverting a power series via Newton iteration.
 
-.. function:: void _fq_zech_poly_inv_series(fq_zech_struct* Qinv, const fq_zech_struct* Q, slong n, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_inv_series(fq_zech_struct* Qinv, const fq_zech_struct* Q, slong n, const fq_zech_t cinv, const fq_zech_ctx_t ctx)
 
     Given ``Q`` of length ``n`` whose constant coefficient is
     invertible modulo the given modulus, find a polynomial ``Qinv``
@@ -923,13 +923,13 @@ Euclidean division
     be invertible modulo the modulus of ``Q``. An exception is
     raised if this is not the case or if ``n = 0``.
 
-.. function:: void _fq_zech_poly_div_series(fmpz * Q, const fmpz * A, slong Alen, const fmpz * B, slong Blen, slong n, fq_ctx_t ctx)
+.. function:: void _fq_zech_poly_div_series(fq_zech_struct * Q, const fq_zech_struct * A, slong Alen, const fq_zech_struct * B, slong Blen, slong n, const fq_zech_ctx_t ctx)
 
     Set ``(Q, n)`` to the quotient of the series ``(A, Alen``) and
     ``(B, Blen)`` assuming ``Alen, Blen <= n``. We assume the bottom
     coefficient of ``B`` is invertible.
 
-.. function:: void fq_zech_poly_div_series(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, slong n, fq_ctx_t ctx)
+.. function:: void fq_zech_poly_div_series(fq_zech_poly_t Q, const fq_zech_poly_t A, const fq_zech_poly_t B, slong n, const fq_zech_ctx_t ctx)
 
     Set `Q` to the quotient of the series `A` by `B`, thinking of the series as
     though they were of length `n`. We assume that the bottom coefficient of
@@ -949,7 +949,7 @@ Greatest common divisor
     `P`. Except in the case where the GCD is zero, the GCD `G` is made
     monic.
 
-.. function:: long _fq_zech_poly_gcd(fq_zech_struct* G,const fq_zech_struct* A, slong lenA, const fq_zech_struct* B, slong lenB, const fq_zech_ctx_t ctx)
+.. function:: slong _fq_zech_poly_gcd(fq_zech_struct* G, const fq_zech_struct* A, slong lenA, const fq_zech_struct* B, slong lenB, const fq_zech_ctx_t ctx)
 
     Computes the GCD of `A` of length ``lenA`` and `B` of length
     ``lenB``, where ``lenA >= lenB > 0`` and sets `G` to it. The
@@ -972,7 +972,7 @@ Greatest common divisor
     Either sets `f = 1` and `G` to the greatest common divisor of `A`
     and `B` or sets `f` to a factor of the modulus of ``ctx``.
 
-.. function:: slong _fq_zech_poly_xgcd(fq_zech_struct *G, fq_zech_struct *S, fq_zech_struct *T, const fq_zech_struct *A, slong lenA, const fq_zech_struct *B, slong lenB, const fmpz_t invB, const fq_zech_ctx_t ctx)
+.. function:: slong _fq_zech_poly_xgcd(fq_zech_struct *G, fq_zech_struct *S, fq_zech_struct *T, const fq_zech_struct *A, slong lenA, const fq_zech_struct *B, slong lenB, const fq_zech_ctx_t ctx)
 
     Computes the GCD of `A` and `B` together with cofactors `S` and `T`
     such that `S A + T B = G`.  Returns the length of `G`.
@@ -1000,7 +1000,7 @@ Greatest common divisor
     ``S*A + T*B = G``. The length of ``S`` will be at most
     ``lenB`` and the length of ``T`` will be at most ``lenA``.
 
-.. function:: slong _fq_zech_poly_xgcd_euclidean_f(fq_zech_t f, fq_zech_struct *G, fq_zech_struct *S, fq_zech_struct *T, const fq_zech_struct *A, slong lenA, const fq_zech_struct *B, slong lenB, const fmpz_t invB, const fq_zech_ctx_t ctx)
+.. function:: slong _fq_zech_poly_xgcd_euclidean_f(fq_zech_t f, fq_zech_struct *G, fq_zech_struct *S, fq_zech_struct *T, const fq_zech_struct *A, slong lenA, const fq_zech_struct *B, slong lenB, const fq_zech_ctx_t ctx)
 
     Either sets `f = 1` and computes the GCD of `A` and `B` together
     with cofactors `S` and `T` such that `S A + T B = G`; otherwise,

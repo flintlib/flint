@@ -46,13 +46,13 @@ Orderings
 
     Initialize a context with a random choice for the ordering.
 
-.. function:: int mpoly_ordering_isdeg(ordering_t ord)
+.. function:: int mpoly_ordering_isdeg(const mpoly_ctx_t ctx)
 
-    Return 1 if the given ordering is a degree ordering (deglex or degrevlex).
+    Return 1 if the ordering of the given context is a degree ordering (deglex or degrevlex).
 
-.. function:: int mpoly_ordering_isrev(ordering_t ord)
+.. function:: int mpoly_ordering_isrev(const mpoly_ctx_t cth)
 
-    Return 1 if the given ordering is a reverse ordering (currently only
+    Return 1 if the ordering of the given context is a reverse ordering (currently only
     degrevlex).
 
 .. function:: void mpoly_ordering_print(ordering_t ord)
@@ -126,7 +126,7 @@ Monomial comparison
 
     Return 1 if the monomials ``(exp2, N)`` and ``(exp3, N)`` are equal.
 
-.. function:: void mpoly_get_cmpmask(ulong * cmpmask, slong N, slong bits, const mpoly_ctx_t mctx)
+.. function:: void mpoly_get_cmpmask(ulong * cmpmask, slong N, ulong bits, const mpoly_ctx_t mctx)
 
     Get the mask ``(cmpmask, N)`` for comparisons.
     ``bits`` should be set to the number of bits in the exponents
@@ -196,13 +196,13 @@ Basic manipulation
     Returns the number of bits required to store ``user_exp`` in packed
     format. The returned number of bits includes space for a zeroed signed bit.
     
-.. function:: void mpoly_max_fields_ui_sp(ulong * max_fields, const ulong * poly_exps, slong len, slong bits, const mpoly_ctx_t mctx)
+.. function:: void mpoly_max_fields_ui_sp(ulong * max_fields, const ulong * poly_exps, slong len, ulong bits, const mpoly_ctx_t mctx)
 
     Compute the field-wise maximum of packed exponents from ``poly_exps``
     of length ``len`` and unpack the result into ``max_fields``.
     The maximums are assumed to fit a ulong.
 
-.. function:: void mpoly_max_fields_fmpz(fmpz * max_fields, const ulong * poly_exps, slong len, slong bits, const mpoly_ctx_t mctx)
+.. function:: void mpoly_max_fields_fmpz(fmpz * max_fields, const ulong * poly_exps, slong len, ulong bits, const mpoly_ctx_t mctx)
 
     Compute the field-wise maximum of packed exponents from ``poly_exps``
     of length ``len`` and unpack the result into ``max_fields``.
@@ -227,7 +227,7 @@ Basic manipulation
     could be inserted to preserve the ordering. The index can be in the range
     ``[0, len]``.
 
-.. function:: void mpoly_search_monomials( slong ** e_ind, ulong * e, slong * e_score, slong * t1, slong * t2, slong *t3, slong lower, slong upper, const ulong * a, slong a_len, const ulong * b, slong b_len, slong N, const ulong * cmpmask)
+.. function:: void mpoly_search_monomials(slong ** e_ind, ulong * e, slong * e_score, slong * t1, slong * t2, slong *t3, slong lower, slong upper, const ulong * a, slong a_len, const ulong * b, slong b_len, slong N, const ulong * cmpmask)
 
     Given packed exponent vectors ``a`` and ``b``, compute a packed
     exponent ``e`` such that the number of monomials in the cross product
@@ -245,17 +245,17 @@ Setting and getting monomials
 --------------------------------------------------------------------------------
 
 
-.. function:: int mpoly_term_exp_fits_ui(ulong * exps, slong bits, slong n, const mpoly_ctx_t mctx)
+.. function:: int mpoly_term_exp_fits_ui(ulong * exps, ulong bits, slong n, const mpoly_ctx_t mctx)
 
     Return whether every entry of the exponent vector of index `n` in
     ``exps`` fits into a ``ulong``.
 
-.. function:: int mpoly_term_exp_fits_si(ulong * exps, slong bits, slong n, const mpoly_ctx_t mctx)
+.. function:: int mpoly_term_exp_fits_si(ulong * exps, ulong bits, slong n, const mpoly_ctx_t mctx)
 
     Return whether every entry of the exponent vector of index `n` in
     ``exps`` fits into a ``slong``.
 
-.. function:: void mpoly_get_monomial_ui(ulong * exps, const ulong * poly_exps, slong bits, const mpoly_ctx_t mctx)
+.. function:: void mpoly_get_monomial_ui(ulong * exps, const ulong * poly_exps, ulong bits, const mpoly_ctx_t mctx)
 
     Convert the packed exponent ``poly_exps`` of bit count ``bits`` to a
     monomial from the user's perspective. The exponents are assumed to fit
@@ -271,7 +271,7 @@ Setting and getting monomials
     Convert the packed exponent ``poly_exps`` of bit count ``bits`` to a
     monomial from the user's perspective.
 
-.. function:: void mpoly_set_monomial_ui(ulong * exp1, const ulong * exp2, slong bits, const mpoly_ctx_t mctx)
+.. function:: void mpoly_set_monomial_ui(ulong * exp1, const ulong * exp2, ulong bits, const mpoly_ctx_t mctx)
 
     Convert the user monomial ``exp2`` to packed format using ``bits``.
 
@@ -288,7 +288,7 @@ Packing and unpacking monomials
 --------------------------------------------------------------------------------
 
 
-.. function:: void mpoly_pack_vec_ui(ulong * exp1, const ulong * exp2, slong bits, slong nfields, slong len)
+.. function:: void mpoly_pack_vec_ui(ulong * exp1, const ulong * exp2, ulong bits, slong nfields, slong len)
 
     Packs a vector ``exp2`` into \{exp1} using a bit count of ``bits``.
     No checking is done to ensure that the vector actually fits
@@ -303,7 +303,7 @@ Packing and unpacking monomials
     into ``bits`` bits. The number of fields in each vector is
     ``nfields`` and the total number of vectors to unpack is ``len``.
 
-.. function:: void mpoly_unpack_vec_ui(ulong * exp1, const ulong * exp2, slong bits, slong nfields, slong len)
+.. function:: void mpoly_unpack_vec_ui(ulong * exp1, const ulong * exp2, ulong bits, slong nfields, slong len)
 
     Unpacks vector ``exp2`` of bit count ``bits`` into ``exp1``.
     The number of fields in each vector is
@@ -315,13 +315,13 @@ Packing and unpacking monomials
     The number of fields in each vector is
     ``nfields`` and the total number of vectors to unpack is ``len``.
 
-.. function:: void mpoly_repack_monomials(ulong * exps1, slong bits1, const ulong * exps2, slong bits2, slong len, const mpoly_ctx_t mctx)
+.. function:: int mpoly_repack_monomials(ulong * exps1, ulong bits1, const ulong * exps2, ulong bits2, slong len, const mpoly_ctx_t mctx)
 
     Convert an array of length ``len`` of exponents ``exps2`` packed
     using bits ``bits2`` into an array ``exps1`` using bits ``bits1``.
     No checking is done to ensure that the result fits into bits ``bits1``.
  
-.. function:: void mpoly_pack_monomials_tight(ulong * exp1, const ulong * exp2, slong len, const slong * mults, slong num, slong extra, slong bits)
+.. function:: void mpoly_pack_monomials_tight(ulong * exp1, const ulong * exp2, slong len, const slong * mults, slong num, slong bits)
 
     Given an array of possibly packed exponent vectors ``exp2`` of length
     ``len``, where each field of each exponent vector is packed into the
@@ -336,7 +336,7 @@ Packing and unpacking monomials
     least significant ``num`` fields of each exponent vectors and ignores
     the rest. The number of ignored fields should be passed in ``extras``.
 
-.. function:: void mpoly_unpack_monomials_tight(ulong * e1, ulong * e2, slong len, slong * mults, slong num, slong extra, slong bits)
+.. function:: void mpoly_unpack_monomials_tight(ulong * e1, ulong * e2, slong len, slong * mults, slong num, slong bits)
 
     Given an array of exponent vectors ``e2`` of length ``len`` packed
     using a factorial numbering scheme, unpack the monomials into an array
@@ -371,7 +371,7 @@ Chained heap functions
 --------------------------------------------------------------------------------
 
 
-.. function:: int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x, slong * heap_len, slong N, const ulong * cmpmask)
+.. function:: int _mpoly_heap_insert(mpoly_heap_s * heap, ulong * exp, void * x, slong * next_loc, slong * heap_len, slong N, const ulong * cmpmask)
 
     Given a heap, insert a new node `x` corresponding to the given exponent
     into the heap. Heap elements are ordered by the exponent ``(exp, N)``,
@@ -380,12 +380,12 @@ Chained heap functions
     the function. Note that the index 0 position in the heap is not used, so
     the length is always one greater than the number of elements.
 
-.. function:: void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp, void * x, slong * heap_len, ulong maskhi)
+.. function:: void _mpoly_heap_insert1(mpoly_heap1_s * heap, ulong exp, void * x, slong * next_loc, slong * heap_len, ulong maskhi)
 
     As per ``_mpoly_heap_insert`` except that ``N = 1``, and 
     ``maskhi = cmpmask[0]``.
 
-.. function:: void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N, ulong maskhi, ulong masklo)
+.. function:: void * _mpoly_heap_pop(mpoly_heap_s * heap, slong * heap_len, slong N, const ulong * cmpmask)
 
     Pop the head of the heap. It is cast to a ``void *``. A pointer to the
     current heap length must be passed in via ``heap_len``. This will be

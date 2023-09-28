@@ -289,7 +289,7 @@ Factoring of ``fmpz`` integers using ECM
     If the factor is found, number of words required to store the factor is
     returned, otherwise `0`.
 
-.. function:: int fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2, flint_rand_t state, fmpz_t n_in)
+.. function:: int fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2, flint_rand_t state, const fmpz_t n_in)
 
     Outer wrapper function for the ECM algorithm. In case ``f`` can fit
     in a single unsigned word, a call to ``n_factor_ecm`` is made. 

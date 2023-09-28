@@ -24,7 +24,7 @@ Memory management
     coefficients modulo `n`, where `n` can be any nonzero integer that 
     fits in a limb. All elements are set to zero.
 
-.. function:: void nmod_mat_init_set(nmod_mat_t mat, nmod_mat_t src)
+.. function:: void nmod_mat_init_set(nmod_mat_t mat, const nmod_mat_t src)
 
     Initialises ``mat`` and sets its dimensions, modulus and elements 
     to those of ``src``.
@@ -35,7 +35,7 @@ Memory management
     cannot be used again until it is initialised. This function must be
     called exactly once when finished using an ``nmod_mat_t`` object.
 
-.. function:: void nmod_mat_set(nmod_mat_t mat, nmod_mat_t src)
+.. function:: void nmod_mat_set(nmod_mat_t mat, const nmod_mat_t src)
 
     Sets ``mat`` to a copy of ``src``. It is assumed 
     that ``mat`` and ``src`` have identical dimensions.
@@ -74,11 +74,11 @@ Basic properties and manipulation
     Set the entry at row `i` and column `j` of the matrix ``mat`` to
     ``x``.
     
-.. function:: slong nmod_mat_nrows(nmod_mat_t mat)
+.. function:: slong nmod_mat_nrows(const nmod_mat_t mat)
 
     Returns the number of rows in ``mat``.
 
-.. function:: slong nmod_mat_ncols(nmod_mat_t mat)
+.. function:: slong nmod_mat_ncols(const nmod_mat_t mat)
 
     Returns the number of columns in ``mat``.
 
@@ -86,7 +86,7 @@ Basic properties and manipulation
 
     Sets all entries of the matrix ``mat`` to zero.
 
-.. function:: int nmod_mat_is_zero(nmod_mat_t mat)
+.. function:: int nmod_mat_is_zero(const nmod_mat_t mat)
 
     Returns `1` if all entries of the matrix ``mat`` are zero.
 
@@ -126,7 +126,7 @@ Printing
 --------------------------------------------------------------------------------
 
 
-.. function:: void nmod_mat_print_pretty(nmod_mat_t mat)
+.. function:: void nmod_mat_print_pretty(const nmod_mat_t mat)
 
     Pretty-prints ``mat`` to ``stdout``. A header is printed followed 
     by the rows enclosed in brackets. Each column is right-aligned to the 
@@ -154,7 +154,7 @@ Random matrix generation
     Sets the element to random numbers likely to be close to the modulus
     of the matrix. This is used to test potential overflow-related bugs.
 
-.. function:: int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state, mp_srcptr * diag, slong n)
+.. function:: int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state, mp_srcptr diag, slong n)
 
     Sets ``mat`` to a random permutation of the diagonal matrix 
     with `n` leading entries given by the vector ``diag``. It is 
@@ -200,7 +200,7 @@ Comparison
 --------------------------------------------------------------------------------
 
 
-.. function:: int nmod_mat_equal(nmod_mat_t mat1, nmod_mat_t mat2)
+.. function:: int nmod_mat_equal(const nmod_mat_t mat1, const nmod_mat_t mat2)
 
     Returns nonzero if ``mat1`` and ``mat2`` have the same dimensions and elements,
     and zero otherwise. The moduli are ignored.
@@ -214,7 +214,7 @@ Transposition and permutations
 --------------------------------------------------------------------------------
 
 
-.. function:: void nmod_mat_transpose(nmod_mat_t B, nmod_mat_t A)
+.. function:: void nmod_mat_transpose(nmod_mat_t B, const nmod_mat_t A)
 
     Sets `B` to the transpose of `A`. Dimensions must be compatible.
     `B` and `A` may be the same object if and only if the matrix is square.
@@ -251,15 +251,15 @@ Addition and subtraction
 --------------------------------------------------------------------------------
 
 
-.. function:: void nmod_mat_add(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+.. function:: void nmod_mat_add(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
     Computes `C = A + B`. Dimensions must be identical.
 
-.. function:: void nmod_mat_sub(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+.. function:: void nmod_mat_sub(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
     Computes `C = A - B`. Dimensions must be identical.
 
-.. function:: void nmod_mat_neg(nmod_mat_t A, nmod_mat_t B)
+.. function:: void nmod_mat_neg(nmod_mat_t A, const nmod_mat_t B)
 
     Sets `B = -A`. Dimensions must be identical.
 
@@ -365,7 +365,7 @@ Matrix Exponentiation
 
  	   Sets `dest = mat^{pow}`. ``dest`` and ``mat`` cannot be aliased. Implements exponentiation by squaring.
 
-.. function:: void nmod_mat_pow(nmod_mat_t dest, nmod_mat_t mat, ulong pow)
+.. function:: void nmod_mat_pow(nmod_mat_t dest, const nmod_mat_t mat, ulong pow)
 
     Sets `dest = mat^{pow}`. ``dest`` and ``mat`` may be aliased. Implements
    	exponentiation by squaring.
@@ -402,7 +402,7 @@ Inverse
 --------------------------------------------------------------------------------
 
 
-.. function:: int nmod_mat_inv(nmod_mat_t B, nmod_mat_t A)
+.. function:: int nmod_mat_inv(nmod_mat_t B, const nmod_mat_t A)
 
     Sets `B = A^{-1}` and returns `1` if `A` is invertible. 
     If `A` is singular, returns `0` and sets the elements of 
@@ -495,7 +495,7 @@ Nonsingular square solving
 --------------------------------------------------------------------------------
 
 
-.. function:: int nmod_mat_solve(nmod_mat_t X, nmod_mat_t A, nmod_mat_t B)
+.. function:: int nmod_mat_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B)
 
     Solves the matrix-matrix equation `AX = B` over `\mathbb{Z} / p \mathbb{Z}` where `p`
     is the modulus of `X` which must be a prime number. `X`, `A`, and `B`
@@ -517,7 +517,7 @@ Nonsingular square solving
     set by the function call. They are set to the columns of the pivots chosen
     by the LU decomposition of `A`.
 
-.. function:: int nmod_mat_can_solve(nmod_mat_t X, nmod_mat_t A, nmod_mat_t B)
+.. function:: int nmod_mat_can_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B)
 
     Solves the matrix-matrix equation `AX = B` over `\mathbb{Z} / p \mathbb{Z}` where `p`
     is the modulus of `X` which must be a prime number. `X`, `A`, and `B`
@@ -529,7 +529,7 @@ Nonsingular square solving
 
     There are no restrictions on the shape of `A` and it may be singular.
 
-.. function:: int nmod_mat_solve_vec(mp_limb_t * x, nmod_mat_t A, mp_limb_t * b)
+.. function:: int nmod_mat_solve_vec(mp_ptr x, const nmod_mat_t A, mp_srcptr b)
 
     Solves the matrix-vector equation `Ax = b` over `\mathbb{Z} / p \mathbb{Z}` where `p`
     is the modulus of `A` which must be a prime number.

@@ -73,7 +73,7 @@ so these methods should not be used gratuitously.
     an *slong*. The result is clamped between -*WORD_MAX* and *WORD_MAX*,
     i.e. between `\pm (2^{63}-1)` inclusive on a 64-bit machine.
 
-.. function:: slong _fmpz_set_si_small(fmpz_t x, slong v)
+.. function:: void _fmpz_set_si_small(fmpz_t x, slong v)
 
     Sets *x* to the integer *v* which is required to be a value
     between *COEFF_MIN* and *COEFF_MAX* so that promotion to

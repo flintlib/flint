@@ -50,7 +50,7 @@ Basic Operations
 
     Sets ``res`` to the same factorisation as ``fac``.
 
-.. function:: void fq_nmod_poly_factor_print_pretty(const fq_nmod_poly_factor_t fac, const fq_nmod_ctx_t ctx)
+.. function:: void fq_nmod_poly_factor_print_pretty(const fq_nmod_poly_factor_t fac, const char * var, const fq_nmod_ctx_t ctx)
 
     Pretty-prints the entries of ``fac`` to standard output.
 
@@ -182,7 +182,7 @@ Factorisation
     Factorises a non-constant polynomial ``f`` into monic
     irreducible factors using the Berlekamp algorithm.
 
-.. function:: void fq_nmod_poly_factor_with_berlekamp(fq_nmod_poly_factor_t res, fq_nmod_t leading_coeff, const fq_nmod_poly_t f, const fq_nmod_ctx_t)
+.. function:: void fq_nmod_poly_factor_with_berlekamp(fq_nmod_poly_factor_t res, fq_nmod_t leading_coeff, const fq_nmod_poly_t f, const fq_nmod_ctx_t ctx)
 
     Factorises a general polynomial ``f`` into monic irreducible
     factors and sets ``leading_coeff`` to the leading coefficient

@@ -39,7 +39,7 @@ void fmpz_mod_mpoly_set_fmpz(
 
 void fmpz_mod_mpoly_set_ui(
     fmpz_mod_mpoly_t A,
-    slong c,
+    ulong c,
     const fmpz_mod_mpoly_ctx_t ctx)
 {
     fmpz_mod_mpoly_fit_length(A, 1, ctx);

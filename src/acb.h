@@ -376,7 +376,7 @@ acb_sub(acb_t z, const acb_t x, const acb_t y, slong prec)
 }
 
 ACB_INLINE void
-acb_add_si(acb_t z, const acb_t x, ulong c, slong prec)
+acb_add_si(acb_t z, const acb_t x, slong c, slong prec)
 {
     arb_add_si(acb_realref(z), acb_realref(x), c, prec);
     arb_set_round(acb_imagref(z), acb_imagref(x), prec);
@@ -390,7 +390,7 @@ acb_add_ui(acb_t z, const acb_t x, ulong c, slong prec)
 }
 
 ACB_INLINE void
-acb_sub_si(acb_t z, const acb_t x, ulong c, slong prec)
+acb_sub_si(acb_t z, const acb_t x, slong c, slong prec)
 {
     arb_sub_si(acb_realref(z), acb_realref(x), c, prec);
     arb_set_round(acb_imagref(z), acb_imagref(x), prec);

@@ -52,7 +52,7 @@ Basic assignment and manipulation
     Swaps two matrices by swapping the individual entries rather than swapping
     the contents of the structs.
 
-.. function:: fmpz * fmpz_mat_entry(fmpz_mat_t mat, slong i, slong j)
+.. function:: fmpz * fmpz_mat_entry(const fmpz_mat_t mat, slong i, slong j)
 
     Returns a reference to the entry of ``mat`` at row `i` and column `j`.
     This reference can be passed as an input or output variable to any
@@ -373,7 +373,7 @@ Modular reduction and reconstruction
     with entries satisfying `-mn/2 <= c < mn/2` (if sign = 1)
     or `0 <= c < mn` (if sign = 0).
 
-.. function:: void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres, const fmpz_mat_t mat, fmpz_comb_t comb, fmpz_comb_temp_t temp)
+.. function:: void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres, const fmpz_mat_t mat, const fmpz_comb_t comb, fmpz_comb_temp_t temp)
 
     Sets each of the ``nres`` matrices in ``residues`` to ``mat`` reduced modulo
     the modulus of the respective matrix, given precomputed ``comb`` and
@@ -391,7 +391,7 @@ Modular reduction and reconstruction
     For reducing or reconstructing multiple integer matrices over the same
     set of moduli, it is faster to use ``fmpz_mat_multi_mod_precomp``.
 
-.. function:: void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat, nmod_mat_t * const residues, slong nres, fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign)
+.. function:: void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat, nmod_mat_t * const residues, slong nres, const fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign)
 
     Reconstructs ``mat`` from its images modulo the ``nres`` matrices in
     ``residues``, given precomputed ``comb`` and ``comb_temp`` structures.
@@ -571,7 +571,7 @@ Matrix multiplication
     where ``A`` must be a square matrix. Aliasing is allowed.
 
 
-.. function:: int _fmpz_mat_mul_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
+.. function:: void _fmpz_mat_mul_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     This internal function sets `C` to the matrix product `C = A B` computed
     using classical matrix algorithm assuming that all entries of `A` and `B`
@@ -972,7 +972,7 @@ allowed between arguments.
     Note that the matrices `A` and `B` may have any shape as long as they have
     the same number of rows.
 
-.. function:: void fmpz_mat_can_solve_fflu(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B)
+.. function:: int fmpz_mat_can_solve_fflu(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B)
 
     Returns `1` if the system `AX = B` can be solved. If so it computes
     (``X``, ``den``) such that `AX = B \times \operatorname{den}`. The
@@ -1105,7 +1105,7 @@ Strong echelon form and Howell form
 
     `A` must have at least as many rows as columns.
 
-.. function:: slong fmpz_mat_howell_form_mod(nmod_mat_t A, const fmpz_t mod)
+.. function:: slong fmpz_mat_howell_form_mod(fmpz_mat_t A, const fmpz_t mod)
 
     Transforms `A` such that `A` modulo ``mod`` is the Howell form of the
     input matrix modulo ``mod``. 

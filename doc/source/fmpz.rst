@@ -457,7 +457,7 @@ Input and output
     ``scanf`` from the standard library and ``mpz_inp_str`` 
     from MPIR.
 
-.. function:: size_t fmpz_inp_raw( fmpz_t x, FILE *fin )
+.. function:: size_t fmpz_inp_raw(fmpz_t x, FILE *fin )
 
     Reads a multiprecision integer from the stream ``file``.  The
     format is raw binary format write by :func:`fmpz_out_raw`. 
@@ -468,7 +468,7 @@ Input and output
     This function calls the ``mpz_inp_raw`` function in library gmp. So that it 
     can read the raw data written by ``mpz_inp_raw`` directly.
     
-.. function:: int fmpz_print(fmpz_t x)
+.. function:: int fmpz_print(const fmpz_t x)
 
     Prints the value `x` to ``stdout``, without a carriage return (CR).
     The value is printed as either `0`, the decimal digits of a 
@@ -482,7 +482,7 @@ Input and output
     ``flint_printf`` from the standard library and ``mpz_out_str`` 
     from MPIR.
 
-.. function:: int fmpz_fprint(FILE * file, fmpz_t x)
+.. function:: int fmpz_fprint(FILE * file, const fmpz_t x)
 
     Prints the value `x` to ``file``, without a carriage return (CR).
     The value is printed as either `0`, the decimal digits of a 
@@ -496,7 +496,7 @@ Input and output
     ``flint_printf`` from the standard library and ``mpz_out_str`` 
     from MPIR.
 
-.. function:: size_t fmpz_out_raw( FILE *fout, const fmpz_t x )
+.. function:: size_t fmpz_out_raw(FILE *fout, const fmpz_t x )
 
     Writes the value `x` to ``file``.
     The value is written in raw binary format. The integer is written in 
@@ -1103,7 +1103,7 @@ Bit packing and unpacking
 --------------------------------------------------------------------------------
 
 
-.. function:: int fmpz_bit_pack(mp_limb_t * arr, flint_bitcnt_t shift, flint_bitcnt_t bits, fmpz_t coeff, int negate, int borrow)
+.. function:: int fmpz_bit_pack(mp_limb_t * arr, flint_bitcnt_t shift, flint_bitcnt_t bits, const fmpz_t coeff, int negate, int borrow)
 
     Shifts the given coefficient to the left by ``shift`` bits and adds 
     it to the integer in ``arr`` in a field of the given number of bits::
@@ -1171,7 +1171,7 @@ Logic Operations
     Sets ``r`` to the bit-wise logical exclusive ``or`` of
     ``a`` and ``b``.
 
-.. function:: int fmpz_popcnt(const fmpz_t a)
+.. function:: ulong fmpz_popcnt(const fmpz_t a)
 
     Returns the number of '1' bits in the given Z (aka Hamming weight or
     population count).
@@ -1197,7 +1197,7 @@ see ``crt.c`` and ``multi_crt.c`` in the ``examples``
 directory.
 The ``fmpz_multi_CRT`` class is similar to ``fmpz_multi_CRT_ui`` except that it performs error checking and works with arbitrary moduli.
 
-.. function:: void fmpz_CRT_ui(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2, int sign)
+.. function:: void fmpz_CRT_ui(fmpz_t out, const fmpz_t r1, const fmpz_t m1, ulong r2, ulong m2, int sign)
 
     Uses the Chinese Remainder Theorem to compute the unique integer
     `0 \le x < M` (if sign = 0) or `-M/2 < x \le M/2` (if sign = 1)
@@ -1280,12 +1280,12 @@ The ``fmpz_multi_CRT`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
     A return of ``1`` indicates that the compilation was successful, which occurs if and only
     if either (1) ``len == 1`` and ``modulus + 0`` is nonzero, or (2) no modulus is `0,1,-1` and all moduli are pairwise relatively prime.
 
-.. function:: void fmpz_multi_CRT_precomp(fmpz_t output, const fmpz_multi_CRT_t P, const fmpz * inputs)
+.. function:: void fmpz_multi_CRT_precomp(fmpz_t output, const fmpz_multi_CRT_t P, const fmpz * inputs, int sign)
 
     Set ``output`` to an integer of smallest absolute value that is congruent to ``values + i`` modulo the ``moduli + i``
     in ``P``.
 
-.. function:: int fmpz_multi_CRT(fmpz_t output, const fmpz * moduli, const fmpz * values, slong len)
+.. function:: int fmpz_multi_CRT(fmpz_t output, const fmpz * moduli, const fmpz * values, slong len, int sign)
 
     Perform the same operation as :func:`fmpz_multi_CRT_precomp` while internally constructing and destroying the precomputed data.
     All of the remarks in :func:`fmpz_multi_CRT_precompute` apply.

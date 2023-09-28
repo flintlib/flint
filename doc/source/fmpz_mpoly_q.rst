@@ -121,7 +121,7 @@ Special values
 Input and output
 -------------------------------------------------------------------------------
 
-.. function:: void fmpz_mpoly_q_print_pretty(const fmpz_mpoly_q_t f, const char ** x, fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_q_print_pretty(const fmpz_mpoly_q_t f, const char ** x, const fmpz_mpoly_ctx_t ctx)
 
     Prints *res* to standard output. If *x* is not *NULL*, the strings in
     *x* are used as the symbols for the variables.

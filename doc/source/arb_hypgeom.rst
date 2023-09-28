@@ -171,7 +171,7 @@ Confluent hypergeometric functions
 
     Computes the confluent hypergeometric function `U(a,b,z)`.
 
-.. function:: void arb_hypgeom_u_integration(arb_t res, const arb_t a, const arb_t b, const arb_t z, int regularized, slong prec)
+.. function:: void arb_hypgeom_u_integration(arb_t res, const arb_t a, const arb_t b, const arb_t z, slong prec)
 
     Computes the confluent hypergeometric function `U(a,b,z)` using numerical integration
     of the representation
@@ -196,7 +196,7 @@ Gauss hypergeometric function
     Additional evaluation flags can be passed via the *regularized*
     argument; see :func:`acb_hypgeom_2f1` for documentation.
 
-.. function:: void arb_hypgeom_2f1_integration(arb_t res, const arb_t a, const arb_t b, const arb_t z, int regularized, slong prec)
+.. function:: void arb_hypgeom_2f1_integration(arb_t res, const arb_t a, const arb_t b, const arb_t c, const arb_t z, int regularized, slong prec)
 
     Computes the Gauss hypergeometric function using numerical integration
     of the representation
@@ -600,7 +600,7 @@ Orthogonal polynomials and functions
 .. function:: void arb_hypgeom_legendre_p_ui_zero(arb_t res, arb_t res_prime, ulong n, const arb_t x, slong K, slong prec)
               void arb_hypgeom_legendre_p_ui_one(arb_t res, arb_t res_prime, ulong n, const arb_t x, slong K, slong prec)
               void arb_hypgeom_legendre_p_ui_asymp(arb_t res, arb_t res_prime, ulong n, const arb_t x, slong K, slong prec)
-              void arb_hypgeom_legendre_p_rec(arb_t res, arb_t res_prime, ulong n, const arb_t x, slong prec)
+              void arb_hypgeom_legendre_p_ui_rec(arb_t res, arb_t res_prime, ulong n, const arb_t x, slong prec)
               void arb_hypgeom_legendre_p_ui(arb_t res, arb_t res_prime, ulong n, const arb_t x, slong prec)
 
     Evaluates the ordinary Legendre polynomial `P_n(x)`. If *res_prime* is

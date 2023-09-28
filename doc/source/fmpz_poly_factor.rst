@@ -81,7 +81,7 @@ Factoring algorithms
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpz_poly_factor_squarefree(fmpz_poly_factor_t fac, fmpz_poly_t F)
+.. function:: void fmpz_poly_factor_squarefree(fmpz_poly_factor_t fac, const fmpz_poly_t F)
 
     Takes as input a polynomial `F` and a freshly initialized factor 
     structure ``fac``.  Updates ``fac`` to contain a factorization 
@@ -107,7 +107,7 @@ Factoring algorithms
     The impact of the algorithm is to augment a factorization of 
     ``F^exp`` to the factor structure ``final_fac``.
 
-.. function:: void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, slong exp, fmpz_poly_t f, slong cutoff, int use_van_hoeij)
+.. function:: void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, slong exp, const fmpz_poly_t f, slong cutoff, int use_van_hoeij)
 
     This is the internal wrapper of Zassenhaus.
 
@@ -129,7 +129,7 @@ Factoring algorithms
     algorithm with gradual feeding and mod `2^k` data truncation to find
     factors when the number of local factors is large.
 
-.. function:: void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, fmpz_poly_t F)
+.. function:: void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, const fmpz_poly_t F)
 
     A wrapper of the Zassenhaus factoring algorithm, which takes as input 
     any polynomial `F`, and stores a factorization in ``final_fac``.
@@ -145,7 +145,7 @@ Factoring algorithms
     been removed, and does not update the content of *fac*.
     The factorization is calculated over `\mathbb{R}` or `\mathbb{Q}_2` and then tested over `\mathbb{Z}`.
 
-.. function:: void fmpz_poly_factor(fmpz_poly_factor_t final_fac, fmpz_poly_t F)
+.. function:: void fmpz_poly_factor(fmpz_poly_factor_t final_fac, const fmpz_poly_t F)
 
     A wrapper of the Zassenhaus and van Hoeij factoring algorithms, which takes
     as input any polynomial `F`, and stores a factorization in

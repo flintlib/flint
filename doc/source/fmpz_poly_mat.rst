@@ -51,7 +51,7 @@ Basic assignment and manipulation
 --------------------------------------------------------------------------------
 
 
-.. function:: fmpz_poly_struct * fmpz_poly_mat_entry(fmpz_poly_mat_t mat, slong i, slong j)
+.. function:: fmpz_poly_struct * fmpz_poly_mat_entry(const fmpz_poly_mat_t mat, slong i, slong j)
 
     Gives a reference to the entry at row ``i`` and column ``j``.
     The reference can be passed as an input or output variable to any

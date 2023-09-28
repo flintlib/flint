@@ -268,7 +268,7 @@ Atoms
 
     Sets *res* to the atomic integer *c*.
 
-.. function:: void fexpr_get_fmpz(fmpz_t res, const fexpr_t expr)
+.. function:: int fexpr_get_fmpz(fmpz_t res, const fexpr_t expr)
 
     Sets *res* to the atomic integer in *expr*. This aborts
     if *expr* is not an atomic integer.
