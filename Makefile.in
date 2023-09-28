@@ -36,9 +36,9 @@ FLINT_SOLIB:=@FLINT_SOLIB@
 prefix:=@prefix@
 exec_prefix:=@exec_prefix@
 
-INCLUDEDIR:=@includedir@
-LIBDIR:=@libdir@
-BINDIR:=@bindir@
+INCLUDEDIR:=$(DESTDIR)@includedir@
+LIBDIR:=$(DESTDIR)@libdir@
+BINDIR:=$(DESTDIR)@bindir@
 PKGCONFIGDIR:=$(LIBDIR)/pkgconfig
 
 HOST_OS:=@host_os@
