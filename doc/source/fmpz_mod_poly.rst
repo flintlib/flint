@@ -294,7 +294,7 @@ Shifting
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fmpz_mod_poly_shift_left(fmpz * res, const fmpz * poly, slong len, slong n, const fmpz_mod_ctx_t ctx)
+.. function:: void _fmpz_mod_poly_shift_left(fmpz * res, const fmpz * poly, slong len, slong n)
 
     Sets ``(res, len + n)`` to ``(poly, len)`` shifted left by
     `n` coefficients.
@@ -308,7 +308,7 @@ Shifting
     Sets ``res`` to ``poly`` shifted left by `n` coeffs.  Zero
     coefficients are inserted.
 
-.. function:: void _fmpz_mod_poly_shift_right(fmpz * res, const fmpz * poly, slong len, slong n, const fmpz_mod_ctx_t ctx)
+.. function:: void _fmpz_mod_poly_shift_right(fmpz * res, const fmpz * poly, slong len, slong n)
 
     Sets ``(res, len - n)`` to ``(poly, len)`` shifted right by
     `n` coefficients.
@@ -412,7 +412,7 @@ Multiplication
 
     Sets ``res`` to the product of ``poly1`` and ``poly2``.
 
-.. function:: void _fmpz_mod_poly_mullow(fmpz *res, const fmpz *poly1, slong len1, const fmpz *poly2, slong len2, const fmpz_t p, slong n)
+.. function:: void _fmpz_mod_poly_mullow(fmpz *res, const fmpz *poly1, slong len1, const fmpz *poly2, slong len2, slong n, const fmpz_mod_ctx_t ctx)
 
     Sets ``(res, n)`` to the lowest `n` coefficients of the product of
     ``(poly1, len1)`` and ``(poly2, len2)``.
@@ -481,7 +481,7 @@ Products
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fmpz_mod_poly_product_roots_fmpz_vec(fmpz * poly, const fmpz * xs, slong n, fmpz_t f)
+.. function:: void _fmpz_mod_poly_product_roots_fmpz_vec(fmpz * poly, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx)
 
     Sets ``(poly, n + 1)`` to the monic polynomial which is the product
     of `(x - x_0)(x - x_1) \cdots (x - x_{n-1})`, the roots `x_i` being
@@ -490,7 +490,7 @@ Products
     Aliasing of the input and output is not allowed.
 
 
-.. function:: void fmpz_mod_poly_product_roots_fmpz_vec(fmpz_mod_poly_t poly, const fmpz * xs, slong n, fmpz_t f, const fmpz_mod_ctx_t ctx)
+.. function:: void fmpz_mod_poly_product_roots_fmpz_vec(fmpz_mod_poly_t poly, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx)
 
     Sets ``poly`` to the monic polynomial which is the product
     of `(x - x_0)(x - x_1) \cdots (x - x_{n-1})`, the roots `x_i` being
@@ -646,7 +646,7 @@ Powering
     No aliasing is permitted between the entries of ``res`` and either of the
     inputs.
 
-.. function:: void _fmpz_mod_poly_powers_mod_preinv_threaded_pool(fmpz ** res, const fmpz * f, slong flen, slong n, const fmpz * g, slong glen, const fmpz * ginv, slong ginvlen, const fmpz_t p, thread_pool_handle * threads, slong num_threads)
+.. function:: void _fmpz_mod_poly_powers_mod_preinv_threaded_pool(fmpz ** res, const fmpz * f, slong flen, slong n, const fmpz * g, slong glen, const fmpz * ginv, slong ginvlen, const fmpz_mod_ctx_t p, thread_pool_handle * threads, slong num_threads)
 
     Compute ``f^0, f^1, ..., f^(n-1) mod g``, where ``g`` has length ``glen``
     and ``f`` is reduced mod ``g`` and has length ``flen`` (possibly zero
@@ -661,7 +661,7 @@ Powering
     No aliasing is permitted between the entries of ``res`` and either of the
     inputs.
 
-.. function:: void fmpz_mod_poly_frobenius_powers_2exp_precomp( fmpz_mod_poly_frobenius_powers_2exp_t pow, const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m, const fmpz_mod_ctx_t ctx)
+.. function:: void fmpz_mod_poly_frobenius_powers_2exp_precomp(fmpz_mod_poly_frobenius_powers_2exp_t pow, const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv, ulong m, const fmpz_mod_ctx_t ctx)
 
     If ``p = f->p``, compute `x^{(p^1)}`, `x^{(p^2)}`, `x^{(p^4)}`, ...,
     `x^{(p^{(2^l)})} \pmod{f}` where `2^l` is the greatest power of `2` less than
@@ -853,7 +853,7 @@ Division
     ``(A, lenA)``.  No aliasing of input and output operands is
     allowed.
 
-.. function:: void _fmpz_mod_poly_rem_f(fmpz_t f, fmpz *R, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invB, const fmpz_mod_ctx_t ctx)
+.. function:: void fmpz_mod_poly_rem_f(fmpz_t f, fmpz_mod_poly_t R, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
 
     If `f` returns with the value `1` then the function operates as
     ``_fmpz_mod_poly_rem``, otherwise `f` will be set to a nontrivial
@@ -879,7 +879,7 @@ Divisibility testing
     `(Q, lenA - lenB + 1)` to the quotient. Otherwise, returns `0` and sets
     `(Q, lenA - lenB + 1)` to zero. We require that `lenA >= lenB > 0`.
 
-.. function:: int fmpz_mod_poly_divides_classical(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, fmpz_mod_ctx_t ctx)
+.. function:: int fmpz_mod_poly_divides_classical(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
 
     Returns `1` if `B` divides `A` and sets `Q` to the quotient. Otherwise
     returns `0` and sets `Q` to zero.
@@ -890,7 +890,7 @@ Divisibility testing
     `(Q, lenA - lenB + 1)` to the quotient. Otherwise, returns `0` and sets
     `(Q, lenA - lenB + 1)` to zero. We require that `lenA >= lenB > 0`.
 
-.. function:: int fmpz_mod_poly_divides(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, fmpz_mod_ctx_t ctx)
+.. function:: int fmpz_mod_poly_divides(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx)
 
     Returns `1` if `B` divides `A` and sets `Q` to the quotient. Otherwise
     returns `0` and sets `Q` to zero.
@@ -899,7 +899,7 @@ Power series inversion
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fmpz_mod_poly_inv_series(fmpz * Qinv, const fmpz * Q, slong n, const fmpz_t cinv, const fmpz_mod_ctx_t ctx)
+.. function:: void _fmpz_mod_poly_inv_series(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n, const fmpz_mod_ctx_t ctx)
 
     Sets ``(Qinv, n)`` to the inverse of ``(Q, n)`` modulo `x^n`,
     where `n \geq 1`, assuming that the bottom coefficient of `Q` is
@@ -922,7 +922,7 @@ Power series division
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen, const fmpz * B, slong Blen, const fmpz_t p, slong n)
+.. function:: void _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen, const fmpz * B, slong Blen, slong n, const fmpz_mod_ctx_t ctx)
 
     Set ``(Q, n)`` to the quotient of the series ``(A, Alen``) and
     ``(B, Blen)`` assuming ``Alen, Blen <= n``. We assume the bottom
@@ -953,7 +953,7 @@ Greatest common divisor
     coefficient or set `f` to a nontrivial factor of `p` and leave ``res``
     undefined.
 
-.. function:: slong _fmpz_mod_poly_gcd(fmpz *G, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invB, const fmpz_mod_ctx_t ctx)
+.. function:: slong _fmpz_mod_poly_gcd(fmpz *G, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_mod_ctx_t ctx)
 
     Sets `G` to the greatest common divisor of `(A, \operatorname{len}(A))`
     and `(B, \operatorname{len}(B))` and returns its length.
@@ -1080,7 +1080,7 @@ Greatest common divisor
     ``fmpz_mod_poly_xgcd``, otherwise `f` is set to a nontrivial
     factor of `p`.
 
-.. function:: slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_mod_ctx_t ctx)
+.. function:: slong _fmpz_mod_poly_gcdinv_euclidean(fmpz *G, fmpz *S, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invA, const fmpz_mod_ctx_t ctx)
 
     Computes ``(G, lenA)``, ``(S, lenB-1)`` such that
     `G \cong S A \pmod{B}`, returning the actual length of `G`.
@@ -1095,7 +1095,7 @@ Greatest common divisor
 
     In the case that `A = 0 \pmod{B}`, returns `G = S = 0`.
 
-.. function:: slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_mod_ctx_t ctx)
+.. function:: slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t invA, const fmpz_mod_ctx_t ctx)
 
     If `f` returns with value `1` then the function operates as per
     :func:`_fmpz_mod_poly_gcdinv_euclidean`, otherwise `f` is set to a
@@ -1508,22 +1508,22 @@ by means of the generalised binomial theorem
 It is assumed that `h` has constant term `1` and that the coefficients
 `2^{-k}` exist in the coefficient ring (i.e. `2` must be invertible).
 
-.. function:: void _fmpz_mod_poly_invsqrt_series(fmpz * g, const fmpz * h, slong hlen, slong n, fmpz_mod_ctx_t ctx)
+.. function:: void _fmpz_mod_poly_invsqrt_series(fmpz * g, const fmpz * h, slong hlen, slong n, const fmpz_mod_ctx_t ctx)
 
     Set the first `n` terms of `g` to the series expansion of `1/\sqrt{h}`.
     It is assumed that `n > 0` and `h > 0`. Aliasing is not permitted.
 
-.. function:: void fmpz_mod_poly_invsqrt_series(fmpz_mod_poly_t g, const fmpz_mod_poly_t h, slong n, fmpz_ctx_t ctx)
+.. function:: void fmpz_mod_poly_invsqrt_series(fmpz_mod_poly_t g, const fmpz_mod_poly_t h, slong n, const fmpz_mod_ctx_t ctx)
 
     Set `g` to the series expansion of `1/\sqrt{h}` to order `O(x^n)`.
     It is assumed that `h` has constant term 1.
 
-.. function:: void _fmpz_mod_poly_sqrt_series(fmpz * g, const fmpz * h, slong hlen, slong n, fmpz_mod_ctx_t ctx)
+.. function:: void _fmpz_mod_poly_sqrt_series(fmpz * g, const fmpz * h, slong hlen, slong n, const fmpz_mod_ctx_t ctx)
 
     Set the first `n` terms of `g` to the series expansion of `\sqrt{h}`.
     It is assumed that `n > 0` and `h > 0`. Aliasing is not permitted.
 
-.. function:: void fmpz_mod_poly_sqrt_series(fmpz_mod_poly_t g, const fmpz_mod_poly_t h, slong n, fmpz_mod_ctx_t ctx)
+.. function:: void fmpz_mod_poly_sqrt_series(fmpz_mod_poly_t g, const fmpz_mod_poly_t h, slong n, const fmpz_mod_ctx_t ctx)
 
     Set `g` to the series expansion of `\sqrt{h}` to order `O(x^n)`.
     It is assumed that `h` has constant term 1.
@@ -1685,13 +1685,13 @@ Modular composition
     ``polys`` is allowed.
     The algorithm used is the Brent-Kung matrix algorithm.
 
-.. function:: void _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong lenpolys, slong l, const fmpz * g, slong glen, const fmpz * poly, slong len, const fmpz * polyinv, slong leninv, const fmpz_t p, thread_pool_handle * threads, slong num_threads)
+.. function:: void _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong lenpolys, slong l, const fmpz * g, slong glen, const fmpz * poly, slong len, const fmpz * polyinv, slong leninv, const fmpz_mod_ctx_t ctx, thread_pool_handle * threads, slong num_threads)
 
     Multithreaded version of
     :func:`_fmpz_mod_poly_compose_mod_brent_kung_vec_preinv`. Distributing the
     Horner evaluations across :func:`flint_get_num_threads` threads.
 
-.. function:: void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_struct * res,const fmpz_mod_poly_struct * polys, slong len1, slong n, const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly, const fmpz_mod_poly_t polyinv, const fmpz_mod_ctx_t ctx, thread_pool_handle * threads, slong num_threads)
+.. function:: void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong n, const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly, const fmpz_mod_poly_t polyinv, const fmpz_mod_ctx_t ctx, thread_pool_handle * threads, slong num_threads)
  
     Multithreaded version of
     :func:`fmpz_mod_poly_compose_mod_brent_kung_vec_preinv`. Distributing the
@@ -1825,7 +1825,7 @@ is ``"4 6  1 2 0 5"``, where the first two numbers denote the
 length of the polynomial and the modulus.  The pretty string
 representation is ``"5*x^3+2*x+1"``.
 
-.. function:: int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, slong len, const fmpz_mod_ctx_t ctx)
+.. function:: int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, slong len, const fmpz_t p)
 
     Prints the polynomial ``(poly, len)`` to the stream ``file``.
 

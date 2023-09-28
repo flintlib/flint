@@ -98,7 +98,7 @@ Multiplicative group modulo *q*
 
     If *num* gets very large, the entire group may be indexed.
 
-.. function:: void dirichlet_group_dlog_clear(dirichlet_group_t G, ulong num)
+.. function:: void dirichlet_group_dlog_clear(dirichlet_group_t G)
 
    Clear discrete logarithm tables in *G*. When discrete logarithm tables are
    shared with subgroups, those subgroups must be cleared before clearing the

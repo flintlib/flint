@@ -68,14 +68,14 @@ Memory management
     Demotes the coefficients of ``poly`` beyond ``newlen`` and sets 
     the length of ``poly`` to ``newlen``.
 
-.. function:: void fmpz_poly_attach_truncate(fmpz_poly_t trunc, fmpz_poly_t poly, slong n)
+.. function:: void fmpz_poly_attach_truncate(fmpz_poly_t trunc, const fmpz_poly_t poly, slong n)
 
     This function sets the uninitialised polynomial ``trunc`` to the low
     `n` coefficients of ``poly``, or to ``poly`` if the latter doesn't
     have `n` coefficients. The polynomial ``trunc`` not be cleared or used
     as the output of any Flint functions. 
 
-.. function:: void fmpz_poly_attach_shift(fmpz_poly_t trunc, fmpz_poly_t poly, slong n)
+.. function:: void fmpz_poly_attach_shift(fmpz_poly_t trunc, const fmpz_poly_t poly, slong n)
 
     This function sets the uninitialised polynomial ``trunc`` to the
     high coefficients of ``poly``, i.e. the coefficients not among the low
@@ -362,7 +362,7 @@ Addition and subtraction
 
     Sets ``res`` to the sum of ``poly1`` and ``poly2``.
 
-.. function:: void fmpz_poly_add_series(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong n)
+.. function:: void fmpz_poly_add_series(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)
 
     Notionally truncate ``poly1`` and ``poly2`` to length `n` and then
     set ``res`` to the sum.
@@ -377,7 +377,7 @@ Addition and subtraction
 
     Sets ``res`` to ``poly1`` minus ``poly2``.
 
-.. function:: void fmpz_poly_sub_series(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong n)
+.. function:: void fmpz_poly_sub_series(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)
 
     Notionally truncate ``poly1`` and ``poly2`` to length `n` and then
     set ``res`` to the sum.
@@ -400,15 +400,15 @@ Scalar absolute value, multiplication and division
 
     Sets ``poly1`` to ``poly2`` times `x`.
 
-.. function:: void fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, fmpz_poly_t poly2, slong x)
+.. function:: void fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, const fmpz_poly_t poly2, slong x)
 
     Sets ``poly1`` to ``poly2`` times the signed ``slong x``.
 
-.. function:: void fmpz_poly_scalar_mul_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
+.. function:: void fmpz_poly_scalar_mul_ui(fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong x)
 
     Sets ``poly1`` to ``poly2`` times the ``ulong x``.
 
-.. function:: void fmpz_poly_scalar_mul_2exp(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong exp)
+.. function:: void fmpz_poly_scalar_mul_2exp(fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong exp)
 
     Sets ``poly1`` to ``poly2`` times ``2^exp``.
 
@@ -429,17 +429,17 @@ Scalar absolute value, multiplication and division
     Sets ``poly1`` to ``poly2`` divided by the ``fmpz_t x``, 
     rounding coefficients down toward `- \infty`.
 
-.. function:: void fmpz_poly_scalar_fdiv_si(fmpz_poly_t poly1, fmpz_poly_t poly2, slong x)
+.. function:: void fmpz_poly_scalar_fdiv_si(fmpz_poly_t poly1, const fmpz_poly_t poly2, slong x)
 
     Sets ``poly1`` to ``poly2`` divided by the ``slong x``, 
     rounding coefficients down toward `- \infty`.
 
-.. function:: void fmpz_poly_scalar_fdiv_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
+.. function:: void fmpz_poly_scalar_fdiv_ui(fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong x)
 
     Sets ``poly1`` to ``poly2`` divided by the ``ulong x``, 
     rounding coefficients down toward `- \infty`.
 
-.. function:: void fmpz_poly_scalar_fdiv_2exp(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
+.. function:: void fmpz_poly_scalar_fdiv_2exp(fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong x)
 
     Sets ``poly1`` to ``poly2`` divided by ``2^x``, 
     rounding coefficients down toward `- \infty`.
@@ -449,17 +449,17 @@ Scalar absolute value, multiplication and division
     Sets ``poly1`` to ``poly2`` divided by the ``fmpz_t x``, 
     rounding coefficients toward `0`.
 
-.. function:: void fmpz_poly_scalar_tdiv_si(fmpz_poly_t poly1, fmpz_poly_t poly2, slong x)
+.. function:: void fmpz_poly_scalar_tdiv_si(fmpz_poly_t poly1, const fmpz_poly_t poly2, slong x)
 
     Sets ``poly1`` to ``poly2`` divided by the ``slong x``, 
     rounding coefficients toward `0`.
 
-.. function:: void fmpz_poly_scalar_tdiv_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
+.. function:: void fmpz_poly_scalar_tdiv_ui(fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong x)
 
     Sets ``poly1`` to ``poly2`` divided by the ``ulong x``, 
     rounding coefficients toward `0`.
 
-.. function:: void fmpz_poly_scalar_tdiv_2exp(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
+.. function:: void fmpz_poly_scalar_tdiv_2exp(fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong x)
 
     Sets ``poly1`` to ``poly2`` divided by ``2^x``, 
     rounding coefficients toward `0`.
@@ -469,12 +469,12 @@ Scalar absolute value, multiplication and division
     Sets ``poly1`` to ``poly2`` divided by the ``fmpz_t x``, 
     assuming the division is exact for every coefficient.
 
-.. function:: void fmpz_poly_scalar_divexact_si(fmpz_poly_t poly1, fmpz_poly_t poly2, slong x)
+.. function:: void fmpz_poly_scalar_divexact_si(fmpz_poly_t poly1, const fmpz_poly_t poly2, slong x)
 
     Sets ``poly1`` to ``poly2`` divided by the ``slong x``, 
     assuming the coefficient is exact for every coefficient.
 
-.. function:: void fmpz_poly_scalar_divexact_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
+.. function:: void fmpz_poly_scalar_divexact_ui(fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong x)
 
     Sets ``poly1`` to ``poly2`` divided by the ``ulong x``, 
     assuming the coefficient is exact for every coefficient.
@@ -522,7 +522,7 @@ Bit packing
     leading term with coefficient `\pm1` should be added at
     position ``len`` of ``poly``.
 
-.. function:: void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, slong len, mp_srcptr_t arr, flint_bitcnt_t bit_size)
+.. function:: void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, slong len, mp_srcptr arr, flint_bitcnt_t bit_size)
 
     Unpacks the polynomial of given length from the array as packed into 
     fields of the given ``bit_size``.  The coefficients are assumed to 
@@ -794,7 +794,7 @@ FFT precached multiplication
     There are no restrictions on the length of ``poly1`` other than those given
     in the call to ``fmpz_poly_mul_SS_precache_init``.
 
-.. function:: void fmpz_poly_mul_SS_precache(fmpz_poly_t res, const fmpz_poly_t poly1, fmpz_poly_precache_t pre)
+.. function:: void fmpz_poly_mul_SS_precache(fmpz_poly_t res, const fmpz_poly_t poly1, fmpz_poly_mul_precache_t pre)
 
     Set ``res`` to the product of ``poly1`` by the polynomial whose FFT was
     precached by ``fmpz_poly_mul_SS_precache_init`` (and stored in pre).
@@ -1897,7 +1897,7 @@ Power series division
     using a recurrence, assuming that `Q` has constant term `\pm 1` 
     and `n \geq 1`.
 
-.. function:: void _fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n)
+.. function:: void _fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
 
     Computes the first `n` terms of the inverse power series of
     ``(Q, lenQ)`` using Newton iteration.
@@ -1905,12 +1905,12 @@ Power series division
     Assumes that `n \geq 1` and that `Q` has constant term `\pm 1`.
     Does not support aliasing.
 
-.. function:: void fmpz_poly_inv_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong Qlen, slong n)
+.. function:: void fmpz_poly_inv_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
 
     Computes the first `n` terms of the inverse power series of `Q` using
     Newton iteration, assuming `Q` has constant term `\pm 1` and `n \geq 1`.
 
-.. function:: void _fmpz_poly_inv_series(fmpz * Qinv, const fmpz * Q, slong n)
+.. function:: void _fmpz_poly_inv_series(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
 
     Computes the first `n` terms of the inverse power series of
     ``(Q, lenQ)``.
@@ -3007,7 +3007,7 @@ Some examples of the ``_pretty`` representation are::
     In case of success, returns a positive value.  In case of failure, 
     returns a non-positive value.
 
-.. function:: int _fmpz_poly_fprint_pretty(FILE * file, const fmpz * poly, slong len, char * x)
+.. function:: int _fmpz_poly_fprint_pretty(FILE * file, const fmpz * poly, slong len, const char * x)
 
     Prints the pretty representation of ``(poly, len)`` to the stream 
     ``file``, using the string ``x`` to represent the indeterminate.
@@ -3015,7 +3015,7 @@ Some examples of the ``_pretty`` representation are::
     In case of success, returns a positive value.  In case of failure, 
     returns a non-positive value.
 
-.. function:: int fmpz_poly_fprint_pretty(FILE * file, const fmpz_poly_t poly, char * x)
+.. function:: int fmpz_poly_fprint_pretty(FILE * file, const fmpz_poly_t poly, const char * x)
 
     Prints the pretty representation of ``poly`` to the stream ``file``, 
     using the string ``x`` to represent the indeterminate.
@@ -3061,7 +3061,7 @@ Modular reduction and reconstruction
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpz_poly_get_nmod_poly(nmod_poly_t Amod, fmpz_poly_t A)
+.. function:: void fmpz_poly_get_nmod_poly(nmod_poly_t Amod, const fmpz_poly_t A)
 
     Sets the coefficients of ``Amod`` to the coefficients in ``A``,
     reduced by the modulus of ``Amod``.
@@ -3250,7 +3250,7 @@ Minimal polynomials
     and compute `\Phi_q(x)`. Then `\Phi_n(x) = \Phi_q(x^s)`.
 
 .. function:: ulong _fmpz_poly_is_cyclotomic(const fmpz * poly, slong len)
-              ulong fmpz_poly_is_cyclotomic(fmpz_poly_t poly)
+              ulong fmpz_poly_is_cyclotomic(const fmpz_poly_t poly)
 
     If ``poly`` is a cyclotomic polynomial, returns the index `n` of this
     cyclotomic polynomial. If ``poly`` is not a cyclotomic polynomial,

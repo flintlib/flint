@@ -31,7 +31,7 @@ Initialisation
     Generate a random number field element `a` in the number field \code{nf}
     whose coefficients have up to the given number of bits.
 
-.. function:: void nf_elem_canonicalise(nf_elem_t a, nf_t nf)
+.. function:: void nf_elem_canonicalise(nf_elem_t a, const nf_t nf)
 
     Canonicalise a number field element, i.e. reduce numerator and denominator
     to lowest terms. If the numerator is `0`, set the denominator to `1`.
@@ -63,13 +63,13 @@ Initialisation
 Conversion
 --------------------------------------------------------------------------------
 
-.. function:: void nf_elem_set_fmpz_mat_row(nf_elem_t b, const fmpz_mat_t M, const int i, fmpz_t den, const nf_t nf)
+.. function:: void nf_elem_set_fmpz_mat_row(nf_elem_t b, const fmpz_mat_t M, const slong i, fmpz_t den, const nf_t nf)
 
     Set `b` to the element specified by row `i` of the matrix `M` and with the
     given denominator `d`. Column `0` of the matrix corresponds to the constant
     coefficient of the number field element.
 
-.. function:: void nf_elem_get_fmpz_mat_row(fmpz_mat_t M, const int i, fmpz_t den, const nf_elem_t b, const nf_t nf)
+.. function:: void nf_elem_get_fmpz_mat_row(fmpz_mat_t M, const slong i, fmpz_t den, const nf_elem_t b, const nf_t nf)
 
     Set the row `i` of the matrix `M` to the coefficients of the numerator of
     the element `b` and `d` to the denominator of `b`. Column `0` of the matrix
@@ -84,28 +84,28 @@ Conversion
     Set \code{pol} to a polynomial corresponding to `a`, reduced modulo the
     defining polynomial of \code{nf}.
 
-.. function:: void nf_elem_get_nmod_poly_den(nmod_poly_t pol, const nf_elem_t a, const nf_t nf, int den);
+.. function:: void nf_elem_get_nmod_poly_den(nmod_poly_t pol, const nf_elem_t a, const nf_t nf, int den)
 
     Set \code{pol} to the reduction of the polynomial corresponding to the
     numerator of `a`. If \code{den == 1}, the result is multiplied by the
     inverse of the denominator of `a`. In this case it is assumed that the
     reduction of the denominator of `a` is invertible.
 
-.. function:: void nf_elem_get_nmod_poly(nmod_poly_t pol, const nf_elem_t a, const nf_t nf);
+.. function:: void nf_elem_get_nmod_poly(nmod_poly_t pol, const nf_elem_t a, const nf_t nf)
 
     Set \code{pol} to the reduction of the polynomial corresponding to the
     numerator of `a`. The result is multiplied by the inverse of the
     denominator of `a`. It is assumed that the reduction of the denominator of
     `a` is invertible.
 
-.. function:: void nf_elem_get_fmpz_mod_poly_den(fmpz_mod_poly_t pol, const nf_elem_t a, const nf_t nf, int den);
+.. function:: void nf_elem_get_fmpz_mod_poly_den(fmpz_mod_poly_t pol, const nf_elem_t a, const nf_t nf, int den, const fmpz_mod_ctx_t ctx)
 
     Set \code{pol} to the reduction of the polynomial corresponding to the
     numerator of `a`. If \code{den == 1}, the result is multiplied by the
     inverse of the denominator of `a`. In this case it is assumed that the
     reduction of the denominator of `a` is invertible.
 
-.. function:: void nf_elem_get_fmpz_mod_poly(fmpz_mod_poly_t pol, const nf_elem_t a, const nf_t nf);
+.. function:: void nf_elem_get_fmpz_mod_poly(fmpz_mod_poly_t pol, const nf_elem_t a, const nf_t nf, const fmpz_mod_ctx_t ctx)
 
     Set \code{pol} to the reduction of the polynomial corresponding to the
     numerator of `a`. The result is multiplied by the inverse of the
@@ -271,7 +271,7 @@ Arithmetic
     Set \code{res} to the absolute norm of the given number field
     element `a`.
 
-.. function:: void nf_elem_norm_div(fmpq_t res, const nf_elem_t a, const nf_t nf, fmpz_t div, slong nbits)
+.. function:: void nf_elem_norm_div(fmpq_t res, const nf_elem_t a, const nf_t nf, const fmpz_t div, slong nbits)
 
     Set \code{res} to the absolute norm of the given number field element `a`,
     divided by \code{div} . Assumes the result to be an integer and having
@@ -312,7 +312,7 @@ Representation matrix
 Modular reduction
 --------------------------------------------------------------------------------
 
-.. function:: void nf_elem_mod_fmpz_den(nf_elem_t z, const nf_elem_t a, const fmpz_t mod, const nf_t nf)
+.. function:: void nf_elem_mod_fmpz_den(nf_elem_t z, const nf_elem_t a, const fmpz_t mod, const nf_t nf, int den)
 
     If \code{den == 0}, return an element `z` with denominator `1`, such that
     the coefficients of `z - da` are divisble by \code{mod}, where `d` is the
@@ -325,7 +325,7 @@ Modular reduction
 
     Reduction takes place with respect to the positive residue system.
 
-.. function:: void nf_elem_smod_fmpz_den(nf_elem_t z, const nf_elem_t a, const fmpz_t mod, const nf_t nf)
+.. function:: void nf_elem_smod_fmpz_den(nf_elem_t z, const nf_elem_t a, const fmpz_t mod, const nf_t nf, int den)
 
     If \code{den == 0}, return an element `z` with denominator `1`, such that
     the coefficients of `z - da` are divisble by \code{mod}, where `d` is the

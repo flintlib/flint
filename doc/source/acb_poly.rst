@@ -626,7 +626,7 @@ Transforms
 
 .. function:: void _acb_poly_graeffe_transform(acb_ptr b, acb_srcptr a, slong len, slong prec)
 
-.. function:: void acb_poly_graeffe_transform(acb_poly_t b, acb_poly_t a, slong prec)
+.. function:: void acb_poly_graeffe_transform(acb_poly_t b, const acb_poly_t a, slong prec)
 
     Computes the Graeffe transform of input polynomial, which is of length *len*.
     See :func:`arb_poly_graeffe_transform` for details.
@@ -776,7 +776,7 @@ Elementary functions
     The underscore method supports aliasing and allows the input to be
     shorter than the output, but requires the lengths to be nonzero.
 
-.. function:: void _acb_poly_sin_cos_series(acb_ptr s, acb_ptr c, acb_srcptr h, slong hlen, slong n, slong prec)
+.. function:: void _acb_poly_sin_cos_series(acb_ptr s, acb_ptr c, const acb_srcptr h, slong hlen, slong n, slong prec)
               void acb_poly_sin_cos_series(acb_poly_t s, acb_poly_t c, const acb_poly_t h, slong n, slong prec)
 
     Sets *s* and *c* to the power series sine and cosine of *h*, computed
@@ -808,7 +808,7 @@ Elementary functions
     The underscore version does not support aliasing, and requires
     the lengths to be nonzero.
 
-.. function:: void _acb_poly_sin_cos_pi_series(acb_ptr s, acb_ptr c, acb_srcptr h, slong hlen, slong n, slong prec)
+.. function:: void _acb_poly_sin_cos_pi_series(acb_ptr s, acb_ptr c, const acb_srcptr h, slong hlen, slong n, slong prec)
 
 .. function:: void acb_poly_sin_cos_pi_series(acb_poly_t s, acb_poly_t c, const acb_poly_t h, slong n, slong prec)
 
@@ -827,15 +827,15 @@ Elementary functions
     Compute the respective trigonometric functions of the input
     multiplied by `\pi`.
 
-.. function:: void _acb_poly_sinh_cosh_series_basecase(acb_ptr s, acb_ptr c, acb_srcptr h, slong hlen, slong n, slong prec)
+.. function:: void _acb_poly_sinh_cosh_series_basecase(acb_ptr s, acb_ptr c, const acb_srcptr h, slong hlen, slong n, slong prec)
 
 .. function:: void acb_poly_sinh_cosh_series_basecase(acb_poly_t s, acb_poly_t c, const acb_poly_t h, slong n, slong prec)
 
-.. function:: void _acb_poly_sinh_cosh_series_exponential(acb_ptr s, acb_ptr c, acb_srcptr h, slong hlen, slong n, slong prec)
+.. function:: void _acb_poly_sinh_cosh_series_exponential(acb_ptr s, acb_ptr c, const acb_srcptr h, slong hlen, slong n, slong prec)
 
 .. function:: void acb_poly_sinh_cosh_series_exponential(acb_poly_t s, acb_poly_t c, const acb_poly_t h, slong n, slong prec)
 
-.. function:: void _acb_poly_sinh_cosh_series(acb_ptr s, acb_ptr c, acb_srcptr h, slong hlen, slong n, slong prec)
+.. function:: void _acb_poly_sinh_cosh_series(acb_ptr s, acb_ptr c, const acb_srcptr h, slong hlen, slong n, slong prec)
 
 .. function:: void acb_poly_sinh_cosh_series(acb_poly_t s, acb_poly_t c, const acb_poly_t h, slong n, slong prec)
 

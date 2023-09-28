@@ -39,7 +39,7 @@ Basic assignment and manipulation
     Swaps two matrices by swapping the individual entries rather than swapping
     the contents of the structs.
 
-.. function:: mpf * mpf_mat_entry(const mpf_mat_t * mat, slong i, slong j)
+.. function:: mpf * mpf_mat_entry(const mpf_mat_t mat, slong i, slong j)
 
     Returns a reference to the entry of ``mat`` at row `i` and column `j`.
     Both `i` and `j` must not exceed the dimensions of the matrix.
@@ -70,7 +70,7 @@ Random matrix generation
 --------------------------------------------------------------------------------
 
 
-.. function:: void mpf_mat_randtest(mpf_mat_t mat, flint_ranmpf_t state, flint_bitcnt_t bits)
+.. function:: void mpf_mat_randtest(mpf_mat_t mat, flint_rand_t state, flint_bitcnt_t bits)
 
     Sets the entries of ``mat`` to random numbers in the 
     interval `[0, 1)` with ``bits`` significant bits in the mantissa or less if

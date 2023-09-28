@@ -166,7 +166,7 @@ Context objects
     This function should only be called after all :type:`ca_t` instances
     referring to this context have been cleared.
 
-.. function:: void ca_ctx_print(const ca_ctx_t ctx)
+.. function:: void ca_ctx_print(ca_ctx_t ctx)
 
     Prints a description of the context *ctx* to standard output.
     This will give a complete listing of the cached fields in *ctx*.
@@ -298,20 +298,20 @@ printed in various styles::
     3.36603 {(a+5)/2  in  QQ(a)/<a^2-3> where a = 1.73205 [a^2-3=0]}
     1.61889 + 4.44288*I {a*c+b*c*d  in  QQ(a,b,c,d)/<c^2-2, d^2+1> where a = 1.14473 [Log(3.14159 {b  in  QQ(b)})], b = 3.14159 [Pi], c = 1.41421 [c^2-2=0], d = I [d^2+1=0]}
 
-.. function:: void ca_print(const ca_t x, const ca_ctx_t ctx)
+.. function:: void ca_print(const ca_t x, ca_ctx_t ctx)
 
     Prints *x* to standard output.
 
-.. function:: void ca_fprint(FILE * fp, const ca_t x, const ca_ctx_t ctx)
+.. function:: void ca_fprint(FILE * fp, const ca_t x, ca_ctx_t ctx)
 
     Prints *x* to the file *fp*.
 
-.. function:: char * ca_get_str(const ca_t x, const ca_ctx_t ctx)
+.. function:: char * ca_get_str(const ca_t x, ca_ctx_t ctx)
 
     Prints *x* to a string which is returned.
     The user should free this string by calling ``flint_free``.
 
-.. function:: void ca_printn(const ca_t x, slong n, const ca_ctx_t ctx)
+.. function:: void ca_printn(const ca_t x, slong n, ca_ctx_t ctx)
 
     Prints an *n*-digit numerical representation of *x* to standard output.
 
@@ -423,7 +423,7 @@ Conversion of algebraic numbers
     * TODO: if possible, coerce *x* to a low-degree cyclotomic field.
 
 .. function:: int ca_get_fmpz(fmpz_t res, const ca_t x, ca_ctx_t ctx)
-              int ca_get_fmpq(fmpz_t res, const ca_t x, ca_ctx_t ctx)
+              int ca_get_fmpq(fmpq_t res, const ca_t x, ca_ctx_t ctx)
               int ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx)
 
     Attempts to evaluate *x* to an explicit integer, rational or
@@ -1550,7 +1550,7 @@ Internal representation
     an :type:`nf_elem_t`.
 
 
-.. function:: void _ca_make_field_element(ca_t x, slong new_index, ca_ctx_t ctx)
+.. function:: void _ca_make_field_element(ca_t x, ca_field_srcptr new_index, ca_ctx_t ctx)
 
     Changes the internal representation of *x* to that of an element
     of the field with index *new_index* in the context object *ctx*.

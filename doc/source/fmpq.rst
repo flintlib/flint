@@ -128,11 +128,11 @@ Comparison
 
      Returns negative if `x < y`, zero if `x = y`, and positive if `x > y`.
 
-.. function:: int fmpq_equal_ui(const fmpq_t x, ulong y)
+.. function:: int fmpq_equal_ui(fmpq_t x, ulong y)
 
     Returns `1` if `x = y`, otherwise returns `0`.
 
-.. function:: int fmpq_equal_si(const fmpq_t x, slong y)
+.. function:: int fmpq_equal_si(fmpq_t x, slong y)
 
     Returns `1` if `x = y`, otherwise returns `0`.
 
@@ -184,7 +184,7 @@ Conversion
     Sets the value of ``dest`` to that of the ``mpq_t`` variable
     ``src``.
 
-.. function:: void fmpq_set_str(fmpq_t dest, const char * s, int base)
+.. function:: int fmpq_set_str(fmpq_t dest, const char * s, int base)
 
     Sets the value of ``dest`` to the value represented in the string
     ``s`` in base ``base``.

@@ -922,7 +922,7 @@ Division
 --------------------------------------------------------------------------------
 
 
-.. function:: void _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, mp_ptr W, mp_srcptr A, slong A_len, mp_srcptr B, slong B_len, nmod_t mod)
+.. function:: void _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, mp_srcptr A, slong A_len, mp_srcptr B, slong B_len, nmod_t mod)
 
     Finds `Q` and `R` such that `A = B Q + R` with `\operatorname{len}(R) < \operatorname{len}(B)`.
     If `\operatorname{len}(B) = 0` an exception is raised. We require that ``W``
@@ -1179,7 +1179,7 @@ Evaluation
     given modulus of ``poly``. The value~``c`` should be reduced
     modulo the modulus. The algorithm used is Horner's method.
 
-.. function:: mp_limb_t nmod_poly_evaluate_nmod(nmod_poly_t poly, mp_limb_t c)
+.. function:: mp_limb_t nmod_poly_evaluate_nmod(const nmod_poly_t poly, mp_limb_t c)
 
     Evaluates ``poly`` at the value~``c`` and reduces modulo the
     modulus of ``poly``. The value~``c`` should be reduced modulo
@@ -1846,7 +1846,7 @@ Greatest common divisor
     For convenience, we define the resultant to be equal to zero if either
     of the two polynomials is zero.
 
-.. function:: slong _nmod_poly_gcdinv(mp_ptr G, mp_ptr S, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, const nmod_t mod)
+.. function:: slong _nmod_poly_gcdinv(mp_limb_t *G, mp_limb_t *S, const mp_limb_t *A, slong lenA, const mp_limb_t *B, slong lenB, const nmod_t mod)
 
     Computes ``(G, lenA)``, ``(S, lenB-1)`` such that
     `G \cong S A \pmod{B}`, returning the actual length of `G`.
@@ -1861,7 +1861,7 @@ Greatest common divisor
 
     In the case that `A = 0 \pmod{B}`, returns `G = S = 0`.
 
-.. function:: int _nmod_poly_invmod(mp_ptr A, mp_srcptr B, slong lenB, mp_srcptr P, slong lenP, const nmod_t mod)
+.. function:: int _nmod_poly_invmod(mp_limb_t *A, const mp_limb_t *B, slong lenB, const mp_limb_t *P, slong lenP, const nmod_t mod)
 
     Attempts to set ``(A, lenP-1)`` to the inverse of ``(B, lenB)``
     modulo the polynomial ``(P, lenP)``.  Returns `1` if ``(B, lenB)``
@@ -1912,7 +1912,7 @@ Power series composition
 Power series composition
 --------------------------------------------------------------------------------
 
-.. function:: void _nmod_poly_compose_series(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong n)
+.. function:: void _nmod_poly_compose_series(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong n, nmod_t mod)
 
     Sets ``res`` to the composition of ``poly1`` and ``poly2``
     modulo `x^n`, where the constant term of ``poly2`` is required
@@ -2194,7 +2194,7 @@ of polynomial multiplication.
     algorithm in [HanZim2004]_).
     For small `n`, falls back to the basecase algorithm.
 
-.. function:: void  _nmod_poly_exp_expinv_series(mp_ptr f, mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
+.. function:: void  _nmod_poly_exp_expinv_series(mp_ptr f, mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod)
 
     Set `f = \exp(h) + O(x^n)` and `g = \exp(-h) + O(x^n)`, more efficiently
     for large `n` than performing a separate inversion to obtain `g`.
@@ -2210,7 +2210,7 @@ of polynomial multiplication.
     detected and handled efficiently. Otherwise this function automatically
     uses the basecase algorithm for small `n` and Newton iteration otherwise.
 
-.. function:: void _nmod_poly_atan_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
+.. function:: void _nmod_poly_atan_series(mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod)
 
     Set `g = \operatorname{atan}(h) + O(x^n)`. Assumes `n > 0`.
     Aliasing of `g` and `h` is allowed.
@@ -2219,7 +2219,7 @@ of polynomial multiplication.
 
     Set `g = \operatorname{atan}(h) + O(x^n)`.
 
-.. function:: void _nmod_poly_atanh_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
+.. function:: void _nmod_poly_atanh_series(mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod)
 
     Set `g = \operatorname{atanh}(h) + O(x^n)`. Assumes `n > 0`.
     Aliasing of `g` and `h` is allowed.
@@ -2268,7 +2268,7 @@ of polynomial multiplication.
 
     Set `g = \operatorname{cos}(h) + O(x^n)`.
 
-.. function:: void _nmod_poly_tan_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
+.. function:: void _nmod_poly_tan_series(mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod)
 
     Set `g = \operatorname{tan}(h) + O(x^n)`. Assumes `n > 0` and that `h`
     is zero-padded as necessary to length `n`. Aliasing of `g` and `h` is

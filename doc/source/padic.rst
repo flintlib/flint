@@ -350,7 +350,7 @@ Arithmetic operations
 
     This function employs Hensel lifting of an inverse modulo `p`.
 
-.. function:: int padic_sqrt(padic_rop, const padic_t op, const padic_ctx_t ctx)
+.. function:: int padic_sqrt(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
     Returns whether ``op`` is a `p`-adic square.  If this is 
     the case, sets ``rop`` to one of the square roots;  otherwise, 

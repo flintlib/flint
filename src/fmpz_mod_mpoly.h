@@ -222,7 +222,7 @@ void fmpz_mod_mpoly_set_fmpz(fmpz_mod_mpoly_t A,
                                const fmpz_t c, const fmpz_mod_mpoly_ctx_t ctx);
 
 void fmpz_mod_mpoly_set_ui(fmpz_mod_mpoly_t A,
-                                      slong c, const fmpz_mod_mpoly_ctx_t ctx);
+                                      ulong c, const fmpz_mod_mpoly_ctx_t ctx);
 
 void fmpz_mod_mpoly_set_si(fmpz_mod_mpoly_t A,
                                       slong c, const fmpz_mod_mpoly_ctx_t ctx);

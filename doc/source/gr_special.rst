@@ -149,7 +149,7 @@ Factorials and gamma functions
 
     Double factorial `x!!`.
 
-.. function:: int gr_harmonic(gr_ptr res, ulong x, gr_ctx_t ctx)
+.. function:: int gr_harmonic(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
               int gr_harmonic_ui(gr_ptr res, ulong x, gr_ctx_t ctx)
 
     Harmonic number `H_x`.

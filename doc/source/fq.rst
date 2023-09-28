@@ -80,13 +80,13 @@ Context Management
 
     Returns a pointer to the modulus in the context.
 
-.. function:: long fq_ctx_degree(const fq_ctx_t ctx)
+.. function:: slong fq_ctx_degree(const fq_ctx_t ctx)
 
     Returns the degree of the field extension
     `[\mathbf{F}_{q} : \mathbf{F}_{p}]`, which
     is equal to `\log_{p} q`.
 
-.. function:: fmpz * fq_ctx_prime(const fq_ctx_t ctx)
+.. function:: const fmpz * fq_ctx_prime(const fq_ctx_t ctx)
 
     Returns a pointer to the prime `p` in the context.
 
@@ -103,12 +103,12 @@ Context Management
 
     Prints the context information to ``stdout``.
 
-.. function:: void fq_ctx_randtest(fq_ctx_t ctx)
+.. function:: void fq_ctx_randtest(fq_ctx_t ctx, flint_rand_t state)
 
     Initializes ``ctx`` to a random finite field.  Assumes that
     ``fq_ctx_init`` has not been called on ``ctx`` already.
 
-.. function:: void fq_ctx_randtest_reducible(fq_ctx_t ctx)
+.. function:: void fq_ctx_randtest_reducible(fq_ctx_t ctx, flint_rand_t state)
 
     Initializes ``ctx`` to a random extension of a prime field.
     The modulus may or may not be irreducible.  Assumes that
@@ -291,7 +291,7 @@ Output
     part of the function's signature to allow for a later implementation to
     return the number of characters printed or a non-positive error code.
 
-.. function:: void fq_fprint(FILE * file, const fq_t op, const fq_ctx_t ctx)
+.. function:: int fq_fprint(FILE * file, const fq_t op, const fq_ctx_t ctx)
 
     Prints a representation of ``op`` to ``file``.
 
@@ -491,7 +491,7 @@ Special functions
     `\sigma \in \operatorname{Gal}(\mathbf{F}_q/\mathbf{F}_p)` is the Frobenius element
     `\sigma \colon x \mapsto x^p`.
 
-.. function:: int fq_multiplicative_order(fmpz_t ord, const fq_t op, const fq_ctx_t ctx)
+.. function:: int fq_multiplicative_order(fmpz * ord, const fq_t op, const fq_ctx_t ctx)
 
     Computes the order of ``op`` as an element of the
     multiplicative group of ``ctx``.

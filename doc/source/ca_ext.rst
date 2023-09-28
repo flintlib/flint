@@ -169,7 +169,7 @@ Structure
 Input and output
 -------------------------------------------------------------------------------
 
-.. function:: void ca_ext_print(const ca_ext_t x, const ca_ctx_t ctx)
+.. function:: void ca_ext_print(const ca_ext_t x, ca_ctx_t ctx)
 
     Prints a description of *x* to standard output.
 

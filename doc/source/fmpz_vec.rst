@@ -57,7 +57,7 @@ Bit sizes and norms
     the elements of ``vec``. Sets ``maxabs`` to the bit count of the
     maximum of the absolute values of the elements of ``vec``.
 
-.. function:: ulong _fmpz_vec_max_limbs(const fmpz * vec, slong len)
+.. function:: mp_size_t _fmpz_vec_max_limbs(const fmpz * vec, slong len)
 
     Returns the maximum number of limbs needed to store the absolute value 
     of any entry in ``(vec, len)``.  If all entries are zero, returns 
@@ -250,7 +250,7 @@ Scalar multiplication and division
     Sets ``(vec1, len2)`` to ``(vec2, len2)`` multiplied by `c`, 
     where `c` is an ``fmpz_t``.
 
-.. function:: id _fmpz_vec_scalar_mul_si(fmpz * vec1, const fmpz * vec2, slong len2, slong c)
+.. function:: void _fmpz_vec_scalar_mul_si(fmpz * vec1, const fmpz * vec2, slong len2, slong c)
 
     Sets ``(vec1, len2)`` to ``(vec2, len2)`` multiplied by `c`, 
     where `c` is a ``slong``.
@@ -274,7 +274,7 @@ Scalar multiplication and division
     Sets ``(vec1, len2)`` to ``(vec2, len2)`` divided by `x`, where the 
     division is assumed to be exact for every entry in ``vec2``.
 
-.. function:: void _fmpz_vec_scalar_divexact_ui(fmpz * vec1, const fmpz * vec2, ulong len2, ulong c)
+.. function:: void _fmpz_vec_scalar_divexact_ui(fmpz * vec1, const fmpz * vec2, slong len2, ulong c)
 
     Sets ``(vec1, len2)`` to ``(vec2, len2)`` divided by `x`, where the 
     division is assumed to be exact for every entry in ``vec2``.

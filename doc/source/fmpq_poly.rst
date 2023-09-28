@@ -403,14 +403,14 @@ Addition and subtraction
     weak canonicalisation to prevent explosion in memory usage. It exists for
     performance reasons.
 
-.. function:: void fmpq_poly_add(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2)
+.. function:: void fmpq_poly_add(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
     Sets ``res`` to the sum of ``poly1`` and ``poly2``, using 
     Henrici's algorithm.
 
-.. function:: void fmpq_poly_add_can(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2, int can)
+.. function:: void fmpq_poly_add_can(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2, int can)
 
-    As per ``fmpq_poly_add`` except that one can specify whether to
+    As per ``mpq_poly_add`` except that one can specify whether to
     canonicalise the output or not. This function is intended to be used with
     weak canonicalisation to prevent explosion in memory usage. It exists for
     performance reasons.
@@ -428,12 +428,12 @@ Addition and subtraction
     then the output only needs space for `n` coefficients. We require 
     `n \geq 0`.
 
-.. function:: void fmpq_poly_add_series(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2, slong n)
+.. function:: void fmpq_poly_add_series(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n)
 
     As per ``fmpq_poly_add`` but the inputs are first notionally
     truncated to length `n`. 
 
-.. function:: void fmpq_poly_add_series_can(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2, slong n, int can)
+.. function:: void fmpq_poly_add_series_can(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n, int can)
 
     As per ``fmpq_poly_add_can`` but the inputs are first notionally
     truncated to length `n`. 
@@ -458,12 +458,12 @@ Addition and subtraction
     weak canonicalisation to prevent explosion in memory usage. It exists for
     performance reasons.
 
-.. function:: void fmpq_poly_sub(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2)
+.. function:: void fmpq_poly_sub(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
     Sets ``res`` to the difference of ``poly1`` and ``poly2``, 
     using Henrici's algorithm.
 
-.. function:: void fmpq_poly_sub_can(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2, int can)
+.. function:: void fmpq_poly_sub_can(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2, int can)
 
     As per ``_fmpq_poly_sub`` except that one can specify whether to
     canonicalise the output or not. This function is intended to be used with
@@ -483,12 +483,12 @@ Addition and subtraction
     then the output only needs space for `n` coefficients. We require 
     `n \geq 0`.
 
-.. function:: void fmpq_poly_sub_series(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2, slong n)
+.. function:: void fmpq_poly_sub_series(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n)
 
     As per ``fmpq_poly_sub`` but the inputs are first notionally
     truncated to length `n`. 
 
-.. function:: void fmpq_poly_sub_series_can(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2, slong n, int can)
+.. function:: void fmpq_poly_sub_series_can(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n, int can)
 
     As per ``fmpq_poly_sub_can`` but the inputs are first notionally
     truncated to length `n`. 
@@ -780,7 +780,7 @@ Powering
     Clean up resources used by precomputed powers which have been computed
     by ``fmpq_poly_powers_precompute``.
 
-.. function:: void _fmpq_poly_rem_powers_precomp(fmpz * A, fmpz_t denA, slong m, const fmpz * B, const fmpz_t denB, slong n, const fmpq_poly_struct * const powers)
+.. function:: void _fmpq_poly_rem_powers_precomp(fmpz * A, fmpz_t denA, slong m, const fmpz * B, const fmpz_t denB, slong n, fmpq_poly_struct * const powers)
 
     Set `A` to the remainder of `A` divide `B` given precomputed powers mod `B`
     provided by ``_fmpq_poly_powers_precompute``. No aliasing is allowed.
@@ -842,7 +842,7 @@ Power series division
     of ``poly`` using Newton iteration, assuming that ``poly`` 
     has non-zero constant term and `n \geq 1`.
 
-.. function:: void _fmpq_poly_inv_series(fmpz * rpoly, fmpz_t rden, const fmpz * poly, const fmpz_t den, slong n)
+.. function:: void _fmpq_poly_inv_series(fmpz * rpoly, fmpz_t rden, const fmpz * poly, const fmpz_t den, slong den_len, slong n)
 
     Computes the first `n` terms of the inverse power series of 
     ``(poly, den, len)``.
@@ -909,7 +909,7 @@ Greatest common divisor
 
     Does not support zero padding of the input arguments.
 
-.. function:: void fmpq_poly_xgcd(fmpq_poly_t G, fmpz_poly_t S, fmpz_poly_t T, const fmpq_poly_t A, const fmpq_poly_t B)
+.. function:: void fmpq_poly_xgcd(fmpq_poly_t G, fmpq_poly_t S, fmpq_poly_t T, const fmpq_poly_t A, const fmpq_poly_t B)
 
     Computes polynomials `G`, `S`, and `T` such that 
     `G = \gcd(A, B) = S A + T B`, where `G` is the monic 
@@ -966,7 +966,7 @@ Greatest common divisor
     the resultant is zero.  Note that otherwise if one of the polynomials is 
     constant, the last term in the above expression is the empty product.
 
-.. function:: void fmpq_poly_resultant_div(fmpq_t r, const fmpq_poly_t f, const fmpq_poly_t g, fmpz_t div, slong nbits)
+.. function:: void fmpq_poly_resultant_div(fmpq_t r, const fmpq_poly_t f, const fmpq_poly_t g, const fmpz_t div, slong nbits)
 
     Returns the resultant of `f` and `g` divided by ``div`` under the
     assumption that the result has at most ``nbits`` bits. The result must
@@ -1270,7 +1270,7 @@ Orthogonal polynomials
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fmpq_poly_legendre_p(fmpq * coeffs, fmpz_t den, ulong n)
+.. function:: void _fmpq_poly_legendre_p(fmpz * coeffs, fmpz_t den, ulong n)
 
     Sets ``coeffs`` to the coefficient array of the Legendre polynomial
     `P_n(x)`, defined by `(n+1) P_{n+1}(x) = (2n+1) x P_n(x) - n P_{n-1}(x)`,
@@ -1294,7 +1294,7 @@ Orthogonal polynomials
     `\gcd(n!,2^n) = 2^{\lfloor n/2 \rfloor + \lfloor n/4 \rfloor + \ldots}.`
     See ``fmpz_poly`` for the shifted Legendre polynomials.
 
-.. function:: void _fmpq_poly_laguerre_l(fmpq * coeffs, fmpz_t den, ulong n)
+.. function:: void _fmpq_poly_laguerre_l(fmpz * coeffs, fmpz_t den, ulong n)
 
     Sets ``coeffs`` to the coefficient array of the Laguerre polynomial
     `L_n(x)`, defined by `(n+1) L_{n+1}(x) = (2n+1-x) L_n(x) - n L_{n-1}(x)`,
@@ -1308,7 +1308,7 @@ Orthogonal polynomials
     `(n+1) L_{n+1}(x) = (2n+1-x) L_n(x) - n L_{n-1}(x)`, for `n\ge0`.
     The coefficients are calculated using a hypergeometric recurrence.
 
-.. function:: void _fmpq_poly_gegenbauer_c(fmpq * coeffs, fmpz_t den, ulong n, const fmpq_t a)
+.. function:: void _fmpq_poly_gegenbauer_c(fmpz * coeffs, fmpz_t den, ulong n, const fmpq_t a)
 
     Sets ``coeffs`` to the coefficient array of the Gegenbauer
     (ultraspherical) polynomial
@@ -1695,7 +1695,7 @@ Input and output
 
 .. function:: int _fmpq_poly_fprint_pretty(FILE * file, const fmpz *poly, const fmpz_t den, slong len, const char * x)
 
-.. function:: int fmpq_poly_fprint_pretty(FILT * file, const fmpq_poly_t poly, const char * var)
+.. function:: int fmpq_poly_fprint_pretty(FILE * file, const fmpq_poly_t poly, const char * var)
 
     Prints the pretty representation of ``poly`` to ``stdout``, using 
     the null-terminated string ``var`` not equal to ``"\0"`` as the 

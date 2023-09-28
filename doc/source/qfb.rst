@@ -109,7 +109,7 @@ Computing with forms
     automatically by \code{qfb_reduced_forms} for large `|d|` so that 
     ``flint_primes`` is not exhausted.
 
-.. function:: void qfb_nucomp(qfb_t r, qfb_t f, qfb_t g, fmpz_t D, fmpz_t L)
+.. function:: void qfb_nucomp(qfb_t r, const qfb_t f, const qfb_t g, fmpz_t D, fmpz_t L)
     
     Shanks' NUCOMP as described in~\citep{JacvdP}
 
@@ -122,7 +122,7 @@ Computing with forms
 
     We require that that `f` is a primitive form.
 
-.. function:: void qfb_nudupl(qfb_t r, qfb_t f, fmpz_t D, fmpz_t L)
+.. function:: void qfb_nudupl(qfb_t r, const qfb_t f, fmpz_t D, fmpz_t L)
    
     As for \code{nucomp} except that the form `f` is composed with itself.
     We require that that `f` is a primitive form.
@@ -202,7 +202,7 @@ Computing with forms
        % MIT Thesis 2007.
        % http://groups.csail.mit.edu/cis/theses/sutherland-phd.pdf
 
-.. function:: int qfb_exponent_grh(fmpz_t exponent, fmpz_t n, ulong iters, ulong B1, ulong B2_sqrt)
+.. function:: int qfb_exponent_grh(fmpz_t exponent, fmpz_t n, ulong B1, ulong B2_sqrt)
 
     As per \code{qfb_exponent} except that the bound \code{c} is 
     automatically generated such that the exponent it guaranteed to be

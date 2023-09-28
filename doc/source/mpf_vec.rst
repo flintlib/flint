@@ -8,7 +8,7 @@ Memory management
 --------------------------------------------------------------------------------
 
 
-.. function:: mpf * _mpf_vec_init(slong len)
+.. function:: mpf * _mpf_vec_init(slong len, mp_limb_t prec)
 
     Returns a vector of the given length of initialised ``mpf``'s
     with at least the given precision.
@@ -109,7 +109,7 @@ Dot product and norm
     Sets ``res`` to the dot product of ``(vec1, len2)`` with 
     ``(vec2, len2)``.
     
-.. function:: void _mpf_vec_norm(mpf_t res, mpf * vec, slong len)
+.. function:: void _mpf_vec_norm(mpf_t res, const mpf * vec, slong len)
 
     Sets ``res`` to the square of the Euclidean norm of 
     ``(vec, len)``.
@@ -121,7 +121,7 @@ Dot product and norm
     set to be at least ``prec`` bits. Returns 0 if a probable
     cancellation is detected, and otherwise returns a non-zero value.
 
-.. function:: void _mpf_vec_norm2(mpf_t res, mpf * vec, slong len, flint_bitcnt_t prec)
+.. function:: void _mpf_vec_norm2(mpf_t res, const mpf * vec, slong len, flint_bitcnt_t prec)
 
     Sets ``res`` to the square of the Euclidean norm of 
     ``(vec, len)``. The temporary variable used has its precision
