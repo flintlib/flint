@@ -410,7 +410,7 @@ Addition and subtraction
 
 .. function:: void fmpq_poly_add_can(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2, int can)
 
-    As per ``t mpq_poly_add`` except that one can specify whether to
+    As per ``mpq_poly_add`` except that one can specify whether to
     canonicalise the output or not. This function is intended to be used with
     weak canonicalisation to prevent explosion in memory usage. It exists for
     performance reasons.
