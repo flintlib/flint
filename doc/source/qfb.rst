@@ -83,13 +83,14 @@ Computing with forms
 
 .. function:: void qfb_reduce(qfb_t r, qfb_t f, fmpz_t D)
 
-    Set `r` to the reduced form equivalent to the binary quadratic form `f`
-    of discriminant `D`.
+    Set `r` to a reduced form equivalent to the binary quadratic form `f`
+    of discriminant `D`. If `D > 0`, then there can be more than one reduced 
+    form equivalent to `f`.
 
 .. function:: int qfb_is_reduced(qfb_t r)
 
     Returns `1` if `q` is a reduced binary quadratic form. Otherwise returns
-    `1`.
+    `0`.
 
 .. function:: slong qfb_reduced_forms(qfb ** forms, slong d)
 
@@ -120,12 +121,12 @@ Computing with forms
     `L = \lfloor |D|^{1/4} \rfloor` where `D` is the common discriminant of
     `f` and `g`. The result is returned in `r`.
 
-    We require that that `f` is a primitive form.
+    We require that `f` is a primitive form.
 
 .. function:: void qfb_nudupl(qfb_t r, const qfb_t f, fmpz_t D, fmpz_t L)
    
     As for \code{nucomp} except that the form `f` is composed with itself.
-    We require that that `f` is a primitive form.
+    We require that `f` is a primitive form.
 
 .. function:: void qfb_pow_ui(qfb_t r, qfb_t f, fmpz_t D, ulong exp)
 
@@ -146,7 +147,7 @@ Computing with forms
 .. function:: int qfb_is_principal_form(qfb_t f, fmpz_t D)
     
     Return `1` if `f` is the reduced principal form of discriminant `D`,
-    i.e. the identity in the form class group.
+    i.e. the identity in the form class group, else `0`.
 
 .. function:: void qfb_principal_form(qfb_t f, fmpz_t D)
 
