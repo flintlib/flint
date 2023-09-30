@@ -33,10 +33,6 @@ acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec
     {
         acb_theta_ql_all_sqr(aux, x, w, prec);
     }
-    else if (acb_theta_ql_all_use_naive(g, prec))
-    {
-        acb_theta_naive_all(aux, x, 1, w, prec);
-    }
     else
     {
         acb_theta_ql_all(aux, x, w, prec);

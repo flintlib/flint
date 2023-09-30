@@ -28,6 +28,18 @@ _acb_vec_contains_zero(acb_srcptr v, slong n)
     return 0;
 }
 
+int acb_theta_ql_all_use_naive(slong g, slong prec)
+{
+    if (g <= 2)
+    {
+        return (prec <= 1500);
+    }
+    else
+    {
+        return 0;
+    }
+}
+
 static int
 acb_theta_ql_all_with_t(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
     arb_srcptr dist, const acb_mat_t tau, slong guard, slong prec)
@@ -228,7 +240,11 @@ acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
 
     if (acb_is_finite(c))
     {
-        if (d > 0)
+        if (d > 0 && acb_theta_ql_all_use_naive(g, prec))
+        {
+            acb_theta_naive_all(aux, x, 1, w, prec);
+        }
+        else if (d > 0)
         {
             acb_theta_ql_all_red(aux, x, w, prec);
         }

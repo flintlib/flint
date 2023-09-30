@@ -11,30 +11,8 @@
 
 #include "acb_theta.h"
 
-/* Assumes that the ch are all distinct. More efficient: compute ch from the
-   Goepel relation, then check if it is even, etc. */
-
 int
 acb_theta_char_is_syzygous(ulong ch1, ulong ch2, ulong ch3, slong g)
 {
-    ulong n = 1 << (2 * g);
-    ulong ch;
-
-    if (ch1 == ch2 || ch2 == ch3 || ch1 == ch3)
-    {
-        return 0;
-    }
-
-    for (ch = 0; ch < n; ch++)
-    {
-        if (acb_theta_char_is_even(ch, g)
-            && (ch != ch1)
-            && (ch != ch2)
-            && (ch != ch3)
-            && acb_theta_char_is_goepel(ch, ch1, ch2, ch3, g))
-        {
-            return 1;
-        }
-    }
-    return 0;
+    return acb_theta_char_is_goepel(ch1, ch2, ch3, ch1 ^ ch2 ^ ch3, g);
 }

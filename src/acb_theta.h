@@ -63,7 +63,7 @@ void acb_siegel_cocycle_det(acb_t det, const fmpz_mat_t mat, const acb_mat_t tau
 void acb_siegel_transform(acb_mat_t res, const fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 void acb_siegel_transform_ext(acb_ptr r, acb_mat_t w, const fmpz_mat_t mat,
     acb_srcptr z, const acb_mat_t tau, slong prec);
-void acb_siegel_transform_cocycle_inv(acb_mat_t t, acb_mat_t c, acb_mat_t cinv,
+void acb_siegel_transform_cocycle_inv(acb_mat_t r, acb_mat_t c, acb_mat_t cinv,
     const fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 
 void acb_siegel_reduce_imag(fmpz_mat_t mat, const acb_mat_t tau, slong prec);
@@ -78,8 +78,8 @@ void acb_siegel_randtest_nice(acb_mat_t tau, flint_rand_t state, slong prec);
 
 void acb_theta_char_get_slong(slong* n, ulong a, slong g);
 ulong acb_theta_char_get_a(const slong* n, slong g);
-void acb_theta_char_get_acb(acb_ptr v, ulong a, slong g);
 void acb_theta_char_get_arb(arb_ptr v, ulong a, slong g);
+void acb_theta_char_get_acb(acb_ptr v, ulong a, slong g);
 
 slong acb_theta_char_dot(ulong a, ulong b, slong g);
 slong acb_theta_char_dot_slong(ulong a, const slong* n, slong g);
@@ -227,8 +227,6 @@ void acb_theta_agm_rel_mag_err(arf_t m, arf_t eps, acb_srcptr a,
 void acb_theta_agm_mul_tight(acb_ptr r, acb_srcptr a0, acb_srcptr a,
     arb_srcptr d0, arb_srcptr d, slong g, slong prec);
 
-#define ACB_THETA_QL_TRY 100
-
 slong acb_theta_ql_nb_steps(const arb_mat_t cho, slong d, slong prec);
 void acb_theta_ql_log_rescale(acb_t f, acb_srcptr z, const acb_mat_t tau, slong prec);
 int acb_theta_ql_roots(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
@@ -253,9 +251,10 @@ int acb_theta_ql_a0_steps(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist
 int acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
     arb_srcptr dist, const acb_mat_t tau, slong guard, slong prec);
 
+#define ACB_THETA_QL_TRY 100
+
 slong acb_theta_ql_reduce(acb_ptr x, acb_t c, arb_t u, acb_srcptr z,
     const acb_mat_t tau, slong prec);
-int acb_theta_ql_all_use_naive(slong g, slong prec);
 void acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec);
 void acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec);
 
