@@ -61,13 +61,13 @@ acb_theta_jet_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slo
         for (k = 0; k < g; k++)
         {
             acb_get_mid(acb_mat_entry(tau_mid, j, k), acb_mat_entry(tau, j, k));
-            /*acb_add_error_arf(acb_mat_entry(tau_mid, j, k), e);*/
+            acb_add_error_arf(acb_mat_entry(tau_mid, j, k), e);
             acb_set(acb_mat_entry(tau_mid, k, j), acb_mat_entry(tau_mid, j, k));
         }
         acb_get_mid(&z_mid[j], &z[j]);
         if (has_z)
         {
-            /*acb_add_error_arf(&z_mid[j], e);*/
+            acb_add_error_arf(&z_mid[j], e);
         }
     }
 

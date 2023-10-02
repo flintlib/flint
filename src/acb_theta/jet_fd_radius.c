@@ -21,22 +21,16 @@ acb_theta_jet_fd_radius(arf_t eps, arf_t err, const arb_t c, const arb_t rho,
     arb_init(t);
     arb_init(x);
 
-    /* Set x to minimum of (1/2g)^(1/b)*rho, (2^(-hprec-1)/cg)^(1/b)*rho^2 */
-    arb_set_si(x, 2 * g);
-    arb_inv(x, x, prec);
-    arb_root_ui(x, x, b, prec);
-
-    arb_mul_si(t, c, g, prec);
-    arb_inv(t, t, prec);
-    arb_mul_2exp_si(t, t, -hprec - 1);
-    arb_root_ui(t, t, b, prec);
-    arb_mul(t, t, rho, prec);
-
+    /* Set x to minimum of (1/2g)^(1/b)*rho, (2^(-hprec-1)/cg)^(1/b)*rho */
+    arb_mul_2exp_si(x, c, -hprec);
+    arb_div(x, x, c, prec);
+    arb_set_si(t, 1);
     arb_min(x, x, t, prec);
+    arb_div_si(x, x, 2 * g, prec);
+    arb_root_ui(x, x, b, prec);
     arb_mul(x, x, rho, prec);
-    arb_get_lbound_arf(eps, x, prec);
 
-    /* Set error */
+    arb_get_lbound_arf(eps, x, prec);
     arf_one(err);
     arf_mul_2exp_si(err, err, -hprec);
 

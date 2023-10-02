@@ -102,7 +102,7 @@ acb_theta_jet_bounds(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau,
     arb_mul_2exp_si(t, t, 1);
     arb_sqr(rho, t, prec);
     arb_sqr(t, c2, prec);
-    arb_mul_si(t, t, 64 * b, prec);
+    arb_mul_si(t, t, 8 * b, prec);
     arb_add(rho, rho, t, prec);
     arb_sqrt(rho, rho, prec);
     arb_mul(t, c1, c2, prec);
