@@ -10,7 +10,8 @@
 */
 
 #include "acb_theta.h"
-#include "profiler.h"
+
+#define ACB_THETA_G2_JET_NAIVE_THRESHOLD 10000
 
 void acb_theta_g2_sextic(acb_poly_t r, const acb_mat_t tau, slong prec)
 {

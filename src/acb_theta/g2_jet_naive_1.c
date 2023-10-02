@@ -147,14 +147,8 @@ worker_dim1(acb_ptr dth, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong
         }
     }
 
-    /* Multiply vector by cofactor and i*pi, then add to dth */
+    /* Multiply vector by cofactor and add to dth */
     _acb_vec_scalar_mul(aux, aux, 2 * 3 * n, cofactor, prec);
-    acb_const_pi(x, prec);
-    acb_mul_onei(x, x);
-    for (i = 0; i < 2 * n; i++)
-    {
-        _acb_vec_scalar_mul(&aux[3 * i + 1], &aux[3 * i + 1], 2, x, prec);
-    }
     for (b = 0; b < n; b++)
     {
         _acb_vec_add(&dth[3 * (n * a0 + b)], &dth[3 * (n * a0 + b)],
@@ -185,6 +179,7 @@ acb_theta_g2_jet_naive_1(acb_ptr dth, const acb_mat_t tau, slong prec)
     acb_t c;
     arb_t u;
     acb_mat_t new_tau;
+    slong k;
 
     acb_theta_eld_init(E, g, g);
     acb_theta_precomp_init(D, 1, g);
@@ -201,6 +196,15 @@ acb_theta_g2_jet_naive_1(acb_ptr dth, const acb_mat_t tau, slong prec)
     acb_one(c);
 
     acb_theta_naive_worker(dth, 3 * n2, c, u, E, D, 0, ord, prec, worker_dim1);
+
+    /* Multiply by i*pi */
+    acb_const_pi(c, prec);
+    acb_mul_onei(c, c, prec);
+    for (k = 0; k < n2; k++)
+    {
+        acb_mul(&dth[3 * k + 1], &dth[3 * k + 1], c, prec);
+        acb_mul(&dth[3 * k + 2], &dth[3 * k + 2], c, prec);
+    }
 
     acb_theta_eld_clear(E);
     acb_theta_precomp_clear(D);

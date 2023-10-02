@@ -50,7 +50,6 @@ acb_theta_g2_chi63(acb_poly_t r, acb_srcptr dth, slong prec)
     acb_poly_mul(s, s, &aux[5], prec);
     acb_poly_mul(r, r, s, prec);
     acb_const_pi(den, prec);
-    acb_mul_onei(den, den);
     acb_pow_ui(den, den, 6, prec);
     acb_poly_scalar_div(r, r, den, prec);
     acb_poly_scalar_mul_2exp_si(r, r, -6);
