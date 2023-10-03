@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("jet_naive_ind....");
+    flint_printf("jet_naive_fixed_ab....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -46,7 +46,7 @@ int main(void)
             acb_urandom(&z[k], state, prec);
         }
 
-        acb_theta_jet_naive_ind(dth, ab, z, tau, ord, prec);
+        acb_theta_jet_naive_fixed_ab(dth, ab, z, tau, ord, prec);
         acb_theta_jet_naive_all(test, z, tau, ord, prec);
 
         if (!_acb_vec_overlaps(dth, test + ab * nb, nb))
@@ -55,7 +55,7 @@ int main(void)
             flint_printf("g = %wd, prec = %wd, ord = %wd, ab = %wd\n", g, prec, ord, ab);
             acb_mat_printd(tau, 5);
             _acb_vec_printd(z, g, 5);
-            flint_printf("jet_naive_ind:\n");
+            flint_printf("jet_naive_fixed_ab:\n");
             _acb_vec_printd(dth, nb, 5);
             flint_printf("jet_naive_all:\n");
             _acb_vec_printd(test + ab * nb, nb, 5);

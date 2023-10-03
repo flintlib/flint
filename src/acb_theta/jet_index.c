@@ -11,13 +11,13 @@
 
 #include "acb_theta.h"
 
-slong acb_theta_jet_index(const slong* orders, slong g)
+slong acb_theta_jet_index(const slong* tup, slong g)
 {
     slong ord, res, k;
     slong j;
 
     /* Get total derivation order */
-    ord = acb_theta_jet_total_order(orders, g);
+    ord = acb_theta_jet_total_order(tup, g);
     if (ord == 0 || g == 1)
     {
         return ord;
@@ -28,7 +28,7 @@ slong acb_theta_jet_index(const slong* orders, slong g)
 
     for (j = 0; j < g - 1; j++)
     {
-        k = orders[j];
+        k = tup[j];
         res += acb_theta_jet_nb(ord - k - 1, g - 1 - j);
         ord -= k;
     }

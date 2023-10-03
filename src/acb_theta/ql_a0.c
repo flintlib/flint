@@ -119,7 +119,7 @@ acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
             {
                 lp = FLINT_MAX(ACB_THETA_LOW_PREC, acb_theta_dist_addprec(&dist0[a]));
             }
-            acb_theta_jet_naive_ind(dth, a << g, z_mid, tau, 2, lp);
+            acb_theta_jet_naive_fixed_ab(dth, a << g, z_mid, tau, 2, lp);
             acb_theta_jet_error_bounds(err, z_mid, tau, dth, 0, lp);
             acb_add_error_arb(&r[k * n + a], err);
         }

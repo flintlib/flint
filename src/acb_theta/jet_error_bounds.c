@@ -21,8 +21,8 @@ void acb_theta_jet_error_bounds(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
     arb_t e, f;
     slong nb = acb_theta_jet_nb(ord, g);
     slong nb_dth = acb_theta_jet_nb(ord + 2, g);
-    slong* orders;
-    slong* new_orders;
+    slong* tups;
+    slong* new_tups;
     slong j, l, m, i;
 
     abs_der = _arb_vec_init(nb_dth);
@@ -30,8 +30,8 @@ void acb_theta_jet_error_bounds(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
     z_err = _arb_vec_init(g);
     arb_init(e);
     arb_init(f);
-    orders = flint_malloc(nb * g * sizeof(slong));
-    new_orders = flint_malloc(g * sizeof(slong));
+    tups = flint_malloc(nb * g * sizeof(slong));
+    new_tups = flint_malloc(g * sizeof(slong));
 
     /* Get input errors on z, tau */
     for (l = 0; l < g; l++)
@@ -51,8 +51,8 @@ void acb_theta_jet_error_bounds(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
         acb_get_abs_ubound_arf(arb_midref(&abs_der[j]), &dth[j], prec);
     }
 
-    /* Loop over orders to compute the correct bounds */
-    acb_theta_jet_orders(orders, ord, g);
+    /* Loop over tuples to compute the correct bounds */
+    acb_theta_jet_tuples(tups, ord, g);
     for (j = 0; j < nb; j++)
     {
         arb_zero(&err[j]);
@@ -64,23 +64,23 @@ void acb_theta_jet_error_bounds(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
                 /* Heat equation: d/dzl d/dzm = 2pi i (1 + delta) d/dtaulm */
                 for (i = 0; i < g; i++)
                 {
-                    new_orders[i] = orders[j * g + i];
+                    new_tups[i] = tups[j * g + i];
                 }
-                new_orders[l] += 1;
-                new_orders[m] += 1;
-                i = acb_theta_jet_index(new_orders, g);
+                new_tups[l] += 1;
+                new_tups[m] += 1;
+                i = acb_theta_jet_index(new_tups, g);
 
                 arb_mul(e, arb_mat_entry(tau_err, l, m), &abs_der[i], prec);
                 arb_const_pi(f, prec);
                 if (l == m)
                 {
                     arb_mul_2exp_si(f, f, 2);
-                    arb_mul_si(e, e, new_orders[l] * (new_orders[l] - 1), prec);
+                    arb_mul_si(e, e, new_tups[l] * (new_tups[l] - 1), prec);
                 }
                 else
                 {
                     arb_mul_2exp_si(f, f, 1);
-                    arb_mul_si(e, e, new_orders[l] * new_orders[m], prec);
+                    arb_mul_si(e, e, new_tups[l] * new_tups[m], prec);
                 }
                 arb_div(e, e, f, prec);
                 arb_add(&err[j], &err[j], e, prec);
@@ -91,13 +91,13 @@ void acb_theta_jet_error_bounds(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
         {
             for (i = 0; i < g; i++)
             {
-                new_orders[i] = orders[j * g + i];
+                new_tups[i] = tups[j * g + i];
             }
-            new_orders[l] += 1;
-            i = acb_theta_jet_index(new_orders, g);
+            new_tups[l] += 1;
+            i = acb_theta_jet_index(new_tups, g);
 
             arb_mul(e, &z_err[l], &abs_der[i], prec);
-            arb_mul_si(e, e, new_orders[l], prec);
+            arb_mul_si(e, e, new_tups[l], prec);
             arb_add(&err[j], &err[j], e, prec);
         }
     }
@@ -106,6 +106,6 @@ void acb_theta_jet_error_bounds(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
     arb_mat_clear(tau_err);
     _arb_vec_clear(z_err, g);
     arb_clear(e);
-    flint_free(orders);
-    flint_free(new_orders);
+    flint_free(tups);
+    flint_free(new_tups);
 }

@@ -31,7 +31,7 @@ int main(void)
         slong b = ord + 1;
         slong nb_val = n_pow(b, g);
         slong nb_fd = acb_theta_jet_nb(ord, g);
-        slong *orders;
+        slong* tups;
         arb_t c, rho;
         arf_t eps, err;
         acb_ptr val, df, test;
@@ -39,7 +39,7 @@ int main(void)
         fmpz_t m;
         slong k, kk, j, i;
 
-        orders = flint_malloc(g * nb_fd * sizeof(slong));
+        tups = flint_malloc(g * nb_fd * sizeof(slong));
         arb_init(c);
         arb_init(rho);
         arf_init(eps);
@@ -77,13 +77,13 @@ int main(void)
         acb_theta_jet_fd(df, eps, err, val, ord, g, 2 * prec);
 
         /* Fill in test */
-        acb_theta_jet_orders(orders, ord, g);
+        acb_theta_jet_tuples(tups, ord, g);
         for (j = 0; j < nb_fd; j++)
         {
             acb_one(x);
             for (i = 0; i < g; i++)
             {
-                fmpz_fac_ui(m, orders[j * g + i]);
+                fmpz_fac_ui(m, tups[j * g + i]);
                 acb_div_fmpz(x, x, m, prec);
             }
             acb_set(&test[j], x);
@@ -104,7 +104,7 @@ int main(void)
             flint_abort();
         }
 
-        flint_free(orders);
+        flint_free(tups);
         arb_clear(c);
         arb_clear(rho);
         arf_clear(eps);

@@ -93,8 +93,7 @@ int acb_theta_char_is_syzygous(ulong ch1, ulong ch2, ulong ch3, slong g);
 
 struct acb_theta_eld_struct
 {
-    slong dim;
-    slong ambient_dim;
+    slong dim, ambient_dim;
     slong* last_coords;
     slong min, mid, max, nr, nl;
     struct acb_theta_eld_struct* rchildren;
@@ -134,21 +133,20 @@ void acb_theta_eld_print(const acb_theta_eld_t E);
 
 typedef struct
 {
-    slong dim;
+    slong dim, nb;
     acb_mat_struct exp_mat;
     acb_ptr sqr_powers;
     slong* indices;
     acb_ptr exp_z;
-    slong nb;
 } acb_theta_precomp_struct;
 
 typedef acb_theta_precomp_struct acb_theta_precomp_t[1];
 
 #define acb_theta_precomp_dim(D) ((D)->dim)
+#define acb_theta_precomp_nb(D) ((D)->nb)
 #define acb_theta_precomp_exp_mat(D) (&(D)->exp_mat)
 #define acb_theta_precomp_sqr_pow(D, k, j) (&(D)->sqr_powers[(j) + (D)->indices[(k)]])
 #define acb_theta_precomp_exp_z(D, k, j) (&(D)->exp_z[(k) * (D)->dim + (j)])
-#define acb_theta_precomp_nb(D) ((D)->nb)
 
 void acb_theta_precomp_init(acb_theta_precomp_t D, slong nb, slong g);
 void acb_theta_precomp_clear(acb_theta_precomp_t D);
@@ -157,8 +155,7 @@ void acb_theta_precomp_set(acb_theta_precomp_t D, acb_srcptr zs,
 
 /* Naive algorithms */
 
-void acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau,
-    slong* n, slong prec);
+void acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau,  slong* n, slong prec);
 void acb_theta_naive_tail(arb_t res, const arf_t R2, const arb_mat_t C, slong ord);
 void acb_theta_naive_radius(arf_t R2, arf_t eps, const arb_mat_t C, slong ord, slong prec);
 
@@ -187,18 +184,18 @@ void acb_theta_naive_all(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t ta
 /* Naive algorithms for derivatives */
 
 slong acb_theta_jet_nb(slong ord, slong g);
-slong acb_theta_jet_total_order(const slong* orders, slong g);
-void acb_theta_jet_orders(slong* orders, slong ord, slong g);
-slong acb_theta_jet_index(const slong* orders, slong g);
+slong acb_theta_jet_total_order(const slong* tup, slong g);
+void acb_theta_jet_tuples(slong* tups, slong ord, slong g);
+slong acb_theta_jet_index(const slong* tup, slong g);
 
-void acb_theta_jet_naive_radius(arf_t R2, arf_t eps, arb_srcptr offset,
-    const arb_mat_t cho, slong ord, slong prec);
+void acb_theta_jet_naive_radius(arf_t R2, arf_t eps, arb_srcptr v,
+    const arb_mat_t C, slong ord, slong prec);
 void acb_theta_jet_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z,
     const acb_mat_t tau, slong ord, slong prec);
 
 void acb_theta_jet_naive_00(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
     slong ord, slong prec);
-void acb_theta_jet_naive_ind(acb_ptr dth, ulong ab, acb_srcptr z, const acb_mat_t tau,
+void acb_theta_jet_naive_fixed_ab(acb_ptr dth, ulong ab, acb_srcptr z, const acb_mat_t tau,
     slong ord, slong prec);
 void acb_theta_jet_naive_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
     slong ord, slong prec);

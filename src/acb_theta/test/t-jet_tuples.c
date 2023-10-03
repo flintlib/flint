@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("jet_orders....");
+    flint_printf("jet_tuples....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -27,26 +27,26 @@ int main(void)
         slong g = 1 + n_randint(state, 6);
         slong ord = n_randint(state, 6);
         slong nb = acb_theta_jet_nb(ord, g);
-        slong *orders;
+        slong* tups;
         slong i = n_randint(state, nb);
         slong test;
         slong j, k;
 
-        orders = flint_malloc(nb * g * sizeof(slong));
+        tups = flint_malloc(nb * g * sizeof(slong));
 
-        acb_theta_jet_orders(orders, ord, g);
-        test = acb_theta_jet_index(orders + i * g, g);
+        acb_theta_jet_tuples(tups, ord, g);
+        test = acb_theta_jet_index(tups + i * g, g);
 
         if (test != i)
         {
             flint_printf("FAIL\n");
             flint_printf("g = %wd, ord = %wd, nb = %wd\n", g, ord, nb);
-            flint_printf("orders:\n");
+            flint_printf("tups:\n");
             for (j = 0; j < nb; j++)
             {
                 for (k = 0; k < g; k++)
                 {
-                    flint_printf("%wd ", orders[j * g + k]);
+                    flint_printf("%wd ", tups[j * g + k]);
                 }
                 flint_printf("\n");
             }
@@ -54,7 +54,7 @@ int main(void)
             flint_abort();
         }
 
-        flint_free(orders);
+        flint_free(tups);
     }
 
     flint_randclear(state);

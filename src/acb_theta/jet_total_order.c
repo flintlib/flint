@@ -11,14 +11,14 @@
 
 #include "acb_theta.h"
 
-slong acb_theta_jet_total_order(const slong* orders, slong g)
+slong acb_theta_jet_total_order(const slong* tup, slong g)
 {
     slong k;
     slong res = 0;
 
     for (k = 0; k < g; k++)
     {
-        res += orders[k];
+        res += tup[k];
     }
 
     return res;

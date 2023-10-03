@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 void
-acb_theta_jet_orders(slong* orders, slong ord, slong g)
+acb_theta_jet_tuples(slong* tups, slong ord, slong g)
 {
     slong k, j, l, nb_rec, ind;
     slong* rec;
@@ -21,26 +21,26 @@ acb_theta_jet_orders(slong* orders, slong ord, slong g)
     {
         for (k = 0; k <= ord; k++)
         {
-            orders[k] = k;
+            tups[k] = k;
         }
         return;
     }
 
-    /* Generate orders in dimension g - 1 */
+    /* Generate tuples in dimension g - 1 */
     nb_rec = acb_theta_jet_nb(ord, g - 1);
     rec = flint_malloc((g - 1) * nb_rec * sizeof(slong));
-    acb_theta_jet_orders(rec, ord, g - 1);
+    acb_theta_jet_tuples(rec, ord, g - 1);
 
     for (k = 0; k <= ord; k++)
     {
-        /* Construct orders of total order k from rec */
+        /* Construct tuples of total order k from rec */
         ind = acb_theta_jet_nb(k - 1, g);
         for (j = 0; j < acb_theta_jet_nb(k, g - 1); j++)
         {
-            orders[(ind + j) * g] = k - acb_theta_jet_total_order(rec + j * (g - 1), g - 1);
+            tups[(ind + j) * g] = k - acb_theta_jet_total_order(rec + j * (g - 1), g - 1);
             for (l = 0; l < g - 1; l++)
             {
-                orders[(ind + j) * g + l + 1] = rec[j * (g - 1) + l];
+                tups[(ind + j) * g + l + 1] = rec[j * (g - 1) + l];
             }
         }
     }

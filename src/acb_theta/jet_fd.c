@@ -22,19 +22,19 @@ acb_theta_jet_fd(acb_ptr dth, const arf_t eps, const arf_t err, acb_srcptr val,
     arb_t t;
     slong nb = acb_theta_jet_nb(ord, g);
     slong b = ord + 1;
-    slong* orders;
+    slong* tups;
     slong j, i, l;
     slong k = 0;
 
     aux = _acb_vec_init(n_pow(b, g));
     arb_init(t);
-    orders = flint_malloc(g * nb * sizeof(slong));
+    tups = flint_malloc(g * nb * sizeof(slong));
 
     acb_theta_jet_fourier(aux, val, ord, g, prec);
     arb_set_si(t, n_pow(b, g));
     _acb_vec_scalar_div_arb(aux, aux, n_pow(b, g), t, prec);
 
-    acb_theta_jet_orders(orders, ord, g);
+    acb_theta_jet_tuples(tups, ord, g);
 
     /* Get Taylor coefficients, divide by eps^k */
     k = 0;
@@ -45,11 +45,11 @@ acb_theta_jet_fd(acb_ptr dth, const arf_t eps, const arf_t err, acb_srcptr val,
         for (i = 0; i < g; i++)
         {
             l *= b;
-            l += orders[j * g + i];
+            l += tups[j * g + i];
         }
         acb_set(&dth[j], &aux[l]);
 
-        if (acb_theta_jet_total_order(orders + j * g, g) > k)
+        if (acb_theta_jet_total_order(tups + j * g, g) > k)
         {
             k++;
             arb_mul_arf(t, t, eps, prec);
@@ -60,5 +60,5 @@ acb_theta_jet_fd(acb_ptr dth, const arf_t eps, const arf_t err, acb_srcptr val,
 
     _acb_vec_clear(aux, n_pow(b, g));
     arb_clear(t);
-    flint_free(orders);
+    flint_free(tups);
 }

@@ -12,21 +12,21 @@
 #include "acb_theta.h"
 
 void
-acb_theta_jet_naive_ind(acb_ptr dth, ulong ab, acb_srcptr z, const acb_mat_t tau,
+acb_theta_jet_naive_fixed_ab(acb_ptr dth, ulong ab, acb_srcptr z, const acb_mat_t tau,
     slong ord, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong nb = acb_theta_jet_nb(ord, g);
     ulong a = ab >> g;
     ulong b = ab;
-    slong* orders;
+    slong* tups;
     acb_ptr new_z, v, w, aux;
     acb_t c, x;
     fmpz_t m;
     slong j, k, l;
     int le;
 
-    orders = flint_malloc(nb * g * sizeof(slong));
+    tups = flint_malloc(nb * g * sizeof(slong));
     new_z = _acb_vec_init(g);
     v = _acb_vec_init(g);
     w = _acb_vec_init(g);
@@ -54,7 +54,7 @@ acb_theta_jet_naive_ind(acb_ptr dth, ulong ab, acb_srcptr z, const acb_mat_t tau
     _acb_vec_scalar_mul(aux, aux, nb, x, prec);
 
     /* Make linear combinations */
-    acb_theta_jet_orders(orders, ord, g);
+    acb_theta_jet_tuples(tups, ord, g);
     _acb_vec_zero(dth, nb);
     for (j = 0; j < nb; j++)
     {
@@ -63,7 +63,7 @@ acb_theta_jet_naive_ind(acb_ptr dth, ulong ab, acb_srcptr z, const acb_mat_t tau
             le = 1;
             for (l = 0; (l < g && le); l++)
             {
-                if (orders[k * g + l] > orders[j * g + l])
+                if (tups[k * g + l] > tups[j * g + l])
                 {
                     le = 0;
                 }
@@ -78,22 +78,22 @@ acb_theta_jet_naive_ind(acb_ptr dth, ulong ab, acb_srcptr z, const acb_mat_t tau
             {
                 acb_set_si(c, (a >> (g - 1 - l)) % 2);
                 acb_mul_2exp_si(c, c, -1);
-                acb_pow_ui(c, c, orders[j * g + l] - orders[k * g + l], prec);
-                fmpz_fac_ui(m, orders[j * g + l] - orders[k * g + l]);
+                acb_pow_ui(c, c, tups[j * g + l] - tups[k * g + l], prec);
+                fmpz_fac_ui(m, tups[j * g + l] - tups[k * g + l]);
                 acb_div_fmpz(c, c, m, prec);
                 acb_mul(x, x, c, prec);
             }
             acb_const_pi(c, prec);
             acb_mul_onei(c, c);
             acb_mul_2exp_si(c, c, 1);
-            acb_pow_ui(c, c, acb_theta_jet_total_order(orders + j * g, g)
-                - acb_theta_jet_total_order(orders + k * g, g), prec);
+            acb_pow_ui(c, c, acb_theta_jet_total_order(tups + j * g, g)
+                - acb_theta_jet_total_order(tups + k * g, g), prec);
             acb_mul(x, x, c, prec);
             acb_addmul(&dth[j], &aux[k], x, prec);
         }
     }
 
-    flint_free(orders);
+    flint_free(tups);
     _acb_vec_clear(new_z, g);
     _acb_vec_clear(v, g);
     _acb_vec_clear(w, g);
