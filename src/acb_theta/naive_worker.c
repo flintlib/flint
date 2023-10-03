@@ -225,12 +225,12 @@ acb_theta_naive_worker_rec(acb_ptr th, acb_ptr v1, acb_ptr v2, slong* precs,
 /* User function */
 
 void
-acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arb_t u,
+acb_theta_naive_worker(acb_ptr th, slong len, const acb_t c, const arb_t u,
     const acb_theta_eld_t E, const acb_theta_precomp_t D, slong k,
     slong ord, slong prec, acb_theta_naive_worker_t worker_dim1)
 {
     slong g = acb_theta_eld_ambient_dim(E);
-    slong len = 0;
+    slong width = 0;
     acb_mat_t lin_powers;
     acb_ptr v1, v2;
     slong* precs;
@@ -239,19 +239,19 @@ acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arb_t u,
 
     for (j = 0; j < g; j++)
     {
-        len = FLINT_MAX(len, 2 * acb_theta_eld_box(E, j) + 1);
+        width = FLINT_MAX(width, 2 * acb_theta_eld_box(E, j) + 1);
     }
 
     acb_mat_init(lin_powers, g, g);
     acb_init(cofactor);
-    v1 = _acb_vec_init(len);
-    v2 = _acb_vec_init(len);
-    precs = flint_malloc(len * sizeof(slong));
+    v1 = _acb_vec_init(width);
+    v2 = _acb_vec_init(width);
+    precs = flint_malloc(width * sizeof(slong));
 
     acb_mat_set(lin_powers, acb_theta_precomp_exp_mat(D));
     acb_one(cofactor);
 
-    for (j = 0; j < nb; j++)
+    for (j = 0; j < len; j++)
     {
         acb_zero(&th[j]);
     }
@@ -260,7 +260,7 @@ acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arb_t u,
         lin_powers, E, D, acb_theta_precomp_exp_z(D, k, 0),
         cofactor, ord, prec, prec, worker_dim1);
 
-    for (j = 0; j < nb; j++)
+    for (j = 0; j < len; j++)
     {
         acb_mul(&th[j], &th[j], c, prec);
         acb_add_error_arb(&th[j], u);
@@ -268,7 +268,7 @@ acb_theta_naive_worker(acb_ptr th, slong nb, const acb_t c, const arb_t u,
 
     acb_mat_clear(lin_powers);
     acb_clear(cofactor);
-    _acb_vec_clear(v1, len);
-    _acb_vec_clear(v2, len);
+    _acb_vec_clear(v1, width);
+    _acb_vec_clear(v2, width);
     flint_free(precs);
 }

@@ -32,7 +32,7 @@ acb_theta_ql_a0_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
     }
     for (k = 0; k < n; k++)
     {
-        acb_theta_naive_ind(th, k << g, x, nb_t, tau,
+        acb_theta_naive_fixed_ab(th, k << g, x, nb_t, tau,
             prec + acb_theta_dist_addprec(&dist0[k]));
         for (j = 0; j < nb_t; j++)
         {
@@ -48,7 +48,7 @@ acb_theta_ql_a0_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
         }
         for (k = 0; k < n; k++)
         {
-            acb_theta_naive_ind(th, k << g, x, nb_t, tau,
+            acb_theta_naive_fixed_ab(th, k << g, x, nb_t, tau,
                 prec + acb_theta_dist_addprec(&dist[k]));
             for (j = 0; j < nb_t; j++)
             {

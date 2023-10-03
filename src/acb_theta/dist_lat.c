@@ -82,7 +82,7 @@ acb_theta_dist_lat(arb_t d2, arb_srcptr v, const arb_mat_t cho, slong prec)
     arb_init(x);
 
     acb_theta_dist_ubound(u, v, cho, prec);
-    acb_theta_eld_fill(E, cho, u, v, prec);
+    acb_theta_eld_fill(E, cho, u, v);
     nb = acb_theta_eld_nb_pts(E);
 
     pts = flint_malloc(nb * g * sizeof(slong));

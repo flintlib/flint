@@ -12,9 +12,9 @@
 #include "acb_theta.h"
 
 void
-acb_theta_eld_interval(slong* min, slong* mid, slong* max, const arb_t ctr,
-    const arf_t rad, slong prec)
+acb_theta_eld_interval(slong* min, slong* mid, slong* max, const arb_t ctr, const arf_t rad)
 {
+    slong lp = ACB_THETA_LOW_PREC;
     arb_t y;
     arf_t b;
 
@@ -35,13 +35,13 @@ acb_theta_eld_interval(slong* min, slong* mid, slong* max, const arb_t ctr,
     *mid = arf_get_si(arb_midref(ctr), ARF_RND_NEAR);
 
     arb_set_arf(y, rad);
-    arb_add(y, ctr, y, prec);
-    arb_get_ubound_arf(b, y, prec);
+    arb_add(y, ctr, y, lp);
+    arb_get_ubound_arf(b, y, lp);
     *max = arf_get_si(b, ARF_RND_FLOOR);
 
     arb_set_arf(y, rad);
-    arb_sub(y, ctr, y, prec);
-    arb_get_lbound_arf(b, y, prec);
+    arb_sub(y, ctr, y, lp);
+    arb_get_lbound_arf(b, y, lp);
     *min = arf_get_si(b, ARF_RND_CEIL);
 
     arb_clear(y);

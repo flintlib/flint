@@ -41,7 +41,7 @@ int main(void)
         arb_init(test);
 
         acb_siegel_randtest(tau, state, prec, mag_bits);
-        acb_siegel_reduce(res, mat, tau, prec);
+        acb_siegel_reduce(mat, tau, prec);
 
         if (!sp2gz_is_correct(mat))
         {
@@ -51,6 +51,7 @@ int main(void)
             flint_abort();
         }
 
+        acb_siegel_transform(res, mat, tau, prec);
         acb_abs(test, acb_mat_entry(res, 0, 0), prec);
         arb_mul_2exp_si(test, test, 1);
         arb_sub_si(test, test, 1, prec);

@@ -16,7 +16,6 @@ acb_theta_jet_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z,
     const acb_mat_t tau, slong ord, slong prec)
 {
     slong g = acb_mat_nrows(tau);
-    slong lp = ACB_THETA_LOW_PREC;
     arf_t R2, eps;
     arb_mat_t cho, Yinv;
     arb_ptr offset;
@@ -43,7 +42,7 @@ acb_theta_jet_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z,
 
         /* Get radius, fill ellipsoid */
         acb_theta_jet_naive_radius(R2, eps, offset, cho, ord, prec);
-        acb_theta_eld_fill(E, cho, R2, offset, lp);
+        acb_theta_eld_fill(E, cho, R2, offset);
         arb_mul_arf(u, u, eps, prec);
     }
     else
@@ -51,7 +50,7 @@ acb_theta_jet_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z,
         /* Cannot compute cho, result will be nan */
         arb_mat_one(cho);
         arf_zero(R2);
-        acb_theta_eld_fill(E, cho, R2, offset, lp);
+        acb_theta_eld_fill(E, cho, R2, offset);
         arb_indeterminate(u);
     }
 

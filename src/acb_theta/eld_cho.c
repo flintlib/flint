@@ -11,7 +11,7 @@
 
 #include "acb_theta.h"
 
-void acb_theta_eld_cho(arb_mat_t cho, const acb_mat_t tau, slong prec)
+void acb_theta_eld_cho(arb_mat_t C, const acb_mat_t tau, slong prec)
 {
     arb_t pi;
     int res;
@@ -19,14 +19,14 @@ void acb_theta_eld_cho(arb_mat_t cho, const acb_mat_t tau, slong prec)
     arb_init(pi);
     arb_const_pi(pi, prec);
 
-    acb_mat_get_imag(cho, tau);
-    arb_mat_scalar_mul_arb(cho, cho, pi, prec);
-    res = arb_mat_cho(cho, cho, prec);
-    arb_mat_transpose(cho, cho);
+    acb_mat_get_imag(C, tau);
+    arb_mat_scalar_mul_arb(C, C, pi, prec);
+    res = arb_mat_cho(C, C, prec);
+    arb_mat_transpose(C, C);
 
     if (!res)
     {
-        arb_mat_indeterminate(cho);
+        arb_mat_indeterminate(C);
     }
 
     arb_clear(pi);

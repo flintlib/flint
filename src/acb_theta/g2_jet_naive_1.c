@@ -199,7 +199,7 @@ acb_theta_g2_jet_naive_1(acb_ptr dth, const acb_mat_t tau, slong prec)
 
     /* Multiply by i*pi */
     acb_const_pi(c, prec);
-    acb_mul_onei(c, c, prec);
+    acb_mul_onei(c, c);
     for (k = 0; k < n2; k++)
     {
         acb_mul(&dth[3 * k + 1], &dth[3 * k + 1], c, prec);

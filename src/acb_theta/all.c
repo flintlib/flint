@@ -26,8 +26,8 @@ acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec
     x = _acb_vec_init(g);
     aux = _acb_vec_init(n * n);
 
-    acb_siegel_reduce(w, mat, tau, prec);
-    acb_siegel_transform_ext(x, w, mat, z, tau, prec);
+    acb_siegel_reduce(mat, tau, prec);
+    acb_siegel_transform_z(x, w, mat, z, tau, prec);
 
     if (sqr)
     {

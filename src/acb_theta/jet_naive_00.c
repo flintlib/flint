@@ -104,7 +104,7 @@ acb_theta_jet_naive_00_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
     {
         acb_const_pi(c, prec);
         acb_mul_2exp_si(c, c, 1);
-        acb_pow_ui(c, c, acb_theta_jet_total_orders(orders + k * g), prec);
+        acb_pow_ui(c, c, acb_theta_jet_total_order(orders + k * g, g), prec);
         fmpz_one(m);
         for (j = 0; j < g; j++)
         {

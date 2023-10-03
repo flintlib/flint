@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 void
-acb_theta_precomp_set(acb_theta_precomp_t D, acb_srcptr z,
+acb_theta_precomp_set(acb_theta_precomp_t D, acb_srcptr zs,
     const acb_mat_t tau, const acb_theta_eld_t E, slong prec)
 {
     slong g = acb_theta_eld_ambient_dim(E);
@@ -74,13 +74,13 @@ acb_theta_precomp_set(acb_theta_precomp_t D, acb_srcptr z,
         }
     }
 
-    /* Set exponentials of z */
+    /* Set exponentials of zs */
     /* Contain exp(2 i pi z_j) */
-    for (k = 0; k < acb_theta_precomp_nb_z(D); k++)
+    for (k = 0; k < acb_theta_precomp_nb(D); k++)
     {
         for (j = 0; j < g; j++)
         {
-            acb_mul_2exp_si(acb_theta_precomp_exp_z(D, k, j), &z[k * g + j], 1);
+            acb_mul_2exp_si(acb_theta_precomp_exp_z(D, k, j), &zs[k * g + j], 1);
             acb_exp_pi_i(acb_theta_precomp_exp_z(D, k, j),
                 acb_theta_precomp_exp_z(D, k, j), prec);
         }

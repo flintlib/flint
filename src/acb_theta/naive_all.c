@@ -12,15 +12,15 @@
 #include "acb_theta.h"
 
 void
-acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
+acb_theta_naive_all(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
-    acb_ptr all_z, ata, v;
+    acb_ptr all_zs, ata, v;
     acb_t c;
     slong a, b, d, k;
 
-    all_z = _acb_vec_init(g * n * nb_z);
+    all_zs = _acb_vec_init(g * n * nb);
     ata = _acb_vec_init(n);
     v = _acb_vec_init(g);
     acb_init(c);
@@ -29,21 +29,21 @@ acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, s
     {
         acb_theta_char_get_acb(v, a, g);
         acb_mat_vector_mul_col(v, tau, v, prec);
-        for (k = 0; k < nb_z; k++)
+        for (k = 0; k < nb; k++)
         {
-            _acb_vec_add(all_z + k * g * n + a * g, z + k * g, v, g, prec);
+            _acb_vec_add(all_zs + k * g * n + a * g, zs + k * g, v, g, prec);
         }
         acb_theta_char_dot_acb(&ata[a], a, v, g, prec);
     }
 
-    acb_theta_naive_0b(th, all_z, n * nb_z, tau, prec);
+    acb_theta_naive_0b(th, all_zs, n * nb, tau, prec);
 
     for (a = 0; a < n; a++)
     {
         /* Factors depending on z, not on b */
-        for (k = 0; k < nb_z; k++)
+        for (k = 0; k < nb; k++)
         {
-            acb_theta_char_dot_acb(c, a, z + k * g, g, prec);
+            acb_theta_char_dot_acb(c, a, zs + k * g, g, prec);
             acb_mul_2exp_si(c, c, 1);
             acb_add(c, c, &ata[a], prec);
             acb_exp_pi_i(c, c, prec);
@@ -54,7 +54,7 @@ acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, s
         for (b = 0; b < n; b++)
         {
             d = acb_theta_char_dot(a, b, g);
-            for (k = 0; k < nb_z; k++)
+            for (k = 0; k < nb; k++)
             {
                 acb_mul_powi(&th[k * n * n + a * n + b],
                     &th[k * n * n + a * n + b], d);
@@ -62,7 +62,7 @@ acb_theta_naive_all(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, s
         }
     }
 
-    _acb_vec_clear(all_z, g * n * nb_z);
+    _acb_vec_clear(all_zs, g * n * nb);
     _acb_vec_clear(ata, n);
     _acb_vec_clear(v, g);
     acb_clear(c);

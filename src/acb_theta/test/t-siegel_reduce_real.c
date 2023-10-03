@@ -37,7 +37,7 @@ int main(void)
         arb_init(test);
 
         acb_siegel_randtest(tau, state, prec, mag_bits);
-        acb_siegel_reduce_real(m, tau, prec);
+        acb_siegel_reduce_real(m, tau);
         acb_siegel_transform(tau, m, tau, prec);
 
         arb_abs(test, acb_realref(acb_mat_entry(tau, 0, 0)));

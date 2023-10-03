@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("siegel_transform_ext....");
+    flint_printf("siegel_transform_z....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -46,7 +46,7 @@ int main(void)
         }
 
         sp2gz_randtest(m, state, bits);
-        acb_siegel_transform_ext(r, w, m, z1, tau1, prec);
+        acb_siegel_transform_z(r, w, m, z1, tau1, prec);
 
         /* Test: agrees with transform */
         acb_siegel_transform(tau2, m, tau1, prec);
@@ -62,7 +62,7 @@ int main(void)
 
         /* Test: inverse transformation */
         sp2gz_inv(m, m);
-        acb_siegel_transform_ext(z2, tau2, m, r, w, prec);
+        acb_siegel_transform_z(z2, tau2, m, r, w, prec);
         if (!acb_mat_contains(tau2, tau1) || !_acb_vec_contains(z2, z1, g))
         {
             flint_printf("FAIL (inverse)\n\n");
@@ -78,7 +78,7 @@ int main(void)
         }
 
         /* Test: aliasing */
-        acb_siegel_transform_ext(r, w, m, r, w, prec);
+        acb_siegel_transform_z(r, w, m, r, w, prec);
         if (!acb_mat_overlaps(tau2, w) || !_acb_vec_contains(z2, r, g))
         {
             flint_printf("FAIL\n\n");

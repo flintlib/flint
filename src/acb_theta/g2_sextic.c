@@ -27,7 +27,8 @@ void acb_theta_g2_sextic(acb_poly_t r, const acb_mat_t tau, slong prec)
     dth = _acb_vec_init(n2 * nb);
     z = _acb_vec_init(g);
 
-    acb_siegel_reduce(w, mat, tau, prec);
+    acb_siegel_reduce(mat, tau, prec);
+    acb_siegel_transform(w, mat, tau, prec);
 
     if (prec < ACB_THETA_G2_JET_NAIVE_THRESHOLD)
     {

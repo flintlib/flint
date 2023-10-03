@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 void
-acb_siegel_transform_cocycle_inv(acb_mat_t t, acb_mat_t c, acb_mat_t cinv,
+acb_siegel_transform_cocycle_inv(acb_mat_t w, acb_mat_t c, acb_mat_t cinv,
     const fmpz_mat_t mat, const acb_mat_t tau, slong prec)
 {
     slong g = sp2gz_dim(mat);
@@ -37,7 +37,7 @@ acb_siegel_transform_cocycle_inv(acb_mat_t t, acb_mat_t c, acb_mat_t cinv,
     {
         acb_mat_indeterminate(cinv);
     }
-    acb_mat_mul(t, num, cinv, prec);
+    acb_mat_mul(w, num, cinv, prec);
 
     fmpz_mat_clear(a);
     acb_mat_clear(x);

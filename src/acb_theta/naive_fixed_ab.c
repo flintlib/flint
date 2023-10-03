@@ -12,18 +12,18 @@
 #include "acb_theta.h"
 
 void
-acb_theta_naive_ind(acb_ptr th, ulong ab, acb_srcptr z, slong nb_z,
+acb_theta_naive_fixed_ab(acb_ptr th, ulong ab, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     ulong a = ab >> g;
     ulong b = ab;
-    acb_ptr new_z;
+    acb_ptr new_zs;
     acb_ptr v, w;
     acb_t c, x;
     slong k;
 
-    new_z = _acb_vec_init(nb_z * g);
+    new_zs = _acb_vec_init(nb * g);
     v = _acb_vec_init(g);
     w = _acb_vec_init(g);
     acb_init(c);
@@ -33,18 +33,18 @@ acb_theta_naive_ind(acb_ptr th, ulong ab, acb_srcptr z, slong nb_z,
     acb_mat_vector_mul_col(v, tau, v, prec); /* tau.a/2 */
     acb_theta_char_get_acb(w, b, g);
     _acb_vec_add(w, v, w, g, prec);
-    for (k = 0; k < nb_z; k++)
+    for (k = 0; k < nb; k++)
     {
-        _acb_vec_add(new_z + k * g, z + k * g, w, g, prec);
+        _acb_vec_add(new_zs + k * g, zs + k * g, w, g, prec);
     }
 
-    acb_theta_naive_00(th, new_z, nb_z, tau, prec);
+    acb_theta_naive_00(th, new_zs, nb, tau, prec);
 
     acb_theta_char_dot_acb(c, a, v, g, prec);
-    for (k = 0; k < nb_z; k++)
+    for (k = 0; k < nb; k++)
     {
         acb_theta_char_get_acb(w, b, g);
-        _acb_vec_add(w, w, z + k * g, g, prec);
+        _acb_vec_add(w, w, zs + k * g, g, prec);
         acb_theta_char_dot_acb(x, a, w, g, prec);
         acb_mul_2exp_si(x, x, 1);
         acb_add(x, x, c, prec);
@@ -52,7 +52,7 @@ acb_theta_naive_ind(acb_ptr th, ulong ab, acb_srcptr z, slong nb_z,
         acb_mul(&th[k], &th[k], x, prec);
     }
 
-    _acb_vec_clear(new_z, nb_z * g);
+    _acb_vec_clear(new_zs, nb * g);
     _acb_vec_clear(v, g);
     _acb_vec_clear(w, g);
     acb_clear(c);

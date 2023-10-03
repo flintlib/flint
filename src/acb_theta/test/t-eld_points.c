@@ -58,7 +58,7 @@ int main(void)
             arb_randtest_precise(&offset[k], state, prec, mag_bits);
         }
 
-        acb_theta_eld_fill(E, cho, R2, offset, prec);
+        acb_theta_eld_fill(E, cho, R2, offset);
         all_pts = flint_malloc(acb_theta_eld_nb_pts(E) * g * sizeof(slong));
         acb_theta_eld_points(all_pts, E);
 

@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("naive_ind....");
+    flint_printf("naive_fixed_ab....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -50,7 +50,7 @@ int main(void)
 
         for (ab = 0; ab < nb * nb; ab++)
         {
-            acb_theta_naive_ind(th, ab, z, nb_z, tau, prec);
+            acb_theta_naive_fixed_ab(th, ab, z, nb_z, tau, prec);
             for (k = 0; k < nb_z; k++)
             {
                 acb_set(&th_test[k], &th_all[k * nb * nb + ab]);

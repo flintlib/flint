@@ -60,7 +60,7 @@ int main(void)
         arb_get_ubound_arf(R2, dist, prec);
 
         /* Test: ellipsoid has points and dist is the minimum distance */
-        acb_theta_eld_fill(E, cho, R2, offset, prec);
+        acb_theta_eld_fill(E, cho, R2, offset);
 
         if (acb_theta_eld_nb_pts(E) == 0)
         {

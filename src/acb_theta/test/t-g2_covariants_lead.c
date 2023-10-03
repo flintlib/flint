@@ -11,6 +11,8 @@
 
 #include "acb_theta.h"
 
+#define ACB_THETA_G2_COV_J {6,0,4,8,2,6,8,12,0,4,6,10,2,4,8,0,6,6,2,4,2,4,0,2,2,0}
+
 int main(void)
 {
     slong iter;

@@ -60,7 +60,7 @@ int main(void)
         }
         acb_theta_transform(th, mat, th, z, tau, kappa, sqr, prec);
 
-        acb_siegel_transform_ext(z, tau, mat, z, tau, prec);
+        acb_siegel_transform_z(z, tau, mat, z, tau, prec);
         acb_modular_theta(&test[3], &test[2], &test[0], &test[1], z,
             acb_mat_entry(tau, 0, 0), prec);
         acb_neg(&test[3], &test[3]);

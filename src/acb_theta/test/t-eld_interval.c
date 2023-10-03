@@ -48,7 +48,7 @@ int main(void)
             arf_abs(rad, rad);
         }
 
-        acb_theta_eld_interval(&min, &mid, &max, ctr, rad, prec);
+        acb_theta_eld_interval(&min, &mid, &max, ctr, rad);
         arb_set_si(tmax, max + 1);
         arb_sub_arf(tmax, tmax, rad, prec);
         arb_set_si(tmin, min - 1);

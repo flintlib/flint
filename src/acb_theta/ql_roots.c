@@ -45,7 +45,7 @@ acb_theta_ql_roots_1(acb_ptr r, acb_srcptr z, arb_srcptr dist,
             for (guard = 16; (guard <= prec) && !res; guard += 16)
             {
                 hprec = guard + acb_theta_dist_addprec(d);
-                acb_theta_naive_ind(&r[k * n + a], a << g, x, 1, w, hprec);
+                acb_theta_naive_fixed_ab(&r[k * n + a], a << g, x, 1, w, hprec);
                 if (acb_is_finite(&r[k * n + a]) && !acb_contains_zero(&r[k * n + a]))
                 {
                     res = 1;

@@ -34,7 +34,6 @@ int main(void)
         acb_t term;
         arb_t abs, sum;
         slong nb_z = 1 + n_randint(state, 4);
-        slong ord = 0;
         slong nb_pts;
         slong* pts;
         slong k, j;
@@ -56,7 +55,7 @@ int main(void)
         }
 
         /* Test: sum of terms on the border is less than u */
-        acb_theta_naive_ellipsoid(E, new_z, c, u, ord, z, nb_z, tau, prec);
+        acb_theta_naive_ellipsoid(E, new_z, c, u, z, nb_z, tau, prec);
         nb_pts = acb_theta_eld_nb_border(E);
         pts = flint_malloc(g * nb_pts * sizeof(slong));
         acb_theta_eld_border(pts, E);

@@ -35,7 +35,7 @@ acb_theta_transform_scal(acb_t scal, const fmpz_mat_t mat, acb_srcptr z,
     acb_theta_transform_sqrtdet(x, mat, tau, prec);
     acb_mul(scal, x, mu, prec);
 
-    acb_siegel_transform_ext(Nz, w, mat, z, tau, prec);
+    acb_siegel_transform_z(Nz, w, mat, z, tau, prec);
     sp2gz_get_c(c, mat);
     acb_mat_set_fmpz_mat(w, c);
     acb_mat_vector_mul_col(v, w, z, prec);

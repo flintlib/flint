@@ -100,7 +100,7 @@ acb_theta_ql_a0_eld_points(slong** pts, slong* nb_pts, arb_ptr offset,
     acb_theta_naive_radius(R2, eps, cho, 0, *fullprec);
 
     /* List points in ellipsoid */
-    acb_theta_eld_fill(E, cho1, R2, offset, prec);
+    acb_theta_eld_fill(E, cho1, R2, offset);
     *nb_pts = acb_theta_eld_nb_pts(E);
     *pts = flint_malloc(acb_theta_eld_nb_pts(E) * (g - d) * sizeof(slong));
     acb_theta_eld_points(*pts, E);

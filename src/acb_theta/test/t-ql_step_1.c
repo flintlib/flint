@@ -21,7 +21,7 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: agrees with naive_ind */
+    /* Test: agrees with naive_fixed_ab */
     for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 4);
@@ -51,7 +51,7 @@ int main(void)
         acb_theta_dist_a0(dist0, z, tau, lp);
         for (k = 0; k < n; k++)
         {
-            acb_theta_naive_ind(&th0[k], k << g, z, 1, tau, prec);
+            acb_theta_naive_fixed_ab(&th0[k], k << g, z, 1, tau, prec);
         }
 
         /* Get input at z */
@@ -62,7 +62,7 @@ int main(void)
         acb_theta_dist_a0(dist, z, tau, lp);
         for (k = 0; k < n; k++)
         {
-            acb_theta_naive_ind(&th[k], k << g, z, 1, tau, prec);
+            acb_theta_naive_fixed_ab(&th[k], k << g, z, 1, tau, prec);
         }
 
         /* Get output at tau/2, z/2 */
@@ -70,7 +70,7 @@ int main(void)
         _acb_vec_scalar_mul_2exp_si(z, z, g, -1);
         for (k = 0; k < n; k++)
         {
-            acb_theta_naive_ind(&test[k], k << g, z, 1, tau, prec);
+            acb_theta_naive_fixed_ab(&test[k], k << g, z, 1, tau, prec);
             acb_set_round(&roots[k], &test[k], lp);
         }
 

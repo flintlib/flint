@@ -85,9 +85,9 @@ invert_lin_plus_log(arf_t R2, slong a, const arb_t b, slong prec)
 }
 
 void
-acb_theta_naive_radius(arf_t R2, arf_t eps, const arb_mat_t cho, slong ord, slong prec)
+acb_theta_naive_radius(arf_t R2, arf_t eps, const arb_mat_t C, slong ord, slong prec)
 {
-    slong g = arb_mat_nrows(cho);
+    slong g = arb_mat_nrows(C);
     slong lp = ACB_THETA_LOW_PREC;
     arb_t b, temp;
     arf_t cmp;
@@ -115,7 +115,7 @@ acb_theta_naive_radius(arf_t R2, arf_t eps, const arb_mat_t cho, slong ord, slon
     arb_one(b);
     for (k = 0; k < g; k++)
     {
-        arb_inv(temp, arb_mat_entry(cho, k, k), lp);
+        arb_inv(temp, arb_mat_entry(C, k, k), lp);
         arb_add_si(temp, temp, 1, lp);
         arb_mul(b, b, temp, lp);
     }

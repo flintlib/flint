@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
     slong prec, pmax, pstep;
     slong d, dmax, dstep;
     flint_rand_t state;
-    acb_mat_t tau, w, res;
+    acb_mat_t tau, w;
     arb_t r;
     fmpz_mat_t mat;
     slong j, k;
@@ -44,7 +44,6 @@ int main(int argc, char *argv[])
     flint_randinit(state);
     acb_mat_init(tau, g, g);
     acb_mat_init(w, g, g);
-    acb_mat_init(res, g, g);
     arb_init(r);
     fmpz_mat_init(mat, 2 * g, 2 * g);
 
@@ -72,7 +71,7 @@ int main(int argc, char *argv[])
 
             TIMEIT_START
 
-                acb_siegel_reduce(res, mat, w, prec);
+                acb_siegel_reduce(mat, w, prec);
 
             TIMEIT_STOP;
         }
@@ -81,7 +80,6 @@ int main(int argc, char *argv[])
     flint_randclear(state);
     acb_mat_clear(tau);
     acb_mat_clear(w);
-    acb_mat_clear(res);
     arb_clear(r);
     fmpz_mat_clear(mat);
 

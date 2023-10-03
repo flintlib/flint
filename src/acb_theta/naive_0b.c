@@ -61,42 +61,41 @@ worker_dim1(acb_ptr th, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong 
 }
 
 static void
-acb_theta_naive_0b_gen(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
+acb_theta_naive_0b_gen(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     acb_theta_eld_t E;
     acb_theta_precomp_t D;
-    acb_ptr c;
-    arb_ptr u;
-    acb_ptr new_z;
-    slong ord = 0;
-    slong nb = 1 << g;
+    acb_ptr cs;
+    arb_ptr us;
+    acb_ptr new_zs;
+    slong len = 1 << g;
     slong k;
 
     acb_theta_eld_init(E, g, g);
-    acb_theta_precomp_init(D, nb_z, g);
-    c = _acb_vec_init(nb_z);
-    u = _arb_vec_init(nb_z);
-    new_z = _acb_vec_init(nb_z * g);
+    acb_theta_precomp_init(D, nb, g);
+    cs = _acb_vec_init(nb);
+    us = _arb_vec_init(nb);
+    new_zs = _acb_vec_init(nb * g);
 
-    acb_theta_naive_ellipsoid(E, new_z, c, u, ord, z, nb_z, tau, prec);
+    acb_theta_naive_ellipsoid(E, new_zs, cs, us, zs, nb, tau, prec);
     prec = acb_theta_naive_fullprec(E, prec);
-    acb_theta_precomp_set(D, new_z, tau, E, prec);
+    acb_theta_precomp_set(D, new_zs, tau, E, prec);
 
-    for (k = 0; k < nb_z; k++)
+    for (k = 0; k < nb; k++)
     {
-        acb_theta_naive_worker(&th[k * nb], nb, &c[k], &u[k], E, D, k, ord, prec, worker_dim1);
+        acb_theta_naive_worker(&th[k * nb], len, &cs[k], &us[k], E, D, k, 0, prec, worker_dim1);
     }
 
     acb_theta_eld_clear(E);
     acb_theta_precomp_clear(D);
-    _acb_vec_clear(c, nb_z);
-    _arb_vec_clear(u, nb_z);
-    _acb_vec_clear(new_z, nb_z * g);
+    _acb_vec_clear(cs, nb);
+    _arb_vec_clear(us, nb);
+    _acb_vec_clear(new_zs, nb * g);
 }
 
 void
-acb_theta_naive_0b(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, slong prec)
+acb_theta_naive_0b(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     acb_ptr res;
@@ -105,9 +104,9 @@ acb_theta_naive_0b(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, sl
     if (g == 1)
     {
         res = _acb_vec_init(4);
-        for (k = 0; k < nb_z; k++)
+        for (k = 0; k < nb; k++)
         {
-            acb_modular_theta(&res[0], &res[1], &res[2], &res[3], z + k * g,
+            acb_modular_theta(&res[0], &res[1], &res[2], &res[3], zs + k * g,
                 acb_mat_entry(tau, 0, 0), prec);
             acb_set(&th[2 * k], &res[2]);
             acb_set(&th[2 * k + 1], &res[3]);
@@ -116,6 +115,6 @@ acb_theta_naive_0b(acb_ptr th, acb_srcptr z, slong nb_z, const acb_mat_t tau, sl
     }
     else
     {
-        acb_theta_naive_0b_gen(th, z, nb_z, tau, prec);
+        acb_theta_naive_0b_gen(th, zs, nb, tau, prec);
     }
 }

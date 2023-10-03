@@ -120,7 +120,7 @@ acb_theta_transform_kappa(const fmpz_mat_t mat)
 
         acb_siegel_sqrtdet_i(t, mat);
         acb_siegel_transform(tau, mat, tau, prec);
-        acb_theta_naive_ind(scal2, ab, z, 1, tau, prec);
+        acb_theta_naive_fixed_ab(scal2, ab, z, 1, tau, prec);
 
         acb_mul(scal1, scal1, t, prec);
         acb_set_fmpz(t, eps);

@@ -11,6 +11,8 @@
 
 #include "acb_theta.h"
 
+#define ACB_SIEGEL_REDUCE_MAG_BOUND 1000000000
+
 static void
 fmpz_mat_bound_inf_norm(mag_t b, const fmpz_mat_t mat)
 {
@@ -24,7 +26,7 @@ fmpz_mat_bound_inf_norm(mag_t b, const fmpz_mat_t mat)
     arb_mat_clear(m);
 }
 
-/* Todo: g * (...) is an emergency fix, what is the right value here? */
+/* Todo: better choice of precision here? */
 static slong
 acb_siegel_reduce_real_lowprec(const mag_t ntau, const mag_t nmat, slong g, slong prec)
 {
@@ -60,7 +62,7 @@ acb_siegel_reduce_imag_lowprec(const mag_t ntau, const mag_t ndet, const mag_t n
 }
 
 void
-acb_siegel_reduce(acb_mat_t res, fmpz_mat_t mat, const acb_mat_t tau, slong prec)
+acb_siegel_reduce(fmpz_mat_t mat, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong lp;
@@ -89,7 +91,8 @@ acb_siegel_reduce(acb_mat_t res, fmpz_mat_t mat, const acb_mat_t tau, slong prec
     acb_mat_get_imag(im, tau);
     arb_mat_det(abs, im, prec);
     arb_get_mag_lower(ndet, abs);
-    if (mag_is_inf(ntau) || mag_is_zero(ndet))
+    if (mag_cmp_2exp_si(ntau, ACB_SIEGEL_REDUCE_MAG_BOUND) >= 0
+        || mag_cmp_2exp_si(ndet, -ACB_SIEGEL_REDUCE_MAG_BOUND) <= 0)
     {
         stop = 1;
     }
@@ -108,7 +111,7 @@ acb_siegel_reduce(acb_mat_t res, fmpz_mat_t mat, const acb_mat_t tau, slong prec
         fmpz_mat_bound_inf_norm(nmat, mat);
         lp = acb_siegel_reduce_real_lowprec(ntau, nmat, g, prec);
         acb_siegel_transform(cur, m, cur, lp);
-        acb_siegel_reduce_real(m, cur, lp);
+        acb_siegel_reduce_real(m, cur);
         fmpz_mat_mul(mat, m, mat);
 
         /* Loop over fundamental matrices (keeping same precision) */
@@ -138,9 +141,6 @@ acb_siegel_reduce(acb_mat_t res, fmpz_mat_t mat, const acb_mat_t tau, slong prec
             stop = 1;
         }
     }
-
-    /* Final transform at full precision */
-    acb_siegel_transform(res, mat, tau, prec);
 
     fmpz_mat_clear(m);
     acb_mat_clear(cur);

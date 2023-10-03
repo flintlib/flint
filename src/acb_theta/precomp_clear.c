@@ -23,5 +23,5 @@ acb_theta_precomp_clear(acb_theta_precomp_t D)
     {
         _acb_vec_clear(D->sqr_powers, nb_pow);
     }
-    _acb_vec_clear(D->exp_z, g * acb_theta_precomp_nb_z(D));
+    _acb_vec_clear(D->exp_z, g * acb_theta_precomp_nb(D));
 }

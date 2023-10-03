@@ -43,7 +43,7 @@ int main(void)
         arb_mat_transpose(Y, Y);
 
         acb_theta_naive_radius(R2, eps, Y, ord, exp);
-        acb_theta_naive_tail(bound, R2, Y, ord, prec);
+        acb_theta_naive_tail(bound, R2, Y, ord);
         arb_get_lbound_arf(t, bound, prec);
 
         if (arf_cmp(t, eps) > 0)
