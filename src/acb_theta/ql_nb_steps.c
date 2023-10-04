@@ -11,9 +11,9 @@
 
 #include "acb_theta.h"
 
-slong acb_theta_ql_nb_steps(const arb_mat_t cho, slong d, slong prec)
+slong acb_theta_ql_nb_steps(const arb_mat_t C, slong d, slong prec)
 {
-    slong g = arb_mat_nrows(cho);
+    slong g = arb_mat_nrows(C);
     slong lp = ACB_THETA_LOW_PREC;
     arb_t x, t;
     slong res;
@@ -21,7 +21,7 @@ slong acb_theta_ql_nb_steps(const arb_mat_t cho, slong d, slong prec)
     arb_init(x);
     arb_init(t);
 
-    arb_sqr(x, arb_mat_entry(cho, d, d), lp);
+    arb_sqr(x, arb_mat_entry(C, d, d), lp);
     arb_const_log2(t, lp);
     arb_div(x, x, t, lp);
     arb_div_si(x, x, prec, lp);

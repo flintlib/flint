@@ -13,7 +13,7 @@
 
 /* This is assuming a0 corresponds to theta constants */
 void
-acb_theta_agm_mul_tight(acb_ptr r, acb_srcptr a0, acb_srcptr a,
+acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
     arb_srcptr d0, arb_srcptr d, slong g, slong prec)
 {
     slong n = 1 << g;
@@ -47,11 +47,11 @@ acb_theta_agm_mul_tight(acb_ptr r, acb_srcptr a0, acb_srcptr a,
     /* Perform agm_mul or agm_sqr at high precision */
     if (a0 == a)
     {
-        acb_theta_agm_mul(r, v0, v0, g, hprec);
+        acb_theta_agm_mul(res, v0, v0, g, hprec);
     }
     else
     {
-        acb_theta_agm_mul(r, v0, v, g, hprec);
+        acb_theta_agm_mul(res, v0, v, g, hprec);
     }
 
     /* New relative error wrt distances is m0 eps + m eps0 + eps0 eps */
@@ -66,7 +66,7 @@ acb_theta_agm_mul_tight(acb_ptr r, acb_srcptr a0, acb_srcptr a,
         arb_neg(err, &d[k]);
         arb_exp(err, err, prec);
         arb_mul_arf(err, err, e, lp);
-        acb_add_error_arb(&r[k], err);
+        acb_add_error_arb(&res[k], err);
     }
 
     _acb_vec_clear(v0, n);

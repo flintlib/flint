@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 void
-acb_theta_agm_mul(acb_ptr r, acb_srcptr a1, acb_srcptr a2, slong g, slong prec)
+acb_theta_agm_mul(acb_ptr res, acb_srcptr a1, acb_srcptr a2, slong g, slong prec)
 {
     acb_ptr v;
     slong n = 1 << g;
@@ -38,8 +38,8 @@ acb_theta_agm_mul(acb_ptr r, acb_srcptr a1, acb_srcptr a2, slong g, slong prec)
         }
     }
 
-    acb_theta_agm_hadamard(r, v, g, prec);
-    _acb_vec_scalar_mul_2exp_si(r, r, n, -2 * g);
+    acb_theta_agm_hadamard(res, v, g, prec);
+    _acb_vec_scalar_mul_2exp_si(res, res, n, -2 * g);
 
     _acb_vec_clear(v, 2 * n);
 }

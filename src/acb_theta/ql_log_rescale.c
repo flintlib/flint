@@ -11,7 +11,7 @@
 
 #include "acb_theta.h"
 
-void acb_theta_ql_log_rescale(acb_t f, acb_srcptr z, const acb_mat_t tau, slong prec)
+void acb_theta_ql_log_rescale(acb_t res, acb_srcptr z, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     arb_mat_t Yinv;
@@ -24,8 +24,8 @@ void acb_theta_ql_log_rescale(acb_t f, acb_srcptr z, const acb_mat_t tau, slong 
     arb_mat_inv(Yinv, Yinv, prec);
     _acb_vec_get_imag(y, z, g);
 
-    acb_zero(f);
-    arb_mat_bilinear_form(acb_imagref(f), Yinv, y, y, prec);
+    acb_zero(res);
+    arb_mat_bilinear_form(acb_imagref(res), Yinv, y, y, prec);
 
     arb_mat_clear(Yinv);
     _arb_vec_clear(y, g);

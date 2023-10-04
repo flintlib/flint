@@ -12,22 +12,22 @@
 #include "acb_theta.h"
 
 void
-acb_theta_dist_a0(arb_ptr dist, acb_srcptr z, const acb_mat_t tau, slong prec)
+acb_theta_dist_a0(arb_ptr d, acb_srcptr z, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
-    arb_mat_t Yinv, cho;
+    arb_mat_t Yinv, C;
     arb_ptr v, w;
     ulong a;
 
     arb_mat_init(Yinv, g, g);
-    arb_mat_init(cho, g, g);
+    arb_mat_init(C, g, g);
     v = _arb_vec_init(g);
     w = _arb_vec_init(g);
 
     acb_mat_get_imag(Yinv, tau);
     arb_mat_inv(Yinv, Yinv, prec);
-    acb_theta_eld_cho(cho, tau, prec);
+    acb_theta_eld_cho(C, tau, prec);
 
     _acb_vec_get_imag(v, z, g);
     arb_mat_vector_mul_col(v, Yinv, v, prec);
@@ -36,12 +36,12 @@ acb_theta_dist_a0(arb_ptr dist, acb_srcptr z, const acb_mat_t tau, slong prec)
     {
         acb_theta_char_get_arb(w, a, g);
         _arb_vec_add(w, v, w, g, prec);
-        arb_mat_vector_mul_col(w, cho, w, prec);
-        acb_theta_dist_lat(&dist[a], w, cho, prec);
+        arb_mat_vector_mul_col(w, C, w, prec);
+        acb_theta_dist_lat(&d[a], w, C, prec);
     }
 
     arb_mat_clear(Yinv);
-    arb_mat_clear(cho);
+    arb_mat_clear(C);
     _arb_vec_clear(v, g);
     _arb_vec_clear(w, g);
 }

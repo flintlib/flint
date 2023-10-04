@@ -13,7 +13,7 @@
 
 void
 acb_theta_ql_dupl(acb_ptr th2, acb_srcptr th0, acb_srcptr th,
-    arb_srcptr dist0, arb_srcptr dist, slong g, slong prec)
+    arb_srcptr d0, arb_srcptr d, slong g, slong prec)
 {
     slong n = 1 << g;
     acb_ptr v;
@@ -31,7 +31,7 @@ acb_theta_ql_dupl(acb_ptr th2, acb_srcptr th0, acb_srcptr th,
                 acb_neg(&v[b], &v[b]);
             }
         }
-        acb_theta_agm_mul_tight(v, th0, v, dist0, dist, g, prec);
+        acb_theta_agm_mul_tight(v, th0, v, d0, d, g, prec);
         for (b = 0; b < n; b++)
         {
             acb_set(&th2[b * n + a], &v[b]);

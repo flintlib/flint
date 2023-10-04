@@ -12,52 +12,52 @@
 #include "acb_theta.h"
 
 int
-acb_theta_ql_a0_naive(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
-    arb_srcptr dist, const acb_mat_t tau, slong guard, slong prec)
+acb_theta_ql_a0_naive(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
+    arb_srcptr d, const acb_mat_t tau, slong guard, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
-    int has_t = !_acb_vec_is_zero(t, g);
-    int has_z = !_acb_vec_is_zero(z, g);
-    slong nb_t = (has_t ? 3 : 1);
-    acb_ptr x, th;
+    int hast = !_acb_vec_is_zero(t, g);
+    int hasz = !_acb_vec_is_zero(z, g);
+    slong nbt = (hast ? 3 : 1);
+    acb_ptr x, aux;
     slong j, k;
 
-    x = _acb_vec_init(g * nb_t);
-    th = _acb_vec_init(nb_t);
+    x = _acb_vec_init(g * nbt);
+    aux = _acb_vec_init(nbt);
 
-    for (k = 0; k < nb_t; k++)
+    for (k = 0; k < nbt; k++)
     {
         _acb_vec_scalar_mul_ui(x + k * g, t, g, k, prec);
     }
     for (k = 0; k < n; k++)
     {
-        acb_theta_naive_fixed_ab(th, k << g, x, nb_t, tau,
-            prec + acb_theta_dist_addprec(&dist0[k]));
-        for (j = 0; j < nb_t; j++)
+        acb_theta_naive_fixed_ab(aux, k << g, x, nbt, tau,
+            prec + acb_theta_dist_addprec(&d0[k]));
+        for (j = 0; j < nbt; j++)
         {
-            acb_set(&r[j * n + k], &th[j]);
+            acb_set(&th[j * n + k], &aux[j]);
         }
     }
 
-    if (has_z)
+    if (hasz)
     {
-        for (k = 0; k < nb_t; k++)
+        for (k = 0; k < nbt; k++)
         {
             _acb_vec_add(x + k * g, x + k * g, z, g, prec);
         }
         for (k = 0; k < n; k++)
         {
-            acb_theta_naive_fixed_ab(th, k << g, x, nb_t, tau,
-                prec + acb_theta_dist_addprec(&dist[k]));
-            for (j = 0; j < nb_t; j++)
+            acb_theta_naive_fixed_ab(aux, k << g, x, nbt, tau,
+                prec + acb_theta_dist_addprec(&d[k]));
+            for (j = 0; j < nbt; j++)
             {
-                acb_set(&r[nb_t * n + j * n + k], &th[j]);
+                acb_set(&th[nbt * n + j * n + k], &aux[j]);
             }
         }
     }
 
-    _acb_vec_clear(x, g * nb_t);
-    _acb_vec_clear(th, nb_t);
+    _acb_vec_clear(x, g * nbt);
+    _acb_vec_clear(aux, nbt);
     return 1;
 }

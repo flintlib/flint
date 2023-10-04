@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 void
-acb_siegel_cocycle_det(acb_t res, const fmpz_mat_t mat, const acb_mat_t tau, slong prec)
+acb_siegel_cocycle_det(acb_t det, const fmpz_mat_t mat, const acb_mat_t tau, slong prec)
 {
     slong g = sp2gz_dim(mat);
     acb_mat_t w;
@@ -20,7 +20,7 @@ acb_siegel_cocycle_det(acb_t res, const fmpz_mat_t mat, const acb_mat_t tau, slo
     acb_mat_init(w, g, g);
 
     acb_siegel_cocycle(w, mat, tau, prec);
-    acb_mat_det(res, w, prec);
+    acb_mat_det(det, w, prec);
 
     acb_mat_clear(w);
 }

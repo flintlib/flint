@@ -24,8 +24,7 @@ acb_theta_eld_ncenter(arb_ptr res, acb_srcptr z, const acb_mat_t tau, slong prec
     b = arb_mat_inv(Yinv, Yinv, prec);
     if (!b)
     {
-        flint_printf("acb_theta_eld_center: Error (impossible inverse)\n");
-        flint_printf("\n");
+        arb_mat_indeterminate(Yinv);
     }
 
     _acb_vec_get_imag(res, z, g);
@@ -35,252 +34,250 @@ acb_theta_eld_ncenter(arb_ptr res, acb_srcptr z, const acb_mat_t tau, slong prec
 }
 
 static void
-acb_theta_ql_blocks(acb_mat_t t0, acb_mat_t x, acb_mat_t t1,
-    const acb_mat_t tau, slong d)
+acb_theta_ql_blocks(acb_mat_t t0, acb_mat_t x, acb_mat_t t1, const acb_mat_t tau, slong s)
 {
     slong g = acb_mat_nrows(tau);
     slong j, k;
 
-    for (j = 0; j < d; j++)
+    for (j = 0; j < s; j++)
     {
-        for (k = 0; k < d; k++)
+        for (k = 0; k < s; k++)
         {
             acb_set(acb_mat_entry(t0, j, k), acb_mat_entry(tau, j, k));
         }
     }
 
-    for (j = 0; j < d; j++)
+    for (j = 0; j < s; j++)
     {
-        for (k = 0; k < (g - d); k++)
+        for (k = 0; k < (g - s); k++)
         {
-            acb_set(acb_mat_entry(x, j, k), acb_mat_entry(tau, j, k + d));
+            acb_set(acb_mat_entry(x, j, k), acb_mat_entry(tau, j, k + s));
         }
     }
 
-    for (j = 0; j < (g - d); j++)
+    for (j = 0; j < (g - s); j++)
     {
-        for (k = 0; k < (g - d); k++)
+        for (k = 0; k < (g - s); k++)
         {
-            acb_set(acb_mat_entry(t1, j, k), acb_mat_entry(tau, j + d, k + d));
+            acb_set(acb_mat_entry(t1, j, k), acb_mat_entry(tau, j + s, k + s));
         }
     }
 }
 
 static void
-acb_theta_ql_a0_eld_points(slong** pts, slong* nb_pts, arb_ptr offset,
-    slong* fullprec, arf_t eps, arb_srcptr dist, ulong a, arb_srcptr nctr,
-    const arb_mat_t cho, const arb_mat_t cho1, slong prec)
+acb_theta_ql_a0_eld_points(slong** pts, slong* nb_pts, arb_ptr v,
+    slong* fullprec, arf_t eps, arb_srcptr d, ulong a, arb_srcptr nctr,
+    const arb_mat_t C, const arb_mat_t C1, slong prec)
 {
-    slong g = arb_mat_nrows(cho);
-    slong d = g - arb_mat_nrows(cho1);
+    slong g = arb_mat_nrows(C);
+    slong s = g - arb_mat_nrows(C1);
     slong n = 1 << g;
-    slong nb_a = 1 << (g - d);
+    slong nba = 1 << (g - s);
     slong lp = ACB_THETA_LOW_PREC;
-    arb_t max_dist;
+    arb_t max_d;
     arf_t R2;
     acb_theta_eld_t E;
     slong k;
 
-    acb_theta_eld_init(E, g - d, g - d);
+    acb_theta_eld_init(E, g - s, g - s);
     arf_init(R2);
-    arb_init(max_dist);
+    arb_init(max_d);
 
     /* Get offset */
-    acb_theta_char_get_arb(offset, a, g - d);
-    _arb_vec_add(offset, offset, nctr + d, g - d, prec);
-    arb_mat_vector_mul_col(offset, cho1, offset, prec);
+    acb_theta_char_get_arb(v, a, g - s);
+    _arb_vec_add(v, v, nctr + s, g - s, prec);
+    arb_mat_vector_mul_col(v, C1, v, prec);
 
     /* Get R2 */
-    arb_zero(max_dist);
-    for (k = a; k < n; k += nb_a)
+    arb_zero(max_d);
+    for (k = a; k < n; k += nba)
     {
-        arb_max(max_dist, max_dist, &dist[k], lp);
+        arb_max(max_d, max_d, &d[k], lp);
     }
-    *fullprec = prec + acb_theta_dist_addprec(max_dist);
-    acb_theta_naive_radius(R2, eps, cho, 0, *fullprec);
+    *fullprec = prec + acb_theta_dist_addprec(max_d);
+    acb_theta_naive_radius(R2, eps, C, 0, *fullprec);
 
     /* List points in ellipsoid */
-    acb_theta_eld_fill(E, cho1, R2, offset);
+    acb_theta_eld_fill(E, C1, R2, v);
     *nb_pts = acb_theta_eld_nb_pts(E);
-    *pts = flint_malloc(acb_theta_eld_nb_pts(E) * (g - d) * sizeof(slong));
+    *pts = flint_malloc(acb_theta_eld_nb_pts(E) * (g - s) * sizeof(slong));
     acb_theta_eld_points(*pts, E);
 
     acb_theta_eld_clear(E);
     arf_clear(R2);
-    arb_init(max_dist);
+    arb_init(max_d);
 }
 
 static int
-acb_theta_ql_a0_split_term(acb_ptr r, slong* pt, ulong a, acb_srcptr t, acb_srcptr z,
-    arb_srcptr offset, arb_srcptr dist, arb_srcptr new_dist0, const acb_mat_t tau0,
-    const acb_mat_t star, const acb_mat_t tau1, const arb_mat_t cho1, slong guard,
+acb_theta_ql_a0_split_term(acb_ptr th, slong* pt, ulong a, acb_srcptr t, acb_srcptr z,
+    arb_srcptr v, arb_srcptr d, arb_srcptr new_d0, const acb_mat_t tau0,
+    const acb_mat_t star, const acb_mat_t tau1, const arb_mat_t C1, slong guard,
     slong prec, slong fullprec, acb_theta_ql_worker_t worker)
 {
-    slong d = acb_mat_nrows(tau0);
-    slong g = d + acb_mat_nrows(tau1);
+    slong s = acb_mat_nrows(tau0);
+    slong g = s + acb_mat_nrows(tau1);
     slong lp = ACB_THETA_LOW_PREC;
     slong n = 1 << g;
-    slong nb_a = 1 << (g - d);
-    slong nb_th = 1 << d;
-    slong nb_t = (_acb_vec_is_zero(t, g) ? 1 : 3);
+    slong nba = 1 << (g - s);
+    slong nbth = 1 << s;
+    slong nbt = (_acb_vec_is_zero(t, g) ? 1 : 3);
     slong new_prec;
-    acb_ptr v, w, new_z, new_th;
+    acb_ptr u, w, new_z, new_th;
     acb_t f, c;
-    arb_ptr new_dist;
-    arb_t orth_dist, x;
+    arb_ptr new_d;
+    arb_t orth, x;
     slong j, k;
     int res;
 
-    v = _acb_vec_init(g - d);
-    w = _acb_vec_init(g - d);
-    new_z = _acb_vec_init(d);
-    new_th = _acb_vec_init(2 * nb_th * nb_t);
-    new_dist = _arb_vec_init(nb_th);
+    u = _acb_vec_init(g - s);
+    w = _acb_vec_init(g - s);
+    new_z = _acb_vec_init(s);
+    new_th = _acb_vec_init(2 * nbth * nbt);
+    new_d = _arb_vec_init(nbth);
     acb_init(f);
     acb_init(c);
-    arb_init(orth_dist);
+    arb_init(orth);
     arb_init(x);
 
-    /* Set v to pt + a1/2 */
-    acb_theta_char_get_acb(v, a, g - d);
-    for (j = 0; j < g - d; j++)
+    /* Set u to pt + a1/2 */
+    acb_theta_char_get_acb(u, a, g - s);
+    for (j = 0; j < g - s; j++)
     {
-        acb_add_si(&v[j], &v[j], pt[j], prec);
+        acb_add_si(&u[j], &u[j], pt[j], prec);
     }
 
     /* Get new_z and cofactor at 0 */
-    acb_mat_vector_mul_col(new_z, star, v, prec);
-    _acb_vec_add(new_z, new_z, z, d, prec);
-    acb_dot(f, NULL, 0, v, 1, z + d, 1, g - d, prec);
+    acb_mat_vector_mul_col(new_z, star, u, prec);
+    _acb_vec_add(new_z, new_z, z, s, prec);
+    acb_dot(f, NULL, 0, u, 1, z + s, 1, g - s, prec);
     acb_mul_2exp_si(f, f, 1);
-    acb_mat_vector_mul_col(w, tau1, v, prec);
-    acb_dot(f, f, 0, w, 1, v, 1, g - d, prec);
+    acb_mat_vector_mul_col(w, tau1, u, prec);
+    acb_dot(f, f, 0, w, 1, u, 1, g - d, prec);
 
     /* Get new distances and relative precision */
-    acb_theta_dist_a0(new_dist, new_z, tau0, lp);
-    acb_theta_dist_pt(orth_dist, offset, cho1, pt, lp);
+    acb_theta_dist_a0(new_d, new_z, tau0, lp);
+    acb_theta_dist_pt(orth, v, C1, pt, lp);
     new_prec = prec;
-    for (j = 0; j < nb_th; j++)
+    for (j = 0; j < nbth; j++)
     {
-        arb_sub(x, &dist[a + j * nb_a], orth_dist, lp);
-        arb_sub(x, x, &new_dist[j], lp);
+        arb_sub(x, &d[a + j * nba], orth, lp);
+        arb_sub(x, x, &new_d[j], lp);
         new_prec = FLINT_MIN(new_prec, prec + acb_theta_dist_addprec(x));
     }
     new_prec = FLINT_MAX(new_prec, lp);
 
     /* Call worker */
-    res = worker(new_th, t, new_z, new_dist0, new_dist, tau0, guard, new_prec);
+    res = worker(new_th, t, new_z, new_d0, new_d, tau0, guard, new_prec);
 
-    if (!_acb_vec_is_zero(new_z, d))
+    if (!_acb_vec_is_zero(new_z, s))
     {
         /* We are only interested in the values at z */
-        _acb_vec_set(new_th, new_th + nb_th * nb_t, nb_th * nb_t);
+        _acb_vec_set(new_th, new_th + nbth * nbt, nbth * nbt);
     }
 
-    /* Rescale to set r; cofactor depends on t */
-    for (k = 0; k < nb_t; k++)
+    /* Rescale to set th; cofactor depends on t */
+    for (k = 0; k < nbt; k++)
     {
-        acb_dot(c, NULL, 0, v, 1, t + d, 1, g - d, prec);
+        acb_dot(c, NULL, 0, u, 1, t + s, 1, g - s, prec);
         acb_mul_si(c, c, 2 * k, prec);
         acb_add(c, c, f, prec);
         acb_exp_pi_i(c, c, prec);
-        _acb_vec_scalar_mul(new_th + k * nb_th, new_th + k * nb_th,
-            nb_th, c, prec);
-        for (j = 0; j < nb_th; j++)
+        _acb_vec_scalar_mul(new_th + k * nbth, new_th + k * nbth,
+            nbth, c, prec);
+        for (j = 0; j < nbth; j++)
         {
-            acb_add(&r[k * n + j * nb_a + a], &r[k * n + j * nb_a + a],
-                &new_th[k * nb_th + j], fullprec);
+            acb_add(&th[k * n + j * nba + a], &th[k * n + j * nba + a],
+                &new_th[k * nbth + j], fullprec);
         }
     }
 
-    _acb_vec_clear(v, g - d);
-    _acb_vec_clear(w, g - d);
-    _acb_vec_clear(new_z, d);
-    _acb_vec_clear(new_th, 2 * nb_th * nb_t);
-    _arb_vec_clear(new_dist, nb_th);
+    _acb_vec_clear(u, g - s);
+    _acb_vec_clear(w, g - s);
+    _acb_vec_clear(new_z, s);
+    _acb_vec_clear(new_th, 2 * nbth * nbt);
+    _arb_vec_clear(new_d, nbth);
     acb_clear(f);
     acb_clear(c);
-    arb_clear(orth_dist);
+    arb_clear(orth);
     arb_clear(x);
     return res;
 }
 
 int
-acb_theta_ql_a0_split(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
-    const acb_mat_t tau, slong split, slong guard, slong prec, acb_theta_ql_worker_t worker)
+acb_theta_ql_a0_split(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d,
+    const acb_mat_t tau, slong s, slong guard, slong prec, acb_theta_ql_worker_t worker)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
-    slong nb_a = 1 << (g - split);
-    slong nb_th = 1 << split;
-    slong nb_t = (_acb_vec_is_zero(t, g) ? 1 : 3);
+    slong nba = 1 << (g - s);
+    slong nbth = 1 << s;
+    slong nbt = (_acb_vec_is_zero(t, g) ? 1 : 3);
     slong lp = ACB_THETA_LOW_PREC;
-    arb_mat_t cho, cho1;
+    arb_mat_t C, C1;
     acb_mat_t tau0, star, tau1;
-    arb_ptr offset, nctr, new_dist0;
+    arb_ptr v, nctr, new_d0;
     arf_t eps;
     slong* pts;
     slong fullprec, nb_pts;
     slong a, j, k;
     int res = 1;
 
-    if (split <= 0 || split >= g)
+    if (s <= 0 || s >= g)
     {
-        flint_printf("ql_a0_split: Error (must have 1 < split < g)\n");
+        flint_printf("ql_a0_split: Error (must have 1 < s < g)\n");
         flint_abort();
     }
 
-    arb_mat_init(cho, g, g);
-    arb_mat_init(cho1, g - split, g - split);
-    acb_mat_init(tau0, split, split);
-    acb_mat_init(star, split, g - split);
-    acb_mat_init(tau1, g - split, g - split);
-    offset = _arb_vec_init(g - split);
+    arb_mat_init(C, g, g);
+    arb_mat_init(C1, g - s, g - s);
+    acb_mat_init(tau0, s, s);
+    acb_mat_init(star, s, g - s);
+    acb_mat_init(tau1, g - s, g - s);
+    v = _arb_vec_init(g - s);
     nctr = _arb_vec_init(g);
-    new_dist0 = _arb_vec_init(nb_th);
+    new_d0 = _arb_vec_init(nbth);
     arf_init(eps);
 
-    acb_theta_ql_blocks(tau0, star, tau1, tau, split);
-    acb_theta_eld_cho(cho, tau, prec);
-    acb_theta_eld_cho(cho1, tau1, prec);
-    acb_theta_dist_a0(new_dist0, z, tau0, lp);
+    acb_theta_ql_blocks(tau0, star, tau1, tau, s);
+    acb_theta_eld_cho(C, tau, prec);
+    acb_theta_eld_cho(C1, tau1, prec);
+    acb_theta_dist_a0(new_d0, z, tau0, lp);
     acb_theta_eld_ncenter(nctr, z, tau, prec);
 
-    _acb_vec_zero(r, n * nb_t);
-    for (a = 0; a < nb_a; a++)
+    _acb_vec_zero(th, n * nbt);
+    for (a = 0; a < nba; a++)
     {
         /* Get offset, fullprec, error and list of points in ellipsoid */
-        acb_theta_ql_a0_eld_points(&pts, &nb_pts, offset, &fullprec, eps,
-            dist, a, nctr, cho, cho1, prec);
+        acb_theta_ql_a0_eld_points(&pts, &nb_pts, v, &fullprec, eps,
+            d, a, nctr, C, C1, prec);
 
         /* Sum terms at each point using worker */
         for (k = 0; (k < nb_pts) && res; k++)
         {
-            res = acb_theta_ql_a0_split_term(r, pts + k * (g - split), a, t, z,
-                offset, dist, new_dist0, tau0, star, tau1, cho1, guard,
-                prec, fullprec, worker);
+            res = acb_theta_ql_a0_split_term(th, pts + k * (g - s), a, t, z,
+                v, d, new_d0, tau0, star, tau1, C1, guard, prec, fullprec, worker);
         }
 
         /* Add error */
-        for (k = 0; k < nb_th; k++)
+        for (k = 0; k < nbth; k++)
         {
-            for (j = 0; j < nb_t; j++)
+            for (j = 0; j < nbt; j++)
             {
-                acb_add_error_arf(&r[j * n + k * nb_a + a], eps);
+                acb_add_error_arf(&r[j * n + k * nba + a], eps);
             }
         }
 
         flint_free(pts);
     }
 
-    arb_mat_clear(cho);
-    arb_mat_clear(cho1);
+    arb_mat_clear(C);
+    arb_mat_clear(C1);
     acb_mat_clear(tau0);
     acb_mat_clear(star);
     acb_mat_clear(tau1);
-    _arb_vec_clear(offset, g - split);
+    _arb_vec_clear(v, g - s);
     _arb_vec_clear(nctr, g);
-    _arb_vec_clear(new_dist0, nb_th);
+    _arb_vec_clear(new_d0, nbth);
     arf_clear(eps);
     return res;
 }

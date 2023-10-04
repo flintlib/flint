@@ -12,8 +12,8 @@
 #include "acb_theta.h"
 
 void
-acb_theta_agm_rel_mag_err(arf_t m, arf_t eps, acb_srcptr a, arb_srcptr dist,
-    slong n, slong prec)
+acb_theta_agm_rel_mag_err(arf_t m, arf_t eps, acb_srcptr a, arb_srcptr d,
+    slong nb, slong prec)
 {
     acb_t x, err;
     arb_t y;
@@ -28,10 +28,10 @@ acb_theta_agm_rel_mag_err(arf_t m, arf_t eps, acb_srcptr a, arb_srcptr dist,
     arf_zero(m);
     arf_zero(eps);
 
-    for (k = 0; k < n; k++)
+    for (k = 0; k < nb; k++)
     {
         arb_zero(y);
-        arb_get_ubound_arf(arb_midref(y), &dist[k], prec);
+        arb_get_ubound_arf(arb_midref(y), &d[k], prec);
         arb_exp(y, y, prec);
         acb_mul_arb(x, &a[k], y, prec);
 

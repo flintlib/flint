@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 static void
-worker_dim1(acb_ptr dth, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong len,
+worker(acb_ptr dth, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong len,
     const acb_t cofactor, const slong* coords, slong ord, slong g, slong prec, slong fullprec)
 {
     slong nb = acb_theta_jet_nb(ord, g);
@@ -96,7 +96,7 @@ acb_theta_jet_naive_00_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
     acb_theta_precomp_set(D, z, tau, E, prec);
     acb_one(c);
 
-    acb_theta_naive_worker(dth, nb, c, u, E, D, 0, ord, prec, worker_dim1);
+    acb_theta_naive_worker(dth, nb, c, u, E, D, 0, ord, prec, worker);
 
     /* Multiply by factorials and powers of pi */
     acb_theta_jet_tuples(tups, ord, g);

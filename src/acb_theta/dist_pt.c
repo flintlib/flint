@@ -12,21 +12,21 @@
 #include "acb_theta.h"
 
 void
-acb_theta_dist_pt(arb_t d2, arb_srcptr offset, const arb_mat_t cho, slong* pt, slong prec)
+acb_theta_dist_pt(arb_t d, arb_srcptr v, const arb_mat_t C, slong* n, slong prec)
 {
-    slong g = arb_mat_nrows(cho);
-    arb_ptr v;
+    slong g = arb_mat_nrows(C);
+    arb_ptr w;
     slong k;
 
-    v = _arb_vec_init(g);
+    w = _arb_vec_init(g);
 
     for (k = 0; k < g; k++)
     {
-        arb_set_si(&v[k], pt[k]);
+        arb_set_si(&w[k], n[k]);
     }
-    arb_mat_vector_mul_col(v, cho, v, prec);
-    _arb_vec_add(v, v, offset, g, prec);
-    arb_dot(d2, NULL, 0, v, 1, v, 1, g, prec);
+    arb_mat_vector_mul_col(w, C, w, prec);
+    _arb_vec_add(w, w, v, g, prec);
+    arb_dot(d, NULL, 0, w, 1, w, 1, g, prec);
 
-    _arb_vec_clear(v, g);
+    _arb_vec_clear(w, g);
 }

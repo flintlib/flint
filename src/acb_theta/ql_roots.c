@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 static int
-acb_theta_ql_roots_1(acb_ptr r, acb_srcptr z, arb_srcptr dist,
+acb_theta_ql_roots_1(acb_ptr rts, acb_srcptr z, arb_srcptr d,
     const acb_t f, const acb_mat_t tau, slong nb_steps, slong prec)
 {
     slong g = acb_mat_nrows(tau);
@@ -20,7 +20,7 @@ acb_theta_ql_roots_1(acb_ptr r, acb_srcptr z, arb_srcptr dist,
     acb_mat_t w;
     acb_ptr x;
     acb_t c;
-    arb_t d;
+    arb_t h;
     slong hprec, guard;
     slong k, a;
     int res = 1;
@@ -28,7 +28,7 @@ acb_theta_ql_roots_1(acb_ptr r, acb_srcptr z, arb_srcptr dist,
     acb_mat_init(w, g, g);
     x = _acb_vec_init(g);
     acb_init(c);
-    arb_init(d);
+    arb_init(h);
 
 
     for (k = 0; (k < nb_steps) && res; k++)
@@ -40,31 +40,31 @@ acb_theta_ql_roots_1(acb_ptr r, acb_srcptr z, arb_srcptr dist,
 
         for (a = 0; (a < n) && res; a++)
         {
-            arb_mul_2exp_si(d, &dist[a], k);
+            arb_mul_2exp_si(h, &d[a], k);
             res = 0;
             for (guard = 16; (guard <= prec) && !res; guard += 16)
             {
-                hprec = guard + acb_theta_dist_addprec(d);
-                acb_theta_naive_fixed_ab(&r[k * n + a], a << g, x, 1, w, hprec);
-                if (acb_is_finite(&r[k * n + a]) && !acb_contains_zero(&r[k * n + a]))
+                hprec = guard + acb_theta_dist_addprec(h);
+                acb_theta_naive_fixed_ab(&rts[k * n + a], a << g, x, 1, w, hprec);
+                if (acb_is_finite(&rts[k * n + a]) && !acb_contains_zero(&rts[k * n + a]))
                 {
                     res = 1;
                 }
             }
         }
 
-        _acb_vec_scalar_mul(r + k * n, r + k * n, n, c, prec);
+        _acb_vec_scalar_mul(rts + k * n, rts + k * n, n, c, prec);
     }
 
     acb_mat_clear(w);
     _acb_vec_clear(x, g);
     acb_clear(c);
-    arb_clear(d);
+    arb_clear(h);
     return res;
 }
 
 static int
-acb_theta_ql_roots_3(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
+acb_theta_ql_roots_3(acb_ptr rts, acb_srcptr t, acb_srcptr z, arb_srcptr d,
     const acb_mat_t tau, slong nb_steps, slong guard, slong prec)
 {
     slong g = acb_mat_nrows(tau);
@@ -82,7 +82,7 @@ acb_theta_ql_roots_3(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
 
     if (!has_t)
     {
-        res = acb_theta_ql_roots_1(r, z, dist, f, tau, nb_steps, guard);
+        res = acb_theta_ql_roots_1(rts, z, d, f, tau, nb_steps, guard);
     }
     else
     {
@@ -90,7 +90,7 @@ acb_theta_ql_roots_3(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
         {
             _acb_vec_scalar_mul_ui(x, t, g, k, prec);
             _acb_vec_add(x, x, z, g, prec);
-            res = acb_theta_ql_roots_1(r + (k - 1) * nb_steps * n, x, dist,
+            res = acb_theta_ql_roots_1(rts + (k - 1) * nb_steps * n, x, d,
                 f, tau, nb_steps, guard);
         }
     }
@@ -101,23 +101,23 @@ acb_theta_ql_roots_3(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist,
 }
 
 int
-acb_theta_ql_roots(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
-    arb_srcptr dist, const acb_mat_t tau, slong nb_steps, slong guard, slong prec)
+acb_theta_ql_roots(acb_ptr rts, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
+    arb_srcptr d, const acb_mat_t tau, slong nb_steps, slong guard, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
-    int has_z = !_acb_vec_is_zero(z, g);
-    int has_t = !_acb_vec_is_zero(t, g);
-    slong nb_r = (has_t ? 2 : 1);
+    int hasz = !_acb_vec_is_zero(z, g);
+    int hast = !_acb_vec_is_zero(t, g);
+    slong nbt = (hast ? 2 : 1);
     acb_ptr x;
     int res;
 
     x = _acb_vec_init(g);
 
-    res = acb_theta_ql_roots_3(r, t, x, dist0, tau, nb_steps, guard, prec);
-    if (res && has_z)
+    res = acb_theta_ql_roots_3(rts, t, x, d0, tau, nb_steps, guard, prec);
+    if (res && hasz)
     {
-        res = acb_theta_ql_roots_3(r + nb_r * n * nb_steps, t, z, dist, tau,
+        res = acb_theta_ql_roots_3(rts + nbt * n * nb_steps, t, z, d, tau,
             nb_steps, guard, prec);
     }
 

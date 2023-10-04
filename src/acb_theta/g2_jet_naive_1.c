@@ -14,7 +14,7 @@
 #define ACB_THETA_G2_JET_NAIVE_1_THRESHOLD 100
 
 static void
-worker_dim1(acb_ptr dth, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong len,
+worker(acb_ptr dth, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong len,
     const acb_t cofactor, const slong* coords, slong ord, slong g, slong prec, slong fullprec)
 {
     slong n = 1 << g;
@@ -195,7 +195,7 @@ acb_theta_g2_jet_naive_1(acb_ptr dth, const acb_mat_t tau, slong prec)
     acb_theta_precomp_set(D, z, new_tau, E, prec);
     acb_one(c);
 
-    acb_theta_naive_worker(dth, 3 * n2, c, u, E, D, 0, ord, prec, worker_dim1);
+    acb_theta_naive_worker(dth, 3 * n2, c, u, E, D, 0, ord, prec, worker);
 
     /* Multiply by i*pi */
     acb_const_pi(c, prec);

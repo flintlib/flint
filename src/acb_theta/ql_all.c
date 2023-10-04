@@ -41,39 +41,39 @@ int acb_theta_ql_all_use_naive(slong g, slong prec)
 }
 
 static int
-acb_theta_ql_all_with_t(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
-    arb_srcptr dist, const acb_mat_t tau, slong guard, slong prec)
+acb_theta_ql_all_with_t(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
+    arb_srcptr d, const acb_mat_t tau, slong guard, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
-    int has_z = !_acb_vec_is_zero(z, g);
-    int has_t = !_acb_vec_is_zero(t, g);
-    slong nb_z = (has_z ? 2 : 1);
-    slong nb_t = (has_t ? 3 : 1);
+    int hasz = !_acb_vec_is_zero(z, g);
+    int hast = !_acb_vec_is_zero(t, g);
+    slong nbz = (hasz ? 2 : 1);
+    slong nbt = (hast ? 3 : 1);
     acb_mat_t new_tau;
-    acb_ptr roots, new_z, th_a0, aux;
-    arb_ptr new_dist0, new_dist;
+    acb_ptr rts, new_z, th_a0, aux;
+    arb_ptr new_d0, new_d;
     slong hprec;
     slong k, a;
     int res = 1;
 
     acb_mat_init(new_tau, g, g);
-    roots = _acb_vec_init(n * n);
+    rts = _acb_vec_init(n * n);
     new_z = _acb_vec_init(g);
-    th_a0 = _acb_vec_init(n * nb_z * nb_t);
+    th_a0 = _acb_vec_init(n * nbz * nbt);
     aux = _acb_vec_init(n * n);
-    new_dist0 = _arb_vec_init(n);
-    new_dist = _arb_vec_init(n);
+    new_d0 = _arb_vec_init(n);
+    new_d = _arb_vec_init(n);
 
     /* Collect roots: we only need theta_{a,b}(z + t, tau) */
     _acb_vec_add(new_z, z, t, g, prec);
 
     for (a = 0; a < n; a++)
     {
-        hprec = guard + acb_theta_dist_addprec(&dist[a]);
-        acb_theta_naive_fixed_a(roots + a * n, a, new_z, 1, tau, hprec);
+        hprec = guard + acb_theta_dist_addprec(&d[a]);
+        acb_theta_naive_fixed_a(rts + a * n, a, new_z, 1, tau, hprec);
 
-        if (_acb_vec_contains_zero(roots + a * n, n))
+        if (_acb_vec_contains_zero(rts + a * n, n))
         {
             res = 0;
             break;
@@ -85,24 +85,24 @@ acb_theta_ql_all_with_t(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr dist0
     {
         acb_mat_scalar_mul_2exp_si(new_tau, tau, 1);
         _acb_vec_scalar_mul_2exp_si(new_z, z, g, 1);
-        _arb_vec_scalar_mul_2exp_si(new_dist, dist, n, 1);
-        _arb_vec_scalar_mul_2exp_si(new_dist0, dist0, n, 1);
+        _arb_vec_scalar_mul_2exp_si(new_d, d, n, 1);
+        _arb_vec_scalar_mul_2exp_si(new_d0, d0, n, 1);
 
-        res = acb_theta_ql_a0(th_a0, t, new_z, new_dist0, new_dist, new_tau, guard, prec);
+        res = acb_theta_ql_a0(th_a0, t, new_z, new_d0, new_d, new_tau, guard, prec);
     }
 
     if (res)
     {
         /* Get theta_{a,b}(z + t, tau) from square roots */
-        acb_theta_ql_dupl(th, th_a0, th_a0 + (nb_z * nb_t - 1) * n,
-            new_dist0, new_dist, g, prec);
-        acb_theta_agm_sqrt(th, th, roots, n * n, prec);
+        acb_theta_ql_dupl(th, th_a0, th_a0 + (nbz * nbt - 1) * n,
+            new_d0, new_d, g, prec);
+        acb_theta_agm_sqrt(th, th, rts, n * n, prec);
 
-        if (has_t)
+        if (hast)
         {
             /* Get theta_{a,b}(z, tau) from division */
-            acb_theta_ql_dupl(aux, th_a0 + n, th_a0 + (3 * nb_z - 2) * n,
-                new_dist0, new_dist, g, prec);
+            acb_theta_ql_dupl(aux, th_a0 + n, th_a0 + (3 * nbz - 2) * n,
+                new_d0, new_d, g, prec);
             for (k = 0; k < n * n; k++)
             {
                 acb_div(&th[k], &aux[k], &th[k], prec);
@@ -111,12 +111,12 @@ acb_theta_ql_all_with_t(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr dist0
     }
 
     acb_mat_clear(new_tau);
-    _acb_vec_clear(roots, n * n);
+    _acb_vec_clear(rts, n * n);
     _acb_vec_clear(new_z, g);
-    _acb_vec_clear(th_a0, n * nb_z * nb_t);
+    _acb_vec_clear(th_a0, n * nbz * nbt);
     _acb_vec_clear(aux, n * n);
-    _arb_vec_clear(new_dist0, n);
-    _arb_vec_clear(new_dist, n);
+    _arb_vec_clear(new_d0, n);
+    _arb_vec_clear(new_d, n);
     return res;
 }
 
@@ -129,18 +129,18 @@ acb_theta_ql_all_red(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
     slong guard = ACB_THETA_LOW_PREC;
     slong nb_der = acb_theta_jet_nb(2, g);
     flint_rand_t state;
-    arb_ptr dist, dist0;
+    arb_ptr d, d0;
     acb_mat_t tau_mid;
     acb_ptr t, z_mid, dth;
     arb_t err;
     arf_t e;
     slong j, k;
-    int has_z = !_acb_vec_is_zero(z, g);
+    int hasz = !_acb_vec_is_zero(z, g);
     int res;
 
     flint_randinit(state);
-    dist = _arb_vec_init(n);
-    dist0 = _arb_vec_init(n);
+    d = _arb_vec_init(n);
+    d0 = _arb_vec_init(n);
     acb_mat_init(tau_mid, g, g);
     t = _acb_vec_init(g);
     z_mid = _acb_vec_init(g);
@@ -148,10 +148,10 @@ acb_theta_ql_all_red(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
     arb_init(err);
     arf_init(e);
 
-    acb_theta_dist_a0(dist, z, tau, lp);
-    acb_theta_dist_a0(dist0, t, tau, lp);
+    acb_theta_dist_a0(d, z, tau, lp);
+    acb_theta_dist_a0(d0, t, tau, lp);
 
-    /* Get midpoints; ql_all_with_t is expected to lose guard+g bits of precision */
+    /* Get midpoints; ql_all_with_t is expected to lose guard + g bits of precision */
     arf_one(e);
     arf_mul_2exp_si(e, e, -prec - guard - g);
     for (j = 0; j < g; j++)
@@ -163,13 +163,13 @@ acb_theta_ql_all_red(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
             acb_set(acb_mat_entry(tau_mid, k, j), acb_mat_entry(tau_mid, j, k));
         }
         acb_get_mid(&z_mid[j], &z[j]);
-        if (has_z)
+        if (hasz)
         {
             acb_add_error_arf(&z_mid[j], e);
         }
     }
 
-    res = acb_theta_ql_all_with_t(th, t, z_mid, dist0, dist, tau_mid,
+    res = acb_theta_ql_all_with_t(th, t, z_mid, d0, d, tau_mid,
         guard, prec + guard + g);
 
     for (j = 0; (j < ACB_THETA_QL_TRY) && !res; j++)
@@ -179,7 +179,7 @@ acb_theta_ql_all_red(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
             arb_urandom(acb_realref(&t[k]), state, prec + guard + g);
         }
         _acb_vec_scalar_mul_2exp_si(t, t, g, 1);
-        res = acb_theta_ql_all_with_t(th, t, z_mid, dist0, dist, tau_mid,
+        res = acb_theta_ql_all_with_t(th, t, z_mid, d0, d, tau_mid,
             guard, prec + guard + g);
         guard += ACB_THETA_LOW_PREC;
     }
@@ -199,8 +199,8 @@ acb_theta_ql_all_red(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
     }
 
     flint_randclear(state);
-    _arb_vec_clear(dist, n);
-    _arb_vec_clear(dist0, n);
+    _arb_vec_clear(d, n);
+    _arb_vec_clear(d0, n);
     acb_mat_clear(tau_mid);
     _acb_vec_clear(t, g);
     _acb_vec_clear(z_mid, g);
@@ -215,71 +215,83 @@ acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
     slong g = acb_mat_nrows(tau);
     slong n2 = 1 << (2 * g);
     acb_mat_t w;
-    acb_ptr x, aux;
+    acb_ptr new_z, aux;
     acb_t c;
     arb_t u;
-    slong d, j, k;
-    ulong ab, a0, a1, b0;
+    slong s, j, k;
+    ulong ab, a0, a1, b0, fixed_a1;
 
     acb_init(c);
     arb_init(u);
-    x = _acb_vec_init(g);
+    new_z = _acb_vec_init(g);
 
-    d = acb_theta_ql_reduce(x, c, u, z, tau, prec);
+    s = acb_theta_ql_reduce(new_z, c, u, &fixed_a1, z, tau, prec);
 
-    acb_mat_init(w, d, d);
-    aux = _acb_vec_init(1 << (2 * d));
-
-    for (j = 0; j < d; j++)
+    if (s == -1)
     {
-        for (k = 0; k < d; k++)
+        _acb_vec_zero(th, n * n);
+        for (ab = 0; ab < n2; ab++)
         {
-            acb_set(acb_mat_entry(w, j, k), acb_mat_entry(tau, j, k));
+            acb_add_error_arb(&th[ab], u);
         }
-    }
-
-    if (acb_is_finite(c))
-    {
-        if (d > 0 && acb_theta_ql_all_use_naive(g, prec))
-        {
-            acb_theta_naive_all(aux, x, 1, w, prec);
-        }
-        else if (d > 0)
-        {
-            acb_theta_ql_all_red(aux, x, w, prec);
-        }
-        else
-        {
-            acb_one(&aux[0]);
-        }
-        _acb_vec_scalar_mul(aux, aux, 1 << (2 * d), c, prec);
     }
     else
     {
-        _acb_vec_indeterminate(aux, 1 << (2 * d));
-    }
+        acb_mat_init(w, s, s);
+        aux = _acb_vec_init(w, s, s);
 
-    for (ab = 0; ab < n2; ab++)
-    {
-        /* Write ab as a0 a1 b0 b1 */
-        a0 = ab >> (g + (g - d));
-        a1 = (ab >> g) % (1 << (g - d));
-        b0 = (ab >> (g - d)) % (1 << d);
-
-        if (a1 == 0)
+        for (j = 0; j < s; j++)
         {
-            acb_set(&th[ab], &aux[(a0 << d) + b0]);
+            for (k = 0; k < s; k++)
+            {
+                acb_set(acb_mat_entry(w, j, k), acb_mat_entry(tau, j, k));
+            }
+        }
+
+        if (acb_is_finite(c))
+        {
+            if (s > 0 && acb_theta_ql_all_use_naive(g, prec))
+            {
+                acb_theta_naive_all(aux, new_z, 1, w, prec);
+            }
+            else if (s > 0)
+            {
+                acb_theta_ql_all_red(aux, new_z, w, prec);
+            }
+            else
+            {
+                acb_one(&aux[0]);
+            }
+            _acb_vec_scalar_mul(aux, aux, 1 << (2 * d), c, prec);
         }
         else
         {
-            acb_zero(&th[ab]);
+            _acb_vec_indeterminate(aux, 1 << (2 * d));
         }
-        acb_add_error_arb(&th[ab], u);
+
+        for (ab = 0; ab < n2; ab++)
+        {
+            /* Write ab as a0 a1 b0 b1 */
+            a0 = ab >> (g + (g - s));
+            a1 = (ab >> g) % (1 << (g - s));
+            b0 = (ab >> (g - s)) % (1 << s);
+
+            if (a1 == fixed_a1)
+            {
+                acb_mul_powi(&th[ab], &aux[(a0 << s) + b0], acb_theta_char_dot(a1, b1, g - s));
+            }
+            else
+            {
+                acb_zero(&th[ab]);
+            }
+            acb_add_error_arb(&th[ab], u);
+        }
+
+        acb_mat_clear(w);
+        _acb_vec_clear(aux, 1 << (2 * d));
     }
 
-    _acb_vec_clear(x, g);
+    _acb_vec_clear(new_z, g);
     acb_clear(c);
     arb_clear(u);
-    acb_mat_clear(w);
-    _acb_vec_clear(aux, 1 << (2 * d));
 }

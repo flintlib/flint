@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 void
-acb_theta_ql_step_3(acb_ptr res, acb_srcptr th0, acb_srcptr th, acb_srcptr rts,
+acb_theta_ql_step_2(acb_ptr res, acb_srcptr th0, acb_srcptr th, acb_srcptr rts,
     arb_srcptr d0, arb_srcptr d, slong g, slong prec)
 {
     slong n = 1 << g;
@@ -27,13 +27,6 @@ acb_theta_ql_step_3(acb_ptr res, acb_srcptr th0, acb_srcptr th, acb_srcptr rts,
     _acb_vec_scalar_mul_2exp_si(aux + n, aux + n, 2 * n, g);
     acb_theta_agm_sqrt(aux + n, aux + n, rts, 2 * n, prec);
 
-    /* Duplication using divisions for z */
-    acb_theta_agm_mul_tight(aux, th0 + n, th + n, d0, d, g, prec);
-    _acb_vec_scalar_mul_2exp_si(aux, aux, n, g);
-    for (a = 0; a < n; a++)
-    {
-        acb_div(&aux[a], &aux[a], &aux[2 * n + a], prec);
-    }
     _acb_vec_set(res, aux, 3 * n);
 
     _acb_vec_clear(aux, 3 * n);
