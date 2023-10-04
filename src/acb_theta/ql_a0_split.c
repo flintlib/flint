@@ -34,37 +34,6 @@ acb_theta_eld_ncenter(arb_ptr res, acb_srcptr z, const acb_mat_t tau, slong prec
 }
 
 static void
-acb_theta_ql_blocks(acb_mat_t t0, acb_mat_t x, acb_mat_t t1, const acb_mat_t tau, slong s)
-{
-    slong g = acb_mat_nrows(tau);
-    slong j, k;
-
-    for (j = 0; j < s; j++)
-    {
-        for (k = 0; k < s; k++)
-        {
-            acb_set(acb_mat_entry(t0, j, k), acb_mat_entry(tau, j, k));
-        }
-    }
-
-    for (j = 0; j < s; j++)
-    {
-        for (k = 0; k < (g - s); k++)
-        {
-            acb_set(acb_mat_entry(x, j, k), acb_mat_entry(tau, j, k + s));
-        }
-    }
-
-    for (j = 0; j < (g - s); j++)
-    {
-        for (k = 0; k < (g - s); k++)
-        {
-            acb_set(acb_mat_entry(t1, j, k), acb_mat_entry(tau, j + s, k + s));
-        }
-    }
-}
-
-static void
 acb_theta_ql_a0_eld_points(slong** pts, slong* nb_pts, arb_ptr v,
     slong* fullprec, arf_t eps, arb_srcptr d, ulong a, arb_srcptr nctr,
     const arb_mat_t C, const arb_mat_t C1, slong prec)
@@ -152,7 +121,7 @@ acb_theta_ql_a0_split_term(acb_ptr th, slong* pt, ulong a, acb_srcptr t, acb_src
     acb_dot(f, NULL, 0, u, 1, z + s, 1, g - s, prec);
     acb_mul_2exp_si(f, f, 1);
     acb_mat_vector_mul_col(w, tau1, u, prec);
-    acb_dot(f, f, 0, w, 1, u, 1, g - d, prec);
+    acb_dot(f, f, 0, w, 1, u, 1, g - s, prec);
 
     /* Get new distances and relative precision */
     acb_theta_dist_a0(new_d, new_z, tau0, lp);
@@ -240,7 +209,13 @@ acb_theta_ql_a0_split(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d,
 
     acb_theta_ql_blocks(tau0, star, tau1, tau, s);
     acb_theta_eld_cho(C, tau, prec);
-    acb_theta_eld_cho(C1, tau1, prec);
+    for (j = 0; j < g - s; j++)
+    {
+        for (k = j; k < g - s; k++)
+        {
+            arb_set(arb_mat_entry(C1, j, k), arb_mat_entry(C, j, k));
+        }
+    }
     acb_theta_dist_a0(new_d0, z, tau0, lp);
     acb_theta_eld_ncenter(nctr, z, tau, prec);
 
@@ -263,7 +238,7 @@ acb_theta_ql_a0_split(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d,
         {
             for (j = 0; j < nbt; j++)
             {
-                acb_add_error_arf(&r[j * n + k * nba + a], eps);
+                acb_add_error_arf(&th[j * n + k * nba + a], eps);
             }
         }
 

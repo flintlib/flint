@@ -72,7 +72,7 @@ acb_theta_ql_a0_start(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
 }
 
 static void
-acb_theta_ql_a0_step(acb_ptr th, acb_srcptr rts, arb_srcptr d0, arb_srcptr d,
+acb_theta_ql_a0_step(acb_ptr th, acb_srcptr all_rts, arb_srcptr d0, arb_srcptr d,
     slong k, slong nb_steps, int hast, int hasz, slong g, slong prec)
 {
     slong n = 1 << g;
@@ -93,7 +93,7 @@ acb_theta_ql_a0_step(acb_ptr th, acb_srcptr rts, arb_srcptr d0, arb_srcptr d,
     _arb_vec_scalar_mul_2exp_si(new_d0, d0, n, k + 1);
     for (j = 0; j < nbz * nbr; j++)
     {
-        _acb_vec_set(rts + j * n, rts + j * nb_steps * n + k * n, n);
+        _acb_vec_set(rts + j * n, all_rts + j * nb_steps * n + k * n, n);
     }
 
     if (hast)

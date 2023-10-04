@@ -95,7 +95,7 @@ acb_theta_jet_bounds(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slon
     arf_init(x);
 
     /* Get ci */
-    acb_theta_jet_bounds_ci(c0, c1, c2, z, tau, lp);
+    acb_theta_jet_bounds_ci(c0, c1, c2, z, tau);
 
     /* Set rho to positive root of 2 c_2 rho (c_1 + c_2 rho) = 2 b */
     arb_mul(t, c1, c2, lp);

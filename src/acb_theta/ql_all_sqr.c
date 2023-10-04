@@ -89,7 +89,7 @@ acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec)
     arb_t u, v;
     arf_t b;
     slong s, j, k;
-    ulong ab, a0, a1, b0, fixed_a1;
+    ulong ab, a0, a1, b0, b1, fixed_a1;
 
     acb_init(c);
     arb_init(u);
@@ -97,16 +97,16 @@ acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec)
     arf_init(b);
     new_z = _acb_vec_init(g);
 
-    s = acb_theta_ql_reduce(new_z, c, u, z, tau, prec);
+    s = acb_theta_ql_reduce(new_z, c, u, &fixed_a1, z, tau, prec);
     acb_sqr(c, c, prec);
     arb_sqr(u, u, prec);
 
     if (s == -1)
     {
-        _acb_vec_zero(th, n * n);
+        _acb_vec_zero(th2, n2);
         for (ab = 0; ab < n2; ab++)
         {
-            acb_add_error_arb(&th[ab], u);
+            acb_add_error_arb(&th2[ab], u);
         }
     }
     else
@@ -145,6 +145,7 @@ acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec)
             a0 = ab >> (g + (g - s));
             a1 = (ab >> g) % (1 << (g - s));
             b0 = (ab >> (g - s)) % (1 << s);
+            b1 = ab % (1 << (g - s));
 
             if (a1 == fixed_a1)
             {

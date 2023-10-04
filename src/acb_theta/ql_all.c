@@ -219,7 +219,7 @@ acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
     acb_t c;
     arb_t u;
     slong s, j, k;
-    ulong ab, a0, a1, b0, fixed_a1;
+    ulong ab, a0, a1, b0, b1, fixed_a1;
 
     acb_init(c);
     arb_init(u);
@@ -229,7 +229,7 @@ acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
 
     if (s == -1)
     {
-        _acb_vec_zero(th, n * n);
+        _acb_vec_zero(th, n2);
         for (ab = 0; ab < n2; ab++)
         {
             acb_add_error_arb(&th[ab], u);
@@ -238,7 +238,7 @@ acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
     else
     {
         acb_mat_init(w, s, s);
-        aux = _acb_vec_init(w, s, s);
+        aux = _acb_vec_init(1 << (2 * s));
 
         for (j = 0; j < s; j++)
         {
@@ -262,11 +262,11 @@ acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
             {
                 acb_one(&aux[0]);
             }
-            _acb_vec_scalar_mul(aux, aux, 1 << (2 * d), c, prec);
+            _acb_vec_scalar_mul(aux, aux, 1 << (2 * s), c, prec);
         }
         else
         {
-            _acb_vec_indeterminate(aux, 1 << (2 * d));
+            _acb_vec_indeterminate(aux, 1 << (2 * s));
         }
 
         for (ab = 0; ab < n2; ab++)
@@ -275,6 +275,7 @@ acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
             a0 = ab >> (g + (g - s));
             a1 = (ab >> g) % (1 << (g - s));
             b0 = (ab >> (g - s)) % (1 << s);
+            b1 = ab % (1 << (g - s));
 
             if (a1 == fixed_a1)
             {
@@ -288,7 +289,7 @@ acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
         }
 
         acb_mat_clear(w);
-        _acb_vec_clear(aux, 1 << (2 * d));
+        _acb_vec_clear(aux, 1 << (2 * s));
     }
 
     _acb_vec_clear(new_z, g);

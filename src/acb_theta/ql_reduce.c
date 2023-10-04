@@ -18,12 +18,13 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, ulong* a1, acb_srcptr
     acb_theta_eld_t E;
     arb_mat_t C, C1;
     acb_mat_t tau0, tau1, x;
-    arb_ptr v, t, u;
+    acb_ptr t, w;
+    arb_ptr v;
     acb_t f;
     arf_t R2, eps;
     arb_t b;
     slong* n;
-    slong s;
+    slong s, j, k;
 
     arb_mat_init(C, g, g);
     v = _arb_vec_init(g);
@@ -32,7 +33,7 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, ulong* a1, acb_srcptr
     arf_init(eps);
     arb_init(b);
 
-    acb_theta_eld_C(C, tau, prec);
+    acb_theta_eld_cho(C, tau, prec);
     acb_theta_naive_radius(R2, eps, C, 0, prec);
     acb_theta_naive_reduce(v, new_z, c, u, z, 1, tau, C, prec);
     arb_mul_arf(u, u, eps, prec);
@@ -58,11 +59,18 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, ulong* a1, acb_srcptr
         acb_mat_init(tau1, g - s, g - s);
         acb_mat_init(x, s, g - s);
         t = _acb_vec_init(g - s);
-        u = _acb_vec_init(g - s);
+        w = _acb_vec_init(g - s);
         n = flint_malloc((g - s) * sizeof(slong));
 
         acb_theta_ql_blocks(tau0, x, tau1, tau, s);
-        acb_theta_eld_cho(C1, t1, prec);
+        for (j = 0; j < g - s; j++)
+        {
+            for (k = 0; k < g - s; k++)
+            {
+                arb_set(arb_mat_entry(C1, j, k), arb_mat_entry(C, j, k));
+            }
+        }
+        acb_theta_eld_cho(C1, tau1, prec);
         _arb_vec_scalar_mul_2exp_si(v, v, g, 1);
         arf_mul_2exp_si(R2, R2, 2);
         acb_theta_eld_fill(E, C1, R2, v + s);
@@ -82,14 +90,15 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, ulong* a1, acb_srcptr
             *a1 = acb_theta_char_get_a(n, g - s);
 
             /* Update new_z and c */
-            acb_theta_char_get_acb(t, a, g - s);
-            acb_mat_vector_mul_col(v, x, t, prec);
-            _acb_vec_add(new_z, new_z, v, s, prec);
+            acb_theta_char_get_acb(t, *a1, g - s);
+            acb_mat_vector_mul_col(w, x, t, prec);
+            _acb_vec_add(new_z, new_z, w, s, prec);
 
-            acb_mat_vector_mul_col(v, tau1, t, prec);
-            _acb_vec_scalar_mul_2exp_si(u, new_z + s, g - s, 1);
-            _acb_vec_add(v, v, u, g - s, prec);
-            acb_dot(f, NULL, 0, t, 1, v, 1, g - s, prec);
+            acb_mat_vector_mul_col(w, tau1, t, prec);
+            _acb_vec_scalar_mul_2exp_si(w, w, g - s, -1);
+            _acb_vec_add(w, w, new_z + s, g - s, prec);
+            _acb_vec_scalar_mul_2exp_si(w, w, g - s, 1);
+            acb_dot(f, NULL, 0, t, 1, w, 1, g - s, prec);
             acb_exp_pi_i(f, f, prec);
             acb_mul(c, c, f, prec);
         }
@@ -100,7 +109,7 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, ulong* a1, acb_srcptr
         acb_mat_clear(tau1);
         acb_mat_clear(x);
         _acb_vec_clear(t, g - s);
-        _acb_vec_init(u, g - s);
+        _acb_vec_clear(w, g - s);
         flint_free(n);
     }
 

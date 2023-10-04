@@ -217,6 +217,8 @@ void acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
 
 slong acb_theta_ql_nb_steps(const arb_mat_t C, slong s, slong prec);
 void acb_theta_ql_log_rescale(acb_t res, acb_srcptr z, const acb_mat_t tau, slong prec);
+void acb_theta_ql_blocks(acb_mat_t tau0, acb_mat_t x, acb_mat_t tau1,
+    const acb_mat_t tau, slong s);
 int acb_theta_ql_roots(acb_ptr rts, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
     arb_srcptr d, const acb_mat_t tau, slong nb_steps, slong guard, slong prec);
 void acb_theta_ql_step_1(acb_ptr res, acb_srcptr th0, acb_srcptr th,

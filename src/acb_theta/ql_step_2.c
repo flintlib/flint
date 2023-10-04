@@ -16,8 +16,7 @@ acb_theta_ql_step_2(acb_ptr res, acb_srcptr th0, acb_srcptr th, acb_srcptr rts,
     arb_srcptr d0, arb_srcptr d, slong g, slong prec)
 {
     slong n = 1 << g;
-    acb_ptr res;
-    ulong a;
+    acb_ptr aux;
 
     aux = _acb_vec_init(3 * n);
 

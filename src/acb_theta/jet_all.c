@@ -21,7 +21,7 @@ acb_theta_jet_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slo
     slong lp = ACB_THETA_LOW_PREC;
     slong nb = acb_theta_jet_nb(ord, g);
     slong nb_low = acb_theta_jet_nb(ord + 2, g);
-    int has_z = !_acb_vec_is_zero(z, g);
+    int hasz = !_acb_vec_is_zero(z, g);
     arb_t c, rho, t;
     arf_t eps, err, e;
     acb_mat_t tau_mid;
@@ -46,8 +46,8 @@ acb_theta_jet_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slo
     err_vec = _arb_vec_init(nb);
 
     /* Get bounds and high precision */
-    acb_theta_jet_bounds(c, rho, z, tau, ord, lp);
-    acb_theta_jet_fd_radius(eps, err, c, rho, ord, g, prec, lp);
+    acb_theta_jet_bounds(c, rho, z, tau, ord);
+    acb_theta_jet_fd_radius(eps, err, c, rho, ord, g, prec);
     arb_set_arf(t, eps);
     arb_log_base_ui(t, t, 2, lp);
     arb_neg(t, t);
@@ -65,7 +65,7 @@ acb_theta_jet_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slo
             acb_set(acb_mat_entry(tau_mid, k, j), acb_mat_entry(tau_mid, j, k));
         }
         acb_get_mid(&z_mid[j], &z[j]);
-        if (has_z)
+        if (hasz)
         {
             acb_add_error_arf(&z_mid[j], e);
         }

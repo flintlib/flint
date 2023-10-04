@@ -19,7 +19,7 @@ acb_theta_agm_hadamard(acb_ptr res, acb_srcptr a, slong g, slong prec)
 
     if (g == 0)
     {
-        acb_set(&r[0], &a[0]);
+        acb_set(&res[0], &a[0]);
     }
     else
     {
