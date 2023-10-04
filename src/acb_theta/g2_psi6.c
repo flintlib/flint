@@ -44,16 +44,16 @@ g2_psi6_sgn(ulong b, ulong c, ulong d)
 
 
 void
-igusa_h6(acb_t h6, acb_srcptr th2, slong prec)
+igusa_h6(acb_t res, acb_srcptr th2, slong prec)
 {
     slong g = 2;
     ulong ch1, ch2, ch3;
     ulong n = 1 << (2 * g);
     slong sgn;
-    acb_t res, aux;
+    acb_t s, t;
 
-    acb_init(res);
-    acb_init(aux);
+    acb_init(s);
+    acb_init(t);
 
     for (ch1 = 0; ch1 < n; ch1++)
     {
@@ -64,17 +64,17 @@ igusa_h6(acb_t h6, acb_srcptr th2, slong prec)
                 if (acb_theta_char_is_syzygous(ch1, ch2, ch3, g))
                 {
                     sgn = g2_psi6_sgn(ch1, ch2, ch3);
-                    acb_mul(aux, &th2[ch1], &th2[ch2], prec);
-                    acb_mul(aux, aux, &th2[ch3], prec);
-                    acb_sqr(aux, aux, prec);
-                    acb_mul_si(aux, aux, sgn, prec);
-                    acb_add(res, res, aux, prec);
+                    acb_mul(t, &th2[ch1], &th2[ch2], prec);
+                    acb_mul(t, t, &th2[ch3], prec);
+                    acb_sqr(t, t, prec);
+                    acb_mul_si(t, t, sgn, prec);
+                    acb_add(s, s, t, prec);
                 }
             }
         }
     }
-    acb_mul_2exp_si(h6, res, -2);
+    acb_mul_2exp_si(res, s, -2);
 
-    acb_clear(res);
-    acb_clear(aux);
+    acb_clear(s);
+    acb_clear(t);
 }

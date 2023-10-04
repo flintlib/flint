@@ -11,7 +11,7 @@
 
 #include "acb_theta.h"
 
-void acb_theta_g2_transvectant_lead(acb_t r, const acb_poly_t g, const acb_poly_t h,
+void acb_theta_g2_transvectant_lead(acb_t res, const acb_poly_t g, const acb_poly_t h,
     slong m, slong n, slong k, slong prec)
 {
     acb_ptr s, t;
@@ -38,7 +38,7 @@ void acb_theta_g2_transvectant_lead(acb_t r, const acb_poly_t g, const acb_poly_
         }
         acb_mul_fmpz(&s[j], &s[j], num, prec);
     }
-    acb_dot(r, NULL, 0, s, 1, t, 1, k + 1, prec);
+    acb_dot(res, NULL, 0, s, 1, t, 1, k + 1, prec);
 
     fmpz_fac_ui(num, k);
     acb_set_fmpz(t, num);
@@ -46,7 +46,7 @@ void acb_theta_g2_transvectant_lead(acb_t r, const acb_poly_t g, const acb_poly_
     fmpz_fac_ui(f, n);
     fmpz_mul(num, num, f);
     acb_div_fmpz(t, t, num, prec);
-    acb_mul(r, r, t, prec);
+    acb_mul(res, res, t, prec);
 
     acb_clear(s);
     acb_clear(t);

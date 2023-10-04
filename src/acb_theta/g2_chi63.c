@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 void
-acb_theta_g2_chi63(acb_poly_t r, acb_srcptr dth, slong prec)
+acb_theta_g2_chi63(acb_poly_t res, acb_srcptr dth, slong prec)
 {
     slong g = 2;
     slong n = 1 << (2 * g);
@@ -44,15 +44,15 @@ acb_theta_g2_chi63(acb_poly_t r, acb_srcptr dth, slong prec)
             k++;
         }
     }
-    acb_poly_mul(r, &aux[0], &aux[1], prec);
-    acb_poly_mul(r, r, &aux[2], prec);
+    acb_poly_mul(res, &aux[0], &aux[1], prec);
+    acb_poly_mul(res, res, &aux[2], prec);
     acb_poly_mul(s, &aux[3], &aux[4], prec);
     acb_poly_mul(s, s, &aux[5], prec);
-    acb_poly_mul(r, r, s, prec);
+    acb_poly_mul(res, res, s, prec);
     acb_const_pi(den, prec);
     acb_pow_ui(den, den, 6, prec);
-    acb_poly_scalar_div(r, r, den, prec);
-    acb_poly_scalar_mul_2exp_si(r, r, -6);
+    acb_poly_scalar_div(res, res, den, prec);
+    acb_poly_scalar_mul_2exp_si(res, res, -6);
 
     acb_poly_clear(s);
     acb_clear(den);

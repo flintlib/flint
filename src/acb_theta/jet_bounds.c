@@ -15,9 +15,9 @@
    around z is bounded above by c0 exp((c1 + c2 rho)^2) */
 
 static void
-acb_theta_jet_bounds_ci(arb_t c0, arb_t c1, arb_t c2, acb_srcptr z,
-    const acb_mat_t tau, slong prec)
+acb_theta_jet_bounds_ci(arb_t c0, arb_t c1, arb_t c2, acb_srcptr z, const acb_mat_t tau)
 {
+    slong lp = ACB_THETA_LOW_PREC;
     slong g = acb_mat_nrows(tau);
     arb_mat_t Yinv;
     arb_mat_t cho;
@@ -33,8 +33,8 @@ acb_theta_jet_bounds_ci(arb_t c0, arb_t c1, arb_t c2, acb_srcptr z,
 
     acb_mat_get_imag(Yinv, tau);
     _acb_vec_get_imag(y, z, g);
-    arb_mat_inv(Yinv, Yinv, prec);
-    acb_theta_eld_cho(cho, tau, prec);
+    arb_mat_inv(Yinv, Yinv, lp);
+    acb_theta_eld_cho(cho, tau, lp);
 
     /* c0 is 2^g \prod_{i=1}^g (1 + 2/\sqrt{\gamma_i}) */
     arb_one(c0);
@@ -42,19 +42,19 @@ acb_theta_jet_bounds_ci(arb_t c0, arb_t c1, arb_t c2, acb_srcptr z,
     for (k = 0; k < g; k++)
     {
         arb_mul_2exp_si(t, arb_mat_entry(cho, k, k), 1);
-        arb_add_si(t, t, 1, prec);
-        arb_mul(c0, c0, t, prec);
+        arb_add_si(t, t, 1, lp);
+        arb_mul(c0, c0, t, lp);
     }
 
     /* c1 is sqrt(\pi y Y^{-1} y) */
-    arb_const_pi(t, prec);
-    arb_mat_scalar_mul_arb(Yinv, Yinv, t, prec);
-    arb_mat_bilinear_form(c1, Yinv, y, y, prec);
-    arb_sqrt(c1, c1, prec);
+    arb_const_pi(t, lp);
+    arb_mat_scalar_mul_arb(Yinv, Yinv, t, lp);
+    arb_mat_bilinear_form(c1, Yinv, y, y, lp);
+    arb_sqrt(c1, c1, lp);
 
     /* c2 is sqrt(max of \pi x Y^{-1} x where |x| \leq 1) */
     arb_zero(c2);
-    arb_mat_cho(cho, Yinv, prec);
+    arb_mat_cho(cho, Yinv, lp);
     arb_mat_transpose(cho, cho);
     for (k = 0; k < g; k++)
     {
@@ -62,12 +62,12 @@ acb_theta_jet_bounds_ci(arb_t c0, arb_t c1, arb_t c2, acb_srcptr z,
         for (j = k; j < g; j++)
         {
             arb_abs(t, arb_mat_entry(cho, k, j));
-            arb_add(s, s, t, prec);
+            arb_add(s, s, t, lp);
         }
-        arb_sqr(s, s, prec);
-        arb_add(c2, c2, s, prec);
+        arb_sqr(s, s, lp);
+        arb_add(c2, c2, s, lp);
     }
-    arb_sqrt(c2, c2, prec);
+    arb_sqrt(c2, c2, lp);
 
     arb_mat_clear(Yinv);
     arb_mat_clear(cho);
@@ -81,9 +81,9 @@ acb_theta_jet_bounds_ci(arb_t c0, arb_t c1, arb_t c2, acb_srcptr z,
    order ord */
 
 void
-acb_theta_jet_bounds(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau,
-    slong ord, slong prec)
+acb_theta_jet_bounds(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord)
 {
+    slong lp = ACB_THETA_LOW_PREC;
     slong b = ord + 1;
     arb_t t, c0, c1, c2;
     arf_t x;
@@ -95,28 +95,28 @@ acb_theta_jet_bounds(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau,
     arf_init(x);
 
     /* Get ci */
-    acb_theta_jet_bounds_ci(c0, c1, c2, z, tau, prec);
+    acb_theta_jet_bounds_ci(c0, c1, c2, z, tau, lp);
 
     /* Set rho to positive root of 2 c_2 rho (c_1 + c_2 rho) = 2 b */
-    arb_mul(t, c1, c2, prec);
+    arb_mul(t, c1, c2, lp);
     arb_mul_2exp_si(t, t, 1);
-    arb_sqr(rho, t, prec);
-    arb_sqr(t, c2, prec);
-    arb_mul_si(t, t, 8 * b, prec);
-    arb_add(rho, rho, t, prec);
-    arb_sqrt(rho, rho, prec);
-    arb_mul(t, c1, c2, prec);
-    arb_submul_si(rho, t, 2, prec);
-    arb_sqr(t, c2, prec);
+    arb_sqr(rho, t, lp);
+    arb_sqr(t, c2, lp);
+    arb_mul_si(t, t, 8 * b, lp);
+    arb_add(rho, rho, t, lp);
+    arb_sqrt(rho, rho, lp);
+    arb_mul(t, c1, c2, lp);
+    arb_submul_si(rho, t, 2, lp);
+    arb_sqr(t, c2, lp);
     arb_mul_2exp_si(t, t, 2);
-    arb_div(rho, rho, t, prec);
+    arb_div(rho, rho, t, lp);
 
     /* Set c to corresponding bound */
-    arb_mul(c, c2, rho, prec);
-    arb_add(c, c, c1, prec);
-    arb_sqr(c, c, prec);
-    arb_exp(c, c, prec);
-    arb_mul(c, c, c0, prec);
+    arb_mul(c, c2, rho, lp);
+    arb_add(c, c, c1, lp);
+    arb_sqr(c, c, lp);
+    arb_exp(c, c, lp);
+    arb_mul(c, c, c0, lp);
 
     arb_clear(t);
     arb_clear(c0);

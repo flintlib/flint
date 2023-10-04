@@ -13,7 +13,7 @@
 
 #define ACB_THETA_G2_JET_NAIVE_THRESHOLD 10000
 
-void acb_theta_g2_sextic(acb_poly_t r, const acb_mat_t tau, slong prec)
+void acb_theta_g2_sextic(acb_poly_t res, const acb_mat_t tau, slong prec)
 {
     slong g = 2;
     slong n2 = 1 << (2 * g);
@@ -33,17 +33,17 @@ void acb_theta_g2_sextic(acb_poly_t r, const acb_mat_t tau, slong prec)
     if (prec < ACB_THETA_G2_JET_NAIVE_THRESHOLD)
     {
         acb_theta_g2_jet_naive_1(dth, w, prec);
-        acb_theta_g2_chi6m2(r, dth, prec);
+        acb_theta_g2_chi6m2(res, dth, prec);
     }
     else
     {
         acb_theta_jet_all(dth, z, w, 1, prec);
-        acb_theta_g2_chi6m2(r, dth, prec);
+        acb_theta_g2_chi6m2(res, dth, prec);
     }
 
     sp2gz_inv(mat, mat);
     acb_siegel_cocycle(w, mat, w, prec);
-    acb_theta_g2_detk_symj(r, w, r, -2, 6, prec);
+    acb_theta_g2_detk_symj(res, w, res, -2, 6, prec);
 
     fmpz_mat_clear(mat);
     acb_mat_clear(w);

@@ -104,13 +104,13 @@ bolza_E(acb_t E, acb_srcptr th, slong prec)
 
 /* See Igusa, "Modular forms and projective invariants" p. 848 */
 void
-acb_theta_g2_chi35(acb_t chi35, acb_srcptr th, slong prec)
+acb_theta_g2_chi35(acb_t res, acb_srcptr th, slong prec)
 {
     acb_t t;
     acb_init(t);
 
     bolza_E(t, th, prec);
-    acb_mul_2exp_si(chi35, t, -37); /* Igusa's chi35 with primitive Fourier expansion */
+    acb_mul_2exp_si(res, t, -37); /* Igusa's chi35 with primitive Fourier expansion */
 
     acb_clear(t);
 }

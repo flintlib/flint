@@ -11,74 +11,48 @@
 
 #include "acb_theta.h"
 
-/* Ordering is:
-   [0, 'Co16'], [1, 'Co20'], [2, 'Co24'], [3, 'Co28'], [4, 'Co32'], [5,
-   'Co36'], [6, 'Co38'], [7, 'Co312'], [8, 'Co40'], [9, 'Co44'], [10, 'Co46'],
-   [11, 'Co410'], [12, 'Co52'], [13, 'Co54'], [14, 'Co58'], [15, 'Co60'], [16,
-   'Co661'], [17, 'Co662'], [18, 'Co72'], [19, 'Co74'], [20, 'Co82'], [21,
-   'Co94'], [22, 'Co100'], [23, 'Co102'], [24, 'Co122'], [25, 'Co150'] */
-
 static void
-acb_theta_g2_transvectants(acb_poly_struct* res, const acb_poly_t r, slong prec)
+acb_theta_g2_transvectants(acb_poly_struct* res, const acb_poly_t f, slong prec)
 {
     acb_poly_t s;
 
     acb_poly_init(s);
 
-    /* Each block is a weight 1, 2, ..., 10, 12, 15 */
-    acb_poly_set(&res[0], r);
-
-    acb_theta_g2_transvectant(&res[1], r, r, 6, 6, 6, prec);
-    acb_theta_g2_transvectant(&res[2], r, r, 6, 6, 4, prec);
-    acb_theta_g2_transvectant(&res[3], r, r, 6, 6, 2, prec);
-
-    acb_theta_g2_transvectant(&res[4], r, &res[2], 6, 4, 4, prec);
-    acb_theta_g2_transvectant(&res[5], r, &res[2], 6, 4, 2, prec);
-    acb_theta_g2_transvectant(&res[6], r, &res[2], 6, 4, 1, prec);
-    acb_theta_g2_transvectant(&res[7], r, &res[3], 6, 8, 1, prec);
-
+    acb_poly_set(&res[0], f);
+    acb_theta_g2_transvectant(&res[1], f, f, 6, 6, 6, prec);
+    acb_theta_g2_transvectant(&res[2], f, f, 6, 6, 4, prec);
+    acb_theta_g2_transvectant(&res[3], f, f, 6, 6, 2, prec);
+    acb_theta_g2_transvectant(&res[4], f, &res[2], 6, 4, 4, prec);
+    acb_theta_g2_transvectant(&res[5], f, &res[2], 6, 4, 2, prec);
+    acb_theta_g2_transvectant(&res[6], f, &res[2], 6, 4, 1, prec);
+    acb_theta_g2_transvectant(&res[7], f, &res[3], 6, 8, 1, prec);
     acb_theta_g2_transvectant(&res[8], &res[2], &res[2], 4, 4, 4, prec);
-    acb_theta_g2_transvectant(&res[9], r, &res[4], 6, 2, 2, prec);
-    acb_theta_g2_transvectant(&res[10], r, &res[4], 6, 2, 1, prec);
+    acb_theta_g2_transvectant(&res[9], f, &res[4], 6, 2, 2, prec);
+    acb_theta_g2_transvectant(&res[10], f, &res[4], 6, 2, 1, prec);
     acb_theta_g2_transvectant(&res[11], &res[3], &res[2], 8, 4, 1, prec);
-
     acb_theta_g2_transvectant(&res[12], &res[2], &res[4], 4, 2, 2, prec);
     acb_theta_g2_transvectant(&res[13], &res[2], &res[4], 4, 2, 1, prec);
     acb_theta_g2_transvectant(&res[14], &res[3], &res[4], 8, 2, 1, prec);
-
     acb_theta_g2_transvectant(&res[15], &res[4], &res[4], 2, 2, 2, prec);
     acb_theta_g2_transvectant(&res[16], &res[5], &res[4], 6, 2, 1, prec);
     acb_theta_g2_transvectant(&res[17], &res[6], &res[4], 8, 2, 2, prec);
-
-    acb_poly_mul(s, &res[4], &res[4], prec); /* C_32^2 */
-    acb_theta_g2_transvectant(&res[18], r, s, 6, 4, 4, prec);
-    acb_theta_g2_transvectant(&res[19], r, s, 6, 4, 3, prec);
-
+    acb_poly_mul(s, &res[4], &res[4], prec); /* now C_32^2 */
+    acb_theta_g2_transvectant(&res[18], f, s, 6, 4, 4, prec);
+    acb_theta_g2_transvectant(&res[19], f, s, 6, 4, 3, prec);
     acb_theta_g2_transvectant(&res[20], &res[2], s, 4, 4, 3, prec);
-
     acb_theta_g2_transvectant(&res[21], &res[6], s, 8, 4, 4, prec);
-
     acb_poly_mul(s, s, &res[4], prec); /* now C_32^3 */
-    acb_theta_g2_transvectant(&res[22], r, s, 6, 6, 6, prec);
-    acb_theta_g2_transvectant(&res[23], r, s, 6, 6, 5, prec);
-
+    acb_theta_g2_transvectant(&res[22], f, s, 6, 6, 6, prec);
+    acb_theta_g2_transvectant(&res[23], f, s, 6, 6, 5, prec);
     acb_theta_g2_transvectant(&res[24], &res[6], s, 8, 6, 6, prec);
-
     acb_poly_mul(s, s, &res[4], prec); /* now C_32^4 */
     acb_theta_g2_transvectant(&res[25], &res[6], s, 8, 8, 8, prec);
 
     acb_poly_clear(s);
 }
 
-/* Ordering is:
-   [0, 'Co16'], [1, 'Co20'], [2, 'Co24], [3, 'Co28'], [4, 'Co32'], [5, 'Co36'],
-   [6, 'Co38'], [7, 'Co312'], [8, 'Co40'], [9, 'Co44'], [10, 'Co46'], [11,
-   'Co410'], [12, 'Co52'], [13, 'Co54'], [14, 'Co58'], [15, 'Co60'], [16,
-   'Co661'], [17, 'Co662'], [18, 'Co72'], [19, 'Co74'], [20, 'Co82'], [21,
-   'Co94'], [22, 'Co100'], [23, 'Co102'], [24, 'Co122'], [25, 'Co150'] */
-
 void
-acb_theta_g2_covariants(acb_poly_struct* res, const acb_poly_t r, slong prec)
+acb_theta_g2_covariants(acb_poly_struct* res, const acb_poly_t f, slong prec)
 {
     acb_t c;
     slong cofactors[ACB_THETA_G2_COV_NB] = {1, 60, 75, 90, 2250, 2250, 450,
@@ -89,7 +63,7 @@ acb_theta_g2_covariants(acb_poly_struct* res, const acb_poly_t r, slong prec)
 
     acb_init(c);
 
-    acb_theta_g2_transvectants(res, r, prec);
+    acb_theta_g2_transvectants(res, f, prec);
     for (k = 0; k < ACB_THETA_G2_COV_NB; k++)
     {
         acb_set_si(c, cofactors[k]);
