@@ -33,21 +33,15 @@ int main(void)
     for (prec = 32; prec <= n_pow(2, 14); prec *= 2)
     {
         flint_printf("prec = %wd, naive:\n", prec);
-
-        TIMEIT_START
-
-            acb_theta_naive_all(th, z, 1, tau, prec);
-
+        TIMEIT_START;
+        acb_theta_naive_all(th, z, 1, tau, prec);
         TIMEIT_STOP;
-
         acb_printd(&th[0], 5);
         flint_printf("\n");
+
         flint_printf("prec = %wd, ql:\n", prec);
-
-        TIMEIT_START
-
-            acb_theta_all(th, z, tau, 0, prec);
-
+        TIMEIT_START;
+        acb_theta_all(th, z, tau, 0, prec);
         TIMEIT_STOP;
         acb_printd(&th[0], 5);
         flint_printf("\n\n");

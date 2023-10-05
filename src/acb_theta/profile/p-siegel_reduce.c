@@ -69,10 +69,8 @@ int main(int argc, char *argv[])
 
             flint_printf("prec = %wd, d = %wd\n", prec, d);
 
-            TIMEIT_START
-
-                acb_siegel_reduce(mat, w, prec);
-
+            TIMEIT_START;
+            acb_siegel_reduce(mat, w, prec);
             TIMEIT_STOP;
         }
     }

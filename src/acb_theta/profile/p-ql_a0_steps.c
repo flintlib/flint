@@ -40,10 +40,10 @@ int main(int argc, char *argv[])
     /* Profile with different number of steps on reduced input */
     for (prec = pstep; prec <= pmax; prec += pstep)
     {
-        int has_t = iter % 2;
-        int has_z = (iter % 4) / 2;
-        slong nbt = (has_t ? 3 : 1);
-        slong nbz = (has_z ? 2 : 1);
+        int hast = iter % 2;
+        int hasz = (iter % 4) / 2;
+        slong nbt = (hast ? 3 : 1);
+        slong nbz = (hasz ? 2 : 1);
         slong guard = 2 * ACB_THETA_LOW_PREC;
         slong lp = ACB_THETA_LOW_PREC;
         acb_mat_t tau;
@@ -75,11 +75,11 @@ int main(int argc, char *argv[])
 
         for (k = 0; k < g; k++)
         {
-            if (has_z)
+            if (hasz)
             {
                 acb_urandom(&z[k], state, prec);
             }
-            if (has_t)
+            if (hast)
             {
                 arb_urandom(acb_realref(&t[k]), state, prec);
             }
@@ -90,15 +90,16 @@ int main(int argc, char *argv[])
         split = 0;
         nb_steps = acb_theta_ql_nb_steps(cho, 0, prec);
 
-        flint_printf("(g = %wd, prec = %wd, has_t = %wd, has_z = %wd) ideal nb_steps: %wd, tau:\n", g, prec, has_t, has_z, nb_steps);
+        flint_printf("(g = %wd, prec = %wd, hast = %wd, hasz = %wd) ideal nb_steps: %wd, tau:\n",
+            g, prec, hast, hasz, nb_steps);
         acb_mat_printd(tau, 2);
 
         for (k = -FLINT_MIN(nb_steps, 2); k <= 2; k++)
         {
             flint_printf("nb_steps = %wd: ", nb_steps + k);
-            TIMEIT_START
-                res = acb_theta_ql_a0_steps(r, t, z, dist0, dist, tau, nb_steps + k, split,
-                    guard, prec, &acb_theta_ql_a0_naive);
+            TIMEIT_START;
+            res = acb_theta_ql_a0_steps(r, t, z, dist0, dist, tau, nb_steps + k, split,
+                guard, prec, &acb_theta_ql_a0_naive);
             TIMEIT_STOP;
             if (res)
             {

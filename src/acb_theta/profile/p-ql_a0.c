@@ -40,10 +40,10 @@ int main(int argc, char *argv[])
     /* Profile with different number of steps on reduced input */
     for (prec = pstep; prec <= pmax; prec += pstep)
     {
-        int has_t = iter % 2;
-        int has_z = (iter % 4) / 2;
-        slong nbt = (has_t ? 3 : 1);
-        slong nbz = (has_z ? 2 : 1);
+        int hast = iter % 2;
+        int hasz = (iter % 4) / 2;
+        slong nbt = (hast ? 3 : 1);
+        slong nbz = (hasz ? 2 : 1);
         slong guard = 2 * ACB_THETA_LOW_PREC;
         slong lp = ACB_THETA_LOW_PREC;
         acb_mat_t tau;
@@ -71,11 +71,11 @@ int main(int argc, char *argv[])
 
         for (k = 0; k < g; k++)
         {
-            if (has_z)
+            if (hasz)
             {
                 acb_urandom(&z[k], state, prec);
             }
-            if (has_t)
+            if (hast)
             {
                 arb_urandom(acb_realref(&t[k]), state, prec);
             }
@@ -83,12 +83,12 @@ int main(int argc, char *argv[])
         acb_theta_dist_a0(dist, z, tau, lp);
         acb_theta_dist_a0(dist0, t, tau, lp);
 
-        flint_printf("g = %wd, prec = %wd, has_t = %wd, has_z = %wd, tau:\n",
-            g, prec, has_t, has_z);
+        flint_printf("g = %wd, prec = %wd, hast = %wd, hasz = %wd, tau:\n",
+            g, prec, hast, hasz);
         acb_mat_printd(tau, 2);
 
-        TIMEIT_START
-            res = acb_theta_ql_a0(r, t, z, dist0, dist, tau, guard, prec);
+        TIMEIT_START;
+        res = acb_theta_ql_a0(r, t, z, dist0, dist, tau, guard, prec);
         TIMEIT_STOP;
         if (res)
         {

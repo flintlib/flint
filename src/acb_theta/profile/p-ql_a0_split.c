@@ -88,28 +88,28 @@ int main(int argc, char *argv[])
             acb_theta_eld_cho(cho, tau1, lp);
             nb_steps_1 = acb_theta_ql_nb_steps(cho, split, prec);
             nb_steps_2 = acb_theta_ql_nb_steps(cho, 0, prec);
-            
+
             flint_printf("time for split (nb_steps = %wd):\n", nb_steps_1);
-            TIMEIT_START
-                res = acb_theta_ql_a0_steps(r1, t, t, dist0, dist0, tau1, nb_steps_1,
-                    split, guard, prec, &acb_theta_ql_a0);
+            TIMEIT_START;
+            res = acb_theta_ql_a0_steps(r1, t, t, dist0, dist0, tau1, nb_steps_1,
+                split, guard, prec, &acb_theta_ql_a0);
             TIMEIT_STOP;
 
             if (res)
             {
 
                 flint_printf("time for non-split (nb_steps = %wd):\n", nb_steps_2);
-                TIMEIT_START
-                    res = acb_theta_ql_a0_steps(r2, t, t, dist0, dist0, tau1, nb_steps_2,
-                        0, guard, prec, &acb_theta_ql_a0);
+                TIMEIT_START;
+                res = acb_theta_ql_a0_steps(r2, t, t, dist0, dist0, tau1, nb_steps_2,
+                    0, guard, prec, &acb_theta_ql_a0);
                 TIMEIT_STOP;
             }
 
             if (res)
             {
                 flint_printf("time for ql_a0:\n");
-                TIMEIT_START
-                    res = acb_theta_ql_a0(r3, t, t, dist0, dist0, tau1, guard, prec);
+                TIMEIT_START;
+                res = acb_theta_ql_a0(r3, t, t, dist0, dist0, tau1, guard, prec);
                 TIMEIT_STOP;
             }
 

@@ -34,20 +34,16 @@ int main(void)
     {
         flint_printf("prec = %wd, naive:\n", prec);
 
-        TIMEIT_START
-
-            acb_theta_jet_naive_all(dth, z, tau, 1, prec);
-
+        TIMEIT_START;
+        acb_theta_jet_naive_all(dth, z, tau, 1, prec);
         TIMEIT_STOP;
 
         acb_printd(&dth[0], 5);
         flint_printf("\n");
         flint_printf("prec = %wd, ql:\n", prec);
 
-        TIMEIT_START
-
-            acb_theta_jet_all(dth, z, tau, 1, prec);
-
+        TIMEIT_START;
+        acb_theta_jet_all(dth, z, tau, 1, prec);
         TIMEIT_STOP;
 
         acb_printd(&dth[0], 5);
