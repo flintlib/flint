@@ -12,7 +12,7 @@
 #include "acb_mat.h"
 
 void
-acb_mat_vector_mul_row(acb_ptr res, acb_srcptr row, const acb_mat_t A, slong prec)
+acb_mat_vector_mul_row(acb_ptr res, acb_srcptr v, const acb_mat_t A, slong prec)
 {
     slong nrow = acb_mat_nrows(A);
     slong ncol = acb_mat_ncols(A);
@@ -24,7 +24,7 @@ acb_mat_vector_mul_row(acb_ptr res, acb_srcptr row, const acb_mat_t A, slong pre
 
     for (k = 0; k < nrow; k++)
     {
-        acb_set(acb_mat_entry(r, 0, k), &row[k]);
+        acb_set(acb_mat_entry(r, 0, k), &v[k]);
     }
     acb_mat_mul(p, r, A, prec);
     for (k = 0; k < ncol; k++)
@@ -37,7 +37,7 @@ acb_mat_vector_mul_row(acb_ptr res, acb_srcptr row, const acb_mat_t A, slong pre
 }
 
 void
-acb_mat_vector_mul_col(acb_ptr res, const acb_mat_t A, acb_srcptr col, slong prec)
+acb_mat_vector_mul_col(acb_ptr res, const acb_mat_t A, acb_srcptr v, slong prec)
 {
     slong nrow = acb_mat_nrows(A);
     slong ncol = acb_mat_ncols(A);
@@ -49,7 +49,7 @@ acb_mat_vector_mul_col(acb_ptr res, const acb_mat_t A, acb_srcptr col, slong pre
 
     for (k = 0; k < ncol; k++)
     {
-        acb_set(acb_mat_entry(c, k, 0), &col[k]);
+        acb_set(acb_mat_entry(c, k, 0), &v[k]);
     }
     acb_mat_mul(p, A, c, prec);
     for (k = 0; k < nrow; k++)

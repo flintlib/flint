@@ -361,9 +361,9 @@ acb_mat_scalar_div_arb(acb_mat_t B, const acb_mat_t A, const arb_t c, slong prec
 
 /* Vector arithmetic */
 
-void acb_mat_vector_mul_row(acb_ptr res, acb_srcptr row, const acb_mat_t A, slong prec);
+void acb_mat_vector_mul_row(acb_ptr res, acb_srcptr v, const acb_mat_t A, slong prec);
 
-void acb_mat_vector_mul_col(acb_ptr res, const acb_mat_t A, acb_srcptr col, slong prec);
+void acb_mat_vector_mul_col(acb_ptr res, const acb_mat_t A, acb_srcptr v, slong prec);
 
 /* Solving */
 

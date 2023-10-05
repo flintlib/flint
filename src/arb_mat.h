@@ -136,9 +136,6 @@ arb_mat_is_diag(const arb_mat_t mat)
     return arb_mat_is_tril(mat) && arb_mat_is_triu(mat);
 }
 
-int arb_mat_is_symmetric(const arb_mat_t mat);
-int arb_mat_is_nonsymmetric(const arb_mat_t mat);
-
 /* Radius and interval operations */
 
 ARB_MAT_INLINE void
@@ -318,9 +315,9 @@ arb_mat_scalar_div_arb(arb_mat_t B, const arb_mat_t A, const arb_t c, slong prec
 
 /* Vector arithmetic */
 
-void arb_mat_vector_mul_row(arb_ptr res, arb_srcptr row, const arb_mat_t A, slong prec);
+void arb_mat_vector_mul_row(arb_ptr res, arb_srcptr v, const arb_mat_t A, slong prec);
 
-void arb_mat_vector_mul_col(arb_ptr res, const arb_mat_t A, arb_srcptr col, slong prec);
+void arb_mat_vector_mul_col(arb_ptr res, const arb_mat_t A, arb_srcptr v, slong prec);
 
 /* Solving */
 
