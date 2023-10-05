@@ -24,8 +24,7 @@ int main(void)
     /* Test: find correct coefficients for exp function */
     for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
-        slong lp = ACB_THETA_LOW_PREC;
-        slong prec = lp + n_randint(state, 1000);
+        slong prec = 100 + n_randint(state, 1000);
         slong ord = n_randint(state, 4);
         slong g = 1 + n_randint(state, 4);
         slong b = ord + 1;
@@ -54,8 +53,8 @@ int main(void)
         /* Get c, rho, eps, err */
         arb_one(rho);
         arb_set_si(c, g);
-        arb_exp(c, c, lp);
-        acb_theta_jet_fd_radius(eps, err, c, rho, ord, g, prec, lp);
+        arb_exp(c, c, prec);
+        acb_theta_jet_fd_radius(eps, err, c, rho, ord, g, prec);
 
         /* Fill in values, apply jet_fd at 2*prec */
         for (k = 0; k < nb_val; k++)

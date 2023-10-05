@@ -86,7 +86,7 @@ int main(void)
             arb_min(test, test, x, prec);
         }
 
-        if (!arb_overlaps(dist, test))
+        if (!arb_overlaps(d, test))
         {
             flint_printf("FAIL (wrong distance)\n");
             flint_printf("g = %wd, C:\n", g);

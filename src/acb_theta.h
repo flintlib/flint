@@ -161,6 +161,7 @@ void acb_theta_naive_reduce(arb_ptr v, acb_ptr new_zs, acb_ptr cs, arb_ptr us,
 void acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr new_zs, acb_ptr cs,
     arb_ptr us, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec);
 slong acb_theta_naive_fullprec(const acb_theta_eld_t E, slong prec);
+void acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong* n, slong prec);
 
 typedef void (*acb_theta_naive_worker_t)(acb_ptr, acb_srcptr, acb_srcptr, const slong*,
     slong, const acb_t, const slong*, slong, slong, slong, slong);
