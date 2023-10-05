@@ -31,12 +31,12 @@ int main(void)
         slong bits = n_randint(state, 4);
         acb_mat_t tau;
         acb_ptr z, dth;
-        acb_poly_t chi, test;
+        acb_poly_t f, test;
 
         acb_mat_init(tau, g, g);
         z = _acb_vec_init(g);
         dth = _acb_vec_init(n * nb);
-        acb_poly_init(chi);
+        acb_poly_init(f);
         acb_poly_init(test);
 
         acb_siegel_randtest_reduced(tau, state, prec, bits);
@@ -44,13 +44,13 @@ int main(void)
 
         acb_theta_jet_all(dth, z, tau, 1, prec);
         acb_theta_g2_chi6m2(test, dth, prec);
-        acb_theta_g2_sextic(chi, tau, prec);
+        acb_theta_g2_sextic(f, tau, prec);
 
-        if (!acb_poly_overlaps(chi, test))
+        if (!acb_poly_overlaps(f, test))
         {
             flint_printf("FAIL\n");
-            flint_printf("chi:\n");
-            acb_poly_printd(chi, 5);
+            flint_printf("f:\n");
+            acb_poly_printd(f, 5);
             flint_printf("\ntest:\n");
             acb_poly_printd(test, 5);
             flint_printf("\n");
@@ -60,7 +60,7 @@ int main(void)
         acb_mat_clear(tau);
         _acb_vec_clear(z, g);
         _acb_vec_clear(dth, n * nb);
-        acb_poly_clear(chi);
+        acb_poly_clear(f);
         acb_poly_clear(test);
     }
 

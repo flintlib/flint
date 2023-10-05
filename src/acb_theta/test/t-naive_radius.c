@@ -11,6 +11,7 @@
 
 #include "acb_theta.h"
 
+/* Evaluate upper bound on the tail */
 static void
 acb_theta_naive_tail(arb_t res, const arf_t R2, const arb_mat_t C, slong ord)
 {

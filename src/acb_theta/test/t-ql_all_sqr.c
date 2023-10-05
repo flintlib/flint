@@ -26,7 +26,7 @@ int main(void)
     {
         slong g = 1 + n_randint(state, 3);
         slong n = 1 << g;
-        int has_z = iter % 2;
+        int hasz = iter % 2;
         slong prec = (g > 1 ? 100 : 1000) + n_randint(state, 500);
         slong hprec = prec + 25;
         slong bits = n_randint(state, 5);
@@ -40,7 +40,7 @@ int main(void)
         test = _acb_vec_init(n * n);
 
         acb_siegel_randtest_reduced(tau, state, hprec, bits);
-        if (has_z)
+        if (hasz)
         {
             for (k = 0; k < g; k++)
             {
@@ -58,8 +58,8 @@ int main(void)
         if (!acb_is_finite(&th[0]) || !_acb_vec_overlaps(th, test, n * n))
         {
             flint_printf("FAIL\n");
-            flint_printf("g = %wd, prec = %wd, has_z = %wd, tau:\n",
-                g, prec, has_z);
+            flint_printf("g = %wd, prec = %wd, hasz = %wd, tau:\n",
+                g, prec, hasz);
             acb_mat_printd(tau, 5);
             flint_printf("output:\n");
             _acb_vec_printd(th, n * n, 5);

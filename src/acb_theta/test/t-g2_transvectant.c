@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("g2_slash_basic_covariants....");
+    flint_printf("g2_transvectant....");
     fflush(stdout);
 
     flint_randinit(state);

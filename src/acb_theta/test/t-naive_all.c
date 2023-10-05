@@ -29,7 +29,7 @@ int main(void)
         acb_mat_t tau;
         acb_mat_t tau11;
         acb_ptr z;
-        slong nb_z = 1 + n_randint(state, 4);
+        slong nbz = 1 + n_randint(state, 4);
         acb_ptr th;
         acb_ptr th_test;
         acb_ptr th_g1;
@@ -41,9 +41,9 @@ int main(void)
 
         acb_mat_init(tau, g, g);
         acb_mat_init(tau11, 1, 1);
-        z = _acb_vec_init(g * nb_z);
-        th = _acb_vec_init(nb * nb_z);
-        th_test = _acb_vec_init(nb * nb_z);
+        z = _acb_vec_init(g * nbz);
+        th = _acb_vec_init(nb * nbz);
+        th_test = _acb_vec_init(nb * nbz);
         th_g1 = _acb_vec_init(4 * g);
 
         for (k = 0; k < g; k++)
@@ -51,15 +51,15 @@ int main(void)
             acb_siegel_randtest(tau11, state, prec, mag_bits);
             acb_set(acb_mat_entry(tau, k, k), acb_mat_entry(tau11, 0, 0));
         }
-        for (k = 0; k < g * nb_z; k++)
+        for (k = 0; k < g * nbz; k++)
         {
             acb_urandom(&z[k], state, prec);
         }
-        acb_theta_naive_all(th, z, nb_z, tau, prec1);
+        acb_theta_naive_all(th, z, nbz, tau, prec1);
 
         if (g == 1)
         {
-            for (k = 0; k < nb_z; k++)
+            for (k = 0; k < nbz; k++)
             {
                 acb_modular_theta(&th_test[4 * k + 3], &th_test[4 * k + 2],
                     &th_test[4 * k], &th_test[4 * k + 1],
@@ -69,7 +69,7 @@ int main(void)
         }
         else
         {
-            for (j = 0; j < nb_z; j++)
+            for (j = 0; j < nbz; j++)
             {
                 for (k = 0; k < g; k++)
                 {
@@ -93,25 +93,25 @@ int main(void)
             }
         }
 
-        if (!_acb_vec_overlaps(th, th_test, nb * nb_z))
+        if (!_acb_vec_overlaps(th, th_test, nb * nbz))
         {
             flint_printf("FAIL: overlap\n");
-            flint_printf("g = %wd, prec = %wd, nb_z = %wd, tau:\n", g, prec, nb_z);
+            flint_printf("g = %wd, prec = %wd, nbz = %wd, tau:\n", g, prec, nbz);
             acb_mat_printd(tau, 10);
             flint_printf("z:\n");
-            _acb_vec_printd(z, g * nb_z, 10);
+            _acb_vec_printd(z, g * nbz, 10);
             flint_printf("th, th_test:\n");
-            _acb_vec_printd(th, nb * nb_z, 10);
-            _acb_vec_printd(th_test, nb * nb_z, 10);
+            _acb_vec_printd(th, nb * nbz, 10);
+            _acb_vec_printd(th_test, nb * nbz, 10);
             fflush(stdout);
             flint_abort();
         }
 
         acb_mat_clear(tau);
         acb_mat_clear(tau11);
-        _acb_vec_clear(z, g * nb_z);
-        _acb_vec_clear(th, nb * nb_z);
-        _acb_vec_clear(th_test, nb * nb_z);
+        _acb_vec_clear(z, g * nbz);
+        _acb_vec_clear(th, nb * nbz);
+        _acb_vec_clear(th_test, nb * nbz);
         _acb_vec_clear(th_g1, 4 * g);
     }
 

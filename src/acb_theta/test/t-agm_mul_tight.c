@@ -32,7 +32,7 @@ int main(void)
         acb_mat_t tau;
         acb_ptr z;
         acb_ptr th, th0, r;
-        arb_ptr dist, dist0;
+        arb_ptr d, d0;
         arb_t x;
         arf_t m, eps;
         slong k;
@@ -42,37 +42,37 @@ int main(void)
         r = _acb_vec_init(n);
         th = _acb_vec_init(n);
         th0 = _acb_vec_init(n);
-        dist = _arb_vec_init(n);
-        dist0 = _arb_vec_init(n);
+        d = _arb_vec_init(n);
+        d0 = _arb_vec_init(n);
         arb_init(x);
         arf_init(m);
         arf_init(eps);
 
         /* Generate distances, not too crazy */
         acb_siegel_randtest_nice(tau, state, prec);
-        acb_theta_dist_a0(dist0, z, tau, prec);
+        acb_theta_dist_a0(d0, z, tau, prec);
         for (k = 0; k < g; k++)
         {
             acb_randtest_precise(&z[k], state, prec, bits);
         }
-        acb_theta_dist_a0(dist, z, tau, prec);
+        acb_theta_dist_a0(d, z, tau, prec);
 
         /* Generate values */
         for (k = 0; k < n; k++)
         {
-            arb_neg(x, &dist[k]);
+            arb_neg(x, &d[k]);
             arb_exp(x, x, prec);
             acb_urandom(&th[k], state, prec);
             acb_mul_arb(&th[k], &th[k], x, prec);
 
-            arb_neg(x, &dist0[k]);
+            arb_neg(x, &d0[k]);
             arb_exp(x, x, prec);
             acb_urandom(&th0[k], state, prec);
             acb_mul_arb(&th0[k], &th0[k], x, prec);
         }
 
-        acb_theta_agm_mul_tight(r, th0, th, dist0, dist, g, prec);
-        acb_theta_agm_rel_mag_err(m, eps, r, dist, n, prec);
+        acb_theta_agm_mul_tight(r, th0, th, d0, d, g, prec);
+        acb_theta_agm_rel_mag_err(m, eps, r, d, n, prec);
 
         /* Test: m <= 1 and eps is not too small */
         if (arf_cmp_si(m, 1) > 0 || arf_cmp_2exp_si(eps, -prec + delta) > 0)
@@ -81,8 +81,8 @@ int main(void)
             flint_printf("g = %wd, prec = %wd, tau:\n", g, prec);
             acb_mat_printd(tau, 5);
             flint_printf("distances:\n");
-            _arb_vec_printd(dist0, n, 5);
-            _arb_vec_printd(dist, n, 5);
+            _arb_vec_printd(d0, n, 5);
+            _arb_vec_printd(d, n, 5);
             flint_printf("values:\n");
             _acb_vec_printd(th0, n, 5);
             _acb_vec_printd(th, n, 5);
@@ -101,8 +101,8 @@ int main(void)
         _acb_vec_clear(r, n);
         _acb_vec_clear(th, n);
         _acb_vec_clear(th0, n);
-        _arb_vec_clear(dist, n);
-        _arb_vec_clear(dist0, n);
+        _arb_vec_clear(d, n);
+        _arb_vec_clear(d0, n);
         arb_clear(x);
         arf_clear(m);
         arf_clear(eps);

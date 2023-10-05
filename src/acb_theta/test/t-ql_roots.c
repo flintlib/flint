@@ -30,7 +30,7 @@ int main(void)
         slong guard = ACB_THETA_LOW_PREC;
         acb_mat_t tau;
         acb_ptr r, t, z;
-        arb_ptr dist;
+        arb_ptr d;
         slong nb_steps = n_randint(state, 10);
         int res;
 
@@ -38,11 +38,11 @@ int main(void)
         r = _acb_vec_init(n * nb_steps);
         z = _acb_vec_init(g);
         t = _acb_vec_init(g);
-        dist = _arb_vec_init(n);
+        d = _arb_vec_init(n);
 
         acb_siegel_randtest_nice(tau, state, prec);
-        acb_theta_dist_a0(dist, z, tau, prec);
-        res = acb_theta_ql_roots(r, t, z, dist, dist, tau, nb_steps, guard, prec);
+        acb_theta_dist_a0(d, z, tau, prec);
+        res = acb_theta_ql_roots(r, t, z, d, d, tau, nb_steps, guard, prec);
 
         if (!res)
         {
@@ -55,7 +55,7 @@ int main(void)
         _acb_vec_clear(r, n * nb_steps);
         _acb_vec_clear(t, g);
         _acb_vec_clear(z, g);
-        _arb_vec_clear(dist, n);
+        _arb_vec_clear(d, n);
     }
 
     flint_randclear(state);

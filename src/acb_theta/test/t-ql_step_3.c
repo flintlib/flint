@@ -30,8 +30,8 @@ int main(void)
         slong prec = 100;
         acb_mat_t tau;
         acb_ptr z, t, x;
-        acb_ptr r, test, th, th0, roots;
-        arb_ptr dist, dist0;
+        acb_ptr r, test, th, th0, rts;
+        arb_ptr d, d0;
         slong j, k;
 
         acb_mat_init(tau, g, g);
@@ -42,9 +42,9 @@ int main(void)
         test = _acb_vec_init(3 * n);
         th = _acb_vec_init(3 * n);
         th0 = _acb_vec_init(3 * n);
-        roots = _acb_vec_init(2 * n);
-        dist = _arb_vec_init(n);
-        dist0 = _arb_vec_init(n);
+        rts = _acb_vec_init(2 * n);
+        d = _arb_vec_init(n);
+        d0 = _arb_vec_init(n);
 
         acb_siegel_randtest_nice(tau, state, prec);
         acb_mat_scalar_mul_2exp_si(tau, tau, 1);
@@ -54,7 +54,7 @@ int main(void)
         }
 
         /* Get input at zero */
-        acb_theta_dist_a0(dist0, z, tau, lp);
+        acb_theta_dist_a0(d0, z, tau, lp);
         for (j = 0; j < 3; j++)
         {
             _acb_vec_scalar_mul_ui(x, t, g, j, prec);
@@ -69,7 +69,7 @@ int main(void)
         {
             acb_urandom(&z[k], state, prec);
         }
-        acb_theta_dist_a0(dist, z, tau, lp);
+        acb_theta_dist_a0(d, z, tau, lp);
         for (j = 0; j < 3; j++)
         {
             _acb_vec_scalar_mul_ui(x, t, g, j, prec);
@@ -93,12 +93,12 @@ int main(void)
                 acb_theta_naive_fixed_ab(&test[j * n + k], k << g, x, 1, tau, prec);
                 if (j > 0)
                 {
-                    acb_set_round(&roots[(j - 1) * n + k], &test[j * n + k], lp);
+                    acb_set_round(&rts[(j - 1) * n + k], &test[j * n + k], lp);
                 }
             }
         }
 
-        acb_theta_ql_step_3(r, th0, th, roots, dist0, dist, g, prec);
+        acb_theta_ql_step_3(r, th0, th, rts, d0, d, g, prec);
 
         if (!acb_is_finite(&r[0]) || !_acb_vec_overlaps(r, test, 3 * n))
         {
@@ -121,9 +121,9 @@ int main(void)
         _acb_vec_clear(test, 3 * n);
         _acb_vec_clear(th, 3 * n);
         _acb_vec_clear(th0, 3 * n);
-        _acb_vec_clear(roots, 2 * n);
-        _arb_vec_clear(dist, n);
-        _arb_vec_clear(dist0, n);
+        _acb_vec_clear(rts, 2 * n);
+        _arb_vec_clear(d, n);
+        _arb_vec_clear(d0, n);
     }
 
     flint_randclear(state);

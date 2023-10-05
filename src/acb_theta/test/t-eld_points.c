@@ -25,9 +25,9 @@ int main(void)
     {
         slong g = 1 + n_randint(state, 4);
         acb_theta_eld_t E;
-        arb_mat_t cho;
+        arb_mat_t C;
         arf_t R2;
-        arb_ptr offset;
+        arb_ptr v;
         slong prec = ACB_THETA_LOW_PREC;
         slong mag_bits = n_randint(state, 2);
         slong k, j;
@@ -39,26 +39,26 @@ int main(void)
         arb_t sqr, sum;
 
         acb_theta_eld_init(E, g, g);
-        arb_mat_init(cho, g, g);
+        arb_mat_init(C, g, g);
         arf_init(R2);
-        offset = _arb_vec_init(g);
+        v = _arb_vec_init(g);
         pt = flint_malloc(g * sizeof(slong));
         arb_mat_init(vec, g, 1);
         arb_init(sqr);
         arb_init(sum);
 
-        arb_mat_randtest_cho(cho, state, prec, mag_bits);
-        arb_mat_transpose(cho, cho);
+        arb_mat_randtest_cho(C, state, prec, mag_bits);
+        arb_mat_transpose(C, C);
         arb_randtest_positive(sqr, state, prec, mag_bits);   /* Use as temp */
         arf_set(R2, arb_midref(sqr));
         arf_mul_si(R2, R2, 1 + n_randint(state, 10), prec, ARF_RND_UP);
 
         for (k = 0; k < g; k++)
         {
-            arb_randtest_precise(&offset[k], state, prec, mag_bits);
+            arb_randtest_precise(&v[k], state, prec, mag_bits);
         }
 
-        acb_theta_eld_fill(E, cho, R2, offset);
+        acb_theta_eld_fill(E, C, R2, v);
         all_pts = flint_malloc(acb_theta_eld_nb_pts(E) * g * sizeof(slong));
         acb_theta_eld_points(all_pts, E);
 
@@ -127,12 +127,12 @@ int main(void)
                     arb_set_si(arb_mat_entry(vec, k, 0), pt[k]);
                 }
 
-                arb_mat_mul(vec, cho, vec, prec);
+                arb_mat_mul(vec, C, vec, prec);
                 arb_zero(sum);
                 for (k = 0; k < g; k++)
                 {
                     arb_add(arb_mat_entry(vec, k, 0),
-                            arb_mat_entry(vec, k, 0), &offset[k], prec);
+                            arb_mat_entry(vec, k, 0), &v[k], prec);
                     arb_sqr(sqr, arb_mat_entry(vec, k, 0), prec);
                     arb_add(sum, sum, sqr, prec);
                 }
@@ -145,7 +145,7 @@ int main(void)
                         flint_printf("%wd ", pt[j]);
                     }
                     flint_printf("\nCholesky:\n");
-                    arb_mat_printd(cho, 10);
+                    arb_mat_printd(C, 10);
                     flint_printf("Norm of point: ");
                     arb_printd(sum, 10);
                     flint_printf("\nCoordinates:\n");
@@ -160,7 +160,7 @@ int main(void)
                     flint_printf("Offset:\n");
                     for (j = 0; j < g; j++)
                     {
-                        arb_printd(&offset[j], 10);
+                        arb_printd(&v[j], 10);
                         flint_printf("\n");
                     }
                     flint_printf("Points:\n");
@@ -180,9 +180,9 @@ int main(void)
         }
 
         acb_theta_eld_clear(E);
-        arb_mat_clear(cho);
+        arb_mat_clear(C);
         arf_clear(R2);
-        _arb_vec_clear(offset, g);
+        _arb_vec_clear(v, g);
         flint_free(all_pts);
         flint_free(pt);
         arb_mat_clear(vec);

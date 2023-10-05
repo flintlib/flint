@@ -33,35 +33,35 @@ int main(void)
         arb_ptr u;
         acb_t term;
         arb_t abs, sum;
-        slong nb_z = 1 + n_randint(state, 4);
+        slong nbz = 1 + n_randint(state, 4);
         slong nb_pts;
         slong* pts;
         slong k, j;
 
         acb_mat_init(tau, g, g);
         acb_theta_eld_init(E, g, g);
-        z = _acb_vec_init(g * nb_z);
-        new_z = _acb_vec_init(g * nb_z);
-        c = _acb_vec_init(nb_z);
-        u = _arb_vec_init(nb_z);
+        z = _acb_vec_init(g * nbz);
+        new_z = _acb_vec_init(g * nbz);
+        c = _acb_vec_init(nbz);
+        u = _arb_vec_init(nbz);
         acb_init(term);
         arb_init(abs);
         arb_init(sum);
 
         acb_siegel_randtest_reduced(tau, state, prec, bits);
-        for (k = 0; k < g * nb_z; k++)
+        for (k = 0; k < g * nbz; k++)
         {
             acb_randtest_precise(&z[k], state, prec, bits);
         }
 
         /* Test: sum of terms on the border is less than u */
-        acb_theta_naive_ellipsoid(E, new_z, c, u, z, nb_z, tau, prec);
+        acb_theta_naive_ellipsoid(E, new_z, c, u, z, nbz, tau, prec);
         nb_pts = acb_theta_eld_nb_border(E);
         pts = flint_malloc(g * nb_pts * sizeof(slong));
         acb_theta_eld_border(pts, E);
 
         arb_zero(sum);
-        for (j = 0; j < nb_z; j++)
+        for (j = 0; j < nbz; j++)
         {
             arb_zero(sum);
             for (k = 0; k < nb_pts; k++)
@@ -91,10 +91,10 @@ int main(void)
 
         acb_mat_clear(tau);
         acb_theta_eld_clear(E);
-        _acb_vec_clear(z, g * nb_z);
-        _acb_vec_clear(new_z, g * nb_z);
-        _acb_vec_clear(c, nb_z);
-        _arb_vec_clear(u, nb_z);
+        _acb_vec_clear(z, g * nbz);
+        _acb_vec_clear(new_z, g * nbz);
+        _acb_vec_clear(c, nbz);
+        _arb_vec_clear(u, nbz);
         acb_clear(term);
         arb_clear(abs);
         arb_clear(sum);

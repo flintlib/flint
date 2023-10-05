@@ -31,14 +31,14 @@ int main(void)
         slong bits = n_randint(state, 5);
         acb_mat_t tau;
         acb_ptr z;
-        arb_ptr dist;
+        arb_ptr d;
         arb_t c;
         ulong a = n_randint(state, n);
         slong k;
 
         acb_mat_init(tau, g, g);
         z = _acb_vec_init(g);
-        dist = _arb_vec_init(n);
+        d = _arb_vec_init(n);
         arb_init(c);
 
         acb_siegel_randtest_reduced(tau, state, hprec, bits);
@@ -50,21 +50,21 @@ int main(void)
             acb_add_arb(&z[k], &z[k], c, prec);
         }
 
-        acb_theta_dist_a0(dist, z, tau, prec);
+        acb_theta_dist_a0(d, z, tau, prec);
 
-        if (!arb_contains_zero(&dist[a]))
+        if (!arb_contains_zero(&d[a]))
         {
             flint_printf("FAIL\n");
             flint_printf("g = %wd, a = %wd, tau:\n", g, a);
             acb_mat_printd(tau, 5);
             flint_printf("distances:\n");
-            _arb_vec_printd(dist, n, 5);
+            _arb_vec_printd(d, n, 5);
             flint_abort();
         }
 
         acb_mat_clear(tau);
         _acb_vec_clear(z, g);
-        _arb_vec_clear(dist, n);
+        _arb_vec_clear(d, n);
         arb_clear(c);
     }
 

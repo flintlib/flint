@@ -30,8 +30,8 @@ int main(void)
         slong prec = 100;
         acb_mat_t tau;
         acb_ptr z;
-        acb_ptr r, test, th, th0, roots;
-        arb_ptr dist, dist0;
+        acb_ptr r, test, th, th0, rts;
+        arb_ptr d, d0;
         slong k;
 
         acb_mat_init(tau, g, g);
@@ -40,15 +40,15 @@ int main(void)
         test = _acb_vec_init(n);
         th = _acb_vec_init(n);
         th0 = _acb_vec_init(n);
-        roots = _acb_vec_init(n);
-        dist = _arb_vec_init(n);
-        dist0 = _arb_vec_init(n);
+        rts = _acb_vec_init(n);
+        d = _arb_vec_init(n);
+        d0 = _arb_vec_init(n);
 
         acb_siegel_randtest_nice(tau, state, prec);
         acb_mat_scalar_mul_2exp_si(tau, tau, 1);
 
         /* Get input at zero */
-        acb_theta_dist_a0(dist0, z, tau, lp);
+        acb_theta_dist_a0(d0, z, tau, lp);
         for (k = 0; k < n; k++)
         {
             acb_theta_naive_fixed_ab(&th0[k], k << g, z, 1, tau, prec);
@@ -59,7 +59,7 @@ int main(void)
         {
             acb_urandom(&z[k], state, prec);
         }
-        acb_theta_dist_a0(dist, z, tau, lp);
+        acb_theta_dist_a0(d, z, tau, lp);
         for (k = 0; k < n; k++)
         {
             acb_theta_naive_fixed_ab(&th[k], k << g, z, 1, tau, prec);
@@ -71,10 +71,10 @@ int main(void)
         for (k = 0; k < n; k++)
         {
             acb_theta_naive_fixed_ab(&test[k], k << g, z, 1, tau, prec);
-            acb_set_round(&roots[k], &test[k], lp);
+            acb_set_round(&rts[k], &test[k], lp);
         }
 
-        acb_theta_ql_step_1(r, th0, th, roots, dist0, dist, g, prec);
+        acb_theta_ql_step_1(r, th0, th, rts, d0, d, g, prec);
 
         if (!acb_is_finite(&r[0]) || !_acb_vec_overlaps(r, test, n))
         {
@@ -95,9 +95,9 @@ int main(void)
         _acb_vec_clear(test, n);
         _acb_vec_clear(th, n);
         _acb_vec_clear(th0, n);
-        _acb_vec_clear(roots, n);
-        _arb_vec_clear(dist, n);
-        _arb_vec_clear(dist0, n);
+        _acb_vec_clear(rts, n);
+        _arb_vec_clear(d, n);
+        _arb_vec_clear(d0, n);
     }
 
     flint_randclear(state);

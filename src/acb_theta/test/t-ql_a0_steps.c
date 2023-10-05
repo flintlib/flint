@@ -26,19 +26,19 @@ int main(void)
     {
         slong g = 2 + n_randint(state, 2);
         slong n = 1 << g;
-        slong d = 1 + n_randint(state, g - 1);
+        slong s = 1 + n_randint(state, g - 1);
         slong nb_steps = n_randint(state, 5);
-        int has_t = iter % 2;
-        int has_z = (iter % 4) / 2;
-        slong nbt = (has_t ? 3 : 1);
-        slong nbz = (has_z ? 2 : 1);
+        int hast = iter % 2;
+        int hasz = (iter % 4) / 2;
+        slong nbt = (hast ? 3 : 1);
+        slong nbz = (hasz ? 2 : 1);
         slong prec = 200 + n_randint(state, 500);
         slong hprec = prec + 50;
         slong guard = ACB_THETA_LOW_PREC;
         slong lp = ACB_THETA_LOW_PREC;
         acb_mat_t tau;
         acb_ptr z, zero, t, r, test;
-        arb_ptr dist, dist0;
+        arb_ptr d, d0;
         slong j, k;
         int res;
 
@@ -48,13 +48,13 @@ int main(void)
         t = _acb_vec_init(g);
         r = _acb_vec_init(nbz * nbt * n);
         test = _acb_vec_init(nbz * nbt * n);
-        dist = _arb_vec_init(n);
-        dist0 = _arb_vec_init(n);
+        d = _arb_vec_init(n);
+        d0 = _arb_vec_init(n);
 
         acb_siegel_randtest_nice(tau, state, hprec);
-        for (k = d; k < g; k++)
+        for (k = s; k < g; k++)
         {
-            for (j = d; j < g; j++)
+            for (j = s; j < g; j++)
             {
                 acb_mul_2exp_si(acb_mat_entry(tau, j, k),
                     acb_mat_entry(tau, j, k), 6);
@@ -62,27 +62,27 @@ int main(void)
         }
         for (k = 0; k < g; k++)
         {
-            if (has_z)
+            if (hasz)
             {
                 acb_urandom(&z[k], state, hprec);
             }
-            if (has_t)
+            if (hast)
             {
                 arb_urandom(acb_realref(&t[k]), state, hprec);
             }
         }
-        acb_theta_dist_a0(dist, z, tau, lp);
-        acb_theta_dist_a0(dist0, zero, tau, lp);
+        acb_theta_dist_a0(d, z, tau, lp);
+        acb_theta_dist_a0(d0, zero, tau, lp);
 
-        res = acb_theta_ql_a0_steps(r, t, z, dist0, dist, tau, nb_steps, d,
+        res = acb_theta_ql_a0_steps(r, t, z, d0, d, tau, nb_steps, s,
             guard, prec, &acb_theta_ql_a0_naive);
-        acb_theta_ql_a0_naive(test, t, z, dist0, dist, tau, guard, hprec);
+        acb_theta_ql_a0_naive(test, t, z, d0, d, tau, guard, hprec);
 
         if (res && !_acb_vec_overlaps(r, test, nbz * nbt * n))
         {
             flint_printf("FAIL\n");
-            flint_printf("g = %wd, prec = %wd, d = %wd, has_z = %wd, has_t = %wd, tau:\n",
-                g, prec, d, has_z, has_t);
+            flint_printf("g = %wd, prec = %wd, s = %wd, hasz = %wd, hast = %wd, tau:\n",
+                g, prec, s, hasz, hast);
             acb_mat_printd(tau, 5);
             flint_printf("output:\n");
             _acb_vec_printd(r, nbz * nbt * n, 5);
@@ -96,8 +96,8 @@ int main(void)
         _acb_vec_clear(t, g);
         _acb_vec_clear(r, nbz * nbt * n);
         _acb_vec_clear(test, nbz * nbt * n);
-        _arb_vec_clear(dist, n);
-        _arb_vec_clear(dist0, n);
+        _arb_vec_clear(d, n);
+        _arb_vec_clear(d0, n);
     }
 
     flint_randclear(state);
