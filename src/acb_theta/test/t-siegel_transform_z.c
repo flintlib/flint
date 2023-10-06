@@ -21,6 +21,8 @@ int main(void)
 
     flint_randinit(state);
 
+    /* Test: matches siegel_transform, inverse matrix gives inverse
+       transformation */
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 10);

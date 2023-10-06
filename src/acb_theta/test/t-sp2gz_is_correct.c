@@ -21,6 +21,7 @@ int main(void)
 
     flint_randinit(state);
 
+    /* Test: return 1 on various kinds of symplectic matrices */
     for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 10);

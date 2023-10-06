@@ -21,8 +21,8 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: mat is symplectic; upper left imag entry is not less than 1/2,
-       and real part is reduced */
+    /* Test: mat is symplectic, upper left imag entry is at least 1/2, and real
+       part is reduced */
     for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 4);
@@ -47,7 +47,6 @@ int main(void)
         {
             flint_printf("FAIL (symplectic)\n");
             fmpz_mat_print(mat);
-            fflush(stdout);
             flint_abort();
         }
 
@@ -74,7 +73,6 @@ int main(void)
             fmpz_mat_print_pretty(mat);
             flint_printf("\n");
             acb_mat_printd(res, 10);
-            fflush(stdout);
             flint_abort();
         }
 

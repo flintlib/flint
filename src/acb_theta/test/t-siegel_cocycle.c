@@ -21,6 +21,7 @@ int main(void)
 
     flint_randinit(state);
 
+    /* Test: chain rule */
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 10);

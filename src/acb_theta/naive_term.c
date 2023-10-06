@@ -18,6 +18,7 @@ acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong* n, slo
     arb_ptr x, y, v;
     arb_mat_t X, Y;
     acb_t dot;
+    fmpz_t m, t;
     slong k;
 
     x = _arb_vec_init(g);
@@ -26,6 +27,8 @@ acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong* n, slo
     arb_mat_init(X, g, g);
     arb_mat_init(Y, g, g);
     acb_init(dot);
+    fmpz_init(m);
+    fmpz_init(t);
 
     _acb_vec_get_real(x, z, g);
     _acb_vec_get_imag(y, z, g);
@@ -45,10 +48,21 @@ acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong* n, slo
     acb_add(res, res, dot, prec);
     acb_exp_pi_i(res, res, prec);
 
+    fmpz_one(m);
+    for (k = 0; k < g; k++)
+    {
+        fmpz_set_si(t, n[k]);
+        fmpz_pow_ui(t, t, tup[k]);
+        fmpz_mul(m, m, t);
+    }
+    acb_mul_fmpz(res, res, m, prec);
+
     _arb_vec_clear(x, g);
     _arb_vec_clear(y, g);
     _arb_vec_clear(v, g);
     arb_mat_clear(X);
     arb_mat_clear(Y);
     acb_clear(dot);
+    fmpz_clear(m);
+    fmpz_clear(t);
 }

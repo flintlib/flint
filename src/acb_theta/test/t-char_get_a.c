@@ -21,7 +21,7 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: various dots are the same */
+    /* Test: inverse of char_get_slong */
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         slong g = n_randint(state, 10);

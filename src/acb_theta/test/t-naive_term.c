@@ -28,6 +28,7 @@ int main(void)
         slong prec = 100 + n_randint(state, 200);
         slong bits = n_randint(state, 5);
         slong n = n_randint(state, 100);
+        slong k = n_randint(state, 10);
         acb_mat_t tau;
         acb_t z;
         acb_t x, t;
@@ -40,11 +41,14 @@ int main(void)
         acb_siegel_randtest(tau, state, prec, bits);
         acb_randtest_precise(z, state, prec, bits);
 
-        acb_theta_naive_term(x, z, tau, &n, prec);
+        acb_theta_naive_term(x, z, tau, &k, &n, prec);
         acb_mul_si(t, acb_mat_entry(tau, 0, 0), n, prec);
         acb_addmul_si(t, z, 2, prec);
         acb_mul_si(t, t, n, prec);
         acb_exp_pi_i(t, t, prec);
+
+        fmpz_pow_ui(n, n, k);
+        acb_mul(t, t, n, prec);
 
         if (!acb_overlaps(x, t))
         {

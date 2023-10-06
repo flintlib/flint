@@ -21,6 +21,7 @@ int main(void)
 
     flint_randinit(state);
 
+    /* Test: set_abcd is inverse of get_abcd */
     for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 10);

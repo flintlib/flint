@@ -21,15 +21,19 @@ int main(void)
 
     flint_randinit(state);
 
+    /* Test: all ellipsoid points must be within the box
+       Then, generate random points:
+       - points inside ellipsoid must appear in all_pts
+       - points outside ellipsoid must have norm greater than R2 */
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 4);
+        slong prec = ACB_THETA_LOW_PREC;
+        slong mag_bits = n_randint(state, 2);
         acb_theta_eld_t E;
         arb_mat_t C;
         arf_t R2;
         arb_ptr v;
-        slong prec = ACB_THETA_LOW_PREC;
-        slong mag_bits = n_randint(state, 2);
         slong k, j;
         slong try;
         slong *all_pts;
@@ -49,7 +53,7 @@ int main(void)
 
         arb_mat_randtest_cho(C, state, prec, mag_bits);
         arb_mat_transpose(C, C);
-        arb_randtest_positive(sqr, state, prec, mag_bits);   /* Use as temp */
+        arb_randtest_positive(sqr, state, prec, mag_bits);
         arf_set(R2, arb_midref(sqr));
         arf_mul_si(R2, R2, 1 + n_randint(state, 10), prec, ARF_RND_UP);
 
@@ -62,13 +66,6 @@ int main(void)
         all_pts = flint_malloc(acb_theta_eld_nb_pts(E) * g * sizeof(slong));
         acb_theta_eld_points(all_pts, E);
 
-        /* Test:
-           - all ellipsoid points must be within the box
-           Then, generate random points:
-           - points inside ellipsoid must appear in all_pts
-           - points outside ellipsoid must have norm greater than R2
-         */
-
         for (k = 0; k < acb_theta_eld_nb_pts(E); k++)
         {
             for (j = 0; j < g; j++)
@@ -77,7 +74,6 @@ int main(void)
                 {
                     flint_printf("FAIL: point outside box\n");
                     flint_printf("\n");
-                    fflush(stdout);
                     flint_abort();
                 }
             }
@@ -114,7 +110,6 @@ int main(void)
                     {
                         flint_printf("%wd ", pt[j]);
                     }
-                    fflush(stdout);
                     flint_abort();
                 }
             }
@@ -173,7 +168,6 @@ int main(void)
 
                         flint_printf("\n");
                     }
-                    fflush(stdout);
                     flint_abort();
                 }
             }

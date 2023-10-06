@@ -21,6 +21,7 @@ int main(void)
 
     flint_randinit(state);
 
+    /* Test: check output on intervals with/without a guaranteed point */
     for (iter = 0; iter < 2000 * flint_test_multiplier(); iter++)
     {
         slong prec = ACB_THETA_LOW_PREC;
