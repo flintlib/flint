@@ -21,7 +21,7 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: agrees with usual jet_naive at the right indices, up to pi*i */
+    /* Test: agrees with usual jet_naive at the right indices */
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         slong g = 2;

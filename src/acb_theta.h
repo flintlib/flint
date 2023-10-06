@@ -66,8 +66,6 @@ void acb_siegel_transform(acb_mat_t w, const fmpz_mat_t mat, const acb_mat_t tau
 void acb_siegel_transform_z(acb_ptr r, acb_mat_t w, const fmpz_mat_t mat,
     acb_srcptr z, const acb_mat_t tau, slong prec);
 
-void acb_siegel_reduce_imag(fmpz_mat_t mat, const acb_mat_t tau, slong prec);
-void acb_siegel_reduce_real(fmpz_mat_t mat, const acb_mat_t tau);
 void acb_siegel_reduce(fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 
 void acb_siegel_randtest(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits);

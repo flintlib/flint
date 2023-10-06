@@ -42,6 +42,40 @@ acb_siegel_reduce_real_lowprec(const mag_t ntau, const mag_t nmat, slong g, slon
     return res;
 }
 
+static void
+acb_siegel_reduce_real(fmpz_mat_t mat, const acb_mat_t tau)
+{
+    slong g = acb_mat_nrows(tau);
+    slong j, k;
+    fmpz_t c;
+
+    if (!acb_mat_is_finite(tau))
+    {
+        fmpz_mat_zero(mat);
+        return;
+    }
+
+    fmpz_init(c);
+
+    fmpz_mat_one(mat);
+    for (j = 0; j < g; j++)
+    {
+        for (k = j; k < g; k++)
+        {
+            arf_get_fmpz(c, arb_midref(acb_realref(acb_mat_entry(tau, j, k))),
+                         ARF_RND_NEAR);
+            fmpz_neg(fmpz_mat_entry(mat, j, k + g), c);
+        }
+        for (k = 0; k < j; k++)
+        {
+            fmpz_set(fmpz_mat_entry(mat, j, k + g),
+                     fmpz_mat_entry(mat, k, j + g));
+        }
+    }
+
+    fmpz_clear(c);
+}
+
 static slong
 acb_siegel_reduce_imag_lowprec(const mag_t ntau, const mag_t ndet, const mag_t nmat,
     slong g, slong prec)
@@ -59,6 +93,24 @@ acb_siegel_reduce_imag_lowprec(const mag_t ntau, const mag_t ndet, const mag_t n
     mag_clear(b);
 
     return res;
+}
+
+static void
+acb_siegel_reduce_imag(fmpz_mat_t mat, const acb_mat_t tau, slong prec)
+{
+    slong g = acb_mat_nrows(tau);
+    arb_mat_t im;
+    fmpz_mat_t U;
+
+    arb_mat_init(im, g, g);
+    fmpz_mat_init(U, g, g);
+
+    acb_mat_get_imag(im, tau);
+    arb_mat_spd_lll_reduce(U, im, prec);
+    sp2gz_block_diag(mat, U);
+
+    arb_mat_clear(im);
+    fmpz_mat_clear(U);
 }
 
 void
