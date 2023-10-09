@@ -39,6 +39,8 @@
     Note that the formula degenerates for $j = 0$ and $j = n$
     and so in this case we use that the leading (resp.\ constant)
     term of $g$ divides the leading (resp.\ constant) term of $f$.
+
+    [Coh1996] Cohen, Henri : A course in computational algebraic number theory, Springer, 1996
  */
 void _fmpz_poly_factor_mignotte(fmpz_t B, const fmpz *f, slong m)
 {
