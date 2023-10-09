@@ -23,6 +23,18 @@ void fmpq_mpoly_push_term_fmpq_fmpz(fmpq_mpoly_t A,
     fmpq_clear(C);
 }
 
+void fmpq_mpoly_push_term_fmpq_ffmpz(fmpq_mpoly_t A,
+                const fmpq_t c, const fmpz * exp, const fmpq_mpoly_ctx_t ctx)
+{
+    fmpq_t C;
+    fmpz_init_set(fmpq_numref(C), fmpq_numref(c));
+    fmpz_init_set(fmpq_denref(C), fmpq_denref(c));
+    _fmpq_mpoly_push_rescale(A, C, ctx);
+    _fmpz_mpoly_push_exp_ffmpz(A->zpoly, exp, ctx->zctx);
+    fmpz_swap(A->zpoly->coeffs + A->zpoly->length - 1, fmpq_numref(C));
+    fmpq_clear(C);
+}
+
 void fmpq_mpoly_push_term_fmpz_fmpz(fmpq_mpoly_t A,
                 const fmpz_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
 {
@@ -31,6 +43,18 @@ void fmpq_mpoly_push_term_fmpz_fmpz(fmpq_mpoly_t A,
     fmpz_init_set_ui(fmpq_denref(C), UWORD(1));
     _fmpq_mpoly_push_rescale(A, C, ctx);
     _fmpz_mpoly_push_exp_pfmpz(A->zpoly, exp, ctx->zctx);
+    fmpz_swap(A->zpoly->coeffs + A->zpoly->length - 1, fmpq_numref(C));
+    fmpq_clear(C);
+}
+
+void fmpq_mpoly_push_term_fmpz_ffmpz(fmpq_mpoly_t A, const fmpz_t c,
+                                  const fmpz *exp, const fmpq_mpoly_ctx_t ctx)
+{
+    fmpq_t C;
+    fmpz_init_set(fmpq_numref(C), c);
+    fmpz_init_set_ui(fmpq_denref(C), UWORD(1));
+    _fmpq_mpoly_push_rescale(A, C, ctx);
+    _fmpz_mpoly_push_exp_ffmpz(A->zpoly, exp, ctx->zctx);
     fmpz_swap(A->zpoly->coeffs + A->zpoly->length - 1, fmpq_numref(C));
     fmpq_clear(C);
 }
@@ -47,6 +71,18 @@ void fmpq_mpoly_push_term_ui_fmpz(fmpq_mpoly_t A,
     fmpq_clear(C);
 }
 
+void fmpq_mpoly_push_term_ui_ffmpz(fmpq_mpoly_t A,
+                       ulong c, const fmpz * exp, const fmpq_mpoly_ctx_t ctx)
+{
+    fmpq_t C;
+    fmpz_init_set_ui(fmpq_numref(C), c);
+    fmpz_init_set_ui(fmpq_denref(C), UWORD(1));
+    _fmpq_mpoly_push_rescale(A, C, ctx);
+    _fmpz_mpoly_push_exp_ffmpz(A->zpoly, exp, ctx->zctx);
+    fmpz_swap(A->zpoly->coeffs + A->zpoly->length - 1, fmpq_numref(C));
+    fmpq_clear(C);
+}
+
 void fmpq_mpoly_push_term_si_fmpz(fmpq_mpoly_t A,
                        slong c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
 {
@@ -55,6 +91,18 @@ void fmpq_mpoly_push_term_si_fmpz(fmpq_mpoly_t A,
     fmpz_init_set_ui(fmpq_denref(C), UWORD(1));
     _fmpq_mpoly_push_rescale(A, C, ctx);
     _fmpz_mpoly_push_exp_pfmpz(A->zpoly, exp, ctx->zctx);
+    fmpz_swap(A->zpoly->coeffs + A->zpoly->length - 1, fmpq_numref(C));
+    fmpq_clear(C);
+}
+
+void fmpq_mpoly_push_term_si_ffmpz(fmpq_mpoly_t A,
+                       slong c, const fmpz * exp, const fmpq_mpoly_ctx_t ctx)
+{
+    fmpq_t C;
+    fmpz_init_set_si(fmpq_numref(C), c);
+    fmpz_init_set_ui(fmpq_denref(C), UWORD(1));
+    _fmpq_mpoly_push_rescale(A, C, ctx);
+    _fmpz_mpoly_push_exp_ffmpz(A->zpoly, exp, ctx->zctx);
     fmpz_swap(A->zpoly->coeffs + A->zpoly->length - 1, fmpq_numref(C));
     fmpq_clear(C);
 }
