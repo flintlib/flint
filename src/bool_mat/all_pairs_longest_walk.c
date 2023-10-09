@@ -20,7 +20,7 @@
 typedef struct
 {
     slong n; /* number of vertices in the original graph */
-    slong k; /* number of strongly connnected components (sccs) */
+    slong k; /* number of strongly connected components (sccs) */
     bool_mat_t C; /* adjacency matrix of the sccs in the condensation */
     slong *partition; /* maps the vertex index to the scc index */
 } _condensation_struct;
