@@ -26,8 +26,8 @@
     \begin{equation*}
     \abs{b_j} \leq \binom{n-1}{j} \abs{f} + \binom{n-1}{j-1} \abs{a_m}
     \end{equation*}
-    where $\abs{f}$ denotes the $2$-norm of $f$.  This bound
-    is due to Mignotte, see e.g., Cohen p.\ 134.
+    where $\abs{f}$ denotes the $2$-norm of $f$.
+    This bound is due to Mignotte, see [Coh1996] page 133.
 
     This function sets $B$ such that, for all $0 \leq j \leq \deg(g)$,
     $\abs{b_j} \leq B$.
