@@ -87,6 +87,8 @@ int main(void)
     fmpz_clear(sum);
     fmpz_clear(fac);
 
+    FLINT_TEST_CLEANUP(state);
+
     flint_printf("PASS\n");
     return 0;
 }
