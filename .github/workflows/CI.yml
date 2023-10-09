@@ -25,7 +25,7 @@ jobs:
       TESTCFLAGS: "-Wall -O1"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: "Setup"
         run: |
@@ -85,7 +85,7 @@ jobs:
       CFLAGS: "-Wall -Werror=implicit-function-declaration"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: "Setup"
         run: |
@@ -139,7 +139,7 @@ jobs:
       CC: "gcc"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: "Setup"
         run: |
@@ -193,7 +193,7 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: "Run tests on FreeBSD"
         uses: cross-platform-actions/action@v0.10.0
@@ -292,7 +292,7 @@ jobs:
       CC: "gcc"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: "Set up Cygwin"
         uses: gap-actions/setup-cygwin@v1
@@ -354,7 +354,7 @@ jobs:
       EXTRA_OPTIONS: "--disable-static --enable-shared"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: "Setup"
         run: |
@@ -408,7 +408,7 @@ jobs:
       CFLAGS: "-Wall"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: "Setup"
         run: |
@@ -457,7 +457,7 @@ jobs:
       CC: "gcc"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: "Setup MinGW"
         uses: msys2/setup-msys2@v2
@@ -507,7 +507,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: "Setup Conda"
         uses: conda-incubator/setup-miniconda@v2.2.0
@@ -570,7 +570,7 @@ jobs:
       CC: "gcc"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: "Setup"
         run: |
