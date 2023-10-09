@@ -423,7 +423,6 @@ void worker(slong x, work_t * work)
 
     xnum = work->xnum;
     ynum = work->ynum;
-    ynum = ynum; /* unused */
     y = work->y;
 
     for (prec = 30; prec < 500; prec *= 2)
