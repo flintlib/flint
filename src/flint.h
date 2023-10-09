@@ -26,7 +26,11 @@
 
 #include <limits.h>
 #include <gmp.h>
-#include "flint-config.h"
+#ifdef BUILDING_FLINT
+# include "config.h"
+#else
+# include "flint-config.h"
+#endif
 
 #if FLINT_USES_GC
 # include "gc.h"

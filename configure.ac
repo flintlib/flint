@@ -122,7 +122,7 @@ dnl AC_CANONICAL_HOST
 # configure headers
 ################################################################################
 
-AC_CONFIG_HEADERS(src/flint-config.h:src/config.h.in)
+AC_CONFIG_HEADERS(src/config.h src/flint-config.h)
 
 ################################################################################
 # features

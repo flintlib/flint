@@ -77,7 +77,7 @@ NTL_LIB_PATH:=@NTL_LIB_PATH@
 
 CFLAGS:=@CFLAGS@
 TESTCFLAGS:=@TESTCFLAGS@
-CPPFLAGS:=@CPPFLAGS@
+CPPFLAGS:=@CPPFLAGS@ -DBUILDING_FLINT
 CPPFLAGS2:=-L$(FLINT_DIR) $(CPPFLAGS)
 LIB_CPPFLAGS:=@LIB_CPPFLAGS@
 CXXFLAGS:=@CXXFLAGS@
@@ -100,7 +100,8 @@ EXE_LDFLAGS:=$(LDFLAGS) $(foreach path, $(ABS_FLINT_DIR) $(GMP_LIB_PATH) $(MPFR_
 ################################################################################
 
 CFG_FILES :=                                                                \
-        $(FLINT_DIR)/config.log         $(SRC_DIR)/flint-config.h           \
+        $(FLINT_DIR)/config.h           $(SRC_DIR)/flint-config.h           \
+        $(FLINT_DIR)/config.log                                             \
         $(SRC_DIR)/fft_tuning.h         $(FLINT_DIR)/flint.pc               \
         $(FLINT_DIR)/Makefile           $(SRC_DIR)/fmpz/fmpz.c
 
