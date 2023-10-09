@@ -53,8 +53,8 @@ _fmpz_mod_vec_set_fmpz_vec(fmpz * A, const fmpz * B, slong len,
         slong bits = fmpz_bits(fmpz_mod_ctx_modulus(ctx));
 
         if ((len >= 10000 ||
-            (bits >= 20000 && fabs(_fmpz_vec_max_bits(B, len)) >= 20000) ||
-                (len * (double) bits >= 400000 && len * fabs(_fmpz_vec_max_bits(B, len)) >= 400000)) &&
+            (bits >= 20000 && labs(_fmpz_vec_max_bits(B, len)) >= 20000) ||
+                (len * (double) bits >= 400000 && len * labs(_fmpz_vec_max_bits(B, len)) >= 400000)) &&
             flint_get_num_threads() >= 2)
         {
             _fmpz_mod_vec_set_fmpz_vec_threaded(A, B, len, ctx);
