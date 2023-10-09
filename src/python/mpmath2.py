@@ -1,7 +1,7 @@
 # just for fun
 
 from mpmath.ctx_base import StandardBaseContext
-import flint2
+import flint
 
 import mpmath.libmp
 from mpmath.libmp import prec_to_dps, dps_to_prec
@@ -310,7 +310,7 @@ class RFContext(StandardBaseContext):
     '''
 
 
-mp = RFContext(flint2.RF, flint2.CF, flint2.QQ, flint2.ZZ)
+mp = RFContext(flint.RF, flint.CF, flint.QQ, flint.ZZ)
 
 sqrt = mp.sqrt
 log = mp.log

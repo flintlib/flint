@@ -1,6 +1,6 @@
-import flint2
+import flint
 
-CC = flint2.CC
+CC = flint.CC
 
 __exclude = set(["prec"])
 
