@@ -1,8 +1,18 @@
 name: CI
 
+on:
+  pull_request:
+  push:
+    branches:
+      - trunk
+      - flint-*
 
-on: [push, pull_request]
-
+concurrency:
+  # group by workflow and ref; the last slightly strange component ensures that for pull
+  # requests, we limit to 1 concurrent job, but for the trunk branch we don't
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/trunk' || github.run_number }}
+  # Cancel intermediate builds, but only if it is a pull request build.
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
 jobs:
   ##############################################################################
@@ -19,7 +29,7 @@ jobs:
       TESTCFLAGS: "-Wall -O1"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: "Setup"
         run: |
@@ -79,7 +89,7 @@ jobs:
       CFLAGS: "-Wall -Werror=implicit-function-declaration"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: "Setup"
         run: |
@@ -133,7 +143,7 @@ jobs:
       CC: "gcc"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: "Setup"
         run: |
@@ -187,7 +197,7 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: "Run tests on FreeBSD"
         uses: cross-platform-actions/action@v0.10.0
@@ -280,13 +290,13 @@ jobs:
 
     env:
       MAKE: "make -j --output-sync=target"
-      REPO: /cygdrive/d/a/flint2/flint2 # FIXME: De-hardcode this
+      REPO: /cygdrive/d/a/flint/flint # FIXME: De-hardcode this
       CFLAGS: "-Wall"
       EXTRA_OPTIONS: "--enable-shared --disable-static"
       CC: "gcc"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: "Set up Cygwin"
         uses: gap-actions/setup-cygwin@v1
@@ -348,7 +358,7 @@ jobs:
       EXTRA_OPTIONS: "--disable-static --enable-shared"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: "Setup"
         run: |
@@ -402,7 +412,7 @@ jobs:
       CFLAGS: "-Wall"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: "Setup"
         run: |
@@ -451,7 +461,7 @@ jobs:
       CC: "gcc"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: "Setup MinGW"
         uses: msys2/setup-msys2@v2
@@ -501,7 +511,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: "Setup Conda"
         uses: conda-incubator/setup-miniconda@v2.2.0
@@ -564,7 +574,7 @@ jobs:
       CC: "gcc"
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: "Setup"
         run: |

@@ -31,7 +31,7 @@ AC_PREREQ(2.59)
 
 define(FLINT_VERSION,[3.0.0-dev])
 
-AC_INIT(FLINT, FLINT_VERSION, [https://github.com/flintlib/flint2/issues/], flint, [https://flintlib.org/])
+AC_INIT(FLINT, FLINT_VERSION, [https://github.com/flintlib/flint/issues/], flint, [https://flintlib.org/])
 AC_CONFIG_AUX_DIR([config])
 AC_LANG(C)
 
@@ -493,7 +493,7 @@ case "$host_os" in
         flint_lib="libflint.dylib"
         flint_lib_major="libflint.$FLINT_MAJOR_SO.dylib"
         flint_lib_full="libflint.$FLINT_MAJOR_SO.$FLINT_MINOR_SO.dylib"
-        extra_shared_flags="-install_name `pwd`/$flint_lib_full -compatibility_version $FLINT_MAJOR_SO.$FLINT_MINOR_SO -current_version $FLINT_MAJOR_SO.$FLINT_MINOR_SO.$FLINT_PATCH_SO"
+        extra_shared_flags="-install_name '`pwd`/$flint_lib_full' -compatibility_version $FLINT_MAJOR_SO.$FLINT_MINOR_SO -current_version $FLINT_MAJOR_SO.$FLINT_MINOR_SO.$FLINT_PATCH_SO"
         flint_dylib="yes"
         ;;
     cygwin|mingw*|msys)
@@ -661,7 +661,7 @@ AC_CHECK_LIB(m,fabs,
 AC_CHECK_LIB(gmp,__gmpz_init,
 [LIBS="-lgmp $LIBS"],
 [AC_MSG_ERROR([GMP library was not found.  If you indeed have GMP installed, please
-submit a bug report to <https://github.com/flintlib/flint2/issues/> so
+submit a bug report to <https://github.com/flintlib/flint/issues/> so
 that we can either fix the issue or give a more proper error message.])])
 
 if test "$enable_gmp_internals" = "yes";
@@ -679,7 +679,7 @@ fi
 AC_CHECK_LIB(mpfr,mpfr_init,
 [LIBS="-lmpfr $LIBS"],
 [AC_MSG_ERROR([MPFR library was not found.  If you indeed have MPFR installed, please
-submit a bug report to <https://github.com/flintlib/flint2/issues/> so
+submit a bug report to <https://github.com/flintlib/flint/issues/> so
 that we can either fix the issue or give a more proper error message.])])
 
 if test "$enable_pthread" = "yes";
@@ -703,7 +703,7 @@ then
      [AC_CHECK_LIB(blas,cblas_dgemm,
       [LIBS="-lblas $LIBS"],
       [AC_MSG_ERROR([BLAS library was not found.  If you indeed have BLAS installed, please
-submit a bug report to <https://github.com/flintlib/flint2/issues/> so
+submit a bug report to <https://github.com/flintlib/flint/issues/> so
 that we can either fix the issue or give a more proper error message.])]
       )]
      )]
@@ -729,7 +729,7 @@ std::cout << c << "\n";]
     [AC_MSG_RESULT([yes])],
     [AC_MSG_RESULT([no])
     AC_MSG_ERROR([NTL library was not found.  If you indeed have NTL installed, please
-submit a bug report to <https://github.com/flintlib/flint2/issues/> so
+submit a bug report to <https://github.com/flintlib/flint/issues/> so
 that we can either fix the issue or give a more proper error message.])])
     AC_LANG_POP
     LIBS="$SAVE_libs"
@@ -791,7 +791,7 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM(
 [AC_MSG_RESULT([yes])],
 [AC_MSG_RESULT([no])
 AC_MSG_ERROR([Couldn't find alloca, which is required for FLINT. Please submit a bug
-report to <https://github.com/flintlib/flint2/issues/> and specify your
+report to <https://github.com/flintlib/flint/issues/> and specify your
 operating system.])])
 
 AC_MSG_CHECKING([if $CC has popcount intrinsics])

@@ -65,6 +65,8 @@ pairs_append(pairs_t vec, slong i, slong j)
     vec->length++;
 }
 
+
+/*
 static void
 pairs_insert_unique(pairs_t vec, slong i, slong j)
 {
@@ -78,6 +80,7 @@ pairs_insert_unique(pairs_t vec, slong i, slong j)
 
     pairs_append(vec, i, j);
 }
+*/
 
 static pair_t
 fmpz_mpoly_select_pop_pair(pairs_t pairs, const fmpz_mpoly_vec_t G, const fmpz_mpoly_ctx_t ctx)
