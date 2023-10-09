@@ -217,6 +217,7 @@ SINGLE_HEADERS :=                                                           \
         flint.h         longlong.h      exception.h    gmpcompat.h          \
         hashmap.h       profiler.h      templates.h    flint-config.h       \
         fft_tuning.h                                                        \
+        crt_helpers.h                   machine_vectors.h                   \
                                                                             \
         limb_types.h                    mpoly_types.h                       \
         fmpz_types.h                    fmpq_types.h                        \
