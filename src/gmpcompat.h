@@ -896,6 +896,10 @@ int flint_mpf_fits_slong_p(mpf_srcptr f)
 
 #else
 
+/* defined in mpn_extras.h and used by flint_mpf_get_d_2exp below */
+double
+flint_mpn_get_d(mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp);
+
 /* double mpf_get_d_2exp (signed long int *exp, mpf_t src).
 
 Copyright 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
