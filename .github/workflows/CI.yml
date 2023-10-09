@@ -286,7 +286,7 @@ jobs:
 
     env:
       MAKE: "make -j --output-sync=target"
-      REPO: /cygdrive/d/a/flint2/flint2 # FIXME: De-hardcode this
+      REPO: /cygdrive/d/a/flint/flint # FIXME: De-hardcode this
       CFLAGS: "-Wall"
       EXTRA_OPTIONS: "--enable-shared --disable-static"
       CC: "gcc"
