@@ -127,7 +127,7 @@ HEADER_DIRS :=                                                              \
                                                                             \
         fq              fq_vec          fq_mat          fq_poly             \
         fq_nmod         fq_nmod_vec     fq_nmod_mat     fq_nmod_poly        \
-        fq_zech         fq_zech_vec     fq_zech_mat     fq_zech_poly        \
+        fq_zech                         fq_zech_mat     fq_zech_poly        \
         fq_default                      fq_default_mat  fq_default_poly     \
         fq_embed                                                            \
         fq_nmod_embed                                                       \
@@ -218,6 +218,8 @@ SINGLE_HEADERS :=                                                           \
         hashmap.h       profiler.h      templates.h    flint-config.h       \
         fft_tuning.h                                                        \
         crt_helpers.h                   machine_vectors.h                   \
+                                                                            \
+        fq_zech_vec.h                                                       \
                                                                             \
         limb_types.h                    mpoly_types.h                       \
         fmpz_types.h                    fmpq_types.h                        \
