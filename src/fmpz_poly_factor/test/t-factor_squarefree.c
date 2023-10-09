@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 
@@ -19,8 +20,6 @@ int main(void)
 
     flint_printf("squarefree....");
     fflush(stdout);
-
-
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -86,6 +85,26 @@ int main(void)
             fmpz_poly_clear(g[k]);
         fmpz_poly_clear(h);
         fmpz_poly_clear(t);
+        fmpz_poly_factor_clear(fac);
+    }
+
+    /* check that the zero polynomial doesn't crash */
+    {
+        fmpz_poly_factor_t fac;
+        fmpz_poly_t f;
+
+        fmpz_poly_init(f);
+        fmpz_poly_factor_init(fac);
+
+        fmpz_poly_factor_squarefree(fac, f);
+
+        if (fac->num != 0 || !fmpz_is_zero(&(fac->c)))
+        {
+            flint_printf("FAIL: 0\n");
+            flint_abort();
+        }
+
+        fmpz_poly_clear(f);
         fmpz_poly_factor_clear(fac);
     }
 
