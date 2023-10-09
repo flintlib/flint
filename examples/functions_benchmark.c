@@ -97,7 +97,7 @@ int main()
     arb_t x, y, res;
     slong n, prec;
     int function;
-    double __attribute__((unused)) tcpu, twall;
+    double FLINT_UNUSED(tcpu), twall;
 
     arb_init(x);
     arb_init(y);
