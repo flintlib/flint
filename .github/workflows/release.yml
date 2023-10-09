@@ -1,0 +1,146 @@
+# This workflow takes care of creating release archives for the
+# Flint distribution. It is run for all PR and branch pushes as usual,
+# but also on tags whose name starts with `vX.Y` with X, Y numbers
+# (the idea is to use v1.2.3 or v1.2.3-beta3)
+#
+# For builds triggered by a tag, the tag is turned into a GitHub release and
+# the produced archives are attached to that.
+name: "Wrap releases"
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    tags:
+      - v[1-9]+.[0-9]+.[0-9]    # allow v1.2.3
+      - v[1-9]+.[0-9]+.[0-9]-*  # allow v1.2.3-beta3 etc.
+    branches:
+      - trunk
+      - flint-*
+  schedule:
+    # Every day at 3:33 AM UTC
+    - cron: '33 3 * * *'
+
+concurrency:
+  # group by workflow and ref; the last slightly strange component ensures that for pull
+  # requests, we limit to 1 concurrent job, but for the trunk branch we don't
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/trunk' || github.run_number }}
+  # Cancel intermediate builds, but only if it is a pull request build.
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+
+jobs:
+  make-archive:
+    runs-on: ubuntu-latest
+    outputs:
+      get-version: ${{ steps.get-version.outputs.version }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Setup"
+        run: |
+          sudo apt-get install -y autoconf libtool-bin
+          autoconf --version
+          libtool --version
+
+      - name: "Record FLINT version"
+        id: get-version
+        run: |
+          # special treatment for tags: these are used for actual releases, so
+          # we force the version in the VERSION file and in the tag to match
+          if ${{ startsWith(github.ref, 'refs/tags/v') }} ; then
+            version=${GITHUB_REF#refs/tags/v}
+          else
+            version=$(cat VERSION)
+          fi
+          echo "version=${version}"
+          echo "version=${version}" >> $GITHUB_OUTPUT
+
+      - name: "Bootstrap"
+        run: |
+          ./bootstrap.sh
+
+      - name: "Create source archive"
+        run: dev/make_dist.sh ${{ steps.get-version.outputs.version }}
+
+      - name: "Upload source archive as artifact"
+        uses: actions/upload-artifact@v3
+        with:
+          if-no-files-found: error
+          name: flint
+          path: flint-${{ steps.get-version.outputs.version }}.*
+          retention-days: 1
+
+  test-archive:
+    needs: make-archive
+    runs-on: ubuntu-latest
+    env:
+      FLINT_VERSION: ${{ needs.make-archive.outputs.get-version }}
+      MAKE: "make -j --output-sync=target"
+      TESTCFLAGS: "-Wall -O1"
+    steps:
+      - name: "Download archive from previous job"
+        uses: actions/download-artifact@v3
+        with:
+          name: flint
+
+      - name: "Setup"
+        run: |
+          sudo apt-get install -y libgmp-dev
+          sudo apt-get install -y libmpfr-dev
+          # now *remove* autotools to verify we can build with out it
+          sudo apt-get remove -y autoconf
+          sudo apt-get remove -y automake
+          sudo apt-get remove -y libtool-bin
+
+      - name: "Extract"
+        run: |
+          tar -xf flint-$FLINT_VERSION.tar.gz
+          mv flint-$FLINT_VERSION flint # to simplify code
+
+      - name: "Configure"
+        run: |
+          cd flint
+          # *no* call to bootstrap.sh !
+          ./configure
+
+      - name: "Compile library"
+        run: |
+          cd flint
+          $MAKE
+          ldd libflint.so
+
+      - name: "Compile tests"
+        run: |
+          cd flint
+          export FLINT_TEST_MULTIPLIER=0.1
+          $MAKE tests
+
+      - name: "Check"
+        run: |
+          cd flint
+          export FLINT_TEST_MULTIPLIER=0.1
+          $MAKE check
+
+  upload-archive:
+    needs: [make-archive, test-archive]
+    runs-on: ubuntu-latest
+    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    steps:
+      - name: "Download archive from previous job"
+        uses: actions/download-artifact@v3
+        with:
+          name: flint
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          fail_on_unmatched_files: true
+          files: |
+            flint-${{ needs.make-archive.outputs.get-version }}.tar.gz
+            flint-${{ needs.make-archive.outputs.get-version }}.tar.xz
+            flint-${{ needs.make-archive.outputs.get-version }}.zip
+
+# TODO: we could / should perhaps also test `make install` ?
+# TODO: also trigger a documentation build and upload the result?
+# TODO: if desired, we could e.g. also upload the archive to a server via scp

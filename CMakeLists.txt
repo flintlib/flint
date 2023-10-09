@@ -211,7 +211,10 @@ configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/CMake/cmake_config.h.in
     ${CMAKE_CURRENT_SOURCE_DIR}/src/flint-config.h
 )
-
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/flint.h.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/flint.h
+)
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/src/fmpz/link/fmpz_${MEMORY_MANAGER}.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/fmpz/fmpz.c
