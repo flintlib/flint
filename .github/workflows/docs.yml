@@ -45,17 +45,11 @@ jobs:
           cd doc
           make html SPHINXOPTS="-W -j auto"
 
-      - name: "Build documentation"
-        if: success() && steps.check_doc_changes.outputs.diff == 'true'
-        run: |
-          cd doc
-          make html SPHINXOPTS="-W -j auto"
-
       - name: "Build pdf documentation"
         if: success() && steps.check_doc_changes.outputs.diff == 'true'
         run: |
           cd doc
-          make latex SPHINXOPTS="-W -j auto"
+          make latexpdf SPHINXOPTS="-W -j auto"
 
       - name: "Create a tarball of the documentation"
         if: success() && steps.check_doc_changes.outputs.diff == 'true'
