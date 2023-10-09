@@ -493,7 +493,7 @@ case "$host_os" in
         flint_lib="libflint.dylib"
         flint_lib_major="libflint.$FLINT_MAJOR_SO.dylib"
         flint_lib_full="libflint.$FLINT_MAJOR_SO.$FLINT_MINOR_SO.dylib"
-        extra_shared_flags="-install_name `pwd`/$flint_lib_full -compatibility_version $FLINT_MAJOR_SO.$FLINT_MINOR_SO -current_version $FLINT_MAJOR_SO.$FLINT_MINOR_SO.$FLINT_PATCH_SO"
+        extra_shared_flags="-install_name '`pwd`/$flint_lib_full' -compatibility_version $FLINT_MAJOR_SO.$FLINT_MINOR_SO -current_version $FLINT_MAJOR_SO.$FLINT_MINOR_SO.$FLINT_PATCH_SO"
         flint_dylib="yes"
         ;;
     cygwin|mingw*|msys)
