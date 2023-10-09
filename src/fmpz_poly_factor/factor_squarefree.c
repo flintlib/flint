@@ -17,7 +17,8 @@
 void fmpz_poly_factor_squarefree(fmpz_poly_factor_t fac, const fmpz_poly_t F)
 {
     fmpz_poly_content(&(fac->c), F);
-    if (fmpz_sgn(fmpz_poly_lead(F)) < 0)
+
+    if (F->length != 0 && fmpz_sgn(fmpz_poly_lead(F)) < 0)
         fmpz_neg(&(fac->c), &(fac->c));
 
     if (F->length > 1)
