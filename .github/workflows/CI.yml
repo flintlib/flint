@@ -1,7 +1,11 @@
 name: CI
 
-
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - trunk
+      - flint-*
 
 concurrency:
   # group by workflow and ref; the last slightly strange component ensures that for pull
