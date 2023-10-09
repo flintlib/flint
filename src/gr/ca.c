@@ -1157,7 +1157,7 @@ _gr_ca_sinh(ca_t res, const ca_t x, gr_ctx_t ctx)
 
         GR_TMP_CLEAR2(t, u, ctx);
 
-        return handle_possible_special_value(res, ctx);
+        return status | handle_possible_special_value(res, ctx);
     }
 }
 
@@ -1189,7 +1189,7 @@ _gr_ca_cosh(ca_t res, const ca_t x, gr_ctx_t ctx)
 
         GR_TMP_CLEAR2(t, u, ctx);
 
-        return handle_possible_special_value(res, ctx);
+        return status | handle_possible_special_value(res, ctx);
     }
 }
 
@@ -1208,7 +1208,7 @@ _gr_ca_tanh(ca_t res, const ca_t x, gr_ctx_t ctx)
 
     GR_TMP_CLEAR2(t, u, ctx);
 
-    return handle_possible_special_value(res, ctx);
+    return status | handle_possible_special_value(res, ctx);
 }
 
 int
@@ -1226,7 +1226,7 @@ _gr_ca_coth(ca_t res, const ca_t x, gr_ctx_t ctx)
 
     GR_TMP_CLEAR2(t, u, ctx);
 
-    return handle_possible_special_value(res, ctx);
+    return status | handle_possible_special_value(res, ctx);
 }
 
 
