@@ -24,6 +24,9 @@ jobs:
 
       - name: Install TeX Live
         uses: zauguin/install-texlive@v2
+        with:
+          packages: >-
+            latexmk
 
       - name: "Setup"
         run: |
