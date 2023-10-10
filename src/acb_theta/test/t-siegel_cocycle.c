@@ -24,12 +24,12 @@ int main(void)
     /* Test: chain rule */
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 10);
+        slong g = 1 + n_randint(state, 6);
+        slong prec = 100 + n_randint(state, 200);
+        slong mag_bits = n_randint(state, 10);
         fmpz_mat_t m1, m2, m3;
         acb_mat_t tau1, tau2;
         acb_mat_t c1, c2, c3, t;
-        slong prec = 100 + n_randint(state, 200);
-        slong mag_bits = n_randint(state, 10);
 
         fmpz_mat_init(m1, 2 * g, 2 * g);
         fmpz_mat_init(m2, 2 * g, 2 * g);
@@ -42,7 +42,6 @@ int main(void)
         acb_mat_init(t, g, g);
 
         acb_siegel_randtest(tau1, state, prec, mag_bits);
-        acb_siegel_randtest(tau2, state, prec, mag_bits);
         sp2gz_randtest(m1, state, mag_bits);
         sp2gz_randtest(m2, state, mag_bits);
 

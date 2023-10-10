@@ -16,12 +16,13 @@ acb_siegel_sqrtdet_i(acb_t r, const fmpz_mat_t mat)
 {
     slong g = sp2gz_dim(mat);
     slong prec = ACB_THETA_LOW_PREC;
-    acb_mat_t tau;
+    acb_mat_t tau, c;
     acb_t x;
     fmpz_t re, im;
     int done = 0;
 
     acb_mat_init(tau, g, g);
+    acb_mat_init(c, g, g);
     acb_mat_onei(tau);
     acb_init(x);
     fmpz_init(re);
@@ -30,15 +31,17 @@ acb_siegel_sqrtdet_i(acb_t r, const fmpz_mat_t mat)
     while (!done)
     {
         prec *= 2;
-        acb_siegel_cocycle_det(x, mat, tau, prec);
-        done = arb_get_unique_fmpz(re, acb_realref(r))
-            && arb_get_unique_fmpz(im, acb_imagref(r));
+        acb_siegel_cocycle(c, mat, tau, prec);
+        acb_mat_det(x, c, prec);
+        done = arb_get_unique_fmpz(re, acb_realref(x))
+            && arb_get_unique_fmpz(im, acb_imagref(x));
     }
-    arb_set_fmpz(acb_realref(r), re);
-    arb_set_fmpz(acb_imagref(r), im);
+    arb_set_fmpz(acb_realref(x), re);
+    arb_set_fmpz(acb_imagref(x), im);
     acb_sqrts(r, x, x, prec);
 
     acb_mat_clear(tau);
+    acb_mat_clear(c);
     fmpz_clear(re);
     fmpz_clear(im);
 }

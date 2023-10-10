@@ -21,7 +21,7 @@ int main(void)
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         slong m, n;
         arb_mat_t re, im, x, y;

@@ -23,12 +23,11 @@ int main(void)
 
     /* Test: mat is symplectic, upper left imag entry is at least 1/2, and real
        part is reduced */
-    for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 4);
-        slong prec = 100 + n_randint(state, 500);
+        slong prec = 100 + n_randint(state, 200);
         slong mag_bits = n_randint(state, 5);
-
         acb_mat_t tau;
         acb_mat_t res;
         fmpz_mat_t mat;

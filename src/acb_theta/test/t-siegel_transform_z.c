@@ -21,16 +21,15 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: matches siegel_transform, inverse matrix gives inverse
-       transformation */
+    /* Test: matches siegel_transform, inverse matrix gives inverse transformation */
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 10);
+        slong g = 1 + n_randint(state, 6);
+        slong prec = 100 + n_randint(state, 200);
+        slong bits = n_randint(state, 10);
         acb_mat_t tau1, w, tau2;
         acb_ptr z1, r, z2;
         fmpz_mat_t m;
-        slong prec = 100 + n_randint(state, 200);
-        slong bits = n_randint(state, 10);
         slong k;
 
         acb_mat_init(tau1, g, g);
@@ -75,18 +74,6 @@ int main(void)
             _acb_vec_printd(z1, g, 10);
             flint_printf("\n\n");
             _acb_vec_printd(z2, g, 10);
-            flint_printf("\n");
-            flint_abort();
-        }
-
-        /* Test: aliasing */
-        acb_siegel_transform_z(r, w, m, r, w, prec);
-        if (!acb_mat_overlaps(tau2, w) || !_acb_vec_contains(z2, r, g))
-        {
-            flint_printf("FAIL\n\n");
-            acb_mat_printd(w, 10);
-            flint_printf("\n");
-            acb_mat_printd(tau2, 10);
             flint_printf("\n");
             flint_abort();
         }

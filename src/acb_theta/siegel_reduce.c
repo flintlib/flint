@@ -119,7 +119,7 @@ acb_siegel_reduce(fmpz_mat_t mat, const acb_mat_t tau, slong prec)
     slong g = acb_mat_nrows(tau);
     slong lp;
     fmpz_mat_t m;
-    acb_mat_t cur;
+    acb_mat_t w, c;
     arb_mat_t im;
     acb_t det;
     arb_t abs;
@@ -130,7 +130,8 @@ acb_siegel_reduce(fmpz_mat_t mat, const acb_mat_t tau, slong prec)
     slong j, j0;
 
     fmpz_mat_init(m, 2 * g, 2 * g);
-    acb_mat_init(cur, g, g);
+    acb_mat_init(w, g, g);
+    acb_mat_init(c, g, g);
     arb_mat_init(im, g, g);
     acb_init(det);
     arb_init(abs);
@@ -155,25 +156,26 @@ acb_siegel_reduce(fmpz_mat_t mat, const acb_mat_t tau, slong prec)
         /* Choose precision, reduce imaginary part */
         fmpz_mat_bound_inf_norm(nmat, mat);
         lp = acb_siegel_reduce_imag_lowprec(ntau, ndet, nmat, g, prec);
-        acb_siegel_transform(cur, mat, tau, lp);
-        acb_siegel_reduce_imag(m, cur, lp);
+        acb_siegel_transform(w, mat, tau, lp);
+        acb_siegel_reduce_imag(m, w, lp);
         fmpz_mat_mul(mat, m, mat);
 
         /* Choose precision, reduce real part */
         fmpz_mat_bound_inf_norm(nmat, mat);
         lp = acb_siegel_reduce_real_lowprec(ntau, nmat, g, prec);
-        acb_siegel_transform(cur, m, cur, lp);
-        acb_siegel_reduce_real(m, cur);
+        acb_siegel_transform(w, m, w, lp);
+        acb_siegel_reduce_real(m, w);
         fmpz_mat_mul(mat, m, mat);
 
         /* Loop over fundamental matrices (keeping same precision) */
-        acb_siegel_transform(cur, m, cur, lp);
+        acb_siegel_transform(w, m, w, lp);
         j0 = -1;
         arb_one(t);
         for (j = 0; j < sp2gz_nb_fundamental(g); j++)
         {
             sp2gz_fundamental(m, j);
-            acb_siegel_cocycle_det(det, m, cur, lp);
+            acb_siegel_cocycle(c, m, w, lp);
+            acb_mat_det(det, c, lp);
             acb_abs(abs, det, lp);
             if (arb_lt(abs, t))
             {
@@ -195,7 +197,8 @@ acb_siegel_reduce(fmpz_mat_t mat, const acb_mat_t tau, slong prec)
     }
 
     fmpz_mat_clear(m);
-    acb_mat_clear(cur);
+    acb_mat_clear(w);
+    acb_mat_clear(c);
     arb_mat_clear(im);
     acb_clear(det);
     arb_clear(abs);

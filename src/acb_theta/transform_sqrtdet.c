@@ -77,13 +77,17 @@ acb_theta_transform_sqrtdet_lowprec(acb_t r, const fmpz_mat_t mat, const acb_mat
 void
 acb_theta_transform_sqrtdet(acb_t r, const fmpz_mat_t mat, const acb_mat_t tau, slong prec)
 {
+    slong g = acb_mat_nrows(tau);
+    acb_mat_t c;
     acb_t x, y1, y2;
 
+    acb_mat_init(c, g, g);
     acb_init(x);
     acb_init(y1);
     acb_init(y2);
 
-    acb_siegel_cocycle_det(r, mat, tau, prec);
+    acb_siegel_cocycle(c, mat, tau, prec);
+    acb_mat_det(r, c, prec);
     acb_theta_transform_sqrtdet_lowprec(x, mat, tau);
     acb_sqrts(y1, y2, r, prec);
 
@@ -105,6 +109,7 @@ acb_theta_transform_sqrtdet(acb_t r, const fmpz_mat_t mat, const acb_mat_t tau, 
         flint_abort();
     }
 
+    acb_mat_clear(c);
     acb_clear(x);
     acb_clear(y1);
     acb_clear(y2);

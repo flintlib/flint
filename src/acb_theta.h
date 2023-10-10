@@ -59,7 +59,6 @@ void sp2gz_randtest(fmpz_mat_t mat, flint_rand_t state, slong bits);
 /* The Siegel half space */
 
 void acb_siegel_cocycle(acb_mat_t c, const fmpz_mat_t mat, const acb_mat_t tau, slong prec);
-void acb_siegel_cocycle_det(acb_t det, const fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 void acb_siegel_transform_cocycle_inv(acb_mat_t w, acb_mat_t c, acb_mat_t cinv,
     const fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 void acb_siegel_transform(acb_mat_t w, const fmpz_mat_t mat, const acb_mat_t tau, slong prec);

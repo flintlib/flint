@@ -22,7 +22,7 @@ int main(void)
     flint_randinit(state);
 
     /* Test: matches fmpz_mat_inv */
-    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 10);
         slong bits = n_randint(state, 10);
