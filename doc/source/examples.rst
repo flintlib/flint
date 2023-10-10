@@ -14,7 +14,7 @@ features. To build the example programs run::
 The example programs are built in the ``build/examples`` directory.
 
 For Arb and Calcium there are separate example pages
-:ref:`examples_arb` and :ref:`examples_calcium`. Below are some
+:ref:`examples-arb` and :ref:`examples-calcium`. Below are some
 general examples.
 
 - ``partitions`` Demonstrates the partition counting code, e.g.
