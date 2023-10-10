@@ -56,10 +56,10 @@ not the desired behaviour, an option exists to the function for waking worker
 threads to alter how many threads it can start. In some cases it is also
 necessary to temporarily restrict the number of worker threads a given function
 can start. This is accomplished by calling flint_set_num_workers() and then
-once the function is called, calling flint_reset_num_workers(). Any function
-threaded function which calls flint_get_num_threads() to determine how many
-threads to request from the thread pool will be appropriately restricted by
-such calls.
+once the function is called, calling flint_reset_num_workers(). Any
+threaded function which calls flint_get_num_threads() to determine how
+many threads to request from the thread pool will be appropriately
+restricted by such calls.
 
 Note that if ``flint_get_num_threads()`` returns ``n`` then the number of workers that
 can be started is ``n - 1`` (in addition to the thread the function is already
