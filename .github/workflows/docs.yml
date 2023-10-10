@@ -27,6 +27,8 @@ jobs:
         with:
           packages: >-
             latexmk
+            pdftex
+            pdflatex
 
       - name: "Setup"
         run: |
