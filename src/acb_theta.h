@@ -242,7 +242,7 @@ int acb_theta_ql_a0(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
 
 #define ACB_THETA_QL_TRY 100
 
-slong acb_theta_ql_reduce(acb_ptr x, acb_t c, arb_t u, ulong* a1, acb_srcptr z,
+slong acb_theta_ql_reduce(acb_ptr x, acb_t c, arb_t u, slong* n1, acb_srcptr z,
     const acb_mat_t tau, slong prec);
 void acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec);
 void acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec);

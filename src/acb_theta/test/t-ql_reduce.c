@@ -22,12 +22,11 @@ int main(void)
     flint_randinit(state);
 
     /* Test: agrees with naive algorithms */
-    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         slong g = 2 + n_randint(state, 3);
         slong n = 1 << g;
         slong prec = ACB_THETA_LOW_PREC + n_randint(state, 100);
-        slong bits = 4;
         slong s = n_randint(state, g + 1);
         acb_mat_t tau, tau0;
         arb_mat_t Y;
@@ -36,6 +35,7 @@ int main(void)
         acb_t c;
         arb_t u, abs;
         ulong a0, a1, b0, b1, fixed_a1;
+        slong* n1;
         slong j, k;
 
         acb_mat_init(tau, g, g);
@@ -49,9 +49,10 @@ int main(void)
         acb_init(c);
         arb_init(u);
         arb_init(abs);
+        n1 = flint_malloc(g * sizeof(slong));
 
         /* Make period matrix with splitting at s */
-        acb_siegel_randtest_reduced(tau, state, prec, bits);
+        acb_siegel_randtest_nice(tau, state, prec);
         for (j = s; j < g; j++)
         {
             for (k = s; k < g; k++)
@@ -62,6 +63,7 @@ int main(void)
         }
 
         /* Choose z as Y.v + error with v either 0, 1/4 or 1/2 entries */
+        acb_mat_get_imag(Y, tau);
         for (k = 0; k < g; k++)
         {
             arb_set_si(&x[k], n_randint(state, 3));
@@ -73,9 +75,12 @@ int main(void)
             acb_urandom(&z[k], state, prec);
             arb_add(acb_imagref(&z[k]), acb_imagref(&z[k]), &x[k], prec);
         }
+        _acb_vec_printd(z, g, 5);
 
-        s = acb_theta_ql_reduce(new_z, c, u, &fixed_a1, z, tau, prec);
+        s = acb_theta_ql_reduce(new_z, c, u, n1, z, tau, prec);
         acb_theta_naive_all(th, z, 1, tau, prec);
+
+        flint_printf("Found g = %wd, s = %wd\n", g, s, fixed_a1);
 
         /* If s == -1, check that theta values are small */
         if (s == -1)
@@ -95,41 +100,47 @@ int main(void)
                 }
             }
         }
-
         /* Otherwise, construct test vector */
-        if (s == 0)
-        {
-            acb_one(&th0[0]);
-        }
         else
         {
-            acb_mat_window_init(tau0, tau, 0, s, 0, s);
-            acb_theta_naive_all(th0, new_z, 1, tau0, prec);
-            acb_mat_window_clear(tau0);
-        }
-
-        for (k = 0; k < n * n; k++)
-        {
-            a0 = k >> (g + g - s);
-            a1 = (k >> g) % (1 << (g - s));
-            b0 = k >> (g - s) % (1 << s);
-            b1 = k % (1 << (g - s));
-            if (a1 == fixed_a1)
+            fixed_a1 = acb_theta_char_get_a(n1, g - s);
+            if (s == 0)
             {
-                acb_mul(&test[k], c, &th0[(a0 << s) + b0], prec);
-                acb_mul_powi(&test[k], &test[k], acb_theta_char_dot(a1, b1, g));
+                acb_one(&th0[0]);
             }
-            acb_add_error_arb(&test[k], u);
-        }
+            else
+            {
+                acb_mat_window_init(tau0, tau, 0, 0, s, s);
+                acb_theta_naive_all(th0, new_z, 1, tau0, prec);
+                acb_mat_window_clear(tau0);
+            }
 
-        if (!_acb_vec_overlaps(th, test, n * n))
-        {
-            flint_printf("FAIL (g = %wd, s = %wd)", g, s);
-            acb_mat_printd(tau, 5);
-            flint_printf("th, test:\n");
-            _acb_vec_printd(th, n * n, 5);
-            _acb_vec_printd(test, n * n, 5);
-            flint_abort();
+            for (k = 0; k < n * n; k++)
+            {
+                a0 = k >> (g + g - s);
+                a1 = (k >> g) % (1 << (g - s));
+                b0 = (k >> (g - s)) % (1 << s);
+                b1 = k % (1 << (g - s));
+                if (a1 == fixed_a1)
+                {
+                    acb_mul(&test[k], c, &th0[(a0 << s) + b0], prec);
+                    acb_mul_powi(&test[k], &test[k], acb_theta_char_dot_slong(a1, n1, g));
+                }
+                acb_add_error_arb(&test[k], u);
+            }
+
+            if (!_acb_vec_overlaps(th, test, n * n))
+            {
+                flint_printf("FAIL (g = %wd, s = %wd)\n", g, s);
+                acb_mat_printd(tau, 5);
+                flint_printf("th, test:\n");
+                _acb_vec_printd(th, n * n, 5);
+                _acb_vec_printd(test, n * n, 5);
+                flint_printf("difference:\n");
+                _acb_vec_sub(test, test, th, n * n, prec);
+                _acb_vec_printd(test, n * n, 5);
+                flint_abort();
+            }
         }
 
         acb_mat_clear(tau);
@@ -143,6 +154,7 @@ int main(void)
         acb_clear(c);
         arb_clear(u);
         arb_clear(abs);
+        flint_free(n1);
     }
 
     flint_randclear(state);
