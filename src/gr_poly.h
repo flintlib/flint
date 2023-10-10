@@ -97,7 +97,7 @@ truth_t gr_poly_is_scalar(const gr_poly_t poly, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_poly_set_scalar(gr_poly_t poly, gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_set_si(gr_poly_t poly, slong x, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_poly_set_ui(gr_poly_t poly, slong x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_set_ui(gr_poly_t poly, ulong x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_set_fmpz(gr_poly_t poly, const fmpz_t x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_set_fmpq(gr_poly_t poly, const fmpq_t x, gr_ctx_t ctx);
 
