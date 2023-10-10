@@ -70,7 +70,7 @@ acb_dirichlet_platt_multieval_threaded(arb_ptr out, const fmpz_t T, slong A,
     fmpz_t threadtasks;
 
     num_workers = flint_request_threads(&handles, WORD_MAX);
-    num_threads = num_threads;
+    num_threads = num_workers + 1;
 
     N = A*B;
     fmpz_init(threadtasks);

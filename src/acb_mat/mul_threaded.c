@@ -93,26 +93,6 @@ acb_mat_mul_threaded(acb_mat_t C, const acb_mat_t A, const acb_mat_t B, slong pr
     num_workers = flint_request_threads(&handles, FLINT_MAX(ar, bc) - 1);
     num_threads = num_workers + 1;
 
-    if (num_workers < 1)
-    {
-        _worker_arg main_arg;
-
-        flint_give_back_threads(handles, num_workers);
-
-        main_arg.C = C->rows;
-        main_arg.A = A->rows;
-        main_arg.B = B->rows;
-        main_arg.ar0 = 0;
-        main_arg.ar1 = ar;
-        main_arg.bc0 = 0;
-        main_arg.bc1 = bc;
-        main_arg.br = br;
-        main_arg.prec = prec;
-
-        _acb_mat_mul_thread(&main_arg);
-        return;
-    }
-
     args = FLINT_ARRAY_ALLOC(num_threads, _worker_arg);
 
     for (i = 0; i < num_threads; i++)
