@@ -246,6 +246,10 @@ define xxx_SOURCES
 $(1)_SOURCES := $(wildcard $(SRC_DIR)/$(1)/*.c)
 endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_SOURCES,$(dir))))
+
+# We clear some template files
+fmpz_lll_SOURCES := $(filter-out $(SRC_DIR)/fmpz_lll/babai.c $(SRC_DIR)/fmpz_lll/mpf2_lll.c $(SRC_DIR)/fmpz_lll/d_lll.c,$(fmpz_lll_SOURCES))
+
 SOURCES := $(foreach dir,$(DIRS),$($(dir)_SOURCES))
 # NOTE: We do not add CPP files to C files in SOURCES in order to not screw up
 # the `patsubst' in the object files.
