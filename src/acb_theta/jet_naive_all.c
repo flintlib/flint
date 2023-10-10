@@ -149,6 +149,7 @@ acb_theta_jet_naive_all_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
     for (k = 0; k < nb; k++)
     {
         acb_const_pi(c, prec); /* not 2 pi because of rescaling */
+        acb_mul_onei(c, c);
         acb_pow_ui(c, c, acb_theta_jet_total_order(tups + k * g, g), prec);
         fmpz_one(m);
         for (j = 0; j < g; j++)

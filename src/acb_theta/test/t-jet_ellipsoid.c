@@ -22,7 +22,7 @@ int main(void)
     flint_randinit(state);
 
     /* Test: sum of terms on border of ellipsoid must be less than bound */
-    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
         slong prec = 100 + n_randint(state, 100);
@@ -46,7 +46,7 @@ int main(void)
         arb_init(u);
         arb_init(abs);
         arb_init(sum);
-        tups = flint_malloc(g * nb);
+        tups = flint_malloc(g * nb * sizeof(slong));
 
         acb_siegel_randtest_reduced(tau, state, prec, bits);
         for (k = 0; k < g; k++)

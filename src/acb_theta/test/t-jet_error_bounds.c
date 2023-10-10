@@ -31,13 +31,13 @@ int main(void)
         slong nb = acb_theta_jet_nb(ord, g);
         slong nb_der = acb_theta_jet_nb(ord + 2, g);
         slong lprec = ACB_THETA_LOW_PREC;
+        slong mprec = ACB_THETA_LOW_PREC + n_randint(state, 50);
+        slong hprec = mprec + n_randint(state, 50);
         acb_mat_t tau1, tau2, tau3;
         acb_ptr z1, z2, z3, dth;
         arb_ptr err;
         acb_ptr d1, d2, test;
         acb_t x;
-        slong mprec = ACB_THETA_LOW_PREC + n_randint(state, 50);
-        slong hprec = mprec + n_randint(state, 50);
         slong j, k;
 
         acb_mat_init(tau1, g, g);

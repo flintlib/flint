@@ -26,15 +26,12 @@ int main(void)
     {
         slong g = 1 + n_randint(state, 3);
         slong nb = n_pow(2, 2 * g);
-        acb_mat_t tau, tau11;
-        acb_ptr z;
-        slong nbz = 1 + n_randint(state, 4);
-        acb_ptr th;
-        acb_ptr th_test;
-        acb_ptr th_g1;
-        slong prec1 = 20 + n_randint(state, 200);
-        slong prec = prec1; /* + n_randint(state, 200);*/
+        slong prec1 = ACB_THETA_LOW_PREC + n_randint(state, 200);
+        slong prec = prec1 + n_randint(state, 100);
         slong mag_bits = n_randint(state, 2);
+        slong nbz = 1 + n_randint(state, 4);
+        acb_mat_t tau, tau11;
+        acb_ptr z, th, th_test, th_g1;
         slong k, j;
         ulong ab, a, b;
 
@@ -47,7 +44,7 @@ int main(void)
 
         for (k = 0; k < g; k++)
         {
-            acb_siegel_randtest(tau11, state, prec, mag_bits);
+            acb_siegel_randtest_reduced(tau11, state, prec, mag_bits);
             acb_set(acb_mat_entry(tau, k, k), acb_mat_entry(tau11, 0, 0));
         }
         for (k = 0; k < g * nbz; k++)

@@ -60,9 +60,11 @@ acb_theta_jet_naive_tail(arb_t res, const arf_t R2, const arb_mat_t C, arb_srcpt
 {
     slong g = arb_mat_nrows(C);
     slong lp = ACB_THETA_LOW_PREC;
+    arb_mat_t Cinv;
     arb_t t, u, R;
     slong k;
 
+    arb_mat_init(Cinv, g, g);
     arb_init(t);
     arb_init(u);
     arb_init(R);
@@ -81,6 +83,7 @@ acb_theta_jet_naive_tail(arb_t res, const arf_t R2, const arb_mat_t C, arb_srcpt
     arb_mul(res, res, t, lp);
 
     arb_sqr(t, R, lp);
+    arb_neg(t, t);
     arb_exp(t, t, lp);
     arb_mul(res, res, t, lp);
 
@@ -91,8 +94,10 @@ acb_theta_jet_naive_tail(arb_t res, const arf_t R2, const arb_mat_t C, arb_srcpt
         arb_mul(res, res, t, lp);
     }
 
-    /* Multiply by max(1, ||C||R + ||v||)^ord */
-    arb_mat_inf_norm(t, C, lp);
+    /* Multiply by max(1, ||C^{-1}||R + ||v||)^ord */
+    arb_mat_one(Cinv);
+    arb_mat_solve_triu(Cinv, C, Cinv, 0, lp);
+    arb_mat_inf_norm(t, Cinv, lp);
     arb_mul(t, t, R, lp);
     _arb_vec_inf_norm(u, v, g, lp);
     arb_add(t, t, u, lp);
@@ -101,6 +106,7 @@ acb_theta_jet_naive_tail(arb_t res, const arf_t R2, const arb_mat_t C, arb_srcpt
     arb_pow_ui(t, t, ord, lp);
     arb_mul(res, res, t, lp);
 
+    arb_mat_clear(Cinv);
     arb_clear(t);
     arb_clear(u);
     arb_clear(R);

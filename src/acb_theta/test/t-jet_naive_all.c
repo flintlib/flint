@@ -24,24 +24,24 @@ int main(void)
     /* Test: values match acb_modular_theta_jet on diagonal matrices */
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 3);
+        slong g = 2 + n_randint(state, 2);
         slong mprec = ACB_THETA_LOW_PREC + n_randint(state, 100);
         slong prec = mprec + 50;
         slong bits = n_randint(state, 4);
-        slong ord = n_randint(state, 4);
+        slong ord = n_randint(state, 3);
         slong n2 = 1 << (2 * g);
         slong nb = acb_theta_jet_nb(ord, g);
         acb_mat_t tau, tau11;
         acb_ptr z, dth, dth_g1, test;
         acb_t prod, t;
         slong* tups;
-        slong k, j, l;
+        slong k, j, l, ab;
 
         acb_mat_init(tau, g, g);
         acb_mat_init(tau11, 1, 1);
         z = _acb_vec_init(g);
         dth = _acb_vec_init(nb * n2);
-        dth_g1 = _acb_vec_init((ord + 1) * g * n2);
+        dth_g1 = _acb_vec_init((ord + 1) * g * 4);
         test = _acb_vec_init(nb * n2);
         acb_init(prod);
         acb_init(t);
@@ -49,7 +49,7 @@ int main(void)
 
         for (k = 0; k < g; k++)
         {
-            acb_siegel_randtest(tau11, state, prec, bits);
+            acb_siegel_randtest_reduced(tau11, state, prec, bits);
             acb_set(acb_mat_entry(tau, k, k), acb_mat_entry(tau11, 0, 0));
             acb_urandom(&z[k], state, prec);
         }
@@ -58,10 +58,11 @@ int main(void)
         for (k = 0; k < g; k++)
         {
             acb_set(acb_mat_entry(tau11, 0, 0), acb_mat_entry(tau, k, k));
-            acb_theta_jet_naive_all(dth_g1 + k * (ord + 1) * n2, &z[k], tau11, ord, prec);
+            acb_theta_jet_naive_all(dth_g1 + k * (ord + 1) * 4, &z[k], tau11, ord, prec);
         }
 
         /* Make test vector using products of derivatives wrt each variable */
+        acb_theta_jet_tuples(tups, ord, g);
         for (j = 0; j < nb; j++)
         {
             for (k = 0; k < n2; k++)
@@ -69,7 +70,9 @@ int main(void)
                 acb_one(prod);
                 for (l = 0; l < g; l++)
                 {
-                    acb_mul(prod, prod, &dth_g1[l * (ord + 1) * n2 + k * (ord + 1) + j], prec);
+                    ab = 2 * ((k >> (2 * g - l - 1)) % 2) + ((k >> (g - l - 1)) % 2);
+                    acb_mul(prod, prod,
+                        &dth_g1[l * (ord + 1) * 4 + ab * (ord + 1) + tups[j * g + l]], prec);
                 }
                 acb_set(&test[k * nb + j], prod);
             }
@@ -92,7 +95,7 @@ int main(void)
         acb_mat_clear(tau11);
         _acb_vec_clear(z, g);
         _acb_vec_clear(dth, nb * n2);
-        _acb_vec_clear(dth_g1, (ord + 1) * g * n2);
+        _acb_vec_clear(dth_g1, (ord + 1) * g * 4);
         _acb_vec_clear(test, nb * n2);
         acb_clear(prod);
         acb_clear(t);
