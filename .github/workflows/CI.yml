@@ -280,7 +280,7 @@ jobs:
   # cygwin with gcc
   ##############################################################################
   cygwin-gcc:
-    name: Cygwin GCC (x1)
+    name: Cygwin GCC (x0.5)
 
     runs-on: windows-latest
 
@@ -326,13 +326,13 @@ jobs:
       - name: "Compile tests"
         run: |
           cd ${REPO}
-          export FLINT_TEST_MULTIPLIER=1
+          export FLINT_TEST_MULTIPLIER=0.5
           $MAKE tests
 
       - name: "Check"
         run: |
           cd ${REPO}
-          export FLINT_TEST_MULTIPLIER=1
+          export FLINT_TEST_MULTIPLIER=0.5
           $MAKE check
 
       - if: failure()
