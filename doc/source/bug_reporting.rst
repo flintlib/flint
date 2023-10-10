@@ -19,5 +19,4 @@ precise details of how to replicate the bug.
 Note that FLINT needs to be linked against version 2.6.0 or later of
 MPIR (or version 5.1.1 or later of GMP), version 3.0.0 or later of
 MPFR and must be compiled with gcc version 2.96 or later. Version 4.8
-or later of GCC is recommended for parallel builds and use of the
-``C++`` interface.
+or later of GCC is recommended for parallel builds.
