@@ -1165,7 +1165,7 @@ Fine tuning of the installation directories:
   --includedir=DIR        C header files [PREFIX/include]
 _ACEOF
 
-    cat <<_ACEOF]
-    m4_divert_pop([HELP_BEGIN])dnl
+    cat <<\_ACEOF]
+m4_divert_pop([HELP_BEGIN])dnl
 
 dnl NOTE: There is supposed to be a missing `fi' here.
