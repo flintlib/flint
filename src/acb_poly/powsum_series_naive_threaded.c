@@ -10,6 +10,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "thread_support.h"
 #include "acb_poly.h"
 
@@ -130,23 +131,17 @@ _acb_poly_powsum_series_naive_threaded(acb_ptr z,
 {
     thread_pool_handle * handles;
     _worker_arg * args;
-    slong i, num_workers;
+    slong i, num_threads, num_workers;
     int split_each_term;
-
-    num_workers = flint_request_threads(&handles, WORD_MAX);
-
-    if (num_workers < 1)
-    {
-        flint_give_back_threads(handles, num_workers);
-        _acb_poly_powsum_series_naive_threaded(z, s, a, q, n, len, prec);
-        return;
-    }
-
-    args = FLINT_ARRAY_ALLOC(num_workers, _worker_arg);
 
     split_each_term = (len > 1000);
 
-    for (i = 0; i < num_workers; i++)
+    num_workers = flint_request_threads(&handles, split_each_term ? len - 1 : n);
+    num_threads = num_workers + 1;
+
+    args = FLINT_ARRAY_ALLOC(num_threads, _worker_arg);
+
+    for (i = 0; i < num_threads; i++)
     {
         args[i].s = s;
         args[i].a = a;
@@ -155,8 +150,8 @@ _acb_poly_powsum_series_naive_threaded(acb_ptr z,
         if (split_each_term)
         {
             slong n0, n1;
-            n0 = (len * i) / num_workers;
-            n1 = (len * (i + 1)) / num_workers;
+            n0 = (len * i) / num_threads;
+            n1 = (len * (i + 1)) / num_threads;
             args[i].z = z + n0;
             args[i].n0 = 0;
             args[i].n1 = n;
@@ -166,14 +161,18 @@ _acb_poly_powsum_series_naive_threaded(acb_ptr z,
         else
         {
             args[i].z = _acb_vec_init(len);
-            args[i].n0 = (n * i) / num_workers;
-            args[i].n1 = (n * (i + 1)) / num_workers;
+            args[i].n0 = (n * i) / num_threads;
+            args[i].n1 = (n * (i + 1)) / num_threads;
             args[i].d0 = 0;
             args[i].len = len;
         }
 
         args[i].prec = prec;
-        thread_pool_wake(global_thread_pool, handles[i], 0, _acb_zeta_powsum_evaluator, &args[i]);
+
+        if (i < num_workers)
+            thread_pool_wake(global_thread_pool, handles[i], 0, _acb_zeta_powsum_evaluator, &args[i]);
+        else
+            _acb_zeta_powsum_evaluator(&args[i]);
     }
 
     for (i = 0; i < num_workers; i++)
@@ -182,7 +181,7 @@ _acb_poly_powsum_series_naive_threaded(acb_ptr z,
     if (!split_each_term)
     {
         _acb_vec_zero(z, len);
-        for (i = 0; i < num_workers; i++)
+        for (i = 0; i < num_threads; i++)
         {
             _acb_vec_add(z, z, args[i].z, len, prec);
             _acb_vec_clear(args[i].z, len);
