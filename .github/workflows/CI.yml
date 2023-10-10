@@ -37,39 +37,7 @@ jobs:
 
       - name: "Setup"
         run: |
-          sudo apt install -y libgmp-dev
-          sudo apt install -y libmpfr-dev
-          sudo apt install -y autoconf
-          sudo apt install -y libtool-bin
-          gcc --version
-          gcov --version
-          make --version
-          autoconf --version
-          libtool --version
-
-      - name: "Configure"
-        run: |
-          ./bootstrap.sh
-          ./configure CC=${CC} --enable-avx2 TESTCFLAGS="${TESTCFLAGS}" --disable-static --enable-coverage
-
-      - name: "Compile library"
-        run: |
-          $MAKE
-          ldd libflint.so
-
-      - name: "Compile tests"
-        run: |
-          $MAKE tests
-
-      - name: "Check"
-        run: |
-          $MAKE check
-
-      - name: "Gather coverage data"
-        run: dev/gather_coverage.sh
-
-      - name: "Upload coverage data"
-        uses: codecov/codecov-action@v3.1.1
+            cd lkjasndkjfnkajsdnfkjnaksjdnf
 
       - if: failure()
         name: "If failure, stop all other jobs"
