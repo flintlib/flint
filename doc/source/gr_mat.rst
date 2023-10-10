@@ -631,7 +631,7 @@ Eigenvalues
     over this field.
 
     The *precomp* version requires as input a precomputed set of eigenvalues
-    with corresponding multiplicites, which can be computed
+    with corresponding multiplicities, which can be computed
     with :func:`gr_mat_eigenvalues`.
 
 Jordan decomposition

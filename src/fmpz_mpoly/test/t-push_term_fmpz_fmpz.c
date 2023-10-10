@@ -24,15 +24,16 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_mpoly_ctx_t ctx;
-        fmpz_mpoly_t f1, f2, m;
+        fmpz_mpoly_t f1, f2, f3, m;
         flint_bitcnt_t coeff_bits, exp_bits;
-        fmpz ** exp, ** exp2;
+        fmpz **exp, **exp2, *exp3;
         slong len, nvars;
         fmpz_t c, c2;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 10);
         fmpz_mpoly_init(f1, ctx);
         fmpz_mpoly_init(f2, ctx);
+        fmpz_mpoly_init(f3, ctx);
         fmpz_mpoly_init(m, ctx);
         fmpz_init(c);
         fmpz_init(c2);
@@ -41,12 +42,14 @@ main(void)
 
         exp = (fmpz **) flint_malloc(nvars*sizeof(fmpz *));
         exp2 = (fmpz **) flint_malloc(nvars*sizeof(fmpz *));
+        exp3 = (fmpz *) flint_malloc(nvars*sizeof(fmpz));
         for (k = 0; k < nvars; k++)
         {
             exp[k] = (fmpz *) flint_malloc(sizeof(fmpz));
             fmpz_init(exp[k]);
             exp2[k] = (fmpz *) flint_malloc(sizeof(fmpz));
             fmpz_init(exp2[k]);
+            fmpz_init(exp3+k);
         }
 
         len = n_randint(state, 20);
@@ -60,8 +63,10 @@ main(void)
         {
             /* get random term */
             fmpz_randtest(c, state, coeff_bits);
-            for (k = 0; k < nvars; k++)
+            for (k = 0; k < nvars; k++){
                 fmpz_randtest_unsigned(exp[k], state, exp_bits);
+                fmpz_set(exp3 + k, exp[k]);
+            }
 
             /* add it to f1 */
             fmpz_mpoly_zero(m, ctx);
@@ -71,6 +76,9 @@ main(void)
 
             /* push it back on f2 */
             fmpz_mpoly_push_term_fmpz_fmpz(f2, c, exp, ctx);
+
+            /* push it on f3 */
+            fmpz_mpoly_push_term_fmpz_ffmpz(f3, c, exp3, ctx);
 
             /* make sure last term matches */
             fmpz_mpoly_get_term_coeff_fmpz(c2, f2, fmpz_mpoly_length(f2, ctx) - 1, ctx);
@@ -98,6 +106,10 @@ main(void)
         fmpz_mpoly_combine_like_terms(f2, ctx);
         fmpz_mpoly_assert_canonical(f2, ctx);
 
+        fmpz_mpoly_sort_terms(f3, ctx);
+        fmpz_mpoly_combine_like_terms(f3, ctx);
+        fmpz_mpoly_assert_canonical(f3, ctx);
+
         if (!fmpz_mpoly_equal(f1, f2, ctx))
         {
             printf("FAIL\n");
@@ -106,20 +118,31 @@ main(void)
             flint_abort();
         }
 
+        if (!fmpz_mpoly_equal(f1, f3, ctx)) {
+            printf("FAIL\n");
+            flint_printf(
+                "Check pushed with ffmpz polynomial matches add\ni=%wd\n", i, j);
+            fflush(stdout);
+            flint_abort();
+        }
+
         fmpz_clear(c2);
         fmpz_clear(c);
         fmpz_mpoly_clear(f1, ctx);
         fmpz_mpoly_clear(f2, ctx);
+        fmpz_mpoly_clear(f3, ctx);
         fmpz_mpoly_clear(m, ctx);
         fmpz_mpoly_ctx_clear(ctx);
 
         for (k = 0; k < nvars; k++)
         {
+            fmpz_clear(exp3 + k);
             fmpz_clear(exp2[k]);
             flint_free(exp2[k]);
             fmpz_clear(exp[k]);
             flint_free(exp[k]);
         }
+        flint_free(exp3);
         flint_free(exp2);
         flint_free(exp);
     }

@@ -128,7 +128,7 @@ FLINT_DLL void flint_aligned_free(void* p);
     The unallocated ones start out as NULL, and once they are filled in, they
     never have to move. This simplifies thread safe enlargement but complicates
     random access into the original table. If j is the index into the original
-    table, the new indicies are
+    table, the new indices are
 
         [j_bits][j_r]  where j_bits = nbits(j), j_r = j - 2^(j_bits-1)
 

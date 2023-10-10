@@ -47,6 +47,9 @@
 
 #define BITS_TO_LIMBS(b) (((b) + GMP_NUMB_BITS - 1) / GMP_NUMB_BITS)
 
+double
+flint_mpn_get_d(mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp);
+
 #define flint_mpn_mul_2x1(r2, r1, r0, a1, a0, b0)           \
     do {                                                    \
         mp_limb_t t1;                                       \
