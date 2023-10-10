@@ -21,61 +21,82 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: first values match naive_all */
+    /* Test: values match acb_modular_theta_jet on diagonal matrices */
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
-        slong prec = ACB_THETA_LOW_PREC + n_randint(state, 100);
+        slong g = 1 + n_randint(state, 3);
+        slong mprec = ACB_THETA_LOW_PREC + n_randint(state, 100);
+        slong prec = mprec + 50;
         slong bits = n_randint(state, 4);
         slong ord = n_randint(state, 4);
-        slong g = 1 + n_randint(state, 3);
         slong n2 = 1 << (2 * g);
         slong nb = acb_theta_jet_nb(ord, g);
-        acb_mat_t tau;
-        acb_ptr z, th, dth, test;
-        slong k;
+        acb_mat_t tau, tau11;
+        acb_ptr z, dth, dth_g1, test;
+        acb_t prod, t;
+        slong* tups;
+        slong k, j, l;
 
         acb_mat_init(tau, g, g);
+        acb_mat_init(tau11, 1, 1);
         z = _acb_vec_init(g);
-        th = _acb_vec_init(n2);
         dth = _acb_vec_init(nb * n2);
-        test = _acb_vec_init(n2);
+        dth_g1 = _acb_vec_init((ord + 1) * g * n2);
+        test = _acb_vec_init(nb * n2);
+        acb_init(prod);
+        acb_init(t);
+        tups = flint_malloc(nb * g * sizeof(slong));
 
-        acb_siegel_randtest_reduced(tau, state, prec, bits);
         for (k = 0; k < g; k++)
         {
+            acb_siegel_randtest(tau11, state, prec, bits);
+            acb_set(acb_mat_entry(tau, k, k), acb_mat_entry(tau11, 0, 0));
             acb_urandom(&z[k], state, prec);
         }
 
-        acb_theta_jet_naive_all(dth, z, tau, ord, prec);
-        acb_theta_naive_all(th, z, 1, tau, prec);
-        for (k = 0; k < n2; k++)
+        acb_theta_jet_naive_all(dth, z, tau, ord, mprec);
+        for (k = 0; k < g; k++)
         {
-            acb_set(&test[k], &dth[k * nb]);
+            acb_set(acb_mat_entry(tau11, 0, 0), acb_mat_entry(tau, k, k));
+            acb_theta_jet_naive_all(dth_g1 + k * (ord + 1) * n2, &z[k], tau11, ord, prec);
         }
 
-        if (!_acb_vec_overlaps(th, test, n2))
+        /* Make test vector using products of derivatives wrt each variable */
+        for (j = 0; j < nb; j++)
+        {
+            for (k = 0; k < n2; k++)
+            {
+                acb_one(prod);
+                for (l = 0; l < g; l++)
+                {
+                    acb_mul(prod, prod, &dth_g1[l * (ord + 1) * n2 + k * (ord + 1) + j], prec);
+                }
+                acb_set(&test[k * nb + j], prod);
+            }
+        }
+
+        if (!_acb_vec_overlaps(dth, test, n2 * nb))
         {
             flint_printf("FAIL (overlap)\n");
             flint_printf("g = %wd, prec = %wd, ord = %wd\n", g, prec, ord);
             acb_mat_printd(tau, 5);
             _acb_vec_printd(z, g, 5);
-            flint_printf("naive_all:\n");
-            _acb_vec_printd(th, n2, 5);
+            flint_printf("jet_naive_all:\n");
+            _acb_vec_printd(dth, nb * n2, 5);
             flint_printf("test:\n");
-            _acb_vec_printd(test, n2, 5);
-            flint_printf("dth:\n");
-            _acb_vec_printd(dth, n2 * nb, 5);
-            _acb_vec_sub(test, th, test, n2, prec);
-            flint_printf("diff:\n");
-            _acb_vec_printd(test, n2, 5);
+            _acb_vec_printd(test, nb * n2, 5);
             flint_abort();
         }
 
         acb_mat_clear(tau);
+        acb_mat_clear(tau11);
         _acb_vec_clear(z, g);
-        _acb_vec_clear(th, n2);
         _acb_vec_clear(dth, nb * n2);
-        _acb_vec_clear(test, n2);
+        _acb_vec_clear(dth_g1, (ord + 1) * g * n2);
+        _acb_vec_clear(test, nb * n2);
+        acb_clear(prod);
+        acb_clear(t);
+        flint_free(tups);
     }
 
     flint_randclear(state);

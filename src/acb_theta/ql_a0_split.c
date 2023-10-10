@@ -199,15 +199,14 @@ acb_theta_ql_a0_split(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d,
 
     arb_mat_init(C, g, g);
     arb_mat_init(C1, g - s, g - s);
-    acb_mat_init(tau0, s, s);
-    acb_mat_init(star, s, g - s);
-    acb_mat_init(tau1, g - s, g - s);
+    acb_mat_window_init(tau0, tau, 0, s, 0, s);
+    acb_mat_window_init(star, tau, 0, s, s, g);
+    acb_mat_window_init(tau1, tau, s, g, s, g);
     v = _arb_vec_init(g - s);
     nctr = _arb_vec_init(g);
     new_d0 = _arb_vec_init(nbth);
     arf_init(eps);
 
-    acb_theta_ql_blocks(tau0, star, tau1, tau, s);
     acb_theta_eld_cho(C, tau, prec);
     for (j = 0; j < g - s; j++)
     {
@@ -247,9 +246,9 @@ acb_theta_ql_a0_split(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d,
 
     arb_mat_clear(C);
     arb_mat_clear(C1);
-    acb_mat_clear(tau0);
-    acb_mat_clear(star);
-    acb_mat_clear(tau1);
+    acb_mat_window_clear(tau0);
+    acb_mat_window_clear(star);
+    acb_mat_window_clear(tau1);
     _arb_vec_clear(v, g - s);
     _arb_vec_clear(nctr, g);
     _arb_vec_clear(new_d0, nbth);

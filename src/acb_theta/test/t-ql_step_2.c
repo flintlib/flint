@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("ql_step_3....");
+    flint_printf("ql_step_2....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -98,9 +98,9 @@ int main(void)
             }
         }
 
-        acb_theta_ql_step_3(r, th0, th, rts, d0, d, g, prec);
+        acb_theta_ql_step_2(r, th0, th, rts, d0, d, g, prec);
 
-        if (!acb_is_finite(&r[0]) || !_acb_vec_overlaps(r, test, 3 * n))
+        if (!acb_is_finite(&r[n]) || !_acb_vec_overlaps(r + n, test + n, 2 * n))
         {
             flint_printf("FAIL\n");
             flint_printf("g = %wd, prec = %wd, tau:\n", g, prec);
@@ -109,7 +109,7 @@ int main(void)
             _acb_vec_printd(th, 3 * n, 5);
             _acb_vec_printd(th0, 3 * n, 5);
             flint_printf("output:\n");
-            _acb_vec_printd(r, 3 * n, 5);
+            _acb_vec_printd(r + n, 2 * n, 5);
             flint_abort();
         }
 

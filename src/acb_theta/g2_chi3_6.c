@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 void
-acb_theta_g2_chi63(acb_poly_t res, acb_srcptr dth, slong prec)
+acb_theta_g2_chi3_6(acb_poly_t res, acb_srcptr dth, slong prec)
 {
     slong g = 2;
     slong n = 1 << (2 * g);

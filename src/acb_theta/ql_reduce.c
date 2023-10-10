@@ -55,14 +55,13 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, ulong* a1, acb_srcptr
         /* Construct ellipsoid */
         acb_theta_eld_init(E, g - s, g - s);
         arb_mat_init(C1, g - s, g - s);
-        acb_mat_init(tau0, s, s);
-        acb_mat_init(tau1, g - s, g - s);
-        acb_mat_init(x, s, g - s);
+        acb_mat_window_init(tau0, tau, 0, s, 0, s);
+        acb_mat_window_init(tau1, tau, s, g, s, g);
+        acb_mat_window_init(x, tau, 0, s, s, g);
         t = _acb_vec_init(g - s);
         w = _acb_vec_init(g - s);
         n = flint_malloc((g - s) * sizeof(slong));
 
-        acb_theta_ql_blocks(tau0, x, tau1, tau, s);
         for (j = 0; j < g - s; j++)
         {
             for (k = 0; k < g - s; k++)
@@ -105,9 +104,9 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, ulong* a1, acb_srcptr
 
         acb_theta_eld_clear(E);
         arb_mat_clear(C1);
-        acb_mat_clear(tau0);
-        acb_mat_clear(tau1);
-        acb_mat_clear(x);
+        acb_mat_window_clear(tau0);
+        acb_mat_window_clear(tau1);
+        acb_mat_window_clear(x);
         _acb_vec_clear(t, g - s);
         _acb_vec_clear(w, g - s);
         flint_free(n);

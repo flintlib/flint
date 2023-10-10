@@ -21,7 +21,7 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: agrees with chi6m2 */
+    /* Test: discriminant of sextic is chi10 */
     for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         slong g = 2;
@@ -30,38 +30,59 @@ int main(void)
         slong prec = 100 + n_randint(state, 100);
         slong bits = n_randint(state, 4);
         acb_mat_t tau;
-        acb_ptr z, dth;
-        acb_poly_t f, test;
+        acb_ptr z, th2, roots;
+        acb_poly_t f;
+        acb_t d, t;
+        slong nb, k, j;
 
         acb_mat_init(tau, g, g);
         z = _acb_vec_init(g);
-        dth = _acb_vec_init(n * nb);
+        th2 = _acb_vec_init(n);
+        roots = _acb_vec_init(6);
         acb_poly_init(f);
-        acb_poly_init(test);
+        acb_init(d);
+        acb_init(t);
 
         acb_siegel_randtest_reduced(tau, state, prec, bits);
-        acb_mat_scalar_mul_2exp_si(tau, tau, -2);
 
-        acb_theta_jet_all(dth, z, tau, 1, prec);
-        acb_theta_g2_chi6m2(test, dth, prec);
         acb_theta_g2_sextic(f, tau, prec);
+        nb = acb_poly_find_roots(roots, f, NULL, 0, prec);
 
-        if (!acb_poly_overlaps(f, test))
+        if (nb == 6)
         {
-            flint_printf("FAIL\n");
-            flint_printf("f:\n");
-            acb_poly_printd(f, 5);
-            flint_printf("\ntest:\n");
-            acb_poly_printd(test, 5);
-            flint_printf("\n");
-            flint_abort();
+            acb_one(d);
+            for (k = 0; k < 6; k++)
+            {
+                for (j = k + 1; j < 6; j++)
+                {
+                    acb_sub(t, &roots[k], &roots[j], prec);
+                    acb_mul(d, d, t, prec);
+                }
+            }
+            acb_sqr(d, d, prec);
+
+            acb_theta_all(th2, z, tau, 1, prec);
+            acb_theta_g2_chi10(t, th2, prec);
+
+            if (!acb_overlaps(d, t))
+            {
+                flint_printf("FAIL\n");
+                flint_printf("roots, discr, chi10:\n");
+                _acb_vec_printd(roots, 6, 5);
+                acb_printd(d, 5);
+                flint_printd("\n");
+                acb_printd(t, 5);
+                flint_printf("\n");
+            }
         }
 
         acb_mat_clear(tau);
         _acb_vec_clear(z, g);
-        _acb_vec_clear(dth, n * nb);
+        _acb_vec_clear(th2, n);
+        _acb_vec_clear(roots, 6);
         acb_poly_clear(f);
-        acb_poly_clear(test);
+        acb_clear(d);
+        acb_clear(t);
     }
 
     flint_randclear(state);

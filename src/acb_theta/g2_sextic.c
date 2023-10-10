@@ -13,6 +13,31 @@
 
 #define ACB_THETA_G2_JET_NAIVE_THRESHOLD 10000
 
+static void
+acb_theta_g2_chim2_6(acb_poly_t res, acb_srcptr dth, slong prec)
+{
+    slong g = 2;
+    slong n = 1 << (2 * g);
+    slong nb = acb_theta_jet_nb(1, g);
+    acb_ptr th;
+    acb_t den;
+    slong k;
+
+    th = _acb_vec_init(n);
+    acb_init(den);
+
+    for (k = 0; k < n; k++)
+    {
+        acb_set(&th[k], &dth[k * nb]);
+    }
+    acb_theta_g2_chi3_6(res, dth, prec);
+    acb_theta_g2_chi5(den, th, prec);
+    acb_poly_scalar_div(res, res, den, prec);
+
+    _acb_vec_clear(th, n);
+    acb_clear(den);
+}
+
 void acb_theta_g2_sextic(acb_poly_t res, const acb_mat_t tau, slong prec)
 {
     slong g = 2;

@@ -28,18 +28,13 @@ int main(void)
         slong bits = 2;
         acb_poly_t f, g;
         acb_t c, test;
-        slong k;
 
         acb_poly_init(f);
         acb_poly_init(g);
         acb_init(c);
         acb_init(test);
 
-        for (k = 0; k <= 5; k++)
-        {
-            acb_randtest_precise(c, state, prec, bits);
-            acb_poly_set_coeff_acb(f, k, c);
-        }
+        acb_poly_randtest(f, 6, prec, bits);
         acb_poly_set_coeff_si(f, 6, 1);
 
         acb_theta_g2_transvectant(g, f, f, 6, 6, 6, prec);

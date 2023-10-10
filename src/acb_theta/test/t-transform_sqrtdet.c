@@ -21,60 +21,41 @@ int main(void)
 
     flint_randinit(state);
 
+    /* Test: square of sqrtdet is cocycle_det */
     for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 2);
-        fmpz_mat_t m1, m2, m3;
-        acb_mat_t tau1, tau2;
-        acb_t c1, c2, c3, t;
+        slong g = 1 + n_randint(state, 3);
+        fmpz_mat_t m;
+        acb_mat_t tau;
+        acb_t c, t;
         slong prec = 100 + n_randint(state, 200);
         slong mag_bits = n_randint(state, 1);
 
-        fmpz_mat_init(m1, 2 * g, 2 * g);
-        fmpz_mat_init(m2, 2 * g, 2 * g);
-        fmpz_mat_init(m3, 2 * g, 2 * g);
-        acb_mat_init(tau1, g, g);
-        acb_mat_init(tau2, g, g);
-        acb_init(c1);
-        acb_init(c2);
-        acb_init(c3);
+        fmpz_mat_init(m, 2 * g, 2 * g);
+        acb_mat_init(tau, g, g);
+        acb_init(c);
         acb_init(t);
 
-        acb_siegel_randtest_reduced(tau1, state, prec, mag_bits);
-        acb_siegel_randtest_reduced(tau2, state, prec, mag_bits);
-        sp2gz_randtest(m1, state, mag_bits);
-        sp2gz_randtest(m2, state, mag_bits);
-        fmpz_mat_mul(m3, m2, m1);
+        acb_siegel_randtest_reduced(tau, state, prec, mag_bits);
+        sp2gz_randtest(m, state, mag_bits);
 
-        /* Test: chain rule up to sign */
-        acb_theta_transform_sqrtdet(c1, m1, tau1, prec);
-        acb_siegel_transform(tau2, m1, tau1, prec);
-        acb_theta_transform_sqrtdet(c2, m2, tau2, prec);
-        acb_theta_transform_sqrtdet(c3, m3, tau1, prec);
-        acb_mul(t, c2, c1, prec);
+        acb_theta_transform_sqrtdet(c, m, tau, prec);
+        acb_sqr(c, c, prec);
+        acb_siegel_cocycle_det(t, m, tau, prec);
 
-        if (!acb_overlaps(t, c3))
-        {
-            acb_neg(t, t);
-        }
-        if (!acb_overlaps(t, c3))
+        if (!acb_overlaps(c, t))
         {
             flint_printf("FAIL\n");
-            acb_printd(c3, 10);
+            acb_printd(c, 10);
             flint_printf("\n");
             acb_printd(t, 10);
             flint_printf("\n");
             flint_abort();
         }
 
-        fmpz_mat_clear(m1);
-        fmpz_mat_clear(m2);
-        fmpz_mat_clear(m3);
-        acb_mat_clear(tau1);
-        acb_mat_clear(tau2);
-        acb_clear(c1);
-        acb_clear(c2);
-        acb_clear(c3);
+        fmpz_mat_clear(m);
+        acb_mat_clear(tau);
+        acb_clear(c);
         acb_clear(t);
     }
 

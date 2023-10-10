@@ -21,6 +21,7 @@ int main(void)
 
     flint_randinit(state);
 
+    /* Test: chain rule */
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         slong g = 2;
@@ -43,7 +44,6 @@ int main(void)
         acb_mat_mul(c3, c1, c2, prec);
         acb_poly_randtest(s, state, j + 1, prec, bits);
 
-        /* Test: chain rule */
         acb_theta_g2_detk_symj(r, c2, s, k, j, prec);
         acb_theta_g2_detk_symj(r, c1, r, k, j, prec);
         acb_theta_g2_detk_symj(t, c3, s, k, j, prec);

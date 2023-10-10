@@ -56,7 +56,7 @@ _arb_vec_inf_norm(arb_t res, arb_srcptr v, slong nb, slong prec)
 
 /* Evaluate upper bound on the tail */
 static void
-acb_theta_naive_tail(arb_t res, const arf_t R2, const arb_mat_t C, arb_srcptr v, slong ord)
+acb_theta_jet_naive_tail(arb_t res, const arf_t R2, const arb_mat_t C, arb_srcptr v, slong ord)
 {
     slong g = arb_mat_nrows(C);
     slong lp = ACB_THETA_LOW_PREC;
@@ -146,8 +146,8 @@ int main(void)
         }
         arb_mat_vector_mul_col(v, C, w, prec);
 
-        acb_theta_naive_radius(R2, eps, C, v, ord, exp);
-        acb_theta_naive_tail(bound, R2, C, w, ord);
+        acb_theta_jet_naive_radius(R2, eps, C, v, ord, exp);
+        acb_theta_jet_naive_tail(bound, R2, C, w, ord);
         arb_get_lbound_arf(t, bound, prec);
 
         if (arf_cmp(t, eps) > 0)

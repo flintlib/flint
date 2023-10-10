@@ -26,8 +26,7 @@ int main(void)
     {
         slong g = 1 + n_randint(state, 3);
         slong nb = n_pow(2, 2 * g);
-        acb_mat_t tau;
-        acb_mat_t tau11;
+        acb_mat_t tau, tau11;
         acb_ptr z;
         slong nbz = 1 + n_randint(state, 4);
         acb_ptr th;
