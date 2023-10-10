@@ -54,5 +54,3 @@ The current example programs are:
 
 - ``fmpq_poly`` Gives a very simple example of the ``fmpq_poly`` module.
 
-Some of the example programs have associated ``C++`` versions.
-

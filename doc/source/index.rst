@@ -303,7 +303,6 @@ Interfaces
 .. toctree::
    :maxdepth: 1
 
-   flintxx.rst
    python_flint.rst
 
 References

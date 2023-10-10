@@ -178,16 +178,6 @@ systems.
 It is also possible to override the default CC, AR and CFLAGS used by FLINT by
 passing ``CC=full_path_to_compiler``, etc., to FLINT's configure.
 
-C++ wrapper
--------------------------------------------------------------------------------
-
-If you wish to enable the test functions for the FLINT ``C++`` wrapper
-``flintxx`` you must pass ``--enable-cxx`` to configure.
-
-The ``C++`` wrapper is always available, but tests will only run if
-this option is selected. It is disabled by default (``--disable-cxx``)
-because some ``C++`` compilers internally segfault when compiling the
-tests, or exhaust memory due to the complexity of the ``C++`` code.
 
 CMake build
 -------------------------------------------------------------------------------
