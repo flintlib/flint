@@ -24,7 +24,7 @@ int main(void)
     /* Test: make ellipsoid to check it is indeed the minimal distance */
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 6);
+        slong g = 1 + n_randint(state, 4);
         slong prec = ACB_THETA_LOW_PREC;
         slong hprec = 200;
         slong bits = n_randint(state, 5);

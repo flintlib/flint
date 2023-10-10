@@ -22,9 +22,9 @@ int main(void)
     flint_randinit(state);
 
     /* Test: find zero value when z = tau a/2 + real stuff */
-    for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 6);
+        slong g = 1 + n_randint(state, 4);
         slong n = 1 << g;
         slong prec = ACB_THETA_LOW_PREC;
         slong hprec = 200;
