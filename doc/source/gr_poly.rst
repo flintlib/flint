@@ -114,7 +114,7 @@ Basic manipulation
 
 .. function:: int gr_poly_set_scalar(gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
               int gr_poly_set_si(gr_poly_t poly, slong c, gr_ctx_t ctx)
-              int gr_poly_set_ui(gr_poly_t poly, slong c, gr_ctx_t ctx)
+              int gr_poly_set_ui(gr_poly_t poly, ulong c, gr_ctx_t ctx)
               int gr_poly_set_fmpz(gr_poly_t poly, const fmpz_t c, gr_ctx_t ctx)
               int gr_poly_set_fmpq(gr_poly_t poly, const fmpq_t c, gr_ctx_t ctx)
 

@@ -165,7 +165,7 @@ int gr_mpoly_print_pretty(const gr_mpoly_t A, const char ** x_in, const mpoly_ct
 /* Constants */
 
 WARN_UNUSED_RESULT int gr_mpoly_set_scalar(gr_mpoly_t A, gr_srcptr c, const mpoly_ctx_t mctx, gr_ctx_t cctx);
-WARN_UNUSED_RESULT int gr_mpoly_set_ui(gr_mpoly_t A, slong c, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+WARN_UNUSED_RESULT int gr_mpoly_set_ui(gr_mpoly_t A, ulong c, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 WARN_UNUSED_RESULT int gr_mpoly_set_si(gr_mpoly_t A, slong c, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 WARN_UNUSED_RESULT int gr_mpoly_set_fmpz(gr_mpoly_t A, const fmpz_t c, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 WARN_UNUSED_RESULT int gr_mpoly_set_fmpq(gr_mpoly_t A, const fmpq_t c, const mpoly_ctx_t mctx, gr_ctx_t cctx);

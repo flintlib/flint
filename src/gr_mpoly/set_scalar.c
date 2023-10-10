@@ -31,7 +31,7 @@ int gr_mpoly_set_scalar(gr_mpoly_t A,
 }
 
 int gr_mpoly_set_ui(gr_mpoly_t A,
-    slong c,
+    ulong c,
     const mpoly_ctx_t mctx, gr_ctx_t cctx)
 {
     int status;
