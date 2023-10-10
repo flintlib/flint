@@ -27,7 +27,6 @@ int main(void)
         slong g = 1 + n_randint(state, 10);
         slong prec = 200;
         slong mag_bits = n_randint(state, 4);
-
         acb_mat_t tau;
         arb_mat_t C;
         arb_mat_t im, test;
@@ -37,6 +36,7 @@ int main(void)
         arb_mat_init(C, g, g);
         arb_mat_init(im, g, g);
         arb_mat_init(test, g, g);
+        arb_init(pi);
 
         acb_siegel_randtest(tau, state, prec, mag_bits);
         acb_theta_eld_cho(C, tau, prec);

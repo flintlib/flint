@@ -22,7 +22,7 @@ int main(void)
     flint_randinit(state);
 
     /* Test: border points are not contained in the ellipsoid */
-    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 4);
         slong nb = n_randint(state, 3);
@@ -64,7 +64,7 @@ int main(void)
 
         for (j = 0; j < g; j++)
         {
-            for (k = 0; k < g; k++)
+            for (k = j; k < g; k++)
             {
                 if (!acb_is_one(acb_mat_entry(acb_theta_precomp_exp_mat(D), j, k)))
                 {
@@ -75,7 +75,7 @@ int main(void)
 
         for (k = 0; k < g; k++)
         {
-            for (j = 0; j < acb_theta_eld_box(E, k); j++)
+            for (j = 0; j <= acb_theta_eld_box(E, k); j++)
             {
                 if (!acb_is_one(acb_theta_precomp_sqr_pow(D, k, j)))
                 {

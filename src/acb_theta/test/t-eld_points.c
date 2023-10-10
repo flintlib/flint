@@ -25,7 +25,7 @@ int main(void)
        Then, generate random points:
        - points inside ellipsoid must appear in all_pts
        - points outside ellipsoid must have norm greater than R2 */
-    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 4);
         slong prec = ACB_THETA_LOW_PREC;

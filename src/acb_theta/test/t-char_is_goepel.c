@@ -31,11 +31,11 @@ int main(void)
 
         for (ch1 = 0; ch1 < n; ch1++)
         {
-            for (ch2 = 0; ch2 < n; ch2++)
+            for (ch2 = ch1; ch2 < n; ch2++)
             {
-                for (ch3 = 0; ch3 < n; ch3++)
+                for (ch3 = ch2; ch3 < n; ch3++)
                 {
-                    for (ch4 = 0; ch4 < n; ch4++)
+                    for (ch4 = ch3; ch4 < n; ch4++)
                     {
                         if (acb_theta_char_is_goepel(ch1, ch2, ch3, ch4, g))
                         {

@@ -21,11 +21,6 @@ acb_theta_precomp_set(acb_theta_precomp_t D, acb_srcptr zs,
     slong k, j;
     slong nb_pow;
 
-    if (acb_theta_eld_nb_pts(E) == 0)
-    {
-        return;
-    }
-
     arb_init(pi);
     acb_init(c);
     acb_init(dc);
