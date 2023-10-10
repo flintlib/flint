@@ -47,7 +47,7 @@ int main(void)
         test = _acb_vec_init(2 * n);
         arb_init(err);
 
-        acb_siegel_randtest(tau, state, prec, mag_bits);
+        acb_siegel_randtest_reduced(tau, state, prec, mag_bits);
         arf_one(rad);
         arf_mul_2exp_si(rad, rad, rad_exp);
         for (k = 0; k < g; k++)

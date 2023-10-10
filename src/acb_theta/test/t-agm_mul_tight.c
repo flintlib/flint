@@ -22,9 +22,9 @@ int main(void)
     flint_randinit(state);
 
     /* Test: respects relative precision */
-    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 6);
+        slong g = 1 + n_randint(state, 4);
         slong n = 1 << g;
         slong prec = 100 + n_randint(state, 500);
         slong bits = n_randint(state, 3);
