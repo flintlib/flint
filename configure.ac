@@ -201,17 +201,6 @@ yes|no)
 esac],
 enable_coverage="no")
 
-dnl TODO: This is currently not working because of the makefile.
-AC_ARG_ENABLE(cxx,
-[AS_HELP_STRING([--enable-cxx],[Enable C++ wrappers, including tests [default=no]])],
-[case $enableval in
-yes|no)
-    ;;
-*)
-    AC_MSG_ERROR([Bad value $enableval for --enable-cxx. Need yes or no.])
-    ;;
-esac],
-enable_cxx="no")
 
 AC_ARG_ENABLE(dependency-tracking,
 [AS_HELP_STRING([--enable-dependency-tracking],[Enable GCC automated dependency tracking [default=yes]])],
@@ -458,7 +447,7 @@ fi
 dnl NOTE: This is invoked from LT_INIT
 dnl AC_PROG_CC
 
-if test "$with_ntl" = "yes" || test "$enable_cxx" = "yes";
+if test "$with_ntl" = "yes" ;
 then
     AC_PROG_CXX
 fi
@@ -1054,13 +1043,6 @@ then
     AC_SUBST(WANT_DEPS,1)
 else
     AC_SUBST(WANT_DEPS,0)
-fi
-
-if test "$enable_cxx" = "yes";
-then
-    AC_SUBST(WANT_CXX,1)
-else
-    AC_SUBST(WANT_CXX,0)
 fi
 
 if test "$with_ntl" = "yes";
