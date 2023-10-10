@@ -533,14 +533,6 @@ void nmod_poly_powmod_fmpz_binexp(nmod_poly_t res,
 void _nmod_poly_powmod_fmpz_binexp(mp_ptr res, mp_srcptr poly,
                                 fmpz_t e, mp_srcptr f, slong lenf, nmod_t mod);
 
-void _nmod_poly_powmod_mpz_binexp(mp_ptr res, mp_srcptr poly,
-                                mpz_srcptr e, mp_srcptr f,
-                                slong lenf, nmod_t mod);
-
-void nmod_poly_powmod_mpz_binexp(nmod_poly_t res,
-                           const nmod_poly_t poly, mpz_srcptr e,
-                           const nmod_poly_t f);
-
 void _nmod_poly_powmod_ui_binexp_preinv (mp_ptr res, mp_srcptr poly,
                                     ulong e, mp_srcptr f, slong lenf,
                                     mp_srcptr finv, slong lenfinv, nmod_t mod);
@@ -562,14 +554,6 @@ void _nmod_poly_powmod_x_ui_preinv (mp_ptr res, ulong e, mp_srcptr f, slong lenf
 
 void nmod_poly_powmod_x_ui_preinv(nmod_poly_t res, ulong e, const nmod_poly_t f,
                              const nmod_poly_t finv);
-
-void _nmod_poly_powmod_mpz_binexp_preinv (mp_ptr res, mp_srcptr poly,
-                                    mpz_srcptr e, mp_srcptr f, slong lenf,
-                                    mp_srcptr finv, slong lenfinv, nmod_t mod);
-
-void nmod_poly_powmod_mpz_binexp_preinv(nmod_poly_t res,
-                           const nmod_poly_t poly, mpz_srcptr e,
-                           const nmod_poly_t f, const nmod_poly_t finv);
 
 void _nmod_poly_powmod_x_fmpz_preinv (mp_ptr res, fmpz_t e, mp_srcptr f, slong lenf,
                                mp_srcptr finv, slong lenfinv, nmod_t mod);
