@@ -202,9 +202,6 @@ endif
 INSTALL_DIRS :=                                                             \
         $(LIBDIR)                       $(INCLUDEDIR)/flint                 \
         $(PKGCONFIGDIR)
-ifneq ($(WANT_CXX),0)
-INSTALL_DIRS += $(INCLUDEDIR)/flint/flintxx
-endif
 ifneq ($(FLINT_DLLLIB),0)
 INSTALL_DIRS += $(BINDIR)
 endif
@@ -763,10 +760,6 @@ ifneq ($(STATIC), 0)
 	$(CP) $(FLINT_DIR)/$(FLINT_LIB_STATIC) $(LIBDIR)
 endif
 	$(CP) $(HEADERS) $(INCLUDEDIR)/flint
-ifneq ($(WANT_CXX), 0)
-	$(CP) $(SRC_DIR)/flintxx/*.h $(INCLUDEDIR)/flint/flintxx
-	$(CP) $(SRC_DIR)/flintxx_public/*xx.h $(INCLUDEDIR)/flint
-endif
 
 uninstall:
 	$(RM_F) $(PKGCONFIGDIR)/flint.pc
