@@ -1735,7 +1735,7 @@ int nmod_mpolyn_divides_threaded_pool(
     FLINT_ASSERT(B->bits == bits);
     FLINT_ASSERT(Q->bits == bits);
 
-#if !FLINT_KNOW_STRONG_ORDER
+#ifdef FLINT_BIG_ENDIAN
     return nmod_mpolyn_divides(Q, A, B, ctx);
 #endif
 

@@ -1710,7 +1710,7 @@ int _nmod_mpoly_divides_heap_threaded_pool(
 #endif
     TMP_INIT;
 
-#if !FLINT_KNOW_STRONG_ORDER
+#ifdef FLINT_BIG_ENDIAN
     return nmod_mpoly_divides_monagan_pearce(Q, A, B, ctx);
 #endif
 

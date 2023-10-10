@@ -60,14 +60,8 @@ extern "C" {
 # endif
 #endif
 
-/* 1 if we know that the hardware is strongly-ordered */
-#define FLINT_KNOW_STRONG_ORDER 0
-
 /* x86 : 64 bit */
 #if (GMP_LIMB_BITS == 64 && defined (__amd64__))
-
-#undef FLINT_KNOW_STRONG_ORDER
-#define FLINT_KNOW_STRONG_ORDER 1
 
 #define add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)  \
   __asm__ ("addq %11,%q3\n\tadcq %9,%q2\n\tadcq %7,%q1\n\tadcq %5,%q0"    \
@@ -155,10 +149,6 @@ static __inline__ flint_bitcnt_t flint_ctz(mp_limb_t x)
 /* x86 : 32 bit */
 #if (GMP_LIMB_BITS == 32 && (defined (__i386__) \
    || defined (__i486__) || defined(__amd64__)))
-
-#undef FLINT_KNOW_STRONG_ORDER
-#define FLINT_KNOW_STRONG_ORDER 1
-
 
 #define add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)  \
   __asm__ ("addl %11,%k3\n\tadcl %9,%k2\n\tadcl %7,%k1\n\tadcl %5,%k0"    \

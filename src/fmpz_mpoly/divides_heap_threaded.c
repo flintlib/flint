@@ -2004,7 +2004,7 @@ int _fmpz_mpoly_divides_heap_threaded_pool(
     divides_heap_base_t H;
     TMP_INIT;
 
-#if !FLINT_KNOW_STRONG_ORDER
+#ifdef FLINT_BIG_ENDIAN
     return fmpz_mpoly_divides_monagan_pearce(Q, A, B, ctx);
 #endif
 
