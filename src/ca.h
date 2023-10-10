@@ -8,6 +8,7 @@
     by the Free Software Foundation; either version 2.1 of the License, or
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
+/** @file */
 
 #ifndef CA_H
 #define CA_H
@@ -153,9 +154,10 @@ typedef ca_ext_cache_struct ca_ext_cache_t[1];
 
 typedef struct
 {
-    slong length;                /* Number of generators              */
-    ca_ext_struct ** ext;        /* Generators                        */
-    fmpz_mpoly_vec_struct ideal; /* Algebraic relations for reduction */
+    slong length;                /**< Number of generators              */
+    ca_ext_struct ** ext;        /**< Generators                        */
+    fmpz_mpoly_vec_struct ideal;
+    /**> Algebraic relations for reduction */
     ulong hash;
 }
 ca_field_struct;
@@ -164,6 +166,7 @@ typedef ca_field_struct ca_field_t[1];
 typedef ca_field_struct * ca_field_ptr;
 typedef const ca_field_struct * ca_field_srcptr;
 
+/** length */
 #define CA_FIELD_LENGTH(K) ((K)->length)
 #define CA_FIELD_EXT(K) ((K)->ext)
 #define CA_FIELD_EXT_ELEM(K, i) ((K)->ext[i])
@@ -183,8 +186,16 @@ typedef const ca_field_struct * ca_field_srcptr;
 #define CA_FIELD_IDEAL_P(K) ((K)->ideal.p)
 
 #define CA_MCTX_1(ctx) ((ctx)->mctx[0])
+/**
+
+    Assuming that *K* represents a multivariate field, accesses the
+    :type:`fmpz_mpoly_ctx_t` context object for multivariate polynomial
+    arithmetic on the internal representation of elements in this field.
+*/
 #define CA_FIELD_MCTX(K, ctx) ((ctx)->mctx[CA_FIELD_LENGTH(K) - 1])
 
+/**
+ */
 typedef struct
 {
     ca_field_struct ** items;
@@ -196,6 +207,14 @@ typedef struct
 }
 ca_field_cache_struct;
 
+
+/**
+ *
+    Represents a set of distinct :type:`ca_field_t` instances.
+    This object contains an array of pointers to individual heap-allocated
+    :type:`ca_field_struct` objects as well as a hash table for quick
+    lookup.
+*/
 typedef ca_field_cache_struct ca_field_cache_t[1];
 
 /* Context object ************************************************************/

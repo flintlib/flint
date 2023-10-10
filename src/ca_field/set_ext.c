@@ -13,6 +13,15 @@
 #include "ca_ext.h"
 #include "ca_field.h"
 
+/**
+
+    Sets the extension number at position *i* (here indexed from 0) of *K*
+    to the generator of the field with index *x_index* in *ctx*.
+    (It is assumed that the generating field is a univariate field.)
+
+    This only inserts a shallow reference: the field at index *x_index* must
+    be kept alive until *K* has been cleared.
+*/
 void
 ca_field_set_ext(ca_field_t K, slong i, ca_ext_srcptr x, ca_ctx_t ctx)
 {

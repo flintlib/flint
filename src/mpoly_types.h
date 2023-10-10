@@ -55,6 +55,9 @@ typedef struct
 }
 fmpz_mpoly_ctx_struct;
 
+/**
+    An array of length `1` of ``fmpz_mpoly_ctx_struct``.
+*/
 typedef fmpz_mpoly_ctx_struct fmpz_mpoly_ctx_t[1];
 
 typedef struct

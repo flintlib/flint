@@ -196,6 +196,14 @@ ca_field_depth(const ca_field_t K, ca_ctx_t ctx)
 }
 
 /* todo: sort on depth? */
+/**
+
+    Compares the field objects *K1* and *K2* in a canonical sort order,
+    returning -1, 0 or 1. This only performs a lexicographic comparison
+    of the representations of *K1* and *K2*; the return value does not say
+    anything meaningful about the relative structures of *K1* and *K2*
+    as mathematical fields.
+*/
 int
 ca_field_cmp(const ca_field_t K1, const ca_field_t K2, ca_ctx_t ctx)
 {

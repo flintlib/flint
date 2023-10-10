@@ -51,6 +51,7 @@ release = version
 extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.autodoc',
+    'breathe'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -137,6 +138,12 @@ html_static_path = ['_static']
 #
 # html_sidebars = {}
 
+mathjax3_config = {
+  "tex": {
+    "inlineMath": [['$', '$'], ['\\(', '\\)']]
+  }, }
+
+
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
@@ -199,3 +206,8 @@ texinfo_documents = [
 
 
 # -- Extension configuration -------------------------------------------------
+breathe_default_project = "my_project"
+breathe_projects_source = {
+    "my_project" : ( "../../src/", ["ca_field.h"] )
+}
+

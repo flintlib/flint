@@ -11,6 +11,11 @@
 
 #include "ca_field.h"
 
+/**
+
+    Clears the field *K*. This does not clear the individual extension
+    numbers, which are only held as references.
+*/
 void
 ca_field_clear(ca_field_t K, ca_ctx_t ctx)
 {

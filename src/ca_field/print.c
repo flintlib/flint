@@ -13,6 +13,10 @@
 #include "ca_ext.h"
 #include "ca_field.h"
 
+/**
+
+    Prints a description of the field *K* to standard output.
+*/
 void
 ca_field_print(const ca_field_t K, ca_ctx_t ctx)
 {
