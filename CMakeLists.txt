@@ -136,7 +136,6 @@ set(_BUILD_DIRS
     ca              ca_ext          ca_field        ca_vec
     ca_poly         ca_mat
 
-    flintxx
 )
 string(REGEX REPLACE "([A-Za-z0-9_-]+;|[A-Za-z0-9_-]+$)" "src/\\1" BUILD_DIRS "${_BUILD_DIRS}")
 
