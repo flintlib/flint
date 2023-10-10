@@ -119,7 +119,7 @@ arb_mat_mul_threaded(arb_mat_t C, const arb_mat_t A, const arb_mat_t B, slong pr
         args[i].br = br;
         args[i].prec = prec;
 
-        if (i < num_threads)
+        if (i < num_workers)
             thread_pool_wake(global_thread_pool, handles[i], 0, _arb_mat_mul_thread, &args[i]);
         else
             _arb_mat_mul_thread(&args[i]);
