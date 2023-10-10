@@ -1,18 +1,18 @@
 .. _examples-calcium:
 
-Example programs
+Calcium example programs
 ===============================================================================
 
 .. highlight:: text
 
-The *examples* directory
-(https://github.com/fredrik-johansson/calcium/tree/master/examples)
-contains complete C programs illustrating use of Calcium.
+See :ref:`examples` for general information about example programs.
 Running::
 
     make examples
 
-will compile the programs and place the binaries in ``build/examples``.
+will compile the programs and place the binaries in
+``build/examples``. The examples related to the Calcium module are
+documented below.
 
 elementary.c
 -------------------------------------------------------------------------------
@@ -22,13 +22,13 @@ For some inputs,
 Calcium's arithmetic should produce
 a simplified result automatically.
 Some inputs do not yet automatically simplify as much
-as one might hope. 
+as one might hope.
 Calcium may still able to prove that such a number is zero or nonzero;
 the output of :func:`ca_check_is_zero` is then ``T_TRUE`` or ``T_FALSE``.
 
 Sample output::
 
-    > build/examples/elementary 
+    > build/examples/elementary
     >>> Exp(Pi*I) + 1
     0
 
@@ -136,7 +136,7 @@ This program checks several variations of Machin's formula
 
 expressing `\pi` or logarithms of small integers in terms of
 arctangents or hyperbolic arctangents of rational numbers.
-The program actually evaluates 
+The program actually evaluates
 `4 \operatorname{atan}\left(\tfrac{1}{5}\right) - \operatorname{atan}\left(\tfrac{1}{239}\right) - \tfrac{\pi}{4}`
 (etc.) and prints the result, which should be precisely 0, proving the identity.
 Inverse trigonometric functions are not yet implemented in Calcium,
@@ -144,7 +144,7 @@ so the example program evaluates them using logarithms.
 
 Sample output::
 
-    > build/examples/machin 
+    > build/examples/machin
     [(1)*Atan(1/1) - Pi/4]   =   0
     [(1)*Atan(1/2) + (1)*Atan(1/3) - Pi/4]   =   0
     [(2)*Atan(1/2) + (-1)*Atan(1/7) - Pi/4]   =   0
@@ -224,7 +224,7 @@ operations in total).
 
 By default, the program runs the computation using :type:`qqbar_t` arithmetic::
 
-    > build/examples/huge_expr 
+    > build/examples/huge_expr
     Evaluating N...
     cpu/wall(s): 7.205 7.206
     Evaluating M...
