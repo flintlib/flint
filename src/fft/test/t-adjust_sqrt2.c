@@ -9,9 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmpcompat.h"
 #include "mpn_extras.h"
 #include "fft.h"
-
 
 /* set p = 2^wn + 1 */
 void set_p(mpz_t p, mp_size_t n, flint_bitcnt_t w)
