@@ -102,6 +102,7 @@ cleanup:
    fmpz_clear(n2);
    fmpz_clear(exp);
    n_primes_clear(iter);
+   mpfr_clear(lim);
 
    flint_mpz_clear_readonly(mn);
 

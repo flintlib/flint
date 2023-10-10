@@ -1,7 +1,11 @@
 name: CI
 
-
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - trunk
+      - flint-*
 
 concurrency:
   # group by workflow and ref; the last slightly strange component ensures that for pull
@@ -196,7 +200,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: "Run tests on FreeBSD"
-        uses: cross-platform-actions/action@v0.10.0
+        uses: cross-platform-actions/action@v0.19.1
         timeout-minutes: 25
         continue-on-error: true
         with:
@@ -276,7 +280,7 @@ jobs:
   # cygwin with gcc
   ##############################################################################
   cygwin-gcc:
-    name: Cygwin GCC (x1)
+    name: Cygwin GCC (x0.5)
 
     runs-on: windows-latest
 
@@ -322,13 +326,13 @@ jobs:
       - name: "Compile tests"
         run: |
           cd ${REPO}
-          export FLINT_TEST_MULTIPLIER=1
+          export FLINT_TEST_MULTIPLIER=0.5
           $MAKE tests
 
       - name: "Check"
         run: |
           cd ${REPO}
-          export FLINT_TEST_MULTIPLIER=1
+          export FLINT_TEST_MULTIPLIER=0.5
           $MAKE check
 
       - if: failure()

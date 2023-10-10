@@ -104,6 +104,7 @@ main(void)
     }
 
     flint_randclear(state);
+    flint_cleanup();
 
     return 0;
 }
