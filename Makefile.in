@@ -230,10 +230,8 @@ SINGLE_HEADERS :=                                                           \
         fq_types.h                      fq_nmod_types.h                     \
         fq_zech_types.h                                                     \
         arf_types.h                     acf_types.h                         \
-        arb_types.h                     acb_types.h
-ifneq ($(WANT_NTL), 0)
-SINGLE_HEADERS += NTL-interface.h
-endif
+        arb_types.h                     acb_types.h                         \
+        NTL-interface.h
 
 HEADERS :=  $(patsubst %,$(SRC_DIR)/%,                                      \
                 $(patsubst %,%,$(SINGLE_HEADERS))                           \
@@ -250,11 +248,6 @@ $(1)_SOURCES := $(wildcard $(SRC_DIR)/$(1)/*.c)
 endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_SOURCES,$(dir))))
 SOURCES := $(foreach dir,$(DIRS),$($(dir)_SOURCES))
-# NOTE: We do not add CPP files to C files in SOURCES in order to not screw up
-# the `patsubst' in the object files.
-ifneq ($(WANT_NTL), 0)
-interfaces_SOURCES := $(SRC_DIR)/interfaces/NTL-interface.cpp
-endif
 
 define xxx_PROF_SOURCES
 $(1)_PROF_SOURCES := $(wildcard $(SRC_DIR)/$(1)/profile/*.c)
@@ -271,6 +264,8 @@ endef
 _TEST_SOURCES := $(wildcard $(SRC_DIR)/test/*.c)
 $(foreach dir, $(DIRS), $(eval $(call xxx_TEST_SOURCES,$(dir))))
 TEST_SOURCES := $(foreach dir,$(DIRS),$($(dir)_TEST_SOURCES)) $(_TEST_SOURCES) $(fq_zech_vec_TEST_SOURCES)
+# NOTE: We do not add CPP files to C files in SOURCES in order to not screw up
+# the `patsubst' in the object files.
 ifneq ($(WANT_NTL), 0)
 interfaces_TEST_SOURCES := $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp
 endif
@@ -294,9 +289,6 @@ $(1)_OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$($(1)_SOURCES))
 endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_OBJS,$(dir))))
 OBJS := $(foreach dir, $(DIRS), $($(dir)_OBJS))
-ifneq ($(WANT_NTL), 0)
-OBJS += $(BUILD_DIR)/interfaces/NTL-interface.o
-endif
 endif
 
 ################################################################################
@@ -374,9 +366,6 @@ $(BUILD_DIR)/$(1)_merged.lo: $($(1)_LOBJS) | $(BUILD_DIR)
 endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_merged_lobj_rule,$(dir))))
 MERGED_LOBJS:=$(foreach dir, $(DIRS),$(BUILD_DIR)/$(dir)_merged.lo)
-ifneq ($(WANT_NTL), 0)
-MERGED_LOBJS += $(BUILD_DIR)/interfaces/NTL-interface.lo
-endif
 
 $(FLINT_DIR)/$(FLINT_LIB_FULL): $(MERGED_LOBJS)
 	$(CC) $(CFLAGS) -shared $(EXTRA_SHARED_FLAGS) $(MERGED_LOBJS) -o $(FLINT_LIB_FULL) $(LDFLAGS) $(LIBS)
@@ -527,12 +516,6 @@ $(BUILD_DIR)/$(1)/%.o: $(SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
 endef
 
 $(foreach dir, $(DIRS), $(eval $(call xxx_OBJS_rule,$(dir))))
-
-ifneq ($(WANT_NTL), 0)
-$(BUILD_DIR)/interfaces/NTL-interface.o: $(SRC_DIR)/interfaces/NTL-interface.cpp | $(BUILD_DIR)/interfaces
-	@echo "  CXX $(@:$(BUILD_DIR)/%=%)"
-	@$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $< -o $@ -MMD -MF $(@:%=%.d)
-endif
 endif
 
 ################################################################################
@@ -547,12 +530,6 @@ $(BUILD_DIR)/$(1)/%.lo: $(SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
 endef
 
 $(foreach dir, $(DIRS), $(eval $(call xxx_LOBJS_rule,$(dir))))
-
-ifneq ($(WANT_NTL), 0)
-$(BUILD_DIR)/interfaces/NTL-interface.lo: $(SRC_DIR)/interfaces/NTL-interface.cpp | $(BUILD_DIR)/interfaces
-	@echo "  CXX $(@:$(BUILD_DIR)/%=%)"
-	@$(CXX) $(PIC_FLAG) $(CXXFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $< -o $@ -MMD -MF $(@:%=.d)
-endif
 endif
 
 ################################################################################
