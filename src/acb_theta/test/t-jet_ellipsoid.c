@@ -55,7 +55,7 @@ int main(void)
         }
 
         /* Test: sum of terms on the border is less than u */
-        acb_theta_jet_ellipsoid(E, u, z, tau, prec);
+        acb_theta_jet_ellipsoid(E, u, z, tau, ord, prec);
         nb_pts = acb_theta_eld_nb_border(E);
         pts = flint_malloc(g * nb_pts * sizeof(slong));
         acb_theta_eld_border(pts, E);

@@ -50,7 +50,7 @@ int main(void)
         {
             flint_printf("FAIL\n");
             acb_mat_printd(tau, 5);
-            arb_mat_printd(cho, 5);
+            arb_mat_printd(C, 5);
             flint_abort();
         }
 

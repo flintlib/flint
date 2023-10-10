@@ -25,7 +25,7 @@ chi35_lead(acb_t r, const acb_mat_t tau, slong prec)
     acb_exp_pi_i(q2, acb_mat_entry(tau, 0, 1), prec);
     acb_exp_pi_i(q3, acb_mat_entry(tau, 1, 1), prec);
 
-    acb_mul_(r, q1, q3, prec);
+    acb_mul(r, q1, q3, prec);
     acb_sqr(r, r, prec);
     acb_sub(t, q1, q3, prec);
     acb_mul(r, r, t, prec);
@@ -91,7 +91,7 @@ int main(void)
         }
 
         acb_siegel_randtest_nice(tau, state, prec);
-        acb_mul_2exp_si(tau, tau, n_randint(state, 10));
+        acb_mat_scalar_mul_2exp_si(tau, tau, n_randint(state, 10));
         acb_theta_naive_all(th, z, 1, tau, prec);
         acb_theta_g2_chi35(r, th, prec);
         chi35_lead(s, tau, prec);

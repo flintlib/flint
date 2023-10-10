@@ -58,12 +58,12 @@ void acb_theta_g2_sextic(acb_poly_t res, const acb_mat_t tau, slong prec)
     if (prec < ACB_THETA_G2_JET_NAIVE_THRESHOLD)
     {
         acb_theta_g2_jet_naive_1(dth, w, prec);
-        acb_theta_g2_chi6m2(res, dth, prec);
+        acb_theta_g2_chim2_6(res, dth, prec);
     }
     else
     {
         acb_theta_jet_all(dth, z, w, 1, prec);
-        acb_theta_g2_chi6m2(res, dth, prec);
+        acb_theta_g2_chim2_6(res, dth, prec);
     }
 
     sp2gz_inv(mat, mat);

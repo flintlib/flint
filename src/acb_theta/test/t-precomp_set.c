@@ -77,7 +77,7 @@ int main(void)
         {
             for (j = 0; j < acb_theta_eld_box(E, k); j++)
             {
-                if (!acb_is_done(acb_theta_precomp_sqr_pow(D, k, j)))
+                if (!acb_is_one(acb_theta_precomp_sqr_pow(D, k, j)))
                 {
                     res = 0;
                 }

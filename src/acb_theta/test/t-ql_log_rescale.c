@@ -21,19 +21,23 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: if z = C^t x, should find i|z|^2 */
+    /* Test: if z = C^t x, should find i|x|^2 */
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 4);
         slong prec = 100;
         slong bits = 1 + n_randint(state, 4);
-        acb_mat_t tau;
+        acb_mat_t tau, A;
         arb_mat_t C;
         acb_ptr x, z;
         acb_t r, s, t;
+        slong k;
 
         acb_mat_init(tau, g, g);
+        acb_mat_init(A, g, g);
+        arb_mat_init(C, g, g);
         x = _acb_vec_init(g);
+        z = _acb_vec_init(g);
         acb_init(r);
         acb_init(s);
         acb_init(t);
@@ -44,11 +48,12 @@ int main(void)
             acb_urandom(&x[k], state, prec);
         }
         acb_theta_eld_cho(C, tau, prec);
-        acb_mat_transpose(C, C);
-        acb_mat_vector_mul_col(z, C, x, prec);
+        arb_mat_transpose(C, C);
+        acb_mat_set_arb_mat(A, C);
+        acb_mat_vector_mul_col(z, A, x, prec);
 
         acb_theta_ql_log_rescale(r, z, tau, prec);
-        acb_dot(t, NULL, 0, x, 1, x, 1, prec);
+        acb_dot(t, NULL, 0, x, 1, x, 1, g, prec);
         acb_const_pi(s, prec);
         acb_mul_onei(s, s);
         acb_mul(t, t, s, prec);
@@ -64,7 +69,10 @@ int main(void)
         }
 
         acb_mat_clear(tau);
+        acb_mat_clear(A);
+        arb_mat_clear(C);
         _acb_vec_clear(x, g);
+        _acb_vec_clear(z, g);
         acb_clear(r);
         acb_clear(s);
         acb_clear(t);

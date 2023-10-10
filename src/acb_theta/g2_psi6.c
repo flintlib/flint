@@ -44,7 +44,7 @@ g2_psi6_sgn(ulong b, ulong c, ulong d)
 
 
 void
-igusa_h6(acb_t res, acb_srcptr th2, slong prec)
+acb_theta_g2_psi6(acb_t res, acb_srcptr th2, slong prec)
 {
     slong g = 2;
     ulong ch1, ch2, ch3;

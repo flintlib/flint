@@ -65,7 +65,7 @@ int main(void)
             arb_zero(sum);
             for (k = 0; k < nb_pts; k++)
             {
-                acb_theta_naive_term(term, new_z + j * g, tau, pts + k * g, 2 * prec);
+                acb_theta_naive_term(term, new_z + j * g, tau, NULL, pts + k * g, 2 * prec);
                 acb_abs(abs, term, 2 * prec);
                 arb_add(sum, sum, abs, 2 * prec);
             }

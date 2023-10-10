@@ -35,7 +35,7 @@ int main(void)
             {
                 for (ch3 = 0; ch3 < n; ch3++)
                 {
-                    if (acb_theta_char_is_goepel(ch1, ch2, ch3, ch4, g))
+                    if (acb_theta_char_is_syzygous(ch1, ch2, ch3, g))
                     {
                         cnt++;
                     }

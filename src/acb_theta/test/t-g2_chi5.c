@@ -43,7 +43,7 @@ int main(void)
 
         acb_theta_g2_chi5(r, th, prec);
         acb_sqr(r, r, prec);
-        _acb_vec_sqr(th, th, n2);
+        _acb_vec_sqr(th, th, n2, prec);
         acb_theta_g2_chi10(s, th, prec);
 
         if (!acb_overlaps(r, s))

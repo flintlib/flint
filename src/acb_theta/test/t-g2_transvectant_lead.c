@@ -38,9 +38,9 @@ int main(void)
         acb_init(c);
         acb_init(t);
 
-        acb_poly_randtest(f, m, prec, bits);
+        acb_poly_randtest(f, state, m, prec, bits);
         acb_poly_set_coeff_si(f, m, 1);
-        acb_poly_randtest(g, n, prec, bits);
+        acb_poly_randtest(g, state, n, prec, bits);
         acb_poly_set_coeff_si(g, n, 1);
 
         acb_theta_g2_transvectant(h, f, g, m, n, k, prec);

@@ -32,7 +32,7 @@ int main(void)
         arb_t x;
         arf_t R2;
         arb_ptr v;
-        slong k;
+        slong k, j;
         slong *all_pts;
 
         acb_theta_eld_init(E, g, g);

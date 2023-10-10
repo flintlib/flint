@@ -45,7 +45,7 @@ int main(void)
         }
 
         acb_mat_clear(tau);
-        fmpz_mat_clear(tau);
+        fmpz_mat_clear(mat);
     }
 
     flint_randclear(state);

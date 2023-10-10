@@ -32,11 +32,13 @@ int main(void)
         acb_mat_t tau;
         acb_t z;
         acb_t x, t;
+        fmpz_t m;
 
         acb_mat_init(tau, g, g);
         acb_init(z);
         acb_init(x);
         acb_init(t);
+        fmpz_init(m);
 
         acb_siegel_randtest(tau, state, prec, bits);
         acb_randtest_precise(z, state, prec, bits);
@@ -47,8 +49,9 @@ int main(void)
         acb_mul_si(t, t, n, prec);
         acb_exp_pi_i(t, t, prec);
 
-        fmpz_pow_ui(n, n, k);
-        acb_mul(t, t, n, prec);
+        fmpz_set_si(m, n);
+        fmpz_pow_ui(m, m, k);
+        acb_mul_fmpz(t, t, m, prec);
 
         if (!acb_overlaps(x, t))
         {
@@ -60,6 +63,7 @@ int main(void)
         acb_clear(z);
         acb_clear(x);
         acb_clear(t);
+        fmpz_clear(m);
     }
 
     flint_randclear(state);

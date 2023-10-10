@@ -26,7 +26,6 @@ int main(void)
     {
         slong g = 2;
         slong n = 1 << (2 * g);
-        slong nb = acb_theta_jet_nb(1, g + 1);
         slong prec = 100 + n_randint(state, 100);
         slong bits = n_randint(state, 4);
         acb_mat_t tau;
@@ -70,7 +69,7 @@ int main(void)
                 flint_printf("roots, discr, chi10:\n");
                 _acb_vec_printd(roots, 6, 5);
                 acb_printd(d, 5);
-                flint_printd("\n");
+                flint_printf("\n");
                 acb_printd(t, 5);
                 flint_printf("\n");
             }

@@ -28,14 +28,14 @@ int main(void)
         slong n = 1 << g;
         slong prec = ACB_THETA_LOW_PREC + n_randint(state, 100);
         slong bits = 4;
-        slong s = n_randint(g + 1);
+        slong s = n_randint(state, g + 1);
         acb_mat_t tau, tau0;
         arb_mat_t Y;
         acb_ptr z, new_z, th, th0, test;
         arb_ptr x;
         acb_t c;
         arb_t u, abs;
-        ulong a0, a1, b0, b1, fixed_a1, s;
+        ulong a0, a1, b0, b1, fixed_a1;
         slong j, k;
 
         acb_mat_init(tau, g, g);
@@ -71,7 +71,7 @@ int main(void)
         for (k = 0; k < g; k++)
         {
             acb_urandom(&z[k], state, prec);
-            arb_add(acb_imagref(&z[k]), &x[k], prec);
+            arb_add(acb_imagref(&z[k]), acb_imagref(&z[k]), &x[k], prec);
         }
 
         s = acb_theta_ql_reduce(new_z, c, u, &fixed_a1, z, tau, prec);
@@ -116,7 +116,7 @@ int main(void)
             b1 = k % (1 << (g - s));
             if (a1 == fixed_a1)
             {
-                acb_mul(&test[k], c, &th0[a0 << s + b0], prec);
+                acb_mul(&test[k], c, &th0[(a0 << s) + b0], prec);
                 acb_mul_powi(&test[k], &test[k], acb_theta_char_dot(a1, b1, g));
             }
             acb_add_error_arb(&test[k], u);

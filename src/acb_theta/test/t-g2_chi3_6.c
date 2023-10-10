@@ -45,7 +45,6 @@ int main(void)
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         slong g = 2;
-        slong n2 = 1 << (2 * g);
         slong prec = 100 + n_randint(state, 500);
         slong mag_bits = n_randint(state, 2);
         fmpz_mat_t mat;
@@ -57,8 +56,8 @@ int main(void)
         acb_mat_init(w, g, g);
         acb_mat_init(c, g, g);
         acb_mat_init(cinv, g, g);
-        acb_init(r);
-        acb_init(s);
+        acb_poly_init(r);
+        acb_poly_init(s);
 
         sp2gz_randtest(mat, state, mag_bits);
         acb_siegel_randtest_reduced(tau, state, prec, mag_bits);
@@ -84,8 +83,8 @@ int main(void)
         acb_mat_clear(w);
         acb_mat_clear(c);
         acb_mat_clear(cinv);
-        acb_clear(r);
-        acb_clear(s);
+        acb_poly_clear(r);
+        acb_poly_clear(s);
     }
 
     flint_randclear(state);

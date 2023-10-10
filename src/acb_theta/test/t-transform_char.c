@@ -28,7 +28,7 @@ int main(void)
         slong bits = 8;
         fmpz_mat_t mat;
         slong e;
-        ulong ab = n_randint(1 << (2 * g));
+        ulong ab = n_randint(state, 1 << (2 * g));
         ulong test;
         slong j, k;
 

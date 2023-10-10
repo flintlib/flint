@@ -18,13 +18,13 @@ acb_theta_jet_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z,
     slong g = acb_mat_nrows(tau);
     arf_t R2, eps;
     arb_mat_t C, Yinv;
-    arb_ptr offset;
+    arb_ptr v;
 
     arf_init(R2);
     arf_init(eps);
     arb_mat_init(C, g, g);
     arb_mat_init(Yinv, g, g);
-    offset = _arb_vec_init(g);
+    v = _arb_vec_init(g);
 
     acb_theta_eld_cho(C, tau, prec);
     acb_mat_get_imag(Yinv, tau);
@@ -33,16 +33,16 @@ acb_theta_jet_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z,
     if (arb_mat_is_finite(C))
     {
         /* Get offset and bound on leading factor */
-        _acb_vec_get_imag(offset, z, g);
-        arb_mat_vector_mul_col(offset, Yinv, offset, prec);
-        arb_mat_vector_mul_col(offset, C, offset, prec);
+        _acb_vec_get_imag(v, z, g);
+        arb_mat_vector_mul_col(v, Yinv, v, prec);
+        arb_mat_vector_mul_col(v, C, v, prec);
         arb_zero(u);
-        arb_dot(u, u, 0, offset, 1, offset, 1, g, prec);
+        arb_dot(u, u, 0, v, 1, v, 1, g, prec);
         arb_exp(u, u, prec);
 
         /* Get radius, fill ellipsoid */
-        acb_theta_jet_naive_radius(R2, eps, offset, C, ord, prec);
-        acb_theta_eld_fill(E, C, R2, offset);
+        acb_theta_jet_naive_radius(R2, eps, C, v, ord, prec);
+        acb_theta_eld_fill(E, C, R2, v);
         arb_mul_arf(u, u, eps, prec);
     }
     else
@@ -50,7 +50,7 @@ acb_theta_jet_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z,
         /* Cannot compute C, result will be nan */
         arb_mat_one(C);
         arf_zero(R2);
-        acb_theta_eld_fill(E, C, R2, offset);
+        acb_theta_eld_fill(E, C, R2, v);
         arb_indeterminate(u);
     }
 
@@ -58,5 +58,5 @@ acb_theta_jet_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z,
     arf_clear(eps);
     arb_mat_clear(C);
     arb_mat_clear(Yinv);
-    _arb_vec_clear(offset, g);
+    _arb_vec_clear(v, g);
 }

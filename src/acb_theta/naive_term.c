@@ -12,7 +12,8 @@
 #include "acb_theta.h"
 
 void
-acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong* n, slong prec)
+acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong* tup,
+    slong* n, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     arb_ptr x, y, v;
@@ -48,14 +49,17 @@ acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong* n, slo
     acb_add(res, res, dot, prec);
     acb_exp_pi_i(res, res, prec);
 
-    fmpz_one(m);
-    for (k = 0; k < g; k++)
+    if (tup != NULL)
     {
-        fmpz_set_si(t, n[k]);
-        fmpz_pow_ui(t, t, tup[k]);
-        fmpz_mul(m, m, t);
+        fmpz_one(m);
+        for (k = 0; k < g; k++)
+        {
+            fmpz_set_si(t, n[k]);
+            fmpz_pow_ui(t, t, tup[k]);
+            fmpz_mul(m, m, t);
+        }
+        acb_mul_fmpz(res, res, m, prec);
     }
-    acb_mul_fmpz(res, res, m, prec);
 
     _arb_vec_clear(x, g);
     _arb_vec_clear(y, g);

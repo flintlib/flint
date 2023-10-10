@@ -12,8 +12,8 @@
 #include "acb_theta.h"
 
 void
-acb_theta_jet_naive_radius(arf_t R2, arf_t eps, arb_srcptr v,
-    const arb_mat_t C, slong ord, slong prec)
+acb_theta_jet_naive_radius(arf_t R2, arf_t eps, const arb_mat_t C, arb_srcptr v,
+    slong ord, slong prec)
 {
     slong g = arb_mat_nrows(C);
     slong lp = ACB_THETA_LOW_PREC;

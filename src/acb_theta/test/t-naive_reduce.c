@@ -104,8 +104,8 @@ int main(void)
 
         for (k = 0; k < nbz; k++)
         {
-            acb_theta_naive_term(x, z + k * g, tau, n + k * g, prec);
-            acb_theta_naive_term(t, new_z + k * g, tau, zero, prec);
+            acb_theta_naive_term(x, z + k * g, tau, NULL, n + k * g, prec);
+            acb_theta_naive_term(t, new_z + k * g, tau, NULL, zero, prec);
             acb_mul(t, t, &c[k], prec);
 
             if (!acb_overlaps(x, t))

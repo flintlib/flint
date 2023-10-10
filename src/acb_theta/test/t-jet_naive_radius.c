@@ -80,7 +80,7 @@ acb_theta_jet_naive_tail(arb_t res, const arf_t R2, const arb_mat_t C, arb_srcpt
     arb_pow_ui(t, R, g - 1, lp);
     arb_mul(res, res, t, lp);
 
-    arb_sqr(t, R, prec);
+    arb_sqr(t, R, lp);
     arb_exp(t, t, lp);
     arb_mul(res, res, t, lp);
 
@@ -97,7 +97,7 @@ acb_theta_jet_naive_tail(arb_t res, const arf_t R2, const arb_mat_t C, arb_srcpt
     _arb_vec_inf_norm(u, v, g, lp);
     arb_add(t, t, u, lp);
     arb_set_si(u, 1);
-    arb_max(t, t, u);
+    arb_max(t, t, u, lp);
     arb_pow_ui(t, t, ord, lp);
     arb_mul(res, res, t, lp);
 
