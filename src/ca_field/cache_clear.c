@@ -11,6 +11,10 @@
 
 #include "ca_field.h"
 
+/**
+    Clears *cache*, freeing the memory allocated internally.
+    This does not clear the individual extension
+    numbers, which are only held as references. */
 void
 ca_field_cache_clear(ca_field_cache_t cache, ca_ctx_t ctx)
 {

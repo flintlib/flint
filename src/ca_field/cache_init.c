@@ -13,6 +13,10 @@
 
 #define INITIAL_HASH_SIZE 16
 
+/**
+
+    Initializes *cache* for use.
+*/
 void
 ca_field_cache_init(ca_field_cache_t cache, ca_ctx_t ctx)
 {

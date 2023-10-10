@@ -32,6 +32,10 @@ _ca_ctx_init_mctx(ca_ctx_t ctx, slong len)
 }
 
 
+/**
+
+    Initializes *K* to represent the trivial field `\mathbb{Q}`.
+*/
 void
 ca_field_init_qq(ca_field_t K, ca_ctx_t ctx)
 {
@@ -43,6 +47,10 @@ ca_field_init_qq(ca_field_t K, ca_ctx_t ctx)
     CA_FIELD_HASH(K) = 0;
 }
 
+/**
+
+    Initializes *K* to represent the algebraic number field `\mathbb{Q}(x)`.
+*/
 void
 ca_field_init_nf(ca_field_t K, const qqbar_t x, ca_ctx_t ctx)
 {
@@ -63,6 +71,12 @@ ca_field_init_nf(ca_field_t K, const qqbar_t x, ca_ctx_t ctx)
     CA_FIELD_HASH(K) = CA_EXT_HASH(ext);
 }
 
+/**
+
+    Initializes *K* to represent the field
+    `\mathbb{Q}(x)` where *x* is a builtin constant defined by
+    *func* (example: *func* = *CA_Pi* for `x = \pi`).
+*/
 void
 ca_field_init_const(ca_field_t K, calcium_func_code func, ca_ctx_t ctx)
 {
@@ -85,6 +99,12 @@ ca_field_init_const(ca_field_t K, calcium_func_code func, ca_ctx_t ctx)
     _ca_ctx_init_mctx(ctx, 1);
 }
 
+/**
+
+    Initializes *K* to represent the field
+    $\mathbb{Q}(a)$ where `a = f(x)`, given a number *x* and a builtin
+    univariate function *func* (example: *func* = *CA_Exp* for `e^x`).
+*/
 void ca_field_init_fx(ca_field_t K, calcium_func_code func, const ca_t x, ca_ctx_t ctx)
 {
     ca_ext_ptr ext;
@@ -106,6 +126,11 @@ void ca_field_init_fx(ca_field_t K, calcium_func_code func, const ca_t x, ca_ctx
     _ca_ctx_init_mctx(ctx, 1);
 }
 
+/**
+
+    Initializes *K* to represent the field
+    `\mathbb{Q}(a,b)` where `a = f(x, y)`.
+*/
 void ca_field_init_fxy(ca_field_t K, calcium_func_code func, const ca_t x, const ca_t y, ca_ctx_t ctx)
 {
     ca_ext_ptr ext;
@@ -127,6 +152,13 @@ void ca_field_init_fxy(ca_field_t K, calcium_func_code func, const ca_t x, const
     _ca_ctx_init_mctx(ctx, 2);
 }
 
+/**
+
+    Initializes *K* to represent a multivariate field
+    `\mathbb{Q}(a_1, \ldots, a_n)` in *n*
+    extension numbers. The extension numbers must subsequently be
+    assigned one by one using  `::ca_field_set_ext`.
+*/
 void
 ca_field_init_multi(ca_field_t K, slong len, ca_ctx_t ctx)
 {

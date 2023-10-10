@@ -21,9 +21,7 @@ Types, macros and constants
 
     Context structure representing the parent ring of an ``fmpz_mpoly``.
 
-.. type:: fmpz_mpoly_ctx_t
-
-    An array of length `1` of ``fmpz_mpoly_ctx_struct``.
+.. doxygentypedef:: fmpz_mpoly_ctx_t
 
 
 Context object

@@ -280,6 +280,15 @@ erf(x) - i*erfi(-i*x)      = 0
 erfc(x) - i*erfi(i*x) - 1  = 0
 erfc(x) + i*erfi(-i*x) - 1 = 0
 */
+/**
+
+    Builds relations for error functions present among the extension
+    numbers in *K*. This heuristic adds relations that are consequences
+    of the functional equations
+    `\operatorname{erf}(x) = -\operatorname{erf}(-x)`,
+    `\operatorname{erfc}(x) = 1-\operatorname{erf}(x)`,
+    `\operatorname{erfi}(x) = -i\operatorname{erf}(ix)`.
+*/
 void
 ca_field_build_ideal_erf(ca_field_t K, ca_ctx_t ctx)
 {

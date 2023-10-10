@@ -104,6 +104,13 @@ ca_field_init_set_ext(ca_field_t K, ca_ext_struct ** ext, slong len, ca_ctx_t ct
 }
 
 
+/*!
+    Adds the field defined by the length-*len* list of extension numbers *x*
+    to *cache* without duplication. If such a field already exists in *cache*,
+    a pointer to that instance is returned. Otherwise, a field with
+    extension numbers *x* is inserted into *cache* and a pointer to that
+    new instance is returned. Upon insertion of a new field, the
+    reduction ideal is constructed via `::ca_field_build_ideal`. */
 ca_field_ptr ca_field_cache_insert_ext(ca_field_cache_t cache, ca_ext_struct ** x, slong length, ca_ctx_t ctx)
 {
     ulong xhash;

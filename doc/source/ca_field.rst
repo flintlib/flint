@@ -93,138 +93,68 @@ For all types, a *type_t* is defined as an array of length one of type
 .. macro:: CA_FIELD_IDEAL_ELEM(K, i)
 
     Assuming that *K* represents a multivariate field, accesses element *i*
-    (indexed from zero) of the reduction ideal as a :type:`fmpz_mpoly_t`.
+    (indexed from zero) of the reduction ideal as a ``::fmpz_mpoly_t``.
 
 .. macro:: CA_FIELD_IDEAL_LENGTH(K)
 
     Assuming that *K* represents a multivariate field, accesses the number
     of polynomials in the reduction ideal.
 
-.. macro:: CA_FIELD_MCTX(K, ctx)
-
-    Assuming that *K* represents a multivariate field, accesses the
-    :type:`fmpz_mpoly_ctx_t` context object for multivariate polynomial
-    arithmetic on the internal representation of elements in this field.
+.. doxygendefine:: CA_FIELD_MCTX
 
 Memory management
 -------------------------------------------------------------------------------
 
-.. function:: void ca_field_init_qq(ca_field_t K, ca_ctx_t ctx)
+.. doxygenfunction:: ca_field_init_qq
 
-    Initializes *K* to represent the trivial field `\mathbb{Q}`.
+.. doxygenfunction:: ca_field_init_nf
 
-.. function:: void ca_field_init_nf(ca_field_t K, const qqbar_t x, ca_ctx_t ctx)
+.. doxygenfunction:: ca_field_init_const
 
-    Initializes *K* to represent the algebraic number field `\mathbb{Q}(x)`.
+.. doxygenfunction:: ca_field_init_fx
 
-.. function:: void ca_field_init_const(ca_field_t K, calcium_func_code func, ca_ctx_t ctx)
+.. doxygenfunction:: ca_field_init_fxy
 
-    Initializes *K* to represent the field
-    `\mathbb{Q}(x)` where *x* is a builtin constant defined by
-    *func* (example: *func* = *CA_Pi* for `x = \pi`).
+.. doxygenfunction:: ca_field_init_multi
 
-.. function:: void ca_field_init_fx(ca_field_t K, calcium_func_code func, const ca_t x, ca_ctx_t ctx)
+.. doxygenfunction:: ca_field_set_ext
 
-    Initializes *K* to represent the field
-    `\mathbb{Q}(a)` where `a = f(x)`, given a number *x* and a builtin
-    univariate function *func* (example: *func* = *CA_Exp* for `e^x`).
-
-.. function:: void ca_field_init_fxy(ca_field_t K, calcium_func_code func, const ca_t x, const ca_t y, ca_ctx_t ctx)
-
-    Initializes *K* to represent the field
-    `\mathbb{Q}(a,b)` where `a = f(x, y)`.
-
-.. function:: void ca_field_init_multi(ca_field_t K, slong len, ca_ctx_t ctx)
-
-    Initializes *K* to represent a multivariate field
-    `\mathbb{Q}(a_1, \ldots, a_n)` in *n*
-    extension numbers. The extension numbers must subsequently be
-    assigned one by one using :func:`ca_field_set_ext`.
-
-.. function:: void ca_field_set_ext(ca_field_t K, slong i, ca_ext_srcptr x_index, ca_ctx_t ctx)
-
-    Sets the extension number at position *i* (here indexed from 0) of *K*
-    to the generator of the field with index *x_index* in *ctx*.
-    (It is assumed that the generating field is a univariate field.)
-
-    This only inserts a shallow reference: the field at index *x_index* must
-    be kept alive until *K* has been cleared.
-
-.. function:: void ca_field_clear(ca_field_t K, ca_ctx_t ctx)
-
-    Clears the field *K*. This does not clear the individual extension
-    numbers, which are only held as references.
+.. doxygenfunction:: ca_field_clear
 
 Input and output
 -------------------------------------------------------------------------------
 
-.. function:: void ca_field_print(const ca_field_t K, ca_ctx_t ctx)
-
-    Prints a description of the field *K* to standard output.
+.. doxygenfunction:: ca_field_print
 
 Ideal
 -------------------------------------------------------------------------------
 
-.. function:: void ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
+.. doxygenfunction:: ca_field_build_ideal
 
-    Given *K* with assigned extension numbers,
-    builds the reduction ideal in-place.
-
-.. function:: void ca_field_build_ideal_erf(ca_field_t K, ca_ctx_t ctx)
-
-    Builds relations for error functions present among the extension
-    numbers in *K*. This heuristic adds relations that are consequences
-    of the functional equations
-    `\operatorname{erf}(x) = -\operatorname{erf}(-x)`,
-    `\operatorname{erfc}(x) = 1-\operatorname{erf}(x)`,
-    `\operatorname{erfi}(x) = -i\operatorname{erf}(ix)`.
+.. doxygenfunction:: ca_field_build_ideal_erf
 
 
 Structure operations
 -------------------------------------------------------------------------------
 
-.. function:: int ca_field_cmp(const ca_field_t K1, const ca_field_t K2, ca_ctx_t ctx)
-
-    Compares the field objects *K1* and *K2* in a canonical sort order,
-    returning -1, 0 or 1. This only performs a lexicographic comparison
-    of the representations of *K1* and *K2*; the return value does not say
-    anything meaningful about the relative structures of *K1* and *K2*
-    as mathematical fields.
+.. doxygenfunction:: ca_field_cmp
 
 Cache
 -------------------------------------------------------------------------------
 
-.. type:: ca_field_cache_struct
+.. doxygenstruct:: ca_field_cache_struct
 
-.. type:: ca_field_cache_t
+.. doxygentypedef:: ca_field_cache_t
 
-    Represents a set of distinct :type:`ca_field_t` instances.
-    This object contains an array of pointers to individual heap-allocated
-    :type:`ca_field_struct` objects as well as a hash table for quick
-    lookup.
+.. doxygenfunction:: ca_field_cache_init
 
-.. function:: void ca_field_cache_init(ca_field_cache_t cache, ca_ctx_t ctx)
+.. doxygenfunction:: ca_field_cache_clear
 
-    Initializes *cache* for use.
-
-.. function:: void ca_field_cache_clear(ca_field_cache_t cache, ca_ctx_t ctx)
-
-    Clears *cache*, freeing the memory allocated internally.
-    This does not clear the individual extension
-    numbers, which are only held as references.
-
-.. function:: ca_field_ptr ca_field_cache_insert_ext(ca_field_cache_t cache, ca_ext_struct ** x, slong len, ca_ctx_t ctx)
-
-    Adds the field defined by the length-*len* list of extension numbers *x*
-    to *cache* without duplication. If such a field already exists in *cache*,
-    a pointer to that instance is returned. Otherwise, a field with
-    extension numbers *x* is inserted into *cache* and a pointer to that
-    new instance is returned. Upon insertion of a new field, the
-    reduction ideal is constructed via :func:`ca_field_build_ideal`.
-
-
+.. doxygenfunction:: ca_field_cache_insert_ext
 
 .. raw:: latex
 
     \newpage
 
+.. doxygenstruct:: ca_field_struct
+    :members:

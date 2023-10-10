@@ -894,6 +894,11 @@ fmpz_mpoly_set_coeff_si_x(fmpz_mpoly_t poly,
         slong x_var, slong x_exp,
         const fmpz_mpoly_ctx_t ctx);
 
+/**
+
+    Given *K* with assigned extension numbers,
+    builds the reduction ideal in-place.
+*/
 void
 ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
 {
