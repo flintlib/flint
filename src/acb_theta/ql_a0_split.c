@@ -199,9 +199,9 @@ acb_theta_ql_a0_split(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d,
 
     arb_mat_init(C, g, g);
     arb_mat_init(C1, g - s, g - s);
-    acb_mat_window_init(tau0, tau, 0, s, 0, s);
+    acb_mat_window_init(tau0, tau, 0, 0, s ,s);
     acb_mat_window_init(star, tau, 0, s, s, g);
-    acb_mat_window_init(tau1, tau, s, g, s, g);
+    acb_mat_window_init(tau1, tau, s, s, g, g);
     v = _arb_vec_init(g - s);
     nctr = _arb_vec_init(g);
     new_d0 = _arb_vec_init(nbth);
