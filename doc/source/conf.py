@@ -22,7 +22,7 @@ sys.path.append(os.path.abspath('../../src/python'))
 # -- Project information -----------------------------------------------------
 
 project = u'Flint'
-copyright = u'2018, The Flint development team'
+copyright = u'2009-2023, The Flint development team'
 author = u'The Flint development team'
 
 # The short X.Y version
