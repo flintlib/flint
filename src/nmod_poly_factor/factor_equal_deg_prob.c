@@ -14,6 +14,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
@@ -24,7 +25,7 @@ nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
     flint_rand_t state, const nmod_poly_t pol, slong d)
 {
     nmod_poly_t a, b, c, polinv;
-    mpz_t exp;
+    fmpz_t exp;
     int res = 1;
     slong i;
 
@@ -56,16 +57,16 @@ nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
     nmod_poly_reverse(polinv, pol, pol->length);
     nmod_poly_inv_series(polinv, polinv, polinv->length);
 
-    mpz_init(exp);
+    fmpz_init(exp);
 
     if (pol->mod.n > 2)
     {
         /* compute a^{(p^d-1)/2} rem pol */
-        flint_mpz_ui_pow_ui(exp, pol->mod.n, d);
-        flint_mpz_sub_ui(exp, exp, 1);
-        mpz_tdiv_q_2exp(exp, exp, 1);
+        fmpz_ui_pow_ui(exp, pol->mod.n, d);
+        fmpz_sub_ui(exp, exp, 1);
+        fmpz_tdiv_q_2exp(exp, exp, 1);
 
-        nmod_poly_powmod_mpz_binexp_preinv(b, a, exp, pol, polinv);
+        nmod_poly_powmod_fmpz_binexp_preinv(b, a, exp, pol, polinv);
     }
     else
     {
@@ -85,7 +86,7 @@ nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
         nmod_poly_clear(c);
     }
 
-    mpz_clear(exp);
+    fmpz_clear(exp);
 
     nmod_poly_set_coeff_ui(b, 0, n_submod(b->coeffs[0], 1, pol->mod.n));
 
