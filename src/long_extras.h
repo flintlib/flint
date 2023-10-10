@@ -69,13 +69,6 @@ mp_limb_signed_t z_randint(flint_rand_t state, mp_limb_t limit);
 
 int z_kronecker(slong a, slong n);
 
-LONG_EXTRAS_INLINE
-slong slong_abs(slong x) {
-    return (x < 0) ? -x : x;
-}
-
-
-
 #ifdef __cplusplus
 }
 #endif
