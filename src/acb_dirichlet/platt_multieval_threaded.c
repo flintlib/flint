@@ -61,7 +61,7 @@ acb_dirichlet_platt_multieval_threaded(arb_ptr out, const fmpz_t T, slong A,
         slong B, const arb_t h, const fmpz_t J, slong K,
         slong sigma, slong prec)
 {
-    slong i, num_workers, N;
+    slong i, num_workers, num_threads, N;
     fmpz * smk_points;
     thread_pool_handle * handles;
     _worker_arg * args;
@@ -70,12 +70,13 @@ acb_dirichlet_platt_multieval_threaded(arb_ptr out, const fmpz_t T, slong A,
     fmpz_t threadtasks;
 
     num_workers = flint_request_threads(&handles, WORD_MAX);
+    num_threads = num_threads;
 
     N = A*B;
     fmpz_init(threadtasks);
-    args = FLINT_ARRAY_ALLOC(num_workers + 1, _worker_arg);
+    args = FLINT_ARRAY_ALLOC(num_threads, _worker_arg);
     fmpz_add_si(threadtasks, J, num_workers);
-    fmpz_tdiv_q_ui(threadtasks, threadtasks, num_workers + 1);
+    fmpz_tdiv_q_ui(threadtasks, threadtasks, num_threads);
     smk_points = _fmpz_vec_init(N);
     arb_init(t0);
 
@@ -83,7 +84,7 @@ acb_dirichlet_platt_multieval_threaded(arb_ptr out, const fmpz_t T, slong A,
     arb_set_fmpz(t0, T);
 
     S =  _acb_vec_init(K * N);
-    for (i = 0; i <= num_workers; i++)
+    for (i = 0; i < num_threads; i++)
     {
         args[i].S = S;
         args[i].startvec = _acb_vec_init(K);
@@ -102,18 +103,19 @@ acb_dirichlet_platt_multieval_threaded(arb_ptr out, const fmpz_t T, slong A,
         args[i].mstart = platt_get_smk_index(B, args[i].jstart, prec);
         args[i].mstop = platt_get_smk_index(B, args[i].jstop, prec);
     }
-    fmpz_set(args[num_workers].jstop, J);
-    args[num_workers].mstop = platt_get_smk_index(B, J, prec);
+    fmpz_set(args[num_threads - 1].jstop, J);
+    args[num_threads - 1].mstop = platt_get_smk_index(B, J, prec);
 
     for (i = 0; i < num_workers; i++)
         thread_pool_wake(global_thread_pool, handles[i], 0, _platt_smk_thread, &args[i]);
 
+    /* Work on master thread */
     _platt_smk_thread(&args[num_workers]);
 
     for (i = 0; i < num_workers; i++)
         thread_pool_wait(global_thread_pool, handles[i]);
 
-    for (i = 0; i <= num_workers; i++)
+    for (i = 0; i < num_threads; i++)
     {
         slong k;
         for (k = 0; k < K; k++)

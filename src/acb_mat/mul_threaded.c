@@ -62,7 +62,7 @@ _acb_mat_mul_thread(void * arg_ptr)
 void
 acb_mat_mul_threaded(acb_mat_t C, const acb_mat_t A, const acb_mat_t B, slong prec)
 {
-    slong ar, ac, br, bc, i, num_workers;
+    slong ar, ac, br, bc, i, num_threads, num_workers;
     thread_pool_handle * handles;
     _worker_arg * args;
 
@@ -91,6 +91,7 @@ acb_mat_mul_threaded(acb_mat_t C, const acb_mat_t A, const acb_mat_t B, slong pr
     }
 
     num_workers = flint_request_threads(&handles, FLINT_MAX(ar, bc) - 1);
+    num_threads = num_workers + 1;
 
     if (num_workers < 1)
     {
@@ -112,9 +113,9 @@ acb_mat_mul_threaded(acb_mat_t C, const acb_mat_t A, const acb_mat_t B, slong pr
         return;
     }
 
-    args = FLINT_ARRAY_ALLOC(num_workers + 1, _worker_arg);
+    args = FLINT_ARRAY_ALLOC(num_threads, _worker_arg);
 
-    for (i = 0; i < num_workers + 1; i++)
+    for (i = 0; i < num_threads; i++)
     {
         args[i].C = C->rows;
         args[i].A = A->rows;
@@ -122,8 +123,8 @@ acb_mat_mul_threaded(acb_mat_t C, const acb_mat_t A, const acb_mat_t B, slong pr
 
         if (ar >= bc)
         {
-            args[i].ar0 = (ar * i) / (num_workers + 1);
-            args[i].ar1 = (ar * (i + 1)) / (num_workers + 1);
+            args[i].ar0 = (ar * i) / num_threads;
+            args[i].ar1 = (ar * (i + 1)) / num_threads;
             args[i].bc0 = 0;
             args[i].bc1 = bc;
         }
@@ -131,8 +132,8 @@ acb_mat_mul_threaded(acb_mat_t C, const acb_mat_t A, const acb_mat_t B, slong pr
         {
             args[i].ar0 = 0;
             args[i].ar1 = ar;
-            args[i].bc0 = (bc * i) / (num_workers + 1);
-            args[i].bc1 = (bc * (i + 1)) / (num_workers + 1);
+            args[i].bc0 = (bc * i) / num_threads;
+            args[i].bc1 = (bc * (i + 1)) / num_threads;
         }
 
         args[i].br = br;
