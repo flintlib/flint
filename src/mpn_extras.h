@@ -157,17 +157,20 @@ flint_mpn_sqr(mp_ptr z, mp_srcptr x, mp_size_t n)
     ((n) > 0 ? (((lo) >> (n)) | ((hi) << (GMP_LIMB_BITS - (n))))    \
              : (lo))
 
+#ifdef FLINT_WANT_GMP_INTERNALS
 
-/* Not defined in gmp.h
-mp_limb_t  __gmpn_modexact_1_odd(mp_srcptr src, mp_size_t size,
-                                 mp_limb_t divisor);
-#define mpn_modexact_1_odd __gmpn_modexact_1_odd
-*/
+# define mpn_modexact_1_odd __gmpn_modexact_1_odd
+mp_limb_t mpn_modexact_1_odd(mp_srcptr, mp_size_t, mp_limb_t);
 
-#ifdef mpn_modexact_1_odd
-#define flint_mpn_divisible_1_p(x, xsize, d) (mpn_modexact_1_odd(x, xsize, d) == 0)
+MPN_EXTRAS_INLINE int
+flint_mpn_divisible_1_p(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
+{
+    return mpn_modexact_1_odd(x, xsize, d) == 0;
+}
+
 #else
-#include "gmpcompat.h"
+
+# include "gmpcompat.h"
 
 MPN_EXTRAS_INLINE int
 flint_mpn_divisible_1_p(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
@@ -177,9 +180,9 @@ flint_mpn_divisible_1_p(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
     s._mp_d = (mp_ptr) x;
     return flint_mpz_divisible_ui_p(&s, d);
 }
+
 #endif
 
-/* todo: figure out how to call GMP's actual division code instead of mpn_tdiv_qr here */
 #ifndef mpn_tdiv_q
 /* substitute for mpir's mpn_tdiv_q */
 static __inline__ void
