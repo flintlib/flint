@@ -65,7 +65,7 @@ int main(void)
             flint_printf("th, test:\n");
             _acb_vec_printd(th, nbz, 5);
             _acb_vec_printd(test, nbz, 5);
-            /*flint_abort();*/
+            flint_abort();
         }
 
         acb_mat_clear(tau);

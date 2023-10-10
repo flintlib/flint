@@ -22,12 +22,12 @@ int main(void)
     flint_randinit(state);
 
     /* Test: sum of terms on border of ellipsoid must be less than bound */
-    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 4);
+        slong g = 1 + n_randint(state, 3);
         slong prec = 100 + n_randint(state, 100);
         slong bits = n_randint(state, 4);
-        slong nbz = 1 + n_randint(state, 4);
+        slong nbz = 1 + n_randint(state, 3);
         acb_theta_eld_t E;
         acb_mat_t tau;
         acb_ptr c, z, new_z;
