@@ -90,7 +90,7 @@ acb_mat_mul_threaded(acb_mat_t C, const acb_mat_t A, const acb_mat_t B, slong pr
         return;
     }
 
-    num_workers = flint_request_threads(&handles, FLINT_MAX(ar, bc) - 1);
+    num_workers = flint_request_threads(&handles, FLINT_MAX(ar, bc));
     num_threads = num_workers + 1;
 
     args = FLINT_ARRAY_ALLOC(num_threads, _worker_arg);

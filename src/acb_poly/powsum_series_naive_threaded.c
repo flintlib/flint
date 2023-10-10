@@ -136,7 +136,7 @@ _acb_poly_powsum_series_naive_threaded(acb_ptr z,
 
     split_each_term = (len > 1000);
 
-    num_workers = flint_request_threads(&handles, split_each_term ? len - 1 : n - 1);
+    num_workers = flint_request_threads(&handles, split_each_term ? len : n);
     num_threads = num_workers + 1;
 
     args = FLINT_ARRAY_ALLOC(num_threads, _worker_arg);

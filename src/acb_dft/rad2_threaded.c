@@ -68,7 +68,7 @@ acb_dft_rad2_precomp_inplace_threaded(acb_ptr v, const acb_dft_rad2_t rad2, slon
     slong nz = rad2->nz; /* always n/2 ? */
     slong logn = rad2->e;
 
-    num_workers = flint_request_threads(&handles, nz - 1);
+    num_workers = flint_request_threads(&handles, nz);
     num_threads = num_workers + 1;
 
     for (logt = 0; WORD(1) << (logt + 1) <= num_threads; logt++);
