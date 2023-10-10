@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2012-2014 Fredrik Johansson
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of Arb.
 
@@ -9,7 +10,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <pthread.h>
+#include "thread_support.h"
 #include "acb_poly.h"
 
 typedef struct
@@ -24,12 +25,12 @@ typedef struct
     slong len;
     slong prec;
 }
-powsum_arg_t;
+_worker_arg;
 
-void *
+void
 _acb_zeta_powsum_evaluator(void * arg_ptr)
 {
-    powsum_arg_t arg = *((powsum_arg_t *) arg_ptr);
+    _worker_arg arg = *((_worker_arg *) arg_ptr);
     slong i, k;
     int q_one, s_int;
 
@@ -120,26 +121,32 @@ _acb_zeta_powsum_evaluator(void * arg_ptr)
 
     flint_cleanup();
 
-    return NULL;
+    return;
 }
 
 void
 _acb_poly_powsum_series_naive_threaded(acb_ptr z,
     const acb_t s, const acb_t a, const acb_t q, slong n, slong len, slong prec)
 {
-    pthread_t * threads;
-    powsum_arg_t * args;
-    slong i, num_threads;
+    thread_pool_handle * handles;
+    _worker_arg * args;
+    slong i, num_workers;
     int split_each_term;
 
-    num_threads = flint_get_num_threads();
+    num_workers = flint_request_threads(&handles, WORD_MAX);
 
-    threads = flint_malloc(sizeof(pthread_t) * num_threads);
-    args = flint_malloc(sizeof(powsum_arg_t) * num_threads);
+    if (num_workers < 1)
+    {
+        flint_give_back_threads(handles, num_workers);
+        _acb_poly_powsum_series_naive_threaded(z, s, a, q, n, len, prec);
+        return;
+    }
+
+    args = FLINT_ARRAY_ALLOC(num_workers, _worker_arg);
 
     split_each_term = (len > 1000);
 
-    for (i = 0; i < num_threads; i++)
+    for (i = 0; i < num_workers; i++)
     {
         args[i].s = s;
         args[i].a = a;
@@ -148,8 +155,8 @@ _acb_poly_powsum_series_naive_threaded(acb_ptr z,
         if (split_each_term)
         {
             slong n0, n1;
-            n0 = (len * i) / num_threads;
-            n1 = (len * (i + 1)) / num_threads;
+            n0 = (len * i) / num_workers;
+            n1 = (len * (i + 1)) / num_workers;
             args[i].z = z + n0;
             args[i].n0 = 0;
             args[i].n1 = n;
@@ -159,32 +166,30 @@ _acb_poly_powsum_series_naive_threaded(acb_ptr z,
         else
         {
             args[i].z = _acb_vec_init(len);
-            args[i].n0 = (n * i) / num_threads;
-            args[i].n1 = (n * (i + 1)) / num_threads;
+            args[i].n0 = (n * i) / num_workers;
+            args[i].n1 = (n * (i + 1)) / num_workers;
             args[i].d0 = 0;
             args[i].len = len;
         }
 
         args[i].prec = prec;
-        pthread_create(&threads[i], NULL, _acb_zeta_powsum_evaluator, &args[i]);
+        thread_pool_wake(global_thread_pool, handles[i], 0, _acb_zeta_powsum_evaluator, &args[i]);
     }
 
-    for (i = 0; i < num_threads; i++)
-    {
-        pthread_join(threads[i], NULL);
-    }
+    for (i = 0; i < num_workers; i++)
+        thread_pool_wait(global_thread_pool, handles[i]);
 
     if (!split_each_term)
     {
         _acb_vec_zero(z, len);
-        for (i = 0; i < num_threads; i++)
+        for (i = 0; i < num_workers; i++)
         {
             _acb_vec_add(z, z, args[i].z, len, prec);
             _acb_vec_clear(args[i].z, len);
         }
     }
 
-    flint_free(threads);
+    flint_give_back_threads(handles, num_workers);
     flint_free(args);
 }
 
