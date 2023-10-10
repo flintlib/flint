@@ -27,16 +27,17 @@ int main(void)
         slong g = 1 + n_randint(state, 4);
         slong prec = 100;
         slong bits = 1 + n_randint(state, 4);
-        acb_mat_t tau, A;
+        acb_mat_t tau;
         arb_mat_t C;
-        acb_ptr x, z;
+        arb_ptr x, y;
+        acb_ptr z;
         acb_t r, s, t;
         slong k;
 
         acb_mat_init(tau, g, g);
-        acb_mat_init(A, g, g);
         arb_mat_init(C, g, g);
-        x = _acb_vec_init(g);
+        x = _arb_vec_init(g);
+        y = _arb_vec_init(g);
         z = _acb_vec_init(g);
         acb_init(r);
         acb_init(s);
@@ -45,17 +46,16 @@ int main(void)
         acb_siegel_randtest_reduced(tau, state, prec, bits);
         for (k = 0; k < g; k++)
         {
-            acb_urandom(&x[k], state, prec);
+            arb_urandom(&x[k], state, prec);
         }
         acb_theta_eld_cho(C, tau, prec);
         arb_mat_transpose(C, C);
-        acb_mat_set_arb_mat(A, C);
-        acb_mat_vector_mul_col(z, A, x, prec);
+        arb_mat_vector_mul_col(y, C, x, prec);
+        _acb_vec_set_real_imag(z, x, y, g);
 
         acb_theta_ql_log_rescale(r, z, tau, prec);
-        acb_dot(t, NULL, 0, x, 1, x, 1, g, prec);
+        arb_dot(acb_imagref(t), NULL, 0, x, 1, x, 1, g, prec);
         acb_const_pi(s, prec);
-        acb_mul_onei(s, s);
         acb_mul(t, t, s, prec);
 
         if (!acb_overlaps(r, t))
@@ -69,9 +69,9 @@ int main(void)
         }
 
         acb_mat_clear(tau);
-        acb_mat_clear(A);
         arb_mat_clear(C);
-        _acb_vec_clear(x, g);
+        _arb_vec_clear(x, g);
+        _arb_vec_clear(y, g);
         _acb_vec_clear(z, g);
         acb_clear(r);
         acb_clear(s);

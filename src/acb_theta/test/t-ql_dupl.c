@@ -22,7 +22,7 @@ int main(void)
     flint_randinit(state);
 
     /* Test: agrees with naive_all */
-    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
         slong n = 1 << g;
@@ -78,6 +78,7 @@ int main(void)
             _acb_vec_printd(th0, n, 5);
             flint_printf("output:\n");
             _acb_vec_printd(th2, n * n, 5);
+            _acb_vec_printd(test, n * n, 5);
             flint_abort();
         }
 
