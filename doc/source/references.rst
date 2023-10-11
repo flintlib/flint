@@ -11,7 +11,7 @@ References
 
 .. [Ari2012] \J. Arias de Reyna, "Programs for Riemann's zeta function", (J. A. J. van Vonderen, Ed.) *Leven met getallen : liber amicorum ter gelegenheid van de pensionering van Herman te Riele* CWI (2012) 102-112, https://ir.cwi.nl/pub/19724
 
-.. [Arn2010] \J. Arndt, *Matters Computational*, Springer (2010), http://www.jjj.de/fxt/#fxtbook
+.. [Arn2010] \J. Arndt, *Matters Computational*, Springer (2010), https://www.jjj.de/fxt/#fxtbook
 
 .. [Arn2012] \J. Arndt, "On computing the generalized Lambert series", https://arxiv.org/abs/1202.6525
 
@@ -29,7 +29,7 @@ References
 
 .. [BFSS2006] \A. Bostan, P. Flajolet, B. Salvy and É. Schost. "Fast computation of special resultants". Journal of Symbolic Computation, 41(1):1–29, January 2006. https://doi.org/10.1016/j.jsc.2005.07.001
 
-.. [BJ2013] \R. P. Brent and F. Johansson, "A bound for the error term in the Brent-McMillan algorithm", preprint (2013), http://arxiv.org/abs/1312.0039
+.. [BJ2013] \R. P. Brent and F. Johansson, "A bound for the error term in the Brent-McMillan algorithm", preprint (2013), https://arxiv.org/abs/1312.0039
 
 .. [BM1980] \R. P. Brent and E. M. McMillan, "Some new algorithms for high-precision computation of Euler's constant", Mathematics of Computation 34 (1980) 305-312.
 
@@ -89,7 +89,7 @@ References
 
 .. [DomKanTro1987] \Domich, P. D. and Kannan, R. and Trotter, L. E. Jr. : Hermite Normal Form Computation Using Modulo Determinant Arithmetic, Math. Operations Res. (12) 1987 50-59
 
-.. [Dup2006] \R. Dupont. "Moyenne arithmético-géométrique, suites de Borchardt et applications." These de doctorat, École polytechnique, Palaiseau (2006). http://http://www.lix.polytechnique.fr/Labo/Regis.Dupont/these_soutenance.pdf
+.. [Dup2006] \R. Dupont. "Moyenne arithmético-géométrique, suites de Borchardt et applications." These de doctorat, École polytechnique, Palaiseau (2006). http://www.lix.polytechnique.fr/Labo/Regis.Dupont/these_soutenance.pdf
 
 .. [Dus1999] \P. Dusart, "The `k^{th}` prime is greater than `k(\ln k+\ln \ln k-1)` for `k \ge 2`," Math. Comp., 68:225 (January 1999) 411--415.
 
@@ -155,15 +155,15 @@ References
 
 .. [Joh2012] \F. Johansson, "Efficient implementation of the Hardy-Ramanujan-Rademacher formula", LMS Journal of Computation and Mathematics, Volume 15 (2012), 341-359, http://journals.cambridge.org/action/displayAbstract?fromPage=online&aid=8710297
 
-.. [Joh2013] \F. Johansson, "Rigorous high-precision computation of the Hurwitz zeta function and its derivatives", Numerical Algorithms, http://arxiv.org/abs/1309.2877 http://dx.doi.org/10.1007/s11075-014-9893-1
+.. [Joh2013] \F. Johansson, "Rigorous high-precision computation of the Hurwitz zeta function and its derivatives", Numerical Algorithms, http://arxiv.org/abs/1309.2877 https://doi.org/10.1007/s11075-014-9893-1
 
-.. [Joh2014a] \F. Johansson, *Fast and rigorous computation of special functions to high precision*, PhD thesis, RISC, Johannes Kepler University, Linz, 2014. http://fredrikj.net/thesis/
+.. [Joh2014a] \F. Johansson, *Fast and rigorous computation of special functions to high precision*, PhD thesis, RISC, Johannes Kepler University, Linz, 2014. https://fredrikj.net/thesis/
 
-.. [Joh2014b] \F. Johansson, "Evaluating parametric holonomic sequences using rectangular splitting", ISSAC 2014, 256-263. http://dx.doi.org/10.1145/2608628.2608629
+.. [Joh2014b] \F. Johansson, "Evaluating parametric holonomic sequences using rectangular splitting", ISSAC 2014, 256-263. https://doi.org/10.1145/2608628.2608629
 
-.. [Joh2014c] \F. Johansson, "Efficient implementation of elementary functions in the medium-precision range", http://arxiv.org/abs/1410.7176
+.. [Joh2014c] \F. Johansson, "Efficient implementation of elementary functions in the medium-precision range", https://arxiv.org/abs/1410.7176
 
-.. [Joh2015] \F. Johansson, "Computing Bell numbers", http://fredrikj.net/blog/2015/08/computing-bell-numbers/
+.. [Joh2015] \F. Johansson, "Computing Bell numbers", https://fredrikj.net/blog/2015/08/computing-bell-numbers/
 
 .. [Joh2015b] \F. Johansson, "A fast algorithm for reversion of power series", Math. Comp. 84 (2015), 475-484, http://doi.org/10.1090/S0025-5718-2014-02857-3
 
@@ -177,7 +177,7 @@ References
 
 .. [Joh2018a] \F. Johansson, "Numerical integration in arbitrary-precision ball arithmetic", preprint (2018), https://arxiv.org/abs/1802.07942
 
-.. [Joh2018b] \F. Johansson and others, "mpmath: a Python library for arbitrary-precision floating-point arithmetic (version 1.1.0)", December 2018. http://mpmath.org/
+.. [Joh2018b] \F. Johansson and others, "mpmath: a Python library for arbitrary-precision floating-point arithmetic (version 1.1.0)", December 2018. https://mpmath.org/
 
 .. [JvdP2002] \M. J. Jacobson Jr. and A. J. van der Poorten. "Computational aspects of NUCOMP." In International Algorithmic Number Theory Symposium, pp. 120-133. Berlin, Heidelberg: Springer Berlin Heidelberg, 2002.
 
@@ -199,19 +199,19 @@ References
 
 .. [MP2006] \M. Monagan and R. Pearce. "Rational simplification modulo a polynomial ideal". Proceedings of the 2006 international symposium on Symbolic and algebraic computation - ISSAC '06. https://doi.org/10.1145/1145768.1145809
 
-.. [MPFR2012] The MPFR team, "MPFR Algorithms" (2012), http://www.mpfr.org/algo.html
+.. [MPFR2012] The MPFR team, "MPFR Algorithms" (2012), https://www.mpfr.org/algo.html
 
 .. [MasRob1996] \J. Massias and G. Robin, "Bornes effectives pour certaines fonctions concernant les nombres premiers," J. Theorie Nombres Bordeaux, 8 (1996) 215-242.
 
 .. [Mic2007] \N. Michel, "Precise Coulomb wave functions for a wide range of complex l, eta and z", Computer Physics Communications, Volume 176, Issue 3, (2007), 232-249, https://doi.org/10.1016/j.cpc.2006.10.004
 
-.. [Miy2010] \S. Miyajima, "Fast enclosure for all eigenvalues in generalized eigenvalue problems", Journal of Computational and Applied Mathematics, 233 (2010), 2994-3004, https://dx.doi.org/10.1016/j.cam.2009.11.048
+.. [Miy2010] \S. Miyajima, "Fast enclosure for all eigenvalues in generalized eigenvalue problems", Journal of Computational and Applied Mathematics, 233 (2010), 2994-3004, https://doi.org/10.1016/j.cam.2009.11.048
 
 .. [Mos1971] \J. Moses. "Algebraic simplification - a guide for the perplexed". Proceedings of the second ACM symposium on Symbolic and algebraic manipulation (1971), 282-304. https://doi.org/10.1145/362637.362648
 
 .. [Mul2000] \Thom Mulders : On Short Multiplications and Divisions, AAECC vol. 11 (2000) 69--88
 
-.. [NIST2012] National Institute of Standards and Technology, *Digital Library of Mathematical Functions* (2012), http://dlmf.nist.gov/
+.. [NIST2012] National Institute of Standards and Technology, *Digital Library of Mathematical Functions* (2012), https://dlmf.nist.gov/
 
 .. [NakTurWil1997] \Nakos, George and Turner, Peter and Williams, Robert : Fraction-free algorithms for linear and polynomial equations, ACM SIGSAM Bull. 31 (1997) 3 11--19
 

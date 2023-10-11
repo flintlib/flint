@@ -39,7 +39,7 @@ TEST_FUNCTION_START(dirichlet_char, state)
 
         if (FLINT_BITS == 64 || q < 1024)
         {
-            /* use http://oeis.org/A053818 to check all elements
+            /* use https://oeis.org/A053818 to check all elements
              * are gone through */
             ref = (q % 4 == 2) ? -2 : 1;
             for (k = (G->neven == 2); k < G->num; k++)

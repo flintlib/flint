@@ -105,7 +105,7 @@ bool_mat_nilpotency_degree(const bool_mat_t A)
         else
         {
             /* Find the length of the longest path within the DAG */
-            /* http://stackoverflow.com/a/10737524/4072759 */
+            /* https://stackoverflow.com/a/10737524/4072759 */
 
             slong x, y, z;
             slong max_overall;
