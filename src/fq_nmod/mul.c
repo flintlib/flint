@@ -11,7 +11,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "nmod_poly.h"
+#include "fmpz.h"
 #include "fq_nmod.h"
 
 void fq_nmod_mul(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_t op2, const fq_nmod_ctx_t ctx)
@@ -19,4 +21,25 @@ void fq_nmod_mul(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_t op2, const 
     nmod_poly_mul(rop, op1, op2);
 
     fq_nmod_reduce(rop, ctx);
+}
+
+void fq_nmod_mul_fmpz(fq_nmod_t rop, const fq_nmod_t op, const fmpz_t x, const fq_nmod_ctx_t ctx)
+{
+    fmpz_t rx;
+    fmpz_init(rx);
+
+    fmpz_mod(rx, x, fq_nmod_ctx_prime(ctx));
+    nmod_poly_scalar_mul_nmod(rop, op, fmpz_get_ui(rx));
+
+    fmpz_clear(rx);
+}
+
+void fq_nmod_mul_si(fq_nmod_t rop, const fq_nmod_t op, slong x, const fq_nmod_ctx_t ctx)
+{
+    nmod_poly_scalar_mul_nmod(rop, op, nmod_set_si(x, ctx->mod));
+}
+
+void fq_nmod_mul_ui(fq_nmod_t rop, const fq_nmod_t op, ulong x, const fq_nmod_ctx_t ctx)
+{
+    nmod_poly_scalar_mul_nmod(rop, op, nmod_set_ui(x, ctx->mod));
 }
