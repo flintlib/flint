@@ -150,6 +150,7 @@ Printing
 
     Currently, same as `nmod_mat_fprint_pretty`.
 
+
 Random matrix generation
 --------------------------------------------------------------------------------
 
