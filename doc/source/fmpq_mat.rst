@@ -3,19 +3,20 @@
 **fmpq_mat.h** -- matrices over the rational numbers
 ===============================================================================
 
-The `fmpq_mat_t` data type represents matrices over `\Q`.
+The :type:`fmpq_mat_t` data type represents matrices over `\mathbb{Q}`.
 
-A rational matrix is stored as an array of `fmpq` elements in order to
-allow convenient and efficient manipulation of individual entries. In
-general, `fmpq_mat` functions assume that input entries are in
+A rational matrix is stored as an array of ``fmpq`` elements in order
+to allow convenient and efficient manipulation of individual entries.
+In general, ``fmpq_mat`` functions assume that input entries are in
 canonical form, and produce output with entries in canonical form.
 
 Since rational arithmetic is expensive, computations are typically
 performed by clearing denominators, performing the heavy work over the
 integers, and converting the final result back to a rational matrix.
-The `fmpq_mat` functions take care of such conversions transparently.
-For users who need fine-grained control, various functions for
-conversion between rational and integer matrices are provided.
+The ``fmpq_mat`` functions take care of such conversions
+transparently. For users who need fine-grained control, various
+functions for conversion between rational and integer matrices are
+provided.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
