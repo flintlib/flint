@@ -1,4 +1,6 @@
 /*
+    Copyright (C) 2008, 2009, William Hart
+    Copyright (C) 2010 Fredrik Johansson
     Copyright (C) 2021 Daniel Schultz
 
     This file is part of FLINT.
@@ -9,9 +11,128 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
+void fmpz_multi_mod_clear(fmpz_multi_mod_t P)
+{
+    slong i;
+
+    for (i = 0; i < P->alloc; i++)
+    {
+        fmpz_clear(P->prog[i].modulus);
+        fmpz_clear(P->moduli + i);
+    }
+
+    flint_free(P->prog);
+    flint_free(P->moduli);
+}
+
+void fmpz_multi_mod_init(fmpz_multi_mod_t P)
+{
+    P->prog = NULL;
+    P->moduli = NULL;
+    P->alloc = 0;
+    P->length = 0;
+    P->localsize = 1;
+    P->temp1loc = 0;
+    P->good = 0;
+}
+
+void _fmpz_multi_mod_precomp(
+    fmpz * outputs,
+    const fmpz_multi_mod_t P,
+    const fmpz_t input,
+    int sign,
+    fmpz * T)
+{
+    slong i, a, b;
+    slong len = P->length;
+    _fmpz_multi_mod_instr * instr = P->prog;
+    fmpz * t1 = T + P->temp1loc;
+    unsigned char * org;
+    TMP_INIT;
+
+    TMP_START;
+
+    /*
+        Efficiently propagate small inputs without copying:
+        ord[i] = 1 means T[i] should be read from input
+    */
+    org = TMP_ARRAY_ALLOC(P->localsize, unsigned char);
+
+#ifdef FLINT_WANT_ASSERT
+    for (i = 0; i < P->localsize; i++)
+        org[i] = 2;
+#endif
+
+    for (i = 0; i < len; i++)
+    {
+        a = P->prog[i].in_idx;
+        b = P->prog[i].out_idx;
+
+        FLINT_ASSERT(a < 1 || org[a] < 2);
+
+        if (a > 0 && org[a] == 0)
+        {
+            /* read input from T[a] */
+
+            if (b < 0)
+            {
+                _fmpz_smod(outputs - b - 1, T + a, instr[i].modulus, sign, t1);
+            }
+            else
+            {
+                org[b] = 0;
+                fmpz_tdiv_qr(t1, T + b, T + a, instr[i].modulus);
+            }
+        }
+        else
+        {
+            /* read input from input */
+
+            if (b < 0)
+            {
+                _fmpz_smod(outputs - b - 1, input, instr[i].modulus, sign, t1);
+            }
+            else if (fmpz_cmpabs(instr[i].modulus, input) > 0)
+            {
+                org[b] = 1;
+            }
+            else
+            {
+                org[b] = 0;
+                fmpz_tdiv_qr(t1, T + b, input, instr[i].modulus);
+            }
+        }
+    }
+
+    TMP_END;
+}
+
+void fmpz_multi_mod_precomp(
+    fmpz * outputs,
+    const fmpz_multi_mod_t P,
+    const fmpz_t input,
+    int sign)
+{
+    slong i;
+    fmpz * tmp;
+    TMP_INIT;
+
+    TMP_START;
+    tmp = TMP_ARRAY_ALLOC(P->localsize, fmpz);
+    for (i = 0; i < P->localsize; i++)
+        fmpz_init(tmp + i);
+
+    _fmpz_multi_mod_precomp(outputs, P, input, sign, tmp);
+
+    for (i = 0; i < P->localsize; i++)
+        fmpz_clear(tmp + i);
+
+    TMP_END;
+}
 
 static void _fmpz_multi_mod_fit_length(fmpz_multi_mod_t P, slong k)
 {
@@ -61,7 +182,6 @@ static int _fill_sort(slong * link, fmpz * v, slong j)
 
     return 1;
 }
-
 
 static void _fill_prog(
     fmpz_multi_mod_t P,
@@ -221,3 +341,67 @@ done:
     return P->good;
 }
 
+void fmpz_multi_mod_ui(
+    mp_limb_t * out,
+    const fmpz_t input,
+    const fmpz_comb_t C,
+    fmpz_comb_temp_t CT)
+{
+    slong i, k, l;
+    slong stride = 1;
+    fmpz * A = CT->A;
+    mod_lut_entry * lu;
+    slong * offsets;
+    slong klen = C->mod_klen;
+    fmpz_t ttt;
+
+    /* high level split */
+    if (klen == 1)
+    {
+        *ttt = A[0];
+        A[0] = *input;
+    }
+    else
+    {
+        _fmpz_multi_mod_precomp(A, C->mod_P, input, -1, CT->T);
+    }
+
+    offsets = C->mod_offsets;
+    lu = C->mod_lu;
+
+    for (k = 0, i = 0, l = 0; k < klen; k++)
+    {
+        slong j = offsets[k];
+
+        for ( ; i < j; i++)
+        {
+            /* mid level split: depends on FMPZ_MOD_UI_CUTOFF */
+            mp_limb_t t = fmpz_get_nmod(A + k, lu[i].mod);
+
+            /* low level split: 1, 2, or 3 small primes */
+            if (lu[i].mod2.n != 0)
+            {
+                FLINT_ASSERT(l + 3 <= C->num_primes);
+                NMOD_RED(out[l*stride], t, lu[i].mod0); l++;
+                NMOD_RED(out[l*stride], t, lu[i].mod1); l++;
+                NMOD_RED(out[l*stride], t, lu[i].mod2); l++;
+            }
+            else if (lu[i].mod1.n != 0)
+            {
+                FLINT_ASSERT(l + 2 <= C->num_primes);
+                NMOD_RED(out[l*stride], t, lu[i].mod0); l++;
+                NMOD_RED(out[l*stride], t, lu[i].mod1); l++;
+            }
+            else
+            {
+                FLINT_ASSERT(l + 1 <= C->num_primes);
+                out[l*stride] = t; l++;
+            }
+        }
+    }
+
+    FLINT_ASSERT(l == C->num_primes);
+
+    if (klen == 1)
+        A[0] = *ttt;
+}
