@@ -3,54 +3,55 @@
 **fmpz.h** -- integers
 ===============================================================================
 
-By default, an `fmpz_t` is implemented as an array of `fmpz`'s of
-length one to allow passing by reference as one can do with GMP/
-MPIR's `mpz_t` type. The `fmpz_t` type is simply a single limb, though
-the user does not need to be aware of this except in one specific case
-outlined below.
+By default, an :type:`fmpz_t` is implemented as an array of
+:type:`fmpz`'s of length one to allow passing by reference as one can
+do with GMP/ MPIR's :type:`mpz_t` type. The :type:`fmpz_t` type is
+simply a single limb, though the user does not need to be aware of
+this except in one specific case outlined below.
 
-In all respects, `fmpz_t`'s act precisely like GMP/ MPIR's
-`mpz_t`'s, with automatic memory management, however, in the first
-place only one limb is used to implement them.  Once an `fmpz_t`
-overflows a limb then a multiprecision integer is automatically allocated
-and instead of storing the actual integer data the `slong` which
-implements the type becomes an index into a FLINT wide array of
-`mpz_t`'s.
+In all respects, :type:`fmpz_t`'s act precisely like GMP/ MPIR's
+``mpz_t``'s, with automatic memory management, however, in the first
+place only one limb is used to implement them. Once an :type:`fmpz_t`
+overflows a limb then a multiprecision integer is automatically
+allocated and instead of storing the actual integer data the
+:type:`slong` which implements the type becomes an index into a FLINT
+wide array of :type:`mpz_t`'s.
 
-These internal implementation details are not important for the user to
-understand, except for three important things.
+These internal implementation details are not important for the user
+to understand, except for three important things.
 
-Firstly, `fmpz_t`'s will be more efficient than `mpz_t`'s for
-single limb operations, or more precisely for signed quantities whose
-absolute value does not exceed `FLINT_BITS - 2` bits.
+Firstly, :type:`fmpz_t`'s will be more efficient than :type:`mpz_t`'s
+for single limb operations, or more precisely for signed quantities
+whose absolute value does not exceed ``FLINT_BITS - 2``` bits.
 
-Secondly, for small integers that fit into `FLINT_BITS - 2` bits
-much less memory will be used than for an `mpz_t`.  When very many
-`fmpz_t`'s are used, there can be important cache benefits on
-account of this.
+Secondly, for small integers that fit into ```FLINT_BITS - 2``` bits
+much less memory will be used than for an :type:`mpz_t`. When very
+many :type:`fmpz_t`'s are used, there can be important cache benefits
+on account of this.
 
 Thirdly, it is important to understand how to deal with arrays of
-`fmpz_t`'s.  As for `mpz_t`'s, there is an underlying type,
-an `fmpz`, which can be used to create the array, e.g.\
+:type:`fmpz_t`'s. As for :type:`mpz_t`'s, there is an underlying type,
+an :type:`fmpz`, which can be used to create the array, e.g.\
 
 ::
 
    fmpz myarr[100];
 
-Now recall that an `fmpz_t` is an array of length one of `fmpz`'s.
-Thus, a pointer to an `fmpz` can be used in place of an `fmpz_t`.
-For example, to find the sign of the third integer in our array we would
-write
-\begin{lstlisting}
-int sign = fmpz_sgn(myarr + 2);
-\end{lstlisting}
+Now recall that an :type:`fmpz_t` is an array of length one of
+:type:`fmpz`'s. Thus, a pointer to an :type:`fmpz` can be used in
+place of an :type:`fmpz_t`. For example, to find the sign of the third
+integer in our array we would write
 
-The `fmpz` module provides routines for memory management, basic
+::
+
+   int sign = fmpz_sgn(myarr + 2);
+
+The :type:`fmpz` module provides routines for memory management, basic
 manipulation and basic arithmetic.
 
-Unless otherwise specified, all functions in this section permit aliasing
-between their input arguments and between their input and output
-arguments.
+Unless otherwise specified, all functions in this section permit
+aliasing between their input arguments and between their input and
+output arguments.
 
 Simple example
 --------------
