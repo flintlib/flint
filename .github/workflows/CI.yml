@@ -600,7 +600,7 @@ jobs:
 
           # Now we can create the makefile
           ./bootstrap.sh
-          ./configure CC=${CC} CFLAGS="${CFLAGS}" --prefix=${LOCAL} ${EXTRA_OPTIONS}
+          ./configure CC=${CC} CFLAGS="${CFLAGS}" --prefix=${LOCAL} ${EXTRA_OPTIONS} --with-gmp-lib=$(find ~/.julia/ -type d -wholename "*/lib/julia")
 
       - name: "Compile and install"
         run: |
