@@ -31,7 +31,7 @@ on account of this.
 
 Thirdly, it is important to understand how to deal with arrays of
 :type:`fmpz_t`'s. As for :type:`mpz_t`'s, there is an underlying type,
-an :type:`fmpz`, which can be used to create the array, e.g.\
+an :type:`fmpz`, which can be used to create the array, e.g.
 
 ::
 
