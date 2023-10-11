@@ -62,6 +62,8 @@ nmod_poly_mat_swap_entrywise(nmod_poly_mat_t mat1, nmod_poly_mat_t mat2)
 
 void nmod_poly_mat_set(nmod_poly_mat_t mat1, const nmod_poly_mat_t mat2);
 
+void nmod_poly_mat_set_nmod_mat(nmod_poly_mat_t pmat, const nmod_mat_t cmat);
+
 void nmod_poly_mat_clear(nmod_poly_mat_t mat);
 
 /* Basic properties **********************************************************/
