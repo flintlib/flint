@@ -64,6 +64,22 @@ void nmod_poly_mat_set(nmod_poly_mat_t mat1, const nmod_poly_mat_t mat2);
 
 void nmod_poly_mat_clear(nmod_poly_mat_t mat);
 
+/* Truncate, shift *********************************************************/
+
+void nmod_poly_mat_set_trunc(nmod_poly_mat_t res,
+                             const nmod_poly_mat_t pmat,
+                             long len);
+
+void nmod_poly_mat_truncate(nmod_poly_mat_t pmat, long len);
+
+void nmod_poly_mat_shift_left(nmod_poly_mat_t res,
+                              const nmod_poly_mat_t pmat,
+                              slong k);
+
+void nmod_poly_mat_shift_right(nmod_poly_mat_t res,
+                               const nmod_poly_mat_t pmat,
+                               slong k);
+
 /* Basic properties **********************************************************/
 
 NMOD_POLY_MAT_INLINE mp_limb_t
