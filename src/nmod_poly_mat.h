@@ -79,6 +79,9 @@ nmod_poly_mat_modulus(const nmod_poly_mat_t mat)
 int nmod_poly_mat_equal(const nmod_poly_mat_t mat1,
                         const nmod_poly_mat_t mat2);
 
+int nmod_poly_mat_equal_nmod_mat(const nmod_poly_mat_t pmat,
+                                const nmod_mat_t cmat);
+
 int nmod_poly_mat_is_zero(const nmod_poly_mat_t mat);
 
 int nmod_poly_mat_is_one(const nmod_poly_mat_t mat);

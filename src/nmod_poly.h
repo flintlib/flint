@@ -224,6 +224,7 @@ void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, slong m);
 /* Comparison  ***************************************************************/
 
 int nmod_poly_equal(const nmod_poly_t a, const nmod_poly_t b);
+int nmod_poly_equal_ui(const nmod_poly_t a, mp_limb_t b);
 int nmod_poly_equal_trunc(const nmod_poly_t poly1, const nmod_poly_t poly2, slong n);
 
 NMOD_POLY_INLINE

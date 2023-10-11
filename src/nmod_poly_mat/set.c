@@ -10,9 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint/nmod_poly.h"
-#include "flint/nmod_mat.h"
-#include "flint/nmod_poly_mat.h"
+#include "nmod_poly.h"
+#include "nmod_mat.h"
+#include "nmod_poly_mat.h"
 
 void
 nmod_poly_mat_set(nmod_poly_mat_t B, const nmod_poly_mat_t A)
