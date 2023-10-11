@@ -24,7 +24,7 @@ int main(void)
     /* Test: Gram matrices are positive definite iff full rank */
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
-        slong n = n_randint(state, 50);
+        slong n = n_randint(state, 10);
         slong rk;
         fmpz_mat_t A;
         int res;

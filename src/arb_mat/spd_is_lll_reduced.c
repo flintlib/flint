@@ -45,7 +45,7 @@ int arb_mat_spd_is_lll_reduced(const arb_mat_t A, slong tol_exp, slong prec)
         }
     }
 
-    res = res && arb_mat_spd_get_fmpz_mat(N, B, -tol_exp + 4);
+    res = res && arb_mat_spd_get_fmpz_mat(N, B, prec);
     if (res)
     {
         /* Default Flint LLL values, except Gram */

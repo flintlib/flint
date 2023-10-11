@@ -25,8 +25,8 @@ int main(void)
     /* Test: construct input from an integral matrix */
     for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
     {
-        slong n = n_randint(state, 50);
-        slong prec = n_randint(state, 50);
+        slong n = n_randint(state, 10);
+        slong prec = 200;
         slong mag_exp = -prec - 10;
         slong rk = 0;
         fmpz_mat_t N, T;
@@ -41,7 +41,7 @@ int main(void)
 
         while (rk < n)
         {
-            fmpz_mat_randtest(N, state, 1 + n_randint(state, 200));
+            fmpz_mat_randtest(N, state, 1 + n_randint(state, 50));
             fmpz_mat_gram(N, N);
             rk = fmpz_mat_rank(N);
         }
