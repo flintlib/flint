@@ -138,6 +138,18 @@ Printing
         [   0    0 2607]
         [ 622    0    0]
 
+.. function:: int nmod_mat_fprint_pretty(FILE * file, const nmod_mat_t mat)
+
+    Same as ``nmod_mat_print_pretty`` but printing to ``file``.
+
+.. function:: int nmod_mat_print(const nmod_mat_t mat)
+
+    Currently, same as ``nmod_mat_print_pretty``.
+
+.. function:: int nmod_mat_fprint(FILE * f, const nmod_mat_t mat)
+
+    Currently, same as ``nmod_mat_fprint_pretty``.
+
 
 Random matrix generation
 --------------------------------------------------------------------------------

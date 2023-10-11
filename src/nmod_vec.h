@@ -190,6 +190,16 @@ mp_limb_t _nmod_vec_dot_rev(mp_srcptr vec1, mp_srcptr vec2,
 mp_limb_t _nmod_vec_dot_ptr(mp_srcptr vec1, const mp_ptr * vec2, slong offset,
     slong len, nmod_t mod, int nlimbs);
 
+/* some IO functions */
+#ifdef FLINT_HAVE_FILE
+int _nmod_vec_fprint_pretty(FILE * file, mp_srcptr vec, slong len, nmod_t mod);
+int _nmod_vec_fprint(FILE * f, mp_srcptr vec, slong len, nmod_t mod);
+#endif
+
+void _nmod_vec_print_pretty(mp_srcptr vec, slong len, nmod_t mod);
+int _nmod_vec_print(mp_srcptr vec, slong len, nmod_t mod);
+
+
 
 #ifdef __cplusplus
 }

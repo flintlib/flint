@@ -59,6 +59,33 @@ Basic manipulation and comparison
     otherwise returns~`0`.
 
 
+Printing
+--------------------------------------------------------------------------------
+
+
+.. function:: void _nmod_vec_print_pretty(mp_srcptr vec, slong len, nmod_t mod)
+
+    Pretty-prints ``vec`` to ``stdout``. A header is printed followed by the
+    vector enclosed in brackets. Each entry is right-aligned to the width of
+    the modulus written in decimal, and the entries are separated by spaces.
+    For example::
+
+        <length-12 integer vector mod 197>
+        [ 33 181 107  61  32  11  80 138  34 171  86 156]
+
+.. function:: int _nmod_vec_fprint_pretty(FILE * file, mp_srcptr vec, slong len, nmod_t mod)
+
+    Same as ``_nmod_vec_print_pretty`` but printing to ``file``.
+
+.. function:: int _nmod_vec_print(mp_srcptr vec, slong len, nmod_t mod)
+
+    Currently, same as ``_nmod_vec_print_pretty``.
+
+.. function:: int _nmod_vec_fprint(FILE * f, mp_srcptr vec, slong len, nmod_t mod)
+
+    Currently, same as ``_nmod_vec_fprint_pretty``.
+
+
 Arithmetic operations
 --------------------------------------------------------------------------------
 
