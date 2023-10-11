@@ -3,8 +3,8 @@
 **fmpz_mat.h** -- matrices over the integers
 ===============================================================================
 
-The `fmpz_mat_t` data type represents dense matrices of multiprecision
-integers, implemented using `fmpz` vectors.
+The :type:`fmpz_mat_t` data type represents dense matrices of
+multiprecision integers, implemented using :type:`fmpz` vectors.
 
 No automatic resizing is performed: in general, the user must provide
 matrices of correct dimensions for both input and output variables.
@@ -15,18 +15,18 @@ Matrices are indexed from zero: an `m \times n` matrix has rows of
 index `0,1,\ldots,m-1` and columns of index `0,1,\ldots,n-1`. One or
 both of `m` and `n` may be zero.
 
-Elements of a matrix can be read or written using the `fmpz_mat_entry`
-macro, which returns a reference to the entry at a given row and
-column index. This reference can be passed as an input or output
-`fmpz_t` variable to any function in the `fmpz` module for direct
-manipulation.
+Elements of a matrix can be read or written using the
+``fmpz_mat_entry`` macro, which returns a reference to the entry at a
+given row and column index. This reference can be passed as an input
+or output :type:`fmpz_t` variable to any function in the ``fmpz``
+module for direct manipulation.
 
 Simple example
 --------------
 
-The following example creates the :math:`2 \times 2` matrix :math:`A`
-with value :math:`2i+j` at row :math:`i` and column :math:`j`, computes
-:math:`B = A^2`, and prints both matrices.
+The following example creates the `2 \times 2` matrix `A` with value
+`2i+j` at row `i` and column `j`, computes `B = A^2`, and prints both
+matrices.
 
 .. code:: c
 
