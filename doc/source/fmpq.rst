@@ -3,34 +3,34 @@
 **fmpq.h** -- rational numbers
 ===============================================================================
 
-The `fmpq_t` data type represents rational numbers as fractions of
-multiprecision integers.
+The :type:`fmpq_t` data type represents rational numbers as fractions
+of multiprecision integers.
 
-An `fmpq_t` is an array of length 1 of type `fmpq`, with `fmpq` being
-implemented as a pair of `fmpz`'s representing numerator and
-denominator.
+An :type:`fmpq_t` is an array of length 1 of type :type:`fmpq`, with
+:type:`fmpq` being implemented as a pair of :type:`fmpz`'s
+representing numerator and denominator.
 
 This format is designed to allow rational numbers with small
 numerators or denominators to be stored and manipulated efficiently.
 When components no longer fit in single machine words, the cost of
-`fmpq_t` arithmetic is roughly the same as that of `mpq_t` arithmetic,
-plus a small amount of overhead.
+:type:`fmpq_t` arithmetic is roughly the same as that of ``mpq_t``
+arithmetic, plus a small amount of overhead.
 
 A fraction is said to be in canonical form if the numerator and
 denominator have no common factor and the denominator is positive.
-Except where otherwise noted, all functions in the `fmpq` module
+Except where otherwise noted, all functions in the :type:`fmpq` module
 assume that inputs are in canonical form, and produce outputs in
 canonical form. The user can manipulate the numerator and denominator
-of an `fmpq_t` as arbitrary integers, but then becomes responsible for
-canonicalising the number (for example by calling `fmpq_canonicalise`)
-before passing it to any library function.
+of an :type:`fmpq_t` as arbitrary integers, but then becomes
+responsible for canonicalising the number (for example by calling
+``fmpq_canonicalise``) before passing it to any library function.
 
-For most operations, both a function operating on `fmpq_t`'s and an
-underscore version operating on `fmpz_t` components are provided. The
-underscore functions may perform less error checking, and may impose
-limitations on aliasing between the input and output variables, but
-generally assume that the components are in canonical form just like
-the non-underscore functions.
+For most operations, both a function operating on :type:`fmpq_t`'s and
+an underscore version operating on :type:`fmpz_t` components are
+provided. The underscore functions may perform less error checking,
+and may impose limitations on aliasing between the input and output
+variables, but generally assume that the components are in canonical
+form just like the non-underscore functions.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
