@@ -787,9 +787,15 @@ endif
 # maintainer stuff
 ################################################################################
 
-dist:
-	git archive --format tar --prefix flint-$(FLINT_MAJOR).$(FLINT_MINOR).$(FLINT_PATCH)/ origin/flint-$(FLINT_MAJOR).$(FLINT_MINOR) > ../flint-$(FLINT_MAJOR).$(FLINT_MINOR).$(FLINT_PATCH).tar; gzip ../flint-$(FLINT_MAJOR).$(FLINT_MINOR).$(FLINT_PATCH).tar
-	git archive --format zip --prefix flint-$(FLINT_MAJOR).$(FLINT_MINOR).$(FLINT_PATCH)/ origin/flint-$(FLINT_MAJOR).$(FLINT_MINOR) > ../flint-$(FLINT_MAJOR).$(FLINT_MINOR).$(FLINT_PATCH).zip 
+configure aclocal.m4 src/config.h.in &: bootstrap.sh configure.ac acinclude.m4
+	./$<
+
+DIST_NAME := flint-$(FLINT_MAJOR).$(FLINT_MINOR).$(FLINT_PATCH)
+
+../$(DIST_NAME).%: FORCE
+	git archive --format $* --prefix ${DIST_NAME}/src/ --add-file src/config.h.in --prefix ${DIST_NAME}/config/ $(patsubst %,--add-file %,$(wildcard config/*)) --prefix ${DIST_NAME}/ --add-file configure --add-file aclocal.m4 origin/flint-$(FLINT_MAJOR).$(FLINT_MINOR) > $@
+
+dist: ../$(DIST_NAME).tar.gz ../$(DIST_NAME).zip
 
 ################################################################################
 # debugging
@@ -797,5 +803,7 @@ dist:
 
 print-%:
 	@echo "$*=$($*)"
+
+FORCE:
 
 .PHONY: all library shared static examples profile tests check tune valgrind clean distclean install uninstall dist %_TEST_RUN %_VALGRIND_RUN print-% coverage
