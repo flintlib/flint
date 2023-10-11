@@ -75,7 +75,6 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong* n1, acb_srcptr
         else
         {
             acb_theta_eld_points(n1, E);
-            flint_printf("(ql_reduce) last coord: %wd\n", n1[g-s-1]);
 
             /* Update new_z and c */
             for (k = 0; k < g - s; k++)
@@ -92,13 +91,6 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong* n1, acb_srcptr
             _acb_vec_scalar_mul_2exp_si(w, w, g - s, 1);
             acb_dot(f, NULL, 0, t, 1, w, 1, g - s, prec);
             acb_exp_pi_i(f, f, prec);
-
-            flint_printf("(ql_reduce) c, f:\n");
-            acb_printd(c, 10);
-            flint_printf("\n");
-            acb_printd(f, 10);
-            flint_printf("\n");
-            
             acb_mul(c, c, f, prec);
         }
 

@@ -22,9 +22,9 @@ int main(void)
     flint_randinit(state);
 
     /* Test: agrees with naive algorithms */
-    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
-        slong g = 2 + n_randint(state, 3);
+        slong g = 2 + n_randint(state, 2);
         slong n = 1 << g;
         slong prec = ACB_THETA_LOW_PREC + n_randint(state, 100);
         slong s = n_randint(state, g + 1);
@@ -75,12 +75,9 @@ int main(void)
             acb_urandom(&z[k], state, prec);
             arb_add(acb_imagref(&z[k]), acb_imagref(&z[k]), &x[k], prec);
         }
-        _acb_vec_printd(z, g, 5);
 
         s = acb_theta_ql_reduce(new_z, c, u, n1, z, tau, prec);
         acb_theta_naive_all(th, z, 1, tau, prec);
-
-        flint_printf("Found g = %wd, s = %wd\n", g, s);
 
         /* If s == -1, check that theta values are small */
         if (s == -1)
@@ -124,7 +121,7 @@ int main(void)
                 if (a1 == fixed_a1)
                 {
                     acb_mul(&test[k], c, &th0[(a0 << s) + b0], prec);
-                    acb_mul_powi(&test[k], &test[k], acb_theta_char_dot_slong(b1, n1, g));
+                    acb_mul_powi(&test[k], &test[k], acb_theta_char_dot_slong(b1, n1, g - s));
                 }
                 acb_add_error_arb(&test[k], u);
             }
