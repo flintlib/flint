@@ -32,8 +32,8 @@ polynomial objects, the behaviour is undefined.
 
 The basic arithmetic operations, addition, subtraction and
 multiplication, are all implemented using adapted versions of
-Henrici's algorithms, see *Hen1956*. Differentiation is implemented in
-a way slightly improving on the algorithm described in *Hor1972*.
+Henrici's algorithms, see [Hen1956]_. Differentiation is implemented
+in a way slightly improving on the algorithm described in [Hor1972]_.
 
 Simple example
 --------------
