@@ -35,7 +35,7 @@ jobs:
       - name: "Build pdf documentation"
         uses: dante-ev/latex-action@latest
         with:
-          entrypoint: cd doc && make latexpdf SPHINXOPTS="-W -j auto"
+          entrypoint: cd doc && make latexpdf SPHINXOPTS=\"-W -j auto\"
 
       - name: "Create a tarball of the documentation"
         run: |
