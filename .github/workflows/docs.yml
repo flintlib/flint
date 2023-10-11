@@ -37,7 +37,7 @@ jobs:
         with:
           working_directory: doc
           extra_system_packages: "python3-sphinx make"
-          entrypoint: entrypoint.sh
+          entrypoint: ./entrypoint.sh
 
       - name: "Create a tarball of the documentation"
         run: |
