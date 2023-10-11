@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Fredrik Johansson
     Copyright (C) 2012 William Hart
 
     This file is part of FLINT.
@@ -14,6 +15,61 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
+#include "gr.h"
+#include "gr_poly.h"
+
+void _fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz *poly, slong len,
+                                  const fmpz_t a, const fmpz_mod_ctx_t ctx)
+{
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
+
+    if (fmpz_sgn(a) >= 0 && fmpz_cmp(a, fmpz_mod_ctx_modulus(ctx)) < 0)
+    {
+        GR_MUST_SUCCEED(_gr_poly_evaluate_horner(res, poly, len, a, gr_ctx));
+    }
+    else
+    {
+        fmpz_t t;
+        fmpz_init(t);
+        fmpz_mod_set_fmpz(t, a, ctx);
+        GR_MUST_SUCCEED(_gr_poly_evaluate_horner(res, poly, len, t, gr_ctx));
+        fmpz_clear(t);
+    }
+}
+
+void fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz_mod_poly_t poly,
+                                      const fmpz_t a, const fmpz_mod_ctx_t ctx)
+{
+    if (res == a)
+    {
+        fmpz_t t;
+        fmpz_init(t);
+        _fmpz_mod_poly_evaluate_fmpz(t, poly->coeffs, poly->length, a, ctx);
+        fmpz_swap(res, t);
+        fmpz_clear(t);
+    }
+    else
+    {
+        _fmpz_mod_poly_evaluate_fmpz(res, poly->coeffs, poly->length, a, ctx);
+    }
+}
+
+void
+_fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys, const fmpz * coeffs,
+                        slong len, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx)
+{
+    if (len < 32)
+        _fmpz_mod_poly_evaluate_fmpz_vec_iter(ys, coeffs, len, xs, n, ctx);
+    else
+        _fmpz_mod_poly_evaluate_fmpz_vec_fast(ys, coeffs, len, xs, n, ctx);
+}
+
+void fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys, const fmpz_mod_poly_t poly,
+                            const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx)
+{
+    _fmpz_mod_poly_evaluate_fmpz_vec(ys, poly->coeffs, poly->length, xs, n, ctx);
+}
 
 void
 _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, const fmpz * poly,
@@ -130,5 +186,21 @@ void fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys, const fmpz_mod_poly_t poly,
                             const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx)
 {
     _fmpz_mod_poly_evaluate_fmpz_vec_fast(ys, poly->coeffs,
+                               poly->length, xs, n, ctx);
+}
+
+void
+_fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys, const fmpz * coeffs, slong len,
+    const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx)
+{
+    slong i;
+    for (i = 0; i < n; i++)
+        _fmpz_mod_poly_evaluate_fmpz(ys + i, coeffs, len, xs + i, ctx);
+}
+
+void fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys, const fmpz_mod_poly_t poly,
+                           const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx)
+{
+    _fmpz_mod_poly_evaluate_fmpz_vec_iter(ys, poly->coeffs,
                                poly->length, xs, n, ctx);
 }
