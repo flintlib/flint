@@ -17,10 +17,10 @@ nmod_poly_set_trunc(nmod_poly_t res, const nmod_poly_t poly, slong len)
 {
     if (poly == res)
     {
-        if (poly->length > len)
+        if (res->length > len)
         {
-            poly->length = len;
-            _nmod_poly_normalise(poly);
+            res->length = len;
+            _nmod_poly_normalise(res);
         }
     }
     else

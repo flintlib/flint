@@ -206,7 +206,7 @@ void nmod_poly_one(nmod_poly_t res)
     res->coeffs[0] = 1;
 }
 
-void nmod_poly_set_trunc(nmod_poly_t res, const nmod_poly_t poly, slong n);
+void nmod_poly_set_trunc(nmod_poly_t res, const nmod_poly_t poly, slong len);
 
 NMOD_POLY_INLINE
 void nmod_poly_truncate(nmod_poly_t poly, slong len)
