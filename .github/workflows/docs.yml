@@ -35,6 +35,9 @@ jobs:
       - name: "Build pdf documentation"
         uses: dante-ev/latex-action@latest
         with:
+          root_file:
+          compiler:
+          args:
           working_directory: doc
           extra_system_packages: "python3-sphinx make"
           entrypoint: ./entrypoint.sh
