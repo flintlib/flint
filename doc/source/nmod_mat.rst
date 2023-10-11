@@ -140,7 +140,7 @@ Printing
 
 .. function:: int nmod_mat_fprint_pretty(FILE * file, const nmod_mat_t mat)
 
-    Same as ``nmod_mat_print_pretty`` but printing to `file`.
+    Same as ``nmod_mat_print_pretty`` but printing to ``file``.
 
 .. function:: int nmod_mat_print(const nmod_mat_t mat)
 

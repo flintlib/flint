@@ -75,7 +75,7 @@ Printing
 
 .. function:: int _nmod_vec_fprint_pretty(FILE * file, mp_srcptr vec, slong len, nmod_t mod)
 
-    Same as ``_nmod_vec_print_pretty`` but printing to `file`.
+    Same as ``_nmod_vec_print_pretty`` but printing to ``file``.
 
 .. function:: int _nmod_vec_print(mp_srcptr vec, slong len, nmod_t mod)
 
