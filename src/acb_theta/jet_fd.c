@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "acb_dft.h"
 #include "acb_theta.h"
 
 /* Given values of f at (x_1 + eps zeta^{n_1}, ..., x_g + eps zeta^{n_g}), make
@@ -23,20 +24,25 @@ acb_theta_jet_fd(acb_ptr dth, const arf_t eps, const arf_t err, acb_srcptr val,
     slong nb = acb_theta_jet_nb(ord, g);
     slong b = ord + 1;
     slong* tups;
+    slong* cyc;
     slong j, i, l;
-    slong k = 0;
+    slong k;
 
     aux = _acb_vec_init(n_pow(b, g));
     arb_init(t);
     tups = flint_malloc(g * nb * sizeof(slong));
+    cyc = flint_malloc(g * sizeof(slong));
 
-    acb_theta_jet_fourier(aux, val, ord, g, prec);
+    for (j = 0; j < g; j++)
+    {
+        cyc[j] = b;
+    }
+    acb_dft_prod(aux, val, cyc, g, prec);
     arb_set_si(t, n_pow(b, g));
     _acb_vec_scalar_div_arb(aux, aux, n_pow(b, g), t, prec);
 
-    acb_theta_jet_tuples(tups, ord, g);
-
     /* Get Taylor coefficients, divide by eps^k */
+    acb_theta_jet_tuples(tups, ord, g);
     k = 0;
     arb_one(t);
     for (j = 0; j < nb; j++)
@@ -61,4 +67,5 @@ acb_theta_jet_fd(acb_ptr dth, const arf_t eps, const arf_t err, acb_srcptr val,
     _acb_vec_clear(aux, n_pow(b, g));
     arb_clear(t);
     flint_free(tups);
+    flint_free(cyc);
 }

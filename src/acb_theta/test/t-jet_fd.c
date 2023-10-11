@@ -22,7 +22,7 @@ int main(void)
     flint_randinit(state);
 
     /* Test: find correct coefficients for exp function */
-    for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         slong prec = 100 + n_randint(state, 1000);
         slong ord = n_randint(state, 4);

@@ -22,7 +22,7 @@ int main(void)
     flint_randinit(state);
 
     /* Test: inequalities are satisfied */
-    for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         slong prec = 100 + n_randint(state, 500);
         slong mag_bits = n_randint(state, 10);
@@ -80,11 +80,11 @@ int main(void)
             flint_abort();
         }
 
-        arb_init(c);
-        arb_init(rho);
-        arb_init(t);
-        arf_init(eps);
-        arf_init(err);
+        arb_clear(c);
+        arb_clear(rho);
+        arb_clear(t);
+        arf_clear(eps);
+        arf_clear(err);
     }
 
     flint_randclear(state);

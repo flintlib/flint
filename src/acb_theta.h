@@ -260,7 +260,6 @@ void acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong
 void acb_theta_jet_bounds(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord);
 void acb_theta_jet_fd_radius(arf_t eps, arf_t err, const arb_t c, const arb_t rho,
     slong ord, slong g, slong prec);
-void acb_theta_jet_fourier(acb_ptr res, acb_srcptr val, slong ord, slong g, slong prec);
 void acb_theta_jet_fd(acb_ptr dth, const arf_t eps, const arf_t err, acb_srcptr val,
     slong ord, slong g, slong prec);
 
