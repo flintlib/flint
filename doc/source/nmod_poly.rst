@@ -341,6 +341,20 @@ Comparison
     Returns~`1` if the polynomial ``poly`` is the constant polynomial 1,
     otherwise returns~`0`.
 
+.. function:: int nmod_poly_is_unit(const nmod_poly_t poly)
+
+   Returns~`1` if the polynomial is a nonzero constant (in the case of prime
+   modulus, this is equivalent to being a unit).
+
+.. function:: int nmod_poly_is_gen(const nmod_poly_t poly)
+
+   Returns~`1` if the polynomial is the variable (i.e. has degree `1`, constant
+   coefficient `0`, and leading coefficient `1`).
+
+.. function:: int nmod_poly_is_monic(const nmod_poly_t poly)
+
+   Returns~`1` if the polynomial is monic, i.e. nonzero with leading coefficient `1`.
+
 
 Shifting
 --------------------------------------------------------------------------------
