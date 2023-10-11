@@ -21,6 +21,8 @@ References
 
 .. [BBK2014] \D. H. Bailey, J. M. Borwein and A. D. Kaiser. "Automated simplification of large symbolic expressions". Journal of Symbolic Computation Volume 60, January 2014, Pages 120-136. https://doi.org/10.1016/j.jsc.2013.09.001
 
+.. [BD1992] \D. Buchmann and S. Düllmann. "Distributed class group computation." Informatik: Festschrift zum 60. Geburtstag von Günter Hotz (1992): 69-79.
+
 .. [BF2020] \F. Beukers and J. Forsgård. "Gamma-evaluations of hypergeometric series". Preprint, 2020. https://arxiv.org/abs/2004.08117
 
 .. [BFSS2006] \A. Bostan, P. Flajolet, B. Salvy and É. Schost. "Fast computation of special resultants". Journal of Symbolic Computation, 41(1):1–29, January 2006. https://doi.org/10.1016/j.jsc.2005.07.001
@@ -28,7 +30,7 @@ References
 .. [BJ2013] \R. P. Brent and F. Johansson, "A bound for the error term in the Brent-McMillan algorithm", preprint (2013), http://arxiv.org/abs/1312.0039
 
 .. [BM1980] \R. P. Brent and E. M. McMillan, "Some new algorithms for high-precision computation of Euler's constant", Mathematics of Computation 34 (1980) 305-312.
-
+	    
 .. [BZ1992] \J. Borwein and I. Zucker, "Fast evaluation of the gamma function for small rational fractions using complete elliptic integrals of the first kind", IMA Journal of Numerical Analysis 12 (1992) 519-526
 
 .. [BZ2011] \R. P. Brent and P. Zimmermann, *Modern Computer Arithmetic*, Cambridge University Press (2011), http://www.loria.fr/~zimmerma/mca/pub226.html
@@ -167,6 +169,8 @@ References
 
 .. [Joh2018b] \F. Johansson and others, "mpmath: a Python library for arbitrary-precision floating-point arithmetic (version 1.1.0)", December 2018. http://mpmath.org/
 
+.. [JvdP2002] \M. J. Jacobson Jr. and A. J. van der Poorten. "Computational aspects of NUCOMP." In International Algorithmic Number Theory Symposium, pp. 120-133. Berlin, Heidelberg: Springer Berlin Heidelberg, 2002.
+
 .. [Kahan1991] \Kahan, William: Computing a Real Cube Root. https://csclub.uwaterloo.ca/~pbarfuss/qbrt.pdf
 
 .. [KanBac1979] \Kannan, R. and Bachem, A. : Polynomial algorithms for computing and the Smith and Hermite normal forms of an integer matrix, SIAM J. Computation vol. 9 (1979) 499--507
@@ -257,6 +261,8 @@ References
 
 .. [Str2012] \A. Strzebonski. "Real root isolation for exp-log-arctan functions". Journal of Symbolic Computation 47 (2012) 282–314. https://doi.org/10.1016/j.jsc.2011.11.004
 
+.. [Sut2007] \A. V. Sutherland. "Order computations in generic groups." PhD diss., Massachusetts Institute of Technology, 2007.
+	    
 .. [Tak2000] \D. Takahashi, "A fast algorithm for computing large Fibonacci numbers", Information Processing Letters 75 (2000) 243-246, http://www.ii.uni.wroc.pl/~lorys/IPL/article75-6-1.pdf
 
 .. [ThullYap1990] \Thull, K. and Yap, C. : A Unified Approach to HGCD Algorithms for Polynomials and Integers, (1990)
@@ -285,5 +291,5 @@ References
 
 .. [vdH2006] \J. van der Hoeven, "Computations with effective real numbers". Theoretical Computer Science, Volume 351, Issue 1, 14 February 2006, Pages 52-60. https://doi.org/10.1016/j.tcs.2005.09.060
 
-All referenced works: [AbbottBronsteinMulders1999]_, [Apostol1997]_, [Ari2011]_, [Ari2012]_, [Arn2010]_, [ArnoldMonagan2011]_, [BBC1997]_, [BBC2000]_, [BBK2014]_, [BF2020]_, [BFSS2006]_, [BJ2013]_, [BM1980]_, [BZ1992]_, [BZ2011]_, [BaiWag1980]_, [BerTas2010]_, [Blo2009]_, [Bodrato2010]_, [Boe2020]_, [Bog2012]_, [Bor1987]_, [Bor2000]_, [Bre1978]_, [Bre1979]_, [Bre2010]_, [BrentKung1978]_, [BuhlerCrandallSompolski1992]_, [CGHJK1996]_, [CP2005]_, [Car1995]_, [Car2004]_, [Chen2003]_, [Cho1999]_, [Coh1996]_, [Coh2000]_, [Col1971]_, [CraPom2005]_, [DYF1999]_, [DelegliseNicolasZimmermann2009]_, [DomKanTro1987]_, [Dup2006]_, [Dus1999]_, [EHJ2016]_, [EM2004]_, [Fie2007]_, [FieHof2014]_, [Fil1992]_, [GCL1992]_, [GG2003]_, [GS2003]_, [GVL1996]_, [Gas2018]_, [GowWag2008]_, [GraMol2010]_, [HM2017]_, [HS1967]_, [HZ2004]_, [HanZim2004]_, [Har2010]_, [Har2012]_, [Har2015]_, [Har2018]_, [Hart2010]_, [Hoe2001]_, [Hoe2009]_, [Iliopoulos1989]_, [JB2018]_, [JM2018]_, [JR1999]_, [Joh2012]_, [Joh2013]_, [Joh2014a]_, [Joh2014b]_, [Joh2014c]_, [Joh2015]_, [Joh2016]_, [Joh2017]_, [Joh2017a]_, [Joh2017b]_, [Joh2018a]_, [Joh2018b]_, [Kahan1991]_, [KanBac1979]_, [Kar1998]_, [Knu1997]_, [Kob2010]_, [Kri2013]_, [Leh1970]_, [LukPatWil1996]_, [MP2006]_, [MPFR2012]_, [MasRob1996]_, [Mic2007]_, [Miy2010]_, [Mos1971]_, [Mul2000]_, [NIST2012]_, [NakTurWil1997]_, [Olv1997]_, [PP2010]_, [PS1973]_, [PS1991]_, [Paterson1973]_, [PernetStein2010]_, [Pet1999]_, [Pla2011]_, [Pla2017]_, [RF1994]_, [Rad1973]_, [Rademacher1937]_, [Ric1992]_, [Ric1995]_, [Ric1997]_, [Ric2007]_, [Ric2009]_, [RosSch1962]_, [Rum2010]_, [Smi2001]_, [SorWeb2016]_, [Ste2002]_, [Ste2010]_, [Stehle2010]_, [Stein2007]_, [StoMul1998]_, [Str1997]_, [Str2012]_, [Tak2000]_, [ThullYap1990]_, [Tre2008]_, [Tru2011]_, [Tru2014]_, [Tur1953]_, [Villard2007]_, [WaktinsZeitlin1993]_, [Wei2000]_, [Whiteman1956]_, [Zip1985]_, [vHP2012]_, [vdH1995]_, [vdH2006]_
+All referenced works: [AbbottBronsteinMulders1999]_, [Apostol1997]_, [Ari2011]_, [Ari2012]_, [Arn2010]_, [ArnoldMonagan2011]_, [BBC1997]_, [BBC2000]_, [BBK2014]_, [BD1992]_, [BF2020]_, [BFSS2006]_, [BJ2013]_, [BM1980]_, [BZ1992]_, [BZ2011]_, [BaiWag1980]_, [BerTas2010]_, [Blo2009]_, [Bodrato2010]_, [Boe2020]_, [Bog2012]_, [Bor1987]_, [Bor2000]_, [Bre1978]_, [Bre1979]_, [Bre2010]_, [BrentKung1978]_, [BuhlerCrandallSompolski1992]_, [CGHJK1996]_, [CP2005]_, [Car1995]_, [Car2004]_, [Chen2003]_, [Cho1999]_, [Coh1996]_, [Coh2000]_, [Col1971]_, [CraPom2005]_, [DYF1999]_, [DelegliseNicolasZimmermann2009]_, [DomKanTro1987]_, [Dup2006]_, [Dus1999]_, [EHJ2016]_, [EM2004]_, [Fie2007]_, [FieHof2014]_, [Fil1992]_, [GCL1992]_, [GG2003]_, [GS2003]_, [GVL1996]_, [Gas2018]_, [GowWag2008]_, [GraMol2010]_, [HM2017]_, [HS1967]_, [HZ2004]_, [HanZim2004]_, [Har2010]_, [Har2012]_, [Har2015]_, [Har2018]_, [Hart2010]_, [Hoe2001]_, [Hoe2009]_, [Iliopoulos1989]_, [JB2018]_, [JM2018]_, [JR1999]_, [Joh2012]_, [Joh2013]_, [Joh2014a]_, [Joh2014b]_, [Joh2014c]_, [Joh2015]_, [Joh2016]_, [Joh2017]_, [Joh2017a]_, [Joh2017b]_, [Joh2018a]_, [Joh2018b]_, [JvdP2002]_, [Kahan1991]_, [KanBac1979]_, [Kar1998]_, [Knu1997]_, [Kob2010]_, [Kri2013]_, [Leh1970]_, [LukPatWil1996]_, [MP2006]_, [MPFR2012]_, [MasRob1996]_, [Mic2007]_, [Miy2010]_, [Mos1971]_, [Mul2000]_, [NIST2012]_, [NakTurWil1997]_, [Olv1997]_, [PP2010]_, [PS1973]_, [PS1991]_, [Paterson1973]_, [PernetStein2010]_, [Pet1999]_, [Pla2011]_, [Pla2017]_, [RF1994]_, [Rad1973]_, [Rademacher1937]_, [Ric1992]_, [Ric1995]_, [Ric1997]_, [Ric2007]_, [Ric2009]_, [RosSch1962]_, [Rum2010]_, [Smi2001]_, [SorWeb2016]_, [Ste2002]_, [Ste2010]_, [Stehle2010]_, [Stein2007]_, [Sut2007]_, [StoMul1998]_, [Str1997]_, [Str2012]_, [Tak2000]_, [ThullYap1990]_, [Tre2008]_, [Tru2011]_, [Tru2014]_, [Tur1953]_, [Villard2007]_, [WaktinsZeitlin1993]_, [Wei2000]_, [Whiteman1956]_, [Zip1985]_, [vHP2012]_, [vdH1995]_, [vdH2006]_
 
