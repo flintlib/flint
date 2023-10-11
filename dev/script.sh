@@ -1,0 +1,142 @@
+dirs=(
+    thread_pool
+    thread_support
+    ulong_extras
+    long_extras
+    perm
+    double_extras
+    d_vec
+    d_mat
+    mpn_extras
+    mpf_vec
+    mpf_mat
+    mpfr_vec
+    mpfr_mat
+    nmod
+    nmod_vec
+    nmod_mat
+    nmod_poly
+    fmpz
+    fmpz_vec
+    fmpz_mat
+    fmpz_poly
+    fmpz_mod
+    fmpz_mod_vec
+    fmpz_mod_mat
+    fmpz_mod_poly
+    fmpq
+    fmpq_vec
+    fmpq_mat
+    fmpq_poly
+    fq
+    fq_vec
+    fq_mat
+    fq_poly
+    fq_nmod
+    fq_nmod_vec
+    fq_nmod_mat
+    fq_nmod_poly
+    fq_zech
+    fq_zech_mat
+    fq_zech_poly
+    fq_default
+    fq_default_mat
+    fq_default_poly
+    fq_embed
+    fq_nmod_embed
+    fq_zech_embed
+    padic
+    padic_mat
+    padic_poly
+    qadic
+    nmod_poly_factor
+    fmpz_factor
+    fmpz_poly_factor
+    fmpz_mod_poly_factor
+    fq_poly_factor
+    fq_nmod_poly_factor
+    fq_zech_poly_factor
+    fq_default_poly_factor
+    nmod_poly_mat
+    fmpz_poly_mat
+    mpoly
+    nmod_mpoly
+    fmpz_mpoly
+    fmpz_mod_mpoly
+    fmpq_mpoly
+    fq_nmod_mpoly
+    fq_zech_mpoly
+    nmod_mpoly_factor
+    fmpz_mpoly_factor
+    fmpz_mod_mpoly_factor
+    fmpq_mpoly_factor
+    fq_nmod_mpoly_factor
+    fq_zech_mpoly_factor
+    fft
+    fmpz_poly_q
+    fmpz_lll
+    n_poly
+    arith
+    qsieve
+    aprcl
+    nf
+    nf_elem
+    qfb
+    double_interval
+    dlog
+    fmpz_extras
+    fmpzi
+    bool_mat
+    partitions
+    mag
+    arf
+    acf
+    arb
+    acb
+    arb_mat
+    arb_poly
+    arb_calc
+    arb_hypgeom
+    acb_mat
+    acb_poly
+    acb_calc
+    acb_hypgeom
+    arb_fmpz_poly
+    arb_fpwrap
+    acb_dft
+    acb_elliptic
+    acb_modular
+    acb_dirichlet
+    dirichlet
+    bernoulli
+    hypgeom
+    gr
+    gr_generic
+    gr_vec
+    gr_mat
+    gr_poly
+    gr_mpoly
+    gr_special
+    calcium
+    fmpz_mpoly_q
+    fexpr
+    fexpr_builtin
+    qqbar
+    ca
+    ca_ext
+    ca_field
+    ca_vec
+    ca_poly
+    ca_mat
+)
+
+TIMEFORMAT=%R
+rm -f timings.txt
+
+for dir in "${dirs[@]}";
+do
+    echo "${dir}:" >> timings.txt
+    { time make build/${dir}_merged.lo 2> tmp ; } 2>> timings.txt
+    echo >> timings.txt
+    rm tmp
+done

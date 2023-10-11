@@ -56,3 +56,4 @@ libtool
 ltmain.sh
 src/config.h.in
 flint.pc
+timings.txt
