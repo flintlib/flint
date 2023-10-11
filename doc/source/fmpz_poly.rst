@@ -6,16 +6,18 @@
 Introduction
 ------------
 
-The `fmpz_poly_t` data type represents elements of `\Z[x]`. The
-`fmpz_poly` module provides routines for memory management, basic
-arithmetic, and conversions from or to other types.
+The :type:`fmpz_poly_t` data type represents elements of
+`\mathbb{Z}[x]`. The :type:`fmpz_poly` module provides routines for
+memory management, basic arithmetic, and conversions from or to other
+types.
 
-Each coefficient of an `fmpz_poly_t` is an integer of the FLINT
-`fmpz_t` type. There are two advantages of this model. Firstly, the
-`fmpz_t` type is memory managed, so the user can manipulate individual
-coefficients of a polynomial without having to deal with tedious
-memory management. Secondly, a coefficient of an `fmpz_poly_t` can be
-changed without changing the size of any of the other coefficients.
+Each coefficient of an :type:`fmpz_poly_t` is an integer of the FLINT
+:type:`fmpz_t` type. There are two advantages of this model. Firstly,
+the :type:`fmpz_t` type is memory managed, so the user can manipulate
+individual coefficients of a polynomial without having to deal with
+tedious memory management. Secondly, a coefficient of an
+:type:`fmpz_poly_t` can be changed without changing the size of any of
+the other coefficients.
 
 Unless otherwise specified, all functions in this section permit
 aliasing between their input arguments and between their input and
@@ -26,8 +28,8 @@ output arguments.
 Simple example
 --------------
 
-The following example computes the square of the polynomial
-:math:`5x^3 - 1`.
+The following example computes the square of the polynomial `5x^3 -
+1`.
 
 .. code:: c
 
@@ -57,33 +59,33 @@ The output is:
 Definition of the fmpz_poly_t type
 ----------------------------------
 
-The `fmpz_poly_t` type is a typedef for an array of length~1 of
-`fmpz_poly_struct`'s. This permits passing parameters of type
-`fmpz_poly_t` by reference in a manner similar to the way GMP integers
-of type `mpz_t` can be passed by reference.
+The :type:`fmpz_poly_t` type is a typedef for an array of length 1 of
+:type:`fmpz_poly_struct`'s. This permits passing parameters of type
+:type:`fmpz_poly_t` by reference in a manner similar to the way GMP
+integers of type ``mpz_t`` can be passed by reference.
 
-In reality one never deals directly with the `struct` and simply deals
-with objects of type `fmpz_poly_t`. For simplicity we will think of an
-`fmpz_poly_t` as a `struct`, though in practice to access fields of
-this `struct`, one needs to dereference first, e.g.\ to access the
-`length` field of an `fmpz_poly_t` called `poly1` one writes
-`poly1->length`.
+In reality one never deals directly with the ``struct`` and simply
+deals with objects of type :type:`fmpz_poly_t`. For simplicity we will
+think of an :type:`fmpz_poly_t` as a ``struct``, though in practice to
+access fields of this ``struct``, one needs to dereference first, e.g.
+to access the ``length`` field of an :type:`fmpz_poly_t` called
+``poly1`` one writes ``poly1->length``.
 
-An `fmpz_poly_t` is said to be *normalised* if either `length` is
-zero, or if the leading coefficient of the polynomial is non-zero. All
-`fmpz_poly` functions expect their inputs to be normalised, and unless
-otherwise specified they produce output that is normalised.
+An :type:`fmpz_poly_t` is said to be *normalised* if either ``length``
+is zero, or if the leading coefficient of the polynomial is non-zero.
+All :type:`fmpz_poly` functions expect their inputs to be normalised,
+and unless otherwise specified they produce output that is normalised.
 
 It is recommended that users do not access the fields of an
-`fmpz_poly_t` or its coefficient data directly, but make use of the
-functions designed for this purpose, detailed below.
+:type:`fmpz_poly_t` or its coefficient data directly, but make use of
+the functions designed for this purpose, detailed below.
 
-Functions in `fmpz_poly` do all the memory management for the user.
-One does not need to specify the maximum length or number of limbs per
-coefficient in advance before using a polynomial object. FLINT
-reallocates space automatically as the computation proceeds, if more
-space is required. Each coefficient is also managed separately, being
-resized as needed, independently of the other coefficients.
+Functions in :type:`fmpz_poly` do all the memory management for the
+user. One does not need to specify the maximum length or number of
+limbs per coefficient in advance before using a polynomial object.
+FLINT reallocates space automatically as the computation proceeds, if
+more space is required. Each coefficient is also managed separately,
+being resized as needed, independently of the other coefficients.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
