@@ -76,6 +76,7 @@ the result.
         fmpz_clear(x);
         fmpz_clear(y);
     }
+
 ::
 
    7^2 = 49
