@@ -23,7 +23,7 @@ sp2gz_j(fmpz_mat_t mat)
 
     fmpz_mat_one(one);
     fmpz_mat_neg(minus_one, one);
-    sp2gz_set_abcd(mat, zero, one, minus_one, zero);
+    sp2gz_set_blocks(mat, zero, one, minus_one, zero);
 
     fmpz_mat_clear(zero);
     fmpz_mat_clear(one);

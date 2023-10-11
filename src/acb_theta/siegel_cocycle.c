@@ -15,19 +15,19 @@ void
 acb_siegel_cocycle(acb_mat_t c, const fmpz_mat_t mat, const acb_mat_t tau, slong prec)
 {
     slong g = sp2gz_dim(mat);
-    fmpz_mat_t block;
+    fmpz_mat_t gamma, delta;
     acb_mat_t r;
 
-    fmpz_mat_init(block, g, g);
+    fmpz_mat_window_init(gamma, mat, g, 0, 2 * g, g);
+    fmpz_mat_window_init(delta, mat, g, g, 2 * g, 2 * g);
     acb_mat_init(r, g, g);
 
-    sp2gz_get_c(block, mat);
-    acb_mat_set_fmpz_mat(c, block);
+    acb_mat_set_fmpz_mat(c, gamma);
+    acb_mat_set_fmpz_mat(r, delta);
     acb_mat_mul(c, c, tau, prec);
-    sp2gz_get_d(block, mat);
-    acb_mat_set_fmpz_mat(r, block);
     acb_mat_add(c, c, r, prec);
 
-    fmpz_mat_clear(block);
+    fmpz_mat_window_clear(gamma);
+    fmpz_mat_window_clear(delta);
     acb_mat_clear(r);
 }

@@ -80,7 +80,7 @@ int main(void)
         s = acb_theta_ql_reduce(new_z, c, u, n1, z, tau, prec);
         acb_theta_naive_all(th, z, 1, tau, prec);
 
-        flint_printf("Found g = %wd, s = %wd\n", g, s, fixed_a1);
+        flint_printf("Found g = %wd, s = %wd\n", g, s);
 
         /* If s == -1, check that theta values are small */
         if (s == -1)
@@ -124,7 +124,7 @@ int main(void)
                 if (a1 == fixed_a1)
                 {
                     acb_mul(&test[k], c, &th0[(a0 << s) + b0], prec);
-                    acb_mul_powi(&test[k], &test[k], acb_theta_char_dot_slong(a1, n1, g));
+                    acb_mul_powi(&test[k], &test[k], acb_theta_char_dot_slong(b1, n1, g));
                 }
                 acb_add_error_arb(&test[k], u);
             }

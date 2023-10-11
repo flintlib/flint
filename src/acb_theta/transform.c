@@ -16,12 +16,12 @@ acb_theta_transform_scal(acb_t scal, const fmpz_mat_t mat, acb_srcptr z,
     const acb_mat_t tau, const slong kappa, slong prec)
 {
     slong g = sp2gz_dim(mat);
-    fmpz_mat_t c;
+    fmpz_mat_t gamma;
     acb_mat_t w;
     acb_ptr Nz, v;
     acb_t mu, x;
 
-    fmpz_mat_init(c, g, g);
+    fmpz_mat_window_init(gamma, mat, g, 0, 2 * g, g);
     acb_mat_init(w, g, g);
     v = _acb_vec_init(g);
     Nz = _acb_vec_init(g);
@@ -36,15 +36,14 @@ acb_theta_transform_scal(acb_t scal, const fmpz_mat_t mat, acb_srcptr z,
     acb_mul(scal, x, mu, prec);
 
     acb_siegel_transform_z(Nz, w, mat, z, tau, prec);
-    sp2gz_get_c(c, mat);
-    acb_mat_set_fmpz_mat(w, c);
+    acb_mat_set_fmpz_mat(w, gamma);
     acb_mat_vector_mul_col(v, w, z, prec);
 
     acb_dot(x, NULL, 0, v, 1, Nz, 1, g, prec);
     acb_exp_pi_i(x, x, prec);
     acb_mul(scal, scal, x, prec);
 
-    fmpz_mat_clear(c);
+    fmpz_mat_window_clear(gamma);
     acb_mat_clear(w);
     _acb_vec_clear(v, g);
     _acb_vec_clear(Nz, g);

@@ -120,7 +120,7 @@ sp2gz_fundamental_g2(fmpz_mat_t mat, slong j)
             fmpz_mat_set(d, a);
     }
 
-    sp2gz_set_abcd(mat, a, b, c, d);
+    sp2gz_set_blocks(mat, a, b, c, d);
 
     fmpz_mat_clear(a);
     fmpz_mat_clear(b);

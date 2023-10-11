@@ -83,12 +83,13 @@ acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n2 = 1 << (2 * g);
-    acb_mat_t w;
+    acb_mat_t tau0;
     acb_ptr new_z, aux;
     acb_t c;
     arb_t u, v;
     arf_t b;
-    slong s, j, k;
+    slong s;
+    slong* n1;
     ulong ab, a0, a1, b0, b1, fixed_a1;
 
     acb_init(c);
@@ -96,8 +97,9 @@ acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec)
     arb_init(v);
     arf_init(b);
     new_z = _acb_vec_init(g);
+    n1 = flint_malloc(g * sizeof(slong));
 
-    s = acb_theta_ql_reduce(new_z, c, u, &fixed_a1, z, tau, prec);
+    s = acb_theta_ql_reduce(new_z, c, u, n1, z, tau, prec);
     acb_sqr(c, c, prec);
     arb_sqr(u, u, prec);
 
@@ -111,22 +113,15 @@ acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec)
     }
     else
     {
-        acb_mat_init(w, s, s);
+        fixed_a1 = acb_theta_char_get_a(n1, g - s);
+        acb_mat_window_init(tau0, tau, 0, 0, s, s);
         aux = _acb_vec_init(1 << (2 * s));
-
-        for (j = 0; j < s; j++)
-        {
-            for (k = 0; k < s; k++)
-            {
-                acb_set(acb_mat_entry(w, j, k), acb_mat_entry(tau, j, k));
-            }
-        }
 
         if (acb_is_finite(c))
         {
             if (s > 0)
             {
-                acb_theta_ql_all_sqr_red(aux, new_z, w, prec);
+                acb_theta_ql_all_sqr_red(aux, new_z, tau0, prec);
             }
             else
             {
@@ -150,7 +145,7 @@ acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec)
             if (a1 == fixed_a1)
             {
                 acb_set(&th2[ab], &aux[(a0 << s) + b0]);
-                if (acb_theta_char_dot(a1, b1, g - s) % 2 == 1)
+                if (acb_theta_char_dot_slong(b1, n1, g - s) % 2 == 1)
                 {
                     acb_neg(&th2[ab], &th2[ab]);
                 }
@@ -169,7 +164,7 @@ acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec)
             }
         }
 
-        acb_mat_clear(w);
+        acb_mat_window_clear(tau0);
         _acb_vec_clear(aux, 1 << (2 * s));
     }
 
@@ -178,4 +173,5 @@ acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec)
     arb_clear(u);
     arb_clear(v);
     arf_clear(b);
+    flint_free(n1);
 }

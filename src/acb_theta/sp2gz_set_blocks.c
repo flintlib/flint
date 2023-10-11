@@ -12,8 +12,8 @@
 #include "acb_theta.h"
 
 void
-sp2gz_set_abcd(fmpz_mat_t mat, const fmpz_mat_t a, const fmpz_mat_t b,
-    const fmpz_mat_t c, const fmpz_mat_t d)
+sp2gz_set_blocks(fmpz_mat_t mat, const fmpz_mat_t alpha, const fmpz_mat_t beta,
+    const fmpz_mat_t gamma, const fmpz_mat_t delta)
 {
     slong g = sp2gz_dim(mat);
     slong j, k;
@@ -22,10 +22,10 @@ sp2gz_set_abcd(fmpz_mat_t mat, const fmpz_mat_t a, const fmpz_mat_t b,
     {
         for (k = 0; k < g; k++)
         {
-            fmpz_set(fmpz_mat_entry(mat, j, k), fmpz_mat_entry(a, j, k));
-            fmpz_set(fmpz_mat_entry(mat, j, k + g), fmpz_mat_entry(b, j, k));
-            fmpz_set(fmpz_mat_entry(mat, j + g, k), fmpz_mat_entry(c, j, k));
-            fmpz_set(fmpz_mat_entry(mat, j + g, k + g), fmpz_mat_entry(d, j, k));
+            fmpz_set(fmpz_mat_entry(mat, j, k), fmpz_mat_entry(alpha, j, k));
+            fmpz_set(fmpz_mat_entry(mat, j, k + g), fmpz_mat_entry(beta, j, k));
+            fmpz_set(fmpz_mat_entry(mat, j + g, k), fmpz_mat_entry(gamma, j, k));
+            fmpz_set(fmpz_mat_entry(mat, j + g, k + g), fmpz_mat_entry(delta, j, k));
         }
     }
 }

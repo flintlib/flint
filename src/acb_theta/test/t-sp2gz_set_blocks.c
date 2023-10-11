@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("sp2gz_set_abcd....");
+    flint_printf("sp2gz_set_blocks....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -29,19 +29,16 @@ int main(void)
         fmpz_mat_t m, n;
         slong bits = n_randint(state, 10);
 
-        fmpz_mat_init(a, g, g);
-        fmpz_mat_init(b, g, g);
-        fmpz_mat_init(c, g, g);
-        fmpz_mat_init(d, g, g);
         fmpz_mat_init(m, 2 * g, 2 * g);
         fmpz_mat_init(n, 2 * g, 2 * g);
-
         sp2gz_randtest(m, state, bits);
-        sp2gz_get_a(a, m);
-        sp2gz_get_b(b, m);
-        sp2gz_get_c(c, m);
-        sp2gz_get_d(d, m);
-        sp2gz_set_abcd(n, a, b, c, d);
+
+        fmpz_mat_window_init(a, m, 0, 0, g, g);
+        fmpz_mat_window_init(b, m, 0, g, g, 2 * g);
+        fmpz_mat_window_init(c, m, g, 0, 2 * g, g);
+        fmpz_mat_window_init(d, m, g, g, 2 * g, 2 * g);
+
+        sp2gz_set_blocks(n, a, b, c, d);
 
         if (!fmpz_mat_equal(m, n))
         {
@@ -53,10 +50,10 @@ int main(void)
             flint_printf("\n\n");
         }
 
-        fmpz_mat_clear(a);
-        fmpz_mat_clear(b);
-        fmpz_mat_clear(c);
-        fmpz_mat_clear(d);
+        fmpz_mat_window_clear(a);
+        fmpz_mat_window_clear(b);
+        fmpz_mat_window_clear(c);
+        fmpz_mat_window_clear(d);
         fmpz_mat_clear(m);
         fmpz_mat_clear(n);
     }

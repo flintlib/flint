@@ -17,19 +17,18 @@ acb_theta_transform_char(slong* e, const fmpz_mat_t mat, ulong ab)
     slong g = sp2gz_dim(mat);
     fmpz_mat_t a, b, c, d;
     fmpz_mat_t mat_tp;
-    fmpz_mat_t block;           /* CD^t or AB^t */
-    fmpz_mat_t alphabeta;
-    fmpz_mat_t alpha, beta;     /* These are windows, not initialized or freed */
+    fmpz_mat_t block; /* CD^t or AB^t */
+    fmpz_mat_t alphabeta, alpha, beta;
     fmpz_mat_t Cvec_1, Cvec_2, Lvec;
     fmpz_mat_t coef;
     fmpz_t eps, x;
     ulong res = 0;
     slong i;
 
-    fmpz_mat_init(a, g, g);
-    fmpz_mat_init(b, g, g);
-    fmpz_mat_init(c, g, g);
-    fmpz_mat_init(d, g, g);
+    fmpz_mat_window_init(a, mat, 0, 0, g, g);
+    fmpz_mat_window_init(b, mat, 0, g, g, 2 * g);
+    fmpz_mat_window_init(c, mat, g, 0, 2 * g, g);
+    fmpz_mat_window_init(d, mat, g, g, 2 * g, 2 * g);
     fmpz_mat_init(mat_tp, 2 * g, 2 * g);
     fmpz_mat_init(block, g, g);
     fmpz_mat_init(alphabeta, 2 * g, 1);
@@ -40,10 +39,6 @@ acb_theta_transform_char(slong* e, const fmpz_mat_t mat, ulong ab)
     fmpz_init(eps);
     fmpz_init(x);
 
-    sp2gz_get_a(a, mat);
-    sp2gz_get_b(b, mat);
-    sp2gz_get_c(c, mat);
-    sp2gz_get_d(d, mat);
     fmpz_mat_transpose(mat_tp, mat);
 
     /* Compute blocks and substract diagonals in alphabeta */
@@ -110,9 +105,6 @@ acb_theta_transform_char(slong* e, const fmpz_mat_t mat, ulong ab)
     fmpz_mat_mul(coef, Lvec, Cvec_1);
     fmpz_addmul_ui(eps, fmpz_mat_entry(coef, 0, 0), 2);
 
-    fmpz_mat_window_clear(alpha);
-    fmpz_mat_window_clear(beta);
-
     /* Convert alphabeta mod 2 to ulong */
     for (i = 0; i < 2 * g; i++)
     {
@@ -130,19 +122,20 @@ acb_theta_transform_char(slong* e, const fmpz_mat_t mat, ulong ab)
     }
     *e = fmpz_mod_ui(eps, eps, 8);
 
-    fmpz_mat_clear(a);
-    fmpz_mat_clear(b);
-    fmpz_mat_clear(c);
-    fmpz_mat_clear(d);
+    fmpz_mat_window_clear(a);
+    fmpz_mat_window_clear(b);
+    fmpz_mat_window_clear(c);
+    fmpz_mat_window_clear(d);
     fmpz_mat_clear(mat_tp);
     fmpz_mat_clear(block);
     fmpz_mat_clear(alphabeta);
+    fmpz_mat_window_clear(alpha);
+    fmpz_mat_window_clear(beta);
     fmpz_mat_clear(Cvec_1);
     fmpz_mat_clear(Cvec_2);
     fmpz_mat_clear(Lvec);
     fmpz_mat_clear(coef);
     fmpz_clear(eps);
     fmpz_clear(x);
-
     return res;
 }

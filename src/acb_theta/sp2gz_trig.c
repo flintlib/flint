@@ -21,7 +21,7 @@ sp2gz_trig(fmpz_mat_t mat, const fmpz_mat_t S)
     fmpz_mat_init(one, g, g);
 
     fmpz_mat_one(one);
-    sp2gz_set_abcd(mat, one, S, zero, one);
+    sp2gz_set_blocks(mat, one, S, zero, one);
 
     fmpz_mat_clear(zero);
     fmpz_mat_clear(one);

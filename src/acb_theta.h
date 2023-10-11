@@ -39,13 +39,8 @@ sp2gz_dim(const fmpz_mat_t mat)
     return fmpz_mat_nrows(mat) / 2;
 }
 
-void sp2gz_get_a(fmpz_mat_t res, const fmpz_mat_t mat);
-void sp2gz_get_b(fmpz_mat_t res, const fmpz_mat_t mat);
-void sp2gz_get_c(fmpz_mat_t res, const fmpz_mat_t mat);
-void sp2gz_get_d(fmpz_mat_t res, const fmpz_mat_t mat);
-void sp2gz_set_abcd(fmpz_mat_t mat, const fmpz_mat_t a, const fmpz_mat_t b,
-    const fmpz_mat_t c, const fmpz_mat_t d);
-
+void sp2gz_set_blocks(fmpz_mat_t mat, const fmpz_mat_t alpha, const fmpz_mat_t beta,
+    const fmpz_mat_t gamma, const fmpz_mat_t delta);
 void sp2gz_j(fmpz_mat_t mat);
 void sp2gz_block_diag(fmpz_mat_t mat, const fmpz_mat_t U);
 void sp2gz_trig(fmpz_mat_t mat, const fmpz_mat_t S);
@@ -65,6 +60,7 @@ void acb_siegel_transform(acb_mat_t w, const fmpz_mat_t mat, const acb_mat_t tau
 void acb_siegel_transform_z(acb_ptr r, acb_mat_t w, const fmpz_mat_t mat,
     acb_srcptr z, const acb_mat_t tau, slong prec);
 
+int acb_siegel_is_reduced(const acb_mat_t tau, const arf_t tol, slong prec);
 void acb_siegel_reduce(fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 
 void acb_siegel_randtest(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits);
