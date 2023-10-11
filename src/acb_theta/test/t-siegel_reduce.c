@@ -21,23 +21,20 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: mat is symplectic, upper left imag entry is at least 1/2, and real
-       part is reduced */
+    /* Test: mat is symplectic and image passes acb_siegel_is_reduced */
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 4);
         slong prec = 100 + n_randint(state, 200);
         slong mag_bits = n_randint(state, 5);
+        slong tol_exp = -10;
         acb_mat_t tau;
-        acb_mat_t res;
+        acb_mat_t w;
         fmpz_mat_t mat;
-        arb_t test;
-        int r = 1;
 
         acb_mat_init(tau, g, g);
-        acb_mat_init(res, g, g);
+        acb_mat_init(w, g, g);
         fmpz_mat_init(mat, 2 * g, 2 * g);
-        arb_init(test);
 
         acb_siegel_randtest(tau, state, prec, mag_bits);
         acb_siegel_reduce(mat, tau, prec);
@@ -49,36 +46,21 @@ int main(void)
             flint_abort();
         }
 
-        acb_siegel_transform(res, mat, tau, prec);
-        acb_abs(test, acb_mat_entry(res, 0, 0), prec);
-        arb_mul_2exp_si(test, test, 1);
-        arb_sub_si(test, test, 1, prec);
-        if (arb_is_negative(test))
-        {
-            r = 0;
-        }
+        acb_siegel_transform(w, mat, tau, prec);
 
-        arb_abs(test, acb_realref(acb_mat_entry(res, 0, 0)));
-        arb_sub_si(test, test, 1, prec);
-        if (arb_is_positive(test))
+        if (!acb_siegel_is_reduced(w, tol_exp, prec))
         {
-            r = 0;
-        }
-
-        if (!r)
-        {
-            flint_printf("FAIL (not reduced):\n");
+            flint_printf("FAIL (not reduced)\n");
             acb_mat_printd(tau, 10);
             fmpz_mat_print_pretty(mat);
             flint_printf("\n");
-            acb_mat_printd(res, 10);
+            acb_mat_printd(w, 10);
             flint_abort();
         }
 
         acb_mat_clear(tau);
-        acb_mat_clear(res);
+        acb_mat_clear(w);
         fmpz_mat_clear(mat);
-        arb_clear(test);
     }
 
     flint_randclear(state);
