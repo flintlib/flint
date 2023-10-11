@@ -153,6 +153,13 @@ void nmod_poly_mat_print(const nmod_poly_mat_t mat, const char * x);
 
 slong nmod_poly_mat_max_length(const nmod_poly_mat_t A);
 
+NMOD_POLY_MAT_INLINE
+slong nmod_poly_mat_degree(const nmod_poly_mat_t pmat)
+{
+    return nmod_poly_mat_max_length(pmat)-1;
+}
+
+
 /* Scalar arithmetic *********************************************************/
 
 void nmod_poly_mat_scalar_mul_nmod_poly(nmod_poly_mat_t B,
