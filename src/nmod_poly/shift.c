@@ -32,3 +32,22 @@ void nmod_poly_shift_left(nmod_poly_t res, const nmod_poly_t poly, slong k)
     res->length = poly->length + k;
 }
 
+void _nmod_poly_shift_right(mp_ptr res, mp_srcptr poly, slong len, slong k)
+{
+    flint_mpn_copyi(res, poly + k, len);
+}
+
+void nmod_poly_shift_right(nmod_poly_t res, const nmod_poly_t poly, slong k)
+{
+    if (k >= poly->length) /* shift all coeffs out */
+        res->length = 0;
+    else
+    {
+        const slong len = poly->length - k;
+        nmod_poly_fit_length(res, len);
+
+        _nmod_poly_shift_right(res->coeffs, poly->coeffs, len, k);
+
+        res->length = len;
+    }
+}
