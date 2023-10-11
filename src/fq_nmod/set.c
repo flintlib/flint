@@ -1,5 +1,7 @@
 /*
     Copyright (C) 2017 Luca De Feo
+    Copyright (C) 2020 Daniel Schultz
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -11,17 +13,34 @@
 
 #include "nmod_poly.h"
 #include "nmod_mat.h"
+#include "fmpz.h"
 #include "fq_nmod.h"
 
-void fq_nmod_get_nmod_mat(nmod_mat_t col,
-                          const fq_nmod_t a,
-                          const fq_nmod_ctx_t ctx)
+void fq_nmod_set_fmpz(fq_nmod_t rop, const fmpz_t x, const fq_nmod_ctx_t ctx)
 {
-    slong i, n = fq_nmod_ctx_degree(ctx);
-    for (i = 0; i < a->length; i++)
-        nmod_mat_set_entry(col, i, 0, a->coeffs[i]);
-    for ( ; i < n; i++)
-        nmod_mat_entry(col, i, 0) = 0;
+    fmpz_t rx;
+    fmpz_init(rx);
+    fmpz_mod(rx, x, fq_nmod_ctx_prime(ctx));
+    nmod_poly_zero(rop);
+    nmod_poly_set_coeff_ui(rop, 0, fmpz_get_ui(rx));
+    fmpz_clear(rx);
+}
+
+void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b,
+                                                       const fq_nmod_ctx_t ctx)
+{
+    FLINT_ASSERT(a->mod.n == b->mod.n);
+    FLINT_ASSERT(a->mod.n == ctx->modulus->mod.n);
+
+    if (b->length <= 2*(ctx->modulus->length - 1))
+    {
+        nmod_poly_set(a, b);
+        fq_nmod_reduce(a, ctx);
+    }
+    else
+    {
+        nmod_poly_rem(a, b, ctx->modulus);
+    }
 }
 
 void fq_nmod_set_nmod_mat(fq_nmod_t a,
