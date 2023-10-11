@@ -24,7 +24,7 @@ int main(void)
     /* Test: kappa^2 on [u, 0; 0, u^-t] is det(u) */
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 3);
+        slong g = 1 + n_randint(state, 4);
         fmpz_mat_t U, mat;
         fmpz_t det;
         slong kappa;

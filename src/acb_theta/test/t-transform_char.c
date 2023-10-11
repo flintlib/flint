@@ -22,7 +22,7 @@ int main(void)
     flint_randinit(state);
 
     /* Test: on trigonal symplectic matrices, a remains the same */
-    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 10);
         slong bits = 8;
@@ -42,7 +42,7 @@ int main(void)
                 fmpz_set(fmpz_mat_entry(mat, k, j), fmpz_mat_entry(mat, j, k));
             }
         }
-        sp2gz_block_diag(mat, mat);
+        sp2gz_trig(mat, mat);
 
         test = acb_theta_transform_char(&e, mat, ab);
 

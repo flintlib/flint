@@ -16,6 +16,7 @@ acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
+    slong lp;
     fmpz_mat_t mat;
     acb_mat_t w;
     acb_ptr x, aux;
@@ -29,14 +30,28 @@ acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec
     acb_siegel_reduce(mat, tau, prec);
     acb_siegel_transform_z(x, w, mat, z, tau, prec);
 
-    if (sqr)
+    if (acb_siegel_is_reduced(w, -10, prec))
     {
-        acb_theta_ql_all_sqr(aux, x, w, prec);
+        if (sqr)
+        {
+            acb_theta_ql_all_sqr(aux, x, w, prec);
+        }
+        else
+        {
+            acb_theta_ql_all(aux, x, w, prec);
+        }
     }
     else
     {
-        acb_theta_ql_all(aux, x, w, prec);
+        lp = ceil(exp(log(((double) FLINT_MAX(ACB_THETA_LOW_PREC, prec)))/g));
+        lp = FLINT_MAX(lp, ACB_THETA_LOW_PREC);
+        acb_theta_naive_all(aux, x, 1, w, lp);
+        if (sqr)
+        {
+            _acb_vec_sqr(aux, aux, n * n, lp);
+        }
     }
+
     sp2gz_inv(mat, mat);
     kappa = acb_theta_transform_kappa(mat);
     acb_theta_transform(th, mat, aux, x, w, kappa, sqr, prec);

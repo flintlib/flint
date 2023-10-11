@@ -22,14 +22,13 @@ int main(void)
     flint_randinit(state);
 
     /* Test: agrees with naive_all */
-    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
         slong n = 1 << g;
         int hasz = iter % 2;
         slong prec = (g > 1 ? 100 : 1000) + n_randint(state, 200);
         slong hprec = prec + 25;
-        slong bits = n_randint(state, 3);
         acb_mat_t tau;
         acb_ptr z, th, test;
         slong k;
@@ -39,7 +38,7 @@ int main(void)
         th = _acb_vec_init(n * n);
         test = _acb_vec_init(n * n);
 
-        acb_siegel_randtest_reduced(tau, state, hprec, bits);
+        acb_siegel_randtest_nice(tau, state, hprec);
         if (hasz)
         {
             for (k = 0; k < g; k++)
