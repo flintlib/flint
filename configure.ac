@@ -830,6 +830,66 @@ AC_COMPILE_IFELSE(
     [AC_MSG_RESULT([no])]
 )
 
+AC_MSG_CHECKING([which longlong.h to use])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([
+#include <gmp.h>
+#if GMP_LIMB_BITS == 64 && defined (__amd64__)
+#else
+# error Not x86_64
+#endif
+],[])],
+    [AC_MSG_RESULT([longlong-x86_64.h.in])
+    longlong_in="src/longlong-x86_64.h.in"],
+    AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM([
+#include <gmp.h>
+#if GMP_LIMB_BITS == 32 && (defined (__i386__) || defined (__i486__) || defined(__amd64__))
+#else
+# error Not x86
+#endif
+        ],[])],
+        [AC_MSG_RESULT([longlong-x86.h.in])
+        longlong_in="src/longlong-x86.h.in"],
+        AC_COMPILE_IFELSE(
+            [AC_LANG_PROGRAM([
+#include <gmp.h>
+#if GMP_LIMB_BITS == 64 && defined (__ia64)
+#else
+# error Not Itanium
+#endif
+            ],[])],
+            [AC_MSG_RESULT([longlong-ia64.h.in])
+            longlong_in="src/longlong-ia64.h.in"],
+            AC_COMPILE_IFELSE(
+                [AC_LANG_PROGRAM([
+#include <gmp.h>
+#if GMP_LIMB_BITS == 32 && defined (__arm__)
+#else
+# error Not Arm
+#endif
+                ],[])],
+                [AC_MSG_RESULT([longlong-arm.h.in])
+                longlong_in="src/longlong-arm.h.in"],
+                AC_COMPILE_IFELSE(
+                    [AC_LANG_PROGRAM([
+#include <gmp.h>
+#if defined(__arm64__)
+#else
+# error Not Arm64
+#endif
+                    ],[])],
+                    [AC_MSG_RESULT([longlong-arm64.h.in])
+                    longlong_in="src/longlong-arm64.h.in"],
+                    [AC_MSG_RESULT([longlong-generic.h.in])
+                    longlong_in="src/longlong-generic.h.in"]
+                )
+            )
+        )
+    )
+)
+AC_CONFIG_FILES([src/longlong.h:$longlong_in])
+
 ################################################################################
 # CFLAGS
 ################################################################################

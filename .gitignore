@@ -10,6 +10,8 @@
 */.deps/*
 src/fmpz/fmpz.c
 src/flint-config.h
+src/config.h.in
+src/longlong.h
 src/fft_tuning.h
 build/
 config.log
@@ -53,5 +55,4 @@ configure
 install-sh
 libtool
 ltmain.sh
-src/config.h.in
 flint.pc

@@ -1,0 +1,166 @@
+/*
+   Copyright 1991, 1992, 1993, 1994, 1996, 1997, 1999, 2000, 2001, 2002, 2003,
+   2004, 2005 Free Software Foundation, Inc.
+
+   Copyright 2009, 2015, 2016 William Hart
+   Copyright 2011 Fredrik Johansson
+   Copyright 2023 Albin Ahlbäck
+
+   This file is free software; you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as published by
+   the Free Software Foundation; either version 2.1 of the License, or (at your
+   option) any later version.
+
+   This file is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+   License for more details.
+
+   You should have received a copy of the GNU Lesser General Public License
+   along with this file; see the file COPYING.LIB.  If not, write to
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+*/
+
+/*
+   N.B: This file has been adapted from code found in GMP 4.2.1.
+*/
+
+#ifndef FLINT_LONGLONG_H
+#define FLINT_LONGLONG_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define count_leading_zeros _Pragma("GCC error \"'count_leading_zeros' is deprecated. Use 'flint_clz' instead.\"")
+#define count_trailing_zeros _Pragma("GCC error \"'count_trailing_zeros' is deprecated. Use 'flint_ctz' instead.\"")
+
+#ifdef FLINT_HAS_POPCNT
+# ifndef _LONG_LONG_LIMB
+#  define flint_popcount __builtin_popcountl
+# else
+#  define flint_popcount __builtin_popcountll
+# endif
+#endif
+
+#ifdef FLINT_HAS_CLZ
+# ifndef _LONG_LONG_LIMB
+#  define flint_clz __builtin_clzl
+# else
+#  define flint_clz __builtin_clzll
+# endif
+#endif
+
+#ifdef FLINT_HAS_CTZ
+# ifndef _LONG_LONG_LIMB
+#  define flint_ctz __builtin_ctzl
+# else
+#  define flint_ctz __builtin_ctzll
+# endif
+#endif
+
+#define add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)  \
+  __asm__ ("addl %11,%k3\n\tadcl %9,%k2\n\tadcl %7,%k1\n\tadcl %5,%k0"    \
+       : "=r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                    \
+       : "0"  ((mp_limb_t)(a3)), "g" ((mp_limb_t)(b3)),                   \
+         "1"  ((mp_limb_t)(a2)), "g" ((mp_limb_t)(b2)),                   \
+         "2"  ((mp_limb_t)(a1)), "g" ((mp_limb_t)(b1)),                   \
+         "3"  ((mp_limb_t)(a0)), "g" ((mp_limb_t)(b0)))                   \
+
+#define add_sssaaaaaa(sh, sm, sl, ah, am, al, bh, bm, bl)  \
+  __asm__ ("addl %8,%k2\n\tadcl %6,%k1\n\tadcl %4,%k0"     \
+       : "=r" (sh), "=r" (sm), "=&r" (sl)                  \
+       : "0"  ((mp_limb_t)(ah)), "g" ((mp_limb_t)(bh)),    \
+         "1"  ((mp_limb_t)(am)), "g" ((mp_limb_t)(bm)),    \
+         "2"  ((mp_limb_t)(al)), "g" ((mp_limb_t)(bl)))    \
+
+#define sub_dddmmmsss(dh, dm, dl, mh, mm, ml, sh, sm, sl)  \
+  __asm__ ("subl %8,%k2\n\tsbbl %6,%k1\n\tsbbl %4,%k0"     \
+       : "=r" (dh), "=r" (dm), "=&r" (dl)                  \
+       : "0"  ((mp_limb_t)(mh)), "g" ((mp_limb_t)(sh)),    \
+         "1"  ((mp_limb_t)(mm)), "g" ((mp_limb_t)(sm)),    \
+         "2"  ((mp_limb_t)(ml)), "g" ((mp_limb_t)(sl)))    \
+
+#define add_ssaaaa(sh, sl, ah, al, bh, bl)               \
+  __asm__ ("addl %5,%k1\n\tadcl %3,%k0"                  \
+       : "=r" (sh), "=&r" (sl)                           \
+       : "0"  ((mp_limb_t)(ah)), "g" ((mp_limb_t)(bh)),  \
+         "%1" ((mp_limb_t)(al)), "g" ((mp_limb_t)(bl)))
+
+#define sub_ddmmss(sh, sl, ah, al, bh, bl)              \
+  __asm__ ("subl %5,%k1\n\tsbbl %3,%k0"                 \
+       : "=r" (sh), "=&r" (sl)                          \
+       : "0" ((mp_limb_t)(ah)), "g" ((mp_limb_t)(bh)),  \
+         "1" ((mp_limb_t)(al)), "g" ((mp_limb_t)(bl)))
+
+#define umul_ppmm(w1, w0, u, v)                         \
+  __asm__ ("mull %3"                                    \
+       : "=a" (w0), "=d" (w1)                           \
+       : "%0" ((mp_limb_t)(u)), "rm" ((mp_limb_t)(v)))
+
+#define smul_ppmm(w1, w0, u, v)                         \
+  __asm__ ("imull %3"                                   \
+       : "=a" (w0), "=d" (w1)                           \
+       : "%0" ((mp_limb_t)(u)), "rm" ((mp_limb_t)(v)))
+
+#define udiv_qrnnd(q, r, n1, n0, dx)                                            \
+  __asm__ volatile ("divl %4"                                                            \
+       : "=a" (q), "=d" (r)                                                     \
+       : "0" ((mp_limb_t)(n0)), "1" ((mp_limb_t)(n1)), "rm" ((mp_limb_t)(dx)))
+
+#define sdiv_qrnnd(q, r, n1, n0, dx)                                            \
+  __asm__ volatile ("idivl %4"                                                           \
+       : "=a" (q), "=d" (r)                                                     \
+       : "0" ((mp_limb_t)(n0)), "1" ((mp_limb_t)(n1)), "rm" ((mp_limb_t)(dx)))
+
+#ifndef FLINT_HAS_CLZ
+# define flint_clz flint_clz
+static __inline__ flint_bitcnt_t flint_clz(mp_limb_t x)
+{
+    mp_limb_t count;
+    FLINT_ASSERT(x != 0);
+    __asm__("bsrl %1,%0" : "=r" (count) : "rm" (x));
+    return count ^ (mp_limb_t) 31;
+}
+#endif
+
+#ifndef FLINT_HAS_CTZ
+# define flint_ctz flint_ctz
+static __inline__ flint_bitcnt_t flint_ctz(mp_limb_t x)
+{
+    mp_limb_t count;
+    FLINT_ASSERT(x != 0);
+    __asm__("bsfl %1,%0" : "=r" (count) : "rm" (x));
+    return count;
+}
+#endif
+
+#define byte_swap(x)                                                 \
+  do {                                                               \
+    __asm__("bswap %0" : "=r"(x) : "0"(x));                          \
+  } while (0)
+
+#define udiv_qrnnd_preinv(q, r, nh, nl, d, di)               \
+  do {                                                       \
+    mp_limb_t _n2, _n10, _nmask, _nadj, _q1;                 \
+    mp_limb_t _xh, _xl;                                      \
+    _n2 = (nh);                                              \
+    _n10 = (nl);                                             \
+    _nmask = (mp_limb_signed_t) (_n10) >> (FLINT_BITS - 1);  \
+    _nadj = _n10 + (_nmask & (d));                           \
+    umul_ppmm (_xh, _xl, di, _n2 - _nmask);                  \
+    add_ssaaaa (_xh, _xl, _xh, _xl, _n2, _nadj);             \
+    _q1 = ~_xh;                                              \
+    umul_ppmm (_xh, _xl, _q1, d);                            \
+    add_ssaaaa (_xh, _xl, _xh, _xl, nh, nl);                 \
+    _xh -= (d);                 /* xh = 0 or -1 */           \
+    (r) = _xl + ((d) & _xh);                                 \
+    (q) = _xh - _q1;                                         \
+  } while (0)
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
