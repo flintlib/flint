@@ -34,8 +34,10 @@ jobs:
 
       - name: "Build pdf documentation"
         uses: dante-ev/latex-action@latest
+        working_directory: doc
+        extra_system_packages: "python3-sphinx"
         with:
-          entrypoint: cd doc && make latexpdf SPHINXOPTS=\"-W -j auto\"
+          entrypoint: make latexpdf SPHINXOPTS=\"-W -j auto\"
 
       - name: "Create a tarball of the documentation"
         run: |
