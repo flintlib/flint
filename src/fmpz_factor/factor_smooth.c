@@ -141,6 +141,9 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
         {
             p = primes[idx[i]];
 
+            if (p == 2)
+                continue;
+
             exp = 1;
             xsize = flint_mpn_divexact_1(xd, xsize, p);
 

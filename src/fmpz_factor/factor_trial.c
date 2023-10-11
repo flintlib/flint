@@ -78,6 +78,9 @@ fmpz_factor_trial(fmpz_factor_t factor, const fmpz_t n, slong num_primes)
         {
             p = primes[idx[i]];
 
+            if (p == 2)
+                continue;
+
             exp = 1;
             xsize = flint_mpn_divexact_1(xd, xsize, p);
 
