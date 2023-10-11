@@ -48,8 +48,8 @@ void acb_theta_g2_transvectant_lead(acb_t res, const acb_poly_t g, const acb_pol
     acb_div_fmpz(t, t, num, prec);
     acb_mul(res, res, t, prec);
 
-    acb_clear(s);
-    acb_clear(t);
+    _acb_vec_clear(s, k + 1);
+    _acb_vec_clear(t, k + 1);
     fmpz_clear(num);
     fmpz_clear(f);
 }
