@@ -36,7 +36,7 @@ jobs:
         uses: dante-ev/latex-action@latest
         with:
           working_directory: doc
-          extra_system_packages: "python3-sphinx"
+          extra_system_packages: "python3-sphinx make"
           entrypoint: make latexpdf SPHINXOPTS=\"-W -j auto\"
 
       - name: "Create a tarball of the documentation"
