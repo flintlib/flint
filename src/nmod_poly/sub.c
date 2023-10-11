@@ -1,6 +1,8 @@
 /*
     Copyright (C) 2007, David Howden.
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2008-2010, 2014, 2015 William Hart
+    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2015 Tommy Hofmann
 
     This file is part of FLINT.
 
@@ -47,4 +49,52 @@ nmod_poly_sub(nmod_poly_t res, const nmod_poly_t poly1,
 
     res->length = max;
     _nmod_poly_normalise(res);  /* there may have been cancellation */
+}
+
+void nmod_poly_sub_series(nmod_poly_t res,
+            const nmod_poly_t poly1, const nmod_poly_t poly2, slong n)
+{
+    slong len1, len2, max = FLINT_MAX(poly1->length, poly2->length);
+
+    if (n < 0)
+       n = 0;
+
+    max = FLINT_MIN(max, n);
+    len1 = FLINT_MIN(poly1->length, max);
+    len2 = FLINT_MIN(poly2->length, max);
+
+    nmod_poly_fit_length(res, max);
+
+    _nmod_poly_sub(res->coeffs, poly1->coeffs, len1,
+                                    poly2->coeffs, len2, poly1->mod);
+
+    _nmod_poly_set_length(res, max);
+    _nmod_poly_normalise(res);
+}
+
+void nmod_poly_sub_ui(nmod_poly_t res, const nmod_poly_t poly, ulong c)
+{
+    if (c >= poly->mod.n)
+        NMOD_RED(c, c, poly->mod);
+
+    if (poly->length == 0)
+    {
+        if (c == 0)
+            nmod_poly_zero(res);
+        else
+        {
+            nmod_poly_fit_length(res, 1);
+            nmod_poly_set_coeff_ui(res, 0, poly->mod.n - c);
+            _nmod_poly_set_length(res, 1);
+        }
+    }
+    else
+    {
+        nmod_poly_set(res, poly);
+
+        nmod_poly_set_coeff_ui(res, 0, nmod_sub(res->coeffs[0], c, poly->mod));
+
+        _nmod_poly_normalise(res);
+
+   }
 }
