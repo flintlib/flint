@@ -163,7 +163,7 @@ flint_mpn_sqr(mp_ptr z, mp_srcptr x, mp_size_t n)
 mp_limb_t mpn_modexact_1_odd(mp_srcptr, mp_size_t, mp_limb_t);
 
 MPN_EXTRAS_INLINE int
-flint_mpn_divisible_1_p(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
+flint_mpn_divisible_1_odd(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
 {
     return mpn_modexact_1_odd(x, xsize, d) == 0;
 }
@@ -173,7 +173,7 @@ flint_mpn_divisible_1_p(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
 # include "gmpcompat.h"
 
 MPN_EXTRAS_INLINE int
-flint_mpn_divisible_1_p(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
+flint_mpn_divisible_1_odd(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
 {
     __mpz_struct s;
     s._mp_size = xsize;
