@@ -62,6 +62,8 @@ nmod_poly_mat_swap_entrywise(nmod_poly_mat_t mat1, nmod_poly_mat_t mat2)
 
 void nmod_poly_mat_set(nmod_poly_mat_t mat1, const nmod_poly_mat_t mat2);
 
+void nmod_poly_mat_set_nmod_mat(nmod_poly_mat_t pmat, const nmod_mat_t cmat);
+
 void nmod_poly_mat_clear(nmod_poly_mat_t mat);
 
 /* Truncate, shift *********************************************************/
@@ -96,6 +98,9 @@ nmod_poly_mat_modulus(const nmod_poly_mat_t mat)
 
 int nmod_poly_mat_equal(const nmod_poly_mat_t mat1,
                         const nmod_poly_mat_t mat2);
+
+int nmod_poly_mat_equal_nmod_mat(const nmod_poly_mat_t pmat,
+                                const nmod_mat_t cmat);
 
 int nmod_poly_mat_is_zero(const nmod_poly_mat_t mat);
 

@@ -23,3 +23,11 @@ int nmod_poly_equal(const nmod_poly_t a, const nmod_poly_t b)
 
     return 1;
 }
+
+int nmod_poly_equal_ui(const nmod_poly_t a, mp_limb_t b)
+{
+    if (b == 0)
+        return nmod_poly_is_zero(a);
+    else
+        return a->coeffs[0] == b;
+}
