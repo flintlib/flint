@@ -10,8 +10,8 @@
 */
 
 #include <stdio.h>
-#include "flint/ulong_extras.h"
-#include "flint/nmod_vec.h"
+#include "ulong_extras.h"
+#include "nmod_vec.h"
 
 int _nmod_vec_fprint_pretty(FILE * file, mp_srcptr vec, slong len, nmod_t mod)
 {
