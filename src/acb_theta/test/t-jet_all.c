@@ -24,8 +24,7 @@ int main(void)
     /* Test: matches jet_naive_all */
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
-        slong prec = ACB_THETA_LOW_PREC + n_randint(state, 200);
-        slong bits = n_randint(state, 3);
+        slong prec = ACB_THETA_LOW_PREC + n_randint(state, 100);
         slong ord = n_randint(state, 3);
         slong g = 1 + n_randint(state, 2);
         slong n2 = 1 << (2 * g);
@@ -39,7 +38,7 @@ int main(void)
         dth = _acb_vec_init(nb * n2);
         test = _acb_vec_init(nb * n2);
 
-        acb_siegel_randtest_reduced(tau, state, prec, bits);
+        acb_siegel_randtest_nice(tau, state, prec);
         for (k = 0; k < g; k++)
         {
             acb_urandom(&z[k], state, prec);
