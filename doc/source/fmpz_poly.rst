@@ -80,12 +80,12 @@ It is recommended that users do not access the fields of an
 :type:`fmpz_poly_t` or its coefficient data directly, but make use of
 the functions designed for this purpose, detailed below.
 
-Functions in :type:`fmpz_poly` do all the memory management for the
-user. One does not need to specify the maximum length or number of
-limbs per coefficient in advance before using a polynomial object.
-FLINT reallocates space automatically as the computation proceeds, if
-more space is required. Each coefficient is also managed separately,
-being resized as needed, independently of the other coefficients.
+Functions in ``fmpz_poly`` do all the memory management for the user.
+One does not need to specify the maximum length or number of limbs per
+coefficient in advance before using a polynomial object. FLINT
+reallocates space automatically as the computation proceeds, if more
+space is required. Each coefficient is also managed separately, being
+resized as needed, independently of the other coefficients.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
