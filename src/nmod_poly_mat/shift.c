@@ -9,20 +9,18 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_poly_mat.h"
+#include "flint/nmod_poly_mat.h"
 
-void nmod_poly_mat_shift_left(nmod_poly_mat_t smat, const nmod_poly_mat_t pmat, slong k)
+void nmod_poly_mat_shift_left(nmod_poly_mat_t res, const nmod_poly_mat_t pmat, slong k)
 {
-    for (slong i = 0; i < smat->r; i++)
-        for (slong j = 0; j < smat->c; j++)
-            nmod_poly_shift_left(nmod_poly_mat_entry(smat, i, j), nmod_poly_mat_entry(pmat, i, j), k);
+    for (slong i = 0; i < pmat->r; i++)
+        for (slong j = 0; j < pmat->c; j++)
+            nmod_poly_shift_left(nmod_poly_mat_entry(res, i, j), nmod_poly_mat_entry(pmat, i, j), k);
 }
 
-void nmod_poly_mat_shift_right(nmod_poly_mat_t smat, const nmod_poly_mat_t pmat, slong k)
+void nmod_poly_mat_shift_right(nmod_poly_mat_t res, const nmod_poly_mat_t pmat, slong k)
 {
-    for (slong i = 0; i < smat->r; i++)
-        for (slong j = 0; j < smat->c; j++)
-            nmod_poly_shift_right(smat->rows[i] + j, pmat->rows[i] + j, k);
+    for (slong i = 0; i < pmat->r; i++)
+        for (slong j = 0; j < pmat->c; j++)
+            nmod_poly_shift_right(nmod_poly_mat_entry(res, i, j), nmod_poly_mat_entry(pmat, i, j), k);
 }
-
-
