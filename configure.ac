@@ -659,14 +659,14 @@ then
     [dummy_var="x"],
     [AC_MSG_ERROR([`mpn_gcd_11' was not found in the GMP library. It is needed to enable GMP
 internals.])])
+
     AC_CHECK_LIB([gmp],[__gmpn_div_q],
     [dummy_var="x"],
     [AC_MSG_ERROR([`mpn_div_q' was not found in the GMP library. It is needed to enable GMP
 internals.])])
+
     AC_CHECK_LIB([gmp],[__gmpn_modexact_1_odd],
-    [dummy_var="x"],
-    [AC_MSG_ERROR([`mpn_modexact_1_odd' was not found in the GMP library. It is needed to
-enable GMP internals.])])
+    [AC_DEFINE(FLINT_HAVE_MPN_MODEXACT_1_ODD,1,Define if system has mpn_modexact_1_odd)])
 fi
 
 AC_CHECK_LIB(mpfr,mpfr_init,

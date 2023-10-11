@@ -157,7 +157,7 @@ flint_mpn_sqr(mp_ptr z, mp_srcptr x, mp_size_t n)
     ((n) > 0 ? (((lo) >> (n)) | ((hi) << (GMP_LIMB_BITS - (n))))    \
              : (lo))
 
-#ifdef FLINT_WANT_GMP_INTERNALS
+#ifdef FLINT_HAVE_MPN_MODEXACT_1_ODD
 
 # define mpn_modexact_1_odd __gmpn_modexact_1_odd
 mp_limb_t mpn_modexact_1_odd(mp_srcptr, mp_size_t, mp_limb_t);
