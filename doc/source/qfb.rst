@@ -6,15 +6,15 @@
 Authors:
 
 * William Hart
-* Håvard Damm-Johnsen
+* Håvard Damm-Johnsen (updated documentation)
 
 
 Introduction
 --------------------------------------------------------------------------------
 
-This module contains functionality for creating, listing and reducing binary quadratic forms. A ``qfb`` struct consists of three ``fmpz_t`` s, `a`, `b` and `c`, and basic algorithms for operating on forms are described below.
+This module contains functionality for creating, listing and reducing binary quadratic forms. A ``qfb`` struct consists of three ``fmpz_t`` s, `a`, `b` and `c`, and basic algorithms for operations such as reduction, composition and enumerating are inplemented and described below.
 
-Currently, the code only works for definite binary quadratic forms.
+Currently the code only works for definite binary quadratic forms.
 
 Memory management
 ----------------------------------------------------------------------------------------
@@ -57,7 +57,7 @@ Hash table
     Search for the given binary quadratic form or its inverse in the 
     given hash table of size `2^{depth}`. If it is found, return
     the index in the table (which is an array of ``qfb_hash_t`` 
-    structs, otherwise return ``-1L``.
+    structs), otherwise return ``-1``.
 
 Basic manipulation
 ----------------------------------------------------------------------------------------
@@ -93,13 +93,14 @@ Computing with forms
 .. function:: void qfb_reduce(qfb_t r, qfb_t f, fmpz_t D)
 
     Set `r` to a reduced form equivalent to the binary quadratic form `f`
-    of discriminant `D`. If `D > 0`, then there can be more than one reduced 
-    form equivalent to `f`.
-
+    of discriminant `D`.
+    
 .. function:: int qfb_is_reduced(qfb_t r)
 
-    Returns `1` if `q` is a reduced binary quadratic form. Otherwise returns
-    `0`. 
+    Returns `1` if `q` is a reduced binary quadratic form, otherwise
+    returns `0`. Note that this only tests for definite quadratic
+    forms, so a form `r = (a,b,c)` is reduced if and only if `|b| \le a \le
+    c` and if either inequality is an equality, then `b \ge 0`. 
 
 .. function:: slong qfb_reduced_forms(qfb ** forms, slong d)
 
@@ -107,7 +108,7 @@ Computing with forms
     all the reduced binary quadratic forms of that discriminant. The function
     allocates space for these and returns it in the variable ``forms`` 
     (the user is responsible for cleaning this up by a single call to 
-    ``qfb_array_clear`` on ``forms``, after use. The function returns 
+    ``qfb_array_clear`` on ``forms``, after use.) The function returns 
     the number of forms generated (the form class number). The forms are 
     stored in an array of ``qfb`` structs, which contain fields 
     ``a, b, c`` corresponding to forms `(a, b, c)`. 
@@ -175,12 +176,12 @@ Computing with forms
     Find the exponent of the element `f` in the form class group of forms of
     discriminant `n`, doing a stage `1` with primes up to at least ``B1`` 
     and a stage `2` for a single large prime up to at least the square of 
-    ``B2``. If the function fails to find the exponent it returns `0`, 
+    ``B2_sqrt``. If the function fails to find the exponent it returns `0`, 
     otherwise the function returns `1` and ``exponent`` is set to the 
     exponent of `f`, i.e. the minimum power of `f` which gives the identity.
 
     It is assumed that the form `f` is reduced. We require that ``iters``
-    is a power of `2` and that ``iters``` >= 1024`.
+    is a power of `2` and that ``iters`` `\ge 1024`.
 
     The function performs a stage `2` which stores up to `4\times` 
     ``iters`` binary quadratic forms, and `12\times` ``iters``
@@ -189,14 +190,14 @@ Computing with forms
 
 .. function:: int qfb_exponent(fmpz_t exponent, fmpz_t n, ulong B1, ulong B2_sqrt, slong c)
 
-    Compute the exponent of the class group of discriminant `n`, doing a 
-    stage `1` with primes up to at least ``B1`` and a stage `2` for a 
-    single large prime up to at least the square of ``B2_sqrt``, and with
-    probability at least `1 - 2^{-c}`. If the prime limits are exhausted
-    without finding the exponent, the function returns `0`, otherwise it 
-    returns `1` and ``exponent`` is set to the computed exponent, i.e. the 
-    minimum power which every element of the class group has to be raised to 
-    give the identity. 
+    Compute the exponent of the class group of discriminant `n`, doing
+    a stage `1` with primes up to at least ``B1`` and a stage `2` for
+    a single large prime up to at least the square of ``B2_sqrt``, and
+    with probability at least `1 - 2^{-c}`. If the prime limits are
+    exhausted without finding the exponent, the function returns `0`,
+    otherwise it returns `1` and ``exponent`` is set to the computed
+    exponent, i.e. the minimum power to which every element of the
+    class group has to be raised in order to get the identity.
 
     The function performs a stage `2` which stores up to `4\times` 
     ``iters`` binary quadratic forms, and `12\times` ``iters``
@@ -207,7 +208,7 @@ Computing with forms
 
 .. function:: int qfb_exponent_grh(fmpz_t exponent, fmpz_t n, ulong B1, ulong B2_sqrt)
 
-    As per ``qfb_exponent`` except that the bound ``c`` is 
-    automatically generated such that the exponent it guaranteed to be
+    Similar to ``qfb_exponent`` except that the bound ``c`` is 
+    automatically generated such that the exponent is guaranteed to be
     correct, if found, assuming the GRH, namely that the class group is 
-    generated by primes less than `6\log^2(|n|)` as per [BD1992]_.
+    generated by primes less than `6\log^2(|n|)` as described in [BD1992]_.
