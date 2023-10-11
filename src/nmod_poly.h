@@ -252,6 +252,14 @@ int nmod_poly_is_gen(const nmod_poly_t poly)
            (poly->length == 2 && poly->coeffs[0] == 0 && poly->coeffs[1] == 1);
 }
 
+NMOD_POLY_INLINE
+int nmod_poly_is_monic(const nmod_poly_t poly)
+{
+    return (poly->length && poly->coeffs[(poly->length - 1)] == 1);
+}
+
+
+
 /* Randomisation  ************************************************************/
 
 void nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, slong len);
