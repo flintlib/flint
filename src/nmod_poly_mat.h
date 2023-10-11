@@ -94,6 +94,15 @@ nmod_poly_mat_modulus(const nmod_poly_mat_t mat)
     return mat->modulus;
 }
 
+void nmod_poly_mat_get_coeff_mat(nmod_mat_t coeff,
+                                 const nmod_poly_mat_t pmat,
+                                 slong deg);
+
+void nmod_poly_mat_set_coeff_mat(nmod_poly_mat_t pmat,
+                                 const nmod_mat_t coeff,
+                                 slong deg);
+
+
 /* Comparison ****************************************************************/
 
 int nmod_poly_mat_equal(const nmod_poly_mat_t mat1,
