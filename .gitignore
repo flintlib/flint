@@ -9,8 +9,9 @@
 *.ppm
 */.deps/*
 src/fmpz/fmpz.c
-src/flint-config.h
+src/config.h
 src/fft_tuning.h
+src/flint-config.h
 build/
 config.log
 /Makefile
