@@ -3,7 +3,74 @@
 **nmod_poly.h** -- univariate polynomials over integers mod n (word-size n)
 ===============================================================================
 
-Description.
+The `nmod_poly_t` data type represents elements of `\Z/n\Z[x]` for a
+fixed modulus `n`. The `nmod_poly` module provides routines for memory
+management, basic arithmetic and some higher level functions such as
+GCD, etc.
+
+Each coefficient of an `nmod_poly_t` is of type `mp_limb_t` and
+represents an integer reduced modulo the fixed modulus `n`.
+
+Unless otherwise specified, all functions in this section permit
+aliasing between their input arguments and between their input and
+output arguments.
+
+The `nmod_poly_t` type is a typedef for an array of length 1 of
+`nmod_poly_struct`'s. This permits passing parameters of type
+`nmod_poly_t` by reference.
+
+In reality one never deals directly with the `struct` and simply deals
+with objects of type `nmod_poly_t`.  For simplicity we will think of an
+`nmod_poly_t` as a `struct`, though in practice to access fields
+of this `struct`, one needs to dereference first, e.g.\ to access the
+`length` field of an `nmod_poly_t` called `poly1` one writes
+`poly1->length`.
+
+An `nmod_poly_t` is said to be *normalised** if either `length` is
+zero, or if the leading coefficient of the polynomial is non-zero. All
+`nmod_poly` functions expect their inputs to be normalised and for all
+coefficients to be reduced modulo `n` and unless otherwise specified
+they produce output that is normalised with coefficients reduced
+modulo `n`.
+
+It is recommended that users do not access the fields of an
+`nmod_poly_t` or its coefficient data directly, but make use of the
+functions designed for this purpose, detailed below.
+
+Functions in `nmod_poly` do all the memory management for the user.
+One does not need to specify the maximum length in advance before
+using a polynomial object. FLINT reallocates space automatically as
+the computation proceeds, if more space is required.
+
+Simple example
+--------------
+
+The following example computes the square of the polynomial `5x^3 + 6`
+in `\Z/7\Z[x]`.
+
+.. code:: c
+
+   #include "nmod_poly.h"
+   int main()
+   {
+       nmod_poly_t x, y;
+       nmod_poly_init(x, 7);
+       nmod_poly_init(y, 7);
+       nmod_poly_set_coeff_ui(x, 3, 5);
+       nmod_poly_set_coeff_ui(x, 0, 6);
+       nmod_poly_mul(y, x, x);
+       nmod_poly_print(x); flint_printf("\n");
+       nmod_poly_print(y); flint_printf("\n");
+       nmod_poly_clear(x);
+       nmod_poly_clear(y);
+   }
+
+The output is:
+
+::
+
+   4 7  6 0 0 5
+   7 7  1 0 0 4 0 0 4
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -11,9 +78,6 @@ Types, macros and constants
 .. type:: nmod_poly_struct
 
 .. type:: nmod_poly_t
-
-    Description.
-
 
 Helper functions
 --------------------------------------------------------------------------------
@@ -886,7 +950,7 @@ Powering
     ``ginv`` of length ``ginvlen`` is set to the power series inverse of the
     reverse of ``g``.
 
-.. function:: void _nmod_poly_powers_mod_preinv_threaded(mp_ptr * res, mp_srcptr f, slong flen, slong n, mp_srcptr g, slong glen, mp_srcptr ginv, slong ginvlen, const nmod_t mod)   
+.. function:: void _nmod_poly_powers_mod_preinv_threaded(mp_ptr * res, mp_srcptr f, slong flen, slong n, mp_srcptr g, slong glen, mp_srcptr ginv, slong ginvlen, const nmod_t mod)
 
     Compute ``f^0, f^1, ..., f^(n-1) mod g``, where ``g`` has length ``glen``
     and ``f`` is reduced mod ``g`` and has length ``flen`` (possibly zero
@@ -1543,7 +1607,7 @@ Modular composition
     :func:`_nmod_poly_compose_mod_brent_kung_vec_preinv`. Distributing the
     Horner evaluations across :func:`flint_get_num_threads` threads.
 
-.. function:: void nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * res, const nmod_poly_struct * polys, slong len1, slong n, const nmod_poly_t g, const nmod_poly_t poly, const nmod_poly_t polyinv, thread_pool_handle * threads, slong num_threads) 
+.. function:: void nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * res, const nmod_poly_struct * polys, slong len1, slong n, const nmod_poly_t g, const nmod_poly_t poly, const nmod_poly_t polyinv, thread_pool_handle * threads, slong num_threads)
 
     Multithreaded version of
     :func:`nmod_poly_compose_mod_brent_kung_vec_preinv`. Distributing the
