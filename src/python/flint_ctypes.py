@@ -801,6 +801,51 @@ class gr_ctx:
     def gens(ctx):
         return ctx._op_vec_ctx(libgr.gr_gens, "gens")
 
+    def zero(ctx):
+        """
+        The zero element of this domain.
+
+            >>> ZZ.zero()
+            0
+            >>> Vec(ZZ,3).zero()
+            [0, 0, 0]
+            >>> Vec(ZZ).zero()
+            Traceback (most recent call last):
+              ...
+            FlintDomainError: zero is not an element of {Vectors (any length) over Integer ring (fmpz)}
+        """
+        return ctx._constant(ctx, libgr.gr_zero, "zero")
+
+    def one(ctx):
+        """
+        The one element of this domain.
+
+            >>> ZZ.one()
+            1
+            >>> Vec(ZZ,3).one()
+            [1, 1, 1]
+            >>> Vec(ZZ).one()
+            Traceback (most recent call last):
+              ...
+            FlintDomainError: one is not an element of {Vectors (any length) over Integer ring (fmpz)}
+        """
+        return ctx._constant(ctx, libgr.gr_one, "one")
+
+    def neg_one(ctx):
+        """
+        The negative one element of this domain.
+
+            >>> ZZ.neg_one()
+            -1
+            >>> Vec(ZZ,3).neg_one()
+            [-1, -1, -1]
+            >>> Vec(ZZ).neg_one()
+            Traceback (most recent call last):
+              ...
+            FlintDomainError: neg_one is not an element of {Vectors (any length) over Integer ring (fmpz)}
+        """
+        return ctx._constant(ctx, libgr.gr_neg_one, "neg_one")
+
     def i(ctx):
         """
         Imaginary unit as an element of this domain.
@@ -824,6 +869,9 @@ class gr_ctx:
             Traceback (most recent call last):
               ...
             FlintDomainError: pi is not an element of {Complex algebraic numbers (qqbar)}
+            >>> Vec(RR, 2).pi()
+            [[3.141592653589793 +/- 3.39e-16], [3.141592653589793 +/- 3.39e-16]]
+
         """
         return ctx._constant(ctx, libgr.gr_pi, "pi")
 
@@ -7243,8 +7291,10 @@ def test_vec():
     assert b + ZZ(1) == VecQQ([3,4,5])
     assert ZZ(1) + b == VecQQ([3,4,5])
     assert b ** -5 == 1 / b ** 5
-
-
+    assert raises(lambda: Vec(ZZi).i(), ValueError)
+    i = ZZi.i()
+    V = Vec(ZZi,3)
+    assert V.i()  == V([i,i,1j])
 
 def test_all():
 
