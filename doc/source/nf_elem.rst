@@ -252,7 +252,7 @@ Arithmetic
 .. function:: void _nf_elem_pow(nf_elem_t res, const nf_elem_t a, ulong e, const nf_t nf)
 
     Set ``res`` to `a^e` using left-to-right binary exponentiation as 
-    described in~\citep[p.~461]{Knu1997}.
+    described on p. 461 of [Knu1997]_.
     
     Assumes that `a \neq 0` and `e > 1`. Does not support aliasing.
 
