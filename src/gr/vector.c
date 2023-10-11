@@ -16,6 +16,7 @@
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "gr_special.h"
 
 #define ENTRY_CTX(ctx) (VECTOR_CTX(ctx)->base_ring)
 
@@ -174,6 +175,45 @@ vector_gr_vec_neg(gr_vec_t res, const gr_vec_t src, gr_ctx_t ctx)
 {
     return gr_poly_neg((gr_poly_struct *) res, (gr_poly_struct *) src, ENTRY_CTX(ctx));
 }
+
+static int
+_gr_vec_apply_const(gr_ptr res, gr_method_constant_op f, slong len, gr_ctx_t ctx)
+{
+    int status;
+    slong i, sz;
+
+    sz = ctx->sizeof_elem;
+    status = GR_SUCCESS;
+
+    for (i = 0; i < len; i++)
+        status |= f(GR_ENTRY(res, i, sz), ctx);
+
+    return status;
+}
+
+#define DEF_CONSTANT_OP_FROM_OP(op, OP) \
+int \
+vector_gr_vec_ ## op(gr_vec_t res, gr_ctx_t ctx) \
+{ \
+    slong xlen = VECTOR_CTX(ctx)->n; \
+ \
+    if (VECTOR_CTX(ctx)->all_sizes) \
+        return GR_DOMAIN;\
+ \
+    gr_method_constant_op f = GR_CONSTANT_OP(ENTRY_CTX(ctx), OP); \
+ \
+    if (res->length != xlen) \
+        gr_vec_set_length(res, xlen, ENTRY_CTX(ctx)); \
+ \
+    return _gr_vec_apply_const(res->entries, f, xlen, ENTRY_CTX(ctx)); \
+} \
+
+DEF_CONSTANT_OP_FROM_OP(zero, ZERO)
+DEF_CONSTANT_OP_FROM_OP(one, ONE)
+DEF_CONSTANT_OP_FROM_OP(neg_one, NEG_ONE)
+DEF_CONSTANT_OP_FROM_OP(i, I)
+DEF_CONSTANT_OP_FROM_OP(pi, PI)
+
 
 static int
 _gr_vec_apply_unary(gr_ptr res, gr_method_unary_op f, gr_srcptr src, slong len, gr_ctx_t ctx)
@@ -404,6 +444,10 @@ gr_method_tab_input _gr_vec_methods_input[] =
     {GR_METHOD_SET_OTHER,   (gr_funcptr) vector_gr_vec_set_other},
     {GR_METHOD_NEG,         (gr_funcptr) vector_gr_vec_neg},
 
+    {GR_METHOD_ZERO,        (gr_funcptr) vector_gr_vec_zero},
+    {GR_METHOD_ONE,         (gr_funcptr) vector_gr_vec_one},
+    {GR_METHOD_NEG_ONE,     (gr_funcptr) vector_gr_vec_neg_one},
+
     {GR_METHOD_ADD,         (gr_funcptr) vector_gr_vec_add},
     {GR_METHOD_ADD_UI,      (gr_funcptr) vector_gr_vec_add_ui},
     {GR_METHOD_ADD_SI,      (gr_funcptr) vector_gr_vec_add_si},
@@ -464,6 +508,9 @@ gr_method_tab_input _gr_vec_methods_input[] =
     {GR_METHOD_IM,              (gr_funcptr) vector_gr_vec_im},
     {GR_METHOD_SGN,             (gr_funcptr) vector_gr_vec_sgn},
     {GR_METHOD_CSGN,            (gr_funcptr) vector_gr_vec_csgn},
+
+    {GR_METHOD_I,             (gr_funcptr) vector_gr_vec_i},
+    {GR_METHOD_PI,            (gr_funcptr) vector_gr_vec_pi},
 
     {GR_METHOD_EXP,            (gr_funcptr) vector_gr_vec_exp},
     {GR_METHOD_LOG,            (gr_funcptr) vector_gr_vec_log},
