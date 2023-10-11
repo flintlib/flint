@@ -70,7 +70,11 @@ void nmod_poly_mat_set_trunc(nmod_poly_mat_t res,
                              const nmod_poly_mat_t pmat,
                              long len);
 
-void nmod_poly_mat_truncate(nmod_poly_mat_t pmat, long len);
+NMOD_POLY_MAT_INLINE
+void nmod_poly_mat_truncate(nmod_poly_mat_t pmat, long len)
+{
+    nmod_poly_mat_set_trunc(pmat, pmat, len);
+}
 
 void nmod_poly_mat_shift_left(nmod_poly_mat_t res,
                               const nmod_poly_mat_t pmat,

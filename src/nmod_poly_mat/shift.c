@@ -11,20 +11,6 @@
 
 #include "nmod_poly_mat.h"
 
-void nmod_poly_mat_set_trunc(nmod_poly_mat_t tmat, const nmod_poly_mat_t pmat, long len)
-{
-    for (slong i = 0; i < pmat->r; i++)
-        for (slong j = 0; j < pmat->c; j++)
-            nmod_poly_set_trunc(tmat->rows[i] + j, pmat->rows[i] + j, len);
-}
-
-void nmod_poly_mat_truncate(nmod_poly_mat_t pmat, long len)
-{
-    for (slong i = 0; i < pmat->r; i++)
-        for (slong j = 0; j < pmat->c; j++)
-            nmod_poly_truncate(pmat->rows[i] + j, len);
-}
-
 void nmod_poly_mat_shift_left(nmod_poly_mat_t smat, const nmod_poly_mat_t pmat, slong k)
 {
     for (slong i = 0; i < smat->r; i++)
@@ -38,4 +24,5 @@ void nmod_poly_mat_shift_right(nmod_poly_mat_t smat, const nmod_poly_mat_t pmat,
         for (slong j = 0; j < smat->c; j++)
             nmod_poly_shift_right(smat->rows[i] + j, pmat->rows[i] + j, k);
 }
+
 
