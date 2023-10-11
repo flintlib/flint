@@ -17,3 +17,9 @@ fq_nmod_get_str(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 {
     return nmod_poly_get_str(op);
 }
+
+char *
+fq_nmod_get_str_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+{
+    return nmod_poly_get_str_pretty(op, ctx->var);
+}
