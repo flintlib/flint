@@ -135,9 +135,9 @@ Assignment and basic manipulation
     If ``len`` is greater than the current length of ``poly``,
     then nothing happens.
 
-.. function:: void nmod_poly_set_trunc(nmod_poly_t res, const nmod_poly_t poly, slong n)
+.. function:: void nmod_poly_set_trunc(nmod_poly_t res, const nmod_poly_t poly, slong len)
 
-    Notionally truncate ``poly`` to length `n` and set ``res`` to the
+    Notionally truncate ``poly`` to length ``len`` and set ``res`` to the
     result. The result is normalised.
 
 .. function:: void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, slong len, slong m)
@@ -385,7 +385,7 @@ Shifting
 .. function:: void nmod_poly_shift_right(nmod_poly_t res, const nmod_poly_t poly, slong k)
 
     Sets ``res`` to ``poly`` shifted right by ``k`` coefficients,
-    i.e.\ divide by `x^k` and throws away the remainder. If ``k`` is
+    i.e. divide by `x^k` and throw away the remainder. If ``k`` is
     greater than or equal to the length of ``poly``, the result is the
     zero polynomial.
 
