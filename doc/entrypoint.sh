@@ -1,3 +1,3 @@
 #!/bin/bash
 
-make latex -W
+make latexpdf SPHINXOPTS="-W -j auto"
