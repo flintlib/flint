@@ -3,18 +3,18 @@
 **aprcl.h** -- APRCL primality testing
 ========================================================================================
 
-This module implements the rigorous APRCL primality test, suitable for integers
-up to a few thousand digits.
+This module implements the rigorous APRCL primality test, suitable for
+integers up to a few thousand digits.
 
 The APR-CL test uses the Jacobi sums that belong to
-`\mathbb{Z}[\zeta]/(n)`, so we have `unity_zp` struct and some useful
-operations. `unity_zp` is just a wrapper over `fmpz_mod_poly` with
-additional fields.
+`\mathbb{Z}[\zeta]/(n)`, so we have :type:`unity_zp` struct and some
+useful operations. :type:`unity_zp` is just a wrapper over
+:type:`fmpz_mod_poly` with additional fields.
 
 Also provides Gauss sum test, which is not very useful in practice,
 but can be useful for people who want to see an implementation of
 these. Gauss sums belong `\mathbb{Z}[\zeta_q, \zeta_p]/(n)` and
-implemented in `unity_zpq` struct.
+implemented in :type:`unity_zpq` struct.
 
 Authors:
 
