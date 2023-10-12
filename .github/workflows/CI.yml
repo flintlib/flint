@@ -34,10 +34,10 @@ jobs:
 
       - name: "Setup"
         run: |
-          sudo apt install -y libgmp-dev
-          sudo apt install -y libmpfr-dev
-          sudo apt install -y autoconf
-          sudo apt install -y libtool-bin
+          sudo apt-get install -y libgmp-dev
+          sudo apt-get install -y libmpfr-dev
+          sudo apt-get install -y autoconf
+          sudo apt-get install -y libtool-bin
           gcc --version
           gcov --version
           make --version
@@ -93,10 +93,10 @@ jobs:
 
       - name: "Setup"
         run: |
-          sudo apt install -y libgmp-dev
-          sudo apt install -y libmpfr-dev
-          sudo apt install -y autoconf
-          sudo apt install -y libtool-bin
+          sudo apt-get install -y libgmp-dev
+          sudo apt-get install -y libmpfr-dev
+          sudo apt-get install -y autoconf
+          sudo apt-get install -y libtool-bin
           gcc --version
           make --version
           autoconf --version
@@ -360,10 +360,10 @@ jobs:
 
       - name: "Setup"
         run: |
-          sudo apt install -y libgmp-dev
-          sudo apt install -y libmpfr-dev
-          sudo apt install -y autoconf
-          sudo apt install -y libtool-bin
+          sudo apt-get install -y libgmp-dev
+          sudo apt-get install -y libmpfr-dev
+          sudo apt-get install -y autoconf
+          sudo apt-get install -y libtool-bin
           clang --version
           make --version
           autoconf --version
@@ -412,9 +412,9 @@ jobs:
 
       - name: "Setup"
         run: |
-          sudo apt install -y cmake
-          sudo apt install -y libgmp-dev
-          sudo apt install -y libmpfr-dev
+          sudo apt-get install -y cmake
+          sudo apt-get install -y libgmp-dev
+          sudo apt-get install -y libmpfr-dev
           gcc --version
           make --version
           cmake --version
@@ -573,9 +573,9 @@ jobs:
 
       - name: "Setup"
         run: |
-          sudo apt install -y sed
-          sudo apt install -y autoconf
-          sudo apt install -y libtool-bin
+          sudo apt-get install -y sed
+          sudo apt-get install -y autoconf
+          sudo apt-get install -y libtool-bin
           gcc --version
           make --version
           autoconf --version
