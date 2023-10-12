@@ -28,13 +28,13 @@
 
 /* test function macro *******************************************************/
 
-#define TEST_FUNCTION(label) TEMPLATE(test, label)
+#define TEST_FUNCTION(label) CAT(test, label)
 
 #define TEST_FUNCTION_START(label)                      \
-int TEMPLATE(test, label)(void)                         \
+int CAT(test, label)(void)                              \
 {                                                       \
     FLINT_TEST_INIT(state);                             \
-    printf(TEMPLATE_STR(label) "....");                 \
+    printf(#label "....");                 \
     fflush(stdout);                                     \
 
 #define TEST_FUNCTION_END                               \
