@@ -29,8 +29,7 @@ acb_theta_g2_chi10(acb_t res, acb_srcptr th2, slong prec)
             acb_mul(t, t, &th2[ab], prec);
         }
     }
-    acb_neg(res, t);
-    acb_mul_2exp_si(res, res, -12);
+    acb_mul_2exp_si(res, t, -12);
 
     acb_clear(t);
 }

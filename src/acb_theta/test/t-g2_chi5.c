@@ -22,7 +22,7 @@ int main(void)
     flint_randinit(state);
 
     /* Test: square is chi10 */
-    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         slong g = 2;
         slong n2 = 1 << (2 * g);

@@ -110,7 +110,8 @@ acb_theta_g2_chi35(acb_t res, acb_srcptr th, slong prec)
     acb_init(t);
 
     bolza_E(t, th, prec);
-    acb_mul_2exp_si(res, t, -37); /* Igusa's chi35 with primitive Fourier expansion */
+    acb_neg(res, t);
+    acb_mul_2exp_si(res, res, -37);
 
     acb_clear(t);
 }

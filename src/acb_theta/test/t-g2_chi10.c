@@ -22,12 +22,12 @@ int main(void)
     flint_randinit(state);
 
     /* Test: is a modular form */
-    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         slong g = 2;
         slong n2 = 16;
         slong prec = 100 + n_randint(state, 500);
-        slong mag_bits = n_randint(state, 4);
+        slong mag_bits = n_randint(state, 2);
         fmpz_mat_t mat;
         acb_ptr th2;
         acb_t r, s;

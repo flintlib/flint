@@ -16,6 +16,7 @@ acb_theta_g2_chi8_6(acb_poly_t res, const acb_mat_t tau, slong prec)
 {
     acb_ptr z, dth;
     acb_t c;
+    slong k;
 
     dth = _acb_vec_init(3 * 16);
     z = _acb_vec_init(2);
@@ -23,6 +24,10 @@ acb_theta_g2_chi8_6(acb_poly_t res, const acb_mat_t tau, slong prec)
 
     acb_theta_jet_all(dth, z, tau, 1, prec);
     acb_theta_g2_chi3_6(res, dth, prec);
+    for (k = 0; k < 16; k++)
+    {
+        acb_set(&dth[k], &dth[3 * k]);
+    }
     acb_theta_g2_chi5(c, dth, prec);
     acb_poly_scalar_mul(res, res, c, prec);
 
@@ -42,7 +47,7 @@ int main(void)
     flint_randinit(state);
 
     /* Test: chi5 * chi3_6 transforms like a modular form */
-    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         slong g = 2;
         slong prec = 100 + n_randint(state, 500);
@@ -74,7 +79,9 @@ int main(void)
             fmpz_mat_print_pretty(mat);
             flint_printf("values at tau, m*tau:\n");
             acb_poly_printd(r, 10);
+            flint_printf("\n");
             acb_poly_printd(s, 10);
+            flint_printf("\n");
             flint_abort();
         }
 

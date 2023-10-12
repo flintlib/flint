@@ -22,7 +22,7 @@ int main(void)
     flint_randinit(state);
 
     /* Test: discriminant of sextic is chi10 */
-    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         slong g = 2;
         slong n = 1 << (2 * g);
@@ -43,6 +43,7 @@ int main(void)
         acb_init(t);
 
         acb_siegel_randtest_reduced(tau, state, prec, bits);
+        acb_mat_scalar_mul_2exp_si(tau, tau, -2);
 
         acb_theta_g2_sextic(f, tau, prec);
         nb = acb_poly_find_roots(roots, f, NULL, 0, prec);
@@ -59,6 +60,10 @@ int main(void)
                 }
             }
             acb_sqr(d, d, prec);
+            acb_poly_get_coeff_acb(t, f, 6);
+            acb_pow_ui(t, t, 10, prec);
+            acb_mul(d, d, t, prec);
+            acb_mul_2exp_si(d, d, -12);
 
             acb_theta_all(th2, z, tau, 1, prec);
             acb_theta_g2_chi10(t, th2, prec);
@@ -72,6 +77,7 @@ int main(void)
                 flint_printf("\n");
                 acb_printd(t, 5);
                 flint_printf("\n");
+                flint_abort();
             }
         }
 

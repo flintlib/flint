@@ -31,7 +31,7 @@ int main(void)
        - covariants take integral values on integral polynomials */
     for (iter = 0; iter < 5 * flint_test_multiplier(); iter++)
     {
-        slong prec = 100 + n_randint(state, 100);
+        slong prec = 200 + n_randint(state, 200);
         slong g = 2;
         slong n = 1 << (2 * g);
         slong bits = 2;
@@ -115,8 +115,11 @@ int main(void)
                 flint_printf("FAIL (transform, k = %wd)\n", k);
                 acb_mat_printd(tau, 5);
                 fmpz_mat_print_pretty(mat);
+                flint_printf("\n");
                 acb_poly_printd(u, 5);
+                flint_printf("\n");
                 acb_poly_printd(&cov2[k], 5);
+                flint_printf("\n");
                 flint_abort();
             }
         }
@@ -134,6 +137,7 @@ int main(void)
             {
                 flint_printf("FAIL (integrality, k = %wd)\n", k);
                 acb_poly_printd(&cov1[k], 5);
+                flint_printf("\n");
                 flint_abort();
             }
         }
