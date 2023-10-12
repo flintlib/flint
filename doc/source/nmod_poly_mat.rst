@@ -3,18 +3,19 @@
 **nmod_poly_mat.h** -- matrices of univariate polynomials over integers mod n (word-size n)
 ===========================================================================================
 
-The `nmod_poly_mat_t` data type represents matrices whose entries are
-polynomials having coefficients in `\Z / n \Z`. We generally assume
-that `n` is a prime number.
+The :type:`nmod_poly_mat_t` data type represents matrices whose
+entries are polynomials having coefficients in
+`\mathbb{Z}/n\mathbb{Z}`. We generally assume that `n` is a prime
+number.
 
-The `nmod_poly_mat_t` type is defined as an array of
-`nmod_poly_mat_struct`'s of length one. This permits passing
-parameters of type `nmod_poly_mat_t` by reference.
+The :type:`nmod_poly_mat_t` type is defined as an array of
+:type:`nmod_poly_mat_struct`'s of length one. This permits passing
+parameters of type :type:`nmod_poly_mat_t` by reference.
 
 A matrix internally consists of a single array of
-`nmod_poly_struct`'s, representing a dense matrix in row-major order.
-This array is only directly indexed during memory allocation and
-deallocation. A separate array holds pointers to the start of each
+:type:`nmod_poly_struct`'s, representing a dense matrix in row-major
+order. This array is only directly indexed during memory allocation
+and deallocation. A separate array holds pointers to the start of each
 row, and is used for all indexing. This allows the rows of a matrix to
 be permuted quickly by swapping pointers.
 
