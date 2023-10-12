@@ -3,9 +3,9 @@
 **fq_poly.h** -- univariate polynomials over finite fields
 ===============================================================================
 
-We represent a polynomial in `\mathbf{F}_q[X]` as a `struct` which
-includes an array `coeffs` with the coefficients, as well as the
-length `length` and the number `alloc` of coefficients for which
+We represent a polynomial in `\mathbf{F}_q[X]` as a ``struct`` which
+includes an array ``coeffs`` with the coefficients, as well as the
+length ``length`` and the number ``alloc`` of coefficients for which
 memory has been allocated.
 
 As a data structure, we call this polynomial *normalised* if the top
