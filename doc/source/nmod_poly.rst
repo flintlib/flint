@@ -3,41 +3,41 @@
 **nmod_poly.h** -- univariate polynomials over integers mod n (word-size n)
 ===============================================================================
 
-The `nmod_poly_t` data type represents elements of `\Z/n\Z[x]` for a
-fixed modulus `n`. The `nmod_poly` module provides routines for memory
-management, basic arithmetic and some higher level functions such as
-GCD, etc.
+The :type:`nmod_poly_t` data type represents elements of
+`\mathbb{Z}/n\mathbb{Z}[x]` for a fixed modulus `n`. The ``nmod_poly``
+module provides routines for memory management, basic arithmetic and
+some higher level functions such as GCD, etc.
 
-Each coefficient of an `nmod_poly_t` is of type `mp_limb_t` and
-represents an integer reduced modulo the fixed modulus `n`.
+Each coefficient of an :type:`nmod_poly_t` is of type ``mp_limb_t``
+and represents an integer reduced modulo the fixed modulus `n`.
 
 Unless otherwise specified, all functions in this section permit
 aliasing between their input arguments and between their input and
 output arguments.
 
-The `nmod_poly_t` type is a typedef for an array of length 1 of
-`nmod_poly_struct`'s. This permits passing parameters of type
-`nmod_poly_t` by reference.
+The :type:`nmod_poly_t` type is a typedef for an array of length 1 of
+:type:`nmod_poly_struct`'s. This permits passing parameters of type
+:type:`nmod_poly_t` by reference.
 
-In reality one never deals directly with the `struct` and simply deals
-with objects of type `nmod_poly_t`.  For simplicity we will think of an
-`nmod_poly_t` as a `struct`, though in practice to access fields
-of this `struct`, one needs to dereference first, e.g.\ to access the
-`length` field of an `nmod_poly_t` called `poly1` one writes
-`poly1->length`.
+In reality one never deals directly with the ``struct`` and simply
+deals with objects of type :type:`nmod_poly_t`. For simplicity we will
+think of an :type:`nmod_poly_t` as a ``struct``, though in practice to
+access fields of this ``struct``, one needs to dereference first,
+e.g.\ to access the ``length`` field of an :type:`nmod_poly_t` called
+``poly1`` one writes ``poly1->length``.
 
-An `nmod_poly_t` is said to be *normalised** if either `length` is
-zero, or if the leading coefficient of the polynomial is non-zero. All
-`nmod_poly` functions expect their inputs to be normalised and for all
-coefficients to be reduced modulo `n` and unless otherwise specified
-they produce output that is normalised with coefficients reduced
-modulo `n`.
+An :type:`nmod_poly_t` is said to be *normalised* if either ``length``
+is zero, or if the leading coefficient of the polynomial is non-zero.
+All ``nmod_poly`` functions expect their inputs to be normalised and
+for all coefficients to be reduced modulo `n` and unless otherwise
+specified they produce output that is normalised with coefficients
+reduced modulo `n`.
 
 It is recommended that users do not access the fields of an
-`nmod_poly_t` or its coefficient data directly, but make use of the
-functions designed for this purpose, detailed below.
+:type:`nmod_poly_t` or its coefficient data directly, but make use of
+the functions designed for this purpose, detailed below.
 
-Functions in `nmod_poly` do all the memory management for the user.
+Functions in ``nmod_poly`` do all the memory management for the user.
 One does not need to specify the maximum length in advance before
 using a polynomial object. FLINT reallocates space automatically as
 the computation proceeds, if more space is required.
@@ -46,7 +46,7 @@ Simple example
 --------------
 
 The following example computes the square of the polynomial `5x^3 + 6`
-in `\Z/7\Z[x]`.
+in `\mathbb{Z}/7\\mathbb{Z}[x]`.
 
 .. code:: c
 
