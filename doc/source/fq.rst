@@ -3,7 +3,18 @@
 **fq.h** -- finite fields
 ===============================================================================
 
-Description.
+We represent an element of the finite field `\mathbf{F}_{p^n} \cong
+\mathbf{F}_p[X]/(f(X))`, where `f(X) \in \mathbf{F}_p[X]` is a monic,
+irreducible polynomial of degree `n`, as a polynomial in
+`\mathbf{F}_p[X]` of degree less than `n`. The underlying data
+structure is an :type:`fmpz_poly_t`.
+
+The default choice for `f(X)` is the Conway polynomial for the pair
+`(p,n)`. Frank Luebeck's data base of Conway polynomials is made
+available in the file ``src/qadic/CPimport.txt``. If a Conway
+polynomial is not available, then a random irreducible polynomial will
+be chosen for `f(X)`. Additionally, the user is able to supply their
+own `f(X)`.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -12,13 +23,9 @@ Types, macros and constants
 
 .. type:: fq_ctx_t
 
-    Description.
-
 .. type:: fq_struct
 
 .. type:: fq_t
-
-    Description.
 
 Context Management
 --------------------------------------------------------------------------------
@@ -495,7 +502,7 @@ Special functions
 
     Computes the order of ``op`` as an element of the
     multiplicative group of ``ctx``.
-    
+
     Returns 0 if ``op`` is 0, otherwise it returns 1 if ``op``
     is a generator of the multiplicative group, and -1 if it is not.
 

@@ -3,16 +3,12 @@
 **fq_zech_poly_factor.h** -- factorisation of univariate polynomials over finite fields (Zech logarithm representation)
 =======================================================================================================================
 
-Description.
-
 Types, macros and constants
 -------------------------------------------------------------------------------
 
 .. type:: fq_zech_poly_factor_struct
 
 .. type:: fq_zech_poly_factor_t
-
-    Description.
 
 
 Memory Management

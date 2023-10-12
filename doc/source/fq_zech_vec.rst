@@ -3,9 +3,6 @@
 **fq_zech_vec.h** -- vectors over finite fields (Zech logarithm representation)
 ===============================================================================
 
-Description.
-
-
 Memory management
 --------------------------------------------------------------------------------
 

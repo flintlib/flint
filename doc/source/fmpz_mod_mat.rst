@@ -3,8 +3,6 @@
 **fmpz_mod_mat.h** -- matrices over integers mod n
 ===============================================================================
 
-Description.
-
 Types, macros and constants
 -------------------------------------------------------------------------------
 
@@ -12,13 +10,9 @@ Types, macros and constants
 
 .. type:: fmpz_mod_mat_t
 
-    Description.
+.. type:: fmpz_mod_mat_struct
 
-    .. type:: fmpz_mod_mat_struct
-                        
-    .. type:: fmpz_mod_mat_t
-                      
-    Description.
+.. type:: fmpz_mod_mat_t
 
 Element access
 --------------------------------------------------------------------------------
@@ -382,7 +376,7 @@ Solving
     elements of `X` to undefined values.
 
     The matrix `A` must be square.
-    
+
     The modulus is assumed to be prime.
 
 .. function:: int fmpz_mod_mat_can_solve(fmpz_mod_mat_t X, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B)
@@ -439,4 +433,3 @@ Minimal polynomial
     is required to be square, otherwise an exception is raised.
 
     The modulus is assumed to be prime.
-

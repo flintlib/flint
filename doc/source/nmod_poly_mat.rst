@@ -3,7 +3,27 @@
 **nmod_poly_mat.h** -- matrices of univariate polynomials over integers mod n (word-size n)
 ===========================================================================================
 
-Description.
+The :type:`nmod_poly_mat_t` data type represents matrices whose
+entries are polynomials having coefficients in
+`\mathbb{Z}/n\mathbb{Z}`. We generally assume that `n` is a prime
+number.
+
+The :type:`nmod_poly_mat_t` type is defined as an array of
+:type:`nmod_poly_mat_struct`'s of length one. This permits passing
+parameters of type :type:`nmod_poly_mat_t` by reference.
+
+A matrix internally consists of a single array of
+:type:`nmod_poly_struct`'s, representing a dense matrix in row-major
+order. This array is only directly indexed during memory allocation
+and deallocation. A separate array holds pointers to the start of each
+row, and is used for all indexing. This allows the rows of a matrix to
+be permuted quickly by swapping pointers.
+
+Matrices having zero rows or columns are allowed.
+
+The shape of a matrix is fixed upon initialisation. The user is
+assumed to provide input and output variables whose dimensions are
+compatible with the given operation.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -11,9 +31,6 @@ Types, macros and constants
 .. type:: nmod_poly_mat_struct
 
 .. type:: nmod_poly_mat_t
-
-    Description.
-
 
 Memory management
 --------------------------------------------------------------------------------
@@ -211,14 +228,14 @@ Arithmetic
 
 .. function:: void nmod_poly_mat_mul_classical(nmod_poly_mat_t C, const nmod_poly_mat_t A, const nmod_poly_mat_t B)
 
-    Sets ``C`` to the matrix product of ``A`` and ``B``, 
-    computed using the classical algorithm. The matrices must have 
+    Sets ``C`` to the matrix product of ``A`` and ``B``,
+    computed using the classical algorithm. The matrices must have
     compatible dimensions for matrix multiplication. Aliasing is allowed.
 
 .. function:: void nmod_poly_mat_mul_KS(nmod_poly_mat_t C, const nmod_poly_mat_t A, const nmod_poly_mat_t B)
 
-    Sets ``C`` to the matrix product of ``A`` and ``B``, 
-    computed using Kronecker segmentation. The matrices must have 
+    Sets ``C`` to the matrix product of ``A`` and ``B``,
+    computed using Kronecker segmentation. The matrices must have
     compatible dimensions for matrix multiplication. Aliasing is allowed.
 
 .. function:: void nmod_poly_mat_mul_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A, const nmod_poly_mat_t B)
