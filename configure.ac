@@ -572,7 +572,7 @@ then
             LDCONFIG="true"
             if test "$FLINT_SOLIB" = "1";
             then
-                if test ldconfig > /dev/null 2>&1;
+                if test -x ldconfig > /dev/null 2>&1;
                 then
                     LDCONFIG="ldconfig"
                 elif test -x /sbin/ldconfig;
