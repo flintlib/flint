@@ -3,16 +3,16 @@
 **nmod_mat.h** -- matrices over integers mod n (word-size n)
 ===============================================================================
 
-An `nmod_mat_t` represents a matrix of integers modulo `n`, for any
-non-zero modulus `n` that fits in a single limb, up to `2^{32}-1` or
-`2^{64}-1`.
+An :type:`nmod_mat_t` represents a matrix of integers modulo `n`, for
+any non-zero modulus `n` that fits in a single limb, up to `2^{32}-1`
+or `2^{64}-1`.
 
-The `nmod_mat_t` type is defined as an array of `nmod_mat_struct`'s of
-length one. This permits passing parameters of type `nmod_mat_t` by
-reference.
+The :type:`nmod_mat_t` type is defined as an array of
+:type:`nmod_mat_struct`'s of length one. This permits passing
+parameters of type :type:`nmod_mat_t` by reference.
 
-An `nmod_mat_t` internally consists of a single array of
-`mp_limb_t`'s, representing a dense matrix in row-major order. This
+An :type:`nmod_mat_t` internally consists of a single array of
+``mp_limb_t``'s, representing a dense matrix in row-major order. This
 array is only directly indexed during memory allocation and
 deallocation. A separate array holds pointers to the start of each
 row, and is used for all indexing. This allows the rows of a matrix to
@@ -40,8 +40,6 @@ Types, macros and constants
 .. type:: nmod_mat_struct
 
 .. type:: nmod_mat_t
-
-    Description.
 
 Memory management
 --------------------------------------------------------------------------------
