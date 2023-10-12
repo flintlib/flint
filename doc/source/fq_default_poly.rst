@@ -3,15 +3,10 @@
 **fq_default_poly.h** -- univariate polynomials over finite fields
 ===============================================================================
 
-Description.
-
 Types, macros and constants
 -------------------------------------------------------------------------------
 
 .. type:: fq_default_poly_t
-
-    Description.
-
 
 Memory management
 --------------------------------------------------------------------------------
@@ -268,7 +263,7 @@ Scalar multiplication and division
     Subtracts from ``rop`` the product of ``op`` by the
     scalar ``x``, in the context defined by ``ctx``.
 
-.. function:: void fq_default_poly_scalar_div_fq_default(fq_default_poly_t rop, const fq_default_poly_t op, const fq_default_t x, const fq_default_ctx_t ctx)                                                 
+.. function:: void fq_default_poly_scalar_div_fq_default(fq_default_poly_t rop, const fq_default_poly_t op, const fq_default_t x, const fq_default_ctx_t ctx)
 
     Sets ``rop`` to the quotient of ``op`` by the scalar ``x``, in the context
     defined by ``ctx``. An exception is raised if ``x`` is zero.

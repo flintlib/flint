@@ -62,7 +62,29 @@ nmod_poly_mat_swap_entrywise(nmod_poly_mat_t mat1, nmod_poly_mat_t mat2)
 
 void nmod_poly_mat_set(nmod_poly_mat_t mat1, const nmod_poly_mat_t mat2);
 
+void nmod_poly_mat_set_nmod_mat(nmod_poly_mat_t pmat, const nmod_mat_t cmat);
+
 void nmod_poly_mat_clear(nmod_poly_mat_t mat);
+
+/* Truncate, shift *********************************************************/
+
+void nmod_poly_mat_set_trunc(nmod_poly_mat_t res,
+                             const nmod_poly_mat_t pmat,
+                             long len);
+
+NMOD_POLY_MAT_INLINE
+void nmod_poly_mat_truncate(nmod_poly_mat_t pmat, long len)
+{
+    nmod_poly_mat_set_trunc(pmat, pmat, len);
+}
+
+void nmod_poly_mat_shift_left(nmod_poly_mat_t res,
+                              const nmod_poly_mat_t pmat,
+                              slong k);
+
+void nmod_poly_mat_shift_right(nmod_poly_mat_t res,
+                               const nmod_poly_mat_t pmat,
+                               slong k);
 
 /* Basic properties **********************************************************/
 
@@ -72,10 +94,22 @@ nmod_poly_mat_modulus(const nmod_poly_mat_t mat)
     return mat->modulus;
 }
 
+void nmod_poly_mat_get_coeff_mat(nmod_mat_t coeff,
+                                 const nmod_poly_mat_t pmat,
+                                 slong deg);
+
+void nmod_poly_mat_set_coeff_mat(nmod_poly_mat_t pmat,
+                                 const nmod_mat_t coeff,
+                                 slong deg);
+
+
 /* Comparison ****************************************************************/
 
 int nmod_poly_mat_equal(const nmod_poly_mat_t mat1,
                         const nmod_poly_mat_t mat2);
+
+int nmod_poly_mat_equal_nmod_mat(const nmod_poly_mat_t pmat,
+                                const nmod_mat_t cmat);
 
 int nmod_poly_mat_is_zero(const nmod_poly_mat_t mat);
 
@@ -127,6 +161,13 @@ void nmod_poly_mat_print(const nmod_poly_mat_t mat, const char * x);
 /* Norms *********************************************************************/
 
 slong nmod_poly_mat_max_length(const nmod_poly_mat_t A);
+
+NMOD_POLY_MAT_INLINE
+slong nmod_poly_mat_degree(const nmod_poly_mat_t pmat)
+{
+    return nmod_poly_mat_max_length(pmat)-1;
+}
+
 
 /* Scalar arithmetic *********************************************************/
 

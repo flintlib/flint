@@ -3,16 +3,12 @@
 **fq_nmod_mat.h** -- matrices over finite fields (word-size characteristic)
 ===============================================================================
 
-Description.
-
 Types, macros and constants
 -------------------------------------------------------------------------------
 
 .. type:: fq_nmod_mat_struct
 
 .. type:: fq_nmod_mat_t
-
-    Description.
 
 Memory management
 --------------------------------------------------------------------------------
@@ -81,23 +77,23 @@ Basic properties and manipulation
     Sets all diagonal entries of ``mat`` to 1 and all other entries to 0.
 
 .. function:: void fq_nmod_mat_swap_rows(fq_nmod_mat_t mat, slong * perm, slong r, slong s, const fq_nmod_ctx_t ctx)
-    
+
     Swaps rows ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
     permutation of the rows will also be applied to ``perm``.
 
 .. function:: void fq_nmod_mat_swap_cols(fq_nmod_mat_t mat, slong * perm, slong r, slong s, const fq_nmod_ctx_t ctx)
-    
+
     Swaps columns ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
     permutation of the columns will also be applied to ``perm``.
 
 .. function:: void fq_nmod_mat_invert_rows(fq_nmod_mat_t mat, slong * perm, const fq_nmod_ctx_t ctx)
-    
+
     Swaps rows ``i`` and ``r - i`` of ``mat`` for ``0 <= i < r/2``, where
     ``r`` is the number of rows of ``mat``. If ``perm`` is non-``NULL``, the
     permutation of the rows will also be applied to ``perm``.
 
 .. function:: void fq_nmod_mat_invert_cols(fq_nmod_mat_t mat, slong * perm, const fq_nmod_ctx_t ctx)
-    
+
     Swaps columns ``i`` and ``c - i`` of ``mat`` for ``0 <= i < c/2``, where
     ``c`` is the number of columns of ``mat``. If ``perm`` is non-``NULL``, the
     permutation of the columns will also be applied to ``perm``.
@@ -438,7 +434,7 @@ Triangular solving
         \begin{pmatrix} A & 0 \\ C & D \end{pmatrix}^{-1}
         \begin{pmatrix} X \\ Y \end{pmatrix} =
         \begin{pmatrix} A^{-1} X \\ D^{-1} ( Y - C A^{-1} X ) \end{pmatrix}
-    
+
 
     to reduce the problem to matrix multiplication and triangular
     solving of smaller systems.
@@ -474,7 +470,7 @@ Triangular solving
         \begin{pmatrix} A & B \\ 0 & D \end{pmatrix}^{-1}
         \begin{pmatrix} X \\ Y \end{pmatrix} =
         \begin{pmatrix} A^{-1} (X - B D^{-1} Y) \\ D^{-1} Y \end{pmatrix}
-    
+
 
     to reduce the problem to matrix multiplication and triangular
     solving of smaller systems.

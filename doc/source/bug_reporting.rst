@@ -12,6 +12,7 @@ open an issue at the GitHub repository
 report to the FLINT devel list
 https://groups.google.com/group/flint-devel.
 
+
 If possible please include details of your system, how Flint was
 complied/installed, the versions of GMP/MPIR and MPFR as well as
 precise details of how to replicate the bug.

@@ -3,7 +3,23 @@
 **fq_zech.h** -- finite fields (Zech logarithm representation)
 ===============================================================================
 
-Description.
+We represent an element of the finite field as a power of a generator
+for the multiplicative group of the finite field. In particular, we
+use a root of `f(x)`, where `f(X) \in \mathbf{F}_p[X]` is a monic,
+irreducible polynomial of degree `n`, as a polynomial in
+`\mathbf{F}_p[X]` of degree less than `n`. The underlying data
+structure is just an ``mp_limb_t``.
+
+The default choice for `f(X)` is the Conway polynomial for the pair
+`(p,n)`. Frank Luebeck's data base of Conway polynomials is made
+available in the file ``src/qadic/CPimport.txt``. If a Conway
+polynomial is not available, then a random irreducible polynomial will
+be chosen for `f(X)`. Additionally, the user is able to supply their
+own `f(X)`.
+
+We required that the order of the field fits inside of an
+``mp_limb_t``; however, it is recommended that `p^n < 2^{20}` due to
+the time and memory needed to compute the Zech logarithm table.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -12,13 +28,9 @@ Types, macros and constants
 
 .. type:: fq_zech_ctx_t
 
-    Description.
-
 .. type:: fq_zech_struct
 
 .. type:: fq_zech_t
-
-    Description.
 
 Context Management
 --------------------------------------------------------------------------------
@@ -302,7 +314,7 @@ Roots
 
 .. function:: int fq_zech_is_square(const fq_zech_t op, const fq_zech_ctx_t ctx)
 
-    Return ``1`` if ``op`` is a square. 
+    Return ``1`` if ``op`` is a square.
 
 Output
 --------------------------------------------------------------------------------
@@ -513,7 +525,7 @@ Special functions
 
     Computes the order of ``op`` as an element of the
     multiplicative group of ``ctx``.
-    
+
     Returns 0 if ``op`` is 0, otherwise it returns 1 if ``op``
     is a generator of the multiplicative group, and -1 if it is not.
 

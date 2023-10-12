@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2020 Rudolph
     Copyright (C) 2020 D.H.J. Polymath
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of Arb.
 
@@ -10,9 +11,9 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "thread_support.h"
 #include "fmpz_vec.h"
 #include "acb_dirichlet.h"
-#include "pthread.h"
 
 slong platt_get_smk_index(slong B, const fmpz_t j, slong prec);
 void get_smk_points(slong * res, slong A, slong B);
@@ -42,16 +43,16 @@ typedef struct
     slong mstop;
     slong prec;
 }
-platt_smk_arg_t;
+_worker_arg;
 
-static void *
+static void
 _platt_smk_thread(void * arg_ptr)
 {
-    platt_smk_arg_t *p = (platt_smk_arg_t *) arg_ptr;
+    _worker_arg *p = (_worker_arg *) arg_ptr;
     _platt_smk(p->S, p->startvec, p->stopvec, p->smk_points, p->t0, p->A, p->B,
                p->jstart, p->jstop, p->mstart, p->mstop, p->K, p->prec);
     flint_cleanup();
-    return NULL;
+    return;
 }
 
 
@@ -60,34 +61,29 @@ acb_dirichlet_platt_multieval_threaded(arb_ptr out, const fmpz_t T, slong A,
         slong B, const arb_t h, const fmpz_t J, slong K,
         slong sigma, slong prec)
 {
-    slong i, num_threads, N;
+    slong i, num_workers, num_threads, N;
     fmpz * smk_points;
-    pthread_t * threads;
-    platt_smk_arg_t * args;
+    thread_pool_handle * handles;
+    _worker_arg * args;
     acb_ptr S;
     arb_t t0;
     fmpz_t threadtasks;
 
-    num_threads = flint_get_num_threads();
-    if (num_threads < 1)
-    {
-        flint_printf("no threads available\n");
-        flint_abort();
-    }
+    num_workers = flint_request_threads(&handles, WORD_MAX);
+    num_threads = num_workers + 1;
 
     N = A*B;
     fmpz_init(threadtasks);
-    threads = flint_malloc(sizeof(pthread_t) * num_threads);
-    args = flint_malloc(sizeof(platt_smk_arg_t) * num_threads);
-    fmpz_add_si(threadtasks, J, num_threads - 1);
-    fmpz_tdiv_q_ui(threadtasks, threadtasks, (ulong) num_threads);
+    args = FLINT_ARRAY_ALLOC(num_threads, _worker_arg);
+    fmpz_add_si(threadtasks, J, num_workers);
+    fmpz_tdiv_q_ui(threadtasks, threadtasks, num_threads);
     smk_points = _fmpz_vec_init(N);
     arb_init(t0);
 
     get_smk_points(smk_points, A, B);
     arb_set_fmpz(t0, T);
 
-    S =  _acb_vec_init(K*N);
+    S =  _acb_vec_init(K * N);
     for (i = 0; i < num_threads; i++)
     {
         args[i].S = S;
@@ -107,18 +103,17 @@ acb_dirichlet_platt_multieval_threaded(arb_ptr out, const fmpz_t T, slong A,
         args[i].mstart = platt_get_smk_index(B, args[i].jstart, prec);
         args[i].mstop = platt_get_smk_index(B, args[i].jstop, prec);
     }
-    fmpz_set(args[num_threads-1].jstop, J);
-    args[num_threads-1].mstop = platt_get_smk_index(B, J, prec);
+    fmpz_set(args[num_threads - 1].jstop, J);
+    args[num_threads - 1].mstop = platt_get_smk_index(B, J, prec);
 
-    for (i = 0; i < num_threads; i++)
-    {
-        pthread_create(&threads[i], NULL, _platt_smk_thread, &args[i]);
-    }
+    for (i = 0; i < num_workers; i++)
+        thread_pool_wake(global_thread_pool, handles[i], 0, _platt_smk_thread, &args[i]);
 
-    for (i = 0; i < num_threads; i++)
-    {
-        pthread_join(threads[i], NULL);
-    }
+    /* Work on master thread */
+    _platt_smk_thread(&args[num_workers]);
+
+    for (i = 0; i < num_workers; i++)
+        thread_pool_wait(global_thread_pool, handles[i]);
 
     for (i = 0; i < num_threads; i++)
     {
@@ -140,9 +135,9 @@ acb_dirichlet_platt_multieval_threaded(arb_ptr out, const fmpz_t T, slong A,
     _acb_dirichlet_platt_multieval(out, S, t0, A, B, h, J, K, sigma, prec);
 
     arb_clear(t0);
-    _acb_vec_clear(S, K*N);
+    _acb_vec_clear(S, K * N);
     _fmpz_vec_clear(smk_points, N);
 
+    flint_give_back_threads(handles, num_workers);
     flint_free(args);
-    flint_free(threads);
 }

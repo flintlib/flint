@@ -13,17 +13,21 @@
 #include "nmod_poly.h"
 
 void
-nmod_poly_set_trunc(nmod_poly_t res, const nmod_poly_t poly, slong n)
+nmod_poly_set_trunc(nmod_poly_t res, const nmod_poly_t poly, slong len)
 {
     if (poly == res)
     {
-        nmod_poly_truncate(res, n);
+        if (res->length > len)
+        {
+            res->length = len;
+            _nmod_poly_normalise(res);
+        }
     }
     else
     {
         slong rlen;
 
-        rlen = FLINT_MIN(n, poly->length);
+        rlen = FLINT_MIN(len, poly->length);
         while (rlen > 0 && poly->coeffs[rlen - 1] == 0)
             rlen--;
 

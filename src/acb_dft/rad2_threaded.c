@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2016 Pascal Molin
     Copyright (C) 2020 D.H.J. Polymath
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of Arb.
 
@@ -10,6 +11,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "thread_support.h"
 #include "acb_dft.h"
 
 void acb_dft_rad2_reorder(acb_ptr v, slong n);
@@ -25,12 +27,12 @@ typedef struct
     acb_srcptr w;
     slong prec;
 }
-acb_dft_rad2_arg_t;
+_worker_arg;
 
-void *
+void
 _acb_dft_rad2_thread(void * arg_ptr)
 {
-    acb_dft_rad2_arg_t arg = *((acb_dft_rad2_arg_t *) arg_ptr);
+    _worker_arg arg = *((_worker_arg *) arg_ptr);
     slong j, rstart, pstep;
     acb_ptr p, r;
     acb_t tmp;
@@ -51,27 +53,28 @@ _acb_dft_rad2_thread(void * arg_ptr)
 
     acb_clear(tmp);
     flint_cleanup();
-    return NULL;
+    return;
 }
 
 void
 acb_dft_rad2_precomp_inplace_threaded(acb_ptr v, const acb_dft_rad2_t rad2, slong prec)
 {
-    slong num_threads;
-    pthread_t * threads;
-    acb_dft_rad2_arg_t * args;
+    slong num_threads, num_workers;
+    thread_pool_handle * handles;
+    _worker_arg * args;
 
     slong t, logt, logk, logl;
     slong n = rad2->n;
     slong nz = rad2->nz; /* always n/2 ? */
     slong logn = rad2->e;
 
-    num_threads = FLINT_MIN(flint_get_num_threads(), nz);
+    num_workers = flint_request_threads(&handles, nz);
+    num_threads = num_workers + 1;
+
     for (logt = 0; WORD(1) << (logt + 1) <= num_threads; logt++);
     t = WORD(1) << logt;
 
-    threads = flint_malloc(sizeof(pthread_t) * t);
-    args = flint_malloc(sizeof(acb_dft_rad2_arg_t) * t);
+    args = FLINT_ARRAY_ALLOC(t, _worker_arg);
 
     acb_dft_rad2_reorder(v, n);
 
@@ -95,22 +98,24 @@ acb_dft_rad2_precomp_inplace_threaded(acb_ptr v, const acb_dft_rad2_t rad2, slon
                 args[i].l = WORD(1) << logl;
                 args[i].w = rad2->z;
                 args[i].prec = prec;
-                pthread_create(&threads[i], NULL, _acb_dft_rad2_thread, &args[i]);
+
+                if (i != num_workers)
+                    thread_pool_wake(global_thread_pool, handles[i], 0, _acb_dft_rad2_thread, &args[i]);
+                else
+                    _acb_dft_rad2_thread(&args[i]);
+
                 i++;
             }
         }
+
         if (i != t)
-        {
-            flint_printf("threaded dft error: unequal i=%wd t=%wd\n", i, t);
-            flint_abort();
-        }
-        for (i = 0; i < t; i++)
-        {
-            pthread_join(threads[i], NULL);
-        }
+            flint_throw(FLINT_ERROR, "unequal i=%wd, t=%wd in %s\n", i, t, __FUNCTION__);
+
+        for (i = 0; i < num_workers; i++)
+            thread_pool_wait(global_thread_pool, handles[i]);
     }
 
-    flint_free(threads);
+    flint_give_back_threads(handles, num_workers);
     flint_free(args);
 }
 

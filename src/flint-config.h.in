@@ -1,0 +1,58 @@
+/*
+    Copyright (C) 2023 Albin Ahlbäck
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
+
+/* Define if system is big endian. */
+#undef FLINT_BIG_ENDIAN
+
+/* Define if compiler has CLZ intrinsics */
+#undef FLINT_HAS_CLZ
+
+/* Define if compiler has CTZ intrinsics */
+#undef FLINT_HAS_CTZ
+
+/* Define if compiler has popcount intrinsics */
+#undef FLINT_HAS_POPCNT
+
+/* Define if system has AVX2 */
+#undef FLINT_HAVE_AVX2
+
+/* Define if system has AVX512 */
+#undef FLINT_HAVE_AVX512
+
+/* Define if compiler has __builtin_constant_p */
+#undef FLINT_HAVE_CONSTANT_P
+
+/* Define to use the fft_small module */
+#undef FLINT_HAVE_FFT_SMALL
+
+/* Define to enable reentrant. */
+#undef FLINT_REENTRANT
+
+/* Define to enable BLAS. */
+#undef FLINT_USES_BLAS
+
+/* Define if system has cpu_set_t */
+#undef FLINT_USES_CPUSET
+
+/* Define to enable the Boehm-Demers-Weise garbage collector. */
+#undef FLINT_USES_GC
+
+/* Define to enable the use of pthread. */
+#undef FLINT_USES_PTHREAD
+
+/* Define to enable thread-local storage. */
+#undef FLINT_USES_TLS
+
+/* Define to enable use of asserts. */
+#undef FLINT_WANT_ASSERT
+
+/* Define to enable use of GMP internals. */
+#undef FLINT_WANT_GMP_INTERNALS

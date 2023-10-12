@@ -22,11 +22,9 @@
 
 #define FLINT_DEFAULT_THREAD_LIMIT 99999
 
-slong flint_request_threads(thread_pool_handle ** handles,
-                                                           slong thread_limit);
+slong flint_request_threads(thread_pool_handle ** handles, slong thread_limit);
 
-void flint_give_back_threads(thread_pool_handle * handles,
-                                                            slong num_handles);
+void flint_give_back_threads(thread_pool_handle * handles, slong num_handles);
 
 slong flint_get_num_available_threads(void);
 
