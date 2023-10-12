@@ -3,17 +3,17 @@
 **fmpz_poly_mat.h** -- matrices of polynomials over the integers
 ===============================================================================
 
-The `fmpz_poly_mat_t` data type represents matrices whose entries are
-integer polynomials.
+The :type:`fmpz_poly_mat_t` data type represents matrices whose
+entries are integer polynomials.
 
-The `fmpz_poly_mat_t` type is defined as an array of
-`fmpz_poly_mat_struct`'s of length one. This permits passing
-parameters of type `fmpz_poly_mat_t` by reference.
+The :type:`fmpz_poly_mat_t` type is defined as an array of
+:type:`fmpz_poly_mat_struct`'s of length one. This permits passing
+parameters of type :type:`fmpz_poly_mat_t` by reference.
 
 An integer polynomial matrix internally consists of a single array of
-`fmpz_poly_struct`'s, representing a dense matrix in row-major order.
-This array is only directly indexed during memory allocation and
-deallocation. A separate array holds pointers to the start of each
+:type:`fmpz_poly_struct`'s, representing a dense matrix in row-major
+order. This array is only directly indexed during memory allocation
+and deallocation. A separate array holds pointers to the start of each
 row, and is used for all indexing. This allows the rows of a matrix to
 be permuted quickly by swapping pointers.
 
@@ -26,9 +26,8 @@ compatible with the given operation.
 Simple example
 --------------
 
-The following example constructs the matrix
-:math:`\begin{pmatrix} 2x+1 & x \\ 1-x & -1 \end{pmatrix}` and computes
-its determinant.
+The following example constructs the matrix `\begin{pmatrix} 2x+1 & x
+\\ 1-x & -1 \end{pmatrix}` and computes its determinant.
 
 .. code:: c
 
@@ -56,7 +55,7 @@ its determinant.
 
 The output is:
 
-.. code:: c
+::
 
    x^2-3*x-1
 
