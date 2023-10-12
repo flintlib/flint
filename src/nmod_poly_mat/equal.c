@@ -39,8 +39,8 @@ nmod_poly_mat_equal_nmod_mat(const nmod_poly_mat_t pmat,
 
     for (slong i = 0; i < pmat->r; i++)
         for (slong j = 0; j < pmat->c; j++)
-            if (! nmod_poly_equal_ui(nmod_poly_mat_entry(pmat, i, j),
-                                     nmod_mat_entry(cmat, i, j)))
+            if (! nmod_poly_equal_nmod(nmod_poly_mat_entry(pmat, i, j),
+                                       nmod_mat_entry(cmat, i, j)))
                 return 0;
     return 1;
 }
