@@ -16,6 +16,8 @@ src/flint-config.h
 build/
 config/
 config.log
+confdefs.h
+conftest.*
 /Makefile
 doc/build
 doc/latex/flint-manual.*
