@@ -400,19 +400,19 @@ then
 fi
 
 AC_ARG_WITH(ntl_include,
-[AS_HELP_STRING([--with-ntl-include=DIR],[Use NTL and specify its include directory])],
+[AS_HELP_STRING([--with-ntl-include=DIR],[Use NTL (in tests) and specify its include directory])],
 CPPFLAGS="$CPPFLAGS -I$withval"
 ntl_include_path="$withval"
 )
 
 AC_ARG_WITH(ntl_lib,
-[AS_HELP_STRING([--with-ntl-lib=DIR],[Use NTL and specify its library directory])],
+[AS_HELP_STRING([--with-ntl-lib=DIR],[Use NTL (in tests) and specify its library directory])],
 LDFLAGS="$LDFLAGS -L$withval"
 ntl_lib_path="$withval"
 )
 
 AC_ARG_WITH(ntl,
-[AS_HELP_STRING([--with-ntl[[=DIR]]],[Use NTL and optionally specify its install directory])],
+[AS_HELP_STRING([--with-ntl[[=DIR]]],[Use NTL (in tests) and optionally specify its install directory])],
 if test "$with_ntl" = "yes";
 then
     :
