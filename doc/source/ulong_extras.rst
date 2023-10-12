@@ -11,23 +11,24 @@ The module includes functions for square roots, factorisation and
 primality testing. Almost all the functions in this module are highly
 developed and extremely well optimised.
 
-The basic type is the `mp_limb_t` as defined by MPIR. Functions which
-take a precomputed inverse either have the suffix `preinv` and take an
-`mp_limb_t` precomputed inverse as computed by `n_preinvert_limb` or
-have the suffix `_precomp` and accept a `double` precomputed inverse
-as computed by `n_precompute_inverse`.
+The basic type is the ``mp_limb_t`` as defined by MPIR. Functions
+which take a precomputed inverse either have the suffix ``preinv`` and
+take an ``mp_limb_t`` precomputed inverse as computed by
+``n_preinvert_limb`` or have the suffix ``_precomp`` and accept a
+``double`` precomputed inverse as computed by
+``n_precompute_inverse``.
 
 Sometimes three functions with similar names are provided for the same
-task, e.g. `n_mod_precomp`, `n_mod2_precomp` and `n_mod2_preinv`. If
-the part of the name that designates the functionality ends in 2 then
-the function has few if any limitations on its inputs. Otherwise the
-function may have limitations such as being limited to 52 or 53 bits.
-In practice we found that the preinv functions are generally faster
-anyway, so most times it pays to just use the `n_blah2_preinv`
-variants.
+task, e.g. ``n_mod_precomp``, ``n_mod2_precomp`` and
+``n_mod2_preinv``. If the part of the name that designates the
+functionality ends in 2 then the function has few if any limitations
+on its inputs. Otherwise the function may have limitations such as
+being limited to 52 or 53 bits. In practice we found that the preinv
+functions are generally faster anyway, so most times it pays to just
+use the ``n_blah2_preinv`` variants.
 
-Some functions with the `n_ll_` or `n_lll_` prefix accept parameters
-of two or three limbs respectively.
+Some functions with the ``n_ll_`` or ``n_lll_`` prefix accept
+parameters of two or three limbs respectively.
 
 Simple example
 --------------
