@@ -70,7 +70,7 @@ Divisibility
 --------------------------------------------------------------------------------
 
 
-.. function:: int flint_mpn_divisible_1_p(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
+.. function:: int flint_mpn_divisible_1_odd(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
 
     Expression determining whether ``(x, xsize)`` is divisible by the
     ``mp_limb_t d`` which is assumed to be odd-valued and at least `3`.

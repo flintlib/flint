@@ -574,8 +574,6 @@ jobs:
       - name: "Setup"
         run: |
           sudo apt install -y sed
-          sudo apt install -y libgmp-dev
-          sudo apt install -y libmpfr-dev
           sudo apt install -y autoconf
           sudo apt install -y libtool-bin
           gcc --version
@@ -583,9 +581,16 @@ jobs:
           autoconf --version
           libtool --version
           julia --version
+          julia -e 'println(Base.BinaryPlatforms.HostPlatform())'
 
       - name: "Configure"
         run: |
+          # Find path to GMP and MPFR
+          gmp_path=$(julia -e 'include("dev/find_gmp_mpfr.jl"); print(gmp_artifact_dir())')
+          echo "Path to GMP: ${gmp_path}"
+          mpfr_path=$(julia -e 'include("dev/find_gmp_mpfr.jl"); print(mpfr_artifact_dir())')
+          echo "Path to MPFR: ${mpfr_path}"
+
           # Make sure that we output an soname which corresponds to FLINT_JLL's
           # soname
           wget https://raw.githubusercontent.com/JuliaPackaging/Yggdrasil/master/F/FLINT/build_tarballs.jl
@@ -598,9 +603,12 @@ jobs:
           sed -i "s/^\(FLINT_MINOR_SO=\)[0-9]\+/\1$FLINT_JLL_MINOR/" configure.ac
           sed -i "s/^\(FLINT_PATCH_SO=\)[0-9]\+/\1$FLINT_JLL_PATCH/" configure.ac
 
-          # Now we can create the makefile
+          # Now we can configure FLINT. However, recent versions of MPFR_jll has
+          # memory sanitation which messes with finding mpfr_init in the
+          # configure-script. Hence, we also omit the check for finding MPFR.
+          # FIXME: Probably want to fix this.
           ./bootstrap.sh
-          ./configure CC=${CC} CFLAGS="${CFLAGS}" --prefix=${LOCAL} ${EXTRA_OPTIONS}
+          ./configure CC=${CC} CFLAGS="${CFLAGS}" --prefix=${LOCAL} ${EXTRA_OPTIONS} --with-gmp=${gmp_path} --with-mpfr=${mpfr_path} --disable-mpfr-check
 
       - name: "Compile and install"
         run: |

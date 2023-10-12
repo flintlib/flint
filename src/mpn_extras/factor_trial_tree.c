@@ -207,7 +207,7 @@ int flint_mpn_factor_trial_tree(slong * factors,
             {
 
                 /* check divisibility by primes with index 4*i + j */
-	            if (flint_mpn_divisible_1_p(x, xsize, primes[(FLINT_BITS/16)*i + j]))
+	            if (flint_mpn_divisible_1_odd(x, xsize, primes[(FLINT_BITS/16)*i + j]))
 	                factors[numfacs++] = (FLINT_BITS/16)*i + j;
 	        }
 	    }

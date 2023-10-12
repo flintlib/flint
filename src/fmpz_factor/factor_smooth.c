@@ -141,18 +141,21 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
         {
             p = primes[idx[i]];
 
+            if (p == 2)
+                continue;
+
             exp = 1;
             xsize = flint_mpn_divexact_1(xd, xsize, p);
 
             /* Check if p^2 divides n */
-            if (flint_mpn_divisible_1_p(xd, xsize, p))
+            if (flint_mpn_divisible_1_odd(xd, xsize, p))
             {
                 xsize = flint_mpn_divexact_1(xd, xsize, p);
                 exp = 2;
             }
 
             /* If we're up to cubes, then maybe there are higher powers */
-            if (exp == 2 && flint_mpn_divisible_1_p(xd, xsize, p))
+            if (exp == 2 && flint_mpn_divisible_1_odd(xd, xsize, p))
             {
                 xsize = flint_mpn_divexact_1(xd, xsize, p);
                 xsize = flint_mpn_remove_power_ascending(xd, xsize, &p, 1, &exp);
