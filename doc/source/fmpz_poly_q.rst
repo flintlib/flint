@@ -3,14 +3,15 @@
 **fmpz_poly_q.h** -- rational functions over the rational numbers
 ===============================================================================
 
-The module `fmpz_poly_q` provides functions for performing arithmetic
-on rational functions in `\mathbf{Q}(t)`, represented as quotients of
-integer polynomials of type `fmpz_poly_t`. These functions start with
-the prefix `fmpz_poly_q_`.
+The module :type:`fmpz_poly_q` provides functions for performing
+arithmetic on rational functions in `\mathbf{Q}(t)`, represented as
+quotients of integer polynomials of type :type:`fmpz_poly_t`. These
+functions start with the prefix :type:`fmpz_poly_q_`.
 
-Rational functions are stored in objects of type `fmpz_poly_q_t`,
-which is an array of `fmpz_poly_q_struct`'s of length one.  This
-permits passing parameters of type `fmpz_poly_q_t` by reference.
+Rational functions are stored in objects of type
+:type:`fmpz_poly_q_t`, which is an array of
+:type:`fmpz_poly_q_struct`'s of length one. This permits passing
+parameters of type :type:`fmpz_poly_q_t` by reference.
 
 The representation of a rational function as the quotient of two
 integer polynomials can be made canonical by demanding the numerator
@@ -19,10 +20,10 @@ denominator to have positive leading coefficient. As the only special
 case, we represent the zero function as `0/1`. All arithmetic
 functions assume that the operands are in this canonical form, and
 canonicalize their result. If the numerator or denominator is modified
-individually, for example using the macros `fmpz_poly_q_numref()` and
-`fmpz_poly_q_denref()`, it is the user's responsibility to
+individually, for example using the macros ``fmpz_poly_q_numref()``
+and ``fmpz_poly_q_denref()``, it is the user's responsibility to
 canonicalise the rational function using the function
-`fmpz_poly_q_canonicalise()` if necessary.
+``fmpz_poly_q_canonicalise()`` if necessary.
 
 All methods support aliasing of their inputs and outputs *unless*
 explicitly stated otherwise, subject to the following caveat. If
@@ -66,7 +67,7 @@ prints the result:
 
 The output is:
 
-.. code:: c
+::
 
    (3*t+1)/2 * 3/(7*t+2) = (9*t+3)/(14*t+4)
 
