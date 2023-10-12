@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
+
 /* Include functions *********************************************************/
 
 #include "t-add_ssaaaa.c"
@@ -46,14 +48,66 @@ int (*test_functions[])(void) =
     TEST_FUNCTION(umul_ppmm)
 };
 
+char add_ssaaaa_name[] = "add_ssaaaa";
+char add_sssaaaaaa_name[] = "add_sssaaaaaa";
+char add_ssssaaaaaaaa_name[] = "add_ssssaaaaaaaa";
+char byte_swap_name[] = "byte_swap";
+char flint_clz_name[] = "flint_clz";
+char flint_ctz_name[] = "flint_ctz";
+char invert_limb_name[] = "invert_limb";
+char sdiv_qrnnd_name[] = "sdiv_qrnnd";
+char smul_ppmm_name[] = "smul_ppmm";
+char sub_dddmmmsss_name[] = "sub_dddmmmsss";
+char sub_ddmmss_name[] = "sub_ddmmss";
+char udiv_qrnnd_name[] = "udiv_qrnnd";
+char udiv_qrnnd_preinv_name[] = "udiv_qrnnd_preinv";
+char umul_ppmm_name[] = "umul_ppmm";
+
+char * test_names[] =
+{
+    add_ssaaaa_name,
+    add_sssaaaaaa_name,
+    add_ssssaaaaaaaa_name,
+    byte_swap_name,
+    flint_clz_name,
+    flint_ctz_name,
+    invert_limb_name,
+    sdiv_qrnnd_name,
+    smul_ppmm_name,
+    sub_dddmmmsss_name,
+    sub_ddmmss_name,
+    udiv_qrnnd_name,
+    udiv_qrnnd_preinv_name,
+    umul_ppmm_name
+};
+
 /* main function *************************************************************/
 
 int
-main()
+main(int argc, char ** argv)
 {
-    slong ix;
+    int ix, jx;
 
-    for (ix = 0; ix < sizeof(test_functions) / sizeof(int (*)(void)); ix++)
-        if (test_functions[ix]())
-            flint_abort();
+    if (argc < 2)
+    {
+        for (ix = 0; ix < sizeof(test_functions) / sizeof(int (*)(void)); ix++)
+            if (test_functions[ix]())
+                flint_abort();
+    }
+    else
+    {
+        for (ix = 1; ix < argc; ix++)
+            for (jx = 1; jx < argc; jx++)
+            {
+                /* If argument equals to test name, run it */
+                if (strcmp(argv[ix], test_names[jx]) == 0)
+                {
+                    if (test_functions[jx]())
+                        flint_abort();
+                    break;
+                }
+            }
+    }
+
+    return 0;
 }
