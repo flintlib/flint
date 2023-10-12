@@ -3,18 +3,12 @@
 **fq_default_default.h** -- unified finite fields
 ===============================================================================
 
-Description.
-
 Types, macros and constants
 -------------------------------------------------------------------------------
 
 .. type:: fq_default_default_ctx_t
 
-    Description.
-
 .. type:: fq_default_default_t
-
-    Description.
 
 Context Management
 --------------------------------------------------------------------------------
@@ -44,7 +38,7 @@ Context Management
     Initialises the context for the finite field defined by the given
     polynomial ``modulus``. The characteristic will be the modulus of
     the polynomial and the degree equal to its degree.
-    
+
     Assumes that the characteristic is prime and the polynomial irreducible.
 
     Assumes that the string ``var`` is a null-terminated string
@@ -439,4 +433,3 @@ Special functions
     `\mathbf{Z}/d\mathbf{Z}`, where
     `\sigma \in \operatorname{Gal}(\mathbf{F}_q/\mathbf{F}_p)` is the Frobenius element
     `\sigma \colon x \mapsto x^p`.
-

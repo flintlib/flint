@@ -3,14 +3,10 @@
 **fq_default_poly_factor.h** -- factorisation of univariate polynomials over finite fields
 ==========================================================================================
 
-Description.
-
 Types, macros and constants
 -------------------------------------------------------------------------------
 
 .. type:: fq_default_poly_factor_t
-
-    Description.
 
 
 Memory Management
