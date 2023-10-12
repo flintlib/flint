@@ -79,7 +79,7 @@ typedef fexpr_vec_struct fexpr_vec_t[1];
 FEXPR_INLINE void
 fexpr_init(fexpr_t expr)
 {
-    expr->data = flint_malloc(sizeof(ulong));
+    expr->data = (ulong *) flint_malloc(sizeof(ulong));
     expr->data[0] = 0;
     expr->alloc = 1;
 }
@@ -94,7 +94,7 @@ FEXPR_INLINE fexpr_ptr
 _fexpr_vec_init(slong len)
 {
     slong i;
-    fexpr_ptr vec = flint_malloc(sizeof(fexpr_struct) * len);
+    fexpr_ptr vec = (fexpr_struct *) flint_malloc(sizeof(fexpr_struct) * len);
     for (i = 0; i < len; i++)
         fexpr_init(vec + i);
     return vec;
@@ -115,7 +115,7 @@ fexpr_fit_size(fexpr_t expr, slong size)
     if (expr->alloc < size)
     {
         size = FLINT_MAX(size, 2 * expr->alloc);
-        expr->data = flint_realloc(expr->data, size * sizeof(ulong));
+        expr->data = (ulong *) flint_realloc(expr->data, size * sizeof(ulong));
         expr->alloc = size;
     }
 }
@@ -497,7 +497,7 @@ fexpr_vec_fit_length(fexpr_vec_t vec, slong len)
         if (len < 2 * vec->alloc)
             len = 2 * vec->alloc;
 
-        vec->entries = flint_realloc(vec->entries, len * sizeof(fexpr_struct));
+        vec->entries = (fexpr_struct *) flint_realloc(vec->entries, len * sizeof(fexpr_struct));
 
         for (i = vec->alloc; i < len; i++)
             fexpr_init(vec->entries + i);

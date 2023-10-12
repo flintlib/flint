@@ -16,10 +16,7 @@
     NTL Interface
 
     The NTL interface allows conversion between NTL objects and FLINT objects
-    and vice versa. The interface is built using C$++$ and is not built as a
-    part of the FLINT library library by default. To build the NTL interface
-    one must specify the location of NTL with the \code{--with-ntl=path} option
-    to configure. NTL version 5.5.2 or later is required.
+    and vice versa. NTL version 5.5.2 or later is required.
 
 *******************************************************************************
 

@@ -3,9 +3,6 @@
 **fmpq_vec.h** -- vectors over rational numbers
 ===============================================================================
 
-Description.
-
-
 Memory management
 --------------------------------------------------------------------------------
 
@@ -29,7 +26,7 @@ Randomisation
 
 .. function:: void _fmpq_vec_randtest(fmpq * f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
-    Sets the entries of a vector of the given length to random rationals with 
+    Sets the entries of a vector of the given length to random rationals with
     numerator and denominator having up to the given number of bits per entry.
 
 .. function:: void _fmpq_vec_randtest_uniq_sorted(fmpq * vec, flint_rand_t state, slong len, flint_bitcnt_t bits)
@@ -67,7 +64,7 @@ Dot product
 
 .. function:: void _fmpq_vec_dot(fmpq_t res, const fmpq * vec1, const fmpq * vec2, slong len)
 
-    Sets ``res`` to the dot product of the vectors ``(vec1, len)`` and 
+    Sets ``res`` to the dot product of the vectors ``(vec1, len)`` and
     ``(vec2, len)``.
 
 
@@ -89,4 +86,3 @@ Input and output
     Prints the vector of given length to ``stdout``.
 
     For further details, see :func:`_fmpq_vec_fprint()`.
-

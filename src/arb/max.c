@@ -22,6 +22,30 @@ arb_max(arb_t z, const arb_t x, const arb_t y, slong prec)
         return;
     }
 
+    if (!arb_is_finite(x) || !arb_is_finite(y))
+    {
+        if (
+	  (arf_is_pos_inf(arb_midref(x)) && mag_is_finite(arb_radref(x))) ||
+	  (arf_is_pos_inf(arb_midref(y)) && mag_is_finite(arb_radref(y)))
+	  )
+	{
+	    arb_pos_inf(z);
+	}
+	else if (!mag_is_finite(arb_radref(x)) || !mag_is_finite(arb_radref(y)))
+	{
+	    arb_zero_pm_inf(z);
+	}
+	else if (arf_is_neg_inf(arb_midref(x)))
+	{
+	    arb_set(z, y);
+	} else
+	{
+	    /* In this case must have y = -inf */
+	    arb_set(z, x);
+	}
+	return;
+    }
+
     arf_init(left);
     arf_init(right);
     arf_init(t);
