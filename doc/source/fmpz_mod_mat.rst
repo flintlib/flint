@@ -10,10 +10,6 @@ Types, macros and constants
 
 .. type:: fmpz_mod_mat_t
 
-.. type:: fmpz_mod_mat_struct
-
-.. type:: fmpz_mod_mat_t
-
 Element access
 --------------------------------------------------------------------------------
 
