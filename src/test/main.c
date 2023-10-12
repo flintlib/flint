@@ -83,6 +83,8 @@ char * test_names[] =
 
 /* main function *************************************************************/
 
+#define NUMBER_OF_TESTS (sizeof(test_functions) / sizeof(int (*)(void)))
+
 int
 main(int argc, char ** argv)
 {
@@ -90,14 +92,15 @@ main(int argc, char ** argv)
 
     if (argc < 2)
     {
-        for (ix = 0; ix < sizeof(test_functions) / sizeof(int (*)(void)); ix++)
+        for (ix = 0; ix < NUMBER_OF_TESTS; ix++)
             if (test_functions[ix]())
                 flint_abort();
     }
     else
     {
         for (ix = 1; ix < argc; ix++)
-            for (jx = 1; jx < argc; jx++)
+        {
+            for (jx = 0; jx < NUMBER_OF_TESTS; jx++)
             {
                 /* If argument equals to test name, run it */
                 if (strcmp(argv[ix], test_names[jx]) == 0)
@@ -107,6 +110,13 @@ main(int argc, char ** argv)
                     break;
                 }
             }
+
+            if (jx == NUMBER_OF_TESTS)
+            {
+                fprintf(stderr, "Error: Could not find test function for %s\n", argv[ix]);
+                flint_abort();
+            }
+        }
     }
 
     return 0;
