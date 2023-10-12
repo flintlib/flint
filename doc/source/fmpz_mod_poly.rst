@@ -3,41 +3,42 @@
 **fmpz_mod_poly.h** -- polynomials over integers mod n
 ===============================================================================
 
-The `fmpz_mod_poly_t` data type represents elements of `\Z/n\Z[x]` for
-a fixed modulus `n`. The `fmpz_mod_poly` module provides routines for
-memory management, basic arithmetic and some higher level functions
-such as GCD, etc.
+The :type:`fmpz_mod_poly_t` data type represents elements of
+`\\mathbb{Z}/n\\mathbb{Z}[x]` for a fixed modulus `n`. The
+:type:`fmpz_mod_poly` module provides routines for memory management,
+basic arithmetic and some higher level functions such as GCD, etc.
 
-Each coefficient of an `fmpz_mod_poly_t` is of type `fmpz`
+Each coefficient of an :type:`fmpz_mod_poly_t` is of type :type:`fmpz`
 and represents an integer reduced modulo the fixed modulus `n` in the
 range `[0,n)`.
 
-Unless otherwise specified, all functions in this section permit aliasing
-between their input arguments and between their input and output arguments.
+Unless otherwise specified, all functions in this section permit
+aliasing between their input arguments and between their input and
+output arguments.
 
-The `fmpz_mod_poly_t` type is a typedef for an array of length 1 of
-`fmpz_mod_poly_struct`'s. This permits passing parameters of type
-`fmpz_mod_poly_t` by reference.
+The :type:`fmpz_mod_poly_t` type is a typedef for an array of length 1
+of :type:`fmpz_mod_poly_struct`'s. This permits passing parameters of
+type :type:`fmpz_mod_poly_t` by reference.
 
-In reality one never deals directly with the `struct` and simply deals
-with objects of type `fmpz_mod_poly_t`. For simplicity we will think
-of an `fmpz_mod_poly_t` as a `struct`, though in practice to access
-fields of this `struct`, one needs to dereference first, e.g. to
-access the `length` field of an `fmpz_mod_poly_t` called `poly1` one
-writes `poly1->length`.
+In reality one never deals directly with the ``struct`` and simply
+deals with objects of type :type:`fmpz_mod_poly_t`. For simplicity we
+will think of an :type:`fmpz_mod_poly_t` as a ``struct``, though in
+practice to access fields of this ``struct``, one needs to dereference
+first, e.g. to access the ``length`` field of an
+:type:`fmpz_mod_poly_t` called ``poly1`` one writes ``poly1->length``.
 
-An `fmpz_mod_poly_t` is said to be *normalised* if either `length` is
-zero, or if the leading coefficient of the polynomial is non-zero. All
-`fmpz_mod_poly` functions expect their inputs to be normalised and all
-coefficients to be reduced modulo `n`, and unless otherwise specified
-they produce output that is normalised with coefficients reduced
-modulo `n`.
+An :type:`fmpz_mod_poly_t` is said to be *normalised* if either
+``length`` is zero, or if the leading coefficient of the polynomial is
+non-zero. All :type:`fmpz_mod_poly` functions expect their inputs to
+be normalised and all coefficients to be reduced modulo `n`, and
+unless otherwise specified they produce output that is normalised with
+coefficients reduced modulo `n`.
 
 Simple example
 --------------
 
 The following example computes the square of the polynomial `5x^3 + 6`
-in `\Z/7\Z[x]`.
+in `\mathbb{Z}/7\Z[x]`.
 
 .. code:: c
 
