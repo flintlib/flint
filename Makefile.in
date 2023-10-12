@@ -259,9 +259,13 @@ PROF_SOURCES := $(foreach dir,$(DIRS),$($(dir)_PROF_SOURCES)) $(_PROF_SOURCES)
 # FIXME: De-hardcode fq_zech_vec from this.
 fq_zech_vec_TEST_SOURCES := $(wildcard $(SRC_DIR)/fq_zech_vec/test/*.c)
 define xxx_TEST_SOURCES
+ifeq (,$(wildcard $(SRC_DIR)/$(1)/test/main.c))
 $(1)_TEST_SOURCES := $(wildcard $(SRC_DIR)/$(1)/test/*.c)
+else
+$(1)_TEST_SOURCES := $(SRC_DIR)/$(1)/test/main.c
+endif
 endef
-_TEST_SOURCES := $(wildcard $(SRC_DIR)/test/*.c)
+_TEST_SOURCES := $(wildcard $(SRC_DIR)/test/main.c)
 $(foreach dir, $(DIRS), $(eval $(call xxx_TEST_SOURCES,$(dir))))
 TEST_SOURCES := $(foreach dir,$(DIRS),$($(dir)_TEST_SOURCES)) $(_TEST_SOURCES) $(fq_zech_vec_TEST_SOURCES)
 # NOTE: We do not add CPP files to C files in SOURCES in order to not screw up
