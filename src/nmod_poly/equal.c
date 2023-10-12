@@ -23,3 +23,11 @@ int nmod_poly_equal(const nmod_poly_t a, const nmod_poly_t b)
 
     return 1;
 }
+
+int nmod_poly_equal_nmod(const nmod_poly_t poly, ulong cst)
+{
+    if (cst == 0)
+        return nmod_poly_is_zero(poly);
+    else
+        return (poly->length == 1 && poly->coeffs[0] == cst);
+}
