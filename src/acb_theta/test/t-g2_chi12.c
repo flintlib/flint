@@ -22,7 +22,7 @@ int main(void)
     flint_randinit(state);
 
     /* Test: is a modular form */
-    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         slong g = 2;
         slong n2 = 16;

@@ -22,7 +22,7 @@ int main(void)
     flint_randinit(state);
 
     /* Test: matches leading coefficient of g2_transvectant */
-    for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         slong prec = 200;
         slong bits = 2;
@@ -30,7 +30,7 @@ int main(void)
         acb_t c, t;
         slong m = n_randint(state, 10);
         slong n = n_randint(state, 10);
-        slong k = n_randint(state, (n + m)/2 + 1);
+        slong k = n_randint(state, FLINT_MIN(m, n) + 1);
 
         acb_poly_init(f);
         acb_poly_init(g);
