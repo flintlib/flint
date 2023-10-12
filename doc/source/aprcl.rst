@@ -3,8 +3,18 @@
 **aprcl.h** -- APRCL primality testing
 ========================================================================================
 
-This module implements the rigorous APRCL primality test, suitable for integers
-up to a few thousand digits.
+This module implements the rigorous APRCL primality test, suitable for
+integers up to a few thousand digits.
+
+The APR-CL test uses the Jacobi sums that belong to
+`\mathbb{Z}[\zeta]/(n)`, so we have :type:`unity_zp` struct and some
+useful operations. :type:`unity_zp` is just a wrapper over
+:type:`fmpz_mod_poly` with additional fields.
+
+Also provides Gauss sum test, which is not very useful in practice,
+but can be useful for people who want to see an implementation of
+these. Gauss sums belong `\mathbb{Z}[\zeta_q, \zeta_p]/(n)` and
+implemented in :type:`unity_zpq` struct.
 
 Authors:
 
@@ -60,7 +70,7 @@ Primality test functions
 
 .. function:: int aprcl_is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r)
 
-    Returns 0 if for some `a = n^k \bmod s`, where `k \in [1, r - 1]`, 
+    Returns 0 if for some `a = n^k \bmod s`, where `k \in [1, r - 1]`,
     we have that `a \mid n`; otherwise returns 1.
 
 Configuration functions
@@ -81,7 +91,7 @@ Configuration functions
 .. function:: void aprcl_config_gauss_init_min_R(aprcl_config conf, const fmpz_t n, ulong R)
 
     Computes the `s` with fixed minimum `R` such that `a^R \equiv 1 \mod{s}`
-    for all integers `a` coprime to `s`. 
+    for all integers `a` coprime to `s`.
 
 .. function:: void aprcl_config_gauss_clear(aprcl_config conf)
 

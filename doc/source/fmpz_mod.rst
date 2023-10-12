@@ -3,8 +3,6 @@
 **fmpz_mod.h** -- arithmetic modulo integers
 ===============================================================================
 
-Description.
-
 Types, macros and constants
 -------------------------------------------------------------------------------
 
@@ -138,4 +136,3 @@ Discrete Logarithms via Pohlig-Hellman
 
     Either return `1` and set `a` to a smooth prime strictly greater than `b`, or return `0` and set `a` to `0`.
     The smooth primes returned by this function currently have no prime factor of `a-1` greater than `23`, but this should not be relied upon.
-

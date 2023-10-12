@@ -3,17 +3,12 @@
 **fq_nmod_poly_factor.h** -- factorisation of univariate polynomials over finite fields (word-size characteristic)
 ==================================================================================================================
 
-Description.
-
 Types, macros and constants
 -------------------------------------------------------------------------------
 
 .. type:: fq_nmod_poly_factor_struct
 
 .. type:: fq_nmod_poly_factor_t
-
-    Description.
-
 
 Memory Management
 --------------------------------------------------------------------------------

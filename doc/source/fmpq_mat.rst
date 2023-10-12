@@ -3,7 +3,20 @@
 **fmpq_mat.h** -- matrices over the rational numbers
 ===============================================================================
 
-Description.
+The :type:`fmpq_mat_t` data type represents matrices over `\mathbb{Q}`.
+
+A rational matrix is stored as an array of ``fmpq`` elements in order
+to allow convenient and efficient manipulation of individual entries.
+In general, ``fmpq_mat`` functions assume that input entries are in
+canonical form, and produce output with entries in canonical form.
+
+Since rational arithmetic is expensive, computations are typically
+performed by clearing denominators, performing the heavy work over the
+integers, and converting the final result back to a rational matrix.
+The ``fmpq_mat`` functions take care of such conversions
+transparently. For users who need fine-grained control, various
+functions for conversion between rational and integer matrices are
+provided.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -11,9 +24,6 @@ Types, macros and constants
 .. type:: fmpq_mat_struct
 
 .. type:: fmpq_mat_t
-
-    Description.
-
 
 Memory management
 --------------------------------------------------------------------------------
@@ -83,7 +93,7 @@ Basic assignment
 
 .. function:: void fmpq_mat_set(fmpq_mat_t dest, const fmpq_mat_t src)
 
-    Sets the entries in ``dest`` to the same values as in ``src``, 
+    Sets the entries in ``dest`` to the same values as in ``src``,
     assuming the two matrices have the same dimensions.
 
 .. function:: void fmpq_mat_zero(fmpq_mat_t mat)
@@ -92,34 +102,34 @@ Basic assignment
 
 .. function:: void fmpq_mat_one(fmpq_mat_t mat)
 
-    Let `m` be the minimum of the number of rows and columns 
-    in the matrix ``mat``.  This function sets the first 
-    `m \times m` block to the identity matrix, and the remaining 
+    Let `m` be the minimum of the number of rows and columns
+    in the matrix ``mat``.  This function sets the first
+    `m \times m` block to the identity matrix, and the remaining
     block to zero.
 
 .. function:: void fmpq_mat_transpose(fmpq_mat_t rop, const fmpq_mat_t op)
 
-    Sets the matrix ``rop`` to the transpose of the matrix ``op``, 
+    Sets the matrix ``rop`` to the transpose of the matrix ``op``,
     assuming that their dimensions are compatible.
 
 .. function:: void fmpq_mat_swap_rows(fmpq_mat_t mat, slong * perm, slong r, slong s)
-    
+
     Swaps rows ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
     permutation of the rows will also be applied to ``perm``.
 
 .. function:: void fmpq_mat_swap_cols(fmpq_mat_t mat, slong * perm, slong r, slong s)
-    
+
     Swaps columns ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
     permutation of the columns will also be applied to ``perm``.
 
 .. function:: void fmpq_mat_invert_rows(fmpq_mat_t mat, slong * perm)
-    
+
     Swaps rows ``i`` and ``r - i`` of ``mat`` for ``0 <= i < r/2``, where
     ``r`` is the number of rows of ``mat``. If ``perm`` is non-``NULL``, the
     permutation of the rows will also be applied to ``perm``.
 
 .. function:: void fmpq_mat_invert_cols(fmpq_mat_t mat, slong * perm)
-    
+
     Swaps columns ``i`` and ``c - i`` of ``mat`` for ``0 <= i < c/2``, where
     ``c`` is the number of columns of ``mat``. If ``perm`` is non-``NULL``, the
     permutation of the columns will also be applied to ``perm``.
@@ -130,22 +140,22 @@ Addition, scalar multiplication
 
 .. function:: void fmpq_mat_add(fmpq_mat_t mat, const fmpq_mat_t mat1, const fmpq_mat_t mat2)
 
-    Sets ``mat`` to the sum of ``mat1`` and ``mat2``, 
+    Sets ``mat`` to the sum of ``mat1`` and ``mat2``,
     assuming that all three matrices have the same dimensions.
 
 .. function:: void fmpq_mat_sub(fmpq_mat_t mat, const fmpq_mat_t mat1, const fmpq_mat_t mat2)
 
-    Sets ``mat`` to the difference of ``mat1`` and ``mat2``, 
+    Sets ``mat`` to the difference of ``mat1`` and ``mat2``,
     assuming that all three matrices have the same dimensions.
 
 .. function:: void fmpq_mat_neg(fmpq_mat_t rop, const fmpq_mat_t op)
 
-    Sets ``rop`` to the negative of ``op``, assuming that 
+    Sets ``rop`` to the negative of ``op``, assuming that
     the two matrices have the same dimensions.
 
 .. function:: void fmpq_mat_scalar_mul_fmpq(fmpq_mat_t rop, const fmpq_mat_t op, const fmpq_t x)
 
-    Sets ``rop`` to ``op`` multiplied by the rational `x`, 
+    Sets ``rop`` to ``op`` multiplied by the rational `x`,
     assuming that the two matrices have the same dimensions.
 
     Note that the rational ``x`` may not be aliased with any part of the
@@ -153,19 +163,19 @@ Addition, scalar multiplication
 
 .. function:: void fmpq_mat_scalar_mul_fmpz(fmpq_mat_t rop, const fmpq_mat_t op, const fmpz_t x)
 
-    Sets ``rop`` to ``op`` multiplied by the integer `x`, 
+    Sets ``rop`` to ``op`` multiplied by the integer `x`,
     assuming that the two matrices have the same dimensions.
 
-    Note that the integer `x` may not be aliased with any part of 
+    Note that the integer `x` may not be aliased with any part of
     the entries of ``rop``.
 
 .. function:: void fmpq_mat_scalar_div_fmpz(fmpq_mat_t rop, const fmpq_mat_t op, const fmpz_t x)
 
-    Sets ``rop`` to ``op`` divided by the integer `x`, 
-    assuming that the two matrices have the same dimensions 
+    Sets ``rop`` to ``op`` divided by the integer `x`,
+    assuming that the two matrices have the same dimensions
     and that `x` is non-zero.
 
-    Note that the integer `x` may not be aliased with any part of 
+    Note that the integer `x` may not be aliased with any part of
     the entries of ``rop``.
 
 
@@ -549,7 +559,7 @@ Gram-Schmidt Orthogonalisation
 
     Takes a subset of `\mathbb{Q}^m` `S = \{a_1, a_2, \ldots ,a_n\}` (as the
     columns of a `m \times n` matrix ``A``) and generates an orthogonal set
-    `S' = \{b_1, b_2, \ldots ,b_n\}` (as the columns of the `m \times n` matrix 
+    `S' = \{b_1, b_2, \ldots ,b_n\}` (as the columns of the `m \times n` matrix
     ``B``) that spans the same subspace of `\mathbb{Q}^m` as `S`.
 
 

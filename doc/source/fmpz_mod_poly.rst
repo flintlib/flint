@@ -3,7 +3,70 @@
 **fmpz_mod_poly.h** -- polynomials over integers mod n
 ===============================================================================
 
-Description.
+The :type:`fmpz_mod_poly_t` data type represents elements of
+`\\mathbb{Z}/n\\mathbb{Z}[x]` for a fixed modulus `n`. The
+:type:`fmpz_mod_poly` module provides routines for memory management,
+basic arithmetic and some higher level functions such as GCD, etc.
+
+Each coefficient of an :type:`fmpz_mod_poly_t` is of type :type:`fmpz`
+and represents an integer reduced modulo the fixed modulus `n` in the
+range `[0,n)`.
+
+Unless otherwise specified, all functions in this section permit
+aliasing between their input arguments and between their input and
+output arguments.
+
+The :type:`fmpz_mod_poly_t` type is a typedef for an array of length 1
+of :type:`fmpz_mod_poly_struct`'s. This permits passing parameters of
+type :type:`fmpz_mod_poly_t` by reference.
+
+In reality one never deals directly with the ``struct`` and simply
+deals with objects of type :type:`fmpz_mod_poly_t`. For simplicity we
+will think of an :type:`fmpz_mod_poly_t` as a ``struct``, though in
+practice to access fields of this ``struct``, one needs to dereference
+first, e.g. to access the ``length`` field of an
+:type:`fmpz_mod_poly_t` called ``poly1`` one writes ``poly1->length``.
+
+An :type:`fmpz_mod_poly_t` is said to be *normalised* if either
+``length`` is zero, or if the leading coefficient of the polynomial is
+non-zero. All :type:`fmpz_mod_poly` functions expect their inputs to
+be normalised and all coefficients to be reduced modulo `n`, and
+unless otherwise specified they produce output that is normalised with
+coefficients reduced modulo `n`.
+
+Simple example
+--------------
+
+The following example computes the square of the polynomial `5x^3 + 6`
+in `\mathbb{Z}/7\Z[x]`.
+
+.. code:: c
+
+   #include "fmpz_mod_poly.h"
+   int main()
+   {
+       fmpz_t n;
+       fmpz_mod_poly_t x, y;
+
+       fmpz_init_set_ui(n, 7);
+       fmpz_mod_poly_init(x, n);
+       fmpz_mod_poly_init(y, n);
+       fmpz_mod_poly_set_coeff_ui(x, 3, 5);
+       fmpz_mod_poly_set_coeff_ui(x, 0, 6);
+       fmpz_mod_poly_sqr(y, x);
+       fmpz_mod_poly_print(x); flint_printf("\n");
+       fmpz_mod_poly_print(y); flint_printf("\n");
+       fmpz_mod_poly_clear(x);
+       fmpz_mod_poly_clear(y);
+       fmpz_clear(n);
+   }
+
+The output is:
+
+::
+
+   4 7  6 0 0 5
+   7 7  1 0 0 4 0 0 4
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -1692,7 +1755,7 @@ Modular composition
     Horner evaluations across :func:`flint_get_num_threads` threads.
 
 .. function:: void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys, slong len1, slong n, const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly, const fmpz_mod_poly_t polyinv, const fmpz_mod_ctx_t ctx, thread_pool_handle * threads, slong num_threads)
- 
+
     Multithreaded version of
     :func:`fmpz_mod_poly_compose_mod_brent_kung_vec_preinv`. Distributing the
     Horner evaluations across :func:`flint_get_num_threads` threads.

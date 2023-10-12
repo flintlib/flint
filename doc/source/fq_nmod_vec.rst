@@ -3,9 +3,6 @@
 **fq_nmod_vec.h** -- vectors over finite fields (word-size characteristic)
 ===============================================================================
 
-Description.
-
-
 Memory management
 --------------------------------------------------------------------------------
 
