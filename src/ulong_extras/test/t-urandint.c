@@ -9,11 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(n_urandint)
 {
     ulong limit, rand_num;
     slong deviation;
@@ -21,11 +20,6 @@ main(void)
     int * count;
     int * count_in_subrange;
     slong test_multiplier;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("n_urandint....");
-    fflush(stdout);
 
     test_multiplier = FLINT_MAX(1, flint_test_multiplier());
 
@@ -125,8 +119,5 @@ main(void)
 
     flint_free(count_in_subrange);
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }
