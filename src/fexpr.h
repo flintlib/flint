@@ -94,7 +94,7 @@ FEXPR_INLINE fexpr_ptr
 _fexpr_vec_init(slong len)
 {
     slong i;
-    fexpr_ptr vec = (fexpr_struct *) flint_malloc(sizeof(fexpr_struct) * len);
+    fexpr_ptr vec = (fexpr_ptr) flint_malloc(sizeof(fexpr_struct) * len);
     for (i = 0; i < len; i++)
         fexpr_init(vec + i);
     return vec;
@@ -456,7 +456,7 @@ fexpr_vec_init(fexpr_vec_t vec, slong len)
     else
     {
         slong i;
-        vec->entries = flint_malloc(sizeof(fexpr_struct) * len);
+        vec->entries = (fexpr_ptr) flint_malloc(sizeof(fexpr_struct) * len);
         for (i = 0; i < len; i++)
             fexpr_init(vec->entries + i);
         vec->length = vec->alloc = len;
