@@ -38,7 +38,6 @@ jobs:
           root_file:
           compiler:
           args:
-          working_directory: doc
           extra_system_packages: "python3-sphinx make"
           entrypoint: doc/entrypoint.sh
 
