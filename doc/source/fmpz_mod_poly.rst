@@ -38,7 +38,7 @@ Simple example
 --------------
 
 The following example computes the square of the polynomial `5x^3 + 6`
-in `\mathbb{Z}/7\Z[x]`.
+in `\mathbb{Z}/7\mathbb Z[x]`.
 
 .. code:: c
 

@@ -46,7 +46,7 @@ Simple example
 --------------
 
 The following example computes the square of the polynomial `5x^3 + 6`
-in `\mathbb{Z}/7\\mathbb{Z}[x]`.
+in `\mathbb{Z}/7\mathbb{Z}[x]`.
 
 .. code:: c
 
@@ -169,11 +169,12 @@ Polynomial properties
 .. function:: int nmod_poly_is_unit(const nmod_poly_t poly)
 
    Returns `1` if the polynomial is a nonzero constant (in the case of prime
-   modulus, this is equivalent to being a unit).
+   modulus, this is equivalent to being a unit), otherwise `0`.
 
 .. function:: int nmod_poly_is_monic(const nmod_poly_t poly)
 
-   Returns `1` if the polynomial is monic, i.e. nonzero with leading coefficient `1`.
+   Returns `1` if the polynomial is monic, i.e. nonzero with leading
+   coefficient `1`, otherwise `0`.
 
 
 Assignment and basic manipulation
@@ -401,14 +402,15 @@ Comparison
 
 .. function:: int nmod_poly_equal_nmod(const nmod_poly_t poly, ulong cst)
 
-    Returns `1` if the polynomial ``poly`` is constant, equal to ``cst``.
+    Returns `1` if the polynomial ``poly`` is constant, equal to ``cst``,
+    otherwise `0`.
     ``cst`` is assumed to be already reduced, i.e. less than the modulus of
     ``poly``.
 
 .. function:: int nmod_poly_equal_ui(const nmod_poly_t poly, ulong cst)
 
-    Returns `1` if the polynomial ``poly`` is constant, equal to ``cst`` up to
-    reduction modulo the modulus of ``poly``.
+    Returns `1` if the polynomial ``poly`` is constant and equal to ``cst`` up to
+    reduction modulo the modulus of ``poly``, otherwise returns `0`.
 
 .. function:: int nmod_poly_equal_trunc(const nmod_poly_t poly1, const nmod_poly_t poly2, slong n)
 
@@ -428,7 +430,8 @@ Comparison
 .. function:: int nmod_poly_is_gen(const nmod_poly_t poly)
 
    Returns `1` if the polynomial is the generating indeterminate (i.e. has
-   degree `1`, constant coefficient `0`, and leading coefficient `1`).
+   degree `1`, constant coefficient `0`, and leading coefficient `1`), otherwise
+   returns `0`.
 
 
 Shifting
@@ -444,7 +447,7 @@ Shifting
 .. function:: void nmod_poly_shift_left(nmod_poly_t res, const nmod_poly_t poly, slong k)
 
     Sets ``res`` to ``poly`` shifted left by ``k`` coefficients,
-    i.e.\ multiplied by `x^k`.
+    i.e. multiplied by `x^k`.
 
 .. function:: void _nmod_poly_shift_right(mp_ptr res, mp_srcptr poly, slong len, slong k)
 
@@ -532,7 +535,7 @@ Bit packing and unpacking
 .. function:: void _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, slong len, flint_bitcnt_t bits)
 
     Packs ``len`` coefficients of ``poly`` into fields of the given
-    number of bits in the large integer ``res``, i.e.\ evaluates
+    number of bits in the large integer ``res``, i.e. evaluates
     ``poly`` at ``2^bits`` and store the result in ``res``.
     Assumes ``len > 0`` and ``bits > 0``. Also assumes that no
     coefficient of ``poly`` is bigger than ``bits/2`` bits. We
@@ -1403,7 +1406,7 @@ Composition
 .. function:: void _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, nmod_t mod)
 
     Composes ``poly1`` of length ``len1`` with ``poly2`` of length
-    ``len2`` and sets ``res`` to the result, i.e.\ evaluates
+    ``len2`` and sets ``res`` to the result, i.e. evaluates
     ``poly1`` at ``poly2``. The algorithm used is Horner's algorithm.
     We require that ``res`` have space for ``(len1 - 1)*(len2 - 1) + 1``
     coefficients. It is assumed that ``len1 > 0`` and ``len2 > 0``.
@@ -1411,13 +1414,13 @@ Composition
 .. function:: void nmod_poly_compose_horner(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2)
 
     Composes ``poly1`` with ``poly2`` and sets ``res`` to the result,
-    i.e.\ evaluates ``poly1`` at ``poly2``. The algorithm used is
+    i.e. evaluates ``poly1`` at ``poly2``. The algorithm used is
     Horner's algorithm.
 
 .. function:: void _nmod_poly_compose_divconquer(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, nmod_t mod)
 
     Composes ``poly1`` of length ``len1`` with ``poly2`` of length
-    ``len2`` and sets ``res`` to the result, i.e.\ evaluates
+    ``len2`` and sets ``res`` to the result, i.e. evaluates
     ``poly1`` at ``poly2``. The algorithm used is the divide and
     conquer algorithm. We require that ``res`` have space for
     ``(len1 - 1)*(len2 - 1) + 1`` coefficients. It is assumed that
@@ -1426,13 +1429,13 @@ Composition
 .. function:: void nmod_poly_compose_divconquer(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2)
 
     Composes ``poly1`` with ``poly2`` and sets ``res`` to the result,
-    i.e.\ evaluates ``poly1`` at ``poly2``. The algorithm used is
+    i.e. evaluates ``poly1`` at ``poly2``. The algorithm used is
     the divide and conquer algorithm.
 
 .. function:: void _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, nmod_t mod)
 
     Composes ``poly1`` of length ``len1`` with ``poly2`` of length
-    ``len2`` and sets ``res`` to the result, i.e.\ evaluates ``poly1``
+    ``len2`` and sets ``res`` to the result, i.e. evaluates ``poly1``
     at ``poly2``. We require that ``res`` have space for
     ``(len1 - 1)*(len2 - 1) + 1`` coefficients. It is assumed that
     ``len1 > 0`` and ``len2 > 0``.
@@ -1946,7 +1949,7 @@ Greatest common divisor
 
 
 
-Power series composition
+Discriminant
 --------------------------------------------------------------------------------
 
 
@@ -1958,10 +1961,10 @@ Power series composition
 
     Return the discriminant of `f`.
     We normalise the discriminant so that
-    `\operatorname{disc}(f) = (-1)^(n(n-1)/2) \operatorname{res}(f, f') /
-    \operatorname{lc}(f)^(n - m - 2)`, where ``n = len(f)`` and
+    `\operatorname{disc}(f) = (-1)^{n(n-1)/2} \operatorname{res}(f, f') /
+    \operatorname{lc}(f)^{n - m - 2}`, where ``n = len(f)`` and
     ``m = len(f')``. Thus `\operatorname{disc}(f) =
-    \operatorname{lc}(f)^(2n - 2) \prod_{i < j} (r_i - r_j)^2`, where
+    \operatorname{lc}(f)^{2n - 2} \prod_{i < j} (r_i - r_j)^2`, where
     `\operatorname{lc}(f)` is the leading coefficient of `f` and `r_i` are the
     roots of `f`.
 
@@ -1977,7 +1980,7 @@ Power series composition
     to be zero.
 
     Assumes that ``len1, len2, n > 0``, that ``len1, len2 <= n``,
-    and that\\ ``(len1-1) * (len2-1) + 1 <= n``, and that ``res`` has
+    and that ``(len1-1) * (len2-1) + 1 <= n``, and that ``res`` has
     space for ``n`` coefficients. Does not support aliasing between any
     of the inputs and the output.
 

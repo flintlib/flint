@@ -25,7 +25,7 @@ int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize, slong start, slong stop
 
     for (i = start; i < stop; i++)
     {
-        if (flint_mpn_divisible_1_p(x, xsize, primes[i]))
+        if (flint_mpn_divisible_1_odd(x, xsize, primes[i]))
             return i;
     }
     return 0;
