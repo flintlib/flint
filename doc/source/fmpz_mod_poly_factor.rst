@@ -3,8 +3,6 @@
 **fmpz_mod_poly_factor.h** -- factorisation of polynomials over integers mod n
 ==================================================================================================
 
-Description.
-
 Types, macros and constants
 -------------------------------------------------------------------------------
 
@@ -86,11 +84,11 @@ Factorisation
 
 .. function:: int fmpz_mod_poly_is_irreducible_rabin_f(fmpz_t r, const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx)
 
-    Either sets `r` to `1` and returns 1 if the polynomial ``f`` is 
+    Either sets `r` to `1` and returns 1 if the polynomial ``f`` is
     irreducible or `0` otherwise, or sets `r` to a nontrivial factor of
     `p`.
 
-    This algorithm correctly determines whether `f` is irreducible over 
+    This algorithm correctly determines whether `f` is irreducible over
     `\mathbb{Z}/p\mathbb{Z}`, even for composite `f`, or it finds a factor
     of `p`.
 
@@ -201,4 +199,3 @@ Root Finding
     The roots are first found modulo the primes in `n`, then lifted to the corresponding prime powers, then combined into roots of the original polynomial `f`.
     A return of `1` indicates the function was successful. A return of `0` indicates the function was not able to find the roots, possibly because there are too many of them.
     This function throws if `f` is zero.
-

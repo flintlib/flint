@@ -3,17 +3,12 @@
 **fq_poly_factor.h** -- factorisation of univariate polynomials over finite fields
 ==================================================================================
 
-Description.
-
 Types, macros and constants
 -------------------------------------------------------------------------------
 
 .. type:: fq_poly_factor_struct
 
 .. type:: fq_poly_factor_t
-
-    Description.
-
 
 Memory Management
 --------------------------------------------------------------------------------

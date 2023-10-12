@@ -3,17 +3,12 @@
 **fq_zech_mat.h** -- matrices over finite fields (Zech logarithm representation)
 ================================================================================
 
-Description.
-
 Types, macros and constants
 -------------------------------------------------------------------------------
 
 .. type:: fq_zech_mat_struct
 
 .. type:: fq_zech_mat_t
-
-    Description.
-
 
 Memory management
 --------------------------------------------------------------------------------
@@ -406,7 +401,7 @@ Triangular solving
       \begin{pmatrix} A & 0 \\ C & D \end{pmatrix}^{-1}
       \begin{pmatrix} X \\ Y \end{pmatrix} =
       \begin{pmatrix} A^{-1} X \\ D^{-1} ( Y - C A^{-1} X ) \end{pmatrix}
-    
+
 
     to reduce the problem to matrix multiplication and triangular
     solving of smaller systems.
@@ -442,7 +437,7 @@ Triangular solving
         \begin{pmatrix} A & B \\ 0 & D \end{pmatrix}^{-1}
         \begin{pmatrix} X \\ Y \end{pmatrix} =
         \begin{pmatrix} A^{-1} (X - B D^{-1} Y) \\ D^{-1} Y \end{pmatrix}
-    
+
 
     to reduce the problem to matrix multiplication and triangular
     solving of smaller systems.
