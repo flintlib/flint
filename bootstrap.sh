@@ -2,7 +2,7 @@
 
 rm -rf autom4te.cache
 
-autoreconf -f -i -s -v -Wall
+autoreconf -f -i -v -Wall
 
 # The following lines are from Semigroups/Semigroups, written by Max Horn.
 if ! test -x config.guess -a -x config.sub ;
@@ -17,7 +17,7 @@ fi
 # by the bug, we add a test to limit when this workaround is applied
 if fgrep -q ac_aux_dir/install-sh configure ;
 then
-    touch install-sh
+    touch config/install-sh
 fi
 
 rm -rf autom4te.cache

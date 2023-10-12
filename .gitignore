@@ -9,9 +9,12 @@
 *.ppm
 */.deps/*
 src/fmpz/fmpz.c
-src/flint-config.h
+src/config.h
+src/config.h.in
 src/fft_tuning.h
+src/flint-config.h
 build/
+config/
 config.log
 /Makefile
 doc/build
@@ -46,12 +49,7 @@ flint2
 .DS_Store
 python/__pycache__/*.pyc
 aclocal.m4
-config.guess
 config.status
-config.sub
 configure
-install-sh
 libtool
-ltmain.sh
-src/config.h.in
 flint.pc

@@ -206,17 +206,13 @@ void nmod_poly_one(nmod_poly_t res)
     res->coeffs[0] = 1;
 }
 
+void nmod_poly_set_trunc(nmod_poly_t res, const nmod_poly_t poly, slong len);
+
 NMOD_POLY_INLINE
 void nmod_poly_truncate(nmod_poly_t poly, slong len)
 {
-    if (poly->length > len)
-    {
-        poly->length = len;
-        _nmod_poly_normalise(poly);
-    }
+    nmod_poly_set_trunc(poly, poly, len);
 }
-
-void nmod_poly_set_trunc(nmod_poly_t res, const nmod_poly_t poly, slong n);
 
 void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, slong len, slong m);
 void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, slong m);
@@ -251,6 +247,14 @@ int nmod_poly_is_gen(const nmod_poly_t poly)
     return (poly->mod.n == 0) ||
            (poly->length == 2 && poly->coeffs[0] == 0 && poly->coeffs[1] == 1);
 }
+
+NMOD_POLY_INLINE
+int nmod_poly_is_monic(const nmod_poly_t poly)
+{
+    return (poly->length && poly->coeffs[(poly->length - 1)] == 1);
+}
+
+
 
 /* Randomisation  ************************************************************/
 
