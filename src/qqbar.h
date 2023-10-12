@@ -54,7 +54,7 @@ QQBAR_INLINE qqbar_ptr
 _qqbar_vec_init(slong len)
 {
     slong i;
-    qqbar_ptr vec = flint_malloc(len * sizeof(qqbar_struct));
+    qqbar_ptr vec = (qqbar_ptr) flint_malloc(len * sizeof(qqbar_struct));
     for (i = 0; i < len; i++)
         qqbar_init(vec + i);
     return vec;
