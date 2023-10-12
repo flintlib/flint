@@ -1,3 +1,3 @@
 #!/bin/bash
 
-make pdf
+make latex -W
