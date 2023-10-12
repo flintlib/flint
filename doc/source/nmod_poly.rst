@@ -399,11 +399,16 @@ Comparison
 
     Returns `1` if the polynomials are equal, otherwise `0`.
 
-.. function:: int nmod_poly_equal_ui(const nmod_poly_t poly, mp_limb_t cst)
+.. function:: int nmod_poly_equal_nmod(const nmod_poly_t poly, ulong cst)
 
     Returns `1` if the polynomial ``poly`` is constant, equal to ``cst``.
     ``cst`` is assumed to be already reduced, i.e. less than the modulus of
     ``poly``.
+
+.. function:: int nmod_poly_equal_ui(const nmod_poly_t poly, ulong cst)
+
+    Returns `1` if the polynomial ``poly`` is constant, equal to ``cst`` up to
+    reduction modulo the modulus of ``poly``.
 
 .. function:: int nmod_poly_equal_trunc(const nmod_poly_t poly1, const nmod_poly_t poly2, slong n)
 

@@ -22,6 +22,7 @@
 #define NMOD_POLY_INLINE static __inline__
 #endif
 
+#include "nmod.h" /* for nmod_set_ui */
 #include "nmod_types.h"
 #include "thread_pool.h"
 
@@ -220,7 +221,15 @@ void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, slong m);
 /* Comparison  ***************************************************************/
 
 int nmod_poly_equal(const nmod_poly_t a, const nmod_poly_t b);
-int nmod_poly_equal_ui(const nmod_poly_t poly, mp_limb_t cst);
+
+int nmod_poly_equal_nmod(const nmod_poly_t poly, ulong cst);
+
+NMOD_POLY_INLINE
+int nmod_poly_equal_ui(const nmod_poly_t poly, ulong cst)
+{
+    return nmod_poly_equal_nmod(poly, nmod_set_ui(cst, poly->mod));
+}
+
 int nmod_poly_equal_trunc(const nmod_poly_t poly1, const nmod_poly_t poly2, slong n);
 
 NMOD_POLY_INLINE
