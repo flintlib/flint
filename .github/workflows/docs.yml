@@ -22,13 +22,6 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Install TeX Live
-        uses: zauguin/install-texlive@v2
-        with:
-          packages: >-
-            latexmk
-            pdftex
-
       - name: "Setup"
         run: |
           sudo apt install -y python3-sphinx
@@ -40,15 +33,18 @@ jobs:
           make html SPHINXOPTS="-W -j auto"
 
       - name: "Build pdf documentation"
-        run: |
-          cd doc
-          make latexpdf SPHINXOPTS="-W -j auto"
+        uses: dante-ev/latex-action@latest
+        with:
+          root_file:
+          compiler:
+          args:
+          entrypoint: doc/entrypoint.sh
 
       - name: "Create a tarball of the documentation"
         run: |
           cd doc/build
           mv html doc
-          mv latex/Flint.pdf doc
+          cp latex/Flint.pdf doc
           tar -czvf doc.tar.gz doc
 
       - name: "Setup SSH key"
