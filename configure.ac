@@ -655,7 +655,7 @@ fi
 # check libraries
 ################################################################################
 
-AC_SEARCH_LIBS([fabs],[m],
+AC_SEARCH_LIBS([atan2],[m],
    [],
    [AC_MSG_ERROR(["The C math library was not found!"])])
 
