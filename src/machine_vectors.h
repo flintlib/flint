@@ -1540,7 +1540,7 @@ FLINT_FORCE_INLINE vec8n vec8n_bit_shift_right_32(vec8n a)
 
 #else
 
-#error machine_vector.h not implmented
+#error machine_vector.h not implemented
 
 #endif
 
