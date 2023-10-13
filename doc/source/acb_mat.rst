@@ -96,6 +96,18 @@ Conversions
 
     Sets *dest* to *src*. The operands must have identical dimensions.
 
+.. function:: void acb_mat_get_real(arb_mat_t re, const arb_mat_t mat)
+
+.. function:: void acb_mat_get_imag(arb_mat_t im, const arb_mat_t mat)
+
+    Sets *re* or *im* to the real or imaginary part of *mat*, respectively.
+    The operands must have identical dimensions.
+
+.. function:: void acb_mat_set_real_imag(acb_mat_t mat, const arb_mat_t re, const arb_mat_t im)
+
+    Sets *mat* to the complex matrix with real and imaginary parts *re*, *im*.
+    The operands must have identical dimensions.
+
 Random generation
 -------------------------------------------------------------------------------
 
@@ -209,6 +221,11 @@ Special matrices
 .. function:: void acb_mat_ones(acb_mat_t mat)
 
     Sets all entries in the matrix to ones.
+
+.. function:: void acb_mat_onei(acb_mat_t mat)
+
+    Sets the entries of the main diagonal to `i = \sqrt{-1}` and all other
+    entries to zero.
 
 .. function:: void acb_mat_indeterminate(acb_mat_t mat)
 
@@ -363,6 +380,16 @@ Scalar arithmetic
 
     Sets *B* to `A / c`.
 
+Vector arithmetic
+-------------------------------------------------------------------------------
+
+.. function:: void acb_mat_vector_mul_row(acb_ptr res, acb_srcptr v, const acb_mat_t A, slong prec)
+
+.. function:: void acb_mat_vector_mul_col(acb_ptr res, const acb_mat_t A, acb_srcptr v, slong prec)
+
+    Sets *res* to the product `vA`, (resp. `Av`), where *res* and *v* are seen
+    as row (resp. column) vectors. The lengths of the vectors must match the
+    dimensions of *A*.
 
 Gaussian elimination and solving
 -------------------------------------------------------------------------------

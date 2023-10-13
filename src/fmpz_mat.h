@@ -507,6 +507,8 @@ int fmpz_mat_hadamard(fmpz_mat_t A);
 
 void fmpz_mat_gram(fmpz_mat_t B, const fmpz_mat_t A);
 
+int fmpz_mat_is_spd(const fmpz_mat_t A);
+
 /* Conversions **************************************************************/
 
 int fmpz_mat_get_d_mat(d_mat_t B, const fmpz_mat_t A);

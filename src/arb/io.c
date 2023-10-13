@@ -117,6 +117,34 @@ void arb_print(const arb_t x) { arb_fprint(stdout, x); }
 void arb_printd(const arb_t x, slong digits) { arb_fprintd(stdout, x, digits); }
 void arb_printn(const arb_t x, slong digits, ulong flags) { arb_fprintn(stdout, x, digits, flags); }
 
+void
+_arb_vec_printn(arb_srcptr vec, slong len, slong ndigits, ulong flags)
+{
+    slong i;
+    for (i = 0; i < len; i++)
+    {
+        arb_printn(vec + i, ndigits, flags);
+        if (i < len - 1)
+            flint_printf(", ");
+    }
+}
+
+void
+_arb_vec_printd(arb_srcptr vec, slong len, slong ndigits)
+{
+    slong i;
+    for (i = 0; i < len; i++)
+    {
+        arb_printd(vec + i, ndigits);
+        if (i < len - 1)
+        {
+            flint_printf(", ");
+        }
+    }
+    flint_printf("\n");
+}
+
+
 /* file I/O *******************************************************************/
 
 int

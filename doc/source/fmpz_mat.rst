@@ -1405,12 +1405,17 @@ Cholesky Decomposition
 --------------------------------------------------------------------------------
 
 
+.. function:: void fmpz_mat_is_spd(const fmpz_mat_t A)
+
+    Returns true iff ``A`` is symmetric and positive definite, or equivalently
+    ``A`` is symmetric and the determinants of its principal minors are all
+    positive.
+
 .. function:: void fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A)
 
     Computes ``R``, the Cholesky factor of a symmetric, positive definite
     matrix ``A`` using the Cholesky decomposition process. (Sets ``R``
     such that `A = RR^{T}` where ``R`` is a lower triangular matrix.)
-
 
 LLL
 --------------------------------------------------------------------------------

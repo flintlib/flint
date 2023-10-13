@@ -48,6 +48,22 @@ arb_randtest_precise(arb_t x, flint_rand_t state, slong prec, slong mag_bits)
 }
 
 void
+arb_randtest_positive(arb_t x, flint_rand_t state, slong prec, slong mag_bits)
+{
+    int stop = 0;
+
+    while (!stop)
+    {
+        arb_randtest_precise(x, state, prec, mag_bits);
+        stop = !arb_contains_zero(x);
+    }
+    if (!arb_is_positive(x))
+    {
+        arb_neg(x, x);
+    }
+}
+
+void
 arb_randtest(arb_t x, flint_rand_t state, slong prec, slong mag_bits)
 {
     switch (n_randint(state, 8))

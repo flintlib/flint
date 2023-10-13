@@ -509,6 +509,28 @@ acb_div_onei(acb_t z, const acb_t x)
     }
 }
 
+ACB_INLINE void
+acb_mul_powi(acb_t z, const acb_t x, slong k)
+{
+    k = ((k % 4) + 4) % 4;
+    if (k == 0)
+    {
+        acb_set(z, x);
+    }
+    else if (k == 1)
+    {
+        acb_mul_onei(z, x);
+    }
+    else if (k == 2)
+    {
+        acb_neg(z, x);
+    }
+    else
+    {
+        acb_div_onei(z, x);
+    }
+}
+
 void acb_mul(acb_t z, const acb_t x, const acb_t y, slong prec);
 
 void acb_mul_naive(acb_t z, const acb_t x, const acb_t y, slong prec);
@@ -745,6 +767,7 @@ void acb_pow(acb_t r, const acb_t x, const acb_t y, slong prec);
 
 void acb_sqrt(acb_t y, const acb_t x, slong prec);
 void acb_rsqrt(acb_t y, const acb_t x, slong prec);
+void acb_sqrts(acb_t y1, acb_t y2, const acb_t x, slong prec);
 
 void acb_root_ui(acb_t y, const acb_t x, ulong k, slong prec);
 
@@ -981,6 +1004,14 @@ _acb_vec_scalar_div_fmpz(acb_ptr res, acb_srcptr vec, slong len, const fmpz_t c,
         acb_div_fmpz(res + i, vec + i, c, prec);
 }
 
+ACB_INLINE void
+_acb_vec_sqr(acb_ptr res, acb_srcptr vec, slong len, slong prec)
+{
+    slong i;
+    for (i = 0; i < len; i++)
+        acb_sqr(res + i, vec + i, prec);
+}
+
 #ifdef FLINT_HAVE_FILE
 void acb_fprint(FILE * file, const acb_t x);
 void acb_fprintd(FILE * file, const acb_t z, slong digits);
@@ -991,6 +1022,7 @@ void acb_print(const acb_t x);
 void acb_printd(const acb_t z, slong digits);
 void acb_printn(const acb_t x, slong digits, ulong flags);
 
+void _acb_vec_printd(acb_srcptr vec, slong len, slong ndigits);
 void _acb_vec_printn(acb_srcptr vec, slong len, slong ndigits, ulong flags);
 
 void acb_randtest(acb_t z, flint_rand_t state, slong prec, slong mag_bits);
@@ -1000,6 +1032,8 @@ void acb_randtest_special(acb_t z, flint_rand_t state, slong prec, slong mag_bit
 void acb_randtest_precise(acb_t z, flint_rand_t state, slong prec, slong mag_bits);
 
 void acb_randtest_param(acb_t z, flint_rand_t state, slong prec, slong mag_bits);
+
+void acb_urandom(acb_t z, flint_rand_t state, slong prec);
 
 slong acb_rel_error_bits(const acb_t x);
 
@@ -1044,6 +1078,80 @@ ACB_INLINE int
 _acb_vec_is_finite(acb_srcptr vec, slong len)
 {
     return _arb_vec_is_finite((arb_srcptr) vec, 2 * len);
+}
+
+ACB_INLINE int
+_acb_vec_equal(acb_srcptr vec1, acb_srcptr vec2, slong len)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+    {
+        if (!acb_equal(vec1 + i, vec2 + i))
+            return 0;
+    }
+    return 1;
+}
+
+ACB_INLINE int
+_acb_vec_overlaps(acb_srcptr vec1, acb_srcptr vec2, slong len)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+    {
+        if (!acb_overlaps(vec1 + i, vec2 + i))
+            return 0;
+    }
+
+    return 1;
+}
+
+ACB_INLINE int
+_acb_vec_contains(acb_srcptr vec1, acb_srcptr vec2, slong len)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+    {
+        if (!acb_contains(vec1 + i, vec2 + i))
+            return 0;
+    }
+
+    return 1;
+}
+
+ACB_INLINE void
+_acb_vec_get_real(arb_ptr re, acb_srcptr vec, slong len)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+    {
+        arb_set(re + i, acb_realref(vec + i));
+    }
+}
+
+ACB_INLINE void
+_acb_vec_get_imag(arb_ptr im, acb_srcptr vec, slong len)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+    {
+        arb_set(im + i, acb_imagref(vec + i));
+    }
+}
+
+ACB_INLINE void
+_acb_vec_set_real_imag(acb_ptr vec, arb_srcptr re, arb_srcptr im, slong len)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+    {
+        acb_set_arb_arb(vec + i, re + i, im + i);
+    }
 }
 
 ACB_INLINE slong

@@ -84,6 +84,12 @@ void acb_mat_set_arb_mat(acb_mat_t dest, const arb_mat_t src);
 
 void acb_mat_set_round_arb_mat(acb_mat_t dest, const arb_mat_t src, slong prec);
 
+void acb_mat_get_real(arb_mat_t re, const acb_mat_t mat);
+
+void acb_mat_get_imag(arb_mat_t im, const acb_mat_t mat);
+
+void acb_mat_set_real_imag(acb_mat_t mat, const arb_mat_t re, const arb_mat_t im);
+
 /* Random generation */
 
 void acb_mat_randtest(acb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits);
@@ -175,6 +181,8 @@ void acb_mat_zero(acb_mat_t mat);
 void acb_mat_one(acb_mat_t mat);
 
 void acb_mat_ones(acb_mat_t mat);
+
+void acb_mat_onei(acb_mat_t mat);
 
 void acb_mat_indeterminate(acb_mat_t mat);
 
@@ -350,6 +358,12 @@ acb_mat_scalar_div_arb(acb_mat_t B, const acb_mat_t A, const arb_t c, slong prec
         for (j = 0; j < acb_mat_ncols(A); j++)
             acb_div_arb(acb_mat_entry(B, i, j), acb_mat_entry(A, i, j), c, prec);
 }
+
+/* Vector arithmetic */
+
+void acb_mat_vector_mul_row(acb_ptr res, acb_srcptr v, const acb_mat_t A, slong prec);
+
+void acb_mat_vector_mul_col(acb_ptr res, const acb_mat_t A, acb_srcptr v, slong prec);
 
 /* Solving */
 

@@ -105,3 +105,18 @@ _acb_vec_printn(acb_srcptr vec, slong len, slong ndigits, ulong flags)
             flint_printf(", ");
     }
 }
+
+void
+_acb_vec_printd(acb_srcptr vec, slong len, slong ndigits)
+{
+    slong i;
+    for (i = 0; i < len; i++)
+    {
+        acb_printd(vec + i, ndigits);
+        if (i < len - 1)
+        {
+            flint_printf(", ");
+        }
+    }
+    flint_printf("\n");
+}
