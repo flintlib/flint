@@ -9,17 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
-int
-main(void)
+
+TEST_FUNCTION_START(fmpz_poly_divides)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("divides....");
-    fflush(stdout);
 
     /* Check that b divides a*b and that the quotient is a */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
@@ -151,8 +147,5 @@ main(void)
     }
 
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }

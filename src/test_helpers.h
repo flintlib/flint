@@ -43,4 +43,10 @@ int CAT(test, label)(void)                              \
     return 0;                                           \
 }
 
+#define TEST_FUNCTION_END_SKIPPED                       \
+    FLINT_TEST_CLEANUP(state);                          \
+    printf("SKIPPED\n");                                \
+    return 0;                                           \
+}
+
 #endif
