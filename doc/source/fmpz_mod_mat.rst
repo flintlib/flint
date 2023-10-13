@@ -3,22 +3,12 @@
 **fmpz_mod_mat.h** -- matrices over integers mod n
 ===============================================================================
 
-Description.
-
 Types, macros and constants
 -------------------------------------------------------------------------------
 
 .. type:: fmpz_mod_mat_struct
 
 .. type:: fmpz_mod_mat_t
-
-    Description.
-
-    .. type:: fmpz_mod_mat_struct
-                        
-    .. type:: fmpz_mod_mat_t
-                      
-    Description.
 
 Element access
 --------------------------------------------------------------------------------
@@ -207,7 +197,7 @@ Scalar arithmetic
 
     Set ``B`` to `cA` where ``c`` is a constant.
 
-.. function:: void fmpz_mod_mat_scalar_mul_ui(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, slong c)
+.. function:: void fmpz_mod_mat_scalar_mul_ui(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, ulong c)
 
     Set ``B`` to `cA` where ``c`` is a constant.
 
@@ -306,7 +296,7 @@ Inverse
 --------------------------------------------------------------------------------
 
 
-.. function:: int fmpz_mod_mat_inv(fmpz_mod_mat_t B, fmpz_mod_mat_t A, fmpz_mod_ctx_t ctx)
+.. function:: int fmpz_mod_mat_inv(fmpz_mod_mat_t B, fmpz_mod_mat_t A)
 
     Sets `B = A^{-1}` and returns `1` if `A` is invertible. If `A` is singular,
     returns `0` and sets the elements of `B` to undefined values.
@@ -320,7 +310,7 @@ LU decomposition
 --------------------------------------------------------------------------------
 
 
-.. function:: slong fmpz_mod_mat_lu(slong * P, fmpz_mod_mat_t A, int rank_check, const fmpz_mod_ctx_t ctx)
+.. function:: slong fmpz_mod_mat_lu(slong * P, fmpz_mod_mat_t A, int rank_check)
 
     Computes a generalised LU decomposition `LU = PA` of a given
     matrix `A`, returning the rank of `A`.
@@ -347,7 +337,7 @@ Triangular solving
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpz_mod_mat_solve_tril(fmpz_mod_mat_t X, const fmpz_mod_mat_t L, const fmpz_mod_mat_t B, int unit, const fmpz_mod_ctx_t ctx)
+.. function:: void fmpz_mod_mat_solve_tril(fmpz_mod_mat_t X, const fmpz_mod_mat_t L, const fmpz_mod_mat_t B, int unit)
 
     Sets `X = L^{-1} B` where `L` is a full rank lower triangular
     square matrix. If ``unit`` = 1, `L` is assumed to have ones on
@@ -358,7 +348,7 @@ Triangular solving
 
     The modulus is assumed to be prime.
 
-.. function:: void fmpz_mod_mat_solve_triu(fmpz_mod_mat_t X, const fmpz_mod_mat_t U, const fmpz_mod_mat_t B, int unit, const fmpz_mod_ctx_t ctx)
+.. function:: void fmpz_mod_mat_solve_triu(fmpz_mod_mat_t X, const fmpz_mod_mat_t U, const fmpz_mod_mat_t B, int unit)
 
     Sets `X = U^{-1} B` where `U` is a full rank upper triangular
     square matrix. If ``unit`` = 1, `U` is assumed to have ones on
@@ -374,7 +364,7 @@ Solving
 --------------------------------------------------------------------------------
 
 
-.. function:: int fmpz_mod_mat_solve(fmpz_mod_mat_t X, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B, const fmpz_mod_ctx_t ctx)
+.. function:: int fmpz_mod_mat_solve(fmpz_mod_mat_t X, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B)
 
     Solves the matrix-matrix equation `AX = B`.
 
@@ -382,10 +372,10 @@ Solving
     elements of `X` to undefined values.
 
     The matrix `A` must be square.
-    
+
     The modulus is assumed to be prime.
 
-.. function:: int fmpz_mod_mat_can_solve(fmpz_mod_mat_t X, fmpz_mod_mat_t A, fmpz_mod_mat_t B, const fmpz_mod_ctx_t ctx)
+.. function:: int fmpz_mod_mat_can_solve(fmpz_mod_mat_t X, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B)
 
     Solves the matrix-matrix equation `AX = B` over `Fp`.
 
@@ -402,7 +392,7 @@ Transforms
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpz_mod_mat_similarity(fmpz_mod_mat_t M, slong r, fmpz_t d, fmpz_mod_ctx_t ctx)
+.. function:: void fmpz_mod_mat_similarity(fmpz_mod_mat_t M, slong r, fmpz_t d)
 
     Applies a similarity transform to the `n\times n` matrix `M` in-place.
 
@@ -439,4 +429,3 @@ Minimal polynomial
     is required to be square, otherwise an exception is raised.
 
     The modulus is assumed to be prime.
-

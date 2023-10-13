@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2023 Fredrik Johansson
 
+
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
@@ -11,6 +12,132 @@
 
 #include "gr_vec.h"
 #include "gr_poly.h"
+
+int
+_gr_poly_div_series_basecase_noinv(gr_ptr Q,
+    gr_srcptr A, slong Alen,
+    gr_srcptr B, slong Blen, slong len, gr_ctx_t ctx)
+{
+    int status = GR_SUCCESS;
+    slong sz = ctx->sizeof_elem;
+    slong i, l;
+
+    if (len == 0)
+        return GR_SUCCESS;
+
+    if (Blen == 0)
+        return GR_DOMAIN;
+
+    Alen = FLINT_MIN(Alen, len);
+    Blen = FLINT_MIN(Blen, len);
+
+    if (Blen == 1)
+    {
+        status |= _gr_vec_div_scalar(Q, A, Alen, B, ctx);
+        status |= _gr_vec_zero(GR_ENTRY(Q, Alen, sz), len - Alen, ctx);
+        return status;
+    }
+
+    if (len == 2)
+    {
+        if (Alen == 1)
+        {
+            status |= gr_div(Q, A, B, ctx);
+            status |= gr_div(GR_ENTRY(Q, 1, sz), Q, B, ctx);
+            status |= gr_mul(GR_ENTRY(Q, 1, sz), GR_ENTRY(Q, 1, sz), GR_ENTRY(B, 1, sz), ctx);
+            status |= gr_neg(GR_ENTRY(Q, 1, sz), GR_ENTRY(Q, 1, sz), ctx);
+        }
+        else
+        {
+            status |= gr_div(Q, A, B, ctx);
+            status |= gr_mul(GR_ENTRY(Q, 1, sz), Q, GR_ENTRY(B, 1, sz), ctx);
+            status |= gr_sub(GR_ENTRY(Q, 1, sz), GR_ENTRY(A, 1, sz), GR_ENTRY(Q, 1, sz), ctx);
+            status |= gr_div(GR_ENTRY(Q, 1, sz), GR_ENTRY(Q, 1, sz), B, ctx);
+        }
+
+        return status;
+    }
+
+    status = gr_div(Q, A, B, ctx);
+
+    if (status == GR_SUCCESS)
+    {
+        for (i = 1; i < len; i++)
+        {
+            l = FLINT_MIN(i, Blen - 1);
+
+            status |= _gr_vec_dot_rev(GR_ENTRY(Q, i, sz), (i < Alen) ? GR_ENTRY(A, i, sz) : NULL, 1, GR_ENTRY(B, 1, sz), GR_ENTRY(Q, i - l, sz), l, ctx);
+            status |= gr_div(GR_ENTRY(Q, i, sz), GR_ENTRY(Q, i, sz), B, ctx);
+
+            if (status != GR_SUCCESS)
+                break;
+        }
+    }
+
+    return status;
+}
+
+int
+_gr_poly_div_series_basecase_preinv1(gr_ptr Q,
+    gr_srcptr A, slong Alen,
+    gr_srcptr B, slong Blen, gr_srcptr Binv, slong len, gr_ctx_t ctx)
+{
+    int status = GR_SUCCESS;
+    slong sz = ctx->sizeof_elem;
+    slong i, l;
+    int is_one;
+
+    if (len == 0)
+        return GR_SUCCESS;
+
+    if (Blen == 0)
+        return GR_DOMAIN;
+
+    Alen = FLINT_MIN(Alen, len);
+    Blen = FLINT_MIN(Blen, len);
+
+    if (Blen == 1)
+    {
+        status |= _gr_vec_mul_scalar(Q, A, Alen, Binv, ctx);
+        status |= _gr_vec_zero(GR_ENTRY(Q, Alen, sz), len - Alen, ctx);
+        return status;
+    }
+
+    if (len == 2)
+    {
+        if (Alen == 1)
+        {
+            status |= gr_mul(Q, A, Binv, ctx);
+            status |= gr_mul(GR_ENTRY(Q, 1, sz), Q, Binv, ctx);
+            status |= gr_mul(GR_ENTRY(Q, 1, sz), GR_ENTRY(Q, 1, sz), GR_ENTRY(B, 1, sz), ctx);
+            status |= gr_neg(GR_ENTRY(Q, 1, sz), GR_ENTRY(Q, 1, sz), ctx);
+        }
+        else
+        {
+            status |= gr_mul(Q, A, Binv, ctx);
+            status |= gr_mul(GR_ENTRY(Q, 1, sz), Q, GR_ENTRY(B, 1, sz), ctx);
+            status |= gr_sub(GR_ENTRY(Q, 1, sz), GR_ENTRY(A, 1, sz), GR_ENTRY(Q, 1, sz), ctx);
+            status |= gr_mul(GR_ENTRY(Q, 1, sz), GR_ENTRY(Q, 1, sz), Binv, ctx);
+        }
+
+        return status;
+    }
+
+    is_one = (gr_is_one(Binv, ctx) == T_TRUE);
+
+    status |= gr_mul(Q, A, Binv, ctx);
+
+    for (i = 1; i < len; i++)
+    {
+        l = FLINT_MIN(i, Blen - 1);
+        status |= _gr_vec_dot_rev(GR_ENTRY(Q, i, sz), (i < Alen) ? GR_ENTRY(A, i, sz) : NULL, 1, GR_ENTRY(B, 1, sz), GR_ENTRY(Q, i - l, sz), l, ctx);
+
+        if (!is_one)
+            status |= gr_mul(GR_ENTRY(Q, i, sz), GR_ENTRY(Q, i, sz), Binv, ctx);
+    }
+
+    return status;
+}
 
 int
 _gr_poly_div_series_basecase_generic(gr_ptr Q,
@@ -78,48 +205,15 @@ _gr_poly_div_series_basecase_generic(gr_ptr Q,
 
     {
         gr_ptr q;
-        int is_one;
-        slong i, l;
 
         GR_TMP_INIT(q, ctx);
 
-        /* todo: we sometimes want to keep dividing, e.g. over RR with small coefficient */
         status = gr_inv(q, B, ctx);
 
-        /* constant is a unit; can multiply by inverse */
         if (status == GR_SUCCESS)
-        {
-            is_one = (gr_is_one(q, ctx) == T_TRUE);
-
-            status |= gr_mul(Q, A, q, ctx);
-
-            for (i = 1; i < len; i++)
-            {
-                l = FLINT_MIN(i, Blen - 1);
-                status |= _gr_vec_dot_rev(GR_ENTRY(Q, i, sz), (i < Alen) ? GR_ENTRY(A, i, sz) : NULL, 1, GR_ENTRY(B, 1, sz), GR_ENTRY(Q, i - l, sz), l, ctx);
-
-                if (!is_one)
-                    status |= gr_mul(GR_ENTRY(Q, i, sz), GR_ENTRY(Q, i, sz), q, ctx);
-            }
-        }
-        else  /* need to check divisions */
-        {
-            status = gr_div(Q, A, B, ctx);
-
-            if (status == GR_SUCCESS)
-            {
-                for (i = 1; i < len; i++)
-                {
-                    l = FLINT_MIN(i, Blen - 1);
-
-                    status |= _gr_vec_dot_rev(GR_ENTRY(Q, i, sz), (i < Alen) ? GR_ENTRY(A, i, sz) : NULL, 1, GR_ENTRY(B, 1, sz), GR_ENTRY(Q, i - l, sz), l, ctx);
-                    status |= gr_div(GR_ENTRY(Q, i, sz), GR_ENTRY(Q, i, sz), B, ctx);
-
-                    if (status != GR_SUCCESS)
-                        break;
-                }
-            }
-        }
+            status = _gr_poly_div_series_basecase_preinv1(Q, A, Alen, B, Blen, q, len, ctx);
+        else
+            status = _gr_poly_div_series_basecase_noinv(Q, A, Alen, B, Blen, len, ctx);
 
         GR_TMP_CLEAR(q, ctx);
     }

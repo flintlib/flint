@@ -96,15 +96,15 @@ Polynomial parameters
 --------------------------------------------------------------------------------
 
 
-.. function:: slong padic_poly_degree(padic_poly_t poly)
+.. function:: slong padic_poly_degree(const padic_poly_t poly)
 
     Returns the degree of the polynomial ``poly``.
 
-.. function:: slong padic_poly_length(padic_poly_t poly)
+.. function:: slong padic_poly_length(const padic_poly_t poly)
 
     Returns the length of the polynomial ``poly``.
 
-.. function:: slong padic_poly_val(padic_poly_t poly)
+.. function:: slong padic_poly_val(const padic_poly_t poly)
 
     Returns the valuation of the polynomial ``poly``, 
     which is defined to be the minimum valuation of all 
@@ -254,7 +254,7 @@ Comparison
 
     Returns whether the polynomial ``poly`` is the zero polynomial.
 
-.. function:: int padic_poly_is_one(const padic_poly_t poly, const padic_ctx_t ctx)
+.. function:: int padic_poly_is_one(const padic_poly_t poly)
 
     Returns whether the polynomial ``poly`` is equal 
     to the constant polynomial~`1`, taking the precision 
@@ -281,7 +281,7 @@ Addition and subtraction
 
     Sets `f` to the sum `g + h`.
 
-.. function:: void _padic_poly_sub(fmpz *rop, slong *rval, const fmpz *op1, slong val1, slong len1, const fmpz *op2, slong val2, slong len2, const padic_ctx_t ctx)
+.. function:: void _padic_poly_sub(fmpz *rop, slong *rval, slong N, const fmpz *op1, slong val1, slong len1, slong N1, const fmpz *op2, slong val2, slong len2, slong N2, const padic_ctx_t ctx)
 
     Sets ``(rop, *val, FLINT_MAX(len1, len2)`` to the difference of 
     ``(op1, val1, len1)`` and ``(op2, val2, len2)``.
@@ -306,7 +306,7 @@ Scalar multiplication
 --------------------------------------------------------------------------------
 
 
-.. function:: void _padic_poly_scalar_mul_padic(fmpz *rop, slong *rval, const fmpz *op, slong val, slong len, const padic_t c, const padic_ctx_t ctx)
+.. function:: void _padic_poly_scalar_mul_padic(fmpz *rop, slong *rval, slong N, const fmpz *op, slong val, slong len, const padic_t c, const padic_ctx_t ctx)
 
     Sets ``(rop, *rval, len)`` to ``(op, val, len)`` multiplied 
     by the scalar `c`.
@@ -421,7 +421,7 @@ Shifting
     Notationally, sets the polynomial ``rop`` to the polynomial ``op`` 
     multiplied by `x^n`, where `n \geq 0`, and reduces the result.
 
-.. function:: void padic_poly_shift_right(padic_poly_t rop, const padic_poly_t op, slong n)
+.. function:: void padic_poly_shift_right(padic_poly_t rop, const padic_poly_t op, slong n, const padic_ctx_t ctx)
 
     Notationally, sets the polynomial ``rop`` to the polynomial 
     ``op`` after floor division by `x^n`, where `n \geq 0`, ensuring 
@@ -530,7 +530,7 @@ Input and output
 
 .. function:: int _padic_poly_fprint_pretty(FILE *file, const fmpz *poly, slong val, slong len, const char *var, const padic_ctx_t ctx)
               int padic_poly_fprint_pretty(FILE *file, const padic_poly_t poly, const char *var, const padic_ctx_t ctx)
-              int _padic_poly_print_pretty(FILE *file, const fmpz *poly, slong val, slong len, const char *var, const padic_ctx_t ctx)
+              int _padic_poly_print_pretty(const fmpz *poly, slong val, slong len, const char *var, const padic_ctx_t ctx)
               int padic_poly_print_pretty(const padic_poly_t poly, const char *var, const padic_ctx_t ctx)
 
 

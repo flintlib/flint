@@ -3,7 +3,34 @@
 **fmpq.h** -- rational numbers
 ===============================================================================
 
-Description.
+The :type:`fmpq_t` data type represents rational numbers as fractions
+of multiprecision integers.
+
+An :type:`fmpq_t` is an array of length 1 of type :type:`fmpq`, with
+:type:`fmpq` being implemented as a pair of :type:`fmpz`'s
+representing numerator and denominator.
+
+This format is designed to allow rational numbers with small
+numerators or denominators to be stored and manipulated efficiently.
+When components no longer fit in single machine words, the cost of
+:type:`fmpq_t` arithmetic is roughly the same as that of ``mpq_t``
+arithmetic, plus a small amount of overhead.
+
+A fraction is said to be in canonical form if the numerator and
+denominator have no common factor and the denominator is positive.
+Except where otherwise noted, all functions in the :type:`fmpq` module
+assume that inputs are in canonical form, and produce outputs in
+canonical form. The user can manipulate the numerator and denominator
+of an :type:`fmpq_t` as arbitrary integers, but then becomes
+responsible for canonicalising the number (for example by calling
+``fmpq_canonicalise``) before passing it to any library function.
+
+For most operations, both a function operating on :type:`fmpq_t`'s and
+an underscore version operating on :type:`fmpz_t` components are
+provided. The underscore functions may perform less error checking,
+and may impose limitations on aliasing between the input and output
+variables, but generally assume that the components are in canonical
+form just like the non-underscore functions.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -128,11 +155,11 @@ Comparison
 
      Returns negative if `x < y`, zero if `x = y`, and positive if `x > y`.
 
-.. function:: int fmpq_equal_ui(const fmpq_t x, ulong y)
+.. function:: int fmpq_equal_ui(fmpq_t x, ulong y)
 
     Returns `1` if `x = y`, otherwise returns `0`.
 
-.. function:: int fmpq_equal_si(const fmpq_t x, slong y)
+.. function:: int fmpq_equal_si(fmpq_t x, slong y)
 
     Returns `1` if `x = y`, otherwise returns `0`.
 
@@ -184,7 +211,7 @@ Conversion
     Sets the value of ``dest`` to that of the ``mpq_t`` variable
     ``src``.
 
-.. function:: void fmpq_set_str(fmpq_t dest, const char * s, int base)
+.. function:: int fmpq_set_str(fmpq_t dest, const char * s, int base)
 
     Sets the value of ``dest`` to the value represented in the string
     ``s`` in base ``base``.
@@ -220,22 +247,22 @@ Conversion
 .. function:: char * _fmpq_get_str(char * str, int b, const fmpz_t num, const fmpz_t den)
               char * fmpq_get_str(char * str, int b, const fmpq_t x)
 
-    Prints the string representation of `x` in base `b \in [2, 36]` 
+    Prints the string representation of `x` in base `b \in [2, 36]`
     to a suitable buffer.
 
-    If ``str`` is not ``NULL``, this is used as the buffer and 
-    also the return value.  If ``str`` is ``NULL``, allocates 
+    If ``str`` is not ``NULL``, this is used as the buffer and
+    also the return value.  If ``str`` is ``NULL``, allocates
     sufficient space and returns a pointer to the string.
 
 .. function:: void flint_mpq_init_set_readonly(mpq_t z, const fmpq_t f)
 
-    Sets the uninitialised ``mpq_t`` `z` to the value of the 
+    Sets the uninitialised ``mpq_t`` `z` to the value of the
     readonly ``fmpq_t`` `f`.
 
-    Note that it is assumed that `f` does not change during 
+    Note that it is assumed that `f` does not change during
     the lifetime of `z`.
 
-    The rational `z` has to be cleared by a call to 
+    The rational `z` has to be cleared by a call to
     :func:`flint_mpq_clear_readonly`.
 
     The suggested use of the two functions is as follows::
@@ -250,7 +277,7 @@ Conversion
             flint_mpq_clear_readonly(z);
         }
 
-    This provides a convenient function for user code, only 
+    This provides a convenient function for user code, only
     requiring to work with the types ``fmpq_t`` and ``mpq_t``.
 
 .. function:: void flint_mpq_clear_readonly(mpq_t z)
@@ -259,13 +286,13 @@ Conversion
 
 .. function:: void fmpq_init_set_readonly(fmpq_t f, const mpq_t z)
 
-    Sets the uninitialised ``fmpq_t`` `f` to a readonly 
+    Sets the uninitialised ``fmpq_t`` `f` to a readonly
     version of the rational `z`.
 
-    Note that the value of `z` is assumed to remain constant 
+    Note that the value of `z` is assumed to remain constant
     throughout the lifetime of `f`.
 
-    The ``fmpq_t`` `f` has to be cleared by calling the 
+    The ``fmpq_t`` `f` has to be cleared by calling the
     function :func:`fmpq_clear_readonly`.
 
     The suggested use of the two functions is as follows::
@@ -291,8 +318,8 @@ Input and output
 
 .. function:: int fmpq_fprint(FILE * file, const fmpq_t x)
 
-    Prints ``x`` as a fraction to the stream ``file``.   
-    The numerator and denominator are printed verbatim as integers, 
+    Prints ``x`` as a fraction to the stream ``file``.
+    The numerator and denominator are printed verbatim as integers,
     with a forward slash (/) printed in between.
 
     In case of success, returns a positive number. In case of failure,
@@ -301,7 +328,7 @@ Input and output
 .. function:: int _fmpq_fprint(FILE * file, const fmpz_t num, const fmpz_t den)
 
     Does the same thing as ``fmpq_fprint``, but for numerator
-    and denominator given explicitly as ``fmpz_t`` variables. 
+    and denominator given explicitly as ``fmpz_t`` variables.
 
     In case of success, returns a positive number. In case of failure,
     returns a non-positive number.
@@ -318,7 +345,7 @@ Input and output
 .. function:: int _fmpq_print(const fmpz_t num, const fmpz_t den)
 
     Does the same thing as ``fmpq_print``, but for numerator
-    and denominator given explicitly as ``fmpz_t`` variables. 
+    and denominator given explicitly as ``fmpz_t`` variables.
 
     In case of success, returns a positive number. In case of failure,
     returns a non-positive number.
@@ -343,7 +370,7 @@ Random number generation
 
 .. function:: void fmpq_randtest_not_zero(fmpq_t res, flint_rand_t state, flint_bitcnt_t bits)
 
-    As per ``fmpq_randtest``, but the result will not be `0`. 
+    As per ``fmpq_randtest``, but the result will not be `0`.
     If ``bits`` is set to `0`, an exception will result.
 
 .. function:: void fmpq_randbits(fmpq_t res, flint_rand_t state, flint_bitcnt_t bits)
@@ -405,7 +432,7 @@ Arithmetic
               void fmpq_add_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c)
               void fmpq_sub_fmpz(fmpq_t res, const fmpq_t op1, const fmpz_t c)
 
-   Sets ``res`` to the sum or difference respectively of the fraction 
+   Sets ``res`` to the sum or difference respectively of the fraction
    ``op1`` and the integer `c`.
 
 .. function:: void _fmpq_mul_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, slong r)
@@ -416,9 +443,9 @@ Arithmetic
 
    Sets ``res`` to the product of ``op1`` and the integer `c`.
 
-.. function:: void _fmpq_mul_ui(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, ulong r)                                                            
+.. function:: void _fmpq_mul_ui(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, ulong r)
 
-   Sets ``(rnum, rden)`` to the product of ``(p, q)`` and the integer `r`.     
+   Sets ``(rnum, rden)`` to the product of ``(p, q)`` and the integer `r`.
 
 .. function:: void fmpq_mul_ui(fmpq_t res, const fmpq_t op1, ulong c)
 
@@ -448,8 +475,8 @@ Arithmetic
 .. function:: void _fmpq_pow_si(fmpz_t rnum, fmpz_t rden, const fmpz_t opnum, const fmpz_t opden, slong e)
               void fmpq_pow_si(fmpq_t res, const fmpq_t op, slong e)
 
-    Sets ``res`` to ``op`` raised to the power `e`, where `e` 
-    is a ``slong``.  If `e` is `0` and ``op`` is `0`, then 
+    Sets ``res`` to ``op`` raised to the power `e`, where `e`
+    is a ``slong``.  If `e` is `0` and ``op`` is `0`, then
     ``res`` will be set to `1`.
 
 .. function:: int fmpq_pow_fmpz(fmpq_t a, const fmpq_t b, const fmpz_t e)
@@ -459,12 +486,12 @@ Arithmetic
 
 .. function:: void fmpq_mul_fmpz(fmpq_t res, const fmpq_t op, const fmpz_t x)
 
-    Sets ``res`` to the product of the rational number ``op`` 
+    Sets ``res`` to the product of the rational number ``op``
     and the integer ``x``.
 
 .. function:: void fmpq_div_fmpz(fmpq_t res, const fmpq_t op, const fmpz_t x)
 
-    Sets ``res`` to the quotient of the rational number ``op`` 
+    Sets ``res`` to the quotient of the rational number ``op``
     and the integer ``x``.
 
 .. function:: void fmpq_mul_2exp(fmpq_t res, const fmpq_t x, flint_bitcnt_t exp)
@@ -689,7 +716,7 @@ Special functions
               void fmpq_harmonic_ui(fmpq_t x, ulong n)
 
     Computes the harmonic number `H_n = 1 + 1/2 + 1/3 + \dotsb + 1/n`.
-    Table lookup is used for `H_n` whose numerator and denominator 
+    Table lookup is used for `H_n` whose numerator and denominator
     fit in single limb. For larger `n`, a divide and conquer strategy is used.
 
 
@@ -705,7 +732,7 @@ defined for all integers `h` and `k` as
      s(h,k) = \sum_{i=1}^{k-1} \left(\left(\frac{i}{k}\right)\right)
      \left(\left(\frac{hi}{k}\right)\right)
 
-where 
+where
 
 .. math ::
 
@@ -726,7 +753,7 @@ If `0 < h < k` and `(h,k) = 1`, this reduces to
 The main formula for evaluating the series above is the following.
 Letting `r_0 = k`, `r_1 = h`, `r_2, r_3, \ldots, r_n, r_{n+1} = 1`
 be the remainder sequence in the Euclidean algorithm for
-computing GCD of `h` and `k`, 
+computing GCD of `h` and `k`,
 
 .. math ::
     s(h,k) = \frac{1-(-1)^n}{8} - \frac{1}{12} \sum_{i=1}^{n+1}

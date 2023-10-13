@@ -13,14 +13,15 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
+/* todo: tuning */
+#define DIVCONQUER_CUTOFF 10
+
 int
-_gr_poly_div(gr_ptr Q, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
+_gr_poly_div_generic(gr_ptr Q, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
 {
     int status;
 
-    /* todo: tuning */
-
-    if (lenB <= 10)
+    if (lenB <= DIVCONQUER_CUTOFF || lenA - lenB <= DIVCONQUER_CUTOFF)
     {
         status = _gr_poly_div_basecase(Q, A, lenA, B, lenB, ctx);
     }
@@ -28,8 +29,10 @@ _gr_poly_div(gr_ptr Q, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_
     {
         status = _gr_poly_div_newton(Q, A, lenA, B, lenB, ctx);
 
-        if (status != GR_SUCCESS)
-            status = _gr_poly_div_basecase(Q, A, lenA, B, lenB, ctx);
+        /* Newton requires invertible lc(B); basecase and divide-and-conquer
+           may yet succeed without it. */
+        if (status == GR_DOMAIN)
+            status = _gr_poly_div_divconquer_noinv(Q, A, lenA, B, lenB, DIVCONQUER_CUTOFF, ctx);
     }
 
     return status;

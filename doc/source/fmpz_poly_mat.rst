@@ -3,7 +3,61 @@
 **fmpz_poly_mat.h** -- matrices of polynomials over the integers
 ===============================================================================
 
-Description.
+The :type:`fmpz_poly_mat_t` data type represents matrices whose
+entries are integer polynomials.
+
+The :type:`fmpz_poly_mat_t` type is defined as an array of
+:type:`fmpz_poly_mat_struct`'s of length one. This permits passing
+parameters of type :type:`fmpz_poly_mat_t` by reference.
+
+An integer polynomial matrix internally consists of a single array of
+:type:`fmpz_poly_struct`'s, representing a dense matrix in row-major
+order. This array is only directly indexed during memory allocation
+and deallocation. A separate array holds pointers to the start of each
+row, and is used for all indexing. This allows the rows of a matrix to
+be permuted quickly by swapping pointers.
+
+Matrices having zero rows or columns are allowed.
+
+The shape of a matrix is fixed upon initialisation. The user is
+assumed to provide input and output variables whose dimensions are
+compatible with the given operation.
+
+Simple example
+--------------
+
+The following example constructs the matrix `\begin{pmatrix} 2x+1 & x
+\\ 1-x & -1 \end{pmatrix}` and computes its determinant.
+
+.. code:: c
+
+   #include "fmpz_poly.h"
+   #include "fmpz_poly_mat.h"
+   int main()
+   {
+       fmpz_poly_mat_t A;
+       fmpz_poly_t P;
+
+       fmpz_poly_mat_init(A, 2, 2);
+       fmpz_poly_init(P);
+
+       fmpz_poly_set_str(fmpz_poly_mat_entry(A, 0, 0), "2  1 2");
+       fmpz_poly_set_str(fmpz_poly_mat_entry(A, 0, 1), "2  0 1");
+       fmpz_poly_set_str(fmpz_poly_mat_entry(A, 1, 0), "2  1 -1");
+       fmpz_poly_set_str(fmpz_poly_mat_entry(A, 1, 1), "1  -1");
+
+       fmpz_poly_mat_det(P, A);
+       fmpz_poly_print_pretty(P, "x");
+
+       fmpz_poly_clear(P);
+       fmpz_poly_mat_clear(A);
+   }
+
+The output is:
+
+::
+
+   x^2-3*x-1
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -11,8 +65,6 @@ Types, macros and constants
 .. type:: fmpz_poly_mat_struct
 
 .. type:: fmpz_poly_mat_t
-
-    Description.
 
 Memory management
 --------------------------------------------------------------------------------
@@ -51,7 +103,7 @@ Basic assignment and manipulation
 --------------------------------------------------------------------------------
 
 
-.. function:: fmpz_poly_struct * fmpz_poly_mat_entry(fmpz_poly_mat_t mat, slong i, slong j)
+.. function:: fmpz_poly_struct * fmpz_poly_mat_entry(const fmpz_poly_mat_t mat, slong i, slong j)
 
     Gives a reference to the entry at row ``i`` and column ``j``.
     The reference can be passed as an input or output variable to any
@@ -226,21 +278,21 @@ Arithmetic
 
 .. function:: void fmpz_poly_mat_mul_classical(fmpz_poly_mat_t C, const fmpz_poly_mat_t A, const fmpz_poly_mat_t B)
 
-    Sets ``C`` to the matrix product of ``A`` and ``B``, 
-    computed using the classical algorithm. The matrices must have 
+    Sets ``C`` to the matrix product of ``A`` and ``B``,
+    computed using the classical algorithm. The matrices must have
     compatible dimensions for matrix multiplication. Aliasing is allowed.
 
 .. function:: void fmpz_poly_mat_mul_KS(fmpz_poly_mat_t C, const fmpz_poly_mat_t A, const fmpz_poly_mat_t B)
 
-    Sets ``C`` to the matrix product of ``A`` and ``B``, 
-    computed using Kronecker segmentation. The matrices must have 
+    Sets ``C`` to the matrix product of ``A`` and ``B``,
+    computed using Kronecker segmentation. The matrices must have
     compatible dimensions for matrix multiplication. Aliasing is allowed.
 
 .. function:: void fmpz_poly_mat_mullow(fmpz_poly_mat_t C, const fmpz_poly_mat_t A, const fmpz_poly_mat_t B, slong len)
 
     Sets ``C`` to the matrix product of ``A`` and ``B``,
     truncating each entry in the result to length ``len``.
-    Uses classical matrix multiplication. The matrices must have 
+    Uses classical matrix multiplication. The matrices must have
     compatible dimensions for matrix multiplication. Aliasing is allowed.
 
 .. function:: void fmpz_poly_mat_sqr(fmpz_poly_mat_t B, const fmpz_poly_mat_t A)

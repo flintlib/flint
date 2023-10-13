@@ -53,9 +53,9 @@ Types and basic operations
 
     Appends the element *x* to the end of vector *vec*.
 
-.. function:: int _gr_vec_write(gr_stream_t out, gr_srcptr vec, slong len, gr_ctx_t ctx);
-              int gr_vec_write(gr_stream_t out, const gr_vec_t vec, gr_ctx_t ctx);
-              int gr_vec_print(const gr_vec_t vec, gr_ctx_t ctx);
+.. function:: int _gr_vec_write(gr_stream_t out, gr_srcptr vec, slong len, gr_ctx_t ctx)
+              int gr_vec_write(gr_stream_t out, const gr_vec_t vec, gr_ctx_t ctx)
+              int gr_vec_print(const gr_vec_t vec, gr_ctx_t ctx)
 
 .. macro:: GR_ENTRY(vec, i, size)
 

@@ -3,17 +3,12 @@
 **nmod_poly_factor.h** -- factorisation of univariate polynomials over integers mod n (word-size n)
 ===================================================================================================
 
-Description.
-
 Types, macros and constants
 -------------------------------------------------------------------------------
 
 .. type:: nmod_poly_factor_struct
 
 .. type:: nmod_poly_factor_t
-
-    Description.
-
 
 Factorisation
 --------------------------------------------------------------------------------
@@ -31,14 +26,14 @@ Factorisation
 
 .. function:: void nmod_poly_factor_realloc(nmod_poly_factor_t fac, slong alloc)
 
-    Reallocates the factor structure to provide space for 
+    Reallocates the factor structure to provide space for
     precisely ``alloc`` factors.
 
 .. function:: void nmod_poly_factor_fit_length(nmod_poly_factor_t fac, slong len)
 
-    Ensures that the factor structure has space for at 
-    least ``len`` factors.  This function takes care 
-    of the case of repeated calls by always at least 
+    Ensures that the factor structure has space for at
+    least ``len`` factors.  This function takes care
+    of the case of repeated calls by always at least
     doubling the number of factors the structure can hold.
 
 .. function:: void nmod_poly_factor_set(nmod_poly_factor_t res, const nmod_poly_factor_t fac)
@@ -61,7 +56,7 @@ Factorisation
 
     Concatenates two factorisations.
 
-    This is equivalent to calling :func:`nmod_poly_factor_insert` 
+    This is equivalent to calling :func:`nmod_poly_factor_insert`
     repeatedly with the individual factors of ``fac``.
 
     Does not support aliasing between ``res`` and ``fac``.

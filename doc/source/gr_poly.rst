@@ -110,10 +110,11 @@ Basic manipulation
 .. function:: truth_t gr_poly_is_zero(const gr_poly_t poly, gr_ctx_t ctx)
               truth_t gr_poly_is_one(const gr_poly_t poly, gr_ctx_t ctx)
               truth_t gr_poly_is_gen(const gr_poly_t poly, gr_ctx_t ctx)
+              truth_t gr_poly_is_scalar(const gr_poly_t poly, gr_ctx_t ctx)
 
 .. function:: int gr_poly_set_scalar(gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
               int gr_poly_set_si(gr_poly_t poly, slong c, gr_ctx_t ctx)
-              int gr_poly_set_ui(gr_poly_t poly, slong c, gr_ctx_t ctx)
+              int gr_poly_set_ui(gr_poly_t poly, ulong c, gr_ctx_t ctx)
               int gr_poly_set_fmpz(gr_poly_t poly, const fmpz_t c, gr_ctx_t ctx)
               int gr_poly_set_fmpq(gr_poly_t poly, const fmpq_t c, gr_ctx_t ctx)
 
@@ -140,6 +141,7 @@ Arithmetic
               int gr_poly_mul(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx)
 
 .. function:: int _gr_poly_mullow_generic(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+              int _gr_poly_mullow(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
               int gr_poly_mullow(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong len, gr_ctx_t ctx)
 
 .. function:: int gr_poly_mul_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
@@ -161,7 +163,7 @@ Powering
 
 .. function:: int gr_poly_pow_fmpz(gr_poly_t res, const gr_poly_t poly, const fmpz_t exp, gr_ctx_t ctx)
 
-.. function:: int _gr_poly_pow_series_fmpq_recurrence(gr_ptr h, gr_srcptr f, slong flen, const fmpq_t exp, slong len, gr_ctx_t ctx)
+.. function:: int _gr_poly_pow_series_fmpq_recurrence(gr_ptr h, gr_srcptr f, slong flen, const fmpq_t exp, slong len, int precomp, gr_ctx_t ctx)
               int gr_poly_pow_series_fmpq_recurrence(gr_poly_t res, const gr_poly_t poly, const fmpq_t exp, slong len, gr_ctx_t ctx)
 
 Shifting
@@ -174,12 +176,11 @@ Shifting
               int gr_poly_shift_right(gr_poly_t res, const gr_poly_t poly, slong n, gr_ctx_t ctx)
 
 
-Division
+Division with remainder
 --------------------------------------------------------------------------------
 
-TODO: algorithms handle allocation for R differently
-
 .. function:: int _gr_poly_divrem_divconquer_preinv1(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_srcptr invB, slong cutoff, gr_ctx_t ctx)
+              int _gr_poly_divrem_divconquer_noinv(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, slong cutoff, gr_ctx_t ctx)
               int _gr_poly_divrem_divconquer(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, slong cutoff, gr_ctx_t ctx)
               int gr_poly_divrem_divconquer(gr_poly_t Q, gr_poly_t R, const gr_poly_t A, const gr_poly_t B, slong cutoff, gr_ctx_t ctx)
               int _gr_poly_divrem_basecase_preinv1(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_srcptr invB, gr_ctx_t ctx)
@@ -191,9 +192,22 @@ TODO: algorithms handle allocation for R differently
               int _gr_poly_divrem(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
               int gr_poly_divrem(gr_poly_t Q, gr_poly_t R, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
 
-    Polynomial division with remainder. ``GR_DOMAIN`` is returned when
-    *B* is provably zero or when encountering an impossible division
-    in the polynomial division algorithm.
+    These functions implement Euclidean division with remainder:
+    given polynomials `A, B \in K[x]` where `K` is a field, with `B \ne 0`,
+    there is a unique quotient `Q` and remainder `R` such that `A = BQ + R`
+    and either `R = 0` or `\deg(R) < \deg(B)`.
+    If *B* is provably zero, ``GR_DOMAIN`` is returned.
+
+    When `K` is a commutative ring and `\operatorname{lc}(B)` is a unit in `K`,
+    the situation is the same as over fields. In particular, Euclidean division
+    with remainder always makes sense over commutative rings when `B` is monic.
+    If `\operatorname{lc}(B)` is not a unit, the division still makes sense if
+    the coefficient quotient `\operatorname{lc}(r)`  / `\operatorname{lc}(B)`
+    exists for each partial remainder `r`. Indeed,
+    the *basecase* and *divconquer* algorithms return ``GR_DOMAIN`` precisely when
+    encountering a leading quotient `\operatorname{lc}(r)`  / `\operatorname{lc}(B) \not \in K`.
+    However, the *newton* algorithm as currently implemented
+    returns ``GR_DOMAIN`` when `\operatorname{lc}(B)^{-1} \not \in K`.
 
     The underscore methods make the following assumptions:
 
@@ -203,15 +217,21 @@ TODO: algorithms handle allocation for R differently
     * *Q* is not aliased with either *A* or *B*.
     * *R* is not aliased with *B*.
     * *R* may be aliased with *A*, in which case all ``lenA``
-      entries may be used as scratch space.
+      entries may be used as scratch space. Note that in this case,
+      only the low ``lenB - 1`` coefficients of *R* actually represent
+      valid coefficients on output: the higher scratch coefficients will not
+      necessarily be zeroed.
     * The divisor *B* is normalized to have nonzero leading coefficient.
       (The non-underscore methods check for leading coefficients that
-      are not provably nonzero and return ``GR_UNABLE``)
+      are not provably nonzero and return ``GR_UNABLE``.)
 
     The *preinv1* functions take a precomputed inverse of the
     leading coefficient as input.
+    The *noinv* versions perform repeated checked divisions
+    by the leading coefficient.
 
 .. function:: int _gr_poly_div_divconquer_preinv1(gr_ptr Q, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_srcptr invB, slong cutoff, gr_ctx_t ctx)
+              int _gr_poly_div_divconquer_noinv(gr_ptr Q, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, slong cutoff, gr_ctx_t ctx)
               int _gr_poly_div_divconquer(gr_ptr Q, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, slong cutoff, gr_ctx_t ctx)
               int gr_poly_div_divconquer(gr_poly_t Q, const gr_poly_t A, const gr_poly_t B, slong cutoff, gr_ctx_t ctx)
               int _gr_poly_div_basecase_preinv1(gr_ptr Q, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_srcptr invB, gr_ctx_t ctx)
@@ -249,6 +269,7 @@ Division uses the Karp-Markstein algorithm.
 
 .. function:: int _gr_poly_inv_series_newton(gr_ptr res, gr_srcptr A, slong Alen, slong len, slong cutoff, gr_ctx_t ctx)
               int gr_poly_inv_series_newton(gr_poly_t res, const gr_poly_t A, slong len, slong cutoff, gr_ctx_t ctx)
+              int _gr_poly_inv_series_basecase_preinv1(gr_ptr res, gr_srcptr A, slong Alen, gr_srcptr Ainv, slong len, gr_ctx_t ctx)
               int _gr_poly_inv_series_basecase(gr_ptr res, gr_srcptr A, slong Alen, slong len, gr_ctx_t ctx)
               int gr_poly_inv_series_basecase(gr_poly_t res, const gr_poly_t A, slong len, gr_ctx_t ctx)
               int _gr_poly_inv_series(gr_ptr res, gr_srcptr A, slong Alen, slong len, gr_ctx_t ctx)
@@ -256,12 +277,56 @@ Division uses the Karp-Markstein algorithm.
 
 .. function:: int _gr_poly_div_series_newton(gr_ptr res, gr_srcptr A, slong Alen, gr_srcptr B, slong Blen, slong len, slong cutoff, gr_ctx_t ctx)
               int gr_poly_div_series_newton(gr_poly_t res, const gr_poly_t A, const gr_poly_t B, slong len, slong cutoff, gr_ctx_t ctx)
+              int _gr_poly_div_series_divconquer(gr_ptr res, gr_srcptr B, slong Blen, gr_srcptr A, slong Alen, slong len, slong cutoff, gr_ctx_t ctx)
+              int gr_poly_div_series_divconquer(gr_poly_t Q, const gr_poly_t A, const gr_poly_t B, slong len, slong cutoff, gr_ctx_t ctx)
               int _gr_poly_div_series_invmul(gr_ptr res, gr_srcptr B, slong Blen, gr_srcptr A, slong Alen, slong len, gr_ctx_t ctx)
               int gr_poly_div_series_invmul(gr_poly_t res, const gr_poly_t A, const gr_poly_t B, slong len, gr_ctx_t ctx)
+              int _gr_poly_div_series_basecase_preinv1(gr_ptr Q, gr_srcptr A, slong Alen, gr_srcptr B, slong Blen, gr_srcptr Binv, slong len, gr_ctx_t ctx)
+              int _gr_poly_div_series_basecase_noinv(gr_ptr Q, gr_srcptr A, slong Alen, gr_srcptr B, slong Blen, slong len, gr_ctx_t ctx)
               int _gr_poly_div_series_basecase(gr_ptr res, gr_srcptr A, slong Alen, gr_srcptr B, slong Blen, slong len, gr_ctx_t ctx)
               int gr_poly_div_series_basecase(gr_poly_t res, const gr_poly_t A, const gr_poly_t B, slong len, gr_ctx_t ctx)
               int _gr_poly_div_series(gr_ptr res, gr_srcptr A, slong Alen, gr_srcptr B, slong Blen, slong len, gr_ctx_t ctx)
               int gr_poly_div_series(gr_poly_t res, const gr_poly_t A, const gr_poly_t B, slong len, gr_ctx_t ctx)
+
+Exact division
+--------------------------------------------------------------------------------
+
+These functions compute a quotient `Q = A / B` which is known to be exact
+(without remainder) in `R[x]` (or in `R[[x]] / x^n` in the case of series
+division). Given a nonexact division, they are allowed to set `Q` to
+an arbitrary polynomial and return ``GR_SUCCESS`` instead of returning an
+error flag.
+
+`R` is assumed to be an integral domain (this is not checked).
+
+For exact division, we have the choice of starting the division
+from the most significant terms (classical division) or the least significant
+(power series division). Which direction is more efficient depends
+in part on whether the leading or trailing coefficient of `B` is cheaper
+to use for divisions. In a generic setting, this is hard to predict.
+
+The *bidirectional* algorithms combine two half-divisions from both ends.
+This halves the number of operations in the basecase regime, though an
+extra coefficient inversion may be needed.
+
+The ``noinv`` versions perform repeated ``divexact`` operations in the
+scalar domain without attempting to invert the leading (or trailing) coefficient,
+while other versions check invertibility first.
+There are no ``divexact_preinv1`` versions because those are identical to the
+``div_preinv1`` counterparts.
+
+.. function:: int _gr_poly_divexact_basecase_bidirectional(gr_ptr Q, gr_srcptr A, slong Alen, gr_srcptr B, slong Blen, gr_ctx_t ctx)
+              int gr_poly_divexact_basecase_bidirectional(gr_poly_t Q, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
+              int _gr_poly_divexact_bidirectional(gr_ptr Q, gr_srcptr A, slong Alen, gr_srcptr B, slong Blen, gr_ctx_t ctx)
+              int gr_poly_divexact_bidirectional(gr_poly_t Q, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
+              int _gr_poly_divexact_basecase_noinv(gr_ptr Q, gr_srcptr A, slong Alen, gr_srcptr B, slong Blen, gr_ctx_t ctx)
+              int _gr_poly_divexact_basecase(gr_ptr Q, gr_srcptr A, slong Alen, gr_srcptr B, slong Blen, gr_ctx_t ctx)
+              int gr_poly_divexact_basecase(gr_poly_t Q, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
+
+.. function:: int _gr_poly_divexact_series_basecase_noinv(gr_ptr Q, gr_srcptr A, slong Alen, gr_srcptr B, slong Blen, slong len, gr_ctx_t ctx)
+              int _gr_poly_divexact_series_basecase(gr_ptr Q, gr_srcptr A, slong Alen, gr_srcptr B, slong Blen, slong len, gr_ctx_t ctx)
+              int gr_poly_divexact_series_basecase(gr_poly_t Q, const gr_poly_t A, const gr_poly_t B, slong len, gr_ctx_t ctx)
+
 
 Square roots
 --------------------------------------------------------------------------------
@@ -447,11 +512,11 @@ GCD
     ring operations. For further details, see [ThullYap1990]_.
 
 
-.. function:: int _gr_poly_xgcd_euclidean(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_srcptr invB, gr_ctx_t ctx)
+.. function:: int _gr_poly_xgcd_euclidean(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
               int gr_poly_xgcd_euclidean(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
 
-.. function:: int _gr_poly_xgcd_hgcd(slong * Glen, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, slong hgcd_cutoff, slong cutoff, gr_ctx_t ctx);
-              int gr_poly_xgcd_hgcd(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, const gr_poly_t B, slong hgcd_cutoff, slong cutoff, gr_ctx_t ctx);
+.. function:: int _gr_poly_xgcd_hgcd(slong * Glen, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, slong hgcd_cutoff, slong cutoff, gr_ctx_t ctx)
+              int gr_poly_xgcd_hgcd(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, const gr_poly_t B, slong hgcd_cutoff, slong cutoff, gr_ctx_t ctx)
 
 Resultant
 -------------------------------------------------------------------------------

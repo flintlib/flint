@@ -3,6 +3,85 @@
 **fmpz.h** -- integers
 ===============================================================================
 
+By default, an :type:`fmpz_t` is implemented as an array of
+:type:`fmpz`'s of length one to allow passing by reference as one can
+do with GMP/ MPIR's :type:`mpz_t` type. The :type:`fmpz_t` type is
+simply a single limb, though the user does not need to be aware of
+this except in one specific case outlined below.
+
+In all respects, :type:`fmpz_t`'s act precisely like GMP/ MPIR's
+``mpz_t``'s, with automatic memory management, however, in the first
+place only one limb is used to implement them. Once an :type:`fmpz_t`
+overflows a limb then a multiprecision integer is automatically
+allocated and instead of storing the actual integer data the
+:type:`slong` which implements the type becomes an index into a FLINT
+wide array of :type:`mpz_t`'s.
+
+These internal implementation details are not important for the user
+to understand, except for three important things.
+
+Firstly, :type:`fmpz_t`'s will be more efficient than :type:`mpz_t`'s
+for single limb operations, or more precisely for signed quantities
+whose absolute value does not exceed ``FLINT_BITS - 2``` bits.
+
+Secondly, for small integers that fit into ```FLINT_BITS - 2``` bits
+much less memory will be used than for an :type:`mpz_t`. When very
+many :type:`fmpz_t`'s are used, there can be important cache benefits
+on account of this.
+
+Thirdly, it is important to understand how to deal with arrays of
+:type:`fmpz_t`'s. As for :type:`mpz_t`'s, there is an underlying type,
+an :type:`fmpz`, which can be used to create the array, e.g.
+
+::
+
+   fmpz myarr[100];
+
+Now recall that an :type:`fmpz_t` is an array of length one of
+:type:`fmpz`'s. Thus, a pointer to an :type:`fmpz` can be used in
+place of an :type:`fmpz_t`. For example, to find the sign of the third
+integer in our array we would write
+
+::
+
+   int sign = fmpz_sgn(myarr + 2);
+
+The :type:`fmpz` module provides routines for memory management, basic
+manipulation and basic arithmetic.
+
+Unless otherwise specified, all functions in this section permit
+aliasing between their input arguments and between their input and
+output arguments.
+
+Simple example
+--------------
+
+The following example computes the square of the integer `7` and prints
+the result.
+
+.. code-block:: c
+
+    #include "fmpz.h"
+
+    int main()
+    {
+        fmpz_t x, y;
+        fmpz_init(x);
+        fmpz_init(y);
+        fmpz_set_ui(x, 7);
+        fmpz_mul(y, x, x);
+        fmpz_print(x);
+        flint_printf("^2 = ");
+        fmpz_print(y);
+        flint_printf("\n");
+        fmpz_clear(x);
+        fmpz_clear(y);
+    }
+
+::
+
+   7^2 = 49
+
 Types, macros and constants
 -------------------------------------------------------------------------------
 
@@ -17,7 +96,7 @@ Types, macros and constants
    bit is `0` the ``fmpz`` represents an ordinary ``slong`` integer whose
    absolute value is at most ``FLINT_BITS - 2`` bits.
 
-   When the second most significant bit is `1` then the value represents a 
+   When the second most significant bit is `1` then the value represents a
    pointer (the pointer is shifted right `2` bits and the second most
    significant bit is set to `1`. This relies on the fact that ``malloc`` always
    allocates memory blocks on a `4` or `8` byte boundary).
@@ -28,22 +107,22 @@ Types, macros and constants
    reference without fuss, similar to the way ``mpz_t`` works.
 
 .. macro:: COEFF_MAX
- 
+
    the largest (positive) value an ``fmpz`` can be if just an ``slong``.
 
 .. macro:: COEFF_MIN
- 
+
    the smallest (negative) value an ``fmpz`` can be if just an ``slong``.
 
 .. function:: fmpz PTR_TO_COEFF(__mpz_struct * ptr)
 
    a macro to convert an ``mpz_t`` (or more generally any ``__mpz_struct *``)
    to an ``fmpz`` (shifts the pointer right by `2` and sets the second most
-   significant bit). 
+   significant bit).
 
 .. function:: __mpz_struct * COEFF_TO_PTR(fmpz f)
 
-   a macro to convert an ``fmpz`` which represents a pointer into an actual 
+   a macro to convert an ``fmpz`` which represents a pointer into an actual
    pointer to an ``__mpz_struct`` (i.e. to an ``mpz_t``).
 
 .. function:: int COEFF_IS_MPZ(fmpz f)
@@ -53,7 +132,7 @@ Types, macros and constants
 
 .. function:: __mpz_struct * _fmpz_new_mpz(void)
 
-   initialises a new ``mpz_t`` and returns a pointer to it. This is only used 
+   initialises a new ``mpz_t`` and returns a pointer to it. This is only used
    internally.
 
 .. function:: void _fmpz_clear_mpz(fmpz f)
@@ -101,17 +180,17 @@ Memory management
 
 .. function:: void fmpz_init(fmpz_t f)
 
-    A small ``fmpz_t`` is initialised, i.e. just a ``slong``.  
+    A small ``fmpz_t`` is initialised, i.e. just a ``slong``.
     The value is set to zero.
 
 .. function:: void fmpz_init2(fmpz_t f, ulong limbs)
 
-    Initialises the given ``fmpz_t`` to have space for the given 
+    Initialises the given ``fmpz_t`` to have space for the given
     number of limbs.
 
-    If ``limbs`` is zero then a small ``fmpz_t`` is allocated, 
-    i.e. just a ``slong``.  The value is also set to zero.  It is 
-    not necessary to call this function except to save time.  A call 
+    If ``limbs`` is zero then a small ``fmpz_t`` is allocated,
+    i.e. just a ``slong``.  The value is also set to zero.  It is
+    not necessary to call this function except to save time.  A call
     to ``fmpz_init`` will do just fine.
 
 .. function:: void fmpz_clear(fmpz_t f)
@@ -132,11 +211,11 @@ Memory management
 Random generation
 --------------------------------------------------------------------------------
 
-For thread-safety, the randomisation methods take as one of their 
-parameters an object of type ``flint_rand_t``.  Before calling 
-any of the randomisation functions such an object first has to be 
-initialised with a call to :func:`flint_randinit`.  When one is 
-finished generating random numbers, one should call 
+For thread-safety, the randomisation methods take as one of their
+parameters an object of type ``flint_rand_t``.  Before calling
+any of the randomisation functions such an object first has to be
+initialised with a call to :func:`flint_randinit`.  When one is
+finished generating random numbers, one should call
 :func:`flint_randclear` to clean up.
 
 .. function:: void fmpz_randbits(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
@@ -156,7 +235,7 @@ finished generating random numbers, one should call
 
 .. function:: void fmpz_randtest_not_zero(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
 
-    As per ``fmpz_randtest``, but the result will not be `0`. 
+    As per ``fmpz_randtest``, but the result will not be `0`.
     If ``bits`` is set to `0`, an exception will result.
 
 .. function:: void fmpz_randm(fmpz_t f, flint_rand_t state, const fmpz_t m)
@@ -241,8 +320,8 @@ Conversion
 
 .. function:: double fmpz_get_d_2exp(slong * exp, const fmpz_t f)
 
-    Returns `f` as a normalized ``double`` along with a `2`-exponent 
-    ``exp``, i.e. if `r` is the return value then `f = r 2^{exp}`, 
+    Returns `f` as a normalized ``double`` along with a `2`-exponent
+    ``exp``, i.e. if `r` is the return value then `f = r 2^{exp}`,
     to within 1 ULP.
 
 .. function:: void fmpz_get_mpz(mpz_t x, const fmpz_t f)
@@ -257,11 +336,11 @@ Conversion
 
 .. function:: char * fmpz_get_str(char * str, int b, const fmpz_t f)
 
-    Returns the representation of `f` in base `b`, which can vary 
+    Returns the representation of `f` in base `b`, which can vary
     between `2` and `62`, inclusive.
 
-    If ``str`` is ``NULL``, the result string is allocated by 
-    the function.  Otherwise, it is up to the caller to ensure that 
+    If ``str`` is ``NULL``, the result string is allocated by
+    the function.  Otherwise, it is up to the caller to ensure that
     the allocated block of memory is sufficiently large.
 
 .. function:: void fmpz_set_si(fmpz_t f, slong val)
@@ -347,8 +426,8 @@ Conversion
 
 .. function:: int fmpz_set_str(fmpz_t f, const char * str, int b)
 
-    Sets `f` to the value given in the null-terminated string ``str``, 
-    in base `b`. The base `b` can vary between `2` and `62`, inclusive. 
+    Sets `f` to the value given in the null-terminated string ``str``,
+    in base `b`. The base `b` can vary between `2` and `62`, inclusive.
     Returns `0` if the string contains a valid input and `-1` otherwise.
 
 .. function:: void fmpz_set_ui_smod(fmpz_t f, mp_limb_t x, mp_limb_t m)
@@ -359,13 +438,13 @@ Conversion
 
 .. function:: void flint_mpz_init_set_readonly(mpz_t z, const fmpz_t f)
 
-    Sets the uninitialised ``mpz_t`` `z` to the value of the 
+    Sets the uninitialised ``mpz_t`` `z` to the value of the
     readonly ``fmpz_t`` `f`.
 
-    Note that it is assumed that `f` does not change during 
+    Note that it is assumed that `f` does not change during
     the lifetime of `z`.
 
-    The integer `z` has to be cleared by a call to 
+    The integer `z` has to be cleared by a call to
     :func:`flint_mpz_clear_readonly`.
 
     The suggested use of the two functions is as follows::
@@ -380,7 +459,7 @@ Conversion
             flint_mpz_clear_readonly(z);
         }
 
-    This provides a convenient function for user code, only 
+    This provides a convenient function for user code, only
     requiring to work with the types ``fmpz_t`` and ``mpz_t``.
 
     In critical code, the following approach may be favourable::
@@ -401,13 +480,13 @@ Conversion
 
 .. function:: void fmpz_init_set_readonly(fmpz_t f, const mpz_t z)
 
-    Sets the uninitialised ``fmpz_t`` `f` to a readonly 
+    Sets the uninitialised ``fmpz_t`` `f` to a readonly
     version of the integer `z`.
 
-    Note that the value of `z` is assumed to remain constant 
+    Note that the value of `z` is assumed to remain constant
     throughout the lifetime of `f`.
 
-    The ``fmpz_t`` `f` has to be cleared by calling the 
+    The ``fmpz_t`` `f` has to be cleared by calling the
     function :func:`fmpz_clear_readonly`.
 
     The suggested use of the two functions is as follows::
@@ -437,71 +516,71 @@ Input and output
     an optional minus sign, followed by one or more digits.  The
     first digit should be non-zero unless it is the only digit.
 
-    In case of success, returns a positive number.  In case of failure, 
+    In case of success, returns a positive number.  In case of failure,
     returns a non-positive number.
 
-    This convention is adopted in light of the return values of 
-    ``scanf`` from the standard library and ``mpz_inp_str`` 
+    This convention is adopted in light of the return values of
+    ``scanf`` from the standard library and ``mpz_inp_str``
     from MPIR.
 
 .. function:: int fmpz_fread(FILE * file, fmpz_t f)
 
-    Reads a multiprecision integer from the stream ``file``.  The 
+    Reads a multiprecision integer from the stream ``file``.  The
     format is an optional minus sign, followed by one or more digits.
     The first digit should be non-zero unless it is the only digit.
 
-    In case of success, returns a positive number.  In case of failure, 
+    In case of success, returns a positive number.  In case of failure,
     returns a non-positive number.
 
-    This convention is adopted in light of the return values of 
-    ``scanf`` from the standard library and ``mpz_inp_str`` 
+    This convention is adopted in light of the return values of
+    ``scanf`` from the standard library and ``mpz_inp_str``
     from MPIR.
 
-.. function:: size_t fmpz_inp_raw( fmpz_t x, FILE *fin )
+.. function:: size_t fmpz_inp_raw(fmpz_t x, FILE *fin )
 
     Reads a multiprecision integer from the stream ``file``.  The
-    format is raw binary format write by :func:`fmpz_out_raw`. 
-    
+    format is raw binary format write by :func:`fmpz_out_raw`.
+
     In case of success, return a positive number, indicating number of bytes read.
     In case of failure 0.
 
-    This function calls the ``mpz_inp_raw`` function in library gmp. So that it 
+    This function calls the ``mpz_inp_raw`` function in library gmp. So that it
     can read the raw data written by ``mpz_inp_raw`` directly.
-    
-.. function:: int fmpz_print(fmpz_t x)
+
+.. function:: int fmpz_print(const fmpz_t x)
 
     Prints the value `x` to ``stdout``, without a carriage return (CR).
-    The value is printed as either `0`, the decimal digits of a 
-    positive integer, or a minus sign followed by the digits of 
+    The value is printed as either `0`, the decimal digits of a
+    positive integer, or a minus sign followed by the digits of
     a negative integer.
 
-    In case of success, returns a positive number.  In case of failure, 
+    In case of success, returns a positive number.  In case of failure,
     returns a non-positive number.
 
-    This convention is adopted in light of the return values of 
-    ``flint_printf`` from the standard library and ``mpz_out_str`` 
+    This convention is adopted in light of the return values of
+    ``flint_printf`` from the standard library and ``mpz_out_str``
     from MPIR.
 
-.. function:: int fmpz_fprint(FILE * file, fmpz_t x)
+.. function:: int fmpz_fprint(FILE * file, const fmpz_t x)
 
     Prints the value `x` to ``file``, without a carriage return (CR).
-    The value is printed as either `0`, the decimal digits of a 
-    positive integer, or a minus sign followed by the digits of 
+    The value is printed as either `0`, the decimal digits of a
+    positive integer, or a minus sign followed by the digits of
     a negative integer.
 
-    In case of success, returns a positive number.  In case of failure, 
+    In case of success, returns a positive number.  In case of failure,
     returns a non-positive number.
 
-    This convention is adopted in light of the return values of 
-    ``flint_printf`` from the standard library and ``mpz_out_str`` 
+    This convention is adopted in light of the return values of
+    ``flint_printf`` from the standard library and ``mpz_out_str``
     from MPIR.
 
-.. function:: size_t fmpz_out_raw( FILE *fout, const fmpz_t x )
+.. function:: size_t fmpz_out_raw(FILE *fout, const fmpz_t x )
 
     Writes the value `x` to ``file``.
-    The value is written in raw binary format. The integer is written in 
+    The value is written in raw binary format. The integer is written in
     portable format, with 4 bytes of size information, and that many bytes
-    of limbs. Both the size and the limbs are written in decreasing 
+    of limbs. Both the size and the limbs are written in decreasing
     significance order (i.e., in big-endian).
 
     The output can be read with ``fmpz_inp_raw``.
@@ -509,7 +588,7 @@ Input and output
     In case of success, return a positive number, indicating number of bytes written.
     In case of failure, return 0.
 
-    The output of this can also be read by ``mpz_inp_raw`` from GMP >= 2, 
+    The output of this can also be read by ``mpz_inp_raw`` from GMP >= 2,
     since this function calls the ``mpz_inp_raw`` function in library gmp.
 
 
@@ -562,7 +641,7 @@ Basic properties and manipulation
 
 .. function:: int fmpz_abs_fits_ui(const fmpz_t f)
 
-    Returns whether the absolute value of `f` 
+    Returns whether the absolute value of `f`
     fits into an ``ulong``.
 
 .. function:: int fmpz_fits_si(const fmpz_t f)
@@ -604,17 +683,17 @@ Comparison
 
 .. function:: int fmpz_cmp_si(const fmpz_t f, slong g)
 
-    Returns a negative value if `f < g`, positive value if `g < f`, 
+    Returns a negative value if `f < g`, positive value if `g < f`,
     otherwise returns `0`.
 
 .. function:: int fmpz_cmpabs(const fmpz_t f, const fmpz_t g)
 
-    Returns a negative value if `\lvert f\rvert < \lvert g\rvert`, positive value if 
+    Returns a negative value if `\lvert f\rvert < \lvert g\rvert`, positive value if
     `\lvert g\rvert < \lvert f \rvert`, otherwise returns `0`.
 
 .. function:: int fmpz_cmp2abs(const fmpz_t f, const fmpz_t g)
 
-    Returns a negative value if `\lvert f\rvert < \lvert 2g\rvert`, positive value if 
+    Returns a negative value if `\lvert f\rvert < \lvert 2g\rvert`, positive value if
     `\lvert 2g\rvert < \lvert f \rvert`, otherwise returns `0`.
 
 .. function:: int fmpz_equal(const fmpz_t f, const fmpz_t g)
@@ -777,7 +856,7 @@ Basic arithmetic
 .. function:: void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h)
 
     Sets `f` to the quotient of `g` and `h`, assuming that the
-    division is exact, i.e. `g` is a multiple of `h`.  If `h` 
+    division is exact, i.e. `g` is a multiple of `h`.  If `h`
     is `0` an exception is raised.
 
 .. function:: void fmpz_divexact2_uiui(fmpz_t f, const fmpz_t g, ulong x, ulong y)
@@ -854,7 +933,7 @@ Basic arithmetic
 
     Returns `\lceil\log_b x\rceil`.
 
-    Assumes that `x \geq 1` and `b \geq 2` and that 
+    Assumes that `x \geq 1` and `b \geq 2` and that
     the return value fits into a signed ``slong``.
 
 .. function:: slong fmpz_flog(const fmpz_t x, const fmpz_t b)
@@ -862,7 +941,7 @@ Basic arithmetic
 
     Returns `\lfloor\log_b x\rfloor`.
 
-    Assumes that `x \geq 1` and `b \geq 2` and that 
+    Assumes that `x \geq 1` and `b \geq 2` and that
     the return value fits into a signed ``slong``.
 
 .. function:: double fmpz_dlog(const fmpz_t x)
@@ -877,7 +956,7 @@ Basic arithmetic
 .. function:: int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p)
 
     If `p` is prime, set `b` to a square root of `a` modulo `p` if `a` is a
-    quadratic residue modulo `p` and return `1`, otherwise return `0`. 
+    quadratic residue modulo `p` and return `1`, otherwise return `0`.
 
     If `p` is not prime the return value is with high probability `0`,
     indicating that `p` is not prime, or `a` is not a square modulo `p`.
@@ -886,15 +965,15 @@ Basic arithmetic
 
 .. function:: void fmpz_sqrt(fmpz_t f, const fmpz_t g)
 
-    Sets `f` to the integer part of the square root of `g`, where 
-    `g` is assumed to be non-negative.  If `g` is negative, an exception 
+    Sets `f` to the integer part of the square root of `g`, where
+    `g` is assumed to be non-negative.  If `g` is negative, an exception
     is raised.
 
 .. function:: void fmpz_sqrtrem(fmpz_t f, fmpz_t r, const fmpz_t g)
 
-    Sets `f` to the integer part of the square root of `g`, where `g` is 
-    assumed to be non-negative, and sets `r` to the remainder, that is, 
-    the difference `g - f^2`.  If `g` is negative, an exception is raised.  
+    Sets `f` to the integer part of the square root of `g`, where `g` is
+    assumed to be non-negative, and sets `r` to the remainder, that is,
+    the difference `g - f^2`.  If `g` is negative, an exception is raised.
     The behaviour is undefined if `f` and `r` are aliases.
 
 .. function:: int fmpz_is_square(const fmpz_t f)
@@ -904,7 +983,7 @@ Basic arithmetic
 .. function:: int fmpz_root(fmpz_t r, const fmpz_t f, slong n)
 
     Set `r` to the integer part of the `n`-th root of `f`. Requires that
-    `n > 0` and that if `n` is even then `f` be non-negative, otherwise an 
+    `n > 0` and that if `n` is even then `f` be non-negative, otherwise an
     exception is raised. The function returns `1` if the root was exact,
     otherwise `0`.
 
@@ -960,7 +1039,7 @@ Greatest common divisor
 
 .. function:: void fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
-    Sets `f` to the greatest common divisor of `g` and `h`.  The 
+    Sets `f` to the greatest common divisor of `g` and `h`.  The
     result is always positive, even if one of `g` and `h` is
     negative.
 
@@ -971,14 +1050,14 @@ Greatest common divisor
 
 .. function:: void fmpz_lcm(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
-    Sets `f` to the least common multiple of `g` and `h`.  The 
+    Sets `f` to the least common multiple of `g` and `h`.  The
     result is always nonnegative, even if one of `g` and `h` is
     negative.
 
 .. function:: void fmpz_gcdinv(fmpz_t d, fmpz_t a, const fmpz_t f, const fmpz_t g)
 
-    Given integers `f, g` with `0 \leq f < g`, computes the 
-    greatest common divisor `d = \gcd(f, g)` and the modular 
+    Given integers `f, g` with `0 \leq f < g`, computes the
+    greatest common divisor `d = \gcd(f, g)` and the modular
     inverse `a = f^{-1} \pmod{g}`, whenever `f \neq 0`.
 
     Assumes that `d` and `a` are not aliased.
@@ -1032,17 +1111,17 @@ Greatest common divisor
 
 .. function:: void fmpz_xgcd_partial(fmpz_t co2, fmpz_t co1, fmpz_t r2, fmpz_t r1, const fmpz_t L)
 
-    This function is an implementation of Lehmer extended GCD with early 
-    termination, as used in the ``qfb`` module. It terminates early when 
+    This function is an implementation of Lehmer extended GCD with early
+    termination, as used in the ``qfb`` module. It terminates early when
     remainders fall below the specified bound. The initial values ``r1``
-    and ``r2`` are treated as successive remainders in the Euclidean 
+    and ``r2`` are treated as successive remainders in the Euclidean
     algorithm and are replaced with the last two remainders computed. The
     values ``co1`` and ``co2`` are the last two cofactors and satisfy
     the identity ``co2*r1 - co1*r2 == +/- r2_orig`` upon termination, where
     ``r2_orig`` is the starting value of ``r2`` supplied, and ``r1``
     and ``r2`` are the final values.
 
-    Aliasing of inputs is not allowed. Similarly aliasing of inputs and outputs 
+    Aliasing of inputs is not allowed. Similarly aliasing of inputs and outputs
     is not allowed.
 
 
@@ -1054,28 +1133,28 @@ Modular arithmetic
 
     Removes all factors `f` from `x` and returns the number of such.
 
-    Assumes that `x` is non-zero, that `f > 1` and that ``finv`` 
-    is the precomputed ``double`` inverse of `f` whenever `f` is 
+    Assumes that `x` is non-zero, that `f > 1` and that ``finv``
+    is the precomputed ``double`` inverse of `f` whenever `f` is
     a small integer and `0` otherwise.
 
     Does not support aliasing.
 
 .. function:: slong fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f)
 
-    Remove all occurrences of the factor `f > 1` from the 
-    integer ``op`` and sets ``rop`` to the resulting 
+    Remove all occurrences of the factor `f > 1` from the
+    integer ``op`` and sets ``rop`` to the resulting
     integer.
 
-    If ``op`` is zero, sets ``rop`` to ``op`` and 
+    If ``op`` is zero, sets ``rop`` to ``op`` and
     returns `0`.
 
-    Returns an ``abort`` signal if any of the assumptions 
+    Returns an ``abort`` signal if any of the assumptions
     are violated.
 
 .. function:: int fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
-    Sets `f` to the inverse of `g` modulo `h`.  The value of `h` may 
-    not be `0` otherwise an exception results.  If the inverse exists 
+    Sets `f` to the inverse of `g` modulo `h`.  The value of `h` may
+    not be `0` otherwise an exception results.  If the inverse exists
     the return value will be non-zero, otherwise the return value will
     be `0` and the value of `f` undefined. As a special case, we
     consider any number invertible modulo `h = \pm 1`, with inverse 0.
@@ -1103,32 +1182,32 @@ Bit packing and unpacking
 --------------------------------------------------------------------------------
 
 
-.. function:: int fmpz_bit_pack(mp_limb_t * arr, flint_bitcnt_t shift, flint_bitcnt_t bits, fmpz_t coeff, int negate, int borrow)
+.. function:: int fmpz_bit_pack(mp_limb_t * arr, flint_bitcnt_t shift, flint_bitcnt_t bits, const fmpz_t coeff, int negate, int borrow)
 
-    Shifts the given coefficient to the left by ``shift`` bits and adds 
+    Shifts the given coefficient to the left by ``shift`` bits and adds
     it to the integer in ``arr`` in a field of the given number of bits::
 
         shift  bits  --------------
 
         X X X C C C C 0 0 0 0 0 0 0
 
-    An optional borrow of `1` can be subtracted from ``coeff`` before 
-    it is packed.  If ``coeff`` is negative after the borrow, then a 
+    An optional borrow of `1` can be subtracted from ``coeff`` before
+    it is packed.  If ``coeff`` is negative after the borrow, then a
     borrow will be returned by the function.
 
-    The value of ``shift`` is assumed to be less than ``FLINT_BITS``. 
-    All but the first ``shift`` bits of ``arr`` are assumed to be zero 
+    The value of ``shift`` is assumed to be less than ``FLINT_BITS``.
+    All but the first ``shift`` bits of ``arr`` are assumed to be zero
     on entry to the function.
 
-    The value of ``coeff`` may also be optionally (and notionally) negated 
+    The value of ``coeff`` may also be optionally (and notionally) negated
     before it is used, by setting the ``negate`` parameter to `-1`.
 
 .. function:: int fmpz_bit_unpack(fmpz_t coeff, mp_limb_t * arr, flint_bitcnt_t shift, flint_bitcnt_t bits, int negate, int borrow)
 
     A bit field of the given number of bits is extracted from ``arr``,
-    starting after ``shift`` bits, and placed into ``coeff``.  An 
-    optional borrow of `1` may be added to the coefficient.  If the result 
-    is negative, a borrow of `1` is returned.  Finally, the resulting 
+    starting after ``shift`` bits, and placed into ``coeff``.  An
+    optional borrow of `1` may be added to the coefficient.  If the result
+    is negative, a borrow of `1` is returned.  Finally, the resulting
     ``coeff`` may be negated by setting the ``negate`` parameter to `-1`.
 
     The value of ``shift`` is expected to be less than ``FLINT_BITS``.
@@ -1171,7 +1250,7 @@ Logic Operations
     Sets ``r`` to the bit-wise logical exclusive ``or`` of
     ``a`` and ``b``.
 
-.. function:: int fmpz_popcnt(const fmpz_t a)
+.. function:: ulong fmpz_popcnt(const fmpz_t a)
 
     Returns the number of '1' bits in the given Z (aka Hamming weight or
     population count).
@@ -1197,7 +1276,7 @@ see ``crt.c`` and ``multi_crt.c`` in the ``examples``
 directory.
 The ``fmpz_multi_CRT`` class is similar to ``fmpz_multi_CRT_ui`` except that it performs error checking and works with arbitrary moduli.
 
-.. function:: void fmpz_CRT_ui(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2, int sign)
+.. function:: void fmpz_CRT_ui(fmpz_t out, const fmpz_t r1, const fmpz_t m1, ulong r2, ulong m2, int sign)
 
     Uses the Chinese Remainder Theorem to compute the unique integer
     `0 \le x < M` (if sign = 0) or `-M/2 < x \le M/2` (if sign = 1)
@@ -1225,8 +1304,8 @@ The ``fmpz_multi_CRT`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
 
 .. function:: void fmpz_multi_mod_ui(mp_limb_t * out, const fmpz_t in, const fmpz_comb_t comb, fmpz_comb_temp_t temp)
 
-    Reduces the multiprecision integer ``in`` modulo each of the primes 
-    stored in the ``comb`` structure. The array ``out`` will be filled 
+    Reduces the multiprecision integer ``in`` modulo each of the primes
+    stored in the ``comb`` structure. The array ``out`` will be filled
     with the residues modulo these primes. The structure ``temp`` is
     temporary space which must be provided by :func:`fmpz_comb_temp_init` and
     cleared by :func:`fmpz_comb_temp_clear`.
@@ -1235,22 +1314,22 @@ The ``fmpz_multi_CRT`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
 
     This function takes a set of residues modulo the list of primes
     contained in the ``comb`` structure and reconstructs a multiprecision
-    integer modulo the product of the primes which has 
+    integer modulo the product of the primes which has
     these residues modulo the corresponding primes.
 
     If `N` is the product of all the primes then ``out`` is normalised to
     be in the range `[0, N)` if sign = 0 and the range `[-(N-1)/2, N/2]`
-    if sign = 1. The array ``temp`` is temporary 
-    space which must be provided by :func:`fmpz_comb_temp_init` and 
+    if sign = 1. The array ``temp`` is temporary
+    space which must be provided by :func:`fmpz_comb_temp_init` and
     cleared by :func:`fmpz_comb_temp_clear`.
 
 .. function:: void fmpz_comb_init(fmpz_comb_t comb, mp_srcptr primes, slong num_primes)
 
-    Initialises a ``comb`` structure for multimodular reduction and 
-    recombination.  The array ``primes`` is assumed to contain 
-    ``num_primes`` primes each of ``FLINT_BITS - 1`` bits. Modular 
-    reductions and recombinations will be done modulo this list of primes. 
-    The ``primes`` array must not be ``free``'d until the ``comb`` 
+    Initialises a ``comb`` structure for multimodular reduction and
+    recombination.  The array ``primes`` is assumed to contain
+    ``num_primes`` primes each of ``FLINT_BITS - 1`` bits. Modular
+    reductions and recombinations will be done modulo this list of primes.
+    The ``primes`` array must not be ``free``'d until the ``comb``
     structure is no longer required and must be cleared by the user.
 
 .. function:: void fmpz_comb_temp_init(fmpz_comb_temp_t temp, const fmpz_comb_t comb)
@@ -1280,12 +1359,12 @@ The ``fmpz_multi_CRT`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
     A return of ``1`` indicates that the compilation was successful, which occurs if and only
     if either (1) ``len == 1`` and ``modulus + 0`` is nonzero, or (2) no modulus is `0,1,-1` and all moduli are pairwise relatively prime.
 
-.. function:: void fmpz_multi_CRT_precomp(fmpz_t output, const fmpz_multi_CRT_t P, const fmpz * inputs)
+.. function:: void fmpz_multi_CRT_precomp(fmpz_t output, const fmpz_multi_CRT_t P, const fmpz * inputs, int sign)
 
     Set ``output`` to an integer of smallest absolute value that is congruent to ``values + i`` modulo the ``moduli + i``
     in ``P``.
 
-.. function:: int fmpz_multi_CRT(fmpz_t output, const fmpz * moduli, const fmpz * values, slong len)
+.. function:: int fmpz_multi_CRT(fmpz_t output, const fmpz * moduli, const fmpz * values, slong len, int sign)
 
     Perform the same operation as :func:`fmpz_multi_CRT_precomp` while internally constructing and destroying the precomputed data.
     All of the remarks in :func:`fmpz_multi_CRT_precompute` apply.
@@ -1315,10 +1394,10 @@ Primality testing
 
 .. function:: int fmpz_is_probabprime_BPSW(const fmpz_t n)
 
-    Perform a Baillie-PSW probable prime test with parameters chosen by 
+    Perform a Baillie-PSW probable prime test with parameters chosen by
     Selfridge's method `A` as per [BaiWag1980]_.
 
-    Return `1` if `n` is a Lucas probable prime, otherwise return `0`. 
+    Return `1` if `n` is a Lucas probable prime, otherwise return `0`.
 
     There are no known composites passed as prime by this test, though
     infinitely many probably exist. The test will declare no primes
@@ -1328,7 +1407,7 @@ Primality testing
 
     Performs some trial division and then some probabilistic primality tests.
     If `p` is definitely composite, the function returns `0`, otherwise it
-    is declared probably prime, i.e. prime for most practical purposes, and 
+    is declared probably prime, i.e. prime for most practical purposes, and
     the function returns `1`. The chance of declaring a composite prime is
     very small.
 
@@ -1338,13 +1417,13 @@ Primality testing
 .. function:: int fmpz_is_prime_pseudosquare(const fmpz_t n)
 
     Return `0` is `n` is composite. If `n` is too large (greater than about
-    `94` bits) the function fails silently and returns `-1`, otherwise, if 
+    `94` bits) the function fails silently and returns `-1`, otherwise, if
     `n` is proven prime by the pseudosquares method, return `1`.
 
     Tests if `n` is a prime according to [Theorem 2.7] [LukPatWil1996]_.
 
     We first factor `N` using trial division up to some limit `B`.
-    In fact, the number of primes used in the trial factoring is at 
+    In fact, the number of primes used in the trial factoring is at
     most ``FLINT_PSEUDOSQUARES_CUTOFF``.
 
     Next we compute `N/B` and find the next pseudosquare `L_p` above
@@ -1353,16 +1432,16 @@ Primality testing
 
     As noted in the text, if `p` is prime then Step 3 will pass. This
     test rejects many composites, and so by this time we suspect
-    that `p` is prime. If `N` is `3` or `7` modulo `8`, we are done, 
+    that `p` is prime. If `N` is `3` or `7` modulo `8`, we are done,
     and `N` is prime.
 
-    We now run a probable prime test, for which no known 
-    counterexamples are known, to reject any composites. We then 
+    We now run a probable prime test, for which no known
+    counterexamples are known, to reject any composites. We then
     proceed to prove `N` prime by executing Step 4. In the case that
     `N` is `1` modulo `8`, if Step 4 fails, we extend the number of primes
     `p_i` at Step 3 and hope to find one which passes Step 4. We take
     the test one past the largest `p` for which we have pseudosquares
-    `L_p` tabulated, as this already corresponds to the next `L_p` which 
+    `L_p` tabulated, as this already corresponds to the next `L_p` which
     is bigger than `2^{64}` and hence larger than any prime we might be
     testing.
 
@@ -1389,7 +1468,7 @@ Primality testing
     that are supplied, the larger F will be.
 
     There is a balance between the amount of time spent looking for
-    factors of `n - 1` and the usefulness of the output (`F` may be as low 
+    factors of `n - 1` and the usefulness of the output (`F` may be as low
     as `2` in some cases).
 
     A reasonable heuristic seems to be to choose ``limit`` to be some
@@ -1406,19 +1485,19 @@ Primality testing
     ``num_pm1``.
 
     One can use `\log(n) + 2` as a bound on the number of factors which might
-    be produced (and hence on the length of the array that needs to be 
+    be produced (and hence on the length of the array that needs to be
     supplied).
 
 .. function:: int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, mp_ptr pp1, slong num_pp1)
 
-    Applies the Morrison `p + 1` primality test. The test computes a 
-    product `F` of primes which divide `n + 1`. 
+    Applies the Morrison `p + 1` primality test. The test computes a
+    product `F` of primes which divide `n + 1`.
 
     The function then returns either `0` if `n` is definitely composite
     or it returns `1` if all factors of `n` are `\pm 1 \pmod{F}`. Also in
     that case, `R` is set to `(n + 1)/F`.
 
-    NB: a return value of `1` only proves `n` prime if 
+    NB: a return value of `1` only proves `n` prime if
     `F > \sqrt{n} + 1`.
 
     The function does not compute which primes divide `n + 1`. Instead,
@@ -1427,7 +1506,7 @@ Primality testing
     that are supplied, the larger `F` will be.
 
     There is a balance between the amount of time spent looking for
-    factors of `n + 1` and the usefulness of the output (`F` may be as low 
+    factors of `n + 1` and the usefulness of the output (`F` may be as low
     as `2` in some cases).
 
     A reasonable heuristic seems to be to choose ``limit`` to be some
@@ -1444,7 +1523,7 @@ Primality testing
     ``num_pp1``.
 
     One can use `\log(n) + 2` as a bound on the number of factors which might
-    be produced (and hence on the length of the array that needs to be 
+    be produced (and hence on the length of the array that needs to be
     supplied).
 
 .. function:: int fmpz_is_prime(const fmpz_t n)
@@ -1493,33 +1572,33 @@ Primality testing
     Given `U_m, U_{m + 1} \pmod{n}` compute `U_{2m}, U_{2m + 1} \pmod{n}`.
 
     Aliasing of `U_{2m}` and `U_m` and aliasing of `U_{2m + 1}` and `U_{m + 1}`
-    is permitted. No other aliasing is allowed. 
+    is permitted. No other aliasing is allowed.
 
 .. function:: void fmpz_lucas_chain_add(fmpz_t Umn, fmpz_t Umn1, const fmpz_t Um, const fmpz_t Um1, const fmpz_t Un, const fmpz_t Un1, const fmpz_t A, const fmpz_t B, const fmpz_t n)
 
-    Given `U_m, U_{m + 1} \pmod{n}` and `U_n, U_{n + 1} \pmod{n}` compute 
+    Given `U_m, U_{m + 1} \pmod{n}` and `U_n, U_{n + 1} \pmod{n}` compute
     `U_{m + n}, U_{m + n + 1} \pmod{n}`.
 
-    Aliasing of `U_{m + n}` with `U_m` or `U_n` and aliasing of `U_{m + n + 1}` 
-    with `U_{m + 1}` or `U_{n + 1}` is permitted. No other aliasing is allowed. 
+    Aliasing of `U_{m + n}` with `U_m` or `U_n` and aliasing of `U_{m + n + 1}`
+    with `U_{m + 1}` or `U_{n + 1}` is permitted. No other aliasing is allowed.
 
 .. function:: void fmpz_lucas_chain_mul(fmpz_t Ukm, fmpz_t Ukm1, const fmpz_t Um, const fmpz_t Um1, const fmpz_t A, const fmpz_t B, const fmpz_t k, const fmpz_t n)
 
     Given `U_m, U_{m + 1} \pmod{n}` compute `U_{km}, U_{km + 1} \pmod{n}`.
 
     Aliasing of `U_{km}` and `U_m` and aliasing of `U_{km + 1}` and `U_{m + 1}`
-    is permitted. No other aliasing is allowed. 
-  
+    is permitted. No other aliasing is allowed.
+
 .. function:: void fmpz_lucas_chain_VtoU(fmpz_t Um, fmpz_t Um1, const fmpz_t Vm, const fmpz_t Vm1, const fmpz_t A, const fmpz_t B, const fmpz_t Dinv, const fmpz_t n)
 
     Given `V_m, V_{m + 1} \pmod{n}` compute `U_m, U_{m + 1} \pmod{n}`.
 
     Aliasing of `V_m` and `U_m` and aliasing of `V_{m + 1}` and `U_{m + 1}`
-    is permitted. No other aliasing is allowed. 
+    is permitted. No other aliasing is allowed.
 
 .. function:: int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, const fmpz_t r, const fmpz_t s)
 
-    If there exists a proper divisor of `n` which is `r \pmod{s}` for 
+    If there exists a proper divisor of `n` which is `r \pmod{s}` for
     `0 < r < s < n`, this function returns `1` and sets ``fac`` to such a
     divisor. Otherwise the function returns `0` and the value of ``fac`` is
     undefined.
@@ -1538,37 +1617,37 @@ Primality testing
     the GMP ``mpz_nextprime`` function is called. Up to and including
     GMP 6.1.2 this used Miller-Rabin iterations, and thereafter uses
     a BPSW test.
-    
+
 Special functions
 --------------------------------------------------------------------------------
 
 
 .. function:: void fmpz_primorial(fmpz_t res, ulong n)
 
-    Sets ``res`` to ``n`` primorial or `n \#`, the product of all prime 
+    Sets ``res`` to ``n`` primorial or `n \#`, the product of all prime
     numbers less than or equal to `n`.
 
 .. function:: void fmpz_factor_euler_phi(fmpz_t res, const fmpz_factor_t fac)
               void fmpz_euler_phi(fmpz_t res, const fmpz_t n)
 
-    Sets ``res`` to the Euler totient function `\phi(n)`, counting the 
-    number of positive integers less than or equal to `n` that are coprime 
+    Sets ``res`` to the Euler totient function `\phi(n)`, counting the
+    number of positive integers less than or equal to `n` that are coprime
     to `n`. The factor version takes a precomputed
     factorisation of `n`.
 
 .. function:: int fmpz_factor_moebius_mu(const fmpz_factor_t fac)
               int fmpz_moebius_mu(const fmpz_t n)
 
-    Computes the Moebius function `\mu(n)`, which is defined as `\mu(n) = 0` 
-    if `n` has a prime factor of multiplicity greater than `1`, `\mu(n) = -1` 
-    if `n` has an odd number of distinct prime factors, and `\mu(n) = 1` if 
-    `n` has an even number of distinct prime factors.  By convention, 
+    Computes the Moebius function `\mu(n)`, which is defined as `\mu(n) = 0`
+    if `n` has a prime factor of multiplicity greater than `1`, `\mu(n) = -1`
+    if `n` has an odd number of distinct prime factors, and `\mu(n) = 1` if
+    `n` has an even number of distinct prime factors.  By convention,
     `\mu(0) = 0`. The factor version takes a precomputed
     factorisation of `n`.
 
 .. function:: void fmpz_factor_divisor_sigma(fmpz_t res, ulong k, const fmpz_factor_t fac)
               void fmpz_divisor_sigma(fmpz_t res, ulong k, const fmpz_t n)
 
-    Sets ``res`` to `\sigma_k(n)`, the sum of `k`\th powers of all 
+    Sets ``res`` to `\sigma_k(n)`, the sum of `k`\th powers of all
     divisors of `n`. The factor version takes a precomputed
     factorisation of `n`.

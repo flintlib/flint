@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2013 Fredrik Johansson
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of Arb.
 
@@ -9,8 +10,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "thread_support.h"
 #include "acb_mat.h"
-#include "pthread.h"
 
 typedef struct
 {
@@ -24,12 +25,12 @@ typedef struct
     slong br;
     slong prec;
 }
-acb_mat_mul_arg_t;
+_worker_arg;
 
-void *
+void
 _acb_mat_mul_thread(void * arg_ptr)
 {
-    acb_mat_mul_arg_t arg = *((acb_mat_mul_arg_t *) arg_ptr);
+    _worker_arg arg = *((_worker_arg *) arg_ptr);
     slong i, j, br, bc;
     acb_ptr tmp;
     TMP_INIT;
@@ -55,15 +56,15 @@ _acb_mat_mul_thread(void * arg_ptr)
 
     TMP_END;
     flint_cleanup();
-    return NULL;
+    return;
 }
 
 void
 acb_mat_mul_threaded(acb_mat_t C, const acb_mat_t A, const acb_mat_t B, slong prec)
 {
-    slong ar, ac, br, bc, i, num_threads;
-    pthread_t * threads;
-    acb_mat_mul_arg_t * args;
+    slong ar, ac, br, bc, i, num_threads, num_workers;
+    thread_pool_handle * handles;
+    _worker_arg * args;
 
     ar = acb_mat_nrows(A);
     ac = acb_mat_ncols(A);
@@ -71,10 +72,7 @@ acb_mat_mul_threaded(acb_mat_t C, const acb_mat_t A, const acb_mat_t B, slong pr
     bc = acb_mat_ncols(B);
 
     if (ac != br || ar != acb_mat_nrows(C) || bc != acb_mat_ncols(C))
-    {
-        flint_printf("acb_mat_mul_threaded: incompatible dimensions\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_DOMERR, "incompatible dimensions in %s\n", __FUNCTION__);
 
     if (br == 0)
     {
@@ -92,9 +90,10 @@ acb_mat_mul_threaded(acb_mat_t C, const acb_mat_t A, const acb_mat_t B, slong pr
         return;
     }
 
-    num_threads = flint_get_num_threads();
-    threads = flint_malloc(sizeof(pthread_t) * num_threads);
-    args = flint_malloc(sizeof(acb_mat_mul_arg_t) * num_threads);
+    num_workers = flint_request_threads(&handles, FLINT_MAX(ar, bc));
+    num_threads = num_workers + 1;
+
+    args = FLINT_ARRAY_ALLOC(num_threads, _worker_arg);
 
     for (i = 0; i < num_threads; i++)
     {
@@ -120,14 +119,15 @@ acb_mat_mul_threaded(acb_mat_t C, const acb_mat_t A, const acb_mat_t B, slong pr
         args[i].br = br;
         args[i].prec = prec;
 
-        pthread_create(&threads[i], NULL, _acb_mat_mul_thread, &args[i]);
+        if (i < num_workers)
+            thread_pool_wake(global_thread_pool, handles[i], 0, _acb_mat_mul_thread, &args[i]);
+        else
+            _acb_mat_mul_thread(&args[i]);
     }
 
-    for (i = 0; i < num_threads; i++)
-    {
-        pthread_join(threads[i], NULL);
-    }
+    for (i = 0; i < num_workers; i++)
+        thread_pool_wait(global_thread_pool, handles[i]);
 
-    flint_free(threads);
+    flint_give_back_threads(handles, num_workers);
     flint_free(args);
 }

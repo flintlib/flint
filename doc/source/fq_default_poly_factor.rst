@@ -3,14 +3,10 @@
 **fq_default_poly_factor.h** -- factorisation of univariate polynomials over finite fields
 ==========================================================================================
 
-Description.
-
 Types, macros and constants
 -------------------------------------------------------------------------------
 
 .. type:: fq_default_poly_factor_t
-
-    Description.
 
 
 Memory Management
@@ -48,7 +44,7 @@ Basic Operations
 
     Sets ``res`` to the same factorisation as ``fac``.
 
-.. function:: void fq_default_poly_factor_print_pretty(const fq_default_poly_factor_t fac, const fq_default_ctx_t ctx)
+.. function:: void fq_default_poly_factor_print_pretty(const fq_default_poly_factor_t fac, const char * var, const fq_default_ctx_t ctx)
 
     Pretty-prints the entries of ``fac`` to standard output.
 

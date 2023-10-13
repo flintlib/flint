@@ -22,6 +22,7 @@
 #define NMOD_POLY_INLINE static __inline__
 #endif
 
+#include "nmod.h" /* for nmod_set_ui */
 #include "nmod_types.h"
 #include "thread_pool.h"
 
@@ -206,17 +207,13 @@ void nmod_poly_one(nmod_poly_t res)
     res->coeffs[0] = 1;
 }
 
+void nmod_poly_set_trunc(nmod_poly_t res, const nmod_poly_t poly, slong len);
+
 NMOD_POLY_INLINE
 void nmod_poly_truncate(nmod_poly_t poly, slong len)
 {
-    if (poly->length > len)
-    {
-        poly->length = len;
-        _nmod_poly_normalise(poly);
-    }
+    nmod_poly_set_trunc(poly, poly, len);
 }
-
-void nmod_poly_set_trunc(nmod_poly_t res, const nmod_poly_t poly, slong n);
 
 void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, slong len, slong m);
 void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, slong m);
@@ -224,6 +221,15 @@ void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, slong m);
 /* Comparison  ***************************************************************/
 
 int nmod_poly_equal(const nmod_poly_t a, const nmod_poly_t b);
+
+int nmod_poly_equal_nmod(const nmod_poly_t poly, ulong cst);
+
+NMOD_POLY_INLINE
+int nmod_poly_equal_ui(const nmod_poly_t poly, ulong cst)
+{
+    return nmod_poly_equal_nmod(poly, nmod_set_ui(cst, poly->mod));
+}
+
 int nmod_poly_equal_trunc(const nmod_poly_t poly1, const nmod_poly_t poly2, slong n);
 
 NMOD_POLY_INLINE
@@ -251,6 +257,14 @@ int nmod_poly_is_gen(const nmod_poly_t poly)
     return (poly->mod.n == 0) ||
            (poly->length == 2 && poly->coeffs[0] == 0 && poly->coeffs[1] == 1);
 }
+
+NMOD_POLY_INLINE
+int nmod_poly_is_monic(const nmod_poly_t poly)
+{
+    return (poly->length && poly->coeffs[(poly->length - 1)] == 1);
+}
+
+
 
 /* Randomisation  ************************************************************/
 
@@ -533,14 +547,6 @@ void nmod_poly_powmod_fmpz_binexp(nmod_poly_t res,
 void _nmod_poly_powmod_fmpz_binexp(mp_ptr res, mp_srcptr poly,
                                 fmpz_t e, mp_srcptr f, slong lenf, nmod_t mod);
 
-void _nmod_poly_powmod_mpz_binexp(mp_ptr res, mp_srcptr poly,
-                                mpz_srcptr e, mp_srcptr f,
-                                slong lenf, nmod_t mod);
-
-void nmod_poly_powmod_mpz_binexp(nmod_poly_t res,
-                           const nmod_poly_t poly, mpz_srcptr e,
-                           const nmod_poly_t f);
-
 void _nmod_poly_powmod_ui_binexp_preinv (mp_ptr res, mp_srcptr poly,
                                     ulong e, mp_srcptr f, slong lenf,
                                     mp_srcptr finv, slong lenfinv, nmod_t mod);
@@ -562,14 +568,6 @@ void _nmod_poly_powmod_x_ui_preinv (mp_ptr res, ulong e, mp_srcptr f, slong lenf
 
 void nmod_poly_powmod_x_ui_preinv(nmod_poly_t res, ulong e, const nmod_poly_t f,
                              const nmod_poly_t finv);
-
-void _nmod_poly_powmod_mpz_binexp_preinv (mp_ptr res, mp_srcptr poly,
-                                    mpz_srcptr e, mp_srcptr f, slong lenf,
-                                    mp_srcptr finv, slong lenfinv, nmod_t mod);
-
-void nmod_poly_powmod_mpz_binexp_preinv(nmod_poly_t res,
-                           const nmod_poly_t poly, mpz_srcptr e,
-                           const nmod_poly_t f, const nmod_poly_t finv);
 
 void _nmod_poly_powmod_x_fmpz_preinv (mp_ptr res, fmpz_t e, mp_srcptr f, slong lenf,
                                mp_srcptr finv, slong lenfinv, nmod_t mod);

@@ -3,7 +3,18 @@
 **fq.h** -- finite fields
 ===============================================================================
 
-Description.
+We represent an element of the finite field `\mathbf{F}_{p^n} \cong
+\mathbf{F}_p[X]/(f(X))`, where `f(X) \in \mathbf{F}_p[X]` is a monic,
+irreducible polynomial of degree `n`, as a polynomial in
+`\mathbf{F}_p[X]` of degree less than `n`. The underlying data
+structure is an :type:`fmpz_poly_t`.
+
+The default choice for `f(X)` is the Conway polynomial for the pair
+`(p,n)`. Frank Luebeck's data base of Conway polynomials is made
+available in the file ``src/qadic/CPimport.txt``. If a Conway
+polynomial is not available, then a random irreducible polynomial will
+be chosen for `f(X)`. Additionally, the user is able to supply their
+own `f(X)`.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -12,13 +23,9 @@ Types, macros and constants
 
 .. type:: fq_ctx_t
 
-    Description.
-
 .. type:: fq_struct
 
 .. type:: fq_t
-
-    Description.
 
 Context Management
 --------------------------------------------------------------------------------
@@ -80,13 +87,13 @@ Context Management
 
     Returns a pointer to the modulus in the context.
 
-.. function:: long fq_ctx_degree(const fq_ctx_t ctx)
+.. function:: slong fq_ctx_degree(const fq_ctx_t ctx)
 
     Returns the degree of the field extension
     `[\mathbf{F}_{q} : \mathbf{F}_{p}]`, which
     is equal to `\log_{p} q`.
 
-.. function:: fmpz * fq_ctx_prime(const fq_ctx_t ctx)
+.. function:: const fmpz * fq_ctx_prime(const fq_ctx_t ctx)
 
     Returns a pointer to the prime `p` in the context.
 
@@ -103,12 +110,12 @@ Context Management
 
     Prints the context information to ``stdout``.
 
-.. function:: void fq_ctx_randtest(fq_ctx_t ctx)
+.. function:: void fq_ctx_randtest(fq_ctx_t ctx, flint_rand_t state)
 
     Initializes ``ctx`` to a random finite field.  Assumes that
     ``fq_ctx_init`` has not been called on ``ctx`` already.
 
-.. function:: void fq_ctx_randtest_reducible(fq_ctx_t ctx)
+.. function:: void fq_ctx_randtest_reducible(fq_ctx_t ctx, flint_rand_t state)
 
     Initializes ``ctx`` to a random extension of a prime field.
     The modulus may or may not be irreducible.  Assumes that
@@ -291,7 +298,7 @@ Output
     part of the function's signature to allow for a later implementation to
     return the number of characters printed or a non-positive error code.
 
-.. function:: void fq_fprint(FILE * file, const fq_t op, const fq_ctx_t ctx)
+.. function:: int fq_fprint(FILE * file, const fq_t op, const fq_ctx_t ctx)
 
     Prints a representation of ``op`` to ``file``.
 
@@ -491,11 +498,11 @@ Special functions
     `\sigma \in \operatorname{Gal}(\mathbf{F}_q/\mathbf{F}_p)` is the Frobenius element
     `\sigma \colon x \mapsto x^p`.
 
-.. function:: int fq_multiplicative_order(fmpz_t ord, const fq_t op, const fq_ctx_t ctx)
+.. function:: int fq_multiplicative_order(fmpz * ord, const fq_t op, const fq_ctx_t ctx)
 
     Computes the order of ``op`` as an element of the
     multiplicative group of ``ctx``.
-    
+
     Returns 0 if ``op`` is 0, otherwise it returns 1 if ``op``
     is a generator of the multiplicative group, and -1 if it is not.
 

@@ -503,7 +503,11 @@ int qsieve_process_relation(qs_t qs_inf)
     relation_t * rlist;
     int done = 0;
 
+    if (qs_inf->siqs != NULL && fclose((FILE *) qs_inf->siqs))
+        flint_throw(FLINT_ERROR, "fclose fail\n");
     qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "r");
+    if (qs_inf->siqs == NULL)
+        flint_throw(FLINT_ERROR, "fopen fail\n");
 
 #if QS_DEBUG & 64
     printf("Getting relations\n");
@@ -528,7 +532,9 @@ int qsieve_process_relation(qs_t qs_inf)
         }
     }
 
-    fclose((FILE *) qs_inf->siqs);
+    if(fclose((FILE *) qs_inf->siqs))
+        flint_throw(FLINT_ERROR, "fclose fail\n");
+    qs_inf->siqs = NULL;
 
 #if QS_DEBUG & 64
     printf("Removing duplicates\n");
@@ -581,7 +587,11 @@ int qsieve_process_relation(qs_t qs_inf)
     {
        qs_inf->edges -= 100;
        done = 0;
+       if (qs_inf->siqs != NULL && fclose((FILE *) qs_inf->siqs))
+           flint_throw(FLINT_ERROR, "fclose fail\n");
        qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "a");
+       if (qs_inf->siqs == NULL)
+           flint_throw(FLINT_ERROR, "fopen fail\n");
     } else
     {
        done = 1;

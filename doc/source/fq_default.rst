@@ -3,18 +3,12 @@
 **fq_default_default.h** -- unified finite fields
 ===============================================================================
 
-Description.
-
 Types, macros and constants
 -------------------------------------------------------------------------------
 
 .. type:: fq_default_default_ctx_t
 
-    Description.
-
 .. type:: fq_default_default_t
-
-    Description.
 
 Context Management
 --------------------------------------------------------------------------------
@@ -44,7 +38,7 @@ Context Management
     Initialises the context for the finite field defined by the given
     polynomial ``modulus``. The characteristic will be the modulus of
     the polynomial and the degree equal to its degree.
-    
+
     Assumes that the characteristic is prime and the polynomial irreducible.
 
     Assumes that the string ``var`` is a null-terminated string
@@ -194,7 +188,7 @@ Basic arithmetic
     Sets ``rop`` to the square of ``op``,
     reducing the output in the given context.
 
-.. function:: void fq_default_div(fq_default_t rop, const fq_default_t op1, const fq_default_t op2, const fq_default_ctx_t ctx)
+.. function:: void fq_default_div(fq_default_t rop, fq_default_t op1, fq_default_t op2, const fq_default_ctx_t ctx)
 
     Sets ``rop`` to the quotient of ``op1`` and ``op2``,
     reducing the output in the given context.
@@ -254,7 +248,7 @@ Output
     part of the function's signature to allow for a later implementation to
     return the number of characters printed or a non-positive error code.
 
-.. function:: int fq_default_print_pretty(const fq_default_t op, const fq_default_ctx_t ctx)
+.. function:: void fq_default_print_pretty(const fq_default_t op, const fq_default_ctx_t ctx)
 
     Prints a pretty representation of ``op`` to ``stdout``.
 
@@ -262,7 +256,7 @@ Output
     part of the function's signature to allow for a later implementation to
     return the number of characters printed or a non-positive error code.
 
-.. function:: void fq_default_fprint(FILE * file, const fq_default_t op, const fq_default_ctx_t ctx)
+.. function:: int fq_default_fprint(FILE * file, const fq_default_t op, const fq_default_ctx_t ctx)
 
     Prints a representation of ``op`` to ``file``.
 
@@ -360,13 +354,13 @@ Assignments and conversions
     ``poly``. Assumes the characteristic of the field and the modulus of the
     polynomial are the same. No checking of this occurs.
 
-.. function:: void fq_default_get_fmpz_mod_poly(fmpz_mod_poly_t poly, const fq_default_t op, const fmpz_mod_ctx_t mod_ctx, const fq_default_ctx_t ctx)
+.. function:: void fq_default_get_fmpz_mod_poly(fmpz_mod_poly_t poly, const fq_default_t op,  const fq_default_ctx_t ctx)
 
     Sets ``poly`` to the polynomial representation of ``op``. Assumes the
     characteristic of the field and the modulus of the polynomial are the same.
     No checking of this occurs.
 
-.. function:: void fq_default_set_fmpz_mod_poly(fq_default_t op, const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t mod_ctx, const fq_default_ctx_t ctx)
+.. function:: void fq_default_set_fmpz_mod_poly(fq_default_t op, const fmpz_mod_poly_t poly, const fq_default_ctx_t ctx)
 
     Sets ``op`` to the finite field element represented by the polynomial
     ``poly``. Assumes the characteristic of the field and the modulus of the
@@ -378,7 +372,7 @@ Assignments and conversions
     The representatives are taken in `(\mathbb{Z}/p\mathbb{Z})[x]/h(x)` where
     `h(x)` is the defining polynomial in ``ctx``.
 
-.. function:: void fq_default_set_fmpz_poly(fq_default a, const fmpz_poly_t b, const fq_default_ctx_t ctx)
+.. function:: void fq_default_set_fmpz_poly(fq_default_t a, const fmpz_poly_t b, const fq_default_ctx_t ctx)
 
     Set ``a`` to the element in ``ctx`` with representative ``b``.
     The representatives are taken in `(\mathbb{Z}/p\mathbb{Z})[x]/h(x)` where
@@ -439,4 +433,3 @@ Special functions
     `\mathbf{Z}/d\mathbf{Z}`, where
     `\sigma \in \operatorname{Gal}(\mathbf{F}_q/\mathbf{F}_p)` is the Frobenius element
     `\sigma \colon x \mapsto x^p`.
-

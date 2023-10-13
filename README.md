@@ -1,3 +1,7 @@
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://flintlib.org/doc/#)
+[![CI](https://github.com/flintlib/flint/actions/workflows/CI.yml/badge.svg)](https://github.com/flintlib/flint/actions/workflows/CI.yml)
+[![codecov](https://codecov.io/gh/flintlib/flint/graph/badge.svg?token=qKHycWTpUP)](https://codecov.io/gh/flintlib/flint)
+
 # FLINT (Fast Library for Number Theory)
 
 Website: https://flintlib.org

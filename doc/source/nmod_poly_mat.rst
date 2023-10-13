@@ -3,7 +3,27 @@
 **nmod_poly_mat.h** -- matrices of univariate polynomials over integers mod n (word-size n)
 ===========================================================================================
 
-Description.
+The :type:`nmod_poly_mat_t` data type represents matrices whose
+entries are polynomials having coefficients in
+`\mathbb{Z}/n\mathbb{Z}`. We generally assume that `n` is a prime
+number.
+
+The :type:`nmod_poly_mat_t` type is defined as an array of
+:type:`nmod_poly_mat_struct`'s of length one. This permits passing
+parameters of type :type:`nmod_poly_mat_t` by reference.
+
+A matrix internally consists of a single array of
+:type:`nmod_poly_struct`'s, representing a dense matrix in row-major
+order. This array is only directly indexed during memory allocation
+and deallocation. A separate array holds pointers to the start of each
+row, and is used for all indexing. This allows the rows of a matrix to
+be permuted quickly by swapping pointers.
+
+Matrices having zero rows or columns are allowed.
+
+The shape of a matrix is fixed upon initialisation. The user is
+assumed to provide input and output variables whose dimensions are
+compatible with the given operation.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -11,9 +31,6 @@ Types, macros and constants
 .. type:: nmod_poly_mat_struct
 
 .. type:: nmod_poly_mat_t
-
-    Description.
-
 
 Memory management
 --------------------------------------------------------------------------------
@@ -34,6 +51,30 @@ Memory management
     Frees all memory associated with the matrix. The matrix must be
     reinitialised if it is to be used again.
 
+Truncate, shift
+--------------------------------------------------------------------------------
+
+.. function:: void nmod_poly_mat_set_trunc(nmod_poly_mat_t res, const nmod_poly_mat_t pmat, long len)
+
+    Set ``res`` to the truncation of ``pmat`` to length ``len``. Entries of
+    ``res`` are normalized.
+
+.. function:: void nmod_poly_mat_truncate(nmod_poly_mat_t pmat, long len)
+
+    Truncates ``pmat`` to the given length ``len``, and normalize its entries.
+    If ``len`` is greater than the maximum length of the entries of ``pmat``,
+    then nothing happens.
+
+.. function:: void nmod_poly_mat_shift_left(nmod_poly_mat_t res, const nmod_poly_mat_t pmat, slong k)
+
+    Sets ``res`` to ``pmat`` shifted left by ``k`` coefficients, that is,
+    multiplied by `x^k`.
+
+.. function:: void nmod_poly_mat_shift_right(nmod_poly_mat_t res, const nmod_poly_mat_t pmat, slong k)
+
+    Sets ``res`` to ``pmat`` shifted right by ``k`` coefficients, that is,
+    divide by `x^k` and throw away the remainder. If ``k`` is greater than or
+    equal to the length of ``pmat``, the result is the zero polynomial matrix.
 
 Basic properties
 --------------------------------------------------------------------------------
@@ -66,6 +107,12 @@ Basic assignment and manipulation
 .. function:: void nmod_poly_mat_set(nmod_poly_mat_t mat1, const nmod_poly_mat_t mat2)
 
     Sets ``mat1`` to a copy of ``mat2``.
+
+.. function:: void nmod_poly_mat_set_nmod_mat(nmod_poly_mat_t pmat, const nmod_mat_t cmat)
+
+    Sets the already-initialized polynomial matrix ``pmat`` to a constant
+    matrix with the same entries as ``cmat``. Both input matrices must have the
+    same dimensions and modulus.
 
 .. function:: void nmod_poly_mat_swap(nmod_poly_mat_t mat1, nmod_poly_mat_t mat2)
 
@@ -129,6 +176,11 @@ Basic comparison and properties
     Returns nonzero if ``mat1`` and ``mat2`` have the same shape and
     all their entries agree, and returns zero otherwise.
 
+.. function:: int nmod_poly_mat_equal_nmod_mat(const nmod_poly_mat_t pmat, const nmod_mat_t cmat)
+
+    Returns nonzero if ``pmat`` is a constant matrix with the same dimensions
+    and entries as ``cmat``; returns zero otherwise.
+
 .. function:: int nmod_poly_mat_is_zero(const nmod_poly_mat_t mat)
 
     Returns nonzero if all entries in ``mat`` are zero, and returns
@@ -151,7 +203,21 @@ Basic comparison and properties
     Returns a non-zero value if the number of rows is equal to the
     number of columns in ``mat``, and otherwise returns zero.
 
+.. function:: void nmod_poly_mat_get_coeff_mat(nmod_mat_t coeff, const nmod_poly_mat_t pmat, slong deg)
 
+    Sets ``coeff`` to be the coefficient of ``pmat`` of degree ``deg``, where
+    ``pmat`` is seen as a polynomial with matrix coefficients and coefficients
+    are numbered from zero. ``coeff`` must be already initialized with the
+    right dimensions and modulus. For entries of ``pmat`` of degree less than
+    ``deg``, the corresponding entry of ``coeff`` is zero.
+
+.. function:: void nmod_poly_mat_set_coeff_mat(nmod_poly_mat_t pmat, const nmod_mat_t coeff, slong deg)
+
+    Sets the coefficient of ``pmat`` of degree ``deg`` to ``coeff``, where
+    ``pmat`` is seen as a polynomial with matrix coefficients and coefficients
+    are numbered from zero. For each entry of ``pmat``, if ``deg`` is larger
+    than its degree, this entry is first resized to the appropriate length,
+    with intervening coefficients being set to zero.
 
 Norms
 --------------------------------------------------------------------------------
@@ -161,6 +227,10 @@ Norms
 
     Returns the maximum polynomial length among all the entries in ``A``.
 
+.. function:: slong nmod_poly_mat_degree(const nmod_poly_mat_t pmat)
+
+    Returns the degree of the polynomial matrix ``pmat``. The zero matrix is
+    deemed to have degree `-1`.
 
 
 Evaluation
@@ -211,14 +281,14 @@ Arithmetic
 
 .. function:: void nmod_poly_mat_mul_classical(nmod_poly_mat_t C, const nmod_poly_mat_t A, const nmod_poly_mat_t B)
 
-    Sets ``C`` to the matrix product of ``A`` and ``B``, 
-    computed using the classical algorithm. The matrices must have 
+    Sets ``C`` to the matrix product of ``A`` and ``B``,
+    computed using the classical algorithm. The matrices must have
     compatible dimensions for matrix multiplication. Aliasing is allowed.
 
 .. function:: void nmod_poly_mat_mul_KS(nmod_poly_mat_t C, const nmod_poly_mat_t A, const nmod_poly_mat_t B)
 
-    Sets ``C`` to the matrix product of ``A`` and ``B``, 
-    computed using Kronecker segmentation. The matrices must have 
+    Sets ``C`` to the matrix product of ``A`` and ``B``,
+    computed using Kronecker segmentation. The matrices must have
     compatible dimensions for matrix multiplication. Aliasing is allowed.
 
 .. function:: void nmod_poly_mat_mul_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A, const nmod_poly_mat_t B)

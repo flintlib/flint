@@ -3,8 +3,18 @@
 **aprcl.h** -- APRCL primality testing
 ========================================================================================
 
-This module implements the rigorous APRCL primality test, suitable for integers
-up to a few thousand digits.
+This module implements the rigorous APRCL primality test, suitable for
+integers up to a few thousand digits.
+
+The APR-CL test uses the Jacobi sums that belong to
+`\mathbb{Z}[\zeta]/(n)`, so we have :type:`unity_zp` struct and some
+useful operations. :type:`unity_zp` is just a wrapper over
+:type:`fmpz_mod_poly` with additional fields.
+
+Also provides Gauss sum test, which is not very useful in practice,
+but can be useful for people who want to see an implementation of
+these. Gauss sums belong `\mathbb{Z}[\zeta_q, \zeta_p]/(n)` and
+implemented in :type:`unity_zpq` struct.
 
 Authors:
 
@@ -54,13 +64,13 @@ Primality test functions
     ``PRIME``, ``COMPOSITE`` and ``PROBABPRIME``
     (if we cannot prove primality).
 
-.. function:: void aprcl_is_prime_gauss_min_R(const fmpz_t n, ulong R)
+.. function:: int aprcl_is_prime_gauss_min_R(const fmpz_t n, ulong R)
 
     Same as :func:`aprcl_is_prime_gauss` with fixed minimum value of `R`.
 
 .. function:: int aprcl_is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r)
 
-    Returns 0 if for some `a = n^k \bmod s`, where `k \in [1, r - 1]`, 
+    Returns 0 if for some `a = n^k \bmod s`, where `k \in [1, r - 1]`,
     we have that `a \mid n`; otherwise returns 1.
 
 Configuration functions
@@ -81,7 +91,7 @@ Configuration functions
 .. function:: void aprcl_config_gauss_init_min_R(aprcl_config conf, const fmpz_t n, ulong R)
 
     Computes the `s` with fixed minimum `R` such that `a^R \equiv 1 \mod{s}`
-    for all integers `a` coprime to `s`. 
+    for all integers `a` coprime to `s`.
 
 .. function:: void aprcl_config_gauss_clear(aprcl_config conf)
 
@@ -154,11 +164,11 @@ Memory management
 Comparison
 ................................................................................
 
-.. function:: slong unity_zp_is_unity(const unity_zp f)
+.. function:: slong unity_zp_is_unity(unity_zp f)
 
     If `f = \zeta^h` returns h; otherwise returns -1.
 
-.. function:: int unity_zp_equal(const unity_zp f, const unity_zp g)
+.. function:: int unity_zp_equal(unity_zp f, unity_zp g)
 
     Returns nonzero if `f = g` reduced by the `p^{exp}`-th cyclotomic
     polynomial.
@@ -227,7 +237,7 @@ Addition and multiplication
     Sets `f` to `g \cdot g`.
     `f`, `g` and `h` must be initialized with same `p`, `exp` and `n`.
 
-.. function:: void unity_zp_mul_inplace(unity_zp f, const unity_zp g, const untiy_zp h, fmpz_t * t)
+.. function:: void unity_zp_mul_inplace(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
 
     Sets `f` to `g \cdot h`. If `p^{exp} = 3, 4, 5, 7, 8, 9, 11, 16` special
     multiplication functions are used. The preallocated array `t` of ``fmpz_t`` is
@@ -244,12 +254,12 @@ Addition and multiplication
 Powering functions
 ................................................................................
 
-.. function:: void unity_zp_pow_fmpz(unity_zp f, unity_zp g, const fmpz_t pow)
+.. function:: void unity_zp_pow_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
 
     Sets `f` to `g^{pow}`. `f` and `g` must be initialized with
     same `p`, `exp` and `n`.
 
-.. function:: void unity_zp_pow_ui(unity_zp f, unity_zp g, ulong pow)
+.. function:: void unity_zp_pow_ui(unity_zp f, const unity_zp g, ulong pow)
 
     Sets `f` to `g^{pow}`. `f` and `g` must be initialized with
     same `p`, `exp` and `n`.
@@ -259,7 +269,7 @@ Powering functions
     Returns the smallest integer `k` satisfying
     `\log (n) < (k(k + 1)2^{2k}) / (2^{k + 1} - k - 2) + 1`
 
-.. function:: void unity_zp_pow_2k_fmpz(unity_zp f, unity_zp g, const fmpz_t pow)
+.. function:: void unity_zp_pow_2k_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
 
     Sets `f` to `g^{pow}` using the `2^k`-ary exponentiation method.
     `f` and `g` must be initialized with same `p`, `exp` and `n`.
@@ -352,7 +362,7 @@ Extended rings
 
     Returns nonzero if `f = g`.
 
-.. function:: ulong unity_zpq_p_unity(const unity_zpq f)
+.. function:: slong unity_zpq_p_unity(const unity_zpq f)
 
     If `f = \zeta_p^x` returns `x \in [0, p - 1]`; otherwise returns `p`.
 
@@ -364,17 +374,17 @@ Extended rings
 
     Returns nonzero if `f` is a generator of the cyclic group `\langle\zeta_p\rangle`.
 
-.. function:: void unity_zpq_coeff_set_fmpz(unity_zpq f, ulong i, ulong j, const fmpz_t x)
+.. function:: void unity_zpq_coeff_set_fmpz(unity_zpq f, slong i, slong j, const fmpz_t x)
 
     Sets the coefficient of `\zeta_q^i \zeta_p^j` to `x`.
     `i` must be less than `q` and `j` must be less than `p`.
 
-.. function:: void unity_zpq_coeff_set_ui(unity_zpq f, ulong i, ulong j, ulong x)
+.. function:: void unity_zpq_coeff_set_ui(unity_zpq f, slong i, slong j, ulong x)
 
     Sets the coefficient of `\zeta_q^i \zeta_p^j` to `x`.
     `i` must be less than `q` and `j` must be less then `p`.
 
-.. function:: void unity_zpq_coeff_add(unity_zpq f, ulong i, ulong j, const fmpz_t x)
+.. function:: void unity_zpq_coeff_add(unity_zpq f, slong i, slong j, const fmpz_t x)
 
     Adds `x` to the coefficient of `\zeta_p^i \zeta_q^j`. `x` must be less than `n`.
 
@@ -394,15 +404,15 @@ Extended rings
 
     Sets `f = f \cdot \zeta_p`.
 
-.. function:: void unity_zpq_mul_unity_p_pow(unity_zpq f, const unity_zpq g, ulong k)
+.. function:: void unity_zpq_mul_unity_p_pow(unity_zpq f, const unity_zpq g, slong k)
 
     Sets `f` to `g \cdot \zeta_p^k`.
 
-.. function:: void unity_zpq_pow(unity_zpq f, unity_zpq g, const fmpz_t p)
+.. function:: void unity_zpq_pow(unity_zpq f, const unity_zpq g, const fmpz_t p)
 
     Sets `f` to `g^p`. `f` and `g` must be initialized with same `p`, `q` and `n`.
 
-.. function:: void unity_zpq_pow_ui(unity_zpq f, unity_zpq g, ulong p)
+.. function:: void unity_zpq_pow_ui(unity_zpq f, const unity_zpq g, ulong p)
 
     Sets `f` to `g^p`. `f` and `g` must be initialized with same `p`, `q` and `n`.
 

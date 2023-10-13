@@ -41,7 +41,7 @@ Random functions
 
     As for ``z_randtest(state)``, but does not return `0`.
 
-.. function:: mp_limb_t z_randint(flint_rand_t state, mp_limb_t limit)
+.. function:: mp_limb_signed_t z_randint(flint_rand_t state, mp_limb_t limit)
 
     Returns a pseudo random number of absolute value less than 
     ``limit``.  If ``limit`` is zero or exceeds ``WORD_MAX``, 

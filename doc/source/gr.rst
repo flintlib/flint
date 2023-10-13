@@ -35,7 +35,7 @@ computes `3^{100}` in the ring of integers and prints the value::
     int main()
     {
         int status;
-        gr_ctx_t ZZ:             /* a parent (context object) */
+        gr_ctx_t ZZ;             /* a parent (context object) */
         gr_ptr x;                /* an element */
 
         gr_ctx_init_fmpz(ZZ);    /* ZZ = ring of integers with fmpz_t elements */
@@ -282,7 +282,7 @@ Memory management
 
     Swaps *x* and *y* efficiently.
 
-.. function:: void gr_set_shallow(gr_ptr res, gr_ptr x, gr_ctx_t ctx)
+.. function:: void gr_set_shallow(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 
     Sets *res* to a shallow copy of *x*, copying the struct data.
 

@@ -266,7 +266,7 @@ see :ref:`algorithms_hypergeometric_asymptotic_confluent`.
 Generalized hypergeometric function
 -------------------------------------------------------------------------------
 
-.. function:: void acb_hypgeom_pfq(acb_poly_t res, acb_srcptr a, slong p, acb_srcptr b, slong q, const acb_t z, int regularized, slong prec)
+.. function:: void acb_hypgeom_pfq(acb_t res, acb_srcptr a, slong p, acb_srcptr b, slong q, const acb_t z, int regularized, slong prec)
 
     Computes the generalized hypergeometric function `{}_pF_{q}(z)`,
     or the regularized version if *regularized* is set.

@@ -83,6 +83,7 @@ int main(void)
         unity_zp_clear(g);
     }
 
+    fmpz_mod_ctx_clear(ctx);
     FLINT_TEST_CLEANUP(state);
 
     flint_printf("PASS\n");

@@ -3,7 +3,36 @@
 **nmod_mat.h** -- matrices over integers mod n (word-size n)
 ===============================================================================
 
-Description.
+An :type:`nmod_mat_t` represents a matrix of integers modulo `n`, for
+any non-zero modulus `n` that fits in a single limb, up to `2^{32}-1`
+or `2^{64}-1`.
+
+The :type:`nmod_mat_t` type is defined as an array of
+:type:`nmod_mat_struct`'s of length one. This permits passing
+parameters of type :type:`nmod_mat_t` by reference.
+
+An :type:`nmod_mat_t` internally consists of a single array of
+``mp_limb_t``'s, representing a dense matrix in row-major order. This
+array is only directly indexed during memory allocation and
+deallocation. A separate array holds pointers to the start of each
+row, and is used for all indexing. This allows the rows of a matrix to
+be permuted quickly by swapping pointers.
+
+Matrices having zero rows or columns are allowed.
+
+The shape of a matrix is fixed upon initialisation. The user is
+assumed to provide input and output variables whose dimensions are
+compatible with the given operation.
+
+It is assumed that all matrices passed to a function have the same
+modulus. The modulus is assumed to be a prime number in functions that
+perform some kind of division, solving, or Gaussian elimination
+(including computation of rank and determinant), but can be composite
+in functions that only perform basic manipulation and ring operations
+(e.g. transpose and matrix multiplication).
+
+The user can manipulate matrix entries directly, but must assume
+responsibility for normalising all values to the range `[0, n)`.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -12,32 +41,30 @@ Types, macros and constants
 
 .. type:: nmod_mat_t
 
-    Description.
-
 Memory management
 --------------------------------------------------------------------------------
 
 
 .. function:: void nmod_mat_init(nmod_mat_t mat, slong rows, slong cols, mp_limb_t n)
 
-    Initialises ``mat`` to a ``rows``-by-``cols`` matrix with 
-    coefficients modulo `n`, where `n` can be any nonzero integer that 
+    Initialises ``mat`` to a ``rows``-by-``cols`` matrix with
+    coefficients modulo `n`, where `n` can be any nonzero integer that
     fits in a limb. All elements are set to zero.
 
-.. function:: void nmod_mat_init_set(nmod_mat_t mat, nmod_mat_t src)
+.. function:: void nmod_mat_init_set(nmod_mat_t mat, const nmod_mat_t src)
 
-    Initialises ``mat`` and sets its dimensions, modulus and elements 
+    Initialises ``mat`` and sets its dimensions, modulus and elements
     to those of ``src``.
 
 .. function:: void nmod_mat_clear(nmod_mat_t mat)
 
-    Clears the matrix and releases any memory it used. The matrix 
+    Clears the matrix and releases any memory it used. The matrix
     cannot be used again until it is initialised. This function must be
     called exactly once when finished using an ``nmod_mat_t`` object.
 
-.. function:: void nmod_mat_set(nmod_mat_t mat, nmod_mat_t src)
+.. function:: void nmod_mat_set(nmod_mat_t mat, const nmod_mat_t src)
 
-    Sets ``mat`` to a copy of ``src``. It is assumed 
+    Sets ``mat`` to a copy of ``src``. It is assumed
     that ``mat`` and ``src`` have identical dimensions.
 
 .. function:: void nmod_mat_swap(nmod_mat_t mat1, nmod_mat_t mat2)
@@ -73,12 +100,12 @@ Basic properties and manipulation
 
     Set the entry at row `i` and column `j` of the matrix ``mat`` to
     ``x``.
-    
-.. function:: slong nmod_mat_nrows(nmod_mat_t mat)
+
+.. function:: slong nmod_mat_nrows(const nmod_mat_t mat)
 
     Returns the number of rows in ``mat``.
 
-.. function:: slong nmod_mat_ncols(nmod_mat_t mat)
+.. function:: slong nmod_mat_ncols(const nmod_mat_t mat)
 
     Returns the number of columns in ``mat``.
 
@@ -86,7 +113,7 @@ Basic properties and manipulation
 
     Sets all entries of the matrix ``mat`` to zero.
 
-.. function:: int nmod_mat_is_zero(nmod_mat_t mat)
+.. function:: int nmod_mat_is_zero(const nmod_mat_t mat)
 
     Returns `1` if all entries of the matrix ``mat`` are zero.
 
@@ -126,17 +153,29 @@ Printing
 --------------------------------------------------------------------------------
 
 
-.. function:: void nmod_mat_print_pretty(nmod_mat_t mat)
+.. function:: void nmod_mat_print_pretty(const nmod_mat_t mat)
 
-    Pretty-prints ``mat`` to ``stdout``. A header is printed followed 
-    by the rows enclosed in brackets. Each column is right-aligned to the 
-    width of the modulus written in decimal, and the columns are separated by 
+    Pretty-prints ``mat`` to ``stdout``. A header is printed followed
+    by the rows enclosed in brackets. Each column is right-aligned to the
+    width of the modulus written in decimal, and the columns are separated by
     spaces.
     For example::
-    
+
         <2 x 3 integer matrix mod 2903>
         [   0    0 2607]
         [ 622    0    0]
+
+.. function:: int nmod_mat_fprint_pretty(FILE * file, const nmod_mat_t mat)
+
+    Same as ``nmod_mat_print_pretty`` but printing to ``file``.
+
+.. function:: int nmod_mat_print(const nmod_mat_t mat)
+
+    Currently, same as ``nmod_mat_print_pretty``.
+
+.. function:: int nmod_mat_fprint(FILE * f, const nmod_mat_t mat)
+
+    Currently, same as ``nmod_mat_fprint_pretty``.
 
 
 Random matrix generation
@@ -154,21 +193,21 @@ Random matrix generation
     Sets the element to random numbers likely to be close to the modulus
     of the matrix. This is used to test potential overflow-related bugs.
 
-.. function:: int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state, mp_srcptr * diag, slong n)
+.. function:: int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state, mp_srcptr diag, slong n)
 
-    Sets ``mat`` to a random permutation of the diagonal matrix 
-    with `n` leading entries given by the vector ``diag``. It is 
-    assumed that the main diagonal of ``mat`` has room for at 
+    Sets ``mat`` to a random permutation of the diagonal matrix
+    with `n` leading entries given by the vector ``diag``. It is
+    assumed that the main diagonal of ``mat`` has room for at
     least `n` entries.
 
-    Returns `0` or `1`, depending on whether the permutation is even 
+    Returns `0` or `1`, depending on whether the permutation is even
     or odd respectively.
 
 .. function:: void nmod_mat_randrank(nmod_mat_t mat, flint_rand_t state, slong rank)
 
-    Sets ``mat`` to a random sparse matrix with the given rank, 
-    having exactly as many non-zero elements as the rank, with the 
-    non-zero elements being uniformly random integers between `0` 
+    Sets ``mat`` to a random sparse matrix with the given rank,
+    having exactly as many non-zero elements as the rank, with the
+    non-zero elements being uniformly random integers between `0`
     and `m-1` inclusive, where `m` is the modulus of ``mat``.
 
     The matrix can be transformed into a dense matrix with unchanged
@@ -176,10 +215,10 @@ Random matrix generation
 
 .. function:: void nmod_mat_randops(nmod_mat_t mat, slong count, flint_rand_t state)
 
-    Randomises ``mat`` by performing elementary row or column 
-    operations. More precisely, at most ``count`` random additions 
-    or subtractions of distinct rows and columns will be performed. 
-    This leaves the rank (and for square matrices, determinant) 
+    Randomises ``mat`` by performing elementary row or column
+    operations. More precisely, at most ``count`` random additions
+    or subtractions of distinct rows and columns will be performed.
+    This leaves the rank (and for square matrices, determinant)
     unchanged.
 
 .. function:: void nmod_mat_randtril(nmod_mat_t mat, flint_rand_t state, int unit)
@@ -200,7 +239,7 @@ Comparison
 --------------------------------------------------------------------------------
 
 
-.. function:: int nmod_mat_equal(nmod_mat_t mat1, nmod_mat_t mat2)
+.. function:: int nmod_mat_equal(const nmod_mat_t mat1, const nmod_mat_t mat2)
 
     Returns nonzero if ``mat1`` and ``mat2`` have the same dimensions and elements,
     and zero otherwise. The moduli are ignored.
@@ -214,29 +253,29 @@ Transposition and permutations
 --------------------------------------------------------------------------------
 
 
-.. function:: void nmod_mat_transpose(nmod_mat_t B, nmod_mat_t A)
+.. function:: void nmod_mat_transpose(nmod_mat_t B, const nmod_mat_t A)
 
     Sets `B` to the transpose of `A`. Dimensions must be compatible.
     `B` and `A` may be the same object if and only if the matrix is square.
 
 .. function:: void nmod_mat_swap_rows(nmod_mat_t mat, slong * perm, slong r, slong s)
-    
+
     Swaps rows ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
     permutation of the rows will also be applied to ``perm``.
 
 .. function:: void nmod_mat_swap_cols(nmod_mat_t mat, slong * perm, slong r, slong s)
-    
+
     Swaps columns ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
     permutation of the columns will also be applied to ``perm``.
 
 .. function:: void nmod_mat_invert_rows(nmod_mat_t mat, slong * perm)
-    
+
     Swaps rows ``i`` and ``r - i`` of ``mat`` for ``0 <= i < r/2``, where
     ``r`` is the number of rows of ``mat``. If ``perm`` is non-``NULL``, the
     permutation of the rows will also be applied to ``perm``.
 
 .. function:: void nmod_mat_invert_cols(nmod_mat_t mat, slong * perm)
-    
+
     Swaps columns ``i`` and ``c - i`` of ``mat`` for ``0 <= i < c/2``, where
     ``c`` is the number of columns of ``mat``. If ``perm`` is non-``NULL``, the
     permutation of the columns will also be applied to ``perm``.
@@ -251,15 +290,15 @@ Addition and subtraction
 --------------------------------------------------------------------------------
 
 
-.. function:: void nmod_mat_add(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+.. function:: void nmod_mat_add(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
     Computes `C = A + B`. Dimensions must be identical.
 
-.. function:: void nmod_mat_sub(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+.. function:: void nmod_mat_sub(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
     Computes `C = A - B`. Dimensions must be identical.
 
-.. function:: void nmod_mat_neg(nmod_mat_t A, nmod_mat_t B)
+.. function:: void nmod_mat_neg(nmod_mat_t A, const nmod_mat_t B)
 
     Sets `B = -A`. Dimensions must be identical.
 
@@ -310,7 +349,7 @@ Matrix multiplication
     is very small.
 
 .. function:: void _nmod_mat_mul_classical_threaded_pool_op(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, int op, thread_pool_handle * threads, slong num_threads)
- 
+
     Multithreaded version of ``_nmod_mat_mul_classical``.
 
 .. function:: void _nmod_mat_mul_classical_threaded_op(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, int op)
@@ -365,7 +404,7 @@ Matrix Exponentiation
 
  	   Sets `dest = mat^{pow}`. ``dest`` and ``mat`` cannot be aliased. Implements exponentiation by squaring.
 
-.. function:: void nmod_mat_pow(nmod_mat_t dest, nmod_mat_t mat, ulong pow)
+.. function:: void nmod_mat_pow(nmod_mat_t dest, const nmod_mat_t mat, ulong pow)
 
     Sets `dest = mat^{pow}`. ``dest`` and ``mat`` may be aliased. Implements
    	exponentiation by squaring.
@@ -402,10 +441,10 @@ Inverse
 --------------------------------------------------------------------------------
 
 
-.. function:: int nmod_mat_inv(nmod_mat_t B, nmod_mat_t A)
+.. function:: int nmod_mat_inv(nmod_mat_t B, const nmod_mat_t A)
 
-    Sets `B = A^{-1}` and returns `1` if `A` is invertible. 
-    If `A` is singular, returns `0` and sets the elements of 
+    Sets `B = A^{-1}` and returns `1` if `A` is invertible.
+    If `A` is singular, returns `0` and sets the elements of
     `B` to undefined values.
 
     `A` and `B` must be square matrices with the same dimensions
@@ -448,7 +487,7 @@ Triangular solving
         \begin{pmatrix} A & 0 \\ C & D \end{pmatrix}^{-1}
         \begin{pmatrix} X \\ Y \end{pmatrix} =
         \begin{pmatrix} A^{-1} X \\ D^{-1} ( Y - C A^{-1} X ) \end{pmatrix}
-    
+
 
     to reduce the problem to matrix multiplication and triangular solving
     of smaller systems.
@@ -484,7 +523,7 @@ Triangular solving
         \begin{pmatrix} A & B \\ 0 & D \end{pmatrix}^{-1}
         \begin{pmatrix} X \\ Y \end{pmatrix} =
         \begin{pmatrix} A^{-1} (X - B D^{-1} Y) \\ D^{-1} Y \end{pmatrix}
-    
+
 
     to reduce the problem to matrix multiplication and triangular solving
     of smaller systems.
@@ -495,7 +534,7 @@ Nonsingular square solving
 --------------------------------------------------------------------------------
 
 
-.. function:: int nmod_mat_solve(nmod_mat_t X, nmod_mat_t A, nmod_mat_t B)
+.. function:: int nmod_mat_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B)
 
     Solves the matrix-matrix equation `AX = B` over `\mathbb{Z} / p \mathbb{Z}` where `p`
     is the modulus of `X` which must be a prime number. `X`, `A`, and `B`
@@ -517,7 +556,7 @@ Nonsingular square solving
     set by the function call. They are set to the columns of the pivots chosen
     by the LU decomposition of `A`.
 
-.. function:: int nmod_mat_can_solve(nmod_mat_t X, nmod_mat_t A, nmod_mat_t B)
+.. function:: int nmod_mat_can_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B)
 
     Solves the matrix-matrix equation `AX = B` over `\mathbb{Z} / p \mathbb{Z}` where `p`
     is the modulus of `X` which must be a prime number. `X`, `A`, and `B`
@@ -529,7 +568,7 @@ Nonsingular square solving
 
     There are no restrictions on the shape of `A` and it may be singular.
 
-.. function:: int nmod_mat_solve_vec(mp_limb_t * x, nmod_mat_t A, mp_limb_t * b)
+.. function:: int nmod_mat_solve_vec(mp_ptr x, const nmod_mat_t A, mp_srcptr b)
 
     Solves the matrix-vector equation `Ax = b` over `\mathbb{Z} / p \mathbb{Z}` where `p`
     is the modulus of `A` which must be a prime number.
@@ -616,7 +655,7 @@ Nullspace
 
     This function computes the reduced row echelon form and then reads
     off the basis vectors.
-    
+
 
 Transforms
 --------------------------------------------------------------------------------

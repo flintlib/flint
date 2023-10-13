@@ -179,7 +179,7 @@ Assignments and conversions
 --------------------------------------------------------------------------------
 
 
-.. function:: void qadic_set(qadic_t rop, const qadic_t op)
+.. function:: void qadic_set(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 
     Sets ``rop`` to ``op``.
 
@@ -187,7 +187,7 @@ Assignments and conversions
 
     Sets ``rop`` to zero.
 
-.. function:: void qadic_one(qadic_t rop, const qadic_ctx_t ctx)
+.. function:: void qadic_one(qadic_t rop)
 
     Sets ``rop`` to one, reduced in the given context.
 
@@ -219,7 +219,7 @@ Comparison
 
     Returns whether ``op`` is equal to zero.
 
-.. function:: int qadic_is_one(const qadic_t op, const qadic_ctx_t ctx)
+.. function:: int qadic_is_one(const qadic_t op)
 
     Returns whether ``op`` is equal to one in the given 
     context.
@@ -344,7 +344,7 @@ Special functions
     and sets ``rop`` to its value reduced modulo in the given 
     context.
 
-.. function:: void _qadic_exp(fmpz *rop, const fmpz *op, slong v, slong len, const fmpz *a, const slong *j, slong lena, const fmpz_t p, slong N)
+.. function:: void _qadic_exp(fmpz *rop, const fmpz *op, slong v, slong len, const fmpz *a, const slong *j, slong lena, const fmpz_t p, slong N, const fmpz_t pN)
 
     Sets ``(rop, 2*d - 1)`` to the exponential of ``(op, v, len)`` 
     reduced modulo `p^N`, assuming that the series converges.
@@ -390,7 +390,7 @@ Special functions
 
     Supports aliasing between `y` and `z`.
 
-.. function:: int qadic_log_rectangular(qadic_t rop, const qadic_t op, const padic_ctx_t ctx)
+.. function:: int qadic_log_rectangular(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 
     Returns whether the `p`-adic logarithm function converges at 
     ``op``, and if so sets ``rop`` to its value.

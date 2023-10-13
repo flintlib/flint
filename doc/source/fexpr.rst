@@ -29,7 +29,7 @@ Formally, a symbolic expression is either:
 
 The meaning of an expression depends on the interpretation
 of symbols in a given context.
-For example, with a standard intepretation (used within Calcium) of the symbols
+For example, with a standard interpretation (used within Calcium) of the symbols
 ``Mul``, ``Add`` and
 ``Neg``, the expression ``Mul(3, Add(Neg(x), y))``
 encodes the formula `3 \cdot ((-x)+y)`
@@ -268,7 +268,7 @@ Atoms
 
     Sets *res* to the atomic integer *c*.
 
-.. function:: void fexpr_get_fmpz(fmpz_t res, const fexpr_t expr)
+.. function:: int fexpr_get_fmpz(fmpz_t res, const fexpr_t expr)
 
     Sets *res* to the atomic integer in *expr*. This aborts
     if *expr* is not an atomic integer.

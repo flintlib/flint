@@ -179,7 +179,7 @@ Error bounding
 Summation
 -------------------------------------------------------------------------------
 
-.. function:: void arb_hypgeom_sum(arb_t P, arb_t Q, const hypgeom_t hyp, const slong n, slong prec)
+.. function:: void arb_hypgeom_sum(arb_t P, arb_t Q, const hypgeom_t hyp, slong n, slong prec)
 
     Computes `P, Q` such that `P / Q = \sum_{k=0}^{n-1} T(k)` where `T(k)`
     is defined by *hyp*,

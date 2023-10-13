@@ -53,8 +53,8 @@ each of which can be linked to a C program making use of their functionality.
 
 All of the functions in FLINT have a corresponding test function provided
 in an appropriately named test file.  For example, the function
-``fmpz_poly_add`` located in ``fmpz_poly/add.c`` has test code in the
-file ``fmpz_poly/test/t-add.c``.
+``fmpz_poly_add`` located in ``src/fmpz_poly/add.c`` has test code in the
+file ``src/fmpz_poly/test/t-add.c``.
 
 Some modules have a ``profile`` directory in which profile programs can be
 found.

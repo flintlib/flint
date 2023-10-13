@@ -736,6 +736,8 @@ acb_mat_approx_eig_triu_l(acb_mat_t EL, const acb_mat_t A, slong prec)
         }
     }
 
+    acb_mat_clear(AT);
+
     acb_clear(r);
     acb_clear(s);
     acb_clear(t);

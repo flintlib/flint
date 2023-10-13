@@ -9,9 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmpcompat.h"
+#include "mpn_extras.h"
 #include "fmpq.h"
 #include "fmpz_poly.h"
-#include "mpn_extras.h"
 
 /* enable for debug printing of various types */
 #if 0

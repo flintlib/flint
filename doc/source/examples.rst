@@ -7,17 +7,15 @@ Example programs
 -------------------------------------------------------------------------------
 
 FLINT comes with example programs to demonstrate current and future FLINT
-features.  To build the example programs, type:
-
-.. code-block:: bash
+features. To build the example programs run::
 
     make examples
 
-The example programs are built in the ``build/examples`` directory. You must
-set your ``LD_LIBRARY_PATH`` or equivalent for the FLINT, MPIR and MPFR
-libraries. See your operating system documentation to see how to set this.
+The example programs are built in the ``build/examples`` directory.
 
-The current example programs are:
+For Arb and Calcium there are separate example pages
+:ref:`examples-arb` and :ref:`examples-calcium`. Below are some
+general examples.
 
 - ``partitions`` Demonstrates the partition counting code, e.g.
   ``build/examples/partitions 1000000000`` will compute the number of
@@ -50,9 +48,4 @@ The current example programs are:
 
 - ``fmpz_poly_q`` Gives a very simple example of the ``fmpz_poly_q`` module.
 
-- ``fmpz_poly`` Gives a very simple example of the ``fmpz_poly`` module.
-
 - ``fmpq_poly`` Gives a very simple example of the ``fmpq_poly`` module.
-
-Some of the example programs have associated ``C++`` versions.
-

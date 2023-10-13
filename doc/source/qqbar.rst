@@ -423,7 +423,7 @@ Arithmetic
 
     Sets *res* to the square of *x*.
 
-.. function:: void qqbar_inv(qqbar_t res, const qqbar_t x, const qqbar_t y)
+.. function:: void qqbar_inv(qqbar_t res, const qqbar_t x)
 
     Sets *res* to the multiplicative inverse of *y*.
     Division by zero calls *flint_abort*.
@@ -461,7 +461,7 @@ Powers and roots
     Division by zero calls *flint_abort*.
 
 .. function:: void qqbar_pow_ui(qqbar_t res, const qqbar_t x, ulong n)
-              void qqbar_pow_si(qqbar_t res, const qqbar_t x, ulong n)
+              void qqbar_pow_si(qqbar_t res, const qqbar_t x, slong n)
               void qqbar_pow_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t n)
               void qqbar_pow_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t n)
 
@@ -602,7 +602,7 @@ Polynomial roots
       consecutively).
 
 .. function:: void qqbar_eigenvalues_fmpz_mat(qqbar_ptr res, const fmpz_mat_t mat, int flags)
-              void qqbar_eigenvalues_fmpq_mat(qqbar_ptr res, const fmpz_mat_t mat, int flags)
+              void qqbar_eigenvalues_fmpq_mat(qqbar_ptr res, const fmpq_mat_t mat, int flags)
 
     Sets the entries of the vector *res* to the eigenvalues of the
     square matrix *mat*. These functions compute the characteristic polynomial
@@ -753,7 +753,7 @@ Guessing and simplification
 Symbolic expressions and conversion to radicals
 -------------------------------------------------------------------------------
 
-.. function:: void qqbar_get_quadratic(fmpz_t a, fmpz_t b, fmpz_t c, const fmpz_t q, const qqbar_t x, int factoring)
+.. function:: void qqbar_get_quadratic(fmpz_t a, fmpz_t b, fmpz_t c, fmpz_t q, const qqbar_t x, int factoring)
 
     Assuming that *x* has degree 1 or 2, computes integers *a*, *b*, *c*
     and *q* such that

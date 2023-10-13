@@ -3,6 +3,8 @@
 **arith.h** -- arithmetic and special functions
 ================================================================================
 
+This module implements arithmetic functions, number-theoretic and
+combinatorial special number sequences and polynomials.
 
 Primorials
 --------------------------------------------------------------------------------
@@ -10,7 +12,7 @@ Primorials
 
 .. function:: void arith_primorial(fmpz_t res, slong n)
 
-    Sets ``res`` to ``n`` primorial or `n \#`, the product of all prime 
+    Sets ``res`` to ``n`` primorial or `n \#`, the product of all prime
     numbers less than or equal to `n`.
 
 
@@ -35,9 +37,9 @@ Stirling numbers
 .. function:: void arith_stirling_number_2(fmpz_t s, ulong n, ulong k)
 
     Sets `s` to `S(n,k)` where `S(n,k)` denotes an unsigned Stirling
-    number of the first kind `|S_1(n, k)|`, a signed Stirling number 
-    of the first kind `S_1(n, k)`, or a Stirling number of the second 
-    kind `S_2(n, k)`.  The Stirling numbers are defined using the 
+    number of the first kind `|S_1(n, k)|`, a signed Stirling number
+    of the first kind `S_1(n, k)`, or a Stirling number of the second
+    kind `S_2(n, k)`.  The Stirling numbers are defined using the
     generating functions
 
     .. math ::
@@ -48,12 +50,12 @@ Stirling numbers
 
         x^n     = \sum_{k=0}^n S_2(n,k) x_{(k)}
 
-    where `x_{(n)} = x(x-1)(x-2) \dotsm (x-n+1)` is a falling factorial 
+    where `x_{(n)} = x(x-1)(x-2) \dotsm (x-n+1)` is a falling factorial
     and `x^{(n)} = x(x+1)(x+2) \dotsm (x+n-1)` is a rising factorial.
     `S(n,k)` is taken to be zero if `n < 0` or `k < 0`.
 
-    These three functions are useful for computing isolated Stirling 
-    numbers efficiently. To compute a range of numbers, the vector or 
+    These three functions are useful for computing isolated Stirling
+    numbers efficiently. To compute a range of numbers, the vector or
     matrix versions should generally be used.
 
 .. function:: void arith_stirling_number_1u_vec(fmpz * row, ulong n, slong klen)
@@ -65,18 +67,18 @@ Stirling numbers
     Computes the row of Stirling numbers
     ``S(n,0), S(n,1), S(n,2), ..., S(n,klen-1)``.
 
-    To compute a full row, this function can be called with 
+    To compute a full row, this function can be called with
     ``klen = n+1``. It is assumed that ``klen`` is at most `n + 1`.
 
-.. function:: void arith_stirling_number_1u_vec_next(fmpz * row, fmpz * prev, slong n, slong klen)
+.. function:: void arith_stirling_number_1u_vec_next(fmpz * row, const fmpz * prev, slong n, slong klen)
 
-.. function:: void arith_stirling_number_1_vec_next(fmpz * row, fmpz * prev, slong n, slong klen)
+.. function:: void arith_stirling_number_1_vec_next(fmpz * row, const fmpz * prev, slong n, slong klen)
 
-.. function:: void arith_stirling_number_2_vec_next(fmpz * row, fmpz * prev, slong n, slong klen)
+.. function:: void arith_stirling_number_2_vec_next(fmpz * row, const fmpz * prev, slong n, slong klen)
 
     Given the vector ``prev`` containing a row of Stirling numbers
     ``S(n-1,0), S(n-1,1), S(n-1,2), ..., S(n-1,klen-1)``, computes
-    and stores in the row argument 
+    and stores in the row argument
     ``S(n,0), S(n,1), S(n,2), ..., S(n,klen-1)``.
 
     If ``klen`` is greater than ``n``, the output ends with
@@ -84,7 +86,7 @@ Stirling numbers
     In this case, the input only needs to have length ``n-1``;
     only the input entries up to ``S(n-1,n-2)`` are read.
 
-    The ``row`` and ``prev`` arguments are permitted to be the 
+    The ``row`` and ``prev`` arguments are permitted to be the
     same, meaning that the row will be updated in-place.
 
 .. function:: void arith_stirling_matrix_1u(fmpz_mat_t mat)
@@ -104,7 +106,7 @@ Stirling numbers
     up to row `m-1` and column `n-1` inclusive. The upper triangular
     part of the matrix is zeroed.
 
-    For any `n`, the `S_1` and `S_2` matrices thus obtained are 
+    For any `n`, the `S_1` and `S_2` matrices thus obtained are
     inverses of each other.
 
 
@@ -275,7 +277,7 @@ Bernoulli numbers and polynomials
 
     Sets the elements of ``num`` and ``den`` to the reduced
     numerators and denominators of `B_0, B_1, B_2, \ldots, B_{n-1}`
-    inclusive. Uses the generating function 
+    inclusive. Uses the generating function
 
     .. math ::
 
@@ -330,7 +332,7 @@ The corresponding Euler polynomials are defined by
 
     .. math ::
 
-        E_n(x) = \frac{2}{n+1}\left(B_{n+1}(x) - 
+        E_n(x) = \frac{2}{n+1}\left(B_{n+1}(x) -
             2^{n+1}B_{n+1}\left(\frac{x}{2}\right)\right),
 
     with the Bernoulli polynomial `B_{n+1}(x)` evaluated once
@@ -349,32 +351,32 @@ Multiplicative functions
 
 .. function:: void arith_divisors(fmpz_poly_t res, const fmpz_t n)
 
-    Set the coefficients of the polynomial ``res`` to the divisors of `n`, 
+    Set the coefficients of the polynomial ``res`` to the divisors of `n`,
     including `1` and `n` itself, in ascending order.
 
 .. function:: void arith_ramanujan_tau(fmpz_t res, const fmpz_t n)
 
-    Sets ``res`` to the Ramanujan tau function `\tau(n)` which is the 
-    coefficient of `q^n` in the series expansion of 
+    Sets ``res`` to the Ramanujan tau function `\tau(n)` which is the
+    coefficient of `q^n` in the series expansion of
     `f(q) = q  \prod_{k \geq 1} \bigl(1 - q^k\bigr)^{24}`.
 
-    We factor `n` and use the identity `\tau(pq) = \tau(p) \tau(q)` 
-    along with the recursion 
+    We factor `n` and use the identity `\tau(pq) = \tau(p) \tau(q)`
+    along with the recursion
     `\tau(p^{r+1}) = \tau(p) \tau(p^r) - p^{11} \tau(p^{r-1})`
     for prime powers.
 
-    The base values `\tau(p)` are obtained using the function 
-    ``arith_ramanujan_tau_series()``. Thus the speed of 
+    The base values `\tau(p)` are obtained using the function
+    ``arith_ramanujan_tau_series()``. Thus the speed of
     ``arith_ramanujan_tau()`` depends on the largest prime factor of `n`.
 
-    Future improvement:  optimise this function for small `n`, which 
-    could be accomplished using a lookup table or by calling 
+    Future improvement:  optimise this function for small `n`, which
+    could be accomplished using a lookup table or by calling
     ``arith_ramanujan_tau_series()`` directly.
 
 .. function:: void arith_ramanujan_tau_series(fmpz_poly_t res, slong n)
 
-    Sets ``res`` to the polynomial with coefficients 
-    `\tau(0),\tau(1), \dotsc, \tau(n-1)`, giving the initial `n` terms 
+    Sets ``res`` to the polynomial with coefficients
+    `\tau(0),\tau(1), \dotsc, \tau(n-1)`, giving the initial `n` terms
     in the series expansion of
     `f(q) = q \prod_{k \geq 1} \bigl(1-q^k\bigr)^{24}`.
 
@@ -560,4 +562,3 @@ Sums of squares
     .. math ::
 
         \vartheta_3^k(q) = \left( \sum_{i=-\infty}^{\infty} q^{i^2} \right)^k.
-

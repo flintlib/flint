@@ -41,7 +41,7 @@ Basic manipulation
 
     Return the length of the product in *f*.
 
-.. function:: void nmod_mpoly_factor_get_constant_ui(const nmod_mpoly_factor_t f, const nmod_mpoly_ctx_t ctx)
+.. function:: ulong nmod_mpoly_factor_get_constant_ui(const nmod_mpoly_factor_t f, const nmod_mpoly_ctx_t ctx)
 
     Return the constant of *f*.
 

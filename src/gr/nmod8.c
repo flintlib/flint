@@ -14,6 +14,7 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "gr.h"
+#include "gr_mat.h"
 
 #define NMOD8_CTX_REF(ring_ctx) (((nmod_t *)((ring_ctx))))
 #define NMOD8_CTX(ring_ctx) (*NMOD8_CTX_REF(ring_ctx))
@@ -280,7 +281,68 @@ nmod8_is_invertible(const nmod8_t x, const gr_ctx_t ctx)
     return (g == 1) ? T_TRUE : T_FALSE;
 }
 
-/* todo: overflow checks */
+void
+_nmod8_vec_init(nmod8_struct * res, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        res[i] = 0;
+}
+
+void
+_nmod8_vec_clear(nmod8_struct * res, slong len, gr_ctx_t ctx)
+{
+}
+
+int
+_nmod8_vec_set(nmod8_struct * res, const nmod8_struct * vec, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        res[i] = vec[i];
+
+    return GR_SUCCESS;
+}
+
+int
+_nmod8_vec_neg(nmod8_struct * res, const nmod8_struct * vec, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    nmod_t mod = NMOD8_CTX(ctx);
+
+    for (i = 0; i < len; i++)
+        res[i] = nmod_neg(vec[i], mod);
+
+    return GR_SUCCESS;
+}
+
+int
+_nmod8_vec_add(nmod8_struct * res, const nmod8_struct * vec1, const nmod8_struct * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    nmod_t mod = NMOD8_CTX(ctx);
+
+    for (i = 0; i < len; i++)
+        res[i] = _nmod_add(vec1[i], vec2[i], mod);
+
+    return GR_SUCCESS;
+}
+
+
+int
+_nmod8_vec_sub(nmod8_struct * res, const nmod8_struct * vec1, const nmod8_struct * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    nmod_t mod = NMOD8_CTX(ctx);
+
+    for (i = 0; i < len; i++)
+        res[i] = nmod_sub(vec1[i], vec2[i], mod);
+
+    return GR_SUCCESS;
+}
+
 int
 _nmod8_vec_dot(nmod8_t res, const nmod8_t initial, int subtract, const nmod8_struct * vec1, const nmod8_struct * vec2, slong len, gr_ctx_t ctx)
 {
@@ -305,21 +367,37 @@ _nmod8_vec_dot(nmod8_t res, const nmod8_t initial, int subtract, const nmod8_str
     else
     {
         if (subtract)
-            s = (n - initial[0]);
+            s = n_negmod(initial[0], n);
         else
             s = initial[0];
     }
 
-    for (i = 0; i + 4 < len; i += 4)
+    if (len < 65536)
     {
-        s += (ulong) vec1[i    ] * (ulong) vec2[i];
-        s += (ulong) vec1[i + 1] * (ulong) vec2[i + 1];
-        s += (ulong) vec1[i + 2] * (ulong) vec2[i + 2];
-        s += (ulong) vec1[i + 3] * (ulong) vec2[i + 3];
-    }
+        unsigned int ss = 0;
 
-    for ( ; i < len; i++)
-        s += (ulong) vec1[i] * (ulong) vec2[i];
+        for (i = 0; i + 4 < len; i += 4)
+        {
+            s += (unsigned int) vec1[i + 0] * (unsigned int) vec2[i + 0];
+            s += (unsigned int) vec1[i + 1] * (unsigned int) vec2[i + 1];
+            s += (unsigned int) vec1[i + 2] * (unsigned int) vec2[i + 2];
+            s += (unsigned int) vec1[i + 3] * (unsigned int) vec2[i + 3];
+        }
+
+        for ( ; i < len; i++)
+            s += (unsigned int) vec1[i] * (unsigned int) vec2[i];
+
+        s += ss;
+    }
+    else
+    {
+        ulong ss;
+        int nlimbs;
+
+        nlimbs = _nmod_vec_dot_bound_limbs(len, NMOD8_CTX(ctx));
+        NMOD_VEC_DOT(ss, i, len, (ulong) vec1[i], (ulong) vec2[i], NMOD8_CTX(ctx), nlimbs);
+        s = n_addmod(s, ss, n);
+    }
 
     nmod8_set_ui(res, s, ctx);
 
@@ -329,7 +407,6 @@ _nmod8_vec_dot(nmod8_t res, const nmod8_t initial, int subtract, const nmod8_str
     return GR_SUCCESS;
 }
 
-/* todo: overflow checks */
 int
 _nmod8_vec_dot_rev(nmod8_t res, const nmod8_t initial, int subtract, const nmod8_struct * vec1, const nmod8_struct * vec2, slong len, gr_ctx_t ctx)
 {
@@ -354,21 +431,37 @@ _nmod8_vec_dot_rev(nmod8_t res, const nmod8_t initial, int subtract, const nmod8
     else
     {
         if (subtract)
-            s = (n - initial[0]);
+            s = n_negmod(initial[0], n);
         else
             s = initial[0];
     }
 
-    for (i = 0; i + 4 < len; i += 4)
+    if (len < 65536)
     {
-        s += (ulong) vec1[i    ] * (ulong) vec2[len - 1 - i];
-        s += (ulong) vec1[i + 1] * (ulong) vec2[len - 1 - i - 1];
-        s += (ulong) vec1[i + 2] * (ulong) vec2[len - 1 - i - 2];
-        s += (ulong) vec1[i + 3] * (ulong) vec2[len - 1 - i - 3];
-    }
+        unsigned int ss = 0;
 
-    for ( ; i < len; i++)
-        s += (ulong) vec1[i] * (ulong) vec2[len - 1 - i];
+        for (i = 0; i + 4 < len; i += 4)
+        {
+            s += (unsigned int) vec1[i + 0] * (unsigned int) vec2[len - 1 - i - 0];
+            s += (unsigned int) vec1[i + 1] * (unsigned int) vec2[len - 1 - i - 1];
+            s += (unsigned int) vec1[i + 2] * (unsigned int) vec2[len - 1 - i - 2];
+            s += (unsigned int) vec1[i + 3] * (unsigned int) vec2[len - 1 - i - 3];
+        }
+
+        for ( ; i < len; i++)
+            s += (unsigned int) vec1[i] * (unsigned int) vec2[len - 1 - i];
+
+        s += ss;
+    }
+    else
+    {
+        ulong ss;
+        int nlimbs;
+
+        nlimbs = _nmod_vec_dot_bound_limbs(len, NMOD8_CTX(ctx));
+        NMOD_VEC_DOT(ss, i, len, (ulong) vec1[i], (ulong) vec2[len - 1 - i], NMOD8_CTX(ctx), nlimbs);
+        s = n_addmod(s, ss, n);
+    }
 
     nmod8_set_ui(res, s, ctx);
 
@@ -376,6 +469,16 @@ _nmod8_vec_dot_rev(nmod8_t res, const nmod8_t initial, int subtract, const nmod8
         res[0] = (n - res[0]);
 
     return GR_SUCCESS;
+}
+
+/* todo: tuning for rectangular matrices */
+int
+_nmod8_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+{
+    if (A->r >= 256 && A->c >= 256 && B->c >= 256)
+        return gr_mat_mul_strassen(C, A, B, ctx);
+    else
+        return gr_mat_mul_classical(C, A, B, ctx);
 }
 
 
@@ -427,8 +530,15 @@ gr_method_tab_input _nmod8_methods_input[] =
     {GR_METHOD_DIV_SI,          (gr_funcptr) nmod8_div_si},
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) nmod8_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) nmod8_inv},
+    {GR_METHOD_VEC_INIT,        (gr_funcptr) _nmod8_vec_init},
+    {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _nmod8_vec_clear},
+    {GR_METHOD_VEC_SET,         (gr_funcptr) _nmod8_vec_set},
+    {GR_METHOD_VEC_NEG,         (gr_funcptr) _nmod8_vec_neg},
+    {GR_METHOD_VEC_ADD,         (gr_funcptr) _nmod8_vec_add},
+    {GR_METHOD_VEC_SUB,         (gr_funcptr) _nmod8_vec_sub},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _nmod8_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _nmod8_vec_dot_rev},
+    {GR_METHOD_MAT_MUL,         (gr_funcptr) _nmod8_mat_mul},
     {0,                         (gr_funcptr) NULL},
 };
 

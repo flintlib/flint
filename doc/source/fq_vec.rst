@@ -3,8 +3,6 @@
 **fq_vec.h** -- vectors over finite fields
 ===============================================================================
 
-Description.
-
 Memory management
 --------------------------------------------------------------------------------
 
@@ -13,7 +11,7 @@ Memory management
 
     Returns an initialised vector of ``fq``'s of given length.
 
-.. function:: void _fq_vec_clear(fq * vec, slong len, const fq_ctx_t ctx)
+.. function:: void _fq_vec_clear(fq_struct * vec, slong len, const fq_ctx_t ctx)
 
     Clears the entries of ``(vec, len)`` and frees the space allocated
     for ``vec``.
@@ -79,7 +77,7 @@ Comparison
     Compares two vectors of the given length and returns `1` if they are
     equal, otherwise returns `0`.
 
-.. function:: int _fq_vec_is_zero(const fq_struct * vec, slong len, const ctx_ctx)
+.. function:: int _fq_vec_is_zero(const fq_struct * vec, slong len, const fq_ctx_t ctx)
 
     Returns `1` if ``(vec, len)`` is zero, and `0` otherwise.
 

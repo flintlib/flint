@@ -203,7 +203,7 @@ Comparisons
 .. function:: int arb_poly_overlaps(const arb_poly_t poly1, const arb_poly_t poly2)
 
     Returns nonzero iff *poly1* overlaps with *poly2*. The underscore
-    function requires that *len1* ist at least as large as *len2*.
+    function requires that *len1* is at least as large as *len2*.
 
 .. function:: int arb_poly_get_unique_fmpz_poly(fmpz_poly_t z, const arb_poly_t x)
 
@@ -624,7 +624,7 @@ Differentiation
     Sets *{res, len - n}* to the nth derivative of *{poly, len}*. Does
     nothing if *len <= n*. Allows aliasing of the input and output.
 
-.. function:: void arb_poly_nth_derivative(arb_poly_t res, const arb_poly_t poly, slong prec)
+.. function:: void arb_poly_nth_derivative(arb_poly_t res, const arb_poly_t poly, ulong n, slong prec)
 
     Sets *res* to the nth derivative of *poly*.
 
@@ -692,7 +692,7 @@ Transforms
 
 .. function:: void _arb_poly_graeffe_transform(arb_ptr b, arb_srcptr a, slong len, slong prec)
 
-.. function:: void arb_poly_graeffe_transform(arb_poly_t b, arb_poly_t a, slong prec)
+.. function:: void arb_poly_graeffe_transform(arb_poly_t b, const arb_poly_t a, slong prec)
 
     Computes the Graeffe transform of input polynomial.
 

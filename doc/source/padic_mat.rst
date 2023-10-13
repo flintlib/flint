@@ -104,7 +104,7 @@ Memory management
 
     Returns whether the matrix `A` is square.
 
-.. function:: int padic_mat_is_canonical(const padic_mat_t A, const fmpz_t p)
+.. function:: int padic_mat_is_canonical(const padic_mat_t A, const padic_ctx_t p)
 
     Returns whether the matrix `A` is in canonical form.
 
@@ -113,7 +113,7 @@ Basic assignment
 --------------------------------------------------------------------------------
 
 
-.. function:: void padic_mat_set(padic_mat_t B, const padic_mat_t A)
+.. function:: void padic_mat_set(padic_mat_t B, const padic_mat_t A, const padic_ctx_t p)
 
     Sets `B` to a copy of `A`, respecting the precision of `B`.
 

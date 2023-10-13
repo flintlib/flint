@@ -85,7 +85,7 @@ _gr_poly_div_basecase(gr_ptr Q,
 
     /* constant is a unit; can multiply by inverse */
     if (status == GR_SUCCESS)
-        status |= _gr_poly_div_basecase_preinv1(Q, A, Alen, B, Blen, invB, ctx);
+        status = _gr_poly_div_basecase_preinv1(Q, A, Alen, B, Blen, invB, ctx);
     else
         status = _gr_poly_div_basecase_noinv(Q, A, Alen, B, Blen, ctx);
 

@@ -123,7 +123,7 @@ void fmpq_set_ui(fmpq_t res, ulong p, ulong q);
 void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, slong p, ulong q);
 void fmpq_set_si(fmpq_t res, slong p, ulong q);
 
-FMPQ_INLINE int fmpq_equal_ui(fmpq_t q, slong n)
+FMPQ_INLINE int fmpq_equal_ui(fmpq_t q, ulong n)
 {
     return fmpz_equal_ui(fmpq_numref(q), n) && q->den == WORD(1);
 }

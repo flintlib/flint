@@ -663,7 +663,9 @@ typedef enum
 
     /* Polynomial methods (todo: rename -> GR_POLY) */
     GR_METHOD_POLY_MULLOW,
+    GR_METHOD_POLY_DIV,
     GR_METHOD_POLY_DIVREM,
+    GR_METHOD_POLY_DIVEXACT,
     GR_METHOD_POLY_TAYLOR_SHIFT,
     GR_METHOD_POLY_INV_SERIES,
     GR_METHOD_POLY_INV_SERIES_BASECASE,
@@ -704,7 +706,7 @@ void gr_method_tab_init(gr_funcptr * methods, gr_method_tab_input * tab);
 typedef enum
 {
     GR_CTX_FMPZ, GR_CTX_FMPQ, GR_CTX_FMPZI,
-    GR_CTX_FMPZ_MOD, GR_CTX_NMOD, GR_CTX_NMOD8,
+    GR_CTX_FMPZ_MOD, GR_CTX_NMOD, GR_CTX_NMOD8, GR_CTX_NMOD32,
     GR_CTX_FQ, GR_CTX_FQ_NMOD, GR_CTX_FQ_ZECH,
     GR_CTX_NF,
     GR_CTX_REAL_ALGEBRAIC_QQBAR, GR_CTX_COMPLEX_ALGEBRAIC_QQBAR,
@@ -1339,7 +1341,9 @@ void gr_ctx_fmpz_mod_set_primality(gr_ctx_t ctx, truth_t is_prime);
 
 void gr_ctx_init_nmod(gr_ctx_t ctx, ulong n);
 void _gr_ctx_init_nmod(gr_ctx_t ctx, void * nmod_t_ref);
+
 void gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n);
+void gr_ctx_init_nmod32(gr_ctx_t ctx, unsigned int n);
 
 void gr_ctx_init_real_qqbar(gr_ctx_t ctx);
 void gr_ctx_init_complex_qqbar(gr_ctx_t ctx);

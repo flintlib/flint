@@ -185,6 +185,8 @@ main(void)
 
     fmpz_clear(f);
 
+    flint_cleanup_master();
+
     flint_printf("PASS\n");
     return 0;
 }

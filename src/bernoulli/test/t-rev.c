@@ -89,6 +89,8 @@ int main(void)
         fmpz_clear(denom);
     }
 
+    nmod_poly_clear(A);
+
     flint_randclear(state);
     flint_cleanup();
     flint_printf("PASS\n");

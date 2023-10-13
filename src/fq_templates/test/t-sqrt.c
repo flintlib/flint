@@ -113,6 +113,7 @@ main(void)
             TEMPLATE(T, clear)(b, ctx);
             TEMPLATE(T, clear)(c, ctx);
             TEMPLATE(T, clear)(d, ctx);
+            TEMPLATE(T, clear)(x, ctx);
         }
 
         TEMPLATE(T, ctx_clear)(ctx);

@@ -128,7 +128,7 @@ Basic manipulation
     
     Set *A* to *B*.
 
-.. function:: int fmpq_mpoly_equal(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
+.. function:: int fmpq_mpoly_equal(const fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
 
     Return `1` if *A* is equal to *B*, else return `0`.
 
@@ -165,8 +165,8 @@ Constants
 
     Set *A* to the constant `1`.
 
-.. function:: int fmpq_mpoly_equal_fmpq(const fmpq_mpoly_t A, fmpq_t c, const fmpq_mpoly_ctx_t ctx)
-              int fmpq_mpoly_equal_fmpz(const fmpq_mpoly_t A, fmpz_t c, const fmpq_mpoly_ctx_t ctx)
+.. function:: int fmpq_mpoly_equal_fmpq(const fmpq_mpoly_t A, const fmpq_t c, const fmpq_mpoly_ctx_t ctx)
+              int fmpq_mpoly_equal_fmpz(const fmpq_mpoly_t A, const fmpz_t c, const fmpq_mpoly_ctx_t ctx)
               int fmpq_mpoly_equal_ui(const fmpq_mpoly_t A, ulong c, const fmpq_mpoly_ctx_t ctx)
               int fmpq_mpoly_equal_si(const fmpq_mpoly_t A, slong c, const fmpq_mpoly_ctx_t ctx)
 
@@ -235,12 +235,12 @@ Coefficients
     This function throws if *M* is not a monomial.
 
 .. function:: void fmpq_mpoly_get_coeff_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t A, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
-              void fmpq_mpoly_get_coeff_fmpq_ui(fmpq_t c, const fmpq_mpoly_t A, ulong const * exp, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_get_coeff_fmpq_ui(fmpq_t c, const fmpq_mpoly_t A, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
 
     Set *c* to the coefficient of the monomial with exponent *exp*.
 
-.. function:: void fmpq_mpoly_set_coeff_fmpq_fmpz(fmpq_mpoly_t A, const fmpq_t c, fmpz * const * exp, fmpq_mpoly_ctx_t ctx)
-              void fmpq_mpoly_set_coeff_fmpq_ui(fmpq_mpoly_t A, const fmpq_t c, ulong const * exp, fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_set_coeff_fmpq_fmpz(fmpq_mpoly_t A, const fmpq_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_set_coeff_fmpq_ui(fmpq_mpoly_t A, const fmpq_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
 
     Set the coefficient of the monomial with exponent *exp* to *c*.
 
@@ -339,9 +339,13 @@ Container operations
     Set *M* to the monomial of the term of index *i* in *A*. The coefficient of *M* will be one.
 
 .. function:: void fmpq_mpoly_push_term_fmpq_fmpz(fmpq_mpoly_t A, const fmpq_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_push_term_fmpq_ffmpz(fmpq_mpoly_t A, const fmpq_t c, const fmpz * exp, const fmpq_mpoly_ctx_t ctx)
               void fmpq_mpoly_push_term_fmpz_fmpz(fmpq_mpoly_t A, const fmpz_t c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_push_term_fmpz_ffmpz(fmpq_mpoly_t A, const fmpz_t c, const fmpz * exp, const fmpq_mpoly_ctx_t ctx)
               void fmpq_mpoly_push_term_ui_fmpz(fmpq_mpoly_t A, ulong c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_push_term_ui_ffmpz(fmpq_mpoly_t A, ulong c, const fmpz * exp, const fmpq_mpoly_ctx_t ctx)
               void fmpq_mpoly_push_term_si_fmpz(fmpq_mpoly_t A, slong c, fmpz * const * exp, const fmpq_mpoly_ctx_t ctx)
+              void fmpq_mpoly_push_term_si_ffmpz(fmpq_mpoly_t A, slong c, const fmpz * exp, const fmpq_mpoly_ctx_t ctx)
               void fmpq_mpoly_push_term_fmpq_ui(fmpq_mpoly_t A, const fmpq_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
               void fmpq_mpoly_push_term_fmpz_ui(fmpq_mpoly_t A, const fmpz_t c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
               void fmpq_mpoly_push_term_ui_ui(fmpq_mpoly_t A, ulong c, const ulong * exp, const fmpq_mpoly_ctx_t ctx)
@@ -440,7 +444,7 @@ Scalar operations
 
     Set *A* to `B/c`.
 
-.. function:: void fmpq_mpoly_make_monic(fmpq_mpoly_t A, fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
+.. function:: void fmpq_mpoly_make_monic(fmpq_mpoly_t A, const fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
 
     Set *A* to *B* divided by the leading coefficient of *B*.
     This throws if *B* is zero.

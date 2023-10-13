@@ -31,7 +31,7 @@ AC_PREREQ(2.59)
 
 define(FLINT_VERSION,[3.0.0-alpha1])
 
-AC_INIT(FLINT, FLINT_VERSION, [https://github.com/flintlib/flint2/issues/], flint, [https://flintlib.org/])
+AC_INIT(FLINT, FLINT_VERSION, [https://github.com/flintlib/flint/issues/], flint, [https://flintlib.org/])
 AC_CONFIG_AUX_DIR([config])
 AC_LANG(C)
 
@@ -68,9 +68,6 @@ AC_LANG(C)
 # 3.0.0 => 18.0.0
 
 # NOTE: This must be after AC_INIT
-FLINT_MAJOR=3
-FLINT_MINOR=0
-FLINT_PATCH=0
 FLINT_MAJOR_SO=18
 FLINT_MINOR_SO=0
 FLINT_PATCH_SO=0
@@ -122,7 +119,7 @@ dnl AC_CANONICAL_HOST
 # configure headers
 ################################################################################
 
-AC_CONFIG_HEADERS(src/flint-config.h:src/config.h.in)
+AC_CONFIG_HEADERS(src/config.h src/flint-config.h)
 
 ################################################################################
 # features
@@ -201,17 +198,6 @@ yes|no)
 esac],
 enable_coverage="no")
 
-dnl TODO: This is currently not working because of the makefile.
-AC_ARG_ENABLE(cxx,
-[AS_HELP_STRING([--enable-cxx],[Enable C++ wrappers, including tests [default=no]])],
-[case $enableval in
-yes|no)
-    ;;
-*)
-    AC_MSG_ERROR([Bad value $enableval for --enable-cxx. Need yes or no.])
-    ;;
-esac],
-enable_cxx="no")
 
 AC_ARG_ENABLE(dependency-tracking,
 [AS_HELP_STRING([--enable-dependency-tracking],[Enable GCC automated dependency tracking [default=yes]])],
@@ -256,6 +242,17 @@ yes|no)
     ;;
 esac],
 enable_avx512="no")
+
+# Note: This is maintainer level only. Currently only used for Nemo CI.
+AC_ARG_ENABLE(mpfr-check,[],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-mpfr-check. Need yes or no.])
+    ;;
+esac],
+enable_mpfr_check="yes")
 
 ################################################################################
 # packages
@@ -320,6 +317,7 @@ then
     LDFLAGS="$LDFLAGS -L$withval/lib"
     mpfr_include_path="$withval/include"
     mpfr_lib_path="$withval/lib"
+    with_mpfr="yes"
 else
     AC_MSG_FAILURE([Cannot use --with-mpfr along with --with-mpfr-include or --with-mpfr-lib.])
 fi,
@@ -411,19 +409,19 @@ then
 fi
 
 AC_ARG_WITH(ntl_include,
-[AS_HELP_STRING([--with-ntl-include=DIR],[Use NTL and specify its include directory])],
+[AS_HELP_STRING([--with-ntl-include=DIR],[Use NTL (in tests) and specify its include directory])],
 CPPFLAGS="$CPPFLAGS -I$withval"
 ntl_include_path="$withval"
 )
 
 AC_ARG_WITH(ntl_lib,
-[AS_HELP_STRING([--with-ntl-lib=DIR],[Use NTL and specify its library directory])],
+[AS_HELP_STRING([--with-ntl-lib=DIR],[Use NTL (in tests) and specify its library directory])],
 LDFLAGS="$LDFLAGS -L$withval"
 ntl_lib_path="$withval"
 )
 
 AC_ARG_WITH(ntl,
-[AS_HELP_STRING([--with-ntl[[=DIR]]],[Use NTL and optionally specify its install directory])],
+[AS_HELP_STRING([--with-ntl[[=DIR]]],[Use NTL (in tests) and optionally specify its install directory])],
 if test "$with_ntl" = "yes";
 then
     :
@@ -458,7 +456,7 @@ fi
 dnl NOTE: This is invoked from LT_INIT
 dnl AC_PROG_CC
 
-if test "$with_ntl" = "yes" || test "$enable_cxx" = "yes";
+if test "$with_ntl" = "yes" ;
 then
     AC_PROG_CXX
 fi
@@ -474,15 +472,6 @@ AC_ARG_VAR([TESTCFLAGS], [Choose different C compiler flags for tests [default=C
 AC_ARG_VAR(ABI, [Desired ABI])
 
 AC_ARG_VAR(LDCONFIG, [ldconfig tool])
-
-AC_ARG_VAR(TMPDIR, [Specify directory meant for temporary files for host system. Only relevant if host do not have read and write access to /tmp [default=/tmp].])
-
-if test -z "$TMPDIR";
-then
-    TMPDIR="/tmp"
-fi
-
-AC_DEFINE_UNQUOTED([FLINT_TMPDIR], ["$TMPDIR"], [Define to set the default directory for temporary files])
 
 ################################################################################
 # check programs and system
@@ -502,7 +491,7 @@ case "$host_os" in
         flint_lib="libflint.dylib"
         flint_lib_major="libflint.$FLINT_MAJOR_SO.dylib"
         flint_lib_full="libflint.$FLINT_MAJOR_SO.$FLINT_MINOR_SO.dylib"
-        extra_shared_flags="-install_name `pwd`/$flint_lib_full -compatibility_version $FLINT_MAJOR_SO.$FLINT_MINOR_SO -current_version $FLINT_MAJOR_SO.$FLINT_MINOR_SO.$FLINT_PATCH_SO"
+        extra_shared_flags="-install_name '`pwd`/$flint_lib_full' -compatibility_version $FLINT_MAJOR_SO.$FLINT_MINOR_SO -current_version $FLINT_MAJOR_SO.$FLINT_MINOR_SO.$FLINT_PATCH_SO"
         flint_dylib="yes"
         ;;
     cygwin|mingw*|msys)
@@ -563,8 +552,8 @@ case "$host_os" in
     cygwin|mingw*|msys)
         if test "$DLLTOOL" = "false";
         then
-            AC_MSG_ERROR("Couldn't find any dlltool that is required to create import libraries for
-Windows-type systems.")
+            AC_MSG_ERROR(["Couldn't find any dlltool that is required to create import libraries for
+Windows-type systems."])
         fi
         ;;
     *)
@@ -592,7 +581,7 @@ then
             LDCONFIG="true"
             if test "$FLINT_SOLIB" = "1";
             then
-                if test ldconfig > /dev/null 2>&1;
+                if test -x ldconfig > /dev/null 2>&1;
                 then
                     LDCONFIG="ldconfig"
                 elif test -x /sbin/ldconfig;
@@ -653,67 +642,77 @@ fi
 
 if test "$with_ntl" = "yes";
 then
+    AC_LANG_PUSH([C++])
     AC_CHECK_HEADER([NTL/ZZ.h],,
                     AC_MSG_ERROR([Could not find NTL/ZZ.h!]))
+    AC_LANG_POP([C++])
 fi
 
 ################################################################################
 # check libraries
 ################################################################################
 
-AC_CHECK_LIB(m,fabs,
-[LIBS="-lm $LIBS"],
-[AC_MSG_ERROR([The C math library was not found!])])
+AC_SEARCH_LIBS([atan2],[m],
+   [],
+   [AC_MSG_ERROR(["The C math library was not found!"])])
 
-AC_CHECK_LIB(gmp,__gmpz_init,
-[LIBS="-lgmp $LIBS"],
-[AC_MSG_ERROR([GMP library was not found.  If you indeed have GMP installed, please
-submit a bug report to <https://github.com/flintlib/flint2/issues/> so
-that we can either fix the issue or give a more proper error message.])])
+AC_SEARCH_LIBS([__gmpz_init],[gmp],
+   [],
+   [AC_MSG_ERROR(["GMP library was not found.  If you indeed have GMP installed, please
+submit a bug report to <https://github.com/flintlib/flint/issues/> so
+that we can either fix the issue or give a more proper error message."])])
 
 if test "$enable_gmp_internals" = "yes";
 then
-    AC_CHECK_LIB([gmp],[__gmpn_gcd_11],
-    [dummy_var="x"],
-    [AC_MSG_ERROR([`mpn_gcd_11' was not found in the GMP library. It is needed to enable GMP
+    AC_SEARCH_LIBS([__gmpn_gcd_11],[gmp],
+        [],
+        [AC_MSG_ERROR(["`mpn_gcd_11' was not found in the GMP library. It is needed to enable GMP
+internals."])])
+
+    AC_SEARCH_LIBS([__gmpn_div_q],[gmp],
+        [],
+        [AC_MSG_ERROR([`mpn_div_q' was not found in the GMP library. It is needed to enable GMP
 internals.])])
-    AC_CHECK_LIB([gmp],[__gmpn_div_q],
-    [dummy_var="x"],
-    [AC_MSG_ERROR([`mpn_div_q' was not found in the GMP library. It is needed to enable GMP
-internals.])])
+
+    AC_SEARCH_LIBS([__gmpn_modexact_1_odd],[gmp],
+        [AC_DEFINE(FLINT_HAVE_MPN_MODEXACT_1_ODD,1,Define if system has mpn_modexact_1_odd)])
 fi
 
-AC_CHECK_LIB(mpfr,mpfr_init,
-[LIBS="-lmpfr $LIBS"],
-[AC_MSG_ERROR([MPFR library was not found.  If you indeed have MPFR installed, please
-submit a bug report to <https://github.com/flintlib/flint2/issues/> so
+if test "$enable_mpfr_check" = "yes";
+then
+    AC_SEARCH_LIBS([mpfr_init],[mpfr],
+        [],
+        [AC_MSG_ERROR([MPFR library was not found.  If you indeed have MPFR installed, please
+submit a bug report to <https://github.com/flintlib/flint/issues/> so
 that we can either fix the issue or give a more proper error message.])])
+else
+    LIBS="$LIBS -lmpfr"
+fi
 
 if test "$enable_pthread" = "yes";
 then
     # check if compiler accepts the preferred -pthread
-    AX_CHECK_COMPILE_FLAG(-pthread,
-    [LIBS="-pthread $LIBS"],
-    # check if the compiler can do -lpthread
-    AC_CHECK_LIB(pthread,pthread_create,
-    [LIBS="-lpthread $LIBS"],
-    [AC_MSG_ERROR([Couldn't link against POSIX threads via -pthread or -lpthread while
---enable-pthread was specified.])]))
+    AX_CHECK_COMPILE_FLAG([-pthread],
+        [LIBS="-pthread $LIBS"],
+        # check if the compiler can do -lpthread
+        AC_SEARCH_LIBS([pthread_create],[pthread],
+            [],
+            AC_MSG_ERROR([Couldn't link against POSIX threads via -pthread or -lpthread while
+--enable-pthread was specified.])
+        )
+    )
 fi
 
 if test "$with_blas" = "yes";
 then
-    AC_CHECK_LIB(cblas,cblas_dgemm,
-    [LIBS="-lcblas $LIBS"],
-    [AC_CHECK_LIB(openblas,cblas_dgemm,
-     [LIBS="-lopenblas $LIBS"],
-     [AC_CHECK_LIB(blas,cblas_dgemm,
-      [LIBS="-lblas $LIBS"],
-      [AC_MSG_ERROR([BLAS library was not found.  If you indeed have BLAS installed, please
-submit a bug report to <https://github.com/flintlib/flint2/issues/> so
+    AC_SEARCH_LIBS([cblas_dgemm],[cblas],[],
+        [AC_SEARCH_LIBS([cblas_dgemm],[openblas],[],
+            [AC_SEARCH_LIBS([cblas_dgemm],[blas],[],
+                [AC_MSG_ERROR([BLAS library was not found.  If you indeed have BLAS installed, please
+submit a bug report to <https://github.com/flintlib/flint/issues/> so
 that we can either fix the issue or give a more proper error message.])]
-      )]
-     )]
+            )]
+        )]
     )
 fi
 
@@ -725,19 +724,18 @@ then
     AC_LANG_PUSH([C++])
     dnl The following code snippet was taken from NTL's documentation
     AC_LINK_IFELSE(
-    [AC_LANG_PROGRAM(
-        [#include <NTL/ZZ.h>],
-        [NTL::ZZ a, b, c;
+        [AC_LANG_PROGRAM([[#include <NTL/ZZ.h>]],
+            [NTL::ZZ a, b, c;
 std::cin >> a;
 std::cin >> b;
 c = (a+1)*(b+1);
-std::cout << c << "\n";]
-    )],
-    [AC_MSG_RESULT([yes])],
-    [AC_MSG_RESULT([no])
-    AC_MSG_ERROR([NTL library was not found.  If you indeed have NTL installed, please
-submit a bug report to <https://github.com/flintlib/flint2/issues/> so
-that we can either fix the issue or give a more proper error message.])])
+std::cout << c << "\n";])],
+        AC_MSG_RESULT([yes]),
+        AC_MSG_RESULT([no])
+        [AC_MSG_ERROR([NTL library was not found.  If you indeed have NTL installed, please
+submit a bug report to <https://github.com/flintlib/flint/issues/> so
+that we can either fix the issue or give a more proper error message.])]
+    )
     AC_LANG_POP
     LIBS="$SAVE_libs"
 fi
@@ -751,10 +749,13 @@ AC_SUBST(PIC_FLAG,$pic_flag)
 if test "$enable_thread_safe" = "yes";
 then
     AC_MSG_CHECKING([if $CC supports TLS handle])
-    for tls_expression in "__thread" "_Thread_local" "__declspec(thread)"
+    for tls_expression in '__thread' '_Thread_local' '__declspec(thread)'
     do
-        AC_LINK_IFELSE([AC_LANG_PROGRAM([$tls_expression int myvariable = 0;],[])],
-        [flint_success="yes"],[flint_success="no"])
+        AC_LINK_IFELSE(
+            [AC_LANG_PROGRAM([$tls_expression int myvariable = 0;],[])],
+            [flint_success="yes"],
+            [flint_success="no"]
+        )
 
         if test "$flint_success" = "yes";
         then
@@ -798,7 +799,7 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM(
 [AC_MSG_RESULT([yes])],
 [AC_MSG_RESULT([no])
 AC_MSG_ERROR([Couldn't find alloca, which is required for FLINT. Please submit a bug
-report to <https://github.com/flintlib/flint2/issues/> and specify your
+report to <https://github.com/flintlib/flint/issues/> and specify your
 operating system.])])
 
 AC_MSG_CHECKING([if $CC has popcount intrinsics])
@@ -926,7 +927,7 @@ then
     CFLAGS="$save_CFLAGS $DEFAULT_CFLAGS"
 else
     CFLAGS="$save_CFLAGS"
-    AX_CHECK_COMPILE_FLAG([$CFLAGS],[],AC_MSG_ERROR([Couldn't compile with given CFLAGS!]))
+    AX_CHECK_COMPILE_FLAG([$CFLAGS],[],AC_MSG_ERROR(["Couldn't compile with given CFLAGS!"]))
 fi
 
 if test "$testcflags_set" = "no";
@@ -1002,6 +1003,16 @@ fi
 # substitutions and definitions
 ################################################################################
 
+AC_SUBST([FLINT_VERSION], FLINT_VERSION)
+
+# split version into major/minor/patch using POSIX variable substitutions
+tail=FLINT_VERSION
+FLINT_MAJOR=${tail%%.*}
+tail=${tail#*.}
+FLINT_MINOR=${tail%%.*}
+tail=${tail#*.}
+FLINT_PATCH=${tail%-*}
+
 AC_SUBST(FLINT_MAJOR)
 AC_SUBST(FLINT_MINOR)
 AC_SUBST(FLINT_PATCH)
@@ -1022,7 +1033,7 @@ if test "$with_gc" = "yes";
 then
     if test "$enable_thread_safe" = "yes";
     then
-        AC_MSG_ERROR([The Boehm-Demers-Weise garbage collector does not support thread-local storage!])
+        AC_MSG_ERROR(["The Boehm-Demers-Weise garbage collector does not support thread-local storage!"])
     fi
     fmpz_c="src/fmpz/link/fmpz_gc.c"
 else
@@ -1033,6 +1044,7 @@ else
         fmpz_c="src/fmpz/link/fmpz_single.c"
     fi
 fi
+
 AC_CONFIG_FILES([src/fmpz/fmpz.c:$fmpz_c])
 
 if test "$enable_shared" = "yes";
@@ -1061,13 +1073,6 @@ then
     AC_SUBST(WANT_DEPS,1)
 else
     AC_SUBST(WANT_DEPS,0)
-fi
-
-if test "$enable_cxx" = "yes";
-then
-    AC_SUBST(WANT_CXX,1)
-else
-    AC_SUBST(WANT_CXX,0)
 fi
 
 if test "$with_ntl" = "yes";
@@ -1121,7 +1126,7 @@ fi
 # epilog
 ################################################################################
 
-AC_CONFIG_FILES([Makefile flint.pc])
+AC_CONFIG_FILES([Makefile flint.pc src/flint.h])
 AC_OUTPUT
 
 dnl Shorten the original help message
@@ -1172,7 +1177,7 @@ Fine tuning of the installation directories:
   --includedir=DIR        C header files [PREFIX/include]
 _ACEOF
 
-    cat <<_ACEOF]
-    m4_divert_pop([HELP_BEGIN])dnl
+    cat <<\_ACEOF]
+m4_divert_pop([HELP_BEGIN])dnl
 
 dnl NOTE: There is supposed to be a missing `fi' here.

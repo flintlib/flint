@@ -35,7 +35,7 @@ Context object
     Initialise a context object for a polynomial ring modulo *n* with *nvars* variables and ordering *ord*.
     The possibilities for the ordering are ``ORD_LEX``, ``ORD_DEGLEX`` and ``ORD_DEGREVLEX``.
 
-.. function:: slong fmpz_mod_mpoly_ctx_nvars(fmpz_mod_mpoly_ctx_t ctx)
+.. function:: slong fmpz_mod_mpoly_ctx_nvars(const fmpz_mod_mpoly_ctx_t ctx)
 
     Return the number of variables used to initialize the context.
 
@@ -117,7 +117,7 @@ Basic manipulation
     
     Set *A* to *B*.
 
-.. function:: int fmpz_mod_mpoly_equal(fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_t B, const fmpz_mod_mpoly_ctx_t ctx)
+.. function:: int fmpz_mod_mpoly_equal(const fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_t B, const fmpz_mod_mpoly_ctx_t ctx)
 
     Return `1` if *A* is equal to *B*, else return `0`.
 
@@ -153,7 +153,7 @@ Constants
 
     Set *A* to the constant `1`.
 
-.. function:: int fmpz_mod_mpoly_equal_fmpz(const fmpz_mod_mpoly_t A, fmpz_t c, const fmpz_mod_mpoly_ctx_t ctx)
+.. function:: int fmpz_mod_mpoly_equal_fmpz(const fmpz_mod_mpoly_t A, const fmpz_t c, const fmpz_mod_mpoly_ctx_t ctx)
               int fmpz_mod_mpoly_equal_ui(const fmpz_mod_mpoly_t A, ulong c, const fmpz_mod_mpoly_ctx_t ctx)
               int fmpz_mod_mpoly_equal_si(const fmpz_mod_mpoly_t A, slong c, const fmpz_mod_mpoly_ctx_t ctx)
 
@@ -218,16 +218,16 @@ Coefficients
     This function throws if *M* is not a monomial.
 
 .. function:: void fmpz_mod_mpoly_get_coeff_fmpz_fmpz(fmpz_t c, const fmpz_mod_mpoly_t A, fmpz * const * exp, const fmpz_mod_mpoly_ctx_t ctx)
-              void fmpz_mod_mpoly_get_coeff_fmpz_ui(fmpz_t c, const fmpz_mod_mpoly_t A, ulong const * exp, const fmpz_mod_mpoly_ctx_t ctx)
+              void fmpz_mod_mpoly_get_coeff_fmpz_ui(fmpz_t c, const fmpz_mod_mpoly_t A, const ulong * exp, const fmpz_mod_mpoly_ctx_t ctx)
 
     Set *c* to the coefficient of the monomial with exponent vector *exp*.
 
-.. function:: void fmpz_mod_mpoly_set_coeff_fmpz_fmpz(fmpz_mod_mpoly_t A, const fmpz_t c, fmpz * const * exp, fmpz_mod_mpoly_ctx_t ctx)
+.. function:: void fmpz_mod_mpoly_set_coeff_fmpz_fmpz(fmpz_mod_mpoly_t A, const fmpz_t c, fmpz * const * exp, const fmpz_mod_mpoly_ctx_t ctx)
               void fmpz_mod_mpoly_set_coeff_ui_fmpz(fmpz_mod_mpoly_t A, ulong c, fmpz * const * exp, const fmpz_mod_mpoly_ctx_t ctx)
               void fmpz_mod_mpoly_set_coeff_si_fmpz(fmpz_mod_mpoly_t A, slong c, fmpz * const * exp, const fmpz_mod_mpoly_ctx_t ctx)
-              void fmpz_mod_mpoly_set_coeff_fmpz_ui(fmpz_mod_mpoly_t A, const fmpz_t c, ulong const * exp, fmpz_mod_mpoly_ctx_t ctx)
-              void fmpz_mod_mpoly_set_coeff_ui_ui(fmpz_mod_mpoly_t A, ulong c, ulong const * exp, const fmpz_mod_mpoly_ctx_t ctx)
-              void fmpz_mod_mpoly_set_coeff_si_ui(fmpz_mod_mpoly_t A, slong c, ulong const * exp, const fmpz_mod_mpoly_ctx_t ctx)
+              void fmpz_mod_mpoly_set_coeff_fmpz_ui(fmpz_mod_mpoly_t A, const fmpz_t c, const ulong * exp, const fmpz_mod_mpoly_ctx_t ctx)
+              void fmpz_mod_mpoly_set_coeff_ui_ui(fmpz_mod_mpoly_t A, ulong c, const ulong * exp, const fmpz_mod_mpoly_ctx_t ctx)
+              void fmpz_mod_mpoly_set_coeff_si_ui(fmpz_mod_mpoly_t A, slong c, const ulong * exp, const fmpz_mod_mpoly_ctx_t ctx)
 
     Set the coefficient of the monomial with exponent vector *exp* to *c*.
 
@@ -310,8 +310,11 @@ Container operations
     Set *M* to the monomial of the term of index *i* in *A*. The coefficient of *M* will be one.
 
 .. function:: void fmpz_mod_mpoly_push_term_fmpz_fmpz(fmpz_mod_mpoly_t A, const fmpz_t c, fmpz * const * exp, const fmpz_mod_mpoly_ctx_t ctx)
+              void fmpz_mod_mpoly_push_term_fmpz_ffmpz(fmpz_mod_mpoly_t A, const fmpz_t c, const fmpz * exp, const fmpz_mod_mpoly_ctx_t ctx)
               void fmpz_mod_mpoly_push_term_ui_fmpz(fmpz_mod_mpoly_t A, ulong c, fmpz * const * exp, const fmpz_mod_mpoly_ctx_t ctx)
+              void fmpz_mod_mpoly_push_term_ui_ffmpz(fmpz_mod_mpoly_t A, ulong c, const fmpz * exp, const fmpz_mod_mpoly_ctx_t ctx)
               void fmpz_mod_mpoly_push_term_si_fmpz(fmpz_mod_mpoly_t A, slong c, fmpz * const * exp, const fmpz_mod_mpoly_ctx_t ctx)
+              void fmpz_mod_mpoly_push_term_si_ffmpz(fmpz_mod_mpoly_t A, slong c, const fmpz * exp, const fmpz_mod_mpoly_ctx_t ctx)
               void fmpz_mod_mpoly_push_term_fmpz_ui(fmpz_mod_mpoly_t A, const fmpz_t c, const ulong * exp, const fmpz_mod_mpoly_ctx_t ctx)
               void fmpz_mod_mpoly_push_term_ui_ui(fmpz_mod_mpoly_t A, ulong c, const ulong * exp, const fmpz_mod_mpoly_ctx_t ctx)
               void fmpz_mod_mpoly_push_term_si_ui(fmpz_mod_mpoly_t A, slong c, const ulong * exp, const fmpz_mod_mpoly_ctx_t ctx)
@@ -359,13 +362,13 @@ Addition/Subtraction
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpz_mod_mpoly_add_fmpz(fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_t B, fmpz_t c, const fmpz_mod_mpoly_ctx_t ctx)
+.. function:: void fmpz_mod_mpoly_add_fmpz(fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_t B, const fmpz_t c, const fmpz_mod_mpoly_ctx_t ctx)
               void fmpz_mod_mpoly_add_ui(fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_t B, ulong c, const fmpz_mod_mpoly_ctx_t ctx)
               void fmpz_mod_mpoly_add_si(fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_t B, slong c, const fmpz_mod_mpoly_ctx_t ctx)
 
     Set *A* to `B + c`.
 
-.. function:: void fmpz_mod_mpoly_sub_fmpz(fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_t B, fmpz_t c, const fmpz_mod_mpoly_ctx_t ctx)
+.. function:: void fmpz_mod_mpoly_sub_fmpz(fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_t B, const fmpz_t c, const fmpz_mod_mpoly_ctx_t ctx)
               void fmpz_mod_mpoly_sub_ui(fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_t B, ulong c, const fmpz_mod_mpoly_ctx_t ctx)
               void fmpz_mod_mpoly_sub_si(fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_t B, slong c, const fmpz_mod_mpoly_ctx_t ctx)
 

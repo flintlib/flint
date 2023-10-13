@@ -54,13 +54,6 @@ if(CMAKE_BUILD_TYPE STREQUAL Debug)
   set(FLINT_WANT_ASSERT ON)
 endif()
 
-# temporary directory
-if(NOT DEFINED TMPDIR)
-    set(FLINT_TMPDIR "/tmp" CACHE STRING "Path to a directory meant for temporary files for host system. Only relevant if host do not have read and write access to /tmp [default=/tmp].")
-else()
-    set(FLINT_TMPDIR "${TMPDIR}" CACHE STRING "Path to a directory meant for temporary files for host system. Only relevant if host do not have read and write access to /tmp [default=/tmp].")
-endif()
-
 # pthread configuration
 
 if(MSVC)
@@ -143,7 +136,6 @@ set(_BUILD_DIRS
     ca              ca_ext          ca_field        ca_vec
     ca_poly         ca_mat
 
-    flintxx
 )
 string(REGEX REPLACE "([A-Za-z0-9_-]+;|[A-Za-z0-9_-]+$)" "src/\\1" BUILD_DIRS "${_BUILD_DIRS}")
 
@@ -219,7 +211,10 @@ configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/CMake/cmake_config.h.in
     ${CMAKE_CURRENT_SOURCE_DIR}/src/flint-config.h
 )
-
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/flint.h.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/flint.h
+)
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/src/fmpz/link/fmpz_${MEMORY_MANAGER}.c
     ${CMAKE_CURRENT_SOURCE_DIR}/src/fmpz/fmpz.c
