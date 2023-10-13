@@ -9,18 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_divides)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("divides....");
-    fflush(stdout);
 
     /* Random values */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -31,7 +26,7 @@ main(void)
         fmpz_init(a);
         fmpz_init(b);
         fmpz_init(p);
-	fmpz_init(q);
+        fmpz_init(q);
 
         fmpz_randtest(a, state, 200);
         fmpz_randtest(b, state, 200);
@@ -40,12 +35,12 @@ main(void)
         fmpz_mul(p, a, q);
 
         result = ((divides && fmpz_equal(p, b)) ||
-	         (!divides && fmpz_is_zero(q) && !fmpz_equal(p, b)));
+                (!divides && fmpz_is_zero(q) && !fmpz_equal(p, b)));
         if (!result)
         {
             flint_printf("FAIL:\n");
             flint_printf("divides = %d\n", divides);
-	    flint_printf("a = "); fmpz_print(a); flint_printf("\n");
+            flint_printf("a = "); fmpz_print(a); flint_printf("\n");
             flint_printf("b = "); fmpz_print(b); flint_printf("\n");
             flint_printf("p = "); fmpz_print(p); flint_printf("\n");
             flint_printf("q = "); fmpz_print(q); flint_printf("\n");
@@ -55,7 +50,7 @@ main(void)
 
         fmpz_clear(a);
         fmpz_clear(b);
-	fmpz_clear(p);
+        fmpz_clear(p);
         fmpz_clear(q);
     }
 
@@ -68,7 +63,7 @@ main(void)
         fmpz_init(a);
         fmpz_init(b);
         fmpz_init(p);
-	fmpz_init(q);
+        fmpz_init(q);
 
         fmpz_randtest(a, state, 200);
         fmpz_randtest(b, state, 200);
@@ -82,7 +77,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("divides = %d\n", divides);
-	    flint_printf("a = "); fmpz_print(a); flint_printf("\n");
+            flint_printf("a = "); fmpz_print(a); flint_printf("\n");
             flint_printf("b = "); fmpz_print(b); flint_printf("\n");
             flint_printf("p = "); fmpz_print(p); flint_printf("\n");
             flint_printf("q = "); fmpz_print(q); flint_printf("\n");
@@ -92,7 +87,7 @@ main(void)
 
         fmpz_clear(a);
         fmpz_clear(b);
-	fmpz_clear(p);
+        fmpz_clear(p);
         fmpz_clear(q);
     }
 
@@ -104,7 +99,7 @@ main(void)
 
         fmpz_init(a);
         fmpz_init(b);
-	fmpz_init(q);
+        fmpz_init(q);
 
         fmpz_randtest(a, state, 200);
         fmpz_randtest(b, state, 200);
@@ -117,7 +112,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("divides1 = %d, divides2 = %d\n", divides1, divides2);
-	    flint_printf("a = "); fmpz_print(a); flint_printf("\n");
+            flint_printf("a = "); fmpz_print(a); flint_printf("\n");
             flint_printf("b = "); fmpz_print(b); flint_printf("\n");
             flint_printf("q = "); fmpz_print(q); flint_printf("\n");
             fflush(stdout);
@@ -137,7 +132,7 @@ main(void)
 
         fmpz_init(a);
         fmpz_init(b);
-	fmpz_init(q);
+        fmpz_init(q);
 
         fmpz_randtest(a, state, 200);
         fmpz_randtest(b, state, 200);
@@ -150,7 +145,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("divides1 = %d, divides2 = %d\n", divides1, divides2);
-	    flint_printf("a = "); fmpz_print(a); flint_printf("\n");
+            flint_printf("a = "); fmpz_print(a); flint_printf("\n");
             flint_printf("b = "); fmpz_print(b); flint_printf("\n");
             flint_printf("q = "); fmpz_print(q); flint_printf("\n");
             fflush(stdout);
@@ -162,9 +157,6 @@ main(void)
         fmpz_clear(q);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }
 

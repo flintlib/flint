@@ -9,21 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_addmul_ui)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("addmul_ui....");
-    fflush(stdout);
-
-
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
@@ -114,8 +107,5 @@ main(void)
         mpz_clear(e);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }
