@@ -820,4 +820,4 @@ LLL reduction
     matrix whose entries are `2^{\mathit{prec}}(1 + \varepsilon)^{\min(i,j)}
     A_{i,j}` rounded to integers: it must be positive definite and pass
     :func:`fmpz_mat_is_reduced` with default parameters. The warnings of
-    :func:`arf_get_fmpz}` apply.
+    :func:`arf_get_fmpz` apply.
