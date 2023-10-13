@@ -14,12 +14,18 @@
 int acb_siegel_is_reduced(const acb_mat_t tau, slong tol_exp, slong prec)
 {
     slong g = acb_mat_nrows(tau);
+    fmpz_mat_t mat;
+    acb_mat_t c;
     arb_mat_t im;
+    acb_t det;
     arb_t abs, t, u;
     slong j, k;
     int res = 1;
 
+    fmpz_mat_init(mat, 2 * g, 2 * g);
+    acb_mat_init(c, g, g);
     arb_mat_init(im, g, g);
+    acb_init(det);
     arb_init(abs);
     arb_init(t);
     arb_init(u);
@@ -57,7 +63,24 @@ int acb_siegel_is_reduced(const acb_mat_t tau, slong tol_exp, slong prec)
         res = arb_mat_spd_is_lll_reduced(im, tol_exp, prec);
     }
 
+    arb_one(t);
+    arb_sub(t, t, u, prec);
+    for (k = 0; k < sp2gz_nb_fundamental(g); k++)
+    {
+        sp2gz_fundamental(mat, k);
+        acb_siegel_cocycle(c, mat, tau, prec);
+        acb_mat_det(det, c, prec);
+        acb_abs(abs, det, prec);
+        if (!arb_gt(abs, t))
+        {
+            res = 0;
+        }
+    }
+
+    fmpz_mat_clear(mat);
+    acb_mat_clear(c);
     arb_mat_clear(im);
+    acb_clear(det);
     arb_clear(abs);
     arb_clear(t);
     arb_clear(u);

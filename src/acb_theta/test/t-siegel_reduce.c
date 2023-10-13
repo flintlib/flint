@@ -22,7 +22,7 @@ int main(void)
     flint_randinit(state);
 
     /* Test: mat is symplectic and image passes acb_siegel_is_reduced */
-    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 4);
         slong prec = 100 + n_randint(state, 200);

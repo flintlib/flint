@@ -14,8 +14,10 @@
 slong
 sp2gz_nb_fundamental(slong g)
 {
+    if (g == 1)
+        return 1;
     if (g == 2)
         return 19;
     else
-        return 1;
+        return 19 * ((g * (g - 1)) / 2) + (1 << g);
 }

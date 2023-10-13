@@ -128,10 +128,69 @@ sp2gz_fundamental_g2(fmpz_mat_t mat, slong j)
     fmpz_mat_clear(d);
 }
 
+static void
+sp2gz_fundamental_gen_1(fmpz_mat_t mat, slong j)
+{
+    slong g = sp2gz_dim(mat);
+    slong k = 0;
+    slong cnt = 0;
+    slong l, u, v;
+    fmpz_mat_t mat_g2;
+
+    fmpz_mat_init(mat_g2, 4, 4);
+
+    while (cnt + (g - 1 - k) <= j/19)
+    {
+        cnt += g - 1 - k;
+        k++;
+    }
+    l = k + 1 + (j/19 - cnt);
+    sp2gz_fundamental_g2(mat_g2, j % 19);
+
+    fmpz_mat_one(mat);
+    for (u = 0; u < 2; u++)
+    {
+        for (v = 0; v < 2; v++)
+        {
+            fmpz_set(fmpz_mat_entry(mat, k + u * g, k + v * g),
+                fmpz_mat_entry(mat_g2, 2 * u, 2 * v));
+            fmpz_set(fmpz_mat_entry(mat, k + u * g, l + v * g),
+                fmpz_mat_entry(mat_g2, 2 * u, 2 * v + 1));
+            fmpz_set(fmpz_mat_entry(mat, l + u * g, k + v * g),
+                fmpz_mat_entry(mat_g2, 2 * u + 1, 2 * v));
+            fmpz_set(fmpz_mat_entry(mat, l + u * g, l + v * g),
+                fmpz_mat_entry(mat_g2, 2 * u + 1, 2 * v + 1));
+        }
+    }
+
+    fmpz_mat_clear(mat_g2);
+}
+
+static void
+sp2gz_fundamental_gen_2(fmpz_mat_t mat, slong j)
+{
+    slong g = sp2gz_dim(mat);
+    slong k;
+
+    fmpz_mat_one(mat);
+
+    for (k = g - 1; k >= 0; k--)
+    {
+        if (j % 2 == 1)
+        {
+            fmpz_zero(fmpz_mat_entry(mat, k, k));
+            fmpz_one(fmpz_mat_entry(mat, k, k + g));
+            fmpz_set_si(fmpz_mat_entry(mat, k + g, k), -1);
+            fmpz_zero(fmpz_mat_entry(mat, k + g, k + g));
+        }
+    }
+}
+
 void
 sp2gz_fundamental(fmpz_mat_t mat, slong j)
 {
     slong g = sp2gz_dim(mat);
+    slong nb_1 = 19 * ((g * (g - 1))/2);
 
     if (g == 1)
     {
@@ -141,12 +200,12 @@ sp2gz_fundamental(fmpz_mat_t mat, slong j)
     {
         sp2gz_fundamental_g2(mat, j);
     }
+    else if (j < nb_1)
+    {
+        sp2gz_fundamental_gen_1(mat, j);
+    }
     else
     {
-        fmpz_mat_one(mat);
-        fmpz_zero(fmpz_mat_entry(mat, 0, 0));
-        fmpz_zero(fmpz_mat_entry(mat, g, g));
-        fmpz_one(fmpz_mat_entry(mat, g, 0));
-        fmpz_set_si(fmpz_mat_entry(mat, 0, g), -1);
+        sp2gz_fundamental_gen_2(mat, j - nb_1);
     }
 }
