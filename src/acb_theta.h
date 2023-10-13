@@ -49,6 +49,8 @@ void sp2gz_fundamental(fmpz_mat_t mat, slong j);
 
 void sp2gz_inv(fmpz_mat_t inv, const fmpz_mat_t mat);
 int sp2gz_is_correct(const fmpz_mat_t mat);
+fmpz_mat_struct* sp2gz_decompose(slong* nb, const fmpz_mat_t mat);
+
 void sp2gz_randtest(fmpz_mat_t mat, flint_rand_t state, slong bits);
 
 /* The Siegel half space */
@@ -246,6 +248,9 @@ void acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong 
 /* Transformation formulas */
 
 ulong acb_theta_transform_char(slong* e, const fmpz_mat_t mat, ulong ab);
+void acb_theta_transform_sqrtdet_new(acb_t res, const acb_mat_t tau, slong prec);
+slong acb_theta_transform_kappa_new(acb_t sqrtdet, const fmpz_mat_t mat,
+    const acb_mat_t tau, slong prec);
 slong acb_theta_transform_kappa(const fmpz_mat_t mat);
 void acb_theta_transform_sqrtdet(acb_t res, const fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 void acb_theta_transform_proj(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th,

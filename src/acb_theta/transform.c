@@ -60,7 +60,7 @@ acb_theta_transform(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th, acb_srcptr
     acb_init(scal);
     acb_init(x);
 
-    acb_theta_transform_scal(scal, mat, z, tau, kappa, sqr, prec);
+    acb_theta_transform_scal(scal, mat, z, tau, kappa, prec);
     if (sqr)
     {
         acb_sqr(scal, scal, prec);
