@@ -16,6 +16,7 @@
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "gr_special.h"
 
 #define ENTRY_CTX(ctx) (VECTOR_CTX(ctx)->base_ring)
 
@@ -126,6 +127,164 @@ vector_gr_vec_set(gr_vec_t res, const gr_vec_t vec, gr_ctx_t ctx)
     return gr_vec_set(res, vec, ENTRY_CTX(ctx));
 }
 
+/* todo: move out */
+static int
+_gr_vec_set_ui(gr_ptr res, slong len, ulong x, gr_ctx_t ctx)
+{
+    gr_method_unary_op_ui f = GR_UNARY_OP_UI(ctx, SET_UI);
+    int status;
+    slong i, sz;
+
+    sz = ctx->sizeof_elem;
+    status = GR_SUCCESS;
+
+    for (i = 0; i < len; i++)
+        status |= f(GR_ENTRY(res, i, sz), x, ctx);
+
+    return status;
+}
+
+static int
+_gr_vec_set_si(gr_ptr res, slong len, slong x, gr_ctx_t ctx)
+{
+    gr_method_unary_op_si f = GR_UNARY_OP_SI(ctx, SET_SI);
+    int status;
+    slong i, sz;
+
+    sz = ctx->sizeof_elem;
+    status = GR_SUCCESS;
+
+    for (i = 0; i < len; i++)
+        status |= f(GR_ENTRY(res, i, sz), x, ctx);
+
+    return status;
+}
+
+static int
+_gr_vec_set_fmpz(gr_ptr res, slong len, const fmpz_t x, gr_ctx_t ctx)
+{
+    gr_method_unary_op_fmpz f = GR_UNARY_OP_FMPZ(ctx, SET_FMPZ);
+    int status;
+    slong i, sz;
+
+    sz = ctx->sizeof_elem;
+    status = GR_SUCCESS;
+
+    for (i = 0; i < len; i++)
+        status |= f(GR_ENTRY(res, i, sz), x, ctx);
+
+    return status;
+}
+
+static int
+_gr_vec_set_fmpq(gr_ptr res, slong len, const fmpq_t x, gr_ctx_t ctx)
+{
+    gr_method_unary_op_fmpq f = GR_UNARY_OP_FMPQ(ctx, SET_FMPQ);
+    int status;
+    slong i, sz;
+
+    sz = ctx->sizeof_elem;
+    status = GR_SUCCESS;
+
+    for (i = 0; i < len; i++)
+        status |= f(GR_ENTRY(res, i, sz), x, ctx);
+
+    return status;
+}
+
+
+static int
+_gr_vec_set_d(gr_ptr res, slong len, double x, gr_ctx_t ctx)
+{
+    gr_method_unary_op_d f = GR_UNARY_OP_D(ctx, SET_D);
+    int status;
+    slong i, sz;
+
+    sz = ctx->sizeof_elem;
+    status = GR_SUCCESS;
+
+    for (i = 0; i < len; i++)
+        status |= f(GR_ENTRY(res, i, sz), x, ctx);
+
+    return status;
+}
+
+int
+vector_gr_vec_set_ui(gr_vec_t res, ulong x, gr_ctx_t ctx)
+{
+    slong len = VECTOR_CTX(ctx)->n;
+
+    if (VECTOR_CTX(ctx)->all_sizes)
+        return GR_DOMAIN;
+
+    /* should not be needed; just a precaution (might want an assert) */
+    if (res->length != len)
+        gr_vec_set_length(res, len, ENTRY_CTX(ctx));
+
+    return _gr_vec_set_ui(res->entries, len, x, ENTRY_CTX(ctx));
+}
+
+int
+vector_gr_vec_set_si(gr_vec_t res, slong x, gr_ctx_t ctx)
+{
+    slong len = VECTOR_CTX(ctx)->n;
+
+    if (VECTOR_CTX(ctx)->all_sizes)
+        return GR_DOMAIN;
+
+    /* should not be needed; just a precaution (might want an assert) */
+    if (res->length != len)
+        gr_vec_set_length(res, len, ENTRY_CTX(ctx));
+
+    return _gr_vec_set_si(res->entries, len, x, ENTRY_CTX(ctx));
+}
+
+int
+vector_gr_vec_set_fmpz(gr_vec_t res, const fmpz_t x, gr_ctx_t ctx)
+{
+    slong len = VECTOR_CTX(ctx)->n;
+
+    if (VECTOR_CTX(ctx)->all_sizes)
+        return GR_DOMAIN;
+
+    /* should not be needed; just a precaution (might want an assert) */
+    if (res->length != len)
+        gr_vec_set_length(res, len, ENTRY_CTX(ctx));
+
+    return _gr_vec_set_fmpz(res->entries, len, x, ENTRY_CTX(ctx));
+}
+
+int
+vector_gr_vec_set_fmpq(gr_vec_t res, const fmpq_t x, gr_ctx_t ctx)
+{
+    slong len = VECTOR_CTX(ctx)->n;
+
+    if (VECTOR_CTX(ctx)->all_sizes)
+        return GR_DOMAIN;
+
+    /* should not be needed; just a precaution (might want an assert) */
+    if (res->length != len)
+        gr_vec_set_length(res, len, ENTRY_CTX(ctx));
+
+    return _gr_vec_set_fmpq(res->entries, len, x, ENTRY_CTX(ctx));
+}
+
+int
+vector_gr_vec_set_d(gr_vec_t res, double x, gr_ctx_t ctx)
+{
+    slong len = VECTOR_CTX(ctx)->n;
+
+    if (VECTOR_CTX(ctx)->all_sizes)
+        return GR_DOMAIN;
+
+    /* should not be needed; just a precaution (might want an assert) */
+    if (res->length != len)
+        gr_vec_set_length(res, len, ENTRY_CTX(ctx));
+
+    return _gr_vec_set_d(res->entries, len, x, ENTRY_CTX(ctx));
+}
+
+
 /* todo: convert from matrices, ...? */
 int
 vector_gr_vec_set_other(gr_vec_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
@@ -174,6 +333,59 @@ vector_gr_vec_neg(gr_vec_t res, const gr_vec_t src, gr_ctx_t ctx)
 {
     return gr_poly_neg((gr_poly_struct *) res, (gr_poly_struct *) src, ENTRY_CTX(ctx));
 }
+
+int
+vector_gr_vec_zero(gr_vec_t res, gr_ctx_t ctx) \
+{
+    slong xlen = VECTOR_CTX(ctx)->n; \
+
+    if (VECTOR_CTX(ctx)->all_sizes) \
+        return GR_DOMAIN;
+
+    /* should not be needed; just a precaution (might want an assert) */
+    if (res->length != xlen)
+        gr_vec_set_length(res, xlen, ENTRY_CTX(ctx));
+
+    return _gr_vec_zero(res->entries, xlen, ENTRY_CTX(ctx));
+}
+
+static int
+_gr_vec_apply_const(gr_ptr res, gr_method_constant_op f, slong len, gr_ctx_t ctx)
+{
+    int status;
+    slong i, sz;
+
+    sz = ctx->sizeof_elem;
+    status = GR_SUCCESS;
+
+    for (i = 0; i < len; i++)
+        status |= f(GR_ENTRY(res, i, sz), ctx);
+
+    return status;
+}
+
+#define DEF_CONSTANT_OP_FROM_OP(op, OP) \
+int \
+vector_gr_vec_ ## op(gr_vec_t res, gr_ctx_t ctx) \
+{ \
+    slong xlen = VECTOR_CTX(ctx)->n; \
+ \
+    if (VECTOR_CTX(ctx)->all_sizes) \
+        return GR_DOMAIN;\
+ \
+    gr_method_constant_op f = GR_CONSTANT_OP(ENTRY_CTX(ctx), OP); \
+ \
+    if (res->length != xlen) \
+        gr_vec_set_length(res, xlen, ENTRY_CTX(ctx)); \
+ \
+    return _gr_vec_apply_const(res->entries, f, xlen, ENTRY_CTX(ctx)); \
+} \
+
+DEF_CONSTANT_OP_FROM_OP(one, ONE)
+DEF_CONSTANT_OP_FROM_OP(neg_one, NEG_ONE)
+DEF_CONSTANT_OP_FROM_OP(i, I)
+DEF_CONSTANT_OP_FROM_OP(pi, PI)
+
 
 static int
 _gr_vec_apply_unary(gr_ptr res, gr_method_unary_op f, gr_srcptr src, slong len, gr_ctx_t ctx)
@@ -402,6 +614,16 @@ gr_method_tab_input _gr_vec_methods_input[] =
     {GR_METHOD_EQUAL,       (gr_funcptr) vector_gr_vec_equal},
     {GR_METHOD_SET,         (gr_funcptr) vector_gr_vec_set},
     {GR_METHOD_SET_OTHER,   (gr_funcptr) vector_gr_vec_set_other},
+    {GR_METHOD_SET_UI,      (gr_funcptr) vector_gr_vec_set_ui},
+    {GR_METHOD_SET_SI,      (gr_funcptr) vector_gr_vec_set_si},
+    {GR_METHOD_SET_FMPZ,    (gr_funcptr) vector_gr_vec_set_fmpz},
+    {GR_METHOD_SET_FMPQ,    (gr_funcptr) vector_gr_vec_set_fmpq},
+    {GR_METHOD_SET_D,       (gr_funcptr) vector_gr_vec_set_d},
+
+    {GR_METHOD_ZERO,        (gr_funcptr) vector_gr_vec_zero},
+    {GR_METHOD_ONE,         (gr_funcptr) vector_gr_vec_one},
+    {GR_METHOD_NEG_ONE,     (gr_funcptr) vector_gr_vec_neg_one},
+
     {GR_METHOD_NEG,         (gr_funcptr) vector_gr_vec_neg},
 
     {GR_METHOD_ADD,         (gr_funcptr) vector_gr_vec_add},
@@ -464,6 +686,9 @@ gr_method_tab_input _gr_vec_methods_input[] =
     {GR_METHOD_IM,              (gr_funcptr) vector_gr_vec_im},
     {GR_METHOD_SGN,             (gr_funcptr) vector_gr_vec_sgn},
     {GR_METHOD_CSGN,            (gr_funcptr) vector_gr_vec_csgn},
+
+    {GR_METHOD_I,             (gr_funcptr) vector_gr_vec_i},
+    {GR_METHOD_PI,            (gr_funcptr) vector_gr_vec_pi},
 
     {GR_METHOD_EXP,            (gr_funcptr) vector_gr_vec_exp},
     {GR_METHOD_LOG,            (gr_funcptr) vector_gr_vec_log},

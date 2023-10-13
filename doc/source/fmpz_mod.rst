@@ -3,8 +3,6 @@
 **fmpz_mod.h** -- arithmetic modulo integers
 ===============================================================================
 
-Description.
-
 Types, macros and constants
 -------------------------------------------------------------------------------
 
@@ -58,9 +56,9 @@ Comparison of elements against each other or against zero can be accomplished wi
 
     Set `a` to `b+c` modulo `n`.
 
-.. function:: void fmpz_mod_add_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
-              void fmpz_mod_add_ui(fmpz_t a, const fmpz_t b, ulong c, const fmpz_mod_ctx_t ctx);
-              void fmpz_mod_add_si(fmpz_t a, const fmpz_t b, slong c, const fmpz_mod_ctx_t ctx);
+.. function:: void fmpz_mod_add_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx)
+              void fmpz_mod_add_ui(fmpz_t a, const fmpz_t b, ulong c, const fmpz_mod_ctx_t ctx)
+              void fmpz_mod_add_si(fmpz_t a, const fmpz_t b, slong c, const fmpz_mod_ctx_t ctx)
 
     Set `a` to `b+c` modulo `n` where only `b` is assumed to be canonical.
 
@@ -68,15 +66,15 @@ Comparison of elements against each other or against zero can be accomplished wi
 
     Set `a` to `b-c` modulo `n`.
 
-.. function:: void fmpz_mod_sub_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
-              void fmpz_mod_sub_ui(fmpz_t a, const fmpz_t b, ulong c, const fmpz_mod_ctx_t ctx);
-              void fmpz_mod_sub_si(fmpz_t a, const fmpz_t b, slong c, const fmpz_mod_ctx_t ctx);
+.. function:: void fmpz_mod_sub_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx)
+              void fmpz_mod_sub_ui(fmpz_t a, const fmpz_t b, ulong c, const fmpz_mod_ctx_t ctx)
+              void fmpz_mod_sub_si(fmpz_t a, const fmpz_t b, slong c, const fmpz_mod_ctx_t ctx)
 
     Set `a` to `b-c` modulo `n` where only `b` is assumed to be canonical.
 
-.. function:: void fmpz_mod_fmpz_sub(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
-              void fmpz_mod_ui_sub(fmpz_t a, ulong b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
-              void fmpz_mod_si_sub(fmpz_t a, slong b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
+.. function:: void fmpz_mod_fmpz_sub(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx)
+              void fmpz_mod_ui_sub(fmpz_t a, ulong b, const fmpz_t c, const fmpz_mod_ctx_t ctx)
+              void fmpz_mod_si_sub(fmpz_t a, slong b, const fmpz_t c, const fmpz_mod_ctx_t ctx)
 
     Set `a` to `b-c` modulo `n` where only `c` is assumed to be canonical.
 
@@ -124,7 +122,7 @@ Discrete Logarithms via Pohlig-Hellman
     Configure ``L`` for discrete logarithms modulo ``p`` to an internally chosen base. It is assumed that ``p`` is prime.
     The return is an estimate on the number of multiplications needed for one run.
 
-.. function:: const fmpz * fmpz_mod_discrete_log_pohlig_hellman_primitive_root(const fmpz_mod_discrete_log_pohlig_hellman_t L)
+.. function:: const fmpz * fmpz_mod_discrete_log_pohlig_hellman_primitive_root(fmpz_mod_discrete_log_pohlig_hellman_t L)
 
     Return the internally stored base.
 
@@ -138,4 +136,3 @@ Discrete Logarithms via Pohlig-Hellman
 
     Either return `1` and set `a` to a smooth prime strictly greater than `b`, or return `0` and set `a` to `0`.
     The smooth primes returned by this function currently have no prime factor of `a-1` greater than `23`, but this should not be relied upon.
-

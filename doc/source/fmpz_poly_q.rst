@@ -3,7 +3,73 @@
 **fmpz_poly_q.h** -- rational functions over the rational numbers
 ===============================================================================
 
-Description.
+The module :type:`fmpz_poly_q` provides functions for performing
+arithmetic on rational functions in `\mathbf{Q}(t)`, represented as
+quotients of integer polynomials of type :type:`fmpz_poly_t`. These
+functions start with the prefix :type:`fmpz_poly_q_`.
+
+Rational functions are stored in objects of type
+:type:`fmpz_poly_q_t`, which is an array of
+:type:`fmpz_poly_q_struct`'s of length one. This permits passing
+parameters of type :type:`fmpz_poly_q_t` by reference.
+
+The representation of a rational function as the quotient of two
+integer polynomials can be made canonical by demanding the numerator
+and denominator to be coprime (as integer polynomials) and the
+denominator to have positive leading coefficient. As the only special
+case, we represent the zero function as `0/1`. All arithmetic
+functions assume that the operands are in this canonical form, and
+canonicalize their result. If the numerator or denominator is modified
+individually, for example using the macros ``fmpz_poly_q_numref()``
+and ``fmpz_poly_q_denref()``, it is the user's responsibility to
+canonicalise the rational function using the function
+``fmpz_poly_q_canonicalise()`` if necessary.
+
+All methods support aliasing of their inputs and outputs *unless*
+explicitly stated otherwise, subject to the following caveat. If
+different rational functions (as objects in memory, not necessarily in
+the mathematical sense) share some of the underlying integer
+polynomial objects, the behaviour is undefined.
+
+The basic arithmetic operations, addition, subtraction and
+multiplication, are all implemented using adapted versions of
+Henrici's algorithms, see [Hen1956]_. Differentiation is implemented
+in a way slightly improving on the algorithm described in [Hor1972]_.
+
+Simple example
+--------------
+
+The following example computes the product of two rational functions and
+prints the result:
+
+.. code:: c
+
+   #include "fmpz_poly_q.h"
+   int main()
+   {
+       char *str, *strf, *strg;
+       fmpz_poly_q_t f, g;
+       fmpz_poly_q_init(f);
+       fmpz_poly_q_init(g);
+       fmpz_poly_q_set_str(f, "2  1 3/1  2");
+       fmpz_poly_q_set_str(g, "1  3/2  2 7");
+       strf = fmpz_poly_q_get_str_pretty(f, "t");
+       strg = fmpz_poly_q_get_str_pretty(g, "t");
+       fmpz_poly_q_mul(f, f, g);
+       str  = fmpz_poly_q_get_str_pretty(f, "t");
+       flint_printf("%s * %s = %s\n", strf, strg, str);
+       free(str);
+       free(strf);
+       free(strg);
+       fmpz_poly_q_clear(f);
+       fmpz_poly_q_clear(g);
+   }
+
+The output is:
+
+::
+
+   (3*t+1)/2 * 3/(7*t+2) = (9*t+3)/(14*t+4)
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -12,15 +78,8 @@ Types, macros and constants
 
 .. type:: fmpz_poly_q_t
 
-    Description.
-
 Memory management
 --------------------------------------------------------------------------------
-
-We represent a rational function over `\mathbf{Q}` as the quotient 
-of two coprime integer polynomials of type ``fmpz_poly_t``, 
-enforcing that the leading coefficient of the denominator is 
-positive.  The zero function is represented as `0/1`.
 
 .. function:: void fmpz_poly_q_init(fmpz_poly_q_t rop)
 
@@ -40,12 +99,12 @@ positive.  The zero function is represented as `0/1`.
 
 .. function:: void fmpz_poly_q_canonicalise(fmpz_poly_q_t rop)
 
-    Brings ``rop`` into canonical form, only assuming that 
+    Brings ``rop`` into canonical form, only assuming that
     the denominator is non-zero.
 
 .. function:: int fmpz_poly_q_is_canonical(const fmpz_poly_q_t op)
 
-    Checks whether the rational function ``op`` is in 
+    Checks whether the rational function ``op`` is in
     canonical form.
 
 
@@ -72,7 +131,7 @@ Assignment
 
 .. function:: void fmpz_poly_q_set_si(fmpz_poly_q_t rop, slong op)
 
-    Sets the element ``rop`` to the value given by the ``slong`` 
+    Sets the element ``rop`` to the value given by the ``slong``
     ``op``.
 
 .. function:: void fmpz_poly_q_swap(fmpz_poly_q_t op1, fmpz_poly_q_t op2)
@@ -110,7 +169,7 @@ Comparison
 
 .. function:: int fmpz_poly_q_is_one(const fmpz_poly_q_t op)
 
-    Returns whether the element ``rop`` is equal to the constant 
+    Returns whether the element ``rop`` is equal to the constant
     polynomial `1`.
 
 .. function:: int fmpz_poly_q_equal(const fmpz_poly_q_t op1, const fmpz_poly_q_t op2)
@@ -145,32 +204,32 @@ Scalar multiplication and division
 
 .. function:: void fmpz_poly_q_scalar_mul_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, slong x)
 
-    Sets ``rop`` to the product of the rational function ``op`` 
+    Sets ``rop`` to the product of the rational function ``op``
     and the ``slong`` integer `x`.
 
 .. function:: void fmpz_poly_q_scalar_mul_fmpz(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const fmpz_t x)
 
-    Sets ``rop`` to the product of the rational function ``op`` 
+    Sets ``rop`` to the product of the rational function ``op``
     and the ``fmpz_t`` integer `x`.
 
 .. function:: void fmpz_poly_q_scalar_mul_fmpq(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const fmpq_t x)
 
-    Sets ``rop`` to the product of the rational function ``op`` 
+    Sets ``rop`` to the product of the rational function ``op``
     and the ``fmpq_t`` rational `x`.
 
 .. function:: void fmpz_poly_q_scalar_div_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, slong x)
 
-    Sets ``rop`` to the quotient of the rational function ``op`` 
+    Sets ``rop`` to the quotient of the rational function ``op``
     and the ``slong`` integer `x`.
 
 .. function:: void fmpz_poly_q_scalar_div_fmpz(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const fmpz_t x)
 
-    Sets ``rop`` to the quotient of the rational function ``op`` 
+    Sets ``rop`` to the quotient of the rational function ``op``
     and the ``fmpz_t`` integer `x`.
 
 .. function:: void fmpz_poly_q_scalar_div_fmpq(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const fmpq_t x)
 
-    Sets ``rop`` to the quotient of the rational function ``op`` 
+    Sets ``rop`` to the quotient of the rational function ``op``
     and the ``fmpq_t`` rational `x`.
 
 
@@ -195,7 +254,7 @@ Powering
 
     Sets ``rop`` to the ``exp``-th power of ``op``.
 
-    The corner case of ``exp == 0`` is handled by setting ``rop`` to 
+    The corner case of ``exp == 0`` is handled by setting ``rop`` to
     the constant function `1`.  Note that this includes the case `0^0 = 1`.
 
 
@@ -216,60 +275,60 @@ Evaluation
 
     Sets ``rop`` to `f` evaluated at the rational `a`.
 
-    If the denominator evaluates to zero at `a`, returns non-zero and 
-    does not modify any of the variables.  Otherwise, returns `0` and 
+    If the denominator evaluates to zero at `a`, returns non-zero and
+    does not modify any of the variables.  Otherwise, returns `0` and
     sets ``rop`` to the rational `f(a)`.
 
 
 Input and output
 --------------------------------------------------------------------------------
 
-The following three methods enable users to construct elements of type 
-``fmpz_poly_q_t`` from strings or to obtain string representations of 
+The following three methods enable users to construct elements of type
+``fmpz_poly_q_t`` from strings or to obtain string representations of
 such elements.
-The format used is based on the FLINT format for integer polynomials of 
-type ``fmpz_poly_t``, which we recall first: 
-A non-zero polynomial `a_0 + a_1 X + \dotsb + a_n X^n` of length 
-`n + 1` is represented by the string ``"n+1  a_0 a_1 ... a_n"``, 
-where there are two space characters following the length and single 
-space characters separating the individual coefficients.  There is no 
-leading or trailing white-space.  The zero polynomial is simply 
+The format used is based on the FLINT format for integer polynomials of
+type ``fmpz_poly_t``, which we recall first:
+A non-zero polynomial `a_0 + a_1 X + \dotsb + a_n X^n` of length
+`n + 1` is represented by the string ``"n+1  a_0 a_1 ... a_n"``,
+where there are two space characters following the length and single
+space characters separating the individual coefficients.  There is no
+leading or trailing white-space.  The zero polynomial is simply
 represented by ``"0"``.
-We adapt this notation for rational functions as follows.  We denote the 
-zero function by ``"0"``.  Given a non-zero function with numerator 
-and denominator string representations ``num`` and ``den``, 
-respectively, we use the string ``num/den`` to represent the rational 
-function, unless the denominator is equal to one, in which case we simply 
+We adapt this notation for rational functions as follows.  We denote the
+zero function by ``"0"``.  Given a non-zero function with numerator
+and denominator string representations ``num`` and ``den``,
+respectively, we use the string ``num/den`` to represent the rational
+function, unless the denominator is equal to one, in which case we simply
 use ``num``.
-There is also a ``_pretty`` variant available, which bases the string 
-parts for the numerator and denominator on the output of the function 
-``fmpz_poly_get_str_pretty`` and introduces parentheses where 
+There is also a ``_pretty`` variant available, which bases the string
+parts for the numerator and denominator on the output of the function
+``fmpz_poly_get_str_pretty`` and introduces parentheses where
 necessary.
-Note that currently these functions are not optimised for performance and 
-are intended to be used only for debugging purposes or one-off input and 
+Note that currently these functions are not optimised for performance and
+are intended to be used only for debugging purposes or one-off input and
 output, rather than as a low-level parser.
 
 .. function:: int fmpz_poly_q_set_str(fmpz_poly_q_t rop, const char *s)
 
-    Sets ``rop`` to the rational function given 
+    Sets ``rop`` to the rational function given
     by the string ``s``.
 
 .. function:: char * fmpz_poly_q_get_str(const fmpz_poly_q_t op)
 
-    Returns the string representation of 
+    Returns the string representation of
     the rational function ``op``.
 
 .. function:: char * fmpz_poly_q_get_str_pretty(const fmpz_poly_q_t op, const char *x)
 
-    Returns the pretty string representation of 
+    Returns the pretty string representation of
     the rational function ``op``.
 
 .. function:: int fmpz_poly_q_print(const fmpz_poly_q_t op)
 
-    Prints the representation of the rational 
+    Prints the representation of the rational
     function ``op`` to ``stdout``.
 
 .. function:: int fmpz_poly_q_print_pretty(const fmpz_poly_q_t op, const char *x)
 
-    Prints the pretty representation of the rational 
+    Prints the pretty representation of the rational
     function ``op`` to ``stdout``.

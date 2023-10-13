@@ -194,7 +194,7 @@ Comparisons
 .. function:: int acb_poly_overlaps(const acb_poly_t poly1, const acb_poly_t poly2)
 
     Returns nonzero iff *poly1* overlaps with *poly2*. The underscore
-    function requires that *len1* ist at least as large as *len2*.
+    function requires that *len1* is at least as large as *len2*.
 
 .. function:: int acb_poly_get_unique_fmpz_poly(fmpz_poly_t z, const acb_poly_t x)
 
@@ -626,7 +626,7 @@ Transforms
 
 .. function:: void _acb_poly_graeffe_transform(acb_ptr b, acb_srcptr a, slong len, slong prec)
 
-.. function:: void acb_poly_graeffe_transform(acb_poly_t b, acb_poly_t a, slong prec)
+.. function:: void acb_poly_graeffe_transform(acb_poly_t b, const acb_poly_t a, slong prec)
 
     Computes the Graeffe transform of input polynomial, which is of length *len*.
     See :func:`arb_poly_graeffe_transform` for details.
@@ -1166,4 +1166,3 @@ Root-finding
     If this function returns zero, then the signs of the imaginary parts
     are not known for certain, based on the accuracy of the inputs
     and the working precision *prec*.
-

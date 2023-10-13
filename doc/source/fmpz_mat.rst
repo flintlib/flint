@@ -3,7 +3,65 @@
 **fmpz_mat.h** -- matrices over the integers
 ===============================================================================
 
-Description.
+The :type:`fmpz_mat_t` data type represents dense matrices of
+multiprecision integers, implemented using :type:`fmpz` vectors.
+
+No automatic resizing is performed: in general, the user must provide
+matrices of correct dimensions for both input and output variables.
+Output variables are *not* allowed to be aliased with input variables
+unless otherwise noted.
+
+Matrices are indexed from zero: an `m \times n` matrix has rows of
+index `0,1,\ldots,m-1` and columns of index `0,1,\ldots,n-1`. One or
+both of `m` and `n` may be zero.
+
+Elements of a matrix can be read or written using the
+``fmpz_mat_entry`` macro, which returns a reference to the entry at a
+given row and column index. This reference can be passed as an input
+or output :type:`fmpz_t` variable to any function in the ``fmpz``
+module for direct manipulation.
+
+Simple example
+--------------
+
+The following example creates the `2 \times 2` matrix `A` with value
+`2i+j` at row `i` and column `j`, computes `B = A^2`, and prints both
+matrices.
+
+.. code:: c
+
+   #include "fmpz.h"
+   #include "fmpz_mat.h"
+
+   int main()
+   {
+       long i, j;
+       fmpz_mat_t A;
+       fmpz_mat_t B;
+       fmpz_mat_init(A, 2, 2);
+       fmpz_mat_init(B, 2, 2);
+       for (i = 0; i < 2; i++)
+           for (j = 0; j < 2; j++)
+               fmpz_set_ui(fmpz_mat_entry(A, i, j), 2*i+j);
+       fmpz_mat_mul(B, A, A);
+       flint_printf("A = \n");
+       fmpz_mat_print_pretty(A);
+       flint_printf("A^2 = \n");
+       fmpz_mat_print_pretty(B);
+       fmpz_mat_clear(A);
+       fmpz_mat_clear(B);
+   }
+
+The output is:
+
+::
+
+   A =
+   [[0 1]
+   [2 3]]
+   A^2 =
+   [[2 3]
+   [6 11]]
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -12,16 +70,13 @@ Types, macros and constants
 
 .. type:: fmpz_mat_t
 
-    Description.
-
-
 Memory management
 --------------------------------------------------------------------------------
 
 
 .. function:: void fmpz_mat_init(fmpz_mat_t mat, slong rows, slong cols)
 
-    Initialises a matrix with the given number of rows and columns for use. 
+    Initialises a matrix with the given number of rows and columns for use.
 
 .. function:: void fmpz_mat_clear(fmpz_mat_t mat)
 
@@ -34,17 +89,17 @@ Basic assignment and manipulation
 
 .. function:: void fmpz_mat_set(fmpz_mat_t mat1, const fmpz_mat_t mat2)
 
-    Sets ``mat1`` to a copy of ``mat2``. The dimensions of 
+    Sets ``mat1`` to a copy of ``mat2``. The dimensions of
     ``mat1`` and ``mat2`` must be the same.
 
 .. function:: void fmpz_mat_init_set(fmpz_mat_t mat, const fmpz_mat_t src)
 
-    Initialises the matrix ``mat`` to the same size as ``src`` and 
+    Initialises the matrix ``mat`` to the same size as ``src`` and
     sets it to a copy of ``src``.
 
 .. function:: void fmpz_mat_swap(fmpz_mat_t mat1, fmpz_mat_t mat2)
 
-    Swaps two matrices. The dimensions of ``mat1`` and ``mat2`` 
+    Swaps two matrices. The dimensions of ``mat1`` and ``mat2``
     are allowed to be different.
 
 .. function:: void fmpz_mat_swap_entrywise(fmpz_mat_t mat1, fmpz_mat_t mat2)
@@ -52,7 +107,7 @@ Basic assignment and manipulation
     Swaps two matrices by swapping the individual entries rather than swapping
     the contents of the structs.
 
-.. function:: fmpz * fmpz_mat_entry(fmpz_mat_t mat, slong i, slong j)
+.. function:: fmpz * fmpz_mat_entry(const fmpz_mat_t mat, slong i, slong j)
 
     Returns a reference to the entry of ``mat`` at row `i` and column `j`.
     This reference can be passed as an input or output variable to any
@@ -118,69 +173,69 @@ Random matrix generation
 
 .. function:: void fmpz_mat_randbits(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits)
 
-    Sets the entries of ``mat`` to random signed integers whose absolute 
+    Sets the entries of ``mat`` to random signed integers whose absolute
     values have the given number of binary bits.
 
 .. function:: void fmpz_mat_randtest(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits)
 
-    Sets the entries of ``mat`` to random signed integers whose 
-    absolute values have a random number of bits up to the given number 
+    Sets the entries of ``mat`` to random signed integers whose
+    absolute values have a random number of bits up to the given number
     of bits inclusive.
 
 .. function:: void fmpz_mat_randintrel(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits)
 
-    Sets ``mat`` to be a random *integer relations* matrix, with 
+    Sets ``mat`` to be a random *integer relations* matrix, with
     signed entries up to the given number of bits.
 
-    The number of columns of ``mat`` must be equal to one more than 
-    the number of rows. The format of the matrix is a set of random integers 
-    in the left hand column and an identity matrix in the remaining square 
+    The number of columns of ``mat`` must be equal to one more than
+    the number of rows. The format of the matrix is a set of random integers
+    in the left hand column and an identity matrix in the remaining square
     submatrix.
 
 .. function:: void fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, flint_bitcnt_t bits2)
 
     Sets ``mat`` to a random *simultaneous diophantine* matrix.
 
-    The matrix must be square. The top left entry is set to ``2^bits2``. 
-    The remainder of that row is then set to signed random integers of the 
-    given number of binary bits. The remainder of the first column is zero. 
-    Running down the rest of the diagonal are the values ``2^bits`` with 
+    The matrix must be square. The top left entry is set to ``2^bits2``.
+    The remainder of that row is then set to signed random integers of the
+    given number of binary bits. The remainder of the first column is zero.
+    Running down the rest of the diagonal are the values ``2^bits`` with
     all remaining entries zero.
 
 .. function:: void fmpz_mat_randntrulike(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, ulong q)
 
-    Sets a square matrix ``mat`` of even dimension to a random 
+    Sets a square matrix ``mat`` of even dimension to a random
     *NTRU like* matrix.
 
     The matrix is broken into four square submatrices. The top left submatrix
-    is set to the identity. The bottom left submatrix is set to the zero 
+    is set to the identity. The bottom left submatrix is set to the zero
     matrix. The bottom right submatrix is set to `q` times the identity matrix.
     Finally the top right submatrix has the following format. A random vector
-    `h` of length `r/2` is created, with random signed entries of the given 
-    number of bits. Then entry `(i, j)` of the submatrix is set to 
-    `h[i + j \bmod{r/2}]`. 
+    `h` of length `r/2` is created, with random signed entries of the given
+    number of bits. Then entry `(i, j)` of the submatrix is set to
+    `h[i + j \bmod{r/2}]`.
 
 .. function:: void fmpz_mat_randntrulike2(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, ulong q)
 
-    Sets a square matrix ``mat`` of even dimension to a random 
+    Sets a square matrix ``mat`` of even dimension to a random
     *NTRU like* matrix.
 
     The matrix is broken into four square submatrices. The top left submatrix
-    is set to `q` times the identity matrix. The top right submatrix is set to 
+    is set to `q` times the identity matrix. The top right submatrix is set to
     the zero matrix. The bottom right submatrix is set to the identity matrix.
     Finally the bottom left submatrix has the following format. A random vector
-    `h` of length `r/2` is created, with random signed entries of the given 
-    number of bits. Then entry `(i, j)` of the submatrix is set to 
+    `h` of length `r/2` is created, with random signed entries of the given
+    number of bits. Then entry `(i, j)` of the submatrix is set to
     `h[i + j \bmod{r/2}]`.
 
 .. function:: void fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha)
 
-    Sets a square matrix ``mat`` to a random *ajtai* matrix. 
-    The diagonal entries `(i, i)` are set to a random entry in the range 
-    `[1, 2^{b-1}]` inclusive where `b = \lfloor(2 r - i)^\alpha\rfloor` for some 
-    double parameter `\alpha`. The entries below the diagonal in column `i` 
-    are set to a random entry in the range `(-2^b + 1, 2^b - 1)` whilst the 
-    entries to the right of the diagonal in row `i` are set to zero. 
+    Sets a square matrix ``mat`` to a random *ajtai* matrix.
+    The diagonal entries `(i, i)` are set to a random entry in the range
+    `[1, 2^{b-1}]` inclusive where `b = \lfloor(2 r - i)^\alpha\rfloor` for some
+    double parameter `\alpha`. The entries below the diagonal in column `i`
+    are set to a random entry in the range `(-2^b + 1, 2^b - 1)` whilst the
+    entries to the right of the diagonal in row `i` are set to zero.
 
 .. function:: int fmpz_mat_randpermdiag(fmpz_mat_t mat, flint_rand_t state, const fmpz * diag, slong n)
 
@@ -193,8 +248,8 @@ Random matrix generation
 
 .. function:: void fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, slong rank, flint_bitcnt_t bits)
 
-    Sets ``mat`` to a random sparse matrix with the given rank, 
-    having exactly as many non-zero elements as the rank, with the 
+    Sets ``mat`` to a random sparse matrix with the given rank,
+    having exactly as many non-zero elements as the rank, with the
     nonzero elements being random integers of the given bit size.
 
     The matrix can be transformed into a dense matrix with unchanged
@@ -205,8 +260,8 @@ Random matrix generation
     Sets ``mat`` to a random sparse matrix with minimal number of
     nonzero entries such that its determinant has the given value.
 
-    Note that the matrix will be zero if ``det`` is zero.  
-    In order to generate a non-zero singular matrix, the function 
+    Note that the matrix will be zero if ``det`` is zero.
+    In order to generate a non-zero singular matrix, the function
     :func:`fmpz_mat_randrank` can be used.
 
     The matrix can be transformed into a dense matrix with unchanged
@@ -227,50 +282,50 @@ Input and output
 
 .. function:: int fmpz_mat_fprint(FILE * file, const fmpz_mat_t mat)
 
-    Prints the given matrix to the stream ``file``.  The format is 
-    the number of rows, a space, the number of columns, two spaces, then 
+    Prints the given matrix to the stream ``file``.  The format is
+    the number of rows, a space, the number of columns, two spaces, then
     a space separated list of coefficients, one row after the other.
 
-    In case of success, returns a positive value;  otherwise, returns 
+    In case of success, returns a positive value;  otherwise, returns
     a non-positive value.
 
 .. function:: int fmpz_mat_fprint_pretty(FILE * file, const fmpz_mat_t mat)
 
-    Prints the given matrix to the stream ``file``.  The format is an 
-    opening square bracket, then on each line a row of the matrix, followed 
-    by a closing square bracket. Each row is written as an opening square 
-    bracket followed by a space separated list of coefficients followed 
+    Prints the given matrix to the stream ``file``.  The format is an
+    opening square bracket, then on each line a row of the matrix, followed
+    by a closing square bracket. Each row is written as an opening square
+    bracket followed by a space separated list of coefficients followed
     by a closing square bracket.
 
-    In case of success, returns a positive value;  otherwise, returns 
+    In case of success, returns a positive value;  otherwise, returns
     a non-positive value.
 
 .. function:: int fmpz_mat_print(const fmpz_mat_t mat)
 
-    Prints the given matrix to the stream ``stdout``.  For further 
+    Prints the given matrix to the stream ``stdout``.  For further
     details, see :func:`fmpz_mat_fprint`.
 
 .. function:: int fmpz_mat_print_pretty(const fmpz_mat_t mat)
 
-    Prints the given matrix to ``stdout``.  For further details, 
+    Prints the given matrix to ``stdout``.  For further details,
     see :func:`fmpz_mat_fprint_pretty`.
 
 .. function:: int fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
 
-    Reads a matrix from the stream ``file``, storing the result 
-    in ``mat``.  The expected format is the number of rows, a 
+    Reads a matrix from the stream ``file``, storing the result
+    in ``mat``.  The expected format is the number of rows, a
     space, the number of columns, two spaces, then a space separated
     list of coefficients, one row after the other.
 
-    In case of success, returns a positive number.  In case of failure, 
+    In case of success, returns a positive number.  In case of failure,
     returns a non-positive value.
 
 .. function:: int fmpz_mat_read(fmpz_mat_t mat)
 
-    Reads a matrix from ``stdin``, storing the result 
+    Reads a matrix from ``stdin``, storing the result
     in ``mat``.
 
-    In case of success, returns a positive number.  In case of failure, 
+    In case of success, returns a positive number.  In case of failure,
     returns a non-positive value.
 
 
@@ -280,7 +335,7 @@ Comparison
 
 .. function:: int fmpz_mat_equal(const fmpz_mat_t mat1, const fmpz_mat_t mat2)
 
-    Returns a non-zero value if ``mat1`` and ``mat2`` have 
+    Returns a non-zero value if ``mat1`` and ``mat2`` have
     the same dimensions and entries, and zero otherwise.
 
 .. function:: int fmpz_mat_is_zero(const fmpz_mat_t mat)
@@ -373,7 +428,7 @@ Modular reduction and reconstruction
     with entries satisfying `-mn/2 <= c < mn/2` (if sign = 1)
     or `0 <= c < mn` (if sign = 0).
 
-.. function:: void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres, const fmpz_mat_t mat, fmpz_comb_t comb, fmpz_comb_temp_t temp)
+.. function:: void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres, const fmpz_mat_t mat, const fmpz_comb_t comb, fmpz_comb_temp_t temp)
 
     Sets each of the ``nres`` matrices in ``residues`` to ``mat`` reduced modulo
     the modulus of the respective matrix, given precomputed ``comb`` and
@@ -391,7 +446,7 @@ Modular reduction and reconstruction
     For reducing or reconstructing multiple integer matrices over the same
     set of moduli, it is faster to use ``fmpz_mat_multi_mod_precomp``.
 
-.. function:: void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat, nmod_mat_t * const residues, slong nres, fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign)
+.. function:: void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat, nmod_mat_t * const residues, slong nres, const fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign)
 
     Reconstructs ``mat`` from its images modulo the ``nres`` matrices in
     ``residues``, given precomputed ``comb`` and ``comb_temp`` structures.
@@ -514,7 +569,7 @@ Matrix multiplication
 
     The matrices must have compatible dimensions for matrix multiplication.
     No aliasing is allowed.
-    
+
 .. function:: void fmpz_mat_mul_strassen(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     Sets `C = AB`. Dimensions must be compatible for matrix multiplication.
@@ -524,7 +579,7 @@ Matrix multiplication
 .. function:: void _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B, int sign, flint_bitcnt_t bits)
               void fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
-    Sets ``C`` to the matrix product `C = AB` computed using a multimodular 
+    Sets ``C`` to the matrix product `C = AB` computed using a multimodular
     algorithm. `C` is computed modulo several small prime numbers
     and reconstructed using the Chinese Remainder Theorem. This generally
     becomes more efficient than classical multiplication for large matrices.
@@ -561,7 +616,7 @@ Matrix multiplication
     Sets ``B`` to the square of the matrix ``A``, which must be
     a square matrix. Aliasing is allowed.
     The Bodrato algorithm is described in [Bodrato2010]_.
-    It is highly efficient for squaring matrices which satisfy both the 
+    It is highly efficient for squaring matrices which satisfy both the
     following conditions: (a) large elements,  (b) dimensions less than 150.
 
 
@@ -571,7 +626,7 @@ Matrix multiplication
     where ``A`` must be a square matrix. Aliasing is allowed.
 
 
-.. function:: int _fmpz_mat_mul_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
+.. function:: void _fmpz_mat_mul_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     This internal function sets `C` to the matrix product `C = A B` computed
     using classical matrix algorithm assuming that all entries of `A` and `B`
@@ -634,8 +689,8 @@ Content
 .. function:: void fmpz_mat_content(fmpz_t mat_gcd, const fmpz_mat_t A)
 
     Sets ``mat_gcd`` as the gcd of all the elements of the matrix ``A``.
-    Returns 0 if the matrix is empty. 
-    
+    Returns 0 if the matrix is empty.
+
 
 
 Trace
@@ -762,34 +817,34 @@ Characteristic polynomial
 
 .. function:: void _fmpz_mat_charpoly_berkowitz(fmpz * cp, const fmpz_mat_t mat)
 
-    Sets ``(cp, n+1)`` to the characteristic polynomial of 
+    Sets ``(cp, n+1)`` to the characteristic polynomial of
     an `n \times n` square matrix.
 
 .. function:: void fmpz_mat_charpoly_berkowitz(fmpz_poly_t cp, const fmpz_mat_t mat)
 
-    Computes the characteristic polynomial of length `n + 1` of 
+    Computes the characteristic polynomial of length `n + 1` of
     an `n \times n` square matrix. Uses an `O(n^4)` algorithm based on the
     method of Berkowitz.
 
 .. function:: void _fmpz_mat_charpoly_modular(fmpz * cp, const fmpz_mat_t mat)
 
-    Sets ``(cp, n+1)`` to the characteristic polynomial of 
+    Sets ``(cp, n+1)`` to the characteristic polynomial of
     an `n \times n` square matrix.
 
 .. function:: void fmpz_mat_charpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat)
 
-    Computes the characteristic polynomial of length `n + 1` of 
+    Computes the characteristic polynomial of length `n + 1` of
     an `n \times n` square matrix. Uses a modular method based on an `O(n^3)`
     method over `\mathbb{Z}/n\mathbb{Z}`.
 
 .. function:: void _fmpz_mat_charpoly(fmpz * cp, const fmpz_mat_t mat)
 
-    Sets ``(cp, n+1)`` to the characteristic polynomial of 
+    Sets ``(cp, n+1)`` to the characteristic polynomial of
     an `n \times n` square matrix.
 
 .. function:: void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
 
-    Computes the characteristic polynomial of length `n + 1` of 
+    Computes the characteristic polynomial of length `n + 1` of
     an `n \times n` square matrix.
 
 
@@ -799,7 +854,7 @@ Minimal polynomial
 
 .. function:: slong _fmpz_mat_minpoly_modular(fmpz * cp, const fmpz_mat_t mat)
 
-    Sets ``(cp, n+1)`` to the modular polynomial of 
+    Sets ``(cp, n+1)`` to the modular polynomial of
     an `n \times n` square matrix and returns its length.
 
 .. function:: void fmpz_mat_minpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat)
@@ -835,7 +890,7 @@ Column partitioning
 
 .. function:: int fmpz_mat_col_partition(slong * part, fmpz_mat_t M, int short_circuit)
 
-    Returns the number `p` of distinct columns of `M` (or `0` if the flag 
+    Returns the number `p` of distinct columns of `M` (or `0` if the flag
     ``short_circuit`` is set and this number is greater than the number
     of rows of `M`). The entries of array ``part`` are set to values in
     `[0, p)` such that two entries of part are equal iff the corresponding
@@ -933,7 +988,7 @@ allowed between arguments.
 .. function:: void _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B, const nmod_mat_t Ainv, mp_limb_t p, const fmpz_t N, const fmpz_t D)
 
     Solves the equation `AX = B` for nonsingular `A`. More precisely, computes
-    (``X``, ``den``) such that `AX = B \times \operatorname{den}` using a 
+    (``X``, ``den``) such that `AX = B \times \operatorname{den}` using a
     ``p``-adic algorithm for the supplied prime ``p``. The values ``N`` and
     ``D`` are absolute value bounds for the numerator and denominator of the
     solution.
@@ -972,7 +1027,7 @@ allowed between arguments.
     Note that the matrices `A` and `B` may have any shape as long as they have
     the same number of rows.
 
-.. function:: void fmpz_mat_can_solve_fflu(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B)
+.. function:: int fmpz_mat_can_solve_fflu(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B)
 
     Returns `1` if the system `AX = B` can be solved. If so it computes
     (``X``, ``den``) such that `AX = B \times \operatorname{den}`. The
@@ -1067,13 +1122,13 @@ Row reduction
     The algorithm works by computing the reduced row echelon form of ``A``
     modulo a prime `p` using ``nmod_mat_rref``. The pivot columns and rows
     of this matrix will then define a non-singular submatrix of ``A``,
-    nonsingular solving and matrix multiplication can then be used to determine 
+    nonsingular solving and matrix multiplication can then be used to determine
     the reduced row echelon form of the whole of ``A``. This procedure is
     described in [Stein2007]_.
 
 .. function:: int fmpz_mat_is_in_rref_with_rank(const fmpz_mat_t A, const fmpz_t den, slong rank)
 
-    Checks that the matrix `A/den` is in reduced row echelon form of rank 
+    Checks that the matrix `A/den` is in reduced row echelon form of rank
     ``rank``, returns 1 if so and 0 otherwise.
 
 
@@ -1105,10 +1160,10 @@ Strong echelon form and Howell form
 
     `A` must have at least as many rows as columns.
 
-.. function:: slong fmpz_mat_howell_form_mod(nmod_mat_t A, const fmpz_t mod)
+.. function:: slong fmpz_mat_howell_form_mod(fmpz_mat_t A, const fmpz_t mod)
 
     Transforms `A` such that `A` modulo ``mod`` is the Howell form of the
-    input matrix modulo ``mod``. 
+    input matrix modulo ``mod``.
     For a definition of the Howell form see [StoMul1998]_. The Howell form
     is computed by first putting `A` into strong echelon form and then ordering
     the rows.
@@ -1180,7 +1235,7 @@ Hermite normal form
     implementations in FLINT as per ``fmpz_mat_hnf``.
 
     Aliasing of ``H`` and ``A`` is allowed. The size of ``H`` must be
-    the same as that of ``A`` and ``U`` must be square of \compatible 
+    the same as that of ``A`` and ``U`` must be square of \compatible
     dimension (having the same number of rows as ``A``).
 
 .. function:: void fmpz_mat_hnf_classical(fmpz_mat_t H, const fmpz_mat_t A)
@@ -1274,7 +1329,7 @@ Smith normal form
 
     Computes an integer matrix ``S`` such that ``S`` is the unique Smith
     normal form of the diagonal matrix ``A``. The algorithm used here is due
-    to Kannan and Bachem [KanBac1979]_ 
+    to Kannan and Bachem [KanBac1979]_
 
     Aliasing of ``S`` and ``A`` is allowed. The size of ``S`` must be
     the same as that of ``A``.
@@ -1300,10 +1355,10 @@ Special matrices
 
 .. function:: void fmpz_mat_gram(fmpz_mat_t B, const fmpz_mat_t A)
 
-    Sets ``B`` to the Gram matrix of the `m`-dimensional lattice ``L`` in 
+    Sets ``B`` to the Gram matrix of the `m`-dimensional lattice ``L`` in
     `n`-dimensional Euclidean space `R^n` spanned by the rows of
     the `m \times n` matrix ``A``. Dimensions must be compatible.
-    ``A`` and ``B`` are allowed to be the same object if ``A`` is a 
+    ``A`` and ``B`` are allowed to be the same object if ``A`` is a
     square matrix.
 
 .. function:: int fmpz_mat_is_hadamard(const fmpz_mat_t H)
@@ -1325,7 +1380,7 @@ Special matrices
     `q` is an odd prime power. Orders `n` for which Hadamard matrices are
     known to exist but for which this construction fails are
     92, 116, 156, ... (OEIS A046116).
-    
+
 
 Conversions
 --------------------------------------------------------------------------------
@@ -1403,7 +1458,6 @@ Modified LLL
     LLL, which has better complexity in terms of the lattice dimension,
     introduced by Storjohann.
 
-    See "Faster Algorithms for Integer Lattice Basis Reduction." Technical 
-    Report 249. Zurich, Switzerland: Department Informatik, ETH. July 30, 
+    See "Faster Algorithms for Integer Lattice Basis Reduction." Technical
+    Report 249. Zurich, Switzerland: Department Informatik, ETH. July 30,
     1996.
-

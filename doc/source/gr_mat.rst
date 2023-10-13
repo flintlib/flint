@@ -78,7 +78,7 @@ Memory management
     Initializes *mat* to a matrix with the given number of rows and
     columns.
 
-.. function:: void gr_mat_init_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+.. function:: int gr_mat_init_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 
     Initializes *res* to a copy of the matrix *mat*.
 
@@ -509,8 +509,8 @@ Inverse and adjugate
 Characteristic polynomial
 -------------------------------------------------------------------------------
 
-.. function:: int _gr_mat_charpoly(gr_ptr res, gr_mat_t adj, const gr_mat_t mat, gr_ctx_t ctx)
-              int gr_mat_charpoly(gr_poly_t res, gr_mat_t adj, const gr_mat_t mat, gr_ctx_t ctx)
+.. function:: int _gr_mat_charpoly(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_charpoly(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx)
 
     Computes the characteristic polynomial using a default
     algorithm choice. The
@@ -631,7 +631,7 @@ Eigenvalues
     over this field.
 
     The *precomp* version requires as input a precomputed set of eigenvalues
-    with corresponding multiplicites, which can be computed
+    with corresponding multiplicities, which can be computed
     with :func:`gr_mat_eigenvalues`.
 
 Jordan decomposition

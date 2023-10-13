@@ -265,7 +265,7 @@ Norms
     Sets *b* to an upper bound for the infinity norm (i.e. the largest
     absolute value row sum) of *A*.
 
-.. function:: void acb_mat_frobenius_norm(acb_t res, const acb_mat_t A, slong prec)
+.. function:: void acb_mat_frobenius_norm(arb_t res, const acb_mat_t A, slong prec)
 
     Sets *res* to the Frobenius norm (i.e. the square root of the sum
     of squares of entries) of *A*.

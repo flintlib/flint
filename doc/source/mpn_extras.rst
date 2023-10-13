@@ -70,7 +70,7 @@ Divisibility
 --------------------------------------------------------------------------------
 
 
-.. function:: int flint_mpn_divisible_1_p(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
+.. function:: int flint_mpn_divisible_1_odd(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
 
     Expression determining whether ``(x, xsize)`` is divisible by the
     ``mp_limb_t d`` which is assumed to be odd-valued and at least `3`.
@@ -218,7 +218,7 @@ GCD
 --------------------------------------------------------------------------------
 
 
-.. function:: mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg, mp_ptr array1, mp_size_t limbs1, mp_ptr array2, mp_size_t limbs2, mp_ptr temp)
+.. function:: mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg, mp_srcptr array1, mp_size_t limbs1, mp_srcptr array2, mp_size_t limbs2, mp_ptr temp)
 
     Sets ``(arrayg, retvalue)`` to the gcd of ``(array1, limbs1)`` and
         ``(array2, limbs2)``.
@@ -230,7 +230,7 @@ GCD
     space, or ``NULL`` must be passed to ``temp`` if the function should
     allocate its own space.
 
-.. function:: mp_size_t flint_mpn_gcd_full(mp_ptr arrayg, mp_ptr array1, mp_size_t limbs1, mp_ptr array2, mp_size_t limbs2)
+.. function:: mp_size_t flint_mpn_gcd_full(mp_ptr arrayg, mp_srcptr array1, mp_size_t limbs1, mp_srcptr array2, mp_size_t limbs2)
 
     Sets ``(arrayg, retvalue)`` to the gcd of ``(array1, limbs1)`` and
     ``(array2, limbs2)``. 

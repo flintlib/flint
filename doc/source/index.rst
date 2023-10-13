@@ -9,8 +9,8 @@ FLINT: Fast Library for Number Theory
 Welcome to FLINT's documentation! FLINT is a C library for doing number theory.
 
 * Website: https://flintlib.org
-* Source code on GitHub: https://github.com/flintlib/flint2
-* Issue tracker: https://github.com/flintlib/flint2/issues
+* Source code on GitHub: https://github.com/flintlib/flint
+* Issue tracker: https://github.com/flintlib/flint/issues
 * Mailing list: https://groups.google.com/group/flint-devel
 
 FLINT is free software distributed under the
@@ -61,10 +61,12 @@ Generic rings
    gr_poly.rst
    gr_mpoly.rst
 
-.. toctree::
-   :maxdepth: 1
+.. only:: not latex
 
-   index_generic.rst
+   .. toctree::
+      :maxdepth: 1
+
+      index_generic.rst
 
 
 Integers
@@ -93,10 +95,13 @@ Integers
    fft_small.rst
    qsieve.rst
 
-.. toctree::
-   :maxdepth: 1
 
-   index_integers.rst
+.. only:: not latex
+	  
+   .. toctree::
+      :maxdepth: 1
+
+      index_integers.rst
 
 Rational numbers
 ----------------
@@ -113,10 +118,12 @@ Rational numbers
    fmpz_poly_q.rst
    fmpz_mpoly_q.rst
 
-.. toctree::
-   :maxdepth: 1
-
-   index_rationals.rst
+.. only:: not latex
+	  
+   .. toctree::
+      :maxdepth: 1
+		 
+      index_rationals.rst
 
 Integers mod n
 ---------------
@@ -140,10 +147,12 @@ Integers mod n
    fmpz_mod_mpoly.rst
    fmpz_mod_mpoly_factor.rst
 
-.. toctree::
-   :maxdepth: 1
+.. only:: not latex
 
-   index_integers_mod.rst
+   .. toctree::
+      :maxdepth: 1
+
+      index_integers_mod.rst
 
 Groups and other structures
 ---------------------------
@@ -209,10 +218,12 @@ Real and complex numbers
    hypergeometric.rst
    agm.rst
 
-.. toctree::
-   :maxdepth: 1
+.. only:: not latex
 
-   index_arb.rst
+    .. toctree::
+       :maxdepth: 1
+
+       index_arb.rst
 
 Exact real and complex numbers
 ----------------------------------------
@@ -303,7 +314,6 @@ Interfaces
 .. toctree::
    :maxdepth: 1
 
-   flintxx.rst
    python_flint.rst
 
 References

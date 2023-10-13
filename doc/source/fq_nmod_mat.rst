@@ -3,16 +3,12 @@
 **fq_nmod_mat.h** -- matrices over finite fields (word-size characteristic)
 ===============================================================================
 
-Description.
-
 Types, macros and constants
 -------------------------------------------------------------------------------
 
 .. type:: fq_nmod_mat_struct
 
 .. type:: fq_nmod_mat_t
-
-    Description.
 
 Memory management
 --------------------------------------------------------------------------------
@@ -24,7 +20,7 @@ Memory management
     coefficients in `\mathbf{F}_{q}` given by ``ctx``. All elements
     are set to zero.
 
-.. function:: void fq_nmod_mat_init_set(fq_nmod_mat_t mat, fq_nmod_mat_t src, const fq_nmod_ctx_t ctx)
+.. function:: void fq_nmod_mat_init_set(fq_nmod_mat_t mat, const fq_nmod_mat_t src, const fq_nmod_ctx_t ctx)
 
     Initialises ``mat`` and sets its dimensions and elements to
     those of ``src``.
@@ -35,7 +31,7 @@ Memory management
     cannot be used again until it is initialised. This function must be
     called exactly once when finished using an :type:`fq_nmod_mat_t` object.
 
-.. function:: void fq_nmod_mat_set(fq_nmod_mat_t mat, fq_nmod_mat_t src, const fq_nmod_ctx_t ctx)
+.. function:: void fq_nmod_mat_set(fq_nmod_mat_t mat, const fq_nmod_mat_t src, const fq_nmod_ctx_t ctx)
 
     Sets ``mat`` to a copy of ``src``. It is assumed
     that ``mat`` and ``src`` have identical dimensions.
@@ -45,20 +41,20 @@ Basic properties and manipulation
 --------------------------------------------------------------------------------
 
 
-.. function:: fq_nmod_struct * fq_nmod_mat_entry(fq_nmod_mat_t mat, slong i, slong j)
+.. function:: fq_nmod_struct * fq_nmod_mat_entry(const fq_nmod_mat_t mat, slong i, slong j)
 
     Directly accesses the entry in ``mat`` in row `i` and column `j`,
     indexed from zero. No bounds checking is performed.
 
-.. function:: void fq_nmod_mat_entry_set(fq_nmod_mat_t mat, slong i, slong j, fq_nmod_t x, const fq_nmod_ctx_t ctx)
+.. function:: void fq_nmod_mat_entry_set(fq_nmod_mat_t mat, slong i, slong j, const fq_nmod_t x, const fq_nmod_ctx_t ctx)
 
     Sets the entry in ``mat`` in row `i` and column `j` to ``x``.
 
-.. function:: slong fq_nmod_mat_nrows(fq_nmod_mat_t mat, const fq_nmod_ctx_t ctx)
+.. function:: slong fq_nmod_mat_nrows(const fq_nmod_mat_t mat, const fq_nmod_ctx_t ctx)
 
     Returns the number of rows in ``mat``.
 
-.. function:: slong fq_nmod_mat_ncols(fq_nmod_mat_t mat, const fq_nmod_ctx_t ctx)
+.. function:: slong fq_nmod_mat_ncols(const fq_nmod_mat_t mat, const fq_nmod_ctx_t ctx)
 
     Returns the number of columns in ``mat``.
 
@@ -67,7 +63,7 @@ Basic properties and manipulation
     Swaps two matrices. The dimensions of ``mat1`` and ``mat2``
     are allowed to be different.
 
-.. function:: void fq_nmod_mat_swap_entrywise(fq_nmod_mat_t mat1, fq_nmod_mat_t mat2)
+.. function:: void fq_nmod_mat_swap_entrywise(fq_nmod_mat_t mat1, fq_nmod_mat_t mat2, const fq_nmod_ctx_t ctx)
 
     Swaps two matrices by swapping the individual entries rather than swapping
     the contents of the structs.
@@ -80,24 +76,24 @@ Basic properties and manipulation
 
     Sets all diagonal entries of ``mat`` to 1 and all other entries to 0.
 
-.. function:: void fq_nmod_mat_swap_rows(fq_nmod_mat_t mat, slong * perm, slong r, slong s)
-    
+.. function:: void fq_nmod_mat_swap_rows(fq_nmod_mat_t mat, slong * perm, slong r, slong s, const fq_nmod_ctx_t ctx)
+
     Swaps rows ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
     permutation of the rows will also be applied to ``perm``.
 
-.. function:: void fq_nmod_mat_swap_cols(fq_nmod_mat_t mat, slong * perm, slong r, slong s)
-    
+.. function:: void fq_nmod_mat_swap_cols(fq_nmod_mat_t mat, slong * perm, slong r, slong s, const fq_nmod_ctx_t ctx)
+
     Swaps columns ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
     permutation of the columns will also be applied to ``perm``.
 
-.. function:: void fq_nmod_mat_invert_rows(fq_nmod_mat_t mat, slong * perm)
-    
+.. function:: void fq_nmod_mat_invert_rows(fq_nmod_mat_t mat, slong * perm, const fq_nmod_ctx_t ctx)
+
     Swaps rows ``i`` and ``r - i`` of ``mat`` for ``0 <= i < r/2``, where
     ``r`` is the number of rows of ``mat``. If ``perm`` is non-``NULL``, the
     permutation of the rows will also be applied to ``perm``.
 
-.. function:: void fq_nmod_mat_invert_cols(fq_nmod_mat_t mat, slong * perm)
-    
+.. function:: void fq_nmod_mat_invert_cols(fq_nmod_mat_t mat, slong * perm, const fq_nmod_ctx_t ctx)
+
     Swaps columns ``i`` and ``c - i`` of ``mat`` for ``0 <= i < c/2``, where
     ``c`` is the number of columns of ``mat``. If ``perm`` is non-``NULL``, the
     permutation of the columns will also be applied to ``perm``.
@@ -131,7 +127,7 @@ Printing
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_nmod_mat_print_pretty(const fq_nmod_mat_t mat, const fq_nmod_ctx_t ctx)
+.. function:: int fq_nmod_mat_print_pretty(const fq_nmod_mat_t mat, const fq_nmod_ctx_t ctx)
 
     Pretty-prints ``mat`` to ``stdout``. A header is printed
     followed by the rows enclosed in brackets.
@@ -144,7 +140,7 @@ Printing
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
-.. function:: void fq_nmod_mat_print(const fq_nmod_mat_t mat, const fq_nmod_ctx_t ctx)
+.. function:: int fq_nmod_mat_print(const fq_nmod_mat_t mat, const fq_nmod_ctx_t ctx)
 
     Prints ``mat`` to ``stdout``. A header is printed followed
     by the rows enclosed in brackets.
@@ -234,7 +230,7 @@ Comparison
 --------------------------------------------------------------------------------
 
 
-.. function:: int fq_nmod_mat_equal(fq_nmod_mat_t mat1, fq_nmod_mat_t mat2, const fq_nmod_ctx_t ctx)
+.. function:: int fq_nmod_mat_equal(const fq_nmod_mat_t mat1, const fq_nmod_mat_t mat2, const fq_nmod_ctx_t ctx)
 
     Returns nonzero if mat1 and mat2 have the same dimensions and elements,
     and zero otherwise.
@@ -307,15 +303,15 @@ Matrix multiplication
     Sets `D = C + AB`. `C` and `D` may be aliased with each other but
     not with `A` or `B`.
 
-.. function:: void fq_nmod_mat_mul_vec(fq_nmod_struct * c, const fq_nmod_mat_t A, const fq_nmod_struct * b, slong blen)
-              void fq_nmod_mat_mul_vec_ptr(fq_nmod_struct * const * c, const fq_nmod_mat_t A, const fq_nmod_struct * const * b, slong blen)
+.. function:: void fq_nmod_mat_mul_vec(fq_nmod_struct * c, const fq_nmod_mat_t A, const fq_nmod_struct * b, slong blen, const fq_nmod_ctx_t ctx)
+              void fq_nmod_mat_mul_vec_ptr(fq_nmod_struct * const * c, const fq_nmod_mat_t A, const fq_nmod_struct * const * b, slong blen, const fq_nmod_ctx_t ctx)
 
     Compute a matrix-vector product of ``A`` and ``(b, blen)`` and store the result in ``c``.
     The vector ``(b, blen)`` is either truncated or zero-extended to the number of columns of ``A``.
     The number entries written to ``c`` is always equal to the number of rows of ``A``.
 
-.. function:: void fq_nmod_mat_vec_mul(fq_nmod_struct * c, const fq_nmod_struct * a, slong alen, const fq_nmod_mat_t B)
-              void fq_nmod_mat_vec_mul_ptr(fq_nmod_struct * const * c, const fq_nmod_struct * const * a, slong alen, const fq_nmod_mat_t B)
+.. function:: void fq_nmod_mat_vec_mul(fq_nmod_struct * c, const fq_nmod_struct * a, slong alen, const fq_nmod_mat_t B, const fq_nmod_ctx_t ctx)
+              void fq_nmod_mat_vec_mul_ptr(fq_nmod_struct * const * c, const fq_nmod_struct * const * a, slong alen, const fq_nmod_mat_t B, const fq_nmod_ctx_t ctx)
 
     Compute a vector-matrix product of ``(a, alen)`` and ``B`` and and store the result in ``c``.
     The vector ``(a, alen)`` is either truncated or zero-extended to the number of rows of ``B``.
@@ -326,7 +322,7 @@ Inverse
 --------------------------------------------------------------------------------
 
 
-.. function:: int fq_nmod_mat_inv(fq_nmod_mat_t B, fq_nmod_mat_t A, fq_ctx_t ctx)
+.. function:: int fq_nmod_mat_inv(fq_nmod_mat_t B, fq_nmod_mat_t A, const fq_nmod_ctx_t ctx)
 
     Sets `B = A^{-1}` and returns `1` if `A` is invertible. If `A` is singular,
     returns `0` and sets the elements of `B` to undefined values.
@@ -388,7 +384,7 @@ Reduced row echelon form
     form via LU decomposition and then solving an additional
     triangular system.
 
-.. function:: slong fq_nmod_mat_reduce_row(fq_nmod_mat_t A, slong * P, slong * L, slong n, fq_nmod_ctx_t ctx)
+.. function:: slong fq_nmod_mat_reduce_row(fq_nmod_mat_t A, slong * P, slong * L, slong n, const fq_nmod_ctx_t ctx)
 
     Reduce row n of the matrix `A`, assuming the prior rows are in Gauss
     form. However those rows may not be in order. The entry `i` of the array
@@ -438,7 +434,7 @@ Triangular solving
         \begin{pmatrix} A & 0 \\ C & D \end{pmatrix}^{-1}
         \begin{pmatrix} X \\ Y \end{pmatrix} =
         \begin{pmatrix} A^{-1} X \\ D^{-1} ( Y - C A^{-1} X ) \end{pmatrix}
-    
+
 
     to reduce the problem to matrix multiplication and triangular
     solving of smaller systems.
@@ -474,7 +470,7 @@ Triangular solving
         \begin{pmatrix} A & B \\ 0 & D \end{pmatrix}^{-1}
         \begin{pmatrix} X \\ Y \end{pmatrix} =
         \begin{pmatrix} A^{-1} (X - B D^{-1} Y) \\ D^{-1} Y \end{pmatrix}
-    
+
 
     to reduce the problem to matrix multiplication and triangular
     solving of smaller systems.
@@ -493,7 +489,7 @@ Solving
 
     The matrix `A` must be square.
 
-.. function:: int fq_nmod_mat_can_solve(fq_nmod_mat_t X, fq_nmod_mat_t A, fq_nmod_mat_t B, const fq_nmod_ctx_t ctx)
+.. function:: int fq_nmod_mat_can_solve(fq_nmod_mat_t X, const fq_nmod_mat_t A, const fq_nmod_mat_t B, const fq_nmod_ctx_t ctx)
 
     Solves the matrix-matrix equation `AX = B` over `Fq`.
 
@@ -508,7 +504,7 @@ Transforms
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_nmod_mat_similarity(fq_nmod_mat_t M, slong r, fq_nmod_t d, fq_nmod_ctx_t ctx)
+.. function:: void fq_nmod_mat_similarity(fq_nmod_mat_t M, slong r, fq_nmod_t d, const fq_nmod_ctx_t ctx)
 
     Applies a similarity transform to the `n\times n` matrix `M` in-place.
 
@@ -527,12 +523,12 @@ Characteristic polynomial
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_nmod_mat_charpoly_danilevsky(fq_nmod_poly_t p, const fq_nmod_mat_t M, fq_nmod_ctx_t ctx)
+.. function:: void fq_nmod_mat_charpoly_danilevsky(fq_nmod_poly_t p, const fq_nmod_mat_t M, const fq_nmod_ctx_t ctx)
 
     Compute the characteristic polynomial `p` of the matrix `M`. The matrix
     is assumed to be square.
 
-.. function:: void fq_nmod_mat_charpoly(fq_nmod_poly_t p, const fq_nmod_mat_t M, fq_nmod_ctx_t ctx)
+.. function:: void fq_nmod_mat_charpoly(fq_nmod_poly_t p, const fq_nmod_mat_t M, const fq_nmod_ctx_t ctx)
 
     Compute the characteristic polynomial `p` of the matrix `M`. The matrix
     is required to be square, otherwise an exception is raised.
@@ -542,7 +538,7 @@ Minimal polynomial
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_nmod_mat_minpoly(fq_nmod_poly_t p, const fq_nmod_mat_t M, fq_nmod_ctx_t ctx)
+.. function:: void fq_nmod_mat_minpoly(fq_nmod_poly_t p, const fq_nmod_mat_t M, const fq_nmod_ctx_t ctx)
 
     Compute the minimal polynomial `p` of the matrix `M`. The matrix
     is required to be square, otherwise an exception is raised.

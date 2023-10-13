@@ -12,7 +12,7 @@
 FLINT_DIR:=.
 SRC_DIR:=src
 BUILD_DIR:=build
-ABS_FLINT_DIR:=$(patsubst %/,%, $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
+ABS_FLINT_DIR:='$(patsubst %/,%, $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))'
 ABS_SRC_DIR:=$(ABS_FLINT_DIR)/$(SRC_DIR)
 ABS_BUILD_DIR:=$(ABS_FLINT_DIR)/$(SRC_DIR)
 
@@ -36,9 +36,9 @@ FLINT_SOLIB:=@FLINT_SOLIB@
 prefix:=@prefix@
 exec_prefix:=@exec_prefix@
 
-INCLUDEDIR:=@includedir@
-LIBDIR:=@libdir@
-BINDIR:=@bindir@
+INCLUDEDIR:=$(DESTDIR)@includedir@
+LIBDIR:=$(DESTDIR)@libdir@
+BINDIR:=$(DESTDIR)@bindir@
 PKGCONFIGDIR:=$(LIBDIR)/pkgconfig
 
 HOST_OS:=@host_os@
@@ -77,11 +77,14 @@ NTL_LIB_PATH:=@NTL_LIB_PATH@
 
 CFLAGS:=@CFLAGS@
 TESTCFLAGS:=@TESTCFLAGS@
-CPPFLAGS:=@CPPFLAGS@
+CPPFLAGS:=@CPPFLAGS@ -DBUILDING_FLINT
 CPPFLAGS2:=-L$(FLINT_DIR) $(CPPFLAGS)
 LIB_CPPFLAGS:=@LIB_CPPFLAGS@
 CXXFLAGS:=@CXXFLAGS@
 LIBS:=@LIBS@
+ifneq ($(WANT_NTL), 0)
+LIBS += -lstdc++ -lntl
+endif
 LIBS2:=$(LIBS) -lflint
 PIC_FLAG:=@PIC_FLAG@
 
@@ -100,7 +103,8 @@ EXE_LDFLAGS:=$(LDFLAGS) $(foreach path, $(ABS_FLINT_DIR) $(GMP_LIB_PATH) $(MPFR_
 ################################################################################
 
 CFG_FILES :=                                                                \
-        $(FLINT_DIR)/config.log         $(SRC_DIR)/flint-config.h           \
+        $(FLINT_DIR)/config.h           $(SRC_DIR)/flint-config.h           \
+        $(FLINT_DIR)/config.log                                             \
         $(SRC_DIR)/fft_tuning.h         $(FLINT_DIR)/flint.pc               \
         $(FLINT_DIR)/Makefile           $(SRC_DIR)/fmpz/fmpz.c
 
@@ -127,7 +131,7 @@ HEADER_DIRS :=                                                              \
                                                                             \
         fq              fq_vec          fq_mat          fq_poly             \
         fq_nmod         fq_nmod_vec     fq_nmod_mat     fq_nmod_poly        \
-        fq_zech         fq_zech_vec     fq_zech_mat     fq_zech_poly        \
+        fq_zech                         fq_zech_mat     fq_zech_poly        \
         fq_default                      fq_default_mat  fq_default_poly     \
         fq_embed                                                            \
         fq_nmod_embed                                                       \
@@ -202,9 +206,6 @@ endif
 INSTALL_DIRS :=                                                             \
         $(LIBDIR)                       $(INCLUDEDIR)/flint                 \
         $(PKGCONFIGDIR)
-ifneq ($(WANT_CXX),0)
-INSTALL_DIRS += $(INCLUDEDIR)/flint/flintxx
-endif
 ifneq ($(FLINT_DLLLIB),0)
 INSTALL_DIRS += $(BINDIR)
 endif
@@ -217,6 +218,9 @@ SINGLE_HEADERS :=                                                           \
         flint.h         longlong.h      exception.h    gmpcompat.h          \
         hashmap.h       profiler.h      templates.h    flint-config.h       \
         fft_tuning.h                                                        \
+        crt_helpers.h                   machine_vectors.h                   \
+                                                                            \
+        fq_zech_vec.h                                                       \
                                                                             \
         limb_types.h                    mpoly_types.h                       \
         fmpz_types.h                    fmpq_types.h                        \
@@ -224,10 +228,8 @@ SINGLE_HEADERS :=                                                           \
         fq_types.h                      fq_nmod_types.h                     \
         fq_zech_types.h                                                     \
         arf_types.h                     acf_types.h                         \
-        arb_types.h                     acb_types.h
-ifneq ($(WANT_NTL), 0)
-SINGLE_HEADERS += NTL-interface.h
-endif
+        arb_types.h                     acb_types.h                         \
+        NTL-interface.h
 
 HEADERS :=  $(patsubst %,$(SRC_DIR)/%,                                      \
                 $(patsubst %,%,$(SINGLE_HEADERS))                           \
@@ -243,12 +245,11 @@ define xxx_SOURCES
 $(1)_SOURCES := $(wildcard $(SRC_DIR)/$(1)/*.c)
 endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_SOURCES,$(dir))))
+
+# We clear some template files
+fmpz_lll_SOURCES := $(filter-out $(SRC_DIR)/fmpz_lll/babai.c $(SRC_DIR)/fmpz_lll/mpf2_lll.c $(SRC_DIR)/fmpz_lll/d_lll.c,$(fmpz_lll_SOURCES))
+
 SOURCES := $(foreach dir,$(DIRS),$($(dir)_SOURCES))
-# NOTE: We do not add CPP files to C files in SOURCES in order to not screw up
-# the `patsubst' in the object files.
-ifneq ($(WANT_NTL), 0)
-interfaces_SOURCES := $(SRC_DIR)/interfaces/NTL-interface.cpp
-endif
 
 define xxx_PROF_SOURCES
 $(1)_PROF_SOURCES := $(wildcard $(SRC_DIR)/$(1)/profile/*.c)
@@ -257,12 +258,16 @@ _PROF_SOURCES := $(wildcard $(SRC_DIR)/profile/*.c)
 $(foreach dir, $(DIRS), $(eval $(call xxx_PROF_SOURCES,$(dir))))
 PROF_SOURCES := $(foreach dir,$(DIRS),$($(dir)_PROF_SOURCES)) $(_PROF_SOURCES)
 
+# FIXME: De-hardcode fq_zech_vec from this.
+fq_zech_vec_TEST_SOURCES := $(wildcard $(SRC_DIR)/fq_zech_vec/test/*.c)
 define xxx_TEST_SOURCES
 $(1)_TEST_SOURCES := $(wildcard $(SRC_DIR)/$(1)/test/*.c)
 endef
 _TEST_SOURCES := $(wildcard $(SRC_DIR)/test/*.c)
 $(foreach dir, $(DIRS), $(eval $(call xxx_TEST_SOURCES,$(dir))))
-TEST_SOURCES := $(foreach dir,$(DIRS),$($(dir)_TEST_SOURCES)) $(_TEST_SOURCES)
+TEST_SOURCES := $(foreach dir,$(DIRS),$($(dir)_TEST_SOURCES)) $(_TEST_SOURCES) $(fq_zech_vec_TEST_SOURCES)
+# NOTE: We do not add CPP files to C files in SOURCES in order to not screw up
+# the `patsubst' in the object files.
 ifneq ($(WANT_NTL), 0)
 interfaces_TEST_SOURCES := $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp
 endif
@@ -286,9 +291,6 @@ $(1)_OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$($(1)_SOURCES))
 endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_OBJS,$(dir))))
 OBJS := $(foreach dir, $(DIRS), $($(dir)_OBJS))
-ifneq ($(WANT_NTL), 0)
-OBJS += $(BUILD_DIR)/interfaces/NTL-interface.o
-endif
 endif
 
 ################################################################################
@@ -300,10 +302,6 @@ define xxx_LOBJS
 $(1)_LOBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.lo,$($(1)_SOURCES))
 endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_LOBJS,$(dir))))
-LOBJS := $(foreach dir, $(DIRS), $($(dir)_LOBJS))
-ifneq ($(WANT_NTL), 0)
-LOBJS += $(BUILD_DIR)/interfaces/NTL-interface.lo
-endif
 endif
 
 ################################################################################
@@ -520,12 +518,6 @@ $(BUILD_DIR)/$(1)/%.o: $(SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
 endef
 
 $(foreach dir, $(DIRS), $(eval $(call xxx_OBJS_rule,$(dir))))
-
-ifneq ($(WANT_NTL), 0)
-$(BUILD_DIR)/interfaces/NTL-interface.o: $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp | $(BUILD_DIR)/interfaces
-	@echo "  CXX $(@:$(BUILD_DIR)/%=%)"
-	@$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $< -o $@ -MMD -MF $(@:%=%.d)
-endif
 endif
 
 ################################################################################
@@ -540,12 +532,6 @@ $(BUILD_DIR)/$(1)/%.lo: $(SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
 endef
 
 $(foreach dir, $(DIRS), $(eval $(call xxx_LOBJS_rule,$(dir))))
-
-ifneq ($(WANT_NTL), 0)
-$(BUILD_DIR)/interfaces/NTL-interface.lo: $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp | $(BUILD_DIR)/interfaces
-	@echo "  CXX $(@:$(BUILD_DIR)/%=%)"
-	@$(CXX) $(PIC_FLAG) $(CXXFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $< -o $@ -MMD -MF $(@:%=.d)
-endif
 endif
 
 ################################################################################
@@ -758,10 +744,6 @@ ifneq ($(STATIC), 0)
 	$(CP) $(FLINT_DIR)/$(FLINT_LIB_STATIC) $(LIBDIR)
 endif
 	$(CP) $(HEADERS) $(INCLUDEDIR)/flint
-ifneq ($(WANT_CXX), 0)
-	$(CP) $(SRC_DIR)/flintxx/*.h $(INCLUDEDIR)/flint/flintxx
-	$(CP) $(SRC_DIR)/flintxx_public/*xx.h $(INCLUDEDIR)/flint
-endif
 
 uninstall:
 	$(RM_F) $(PKGCONFIGDIR)/flint.pc

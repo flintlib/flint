@@ -35,7 +35,7 @@ Context object
     Initialise a context object for a polynomial ring with the given number of variables and the given ordering.
     The possibilities for the ordering are ``ORD_LEX``, ``ORD_DEGLEX`` and ``ORD_DEGREVLEX``.
 
-.. function:: slong fmpz_mpoly_ctx_nvars(fmpz_mpoly_ctx_t ctx)
+.. function:: slong fmpz_mpoly_ctx_nvars(const fmpz_mpoly_ctx_t ctx)
 
     Return the number of variables used to initialize the context.
 
@@ -126,7 +126,7 @@ Basic manipulation
     
     Set *A* to *B*.
 
-.. function:: int fmpz_mpoly_equal(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+.. function:: int fmpz_mpoly_equal(const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
     Return `1` if *A* is equal to *B*, else return `0`.
 
@@ -174,7 +174,7 @@ Constants
 
     Set *A* to the constant `1`.
 
-.. function:: int fmpz_mpoly_equal_fmpz(const fmpz_mpoly_t A, fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+.. function:: int fmpz_mpoly_equal_fmpz(const fmpz_mpoly_t A, const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
               int fmpz_mpoly_equal_ui(const fmpz_mpoly_t A, ulong c, const fmpz_mpoly_ctx_t ctx)
               int fmpz_mpoly_equal_si(const fmpz_mpoly_t A, slong c, const fmpz_mpoly_ctx_t ctx)
 
@@ -241,18 +241,18 @@ Coefficients
 .. function:: void fmpz_mpoly_get_coeff_fmpz_fmpz(fmpz_t c, const fmpz_mpoly_t A, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
               ulong fmpz_mpoly_get_coeff_ui_fmpz(const fmpz_mpoly_t A, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
               slong fmpz_mpoly_get_coeff_si_fmpz(const fmpz_mpoly_t A, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
-              void fmpz_mpoly_get_coeff_fmpz_ui(fmpz_t c, const fmpz_mpoly_t A, ulong const * exp, const fmpz_mpoly_ctx_t ctx)
-              ulong fmpz_mpoly_get_coeff_ui_ui(const fmpz_mpoly_t A, ulong const * exp, const fmpz_mpoly_ctx_t ctx)
-              slong fmpz_mpoly_get_coeff_si_ui(const fmpz_mpoly_t A, ulong const * exp, const fmpz_mpoly_ctx_t ctx)
+              void fmpz_mpoly_get_coeff_fmpz_ui(fmpz_t c, const fmpz_mpoly_t A, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
+              ulong fmpz_mpoly_get_coeff_ui_ui(const fmpz_mpoly_t A, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
+              slong fmpz_mpoly_get_coeff_si_ui(const fmpz_mpoly_t A, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 
     Either return or set *c* to the coefficient of the monomial with exponent vector *exp*.
 
-.. function:: void fmpz_mpoly_set_coeff_fmpz_fmpz(fmpz_mpoly_t A, const fmpz_t c, fmpz * const * exp, fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_set_coeff_fmpz_fmpz(fmpz_mpoly_t A, const fmpz_t c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
               void fmpz_mpoly_set_coeff_ui_fmpz(fmpz_mpoly_t A, ulong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
               void fmpz_mpoly_set_coeff_si_fmpz(fmpz_mpoly_t A, slong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
-              void fmpz_mpoly_set_coeff_fmpz_ui(fmpz_mpoly_t A, const fmpz_t c, ulong const * exp, fmpz_mpoly_ctx_t ctx)
-              void fmpz_mpoly_set_coeff_ui_ui(fmpz_mpoly_t A, ulong c, ulong const * exp, const fmpz_mpoly_ctx_t ctx)
-              void fmpz_mpoly_set_coeff_si_ui(fmpz_mpoly_t A, slong c, ulong const * exp, const fmpz_mpoly_ctx_t ctx)
+              void fmpz_mpoly_set_coeff_fmpz_ui(fmpz_mpoly_t A, const fmpz_t c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
+              void fmpz_mpoly_set_coeff_ui_ui(fmpz_mpoly_t A, ulong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
+              void fmpz_mpoly_set_coeff_si_ui(fmpz_mpoly_t A, slong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
 
     Set the coefficient of the monomial with exponent vector *exp* to *c*.
 
@@ -358,8 +358,11 @@ Container operations
     Set `M` to the monomial of the term of index *i* in *A*. The coefficient of `M` will be one.
 
 .. function:: void fmpz_mpoly_push_term_fmpz_fmpz(fmpz_mpoly_t A, const fmpz_t c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
+              void fmpz_mpoly_push_term_fmpz_ffmpz(fmpz_mpoly_t A, const fmpz_t c, const fmpz * exp, const fmpz_mpoly_ctx_t ctx)
               void fmpz_mpoly_push_term_ui_fmpz(fmpz_mpoly_t A, ulong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
+              void fmpz_mpoly_push_term_ui_ffmpz(fmpz_mpoly_t A, ulong c, const fmpz * exp, const fmpz_mpoly_ctx_t ctx)
               void fmpz_mpoly_push_term_si_fmpz(fmpz_mpoly_t A, slong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx)
+              void fmpz_mpoly_push_term_si_ffmpz(fmpz_mpoly_t A, slong c, const fmpz * exp, const fmpz_mpoly_ctx_t ctx)
               void fmpz_mpoly_push_term_fmpz_ui(fmpz_mpoly_t A, const fmpz_t c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
               void fmpz_mpoly_push_term_ui_ui(fmpz_mpoly_t A, ulong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
               void fmpz_mpoly_push_term_si_ui(fmpz_mpoly_t A, slong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx)
@@ -410,14 +413,14 @@ Addition/Subtraction
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpz_mpoly_add_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_add_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
               void fmpz_mpoly_add_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B, ulong c, const fmpz_mpoly_ctx_t ctx)
               void fmpz_mpoly_add_si(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong c, const fmpz_mpoly_ctx_t ctx)
 
     Set *A* to `B + c`.
     If *A* and *B* are aliased, this function will probably run quickly.
 
-.. function:: void fmpz_mpoly_sub_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_sub_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
               void fmpz_mpoly_sub_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B, ulong c, const fmpz_mpoly_ctx_t ctx)
               void fmpz_mpoly_sub_si(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong c, const fmpz_mpoly_ctx_t ctx)
 
@@ -762,7 +765,7 @@ Internal Functions
     ``fmpz_mpoly_div_monagan_pearce`` below may be much faster if the
     quotient is known to be exact.
 
-.. function:: slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1, slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, slong len3, slong bits, slong N)
+.. function:: slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1, slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, slong len3, ulong bits, slong N, const mp_limb_t *cmpmask)
 
     Set ``(poly1, exp1, alloc)`` to ``(poly2, exp3, len2)`` divided by
     ``(poly3, exp3, len3)`` and return 1 if the quotient is exact. Otherwise
@@ -774,7 +777,7 @@ Internal Functions
 
 .. function:: int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 
-.. function:: int fmpz_mpoly_divides_heap_threaded(fmpz_mpoly_t Q, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx, slong thread_limit)
+.. function:: int fmpz_mpoly_divides_heap_threaded(fmpz_mpoly_t Q, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
     Set ``poly1`` to ``poly2`` divided by ``poly3`` and return 1 if
     the quotient is exact. Otherwise return 0. The function uses the algorithm
@@ -784,7 +787,7 @@ Internal Functions
 
     The threaded version takes an upper limit on the number of threads to use, while the first version always uses one thread.
 
-.. function:: slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq, ulong ** expq, slong * allocq, const fmpz * poly2, const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, slong len3, slong bits, slong N)
+.. function:: slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq, ulong ** expq, slong * allocq, const fmpz * poly2, const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, slong len3, slong bits, slong N, const mp_limb_t *cmpmask)
 
     Set ``(polyq, expq, allocq)`` to the quotient of
     ``(poly2, exp2, len2)`` by ``(poly3, exp3, len3)`` discarding
@@ -806,7 +809,7 @@ Internal Functions
     Monagan and Roman Pearce. This function is exceptionally efficient if the
     division is known to be exact.
 
-.. function:: slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr, fmpz ** polyq, ulong ** expq, slong * allocq, fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2, const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, slong len3, slong bits, slong N)
+.. function:: slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr, fmpz ** polyq, ulong ** expq, slong * allocq, fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2, const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, slong len3, slong bits, slong N, const mp_limb_t *cmpmask)
 
     Set ``(polyq, expq, allocq)`` and ``(polyr, expr, allocr)`` to the
     quotient and remainder of ``(poly2, exp2, len2)`` by
@@ -859,7 +862,7 @@ Internal Functions
     ``poly3`` is zero or if an exponent overflow occurs.
 
 
-.. function:: slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq, fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2, const ulong * exp2, slong len2, fmpz_mpoly_struct * const * poly3, ulong * const * exp3, slong len, slong N, slong bits, const fmpz_mpoly_ctx_t ctx)
+.. function:: slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq, fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2, const ulong * exp2, slong len2, fmpz_mpoly_struct * const * poly3, ulong * const * exp3, slong len, slong N, slong bits, const fmpz_mpoly_ctx_t ctx, const mp_limb_t *cmpmask)
 
     This function is as per ``_fmpz_mpoly_divrem_monagan_pearce`` except
     that it takes an array of divisor polynomials ``poly3`` and an array of

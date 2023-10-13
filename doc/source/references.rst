@@ -21,6 +21,8 @@ References
 
 .. [BBK2014] \D. H. Bailey, J. M. Borwein and A. D. Kaiser. "Automated simplification of large symbolic expressions". Journal of Symbolic Computation Volume 60, January 2014, Pages 120-136. https://doi.org/10.1016/j.jsc.2013.09.001
 
+.. [BD1992] \D. Buchmann and S. Düllmann. "Distributed class group computation." Informatik: Festschrift zum 60. Geburtstag von Günter Hotz (1992): 69-79.
+
 .. [BF2020] \F. Beukers and J. Forsgård. "Gamma-evaluations of hypergeometric series". Preprint, 2020. https://arxiv.org/abs/2004.08117
 
 .. [BFSS2006] \A. Bostan, P. Flajolet, B. Salvy and É. Schost. "Fast computation of special resultants". Journal of Symbolic Computation, 41(1):1–29, January 2006. https://doi.org/10.1016/j.jsc.2005.07.001
@@ -33,7 +35,7 @@ References
 
 .. [BZ2011] \R. P. Brent and P. Zimmermann, *Modern Computer Arithmetic*, Cambridge University Press (2011), http://www.loria.fr/~zimmerma/mca/pub226.html
 
-.. [BaiWag1980] \Robert Baillie; Samuel S. Wagstaff, Jr. (October 1980). "Lucas Pseudoprimes". Mathematics of Computation. 35 (152): 1391–1417. 
+.. [BaiWag1980] \Robert Baillie; Samuel S. Wagstaff, Jr. (October 1980). "Lucas Pseudoprimes". Mathematics of Computation. 35 (152): 1391–1417.
 
 .. [BerTas2010] \D. Berend and T. Tassa : Improved bounds on Bell numbers and on moments of sums of random variables, Probability and Mathematical Statistics vol. 30 (2010) 185--205
 
@@ -71,7 +73,7 @@ References
 
 .. [Cho1999] \T. Chow. "What is a closed-form number?". The American Mathematical Monthly Volume 106, 1999 - Issue 5. https://doi.org/10.1080/00029890.1999.12005066
 
-.. [Coh1996] \Cohen, Henri : A course in computational algebraic number theory, Springer, 1996 
+.. [Coh1996] \Cohen, Henri : A course in computational algebraic number theory, Springer, 1996
 
 .. [Coh2000] \H. Cohen. *Advanced topics in computational number theory*. Springer, 2000. https://doi.org/10.1007/978-1-4419-8489-0
 
@@ -131,9 +133,13 @@ References
 
 .. [Hart2010] \W. B. Hart. "Fast library for number theory: an introduction." International Congress on Mathematical Software. Springer, Berlin, Heidelberg, 2010. https://doi.org/10.1007/978-3-642-15582-6_18
 
+.. [Hen1956] \Peter Henrici : "A Subroutine for Computations with Rational Numbers" J. ACM (1956), https://doi.org/10.1145/320815.320818
+
 .. [Hoe2001] \J. van der Hoeven. "Fast evaluation of holonomic functions near and in regular singularities", Journal of Symbolic Computation, 31(6):717-743 (2001).
 
 .. [Hoe2009] \J. van der Hoeven, "Ball arithmetic", Technical Report, HAL 00432152 (2009), http://www.texmacs.org/joris/ball/ball-abs.html
+
+.. [Hor1972] \Ellis Horowitz : "Algorithms for Rational Function Arithmetic Operations" Annual ACM Symposium on Theory of Computing:  Proceedings of the Fourth Annual ACM Symposium on Theory of Computing (Denver) (1972), https://doi.org/10.1145/800152.804903
 
 .. [Iliopoulos1989] \Iliopoulos, C. S., Worst-Case Complexity Bounds on Algorithms for Computing the Canonical Structure of Finite Abelian Groups and the Hermite and Smith Normal Forms of an Integer Matrix : SIAM J. Computation 18:4 (1989) 658
 
@@ -166,6 +172,8 @@ References
 .. [Joh2018a] \F. Johansson, "Numerical integration in arbitrary-precision ball arithmetic", preprint (2018), https://arxiv.org/abs/1802.07942
 
 .. [Joh2018b] \F. Johansson and others, "mpmath: a Python library for arbitrary-precision floating-point arithmetic (version 1.1.0)", December 2018. http://mpmath.org/
+
+.. [JvdP2002] \M. J. Jacobson Jr. and A. J. van der Poorten. "Computational aspects of NUCOMP." In International Algorithmic Number Theory Symposium, pp. 120-133. Berlin, Heidelberg: Springer Berlin Heidelberg, 2002.
 
 .. [Kahan1991] \Kahan, William: Computing a Real Cube Root. https://csclub.uwaterloo.ca/~pbarfuss/qbrt.pdf
 
@@ -217,7 +225,7 @@ References
 
 .. [Pla2011] \D. J. Platt, "Computing degree 1 L-functions rigorously", Ph.D. Thesis, University of Bristol (2011), https://people.maths.bris.ac.uk/~madjp/thesis5.pdf
 
-.. [Pla2017] \D. J. Platt, "Isolating some non-trivial zeros of zeta", Mathematics of Computation 86 (2017), 2449-2467, https://doi.org/10.1090/mcom/3198 
+.. [Pla2017] \D. J. Platt, "Isolating some non-trivial zeros of zeta", Mathematics of Computation 86 (2017), 2449-2467, https://doi.org/10.1090/mcom/3198
 
 .. [RF1994] \D. Richardson and J. Fitch. "The identity problem for elementary functions and constants". ISSAC '94: Proceedings of the international symposium on Symbolic and algebraic computation, August 1994, 285-290. https://doi.org/10.1145/190347.190429
 
@@ -235,13 +243,13 @@ References
 
 .. [Ric2009] \D. Richardson. "Recognising zero among implicitly defined elementary numbers". Preprint, 2009.
 
-.. [RosSch1962] \Rosser, J. Barkley; Schoenfeld, Lowell: Approximate formulas for some functions of prime numbers. Illinois J. Math. 6 (1962), no. 1, 64--94. 
+.. [RosSch1962] \Rosser, J. Barkley; Schoenfeld, Lowell: Approximate formulas for some functions of prime numbers. Illinois J. Math. 6 (1962), no. 1, 64--94.
 
 .. [Rum2010] \S. M. Rump, "Verification methods: Rigorous results using floating-point arithmetic", Acta Numerica 19 (2010), 287-449.
 
 .. [Smi2001] \D. M. Smith, "Algorithm: Fortran 90 Software for Floating-Point Multiple Precision Arithmetic, Gamma and Related Functions", Transactions on Mathematical Software 27 (2001) 377-387, http://myweb.lmu.edu/dmsmith/toms2001.pdf
 
-.. [SorWeb2016] \Sorenson, Jonathan and Webster, Jonathan : Strong pseudoprimes to twelve prime bases. Math. Comp. 86 (2017), 985-1003, https://doi.org/10.1090/mcom/3134 
+.. [SorWeb2016] \Sorenson, Jonathan and Webster, Jonathan : Strong pseudoprimes to twelve prime bases. Math. Comp. 86 (2017), 985-1003, https://doi.org/10.1090/mcom/3134
 
 .. [Ste2002] \A. Steel. "A new scheme for computing with algebraically closed fields". In: Fieker C., Kohel D.R. (eds) Algorithmic Number Theory. ANTS 2002. Lecture Notes in Computer Science, vol 2369. Springer, Berlin, Heidelberg. https://doi.org/10.1007/3-540-45455-1_38
 
@@ -257,19 +265,21 @@ References
 
 .. [Str2012] \A. Strzebonski. "Real root isolation for exp-log-arctan functions". Journal of Symbolic Computation 47 (2012) 282–314. https://doi.org/10.1016/j.jsc.2011.11.004
 
+.. [Sut2007] \A. V. Sutherland. "Order computations in generic groups." PhD diss., Massachusetts Institute of Technology, 2007.
+
 .. [Tak2000] \D. Takahashi, "A fast algorithm for computing large Fibonacci numbers", Information Processing Letters 75 (2000) 243-246, http://www.ii.uni.wroc.pl/~lorys/IPL/article75-6-1.pdf
 
 .. [ThullYap1990] \Thull, K. and Yap, C. : A Unified Approach to HGCD Algorithms for Polynomials and Integers, (1990)
 
 .. [Tre2008] \L. N. Trefethen, "Is Gauss Quadrature Better than Clenshaw-Curtis?", SIAM Review, 50:1 (2008), 67-87, https://doi.org/10.1137/060659831
 
-.. [Tru2011] \T. S. Trudgian, "Improvements to Turing's method", Mathematics of Computation 80 (2011), 2259-2279, https://doi.org/10.1090/S0025-5718-2011-02470-1 
+.. [Tru2011] \T. S. Trudgian, "Improvements to Turing's method", Mathematics of Computation 80 (2011), 2259-2279, https://doi.org/10.1090/S0025-5718-2011-02470-1
 
 .. [Tru2014] \T. S. Trudgian, "An improved upper bound for the argument of the Riemann zeta-function on the critical line II", Journal of Number Theory 134 (2014), 280-292, https://doi.org/10.1016/j.jnt.2013.07.017
 
 .. [Tur1953] \A. M. Turing, "Some Calculations of the Riemann Zeta-Function", Proc. of the London Mathematical Society 3(3) (1953), 99-117, https://doi.org/10.1112/plms/s3-3.1.99
 
-.. [Villard2007] \Villard, Gilles :  Certification of the QR Factor R and of Lattice Basis Reducedness, In proceedings of ACM International Symposium on Symbolic and Algebraic Computation (2007) 361--368 ACM Press. 
+.. [Villard2007] \Villard, Gilles :  Certification of the QR Factor R and of Lattice Basis Reducedness, In proceedings of ACM International Symposium on Symbolic and Algebraic Computation (2007) 361--368 ACM Press.
 
 .. [WaktinsZeitlin1993] \Watkins, W. and Zeitlin, J. : The minimal polynomial of `\cos(2\pi/n)` The American Mathematical Monthly 100:5 (1993) 471--474
 
@@ -285,5 +295,4 @@ References
 
 .. [vdH2006] \J. van der Hoeven, "Computations with effective real numbers". Theoretical Computer Science, Volume 351, Issue 1, 14 February 2006, Pages 52-60. https://doi.org/10.1016/j.tcs.2005.09.060
 
-All referenced works: [AbbottBronsteinMulders1999]_, [Apostol1997]_, [Ari2011]_, [Ari2012]_, [Arn2010]_, [ArnoldMonagan2011]_, [BBC1997]_, [BBC2000]_, [BBK2014]_, [BF2020]_, [BFSS2006]_, [BJ2013]_, [BM1980]_, [BZ1992]_, [BZ2011]_, [BaiWag1980]_, [BerTas2010]_, [Blo2009]_, [Bodrato2010]_, [Boe2020]_, [Bog2012]_, [Bor1987]_, [Bor2000]_, [Bre1978]_, [Bre1979]_, [Bre2010]_, [BrentKung1978]_, [BuhlerCrandallSompolski1992]_, [CGHJK1996]_, [CP2005]_, [Car1995]_, [Car2004]_, [Chen2003]_, [Cho1999]_, [Coh1996]_, [Coh2000]_, [Col1971]_, [CraPom2005]_, [DYF1999]_, [DelegliseNicolasZimmermann2009]_, [DomKanTro1987]_, [Dup2006]_, [Dus1999]_, [EHJ2016]_, [EM2004]_, [Fie2007]_, [FieHof2014]_, [Fil1992]_, [GCL1992]_, [GG2003]_, [GS2003]_, [GVL1996]_, [Gas2018]_, [GowWag2008]_, [GraMol2010]_, [HM2017]_, [HS1967]_, [HZ2004]_, [HanZim2004]_, [Har2010]_, [Har2012]_, [Har2015]_, [Har2018]_, [Hart2010]_, [Hoe2001]_, [Hoe2009]_, [Iliopoulos1989]_, [JB2018]_, [JM2018]_, [JR1999]_, [Joh2012]_, [Joh2013]_, [Joh2014a]_, [Joh2014b]_, [Joh2014c]_, [Joh2015]_, [Joh2016]_, [Joh2017]_, [Joh2017a]_, [Joh2017b]_, [Joh2018a]_, [Joh2018b]_, [Kahan1991]_, [KanBac1979]_, [Kar1998]_, [Knu1997]_, [Kob2010]_, [Kri2013]_, [Leh1970]_, [LukPatWil1996]_, [MP2006]_, [MPFR2012]_, [MasRob1996]_, [Mic2007]_, [Miy2010]_, [Mos1971]_, [Mul2000]_, [NIST2012]_, [NakTurWil1997]_, [Olv1997]_, [PP2010]_, [PS1973]_, [PS1991]_, [Paterson1973]_, [PernetStein2010]_, [Pet1999]_, [Pla2011]_, [Pla2017]_, [RF1994]_, [Rad1973]_, [Rademacher1937]_, [Ric1992]_, [Ric1995]_, [Ric1997]_, [Ric2007]_, [Ric2009]_, [RosSch1962]_, [Rum2010]_, [Smi2001]_, [SorWeb2016]_, [Ste2002]_, [Ste2010]_, [Stehle2010]_, [Stein2007]_, [StoMul1998]_, [Str1997]_, [Str2012]_, [Tak2000]_, [ThullYap1990]_, [Tre2008]_, [Tru2011]_, [Tru2014]_, [Tur1953]_, [Villard2007]_, [WaktinsZeitlin1993]_, [Wei2000]_, [Whiteman1956]_, [Zip1985]_, [vHP2012]_, [vdH1995]_, [vdH2006]_
-
+All referenced works: [AbbottBronsteinMulders1999]_, [Apostol1997]_, [Ari2011]_, [Ari2012]_, [Arn2010]_, [ArnoldMonagan2011]_, [BBC1997]_, [BBC2000]_, [BBK2014]_, [BD1992]_, [BF2020]_, [BFSS2006]_, [BJ2013]_, [BM1980]_, [BZ1992]_, [BZ2011]_, [BaiWag1980]_, [BerTas2010]_, [Blo2009]_, [Bodrato2010]_, [Boe2020]_, [Bog2012]_, [Bor1987]_, [Bor2000]_, [Bre1978]_, [Bre1979]_, [Bre2010]_, [BrentKung1978]_, [BuhlerCrandallSompolski1992]_, [CGHJK1996]_, [CP2005]_, [Car1995]_, [Car2004]_, [Chen2003]_, [Cho1999]_, [Coh1996]_, [Coh2000]_, [Col1971]_, [CraPom2005]_, [DYF1999]_, [DelegliseNicolasZimmermann2009]_, [DomKanTro1987]_, [Dup2006]_, [Dus1999]_, [EHJ2016]_, [EM2004]_, [Fie2007]_, [FieHof2014]_, [Fil1992]_, [GCL1992]_, [GG2003]_, [GS2003]_, [GVL1996]_, [Gas2018]_, [GowWag2008]_, [GraMol2010]_, [HM2017]_, [HS1967]_, [HZ2004]_, [HanZim2004]_, [Har2010]_, [Har2012]_, [Har2015]_, [Har2018]_, [Hart2010]_, [Hen1956]_, [Hoe2001]_, [Hoe2009]_, [Hor1972]_, [Iliopoulos1989]_, [JB2018]_, [JM2018]_, [JR1999]_, [Joh2012]_, [Joh2013]_, [Joh2014a]_, [Joh2014b]_, [Joh2014c]_, [Joh2015]_, [Joh2016]_, [Joh2017]_, [Joh2017a]_, [Joh2017b]_, [Joh2018a]_, [Joh2018b]_, [JvdP2002]_, [Kahan1991]_, [KanBac1979]_, [Kar1998]_, [Knu1997]_, [Kob2010]_, [Kri2013]_, [Leh1970]_, [LukPatWil1996]_, [MP2006]_, [MPFR2012]_, [MasRob1996]_, [Mic2007]_, [Miy2010]_, [Mos1971]_, [Mul2000]_, [NIST2012]_, [NakTurWil1997]_, [Olv1997]_, [PP2010]_, [PS1973]_, [PS1991]_, [Paterson1973]_, [PernetStein2010]_, [Pet1999]_, [Pla2011]_, [Pla2017]_, [RF1994]_, [Rad1973]_, [Rademacher1937]_, [Ric1992]_, [Ric1995]_, [Ric1997]_, [Ric2007]_, [Ric2009]_, [RosSch1962]_, [Rum2010]_, [Smi2001]_, [SorWeb2016]_, [Ste2002]_, [Ste2010]_, [Stehle2010]_, [Stein2007]_, [Sut2007]_, [StoMul1998]_, [Str1997]_, [Str2012]_, [Tak2000]_, [ThullYap1990]_, [Tre2008]_, [Tru2011]_, [Tru2014]_, [Tur1953]_, [Villard2007]_, [WaktinsZeitlin1993]_, [Wei2000]_, [Whiteman1956]_, [Zip1985]_, [vHP2012]_, [vdH1995]_, [vdH2006]_

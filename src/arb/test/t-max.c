@@ -11,6 +11,8 @@
 
 #include "arb.h"
 
+#define ASSERT(cond) if (!(cond)) { flint_printf("FAIL: %d\n", __LINE__); flint_abort(); }
+
 /* sample (x, y) so that x /in y */
 void _sample_arf_in_arb(arf_t x, arb_t y, flint_rand_t state)
 {
@@ -119,6 +121,51 @@ int main(void)
         arb_clear(x);
         arb_clear(y);
         arb_clear(z);
+    }
+
+    /* test special cases with non-finite input */
+    {
+      slong prec;
+      arb_t zero, special, z;
+
+      prec = 64;
+      arb_init(zero);
+      arb_init(special);
+      arb_init(z);
+
+      /* -Inf +/- Inf */
+      mag_inf(arb_radref(special));
+      arf_neg_inf(arb_midref(special));
+      arb_max(z, zero, special, prec);
+      ASSERT(arf_is_zero(arb_midref(z)));
+      ASSERT(mag_is_inf(arb_radref(z)));
+      arb_max(z, special, zero, prec);
+      ASSERT(arf_is_zero(arb_midref(z)));
+      ASSERT(mag_is_inf(arb_radref(z)));
+
+      /* Inf +/- Inf */
+      mag_inf(arb_radref(special));
+      arf_pos_inf(arb_midref(special));
+      arb_max(z, zero, special, prec);
+      ASSERT(arf_is_zero(arb_midref(z)));
+      ASSERT(mag_is_inf(arb_radref(z)));
+      arb_max(z, special, zero, prec);
+      ASSERT(arf_is_zero(arb_midref(z)));
+      ASSERT(mag_is_inf(arb_radref(z)));
+
+      /* NaN +/- 1*/
+      mag_one(arb_radref(special));
+      arf_nan(arb_midref(special));
+      arb_max(z, zero, special, prec);
+      ASSERT(arf_is_nan(arb_midref(z)));
+      ASSERT(mag_is_inf(arb_radref(z)));
+      arb_max(z, special, zero, prec);
+      ASSERT(arf_is_nan(arb_midref(z)));
+      ASSERT(mag_is_inf(arb_radref(z)));
+
+      arb_clear(zero);
+      arb_clear(special);
+      arb_clear(z);
     }
 
     flint_randclear(state);

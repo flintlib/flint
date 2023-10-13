@@ -117,13 +117,13 @@ Memory management
 
     Initializes *K* to represent the algebraic number field `\mathbb{Q}(x)`.
 
-.. function:: void ca_field_init_const(ca_field_t K, ulong func, ca_ctx_t ctx)
+.. function:: void ca_field_init_const(ca_field_t K, calcium_func_code func, ca_ctx_t ctx)
 
     Initializes *K* to represent the field
     `\mathbb{Q}(x)` where *x* is a builtin constant defined by
     *func* (example: *func* = *CA_Pi* for `x = \pi`).
 
-.. function:: void ca_field_init_fx(ca_field_t K, ulong func, const ca_t x, ca_ctx_t ctx)
+.. function:: void ca_field_init_fx(ca_field_t K, calcium_func_code func, const ca_t x, ca_ctx_t ctx)
 
     Initializes *K* to represent the field
     `\mathbb{Q}(a)` where `a = f(x)`, given a number *x* and a builtin
@@ -141,7 +141,7 @@ Memory management
     extension numbers. The extension numbers must subsequently be
     assigned one by one using :func:`ca_field_set_ext`.
 
-.. function:: void ca_field_set_ext(ca_field_t K, slong i, slong x_index, ca_ctx_t ctx)
+.. function:: void ca_field_set_ext(ca_field_t K, slong i, ca_ext_srcptr x_index, ca_ctx_t ctx)
 
     Sets the extension number at position *i* (here indexed from 0) of *K*
     to the generator of the field with index *x_index* in *ctx*.
@@ -158,7 +158,7 @@ Memory management
 Input and output
 -------------------------------------------------------------------------------
 
-.. function:: void ca_field_print(const ca_field_t K, const ca_ctx_t ctx)
+.. function:: void ca_field_print(const ca_field_t K, ca_ctx_t ctx)
 
     Prints a description of the field *K* to standard output.
 

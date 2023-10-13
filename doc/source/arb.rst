@@ -764,6 +764,10 @@ Arithmetic
 
     Sets *z* respectively to the minimum and the maximum of *x* and *y*.
 
+.. function:: void arb_minmax(arb_t z1, arb_t z2, const arb_t x, const arb_t y, slong prec)
+
+    Sets *z1* and *z2* respectively to the minimum and the maximum of *x* and *y*.
+
 .. function:: void arb_add(arb_t z, const arb_t x, const arb_t y, slong prec)
 
 .. function:: void arb_add_arf(arb_t z, const arb_t x, const arf_t y, slong prec)
@@ -1003,7 +1007,7 @@ Powers and roots
 
 .. function:: void arb_sqr(arb_t y, const arb_t x, slong prec)
 
-    Sets *y* to be the square of *x*. 
+    Sets *y* to be the square of *x*.
 
 .. function:: void arb_pow_fmpz_binexp(arb_t y, const arb_t b, const fmpz_t e, slong prec)
 
@@ -1937,7 +1941,7 @@ Vector functions
 
    Performs the respective scalar operation elementwise.
 
-.. function:: void _arb_vec_get_mag(mag_t bound, arb_srcptr vec, slong len, slong prec)
+.. function:: void _arb_vec_get_mag(mag_t bound, arb_srcptr vec, slong len)
 
     Sets *bound* to an upper bound for the entries in *vec*.
 
@@ -1969,4 +1973,3 @@ Vector functions
     Calls :func:`arb_get_unique_fmpz` elementwise and returns nonzero if
     all entries can be rounded uniquely to integers. If any entry in *vec*
     cannot be rounded uniquely to an integer, returns zero.
-

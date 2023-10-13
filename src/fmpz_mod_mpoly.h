@@ -222,7 +222,7 @@ void fmpz_mod_mpoly_set_fmpz(fmpz_mod_mpoly_t A,
                                const fmpz_t c, const fmpz_mod_mpoly_ctx_t ctx);
 
 void fmpz_mod_mpoly_set_ui(fmpz_mod_mpoly_t A,
-                                      slong c, const fmpz_mod_mpoly_ctx_t ctx);
+                                      ulong c, const fmpz_mod_mpoly_ctx_t ctx);
 
 void fmpz_mod_mpoly_set_si(fmpz_mod_mpoly_t A,
                                       slong c, const fmpz_mod_mpoly_ctx_t ctx);
@@ -478,11 +478,20 @@ void fmpz_mod_mpoly_get_term_monomial(fmpz_mod_mpoly_t M,
 void fmpz_mod_mpoly_push_term_fmpz_fmpz(fmpz_mod_mpoly_t A,
            const fmpz_t c, fmpz * const * exp, const fmpz_mod_mpoly_ctx_t ctx);
 
+void fmpz_mod_mpoly_push_term_fmpz_ffmpz(fmpz_mod_mpoly_t A,
+           const fmpz_t c, const fmpz * exp, const fmpz_mod_mpoly_ctx_t ctx);
+
 void fmpz_mod_mpoly_push_term_ui_fmpz(fmpz_mod_mpoly_t A,
                   ulong c, fmpz * const * exp, const fmpz_mod_mpoly_ctx_t ctx);
 
+void fmpz_mod_mpoly_push_term_ui_ffmpz(fmpz_mod_mpoly_t A,
+                  ulong c, const fmpz * exp, const fmpz_mod_mpoly_ctx_t ctx);
+
 void fmpz_mod_mpoly_push_term_si_fmpz(fmpz_mod_mpoly_t A,
                   slong c, fmpz * const * exp, const fmpz_mod_mpoly_ctx_t ctx);
+
+void fmpz_mod_mpoly_push_term_si_ffmpz(fmpz_mod_mpoly_t A,
+                  slong c, const fmpz * exp, const fmpz_mod_mpoly_ctx_t ctx);
 
 void fmpz_mod_mpoly_push_term_fmpz_ui(fmpz_mod_mpoly_t A,
             const fmpz_t c, const ulong * exp, const fmpz_mod_mpoly_ctx_t ctx);

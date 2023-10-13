@@ -3,7 +3,18 @@
 **fq_nmod.h** -- finite fields (word-size characteristic)
 ===============================================================================
 
-Description.
+We represent an element of the finite field `\mathbf{F}_{p^n} \cong
+\mathbf{F}_p[X]/(f(X))`, where `f(X) \in \mathbf{F}_p[X]` is a monic,
+irreducible polynomial of degree `n`, as a polynomial in
+`\mathbf{F}_p[X]` of degree less than `n`. The underlying data
+structure is an :type:`nmod_poly_t`.
+
+The default choice for `f(X)` is the Conway polynomial for the pair
+`(p,n)`. Frank Luebeck's data base of Conway polynomials is made
+available in the file ``src/qadic/CPimport.txt``. If a Conway
+polynomial is not available, then a random irreducible polynomial will
+be chosen for `f(X)`. Additionally, the user is able to supply their
+own `f(X)`.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -12,13 +23,9 @@ Types, macros and constants
 
 .. type:: fq_nmod_ctx_t
 
-    Description.
-
 .. type:: fq_nmod_struct
 
 .. type:: fq_nmod_t
-
-    Description.
 
 Context Management
 --------------------------------------------------------------------------------
@@ -62,7 +69,7 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
-.. function:: void fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, nmod_poly_t modulus, const char *var)
+.. function:: void fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus, const char *var)
 
     Initialises the context for given ``modulus`` with name
     ``var`` for the generator.
@@ -81,7 +88,7 @@ Context Management
 
     Returns a pointer to the modulus in the context.
 
-.. function:: long fq_nmod_ctx_degree(const fq_nmod_ctx_t ctx)
+.. function:: slong fq_nmod_ctx_degree(const fq_nmod_ctx_t ctx)
 
     Returns the degree of the field extension
     `[\mathbf{F}_{q} : \mathbf{F}_{p}]`, which
@@ -104,13 +111,13 @@ Context Management
 
     Prints the context information to ``stdout``.
 
-.. function:: void fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx)
+.. function:: void fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx, flint_rand_t state)
 
     Initializes ``ctx`` to a random finite field.  Assumes that
     ``fq_nmod_ctx_init`` has not been called on ``ctx`` already.
 
 
-.. function:: void fq_nmod_ctx_randtest_reducible(fq_nmod_ctx_t ctx)
+.. function:: void fq_nmod_ctx_randtest_reducible(fq_nmod_ctx_t ctx, flint_rand_t state)
 
     Initializes ``ctx`` to a random extension of a word-sized prime
     field.  The modulus may or may not be irreducible.  Assumes that
@@ -134,17 +141,17 @@ Memory management
 
     Clears the element ``rop``.
 
-.. function:: void _fq_nmod_sparse_reduce(mp_ptr R, slong lenR, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_sparse_reduce(mp_limb_t * R, slong lenR, const fq_nmod_ctx_t ctx)
 
     Reduces ``(R, lenR)`` modulo the polynomial `f` given by the
     modulus of ``ctx``.
 
-.. function:: void _fq_nmod_dense_reduce(mp_ptr R, slong lenR, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_dense_reduce(mp_limb_t * R, slong lenR, const fq_nmod_ctx_t ctx)
 
     Reduces ``(R, lenR)`` modulo the polynomial `f` given by the
     modulus of ``ctx`` using Newton division.
 
-.. function:: void _fq_nmod_reduce(mp_ptr r, slong lenR, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_reduce(mp_limb_t * r, slong lenR, const fq_nmod_ctx_t ctx)
 
     Reduces ``(R, lenR)`` modulo the polynomial `f` given by the
     modulus of ``ctx``.  Does either sparse or dense reduction
@@ -216,7 +223,7 @@ Basic arithmetic
      of ``ctx``.  If ``op`` is not invertible, then ``f`` is
      set to a factor of the modulus; otherwise, it is set to one.
 
-.. function:: void _fq_nmod_pow(mp_ptr * rop, mp_srcptr * op, slong len, const fmpz_t e, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_pow(mp_limb_t * rop, const mp_limb_t * op, slong len, const fmpz_t e, const fq_nmod_ctx_t ctx)
 
     Sets ``(rop, 2*d-1)`` to ``(op,len)`` raised to the power `e`,
     reduced modulo `f(X)`, the modulus of ``ctx``.
@@ -252,7 +259,7 @@ Roots
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_nmod_sqrt(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx)
+.. function:: int fq_nmod_sqrt(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx)
 
     Sets ``rop`` to the square root of ``op1`` if it is a square, and return
     `1`, otherwise return `0`.
@@ -278,14 +285,14 @@ Output
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
-.. function:: int fq_nmod_print_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+.. function:: void fq_nmod_print_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 
     Prints a pretty representation of ``op`` to ``stdout``.
 
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
-.. function:: void fq_nmod_fprint(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+.. function:: int fq_nmod_fprint(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 
     Prints a representation of ``op`` to ``file``.
 
@@ -382,12 +389,12 @@ Assignments and conversions
     If ``op`` has a lift to the integers, return `1` and set ``rop`` to the lift in `[0,p)`.
     Otherwise, return `0` and leave `rop` undefined.
 
-.. function:: void fq_nmod_get_nmod_poly(nmod_poly_t a, const fq_nmod_t b, const fq_nmod_ctx_t ctx);
+.. function:: void fq_nmod_get_nmod_poly(nmod_poly_t a, const fq_nmod_t b, const fq_nmod_ctx_t ctx)
 
     Set ``a`` to a representative of ``b`` in ``ctx``.
     The representatives are taken in `(\mathbb{Z}/p\mathbb{Z})[x]/h(x)` where `h(x)` is the defining polynomial in ``ctx``.
 
-.. function:: void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b, const fq_nmod_ctx_t ctx);
+.. function:: void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b, const fq_nmod_ctx_t ctx)
 
     Set ``a`` to the element in ``ctx`` with representative ``b``.
     The representatives are taken in `(\mathbb{Z}/p\mathbb{Z})[x]/h(x)` where `h(x)` is the defining polynomial in ``ctx``.
@@ -435,7 +442,7 @@ Special functions
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fq_nmod_trace(fmpz_t rop, mp_srcptr * op, slong len, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_trace(fmpz_t rop, const mp_limb_t * op, slong len, const fq_nmod_ctx_t ctx)
 
     Sets ``rop`` to the trace of the non-zero element ``(op, len)``
     in `\mathbf{F}_{q}`.
@@ -451,7 +458,7 @@ Special functions
     `a` is equal to `\sum_{i=0}^{d-1} \Sigma^i (a)`, where `d =
     \log_{p} q`.
 
-.. function:: void _fq_nmod_norm(fmpz_t rop, mp_srcptr * op, slong len, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_norm(fmpz_t rop, const mp_limb_t * op, slong len, const fq_nmod_ctx_t ctx)
 
     Sets ``rop`` to the norm of the non-zero element ``(op, len)``
     in `\mathbf{F}_{q}`.
@@ -469,7 +476,7 @@ Special functions
 
     Algorithm selection is automatic depending on the input.
 
-.. function:: void _fq_nmod_frobenius(mp_ptr * rop, mp_srcptr * op, slong len, slong e, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_frobenius(mp_limb_t * rop, const mp_limb_t * op, slong len, slong e, const fq_nmod_ctx_t ctx)
 
     Sets ``(rop, 2d-1)`` to the image of ``(op, len)`` under the
     Frobenius operator raised to the e-th power, assuming that neither
@@ -485,11 +492,11 @@ Special functions
     `\sigma \in \operatorname{Gal}(\mathbf{F}_q/\mathbf{F}_p)` is the Frobenius element
     `\sigma \colon x \mapsto x^p`.
 
-.. function:: int fq_nmod_multiplicative_order(fmpz_t ord, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+.. function:: int fq_nmod_multiplicative_order(fmpz * ord, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 
     Computes the order of ``op`` as an element of the
     multiplicative group of ``ctx``.
-    
+
     Returns 0 if ``op`` is 0, otherwise it returns 1 if ``op``
     is a generator of the multiplicative group, and -1 if it is not.
 

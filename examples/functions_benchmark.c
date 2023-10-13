@@ -97,7 +97,7 @@ int main()
     arb_t x, y, res;
     slong n, prec;
     int function;
-    double tcpu, twall;
+    double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
     arb_init(x);
     arb_init(y);
@@ -149,7 +149,6 @@ int main()
             printf("%12.3g", twall);
             fflush(stdout);
 
-            tcpu = tcpu; /* unused */
             printf("\n");
         }
     }

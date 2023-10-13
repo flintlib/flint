@@ -179,11 +179,11 @@ Thread functions
     woken but not given back). The function cannot be called from inside
     worker threads.
 
-.. function:: void flint_get_num_threads()
+.. function:: int flint_get_num_threads(void)
 
     When called at the global level, this function returns one more than the
-    number of worker threads in the Flint thread pool, i.e. it counts the
-    workers in the thread pool plus one more for the master thread.
+    number of worker threads in the Flint thread pool, i.e. it returns the
+    number of workers in the thread pool plus one for the master thread.
 
     In general, this function returns one more than the number of additional
     worker threads that can be started by the current thread.

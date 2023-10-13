@@ -3,17 +3,12 @@
 **fq_zech_mat.h** -- matrices over finite fields (Zech logarithm representation)
 ================================================================================
 
-Description.
-
 Types, macros and constants
 -------------------------------------------------------------------------------
 
 .. type:: fq_zech_mat_struct
 
 .. type:: fq_zech_mat_t
-
-    Description.
-
 
 Memory management
 --------------------------------------------------------------------------------
@@ -25,7 +20,7 @@ Memory management
     coefficients in `\mathbf{F}_{q}` given by ``ctx``. All elements
     are set to zero.
 
-.. function:: void fq_zech_mat_init_set(fq_zech_mat_t mat, fq_zech_mat_t src, const fq_zech_ctx_t ctx)
+.. function:: void fq_zech_mat_init_set(fq_zech_mat_t mat, const fq_zech_mat_t src, const fq_zech_ctx_t ctx)
 
     Initialises ``mat`` and sets its dimensions and elements to
     those of ``src``.
@@ -36,7 +31,7 @@ Memory management
     cannot be used again until it is initialised. This function must be
     called exactly once when finished using an ``fq_zech_mat_t`` object.
 
-.. function:: void fq_zech_mat_set(fq_zech_mat_t mat, fq_zech_mat_t src, const fq_zech_ctx_t ctx)
+.. function:: void fq_zech_mat_set(fq_zech_mat_t mat, const fq_zech_mat_t src, const fq_zech_ctx_t ctx)
 
     Sets ``mat`` to a copy of ``src``. It is assumed
     that ``mat`` and ``src`` have identical dimensions.
@@ -46,20 +41,20 @@ Basic properties and manipulation
 --------------------------------------------------------------------------------
 
 
-.. function:: fq_zech_struct * fq_zech_mat_entry(fq_zech_mat_t mat, slong i, slong j)
+.. function:: fq_zech_struct * fq_zech_mat_entry(const fq_zech_mat_t mat, slong i, slong j)
 
     Directly accesses the entry in ``mat`` in row `i` and column `j`,
     indexed from zero. No bounds checking is performed.
 
-.. function:: void fq_zech_mat_entry_set(fq_zech_mat_t mat, slong i, slong j, fq_zech_t x, const fq_zech_ctx_t ctx)
+.. function:: void fq_zech_mat_entry_set(fq_zech_mat_t mat, slong i, slong j, const fq_zech_t x, const fq_zech_ctx_t ctx)
 
     Sets the entry in ``mat`` in row `i` and column `j` to ``x``.
 
-.. function:: slong fq_zech_mat_nrows(fq_zech_mat_t mat, const fq_zech_ctx_t ctx)
+.. function:: slong fq_zech_mat_nrows(const fq_zech_mat_t mat, const fq_zech_ctx_t ctx)
 
     Returns the number of rows in ``mat``.
 
-.. function:: slong fq_zech_mat_ncols(fq_zech_mat_t mat, const fq_zech_ctx_t ctx)
+.. function:: slong fq_zech_mat_ncols(const fq_zech_mat_t mat, const fq_zech_ctx_t ctx)
 
     Returns the number of columns in ``mat``.
 
@@ -68,7 +63,7 @@ Basic properties and manipulation
     Swaps two matrices. The dimensions of ``mat1`` and ``mat2``
     are allowed to be different.
 
-.. function:: void fq_zech_mat_swap_entrywise(fq_zech_mat_t mat1, fq_zech_mat_t mat2)
+.. function:: void fq_zech_mat_swap_entrywise(fq_zech_mat_t mat1, fq_zech_mat_t mat2, const fq_zech_ctx_t ctx)
 
     Swaps two matrices by swapping the individual entries rather than swapping
     the contents of the structs.
@@ -111,7 +106,7 @@ Printing
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_zech_mat_print_pretty(const fq_zech_mat_t mat, const fq_zech_ctx_t ctx)
+.. function:: int fq_zech_mat_print_pretty(const fq_zech_mat_t mat, const fq_zech_ctx_t ctx)
 
     Pretty-prints ``mat`` to ``stdout``. A header is printed
     followed by the rows enclosed in brackets.
@@ -124,7 +119,7 @@ Printing
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
-.. function:: void fq_zech_mat_print(const fq_zech_mat_t mat, const fq_zech_ctx_t ctx)
+.. function:: int fq_zech_mat_print(const fq_zech_mat_t mat, const fq_zech_ctx_t ctx)
 
     Prints ``mat`` to ``stdout``. A header is printed followed
     by the rows enclosed in brackets.
@@ -213,7 +208,7 @@ Comparison
 --------------------------------------------------------------------------------
 
 
-.. function:: int fq_zech_mat_equal(fq_zech_mat_t mat1, fq_zech_mat_t mat2, const fq_zech_ctx_t ctx)
+.. function:: int fq_zech_mat_equal(const fq_zech_mat_t mat1, const fq_zech_mat_t mat2, const fq_zech_ctx_t ctx)
 
     Returns nonzero if mat1 and mat2 have the same dimensions and elements,
     and zero otherwise.
@@ -287,15 +282,15 @@ Matrix multiplication
     Sets `D = C + AB`. `C` and `D` may be aliased with each other but
     not with `A` or `B`.
 
-.. function:: void fq_zech_mat_mul_vec(fq_zech_struct * c, const fq_zech_mat_t A, const fq_zech_struct * b, slong blen)
-              void fq_zech_mat_mul_vec_ptr(fq_zech_struct * const * c, const fq_zech_mat_t A, const fq_zech_struct * const * b, slong blen)
+.. function:: void fq_zech_mat_mul_vec(fq_zech_struct * c, const fq_zech_mat_t A, const fq_zech_struct * b, slong blen, const fq_zech_ctx_t ctx)
+              void fq_zech_mat_mul_vec_ptr(fq_zech_struct * const * c, const fq_zech_mat_t A, const fq_zech_struct * const * b, slong blen, const fq_zech_ctx_t ctx)
 
     Compute a matrix-vector product of ``A`` and ``(b, blen)`` and store the result in ``c``.
     The vector ``(b, blen)`` is either truncated or zero-extended to the number of columns of ``A``.
     The number entries written to ``c`` is always equal to the number of rows of ``A``.
 
-.. function:: void fq_zech_mat_vec_mul(fq_zech_struct * c, const fq_zech_struct * a, slong alen, const fq_zech_mat_t B)
-              void fq_zech_mat_vec_mul_ptr(fq_zech_struct * const * c, const fq_zech_struct * const * a, slong alen, const fq_zech_mat_t B)
+.. function:: void fq_zech_mat_vec_mul(fq_zech_struct * c, const fq_zech_struct * a, slong alen, const fq_zech_mat_t B, const fq_zech_ctx_t ctx)
+              void fq_zech_mat_vec_mul_ptr(fq_zech_struct * const * c, const fq_zech_struct * const * a, slong alen, const fq_zech_mat_t B, const fq_zech_ctx_t ctx)
 
     Compute a vector-matrix product of ``(a, alen)`` and ``B`` and and store the result in ``c``.
     The vector ``(a, alen)`` is either truncated or zero-extended to the number of rows of ``B``.
@@ -356,7 +351,7 @@ Reduced row echelon form
     form via LU decomposition and then solving an additional
     triangular system.
 
-.. function:: slong fq_zech_mat_reduce_row(fq_zech_mat_t A, slong * P, slong * L, slong n, fq_zech_ctx_t ctx)
+.. function:: slong fq_zech_mat_reduce_row(fq_zech_mat_t A, slong * P, slong * L, slong n, const fq_zech_ctx_t ctx)
 
     Reduce row n of the matrix `A`, assuming the prior rows are in Gauss
     form. However those rows may not be in order. The entry `i` of the array
@@ -406,7 +401,7 @@ Triangular solving
       \begin{pmatrix} A & 0 \\ C & D \end{pmatrix}^{-1}
       \begin{pmatrix} X \\ Y \end{pmatrix} =
       \begin{pmatrix} A^{-1} X \\ D^{-1} ( Y - C A^{-1} X ) \end{pmatrix}
-    
+
 
     to reduce the problem to matrix multiplication and triangular
     solving of smaller systems.
@@ -442,7 +437,7 @@ Triangular solving
         \begin{pmatrix} A & B \\ 0 & D \end{pmatrix}^{-1}
         \begin{pmatrix} X \\ Y \end{pmatrix} =
         \begin{pmatrix} A^{-1} (X - B D^{-1} Y) \\ D^{-1} Y \end{pmatrix}
-    
+
 
     to reduce the problem to matrix multiplication and triangular
     solving of smaller systems.
@@ -459,7 +454,7 @@ Solving
 
     The matrix `A` must be square.
 
-.. function:: int fq_zech_mat_can_solve(fq_zech_mat_t X, fq_zech_mat_t A, fq_zech_mat_t B, const fq_zech_ctx_t ctx)
+.. function:: int fq_zech_mat_can_solve(fq_zech_mat_t X, const fq_zech_mat_t A, const fq_zech_mat_t B, const fq_zech_ctx_t ctx)
 
     Solves the matrix-matrix equation `AX = B` over `Fq`.
 
@@ -473,7 +468,7 @@ Transforms
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_zech_mat_similarity(fq_zech_mat_t M, slong r, fq_zech_t d, fq_zech_ctx_t ctx)
+.. function:: void fq_zech_mat_similarity(fq_zech_mat_t M, slong r, fq_zech_t d, const fq_zech_ctx_t ctx)
 
     Applies a similarity transform to the `n\times n` matrix `M` in-place.
 
@@ -492,12 +487,12 @@ Characteristic polynomial
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_zech_mat_charpoly_danilevsky(fq_zech_poly_t p, const fq_zech_mat_t M, fq_zech_ctx_t ctx)
+.. function:: void fq_zech_mat_charpoly_danilevsky(fq_zech_poly_t p, const fq_zech_mat_t M, const fq_zech_ctx_t ctx)
 
     Compute the characteristic polynomial `p` of the matrix `M`. The matrix
     is assumed to be square.
 
-.. function:: void fq_zech_mat_charpoly(fq_zech_poly_t p, const fq_zech_mat_t M)
+.. function:: void fq_zech_mat_charpoly(fq_zech_poly_t p, const fq_zech_mat_t M, const fq_zech_ctx_t ctx)
 
     Compute the characteristic polynomial `p` of the matrix `M`. The matrix
     is required to be square, otherwise an exception is raised.
@@ -507,7 +502,7 @@ Minimal polynomial
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_zech_mat_minpoly(fq_zech_poly_t p, const fq_zech_mat_t M, fq_zech_ctx_t ctx)
+.. function:: void fq_zech_mat_minpoly(fq_zech_poly_t p, const fq_zech_mat_t M, const fq_zech_ctx_t ctx)
 
     Compute the minimal polynomial `p` of the matrix `M`. The matrix
     is required to be square, otherwise an exception is raised.

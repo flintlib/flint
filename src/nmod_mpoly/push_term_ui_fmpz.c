@@ -59,3 +59,15 @@ void nmod_mpoly_push_term_ui_fmpz(
         NMOD_RED(c, c, ctx->mod);
     A->coeffs[A->length - 1] = c;
 }
+
+void nmod_mpoly_push_term_ui_ffmpz(
+    nmod_mpoly_t A,
+    ulong c,
+    const fmpz * exp,
+    const nmod_mpoly_ctx_t ctx)
+{
+    _nmod_mpoly_push_exp_ffmpz(A, exp, ctx);
+    if (c >= ctx->mod.n)
+        NMOD_RED(c, c, ctx->mod);
+    A->coeffs[A->length - 1] = c;
+}

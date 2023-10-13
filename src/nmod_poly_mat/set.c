@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2023 Vincent Neiger
 
     This file is part of FLINT.
 
@@ -9,8 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "nmod_poly.h"
+#include "nmod_mat.h"
 #include "nmod_poly_mat.h"
 
 void
@@ -26,3 +27,22 @@ nmod_poly_mat_set(nmod_poly_mat_t B, const nmod_poly_mat_t A)
                               nmod_poly_mat_entry(A, i, j));
     }
 }
+
+void nmod_poly_mat_set_nmod_mat(nmod_poly_mat_t pmat, const nmod_mat_t cmat)
+{
+    for (slong i = 0; i < cmat->r; i++)
+    {
+        for (slong j = 0; j < cmat->c; j++)
+        {
+            if (nmod_mat_entry(cmat, i, j) == 0)
+                nmod_poly_zero(nmod_poly_mat_entry(pmat, i, j));
+            else
+            {
+                nmod_poly_realloc(nmod_poly_mat_entry(pmat, i, j), 1);
+                nmod_poly_mat_entry(pmat, i, j)->coeffs[0]
+                    = nmod_mat_entry(cmat, i, j);
+            }
+        }
+    }
+}
+

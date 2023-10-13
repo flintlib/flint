@@ -2,7 +2,11 @@ name: Deploy
 
 on:
   push:
-    branches: [trunk]
+    branches:
+      - trunk
+    paths:
+      - 'doc/**'
+      - '.github/workflows/docs.yml'
 
 jobs:
   ##############################################################################
@@ -14,43 +18,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
-      - name: "Check for changes in documentation"
-        id: check_doc_changes
-        run: |
-          if test -z "$(git diff --name-only HEAD~1..HEAD -- doc/)";
-          then
-            echo "No changes in doc/"
-            echo "diff=false" >> $GITHUB_OUTPUT
-          else
-            echo "Changes in doc/ detected"
-            echo "diff=true" >> $GITHUB_OUTPUT
-          fi
-
       - name: "Setup"
-        if: success() && steps.check_doc_changes.outputs.diff == 'true'
         run: |
-          sudo apt install -y python3-sphinx
+          sudo apt-get install -y python3-sphinx
           sphinx-build --version
 
       - name: "Build documentation"
-        if: success() && steps.check_doc_changes.outputs.diff == 'true'
         run: |
           cd doc
           make html SPHINXOPTS="-W -j auto"
 
+      - name: "Build pdf documentation"
+        uses: dante-ev/latex-action@latest
+        with:
+          root_file:
+          compiler:
+          args:
+          entrypoint: doc/entrypoint.sh
+
       - name: "Create a tarball of the documentation"
-        if: success() && steps.check_doc_changes.outputs.diff == 'true'
         run: |
           cd doc/build
           mv html doc
+          cp latex/Flint.pdf doc
           tar -czvf doc.tar.gz doc
 
       - name: "Setup SSH key"
-        if: success() && steps.check_doc_changes.outputs.diff == 'true'
         uses: shimataro/ssh-key-action@v2.5.0
         with:
           key: ${{ secrets.SSH_KEY }}
@@ -58,7 +55,6 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
 
       - name: "Push documentation to server"
-        if: success() && steps.check_doc_changes.outputs.diff == 'true'
         run: |
           cd doc/build
           ssh -t wbhart@opal6.opalstack.com 'mkdir ~/tmp'

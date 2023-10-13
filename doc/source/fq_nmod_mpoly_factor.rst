@@ -46,7 +46,7 @@ Basic manipulation
     Set `c` to the constant of *f*.
 
 .. function:: void fq_nmod_mpoly_factor_get_base(fq_nmod_mpoly_t p, const fq_nmod_mpoly_factor_t f, slong i, const fq_nmod_mpoly_ctx_t ctx)
-              void fq_nmod_mpoly_factor_swap_base(fq_nmod_mpoly_t p, fq_nmod_mpoly_factor_t f, slong i, const fq_nmod_mpoly_ctx_t ctx)
+              void fq_nmod_mpoly_factor_swap_base(fq_nmod_mpoly_t p, const fq_nmod_mpoly_factor_t f, slong i, const fq_nmod_mpoly_ctx_t ctx)
 
     Set (resp. swap) *B* to (resp. with) the base of the term of index *i* in *A*.
 

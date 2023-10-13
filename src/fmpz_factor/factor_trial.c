@@ -78,11 +78,14 @@ fmpz_factor_trial(fmpz_factor_t factor, const fmpz_t n, slong num_primes)
         {
             p = primes[idx[i]];
 
+            if (p == 2)
+                continue;
+
             exp = 1;
             xsize = flint_mpn_divexact_1(xd, xsize, p);
 
             /* Check if p^2 divides n */
-            if (flint_mpn_divisible_1_p(xd, xsize, p))
+            if (flint_mpn_divisible_1_odd(xd, xsize, p))
             {
                 /* TODO: when searching for squarefree numbers
                    (Moebius function, etc), we can abort here. */
@@ -91,7 +94,7 @@ fmpz_factor_trial(fmpz_factor_t factor, const fmpz_t n, slong num_primes)
             }
 
             /* If we're up to cubes, then maybe there are higher powers */
-            if (exp == 2 && flint_mpn_divisible_1_p(xd, xsize, p))
+            if (exp == 2 && flint_mpn_divisible_1_odd(xd, xsize, p))
             {
                 xsize = flint_mpn_divexact_1(xd, xsize, p);
                 xsize = flint_mpn_remove_power_ascending(xd, xsize, &p, 1, &exp);

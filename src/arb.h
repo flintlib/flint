@@ -377,6 +377,7 @@ void arb_get_rand_fmpq(fmpq_t q, flint_rand_t state, const arb_t x, slong bits);
 
 void arb_min(arb_t z, const arb_t x, const arb_t y, slong prec);
 void arb_max(arb_t z, const arb_t x, const arb_t y, slong prec);
+void arb_minmax(arb_t z1, arb_t z2, const arb_t x, const arb_t y, slong prec);
 
 int arb_can_round_arf(const arb_t x, slong prec, arf_rnd_t rnd);
 #ifdef __MPFR_H

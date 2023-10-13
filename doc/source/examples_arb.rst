@@ -1,16 +1,18 @@
 .. _examples-arb:
 
-Example programs
+Arb example programs
 ===============================================================================
 
 .. highlight:: text
 
-The *examples* directory
-contains several complete C programs, which are documented below. Running::
+See :ref:`examples` for general information about example programs.
+Running::
 
     make examples
 
-will compile the programs and place the binaries in ``build/examples``.
+will compile the programs and place the binaries in
+``build/examples``. The examples related to the Arb module are
+documented below.
 
 pi.c
 -------------------------------------------------------------------------------

@@ -3,7 +3,23 @@
 **fq_zech.h** -- finite fields (Zech logarithm representation)
 ===============================================================================
 
-Description.
+We represent an element of the finite field as a power of a generator
+for the multiplicative group of the finite field. In particular, we
+use a root of `f(x)`, where `f(X) \in \mathbf{F}_p[X]` is a monic,
+irreducible polynomial of degree `n`, as a polynomial in
+`\mathbf{F}_p[X]` of degree less than `n`. The underlying data
+structure is just an ``mp_limb_t``.
+
+The default choice for `f(X)` is the Conway polynomial for the pair
+`(p,n)`. Frank Luebeck's data base of Conway polynomials is made
+available in the file ``src/qadic/CPimport.txt``. If a Conway
+polynomial is not available, then a random irreducible polynomial will
+be chosen for `f(X)`. Additionally, the user is able to supply their
+own `f(X)`.
+
+We required that the order of the field fits inside of an
+``mp_limb_t``; however, it is recommended that `p^n < 2^{20}` due to
+the time and memory needed to compute the Zech logarithm table.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -12,13 +28,9 @@ Types, macros and constants
 
 .. type:: fq_zech_ctx_t
 
-    Description.
-
 .. type:: fq_zech_struct
 
 .. type:: fq_zech_t
-
-    Description.
 
 Context Management
 --------------------------------------------------------------------------------
@@ -73,7 +85,7 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
-.. function:: void fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx, nmod_poly_t modulus, const char *var)
+.. function:: void fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx, const nmod_poly_t modulus, const char *var)
 
     Initialises the context for given ``modulus`` with name
     ``var`` for the generator.
@@ -85,7 +97,7 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
-.. function:: int fq_zech_ctx_init_modulus_check(fq_zech_ctx_t ctx, nmod_poly_t modulus, const char *var)
+.. function:: int fq_zech_ctx_init_modulus_check(fq_zech_ctx_t ctx, const nmod_poly_t modulus, const char *var)
 
     As per the previous function, but returns `0` if the modulus was not
     primitive and `1` if the context was successfully initialised with the
@@ -110,7 +122,7 @@ Context Management
 
     Returns a pointer to the modulus in the context.
 
-.. function:: long fq_zech_ctx_degree(const fq_zech_ctx_t ctx)
+.. function:: slong fq_zech_ctx_degree(const fq_zech_ctx_t ctx)
 
     Returns the degree of the field extension
     `[\mathbf{F}_{q} : \mathbf{F}_{p}]`, which
@@ -137,12 +149,12 @@ Context Management
 
     Prints the context information to {\tt{stdout}}.
 
-.. function:: void fq_zech_ctx_randtest(fq_zech_ctx_t ctx)
+.. function:: void fq_zech_ctx_randtest(fq_zech_ctx_t ctx, flint_rand_t state)
 
     Initializes ``ctx`` to a random finite field.  Assumes that
     ``fq_zech_ctx_init`` has not been called on ``ctx`` already.
 
-.. function:: void fq_zech_ctx_randtest_reducible(fq_zech_ctx_t ctx)
+.. function:: void fq_zech_ctx_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_t state)
 
     Since the Zech logarithm representation does not work with a
     non-irreducible modulus, does the same as
@@ -253,7 +265,7 @@ Basic arithmetic
      of ``ctx`` and sets ``f`` to one.  Since the modulus for
      ``ctx`` is always irreducible, ``op`` is always invertible.
 
-.. function:: void _fq_zech_pow(mp_ptr *rop, mp_srcptr *op, slong len, const fmpz_t e, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e, const fmpz * a, const slong *j, slong lena, const fmpz_t p)
 
     Sets ``(rop, 2*d-1)`` to ``(op,len)`` raised to the power `e`,
     reduced modulo `f(X)`, the modulus of ``ctx``.
@@ -289,7 +301,7 @@ Roots
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_zech_sqrt(fq_zech_t rop, const fq_zech_t op1, const fq_zech_ctx_t ctx)
+.. function:: int fq_zech_sqrt(fq_zech_t rop, const fq_zech_t op1, const fq_zech_ctx_t ctx)
 
     Sets ``rop`` to the square root of ``op1`` if it is a square, and return
     `1`, otherwise return `0`.
@@ -302,7 +314,7 @@ Roots
 
 .. function:: int fq_zech_is_square(const fq_zech_t op, const fq_zech_ctx_t ctx)
 
-    Return ``1`` if ``op`` is a square. 
+    Return ``1`` if ``op`` is a square.
 
 Output
 --------------------------------------------------------------------------------
@@ -316,7 +328,7 @@ Output
     part of the function's signature to allow for a later implementation to
     return the number of characters printed or a non-positive error code.
 
-.. function:: int fq_zech_print_pretty(const fq_zech_t op, const fq_zech_ctx_t ctx)
+.. function:: void fq_zech_print_pretty(const fq_zech_t op, const fq_zech_ctx_t ctx)
 
     Prints a pretty representation of ``op`` to ``stdout``.
 
@@ -324,7 +336,7 @@ Output
     part of the function's signature to allow for a later implementation to
     return the number of characters printed or a non-positive error code.
 
-.. function:: void fq_zech_fprint(FILE * file, const fq_zech_t op, const fq_zech_ctx_t ctx)
+.. function:: int fq_zech_fprint(FILE * file, const fq_zech_t op, const fq_zech_ctx_t ctx)
 
     Prints a representation of ``op`` to ``file``.
 
@@ -428,7 +440,7 @@ Assignments and conversions
     Set ``a`` to a representative of ``b`` in ``ctx``.
     The representatives are taken in `(\mathbb{Z}/p\mathbb{Z})[x]/h(x)` where `h(x)` is the defining polynomial in ``ctx``.
 
-.. function:: void fq_zech_set_nmod_poly(fq_zech_t a, const nmod_poly_t b, const fq_zech_ctx_t ctx);
+.. function:: void fq_zech_set_nmod_poly(fq_zech_t a, const nmod_poly_t b, const fq_zech_ctx_t ctx)
 
     Set ``a`` to the element in ``ctx`` with representative ``b``.
     The representatives are taken in `(\mathbb{Z}/p\mathbb{Z})[x]/h(x)` where `h(x)` is the defining polynomial in ``ctx``.
@@ -509,11 +521,11 @@ Special functions
     `\sigma \in \operatorname{Gal}(\mathbf{F}_q/\mathbf{F}_p)` is the Frobenius element
     `\sigma \colon x \mapsto x^p`.
 
-.. function:: int fq_zech_multiplicative_order(fmpz_t ord, const fq_zech_t op, const fq_zech_ctx_t ctx)
+.. function:: int fq_zech_multiplicative_order(fmpz * ord, const fq_zech_t op, const fq_zech_ctx_t ctx)
 
     Computes the order of ``op`` as an element of the
     multiplicative group of ``ctx``.
-    
+
     Returns 0 if ``op`` is 0, otherwise it returns 1 if ``op``
     is a generator of the multiplicative group, and -1 if it is not.
 

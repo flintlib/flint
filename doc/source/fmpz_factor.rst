@@ -3,8 +3,6 @@
 **fmpz_factor.h** -- integer factorisation
 ===============================================================================
 
-Description.
-
 Types, macros and constants
 -------------------------------------------------------------------------------
 
@@ -12,15 +10,13 @@ Types, macros and constants
 
 .. type:: fmpz_factor_t
 
-    Description.
-
-Factoring integers 
+Factoring integers
 --------------------------------------------------------------------------------
 
-An integer may be represented in factored form using the 
-``fmpz_factor_t`` data structure. This consists of two ``fmpz`` 
-vectors representing bases and exponents, respectively. Canonically, 
-the bases will be prime numbers sorted in ascending order and the 
+An integer may be represented in factored form using the
+``fmpz_factor_t`` data structure. This consists of two ``fmpz``
+vectors representing bases and exponents, respectively. Canonically,
+the bases will be prime numbers sorted in ascending order and the
 exponents will be positive.
 A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
 
@@ -34,12 +30,12 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
 
 .. function:: void _fmpz_factor_append_ui(fmpz_factor_t factor, mp_limb_t p, ulong exp)
 
-    Append a factor `p` to the given exponent to the 
+    Append a factor `p` to the given exponent to the
     ``fmpz_factor_t`` structure ``factor``.
 
 .. function:: void _fmpz_factor_append(fmpz_factor_t factor, const fmpz_t p, ulong exp)
 
-    Append a factor `p` to the given exponent to the 
+    Append a factor `p` to the given exponent to the
     ``fmpz_factor_t`` structure ``factor``.
 
 .. function:: void fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
@@ -59,7 +55,7 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
     If the number has a factor of around the given number of bits, there is
     at least a two-thirds chance of finding it. Smaller factors should be
     found with a much higher probability.
-    
+
     The amount of time spent factoring can be controlled by lowering or
     increasing ``bits``. However, the quadratic sieve may be faster if
     ``bits`` is set to more than one third of the number of bits of `n`.
@@ -91,12 +87,12 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
 
 .. function:: int fmpz_factor_trial_range(fmpz_factor_t factor, const fmpz_t n, ulong start, ulong num_primes)
 
-    Factors `n` into prime factors using trial division. If `n` is 
-    zero or negative, the sign field of the ``factor`` object will be 
+    Factors `n` into prime factors using trial division. If `n` is
+    zero or negative, the sign field of the ``factor`` object will be
     set accordingly.
 
     The algorithm starts with the given start index in the ``flint_primes``
-    table and uses at most ``num_primes`` primes from that point. 
+    table and uses at most ``num_primes`` primes from that point.
 
     The function returns 1 if `n` is completely factored, otherwise it returns
     `0`.
@@ -132,19 +128,19 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
 
     This currently exponentiates the bases separately and multiplies
     them together one by one, although much more efficient algorithms
-    exist. 
+    exist.
 
 .. function:: int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, ulong B1, ulong B2_sqrt, ulong c)
 
     Use Williams' `p + 1` method to factor `n`, using a prime bound in
-    stage 1 of ``B1`` and a prime limit in stage 2 of at least the square 
-    of ``B2_sqrt``. If a factor is found, the function returns `1` and 
-    ``factor`` is set to the factor that is found. Otherwise, the function 
+    stage 1 of ``B1`` and a prime limit in stage 2 of at least the square
+    of ``B2_sqrt``. If a factor is found, the function returns `1` and
+    ``factor`` is set to the factor that is found. Otherwise, the function
     returns `0`.
 
-    The value `c` should be a random value greater than `2`. Successive 
-    calls to the function with different values of `c` give additional 
-    chances to factor `n` with roughly exponentially decaying probability 
+    The value `c` should be a random value greater than `2`. Successive
+    calls to the function with different values of `c` give additional
+    chances to factor `n` with roughly exponentially decaying probability
     of finding a factor which has been missed (if `p+1` or `p-1` is not
     smooth for any prime factors `p` of `n` then the function will
     not ever succeed).
@@ -154,30 +150,30 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
     Pollard Rho algorithm for integer factorization. Assumes that the `n` is
     not prime. ``factor`` is set as the factor if found. Takes as input the initial
     value `y`, to start polynomial evaluation, and `a`, the constant of the polynomial
-    used. It is not assured that the factor found will be prime. Does not compute 
-    the complete factorization, just one factor. Returns the number of limbs of 
-    factor if factorization is successful (non trivial factor is found), else returns 0. 
+    used. It is not assured that the factor found will be prime. Does not compute
+    the complete factorization, just one factor. Returns the number of limbs of
+    factor if factorization is successful (non trivial factor is found), else returns 0.
 
-    ``max_iters`` is the number of iterations tried in process of finding the cycle. 
-    If the algorithm fails to find a non trivial factor in one call, it tries again 
-    (this time with a different set of random values). 
-    
+    ``max_iters`` is the number of iterations tried in process of finding the cycle.
+    If the algorithm fails to find a non trivial factor in one call, it tries again
+    (this time with a different set of random values).
+
 .. function:: int fmpz_factor_pollard_brent(fmpz_t factor, flint_rand_t state, fmpz_t n, mp_limb_t max_tries, mp_limb_t max_iters)
 
     Pollard Rho algorithm for integer factorization. Assumes that the `n` is
-    not prime. ``factor`` is set as the factor if found. It is not assured that the 
-    factor found will be prime. Does not compute the complete factorization, 
-    just one factor. Returns the number of limbs of factor if factorization is 
-    successful (non trivial factor is found), else returns 0. 
+    not prime. ``factor`` is set as the factor if found. It is not assured that the
+    factor found will be prime. Does not compute the complete factorization,
+    just one factor. Returns the number of limbs of factor if factorization is
+    successful (non trivial factor is found), else returns 0.
 
-    ``max_iters`` is the number of iterations tried in process of finding the cycle. 
-    If the algorithm fails to find a non trivial factor in one call, it tries again 
-    (this time with a different set of random values). This process is repeated a 
-    maximum of ``max_tries`` times. 
+    ``max_iters`` is the number of iterations tried in process of finding the cycle.
+    If the algorithm fails to find a non trivial factor in one call, it tries again
+    (this time with a different set of random values). This process is repeated a
+    maximum of ``max_tries`` times.
 
     The algorithm used is a modification of the original Pollard Rho algorithm,
     suggested by Richard Brent. It can be found in the paper available at
-    https://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf 
+    https://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf
 
 
 Elliptic curve (ECM) method
@@ -186,7 +182,7 @@ Elliptic curve (ECM) method
 Factoring of ``fmpz`` integers using ECM
 
 .. function:: void fmpz_factor_ecm_init(ecm_t ecm_inf, mp_limb_t sz)
-    
+
     Initializes the ``ecm_t`` struct. This is needed in some functions
     and carries data between subsequent calls.
 
@@ -242,7 +238,7 @@ Factoring of ``fmpz`` integers using ECM
 
 .. function:: void fmpz_factor_ecm_mul_montgomery_ladder(mp_ptr x, mp_ptr z, mp_ptr x0, mp_ptr z0, mp_limb_t k, mp_ptr n, ecm_t ecm_inf)
 
-    Montgomery ladder algorithm for scalar multiplication of elliptic points. 
+    Montgomery ladder algorithm for scalar multiplication of elliptic points.
 
     Sets the point `(x : z)` to `k(x_0 : z_0)` modulo `n`.
 
@@ -289,10 +285,10 @@ Factoring of ``fmpz`` integers using ECM
     If the factor is found, number of words required to store the factor is
     returned, otherwise `0`.
 
-.. function:: int fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2, flint_rand_t state, fmpz_t n_in)
+.. function:: int fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2, flint_rand_t state, const fmpz_t n_in)
 
     Outer wrapper function for the ECM algorithm. In case ``f`` can fit
-    in a single unsigned word, a call to ``n_factor_ecm`` is made. 
+    in a single unsigned word, a call to ``n_factor_ecm`` is made.
 
     The function calls stage I and II, and
     the precomputations (builds ``prime_array`` for stage I,
@@ -302,8 +298,7 @@ Factoring of ``fmpz`` integers using ECM
     random curves being tried. ``B1``, ``B2`` are the two bounds or
     stage I and stage II. `n` is the number being factored.
 
-    If a factor is found in stage I, `1` is returned. 
-    If a factor is found in stage II, `2` is returned. 
-    If a factor is found while selecting the curve, `-1` is returned. 
+    If a factor is found in stage I, `1` is returned.
+    If a factor is found in stage II, `2` is returned.
+    If a factor is found while selecting the curve, `-1` is returned.
     Otherwise `0` is returned.
-

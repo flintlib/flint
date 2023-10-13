@@ -65,8 +65,8 @@ Usage details
 .......................................................................
 
 To understand how Calcium works more concretely, see
-:ref:`examples` and the documentation for the
-main Calcium number type (:type:`ca_t`):
+:ref:`examples-calcium` and the documentation for the main Calcium
+number type (:type:`ca_t`):
 
 * :ref:`ca`
 

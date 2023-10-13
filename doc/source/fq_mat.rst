@@ -3,16 +3,12 @@
 **fq_mat.h** -- matrices over finite fields
 ===============================================================================
 
-Description.
-
 Types, macros and constants
 -------------------------------------------------------------------------------
 
 .. type:: fq_mat_struct
 
 .. type:: fq_mat_t
-
-    Description.
 
 Memory management
 --------------------------------------------------------------------------------
@@ -24,7 +20,7 @@ Memory management
     coefficients in `\mathbf{F}_{q}` given by ``ctx``. All elements
     are set to zero.
 
-.. function:: void fq_mat_init_set(fq_mat_t mat, fq_mat_t src, const fq_ctx_t ctx)
+.. function:: void fq_mat_init_set(fq_mat_t mat, const fq_mat_t src, const fq_ctx_t ctx)
 
     Initialises ``mat`` and sets its dimensions and elements to
     those of ``src``.
@@ -35,7 +31,7 @@ Memory management
     cannot be used again until it is initialised. This function must be
     called exactly once when finished using an ``fq_mat_t`` object.
 
-.. function:: void fq_mat_set(fq_mat_t mat, fq_mat_t src, const fq_ctx_t ctx)
+.. function:: void fq_mat_set(fq_mat_t mat, const fq_mat_t src, const fq_ctx_t ctx)
 
     Sets ``mat`` to a copy of ``src``. It is assumed
     that ``mat`` and ``src`` have identical dimensions.
@@ -45,20 +41,20 @@ Basic properties and manipulation
 --------------------------------------------------------------------------------
 
 
-.. function:: fq_struct * fq_mat_entry(fq_mat_t mat, slong i, slong j)
+.. function:: fq_struct * fq_mat_entry(const fq_mat_t mat, slong i, slong j)
 
     Directly accesses the entry in ``mat`` in row `i` and column `j`,
     indexed from zero. No bounds checking is performed.
 
-.. function:: void fq_mat_entry_set(fq_mat_t mat, slong i, slong j, fq_t x, const fq_ctx_t ctx)
+.. function:: void fq_mat_entry_set(fq_mat_t mat, slong i, slong j, const fq_t x, const fq_ctx_t ctx)
 
     Sets the entry in ``mat`` in row `i` and column `j` to ``x``.
 
-.. function:: slong fq_mat_nrows(fq_mat_t mat, const fq_ctx_t ctx)
+.. function:: slong fq_mat_nrows(const fq_mat_t mat, const fq_ctx_t ctx)
 
     Returns the number of rows in ``mat``.
 
-.. function:: slong fq_mat_ncols(fq_mat_t mat, const fq_ctx_t ctx)
+.. function:: slong fq_mat_ncols(const fq_mat_t mat, const fq_ctx_t ctx)
 
     Returns the number of columns in ``mat``.
 
@@ -67,7 +63,7 @@ Basic properties and manipulation
     Swaps two matrices. The dimensions of ``mat1`` and ``mat2``
     are allowed to be different.
 
-.. function:: void fq_mat_swap_entrywise(fq_mat_t mat1, fq_mat_t mat2)
+.. function:: void fq_mat_swap_entrywise(fq_mat_t mat1, fq_mat_t mat2, const fq_ctx_t ctx)
 
     Swaps two matrices by swapping the individual entries rather than swapping
     the contents of the structs.
@@ -80,24 +76,24 @@ Basic properties and manipulation
 
     Sets all the diagonal entries of ``mat`` to 1 and all other entries to 0.
 
-.. function:: void fq_mat_swap_rows(fq_mat_t mat, slong * perm, slong r, slong s)
-    
+.. function:: void fq_mat_swap_rows(fq_mat_t mat, slong * perm, slong r, slong s, const fq_ctx_t ctx)
+
     Swaps rows ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
     permutation of the rows will also be applied to ``perm``.
 
-.. function:: void fq_mat_swap_cols(fq_mat_t mat, slong * perm, slong r, slong s)
-    
+.. function:: void fq_mat_swap_cols(fq_mat_t mat, slong * perm, slong r, slong s, const fq_ctx_t ctx)
+
     Swaps columns ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
     permutation of the columns will also be applied to ``perm``.
 
-.. function:: void fq_mat_invert_rows(fq_mat_t mat, slong * perm)
-    
+.. function:: void fq_mat_invert_rows(fq_mat_t mat, slong * perm, const fq_ctx_t ctx)
+
     Swaps rows ``i`` and ``r - i`` of ``mat`` for ``0 <= i < r/2``, where
     ``r`` is the number of rows of ``mat``. If ``perm`` is non-``NULL``, the
     permutation of the rows will also be applied to ``perm``.
 
-.. function:: void fq_mat_invert_cols(fq_mat_t mat, slong * perm)
-    
+.. function:: void fq_mat_invert_cols(fq_mat_t mat, slong * perm, const fq_ctx_t ctx)
+
     Swaps columns ``i`` and ``c - i`` of ``mat`` for ``0 <= i < c/2``, where
     ``c`` is the number of columns of ``mat``. If ``perm`` is non-``NULL``, the
     permutation of the columns will also be applied to ``perm``.
@@ -132,7 +128,7 @@ Printing
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_mat_print_pretty(const fq_mat_t mat, const fq_ctx_t ctx)
+.. function:: int fq_mat_print_pretty(const fq_mat_t mat, const fq_ctx_t ctx)
 
     Pretty-prints ``mat`` to ``stdout``. A header is printed
     followed by the rows enclosed in brackets.
@@ -145,7 +141,7 @@ Printing
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
-.. function:: void fq_mat_print(const fq_mat_t mat, const fq_ctx_t ctx)
+.. function:: int fq_mat_print(const fq_mat_t mat, const fq_ctx_t ctx)
 
     Prints ``mat`` to ``stdout``. A header is printed followed
     by the rows enclosed in brackets.
@@ -235,7 +231,7 @@ Comparison
 --------------------------------------------------------------------------------
 
 
-.. function:: int fq_mat_equal(fq_mat_t mat1, fq_mat_t mat2, const fq_ctx_t ctx)
+.. function:: int fq_mat_equal(const fq_mat_t mat1, const fq_mat_t mat2, const fq_ctx_t ctx)
 
     Returns nonzero if mat1 and mat2 have the same dimensions and elements,
     and zero otherwise.
@@ -308,15 +304,15 @@ Matrix multiplication
     Sets `D = C + AB`. `C` and `D` may be aliased with each other but
     not with `A` or `B`.
 
-.. function:: void fq_mat_mul_vec(fq_struct * c, const fq_mat_t A, const fq_struct * b, slong blen)
-              void fq_mat_mul_vec_ptr(fq_struct * const * c, const fq_mat_t A, const fq_struct * const * b, slong blen)
+.. function:: void fq_mat_mul_vec(fq_struct * c, const fq_mat_t A, const fq_struct * b, slong blen, const fq_ctx_t ctx)
+              void fq_mat_mul_vec_ptr(fq_struct * const * c, const fq_mat_t A, const fq_struct * const * b, slong blen, const fq_ctx_t ctx)
 
     Compute a matrix-vector product of ``A`` and ``(b, blen)`` and store the result in ``c``.
     The vector ``(b, blen)`` is either truncated or zero-extended to the number of columns of ``A``.
     The number entries written to ``c`` is always equal to the number of rows of ``A``.
 
-.. function:: void fq_mat_vec_mul(fq_struct * c, const fq_struct * a, slong alen, const fq_mat_t B)
-              void fq_mat_vec_mul_ptr(fq_struct * const * c, const fq_struct * const * a, slong alen, const fq_mat_t B)
+.. function:: void fq_mat_vec_mul(fq_struct * c, const fq_struct * a, slong alen, const fq_mat_t B, const fq_ctx_t ctx)
+              void fq_mat_vec_mul_ptr(fq_struct * const * c, const fq_struct * const * a, slong alen, const fq_mat_t B, const fq_ctx_t ctx)
 
     Compute a vector-matrix product of ``(a, alen)`` and ``B`` and and store the result in ``c``.
     The vector ``(a, alen)`` is either truncated or zero-extended to the number of rows of ``B``.
@@ -327,7 +323,7 @@ Inverse
 --------------------------------------------------------------------------------
 
 
-.. function:: int fq_mat_inv(fq_mat_t B, fq_mat_t A, fq_ctx_t ctx)
+.. function:: int fq_mat_inv(fq_mat_t B, fq_mat_t A, const fq_ctx_t ctx)
 
     Sets `B = A^{-1}` and returns `1` if `A` is invertible. If `A` is singular,
     returns `0` and sets the elements of `B` to undefined values.
@@ -439,7 +435,7 @@ Triangular solving
         \begin{pmatrix} A & 0 \\ C & D \end{pmatrix}^{-1}
         \begin{pmatrix} X \\ Y \end{pmatrix} =
         \begin{pmatrix} A^{-1} X \\ D^{-1} ( Y - C A^{-1} X ) \end{pmatrix}
-      
+
 
     to reduce the problem to matrix multiplication and triangular
     solving of smaller systems.
@@ -475,7 +471,7 @@ Triangular solving
         \begin{pmatrix} A & B \\ 0 & D \end{pmatrix}^{-1}
         \begin{pmatrix} X \\ Y \end{pmatrix} =
         \begin{pmatrix} A^{-1} (X - B D^{-1} Y) \\ D^{-1} Y \end{pmatrix}
-    
+
 
     to reduce the problem to matrix multiplication and triangular
     solving of smaller systems.
@@ -493,8 +489,8 @@ Solving
     elements of `X` to undefined values.
 
     The matrix `A` must be square.
-    
-.. function:: int fq_mat_can_solve(fq_mat_t X, fq_mat_t A, fq_mat_t B, const fq_ctx_t ctx)
+
+.. function:: int fq_mat_can_solve(fq_mat_t X, const fq_mat_t A, const fq_mat_t B, const fq_ctx_t ctx)
 
     Solves the matrix-matrix equation `AX = B` over `Fq`.
 
@@ -509,7 +505,7 @@ Transforms
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_mat_similarity(fq_mat_t M, slong r, fq_t d, fq_ctx_t ctx)
+.. function:: void fq_mat_similarity(fq_mat_t M, slong r, fq_t d, const fq_ctx_t ctx)
 
     Applies a similarity transform to the `n\times n` matrix `M` in-place.
 

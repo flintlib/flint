@@ -3,15 +3,10 @@
 **fq_default_poly.h** -- univariate polynomials over finite fields
 ===============================================================================
 
-Description.
-
 Types, macros and constants
 -------------------------------------------------------------------------------
 
 .. type:: fq_default_poly_t
-
-    Description.
-
 
 Memory management
 --------------------------------------------------------------------------------
@@ -82,11 +77,11 @@ Polynomial parameters
 --------------------------------------------------------------------------------
 
 
-.. function:: long fq_default_poly_degree(fq_default_poly_t poly, const fq_default_ctx_t ctx)
+.. function:: slong fq_default_poly_degree(const fq_default_poly_t poly, const fq_default_ctx_t ctx)
 
     Returns the degree of the polynomial ``poly``.
 
-.. function:: long fq_default_poly_length(fq_default_poly_t poly, const fq_default_ctx_t ctx)
+.. function:: slong fq_default_poly_length(const fq_default_poly_t poly, const fq_default_ctx_t ctx)
 
     Returns the length of the polynomial ``poly``.
 
@@ -197,7 +192,7 @@ Comparison
 
     Returns whether the polynomial ``poly`` is the zero polynomial.
 
-.. function:: int fq_default_poly_is_one(const fq_default_poly_t op)
+.. function:: int fq_default_poly_is_one(const fq_default_poly_t op, const fq_default_ctx_t ctx)
 
     Returns whether the polynomial ``poly`` is equal
     to the constant polynomial `1`.
@@ -268,7 +263,7 @@ Scalar multiplication and division
     Subtracts from ``rop`` the product of ``op`` by the
     scalar ``x``, in the context defined by ``ctx``.
 
-.. function:: void fq_default_poly_scalar_div_fq_default(fq_default_poly_t rop, const fq_default_poly_t op, const fq_default_t x, const fq_default_ctx_t ctx)                                                 
+.. function:: void fq_default_poly_scalar_div_fq_default(fq_default_poly_t rop, const fq_default_poly_t op, const fq_default_t x, const fq_default_ctx_t ctx)
 
     Sets ``rop`` to the quotient of ``op`` by the scalar ``x``, in the context
     defined by ``ctx``. An exception is raised if ``x`` is zero.
@@ -293,7 +288,7 @@ Multiplication
     coefficients from ``start`` onwards into the high coefficients of
     ``res``, the remaining coefficients being arbitrary but reduced.
 
-.. function:: void fq_default_poly_mulmod(fq_default_poly_t res,const fq_default_poly_t poly1, const fq_default_poly_t poly2, const fq_default_poly_t f, const fq_default_ctx_t ctx)
+.. function:: void fq_default_poly_mulmod(fq_default_poly_t res, const fq_default_poly_t poly1, const fq_default_poly_t poly2, const fq_default_poly_t f, const fq_default_ctx_t ctx)
 
     Sets ``res`` to the remainder of the product of ``poly1``
     and ``poly2`` upon polynomial division by ``f``.
@@ -324,12 +319,12 @@ Powering
     Sets ``res`` to ``poly`` raised to the power ``e`` modulo
     ``f``, using binary exponentiation. We require ``e >= 0``.
 
-.. function:: void fq_default_poly_powmod_fmpz_binexp(fq_default_poly_t res, const fq_default_poly_t poly, fmpz_t e, const fq_default_poly_t f, const fq_default_ctx_t ctx)
+.. function:: void fq_default_poly_powmod_fmpz_binexp(fq_default_poly_t res, const fq_default_poly_t poly, const fmpz_t e, const fq_default_poly_t f, const fq_default_ctx_t ctx)
 
     Sets ``res`` to ``poly`` raised to the power ``e`` modulo
     ``f``, using binary exponentiation. We require ``e >= 0``.
 
-.. function:: void fq_default_poly_pow_trunc(fq_default_poly_t res, const fq_default_poly_t poly, ulong e, slong trunc, fq_default_ctx_t ctx)
+.. function:: void fq_default_poly_pow_trunc(fq_default_poly_t res, const fq_default_poly_t poly, ulong e, slong trunc, const fq_default_ctx_t ctx)
 
     Sets ``res`` to the low ``trunc`` coefficients of ``poly``
     to the power ``e``. This is equivalent to doing a powering
@@ -356,7 +351,7 @@ Norms
 --------------------------------------------------------------------------------
 
 
-.. function:: long fq_default_poly_hamming_weight(const fq_default_poly_t op, const fq_default_ctx_t ctx)
+.. function:: slong fq_default_poly_hamming_weight(const fq_default_poly_t op, const fq_default_ctx_t ctx)
 
     Returns the number of non-zero entries in the polynomial ``op``.
 
@@ -386,7 +381,7 @@ Euclidean division
     be invertible modulo the modulus of ``Q``. An exception is
     raised if this is not the case or if ``n = 0``.
 
-.. function:: void fq_default_poly_div_series(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, slong n, fq_default_ctx_t ctx)
+.. function:: void fq_default_poly_div_series(fq_default_poly_t Q, const fq_default_poly_t A, const fq_default_poly_t B, slong n, const fq_default_ctx_t ctx)
 
     Set `Q` to the quotient of the series `A` by `B`, thinking of the series as
     though they were of length `n`. We assume that the bottom coefficient of

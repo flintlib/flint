@@ -49,7 +49,7 @@ gr_poly_set_si(gr_poly_t poly, slong x, gr_ctx_t ctx)
 }
 
 int
-gr_poly_set_ui(gr_poly_t poly, slong x, gr_ctx_t ctx)
+gr_poly_set_ui(gr_poly_t poly, ulong x, gr_ctx_t ctx)
 {
     if (x == 0)
     {

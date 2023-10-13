@@ -26,7 +26,11 @@
 
 #include <limits.h>
 #include <gmp.h>
-#include "flint-config.h"
+#ifdef BUILDING_FLINT
+# include "config.h"
+#else
+# include "flint-config.h"
+#endif
 
 #if FLINT_USES_GC
 # include "gc.h"
@@ -117,7 +121,7 @@ typedef struct __FLINT_FILE FLINT_FILE;
 
 #if defined(__GNUC__)
 # define FLINT_FORCE_INLINE static __attribute__((always_inline)) __inline__
-# define FLINT_STATIC_NOINLINE static __attribute__((noinline)) 
+# define FLINT_STATIC_NOINLINE static __attribute__((noinline))
 # define FLINT_UNUSED(x) UNUSED_ ## x __attribute__((unused))
 # define FLINT_SET_BUT_UNUSED(x) x __attribute__((unused))
 # define FLINT_NORETURN __attribute__ ((noreturn))
