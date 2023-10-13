@@ -29,7 +29,7 @@ AH_TOP(FLINT_COPYRIGHT_C)
 
 AC_PREREQ(2.59)
 
-define(FLINT_VERSION,[3.0.0-alpha1])
+m4_define(FLINT_VERSION,m4_include([VERSION]))
 
 AC_INIT(FLINT, FLINT_VERSION, [https://github.com/flintlib/flint/issues/], flint, [https://flintlib.org/])
 AC_CONFIG_AUX_DIR([config])
