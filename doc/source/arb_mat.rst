@@ -190,14 +190,6 @@ Predicate methods return 1 if the property certainly holds and 0 otherwise.
     Returns whether *mat* is a diagonal matrix; that is, all entries
     off the main diagonal are exactly zero.
 
-.. function:: int arb_mat_is_symmetric(const arb_mat_t mat)
-
-    Returns whether *mat* is certainly symmetric (in particular square).
-
-.. function:: int arb_mat_is_nonsymmetric(const arb_mat_t mat)
-
-    Returns whether *mat* is certainly not a symmetric matrix.
-
 Special matrices
 -------------------------------------------------------------------------------
 
