@@ -9,23 +9,18 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "arb.h"
-
 #ifdef __GNUC__
 # define fabs __builtin_fabs
 #else
 # include <math.h>
 #endif
 
-int main(void)
+#include "test_helpers.h"
+#include "arb.h"
+
+TEST_FUNCTION_START(arb_atan_frac_bsplit)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("atan_frac_bsplit....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -80,9 +75,6 @@ int main(void)
         fmpz_clear(q);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }
 

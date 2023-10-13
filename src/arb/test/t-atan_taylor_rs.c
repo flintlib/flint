@@ -9,18 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "mpn_extras.h"
 #include "arb.h"
 
-int main(void)
+TEST_FUNCTION_START(arb_atan_taylor_rs)
 {
     slong iter;
-    flint_rand_t state;
 
-    flint_printf("atan_taylor_rs....");
-    fflush(stdout);
-
-    flint_randinit(state);
     _flint_rand_init_gmp(state);
 
     for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
@@ -82,9 +78,6 @@ int main(void)
         flint_free(t);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }
 

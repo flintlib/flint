@@ -9,9 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq.h"
 #include "arb.h"
 
+#ifndef mag_close
+#define mag_close mag_close
 int
 mag_close(const mag_t am, const mag_t bm)
 {
@@ -39,7 +42,10 @@ mag_close(const mag_t am, const mag_t bm)
 
     return res1 && res2;
 }
+#endif
 
+#ifndef arb_equal_mid_close_mag
+#define arb_equal_mid_close_mag arb_equal_mid_close_mag
 int
 arb_equal_mid_close_mag(const arb_t a, const arb_t b)
 {
@@ -52,6 +58,7 @@ arb_equal_mid_close_mag(const arb_t a, const arb_t b)
                 mag_is_finite(arb_radref(a)) && mag_is_finite(arb_radref(b))) ||
             (arf_is_nan(arb_midref(a)) && arf_is_nan(arb_midref(b))));
 }
+#endif
 
 void
 arb_submul_naive(arb_t z, const arb_t x, const arb_t y, slong prec)
@@ -63,15 +70,9 @@ arb_submul_naive(arb_t z, const arb_t x, const arb_t y, slong prec)
     arb_clear(t);
 }
 
-int main(void)
+TEST_FUNCTION_START(arb_submul)
 {
     slong iter, iter2;
-    flint_rand_t state;
-
-    flint_printf("submul....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -307,8 +308,5 @@ int main(void)
         arb_clear(v);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }

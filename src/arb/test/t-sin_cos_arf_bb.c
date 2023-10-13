@@ -9,20 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "arb.h"
 
 void arb_sin_cos_fmpz_div_2exp_bsplit(arb_t wsin, arb_t wcos,
     const fmpz_t x, flint_bitcnt_t r, slong prec);
 
-int main(void)
+TEST_FUNCTION_START(arb_sin_cos_arf_bb)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("sin_cos_arf_bb....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* test the series evaluation code directly */
     for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
@@ -165,9 +160,6 @@ int main(void)
         arb_clear(c2);
     }
 
-    flint_randclear(state);
-    flint_cleanup_master();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }
 

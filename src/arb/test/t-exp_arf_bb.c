@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include <mpfr.h>
 #include "arb.h"
 
@@ -35,15 +36,9 @@ arb_exp_arf_via_mpfr(arb_t z, const arf_t x, slong prec)
     mpfr_clear(u);
 }
 
-int main(void)
+TEST_FUNCTION_START(arb_exp_arf_bb)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("exp_arf_bb....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 5000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -110,9 +105,6 @@ int main(void)
         arb_clear(z);
     }
 
-    flint_randclear(state);
-    flint_cleanup_master();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }
 

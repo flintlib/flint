@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "arb.h"
 
 void
@@ -22,15 +23,9 @@ arb_fma_naive(arb_t res, const arb_t x, const arb_t y, const arb_t z, slong prec
     arb_clear(t);
 }
 
-int main(void)
+TEST_FUNCTION_START(arb_fma)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("fma....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -118,8 +113,5 @@ int main(void)
         arb_clear(res2);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }

@@ -9,18 +9,16 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include <mpfr.h>
 #include "arb.h"
 
-int main(void)
+TEST_FUNCTION_START(arb_atan_tab)
 {
     slong i;
 
     mpfr_t tabx, atanx, y1, y2;
     mpz_t tt;
-
-    flint_printf("atan_tab....");
-    fflush(stdout);
 
     {
         slong prec, bits, num;
@@ -175,8 +173,6 @@ int main(void)
         mpfr_clear(y2);
     }
 
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }
 

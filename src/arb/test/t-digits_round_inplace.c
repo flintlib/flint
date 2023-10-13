@@ -9,16 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include <string.h>
 #include "arb.h"
 
-int main(void)
+TEST_FUNCTION_START(arb_digits_round_inplace)
 {
-    flint_rand_t state;
-
-    flint_printf("digits_round_inplace....");
-    fflush(stdout);
-    flint_randinit(state);
 
     {
         char s[30];
@@ -85,9 +81,6 @@ int main(void)
         fmpz_clear(t);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }
 

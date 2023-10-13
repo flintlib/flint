@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "arb.h"
 
 /* Consecutively, real and imaginary parts of first 64 nonreal
@@ -22,15 +23,9 @@ static const signed char small_gaussian_primes[] = {
     5, 26, 15, 22, 2, 27, 9, 26
 };
 
-int main(void)
+TEST_FUNCTION_START(arb_atan_gauss_primes_vec_bsplit)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("atan_gauss_primes_vec_bsplit....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 500 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -69,9 +64,6 @@ int main(void)
         arb_clear(t);
     }
 
-    flint_randclear(state);
-    flint_cleanup_master();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }
 

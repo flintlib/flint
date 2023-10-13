@@ -9,13 +9,11 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "arb.h"
 
-int main(void)
+TEST_FUNCTION_START(arb_fib)
 {
-    flint_printf("fib....");
-    fflush(stdout);
-
     /* trivial test because functions are based on gr */
     {
         fmpz_t n;
@@ -32,7 +30,5 @@ int main(void)
         fmpz_clear(n);
     }
 
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }

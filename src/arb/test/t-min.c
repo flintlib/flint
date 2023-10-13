@@ -9,10 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "arb.h"
 
 #define ASSERT(cond) if (!(cond)) { flint_printf("FAIL: %d\n", __LINE__); flint_abort(); }
 
+#ifndef _sample_arf_in_arb
+#define _sample_arf_in_arb _sample_arf_in_arb
 /* sample (x, y) so that x /in y */
 void _sample_arf_in_arb(arf_t x, arb_t y, flint_rand_t state)
 {
@@ -43,15 +46,11 @@ void _sample_arf_in_arb(arf_t x, arb_t y, flint_rand_t state)
     arf_clear(a);
     arf_clear(b);
 }
+#endif
 
-int main(void)
+TEST_FUNCTION_START(arb_min)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("min....");
-    fflush(stdout);
-    flint_randinit(state);
 
     for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -168,8 +167,5 @@ int main(void)
       arb_clear(z);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }

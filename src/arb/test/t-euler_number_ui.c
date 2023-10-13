@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_vec.h"
 #include "ulong_extras.h"
 #include "arith.h"
@@ -41,15 +42,9 @@ divisor_table_odd(unsigned int * tab, slong len)
     }
 }
 
-int main(void)
+TEST_FUNCTION_START(arb_euler_number_ui)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("euler_number_ui....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     {
         slong nmax;
@@ -143,8 +138,5 @@ int main(void)
         _fmpz_vec_clear(En, nmax);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }

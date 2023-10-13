@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "arb.h"
 
 #define ASSERT(cond) if (!(cond)) { flint_printf("FAIL: %d\n", __LINE__); flint_abort(); }
@@ -117,15 +118,9 @@ int nearly_equal(const arb_t x, const arb_t y)
     return res;
 }
 
-int main(void)
+TEST_FUNCTION_START(arb_nonnegative_abs)
 {
     slong iter, wide;
-    flint_rand_t state;
-
-    flint_printf("nonnegative_abs....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (wide = 0; wide < 2; wide++)
     {
@@ -175,8 +170,5 @@ int main(void)
         }
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }

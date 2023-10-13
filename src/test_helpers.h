@@ -34,7 +34,7 @@
 int CAT(test, label)(void)                              \
 {                                                       \
     FLINT_TEST_INIT(state);                             \
-    printf(#label "....");                 \
+    printf(#label "....");                              \
     fflush(stdout);                                     \
 
 #define TEST_FUNCTION_END                               \

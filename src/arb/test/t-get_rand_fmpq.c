@@ -9,17 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq.h"
 #include "arb.h"
 
-int main(void)
+TEST_FUNCTION_START(arb_get_rand_fmpq)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("get_rand_fmpq....");
-    fflush(stdout);
-    flint_randinit(state);
 
     for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -44,8 +40,5 @@ int main(void)
         fmpq_clear(q);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }

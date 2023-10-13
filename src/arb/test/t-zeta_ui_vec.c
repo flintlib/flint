@@ -9,17 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include <mpfr.h>
 #include "arb.h"
 
-int main(void)
+TEST_FUNCTION_START(arb_zeta_ui_vec)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("zeta_ui_vec....");
-    fflush(stdout);
-    flint_randinit(state);
 
     for (iter = 0; iter < 100 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -67,8 +63,5 @@ int main(void)
         mpfr_clear(s);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }

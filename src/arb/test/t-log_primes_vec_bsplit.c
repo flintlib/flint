@@ -9,18 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "arb.h"
 
-int main(void)
+TEST_FUNCTION_START(arb_log_primes_vec_bsplit)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("log_primes_vec_bsplit....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 500 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -64,9 +59,6 @@ int main(void)
         arb_clear(t);
     }
 
-    flint_randclear(state);
-    flint_cleanup_master();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }
 

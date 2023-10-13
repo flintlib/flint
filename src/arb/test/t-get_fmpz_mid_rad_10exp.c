@@ -9,16 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "arb.h"
 
-int main(void)
+TEST_FUNCTION_START(arb_get_fmpz_mid_rad_10exp)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("get_fmpz_mid_rad_10exp....");
-    fflush(stdout);
-    flint_randinit(state);
 
     for (iter = 0; iter < 5000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -76,8 +72,5 @@ int main(void)
         fmpz_clear(exp);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }

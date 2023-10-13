@@ -9,18 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include <mpfr.h>
 #include "arb.h"
 
-int main(void)
+TEST_FUNCTION_START(arb_can_round_mpfr)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("can_round_mpfr....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -78,8 +73,5 @@ int main(void)
         mpfr_clear(y2);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }
