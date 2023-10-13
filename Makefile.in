@@ -16,9 +16,7 @@ ABS_FLINT_DIR:='$(patsubst %/,%, $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 ABS_SRC_DIR:=$(ABS_FLINT_DIR)/$(SRC_DIR)
 ABS_BUILD_DIR:=$(ABS_FLINT_DIR)/$(SRC_DIR)
 
-FLINT_MAJOR:=@FLINT_MAJOR@
-FLINT_MINOR:=@FLINT_MINOR@
-FLINT_PATCH:=@FLINT_PATCH@
+FLINT_VERSION:=@FLINT_VERSION@
 FLINT_MAJOR_SO:=@FLINT_MAJOR_SO@
 FLINT_MINOR_SO:=@FLINT_MINOR_SO@
 FLINT_PATCH_SO:=@FLINT_PATCH_SO@
@@ -765,8 +763,7 @@ endif
 ################################################################################
 
 dist:
-	git archive --format tar --prefix flint-$(FLINT_MAJOR).$(FLINT_MINOR).$(FLINT_PATCH)/ origin/flint-$(FLINT_MAJOR).$(FLINT_MINOR) > ../flint-$(FLINT_MAJOR).$(FLINT_MINOR).$(FLINT_PATCH).tar; gzip ../flint-$(FLINT_MAJOR).$(FLINT_MINOR).$(FLINT_PATCH).tar
-	git archive --format zip --prefix flint-$(FLINT_MAJOR).$(FLINT_MINOR).$(FLINT_PATCH)/ origin/flint-$(FLINT_MAJOR).$(FLINT_MINOR) > ../flint-$(FLINT_MAJOR).$(FLINT_MINOR).$(FLINT_PATCH).zip 
+	dev/make_dist.sh $(FLINT_VERSION)
 
 ################################################################################
 # debugging
