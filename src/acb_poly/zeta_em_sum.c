@@ -35,14 +35,13 @@ void _acb_poly_mullow_cpx(acb_ptr res, acb_srcptr src, slong len, const acb_t c,
 void
 _acb_poly_zeta_em_sum(acb_ptr z, const acb_t s, const acb_t a, int deflate, ulong N, ulong M, slong d, slong prec)
 {
-    acb_ptr t, u, v, term, sum;
+    acb_ptr t, u, v, sum;
     acb_t Na, one;
     slong i;
 
     t = _acb_vec_init(d + 1);
     u = _acb_vec_init(d);
     v = _acb_vec_init(d);
-    term = _acb_vec_init(d);
     sum = _acb_vec_init(d);
     acb_init(Na);
     acb_init(one);
@@ -130,9 +129,7 @@ _acb_poly_zeta_em_sum(acb_ptr z, const acb_t s, const acb_t a, int deflate, ulon
     _acb_vec_clear(t, d + 1);
     _acb_vec_clear(u, d);
     _acb_vec_clear(v, d);
-    _acb_vec_clear(term, d);
     _acb_vec_clear(sum, d);
     acb_clear(Na);
     acb_clear(one);
 }
-
