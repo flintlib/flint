@@ -108,7 +108,7 @@ Random generation
 .. function:: void arb_mat_randtest_spd(arb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits)
 
     Sets *mat* to a random symmetric positive definite matrix, obtained as a
-    product `L * L^T` where `L` is a random Cholesky matrix. Requires that
+    product `L L^T` where *L* is a random Cholesky matrix. Requires that
     *mat* is square.
 
 Input and output
@@ -394,6 +394,22 @@ Scalar arithmetic
 
     Sets *B* to `A / c`.
 
+Vector arithmetic
+-------------------------------------------------------------------------------
+
+.. function:: void arb_mat_vector_mul_row(arb_ptr res, arb_srcptr v, const arb_mat_t A, slong prec)
+
+.. function:: void arb_mat_vector_mul_col(arb_ptr res, const arb_mat_t A, arb_srcptr v, slong prec)
+
+    Sets *res* to the product `vA`, (resp. `Av`), where *res* and *v* are seen
+    as row (resp. column) vectors. The lengths of the vectors must match the
+    dimensions of *A*.
+
+.. function:: void arb_mat_bilinear_form(arb_t x, const arb_mat_t A, arb_srcptr v1, arb_srcptr v2, slong prec)
+
+    Sets *res* to the product `v_1^T A v_2`, where `v_1` and `v_2` are seen as
+    column vectors. The lengths of the vectors must match the dimensions of
+    *A*.
 
 Gaussian elimination and solving
 -------------------------------------------------------------------------------
@@ -780,7 +796,28 @@ In the future dedicated methods for real matrices will be added here.
 LLL reduction
 -------------------------------------------------------------------------------
 
-.. function:: arb_mat_spd_lll_reduce(fmpz_mat_t U, const arb_mat_t A, slong prec)
+.. function:: int arb_mat_spd_get_fmpz_mat(fmpz_mat_t B, const arb_mat_t A, slong prec)
+
+    Attempts to set *B* to a symmetric and positive definite matrix obtained by
+    rounding the midpoints of entries of `2^{\mathit{prec}}\cdot A` to
+    integers. Returns 1 on success. Returns 0 and leaves *B* undefined if *A*
+    is not symmetric or the result of rounding is not a positive definite
+    matrix. The warnings of :func:`arf_get_fmpz` apply.
+
+.. function:: void arb_mat_spd_lll_reduce(fmpz_mat_t U, const arb_mat_t A, slong prec)
 
     Given a symmetric positive definite matrix *A*, compute a unimodular
-    transformation *U* such that *U^T A U* is close to being LLL-reduced.
+    transformation *U* such that *U^T A U* is close to being LLL-reduced. If
+    :func:`arb_mat_spd_get_fmpz_mat` succeeds at the chosen precision, we call
+    :func:`fmpz_lll`, and otherwise set *U* to the identity matrix. The
+    warnings of :func:`arf_get_fmpz` apply.
+
+.. function:: int arb_mat_spd_is_lll_reduced(const arb_mat_t A, slong tol_exp, slong prec)
+
+    Returns nonzero iff *A* is LLL-reduced with a tolerance of `\varepsilon =
+    2^{\stars{tol_exp}`. This means the following. First, the error radius on
+    each entry of *A* must be at most `\varepsilon/16`. Then we consider the
+    matrix whose entries are `2^{\mathit{prec}}(1 + \varepsilon)^{\min(i,j)}
+    A_{i,j}` rounded to integers: it must be positive definite and pass
+    :func:`fmpz_mat_is_reduced` with default parameters. The warnings of
+    :func:`arf_get_fmpz` apply.

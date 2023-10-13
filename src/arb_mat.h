@@ -319,6 +319,8 @@ void arb_mat_vector_mul_row(arb_ptr res, arb_srcptr v, const arb_mat_t A, slong 
 
 void arb_mat_vector_mul_col(arb_ptr res, const arb_mat_t A, arb_srcptr v, slong prec);
 
+void arb_mat_bilinear_form(arb_t res, const arb_mat_t A, arb_srcptr v1, arb_srcptr v2, slong prec);
+
 /* Solving */
 
 ARB_MAT_INLINE void
@@ -445,15 +447,13 @@ arb_mat_allocated_bytes(const arb_mat_t x)
     return _arb_vec_allocated_bytes(x->entries, x->r * x->c) + x->r * sizeof(arb_ptr);
 }
 
-/* Quadratic forms */
+/* LLL reduction */
 
 int arb_mat_spd_get_fmpz_mat(fmpz_mat_t B, const arb_mat_t A, slong prec);
 
 void arb_mat_spd_lll_reduce(fmpz_mat_t U, const arb_mat_t A, slong prec);
 
 int arb_mat_spd_is_lll_reduced(const arb_mat_t A, slong tol_exp, slong prec);
-
-void arb_mat_bilinear_form(arb_t x, const arb_mat_t A, arb_srcptr v1, arb_srcptr v2, slong prec);
 
 #ifdef __cplusplus
 }

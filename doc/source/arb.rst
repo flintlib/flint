@@ -1911,6 +1911,18 @@ Vector functions
 
     Returns nonzero iff all entries in *x* certainly are finite.
 
+.. function:: int _arb_vec_equal(arb_srcptr vec1, arb_srcptr vec2, slong len)
+
+    Returns nonzero iff *vec1* equals *vec2* elementwise.
+
+.. function:: int _arb_vec_overlaps(arb_srcptr vec1, arb_srcptr vec2, slong len)
+
+    Returns nonzero iff *vec1* overlaps *vec2* elementwise.
+
+.. function:: int _arb_vec_contains(arb_srcptr vec1, arb_srcptr vec2, slong len)
+
+    Returns nonzero iff *vec1* contains *vec2* elementwise.
+
 .. function:: void _arb_vec_set(arb_ptr res, arb_srcptr vec, slong len)
 
     Sets *res* to a copy of *vec*.
@@ -1973,3 +1985,9 @@ Vector functions
     Calls :func:`arb_get_unique_fmpz` elementwise and returns nonzero if
     all entries can be rounded uniquely to integers. If any entry in *vec*
     cannot be rounded uniquely to an integer, returns zero.
+
+.. function:: void _arb_vec_printn(arb_srcptr vec, slong len, slong digits, ulong flags)
+
+.. function:: _arb_vec_printd(arb_srcptr vec, slong len, slong ndigits)
+
+    Prints *vec* in decimal using :func:`arb_printn` or :func:`arb_printd` on each entry.

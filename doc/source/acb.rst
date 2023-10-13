@@ -188,13 +188,6 @@ The *acb_print...* functions print to standard output, while
     Any flags understood by :func:`arb_get_str` can be passed via *flags*
     to control the format of the real and imaginary parts.
 
-.. function:: void _acb_vec_printd(acb_srcptr vec, slong len, slong digits)
-
-.. function:: void _acb_vec_printn(acb_srcptr vec, slong len, slong digits, ulong flags)
-
-    Prints *vec* in decimal, using :func:`acb_printd` or :func:`acb_printn` on
-    each entry.
-
 Random number generation
 -------------------------------------------------------------------------------
 
@@ -464,7 +457,7 @@ Arithmetic
 
 .. function:: void acb_mul_powi(acb_t z, const acb_t x, slong k)
 
-    Sets *z* to *x* multiplied by *i^k*, where *i* denotes the imaginary unit.
+    Sets *z* to *x* multiplied by `i^k`, where *i* denotes the imaginary unit.
 
 .. function:: void acb_mul_ui(acb_t z, const acb_t x, ulong y, slong prec)
 
@@ -628,6 +621,12 @@ Powers and roots
 
     Computes the reciprocal square root. If *analytic* is set, gives a
     NaN-containing result if *z* touches the branch cut.
+
+.. function:: void acb_sqrts(acb_t y1, acb_t y2, const acb_t x, slong prec)
+
+    Sets *y1* and *y2* to the two square roots of *x*, without any precision
+    loss due to branch cuts. The order in which the square roots appear is not
+    specified.
 
 .. function:: void acb_quadratic_roots_fmpz(acb_t r1, acb_t r2, const fmpz_t a, const fmpz_t b, const fmpz_t c, slong prec)
 
@@ -1178,6 +1177,22 @@ Vector functions
 
     Returns nonzero iff all entries in *x* have zero imaginary part.
 
+.. function:: int _acb_vec_is_finite(acb_srcptr vec, slong len)
+
+    Returns nonzero iff all entries in *x* certainly are finite.
+
+.. function:: int _acb_vec_equal(acb_srcptr vec1, acb_srcptr vec2, slong len)
+
+    Returns true iff *vec1* equals *vec2* elementwise.
+
+.. function:: int _acb_vec_overlaps(acb_srcptr vec1, acb_srcptr vec2, slong len)
+
+    Returns true iff *vec1* overlaps *vec2* elementwise.
+
+.. function:: int _acb_vec_contains(acb_srcptr vec1, acb_srcptr vec2, slong len)
+
+    Returns true iff *vec1* contains *vec2* elementwise.
+
 .. function:: void _acb_vec_set(acb_ptr res, acb_srcptr vec, slong len)
 
     Sets *res* to a copy of *vec*.
@@ -1186,17 +1201,20 @@ Vector functions
 
     Sets *res* to a copy of *vec*, rounding each entry to *prec* bits.
 
-.. function:: void _acb_vec_overlaps(acb_srcptr vec1, acb_srcptr vec2, slong len)
-
-    Returns true iff *vec1* overlaps *vec2* entrywise.
-
-.. function:: void _acb_vec_contains(acb_srcptr vec1, acb_srcptr vec2, slong len)
-
-    Returns true iff *vec1* contains *vec2* entrywise.
-
 .. function:: void _acb_vec_swap(acb_ptr vec1, acb_ptr vec2, slong len)
 
     Swaps the entries of *vec1* and *vec2*.
+
+.. function:: void _acb_vec_get_real(arb_ptr re, acb_srcptr vec, slong len)
+
+.. function:: void _acb_vec_get_imag(arb_ptr im, acb_srcptr vec, slong len)
+
+    Sets each entry of *re* (resp. *im*) to the real (resp. imaginary) part of
+    the corresponding entry of *vec*.
+
+.. function:: void _acb_vec_set_real_imag(acb_ptr vec, arb_srcptr re, arb_srcptr im, slong len)
+
+    Sets *vec* to the vector with real part *re* and imaginary part *im*.
 
 .. function:: void _acb_vec_neg(acb_ptr res, acb_srcptr vec, slong len)
 
@@ -1276,3 +1294,9 @@ Vector functions
     This is intended to reveal structure when printing a set of complex numbers,
     not to apply an order relation in a rigorous way.
 
+.. function:: void _acb_vec_printd(acb_srcptr vec, slong len, slong digits)
+
+.. function:: void _acb_vec_printn(acb_srcptr vec, slong len, slong digits, ulong flags)
+
+    Prints *vec* in decimal using :func:`acb_printd` or :func:`acb_printn` on
+    each entry.

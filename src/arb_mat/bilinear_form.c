@@ -12,7 +12,7 @@
 #include "arb_mat.h"
 
 void
-arb_mat_bilinear_form(arb_t x, const arb_mat_t A, arb_srcptr v1, arb_srcptr v2, slong prec)
+arb_mat_bilinear_form(arb_t res, const arb_mat_t A, arb_srcptr v1, arb_srcptr v2, slong prec)
 {
     slong nrow = arb_mat_nrows(A);
     slong ncol = arb_mat_ncols(A);
@@ -34,7 +34,7 @@ arb_mat_bilinear_form(arb_t x, const arb_mat_t A, arb_srcptr v1, arb_srcptr v2, 
     }
     arb_mat_mul(prod, A, col, prec);
     arb_mat_mul(scal, row, prod, prec);
-    arb_set(x, arb_mat_entry(scal, 0, 0));
+    arb_set(res, arb_mat_entry(scal, 0, 0));
 
     arb_mat_clear(col);
     arb_mat_clear(row);

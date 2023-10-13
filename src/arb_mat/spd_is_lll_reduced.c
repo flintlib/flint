@@ -16,16 +16,14 @@
 int arb_mat_spd_is_lll_reduced(const arb_mat_t A, slong tol_exp, slong prec)
 {
     slong g = arb_mat_nrows(A);
-    fmpz_lll_t fl;
     arb_mat_t B;
-    fmpz_mat_t N, U;
+    fmpz_mat_t N;
     arb_t c;
     int res = 1;
     slong j, k;
 
     arb_mat_init(B, g, g);
     fmpz_mat_init(N, g, g);
-    fmpz_mat_init(U, g, g);
     arb_init(c);
 
     /* Set B, check error bounds on coefficients */
@@ -49,15 +47,11 @@ int arb_mat_spd_is_lll_reduced(const arb_mat_t A, slong tol_exp, slong prec)
     if (res)
     {
         /* Default Flint LLL values, except Gram */
-        fmpz_lll_context_init(fl, 0.99, 0.51, GRAM, EXACT);
-        fmpz_mat_one(U);
-        fmpz_lll(N, U, fl);
-        res = fmpz_mat_is_one(U);
+        res = fmpz_mat_is_reduced_gram(N, 0.99, 0.51);
     }
 
     arb_mat_clear(B);
     fmpz_mat_clear(N);
-    fmpz_mat_clear(U);
     arb_clear(c);
     return res;
 }
