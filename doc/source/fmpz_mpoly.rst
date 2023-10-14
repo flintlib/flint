@@ -892,7 +892,7 @@ Vectors
 
     A type holding a vector of :type:`fmpz_mpoly_t`.
 
-.. macro::  fmpz_mpoly_vec_entry(vec, i)
+.. macro:: fmpz_mpoly_vec_entry(vec, i)
 
     Macro for accessing the entry at position *i* in *vec*.
 
@@ -900,7 +900,7 @@ Vectors
 
     Initializes *vec* to a vector of length *len*, setting all entries to the zero polynomial.
 
-.. function::void fmpz_mpoly_vec_clear(fmpz_mpoly_vec_t vec, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_vec_clear(fmpz_mpoly_vec_t vec, const fmpz_mpoly_ctx_t ctx)
 
     Clears *vec*, freeing its allocated memory.
 
