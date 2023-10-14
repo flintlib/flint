@@ -31,8 +31,10 @@ to avoid problems with integer promotion.
 Similar to the previous macro, ``FLINT_MAX(x, y)`` returns the
 maximum of `x` and `y`.
 
-The function ``FLINT_BIT_COUNT(x)`` returns the number of binary bits
-required to represent an ``ulong x``.  If `x` is zero, returns `0`.
+.. function:: mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
+
+    Returns the number of binary bits required to represent an ``ulong x``.  If
+    `x` is zero, returns `0`.
 
 Derived from this there are the two macros ``FLINT_FLOG2(x)`` and
 ``FLINT_CLOG2(x)`` which, for any `x \geq 1`, compute `\lfloor \log_2 x  \rfloor`

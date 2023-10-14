@@ -45,6 +45,11 @@ Types, macros and constants
     An array of length 1 of fmpq's.  This is used to pass fmpq's around by
     reference without fuss, similar to the way mpq_t's work.
 
+.. function:: fmpz * fmpq_numref(const fmpq_t x)
+              fmpz * fmpq_denref(const fmpq_t x)
+
+    Returns respectively a pointer to the numerator and denominator of x.
+
 Memory management
 --------------------------------------------------------------------------------
 
