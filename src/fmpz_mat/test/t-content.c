@@ -9,18 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-int main(void)
+TEST_FUNCTION_START(fmpz_mat_content)
 {
 	int i;
 	fmpz_mat_t A,B;
 	fmpz_t scalar, gcd_mat, temp;
-	FLINT_TEST_INIT(state);
-
-	flint_printf("fmpz_mat_content....");
-	fflush(stdout);
 
 	for (i = 0; i < 100 * flint_test_multiplier(); i++)
 	{
@@ -79,8 +76,6 @@ cleanup:
 	}
 
 
-	FLINT_TEST_CLEANUP(state);
-	flint_printf("PASS\n");
-	return 0;
+    TEST_FUNCTION_END;
 }
 
