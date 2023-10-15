@@ -11,19 +11,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_revert_series_lagrange_fast)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("revert_series_lagrange_fast....");
-    fflush(stdout);
-
-
 
     /* Check aliasing */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -100,8 +94,5 @@ main(void)
         nmod_poly_clear(h);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }

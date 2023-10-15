@@ -9,18 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "nmod.h"
 #include "nmod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_power_sums_schoenhage)
 {
     int l, result;
     mp_limb_t i, j, k, tot;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("power_sums_schoenhage....");
 
     /* Check that it is valid in degree 3 with integer roots, ie */
     /* for polynomials of the form (x-i)(x-j)(x-k)               */
@@ -202,8 +198,5 @@ main(void)
         nmod_poly_clear(d);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }

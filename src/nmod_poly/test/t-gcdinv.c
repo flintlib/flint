@@ -9,17 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_gcdinv)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    printf("gcdinv....");
-    fflush(stdout);
 
     /* Generic case, most likely co-prime arguments ******************************/
 
@@ -130,8 +126,6 @@ main(void)
         nmod_poly_clear(u);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }
 

@@ -9,18 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_invmod)
 {
     int i, result;
 
-    FLINT_TEST_INIT(state);
-
-    printf("invmod....");
-    fflush(stdout);
 
     /* Test aliasing *************************************************************/
 
@@ -199,8 +195,6 @@ main(void)
         nmod_poly_clear(u);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }
 
