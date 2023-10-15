@@ -134,7 +134,7 @@ Dot products
     this function returns the precise limb size of ``len`` times
     ``(mod.n - 1) ^ 2``.
 
-.. function:: macro NMOD_VEC_DOT(res, i, len, expr1, expr2, mod, nlimbs)
+.. macro:: NMOD_VEC_DOT(res, i, len, expr1, expr2, mod, nlimbs)
 
     Effectively performs the computation::
 

@@ -1071,6 +1071,9 @@ Square root and perfect power testing
 Factorisation
 --------------------------------------------------------------------------------
 
+.. function:: void n_factor_init(n_factor_t * factors)
+
+    Initializes factors.
 
 .. function:: int n_remove(ulong * n, ulong p)
 
