@@ -9,19 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq.h"
 #include "fmpq_poly.h"
 
 #pragma GCC diagnostic ignored "-Woverlength-strings"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_poly_resultant_div)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("resultant_div....");
-    fflush(stdout);
 
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
@@ -144,9 +140,5 @@ main(void)
         fmpz_clear(den);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }
-
