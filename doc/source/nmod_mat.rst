@@ -81,7 +81,7 @@ Basic properties and manipulation
 --------------------------------------------------------------------------------
 
 
-.. function:: MACRO nmod_mat_entry(nmod_mat_t mat, slong i, slong j)
+.. macro:: nmod_mat_entry(mat, i, j)
 
     Directly accesses the entry in ``mat`` in row `i` and column `j`,
     indexed from zero. No bounds checking is performed. This macro can be
