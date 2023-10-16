@@ -9,10 +9,16 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_dft.h"
 
+/* Both of these are defined in t-convol.c and t-dft.c. However, do_f is not the
+ * same. */
+#define do_f rajtantajtan
 typedef void (*do_f) (acb_ptr w, acb_srcptr v, slong len, slong prec);
 
+#ifndef check_vec_eq_prec
+#define check_vec_eq_prec check_vec_eq_prec
 void
 check_vec_eq_prec(acb_srcptr w1, acb_srcptr w2, slong len, slong prec, slong digits, ulong q, char d[], char f1[], char f2[])
 {
@@ -24,7 +30,7 @@ check_vec_eq_prec(acb_srcptr w1, acb_srcptr w2, slong len, slong prec, slong dig
         {
             flint_printf("FAIL\n\n");
             flint_printf("q = %wu, size = %wd\n", q, len);
-            flint_printf("\nDFT %s differ from index %wd / %wd \n", d, i, len);
+            flint_printf("\nDFT %sdiffer from index %wd / %wd \n", d, i, len);
             flint_printf("\n%s =\n", f1);
             acb_vec_printd_index(w1, len, digits);
             flint_printf("\n%s =\n", f2);
@@ -49,24 +55,19 @@ check_vec_eq_prec(acb_srcptr w1, acb_srcptr w2, slong len, slong prec, slong dig
         }
     }
 }
+#endif
 
-int main(void)
+TEST_FUNCTION_START(acb_dft)
 {
     slong k;
     slong prec = 100, digits = 30;
     slong nq = 19;
     ulong q[19] = { 0, 1, 2, 3, 4, 5, 6, 23, 10, 15, 16, 30, 59, 125, 308, 335, 525, 961, 1225};
     slong nr = 5;
-    flint_rand_t state;
 
     slong f, nf = 5;
     do_f func[5] = { acb_dft_naive, acb_dft_cyc, acb_dft_crt, acb_dft_bluestein, acb_dft };
     char * name[5] = { "naive", "cyc", "crt", "bluestein", "default" };
-
-    flint_printf("dft....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* cyclic dft */
     for (k = 0; k < nq + nr; k++)
@@ -107,19 +108,19 @@ int main(void)
                 _acb_vec_set(w3, v, len);
                 func[f](w3, w3, len, prec);
 
-                check_vec_eq_prec(w1, w3, len, prec, digits, len, "alias", name[0], name[f]);
+                check_vec_eq_prec(w1, w3, len, prec, digits, len, "alias ", name[0], name[f]);
             }
 
             if (f > f0)
             {
                 /* check non aliased */
-                check_vec_eq_prec(w1, w2, len, prec, digits, len, "no alias", name[0], name[f]);
+                check_vec_eq_prec(w1, w2, len, prec, digits, len, "no alias ", name[0], name[f]);
             }
             else
             {
                 /* check inverse */
                 acb_dft_inverse(w2, w1, len, prec);
-                check_vec_eq_prec(v, w2, len, prec, digits, len, "inverse", "original", "inverse");
+                check_vec_eq_prec(v, w2, len, prec, digits, len, "inverse ", "original", "inverse");
             }
         }
 
@@ -143,7 +144,7 @@ int main(void)
         acb_dft_cyc(w1, v, n, prec);
         acb_dft_rad2_inplace(w2, k, prec);
 
-        check_vec_eq_prec(w1, w2, n, prec, digits, n, "rad2", "cyc", "rad2");
+        check_vec_eq_prec(w1, w2, n, prec, digits, n, "rad2 ", "cyc", "rad2");
 
         _acb_vec_clear(v, n);
         _acb_vec_clear(w1, n);
@@ -166,15 +167,13 @@ int main(void)
         acb_dft_cyc(w1, v, n, prec);
         acb_dft_rad2_inplace_threaded(w2, k, prec);
 
-        check_vec_eq_prec(w1, w2, n, prec, digits, n, "rad2", "cyc", "rad2");
+        check_vec_eq_prec(w1, w2, n, prec, digits, n, "rad2 ", "cyc", "rad2");
 
         _acb_vec_clear(v, n);
         _acb_vec_clear(w1, n);
 
     }
 
-    flint_randclear(state);
-    flint_cleanup_master();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }
+#undef do_f

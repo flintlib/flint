@@ -9,12 +9,18 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_dft.h"
 
+/* Both of these are defined in t-convol.c and t-dft.c. However, do_f is not the
+ * same. */
+#define do_f hogusbogusname
 typedef void (*do_f) (acb_ptr z, acb_srcptr x, acb_srcptr y, slong len, slong prec);
 
+#ifndef check_vec_eq_prec
+#define check_vec_eq_prec check_vec_eq_prec
 void
-check_vec_eq_prec(acb_srcptr w1, acb_srcptr w2, slong len, slong prec, slong digits, ulong q, char f1[], char f2[])
+check_vec_eq_prec(acb_srcptr w1, acb_srcptr w2, slong len, slong prec, slong digits, ulong q, char d[], char f1[], char f2[])
 {
     slong i;
 
@@ -24,7 +30,7 @@ check_vec_eq_prec(acb_srcptr w1, acb_srcptr w2, slong len, slong prec, slong dig
         {
             flint_printf("FAIL\n\n");
             flint_printf("q = %wu, size = %wd\n", q, len);
-            flint_printf("\nDFT differ from index %wd / %wd \n", i, len);
+            flint_printf("\nDFT %sdiffer from index %wd / %wd \n", d, i, len);
             flint_printf("\n%s =\n", f1);
             acb_vec_printd_index(w1, len, digits);
             flint_printf("\n%s =\n", f2);
@@ -49,25 +55,19 @@ check_vec_eq_prec(acb_srcptr w1, acb_srcptr w2, slong len, slong prec, slong dig
         }
     }
 }
+#endif
 
-int main(void)
+TEST_FUNCTION_START(acb_dft_convol)
 {
-
     slong k;
     slong prec = 100, digits = 30;
     slong nq = 17;
     ulong q[17] = { 0, 1, 2, 3, 4, 5, 6, 23, 10, 15, 30, 59, 256, 308, 335, 344, 961};
     ulong nr = 5;
-    flint_rand_t state;
 
     slong f, nf = 4;
     do_f func[4] = { acb_dft_convol_naive, acb_dft_convol_rad2, acb_dft_convol_dft, acb_dft_convol_mullow };
     char * name[4] = { "naive", "rad2", "dft", "mullow" };
-
-    flint_printf("convol....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (k = 0; k < nq + nr; k++)
     {
@@ -105,7 +105,7 @@ int main(void)
             if (f == 0)
                 continue;
 
-            check_vec_eq_prec(z1, z2, len, prec, digits, len, name[0], name[f]);
+            check_vec_eq_prec(z1, z2, len, prec, digits, len, "", name[0], name[f]);
 
         }
 
@@ -115,8 +115,6 @@ int main(void)
         _acb_vec_clear(z2, len);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }
+#undef do_f
