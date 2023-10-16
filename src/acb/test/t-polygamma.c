@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb.h"
 
 static const char *testdata[5] = {
@@ -19,15 +20,9 @@ static const char *testdata[5] = {
     "-2.404113806319188570799476323022899981529972584680997763584543110683676411572626180372911747218670516 +/- 1e-90",
 };
 
-int main(void)
+TEST_FUNCTION_START(acb_polygamma)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("polygamma....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -87,8 +82,5 @@ int main(void)
         acb_clear(c);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }

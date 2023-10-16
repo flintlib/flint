@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb.h"
 
 #ifdef __GNUC__
@@ -21,7 +22,7 @@
 #define NUM_DERIVS 4
 #define NUM_TESTS 11
 
-const double agm_testdata[NUM_TESTS][10] = {
+const double agm1_testdata[NUM_TESTS][10] = {
     {1.0, 0.0, 1.0, 0.0, 0.5, 0.0, -0.0625, 0.0, 0.03125, 0.0},
     {0.25, 0.0, 0.56075714507190064253, 0.0, 0.76633907325304843764, 0.0,
         -0.58010113691169132987, 0.0, 1.2991960360521313649, 0.0},
@@ -63,15 +64,9 @@ const double agm_testdata[NUM_TESTS][10] = {
         92537341636.835656296},
 };
 
-int main(void)
+TEST_FUNCTION_START(acb_agm1)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("agm1....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* check particular values against table */
     {
@@ -89,22 +84,22 @@ int main(void)
             {
                 for (cnj = 0; cnj < 2; cnj++)
                 {
-                    if (cnj == 1 && agm_testdata[i][0] < 0 &&
-                        agm_testdata[i][1] == 0)
+                    if (cnj == 1 && agm1_testdata[i][0] < 0 &&
+                        agm1_testdata[i][1] == 0)
                         continue;
 
                     acb_zero(z);
-                    arf_set_d(arb_midref(acb_realref(z)), agm_testdata[i][0]);
-                    arf_set_d(arb_midref(acb_imagref(z)), cnj ? -agm_testdata[i][1] : agm_testdata[i][1]);
+                    arf_set_d(arb_midref(acb_realref(z)), agm1_testdata[i][0]);
+                    arf_set_d(arb_midref(acb_imagref(z)), cnj ? -agm1_testdata[i][1] : agm1_testdata[i][1]);
 
                     acb_agm1_cpx(w1, z, NUM_DERIVS, prec);
 
                     for (j = 0; j < NUM_DERIVS; j++)
                     {
-                        arf_set_d(arb_midref(acb_realref(t)), agm_testdata[i][2+2*j]);
-                        mag_set_d(arb_radref(acb_realref(t)), fabs(agm_testdata[i][2+2*j]) * EPS);
-                        arf_set_d(arb_midref(acb_imagref(t)), cnj ? -agm_testdata[i][2+2*j+1] : agm_testdata[i][2+2*j+1]);
-                        mag_set_d(arb_radref(acb_imagref(t)), fabs(agm_testdata[i][2+2*j+1]) * EPS);
+                        arf_set_d(arb_midref(acb_realref(t)), agm1_testdata[i][2+2*j]);
+                        mag_set_d(arb_radref(acb_realref(t)), fabs(agm1_testdata[i][2+2*j]) * EPS);
+                        arf_set_d(arb_midref(acb_imagref(t)), cnj ? -agm1_testdata[i][2+2*j+1] : agm1_testdata[i][2+2*j+1]);
+                        mag_set_d(arb_radref(acb_imagref(t)), fabs(agm1_testdata[i][2+2*j+1]) * EPS);
 
                         if (!acb_overlaps(w1 + j, t))
                         {
@@ -185,9 +180,8 @@ int main(void)
         acb_clear(t);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }
-
+#undef EPS
+#undef NUM_DERIVS
+#undef NUM_TESTS

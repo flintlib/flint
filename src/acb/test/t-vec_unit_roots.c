@@ -9,18 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq.h"
 #include "acb.h"
 
-int main(void)
+TEST_FUNCTION_START(acb_vec_unit_roots)
 {
     slong len;
-    flint_rand_t state;
-
-    flint_printf("vec_unit_roots....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (len = 0; len < 100; len++)
     {
@@ -78,9 +73,6 @@ int main(void)
         }
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }
 

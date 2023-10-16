@@ -9,19 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb.h"
 
 FLINT_DLL extern slong acb_dot_gauss_dot_cutoff;
 
-int main(void)
+TEST_FUNCTION_START(acb_approx_dot)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("approx_dot....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -254,8 +249,5 @@ int main(void)
         _acb_vec_clear(y, len);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }
