@@ -231,7 +231,9 @@ List of removals
 * ``__fmpz_mod_poly_div_divconquer, __fmpz_mod_poly_divrem_divconquer, __fq_nmod_poly_divrem_divconquer, __fq_poly_divrem_divconquer, __fq_zech_poly_divrem_divconquer``
 * ``__nmod_poly_div_divconquer, __nmod_poly_divrem_divconquer, __nmod_poly_invsqrt_series_prealloc``
 * ``_acb_poly_compose_axnc, _acb_poly_compose_divconquer, _acb_poly_compose_horner, _acb_poly_compose_series_brent_kung, _acb_poly_compose_series_horner, _acb_poly_sin_cos_series_basecase, _acb_poly_sin_cos_series_tangent, _acb_poly_taylor_shift_convolution, _acb_poly_taylor_shift_divconquer, _acb_poly_taylor_shift_horner``
+* ``acb_rising_ui_bs, acb_rising_ui_rs, acb_rising_ui_rec``
 * ``_arb_poly_compose_axnc, _arb_poly_compose_divconquer, _arb_poly_compose_horner, _arb_poly_compose_series_brent_kung, _arb_poly_compose_series_horner, _arb_poly_sin_cos_series_basecase, _arb_poly_sin_cos_series_tangent, _arb_poly_taylor_shift_convolution, _arb_poly_taylor_shift_divconquer, _arb_poly_taylor_shift_horner``
+* ``arb_rising_ui_bs, arb_rising_ui_rs, arb_rising_ui_rec, arb_rising2_ui_bs, arb_rising2_ui_rs, arb_rising2_ui``
 * ``_arith_bernoulli_number_vec_zeta, _arith_bernoulli_number_zeta, _arith_cos_minpoly, _arith_euler_number_zeta, _arith_number_of_partitions_mpfr``
 * ``_ca_poly_atan_series, _ca_poly_compose_divconquer, _ca_poly_compose_horner``
 * ``_fmpq_poly_set_array_mpq``
