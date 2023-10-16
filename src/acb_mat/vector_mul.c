@@ -12,51 +12,55 @@
 #include "acb_mat.h"
 
 void
-acb_mat_vector_mul_row(acb_ptr res, acb_srcptr v, const acb_mat_t A, slong prec)
+_acb_mat_vector_mul_row(acb_ptr res, acb_srcptr v, const acb_mat_t A, slong prec)
 {
-    slong nrow = acb_mat_nrows(A);
-    slong ncol = acb_mat_ncols(A);
-    acb_mat_t r, p;
+    slong r = acb_mat_nrows(A);
+    slong c = acb_mat_ncols(A);
     slong k;
 
-    acb_mat_init(r, 1, nrow);
-    acb_mat_init(p, 1, ncol);
-
-    for (k = 0; k < nrow; k++)
+    for (k = 0; k < c; k++)
     {
-        acb_set(acb_mat_entry(r, 0, k), &v[k]);
+        acb_dot(&res[k], NULL, 0, &(A->entries[k]), c, v, 1, r, prec);
     }
-    acb_mat_mul(p, r, A, prec);
-    for (k = 0; k < ncol; k++)
-    {
-        acb_set(&res[k], acb_mat_entry(p, 0, k));
-    }
+}
 
-    acb_mat_clear(r);
-    acb_mat_clear(p);
+void
+acb_mat_vector_mul_row(acb_ptr res, acb_srcptr v, const acb_mat_t A, slong prec)
+{
+    slong c = acb_mat_ncols(A);
+    acb_ptr aux;
+
+    aux = _acb_vec_init(c);
+
+    _acb_mat_vector_mul_row(aux, v, A, prec);
+    _acb_vec_set(res, aux, c);
+
+    _acb_vec_clear(aux, c);
+}
+
+void
+_acb_mat_vector_mul_col(acb_ptr res, const acb_mat_t A, acb_srcptr v, slong prec)
+{
+    slong r = acb_mat_nrows(A);
+    slong c = acb_mat_ncols(A);
+    slong k;
+
+    for (k = 0; k < r; k++)
+    {
+        acb_dot(&res[k], NULL, 0, A->rows[k], 1, v, 1, c, prec);
+    }
 }
 
 void
 acb_mat_vector_mul_col(acb_ptr res, const acb_mat_t A, acb_srcptr v, slong prec)
 {
-    slong nrow = acb_mat_nrows(A);
-    slong ncol = acb_mat_ncols(A);
-    acb_mat_t c, p;
-    slong k;
+    slong r = acb_mat_nrows(A);
+    acb_ptr aux;
 
-    acb_mat_init(c, ncol, 1);
-    acb_mat_init(p, nrow, 1);
+    aux = _acb_vec_init(r);
 
-    for (k = 0; k < ncol; k++)
-    {
-        acb_set(acb_mat_entry(c, k, 0), &v[k]);
-    }
-    acb_mat_mul(p, A, c, prec);
-    for (k = 0; k < nrow; k++)
-    {
-        acb_set(&res[k], acb_mat_entry(p, k, 0));
-    }
+    _acb_mat_vector_mul_col(aux, A, v, prec);
+    _acb_vec_set(res, aux, r);
 
-    acb_mat_clear(c);
-    acb_mat_clear(p);
+    _acb_vec_clear(aux, r);
 }

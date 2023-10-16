@@ -1183,7 +1183,8 @@ Vector functions
 
 .. function:: int _acb_vec_equal(acb_srcptr vec1, acb_srcptr vec2, slong len)
 
-    Returns true iff *vec1* equals *vec2* elementwise.
+    Returns nonzero iff *vec1* and *vec2* are equal in the sense of
+    :func:`acb_equal`, i.e. have both the same midpoint and radius elementwise.
 
 .. function:: int _acb_vec_overlaps(acb_srcptr vec1, acb_srcptr vec2, slong len)
 

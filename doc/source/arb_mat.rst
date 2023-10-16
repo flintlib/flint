@@ -389,6 +389,10 @@ Scalar arithmetic
 Vector arithmetic
 -------------------------------------------------------------------------------
 
+.. function:: void _arb_mat_vector_mul_row(arb_ptr res, arb_srcptr v, const arb_mat_t A, slong prec)
+
+.. function:: void _arb_mat_vector_mul_col(arb_ptr res, const arb_mat_t A, arb_srcptr v, slong prec)
+
 .. function:: void arb_mat_vector_mul_row(arb_ptr res, arb_srcptr v, const arb_mat_t A, slong prec)
 
 .. function:: void arb_mat_vector_mul_col(arb_ptr res, const arb_mat_t A, arb_srcptr v, slong prec)
@@ -396,6 +400,8 @@ Vector arithmetic
     Sets *res* to the product `vA`, (resp. `Av`), where *res* and *v* are seen
     as row (resp. column) vectors. The lengths of the vectors must match the
     dimensions of *A*.
+
+    The underscore methods do not allow aliasing between *res* and *v*.
 
 .. function:: void arb_mat_bilinear_form(arb_t x, const arb_mat_t A, arb_srcptr v1, arb_srcptr v2, slong prec)
 
