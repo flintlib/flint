@@ -9,18 +9,16 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_dirichlet.h"
 
-int main(void)
+TEST_FUNCTION_START(acb_dirichlet_platt_zeta_zeros)
 {
     fmpz_t n;
     acb_ptr pa, pb;
     slong count, i;
     slong maxcount = 50;
     slong prec = 64;
-
-    flint_printf("platt_zeta_zeros....");
-    fflush(stdout);
 
     fmpz_init(n);
     pa = _acb_vec_init(maxcount);
@@ -54,7 +52,5 @@ int main(void)
     _acb_vec_clear(pa, maxcount);
     _acb_vec_clear(pb, maxcount);
 
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }

@@ -9,9 +9,10 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_dirichlet.h"
 
-int main(void)
+TEST_FUNCTION_START(acb_dirichlet_platt_local_hardy_z_zeros)
 {
     /* Check a specific combination of parameter values that is relatively fast
      * to evaluate and that has relatively tight bounds. */
@@ -22,9 +23,6 @@ int main(void)
     slong count, i;
     slong maxcount = 50;
     slong prec = 128;
-
-    flint_printf("platt_local_hardy_z_zeros....");
-    fflush(stdout);
 
     arb_init(h);
     arb_init(H);
@@ -83,7 +81,5 @@ int main(void)
     _arb_vec_clear(pa, maxcount);
     _arb_vec_clear(pb, maxcount);
 
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }

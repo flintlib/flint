@@ -9,18 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_dirichlet.h"
 
-int main(void)
+TEST_FUNCTION_START(acb_dirichlet_jacobi)
 {
     slong prec = 128;
     ulong q;
 
-    flint_printf("jacobi....");
-    fflush(stdout);
-
     /* check Jacobi sums */
-
     for (q = 29 * 29; q > 1; q = q%2 ? 3*q+1 : q/2)
     {
         slong m1, m2;
@@ -82,7 +79,5 @@ int main(void)
         dirichlet_char_clear(chi2);
     }
 
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }

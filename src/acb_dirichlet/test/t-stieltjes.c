@@ -9,20 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_dirichlet.h"
 
 void acb_dirichlet_stieltjes_integral(acb_t res, const fmpz_t n, const acb_t a, slong prec);
 void acb_dirichlet_stieltjes_em(acb_t res, const fmpz_t n, const acb_t a, slong prec);
 
-int main(void)
+TEST_FUNCTION_START(acb_dirichlet_stieltjes)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("stieltjes....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 250 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -120,9 +115,6 @@ int main(void)
         fmpz_clear(n);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }
 

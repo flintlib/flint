@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_dirichlet.h"
 
 typedef void (*do_f) (acb_ptr w, acb_srcptr v, slong len, slong prec);
@@ -51,18 +52,12 @@ check_vec_eq_prec(acb_srcptr w1, acb_srcptr w2, slong len, slong prec, slong dig
 }
 
 
-int main(void)
+TEST_FUNCTION_START(acb_dirichlet_dft)
 {
     slong k;
     slong prec = 100, digits = 30;
     slong nq = 13;
     ulong q[13] = { 2, 3, 4, 5, 6, 23, 10, 15, 30, 59, 308, 335, 961};
-    flint_rand_t state;
-
-    flint_printf("dft....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* Dirichlet group DFT */
     for (k = 0; k < nq; k++)
@@ -121,8 +116,5 @@ int main(void)
         acb_clear(chiy);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }

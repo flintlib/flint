@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_dirichlet.h"
 
 #ifdef __GNUC__
@@ -39,14 +40,9 @@ const double L10[8] = {
   0.999007468458940084215357132419
 };
 
-int main(void)
+TEST_FUNCTION_START(acb_dirichlet_euler_product_real_ui)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("euler_product_real_ui....");
-    fflush(stdout);
-    flint_randinit(state);
 
     for (iter = 0; iter < 3000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -131,9 +127,6 @@ int main(void)
         arb_clear(res2);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }
 

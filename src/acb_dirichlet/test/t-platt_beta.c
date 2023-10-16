@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_dirichlet.h"
 
 static void
@@ -30,15 +31,10 @@ _arb_lt_d(const arb_t a, double d)
     return result;
 }
 
-int main(void)
+TEST_FUNCTION_START(acb_dirichlet_platt_beta)
 {
     slong iter;
-    flint_rand_t state;
     arb_t x, t, t0, expe;
-
-    flint_printf("platt_beta....");
-    fflush(stdout);
-    flint_randinit(state);
 
     arb_init(x);
     arb_init(t);
@@ -119,8 +115,5 @@ int main(void)
     arb_clear(t0);
     arb_clear(expe);
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }

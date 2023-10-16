@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_dirichlet.h"
 
 #ifdef __GNUC__
@@ -60,15 +61,9 @@ static const double laurent_data[TESTQ][TESTLEN] = {
         0.024624650443138705595, -0.004951850872731033514, -0.00020178815459414925709}
 };
 
-int main(void)
+TEST_FUNCTION_START(acb_dirichlet_l_jet)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("l_jet....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* test Laurent series at s = 1 */
     {
@@ -199,9 +194,6 @@ int main(void)
         _acb_vec_clear(vec2, len2);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }
 

@@ -2,12 +2,14 @@
     Copyright (C) 2022 Fredrik Johansson
 
     This file is part of Arb.
+
     Arb is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_dirichlet.h"
 
 void
@@ -59,15 +61,9 @@ const double testdata[NUM_TESTS][8] = {
     { -3.0, 0.0, -2.0, 0.0, -2.0, 0.0, 1.84375, 0.0 },
 };
 
-int main(void)
+TEST_FUNCTION_START(acb_dirichlet_lerch_phi)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("lerch_phi....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* check test values */
     for (iter = 0; iter < 5 * 0.1 * flint_test_multiplier(); iter++)
@@ -192,8 +188,5 @@ int main(void)
         acb_clear(r3);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }

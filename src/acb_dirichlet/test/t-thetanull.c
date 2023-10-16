@@ -9,15 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_dirichlet.h"
 
-int main(void)
+TEST_FUNCTION_START(acb_dirichlet_thetanull)
 {
     slong prec = 64;
     ulong q;
-
-    flint_printf("thetanull....");
-    fflush(stdout);
 
     /* check the only theta functions
      *   theta(chi) = sum chi(k)* k^odd * exp(-Pi * k^2 / q)
@@ -113,7 +111,5 @@ int main(void)
         dirichlet_char_clear(chi);
     }
 
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }

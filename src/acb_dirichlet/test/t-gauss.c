@@ -9,18 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_dirichlet.h"
 
-int main(void)
+TEST_FUNCTION_START(acb_dirichlet_gauss)
 {
     slong prec = 128;
     ulong q;
 
-    flint_printf("gauss....");
-    fflush(stdout);
-
     /* check Gauss sums */
-
     for (q = 3; q < 250; q ++)
     {
         dirichlet_group_t G;
@@ -75,7 +72,5 @@ int main(void)
         dirichlet_char_clear(chi);
     }
 
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }
