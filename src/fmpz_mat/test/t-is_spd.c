@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_mat.h"
 
 int main(void)
@@ -21,31 +22,60 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: Gram matrices are positive definite iff full rank */
+    /* Test:
+       - fails for non-square matrices
+       - fails for non-symmetric matrices
+       - Gram matrices are positive definite iff full rank */
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         slong n = n_randint(state, 10);
         slong rk;
-        fmpz_mat_t A;
+        fmpz_mat_t A, B, C;
+        slong j, k;
         int res;
 
-        fmpz_mat_init(A, n, n);
+        fmpz_mat_init(A, n, n + 1 + n_randint(state, 10));
+        fmpz_mat_init(B, n, n);
+        fmpz_mat_init(C, n, n);
 
-        fmpz_mat_randtest(A, state, 1 + n_randint(state, 200));
-        fmpz_mat_gram(A, A);
-        rk = fmpz_mat_rank(A);
-        res = fmpz_mat_is_spd(A);
+        fmpz_mat_one(A);
+        if (fmpz_mat_is_spd(A))
+        {
+            flint_printf("FAIL (square)\n");
+            flint_abort();
+        }
+
+        fmpz_mat_randtest(B, state, 1 + n_randint(state, 200));
+        fmpz_mat_gram(B, B);
+
+        if (n > 1)
+        {
+            fmpz_mat_set(C, B);
+            j = n_randint(state, n - 1);
+            k = j + 1 + n_randint(state, n - j - 1);
+            fmpz_add_si(fmpz_mat_entry(C, j, k), fmpz_mat_entry(C, j, k), 1);
+            if (fmpz_mat_is_spd(C))
+            {
+                flint_printf("FAIL (symmetric)\n");
+                flint_abort();
+            }
+        }
+
+        rk = fmpz_mat_rank(B);
+        res = fmpz_mat_is_spd(B);
 
         if ((rk < n && res) || (rk == n && !res))
         {
             flint_printf("FAIL\n");
             flint_printf("n = %wd, rk = %wd, res = %wd\n", n, rk, res);
-            fmpz_mat_print_pretty(A);
+            fmpz_mat_print_pretty(B);
             flint_printf("\n");
             flint_abort();
         }
 
         fmpz_mat_clear(A);
+        fmpz_mat_clear(B);
+        fmpz_mat_clear(C);
     }
 
     flint_randclear(state);
