@@ -9,10 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_poly.h"
 #include "acb_calc.h"
 
-/* sin(x) */
+/* sin(x), defined in t-cauchy_bound.c and t-integrate_taylor.c */
+#ifndef sin_x
+#define sin_x sin_x
 int
 sin_x(acb_ptr out, const acb_t inp, void * params, slong order, slong prec)
 {
@@ -25,6 +28,7 @@ sin_x(acb_ptr out, const acb_t inp, void * params, slong order, slong prec)
     _acb_poly_sin_series(out, out, xlen, order, prec);
     return 0;
 }
+#endif
 
 static const double answers[10] = {
   1.04570093561423094, 2.0358667496686487, 4.82706400405656566,
@@ -33,15 +37,9 @@ static const double answers[10] = {
   2815.70144392142227
 };
 
-int main(void)
+TEST_FUNCTION_START(acb_calc_cauchy_bound)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("cauchy_bound....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 100 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -82,9 +80,6 @@ int main(void)
         acb_clear(x);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END;
 }
 
