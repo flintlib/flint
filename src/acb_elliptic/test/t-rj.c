@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb.h"
 #include "acb_elliptic.h"
 
@@ -49,15 +50,9 @@ static const double testdata_rd[6][8] = {
     {-2.0, -1.0, 0.0, -1.0, -1.0, 1.0, 1.8249027393703805305, -1.2218475784827035855},
 };
 
-int main(void)
+TEST_FUNCTION_START(acb_elliptic_rj, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("rj....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -218,9 +213,6 @@ int main(void)
         acb_clear(r2);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
 

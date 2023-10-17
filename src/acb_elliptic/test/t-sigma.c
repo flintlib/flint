@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb.h"
 #include "acb_modular.h"
 #include "acb_elliptic.h"
@@ -18,6 +19,9 @@
 
 /* z, tau, sigma(z, tau) checked with Mathematica:
    N[{z, tau, WeierstrassSigma[z, WeierstrassInvariants[{1, tau}/2]]}, 20] */
+
+/* testdata is defined in t-sigma.c and t-zeta.c */
+#define testdata testdata0
 const double testdata[NUM_TESTS][6] = {
     { 1.4142135623730950488, 1.7320508075688772935,
       2.2360679774997896964, 2.6457513110645905905,
@@ -30,6 +34,9 @@ const double testdata[NUM_TESTS][6] = {
       1.3092907491438550394, 0.9063920053572463817 }
 };
 
+/* acb_set_dddd is defined in t-sigma.c and t-zeta.c */
+#ifndef acb_set_dddd
+#define acb_set_dddd acb_set_dddd
 static void
 acb_set_dddd(acb_t z, double a, double ar, double b, double br)
 {
@@ -38,16 +45,11 @@ acb_set_dddd(acb_t z, double a, double ar, double b, double br)
     arf_set_d(arb_midref(acb_imagref(z)), b);
     mag_set_d(arb_radref(acb_imagref(z)), br);
 }
+#endif
 
-int main(void)
+TEST_FUNCTION_START(acb_elliptic_sigma, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("sigma....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* check test values */
     for (iter = 0; iter < 20 * 0.1 * flint_test_multiplier(); iter++)
@@ -165,9 +167,6 @@ int main(void)
         acb_clear(u);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
+#undef testdata
