@@ -12,51 +12,79 @@
 #include "arb_mat.h"
 
 void
+_arb_mat_vector_mul_row(arb_ptr res, arb_srcptr v, const arb_mat_t A, slong prec)
+{
+    slong r = arb_mat_nrows(A);
+    slong c = arb_mat_ncols(A);
+    arb_ptr tmp;
+    slong k, j;
+
+    if (arb_mat_is_empty(A))
+    {
+        _arb_vec_zero(res, c);
+    }
+    else
+    {
+        tmp = flint_malloc(r * sizeof(arb_struct));
+
+        for (k = 0; k < c; k++)
+        {
+            for (j = 0; j < r; j++)
+            {
+                tmp[j] = *arb_mat_entry(A, j, k);
+            }
+
+            arb_dot(&res[k], NULL, 0, tmp, 1, v, 1, r, prec);
+        }
+
+        flint_free(tmp);
+    }
+}
+
+void
 arb_mat_vector_mul_row(arb_ptr res, arb_srcptr v, const arb_mat_t A, slong prec)
 {
-    slong nrow = arb_mat_nrows(A);
-    slong ncol = arb_mat_ncols(A);
-    arb_mat_t r, p;
+    slong c = arb_mat_ncols(A);
+    arb_ptr aux;
+
+    aux = _arb_vec_init(c);
+
+    _arb_mat_vector_mul_row(aux, v, A, prec);
+    _arb_vec_set(res, aux, c);
+
+    _arb_vec_clear(aux, c);
+}
+
+void
+_arb_mat_vector_mul_col(arb_ptr res, const arb_mat_t A, arb_srcptr v, slong prec)
+{
+    slong r = arb_mat_nrows(A);
+    slong c = arb_mat_ncols(A);
     slong k;
 
-    arb_mat_init(r, 1, nrow);
-    arb_mat_init(p, 1, ncol);
-
-    for (k = 0; k < nrow; k++)
+    if (arb_mat_is_empty(A))
     {
-        arb_set(arb_mat_entry(r, 0, k), &v[k]);
+        _arb_vec_zero(res, r);
     }
-    arb_mat_mul(p, r, A, prec);
-    for (k = 0; k < ncol; k++)
+    else
     {
-        arb_set(&res[k], arb_mat_entry(p, 0, k));
+        for (k = 0; k < r; k++)
+        {
+            arb_dot(&res[k], NULL, 0, A->rows[k], 1, v, 1, c, prec);
+        }
     }
-
-    arb_mat_clear(r);
-    arb_mat_clear(p);
 }
 
 void
 arb_mat_vector_mul_col(arb_ptr res, const arb_mat_t A, arb_srcptr v, slong prec)
 {
-    slong nrow = arb_mat_nrows(A);
-    slong ncol = arb_mat_ncols(A);
-    arb_mat_t c, p;
-    slong k;
+    slong r = arb_mat_nrows(A);
+    arb_ptr aux;
 
-    arb_mat_init(c, ncol, 1);
-    arb_mat_init(p, nrow, 1);
+    aux = _arb_vec_init(r);
 
-    for (k = 0; k < ncol; k++)
-    {
-        arb_set(arb_mat_entry(c, k, 0), &v[k]);
-    }
-    arb_mat_mul(p, A, c, prec);
-    for (k = 0; k < nrow; k++)
-    {
-        arb_set(&res[k], arb_mat_entry(p, k, 0));
-    }
+    _arb_mat_vector_mul_col(aux, A, v, prec);
+    _arb_vec_set(res, aux, r);
 
-    arb_mat_clear(c);
-    arb_mat_clear(p);
+    _arb_vec_clear(aux, r);
 }

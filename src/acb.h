@@ -510,25 +510,18 @@ acb_div_onei(acb_t z, const acb_t x)
 }
 
 ACB_INLINE void
-acb_mul_powi(acb_t z, const acb_t x, slong k)
+acb_mul_i_pow_si(acb_t z, const acb_t x, slong k)
 {
-    k = ((k % 4) + 4) % 4;
+    k &= 3;
+
     if (k == 0)
-    {
         acb_set(z, x);
-    }
     else if (k == 1)
-    {
         acb_mul_onei(z, x);
-    }
     else if (k == 2)
-    {
         acb_neg(z, x);
-    }
     else
-    {
         acb_div_onei(z, x);
-    }
 }
 
 void acb_mul(acb_t z, const acb_t x, const acb_t y, slong prec);

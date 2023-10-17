@@ -38,7 +38,7 @@ int arb_mat_spd_is_lll_reduced(const arb_mat_t A, slong tol_exp, slong prec)
             arb_one(c);
             arb_mul_2exp_si(c, c, tol_exp);
             arb_add_si(c, c, 1, prec);
-            arb_pow_ui(c, c, FLINT_MIN(j, k), prec);
+            arb_pow_ui(c, c, j + k, prec);
             arb_mul(arb_mat_entry(B, j, k), c, arb_mat_entry(A, j, k), prec);
         }
     }
