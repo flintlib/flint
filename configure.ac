@@ -1003,7 +1003,7 @@ fi
 # substitutions and definitions
 ################################################################################
 
-AC_SUBST([FLINT_VERSION], FLINT_VERSION)
+AC_SUBST(FLINT_VERSION_FULL, FLINT_VERSION)
 
 # split version into major/minor/patch using POSIX variable substitutions
 tail=FLINT_VERSION
