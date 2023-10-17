@@ -15,7 +15,7 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_poly_mul)
+TEST_FUNCTION_START(fmpz_poly_mul, state)
 {
     int i, result;
     int tmul = 200;
@@ -196,5 +196,5 @@ TEST_FUNCTION_START(fmpz_poly_mul)
         fmpz_poly_clear(out2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

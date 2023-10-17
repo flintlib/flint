@@ -50,7 +50,7 @@ _check_containment(const char *name, const arb_t x, const char *s)
     arb_clear(u);
 }
 
-TEST_FUNCTION_START(acb_dirichlet_platt_multieval)
+TEST_FUNCTION_START(acb_dirichlet_platt_multieval, state)
 {
     slong iter;
 
@@ -220,5 +220,5 @@ TEST_FUNCTION_START(acb_dirichlet_platt_multieval)
         _arb_vec_clear(v2, N);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

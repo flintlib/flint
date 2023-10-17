@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "acb_dirichlet.h"
 
-TEST_FUNCTION_START(acb_dirichlet_chi)
+TEST_FUNCTION_START(acb_dirichlet_chi, state)
 {
     slong iter;
 
@@ -121,5 +121,5 @@ TEST_FUNCTION_START(acb_dirichlet_chi)
         acb_clear(zn1zn2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -14,7 +14,7 @@
 #include "test_helpers.h"
 #include "fmpq_poly.h"
 
-TEST_FUNCTION_START(fmpq_poly_log_series)
+TEST_FUNCTION_START(fmpq_poly_log_series, state)
 {
     int i, result;
     ulong cflags = UWORD(0);
@@ -106,5 +106,5 @@ TEST_FUNCTION_START(fmpq_poly_log_series)
         fmpq_poly_clear(loga_logb);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

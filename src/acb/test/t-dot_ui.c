@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "acb.h"
 
-TEST_FUNCTION_START(acb_dot_ui)
+TEST_FUNCTION_START(acb_dot_ui, state)
 {
     slong iter;
 
@@ -89,6 +89,6 @@ TEST_FUNCTION_START(acb_dot_ui)
         flint_free(w);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

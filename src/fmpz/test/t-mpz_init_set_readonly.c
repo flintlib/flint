@@ -14,7 +14,7 @@
 #include "long_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_mpz_init_set_readonly)
+TEST_FUNCTION_START(fmpz_mpz_init_set_readonly, state)
 {
     int i;
 
@@ -73,5 +73,5 @@ TEST_FUNCTION_START(fmpz_mpz_init_set_readonly)
         fmpz_clear(g);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

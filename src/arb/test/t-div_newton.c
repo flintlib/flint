@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_div_newton)
+TEST_FUNCTION_START(arb_div_newton, state)
 {
     slong iter;
 
@@ -132,5 +132,5 @@ TEST_FUNCTION_START(arb_div_newton)
         fmpz_clear(e);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

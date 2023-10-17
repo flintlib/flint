@@ -14,7 +14,7 @@
 #include "fmpz.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_bin_uiui)
+TEST_FUNCTION_START(fmpz_bin_uiui, state)
 {
     slong i;
     ulong n, k;
@@ -46,5 +46,5 @@ TEST_FUNCTION_START(fmpz_bin_uiui)
         mpz_clear(z);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

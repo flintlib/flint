@@ -129,7 +129,7 @@ arb_mul_naive(arb_t z, const arb_t x, const arb_t y, slong prec)
     arf_clear(u);
 }
 
-TEST_FUNCTION_START(arb_mul)
+TEST_FUNCTION_START(arb_mul, state)
 {
     slong iter, iter2;
 
@@ -360,5 +360,5 @@ TEST_FUNCTION_START(arb_mul)
         arb_clear(v);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

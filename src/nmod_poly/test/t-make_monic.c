@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_make_monic)
+TEST_FUNCTION_START(nmod_poly_make_monic, state)
 {
     int i, result;
 
@@ -84,5 +84,5 @@ TEST_FUNCTION_START(nmod_poly_make_monic)
         nmod_poly_clear(a);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -13,7 +13,7 @@
 #include "arb.h"
 #include "acb.h"
 
-TEST_FUNCTION_START(arb_hurwitz_zeta)
+TEST_FUNCTION_START(arb_hurwitz_zeta, state)
 {
     slong iter;
 
@@ -63,5 +63,5 @@ TEST_FUNCTION_START(arb_hurwitz_zeta)
         acb_clear(f);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

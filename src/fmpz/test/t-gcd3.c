@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_gcd3)
+TEST_FUNCTION_START(fmpz_gcd3, state)
 {
     slong i;
 
@@ -83,5 +83,5 @@ TEST_FUNCTION_START(fmpz_gcd3)
         fmpz_clear(e);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

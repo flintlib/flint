@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_get_unique_fmpz)
+TEST_FUNCTION_START(arb_get_unique_fmpz, state)
 {
     slong iter;
 
@@ -139,5 +139,5 @@ TEST_FUNCTION_START(arb_get_unique_fmpz)
         fmpz_clear(exp);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

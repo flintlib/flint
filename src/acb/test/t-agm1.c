@@ -64,7 +64,7 @@ const double agm1_testdata[NUM_TESTS][10] = {
         92537341636.835656296},
 };
 
-TEST_FUNCTION_START(acb_agm1)
+TEST_FUNCTION_START(acb_agm1, state)
 {
     slong iter;
 
@@ -180,7 +180,7 @@ TEST_FUNCTION_START(acb_agm1)
         acb_clear(t);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 #undef EPS
 #undef NUM_DERIVS

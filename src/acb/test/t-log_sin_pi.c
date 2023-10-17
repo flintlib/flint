@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "acb.h"
 
-TEST_FUNCTION_START(acb_log_sin_pi)
+TEST_FUNCTION_START(acb_log_sin_pi, state)
 {
     slong iter;
 
@@ -69,6 +69,6 @@ TEST_FUNCTION_START(acb_log_sin_pi)
         acb_clear(t);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_fread_print)
+TEST_FUNCTION_START(nmod_poly_fread_print, state)
 {
     int i, result, r1;
 
@@ -66,8 +66,8 @@ TEST_FUNCTION_START(nmod_poly_fread_print)
         nmod_poly_clear(b);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 #else
-    TEST_FUNCTION_END_SKIPPED;
+    TEST_FUNCTION_END(state)_SKIPPED;
 #endif
 }

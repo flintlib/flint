@@ -129,7 +129,7 @@ acb_log_old(acb_t r, const acb_t z, slong prec)
 #undef b
 }
 
-TEST_FUNCTION_START(acb_log)
+TEST_FUNCTION_START(acb_log, state)
 {
     slong iter;
 
@@ -250,6 +250,6 @@ TEST_FUNCTION_START(acb_log)
         acb_clear(d);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

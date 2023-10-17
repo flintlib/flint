@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_div_2expm1_ui)
+TEST_FUNCTION_START(arb_div_2expm1_ui, state)
 {
     slong iter;
 
@@ -84,6 +84,6 @@ TEST_FUNCTION_START(arb_div_2expm1_ui)
         fmpz_clear(t);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

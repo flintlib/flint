@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "acb.h"
 
-TEST_FUNCTION_START(acb_get_abs_ubound_arf)
+TEST_FUNCTION_START(acb_get_abs_ubound_arf, state)
 {
     slong iter;
 
@@ -54,6 +54,6 @@ TEST_FUNCTION_START(acb_get_abs_ubound_arf)
         arf_clear(s);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

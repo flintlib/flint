@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_compose_mod_horner)
+TEST_FUNCTION_START(nmod_poly_compose_mod_horner, state)
 {
     int i;
 
@@ -160,5 +160,5 @@ TEST_FUNCTION_START(nmod_poly_compose_mod_horner)
         nmod_poly_clear(d);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

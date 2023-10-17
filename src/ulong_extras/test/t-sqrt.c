@@ -13,7 +13,7 @@
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_sqrt)
+TEST_FUNCTION_START(n_sqrt, state)
 {
    int i, result;
 
@@ -77,5 +77,5 @@ TEST_FUNCTION_START(n_sqrt)
       mpz_clear(s2_m);
    }
 
-   TEST_FUNCTION_END;
+   TEST_FUNCTION_END(state);
 }

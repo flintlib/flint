@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_powers_mod_bsgs)
+TEST_FUNCTION_START(nmod_poly_powers_mod_bsgs, state)
 {
 #if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     int i, result, max_threads = 5;
@@ -88,8 +88,8 @@ TEST_FUNCTION_START(nmod_poly_powers_mod_bsgs)
 	flint_free(res);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 #else
-    TEST_FUNCTION_END_SKIPPED;
+    TEST_FUNCTION_END(state)_SKIPPED;
 #endif
 }

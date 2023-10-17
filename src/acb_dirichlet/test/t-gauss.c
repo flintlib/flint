@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "acb_dirichlet.h"
 
-TEST_FUNCTION_START(acb_dirichlet_gauss)
+TEST_FUNCTION_START(acb_dirichlet_gauss, state)
 {
     slong prec = 128;
     ulong q;
@@ -72,5 +72,5 @@ TEST_FUNCTION_START(acb_dirichlet_gauss)
         dirichlet_char_clear(chi);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

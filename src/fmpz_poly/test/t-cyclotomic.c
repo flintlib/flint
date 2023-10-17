@@ -52,7 +52,7 @@ void cyclotomic_naive(fmpz_poly_t poly, ulong n)
 
     fmpz_poly_clear(t);
 }
-TEST_FUNCTION_START(fmpz_poly_cyclotomic)
+TEST_FUNCTION_START(fmpz_poly_cyclotomic, state)
 {
     fmpz_poly_t A, B;
     slong n;
@@ -118,5 +118,5 @@ TEST_FUNCTION_START(fmpz_poly_cyclotomic)
         fmpz_clear(ref);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

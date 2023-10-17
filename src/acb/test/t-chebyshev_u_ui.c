@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "acb.h"
 
-TEST_FUNCTION_START(acb_chebyshev_u_ui)
+TEST_FUNCTION_START(acb_chebyshev_u_ui, state)
 {
     slong iter;
 
@@ -110,6 +110,6 @@ TEST_FUNCTION_START(acb_chebyshev_u_ui)
         acb_clear(e);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

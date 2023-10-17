@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_berlekamp_massey)
+TEST_FUNCTION_START(nmod_poly_berlekamp_massey, state)
 {
     slong i, j, k, l;
 
@@ -153,5 +153,5 @@ TEST_FUNCTION_START(nmod_poly_berlekamp_massey)
         nmod_berlekamp_massey_clear(B2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

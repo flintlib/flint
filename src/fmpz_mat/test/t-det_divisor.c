@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_det_divisor)
+TEST_FUNCTION_START(fmpz_mat_det_divisor, state)
 {
     slong i;
     int result;
@@ -74,5 +74,5 @@ TEST_FUNCTION_START(fmpz_mat_det_divisor)
         fmpz_clear(r);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

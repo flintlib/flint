@@ -13,7 +13,7 @@
 #include "acb_dirichlet.h"
 #include "acb_poly.h"
 
-TEST_FUNCTION_START(acb_dirichlet_powsum_smooth)
+TEST_FUNCTION_START(acb_dirichlet_powsum_smooth, state)
 {
     slong iter;
 
@@ -65,5 +65,5 @@ TEST_FUNCTION_START(acb_dirichlet_powsum_smooth)
         _acb_vec_clear(z2, len);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

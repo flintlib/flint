@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_deflate)
+TEST_FUNCTION_START(nmod_poly_deflate, state)
 {
     int iter;
 
@@ -95,5 +95,5 @@ TEST_FUNCTION_START(nmod_poly_deflate)
         nmod_poly_clear(poly3);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

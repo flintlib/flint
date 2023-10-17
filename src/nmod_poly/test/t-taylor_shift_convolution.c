@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_taylor_shift_convolution)
+TEST_FUNCTION_START(nmod_poly_taylor_shift_convolution, state)
 {
     int i;
 
@@ -94,5 +94,5 @@ TEST_FUNCTION_START(nmod_poly_taylor_shift_convolution)
         nmod_poly_clear(h2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

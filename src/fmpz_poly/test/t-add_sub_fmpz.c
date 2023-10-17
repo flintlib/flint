@@ -14,7 +14,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-TEST_FUNCTION_START(fmpz_poly_add_sub_fmpz)
+TEST_FUNCTION_START(fmpz_poly_add_sub_fmpz, state)
 {
     int i;
 
@@ -84,5 +84,5 @@ TEST_FUNCTION_START(fmpz_poly_add_sub_fmpz)
         fmpz_clear(c);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

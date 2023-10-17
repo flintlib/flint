@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_mod2_precomp)
+TEST_FUNCTION_START(n_mod2_precomp, state)
 {
    int i, result;
 
@@ -41,5 +41,5 @@ TEST_FUNCTION_START(n_mod2_precomp)
       }
    }
 
-   TEST_FUNCTION_END;
+   TEST_FUNCTION_END(state);
 }

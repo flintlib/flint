@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_reverse)
+TEST_FUNCTION_START(nmod_poly_reverse, state)
 {
     int i, result;
 
@@ -78,5 +78,5 @@ TEST_FUNCTION_START(nmod_poly_reverse)
         nmod_poly_clear(b);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

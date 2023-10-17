@@ -13,7 +13,7 @@
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_is_probabprime_fermat)
+TEST_FUNCTION_START(n_is_probabprime_fermat, state)
 {
    int i, result;
    ulong count = UWORD(0);
@@ -82,5 +82,5 @@ TEST_FUNCTION_START(n_is_probabprime_fermat)
       flint_abort();
    }
 
-   TEST_FUNCTION_END;
+   TEST_FUNCTION_END(state);
 }

@@ -35,7 +35,7 @@ const char * const manual_tests[] = {
     "\0"
 };
 
-TEST_FUNCTION_START(fmpz_nextprime)
+TEST_FUNCTION_START(fmpz_nextprime, state)
 {
     int i;
 
@@ -92,5 +92,5 @@ TEST_FUNCTION_START(fmpz_nextprime)
         fmpz_clear(iter);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

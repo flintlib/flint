@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "acb.h"
 
-TEST_FUNCTION_START(acb_rgamma)
+TEST_FUNCTION_START(acb_rgamma, state)
 {
     slong iter;
 
@@ -62,6 +62,6 @@ TEST_FUNCTION_START(acb_rgamma)
         acb_clear(c);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

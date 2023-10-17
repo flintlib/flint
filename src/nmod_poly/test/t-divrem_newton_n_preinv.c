@@ -14,7 +14,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_divrem_newton_n_preinv)
+TEST_FUNCTION_START(nmod_poly_divrem_newton_n_preinv, state)
 {
     int i, result;
 
@@ -354,5 +354,5 @@ TEST_FUNCTION_START(nmod_poly_divrem_newton_n_preinv)
     }
 #endif
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

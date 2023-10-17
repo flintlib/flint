@@ -16,7 +16,7 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_CRT_ui_unsigned)
+TEST_FUNCTION_START(fmpz_mat_CRT_ui_unsigned, state)
 {
     int i;
 
@@ -89,5 +89,5 @@ TEST_FUNCTION_START(fmpz_mat_CRT_ui_unsigned)
         fmpz_clear(mod);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

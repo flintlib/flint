@@ -14,7 +14,7 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_poly_init_realloc_clear)
+TEST_FUNCTION_START(fmpz_poly_init_realloc_clear, state)
 {
     int i;
 
@@ -44,5 +44,5 @@ TEST_FUNCTION_START(fmpz_poly_init_realloc_clear)
         fmpz_poly_clear(a);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

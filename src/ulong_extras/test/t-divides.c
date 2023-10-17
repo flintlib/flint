@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_divides)
+TEST_FUNCTION_START(n_divides, state)
 {
    int i, result;
 
@@ -67,5 +67,5 @@ TEST_FUNCTION_START(n_divides)
       }
    }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

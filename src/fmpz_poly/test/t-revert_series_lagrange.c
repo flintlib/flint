@@ -16,7 +16,7 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_poly_revert_series_lagrange)
+TEST_FUNCTION_START(fmpz_poly_revert_series_lagrange, state)
 {
     int i, result;
 
@@ -90,5 +90,5 @@ TEST_FUNCTION_START(fmpz_poly_revert_series_lagrange)
         fmpz_poly_clear(h);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

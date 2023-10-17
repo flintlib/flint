@@ -14,7 +14,7 @@
 #include "nmod_mat.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_evaluate_mat_paterson_stockmeyer)
+TEST_FUNCTION_START(nmod_poly_evaluate_mat_paterson_stockmeyer, state)
 {
     int i, j;
 
@@ -106,5 +106,5 @@ TEST_FUNCTION_START(nmod_poly_evaluate_mat_paterson_stockmeyer)
         nmod_mat_clear(C);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(n_ll_mod_preinv)
+TEST_FUNCTION_START(n_ll_mod_preinv, state)
 {
     int i, result;
     fmpz_t n;
@@ -88,5 +88,5 @@ TEST_FUNCTION_START(n_ll_mod_preinv)
 
     fmpz_clear(n);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

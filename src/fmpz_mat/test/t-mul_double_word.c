@@ -28,7 +28,7 @@ void _fmpz_mat_full(fmpz_mat_t A, flint_bitcnt_t bits)
     }
 }
 
-TEST_FUNCTION_START(fmpz_mat_mul_double_word)
+TEST_FUNCTION_START(fmpz_mat_mul_double_word, state)
 {
     fmpz_mat_t A, B, C, D;
     slong i;
@@ -106,5 +106,5 @@ TEST_FUNCTION_START(fmpz_mat_mul_double_word)
         fmpz_mat_clear(D);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

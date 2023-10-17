@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_gcdinv)
+TEST_FUNCTION_START(nmod_poly_gcdinv, state)
 {
     int i, result;
 
@@ -126,6 +126,6 @@ TEST_FUNCTION_START(nmod_poly_gcdinv)
         nmod_poly_clear(u);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

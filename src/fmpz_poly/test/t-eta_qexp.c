@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-TEST_FUNCTION_START(fmpz_poly_eta_qexp)
+TEST_FUNCTION_START(fmpz_poly_eta_qexp, state)
 {
     int i;
 
@@ -66,6 +66,6 @@ TEST_FUNCTION_START(fmpz_poly_eta_qexp)
         fmpz_poly_clear(b);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_hnf_modular)
+TEST_FUNCTION_START(fmpz_mat_hnf_modular, state)
 {
     slong iter;
 
@@ -103,5 +103,5 @@ TEST_FUNCTION_START(fmpz_mat_hnf_modular)
         fmpz_clear(det);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

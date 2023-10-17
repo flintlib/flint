@@ -14,7 +14,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-TEST_FUNCTION_START(fmpz_multi_CRT_multi_mod)
+TEST_FUNCTION_START(fmpz_multi_CRT_multi_mod, state)
 {
     slong i, j, k;
 
@@ -314,5 +314,5 @@ TEST_FUNCTION_START(fmpz_multi_CRT_multi_mod)
         fmpz_clear(output);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

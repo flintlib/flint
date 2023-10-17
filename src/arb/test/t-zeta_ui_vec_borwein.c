@@ -13,7 +13,7 @@
 #include <mpfr.h>
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_zeta_ui_vec_borwein)
+TEST_FUNCTION_START(arb_zeta_ui_vec_borwein, state)
 {
     slong iter;
 
@@ -64,5 +64,5 @@ TEST_FUNCTION_START(arb_zeta_ui_vec_borwein)
         mpfr_clear(s);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

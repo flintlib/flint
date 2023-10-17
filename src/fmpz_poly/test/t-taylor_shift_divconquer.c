@@ -14,7 +14,7 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_poly_taylor_shift_divconquer)
+TEST_FUNCTION_START(fmpz_poly_taylor_shift_divconquer, state)
 {
     int i;
 
@@ -73,6 +73,6 @@ TEST_FUNCTION_START(fmpz_poly_taylor_shift_divconquer)
         fmpz_clear(c);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

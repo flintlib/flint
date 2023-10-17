@@ -38,7 +38,7 @@ void fmpz_sigma_naive(fmpz_t x, ulong k, ulong n)
     fmpz_clear(t);
     fmpz_poly_clear(p);
 }
-TEST_FUNCTION_START(fmpz_divisor_sigma)
+TEST_FUNCTION_START(fmpz_divisor_sigma, state)
 {
     fmpz_t m, a, b;
     slong n, k;
@@ -69,6 +69,6 @@ TEST_FUNCTION_START(fmpz_divisor_sigma)
     fmpz_clear(b);
     fmpz_clear(m);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

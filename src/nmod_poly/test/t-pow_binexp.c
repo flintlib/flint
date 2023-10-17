@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_pow_binexp)
+TEST_FUNCTION_START(nmod_poly_pow_binexp, state)
 {
     int i, j, result;
 
@@ -89,5 +89,5 @@ TEST_FUNCTION_START(nmod_poly_pow_binexp)
         nmod_poly_clear(c);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

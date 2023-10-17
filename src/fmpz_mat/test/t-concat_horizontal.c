@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_concat_horizontal)
+TEST_FUNCTION_START(fmpz_mat_concat_horizontal, state)
 {
     fmpz_mat_t A, B, C;
     fmpz_mat_t window1, window2;
@@ -57,5 +57,5 @@ TEST_FUNCTION_START(fmpz_mat_concat_horizontal)
         fmpz_mat_window_clear(window2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

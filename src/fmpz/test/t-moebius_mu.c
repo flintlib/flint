@@ -29,7 +29,7 @@ static void check(fmpz_t input, int output, int expected)
 }
 #endif
 
-TEST_FUNCTION_START(fmpz_moebius_mu)
+TEST_FUNCTION_START(fmpz_moebius_mu, state)
 {
     fmpz_t x;
     ulong p;
@@ -69,5 +69,5 @@ TEST_FUNCTION_START(fmpz_moebius_mu)
 
     fmpz_clear(x);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

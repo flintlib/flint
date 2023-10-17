@@ -13,7 +13,7 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_poly_get_set_coeff_ui)
+TEST_FUNCTION_START(fmpz_poly_get_set_coeff_ui, state)
 {
     int i, j, result;
 
@@ -46,5 +46,5 @@ TEST_FUNCTION_START(fmpz_poly_get_set_coeff_ui)
         fmpz_poly_clear(a);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

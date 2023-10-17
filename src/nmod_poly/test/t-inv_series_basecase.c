@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_inv_series_basecase)
+TEST_FUNCTION_START(nmod_poly_inv_series_basecase, state)
 {
     int i, result;
 
@@ -94,5 +94,5 @@ TEST_FUNCTION_START(nmod_poly_inv_series_basecase)
         nmod_poly_clear(qinv);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

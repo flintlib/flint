@@ -30,7 +30,7 @@ static void check(fmpz_t input, int output, int expected)
 }
 #endif
 
-TEST_FUNCTION_START(fmpz_fits_si)
+TEST_FUNCTION_START(fmpz_fits_si, state)
 {
     slong i;
     fmpz_t x;
@@ -75,5 +75,5 @@ TEST_FUNCTION_START(fmpz_fits_si)
 
     fmpz_clear(x);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_divisor_in_residue_class_lenstra)
+TEST_FUNCTION_START(fmpz_divisor_in_residue_class_lenstra, state)
 {
     int i, result;
 
@@ -122,5 +122,5 @@ TEST_FUNCTION_START(fmpz_divisor_in_residue_class_lenstra)
         fmpz_clear(d);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

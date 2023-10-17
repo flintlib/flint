@@ -14,7 +14,7 @@
 
 #define N 10000
 
-TEST_FUNCTION_START(arb_urandom)
+TEST_FUNCTION_START(arb_urandom, state)
 {
     slong iter;
     slong prec;
@@ -75,5 +75,5 @@ TEST_FUNCTION_START(arb_urandom)
     arb_clear(sp);
     arb_clear(tmp);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

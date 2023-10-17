@@ -15,7 +15,7 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_get_d_mat)
+TEST_FUNCTION_START(fmpz_mat_get_d_mat, state)
 {
     int i;
 
@@ -61,5 +61,5 @@ TEST_FUNCTION_START(fmpz_mat_get_d_mat)
         d_mat_clear(B);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

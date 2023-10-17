@@ -13,7 +13,7 @@
 #include "fmpq.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_atan_sum_bs_powtab)
+TEST_FUNCTION_START(arb_atan_sum_bs_powtab, state)
 {
     slong iter;
 
@@ -67,6 +67,6 @@ TEST_FUNCTION_START(arb_atan_sum_bs_powtab)
         fmpq_clear(V);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

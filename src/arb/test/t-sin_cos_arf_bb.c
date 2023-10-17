@@ -15,7 +15,7 @@
 void arb_sin_cos_fmpz_div_2exp_bsplit(arb_t wsin, arb_t wcos,
     const fmpz_t x, flint_bitcnt_t r, slong prec);
 
-TEST_FUNCTION_START(arb_sin_cos_arf_bb)
+TEST_FUNCTION_START(arb_sin_cos_arf_bb, state)
 {
     slong iter;
 
@@ -160,6 +160,6 @@ TEST_FUNCTION_START(arb_sin_cos_arf_bb)
         arb_clear(c2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

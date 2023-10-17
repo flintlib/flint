@@ -15,7 +15,7 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_poly_pow_addchains)
+TEST_FUNCTION_START(fmpz_poly_pow_addchains, state)
 {
     int i, result;
 
@@ -80,5 +80,5 @@ TEST_FUNCTION_START(fmpz_poly_pow_addchains)
         fmpz_poly_clear(b);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_log_primes_vec_bsplit)
+TEST_FUNCTION_START(arb_log_primes_vec_bsplit, state)
 {
     slong iter;
 
@@ -59,6 +59,6 @@ TEST_FUNCTION_START(arb_log_primes_vec_bsplit)
         arb_clear(t);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

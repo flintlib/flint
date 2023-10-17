@@ -15,7 +15,7 @@
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-TEST_FUNCTION_START(fmpq_poly_revert_series)
+TEST_FUNCTION_START(fmpq_poly_revert_series, state)
 {
     int i, result;
 
@@ -91,5 +91,5 @@ TEST_FUNCTION_START(fmpq_poly_revert_series)
         fmpq_poly_clear(h);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

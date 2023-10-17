@@ -13,7 +13,7 @@
 #include <string.h>
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_dump_file)
+TEST_FUNCTION_START(arb_dump_file, state)
 {
     slong iter;
 
@@ -91,5 +91,5 @@ TEST_FUNCTION_START(arb_dump_file)
 
 #endif
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -13,7 +13,7 @@
 #include "arith.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_euler_number_fmpz)
+TEST_FUNCTION_START(arb_euler_number_fmpz, state)
 {
     slong iter;
 
@@ -100,5 +100,5 @@ TEST_FUNCTION_START(arb_euler_number_fmpz)
         fmpz_clear(bv);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

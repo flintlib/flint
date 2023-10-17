@@ -14,7 +14,7 @@
 #include "fmpq.h"
 #include "fmpq_poly.h"
 
-TEST_FUNCTION_START(fmpq_poly_get_set_coeff_fmpz)
+TEST_FUNCTION_START(fmpq_poly_get_set_coeff_fmpz, state)
 {
     int i, j, result;
     ulong cflags = UWORD(0);
@@ -68,5 +68,5 @@ TEST_FUNCTION_START(fmpq_poly_get_set_coeff_fmpz)
     fmpq_clear(n1);
     fmpq_clear(n2);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

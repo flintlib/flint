@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_clog_2exp)
+TEST_FUNCTION_START(n_clog_2exp, state)
 {
     slong i;
     ulong t[][3] = {{1, 2, 1},
@@ -51,5 +51,5 @@ TEST_FUNCTION_START(n_clog_2exp)
         }
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

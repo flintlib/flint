@@ -13,7 +13,7 @@
 #include "arb.h"
 #include "long_extras.h"
 
-TEST_FUNCTION_START(arb_addmul_si)
+TEST_FUNCTION_START(arb_addmul_si, state)
 {
     slong iter;
 
@@ -93,5 +93,5 @@ TEST_FUNCTION_START(arb_addmul_si)
         arb_clear(c);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

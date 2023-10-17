@@ -70,7 +70,7 @@ arb_submul_naive(arb_t z, const arb_t x, const arb_t y, slong prec)
     arb_clear(t);
 }
 
-TEST_FUNCTION_START(arb_submul)
+TEST_FUNCTION_START(arb_submul, state)
 {
     slong iter, iter2;
 
@@ -308,5 +308,5 @@ TEST_FUNCTION_START(arb_submul)
         arb_clear(v);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

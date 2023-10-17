@@ -14,7 +14,7 @@
 #include "nmod.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_discriminant)
+TEST_FUNCTION_START(nmod_poly_discriminant, state)
 {
     int i, result;
 
@@ -97,5 +97,5 @@ TEST_FUNCTION_START(nmod_poly_discriminant)
         nmod_poly_clear(f);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

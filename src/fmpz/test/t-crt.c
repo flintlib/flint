@@ -14,7 +14,7 @@
 #include "fmpz.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_CRT)
+TEST_FUNCTION_START(fmpz_CRT, state)
 {
     slong i, j;
     int sign;
@@ -91,5 +91,5 @@ TEST_FUNCTION_START(fmpz_CRT)
     fmpz_clear(m2);
     fmpz_clear(mprod);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

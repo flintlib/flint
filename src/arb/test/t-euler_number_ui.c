@@ -42,7 +42,7 @@ divisor_table_odd(unsigned int * tab, slong len)
     }
 }
 
-TEST_FUNCTION_START(arb_euler_number_ui)
+TEST_FUNCTION_START(arb_euler_number_ui, state)
 {
     slong iter;
 
@@ -138,5 +138,5 @@ TEST_FUNCTION_START(arb_euler_number_ui)
         _fmpz_vec_clear(En, nmax);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

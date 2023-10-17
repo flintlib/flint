@@ -14,7 +14,7 @@
 #include "test_helpers.h"
 #include "fmpq_poly.h"
 
-TEST_FUNCTION_START(fmpq_poly_asin_series)
+TEST_FUNCTION_START(fmpq_poly_asin_series, state)
 {
     int i, result;
     ulong cflags = UWORD(0);
@@ -97,5 +97,5 @@ TEST_FUNCTION_START(fmpq_poly_asin_series)
         fmpq_poly_clear(atanB);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

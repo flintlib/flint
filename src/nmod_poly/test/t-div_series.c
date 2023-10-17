@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_div_series)
+TEST_FUNCTION_START(nmod_poly_div_series, state)
 {
     int i, result;
 
@@ -141,5 +141,5 @@ TEST_FUNCTION_START(nmod_poly_div_series)
         nmod_poly_clear(b);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_kronecker)
+TEST_FUNCTION_START(fmpz_kronecker, state)
 {
     slong i, j;
 
@@ -50,5 +50,5 @@ TEST_FUNCTION_START(fmpz_kronecker)
         mpz_clear(nn);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

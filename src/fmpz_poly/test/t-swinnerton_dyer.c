@@ -27,7 +27,7 @@ static const mp_limb_t known_values[] =
     UWORD(394942914)
 };
 
-TEST_FUNCTION_START(fmpz_poly_swinnerton_dyer)
+TEST_FUNCTION_START(fmpz_poly_swinnerton_dyer, state)
 {
     fmpz_poly_t S;
     mp_limb_t r;
@@ -50,6 +50,6 @@ TEST_FUNCTION_START(fmpz_poly_swinnerton_dyer)
         fmpz_poly_clear(S);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

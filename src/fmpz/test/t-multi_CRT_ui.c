@@ -15,7 +15,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-TEST_FUNCTION_START(fmpz_multi_CRT_ui)
+TEST_FUNCTION_START(fmpz_multi_CRT_ui, state)
 {
     fmpz_t input, temp, prod;
     mp_limb_t * output;
@@ -110,6 +110,6 @@ try_again:
         _fmpz_vec_clear(primes2, num_primes);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

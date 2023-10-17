@@ -16,7 +16,7 @@
    but it still makes sense to test them explicitly */
 void arb_exp_taylor_sum_rs_generic(arb_t s, const arb_t x, slong N, slong prec);
 
-TEST_FUNCTION_START(arb_exp_arf_rs_generic)
+TEST_FUNCTION_START(arb_exp_arf_rs_generic, state)
 {
     slong iter;
 
@@ -118,6 +118,6 @@ TEST_FUNCTION_START(arb_exp_arf_rs_generic)
         arb_clear(z);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

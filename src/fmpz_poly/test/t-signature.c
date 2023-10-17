@@ -15,7 +15,7 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_poly_signature)
+TEST_FUNCTION_START(fmpz_poly_signature, state)
 {
     int i, j, result;
 
@@ -152,5 +152,5 @@ TEST_FUNCTION_START(fmpz_poly_signature)
         fmpz_poly_clear(poly);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

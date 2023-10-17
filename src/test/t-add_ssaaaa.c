@@ -12,7 +12,7 @@
 #include "ulong_extras.h"
 #include "test_helpers.h"
 
-TEST_FUNCTION_START(add_ssaaaa)
+TEST_FUNCTION_START(add_ssaaaa, state)
 {
     int i, result;
 
@@ -46,5 +46,5 @@ TEST_FUNCTION_START(add_ssaaaa)
         }
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

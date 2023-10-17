@@ -13,7 +13,7 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(compute_primes)
+TEST_FUNCTION_START(compute_primes, state)
 {
     slong i, lim = 1000000;
     n_primes_t pg;
@@ -60,5 +60,5 @@ TEST_FUNCTION_START(compute_primes)
     flint_free(ref_primes);
     flint_free(ref_inverses);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

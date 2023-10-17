@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_primitive_root_prime)
+TEST_FUNCTION_START(n_primitive_root_prime, state)
 {
     int i, j;
 
@@ -41,5 +41,5 @@ TEST_FUNCTION_START(n_primitive_root_prime)
         }
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

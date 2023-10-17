@@ -14,7 +14,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_root)
+TEST_FUNCTION_START(fmpz_root, state)
 {
     int i, result, exact;
 
@@ -182,5 +182,5 @@ TEST_FUNCTION_START(fmpz_root)
         mpz_clear(mf2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

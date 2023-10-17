@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_fib)
+TEST_FUNCTION_START(arb_fib, state)
 {
     /* trivial test because functions are based on gr */
     {
@@ -30,5 +30,5 @@ TEST_FUNCTION_START(arb_fib)
         fmpz_clear(n);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

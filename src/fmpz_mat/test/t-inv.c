@@ -14,7 +14,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_inv)
+TEST_FUNCTION_START(fmpz_mat_inv, state)
 {
     fmpz_mat_t A, B, C, I;
     fmpz_t den;
@@ -140,5 +140,5 @@ TEST_FUNCTION_START(fmpz_mat_inv)
         fmpz_clear(den);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

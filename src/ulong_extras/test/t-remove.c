@@ -13,7 +13,7 @@
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_remove)
+TEST_FUNCTION_START(n_remove, state)
 {
    int i, result;
 
@@ -95,5 +95,5 @@ TEST_FUNCTION_START(n_remove)
       mpz_clear(d_p);
    }
 
-   TEST_FUNCTION_END;
+   TEST_FUNCTION_END(state);
 }

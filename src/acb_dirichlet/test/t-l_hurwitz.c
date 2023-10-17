@@ -15,7 +15,7 @@
 #define nq 5
 #define nx 3
 
-TEST_FUNCTION_START(acb_dirichlet_l_hurwitz)
+TEST_FUNCTION_START(acb_dirichlet_l_hurwitz, state)
 {
     slong i, j;
     ulong q[nq] = {3, 5, 61, 91, 800};
@@ -135,5 +135,5 @@ TEST_FUNCTION_START(acb_dirichlet_l_hurwitz)
     acb_clear(res);
     _acb_vec_clear(x, nx);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

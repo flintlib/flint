@@ -13,7 +13,7 @@
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_cbrtrem)
+TEST_FUNCTION_START(n_cbrtrem, state)
 {
     int i, result;
 
@@ -51,5 +51,5 @@ TEST_FUNCTION_START(n_cbrtrem)
         mpz_clear(g);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

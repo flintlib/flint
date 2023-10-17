@@ -26,7 +26,7 @@ void check(mp_limb_t n, int s1, int s2)
 }
 #endif
 
-TEST_FUNCTION_START(n_is_squarefree)
+TEST_FUNCTION_START(n_is_squarefree, state)
 {
     int s, k;
 
@@ -63,5 +63,5 @@ TEST_FUNCTION_START(n_is_squarefree)
         flint_abort();
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

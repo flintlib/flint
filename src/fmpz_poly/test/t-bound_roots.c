@@ -14,7 +14,7 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_poly_bound_roots)
+TEST_FUNCTION_START(fmpz_poly_bound_roots, state)
 {
     slong iter;
 
@@ -82,5 +82,5 @@ TEST_FUNCTION_START(fmpz_poly_bound_roots)
         fmpz_poly_clear(g);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

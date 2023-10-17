@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_hnf_minors)
+TEST_FUNCTION_START(fmpz_mat_hnf_minors, state)
 {
     slong iter;
 
@@ -83,5 +83,5 @@ TEST_FUNCTION_START(fmpz_mat_hnf_minors)
         fmpz_mat_clear(A);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

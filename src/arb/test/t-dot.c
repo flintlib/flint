@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_dot)
+TEST_FUNCTION_START(arb_dot, state)
 {
     slong iter;
 
@@ -184,5 +184,5 @@ TEST_FUNCTION_START(arb_dot)
         _arb_vec_clear(y, len);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -23,7 +23,7 @@ static const signed char small_gaussian_primes[] = {
     5, 26, 15, 22, 2, 27, 9, 26
 };
 
-TEST_FUNCTION_START(arb_atan_gauss_primes_vec_bsplit)
+TEST_FUNCTION_START(arb_atan_gauss_primes_vec_bsplit, state)
 {
     slong iter;
 
@@ -64,6 +64,6 @@ TEST_FUNCTION_START(arb_atan_gauss_primes_vec_bsplit)
         arb_clear(t);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

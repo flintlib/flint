@@ -14,7 +14,7 @@
 #include "fmpq.h"
 #include "fmpq_vec.h"
 
-TEST_FUNCTION_START(fmpz_poly_product_roots_fmpq_vec)
+TEST_FUNCTION_START(fmpz_poly_product_roots_fmpq_vec, state)
 {
     slong iter;
 
@@ -67,5 +67,5 @@ TEST_FUNCTION_START(fmpz_poly_product_roots_fmpq_vec)
         fmpz_poly_clear(p);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

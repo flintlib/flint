@@ -15,7 +15,7 @@
 #include "fmpz.h"
 #include "long_extras.h"
 
-TEST_FUNCTION_START(fmpz_divexact_si)
+TEST_FUNCTION_START(fmpz_divexact_si, state)
 {
     int i, result;
 
@@ -103,5 +103,5 @@ TEST_FUNCTION_START(fmpz_divexact_si)
         mpz_clear(g);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -14,7 +14,7 @@
 
 FLINT_DLL extern slong acb_dot_gauss_dot_cutoff;
 
-TEST_FUNCTION_START(acb_dot)
+TEST_FUNCTION_START(acb_dot, state)
 {
     slong iter;
 
@@ -188,5 +188,5 @@ TEST_FUNCTION_START(acb_dot)
         _acb_vec_clear(y, len);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

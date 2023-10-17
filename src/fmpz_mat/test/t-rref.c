@@ -14,7 +14,7 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_rref)
+TEST_FUNCTION_START(fmpz_mat_rref, state)
 {
     slong iter;
 
@@ -126,5 +126,5 @@ TEST_FUNCTION_START(fmpz_mat_rref)
         fmpz_mat_clear(R2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

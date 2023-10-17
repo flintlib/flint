@@ -13,7 +13,7 @@
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_is_probabprime)
+TEST_FUNCTION_START(n_is_probabprime, state)
 {
    int i, result;
    mp_limb_t d;
@@ -104,5 +104,5 @@ TEST_FUNCTION_START(n_is_probabprime)
    }
 #endif
 
-   TEST_FUNCTION_END;
+   TEST_FUNCTION_END(state);
 }

@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "acb_dirichlet.h"
 
-TEST_FUNCTION_START(acb_dirichlet_turing_method_bound)
+TEST_FUNCTION_START(acb_dirichlet_turing_method_bound, state)
 {
     slong iter;
 
@@ -47,5 +47,5 @@ TEST_FUNCTION_START(acb_dirichlet_turing_method_bound)
         fmpz_clear(b);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

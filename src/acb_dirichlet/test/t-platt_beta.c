@@ -31,7 +31,7 @@ _arb_lt_d(const arb_t a, double d)
     return result;
 }
 
-TEST_FUNCTION_START(acb_dirichlet_platt_beta)
+TEST_FUNCTION_START(acb_dirichlet_platt_beta, state)
 {
     slong iter;
     arb_t x, t, t0, expe;
@@ -115,5 +115,5 @@ TEST_FUNCTION_START(acb_dirichlet_platt_beta)
     arb_clear(t0);
     arb_clear(expe);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

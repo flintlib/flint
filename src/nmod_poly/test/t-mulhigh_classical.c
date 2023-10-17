@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_mulhigh_classical)
+TEST_FUNCTION_START(nmod_poly_mulhigh_classical, state)
 {
     int i, result;
 
@@ -148,5 +148,5 @@ TEST_FUNCTION_START(nmod_poly_mulhigh_classical)
         nmod_poly_clear(d);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

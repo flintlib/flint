@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_get_set_str)
+TEST_FUNCTION_START(nmod_poly_get_set_str, state)
 {
     int i, result, r1;
 
@@ -48,5 +48,5 @@ TEST_FUNCTION_START(nmod_poly_get_set_str)
         nmod_poly_clear(b);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -34,7 +34,7 @@ void arb_exp_simple(arb_t res, const arb_t x, slong prec)
     mag_clear(u);
 }
 
-TEST_FUNCTION_START(arb_exp)
+TEST_FUNCTION_START(arb_exp, state)
 {
     slong iter;
 
@@ -219,6 +219,6 @@ TEST_FUNCTION_START(arb_exp)
         mpfr_clear(t);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

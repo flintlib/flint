@@ -15,7 +15,7 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_interpolate_nmod_vec)
+TEST_FUNCTION_START(nmod_poly_interpolate_nmod_vec, state)
 {
     int i, result = 1;
 
@@ -61,5 +61,5 @@ TEST_FUNCTION_START(nmod_poly_interpolate_nmod_vec)
         _nmod_vec_clear(y);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

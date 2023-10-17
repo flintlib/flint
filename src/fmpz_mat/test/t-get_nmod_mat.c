@@ -14,7 +14,7 @@
 #include "nmod_mat.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_get_nmod_mat)
+TEST_FUNCTION_START(fmpz_mat_get_nmod_mat, state)
 {
     int i;
 
@@ -57,5 +57,5 @@ TEST_FUNCTION_START(fmpz_mat_get_nmod_mat)
         nmod_mat_clear(M2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

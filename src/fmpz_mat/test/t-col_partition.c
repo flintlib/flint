@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_col_partition)
+TEST_FUNCTION_START(fmpz_mat_col_partition, state)
 {
     int result = 0;
     slong i;
@@ -89,5 +89,5 @@ TEST_FUNCTION_START(fmpz_mat_col_partition)
         flint_free(part);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -47,7 +47,7 @@ _check_interval(const arf_t a, const arf_t b, const fmpz_t n)
     arb_clear(v);
 }
 
-TEST_FUNCTION_START(acb_dirichlet_isolate_hardy_z_zero)
+TEST_FUNCTION_START(acb_dirichlet_isolate_hardy_z_zero, state)
 {
     slong iter;
 
@@ -93,5 +93,5 @@ TEST_FUNCTION_START(acb_dirichlet_isolate_hardy_z_zero)
         fmpz_clear(n);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_gcd)
+TEST_FUNCTION_START(n_gcd, state)
 {
     int i, result;
 
@@ -101,5 +101,5 @@ TEST_FUNCTION_START(n_gcd)
         }
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

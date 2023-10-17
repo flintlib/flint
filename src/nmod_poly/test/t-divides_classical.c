@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_divides_classical)
+TEST_FUNCTION_START(nmod_poly_divides_classical, state)
 {
     int i, result;
 
@@ -177,5 +177,5 @@ TEST_FUNCTION_START(nmod_poly_divides_classical)
         nmod_poly_clear(q);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

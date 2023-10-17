@@ -14,7 +14,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_addmul_ui)
+TEST_FUNCTION_START(fmpz_addmul_ui, state)
 {
     int i, result;
 
@@ -107,5 +107,5 @@ TEST_FUNCTION_START(fmpz_addmul_ui)
         mpz_clear(e);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

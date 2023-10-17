@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "acb.h"
 
-TEST_FUNCTION_START(acb_get_mag)
+TEST_FUNCTION_START(acb_get_mag, state)
 {
     slong iter;
 
@@ -57,6 +57,6 @@ TEST_FUNCTION_START(acb_get_mag)
         arf_clear(s);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

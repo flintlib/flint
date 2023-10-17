@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-TEST_FUNCTION_START(fmpz_poly_inflate)
+TEST_FUNCTION_START(fmpz_poly_inflate, state)
 {
     slong i;
 
@@ -75,6 +75,6 @@ TEST_FUNCTION_START(fmpz_poly_inflate)
         fmpz_poly_clear(xp);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

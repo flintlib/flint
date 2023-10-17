@@ -15,7 +15,7 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_poly_pow_binexp)
+TEST_FUNCTION_START(fmpz_poly_pow_binexp, state)
 {
     int i, result;
 
@@ -79,5 +79,5 @@ TEST_FUNCTION_START(fmpz_poly_pow_binexp)
         fmpz_poly_clear(b);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

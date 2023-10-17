@@ -18,7 +18,7 @@
 #include "nmod_mat.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_precomp_preinv_threaded)
+TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_precomp_preinv_threaded, state)
 {
 #if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     int i;
@@ -239,9 +239,9 @@ TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_precomp_preinv_threaded)
         flint_free(args1);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 
 #else
-    TEST_FUNCTION_END_SKIPPED;
+    TEST_FUNCTION_END(state)_SKIPPED;
 #endif
 }

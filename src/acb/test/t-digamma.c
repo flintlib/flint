@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "acb.h"
 
-TEST_FUNCTION_START(acb_digamma)
+TEST_FUNCTION_START(acb_digamma, state)
 {
     slong iter;
 
@@ -74,5 +74,5 @@ TEST_FUNCTION_START(acb_digamma)
         acb_clear(c);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

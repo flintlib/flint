@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_scalar_mod_fmpz)
+TEST_FUNCTION_START(fmpz_mat_scalar_mod_fmpz, state)
 {
     int i;
 
@@ -53,5 +53,5 @@ TEST_FUNCTION_START(fmpz_mat_scalar_mod_fmpz)
 
 
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

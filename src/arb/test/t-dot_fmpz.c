@@ -13,7 +13,7 @@
 #include "fmpz_vec.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_dot_fmpz)
+TEST_FUNCTION_START(arb_dot_fmpz, state)
 {
     slong iter;
 
@@ -90,6 +90,6 @@ TEST_FUNCTION_START(arb_dot_fmpz)
         _fmpz_vec_clear(w, len);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

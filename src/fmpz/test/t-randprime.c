@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_randprime)
+TEST_FUNCTION_START(fmpz_randprime, state)
 {
     int i;
     flint_bitcnt_t bits;
@@ -97,5 +97,5 @@ TEST_FUNCTION_START(fmpz_randprime)
         }
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

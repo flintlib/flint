@@ -38,7 +38,7 @@ refimpl(slong * exp, const fmpz_t x, int bits)
     return m;
 }
 
-TEST_FUNCTION_START(fmpz_abs_lbound_ui_2exp)
+TEST_FUNCTION_START(fmpz_abs_lbound_ui_2exp, state)
 {
     slong iter;
 
@@ -72,5 +72,5 @@ TEST_FUNCTION_START(fmpz_abs_lbound_ui_2exp)
         fmpz_clear(x);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

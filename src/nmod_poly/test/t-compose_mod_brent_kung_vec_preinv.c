@@ -14,7 +14,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_vec_preinv)
+TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_vec_preinv, state)
 {
     int i;
 
@@ -82,5 +82,5 @@ TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_vec_preinv)
     }
 
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

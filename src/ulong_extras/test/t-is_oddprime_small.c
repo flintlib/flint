@@ -13,7 +13,7 @@
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_is_oddprime_small)
+TEST_FUNCTION_START(n_is_oddprime_small, state)
 {
    int i, result;
 
@@ -69,5 +69,5 @@ TEST_FUNCTION_START(n_is_oddprime_small)
       mpz_clear(d_m);
    }
 
-   TEST_FUNCTION_END;
+   TEST_FUNCTION_END(state);
 }

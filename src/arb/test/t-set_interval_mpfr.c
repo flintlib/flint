@@ -13,7 +13,7 @@
 #include <mpfr.h>
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_set_interval_mpfr)
+TEST_FUNCTION_START(arb_set_interval_mpfr, state)
 {
     slong iter;
 
@@ -55,6 +55,6 @@ TEST_FUNCTION_START(arb_set_interval_mpfr)
         mpfr_clear(bb);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

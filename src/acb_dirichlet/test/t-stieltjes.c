@@ -15,7 +15,7 @@
 void acb_dirichlet_stieltjes_integral(acb_t res, const fmpz_t n, const acb_t a, slong prec);
 void acb_dirichlet_stieltjes_em(acb_t res, const fmpz_t n, const acb_t a, slong prec);
 
-TEST_FUNCTION_START(acb_dirichlet_stieltjes)
+TEST_FUNCTION_START(acb_dirichlet_stieltjes, state)
 {
     slong iter;
 
@@ -115,6 +115,6 @@ TEST_FUNCTION_START(acb_dirichlet_stieltjes)
         fmpz_clear(n);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

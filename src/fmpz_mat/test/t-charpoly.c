@@ -15,7 +15,7 @@
 #include "fmpz_poly.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_charpoly)
+TEST_FUNCTION_START(fmpz_mat_charpoly, state)
 {
     slong m, n, rep, i;
 
@@ -107,5 +107,5 @@ TEST_FUNCTION_START(fmpz_mat_charpoly)
         fmpz_poly_clear(g);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

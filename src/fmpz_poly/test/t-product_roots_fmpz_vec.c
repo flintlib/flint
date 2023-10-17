@@ -13,7 +13,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-TEST_FUNCTION_START(fmpz_poly_product_roots_fmpz_vec)
+TEST_FUNCTION_START(fmpz_poly_product_roots_fmpz_vec, state)
 {
     int i, result;
 
@@ -61,5 +61,5 @@ TEST_FUNCTION_START(fmpz_poly_product_roots_fmpz_vec)
         _fmpz_vec_clear(x, n);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -15,7 +15,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_powmod_x_ui_preinv)
+TEST_FUNCTION_START(nmod_poly_powmod_x_ui_preinv, state)
 {
     int i, result;
 
@@ -154,5 +154,5 @@ TEST_FUNCTION_START(nmod_poly_powmod_x_ui_preinv)
         nmod_poly_clear(t);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

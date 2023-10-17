@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_prime_pi)
+TEST_FUNCTION_START(n_prime_pi, state)
 {
     int n;
 
@@ -38,5 +38,5 @@ TEST_FUNCTION_START(n_prime_pi)
         }
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

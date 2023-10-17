@@ -13,7 +13,7 @@
 #include "acb_dirichlet.h"
 #include "acb_poly.h"
 
-TEST_FUNCTION_START(acb_dirichlet_hurwitz_precomp)
+TEST_FUNCTION_START(acb_dirichlet_hurwitz_precomp, state)
 {
     slong iter;
 
@@ -75,6 +75,6 @@ TEST_FUNCTION_START(acb_dirichlet_hurwitz_precomp)
         acb_clear(z2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

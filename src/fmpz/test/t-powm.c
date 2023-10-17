@@ -14,7 +14,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_powm)
+TEST_FUNCTION_START(fmpz_powm, state)
 {
     int i, result;
 
@@ -179,6 +179,6 @@ TEST_FUNCTION_START(fmpz_powm)
         fmpz_clear(n);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

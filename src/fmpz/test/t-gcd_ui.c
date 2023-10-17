@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_gcd_ui)
+TEST_FUNCTION_START(fmpz_gcd_ui, state)
 {
     int i, result;
 
@@ -93,5 +93,5 @@ TEST_FUNCTION_START(fmpz_gcd_ui)
         fmpz_clear(fb);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

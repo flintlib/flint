@@ -13,7 +13,7 @@
 #include "fmpq.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_cos_pi_fmpq)
+TEST_FUNCTION_START(arb_cos_pi_fmpq, state)
 {
     slong iter;
 
@@ -52,6 +52,6 @@ TEST_FUNCTION_START(arb_cos_pi_fmpq)
         fmpq_clear(x);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

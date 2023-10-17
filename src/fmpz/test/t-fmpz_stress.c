@@ -75,7 +75,7 @@ void worker3(void * varg)
 }
 
 
-TEST_FUNCTION_START(fmpz_stress)
+TEST_FUNCTION_START(fmpz_stress, state)
 {
     slong i, j, k;
     slong max_num_threads = 5;
@@ -160,6 +160,6 @@ TEST_FUNCTION_START(fmpz_stress)
 
     flint_free(wargs);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

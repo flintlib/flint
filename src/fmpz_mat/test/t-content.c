@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_content)
+TEST_FUNCTION_START(fmpz_mat_content, state)
 {
 	int i;
 	fmpz_mat_t A,B;
@@ -76,6 +76,6 @@ cleanup:
 	}
 
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

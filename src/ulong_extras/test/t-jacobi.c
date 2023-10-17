@@ -13,7 +13,7 @@
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_jacobi)
+TEST_FUNCTION_START(n_jacobi, state)
 {
    int i, result;
 
@@ -49,5 +49,5 @@ TEST_FUNCTION_START(n_jacobi)
       mpz_clear(d_m);
    }
 
-   TEST_FUNCTION_END;
+   TEST_FUNCTION_END(state);
 }

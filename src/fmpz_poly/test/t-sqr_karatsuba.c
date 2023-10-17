@@ -15,7 +15,7 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_poly_sqr_karatsuba)
+TEST_FUNCTION_START(fmpz_poly_sqr_karatsuba, state)
 {
     int i, result;
 
@@ -113,5 +113,5 @@ TEST_FUNCTION_START(fmpz_poly_sqr_karatsuba)
         fmpz_poly_clear(out2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

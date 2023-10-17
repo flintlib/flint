@@ -26,7 +26,7 @@
 
 #if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER)
 
-TEST_FUNCTION_START(fmpz_print_read)
+TEST_FUNCTION_START(fmpz_print_read, state)
 {
     int i, j, n = 10000, result;
 
@@ -245,14 +245,14 @@ TEST_FUNCTION_START(fmpz_print_read)
         }
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 
 #else
 
-TEST_FUNCTION_START(fmpz_print_read)
+TEST_FUNCTION_START(fmpz_print_read, state)
 {
-    TEST_FUNCTION_END_SKIPPED;
+    TEST_FUNCTION_END(state)_SKIPPED;
 }
 
 #endif

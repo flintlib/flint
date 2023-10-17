@@ -14,7 +14,7 @@
 #include "fmpq.h"
 #include "fmpq_poly.h"
 
-TEST_FUNCTION_START(fmpq_poly_primitive_part)
+TEST_FUNCTION_START(fmpq_poly_primitive_part, state)
 {
     int i, result;
     ulong cflags = UWORD(0);
@@ -95,5 +95,5 @@ TEST_FUNCTION_START(fmpq_poly_primitive_part)
         fmpq_poly_clear(g);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

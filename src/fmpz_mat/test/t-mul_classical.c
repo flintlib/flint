@@ -11,7 +11,7 @@
 
 #include "test_helpers.h"
 #include "fmpz_mat.h"
-TEST_FUNCTION_START(fmpz_mat_mul_classical)
+TEST_FUNCTION_START(fmpz_mat_mul_classical, state)
 {
     fmpz_mat_t A, B, C, D;
     slong i;
@@ -51,5 +51,5 @@ TEST_FUNCTION_START(fmpz_mat_mul_classical)
         fmpz_mat_clear(D);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

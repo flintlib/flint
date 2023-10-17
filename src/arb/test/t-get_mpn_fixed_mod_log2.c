@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_get_mpn_fixed_mod_log2)
+TEST_FUNCTION_START(arb_get_mpn_fixed_mod_log2, state)
 {
     slong iter;
 
@@ -89,6 +89,6 @@ TEST_FUNCTION_START(arb_get_mpn_fixed_mod_log2)
         arb_clear(t);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

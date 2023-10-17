@@ -15,7 +15,7 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_poly_xgcd_modular)
+TEST_FUNCTION_START(fmpz_poly_xgcd_modular, state)
 {
     int i, result;
 
@@ -283,5 +283,5 @@ TEST_FUNCTION_START(fmpz_poly_xgcd_modular)
         fmpz_poly_clear(t);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_abs_ubound_ui_2exp)
+TEST_FUNCTION_START(fmpz_abs_ubound_ui_2exp, state)
 {
     slong iter;
     int result;
@@ -110,5 +110,5 @@ TEST_FUNCTION_START(fmpz_abs_ubound_ui_2exp)
         fmpz_clear(y);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

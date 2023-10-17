@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_euler_phi)
+TEST_FUNCTION_START(n_euler_phi, state)
 {
     int n, k, t;
 
@@ -30,5 +30,5 @@ TEST_FUNCTION_START(n_euler_phi)
         }
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

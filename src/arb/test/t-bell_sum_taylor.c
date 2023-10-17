@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_bell_sum_taylor)
+TEST_FUNCTION_START(arb_bell_sum_taylor, state)
 {
     slong iter;
 
@@ -56,6 +56,6 @@ TEST_FUNCTION_START(arb_bell_sum_taylor)
         fmpz_clear(n);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

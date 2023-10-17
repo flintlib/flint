@@ -16,7 +16,7 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_poly_compose)
+TEST_FUNCTION_START(fmpz_poly_compose, state)
 {
     int i, result;
 
@@ -212,5 +212,5 @@ TEST_FUNCTION_START(fmpz_poly_compose)
         fmpz_poly_clear(t);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

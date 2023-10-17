@@ -53,7 +53,7 @@ acb_inv_naive(acb_t z, const acb_t x, slong prec)
 #undef d
 }
 
-TEST_FUNCTION_START(acb_inv)
+TEST_FUNCTION_START(acb_inv, state)
 {
     slong iter;
 
@@ -137,6 +137,6 @@ TEST_FUNCTION_START(acb_inv)
         arf_clear(t);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_find_distinct_nonzero_roots)
+TEST_FUNCTION_START(nmod_poly_find_distinct_nonzero_roots, state)
 {
     slong i, j;
 
@@ -95,5 +95,5 @@ TEST_FUNCTION_START(nmod_poly_find_distinct_nonzero_roots)
         nmod_poly_clear(r);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

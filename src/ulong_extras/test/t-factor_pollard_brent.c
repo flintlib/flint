@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_factor_pollard_brent)
+TEST_FUNCTION_START(n_factor_pollard_brent, state)
 {
     mp_limb_t prime1, prime2, primeprod, fac, modval;
     int i, j, k, l, fails;
@@ -62,5 +62,5 @@ TEST_FUNCTION_START(n_factor_pollard_brent)
         flint_abort();
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

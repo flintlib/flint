@@ -13,7 +13,7 @@
 #include "fmpq.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_ceil)
+TEST_FUNCTION_START(arb_ceil, state)
 {
     slong iter;
 
@@ -66,5 +66,5 @@ TEST_FUNCTION_START(arb_ceil)
         fmpz_clear(y);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

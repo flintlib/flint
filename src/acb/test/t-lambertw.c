@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "acb.h"
 
-TEST_FUNCTION_START(acb_lambertw)
+TEST_FUNCTION_START(acb_lambertw, state)
 {
     slong iter;
 
@@ -161,6 +161,6 @@ TEST_FUNCTION_START(acb_lambertw)
         fmpz_clear(k);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

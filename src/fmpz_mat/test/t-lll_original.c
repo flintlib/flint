@@ -13,7 +13,7 @@
 #include "fmpz_mat.h"
 #include "fmpq.h"
 
-TEST_FUNCTION_START(fmpz_mat_lll_original)
+TEST_FUNCTION_START(fmpz_mat_lll_original, state)
 {
     int i;
 
@@ -55,5 +55,5 @@ TEST_FUNCTION_START(fmpz_mat_lll_original)
         fmpq_clear(eta);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

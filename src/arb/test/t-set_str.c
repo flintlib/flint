@@ -149,7 +149,7 @@ const char * testdata_invalid[] = {
     NULL,
 };
 
-TEST_FUNCTION_START(arb_set_str)
+TEST_FUNCTION_START(arb_set_str, state)
 {
     arb_t t, u, v;
     double x;
@@ -295,5 +295,5 @@ TEST_FUNCTION_START(arb_set_str)
     arb_clear(u);
     arb_clear(v);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

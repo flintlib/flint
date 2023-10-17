@@ -13,7 +13,7 @@
 #include "test_helpers.h"
 #include "fmpq_poly.h"
 
-TEST_FUNCTION_START(fmpq_poly_init_realloc_clear)
+TEST_FUNCTION_START(fmpq_poly_init_realloc_clear, state)
 {
     int i;
 
@@ -43,5 +43,5 @@ TEST_FUNCTION_START(fmpq_poly_init_realloc_clear)
         fmpq_poly_clear(a);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

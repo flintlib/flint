@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_atan_newton)
+TEST_FUNCTION_START(arb_atan_newton, state)
 {
     slong iter;
 
@@ -148,6 +148,6 @@ TEST_FUNCTION_START(arb_atan_newton)
         arb_clear(d);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

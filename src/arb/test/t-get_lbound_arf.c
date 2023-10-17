@@ -13,7 +13,7 @@
 #include "fmpq.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_get_lbound_arf)
+TEST_FUNCTION_START(arb_get_lbound_arf, state)
 {
     slong iter;
 
@@ -83,6 +83,6 @@ TEST_FUNCTION_START(arb_get_lbound_arf)
         arf_clear(b3);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

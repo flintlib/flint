@@ -14,7 +14,7 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_poly_nth_derivative)
+TEST_FUNCTION_START(fmpz_poly_nth_derivative, state)
 {
     ulong nth;
     int i, j, result;
@@ -76,5 +76,5 @@ TEST_FUNCTION_START(fmpz_poly_nth_derivative)
         fmpz_poly_clear(b);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

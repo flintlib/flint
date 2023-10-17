@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_factor_partial)
+TEST_FUNCTION_START(n_factor_partial, state)
 {
    int i, j, result;
 
@@ -43,5 +43,5 @@ TEST_FUNCTION_START(n_factor_partial)
       }
    }
 
-   TEST_FUNCTION_END;
+   TEST_FUNCTION_END(state);
 }

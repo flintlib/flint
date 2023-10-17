@@ -27,7 +27,7 @@ n_revbin_naive(ulong n, ulong b)
     return r;
 }
 
-TEST_FUNCTION_START(n_revbin)
+TEST_FUNCTION_START(n_revbin, state)
 {
     int i, result;
 
@@ -122,5 +122,5 @@ TEST_FUNCTION_START(n_revbin)
         }
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

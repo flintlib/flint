@@ -12,7 +12,7 @@
 #include "ulong_extras.h"
 #include "test_helpers.h"
 
-TEST_FUNCTION_START(udiv_qrnnd_preinv)
+TEST_FUNCTION_START(udiv_qrnnd_preinv, state)
 {
    int i, result;
 
@@ -45,5 +45,5 @@ TEST_FUNCTION_START(udiv_qrnnd_preinv)
       }
    }
 
-   TEST_FUNCTION_END;
+   TEST_FUNCTION_END(state);
 }

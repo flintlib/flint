@@ -31,7 +31,7 @@ static const char * composites_is_strong_probabprime[] = {
     NULL,
 };
 
-TEST_FUNCTION_START(fmpz_is_strong_probabprime)
+TEST_FUNCTION_START(fmpz_is_strong_probabprime, state)
 {
     int i, result, count = 0;
 
@@ -154,5 +154,5 @@ TEST_FUNCTION_START(fmpz_is_strong_probabprime)
         flint_abort();
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

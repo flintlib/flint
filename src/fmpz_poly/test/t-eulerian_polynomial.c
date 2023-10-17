@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-TEST_FUNCTION_START(fmpz_poly_eulerian_polynomial)
+TEST_FUNCTION_START(fmpz_poly_eulerian_polynomial, state)
 {
     ulong n, ix, mx;
     fmpz_t sum, fac;
@@ -83,5 +83,5 @@ TEST_FUNCTION_START(fmpz_poly_eulerian_polynomial)
     fmpz_clear(sum);
     fmpz_clear(fac);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

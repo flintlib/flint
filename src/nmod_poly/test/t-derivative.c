@@ -14,7 +14,7 @@
 #include "nmod_poly.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(nmod_poly_derivative)
+TEST_FUNCTION_START(nmod_poly_derivative, state)
 {
     int i, j, result = 1;
     fmpz_t t;
@@ -90,5 +90,5 @@ TEST_FUNCTION_START(nmod_poly_derivative)
         nmod_poly_clear(b);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

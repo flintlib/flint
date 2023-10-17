@@ -16,7 +16,7 @@
 
 #define NRATS 20
 
-TEST_FUNCTION_START(fmpq_poly_gegenbauer_c)
+TEST_FUNCTION_START(fmpq_poly_gegenbauer_c, state)
 {
     fmpq_poly_t T0, T1, T2, t, tt;
     fmpq_t a, rat;
@@ -90,5 +90,5 @@ TEST_FUNCTION_START(fmpq_poly_gegenbauer_c)
     fmpq_clear(a);
     fmpq_clear(rat);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

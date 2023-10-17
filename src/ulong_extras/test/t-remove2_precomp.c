@@ -13,7 +13,7 @@
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_remove2_precomp)
+TEST_FUNCTION_START(n_remove2_precomp, state)
 {
    int i, result;
    const mp_limb_t * primes;
@@ -100,5 +100,5 @@ TEST_FUNCTION_START(n_remove2_precomp)
       mpz_clear(d_p);
    }
 
-   TEST_FUNCTION_END;
+   TEST_FUNCTION_END(state);
 }

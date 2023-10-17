@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_power_sums)
+TEST_FUNCTION_START(nmod_poly_power_sums, state)
 {
     int i, result;
 
@@ -82,5 +82,5 @@ TEST_FUNCTION_START(nmod_poly_power_sums)
         nmod_poly_clear(e);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

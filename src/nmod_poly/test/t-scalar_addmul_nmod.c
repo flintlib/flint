@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_scalar_addmul_nmod)
+TEST_FUNCTION_START(nmod_poly_scalar_addmul_nmod, state)
 {
     slong i;
 
@@ -62,5 +62,5 @@ TEST_FUNCTION_START(nmod_poly_scalar_addmul_nmod)
         nmod_poly_clear(c);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

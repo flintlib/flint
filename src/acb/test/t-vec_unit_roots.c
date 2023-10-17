@@ -13,7 +13,7 @@
 #include "fmpq.h"
 #include "acb.h"
 
-TEST_FUNCTION_START(acb_vec_unit_roots)
+TEST_FUNCTION_START(acb_vec_unit_roots, state)
 {
     slong len;
 
@@ -73,6 +73,6 @@ TEST_FUNCTION_START(acb_vec_unit_roots)
         }
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

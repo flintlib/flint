@@ -14,7 +14,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_sqrt)
+TEST_FUNCTION_START(fmpz_sqrt, state)
 {
     int i, result;
 
@@ -93,5 +93,5 @@ TEST_FUNCTION_START(fmpz_sqrt)
         mpz_clear(mf2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

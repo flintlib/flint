@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "acb.h"
 
-TEST_FUNCTION_START(acb_rel_accuracy_bits)
+TEST_FUNCTION_START(acb_rel_accuracy_bits, state)
 {
     slong iter;
 
@@ -89,6 +89,6 @@ TEST_FUNCTION_START(acb_rel_accuracy_bits)
         acb_clear(z);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

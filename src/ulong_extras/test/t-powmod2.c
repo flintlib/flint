@@ -14,7 +14,7 @@
 #include "ulong_extras.h"
 #include "long_extras.h"
 
-TEST_FUNCTION_START(n_powmod2)
+TEST_FUNCTION_START(n_powmod2, state)
 {
     int i, result;
 
@@ -102,5 +102,5 @@ TEST_FUNCTION_START(n_powmod2)
         }
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

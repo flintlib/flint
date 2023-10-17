@@ -14,7 +14,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_log_series)
+TEST_FUNCTION_START(nmod_poly_log_series, state)
 {
     int i, result = 1;
 
@@ -113,5 +113,5 @@ TEST_FUNCTION_START(nmod_poly_log_series)
         nmod_poly_clear(B);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

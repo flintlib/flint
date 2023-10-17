@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "acb.h"
 
-TEST_FUNCTION_START(acb_pow_fmpz)
+TEST_FUNCTION_START(acb_pow_fmpz, state)
 {
     slong iter;
 
@@ -78,5 +78,5 @@ TEST_FUNCTION_START(acb_pow_fmpz)
         fmpz_clear(e3);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

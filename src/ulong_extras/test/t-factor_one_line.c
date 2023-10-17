@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_factor_one_line)
+TEST_FUNCTION_START(n_factor_one_line, state)
 {
    int i, result;
    slong num_iter;
@@ -59,5 +59,5 @@ TEST_FUNCTION_START(n_factor_one_line)
       flint_abort();
    }
 
-   TEST_FUNCTION_END;
+   TEST_FUNCTION_END(state);
 }

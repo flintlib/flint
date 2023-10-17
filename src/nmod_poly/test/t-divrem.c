@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_divrem)
+TEST_FUNCTION_START(nmod_poly_divrem, state)
 {
     int i, result;
 
@@ -305,5 +305,5 @@ TEST_FUNCTION_START(nmod_poly_divrem)
         nmod_poly_clear(prod);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

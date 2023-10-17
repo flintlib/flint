@@ -37,7 +37,7 @@ static const double answers[10] = {
   2815.70144392142227
 };
 
-TEST_FUNCTION_START(acb_calc_cauchy_bound)
+TEST_FUNCTION_START(acb_calc_cauchy_bound, state)
 {
     slong iter;
 
@@ -80,6 +80,6 @@ TEST_FUNCTION_START(acb_calc_cauchy_bound)
         acb_clear(x);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

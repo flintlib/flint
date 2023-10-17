@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_mul_strassen)
+TEST_FUNCTION_START(fmpz_mat_mul_strassen, state)
 {
     slong i;
 
@@ -54,5 +54,5 @@ TEST_FUNCTION_START(fmpz_mat_mul_strassen)
         fmpz_mat_clear(D);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

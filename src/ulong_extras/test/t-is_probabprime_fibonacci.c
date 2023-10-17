@@ -13,7 +13,7 @@
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_is_probabprime_fibonacci)
+TEST_FUNCTION_START(n_is_probabprime_fibonacci, state)
 {
    int i, result;
    ulong count = UWORD(0);
@@ -72,5 +72,5 @@ TEST_FUNCTION_START(n_is_probabprime_fibonacci)
       flint_abort();
    }
 
-   TEST_FUNCTION_END;
+   TEST_FUNCTION_END(state);
 }

@@ -13,7 +13,7 @@
 #include <string.h>
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_digits_round_inplace)
+TEST_FUNCTION_START(arb_digits_round_inplace, state)
 {
 
     {
@@ -81,6 +81,6 @@ TEST_FUNCTION_START(arb_digits_round_inplace)
         fmpz_clear(t);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

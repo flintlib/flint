@@ -14,7 +14,7 @@
 #include "long_extras.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_poly_get_set_coeff_si)
+TEST_FUNCTION_START(fmpz_poly_get_set_coeff_si, state)
 {
     int i, j, result;
 
@@ -47,5 +47,5 @@ TEST_FUNCTION_START(fmpz_poly_get_set_coeff_si)
         fmpz_poly_clear(a);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

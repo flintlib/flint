@@ -14,7 +14,7 @@
 #include "fmpq.h"
 #include "fmpq_poly.h"
 
-TEST_FUNCTION_START(fmpq_poly_interpolate_fmpz_vec)
+TEST_FUNCTION_START(fmpq_poly_interpolate_fmpz_vec, state)
 {
     int i;
 
@@ -65,5 +65,5 @@ TEST_FUNCTION_START(fmpq_poly_interpolate_fmpz_vec)
         _fmpz_vec_clear(z, n);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

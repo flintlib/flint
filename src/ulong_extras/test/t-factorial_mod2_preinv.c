@@ -29,7 +29,7 @@ n_factorial_mod2_foolproof(ulong n, mp_limb_t p, mp_limb_t pinv)
 }
 #endif
 
-TEST_FUNCTION_START(n_factorial_mod2_preinv)
+TEST_FUNCTION_START(n_factorial_mod2_preinv, state)
 {
     mp_limb_t n;
     int j;
@@ -55,5 +55,5 @@ TEST_FUNCTION_START(n_factorial_mod2_preinv)
         }
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "acb_dirichlet.h"
 
-TEST_FUNCTION_START(acb_dirichlet_platt_hardy_z_zeros)
+TEST_FUNCTION_START(acb_dirichlet_platt_hardy_z_zeros, state)
 {
     fmpz_t n;
     arb_ptr pa, pb;
@@ -52,5 +52,5 @@ TEST_FUNCTION_START(acb_dirichlet_platt_hardy_z_zeros)
     _arb_vec_clear(pa, maxcount);
     _arb_vec_clear(pb, maxcount);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -26,7 +26,7 @@ void check(mp_limb_t n, int s1, int s2)
 }
 #endif
 
-TEST_FUNCTION_START(n_moebius_mu)
+TEST_FUNCTION_START(n_moebius_mu, state)
 {
     int n, k, s;
     int * mu;
@@ -73,5 +73,5 @@ TEST_FUNCTION_START(n_moebius_mu)
         flint_abort();
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

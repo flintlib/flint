@@ -28,7 +28,7 @@ ulong byte_swap_naive(ulong n)
 }
 
 
-TEST_FUNCTION_START(byte_swap)
+TEST_FUNCTION_START(byte_swap, state)
 {
    int i, result;
 
@@ -79,5 +79,5 @@ TEST_FUNCTION_START(byte_swap)
       }
    }
 
-   TEST_FUNCTION_END;
+   TEST_FUNCTION_END(state);
 }

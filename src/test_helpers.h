@@ -37,20 +37,20 @@ test_struct;
 
 #define TEST_FUNCTION(label) { CAT(test, label), TEMPLATE_STR(label) }
 
-#define TEST_FUNCTION_START(label)                      \
+#define TEST_FUNCTION_START(label, state)               \
 int CAT(test, label)(void)                              \
 {                                                       \
     FLINT_TEST_INIT(state);                             \
     printf(#label "....");                              \
     fflush(stdout);                                     \
 
-#define TEST_FUNCTION_END                               \
+#define TEST_FUNCTION_END(state)                        \
     FLINT_TEST_CLEANUP(state);                          \
     printf("PASS\n");                                   \
     return 0;                                           \
 }
 
-#define TEST_FUNCTION_END_SKIPPED                       \
+#define TEST_FUNCTION_END_SKIPPED(state)                \
     FLINT_TEST_CLEANUP(state);                          \
     printf("SKIPPED\n");                                \
     return 0;                                           \

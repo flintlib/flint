@@ -14,7 +14,7 @@
 #include "long_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_addmul_si)
+TEST_FUNCTION_START(fmpz_addmul_si, state)
 {
     int i, result;
 
@@ -111,6 +111,6 @@ TEST_FUNCTION_START(fmpz_addmul_si)
         mpz_clear(e);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

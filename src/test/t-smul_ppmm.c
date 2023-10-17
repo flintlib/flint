@@ -12,7 +12,7 @@
 #include "ulong_extras.h"
 #include "test_helpers.h"
 
-TEST_FUNCTION_START(smul_ppmm)
+TEST_FUNCTION_START(smul_ppmm, state)
 {
    int i, result;
 
@@ -73,5 +73,5 @@ TEST_FUNCTION_START(smul_ppmm)
       }
    }
 
-   TEST_FUNCTION_END;
+   TEST_FUNCTION_END(state);
 }

@@ -18,7 +18,7 @@
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 
-TEST_FUNCTION_START(fmpz_poly_hensel_lift_without_only_inverse)
+TEST_FUNCTION_START(fmpz_poly_hensel_lift_without_only_inverse, state)
 {
     int i, result;
 
@@ -184,5 +184,5 @@ TEST_FUNCTION_START(fmpz_poly_hensel_lift_without_only_inverse)
         fmpz_poly_clear(F_poly);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

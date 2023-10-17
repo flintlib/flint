@@ -11,7 +11,7 @@
 
 #include "test_helpers.h"
 #include "fmpz_poly.h"
-TEST_FUNCTION_START(fmpz_poly_legendre_pt)
+TEST_FUNCTION_START(fmpz_poly_legendre_pt, state)
 {
     fmpz_poly_t T0, T1, T2, t, tt;
     slong n;
@@ -59,5 +59,5 @@ TEST_FUNCTION_START(fmpz_poly_legendre_pt)
     fmpz_poly_clear(t);
     fmpz_poly_clear(tt);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

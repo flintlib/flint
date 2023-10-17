@@ -15,7 +15,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_revert_series_lagrange_fast)
+TEST_FUNCTION_START(nmod_poly_revert_series_lagrange_fast, state)
 {
     int i, result;
 
@@ -94,5 +94,5 @@ TEST_FUNCTION_START(nmod_poly_revert_series_lagrange_fast)
         nmod_poly_clear(h);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

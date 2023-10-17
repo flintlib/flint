@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_rfac_uiui)
+TEST_FUNCTION_START(fmpz_rfac_uiui, state)
 {
     int i, result;
 
@@ -64,5 +64,5 @@ TEST_FUNCTION_START(fmpz_rfac_uiui)
         fmpz_clear(r3);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

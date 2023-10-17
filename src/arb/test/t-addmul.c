@@ -70,7 +70,7 @@ arb_addmul_naive(arb_t z, const arb_t x, const arb_t y, slong prec)
     arb_clear(t);
 }
 
-TEST_FUNCTION_START(arb_addmul)
+TEST_FUNCTION_START(arb_addmul, state)
 {
     slong iter, iter2;
 
@@ -308,5 +308,5 @@ TEST_FUNCTION_START(arb_addmul)
         arb_clear(v);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

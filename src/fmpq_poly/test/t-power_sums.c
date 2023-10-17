@@ -14,7 +14,7 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
-TEST_FUNCTION_START(fmpq_poly_power_sums)
+TEST_FUNCTION_START(fmpq_poly_power_sums, state)
 {
     int i, j, k, l, den, result;
     fmpz_t il, jl, kl, dl;
@@ -176,5 +176,5 @@ TEST_FUNCTION_START(fmpq_poly_power_sums)
         fmpq_poly_clear(d);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

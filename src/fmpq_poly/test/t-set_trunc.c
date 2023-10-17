@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "fmpq_poly.h"
 
-TEST_FUNCTION_START(fmpq_poly_set_trunc)
+TEST_FUNCTION_START(fmpq_poly_set_trunc, state)
 {
     int i, result;
 
@@ -61,5 +61,5 @@ TEST_FUNCTION_START(fmpq_poly_set_trunc)
         fmpq_poly_clear(c);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

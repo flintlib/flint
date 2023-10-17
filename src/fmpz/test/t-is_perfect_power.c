@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_is_perfect_power)
+TEST_FUNCTION_START(fmpz_is_perfect_power, state)
 {
    int i, result;
    ulong bits, exp;
@@ -140,5 +140,5 @@ TEST_FUNCTION_START(fmpz_is_perfect_power)
    fmpz_clear(pow);
    fmpz_clear(root);
 
-   TEST_FUNCTION_END;
+   TEST_FUNCTION_END(state);
 }

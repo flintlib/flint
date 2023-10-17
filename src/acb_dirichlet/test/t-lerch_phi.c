@@ -61,7 +61,7 @@ const double testdata[NUM_TESTS][8] = {
     { -3.0, 0.0, -2.0, 0.0, -2.0, 0.0, 1.84375, 0.0 },
 };
 
-TEST_FUNCTION_START(acb_dirichlet_lerch_phi)
+TEST_FUNCTION_START(acb_dirichlet_lerch_phi, state)
 {
     slong iter;
 
@@ -188,5 +188,5 @@ TEST_FUNCTION_START(acb_dirichlet_lerch_phi)
         acb_clear(r3);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -38,7 +38,7 @@ static const char * composites_is_prime[] = {
     NULL,
 };
 
-TEST_FUNCTION_START(fmpz_is_prime)
+TEST_FUNCTION_START(fmpz_is_prime, state)
 {
     int i, result, r1;
 
@@ -158,5 +158,5 @@ TEST_FUNCTION_START(fmpz_is_prime)
         fmpz_clear(p);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

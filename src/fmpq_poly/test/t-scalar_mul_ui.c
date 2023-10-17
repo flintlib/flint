@@ -15,7 +15,7 @@
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-TEST_FUNCTION_START(fmpq_poly_scalar_mul_ui)
+TEST_FUNCTION_START(fmpq_poly_scalar_mul_ui, state)
 {
     int i, result;
     ulong cflags = UWORD(0);
@@ -127,5 +127,5 @@ TEST_FUNCTION_START(fmpq_poly_scalar_mul_ui)
         fmpq_poly_clear(c);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

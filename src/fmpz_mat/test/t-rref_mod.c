@@ -53,7 +53,7 @@ check_rref(fmpz_mat_t A)
     }
 }
 
-TEST_FUNCTION_START(fmpz_mat_rref_mod)
+TEST_FUNCTION_START(fmpz_mat_rref_mod, state)
 {
     fmpz_mat_t A;
     fmpz_t p;
@@ -144,5 +144,5 @@ TEST_FUNCTION_START(fmpz_mat_rref_mod)
         flint_free(perm);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

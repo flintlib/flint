@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "acb_dirichlet.h"
 
-TEST_FUNCTION_START(acb_dirichlet_backlund_s)
+TEST_FUNCTION_START(acb_dirichlet_backlund_s, state)
 {
     slong iter;
 
@@ -56,5 +56,5 @@ TEST_FUNCTION_START(acb_dirichlet_backlund_s)
         arb_clear(c);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

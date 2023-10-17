@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_urandint)
+TEST_FUNCTION_START(n_urandint, state)
 {
     ulong limit, rand_num;
     slong deviation;
@@ -119,5 +119,5 @@ TEST_FUNCTION_START(n_urandint)
 
     flint_free(count_in_subrange);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

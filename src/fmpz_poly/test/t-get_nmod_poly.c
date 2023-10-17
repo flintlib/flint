@@ -15,7 +15,7 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_poly_get_nmod_poly)
+TEST_FUNCTION_START(fmpz_poly_get_nmod_poly, state)
 {
     int i;
 
@@ -57,5 +57,5 @@ TEST_FUNCTION_START(fmpz_poly_get_nmod_poly)
         nmod_poly_clear(M2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_get_fmpz_mid_rad_10exp)
+TEST_FUNCTION_START(arb_get_fmpz_mid_rad_10exp, state)
 {
     slong iter;
 
@@ -72,5 +72,5 @@ TEST_FUNCTION_START(arb_get_fmpz_mid_rad_10exp)
         fmpz_clear(exp);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

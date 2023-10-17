@@ -13,7 +13,7 @@
 #include "test_helpers.h"
 #include "fmpq_poly.h"
 
-TEST_FUNCTION_START(fmpq_poly_make_monic)
+TEST_FUNCTION_START(fmpq_poly_make_monic, state)
 {
     int i, result;
     ulong cflags = UWORD(0);
@@ -71,5 +71,5 @@ TEST_FUNCTION_START(fmpq_poly_make_monic)
         fmpq_poly_clear(f);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

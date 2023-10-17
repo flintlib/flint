@@ -15,7 +15,7 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_poly_scalar_submul_fmpz)
+TEST_FUNCTION_START(fmpz_poly_scalar_submul_fmpz, state)
 {
     int i, result;
 
@@ -92,5 +92,5 @@ TEST_FUNCTION_START(fmpz_poly_scalar_submul_fmpz)
         fmpz_poly_clear(c);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_divides)
+TEST_FUNCTION_START(fmpz_divides, state)
 {
     int i, result;
 
@@ -157,6 +157,6 @@ TEST_FUNCTION_START(fmpz_divides)
         fmpz_clear(q);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

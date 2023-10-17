@@ -14,7 +14,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_sqrtrem)
+TEST_FUNCTION_START(fmpz_sqrtrem, state)
 {
     int i, result;
 
@@ -140,5 +140,5 @@ TEST_FUNCTION_START(fmpz_sqrtrem)
         mpz_clear(mf2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

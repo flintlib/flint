@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "acb_dirichlet.h"
 
-TEST_FUNCTION_START(acb_dirichlet_zeta_bound)
+TEST_FUNCTION_START(acb_dirichlet_zeta_bound, state)
 {
     slong iter;
 
@@ -139,6 +139,6 @@ TEST_FUNCTION_START(acb_dirichlet_zeta_bound)
         mag_clear(m2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

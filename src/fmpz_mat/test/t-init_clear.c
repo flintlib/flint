@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_init_clear)
+TEST_FUNCTION_START(fmpz_mat_init_clear, state)
 {
     int i;
 
@@ -33,5 +33,5 @@ TEST_FUNCTION_START(fmpz_mat_init_clear)
         fmpz_mat_clear(a);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -14,7 +14,7 @@
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_cbrt_binary_search)
+TEST_FUNCTION_START(n_cbrt_binary_search, state)
 {
     int i, result;
 
@@ -143,5 +143,5 @@ TEST_FUNCTION_START(n_cbrt_binary_search)
         mpz_clear(mpz_val);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

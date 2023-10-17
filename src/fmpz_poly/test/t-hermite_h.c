@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "fmpz_poly.h"
 
-TEST_FUNCTION_START(fmpz_poly_hermite_h)
+TEST_FUNCTION_START(fmpz_poly_hermite_h, state)
 {
     fmpz_poly_t T0, T1, t1, t2;
     slong n;
@@ -57,5 +57,5 @@ TEST_FUNCTION_START(fmpz_poly_hermite_h)
     fmpz_poly_clear(t1);
     fmpz_poly_clear(t2);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

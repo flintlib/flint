@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "fmpz_poly.h"
 
-TEST_FUNCTION_START(fmpz_poly_is_cyclotomic)
+TEST_FUNCTION_START(fmpz_poly_is_cyclotomic, state)
 {
     int i;
 
@@ -98,5 +98,5 @@ TEST_FUNCTION_START(fmpz_poly_is_cyclotomic)
         fmpz_poly_clear(g);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

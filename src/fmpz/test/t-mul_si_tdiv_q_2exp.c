@@ -15,7 +15,7 @@
 #include "fmpz.h"
 #include "long_extras.h"
 
-TEST_FUNCTION_START(fmpz_mul_si_tdiv_q_2exp)
+TEST_FUNCTION_START(fmpz_mul_si_tdiv_q_2exp, state)
 {
     int i, result;
 
@@ -106,5 +106,5 @@ TEST_FUNCTION_START(fmpz_mul_si_tdiv_q_2exp)
         mpz_clear(f);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

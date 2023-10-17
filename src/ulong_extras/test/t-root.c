@@ -13,7 +13,7 @@
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_root)
+TEST_FUNCTION_START(n_root, state)
 {
    int i, result;
    mp_limb_t upper_limit;
@@ -162,5 +162,5 @@ TEST_FUNCTION_START(n_root)
         mpz_clear(h);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

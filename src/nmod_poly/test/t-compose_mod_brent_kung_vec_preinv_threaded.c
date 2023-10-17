@@ -16,7 +16,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_vec_preinv_threaded)
+TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_vec_preinv_threaded, state)
 {
 #if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     int i;
@@ -91,8 +91,8 @@ TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_vec_preinv_threaded)
         flint_free(pow);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 #else
-    TEST_FUNCTION_END_SKIPPED;
+    TEST_FUNCTION_END(state)_SKIPPED;
 #endif
 }

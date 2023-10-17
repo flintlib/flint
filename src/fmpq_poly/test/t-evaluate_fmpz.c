@@ -14,7 +14,7 @@
 #include "fmpq.h"
 #include "fmpq_poly.h"
 
-TEST_FUNCTION_START(fmpq_poly_evaluate_fmpz)
+TEST_FUNCTION_START(fmpq_poly_evaluate_fmpz, state)
 {
     int i, result;
 
@@ -100,5 +100,5 @@ TEST_FUNCTION_START(fmpq_poly_evaluate_fmpz)
         fmpq_poly_clear(g);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

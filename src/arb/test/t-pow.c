@@ -13,7 +13,7 @@
 #include "arb.h"
 #include "double_extras.h"
 
-TEST_FUNCTION_START(arb_pow)
+TEST_FUNCTION_START(arb_pow, state)
 {
     slong iter;
 
@@ -177,5 +177,5 @@ TEST_FUNCTION_START(arb_pow)
         arb_clear(a);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

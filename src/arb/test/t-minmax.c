@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_minmax)
+TEST_FUNCTION_START(arb_minmax, state)
 {
     slong iter;
 
@@ -83,5 +83,5 @@ TEST_FUNCTION_START(arb_minmax)
 	arb_clear(w2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

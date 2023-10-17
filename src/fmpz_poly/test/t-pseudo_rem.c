@@ -14,7 +14,7 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_poly_pseudo_rem)
+TEST_FUNCTION_START(fmpz_poly_pseudo_rem, state)
 {
     int i, result;
 
@@ -116,5 +116,5 @@ TEST_FUNCTION_START(fmpz_poly_pseudo_rem)
         fmpz_poly_clear(r);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

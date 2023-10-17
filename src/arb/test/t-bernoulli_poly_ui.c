@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_bernoulli_poly_ui)
+TEST_FUNCTION_START(arb_bernoulli_poly_ui, state)
 {
     slong iter;
 
@@ -74,6 +74,6 @@ TEST_FUNCTION_START(arb_bernoulli_poly_ui)
         arb_clear(res2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

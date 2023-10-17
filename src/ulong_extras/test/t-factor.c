@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_factor)
+TEST_FUNCTION_START(n_factor, state)
 {
     int i, j, result;
 
@@ -68,5 +68,5 @@ TEST_FUNCTION_START(n_factor)
         }
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

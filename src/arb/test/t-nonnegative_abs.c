@@ -118,7 +118,7 @@ int nearly_equal(const arb_t x, const arb_t y)
     return res;
 }
 
-TEST_FUNCTION_START(arb_nonnegative_abs)
+TEST_FUNCTION_START(arb_nonnegative_abs, state)
 {
     slong iter, wide;
 
@@ -170,5 +170,5 @@ TEST_FUNCTION_START(arb_nonnegative_abs)
         }
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

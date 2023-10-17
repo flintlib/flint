@@ -14,7 +14,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_popcnt)
+TEST_FUNCTION_START(fmpz_popcnt, state)
 {
     int i, result;
     flint_bitcnt_t r1, r2;
@@ -49,5 +49,5 @@ TEST_FUNCTION_START(fmpz_popcnt)
         mpz_clear(b);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

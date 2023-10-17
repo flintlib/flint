@@ -13,7 +13,7 @@
 #include <mpfr.h>
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_can_round_mpfr)
+TEST_FUNCTION_START(arb_can_round_mpfr, state)
 {
     slong iter;
 
@@ -73,5 +73,5 @@ TEST_FUNCTION_START(arb_can_round_mpfr)
         mpfr_clear(y2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

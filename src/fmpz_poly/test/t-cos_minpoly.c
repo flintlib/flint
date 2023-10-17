@@ -51,7 +51,7 @@ static const short testdata[] = {
     -1
 };
 
-TEST_FUNCTION_START(fmpz_poly_cos_minpoly)
+TEST_FUNCTION_START(fmpz_poly_cos_minpoly, state)
 {
     fmpz_poly_t p;
     slong n;
@@ -81,5 +81,5 @@ TEST_FUNCTION_START(fmpz_poly_cos_minpoly)
 
     fmpz_poly_clear(p);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -14,7 +14,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_sqrt_series)
+TEST_FUNCTION_START(nmod_poly_sqrt_series, state)
 {
     int i, result;
 
@@ -95,5 +95,5 @@ TEST_FUNCTION_START(nmod_poly_sqrt_series)
         nmod_poly_clear(h);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

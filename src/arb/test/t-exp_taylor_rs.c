@@ -13,7 +13,7 @@
 #include "mpn_extras.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_exp_taylor_rs)
+TEST_FUNCTION_START(arb_exp_taylor_rs, state)
 {
     slong iter;
 
@@ -79,6 +79,6 @@ TEST_FUNCTION_START(arb_exp_taylor_rs)
         flint_free(t);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

@@ -13,7 +13,7 @@
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_is_strong_probabprime_precomp)
+TEST_FUNCTION_START(n_is_strong_probabprime_precomp, state)
 {
    int i, j, result;
    ulong count = UWORD(0);
@@ -98,5 +98,5 @@ TEST_FUNCTION_START(n_is_strong_probabprime_precomp)
       flint_abort();
    }
 
-   TEST_FUNCTION_END;
+   TEST_FUNCTION_END(state);
 }

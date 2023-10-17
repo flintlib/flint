@@ -14,7 +14,7 @@
 #include "mpn_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_get_mpn)
+TEST_FUNCTION_START(fmpz_get_mpn, state)
 {
 
     fmpz_t a, b, mmin;
@@ -114,5 +114,5 @@ TEST_FUNCTION_START(fmpz_get_mpn)
     fmpz_clear(b);
     fmpz_clear(mmin);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

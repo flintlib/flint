@@ -14,7 +14,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_dlog)
+TEST_FUNCTION_START(fmpz_dlog, state)
 {
     int i, result;
 
@@ -58,6 +58,6 @@ TEST_FUNCTION_START(fmpz_dlog)
     }
 
     mpfr_free_cache();
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

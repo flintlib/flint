@@ -15,7 +15,7 @@
 
 #pragma GCC diagnostic ignored "-Woverlength-strings"
 
-TEST_FUNCTION_START(fmpq_poly_resultant_div)
+TEST_FUNCTION_START(fmpq_poly_resultant_div, state)
 {
     int i, result;
 
@@ -140,5 +140,5 @@ TEST_FUNCTION_START(fmpq_poly_resultant_div)
         fmpz_clear(den);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -15,7 +15,7 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_poly_2norm_normalised_bits)
+TEST_FUNCTION_START(fmpz_poly_2norm_normalised_bits, state)
 {
     int i, result;
 
@@ -59,5 +59,5 @@ TEST_FUNCTION_START(fmpz_poly_2norm_normalised_bits)
         fmpz_poly_clear(f);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

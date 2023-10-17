@@ -30,7 +30,7 @@ void check_prime_bounds(ulong n, mp_limb_t ans)
     flint_abort();
 }
 
-TEST_FUNCTION_START(n_nth_prime_bounds)
+TEST_FUNCTION_START(n_nth_prime_bounds, state)
 {
     int n;
 
@@ -60,5 +60,5 @@ TEST_FUNCTION_START(n_nth_prime_bounds)
     check_prime_bounds(UWORD(100000000000000000), UWORD(4185296581467695669));
 #endif
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_trace)
+TEST_FUNCTION_START(fmpz_mat_trace, state)
 {
     slong i;
 
@@ -65,5 +65,5 @@ TEST_FUNCTION_START(fmpz_mat_trace)
         fmpz_clear(trba);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

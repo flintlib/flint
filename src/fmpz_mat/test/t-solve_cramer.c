@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_solve_cramer)
+TEST_FUNCTION_START(fmpz_mat_solve_cramer, state)
 {
     fmpz_mat_t A, X, B, AX;
     fmpz_t den;
@@ -100,5 +100,5 @@ TEST_FUNCTION_START(fmpz_mat_solve_cramer)
         fmpz_clear(den);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

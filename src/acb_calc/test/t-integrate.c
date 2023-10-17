@@ -334,7 +334,7 @@ f_min(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
     return 0;
 }
 
-TEST_FUNCTION_START(acb_calc_integrate)
+TEST_FUNCTION_START(acb_calc_integrate, state)
 {
     slong iter;
 
@@ -708,6 +708,6 @@ TEST_FUNCTION_START(acb_calc_integrate)
         mag_clear(tol);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

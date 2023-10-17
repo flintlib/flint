@@ -15,7 +15,7 @@
 #include "fmpz_mat.h"
 #include "fmpz_poly.h"
 
-TEST_FUNCTION_START(fmpz_mat_minpoly)
+TEST_FUNCTION_START(fmpz_mat_minpoly, state)
 {
     slong m, n, rep, i, j;
 
@@ -132,5 +132,5 @@ TEST_FUNCTION_START(fmpz_mat_minpoly)
         fmpz_poly_clear(g);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

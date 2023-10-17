@@ -30,7 +30,7 @@ sin_x(acb_ptr out, const acb_t inp, void * params, slong order, slong prec)
 }
 #endif
 
-TEST_FUNCTION_START(acb_calc_integrate_taylor)
+TEST_FUNCTION_START(acb_calc_integrate_taylor, state)
 {
     slong iter;
 
@@ -86,6 +86,6 @@ TEST_FUNCTION_START(acb_calc_integrate_taylor)
         arf_clear(outr);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

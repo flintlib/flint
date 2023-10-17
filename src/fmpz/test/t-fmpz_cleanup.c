@@ -14,7 +14,7 @@
 #include "fmpz_vec.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_cleanup)
+TEST_FUNCTION_START(fmpz_cleanup, state)
 {
     slong iter;
 
@@ -50,6 +50,6 @@ TEST_FUNCTION_START(fmpz_cleanup)
         _fmpz_vec_clear(B, n);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

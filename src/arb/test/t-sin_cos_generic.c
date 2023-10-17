@@ -14,7 +14,7 @@
 #include "fmpq.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_sin_cos_generic)
+TEST_FUNCTION_START(arb_sin_cos_generic, state)
 {
     slong iter;
 
@@ -201,5 +201,5 @@ TEST_FUNCTION_START(arb_sin_cos_generic)
         mag_clear(allow);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

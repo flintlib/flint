@@ -13,7 +13,7 @@
 #include "test_helpers.h"
 #include "acb_dirichlet.h"
 
-TEST_FUNCTION_START(acb_dirichlet_l_vec_hurwitz)
+TEST_FUNCTION_START(acb_dirichlet_l_vec_hurwitz, state)
 {
     slong iter;
 
@@ -105,6 +105,6 @@ TEST_FUNCTION_START(acb_dirichlet_l_vec_hurwitz)
         acb_dirichlet_hurwitz_precomp_clear(pre);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

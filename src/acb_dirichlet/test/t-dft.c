@@ -52,7 +52,7 @@ check_vec_eq_prec(acb_srcptr w1, acb_srcptr w2, slong len, slong prec, slong dig
 }
 
 
-TEST_FUNCTION_START(acb_dirichlet_dft)
+TEST_FUNCTION_START(acb_dirichlet_dft, state)
 {
     slong k;
     slong prec = 100, digits = 30;
@@ -116,5 +116,5 @@ TEST_FUNCTION_START(acb_dirichlet_dft)
         acb_clear(chiy);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

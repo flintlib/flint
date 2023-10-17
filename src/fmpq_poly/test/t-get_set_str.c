@@ -32,7 +32,7 @@ void check_invalid(char * s)
 }
 
 
-TEST_FUNCTION_START(fmpq_poly_get_set_str)
+TEST_FUNCTION_START(fmpq_poly_get_set_str, state)
 {
     int i, result;
     ulong cflags = UWORD(0);
@@ -90,5 +90,5 @@ TEST_FUNCTION_START(fmpq_poly_get_set_str)
         flint_free(str);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -185,7 +185,7 @@ fmpz_cdiv_r(fmpz_t r, const fmpz_t a, const fmpz_t b)
     fmpz_clear(t);
 }
 
-TEST_FUNCTION_START(fmpz_div_newton)
+TEST_FUNCTION_START(fmpz_div_newton, state)
 {
     slong iter;
 
@@ -208,5 +208,5 @@ TEST_FUNCTION_START(fmpz_div_newton)
         test_div_q(_fmpz_divexact_newton, fmpz_divexact, state, "divexact");
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

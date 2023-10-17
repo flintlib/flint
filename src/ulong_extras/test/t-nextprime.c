@@ -15,7 +15,7 @@
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_nextprime)
+TEST_FUNCTION_START(n_nextprime, state)
 {
     mp_limb_t n;
     mp_limb_t res1, res2;
@@ -82,5 +82,5 @@ TEST_FUNCTION_START(n_nextprime)
 
     mpz_clear(mpz_n);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

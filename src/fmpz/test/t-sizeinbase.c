@@ -15,7 +15,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_sizeinbase)
+TEST_FUNCTION_START(fmpz_sizeinbase, state)
 {
     int i, result;
 
@@ -51,5 +51,5 @@ TEST_FUNCTION_START(fmpz_sizeinbase)
         mpz_clear(b);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -13,7 +13,7 @@
 #include "fmpq.h"
 #include "acb_dirichlet.h"
 
-TEST_FUNCTION_START(acb_dirichlet_l_fmpq)
+TEST_FUNCTION_START(acb_dirichlet_l_fmpq, state)
 {
     slong iter;
 
@@ -72,5 +72,5 @@ TEST_FUNCTION_START(acb_dirichlet_l_fmpq)
         acb_clear(u);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -15,7 +15,7 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_poly_evaluate_horner_fmpz)
+TEST_FUNCTION_START(fmpz_poly_evaluate_horner_fmpz, state)
 {
     int i, result;
 
@@ -87,5 +87,5 @@ TEST_FUNCTION_START(fmpz_poly_evaluate_horner_fmpz)
         fmpz_poly_clear(g);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

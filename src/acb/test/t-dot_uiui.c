@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "acb.h"
 
-TEST_FUNCTION_START(acb_dot_uiui)
+TEST_FUNCTION_START(acb_dot_uiui, state)
 {
     slong iter;
 
@@ -94,6 +94,6 @@ TEST_FUNCTION_START(acb_dot_uiui)
         fmpz_clear(c);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

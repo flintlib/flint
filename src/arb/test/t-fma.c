@@ -23,7 +23,7 @@ arb_fma_naive(arb_t res, const arb_t x, const arb_t y, const arb_t z, slong prec
     arb_clear(t);
 }
 
-TEST_FUNCTION_START(arb_fma)
+TEST_FUNCTION_START(arb_fma, state)
 {
     slong iter;
 
@@ -113,5 +113,5 @@ TEST_FUNCTION_START(arb_fma)
         arb_clear(res2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "fmpq_poly.h"
 
-TEST_FUNCTION_START(fmpq_poly_laguerre_l)
+TEST_FUNCTION_START(fmpq_poly_laguerre_l, state)
 {
     fmpq_poly_t T0, T1, T2, t, tt;
     slong n;
@@ -58,5 +58,5 @@ TEST_FUNCTION_START(fmpq_poly_laguerre_l)
     fmpq_poly_clear(t);
     fmpq_poly_clear(tt);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

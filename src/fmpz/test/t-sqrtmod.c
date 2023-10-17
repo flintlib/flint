@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_sqrtmod)
+TEST_FUNCTION_START(fmpz_sqrtmod, state)
 {
     int i, result;
 
@@ -113,5 +113,5 @@ TEST_FUNCTION_START(fmpz_sqrtmod)
         fmpz_clear(p);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

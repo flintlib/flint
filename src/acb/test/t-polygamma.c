@@ -20,7 +20,7 @@ static const char *testdata[5] = {
     "-2.404113806319188570799476323022899981529972584680997763584543110683676411572626180372911747218670516 +/- 1e-90",
 };
 
-TEST_FUNCTION_START(acb_polygamma)
+TEST_FUNCTION_START(acb_polygamma, state)
 {
     slong iter;
 
@@ -82,5 +82,5 @@ TEST_FUNCTION_START(acb_polygamma)
         acb_clear(c);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_get_set_ui_array)
+TEST_FUNCTION_START(fmpz_get_set_ui_array, state)
 {
     int i;
     slong max_limbs = 100;
@@ -72,5 +72,5 @@ TEST_FUNCTION_START(fmpz_get_set_ui_array)
 
     flint_free(limbs);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

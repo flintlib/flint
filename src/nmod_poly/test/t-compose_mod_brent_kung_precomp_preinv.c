@@ -15,7 +15,7 @@
 #include "nmod_mat.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_precomp_preinv)
+TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_precomp_preinv, state)
 {
     int i;
 
@@ -202,5 +202,5 @@ TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_precomp_preinv)
         nmod_poly_clear(d);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

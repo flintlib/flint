@@ -13,7 +13,7 @@
 #include "acb_poly.h"
 #include "acb_dirichlet.h"
 
-TEST_FUNCTION_START(acb_dirichlet_zeta_jet_rs)
+TEST_FUNCTION_START(acb_dirichlet_zeta_jet_rs, state)
 {
     slong iter;
 
@@ -101,6 +101,6 @@ TEST_FUNCTION_START(acb_dirichlet_zeta_jet_rs)
         _acb_vec_clear(r2, 2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

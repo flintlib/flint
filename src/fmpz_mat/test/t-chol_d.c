@@ -14,7 +14,7 @@
 
 #define FMPZ_MAT_CHOL_EPS (1.0E-9)
 
-TEST_FUNCTION_START(fmpz_mat_chol_d)
+TEST_FUNCTION_START(fmpz_mat_chol_d, state)
 {
     int i;
 
@@ -68,5 +68,5 @@ TEST_FUNCTION_START(fmpz_mat_chol_d)
         d_mat_clear(Btmp);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_power_sum_vec)
+TEST_FUNCTION_START(arb_power_sum_vec, state)
 {
     slong iter;
 
@@ -65,5 +65,5 @@ TEST_FUNCTION_START(arb_power_sum_vec)
         _arb_vec_clear(res, len);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

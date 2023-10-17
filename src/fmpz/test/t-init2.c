@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_init2)
+TEST_FUNCTION_START(fmpz_init2, state)
 {
     int i;
 
@@ -38,5 +38,5 @@ TEST_FUNCTION_START(fmpz_init2)
         fmpz_clear(a);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

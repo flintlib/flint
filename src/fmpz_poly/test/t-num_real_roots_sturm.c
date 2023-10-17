@@ -14,7 +14,7 @@
 #include "fmpq.h"
 #include "fmpq_vec.h"
 
-TEST_FUNCTION_START(fmpz_poly_num_real_roots_sturm)
+TEST_FUNCTION_START(fmpz_poly_num_real_roots_sturm, state)
 {
     int iter;
 
@@ -92,5 +92,5 @@ TEST_FUNCTION_START(fmpz_poly_num_real_roots_sturm)
         fmpz_poly_clear(q);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -14,7 +14,7 @@
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-TEST_FUNCTION_START(fmpq_poly_is_squarefree)
+TEST_FUNCTION_START(fmpq_poly_is_squarefree, state)
 {
     int i, result;
 
@@ -106,5 +106,5 @@ TEST_FUNCTION_START(fmpq_poly_is_squarefree)
         fmpz_clear(N);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

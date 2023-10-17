@@ -29,7 +29,7 @@ static void check(fmpz_t input, int output, int expected)
 }
 #endif
 
-TEST_FUNCTION_START(fmpz_abs_fits_ui)
+TEST_FUNCTION_START(fmpz_abs_fits_ui, state)
 {
     slong i;
     fmpz_t x;
@@ -67,5 +67,5 @@ TEST_FUNCTION_START(fmpz_abs_fits_ui)
 
     fmpz_clear(x);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

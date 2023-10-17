@@ -13,7 +13,7 @@
 #include "long_extras.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_scalar_addmul_si)
+TEST_FUNCTION_START(fmpz_mat_scalar_addmul_si, state)
 {
     int i;
 
@@ -53,5 +53,5 @@ TEST_FUNCTION_START(fmpz_mat_scalar_addmul_si)
 
 
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

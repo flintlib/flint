@@ -57,7 +57,7 @@ check_vec_eq_prec(acb_srcptr w1, acb_srcptr w2, slong len, slong prec, slong dig
 }
 #endif
 
-TEST_FUNCTION_START(acb_dft_convol)
+TEST_FUNCTION_START(acb_dft_convol, state)
 {
     slong k;
     slong prec = 100, digits = 30;
@@ -115,6 +115,6 @@ TEST_FUNCTION_START(acb_dft_convol)
         _acb_vec_clear(z2, len);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 #undef do_f

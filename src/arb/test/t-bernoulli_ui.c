@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_bernoulli_ui)
+TEST_FUNCTION_START(arb_bernoulli_ui, state)
 {
     slong iter;
 
@@ -58,6 +58,6 @@ TEST_FUNCTION_START(arb_bernoulli_ui)
         arb_clear(b2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

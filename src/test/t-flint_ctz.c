@@ -12,7 +12,7 @@
 #include "ulong_extras.h"
 #include "test_helpers.h"
 
-TEST_FUNCTION_START(flint_ctz)
+TEST_FUNCTION_START(flint_ctz, state)
 {
    int i, result;
 
@@ -36,5 +36,5 @@ TEST_FUNCTION_START(flint_ctz)
       }
    }
 
-   TEST_FUNCTION_END;
+   TEST_FUNCTION_END(state);
 }

@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_is_probabprime_BPSW)
+TEST_FUNCTION_START(fmpz_is_probabprime_BPSW, state)
 {
     int i, result;
 
@@ -75,5 +75,5 @@ TEST_FUNCTION_START(fmpz_is_probabprime_BPSW)
         fmpz_clear(F);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

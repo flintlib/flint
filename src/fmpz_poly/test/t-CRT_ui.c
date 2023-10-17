@@ -16,7 +16,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-TEST_FUNCTION_START(fmpz_poly_CRT_ui)
+TEST_FUNCTION_START(fmpz_poly_CRT_ui, state)
 {
     int i;
 
@@ -89,5 +89,5 @@ TEST_FUNCTION_START(fmpz_poly_CRT_ui)
         fmpz_clear(mod);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

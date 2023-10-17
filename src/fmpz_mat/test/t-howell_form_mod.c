@@ -144,7 +144,7 @@ fmpz_mat_mod_is_in_howell_form(const fmpz_mat_t A, const fmpz_t mod)
     return 1;
 }
 
-TEST_FUNCTION_START(fmpz_mat_howell_form_mod)
+TEST_FUNCTION_START(fmpz_mat_howell_form_mod, state)
 {
     slong i;
 
@@ -258,5 +258,5 @@ TEST_FUNCTION_START(fmpz_mat_howell_form_mod)
         fmpz_clear(c);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

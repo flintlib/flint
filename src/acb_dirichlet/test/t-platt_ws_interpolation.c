@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "acb_dirichlet.h"
 
-TEST_FUNCTION_START(acb_dirichlet_platt_ws_interpolation)
+TEST_FUNCTION_START(acb_dirichlet_platt_ws_interpolation, state)
 {
     slong iter;
 
@@ -90,5 +90,5 @@ TEST_FUNCTION_START(acb_dirichlet_platt_ws_interpolation)
         _arb_vec_clear(vec, A*B);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

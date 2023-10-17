@@ -15,7 +15,7 @@
 
 #pragma GCC diagnostic ignored "-Woverlength-strings"
 
-TEST_FUNCTION_START(nmod_poly_mul_KS2)
+TEST_FUNCTION_START(nmod_poly_mul_KS2, state)
 {
     int i, result;
 
@@ -143,5 +143,5 @@ TEST_FUNCTION_START(nmod_poly_mul_KS2)
     }
 #endif
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -14,7 +14,7 @@
 #include "nmod_poly.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(nmod_poly_bit_pack)
+TEST_FUNCTION_START(nmod_poly_bit_pack, state)
 {
     int i, result;
 
@@ -109,5 +109,5 @@ TEST_FUNCTION_START(nmod_poly_bit_pack)
         nmod_poly_clear(B);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

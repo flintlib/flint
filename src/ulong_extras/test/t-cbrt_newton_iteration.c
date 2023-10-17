@@ -14,7 +14,7 @@
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_cbrt_newton_iteration)
+TEST_FUNCTION_START(n_cbrt_newton_iteration, state)
 {
     int i, result;
 
@@ -142,5 +142,5 @@ TEST_FUNCTION_START(n_cbrt_newton_iteration)
         mpz_clear(mpz_val);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

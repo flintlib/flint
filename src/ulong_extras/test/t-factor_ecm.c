@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_factor_ecm)
+TEST_FUNCTION_START(n_factor_ecm, state)
 {
     int i, j, k, result, fails;
     mp_limb_t prime1, prime2, prod, f, mod;
@@ -58,5 +58,5 @@ TEST_FUNCTION_START(n_factor_ecm)
         flint_abort();
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

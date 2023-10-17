@@ -15,7 +15,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-TEST_FUNCTION_START(fmpz_poly_newton_to_monomial)
+TEST_FUNCTION_START(fmpz_poly_newton_to_monomial, state)
 {
     int i;
 
@@ -56,5 +56,5 @@ TEST_FUNCTION_START(fmpz_poly_newton_to_monomial)
         _fmpz_vec_clear(r, n);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

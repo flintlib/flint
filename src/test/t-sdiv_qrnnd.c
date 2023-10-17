@@ -12,7 +12,7 @@
 #include "ulong_extras.h"
 #include "test_helpers.h"
 
-TEST_FUNCTION_START(sdiv_qrnnd)
+TEST_FUNCTION_START(sdiv_qrnnd, state)
 {
     slong i;
 
@@ -70,5 +70,5 @@ TEST_FUNCTION_START(sdiv_qrnnd)
         }
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "fmpq_poly.h"
 
-TEST_FUNCTION_START(fmpq_poly_gcd)
+TEST_FUNCTION_START(fmpq_poly_gcd, state)
 {
     int cflags = 0, i, result;
 
@@ -242,6 +242,6 @@ TEST_FUNCTION_START(fmpq_poly_gcd)
         fmpq_poly_clear(t);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

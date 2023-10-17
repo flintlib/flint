@@ -13,7 +13,7 @@
 #include "test_helpers.h"
 #include "fmpq_poly.h"
 
-TEST_FUNCTION_START(fmpq_poly_mul)
+TEST_FUNCTION_START(fmpq_poly_mul, state)
 {
     int i, result;
     ulong cflags = UWORD(0);
@@ -123,5 +123,5 @@ TEST_FUNCTION_START(fmpq_poly_mul)
         fmpq_poly_clear(d);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

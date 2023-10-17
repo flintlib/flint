@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-TEST_FUNCTION_START(fmpz_poly_power_sums)
+TEST_FUNCTION_START(fmpz_poly_power_sums, state)
 {
     int i, j, k, l, result;
     fmpz_t il, jl, kl, tot;
@@ -205,5 +205,5 @@ TEST_FUNCTION_START(fmpz_poly_power_sums)
         fmpz_poly_clear(f);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

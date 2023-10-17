@@ -13,7 +13,7 @@
 #include "fmpq.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_add)
+TEST_FUNCTION_START(arb_add, state)
 {
     slong iter;
 
@@ -143,5 +143,5 @@ TEST_FUNCTION_START(arb_add)
         fmpq_clear(z);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

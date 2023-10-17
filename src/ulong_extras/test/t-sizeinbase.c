@@ -14,7 +14,7 @@
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_sizeinbase)
+TEST_FUNCTION_START(n_sizeinbase, state)
 {
     mp_limb_t n;
     int base, size1, size2;
@@ -49,5 +49,5 @@ TEST_FUNCTION_START(n_sizeinbase)
     flint_free(str);
     mpz_clear(t);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

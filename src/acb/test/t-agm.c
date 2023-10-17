@@ -272,7 +272,7 @@ const double agm_testdata[NUM_TESTS][6] = {
     {2, 2, 2, 2, 2.00000000000000, 2.00000000000000},
 };
 
-TEST_FUNCTION_START(acb_agm)
+TEST_FUNCTION_START(acb_agm, state)
 {
     slong iter;
 
@@ -421,6 +421,6 @@ TEST_FUNCTION_START(acb_agm)
         acb_clear(t);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 #undef NUM_TESTS

@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung)
+TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung, state)
 {
     int i;
 
@@ -164,5 +164,5 @@ TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung)
         nmod_poly_clear(d);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -15,7 +15,7 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_poly_evaluate_mod)
+TEST_FUNCTION_START(fmpz_poly_evaluate_mod, state)
 {
     int i, result;
 
@@ -57,5 +57,5 @@ TEST_FUNCTION_START(fmpz_poly_evaluate_mod)
         fmpz_clear(s);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

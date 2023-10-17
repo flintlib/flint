@@ -15,7 +15,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-TEST_FUNCTION_START(fmpz_poly_divlow_smodp)
+TEST_FUNCTION_START(fmpz_poly_divlow_smodp, state)
 {
     int i, result;
 
@@ -100,5 +100,5 @@ TEST_FUNCTION_START(fmpz_poly_divlow_smodp)
         fmpz_poly_clear(d);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

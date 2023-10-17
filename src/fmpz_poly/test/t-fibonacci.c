@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-TEST_FUNCTION_START(fmpz_poly_fibonacci)
+TEST_FUNCTION_START(fmpz_poly_fibonacci, state)
 {
     fmpz_poly_t Pn, Pn1, Pn2, R;
 
@@ -53,5 +53,5 @@ TEST_FUNCTION_START(fmpz_poly_fibonacci)
     fmpz_poly_clear(Pn2);
     fmpz_poly_clear(R);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

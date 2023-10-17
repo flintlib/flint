@@ -14,7 +14,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_setbit)
+TEST_FUNCTION_START(fmpz_setbit, state)
 {
     int i, result;
 
@@ -58,5 +58,5 @@ TEST_FUNCTION_START(fmpz_setbit)
         mpz_clear(z);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

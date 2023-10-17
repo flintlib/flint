@@ -13,7 +13,7 @@
 #include "nmod.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_resultant)
+TEST_FUNCTION_START(nmod_poly_resultant, state)
 {
     int i, result;
 
@@ -100,5 +100,5 @@ TEST_FUNCTION_START(nmod_poly_resultant)
         nmod_poly_clear(h);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

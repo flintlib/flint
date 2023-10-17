@@ -13,7 +13,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_max_bits)
+TEST_FUNCTION_START(fmpz_mat_max_bits, state)
 {
     slong m, n, rep, res1, res2;
 
@@ -40,5 +40,5 @@ TEST_FUNCTION_START(fmpz_mat_max_bits)
         fmpz_mat_clear(A);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

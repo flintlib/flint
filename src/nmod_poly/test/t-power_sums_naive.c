@@ -13,7 +13,7 @@
 #include "nmod.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_power_sums_naive)
+TEST_FUNCTION_START(nmod_poly_power_sums_naive, state)
 {
     int l, result;
     mp_limb_t i, j, k, tot;
@@ -198,5 +198,5 @@ TEST_FUNCTION_START(nmod_poly_power_sums_naive)
         nmod_poly_clear(d);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "acb.h"
 
-TEST_FUNCTION_START(acb_quadratic_roots_fmpz)
+TEST_FUNCTION_START(acb_quadratic_roots_fmpz, state)
 {
     slong iter;
 
@@ -76,6 +76,6 @@ TEST_FUNCTION_START(acb_quadratic_roots_fmpz)
         acb_clear(y);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

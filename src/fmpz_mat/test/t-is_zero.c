@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_is_zero)
+TEST_FUNCTION_START(fmpz_mat_is_zero, state)
 {
     int i;
 
@@ -45,5 +45,5 @@ TEST_FUNCTION_START(fmpz_mat_is_zero)
         fmpz_mat_clear(A);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

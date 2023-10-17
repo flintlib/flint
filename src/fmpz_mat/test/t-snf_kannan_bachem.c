@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_snf_kannan_bachem)
+TEST_FUNCTION_START(fmpz_mat_snf_kannan_bachem, state)
 {
     slong iter;
 
@@ -70,5 +70,5 @@ TEST_FUNCTION_START(fmpz_mat_snf_kannan_bachem)
         fmpz_mat_clear(A);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -15,7 +15,7 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_poly_get_set_str)
+TEST_FUNCTION_START(fmpz_poly_get_set_str, state)
 {
     int i, result;
 
@@ -47,5 +47,5 @@ TEST_FUNCTION_START(fmpz_poly_get_set_str)
         flint_free(str);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

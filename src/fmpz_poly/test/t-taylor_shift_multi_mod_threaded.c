@@ -14,7 +14,7 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_poly_taylor_shift_multi_mod_threaded)
+TEST_FUNCTION_START(fmpz_poly_taylor_shift_multi_mod_threaded, state)
 {
 #if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     int i;
@@ -99,9 +99,9 @@ TEST_FUNCTION_START(fmpz_poly_taylor_shift_multi_mod_threaded)
         fmpz_clear(c);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 #else
-    TEST_FUNCTION_END_SKIPPED;
+    TEST_FUNCTION_END(state)_SKIPPED;
 #endif
 }
 

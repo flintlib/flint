@@ -20,7 +20,7 @@
 # include <math.h>
 #endif
 
-TEST_FUNCTION_START(arb_gamma_fmpq)
+TEST_FUNCTION_START(arb_gamma_fmpq, state)
 {
     slong iter;
 
@@ -128,6 +128,6 @@ TEST_FUNCTION_START(arb_gamma_fmpq)
         fmpq_clear(q);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

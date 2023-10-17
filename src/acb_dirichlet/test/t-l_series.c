@@ -13,7 +13,7 @@
 #include "acb_poly.h"
 #include "acb_dirichlet.h"
 
-TEST_FUNCTION_START(acb_dirichlet_l_series)
+TEST_FUNCTION_START(acb_dirichlet_l_series, state)
 {
     slong iter;
 
@@ -71,6 +71,6 @@ TEST_FUNCTION_START(acb_dirichlet_l_series)
         dirichlet_group_clear(G);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

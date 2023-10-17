@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_equal_trunc)
+TEST_FUNCTION_START(nmod_poly_equal_trunc, state)
 {
     int i, result;
 
@@ -98,5 +98,5 @@ TEST_FUNCTION_START(nmod_poly_equal_trunc)
         nmod_poly_clear(b);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

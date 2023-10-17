@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_log_base_ui)
+TEST_FUNCTION_START(arb_log_base_ui, state)
 {
     slong iter;
 
@@ -106,6 +106,6 @@ TEST_FUNCTION_START(arb_log_base_ui)
         arb_clear(lbx1);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

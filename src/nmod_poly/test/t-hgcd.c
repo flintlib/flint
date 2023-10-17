@@ -32,7 +32,7 @@ do {                                                            \
     }                                                           \
 } while (0)
 
-TEST_FUNCTION_START(nmod_poly_hgcd)
+TEST_FUNCTION_START(nmod_poly_hgcd, state)
 {
     slong i, j, result;
 
@@ -225,7 +225,7 @@ TEST_FUNCTION_START(nmod_poly_hgcd)
         nmod_poly_clear(t);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 
 #undef __mul

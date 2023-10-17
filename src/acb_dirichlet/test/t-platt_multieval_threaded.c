@@ -23,7 +23,7 @@ _arb_div_si_si(arb_t res, slong a, slong b, slong prec)
 }
 #endif
 
-TEST_FUNCTION_START(acb_dirichlet_platt_multieval_threaded)
+TEST_FUNCTION_START(acb_dirichlet_platt_multieval_threaded, state)
 {
     slong iter;
 
@@ -139,6 +139,6 @@ TEST_FUNCTION_START(acb_dirichlet_platt_multieval_threaded)
         _arb_vec_clear(v2, N);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

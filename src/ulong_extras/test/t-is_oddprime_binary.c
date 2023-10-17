@@ -13,7 +13,7 @@
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_is_oddprime_binary)
+TEST_FUNCTION_START(n_is_oddprime_binary, state)
 {
    int i, result;
    slong cutoff = 100000;
@@ -73,5 +73,5 @@ TEST_FUNCTION_START(n_is_oddprime_binary)
       mpz_clear(d_m);
    }
 
-   TEST_FUNCTION_END;
+   TEST_FUNCTION_END(state);
 }

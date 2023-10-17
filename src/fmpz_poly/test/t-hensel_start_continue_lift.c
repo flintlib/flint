@@ -18,7 +18,7 @@
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 
-TEST_FUNCTION_START(fmpz_poly_hensel_start_continue_lift)
+TEST_FUNCTION_START(fmpz_poly_hensel_start_continue_lift, state)
 {
     int i, result;
 
@@ -149,5 +149,5 @@ TEST_FUNCTION_START(fmpz_poly_hensel_start_continue_lift)
         fmpz_poly_clear(R);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

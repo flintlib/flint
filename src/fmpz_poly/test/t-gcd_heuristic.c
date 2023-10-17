@@ -29,7 +29,7 @@ int _t_gcd_is_canonical(const fmpz_poly_t poly)
 }
 #endif
 
-TEST_FUNCTION_START(fmpz_poly_gcd_heuristic)
+TEST_FUNCTION_START(fmpz_poly_gcd_heuristic, state)
 {
     int i, result, d1, d2;
 
@@ -312,5 +312,5 @@ TEST_FUNCTION_START(fmpz_poly_gcd_heuristic)
         fmpz_poly_clear(g);
     }
 
-  TEST_FUNCTION_END;
+  TEST_FUNCTION_END(state);
 }

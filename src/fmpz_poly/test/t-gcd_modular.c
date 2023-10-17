@@ -29,7 +29,7 @@ int _t_gcd_is_canonical(const fmpz_poly_t poly)
 }
 #endif
 
-TEST_FUNCTION_START(fmpz_poly_gcd_modular)
+TEST_FUNCTION_START(fmpz_poly_gcd_modular, state)
 {
     int i, result;
 
@@ -234,5 +234,5 @@ TEST_FUNCTION_START(fmpz_poly_gcd_modular)
         fmpz_poly_clear(e);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

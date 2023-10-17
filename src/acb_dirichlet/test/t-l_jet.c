@@ -61,7 +61,7 @@ static const double laurent_data[TESTQ][TESTLEN] = {
         0.024624650443138705595, -0.004951850872731033514, -0.00020178815459414925709}
 };
 
-TEST_FUNCTION_START(acb_dirichlet_l_jet)
+TEST_FUNCTION_START(acb_dirichlet_l_jet, state)
 {
     slong iter;
 
@@ -194,6 +194,6 @@ TEST_FUNCTION_START(acb_dirichlet_l_jet)
         _acb_vec_clear(vec2, len2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

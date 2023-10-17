@@ -13,7 +13,7 @@
 #include "fmpq.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_overlaps)
+TEST_FUNCTION_START(arb_overlaps, state)
 {
     slong iter;
 
@@ -75,5 +75,5 @@ TEST_FUNCTION_START(arb_overlaps)
         fmpq_clear(u);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

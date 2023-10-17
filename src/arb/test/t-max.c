@@ -48,7 +48,7 @@ void _sample_arf_in_arb(arf_t x, arb_t y, flint_rand_t state)
 }
 #endif
 
-TEST_FUNCTION_START(arb_max)
+TEST_FUNCTION_START(arb_max, state)
 {
     slong iter;
 
@@ -167,5 +167,5 @@ TEST_FUNCTION_START(arb_max)
       arb_clear(z);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

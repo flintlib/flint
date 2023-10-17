@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_primes_jump_after)
+TEST_FUNCTION_START(n_primes_jump_after, state)
 {
     slong j, k, l;
 
@@ -48,5 +48,5 @@ TEST_FUNCTION_START(n_primes_jump_after)
         n_primes_clear(iter);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

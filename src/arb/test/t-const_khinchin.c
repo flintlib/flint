@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_const_khinchin)
+TEST_FUNCTION_START(arb_const_khinchin, state)
 {
     slong iter;
 
@@ -51,6 +51,6 @@ TEST_FUNCTION_START(arb_const_khinchin)
         arb_clear(s);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

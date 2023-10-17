@@ -14,7 +14,7 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_product_roots_nmod_vec)
+TEST_FUNCTION_START(nmod_poly_product_roots_nmod_vec, state)
 {
     int i, result;
 
@@ -62,5 +62,5 @@ TEST_FUNCTION_START(nmod_poly_product_roots_nmod_vec)
         _nmod_vec_clear(x);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

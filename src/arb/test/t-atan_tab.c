@@ -13,7 +13,7 @@
 #include <mpfr.h>
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_atan_tab)
+TEST_FUNCTION_START(arb_atan_tab, state)
 {
     slong i;
 
@@ -173,6 +173,6 @@ TEST_FUNCTION_START(arb_atan_tab)
         mpfr_clear(y2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_add_sub)
+TEST_FUNCTION_START(fmpz_mat_add_sub, state)
 {
     slong m, n, rep;
 
@@ -49,5 +49,5 @@ TEST_FUNCTION_START(fmpz_mat_add_sub)
         fmpz_mat_clear(C);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

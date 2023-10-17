@@ -32,7 +32,7 @@ taylor_simple(fmpz_poly_t g, const fmpz_poly_t f, const fmpz_t c)
     _taylor_simple(g->coeffs, c, g->length);
 }
 
-TEST_FUNCTION_START(fmpz_poly_taylor_shift_horner)
+TEST_FUNCTION_START(fmpz_poly_taylor_shift_horner, state)
 {
     int i;
 
@@ -151,5 +151,5 @@ TEST_FUNCTION_START(fmpz_poly_taylor_shift_horner)
         fmpz_clear(c);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

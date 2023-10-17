@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_set_interval_neg_pos_mag)
+TEST_FUNCTION_START(arb_set_interval_neg_pos_mag, state)
 {
     slong iter;
 
@@ -52,6 +52,6 @@ TEST_FUNCTION_START(arb_set_interval_neg_pos_mag)
         mag_clear(v);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

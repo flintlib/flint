@@ -13,7 +13,7 @@
 #include <mpfr.h>
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_zeta_ui_bernoulli)
+TEST_FUNCTION_START(arb_zeta_ui_bernoulli, state)
 {
     slong iter;
 
@@ -57,5 +57,5 @@ TEST_FUNCTION_START(arb_zeta_ui_bernoulli)
         mpfr_clear(s);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

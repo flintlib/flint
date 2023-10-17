@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "fmpz_poly.h"
 
-TEST_FUNCTION_START(fmpz_poly_chebyshev_u)
+TEST_FUNCTION_START(fmpz_poly_chebyshev_u, state)
 {
     fmpz_poly_t T, U;
 
@@ -43,5 +43,5 @@ TEST_FUNCTION_START(fmpz_poly_chebyshev_u)
     fmpz_poly_clear(T);
     fmpz_poly_clear(U);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

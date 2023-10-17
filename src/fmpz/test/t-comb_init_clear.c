@@ -14,7 +14,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_comb_init_clear)
+TEST_FUNCTION_START(fmpz_comb_init_clear, state)
 {
     slong i, j;
     mp_limb_t n;
@@ -41,5 +41,5 @@ TEST_FUNCTION_START(fmpz_comb_init_clear)
         flint_free(primes);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

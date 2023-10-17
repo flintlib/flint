@@ -13,7 +13,7 @@
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_is_perfect_power235)
+TEST_FUNCTION_START(n_is_perfect_power235, state)
 {
    int i, result;
    ulong bits;
@@ -92,5 +92,5 @@ TEST_FUNCTION_START(n_is_perfect_power235)
       mpz_clear(d_m);
    }
 
-   TEST_FUNCTION_END;
+   TEST_FUNCTION_END(state);
 }

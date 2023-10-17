@@ -18,7 +18,7 @@
 
 char * fmpz_get_str_bsplit_threaded(char * s, const fmpz_t f);
 
-TEST_FUNCTION_START(fmpz_get_str)
+TEST_FUNCTION_START(fmpz_get_str, state)
 {
     int i;
 
@@ -96,5 +96,5 @@ TEST_FUNCTION_START(fmpz_get_str)
         mpz_clear(b);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

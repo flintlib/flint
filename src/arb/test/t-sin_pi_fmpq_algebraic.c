@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_sin_pi_fmpq_algebraic)
+TEST_FUNCTION_START(arb_sin_pi_fmpq_algebraic, state)
 {
     slong iter;
 
@@ -64,6 +64,6 @@ TEST_FUNCTION_START(arb_sin_pi_fmpq_algebraic)
         arb_clear(s2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

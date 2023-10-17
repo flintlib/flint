@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "fmpq_poly.h"
 
-TEST_FUNCTION_START(fmpq_poly_exp_expinv_series)
+TEST_FUNCTION_START(fmpq_poly_exp_expinv_series, state)
 {
     int i;
 
@@ -65,5 +65,5 @@ TEST_FUNCTION_START(fmpq_poly_exp_expinv_series)
         fmpq_poly_clear(d);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

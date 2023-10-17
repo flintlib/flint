@@ -18,7 +18,7 @@ int sign(int a)
     return a > 0 ? 1 : a < 0 ? -1 : 0;
 }
 
-TEST_FUNCTION_START(fmpz_cmp2abs)
+TEST_FUNCTION_START(fmpz_cmp2abs, state)
 {
     slong i;
 
@@ -49,5 +49,5 @@ TEST_FUNCTION_START(fmpz_cmp2abs)
         fmpz_clear(b2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

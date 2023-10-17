@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_chebyshev_t_ui)
+TEST_FUNCTION_START(arb_chebyshev_t_ui, state)
 {
     slong iter;
 
@@ -100,6 +100,6 @@ TEST_FUNCTION_START(arb_chebyshev_t_ui)
         arb_clear(d);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_get_interval_arf)
+TEST_FUNCTION_START(arb_get_interval_arf, state)
 {
     slong iter;
 
@@ -46,6 +46,6 @@ TEST_FUNCTION_START(arb_get_interval_arf)
         arb_clear(y);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

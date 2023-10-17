@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_solve_dixon)
+TEST_FUNCTION_START(fmpz_mat_solve_dixon, state)
 {
     fmpz_mat_t A, X, B, AX, AXm, Bm;
     fmpz_t mod;
@@ -104,5 +104,5 @@ TEST_FUNCTION_START(fmpz_mat_solve_dixon)
         fmpz_clear(mod);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

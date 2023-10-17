@@ -14,7 +14,7 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_det_modular_accelerated)
+TEST_FUNCTION_START(fmpz_mat_det_modular_accelerated, state)
 {
     fmpz_mat_t A;
     slong i, m;
@@ -77,5 +77,5 @@ TEST_FUNCTION_START(fmpz_mat_det_modular_accelerated)
         fmpz_clear(det2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

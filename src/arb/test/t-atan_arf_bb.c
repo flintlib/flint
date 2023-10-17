@@ -39,7 +39,7 @@ arb_atan_arf_via_mpfr(arb_t z, const arf_t x, slong prec)
 }
 #endif
 
-TEST_FUNCTION_START(arb_atan_arf_bb)
+TEST_FUNCTION_START(arb_atan_arf_bb, state)
 {
     slong iter;
 
@@ -108,6 +108,6 @@ TEST_FUNCTION_START(arb_atan_arf_bb)
         arb_clear(z);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

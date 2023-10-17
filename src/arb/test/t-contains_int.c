@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_contains_int)
+TEST_FUNCTION_START(arb_contains_int, state)
 {
     slong iter;
 
@@ -48,5 +48,5 @@ TEST_FUNCTION_START(arb_contains_int)
         arb_clear(a);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

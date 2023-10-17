@@ -13,7 +13,7 @@
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_powmod2_ui_preinv)
+TEST_FUNCTION_START(n_powmod2_ui_preinv, state)
 {
     int i, result;
 
@@ -96,5 +96,5 @@ TEST_FUNCTION_START(n_powmod2_ui_preinv)
         }
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

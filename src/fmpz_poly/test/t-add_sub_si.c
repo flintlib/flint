@@ -13,7 +13,7 @@
 #include "test_helpers.h"
 #include "fmpz_poly.h"
 
-TEST_FUNCTION_START(fmpz_poly_add_sub_si)
+TEST_FUNCTION_START(fmpz_poly_add_sub_si, state)
 {
     int i;
 
@@ -82,5 +82,5 @@ TEST_FUNCTION_START(fmpz_poly_add_sub_si)
         fmpz_poly_clear(t);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

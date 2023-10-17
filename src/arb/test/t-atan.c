@@ -14,7 +14,7 @@
 #include "fmpq.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_atan)
+TEST_FUNCTION_START(arb_atan, state)
 {
     slong iter;
 
@@ -240,6 +240,6 @@ TEST_FUNCTION_START(arb_atan)
         arb_clear(d);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

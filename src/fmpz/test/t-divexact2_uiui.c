@@ -16,7 +16,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_divexact2_uiui)
+TEST_FUNCTION_START(fmpz_divexact2_uiui, state)
 {
     int i, result;
 
@@ -110,5 +110,5 @@ TEST_FUNCTION_START(fmpz_divexact2_uiui)
         mpz_clear(g);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

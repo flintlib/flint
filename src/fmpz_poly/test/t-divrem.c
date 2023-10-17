@@ -14,7 +14,7 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_poly_divrem)
+TEST_FUNCTION_START(fmpz_poly_divrem, state)
 {
     int i, result;
     slong tmul = 100;
@@ -183,5 +183,5 @@ TEST_FUNCTION_START(fmpz_poly_divrem)
         fmpz_poly_clear(r);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

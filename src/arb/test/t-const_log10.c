@@ -13,7 +13,7 @@
 #include <mpfr.h>
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_const_log10)
+TEST_FUNCTION_START(arb_const_log10, state)
 {
     slong iter;
 
@@ -54,5 +54,5 @@ TEST_FUNCTION_START(arb_const_log10)
         mpfr_clear(s);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -14,7 +14,7 @@
 #include "nmod_mat.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_scalar_addmul_nmod_mat_ui)
+TEST_FUNCTION_START(fmpz_mat_scalar_addmul_nmod_mat_ui, state)
 {
     int i;
 
@@ -60,5 +60,5 @@ TEST_FUNCTION_START(fmpz_mat_scalar_addmul_nmod_mat_ui)
 
 
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

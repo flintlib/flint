@@ -18,7 +18,7 @@
       udiv_qrnnd (ninv, dummy, ~(n), ~(WORD(0)), n);  \
    } while (0)
 
-TEST_FUNCTION_START(invert_limb)
+TEST_FUNCTION_START(invert_limb, state)
 {
    int i, result;
 
@@ -42,5 +42,5 @@ TEST_FUNCTION_START(invert_limb)
       }
    }
 
-   TEST_FUNCTION_END
+   TEST_FUNCTION_END(state)
 }

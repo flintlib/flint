@@ -14,7 +14,7 @@
 
 #define ASSERT(cond) if (!(cond)) { flint_printf("FAIL: %d\n", __LINE__); flint_abort(); }
 
-TEST_FUNCTION_START(arb_special)
+TEST_FUNCTION_START(arb_special, state)
 {
     arb_t zero, pos, neg, pos_inf, neg_inf, pos_inf_err, neg_inf_err,
       zero_pm_inf, pos_pm_inf, neg_pm_inf,
@@ -630,6 +630,6 @@ TEST_FUNCTION_START(arb_special)
     arb_clear(indet_pos_rad);
     arb_clear(indet_inf_rad);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

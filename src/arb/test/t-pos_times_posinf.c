@@ -112,7 +112,7 @@ void print_arf_and_type(arf_t x, const char *s, const value_type t)
     flint_printf(" of type: %d\n", t);
 }
 
-TEST_FUNCTION_START(arb_pos_times_posinf)
+TEST_FUNCTION_START(arb_pos_times_posinf, state)
 {
     slong i, j, k, prec;
     arb_t t, u, v, w;
@@ -275,5 +275,5 @@ TEST_FUNCTION_START(arb_pos_times_posinf)
     arb_clear(u);
     arb_clear(t);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_powers_mod_naive)
+TEST_FUNCTION_START(nmod_poly_powers_mod_naive, state)
 {
     int i, result;
 
@@ -85,5 +85,5 @@ TEST_FUNCTION_START(nmod_poly_powers_mod_naive)
         flint_free(res);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -14,7 +14,7 @@
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_cbrt_chebyshev_approx)
+TEST_FUNCTION_START(n_cbrt_chebyshev_approx, state)
 {
     int i, result;
 
@@ -142,5 +142,5 @@ TEST_FUNCTION_START(n_cbrt_chebyshev_approx)
         mpz_clear(mpz_val);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

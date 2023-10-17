@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_is_square)
+TEST_FUNCTION_START(fmpz_mat_is_square, state)
 {
     int i;
 
@@ -33,5 +33,5 @@ TEST_FUNCTION_START(fmpz_mat_is_square)
         fmpz_mat_clear(A);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

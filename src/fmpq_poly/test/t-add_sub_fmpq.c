@@ -14,7 +14,7 @@
 #include "fmpq.h"
 #include "fmpq_poly.h"
 
-TEST_FUNCTION_START(fmpq_poly_add_sub_fmpq)
+TEST_FUNCTION_START(fmpq_poly_add_sub_fmpq, state)
 {
     int i;
 
@@ -83,5 +83,5 @@ TEST_FUNCTION_START(fmpq_poly_add_sub_fmpq)
         fmpq_clear(c);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

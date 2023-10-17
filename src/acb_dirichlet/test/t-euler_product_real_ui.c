@@ -40,7 +40,7 @@ const double L10[8] = {
   0.999007468458940084215357132419
 };
 
-TEST_FUNCTION_START(acb_dirichlet_euler_product_real_ui)
+TEST_FUNCTION_START(acb_dirichlet_euler_product_real_ui, state)
 {
     slong iter;
 
@@ -127,6 +127,6 @@ TEST_FUNCTION_START(acb_dirichlet_euler_product_real_ui)
         arb_clear(res2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

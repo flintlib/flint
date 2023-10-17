@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "nmod_mpoly.h"
 
-TEST_FUNCTION_START(nmod_poly_multi_crt)
+TEST_FUNCTION_START(nmod_poly_multi_crt, state)
 {
     slong i, j, k;
 
@@ -425,5 +425,5 @@ TEST_FUNCTION_START(nmod_poly_multi_crt)
         nmod_poly_clear(output);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -14,7 +14,7 @@
 #include "fmpq.h"
 #include "fmpq_poly.h"
 
-TEST_FUNCTION_START(fmpq_poly_equal_trunc)
+TEST_FUNCTION_START(fmpq_poly_equal_trunc, state)
 {
     int i, result;
 
@@ -101,5 +101,5 @@ TEST_FUNCTION_START(fmpq_poly_equal_trunc)
         fmpq_poly_clear(b);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

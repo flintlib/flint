@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "long_extras.h"
 
-TEST_FUNCTION_START(fmpz_get_si)
+TEST_FUNCTION_START(fmpz_get_si, state)
 {
     int i, result;
     fmpz_t x;
@@ -78,5 +78,5 @@ TEST_FUNCTION_START(fmpz_get_si)
         fmpz_clear(a);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

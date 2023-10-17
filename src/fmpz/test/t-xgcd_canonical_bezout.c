@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_xgcd_canonical_bezout)
+TEST_FUNCTION_START(fmpz_xgcd_canonical_bezout, state)
 {
     int ix, result;
     fmpz_t maxval;
@@ -546,5 +546,5 @@ TEST_FUNCTION_START(fmpz_xgcd_canonical_bezout)
     fmpz_clear(nf);
     fmpz_clear(ng);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

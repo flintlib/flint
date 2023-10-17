@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_discrete_log_bsgs)
+TEST_FUNCTION_START(n_discrete_log_bsgs, state)
 {
     int i;
 
@@ -38,5 +38,5 @@ TEST_FUNCTION_START(n_discrete_log_bsgs)
         }
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

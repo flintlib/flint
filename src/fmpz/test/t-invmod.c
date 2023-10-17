@@ -26,7 +26,7 @@ mpz_invert2(mpz_t a, const mpz_t b, const mpz_t c)
         return mpz_invert(a, b, c);
 }
 
-TEST_FUNCTION_START(fmpz_invmod)
+TEST_FUNCTION_START(fmpz_invmod, state)
 {
     int i, result;
 
@@ -206,5 +206,5 @@ TEST_FUNCTION_START(fmpz_invmod)
         mpz_clear(g);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

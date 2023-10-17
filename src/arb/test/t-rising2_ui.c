@@ -14,7 +14,7 @@
 #include "arith.h"
 #include "arb_poly.h"
 
-TEST_FUNCTION_START(arb_rising2_ui)
+TEST_FUNCTION_START(arb_rising2_ui, state)
 {
     slong iter;
 
@@ -98,6 +98,6 @@ TEST_FUNCTION_START(arb_rising2_ui)
         _arb_vec_clear(g, n + 1);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

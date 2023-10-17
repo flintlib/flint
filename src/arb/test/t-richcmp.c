@@ -118,7 +118,7 @@ arb_richcmp_fallback(const arb_t x, const arb_t y, int op)
     return res;
 }
 
-TEST_FUNCTION_START(arb_richcmp)
+TEST_FUNCTION_START(arb_richcmp, state)
 {
     slong iter;
 
@@ -155,6 +155,6 @@ TEST_FUNCTION_START(arb_richcmp)
         arb_clear(b);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

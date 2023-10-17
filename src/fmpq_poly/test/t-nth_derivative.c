@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "fmpq_poly.h"
 
-TEST_FUNCTION_START(fmpq_poly_nth_derivative)
+TEST_FUNCTION_START(fmpq_poly_nth_derivative, state)
 {
     ulong nth, cflags = UWORD(0);
     int i, j, result;
@@ -77,5 +77,5 @@ TEST_FUNCTION_START(fmpq_poly_nth_derivative)
         fmpq_poly_clear(b);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

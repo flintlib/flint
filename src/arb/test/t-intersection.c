@@ -13,7 +13,7 @@
 #include "fmpq.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_intersection)
+TEST_FUNCTION_START(arb_intersection, state)
 {
     slong iter;
 
@@ -190,5 +190,5 @@ TEST_FUNCTION_START(arb_intersection)
         arb_clear(w);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

@@ -15,7 +15,7 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_poly_sqrlow_classical)
+TEST_FUNCTION_START(fmpz_poly_sqrlow_classical, state)
 {
     int i, result;
 
@@ -83,5 +83,5 @@ TEST_FUNCTION_START(fmpz_poly_sqrlow_classical)
         fmpz_poly_clear(c);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

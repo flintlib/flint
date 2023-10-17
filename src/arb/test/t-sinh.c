@@ -14,7 +14,7 @@
 #include "fmpq.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_sinh)
+TEST_FUNCTION_START(arb_sinh, state)
 {
     slong iter;
 
@@ -61,6 +61,6 @@ TEST_FUNCTION_START(arb_sinh)
         mpfr_clear(t);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

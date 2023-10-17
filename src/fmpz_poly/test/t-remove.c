@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-TEST_FUNCTION_START(fmpz_poly_remove)
+TEST_FUNCTION_START(fmpz_poly_remove, state)
 {
     int i, result;
 
@@ -149,5 +149,5 @@ TEST_FUNCTION_START(fmpz_poly_remove)
         fmpz_poly_clear(q);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

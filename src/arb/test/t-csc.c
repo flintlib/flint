@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_csc)
+TEST_FUNCTION_START(arb_csc, state)
 {
     slong iter;
 
@@ -60,6 +60,6 @@ TEST_FUNCTION_START(arb_csc)
         arb_clear(b);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

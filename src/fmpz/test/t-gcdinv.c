@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
-TEST_FUNCTION_START(fmpz_gcdinv)
+TEST_FUNCTION_START(fmpz_gcdinv, state)
 {
    int i, result;
 
@@ -191,5 +191,5 @@ TEST_FUNCTION_START(fmpz_gcdinv)
       fmpz_clear(x);
    }
 
-   TEST_FUNCTION_END;
+   TEST_FUNCTION_END(state);
 }

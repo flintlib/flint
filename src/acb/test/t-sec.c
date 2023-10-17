@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "acb.h"
 
-TEST_FUNCTION_START(acb_sec)
+TEST_FUNCTION_START(acb_sec, state)
 {
     slong iter;
 
@@ -60,6 +60,6 @@ TEST_FUNCTION_START(acb_sec)
         acb_clear(b);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

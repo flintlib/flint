@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "acb_dirichlet.h"
 
-TEST_FUNCTION_START(acb_dirichlet_zeta_zeros)
+TEST_FUNCTION_START(acb_dirichlet_zeta_zeros, state)
 {
     slong iter;
 
@@ -83,6 +83,6 @@ TEST_FUNCTION_START(acb_dirichlet_zeta_zeros)
         _acb_vec_clear(p, maxlen);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

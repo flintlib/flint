@@ -27,7 +27,7 @@ int should_have_hadamard(int n)
     return 0;
 }
 
-TEST_FUNCTION_START(fmpz_mat_hadamard)
+TEST_FUNCTION_START(fmpz_mat_hadamard, state)
 {
     int n;
 
@@ -60,5 +60,5 @@ TEST_FUNCTION_START(fmpz_mat_hadamard)
         fmpz_mat_clear(h);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }

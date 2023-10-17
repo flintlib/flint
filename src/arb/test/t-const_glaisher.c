@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_const_glaisher)
+TEST_FUNCTION_START(arb_const_glaisher, state)
 {
     slong iter;
 
@@ -75,6 +75,6 @@ TEST_FUNCTION_START(arb_const_glaisher)
         fmpz_clear(v);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

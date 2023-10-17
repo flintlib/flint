@@ -13,7 +13,7 @@
 #include <mpfr.h>
 #include "arb.h"
 
-TEST_FUNCTION_START(arb_sin_cos_tab)
+TEST_FUNCTION_START(arb_sin_cos_tab, state)
 {
     slong i, which;
 
@@ -215,6 +215,6 @@ TEST_FUNCTION_START(arb_sin_cos_tab)
         mpfr_clear(y2);
     }
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
 

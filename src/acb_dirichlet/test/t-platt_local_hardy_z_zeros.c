@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "acb_dirichlet.h"
 
-TEST_FUNCTION_START(acb_dirichlet_platt_local_hardy_z_zeros)
+TEST_FUNCTION_START(acb_dirichlet_platt_local_hardy_z_zeros, state)
 {
     /* Check a specific combination of parameter values that is relatively fast
      * to evaluate and that has relatively tight bounds. */
@@ -81,5 +81,5 @@ TEST_FUNCTION_START(acb_dirichlet_platt_local_hardy_z_zeros)
     _arb_vec_clear(pa, maxcount);
     _arb_vec_clear(pb, maxcount);
 
-    TEST_FUNCTION_END;
+    TEST_FUNCTION_END(state);
 }
