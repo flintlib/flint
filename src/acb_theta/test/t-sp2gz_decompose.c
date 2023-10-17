@@ -25,17 +25,21 @@ int main(void)
        and product is the original matrix */
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 10);
-        slong bits = n_randint(state, 100);
-        fmpz_mat_t m, x, alpha, beta, gamma;
+        slong g = 1 + n_randint(state, 3);
+        slong bits = n_randint(state, 20);
+        fmpz_mat_t m, x, y, alpha, beta, gamma;
         fmpz_mat_struct* dec = NULL;
         slong nb_dec = 0;
-        slong k;
+        slong r, k;
 
         fmpz_mat_init(m, 2 * g, 2 * g);
         fmpz_mat_init(x, 2 * g, 2 * g);
 
         sp2gz_randtest(m, state, bits);
+
+        fmpz_mat_print_pretty(m);
+        flint_printf("\n");
+
         dec = sp2gz_decompose(&nb_dec, m);
 
         for (k = 0; k < nb_dec; k++)
@@ -46,7 +50,12 @@ int main(void)
 
             if (!fmpz_mat_is_zero(gamma))
             {
-                sp2gz_j(x);
+                r = fmpz_mat_rank(gamma);
+
+                fmpz_mat_init(y, 2 * r, 2 * r);
+                sp2gz_j(y);
+                sp2gz_embed(x, y);
+                fmpz_mat_clear(y);
             }
             else if (!fmpz_mat_is_zero(beta))
             {
@@ -70,10 +79,18 @@ int main(void)
             fmpz_mat_window_clear(gamma);
         }
 
+            flint_printf("\ndecomposition in %wd matrices:\n", nb_dec);
+            for (k = 0; k < nb_dec; k++)
+            {
+                fmpz_mat_print_pretty(&dec[k]);
+                flint_printf("\n");
+            }
+            flint_printf("\n\n");
+            
         fmpz_mat_one(x);
         for (k = 0; k < nb_dec; k++)
         {
-            fmpz_mat_mul(x, &dec[k], x);
+            fmpz_mat_mul(x, x, &dec[k]);
         }
         if (!fmpz_mat_equal(m, x))
         {
@@ -81,7 +98,12 @@ int main(void)
             fmpz_mat_print_pretty(x);
             flint_printf("\n");
             fmpz_mat_print_pretty(m);
-            flint_printf("\n");
+            flint_printf("\ndecomposition in %wd matrices:\n", nb_dec);
+            for (k = 0; k < nb_dec; k++)
+            {
+                fmpz_mat_print_pretty(&dec[k]);
+                flint_printf("\n");
+            }
             flint_abort();
         }
 

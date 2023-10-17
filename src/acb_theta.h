@@ -49,6 +49,8 @@ void sp2gz_fundamental(fmpz_mat_t mat, slong j);
 
 void sp2gz_inv(fmpz_mat_t inv, const fmpz_mat_t mat);
 int sp2gz_is_correct(const fmpz_mat_t mat);
+void sp2gz_embed(fmpz_mat_t res, const fmpz_mat_t mat);
+void sp2gz_restrict(fmpz_mat_t res, const fmpz_mat_t mat);
 fmpz_mat_struct* sp2gz_decompose(slong* nb, const fmpz_mat_t mat);
 
 void sp2gz_randtest(fmpz_mat_t mat, flint_rand_t state, slong bits);
