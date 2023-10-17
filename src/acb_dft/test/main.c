@@ -18,58 +18,12 @@
 
 /* Array of test functions ***************************************************/
 
-int (*test_functions[])(void) =
+test_struct tests[] =
 {
     TEST_FUNCTION(acb_dft_convol),
     TEST_FUNCTION(acb_dft)
 };
 
-char acb_dft_convol_name[] = "acb_dft_convol";
-char acb_dft_name[] = "acb_dft";
-
-char * test_names[] =
-{
-    acb_dft_convol_name,
-    acb_dft_name
-};
-
 /* main function *************************************************************/
 
-#define NUMBER_OF_TESTS (sizeof(test_functions) / sizeof(int (*)(void)))
-
-int
-main(int argc, char ** argv)
-{
-    int ix, jx;
-
-    if (argc < 2)
-    {
-        for (ix = 0; ix < NUMBER_OF_TESTS; ix++)
-            if (test_functions[ix]())
-                flint_abort();
-    }
-    else
-    {
-        for (ix = 1; ix < argc; ix++)
-        {
-            for (jx = 0; jx < NUMBER_OF_TESTS; jx++)
-            {
-                /* If argument equals to test name, run it */
-                if (strcmp(argv[ix], test_names[jx]) == 0)
-                {
-                    if (test_functions[jx]())
-                        flint_abort();
-                    break;
-                }
-            }
-
-            if (jx == NUMBER_OF_TESTS)
-            {
-                fprintf(stderr, "Error: Could not find test function for %s\n", argv[ix]);
-                flint_abort();
-            }
-        }
-    }
-
-    return 0;
-}
+TEST_MAIN(tests)

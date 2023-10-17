@@ -28,7 +28,14 @@
 
 /* test function macro *******************************************************/
 
-#define TEST_FUNCTION(label) CAT(test, label)
+typedef struct
+{
+    int (* test_function)(void);
+    char * name;
+}
+test_struct;
+
+#define TEST_FUNCTION(label) { CAT(test, label), TEMPLATE_STR(label) }
 
 #define TEST_FUNCTION_START(label)                      \
 int CAT(test, label)(void)                              \
@@ -47,6 +54,48 @@ int CAT(test, label)(void)                              \
     FLINT_TEST_CLEANUP(state);                          \
     printf("SKIPPED\n");                                \
     return 0;                                           \
+}
+
+#define TEST_MAIN(tests)                                                    \
+int                                                                         \
+main(int argc, char ** argv)                                                \
+{                                                                           \
+    int ix, jx;                                                             \
+                                                                            \
+    /* If no arguments where put in, run them all. Else, check which */     \
+    /* functions should be runned. */                                       \
+    if (argc < 2)                                                           \
+    {                                                                       \
+        for (ix = 0; ix < (sizeof(tests) / sizeof(test_struct)); ix++)      \
+            if ((tests)[ix].test_function())                                \
+                flint_abort();                                              \
+    }                                                                       \
+    else                                                                    \
+    {                                                                       \
+        for (jx = 1; jx < argc; jx++)                                       \
+        {                                                                   \
+            for (ix = 0; ix < (sizeof(tests) / sizeof(test_struct)); ix++)  \
+            {                                                               \
+                /* If argument equals to test name, run it */               \
+                if (strcmp(argv[jx], (tests)[ix].name) == 0)                \
+                {                                                           \
+                    if ((tests)[ix].test_function())                        \
+                        flint_abort();                                      \
+                    break;                                                  \
+                }                                                           \
+            }                                                               \
+                                                                            \
+            if (ix == (sizeof(tests) / sizeof(test_struct)))                \
+            {                                                               \
+                fprintf(stderr,                                             \
+                        "Error: Could not find test function for %s\n",     \
+                        argv[jx]);                                          \
+                flint_abort();                                              \
+            }                                                               \
+        }                                                                   \
+    }                                                                       \
+                                                                            \
+    return 0;                                                               \
 }
 
 #endif
