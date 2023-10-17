@@ -68,6 +68,6 @@ TEST_FUNCTION_START(nmod_poly_fread_print, state)
 
     TEST_FUNCTION_END(state);
 #else
-    TEST_FUNCTION_END(state)_SKIPPED;
+    TEST_FUNCTION_END_SKIPPED(state);
 #endif
 }

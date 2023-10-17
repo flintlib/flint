@@ -93,6 +93,6 @@ TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_vec_preinv_threaded, state)
 
     TEST_FUNCTION_END(state);
 #else
-    TEST_FUNCTION_END(state)_SKIPPED;
+    TEST_FUNCTION_END_SKIPPED(state);
 #endif
 }

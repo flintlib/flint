@@ -152,7 +152,7 @@ TEST_FUNCTION_START(fmpz_out_inp_raw, state)
 
 TEST_FUNCTION_START(fmpz_out_inp_raw, state)
 {
-    TEST_FUNCTION_END(state)_SKIPPED;
+    TEST_FUNCTION_END_SKIPPED(state);
 }
 
 #endif
