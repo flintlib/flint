@@ -243,3 +243,172 @@ fmpz_mat_struct* sp2gz_decompose(slong* nb, const fmpz_mat_t mat)
     }
     return res;
 }
+
+static slong
+sp2gz_reduce_gamma_2(fmpz_mat_t next, fmpz_mat_struct* vec, const fmpz_mat_t mat)
+{
+    slong g = sp2gz_dim(mat);
+    fmpz_mat_t gamma, diag, u, v;
+    slong k;
+
+    fmpz_mat_init(u, g, g);
+    fmpz_mat_init(v, g, g);
+    fmpz_mat_init(diag, g, g);
+    fmpz_mat_window_init(gamma, mat, g, 0, 2 * g, g);
+
+    for (k = 0; k < g; k++)
+    {
+        fmpz_one(fmpz_mat_entry(diag, k, g - 1 - k));
+    }
+    fmpz_mat_transpose(v, gamma);
+    fmpz_mat_mul(v, v, diag);
+    fmpz_mat_hnf_transform(v, u, v);
+    fmpz_mat_mul(u, diag, u);
+    fmpz_mat_transpose(u, u);
+
+    sp2gz_block_diag(w, u);
+    fmpz_mat_mul(res, mat, w);
+
+    flint_printf("(reduce_gamma_2) input, output:\n");
+    fmpz_mat_print_pretty(mat);
+    flint_printf("\n");
+    fmpz_mat_print_pretty(res);
+    flint_printf("\n");
+
+    fmpz_mat_clear(u);
+    fmpz_mat_clear(v);
+    fmpz_mat_clear(diag);
+    fmpz_mat_window_clear(gamma);
+}
+
+static void
+sp2gz_reduce_delta_2(fmpz_mat_t res, fmpz_mat_t w, const fmpz_mat_t mat, slong r)
+{
+    slong g = sp2gz_dim(mat);
+    fmpz_mat_t gamma, delta, u, v;
+    slong k;
+
+    fmpz_mat_init(u, g, g);
+    fmpz_mat_init(v, g, g);
+    fmpz_mat_init(diag, g, g);
+    fmpz_mat_window_init(gamma, mat, g, 0, 2 * g, g);
+
+    fmpz_mat_transpose(v, gamma);
+    fmpz_mat_hnf_transform(v, u, v);
+    fmpz_mat_transpose(u, u);
+
+    sp2gz_block_diag(w, u);
+    fmpz_mat_mul(res, mat, w);
+
+    /* Now the g - r last lines of delta have HNF (0 I_{g-r}) */
+    fmpz_mat_window_init(delta, res, g + r, g, 2 * g, 2 * g);
+    fmpz_mat_transpose(v, delta);
+    fmpz_mat_hnf_transform(v, u, v);
+
+    
+    for (k = 0; k < g - r; k++)
+
+    fmpz_mat_clear(u);
+    fmpz_mat_clear(v);
+    fmpz_mat_clear(diag);
+    fmpz_mat_window_clear(delta);
+}
+
+fmpz_mat_struct* sp2gz_decompose_2(slong* nb, const fmpz_mat_t mat)
+{
+    slong g = sp2gz_dim(mat);
+    fmpz_mat_t cur, gamma;
+    fmpz_mat_struct* vec1;
+    fmpz_mat_struct* vec2 = NULL;
+    fmpz_mat_struct* res;
+    fmpz_mat_t w;
+    slong nb_max = 0;
+    slong nb2 = 0;
+    slong nb1 = 0;
+    slong k, add;
+
+    /* We need at most 3 * bits matrices to reduce the last line of gamma to zero */
+    for (k = 0; k < g; k++)
+    {
+        nb_max = FLINT_MAX(nb_max, fmpz_bits(fmpz_mat_entry(mat, 2 * g - 1, k)));
+    }
+    nb_max = 3 * nb_max + 3; /* for last delta reduction + recursion */
+
+    vec1 = flint_malloc(nb_max * sizeof(fmpz_mat_struct));
+    for (k = 0; k < nb_max; k++)
+    {
+        fmpz_mat_init(&vec1[k], 2 * g, 2 * g);
+    }
+    fmpz_mat_init(cur, 2 * g, 2 * g);
+
+    fmpz_mat_set(cur, mat);
+    fmpz_mat_window_init(gamma, mat, g, 0, 2 * g, g);
+    r = fmpz_mat_rank(gamma);
+    fmpz_mat_window_clear(gamma);
+
+    while (r == g)
+    {
+        add = sp2gz_reduce_gamma_2(cur, vec1 + nb1, cur);
+        nb1 += add;
+
+        fmpz_mat_window_init(gamma, mat, g, 0, 2 * g, g);
+        r = fmpz_mat_rank(gamma);
+        fmpz_mat_window_clear(gamma);
+    }
+
+    sp2gz_reduce_delta_2(cur, &vec1[nb1], cur, r);
+    if (!fmpz_mat_is_one(&vec1[nb1]))
+    {
+        nb1++;
+    }
+
+    if (r > 0)
+    {
+        fmpz_mat_init(w, 2 * (g - r), 2 * (g - r));
+        add = sp2gz_decompose_rec(w, vec1 + nb1, cur);
+        vec2 = sp2gz_decompose(&nb2, w);
+        fmpz_mat_clear(w);
+    }
+    else
+    {
+        sp2gz_inv(&gamma[nb_gamma], cur);
+        add = (fmpz_mat_is_one(&gamma[nb_gamma]) ? 0 : 1);
+    }
+
+    /* Make final vector */
+    *nb = add + nb2 + nb1;
+    res = flint_malloc(*nb * sizeof(fmpz_mat_struct));
+    for (k = 0; k < *nb; k++)
+    {
+        fmpz_mat_init(&res[k], 2 * g, 2 * g);
+    }
+
+    for (k = 0; k < add; k++)
+    {
+        sp2gz_inv(&res[k], &vec1[nb1 + add - 1 - k]);
+    }
+    for (k = 0; k < nb2; k++)
+    {
+        sp2gz_embed(&res[add + k], &vec2[k]);
+    }
+    for (k = 0; k < nb_gamma; k++)
+    {
+        sp2gz_inv(&res[add + nb2 + k], &vec1[nb1 - 1 - k]);
+    }
+
+    fmpz_mat_clear(cur);
+    for (k = 0; k < nb_max; k++)
+    {
+        fmpz_mat_clear(&vec1[k]);
+    }
+    flint_free(vec1);
+    if (r > 0)
+    {
+        for (k = 0; k < nb2; k++)
+        {
+            fmpz_mat_clear(&vec2[k]);
+        }
+        flint_free(vec2);
+    }
+    return res;
+}
