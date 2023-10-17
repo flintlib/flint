@@ -815,7 +815,7 @@ LLL reduction
     Returns nonzero iff *A* is LLL-reduced with a tolerance of `\varepsilon =
     2^{\stars{tol_exp}`. This means the following. First, the error radius on
     each entry of *A* must be at most `\varepsilon/16`. Then we consider the
-    matrix whose entries are `2^{\mathit{prec}}(1 + \varepsilon)^{\min(i,j)}
+    matrix whose entries are `2^{\mathit{prec}}(1 + \varepsilon)^{i + j}
     A_{i,j}` rounded to integers: it must be positive definite and pass
     :func:`fmpz_mat_is_reduced` with default parameters. The warnings of
     :func:`arf_get_fmpz` apply.

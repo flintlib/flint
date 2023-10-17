@@ -22,22 +22,25 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: result satisfies arb_mat_spd_is_lll_reduced */
+    /* Test: result satisfies arb_mat_spd_is_lll_reduced and
+       arb_mat_spd_is_lll_reduced returns 0 on more imprecise result */
     for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 4);
         slong prec = 200 + n_randint(state, 500);
         slong mag_bits = 1 + n_randint(state, 5);
-        slong tol_exp = -10;
+        slong tol_exp = -10 - n_randint(state, 20);
         arb_mat_t M;
         arb_mat_t R;
         arb_mat_t T;
         fmpz_mat_t U;
+        mag_t eps;
 
         arb_mat_init(M, g, g);
         arb_mat_init(R, g, g);
         arb_mat_init(T, g, g);
         fmpz_mat_init(U, g, g);
+        mag_init(eps);
 
         arb_mat_randtest_spd(M, state, prec, mag_bits);
         arb_mat_spd_lll_reduce(U, M, prec);
@@ -54,7 +57,17 @@ int main(void)
             arb_mat_printd(R, 10);
             fmpz_mat_print_pretty(U);
             flint_printf("\n");
-            fflush(stdout);
+            flint_abort();
+        }
+
+        mag_one(eps);
+        mag_mul_2exp_si(eps, eps, tol_exp);
+        arb_mat_add_error_mag(R, eps);
+
+        if (arb_mat_spd_is_lll_reduced(R, tol_exp, prec))
+        {
+            flint_printf("FAIL (error bounds)\n");
+            arb_mat_printd(R, 10);
             flint_abort();
         }
 
@@ -62,6 +75,7 @@ int main(void)
         arb_mat_clear(R);
         arb_mat_clear(T);
         fmpz_mat_clear(U);
+        mag_clear(eps);
     }
 
     flint_randclear(state);
