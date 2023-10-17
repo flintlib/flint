@@ -16,11 +16,28 @@ _arb_mat_vector_mul_row(arb_ptr res, arb_srcptr v, const arb_mat_t A, slong prec
 {
     slong r = arb_mat_nrows(A);
     slong c = arb_mat_ncols(A);
-    slong k;
+    arb_ptr tmp;
+    slong k, j;
 
-    for (k = 0; k < c; k++)
+    if (arb_mat_is_empty(A))
     {
-        arb_dot(&res[k], NULL, 0, &(A->entries[k]), c, v, 1, r, prec);
+        _arb_vec_zero(res, c);
+    }
+    else
+    {
+        tmp = flint_malloc(r * sizeof(arb_struct));
+
+        for (k = 0; k < c; k++)
+        {
+            for (j = 0; j < r; j++)
+            {
+                tmp[j] = *arb_mat_entry(A, j, k);
+            }
+
+            arb_dot(&res[k], NULL, 0, tmp, 1, v, 1, r, prec);
+        }
+
+        flint_free(tmp);
     }
 }
 
@@ -45,9 +62,16 @@ _arb_mat_vector_mul_col(arb_ptr res, const arb_mat_t A, arb_srcptr v, slong prec
     slong c = arb_mat_ncols(A);
     slong k;
 
-    for (k = 0; k < r; k++)
+    if (arb_mat_is_empty(A))
     {
-        arb_dot(&res[k], NULL, 0, A->rows[k], 1, v, 1, c, prec);
+        _arb_vec_zero(res, r);
+    }
+    else
+    {
+        for (k = 0; k < r; k++)
+        {
+            arb_dot(&res[k], NULL, 0, A->rows[k], 1, v, 1, c, prec);
+        }
     }
 }
 

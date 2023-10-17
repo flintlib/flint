@@ -51,6 +51,8 @@ int main(void)
         if (!_arb_vec_overlaps(res, t, nrow))
         {
             flint_printf("FAIL\n");
+            _arb_vec_printd(res, nrow, 5);
+            _arb_vec_printd(t, nrow, 5);
             flint_abort();
         }
 
