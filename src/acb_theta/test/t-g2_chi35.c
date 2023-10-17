@@ -47,7 +47,7 @@ int main(void)
         acb_theta_g2_chi35(r, th, prec);
         acb_theta_transform_proj(th, mat, th, 0, prec);
         acb_theta_g2_chi35(s, th, prec);
-        acb_mul_powi(s, s, -acb_theta_transform_kappa(mat));
+        acb_mul_i_pow_si(s, s, -acb_theta_transform_kappa(mat));
 
         if (!acb_overlaps(r, s))
         {

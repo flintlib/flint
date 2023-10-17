@@ -121,7 +121,8 @@ int main(void)
                 if (a1 == fixed_a1)
                 {
                     acb_mul(&test[k], c, &th0[(a0 << s) + b0], prec);
-                    acb_mul_powi(&test[k], &test[k], acb_theta_char_dot_slong(b1, n1, g - s));
+                    acb_mul_i_pow_si(&test[k], &test[k],
+                        acb_theta_char_dot_slong(b1, n1, g - s));
                 }
                 acb_add_error_arb(&test[k], u);
             }

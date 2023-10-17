@@ -52,7 +52,7 @@ worker(acb_ptr dth, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong len,
         {
             for (b = 0; b < n; b++)
             {
-                acb_mul_powi(x, &v3[i], (dots[b] + i * (b >> (g - 1))) % 4);
+                acb_mul_i_pow_si(x, &v3[i], (dots[b] + i * (b >> (g - 1))) % 4);
                 ind0 = 3 * n * (i % 2) + 3 * b;
                 if ((dots[b] + i * (b >> (g - 1))) % 2 == 0)
                 {
@@ -97,21 +97,21 @@ worker(acb_ptr dth, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong len,
                 if (dots[b] % 2 == 0)
                 {
                     /* All even */
-                    acb_mul_powi(x, &diffs[0], dots[b]);
+                    acb_mul_i_pow_si(x, &diffs[0], dots[b]);
                     acb_add(&aux[ind0], &aux[ind0], x, prec);
-                    acb_mul_powi(x, &diffs[1], dots[b]);
+                    acb_mul_i_pow_si(x, &diffs[1], dots[b]);
                     acb_add(&aux[ind1], &aux[ind1], x, prec);
                 }
                 else
                 {
                     /* All odd; use v3 for derivative wrt z1 */
-                    acb_mul_powi(x, &diffs[4], dots[b]);
+                    acb_mul_i_pow_si(x, &diffs[4], dots[b]);
                     acb_add(&aux[ind0 + 1], &aux[ind0 + 1], x, prec);
-                    acb_mul_powi(x, &diffs[0], dots[b]);
+                    acb_mul_i_pow_si(x, &diffs[0], dots[b]);
                     acb_add(&aux[ind0 + 2], &aux[ind0 + 2], x, prec);
-                    acb_mul_powi(x, &diffs[5], dots[b]);
+                    acb_mul_i_pow_si(x, &diffs[5], dots[b]);
                     acb_add(&aux[ind1 + 1], &aux[ind1 + 1], x, prec);
-                    acb_mul_powi(x, &diffs[1], dots[b]);
+                    acb_mul_i_pow_si(x, &diffs[1], dots[b]);
                     acb_add(&aux[ind1 + 2], &aux[ind1 + 2], x, prec);
                 }
             }
@@ -121,21 +121,21 @@ worker(acb_ptr dth, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong len,
                 if (dots[b] % 2 == 0)
                 {
                     /* a0 even, a1 odd */
-                    acb_mul_powi(x, &diffs[2], dots[b]);
+                    acb_mul_i_pow_si(x, &diffs[2], dots[b]);
                     acb_add(&aux[ind0], &aux[ind0], x, prec);
-                    acb_mul_powi(x, &diffs[7], dots[b] + 1);
+                    acb_mul_i_pow_si(x, &diffs[7], dots[b] + 1);
                     acb_add(&aux[ind1 + 1], &aux[ind1 + 1], x, prec);
-                    acb_mul_powi(x, &diffs[3], dots[b] + 1);
+                    acb_mul_i_pow_si(x, &diffs[3], dots[b] + 1);
                     acb_add(&aux[ind1 + 2], &aux[ind1 + 2], x, prec);
                 }
                 else
                 {
                     /* a0 odd, a1 even */
-                    acb_mul_powi(x, &diffs[3], dots[b] + 1);
+                    acb_mul_i_pow_si(x, &diffs[3], dots[b] + 1);
                     acb_add(&aux[ind1], &aux[ind1], x, prec);
-                    acb_mul_powi(x, &diffs[6], dots[b]);
+                    acb_mul_i_pow_si(x, &diffs[6], dots[b]);
                     acb_add(&aux[ind0 + 1], &aux[ind0 + 1], x, prec);
-                    acb_mul_powi(x, &diffs[2], dots[b]);
+                    acb_mul_i_pow_si(x, &diffs[2], dots[b]);
                     acb_add(&aux[ind0 + 2], &aux[ind0 + 2], x, prec);
                 }
             }

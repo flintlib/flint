@@ -24,7 +24,7 @@ sp2gz_reduce_delta(fmpz_mat_t res, fmpz_mat_t w, const fmpz_mat_t mat)
     fmpz_init(d);
 
     fmpz_mat_transpose(col, delta);
-    fmpz_mat_hnf_transform(col, u, a);
+    fmpz_mat_hnf_transform(col, u, col);
     fmpz_mat_inv(u, d, u);
     if (!fmpz_equal_si(d, 1))
     {
@@ -41,7 +41,7 @@ sp2gz_reduce_delta(fmpz_mat_t res, fmpz_mat_t w, const fmpz_mat_t mat)
 }
 
 static slong
-sp2gz_reduce_gamma(fmpz_mat_t res, fmpz_mat_struct* vec, const fmpz_mat_t mat)
+sp2gz_reduce_gamma(fmpz_mat_t next, fmpz_mat_struct* vec, const fmpz_mat_t mat)
 {
     slong g = sp2gz_dim(mat);
     fmpz_mat_t cur, u;
@@ -58,13 +58,14 @@ sp2gz_reduce_gamma(fmpz_mat_t res, fmpz_mat_struct* vec, const fmpz_mat_t mat)
             test = 1;
         }
     }
-    if (!has_gamma)
+    if (!test)
     {
-        fmpz_mat_set(res, mat);
+        fmpz_mat_set(next, mat);
         return res;
     }
 
     fmpz_mat_init(cur, 2 * g, 2 * g);
+    fmpz_mat_init(u, g, g);
     fmpz_init(d);
     fmpz_init(r);
 
@@ -97,8 +98,16 @@ sp2gz_reduce_gamma(fmpz_mat_t res, fmpz_mat_struct* vec, const fmpz_mat_t mat)
     }
     if (!fmpz_mat_is_zero(u))
     {
-        sp2gz_trig(&vec[res]);
-        fmpz_mat_transpose(&vec[res], &vec[res]);
+        sp2gz_j(&vec[res]);
+        fmpz_mat_mul(cur, cur, &vec[res]);
+        res++;
+
+        fmpz_mat_neg(u, u);
+        sp2gz_trig(&vec[res], u);
+        fmpz_mat_mul(cur, cur, &vec[res]);
+        res++;
+
+        sp2gz_j(&vec[res]);
         fmpz_mat_mul(cur, cur, &vec[res]);
         res++;
     }
@@ -108,11 +117,10 @@ sp2gz_reduce_gamma(fmpz_mat_t res, fmpz_mat_struct* vec, const fmpz_mat_t mat)
     flint_printf("\n");
     fmpz_mat_print_pretty(cur);
     flint_printf("\n\n");
-    fmpz_mat_set(res, cur);
+    fmpz_mat_set(next, cur);
 
     fmpz_mat_clear(cur);
     fmpz_mat_clear(u);
-    fmpz_mat_clear(col);
     fmpz_clear(d);
     fmpz_clear(r);
     return res;
@@ -140,26 +148,26 @@ fmpz_mat_struct* sp2gz_decompose(slong* nb, const fmpz_mat_t mat)
     slong g = sp2gz_dim(mat);
     fmpz_mat_t cur;
     fmpz_mat_struct* gamma;
-    fmpz_mat_struct* rec;
+    fmpz_mat_struct* rec = NULL;
     fmpz_mat_struct* res;
     fmpz_mat_t w;
     slong nb_max = 0;
     slong nb_rec = 0;
-    slong k, nb_gamma, add, nb_rec;
+    slong k, nb_gamma, add;
 
     fmpz_mat_init(cur, 2 * g, 2 * g);
 
-    /* We need at most 3 * bits matrices to reduce gamma to zero */
+    /* We need at most 5 * bits matrices to reduce gamma to zero */
     for (k = 0; k < g; k++)
     {
         nb_max = FLINT_MAX(nb_max, fmpz_bits(fmpz_mat_entry(mat, 2 * g - 1, k)));
-        nb_max++; /* for last delta reduction */
+        nb_max = 5 * nb_max + 1; /* for last delta reduction */
     }
 
-    gamma = flint_malloc(nb_max * 3 * sizeof(fmpz_mat_struct));
+    gamma = flint_malloc(nb_max * sizeof(fmpz_mat_struct));
     for (k = 0; k < nb_max; k++)
     {
-        fmpz_mat_init(&gamma[k]);
+        fmpz_mat_init(&gamma[k], 2 * g, 2 * g);
     }
 
     nb_gamma = 0;
@@ -181,19 +189,36 @@ fmpz_mat_struct* sp2gz_decompose(slong* nb, const fmpz_mat_t mat)
     {
         fmpz_mat_window_init(w, cur, 1, 1, g - 1, g - 1);
         rec = sp2gz_decompose(&nb_rec, w);
+        fmpz_mat_window_clear(w);
     }
 
     /* Make final vector */
-    *nb = nb_gamma + (fmpz_mat_is_one(&gamma[nb_gamma]) ? 0 : 1) + nb_rec;
+    *nb = nb_gamma + nb_rec;
     res = flint_malloc(*nb * sizeof(fmpz_mat_struct));
     for (k = 0; k < *nb; k++)
     {
-        fmpz_mat_init(&res[k]);
+        fmpz_mat_init(&res[k], 2 * g, 2 * g);
     }
 
     for (k = 0; k < nb_gamma; k++)
     {
         fmpz_mat_set(&res[k], &gamma[k]);
     }
-    
+    for (k = 0; k < nb_rec; k++)
+    {
+        sp2gz_embed(&res[nb_gamma + k], &rec[k]);
+    }
+
+    fmpz_mat_clear(cur);
+    for (k = 0; k < nb_max; k++)
+    {
+        fmpz_mat_clear(&gamma[k]);
+    }
+    flint_free(gamma);
+    for (k = 0; k < nb_rec; k++)
+    {
+        fmpz_mat_clear(&rec[k]);
+    }
+    flint_free(rec);
+    return res;
 }

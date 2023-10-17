@@ -72,7 +72,7 @@ worker(acb_ptr dth, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong len,
             /* Loop over b, adding coefficients in both a0b and a1b */
             for (b = 0; b < n; b++)
             {
-                acb_mul_powi(y, x, (dots[b] + i * (b >> (g - 1))) % 4);
+                acb_mul_i_pow_si(y, x, (dots[b] + i * (b >> (g - 1))) % 4);
                 if (i % 2 == 0)
                 {
                     acb_add(&aux[(n * a0 + b) * nb + j],

@@ -56,7 +56,7 @@ acb_theta_naive_all(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, sl
             d = acb_theta_char_dot(a, b, g);
             for (k = 0; k < nb; k++)
             {
-                acb_mul_powi(&th[k * n * n + a * n + b],
+                acb_mul_i_pow_si(&th[k * n * n + a * n + b],
                     &th[k * n * n + a * n + b], d);
             }
         }

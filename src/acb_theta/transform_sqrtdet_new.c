@@ -142,7 +142,7 @@ void acb_theta_transform_sqrtdet_new(acb_t res, const acb_mat_t tau, slong prec)
         /* Set mu to +-1 such that mu*sqrt_branch gives the correct value at A,
            i.e. i^(g/2) * something positive */
         acb_mat_det(mu, A, prec);
-        acb_mul_powi(mu, mu, -g);
+        acb_mul_i_pow_si(mu, mu, -g);
         acb_sqrt(mu, mu, prec);
         acb_set_si(z, g);
         acb_mul_2exp_si(z, z, -2);

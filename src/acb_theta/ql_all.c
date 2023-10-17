@@ -274,7 +274,7 @@ acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
 
             if (a1 == fixed_a1)
             {
-                acb_mul_powi(&th[ab], &aux[(a0 << s) + b0],
+                acb_mul_i_pow_si(&th[ab], &aux[(a0 << s) + b0],
                     acb_theta_char_dot_slong(b1, n1, g - s));
             }
             else
