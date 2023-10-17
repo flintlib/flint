@@ -9,18 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb.h"
 #include "acb_modular.h"
 
-int main(void)
+TEST_FUNCTION_START(acb_modular_theta_sum, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("theta_sum....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* Very weak test, just testing the error bounds and not
        that we compute the right functions */
@@ -126,9 +121,6 @@ int main(void)
         acb_clear(q);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
 

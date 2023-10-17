@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq.h"
 #include "acb.h"
 #include "acb_modular.h"
@@ -49,15 +50,9 @@ acb_modular_epsilon_arg_naive(fmpq_t arg, const psl2z_t g)
 #undef d
 }
 
-int main(void)
+TEST_FUNCTION_START(acb_modular_epsilon_arg, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("eta_epsilon_arg....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -97,9 +92,6 @@ int main(void)
         acb_clear(b);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
 
