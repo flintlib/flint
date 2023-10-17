@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb.h"
 #include "acb_hypgeom.h"
 
@@ -18,15 +19,9 @@ void _acb_hypgeom_legendre_q_single(acb_t res, const acb_t n, const acb_t m,
 void _acb_hypgeom_legendre_q_double(acb_t res, const acb_t n, const acb_t m,
     const acb_t z, slong prec);
 
-int main(void)
+TEST_FUNCTION_START(acb_hypgeom_legendre_q, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("legendre_q....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -172,9 +167,6 @@ int main(void)
         acb_clear(u);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
 

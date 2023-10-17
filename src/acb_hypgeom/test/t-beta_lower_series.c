@@ -9,18 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_poly.h"
 #include "acb_hypgeom.h"
 
-int main(void)
+TEST_FUNCTION_START(acb_hypgeom_beta_lower_series, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("beta_lower_series....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -148,9 +143,6 @@ int main(void)
         acb_poly_clear(pu);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
 
