@@ -9,16 +9,23 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq_mat.h"
 #include "acb_mat.h"
 
-void
-_acb_mat_init_randtest(acb_mat_t mat, slong r, slong c, flint_rand_t state)
+/* Defined in t-mul.c and t-mul_reorder.c */
+#ifndef _acb_mat_init_randtest
+#define _acb_mat_init_randtest _acb_mat_init_randtest
+void _acb_mat_init_randtest(acb_mat_t mat, slong r, slong c, flint_rand_t state)
 {
     acb_mat_init(mat, r, c);
     acb_mat_randtest(mat, state, 2 + n_randint(state, 200), 10);
 }
+#endif
 
+/* Defined in t-mul.c and t-mul_reorder.c */
+#ifndef _acb_mat_nprintd
+#define _acb_mat_nprintd _acb_mat_nprintd
 void
 _acb_mat_nprintd(const char * name, acb_mat_t mat)
 {
@@ -26,16 +33,11 @@ _acb_mat_nprintd(const char * name, acb_mat_t mat)
     acb_mat_printd(mat, 15);
     flint_printf("\n\n");
 }
+#endif
 
-int main(void)
+TEST_FUNCTION_START(acb_mat_mul_reorder, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("mul_reorder....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -367,9 +369,6 @@ int main(void)
         acb_mat_clear(s);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
 

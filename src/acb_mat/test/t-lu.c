@@ -9,11 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "perm.h"
 #include "fmpq.h"
 #include "fmpq_mat.h"
 #include "acb_mat.h"
 
+/* Defined in t-lu.c and t-lu_recursive.c */
+#ifndef fmpq_mat_is_invertible
+#define fmpq_mat_is_invertible fmpq_mat_is_invertible
 int fmpq_mat_is_invertible(const fmpq_mat_t A)
 {
     int r;
@@ -24,16 +28,11 @@ int fmpq_mat_is_invertible(const fmpq_mat_t A)
     fmpq_clear(t);
     return r;
 }
+#endif
 
-int main(void)
+TEST_FUNCTION_START(acb_mat_lu, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("lu....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -139,8 +138,5 @@ int main(void)
         _perm_clear(perm);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
