@@ -10,20 +10,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include <float.h>
 #include "ulong_extras.h"
 #include "double_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(d_randtest_signed, state)
 {
     double x;
     slong iter;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("randtest_signed....");
-    fflush(stdout);
 
     /* check that values lie in [0.5, 1) U {0} for minexp = maxexp = 0 */
     for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
@@ -38,8 +33,5 @@ main(void)
         }
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -10,20 +10,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include <float.h>
 #include "ulong_extras.h"
 #include "double_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(d_is_nan, state)
 {
     double x;
     slong iter;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("is_nan....");
-    fflush(stdout);
 
     /* check non-zero value returned if x == NaN */
     x = D_NAN;
@@ -56,8 +51,5 @@ main(void)
         }
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
