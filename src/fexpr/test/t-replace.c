@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "calcium.h"
 #include "fexpr.h"
 #include "fexpr_builtin.h"
@@ -133,15 +134,9 @@ fexpr_replace_vec_naive(fexpr_t res, const fexpr_t expr, const fexpr_vec_t xs, c
     }
 }
 
-int main(void)
+TEST_FUNCTION_START(fexpr_replace, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("replace...");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -221,8 +216,5 @@ int main(void)
         fexpr_clear(res3);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
