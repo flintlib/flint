@@ -9,18 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq_poly.h"
 #include "arb_poly.h"
 
-int main(void)
+TEST_FUNCTION_START(arb_poly_log_series, state)
 {
     slong iter;
     flint_rand_t state;
-
-    flint_printf("log_series....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* compare with fmpq_poly */
     for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
@@ -169,8 +165,5 @@ int main(void)
         arb_poly_clear(c);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
