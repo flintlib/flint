@@ -369,6 +369,7 @@ static int _factor_irred_compressed(
 
         fq_nmod_mpoly_get_n_fq_bpoly(Ab, A, perm[0], perm[1], ctx);
         success = n_fq_bpoly_factor_smprime(c, Abf, Ab, 1, ctx->fqctx);
+
         if (!success)
         {
             fq_nmod_mpoly_get_n_fq_bpoly(Ab, A, perm[0], perm[1], ctx);
