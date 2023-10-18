@@ -9,9 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "arf.h"
 #include "double_interval.h"
 
+/* Defined in t-fast_div.c and t-fast_mul.c */
+#ifndef arf_min2
+#define arf_min2 arf_min2
 void
 arf_min2(arf_t res, const arf_t x, const arf_t y)
 {
@@ -22,7 +26,11 @@ arf_min2(arf_t res, const arf_t x, const arf_t y)
     else
         arf_min(res, x, y);
 }
+#endif
 
+/* Defined in t-fast_div.c and t-fast_mul.c */
+#ifndef arf_max2
+#define arf_max2 arf_max2
 void
 arf_max2(arf_t res, const arf_t x, const arf_t y)
 {
@@ -33,16 +41,11 @@ arf_max2(arf_t res, const arf_t x, const arf_t y)
     else
         arf_max(res, x, y);
 }
+#endif
 
-int main(void)
+TEST_FUNCTION_START(di_fast_div, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("fast_div....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -109,8 +112,5 @@ int main(void)
         arf_clear(zb);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
