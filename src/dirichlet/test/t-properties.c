@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "dirichlet.h"
 
 static void
@@ -35,14 +36,10 @@ random_divisor(flint_rand_t state, const dirichlet_group_t G)
     return d;
 }
 
-int main(void)
+TEST_FUNCTION_START(dirichlet_properties, state)
 {
     slong iter, bits;
-    flint_rand_t state;
 
-    flint_printf("properties....");
-    fflush(stdout);
-    flint_randinit(state);
     for (bits = 5; bits <= 30; bits += 5)
     {
 
@@ -200,8 +197,5 @@ int main(void)
         }
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
