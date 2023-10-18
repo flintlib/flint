@@ -9,20 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq_mat.h"
 #include "arb_mat.h"
 
 FLINT_DLL extern slong arb_mat_mul_block_min_block_size;
 
-int main(void)
+TEST_FUNCTION_START(arb_mat_mul_block, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("mul_block....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 5000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -162,9 +157,6 @@ int main(void)
         arb_mat_clear(D);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
 
