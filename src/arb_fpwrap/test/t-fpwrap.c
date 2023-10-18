@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include <mpfr.h>
 #include "double_extras.h"
 #include "arb.h"
@@ -37,15 +38,9 @@
     } while (0)
 
 
-int main(void)
+TEST_FUNCTION_START(arb_fpwrap, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("fpwrap....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* correct rounding test */
     for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
@@ -486,9 +481,6 @@ int main(void)
         CHECK_CDOUBLE(arb_fpwrap_cdouble_modular_delta(&cres, ctau, flags));
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
 
