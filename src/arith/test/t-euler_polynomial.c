@@ -9,21 +9,18 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
 #include "arith.h"
 
-int main(void)
+TEST_FUNCTION_START(arith_euler_polynomial, state)
 {
     fmpq_poly_t P, Q;
     fmpz_t t;
 
     slong k, n;
 
-    FLINT_TEST_INIT(state);
-
-    flint_printf("euler_polynomial....");
-    fflush(stdout);
 
     for (n = 0; n <= 100; n++)
     {
@@ -66,7 +63,5 @@ int main(void)
         fmpq_poly_clear(Q);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -9,13 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "arith.h"
 
-int main(void)
+TEST_FUNCTION_START(arith_number_of_partitions_vec, state)
 {
     fmpz * p;
     mp_ptr pmod;
@@ -23,10 +24,6 @@ int main(void)
 
     const slong maxn = 1000;
 
-    FLINT_TEST_INIT(state);
-
-    flint_printf("number_of_partitions_vec....");
-    fflush(stdout);
 
     p = _fmpz_vec_init(maxn);
     pmod = _nmod_vec_init(maxn);
@@ -96,8 +93,5 @@ int main(void)
     _fmpz_vec_clear(p, maxn);
     _nmod_vec_clear(pmod);
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

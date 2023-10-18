@@ -9,20 +9,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "arith.h"
 
-int main(void)
+TEST_FUNCTION_START(arith_euler_number_vec, state)
 {
     fmpz * r;
     fmpz_t s, t;
     slong k, n;
 
-    FLINT_TEST_INIT(state);
-
-    flint_printf("euler_number_vec....");
-    fflush(stdout);
 
     for (n = 2; n <= 3000; n += (n<100) ? 2 : n/3)
     {
@@ -55,7 +52,5 @@ int main(void)
         _fmpz_vec_clear(r, n + 1);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -9,19 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "arith.h"
 
-int main(void)
+TEST_FUNCTION_START(arith_bernoulli_number_denom, state)
 {
     fmpz_t s, t;
     slong n;
 
-    FLINT_TEST_INIT(state);
-
-    flint_printf("bernoulli_number_denom....");
-    fflush(stdout);
 
     fmpz_init(s);
     fmpz_init(t);
@@ -44,7 +41,5 @@ int main(void)
     fmpz_clear(s);
     fmpz_clear(t);
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

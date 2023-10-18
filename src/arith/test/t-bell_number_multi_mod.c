@@ -9,17 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "arith.h"
 
-int main(void)
+TEST_FUNCTION_START(arith_bell_number_multi_mod, state)
 {
     slong i;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("bell_number_multi_mod....");
-    fflush(stdout);
 
     for (i = 0; i < 100; i++)
     {
@@ -46,8 +42,5 @@ int main(void)
         fmpz_clear(b2);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

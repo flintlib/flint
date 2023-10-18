@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "gmpcompat.h"
 #include "mpn_extras.h"
 #include "fmpq.h"
@@ -64,16 +65,12 @@ mpq_harmonic_balanced(mpq_t res, slong a, slong b)
     mpq_clear(t);
 }
 
-int main(void)
+TEST_FUNCTION_START(arith_harmonic_number, state)
 {
     slong i;
     mpq_t x, y;
     fmpq_t t;
 
-    FLINT_TEST_INIT(state);
-
-    flint_printf("harmonic_number....");
-    fflush(stdout);
 
     fmpq_init(t);
     mpq_init(x);
@@ -128,7 +125,5 @@ int main(void)
     mpq_clear(y);
     fmpq_clear(t);
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
