@@ -9,20 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_poly.h"
 
-int main(void)
+TEST_FUNCTION_START(acb_poly_graeffe_transform, state)
 {
     slong iter;
-    flint_rand_t state;
     acb_poly_t a, b, c;
     acb_ptr roots;
     acb_t leading;
-
-    flint_printf("graeffe_transform....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     acb_poly_init(a);
     acb_poly_init(b);
@@ -87,9 +82,6 @@ int main(void)
 
     acb_clear(leading);
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
 

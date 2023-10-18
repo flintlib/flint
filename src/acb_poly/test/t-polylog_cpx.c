@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_poly.h"
 
 #ifdef __GNUC__
@@ -248,15 +249,9 @@ const double polylog_testdata[NUM_TESTS][10] = {
     0.0780220225006149953, 0.0215283250955342792},
 };
 
-int main(void)
+TEST_FUNCTION_START(acb_poly_polylog_cpx, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("polylog_cpx....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* check particular values against table */
     {
@@ -396,9 +391,6 @@ int main(void)
         _acb_vec_clear(w2, len2);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
 

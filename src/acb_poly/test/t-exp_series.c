@@ -9,19 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_poly.h"
 
 FLINT_DLL extern slong acb_poly_newton_exp_cutoff;
 
-int main(void)
+TEST_FUNCTION_START(acb_poly_exp_series, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("exp_series....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -84,8 +79,5 @@ int main(void)
         acb_poly_clear(d);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -10,18 +10,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(acb_poly_get_set_coeff_acb, state)
 {
     int i, j, result;
-    flint_rand_t state;
-
-    flint_printf("get/set_coeff_acb....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (i = 0; i < 100; i++)
     {
@@ -57,9 +51,6 @@ main(void)
         acb_poly_clear(a);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
 
