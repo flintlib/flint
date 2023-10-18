@@ -1989,6 +1989,6 @@ Vector functions
 
 .. function:: void _arb_vec_printn(arb_srcptr vec, slong len, slong digits, ulong flags)
 
-.. function:: _arb_vec_printd(arb_srcptr vec, slong len, slong ndigits)
+.. function:: void _arb_vec_printd(arb_srcptr vec, slong len, slong ndigits)
 
     Prints *vec* in decimal using :func:`arb_printn` or :func:`arb_printd` on each entry.

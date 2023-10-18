@@ -455,7 +455,7 @@ Arithmetic
 
     Sets *z* to *x* divided by the imaginary unit.
 
-.. function:: void acb_mul_powi(acb_t z, const acb_t x, slong k)
+.. function:: void acb_mul_i_pow_si(acb_t z, const acb_t x, slong k)
 
     Sets *z* to *x* multiplied by `i^k`, where *i* denotes the imaginary unit.
 
@@ -1249,7 +1249,7 @@ Vector functions
 
     Performs the respective scalar operation elementwise.
 
-.. function:: _acb_vec_sqr(acb_ptr res, acb_srcptr vec, slong len, slong prec)
+.. function:: void _acb_vec_sqr(acb_ptr res, acb_srcptr vec, slong len, slong prec)
 
     Sets *res* to the square of *vec* elementwise.
 
