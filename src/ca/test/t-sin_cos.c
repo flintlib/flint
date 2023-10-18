@@ -9,17 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ca.h"
 
-int main(void)
+TEST_FUNCTION_START(ca_sin_cos, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("sin_cos....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     {
         ca_ctx_t ctx;
@@ -86,8 +81,5 @@ int main(void)
         ca_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

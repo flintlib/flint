@@ -9,18 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ca.h"
 #include "ca_vec.h"
 
-int main(void)
+TEST_FUNCTION_START(ca_fmpz_mpoly_evaluate, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("fmpz_mpoly_evaluate....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -89,8 +84,5 @@ int main(void)
         ca_ctx_clear(cactx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
