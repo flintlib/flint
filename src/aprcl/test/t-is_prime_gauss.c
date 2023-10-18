@@ -9,16 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "aprcl.h"
 
-int main(void)
+TEST_FUNCTION_START(aprcl_is_prime_gauss, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("is_prime_gauss....");
-    fflush(stdout);
 
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
@@ -98,9 +95,6 @@ int main(void)
         fmpz_clear(n);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
 
