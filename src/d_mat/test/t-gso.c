@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "double_extras.h"
 #include "d_mat.h"
 #include "ulong_extras.h"
@@ -16,17 +17,12 @@
 #define D_MAT_GSO_NORM_EPS (4 * D_EPS)
 #define D_MAT_GSO_ORTHO_EPS (2 * D_EPS)
 
-int
-main(void)
+TEST_FUNCTION_START(d_mat_gso, state)
 {
     int i, tmul = 100;
-    FLINT_TEST_INIT(state);
 #ifdef _WIN32
     tmul = 1;
 #endif
-
-    flint_printf("gso....");
-    fflush(stdout);
 
     /* check norm(column(gso)) = 1 or 0
      * check dot product of columns of gso is zero */
@@ -89,8 +85,5 @@ main(void)
         d_mat_clear(A);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
