@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "perm.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
@@ -42,12 +43,15 @@ _is_superficially_ok_entrywise(const fmpz_mat_t A)
     return 1;
 }
 
+/* Defined in t-all_pairs_longest_walk.c and t-transitive_closure.c */
+#ifndef _bool_mat_permute
+#define _bool_mat_permute _bool_mat_permute
+/* permute rows and columns of a square matrix */
 void
 _bool_mat_permute(bool_mat_t B, const bool_mat_t A, const slong *perm)
 {
     slong n, i, j;
-    if (!bool_mat_is_square(A)) flint_abort(); /* assert */
-    if (A == B) flint_abort(); /* assert */
+    if ((A == B) || !bool_mat_is_square(A)) flint_abort(); /* assert */
     n = bool_mat_nrows(A);
     for (i = 0; i < n; i++)
     {
@@ -58,6 +62,7 @@ _bool_mat_permute(bool_mat_t B, const bool_mat_t A, const slong *perm)
         }
     }
 }
+#endif
 
 void
 _fmpz_mat_permute(fmpz_mat_t B, const fmpz_mat_t A, const slong *perm)
@@ -132,15 +137,9 @@ _brute_force_all_pairs_longest_walk(fmpz_mat_t B, const bool_mat_t A)
     }
 }
 
-int main(void)
+TEST_FUNCTION_START(bool_mat_all_pairs_longest_walk, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("all_pairs_longest_walk....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -357,8 +356,5 @@ int main(void)
         }
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

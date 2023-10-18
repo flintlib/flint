@@ -9,9 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "bool_mat.h"
 #include "perm.h"
 
+/* Defined in t-all_pairs_longest_walk.c and t-transitive_closure.c */
+#ifndef _bool_mat_permute
+#define _bool_mat_permute _bool_mat_permute
 /* permute rows and columns of a square matrix */
 void
 _bool_mat_permute(bool_mat_t B, const bool_mat_t A, const slong *perm)
@@ -28,6 +32,7 @@ _bool_mat_permute(bool_mat_t B, const bool_mat_t A, const slong *perm)
         }
     }
 }
+#endif
 
 void
 _bool_mat_transitive_closure_powering(bool_mat_t B, const bool_mat_t A)
@@ -47,15 +52,9 @@ _bool_mat_transitive_closure_powering(bool_mat_t B, const bool_mat_t A)
     bool_mat_clear(T);
 }
 
-int main(void)
+TEST_FUNCTION_START(bool_mat_transitive_closure, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("transitive_closure....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -176,8 +175,5 @@ int main(void)
         bool_mat_clear(C);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
