@@ -11,6 +11,80 @@
 
 #include "acb_theta.h"
 
+static int
+sp2gz_comes_from_g1(const fmpz_mat_t mat)
+{
+    slong g = sp2gz_dim(mat);
+    fmpz_mat_t x, y;
+    slong k, l;
+    int res = 0;
+
+    fmpz_mat_init(x, 2, 2);
+    fmpz_mat_init(y, 2 * g, 2 * g);
+
+    for (k = 0; k < 2; k++)
+    {
+        for (l = 0; l < 2; l++)
+        {
+            fmpz_set(fmpz_mat_entry(x, k, l), fmpz_mat_entry(mat, k * g, l * g));
+        }
+    }
+
+    if (sp2gz_is_correct(x))
+    {
+        sp2gz_embed(y, x);
+        res = fmpz_mat_equal(mat, y);
+    }
+
+    fmpz_mat_clear(x);
+    fmpz_mat_clear(y);
+    return res;
+}
+
+static int
+sp2gz_is_allowed_in_dec(const fmpz_mat_t mat)
+{
+    slong g = sp2gz_dim(mat);
+    fmpz_mat_t alpha, beta, gamma, x, y;
+    slong r;
+    int res;
+
+    if (g == 1 || sp2gz_comes_from_g1(mat))
+    {
+        return 1;
+    }
+
+    fmpz_mat_window_init(alpha, mat, 0, 0, g, g);
+    fmpz_mat_window_init(beta, mat, 0, g, g, 2 * g);
+    fmpz_mat_window_init(gamma, mat, g, 0, 2 * g, g);
+    fmpz_mat_init(x, 2 * g, 2 * g);
+
+    if (!fmpz_mat_is_zero(gamma))
+    {
+        r = fmpz_mat_rank(gamma);
+
+        fmpz_mat_init(y, 2 * r, 2 * r);
+        sp2gz_j(y);
+        sp2gz_embed(x, y);
+        fmpz_mat_clear(y);
+    }
+    else if (!fmpz_mat_is_zero(beta))
+    {
+        sp2gz_trig(x, beta);
+    }
+    else
+    {
+        sp2gz_block_diag(x, alpha);
+    }
+
+    res = fmpz_mat_equal(mat, x);
+    fmpz_mat_window_clear(alpha);
+    fmpz_mat_window_clear(beta);
+    fmpz_mat_window_clear(gamma);
+    fmpz_mat_clear(x);
+    return res;
+}
+
 int main(void)
 {
     slong iter;
@@ -21,72 +95,34 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: decomposition consist of block-diagonal, trigonal or J matrices,
-       and product is the original matrix */
+    /* Test: decomposition consists of elementary matrices and product is the
+       original matrix */
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 3);
+        slong g = 2 + n_randint(state, 5);
         slong bits = n_randint(state, 20);
-        fmpz_mat_t m, x, y, alpha, beta, gamma;
+        fmpz_mat_t m, x;
         fmpz_mat_struct* dec = NULL;
         slong nb_dec = 0;
-        slong r, k;
+        slong k;
 
         fmpz_mat_init(m, 2 * g, 2 * g);
         fmpz_mat_init(x, 2 * g, 2 * g);
 
         sp2gz_randtest(m, state, bits);
-
-        fmpz_mat_print_pretty(m);
-        flint_printf("\n");
-
         dec = sp2gz_decompose(&nb_dec, m);
 
         for (k = 0; k < nb_dec; k++)
         {
-            fmpz_mat_window_init(alpha, &dec[k], 0, 0, g, g);
-            fmpz_mat_window_init(beta, &dec[k], 0, g, g, 2 * g);
-            fmpz_mat_window_init(gamma, &dec[k], g, 0, 2 * g, g);
-
-            if (!fmpz_mat_is_zero(gamma))
-            {
-                r = fmpz_mat_rank(gamma);
-
-                fmpz_mat_init(y, 2 * r, 2 * r);
-                sp2gz_j(y);
-                sp2gz_embed(x, y);
-                fmpz_mat_clear(y);
-            }
-            else if (!fmpz_mat_is_zero(beta))
-            {
-                sp2gz_trig(x, beta);
-            }
-            else
-            {
-                sp2gz_block_diag(x, alpha);
-            }
-
-            if (!fmpz_mat_equal(&dec[k], x))
+            if (!sp2gz_is_allowed_in_dec(&dec[k]))
             {
                 flint_printf("FAIL (not elementary)\n");
                 fmpz_mat_print_pretty(&dec[k]);
                 flint_printf("\n");
                 flint_abort();
             }
-
-            fmpz_mat_window_clear(alpha);
-            fmpz_mat_window_clear(beta);
-            fmpz_mat_window_clear(gamma);
         }
 
-            flint_printf("\ndecomposition in %wd matrices:\n", nb_dec);
-            for (k = 0; k < nb_dec; k++)
-            {
-                fmpz_mat_print_pretty(&dec[k]);
-                flint_printf("\n");
-            }
-            flint_printf("\n\n");
-            
         fmpz_mat_one(x);
         for (k = 0; k < nb_dec; k++)
         {

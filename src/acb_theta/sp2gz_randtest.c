@@ -51,24 +51,25 @@ void
 sp2gz_randtest(fmpz_mat_t mat, flint_rand_t state, slong bits)
 {
     slong g = sp2gz_dim(mat);
+    slong b = bits/5 + 1;
     fmpz_mat_t aux;
 
     fmpz_mat_init(aux, 2 * g, 2 * g);
 
-    sp2gz_randtest_trig(mat, state, bits);
-    sp2gz_randtest_block_diag(aux, state, bits);
+    sp2gz_randtest_block_diag(mat, state, b);
+    sp2gz_randtest_trig(aux, state, b);
     fmpz_mat_mul(mat, mat, aux);
     sp2gz_j(aux);
     fmpz_mat_mul(mat, mat, aux);
-    sp2gz_randtest_trig(aux, state, bits);
+    sp2gz_randtest_trig(aux, state, b);
     fmpz_mat_mul(mat, mat, aux);
     sp2gz_j(aux);
     fmpz_mat_mul(mat, mat, aux);
-    sp2gz_randtest_block_diag(aux, state, bits);
+    sp2gz_randtest_trig(aux, state, b);
     fmpz_mat_mul(mat, mat, aux);
     sp2gz_j(aux);
     fmpz_mat_mul(mat, mat, aux);
-    sp2gz_randtest_trig(aux, state, bits);
+    sp2gz_randtest_trig(aux, state, b);
     fmpz_mat_mul(mat, mat, aux);
 
     fmpz_mat_clear(aux);
