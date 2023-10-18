@@ -9,18 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "arb_fmpz_poly.h"
 #include "acb_dirichlet.h"
 
-int main(void)
+TEST_FUNCTION_START(arb_fmpz_poly_gauss_period_minpoly, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("gauss_period_minpoly....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     {
         slong prec;
@@ -100,9 +95,6 @@ int main(void)
         fmpz_poly_clear(pol);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
 

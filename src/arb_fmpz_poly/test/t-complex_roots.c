@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_poly_factor.h"
 #include "fmpq_poly.h"
 #include "acb.h"
@@ -91,15 +92,9 @@ check_roots(const fmpz_poly_t poly, acb_srcptr roots, slong prec)
     arb_clear(lead);
 }
 
-int main(void)
+TEST_FUNCTION_START(arb_fmpz_poly_complex_roots, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("complex_roots....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 500 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -205,9 +200,6 @@ int main(void)
         fmpz_clear(t);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
 
