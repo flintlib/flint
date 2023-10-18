@@ -660,7 +660,7 @@ FLINT_FORCE_INLINE vec4n vec4n_addmod_limited(vec4n a, vec4n b, vec4n n)
     vec4n t = vec4n_sub(s, n);
     vec4n m = _mm256_srai_epi32(t, 31);
           m = _mm256_shuffle_epi32(m, 1 + 4*(1 + 4*(3 + 4*(3))));
-    return _mm256_blendv_epi8(t, s, m);  
+    return _mm256_blendv_epi8(t, s, m);
 }
 
 FLINT_FORCE_INLINE vec4n vec4n_addmod(vec4n a, vec4n b, vec4n n)
@@ -672,7 +672,7 @@ FLINT_FORCE_INLINE vec4n vec4n_addmod(vec4n a, vec4n b, vec4n n)
     vec4n t0 = vec4n_sub(m, a);
     vec4n t1 = vec4n_sub(b, tt);
     vec4n t2 = vec4n_sub(t1, t0);
-    return _mm256_blendv_epi8(s, t2, _mm256_cmpgt_epi64(t1, t0));  
+    return _mm256_blendv_epi8(s, t2, _mm256_cmpgt_epi64(t1, t0));
 #else
     vec4n t0 = vec4n_sub(s, n);
     vec4n t1 = vec4n_sub(a, tt);

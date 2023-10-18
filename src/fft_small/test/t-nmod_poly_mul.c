@@ -228,7 +228,7 @@ int main(void)
             ulong prec = qn + n_randint(state, 200);
             _nmod_poly_divrem_precomp_init(M, b, bn, prec, mod, R);
             _nmod_poly_divrem_precomp(q3, r3, a, an, M, mod, R);
-            _nmod_poly_divrem_precomp_clear(M);            
+            _nmod_poly_divrem_precomp_clear(M);
 
             for (i = qn; i > 0; i--)
             {

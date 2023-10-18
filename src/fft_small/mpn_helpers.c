@@ -129,5 +129,5 @@ unsigned char flint_mpn_add_inplace_c(ulong* z, ulong zn, ulong* a, ulong an, un
         i++;
     }
 
-    return cf;    
+    return cf;
 }

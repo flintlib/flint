@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2022 Daniel Schultz
 
     This file is part of FLINT.
