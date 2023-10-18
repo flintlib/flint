@@ -9,17 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "arb_poly.h"
 #include "arb_hypgeom.h"
 
-int main(void)
+TEST_FUNCTION_START(arb_hypgeom_gamma_taylor_tab, state)
 {
-    flint_rand_t state;
-
-    flint_printf("gamma_taylor_tab....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     {
         slong n, prec, maxprec;
@@ -75,9 +70,6 @@ int main(void)
         arf_clear(d);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
 

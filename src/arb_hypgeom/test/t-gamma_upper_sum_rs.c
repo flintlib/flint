@@ -9,18 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq.h"
 #include "arb_hypgeom.h"
 
-int main(void)
+TEST_FUNCTION_START(arb_hypgeom_gamma_upper_sum_rs, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("gamma_upper_sum_rs....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -80,8 +75,5 @@ int main(void)
         arb_clear(u);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
