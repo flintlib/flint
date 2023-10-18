@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ca.h"
 #include "ca_ext.h"
 #include "ca_field.h"
@@ -27,15 +28,9 @@ static int _ca_field_equal_ext(const ca_field_t K, ca_ext_struct ** x, slong len
     return 1;
 }
 
-int main(void)
+TEST_FUNCTION_START(ca_field_cache_insert, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("cache_insert....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -110,8 +105,5 @@ int main(void)
         qqbar_clear(x);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
