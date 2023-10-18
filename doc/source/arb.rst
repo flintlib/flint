@@ -349,6 +349,10 @@ Random number generation
     Generates a random number with radius around `2^{-\text{prec}}`
     the magnitude of the midpoint.
 
+.. function:: void arb_randtest_positive(arb_t x, flint_rand_t state, slong prec, slong mag_bits)
+
+    Generates a random precise number which is guaranteed to be positive.
+
 .. function:: void arb_randtest_wide(arb_t x, flint_rand_t state, slong prec, slong mag_bits)
 
     Generates a random number with midpoint and radius chosen independently,
@@ -1907,6 +1911,19 @@ Vector functions
 
     Returns nonzero iff all entries in *x* certainly are finite.
 
+.. function:: int _arb_vec_equal(arb_srcptr vec1, arb_srcptr vec2, slong len)
+
+    Returns nonzero iff *vec1* and *vec2* are equal in the sense of
+    :func:`arb_equal`, i.e. have both the same midpoint and radius elementwise.
+
+.. function:: int _arb_vec_overlaps(arb_srcptr vec1, arb_srcptr vec2, slong len)
+
+    Returns nonzero iff *vec1* overlaps *vec2* elementwise.
+
+.. function:: int _arb_vec_contains(arb_srcptr vec1, arb_srcptr vec2, slong len)
+
+    Returns nonzero iff *vec1* contains *vec2* elementwise.
+
 .. function:: void _arb_vec_set(arb_ptr res, arb_srcptr vec, slong len)
 
     Sets *res* to a copy of *vec*.
@@ -1969,3 +1986,9 @@ Vector functions
     Calls :func:`arb_get_unique_fmpz` elementwise and returns nonzero if
     all entries can be rounded uniquely to integers. If any entry in *vec*
     cannot be rounded uniquely to an integer, returns zero.
+
+.. function:: void _arb_vec_printn(arb_srcptr vec, slong len, slong digits, ulong flags)
+
+.. function:: _arb_vec_printd(arb_srcptr vec, slong len, slong ndigits)
+
+    Prints *vec* in decimal using :func:`arb_printn` or :func:`arb_printd` on each entry.

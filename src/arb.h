@@ -212,6 +212,9 @@ void arb_print(const arb_t x);
 void arb_printd(const arb_t x, slong digits);
 void arb_printn(const arb_t x, slong digits, ulong flags);
 
+void _arb_vec_printn(arb_srcptr vec, slong len, slong ndigits, ulong flags);
+void _arb_vec_printd(arb_srcptr vec, slong len, slong ndigits);
+
 void arb_mul_2exp_si(arb_t y, const arb_t x, slong e);
 
 ARB_INLINE void
@@ -302,6 +305,8 @@ void arb_randtest_exact(arb_t x, flint_rand_t state, slong prec, slong mag_bits)
 void arb_randtest_wide(arb_t x, flint_rand_t state, slong prec, slong mag_bits);
 
 void arb_randtest_precise(arb_t x, flint_rand_t state, slong prec, slong mag_bits);
+
+void arb_randtest_positive(arb_t x, flint_rand_t state, slong prec, slong mag_bits);
 
 void arb_randtest(arb_t x, flint_rand_t state, slong prec, slong mag_bits);
 
@@ -651,18 +656,6 @@ _arb_vec_entry_ptr(arb_ptr vec, slong i)
 }
 
 ARB_INLINE void
-_arb_vec_printn(arb_srcptr vec, slong len, slong ndigits, ulong flags)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-    {
-        arb_printn(vec + i, ndigits, flags);
-        if (i < len - 1)
-            flint_printf(", ");
-    }
-}
-
-ARB_INLINE void
 _arb_vec_zero(arb_ptr A, slong n)
 {
     slong i;
@@ -688,6 +681,47 @@ _arb_vec_is_finite(arb_srcptr x, slong len)
     for (i = 0; i < len; i++)
         if (!arb_is_finite(x + i))
             return 0;
+
+    return 1;
+}
+
+ARB_INLINE int
+_arb_vec_equal(arb_srcptr vec1, arb_srcptr vec2, slong len)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+    {
+        if (!arb_equal(vec1 + i, vec2 + i))
+            return 0;
+    }
+    return 1;
+}
+
+ARB_INLINE int
+_arb_vec_overlaps(arb_srcptr vec1, arb_srcptr vec2, slong len)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+    {
+        if (!arb_overlaps(vec1 + i, vec2 + i))
+            return 0;
+    }
+
+    return 1;
+}
+
+ARB_INLINE int
+_arb_vec_contains(arb_srcptr vec1, arb_srcptr vec2, slong len)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+    {
+        if (!arb_contains(vec1 + i, vec2 + i))
+            return 0;
+    }
 
     return 1;
 }

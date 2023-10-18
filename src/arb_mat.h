@@ -83,6 +83,10 @@ void arb_mat_set_fmpq_mat(arb_mat_t dest, const fmpq_mat_t src, slong prec);
 
 void arb_mat_randtest(arb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits);
 
+void arb_mat_randtest_cho(arb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits);
+
+void arb_mat_randtest_spd(arb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits);
+
 /* I/O */
 
 #ifdef FLINT_HAVE_FILE
@@ -309,6 +313,18 @@ arb_mat_scalar_div_arb(arb_mat_t B, const arb_mat_t A, const arb_t c, slong prec
             arb_div(arb_mat_entry(B, i, j), arb_mat_entry(A, i, j), c, prec);
 }
 
+/* Vector arithmetic */
+
+void _arb_mat_vector_mul_row(arb_ptr res, arb_srcptr v, const arb_mat_t A, slong prec);
+
+void _arb_mat_vector_mul_col(arb_ptr res, const arb_mat_t A, arb_srcptr v, slong prec);
+
+void arb_mat_vector_mul_row(arb_ptr res, arb_srcptr v, const arb_mat_t A, slong prec);
+
+void arb_mat_vector_mul_col(arb_ptr res, const arb_mat_t A, arb_srcptr v, slong prec);
+
+void arb_mat_bilinear_form(arb_t res, const arb_mat_t A, arb_srcptr v1, arb_srcptr v2, slong prec);
+
 /* Solving */
 
 ARB_MAT_INLINE void
@@ -434,6 +450,14 @@ arb_mat_allocated_bytes(const arb_mat_t x)
 {
     return _arb_vec_allocated_bytes(x->entries, x->r * x->c) + x->r * sizeof(arb_ptr);
 }
+
+/* LLL reduction */
+
+int arb_mat_spd_get_fmpz_mat(fmpz_mat_t B, const arb_mat_t A, slong prec);
+
+void arb_mat_spd_lll_reduce(fmpz_mat_t U, const arb_mat_t A, slong prec);
+
+int arb_mat_spd_is_lll_reduced(const arb_mat_t A, slong tol_exp, slong prec);
 
 #ifdef __cplusplus
 }

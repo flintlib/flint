@@ -1409,6 +1409,15 @@ Conversions
 Cholesky Decomposition
 --------------------------------------------------------------------------------
 
+.. function:: void fmpz_mat_is_spd(const fmpz_mat_t A)
+
+    Returns true iff ``A`` is symmetric and positive definite (in particular
+    square).
+
+    We first attempt a numerical `LDL^T` decomposition using
+    :func:`arb_mat_ldl`. If we cannot guarantee that `A` is positive definite,
+    we use an exact method instead, computing the characteristic polynomial of
+    `A` and applying Descartes' rule of signs.
 
 .. function:: void fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A)
 
