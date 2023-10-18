@@ -37,4 +37,3 @@ TEST_FUNCTION_START(aprcl_unity_zp_init, state)
 
     TEST_FUNCTION_END(state);
 }
-

@@ -76,4 +76,3 @@ cleanup:
 
     TEST_FUNCTION_END(state);
 }
-

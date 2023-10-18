@@ -54,4 +54,3 @@ TEST_FUNCTION_START(arb_set_interval_neg_pos_mag, state)
 
     TEST_FUNCTION_END(state);
 }
-

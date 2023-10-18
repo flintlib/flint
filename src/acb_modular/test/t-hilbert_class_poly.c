@@ -164,4 +164,3 @@ TEST_FUNCTION_START(acb_modular_hilbert_class_poly, state)
 
     TEST_FUNCTION_END(state);
 }
-

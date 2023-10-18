@@ -88,4 +88,3 @@ TEST_FUNCTION_START(fmpz_mat_hnf_xgcd, state)
 
     TEST_FUNCTION_END(state);
 }
-

@@ -111,4 +111,3 @@ try_again:
 
     TEST_FUNCTION_END(state);
 }
-

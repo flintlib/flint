@@ -60,4 +60,3 @@ TEST_FUNCTION_START(fmpz_dlog, state)
     mpfr_free_cache();
     TEST_FUNCTION_END(state);
 }
-

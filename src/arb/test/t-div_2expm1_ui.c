@@ -86,4 +86,3 @@ TEST_FUNCTION_START(arb_div_2expm1_ui, state)
 
     TEST_FUNCTION_END(state);
 }
-

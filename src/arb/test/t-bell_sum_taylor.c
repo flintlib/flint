@@ -58,4 +58,3 @@ TEST_FUNCTION_START(arb_bell_sum_taylor, state)
 
     TEST_FUNCTION_END(state);
 }
-

@@ -116,4 +116,3 @@ TEST_FUNCTION_START(fmpz_divisible, state)
 
     TEST_FUNCTION_END(state);
 }
-

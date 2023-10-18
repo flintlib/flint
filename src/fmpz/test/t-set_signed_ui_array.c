@@ -83,4 +83,3 @@ TEST_FUNCTION_START(fmpz_set_signed_ui_array, state)
 
     TEST_FUNCTION_END(state);
 }
-

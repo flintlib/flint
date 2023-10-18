@@ -79,4 +79,3 @@ TEST_FUNCTION_START(acb_tan_pi, state)
 
     TEST_FUNCTION_END(state);
 }
-

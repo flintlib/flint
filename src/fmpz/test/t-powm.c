@@ -181,4 +181,3 @@ TEST_FUNCTION_START(fmpz_powm, state)
 
     TEST_FUNCTION_END(state);
 }
-

@@ -215,4 +215,3 @@ TEST_FUNCTION_START(acb_elliptic_rj, state)
 
     TEST_FUNCTION_END(state);
 }
-

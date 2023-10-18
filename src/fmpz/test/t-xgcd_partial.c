@@ -70,4 +70,3 @@ TEST_FUNCTION_START(fmpz_xgcd_partial, state)
 
     TEST_FUNCTION_END(state);
 }
-

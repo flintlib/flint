@@ -91,4 +91,3 @@ TEST_FUNCTION_START(acb_poly_gamma_series, state)
 
     TEST_FUNCTION_END(state);
 }
-

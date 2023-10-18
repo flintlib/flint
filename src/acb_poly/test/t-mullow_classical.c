@@ -174,4 +174,3 @@ TEST_FUNCTION_START(acb_poly_mullow_classical, state)
 
     TEST_FUNCTION_END(state);
 }
-

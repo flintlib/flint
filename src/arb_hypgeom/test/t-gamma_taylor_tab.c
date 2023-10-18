@@ -72,4 +72,3 @@ TEST_FUNCTION_START(arb_hypgeom_gamma_taylor_tab, state)
 
     TEST_FUNCTION_END(state);
 }
-

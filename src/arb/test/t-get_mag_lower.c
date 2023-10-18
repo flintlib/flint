@@ -67,4 +67,3 @@ TEST_FUNCTION_START(arb_get_mag_lower, state)
 
     TEST_FUNCTION_END(state);
 }
-

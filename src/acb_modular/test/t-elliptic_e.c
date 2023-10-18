@@ -74,4 +74,3 @@ TEST_FUNCTION_START(acb_modular_elliptic_e, state)
 
     TEST_FUNCTION_END(state);
 }
-

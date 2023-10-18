@@ -85,4 +85,3 @@ TEST_FUNCTION_START(acb_poly_sinc_series, state)
 
     TEST_FUNCTION_END(state);
 }
-

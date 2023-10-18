@@ -106,4 +106,3 @@ TEST_FUNCTION_START(acb_hypgeom_pfq_series_sum_bs, state)
 
     TEST_FUNCTION_END(state);
 }
-

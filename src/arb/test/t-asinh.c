@@ -73,4 +73,3 @@ TEST_FUNCTION_START(arb_asinh, state)
 
     TEST_FUNCTION_END(state);
 }
-

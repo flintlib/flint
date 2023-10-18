@@ -96,4 +96,3 @@ TEST_FUNCTION_START(arb_mat_solve_tril, state)
 
     TEST_FUNCTION_END(state);
 }
-

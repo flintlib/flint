@@ -130,4 +130,3 @@ TEST_FUNCTION_START(arb_gamma_fmpq, state)
 
     TEST_FUNCTION_END(state);
 }
-

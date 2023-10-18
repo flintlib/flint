@@ -45,4 +45,3 @@ TEST_FUNCTION_START(aprcl_is_prime, state)
 
     TEST_FUNCTION_END(state);
 }
-

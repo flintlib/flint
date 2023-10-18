@@ -62,4 +62,3 @@ TEST_FUNCTION_START(arb_csc, state)
 
     TEST_FUNCTION_END(state);
 }
-

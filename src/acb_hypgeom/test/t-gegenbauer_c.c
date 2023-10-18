@@ -82,4 +82,3 @@ TEST_FUNCTION_START(acb_hypgeom_gegenbauer_c, state)
 
     TEST_FUNCTION_END(state);
 }
-

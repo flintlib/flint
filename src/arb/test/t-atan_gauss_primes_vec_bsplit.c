@@ -66,4 +66,3 @@ TEST_FUNCTION_START(arb_atan_gauss_primes_vec_bsplit, state)
 
     TEST_FUNCTION_END(state);
 }
-

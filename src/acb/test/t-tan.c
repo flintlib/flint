@@ -88,4 +88,3 @@ TEST_FUNCTION_START(acb_tan, state)
 
     TEST_FUNCTION_END(state);
 }
-

@@ -51,4 +51,3 @@ TEST_FUNCTION_START(aprcl_f_table, state)
 
     TEST_FUNCTION_END(state);
 }
-

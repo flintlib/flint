@@ -147,4 +147,3 @@ TEST_FUNCTION_START(acb_hypgeom_spherical_y, state)
 
     TEST_FUNCTION_END(state);
 }
-

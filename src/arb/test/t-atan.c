@@ -242,4 +242,3 @@ TEST_FUNCTION_START(arb_atan, state)
 
     TEST_FUNCTION_END(state);
 }
-

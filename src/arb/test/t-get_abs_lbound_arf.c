@@ -87,4 +87,3 @@ TEST_FUNCTION_START(arb_get_abs_lbound_arf, state)
 
     TEST_FUNCTION_END(state);
 }
-

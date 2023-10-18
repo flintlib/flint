@@ -99,4 +99,3 @@ TEST_FUNCTION_START(fmpz_fdiv_r_2exp, state)
 
     TEST_FUNCTION_END(state);
 }
-

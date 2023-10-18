@@ -61,4 +61,3 @@ TEST_FUNCTION_START(arb_log_primes_vec_bsplit, state)
 
     TEST_FUNCTION_END(state);
 }
-

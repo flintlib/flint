@@ -69,4 +69,3 @@ TEST_FUNCTION_START(arb_hypgeom_central_bin_ui, state)
 
     TEST_FUNCTION_END(state);
 }
-

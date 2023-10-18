@@ -88,4 +88,3 @@ TEST_FUNCTION_START(acb_calc_integrate_taylor, state)
 
     TEST_FUNCTION_END(state);
 }
-

@@ -104,4 +104,3 @@ TEST_FUNCTION_START(fmpz_poly_taylor_shift_multi_mod_threaded, state)
     TEST_FUNCTION_END_SKIPPED(state);
 #endif
 }
-

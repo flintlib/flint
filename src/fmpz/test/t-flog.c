@@ -117,4 +117,3 @@ TEST_FUNCTION_START(fmpz_flog, state)
 
     TEST_FUNCTION_END(state);
 }
-

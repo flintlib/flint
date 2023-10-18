@@ -88,4 +88,3 @@ TEST_FUNCTION_START(acb_elliptic_p_p_prime, state)
 
     TEST_FUNCTION_END(state);
 }
-

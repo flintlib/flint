@@ -71,4 +71,3 @@ TEST_FUNCTION_START(acb_log_sin_pi, state)
 
     TEST_FUNCTION_END(state);
 }
-

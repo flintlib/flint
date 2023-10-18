@@ -122,4 +122,3 @@ TEST_FUNCTION_START(arb_mat_addmul_rad_mag_fast, state)
 
     TEST_FUNCTION_END(state);
 }
-

@@ -73,4 +73,3 @@ TEST_FUNCTION_START(arb_atanh, state)
 
     TEST_FUNCTION_END(state);
 }
-

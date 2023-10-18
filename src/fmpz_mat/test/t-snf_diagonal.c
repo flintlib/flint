@@ -69,4 +69,3 @@ TEST_FUNCTION_START(fmpz_mat_snf_diagonal, state)
 
     TEST_FUNCTION_END(state);
 }
-

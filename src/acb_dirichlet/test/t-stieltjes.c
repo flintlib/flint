@@ -117,4 +117,3 @@ TEST_FUNCTION_START(acb_dirichlet_stieltjes, state)
 
     TEST_FUNCTION_END(state);
 }
-

@@ -133,4 +133,3 @@ TEST_FUNCTION_START(arb_get_str, state)
 
     TEST_FUNCTION_END(state);
 }
-

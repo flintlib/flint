@@ -101,4 +101,3 @@ TEST_FUNCTION_START(arb_poly_shift_left_right, state)
 
     TEST_FUNCTION_END(state);
 }
-

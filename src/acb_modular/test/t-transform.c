@@ -65,4 +65,3 @@ TEST_FUNCTION_START(acb_modular_transform, state)
 
     TEST_FUNCTION_END(state);
 }
-

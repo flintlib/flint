@@ -53,4 +53,3 @@ TEST_FUNCTION_START(acb_poly_get_set_coeff_acb, state)
 
     TEST_FUNCTION_END(state);
 }
-

@@ -87,4 +87,3 @@ TEST_FUNCTION_START(arb_hypgeom_legendre_p_ui_deriv_bound, state)
 
     TEST_FUNCTION_END(state);
 }
-

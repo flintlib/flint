@@ -56,4 +56,3 @@ TEST_FUNCTION_START(arb_sqrtpos, state)
 
     TEST_FUNCTION_END(state);
 }
-

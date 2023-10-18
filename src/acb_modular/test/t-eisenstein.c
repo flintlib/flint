@@ -79,4 +79,3 @@ TEST_FUNCTION_START(acb_modular_eisenstein, state)
 
     TEST_FUNCTION_END(state);
 }
-

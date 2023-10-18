@@ -92,4 +92,3 @@ TEST_FUNCTION_START(arb_poly_sin_series_cos_series, state)
 
     TEST_FUNCTION_END(state);
 }
-

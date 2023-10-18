@@ -159,4 +159,3 @@ TEST_FUNCTION_START(arb_mat_mul_block, state)
 
     TEST_FUNCTION_END(state);
 }
-

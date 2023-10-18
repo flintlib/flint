@@ -70,4 +70,3 @@ TEST_FUNCTION_START(fmpz_divisor_sigma, state)
 
     TEST_FUNCTION_END(state);
 }
-

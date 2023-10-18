@@ -157,4 +157,3 @@ TEST_FUNCTION_START(arb_richcmp, state)
 
     TEST_FUNCTION_END(state);
 }
-

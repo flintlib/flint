@@ -80,4 +80,3 @@ TEST_FUNCTION_START(arb_atan_taylor_rs, state)
 
     TEST_FUNCTION_END(state);
 }
-

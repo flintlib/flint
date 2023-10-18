@@ -67,4 +67,3 @@ TEST_FUNCTION_START(nmod_poly_set_trunc, state)
 
     TEST_FUNCTION_END(state);
 }
-

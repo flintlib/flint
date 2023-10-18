@@ -710,4 +710,3 @@ TEST_FUNCTION_START(acb_calc_integrate, state)
 
     TEST_FUNCTION_END(state);
 }
-

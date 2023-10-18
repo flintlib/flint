@@ -123,4 +123,3 @@ TEST_FUNCTION_START(acb_modular_theta_sum, state)
 
     TEST_FUNCTION_END(state);
 }
-

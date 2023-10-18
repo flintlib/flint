@@ -56,4 +56,3 @@ TEST_FUNCTION_START(acb_get_abs_lbound_arf, state)
 
     TEST_FUNCTION_END(state);
 }
-

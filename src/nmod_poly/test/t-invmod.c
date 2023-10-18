@@ -196,4 +196,3 @@ TEST_FUNCTION_START(nmod_poly_invmod, state)
 
     TEST_FUNCTION_END(state);
 }
-

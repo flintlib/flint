@@ -51,4 +51,3 @@ TEST_FUNCTION_START(arb_sin_pi, state)
 
     TEST_FUNCTION_END(state);
 }
-

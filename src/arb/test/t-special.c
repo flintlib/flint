@@ -631,4 +631,3 @@ TEST_FUNCTION_START(arb_special, state)
 
     TEST_FUNCTION_END(state);
 }
-

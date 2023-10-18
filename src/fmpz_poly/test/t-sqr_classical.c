@@ -77,4 +77,3 @@ TEST_FUNCTION_START(fmpz_poly_sqr_classical, state)
 
     TEST_FUNCTION_END(state);
 }
-

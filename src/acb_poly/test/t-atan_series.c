@@ -89,4 +89,3 @@ TEST_FUNCTION_START(acb_poly_atan_series, state)
 
     TEST_FUNCTION_END(state);
 }
-

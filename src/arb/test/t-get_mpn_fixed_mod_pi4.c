@@ -107,4 +107,3 @@ TEST_FUNCTION_START(arb_get_mpn_fixed_mod_pi4, state)
 
     TEST_FUNCTION_END(state);
 }
-

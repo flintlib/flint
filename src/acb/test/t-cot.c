@@ -87,4 +87,3 @@ TEST_FUNCTION_START(acb_cot, state)
 
     TEST_FUNCTION_END(state);
 }
-

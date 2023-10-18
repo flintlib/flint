@@ -60,4 +60,3 @@ TEST_FUNCTION_START(arb_get_mag_lower_nonnegative, state)
 
     TEST_FUNCTION_END(state);
 }
-

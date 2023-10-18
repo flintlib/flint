@@ -184,4 +184,3 @@ TEST_FUNCTION_START(aprcl_unity_zp_sqr2, state)
 
     TEST_FUNCTION_END(state);
 }
-

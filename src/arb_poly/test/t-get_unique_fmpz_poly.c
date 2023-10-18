@@ -70,4 +70,3 @@ TEST_FUNCTION_START(arb_poly_get_unique_fmpz_poly, state)
 
     TEST_FUNCTION_END(state);
 }
-

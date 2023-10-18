@@ -96,4 +96,3 @@ TEST_FUNCTION_START(aprcl_is_prime_gauss, state)
 
     TEST_FUNCTION_END(state);
 }
-

@@ -146,4 +146,3 @@ TEST_FUNCTION_START(acb_hypgeom_coulomb_series, state)
 
     TEST_FUNCTION_END(state);
 }
-

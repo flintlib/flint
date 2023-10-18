@@ -51,4 +51,3 @@ TEST_FUNCTION_START(arb_hypgeom_gamma_stirling_sum, state)
 
     TEST_FUNCTION_END(state);
 }
-

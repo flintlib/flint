@@ -52,4 +52,3 @@ TEST_FUNCTION_START(fmpz_cleanup, state)
 
     TEST_FUNCTION_END(state);
 }
-

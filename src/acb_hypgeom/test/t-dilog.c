@@ -118,4 +118,3 @@ TEST_FUNCTION_START(acb_hypgeom_dilog, state)
 
     TEST_FUNCTION_END(state);
 }
-

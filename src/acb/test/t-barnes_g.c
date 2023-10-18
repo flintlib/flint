@@ -89,4 +89,3 @@ TEST_FUNCTION_START(acb_barnes_g, state)
 
     TEST_FUNCTION_END(state);
 }
-

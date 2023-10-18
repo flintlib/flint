@@ -107,4 +107,3 @@ TEST_FUNCTION_START(arb_exp_arf_bb, state)
 
     TEST_FUNCTION_END(state);
 }
-

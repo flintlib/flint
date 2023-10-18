@@ -78,4 +78,3 @@ TEST_FUNCTION_START(acb_quadratic_roots_fmpz, state)
 
     TEST_FUNCTION_END(state);
 }
-

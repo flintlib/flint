@@ -47,4 +47,3 @@ TEST_FUNCTION_START(acb_poly_get_coeff_ptr, state)
 
     TEST_FUNCTION_END(state);
 }
-

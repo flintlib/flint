@@ -91,4 +91,3 @@ TEST_FUNCTION_START(arb_dot_ui, state)
 
     TEST_FUNCTION_END(state);
 }
-

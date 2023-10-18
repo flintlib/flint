@@ -92,4 +92,3 @@ TEST_FUNCTION_START(arb_dot_fmpz, state)
 
     TEST_FUNCTION_END(state);
 }
-

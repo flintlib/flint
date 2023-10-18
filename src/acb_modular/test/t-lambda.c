@@ -108,4 +108,3 @@ TEST_FUNCTION_START(acb_modular_lambda, state)
 
     TEST_FUNCTION_END(state);
 }
-

@@ -91,4 +91,3 @@ TEST_FUNCTION_START(arb_get_mpn_fixed_mod_log2, state)
 
     TEST_FUNCTION_END(state);
 }
-

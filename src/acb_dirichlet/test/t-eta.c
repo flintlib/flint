@@ -57,4 +57,3 @@ TEST_FUNCTION_START(acb_dirichlet_eta, state)
 
     TEST_FUNCTION_END(state);
 }
-

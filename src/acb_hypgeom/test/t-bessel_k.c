@@ -167,4 +167,3 @@ TEST_FUNCTION_START(acb_hypgeom_bessel_k, state)
 
     TEST_FUNCTION_END(state);
 }
-

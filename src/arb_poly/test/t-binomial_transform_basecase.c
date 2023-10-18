@@ -95,4 +95,3 @@ TEST_FUNCTION_START(arb_poly_binomial_transform_basecase, state)
 
     TEST_FUNCTION_END(state);
 }
-

@@ -129,4 +129,3 @@ TEST_FUNCTION_START(acb_dirichlet_euler_product_real_ui, state)
 
     TEST_FUNCTION_END(state);
 }
-

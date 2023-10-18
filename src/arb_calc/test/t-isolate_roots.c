@@ -139,4 +139,3 @@ TEST_FUNCTION_START(arb_calc_isolate_roots, state)
 
     TEST_FUNCTION_END(state);
 }
-

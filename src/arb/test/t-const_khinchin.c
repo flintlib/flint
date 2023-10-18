@@ -53,4 +53,3 @@ TEST_FUNCTION_START(arb_const_khinchin, state)
 
     TEST_FUNCTION_END(state);
 }
-

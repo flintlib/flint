@@ -139,4 +139,3 @@ TEST_FUNCTION_START(acb_inv, state)
 
     TEST_FUNCTION_END(state);
 }
-

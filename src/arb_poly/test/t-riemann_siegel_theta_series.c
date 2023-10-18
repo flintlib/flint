@@ -92,4 +92,3 @@ TEST_FUNCTION_START(arb_poly_riemann_siegel_theta_series, state)
 
     TEST_FUNCTION_END(state);
 }
-

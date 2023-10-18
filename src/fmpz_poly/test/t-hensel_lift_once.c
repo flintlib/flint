@@ -107,4 +107,3 @@ TEST_FUNCTION_START(fmpz_poly_hensel_lift_once, state)
 
     TEST_FUNCTION_END(state);
 }
-

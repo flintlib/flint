@@ -114,4 +114,3 @@ TEST_FUNCTION_START(acb_elliptic_f, state)
 
     TEST_FUNCTION_END(state);
 }
-

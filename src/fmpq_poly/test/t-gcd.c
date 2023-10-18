@@ -244,4 +244,3 @@ TEST_FUNCTION_START(fmpq_poly_gcd, state)
 
     TEST_FUNCTION_END(state);
 }
-

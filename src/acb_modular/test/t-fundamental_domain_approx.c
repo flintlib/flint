@@ -119,4 +119,3 @@ TEST_FUNCTION_START(acb_modular_fundamental_domain_approx, state)
 
     TEST_FUNCTION_END(state);
 }
-

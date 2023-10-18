@@ -70,4 +70,3 @@ TEST_FUNCTION_START(arb_union, state)
 
     TEST_FUNCTION_END(state);
 }
-

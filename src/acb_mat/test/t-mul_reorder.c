@@ -371,4 +371,3 @@ TEST_FUNCTION_START(acb_mat_mul_reorder, state)
 
     TEST_FUNCTION_END(state);
 }
-

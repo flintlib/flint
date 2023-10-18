@@ -94,4 +94,3 @@ TEST_FUNCTION_START(acb_modular_epsilon_arg, state)
 
     TEST_FUNCTION_END(state);
 }
-

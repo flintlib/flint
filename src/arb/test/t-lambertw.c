@@ -113,4 +113,3 @@ TEST_FUNCTION_START(arb_lambertw, state)
 
     TEST_FUNCTION_END(state);
 }
-

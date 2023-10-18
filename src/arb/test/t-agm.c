@@ -137,4 +137,3 @@ TEST_FUNCTION_START(arb_agm, state)
 
     TEST_FUNCTION_END(state);
 }
-

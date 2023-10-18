@@ -72,4 +72,3 @@ TEST_FUNCTION_START(arb_poly_add_series, state)
 
     TEST_FUNCTION_END(state);
 }
-

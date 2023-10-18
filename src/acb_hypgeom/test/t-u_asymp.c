@@ -206,4 +206,3 @@ TEST_FUNCTION_START(acb_hypgeom_u_asymp, state)
 
     TEST_FUNCTION_END(state);
 }
-

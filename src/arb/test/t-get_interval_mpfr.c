@@ -49,4 +49,3 @@ TEST_FUNCTION_START(arb_get_interval_mpfr, state)
 
     TEST_FUNCTION_END(state);
 }
-

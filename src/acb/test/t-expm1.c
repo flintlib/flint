@@ -66,4 +66,3 @@ TEST_FUNCTION_START(acb_expm1, state)
 
     TEST_FUNCTION_END(state);
 }
-

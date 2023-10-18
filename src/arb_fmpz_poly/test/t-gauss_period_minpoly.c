@@ -97,4 +97,3 @@ TEST_FUNCTION_START(arb_fmpz_poly_gauss_period_minpoly, state)
 
     TEST_FUNCTION_END(state);
 }
-

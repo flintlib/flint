@@ -68,4 +68,3 @@ TEST_FUNCTION_START(arb_poly_set_trunc_round, state)
 
     TEST_FUNCTION_END(state);
 }
-

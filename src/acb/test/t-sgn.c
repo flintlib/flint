@@ -70,4 +70,3 @@ TEST_FUNCTION_START(acb_sgn, state)
 
     TEST_FUNCTION_END(state);
 }
-

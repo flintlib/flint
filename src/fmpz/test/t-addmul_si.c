@@ -113,4 +113,3 @@ TEST_FUNCTION_START(fmpz_addmul_si, state)
 
     TEST_FUNCTION_END(state);
 }
-

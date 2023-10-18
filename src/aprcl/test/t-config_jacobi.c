@@ -47,4 +47,3 @@ TEST_FUNCTION_START(aprcl_config_jacobi, state)
 
     TEST_FUNCTION_END(state);
 }
-

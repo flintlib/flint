@@ -83,4 +83,3 @@ TEST_FUNCTION_START(acb_hypgeom_laguerre_l, state)
 
     TEST_FUNCTION_END(state);
 }
-

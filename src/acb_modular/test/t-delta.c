@@ -68,4 +68,3 @@ TEST_FUNCTION_START(acb_modular_delta, state)
 
     TEST_FUNCTION_END(state);
 }
-

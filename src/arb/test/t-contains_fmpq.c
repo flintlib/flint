@@ -90,4 +90,3 @@ TEST_FUNCTION_START(arb_contains_fmpq, state)
 
     TEST_FUNCTION_END(state);
 }
-

@@ -108,4 +108,3 @@ TEST_FUNCTION_START(arb_log_base_ui, state)
 
     TEST_FUNCTION_END(state);
 }
-

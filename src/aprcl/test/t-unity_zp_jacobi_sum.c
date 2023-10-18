@@ -185,4 +185,3 @@ TEST_FUNCTION_START(aprcl_unity_zp_jacobi_sum, state)
 
     TEST_FUNCTION_END(state);
 }
-

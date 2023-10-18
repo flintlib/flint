@@ -80,4 +80,3 @@ TEST_FUNCTION_START(acb_dirichlet_hardy_z_series, state)
 
     TEST_FUNCTION_END(state);
 }
-

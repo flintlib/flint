@@ -67,4 +67,3 @@ TEST_FUNCTION_START(arb_partitions_fmpz, state)
 
     TEST_FUNCTION_END(state);
 }
-

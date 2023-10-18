@@ -63,4 +63,3 @@ TEST_FUNCTION_START(acb_csc_pi, state)
 
     TEST_FUNCTION_END(state);
 }
-

@@ -145,4 +145,3 @@ TEST_FUNCTION_START(acb_hypgeom_beta_lower_series, state)
 
     TEST_FUNCTION_END(state);
 }
-

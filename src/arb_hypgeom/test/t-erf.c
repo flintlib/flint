@@ -213,4 +213,3 @@ TEST_FUNCTION_START(arb_hypgeom_erf, state)
 
     TEST_FUNCTION_END(state);
 }
-

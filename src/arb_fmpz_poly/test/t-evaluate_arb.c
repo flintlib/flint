@@ -101,4 +101,3 @@ TEST_FUNCTION_START(arb_fmpz_poly_evaluate_arb, state)
 
     TEST_FUNCTION_END(state);
 }
-

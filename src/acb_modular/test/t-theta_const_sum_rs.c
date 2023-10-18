@@ -71,4 +71,3 @@ TEST_FUNCTION_START(acb_modular_theta_const_sum_rs, state)
 
     TEST_FUNCTION_END(state);
 }
-

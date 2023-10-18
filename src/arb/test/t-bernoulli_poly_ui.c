@@ -76,4 +76,3 @@ TEST_FUNCTION_START(arb_bernoulli_poly_ui, state)
 
     TEST_FUNCTION_END(state);
 }
-

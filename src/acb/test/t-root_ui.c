@@ -60,4 +60,3 @@ TEST_FUNCTION_START(acb_root_ui, state)
 
     TEST_FUNCTION_END(state);
 }
-

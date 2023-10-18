@@ -63,4 +63,3 @@ TEST_FUNCTION_START(arb_poly_evaluate2, state)
 
     TEST_FUNCTION_END(state);
 }
-

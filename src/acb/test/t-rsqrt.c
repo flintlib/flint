@@ -150,4 +150,3 @@ TEST_FUNCTION_START(acb_rsqrt, state)
 
     TEST_FUNCTION_END(state);
 }
-

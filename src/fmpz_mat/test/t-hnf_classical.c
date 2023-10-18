@@ -72,4 +72,3 @@ TEST_FUNCTION_START(fmpz_mat_hnf_classical, state)
 
     TEST_FUNCTION_END(state);
 }
-

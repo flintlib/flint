@@ -91,4 +91,3 @@ TEST_FUNCTION_START(acb_rel_accuracy_bits, state)
 
     TEST_FUNCTION_END(state);
 }
-

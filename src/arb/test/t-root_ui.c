@@ -60,4 +60,3 @@ TEST_FUNCTION_START(arb_root_ui, state)
 
     TEST_FUNCTION_END(state);
 }
-

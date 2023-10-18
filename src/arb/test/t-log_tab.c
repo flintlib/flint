@@ -230,4 +230,3 @@ TEST_FUNCTION_START(arb_log_tab, state)
 
     TEST_FUNCTION_END(state);
 }
-

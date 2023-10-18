@@ -88,4 +88,3 @@ TEST_FUNCTION_START(arb_hypgeom_sum_fmpq_imag_arb, state)
 
     TEST_FUNCTION_END(state);
 }
-

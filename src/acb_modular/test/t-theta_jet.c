@@ -107,4 +107,3 @@ TEST_FUNCTION_START(acb_modular_theta_jet, state)
 
     TEST_FUNCTION_END(state);
 }
-

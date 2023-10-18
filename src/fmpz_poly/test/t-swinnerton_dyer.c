@@ -51,4 +51,3 @@ TEST_FUNCTION_START(fmpz_poly_swinnerton_dyer, state)
 
     TEST_FUNCTION_END(state);
 }
-

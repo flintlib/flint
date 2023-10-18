@@ -73,4 +73,3 @@ TEST_FUNCTION_START(arb_poly_sqrt_series, state)
 
     TEST_FUNCTION_END(state);
 }
-

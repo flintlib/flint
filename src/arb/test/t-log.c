@@ -185,4 +185,3 @@ TEST_FUNCTION_START(arb_log, state)
 
     TEST_FUNCTION_END(state);
 }
-

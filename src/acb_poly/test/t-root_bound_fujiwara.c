@@ -72,4 +72,3 @@ TEST_FUNCTION_START(acb_poly_root_bound_fujiwara, state)
 
     TEST_FUNCTION_END(state);
 }
-

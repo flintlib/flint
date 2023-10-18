@@ -107,4 +107,3 @@ TEST_FUNCTION_START(arb_mat_det_precond, state)
 
     TEST_FUNCTION_END(state);
 }
-

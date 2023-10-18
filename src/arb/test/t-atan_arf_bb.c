@@ -110,4 +110,3 @@ TEST_FUNCTION_START(arb_atan_arf_bb, state)
 
     TEST_FUNCTION_END(state);
 }
-

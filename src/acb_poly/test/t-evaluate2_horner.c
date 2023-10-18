@@ -62,4 +62,3 @@ TEST_FUNCTION_START(acb_poly_evaluate2_horner, state)
 
     TEST_FUNCTION_END(state);
 }
-

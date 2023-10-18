@@ -62,4 +62,3 @@ TEST_FUNCTION_START(acb_modular_psl2z_inv, state)
 
     TEST_FUNCTION_END(state);
 }
-

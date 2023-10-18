@@ -75,4 +75,3 @@ TEST_FUNCTION_START(fmpz_poly_taylor_shift_divconquer, state)
 
     TEST_FUNCTION_END(state);
 }
-

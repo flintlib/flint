@@ -175,4 +175,3 @@ TEST_FUNCTION_START(arb_atan_tab, state)
 
     TEST_FUNCTION_END(state);
 }
-

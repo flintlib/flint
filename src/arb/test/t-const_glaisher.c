@@ -77,4 +77,3 @@ TEST_FUNCTION_START(arb_const_glaisher, state)
 
     TEST_FUNCTION_END(state);
 }
-

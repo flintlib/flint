@@ -124,4 +124,3 @@ TEST_FUNCTION_START(arb_poly_lambertw_series, state)
 
     TEST_FUNCTION_END(state);
 }
-

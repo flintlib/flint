@@ -54,4 +54,3 @@ TEST_FUNCTION_START(arb_poly_get_set_coeff_arb, state)
 
     TEST_FUNCTION_END(state);
 }
-

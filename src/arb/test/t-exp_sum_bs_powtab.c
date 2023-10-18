@@ -69,4 +69,3 @@ TEST_FUNCTION_START(arb_exp_sum_bs_powtab, state)
 
     TEST_FUNCTION_END(state);
 }
-

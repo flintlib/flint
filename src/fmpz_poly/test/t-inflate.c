@@ -77,4 +77,3 @@ TEST_FUNCTION_START(fmpz_poly_inflate, state)
 
     TEST_FUNCTION_END(state);
 }
-

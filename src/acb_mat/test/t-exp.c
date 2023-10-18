@@ -102,4 +102,3 @@ TEST_FUNCTION_START(acb_mat_exp, state)
 
     TEST_FUNCTION_END(state);
 }
-

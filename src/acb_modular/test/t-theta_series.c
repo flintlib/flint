@@ -93,4 +93,3 @@ TEST_FUNCTION_START(acb_modular_theta_series, state)
 
     TEST_FUNCTION_END(state);
 }
-

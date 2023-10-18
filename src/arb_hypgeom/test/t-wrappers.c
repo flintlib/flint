@@ -272,4 +272,3 @@ TEST_FUNCTION_START(arb_hypgeom_wrappers, state)
 
     TEST_FUNCTION_END(state);
 }
-

@@ -65,4 +65,3 @@ TEST_FUNCTION_START(aprcl_unity_zpq_equal, state)
 
     TEST_FUNCTION_END(state);
 }
-

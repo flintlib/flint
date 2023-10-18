@@ -63,4 +63,3 @@ TEST_FUNCTION_START(arb_rgamma, state)
 
     TEST_FUNCTION_END(state);
 }
-

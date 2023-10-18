@@ -83,4 +83,3 @@ TEST_FUNCTION_START(acb_dirichlet_zeta_rs_r, state)
 
     TEST_FUNCTION_END(state);
 }
-

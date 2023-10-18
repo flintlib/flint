@@ -160,4 +160,3 @@ TEST_FUNCTION_START(fmpq_poly_resultant, state)
 
     TEST_FUNCTION_END(state);
 }
-

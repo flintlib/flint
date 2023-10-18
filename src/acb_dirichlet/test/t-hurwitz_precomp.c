@@ -77,4 +77,3 @@ TEST_FUNCTION_START(acb_dirichlet_hurwitz_precomp, state)
 
     TEST_FUNCTION_END(state);
 }
-

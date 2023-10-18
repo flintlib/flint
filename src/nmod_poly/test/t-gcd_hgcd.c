@@ -142,4 +142,3 @@ TEST_FUNCTION_START(nmod_poly_gcd_hgcd, state)
 
     TEST_FUNCTION_END(state);
 }
-

@@ -202,4 +202,3 @@ TEST_FUNCTION_START(arb_fmpz_poly_complex_roots, state)
 
     TEST_FUNCTION_END(state);
 }
-

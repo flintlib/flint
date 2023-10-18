@@ -120,4 +120,3 @@ TEST_FUNCTION_START(fmpz_clog, state)
 
     TEST_FUNCTION_END(state);
 }
-

@@ -70,4 +70,3 @@ TEST_FUNCTION_START(arb_primorial, state)
 
     TEST_FUNCTION_END(state);
 }
-

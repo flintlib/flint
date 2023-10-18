@@ -127,4 +127,3 @@ TEST_FUNCTION_START(nmod_poly_gcdinv, state)
 
     TEST_FUNCTION_END(state);
 }
-

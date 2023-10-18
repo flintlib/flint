@@ -72,4 +72,3 @@ TEST_FUNCTION_START(acb_hypgeom_chebyshev_t, state)
 
     TEST_FUNCTION_END(state);
 }
-

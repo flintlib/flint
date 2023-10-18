@@ -134,4 +134,3 @@ TEST_FUNCTION_START(nmod_poly_sub_series, state)
 
     TEST_FUNCTION_END(state);
 }
-

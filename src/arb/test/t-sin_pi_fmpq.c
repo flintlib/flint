@@ -54,4 +54,3 @@ TEST_FUNCTION_START(arb_sin_pi_fmpq, state)
 
     TEST_FUNCTION_END(state);
 }
-

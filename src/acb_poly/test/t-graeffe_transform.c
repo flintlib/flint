@@ -84,4 +84,3 @@ TEST_FUNCTION_START(acb_poly_graeffe_transform, state)
 
     TEST_FUNCTION_END(state);
 }
-

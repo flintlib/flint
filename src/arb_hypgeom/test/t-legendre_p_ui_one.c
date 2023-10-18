@@ -98,4 +98,3 @@ TEST_FUNCTION_START(arb_hypgeom_legendre_p_ui_one, state)
 
     TEST_FUNCTION_END(state);
 }
-

@@ -67,4 +67,3 @@ TEST_FUNCTION_START(arb_poly_borel_transform, state)
 
     TEST_FUNCTION_END(state);
 }
-

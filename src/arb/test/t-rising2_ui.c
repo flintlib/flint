@@ -100,4 +100,3 @@ TEST_FUNCTION_START(arb_rising2_ui, state)
 
     TEST_FUNCTION_END(state);
 }
-

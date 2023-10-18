@@ -75,4 +75,3 @@ TEST_FUNCTION_START(acb_log1p, state)
 
     TEST_FUNCTION_END(state);
 }
-

@@ -59,4 +59,3 @@ TEST_FUNCTION_START(acb_get_mag, state)
 
     TEST_FUNCTION_END(state);
 }
-

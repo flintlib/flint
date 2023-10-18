@@ -115,4 +115,3 @@ TEST_FUNCTION_START(arb_tan_pi, state)
 
     TEST_FUNCTION_END(state);
 }
-

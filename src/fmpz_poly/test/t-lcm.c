@@ -125,4 +125,3 @@ TEST_FUNCTION_START(fmpz_poly_lcm, state)
 
     TEST_FUNCTION_END(state);
 }
-

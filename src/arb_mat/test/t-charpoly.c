@@ -62,4 +62,3 @@ TEST_FUNCTION_START(arb_mat_charpoly, state)
 
     TEST_FUNCTION_END(state);
 }
-

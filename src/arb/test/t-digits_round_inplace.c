@@ -83,4 +83,3 @@ TEST_FUNCTION_START(arb_digits_round_inplace, state)
 
     TEST_FUNCTION_END(state);
 }
-

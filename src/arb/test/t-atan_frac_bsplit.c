@@ -77,4 +77,3 @@ TEST_FUNCTION_START(arb_atan_frac_bsplit, state)
 
     TEST_FUNCTION_END(state);
 }
-

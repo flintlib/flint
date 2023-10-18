@@ -94,4 +94,3 @@ TEST_FUNCTION_START(arb_poly_sinc_pi_series, state)
 
     TEST_FUNCTION_END(state);
 }
-

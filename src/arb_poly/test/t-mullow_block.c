@@ -200,4 +200,3 @@ TEST_FUNCTION_START(arb_poly_mullow_block, state)
 
     TEST_FUNCTION_END(state);
 }
-

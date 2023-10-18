@@ -52,4 +52,3 @@ TEST_FUNCTION_START(arb_poly_evaluate_acb_rectangular, state)
 
     TEST_FUNCTION_END(state);
 }
-

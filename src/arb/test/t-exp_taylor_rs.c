@@ -81,4 +81,3 @@ TEST_FUNCTION_START(arb_exp_taylor_rs, state)
 
     TEST_FUNCTION_END(state);
 }
-

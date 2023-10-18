@@ -64,4 +64,3 @@ TEST_FUNCTION_START(acb_gamma, state)
 
     TEST_FUNCTION_END(state);
 }
-

@@ -68,4 +68,3 @@ TEST_FUNCTION_START(fmpz_poly_eta_qexp, state)
 
     TEST_FUNCTION_END(state);
 }
-

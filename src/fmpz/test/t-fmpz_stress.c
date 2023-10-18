@@ -160,4 +160,3 @@ TEST_FUNCTION_START(fmpz_stress, state)
 
     TEST_FUNCTION_END(state);
 }
-

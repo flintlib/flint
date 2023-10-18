@@ -197,4 +197,3 @@ TEST_FUNCTION_START(fmpz_mat_hnf_transform, state)
 
     TEST_FUNCTION_END(state);
 }
-

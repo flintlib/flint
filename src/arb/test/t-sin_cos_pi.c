@@ -59,4 +59,3 @@ TEST_FUNCTION_START(arb_sin_cos_pi, state)
 
     TEST_FUNCTION_END(state);
 }
-

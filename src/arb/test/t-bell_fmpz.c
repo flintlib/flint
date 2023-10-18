@@ -74,4 +74,3 @@ TEST_FUNCTION_START(arb_bell_fmpz, state)
 
     TEST_FUNCTION_END(state);
 }
-

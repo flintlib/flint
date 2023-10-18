@@ -119,4 +119,3 @@ TEST_FUNCTION_START(acb_modular_elliptic_p_zpx, state)
 
     TEST_FUNCTION_END(state);
 }
-

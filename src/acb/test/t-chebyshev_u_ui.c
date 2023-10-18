@@ -112,4 +112,3 @@ TEST_FUNCTION_START(acb_chebyshev_u_ui, state)
 
     TEST_FUNCTION_END(state);
 }
-

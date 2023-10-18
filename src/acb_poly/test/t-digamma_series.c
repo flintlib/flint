@@ -89,4 +89,3 @@ TEST_FUNCTION_START(acb_poly_digamma_series, state)
 
     TEST_FUNCTION_END(state);
 }
-

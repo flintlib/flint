@@ -63,4 +63,3 @@ TEST_FUNCTION_START(arb_csc_pi, state)
 
     TEST_FUNCTION_END(state);
 }
-

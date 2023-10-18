@@ -91,4 +91,3 @@ TEST_FUNCTION_START(arb_poly_atan_series, state)
 
     TEST_FUNCTION_END(state);
 }
-

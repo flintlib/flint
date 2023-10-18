@@ -65,4 +65,3 @@ TEST_FUNCTION_START(acb_poly_zeta_em_tail_bsplit, state)
 
     TEST_FUNCTION_END(state);
 }
-

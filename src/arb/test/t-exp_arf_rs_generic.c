@@ -120,4 +120,3 @@ TEST_FUNCTION_START(arb_exp_arf_rs_generic, state)
 
     TEST_FUNCTION_END(state);
 }
-

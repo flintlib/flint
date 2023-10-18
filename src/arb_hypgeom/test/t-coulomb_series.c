@@ -119,4 +119,3 @@ TEST_FUNCTION_START(arb_hypgeom_coulomb_series, state)
 
     TEST_FUNCTION_END(state);
 }
-

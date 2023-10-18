@@ -121,4 +121,3 @@ TEST_FUNCTION_START(acb_modular_j, state)
 
     TEST_FUNCTION_END(state);
 }
-

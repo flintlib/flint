@@ -95,4 +95,3 @@ TEST_FUNCTION_START(acb_poly_sub, state)
 
     TEST_FUNCTION_END(state);
 }
-

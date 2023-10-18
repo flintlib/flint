@@ -345,4 +345,3 @@ TEST_FUNCTION_START(acb_hypgeom_gamma_upper, state)
 
     TEST_FUNCTION_END(state);
 }
-

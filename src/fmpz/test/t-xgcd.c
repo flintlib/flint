@@ -280,4 +280,3 @@ TEST_FUNCTION_START(fmpz_xgcd, state)
 
     TEST_FUNCTION_END(state);
 }
-

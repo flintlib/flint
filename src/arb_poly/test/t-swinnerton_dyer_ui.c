@@ -79,4 +79,3 @@ TEST_FUNCTION_START(arb_poly_swinnerton_dyer_ui, state)
 
     TEST_FUNCTION_END(state);
 }
-

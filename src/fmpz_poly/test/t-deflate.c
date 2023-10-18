@@ -102,4 +102,3 @@ TEST_FUNCTION_START(fmpz_poly_deflate, state)
 
     TEST_FUNCTION_END(state);
 }
-

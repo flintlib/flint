@@ -74,4 +74,3 @@ TEST_FUNCTION_START(acb_lgamma, state)
 
     TEST_FUNCTION_END(state);
 }
-

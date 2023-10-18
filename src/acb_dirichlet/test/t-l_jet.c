@@ -196,4 +196,3 @@ TEST_FUNCTION_START(acb_dirichlet_l_jet, state)
 
     TEST_FUNCTION_END(state);
 }
-

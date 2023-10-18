@@ -85,4 +85,3 @@ TEST_FUNCTION_START(acb_hypgeom_0f1, state)
 
     TEST_FUNCTION_END(state);
 }
-

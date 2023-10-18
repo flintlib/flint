@@ -59,4 +59,3 @@ TEST_FUNCTION_START(acb_sqrt, state)
 
     TEST_FUNCTION_END(state);
 }
-

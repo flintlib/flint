@@ -116,4 +116,3 @@ TEST_FUNCTION_START(arb_log_hypot, state)
 
     TEST_FUNCTION_END(state);
 }
-

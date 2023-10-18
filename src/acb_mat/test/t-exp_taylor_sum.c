@@ -74,4 +74,3 @@ TEST_FUNCTION_START(acb_mat_exp_taylor_sum, state)
 
     TEST_FUNCTION_END(state);
 }
-

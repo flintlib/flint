@@ -162,4 +162,3 @@ TEST_FUNCTION_START(arb_sin_cos_arf_bb, state)
 
     TEST_FUNCTION_END(state);
 }
-

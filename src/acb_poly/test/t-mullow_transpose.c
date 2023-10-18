@@ -162,4 +162,3 @@ TEST_FUNCTION_START(acb_poly_mullow_transpose, state)
 
     TEST_FUNCTION_END(state);
 }
-

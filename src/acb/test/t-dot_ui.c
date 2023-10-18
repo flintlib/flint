@@ -91,4 +91,3 @@ TEST_FUNCTION_START(acb_dot_ui, state)
 
     TEST_FUNCTION_END(state);
 }
-
