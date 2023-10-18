@@ -106,7 +106,6 @@ _fmpz_factor_equal(const fmpz_factor_t x, const fmpz_factor_t y)
     return 1;
 }
 
-
 int main(void)
 {
     int iter;

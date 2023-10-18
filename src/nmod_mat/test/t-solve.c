@@ -21,7 +21,6 @@ main(void)
     int solved;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("solve....");
     fflush(stdout);
 

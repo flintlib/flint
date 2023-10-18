@@ -51,7 +51,5 @@ TEST_FUNCTION_START(fmpz_mat_scalar_addmul_si, state)
         fmpz_mat_clear(C);
     }
 
-
-
     TEST_FUNCTION_END(state);
 }

@@ -137,7 +137,6 @@ main(void)
         fmpz_mod_poly_randtest(a, state, n_randint(state, 50), ctx);
         fmpz_mod_poly_randtest_not_zero(f, state, n_randint(state, 50) + 1, ctx);
 
-
         fmpz_mod_poly_reverse (finv, f, f->length, ctx);
         fmpz_mod_poly_inv_series (finv, finv, f->length, ctx);
 

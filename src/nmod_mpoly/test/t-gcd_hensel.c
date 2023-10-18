@@ -99,7 +99,6 @@ cleanup:
     nmod_mpoly_clear(cg, ctx);
 }
 
-
 int
 main(void)
 {

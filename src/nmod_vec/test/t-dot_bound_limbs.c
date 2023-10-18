@@ -19,7 +19,6 @@ main(void)
     int i;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("dot_bound_limbs....");
     fflush(stdout);
 

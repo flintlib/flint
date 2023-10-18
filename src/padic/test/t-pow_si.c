@@ -23,8 +23,6 @@ main(void)
     flint_printf("pow_si... ");
     fflush(stdout);
 
-
-
     /* Check aliasing */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {

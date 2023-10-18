@@ -244,7 +244,6 @@ main(void)
             fmpq_mpoly_randtest_bound(g, state, len2, coeff_bits, exp_bound2, ctx);
             fmpq_mpoly_add(fg, f, g, ctx);
 
-
             if (!fmpq_mpoly_evaluate_all_fmpq(fe, f, vals, ctx) ||
                 !fmpq_mpoly_evaluate_all_fmpq(ge, g, vals, ctx) ||
                 !fmpq_mpoly_evaluate_all_fmpq(fge, fg, vals, ctx))

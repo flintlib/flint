@@ -103,7 +103,6 @@ test_div_series(flint_rand_t state, int which)
             status |= gr_poly_div_series_divconquer(C, A, C, n, n_randint(state, 20), ctx);
             break;
 
-
         default:
             flint_abort();
     }

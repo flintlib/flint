@@ -27,7 +27,6 @@ TEST_FUNCTION_START(fmpz_multi_CRT_ui, state)
     fmpz_comb_t comb;
     fmpz_comb_temp_t comb_temp;
 
-
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         int sign = n_randint(state, 2);

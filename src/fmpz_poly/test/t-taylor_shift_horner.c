@@ -122,7 +122,6 @@ TEST_FUNCTION_START(fmpz_poly_taylor_shift_horner, state)
 
         fmpz_init(c);
 
-
         if (n_randint(state, 30))
             fmpz_poly_randtest(f, state, 1 + n_randint(state, 100),
                                          1 + n_randint(state, 10000));

@@ -19,7 +19,6 @@ TEST_FUNCTION_START(fmpz_poly_fibonacci, state)
 
     slong n;
 
-
     fmpz_poly_init(Pn);
     fmpz_poly_init(Pn1);
     fmpz_poly_init(Pn2);

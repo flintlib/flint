@@ -22,7 +22,6 @@ main(void)
     int i;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("set_fmpz_mat....");
     fflush(stdout);
 
@@ -67,8 +66,6 @@ main(void)
         fmpz_mat_clear(A);
         mpf_mat_clear(B);
     }
-
-
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

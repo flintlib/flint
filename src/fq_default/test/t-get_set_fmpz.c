@@ -12,7 +12,6 @@
 #include "fq_default.h"
 #include "test_helpers.h"
 
-
 int main(void)
 {
     slong i, j;

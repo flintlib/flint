@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-
 #include "qadic.h"
 #include "ulong_extras.h"
 
@@ -21,8 +20,6 @@ main(void)
 
     flint_printf("log... ");
     fflush(stdout);
-
-
 
 /** p == 2 *******************************************************************/
 

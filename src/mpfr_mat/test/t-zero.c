@@ -23,8 +23,6 @@ main(void)
     flint_printf("zero....");
     fflush(stdout);
 
-
-
     for (rep = 0; rep < 100 * flint_test_multiplier(); rep++)
     {
         mpfr_mat_t A;

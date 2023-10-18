@@ -18,7 +18,6 @@ TEST_FUNCTION_START(fmpz_poly_chebyshev_u, state)
 
     slong n;
 
-
     fmpz_poly_init(T);
     fmpz_poly_init(U);
 

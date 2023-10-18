@@ -55,7 +55,6 @@ main(void)
             fmpq_set_cfrac(x, c1, bound);
         }
 
-
         c2 = _fmpz_vec_init(bound);
 
         n1 = fmpq_get_cfrac(c1, r, x, bound);

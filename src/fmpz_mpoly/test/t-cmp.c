@@ -12,7 +12,6 @@
 #include "fmpz_mpoly.h"
 #include "ulong_extras.h"
 
-
 int
 main(void)
 {

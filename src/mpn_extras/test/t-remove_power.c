@@ -52,7 +52,6 @@ void test_exact(int d)
     mpz_clear(c);
 }
 
-
 int main(void)
 {
     FLINT_TEST_INIT(state);

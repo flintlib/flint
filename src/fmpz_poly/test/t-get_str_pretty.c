@@ -22,7 +22,6 @@ TEST_FUNCTION_START(fmpz_poly_get_str_pretty, state)
     char *str;
     fmpz_poly_t a;
 
-
     fmpz_poly_init(a);
 
     str = fmpz_poly_get_str_pretty(a, "t");

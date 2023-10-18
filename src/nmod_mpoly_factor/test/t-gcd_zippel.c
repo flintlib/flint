@@ -142,7 +142,6 @@ cleanup:
     return success;
 }
 
-
 void gcd_check(
     nmod_mpoly_t g,
     nmod_mpoly_t a,
@@ -244,7 +243,6 @@ cleanup:
     nmod_mpoly_clear(cb, ctx);
     nmod_mpoly_clear(cg, ctx);
 }
-
 
 int
 main(void)

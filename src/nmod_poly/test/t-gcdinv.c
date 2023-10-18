@@ -25,7 +25,6 @@ TEST_FUNCTION_START(nmod_poly_gcdinv, state)
         mp_limb_t p;
         nmod_poly_t a, b, d, g, s, t, u;
 
-
         p = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, p);

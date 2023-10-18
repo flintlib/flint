@@ -146,6 +146,5 @@ TEST_FUNCTION_START(fmpz_poly_divides, state)
         fmpz_poly_clear(g);
     }
 
-
     TEST_FUNCTION_END(state);
 }

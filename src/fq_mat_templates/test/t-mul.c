@@ -15,7 +15,6 @@
 
 #include "templates.h"
 
-
 int
 main(void)
 {
@@ -164,6 +163,5 @@ main(void)
     printf("PASS\n");
     return 0;
 }
-
 
 #endif

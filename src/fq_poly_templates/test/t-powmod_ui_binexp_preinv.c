@@ -217,7 +217,6 @@ main(void)
         TEMPLATE(T, poly_reverse) (finv, f, f->length, ctx);
         TEMPLATE(T, poly_inv_series_newton) (finv, finv, f->length, ctx);
 
-
         TEMPLATE(T, poly_powmod_ui_binexp_preinv) (res1, a, exp1, f, finv,
                                                    ctx);
         TEMPLATE(T, poly_powmod_ui_binexp_preinv) (res2, a, exp2, f, finv,
@@ -260,6 +259,5 @@ main(void)
     flint_printf("PASS\n");
     return 0;
 }
-
 
 #endif

@@ -34,7 +34,6 @@
             flint_abort(); \
         }
 
-
 int main(void)
 {
     FLINT_TEST_INIT(state);

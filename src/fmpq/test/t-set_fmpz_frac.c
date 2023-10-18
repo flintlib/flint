@@ -21,7 +21,6 @@ main(void)
     int i;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("set_fmpz_frac....");
     fflush(stdout);
 
@@ -60,8 +59,6 @@ main(void)
         fmpz_clear(p);
         fmpz_clear(q);
     }
-
-
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

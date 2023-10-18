@@ -65,7 +65,6 @@ main(void)
                     max[j] = FLINT_MAX(max[j], a[i + j]);
                 }
 
-
             mpoly_pack_vec_ui(b, a, bits1, nfields, length);
             mpoly_pack_monomials_tight(t, b, length, bases, nfields, bits1);
             mpoly_unpack_monomials_tight(c, t, length, bases, nfields, bits2);

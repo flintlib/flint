@@ -119,7 +119,6 @@ void test_mul(mpn_ctx_t R, ulong minsize, ulong maxsize, ulong nreps, flint_rand
     fflush(stdout);
 }
 
-
 int main(void)
 {
     FLINT_TEST_INIT(state);

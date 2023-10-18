@@ -126,6 +126,5 @@ TEST_FUNCTION_START(fmpz_poly_rem_powers_precomp, state)
         fmpz_poly_clear(q);
     }
 
-
     TEST_FUNCTION_END(state);
 }

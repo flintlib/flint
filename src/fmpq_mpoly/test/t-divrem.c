@@ -274,7 +274,6 @@ main(void)
        fmpq_mpoly_clear(r, ctx);
     }
 
-
     /* Check f = g*q + r for random polys, alias remainder and denominator */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {

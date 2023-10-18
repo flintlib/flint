@@ -22,7 +22,6 @@ main(void)
     int solved;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("solve....");
     fflush(stdout);
 
@@ -119,7 +118,6 @@ main(void)
         nmod_mat_clear(X2);
         nmod_mat_clear(AX);
     }
-
 
     FLINT_TEST_CLEANUP(state);
 

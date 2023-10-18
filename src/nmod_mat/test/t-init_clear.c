@@ -18,7 +18,6 @@ main(void)
     slong m, n, mod, i, j, rep;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("init/clear....");
     fflush(stdout);
 

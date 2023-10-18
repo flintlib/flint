@@ -4,7 +4,6 @@
 #include "fft_small.h"
 #include "profiler.h"
 
-
 int main(void)
 {
     flint_bitcnt_t nbits;
@@ -182,7 +181,6 @@ int main(void)
             flint_printf("%c", '\b');
         fflush(stdout);
     }
-
 
     for (nbits = 2; nbits <= FLINT_BITS; nbits++)
     {

@@ -18,7 +18,6 @@ TEST_FUNCTION_START(fmpz_poly_product_roots_fmpq_vec, state)
 {
     slong iter;
 
-
     for (iter = 0; iter < 100; iter++)
     {
         fmpq * vec;

@@ -33,7 +33,6 @@ TEST_FUNCTION_START(fmpz_mat_content, state)
 		fmpz_init(gcd_mat);
 		fmpz_init(temp);
 
-
 		fmpz_mat_randtest(B, state, 100);
 
 		fmpz_mat_content(gcd_mat, B);
@@ -74,7 +73,6 @@ cleanup:
 		fmpz_clear(temp);
 		fmpz_clear(gcd_mat);
 	}
-
 
     TEST_FUNCTION_END(state);
 }

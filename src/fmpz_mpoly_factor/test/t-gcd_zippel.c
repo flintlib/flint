@@ -155,7 +155,6 @@ cleanup:
     return success;
 }
 
-
 void gcd_check(
     fmpz_mpoly_t g,
     fmpz_mpoly_t a,
@@ -252,7 +251,6 @@ cleanup:
     fmpz_mpoly_clear(cg, ctx);
 }
 
-
 int
 main(void)
 {
@@ -348,7 +346,6 @@ main(void)
                   " + x1*x2^2*x3*x4*x5^2*x6^2*x8^2*x9*x10 + x1*x3*x6*x7*x8*x10"
                                                     " + x4^2*x5^2*x6^2*x7*x9^2"
         }};
-
 
         for (i = 1; i <= 10; i++)
         {

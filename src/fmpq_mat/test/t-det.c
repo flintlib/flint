@@ -18,7 +18,6 @@ main(void)
     int i;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("det....");
     fflush(stdout);
 

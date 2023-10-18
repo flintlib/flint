@@ -114,6 +114,5 @@ TEST_FUNCTION_START(fmpz_poly_div_basecase, state)
         fmpz_poly_clear(q);
     }
 
-
     TEST_FUNCTION_END(state);
 }

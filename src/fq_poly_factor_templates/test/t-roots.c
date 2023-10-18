@@ -15,7 +15,6 @@
 
 #include "ulong_extras.h"
 
-
 void test_poly(
     TEMPLATE(T, poly_factor_t) roots,
     const TEMPLATE(T, poly_t) f,
@@ -83,7 +82,6 @@ void test_poly(
     TEMPLATE(T, poly_clear)(qt, ctx);
     TEMPLATE(T, poly_clear)(r, ctx);
 }
-
 
 int
 main(void)

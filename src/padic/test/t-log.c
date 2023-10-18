@@ -35,8 +35,6 @@ main(void)
     flint_printf("log... ");
     fflush(stdout);
 
-
-
 /** p == 2 *******************************************************************/
 
     /* Check aliasing: a = log(a) */

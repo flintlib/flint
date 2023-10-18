@@ -35,7 +35,6 @@ perm(TEMPLATE(T, mat_t) A, slong * P)
     flint_free(tmp);
 }
 
-
 void
 check(slong * P, TEMPLATE(T, mat_t) LU, const TEMPLATE(T, mat_t) A, slong rank,
       const TEMPLATE(T, ctx_t) ctx)
@@ -99,7 +98,6 @@ check(slong * P, TEMPLATE(T, mat_t) LU, const TEMPLATE(T, mat_t) A, slong rank,
     TEMPLATE(T, mat_clear) (L, ctx);
     TEMPLATE(T, mat_clear) (U, ctx);
 }
-
 
 int
 main(void)
@@ -165,6 +163,5 @@ main(void)
     printf("PASS\n");
     return 0;
 }
-
 
 #endif

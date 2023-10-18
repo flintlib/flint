@@ -44,7 +44,6 @@ main(void)
     flint_printf("butterfly_lshB....");
     fflush(stdout);
 
-
     _flint_rand_init_gmp(state);
 
     mpz_init(p);

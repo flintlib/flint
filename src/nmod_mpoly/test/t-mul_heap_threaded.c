@@ -116,7 +116,6 @@ main(void)
         nmod_mpoly_ctx_clear(ctx);
     }
 
-
     /* Check aliasing first argument */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {

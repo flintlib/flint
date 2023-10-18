@@ -21,7 +21,6 @@ main(void)
     int i;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("sub_ui....");
     fflush(stdout);
 

@@ -126,7 +126,6 @@ int main(void)
             n = m;
         }
 
-
         t = gr_heap_init(ctx);
         gr_poly_init(p1, ctx);
         gr_poly_init(p2, ctx);

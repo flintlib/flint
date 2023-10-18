@@ -56,7 +56,6 @@ main(void)
     flint_printf("fft/ifft_butterfly_twiddle....");
     fflush(stdout);
 
-
     _flint_rand_init_gmp(state);
 
     mpz_init(p);

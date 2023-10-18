@@ -179,7 +179,6 @@ main(void)
         fmpz_mpoly_clear(p, ctx);
     }
 
-
     /* Check disc(a*b) = disc(a)*disc(b)*res(a,b)^2 */
     for (i = 0; i < 30 * flint_test_multiplier(); i++)
     {

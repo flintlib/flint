@@ -34,7 +34,6 @@ main(void)
     flint_printf("mul_2expmod_2expp1....");
     fflush(stdout);
 
-
     _flint_rand_init_gmp(state);
 
     mpz_init(m1);

@@ -25,8 +25,6 @@ main(void)
     flint_printf("get/set_fft....");
     fflush(stdout);
 
-
-
      /* convert back and forth and compare */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {

@@ -61,7 +61,6 @@ fmpzi_divrem_ref(fmpzi_t q, fmpzi_t r, const fmpzi_t x, const fmpzi_t y)
     fmpz_clear(v);
 }
 
-
 int main(void)
 {
     slong iter;

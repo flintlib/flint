@@ -153,7 +153,6 @@ int main(void)
         flint_abort();
     }
 
-
     /* check reciprocity law  12*b*c(S(b,c) + S(c,b)) = (b - c)^2 - b*c + 1 */
     for (i = 0; i < 500*flint_test_multiplier(); i++)
     {

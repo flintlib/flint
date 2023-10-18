@@ -147,7 +147,6 @@ main(void)
 
         fmpq_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx1);
 
-
         vals3 = (fmpq **) flint_malloc(nvars1*sizeof(fmpq *));
         for (v = 0; v < nvars1; v++)
         {

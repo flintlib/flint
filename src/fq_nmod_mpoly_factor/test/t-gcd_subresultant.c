@@ -11,7 +11,6 @@
 
 #include "fq_nmod_mpoly_factor.h"
 
-
 int compute_gcd(
     fq_nmod_mpoly_t G,
     const fq_nmod_mpoly_t A,
@@ -92,7 +91,6 @@ cleanup:
 
     return success;
 }
-
 
 void gcd_check(
     fq_nmod_mpoly_t g,
@@ -190,7 +188,6 @@ cleanup:
     fq_nmod_mpoly_clear(cb, ctx);
     fq_nmod_mpoly_clear(cg, ctx);
 }
-
 
 int
 main(void)

@@ -56,8 +56,6 @@ main(void)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
-
-
     /* Check new leading coeff = 1 */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -96,6 +94,5 @@ main(void)
     flint_printf("PASS\n");
     return 0;
 }
-
 
 #endif

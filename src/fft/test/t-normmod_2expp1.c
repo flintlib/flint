@@ -34,7 +34,6 @@ main(void)
     flint_printf("normmod_2expp1....");
     fflush(stdout);
 
-
     _flint_rand_init_gmp(state);
 
     mpz_init(m1);

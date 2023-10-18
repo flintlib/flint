@@ -166,7 +166,6 @@ cleanup:
     return success;
 }
 
-
 void gcd_check(
     fmpz_mod_mpoly_t g,
     fmpz_mod_mpoly_t a,
@@ -269,7 +268,6 @@ cleanup:
     fmpz_mod_mpoly_clear(cb, ctx);
     fmpz_mod_mpoly_clear(cg, ctx);
 }
-
 
 int
 main(void)

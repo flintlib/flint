@@ -64,7 +64,6 @@ mpq_harmonic_balanced(mpq_t res, slong a, slong b)
     mpq_clear(t);
 }
 
-
 int main(void)
 {
     slong i;

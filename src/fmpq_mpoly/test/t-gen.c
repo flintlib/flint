@@ -79,7 +79,6 @@ main(void)
             flint_abort();
         }
 
-
         fmpq_mpoly_clear(f1, ctx);
         fmpq_mpoly_clear(f2, ctx);
     }

@@ -21,8 +21,6 @@ main(void)
     flint_printf("teichmuller... ");
     fflush(stdout);
 
-
-
     /* Check aliasing (x 1,000) */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {

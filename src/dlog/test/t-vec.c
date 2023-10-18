@@ -47,7 +47,6 @@ int main(void)
         dlog_vec_sieve };
     char * n[4] = { "trivial", "loop", "eratos", "sieve" };
 
-
     flint_printf("vec....");
     fflush(stdout);
     flint_randinit(state);

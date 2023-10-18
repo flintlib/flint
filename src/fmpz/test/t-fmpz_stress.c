@@ -41,7 +41,6 @@ void worker1(void * varg)
     }
 }
 
-
 void worker2(void * varg)
 {
     worker_arg_struct * arg = (worker_arg_struct *) varg;
@@ -73,7 +72,6 @@ void worker3(void * varg)
         fmpz_mul_2exp(vec + i, vec + i, 110);
     }
 }
-
 
 TEST_FUNCTION_START(fmpz_stress, state)
 {

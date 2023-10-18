@@ -11,7 +11,6 @@
 
 #include "nmod_mpoly_factor.h"
 
-
 /* check total number of factors with multiplicity is between lower and upper */
 void check_omega(slong lower, slong upper, const nmod_mpoly_t p, const nmod_mpoly_ctx_t ctx)
 {
@@ -93,7 +92,6 @@ void check_omega(slong lower, slong upper, const nmod_mpoly_t p, const nmod_mpol
     nmod_mpoly_factor_clear(h, ctx);
     fmpz_clear(omega);
 }
-
 
 int
 main(void)

@@ -18,7 +18,6 @@ int main(void)
     int i;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("parity....");
     fflush(stdout);
 

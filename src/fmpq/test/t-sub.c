@@ -19,7 +19,6 @@ main(void)
     int i;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("sub....");
     fflush(stdout);
 
@@ -174,8 +173,6 @@ main(void)
         mpq_clear(X);
         mpq_clear(Y);
     }
-
-
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

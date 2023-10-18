@@ -7,7 +7,6 @@
       (at your option) any later version.  See <https://www.gnu.org/licenses/>.
  */
 
-
 /******************************************************************************
 
     Authored 2016 by Daniel S. Roche; US Government work in the public domain

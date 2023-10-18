@@ -20,7 +20,6 @@ main(void)
     int i;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("init/clear....");
     fflush(stdout);
 
@@ -40,8 +39,6 @@ main(void)
 
         d_mat_clear(A);
     }
-
-
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

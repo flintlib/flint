@@ -21,8 +21,6 @@ main(void)
     flint_printf("exp_balanced... ");
     fflush(stdout);
 
-
-
 /** p == 2 *******************************************************************/
 
     /* Check aliasing: a = exp(a) */

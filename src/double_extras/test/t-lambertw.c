@@ -28,8 +28,6 @@ main(void)
     flint_printf("lambertw....");
     fflush(stdout);
 
-
-
     mpfr_init2(xx, prec);
     mpfr_init2(ww, prec);
     mpfr_init2(wnew, prec);

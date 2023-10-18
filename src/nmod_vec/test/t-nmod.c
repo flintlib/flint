@@ -19,7 +19,6 @@ main(void)
     int i;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("nmod....");
     fflush(stdout);
 
@@ -243,7 +242,6 @@ main(void)
         mpz_clear(y);
         mpz_clear(z);
     }
-
 
     FLINT_TEST_CLEANUP(state);
 

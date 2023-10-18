@@ -109,8 +109,6 @@ slong hyperbolic_machin_formulas[NUM_FORMULAS2][4][2] = {
     {{404, 251}, {152, 449}, {-106, 4801}, {174, 8749}},
 };
 
-
-
 int main(void)
 {
     slong iter;

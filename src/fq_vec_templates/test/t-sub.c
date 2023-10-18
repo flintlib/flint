@@ -135,11 +135,9 @@ main(void)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
-
     FLINT_TEST_CLEANUP(state);
     printf("PASS\n");
     return 0;
 }
-
 
 #endif

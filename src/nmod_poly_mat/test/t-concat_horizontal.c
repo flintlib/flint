@@ -47,7 +47,6 @@ int main(void)
         nmod_poly_mat_window_init(window1, C, 0, 0, r1, c1);
         nmod_poly_mat_window_init(window2, C, 0, c1, r1, c1 + c2);
 
-
         if (!(nmod_poly_mat_equal(window1, A) && nmod_poly_mat_equal(window2, B)))
         {
             flint_printf("FAIL: results not equal\n");

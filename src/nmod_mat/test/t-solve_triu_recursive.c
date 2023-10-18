@@ -18,7 +18,6 @@ main(void)
     slong i;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("solve_triu_recursive....");
     fflush(stdout);
 

@@ -122,6 +122,5 @@ TEST_FUNCTION_START(fmpz_mat_can_solve_multi_mod_den, state)
         fmpz_clear(den);
     }
 
-
     TEST_FUNCTION_END(state);
 }

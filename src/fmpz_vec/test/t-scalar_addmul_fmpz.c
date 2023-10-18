@@ -23,8 +23,6 @@ main(void)
     flint_printf("scalar_addmul_fmpz....");
     fflush(stdout);
 
-
-
     /* Compare with fmpz_vec_scalar_addmul_si */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {

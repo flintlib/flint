@@ -58,7 +58,5 @@ TEST_FUNCTION_START(fmpz_mat_scalar_addmul_nmod_mat_ui, state)
         nmod_mat_clear(M);
     }
 
-
-
     TEST_FUNCTION_END(state);
 }

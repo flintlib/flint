@@ -15,7 +15,6 @@
 
 #include "templates.h"
 
-
 #include "ulong_extras.h"
 #include "long_extras.h"
 
@@ -217,7 +216,6 @@ main(void)
         TEMPLATE(T, poly_add) (rhs, b, c, ctx);
         TEMPLATE(T, poly_add) (rhs, a, rhs, ctx);
 
-
         result = (TEMPLATE(T, poly_equal) (lhs, rhs, ctx));
         if (!result)
         {
@@ -245,7 +243,5 @@ main(void)
     flint_printf("PASS\n");
     return 0;
 }
-
-
 
 #endif

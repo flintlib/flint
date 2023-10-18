@@ -70,7 +70,6 @@ main(void)
         for (i = 0; i < n; i++)
             result = result && TEMPLATE(T, poly_equal) (h1[i], h2[i], ctx);
 
-
         if (!result)
         {
             flint_printf("FAIL (composition):\n");
@@ -96,7 +95,5 @@ main(void)
     flint_printf("PASS\n");
     return 0;
 }
-
-
 
 #endif

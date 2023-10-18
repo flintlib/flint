@@ -114,6 +114,5 @@ TEST_FUNCTION_START(fmpz_poly_scale_2exp, state)
         fmpz_clear(res2);
     }
 
-
     TEST_FUNCTION_END(state);
 }

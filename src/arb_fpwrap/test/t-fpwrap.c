@@ -37,7 +37,6 @@
         } \
     } while (0)
 
-
 TEST_FUNCTION_START(arb_fpwrap, state)
 {
     slong iter;

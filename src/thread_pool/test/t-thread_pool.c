@@ -87,7 +87,6 @@ void test1(fmpz_t x, ulong n)
     flint_free(handles);
 }
 
-
 /******************************************************************************
     test2 - calculate x = n! by recursively splitting the work when necessary
 *******************************************************************************/
@@ -108,7 +107,6 @@ void worker2(void * varg)
 
     test2_helper(arg->ans, arg->min, arg->max);
 }
-
 
 /* set x = product of numbers in (min, max] */
 void test2_helper(fmpz_t x, ulong min, ulong max)
@@ -156,7 +154,6 @@ void test2(fmpz_t x, ulong n)
 {
     test2_helper(x, 0, n);
 }
-
 
 int
 main(void)

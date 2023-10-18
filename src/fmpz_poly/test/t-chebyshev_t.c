@@ -17,7 +17,6 @@ TEST_FUNCTION_START(fmpz_poly_chebyshev_t, state)
     fmpz_poly_t T0, T1, T2, t;
     slong n;
 
-
     fmpz_poly_init(T0);
     fmpz_poly_init(T1);
     fmpz_poly_init(T2);

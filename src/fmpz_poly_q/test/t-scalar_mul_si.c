@@ -11,7 +11,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-
 #include "fmpz_poly_q.h"
 #include "long_extras.h"
 #include "ulong_extras.h"
@@ -24,8 +23,6 @@ main(void)
 
     flint_printf("scalar_mul_si... ");
     fflush(stdout);
-
-
 
     /* Check aliasing of a and b */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)

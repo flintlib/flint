@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-
 #include "qadic.h"
 #include "ulong_extras.h"
 #include "long_extras.h"
@@ -22,8 +21,6 @@ main(void)
 
     flint_printf("norm_analytic... ");
     fflush(stdout);
-
-
 
     /* Compare with product of Galois conjugates */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)

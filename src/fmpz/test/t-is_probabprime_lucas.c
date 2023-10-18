@@ -30,7 +30,6 @@ TEST_FUNCTION_START(fmpz_is_probabprime_lucas, state)
            fmpz_abs(p, p);
         } while (!fmpz_is_probabprime(p) || fmpz_cmp_ui(p, 2) == 0);
 
-
         result = fmpz_is_probabprime_lucas(p);
         if (!result)
         {

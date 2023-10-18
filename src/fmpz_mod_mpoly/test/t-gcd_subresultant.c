@@ -99,7 +99,6 @@ cleanup:
     fmpz_mod_mpoly_clear(cg, ctx);
 }
 
-
 int
 main(void)
 {

@@ -12,7 +12,6 @@
 #include "test_helpers.h"
 #include "arb_poly.h"
 
-
 TEST_FUNCTION_START(arb_poly_rising_ui_series, state)
 {
     slong iter;

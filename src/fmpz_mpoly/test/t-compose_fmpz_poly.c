@@ -308,7 +308,6 @@ main(void)
 
         fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits, ctx1);
 
-
         vals3 = (fmpz **) flint_malloc(nvars1*sizeof(fmpz *));
         for (v = 0; v < nvars1; v++)
         {
@@ -372,7 +371,6 @@ main(void)
 
         fmpz_mpoly_ctx_clear(ctx1);
     }
-
 
     printf("PASS\n");
     FLINT_TEST_CLEANUP(state);

@@ -20,8 +20,6 @@ int main(void)
     flint_printf("sqr....");
     fflush(stdout);
 
-
-
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_mod_mat_t A, B, C;

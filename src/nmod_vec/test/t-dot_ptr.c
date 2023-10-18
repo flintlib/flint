@@ -18,7 +18,6 @@ main(void)
     int i;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("dot_ptr....");
     fflush(stdout);
 

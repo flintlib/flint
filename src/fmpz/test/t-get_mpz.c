@@ -17,7 +17,6 @@ TEST_FUNCTION_START(fmpz_get_mpz, state)
 {
     int i, result;
 
-
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a;

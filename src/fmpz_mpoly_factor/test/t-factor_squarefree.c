@@ -11,7 +11,6 @@
 
 #include "fmpz_mpoly_factor.h"
 
-
 void check_it(const fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx)
 {
     slong i, j;
@@ -79,7 +78,6 @@ void check_it(const fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx)
     fmpz_mpoly_factor_clear(g, ctx);
     fmpz_mpoly_factor_clear(h, ctx);
 }
-
 
 int
 main(void)

@@ -62,7 +62,6 @@ main(void)
         cmpmask = (ulong*) flint_malloc(N*sizeof(ulong));
         mpoly_get_cmpmask(cmpmask, N, fg_bits, ctx->minfo);
 
-
         fexp = (ulong *) flint_malloc(f->length*N*sizeof(ulong));
         gexp = (ulong *) flint_malloc(g->length*N*sizeof(ulong));
         e = (ulong *) flint_malloc(N*sizeof(ulong));

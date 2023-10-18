@@ -25,7 +25,6 @@ main(void)
     flint_printf("window_init/clear....");
     fflush(stdout);
 
-
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
     	TEMPLATE(T, ctx_t) ctx;
@@ -62,11 +61,9 @@ main(void)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
-
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");
     return 0;
 }
-
 
 #endif

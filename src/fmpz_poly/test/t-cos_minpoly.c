@@ -12,7 +12,6 @@
 #include "test_helpers.h"
 #include "fmpz_poly.h"
 
-
 /*
 Generated with Mathematica:
 Table[Mod[MinimalPolynomial[2 Cos[2 Pi/n]][1337], 31337], {n,1,300}]
@@ -55,7 +54,6 @@ TEST_FUNCTION_START(fmpz_poly_cos_minpoly, state)
 {
     fmpz_poly_t p;
     slong n;
-
 
     fmpz_poly_init(p);
 

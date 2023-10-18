@@ -79,7 +79,6 @@ arf_pow_binexp_si(arf_t y, const arf_t b, slong e, slong prec, arf_rnd_t rnd)
     fmpz_clear(f);
 }
 
-
 int main(void)
 {
     slong iter;

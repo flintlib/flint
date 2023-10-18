@@ -94,7 +94,6 @@ void check_omega(slong lower, slong upper, const fmpz_mpoly_t p, const fmpz_mpol
     return;
 }
 
-
 int
 main(void)
 {

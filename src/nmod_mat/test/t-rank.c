@@ -20,7 +20,6 @@ main(void)
     mp_limb_t mod;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("rank....");
     fflush(stdout);
 

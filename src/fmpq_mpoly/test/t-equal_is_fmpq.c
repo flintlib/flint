@@ -37,7 +37,6 @@ main(void)
         fmpz_init(a);
         fmpz_init(b);
 
-
         result = 1;
 
         fmpq_mpoly_set_str_pretty(f, "0", vars, ctx);
@@ -69,7 +68,6 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-
 
         result = 1;
 
@@ -106,7 +104,6 @@ main(void)
             flint_abort();
         }
 
-
         result = 1;
 
         fmpq_mpoly_set_str_pretty(f, "2/3", vars, ctx);
@@ -139,7 +136,6 @@ main(void)
             flint_abort();
         }
 
-
         result = 1;
 
         fmpq_mpoly_set_str_pretty(f, "x", vars, ctx);
@@ -169,7 +165,6 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-
 
         result = 1;
 
@@ -211,7 +206,6 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-
 
         result = 1;
 

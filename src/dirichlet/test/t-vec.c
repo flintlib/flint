@@ -72,8 +72,6 @@ int main(void)
                 flint_abort();
             }
 
-
-
         } while (dirichlet_char_next(chi, G) >= 0);
 
         flint_free(v1);

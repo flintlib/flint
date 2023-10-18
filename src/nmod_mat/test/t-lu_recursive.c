@@ -86,15 +86,12 @@ void check(slong * P, nmod_mat_t LU, const nmod_mat_t A, slong rank)
     nmod_mat_clear(U);
 }
 
-
-
 int
 main(void)
 {
     slong i;
 
     FLINT_TEST_INIT(state);
-
 
     flint_printf("lu_recursive....");
     fflush(stdout);

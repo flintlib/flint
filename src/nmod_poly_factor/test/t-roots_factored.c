@@ -112,7 +112,6 @@ void test_poly(
     nmod_poly_clear(r);
 }
 
-
 int
 main(void)
 {

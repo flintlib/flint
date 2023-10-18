@@ -15,7 +15,6 @@
 
 #include "templates.h"
 
-
 #include "ulong_extras.h"
 #include "long_extras.h"
 
@@ -63,7 +62,6 @@ main(void)
         TEMPLATE(T, poly_clear) (a, ctx);
         TEMPLATE(T, poly_clear) (b, ctx);
 
-
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
@@ -106,7 +104,6 @@ main(void)
         TEMPLATE(T, poly_clear) (b, ctx);
         TEMPLATE(T, poly_clear) (c, ctx);
 
-
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
@@ -114,7 +111,5 @@ main(void)
     flint_printf("PASS\n");
     return 0;
 }
-
-
 
 #endif

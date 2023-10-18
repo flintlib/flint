@@ -18,7 +18,6 @@ main(void)
     int i, result;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("scalar_addmul_nmod....");
     fflush(stdout);
 

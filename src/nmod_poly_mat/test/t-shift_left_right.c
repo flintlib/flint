@@ -84,7 +84,6 @@ main(void)
     int i, result;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("shift_left_right....");
     fflush(stdout);
 

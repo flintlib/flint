@@ -22,7 +22,6 @@ main(void)
     flint_printf("fft/ifft_mfa_truncate_sqrt2....");
     fflush(stdout);
 
-
     _flint_rand_init_gmp(state);
 
     for (depth = 6; depth <= 13; depth++)

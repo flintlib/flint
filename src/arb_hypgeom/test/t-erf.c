@@ -165,7 +165,6 @@ TEST_FUNCTION_START(arb_hypgeom_erf, state)
 
 #endif
 
-
 #if 0
     for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {

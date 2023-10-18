@@ -11,7 +11,6 @@
 
 #include "fq.h"
 
-
 #ifdef T
 #undef T
 #endif

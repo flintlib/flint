@@ -85,7 +85,6 @@ main(void)
         fmpz_clear(exp1);
     }
 
-
     FLINT_TEST_CLEANUP(state);
 
     flint_printf("PASS\n");

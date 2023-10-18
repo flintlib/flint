@@ -11,7 +11,6 @@
 
 #include "fmpz_mpoly_factor.h"
 
-
 int compute_gcd(
     fmpz_mpoly_t G,
     const fmpz_mpoly_t A,
@@ -172,7 +171,6 @@ cleanup:
     return success;
 }
 
-
 void gcd_check(
     fmpz_mpoly_t g,
     fmpz_mpoly_t a,
@@ -269,7 +267,6 @@ cleanup:
     fmpz_mpoly_clear(cb, ctx);
     fmpz_mpoly_clear(cg, ctx);
 }
-
 
 int
 main(void)

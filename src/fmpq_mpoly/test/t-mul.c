@@ -11,7 +11,6 @@
 
 #include "fmpq_mpoly.h"
 
-
 int
 main(void)
 {

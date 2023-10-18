@@ -35,7 +35,6 @@ _accuracy_regression_test(const acb_t s, const acb_t z,
     acb_clear(g);
 }
 
-
 TEST_FUNCTION_START(acb_hypgeom_gamma_upper, state)
 {
     slong iter;

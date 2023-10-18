@@ -13,8 +13,6 @@
 
 #include "templates.h"
 
-
-
 int
 main(void)
 {
@@ -38,7 +36,6 @@ main(void)
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (g, ctx);
-
 
         TEMPLATE(T, poly_randtest_not_zero) (a, state, len, ctx);
         TEMPLATE(T, poly_make_monic) (b, a, ctx);
@@ -65,7 +62,6 @@ main(void)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
-
     /*
        Find coprime polys, multiply by another poly
        and check the GCD is that poly
@@ -84,9 +80,7 @@ main(void)
         TEMPLATE(T, poly_init) (c, ctx);
         TEMPLATE(T, poly_init) (g, ctx);
 
-
         TEMPLATE(T, poly_randtest_not_zero) (a, state, len, ctx);
-
 
         for (j = 0;
              (j < 100 * flint_test_multiplier())
@@ -94,7 +88,6 @@ main(void)
         {
             TEMPLATE(T, poly_randtest_not_zero) (b, state, len, ctx);
             TEMPLATE(T, poly_gcd) (g, a, b, ctx);
-
 
         }
 
@@ -194,7 +187,6 @@ main(void)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
-
     /* Check aliasing of b and g */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
@@ -240,6 +232,5 @@ main(void)
     flint_printf("PASS\n");
     return 0;
 }
-
 
 #endif

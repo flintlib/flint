@@ -49,7 +49,6 @@ next:
     return 1;
 }
 
-
 /* length of s is r */
 static void my_subset_print(slong * s, slong r)
 {

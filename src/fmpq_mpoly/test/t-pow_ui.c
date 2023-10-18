@@ -74,7 +74,6 @@ main(void)
         fmpq_mpoly_ctx_clear(ctx);
     }
 
-
     /* Check monomials against pow_fmpz */
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {

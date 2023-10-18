@@ -16,7 +16,6 @@ TEST_FUNCTION_START(fmpz_poly_legendre_pt, state)
     fmpz_poly_t T0, T1, T2, t, tt;
     slong n;
 
-
     fmpz_poly_init(T0);
     fmpz_poly_init(T1);
     fmpz_poly_init(T2);

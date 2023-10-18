@@ -42,7 +42,6 @@ main(void)
         fmpz_mod_ctx_set_modulus(ctx, p);
         exp = n_randint(state, 50);
 
-
         fmpz_mod_poly_init(f, ctx);
         fmpz_mod_poly_init(finv, ctx);
         fmpz_mod_poly_init(res1, ctx);
@@ -146,7 +145,6 @@ main(void)
         fmpz_mod_poly_init(res, ctx);
 
         fmpz_mod_poly_randtest_not_zero(f, state, n_randint(state, 50) + 1, ctx);
-
 
         fmpz_mod_poly_reverse (finv, f, f->length, ctx);
         fmpz_mod_poly_inv_series (finv, finv, f->length, ctx);

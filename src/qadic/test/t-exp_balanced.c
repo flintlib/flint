@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-
 #include "qadic.h"
 #include "ulong_extras.h"
 
@@ -21,8 +20,6 @@ main(void)
 
     flint_printf("exp_balanced... ");
     fflush(stdout);
-
-
 
     /* Check aliasing */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)

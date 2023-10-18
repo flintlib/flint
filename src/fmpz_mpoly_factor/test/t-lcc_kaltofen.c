@@ -117,7 +117,6 @@ cleanup:
     return success;
 }
 
-
 int
 main(void)
 {
@@ -153,7 +152,6 @@ main(void)
         fmpz_init(g1);
         fmpz_init(g2);
         fmpz_init(g3);
-
 
         bounds = FLINT_ARRAY_ALLOC(nvars, ulong);
         alphas = _fmpz_vec_init(nvars - 1);

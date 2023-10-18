@@ -117,7 +117,6 @@ int main(void)
                                         &(d->length), a->coeffs, a->length,
                                         b->coeffs, b->length, cutoff, ctx);
 
-
         gr_poly_fit_length(s, 2 * a->length, ctx);
         gr_poly_fit_length(t, 2 * a->length, ctx);
 

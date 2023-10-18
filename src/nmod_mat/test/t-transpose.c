@@ -18,7 +18,6 @@ main(void)
     slong m, n, mod, mod2, rep;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("transpose....");
     fflush(stdout);
 

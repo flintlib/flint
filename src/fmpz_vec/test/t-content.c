@@ -24,8 +24,6 @@ main(void)
     flint_printf("content....");
     fflush(stdout);
 
-
-
     /* Check that content(a f) = abs(a) content(f) */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {

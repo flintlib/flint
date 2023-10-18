@@ -22,7 +22,6 @@ int main(void)
     flint_printf("concat_horizontal....");
     fflush(stdout);
 
-
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong c1, c2, r1, n;
@@ -66,7 +65,6 @@ int main(void)
         nmod_mat_window_clear(window1);
         nmod_mat_window_clear(window2);
     }
-
 
     FLINT_TEST_CLEANUP(state);
 

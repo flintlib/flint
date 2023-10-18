@@ -83,7 +83,6 @@ TEST_FUNCTION_START(nmod_poly_evaluate_mat_paterson_stockmeyer, state)
         nmod_poly_evaluate_mat_paterson_stockmeyer(C, b, A);
         nmod_mat_add(C, B, C);
 
-
         nmod_poly_add(a, a, b);
         nmod_poly_evaluate_mat_paterson_stockmeyer(B, a, A);
 

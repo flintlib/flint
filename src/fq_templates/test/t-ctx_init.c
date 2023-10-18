@@ -14,7 +14,6 @@
 
 #include "templates.h"
 
-
 #include "fmpz_mod_poly.h"
 #include "ulong_extras.h"
 #include "long_extras.h"
@@ -99,6 +98,5 @@ main(void)
 
     return 0;
 }
-
 
 #endif

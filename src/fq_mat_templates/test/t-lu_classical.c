@@ -99,8 +99,6 @@ check(slong * P, TEMPLATE(T, mat_t) LU, const TEMPLATE(T, mat_t) A, slong rank,
     TEMPLATE(T, mat_clear) (U, ctx);
 }
 
-
-
 int
 main(void)
 {
@@ -166,6 +164,5 @@ main(void)
     printf("PASS\n");
     return 0;
 }
-
 
 #endif

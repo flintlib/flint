@@ -32,7 +32,6 @@ main(void)
     c = flint_malloc(max_length*max_fields*sizeof(ulong));
     d = flint_malloc(max_length*max_fields*sizeof(ulong));
 
-
     for (k = 0; k < 10 * flint_test_multiplier(); k++)
     {
         /* do FLINT_BITS => bits1 => FLINT_BITS and compare */
@@ -57,7 +56,6 @@ main(void)
                 }
         }
     }
-
 
     for (k = 0; k < 1 * flint_test_multiplier(); k++)
     {

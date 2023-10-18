@@ -77,7 +77,6 @@ TEST_FUNCTION_START(arb_hypgeom_gamma_upper_integration, state)
                 flint_abort();
             }
 
-
             arb_set_str(a, "-23515.25", prec1);
             arb_set_str(z, "5118.125", prec1);
 

@@ -77,7 +77,6 @@ int main(void)
         ca_ctx_clear(ctx);
     }
 
-
     for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
         ca_ctx_t ctx;

@@ -120,7 +120,6 @@ cleanup:
     flint_free(stride);
 }
 
-
 int
 main(void)
 {

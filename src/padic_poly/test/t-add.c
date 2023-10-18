@@ -22,8 +22,6 @@ main(void)
     flint_printf("add... ");
     fflush(stdout);
 
-
-
     /* Check aliasing of a and c */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {

@@ -20,7 +20,6 @@ main(void)
     int i, result;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("mulhigh....");
     fflush(stdout);
 
@@ -74,6 +73,5 @@ main(void)
     flint_printf("PASS\n");
     return 0;
 }
-
 
 #endif

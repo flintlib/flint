@@ -22,7 +22,6 @@ main(void)
     int iter;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("factor_cantor_zassenhaus....");
     fflush(stdout);
 
@@ -110,7 +109,6 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-
 
         nmod_poly_clear(product);
         nmod_poly_clear(quot);

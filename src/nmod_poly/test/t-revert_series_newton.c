@@ -37,7 +37,6 @@ TEST_FUNCTION_START(nmod_poly_revert_series_newton, state)
             n = n_randint(state, 100);
         } while (n >= m);
 
-
         nmod_poly_revert_series_newton(f, g, n);
         nmod_poly_revert_series_newton(g, g, n);
 

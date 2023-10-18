@@ -25,8 +25,6 @@ main(void)
     flint_printf("lcm....");
     fflush(stdout);
 
-
-
     /* Check that lcm(a f) = abs(a) lcm(f) */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {

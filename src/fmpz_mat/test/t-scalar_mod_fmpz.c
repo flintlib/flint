@@ -51,7 +51,5 @@ TEST_FUNCTION_START(fmpz_mat_scalar_mod_fmpz, state)
         fmpz_clear(mod);
     }
 
-
-
     TEST_FUNCTION_END(state);
 }

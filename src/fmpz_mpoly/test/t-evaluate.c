@@ -98,7 +98,6 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
-
     /* Check repeated evalone matches evalall */
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {

@@ -11,7 +11,6 @@
 
 #include "fmpz_mpoly.h"
 
-
 int
 main(void)
 {

@@ -71,7 +71,6 @@ main(void)
         gr_ctx_clear(ctx);
     }
 
-
     flint_randclear(state);
     flint_cleanup();
     flint_printf("PASS\n");

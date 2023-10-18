@@ -22,8 +22,6 @@ main(void)
     flint_printf("charpoly....");
     fflush(stdout);
 
-
-
     for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
     {
         fmpq_mat_t A, B, C, D;

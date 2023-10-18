@@ -22,8 +22,6 @@ main(void)
     flint_printf("sub... ");
     fflush(stdout);
 
-
-
     /* Check aliasing: a = a - b */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {

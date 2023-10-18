@@ -20,7 +20,6 @@ main(void)
     flint_printf("derivative/integral....");
     fflush(stdout);
 
-
     /* Check d(f*g) = df*g + f*dg */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
@@ -103,7 +102,6 @@ main(void)
         fmpq_mpoly_clear(t1, ctx);
         fmpq_mpoly_clear(t2, ctx);
     }
-
 
     /* Check d(f*g) = df*g + f*dg with aliasing */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -246,7 +244,6 @@ main(void)
         fmpq_mpoly_clear(g, ctx);
         fmpq_mpoly_clear(f1, ctx);
     }
-
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

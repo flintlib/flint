@@ -24,8 +24,6 @@ main(void)
     flint_printf("get/set_nmod_vec....");
     fflush(stdout);
 
-
-
     /* Check conversion to and from nmod_vec */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {

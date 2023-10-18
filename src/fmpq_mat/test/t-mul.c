@@ -18,7 +18,6 @@ main(void)
     int i, result;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("mul....");
     fflush(stdout);
 

@@ -62,7 +62,6 @@ void check_omega(slong lower, slong upper, const fmpq_mpoly_t p, const fmpq_mpol
         }
     }
 
-
     fmpq_mpoly_factor_make_monic(g, ctx);
     for (i = 0; i < g->num; i++)
     {
@@ -112,7 +111,6 @@ void check_omega(slong lower, slong upper, const fmpq_mpoly_t p, const fmpq_mpol
     fmpz_clear(omega);
     fmpq_clear(t);
 }
-
 
 int
 main(void)

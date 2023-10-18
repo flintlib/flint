@@ -21,7 +21,6 @@ int main(void)
     flint_printf("concat_horizontal....");
     fflush(stdout);
 
-
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong c1, c2, r1;
@@ -44,7 +43,6 @@ int main(void)
         fmpq_mat_window_init(window1, C, 0, 0, r1, c1);
         fmpq_mat_window_init(window2, C, 0, c1, r1, (c1 + c2));
 
-
         if (!(fmpq_mat_equal(window1, A) && fmpq_mat_equal(window2, B)))
         {
             flint_printf("FAIL: results not equal\n");
@@ -59,7 +57,6 @@ int main(void)
         fmpq_mat_window_clear(window1);
         fmpq_mat_window_clear(window2);
     }
-
 
     FLINT_TEST_CLEANUP(state);
 

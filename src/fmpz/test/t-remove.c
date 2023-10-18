@@ -39,7 +39,6 @@ TEST_FUNCTION_START(fmpz_remove, state)
             fmpz_abs(b, b);
         } while (fmpz_is_one(b));
 
-
         fmpz_get_mpz(d, a);
         fmpz_get_mpz(e, b);
 

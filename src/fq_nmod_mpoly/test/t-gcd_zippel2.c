@@ -11,7 +11,6 @@
 
 #include "fq_nmod_mpoly.h"
 
-
 void gcd_check(
     fq_nmod_mpoly_t g,
     fq_nmod_mpoly_t a,

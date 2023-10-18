@@ -40,14 +40,12 @@ TEST_FUNCTION_START(fmpz_mat_concat_horizontal, state)
         fmpz_mat_window_init(window1, C, 0, 0, r1, c1);
         fmpz_mat_window_init(window2, C, 0, c1, r1, (c1+c2));
 
-
         if (!(fmpz_mat_equal(window1, A) && fmpz_mat_equal(window2, B)))
         {
             flint_printf("FAIL: results not equal\n");
             fflush(stdout);
             flint_abort();
         }
-
 
         fmpz_mat_clear(A);
         fmpz_mat_clear(B);

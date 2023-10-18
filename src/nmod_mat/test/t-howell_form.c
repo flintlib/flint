@@ -51,7 +51,6 @@ nmod_mat_is_in_howell_form(const nmod_mat_t A)
         prevrowzero = 1;
     }
 
-
     for (i = 1; i < A->r; i++)
     {
         if (!nmod_mat_is_zero_row(A, i))
@@ -176,7 +175,6 @@ main(void)
 
         r1 = nmod_mat_howell_form(B);
 
-
         if (!nmod_mat_is_in_howell_form(B))
         {
             flint_printf("FAIL (malformed Howell form)\n");
@@ -185,7 +183,6 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-
 
         _perm_randtest(perm, 2 * m, state);
 

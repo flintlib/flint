@@ -23,8 +23,6 @@ main(void)
     flint_printf("sub....");
     fflush(stdout);
 
-
-
     /* Check aliasing of a and c */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -110,7 +108,6 @@ main(void)
         _d_vec_clear(c);
         _d_vec_clear(d);
     }
-
 
     FLINT_TEST_CLEANUP(state);
 

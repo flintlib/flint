@@ -22,7 +22,6 @@ main(void)
     flint_printf("convolution....");
     fflush(stdout);
 
-
     _flint_rand_init_gmp(state);
 
     for (depth = 6; depth <= 13; depth++)

@@ -21,8 +21,6 @@ main(void)
     flint_printf("get_set_fmpz... ");
     fflush(stdout);
 
-
-
     /* Check that Zp(ZZ(x)) == x. */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {

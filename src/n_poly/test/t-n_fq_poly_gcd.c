@@ -11,7 +11,6 @@
 
 #include "n_poly.h"
 
-
 int
 main(void)
 {
@@ -77,7 +76,6 @@ main(void)
         fq_nmod_poly_clear(C, ctx);
         fq_nmod_ctx_clear(ctx);
     }
-
 
     FLINT_TEST_CLEANUP(state);
 

@@ -24,8 +24,6 @@ main(void)
     flint_printf("is_zero....");
     fflush(stdout);
 
-
-
     /* Check zero vector */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {

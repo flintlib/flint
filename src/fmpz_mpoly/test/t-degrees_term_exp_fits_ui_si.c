@@ -69,7 +69,6 @@ main(void)
                 flint_abort();
             }
 
-
             fmpz_mpoly_set_str_pretty(f, "x^18446744073709551615", vars, ctx);
             if (!fmpz_mpoly_term_exp_fits_ui(f, 0, ctx))
             {
@@ -139,7 +138,6 @@ main(void)
                 fflush(stdout);
                 flint_abort();
             }
-
 
             fmpz_mpoly_set_str_pretty(f, "x^4294967295", vars, ctx);
             if (!fmpz_mpoly_term_exp_fits_ui(f, 0, ctx))

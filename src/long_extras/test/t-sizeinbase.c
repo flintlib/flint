@@ -26,8 +26,6 @@ main(void)
     flint_printf("sizeinbase....");
     fflush(stdout);
 
-
-
     for (i = 0; i < 100000; i++)
     {
         slong a;

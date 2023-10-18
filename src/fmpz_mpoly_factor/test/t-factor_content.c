@@ -11,7 +11,6 @@
 
 #include "fmpz_mpoly_factor.h"
 
-
 void check_content(const fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx)
 {
     slong i, v;
@@ -85,7 +84,6 @@ void check_content(const fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx)
     fmpz_mpoly_factor_clear(g, ctx);
     fmpz_clear(deg);
 }
-
 
 int
 main(void)

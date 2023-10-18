@@ -11,7 +11,6 @@
 
 #include "fmpz_mpoly.h"
 
-
 /* foolproof way to check totdeg_check is correct */
 void _check_total_degree(const fmpz_t totdeg_check, const fmpz_mpoly_t A,
                                                     const fmpz_mpoly_ctx_t ctx)
@@ -23,7 +22,6 @@ void _check_total_degree(const fmpz_t totdeg_check, const fmpz_mpoly_t A,
         flint_throw(FLINT_ERROR, "Total degree is wrong");
     fmpz_clear(totdeg);
 }
-
 
 int
 main(void)

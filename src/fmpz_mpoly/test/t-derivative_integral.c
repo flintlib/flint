@@ -138,7 +138,6 @@ main(void)
         fmpz_mpoly_clear(t2, ctx);
     }
 
-
     /* Check d(f*g) = df*g + f*dg with aliasing */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
@@ -286,7 +285,6 @@ main(void)
         fmpz_mpoly_clear(g, ctx);
         fmpz_mpoly_clear(f1, ctx);
     }
-
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

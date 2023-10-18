@@ -43,7 +43,6 @@ TEST_FUNCTION_START(fmpz_divisor_sigma, state)
     fmpz_t m, a, b;
     slong n, k;
 
-
     fmpz_init(a);
     fmpz_init(b);
     fmpz_init(m);

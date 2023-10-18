@@ -13,7 +13,6 @@
 #include "fmpz_mpoly.h"
 #include "fmpz_mpoly_factor.h"
 
-
 void fmpz_mpoly_pow_naive(fmpz_mpoly_t res, fmpz_mpoly_t f,
                                                  slong n, fmpz_mpoly_ctx_t ctx)
 {

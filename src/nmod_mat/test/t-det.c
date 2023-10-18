@@ -19,7 +19,6 @@ main(void)
     slong m, mod, rep;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("det....");
     fflush(stdout);
 

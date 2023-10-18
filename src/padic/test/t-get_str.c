@@ -28,8 +28,6 @@ main(void)
     flint_printf("get_str... ");
     fflush(stdout);
 
-
-
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t p;

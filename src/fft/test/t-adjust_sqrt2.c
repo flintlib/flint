@@ -45,7 +45,6 @@ main(void)
     flint_printf("adjust_sqrt2....");
     fflush(stdout);
 
-
     _flint_rand_init_gmp(state);
 
     mpz_init(p);

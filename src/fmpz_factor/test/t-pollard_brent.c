@@ -33,7 +33,6 @@ int main(void)
     flint_printf("pollard_brent....");
     fflush(stdout);
 
-
     for (i = 10; i < 26; i += 5)
     {
         for (j = 0; j < 10 * flint_test_multiplier(); j++)

@@ -22,8 +22,6 @@ main(void)
     flint_printf("get_set_mpq... ");
     fflush(stdout);
 
-
-
     /* Check that Zp(QQ(x)) == x. */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {

@@ -81,7 +81,6 @@ check_rref(fmpz_mod_mat_t A)
     }
 }
 
-
 int
 main(void)
 {

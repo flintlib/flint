@@ -17,7 +17,6 @@ TEST_FUNCTION_START(nmod_poly_invmod, state)
 {
     int i, result;
 
-
     /* Test aliasing *************************************************************/
 
     /* Aliasing c and a */

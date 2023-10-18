@@ -22,7 +22,6 @@ int main(void)
    FLINT_TEST_INIT(state);
    gmp_randinit_default(st);
 
-
    flint_printf("factor_pp1....");
    fflush(stdout);
 
@@ -88,7 +87,6 @@ int main(void)
       fflush(stdout);
       flint_abort();
    }
-
 
    gmp_randclear(st);
    FLINT_TEST_CLEANUP(state);

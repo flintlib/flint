@@ -33,7 +33,6 @@ TEST_FUNCTION_START(fmpz_poly_swinnerton_dyer, state)
     mp_limb_t r;
     slong n;
 
-
     for (n = 0; n <= 10; n++)
     {
         fmpz_poly_init(S);

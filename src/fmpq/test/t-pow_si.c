@@ -24,8 +24,6 @@ main(void)
     flint_printf("pow_si....");
     fflush(stdout);
 
-
-
     /* Check aliasing of a and b */
     for (i = 0; i < 100000; i++)
     {

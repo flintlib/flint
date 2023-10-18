@@ -22,7 +22,6 @@ main(void)
     flint_printf("fft/ifft_negacyclic....");
     fflush(stdout);
 
-
     _flint_rand_init_gmp(state);
 
     for (depth = 6; depth <= 12; depth++)

@@ -98,7 +98,6 @@ main(void)
             fmpz_clear(f);
         }
 
-
         fq_zech_ctx_clear(ctx);
     }
 

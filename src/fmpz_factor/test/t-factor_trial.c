@@ -179,7 +179,6 @@ int main(void)
         fmpz_factor_clear(fac);
     }
 
-
     fmpz_clear(x);
 
     FLINT_TEST_CLEANUP(state);

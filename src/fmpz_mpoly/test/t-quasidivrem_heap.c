@@ -18,7 +18,6 @@ main(void)
 
     FLINT_TEST_INIT(state);
 
-
     flint_printf("quasidivrem_heap....");
     fflush(stdout);
 
@@ -419,7 +418,6 @@ main(void)
         fmpz_mpoly_clear(t1, ctx);
         fmpz_mpoly_clear(t2, ctx);
     }
-
 
     FLINT_TEST_CLEANUP(state);
 

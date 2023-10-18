@@ -24,8 +24,6 @@ main(void)
     flint_printf("scalar_addmul_si_2exp....");
     fflush(stdout);
 
-
-
     /* Compare with alternative method of computation */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {

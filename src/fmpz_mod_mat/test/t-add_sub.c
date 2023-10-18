@@ -21,8 +21,6 @@ main(void)
     flint_printf("add/sub/neg....");
     fflush(stdout);
 
-
-
     for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
     {
         fmpz_mod_mat_t A;

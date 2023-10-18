@@ -15,7 +15,6 @@
 
 #include "templates.h"
 
-
 #include "ulong_extras.h"
 #include "long_extras.h"
 
@@ -140,7 +139,5 @@ main(void)
     flint_printf("PASS\n");
     return 0;
 }
-
-
 
 #endif

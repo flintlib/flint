@@ -31,7 +31,6 @@ void check_invalid(char * s)
     fmpq_poly_clear(p);
 }
 
-
 TEST_FUNCTION_START(fmpq_poly_get_set_str, state)
 {
     int i, result;

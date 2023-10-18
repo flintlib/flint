@@ -51,7 +51,6 @@ check_vec_eq_prec(acb_srcptr w1, acb_srcptr w2, slong len, slong prec, slong dig
     }
 }
 
-
 TEST_FUNCTION_START(acb_dirichlet_dft, state)
 {
     slong k;

@@ -22,7 +22,6 @@ main(void)
     flint_printf("get/set_fmpz_mat....");
     fflush(stdout);
 
-
     for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
     {
         fmpz_mod_mat_t A;

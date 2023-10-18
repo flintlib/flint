@@ -22,8 +22,6 @@ main(void)
     flint_printf("shift... ");
     fflush(stdout);
 
-
-
     /* Check aliasing */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {

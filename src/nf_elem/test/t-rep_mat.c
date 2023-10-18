@@ -82,7 +82,6 @@ main(void)
             }
         }
 
-
         nf_elem_clear(a, nf);
         nf_elem_clear(b, nf);
         nf_elem_clear(p1, nf);

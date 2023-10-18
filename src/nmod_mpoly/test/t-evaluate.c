@@ -99,7 +99,6 @@ main(void)
         flint_free(perm);
     }
 
-
     /* Check add commutes with evalall */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {

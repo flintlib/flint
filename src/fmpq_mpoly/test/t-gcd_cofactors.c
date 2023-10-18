@@ -242,7 +242,6 @@ void gcd_check(
         flint_abort();
     }
 
-
     res = fmpq_mpoly_gcd_cofactors(cg, ca, cb, abar, bbar, ctx);
     fmpq_mpoly_assert_canonical(cg, ctx);
 

@@ -20,7 +20,6 @@ main(void)
     int i;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("init/clear....");
     fflush(stdout);
 

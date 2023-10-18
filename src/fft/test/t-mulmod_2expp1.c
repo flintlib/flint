@@ -23,7 +23,6 @@ main(void)
     flint_printf("mulmod_2expp1....");
     fflush(stdout);
 
-
     _flint_rand_init_gmp(state);
 
     for (iters = 0; iters < 100; iters++)

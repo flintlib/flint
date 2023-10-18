@@ -11,7 +11,6 @@
 
 #include "fmpz_mpoly.h"
 
-
 int
 main(void)
 {
@@ -198,7 +197,6 @@ main(void)
         fmpz_mpoly_clear(g, ctx);
         fmpz_mpoly_ctx_clear(ctx);
     }
-
 
     FLINT_TEST_CLEANUP(state);
 

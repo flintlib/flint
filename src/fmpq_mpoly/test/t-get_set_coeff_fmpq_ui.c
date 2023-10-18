@@ -72,8 +72,6 @@ main(void)
         fmpq_mpoly_ctx_clear(ctx);
     }
 
-
-
     FLINT_TEST_CLEANUP(state);
 
     flint_printf("PASS\n");

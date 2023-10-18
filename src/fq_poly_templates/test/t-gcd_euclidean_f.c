@@ -131,7 +131,6 @@ main(void)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
-
     /* Check aliasing of b and g */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
@@ -183,7 +182,5 @@ main(void)
     flint_printf("PASS\n");
     return 0;
 }
-
-
 
 #endif

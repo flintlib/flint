@@ -11,7 +11,6 @@
 
 #include "fq_nmod_mpoly_factor.h"
 
-
 /* check total number of factors with multiplicity is between lower and upper */
 void check_it(const fq_nmod_mpoly_t p, const fq_nmod_mpoly_ctx_t ctx)
 {
@@ -80,7 +79,6 @@ void check_it(const fq_nmod_mpoly_t p, const fq_nmod_mpoly_ctx_t ctx)
     fq_nmod_mpoly_factor_clear(g, ctx);
     fq_nmod_mpoly_factor_clear(h, ctx);
 }
-
 
 int
 main(void)

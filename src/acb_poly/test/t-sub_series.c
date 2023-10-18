@@ -12,7 +12,6 @@
 #include "test_helpers.h"
 #include "acb_poly.h"
 
-
 TEST_FUNCTION_START(acb_poly_sub_series, state)
 {
     slong iter;

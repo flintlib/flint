@@ -108,7 +108,6 @@ main(void)
                                                     " + x4^2*x5^2*x6^2*x7*x9^2"
         }};
 
-
         for (i = 1; i <= 10; i++)
         {
             fmpz_mpoly_ctx_init(ctx, i, ORD_DEGREVLEX);
@@ -252,7 +251,6 @@ main(void)
         fmpz_mpoly_clear(t, ctx);
         fmpz_mpoly_ctx_clear(ctx);
     }
-
 
     printf("PASS\n");
     FLINT_TEST_CLEANUP(state);

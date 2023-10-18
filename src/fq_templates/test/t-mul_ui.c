@@ -80,7 +80,6 @@ main(void)
         fmpz_poly_scalar_mul_ui(b,a,x);
 	TEMPLATE(T, reduce)(b,ctx);
 
-
         result = (TEMPLATE(T, equal)(c, b, ctx));
         if (!result)
         {
@@ -102,6 +101,5 @@ main(void)
     flint_printf("PASS\n");
     return 0;
 }
-
 
 #endif

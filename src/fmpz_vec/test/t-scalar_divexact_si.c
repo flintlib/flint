@@ -24,8 +24,6 @@ main(void)
     flint_printf("scalar_divexact_si....");
     fflush(stdout);
 
-
-
     /* Check aliasing of a and b */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {

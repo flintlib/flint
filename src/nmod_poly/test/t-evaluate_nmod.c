@@ -67,7 +67,6 @@ TEST_FUNCTION_START(nmod_poly_evaluate_nmod, state)
         nmod_poly_add(a, a, b);
         eval2 = nmod_poly_evaluate_nmod(a, c);
 
-
         result = (eval1 == eval2);
         if (!result)
         {

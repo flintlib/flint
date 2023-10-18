@@ -43,7 +43,6 @@ main(void)
         exp_bits2 = n_randint(state, 200) + 2;
         exp_bits3 = n_randint(state, 200) + 2;
 
-
         nmod_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
         nmod_mpoly_randtest_bits(g, state, len2, exp_bits2, ctx);
         nmod_mpoly_randtest_bits(h, state, len3, exp_bits3, ctx);

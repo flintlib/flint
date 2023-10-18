@@ -21,8 +21,6 @@ int main(void)
     flint_printf("sqrt... ");
     fflush(stdout);
 
-
-
 /* PRIME p = 2 ***************************************************************/
 
     /* Check aliasing: a = sqrt(a) */

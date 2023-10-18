@@ -211,7 +211,6 @@ main(void)
         fmpz_clear(p);
     }
 
-
     /* Alias binv and q */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {

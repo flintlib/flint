@@ -19,7 +19,6 @@ main(void)
     int iter;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("is_irreducible....");
     fflush(stdout);
 

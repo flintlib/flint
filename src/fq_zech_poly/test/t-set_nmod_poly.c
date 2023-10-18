@@ -12,8 +12,6 @@
 #include "fq_zech.h"
 #include "fq_zech_poly.h"
 
-
-
 #ifdef T
 #undef T
 #endif

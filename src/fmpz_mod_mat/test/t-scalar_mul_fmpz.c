@@ -19,7 +19,6 @@ main(void)
     slong m, n, rep;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("scalar_mul_fmpz....");
     fflush(stdout);
 

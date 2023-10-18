@@ -103,7 +103,6 @@ TEST_FUNCTION_START(aprcl_is_prime_jacobi, state)
         fmpz_clear(u);
     }
 
-
     /* Test _aprcl_is_prime_jacobi_check_2k() */
     {
         ulong p, q, v, k, p_pow;

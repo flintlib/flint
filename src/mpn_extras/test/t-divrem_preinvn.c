@@ -35,7 +35,6 @@ int main(void)
 
     gmp_randinit_default(st);
 
-
     /* test flint_mpn_divrem_preinvn alias r and a */
     for (i = 0; i < 10000; i++)
     {

@@ -12,7 +12,6 @@
 #include "ulong_extras.h"
 #include "nmod_poly_mat.h"
 
-
 void test_with_dims(ulong m, ulong n, flint_rand_t state)
 {
     int result;

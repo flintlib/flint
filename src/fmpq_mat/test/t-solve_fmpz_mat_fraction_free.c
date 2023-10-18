@@ -20,7 +20,6 @@ main(void)
     int i;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("solve_fmpz_mat_fraction_free....");
     fflush(stdout);
 
@@ -115,8 +114,6 @@ main(void)
         fmpz_mat_clear(B);
         fmpq_mat_clear(X);
     }
-
-
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

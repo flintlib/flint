@@ -31,7 +31,6 @@ int main(void)
     /* don't init g */
     gmp_randinit_default(st);
 
-
     /* check if b divides a*b */
     for (i = 0; i < 10000; i++)
     {

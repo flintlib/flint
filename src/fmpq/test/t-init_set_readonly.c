@@ -22,8 +22,6 @@ int main(void)
     flint_printf("init_set_readonly....");
     fflush(stdout);
 
-
-
     /* Create some small fmpq rationals, clear the mpq_t */
     for (i = 0; i < 100000; i++)
     {

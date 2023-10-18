@@ -24,8 +24,6 @@ main(void)
     flint_printf("trace....");
     fflush(stdout);
 
-
-
     /* Test trace(AB) = trace(BA) */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {

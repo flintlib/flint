@@ -81,6 +81,5 @@ TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_vec_preinv, state)
         flint_free(pow);
     }
 
-
     TEST_FUNCTION_END(state);
 }

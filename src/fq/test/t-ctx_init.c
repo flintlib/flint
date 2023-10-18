@@ -108,7 +108,6 @@ main(void)
     return 0;
 }
 
-
 #endif
 
 #undef CAP_T

@@ -1,7 +1,6 @@
 /*
     Copyright (C) 2021 Daniel Schultz
 
-
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under

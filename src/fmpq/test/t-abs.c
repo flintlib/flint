@@ -21,8 +21,6 @@ main(void)
     flint_printf("abs....");
     fflush(stdout);
 
-
-
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpq_t a, b;

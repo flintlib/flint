@@ -94,7 +94,6 @@ main(void)
 
     FLINT_TEST_INIT(state);
 
-
     flint_printf("lu_classical_delayed....");
     fflush(stdout);
 

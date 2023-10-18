@@ -26,8 +26,6 @@ main(void)
     flint_printf("mul....");
     fflush(stdout);
 
-
-
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong m, n, k, l;

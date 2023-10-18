@@ -22,7 +22,6 @@ vec1d vec1d_eval_poly_mod(const vec1d* a, ulong an, const vec1d b, const vec1d n
     return vec1d_reduce_to_pm1n(x, n, ninv);
 }
 
-
 void flint_print_d_fixed(double x, ulong l)
 {
     ulong i;
@@ -47,7 +46,6 @@ void flint_print_d_fixed(double x, ulong l)
 
     TMP_END;
 }
-
 
 void test_v2_fft(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flint_rand_t state)
 {
@@ -149,7 +147,6 @@ void test_v2_fft(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flint_rand
         flint_printf("%c", '\b');
     fflush(stdout);
 }
-
 
 int main(void)
 {

@@ -35,8 +35,6 @@ main(void)
     flint_printf("log_satoh... ");
     fflush(stdout);
 
-
-
 /** p == 2 *******************************************************************/
 
     /* Check aliasing: a = log(a) */

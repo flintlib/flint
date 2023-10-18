@@ -59,7 +59,6 @@ main(void)
         flint_abort();
     }
 
-
     fmpz_set_str(fmpq_numref(r), "18446744073709551615", 10);
     fmpz_set_str(fmpq_denref(r), "18446744073709551616", 10);
     fmpz_set_str(fmpq_numref(ans), "18538977794078099355206", 10);
@@ -95,7 +94,6 @@ main(void)
         fflush(stdout);
         flint_abort();
     }
-
 
     fmpq_clear(r);
     fmpq_clear(ans);

@@ -23,8 +23,6 @@ main(void)
     flint_printf("scalar_smod_fmpz....");
     fflush(stdout);
 
-
-
     /* Check aliasing of a and b */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {

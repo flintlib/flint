@@ -23,7 +23,6 @@ main(void)
     flint_printf("divides_monagan_pearce....");
     fflush(stdout);
 
-
     /*
         A bad case is hit when testing with multiplier 50. The following
         example illustrates this behaviour if the ordering is changed to
@@ -51,7 +50,6 @@ main(void)
     fmpz_mpoly_clear(r, ctx);
     fmpz_mpoly_ctx_clear(ctx);
 }
-
 
     /* Check f*g/g = f */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)

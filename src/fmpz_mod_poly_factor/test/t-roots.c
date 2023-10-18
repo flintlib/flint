@@ -83,7 +83,6 @@ void test_poly(
     fmpz_mod_poly_clear(r, ctx);
 }
 
-
 int
 main(void)
 {

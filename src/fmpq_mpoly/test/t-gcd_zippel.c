@@ -137,7 +137,6 @@ main(void)
         fmpq_mpoly_ctx_clear(ctx);
     }
 
-
     printf("PASS\n");
     FLINT_TEST_CLEANUP(state);
 

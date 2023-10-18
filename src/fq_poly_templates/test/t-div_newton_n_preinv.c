@@ -177,7 +177,6 @@ main(void)
         TEMPLATE(T, poly_init) (binv, ctx);
         TEMPLATE(T, poly_init) (q, ctx);
 
-
         do
             TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 200), ctx);
         while (b->length <= 2);
@@ -214,6 +213,5 @@ main(void)
     flint_printf("PASS\n");
     return 0;
 }
-
 
 #endif

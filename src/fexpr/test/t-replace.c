@@ -133,7 +133,6 @@ fexpr_replace_vec_naive(fexpr_t res, const fexpr_t expr, const fexpr_vec_t xs, c
     }
 }
 
-
 int main(void)
 {
     slong iter;

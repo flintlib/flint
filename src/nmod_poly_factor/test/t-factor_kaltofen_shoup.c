@@ -23,7 +23,6 @@ main(void)
     int iter;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("factor_kaltofen_shoup....");
     fflush(stdout);
 

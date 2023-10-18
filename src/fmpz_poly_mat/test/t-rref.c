@@ -64,8 +64,6 @@ main(void)
     flint_printf("rref....");
     fflush(stdout);
 
-
-
     for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
     {
         fmpz_poly_mat_t A, R, B, R2;

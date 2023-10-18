@@ -75,7 +75,6 @@ TEST_FUNCTION_START(arb_special, state)
     ASSERT(!arb_is_nonzero(indet_pos_rad));
     ASSERT(!arb_is_nonzero(indet_inf_rad));
 
-
     ASSERT(!arb_is_positive(zero));
     ASSERT(arb_is_positive(pos));
     ASSERT(!arb_is_positive(neg));

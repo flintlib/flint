@@ -94,7 +94,6 @@ test_compose_series(flint_rand_t state, int which)
             status |= gr_poly_compose_series(C, A, C, n, ctx);
             break;
 
-
         default:
             flint_abort();
     }

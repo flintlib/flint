@@ -23,8 +23,6 @@ main(void)
     flint_printf("set/equal... ");
     fflush(stdout);
 
-
-
     /* Equal polynomials */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {

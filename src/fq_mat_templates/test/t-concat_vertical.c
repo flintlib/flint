@@ -25,7 +25,6 @@ main(void)
     flint_printf("concat_vertical....");
     fflush(stdout);
 
-
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
     	TEMPLATE(T, ctx_t) ctx;
@@ -75,6 +74,5 @@ main(void)
     flint_printf("PASS\n");
     return 0;
 }
-
 
 #endif

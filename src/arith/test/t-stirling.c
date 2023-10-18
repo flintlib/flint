@@ -114,7 +114,6 @@ int main(void)
             _fmpz_vec_clear(row, k + 1);
         }
 
-
         for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
         {
             n = n_randint(state, 400);

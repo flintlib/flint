@@ -25,8 +25,6 @@ main(void)
     flint_printf("init/init2/realloc/clear... ");
     fflush(stdout);
 
-
-
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         padic_poly_t a;

@@ -20,7 +20,6 @@ main(void)
     int i;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("window_init/clear....");
     fflush(stdout);
 
@@ -54,7 +53,6 @@ main(void)
         fmpq_mat_window_clear(w);
         fmpq_mat_clear(a);
     }
-
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

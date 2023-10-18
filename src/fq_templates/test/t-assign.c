@@ -13,7 +13,6 @@
 
 #include "templates.h"
 
-
 int
 main(void)
 {
@@ -44,7 +43,5 @@ main(void)
     flint_printf("PASS\n");
     return 0;
 }
-
-
 
 #endif

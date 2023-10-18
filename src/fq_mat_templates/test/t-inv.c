@@ -22,7 +22,6 @@ main(void)
     int result;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("inv....");
     fflush(stdout);
 

@@ -19,7 +19,6 @@ TEST_FUNCTION_START(fmpz_poly_eulerian_polynomial, state)
     fmpz_t sum, fac;
     fmpz_poly_t poly;
 
-
     fmpz_poly_init(poly);
     fmpz_init(sum);
     fmpz_init(fac);

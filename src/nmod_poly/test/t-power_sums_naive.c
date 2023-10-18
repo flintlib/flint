@@ -145,7 +145,6 @@ TEST_FUNCTION_START(nmod_poly_power_sums_naive, state)
         nmod_poly_clear(d);
     }
 
-
     /* Check that the product of polynomials correspond to the sum of Power sums series */
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {

@@ -22,8 +22,6 @@ main(void)
     flint_printf("mul... ");
     fflush(stdout);
 
-
-
     /* Check aliasing: a = a * b (mod p^N) */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {

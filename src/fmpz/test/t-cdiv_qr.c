@@ -23,7 +23,6 @@ TEST_FUNCTION_START(fmpz_cdiv_qr, state)
         mpz_t d, e, f, g, h, s;
         slong j;
 
-
         fmpz_init(a);
         fmpz_init(b);
         fmpz_init(c);

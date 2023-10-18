@@ -17,7 +17,6 @@ TEST_FUNCTION_START(fmpz_poly_add_sub_si, state)
 {
     int i;
 
-
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, s, t;

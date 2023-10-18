@@ -83,7 +83,6 @@ int main(void)
             flint_abort();
         }
 
-
         qqbar_clear(x);
         qqbar_clear(y);
         fexpr_clear(e);

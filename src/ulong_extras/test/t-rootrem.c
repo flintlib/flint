@@ -39,7 +39,6 @@ TEST_FUNCTION_START(n_rootrem, state)
         c = n_randint(state, 0);    /*number */
         flint_mpz_set_ui(g, c);
 
-
         d = n_randint(state, 0);   /*root */
         flint_mpz_set_ui(h, d);
 

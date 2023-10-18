@@ -25,8 +25,6 @@ int main(void)
     flint_printf("concat_vertical....");
     fflush(stdout);
 
-
-
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong r1, r2, c1, bits;
@@ -49,7 +47,6 @@ int main(void)
 
         fmpz_poly_mat_window_init(window1, C, 0, 0, r1, c1);
         fmpz_poly_mat_window_init(window2, C, r1, 0, (r1 + r2), c1);
-
 
         if (!(fmpz_poly_mat_equal(window1, A) && fmpz_poly_mat_equal(window2, B)))
         {

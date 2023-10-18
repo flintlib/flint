@@ -24,8 +24,6 @@ main(void)
     flint_printf("height....");
     fflush(stdout);
 
-
-
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a;

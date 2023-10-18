@@ -13,7 +13,6 @@
 #include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
 
-
 int
 main(void)
 {
@@ -23,8 +22,6 @@ main(void)
 
     flint_printf("mul_KS....");
     fflush(stdout);
-
-
 
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {

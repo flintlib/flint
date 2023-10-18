@@ -12,7 +12,6 @@
 #include "test_helpers.h"
 #include "arb_poly.h"
 
-
 TEST_FUNCTION_START(arb_poly_add_series, state)
 {
     slong iter;

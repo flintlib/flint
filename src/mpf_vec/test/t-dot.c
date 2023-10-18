@@ -22,7 +22,6 @@ main(void)
     flint_printf("dot....");
     fflush(stdout);
 
-
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         mpf *a, *b;

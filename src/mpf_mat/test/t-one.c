@@ -23,8 +23,6 @@ main(void)
     flint_printf("one....");
     fflush(stdout);
 
-
-
     for (rep = 0; rep < 100 * flint_test_multiplier(); rep++)
     {
         mpf_mat_t A;

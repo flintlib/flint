@@ -22,7 +22,6 @@ int main(void)
 
     flint_randinit(state);
 
-
     for (iter = 0; iter < 1000; iter++)
     {
         gr_ctx_t ctx;

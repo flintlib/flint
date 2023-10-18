@@ -62,7 +62,6 @@ _spd_solve(arb_mat_t X, const arb_mat_t A, const arb_mat_t B, slong prec)
     return result;
 }
 
-
 TEST_FUNCTION_START(arb_mat_solve_cho_precomp, state)
 {
     slong iter;

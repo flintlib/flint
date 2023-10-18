@@ -77,7 +77,6 @@ _fmpz_mat_permute(fmpz_mat_t B, const fmpz_mat_t A, const slong *perm)
     }
 }
 
-
 void
 _brute_force_all_pairs_longest_walk(fmpz_mat_t B, const bool_mat_t A)
 {
@@ -132,7 +131,6 @@ _brute_force_all_pairs_longest_walk(fmpz_mat_t B, const bool_mat_t A)
         }
     }
 }
-
 
 int main(void)
 {

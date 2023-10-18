@@ -20,7 +20,6 @@ main(void)
     ulong j;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("get/set_coeff_mat....");
     fflush(stdout);
 

@@ -19,7 +19,6 @@ int main(void)
     slong i;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("concat_vertical....");
     fflush(stdout);
 
@@ -66,7 +65,6 @@ int main(void)
         nmod_mat_window_clear(window1);
         nmod_mat_window_clear(window2);
     }
-
 
     FLINT_TEST_CLEANUP(state);
 

@@ -23,8 +23,6 @@ main(void)
     flint_printf("dot....");
     fflush(stdout);
 
-
-
     /* Check commutative law */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {

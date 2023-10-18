@@ -2,7 +2,6 @@
     Copyright (C) 2017 William Hart
     Copyright (C) 2018 Daniel Schultz
 
-
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under

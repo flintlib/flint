@@ -18,7 +18,6 @@ main(void)
     int i, result;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("add/sub/neg....");
     fflush(stdout);
 

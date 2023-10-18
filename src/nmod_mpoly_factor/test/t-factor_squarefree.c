@@ -11,7 +11,6 @@
 
 #include "nmod_mpoly_factor.h"
 
-
 void check_it(const nmod_mpoly_t p, const nmod_mpoly_ctx_t ctx)
 {
     slong i, j;
@@ -79,7 +78,6 @@ void check_it(const nmod_mpoly_t p, const nmod_mpoly_ctx_t ctx)
     nmod_mpoly_factor_clear(g, ctx);
     nmod_mpoly_factor_clear(h, ctx);
 }
-
 
 int
 main(void)

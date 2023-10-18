@@ -23,8 +23,6 @@ main(void)
     flint_printf("inv... ");
     fflush(stdout);
 
-
-
 /* PRIME p = 2 ***************************************************************/
 
     /* Check aliasing: a = a^{-1} (mod p^N) */

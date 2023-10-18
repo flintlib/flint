@@ -57,7 +57,6 @@ TEST_FUNCTION_START(fmpz_poly_cyclotomic, state)
     fmpz_poly_t A, B;
     slong n;
 
-
     for (n = 0; n <= 1000; n++)
     {
         fmpz_poly_init(A);

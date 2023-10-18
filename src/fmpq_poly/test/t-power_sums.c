@@ -137,7 +137,6 @@ TEST_FUNCTION_START(fmpq_poly_power_sums, state)
         fmpz_poly_clear(bz);
     }
 
-
     /* Check that the product of polynomials correspond to the sum of Power sums series */
     /* (and aliasing of fmpq_poly_power_sums)                                           */
     for (i = 0; i < 20 * flint_test_multiplier(); i++)

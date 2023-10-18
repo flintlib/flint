@@ -447,7 +447,6 @@ main(void)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
-
     FLINT_TEST_CLEANUP(state);
 
     flint_printf("PASS\n");

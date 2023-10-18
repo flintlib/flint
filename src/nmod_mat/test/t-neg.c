@@ -18,7 +18,6 @@ main(void)
     slong m, n, mod, rep;
     FLINT_TEST_INIT(state);
 
-
     flint_printf("neg....");
     fflush(stdout);
 

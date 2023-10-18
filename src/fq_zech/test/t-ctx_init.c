@@ -52,7 +52,6 @@ main(void)
 
                 fq_nmod_one(one, fq_nmod_ctx);
 
-
                 for (j = 0; j < ctx->qm1; j++)
                 {
                     /* Skip the cases where a^j + 1 == 0 */

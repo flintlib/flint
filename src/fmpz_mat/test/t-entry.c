@@ -51,7 +51,5 @@ TEST_FUNCTION_START(fmpz_mat_entry, state)
         fmpz_mat_clear(a);
     }
 
-
-
     TEST_FUNCTION_END(state);
 }

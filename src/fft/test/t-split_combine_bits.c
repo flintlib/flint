@@ -23,7 +23,6 @@ main(void)
     flint_printf("split/combine_bits....");
     fflush(stdout);
 
-
     _flint_rand_init_gmp(state);
 
     for (i = 0; i < 10000; i++)
