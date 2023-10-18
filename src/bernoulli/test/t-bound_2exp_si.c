@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq.h"
 #include "arf.h"
 #include "bernoulli.h"
@@ -18,15 +19,12 @@ double log2bern_approx(double n)
     return 1 + ((n+0.5)*log(n) - n - (n-0.5)*log(2*3.14159265358979323)) * (1. / log(2));
 }
 
-int main(void)
+TEST_FUNCTION_START(bernoulli_bound_2exp_si, state)
 {
     slong i, bound;
     double a, b;
     fmpq_t q;
     arf_t t;
-
-    flint_printf("bound_2exp_si....");
-    fflush(stdout);
 
     fmpq_init(q);
     arf_init(t);
@@ -65,7 +63,5 @@ int main(void)
         }
     }
 
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

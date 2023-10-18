@@ -9,22 +9,20 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "arf.h"
 #include "arith.h"
 #include "bernoulli.h"
 
-int main(void)
+TEST_FUNCTION_START(bernoulli_fmpq_ui, state)
 {
     fmpz * num1;
     fmpz * den1;
     fmpz_t num2;
     fmpz_t den2;
     slong n, N;
-
-    flint_printf("fmpq_ui....");
-    fflush(stdout);
 
     N = 4000 * FLINT_MIN(1.0, 0.1 * flint_test_multiplier());
 
@@ -61,7 +59,5 @@ int main(void)
     fmpz_clear(num2);
     fmpz_clear(den2);
 
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

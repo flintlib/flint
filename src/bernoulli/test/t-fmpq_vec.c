@@ -10,22 +10,19 @@
 */
 
 #include "ulong_extras.h"
+#include "test_helpers.h"
 #include "nmod_poly.h"
 #include "fmpq.h"
 #include "fmpq_vec.h"
 #include "bernoulli.h"
 
-int main(void)
+TEST_FUNCTION_START(bernoulli_fmpq_vec, state)
 {
     slong iter;
     flint_rand_t state;
     slong n, bound;
     mp_limb_t p, pinv, m1, m2;
     nmod_poly_t A;
-
-    flint_printf("fmpq_vec....");
-    fflush(stdout);
-    flint_randinit(state);
 
     bound = 1000 * FLINT_MIN(1.0, 0.1 * flint_test_multiplier());
 
@@ -87,8 +84,5 @@ int main(void)
 
     nmod_poly_clear(A);
 
-    flint_randclear(state);
-    flint_cleanup_master();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
