@@ -9,18 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include <mpfr.h>
 #include "arf.h"
 
-int main(void)
+TEST_FUNCTION_START(arf_set_round_fmpz, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("set_round_fmpz....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     {
         arf_t x, y;
@@ -102,8 +97,5 @@ int main(void)
         arf_clear(y);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

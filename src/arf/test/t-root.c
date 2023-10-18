@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "mpfr.h"
 #include "arf.h"
 
@@ -58,15 +59,9 @@ arf_root_naive(arf_t z, const arf_t x, int k, slong prec, arf_rnd_t rnd)
     return res;
 }
 
-int main(void)
+TEST_FUNCTION_START(arf_root, state)
 {
     slong iter, iter2;
-    flint_rand_t state;
-
-    flint_printf("root....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -136,8 +131,5 @@ int main(void)
         arf_clear(v);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
