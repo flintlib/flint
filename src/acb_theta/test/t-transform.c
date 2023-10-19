@@ -33,7 +33,6 @@ int main(void)
         acb_ptr z;
         fmpz_mat_t mat;
         acb_ptr th, test;
-        slong kappa;
         slong k;
 
         acb_mat_init(tau, g, g);
@@ -48,7 +47,6 @@ int main(void)
             acb_urandom(&z[k], state, prec);
         }
         sp2gz_randtest(mat, state, bits);
-        kappa = acb_theta_transform_kappa(mat);
 
         if (sqr)
         {
@@ -58,7 +56,7 @@ int main(void)
         {
             acb_theta_ql_all(th, z, tau, prec);
         }
-        acb_theta_transform(th, mat, th, z, tau, kappa, sqr, prec);
+        acb_theta_transform(th, mat, th, z, tau, sqr, prec);
 
         acb_siegel_transform_z(z, tau, mat, z, tau, prec);
         acb_modular_theta(&test[3], &test[2], &test[0], &test[1], z,

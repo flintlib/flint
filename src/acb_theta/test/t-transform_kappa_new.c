@@ -30,48 +30,29 @@ int main(void)
         fmpz_mat_t mat;
         fmpz_mat_t x;
         acb_mat_t tau;
-        acb_t sqrtdet, test;
-        slong kappa1, kappa2;
+        acb_t sqrtdet;
+        slong kappa, kappa2;
 
         fmpz_mat_init(mat, 2 * g, 2 * g);
         fmpz_mat_init(x, 2, 2);
         acb_mat_init(tau, g, g);
         acb_init(sqrtdet);
-        acb_init(test);
 
         sp2gz_randtest(mat, state, bits);
         acb_siegel_randtest_nice(tau, state, prec);
-        
-        flint_printf("\n\ntau, mat:\n");
-        acb_mat_printd(tau, 5);
-        fmpz_mat_print_pretty(mat);
-        flint_printf("\n");
 
-        kappa1 = acb_theta_transform_kappa(mat);
-        acb_theta_transform_sqrtdet(test, mat, tau, prec);
+        kappa = acb_theta_transform_kappa_new(sqrtdet, mat, tau, prec);
+        kappa2 = acb_theta_transform_kappa2(mat);
 
-        flint_printf("found kappa = %wd, sqrtdet = ", kappa1);
-        acb_printd(test, 5);
-        flint_printf("\n");
-
-        kappa2 = acb_theta_transform_kappa_new(sqrtdet, mat, tau, prec);
-        flint_printf("found new kappa = %wd, sqrtdet = ", kappa2);
-        acb_printd(sqrtdet, 5);
-        flint_printf("\n");
-
-        if (kappa1 % 4 != kappa2 % 4)
+        if (kappa % 4 != kappa2)
         {
-            flint_printf("FAIL (kappa)\n");
-            flint_abort();
-        }
-
-        if (kappa1 != kappa2)
-        {
-            acb_neg(test, test);
-        }
-        if (!acb_overlaps(test, sqrtdet))
-        {
-            flint_printf("FAIL (sqrtdet)\n");
+            flint_printf("FAIL\n");
+            flint_printf("tau, mat:\n");
+            acb_mat_printd(tau, 5);
+            fmpz_mat_print_pretty(mat);
+            flint_printf("kappa = %wd, kappa2 = %wd, sqrtdet:\n", kappa, kappa2);
+            acb_printd(sqrtdet, 5);
+            flint_printf("\n");
             flint_abort();
         }
 
@@ -79,7 +60,6 @@ int main(void)
         fmpz_mat_clear(x);
         acb_mat_clear(tau);
         acb_clear(sqrtdet);
-        acb_clear(test);
     }
 
     flint_randclear(state);

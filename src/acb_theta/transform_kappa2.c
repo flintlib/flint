@@ -12,10 +12,9 @@
 #include "acb_theta.h"
 
 static slong
-transform_kappa_g1(acb_t sqrtdet, const fmpz_mat_t mat, const fmpz_mat_t x,
-    const acb_mat_t tau, slong prec)
+transform_kappa2_g1(const fmpz_mat_t mat, const fmpz_mat_t x)
 {
-    slong g = acb_mat_nrows(tau);
+    slong g = sp2gz_dim(mat);
     psl2z_t y;
     int R[4];
     int S[4];
@@ -32,10 +31,6 @@ transform_kappa_g1(acb_t sqrtdet, const fmpz_mat_t mat, const fmpz_mat_t x,
     fmpz_set(&y->d, fmpz_mat_entry(x, 1, 1));
 
     acb_modular_theta_transform(R, S, &C, y);
-
-    acb_mul_fmpz(sqrtdet, acb_mat_entry(tau, 0, 0), &y->c, prec);
-    acb_add_fmpz(sqrtdet, sqrtdet, &y->d, prec);
-    acb_sqrt(sqrtdet, sqrtdet, prec);
 
     /* find out where theta_00 is going */
     if (S[2] == 0) /* -theta_3 */
@@ -72,57 +67,41 @@ transform_kappa_g1(acb_t sqrtdet, const fmpz_mat_t mat, const fmpz_mat_t x,
 }
 
 static slong
-transform_kappa_j(acb_t sqrtdet, const fmpz_mat_t mat, const acb_mat_t tau, slong prec)
+transform_kappa2_j(const fmpz_mat_t mat)
 {
     slong g = sp2gz_dim(mat);
     fmpz_mat_t gamma;
-    acb_mat_t tau0;
     slong r, res;
 
     fmpz_mat_window_init(gamma, mat, g, 0, 2 * g, g);
     r = fmpz_mat_rank(gamma);
     fmpz_mat_window_clear(gamma);
 
-    /* Mumford: theta_00(mtau) = det(tau0/i)^{1/2} theta_00(tau), and
-       transform_sqrtdet(tau0) = i^{r/2} det(tau0/i)^{1/2} */
-    acb_mat_window_init(tau0, tau, 0, 0, r, r);
-    acb_theta_transform_sqrtdet_new(sqrtdet, tau0, prec);
-    acb_mat_window_clear(tau0);
-
     res = -r;
     if (r % 2 == 1)
     {
-        acb_mul_onei(sqrtdet, sqrtdet);
         res -= 2;
     }
     return res;
 }
 
 slong
-acb_theta_transform_kappa_new(acb_t sqrtdet, const fmpz_mat_t mat,
-    const acb_mat_t tau, slong prec)
+acb_theta_transform_kappa2(const fmpz_mat_t mat)
 {
-    slong g = acb_mat_nrows(tau);
+    slong g = sp2gz_dim(mat);
     fmpz_mat_struct* dec;
     fmpz_mat_t delta;
     fmpz_t det;
     slong nb_dec;
     fmpz_mat_t x;
-    acb_mat_t w;
-    acb_t c;
     slong k, res, e;
     ulong ab;
 
     fmpz_mat_init(x, 2, 2);
-    acb_mat_init(w, g, g);
-    acb_init(c);
     fmpz_init(det);
     dec = sp2gz_decompose(&nb_dec, mat);
 
-    acb_one(sqrtdet);
-    acb_mat_set(w, tau);
     res = 0;
-
     for (k = nb_dec - 1; k >= 0; k--)
     {
         if (sp2gz_is_trig(&dec[k]) || sp2gz_is_block_diag(&dec[k]))
@@ -132,14 +111,9 @@ acb_theta_transform_kappa_new(acb_t sqrtdet, const fmpz_mat_t mat,
             fmpz_mat_det(det, delta);
             fmpz_mat_window_clear(delta);
 
-            if (fmpz_is_one(det))
+            if (!fmpz_is_one(det))
             {
-                acb_one(c);
-            }
-            else
-            {
-                acb_onei(c);
-                res -= 2;
+                res += 2;
             }
         }
         else if (sp2gz_is_embedded(x, &dec[k]))
@@ -149,21 +123,18 @@ acb_theta_transform_kappa_new(acb_t sqrtdet, const fmpz_mat_t mat,
                     && fmpz_cmp_si(fmpz_mat_entry(x, 1, 1), 0) < 0))
             {
                 fmpz_mat_neg(x, x);
-                res += transform_kappa_g1(c, &dec[k], x, w, prec);
-                acb_div_onei(c, c);
+                res += transform_kappa2_g1(&dec[k], x);
                 res += 2;
             }
             else
             {
-                res += transform_kappa_g1(c, &dec[k], x, w, prec);
+                res += transform_kappa2_g1(&dec[k], x);
             }
         }
         else /* embedded j */
         {
-            res += transform_kappa_j(c, &dec[k], w, prec);
+            res += transform_kappa2_j(&dec[k]);
         }
-        acb_siegel_transform(w, &dec[k], w, prec);
-        acb_mul(sqrtdet, sqrtdet, c, prec);
     }
 
     /* Adjust final sign based on transformation of coordinates */
@@ -177,12 +148,11 @@ acb_theta_transform_kappa_new(acb_t sqrtdet, const fmpz_mat_t mat,
     }
 
     fmpz_mat_clear(x);
-    acb_mat_clear(w);
-    acb_clear(c);
     for (k = 0; k < nb_dec; k++)
     {
         fmpz_mat_clear(&dec[k]);
     }
     flint_free(dec);
-    return res & 7;
+    return res & 3;
 }
+

@@ -13,7 +13,7 @@
 
 static void
 acb_theta_transform_scal(acb_t scal, const fmpz_mat_t mat, acb_srcptr z,
-    const acb_mat_t tau, const slong kappa, slong prec)
+    const acb_mat_t tau, slong kappa, slong prec)
 {
     slong g = sp2gz_dim(mat);
     fmpz_mat_t gamma;
@@ -49,10 +49,11 @@ acb_theta_transform_scal(acb_t scal, const fmpz_mat_t mat, acb_srcptr z,
 
 void
 acb_theta_transform(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th, acb_srcptr z,
-    const acb_mat_t tau, slong kappa, int sqr, slong prec)
+    const acb_mat_t tau, int sqr, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
+    slong kappa;
     acb_mat_t c;
     acb_t scal, x;
 
@@ -60,18 +61,23 @@ acb_theta_transform(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th, acb_srcptr
     acb_init(scal);
     acb_init(x);
 
-    acb_theta_transform_scal(scal, mat, z, tau, kappa, prec);
     if (sqr)
     {
-        acb_sqr(scal, scal, prec);
+        kappa = acb_theta_transform_kappa2(mat);
         acb_siegel_cocycle(c, mat, tau, prec);
         acb_mat_det(x, c, prec);
     }
     else
     {
-        acb_theta_transform_sqrtdet(x, mat, tau, prec);
+        kappa = acb_theta_transform_kappa_new(x, mat, tau, prec);
+    }
+    acb_theta_transform_scal(scal, mat, z, tau, kappa, prec);
+    if (sqr)
+    {
+        acb_sqr(scal, scal, prec);
     }
     acb_mul(scal, scal, x, prec);
+
     acb_theta_transform_proj(res, mat, th, sqr, prec);
     _acb_vec_scalar_mul(res, res, n * n, scal, prec);
 

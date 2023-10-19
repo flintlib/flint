@@ -259,12 +259,12 @@ ulong acb_theta_transform_char(slong* e, const fmpz_mat_t mat, ulong ab);
 void acb_theta_transform_sqrtdet_new(acb_t res, const acb_mat_t tau, slong prec);
 slong acb_theta_transform_kappa_new(acb_t sqrtdet, const fmpz_mat_t mat,
     const acb_mat_t tau, slong prec);
-slong acb_theta_transform_kappa(const fmpz_mat_t mat);
-void acb_theta_transform_sqrtdet(acb_t res, const fmpz_mat_t mat, const acb_mat_t tau, slong prec);
+slong acb_theta_transform_kappa2(const fmpz_mat_t mat);
+
 void acb_theta_transform_proj(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th,
     int sqr, slong prec);
 void acb_theta_transform(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th,
-    acb_srcptr z, const acb_mat_t tau, slong kappa, int sqr, slong prec);
+    acb_srcptr z, const acb_mat_t tau, int sqr, slong prec);
 
 void acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec);
 

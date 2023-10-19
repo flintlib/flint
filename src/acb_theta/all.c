@@ -20,7 +20,6 @@ acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec
     fmpz_mat_t mat;
     acb_mat_t w;
     acb_ptr x, aux;
-    slong kappa;
 
     fmpz_mat_init(mat, 2 * g, 2 * g);
     acb_mat_init(w, g, g);
@@ -53,8 +52,7 @@ acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec
     }
 
     sp2gz_inv(mat, mat);
-    kappa = acb_theta_transform_kappa(mat);
-    acb_theta_transform(th, mat, aux, x, w, kappa, sqr, prec);
+    acb_theta_transform(th, mat, aux, x, w, sqr, prec);
 
     fmpz_mat_clear(mat);
     acb_mat_clear(w);
