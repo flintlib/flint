@@ -9,15 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_factor.h"
 
-int main(void)
+TEST_FUNCTION_START(fmpz_factor_pollard_brent_single, state)
 {
     fmpz_t prime1, prime2, prime3, prime4, primeprod, fac, modval, maxa, maxy, a, y;
     int i, j, k, fails;
-    FLINT_TEST_INIT(state);
 
     fmpz_init(prime1);
     fmpz_init(prime2);
@@ -32,9 +32,6 @@ int main(void)
     fmpz_init(maxy);
 
     fails = 0;
-
-    flint_printf("pollard_brent_single....");
-    fflush(stdout);
 
     for (i = 5; i < 36 && i <= FLINT_BITS; i += 5)
     {
@@ -88,7 +85,6 @@ int main(void)
         flint_abort();
     }
 
-    FLINT_TEST_CLEANUP(state);
     fmpz_clear(prime1);
     fmpz_clear(prime2);
     fmpz_clear(prime3);
@@ -101,6 +97,5 @@ int main(void)
     fmpz_clear(maxa);
     fmpz_clear(maxy);
 
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

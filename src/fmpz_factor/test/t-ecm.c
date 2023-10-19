@@ -9,16 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_factor.h"
 
-int main(void)
+TEST_FUNCTION_START(fmpz_factor_ecm, state)
 {
     fmpz_t prime1, prime2, primeprod, fac, modval;
     int i, j, k, fails;
-
-    FLINT_TEST_INIT(state);
 
     fmpz_init(prime1);
     fmpz_init(prime2);
@@ -27,9 +26,6 @@ int main(void)
     fmpz_init(modval);
 
     fails = 0;
-
-    flint_printf("ecm....");
-    fflush(stdout);
 
     for (i = 35; i <= 50; i += 5)
     {
@@ -104,7 +100,6 @@ int main(void)
     fmpz_clear(primeprod);
     fmpz_clear(fac);
     fmpz_clear(modval);
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+
+    TEST_FUNCTION_END(state);
 }
