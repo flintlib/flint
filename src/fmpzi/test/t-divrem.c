@@ -9,7 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_extras.h"
+#include "test_helpers.h"
 #include "fmpzi.h"
 
 void
@@ -61,15 +61,9 @@ fmpzi_divrem_ref(fmpzi_t q, fmpzi_t r, const fmpzi_t x, const fmpzi_t y)
     fmpz_clear(v);
 }
 
-int main(void)
+TEST_FUNCTION_START(fmpzi_divrem, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("divrem....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -181,8 +175,5 @@ int main(void)
         fmpz_clear(nr);
     }
 
-    flint_randclear(state);
-    flint_cleanup_master();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
