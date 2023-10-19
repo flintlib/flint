@@ -21,12 +21,14 @@ int main(void)
 
     flint_randinit(state);
 
-    /* check sqrt overlaps one of the results, y1 = -y2, no precision loss */
+    /* Test: - acb_sqrts on y = x^2 gives both x and -x
+       - acb_sqrts on a precise number does not lose precision */
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         acb_t x, y1, y2, t;
         arf_t e;
         slong prec = 20 + n_randint(state, 1000);
+        slong mag_bits = n_randint(state, 10);
 
         acb_init(x);
         acb_init(y1);
@@ -34,13 +36,15 @@ int main(void)
         acb_init(t);
         arf_init(e);
 
-        acb_urandom(x, state, prec);
-        acb_sqrt(t, x, prec);
-        acb_sqrts(y1, y2, x, prec);
+        acb_randtest(x, state, prec, mag_bits);
+        acb_sqr(y1, x, prec);
+        acb_sqrts(y1, y2, y1, prec);
+        acb_neg(t, x);
 
-        if (!acb_overlaps(y1, t) && !acb_overlaps(y2, t))
+        if (!(acb_contains(y1, x) && acb_contains(y2, t))
+            && !(acb_contains(y1, t) && acb_contains(y2, x)))
         {
-            flint_printf("FAIL (overlap)\n");
+            flint_printf("FAIL (containment)\n");
             acb_printd(x, 10);
             flint_printf("\n");
             acb_printd(y1, 10);
@@ -50,19 +54,12 @@ int main(void)
             flint_abort();
         }
 
-        acb_neg(y2, y2);
-        if (!acb_equal(y1, y2))
-        {
-            flint_printf("FAIL (negative)\n");
-            acb_printd(y1, 10);
-            flint_printf("\n");
-            acb_printd(y2, 10);
-            flint_printf("\n");
-            flint_abort();
-        }
+        acb_urandom(x, state, prec);
+        acb_sqrts(y1, y2, x, prec);
 
         arf_one(e);
         arf_mul_2exp_si(e, e, -prec / 2 + 10);
+
         acb_get_mid(t, y1);
         acb_add_error_arf(t, e);
         if (!acb_contains(t, y1))
