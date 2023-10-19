@@ -10,19 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "gmpcompat.h"
-#include "fmpz.h"
 #include "fmpq.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_cmp_ui, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("cmp_ui....");
-    fflush(stdout);
 
     for (i = 0; i < 10000; i++)
     {
@@ -67,8 +61,5 @@ main(void)
         mpq_clear(Y);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }

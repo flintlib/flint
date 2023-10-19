@@ -9,17 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpq.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_farey_neighbors, state)
 {
     slong i, q, steps;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("farey_neighbors....");
-    fflush(stdout);
 
     /* walk from -2 to 2 with a known number of steps */
 
@@ -89,8 +85,5 @@ main(void)
         fmpq_clear(right);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

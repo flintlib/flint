@@ -9,20 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
+#include "test_helpers.h"
 #include "fmpq.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_next_calkin_wilf, state)
 {
     slong i;
     fmpq_t r, ans;
 
-    FLINT_TEST_INIT(state);
-
-    flint_printf("next_calkin_wilf....");
-    fflush(stdout);
 
     fmpq_init(r);
     fmpq_init(ans);
@@ -98,7 +92,5 @@ main(void)
     fmpq_clear(r);
     fmpq_clear(ans);
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
