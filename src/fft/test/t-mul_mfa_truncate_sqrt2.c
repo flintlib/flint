@@ -9,18 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "mpn_extras.h"
 #include "fft.h"
 
-int
-main(void)
+TEST_FUNCTION_START(mul_mfa_truncate_sqrt2, state)
 {
     flint_bitcnt_t depth, w;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("mul_mfa_truncate_sqrt2....");
-    fflush(stdout);
 
     _flint_rand_init_gmp(state);
 
@@ -97,8 +92,5 @@ main(void)
         }
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

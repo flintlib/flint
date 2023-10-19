@@ -9,19 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "mpn_extras.h"
 #include "fft.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fft_split_combine_bits, state)
 {
     int i;
     mp_size_t j;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("split/combine_bits....");
-    fflush(stdout);
 
     _flint_rand_init_gmp(state);
 
@@ -65,8 +60,5 @@ main(void)
         flint_free(poly);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
