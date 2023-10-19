@@ -51,9 +51,9 @@ slong sp2gz_nb_fundamental(slong g);
 void sp2gz_fundamental(fmpz_mat_t mat, slong j);
 
 int sp2gz_is_correct(const fmpz_mat_t mat);
+int sp2gz_is_j(const fmpz_mat_t mat);
 int sp2gz_is_block_diag(const fmpz_mat_t mat);
 int sp2gz_is_trig(const fmpz_mat_t mat);
-int sp2gz_is_j(const fmpz_mat_t mat);
 int sp2gz_is_embedded(fmpz_mat_t res, const fmpz_mat_t mat);
 
 void sp2gz_inv(fmpz_mat_t inv, const fmpz_mat_t mat);

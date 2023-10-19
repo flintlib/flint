@@ -81,6 +81,8 @@ References
 
 .. [CraPom2005] \Richard Crandall and Carl Pomerance: Prime numbers: a computational perspective. 2005.
 
+.. [DHBHS2004] \B. Deconinck, M. Heil, A. Bobenko, M.  van Hoeij, and M. Schmies, "Computing Riemann theta functions", Math. Comp. 73:247 (2004), 1417--1442. https://arxiv.org/abs/nlin/0206009
+
 .. [DYF1999] \A. Dzieciol, S. Yngve and P. O. Fröman, "Coulomb wave functions with complex values of the variable and the parameters", J. Math. Phys. 40, 6145 (1999), https://doi.org/10.1063/1.533083
 
 .. [DelegliseNicolasZimmermann2009] \Deleglise, Marc and Niclas, Jean-Louis and Zimmermann, Paul : Landau's function for one million billions, J. Théor. Nombres Bordeaux 20:3 (2009) 625--671
@@ -89,11 +91,15 @@ References
 
 .. [Dup2006] \R. Dupont. "Moyenne arithmético-géométrique, suites de Borchardt et applications." These de doctorat, École polytechnique, Palaiseau (2006). http://http://www.lix.polytechnique.fr/Labo/Regis.Dupont/these_soutenance.pdf
 
+.. [Dup2011] \R. Dupont. "Fast evaluation of modular forms using Newton iterations and the AGM", Math. Comp. 80:275 (2011), 1823--1847. https://doi.org/10.1090/S0025-5718-2011-01880-6
+
 .. [Dus1999] \P. Dusart, "The `k^{th}` prime is greater than `k(\ln k+\ln \ln k-1)` for `k \ge 2`," Math. Comp., 68:225 (January 1999) 411--415.
 
 .. [EHJ2016] \A. Enge, W. Hart and F. Johansson, "Short addition sequences for theta functions", preprint (2016), https://arxiv.org/abs/1608.06810
 
 .. [EM2004] \O. Espinosa and V. Moll, "A generalized polygamma function", Integral Transforms and Special Functions (2004), 101-115.
+
+.. [EK23] \N. D. Elkies and J. Kieffer, "A uniform quasi-linear time algorithm for evaluating theta functions in any dimension", in preparation.
 
 .. [Fie2007] \C. Fieker, "Sparse representation for cyclotomic fields". Experiment. Math. Volume 16, Issue 4 (2007), 493-500. https://doi.org/10.1080/10586458.2007.10129012
 
@@ -110,6 +116,8 @@ References
 .. [GVL1996] \G. H. Golub and C. F. Van Loan, *Matrix Computations*, third edition, Johns Hopkins University Press (1996).
 
 .. [Gas2018]  \D. Gaspard, "Connection formulas between Coulomb wave functions" (2018), https://arxiv.org/abs/1804.10976
+
+.. [Got1959] \E. Gottschling, "Explizite Bestimmung der Randflächen es Fundamentalbereiches der Modulgruppe zweiten Grades'', Math. Annalen 138 (1959), 103--124. https://doi.org/10.1007/BF01342938
 
 .. [GowWag2008] \Jason Gower and Sam Wagstaff : "Square form factoring" Math. Comp. 77, 2008, pp 551-588, https://doi.org/10.1090/S0025-5718-07-02010-8
 
@@ -142,6 +150,8 @@ References
 .. [Hor1972] \Ellis Horowitz : "Algorithms for Rational Function Arithmetic Operations" Annual ACM Symposium on Theory of Computing:  Proceedings of the Fourth Annual ACM Symposium on Theory of Computing (Denver) (1972), https://doi.org/10.1145/800152.804903
 
 .. [Iliopoulos1989] \Iliopoulos, C. S., Worst-Case Complexity Bounds on Algorithms for Computing the Canonical Structure of Finite Abelian Groups and the Hermite and Smith Normal Forms of an Integer Matrix : SIAM J. Computation 18:4 (1989) 658
+
+.. [Igu1972] \J-I. Igusa. *Theta functions*, Springer, 1972. https://doi.org/10.1007/978-3-642-65315-5
 
 .. [JB2018] \F. Johansson and I. Blagouchine. "Computing Stieltjes constants using complex integration", preprint (2018), https://arxiv.org/abs/1804.01679
 
@@ -186,6 +196,8 @@ References
 .. [Kob2010] \A. Kobel, "Certified Complex Numerical Root Finding", Seminar on Computational Geometry and Geometric Computing (2010), http://www.mpi-inf.mpg.de/departments/d1/teaching/ss10/Seminar_CGGC/Slides/02_Kobel_NRS.pdf
 
 .. [Kri2013] \A. Krishnamoorthy and D. Menon, "Matrix Inversion Using Cholesky Decomposition" Proc. of the International Conference on Signal Processing Algorithms, Architectures, Arrangements, and Applications (SPA-2013), pp. 70-72, 2013.
+
+.. [LT2016] \H. Labrande and E. Thomé, "Computing theta functions in quasi-linear time in genus 2 and above", ANTS XII, Kaiserslautern, LMS J. Comp. Math 19 (2016), 163--177. https://doi.org/10.1112/S1461157016000309
 
 .. [Leh1970] \R. S. Lehman, "On the Distribution of Zeros of the Riemann Zeta-Function", Proc. of the London Mathematical Society 20(3) (1970), 303-320, https://doi.org/10.1112/plms/s3-20.2.303
 

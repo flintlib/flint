@@ -14,9 +14,16 @@
 int
 sp2gz_is_correct(const fmpz_mat_t mat)
 {
-    slong g = sp2gz_dim(mat);
+    slong r = fmpz_mat_nrows(mat);
+    slong c = fmpz_mat_ncols(mat);
+    slong g = r / 2;
     fmpz_mat_t J, test;
     int res;
+
+    if (r != c || r % 2 != 0)
+    {
+        return 0;
+    }
 
     fmpz_mat_init(J, 2 * g, 2 * g);
     fmpz_mat_init(test, 2 * g, 2 * g);
