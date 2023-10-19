@@ -9,20 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_mod.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mod_divides, state)
 {
     flint_bitcnt_t max_modulus_bits = 200;
     slong i, j;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("divides....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     {
         fmpz_t p, a, b, c;
@@ -141,8 +135,5 @@ main(void)
         fmpz_clear(u);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
