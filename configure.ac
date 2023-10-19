@@ -29,7 +29,7 @@ AH_TOP(FLINT_COPYRIGHT_C)
 
 AC_PREREQ(2.59)
 
-define(FLINT_VERSION,[3.0.0-dev])
+m4_define(FLINT_VERSION,m4_include([VERSION]))
 
 AC_INIT(FLINT, FLINT_VERSION, [https://github.com/flintlib/flint/issues/], flint, [https://flintlib.org/])
 AC_CONFIG_AUX_DIR([config])
@@ -68,9 +68,6 @@ AC_LANG(C)
 # 3.0.0 => 18.0.0
 
 # NOTE: This must be after AC_INIT
-FLINT_MAJOR=3
-FLINT_MINOR=0
-FLINT_PATCH=0
 FLINT_MAJOR_SO=18
 FLINT_MINOR_SO=0
 FLINT_PATCH_SO=0
@@ -1006,6 +1003,16 @@ fi
 # substitutions and definitions
 ################################################################################
 
+AC_SUBST(FLINT_VERSION_FULL, FLINT_VERSION)
+
+# split version into major/minor/patch using POSIX variable substitutions
+tail=FLINT_VERSION
+FLINT_MAJOR=${tail%%.*}
+tail=${tail#*.}
+FLINT_MINOR=${tail%%.*}
+tail=${tail#*.}
+FLINT_PATCH=${tail%-*}
+
 AC_SUBST(FLINT_MAJOR)
 AC_SUBST(FLINT_MINOR)
 AC_SUBST(FLINT_PATCH)
@@ -1119,7 +1126,7 @@ fi
 # epilog
 ################################################################################
 
-AC_CONFIG_FILES([Makefile flint.pc])
+AC_CONFIG_FILES([Makefile flint.pc src/flint.h])
 AC_OUTPUT
 
 dnl Shorten the original help message

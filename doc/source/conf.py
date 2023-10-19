@@ -25,19 +25,12 @@ project = u'Flint'
 copyright = u'2009-2023, The Flint development team'
 author = u'The Flint development team'
 
-# The short X.Y version
-version = u''
-
-
-for _line in open("../../configure.ac").readlines():
-    if _line.startswith("define(FLINT_VERSION,"):
-        _i1 = _line.find('[')
-        _i2 = _line.find(']', _i1 + 1)
-        version = _line[_i1+1:_i2]
-
 # The full version, including alpha/beta/rc tags
-release = version
+with open("../../VERSION") as f:
+    release = f.read().rstrip()
 
+# The short X.Y version
+version = '.'.join(release.split('.')[0:2])
 
 # -- General configuration ---------------------------------------------------
 

@@ -168,7 +168,7 @@ Conversions
 
     Set ``A`` to the matrix ``B`` reducing modulo the modulus of ``A``.
 
-.. function::  void fmpz_mod_mat_get_fmpz_mat(fmpz_mat_t A, const fmpz_mod_mat_t B)
+.. function:: void fmpz_mod_mat_get_fmpz_mat(fmpz_mat_t A, const fmpz_mod_mat_t B)
 
     Set ``A`` to a lift of ``B``.
 

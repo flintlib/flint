@@ -97,6 +97,11 @@ Basic assignment and manipulation
     Initialises the matrix ``mat`` to the same size as ``src`` and
     sets it to a copy of ``src``.
 
+.. function:: slong fmpz_mat_nrows(const fmpz_mat_t mat)
+              slong fmpz_mat_ncols(const fmpz_mat_t mat)
+
+    Returns respectively the number of rows and columns of the matrix.
+
 .. function:: void fmpz_mat_swap(fmpz_mat_t mat1, fmpz_mat_t mat2)
 
     Swaps two matrices. The dimensions of ``mat1`` and ``mat2``

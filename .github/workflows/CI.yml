@@ -27,7 +27,7 @@ jobs:
       MAKE: "make -j --output-sync=target"
       CC: "gcc"
       TESTCFLAGS: "-Wall -O1"
-      FLINT_TEST_MULTIPLIER: "3" # increase to 10 after workshop ~ 30min
+      FLINT_TEST_MULTIPLIER: "10"
 
     steps:
       - uses: actions/checkout@v4
@@ -86,7 +86,7 @@ jobs:
       MAKE: "make -j --output-sync=target"
       CC: "gcc"
       CFLAGS: "-Wall -Werror=implicit-function-declaration"
-      FLINT_TEST_MULTIPLIER: "1" # increase to 2 after workshop ~ 15min
+      FLINT_TEST_MULTIPLIER: "2"
 
     steps:
       - uses: actions/checkout@v4
@@ -139,7 +139,7 @@ jobs:
       CFLAGS: "-Wall"
       EXTRA_OPTIONS: "--disable-static --enable-shared"
       CC: "gcc"
-      FLINT_TEST_MULTIPLIER: "1" # increase to 3 after workshop ~ 10min
+      FLINT_TEST_MULTIPLIER: "3"
 
     steps:
       - uses: actions/checkout@v4
@@ -353,7 +353,7 @@ jobs:
       CFLAGS: "-Wall"
       CC: "clang"
       EXTRA_OPTIONS: "--disable-static --enable-shared"
-      FLINT_TEST_MULTIPLIER: "1" # increase to 5 after workshop
+      FLINT_TEST_MULTIPLIER: "5"
 
     steps:
       - uses: actions/checkout@v4

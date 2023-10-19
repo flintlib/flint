@@ -12,6 +12,7 @@ src/fmpz/fmpz.c
 src/config.h
 src/config.h.in
 src/fft_tuning.h
+src/flint.h
 src/flint-config.h
 build/
 config/

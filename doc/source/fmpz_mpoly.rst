@@ -892,7 +892,7 @@ Vectors
 
     A type holding a vector of :type:`fmpz_mpoly_t`.
 
-.. macro::  fmpz_mpoly_vec_entry(vec, i)
+.. macro:: fmpz_mpoly_vec_entry(vec, i)
 
     Macro for accessing the entry at position *i* in *vec*.
 
@@ -900,7 +900,7 @@ Vectors
 
     Initializes *vec* to a vector of length *len*, setting all entries to the zero polynomial.
 
-.. function::void fmpz_mpoly_vec_clear(fmpz_mpoly_vec_t vec, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_vec_clear(fmpz_mpoly_vec_t vec, const fmpz_mpoly_ctx_t ctx)
 
     Clears *vec*, freeing its allocated memory.
 
@@ -983,12 +983,6 @@ in place of monic rational polynomials.
     Assumes that *G* is a Gröbner basis.
     This produces a reduced Gröbner basis, which is unique
     (up to the sort order of the entries in the vector).
-
-.. function:: pair_t fmpz_mpoly_select_pop_pair(pairs_t pairs, const fmpz_mpoly_vec_t G, const fmpz_mpoly_ctx_t ctx)
-
-    Given a vector *pairs* of indices `(i, j)` into *G*, selects one pair
-    for elimination in Buchberger's algorithm. The pair is removed
-    from *pairs* and returned.
 
 .. function:: void fmpz_mpoly_buchberger_naive(fmpz_mpoly_vec_t G, const fmpz_mpoly_vec_t F, const fmpz_mpoly_ctx_t ctx)
 

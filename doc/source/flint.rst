@@ -31,8 +31,10 @@ to avoid problems with integer promotion.
 Similar to the previous macro, ``FLINT_MAX(x, y)`` returns the
 maximum of `x` and `y`.
 
-The function ``FLINT_BIT_COUNT(x)`` returns the number of binary bits
-required to represent an ``ulong x``.  If `x` is zero, returns `0`.
+.. function:: mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
+
+    Returns the number of binary bits required to represent an ``ulong x``.  If
+    `x` is zero, returns `0`.
 
 Derived from this there are the two macros ``FLINT_FLOG2(x)`` and
 ``FLINT_CLOG2(x)`` which, for any `x \geq 1`, compute `\lfloor \log_2 x  \rfloor`
@@ -116,20 +118,20 @@ internal representation of numbers (using limb arrays).
 Allocation Functions
 -----------------------------------------------
 
-.. function::  void * flint_malloc(size_t size)
+.. function:: void * flint_malloc(size_t size)
 
    Allocate ``size`` bytes of memory.
 
-.. function::  void * flint_realloc(void * ptr, size_t size)
+.. function:: void * flint_realloc(void * ptr, size_t size)
 
    Reallocate an area of memory previously allocated by :func:`flint_malloc`,
    :func:`flint_realloc`, or :func:`flint_calloc`.
 
-.. function::  void * flint_calloc(size_t num, size_t size)
+.. function:: void * flint_calloc(size_t num, size_t size)
 
    Allocate ``num`` objects of ``size`` bytes each, and zero the allocated memory.
 
-.. function ::   void flint_free(void * ptr)       
+.. function:: void flint_free(void * ptr)
 
    Free a section of memory allocated by  :func:`flint_malloc`,
    :func:`flint_realloc`, or :func:`flint_calloc`.
@@ -152,7 +154,7 @@ Random Numbers
     The random state is not initialised.
 
 .. function:: void flint_rand_free(flint_rand_s * state)
-   
+
     Frees a random state object as allocated using :func:`flint_rand_alloc`.
 
 
@@ -200,7 +202,7 @@ Thread functions
     Assumes that the Flint thread pool is already set up.
 
     The function returns the old number of worker threads that can be started.
-    
+
     The function can only be used to reduce the number of workers that can be
     started from a thread. It cannot be used to increase the number. If a
     higher number is passed, the function has no effect.
@@ -223,10 +225,10 @@ Thread functions
 Input/Output
 -----------------
 
-.. function::  int flint_printf(const char * str, ...)
-               int flint_vprintf(const char * str, va_list ap)
-               int flint_fprintf(FILE * f, const char * str, ...)
-               int flint_sprintf(char * s, const char * str, ...)
+.. function:: int flint_printf(const char * str, ...)
+              int flint_vprintf(const char * str, va_list ap)
+              int flint_fprintf(FILE * f, const char * str, ...)
+              int flint_sprintf(char * s, const char * str, ...)
 
     These are equivalent to the standard library functions ``printf``,
     ``vprintf``, ``fprintf``, and ``sprintf`` with an additional length modifier
@@ -234,10 +236,10 @@ Input/Output
     format specifiers "d", "x", or "u", thereby outputting the limb as a signed
     decimal, hexadecimal, or unsigned decimal integer.
 
-           
-.. function::  int flint_scanf(const char * str, ...)
-               int flint_fscanf(FILE * f, const char * str, ...)
-               int flint_sscanf(const char * s, const char * str, ...)
+
+.. function:: int flint_scanf(const char * str, ...)
+              int flint_fscanf(FILE * f, const char * str, ...)
+              int flint_sscanf(const char * s, const char * str, ...)
 
      These are equivalent to the standard library functions ``scanf``,
      ``fscanf``, and ``sscanf`` with an additional length modifier "w" for
