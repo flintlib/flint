@@ -44,16 +44,19 @@ void sp2gz_set_blocks(fmpz_mat_t mat, const fmpz_mat_t alpha, const fmpz_mat_t b
 void sp2gz_j(fmpz_mat_t mat);
 void sp2gz_block_diag(fmpz_mat_t mat, const fmpz_mat_t U);
 void sp2gz_trig(fmpz_mat_t mat, const fmpz_mat_t S);
+void sp2gz_embed(fmpz_mat_t res, const fmpz_mat_t mat);
+void sp2gz_restrict(fmpz_mat_t res, const fmpz_mat_t mat);
+
 slong sp2gz_nb_fundamental(slong g);
 void sp2gz_fundamental(fmpz_mat_t mat, slong j);
 
-void sp2gz_inv(fmpz_mat_t inv, const fmpz_mat_t mat);
 int sp2gz_is_correct(const fmpz_mat_t mat);
 int sp2gz_is_block_diag(const fmpz_mat_t mat);
 int sp2gz_is_trig(const fmpz_mat_t mat);
 int sp2gz_is_j(const fmpz_mat_t mat);
-void sp2gz_embed(fmpz_mat_t res, const fmpz_mat_t mat);
-void sp2gz_restrict(fmpz_mat_t res, const fmpz_mat_t mat);
+int sp2gz_is_embedded(fmpz_mat_t res, const fmpz_mat_t mat);
+
+void sp2gz_inv(fmpz_mat_t inv, const fmpz_mat_t mat);
 fmpz_mat_struct* sp2gz_decompose(slong* nb, const fmpz_mat_t mat);
 
 void sp2gz_randtest(fmpz_mat_t mat, flint_rand_t state, slong bits);
