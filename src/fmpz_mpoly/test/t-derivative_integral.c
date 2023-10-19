@@ -9,17 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mpoly_derivative_integral, state)
 {
     int i, j, result;
     slong tmul = 5;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("derivative/integral....");
-    fflush(stdout);
 
     /* randomized testing doesn't catch exponent overflow in integral */
     {
@@ -286,7 +282,5 @@ main(void)
         fmpz_mpoly_clear(f1, ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

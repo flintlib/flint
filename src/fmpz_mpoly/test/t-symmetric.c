@@ -9,18 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "calcium.h"
+#include "test_helpers.h"
 #include "fmpz_mpoly.h"
 
-int main(void)
+TEST_FUNCTION_START(fmpz_mpoly_symmetric, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("fmpz_mpoly_symmetric...");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* todo; this does noting useful right now except verifying
        that the function can be called */
@@ -46,8 +40,5 @@ int main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

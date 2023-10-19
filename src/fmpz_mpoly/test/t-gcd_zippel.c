@@ -9,16 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mpoly_gcd_zippel, state)
 {
     slong i, j;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("gcd_zippel....");
-    fflush(stdout);
 
     /* examples from Zippel's 1979 paper */
     if (1) {
@@ -252,8 +248,5 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
-    printf("PASS\n");
-    FLINT_TEST_CLEANUP(state);
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }
