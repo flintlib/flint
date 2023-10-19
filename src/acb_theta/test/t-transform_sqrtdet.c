@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("transform_sqrtdet_new....");
+    flint_printf("transform_sqrtdet....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -35,7 +35,7 @@ int main(void)
         acb_init(t);
 
         acb_siegel_randtest(tau, state, prec, mag_bits);
-        acb_theta_transform_sqrtdet_new(r, tau, prec);
+        acb_theta_transform_sqrtdet(r, tau, prec);
         acb_sqr(r, r, prec);
         acb_mat_det(t, tau, prec);
 

@@ -86,7 +86,7 @@ transform_kappa_j(acb_t sqrtdet, const fmpz_mat_t mat, const acb_mat_t tau, slon
     /* Mumford: theta_00(mtau) = det(tau0/i)^{1/2} theta_00(tau), and
        transform_sqrtdet(tau0) = i^{r/2} det(tau0/i)^{1/2} */
     acb_mat_window_init(tau0, tau, 0, 0, r, r);
-    acb_theta_transform_sqrtdet_new(sqrtdet, tau0, prec);
+    acb_theta_transform_sqrtdet(sqrtdet, tau0, prec);
     acb_mat_window_clear(tau0);
 
     res = -r;
@@ -99,7 +99,7 @@ transform_kappa_j(acb_t sqrtdet, const fmpz_mat_t mat, const acb_mat_t tau, slon
 }
 
 slong
-acb_theta_transform_kappa_new(acb_t sqrtdet, const fmpz_mat_t mat,
+acb_theta_transform_kappa(acb_t sqrtdet, const fmpz_mat_t mat,
     const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);

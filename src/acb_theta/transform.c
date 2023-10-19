@@ -69,7 +69,7 @@ acb_theta_transform(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th, acb_srcptr
     }
     else
     {
-        kappa = acb_theta_transform_kappa_new(x, mat, tau, prec);
+        kappa = acb_theta_transform_kappa(x, mat, tau, prec);
     }
     acb_theta_transform_scal(scal, mat, z, tau, kappa, prec);
     if (sqr)

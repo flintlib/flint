@@ -256,8 +256,8 @@ void acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong 
 /* Transformation formulas */
 
 ulong acb_theta_transform_char(slong* e, const fmpz_mat_t mat, ulong ab);
-void acb_theta_transform_sqrtdet_new(acb_t res, const acb_mat_t tau, slong prec);
-slong acb_theta_transform_kappa_new(acb_t sqrtdet, const fmpz_mat_t mat,
+void acb_theta_transform_sqrtdet(acb_t res, const acb_mat_t tau, slong prec);
+slong acb_theta_transform_kappa(acb_t sqrtdet, const fmpz_mat_t mat,
     const acb_mat_t tau, slong prec);
 slong acb_theta_transform_kappa2(const fmpz_mat_t mat);
 

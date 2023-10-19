@@ -41,7 +41,7 @@ acb_theta_sqrt_branch(acb_t res, const acb_t x, acb_srcptr rts_neg, slong nb_neg
     acb_clear(t);
 }
 
-void acb_theta_transform_sqrtdet_new(acb_t res, const acb_mat_t tau, slong prec)
+void acb_theta_transform_sqrtdet(acb_t res, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     flint_rand_t state;

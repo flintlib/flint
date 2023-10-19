@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("transform_kappa_new....");
+    flint_printf("transform_kappa....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -41,7 +41,7 @@ int main(void)
         sp2gz_randtest(mat, state, bits);
         acb_siegel_randtest_nice(tau, state, prec);
 
-        kappa = acb_theta_transform_kappa_new(sqrtdet, mat, tau, prec);
+        kappa = acb_theta_transform_kappa(sqrtdet, mat, tau, prec);
         kappa2 = acb_theta_transform_kappa2(mat);
 
         if (kappa % 4 != kappa2)
