@@ -10,12 +10,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "thread_support.h"
 #include "fmpz.h"
 #include "fmpz_mod_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mod_mat_mul_classical_threaded, state)
 {
 #if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     slong i, max_threads = 5;
@@ -23,13 +23,7 @@ main(void)
 #ifdef _WIN32
     tmul = 50;
 #endif
-#endif
-    FLINT_TEST_INIT(state);
 
-    flint_printf("mul_classical_threaded....");
-    fflush(stdout);
-
-#if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mod_mat_t A, B, C, D;
@@ -80,13 +74,8 @@ main(void)
         fmpz_clear(mod);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
+    TEST_FUNCTION_END(state);
 #else
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("SKIPPED\n");
+    TEST_FUNCTION_END_SKIPPED(state);
 #endif
-    return 0;
 }

@@ -15,16 +15,12 @@
 #include "fmpz_mod.h"
 #include "fmpz_mod_mat.h"
 
-int main(void)
+TEST_FUNCTION_START(fmpz_mod_mat_inv, state)
 {
     fmpz_mod_mat_t A, B, C, I;
     fmpz_mod_ctx_t ctx;
     slong i, j, m, r;
     int result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("inv....");
-    fflush(stdout);
 
     for (i = 0; i < 5 * flint_test_multiplier(); i++)
     {
@@ -90,8 +86,5 @@ int main(void)
         fmpz_mod_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

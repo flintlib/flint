@@ -9,17 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_mod_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mod_mat_add_sub_neg, state)
 {
     slong m, n, rep;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("add/sub/neg....");
-    fflush(stdout);
 
     for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
     {
@@ -57,11 +53,8 @@ main(void)
         fmpz_mod_mat_clear(A);
         fmpz_mod_mat_clear(B);
         fmpz_mod_mat_clear(C);
-	fmpz_clear(mod);
+        fmpz_clear(mod);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
