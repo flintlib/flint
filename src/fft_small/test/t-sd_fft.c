@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "nmod.h"
 #include "ulong_extras.h"
 #include "fft_small.h"
@@ -22,6 +23,9 @@ vec1d vec1d_eval_poly_mod(const vec1d* a, ulong an, const vec1d b, const vec1d n
     return vec1d_reduce_to_pm1n(x, n, ninv);
 }
 
+/* Defined in t-mul.c and t-sd_fft.c */
+#ifndef flint_print_d_fixed
+#define flint_print_d_fixed flint_print_d_fixed
 void flint_print_d_fixed(double x, ulong l)
 {
     ulong i;
@@ -46,6 +50,7 @@ void flint_print_d_fixed(double x, ulong l)
 
     TMP_END;
 }
+#endif
 
 void test_v2_fft(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flint_rand_t state)
 {
@@ -148,13 +153,8 @@ void test_v2_fft(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flint_rand
     fflush(stdout);
 }
 
-int main(void)
+TEST_FUNCTION_START(sd_fft, state)
 {
-    FLINT_TEST_INIT(state);
-
-    flint_printf("sd_fft....");
-    fflush(stdout);
-
     {
         sd_fft_ctx_t Q;
         sd_fft_ctx_init_prime(Q, UWORD(0x0003f00000000001));
@@ -162,8 +162,5 @@ int main(void)
         sd_fft_ctx_clear(Q);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

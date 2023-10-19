@@ -9,10 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fft_small.h"
 #include "machine_vectors.h"
 
+/* Defined in t-mul.c and t-sd_fft.c */
+#ifndef flint_print_d_fixed
+#define flint_print_d_fixed flint_print_d_fixed
 void flint_print_d_fixed(double x, ulong l)
 {
     ulong i;
@@ -37,6 +41,7 @@ void flint_print_d_fixed(double x, ulong l)
 
     TMP_END;
 }
+#endif
 
 void test_mul(mpn_ctx_t R, ulong minsize, ulong maxsize, ulong nreps, flint_rand_t state)
 {
@@ -119,13 +124,8 @@ void test_mul(mpn_ctx_t R, ulong minsize, ulong maxsize, ulong nreps, flint_rand
     fflush(stdout);
 }
 
-int main(void)
+TEST_FUNCTION_START(mpn_ctx_mpn_mul, state)
 {
-    FLINT_TEST_INIT(state);
-
-    flint_printf("mpn_mul....");
-    fflush(stdout);
-
     {
         mpn_ctx_t R;
         mpn_ctx_init(R, UWORD(0x0003f00000000001));
@@ -133,8 +133,5 @@ int main(void)
         mpn_ctx_clear(R);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

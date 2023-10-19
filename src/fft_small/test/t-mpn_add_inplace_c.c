@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "mpn_extras.h"
 #include "fft_small.h"
@@ -34,13 +35,9 @@
             flint_abort(); \
         }
 
-int main(void)
+TEST_FUNCTION_START(flint_mpn_add_inplace_c, state)
 {
-    FLINT_TEST_INIT(state);
     slong iter;
-
-    flint_printf("mpn_add_inplace_c....");
-    fflush(stdout);
 
     _flint_rand_init_gmp(state);
 
@@ -98,8 +95,5 @@ int main(void)
         TEST_SUB(8)
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
