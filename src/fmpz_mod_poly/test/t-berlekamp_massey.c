@@ -9,22 +9,18 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mod_poly_berlekamp_massey, state)
 {
     slong i, j, k, l;
     fmpz_mod_ctx_t ctx;
-    FLINT_TEST_INIT(state);
 
     fmpz_mod_ctx_init_ui(ctx, 101);
-
-    flint_printf("berlekamp_massey....");
-    fflush(stdout);
 
     {
         fmpz_mod_berlekamp_massey_t B;
@@ -155,8 +151,6 @@ main(void)
     }
 
     fmpz_mod_ctx_clear(ctx);
-    FLINT_TEST_CLEANUP(state);
 
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

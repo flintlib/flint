@@ -12,24 +12,20 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded, state)
 {
     int i;
     int tmul = 200;
     fmpz_mod_ctx_t ctx;
-    FLINT_TEST_INIT(state);
 #ifdef _WIN32
     tmul = 1;
 #endif
-
-    flint_printf("compose_mod_brent_kung_vec_preinv_threaded....");
-    fflush(stdout);
 
     fmpz_mod_ctx_init_ui(ctx, 2);
 
@@ -106,8 +102,6 @@ main(void)
     }
 
     fmpz_mod_ctx_clear(ctx);
-    FLINT_TEST_CLEANUP(state);
 
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

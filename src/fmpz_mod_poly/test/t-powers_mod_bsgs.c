@@ -9,23 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mod_poly_powers_mod_bsgs, state)
 {
 #if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     int i, result, max_threads = 5;
     fmpz_mod_ctx_t ctx;
-#endif
-    FLINT_TEST_INIT(state);
-
-    flint_printf("powers_mod_bsgs....");
-    fflush(stdout);
-
-#if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
 
     fmpz_mod_ctx_init_ui(ctx, 2);
 
@@ -103,14 +96,9 @@ main(void)
     }
 
     fmpz_mod_ctx_clear(ctx);
-    FLINT_TEST_CLEANUP(state);
 
-    flint_printf("PASS\n");
+    TEST_FUNCTION_END(state);
 #else
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("SKIPPED\n");
+    TEST_FUNCTION_END_SKIPPED(state);
 #endif
-
-    return 0;
 }

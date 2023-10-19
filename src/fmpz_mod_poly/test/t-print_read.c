@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -11,22 +12,23 @@
 
 /* try to get fdopen declared */
 #if defined __STRICT_ANSI__
-#undef __STRICT_ANSI__
+# undef __STRICT_ANSI__
 #endif
 
-#include <sys/types.h>
 #if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER)
-#include <unistd.h>
+# include <stdlib.h>
+# include <sys/wait.h>
+# include <unistd.h>
 #endif
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 
-#if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER)
-
-int main(void)
+TEST_FUNCTION_START(fmpz_mod_poly_print_read, state)
 {
+#if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER)
     int i, j, n, result;
 
     FILE *in, *out;
@@ -34,14 +36,9 @@ int main(void)
     pid_t childpid;
     fmpz_mod_ctx_t ctx;
 
-    FLINT_TEST_INIT(state);
-
     n = 100 * flint_test_multiplier();
 
     fmpz_mod_ctx_init_ui(ctx, 2);
-
-    flint_printf("print/ read....");
-    fflush(stdout);
 
     /* Randomise n polynomials, write to and read from a pipe */
     {
@@ -103,7 +100,7 @@ int main(void)
                 fmpz_mod_poly_clear(a[j], ctx);
             flint_free(a);
             fclose(out);
-            return 0;
+            exit(0);
         }
         else  /* Parent process */
         {
@@ -154,6 +151,7 @@ int main(void)
             fmpz_mod_poly_clear(t, newctx);
             fmpz_mod_ctx_clear(newctx);
             fclose(in);
+            waitpid(childpid, NULL, 0);
         }
 
         if (i != n)
@@ -211,7 +209,7 @@ int main(void)
             }
 
             fclose(out);
-            return 0;
+            exit(0);
         }
         else  /* Parent process */
         {
@@ -250,24 +248,14 @@ int main(void)
             fmpz_mod_poly_clear(t, newctx);
             fmpz_mod_ctx_clear(newctx);
             fclose(in);
+            waitpid(childpid, NULL, 0);
         }
     }
 
     fmpz_mod_ctx_clear(ctx);
-    FLINT_TEST_CLEANUP(state);
 
-    flint_printf("PASS\n");
-    return 0;
-}
-
+    TEST_FUNCTION_END(state);
 #else
-
-int main(void)
-{
-    flint_printf("print/ read....");
-    fflush(stdout);
-    flint_printf("SKIPPED\n");
-    return 0;
-}
-
+    TEST_FUNCTION_END_SKIPPED(state);
 #endif
+}
