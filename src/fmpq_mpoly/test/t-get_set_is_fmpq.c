@@ -9,17 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq_mpoly.h"
-#include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_mpoly_get_set_is_fmpq, state)
 {
     slong i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("get_set_is_fmpq....");
-    fflush(stdout);
 
     /* Set to random integer and compare */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -78,8 +73,5 @@ main(void)
         fmpq_clear(d);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
