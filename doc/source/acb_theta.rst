@@ -694,7 +694,6 @@ Naive algorithms: main user functions
         \theta_{a,b}(z,\tau) = \exp(\pi i \tfrac{a^T}{2} \tau \tfrac a2)
         \exp(\pi i a^T(z + \tfrac b 2)) \theta_{0,b}(z + \tau \tfrac{a}{2}, \tau).
 
-
 Naive algorithms for derivatives: derivation tuples and bounds
 -------------------------------------------------------------------------------
 
@@ -798,7 +797,6 @@ differentiated series:
     :func:`acb_theta_jet_naive_radius`, we set the radius of *E* to be *R2* and
     set `u = e^{\pi y^T Y^{-1} y}\cdot \mathit{eps}`.
 
-
 Naive algorithms for derivatives: main user functions
 -------------------------------------------------------------------------------
 
@@ -838,660 +836,428 @@ Naive algorithms for derivatives: main user functions
     `(z_0,\tau_0)` and `(z_1,\tau_1)` up to total order *ord* differ by at most
     *err* elementwise.
 
-\subsection{Quasi-linear algorithms on the reduced domain}
+Quasi-linear algorithms on the reduced domain: presentation
+-------------------------------------------------------------------------------
 
-\subsubsection{A simple case: theta constants for `g=1`}
+We refer to [EK2023]_ for a detailed description of the quasi-linear algorithm
+implemented here. In a nutshell, the algorithm relies on the following
+duplication formula:
 
-In this section, we present the quasi-linear algorithm in the simple case
-`g=1` and `z=0`, with the hope that it will make the general case easier
-to follow.
+    .. math ::
 
-The algorithm is based on a \emph{duplication formula}: such formulas typically
-related theta values at `\tau` and `2\tau`, and look like taking a step in
-an arithmetic-geometric (AGM) sequence. For instance, one has for any `g`:
-\begin{displaymath}
-  \theta_{0,b}(0,2\tau)^2 = 2^{-g} \sum_{b'\in (\mathbb{Z}/2\mathbb{Z})^g}
-  \theta_{0,b'}(0,\tau) \theta_{0, b+b'}(0,\tau).
-\end{displaymath}
-When `g=1`, this becomes
-\begin{displaymath}
-  \theta_0(0,2\tau)^2 = \tfrac12(\theta_0(0,\tau)^2 + \theta_{1}(0,\tau)^2),
-  \quad \theta_1(0,2\tau)^2 = \theta_0(0,\tau)\theta_1(0,\tau).
-\end{displaymath}
-This is the formula that is used (in a convoluted way, using limits of
-AGM sequences and a Newton scheme) to obtain quasi-linear algorithms for theta
-values in low genera in \cite{dupont,labrande,kieffer}.
+        \theta_{a,0}(z,\tau) \theta_{a,0}(z',\tau) = \sum_{a'\in(\mathbb{Z}/2\mathbb{Z})^g}
+        \theta_{a',0}(z+z',2\tau) \theta_{a+a',0}(z-z',2\tau).
 
-Here we describe a new algorithm which consists of using the duplication
-formula without any Newton scheme. We just use duplications to transform `\tau`
-into a point of `\mathbb{H}_g` where theta values are easier to evaluate using
-the naive algorithm. Indeed, if `\lambda` denotes the smallest eigenvalue of
-`\mathrm{Im}(\tau)`, then the number of lattice points to consider in the naive
-algorithm to obtain theta values at absolute precision *prec} is
-`O((*prec}/\lambda)^{g/2})`. Thus replacing `\tau` by `2\tau` divides
-this number by `2^{g/2}`. This is already a huge gain, and the quasi-linear
-algorithm will perform roughly `\log_2(*prec})` such duplication steps.
+In particular,
 
-Clearly, to apply this strategy, the previous formula expressing theta values
-at `2\tau` in terms of values at `\tau` goes in the wrong direction. Instead,
-we use a formula relating the values `\theta_{a,0}` for
-`a\in (\mathbb{Z}/2\mathbb{Z})^g`:
-\begin{displaymath}
-  \theta_{a,0}(0,\tau)^2 = \sum_{a'\in (\mathbb{Z}/2\mathbb{Z})^g}
-  \theta_{a',0}(0,2\tau)\theta_{a+a',0}(0,2\tau).
-\end{displaymath}
-When `g=1`, this becomes
-\begin{displaymath}
-  \theta_0(0,\tau)^2 = \theta_0(0,2\tau)^2 + \theta_2(0,2\tau)^2,\quad
-  \theta_2(0,\tau)^2 = 2\theta_0(0,2\tau)\theta_2(0,2\tau).
-\end{displaymath}
-We will explain later how to obtain all the theta values
-`\theta_{a,b}(0,\tau)`, not just `\theta_{a,0}`. For now, we focus on how to
-obtain a quasi-linear algorithm for computing `\theta_{a,0}` from this formula
-in the case `g=1`. We can assume that `\tau` belongs to the usual fundamental
-domain for the action of `\mathrm{SL}_2(\mathbb{Z})` thanks to the
-transformation formula.
+    .. math ::
 
-At each step, we will have to extract square roots to compute
-`\theta_{a,0}(0,\tau)` from `\theta_{a,0}(0,\tau)^2`. We have to worry about 1)
-the choice of sign, and 2) precision losses, since `\theta_{a,0}(0,\tau)` tends
-to zero rapidly as the imaginary part of `\tau` gets large when `a\neq 0`. For
-simplicity, we now restrict to `g=1`. We examine the series in terms of
-`q = \exp(\pi i\tau)`:
-\begin{displaymath}
-  \theta_0(0,\tau) = 1 + 2q + 2q^4 + \cdots, \quad \theta_2(0,\tau) = 2q^{1/4} + 2q^{9/4} + \cdots
-\end{displaymath}
-Thus `\theta_{0}(0,2^n\tau)` tends to `1` as `n\to \infty`: this means that
-taking square roots at each step loses just `O(1)` bits of absolute precision,
-and that it is easy to determine the correct choice of sign, since we just have
-to run the naive algorithm at precision `O(1)` at each step. (Indeed, we could
-just say that the correct square root is the one closest to `1`, but we won't
-have such a shortcut for general `g`).
+        \begin{aligned}
+        \theta_{a,0}(z,\tau)^2 &= \sum_{a'\in (\mathbb{Z}/2\mathbb{Z})^g}
+        \theta_{a',0}(2z,2\tau) \theta_{a+a',0}(0,2\tau),\\
+        \theta_{a,0}(0,\tau)\theta_{a,0}(z,\tau) &= \sum_{a'\in(\mathbb{Z}/2\mathbb{Z})^g}
+        \theta_{a',0}(z,2\tau) \theta_{a+a',0}(z,2\tau), \\
+        \theta_{a,0}(0,\tau)^2 &= \sum_{a'\in (\mathbb{Z}/2\mathbb{Z})^g}
+        \theta_{a',0}(0,2\tau) \theta_{a+a',0}(0,2\tau).
+        \end{aligned}
 
-What about `\theta_2`? If `y` denotes the imaginary part of `\tau`, then one
-can expect (and it's easy to show in the `g=1` case) that
-`|\theta_{2}(0,\tau)|` is roughly `2\exp(-\pi y/4)`. Taking a square root will
-lead to a large precision loss in terms of absolute precision, so it is better
-to think in terms of relative precision, or rather some kind of ``shifted
-absolute precision'': if we compute `\theta_2(0,\tau)^2` up to an absolute
-error of `\exp(-\pi (2y)/4) 2^{-\mathit{prec}}`, then we get `\theta_2(0,\tau)`
-up to an absolute error of `\exp(-\pi y/4) 2^{-\mathit{prec}}`, with `O(1)`
-bits of precision loss.
+These formulas can actually be generalized to compute all theta values, not
+just `\theta_{a,0}`: for instance, we have
 
-How do these shifted absolute precisions interact in the duplication formula?
-For
-\begin{displaymath}
-  \theta_0(0,\tau)^2 = \theta_0(0,2\tau)^2 + \theta_2(0,2\tau)^2,
-\end{displaymath}
-we're fine: we know `\theta_2(0,2\tau)` to a larger precision than
-necessary. For
-\begin{displaymath}
-  \theta_2(0,\tau)^2 = 2\theta_0(0,2\tau)\theta_2(0,2\tau),
-\end{displaymath}
-we're also fine: we get `2\theta_0(0,2\tau)\theta_2(0,2\tau)` up to an error of
-`\exp(-\pi (2y)/4)2^{-\mathit{prec}}`, which is exactly what we want, with
-`O(1)` bits of precision lost.  We note in passing that we can also determine
-the correct choice of square root of each step for `\theta_2(0,\tau)` using the
-naive algorithm on `O(1)` lattice points.
+    .. math ::
 
-In the quasi-linear algorithm, we perform `n\simeq \log_2(\mathit{prec})` such
-duplication steps. We initialize at `2^n\tau` using the naive algorithm. We
-need `\theta_0(0,2^n\tau)` to an absolute precision *prec} (plus maybe a
-logarithmic number of guard bits to account for precision losses at each step):
-for this we need `O(1)` lattice points in the naive algorithm. We also need
-`\theta_2(0,2^n\tau)` to an absolute precision
-`\mathit{prec} + \frac{\pi}{\log(2)2^{n-2}`, which is still
-`O(\mathit{prec})`. So we also need only `O(1)` lattice points to run the naive
-algorithm and compute `\theta_2(0,2^n\tau)` to the right precision.
+        \theta_{a,b}(0,\tau)^2 = \sum_{a'\in (\mathbb{Z}/2\mathbb{Z})^g} (-1)^{a'^Tb}
+        \theta_{a',0}(0,2\tau)\theta_{a+a',0}(0,2\tau).
 
-To conclude the `g=1` case, we explain how to recover all the theta values, not
-just `\theta_{a,0}`. In fact, we have
-\begin{displaymath}
-  \theta_{a,b}(0,\tau)^2 = \sum_{a'\in (\mathbb{Z}/2\mathbb{Z})^g} (-1)^{a'^Tb}
-  \theta_{a',0}(0,2\tau)\theta_{a+a',0}(0,2\tau).
-\end{displaymath}
-Thus, if we want the squared theta values `\theta_{a,b}`, it is enough to
-compute `\theta_{a,0}` at `2\tau` for all `a`. If we want the actual values, we
-add one last square-root step.
+Analogous formulas in the other cases hold as well. Applying one of these
+duplication formulas amounts to taking a step in a (generalized) AGM sequence.
 
-Finally, here are some indications of how the above strategy will
-generalize to any `g`.
-\begin{enumerate}
-\item The concept of shifted absolute precision is important. We expect that
-  `|\theta_{a,0}(0,\tau)|` is roughly `e^{-d^2}`, where `d` denotes the
-  distance between `0` and `\mathbb{Z}^g + \tfrac a2` for the distance attached
-  to the quadratic form `\mathrm{Im}(\tau)`. (There is a similar formula when
-  `z\neq 0`.) These distances are computed using the :func:acb_theta_dist...}
-  functions.
-\item To avoid making `2^{2g}` multiplications in the duplication formula, we
-  use the Hadamard matrix: then a duplication steps costs only `2^g`
-  multiplications and square roots. In the `g=1` case, we would compute
-  `x = (\theta_0 + \theta_2)^2` and `y = (\theta_0 - \theta_2)^2`, then write
-  for instance `2\theta_0\theta_2 = \frac12(x - y)`. However, this would bring
-  huge precision losses in terms of shifted absolute precisions! So we must
-  compute the Hadamard products at a significantly higher precision and adjust
-  the error bounds in the end. See :func:acb_theta_agm_mul_tight}.
-\item When `g\geq 3`, some theta values `\theta_{a,0}(0,2^k\tau)` encountered
-  in the algorithm may very well be much smaller than expected (in terms of
-  lattice distances) or vanish altogether (This also happens for `g=2` and
-  nonzero `z`, maybe even `g=1`). This is problematic for two reasons: we will
-  lose precision when taking square roots, and perhaps more importantly, it
-  won't be cheap anymore to compute the correct choice of sign with the naive
-  algorithm. Luckily, we can circumvent this by introducing a random auxiliary
-  real vector `t` and considering `\theta_{a,0}(2^kt, 2^k\tau)`: these will be
-  large enough with overwhelming probability, and one can adapt the duplication
-  formula to output `\theta_{a,0}(0,\tau)`. See :func:acb_theta_ql_roots},
-  :func:acb_theta_ql_step_1} and :func:step_3}.
-\item When `g\geq 2`, it may be the case that `\mathrm{Im}(\tau)` has
-  eigenvalues of different orders of magnitude. In this case, the ellipsoids in
-  the naive algorithms for `2^k\tau` as `k` grows will become very thin in some
-  directions while still being thick in other directions. We can then do a few
-  duplication steps and then fall back to computing theta values in smaller
-  dimensions: this is implented in :func:acb_theta_ql_a0_split}.
-\item The transformation formula has an analogue for any `g` using the action
-  of `\mathrm{Sp}_{2g}(\mathbb{Z})`: see :func:acb_theta_transform_...} This is
-  important because in order to determine the correct choice of square root at
-  `\tau` using the naive algorithm, we want `\tau` to be reduced.
-\end{enumerate}
+Suppose that we wish to compute `\theta_{a,0}(0,\tau)` for all `a\in \{0,1\}^g`
+and a reduced matrix `tau\in \mathbb{H}_g`. Applying the last formula `n`
+times, we reduce to evaluating `\theta_{a,0}(0,2^n\tau)`, and we expect that
+the absolute value of this complex number is roughly `\exp(-d^2)` for `d =
+2^n\mathrm{Dist}_\tau(0, \mathbb{Z}^g + \tfrac a2))`, where
+`\mathrm{Dist}_\tau` denotes the distance in `mathbb{R}^g` attached to the
+quadratic form `\mathrm{Im}(\tau)`. Provided that `n \simeq
+\log(\mathit{prec})`, we have to sum only `O_g(1)` terms in the naive algorithm
+to evaluate `\theta_{a,0}(0,2^n\tau)` at ``shifted absolute precision'' *prec*,
+i.e. absolute precision `\mathit{prec} + d^2/\log(2)`.
 
+In order to recover `\theta_{a,0}(0,\tau)`, we then perform `n` AGM steps. This
+can be done in such a way that the precision loss is `O_g(1)` bits at each step
+in terms of shifted absolute precision if we assume that each `|\theta_{a,0}(0,
+2^k\tau)|` is indeed of the expected order of magnitude; we also need this
+assumption to calculate the correct sign choices of square roots at each step
+with the naive algorithm. However, depending on the choice of `\tau`, this
+assumption may not always hold.
 
+We make the following adjustments to make the algorithm work for all `tau`, as
+well as for theta values at `z\neq 0`:
 
-\subsubsection{Distances}
+- If we see (after applying the naive algorithm) that some value
+  `\theta_{a,0}(0,2^k\tau)` is too small, we introduce an auxiliary real vector
+  `t`. At each step, starting from `\theta_{a,0}(0,2^{k+1}\tau)`,
+  `\theta_{a,0}(2^{k+1}t, 2^{k+1}\tau)` and `\theta_{a,0}(2^{k+2}t,
+  2^{k+1}\tau)`, we compute `\theta_{a,0}(2^{k}t, 2^k\tau)` and
+  `\theta_{a,0}(2^{k+1}t, 2^k\tau)` using square roots (second formula above), then
+  `\theta_{a,0}(0, 2^k\tau)` using a division (third formula). For a huge
+  majority of such `t`, none of the theta values `\theta_{a,0}(2^kt, 2^k\tau)`
+  and `\theta_{a,0}(2^{k+1}t, 2^k\tau)` will be too small [EK2023]_. In
+  practice, we choose `t` at random and obtain a probabilistic algorithm with a
+  negligible failure probability.
+
+- When computing `\theta_{a,0}(z,\tau)` for a nonzero `z`, we compute
+  `\theta_{a,0}(0, 2^k\tau)` and `\theta_{a,0}(2^k z, 2^k\tau)` using the
+  second and fourth formulas at each step. We actually replace each occurrence
+  of `\theta_{a,0}(z,\tau)` by `e^{-\pi y^T Y^{-1} y}\theta_{a,0}(z,\tau)`, as
+  the absolute values of the latter quantities do not increase as `y` gets
+  farther from zero, and they still satisfy the duplication formulas.
+
+- These two techniques can be combined by evaluating theta values at the six
+  vectors `2^k v` for `v = 0, t, 2t, z, z + t, z + 2t`. Note that we only have
+  to compute `\theta_{a,0}(2^kz, 2^k\tau)` at the last step `k=0`.
+
+- Finally, if the eigenvalues of `\mathrm{Im}(\tau)` have different orders of
+  magnitude, then the ellipsoid we have to sum on for the naive algorithm will
+  become very thin in one direction while still being thick in other
+  directions. In such a case, we can split the total sum and compute `O(1)`
+  theta values in a lower dimension. This increases the efficiency of the
+  algorithm while ensuring that the absolute precisions we consider are always
+  in `O(\mathit{prec})`.
+
+Quasi-linear algorithms on the reduced domain: distances
+-------------------------------------------------------------------------------
 
 .. function:: void acb_theta_dist_pt(arb_t d, arb_srcptr v, const arb_mat_t C, slong* n, slong prec)
 
-Sets *d} to `\lVert v - Cn\rVert^2` for the
-Euclidean norm.
-
-\T check that the results for `v = Cn_1`, `n = n_2` and `v = Cn_2`, `n = n_1` overlap.
+    Sets *d* to `\lVert v - Cn\rVert^2` for the Euclidean norm.
 
 .. function:: void acb_theta_dist_lat(arb_t d, arb_srcptr v, const arb_mat_t C, slong prec)
 
-Sets *d} to `\mathrm{Dist}(v, C \mathbb{Z}^g)^2` for the
-Euclidean norm. We first compute an upper bound on the result by considering
-the `2^g` vectors obtained by rounding the entries of `C^{-1}v` to
-integers, up or down, then compute an ellipsoid to find the minimum distance.
-
-\T for a random choice of `C` and `v`, compute the distance, then compute the
-corresponding ellipsoid. Check that it has at least one point and that the
-distance is correct.
+    Sets *d* to `\mathrm{Dist}(v, C \mathbb{Z}^g)^2` for the Euclidean norm. We
+    first compute an upper bound on the result by considering the `2^g` vectors
+    obtained by rounding the entries of `C^{-1}v` to integers, up or down, then
+    compute an ellipsoid to find the minimum distance.
 
 .. function:: void acb_theta_dist_a0(arb_ptr d, acb_srcptr z, const acb_mat_t tau, slong prec)
 
-Sets *d} to the vector containing
-`\mathrm{Dist}(C \cdot(Y^{-1}y + \tfrac a2), C\cdot
-\mathbb{Z}^g)^2` for `a\in \{0,1\}^g`, where `y, Y` are the imaginary parts of
-`z, \tau` respectively and `C` is the upper-triangular Cholesky
-matrix for `\pi \mathrm{Im}(\tau)`. The `a^{\mathrm{th}}` entry of *d}
-is also `\mathrm{Dist}_\tau(-Y^{-1}y, \mathbb{Z}^g + \tfrac a2)^2`, where
-`\mathrm{Dist}_\tau` denotes the distance attached to the quadratic form
-`\mathrm{Im}(\tau)`.
-
-\T when the imaginary part of `z` is `Y \tfrac{a}{2}` for some theta
-characteristic `a`, check that the `a^{\mathrm{th}}` entry of the result of
-:func:acb_theta_dist_a0} contains zero.
+    Sets *d* to the vector containing `\mathrm{Dist}(C \cdot(Y^{-1}y + \tfrac
+    a2), C\cdot \mathbb{Z}^g)^2` for `a\in \{0,1\}^g`, where `y, Y` are the
+    imaginary parts of `z, \tau` respectively and `C` is the upper-triangular
+    Cholesky matrix for `\pi \mathrm{Im}(\tau)`. The `a^{\mathrm{th}}` entry of
+    *d* is also `\mathrm{Dist}_\tau(-Y^{-1}y, \mathbb{Z}^g + \tfrac a2)^2`,
+    where `\mathrm{Dist}_\tau` denotes the distance attached to the quadratic
+    form `\mathrm{Im}(\tau)`.
 
 .. function:: slong acb_theta_dist_addprec(const arb_t d)
 
-Returns an integer that is close to *d} divided by `\log(2)`. Requires
-that *d} is finite and of reasonable size, otherwise an error is
-thrown.
+    Returns an integer that is close to *d* divided by `\log(2)`. Requires that
+    *d* is finite and of reasonable size, otherwise an error is thrown.
 
-\T no test, but used throughout in quasi-linear algorithms.
-
-\subsubsection{Duplication formulas}
-
-.. function:: void acb_theta_agm_hadamard(acb_ptr res, acb_srcptr a, slong g, slong prec)
-
-Sets *res} to the product of the Hadamard matrix
-`\left(\begin{smallmatrix} 1 & 1 \\ 1 & -1\end{smallmatrix}\right)^{\otimes g}`
-and the vector `a`. Both `r` and `a` must be vectors of length `2^g`. In other
-words, for each `k\in \{0,1\}^g`, this sets the `k^{\mathrm{th}}` entry of
-*res} to `\sum_{j\in \{0,1\}^g} (-1)^{k^T j} a_j`.
-
-\T check that applying the Hadamard matrix twice is equivalent to mutiplying by `2^g`.
-
-.. function:: void acb_theta_agm_sqrt(acb_ptr res, acb_srcptr a, acb_srcptr rts, slong nb, slong prec)
-
-Sets the `k^{\mathrm{th}}` entry of *res} for `0\leq k < \mathit{nb}` to a square
-root of the corresponding entry of `a`. The choice of sign is determined by
-*rts}: each entry of `r` will overlap the corresponding entry of
-*rts} but not its opposite. The result is indeterminate if both square
-roots overlap, and an error is thrown if there is no overlap at all.
-
-\T generate a random vector *t}, set *rts} to a low-precision
-rounding of *t} and set *a} to the square of *t}
-elementwise. The result of :func:acb_theta_agm_sqrt} must then overlap
-*t} and the precision loss must be small (this is just checked on the
-first entry).
-
-.. function:: void acb_theta_agm_mul(acb_ptr res, acb_srcptr a1, acb_srcptr a2, slong g, slong prec)
-
-For each `0\leq k < 2^g`, sets the `k^{\mathrm{th}}` entry of *res} to
-`2^{-g}\sum_{b\in \{0,1\}^g} a_{1,b}\, a_{2, b + k}`, where addition is meant
-in `(\mathbb{Z}/2\mathbb{Z}^g)` (a bitwise xor). Following \cite{labrande}, we
-apply the Hadamard matrix twice with multiplications in-between. This causes
-precision losses when the absolute values of the entries of *a1} and/or
-*a2} are of different orders of magnitude. This function is faster when
-*a1} and *a2} are equal as pointers, as we can use squarings
-instead of multiplications.
-
-\T check that the duplication formula holds: the result of
-:func:acb_theta_agm_mul} on vectors containing `\theta_{0,b}(0,\tau)` and
-`\theta_{0,b}(z,\tau)` for `b\in \{0,1\}^g` must contain
-`\theta_{0,b}^2(2z,2\tau)`.
-
-.. function:: void acb_theta_agm_rel_mag_err(arf_t m, arf_t eps, acb_srcptr a,
-  arb_srcptr d, slong nb, slong prec)
-
-Computes *m} and *eps} such that the following holds: for each
-`0\leq k < \mathit{nb}`, if `d_k` (resp. `a_k`) denotes the `k^{\mathrm{th}}` entry of
-*d} (resp. *a}), then the absolute value of `a_k` is at most
-`m \cdot e^{-d_k}` and the radius of the complex ball `a_k` is at most
-`\mathit{eps}\cdot e^{-d_k}`.
-
-\T after choosing random *m}, *eps} and *d}, generate a
-random vector *a} whose entries satisfy the corresponding inequalities,
-making sure that equality holds for at least one entry of *a}. The result
-`(m',\mathit{eps}')` of :func:agm_rel_mag_err} must then satisfy
-`m'\geq m` and `\mathit{eps'}\geq \mathit{eps}`.
-
-.. function:: void acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
-  arb_srcptr d0, arb_srcptr d, slong g, slong prec)
-
-Assuming that *d0} and *d} are obtained as the result of
-:func:acb_theta_dist_a0} on `(0,\tau)` and `(z,\tau)` respectively, performs
-the same computation as :func:acb_theta_agm_mul} on the vectors *a0} and
-*a}, but manages the error bounds as follows. Let `m_0, \varepsilon_0`
-(resp.~`m,\varepsilon`) be the result of :func:acb_theta_agm_rel_mag_err} on
-`a_0,d_0` (resp. `a,d`). We call :func:acb_theta_agm_mul} on the midpoints of
-*a0} and *a} at working precision
-`\mathit{prec} + {}`:func:acb_theta_dist_addprec(dmax) where *dmax} is
-the largest entry of `d`, then add an error bound to the `k^\mathrm{th}` entry
-of *res} of the form
-`e^{-d_k} (m_0 \varepsilon + m \varepsilon_0 + \varepsilon\varepsilon_0)`. The
-resulting precision losses are very mild when `m_0` and `m` are relatively
-small. The computation is valid for the following reason: for each
-`b\in \{0,1\}^g`, we have (keeping notation from :func:acb_theta_dist_a0})
-\[
-  \mathrm{Dist}_\tau(-Y^{-1}y, \mathbb{Z}^g + \tfrac b2)^2 +
-  \mathrm{Dist}_\tau(-Y^{-1} y, \mathbb{Z}^g + \tfrac{b + k}{2})^2 \leq
-  \mathrm{Dist}_\tau(-Y^{-1}y, \mathbb{Z}^g + \tfrac{k}{2})^2
-\]
-by the parallelogram identity.
-
-\T generate random `\tau` and `z` at precision *prec} and compute the
-associated vectors *d0} and *d}. Set each entry of *a0}
-(resp. *a}) to be of the form `z e^{-t}` where `z` is uniformly random
-with `|z|\leq 1` and `t` is the corresponding entry of *d0}
-(resp. *d}). Apply :func:agm_mul_tight}, then apply
-:func:agm_rel_mag_err} on the result with respect to *d}. Check that the
-resulting *m} satisfies `m \leq 1` and that *eps} is at most
-`2^{-*prec} + \delta}` for some reasonable value of `\delta` (e.g.  25).
-
-\subsubsection{AGM steps for `\theta_{a,0}`}
-
-The first step in quasi-linear algorithms is to compute the quantities
-`\theta_{a,0}(z,\tau)` for `a\in \{0,1\}^g` by repeated applications of the
-duplication formula:
-\[
-  \theta_{a,0}(z,\tau) \theta_{a,0}(z',\tau) = \sum_{a'\in(\mathbb{Z}/2\mathbb{Z})^g}
-  \theta_{a',0}(z+z',2\tau) \theta_{a+a',0}(z-z',2\tau).
-\]
-In particular,
-\[
-  \begin{aligned}
-    \theta_{a,0}(z,\tau)^2 &= \sum_{a'\in (\mathbb{Z}/2\mathbb{Z})^g}
-  \theta_{a',0}(2z,2\tau) \theta_{a+a',0}(0,2\tau),\\
-  \theta_{a,0}(0,\tau)\theta_{a,0}(z,\tau) &= \sum_{a'\in(\mathbb{Z}/2\mathbb{Z})^g}
-  \theta_{a',0}(z,2\tau) \theta_{a+a',0}(z,2\tau), \\
-  \theta_{a,0}(0,\tau)^2 &= \sum_{a'\in (\mathbb{Z}/2\mathbb{Z})^g}
-  \theta_{a',0}(0,2\tau) \theta_{a+a',0}(0,2\tau).
-  \end{aligned}
-\]
-Say we wish to compute `\theta_{a,0}(0,\tau)` for all~`a\in
-\{0,1\}^g`. Applying the last formula `n` times, we reduce to evaluating
-`\theta_{a,0}(0,2^n\tau)`, and we expect that its absolute value is roughly
-`\exp(-2^n\mathrm{Dist}_\tau(0, \mathbb{Z}^g + \tfrac a2))`. Provided that
-`n \simeq \log(\mathit{prec})`, we have to sum only `O_g(1)` terms in the naive
-algorithm to evaluate `\theta_{a,0}(0,2^n\tau)` at ``shifted absolute
-precision'' *prec}, i.e. absolute precision *prec} +
-:func:acb_theta_dist_addprec}`(2^n \mathrm{Dist}_\tau(0, \mathbb{Z}^g + \tfrac
-a2))`. In order to recover `\theta_{a,0}(0,\tau)`, we then perform `n` AGM
-steps. The precision loss when applying :func:acb_theta_agm_mul_tight} is
-`O_g(1)` bits in terms of shifted absolute precision. One also has to take
-square roots at each step. For this, we assume that each
-`|\theta_{a,0}(0, 2^k\tau)|` is indeed of the expected order of
-magnitude. Then, using the naive algorithm with `O_g(1)` terms will be
-sufficient to determine the correct choices of square roots at each step, with
-a precision loss of `O(1)` bits as well. At the end of this algorithm, we
-indeed obtain `\theta_{a,0}(0,\tau)` at shifted absolute precision
-`\mathit{prec - O_g(n)` bits for each~`a`.
-
-We make the following adjustments to make the algorithm work in general:
-\begin{itemize}
-\item If we see (after applying the naive algorithm) that some value
-  `\theta_{a,0}(0,2^k\tau)` is too small, we introduce an auxiliary real
-  vector~`t`. At each step, starting from `\theta_{a,0}(0,2^{k+1}\tau)`,
-  `\theta_{a,0}(2^{k+1}t, 2^{k+1}\tau)` and
-  `\theta_{a,0}(2^{k+2}t, 2^{k+1}\tau)`, we compute
-  `\theta_{a,0}(2^{k}t, 2^k\tau)` and `\theta_{a,0}(2^{k+1}t, 2^k\tau)` using
-  square roots (second formula), then `\theta_{a,0}(0, 2^k\tau)` using a
-  division (third formula). For a huge majority of such `t`, none of the theta
-  values `\theta_{a,0}(2^kt, 2^k\tau)` and~`\theta_{a,0}(2^{k+1}t, 2^k\tau)`
-  will be too small \cite{main}. In practice, we choose `t` at random and obtain a
-  probabilistic algorithm with a negligible failure probability.
-\item When computing `\theta_{a,0}(z,\tau)` for a nonzero~`z`, we compute
-  `\theta_{a,0}(0, 2^k\tau)` and `\theta_{a,0}(2^k z, 2^k\tau)` using the
-  second and fourth formulas at each step.
-\item Finally, these two techniques can be combined by evaluating theta values
-  at the six vectors `2^k v` for `v\in\{0, t, 2t, z, z + t, z + 2t\}`. Note
-  that we only have to compute `\theta_{a,0}(2^kz, 2^k\tau)` at the very last
-  step `k=0`.
-\end{itemize}
-
-We use an additional improvement when the eigenvalues of `\mathrm{Im}(\tau)`
-have different sizes. Let `\gamma_i` for `0\leq i < g` be the diagonal
-coefficients of a Cholesky matrix for `\pi\mathrm{Im}(\tau)`. Let
-`1\leq s < g`, and assume that `\gamma_s` is significantly bigger than
-`\gamma_{s-1}`, so that one can find `n` such that
-`2^{n}\gamma_s^2 \simeq \mathit{prec}` while `2^n \gamma_{s-1}^2` is much
-smaller. One can then split the theta series for `\theta_{a,0}(z, 2^n\tau)` and
-reduce to computing `O_g(1)` theta values in dimension~`s`. See
-:func:acb_theta_ql_a0_split} below for more details.
-
-Finally, we note that the formulas above still hold after replacing each
-occurrence of `\theta_{a,0}(z,\tau)` by
-`e^{-\pi y^T Y^{-1} y}\theta_{a,0}(z,\tau)`. We use the latter quantities
-instead for convenience, since their magnitude does not increase as `y` gets
-farther from zero, and their expected absolute values are easily expressed in
-terms of lattice distances.
+Quasi-linear algorithms on the reduced domain: AGM steps
+-------------------------------------------------------------------------------
 
 The functions in this section will work best when `\tau` lies in the reduced
 domain and the eigenvalues of `\mathrm{Im}(\tau)` are not too large, say in
 `O(\mathit{prec})`.
 
+.. function:: void acb_theta_agm_hadamard(acb_ptr res, acb_srcptr a, slong g, slong prec)
+
+    Sets *res* to the product of the Hadamard matrix `\left(\begin{smallmatrix}
+    1 & 1 \\ 1 & -1\end{smallmatrix}\right)^{\otimes g}` and the vector
+    `a`. Both *res* and `a` must be vectors of length `2^g`. In other words,
+    for each `k\in \{0,1\}^g`, this sets the `k^{\mathrm{th}}` entry of *res*
+    to `\sum_{j\in \{0,1\}^g} (-1)^{k^T j} a_j`.
+
+.. function:: void acb_theta_agm_sqrt(acb_ptr res, acb_srcptr a, acb_srcptr rts, slong nb, slong prec)
+
+    Sets the `k^{\mathrm{th}}` entry of *res* for `0\leq k < \mathit{nb}` to a
+    square root of the corresponding entry of `a`. The choice of sign is
+    determined by *rts*: each entry of *res* will overlap the corresponding
+    entry of *rts* but not its opposite. The result is indeterminate if both
+    square roots overlap, and an error is thrown if there is no overlap at all.
+
+.. function:: void acb_theta_agm_mul(acb_ptr res, acb_srcptr a1, acb_srcptr a2, slong g, slong prec)
+
+    For each `0\leq k < 2^g`, sets the `k^{\mathrm{th}}` entry of *res* to
+    `2^{-g}\sum_{b\in \{0,1\}^g} a_{1,b}\, a_{2, b + k}`, where addition is
+    meant in `(\mathbb{Z}/2\mathbb{Z}^g)` (a bitwise xor).
+
+    Following [LT2016]_, we apply the Hadamard matrix twice with
+    multiplications in-between. This causes precision losses when the absolute
+    values of the entries of *a1* and/or *a2* are of different orders of
+    magnitude. This function is faster when *a1* and *a2* are equal as
+    pointers, as we can use squarings instead of multiplications.
+
+.. function:: void acb_theta_agm_rel_mag_err(arf_t m, arf_t eps, acb_srcptr a, arb_srcptr d, slong nb, slong prec)
+
+    Computes *m* and *eps* such that the following holds: for each `0\leq k <
+    \mathit{nb}`, if `d_k` (resp. `a_k`) denotes the `k^{\mathrm{th}}` entry of
+    *d* (resp. *a*), then the absolute value of `a_k` is at most `m \cdot
+    e^{-d_k}` and the radius of the complex ball `a_k` is at most
+    `\mathit{eps}\cdot e^{-d_k}`.
+
+.. function:: void acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a, arb_srcptr d0, arb_srcptr d, slong g, slong prec)
+
+    Assuming that *d0* and *d* are obtained as the result of
+    :func:`acb_theta_dist_a0` on `(0,\tau)` and `(z,\tau)` respectively,
+    performs the same computation as :func:`acb_theta_agm_mul` on the vectors
+    *a0* and *a* with a different management of error bounds. The resulting
+    error bounds on *res* will be tighter when the absolute value of `a_k` is
+    roughly `e^{-d_k}` for each `0\leq k < 2^g`, and similarly for *a0* and
+    *d0*.
+
+    We manage the error bounds as follows. Let `m_0, \varepsilon_0`
+    (resp. `m,\varepsilon`) be the result of :func:`acb_theta_agm_rel_mag_err`
+    on `a_0,d_0` (resp. `a,d`). We call :func:`acb_theta_agm_mul` on the
+    midpoints of *a0* and *a* at a higher working precision, then add `e^{-d_k}
+    (m_0 \varepsilon + m \varepsilon_0 + \varepsilon\varepsilon_0)` to the
+    error bound on the `k^\mathrm{th}` entry of *res*. This is valid for the
+    following reason: for each `b\in \{0,1\}^g`, we have (keeping notation from
+    :func:`acb_theta_dist_a0}`)
+
+        .. math ::
+
+            \mathrm{Dist}_\tau(-Y^{-1}y, \mathbb{Z}^g + \tfrac b2)^2
+            + \mathrm{Dist}_\tau(-Y^{-1} y, \mathbb{Z}^g + \tfrac{b + k}{2})^2
+              \leq \mathrm{Dist}_\tau(-Y^{-1}y, \mathbb{Z}^g + \tfrac{k}{2})^2
+
+    by the parallelogram identity.
+
 .. function:: slong acb_theta_ql_nb_steps(const arb_mat_t C, slong s, slong prec)
 
-Returns an integer `n` such that `2^n \gamma_s^2 \simeq \mathit{prec}` in the
-above notation, meant to be the number of steps to use in the quasi-linear
-algorithm for `\theta_{a,0}` (before applying the splitting strategy, in the
-case `s > 0`). The precise value of `n` is chosen to optimize performance: see
-:func:acb_theta/profile/p-ql_a0_steps}.
-
-\T no test, but used in :func:acb_theta_ql_a0}.
+    Returns an integer `n` such that `2^n \gamma_s^2 \simeq \mathit{prec}` in
+    the above notation, meant to be the number of steps to use in the
+    quasi-linear algorithm for `\theta_{a,0}` (before applying the splitting
+    strategy, in the case `s > 0`). The precise value of `n` is chosen to
+    optimize performance.
 
 .. function:: void acb_theta_ql_log_rescale(acb_t res, acb_srcptr z, const acb_mat_t tau, slong prec)
 
-Sets *res} to `i y^T Y^{-1} y`. This is used to rescale theta values as explained above.
+    Sets *res* to `i y^T Y^{-1} y`. This is used to rescale theta values as explained above.
 
-\T generate `z` and `x` such that `y = C^Tx` where `C` is obtained from
-:func:acb_theta_eld_cho}, and check that the result is `i\pi\lVert x\rVert^2`
-(for the `L^2` norm).
+.. function:: int acb_theta_ql_roots(acb_ptr rts, acb_srcptr t, acb_srcptr z, arb_srcptr d0, arb_srcptr d, const acb_mat_t tau, slong nb_steps, slong guard, slong prec)
 
-.. function:: int acb_theta_ql_roots(acb_ptr rts, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
-  arb_srcptr d, const acb_mat_t tau, slong nb_steps, slong guard, slong prec)
+    Attempts to set *rts* to the collection of low-precision roots for the
+    given choice of `z` and `t`. It is assumed that *d0* (resp. *d*) contains
+    the result of :func:`acb_theta_dist_a0` on `(0,\tau)` (resp. `(z,\tau)`),
+    and that `t` is a real vector.
 
-Attempts to set *rts} to the collection of low-precision roots for the
-given choice of `z` and `t`. It is assumed that *d0} (resp. *d})
-contains the result of :func:acb_theta_dist_a0} on `(0,\tau)`
-(resp. `(z,\tau)`), and that `t` is a real vector.
+    More precisely, for each `0\leq k < n`, each `v = t, 2t, z + t, z + 2t`,
+    and each `a\in \{0,1\}^g`, we run :func:`acb_theta_naive_ind` to evaluate
+    `\theta_{a,0}(2^kv, 2^k\tau)` at shifted absolute precision *guard*. If
+    none of these complex balls contains zero, returns 1 and sets *rts* to the
+    resulting vector of length `4 \times n \times 2^g`; otherwise, returns 0
+    and leaves *rts* undefined. The number of output values is reduced to
+    `2\times n\times 2^g` or `n\times 2^g` when `z = 0`, `t = 0`, or both.
 
-More precisely, for each `0\leq k < n`, each `v\in \{t, 2t, z + t, z + 2t\}`,
-and each `a\in \{0,1\}^g`, we run :func:acb_theta_naive_ind} to evaluate
-`\theta_{a,0}(2^kv, 2^k\tau)` at working precision *guard} +
-:func:acb_theta_dist_addprec}`(2^k d_k)`, where `d_k` denotes the
-`k^{\mathrm{th}}` entry of *d0} or *d}, according to the
-imaginary part of `v`. If none of these complex balls contains zero, returns
-`1` and sets *rts} to the resulting vector of length `4 \times n \times 2^g`;
-otherwise, returns `0` and leaves *rts} undefined. The number of output values is
-reduced to `2\times n\times 2^g` or `n\times 2^g` when `z = 0`, `t = 0`, or
-both.
+.. function:: void acb_theta_ql_step_1(acb_ptr res, acb_srcptr th0, acb_srcptr th, acb_srcptr rts, arb_srcptr d0, arb_srcptr d, slong g, slong prec)
 
-\T when `g = 2`, `z = t = 0`, and `\tau` is inside the Siegel fundamental
-domain, it is known that the theta values are bounded away from zero, and thus
-the return value must be 1.
+    Given `\theta_{a,0}(0, 2\tau)` (stored in *th0*) and `\theta_{a,0}(2z,
+    2\tau)` (stored in *th*), sets *res* to the values `\theta_{a,0}(z,\tau)`
+    for `a\in \{0,1\}^g`. We assume that *d0* (resp. *d*) contains the result
+    of :func:`acb_theta_dist_a0` on `(0,2\tau)` (resp. `(2z, 2\tau)`), and that
+    *rts* contains low-precision approximations of `\theta_{a,0}(z,\tau)`.
 
-.. function:: void acb_theta_ql_step_1(acb_ptr res, acb_srcptr th0, acb_srcptr th,
-  acb_srcptr rts, arb_srcptr d0, arb_srcptr d, slong g, slong prec)
+    We call :func:`acb_theta_agm_mul_tight` and :func:`acb_theta_agm_sqrt` once
+    each.
 
-Given `\theta_{a,0}(0, 2\tau)` (stored in *th0}) and
-`\theta_{a,0}(2z, 2\tau)` (stored in *th}), sets *res} to the values
-`\theta_{a,0}(z,\tau)` for `a\in \{0,1\}^g`. We assume that *d0}
-(resp. *d}) contains the result of :func:acb_theta_dist_a0} on
-`(0,2\tau)` (resp. `(2z, 2\tau)`), and that *rts} contains
-low-precision approximations of `\theta_{a,0}(z,\tau)`. We call
-:func:acb_theta_agm_mul_tight} and :func:acb_theta_agm_sqrt} once each.
+.. function:: void acb_theta_ql_step_3(acb_ptr res, acb_srcptr th0, acb_srcptr th, acb_srcptr rts, arb_srcptr d0, arb_srcptr d, slong g, slong prec)
 
-\T working at low precision, check that the duplication formula holds by
-generating input using :func:acb_theta_naive_fixed_ab}, applying
-:func:ql_step_1}, and checking the output against
-:func:acb_theta_naive_fixed_ab} as well.
+    Given `\theta_{a,0}(2v, 2\tau)` for `v = 0, t, 2t` (stored in *th0* as a
+    vector of length `3\times 2^g`) and for `v = z, z + t, z + 2t` (stored in
+    *th*), sets *res* to the vector of length `3\times 2^g` containing
+    `\theta_{a,0}(v,\tau)` for `v = z, z + t, z + 2t` and `a\in \{0,1\}^g`. The
+    assumptions on *d0* and *d* are as in :func:`acb_theta_ql_step_1`, and
+    *rts* must contain low-precision approximations of `\theta(v,\tau)` for `v
+    = z+t, z+ 2t`.
 
-.. function:: void acb_theta_ql_step_3(acb_ptr res, acb_srcptr th0, acb_srcptr th,
-  acb_srcptr rts, arb_srcptr d0, arb_srcptr d, slong g, slong prec)
+    We make three calls to :func:`acb_theta_agm_mul_tight`, take `2^{g+1}`
+    square roots, and make `2^g` divisions.
 
-Given `\theta_{a,0}(2v, 2\tau)` for `v\in\{0, t, 2t\}` (stored in *th0}
-as a vector of length `3\times 2^g`) and for `v\in\{z, z + t, z + 2t\}` (stored
-in *th}), sets *res} to the vector of length `3\times 2^g` containing
-`\theta_{a,0}(v,\tau)` for `v\in\{ z, z + t, z + 2t\}` and `a\in
-\{0,1\}^g`. The assumptions on *d0} and *d} are as above, and
-*rts} must contain low-precision approximations of `\theta(v,\tau)` for
-`v\in \{z+t, z+ 2t\}`. We make three calls to :func:acb_theta_agm_mul}, take
-`2^{g+1}` square roots, and make `2^g` divisions.
+.. function:: void acb_theta_ql_step_2(acb_ptr res, acb_srcptr th0, acb_srcptr th, acb_srcptr rts, arb_srcptr d0, arb_srcptr d, slong g, slong prec)
 
-\T check against the naive algorithm as in :func:acb_theta_ql_step_1}.
+    Same as :func:`acb_theta_ql_step_3`, but does not perform the
+    divisions. The first `2^g` entries of *res* are set to zero.
 
-.. function:: void acb_theta_ql_step_2(acb_ptr res, acb_srcptr th0, acb_srcptr th,
-  acb_srcptr rts, arb_srcptr d0, arb_srcptr d, slong g, slong prec)
+.. function:: void acb_theta_ql_dupl(acb_ptr th2, acb_srcptr th0, acb_srcptr th, arb_srcptr d0, arb_srcptr d, slong g, slong prec)
 
-Same as :func:acb_theta_ql_step_3}, but does not perform the divisions. The first
-`2^g` entries of *res} are set to zero.
+    Given input as in :func:`acb_theta_ql_step_1` (*rts* excepted), sets `r` to
+    the vector of squared theta values `\theta_{a,b}(z,\tau)^2` for all `a,b\in
+    \{0,1\}^g`.
 
-\T check against the naive algorithm as in :func:acb_theta_ql_step_1}.
+    We make `2^g` calls to :func:`acb_theta_agm_mul_tight`.
 
-.. function:: void acb_theta_ql_dupl(acb_ptr th2, acb_srcptr th0, acb_srcptr th,
-  arb_srcptr d0, arb_srcptr d, slong g, slong prec)
-
-Given input as in :func:acb_theta_ql_step_1} (except that *rts} is not
-needed), sets `r` to the vector of squared theta values
-`\theta_{a,b}(z,\tau)^2` for all `a,b\in \{0,1\}^g`. We use the following
-version of the duplication formula:
-\[
-  \theta_{a,b}(z,\tau)^2 = \sum_{a'\in (\mathbb{Z}/2\mathbb{Z})^g}
-  (-1)^{a'^Tb} \theta_{a',0}(2z,2\tau) \theta_{a+a',0}(0,2\tau),
-\]
-making `2^g` calls to :func:acb_theta_agm_mul_tight}.
-
-\T check against the naive algorithm as in :func:acb_theta_ql_step_1}.
+Quasi-linear algorithms on the reduced domain: main functions
+-------------------------------------------------------------------------------
 
 \subsubsection{Quasi-linear algorithms for `\theta_{a,0}`}
 
 The functions in this section will work best when `\tau` lies in the reduced
-domain and the eigenvalues of `\mathrm{Im}(\tau)` are not too large, say in
-`O(\mathit{prec})`.
+domain, however `\mathrm{Im}(\tau)` may have large eigenvalues.
 
-.. function:: acb_theta_ql_worker_t}
+.. function:: acb_theta_ql_worker_t
 
-A function pointer type. A function *worker} of this type has the
-following signature:
+    A function pointer type. A function *worker* of this type has the
+    following signature:
 
-.. function:: int worker(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_scptr d0,
-  arb_srcptr d, const acb_mat_t tau, slong guard, slong prec)
+    .. function:: int worker(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_scptr d0, arb_srcptr d, const acb_mat_t tau, slong guard, slong prec)
 
-Such a worker will attempt to set *th} to the values `\theta_{a,0}(v,\tau)` for
-`v\in \{0,t,2t,z,z+t,z+2t\}` and `a\in \{0,1\}^g` at shifted absolute
-precision *prec}, return `1` on success and `0` on failure. The vectors
-*d0} and *d} must contain the result of
-:func:acb_theta_dist_a0} on `(0,\tau)` and `(z,\tau)`. If `z = 0`, `t = 0`, or
-both, we only compute `3`, `2`, or `1` vectors of `2^g` values
-respectively. Two functions of this type are available:
-:func:acb_theta_ql_a0_naive} and the main function
-:func:acb_theta_ql_a0}. Using function pointers allows us to write independent
-test code for the main workhorses :func:acb_theta_ql_a0_steps} and
-:func:acb_theta_ql_a0_split} below.
+    Such a worker will attempt to set *th* to the values `\theta_{a,0}(v,\tau)`
+    for `v = 0,t,2t,z,z+t,z+2t` and `a\in \{0,1\}^g` at shifted absolute
+    precision *prec*, and return `1` on success and `0` on failure. The vectors
+    *d0* and *d* must contain the result of :func:`acb_theta_dist_a0` on
+    `(0,\tau)` and `(z,\tau)`. If `z = 0`, `t = 0`, or both, we only compute
+    `3`, `2`, or `1` vectors of `2^g` values respectively.
 
-.. function:: int acb_theta_ql_a0_naive(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
-  arb_srcptr d, const acb_mat_t tau, slong guard, slong prec)
+    Two functions of this type are available: :func:`acb_theta_ql_a0_naive` and
+    the main function :func:`acb_theta_ql_a0`. Using function pointers allows
+    us to write independent test code for the main workhorses
+    :func:`acb_theta_ql_a0_steps` and :func:`acb_theta_ql_a0_split` below.
 
-Follows the specifications of a function of type .. type:: acb_theta_ql_worker_t}
-using the naive algorithm only. The return value is always `1`.
+.. function:: int acb_theta_ql_a0_naive(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0, arb_srcptr d, const acb_mat_t tau, slong guard, slong prec)
 
-\T no test, but used throughout in quasi-linear algorithms.
+    Follows the specifications of a function of type
+    :type:`acb_theta_ql_worker_t` using the naive algorithm only. The return
+    value is always `1`.
 
-.. function:: int acb_theta_ql_a0_split(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d,
-  const acb_mat_t tau, slong s, slong guard, slong prec, acb_theta_ql_worker_t worker)
+.. function:: int acb_theta_ql_a0_split(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d, const acb_mat_t tau, slong s, slong guard, slong prec, acb_theta_ql_worker_t worker)
 
-Follows the specifications of a function of type .. type:: acb_theta_ql_worker_t},
-except for the additional arguments *s} and *worker}. We split the
-theta series according to the first `s` coordinates of `n\in \mathbb{Z}^g`,
-writing `n = (n_0,n_1)` where `n_0\in \mathbb{Z}^s` and
-`n_1\in \mathbb{Z}^{g - s}`. Then *worker} is called to evaluate each
-term in the split theta series. We must have `1\leq s\leq g -1`.
+    Follows the specifications of a function of type
+    :type:`acb_theta_ql_worker_t`, except for the additional arguments *s* and
+    *worker*. We split the theta series according to the first `s` coordinates
+    of `n\in \mathbb{Z}^g`, writing `n = (n_0,n_1)` where `n_0\in \mathbb{Z}^s`
+    and `n_1\in \mathbb{Z}^{g - s}`. We must have `1\leq s\leq g -1`. Then
+    *worker* is called to evaluate the sum corresponding to each `n_1`. The
+    return value is 1 iff all the calls to *worker* succeed.
 
-More precisely, for each `0\leq a < 2^g`, we compute *R2} and *eps}
-as in :func:acb_theta_naive_radius} at precision
-*prec}`{} + {}`:func:acb_theta_dist_addprec}`(d_a)`. Note that
-`n^T \mathrm{Im}(\tau) n\geq \lVert C_1 n_1\rVert^2`, where `C_1` denotes the
-lower-right block of `C` of dimensions `(g-s)\times(g-s)`. Thus, in order to
-compute `\theta_{a,0}(z, 2^n\tau)` at shifted absolute precision *prec},
-it is enough to consider those `n_1\in \mathbb{Z}^{g - s}` that lie in a
-certain ellipsoid of radius *R2} for the Cholesky matrix `C_1`. This
-ellipsoid is meant to contain very few points, and we list all of them. Then,
-for a given choice of `n_1`, the sum of the corresponding terms in the theta
-series is
-\[
-  \begin{aligned}
-    &c \sum_{n_0\in \mathbb{Z}^s} \exp(\pi i ((n_0 + \tfrac{a_0}{2})^T\tau_0
-    (n_0 + \tfrac{a_0}{2})
-    + 2 (n_0 + \tfrac{a_0}{2})^T x (n_1 + \tfrac{a_1}{2}) + 2(n_0 + \tfrac{a_0}{2}) z_0))\\
-    &\qquad\qquad = c\, \theta_{a_0,0}(z_0 + x (n_1 + \tfrac{a_1}{2}), \tau_0)
-  \end{aligned}
-\]
-with
-\[
-  c = \exp(\pi i ((n_1 + \tfrac{a_1}{2})\tau_1 (n_1 + \tfrac{a_1}{2}) + 2 (n_1
-  + \tfrac{a_1}{2}) z_1)).
-\]
-where `\tau = (\begin{smallmatrix} \tau_0 & x\\x^T & \tau_1\end{smallmatrix})`
-and `z = (z_0,z_1)`. For each `n_1`, we adjust the shifted absolute precision
-for the corresponding term according to the distance between `n_1` and the
-center of the above ellipsoid. The return value is 1 iff *worker}
-succeeds for each `n_1`.
+    More precisely, for each `0\leq a < 2^g`, we compute *R2* and *eps* as in
+    :func:`acb_theta_naive_radius` at shifted absolte precision *prec*. Note
+    that `n^T \mathrm{Im}(\tau) n\geq \lVert C_1 n_1\rVert^2`, where `C_1`
+    denotes the lower-right block of `C` of dimensions
+    `(g-s)\times(g-s)`. Thus, in order to compute `\theta_{a,0}(z, 2^n\tau)` at
+    shifted absolute precision *prec*, it is enough to consider those `n_1\in
+    \mathbb{Z}^{g - s}` in an ellipsoid of radius *R2* for the Cholesky matrix
+    `C_1`. This ellipsoid is meant to contain very few points, and we list all
+    of them. Then, for a given choice of `n_1`, the sum of the corresponding
+    terms in the theta series is
 
-\T check that the result agrees with :func:acb_theta_ql_a0_naive} on random
-input in case of success, using :func:acb_theta_ql_a0_naive} as *worker}.
+    .. math ::
 
-.. function:: int acb_theta_ql_a0_steps(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
-  arb_srcptr d, const acb_mat_t tau, slong nb_steps, slong s,
-  slong guard, slong prec, acb_theta_ql_worker_t worker)
+        \exp(\pi i ((n_1 + \tfrac{a_1}{2})\tau_1 (n_1 + \tfrac{a_1}{2}) + 2 (n_1
+        + \tfrac{a_1}{2}) z_1))
+        \theta_{a_0,0}(z_0 + x (n_1 + \tfrac{a_1}{2}), \tau_0).
 
-Follows the specifications of a function of type :func:acb_theta_ql_worker_t},
-except for the additional arguments *nb_steps}, *s} and
-*worker}, by performing `k := {}`*nb_steps} AGM steps. We first
-call :func:acb_theta_ql_roots} with *guard} bits of shifted absolute
-precision, then call :func:acb_theta_ql_a0_naive} or
-:func:acb_theta_ql_a0_split} on `(2^k t, 2^k z, 2^k\tau)` depending on whether
-*s} is zero or not, and finally we perform the AGM steps. If any
-subprocedure fails, we end the computation and return 0, and otherwise return
-1.
+    where `\tau = (\begin{smallmatrix} \tau_0 & x\\x^T &
+    \tau_1\end{smallmatrix})` and `z = (z_0,z_1)`. When calling *worker*, we
+    adjust the shifted absolute precision according to the distance between
+    `n_1` and the center of the above ellipsoid.
 
-\T same as :func:acb_theta_ql_a0_split}.
+    The user should ensure that the eigenvalues of
+    `2^{\mathit{nb\_steps}}\mathrm{Im}(\tau)` are not too large when calling
+    this function.
 
-.. function:: int acb_theta_ql_a0(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
-  arb_srcptr d, const acb_mat_t tau, slong guard, slong prec)
+.. function:: int acb_theta_ql_a0_steps(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0, arb_srcptr d, const acb_mat_t tau, slong nb_steps, slong s, slong guard, slong prec, acb_theta_ql_worker_t worker)
 
-Follows the specifications of a function of type
-:func:acb_theta_ql_worker_t}. We first decide how many AGM steps we should use
-and whether we should use the splitting strategy. Then we run
-:func:acb_theta_ql_a0_steps} on the midpoints of `t,z` and `\tau` at a slightly
-higher precision to account for precision losses in the duplication formulas,
-using a recursive call to :func:acb_theta_ql_a0} as *worker}. If the
-return value is 1, we finally compute provable error bounds on the result using
-:func:acb_theta_jet_naive_ind} and :func:acb_theta_jet_error_bounds}.
+    Follows the specifications of a function of type
+    :func:`acb_theta_ql_worker_t`, except for the additional arguments
+    *nb_steps*, *s* and *worker*, by performing *nb_steps* AGM steps. We first
+    call :func:`acb_theta_ql_roots` with the given *guard*, then call
+    :func:`acb_theta_ql_a0_naive` or :func:`acb_theta_ql_a0_split` (with the
+    given *worker*) depending on whether *s* is zero or not, and finally
+    perform the AGM steps. The return value is 1 iff each subprocedure
+    succeeds.
 
-\T check that the result agrees with :func:acb_theta_ql_a0_naive} on random
-input if successful.
+.. function:: int acb_theta_ql_a0(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0, arb_srcptr d, const acb_mat_t tau, slong guard, slong prec)
 
-\subsubsection{Quasi-linear algorithms for `\theta_{a,b}`}
+    Follows the specifications of a function of type
+    :func:`acb_theta_ql_worker_t`.
 
-The function :func:acb_theta_ql_a0} may fail for an unlucky choice of auxiliary
-vector `t` or when *guard} is too small. Thus, we implement a
-probabilistic algorithm where we gradually increase *guard} and choose
-first `t = 0`, then a random choice of `t` at each step. The following
-functions will still work best when `\tau` is reduced, however `\mathrm{Im}(\tau)`
-may have large eigenvalues.
+    We first decide how many AGM steps we should use and whether we should use
+    the splitting strategy. Then we run :func:`acb_theta_ql_a0_steps` on the
+    midpoints of `t,z` and `\tau` at a slightly higher precision to account for
+    precision losses in the duplication formulas, using a recursive call to
+    :func:`acb_theta_ql_a0` as *worker*. If the return value is 1, we finally
+    compute provable error bounds on the result using
+    :func:`acb_theta_jet_naive_ind` and :func:`acb_theta_jet_error_bounds`.
 
-.. function:: ACB_THETA_QL_TRY}
+The function :`func:acb_theta_ql_a0` may fail for an unlucky choice of
+auxiliary vector `t` or when *guard* is too small. Thus, we implement a
+probabilistic algorithm where we gradually increase *guard* and choose first `t
+= 0`, then a random choice of `t` at each step.
 
-The number of times that a new `t` should be picked before abandoning and
-setting the result to indeterminate. This is currently set to 100 for
-a negligible failure probability.
+.. macro:: ACB_THETA_QL_TRY
 
-.. function:: slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong* n1,
-  acb_srcptr z, const acb_mat_t tau, slong prec)
+    Macro giving the number of times that a new `t` should be picked before
+    abandoning and setting the result to indeterminate values. This is set to
+    100 for a negligible failure probability.
 
-Sets *new_z}, *c}, *u}, *n1} and returns
-`-1\leq s\leq g` such that the following holds. When `s\geq 0`,
-`z':=*new_z}` is a vector of length `s` and `n_1` is a vector of length
-`g-s`, and for each characteristic `(a,b)`, we have (borrowing notation from
-:func:acb_theta_ql_a0_split}): eitner
-\[
-  |\theta_{a,b}(z,\tau) - c i^{\,n_1^Tb_1} \theta_{a_0,b_0}(z', \tau_0)| \leq u
-\]
-when the last `g-s` coordinates of `a` equal
-`a_1 =`:func:acb_theta_char_get_a}`(n_1)`, or
-\[
-  |\theta_{a,b}(z,\tau)|\leq u
-\]
-otherwise. When `s=-1`, *n1}, *c} and *new_z} are left
-undefined and we have `\theta_{a,b}(z,\tau)\leq u` for all characteristics
-`(a,b)`. This filters out very large eigenvalues of `\mathrm{Im}(\tau)` that
-have a negligible impact on theta values but would give rise to unreasonable
-choices of precisions in the duplication formula.
+.. function:: slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong* n1, acb_srcptr z, const acb_mat_t tau, slong prec)
 
-This works as follows. We first compute *R2} and *eps} as in
-:func:acb_theta_naive_radius}, then set *c}, *u} and *new_z}
-as in :func:acb_theta_naive_reduce} in dimension `g`. We set `s` such that for
-each `s\leq j < g`, we have `\gamma_j^2 > 4R^2`, where `\gamma_j` is the
-`j^{\mathrm{th}}` diagonal coefficient of the Cholesky matrix `C` for
-`\pi\mathrm{Im}(\tau)`. We may assume that `s< g`, otherwise there is nothing
-to be done. Then the ellipsoid `E` of radius `R^2` for `C` that we are
-interested in, when intersected with `\frac12\mathbb{Z}^g`, is either empty or
-consists of points whose last `g-s` coordinates are fixed. In the latter case,
-we return `s = -1`. Now assume that `E` is not empty, let `n_1` be the vector
-of these fixed last `g-s` coordinates, and let `a_1\in \{0,1\}^{g-s}` be the
-corresponding characteristic. We can then write the sum defining `\theta_{a,b}`
-over `E` as
-\[
-  e^{i\pi (\tfrac{n_1^T}{2} \tau_1 \tfrac{n_1}{2} + n_1^T(z_1 + \tfrac{b_1}{2}))
-  \sum_{n_0\in E_0 \cap (\mathbb{Z}^s + \tfrac{a_0}{2}) e^{i\pi(n_0^T \tau_0 n_0 + 2n_0^T(z_0 + x \tfrac{n_1}{2} + \tfrac{b_0}{2}))
-\]
-if the last `g-s` coordinates of `a` are equal to `a_1` on the nose; the sum is
-zero otherwise. Thus we can set `z'` to `z_0 + x\tfrac{n_1}{2}` and multiply
-`c` by `\exp(i\pi (\tfrac{n_1^T}{2}\tau_1\tfrac{n_1}{2} + n_1^Tz_1))`.
+    Sets *new_z*, *c*, *u*, *n1* and returns `-1\leq s\leq g` such that the
+    following holds. When `s\geq 0`, `z'` = *new_z* is a vector of length `s`
+    and `n_1` is a vector of length `g-s`, and for each characteristic `(a,b)`,
+    we have (borrowing notation from :func:`acb_theta_ql_a0_split`): either
 
-\T generate random *tau} and *z} that are likely to lead to
-*s} being positive or `-1` and *n1} being nonzero, and check that
-the above conditions hold when computing theta values with the naive algorithm.
+    .. math ::
+
+        |\theta_{a,b}(z,\tau) - c i^{\,n_1^Tb_1} \theta_{a_0,b_0}(z', \tau_0)| \leq u
+
+    when the last `g-s` coordinates of `a` equal `n_1` modulo 2, or
+
+    .. math ::
+
+        |\theta_{a,b}(z,\tau)|\leq u
+
+    otherwise. When `s=-1`, *n1*, *c* and *new_z* are left undefined and we
+    have `\theta_{a,b}(z,\tau)\leq u` for all characteristics `(a,b)`. This
+    filters out very large eigenvalues of `\mathrm{Im}(\tau)` that have a
+    negligible impact on theta values but would give rise to unreasonable
+    choices of precisions in the final duplication formula for computing all
+    theta values `\theta_{a,b}`.
+
+    This works as follows. We first compute *R2* and *eps* as in
+    :func:`acb_theta_naive_radius`, then set *c*, *u* and *new_z* as in
+    :func:`acb_theta_naive_reduce` in dimension `g`. We set `s` such that for
+    each `s\leq j < g`, we have `\gamma_j^2 > 4R^2`, where `\gamma_j` is the
+    `j^{\mathrm{th}}` diagonal coefficient of the Cholesky matrix `C` for
+    `\pi\mathrm{Im}(\tau)`. We may assume that `s< g`, otherwise there is
+    nothing to be done. Then the ellipsoid `E` of radius `R^2` for `C` that we
+    are interested in, when intersected with `\frac12\mathbb{Z}^g`, is either
+    empty or consists of points whose last `g-s` coordinates are fixed. In the
+    latter case, we return `s = -1`. Now assume that `E` is not empty, let
+    `n_1` be the vector of these fixed last `g-s` coordinates, and let `a_1\in
+    \{0,1\}^{g-s}` be the corresponding characteristic. We can then write the
+    sum defining `\theta_{a,b}` over `E` as
+
+    .. math ::
+
+        e^{i\pi (\tfrac{n_1^T}{2} \tau_1 \tfrac{n_1}{2} + n_1^T(z_1 + \tfrac{b_1}{2}))
+        \sum_{n_0\in E_0 \cap (\mathbb{Z}^s + \tfrac{a_0}{2})
+        e^{i\pi(n_0^T \tau_0 n_0 + 2n_0^T(z_0 + x \tfrac{n_1}{2} + \tfrac{b_0}{2}))
+
+    if the last `g-s` coordinates of `a` are equal to `n_1` modulo 2; the sum
+    is zero otherwise. Thus we can set `z'` to `z_0 + x\tfrac{n_1}{2}` and
+    multiply `c` by `\exp(i\pi (\tfrac{n_1^T}{2}\tau_1\tfrac{n_1}{2} +
+    n_1^Tz_1))`.
 
 .. function:: void acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
 
-Sets *th} to the collection of `\theta_{a,b}(z,\tau)` for all
-`a,b\in \{0,1\}^g`. After calling :func:acb_theta_ql_reduce}, we generally use
-the duplication formula on the result of :func:acb_theta_ql_a0} at `2\tau` and
-a final square-root step. At low precisions, we call :func:acb_theta_naive_all}
-instead.
+    Sets *th* to the collection of `\theta_{a,b}(z,\tau)` for all `a,b\in
+    \{0,1\}^g`.
 
-\T check that the result agrees with :func:acb_theta_naive_all} on random input.
+    After calling :func:`acb_theta_ql_reduce`, we generally use the duplication
+    formula on the result of :func:`acb_theta_ql_a0` at `2\tau` and a final
+    square-root step. At low precisions, we call :func:`acb_theta_naive_all`
+    instead.
 
 .. function:: void acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec)
 
-Sets *th2} to the collection of `\theta_{a,b}(z,\tau)^2` for all
-`a,b\in \{0,1\}^g`. After calling :func:acb_theta_ql_reduce}, we use
-the duplication formula on the result of :func:acb_theta_ql_a0} at `2\tau`.
+    Sets *th2* to the collection of `\theta_{a,b}(z,\tau)^2` for all `a,b\in
+    \{0,1\}^g`.
 
-\T check that the result agrees with :func:acb_theta_naive_all} on random input.
+    After calling :func:`acb_theta_ql_reduce`, we use the duplication formula
+    on the result of :func:`acb_theta_ql_a0` at `2\tau`.
 
 \subsection{The transformation formula}
 
