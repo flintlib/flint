@@ -705,14 +705,10 @@ fi
 
 if test "$with_blas" = "yes";
 then
-    AC_SEARCH_LIBS([cblas_dgemm],[cblas],[],
-        [AC_SEARCH_LIBS([cblas_dgemm],[openblas],[],
-            [AC_SEARCH_LIBS([cblas_dgemm],[blas],[],
-                [AC_MSG_ERROR([BLAS library was not found.  If you indeed have BLAS installed, please
+    AC_SEARCH_LIBS([cblas_dgemm],[cblas openblas blas],[],
+        [AC_MSG_ERROR([BLAS library was not found.  If you indeed have BLAS installed, please
 submit a bug report to <https://github.com/flintlib/flint/issues/> so
 that we can either fix the issue or give a more proper error message.])]
-            )]
-        )]
     )
 fi
 
