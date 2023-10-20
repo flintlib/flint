@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2012 Sebastian Pancratz
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -21,7 +22,8 @@ TEST_TEMPLATE_FUNCTION_START(T, ctx_init, state)
 {
     int i, k, result;
 
-    for (i = 0; i < 3 * flint_test_multiplier(); i++) {
+    for (i = 0; i < 3 * flint_test_multiplier(); i++)
+    {
         fmpz_t p;
         slong d;
         TEMPLATE(T, ctx_t) ctx;
@@ -35,7 +37,8 @@ TEST_TEMPLATE_FUNCTION_START(T, ctx_init, state)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    for (i = 0; i < 3 * flint_test_multiplier(); i++) {
+    for (i = 0; i < 3 * flint_test_multiplier(); i++)
+    {
         fmpz_t p;
         slong d;
         TEMPLATE(T, ctx_t) ctx_conway, ctx_mod;
@@ -47,7 +50,11 @@ TEST_TEMPLATE_FUNCTION_START(T, ctx_init, state)
         d = n_randint(state, 10) + 1;
         TEMPLATE(T, ctx_init_conway)(ctx_conway, p, d, "a");
 
+#ifdef FQ_H
+        TEMPLATE(T, ctx_init_modulus)(ctx_mod, ctx_conway->modulus, ctx_conway->ctxp, "a");
+#else
         TEMPLATE(T, ctx_init_modulus)(ctx_mod, ctx_conway->modulus, "a");
+#endif
 
         TEMPLATE(T, init)(a, ctx_conway);
         TEMPLATE(T, init)(b, ctx_mod);
@@ -56,7 +63,6 @@ TEST_TEMPLATE_FUNCTION_START(T, ctx_init, state)
 
         for (k = 0; k < 30; k++)
         {
-
             TEMPLATE(T, randtest)(a, state, ctx_conway);
             TEMPLATE(T, set)(b, a, ctx_mod);
 
