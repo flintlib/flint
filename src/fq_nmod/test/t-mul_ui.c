@@ -9,18 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "long_extras.h"
 #include "nmod_poly.h"
 #include "fq_nmod.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fq_nmod_mul_ui, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("mul_ui....");
-    fflush(stdout);
 
     /* Check aliasing of a, b */
     for (i = 0; i < 2000; i++)
@@ -45,7 +41,7 @@ main(void)
             flint_printf("FAIL 1:\n\n");
             flint_printf("a = "), fq_nmod_print_pretty(a, ctx), flint_printf("\n");
             flint_printf("b = "), fq_nmod_print_pretty(b, ctx), flint_printf("\n");
-	    flint_printf("x = %wu\n",x);
+            flint_printf("x = %wu\n",x);
             fflush(stdout);
             flint_abort();
         }
@@ -62,13 +58,13 @@ main(void)
         fq_nmod_ctx_t ctx;
         ulong x;
         fq_nmod_t a, c;
-	nmod_poly_t b;
+        nmod_poly_t b;
 
         fq_nmod_ctx_randtest(ctx, state);
 
         fq_nmod_init(a, ctx);
         fq_nmod_init(c, ctx);
-	nmod_poly_init(b, ctx->mod.n);
+        nmod_poly_init(b, ctx->mod.n);
 
         fq_nmod_randtest(a, state, ctx);
         x = n_randint(state, ctx->mod.n);
@@ -82,7 +78,7 @@ main(void)
             flint_printf("a = "), fq_nmod_print_pretty(a, ctx), flint_printf("\n");
             flint_printf("b = "), fq_nmod_print_pretty(b, ctx), flint_printf("\n");
             flint_printf("c = "), fq_nmod_print_pretty(c, ctx), flint_printf("\n");
-	    flint_printf("x = %wu\n",x);
+            flint_printf("x = %wu\n",x);
             fflush(stdout);
             flint_abort();
         }
@@ -93,7 +89,5 @@ main(void)
         fq_nmod_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

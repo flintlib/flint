@@ -9,18 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "nmod_poly.h"
 #include "fq_nmod.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fq_nmod_get_set_nmod_poly, state)
 {
     slong i, j;
     fq_nmod_ctx_t ctx;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("get/set_nmod_poly... ");
-    fflush(stdout);
 
     for (j = 0; j < 10*flint_test_multiplier(); j++)
     {
@@ -64,7 +60,5 @@ main(void)
         fq_nmod_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

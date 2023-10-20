@@ -9,20 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "long_extras.h"
-#include "nmod.h"
 #include "nmod_poly.h"
 #include "fmpz.h"
 #include "fq_nmod.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fq_nmod_mul_si, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("mul_si....");
-    fflush(stdout);
 
     {
         fq_nmod_t rop;
@@ -135,7 +130,5 @@ main(void)
         fq_nmod_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

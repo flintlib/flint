@@ -9,19 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
+#include "test_helpers.h"
 #include "nmod_poly.h"
 #include "fmpz.h"
 #include "fq_nmod.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fq_nmod_mul_fmpz, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("mul_fmpz....");
-    fflush(stdout);
 
     /* Check aliasing of a, b */
     for (i = 0; i < 2000; i++)
@@ -39,7 +34,7 @@ main(void)
 
         fq_nmod_init(a, ctx);
         fq_nmod_init(b, ctx);
-	fmpz_init(x);
+        fmpz_init(x);
 
         fq_nmod_randtest(a, state, ctx);
         fmpz_randtest_mod_signed(x,state,fq_nmod_ctx_prime(ctx));
@@ -52,14 +47,14 @@ main(void)
             flint_printf("FAIL:\n\n");
             flint_printf("a = "), fq_nmod_print_pretty(a, ctx), flint_printf("\n");
             flint_printf("b = "), fq_nmod_print_pretty(b, ctx), flint_printf("\n");
-	    flint_printf("x = "), fmpz_print(x), flint_printf("\n");
+            flint_printf("x = "), fmpz_print(x), flint_printf("\n");
             fflush(stdout);
             flint_abort();
         }
 
         fq_nmod_clear(a, ctx);
         fq_nmod_clear(b, ctx);
-	fmpz_clear(x);
+        fmpz_clear(x);
         fmpz_clear(p);
         fq_nmod_ctx_clear(ctx);
     }
@@ -72,7 +67,7 @@ main(void)
         fq_nmod_ctx_t ctx;
         fmpz_t x;
         fq_nmod_t a, c;
-	nmod_poly_t b;
+        nmod_poly_t b;
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
@@ -81,8 +76,8 @@ main(void)
 
         fq_nmod_init(a, ctx);
         fq_nmod_init(c, ctx);
-	fmpz_init(x);
-	nmod_poly_init(b, fmpz_get_ui(p));
+        fmpz_init(x);
+        nmod_poly_init(b, fmpz_get_ui(p));
 
         fq_nmod_randtest(a, state, ctx);
         fmpz_randtest_mod_signed(x, state, fq_nmod_ctx_prime(ctx));
@@ -105,7 +100,7 @@ main(void)
             flint_printf("a = "), fq_nmod_print_pretty(a, ctx), flint_printf("\n");
             flint_printf("b = "), fq_nmod_print_pretty(b, ctx), flint_printf("\n");
             flint_printf("c = "), fq_nmod_print_pretty(b, ctx), flint_printf("\n");
-	    flint_printf("x = "), fmpz_print(x), flint_printf("\n");
+            flint_printf("x = "), fmpz_print(x), flint_printf("\n");
             fflush(stdout);
             flint_abort();
         }
@@ -114,11 +109,9 @@ main(void)
         fq_nmod_clear(c, ctx);
         nmod_poly_clear(b);
         fmpz_clear(p);
-	fmpz_clear(x);
+        fmpz_clear(x);
         fq_nmod_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
