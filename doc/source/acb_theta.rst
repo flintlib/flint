@@ -1259,218 +1259,208 @@ probabilistic algorithm where we gradually increase *guard* and choose first `t
     After calling :func:`acb_theta_ql_reduce`, we use the duplication formula
     on the result of :func:`acb_theta_ql_a0` at `2\tau`.
 
-\subsection{The transformation formula}
+The transformation formula
+-------------------------------------------------------------------------------
 
-The functions in this section implement the theta transformation formula
-\cite[p.\,176]{igusa}.
+The functions in this section implement the theta transformation formula of
+[Igu1972]_, p. 176 and [Mum1983]_, p. 189: for any symplectic matrix `m`, any
+`(z,\tau)\in \mathbb{C}^g\times \mathbb{H}_g`, and any characteristic `(a,b)`,
+we have
+
+    .. math ::
+
+        \theta_{a,b}(m\cdot(z,\tau)) = \kappa(m) \zeta_8^{e(m, a, b)} \det(\gamma\tau + \delta)^{1/2} \exp(\pi i z^T (\gamma\tau + \delta)^{-1} \gamma z) \theta_{a',b'}(z,\tau)
+
+where
+- `\gamma,\delta` are the lower `g\times g` blocks of `m`,
+- `a',b'` is another characteristic depending on `m,a,b`,
+- `\zeta_8=\exp(i\pi/4)`,
+- `e(m,a,b)` is an integer given by an explicit formula in terms of `m,a,b` (this is
+`\phi_m` in Igusa's notation), and
+- `\kappa(m)` is an eighth root of unity, only well-defined up to sign unless
+we choose a particular branch of `\det(gamma\tau + \delta)^{1/2}` on
+`\mathbb{H}_g`.
 
 .. function:: ulong acb_theta_transform_char(slong* e, const fmpz_mat_t mat, ulong ab)
 
-Returns the theta characteristic `(a',b')` and sets `0\leq e < 8` such that the
-transformation formula reads: for every `\tau\in \mathbb{H}_g`,
-\[
-  \theta_{a,b}(0,\mathit{mat}\cdot \tau) = c\,\zeta_8^e\, \theta_{a',b'}(0,\tau)
-\]
-where `c` depends only on *mat} and `\tau` and `\zeta_8=\exp(i\pi/4)`. In
-Igusa's notation, *e} is `\phi_m(\mathit{mat})`.
+    Returns the theta characteristic `(a',b')` and sets *e* to `e(m,a,b)` in
+    the above formula.
 
-\T check that the `a` component of any characteristic remains the same when
-*mat} is a trigonal symplectic matrix as in :func:sp2gz_trig}.
+.. function:: void acb_theta_transform_sqrtdet(acb_t res, const acb_mat_t tau, slong prec)
 
-.. function:: slong acb_theta_transform_kappa(const fmpz_mat_t mat)
+    Sets *res* to `det(\tau)^{1/2}`, where the branch of the square root is
+    chosen such that the result is `i^{g/2}\det(Y)` when `\tau = iY` is purely
+    imaginary.
 
-Returns an integer `0\leq e < 8` such that in the transformation formula, we
-have `\kappa(\mathit{mat}) = \zeta_8^e`. The sign of `\kappa(\mathit{mat})` is
-fixed by making an arbitrary choice of `\det(c \tau + d)` when `\tau` is `i`
-times the identity matrix.
+    We pick a purely imaginary matrix *A* and consider the polynomial `P(t) =
+    det(A + (t+1)/2 (tau - A))`. Up to choosing another `A`, we may assume that
+    it has degree `g` and that its roots (as complex balls) do not intersect
+    the segment `[-1,1]\subset \mathbb{C}`. We then find the correct branch of
+    `P(t)^{1/2}` between `t=-1` and `t=1` as in [MN2019]_.
 
-\T check that for a block-diagonal symplectic matrix *mat} constructed
-from `U\in \mathrm{GL}_g(\mathbb{Z})`, `\kappa^2` is `\det(U)` in agreement
-with Igusa's results.
+.. function:: slong acb_theta_transform_kappa(acb_t sqrtdet, const fmpz_mat_t mat, const acb_mat_t tau, slong prec)
 
-.. function:: void acb_theta_transform_sqrtdet(acb_t res, const fmpz_mat_t mat, const acb_mat_t tau, slong prec)
+    Returns `0\leq r < 8` such that `\kappa(m) = \zeta_8^r` and sets *sqrtdet*
+    to the corresponding square root of `\det(\gamma\tau + \delta)`.
 
-Sets *res} to `\sqrt{\det(\gamma\tau + \delta)` where `\gamma,\delta`
-denote the lower `g\times g` blocks of *mat}. The choice of square root
-is made so that the transformation formula holds, and is determined by
-computing theta values at low precision.
+    After applying :func:`sp2gz_decompose`, we only have to consider four
+    special cases for *mat*: the easy cases where *mat* is trigonal or
+    block-diagonal as one can compute its action on `\theta_{0,0}` explicitly;
+    the case where *mat* is an embedded matrix from
+    `\mathrm{SL}_2(\mathbb{Z})`, where we rely on
+    :func:`acb_modular_theta_transform`; and the case where *mat* is an
+    embedded `J` matrix from dimension `0\leq r\leq g`, in which case `kappa(m)
+    \zeta_8^{e(m,0,0)} i^{r/2} \det(\tau_0)^{1/2} = 1`, where `tau_0` is the
+    upper left `r\times r` submatrix of `\tau` and the square root is computed
+    as in :func:`acb_theta_transform_sqrtdet`.
 
-\T check that the result squares to the determinant of :func:acb_siegel_cocycle}.
+.. function:: slong acb_theta_transform_kappa2(const fmpz_mat_t mat)
 
-.. function:: void acb_theta_transform_proj(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th,
-  int sqr, slong prec)
+    Returns `0\leq r < 3` such that `\kappa(m)^2 = i^r`, which makes sense
+    without reference to a branch of `\det(\gamma\tau + \delta)^{1/2}`.
 
-Assuming that *sqr} is 0 (false) and that *th} contains
-`\theta_{a,b}(z,\tau)` for some `z\in \mathbb{C}^g` and `\tau\in \mathbb{H}_g`,
-sets *res} to contain the values
-`\theta_{a,b}(\mathit{mat}\cdot (z,\tau))` (where *mat} acts as in
-:func:acb_theta_transform_z}) up to a common scalar factor in
-`\mathbb{C}^\times`. This only permutes the theta values and multiplies them by
-a suitable eighth root of unity. If *sqr} is nonzero (true), does the
-same computation for squared theta values `\theta_{a,b}(z,\tau)^2` instead.
+    We adopt a similar strategy to `acb_theta_transform_kappa` but do not call
+    :func:`acb_theta_transform_sqrtdet`.
 
-\T check that applying :func:acb_theta_transform_proj} using a random
-*mat} then its inverse gives back the initial projective point.
+.. function:: void acb_theta_transform_proj(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th, int sqr, slong prec)
 
-.. function:: void acb_theta_transform(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th,
-  acb_srcptr z, const acb_mat_t tau, slong kappa, int sqr, slong prec)
+    Assuming that *sqr* is 0 (false) and that *th* contains
+    `\theta_{a,b}(z,\tau)` for some `(z,\tau)`, sets *res* to contain the
+    values `\theta_{a,b}(\mathit{mat}\cdot (z,\tau))` up to a common scalar
+    factor in `\mathbb{C}^\times`. This only permutes the theta values and
+    multiplies them by a suitable eighth root of unity. If *sqr* is nonzero
+    (true), does the same computation for squared theta values
+    `\theta_{a,b}(z,\tau)^2` instead.
 
-Assuming that *sqr} is 0, that *kappa} is precomputed as in
-:func:acb_theta_transform_kappa}, and that *th} contains
-`\theta_{a,b}(z,\tau)`, sets *res} to vector of values
-`\theta_{a,b}(\mathit{mat}\cdot(z,\tau))` for `a,b\in\{0,1\}^g`. If *sqr}
-is nonzero, does the same computation for squared theta values instead.
+.. function:: void acb_theta_transform(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec)
 
-\T check that the result agrees with :func:acb_modular_theta} when `g=1` on
-random input. We restrict to `g=1` to avoid calling the naive algorithm on a
-matrix that is far from the fundamental domain.
+    Assuming that *sqr* is 0 and that *th* contains `\theta_{a,b}(z,\tau)`,
+    sets *res* to vector of values `\theta_{a,b}(\mathit{mat}\cdot(z,\tau))`
+    for `a,b\in\{0,1\}^g`. If *sqr* is nonzero, does the same computation for
+    squared theta values instead.
 
 .. function:: void acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec)
 
-Sets *th} to the vector of theta values `\theta_{a,b}(z,\tau)` or
-`\theta_{a,b}(z,\tau)^2` for `a,b\in \{0,1\}^g`, depending on whether
-*sqr} is 0 (false) or not. We reduce `\tau` using
-:func:acb_theta_siegel_reduce}, call :func:acb_theta_ql_all} or
-:func:acb_theta_ql_all_sqr}, and then apply the transformation formula. If the
-reduction is not successful, we call the naive algorithm at a lower precision
-instead.
+    Sets *th* to the vector of theta values `\theta_{a,b}(z,\tau)` or
+    `\theta_{a,b}(z,\tau)^2` for `a,b\in \{0,1\}^g`, depending on whether *sqr*
+    is 0 (false) or nonzero (true).
 
-\T check that the result agrees with :func:acb_theta_naive_all} on random
-input. The matrix *tau} is chosen to be a priori non-reduced but
-reasonably close to the fundamental domain.
+    We reduce `\tau` using :func:`acb_theta_siegel_reduce`, call
+    :func:`acb_theta_ql_all` or :func:`acb_theta_ql_all_sqr` on the reduced
+    matrix, and finally apply the transformation formula. If the reduction step
+    is not successful, we call the naive algorithm at a lower precision
+    instead.
 
-\subsection{Quasi-linear algorithms for derivatives}
+Quasi-linear algorithms for derivatives
+-------------------------------------------------------------------------------
 
 We implement an algorithm for derivatives of theta functions based on finite
 differences. It is quasi-linear in terms of the precision and the number of
 derivatives to be computed.
 
 Consider the Fourier expansion:
-\[
-  \begin{aligned}
-  \theta_{a,b}(z + h, \tau) &= \sum_{k\in \mathbb{Z}^g,\ k\geq 0}
-  \frac{1}{k_0!}\cdots \frac{1}{k_{g-1}!}
-  \frac{\partial^{|k|}\theta_{a,b}}{\partial z_0^{k_0}\cdots \partial
-    z_{g-1}^{k_{g-1}}}(z,\tau)\cdot h_0^{k_0}\cdots
-  h_{g-1}^{k_{g-1}}\\
-  &=: \sum_{k\in \mathbb{Z}^g,\ k\geq 0} a_k\, h_0^{k_0}\cdots h_{g-1}^{k_{g-1}}.
-  \end{aligned}
-\]
-The basic observation is that if one chooses
-`h = h_n = (\varepsilon \zeta^{n_0},\ldots, \varepsilon \zeta^{n_{g-1}})` where
-`\varepsilon > 0` and `\zeta` is a primitive `j^{\mathrm{th}}` root of unity
-and lets `n` run through all vectors in `\{0,\ldots, j - 1\}^g`, then taking a
-discrete Fourier transform of the resulting values will compute the individual
-Taylor coefficient for each derivation tuple that is bounded by `j`
-elementwise. A constant proportion, for fixed `g`, of this set consists of all
-tuples of total order at most `j`. More precisely, fix `p\in
-\mathbb{Z}^g`. Then
-\[
-  \sum_{n\in \{0,\ldots,m-1\}^g} \zeta^{-p^T n} \theta_{a,b}(z + h_n, \tau) =
-  m^g \sum_{\substack{k\in \mathbb{Z}^g,\ k\geq 0,\\\ k = p\ (\text{mod } m)}
-  a_k\,\varepsilon^{|k|} =: m^g (a_p\,\varepsilon^{|p|} + T).
-\]
-Observe that the magnitude gap between the leading term in
-the latter sum and the next ones is `\varepsilon^m`, not `\varepsilon`. This is
-is crucial for the algorithm to remain quasi-linear in the precision and the
-number of derivatives to be computed.
 
+    .. math ::
 
-In order to give an upper bound on `T`, we use the Cauchy integration
-formula. Assume that `|\theta_{a,b}(z,\tau)|\leq c` uniformly on a ball of
-radius `\rho` centered in `z` for `\lVert\cdot\rVert_\infty`. Then
-`|a_k|\leq c/\rho^{|k|}`, so, assuming that `(2g)^{1/m}\varepsilon \leq \rho`,
-\[
-  |T|\leq c \left(\frac{\varepsilon}{\rho}\right)^{|p|} \sum_{j\geq 1} \binom{g
-    - 1 + j}{j} \left(\frac{\varepsilon}{\rho}\right)^{mj} \leq 2 c
-  \left(\frac{\varepsilon}{\rho}\right)^{|p|}
-  \frac{(g\varepsilon/\rho)^m}{1 - (g\varepsilon/\rho)^m} \leq 2c g\,\frac{\varepsilon^{|p|+m}}{\rho^m}.
-\]
+        \begin{aligned}
+        \theta_{a,b}(z + h, \tau) &= \sum_{k\in \mathbb{Z}^g,\ k\geq 0}
+        \frac{1}{k_0!}\cdots \frac{1}{k_{g-1}!}
+        \frac{\partial^{|k|}\theta_{a,b}}{\partial z_0^{k_0}\cdots \partial
+        z_{g-1}^{k_{g-1}}}(z,\tau)\cdot h_0^{k_0}\cdots
+        h_{g-1}^{k_{g-1}}\\
+        &=: \sum_{k\in \mathbb{Z}^g,\ k\geq 0} a_k\, h_0^{k_0}\cdots h_{g-1}^{k_{g-1}}.
+        \end{aligned}
+
+If one chooses `h = h_n = (\varepsilon \zeta^{n_0},\ldots, \varepsilon
+\zeta^{n_{g-1}})` where `\varepsilon > 0` and `\zeta` is a primitive
+`j^{\mathrm{th}}` root of unity and lets `n` run through all vectors in
+`\{0,\ldots, j - 1\}^g`, then taking a discrete Fourier transform of the
+resulting values will compute the individual Taylor coefficient for each
+derivation tuple that is bounded by `j` elementwise. A constant proportion, for
+fixed `g`, of this set consists of all tuples of total order at most `j`. More
+precisely, fix `p\in \mathbb{Z}^g`. Then
+
+    .. math ::
+
+        \sum_{n\in \{0,\ldots,m-1\}^g} \zeta^{-p^T n} \theta_{a,b}(z + h_n, \tau)
+        = m^g \sum_{\substack{k\in \mathbb{Z}^g,\ k\geq 0,\\\ k = p\ (\text{mod } m)}
+        a_k\,\varepsilon^{|k|} =: m^g (a_p\,\varepsilon^{|p|} + T).
+
+We can obtain an upper bound on `T` from the Cauchy integration formula. Assume
+that `|\theta_{a,b}(z,\tau)|\leq c` uniformly on a ball of radius `\rho`
+centered in `z` for `\lVert\cdot\rVert_\infty`. Then we have
+
+    .. math ::
+
+        |T|\leq \leq 2c g\,\frac{\varepsilon^{|p|+m}}{\rho^m}.
+
 Since we divide by `\varepsilon^{|p|}` to get `a_p`, we will add an error of
-`2c g (\varepsilon/\rho)^m`.
+`2c g (\varepsilon/\rho)^m` to the result of the discrete Fourier transform.
 
-.. function:: void acb_theta_jet_bounds(arb_t c, arb_t rho, acb_srcptr z, const
-  acb_mat_t tau, slong ord)
+.. function:: void acb_theta_jet_bounds(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord)
 
-Sets *c} and *rho} such that on every ball centered at (a point
-contained in) *z} of radius *rho}, the functions `|\theta_{a,b}|`
-for all characteristics `(a,b)` are uniformly bounded by `c`. The choice of
-*rho} is tuned to get interesting upper bounds on derivatives of
-`\theta_{a,b}` up to order *ord}.
+    Sets *c* and *rho* such that on every ball centered at (a point contained
+    in) *z* of radius *rho*, the functions `|\theta_{a,b}|` for all
+    characteristics `(a,b)` are uniformly bounded by `c`. The choice of *rho*
+    is tuned to get interesting upper bounds on derivatives of `\theta_{a,b}`
+    up to order *ord*.
 
-We proceed as follows. First, we compute `c_0`, `c_1`, `c_2` such that for any
-choice of `\rho`, one can take `c = c_0\exp((c_1 + c_2\rho)^2)`
-above. Following :func:acb_theta_naive_reduce}, we get
-\[
-  |\theta_{a,b}(z',\tau)| \leq c_0\exp(\pi y'^T Y^{-1} y')
-\]
-where `c_0 = 2^g \prod_{j=0}^{g-1} (1 + 2\gamma_j^{-1})` \cite{main}. In turn,
-if `\lVert z' - z\rVert_\infty\leq \rho`, then
-\[
-  \pi y'^T Y^{-1} y' \leq \bigl(\sqrt{\pi y^T Y^{-1} y} + \rho \sup_{\lVert x
-    \rVert_\infty\leq 1} \sqrt{\pi x^T Y^{-1} x}\bigr)^2
-\]
-by the triangle inequality for the quadratic form `\pi Y^{-1}`. An upper bound
-`c_2` on the sup is easily computed from the Cholesky matrix for `\pi Y^{-1}`,
-while we can take `c_1 = \sqrt{\pi y^T Y^{-1} y}`.
+    We proceed as follows. First, we compute `c_0`, `c_1`, `c_2` such that for
+    any choice of `\rho`, one can take `c = c_0\exp((c_1 + c_2\rho)^2)`
+    above. We can take
 
-Once `c_0, c_1, c_2` are computed, we look for a value of `\rho` that minimizes
-`\exp((c_1 + c_2\rho)^2)/\rho^{m}` where `m = \mathit{ord}+1`, so we set `\rho`
-to the positive root of `2c_2\rho (c_1 + c_2\rho) = m`.
+    .. math ::
 
-\T on reasonable input, check that *c} and *rho} are finite, and
-check that their definition is satisfied by sampling theta values on the
-corresponding ball at low precisions.
+        c_0 = 2^g \prod_{j=0}^{g-1} (1 + 2\gamma_j^{-1}), \quad
+        c_1 = \sqrt{\pi y^T Y^{-1} y}, \quad
+        c_2 = \sup_{\lVert x \rVert_\infty\leq 1}
+            \sqrt{\pi x^T Y^{-1} x}\bigr)^2,
+
+    and one can easily compute an upper bound on `c_2` from the Cholesky
+    decomposition of `\pi Y^{-1}`. We then look for a value of `\rho` that
+    minimizes `\exp((c_1 + c_2\rho)^2)/\rho^{m}` where `m = \mathit{ord}+1`,
+    i.e. we set `\rho` to the positive root of `2c_2\rho (c_1 + c_2\rho) = m`.
 
 .. function:: void acb_theta_jet_fd_radius(arf_t eps, arf_t err, const arb_t c, const arb_t rho,
   slong ord, slong g, slong prec)
 
-Sets *eps} and *err} to be a suitable radius and error bound for
-computing derivatives up to total order *ord} at precision *prec},
-given *c} and *rho} as above. We want
-`(2 g)^{1/m} \varepsilon \leq \rho` and
-`2 c g (\varepsilon/\rho)^{m} \leq 2^{-\mathit{prec}}` where
-`m = \mathit{ord} + 1`, so we set `\varepsilon` to a lower bound for
-`\rho \cdot (\min\{2^{-\mathit{prec}}/c, 1\}/2g)^{1/m}`. We also set
-*err} to `2^{-\mathit{prec}}`.
+    Sets *eps* and *err* to be a suitable radius and error bound for computing
+    derivatives up to total order *ord* at precision *prec*, given *c* and
+    *rho* as above.
 
-\T check that these inequalities are satisfied on random choices of *c} and *rho}.
+    We want `(2 g)^{1/m} \varepsilon \leq \rho` and `2 c g
+    (\varepsilon/\rho)^{m} \leq 2^{-\mathit{prec}}` where `m = \mathit{ord} +
+    1`, so we set `\varepsilon` to a lower bound for `\rho \cdot
+    (\min\{2^{-\mathit{prec}}/c, 1\}/2g)^{1/m}`. We also set *err* to
+    `2^{-\mathit{prec}}`.
 
-.. function:: void acb_theta_jet_fd(acb_ptr dth, const arf_t eps, const arf_t err, acb_srcptr val,
-  slong ord, slong g, slong prec)
+.. function:: void acb_theta_jet_fd(acb_ptr dth, const arf_t eps, const arf_t err, acb_srcptr val, slong ord, slong g, slong prec)
 
-Assuming that *val} contains the values `\theta_{a,b}(z + h_n,\tau)`
-where `h_n = (\varepsilon \zeta^{n_0},\ldots, \varepsilon \zeta^{n_{g-1}})` for
-a root of unity `\zeta` of order `\mathit{ord} + 1`, and assuming that
-*eps} and *err} has been computed as in
-:func:acb_theta_jet_fd_radius}, sets *dth} to the vector of partial
-derivatives of `\theta_{a,b}` at `(z,\tau)` up to total order *ord}. The
-vector *val} should be indexed in lexicographic order as in
-:func:acb_dft}, i.e. writing `j = \overline{a_{g-1}\cdots a_0}` in basis `m`,
-the `j^{\mathrm{th}}` entry of *val} corresponds to
-`n = (a_0,\ldots, a_{g-1})`. The output derivatives are normalized as in the
-Taylor expansion.
-
-\T check that this computes the correct Fourier coefficients for the
-exponential function `\exp(z_0+\cdots+z_{g-1})`, setting *c} and
-*rho} by hand instead of calling :func:acb_theta_jet_bounds}.
+    Assuming that *val* contains the values `\theta_{a,b}(z + h_n,\tau)` where
+    `h_n = (\varepsilon \zeta^{n_0},\ldots, \varepsilon \zeta^{n_{g-1}})` for a
+    root of unity `\zeta` of order `\mathit{ord} + 1`, and assuming that *eps*
+    and *err* has been computed as in :func:`acb_theta_jet_fd_radius`, sets
+    *dth* to the vector of partial derivatives of `\theta_{a,b}` at `(z,\tau)`
+    up to total order *ord*. The vector *val* should be indexed in
+    lexicographic order as in :func:`acb_dft`, i.e. writing `j =
+    \overline{a_{g-1}\cdots a_0}` in basis `m`, the `j^{\mathrm{th}}` entry of
+    *val* corresponds to `n = (a_0,\ldots, a_{g-1})`. The output derivatives
+    are normalized as in the Taylor expansion.
 
 .. function:: void acb_theta_jet_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
 
-Sets *dth} to the derivatives of all functions `\theta_{a,b}` for
-`a,b\in \{0,1\}^g` at `(z,\tau)`, as a concatenation of `2^{2g}` vectors of
-length :func:acb_theta_jet_nb(ord, g). This algorithm runs in quasi-linear
-time in `\mathit{prec}\cdot \mathit{ord}^g` for any fixed `g`.
+    Sets *dth} to the derivatives of all functions `\theta_{a,b}` for `a,b\in
+    \{0,1\}^g` at `(z,\tau)`, as a concatenation of `2^{2g}` vectors of length
+    `N`, the total number of derivation tuples of total order at most
+    *ord*. This algorithm runs in quasi-linear time in `\mathit{prec}\cdot
+    \mathit{ord}^g` for any fixed `g`.
 
-We first compute *c}, *rho}, *err} and *eps} as above,
-then compute theta values `\theta_{a,b}(z + h_n,\tau)` at a higher precision to
-account for division by `\varepsilon^{\mathit{ord}}\cdot
-(\mathit{ord}+1)^g`. For this, we first extract the midpoint of `z` and
-`\tau`. Finally, we adjust the error bounds using
-:func:acb_theta_jet_error_bounds} and the naive algorithm for derivatives of
-order `\mathit{ord} + 2`.
-
-\T check that the output agrees with :func:acb_theta_jet_naive_all} on random input.
+    We first compute *c*, *rho*, *err* and *eps* as above, then compute theta
+    values `\theta_{a,b}(z + h_n,\tau)` at a higher precision at the midpoints
+    of `z` and `\tau` to account for division by
+    `\varepsilon^{\mathit{ord}}\cdot (\mathit{ord}+1)^g`. Finally, we adjust
+    the error bounds using :func:`acb_theta_jet_error_bounds` and the naive
+    algorithm for derivatives of order `\mathit{ord} + 2`.
 
 \subsection{Dimension~`2` specifics}
 
