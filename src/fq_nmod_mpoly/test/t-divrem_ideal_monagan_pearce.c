@@ -9,17 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fq_nmod_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fq_nmod_mpoly_divrem_ideal_monagan_pearce, state)
 {
     int result;
     slong i, j, w;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("divrem_ideal_monagan_pearce....");
-    fflush(stdout);
 
     /* Check f*g/g = f */
     for (i = 0; i < 30 * flint_test_multiplier(); i++)
@@ -273,8 +269,5 @@ main(void)
         fq_nmod_mpoly_ctx_clear(ctx);
     }
 
-    printf("PASS\n");
-    FLINT_TEST_CLEANUP(state);
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }

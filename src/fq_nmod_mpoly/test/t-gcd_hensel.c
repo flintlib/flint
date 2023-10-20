@@ -9,8 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fq_nmod_mpoly.h"
 
+/* Defined in t-gcd_brown.c, t-gcd.c, t-gcd_cofactors.c, t-gcd_hensel.c,
+ * t-gcd_zippel2.c, t-gcd_zippel.c */
+#define gcd_check gcd_check_gcd_hensel
 void gcd_check(
     fq_nmod_mpoly_t g,
     fq_nmod_mpoly_t a,
@@ -105,14 +109,9 @@ cleanup:
     fq_nmod_mpoly_clear(cg, ctx);
 }
 
-int
-main(void)
+TEST_FUNCTION_START(fq_nmod_mpoly_gcd_hensel, state)
 {
     slong i, j;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("gcd_hensel....");
-    fflush(stdout);
 
     for (i = 0; i < 10*flint_test_multiplier(); i++)
     {
@@ -189,8 +188,6 @@ main(void)
         fq_nmod_mpoly_ctx_clear(ctx);
     }
 
-    flint_printf("PASS\n");
-    FLINT_TEST_CLEANUP(state);
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }
+#undef gcd_check

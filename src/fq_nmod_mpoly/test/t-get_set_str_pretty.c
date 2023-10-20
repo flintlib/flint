@@ -9,16 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fq_nmod_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fq_nmod_mpoly_get_set_str_pretty, state)
 {
     slong i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("get_set_str_pretty....");
-    fflush(stdout);
 
     {
         slong len1;
@@ -61,8 +57,5 @@ main(void)
         }
     }
 
-    printf("PASS\n");
-    FLINT_TEST_CLEANUP(state);
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }
