@@ -1462,87 +1462,86 @@ Since we divide by `\varepsilon^{|p|}` to get `a_p`, we will add an error of
     the error bounds using :func:`acb_theta_jet_error_bounds` and the naive
     algorithm for derivatives of order `\mathit{ord} + 2`.
 
-\subsection{Dimension~`2` specifics}
+Dimension 2 specifics
+-------------------------------------------------------------------------------
 
 In the `g=2` case, one can use theta functions to evaluate many fundamental
-Siegel modular forms. This section contains functions to do so, in analogy with
-:func:acb_modular_delta}, :func:acb_modular_eisenstein}, etc. when `g=1`.
+Siegel modular forms. This section methods functions to do so, in analogy with
+:func:`acb_modular_delta` or :func:`acb_modular_eisenstein` when `g=1`.
 
-We use the following notation. For `k,j\geq 0`, a Siegel modular form of weight
+We use the following notation. Fix `k,j\geq 0`. A Siegel modular form of weight
 `\det^k\otimes \mathrm{Sym}^j` is by definition an analytic function
 `f: \mathbb{H}_g\to \mathbb{C}_j[X]` (the vector space of polynomials of degree
-at most~`j`) such that for any `\tau\in \mathbb{H}_g` and
+at most `j`) such that for any `\tau\in \mathbb{H}_g` and
 `m\in \mathrm{Sp}_4(\mathbb{Z})`, we have
-\[
-  f((\alpha\tau + \beta)(\gamma\tau + \delta)^{-1}) = \det(\gamma\tau +
-  \delta)^k\cdot \mathrm{Sym}^j(\gamma\tau + \delta)(f(\tau)).
-\]
+
+    .. math ::
+
+        f((\alpha\tau + \beta)(\gamma\tau + \delta)^{-1}) = \det(\gamma\tau +
+        \delta)^k\cdot \mathrm{Sym}^j(\gamma\tau + \delta)(f(\tau)).
+
 Here `\alpha,\beta,\gamma,\delta` are the `g\times g` blocks of `m`, and
 `\mathrm{Sym}^j(r)` for
 `r = \smash{(\begin{smallmatrix} a & b\\ c & d\end{smallmatrix})\in
 \mathrm{GL}_2(\mathbb{C})` is the map
-`P(X) \mapsto (b X + d)^j P(\tfrac{a X + c}{b X + d})`. For a nonzero `f` to
-exist, `j` must be even.
+
+    .. math ::
+
+        P(X) \mapsto (b X + d)^j P(\tfrac{a X + c}{b X + d}).
+
+For a nonzero `f` to exist, `j` must be even.
 
 Siegel modular forms generate a bi-graded ring which is not finitely
 generated. However, if we relax the definition of a Siegel modular form and
-allow them to have a pole along the diagonal
-`\mathbb{H}_1^2 = \{(\begin{smallmatrix} \tau_1 & 0 \\ 0 &
-  \tau_2\end{smallmatrix})\}\subset \mathbb{H}_2` of a certain order (depending
-on the weight), we indeed find a finitely generated ring with 26 generators
-corresponding to classical \emph{covariants}, studied e.g. by Clebsch
-\cite{clebsch}. For historical reasons, covariants are classified in terms of
-their degree `k` and index `j`, corresponding to Siegel modular functions of
-weight `\det^{k - j/2}\otimes \mathrm{Sym}^j`.
+allow them to have a pole along the diagonal `\mathbb{H}_1^2 =
+\{(\begin{smallmatrix} \tau_1 & 0 \\ 0 & \tau_2\end{smallmatrix})\}\subset
+\mathbb{H}_2` of a certain order (depending on the weight), we indeed find a
+finitely generated ring corresponding to classical \emph{covariants}, studied
+e.g. by Clebsch \cite{clebsch}. Historically, covariants are classified in
+terms of their degree `k` and index `j`, corresponding to Siegel modular
+functions of weight `\det^{k - j/2}\otimes \mathrm{Sym}^j`. See [CFG2017]_ for
+more details on the correspondence between modular forms and covariants.
 
-.. function:: ACB_THETA_G2_COV_NB}
+.. macro:: ACB_THETA_G2_COV_NB
 
-Macro giving the number of generators of the ring of covariants, equal to 26.
+    Macro giving the number of generators of the ring of covariants, equal to 26.
 
 .. function:: void acb_theta_g2_jet_naive_1(acb_ptr dth, const acb_mat_t tau, slong prec)
 
-Sets *dth} in the same way as .. function:: acb_theta_jet_naive_all(dth, z, tau,
-  1, prec) for `z = 0`, but works more efficiently, since the value
-(resp. gradients) of `\theta_{a,b}(z,\tau)` at `z = 0` vanish if `(a,b)` is odd
-(resp. even). The attached worker uses one of two available strategies (doing
-multiplications and then summing, or calling :func:acb_dot} twice) depending on
-*prec}.
+    Sets *dth* in the same way as :func:`acb_theta_jet_naive_all` at order 1
+    for `z=0`.
 
-\T check that the output agrees with :func:acb_theta_jet_naive_all}.
+    We take advantage of the fact that the value (resp. gradients) of
+    `\theta_{a,b}(z,\tau)` at `z = 0` vanish if `(a,b)` is an odd (resp. even)
+    characteristic. The attached worker of type
+    :type:`acb_theta_naive_worker_t` uses one of two available strategies
+    (doing multiplications and then summing, or calling :func:`acb_dot` twice)
+    depending on *prec*.
 
-.. function:: void acb_theta_g2_detk_symj(acb_poly_t res, const acb_mat_t m, const acb_poly_t f,
-  slong k, slong j, slong prec)
+.. function:: void acb_theta_g2_detk_symj(acb_poly_t res, const acb_mat_t m, const acb_poly_t f, slong k, slong j, slong prec)
 
-Sets *res} to `\det(m)^k \mathrm{Sym}^j(m)(f)`. The polynomial `f` should
-be of degree at most `j` (any coefficients of larger degree are ignored).
+    Sets *res* to `\det(m)^k \mathrm{Sym}^j(m)(f)`. The polynomial `f` should
+    be of degree at most `j` (any coefficients of larger degree are ignored).
 
-\T check that the chain rule holds when `m` is obtained as a product of two matrices.
+.. function:: void acb_theta_g2_transvectant(acb_poly_t res, const acb_poly_t g, const acb_poly_t h, slong m, slong n, slong k, slong prec)
 
-.. function:: void acb_theta_g2_transvectant(acb_poly_t res, const acb_poly_t g, const acb_poly_t h,
-  slong m, slong n, slong k, slong prec)
+    Sets *res* to the `k^{\mathrm{th}}` transvectant of the polynomials `g` and
+    `h` of degrees `m` and `n`: considering `g` and `h` as homogeneous
+    polynomials of degree `m` (resp. `n`) in `x_1,x_2`, this sets *res* to
 
-Sets *res} to the `k^{\mathrm{th}}` transvectant of the polynomials `g`
-and `h` of degrees `m` and `n`: considering `g` and `h` as homogeneous
-polynomials of degree `m` (resp. `n`) in `x_1,x_2`, this sets *res} to
-\[
-  (g,h)_k := \frac{(m-k)!(n-k)!}{m!n!}  \sum_{j=0}^{k} (-1)^{k-j} \binom{k}{j}
-  \frac{\partial^k g}{\partial x_1^{k-j}\partial x_2^j} \frac{\partial^k
-    h}{\partial x_1^{j}\partial x_2^{k-j}}.
-\]
-Any coefficients of `g` or `h` of larger degree than `m` (resp. `n`) are
-ignored.
+    .. math ::
 
-\T check that for `f = \sum_{j=0}^6 a_jx^{6-j}`, we have
-`(f,f)_6 = -3a_3^2 + 8a_2a_4 - 20a_1a_5 + 120a_0a_6`.
+        (g,h)_k := \frac{(m-k)!(n-k)!}{m!n!}  \sum_{j=0}^{k} (-1)^{k-j} \binom{k}{j}
+        \frac{\partial^k g}{\partial x_1^{k-j}\partial x_2^j}
+        \frac{\partial^k h}{\partial x_1^{j}\partial x_2^{k-j}}.
 
-.. function:: void acb_theta_g2_transvectant_lead(acb_t res, const acb_poly_t g, const acb_poly_t h,
-  slong m, slong n, slong k, slong prec)
+    Any coefficients of `g` or `h` of larger degree than `m` (resp. `n`) are
+    ignored.
 
-Sets *res} to the leading coefficient of `(g,h)_k` in `x_1`, with the same
-conventions as above.
+.. function:: void acb_theta_g2_transvectant_lead(acb_t res, const acb_poly_t g, const acb_poly_t h, slong m, slong n, slong k, slong prec)
 
-\T check that we indeed get the leading term of the transvectant computed using
-:func:acb_theta_g2_transvectant}.
+    Sets *res* to the leading coefficient of `(g,h)_k` in `x_1`, with the same
+    conventions as in :func:`acb_theta_g2_transvectant`.
 
 .. function:: void acb_theta_g2_psi4(acb_t res, acb_srcptr th2, slong prec)
 
@@ -1552,123 +1551,116 @@ conventions as above.
 
 .. function:: void acb_theta_g2_chi12(acb_t res, acb_srcptr th2, slong prec)
 
-Sets *res} to the value of the Eisenstein series `\psi_4`, `\psi_6` or
-the cusp forms `\chi_{10}, \chi_{12}` corresponding to the given vector of
-squared theta values. We use the formulas from \cite[§7.1]{streng}, with the
-following normalizations: `\psi_4 = h_4/4`, `\psi_6 = h_6/4`,
-`\chi_{10} = -2^{-12} h_{10}`, `\chi_{12} = 2^{-15}h_{12}`. We warn that these
-differ from the classical notation of Igusa. Writing
-`\tau = (\begin{smallmatrix} \tau_1 & \tau_2 \\ \tau_2 &
-  \tau_3\end{smallmatrix})` and `q_j = \exp2(\pi i \tau_j)`, the Fourier
-expansions of these modular forms begin as follows:
-\[\begin{aligned}
-    \psi_4(\tau) &= 1 + 240(q_1 + q_3) + \cdots\\
-    \psi_6(\tau) &= 1 - 504(q_1 + q_3) + \cdots\\
-    \chi_{10}(\tau) &= (q_2 - 2 + q_2^{-1}) q_1 q_3 + \cdots\\
-    \chi_{12}(\tau) &= (q_2 + 10 + q_2^{-1}) q_1 q_3 + \cdots.
-  \end{aligned}
-\]
+    Sets *res* to the value of the Eisenstein series `\psi_4`, `\psi_6` or the
+    cusp forms `\chi_{10}, \chi_{12}` corresponding to the given vector of
+    squared theta values. We use the formulas from §7.1 in [Str2014]_, with
+    the following normalizations:
 
-\T check that the values transform as they should under :func:acb_theta_transform_proj}.
+    .. math ::
+
+        \psi_4 = h_4/4, \quad \psi_6 = h_6/4,\quad \chi_{10} = -2^{-12} h_{10},
+        \quad \chi_{12} = 2^{-15}h_{12}.
+
+    We warn that `chi_{10}` and `\chi_{12}` differ from the classical notation
+    of Igusa (e.g. [Igu1979]_) by scalar factors. Writing `\tau =
+    (\begin{smallmatrix} \tau_1 & \tau_2 \\ \tau_2 & \tau_3\end{smallmatrix})`
+    and `q_j = \exp2(\pi i \tau_j)`, the Fourier expansions of these modular
+    forms begin as follows:
+
+    .. math ::
+
+        \begin{aligned} \psi_4(\tau) &= 1 + 240(q_1 + q_3) + \cdots\\
+        \psi_6(\tau) &= 1 - 504(q_1 + q_3) + \cdots\\
+        \chi_{10}(\tau) &= (q_2 - 2 + q_2^{-1}) q_1 q_3 + \cdots\\
+        \chi_{12}(\tau) &= (q_2 + 10 + q_2^{-1}) q_1 q_3 + \cdots.
+        \end{aligned}
 
 .. function:: void acb_theta_g2_chi5(acb_t res, acb_srcptr th, slong prec)
 
-Sets *res} to the value of
-`\chi_5 = - 2^{-6} \prod_{(a,b)\text{ even}} \theta_{a,b}` corresponding to the
-given vector of theta values. The form `\chi_5` is a Siegel cusp form with
-character: see \cite{clery} for more details.
-
-\T check that `\chi_5^2=\chi_{10}`.
+    Sets *res* to the value of `\chi_5 = - 2^{-6} \prod_{(a,b)\text{ even}}
+    \theta_{a,b}` corresponding to the given theta values. The form `\chi_5` is
+    a Siegel cusp form with character: see [CFG2017]_ for more details.
 
 .. function:: void acb_theta_g2_chi35(acb_t res, acb_srcptr th, slong prec)
 
-Sets *res} to the value of the cusp form `\chi_{35}` corresponding to the vector
-of theta values. The form `\chi_{35}` is the unique scalar-valued Siegel
-modular form of weight `\det^{35}\otimes \mathrm{Sym}^0` up to scalars, and is
-normalized as follows:
-\[
-  \chi_{35}(\tau) = q_1^2 q_3^2 (q_1 - q_3 )(q_2 - q_2^{-1}) + \cdots
-\]
+    Sets *res* to the value of the cusp form `\chi_{35}` corresponding to the vector
+    of theta values. The form `\chi_{35}` is the unique scalar-valued Siegel
+    modular form of weight `\det^{35}\otimes \mathrm{Sym}^0` up to scalars, and is
+    normalized as follows:
 
-\T check that the values transform as they should under :func:acb_theta_transform_proj}.
+    .. math ::
+
+        \chi_{35}(\tau) = q_1^2 q_3^2 (q_1 - q_3 )(q_2 - q_2^{-1}) + \cdots
+
+    An explicit formula for `chi_{35}` in terms of theta values is given in
+    [Bol1887]_. See also [Mum1984]_, Prop. 6.2 p. 98 for how to translate
+    Bolza's notation in terms of theta characteristics.
 
 .. function:: void acb_theta_g2_chi3_6(acb_poly_t res, acb_srcptr dth, slong prec)
 
-Sets *res} to the value of the vector-valued cusp form with character
-`\chi_{6,3}` of weight `\det^3\otimes \mathrm{Sym}^6` corresponding to the
-given values of *dth}, computed as in e.g.
-:func:acb_theta_g2_jet_naive_1}. We have by \cite{clery}:
-\[
-  \chi_{3,6}(\tau) = \frac{1}{64\pi^6} \prod_{(a,b) \text{ odd}}
-  \left(\frac{\partial \theta_{a,b}}{\partial z_1}(0,\tau) x_1 +
-    \frac{\partial\theta_{a,b}}{\partial z_2}(0,\tau) x_2\right).
-\]
+    Sets *res* to the value of the vector-valued cusp form with character
+    `\chi_{6,3}` of weight `\det^3\otimes \mathrm{Sym}^6` corresponding to the
+    given values of *dth*, computed as in e.g.
+    :func:`acb_theta_g2_jet_naive_1`. We have by [CFG2017]_:
 
-\T check that `\chi_5\chi_{3,6}` defines a modular form of weight `\det^{8}\mathrm{Sym}^6`.
+    .. math ::
+
+        \chi_{3,6}(\tau) = \frac{1}{64\pi^6} \prod_{(a,b) \text{ odd}}
+        \left(\frac{\partial \theta_{a,b}}{\partial z_1}(0,\tau) x_1 +
+        \frac{\partial\theta_{a,b}}{\partial z_2}(0,\tau) x_2\right).
 
 .. function:: void acb_theta_g2_sextic(acb_poly_t res, const acb_mat_t tau, slong prec)
 
-Sets *res} to the value of `\chi_{-2,6}:=\chi_{3,6}/\chi_5` at `\tau`. We
-reduce `\tau` to the Siegel fundamental domain and call either
-:func:acb_theta_g2_jet_naive_1} or :func:acb_theta_jet_all} to compute theta
-gradients, depending on *prec}. Under the correspondence between Siegel
-modular functions and covariants of binary sextics, `\chi_{-2,6}` corresponds
-to the binary sextic itself, hence the name.
-
-\T check that the discriminant of :func:acb_theta_g2_sextic} is `2^{12}\chi_{10}`.
+    Sets *res* to the value of `\chi_{-2,6}:=\chi_{3,6}/\chi_5` at `\tau`. We
+    reduce `\tau` to the Siegel fundamental domain and call either
+    :func:`acb_theta_g2_jet_naive_1` or :func:`acb_theta_jet_all` to compute
+    theta gradients, depending on *prec*. Under the correspondence between
+    Siegel modular functions and covariants of binary sextics, `\chi_{-2,6}`
+    corresponds to the binary sextic itself, hence the name.
 
 .. function:: void acb_theta_g2_covariants(acb_poly_struct* res, const acb_poly_t f, slong prec)
 
-Sets *res} to the vector of 26 generators of the ring of covariants
-evaluated at the given sextic *f} (any terms of degree `>6` are ignored),
-in the following order:
-\begin{multicols}{2}
-\begin{enumerate}
-  \setcounter{enumi}{-1}
-\item `C_{1,6}=f`
-\item `C_{2,0}= 60(f,f)_6`
-\item `C_{2,4}= 75(f,f)_4`
-\item `C_{2,8}= 90(f,f)_2`
-\item `C_{3,2}= 30(f,C_{2,4})_4`
-\item `C_{3,6}= 30(f,C_{2,4})_2`
-\item `C_{3,8}= 6(f,C_{2,4})_1`
-\item `C_{3,12}= 6 (f,C_{2,8})_1`
-\item `C_{4,0}= 2 (C_{2,4},C_{2,4})_4`
-\item `C_{4,4}= 30 (f,C_{3,2})_2`
-\item `C_{4,6}= 6(f,C_{3,2})_1`
-\item `C_{4,10}= 2(C_{2,8},C_{2,4})_1`
-\item `C_{5,2}=(C_{2,4},C_{3,2})_2`
-\item `C_{5,4}=\frac 25 (C_{2,4},C_{3,2})_1`
-\item `C_{5,8}= 2(C_{2,8},C_{3,2})_1`
-\item `C_{6,0}= 2(C_{3,2},C_{3,2})_2`
-\item `C_{6,6}^{(1)= \frac 25(C_{3,6},C_{3,2})_1`
-\item `C_{6,6}^{(2)= \frac 83(C_{3,8},C_{3,2})_2`
-\item `C_{7,2}= 30(f,C_{3,2}^2)_4`
-\item `C_{7,4}= 12(f,C_{3,2}^2)_3`
-\item `C_{8,2}= \frac 25(C_{2,4},C_{3,2}^2)_3`
-\item `C_{9,4}= 4(C_{3,8},C_{3,2}^2)_4`
-\item `C_{10,0}= 20(f,C_{3,2}^3)_6`
-\item `C_{10,2}= \frac 65(f,C_{3,2}^3)_5`
-\item `C_{12,2}= \frac 85(C_{3,8},C_{3,2}^3)_6`
-\item `C_{15,0}= \frac{1}{30000} (C_{3,8},C_{3,2}^4)_8`.
-\end{enumerate}
-\end{multicols}
-The scalar factors are chosen so that when evaluated at a formal sextic
-`f = \sum a_i x_1^{6-i}x_2^i`, the covariants are integral and primitive as
-multivariate polynomials in `a_0,\ldots,a_6,x_1,x_2`.
+    Sets *res* to the vector of 26 generators of the ring of covariants
+    evaluated at the given sextic *f* (any terms of degree `>6` are ignored),
+    in the following order:
 
-\T check that the output agrees with :func:acb_theta_g2_psi4} using the
-relation `\psi_4 = -(C_{2,0} - 3C_{4,0})/20`. Also check that covariants
-transform as they should under the action of `\mathrm{Sp}_4(\mathbb{Z})`, and
-that covariants take integral values on integral polynomials.
+    0. `C_{1,6}=f`
+    1. `C_{2,0}= 60(f,f)_6`
+    2. `C_{2,4}= 75(f,f)_4`
+    3. `C_{2,8}= 90(f,f)_2`
+    4. `C_{3,2}= 30(f,C_{2,4})_4`
+    5. `C_{3,6}= 30(f,C_{2,4})_2`
+    6. `C_{3,8}= 6(f,C_{2,4})_1`
+    7. `C_{3,12}= 6 (f,C_{2,8})_1`
+    8. `C_{4,0}= 2 (C_{2,4},C_{2,4})_4`
+    9. `C_{4,4}= 30 (f,C_{3,2})_2`
+    10. `C_{4,6}= 6(f,C_{3,2})_1`
+    11. `C_{4,10}= 2(C_{2,8},C_{2,4})_1`
+    12. `C_{5,2}=(C_{2,4},C_{3,2})_2`
+    13. `C_{5,4}=\frac 25 (C_{2,4},C_{3,2})_1`
+    14. `C_{5,8}= 2(C_{2,8},C_{3,2})_1`
+    15. `C_{6,0}= 2(C_{3,2},C_{3,2})_2`
+    16. `C_{6,6}^{(1)= \frac 25(C_{3,6},C_{3,2})_1`
+    17. `C_{6,6}^{(2)= \frac 83(C_{3,8},C_{3,2})_2`
+    18. `C_{7,2}= 30(f,C_{3,2}^2)_4`
+    19. `C_{7,4}= 12(f,C_{3,2}^2)_3`
+    20. `C_{8,2}= \frac 25(C_{2,4},C_{3,2}^2)_3`
+    21. `C_{9,4}= 4(C_{3,8},C_{3,2}^2)_4`
+    22. `C_{10,0}= 20(f,C_{3,2}^3)_6`
+    23. `C_{10,2}= \frac 65(f,C_{3,2}^3)_5`
+    24. `C_{12,2}= \frac 85(C_{3,8},C_{3,2}^3)_6`
+    25. `C_{15,0}= \frac{1}{30000} (C_{3,8},C_{3,2}^4)_8`.
+
+    The scalar factors are chosen so that when evaluated at a formal sextic `f
+    = \sum a_i x_1^{6-i}x_2^i`, the covariants are integral and primitive as
+    multivariate polynomials in `a_0,\ldots,a_6,x_1,x_2`.
 
 .. function:: void acb_theta_g2_covariants_lead(acb_ptr res, const acb_poly_t f, slong prec)
 
-Sets *res} to the vector of leading coefficients in `x_1` of the 26
-covariants evaluated at *f}. This is more efficient than taking leading
-coefficients of :func:acb_theta_g2_covariants}, since we can use
-:func:acb_theta_g2_transvectant_lead} instead of
-:func:acb_theta_g2_transvectant}.
+    Sets *res* to the vector of leading coefficients in `x_1` of the 26
+    covariants evaluated at *f*.
 
-\T check that the result agrees with taking leading coefficients of
-:func:acb_theta_g2_covariants}.
+    This is more efficient than taking leading coefficients of
+    :func:`acb_theta_g2_covariants`, since we can use
+    :func:`acb_theta_g2_transvectant_lead` instead of
+    :func:`acb_theta_g2_transvectant`.

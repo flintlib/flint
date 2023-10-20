@@ -47,6 +47,8 @@ References
 
 .. [Bog2012] \I. Bogaert, B. Michiels and J. Fostier, "O(1) computation of Legendre polynomials and Gauss-Legendre nodes and weights for parallel computing", SIAM Journal on Scientific Computing 34:3 (2012), C83-C101
 
+.. [Bol1887] \O. Bolza, "Darstellung der rationalen ganzen Invarianten der Binärform sechsten Grades durch die Nullwerthe der zugehörigen Theta-Functionen", Math. Ann. 30:4 (1887), 478--495. https://doi.org/10.1007/BF01444091
+
 .. [Bor1987] \P. Borwein, "Reduced complexity evaluation of hypergeometric functions", Journal of Approximation Theory 50:3 (1987)
 
 .. [Bor2000] \P. Borwein, "An Efficient Algorithm for the Riemann Zeta Function", Constructive experimental and nonlinear analysis, CMS Conference Proc. 27 (2000) 29-34, http://www.cecm.sfu.ca/personal/pborwein/PAPERS/P155.pdf
@@ -60,6 +62,8 @@ References
 .. [BrentKung1978] \Brent, R. P. and Kung, H. T. : Fast Algorithms for Manipulating Formal Power Series, J. ACM 25:4 (1978) 581--595
 
 .. [BuhlerCrandallSompolski1992] \Buhler, J.P. and Crandall, R.E. and Sompolski, R.W. : Irregular primes to one million : Math. Comp. 59:2000 (1992) 717--722
+
+.. [CFG2017] \F. Cléry, C. Faber, and G. van der Geer. "Covariants of binary sextics and vector-valued Siegel modular forms of genus two", Math. Ann. 369 (2017), 1649--1669. https://doi.org/10.1007/s00208-016-1510-2
 
 .. [CGHJK1996] \R. M. Corless, G. H. Gonnet, D. E. Hare, D. J. Jeffrey and D. E. Knuth, "On the Lambert W function", Advances in Computational Mathematics, 5(1) (1996), 329-359
 
@@ -151,7 +155,9 @@ References
 
 .. [Iliopoulos1989] \Iliopoulos, C. S., Worst-Case Complexity Bounds on Algorithms for Computing the Canonical Structure of Finite Abelian Groups and the Hermite and Smith Normal Forms of an Integer Matrix : SIAM J. Computation 18:4 (1989) 658
 
-.. [Igu1972] \J-I. Igusa. *Theta functions*, Springer, 1972. https://doi.org/10.1007/978-3-642-65315-5
+.. [Igu1972] \J.-I. Igusa. *Theta functions*, Springer, 1972. https://doi.org/10.1007/978-3-642-65315-5
+
+.. [Igu1979] \J.-I. Igusa, "On the ring of modular forms of degree two over Z", Amer. J. Math. 101:1 (1979), 149--183. https://doi.org/10.2307/2373943
 
 .. [JB2018] \F. Johansson and I. Blagouchine. "Computing Stieltjes constants using complex integration", preprint (2018), https://arxiv.org/abs/1804.01679
 
@@ -221,6 +227,8 @@ References
 
 .. [Mum1983] \D. Mumford, *Tata Lectures on Theta I*, Birkhäuser, 1983. https://doi.org/10.1007/978-1-4899-2843-6
 
+.. [Mum1984] \D. Mumford, *Tata Lectures on Theta II*, Birkhäuser, 1984. https://doi.org/10.1007/978-0-8176-4578-6
+
 .. [NIST2012] National Institute of Standards and Technology, *Digital Library of Mathematical Functions* (2012), http://dlmf.nist.gov/
 
 .. [NakTurWil1997] \Nakos, George and Turner, Peter and Williams, Robert : Fraction-free algorithms for linear and polynomial equations, ACM SIGSAM Bull. 31 (1997) 3 11--19
@@ -276,6 +284,8 @@ References
 .. [Stein2007] \Stein, William A.: Modular forms, a computational approach. American Mathematical Society. 2007
 
 .. [StoMul1998] \Storjohann, Arne and Mulders, Thom : Fast algorithms for linear algebra modulo :math:`N` : Algorithms---{ESA} '98 (Venice), Lecture Notes in Comput. Sci. 1461 139--150
+
+.. [Str2014] \M. Streng, "Computing Igusa class polynomials", Math. Comp. 83:285 (2014), 275--309. https://doi.org/10.1090/S0025-5718-2013-02712-3
 
 .. [Str1997] \A. Strzebonski. "Computing in the field of complex algebraic numbers". Journal of Symbolic Computation (1997) 24, 647-656. https://doi.org/10.1006/jsco.1997.0158
 
