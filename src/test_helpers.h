@@ -44,6 +44,13 @@ int CAT(test, label)(void)                              \
     printf(#label "....");                              \
     fflush(stdout);                                     \
 
+#define TEST_TEMPLATE_FUNCTION_START(T, label, state)   \
+int TEMPLATE3(test, T, label)(void)                     \
+{                                                       \
+    FLINT_TEST_INIT(state);                             \
+    printf(TEMPLATE_STR(T) "_" #label "....");          \
+    fflush(stdout);                                     \
+
 #define TEST_FUNCTION_END(state)                        \
     FLINT_TEST_CLEANUP(state);                          \
     printf("PASS\n");                                   \

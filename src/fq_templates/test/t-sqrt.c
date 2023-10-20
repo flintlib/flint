@@ -11,19 +11,14 @@
 
 #ifdef T
 
+#include "test_helpers.h"
 #include "templates.h"
 #include "fmpz.h"
 
-int
-main(void)
+TEST_TEMPLATE_FUNCTION_START(T, sqrt, state)
 {
     int j, i, result;
     TEMPLATE(T, ctx_t) ctx;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("sqrt... ");
-    fflush(stdout);
 
     for (j = 0; j < 10; j++)
     {
@@ -41,7 +36,7 @@ main(void)
 
             TEMPLATE(T, sqr)(c, a, ctx);
 
-	    TEMPLATE(T, sqrt)(a, c, ctx);
+            TEMPLATE(T, sqrt)(a, c, ctx);
             TEMPLATE(T, sqrt)(c, c, ctx);
 
             result = (TEMPLATE(T, equal)(a, c, ctx));
@@ -62,13 +57,13 @@ main(void)
         for (i = 0; i < 200; i++)
         {
             int r;
-	    TEMPLATE(T, t) a, b, c, d, x;
+            TEMPLATE(T, t) a, b, c, d, x;
 
             TEMPLATE(T, init)(a, ctx);
             TEMPLATE(T, init)(b, ctx);
             TEMPLATE(T, init)(c, ctx);
             TEMPLATE(T, init)(d, ctx);
-	    TEMPLATE(T, init)(x, ctx);
+            TEMPLATE(T, init)(x, ctx);
 
             TEMPLATE(T, randtest)(a, state, ctx);
 
@@ -82,7 +77,7 @@ main(void)
             {
                 flint_printf("FAIL (sqrt(a^2) == a):\n\n");
                 flint_printf("r = %d\n", r);
-		flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
+                flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
                 flint_printf("b = "), TEMPLATE(T, print_pretty)(b, ctx), flint_printf("\n");
                 flint_printf("c = "), TEMPLATE(T, print_pretty)(c, ctx), flint_printf("\n");
                 flint_printf("d = "), TEMPLATE(T, print_pretty)(c, ctx), flint_printf("\n");
@@ -91,10 +86,10 @@ main(void)
             }
 
             if (ctx->is_conway && fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) != 0 &&
-			          !TEMPLATE(T, is_zero)(b, ctx))
-	    {
+                    !TEMPLATE(T, is_zero)(b, ctx))
+            {
                 TEMPLATE(T, gen)(x, ctx);
-		TEMPLATE(T, mul)(b, b, x, ctx);
+                TEMPLATE(T, mul)(b, b, x, ctx);
 
                 r = TEMPLATE(T, sqrt)(c, b, ctx);
 
@@ -119,11 +114,6 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
 #endif

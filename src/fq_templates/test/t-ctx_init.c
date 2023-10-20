@@ -12,20 +12,14 @@
 
 #ifdef T
 
+#include "test_helpers.h"
 #include "templates.h"
-
-#include "fmpz_mod_poly.h"
+#include "fmpz.h"
 #include "ulong_extras.h"
-#include "long_extras.h"
 
-int
-main(void)
+TEST_TEMPLATE_FUNCTION_START(T, ctx_init, state)
 {
     int i, k, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("ctx_init... ");
-    fflush(stdout);
 
     for (i = 0; i < 3 * flint_test_multiplier(); i++) {
         fmpz_t p;
@@ -90,13 +84,8 @@ main(void)
 
         TEMPLATE(T, ctx_clear)(ctx_conway);
         TEMPLATE(T, ctx_clear)(ctx_mod);
-
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
 #endif
