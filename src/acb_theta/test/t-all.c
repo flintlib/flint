@@ -67,6 +67,18 @@ int main(void)
             flint_abort();
         }
 
+        /* Sample garbage tau, computation should fail quickly */
+        acb_mat_randtest(tau, state, prec, 10);
+        acb_set_si(acb_mat_entry(tau, 0, 0), -1);
+        acb_theta_all(th, z, tau, sqr, prec);
+        {
+            if (acb_is_finite(&th[0]))
+            {
+                flint_printf("FAIL (not infinite)\n");
+                flint(abort);
+            }
+        }
+
         acb_mat_clear(tau);
         _acb_vec_clear(z, g);
         _acb_vec_clear(th, n2);

@@ -42,13 +42,7 @@ acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec
     }
     else
     {
-        lp = ceil(exp(log(((double) FLINT_MAX(ACB_THETA_LOW_PREC, prec)))/g));
-        lp = FLINT_MAX(lp, ACB_THETA_LOW_PREC);
-        acb_theta_naive_all(aux, x, 1, w, lp);
-        if (sqr)
-        {
-            _acb_vec_sqr(aux, aux, n * n, lp);
-        }
+        _acb_vec_indeterminate(aux, n * n);
     }
 
     sp2gz_inv(mat, mat);

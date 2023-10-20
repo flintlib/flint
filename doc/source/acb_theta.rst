@@ -971,11 +971,12 @@ domain and the eigenvalues of `\mathrm{Im}(\tau)` are not too large, say in
 
 .. function:: void acb_theta_agm_sqrt(acb_ptr res, acb_srcptr a, acb_srcptr rts, slong nb, slong prec)
 
-    Sets the `k^{\mathrm{th}}` entry of *res* for `0\leq k < \mathit{nb}` to a
-    square root of the corresponding entry of `a`. The choice of sign is
-    determined by *rts*: each entry of *res* will overlap the corresponding
-    entry of *rts* but not its opposite. The result is indeterminate if both
-    square roots overlap, and an error is thrown if there is no overlap at all.
+    Sets the `k^{\mathrm{th}}` entry `r_k` of *res* for `0\leq k < \mathit{nb}`
+    to a square root of the corresponding entry `a_k` of `a`. The choice of
+    sign is determined by *rts*: each `r_k` will overlap the corresponding
+    entry of *rts* but not its opposite. Exceptional cases are handled as
+    follows: if both square roots of `a_k` overlap *rts*, `r_k` is set to their
+    `acb_union`; if none ovelaps *rts*, `r_k` is set to an indeterminate value.
 
 .. function:: void acb_theta_agm_mul(acb_ptr res, acb_srcptr a1, acb_srcptr a2, slong g, slong prec)
 
@@ -1348,8 +1349,7 @@ we choose a particular branch of `\det(gamma\tau + \delta)^{1/2}` on
     We reduce `\tau` using :func:`acb_theta_siegel_reduce`, call
     :func:`acb_theta_ql_all` or :func:`acb_theta_ql_all_sqr` on the reduced
     matrix, and finally apply the transformation formula. If the reduction step
-    is not successful, we call the naive algorithm at a lower precision
-    instead.
+    is not successful, we set *th* to indeterminate values.
 
 Quasi-linear algorithms for derivatives
 -------------------------------------------------------------------------------
