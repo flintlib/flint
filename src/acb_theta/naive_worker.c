@@ -38,11 +38,6 @@ acb_theta_naive_call_dim1(acb_ptr th, acb_ptr v1, acb_ptr v2, slong* precs,
     slong len = acb_theta_eld_nb_pts(E);
     slong k;
 
-    if (len == 0)
-    {
-        return;
-    }
-
     acb_init(diff);
     acb_init(diff_inv);
     coords = flint_malloc(g * sizeof(slong));

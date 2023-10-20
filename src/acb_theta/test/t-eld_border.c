@@ -21,7 +21,8 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: border points are not contained in the ellipsoid */
+    /* Test: border points are not contained in the ellipsoid,
+       nor any children */
     for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 4);
@@ -62,7 +63,23 @@ int main(void)
                 if (acb_theta_eld_contains(E, all_pts + k * g))
                 {
                     flint_printf("FAIL: point inside ellipsoid\n");
-                    flint_printf("\n");
+                    flint_abort();
+                }
+            }
+
+            for (j = 0; j < acb_theta_eld_nr(E); j++)
+            {
+                if (acb_theta_eld_contains(acb_theta_eld_rchild(E, j), all_pts + k * g))
+                {
+                    flint_printf("FAIL: point inside right child %wd\n", j);
+                    flint_abort();
+                }
+            }
+            for (j = 0; j < acb_theta_eld_nl(E); j++)
+            {
+                if (acb_theta_eld_contains(acb_theta_eld_lchild(E, j), all_pts + k * g))
+                {
+                    flint_printf("FAIL: point inside left child %wd\n", j);
                     flint_abort();
                 }
             }

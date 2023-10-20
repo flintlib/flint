@@ -16,7 +16,6 @@ acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
-    slong lp;
     fmpz_mat_t mat;
     acb_mat_t w;
     acb_ptr x, aux;

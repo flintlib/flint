@@ -27,7 +27,7 @@ int main(void)
         slong g = 2;
         slong n = 1 << (2 * g);
         slong nb = acb_theta_jet_nb(1, g + 1);
-        slong prec = 100 + n_randint(state, 200);
+        slong prec = 100 + n_randint(state, 1000);
         slong bits = n_randint(state, 4);
         acb_mat_t tau;
         acb_ptr z, dth, test;

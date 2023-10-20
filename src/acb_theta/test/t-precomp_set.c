@@ -21,7 +21,7 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: border points are not contained in the ellipsoid */
+    /* Test: can clear and init again; values are all 1 if input is all zero */
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 4);
@@ -47,6 +47,9 @@ int main(void)
         v = _arb_vec_init(g);
         zs = _acb_vec_init(g * nb);
         arb_init(x);
+
+        acb_theta_precomp_clear(D);
+        acb_theta_precompo_init(D, nb, g);
 
         acb_siegel_randtest_reduced(tau, state, prec, mag_bits);
         acb_theta_eld_cho(C, tau, prec);

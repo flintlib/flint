@@ -21,7 +21,7 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: C^T C = pi Im(tau) */
+    /* Test: C^T C = pi Im(tau) on good input, not finite on phony input */
     for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 10);
@@ -51,6 +51,15 @@ int main(void)
             flint_printf("FAIL\n");
             acb_mat_printd(tau, 5);
             arb_mat_printd(C, 5);
+            flint_abort();
+        }
+
+        acb_zero(acb_mat_entry(tau, 0, 0));
+        acb_theta_eld_cho(C, tau, prec);
+
+        if (arb_mat_is_finite(C))
+        {
+            flint_printf("FAIL (not infinite)\n");
             flint_abort();
         }
 

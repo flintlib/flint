@@ -26,7 +26,7 @@ acb_theta_agm_sqrt_entry(acb_t res, const acb_t a, const acb_t rt, slong prec)
 
     if (t1 && t2)
     {
-        acb_union(res, y1, y2);
+        acb_union(res, y1, y2, prec);
     }
     else if (t1)
     {

@@ -21,7 +21,8 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: sum of terms on border of ellipsoid must be less than bound */
+    /* Test: sum of terms on border of ellipsoid must be less than bound, and
+       bounds are infinite on phony tau */
     for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
@@ -29,7 +30,7 @@ int main(void)
         slong bits = n_randint(state, 4);
         slong ord = n_randint(state, 3);
         slong nb = acb_theta_jet_nb(ord, g);
-        acb_theta_eld_t E;
+        acb_theta_eld_t E, E2;
         acb_mat_t tau;
         acb_ptr z;
         acb_t term;
@@ -41,6 +42,7 @@ int main(void)
 
         acb_mat_init(tau, g, g);
         acb_theta_eld_init(E, g, g);
+        acb_theta_eld_init(E2, g, g);
         z = _acb_vec_init(g);
         acb_init(term);
         arb_init(u);
@@ -89,8 +91,19 @@ int main(void)
             }
         }
 
+        /* Test: indeterminate on phony tau */
+        arb_randtest_positive(acb_imagref(acb_mat_entry(tau, 0, 0)), state, prec, bits);
+        acb_neg(acb_mat_entry(tau, 0, 0), acb_mat_entry(tau, 0, 0));
+        acb_theta_jet_ellipsoid(E2, u, z, tau, ord, prec);
+        if (acb_is_finite(c) && arb_is_finite(u))
+        {
+            flint_printf("FAIL (not infinite)\n");
+            flint_abort();
+        }
+
         acb_mat_clear(tau);
         acb_theta_eld_clear(E);
+        acb_theta_eld_clear(E2);
         _acb_vec_clear(z, g);
         acb_clear(term);
         arb_clear(u);

@@ -21,13 +21,13 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: agrees with naive_all */
-    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
+    /* Test: agrees with naive_all, indeterminate on phony input */
+    for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
         slong n = 1 << g;
         int hasz = iter % 2;
-        slong prec = (g > 1 ? 100 : 1000) + n_randint(state, 500);
+        slong prec = (g > 1 ? 100 : 1000) + n_randint(state, 200);
         slong hprec = prec + 25;
         acb_mat_t tau;
         acb_ptr z, th, test;
@@ -64,6 +64,17 @@ int main(void)
             _acb_vec_printd(th, n * n, 5);
             _acb_vec_printd(test, n * n, 5);
             flint_abort();
+        }
+
+        if (iter % 10 == 0)
+        {
+            acb_zero(acb_mat_entry(tau, 0, 0));
+            acb_theta_ql_all_sqr(th, z, tau, prec);
+            if (acb_is_finite(&th[0]))
+            {
+                flint_printf("FAIL (not infinite)\n");
+                flint_abort();
+            }
         }
 
         acb_mat_clear(tau);

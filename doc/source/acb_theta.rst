@@ -38,8 +38,8 @@ compute theta values on the reduced domain. At low precisions and when `\tau`
 is reasonably reduced, one may also consider using "naive algorithms" directly,
 which consist in evaluating a partial sum of the theta series. The main
 functions to do so are `acb_theta_naive_00` and `acb_theta_naive_all`. We also
-provide functionality to evaluate Siegel modular forms in terms of theta
-functions when `g=2`.
+provide functionality to evaluate derivatives of theta functions, and to
+evaluate Siegel modular forms in terms of theta functions when `g=2`.
 
 As usual, the numerical functions in this module compute certified error
 bounds: for instance, if `\tau` is represented by an :type:`acb_mat_t` which is
@@ -50,7 +50,55 @@ ill-conditioned input as indicated in the documentation below.
 Main user functions
 -------------------------------------------------------------------------------
 
+The functions in this section are also documented later in this document, along
+with related internal functions and some implementation details.
 
+.. function:: void acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec)
+
+    Sets *th* to the vector of theta values `\theta_{a,b}(z,\tau)` or
+    `\theta_{a,b}(z,\tau)^2` for `a,b\in \{0,1\}^g`, depending on whether *sqr*
+    is 0 (false) or nonzero (true).
+
+.. function:: void acb_theta_naive_fixed_ab(acb_ptr th, ulong ab, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
+
+.. function:: void acb_theta_naive_all(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
+
+    Assuming that *zs* is the concatenation of *nb* vectors `z^{(0)},\ldots,
+    z^{(\mathit{nb}-1)}` of length `g`, evaluates `\theta_{a,b}(z^{(k)}, \tau)`
+    using the naive algorithm for either the given value of `(a,b)`, or all
+    `(a,b)\in\{0,1\}^{2g}`. The result *th* will be a concatenation of *nb*
+    vectors of length `1` or `2^{2g}` respectively.
+
+    The user should ensure that `\tau` is reasonably reduced before calling
+    `acb_theta_naive` functions.
+
+.. function:: void acb_theta_jet_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
+
+    Sets *dth* to the derivatives of all functions `\theta_{a,b}` for `a,b\in
+    \{0,1\}^g` at `(z,\tau)`, as a concatenation of `2^{2g}` vectors of length
+    `N`, the total number of derivation tuples of total order at most
+    *ord*. (See below for conventions on the numbering and normalization of
+    derivatives.)
+
+.. function:: void acb_theta_jet_naive_fixed_ab(acb_ptr dth, ulong ab, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
+
+    Sets *dth* to the vector of derivatives of `\theta_{a,b}` at the given
+    point `(z,\tau)` up to total order *ord*. We reduce to
+    :func:`acb_theta_jet_naive_00` using the same formula as in
+    :func:`acb_theta_naive_ind` and making suitable linear combinations of the
+    derivatives.
+
+.. function:: void acb_theta_jet_naive_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
+
+    Sets *dth* to the vector of derivatives of `theta_{a,b}` for the given
+    (resp. all) `(a,b)` up to total order *ord* at the given point. The result
+    will be a concatenation of either 1 or `2^{2g}` vectors of length `N`,
+    where `N` is the number of derivation tuples of total order at most *ord*.
+
+The following code snippet constructs a period matrix for `g = 2`, computes the
+associated theta constants (values at `z = 0`) at a high precision, and prints
+them. As expected, the indices in the output vector corresponding to odd theta
+characteristics contain the zero value.
 
 The Siegel modular group
 -------------------------------------------------------------------------------
@@ -221,7 +269,7 @@ We continue to denote by `\alpha,\beta,\gamma,\delta` the `g\times g` blocks of
     reduced domain defined by the tolerance parameter `\varepsilon =
     2^{-\mathit{tol_exp}}`. This means the following:
     `|\mathrm{Re}(\tau_{j,k})| < \frac12 + \varepsilon` for all `0\leq j,k <
-    g`, the imaginary part of *tau* passes \func{arb_mat_spd_is_lll_reduced}
+    g`, the imaginary part of *tau* passes :func:`arb_mat_spd_is_lll_reduced`
     with the same parameters, and for every matrix *mat* obtained from
     :func:`sp2gz_fundamental`, the determinant of the corresponding cocycle is
     at least `1-\eps`.
@@ -303,8 +351,8 @@ Fix `1\leq d\leq g`, an upper-triangular Cholesky matrix `C`, a radius `R\geq
 n_{g-1}`. Consider the ellipsoid `E` consisting of points `n =
 (n_0,\ldots,n_{g-1})` satisfying `(v + Cn)^T(v + Cn)\leq R^2`. We encode `E` as
 follows: we store the endpoints and midpoint of the interval of allowed values
-for `n_{d-1}` as \type{slong}'s, and if `d\geq 1`, we also store a
-`(d-1)`-dimensional ``child'' of `E` for each value of `n_{d-1}`. Children are
+for `n_{d-1}` as :type:`slong`'s, and if `d\geq 1`, we also store a
+`(d-1)`-dimensional "child" of `E` for each value of `n_{d-1}`. Children are
 partitioned between left and right children depending on the position of
 `n_{d-1}` relative to the midpoint (by convention, the midpoint is a right
 child). When `d=g` and for a fixed Cholesky matrix `C`, this representation
@@ -410,7 +458,8 @@ Ellipsoids: memory management and computations
     diagonal entries, *R2* must be finite, and the coordinate of ellipsoid
     points must fit in :type:`slong`'s, otherwise an error is thrown.
 
-The following functions are available after \func{acb_theta_eld_fill} has been called.
+The following functions are available after :func:`acb_theta_eld_fill` has been
+called.
 
 .. function:: void acb_theta_eld_points(slong* pts, const acb_theta_eld_t E)
 
@@ -448,7 +497,7 @@ precompute the following quantities:
 
     .. math ::
 
-        \exp(2 i\pi z^{(k)_j) \text{ for } 0\leq j < g \text{ and } 1\leq k\leq n.
+        \exp(2 i\pi z^{(k)}_j) \text{ for } 0\leq j < g \text{ and } 1\leq k\leq n.
 
 Considering several vectors `z` at the same time is meant to accelerate the
 computation of `\theta_{a,b}(z,\tau)` for many values of `z` and a fixed
@@ -666,8 +715,8 @@ Naive algorithms: main user functions
 
 .. function:: void acb_theta_naive_0b(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 
-    Evaluates either `\theta_{0,0}(z^{(k), \tau)`, or alternatively
-    `\theta_{0,b}(z^{(k), \tau)` for each `b\in \{0,1\}^g`, for each `1\leq k
+    Evaluates either `\theta_{0,0}(z^{(k)}, \tau)`, or alternatively
+    `\theta_{0,b}(z^{(k)}, \tau)` for each `b\in \{0,1\}^g`, for each `1\leq k
     \leq \mathit{nb}`.
 
     The associated worker performs one :func:`acb_dot` operation. The result
@@ -680,7 +729,7 @@ Naive algorithms: main user functions
 
 .. function:: void acb_theta_naive_all(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 
-    Evaluates `\theta_{a,b}(z^{(k), \tau)` for, respectively: the given value
+    Evaluates `\theta_{a,b}(z^{(k)}, \tau)` for, respectively: the given value
     of `(a,b)`; all `(a,b)` for `b\in \{0,1\}^g` and the given value of `a`; or
     all `(a,b)\in\{0,1\}^{2g}`, for each `1\leq k\leq \mathit{nb}`. The result
     *th* will be a concatenation of *nb* vectors of length `1`, `2^g` or
@@ -818,7 +867,7 @@ Naive algorithms for derivatives: main user functions
     Sets *dth* to the vector of derivatives of all the functions `\theta_{a,b}`
     for `a,b\in \{0,1\}^g` up to total order *ord* at the given point. The
     result will be a concatenation of `2^{2g}` vectors of length `N`, where `N`
-    is the number of derivation tuples of total order at most `g`.
+    is the number of derivation tuples of total order at most *ord*.
 
     For simplicity, we use an ellipsoid to encode points in `\tfrac 12
     \mathbb{Z}^g`, and divide `\tau` by 4 and `z` by 2 to sum the correct
@@ -1091,8 +1140,6 @@ domain and the eigenvalues of `\mathrm{Im}(\tau)` are not too large, say in
 
 Quasi-linear algorithms on the reduced domain: main functions
 -------------------------------------------------------------------------------
-
-\subsubsection{Quasi-linear algorithms for `\theta_{a,0}`}
 
 The functions in this section will work best when `\tau` lies in the reduced
 domain, however `\mathrm{Im}(\tau)` may have large eigenvalues.
@@ -1449,7 +1496,7 @@ Since we divide by `\varepsilon^{|p|}` to get `a_p`, we will add an error of
 
 .. function:: void acb_theta_jet_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
 
-    Sets *dth} to the derivatives of all functions `\theta_{a,b}` for `a,b\in
+    Sets *dth* to the derivatives of all functions `\theta_{a,b}` for `a,b\in
     \{0,1\}^g` at `(z,\tau)`, as a concatenation of `2^{2g}` vectors of length
     `N`, the total number of derivation tuples of total order at most
     *ord*. This algorithm runs in quasi-linear time in `\mathit{prec}\cdot
@@ -1496,11 +1543,11 @@ generated. However, if we relax the definition of a Siegel modular form and
 allow them to have a pole along the diagonal `\mathbb{H}_1^2 =
 \{(\begin{smallmatrix} \tau_1 & 0 \\ 0 & \tau_2\end{smallmatrix})\}\subset
 \mathbb{H}_2` of a certain order (depending on the weight), we indeed find a
-finitely generated ring corresponding to classical \emph{covariants}, studied
-e.g. by Clebsch \cite{clebsch}. Historically, covariants are classified in
-terms of their degree `k` and index `j`, corresponding to Siegel modular
-functions of weight `\det^{k - j/2}\otimes \mathrm{Sym}^j`. See [CFG2017]_ for
-more details on the correspondence between modular forms and covariants.
+finitely generated ring corresponding to classical "covariants" of a binary
+sextic. Historically, covariants are classified in terms of their degree `k`
+and index `j`, corresponding to Siegel modular functions of weight `\det^{k -
+j/2}\otimes \mathrm{Sym}^j`. See [CFG2017]_ for more details on the
+correspondence between modular forms and covariants.
 
 .. macro:: ACB_THETA_G2_COV_NB
 

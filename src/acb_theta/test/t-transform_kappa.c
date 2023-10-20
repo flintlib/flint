@@ -22,7 +22,7 @@ int main(void)
     flint_randinit(state);
 
     /* Test: matches combination of transform_kappa and transform_sqrtdet */
-    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
         slong bits = n_randint(state, 10);

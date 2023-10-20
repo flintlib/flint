@@ -34,6 +34,11 @@ int main(void)
         acb_t d, t;
         slong nb, k, j;
 
+        if (iter % 20 == 0)
+        {
+            prec += 10000;
+        }
+
         acb_mat_init(tau, g, g);
         z = _acb_vec_init(g);
         th2 = _acb_vec_init(n);
