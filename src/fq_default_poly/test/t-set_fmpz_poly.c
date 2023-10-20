@@ -9,17 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_poly.h"
 #include "fq_default_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fq_default_poly_set_fmpz_poly, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("set_fmpz_poly....");
-    fflush(stdout);
 
     for (i = 0; i < 1 * flint_test_multiplier(); i++)
     {
@@ -142,11 +138,7 @@ main(void)
         fq_default_ctx_clear(ctx);
 
         fmpz_clear(p);
-
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
