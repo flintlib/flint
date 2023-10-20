@@ -9,21 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
-#include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_poly_mat_neg, state)
 {
     slong i;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("neg....");
-    fflush(stdout);
 
     /* Check evaluation homomorphism */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -113,8 +106,5 @@ main(void)
         fmpz_poly_mat_clear(B);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
