@@ -19,7 +19,7 @@ jobs:
   # ubuntu with gcc
   ##############################################################################
   ubuntu-gcc:
-    name: Ubuntu GCC, default flags with AVX2, Code Coverage (x3)
+    name: Ubuntu GCC, default flags with AVX2, Code Coverage (x10)
 
     runs-on: ubuntu-latest
 
@@ -78,7 +78,7 @@ jobs:
   # ubuntu with gcc (assert)
   ##############################################################################
   ubuntu-gcc-assert:
-    name: Ubuntu GCC (assert, x1)
+    name: Ubuntu GCC (assert, x2)
 
     runs-on: ubuntu-latest
 
@@ -130,7 +130,7 @@ jobs:
   # macos with gcc and blas
   ##############################################################################
   macos-gcc:
-    name: macOS GCC with BLAS (x1)
+    name: macOS GCC with BLAS (x3)
 
     runs-on: macos-latest
 
@@ -342,7 +342,7 @@ jobs:
   # ubuntu with clang
   #############################################################################
   ubuntu-clang:
-    name: Ubuntu Clang (x1)
+    name: Ubuntu Clang (x5)
 
     runs-on: ubuntu-latest
 
@@ -501,7 +501,7 @@ jobs:
   # msvc
   ##############################################################################
   msvc:
-    name: MSVC (x1, excl test)
+    name: MSVC (x1)
 
     runs-on: windows-latest
 
