@@ -290,12 +290,13 @@ Theta characteristics
     Returns true iff the given characteristics define a syzygous triple,
     i.e. they can be completed into a Göpel quadruple.
 
-
 Ellipsoids: types and macros
 -------------------------------------------------------------------------------
 
-Following [DHBHS2004]_, we will consider partial sums of theta series over
-points `n` in the lattice `\mathbb{Z}^g` contained in certain ellipsoids.
+Following [DHBHS2004]_, naive algorithms will compute a partial sum of theta
+series over points `n` in the lattice `\mathbb{Z}^g` contained in certain
+ellipsoids, and finally add an error bound coming from the tail. We first
+gather methods to compute with ellipsoids themselves.
 
 Fix `1\leq d\leq g`, an upper-triangular Cholesky matrix `C`, a radius `R\geq
 0`, a vector `v\in \mathbb{R}^g`, and integers `n_{d},\ldots,
@@ -377,7 +378,6 @@ computed using :func:`acb_theta_eld_fill` below:
     Macro returning the smallest nonnegative integer `M_k` such that all the points
     in *E* satisfy `|n_k|\leq M_k`. This requires `0\leq k < d`.
 
-
 Ellipsoids: memory management and computations
 -------------------------------------------------------------------------------
 
@@ -398,516 +398,445 @@ Ellipsoids: memory management and computations
 
 .. function:: void acb_theta_eld_cho(arb_mat_t C, const acb_mat_t tau, slong prec)
 
-Computes an upper-triangular Cholesky matrix *C} for the symmetric matrix
-`\pi \mathrm{Im}(\tau)`. If one cannot determine that `\mathrm{Im}(\tau)` is
-positive definite at the current working precision, *C} is set to an
-indeterminate matrix.
+    Computes an upper-triangular Cholesky matrix *C* for the symmetric matrix
+    `\pi \mathrm{Im}(\tau)`. If one cannot determine that `\mathrm{Im}(\tau)` is
+    positive definite at the current working precision, *C* is set to an
+    indeterminate matrix.
 
-\T check that `C^TC = \pi \mathrm{Im}(\tau)` on random input.
+.. function:: void acb_theta_eld_fill(acb_theta_eld_t E, const arb_mat_t C, const arf_t R2, arb_srcptr v)
 
-.. function:: void acb_theta_eld_fill(acb_theta_eld_t E, const arb_mat_t C, const arf_t R2,
-  arb_srcptr v)
-
-Sets *E} to represent an ellipsoid as defined above, where *R2}
-indicates `R^2`. The matrix *C} must be an upper-triangular matrix with
-positive diagonal entries, *R2} must be finite, and the coordinate of
-ellipsoid points must fit in .. type:: slong}'s, otherwise an error is thrown.
-
-\T see \func{acb_theta_eld_points}.
-
-\subsubsection{Points in ellipsoids}
+    Sets *E* to represent an ellipsoid as defined above, where *R2* indicates
+    `R^2`. The matrix *C* must be an upper-triangular matrix with positive
+    diagonal entries, *R2* must be finite, and the coordinate of ellipsoid
+    points must fit in :type:`slong`'s, otherwise an error is thrown.
 
 The following functions are available after \func{acb_theta_eld_fill} has been called.
 
 .. function:: void acb_theta_eld_points(slong* pts, const acb_theta_eld_t E)
 
-Sets *pts} to the list of all the points in *E}, as a
-concatenation of vectors of length *g}.
-
-\T generate a random ellipsoid *E}. Check that all the points of
-*E} are inside the box. Then, generate random points: points inside the
-ellipsoid according to \func{acb_theta_eld_contains} below must appear in the
-list of points, and the norm of any point outside *E} must be at least
-the radius of *E}.
+    Sets *pts* to the list of all the points in *E*, as a concatenation of
+    vectors of length *g*.
 
 .. function:: void acb_theta_eld_border(slong* pts, const acb_theta_eld_t E)
 
-Sets *pts} to the list of all the points in the border of *E}.
-
-\T check that the border points are not contained in the ellipsoid.
+    Sets *pts* to the list of all the points in the border of *E*.
 
 .. function:: int acb_theta_eld_contains(const acb_theta_eld_t E, slong* pt)
 
-Returns true iff *pt} is contained in *E}. The vector *pt}
-must be of length *g}.
-
-\T see \func{acb_theta_eld_points} and \func{acb_theta_eld_border} above.
+    Returns true (nonzero) iff *pt* is contained in *E*. The vector *pt* must
+    be of length *g*.
 
 .. function:: void acb_theta_eld_print(const acb_theta_eld_t E)
 
-Prints *E} to .. type:: stdout}. This describes *E} faithfully but may
-be unwieldy in high dimensions.
+    Prints *E*. This describes *E* faithfully but may be unwieldy in high
+    dimensions.
 
-\subsection{Precomputations in naive algorithms}
+Precomputations in naive algorithms: types and macros
+-------------------------------------------------------------------------------
 
-When running naive algorithms on an ellipsoid~`E` for a certain matrix
+When running naive algorithms on an ellipsoid `E` for a certain matrix
 `\tau\in \mathbb{H}_g` and points `z^{(0),\ldots, z^{(n-1)\in \mathbb{C}^g`, we
 precompute the following quantities:
-\begin{itemize}
-\item `\exp(i\pi (2 - \delta_{j,k})\tau_{j,k})` for `0\leq j\leq k < g`,
-\item `\exp(i\pi j^2 \tau_{k,k})` for `0\leq k < g` and `j` between 0 and
-  \func{acb_theta_eld_box(E,k),
-\item `\exp(2 i\pi z^{(k)_j)` for `0\leq j < g` and `1\leq k\leq n`.
-\end{itemize}
-These complex numbers are stored in a structure of type
-\func{acb_theta_precomp_t}. Considering several vectors `z` at the same time is
-meant to accelerate the computation of `\theta_{a,b}(z,\tau)` for many values
-of `z` and a fixed~`\tau`.
 
-\subsubsection{Types and macros}
+    .. math ::
 
-.. function:: acb_theta_precomp_struct}
+        \exp(i\pi (2 - \delta_{j,k})\tau_{j,k}) \text{ for } 0\leq j\leq k < g,
 
-.. function:: acb_theta_precomp_t}
+    .. math ::
 
-An .. type:: acb_theta_precomp_t} is an array of length one of type
-.. function:: acb_theta_precomp_struct} containing the above data, permitting it to be
+        \exp(i\pi j^2 \tau_{k,k}) \text{ for } 0\leq k < g \text{ and } 0\leq j\leq \texttt{acb_theta_eld_box}(E,k),
+
+    .. math ::
+
+        \exp(2 i\pi z^{(k)_j) \text{ for } 0\leq j < g \text{ and } 1\leq k\leq n.
+
+Considering several vectors `z` at the same time is meant to accelerate the
+computation of `\theta_{a,b}(z,\tau)` for many values of `z` and a fixed
+`\tau`.
+
+.. function:: acb_theta_precomp_struct
+
+.. function:: acb_theta_precomp_t
+
+An :type:`acb_theta_precomp_t` is an array of length one of type
+:type:`acb_theta_precomp_struct` containing the above data, permitting it to be
 passed by reference.
 
-The following macros are available after calling \func{acb_theta_precomp_init}
-and \func{acb_theta_precomp_set} below.
+The following macros are available after calling :func:`acb_theta_precomp_init`
+and :func:`acb_theta_precomp_set` below.
 
 .. function:: acb_theta_precomp_dim(D)
 
-Macro returning the ambient dimension `g`.
+    Macro returning the ambient dimension `g`.
 
 .. function:: acb_theta_precomp_nb(D)
 
-Macro returning the number of vectors `z` stored in *D}.
+    Macro returning the number of vectors `z` stored in *D*.
 
 .. function:: acb_theta_precomp_exp_mat(D)
 
-Macro returning a pointer to an .. type:: acb_mat_t} whose entry `(j,k)` contains
-`\exp(i \pi (2 - \delta_{j,k}) \tau_{j,k})` for every `0\leq j \leq k\leq g`.
+    Macro returning a pointer to an :type:`acb_mat_t` whose entry `(j,k)`
+    contains `\exp(i \pi (2 - \delta_{j,k}) \tau_{j,k})` for every `0\leq j
+    \leq k\leq g`.
 
 .. function:: acb_theta_precomp_sqr_pow(D, k, j)
 
-Macro returning a pointer to the complex number `\exp(i \pi j^2 \tau_{k,k})` as
-an .. type:: acb_t}.
+    Macro returning a pointer to the complex number `\exp(i \pi j^2
+    \tau_{k,k})` as an :type:`acb_t`.
 
 .. function:: acb_theta_precomp_exp_z(D, k, j)
 
-Macro returning a pointer to the complex number `\exp(2\pi i z_k^{(j))` as an
-.. type:: acb_t}.
+    Macro returning a pointer to the complex number `\exp(2\pi i z_k^{(j))` as
+    an :type:`acb_t`.
 
-\subsubsection{Memory management and basic manipulation}
+Precomputations in naive algorithms: memory management and computations
+-------------------------------------------------------------------------------
 
 .. function:: void acb_theta_precomp_init(acb_theta_precomp_t D, slong nb, slong g)
 
-Initializes *D} for precomputations on *nb} vectors `z\in \mathbb{C}^g`.
+    Initializes *D* for precomputations on *nb* vectors `z\in \mathbb{C}^g`.
 
 .. function:: void acb_theta_precomp_clear(acb_theta_precomp_t D)
 
-Clears *D}.
+    Clears *D*.
 
-.. function:: void acb_theta_precomp_set(acb_theta_precomp_t D, acb_srcptr zs,
-  const acb_mat_t tau, const acb_theta_eld_t E, slong prec)
+.. function:: void acb_theta_precomp_set(acb_theta_precomp_t D, acb_srcptr zs, const acb_mat_t tau, const acb_theta_eld_t E, slong prec)
 
-Computes the above data for the provided matrix *tau}, vectors `zs` (a
-concatenation of *nb} vectors of length `g`) and ellipsoid *E}. The
-dimensions must match, in particular *E} must be an ellipsoid of
-dimension `g`.
+    Computes the above data for the matrix *tau*, vectors `zs` (a concatenation
+    of *nb* vectors of length `g`) and ellipsoid *E*. The dimensions must
+    match, in particular *E* must be an ellipsoid of dimension `g`.
 
-\T check that all entries are set to one on the phony input `z=0, \tau=0`.
+Naive algorithms: ellipsoids and bounds
+-------------------------------------------------------------------------------
 
-\subsection{Naive algorithms}
+By [EH2023]_, for any `v\in \mathbb{R}^g` and any upper-triangular Cholesky
+matrix `C`, and any `R` such that `R^2 \geq\max(4,\mathit{ord})`, the sum
 
-Naive algorithms consist in summing terms of the theta series over a certain
-ellipsoid and adding an error bound coming from the tail of the series. We will
-compute the relevant ellipsoid using low-precision computations. When several
-vectors `z` are present, we first reduce them to a common compact domain and
-use only one ellipsoid, following~\cite{deconinck}. When `g = 1`, we call
-functions from \myref{acb_modular.h}{acb_modular} instead.
+    .. math ::
 
-\subsubsection{Ellipsoids and bounds}
+        S = \sum_{n\in C\mathbb{Z}^g + v,\ \lVert n\rVert^2 \geq R^2} \lVert n\rVert^{\mathit{ord}} e^{-\lVert n\rVert^2}
 
-By \cite{main}, for any `v\in \mathbb{R}^g` and any upper-triangular Cholesky
-matrix `C`, and any `R` such that `R^2 \geq\max\{4,\mathit{ord}\}`, the sum
-\[
-  S = \sum_{n\in C\mathbb{Z}^g + v,\ \lVert n\rVert^2 \geq R^2} \lVert n\rVert^{\mathit{ord}} e^{-\lVert n\rVert^2}
-\]
 satisfies
-\[
-  S \leq 2^{2g+2} R^{g-1+p} e^{-R^2} \prod_{j=0}^{g-1} (1 + \gamma_j^{-1})
-\]
-where `\gamma_0,\ldots, \gamma_{g-1}` are the diagonal coefficients of~`C`.
+
+    .. math ::
+
+        S \leq 2^{2g+2} R^{g-1+p} e^{-R^2} \prod_{j=0}^{g-1} (1 + \gamma_j^{-1})
+
+where `\gamma_0,\ldots, \gamma_{g-1}` are the diagonal coefficients of `C`. We
+use this to bound the contribution from the tail of the theta series in naive
+algorithms, and thus to find out which ellipsoid to consider at a given
+precision. When several vectors `z` are present, we first reduce them to a
+common compact domain and use only one ellipsoid, following [DHBHS2004]_. The
+methods in this section are only used when `g\geq 2`: when `g=1`, naive
+algorithms will call functions from :ref:`acb_modular.h <acb_modular>`
+directly.
 
 .. function:: void acb_theta_naive_radius(arf_t R2, arf_t eps, const arb_mat_t C, slong ord, slong prec)
 
-Sets *R2} and *eps} such that the above upper bound for *R2}
-and the given *ord} is at most *eps}. We choose *eps} so that
-the relative error on the output of the naive algorithm should be roughly
-`2^{-\mathit{prec}}` if no cancellations occur in the sum, i.e.
-`\mathit{eps} \simeq 2^{-\mathit{prec}} \prod_{j=0}^{g-1} (1 + \gamma_j^{-1})`.
+    Sets *R2* and *eps* such that the above upper bound for *R2*
+    and the given *ord* is at most *eps*. We choose *eps* so that
+    the relative error on the output of the naive algorithm should be roughly
+    `2^{-\mathit{prec}}` if no cancellations occur in the sum, i.e.
+    `\mathit{eps} \simeq 2^{-\mathit{prec}} \prod_{j=0}^{g-1} (1 + \gamma_j^{-1})`.
 
-\T evaluate the above upper bound on the tail for the computed *R2} on a
-random Cholesky matrix *C} and check that it is not greater than *eps}.
+.. function:: void acb_theta_naive_reduce(arb_ptr v, acb_ptr new_zs, acb_ptr cs, arb_ptr us, acb_srcptr zs, slong nb, const acb_mat_t tau, const arb_mat_t C, slong prec)
 
-.. function:: void acb_theta_naive_reduce(arb_ptr v, acb_ptr new_zs, acb_ptr cs,
-  arb_ptr us, acb_srcptr zs, slong nb, const acb_mat_t tau, const arb_mat_t C,
-  slong prec)
+    Performs the simultaneous reductions of the *nb* vectors stored in `zs`
+    with respect to the matrix `\tau`. This means the following. Let
+    `0\leq k\leq \mathit{nb}-1`, let `z` denote the `k^{\mathrm{th}}` vector stored
+    in `zs`, and let `X,Y` (resp. `x,y`) be the real and imaginary parts of `\tau`
+    (resp. `z`). Write `Y^{-1}y = r + a` where `a` is an even integral vector
+    and `r` is bounded. Then
 
-Performs the simultaneous reductions of the *nb} vectors stored in `zs`
-with respect to the matrix `\tau`. This means the following. Let
-`0\leq k\leq \mathit{nb}-1`, let `z` denote the `k^{\mathrm{th}}` vector stored
-in `zs`, and let `X,Y` (resp. `x,y`) be the real and imaginary parts of `\tau`
-(resp. `z`). Write `Y^{-1}y = r + a` where `a` is an even integral vector
-and~`r` is bounded. Then
-\[
-  \begin{aligned}
-  \theta_{0,b}(z,\tau) &= e^{\pi y^T Y^{-1} y} \sum_{n\in \mathbb{Z}^g}
-                         e^{\pi i ((n - a)^T X (n - a) + 2(n - a)^T (x + \tfrac b2)) e^{-\pi (n + r)^T Y (n + r)\\
-    &= e^{\pi y^T Y^{-1} y} e^{\pi i (a^T X a - 2a^T x + i r^T Y r) \theta_{0,b}((x - Xa) + iYr, \tau).
-  \end{aligned}
-\]
-The reduction of `z` is defined as `(x - Xa) + i Y r`, which has a bounded
-imaginary part, and this vector is stored as the `k^{\mathrm{th}}` vector of
-*new_zs}. The quantity `u = \exp(\pi y^T Y^{-1} y)` is a multiplicative
-factor for the error bound, and is stored as the `k^{\mathrm{th}}` entry of
-*us}. the quantity `c = u \exp(\pi i (a^T X a - 2a^T x + i r^T Y r))` is
-a multiplicative factor for the theta values, and is stored as the
-`k^{\mathrm{th}}` entry of *cs}. The offset for the corresponding
-ellipsoid is `v^{(k) = C r` which is also bounded independently of~`k`, and
-the vector *v} is set to the \func{acb_union} of these vectors `v^{(k)`
-for `0\leq k\leq \mathit{nb}-1`.
+    .. math ::
 
-\T check that the results are sound or some special values, as follows. If
-*zs} are real vectors, then *new_zs} must be equal to *zs},
-the entries of *cs}, *us} must all be `1`, and *v} must be
-zero. If `\mathrm{Im}(z) = -Yn + \varepsilon` where `n` is an even integral
-vector and `\varepsilon` is small, then the result of
-\func{acb_theta_naive_term} on `n` for `z` must overlap `c` times the term for
-*new_z} attached to the lattice point `0`, and the computed offset `v`
-must be small.
+        \begin{aligned}
+        \theta_{0,b}(z,\tau) &= e^{\pi y^T Y^{-1} y} \sum_{n\in \mathbb{Z}^g}
+            e^{\pi i ((n - a)^T X (n - a) + 2(n - a)^T (x + \tfrac b2))
+            e^{-\pi (n + r)^T Y (n + r)\\
+            &= e^{\pi y^T Y^{-1} y} e^{\pi i (a^T X a - 2a^T x + i r^T Y r)
+            \theta_{0,b}((x - Xa) + iYr, \tau).
+        \end{aligned}
 
-.. function:: void acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr new_zs, acb_ptr cs,
-  arb_ptr us, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
+    The reduction of `z` is defined as `(x - Xa) + i Y r`, which has a bounded
+    imaginary part, and this vector is stored as the `k^{\mathrm{th}}` vector
+    of *new_zs*. The quantity `u = \exp(\pi y^T Y^{-1} y)` is a multiplicative
+    factor for the error bound, and is stored as the `k^{\mathrm{th}}` entry of
+    *us*. the quantity `c = u \exp(\pi i (a^T X a - 2a^T x + i r^T Y r))` is a
+    multiplicative factor for the theta values, and is stored as the
+    `k^{\mathrm{th}}` entry of *cs*. The offset for the corresponding ellipsoid
+    is `v^{(k)} = C r` which is also bounded independently of `k`, and the
+    vector *v* is set to the :func:`acb_union` of these vectors `v^{(k)}` for
+    `0\leq k\leq \mathit{nb}-1`.
 
-Sets the ellipsoid *E} and the vectors *new_zs}, *cs} and
-*us} such that the following is satisfied: for each
-`0\leq k\leq \mathit{nb}-1`, if `z` and `z'` denote the `k^{\mathrm{th}}`
-vectors in `zs` and *new_zs} respectively, and `c, u` denote the
-`k^{\mathrm{th}}` entries in *cs} and *us}, then summing
-exponential terms involving `z'` over *E} and multiplying by `c` will
-yield an approximation of theta values at `z` up to an error at most
-`u`. Unless cancellations occur in the sum, the relative precision of the
-resulting theta values should be roughly *prec}.
+.. function:: void acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr new_zs, acb_ptr cs, arb_ptr us, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 
-\T check that the sum of terms on the border of the ellipsoid *E} is at
-most *u}.
+    Sets the ellipsoid *E* and the vectors *new_zs*, *cs* and *us* such that
+    the following is satisfied: for each `0\leq k\leq \mathit{nb}-1`, if `z`
+    and `z'` denote the `k^{\mathrm{th}}` vectors in `zs` and *new_zs*
+    respectively, and `c, u` denote the `k^{\mathrm{th}}` entries in *cs* and
+    *us*, then summing exponential terms involving `z'` over *E* and
+    multiplying by `c` will yield an approximation of theta values at `z` up to
+    an error at most `u`. Unless cancellations occur in the sum, the relative
+    precision of the resulting theta values should be roughly *prec*.
 
 .. function:: slong acb_theta_naive_fullprec(const acb_theta_eld_t E, slong prec)
 
-Returns a good choice of full precision for the summation phase when working at
-precision *prec}, which is at least `\mathit{prec} + \log_2(n)` where `n`
-is the number of points in *E}.
+    Returns a good choice of full precision for the summation phase when
+    working at precision *prec*, which is at least `\mathit{prec} + \log_2(n)`
+    where `n` is the number of points in *E*.
 
-\T no test, but used throughout in naive algorithms.
+.. function:: acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong* tup, slong* n, slong prec)
 
-.. function:: acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau,
-  slong* tup, slong* n, slong prec)
+    Sets *res* to `n_0^{k_0} \cdots n_{g-1}^{k_{g-1}}\exp(i\pi(n^T\tau n + 2
+    n^Tz))`, where the `k_j` and `n_j` denotes the `j^{\mathrm{th}}` entry in
+    *tup* and *n* respectively. The vector *tup* may be *NULL*, which is
+    understood to mean the zero tuple. This is only used for testing.
 
-Sets *res} to
-`n_0^{k_0} \cdots n_{g-1}^{k_{g-1}}\exp(i\pi(n^T\tau n + 2 n^Tz))`, where the
-`k_j` and `n_j` denotes the `j^{\mathrm{th}}` entry in *tup} and
-*n} respectively. *tup} may be \func{NULL}, which is understood to
-mean the zero tuple. This is used for testing and in
-\func{acb_theta_naive_00} for very skewed ellipsoids.
-
-\T if `g=1`, this should simply be `n^k\exp(i\pi (n^2\tau + 2nz))`.
-
-\subsubsection{Workers in naive algorithms}
+Naive algorithms: workers
+-------------------------------------------------------------------------------
 
 The main worker inside each version of the naive algorithm will process one
 line inside the computed ellipsoid. Before calling this worker, for fixed
 `\tau` and `z` and fixed coordinates `n_1,\ldots n_{g-1}` defining a line
 inside the ellipsoid, if `n_{\mathrm{min}}` are `n_{\mathrm{max}}` are the
 endpoints of the interval of allowed values for `n_0`, we (efficiently)
-precompute:
-\begin{itemize}
-\item The vector `v_1` with entries `\exp(i \pi j^2 \tau_{0,0})` for
+compute:
+
+- the vector `v_1` with entries `\exp(i \pi j^2 \tau_{0,0})` for
   `n_{\mathrm{min}}\leq j\leq n_{\mathrm{max}}`,
-\item The vector `v_2` with entries `x^j` for `n_{\mathrm{min}}\leq j\leq n_{\mathrm{max}}` where
-  \[
-    x = \exp(2 \pi i z_0) \prod_{k = 1}^{g-1} \exp(2 i \pi n_k \tau_{0,k}),
-  \]
-\item The cofactor `c\in \mathbb{C}` given by
-  \[
-    c = \prod_{k = 1}^{g-1} \exp(2 i\pi n_k z_k) \cdot \prod_{1\leq j\leq k < g} \exp(\pi i (2 - \delta_{j,k}) n_j n_k \tau_{j,k}).
-  \]
-\end{itemize}
-This allow us to use \func{acb_dot} in the workers while maintaining reasonable
-memory costs, and to use an average of strictly less than two complex
-multiplications per lattice point as `R\to \infty`. Moreover, these
+- the vector `v_2` with entries `x^j` for `n_{\mathrm{min}}\leq j\leq
+  n_{\mathrm{max}}`, where
+
+    .. math ::
+
+        x = \exp(2 \pi i z_0) \prod_{k = 1}^{g-1} \exp(2 i \pi n_k \tau_{0,k}),
+
+- the cofactor `c\in \mathbb{C}` given by
+
+    .. math ::
+
+        c = \prod_{k = 1}^{g-1} \exp(2 i\pi n_k z_k) \cdot
+        \prod_{1\leq j\leq k < g} \exp(\pi i (2 - \delta_{j,k}) n_j n_k \tau_{j,k}).
+
+This allow us to use :func:`acb_dot` in the workers while maintaining
+reasonable memory costs, and to use an average of strictly less than two
+complex multiplications per lattice point as `R\to \infty`. Moreover, these
 multiplications are performed at only a fraction of the full precision for
 lattice points far from the ellipsoid center.
 
+Different versions of the naive algorithm will rely on slightly different
+workers, so introducing a function pointer type is helpful to avoid code
+duplication.
 
-.. function:: acb_theta_naive_worker_t}
+.. function:: acb_theta_naive_worker_t
 
-A function pointer type. A function *worker} of this type has the
-following signature:
+    A function pointer type. A function *worker* of this type has the
+    following signature:
 
-.. function:: void worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong len,
-  const acb_t c, const slong* coords, slong ord, slong g, slong prec, slong fullprec)
+    .. function:: void worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong len, const acb_t c, const slong* coords, slong ord, slong g, slong prec, slong fullprec)
 
-where
-\begin{itemize}
-\item *th} denotes the output vector of theta values to which terms will
-  be added,
-\item *v1}, *v2} and *c} are precomputed as above,
-\item *precs} is a vector of working precisions for each term
-  `n_{\mathrm{min}}\leq j\leq n_{\mathrm{max}}`,
-\item *len} `= n_{\mathrm{max}} - n_{\mathrm{min}} + 1` is the common
-  length of *v1}, *v2} and *precs},
-\item *coords} is `(n_{\mathrm{min}}, n_1, \ldots, n_{g-1})`,
-\item *ord} is the maximal derivation order (0 outside \func{acb_theta_jet_naive}
-  functions),
-\item *prec} is the working precision for this line inside the ellipsoid,
-  and finally
-\item *fullprec} is the working precision for summing into *th}.
-\end{itemize}
+where:
 
-.. function:: void acb_theta_naive_worker(acb_ptr th, slong len, const acb_t c, const arb_t u,
-  const acb_theta_eld_t E, const acb_theta_precomp_t D, slong k, slong ord,
-  slong prec, acb_theta_naive_worker_t worker)
+- *th* denotes the output vector of theta values to which terms will be added,
+- *v1*, *v2* and *c* are precomputed as above,
+- *precs* is a vector of working precisions for each term `n_{\mathrm{min}}\leq
+  j\leq n_{\mathrm{max}}`,
+- *len* `= n_{\mathrm{max}} - n_{\mathrm{min}} + 1` is the common length of
+  *v1*, *v2* and *precs*,
+- *coords* is `(n_{\mathrm{min}}, n_1, \ldots, n_{g-1})`,
+- *ord* is the maximal derivation order (0 outside :func:`acb_theta_jet_naive`
+  functions below),
+- *prec* is the working precision for this line inside the ellipsoid, and
+  finally
+- *fullprec* is the working precision for summing into *th*.
 
-Runs the naive algorithm on the ellipsoid *E} using precomputed data for
-the `k^{\mathrm{th}}` vector stored in *D}. Here `c` and `u` are as
-output by \func{acb_theta_naive_ellipsoid}, *ord} is passed as an
-argument to \func{worker}, *prec} is the precision for summing into
-the vector *th}, and *len} is the length of the output vector
-*th}.
+.. function:: void acb_theta_naive_worker(acb_ptr th, slong len, const acb_t c, const arb_t u, const acb_theta_eld_t E, const acb_theta_precomp_t D, slong k, slong ord, slong prec, acb_theta_naive_worker_t worker)
 
-\T no test, but used throughout in naive algorithms.
+    Runs the naive algorithm on the ellipsoid *E* using precomputed data for
+    the `k^{\mathrm{th}}` vector stored in *D*. Here `c` and `u` are as output
+    by :func:`acb_theta_naive_ellipsoid`, *ord* is passed as an argument to
+    :func:`worker`, *prec* is the precision for summing into the vector *th*,
+    and *len* is the length of the output vector *th*.
 
-\subsubsection{Main user functions}
+Naive algorithms: main user functions
+-------------------------------------------------------------------------------
 
-.. function:: void acb_theta_naive_00(acb_ptr th, acb_srcptr zs, slong nb,
-  const acb_mat_t tau, slong prec)
+.. function:: void acb_theta_naive_00(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 
-.. function:: void acb_theta_naive_0b(acb_ptr th, acb_srcptr zs, slong nb,
-  const acb_mat_t tau, slong prec)
+.. function:: void acb_theta_naive_0b(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 
-Evaluates either `\theta_{0,0}(z^{(k), \tau)`, or alternatively
-`\theta_{0,b}(z^{(k), \tau)` for each `b\in \{0,1\}^g`, for each
-`1\leq k \leq \mathit{nb}`. The associated worker performs one \func{acb_dot}
-operation. The result *th} will be a concatenation of *nb} vectors of length
-`1` or `2^g` respectively.
+    Evaluates either `\theta_{0,0}(z^{(k), \tau)`, or alternatively
+    `\theta_{0,b}(z^{(k), \tau)` for each `b\in \{0,1\}^g`, for each `1\leq k
+    \leq \mathit{nb}`.
 
-\T check that the result of \func{naive_00} overlaps the first entry of the
-result of \func{naive_0b} on random input.
+    The associated worker performs one :func:`acb_dot` operation. The result
+    *th* will be a concatenation of *nb* vectors of length `1` or `2^g`
+    respectively.
 
-.. function:: void acb_theta_naive_fixed_ab(acb_ptr th, ulong ab, acb_srcptr zs, slong nb,
-  const acb_mat_t tau, slong prec)
+.. function:: void acb_theta_naive_fixed_ab(acb_ptr th, ulong ab, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 
-.. function:: void acb_theta_naive_fixed_a(acb_ptr th, ulong a, acb_srcptr zs, slong nb,
-  const acb_mat_t tau, slong prec)
+.. function:: void acb_theta_naive_fixed_a(acb_ptr th, ulong a, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 
-.. function:: void acb_theta_naive_all(acb_ptr th, acb_srcptr zs, slong nb,
-  const acb_mat_t tau, slong prec)
+.. function:: void acb_theta_naive_all(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 
-Evaluates `\theta_{a,b}(z^{(k), \tau)` for, respectively: the given value of
-`(a,b)`; all `(a,b)` for `b\in \{0,1\}^g` and the given value of~`a`; or all
-`(a,b)\in\{0,1\}^{2g}`, for each `1\leq k\leq \mathit{nb}`. The result
-*th} will be a concatenation of *nb} vectors of length `1`, `2^g`
-or `2^{2g}` respectively. We reduce to calling \func{acb_theta_naive_00} or
-\func{acb_theta_naive_0b} by writing
-\[
-\theta_{a,b}(z,\tau) = \exp(\pi i \tfrac{a^T}{2} \tau \tfrac a2) \exp(\pi i
-a^T(z + \tfrac b 2)) \theta_{0,b}(z + \tau \tfrac{a}{2}, \tau).
-\]
+    Evaluates `\theta_{a,b}(z^{(k), \tau)` for, respectively: the given value
+    of `(a,b)`; all `(a,b)` for `b\in \{0,1\}^g` and the given value of `a`; or
+    all `(a,b)\in\{0,1\}^{2g}`, for each `1\leq k\leq \mathit{nb}`. The result
+    *th* will be a concatenation of *nb* vectors of length `1`, `2^g` or
+    `2^{2g}` respectively.
 
-\T check that the results of \func{naive_fixed_ab} and \func{naive_fixed_a}
-agree with the corresponding entries of the result of \func{naive_all}. Also
-check that \func{naive_all} agrees with \func{acb_modular_theta} as follows: if
-`\tau` is diagonal with coefficients `\tau_0,\ldots,\tau_{g-1}`, then we have
-`\theta_{a,b}(z,\tau) = \prod_{j=0}^{g-1} \theta_{a_j,b_j}(z_j,\tau_j)`, so
-these quantities must overlap.
+    We reduce to calling :func:`acb_theta_naive_00` or :func:`acb_theta_naive_0b`
+    by writing
 
-\subsection{Naive algorithms for derivatives}
+    .. math ::
 
-We only consider the successive partial derivatives of `\theta_{a,b}(z,\tau)`
-with respect to the~`g` coordinates of~`z`, since derivatives with respect
-to~`\tau` are accounted for by the heat equation
-\[
-  \frac{\partial\theta_{a,b}}{\partial \tau_{j,k}} = \frac{1}{2\pi i(1
-    +\delta_{j,k}) \frac{\partial^2\theta_{a,b}}{\partial z_j \partial z_k}.
-\]
-We encode tuples of derivation orders, henceforth called ``derivation tuples'',
-as vectors of type .. type:: slong} and length~`g`. In agreement with
-\myref{acb_modular}{acb_modular}, we also normalize derivatives in the same way
+        \theta_{a,b}(z,\tau) = \exp(\pi i \tfrac{a^T}{2} \tau \tfrac a2)
+        \exp(\pi i a^T(z + \tfrac b 2)) \theta_{0,b}(z + \tau \tfrac{a}{2}, \tau).
+
+
+Naive algorithms for derivatives: derivation tuples and bounds
+-------------------------------------------------------------------------------
+
+This section contains methods to evaluate the successive partial derivatives of
+`\theta_{a,b}(z,\tau)` with respect to the `g` coordinates of `z`. Derivatives
+with respect to `\tau` are accounted for by the heat equation
+
+    .. math ::
+
+        \frac{\partial\theta_{a,b}}{\partial \tau_{j,k}} = \frac{1}{2\pi i(1 +\delta_{j,k})
+        \frac{\partial^2\theta_{a,b}}{\partial z_j \partial z_k}.
+
+We encode tuples of derivation orders, henceforth called "derivation tuples",
+as vectors of type :type:`slong` and length `g`. In agreement with
+:ref:`acb_modular.h <acb_modular>`, we also normalize derivatives in the same way
 as in the Taylor expansion, so that the tuple `(k_0,\ldots,k_{g-1})`
 corresponds to the differential operator
-\[
-  \frac{1}{k_0!}\cdots\frac{1}{k_{g-1}!} \cdot
-  \frac{\partial^{|k|}}{\partial z_0^{k_0}\cdots \partial z_{g-1}^{k_{g-1}}},
-\]
+
+    .. math ::
+
+        \frac{1}{k_0!}\cdots\frac{1}{k_{g-1}!} \cdot \frac{\partial^{|k|}}{\partial z_0^{k_0}\cdots \partial z_{g-1}^{k_{g-1}}},
+
 where `|k|:=\sum k_i`.  We always consider all derivation tuples up to a total
-order *ord}, and order them first by their total order, then
+order *ord*, and order them first by their total order, then
 reverse-lexicographically. For example, in the case `g=2`, the sequence of
 orders is `(0,0), (1,0), (0,1), (2,0), (1,1)`, etc.
 
 The naive algorithms for derivatives will evaluate a partial sum of the
 differentiated series:
-\[
-  \frac{\partial^{|k|}\theta_{a,b}}{\partial z_0^{k_0}\cdots \partial z_{g-1}^{k_{g-1}}}(z,\tau)
-  = (2\pi i)^{|k|} \sum_{n\in \mathbb{Z}^g + \tfrac a2} n_0^{k_0} \cdots n_{g-1}^{k_{g-1}}
-  \exp(\pi i n^T \tau n + 2\pi i n^T (z + \tfrac b2)).
-\]
+
+    .. math ::
+
+        \frac{\partial^{|k|}\theta_{a,b}}{\partial z_0^{k_0}\cdots \partial z_{g-1}^{k_{g-1}}}(z,\tau) = (2\pi i)^{|k|} \sum_{n\in \mathbb{Z}^g + \tfrac a2} n_0^{k_0} \cdots n_{g-1}^{k_{g-1}}
+        \exp(\pi i n^T \tau n + 2\pi i n^T (z + \tfrac b2)).
 
 .. function:: slong acb_theta_jet_nb(slong ord, slong g)
 
-Returns the number of derivation tuples with total order at most *ord}.
-
-\T no test, but used e.g. in \func{acb_theta_jet_index}.
+    Returns the number of derivation tuples with total order at most *ord*.
 
 .. function:: slong acb_theta_jet_total_order(const slong* tup, slong g)
 
-Returns the total derivation order for the given tuple *tup} of length *g}.
-
-\T no test, but used e.g. in \func{acb_theta_jet_index}.
+    Returns the total derivation order for the given tuple *tup* of length *g*.
 
 .. function:: void acb_theta_jet_tuples(slong* tups, slong ord, slong g)
 
-Sets *tups} to the concatenation of all derivation tuples up to total
-order *ord}.
-
-\T generate the list of tuples, pick an index `i` at random, at check that the
-result of \func{acb_theta_jet_index} below on the `i^{\mathrm{th}}` tuple is
-indeed `i`.
+    Sets *tups* to the concatenation of all derivation tuples up to total order
+    *ord*.
 
 .. function:: slong acb_theta_jet_index(const slong* tup, slong g)
 
-Returns *n} such that *tup} is the `n^{\mathrm{th}}` derivation tuple of length *g}.
+    Returns *n* such that *tup* is the `n^{\mathrm{th}}` derivation tuple of
+    length *g*.
 
-\T see \func{acb_theta_jet_tuples}.
+.. function:: void acb_theta_jet_naive_radius(arf_t R2, arf_t eps, arb_srcptr v, const arb_mat_t C, slong ord, slong prec)
 
-.. function:: void acb_theta_jet_naive_radius(arf_t R2, arf_t eps, arb_srcptr v,
-  const arb_mat_t C, slong ord, slong prec)
+    Assuming that *C* is the upper-triangular Cholesky matrix for `\pi
+    \mathrm{Im}(\tau)` and `v = C Y^{-1} y` where `y, Y` are the imaginary
+    parts of `z` and `\tau` respectively, returns *R2* and *eps* so that, when
+    summing the above series on terms `n\in \mathbb{Z}^g` such that `(v + C
+    n)^T(v + C n)\leq \mathit{R2}`, the absolute value of the tail of the
+    series (before multiplying by the leading term `(2\pi i)^{|k|} e^{\pi y^Y
+    Y^{-1} y}`, see below) will be bounded above by *eps*, for any derivation
+    tuple `k` with `|k|\leq \mathit{ord}`.
 
-Assuming that *C} is the upper-triangular Cholesky matrix for
-`\pi \mathrm{Im}(\tau)` and `v = C Y^{-1} y` where~`y, Y` are the imaginary
-parts of `z` and `\tau` respectively, returns *R2} and *eps} so
-that, when summing the above series on terms `n\in \mathbb{Z}^g` such that
-`(v + C n)^T(v + C n)\leq \mathit{R2}`, the absolute value of the tail of the
-series (ignoring leading multiplicative terms, see below) will be bounded above
-by *eps}, for any derivation tuple `k` with `|k|\leq \mathit{ord}`.
+    We can rewrite the above sum as
 
-We can rewrite the above sum as
-\[
-  \frac{\partial^{|k|}\theta_{a,b}}{\partial z_0^{k_0}\cdots \partial
-    z_{g-1}^{k_{g-1}}}(z,\tau) = (2\pi i)^{|k|} e^{\pi y^T Y^{-1} y} \sum_{n\in
-    \mathbb{Z}^g + \tfrac a2} n_0^{k_0} \cdots n_{g-1}^{k_{g-1}} e^{\pi
-    i(\cdots) e^{-\pi (n + Y^{-1}y)^T Y (n + Y^{-1}y).
-\]
-Ignore the multiplicative factors in front of the sum. Writing
-`m = C n + v`, we have
-\[
-  n_0^{k_0}\cdots n_{g-1}^{k_{g-1}}\leq
-  (\lVert C^{-1}\rVert \lVert n\rVert + \lVert
-  Y^{-1}y\rVert)^{|k|}.
-\]
-Here all norms are (induced) infinity norms, which for vectors are bounded
-above by the `L^2` norm. Therefore, the absolute value of the tail of the
-series is bounded above by
-\[
-  \biggl(\sum_{j=0}^{|k|} \binom{|k|}{j} \lVert C^{-1} \rVert^{j}
-  R^j \lVert Y^{-1}y\rVert^{|k|-j}\biggr) \cdot 2^{2g+2} R^{g-1} e^{-R^2}
-  \prod_{j=0}^{g-1} (1 + \gamma_j^{-1}).
-\]
-The inner sum is simply
-`(\lVert C^{-1} \rVert R + \lVert Y^{-1}y \rVert)^{|k|}`.
+    .. math ::
 
-Thus, we proceed as follows. We first compute *R2} and *eps} using
-\func{acb_theta_naive_radius} with *ord = 0}. If
-`R\leq \lVert Y^{-1}y\rVert/\lVert C^{-1}\rVert`, we simply multiply *eps} by
-`\max\{1, 2 \lVert Y^{-1}y \rVert\}^{\mathit{ord}}`. Otherwise, we compute
-*R2} and *eps} using \func{acb_theta_naive_radius} with the given
-value of *ord}. We can then set *R2} to the maximum of *R2}
-and `\lVert Y^{-1}y \rVert /\lVert C^{-1} \rVert`, and multiply *eps} by
-`\max\{1, 2\lVert C^{-1}\rVert\}^{\mathit{ord}}`.
+        (2\pi i)^{|k|} e^{\pi y^T Y^{-1} y} \sum_{n\in \mathbb{Z}^g + \tfrac a2} n_0^{k_0} \cdots n_{g-1}^{k_{g-1}} e^{\pi i(\cdots) e^{-\pi (n + Y^{-1}y)^T Y (n + Y^{-1}y).
 
-\T generate `C` and `v = Cy^{-1}y` randomly, compute *R2} and
-*eps}, then check that
-`\max\{1, \lVert C^{-1}\rVert R + \lVert Y^{-1}y\rVert\}^{\textit{ord}}\cdot
-2^{2g+2}R^{g-1}e^{-R^2}\prod_{j=0}^{g-1} (1+\gamma_j^{-1})\leq \mathit{eps}`.
+    Ignore the multiplicative factors in front of the sum. Writing
+    `m = C n + v`, we have
 
-.. function:: void acb_theta_jet_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z,
-  const acb_mat_t tau, slong ord, slong prec)
+    .. math ::
 
-Sets *E} and *u} so that summing over *E}
-yields derivatives of theta functions up to an error of at most *u},
-ignoring factorials and powers of `\pi`. After computing *R2} and
-*eps} as in \func{acb_theta_jet_naive_radius}, we set the radius of
-*E} to be *R2} and set
-`u = e^{\pi y^T Y^{-1} y}\cdot \mathit{eps}`.
+        n_0^{k_0}\cdots n_{g-1}^{k_{g-1}}\leq
+        (\lVert C^{-1}\rVert_\infty \lVert n\rVert_2 + \lVert Y^{-1}y\rVert_\infty)^{|k|}.
 
-\T generate random *z} and *tau} and check that the sum of the
-absolute values of terms on the border of the ellipsoid *E} is at most
-*u}.
+    Using the upper bound as in :func:`acb_theta_naive_radius`, the absolute
+    value of the tail of the series is bounded above by
 
-.. function:: void acb_theta_jet_naive_00(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
-  slong ord, slong prec)
+    .. math ::
 
-Sets *dth} to the vector of derivatives of `\theta_{0,0}` at the given
-point `(z,\tau)` up to total order *ord}.
+        (\lVert C^{-1} \rVert_\infty R + \lVert Y^{-1}y \rVert_\infty)^{|k|}
+         2^{2g+2} R^{g-1} e^{-R^2} \prod_{j=0}^{g-1} (1 + \gamma_j^{-1}).
 
-\T check that the values overlap with the result of \func{acb_theta_jet_naive_all} below.
+    Thus, we proceed as follows. We first compute *R2* and *eps* using
+    :func:`acb_theta_naive_radius` with *ord* = 0. If `R\leq \lVert
+    Y^{-1}y\rVert_\infty/\lVert C^{-1}\rVert_\infty`, we simply multiply *eps*
+    by `\max\{1, 2 \lVert Y^{-1}y \rVert\}^{\mathit{ord}}`. Otherwise, we
+    compute *R2* and *eps* using :func:`acb_theta_naive_radius` with the given
+    value of *ord*. We can then set *R2* to the maximum of *R2* and `\lVert
+    Y^{-1}y \rVert_\infty /\lVert C^{-1} \rVert_\infty`, and multiply *eps* by
+    `\max\{1, 2\lVert C^{-1}\rVert\}^{\mathit{ord}}`.
 
-.. function:: void acb_theta_jet_naive_fixed_ab(acb_ptr dth, ulong ab, acb_srcptr z, const acb_mat_t tau,
-  slong ord, slong prec)
+.. function:: void acb_theta_jet_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
 
-Sets *dth} to the vector of derivatives of `\theta_{a,b}` at the given
-point `(z,\tau)` up to total order *ord}. We reduce to
-\func{acb_theta_jet_naive_00} using the same formula as in
-\func{acb_theta_naive_ind}, making suitable linear combinations of the
-derivatives.
+    Sets *E* and *u* so that summing over *E* yields derivatives of theta
+    functions up to an error of at most *u*, ignoring leading factorials and
+    powers of `2\pi i`. After computing *R2* and *eps* as in
+    :func:`acb_theta_jet_naive_radius`, we set the radius of *E* to be *R2* and
+    set `u = e^{\pi y^T Y^{-1} y}\cdot \mathit{eps}`.
 
-\T check that the values overlap with the result of \func{acb_theta_jet_naive_all} below.
 
-.. function:: void acb_theta_jet_naive_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
-  slong ord, slong prec)
+Naive algorithms for derivatives: main user functions
+-------------------------------------------------------------------------------
 
-Sets *dth} to the vector of derivatives of all the functions
-`\theta_{a,b}` for `a,b\in \{0,1\}^g` up to total order *ord} at the
-given point. The result will be a concatenation of `2^{2g}` vectors of length
-\func{acb_theta_jet_nb(ord, g).
+.. function:: void acb_theta_jet_naive_00(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
 
-We use an ellipsoid to encode points in `\tfrac 12 \mathbb{Z}^g`, and divide
-`\tau` by 4 and `z` by 2 to sum the correct terms. The bounds output by
-\func{acb_theta_jet_naive_radius} are still valid, since this just has the
-effect of multiplying `\lVert C^{-1} \rVert` and each
-`\gamma_j^{-1}` by `2`.
+    Sets *dth* to the vector of derivatives of `\theta_{0,0}` at the given
+    point `(z,\tau)` up to total order *ord*.
 
-\T check that for diagonal matrices, the results agree with
-\func{acb_modular_theta_jet}.
+.. function:: void acb_theta_jet_naive_fixed_ab(acb_ptr dth, ulong ab, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
 
-.. function:: void acb_theta_jet_error_bounds(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
-  acb_srcptr dth, slong ord, slong prec)
+    Sets *dth* to the vector of derivatives of `\theta_{a,b}` at the given
+    point `(z,\tau)` up to total order *ord*. We reduce to
+    :func:`acb_theta_jet_naive_00` using the same formula as in
+    :func:`acb_theta_naive_ind` and making suitable linear combinations of the
+    derivatives.
 
-Assuming that *dth} contains the derivatives of a function `\theta_{a,b}`
-up to total order `\mathit{ord} + 2`, sets *err} to a vector with the
-following property. Let `(z_0,\tau_0)` be the midpoint of `(z,\tau)`, and let
-`(z_1,\tau_1)` be any point inside the ball specified by the given *z}
-and *tau}. Then the vectors of derivatives of `\theta_{a,b}` at
-`(z_0,\tau_0)` and `(z_1,\tau_1)` up to total order *ord} differ by at
-most *err} elementwise.
+.. function:: void acb_theta_jet_naive_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
 
-\T generate two pairs `(z_1,\tau_1)` and `(z_2,\tau_2)` close to each other but
-not overlapping, set `(z,\tau)` to be their reunion, and compute *err} on
-`(z,\tau)`. The difference between the result of \func{acb_theta_jet_naive_all}
-on `(z_1,\tau_1)` and `(z_2,\tau_2)` must be at most two times *err}.
+    Sets *dth* to the vector of derivatives of all the functions `\theta_{a,b}`
+    for `a,b\in \{0,1\}^g` up to total order *ord* at the given point. The
+    result will be a concatenation of `2^{2g}` vectors of length `N`, where `N`
+    is the number of derivation tuples of total order at most `g`.
+
+    For simplicity, we use an ellipsoid to encode points in `\tfrac 12
+    \mathbb{Z}^g`, and divide `\tau` by 4 and `z` by 2 to sum the correct
+    terms. The bounds output by :func:`acb_theta_jet_naive_radius` are still
+    valid, since this just has the effect of multiplying `\lVert C^{-1} \rVert`
+    and each `\gamma_j^{-1}` by `2`.
+
+.. function:: void acb_theta_jet_error_bounds(arb_ptr err, acb_srcptr z, const acb_mat_t tau, acb_srcptr dth, slong ord, slong prec)
+
+    Assuming that *dth* contains the derivatives of a function `\theta_{a,b}`
+    up to total order `\mathit{ord} + 2`, sets *err* to a vector with the
+    following property. Let `(z_0,\tau_0)` be the midpoint of `(z,\tau)`, and
+    let `(z_1,\tau_1)` be any point inside the ball specified by the given *z*
+    and *tau*. Then the vectors of derivatives of `\theta_{a,b}` at
+    `(z_0,\tau_0)` and `(z_1,\tau_1)` up to total order *ord* differ by at most
+    *err* elementwise.
 
 \subsection{Quasi-linear algorithms on the reduced domain}
 
@@ -1032,7 +961,7 @@ generalize to any `g`.
   `|\theta_{a,0}(0,\tau)|` is roughly `e^{-d^2}`, where `d` denotes the
   distance between `0` and `\mathbb{Z}^g + \tfrac a2` for the distance attached
   to the quadratic form `\mathrm{Im}(\tau)`. (There is a similar formula when
-  `z\neq 0`.) These distances are computed using the \func{acb_theta_dist...}
+  `z\neq 0`.) These distances are computed using the :func:acb_theta_dist...}
   functions.
 \item To avoid making `2^{2g}` multiplications in the duplication formula, we
   use the Hadamard matrix: then a duplication steps costs only `2^g`
@@ -1041,7 +970,7 @@ generalize to any `g`.
   for instance `2\theta_0\theta_2 = \frac12(x - y)`. However, this would bring
   huge precision losses in terms of shifted absolute precisions! So we must
   compute the Hadamard products at a significantly higher precision and adjust
-  the error bounds in the end. See \func{acb_theta_agm_mul_tight}.
+  the error bounds in the end. See :func:acb_theta_agm_mul_tight}.
 \item When `g\geq 3`, some theta values `\theta_{a,0}(0,2^k\tau)` encountered
   in the algorithm may very well be much smaller than expected (in terms of
   lattice distances) or vanish altogether (This also happens for `g=2` and
@@ -1051,16 +980,16 @@ generalize to any `g`.
   algorithm. Luckily, we can circumvent this by introducing a random auxiliary
   real vector `t` and considering `\theta_{a,0}(2^kt, 2^k\tau)`: these will be
   large enough with overwhelming probability, and one can adapt the duplication
-  formula to output `\theta_{a,0}(0,\tau)`. See \func{acb_theta_ql_roots},
-  \func{acb_theta_ql_step_1} and \func{step_3}.
+  formula to output `\theta_{a,0}(0,\tau)`. See :func:acb_theta_ql_roots},
+  :func:acb_theta_ql_step_1} and :func:step_3}.
 \item When `g\geq 2`, it may be the case that `\mathrm{Im}(\tau)` has
   eigenvalues of different orders of magnitude. In this case, the ellipsoids in
   the naive algorithms for `2^k\tau` as `k` grows will become very thin in some
   directions while still being thick in other directions. We can then do a few
   duplication steps and then fall back to computing theta values in smaller
-  dimensions: this is implented in \func{acb_theta_ql_a0_split}.
+  dimensions: this is implented in :func:acb_theta_ql_a0_split}.
 \item The transformation formula has an analogue for any `g` using the action
-  of `\mathrm{Sp}_{2g}(\mathbb{Z})`: see \func{acb_theta_transform_...} This is
+  of `\mathrm{Sp}_{2g}(\mathbb{Z})`: see :func:acb_theta_transform_...} This is
   important because in order to determine the correct choice of square root at
   `\tau` using the naive algorithm, we want `\tau` to be reduced.
 \end{enumerate}
@@ -1100,7 +1029,7 @@ is also `\mathrm{Dist}_\tau(-Y^{-1}y, \mathbb{Z}^g + \tfrac a2)^2`, where
 
 \T when the imaginary part of `z` is `Y \tfrac{a}{2}` for some theta
 characteristic `a`, check that the `a^{\mathrm{th}}` entry of the result of
-\func{acb_theta_dist_a0} contains zero.
+:func:acb_theta_dist_a0} contains zero.
 
 .. function:: slong acb_theta_dist_addprec(const arb_t d)
 
@@ -1132,7 +1061,7 @@ roots overlap, and an error is thrown if there is no overlap at all.
 
 \T generate a random vector *t}, set *rts} to a low-precision
 rounding of *t} and set *a} to the square of *t}
-elementwise. The result of \func{acb_theta_agm_sqrt} must then overlap
+elementwise. The result of :func:acb_theta_agm_sqrt} must then overlap
 *t} and the precision loss must be small (this is just checked on the
 first entry).
 
@@ -1148,7 +1077,7 @@ precision losses when the absolute values of the entries of *a1} and/or
 instead of multiplications.
 
 \T check that the duplication formula holds: the result of
-\func{acb_theta_agm_mul} on vectors containing `\theta_{0,b}(0,\tau)` and
+:func:acb_theta_agm_mul} on vectors containing `\theta_{0,b}(0,\tau)` and
 `\theta_{0,b}(z,\tau)` for `b\in \{0,1\}^g` must contain
 `\theta_{0,b}^2(2z,2\tau)`.
 
@@ -1164,26 +1093,26 @@ Computes *m} and *eps} such that the following holds: for each
 \T after choosing random *m}, *eps} and *d}, generate a
 random vector *a} whose entries satisfy the corresponding inequalities,
 making sure that equality holds for at least one entry of *a}. The result
-`(m',\mathit{eps}')` of \func{agm_rel_mag_err} must then satisfy
+`(m',\mathit{eps}')` of :func:agm_rel_mag_err} must then satisfy
 `m'\geq m` and `\mathit{eps'}\geq \mathit{eps}`.
 
 .. function:: void acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
   arb_srcptr d0, arb_srcptr d, slong g, slong prec)
 
 Assuming that *d0} and *d} are obtained as the result of
-\func{acb_theta_dist_a0} on `(0,\tau)` and `(z,\tau)` respectively, performs
-the same computation as \func{acb_theta_agm_mul} on the vectors *a0} and
+:func:acb_theta_dist_a0} on `(0,\tau)` and `(z,\tau)` respectively, performs
+the same computation as :func:acb_theta_agm_mul} on the vectors *a0} and
 *a}, but manages the error bounds as follows. Let `m_0, \varepsilon_0`
-(resp.~`m,\varepsilon`) be the result of \func{acb_theta_agm_rel_mag_err} on
-`a_0,d_0` (resp. `a,d`). We call \func{acb_theta_agm_mul} on the midpoints of
+(resp.~`m,\varepsilon`) be the result of :func:acb_theta_agm_rel_mag_err} on
+`a_0,d_0` (resp. `a,d`). We call :func:acb_theta_agm_mul} on the midpoints of
 *a0} and *a} at working precision
-`\mathit{prec} + {}`\func{acb_theta_dist_addprec(dmax) where *dmax} is
+`\mathit{prec} + {}`:func:acb_theta_dist_addprec(dmax) where *dmax} is
 the largest entry of `d`, then add an error bound to the `k^\mathrm{th}` entry
 of *res} of the form
 `e^{-d_k} (m_0 \varepsilon + m \varepsilon_0 + \varepsilon\varepsilon_0)`. The
 resulting precision losses are very mild when `m_0` and `m` are relatively
 small. The computation is valid for the following reason: for each
-`b\in \{0,1\}^g`, we have (keeping notation from \func{acb_theta_dist_a0})
+`b\in \{0,1\}^g`, we have (keeping notation from :func:acb_theta_dist_a0})
 \[
   \mathrm{Dist}_\tau(-Y^{-1}y, \mathbb{Z}^g + \tfrac b2)^2 +
   \mathrm{Dist}_\tau(-Y^{-1} y, \mathbb{Z}^g + \tfrac{b + k}{2})^2 \leq
@@ -1195,8 +1124,8 @@ by the parallelogram identity.
 associated vectors *d0} and *d}. Set each entry of *a0}
 (resp. *a}) to be of the form `z e^{-t}` where `z` is uniformly random
 with `|z|\leq 1` and `t` is the corresponding entry of *d0}
-(resp. *d}). Apply \func{agm_mul_tight}, then apply
-\func{agm_rel_mag_err} on the result with respect to *d}. Check that the
+(resp. *d}). Apply :func:agm_mul_tight}, then apply
+:func:agm_rel_mag_err} on the result with respect to *d}. Check that the
 resulting *m} satisfies `m \leq 1` and that *eps} is at most
 `2^{-*prec} + \delta}` for some reasonable value of `\delta` (e.g.  25).
 
@@ -1227,9 +1156,9 @@ Say we wish to compute `\theta_{a,0}(0,\tau)` for all~`a\in
 `n \simeq \log(\mathit{prec})`, we have to sum only `O_g(1)` terms in the naive
 algorithm to evaluate `\theta_{a,0}(0,2^n\tau)` at ``shifted absolute
 precision'' *prec}, i.e. absolute precision *prec} +
-\func{acb_theta_dist_addprec}`(2^n \mathrm{Dist}_\tau(0, \mathbb{Z}^g + \tfrac
+:func:acb_theta_dist_addprec}`(2^n \mathrm{Dist}_\tau(0, \mathbb{Z}^g + \tfrac
 a2))`. In order to recover `\theta_{a,0}(0,\tau)`, we then perform `n` AGM
-steps. The precision loss when applying \func{acb_theta_agm_mul_tight} is
+steps. The precision loss when applying :func:acb_theta_agm_mul_tight} is
 `O_g(1)` bits in terms of shifted absolute precision. One also has to take
 square roots at each step. For this, we assume that each
 `|\theta_{a,0}(0, 2^k\tau)|` is indeed of the expected order of
@@ -1269,7 +1198,7 @@ coefficients of a Cholesky matrix for `\pi\mathrm{Im}(\tau)`. Let
 `2^{n}\gamma_s^2 \simeq \mathit{prec}` while `2^n \gamma_{s-1}^2` is much
 smaller. One can then split the theta series for `\theta_{a,0}(z, 2^n\tau)` and
 reduce to computing `O_g(1)` theta values in dimension~`s`. See
-\func{acb_theta_ql_a0_split} below for more details.
+:func:acb_theta_ql_a0_split} below for more details.
 
 Finally, we note that the formulas above still hold after replacing each
 occurrence of `\theta_{a,0}(z,\tau)` by
@@ -1288,16 +1217,16 @@ Returns an integer `n` such that `2^n \gamma_s^2 \simeq \mathit{prec}` in the
 above notation, meant to be the number of steps to use in the quasi-linear
 algorithm for `\theta_{a,0}` (before applying the splitting strategy, in the
 case `s > 0`). The precise value of `n` is chosen to optimize performance: see
-\func{acb_theta/profile/p-ql_a0_steps}.
+:func:acb_theta/profile/p-ql_a0_steps}.
 
-\T no test, but used in \func{acb_theta_ql_a0}.
+\T no test, but used in :func:acb_theta_ql_a0}.
 
 .. function:: void acb_theta_ql_log_rescale(acb_t res, acb_srcptr z, const acb_mat_t tau, slong prec)
 
 Sets *res} to `i y^T Y^{-1} y`. This is used to rescale theta values as explained above.
 
 \T generate `z` and `x` such that `y = C^Tx` where `C` is obtained from
-\func{acb_theta_eld_cho}, and check that the result is `i\pi\lVert x\rVert^2`
+:func:acb_theta_eld_cho}, and check that the result is `i\pi\lVert x\rVert^2`
 (for the `L^2` norm).
 
 .. function:: int acb_theta_ql_roots(acb_ptr rts, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
@@ -1305,13 +1234,13 @@ Sets *res} to `i y^T Y^{-1} y`. This is used to rescale theta values as explaine
 
 Attempts to set *rts} to the collection of low-precision roots for the
 given choice of `z` and `t`. It is assumed that *d0} (resp. *d})
-contains the result of \func{acb_theta_dist_a0} on `(0,\tau)`
+contains the result of :func:acb_theta_dist_a0} on `(0,\tau)`
 (resp. `(z,\tau)`), and that `t` is a real vector.
 
 More precisely, for each `0\leq k < n`, each `v\in \{t, 2t, z + t, z + 2t\}`,
-and each `a\in \{0,1\}^g`, we run \func{acb_theta_naive_ind} to evaluate
+and each `a\in \{0,1\}^g`, we run :func:acb_theta_naive_ind} to evaluate
 `\theta_{a,0}(2^kv, 2^k\tau)` at working precision *guard} +
-\func{acb_theta_dist_addprec}`(2^k d_k)`, where `d_k` denotes the
+:func:acb_theta_dist_addprec}`(2^k d_k)`, where `d_k` denotes the
 `k^{\mathrm{th}}` entry of *d0} or *d}, according to the
 imaginary part of `v`. If none of these complex balls contains zero, returns
 `1` and sets *rts} to the resulting vector of length `4 \times n \times 2^g`;
@@ -1329,15 +1258,15 @@ the return value must be 1.
 Given `\theta_{a,0}(0, 2\tau)` (stored in *th0}) and
 `\theta_{a,0}(2z, 2\tau)` (stored in *th}), sets *res} to the values
 `\theta_{a,0}(z,\tau)` for `a\in \{0,1\}^g`. We assume that *d0}
-(resp. *d}) contains the result of \func{acb_theta_dist_a0} on
+(resp. *d}) contains the result of :func:acb_theta_dist_a0} on
 `(0,2\tau)` (resp. `(2z, 2\tau)`), and that *rts} contains
 low-precision approximations of `\theta_{a,0}(z,\tau)`. We call
-\func{acb_theta_agm_mul_tight} and \func{acb_theta_agm_sqrt} once each.
+:func:acb_theta_agm_mul_tight} and :func:acb_theta_agm_sqrt} once each.
 
 \T working at low precision, check that the duplication formula holds by
-generating input using \func{acb_theta_naive_fixed_ab}, applying
-\func{ql_step_1}, and checking the output against
-\func{acb_theta_naive_fixed_ab} as well.
+generating input using :func:acb_theta_naive_fixed_ab}, applying
+:func:ql_step_1}, and checking the output against
+:func:acb_theta_naive_fixed_ab} as well.
 
 .. function:: void acb_theta_ql_step_3(acb_ptr res, acb_srcptr th0, acb_srcptr th,
   acb_srcptr rts, arb_srcptr d0, arb_srcptr d, slong g, slong prec)
@@ -1348,23 +1277,23 @@ in *th}), sets *res} to the vector of length `3\times 2^g` containing
 `\theta_{a,0}(v,\tau)` for `v\in\{ z, z + t, z + 2t\}` and `a\in
 \{0,1\}^g`. The assumptions on *d0} and *d} are as above, and
 *rts} must contain low-precision approximations of `\theta(v,\tau)` for
-`v\in \{z+t, z+ 2t\}`. We make three calls to \func{acb_theta_agm_mul}, take
+`v\in \{z+t, z+ 2t\}`. We make three calls to :func:acb_theta_agm_mul}, take
 `2^{g+1}` square roots, and make `2^g` divisions.
 
-\T check against the naive algorithm as in \func{acb_theta_ql_step_1}.
+\T check against the naive algorithm as in :func:acb_theta_ql_step_1}.
 
 .. function:: void acb_theta_ql_step_2(acb_ptr res, acb_srcptr th0, acb_srcptr th,
   acb_srcptr rts, arb_srcptr d0, arb_srcptr d, slong g, slong prec)
 
-Same as \func{acb_theta_ql_step_3}, but does not perform the divisions. The first
+Same as :func:acb_theta_ql_step_3}, but does not perform the divisions. The first
 `2^g` entries of *res} are set to zero.
 
-\T check against the naive algorithm as in \func{acb_theta_ql_step_1}.
+\T check against the naive algorithm as in :func:acb_theta_ql_step_1}.
 
 .. function:: void acb_theta_ql_dupl(acb_ptr th2, acb_srcptr th0, acb_srcptr th,
   arb_srcptr d0, arb_srcptr d, slong g, slong prec)
 
-Given input as in \func{acb_theta_ql_step_1} (except that *rts} is not
+Given input as in :func:acb_theta_ql_step_1} (except that *rts} is not
 needed), sets `r` to the vector of squared theta values
 `\theta_{a,b}(z,\tau)^2` for all `a,b\in \{0,1\}^g`. We use the following
 version of the duplication formula:
@@ -1372,9 +1301,9 @@ version of the duplication formula:
   \theta_{a,b}(z,\tau)^2 = \sum_{a'\in (\mathbb{Z}/2\mathbb{Z})^g}
   (-1)^{a'^Tb} \theta_{a',0}(2z,2\tau) \theta_{a+a',0}(0,2\tau),
 \]
-making `2^g` calls to \func{acb_theta_agm_mul_tight}.
+making `2^g` calls to :func:acb_theta_agm_mul_tight}.
 
-\T check against the naive algorithm as in \func{acb_theta_ql_step_1}.
+\T check against the naive algorithm as in :func:acb_theta_ql_step_1}.
 
 \subsubsection{Quasi-linear algorithms for `\theta_{a,0}`}
 
@@ -1394,13 +1323,13 @@ Such a worker will attempt to set *th} to the values `\theta_{a,0}(v,\tau)` for
 `v\in \{0,t,2t,z,z+t,z+2t\}` and `a\in \{0,1\}^g` at shifted absolute
 precision *prec}, return `1` on success and `0` on failure. The vectors
 *d0} and *d} must contain the result of
-\func{acb_theta_dist_a0} on `(0,\tau)` and `(z,\tau)`. If `z = 0`, `t = 0`, or
+:func:acb_theta_dist_a0} on `(0,\tau)` and `(z,\tau)`. If `z = 0`, `t = 0`, or
 both, we only compute `3`, `2`, or `1` vectors of `2^g` values
 respectively. Two functions of this type are available:
-\func{acb_theta_ql_a0_naive} and the main function
-\func{acb_theta_ql_a0}. Using function pointers allows us to write independent
-test code for the main workhorses \func{acb_theta_ql_a0_steps} and
-\func{acb_theta_ql_a0_split} below.
+:func:acb_theta_ql_a0_naive} and the main function
+:func:acb_theta_ql_a0}. Using function pointers allows us to write independent
+test code for the main workhorses :func:acb_theta_ql_a0_steps} and
+:func:acb_theta_ql_a0_split} below.
 
 .. function:: int acb_theta_ql_a0_naive(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
   arb_srcptr d, const acb_mat_t tau, slong guard, slong prec)
@@ -1421,8 +1350,8 @@ writing `n = (n_0,n_1)` where `n_0\in \mathbb{Z}^s` and
 term in the split theta series. We must have `1\leq s\leq g -1`.
 
 More precisely, for each `0\leq a < 2^g`, we compute *R2} and *eps}
-as in \func{acb_theta_naive_radius} at precision
-*prec}`{} + {}`\func{acb_theta_dist_addprec}`(d_a)`. Note that
+as in :func:acb_theta_naive_radius} at precision
+*prec}`{} + {}`:func:acb_theta_dist_addprec}`(d_a)`. Note that
 `n^T \mathrm{Im}(\tau) n\geq \lVert C_1 n_1\rVert^2`, where `C_1` denotes the
 lower-right block of `C` of dimensions `(g-s)\times(g-s)`. Thus, in order to
 compute `\theta_{a,0}(z, 2^n\tau)` at shifted absolute precision *prec},
@@ -1450,43 +1379,43 @@ for the corresponding term according to the distance between `n_1` and the
 center of the above ellipsoid. The return value is 1 iff *worker}
 succeeds for each `n_1`.
 
-\T check that the result agrees with \func{acb_theta_ql_a0_naive} on random
-input in case of success, using \func{acb_theta_ql_a0_naive} as *worker}.
+\T check that the result agrees with :func:acb_theta_ql_a0_naive} on random
+input in case of success, using :func:acb_theta_ql_a0_naive} as *worker}.
 
 .. function:: int acb_theta_ql_a0_steps(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
   arb_srcptr d, const acb_mat_t tau, slong nb_steps, slong s,
   slong guard, slong prec, acb_theta_ql_worker_t worker)
 
-Follows the specifications of a function of type \func{acb_theta_ql_worker_t},
+Follows the specifications of a function of type :func:acb_theta_ql_worker_t},
 except for the additional arguments *nb_steps}, *s} and
 *worker}, by performing `k := {}`*nb_steps} AGM steps. We first
-call \func{acb_theta_ql_roots} with *guard} bits of shifted absolute
-precision, then call \func{acb_theta_ql_a0_naive} or
-\func{acb_theta_ql_a0_split} on `(2^k t, 2^k z, 2^k\tau)` depending on whether
+call :func:acb_theta_ql_roots} with *guard} bits of shifted absolute
+precision, then call :func:acb_theta_ql_a0_naive} or
+:func:acb_theta_ql_a0_split} on `(2^k t, 2^k z, 2^k\tau)` depending on whether
 *s} is zero or not, and finally we perform the AGM steps. If any
 subprocedure fails, we end the computation and return 0, and otherwise return
 1.
 
-\T same as \func{acb_theta_ql_a0_split}.
+\T same as :func:acb_theta_ql_a0_split}.
 
 .. function:: int acb_theta_ql_a0(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
   arb_srcptr d, const acb_mat_t tau, slong guard, slong prec)
 
 Follows the specifications of a function of type
-\func{acb_theta_ql_worker_t}. We first decide how many AGM steps we should use
+:func:acb_theta_ql_worker_t}. We first decide how many AGM steps we should use
 and whether we should use the splitting strategy. Then we run
-\func{acb_theta_ql_a0_steps} on the midpoints of `t,z` and `\tau` at a slightly
+:func:acb_theta_ql_a0_steps} on the midpoints of `t,z` and `\tau` at a slightly
 higher precision to account for precision losses in the duplication formulas,
-using a recursive call to \func{acb_theta_ql_a0} as *worker}. If the
+using a recursive call to :func:acb_theta_ql_a0} as *worker}. If the
 return value is 1, we finally compute provable error bounds on the result using
-\func{acb_theta_jet_naive_ind} and \func{acb_theta_jet_error_bounds}.
+:func:acb_theta_jet_naive_ind} and :func:acb_theta_jet_error_bounds}.
 
-\T check that the result agrees with \func{acb_theta_ql_a0_naive} on random
+\T check that the result agrees with :func:acb_theta_ql_a0_naive} on random
 input if successful.
 
 \subsubsection{Quasi-linear algorithms for `\theta_{a,b}`}
 
-The function \func{acb_theta_ql_a0} may fail for an unlucky choice of auxiliary
+The function :func:acb_theta_ql_a0} may fail for an unlucky choice of auxiliary
 vector `t` or when *guard} is too small. Thus, we implement a
 probabilistic algorithm where we gradually increase *guard} and choose
 first `t = 0`, then a random choice of `t` at each step. The following
@@ -1506,12 +1435,12 @@ Sets *new_z}, *c}, *u}, *n1} and returns
 `-1\leq s\leq g` such that the following holds. When `s\geq 0`,
 `z':=*new_z}` is a vector of length `s` and `n_1` is a vector of length
 `g-s`, and for each characteristic `(a,b)`, we have (borrowing notation from
-\func{acb_theta_ql_a0_split}): eitner
+:func:acb_theta_ql_a0_split}): eitner
 \[
   |\theta_{a,b}(z,\tau) - c i^{\,n_1^Tb_1} \theta_{a_0,b_0}(z', \tau_0)| \leq u
 \]
 when the last `g-s` coordinates of `a` equal
-`a_1 =`\func{acb_theta_char_get_a}`(n_1)`, or
+`a_1 =`:func:acb_theta_char_get_a}`(n_1)`, or
 \[
   |\theta_{a,b}(z,\tau)|\leq u
 \]
@@ -1522,8 +1451,8 @@ have a negligible impact on theta values but would give rise to unreasonable
 choices of precisions in the duplication formula.
 
 This works as follows. We first compute *R2} and *eps} as in
-\func{acb_theta_naive_radius}, then set *c}, *u} and *new_z}
-as in \func{acb_theta_naive_reduce} in dimension `g`. We set `s` such that for
+:func:acb_theta_naive_radius}, then set *c}, *u} and *new_z}
+as in :func:acb_theta_naive_reduce} in dimension `g`. We set `s` such that for
 each `s\leq j < g`, we have `\gamma_j^2 > 4R^2`, where `\gamma_j` is the
 `j^{\mathrm{th}}` diagonal coefficient of the Cholesky matrix `C` for
 `\pi\mathrm{Im}(\tau)`. We may assume that `s< g`, otherwise there is nothing
@@ -1549,20 +1478,20 @@ the above conditions hold when computing theta values with the naive algorithm.
 .. function:: void acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
 
 Sets *th} to the collection of `\theta_{a,b}(z,\tau)` for all
-`a,b\in \{0,1\}^g`. After calling \func{acb_theta_ql_reduce}, we generally use
-the duplication formula on the result of \func{acb_theta_ql_a0} at `2\tau` and
-a final square-root step. At low precisions, we call \func{acb_theta_naive_all}
+`a,b\in \{0,1\}^g`. After calling :func:acb_theta_ql_reduce}, we generally use
+the duplication formula on the result of :func:acb_theta_ql_a0} at `2\tau` and
+a final square-root step. At low precisions, we call :func:acb_theta_naive_all}
 instead.
 
-\T check that the result agrees with \func{acb_theta_naive_all} on random input.
+\T check that the result agrees with :func:acb_theta_naive_all} on random input.
 
 .. function:: void acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec)
 
 Sets *th2} to the collection of `\theta_{a,b}(z,\tau)^2` for all
-`a,b\in \{0,1\}^g`. After calling \func{acb_theta_ql_reduce}, we use
-the duplication formula on the result of \func{acb_theta_ql_a0} at `2\tau`.
+`a,b\in \{0,1\}^g`. After calling :func:acb_theta_ql_reduce}, we use
+the duplication formula on the result of :func:acb_theta_ql_a0} at `2\tau`.
 
-\T check that the result agrees with \func{acb_theta_naive_all} on random input.
+\T check that the result agrees with :func:acb_theta_naive_all} on random input.
 
 \subsection{The transformation formula}
 
@@ -1580,7 +1509,7 @@ where `c` depends only on *mat} and `\tau` and `\zeta_8=\exp(i\pi/4)`. In
 Igusa's notation, *e} is `\phi_m(\mathit{mat})`.
 
 \T check that the `a` component of any characteristic remains the same when
-*mat} is a trigonal symplectic matrix as in \func{sp2gz_trig}.
+*mat} is a trigonal symplectic matrix as in :func:sp2gz_trig}.
 
 .. function:: slong acb_theta_transform_kappa(const fmpz_mat_t mat)
 
@@ -1600,7 +1529,7 @@ denote the lower `g\times g` blocks of *mat}. The choice of square root
 is made so that the transformation formula holds, and is determined by
 computing theta values at low precision.
 
-\T check that the result squares to the determinant of \func{acb_siegel_cocycle}.
+\T check that the result squares to the determinant of :func:acb_siegel_cocycle}.
 
 .. function:: void acb_theta_transform_proj(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th,
   int sqr, slong prec)
@@ -1609,24 +1538,24 @@ Assuming that *sqr} is 0 (false) and that *th} contains
 `\theta_{a,b}(z,\tau)` for some `z\in \mathbb{C}^g` and `\tau\in \mathbb{H}_g`,
 sets *res} to contain the values
 `\theta_{a,b}(\mathit{mat}\cdot (z,\tau))` (where *mat} acts as in
-\func{acb_theta_transform_z}) up to a common scalar factor in
+:func:acb_theta_transform_z}) up to a common scalar factor in
 `\mathbb{C}^\times`. This only permutes the theta values and multiplies them by
 a suitable eighth root of unity. If *sqr} is nonzero (true), does the
 same computation for squared theta values `\theta_{a,b}(z,\tau)^2` instead.
 
-\T check that applying \func{acb_theta_transform_proj} using a random
+\T check that applying :func:acb_theta_transform_proj} using a random
 *mat} then its inverse gives back the initial projective point.
 
 .. function:: void acb_theta_transform(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th,
   acb_srcptr z, const acb_mat_t tau, slong kappa, int sqr, slong prec)
 
 Assuming that *sqr} is 0, that *kappa} is precomputed as in
-\func{acb_theta_transform_kappa}, and that *th} contains
+:func:acb_theta_transform_kappa}, and that *th} contains
 `\theta_{a,b}(z,\tau)`, sets *res} to vector of values
 `\theta_{a,b}(\mathit{mat}\cdot(z,\tau))` for `a,b\in\{0,1\}^g`. If *sqr}
 is nonzero, does the same computation for squared theta values instead.
 
-\T check that the result agrees with \func{acb_modular_theta} when `g=1` on
+\T check that the result agrees with :func:acb_modular_theta} when `g=1` on
 random input. We restrict to `g=1` to avoid calling the naive algorithm on a
 matrix that is far from the fundamental domain.
 
@@ -1635,12 +1564,12 @@ matrix that is far from the fundamental domain.
 Sets *th} to the vector of theta values `\theta_{a,b}(z,\tau)` or
 `\theta_{a,b}(z,\tau)^2` for `a,b\in \{0,1\}^g`, depending on whether
 *sqr} is 0 (false) or not. We reduce `\tau` using
-\func{acb_theta_siegel_reduce}, call \func{acb_theta_ql_all} or
-\func{acb_theta_ql_all_sqr}, and then apply the transformation formula. If the
+:func:acb_theta_siegel_reduce}, call :func:acb_theta_ql_all} or
+:func:acb_theta_ql_all_sqr}, and then apply the transformation formula. If the
 reduction is not successful, we call the naive algorithm at a lower precision
 instead.
 
-\T check that the result agrees with \func{acb_theta_naive_all} on random
+\T check that the result agrees with :func:acb_theta_naive_all} on random
 input. The matrix *tau} is chosen to be a priori non-reduced but
 reasonably close to the fundamental domain.
 
@@ -1705,7 +1634,7 @@ for all characteristics `(a,b)` are uniformly bounded by `c`. The choice of
 
 We proceed as follows. First, we compute `c_0`, `c_1`, `c_2` such that for any
 choice of `\rho`, one can take `c = c_0\exp((c_1 + c_2\rho)^2)`
-above. Following \func{acb_theta_naive_reduce}, we get
+above. Following :func:acb_theta_naive_reduce}, we get
 \[
   |\theta_{a,b}(z',\tau)| \leq c_0\exp(\pi y'^T Y^{-1} y')
 \]
@@ -1748,23 +1677,23 @@ Assuming that *val} contains the values `\theta_{a,b}(z + h_n,\tau)`
 where `h_n = (\varepsilon \zeta^{n_0},\ldots, \varepsilon \zeta^{n_{g-1}})` for
 a root of unity `\zeta` of order `\mathit{ord} + 1`, and assuming that
 *eps} and *err} has been computed as in
-\func{acb_theta_jet_fd_radius}, sets *dth} to the vector of partial
+:func:acb_theta_jet_fd_radius}, sets *dth} to the vector of partial
 derivatives of `\theta_{a,b}` at `(z,\tau)` up to total order *ord}. The
 vector *val} should be indexed in lexicographic order as in
-\func{acb_dft}, i.e. writing `j = \overline{a_{g-1}\cdots a_0}` in basis `m`,
+:func:acb_dft}, i.e. writing `j = \overline{a_{g-1}\cdots a_0}` in basis `m`,
 the `j^{\mathrm{th}}` entry of *val} corresponds to
 `n = (a_0,\ldots, a_{g-1})`. The output derivatives are normalized as in the
 Taylor expansion.
 
 \T check that this computes the correct Fourier coefficients for the
 exponential function `\exp(z_0+\cdots+z_{g-1})`, setting *c} and
-*rho} by hand instead of calling \func{acb_theta_jet_bounds}.
+*rho} by hand instead of calling :func:acb_theta_jet_bounds}.
 
 .. function:: void acb_theta_jet_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
 
 Sets *dth} to the derivatives of all functions `\theta_{a,b}` for
 `a,b\in \{0,1\}^g` at `(z,\tau)`, as a concatenation of `2^{2g}` vectors of
-length \func{acb_theta_jet_nb(ord, g). This algorithm runs in quasi-linear
+length :func:acb_theta_jet_nb(ord, g). This algorithm runs in quasi-linear
 time in `\mathit{prec}\cdot \mathit{ord}^g` for any fixed `g`.
 
 We first compute *c}, *rho}, *err} and *eps} as above,
@@ -1772,16 +1701,16 @@ then compute theta values `\theta_{a,b}(z + h_n,\tau)` at a higher precision to
 account for division by `\varepsilon^{\mathit{ord}}\cdot
 (\mathit{ord}+1)^g`. For this, we first extract the midpoint of `z` and
 `\tau`. Finally, we adjust the error bounds using
-\func{acb_theta_jet_error_bounds} and the naive algorithm for derivatives of
+:func:acb_theta_jet_error_bounds} and the naive algorithm for derivatives of
 order `\mathit{ord} + 2`.
 
-\T check that the output agrees with \func{acb_theta_jet_naive_all} on random input.
+\T check that the output agrees with :func:acb_theta_jet_naive_all} on random input.
 
 \subsection{Dimension~`2` specifics}
 
 In the `g=2` case, one can use theta functions to evaluate many fundamental
 Siegel modular forms. This section contains functions to do so, in analogy with
-\func{acb_modular_delta}, \func{acb_modular_eisenstein}, etc. when `g=1`.
+:func:acb_modular_delta}, :func:acb_modular_eisenstein}, etc. when `g=1`.
 
 We use the following notation. For `k,j\geq 0`, a Siegel modular form of weight
 `\det^k\otimes \mathrm{Sym}^j` is by definition an analytic function
@@ -1820,10 +1749,10 @@ Sets *dth} in the same way as .. function:: acb_theta_jet_naive_all(dth, z, tau,
   1, prec) for `z = 0`, but works more efficiently, since the value
 (resp. gradients) of `\theta_{a,b}(z,\tau)` at `z = 0` vanish if `(a,b)` is odd
 (resp. even). The attached worker uses one of two available strategies (doing
-multiplications and then summing, or calling \func{acb_dot} twice) depending on
+multiplications and then summing, or calling :func:acb_dot} twice) depending on
 *prec}.
 
-\T check that the output agrees with \func{acb_theta_jet_naive_all}.
+\T check that the output agrees with :func:acb_theta_jet_naive_all}.
 
 .. function:: void acb_theta_g2_detk_symj(acb_poly_t res, const acb_mat_t m, const acb_poly_t f,
   slong k, slong j, slong prec)
@@ -1857,7 +1786,7 @@ Sets *res} to the leading coefficient of `(g,h)_k` in `x_1`, with the same
 conventions as above.
 
 \T check that we indeed get the leading term of the transvectant computed using
-\func{acb_theta_g2_transvectant}.
+:func:acb_theta_g2_transvectant}.
 
 .. function:: void acb_theta_g2_psi4(acb_t res, acb_srcptr th2, slong prec)
 
@@ -1884,7 +1813,7 @@ expansions of these modular forms begin as follows:
   \end{aligned}
 \]
 
-\T check that the values transform as they should under \func{acb_theta_transform_proj}.
+\T check that the values transform as they should under :func:acb_theta_transform_proj}.
 
 .. function:: void acb_theta_g2_chi5(acb_t res, acb_srcptr th, slong prec)
 
@@ -1905,14 +1834,14 @@ normalized as follows:
   \chi_{35}(\tau) = q_1^2 q_3^2 (q_1 - q_3 )(q_2 - q_2^{-1}) + \cdots
 \]
 
-\T check that the values transform as they should under \func{acb_theta_transform_proj}.
+\T check that the values transform as they should under :func:acb_theta_transform_proj}.
 
 .. function:: void acb_theta_g2_chi3_6(acb_poly_t res, acb_srcptr dth, slong prec)
 
 Sets *res} to the value of the vector-valued cusp form with character
 `\chi_{6,3}` of weight `\det^3\otimes \mathrm{Sym}^6` corresponding to the
 given values of *dth}, computed as in e.g.
-\func{acb_theta_g2_jet_naive_1}. We have by \cite{clery}:
+:func:acb_theta_g2_jet_naive_1}. We have by \cite{clery}:
 \[
   \chi_{3,6}(\tau) = \frac{1}{64\pi^6} \prod_{(a,b) \text{ odd}}
   \left(\frac{\partial \theta_{a,b}}{\partial z_1}(0,\tau) x_1 +
@@ -1925,12 +1854,12 @@ given values of *dth}, computed as in e.g.
 
 Sets *res} to the value of `\chi_{-2,6}:=\chi_{3,6}/\chi_5` at `\tau`. We
 reduce `\tau` to the Siegel fundamental domain and call either
-\func{acb_theta_g2_jet_naive_1} or \func{acb_theta_jet_all} to compute theta
+:func:acb_theta_g2_jet_naive_1} or :func:acb_theta_jet_all} to compute theta
 gradients, depending on *prec}. Under the correspondence between Siegel
 modular functions and covariants of binary sextics, `\chi_{-2,6}` corresponds
 to the binary sextic itself, hence the name.
 
-\T check that the discriminant of \func{acb_theta_g2_sextic} is `2^{12}\chi_{10}`.
+\T check that the discriminant of :func:acb_theta_g2_sextic} is `2^{12}\chi_{10}`.
 
 .. function:: void acb_theta_g2_covariants(acb_poly_struct* res, const acb_poly_t f, slong prec)
 
@@ -1972,7 +1901,7 @@ The scalar factors are chosen so that when evaluated at a formal sextic
 `f = \sum a_i x_1^{6-i}x_2^i`, the covariants are integral and primitive as
 multivariate polynomials in `a_0,\ldots,a_6,x_1,x_2`.
 
-\T check that the output agrees with \func{acb_theta_g2_psi4} using the
+\T check that the output agrees with :func:acb_theta_g2_psi4} using the
 relation `\psi_4 = -(C_{2,0} - 3C_{4,0})/20`. Also check that covariants
 transform as they should under the action of `\mathrm{Sp}_4(\mathbb{Z})`, and
 that covariants take integral values on integral polynomials.
@@ -1981,9 +1910,9 @@ that covariants take integral values on integral polynomials.
 
 Sets *res} to the vector of leading coefficients in `x_1` of the 26
 covariants evaluated at *f}. This is more efficient than taking leading
-coefficients of \func{acb_theta_g2_covariants}, since we can use
-\func{acb_theta_g2_transvectant_lead} instead of
-\func{acb_theta_g2_transvectant}.
+coefficients of :func:acb_theta_g2_covariants}, since we can use
+:func:acb_theta_g2_transvectant_lead} instead of
+:func:acb_theta_g2_transvectant}.
 
 \T check that the result agrees with taking leading coefficients of
-\func{acb_theta_g2_covariants}.
+:func:acb_theta_g2_covariants}.
