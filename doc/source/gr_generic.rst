@@ -114,6 +114,8 @@
               int gr_fmpz_poly_evaluate_horner(gr_ptr res, const fmpz_poly_t f, gr_srcptr x, gr_ctx_t ctx)
               int _gr_fmpz_poly_evaluate_rectangular(gr_ptr res, const fmpz * f, slong len, gr_srcptr x, gr_ctx_t ctx)
               int gr_fmpz_poly_evaluate_rectangular(gr_ptr res, const fmpz_poly_t f, gr_srcptr x, gr_ctx_t ctx)
+              int _gr_fmpz_poly_evaluate_modular(gr_ptr res, const fmpz * f, slong len, gr_srcptr x, gr_ctx_t ctx)
+              int gr_fmpz_poly_evaluate_modular(gr_ptr res, const fmpz_poly_t f, gr_srcptr x, gr_ctx_t ctx)
               int _gr_fmpz_poly_evaluate(gr_ptr res, const fmpz * f, slong len, gr_srcptr x, gr_ctx_t ctx)
               int gr_fmpz_poly_evaluate(gr_ptr res, const fmpz_poly_t f, gr_srcptr x, gr_ctx_t ctx)
 
