@@ -21,7 +21,9 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: value of square root should agree; precision remains high */
+    /* Test:
+       - if nonzero, value of square root should agree; precision remains high
+       - if contains zero or random values, should contain both square roots */
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         acb_t rt;
@@ -41,21 +43,34 @@ int main(void)
         acb_init(test);
 
         acb_randtest_precise(rt, state, prec, mag_bits);
-        while (acb_contains_zero(rt))
+        if (iter % 10 == 0)
         {
-            acb_randtest_precise(rt, state, prec, mag_bits);
+            acb_union(rt, rt, x, prec);
         }
+
         acb_sqr(x, rt, prec);
         arb_one(err);
         arb_mul_2exp_si(err, err, -lowprec);
         arb_add_si(err, err, 1, lowprec);
         acb_mul_arb(rt_low, rt, err, lowprec);
 
+        if (iter % 10 == 1)
+        {
+            acb_randtest(rt_low, state, prec, mag_bits);
+        }
+
         acb_theta_agm_sqrt(test, x, rt_low, 1, prec);
 
-        if (!acb_overlaps(test, rt))
+        if (!acb_contains(test, rt))
         {
             flint_printf("FAIL (value)\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        if (acb_contains(rt_low, rt) && !acb_is_finite(test))
+        {
+            flint_printf("FAIL (infinite)\n");
             fflush(stdout);
             flint_abort();
         }
@@ -66,7 +81,7 @@ int main(void)
         arb_mul_2exp_si(err, err, prec - n_pow(2, mag_bits) - 10);
         arb_add_si(err, err, -1, prec);
 
-        if (!arb_is_negative(err))
+        if (!arb_contains_zero(rt) && !arb_is_negative(err))
         {
             flint_printf("FAIL (precision)\n");
             flint_printf("prec = %wd, mag_bits = %wd, difference:\n", prec, mag_bits);

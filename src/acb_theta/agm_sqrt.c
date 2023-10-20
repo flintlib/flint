@@ -15,30 +15,30 @@ static void
 acb_theta_agm_sqrt_entry(acb_t res, const acb_t a, const acb_t rt, slong prec)
 {
     acb_t y1, y2;
+    int t1, t2;
 
     acb_init(y1);
     acb_init(y2);
 
     acb_sqrts(y1, y2, a, prec);
+    t1 = acb_overlaps(rt, y1);
+    t2 = acb_overlaps(rt, y2);
 
-    if (acb_overlaps(rt, y1) && acb_overlaps(rt, y2))
+    if (t1 && t2)
     {
-        acb_indeterminate(res);
+        acb_union(res, y1, y2);
     }
-    else if (acb_overlaps(rt, y1))
+    else if (t1)
     {
         acb_set(res, y1);
     }
-    else if (acb_overlaps(rt, y2))
+    else if (t2)
     {
         acb_set(res, y2);
     }
     else
     {
-        flint_printf("(agm_sqrt) Error: no overlap\n");
-        acb_printd(a, 10); flint_printf("\n");
-        acb_printd(rt, 10); flint_printf("\n");
-        flint_abort();
+        acb_indeterminate(res);
     }
 
     acb_clear(y1);
