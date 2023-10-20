@@ -9,35 +9,27 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fq_default.h"
 
-#include "flint.h"
-#include "nmod_poly.h"
-#include "ulong_extras.h"
-
-int
-main(void)
+TEST_FUNCTION_START(fq_default_ctx_init_modulus_nmod, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("ctx_init_modulus_nmod....");
-    fflush(stdout);
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fq_default_ctx_t ctx;
         fq_default_t fq;
         ulong p;
-	slong len;
-	nmod_poly_t mod;
+        slong len;
+        nmod_poly_t mod;
 
         p = 3;
 
         nmod_poly_init(mod, p);
 
         len = n_randint(state, 16) + 2;
-	nmod_poly_randtest_irreducible(mod, state, len);
+        nmod_poly_randtest_irreducible(mod, state, len);
 
         fq_default_ctx_init_modulus_nmod(ctx, mod, "x");
 
@@ -174,8 +166,5 @@ main(void)
         nmod_poly_clear(mod);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-        return 0;
+    TEST_FUNCTION_END(state);
 }
