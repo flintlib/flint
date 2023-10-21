@@ -1261,7 +1261,7 @@ Chinese remaindering
 --------------------------------------------------------------------------------
 
 The following functions can be used to reconstruct an integer from its
-residues modulo a set of small (word-size) prime numbers. The first two
+residues modulo a set of prime numbers. The first two
 functions, :func:`fmpz_CRT_ui` and :func:`fmpz_CRT`, are easy
 to use and allow building the result one residue at a time, which is
 useful when the number of needed primes is not known in advance.
@@ -1283,21 +1283,19 @@ The ``fmpz_multi_CRT`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
     congruent to `r_1` modulo `m_1` and `r_2` modulo `m_2`,
     where `M = m_1 \times m_2`. The result `x` is stored in ``out``.
 
-    It is assumed that `m_1` and `m_2` are positive integers greater
-    than `1` and coprime.
+    It is assumed that `m_1` and `m_2` are positive coprime integers.
 
     If sign = 0, it is assumed that `0 \le r_1 < m_1` and `0 \le r_2 < m_2`.
     Otherwise, it is assumed that `-m_1 \le r_1 < m_1` and `0 \le r_2 < m_2`.
 
-.. function:: void fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1, fmpz_t r2, fmpz_t m2, int sign)
+.. function:: void fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1, const fmpz_t r2, const fmpz_t m2, int sign)
 
     Use the Chinese Remainder Theorem to set ``out`` to the unique value
     `0 \le x < M` (if sign = 0) or `-M/2 < x \le M/2` (if sign = 1)
     congruent to `r_1` modulo `m_1` and `r_2` modulo `m_2`,
     where `M = m_1 \times m_2`.
 
-    It is assumed that `m_1` and `m_2` are positive integers greater
-    than `1` and coprime.
+    It is assumed that `m_1` and `m_2` are positive coprime integers.
 
     If sign = 0, it is assumed that `0 \le r_1 < m_1` and `0 \le r_2 < m_2`.
     Otherwise, it is assumed that `-m_1 \le r_1 < m_1` and `0 \le r_2 < m_2`.

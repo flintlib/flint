@@ -16,8 +16,8 @@
 #include "fmpz.h"
 
 void
-_fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1, fmpz_t r2,
-                   fmpz_t m2, const fmpz_t m1m2, fmpz_t c, int sign)
+_fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1, const fmpz_t r2,
+                   const fmpz_t m2, const fmpz_t m1m2, fmpz_t c, int sign)
 {
     fmpz_t r1normal, tmp, r1mod, s;
 
@@ -65,16 +65,14 @@ _fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1, fmpz_t r2,
 }
 
 void fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
-    fmpz_t r2, fmpz_t m2, int sign)
+    const fmpz_t r2, const fmpz_t m2, int sign)
 {
     fmpz_t m1m2, c;
 
     fmpz_init(c);
 
     fmpz_mod(c, m1, m2);
-    fmpz_invmod(c, c, m2);
-
-    if (fmpz_is_zero(c))
+    if (!fmpz_invmod(c, c, m2))
     {
         flint_printf("Exception (fmpz_CRT). m1 not invertible modulo m2.\n");
         flint_abort();
