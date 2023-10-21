@@ -11,13 +11,13 @@
 find_path(CBLAS_INCLUDE_DIRS NAMES cblas.h
   HINTS CBLAS_ROOT ENV CBLAS_ROOT
   PATHS ${INCLUDE_INSTALL_DIR} ${CMAKE_INSTALL_PREFIX}/include
-  PATH_SUFFIXES openblas cblas blis
+  PATH_SUFFIXES openblas cblas blis flexiblas
   )
 
-find_library(CBLAS_LIBRARIES NAMES accelerate openblas cblas blas blis
+find_library(CBLAS_LIBRARIES NAMES accelerate openblas cblas blas blis flexiblas
   HINTS CBLAS_ROOT ENV CBLAS_ROOT
   PATHS ${LIB_INSTALL_DIR} ${CMAKE_INSTALL_PREFIX}/lib
-  PATH_SUFFIXES openblas cblas blis
+  PATH_SUFFIXES openblas cblas blis flexiblas
   )
 
 include(FindPackageHandleStandardArgs)
