@@ -9,27 +9,22 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "nmod_poly.h"
 #include "nmod_mat.h"
 #include "fq_zech.h"
 #include "fq_zech_embed.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fq_zech_embed_matrices, state)
 {
-  int i, j;
-  int primes[4] = {2, 3, 5};
-  int degrees[2] = {2, 3};
-    FLINT_TEST_INIT(state);
-
-    flint_printf("embed matrices... ");
-    fflush(stdout);
+    int i, j;
+    int primes[4] = {2, 3, 5};
+    int degrees[2] = {2, 3};
 
     /* Check that isomorphism to self gives identity matrices */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-
         fq_zech_ctx_t ctx;
         fq_zech_t gen;
         const nmod_poly_struct *modulus;
@@ -139,7 +134,5 @@ main(void)
         }
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
