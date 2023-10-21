@@ -1283,8 +1283,7 @@ The ``fmpz_multi_CRT`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
     congruent to `r_1` modulo `m_1` and `r_2` modulo `m_2`,
     where `M = m_1 \times m_2`. The result `x` is stored in ``out``.
 
-    It is assumed that `m_1` and `m_2` are positive integers greater
-    than `1` and coprime.
+    It is assumed that `m_1` and `m_2` are positive coprime integers.
 
     If sign = 0, it is assumed that `0 \le r_1 < m_1` and `0 \le r_2 < m_2`.
     Otherwise, it is assumed that `-m_1 \le r_1 < m_1` and `0 \le r_2 < m_2`.
@@ -1296,8 +1295,7 @@ The ``fmpz_multi_CRT`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
     congruent to `r_1` modulo `m_1` and `r_2` modulo `m_2`,
     where `M = m_1 \times m_2`.
 
-    It is assumed that `m_1` and `m_2` are positive integers greater
-    than `1` and coprime.
+    It is assumed that `m_1` and `m_2` are positive coprime integers.
 
     If sign = 0, it is assumed that `0 \le r_1 < m_1` and `0 \le r_2 < m_2`.
     Otherwise, it is assumed that `-m_1 \le r_1 < m_1` and `0 \le r_2 < m_2`.

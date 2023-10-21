@@ -72,9 +72,7 @@ void fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
     fmpz_init(c);
 
     fmpz_mod(c, m1, m2);
-    fmpz_invmod(c, c, m2);
-
-    if (fmpz_is_zero(c))
+    if (!fmpz_invmod(c, c, m2))
     {
         flint_printf("Exception (fmpz_CRT). m1 not invertible modulo m2.\n");
         flint_abort();
