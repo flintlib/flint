@@ -22,8 +22,6 @@ main(void)
     flint_printf("rfac_uiui... ");
     fflush(stdout);
 
-
-
     /* Check rf(x,a) * rf(x+a,b) = rf(x,a+b) */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -50,7 +48,7 @@ main(void)
 
         fmpz_mul(r1r2, r1, r2);
 
-        result = fmpz_equal(r1r2, r3);
+        result = fmpz_equal(r1r2, r3) && _fmpz_is_canonical(r1) && _fmpz_is_canonical(r2) && _fmpz_is_canonical(r3);
 
         if (!result)
         {

@@ -41,7 +41,7 @@ main(void)
 
         fmpz_set_uiui(b, hi, lo);
 
-        result = fmpz_equal(a, b);
+        result = fmpz_equal(a, b) && _fmpz_is_canonical(b);
         if (!result)
         {
             flint_printf("FAIL:\n");

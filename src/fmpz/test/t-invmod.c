@@ -35,13 +35,12 @@ main(void)
     flint_printf("invmod....");
     fflush(stdout);
 
-
-
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, c;
         mpz_t d, e, f, g;
         int r1, r2;
+        int aliasing;
 
         fmpz_init(a);
         fmpz_init(b);
@@ -58,12 +57,35 @@ main(void)
         fmpz_get_mpz(d, a);
         fmpz_get_mpz(e, b);
 
-        r1 = fmpz_invmod(c, a, b);
+        aliasing = n_randint(state, 4);
+
+        if (aliasing == 0)
+        {
+            r1 = fmpz_invmod(c, a, b);
+        }
+        else if (aliasing == 1)
+        {
+            fmpz_set(a, b);
+            mpz_set(d, e);
+            r1 = fmpz_invmod(c, a, a);
+        }
+        else if (aliasing == 2)
+        {
+            fmpz_set(c, a);
+            r1 = fmpz_invmod(c, c, b);
+        }
+        else
+        {
+            fmpz_set(c, b);
+            r1 = fmpz_invmod(c, a, c);
+        }
+
         r2 = mpz_invert2(f, d, e);
 
         fmpz_get_mpz(g, c);
 
         result = (r1 != 0 && r2 != 0 && (mpz_cmp(f, g) == 0)) || (r1 == 0 && r2 == 0);
+        result = result && _fmpz_is_canonical(c);
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -77,135 +99,6 @@ main(void)
         fmpz_clear(a);
         fmpz_clear(b);
         fmpz_clear(c);
-
-        mpz_clear(d);
-        mpz_clear(e);
-        mpz_clear(f);
-        mpz_clear(g);
-    }
-
-    /* Check aliasing of a and b */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-    {
-        fmpz_t a, c;
-        mpz_t d, f, g;
-        int r1, r2;
-
-        fmpz_init(a);
-        fmpz_init(c);
-
-        mpz_init(d);
-        mpz_init(f);
-        mpz_init(g);
-
-        fmpz_randtest_not_zero(a, state, 200);
-
-        fmpz_get_mpz(d, a);
-
-        r1 = fmpz_invmod(c, a, a);
-        r2 = mpz_invert2(f, d, d);
-
-        fmpz_get_mpz(g, c);
-
-        result = (r1 != 0 && r2 != 0 && (mpz_cmp(f, g) == 0)) || (r1 == 0 && r2 == 0);
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            gmp_printf("d = %Zd, f = %Zd, g = %Zd, r1 = %d, r2 = %d\n", d, f,
-                       g, r1, r2);
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(a);
-        fmpz_clear(c);
-
-        mpz_clear(d);
-        mpz_clear(f);
-        mpz_clear(g);
-    }
-
-    /* Test aliasing of a and c */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-    {
-        fmpz_t a, b;
-        mpz_t d, e, f, g;
-        int r1, r2;
-
-        fmpz_init(a);
-        fmpz_init(b);
-
-        mpz_init(d);
-        mpz_init(e);
-        mpz_init(f);
-        mpz_init(g);
-
-        fmpz_randtest(a, state, 200);
-        fmpz_randtest_not_zero(b, state, 200);
-
-        fmpz_get_mpz(d, a);
-        fmpz_get_mpz(e, b);
-
-        r1 = fmpz_invmod(a, a, b);
-        r2 = mpz_invert2(f, d, e);
-
-        fmpz_get_mpz(g, a);
-
-        result = (r1 != 0 && r2 != 0 && (mpz_cmp(f, g) == 0)) || (r1 == 0 && r2 == 0);
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(a);
-        fmpz_clear(b);
-
-        mpz_clear(d);
-        mpz_clear(e);
-        mpz_clear(f);
-        mpz_clear(g);
-    }
-
-    /* Test aliasing of b and c */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-    {
-        fmpz_t a, b;
-        mpz_t d, e, f, g;
-        int r1, r2;
-
-        fmpz_init(a);
-        fmpz_init(b);
-
-        mpz_init(d);
-        mpz_init(e);
-        mpz_init(f);
-        mpz_init(g);
-
-        fmpz_randtest(a, state, 200);
-        fmpz_randtest_not_zero(b, state, 200);
-
-        fmpz_get_mpz(d, a);
-        fmpz_get_mpz(e, b);
-
-        r1 = fmpz_invmod(b, a, b);
-        r2 = mpz_invert2(f, d, e);
-
-        fmpz_get_mpz(g, b);
-
-        result = (r1 != 0 && r2 != 0 && (mpz_cmp(f, g) == 0)) || (r1 == 0 && r2 == 0);
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(a);
-        fmpz_clear(b);
 
         mpz_clear(d);
         mpz_clear(e);

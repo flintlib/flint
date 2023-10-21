@@ -119,6 +119,8 @@ void flint_mpz_clear_readonly(mpz_t z);
 void _fmpz_clear_readonly_mpz(mpz_t);
 void fmpz_clear_readonly(fmpz_t f);
 
+int _fmpz_is_canonical(const fmpz_t x);
+
 /* Randomisation *************************************************************/
 
 void fmpz_randbits(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits);

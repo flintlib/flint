@@ -51,7 +51,7 @@ main(void)
 
         fmpz_set_signed_uiuiui(b, hi, mid, lo);
 
-        result = fmpz_equal(a, b);
+        result = fmpz_equal(a, b) && _fmpz_is_canonical(b);
         if (!result)
         {
             flint_printf("FAIL:\n");

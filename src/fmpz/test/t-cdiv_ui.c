@@ -40,12 +40,12 @@ main(void)
         r1 = fmpz_cdiv_ui(a, x);
         r2 = flint_mpz_cdiv_ui(b, x);
 
-        result = (r1 == r2);
+        result = (r1 == r2) && _fmpz_is_canonical(a);
         if (!result)
         {
             flint_printf("FAIL:\n");
             gmp_printf
-                ("b = %Zd, x = %ld, r1 = %ld, r2 = %ld\n", b, x, r1, r2);
+                ("b = %Zd, x = %wu, r1 = %wu, r2 = %wu\n", b, x, r1, r2);
             fflush(stdout);
             flint_abort();
         }

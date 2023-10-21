@@ -250,6 +250,8 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
+
+        fmpz_clear(dsave);
     }
 
     /* Check that xgcd(f, ±2d) = (d, sgn(f), X) */
@@ -298,12 +300,48 @@ main(void)
     for (ix = 0; ix < 1000 * flint_test_multiplier(); ix++)
     {
         fmpz_t tmp;
+        int aliasing;
         fmpz_init(tmp);
 
         fmpz_randm(nf, state, maxval);
         fmpz_randm(ng, state, maxval);
 
         fmpz_xgcd_canonical_bezout(nd, na, nb, nf, ng);
+
+        aliasing = n_randint(state, 5);
+
+        if (aliasing == 0)
+        {
+            fmpz_xgcd_canonical_bezout(nd, na, nb, nf, ng);
+        }
+        else if (aliasing == 1)
+        {
+            /* Test aliasing of d and f, a and g */
+            fmpz_set(nd, nf);
+            fmpz_set(na, ng);
+            fmpz_xgcd_canonical_bezout(nd, na, nb, nd, na);
+        }
+        else if (aliasing == 2)
+        {
+            /* Test aliasing of a and f, d and g */
+            fmpz_set(na, nf);
+            fmpz_set(nd, ng);
+            fmpz_xgcd_canonical_bezout(nd, na, nb, na, nd);
+        }
+        else if (aliasing == 3)
+        {
+            /* Test aliasing of d and f, b and g */
+            fmpz_set(nd, nf);
+            fmpz_set(nb, ng);
+            fmpz_xgcd_canonical_bezout(nd, na, nb, nd, nb);
+        }
+        else
+        {
+            /* Test aliasing of b and f, d and g */
+            fmpz_set(nb, nf);
+            fmpz_set(nd, ng);
+            fmpz_xgcd_canonical_bezout(nd, na, nb, nb, nd);
+        }
 
         fmpz_mul(tmp, na, nf);
         fmpz_addmul(tmp, nb, ng);
@@ -315,7 +353,10 @@ main(void)
 
         result = (fmpz_equal(tmp, nd)
                && fmpz_cmpabs(na, ng) < 0
-               && fmpz_cmpabs(nb, nf) < 0);
+               && fmpz_cmpabs(nb, nf) < 0)
+               && _fmpz_is_canonical(nd)
+               && _fmpz_is_canonical(na)
+               && _fmpz_is_canonical(nb);
 
         if (!result)
         {
@@ -330,218 +371,6 @@ main(void)
         }
 
         fmpz_clear(tmp);
-    }
-
-    /* Test aliasing of d and f, a and g */
-    for (ix = 0; ix < 1000 * flint_test_multiplier(); ix++)
-    {
-        fmpz_t d, a, b, c, f, g, F, G;
-
-        fmpz_init(d);
-        fmpz_init(a);
-        fmpz_init(b);
-        fmpz_init(c);
-        fmpz_init(f);
-        fmpz_init(g);
-        fmpz_init(F);
-        fmpz_init(G);
-
-        fmpz_randtest_unsigned(G, state, 200);
-        fmpz_add_ui(G, G, 1);
-        fmpz_randm(F, state, G);
-        if (n_randint(state, 2)) fmpz_neg(G, G);
-        if (n_randint(state, 2)) fmpz_neg(F, F);
-        fmpz_set(f, F);
-        fmpz_set(g, G);
-
-        fmpz_xgcd(d, a, b, f, g);
-        fmpz_xgcd(f, g, c, f, g);
-
-        result = (fmpz_equal(d, f)
-               && fmpz_equal(b, c)
-               && fmpz_equal(a, g));
-        if (!result)
-        {
-            flint_printf("FAIL:\n\n");
-            flint_printf("d = "), fmpz_print(d), flint_printf("\n");
-            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
-            flint_printf("b = "), fmpz_print(b), flint_printf("\n");
-            flint_printf("c = "), fmpz_print(c), flint_printf("\n");
-            flint_printf("f = "), fmpz_print(f), flint_printf("\n");
-            flint_printf("g = "), fmpz_print(g), flint_printf("\n");
-            flint_printf("F = "), fmpz_print(F), flint_printf("\n");
-            flint_printf("G = "), fmpz_print(G), flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(d);
-        fmpz_clear(a);
-        fmpz_clear(b);
-        fmpz_clear(c);
-        fmpz_clear(f);
-        fmpz_clear(g);
-        fmpz_clear(F);
-        fmpz_clear(G);
-    }
-
-    /* Test aliasing of a and f, d and g */
-    for (ix = 0; ix < 1000 * flint_test_multiplier(); ix++)
-    {
-        fmpz_t d, a, b, c, f, g, F, G;
-
-        fmpz_init(d);
-        fmpz_init(a);
-        fmpz_init(b);
-        fmpz_init(c);
-        fmpz_init(f);
-        fmpz_init(g);
-        fmpz_init(F);
-        fmpz_init(G);
-
-        fmpz_randtest_unsigned(G, state, 200);
-        fmpz_add_ui(G, G, 1);
-        fmpz_randm(F, state, G);
-        if (n_randint(state, 2)) fmpz_neg(G, G);
-        if (n_randint(state, 2)) fmpz_neg(F, F);
-        fmpz_set(f, F);
-        fmpz_set(g, G);
-
-        fmpz_xgcd(d, a, b, f, g);
-        fmpz_xgcd(g, f, c, f, g);
-
-        result = (fmpz_equal(d, g)
-               && fmpz_equal(b, c)
-               && fmpz_equal(a, f));
-        if (!result)
-        {
-            flint_printf("FAIL:\n\n");
-            flint_printf("d = "), fmpz_print(d), flint_printf("\n");
-            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
-            flint_printf("b = "), fmpz_print(b), flint_printf("\n");
-            flint_printf("c = "), fmpz_print(c), flint_printf("\n");
-            flint_printf("f = "), fmpz_print(f), flint_printf("\n");
-            flint_printf("g = "), fmpz_print(g), flint_printf("\n");
-            flint_printf("F = "), fmpz_print(F), flint_printf("\n");
-            flint_printf("G = "), fmpz_print(G), flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(d);
-        fmpz_clear(a);
-        fmpz_clear(b);
-        fmpz_clear(c);
-        fmpz_clear(f);
-        fmpz_clear(g);
-        fmpz_clear(F);
-        fmpz_clear(G);
-    }
-
-    /* Test aliasing of d and f, b and g */
-    for (ix = 0; ix < 1000 * flint_test_multiplier(); ix++)
-    {
-        fmpz_t d, a, b, c, f, g, F, G;
-
-        fmpz_init(d);
-        fmpz_init(a);
-        fmpz_init(b);
-        fmpz_init(c);
-        fmpz_init(f);
-        fmpz_init(g);
-        fmpz_init(F);
-        fmpz_init(G);
-
-        fmpz_randtest_unsigned(G, state, 200);
-        fmpz_add_ui(G, G, 1);
-        fmpz_randm(F, state, G);
-        if (n_randint(state, 2)) fmpz_neg(G, G);
-        if (n_randint(state, 2)) fmpz_neg(F, F);
-        fmpz_set(f, F);
-        fmpz_set(g, G);
-
-        fmpz_xgcd(d, a, b, f, g);
-        fmpz_xgcd(f, c, g, f, g);
-
-        result = (fmpz_equal(d, f)
-               && fmpz_equal(a, c)
-               && fmpz_equal(b, g));
-        if (!result)
-        {
-            flint_printf("FAIL:\n\n");
-            flint_printf("d = "), fmpz_print(d), flint_printf("\n");
-            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
-            flint_printf("b = "), fmpz_print(b), flint_printf("\n");
-            flint_printf("c = "), fmpz_print(c), flint_printf("\n");
-            flint_printf("f = "), fmpz_print(f), flint_printf("\n");
-            flint_printf("g = "), fmpz_print(g), flint_printf("\n");
-            flint_printf("F = "), fmpz_print(F), flint_printf("\n");
-            flint_printf("G = "), fmpz_print(G), flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(d);
-        fmpz_clear(a);
-        fmpz_clear(b);
-        fmpz_clear(c);
-        fmpz_clear(f);
-        fmpz_clear(g);
-        fmpz_clear(F);
-        fmpz_clear(G);
-    }
-
-    /* Test aliasing of b and f, d and g */
-    for (ix = 0; ix < 1000 * flint_test_multiplier(); ix++)
-    {
-        fmpz_t d, a, b, c, f, g, F, G;
-
-        fmpz_init(d);
-        fmpz_init(a);
-        fmpz_init(b);
-        fmpz_init(c);
-        fmpz_init(f);
-        fmpz_init(g);
-        fmpz_init(F);
-        fmpz_init(G);
-
-        fmpz_randtest_unsigned(G, state, 200);
-        fmpz_add_ui(G, G, 1);
-        fmpz_randm(F, state, G);
-        if (n_randint(state, 2)) fmpz_neg(G, G);
-        if (n_randint(state, 2)) fmpz_neg(F, F);
-        fmpz_set(f, F);
-        fmpz_set(g, G);
-
-        fmpz_xgcd(d, a, b, f, g);
-        fmpz_xgcd(g, c, f, f, g);
-
-        result = (fmpz_equal(d, g)
-               && fmpz_equal(a, c)
-               && fmpz_equal(b, f));
-        if (!result)
-        {
-            flint_printf("FAIL:\n\n");
-            flint_printf("d = "), fmpz_print(d), flint_printf("\n");
-            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
-            flint_printf("b = "), fmpz_print(b), flint_printf("\n");
-            flint_printf("c = "), fmpz_print(c), flint_printf("\n");
-            flint_printf("f = "), fmpz_print(f), flint_printf("\n");
-            flint_printf("g = "), fmpz_print(g), flint_printf("\n");
-            flint_printf("F = "), fmpz_print(F), flint_printf("\n");
-            flint_printf("G = "), fmpz_print(G), flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(d);
-        fmpz_clear(a);
-        fmpz_clear(b);
-        fmpz_clear(c);
-        fmpz_clear(f);
-        fmpz_clear(g);
-        fmpz_clear(F);
-        fmpz_clear(G);
     }
 
     fmpz_clear(maxval);

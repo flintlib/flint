@@ -24,8 +24,6 @@ main(void)
     flint_printf("popcnt....");
     fflush(stdout);
 
-
-
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a;

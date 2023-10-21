@@ -60,7 +60,7 @@ int main(void)
             fmpz_set_ui(m, n);
             fmpz_divisor_sigma(a, k, m);
             fmpz_sigma_naive(b, k, n);
-            if (!fmpz_equal(a, b))
+            if (!fmpz_equal(a, b) || !_fmpz_is_canonical(a))
             {
                 flint_printf("FAIL:\n");
                 flint_printf("wrong value for n=%wd, k=%wd\n", n, k);

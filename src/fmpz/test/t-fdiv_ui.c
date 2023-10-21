@@ -23,8 +23,6 @@ main(void)
     flint_printf("fdiv_ui....");
     fflush(stdout);
 
-
-
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a;
@@ -42,7 +40,7 @@ main(void)
         r1 = fmpz_fdiv_ui(a, x);
         r2 = flint_mpz_fdiv_ui(b, x);
 
-        result = (r1 == r2);
+        result = (r1 == r2) && _fmpz_is_canonical(a);
         if (!result)
         {
             flint_printf("FAIL:\n");

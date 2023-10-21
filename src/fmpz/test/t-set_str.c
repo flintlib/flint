@@ -62,7 +62,7 @@ main(void)
         ret2 = mpz_set_str(b, str, base);
         fmpz_set_mpz(c, b);
 
-        if (ret1 != ret2 || (ret1 == 0 && !fmpz_equal(a, c)))
+        if (ret1 != ret2 || (ret1 == 0 && !fmpz_equal(a, c)) || !_fmpz_is_canonical(a))
         {
             flint_printf("FAIL:\n");
             flint_printf("base = %d\n", base);
@@ -108,7 +108,7 @@ main(void)
         ret2 = mpz_set_str(b, str, 10);
         fmpz_set_mpz(c, b);
 
-        if (ret1 != ret2 || !fmpz_equal(a, c))
+        if (ret1 != ret2 || !fmpz_equal(a, c) || !_fmpz_is_canonical(a))
         {
             flint_printf("FAIL:\n");
             flint_printf("str = %s\n", str);
