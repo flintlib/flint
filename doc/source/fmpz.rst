@@ -1288,7 +1288,7 @@ The ``fmpz_multi_CRT`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
     If sign = 0, it is assumed that `0 \le r_1 < m_1` and `0 \le r_2 < m_2`.
     Otherwise, it is assumed that `-m_1 \le r_1 < m_1` and `0 \le r_2 < m_2`.
 
-.. function:: void fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1, fmpz_t r2, fmpz_t m2, int sign)
+.. function:: void fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1, const fmpz_t r2, const fmpz_t m2, int sign)
 
     Use the Chinese Remainder Theorem to set ``out`` to the unique value
     `0 \le x < M` (if sign = 0) or `-M/2 < x \le M/2` (if sign = 1)

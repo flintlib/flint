@@ -16,8 +16,8 @@
 #include "fmpz.h"
 
 void
-_fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1, fmpz_t r2,
-                   fmpz_t m2, const fmpz_t m1m2, fmpz_t c, int sign)
+_fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1, const fmpz_t r2,
+                   const fmpz_t m2, const fmpz_t m1m2, fmpz_t c, int sign)
 {
     fmpz_t r1normal, tmp, r1mod, s;
 
@@ -65,7 +65,7 @@ _fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1, fmpz_t r2,
 }
 
 void fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
-    fmpz_t r2, fmpz_t m2, int sign)
+    const fmpz_t r2, const fmpz_t m2, int sign)
 {
     fmpz_t m1m2, c;
 
