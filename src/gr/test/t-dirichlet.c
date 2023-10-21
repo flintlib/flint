@@ -1,14 +1,22 @@
-#include "ulong_extras.h"
+/*
+    Copyright (C) 2023 Fredrik Johansson
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
+
+#include "test_helpers.h"
 #include "gr.h"
 
-int main(void)
+TEST_FUNCTION_START(gr_dirichlet, state)
 {
     gr_ctx_t G;
     int flags = GR_TEST_ALWAYS_ABLE;
     ulong q;
-
-    flint_printf("dirichlet....");
-    fflush(stdout);
 
     for (q = 1; q <= 100; q++)
     {
@@ -18,9 +26,7 @@ int main(void)
     }
 
     {
-        flint_rand_t state;
         slong iter;
-        flint_randinit(state);
 
         for (iter = 0; iter < 100; iter++)
         {
@@ -31,11 +37,7 @@ int main(void)
                 gr_ctx_clear(G);
             }
         }
-
-        flint_randclear(state);
     }
 
-    flint_cleanup();
-    flint_printf(" PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
