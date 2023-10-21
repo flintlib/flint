@@ -10,17 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fq_nmod.h"
 #include "fq_zech.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fq_zech_get_set_fq_nmod, state)
 {
     int i, j, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("get_fq_nmod/set_fq_nmod... ");
-    fflush(stdout);
 
     for (i = 0; i < 100*flint_test_multiplier(); i++)
     {
@@ -60,7 +56,5 @@ main(void)
         fq_zech_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

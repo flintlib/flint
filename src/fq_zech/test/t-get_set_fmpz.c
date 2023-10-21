@@ -9,14 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod.h"
 #include "fq_zech.h"
 
 #ifdef T
 #undef T
 #endif
 
-#define T fq_nmod
+#define T fq_zech
 #define CAP_T FQ_ZECH
 #include "fq_templates/test/t-get_set_fmpz.c"
 #undef CAP_T
