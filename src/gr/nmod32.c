@@ -325,7 +325,11 @@ _nmod32_vec_add(nmod32_struct * res, const nmod32_struct * vec1, const nmod32_st
     nmod_t mod = NMOD32_CTX(ctx);
 
     for (i = 0; i < len; i++)
+#if FLINT_BITS == 64
         res[i] = _nmod_add(vec1[i], vec2[i], mod);
+#else
+        res[i] = nmod_add(vec1[i], vec2[i], mod);
+#endif
 
     return GR_SUCCESS;
 }
@@ -337,7 +341,11 @@ _nmod32_vec_sub(nmod32_struct * res, const nmod32_struct * vec1, const nmod32_st
     nmod_t mod = NMOD32_CTX(ctx);
 
     for (i = 0; i < len; i++)
+#if FLINT_BITS == 64
+        res[i] = _nmod_sub(vec1[i], vec2[i], mod);
+#else
         res[i] = nmod_sub(vec1[i], vec2[i], mod);
+#endif
 
     return GR_SUCCESS;
 }
