@@ -1261,7 +1261,7 @@ Chinese remaindering
 --------------------------------------------------------------------------------
 
 The following functions can be used to reconstruct an integer from its
-residues modulo a set of small (word-size) prime numbers. The first two
+residues modulo a set of prime numbers. The first two
 functions, :func:`fmpz_CRT_ui` and :func:`fmpz_CRT`, are easy
 to use and allow building the result one residue at a time, which is
 useful when the number of needed primes is not known in advance.
