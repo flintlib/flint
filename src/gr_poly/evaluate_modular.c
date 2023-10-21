@@ -13,14 +13,13 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
-#include <stdio.h>
-
 int
 _gr_poly_evaluate_modular(gr_ptr y, gr_srcptr poly,
     slong len, gr_srcptr x, gr_ctx_t ctx)
 {
     slong sz = ctx->sizeof_elem;
     int status = GR_SUCCESS;
+    gr_method_void_unary_op set_shallow = GR_VOID_UNARY_OP(ctx, SET_SHALLOW);
 
     if (len <= 2)
     {
@@ -35,16 +34,19 @@ _gr_poly_evaluate_modular(gr_ptr y, gr_srcptr poly,
     }
     else
     {
-        slong j, k, coeff_index, l, m;
+        slong i, j, k, coeff_index, l, m;
         gr_ptr xs, ys, tmp, partial_results;
         gr_ptr tmp_gr;
         k = n_sqrt(len)+1;
         j = (len + k - 1) / k;
 
+        TMP_INIT;
+
+        TMP_START;
+        tmp = TMP_ALLOC(sz * k);
         GR_TMP_INIT(tmp_gr, ctx);
         GR_TMP_INIT_VEC(xs, j, ctx);
         GR_TMP_INIT_VEC(ys, k, ctx);
-        GR_TMP_INIT_VEC(tmp, k, ctx);
         GR_TMP_INIT_VEC(partial_results, j, ctx);
 
         status |= _gr_vec_set_powers(xs, x, j, ctx);
@@ -52,26 +54,27 @@ _gr_poly_evaluate_modular(gr_ptr y, gr_srcptr poly,
         status |= _gr_vec_set_powers(ys, tmp_gr, k, ctx);
 
         for (l = 0; l < j; l++){
+            i = 0; //Count number of coeffs in this row
             for (m = 0; m < k; m++){
                 coeff_index = j*m+l;
-                if (coeff_index < len){ //Otherwise coeffs are left to be zero
-                    gr_swap(GR_ENTRY(tmp, m, sz), GR_ENTRY(poly, coeff_index, sz), ctx);
+                if (coeff_index < len)
+                { 
+                    set_shallow(GR_ENTRY(tmp, m, sz), GR_ENTRY(poly, coeff_index, sz), ctx);
+                    i++;
+                }
+                else
+                {
+                    break;
                 }
             }
-            status |= _gr_vec_dot(GR_ENTRY(partial_results, l, sz), NULL, 0, tmp, ys, k, ctx);
-            for (m = 0; m < k; m++){ //Swap back
-                coeff_index = j*m+l;
-                if (coeff_index < len){
-                    gr_swap(GR_ENTRY(tmp, m, sz), GR_ENTRY(poly, coeff_index, sz), ctx);
-                }
-            }
+            status |= _gr_vec_dot(GR_ENTRY(partial_results, l, sz), NULL, 0, tmp, ys, i, ctx);
         }
         status |=_gr_vec_dot(y, NULL, 0, partial_results, xs, j, ctx);
         GR_TMP_CLEAR(tmp_gr, ctx);
         GR_TMP_CLEAR_VEC(xs, j, ctx);
         GR_TMP_CLEAR_VEC(ys, k, ctx);
-        GR_TMP_CLEAR_VEC(tmp, k, ctx);
         GR_TMP_CLEAR_VEC(partial_results, j, ctx);
+        TMP_END;
     }
     return status;
 }
