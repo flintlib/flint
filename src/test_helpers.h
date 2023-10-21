@@ -51,6 +51,14 @@ int TEMPLATE3(test, T, label)(void)                     \
     printf(TEMPLATE_STR(T) "_" #label "....");          \
     fflush(stdout);                                     \
 
+#define TEST_TEMPLATE2_FUNCTION_START(T, label1, label2, state)\
+int TEMPLATE5(test, T, label1, T, label2)(void)         \
+{                                                       \
+    FLINT_TEST_INIT(state);                             \
+    printf(TEMPLATE_STR(T) "_" #label1 "_"              \
+           TEMPLATE_STR(T) "_" #label2 "....");         \
+    fflush(stdout);                                     \
+
 #define TEST_FUNCTION_END(state)                        \
     FLINT_TEST_CLEANUP(state);                          \
     printf("PASS\n");                                   \

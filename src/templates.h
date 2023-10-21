@@ -27,6 +27,7 @@
 #define TEMPLATE(X,Y) CAT(X,Y)
 #define TEMPLATE3(X,Y,Z) CAT3(X,Y,Z)
 #define TEMPLATE4(X,Y,Z,A) CAT4(X,Y,Z,A)
+#define TEMPLATE5(X,Y,Z,A,B) CAT5(X,Y,Z,A,B)
 #define _TEMPLATE(X,Y) _CAT(X,Y)
 #define _TEMPLATE3(X,Y,Z) _CAT3(X,Y,Z)
 #define _TEMPLATE4(X,Y,Z,A) _CAT4(X,Y,Z,A)
