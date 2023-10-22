@@ -75,7 +75,7 @@ main(void)
         fmpz_set_si(a, b);
         c = fmpz_get_si(a);
 
-        result = (b == c);
+        result = (b == c) && _fmpz_is_canonical(a);
         if (!result)
         {
             flint_printf("FAIL:\n");

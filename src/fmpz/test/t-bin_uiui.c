@@ -26,8 +26,6 @@ main(void)
     flint_printf("bin_uiui....");
     fflush(stdout);
 
-
-
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_init(x);
@@ -41,7 +39,7 @@ main(void)
         flint_mpz_bin_uiui(z, n, k);
         fmpz_set_mpz(y, z);
 
-        if (!fmpz_equal(x, y))
+        if (!fmpz_equal(x, y) || !_fmpz_is_canonical(x))
         {
             flint_printf("FAIL: n,k = %wu,%wu\n", n, k);
             fflush(stdout);
@@ -52,8 +50,6 @@ main(void)
         fmpz_clear(y);
         mpz_clear(z);
     }
-
-
 
     FLINT_TEST_CLEANUP(state);
     flint_printf("PASS\n");

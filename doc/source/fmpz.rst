@@ -174,6 +174,10 @@ Types, macros and constants
    preserve the value in `f` which we make to represent an ``slong``, and
    clear the ``mpz_t``.
 
+.. function:: int _fmpz_is_canonical(const fmpz_t f)
+
+   Returns 1 if the internal representation of `f` is correctly normalised
+   and demoted; 0 otherwise.
 
 Memory management
 --------------------------------------------------------------------------------

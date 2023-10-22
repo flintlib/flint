@@ -54,7 +54,7 @@ main(void)
         fmpz_one(c);
         fmpz_mul_2exp(c, c, n*FLINT_BITS);
 
-        if (!fmpz_divisible(a, c))
+        if (!fmpz_divisible(a, c) || !_fmpz_is_canonical(b))
         {
             flint_printf("FAIL: check answer mod 2^(n*FLINT_BITS)\n");
             fflush(stdout);

@@ -22,8 +22,6 @@ main(void)
     flint_printf("swap....");
     fflush(stdout);
 
-
-
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;
@@ -44,7 +42,7 @@ main(void)
 
         fmpz_get_mpz(d, b);
 
-        result = (mpz_cmp(c, d) == 0);
+        result = (mpz_cmp(c, d) == 0) && _fmpz_is_canonical(a) && _fmpz_is_canonical(b);
         if (!result)
         {
             flint_printf("FAIL:\n");

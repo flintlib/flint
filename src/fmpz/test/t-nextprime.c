@@ -55,7 +55,7 @@ int main(void)
         fmpz_nextprime(actual, start, 0);
         fmpz_set_str(expected, manual_tests[i+1], 10);
 
-        if (!fmpz_equal(actual, expected))
+        if (!fmpz_equal(actual, expected) || !_fmpz_is_canonical(actual))
         {
             flint_printf("FAIL:\n");
             fmpz_print(start); flint_printf("\n");
@@ -83,7 +83,7 @@ int main(void)
         do fmpz_add_ui(iter, iter, UWORD(1));
         while (!fmpz_is_probabprime(iter));
 
-        if (!fmpz_equal(res, iter))
+        if (!fmpz_equal(res, iter) || !_fmpz_is_canonical(res))
         {
             flint_printf("FAIL:\n");
             fmpz_print(start); flint_printf("\n");

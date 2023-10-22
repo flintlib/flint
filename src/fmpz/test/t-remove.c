@@ -22,14 +22,13 @@ main(void)
     flint_printf("remove....");
     fflush(stdout);
 
-
-
-    /* Compare with MPIR, random input */
+    /* Compare with GMP, random input */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, c;
         mpz_t d, e, f, g;
         slong x, y;
+        int aliasing;
 
         fmpz_init(a);
         fmpz_init(b);
@@ -46,16 +45,37 @@ main(void)
             fmpz_abs(b, b);
         } while (fmpz_is_one(b));
 
-
         fmpz_get_mpz(d, a);
         fmpz_get_mpz(e, b);
 
-        x = fmpz_remove(c, a, b);
+        aliasing = n_randint(state, 4);
+
+        if (aliasing == 0)
+        {
+            x = fmpz_remove(c, a, b);
+        }
+        else if (aliasing == 1)
+        {
+            fmpz_set(a, b);
+            mpz_set(d, e);
+            x = fmpz_remove(c, a, a);
+        }
+        else if (aliasing == 2)
+        {
+            fmpz_set(c, a);
+            x = fmpz_remove(c, c, b);
+        }
+        else
+        {
+            fmpz_set(c, b);
+            x = fmpz_remove(c, a, c);
+        }
+
         y = mpz_remove(f, d, e);
 
         fmpz_get_mpz(g, c);
 
-        result = ((x == y) && (mpz_cmp(f, g) == 0));
+        result = ((x == y) && (mpz_cmp(f, g) == 0)) && _fmpz_is_canonical(c);
 
         if (!result)
         {
@@ -75,7 +95,7 @@ main(void)
         mpz_clear(g);
     }
 
-    /* Compare with MPIR, random input but ensure that factors exist */
+    /* Compare with GMP, random input but ensure that factors exist */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, c, pow;
@@ -130,109 +150,6 @@ main(void)
         mpz_clear(e);
         mpz_clear(f);
         mpz_clear(g);
-    }
-
-    /* Check aliasing of a and b */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
-    {
-        fmpz_t a, c;
-        slong x;
-
-        fmpz_init(a);
-        fmpz_init(c);
-
-        do {
-            fmpz_randtest_not_zero(a, state, 200);
-            fmpz_abs(a, a);
-        } while (fmpz_is_one(a));
-
-        x = fmpz_remove(c, a, a);
-
-        result = ((x == 1) && (fmpz_cmp_ui(c, 1) == 0));
-
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            fmpz_print(a), flint_printf("\n");
-            fmpz_print(c), flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(a);
-        fmpz_clear(c);
-    }
-
-    /* Check aliasing of a and c */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
-    {
-        fmpz_t a, b, c;
-        slong x, y;
-
-        fmpz_init(a);
-        fmpz_init(b);
-        fmpz_init(c);
-
-        fmpz_randtest_not_zero(a, state, 200);
-        do {
-            fmpz_randtest_not_zero(b, state, 200);
-            fmpz_abs(b, b);
-        } while (fmpz_is_one(b));
-
-        x = fmpz_remove(c, a, b);
-        y = fmpz_remove(a, a, b);
-
-        result = ((x == y) && fmpz_equal(a, c));
-
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            fmpz_print(a), flint_printf("\n");
-            fmpz_print(b), flint_printf("\n");
-            fmpz_print(c), flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(a);
-        fmpz_clear(b);
-        fmpz_clear(c);
-    }
-
-    /* Check aliasing of b and c */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
-    {
-        fmpz_t a, b, c;
-        slong x, y;
-
-        fmpz_init(a);
-        fmpz_init(b);
-        fmpz_init(c);
-
-        fmpz_randtest_not_zero(a, state, 200);
-        do {
-            fmpz_randtest_not_zero(b, state, 200);
-            fmpz_abs(b, b);
-        } while (fmpz_is_one(b));
-
-        x = fmpz_remove(c, a, b);
-        y = fmpz_remove(b, a, b);
-
-        result = ((x == y) && fmpz_equal(b, c));
-
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            fmpz_print(a), flint_printf("\n");
-            fmpz_print(b), flint_printf("\n");
-            fmpz_print(c), flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(a);
-        fmpz_clear(b);
-        fmpz_clear(c);
     }
 
     FLINT_TEST_CLEANUP(state);

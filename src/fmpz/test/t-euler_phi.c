@@ -75,7 +75,7 @@ int main(void)
         fmpz_set_ui(y, n_nth_prime(i+1));
         fmpz_pow_ui(y, y, n-1);
         fmpz_mul_ui(y, y, n_nth_prime(i+1)-1);
-        if (!fmpz_equal(x, y))
+        if (!fmpz_equal(x, y) || !_fmpz_is_canonical(x))
         {
             flint_printf("FAIL: %wu ^ %wu\n", n_nth_prime(i+1), n);
         }
@@ -85,7 +85,7 @@ int main(void)
     fmpz_set_str(x, "10426024348053113487152988625265848110501553295256578345594388516660144", 10);
     fmpz_set_str(y, "2265085829098571747262267425315881590169106756213617459200000000000000", 10);
     fmpz_euler_phi(x, x);
-    if (!fmpz_equal(x, y))
+    if (!fmpz_equal(x, y) || !_fmpz_is_canonical(x))
     {
         flint_printf("FAIL: special test value\n");
         fflush(stdout);

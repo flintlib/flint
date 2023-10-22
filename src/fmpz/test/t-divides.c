@@ -27,25 +27,48 @@ main(void)
     {
         fmpz_t a, b, q, p;
         int divides;
+        int aliasing;
 
         fmpz_init(a);
         fmpz_init(b);
         fmpz_init(p);
-	fmpz_init(q);
+        fmpz_init(q);
 
         fmpz_randtest(a, state, 200);
         fmpz_randtest(b, state, 200);
 
-        divides = fmpz_divides(q, b, a);
+        aliasing = n_randint(state, 4);
+
+        if (aliasing == 0)
+        {
+            divides = fmpz_divides(q, b, a);
+        }
+        else if (aliasing == 1)
+        {
+            fmpz_set(b, a);
+            divides = fmpz_divides(q, b, b);
+        }
+        else if (aliasing == 2)
+        {
+            fmpz_set(q, b);
+            divides = fmpz_divides(q, q, a);
+        }
+        else
+        {
+            fmpz_set(q, a);
+            divides = fmpz_divides(q, b, q);
+        }
+
         fmpz_mul(p, a, q);
 
         result = ((divides && fmpz_equal(p, b)) ||
 	         (!divides && fmpz_is_zero(q) && !fmpz_equal(p, b)));
+        result = result && _fmpz_is_canonical(q);
         if (!result)
         {
             flint_printf("FAIL:\n");
             flint_printf("divides = %d\n", divides);
-	    flint_printf("a = "); fmpz_print(a); flint_printf("\n");
+            flint_printf("a = "); fmpz_print(a); flint_printf("\n");
             flint_printf("b = "); fmpz_print(b); flint_printf("\n");
             flint_printf("p = "); fmpz_print(p); flint_printf("\n");
             flint_printf("q = "); fmpz_print(q); flint_printf("\n");
@@ -68,7 +91,7 @@ main(void)
         fmpz_init(a);
         fmpz_init(b);
         fmpz_init(p);
-	fmpz_init(q);
+        fmpz_init(q);
 
         fmpz_randtest(a, state, 200);
         fmpz_randtest(b, state, 200);
@@ -82,7 +105,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("divides = %d\n", divides);
-	    flint_printf("a = "); fmpz_print(a); flint_printf("\n");
+            flint_printf("a = "); fmpz_print(a); flint_printf("\n");
             flint_printf("b = "); fmpz_print(b); flint_printf("\n");
             flint_printf("p = "); fmpz_print(p); flint_printf("\n");
             flint_printf("q = "); fmpz_print(q); flint_printf("\n");
@@ -92,73 +115,7 @@ main(void)
 
         fmpz_clear(a);
         fmpz_clear(b);
-	fmpz_clear(p);
-        fmpz_clear(q);
-    }
-
-    /* Check aliasing of q and a */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
-    {
-        fmpz_t a, b, q;
-        int divides1, divides2;
-
-        fmpz_init(a);
-        fmpz_init(b);
-	fmpz_init(q);
-
-        fmpz_randtest(a, state, 200);
-        fmpz_randtest(b, state, 200);
-
-        divides1 = fmpz_divides(q, b, a);
-        divides2 = fmpz_divides(a, b, a);
-
-        result = (divides1 == divides2 && fmpz_equal(q, a));
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("divides1 = %d, divides2 = %d\n", divides1, divides2);
-	    flint_printf("a = "); fmpz_print(a); flint_printf("\n");
-            flint_printf("b = "); fmpz_print(b); flint_printf("\n");
-            flint_printf("q = "); fmpz_print(q); flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(a);
-        fmpz_clear(b);
-        fmpz_clear(q);
-    }
-
-    /* Check aliasing of q and b */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
-    {
-        fmpz_t a, b, q;
-        int divides1, divides2;
-
-        fmpz_init(a);
-        fmpz_init(b);
-	fmpz_init(q);
-
-        fmpz_randtest(a, state, 200);
-        fmpz_randtest(b, state, 200);
-
-        divides1 = fmpz_divides(q, b, a);
-        divides2 = fmpz_divides(b, b, a);
-
-        result = (divides1 == divides2 && fmpz_equal(q, b));
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("divides1 = %d, divides2 = %d\n", divides1, divides2);
-	    flint_printf("a = "); fmpz_print(a); flint_printf("\n");
-            flint_printf("b = "); fmpz_print(b); flint_printf("\n");
-            flint_printf("q = "); fmpz_print(q); flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(a);
-        fmpz_clear(b);
+        fmpz_clear(p);
         fmpz_clear(q);
     }
 

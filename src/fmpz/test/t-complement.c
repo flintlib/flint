@@ -22,8 +22,6 @@ main(void)
     flint_printf("complement....");
     fflush(stdout);
 
-
-
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;
@@ -39,12 +37,21 @@ main(void)
 
         fmpz_get_mpz(c, a);
 
-        fmpz_complement(b, a);
+        if (n_randint(state, 2))
+        {
+            fmpz_complement(b, a);
+        }
+        else
+        {
+            fmpz_set(b, a);
+            fmpz_complement(b, b);
+        }
+
         mpz_com(c, c);
 
         fmpz_get_mpz(d, b);
 
-        result = (mpz_cmp(c, d) == 0);
+        result = (mpz_cmp(c, d) == 0) && _fmpz_is_canonical(b);
         if (!result)
         {
             flint_printf("FAIL (no alias):\n");
@@ -55,41 +62,6 @@ main(void)
 
         fmpz_clear(a);
         fmpz_clear(b);
-
-        mpz_clear(c);
-        mpz_clear(d);
-    }
-
-    /* Check aliasing */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-    {
-        fmpz_t a;
-        mpz_t c, d;
-
-        fmpz_init(a);
-
-        mpz_init(c);
-        mpz_init(d);
-
-        fmpz_randtest(a, state, 200);
-
-        fmpz_get_mpz(c, a);
-
-        fmpz_complement(a, a);
-        mpz_com(c, c);
-
-        fmpz_get_mpz(d, a);
-
-        result = (mpz_cmp(c, d) == 0);
-        if (!result)
-        {
-            flint_printf("FAIL (aliased):\n");
-            gmp_printf("c = %Zd, d = %Zd\n", c, d);
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(a);
 
         mpz_clear(c);
         mpz_clear(d);

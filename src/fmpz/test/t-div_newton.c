@@ -68,7 +68,7 @@ test_div_q(void (*my_f)(fmpz_t, const fmpz_t, const fmpz_t),
 
     reference_f(q2, a, b);
 
-    if (!fmpz_equal(q, q2))
+    if (!fmpz_equal(q, q2) || !_fmpz_is_canonical(q))
     {
         flint_printf("FAIL: %s\n", descr);
         flint_printf("aliasing = %d\n", aliasing);
@@ -144,7 +144,7 @@ test_div_qr(void (*my_f)(fmpz_t, fmpz_t, const fmpz_t, const fmpz_t),
 
     reference_f(q2, r2, a, b);
 
-    if (!fmpz_equal(q, q2) || !fmpz_equal(r, r2))
+    if (!fmpz_equal(q, q2) || !fmpz_equal(r, r2) || !_fmpz_is_canonical(q) || !_fmpz_is_canonical(r))
     {
         flint_printf("FAIL: %s\n", descr);
         flint_printf("aliasing = %d\n", aliasing);

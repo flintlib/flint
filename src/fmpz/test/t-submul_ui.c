@@ -23,8 +23,6 @@ main(void)
     flint_printf("submul_ui....");
     fflush(stdout);
 
-
-
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;
@@ -45,20 +43,22 @@ main(void)
         fmpz_get_mpz(e, b);
         x = n_randtest(state);
 
-        fmpz_submul_ui(b, a, x);
+        if (n_randint(state, 2))
+        {
+            fmpz_submul_ui(b, a, x);
+        }
+        else  /* test aliasing */
+        {
+            fmpz_set(b, a);
+            mpz_set(e, d);
+            fmpz_submul_ui(b, b, x);
+        }
+
         flint_mpz_submul_ui(e, d, x);
 
         fmpz_get_mpz(f, b);
 
-        result = (mpz_cmp(e, f) == 0);
-
-        if (COEFF_IS_MPZ(*b))
-        {
-            fmpz c = *b;
-            _fmpz_demote_val(b);
-            if (*b != c)
-                result = 0;
-        }
+        result = (mpz_cmp(e, f) == 0) && _fmpz_is_canonical(b);
 
         if (!result)
         {
@@ -74,43 +74,6 @@ main(void)
         mpz_clear(d);
         mpz_clear(e);
         mpz_clear(f);
-    }
-
-    /* Check aliasing of a and b */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-    {
-        fmpz_t a;
-        mpz_t d, e;
-        ulong x;
-
-        fmpz_init(a);
-
-        mpz_init(d);
-        mpz_init(e);
-
-        fmpz_randtest(a, state, 200);
-
-        fmpz_get_mpz(d, a);
-        x = n_randtest(state);
-
-        fmpz_submul_ui(a, a, x);
-        flint_mpz_submul_ui(d, d, x);
-
-        fmpz_get_mpz(e, a);
-
-        result = (mpz_cmp(d, e) == 0);
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            gmp_printf("d = %Zd, e = %Zd, x = %Mu\n", d, e, x);
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(a);
-
-        mpz_clear(d);
-        mpz_clear(e);
     }
 
     FLINT_TEST_CLEANUP(state);

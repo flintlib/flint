@@ -23,8 +23,6 @@ main(void)
     flint_printf("add_ui....");
     fflush(stdout);
 
-
-
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t f, g, tst;
@@ -43,7 +41,16 @@ main(void)
         fmpz_get_mpz(mg, g);
         x = n_randtest(state);
 
-        fmpz_add_ui(f, g, x);
+        if (n_randint(state, 2))
+        {
+            fmpz_add_ui(f, g, x);
+        }
+        else /* test aliasing */
+        {
+            fmpz_set(f, g);
+            fmpz_add_ui(f, f, x);
+        }
+
         flint_mpz_add_ui(mf, mg, x);
 
         fmpz_set_mpz(tst, mf);
@@ -67,51 +74,6 @@ main(void)
 
         mpz_clear(mf);
         mpz_clear(mg);
-    }
-
-    /* Check aliasing of a and b */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-    {
-        fmpz_t f, g, tst;
-        mpz_t mf;
-        ulong x;
-
-        fmpz_init(f);
-        fmpz_init(g);
-        fmpz_init(tst);
-
-        mpz_init(mf);
-
-        fmpz_randtest(g, state, 200);
-        fmpz_set(f, g);
-
-        fmpz_get_mpz(mf, f);
-        x = n_randtest(state);
-
-        fmpz_add_ui(f, f, x);
-        flint_mpz_add_ui(mf, mf, x);
-
-        fmpz_set_mpz(tst, mf);
-
-        result = fmpz_equal(f, tst);
-
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("(aliasing)\n");
-            flint_printf("f = "); fmpz_print(f); flint_printf(", ");
-            flint_printf("g = "); fmpz_print(g); flint_printf(", ");
-            flint_printf("x = %wu\n", x);
-            flint_printf("Correct result via GMP: "); fmpz_print(tst); flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(f);
-        fmpz_clear(g);
-        fmpz_clear(tst);
-
-        mpz_clear(mf);
     }
 
     FLINT_TEST_CLEANUP(state);
