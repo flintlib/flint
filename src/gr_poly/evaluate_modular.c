@@ -50,12 +50,13 @@ _gr_poly_evaluate_modular(gr_ptr y, gr_srcptr poly,
         GR_TMP_INIT_VEC(partial_results, j, ctx);
 
         status |= _gr_vec_set_powers(xs, x, j, ctx);
-        status |= gr_mul(tmp_gr, x, GR_ENTRY(xs, j-1, sz), ctx); //This is x^j
+        status |= gr_mul(tmp_gr, x, GR_ENTRY(xs, j-1, sz), ctx); /* This is x^j */
         status |= _gr_vec_set_powers(ys, tmp_gr, k, ctx);
 
         for (l = 0; l < j; l++){
-            i = 0; //Count number of coeffs in this row
-            for (m = 0; m < k; m++){
+            i = 0; /* Count number of coeffs in this row */
+            for (m = 0; m < k; m++)
+            {
                 coeff_index = j*m+l;
                 if (coeff_index < len)
                 { 
