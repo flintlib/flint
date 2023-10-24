@@ -49,7 +49,7 @@ int main(void)
         arb_init(x);
 
         acb_theta_precomp_clear(D);
-        acb_theta_precompo_init(D, nb, g);
+        acb_theta_precomp_init(D, nb, g);
 
         acb_siegel_randtest_reduced(tau, state, prec, mag_bits);
         acb_theta_eld_cho(C, tau, prec);

@@ -75,7 +75,7 @@ int main(void)
             if (acb_is_finite(&th[0]))
             {
                 flint_printf("FAIL (not infinite)\n");
-                flint(abort);
+                flint_abort();
             }
         }
 

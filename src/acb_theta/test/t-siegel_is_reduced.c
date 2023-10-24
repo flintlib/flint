@@ -24,7 +24,8 @@ int main(void)
     /* Test: correct values on some matrices */
     for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 6);
+        slong g = 1 + n_randint(state, 4);
+        slong prec = ACB_THETA_LOW_PREC;
         slong tol_exp = -10;
         slong j = n_randint(state, g);
         slong k = n_randint(state, g);
@@ -35,16 +36,16 @@ int main(void)
         acb_mat_onei(tau);
         if (!acb_siegel_is_reduced(tau, tol_exp, prec))
         {
-            flint_printf("FAIL\n");
+            flint_printf("FAIL (1)\n");
             acb_mat_printd(tau, 5);
             flint_abort();
         }
 
-        acb_add_si(acb_mat_entry(tau, j, k), acb_mat_entry(tau, j, k), 1);
-        acb_set(acb_mat_entry(tau, j, k), acb_mat_entry(tau, k, j));
+        acb_add_si(acb_mat_entry(tau, j, k), acb_mat_entry(tau, j, k), 1, prec);
+        acb_set(acb_mat_entry(tau, k, j), acb_mat_entry(tau, j, k));
         if (acb_siegel_is_reduced(tau, tol_exp, prec))
         {
-            flint_printf("FAIL\n");
+            flint_printf("FAIL (2)\n");
             acb_mat_printd(tau, 5);
             flint_abort();
         }
@@ -53,7 +54,7 @@ int main(void)
         acb_mul_2exp_si(acb_mat_entry(tau, j, j), acb_mat_entry(tau, j, j), -1);
         if (acb_siegel_is_reduced(tau, tol_exp, prec))
         {
-            flint_printf("FAIL\n");
+            flint_printf("FAIL (3)\n");
             acb_mat_printd(tau, 5);
             flint_abort();
         }

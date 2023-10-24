@@ -93,7 +93,7 @@ int main(void)
         /* Test: indeterminate on phony tau */
         arb_randtest_positive(acb_imagref(acb_mat_entry(tau, 0, 0)), state, prec, bits);
         acb_neg(acb_mat_entry(tau, 0, 0), acb_mat_entry(tau, 0, 0));
-        acb_theta_naive_ellipsoid(E2, u, z, tau, ord, prec);
+        acb_theta_naive_ellipsoid(E2, new_z, c, u, z, nbz, tau, prec);
         if (acb_is_finite(c) && arb_is_finite(u))
         {
             flint_printf("FAIL (not infinite)\n");

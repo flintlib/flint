@@ -37,8 +37,8 @@ the action of the Siegel modular group `\mathrm{Sp}_{2g}(\mathbb{Z})` on
 compute theta values on the reduced domain. At low precisions and when `\tau`
 is reasonably reduced, one may also consider using "naive algorithms" directly,
 which consist in evaluating a partial sum of the theta series. The main
-functions to do so are `acb_theta_naive_00` and `acb_theta_naive_all`. We also
-provide functionality to evaluate derivatives of theta functions, and to
+functions to do so are `acb_theta_naive_fixed_ab` and `acb_theta_naive_all`. We
+also provide functionality to evaluate derivatives of theta functions, and to
 evaluate Siegel modular forms in terms of theta functions when `g=2`.
 
 As usual, the numerical functions in this module compute certified error
@@ -51,7 +51,7 @@ Main user functions
 -------------------------------------------------------------------------------
 
 The functions in this section are also documented later in this document, along
-with related internal functions and some implementation details.
+with implementation details and related internal functions.
 
 .. function:: void acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec)
 
@@ -82,12 +82,6 @@ with related internal functions and some implementation details.
 
 .. function:: void acb_theta_jet_naive_fixed_ab(acb_ptr dth, ulong ab, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
 
-    Sets *dth* to the vector of derivatives of `\theta_{a,b}` at the given
-    point `(z,\tau)` up to total order *ord*. We reduce to
-    :func:`acb_theta_jet_naive_00` using the same formula as in
-    :func:`acb_theta_naive_ind` and making suitable linear combinations of the
-    derivatives.
-
 .. function:: void acb_theta_jet_naive_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
 
     Sets *dth* to the vector of derivatives of `theta_{a,b}` for the given
@@ -95,10 +89,41 @@ with related internal functions and some implementation details.
     will be a concatenation of either 1 or `2^{2g}` vectors of length `N`,
     where `N` is the number of derivation tuples of total order at most *ord*.
 
-The following code snippet constructs a period matrix for `g = 2`, computes the
-associated theta constants (values at `z = 0`) at a high precision, and prints
-them. As expected, the indices in the output vector corresponding to odd theta
-characteristics contain the zero value.
+The following code snippet constructs the period matrix `tau = iI_2` for `g =
+2`, computes the associated theta constants (values at `z = 0`) at a high
+precision (roughly 0.1 seconds), and prints them. As expected, the entries in
+the output vector corresponding to odd characteristics contain the zero value.
+
+.. code-block:: c
+
+    #include "acb_theta.h"
+
+    int main()
+    {
+        acb_mat_t tau;
+        acb_ptr th, z;
+        slong prec = 10000;
+
+        acb_mat_init(tau, 2, 2);
+        z = _acb_vec_init(2);
+        th = _acb_vec_init(16);
+
+        acb_mat_onei(tau);
+
+        acb_theta_all(th, z, tau, 0, prec);
+
+        _acb_vec_printd(th, 16, 5);
+
+        acb_mat_clear(tau);
+        _acb_vec_clear(z, 2);
+        _acb_vec_clear(th, 16);
+        flint_cleanup();
+        return 0;
+    }
+
+::
+
+   7^2 = 49
 
 The Siegel modular group
 -------------------------------------------------------------------------------

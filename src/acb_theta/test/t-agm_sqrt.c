@@ -81,7 +81,7 @@ int main(void)
         arb_mul_2exp_si(err, err, prec - n_pow(2, mag_bits) - 10);
         arb_add_si(err, err, -1, prec);
 
-        if (!arb_contains_zero(rt) && !arb_is_negative(err))
+        if (!acb_contains_zero(rt) && !arb_is_negative(err))
         {
             flint_printf("FAIL (precision)\n");
             flint_printf("prec = %wd, mag_bits = %wd, difference:\n", prec, mag_bits);

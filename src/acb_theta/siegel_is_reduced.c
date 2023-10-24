@@ -30,6 +30,9 @@ int acb_siegel_is_reduced(const acb_mat_t tau, slong tol_exp, slong prec)
     arb_init(t);
     arb_init(u);
 
+    arb_one(u);
+    arb_mul_2exp_si(u, u, tol_exp);
+
     arb_one(t);
     arb_mul_2exp_si(t, t, -1);
     arb_add(t, t, u, prec);
