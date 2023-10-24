@@ -35,4 +35,5 @@ nmod_poly_mat_window_init(nmod_poly_mat_t window, const nmod_poly_mat_t mat, slo
 
     window->r = r2 - r1;
     window->c = c2 - c1;
+    window->modulus = mat->modulus;
 }
