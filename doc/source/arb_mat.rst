@@ -813,7 +813,7 @@ LLL reduction
 .. function:: int arb_mat_spd_is_lll_reduced(const arb_mat_t A, slong tol_exp, slong prec)
 
     Returns nonzero iff *A* is LLL-reduced with a tolerance of `\varepsilon =
-    2^{\stars{tol_exp}`. This means the following. First, the error radius on
+    2^{tol\_exp}`. This means the following. First, the error radius on
     each entry of *A* must be at most `\varepsilon/16`. Then we consider the
     matrix whose entries are `2^{\mathit{prec}}(1 + \varepsilon)^{i + j}
     A_{i,j}` rounded to integers: it must be positive definite and pass
