@@ -45,7 +45,7 @@ find_package(MPFR REQUIRED)
 if (WITH_NTL)
     find_package(NTL REQUIRED)
 endif()
-find_package(PythonInterp REQUIRED)
+find_package(Python REQUIRED)
 
 find_package(CBLAS)
 set(FLINT_USES_BLAS ${CBLAS_FOUND})
