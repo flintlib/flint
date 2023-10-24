@@ -20,7 +20,23 @@ include(CheckCSourceRuns)
 include(CheckLibraryExists)
 include(TestBigEndian)
 
-project(flint LANGUAGES C CXX)
+# Source of truth for project version
+file(STRINGS VERSION FLINT_VERSION)
+
+project(flint
+  VERSION ${FLINT_VERSION}
+  DESCRIPTION "Fast Library for Number Theory"
+  HOMEPAGE_URL https://flintlib.org/
+  LANGUAGES C CXX)
+
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/configure.ac" CONFIGURE_CONTENTS)
+foreach(version in MAJOR MINOR PATCH)
+  # Set soname version for the library
+  string(REGEX MATCH "FLINT_${version}_SO=([0-9]*)" _ ${CONFIGURE_CONTENTS})
+  set(FLINT_${version}_SO ${CMAKE_MATCH_1})
+  # Set flint version for the header
+  set(FLINT_${version} ${PROJECT_VERSION_${version}})
+endforeach()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
@@ -29,23 +45,17 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
+# Build options
 option(BUILD_SHARED_LIBS "Build shared libs" on)
 option(WITH_NTL "Build with NTL or not" off)
 
-file(READ "${CMAKE_CURRENT_SOURCE_DIR}/configure.ac" CONFIGURE_CONTENTS)
-string(REGEX MATCH "FLINT_MAJOR_SO=([0-9]*)" _ ${CONFIGURE_CONTENTS})
-set(FLINT_MAJOR_SO ${CMAKE_MATCH_1})
-string(REGEX MATCH "FLINT_MINOR_SO=([0-9]*)" _ ${CONFIGURE_CONTENTS})
-set(FLINT_MINOR_SO ${CMAKE_MATCH_1})
-string(REGEX MATCH "FLINT_PATCH_SO=([0-9]*)" _ ${CONFIGURE_CONTENTS})
-set(FLINT_PATCH_SO ${CMAKE_MATCH_1})
-
+# Find dependencies
 find_package(GMP REQUIRED)
 find_package(MPFR REQUIRED)
 if (WITH_NTL)
     find_package(NTL REQUIRED)
 endif()
-find_package(PythonInterp REQUIRED)
+find_package(Python REQUIRED)
 
 find_package(CBLAS)
 set(FLINT_USES_BLAS ${CBLAS_FOUND})
@@ -147,7 +157,7 @@ set(_TEMPLATE_DIRS
 string(REGEX REPLACE "([A-Za-z0-9_-]+;|[A-Za-z0-9_-]+$)" "src/\\1" TEMPLATE_DIRS "${_TEMPLATE_DIRS}")
 
 if (WITH_NTL)
-    list(APPEND SOURCES src/interfaces/NTL-interface.cpp)
+    list(APPEND BUILD_DIRS src/interfaces)
 endif()
 
 set(_HEADERS
@@ -360,7 +370,7 @@ set_target_properties(flint
 if(BUILD_TESTING)
     enable_testing()
     foreach (build_dir IN LISTS BUILD_DIRS CMAKE_CURRENT_SOURCE_DIR)
-        file(GLOB TEST_FILES "${build_dir}/test/*.c")
+        file(GLOB TEST_FILES "${build_dir}/test/*.c*")
         foreach(test_file IN LISTS TEST_FILES)
             file(RELATIVE_PATH test_name ${CMAKE_CURRENT_SOURCE_DIR} ${test_file})
             string(REPLACE "/" "-" test_name ${test_name})
@@ -381,6 +391,11 @@ if(BUILD_TESTING)
             )
         endforeach()
     endforeach ()
+
+    if(WITH_NTL)
+      target_link_libraries(src-interfaces-test-t-NTL-interface ${NTL_LIBRARY})
+      target_include_directories(src-interfaces-test-t-NTL-interface PUBLIC ${NTL_INCLUDE_DIR})
+    endif()
 endif()
 
 
