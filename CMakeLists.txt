@@ -157,7 +157,7 @@ set(_TEMPLATE_DIRS
 string(REGEX REPLACE "([A-Za-z0-9_-]+;|[A-Za-z0-9_-]+$)" "src/\\1" TEMPLATE_DIRS "${_TEMPLATE_DIRS}")
 
 if (WITH_NTL)
-    list(APPEND SOURCES src/interfaces/NTL-interface.cpp)
+    list(APPEND BUILD_DIRS src/interfaces)
 endif()
 
 set(_HEADERS
@@ -370,7 +370,7 @@ set_target_properties(flint
 if(BUILD_TESTING)
     enable_testing()
     foreach (build_dir IN LISTS BUILD_DIRS CMAKE_CURRENT_SOURCE_DIR)
-        file(GLOB TEST_FILES "${build_dir}/test/*.c")
+        file(GLOB TEST_FILES "${build_dir}/test/*.c*")
         foreach(test_file IN LISTS TEST_FILES)
             file(RELATIVE_PATH test_name ${CMAKE_CURRENT_SOURCE_DIR} ${test_file})
             string(REPLACE "/" "-" test_name ${test_name})
@@ -391,6 +391,11 @@ if(BUILD_TESTING)
             )
         endforeach()
     endforeach ()
+
+    if(WITH_NTL)
+      target_link_libraries(src-interfaces-test-t-NTL-interface ${NTL_LIBRARY})
+      target_include_directories(src-interfaces-test-t-NTL-interface PUBLIC ${NTL_INCLUDE_DIR})
+    endif()
 endif()
 
 
