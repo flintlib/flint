@@ -20,7 +20,23 @@ include(CheckCSourceRuns)
 include(CheckLibraryExists)
 include(TestBigEndian)
 
-project(flint LANGUAGES C CXX)
+# Source of truth for project version
+file(STRINGS VERSION FLINT_VERSION)
+
+project(flint
+  VERSION ${FLINT_VERSION}
+  DESCRIPTION "Fast Library for Number Theory"
+  HOMEPAGE_URL https://flintlib.org/
+  LANGUAGES C CXX)
+
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/configure.ac" CONFIGURE_CONTENTS)
+foreach(version in MAJOR MINOR PATCH)
+  # Set soname version for the library
+  string(REGEX MATCH "FLINT_${version}_SO=([0-9]*)" _ ${CONFIGURE_CONTENTS})
+  set(FLINT_${version}_SO ${CMAKE_MATCH_1})
+  # Set flint version for the header
+  set(FLINT_${version} ${PROJECT_VERSION_${version}})
+endforeach()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
@@ -29,17 +45,11 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
+# Build options
 option(BUILD_SHARED_LIBS "Build shared libs" on)
 option(WITH_NTL "Build with NTL or not" off)
 
-file(READ "${CMAKE_CURRENT_SOURCE_DIR}/configure.ac" CONFIGURE_CONTENTS)
-string(REGEX MATCH "FLINT_MAJOR_SO=([0-9]*)" _ ${CONFIGURE_CONTENTS})
-set(FLINT_MAJOR_SO ${CMAKE_MATCH_1})
-string(REGEX MATCH "FLINT_MINOR_SO=([0-9]*)" _ ${CONFIGURE_CONTENTS})
-set(FLINT_MINOR_SO ${CMAKE_MATCH_1})
-string(REGEX MATCH "FLINT_PATCH_SO=([0-9]*)" _ ${CONFIGURE_CONTENTS})
-set(FLINT_PATCH_SO ${CMAKE_MATCH_1})
-
+# Find dependencies
 find_package(GMP REQUIRED)
 find_package(MPFR REQUIRED)
 if (WITH_NTL)
