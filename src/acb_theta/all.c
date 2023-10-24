@@ -38,14 +38,15 @@ acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec
         {
             acb_theta_ql_all(aux, x, w, prec);
         }
+
+        sp2gz_inv(mat, mat);
+        acb_theta_transform(th, mat, aux, x, w, sqr, prec);
     }
     else
     {
-        _acb_vec_indeterminate(aux, n * n);
+        _acb_vec_indeterminate(th, n * n);
     }
 
-    sp2gz_inv(mat, mat);
-    acb_theta_transform(th, mat, aux, x, w, sqr, prec);
 
     fmpz_mat_clear(mat);
     acb_mat_clear(w);

@@ -90,9 +90,8 @@ with implementation details and related internal functions.
     where `N` is the number of derivation tuples of total order at most *ord*.
 
 The following code snippet constructs the period matrix `tau = iI_2` for `g =
-2`, computes the associated theta constants (values at `z = 0`) at a high
-precision (roughly 0.1 seconds), and prints them. As expected, the entries in
-the output vector corresponding to odd characteristics contain the zero value.
+2`, computes the associated theta constants (values at `z = 0`) at 10000 bits
+of precision (roughly 0.1 seconds), and prints them.
 
 .. code-block:: c
 
@@ -123,7 +122,8 @@ the output vector corresponding to odd characteristics contain the zero value.
 
 ::
 
-   7^2 = 49
+       (1.1803 + 0j)  +/-  (2.23e-3010, 1.23e-3010j), (0.99254 + 0j)  +/-  (1.73e-3010, 1.23e-3010j), (0.99254 + 0j)  +/-  (1.73e-3010, 1.23e-3010j), (0.83463 + 0j)  +/-  (1.73e-3010, 1.23e-3010j), (0.99254 + 0j)  +/-  (1.73e-3010, 1.23e-3010j), (0 + 0j)  +/-  (1.23e-3010, 1.23e-3010j), (0.83463 + 0j)  +/-  (1.73e-3010, 1.23e-3010j), (0 + 0j)  +/-  (1.23e-3010, 1.23e-3010j), (0.99254 + 0j)  +/-  (1.73e-3010, 1.23e-3010j), (0.83463 + 0j)  +/-  (1.73e-3010, 1.23e-3010j), (0 + 0j)  +/-  (1.23e-3010, 1.23e-3010j), (0 + 0j)  +/-  (1.23e-3010, 1.23e-3010j), (0.83463 + 0j)  +/-  (1.73e-3010, 1.23e-3010j), (0 + 0j)  +/-  (1.23e-3010, 1.23e-3010j), (0 + 0j)  +/-  (1.23e-3010, 1.23e-3010j), (0 + 0j)  +/-  (1.23e-3010, 1.23e-3010j)
+
 
 The Siegel modular group
 -------------------------------------------------------------------------------

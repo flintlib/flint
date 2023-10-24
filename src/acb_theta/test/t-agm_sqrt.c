@@ -68,30 +68,33 @@ int main(void)
             flint_abort();
         }
 
-        if (acb_contains(rt_low, rt) && !acb_is_finite(test))
+        if (acb_contains(rt_low, rt))
         {
-            flint_printf("FAIL (infinite)\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            if (!acb_is_finite(test))
+            {
+                flint_printf("FAIL (infinite)\n");
+                fflush(stdout);
+                flint_abort();
+            }
 
-        acb_get_mid(x, test);
-        acb_sub(test, test, x, prec);
-        acb_abs(err, test, prec);
-        arb_mul_2exp_si(err, err, prec - n_pow(2, mag_bits) - 10);
-        arb_add_si(err, err, -1, prec);
+            acb_get_mid(x, test);
+            acb_sub(test, test, x, prec);
+            acb_abs(err, test, prec);
+            arb_mul_2exp_si(err, err, prec - n_pow(2, mag_bits) - 10);
+            arb_add_si(err, err, -1, prec);
 
-        if (!acb_contains_zero(rt) && !arb_is_negative(err))
-        {
-            flint_printf("FAIL (precision)\n");
-            flint_printf("prec = %wd, mag_bits = %wd, difference:\n", prec, mag_bits);
-            acb_printd(test, 10);
-            flint_printf("\n");
-            flint_printf("rt_low:\n");
-            acb_printd(rt_low, 10);
-            flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
+            if (!acb_contains_zero(rt) && !arb_is_negative(err))
+            {
+                flint_printf("FAIL (precision)\n");
+                flint_printf("prec = %wd, difference:\n", prec, mag_bits);
+                acb_printd(test, 10);
+                flint_printf("\n");
+                flint_printf("rt_low:\n");
+                acb_printd(rt_low, 10);
+                flint_printf("\n");
+                fflush(stdout);
+                flint_abort();
+            }
         }
 
         acb_clear(rt);
