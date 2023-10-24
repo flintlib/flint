@@ -36,7 +36,6 @@ _gr_poly_evaluate_modular(gr_ptr y, gr_srcptr poly,
     {
         slong i, j, k, coeff_index, l, m;
         gr_ptr xs, ys, tmp, partial_results;
-        gr_ptr tmp_gr;
         k = n_sqrt(len)+1;
         j = (len + k - 1) / k;
 
@@ -44,16 +43,15 @@ _gr_poly_evaluate_modular(gr_ptr y, gr_srcptr poly,
 
         TMP_START;
         tmp = TMP_ALLOC(sz * k);
-        GR_TMP_INIT(tmp_gr, ctx);
-        GR_TMP_INIT_VEC(xs, j, ctx);
+        GR_TMP_INIT_VEC(xs, j + 1, ctx);
         GR_TMP_INIT_VEC(ys, k, ctx);
         GR_TMP_INIT_VEC(partial_results, j, ctx);
 
-        status |= _gr_vec_set_powers(xs, x, j, ctx);
-        status |= gr_mul(tmp_gr, x, GR_ENTRY(xs, j-1, sz), ctx); /* This is x^j */
-        status |= _gr_vec_set_powers(ys, tmp_gr, k, ctx);
+        status |= _gr_vec_set_powers(xs, x, j + 1, ctx);
+        status |= _gr_vec_set_powers(ys, GR_ENTRY(xs, j, sz), k, ctx);
 
-        for (l = 0; l < j; l++){
+        for (l = 0; l < j; l++)
+        {
             i = 0; /* Count number of coeffs in this row */
             for (m = 0; m < k; m++)
             {
@@ -71,15 +69,13 @@ _gr_poly_evaluate_modular(gr_ptr y, gr_srcptr poly,
             status |= _gr_vec_dot(GR_ENTRY(partial_results, l, sz), NULL, 0, tmp, ys, i, ctx);
         }
         status |=_gr_vec_dot(y, NULL, 0, partial_results, xs, j, ctx);
-        GR_TMP_CLEAR(tmp_gr, ctx);
-        GR_TMP_CLEAR_VEC(xs, j, ctx);
+        GR_TMP_CLEAR_VEC(xs, j + 1, ctx);
         GR_TMP_CLEAR_VEC(ys, k, ctx);
         GR_TMP_CLEAR_VEC(partial_results, j, ctx);
         TMP_END;
     }
     return status;
 }
-
 
 int
 gr_poly_evaluate_modular(gr_ptr res, const gr_poly_t f, gr_srcptr x, gr_ctx_t ctx)
