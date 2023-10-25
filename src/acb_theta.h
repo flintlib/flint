@@ -190,6 +190,9 @@ slong acb_theta_jet_total_order(const slong* tup, slong g);
 void acb_theta_jet_tuples(slong* tups, slong ord, slong g);
 slong acb_theta_jet_index(const slong* tup, slong g);
 
+void acb_theta_jet_mul(acb_ptr res, acb_srcptr v1, acb_srcptr v2, slong ord,
+    slong g, slong prec);
+
 void acb_theta_jet_naive_radius(arf_t R2, arf_t eps, const arb_mat_t C, arb_srcptr v,
     slong ord, slong prec);
 void acb_theta_jet_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z,
@@ -250,8 +253,18 @@ int acb_theta_ql_a0(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
 
 slong acb_theta_ql_reduce(acb_ptr x, acb_t c, arb_t u, slong* n1, acb_srcptr z,
     const acb_mat_t tau, slong prec);
+
 void acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec);
 void acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec);
+
+/* Quasi-linear algorithms for derivatives */
+
+void acb_theta_jet_bounds(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord);
+void acb_theta_jet_fd_radius(arf_t eps, arf_t err, const arb_t c, const arb_t rho,
+    slong ord, slong g, slong prec);
+void acb_theta_jet_fd(acb_ptr dth, const arf_t eps, const arf_t err, acb_srcptr val,
+    slong ord, slong g, slong prec);
+void acb_theta_jet_ql_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec);
 
 /* Transformation formulas */
 
@@ -267,15 +280,6 @@ void acb_theta_transform(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th,
     acb_srcptr z, const acb_mat_t tau, int sqr, slong prec);
 
 void acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec);
-
-/* Quasi-linear algorithms for derivatives */
-
-void acb_theta_jet_bounds(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord);
-void acb_theta_jet_fd_radius(arf_t eps, arf_t err, const arb_t c, const arb_t rho,
-    slong ord, slong g, slong prec);
-void acb_theta_jet_fd(acb_ptr dth, const arf_t eps, const arf_t err, acb_srcptr val,
-    slong ord, slong g, slong prec);
-
 void acb_theta_jet_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec);
 
 /* Genus 2 specifics */
