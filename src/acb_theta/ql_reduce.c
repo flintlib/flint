@@ -49,7 +49,12 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong* n1, acb_srcptr
         }
     }
 
-    if (s < g)
+    if (!arb_mat_is_finite(C))
+    {
+        acb_indeterminate(c);
+        arb_pos_inf(u);
+    }
+    else if (s < g)
     {
         /* Construct ellipsoid */
         acb_theta_eld_init(E, g - s, g - s);
