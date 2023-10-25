@@ -22,9 +22,11 @@ include(TestBigEndian)
 
 # Source of truth for project version
 file(STRINGS VERSION FLINT_VERSION_FULL)
+string(REGEX MATCH "([0-9]+\.[0-9]+\.[0-9]+)" _ ${FLINT_VERSION_FULL})
+set(FLINT_VERSION ${CMAKE_MATCH_1})
 
 project(flint
-  VERSION ${FLINT_VERSION_FULL}
+  VERSION ${FLINT_VERSION}
   DESCRIPTION "Fast Library for Number Theory"
   HOMEPAGE_URL https://flintlib.org/
   LANGUAGES C CXX)
