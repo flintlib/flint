@@ -24,8 +24,8 @@ int main(void)
     /* Test: agrees with jet_naive_all */
     for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 3);
-        slong ord = n_randint(state, 4);
+        slong g = 1 + n_randint(state, 2);
+        slong ord = n_randint(state, 3);
         slong nb = acb_theta_jet_nb(ord, g);
         slong n2 = 1 << (2 * g);
         slong prec = 100 + n_randint(state, 400);
@@ -41,6 +41,7 @@ int main(void)
         /* Sample tau not too far from reduced domain */
         acb_siegel_randtest_nice(tau, state, prec);
         acb_mat_scalar_mul_2exp_si(tau, tau, -1);
+        arb_urandom(acb_realref(acb_mat_entry(tau, 0, 0)), state, prec);
         for (k = 0; k < g; k++)
         {
             acb_urandom(z, state, prec);

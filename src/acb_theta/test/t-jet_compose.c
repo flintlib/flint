@@ -43,17 +43,17 @@ int main(void)
 
         for (k = 0; k < nb; k++)
         {
-            acb_randtest_precise(&v1[k], state, prec, mag_bits);
+            acb_randtest_precise(&v3[k], state, prec, mag_bits);
         }
         acb_mat_randtest(N1, state, prec, mag_bits);
         acb_mat_randtest(N2, state, prec, mag_bits);
         acb_mat_mul(N3, N2, N1, prec);
 
-        acb_theta_jet_compose(v2, v1, N1, ord, prec);
-        acb_theta_jet_compose(v3, v2, N2, ord, prec);
-        acb_theta_jet_compose(test, v1, N3, ord, prec);
+        acb_theta_jet_compose(v2, v3, N2, ord, prec);
+        acb_theta_jet_compose(v1, v2, N1, ord, prec);
+        acb_theta_jet_compose(test, v3, N3, ord, prec);
 
-        if (!_acb_vec_overlaps(test, v3, nb))
+        if (!_acb_vec_overlaps(test, v1, nb))
         {
             flint_printf("FAIL (g = %wd, ord = %wd)\n", g, ord);
             _acb_vec_printd(v3, nb, 5);
