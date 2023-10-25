@@ -21,10 +21,10 @@ include(CheckLibraryExists)
 include(TestBigEndian)
 
 # Source of truth for project version
-file(STRINGS VERSION FLINT_VERSION)
+file(STRINGS VERSION FLINT_VERSION_FULL)
 
 project(flint
-  VERSION ${FLINT_VERSION}
+  VERSION ${FLINT_VERSION_FULL}
   DESCRIPTION "Fast Library for Number Theory"
   HOMEPAGE_URL https://flintlib.org/
   LANGUAGES C CXX)
