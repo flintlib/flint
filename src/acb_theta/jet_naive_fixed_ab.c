@@ -33,7 +33,7 @@ acb_theta_jet_exp(acb_ptr res, acb_srcptr z, const acb_mat_t tau, ulong a, ulong
     fmpz_init(t);
 
     /* Get exponential factor */
-    acb_theta_char_get_acb(v, a, prec);
+    acb_theta_char_get_acb(v, a, g);
     acb_mat_vector_mul_col(v, tau, v, prec);
     acb_theta_char_dot_acb(c, a, v, g, prec);
 

@@ -11,6 +11,7 @@
 
 #include "acb_theta.h"
 
+/* Compute jet of exp (z^T N z) */
 static void
 acb_theta_jet_exp_qf(acb_ptr res, acb_srcptr z, const acb_mat_t N, slong ord, slong prec)
 {
@@ -114,33 +115,34 @@ acb_theta_jet_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slo
     acb_siegel_reduce(mat, tau, prec);
     acb_siegel_transform_cocycle_inv(w, c, cinv, mat, tau, prec);
     _acb_vec_unit_roots(units, 8, 8, prec);
+    sp2gz_inv(mat, mat);
 
     if (acb_siegel_is_reduced(w, -10, prec))
     {
         acb_mat_transpose(cinv, cinv);
         acb_mat_vector_mul_col(x, cinv, z, prec);
 
-        fmpz_mat_window_init(gamma, mat, g, 0, 2 * g, g);
-        acb_mat_set_fmpz_mat(N, gamma);
-        fmpz_mat_window_clear(gamma);
-
-        acb_mat_mul(N, cinv, N, prec);
-        acb_const_pi(t, prec);
-        acb_mul_onei(t, t);
-        acb_mat_scalar_mul_acb(N, N, t, prec);
-
         acb_theta_jet_ql_all(aux, x, w, ord, prec);
 
-        sp2gz_inv(mat, mat);
         kappa = acb_theta_transform_kappa(s, mat, w, prec);
         for (ab = 0; ab < n2; ab++)
         {
             image_ab = acb_theta_transform_char(&e, mat, ab);
             acb_mul(t, s, &units[(kappa + e) % 8], prec);
             _acb_vec_scalar_mul(dth + ab * nb, aux + image_ab * nb, nb, t, prec);
+            acb_theta_jet_compose(dth + ab * nb, dth + ab * nb, cinv, ord, prec);
         }
 
-        acb_theta_jet_exp_qf(aux, z, N, ord, prec);
+        fmpz_mat_window_init(gamma, mat, g, 0, 2 * g, g);
+        acb_mat_set_fmpz_mat(N, gamma);
+        acb_mat_transpose(c, c);
+        acb_mat_mul(N, c, N, prec);
+        acb_const_pi(t, prec);
+        acb_mul_onei(t, t);
+        acb_mat_scalar_mul_acb(N, N, t, prec);
+        fmpz_mat_window_clear(gamma);
+
+        acb_theta_jet_exp_qf(aux, x, N, ord, prec);
         for (ab = 0; ab < n2; ab++)
         {
             acb_theta_jet_mul(dth + ab * nb, dth + ab * nb, aux, ord, g, prec);

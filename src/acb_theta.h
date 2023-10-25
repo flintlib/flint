@@ -192,6 +192,8 @@ slong acb_theta_jet_index(const slong* tup, slong g);
 
 void acb_theta_jet_mul(acb_ptr res, acb_srcptr v1, acb_srcptr v2, slong ord,
     slong g, slong prec);
+void acb_theta_jet_compose(acb_ptr res, acb_srcptr v, const acb_mat_t N,
+    slong ord, slong prec);
 
 void acb_theta_jet_naive_radius(arf_t R2, arf_t eps, const arb_mat_t C, arb_srcptr v,
     slong ord, slong prec);

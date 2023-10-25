@@ -1,0 +1,77 @@
+/*
+    Copyright (C) 2023 Jean Kieffer
+
+    This file is part of Arb.
+
+    Arb is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
+
+#include "acb_theta.h"
+
+int main(void)
+{
+    slong iter;
+    flint_rand_t state;
+
+    flint_printf("jet_compose....");
+    fflush(stdout);
+
+    flint_randinit(state);
+
+    /* Test: chain rule */
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
+    {
+        slong g = 1 + n_randint(state, 4);
+        slong ord = n_randint(state, 4);
+        slong nb = acb_theta_jet_nb(ord, g);
+        slong prec = 200;
+        slong mag_bits = 2;
+        acb_mat_t N1, N2, N3;
+        acb_ptr v1, v2, v3, test;
+        slong k;
+
+        acb_mat_init(N1, g, g);
+        acb_mat_init(N2, g, g);
+        acb_mat_init(N3, g, g);
+        v1 = _acb_vec_init(nb);
+        v2 = _acb_vec_init(nb);
+        v3 = _acb_vec_init(nb);
+        test = _acb_vec_init(nb);
+
+        for (k = 0; k < nb; k++)
+        {
+            acb_randtest_precise(&v1[k], state, prec, mag_bits);
+        }
+        acb_mat_randtest(N1, state, prec, mag_bits);
+        acb_mat_randtest(N2, state, prec, mag_bits);
+        acb_mat_mul(N3, N2, N1, prec);
+
+        acb_theta_jet_compose(v2, v1, N1, ord, prec);
+        acb_theta_jet_compose(v3, v2, N2, ord, prec);
+        acb_theta_jet_compose(test, v1, N3, ord, prec);
+
+        if (!_acb_vec_overlaps(test, v3, nb))
+        {
+            flint_printf("FAIL (g = %wd, ord = %wd)\n", g, ord);
+            _acb_vec_printd(v3, nb, 5);
+            _acb_vec_printd(test, nb, 5);
+            flint_abort();
+        }
+
+        acb_mat_clear(N1);
+        acb_mat_clear(N2);
+        acb_mat_clear(N3);
+        _acb_vec_clear(v1, nb);
+        _acb_vec_clear(v2, nb);
+        _acb_vec_clear(v3, nb);
+        _acb_vec_clear(test, nb);
+    }
+
+    flint_randclear(state);
+    flint_cleanup();
+    flint_printf("PASS\n");
+    return 0;
+}
