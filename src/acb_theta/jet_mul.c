@@ -39,6 +39,7 @@ acb_theta_jet_mul(acb_ptr res, acb_srcptr v1, acb_srcptr v2, slong ord, slong g,
     tups = flint_malloc(nb * g * sizeof(slong));
     diff = flint_malloc(g * sizeof(slong));
 
+    acb_theta_jet_tuples(tups, ord, g);
     for (j = 0; j < nb; j++)
     {
         for (k = 0; k < nb; k++)
