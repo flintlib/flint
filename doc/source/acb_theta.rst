@@ -1049,14 +1049,6 @@ domain and the eigenvalues of `\mathrm{Im}(\tau)` are not too large, say in
     magnitude. This function is faster when *a1* and *a2* are equal as
     pointers, as we can use squarings instead of multiplications.
 
-.. function:: void acb_theta_agm_rel_mag_err(arf_t m, arf_t eps, acb_srcptr a, arb_srcptr d, slong nb, slong prec)
-
-    Computes *m* and *eps* such that the following holds: for each `0\leq k <
-    \mathit{nb}`, if `d_k` (resp. `a_k`) denotes the `k^{\mathrm{th}}` entry of
-    *d* (resp. *a*), then the absolute value of `a_k` is at most `m \cdot
-    e^{-d_k}` and the radius of the complex ball `a_k` is at most
-    `\mathit{eps}\cdot e^{-d_k}`.
-
 .. function:: void acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a, arb_srcptr d0, arb_srcptr d, slong g, slong prec)
 
     Assuming that *d0* and *d* are obtained as the result of
@@ -1067,14 +1059,18 @@ domain and the eigenvalues of `\mathrm{Im}(\tau)` are not too large, say in
     roughly `e^{-d_k}` for each `0\leq k < 2^g`, and similarly for *a0* and
     *d0*.
 
-    We manage the error bounds as follows. Let `m_0, \varepsilon_0`
-    (resp. `m,\varepsilon`) be the result of :func:`acb_theta_agm_rel_mag_err`
-    on `a_0,d_0` (resp. `a,d`). We call :func:`acb_theta_agm_mul` on the
-    midpoints of *a0* and *a* at a higher working precision, then add `e^{-d_k}
-    (m_0 \varepsilon + m \varepsilon_0 + \varepsilon\varepsilon_0)` to the
-    error bound on the `k^\mathrm{th}` entry of *res*. This is valid for the
-    following reason: keeping notation from
-    :func:`acb_theta_dist_a0`, for each `b\in \{0,1\}^g`, the sum
+    We manage the error bounds as follows. We compute `m, \varepsilon` such
+    that the following holds: for each `0\leq k < \mathit{nb}`, if `d_k`
+    (resp. `a_k`) denotes the `k^{\mathrm{th}}` entry of *d* (resp. *a*), then
+    the absolute value of `a_k` is at most `m \cdot e^{-d_k}` and the radius of
+    the complex ball `a_k` is at most `\mathit{eps}\cdot e^{-d_k}`. We proceed
+    similarly on *a0* and *d0* to obtain `m_0, \varepsilon_0`. Then we call
+    :func:`acb_theta_agm_mul` on the midpoints of *a0* and *a* at a higher
+    working precision, and finally add `e^{-d_k} (m_0 \varepsilon + m
+    \varepsilon_0 + \varepsilon\varepsilon_0)` to the error bound on the
+    `k^\mathrm{th}` entry of *res*. This is valid for the following reason:
+    keeping notation from :func:`acb_theta_dist_a0`, for each `b\in \{0,1\}^g`,
+    the sum
 
         .. math ::
 

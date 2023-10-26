@@ -33,8 +33,8 @@ int main(void)
         acb_ptr z;
         acb_ptr th, th0, r;
         arb_ptr d, d0;
-        arb_t x;
-        arf_t m, eps;
+        arb_t x, t;
+        arf_t eps;
         slong k;
 
         acb_mat_init(tau, g, g);
@@ -45,7 +45,7 @@ int main(void)
         d = _arb_vec_init(n);
         d0 = _arb_vec_init(n);
         arb_init(x);
-        arf_init(m);
+        arb_init(t);
         arf_init(eps);
 
         /* Generate distances, not too crazy */
@@ -72,28 +72,46 @@ int main(void)
         }
 
         acb_theta_agm_mul_tight(r, th0, th, d0, d, g, prec);
-        acb_theta_agm_rel_mag_err(m, eps, r, d, n, prec);
 
-        /* Test: m <= 1 and eps is not too small */
-        if (arf_cmp_si(m, 1) > 0 || arf_cmp_2exp_si(eps, -prec + delta) > 0)
+        for (k = 0; k < n; k++)
         {
-            flint_printf("FAIL\n");
-            flint_printf("g = %wd, prec = %wd, tau:\n", g, prec);
-            acb_mat_printd(tau, 5);
-            flint_printf("distances:\n");
-            _arb_vec_printd(d0, n, 5);
-            _arb_vec_printd(d, n, 5);
-            flint_printf("values:\n");
-            _acb_vec_printd(th0, n, 5);
-            _acb_vec_printd(th, n, 5);
-            flint_printf("result:\n");
-            _acb_vec_printd(r, n, 5);
-            flint_printf("m, eps: ");
-            arf_printd(m, 10);
-            flint_printf(", ");
-            arf_printd(eps, 10);
-            flint_printf("\n");
-            flint_abort();
+            acb_abs(x, &r[k], prec);
+            arb_neg(t, &d[k]);
+            arb_exp(t, t, prec);
+            if (arb_gt(x, t))
+            {
+                flint_printf("FAIL (absolute value, k = %wd)\n", k);
+                flint_printf("g = %wd, prec = %wd, tau:\n", g, prec);
+                acb_mat_printd(tau, 5);
+                flint_printf("distances:\n");
+                _arb_vec_printd(d0, n, 5);
+                _arb_vec_printd(d, n, 5);
+                flint_printf("values:\n");
+                _acb_vec_printd(th0, n, 5);
+                _acb_vec_printd(th, n, 5);
+                flint_printf("result:\n");
+                _acb_vec_printd(r, n, 5);
+                flint_abort();
+            }
+
+            acb_get_rad_ubound_arf(eps, &r[k], prec);
+            arb_set_arf(x, eps);
+            arb_mul_2exp_si(t, t, -prec + delta);
+            if (arb_gt(x, t))
+            {
+                flint_printf("FAIL (precision loss, k = %wd)\n", k);
+                flint_printf("g = %wd, prec = %wd, tau:\n", g, prec);
+                acb_mat_printd(tau, 5);
+                flint_printf("distances:\n");
+                _arb_vec_printd(d0, n, 5);
+                _arb_vec_printd(d, n, 5);
+                flint_printf("values:\n");
+                _acb_vec_printd(th0, n, 5);
+                _acb_vec_printd(th, n, 5);
+                flint_printf("result:\n");
+                _acb_vec_printd(r, n, 5);
+                flint_abort();
+            }
         }
 
         acb_mat_clear(tau);
@@ -104,7 +122,7 @@ int main(void)
         _arb_vec_clear(d, n);
         _arb_vec_clear(d0, n);
         arb_clear(x);
-        arf_clear(m);
+        arb_clear(t);
         arf_clear(eps);
     }
 
