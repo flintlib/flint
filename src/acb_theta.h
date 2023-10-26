@@ -266,6 +266,7 @@ void acb_theta_jet_fd_radius(arf_t eps, arf_t err, const arb_t c, const arb_t rh
     slong ord, slong g, slong prec);
 void acb_theta_jet_fd(acb_ptr dth, const arf_t eps, const arf_t err, acb_srcptr val,
     slong ord, slong g, slong prec);
+
 void acb_theta_jet_ql_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec);
 
 /* Transformation formulas */
@@ -275,11 +276,8 @@ void acb_theta_transform_sqrtdet(acb_t res, const acb_mat_t tau, slong prec);
 slong acb_theta_transform_kappa(acb_t sqrtdet, const fmpz_mat_t mat,
     const acb_mat_t tau, slong prec);
 slong acb_theta_transform_kappa2(const fmpz_mat_t mat);
-
 void acb_theta_transform_proj(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th,
     int sqr, slong prec);
-void acb_theta_transform(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th,
-    acb_srcptr z, const acb_mat_t tau, int sqr, slong prec);
 
 void acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec);
 void acb_theta_jet_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec);

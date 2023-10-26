@@ -1508,16 +1508,9 @@ where
     `\theta_{a,b}(z,\tau)` for some `(z,\tau)`, sets *res* to contain the
     values `\theta_{a,b}(\mathit{mat}\cdot (z,\tau))` up to a common scalar
     factor in `\mathbb{C}^\times`. This only permutes the theta values and
-    multiplies them by a suitable eighth root of unity. If *sqr* is nonzero
-    (true), does the same computation for squared theta values
+    multiplies them by a suitable `8^{\mathrm{th}}` root of unity. If *sqr* is
+    nonzero (true), does the same computation for squared theta values
     `\theta_{a,b}(z,\tau)^2` instead.
-
-.. function:: void acb_theta_transform(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec)
-
-    Assuming that *sqr* is 0 and that *th* contains `\theta_{a,b}(z,\tau)`,
-    sets *res* to vector of values `\theta_{a,b}(\mathit{mat}\cdot(z,\tau))`
-    for `a,b\in\{0,1\}^g`. If *sqr* is nonzero, does the same computation for
-    squared theta values instead.
 
     In :func:`acb_theta_all` and :func:`acb_theta_jet_all`, we first reduce
     `\tau` using :func:`acb_siegel_reduce`, then call :func:`acb_theta_ql_all`,

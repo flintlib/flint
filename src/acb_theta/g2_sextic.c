@@ -64,7 +64,7 @@ void acb_theta_g2_sextic(acb_poly_t res, const acb_mat_t tau, slong prec)
     }
     else
     {
-        acb_theta_jet_all(dth, z, w, 1, prec);
+        acb_theta_jet_ql_all(dth, z, w, 1, prec);
         acb_theta_g2_chim2_6(res, dth, prec);
     }
 

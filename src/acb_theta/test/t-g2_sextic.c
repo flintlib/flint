@@ -36,7 +36,7 @@ int main(void)
 
         if (iter % 20 == 0)
         {
-            prec += 10000;
+            prec += 1000;
         }
 
         acb_mat_init(tau, g, g);
