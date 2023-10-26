@@ -860,7 +860,7 @@ differentiated series:
     Y^{-1}y \rVert_\infty /\lVert C^{-1} \rVert_\infty`, and multiply *eps* by
     `\max\{1, 2\lVert C^{-1}\rVert\}^{\mathit{ord}}`.
 
-.. function:: void acb_theta_jet_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
+.. function:: void acb_theta_jet_naive_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
 
     Sets `E` and *u* so that summing over `E` yields derivatives of theta
     functions up to an error of at most *u*, ignoring leading factorials and

@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 void
-acb_theta_jet_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z,
+acb_theta_jet_naive_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z,
     const acb_mat_t tau, slong ord, slong prec)
 {
     slong g = acb_mat_nrows(tau);

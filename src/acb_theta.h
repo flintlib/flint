@@ -196,7 +196,7 @@ void acb_theta_jet_compose(acb_ptr res, acb_srcptr v, const acb_mat_t N,
 
 void acb_theta_jet_naive_radius(arf_t R2, arf_t eps, const arb_mat_t C, arb_srcptr v,
     slong ord, slong prec);
-void acb_theta_jet_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z,
+void acb_theta_jet_naive_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z,
     const acb_mat_t tau, slong ord, slong prec);
 
 void acb_theta_jet_naive_00(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,

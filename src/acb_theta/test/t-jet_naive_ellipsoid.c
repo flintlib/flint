@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("jet_ellipsoid....");
+    flint_printf("jet_naive_ellipsoid....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -57,7 +57,7 @@ int main(void)
         }
 
         /* Test: sum of terms on the border is less than u */
-        acb_theta_jet_ellipsoid(E, u, z, tau, ord, prec);
+        acb_theta_jet_naive_ellipsoid(E, u, z, tau, ord, prec);
         nb_pts = acb_theta_eld_nb_border(E);
         pts = flint_malloc(g * nb_pts * sizeof(slong));
         acb_theta_eld_border(pts, E);
@@ -94,7 +94,7 @@ int main(void)
         /* Test: indeterminate on phony tau */
         arb_randtest_positive(acb_imagref(acb_mat_entry(tau, 0, 0)), state, prec, bits);
         acb_neg(acb_mat_entry(tau, 0, 0), acb_mat_entry(tau, 0, 0));
-        acb_theta_jet_ellipsoid(E2, u, z, tau, ord, prec);
+        acb_theta_jet_naive_ellipsoid(E2, u, z, tau, ord, prec);
         if (arb_is_finite(u))
         {
             flint_printf("FAIL (not infinite)\n");
