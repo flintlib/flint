@@ -821,6 +821,16 @@ differentiated series:
     Returns *n* such that *tup* is the `n^{\mathrm{th}}` derivation tuple of
     length *g*.
 
+.. function:: void acb_theta_jet_mul(acb_ptr res, acb_srcptr v1, acb_srcptr v2, slong ord, slong g, slong prec)
+
+    Sets *res* to the vector of derivatives of the product `fg`, assuming that
+    *v1* and *v2* contains the derivatives of `f` and `g` respectively.
+
+.. function:: void acb_theta_jet_compose(acb_ptr res, acb_srcptr v, const acb_mat_t N, slong ord, slong prec)
+
+    Sets *res* to the vector of derivatives of the composition `f(Nz)`,
+    assuming that *v* contains the derivatives of *f* at the point `Nz`.
+
 .. function:: void acb_theta_jet_naive_radius(arf_t R2, arf_t eps, arb_srcptr v, const arb_mat_t C, slong ord, slong prec)
 
     Assuming that *C* is the upper-triangular Cholesky matrix for `\pi
@@ -1332,103 +1342,12 @@ probabilistic algorithm where we gradually increase *guard* and choose first `t
     After calling :func:`acb_theta_ql_reduce`, we use the duplication formula
     on the result of :func:`acb_theta_ql_a0` at `2\tau`.
 
-The transformation formula
--------------------------------------------------------------------------------
-
-The functions in this section implement the theta transformation formula of
-[Igu1972]_, p. 176 and [Mum1983]_, p. 189: for any symplectic matrix `m`, any
-`(z,\tau)\in \mathbb{C}^g\times \mathbb{H}_g`, and any characteristic `(a,b)`,
-we have
-
-    .. math ::
-
-        \theta_{a,b}(m\cdot(z,\tau)) = \kappa(m) \zeta_8^{e(m, a, b)} \det(\gamma\tau + \delta)^{1/2} \exp(\pi i z^T (\gamma\tau + \delta)^{-1} \gamma z) \theta_{a',b'}(z,\tau)
-
-where
-- `\gamma,\delta` are the lower `g\times g` blocks of `m`,
-- `a',b'` is another characteristic depending on `m,a,b`,
-- `\zeta_8=\exp(i\pi/4)`,
-- `e(m,a,b)` is an integer given by an explicit formula in terms of `m,a,b` (this is
-`\phi_m` in Igusa's notation), and
-- `\kappa(m)` is an eighth root of unity, only well-defined up to sign unless
-we choose a particular branch of `\det(gamma\tau + \delta)^{1/2}` on
-`\mathbb{H}_g`.
-
-.. function:: ulong acb_theta_transform_char(slong* e, const fmpz_mat_t mat, ulong ab)
-
-    Returns the theta characteristic `(a',b')` and sets *e* to `e(m,a,b)` in
-    the above formula.
-
-.. function:: void acb_theta_transform_sqrtdet(acb_t res, const acb_mat_t tau, slong prec)
-
-    Sets *res* to `det(\tau)^{1/2}`, where the branch of the square root is
-    chosen such that the result is `i^{g/2}\det(Y)` when `\tau = iY` is purely
-    imaginary.
-
-    We pick a purely imaginary matrix *A* and consider the polynomial `P(t) =
-    det(A + (t+1)/2 (tau - A))`. Up to choosing another `A`, we may assume that
-    it has degree `g` and that its roots (as complex balls) do not intersect
-    the segment `[-1,1]\subset \mathbb{C}`. We then find the correct branch of
-    `P(t)^{1/2}` between `t=-1` and `t=1` as in [MN2019]_.
-
-.. function:: slong acb_theta_transform_kappa(acb_t sqrtdet, const fmpz_mat_t mat, const acb_mat_t tau, slong prec)
-
-    Returns `0\leq r < 8` such that `\kappa(m) = \zeta_8^r` and sets *sqrtdet*
-    to the corresponding square root of `\det(\gamma\tau + \delta)`.
-
-    After applying :func:`sp2gz_decompose`, we only have to consider four
-    special cases for *mat*: the easy cases where *mat* is trigonal or
-    block-diagonal as one can compute its action on `\theta_{0,0}` explicitly;
-    the case where *mat* is an embedded matrix from
-    `\mathrm{SL}_2(\mathbb{Z})`, where we rely on
-    :func:`acb_modular_theta_transform`; and the case where *mat* is an
-    embedded `J` matrix from dimension `0\leq r\leq g`, in which case `kappa(m)
-    \zeta_8^{e(m,0,0)} i^{r/2} \det(\tau_0)^{1/2} = 1`, where `tau_0` is the
-    upper left `r\times r` submatrix of `\tau` and the square root is computed
-    as in :func:`acb_theta_transform_sqrtdet`.
-
-.. function:: slong acb_theta_transform_kappa2(const fmpz_mat_t mat)
-
-    Returns `0\leq r < 3` such that `\kappa(m)^2 = i^r`, which makes sense
-    without reference to a branch of `\det(\gamma\tau + \delta)^{1/2}`.
-
-    We adopt a similar strategy to `acb_theta_transform_kappa` but do not call
-    :func:`acb_theta_transform_sqrtdet`.
-
-.. function:: void acb_theta_transform_proj(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th, int sqr, slong prec)
-
-    Assuming that *sqr* is 0 (false) and that *th* contains
-    `\theta_{a,b}(z,\tau)` for some `(z,\tau)`, sets *res* to contain the
-    values `\theta_{a,b}(\mathit{mat}\cdot (z,\tau))` up to a common scalar
-    factor in `\mathbb{C}^\times`. This only permutes the theta values and
-    multiplies them by a suitable eighth root of unity. If *sqr* is nonzero
-    (true), does the same computation for squared theta values
-    `\theta_{a,b}(z,\tau)^2` instead.
-
-.. function:: void acb_theta_transform(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec)
-
-    Assuming that *sqr* is 0 and that *th* contains `\theta_{a,b}(z,\tau)`,
-    sets *res* to vector of values `\theta_{a,b}(\mathit{mat}\cdot(z,\tau))`
-    for `a,b\in\{0,1\}^g`. If *sqr* is nonzero, does the same computation for
-    squared theta values instead.
-
-.. function:: void acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec)
-
-    Sets *th* to the vector of theta values `\theta_{a,b}(z,\tau)` or
-    `\theta_{a,b}(z,\tau)^2` for `a,b\in \{0,1\}^g`, depending on whether *sqr*
-    is 0 (false) or nonzero (true).
-
-    We reduce `\tau` using :func:`acb_theta_siegel_reduce`, call
-    :func:`acb_theta_ql_all` or :func:`acb_theta_ql_all_sqr` on the reduced
-    matrix, and finally apply the transformation formula. If the reduction step
-    is not successful, we set *th* to indeterminate values.
-
 Quasi-linear algorithms for derivatives
 -------------------------------------------------------------------------------
 
-We implement an algorithm for derivatives of theta functions based on finite
-differences. It is quasi-linear in terms of the precision and the number of
-derivatives to be computed.
+We implement an algorithm for derivatives of theta functions on the reduced
+domain based on finite differences. It is quasi-linear in terms of the
+precision and the number of derivatives to be computed.
 
 Consider the Fourier expansion:
 
@@ -1519,7 +1438,7 @@ Since we divide by `\varepsilon^{|p|}` to get `a_p`, we will add an error of
     *val* corresponds to `n = (a_0,\ldots, a_{g-1})`. The output derivatives
     are normalized as in the Taylor expansion.
 
-.. function:: void acb_theta_jet_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
+.. function:: void acb_theta_jet_ql_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
 
     Sets *dth* to the derivatives of all functions `\theta_{a,b}` for `a,b\in
     \{0,1\}^g` at `(z,\tau)`, as a concatenation of `2^{2g}` vectors of length
@@ -1533,6 +1452,106 @@ Since we divide by `\varepsilon^{|p|}` to get `a_p`, we will add an error of
     `\varepsilon^{\mathit{ord}}\cdot (\mathit{ord}+1)^g`. Finally, we adjust
     the error bounds using :func:`acb_theta_jet_error_bounds` and the naive
     algorithm for derivatives of order `\mathit{ord} + 2`.
+
+The transformation formula
+-------------------------------------------------------------------------------
+
+The functions in this section implement the theta transformation formula of
+[Igu1972]_, p. 176 and [Mum1983]_, p. 189: for any symplectic matrix `m`, any
+`(z,\tau)\in \mathbb{C}^g\times \mathbb{H}_g`, and any characteristic `(a,b)`,
+we have
+
+    .. math ::
+
+        \theta_{a,b}(m\cdot(z,\tau)) = \kappa(m) \zeta_8^{e(m, a, b)} \det(\gamma\tau + \delta)^{1/2} \exp(\pi i z^T (\gamma\tau + \delta)^{-1} \gamma z) \theta_{a',b'}(z,\tau)
+
+where
+- `\gamma,\delta` are the lower `g\times g` blocks of `m`,
+- `a',b'` is another characteristic depending on `m,a,b`,
+- `\zeta_8=\exp(i\pi/4)`,
+- `e(m,a,b)` is an integer given by an explicit formula in terms of `m,a,b` (this is
+`\phi_m` in Igusa's notation), and
+- `\kappa(m)` is an eighth root of unity, only well-defined up to sign unless
+we choose a particular branch of `\det(gamma\tau + \delta)^{1/2}` on
+`\mathbb{H}_g`.
+
+.. function:: ulong acb_theta_transform_char(slong* e, const fmpz_mat_t mat, ulong ab)
+
+    Returns the theta characteristic `(a',b')` and sets *e* to `e(m,a,b)` in
+    the above formula.
+
+.. function:: void acb_theta_transform_sqrtdet(acb_t res, const acb_mat_t tau, slong prec)
+
+    Sets *res* to `det(\tau)^{1/2}`, where the branch of the square root is
+    chosen such that the result is `i^{g/2}\det(Y)` when `\tau = iY` is purely
+    imaginary.
+
+    We pick a purely imaginary matrix *A* and consider the polynomial `P(t) =
+    det(A + (t+1)/2 (tau - A))`. Up to choosing another `A`, we may assume that
+    it has degree `g` and that its roots (as complex balls) do not intersect
+    the segment `[-1,1]\subset \mathbb{C}`. We then find the correct branch of
+    `P(t)^{1/2}` between `t=-1` and `t=1` as in [MN2019]_.
+
+.. function:: slong acb_theta_transform_kappa(acb_t sqrtdet, const fmpz_mat_t mat, const acb_mat_t tau, slong prec)
+
+    Returns `0\leq r < 8` such that `\kappa(m) = \zeta_8^r` and sets *sqrtdet*
+    to the corresponding square root of `\det(\gamma\tau + \delta)`.
+
+    After applying :func:`sp2gz_decompose`, we only have to consider four
+    special cases for *mat*: the easy cases where *mat* is trigonal or
+    block-diagonal as one can compute its action on `\theta_{0,0}` explicitly;
+    the case where *mat* is an embedded matrix from
+    `\mathrm{SL}_2(\mathbb{Z})`, where we rely on
+    :func:`acb_modular_theta_transform`; and the case where *mat* is an
+    embedded `J` matrix from dimension `0\leq r\leq g`, in which case `kappa(m)
+    \zeta_8^{e(m,0,0)} i^{r/2} \det(\tau_0)^{1/2} = 1`, where `tau_0` is the
+    upper left `r\times r` submatrix of `\tau` and the square root is computed
+    as in :func:`acb_theta_transform_sqrtdet`.
+
+.. function:: slong acb_theta_transform_kappa2(const fmpz_mat_t mat)
+
+    Returns `0\leq r < 3` such that `\kappa(m)^2 = i^r`, which makes sense
+    without reference to a branch of `\det(\gamma\tau + \delta)^{1/2}`.
+
+    We adopt a similar strategy to :func:`acb_theta_transform_kappa` but do not
+    call :func:`acb_theta_transform_sqrtdet`.
+
+.. function:: void acb_theta_transform_proj(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th, int sqr, slong prec)
+
+    Assuming that *sqr* is 0 (false) and that *th* contains
+    `\theta_{a,b}(z,\tau)` for some `(z,\tau)`, sets *res* to contain the
+    values `\theta_{a,b}(\mathit{mat}\cdot (z,\tau))` up to a common scalar
+    factor in `\mathbb{C}^\times`. This only permutes the theta values and
+    multiplies them by a suitable eighth root of unity. If *sqr* is nonzero
+    (true), does the same computation for squared theta values
+    `\theta_{a,b}(z,\tau)^2` instead.
+
+.. function:: void acb_theta_transform(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec)
+
+    Assuming that *sqr* is 0 and that *th* contains `\theta_{a,b}(z,\tau)`,
+    sets *res* to vector of values `\theta_{a,b}(\mathit{mat}\cdot(z,\tau))`
+    for `a,b\in\{0,1\}^g`. If *sqr* is nonzero, does the same computation for
+    squared theta values instead.
+
+.. function:: void acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec)
+
+    Sets *th* to the vector of theta values `\theta_{a,b}(z,\tau)` or
+    `\theta_{a,b}(z,\tau)^2` for `a,b\in \{0,1\}^g`, depending on whether *sqr*
+    is 0 (false) or nonzero (true).
+
+    We reduce `\tau` using :func:`acb_theta_siegel_reduce`, call
+    :func:`acb_theta_ql_all` or :func:`acb_theta_ql_all_sqr` on the reduced
+    matrix, and finally apply the transformation formula. If the reduction step
+    is not successful, we set *th* to indeterminate values.
+
+.. function:: void acb_theta_jet_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
+
+    Sets *dth* to the derivatives of the theta functions `\theta_{a,b}` with respect to `z` at the point `(z,\tau)`, as a concatenation of `2^g` vectors.
+
+    We reduce `\tau` using :func:`acb_theta_siegel_reduce`, call
+    :func:`acb_theta_jet_ql_all` on the result, and finally differentiate the
+    transformation formula. If the reduction step is not successful, we set
+    *dth* to indeterminate values.
 
 Dimension 2 specifics
 -------------------------------------------------------------------------------
