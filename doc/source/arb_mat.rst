@@ -403,12 +403,6 @@ Vector arithmetic
 
     The underscore methods do not allow aliasing between *res* and *v*.
 
-.. function:: void arb_mat_bilinear_form(arb_t x, const arb_mat_t A, arb_srcptr v1, arb_srcptr v2, slong prec)
-
-    Sets *res* to the product `v_1^T A v_2`, where `v_1` and `v_2` are seen as
-    column vectors. The lengths of the vectors must match the dimensions of
-    *A*.
-
 Gaussian elimination and solving
 -------------------------------------------------------------------------------
 

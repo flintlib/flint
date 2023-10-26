@@ -21,13 +21,14 @@ acb_theta_jet_bounds_ci(arb_t c0, arb_t c1, arb_t c2, acb_srcptr z, const acb_ma
     slong g = acb_mat_nrows(tau);
     arb_mat_t Yinv;
     arb_mat_t cho;
-    arb_ptr y;
+    arb_ptr y, w;
     arb_t t, s;
     slong k, j;
 
     arb_mat_init(Yinv, g, g);
     arb_mat_init(cho, g, g);
     y = _arb_vec_init(g);
+    w = _arb_vec_init(g);
     arb_init(t);
     arb_init(s);
 
@@ -49,7 +50,8 @@ acb_theta_jet_bounds_ci(arb_t c0, arb_t c1, arb_t c2, acb_srcptr z, const acb_ma
     /* c1 is sqrt(\pi y Y^{-1} y) */
     arb_const_pi(t, lp);
     arb_mat_scalar_mul_arb(Yinv, Yinv, t, lp);
-    arb_mat_bilinear_form(c1, Yinv, y, y, lp);
+    arb_mat_vector_mul_col(w, Yinv, y, lp);
+    arb_dot(c1, NULL, 0, y, 1, w, 1, g, lp);
     arb_sqrt(c1, c1, lp);
 
     /* c2 is sqrt(max of \pi x Y^{-1} x where |x| \leq 1) */
@@ -72,6 +74,7 @@ acb_theta_jet_bounds_ci(arb_t c0, arb_t c1, arb_t c2, acb_srcptr z, const acb_ma
     arb_mat_clear(Yinv);
     arb_mat_clear(cho);
     _arb_vec_clear(y, g);
+    _arb_vec_clear(w, g);
     arb_clear(t);
     arb_clear(s);
 }

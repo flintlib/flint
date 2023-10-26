@@ -16,35 +16,25 @@ acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong* tup,
     slong* n, slong prec)
 {
     slong g = acb_mat_nrows(tau);
-    arb_ptr x, y, v;
-    arb_mat_t X, Y;
+    acb_ptr v, w;
     acb_t dot;
     fmpz_t m, t;
     slong k;
 
-    x = _arb_vec_init(g);
-    y = _arb_vec_init(g);
-    v = _arb_vec_init(g);
-    arb_mat_init(X, g, g);
-    arb_mat_init(Y, g, g);
+    v = _acb_vec_init(g);
+    w = _acb_vec_init(g);
     acb_init(dot);
     fmpz_init(m);
     fmpz_init(t);
 
-    _acb_vec_get_real(x, z, g);
-    _acb_vec_get_imag(y, z, g);
-    acb_mat_get_real(X, tau);
-    acb_mat_get_imag(Y, tau);
     for (k = 0; k < g; k++)
     {
-        arb_set_si(&v[k], n[k]);
+        acb_set_si(&v[k], n[k]);
     }
 
-    acb_zero(res);
-    arb_mat_bilinear_form(acb_realref(res), X, v, v, prec);
-    arb_mat_bilinear_form(acb_imagref(res), Y, v, v, prec);
-    arb_dot(acb_realref(dot), NULL, 0, v, 1, x, 1, g, prec);
-    arb_dot(acb_imagref(dot), NULL, 0, v, 1, y, 1, g, prec);
+    acb_mat_vector_mul_col(w, tau, v, prec);
+    acb_dot(res, NULL, 0, v, 1, w, 1, g, prec);
+    acb_dot(dot, NULL, 0, v, 1, z, 1, g, prec);
     acb_mul_2exp_si(dot, dot, 1);
     acb_add(res, res, dot, prec);
     acb_exp_pi_i(res, res, prec);
@@ -61,11 +51,8 @@ acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong* tup,
         acb_mul_fmpz(res, res, m, prec);
     }
 
-    _arb_vec_clear(x, g);
-    _arb_vec_clear(y, g);
-    _arb_vec_clear(v, g);
-    arb_mat_clear(X);
-    arb_mat_clear(Y);
+    _acb_vec_clear(v, g);
+    _acb_vec_clear(w, g);
     acb_clear(dot);
     fmpz_clear(m);
     fmpz_clear(t);
