@@ -124,7 +124,6 @@ typedef struct acb_theta_eld_struct acb_theta_eld_t[1];
 void acb_theta_eld_init(acb_theta_eld_t E, slong d, slong g);
 void acb_theta_eld_clear(acb_theta_eld_t E);
 
-void acb_theta_eld_interval(slong* min, slong* mid, slong* max, const arb_t ctr, const arf_t rad);
 void acb_theta_eld_cho(arb_mat_t C, const acb_mat_t tau, slong prec);
 void acb_theta_eld_fill(acb_theta_eld_t E, const arb_mat_t C, const arf_t R2, arb_srcptr v);
 void acb_theta_eld_points(slong* pts, const acb_theta_eld_t E);

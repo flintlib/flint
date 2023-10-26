@@ -22,6 +22,42 @@ slong_vec_max(slong * r, slong * v1, slong * v2, slong d)
 }
 
 static void
+acb_theta_eld_interval(slong* min, slong* mid, slong* max, const arb_t ctr, const arf_t rad)
+{
+    slong lp = ACB_THETA_LOW_PREC;
+    arb_t y;
+    arf_t b;
+
+    if (!arb_is_finite(ctr) || !arf_is_finite(rad))
+    {
+        flint_printf("acb_theta_eld_fill: Error (infinite values)\n");
+        arb_printd(ctr, 10);
+        flint_printf("\n");
+        arf_printd(rad, 10);
+        flint_printf("\n");
+        flint_abort();
+    }
+
+    arb_init(y);
+    arf_init(b);
+
+    *mid = arf_get_si(arb_midref(ctr), ARF_RND_NEAR);
+
+    arb_set_arf(y, rad);
+    arb_add(y, ctr, y, lp);
+    arb_get_ubound_arf(b, y, lp);
+    *max = arf_get_si(b, ARF_RND_FLOOR);
+
+    arb_set_arf(y, rad);
+    arb_sub(y, ctr, y, lp);
+    arb_get_lbound_arf(b, y, lp);
+    *min = arf_get_si(b, ARF_RND_CEIL);
+
+    arb_clear(y);
+    arf_clear(b);
+}
+
+static void
 acb_theta_eld_next_R2(arf_t next_R2, const arf_t R2, const arb_t gamma, const arb_t v, slong k)
 {
     slong lp = ACB_THETA_LOW_PREC;

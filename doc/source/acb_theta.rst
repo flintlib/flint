@@ -462,13 +462,6 @@ Ellipsoids: memory management and computations
 
     Clears *E* as well as any recursive data contained in it.
 
-.. function:: void acb_theta_eld_interval(slong* min, slong* mid, slong* max, const arb_t ctr, const arf_t rad)
-
-    Computes the minimum, midpoint, and maximum of a subinterval of
-    `\mathbb{Z}` that is guaranteed to contain all points within a distance
-    *rad* of the real number *ctr*. Both *ctr* and *rad* must be finite and the
-    result must fit in :type:`slong`'s, otherwise an error is thrown.
-
 .. function:: void acb_theta_eld_cho(arb_mat_t C, const acb_mat_t tau, slong prec)
 
     Sets *C* to an upper-triangular Cholesky matrix such that `\pi
