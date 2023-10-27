@@ -120,20 +120,22 @@ acb_theta_naive_reduce_one(arb_ptr v, acb_ptr new_z, acb_t c, arb_t u,
 
 void
 acb_theta_naive_reduce(arb_ptr v, acb_ptr new_zs, acb_ptr cs, arb_ptr us,
-    acb_srcptr zs, slong nb, const acb_mat_t tau, const arb_mat_t C, slong prec)
+    acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
-    arb_mat_t X, Y, Yinv;
+    arb_mat_t X, Y, C, Yinv;
     arb_ptr v1;
     slong k;
 
     arb_mat_init(X, g, g);
     arb_mat_init(Y, g, g);
+    arb_mat_init(C, g, g);
     arb_mat_init(Yinv, g, g);
     v1 = _arb_vec_init(g);
 
     acb_mat_get_real(X, tau);
     acb_mat_get_imag(Y, tau);
+    acb_siegel_cho(C, tau, prec);
     acb_siegel_yinv(Yinv, tau, prec);
 
     for (k = 0; k < nb; k++)
@@ -152,6 +154,7 @@ acb_theta_naive_reduce(arb_ptr v, acb_ptr new_zs, acb_ptr cs, arb_ptr us,
 
     arb_mat_clear(X);
     arb_mat_clear(Y);
+    arb_mat_clear(C);
     arb_mat_clear(Yinv);
     _arb_vec_clear(v1, g);
 }

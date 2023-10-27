@@ -35,7 +35,7 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong* n1, acb_srcptr
 
     acb_siegel_cho(C, tau, prec);
     acb_theta_naive_radius(R2, eps, C, 0, prec);
-    acb_theta_naive_reduce(v, new_z, c, u, z, 1, tau, C, prec);
+    acb_theta_naive_reduce(v, new_z, c, u, z, 1, tau, prec);
     arb_mul_arf(u, u, eps, prec);
 
     arb_set_arf(b, R2);

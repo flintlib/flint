@@ -62,7 +62,7 @@ int main(void)
         {
             arb_randtest_precise(acb_realref(&z[k]), state, prec, bits);
         }
-        acb_theta_naive_reduce(v, new_z, c, u, z, nbz, tau, C, prec);
+        acb_theta_naive_reduce(v, new_z, c, u, z, nbz, tau, prec);
 
         res = 1;
         for (k = 0; k < nbz; k++)
@@ -100,7 +100,7 @@ int main(void)
                 arb_sub(acb_imagref(&z[j]), acb_imagref(&z[j]), &w[j], prec);
             }
         }
-        acb_theta_naive_reduce(v, new_z, c, u, z, nbz, tau, C, prec);
+        acb_theta_naive_reduce(v, new_z, c, u, z, nbz, tau, prec);
 
         for (k = 0; k < nbz; k++)
         {

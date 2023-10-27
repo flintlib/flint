@@ -608,7 +608,7 @@ directly.
     `2^{-\mathit{prec}}` if no cancellations occur in the sum, i.e.
     `\mathit{eps} \simeq 2^{-\mathit{prec}} \prod_{j=0}^{g-1} (1 + \gamma_j^{-1})`.
 
-.. function:: void acb_theta_naive_reduce(arb_ptr v, acb_ptr new_zs, acb_ptr cs, arb_ptr us, acb_srcptr zs, slong nb, const acb_mat_t tau, const arb_mat_t C, slong prec)
+.. function:: void acb_theta_naive_reduce(arb_ptr v, acb_ptr new_zs, acb_ptr cs, arb_ptr us, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 
     Performs the simultaneous reductions of the *nb* vectors stored in `zs`
     with respect to the matrix `\tau`. This means the following. Let `0\leq k<

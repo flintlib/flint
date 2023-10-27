@@ -32,7 +32,7 @@ acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr new_zs, acb_ptr cs, arb_ptr
 
     /* Get radius, fill ellipsoid */
     acb_theta_naive_radius(R2, eps, C, 0, prec);
-    acb_theta_naive_reduce(v, new_zs, cs, us, zs, nb, tau, C, prec);
+    acb_theta_naive_reduce(v, new_zs, cs, us, zs, nb, tau, prec);
     for (k = 0; k < nb; k++)
     {
         arb_mul_arf(&us[k], &us[k], eps, prec);
