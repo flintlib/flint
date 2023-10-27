@@ -224,7 +224,6 @@ void acb_theta_agm_mul(acb_ptr res, acb_srcptr a1, acb_srcptr a2, slong g, slong
 void acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
     arb_srcptr d0, arb_srcptr d, slong g, slong prec);
 
-slong acb_theta_ql_nb_steps(const arb_mat_t C, slong s, slong prec);
 int acb_theta_ql_roots(acb_ptr rts, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
     arb_srcptr d, const acb_mat_t tau, slong nb_steps, slong guard, slong prec);
 void acb_theta_ql_step_1(acb_ptr res, acb_srcptr th0, acb_srcptr th,

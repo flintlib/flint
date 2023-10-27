@@ -1086,15 +1086,6 @@ domain and the eigenvalues of `\mathrm{Im}(\tau)` are not too large, say in
     is at most `\mathrm{Dist}_\tau(-Y^{-1}y, \mathbb{Z}^g + \tfrac{k}{2})^2` by
     the parallelogram identity.
 
-.. function:: slong acb_theta_ql_nb_steps(const arb_mat_t C, slong s, slong prec)
-
-    Returns an integer `n` such that `2^n \gamma_s^2 \simeq \mathit{prec}`
-    where `\gamma_0,\ldots,\gamma_{g-1}` denote the diagonal coefficients of
-    `C`. This `n` is meant to be the number of AGM steps to use in the
-    quasi-linear algorithm for computing `\theta_{a,0}` (before applying the
-    splitting strategy, in the case `s > 0`). The precise value of `n` is
-    chosen to optimize performance.
-
 .. function:: int acb_theta_ql_roots(acb_ptr rts, acb_srcptr t, acb_srcptr z, arb_srcptr d0, arb_srcptr d, const acb_mat_t tau, slong nb_steps, slong guard, slong prec)
 
     Attempts to set *rts* to the collection of low-precision roots for the
