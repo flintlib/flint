@@ -15,20 +15,25 @@ static void
 acb_theta_naive_round(arb_ptr a, arb_srcptr v, slong g)
 {
     slong j;
+    fmpz_t m;
+
+    fmpz_init(m);
 
     for (j = 0; j < g; j++)
     {
-        if (!arb_is_finite(&v[j])
-            || arf_cmpabs_ui(arb_midref(&v[j]), WORD_MAX) > 0)
+        if (arb_is_finite(&v[j])
+            && arf_cmpabs_2exp_si(arb_midref(&v[j]), 1000000) <= 0)
         {
-            flint_printf("acb_theta_naive_reduce: Error (impossible rounding)\n");
-            arb_printd(&v[j], 10);
-            flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
+            arf_get_fmpz(m, arb_midref(&v[j]), ARF_RND_NEAR);
+            arb_set_fmpz(&a[j], m);
         }
-        arb_set_si(&a[j], arf_get_si(arb_midref(&v[j]), ARF_RND_NEAR));
+        else
+        {
+            arb_zero(&a[j]);
+        }
     }
+
+    fmpz_clear(m);
 }
 
 static void

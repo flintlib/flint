@@ -610,11 +610,12 @@ directly.
 .. function:: void acb_theta_naive_reduce(arb_ptr v, acb_ptr new_zs, acb_ptr cs, arb_ptr us, acb_srcptr zs, slong nb, const acb_mat_t tau, const arb_mat_t C, slong prec)
 
     Performs the simultaneous reductions of the *nb* vectors stored in `zs`
-    with respect to the matrix `\tau`. This means the following. Let
-    `0\leq k< \mathit{nb}`, let `z` denote the `k^{\mathrm{th}}` vector stored
-    in *zs*, and let `X,Y` (resp. `x,y`) be the real and imaginary parts of `\tau`
+    with respect to the matrix `\tau`. This means the following. Let `0\leq k<
+    \mathit{nb}`, let `z` denote the `k^{\mathrm{th}}` vector stored in *zs*,
+    and let `X,Y` (resp. `x,y`) be the real and imaginary parts of `\tau`
     (resp. `z`). Write `Y^{-1}y = r + a` where `a` is an even integral vector
-    and `r` is bounded. Then
+    and `r` is bounded. (We set `a=0` instead if the entries of this vector
+    have an unreasonably large magnitude.) Then
 
         .. math ::
 
