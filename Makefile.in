@@ -83,7 +83,7 @@ LIBS:=@LIBS@
 ifneq ($(WANT_NTL), 0)
 LIBS += -lstdc++ -lntl
 endif
-LIBS2:=$(LIBS) -lflint
+LIBS2:=-lflint $(LIBS)
 PIC_FLAG:=@PIC_FLAG@
 
 LDFLAGS:=@LDFLAGS@
