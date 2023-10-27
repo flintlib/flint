@@ -138,7 +138,6 @@ acb_theta_jet_naive_all_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
     acb_mat_scalar_mul_2exp_si(new_tau, tau, -2);
 
     acb_theta_jet_naive_ellipsoid(E, u, new_z, new_tau, ord, prec);
-    prec = acb_theta_naive_fullprec(E, prec);
     acb_theta_precomp_set(D, new_z, new_tau, E, prec);
     acb_one(c);
 

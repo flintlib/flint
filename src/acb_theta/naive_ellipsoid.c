@@ -21,6 +21,7 @@ acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr new_zs, acb_ptr cs, arb_ptr
     arb_mat_t C;
     arb_ptr v;
     slong k;
+    int b;
 
     arf_init(R2);
     arf_init(eps);
@@ -29,25 +30,16 @@ acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr new_zs, acb_ptr cs, arb_ptr
 
     acb_siegel_cho(C, tau, prec);
 
-    if (arb_mat_is_finite(C))
+    /* Get radius, fill ellipsoid */
+    acb_theta_naive_radius(R2, eps, C, 0, prec);
+    acb_theta_naive_reduce(v, new_zs, cs, us, zs, nb, tau, C, prec);
+    for (k = 0; k < nb; k++)
     {
-        /* Get radius, fill ellipsoid */
-        acb_theta_naive_radius(R2, eps, C, 0, prec);
-
-        acb_theta_naive_reduce(v, new_zs, cs, us, zs, nb, tau, C, prec);
-        for (k = 0; k < nb; k++)
-        {
-            arb_mul_arf(&us[k], &us[k], eps, prec);
-        }
-        acb_theta_eld_fill(E, C, R2, v);
+        arb_mul_arf(&us[k], &us[k], eps, prec);
     }
-    else
+    b = acb_theta_eld_set(E, C, R2, v);
+    if (!b)
     {
-        /* Cannot compute C, result will be nan */
-        _acb_vec_zero(new_zs, nb);
-        arb_mat_one(C);
-        arf_zero(R2);
-        acb_theta_eld_fill(E, C, R2, v);
         for (k = 0; k < nb; k++)
         {
             acb_indeterminate(&cs[k]);

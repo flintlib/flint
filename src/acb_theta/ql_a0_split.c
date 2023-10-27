@@ -11,7 +11,7 @@
 
 #include "acb_theta.h"
 
-static void
+static int
 acb_theta_ql_a0_eld_points(slong** pts, slong* nb_pts, arb_ptr v,
     slong* fullprec, arf_t eps, arb_srcptr d, ulong a, arb_srcptr nctr,
     const arb_mat_t C, const arb_mat_t C1, slong prec)
@@ -25,6 +25,7 @@ acb_theta_ql_a0_eld_points(slong** pts, slong* nb_pts, arb_ptr v,
     arf_t R2;
     acb_theta_eld_t E;
     slong k;
+    int res;
 
     acb_theta_eld_init(E, g - s, g - s);
     arf_init(R2);
@@ -45,14 +46,22 @@ acb_theta_ql_a0_eld_points(slong** pts, slong* nb_pts, arb_ptr v,
     acb_theta_naive_radius(R2, eps, C, 0, *fullprec);
 
     /* List points in ellipsoid */
-    acb_theta_eld_fill(E, C1, R2, v);
-    *nb_pts = acb_theta_eld_nb_pts(E);
-    *pts = flint_malloc(acb_theta_eld_nb_pts(E) * (g - s) * sizeof(slong));
-    acb_theta_eld_points(*pts, E);
+    res = acb_theta_eld_set(E, C1, R2, v);
+    if (res)
+    {
+        *nb_pts = acb_theta_eld_nb_pts(E);
+        *pts = flint_malloc(acb_theta_eld_nb_pts(E) * (g - s) * sizeof(slong));
+        acb_theta_eld_points(*pts, E);
+    }
+    else
+    {
+        *pts = flint_malloc(0);
+    }
 
     acb_theta_eld_clear(E);
     arf_clear(R2);
     arb_init(max_d);
+    return res;
 }
 
 static int
@@ -200,10 +209,10 @@ acb_theta_ql_a0_split(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d,
     arb_mat_vector_mul_col(w, Yinv, w, prec);
 
     _acb_vec_zero(th, n * nbt);
-    for (a = 0; a < nba; a++)
+    for (a = 0; (a < nba) && res; a++)
     {
         /* Get offset, fullprec, error and list of points in ellipsoid */
-        acb_theta_ql_a0_eld_points(&pts, &nb_pts, v, &fullprec, eps,
+        res = acb_theta_ql_a0_eld_points(&pts, &nb_pts, v, &fullprec, eps,
             d, a, w, C, C1, prec);
 
         /* Sum terms at each point using worker */

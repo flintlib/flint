@@ -416,7 +416,7 @@ has been initialized using :func:`acb_theta_eld_init` below.
     Macro returning `g`.
 
 The following macros are available after *E* has been initialized and then
-computed using :func:`acb_theta_eld_fill` below.
+computed using :func:`acb_theta_eld_set` below.
 
 .. macro:: acb_theta_eld_coord(E, k)
 
@@ -475,15 +475,16 @@ Ellipsoids: memory management and computations
 
     Clears *E* as well as any recursive data contained in it.
 
-.. function:: void acb_theta_eld_fill(acb_theta_eld_t E, const arb_mat_t C, const arf_t R2, arb_srcptr v)
+.. function:: int acb_theta_eld_set(acb_theta_eld_t E, const arb_mat_t C, const arf_t R2, arb_srcptr v)
 
-    Sets *E* to represent an ellipsoid as defined above, where *R2* indicates
-    `R^2`. The matrix *C* must be an upper-triangular matrix with positive
-    diagonal entries, *R2* must be finite, and the coordinate of ellipsoid
-    points must fit in :type:`slong`'s, otherwise an error is thrown.
+    Assuming that *C* is upper-triangular with positive diagonal entries,
+    attempts to set *E* to represent an ellipsoid as defined above, where *R2*
+    indicates `R^2`, and returns 1 upon success. If the ellipsoid points do not
+    fit in :type:`slong`'s or if the ellipsoid is unreasonably large, returns 0
+    instead and leaves *E* undefined.
 
-The following functions are available after :func:`acb_theta_eld_fill` has been
-called.
+The following functions are available after :func:`acb_theta_eld_set` has been
+called successfully.
 
 .. function:: void acb_theta_eld_points(slong* pts, const acb_theta_eld_t E)
 
@@ -654,12 +655,6 @@ directly.
 
     Unless cancellations occur in the sum, we expect the relative precision of
     the resulting theta values to be roughly *prec*.
-
-.. function:: slong acb_theta_naive_fullprec(const acb_theta_eld_t E, slong prec)
-
-    Returns a good choice of full precision for the summation phase when
-    working at precision *prec*, which is at least `\mathit{prec} + \log_2(n)`
-    where `n` is the number of points contained in `E`.
 
 .. function:: void acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong* tup, slong* n, slong prec)
 

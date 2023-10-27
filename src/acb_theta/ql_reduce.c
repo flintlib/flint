@@ -24,6 +24,7 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong* n1, acb_srcptr
     arf_t R2, eps;
     arb_t b;
     slong s, k;
+    int r;
 
     arb_mat_init(C, g, g);
     v = _arb_vec_init(g);
@@ -33,33 +34,23 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong* n1, acb_srcptr
     arb_init(b);
 
     acb_siegel_cho(C, tau, prec);
+    acb_theta_naive_radius(R2, eps, C, 0, prec);
+    acb_theta_naive_reduce(v, new_z, c, u, z, 1, tau, C, prec);
+    arb_mul_arf(u, u, eps, prec);
 
-    if (arb_mat_is_finite(C))
+    arb_set_arf(b, R2);
+    arb_sqrt(b, b, prec);
+    arb_mul_2exp_si(b, b, 1);
+
+    for (s = g; s > 0; s--)
     {
-        acb_theta_naive_radius(R2, eps, C, 0, prec);
-        acb_theta_naive_reduce(v, new_z, c, u, z, 1, tau, C, prec);
-        arb_mul_arf(u, u, eps, prec);
-
-        arb_set_arf(b, R2);
-        arb_sqrt(b, b, prec);
-        arb_mul_2exp_si(b, b, 1);
-
-        for (s = g; s > 0; s--)
+        if (!arb_gt(arb_mat_entry(C, s - 1, s - 1), b))
         {
-            if (!arb_gt(arb_mat_entry(C, s - 1, s - 1), b))
-            {
-                break;
-            }
+            break;
         }
     }
-    else
-    {
-        acb_indeterminate(c);
-        arb_pos_inf(u);
-        s = -1;
-    }
 
-    if ((s < g) && arb_mat_is_finite(C))
+    if (s < g)
     {
         /* Construct ellipsoid */
         acb_theta_eld_init(E, g - s, g - s);
@@ -71,9 +62,15 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong* n1, acb_srcptr
         w = _acb_vec_init(g);
 
         arb_mat_scalar_mul_2exp_si(C1, C1, -1);
-        acb_theta_eld_fill(E, C1, R2, v + s);
+        r = acb_theta_eld_set(E, C1, R2, v + s);
 
-        if (acb_theta_eld_nb_pts(E) == 0)
+        if (r == 0)
+        {
+            s = -1;
+            acb_indeterminate(c);
+            arb_pos_inf(u);
+        }
+        else if (acb_theta_eld_nb_pts(E) == 0)
         {
             s = -1;
         }

@@ -43,7 +43,6 @@ acb_theta_naive_00_gen(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     new_zs = _acb_vec_init(g * nb);
 
     acb_theta_naive_ellipsoid(E, new_zs, cs, us, zs, nb, tau, prec);
-    prec = acb_theta_naive_fullprec(E, prec);
     acb_theta_precomp_set(D, new_zs, tau, E, prec);
 
     for (k = 0; k < nb; k++)

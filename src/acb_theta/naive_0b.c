@@ -79,12 +79,20 @@ acb_theta_naive_0b_gen(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     new_zs = _acb_vec_init(nb * g);
 
     acb_theta_naive_ellipsoid(E, new_zs, cs, us, zs, nb, tau, prec);
-    prec = acb_theta_naive_fullprec(E, prec);
-    acb_theta_precomp_set(D, new_zs, tau, E, prec);
-
-    for (k = 0; k < nb; k++)
+    if (arb_is_finite(&us[0]))
     {
-        acb_theta_naive_worker(th + k * len, len, &cs[k], &us[k], E, D, k, 0, prec, worker);
+        acb_theta_precomp_set(D, new_zs, tau, E, prec);
+        for (k = 0; k < nb; k++)
+        {
+            acb_theta_naive_worker(th + k * len, len, &cs[k], &us[k], E, D, k, 0, prec, worker);
+        }
+    }
+    else
+    {
+        for (k = 0; k < nb * len; k++)
+        {
+            acb_indeterminate(&th[k]);
+        }
     }
 
     acb_theta_eld_clear(E);

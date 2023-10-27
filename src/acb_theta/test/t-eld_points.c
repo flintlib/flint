@@ -62,7 +62,13 @@ int main(void)
             arb_randtest_precise(&v[k], state, prec, mag_bits);
         }
 
-        acb_theta_eld_fill(E, C, R2, v);
+        res = acb_theta_eld_set(E, C, R2, v);
+        if (!res)
+        {
+            flint_printf("FAIL (ellipsoid)\n");
+            flint_abort();
+        }
+
         all_pts = flint_malloc(acb_theta_eld_nb_pts(E) * g * sizeof(slong));
         acb_theta_eld_points(all_pts, E);
 

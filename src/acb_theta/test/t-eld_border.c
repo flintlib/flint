@@ -35,6 +35,7 @@ int main(void)
         arb_ptr v;
         slong k, j;
         slong *all_pts;
+        int r;
 
         acb_theta_eld_init(E, g, g);
         arb_mat_init(C, g, g);
@@ -52,7 +53,13 @@ int main(void)
             arb_randtest_precise(&v[k], state, prec, mag_bits);
         }
 
-        acb_theta_eld_fill(E, C, R2, v);
+        r = acb_theta_eld_set(E, C, R2, v);
+        if (!r)
+        {
+            flint_printf("FAIL (ellipsoid)\n");
+            flint_abort();
+        }
+
         all_pts = flint_malloc(acb_theta_eld_nb_border(E) * g * sizeof(slong));
         acb_theta_eld_border(all_pts, E);
 
@@ -89,8 +96,8 @@ int main(void)
         arb_mat_clear(C);
         arf_clear(R2);
         _arb_vec_clear(v, g);
-        flint_free(all_pts);
         arb_clear(x);
+        flint_free(all_pts);
     }
 
     flint_randclear(state);

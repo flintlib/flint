@@ -60,7 +60,12 @@ int main(void)
         {
             arb_randtest_precise(&v[k], state, prec, mag_bits);
         }
-        acb_theta_eld_fill(E, C, R2, v);
+        res = acb_theta_eld_set(E, C, R2, v);
+        if (!res)
+        {
+            flint_printf("FAIL (ellipsoid)\n");
+            flint_abort();
+        }
         acb_mat_zero(tau);
 
         acb_theta_precomp_set(D, zs, tau, E, prec);

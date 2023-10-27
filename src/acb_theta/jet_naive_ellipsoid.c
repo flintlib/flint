@@ -19,6 +19,7 @@ acb_theta_jet_naive_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z,
     arf_t R2, eps;
     arb_mat_t C, Yinv;
     arb_ptr v;
+    int b;
 
     arf_init(R2);
     arf_init(eps);
@@ -29,29 +30,22 @@ acb_theta_jet_naive_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z,
     acb_siegel_yinv(Yinv, tau, prec);
     acb_siegel_cho(C, tau, prec);
 
-    if (arb_mat_is_finite(C) && arb_mat_is_finite(Yinv))
-    {
-        /* Get offset and bound on leading factor */
-        _acb_vec_get_imag(v, z, g);
-        arb_mat_vector_mul_col(v, Yinv, v, prec);
-        arb_mat_vector_mul_col(v, C, v, prec);
-        arb_zero(u);
-        arb_dot(u, u, 0, v, 1, v, 1, g, prec);
-        arb_exp(u, u, prec);
+    /* Get offset and bound on leading factor */
+    _acb_vec_get_imag(v, z, g);
+    arb_mat_vector_mul_col(v, Yinv, v, prec);
+    arb_mat_vector_mul_col(v, C, v, prec);
+    arb_zero(u);
+    arb_dot(u, u, 0, v, 1, v, 1, g, prec);
+    arb_exp(u, u, prec);
 
-        /* Get radius, fill ellipsoid */
-        acb_theta_jet_naive_radius(R2, eps, C, v, ord, prec);
-        acb_theta_eld_fill(E, C, R2, v);
-        arb_mul_arf(u, u, eps, prec);
-    }
-    else
+    /* Get radius, fill ellipsoid */
+    acb_theta_jet_naive_radius(R2, eps, C, v, ord, prec);
+    b = acb_theta_eld_set(E, C, R2, v);
+    if (!b)
     {
-        /* Cannot compute C, result will be nan */
-        arb_mat_one(C);
-        arf_zero(R2);
-        acb_theta_eld_fill(E, C, R2, v);
-        arb_indeterminate(u);
+        arb_pos_inf(u);
     }
+    arb_mul_arf(u, u, eps, prec);
 
     arf_clear(R2);
     arf_clear(eps);

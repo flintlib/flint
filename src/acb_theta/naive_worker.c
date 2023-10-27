@@ -11,6 +11,14 @@
 
 #include "acb_theta.h"
 
+static slong
+acb_theta_naive_fullprec(const acb_theta_eld_t E, slong prec)
+{
+    return prec + FLINT_MAX(prec + ceil(n_flog(1 + acb_theta_eld_nb_pts(E), 2)),
+        ACB_THETA_LOW_PREC);
+}
+
+
 ACB_INLINE slong
 acb_theta_naive_newprec(slong prec, slong coord, slong dist, slong max_dist, slong ord)
 {
@@ -225,6 +233,7 @@ acb_theta_naive_worker(acb_ptr th, slong len, const acb_t c, const arb_t u,
     slong ord, slong prec, acb_theta_naive_worker_t worker)
 {
     slong g = acb_theta_eld_ambient_dim(E);
+    slong fullprec = acb_theta_naive_fullprec(E, prec);
     slong width = 0;
     acb_mat_t lin_powers;
     acb_ptr v1, v2;
@@ -253,7 +262,7 @@ acb_theta_naive_worker(acb_ptr th, slong len, const acb_t c, const arb_t u,
 
     acb_theta_naive_worker_rec(th, v1, v2, precs,
         lin_powers, E, D, acb_theta_precomp_exp_z(D, k, 0),
-        cofactor, ord, prec, prec, worker);
+        cofactor, ord, fullprec, fullprec, worker);
 
     for (j = 0; j < len; j++)
     {

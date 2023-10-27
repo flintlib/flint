@@ -127,7 +127,7 @@ typedef struct acb_theta_eld_struct acb_theta_eld_t[1];
 void acb_theta_eld_init(acb_theta_eld_t E, slong d, slong g);
 void acb_theta_eld_clear(acb_theta_eld_t E);
 
-void acb_theta_eld_fill(acb_theta_eld_t E, const arb_mat_t C, const arf_t R2, arb_srcptr v);
+int acb_theta_eld_set(acb_theta_eld_t E, const arb_mat_t C, const arf_t R2, arb_srcptr v);
 void acb_theta_eld_points(slong* pts, const acb_theta_eld_t E);
 void acb_theta_eld_border(slong* pts, const acb_theta_eld_t E);
 int acb_theta_eld_contains(const acb_theta_eld_t E, slong* pt);
@@ -164,7 +164,6 @@ void acb_theta_naive_reduce(arb_ptr v, acb_ptr new_zs, acb_ptr cs, arb_ptr us,
     acb_srcptr zs, slong nb, const acb_mat_t tau, const arb_mat_t C, slong prec);
 void acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr new_zs, acb_ptr cs,
     arb_ptr us, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec);
-slong acb_theta_naive_fullprec(const acb_theta_eld_t E, slong prec);
 void acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong* tup,
     slong* n, slong prec);
 

@@ -55,6 +55,15 @@ acb_theta_naive_reduce_one(arb_ptr v, acb_ptr new_z, acb_t c, arb_t u,
     slong g = arb_mat_nrows(X);
     arb_ptr x, y, a, t, r, new_x, new_y;
 
+    if (!arb_mat_is_finite(C))
+    {
+        acb_indeterminate(c);
+        arb_pos_inf(u);
+        _arb_vec_indeterminate(v, g);
+        _acb_vec_indeterminate(new_z, g);
+        return;
+    }
+
     x = _arb_vec_init(g);
     y = _arb_vec_init(g);
     a = _arb_vec_init(g);
