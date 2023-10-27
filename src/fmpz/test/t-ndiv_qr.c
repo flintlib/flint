@@ -78,7 +78,8 @@ main(void)
         fmpz_addmul(tmp, b, nquo);
         result = ( fmpz_cmp(tmp, a) == 0
                 && fmpz_cmpabs(nrem, frem) <= 0
-                && fmpz_cmpabs(nrem, crem) <= 0);
+                && fmpz_cmpabs(nrem, crem) <= 0)
+                && _fmpz_is_canonical(nquo) && _fmpz_is_canonical(nrem);
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -147,7 +148,8 @@ main(void)
         fmpz_addmul(tmp, b, nquo);
         result = ( fmpz_cmp(tmp, a) == 0
                 && fmpz_cmp(nquo, tquo) == 0
-                && fmpz_cmp(nrem, trem) == 0);
+                && fmpz_cmp(nrem, trem) == 0)
+                && _fmpz_is_canonical(nquo) && _fmpz_is_canonical(nrem);
         if (!result)
         {
             flint_printf("FAIL:\n");

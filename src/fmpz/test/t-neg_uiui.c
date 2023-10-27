@@ -20,7 +20,6 @@ main(void)
 
     FLINT_TEST_INIT(state);
 
-
     flint_printf("neg_uiui....");
     fflush(stdout);
 
@@ -42,7 +41,7 @@ main(void)
 
         fmpz_neg_uiui(b, hi, lo);
 
-        result = fmpz_equal(a, b);
+        result = fmpz_equal(a, b) && _fmpz_is_canonical(b);
         if (!result)
         {
             flint_printf("FAIL:\n");

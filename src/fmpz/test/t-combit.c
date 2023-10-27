@@ -23,8 +23,6 @@ main(void)
     flint_printf("combit....");
     fflush(stdout);
 
-
-
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         ulong j;
@@ -43,7 +41,7 @@ main(void)
         mpz_combit(b, j);
         fmpz_get_mpz(c, a);
 
-        result = (mpz_cmp(b, c) == 0);
+        result = (mpz_cmp(b, c) == 0) && _fmpz_is_canonical(a);
 
         if (!result)
         {

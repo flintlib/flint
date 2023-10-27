@@ -23,13 +23,12 @@ main(void)
     flint_printf("sqrtrem....");
     fflush(stdout);
 
-
-
     /* Comparison with mpz routines */
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t f, r, g;
         mpz_t mf, mf2, mr, mg;
+        int aliasing;
 
         fmpz_init(f);
         fmpz_init(r);
@@ -44,12 +43,28 @@ main(void)
         fmpz_abs(g, g);
         fmpz_get_mpz(mg, g);
 
-        fmpz_sqrtrem(f, r, g);
+        aliasing = n_randint(state, 3);
+
+        if (aliasing == 0)
+        {
+            fmpz_sqrtrem(f, r, g);
+        }
+        else if (aliasing == 1)
+        {
+            fmpz_set(f, g);
+            fmpz_sqrtrem(f, r, f);
+        }
+        else
+        {
+            fmpz_set(r, g);
+            fmpz_sqrtrem(f, r, r);
+        }
+
         mpz_sqrtrem(mf, mr, mg);
 
         fmpz_get_mpz(mf2, f);
 
-        result = (mpz_cmp(mf2, mf) == 0);
+        result = (mpz_cmp(mf2, mf) == 0) && _fmpz_is_canonical(f) && _fmpz_is_canonical(r);
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -67,84 +82,6 @@ main(void)
         mpz_clear(mf2);
         mpz_clear(mr);
         mpz_clear(mg);
-    }
-
-    /* Check aliasing of r and g */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-    {
-        fmpz_t a, f;
-        mpz_t ma, mf, mf2;
-
-        fmpz_init(a);
-        fmpz_init(f);
-
-        mpz_init(ma);
-        mpz_init(mf);
-        mpz_init(mf2);
-
-        fmpz_randtest(a, state, 200);
-        fmpz_abs(a, a);
-        fmpz_get_mpz(ma, a);
-
-        fmpz_sqrtrem(f, a, a);
-        mpz_sqrtrem(mf, ma, ma);
-
-        fmpz_get_mpz(mf2, f);
-
-        result = (mpz_cmp(mf, mf2) == 0);
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            gmp_printf("ma = %Zd, mf = %Zd, mf2 = %Zd\n", ma, mf, mf2);
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(a);
-        fmpz_clear(f);
-
-        mpz_clear(ma);
-        mpz_clear(mf);
-        mpz_clear(mf2);
-    }
-
-    /* Check aliasing of f and g */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-    {
-        fmpz_t r, f;
-        mpz_t mr, mf, mf2;
-
-        fmpz_init(r);
-        fmpz_init(f);
-
-        mpz_init(mr);
-        mpz_init(mf);
-        mpz_init(mf2);
-
-        fmpz_randtest(f, state, 200);
-        fmpz_abs(f, f);
-        fmpz_get_mpz(mf, f);
-
-        fmpz_sqrtrem(f, r, f);
-        mpz_sqrtrem(mf, mr, mf);
-
-        fmpz_get_mpz(mf2, f);
-
-        result = (mpz_cmp(mf, mf2) == 0);
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            gmp_printf("mr = %Zd, mf = %Zd, mf2 = %Zd\n", mr, mf, mf2);
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(r);
-        fmpz_clear(f);
-
-        mpz_clear(mr);
-        mpz_clear(mf);
-        mpz_clear(mf2);
     }
 
     FLINT_TEST_CLEANUP(state);

@@ -22,8 +22,6 @@ main(void)
     flint_printf("xgcd_partial....");
     fflush(stdout);
 
-
-
     /* Test co2*r1 - co1*r2 = r2_orig */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {

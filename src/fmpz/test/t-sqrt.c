@@ -23,8 +23,6 @@ main(void)
     flint_printf("sqrt....");
     fflush(stdout);
 
-
-
     /* Comparison with mpz routines */
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
@@ -42,12 +40,22 @@ main(void)
         fmpz_abs(g, g);
         fmpz_get_mpz(mg, g);
 
+        if (n_randint(state, 2))
+        {
+            fmpz_sqrt(f, g);
+        }
+        else /* test aliasing */
+        {
+            fmpz_set(f, g);
+            fmpz_sqrt(f, f);
+        }
+
         fmpz_sqrt(f, g);
         mpz_sqrt(mf, mg);
 
         fmpz_get_mpz(mf2, f);
 
-        result = (mpz_cmp(mf2, mf) == 0);
+        result = (mpz_cmp(mf2, mf) == 0) && _fmpz_is_canonical(f);
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -62,42 +70,6 @@ main(void)
         mpz_clear(mf);
         mpz_clear(mf2);
         mpz_clear(mg);
-    }
-
-    /* Check aliasing of f and g */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-    {
-        fmpz_t f;
-        mpz_t mf, mf2;
-
-        fmpz_init(f);
-
-        mpz_init(mf);
-        mpz_init(mf2);
-
-        fmpz_randtest(f, state, 200);
-        fmpz_abs(f, f);
-        fmpz_get_mpz(mf, f);
-
-        fmpz_sqrt(f, f);
-        mpz_sqrt(mf, mf);
-
-        fmpz_get_mpz(mf2, f);
-
-        result = (mpz_cmp(mf, mf2) == 0);
-
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            gmp_printf("mf = %Zd, mf2 = %Zd\n", mf, mf2);
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(f);
-
-        mpz_clear(mf);
-        mpz_clear(mf2);
     }
 
     FLINT_TEST_CLEANUP(state);

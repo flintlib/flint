@@ -22,39 +22,6 @@ main(void)
     flint_printf("rfac_ui... ");
     fflush(stdout);
 
-
-
-    /* Check aliasing */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
-    {
-        fmpz_t x, r;
-        ulong a;
-
-        fmpz_init(x);
-        fmpz_init(r);
-
-        fmpz_randtest(x, state, 1 + n_randint(state, 200));
-        a = n_randint(state, 100);
-
-        fmpz_rfac_ui(r, x, a);
-        fmpz_rfac_ui(x, x, a);
-
-        result = fmpz_equal(r, x);
-
-        if (!result)
-        {
-            flint_printf("FAIL (aliasing)\n\n");
-            flint_printf("x: "); fmpz_print(x); flint_printf("\n\n");
-            flint_printf("a = %wu\n\n", a);
-            flint_printf("r: "); fmpz_print(r); flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(x);
-        fmpz_clear(r);
-    }
-
     /* Check rf(x,a) * rf(x+a,b) = rf(x,a+b) */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -73,13 +40,22 @@ main(void)
         b = n_randint(state, 100);
         fmpz_add_ui(xa, x, a);
 
-        fmpz_rfac_ui(r1, x, a);
+        if (n_randint(state, 2))
+        {
+            fmpz_rfac_ui(r1, x, a);
+        }
+        else /* test aliasing */
+        {
+            fmpz_set(r1, x);
+            fmpz_rfac_ui(r1, r1, a);
+        }
+
         fmpz_rfac_ui(r2, xa, b);
         fmpz_rfac_ui(r3, x, a+b);
 
         fmpz_mul(r1r2, r1, r2);
 
-        result = fmpz_equal(r1r2, r3);
+        result = fmpz_equal(r1r2, r3) && _fmpz_is_canonical(r1) && _fmpz_is_canonical(r2) && _fmpz_is_canonical(r3);
 
         if (!result)
         {

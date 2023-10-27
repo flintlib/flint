@@ -22,12 +22,11 @@ main(void)
     flint_printf("fdiv_qr....");
     fflush(stdout);
 
-
-
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, c, r;
         mpz_t d, e, f, g, h, s;
+        int aliasing;
 
         fmpz_init(a);
         fmpz_init(b);
@@ -41,237 +40,45 @@ main(void)
         mpz_init(h);
         mpz_init(s);
 
-        fmpz_randbits(a, state, 1000);
-        do {
-           fmpz_randbits(b, state, 500);
-        } while(fmpz_is_zero(b));
+        fmpz_randtest(a, state, 200);
+        fmpz_randtest_not_zero(b, state, 200);
 
         fmpz_get_mpz(d, a);
         fmpz_get_mpz(e, b);
 
-        fmpz_fdiv_qr(c, r, a, b);
+        aliasing = n_randint(state, 5);
+
+        if (aliasing == 0)
+        {
+            fmpz_fdiv_qr(c, r, a, b);
+        }
+        else if (aliasing == 1)
+        {
+            fmpz_set(c, a);
+            fmpz_fdiv_qr(c, r, c, b);
+        }
+        else if (aliasing == 2)
+        {
+            fmpz_set(c, b);
+            fmpz_fdiv_qr(c, r, a, c);
+        }
+        else if (aliasing == 3)
+        {
+            fmpz_set(r, a);
+            fmpz_fdiv_qr(c, r, r, b);
+        }
+        else
+        {
+            fmpz_set(r, b);
+            fmpz_fdiv_qr(c, r, a, r);
+        }
+
         mpz_fdiv_qr(f, s, d, e);
 
         fmpz_get_mpz(g, c);
         fmpz_get_mpz(h, r);
 
-        result = (mpz_cmp(f, g) == 0 && mpz_cmp(h, s) == 0);
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            gmp_printf
-                ("d = %Zd, e = %Zd, f = %Zd, g = %Zd, h = %Zd, s = %Zd\n", d,
-                 e, f, g, h, s);
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(a);
-        fmpz_clear(b);
-        fmpz_clear(c);
-        fmpz_clear(r);
-
-        mpz_clear(d);
-        mpz_clear(e);
-        mpz_clear(f);
-        mpz_clear(g);
-        mpz_clear(h);
-        mpz_clear(s);
-    }
-
-    /* Check aliasing of c and a */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-    {
-        fmpz_t a, b, c, r;
-        mpz_t d, e, f, g, h, s;
-
-        fmpz_init(a);
-        fmpz_init(b);
-        fmpz_init(c);
-        fmpz_init(r);
-
-        mpz_init(d);
-        mpz_init(e);
-        mpz_init(f);
-        mpz_init(g);
-        mpz_init(h);
-        mpz_init(s);
-
-        fmpz_randtest(a, state, 200);
-        fmpz_randtest_not_zero(b, state, 200);
-
-        fmpz_get_mpz(d, a);
-        fmpz_get_mpz(e, b);
-
-        fmpz_fdiv_qr(a, r, a, b);
-        mpz_fdiv_qr(f, s, d, e);
-
-        fmpz_get_mpz(g, a);
-        fmpz_get_mpz(h, r);
-
-        result = (mpz_cmp(f, g) == 0 && mpz_cmp(h, s) == 0);
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            gmp_printf
-                ("d = %Zd, e = %Zd, f = %Zd, g = %Zd, h = %Zd, s = %Zd\n", d,
-                 e, f, g, h, s);
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(a);
-        fmpz_clear(b);
-        fmpz_clear(c);
-        fmpz_clear(r);
-
-        mpz_clear(d);
-        mpz_clear(e);
-        mpz_clear(f);
-        mpz_clear(g);
-        mpz_clear(h);
-        mpz_clear(s);
-    }
-
-    /* Check aliasing of c and b */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-    {
-        fmpz_t a, b, c, r;
-        mpz_t d, e, f, g, h, s;
-
-        fmpz_init(a);
-        fmpz_init(b);
-        fmpz_init(c);
-        fmpz_init(r);
-
-        mpz_init(d);
-        mpz_init(e);
-        mpz_init(f);
-        mpz_init(g);
-        mpz_init(h);
-        mpz_init(s);
-
-        fmpz_randtest(a, state, 200);
-        fmpz_randtest_not_zero(b, state, 200);
-
-        fmpz_get_mpz(d, a);
-        fmpz_get_mpz(e, b);
-
-        fmpz_fdiv_qr(b, r, a, b);
-        mpz_fdiv_qr(f, s, d, e);
-
-        fmpz_get_mpz(g, b);
-        fmpz_get_mpz(h, r);
-
-        result = (mpz_cmp(f, g) == 0 && mpz_cmp(h, s) == 0);
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            gmp_printf
-                ("d = %Zd, e = %Zd, f = %Zd, g = %Zd, h = %Zd, s = %Zd\n", d,
-                 e, f, g, h, s);
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(a);
-        fmpz_clear(b);
-        fmpz_clear(c);
-        fmpz_clear(r);
-
-        mpz_clear(d);
-        mpz_clear(e);
-        mpz_clear(f);
-        mpz_clear(g);
-        mpz_clear(h);
-        mpz_clear(s);
-    }
-
-    /* Check aliasing of r and a */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-    {
-        fmpz_t a, b, c, r;
-        mpz_t d, e, f, g, h, s;
-
-        fmpz_init(a);
-        fmpz_init(b);
-        fmpz_init(c);
-        fmpz_init(r);
-
-        mpz_init(d);
-        mpz_init(e);
-        mpz_init(f);
-        mpz_init(g);
-        mpz_init(h);
-        mpz_init(s);
-
-        fmpz_randtest(a, state, 200);
-        fmpz_randtest_not_zero(b, state, 200);
-
-        fmpz_get_mpz(d, a);
-        fmpz_get_mpz(e, b);
-
-        fmpz_fdiv_qr(c, a, a, b);
-        mpz_fdiv_qr(f, s, d, e);
-
-        fmpz_get_mpz(g, c);
-        fmpz_get_mpz(h, a);
-
-        result = (mpz_cmp(f, g) == 0 && mpz_cmp(h, s) == 0);
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            gmp_printf
-                ("d = %Zd, e = %Zd, f = %Zd, g = %Zd, h = %Zd, s = %Zd\n", d,
-                 e, f, g, h, s);
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(a);
-        fmpz_clear(b);
-        fmpz_clear(c);
-        fmpz_clear(r);
-
-        mpz_clear(d);
-        mpz_clear(e);
-        mpz_clear(f);
-        mpz_clear(g);
-        mpz_clear(h);
-        mpz_clear(s);
-    }
-
-    /* Check aliasing of r and b */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-    {
-        fmpz_t a, b, c, r;
-        mpz_t d, e, f, g, h, s;
-
-        fmpz_init(a);
-        fmpz_init(b);
-        fmpz_init(c);
-        fmpz_init(r);
-
-        mpz_init(d);
-        mpz_init(e);
-        mpz_init(f);
-        mpz_init(g);
-        mpz_init(h);
-        mpz_init(s);
-
-        fmpz_randtest(a, state, 200);
-        fmpz_randtest_not_zero(b, state, 200);
-
-        fmpz_get_mpz(d, a);
-        fmpz_get_mpz(e, b);
-
-        fmpz_fdiv_qr(c, b, a, b);
-        mpz_fdiv_qr(f, s, d, e);
-
-        fmpz_get_mpz(g, c);
-        fmpz_get_mpz(h, b);
-
-        result = (mpz_cmp(f, g) == 0 && mpz_cmp(h, s) == 0);
+        result = (mpz_cmp(f, g) == 0 && mpz_cmp(h, s) == 0) && _fmpz_is_canonical(c) && _fmpz_is_canonical(r);
         if (!result)
         {
             flint_printf("FAIL:\n");

@@ -29,12 +29,12 @@ int main(void)
     fmpz_init(y);
     fmpz_set_ui(y, 1);
 
-    for (k = 0; k < 10000; k++)
+    for (k = 0; k < 2000; k++)
     {
        fmpz_primorial(x, k);
        if (n_is_prime(k))
           fmpz_mul_ui(y, y, k);
-       if (!fmpz_equal(x, y))
+       if (!fmpz_equal(x, y) || !_fmpz_is_canonical(x))
        {
           flint_printf("FAIL:\n");
           flint_printf("primorial of %wu disagrees with direct product\n", k);

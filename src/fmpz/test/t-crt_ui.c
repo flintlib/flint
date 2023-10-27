@@ -70,7 +70,7 @@ int main(void)
 
         fmpz_CRT_ui(result, r1, m1, r2, m2, sign);
 
-        if (!fmpz_equal(result, input))
+        if (!fmpz_equal(result, input) || !_fmpz_is_canonical(result))
         {
             flint_printf("FAIL:\n");
             flint_printf("m1: "); fmpz_print(m1); flint_printf("\n");

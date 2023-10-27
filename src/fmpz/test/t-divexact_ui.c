@@ -24,8 +24,6 @@ main(void)
     flint_printf("divexact_ui....");
     fflush(stdout);
 
-
-
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, c;
@@ -44,12 +42,21 @@ main(void)
 
         fmpz_get_mpz(e, c);
 
-        fmpz_divexact_ui(a, c, n);
+        if (n_randint(state, 2))
+        {
+            fmpz_divexact_ui(a, c, n);
+        }
+        else
+        {
+            fmpz_set(a, c);
+            fmpz_divexact_ui(a, a, n);
+        }
+
         flint_mpz_divexact_ui(f, e, n);
 
         fmpz_get_mpz(g, a);
 
-        result = (mpz_cmp(f, g) == 0);
+        result = (mpz_cmp(f, g) == 0) && _fmpz_is_canonical(a);
         if (!result)
         {
             flint_printf("FAIL1\n");
@@ -61,46 +68,6 @@ main(void)
         fmpz_clear(a);
         fmpz_clear(c);
         mpz_clear(e);
-        mpz_clear(f);
-        mpz_clear(g);
-    }
-
-    /* Test aliasing of a and c */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-    {
-        fmpz_t a, c;
-        mpz_t d, f, g;
-        ulong n;
-
-        fmpz_init(a);
-        fmpz_init(c);
-        mpz_init(d);
-        mpz_init(f);
-        mpz_init(g);
-
-        fmpz_randtest(a, state, 200);
-        n = n_randtest_not_zero(state);
-        fmpz_mul_ui(c, a, n);
-
-        fmpz_get_mpz(d, c);
-
-        fmpz_divexact_ui(c, c, n);
-        flint_mpz_divexact_ui(f, d, n);
-
-        fmpz_get_mpz(g, c);
-
-        result = (mpz_cmp(f, g) == 0);
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            gmp_printf("d = %Zd, n = %Mu, f = %Zd, g = %Zd\n", d, n, f, g);
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(a);
-        fmpz_clear(c);
-        mpz_clear(d);
         mpz_clear(f);
         mpz_clear(g);
     }

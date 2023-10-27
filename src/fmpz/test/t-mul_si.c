@@ -23,8 +23,6 @@ main(void)
     flint_printf("mul_si....");
     fflush(stdout);
 
-
-
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;
@@ -43,12 +41,21 @@ main(void)
         fmpz_get_mpz(d, a);
         x = z_randtest(state);
 
-        fmpz_mul_si(b, a, x);
+        if (n_randint(state, 2))
+        {
+            fmpz_mul_si(b, a, x);
+        }
+        else
+        {
+            fmpz_set(b, a);
+            fmpz_mul_si(b, b, x);
+        }
+
         flint_mpz_mul_si(e, d, x);
 
         fmpz_get_mpz(f, b);
 
-        result = (mpz_cmp(e, f) == 0);
+        result = (mpz_cmp(e, f) == 0) && _fmpz_is_canonical(b);
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -59,45 +66,6 @@ main(void)
 
         fmpz_clear(a);
         fmpz_clear(b);
-
-        mpz_clear(d);
-        mpz_clear(e);
-        mpz_clear(f);
-    }
-
-    /* Check aliasing of a and b */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-    {
-        fmpz_t a;
-        mpz_t d, e, f;
-        slong x;
-
-        fmpz_init(a);
-
-        mpz_init(d);
-        mpz_init(e);
-        mpz_init(f);
-
-        fmpz_randtest(a, state, 200);
-
-        fmpz_get_mpz(d, a);
-        x = z_randtest(state);
-
-        fmpz_mul_si(a, a, x);
-        flint_mpz_mul_si(e, d, x);
-
-        fmpz_get_mpz(f, a);
-
-        result = (mpz_cmp(e, f) == 0);
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            gmp_printf("d = %Zd, e = %Zd, f = %Zd, x = %Md\n", d, e, f, x);
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(a);
 
         mpz_clear(d);
         mpz_clear(e);

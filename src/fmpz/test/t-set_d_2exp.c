@@ -39,7 +39,7 @@ main(void)
         fmpz_set_d_2exp(a, d, exp);
         d2 = fmpz_get_d_2exp(&exp2, a);
 
-        result = (d2 == d && exp == exp2);
+        result = (d2 == d && exp == exp2) && _fmpz_is_canonical(a);
         if (!result)
         {
             flint_printf("FAIL:\n");

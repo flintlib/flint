@@ -46,7 +46,7 @@ main(void)
         fmpz_set_mpz(a, b);
         fmpz_get_mpz(c, a);
 
-        result = (mpz_cmp(b, c) == 0);
+        result = (mpz_cmp(b, c) == 0) && _fmpz_is_canonical(a);
         if (!result)
         {
             flint_printf("FAIL:\n");

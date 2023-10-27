@@ -22,8 +22,6 @@ main(void)
     flint_printf("init_set_ui....");
     fflush(stdout);
 
-
-
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;
@@ -33,7 +31,7 @@ main(void)
         fmpz_set_ui(a, x);
         fmpz_init_set_ui(b, x);
 
-        result = fmpz_equal(a, b);
+        result = fmpz_equal(a, b) && _fmpz_is_canonical(b);
         if (!result)
         {
             flint_printf("FAIL:\n\n");

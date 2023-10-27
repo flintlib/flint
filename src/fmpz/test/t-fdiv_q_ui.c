@@ -23,8 +23,6 @@ main(void)
     flint_printf("fdiv_q_ui....");
     fflush(stdout);
 
-
-
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         ulong b;
@@ -45,12 +43,21 @@ main(void)
         fmpz_get_mpz(d, a);
         flint_mpz_set_ui(e, b);
 
-        fmpz_fdiv_q_ui(c, a, b);
+        if (n_randint(state, 2))
+        {
+            fmpz_fdiv_q_ui(c, a, b);
+        }
+        else /* test aliasing */
+        {
+            fmpz_set(c, a);
+            fmpz_fdiv_q_ui(c, c, b);
+        }
+
         mpz_fdiv_q(f, d, e);
 
         fmpz_get_mpz(g, c);
 
-        result = (mpz_cmp(f, g) == 0);
+        result = (mpz_cmp(f, g) == 0) && _fmpz_is_canonical(c);
         if (!result)
         {
             flint_printf("FAIL (1):\n");
@@ -61,48 +68,6 @@ main(void)
 
         fmpz_clear(a);
         fmpz_clear(c);
-
-        mpz_clear(d);
-        mpz_clear(e);
-        mpz_clear(f);
-        mpz_clear(g);
-    }
-
-    /* Test aliasing of a and c */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-    {
-        ulong b;
-        fmpz_t a;
-        mpz_t d, e, f, g;
-
-        fmpz_init(a);
-
-        mpz_init(d);
-        mpz_init(e);
-        mpz_init(f);
-        mpz_init(g);
-
-        fmpz_randtest(a, state, 200);
-        b = n_randtest_not_zero(state);
-
-        fmpz_get_mpz(d, a);
-        flint_mpz_set_ui(e, b);
-
-        fmpz_fdiv_q_ui(a, a, b);
-        mpz_fdiv_q(f, d, e);
-
-        fmpz_get_mpz(g, a);
-
-        result = (mpz_cmp(f, g) == 0);
-        if (!result)
-        {
-            flint_printf("FAIL (2):\n");
-            gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(a);
 
         mpz_clear(d);
         mpz_clear(e);

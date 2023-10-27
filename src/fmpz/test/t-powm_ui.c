@@ -24,14 +24,13 @@ main(void)
     flint_printf("powm_ui....");
     fflush(stdout);
 
-
-
-    /* Compare with MPIR */
+    /* Compare with GMP */
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, c;
         mpz_t d, e, f, m;
         ulong x;
+        int aliasing;
 
         fmpz_init(a);
         fmpz_init(b);
@@ -50,12 +49,35 @@ main(void)
         fmpz_get_mpz(m, c);
         x = n_randtest(state);
 
-        fmpz_powm_ui(b, a, x, c);
+        aliasing = n_randint(state, 4);
+
+        if (aliasing == 0)
+        {
+            fmpz_powm_ui(b, a, x, c);
+        }
+        else if (aliasing == 1)
+        {
+            fmpz_set(b, a);
+            fmpz_powm_ui(b, b, x, c);
+        }
+        else if (aliasing == 2)
+        {
+            fmpz_set(a, c);
+            mpz_set(d, m);
+            fmpz_powm_ui(b, a, x, a);
+        }
+        else if (aliasing == 3)
+        {
+            fmpz_set(b, c);
+            mpz_set(d, m);
+            fmpz_powm_ui(b, b, x, b);
+        }
+
         flint_mpz_powm_ui(e, d, x, m);
 
         fmpz_get_mpz(f, b);
 
-        result = (mpz_cmp(e, f) == 0);
+        result = (mpz_cmp(e, f) == 0) && _fmpz_is_canonical(b);
         if (!result)
         {
             flint_printf("FAIL:\n");
@@ -72,107 +94,6 @@ main(void)
         mpz_clear(e);
         mpz_clear(f);
         mpz_clear(m);
-    }
-
-    /* Check aliasing of a and b */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-    {
-        fmpz_t a, b, c;
-        ulong n;
-
-        fmpz_init(a);
-        fmpz_init(b);
-        fmpz_init(c);
-
-        fmpz_randtest(b, state, 200);
-        fmpz_randtest_not_zero(c, state, 200);
-        fmpz_abs(c, c);
-        n = n_randtest(state);
-
-        fmpz_powm_ui(a, b, n, c);
-        fmpz_powm_ui(b, b, n, c);
-
-        result = (fmpz_equal(a, b));
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
-            flint_printf("b = "), fmpz_print(b), flint_printf("\n");
-            flint_printf("c = "), fmpz_print(c), flint_printf("\n");
-            flint_printf("n = %wu\n", n);
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(a);
-        fmpz_clear(b);
-        fmpz_clear(c);
-    }
-
-    /* Check aliasing of a and c */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-    {
-        fmpz_t a, b, c;
-        ulong n;
-
-        fmpz_init(a);
-        fmpz_init(b);
-        fmpz_init(c);
-
-        fmpz_randtest(b, state, 200);
-        fmpz_randtest_not_zero(c, state, 200);
-        fmpz_abs(c, c);
-        n = n_randtest(state);
-
-        fmpz_powm_ui(a, b, n, c);
-        fmpz_powm_ui(c, b, n, c);
-
-        result = (fmpz_equal(a, c));
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
-            flint_printf("b = "), fmpz_print(b), flint_printf("\n");
-            flint_printf("c = "), fmpz_print(c), flint_printf("\n");
-            flint_printf("n = %wu\n", n);
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(a);
-        fmpz_clear(b);
-        fmpz_clear(c);
-    }
-
-    /* Check aliasing of a and {b, c} */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-    {
-        fmpz_t a, c;
-        ulong n;
-
-        fmpz_init(a);
-        fmpz_init(c);
-
-        fmpz_randtest_not_zero(c, state, 200);
-        fmpz_abs(c, c);
-        n = n_randtest(state);
-
-        fmpz_powm_ui(a, c, n, c);
-        fmpz_powm_ui(c, c, n, c);
-
-        result = (fmpz_equal(a, c));
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("a = "), fmpz_print(a), flint_printf("\n");
-            flint_printf("c = "), fmpz_print(c), flint_printf("\n");
-            flint_printf("n = %wu\n", n);
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(a);
-        fmpz_clear(c);
     }
 
     FLINT_TEST_CLEANUP(state);

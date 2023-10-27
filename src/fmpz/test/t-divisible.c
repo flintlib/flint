@@ -22,7 +22,7 @@ main(void)
     flint_printf("divisible....");
     fflush(stdout);
 
-    /* Compare with MPIR:  random */
+    /* Compare with GMP:  random */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;
@@ -58,7 +58,7 @@ main(void)
         mpz_clear(d);
     }
 
-    /* Compare with MPIR:  b a multiple of a */
+    /* Compare with GMP:  b a multiple of a */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;

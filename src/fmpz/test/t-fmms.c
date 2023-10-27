@@ -51,7 +51,7 @@ main(void)
         fmpz_mul(g, a, b);
         fmpz_submul(g, c, d);
 
-        if (!fmpz_equal(f, g))
+        if (!fmpz_equal(f, g) || !_fmpz_is_canonical(f))
         {
             flint_printf("FAIL:\n");
             fmpz_print(a); flint_printf("\n");

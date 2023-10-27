@@ -77,7 +77,7 @@ main(void)
         fmpz_bit_pack(arr, shift, bits, a, 0, 0);
         fmpz_bit_unpack_unsigned(b, arr, shift, bits);
 
-        result = (fmpz_cmp(a, b) == 0);
+        result = (fmpz_cmp(a, b) == 0) && _fmpz_is_canonical(b);
 
         if (!result)
         {
