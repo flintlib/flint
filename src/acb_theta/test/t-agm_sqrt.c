@@ -23,24 +23,22 @@ int main(void)
 
     /* Test:
        - if nonzero, value of square root should agree; precision remains high
-       - if contains zero or random values, should contain both square roots */
+       - no abort on wrong values of rt_low */
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
-        acb_t rt;
-        acb_t x;
-        arb_t err;
-        acb_t rt_low;
-        acb_t test;
-
         slong prec = 100 + n_randint(state, 1000);
         slong mag_bits = n_randint(state, 4);
         slong lowprec = 10 + n_randint(state, 10);
+        slong delta = n_pow(2, mag_bits) + 10;
+        acb_t rt, x, rt_low, t;
+        arf_t err;
+
 
         acb_init(rt);
         acb_init(x);
-        arb_init(err);
         acb_init(rt_low);
-        acb_init(test);
+        acb_init(t);
+        arf_init(err);
 
         acb_randtest_precise(rt, state, prec, mag_bits);
         if (iter % 10 == 0)
@@ -49,59 +47,54 @@ int main(void)
         }
 
         acb_sqr(x, rt, prec);
-        arb_one(err);
-        arb_mul_2exp_si(err, err, -lowprec);
-        arb_add_si(err, err, 1, lowprec);
-        acb_mul_arb(rt_low, rt, err, lowprec);
+        acb_one(t);
+        acb_mul_2exp_si(t, t, -lowprec);
+        acb_add_si(t, t, 1, lowprec);
+        acb_mul(rt_low, rt, t, lowprec);
+
+        acb_theta_agm_sqrt(t, x, rt_low, 1, prec);
+        acb_get_rad_ubound_arf(err, t, prec);
+
+        if (!acb_contains(t, rt))
+        {
+            flint_printf("FAIL (value)\n");
+            acb_printd(rt, 5);
+            flint_printf("\n");
+            acb_printd(t, 5);
+            flint_printf("\n");
+            acb_printd(rt_low, 5);
+            flint_printf("\n");
+            flint_abort();
+        }
+
+        if (!acb_is_finite(t))
+        {
+            flint_printf("FAIL (infinite)\n");
+            flint_abort();
+        }
+
+        if (!acb_contains_zero(rt) && (arf_cmp_2exp_si(err, -prec + delta) > 0))
+        {
+            flint_printf("FAIL (precision)\n");
+            flint_printf("prec = %wd, result:\n", prec, mag_bits);
+            acb_printd(t, 10);
+            flint_printf("\nrt_low:\n");
+            acb_printd(rt_low, 10);
+            flint_printf("\n");
+            flint_abort();
+        }
 
         if (iter % 10 == 1)
         {
             acb_randtest(rt_low, state, prec, mag_bits);
-        }
-
-        acb_theta_agm_sqrt(test, x, rt_low, 1, prec);
-
-        if (!acb_contains(test, rt))
-        {
-            flint_printf("FAIL (value)\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        if (acb_contains(rt_low, rt))
-        {
-            if (!acb_is_finite(test))
-            {
-                flint_printf("FAIL (infinite)\n");
-                fflush(stdout);
-                flint_abort();
-            }
-
-            acb_get_mid(x, test);
-            acb_sub(test, test, x, prec);
-            acb_abs(err, test, prec);
-            arb_mul_2exp_si(err, err, prec - n_pow(2, mag_bits) - 10);
-            arb_add_si(err, err, -1, prec);
-
-            if (!acb_contains_zero(rt) && !arb_is_negative(err))
-            {
-                flint_printf("FAIL (precision)\n");
-                flint_printf("prec = %wd, difference:\n", prec, mag_bits);
-                acb_printd(test, 10);
-                flint_printf("\n");
-                flint_printf("rt_low:\n");
-                acb_printd(rt_low, 10);
-                flint_printf("\n");
-                fflush(stdout);
-                flint_abort();
-            }
+            acb_theta_agm_sqrt(t, x, rt_low, 1, prec);
         }
 
         acb_clear(rt);
         acb_clear(x);
-        arb_clear(err);
         acb_clear(rt_low);
-        acb_clear(test);
+        acb_clear(t);
+        arf_clear(err);
     }
 
     flint_randclear(state);
