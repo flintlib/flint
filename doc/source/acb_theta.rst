@@ -972,7 +972,7 @@ Quasi-linear algorithms: distances
 
 .. function:: void acb_theta_dist_pt(arb_t d, arb_srcptr v, const arb_mat_t C, slong* n, slong prec)
 
-    Sets *d* to `\lVert v - Cn\rVert^2` for the usual Euclidean norm.
+    Sets *d* to `\lVert v + Cn\rVert^2` for the usual Euclidean norm.
 
 .. function:: void acb_theta_dist_lat(arb_t d, arb_srcptr v, const arb_mat_t C, slong prec)
 
