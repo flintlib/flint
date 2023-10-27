@@ -806,10 +806,9 @@ LLL reduction
 
 .. function:: int arb_mat_spd_is_lll_reduced(const arb_mat_t A, slong tol_exp, slong prec)
 
-    Returns nonzero iff *A* is LLL-reduced with a tolerance of `\varepsilon =
-    2^{tol\_exp}`. This means the following. First, the error radius on each
-    entry of *A* must be at most `\varepsilon/16`. Then we consider the matrix
-    whose entries are `2^{\mathit{prec}}(1 + \varepsilon)^{i + j} A_{i,j}`
-    rounded to integers: it must be positive definite and pass
-    :func:`fmpz_mat_is_reduced` with default parameters. The warnings of
-    :func:`arf_get_fmpz` apply.
+    Given a symmetric positive definite matrix *A*, returns nonzero iff *A* is
+    certainly LLL-reduced with a tolerance of `\varepsilon = 2^{tol\_exp}`,
+    meaning that it satisfies the inequalities `|\mu_{j,k}|\leq \eta +
+    \varepsilon` and `(\delta - \varepsilon) \lVert b_{k-1}^*\rVert^2 \leq
+    \lVert b_k^*\rVert^2 + \mu_{k,k-1}^2 \lVert b_{k-1}^*\rVert^2` (with the
+    usual notation) for the default parameters `\eta = 0.51`, `\delta = 0.99`.
