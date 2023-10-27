@@ -162,6 +162,8 @@ void acb_theta_precomp_set(acb_theta_precomp_t D, acb_srcptr zs,
 void acb_theta_naive_radius(arf_t R2, arf_t eps, const arb_mat_t C, slong ord, slong prec);
 void acb_theta_naive_reduce(arb_ptr v, acb_ptr new_zs, acb_ptr cs, arb_ptr us,
     acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec);
+void acb_theta_naive_reduce_jet(arb_ptr v, arb_t u, acb_srcptr z,
+    const acb_mat_t tau, slong prec);
 void acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong* tup,
     slong* n, slong prec);
 
@@ -195,8 +197,6 @@ void acb_theta_jet_compose(acb_ptr res, acb_srcptr v, const acb_mat_t N,
 
 void acb_theta_jet_naive_radius(arf_t R2, arf_t eps, const arb_mat_t C, arb_srcptr v,
     slong ord, slong prec);
-void acb_theta_jet_naive_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z,
-    const acb_mat_t tau, slong ord, slong prec);
 
 void acb_theta_jet_naive_00(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
     slong ord, slong prec);

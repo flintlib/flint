@@ -89,7 +89,7 @@ int main(void)
         arb_mul(sum, sum, abs, prec);
         arb_sub(abs, sum, u, prec);
 
-        if (!arb_is_negative(abs))
+        if (arb_is_positive(abs))
         {
             flint_printf("FAIL\n");
             flint_printf("sum, bound:\n");

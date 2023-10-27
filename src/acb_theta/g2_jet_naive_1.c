@@ -175,45 +175,71 @@ acb_theta_g2_jet_naive_1(acb_ptr dth, const acb_mat_t tau, slong prec)
     slong ord = 1;
     acb_theta_eld_t E;
     acb_theta_precomp_t D;
+    acb_mat_t new_tau;
+    arb_mat_t C;
+    arf_t R2, eps;
     acb_ptr z;
+    arb_ptr v;
     acb_t c;
     arb_t u;
-    acb_mat_t new_tau;
     slong k;
+    int b;
 
     acb_theta_eld_init(E, g, g);
     acb_theta_precomp_init(D, 1, g);
+    acb_mat_init(new_tau, g, g);
+    arb_mat_init(C, g, g);
+    arf_init(R2);
+    arf_init(eps);
     z = _acb_vec_init(g);
+    v = _arb_vec_init(g);
     acb_init(c);
     arb_init(u);
-    acb_mat_init(new_tau, g, g);
 
     acb_mat_scalar_mul_2exp_si(new_tau, tau, -2);
+    acb_siegel_cho(C, new_tau, prec);
 
-    acb_theta_jet_naive_ellipsoid(E, u, z, new_tau, ord, prec);
-    acb_theta_precomp_set(D, z, new_tau, E, prec);
-    acb_one(c);
+    acb_theta_naive_reduce_jet(v, u, z, new_tau, prec);
+    acb_theta_jet_naive_radius(R2, eps, C, v, ord, prec);
+    b = acb_theta_eld_set(E, C, R2, v);
 
-    _acb_vec_zero(dth, 3 * n2);
-    acb_theta_naive_worker(dth, E, D, 0, ord, prec, worker);
-
-    for (k = 0; k < 3 * n2; k++)
+    if (b)
     {
-        acb_mul(&dth[k], &dth[k], c, prec);
-        acb_add_error_arb(&dth[k], u);
+        acb_theta_precomp_set(D, z, new_tau, E, prec);
+
+        _acb_vec_zero(dth, 3 * n2);
+        acb_theta_naive_worker(dth, E, D, 0, ord, prec, worker);
+
+        arb_mul_arf(u, u, eps, prec);
+        for (k = 0; k < 3 * n2; k++)
+        {
+            acb_add_error_arb(&dth[k], u);
+        }
+
+        acb_const_pi(c, prec);
+        acb_mul_onei(c, c);
+        for (k = 0; k < n2; k++)
+        {
+            acb_mul(&dth[3 * k + 1], &dth[3 * k + 1], c, prec);
+            acb_mul(&dth[3 * k + 2], &dth[3 * k + 2], c, prec);
+        }
     }
-    acb_const_pi(c, prec);
-    acb_mul_onei(c, c);
-    for (k = 0; k < n2; k++)
+    else
     {
-        acb_mul(&dth[3 * k + 1], &dth[3 * k + 1], c, prec);
-        acb_mul(&dth[3 * k + 2], &dth[3 * k + 2], c, prec);
+        for (k = 0; k < 3 * n2; k++)
+        {
+            acb_indeterminate(&dth[k]);
+        }
     }
 
     acb_theta_eld_clear(E);
     acb_theta_precomp_clear(D);
+    acb_mat_clear(new_tau);
+    arb_mat_clear(C);
+    arf_clear(R2);
+    arf_clear(eps);
     _acb_vec_clear(z, g);
+    _arb_vec_clear(v, g);
     acb_clear(c);
     arb_clear(u);
-    acb_mat_clear(new_tau);
 }

@@ -643,6 +643,12 @@ directly.
     is `v^{(k)} = C r` which is also bounded independently of `k`, and *v* is
     set to the :func:`acb_union` of the `v^{(k)}` for `0\leq k< \mathit{nb}`.
 
+.. function:: void acb_theta_naive_reduce_jet(arb_ptr v, arb_t u, acb_srcptr z, const acb_mat_t tau, slong prec)
+
+    Sets *v* and *u* as in :func:`acb_theta_naive_reduce` for `a = 0` and a
+    single vector *z*. This version is used when computing derivatives of theta
+    functions with the naive algorithm.
+
 .. function:: void acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong* tup, slong* n, slong prec)
 
     Sets *res* to `n_0^{k_0} \cdots n_{g-1}^{k_{g-1}}\exp(\pi i(n^T\tau n + 2
@@ -847,16 +853,6 @@ differentiated series:
     value of *ord*. We can then set *R2* to the maximum of *R2* and `\lVert
     Y^{-1}y \rVert_\infty /\lVert C^{-1} \rVert_\infty`, and multiply *eps* by
     `\max\{1, 2\lVert C^{-1}\rVert\}^{\mathit{ord}}`.
-
-.. function:: void acb_theta_jet_naive_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
-
-    Sets `E` and *u* so that summing over `E` yields derivatives of theta
-    functions up to an error of at most *u*, ignoring leading factorials and
-    powers of `2\pi i`.
-
-    After computing *R2* and *eps* as in :func:`acb_theta_jet_naive_radius`, we
-    set the radius of `E` to be *R2* and set `u = e^{\pi y^T Y^{-1} y}\cdot
-    \mathit{eps}`.
 
 .. function:: void acb_theta_jet_naive_00(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
 

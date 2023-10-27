@@ -11,107 +11,6 @@
 
 #include "acb_theta.h"
 
-static void
-arb_mat_inf_norm(arb_t res, const arb_mat_t mat, slong prec)
-{
-    arb_t t, u;
-    slong k, j;
-
-    arb_init(t);
-    arb_init(u);
-
-    arb_zero(res);
-    for (k = 0; k < arb_mat_nrows(mat); k++)
-    {
-        arb_zero(t);
-        for (j = 0; j < arb_mat_ncols(mat); j++)
-        {
-            arb_abs(u, arb_mat_entry(mat, k, j));
-            arb_max(t, t, u, prec);
-        }
-        arb_max(res, res, t, prec);
-    }
-
-    arb_clear(t);
-    arb_clear(u);
-}
-
-static void
-_arb_vec_inf_norm(arb_t res, arb_srcptr v, slong nb, slong prec)
-{
-    arb_t t;
-    slong k;
-
-    arb_init(t);
-
-    arb_zero(res);
-    for (k = 0; k < nb; k++)
-    {
-        arb_abs(t, &v[k]);
-        arb_max(res, res, t, prec);
-    }
-
-    arb_clear(t);
-}
-
-/* Evaluate upper bound on the tail */
-static void
-acb_theta_jet_naive_tail(arb_t res, const arf_t R2, const arb_mat_t C, arb_srcptr v, slong ord)
-{
-    slong g = arb_mat_nrows(C);
-    slong lp = ACB_THETA_LOW_PREC;
-    arb_mat_t Cinv;
-    arb_t t, u, R;
-    slong k;
-
-    arb_mat_init(Cinv, g, g);
-    arb_init(t);
-    arb_init(u);
-    arb_init(R);
-
-    /* Ensure assumptions R2\geq 4, R2\geq 2*ord are satisfied */
-    arb_set_arf(R, R2);
-    arb_set_si(t, FLINT_MAX(4, 2 * ord));
-    arb_max(R, R, t, lp);
-    arb_sqrt(R, R, lp);
-
-    /* Evaluate 2^(2*g+2) R^(g - 1) exp(-R^2) \prod(1 + gamma_i^{-1}) */
-    arb_one(res);
-    arb_mul_2exp_si(res, res, 2 * g + 2);
-
-    arb_pow_ui(t, R, g - 1, lp);
-    arb_mul(res, res, t, lp);
-
-    arb_sqr(t, R, lp);
-    arb_neg(t, t);
-    arb_exp(t, t, lp);
-    arb_mul(res, res, t, lp);
-
-    for (k = 0; k < g; k++)
-    {
-        arb_inv(t, arb_mat_entry(C, k, k), lp);
-        arb_add_si(t, t, 1, lp);
-        arb_mul(res, res, t, lp);
-    }
-
-    /* Multiply by max(1, ||C^{-1}||R + ||v||)^ord */
-    arb_mat_one(Cinv);
-    arb_mat_solve_triu(Cinv, C, Cinv, 0, lp);
-    arb_mat_inf_norm(t, Cinv, lp);
-    arb_mul(t, t, R, lp);
-    _arb_vec_inf_norm(u, v, g, lp);
-    arb_add(t, t, u, lp);
-    arb_set_si(u, 1);
-    arb_max(t, t, u, lp);
-    arb_pow_ui(t, t, ord, lp);
-    arb_mul(res, res, t, lp);
-
-    arb_mat_clear(Cinv);
-    arb_clear(t);
-    arb_clear(u);
-    arb_clear(R);
-}
-
 int main(void)
 {
     slong iter;
@@ -122,61 +21,107 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: tail is small */
-    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    /* Test: sum of terms on border of ellipsoid must be less than bound */
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 10);
-        slong ord = n_randint(state, 10);
-        slong prec = ACB_THETA_LOW_PREC;
-        slong bits = n_randint(state, 5);
-        slong exp = 10 + n_randint(state, 100);
+        slong g = 1 + n_randint(state, 3);
+        slong mprec = 50 + n_randint(state, 100);
+        slong prec = mprec + 50;
+        slong bits = n_randint(state, 4);
+        slong ord = n_randint(state, 4);
+        slong nb = acb_theta_jet_nb(ord, g);
+        acb_theta_eld_t E;
+        acb_mat_t tau;
         arb_mat_t C;
-        arb_ptr v, w;
-        arf_t R2, eps, t;
-        arb_t bound;
-        slong k;
+        arf_t R2, eps;
+        acb_ptr z;
+        arb_ptr v;
+        acb_t term;
+        arb_t u, abs, sum;
+        slong nb_pts;
+        slong* pts;
+        slong* tups;
+        slong j, k;
+        int res;
 
+        acb_mat_init(tau, g, g);
         arb_mat_init(C, g, g);
-        v = _arb_vec_init(g);
-        w = _arb_vec_init(g);
         arf_init(R2);
         arf_init(eps);
-        arf_init(t);
-        arb_init(bound);
+        acb_theta_eld_init(E, g, g);
+        z = _acb_vec_init(g);
+        v = _arb_vec_init(g);
+        arb_init(u);
+        acb_init(term);
+        arb_init(abs);
+        arb_init(sum);
+        tups = flint_malloc(g * nb * sizeof(slong));
 
-        arb_mat_randtest_cho(C, state, prec, bits);
-        arb_mat_transpose(C, C);
+        acb_siegel_randtest_reduced(tau, state, prec, bits);
         for (k = 0; k < g; k++)
         {
-            arb_randtest_precise(&w[k], state, prec, bits);
+            acb_randtest_precise(&z[k], state, prec, bits);
         }
-        arb_mat_vector_mul_col(v, C, w, prec);
+        acb_siegel_cho(C, tau, prec);
+        acb_theta_naive_reduce_jet(v, u, z, tau, prec);
 
-        acb_theta_jet_naive_radius(R2, eps, C, v, ord, exp);
-        acb_theta_jet_naive_tail(bound, R2, C, w, ord);
-        arb_get_lbound_arf(t, bound, prec);
+        acb_theta_jet_naive_radius(R2, eps, C, v, ord, mprec);
+        arb_mul_arf(u, u, eps, prec);
 
-        if (arf_cmp(t, eps) > 0)
+        /* Test: sum of terms on the border of ellipsoid is less than u */
+        res = acb_theta_eld_set(E, C, R2, v);
+        if (!res)
         {
-            flint_printf("FAIL\n");
-            arb_mat_printd(C, 5);
-            flint_printf("exp = %wd, ord = %wd, eps, R2:\n", exp, ord);
-            arf_printd(eps, 10);
-            flint_printf("\n");
-            arf_printd(R2, 10);
-            flint_printf("\nbound:\n");
-            arb_printd(bound, 10);
-            flint_printf("\n");
+            flint_printf("FAIL (ellipsoid)\n");
             flint_abort();
         }
 
+        nb_pts = acb_theta_eld_nb_border(E);
+        pts = flint_malloc(g * nb_pts * sizeof(slong));
+        acb_theta_eld_border(pts, E);
+        acb_theta_jet_tuples(tups, ord, g);
+
+        for (j = 0; j < nb; j++)
+        {
+            arb_zero(sum);
+            for (k = 0; k < nb_pts; k++)
+            {
+                acb_theta_naive_term(term, z, tau, tups + j * g, pts + k * g, prec);
+                acb_abs(abs, term, prec);
+                arb_add(sum, sum, abs, prec);
+            }
+
+            arb_sub(abs, sum, u, prec);
+
+            if (arb_is_positive(abs))
+            {
+                flint_printf("FAIL\n");
+                flint_printf("sum, bound:\n");
+                arb_printd(sum, 10);
+                flint_printf("\n");
+                arb_printd(u, 10);
+                flint_printf("\ntau:\n");
+                acb_mat_printd(tau, 5);
+                flint_printf("z:\n");
+                _acb_vec_printd(z, g, 10);
+                acb_theta_eld_print(E);
+                flint_abort();
+            }
+        }
+
+        acb_mat_clear(tau);
         arb_mat_clear(C);
-        _arb_vec_clear(v, g);
-        _arb_vec_clear(w, g);
         arf_clear(R2);
         arf_clear(eps);
-        arf_clear(t);
-        arb_clear(bound);
+        acb_theta_eld_clear(E);
+        _acb_vec_clear(z, g);
+        _arb_vec_clear(v, g);
+        arb_clear(u);
+        acb_clear(term);
+        arb_clear(abs);
+        arb_clear(sum);
+        flint_free(pts);
+        flint_free(tups);
     }
 
     flint_randclear(state);

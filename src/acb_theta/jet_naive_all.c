@@ -117,16 +117,24 @@ acb_theta_jet_naive_all_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
     slong* tups;
     acb_theta_eld_t E;
     acb_theta_precomp_t D;
+    arb_mat_t C;
+    arf_t R2, eps;
+    arb_ptr v;
     acb_t c;
     arb_t u;
     fmpz_t m, t;
     acb_mat_t new_tau;
     acb_ptr new_z;
     slong k, j;
+    int b;
 
     tups = flint_malloc(g * nb * sizeof(slong));
     acb_theta_eld_init(E, g, g);
     acb_theta_precomp_init(D, 1, g);
+    arb_mat_init(C, g, g);
+    arf_init(R2);
+    arf_init(eps);
+    v = _arb_vec_init(g);
     acb_init(c);
     arb_init(u);
     fmpz_init(m);
@@ -136,41 +144,59 @@ acb_theta_jet_naive_all_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
 
     _acb_vec_scalar_mul_2exp_si(new_z, z, g, -1);
     acb_mat_scalar_mul_2exp_si(new_tau, tau, -2);
+    acb_siegel_cho(C, new_tau, prec);
 
-    acb_theta_jet_naive_ellipsoid(E, u, new_z, new_tau, ord, prec);
-    acb_theta_precomp_set(D, new_z, new_tau, E, prec);
-    acb_one(c);
+    acb_theta_naive_reduce_jet(v, u, new_z, new_tau, prec);
+    acb_theta_jet_naive_radius(R2, eps, C, v, ord, prec);
+    b = acb_theta_eld_set(E, C, R2, v);
 
-    _acb_vec_zero(dth, n2 * nb);
-    acb_theta_naive_worker(dth, E, D, 0, ord, prec, worker);
-
-    for (k = 0; k < nb * n2; k++)
+    if (b)
     {
-        acb_mul(&dth[k], &dth[k], c, prec);
-        acb_add_error_arb(&dth[k], u);
-    }
-    acb_theta_jet_tuples(tups, ord, g);
-    for (k = 0; k < nb; k++)
-    {
-        acb_const_pi(c, prec); /* not 2 pi because of rescaling */
-        acb_mul_onei(c, c);
-        acb_pow_ui(c, c, acb_theta_jet_total_order(tups + k * g, g), prec);
-        fmpz_one(m);
-        for (j = 0; j < g; j++)
+        acb_theta_precomp_set(D, new_z, new_tau, E, prec);
+
+        _acb_vec_zero(dth, n2 * nb);
+        acb_theta_naive_worker(dth, E, D, 0, ord, prec, worker);
+
+        arb_mul_arf(u, u, eps, prec);
+        for (k = 0; k < nb * n2; k++)
         {
-            fmpz_fac_ui(t, tups[k * g + j]);
-            fmpz_mul(m, m, t);
+            acb_add_error_arb(&dth[k], u);
         }
-        acb_div_fmpz(c, c, m, prec);
-        for (j = 0; j < n2; j++)
+
+        acb_theta_jet_tuples(tups, ord, g);
+        for (k = 0; k < nb; k++)
         {
-            acb_mul(&dth[j * nb + k], &dth[j * nb + k], c, prec);
+            acb_const_pi(c, prec); /* not 2 pi because of rescaling */
+            acb_mul_onei(c, c);
+            acb_pow_ui(c, c, acb_theta_jet_total_order(tups + k * g, g), prec);
+            fmpz_one(m);
+            for (j = 0; j < g; j++)
+            {
+                fmpz_fac_ui(t, tups[k * g + j]);
+                fmpz_mul(m, m, t);
+            }
+            acb_div_fmpz(c, c, m, prec);
+            for (j = 0; j < n2; j++)
+            {
+                acb_mul(&dth[j * nb + k], &dth[j * nb + k], c, prec);
+            }
+        }
+    }
+    else
+    {
+        for (k = 0; k < nb * n2; k++)
+        {
+            acb_indeterminate(&dth[k]);
         }
     }
 
     flint_free(tups);
     acb_theta_eld_clear(E);
     acb_theta_precomp_clear(D);
+    arb_mat_clear(C);
+    arf_clear(R2);
+    arf_clear(eps);
+    _arb_vec_clear(v, g);
     acb_clear(c);
     arb_clear(u);
     fmpz_clear(m);
