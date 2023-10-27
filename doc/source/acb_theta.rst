@@ -643,19 +643,6 @@ directly.
     is `v^{(k)} = C r` which is also bounded independently of `k`, and *v* is
     set to the :func:`acb_union` of the `v^{(k)}` for `0\leq k< \mathit{nb}`.
 
-.. function:: void acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr new_zs, acb_ptr cs, arb_ptr us, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
-
-    Sets the ellipsoid `E` and the vectors *new_zs*, *cs* and *us* such that
-    the following is satisfied: for each `0\leq k< \mathit{nb}`, if `z`
-    and `z'` denote the `k^{\mathrm{th}}` vectors in *zs* and *new_zs*
-    respectively, and `c, u` denote the `k^{\mathrm{th}}` entries in *cs* and
-    *us*, then summing exponential terms involving `z'` over `E` and
-    multiplying by `c` will yield an approximation of theta values at `z` up to
-    an error at most `u`.
-
-    Unless cancellations occur in the sum, we expect the relative precision of
-    the resulting theta values to be roughly *prec*.
-
 .. function:: void acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong* tup, slong* n, slong prec)
 
     Sets *res* to `n_0^{k_0} \cdots n_{g-1}^{k_{g-1}}\exp(\pi i(n^T\tau n + 2
@@ -720,13 +707,12 @@ duplication.
       finally
     - *fullprec* is the working precision for summing into *th*.
 
-.. function:: void acb_theta_naive_worker(acb_ptr th, slong len, const acb_t c, const arb_t u, const acb_theta_eld_t E, const acb_theta_precomp_t D, slong k, slong ord, slong prec, acb_theta_naive_worker_t worker)
+.. function:: void acb_theta_naive_worker(acb_ptr th, const acb_theta_eld_t E, const acb_theta_precomp_t D, slong k, slong ord, slong prec, acb_theta_naive_worker_t worker)
 
     Runs the naive algorithm on the ellipsoid `E` for the `k^{\mathrm{th}}`
-    vector stored in *D*. Here `c` and `u` are as output by
-    :func:`acb_theta_naive_ellipsoid`, *ord* is passed as an argument to
-    *worker*, *prec* is the precision for summing into the vector *th*, and
-    *len* is the length of the output vector *th*.
+    vector stored in *D*, summing each term into *th* in-place. The argument
+    *ord* is passed to *worker* and is also used internally when computing
+    working precisions.
 
 .. function:: void acb_theta_naive_00(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 

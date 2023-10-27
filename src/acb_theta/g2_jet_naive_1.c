@@ -194,9 +194,14 @@ acb_theta_g2_jet_naive_1(acb_ptr dth, const acb_mat_t tau, slong prec)
     acb_theta_precomp_set(D, z, new_tau, E, prec);
     acb_one(c);
 
-    acb_theta_naive_worker(dth, 3 * n2, c, u, E, D, 0, ord, prec, worker);
+    _acb_vec_zero(dth, 3 * n2);
+    acb_theta_naive_worker(dth, E, D, 0, ord, prec, worker);
 
-    /* Multiply by i*pi */
+    for (k = 0; k < 3 * n2; k++)
+    {
+        acb_mul(&dth[k], &dth[k], c, prec);
+        acb_add_error_arb(&dth[k], u);
+    }
     acb_const_pi(c, prec);
     acb_mul_onei(c, c);
     for (k = 0; k < n2; k++)

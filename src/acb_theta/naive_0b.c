@@ -66,25 +66,43 @@ acb_theta_naive_0b_gen(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     slong g = acb_mat_nrows(tau);
     acb_theta_eld_t E;
     acb_theta_precomp_t D;
+    arb_mat_t C;
+    arf_t R2, eps;
     acb_ptr cs;
-    arb_ptr us;
+    arb_ptr v, us;
     acb_ptr new_zs;
     slong len = 1 << g;
-    slong k;
+    slong k, l;
+    int b;
 
     acb_theta_eld_init(E, g, g);
     acb_theta_precomp_init(D, nb, g);
+    arb_mat_init(C, g, g);
+    arf_init(R2);
+    arf_init(eps);
     cs = _acb_vec_init(nb);
     us = _arb_vec_init(nb);
+    v = _arb_vec_init(g);
     new_zs = _acb_vec_init(nb * g);
 
-    acb_theta_naive_ellipsoid(E, new_zs, cs, us, zs, nb, tau, prec);
-    if (arb_is_finite(&us[0]))
+    acb_siegel_cho(C, tau, prec);
+    acb_theta_naive_radius(R2, eps, C, 0, prec);
+    acb_theta_naive_reduce(v, new_zs, cs, us, zs, nb, tau, prec);
+    b = acb_theta_eld_set(E, C, R2, v);
+
+    if (b)
     {
         acb_theta_precomp_set(D, new_zs, tau, E, prec);
         for (k = 0; k < nb; k++)
         {
-            acb_theta_naive_worker(th + k * len, len, &cs[k], &us[k], E, D, k, 0, prec, worker);
+            _acb_vec_zero(th + k * len, len);
+            acb_theta_naive_worker(th + k * len, E, D, k, 0, prec, worker);
+            _acb_vec_scalar_mul(th + k * len, th + k * len, len, &cs[k], prec);
+            arb_mul_arf(&us[k], &us[k], eps, prec);
+            for (l = 0; l < len; l++)
+            {
+                acb_add_error_arb(&th[k * len + l], &us[k]);
+            }
         }
     }
     else
@@ -97,8 +115,12 @@ acb_theta_naive_0b_gen(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
 
     acb_theta_eld_clear(E);
     acb_theta_precomp_clear(D);
+    arb_mat_clear(C);
+    arf_clear(R2);
+    arf_clear(eps);
     _acb_vec_clear(cs, nb);
     _arb_vec_clear(us, nb);
+    _arb_vec_clear(v, g);
     _acb_vec_clear(new_zs, nb * g);
 }
 

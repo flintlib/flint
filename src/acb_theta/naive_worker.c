@@ -228,9 +228,9 @@ acb_theta_naive_worker_rec(acb_ptr th, acb_ptr v1, acb_ptr v2, slong* precs,
 /* User function */
 
 void
-acb_theta_naive_worker(acb_ptr th, slong len, const acb_t c, const arb_t u,
-    const acb_theta_eld_t E, const acb_theta_precomp_t D, slong k,
-    slong ord, slong prec, acb_theta_naive_worker_t worker)
+acb_theta_naive_worker(acb_ptr th, const acb_theta_eld_t E,
+    const acb_theta_precomp_t D, slong k, slong ord, slong prec,
+    acb_theta_naive_worker_t worker)
 {
     slong g = acb_theta_eld_ambient_dim(E);
     slong fullprec = acb_theta_naive_fullprec(E, prec);
@@ -255,20 +255,9 @@ acb_theta_naive_worker(acb_ptr th, slong len, const acb_t c, const arb_t u,
     acb_mat_set(lin_powers, acb_theta_precomp_exp_mat(D));
     acb_one(cofactor);
 
-    for (j = 0; j < len; j++)
-    {
-        acb_zero(&th[j]);
-    }
-
     acb_theta_naive_worker_rec(th, v1, v2, precs,
         lin_powers, E, D, acb_theta_precomp_exp_z(D, k, 0),
         cofactor, ord, fullprec, fullprec, worker);
-
-    for (j = 0; j < len; j++)
-    {
-        acb_mul(&th[j], &th[j], c, prec);
-        acb_add_error_arb(&th[j], u);
-    }
 
     acb_mat_clear(lin_powers);
     acb_clear(cofactor);

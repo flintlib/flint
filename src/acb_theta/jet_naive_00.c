@@ -95,10 +95,16 @@ acb_theta_jet_naive_00_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
     acb_theta_precomp_set(D, z, tau, E, prec);
     acb_one(c);
 
-    acb_theta_naive_worker(dth, nb, c, u, E, D, 0, ord, prec, worker);
+    _acb_vec_zero(dth, nb);
+    acb_theta_naive_worker(dth, E, D, 0, ord, prec, worker);
 
-    /* Multiply by factorials and powers of pi */
+    /* Add error, ultiply by factorials and powers of pi */
     acb_theta_jet_tuples(tups, ord, g);
+    for (k = 0; k < nb; k++)
+    {
+        acb_mul(&dth[k], &dth[k], c, prec);
+        acb_add_error_arb(&dth[k], u);
+    }
     for (k = 0; k < nb; k++)
     {
         acb_const_pi(c, prec);
