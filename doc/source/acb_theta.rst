@@ -278,6 +278,19 @@ We continue to denote by `\alpha,\beta,\gamma,\delta` the `g\times g` blocks of
     Sets *w* to `(\alpha\tau + \beta)(\gamma\tau + \delta)^{-1}` and *r* to
     `(\gamma\tau + \delta)^{-T}z`.
 
+.. function:: void acb_siegel_cho(arb_mat_t C, const acb_mat_t tau, slong prec)
+
+    Sets *C* to an upper-triangular Cholesky matrix such that `\pi
+    \mathrm{Im}(\tau) = C^T C`. If one cannot determine that
+    `\mathrm{Im}(\tau)` is positive definite at the current working precision,
+    *C* is set to an indeterminate matrix.
+
+.. function:: void acb_siegel_yinv(arb_mat_t Yinv, const acb_mat_t tau, slong prec)
+
+    Sets *Yinv* to the inverse of `\mathrm{Im}(\tau)`. If one cannot determine
+    that `\mathrm{Im}(\tau)` is invertible at the current working precision,
+    *Yinv* is set to an indeterminate matrix.
+
 .. function:: void acb_siegel_reduce(fmpz_mat_t mat, const acb_mat_t tau, slong prec)
 
     Sets *mat* to a symplectic matrix such that `\mathit{mat}\cdot\tau` is as
@@ -461,13 +474,6 @@ Ellipsoids: memory management and computations
 .. function:: void acb_theta_eld_clear(acb_theta_eld_t E)
 
     Clears *E* as well as any recursive data contained in it.
-
-.. function:: void acb_theta_eld_cho(arb_mat_t C, const acb_mat_t tau, slong prec)
-
-    Sets *C* to an upper-triangular Cholesky matrix such that `\pi
-    \mathrm{Im}(\tau) = C^T C`. If one cannot determine that
-    `\mathrm{Im}(\tau)` is positive definite at the current working precision,
-    *C* is set to an indeterminate matrix.
 
 .. function:: void acb_theta_eld_fill(acb_theta_eld_t E, const arb_mat_t C, const arf_t R2, arb_srcptr v)
 
@@ -1088,10 +1094,6 @@ domain and the eigenvalues of `\mathrm{Im}(\tau)` are not too large, say in
     quasi-linear algorithm for computing `\theta_{a,0}` (before applying the
     splitting strategy, in the case `s > 0`). The precise value of `n` is
     chosen to optimize performance.
-
-.. function:: void acb_theta_ql_log_rescale(acb_t res, acb_srcptr z, const acb_mat_t tau, slong prec)
-
-    Sets *res* to `i y^T Y^{-1} y`. This is used to rescale theta values as explained above.
 
 .. function:: int acb_theta_ql_roots(acb_ptr rts, acb_srcptr t, acb_srcptr z, arb_srcptr d0, arb_srcptr d, const acb_mat_t tau, slong nb_steps, slong guard, slong prec)
 

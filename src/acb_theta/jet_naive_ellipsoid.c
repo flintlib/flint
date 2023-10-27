@@ -26,11 +26,10 @@ acb_theta_jet_naive_ellipsoid(acb_theta_eld_t E, arb_t u, acb_srcptr z,
     arb_mat_init(Yinv, g, g);
     v = _arb_vec_init(g);
 
-    acb_theta_eld_cho(C, tau, prec);
-    acb_mat_get_imag(Yinv, tau);
-    arb_mat_inv(Yinv, Yinv, prec);
+    acb_siegel_yinv(Yinv, tau, prec);
+    acb_siegel_cho(C, tau, prec);
 
-    if (arb_mat_is_finite(C))
+    if (arb_mat_is_finite(C) && arb_mat_is_finite(Yinv))
     {
         /* Get offset and bound on leading factor */
         _acb_vec_get_imag(v, z, g);

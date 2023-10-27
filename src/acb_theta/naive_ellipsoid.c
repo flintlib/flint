@@ -27,7 +27,7 @@ acb_theta_naive_ellipsoid(acb_theta_eld_t E, acb_ptr new_zs, acb_ptr cs, arb_ptr
     arb_mat_init(C, g, g);
     v = _arb_vec_init(g);
 
-    acb_theta_eld_cho(C, tau, prec);
+    acb_siegel_cho(C, tau, prec);
 
     if (arb_mat_is_finite(C))
     {

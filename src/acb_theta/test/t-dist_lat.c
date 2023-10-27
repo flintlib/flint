@@ -50,7 +50,7 @@ int main(void)
 
         /* Get reduced C */
         acb_siegel_randtest_reduced(tau, state, hprec, bits);
-        acb_theta_eld_cho(C, tau, prec);
+        acb_siegel_cho(C, tau, prec);
         for (k = 0; k < g; k++)
         {
             arb_randtest_precise(&v[k], state, prec, bits);

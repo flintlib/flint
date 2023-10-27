@@ -25,9 +25,8 @@ acb_theta_dist_a0(arb_ptr d, acb_srcptr z, const acb_mat_t tau, slong prec)
     v = _arb_vec_init(g);
     w = _arb_vec_init(g);
 
-    acb_mat_get_imag(Yinv, tau);
-    arb_mat_inv(Yinv, Yinv, prec);
-    acb_theta_eld_cho(C, tau, prec);
+    acb_siegel_yinv(Yinv, tau, prec);
+    acb_siegel_cho(C, tau, prec);
 
     _acb_vec_get_imag(v, z, g);
     arb_mat_vector_mul_col(v, Yinv, v, prec);

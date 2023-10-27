@@ -32,29 +32,34 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong* n1, acb_srcptr
     arf_init(eps);
     arb_init(b);
 
-    acb_theta_eld_cho(C, tau, prec);
-    acb_theta_naive_radius(R2, eps, C, 0, prec);
-    acb_theta_naive_reduce(v, new_z, c, u, z, 1, tau, C, prec);
-    arb_mul_arf(u, u, eps, prec);
+    acb_siegel_cho(C, tau, prec);
 
-    arb_set_arf(b, R2);
-    arb_sqrt(b, b, prec);
-    arb_mul_2exp_si(b, b, 1);
-
-    for (s = g; s > 0; s--)
+    if (arb_mat_is_finite(C))
     {
-        if (!arb_gt(arb_mat_entry(C, s - 1, s - 1), b))
+        acb_theta_naive_radius(R2, eps, C, 0, prec);
+        acb_theta_naive_reduce(v, new_z, c, u, z, 1, tau, C, prec);
+        arb_mul_arf(u, u, eps, prec);
+
+        arb_set_arf(b, R2);
+        arb_sqrt(b, b, prec);
+        arb_mul_2exp_si(b, b, 1);
+
+        for (s = g; s > 0; s--)
         {
-            break;
+            if (!arb_gt(arb_mat_entry(C, s - 1, s - 1), b))
+            {
+                break;
+            }
         }
     }
-
-    if (!arb_mat_is_finite(C))
+    else
     {
         acb_indeterminate(c);
         arb_pos_inf(u);
+        s = -1;
     }
-    else if (s < g)
+
+    if ((s < g) && arb_mat_is_finite(C))
     {
         /* Construct ellipsoid */
         acb_theta_eld_init(E, g - s, g - s);

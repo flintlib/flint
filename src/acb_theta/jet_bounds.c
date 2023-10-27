@@ -32,10 +32,9 @@ acb_theta_jet_bounds_ci(arb_t c0, arb_t c1, arb_t c2, acb_srcptr z, const acb_ma
     arb_init(t);
     arb_init(s);
 
-    acb_mat_get_imag(Yinv, tau);
     _acb_vec_get_imag(y, z, g);
-    arb_mat_inv(Yinv, Yinv, lp);
-    acb_theta_eld_cho(cho, tau, lp);
+    acb_siegel_yinv(Yinv, tau, lp);
+    acb_siegel_cho(cho, tau, lp);
 
     /* c0 is 2^g \prod_{i=1}^g (1 + 2/\sqrt{\gamma_i}) */
     arb_one(c0);

@@ -70,6 +70,9 @@ void acb_siegel_transform(acb_mat_t w, const fmpz_mat_t mat, const acb_mat_t tau
 void acb_siegel_transform_z(acb_ptr r, acb_mat_t w, const fmpz_mat_t mat,
     acb_srcptr z, const acb_mat_t tau, slong prec);
 
+void acb_siegel_cho(arb_mat_t C, const acb_mat_t tau, slong prec);
+void acb_siegel_yinv(arb_mat_t Yinv, const acb_mat_t tau, slong prec);
+
 void acb_siegel_reduce(fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 int acb_siegel_is_reduced(const acb_mat_t tau, slong tol_exp, slong prec);
 
@@ -124,7 +127,6 @@ typedef struct acb_theta_eld_struct acb_theta_eld_t[1];
 void acb_theta_eld_init(acb_theta_eld_t E, slong d, slong g);
 void acb_theta_eld_clear(acb_theta_eld_t E);
 
-void acb_theta_eld_cho(arb_mat_t C, const acb_mat_t tau, slong prec);
 void acb_theta_eld_fill(acb_theta_eld_t E, const arb_mat_t C, const arf_t R2, arb_srcptr v);
 void acb_theta_eld_points(slong* pts, const acb_theta_eld_t E);
 void acb_theta_eld_border(slong* pts, const acb_theta_eld_t E);
@@ -223,7 +225,6 @@ void acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
     arb_srcptr d0, arb_srcptr d, slong g, slong prec);
 
 slong acb_theta_ql_nb_steps(const arb_mat_t C, slong s, slong prec);
-void acb_theta_ql_log_rescale(acb_t res, acb_srcptr z, const acb_mat_t tau, slong prec);
 int acb_theta_ql_roots(acb_ptr rts, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
     arb_srcptr d, const acb_mat_t tau, slong nb_steps, slong guard, slong prec);
 void acb_theta_ql_step_1(acb_ptr res, acb_srcptr th0, acb_srcptr th,

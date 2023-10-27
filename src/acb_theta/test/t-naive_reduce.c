@@ -54,7 +54,7 @@ int main(void)
 
         /* Set tau, cho, Y */
         acb_siegel_randtest_reduced(tau, state, prec, bits);
-        acb_theta_eld_cho(C, tau, prec);
+        acb_siegel_cho(C, tau, prec);
         acb_mat_get_imag(Y, tau);
 
         /* Test: if z are real, new_z = z, c = 1, u = 1 and v = 0 */

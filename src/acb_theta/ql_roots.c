@@ -13,30 +13,28 @@
 
 static int
 acb_theta_ql_roots_1(acb_ptr rts, acb_srcptr z, arb_srcptr d,
-    const acb_t f, const acb_mat_t tau, slong nb_steps, slong prec)
+    const arb_t f, const acb_mat_t tau, slong nb_steps, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
     acb_mat_t w;
     acb_ptr x;
-    acb_t c;
-    arb_t h;
+    arb_t c, h;
     slong hprec, guard;
     slong k, a;
     int res = 1;
 
     acb_mat_init(w, g, g);
     x = _acb_vec_init(g);
-    acb_init(c);
+    arb_init(c);
     arb_init(h);
-
 
     for (k = 0; (k < nb_steps) && res; k++)
     {
         acb_mat_scalar_mul_2exp_si(w, tau, k);
         _acb_vec_scalar_mul_2exp_si(x, z, g, k);
-        acb_mul_2exp_si(c, f, k);
-        acb_exp_pi_i(c, c, prec);
+        arb_mul_2exp_si(c, f, k);
+        arb_exp(c, c, prec);
 
         for (a = 0; (a < n) && res; a++)
         {
@@ -53,12 +51,12 @@ acb_theta_ql_roots_1(acb_ptr rts, acb_srcptr z, arb_srcptr d,
             }
         }
 
-        _acb_vec_scalar_mul(rts + k * n, rts + k * n, n, c, prec);
+        _acb_vec_scalar_mul_arb(rts + k * n, rts + k * n, n, c, prec);
     }
 
     acb_mat_clear(w);
     _acb_vec_clear(x, g);
-    acb_clear(c);
+    arb_clear(c);
     arb_clear(h);
     return res;
 }
@@ -70,15 +68,26 @@ acb_theta_ql_roots_3(acb_ptr rts, acb_srcptr t, acb_srcptr z, arb_srcptr d,
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
     int has_t = !_acb_vec_is_zero(t, g);
+    arb_mat_t Yinv;
     acb_ptr x;
-    acb_t f;
+    arb_ptr y, w;
+    arb_t f, pi;
     slong k;
     int res = 1;
 
+    arb_mat_init(Yinv, g, g);
     x = _acb_vec_init(g);
-    acb_init(f);
+    y = _arb_vec_init(g);
+    w = _arb_vec_init(g);
+    arb_init(f);
+    arb_init(pi);
 
-    acb_theta_ql_log_rescale(f, z, tau, prec);
+    acb_siegel_yinv(Yinv, tau, prec);
+    _acb_vec_get_imag(y, z, g);
+    arb_mat_vector_mul_col(w, Yinv, y, prec);
+    arb_dot(f, NULL, 1, y, 1, w, 1, g, prec);
+    arb_const_pi(pi, prec);
+    arb_mul(f, f, pi, prec);
 
     if (!has_t)
     {
@@ -95,8 +104,12 @@ acb_theta_ql_roots_3(acb_ptr rts, acb_srcptr t, acb_srcptr z, arb_srcptr d,
         }
     }
 
+    arb_mat_clear(Yinv);
     _acb_vec_clear(x, g);
-    acb_clear(f);
+    _arb_vec_clear(y, g);
+    _arb_vec_clear(w, g);
+    arb_clear(f);
+    arb_clear(pi);
     return res;
 }
 

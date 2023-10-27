@@ -52,7 +52,7 @@ int main(void)
         acb_theta_precomp_init(D, nb, g);
 
         acb_siegel_randtest_reduced(tau, state, prec, mag_bits);
-        acb_theta_eld_cho(C, tau, prec);
+        acb_siegel_cho(C, tau, prec);
         arb_randtest_positive(x, state, prec, mag_bits);
         arf_set(R2, arb_midref(x));
         arf_mul_si(R2, R2, 1 + n_randint(state, 10), prec, ARF_RND_UP);

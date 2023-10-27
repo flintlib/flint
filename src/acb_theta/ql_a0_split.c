@@ -12,28 +12,6 @@
 #include "acb_theta.h"
 
 static void
-acb_theta_eld_ncenter(arb_ptr res, acb_srcptr z, const acb_mat_t tau, slong prec)
-{
-    slong g = acb_mat_nrows(tau);
-    arb_mat_t Yinv;
-    int b;
-
-    arb_mat_init(Yinv, g, g);
-
-    acb_mat_get_imag(Yinv, tau);
-    b = arb_mat_inv(Yinv, Yinv, prec);
-    if (!b)
-    {
-        arb_mat_indeterminate(Yinv);
-    }
-
-    _acb_vec_get_imag(res, z, g);
-    arb_mat_vector_mul_col(res, Yinv, res, prec);
-
-    arb_mat_clear(Yinv);
-}
-
-static void
 acb_theta_ql_a0_eld_points(slong** pts, slong* nb_pts, arb_ptr v,
     slong* fullprec, arf_t eps, arb_srcptr d, ulong a, arb_srcptr nctr,
     const arb_mat_t C, const arb_mat_t C1, slong prec)
@@ -182,9 +160,9 @@ acb_theta_ql_a0_split(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d,
     slong nbth = 1 << s;
     slong nbt = (_acb_vec_is_zero(t, g) ? 1 : 3);
     slong lp = ACB_THETA_LOW_PREC;
-    arb_mat_t C, C1;
+    arb_mat_t C, C1, Yinv;
     acb_mat_t tau0, star, tau1;
-    arb_ptr v, nctr, new_d0;
+    arb_ptr v, w, new_d0;
     arf_t eps;
     slong* pts;
     slong fullprec, nb_pts;
@@ -199,15 +177,17 @@ acb_theta_ql_a0_split(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d,
 
     arb_mat_init(C, g, g);
     arb_mat_init(C1, g - s, g - s);
+    arb_mat_init(Yinv, g, g);
     acb_mat_window_init(tau0, tau, 0, 0, s ,s);
     acb_mat_window_init(star, tau, 0, s, s, g);
     acb_mat_window_init(tau1, tau, s, s, g, g);
     v = _arb_vec_init(g - s);
-    nctr = _arb_vec_init(g);
+    w = _arb_vec_init(g);
     new_d0 = _arb_vec_init(nbth);
     arf_init(eps);
 
-    acb_theta_eld_cho(C, tau, prec);
+    acb_siegel_yinv(Yinv, tau, prec);
+    acb_siegel_cho(C, tau, prec);
     for (j = 0; j < g - s; j++)
     {
         for (k = j; k < g - s; k++)
@@ -216,14 +196,15 @@ acb_theta_ql_a0_split(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d,
         }
     }
     acb_theta_dist_a0(new_d0, z, tau0, lp);
-    acb_theta_eld_ncenter(nctr, z, tau, prec);
+    _acb_vec_get_imag(w, z, g);
+    arb_mat_vector_mul_col(w, Yinv, w, prec);
 
     _acb_vec_zero(th, n * nbt);
     for (a = 0; a < nba; a++)
     {
         /* Get offset, fullprec, error and list of points in ellipsoid */
         acb_theta_ql_a0_eld_points(&pts, &nb_pts, v, &fullprec, eps,
-            d, a, nctr, C, C1, prec);
+            d, a, w, C, C1, prec);
 
         /* Sum terms at each point using worker */
         for (k = 0; (k < nb_pts) && res; k++)
@@ -246,11 +227,12 @@ acb_theta_ql_a0_split(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d,
 
     arb_mat_clear(C);
     arb_mat_clear(C1);
+    arb_mat_clear(Yinv);
     acb_mat_window_clear(tau0);
     acb_mat_window_clear(star);
     acb_mat_window_clear(tau1);
     _arb_vec_clear(v, g - s);
-    _arb_vec_clear(nctr, g);
+    _arb_vec_clear(w, g);
     _arb_vec_clear(new_d0, nbth);
     arf_clear(eps);
     return res;

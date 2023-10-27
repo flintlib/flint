@@ -120,7 +120,7 @@ acb_theta_naive_reduce(arb_ptr v, acb_ptr new_zs, acb_ptr cs, arb_ptr us,
 
     acb_mat_get_real(X, tau);
     acb_mat_get_imag(Y, tau);
-    arb_mat_inv(Yinv, Y, prec);
+    acb_siegel_yinv(Yinv, tau, prec);
 
     for (k = 0; k < nb; k++)
     {
