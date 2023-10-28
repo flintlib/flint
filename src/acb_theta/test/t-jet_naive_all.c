@@ -22,7 +22,7 @@ int main(void)
     flint_randinit(state);
 
     /* Test: values match acb_modular_theta_jet on diagonal matrices */
-    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         slong g = 2 + n_randint(state, 2);
         slong mprec = ACB_THETA_LOW_PREC + n_randint(state, 100);

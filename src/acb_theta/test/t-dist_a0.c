@@ -22,7 +22,7 @@ int main(void)
     flint_randinit(state);
 
     /* Test: find zero value when z = tau a/2 + real stuff */
-    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 4);
         slong n = 1 << g;

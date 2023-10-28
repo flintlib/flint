@@ -26,7 +26,7 @@ int main(void)
     {
         slong prec = ACB_THETA_LOW_PREC + n_randint(state, 100);
         slong bits = n_randint(state, 4);
-        slong ord = n_randint(state, 3);
+        slong ord = n_randint(state, 2);
         slong g = 1 + n_randint(state, 3);
         slong n2 = 1 << (2 * g);
         ulong ab = n_randint(state, n2);

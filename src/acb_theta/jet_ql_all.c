@@ -85,7 +85,7 @@ acb_theta_jet_ql_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, 
         _acb_vec_scalar_mul_arb(new_z, new_z, g, t, hprec);
         _acb_vec_add(new_z, new_z, z_mid, g, hprec);
 
-        acb_theta_ql_all(all_val + k * n2, new_z, tau_mid, hprec);
+        acb_theta_ql_all(all_val + k * n2, new_z, tau_mid, 0, hprec);
     }
 
     /* Make finite differences */

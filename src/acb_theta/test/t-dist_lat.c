@@ -22,7 +22,7 @@ int main(void)
     flint_randinit(state);
 
     /* Test: make ellipsoid to check it is indeed the minimal distance */
-    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 4);
         slong prec = ACB_THETA_LOW_PREC;

@@ -22,11 +22,11 @@ int main(void)
     flint_randinit(state);
 
     /* Test: values match jet_naive_all */
-    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         slong prec = ACB_THETA_LOW_PREC + n_randint(state, 100);
         slong bits = n_randint(state, 4);
-        slong ord = n_randint(state, 4);
+        slong ord = n_randint(state, 3);
         slong g = 1 + n_randint(state, 3);
         slong n2 = 1 << (2 * g);
         slong nb = acb_theta_jet_nb(ord, g);

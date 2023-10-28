@@ -50,9 +50,10 @@ acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec
         acb_mat_vector_mul_col(y, N, x, prec);
         acb_dot(t, NULL, 0, x, 1, y, 1, g, prec);
 
+        acb_theta_ql_all(aux, x, w, sqr, prec);
+
         if (sqr)
         {
-            acb_theta_ql_all_sqr(aux, x, w, prec);
             kappa = acb_theta_transform_kappa2(mat);
             acb_siegel_cocycle(c, mat, w, prec);
             acb_mat_det(s, c, prec);
@@ -60,7 +61,6 @@ acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec
         }
         else
         {
-            acb_theta_ql_all(aux, x, w, prec);
             kappa = acb_theta_transform_kappa(s, mat, w, prec);
         }
 

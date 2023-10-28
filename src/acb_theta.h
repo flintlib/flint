@@ -197,9 +197,6 @@ void acb_theta_agm_mul(acb_ptr res, acb_srcptr a1, acb_srcptr a2, slong g, slong
 void acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
     arb_srcptr d0, arb_srcptr d, slong g, slong prec);
 
-void acb_theta_ql_dupl(acb_ptr th2, acb_srcptr th0, acb_srcptr th,
-    arb_srcptr d0, arb_srcptr d, slong g, slong prec);
-
 typedef int (*acb_theta_ql_worker_t)(acb_ptr, acb_srcptr, acb_srcptr,
     arb_srcptr, arb_srcptr, const acb_mat_t, slong, slong);
 
@@ -218,8 +215,7 @@ int acb_theta_ql_a0(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
 slong acb_theta_ql_reduce(acb_ptr x, acb_t c, arb_t u, slong* n1, acb_srcptr z,
     const acb_mat_t tau, slong prec);
 
-void acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec);
-void acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec);
+void acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec);
 
 /* Quasi-linear algorithms for derivatives */
 

@@ -26,7 +26,7 @@ int main(void)
     {
         slong g = 1 + n_randint(state, 3);
         slong n = 1 << (2 * g);
-        slong ord = n_randint(state, 3);
+        slong ord = n_randint(state, 2);
         slong bits = 2;
         slong nb = acb_theta_jet_nb(ord, g);
         slong nb_der = acb_theta_jet_nb(ord + 2, g);

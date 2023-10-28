@@ -27,6 +27,7 @@ int main(void)
         slong g = 1 + n_randint(state, 3);
         slong n = 1 << g;
         int hasz = iter % 2;
+        int sqr = iter % 3;
         slong prec = (g > 1 ? 100 : 1000) + n_randint(state, 200);
         slong hprec = prec + 25;
         acb_mat_t tau;
@@ -47,8 +48,12 @@ int main(void)
             }
         }
 
-        acb_theta_ql_all(th, z, tau, prec);
+        acb_theta_ql_all(th, z, tau, sqr, prec);
         acb_theta_naive_all(test, z, 1, tau, hprec);
+        if (sqr)
+        {
+            _acb_vec_sqr(test, test, n * n, prec);
+        }
 
         if (!acb_is_finite(&th[0]) || !_acb_vec_overlaps(th, test, n * n))
         {
@@ -62,10 +67,10 @@ int main(void)
             flint_abort();
         }
 
-        if (iter % 10 == 0)
+        if (iter % 11 == 0)
         {
             acb_zero(acb_mat_entry(tau, 0, 0));
-            acb_theta_ql_all(th, z, tau, prec);
+            acb_theta_ql_all(th, z, tau, sqr, prec);
             if (acb_is_finite(&th[0]))
             {
                 flint_printf("FAIL (not infinite)\n");

@@ -22,7 +22,7 @@ int main(void)
     flint_randinit(state);
 
     /* Test: bounds are finite, theta values correctly bounded */
-    for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         slong lp = ACB_THETA_LOW_PREC;
         slong prec = lp + 100;

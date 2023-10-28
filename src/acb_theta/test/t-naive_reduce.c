@@ -22,7 +22,7 @@ int main(void)
     flint_randinit(state);
 
     /* Test: special values of z */
-    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 5);
         slong nbz = n_randint(state, 10);

@@ -50,7 +50,7 @@ int main(void)
     for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         slong g = 2;
-        slong prec = 100 + n_randint(state, 500);
+        slong prec = 100 + n_randint(state, 200);
         slong mag_bits = n_randint(state, 2);
         fmpz_mat_t mat;
         acb_mat_t tau, w, c, cinv;

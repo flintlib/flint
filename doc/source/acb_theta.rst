@@ -993,14 +993,6 @@ domain and the eigenvalues of `\mathrm{Im}(\tau)` are not too large, say in
     is at most `\mathrm{Dist}_\tau(-Y^{-1}y, \mathbb{Z}^g + \tfrac{k}{2})^2` by
     the parallelogram identity.
 
-.. function:: void acb_theta_ql_dupl(acb_ptr th2, acb_srcptr th0, acb_srcptr th, arb_srcptr d0, arb_srcptr d, slong g, slong prec)
-
-    Given input as in :func:`acb_theta_ql_step_1` (*rts* excepted), sets `r` to
-    the vector of squared theta values `\theta_{a,b}(z,\tau)^2` for all `a,b\in
-    \{0,1\}^g`.
-
-    We make `2^g` calls to :func:`acb_theta_agm_mul_tight`.
-
 Quasi-linear algorithms: main functions
 -------------------------------------------------------------------------------
 
@@ -1068,12 +1060,13 @@ domain, however `\mathrm{Im}(\tau)` may have large eigenvalues.
 
     Follows the specifications of a function of type
     :type:`acb_theta_ql_worker_t`, except for the additional arguments
-    *nb_steps*, *s* and *worker*. We first call :func:`acb_theta_ql_roots` for
-    *nb_steps* AGM steps with the given *guard*, then call
-    :func:`acb_theta_ql_a0_naive` or :func:`acb_theta_ql_a0_split` (with the
-    given *worker*) depending on whether *s* is zero or not, and finally
-    perform the AGM steps. The return value is 1 iff each subprocedure
-    succeeds.
+    *nb_steps*, *s* and *worker*. We first compute low-precision approximations
+    (more precisely, at shifted absolute precision *guard*) of the square roots
+    we must take to perform *nb_steps* AGM steps; we hope that none of these
+    approximations contains zero. Then we call :func:`acb_theta_ql_a0_naive` or
+    :func:`acb_theta_ql_a0_split` (with the given *worker*) depending on
+    whether *s* is zero or not, and finally perform the AGM steps. The return
+    value is 1 iff each subprocedure succeeds.
 
     The user should ensure that the eigenvalues of
     `2^{\mathit{nb\_steps}}\mathrm{Im}(\tau)` are not too large when calling
@@ -1154,23 +1147,16 @@ probabilistic algorithm where we gradually increase *guard* and first choose `t
     multiply `c` by `\exp(\pi i (\tfrac{n_1^T}{2}\tau_1\tfrac{n_1}{2} +
     n_1^Tz_1))`.
 
-.. function:: void acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
+.. function:: void acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr slong prec)
 
-    Sets *th* to the collection of `\theta_{a,b}(z,\tau)` for all `a,b\in
-    \{0,1\}^g`.
+    Sets *th* to the collection of `\theta_{a,b}(z,\tau)` or
+    `\theta_{a,b}(z,\tau)^2` for all `a,b\in \{0,1\}^g`, depending on whether
+    *sqr* is 0 (false) or nonzero (true).
 
     After calling :func:`acb_theta_ql_reduce`, we generally use the duplication
-    formula on the result of :func:`acb_theta_ql_a0` at `2\tau` and a final
-    square-root step. At low precisions, we call :func:`acb_theta_naive_all`
-    instead.
-
-.. function:: void acb_theta_ql_all_sqr(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong prec)
-
-    Sets *th2* to the collection of `\theta_{a,b}(z,\tau)^2` for all `a,b\in
-    \{0,1\}^g`.
-
-    After calling :func:`acb_theta_ql_reduce`, we use the duplication formula
-    on the result of :func:`acb_theta_ql_a0` at `2\tau`.
+    formula on the result of :func:`acb_theta_ql_a0` at `2\tau`. When *sqr* is
+    zero, we either add a final square-root step or call
+    :func:`acb_theta_naive_all` when the precision is low.
 
 Quasi-linear algorithms: derivatives
 -------------------------------------------------------------------------------

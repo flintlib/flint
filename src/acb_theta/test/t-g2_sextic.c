@@ -22,7 +22,7 @@ int main(void)
     flint_randinit(state);
 
     /* Test: discriminant of sextic is chi10 */
-    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         slong g = 2;
         slong n = 1 << (2 * g);

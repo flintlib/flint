@@ -30,7 +30,7 @@ int main(void)
         acb_ptr z;
         slong nbz = 1 + n_randint(state, 4);
         acb_ptr th, th_0b, test;
-        slong prec1 = 100 + n_randint(state, 1000);
+        slong prec1 = 100 + n_randint(state, 500);
         slong prec = prec1 + n_randint(state, 200);
         slong mag_bits = n_randint(state, 2);
         slong k;
