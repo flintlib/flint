@@ -11,6 +11,8 @@
 
 #include "acb_theta.h"
 
+#define ACB_THETA_QL_TRY 100
+
 int acb_theta_ql_all_use_naive(slong g, slong prec)
 {
     if (g <= 2)

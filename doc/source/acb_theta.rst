@@ -1091,12 +1091,6 @@ auxiliary vector `t` or when *guard* is too small. Thus, we implement a
 probabilistic algorithm where we gradually increase *guard* and first choose `t
 = 0`, then make a random choice of `t` at each step.
 
-.. macro:: ACB_THETA_QL_TRY
-
-    Macro giving the number of times that a new `t` should be picked before
-    abandoning and setting the result to indeterminate values. This is set to
-    100 for a negligible failure probability.
-
 .. function:: slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong* n1, acb_srcptr z, const acb_mat_t tau, slong prec)
 
     Sets *new_z*, *c*, *u*, *n1* and returns `-1\leq s\leq g` such that the
