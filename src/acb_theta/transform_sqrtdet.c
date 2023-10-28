@@ -161,7 +161,9 @@ void acb_theta_transform_sqrtdet(acb_t res, const acb_mat_t tau, slong prec)
     }
     else
     {
-        acb_indeterminate(res);
+        acb_mat_det(res, tau, prec);
+        acb_sqrts(res, z, res, prec);
+        acb_union(res, res, z, prec);
     }
 
     flint_randclear(state);
