@@ -46,8 +46,8 @@ acb_theta_jet_ql_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, 
     err_vec = _arb_vec_init(nb);
 
     /* Get bounds and high precision */
-    acb_theta_jet_bounds(c, rho, z, tau, ord);
-    acb_theta_jet_fd_radius(eps, err, c, rho, ord, g, prec);
+    acb_theta_jet_ql_bounds(c, rho, z, tau, ord);
+    acb_theta_jet_ql_radius(eps, err, c, rho, ord, g, prec);
     arb_set_arf(t, eps);
     arb_log_base_ui(t, t, 2, lp);
     arb_neg(t, t);
@@ -95,7 +95,7 @@ acb_theta_jet_ql_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, 
         {
             acb_set(&val[j], &all_val[j * n2 + k]);
         }
-        acb_theta_jet_fd(jet, eps, err, val, ord, g, hprec);
+        acb_theta_jet_ql_finite_diff(jet, eps, err, val, ord, g, hprec);
         _acb_vec_set(dth + k * nb, jet, nb);
     }
 

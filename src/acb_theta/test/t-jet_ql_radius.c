@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("jet_fd_radius....");
+    flint_printf("jet_ql_radius....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -40,7 +40,7 @@ int main(void)
         arb_randtest_positive(c, state, prec, mag_bits);
         arb_randtest_positive(c, state, prec, mag_bits);
 
-        acb_theta_jet_fd_radius(eps, err, c, rho, ord, g, prec);
+        acb_theta_jet_ql_radius(eps, err, c, rho, ord, g, prec);
 
         arb_set_si(t, 2 * g);
         arb_root_ui(t, t, ord + 1, prec);

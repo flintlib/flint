@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 void
-acb_theta_jet_fd_radius(arf_t eps, arf_t err, const arb_t c, const arb_t rho,
+acb_theta_jet_ql_radius(arf_t eps, arf_t err, const arb_t c, const arb_t rho,
     slong ord, slong g, slong prec)
 {
     slong lp = ACB_THETA_LOW_PREC;

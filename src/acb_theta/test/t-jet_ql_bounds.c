@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("jet_bounds....");
+    flint_printf("jet_ql_bounds....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -51,7 +51,7 @@ int main(void)
             acb_urandom(&z[k], state, prec);
         }
 
-        acb_theta_jet_bounds(c, rho, z, tau, ord);
+        acb_theta_jet_ql_bounds(c, rho, z, tau, ord);
 
         if (!arb_is_finite(rho) || !arb_is_finite(c))
         {

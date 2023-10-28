@@ -1193,7 +1193,7 @@ centered in `z` for `\lVert\cdot\rVert_\infty`, then the sum is `m^g
 Since we divide by `\varepsilon^{|p|}` to get `a_p`, we will add an error of
 `2c g (\varepsilon/\rho)^m` to the result of the discrete Fourier transform.
 
-.. function:: void acb_theta_jet_bounds(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord)
+.. function:: void acb_theta_jet_ql_bounds(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord)
 
     Sets *c* and *rho* such that on every ball centered at (a point contained
     in) *z* of radius *rho*, the functions `|\theta_{a,b}|` for all
@@ -1224,7 +1224,7 @@ Since we divide by `\varepsilon^{|p|}` to get `a_p`, we will add an error of
     \mathit{ord}+1`, i.e. we set `\rho` to the positive root of `2c_2\rho
     (c_1 + c_2\rho) = m`.
 
-.. function:: void acb_theta_jet_fd_radius(arf_t eps, arf_t err, const arb_t c, const arb_t rho, slong ord, slong g, slong prec)
+.. function:: void acb_theta_jet_ql_radius(arf_t eps, arf_t err, const arb_t c, const arb_t rho, slong ord, slong g, slong prec)
 
     Sets *eps* and *err* to be a suitable radius and error bound for computing
     derivatives up to total order *ord* at precision *prec*, given *c* and
@@ -1236,12 +1236,12 @@ Since we divide by `\varepsilon^{|p|}` to get `a_p`, we will add an error of
     (\min\{2^{-\mathit{prec}}/c, 1\}/2g)^{1/m}`. We also set *err* to
     `2^{-\mathit{prec}}`.
 
-.. function:: void acb_theta_jet_fd(acb_ptr dth, const arf_t eps, const arf_t err, acb_srcptr val, slong ord, slong g, slong prec)
+.. function:: void acb_theta_jet_ql_finite_diff(acb_ptr dth, const arf_t eps, const arf_t err, acb_srcptr val, slong ord, slong g, slong prec)
 
     Assuming that *val* contains the values `\theta_{a,b}(z + h_n,\tau)` where
     `h_n = (\varepsilon \zeta^{n_0},\ldots, \varepsilon \zeta^{n_{g-1}})` for a
     root of unity `\zeta` of order `\mathit{ord} + 1`, and assuming that *eps*
-    and *err* has been computed as in :func:`acb_theta_jet_fd_radius`, sets
+    and *err* has been computed as in :func:`acb_theta_jet_ql_radius`, sets
     *dth* to the vector of partial derivatives of `\theta_{a,b}` at `(z,\tau)`
     up to total order *ord*. The vector *val* should be indexed in
     lexicographic order as in :func:`acb_dft`, i.e. writing `j =

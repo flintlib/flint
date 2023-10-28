@@ -16,7 +16,7 @@ int main(void)
     slong iter;
     flint_rand_t state;
 
-    flint_printf("jet_fd....");
+    flint_printf("jet_ql_finite_diff....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -54,7 +54,7 @@ int main(void)
         arb_one(rho);
         arb_set_si(c, g);
         arb_exp(c, c, prec);
-        acb_theta_jet_fd_radius(eps, err, c, rho, ord, g, prec);
+        acb_theta_jet_ql_radius(eps, err, c, rho, ord, g, prec);
 
         /* Fill in values, apply jet_fd at 2*prec */
         for (k = 0; k < nb_val; k++)
@@ -73,7 +73,7 @@ int main(void)
             acb_mul(x, x, t, 2 * prec);
             acb_exp(&val[k], x, 2 * prec);
         }
-        acb_theta_jet_fd(df, eps, err, val, ord, g, 2 * prec);
+        acb_theta_jet_ql_finite_diff(df, eps, err, val, ord, g, 2 * prec);
 
         /* Fill in test */
         acb_theta_jet_tuples(tups, ord, g);
