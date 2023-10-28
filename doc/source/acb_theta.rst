@@ -922,8 +922,8 @@ Quasi-linear algorithms: distances
 
 .. function:: slong acb_theta_dist_addprec(const arb_t d)
 
-    Returns an integer that is close to *d* divided by `\log(2)`. Requires that
-    *d* is finite and of reasonable size, otherwise an error is thrown.
+    Returns an integer that is close to *d* divided by `\log(2)` if *d* is
+    finite and of reasonable size, and otherwise returns 0.
 
 Quasi-linear algorithms: AGM steps
 -------------------------------------------------------------------------------

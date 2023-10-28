@@ -20,7 +20,15 @@ slong acb_theta_dist_addprec(const arb_t d2)
     arb_init(x);
     arb_const_log2(x, prec);
     arb_div(x, d2, x, prec);
-    res = arf_get_si(arb_midref(x), prec);
+
+    if (arb_is_finite(x) && (arf_cmpabs_2exp_si(arb_midref(x), 30) <= 0))
+    {
+        res = arf_get_si(arb_midref(x), prec);
+    }
+    else
+    {
+        res = 0;
+    }
 
     arb_clear(x);
     return res;
