@@ -676,7 +676,7 @@ directly.
 
     We proceed similarly in :func:`acb_theta_naive_fixed_ab` and
     :func:`acb_theta_naive_all`, using :func:`acb_theta_naive_00` for the
-    latter.
+    former.
 
 Naive algorithms for derivatives
 -------------------------------------------------------------------------------
@@ -928,10 +928,6 @@ Quasi-linear algorithms: distances
 Quasi-linear algorithms: AGM steps
 -------------------------------------------------------------------------------
 
-The functions in this section will work best when `\tau` lies in the reduced
-domain and the eigenvalues of `\mathrm{Im}(\tau)` are not too large, say in
-`O(\mathit{prec})`.
-
 .. function:: void acb_theta_agm_hadamard(acb_ptr res, acb_srcptr a, slong g, slong prec)
 
     Sets *res* to the product of the Hadamard matrix `\left(\begin{smallmatrix}
@@ -1141,7 +1137,7 @@ probabilistic algorithm where we gradually increase *guard* and first choose `t
     multiply `c` by `\exp(\pi i (\tfrac{n_1^T}{2}\tau_1\tfrac{n_1}{2} +
     n_1^Tz_1))`.
 
-.. function:: void acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr slong prec)
+.. function:: void acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec)
 
     Sets *th* to the collection of `\theta_{a,b}(z,\tau)` or
     `\theta_{a,b}(z,\tau)^2` for all `a,b\in \{0,1\}^g`, depending on whether
@@ -1338,9 +1334,9 @@ where
 
     In :func:`acb_theta_all` and :func:`acb_theta_jet_all`, we first reduce
     `\tau` using :func:`acb_siegel_reduce`, then call :func:`acb_theta_ql_all`,
-    :func:`acb_theta_ql_all_sqr` or :func:`acb_theta_jet_ql_all` on the reduced
-    matrix, and finally apply the transformation formula. If the reduction step
-    is not successful, we set the result to indeterminate values.
+    or :func:`acb_theta_jet_ql_all` on the reduced matrix, and finally apply
+    the transformation formula. If the reduction step is not successful, we set
+    the result to indeterminate values.
 
 Dimension 2 specifics
 -------------------------------------------------------------------------------
