@@ -993,51 +993,6 @@ domain and the eigenvalues of `\mathrm{Im}(\tau)` are not too large, say in
     is at most `\mathrm{Dist}_\tau(-Y^{-1}y, \mathbb{Z}^g + \tfrac{k}{2})^2` by
     the parallelogram identity.
 
-.. function:: int acb_theta_ql_roots(acb_ptr rts, acb_srcptr t, acb_srcptr z, arb_srcptr d0, arb_srcptr d, const acb_mat_t tau, slong nb_steps, slong guard, slong prec)
-
-    Attempts to set *rts* to the collection of low-precision roots for the
-    given choice of `z` and `t`. It is assumed that *d0* (resp. *d*) contains
-    the result of :func:`acb_theta_dist_a0` on `(0,\tau)` (resp. `(z,\tau)`),
-    and that `t` is a real vector.
-
-    For each `0\leq k < \mathit{nb\_steps}`, each `v = t, 2t, z + t, z + 2t`,
-    and each `a\in \{0,1\}^g`, we run :func:`acb_theta_naive_fixed_ab` to
-    evaluate `\theta_{a,0}(2^kv, 2^k\tau)` at shifted absolute precision
-    *guard*. If none of these complex balls contains zero, returns 1 and sets
-    *rts* to the resulting vector of length `4 \cdot n \cdot 2^g`; otherwise,
-    returns 0 and leaves *rts* undefined. The number of output values is
-    reduced to `2\cdot n\cdot 2^g` or `n\cdot 2^g` when `z = 0`, `t = 0`, or
-    both.
-
-.. function:: void acb_theta_ql_step_1(acb_ptr res, acb_srcptr th0, acb_srcptr th, acb_srcptr rts, arb_srcptr d0, arb_srcptr d, slong g, slong prec)
-
-    Given `\theta_{a,0}(0, 2\tau)` (stored in *th0*) and `\theta_{a,0}(2z,
-    2\tau)` (stored in *th*), sets *res* to the values `\theta_{a,0}(z,\tau)`
-    for `a\in \{0,1\}^g`. We assume that *d0* (resp. *d*) contains the result
-    of :func:`acb_theta_dist_a0` on `(0,2\tau)` (resp. `(2z, 2\tau)`), and that
-    *rts* contains low-precision approximations of `\theta_{a,0}(z,\tau)`.
-
-    We call :func:`acb_theta_agm_mul_tight` and :func:`acb_theta_agm_sqrt` once
-    each.
-
-.. function:: void acb_theta_ql_step_3(acb_ptr res, acb_srcptr th0, acb_srcptr th, acb_srcptr rts, arb_srcptr d0, arb_srcptr d, slong g, slong prec)
-
-    Given `\theta_{a,0}(2v, 2\tau)` for `v = 0, t, 2t` (stored in *th0* as a
-    vector of length `3\times 2^g`) and for `v = z, z + t, z + 2t` (stored in
-    *th*), sets *res* to the vector of length `3\times 2^g` containing
-    `\theta_{a,0}(v,\tau)` for `v = z, z + t, z + 2t` and `a\in \{0,1\}^g`. The
-    assumptions on *d0* and *d* are as in :func:`acb_theta_ql_step_1`, and
-    *rts* must contain low-precision approximations of `\theta(v,\tau)` for `v
-    = z+t, z+ 2t`.
-
-    We make three calls to :func:`acb_theta_agm_mul_tight`, take `2^{g+1}`
-    square roots, and make `2^g` divisions.
-
-.. function:: void acb_theta_ql_step_2(acb_ptr res, acb_srcptr th0, acb_srcptr th, acb_srcptr rts, arb_srcptr d0, arb_srcptr d, slong g, slong prec)
-
-    Same as :func:`acb_theta_ql_step_3`, but does not perform the
-    divisions. The first `2^g` entries of *res* are set to zero.
-
 .. function:: void acb_theta_ql_dupl(acb_ptr th2, acb_srcptr th0, acb_srcptr th, arb_srcptr d0, arb_srcptr d, slong g, slong prec)
 
     Given input as in :func:`acb_theta_ql_step_1` (*rts* excepted), sets `r` to
