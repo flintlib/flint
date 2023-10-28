@@ -65,7 +65,6 @@ acb_theta_naive_0b_gen(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
 {
     slong g = acb_mat_nrows(tau);
     acb_theta_eld_t E;
-    acb_theta_precomp_t D;
     arb_mat_t C;
     arf_t R2, eps;
     acb_ptr cs;
@@ -76,7 +75,6 @@ acb_theta_naive_0b_gen(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     int b;
 
     acb_theta_eld_init(E, g, g);
-    acb_theta_precomp_init(D, nb, g);
     arb_mat_init(C, g, g);
     arf_init(R2);
     arf_init(eps);
@@ -92,11 +90,10 @@ acb_theta_naive_0b_gen(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
 
     if (b)
     {
-        acb_theta_precomp_set(D, new_zs, tau, E, prec);
+        acb_theta_naive_worker(th, len, new_zs, nb, tau, E, 0, prec, worker);
+
         for (k = 0; k < nb; k++)
         {
-            _acb_vec_zero(th + k * len, len);
-            acb_theta_naive_worker(th + k * len, E, D, k, 0, prec, worker);
             _acb_vec_scalar_mul(th + k * len, th + k * len, len, &cs[k], prec);
             arb_mul_arf(&us[k], &us[k], eps, prec);
             for (l = 0; l < len; l++)
@@ -114,7 +111,6 @@ acb_theta_naive_0b_gen(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     }
 
     acb_theta_eld_clear(E);
-    acb_theta_precomp_clear(D);
     arb_mat_clear(C);
     arf_clear(R2);
     arf_clear(eps);

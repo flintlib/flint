@@ -133,30 +133,6 @@ void acb_theta_eld_border(slong* pts, const acb_theta_eld_t E);
 int acb_theta_eld_contains(const acb_theta_eld_t E, slong* pt);
 void acb_theta_eld_print(const acb_theta_eld_t E);
 
-/* Precomputations in naive algorithms */
-
-typedef struct
-{
-    slong dim, nb;
-    acb_mat_struct exp_mat;
-    acb_ptr sqr_powers;
-    slong* indices;
-    acb_ptr exp_z;
-} acb_theta_precomp_struct;
-
-typedef acb_theta_precomp_struct acb_theta_precomp_t[1];
-
-#define acb_theta_precomp_dim(D) ((D)->dim)
-#define acb_theta_precomp_nb(D) ((D)->nb)
-#define acb_theta_precomp_exp_mat(D) (&(D)->exp_mat)
-#define acb_theta_precomp_sqr_pow(D, k, j) (&(D)->sqr_powers[(j) + (D)->indices[(k)]])
-#define acb_theta_precomp_exp_z(D, k, j) (&(D)->exp_z[(k) * (D)->dim + (j)])
-
-void acb_theta_precomp_init(acb_theta_precomp_t D, slong nb, slong g);
-void acb_theta_precomp_clear(acb_theta_precomp_t D);
-void acb_theta_precomp_set(acb_theta_precomp_t D, acb_srcptr zs,
-    const acb_mat_t tau, const acb_theta_eld_t E, slong prec);
-
 /* Naive algorithms */
 
 void acb_theta_naive_radius(arf_t R2, arf_t eps, const arb_mat_t C, slong ord, slong prec);
@@ -170,8 +146,8 @@ void acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong* t
 typedef void (*acb_theta_naive_worker_t)(acb_ptr, acb_srcptr, acb_srcptr, const slong*,
     slong, const acb_t, const slong*, slong, slong, slong, slong);
 
-void acb_theta_naive_worker(acb_ptr th, const acb_theta_eld_t E,
-    const acb_theta_precomp_t D, slong k, slong ord, slong prec,
+void acb_theta_naive_worker(acb_ptr th, slong len, acb_srcptr zs, slong nb,
+    const acb_mat_t tau, const acb_theta_eld_t E, slong ord, slong prec,
     acb_theta_naive_worker_t worker);
 
 void acb_theta_naive_00(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec);

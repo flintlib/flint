@@ -116,7 +116,6 @@ acb_theta_jet_naive_all_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
     slong nb = acb_theta_jet_nb(ord, g);
     slong* tups;
     acb_theta_eld_t E;
-    acb_theta_precomp_t D;
     arb_mat_t C;
     arf_t R2, eps;
     arb_ptr v;
@@ -130,7 +129,6 @@ acb_theta_jet_naive_all_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
 
     tups = flint_malloc(g * nb * sizeof(slong));
     acb_theta_eld_init(E, g, g);
-    acb_theta_precomp_init(D, 1, g);
     arb_mat_init(C, g, g);
     arf_init(R2);
     arf_init(eps);
@@ -152,10 +150,7 @@ acb_theta_jet_naive_all_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
 
     if (b)
     {
-        acb_theta_precomp_set(D, new_z, new_tau, E, prec);
-
-        _acb_vec_zero(dth, n2 * nb);
-        acb_theta_naive_worker(dth, E, D, 0, ord, prec, worker);
+        acb_theta_naive_worker(dth, nb * n2, new_z, 1, new_tau, E, ord, prec, worker);
 
         arb_mul_arf(u, u, eps, prec);
         for (k = 0; k < nb * n2; k++)
@@ -192,7 +187,6 @@ acb_theta_jet_naive_all_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
 
     flint_free(tups);
     acb_theta_eld_clear(E);
-    acb_theta_precomp_clear(D);
     arb_mat_clear(C);
     arf_clear(R2);
     arf_clear(eps);

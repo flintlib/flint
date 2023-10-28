@@ -505,81 +505,7 @@ called successfully.
     Prints a faithful description of `E`. This may be unwieldy in high
     dimensions.
 
-Precomputations in naive algorithms
--------------------------------------------------------------------------------
-
-When running naive algorithms on an ellipsoid `E` for a certain matrix `\tau\in
-\mathbb{H}_g` and points `z^{(0)},\ldots, z^{(n-1)}\in \mathbb{C}^g`, we
-precompute the following quantities:
-
-    .. math ::
-
-        \exp(\pi i (2 - \delta_{j,k})\tau_{j,k}) \text{ for } 0\leq j\leq k < g,
-
-    .. math ::
-
-        \exp(\pi i j^2 \tau_{k,k}) \text{ for } 0\leq k < g \text{ and } 0\leq j\leq M_k,
-
-where `M_k` is the result of :macro:`acb_theta_eld_box` on `(E,k)`, and finally
-
-    .. math ::
-
-        \exp(2 \pi i z^{(k)}_j) \text{ for } 0\leq j < g \text{ and } 1\leq k\leq n.
-
-Considering several vectors `z` at the same time is meant to accelerate the
-computation of `\theta_{a,b}(z,\tau)` for many values of `z` and a fixed
-`\tau`.
-
-.. type:: acb_theta_precomp_struct
-
-.. type:: acb_theta_precomp_t
-
-An :type:`acb_theta_precomp_t` is an array of length one of type
-:type:`acb_theta_precomp_struct` containing the above data, permitting it to be
-passed by reference.
-
-The following macros are available after calling :func:`acb_theta_precomp_init`
-and :func:`acb_theta_precomp_set` below.
-
-.. macro:: acb_theta_precomp_dim(D)
-
-    Macro returning the ambient dimension `g`.
-
-.. macro:: acb_theta_precomp_nb(D)
-
-    Macro returning the number of vectors `z` stored in *D*.
-
-.. macro:: acb_theta_precomp_exp_mat(D)
-
-    Macro returning a pointer to an :type:`acb_mat_t` whose entry `(j,k)`
-    contains `\exp(\pi i (2 - \delta_{j,k}) \tau_{j,k})` for every `0\leq j
-    \leq k\leq g`.
-
-.. macro:: acb_theta_precomp_sqr_pow(D, k, j)
-
-    Macro returning a pointer to the complex number `\exp(\pi i j^2
-    \tau_{k,k})` as an :type:`acb_t`.
-
-.. macro:: acb_theta_precomp_exp_z(D, k, j)
-
-    Macro returning a pointer to the complex number `\exp(2\pi i z_k^{(j)})` as
-    an :type:`acb_t`.
-
-.. function:: void acb_theta_precomp_init(acb_theta_precomp_t D, slong nb, slong g)
-
-    Initializes *D* for precomputations on *nb* vectors `z\in \mathbb{C}^g`.
-
-.. function:: void acb_theta_precomp_clear(acb_theta_precomp_t D)
-
-    Clears *D*.
-
-.. function:: void acb_theta_precomp_set(acb_theta_precomp_t D, acb_srcptr zs, const acb_mat_t tau, const acb_theta_eld_t E, slong prec)
-
-    Computes the above data for the matrix *tau*, vectors *zs* (a concatenation
-    of *nb* vectors of length `g`) and ellipsoid `E`. The dimensions must
-    match, in particular `E` must be an ellipsoid of dimension `g`.
-
-Naive algorithms: ellipsoids and bounds
+Naive algorithms: error bounds
 -------------------------------------------------------------------------------
 
 By [EK2023]_, for any `v\in \mathbb{R}^g` and any upper-triangular Cholesky
@@ -596,10 +522,6 @@ algorithms, and thus to find out which ellipsoid to consider at a given
 precision. When several vectors `z` are present, we first reduce them to a
 common compact domain and use only one ellipsoid, following [DHBHS2004]_.
 
-The methods in this section are only used when `g\geq 2`: when `g=1`, the naive
-algorithms will call functions from :ref:`acb_modular.h <acb-modular>`
-directly.
-
 .. function:: void acb_theta_naive_radius(arf_t R2, arf_t eps, const arb_mat_t C, slong ord, slong prec)
 
     Sets *R2* and *eps* such that the above upper bound for *R2*
@@ -610,13 +532,14 @@ directly.
 
 .. function:: void acb_theta_naive_reduce(arb_ptr v, acb_ptr new_zs, acb_ptr cs, arb_ptr us, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 
-    Performs the simultaneous reductions of the *nb* vectors stored in `zs`
-    with respect to the matrix `\tau`. This means the following. Let `0\leq k<
-    \mathit{nb}`, let `z` denote the `k^{\mathrm{th}}` vector stored in *zs*,
-    and let `X,Y` (resp. `x,y`) be the real and imaginary parts of `\tau`
-    (resp. `z`). Write `Y^{-1}y = r + a` where `a` is an even integral vector
-    and `r` is bounded. (We set `a=0` instead if the entries of this vector
-    have an unreasonably large magnitude.) Then
+    Given *zs*, a concatenation of *nb* vectors of length `g`, performs the
+    simultaneous reduction of these vectors with respect to the matrix
+    `\tau`. This means the following. Let `0\leq k< \mathit{nb}`, let `z`
+    denote the `k^{\mathrm{th}}` vector stored in *zs*, and let `X,Y`
+    (resp. `x,y`) be the real and imaginary parts of `\tau` (resp. `z`). Write
+    `Y^{-1}y = r + a` where `a` is an even integral vector and `r` is
+    bounded. (We set `a=0` instead if the entries of this vector have an
+    unreasonably large magnitude.) Then
 
         .. math ::
 
@@ -686,11 +609,13 @@ This allow us to use :func:`acb_dot` in the workers while maintaining
 reasonable memory costs, and to use an average of strictly less than two
 complex multiplications per lattice point as `R\to \infty`. Moreover, these
 multiplications are performed at only a fraction of the full precision for
-lattice points far from the ellipsoid center.
+lattice points far from the ellipsoid center. Different versions of the naive
+algorithm will rely on slightly different workers, so introducing a function
+pointer type is helpful to avoid code duplication.
 
-Different versions of the naive algorithm will rely on slightly different
-workers, so introducing a function pointer type is helpful to avoid code
-duplication.
+The methods in this section are only used when `g\geq 2`: when `g=1`, the naive
+algorithms will call functions from :ref:`acb_modular.h <acb-modular>`
+directly.
 
 .. type:: acb_theta_naive_worker_t
 
@@ -713,12 +638,16 @@ duplication.
       finally
     - *fullprec* is the working precision for summing into *th*.
 
-.. function:: void acb_theta_naive_worker(acb_ptr th, const acb_theta_eld_t E, const acb_theta_precomp_t D, slong k, slong ord, slong prec, acb_theta_naive_worker_t worker)
+.. function:: void acb_theta_naive_worker(acb_ptr th, slong len, acb_srcptr zs, slong nb, const acb_mat_t tau, const acb_theta_eld_t E, slong ord, slong prec, acb_theta_naive_worker_t worker)
 
-    Runs the naive algorithm on the ellipsoid `E` for the `k^{\mathrm{th}}`
-    vector stored in *D*, summing each term into *th* in-place. The argument
-    *ord* is passed to *worker* and is also used internally when computing
-    working precisions.
+    Runs the naive algorithm by calling *worker* on each line in the ellipsoid
+    *E*. The argument *zs* is a concatenation of *nb* vectors `z\in
+    \mathbb{C}^g`, *len* is the number of theta values computed by *worker* for
+    each `z`, and *ord* is passed as an argument to *worker*. No error bound
+    coming from the tail is added. Considering several vectors `z` at the same
+    time allows for a faster computation of `\theta_{a,b}(z,\tau)` for many
+    values of `z` and a fixed `\tau`, since exponentials of the entries of
+    `\tau` can be computed only once.
 
 .. function:: void acb_theta_naive_00(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 

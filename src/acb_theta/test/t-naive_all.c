@@ -99,7 +99,9 @@ int main(void)
             flint_printf("th, th_test:\n");
             _acb_vec_printd(th, nb * nbz, 10);
             _acb_vec_printd(th_test, nb * nbz, 10);
-            fflush(stdout);
+            flint_printf("difference:\n");
+            _acb_vec_sub(th_test, th_test, th, nb * nbz, prec);
+            _acb_vec_printd(th_test, nb * nbz, 10);
             flint_abort();
         }
 

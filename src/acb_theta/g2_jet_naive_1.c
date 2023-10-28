@@ -174,7 +174,6 @@ acb_theta_g2_jet_naive_1(acb_ptr dth, const acb_mat_t tau, slong prec)
     slong n2 = 1 << (2 * g);
     slong ord = 1;
     acb_theta_eld_t E;
-    acb_theta_precomp_t D;
     acb_mat_t new_tau;
     arb_mat_t C;
     arf_t R2, eps;
@@ -186,7 +185,6 @@ acb_theta_g2_jet_naive_1(acb_ptr dth, const acb_mat_t tau, slong prec)
     int b;
 
     acb_theta_eld_init(E, g, g);
-    acb_theta_precomp_init(D, 1, g);
     acb_mat_init(new_tau, g, g);
     arb_mat_init(C, g, g);
     arf_init(R2);
@@ -205,10 +203,7 @@ acb_theta_g2_jet_naive_1(acb_ptr dth, const acb_mat_t tau, slong prec)
 
     if (b)
     {
-        acb_theta_precomp_set(D, z, new_tau, E, prec);
-
-        _acb_vec_zero(dth, 3 * n2);
-        acb_theta_naive_worker(dth, E, D, 0, ord, prec, worker);
+        acb_theta_naive_worker(dth, 3 * n2, z, 1, new_tau, E, ord, prec, worker);
 
         arb_mul_arf(u, u, eps, prec);
         for (k = 0; k < 3 * n2; k++)
@@ -233,7 +228,6 @@ acb_theta_g2_jet_naive_1(acb_ptr dth, const acb_mat_t tau, slong prec)
     }
 
     acb_theta_eld_clear(E);
-    acb_theta_precomp_clear(D);
     acb_mat_clear(new_tau);
     arb_mat_clear(C);
     arf_clear(R2);
