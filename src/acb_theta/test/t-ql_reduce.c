@@ -28,6 +28,7 @@ int main(void)
         slong n = 1 << g;
         slong prec = ACB_THETA_LOW_PREC + n_randint(state, 100);
         slong s = n_randint(state, g + 1);
+        int fail = (iter % 10 == 0);
         acb_mat_t tau, tau0;
         arb_mat_t Y;
         acb_ptr z, new_z, th, th0, test;
@@ -62,7 +63,8 @@ int main(void)
             }
         }
 
-        /* Choose z as Y.v + error with v either 0, 1/4 or 1/2 entries */
+        /* Choose z as Y.v + error with v either 0, 1/4 or 1/2 entries, or
+           values on which computation will fail */
         acb_mat_get_imag(Y, tau);
         for (k = 0; k < g; k++)
         {
@@ -72,8 +74,15 @@ int main(void)
         arb_mat_vector_mul_col(x, Y, x, prec);
         for (k = 0; k < g; k++)
         {
-            acb_urandom(&z[k], state, prec);
-            arb_add(acb_imagref(&z[k]), acb_imagref(&z[k]), &x[k], prec);
+            if (fail)
+            {
+                acb_randtest(&z[k], state, prec, 100);
+            }
+            else
+            {
+                acb_urandom(&z[k], state, prec);
+                arb_add(acb_imagref(&z[k]), acb_imagref(&z[k]), &x[k], prec);
+            }
         }
 
         s = acb_theta_ql_reduce(new_z, c, u, n1, z, tau, prec);

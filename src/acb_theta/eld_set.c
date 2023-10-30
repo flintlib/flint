@@ -98,7 +98,7 @@ acb_theta_eld_init_children(acb_theta_eld_t E, slong nr, slong nl)
     slong g = acb_theta_eld_ambient_dim(E);
     slong k;
 
-    if (nr > 0)
+    if (nr > 0) /* should always be the case */
     {
         E->rchildren = flint_malloc(nr * sizeof(struct acb_theta_eld_struct));
         acb_theta_eld_nr(E) = nr;
@@ -260,6 +260,11 @@ acb_theta_eld_set_rec(acb_theta_eld_t E, const arb_mat_t C,
     _arb_vec_set(next_v, v_mid, d - 1);
     for (k = 0; (k < nr) && res; k++)
     {
+        if (k > 0)
+        {
+            _arb_vec_add(next_v, next_v, v_diff, d - 1, lp);
+        }
+
         c = mid + k;
         acb_theta_eld_next_R2(next_R2, R2, arb_mat_entry(C, d - 1, d - 1), &v[d - 1], c);
         next_coords[0] = c;
@@ -271,10 +276,6 @@ acb_theta_eld_set_rec(acb_theta_eld_t E, const arb_mat_t C,
             acb_theta_eld_nb_border(E) += acb_theta_eld_nb_border(acb_theta_eld_rchild(E, k));
             slong_vec_max(E->box, E->box, acb_theta_eld_rchild(E, k)->box, d - 1);
             res = (acb_theta_eld_nb_pts(E) <= ACB_THETA_ELD_MAX_PTS);
-        }
-        if (k < nr)
-        {
-            _arb_vec_add(next_v, next_v, v_diff, d - 1, lp);
         }
     }
 

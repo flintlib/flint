@@ -42,9 +42,13 @@ int main(void)
         test = _acb_vec_init(nbz);
 
         acb_siegel_randtest_reduced(tau, state, prec, mag_bits);
+        if (iter % 10 == 0)
+        {
+            mag_bits = 100;
+        }
         for (k = 0; k < g * nbz; k++)
         {
-            acb_urandom(&z[k], state, prec);
+            acb_randtest(&z[k], state, prec, mag_bits);
         }
 
         acb_theta_naive_00(th, z, nbz, tau, prec1);

@@ -27,7 +27,7 @@ int main(void)
         slong g = 1 + n_randint(state, 4);
         acb_mat_t tau;
         acb_t r, t;
-        slong prec = 100 + n_randint(state, 200);
+        slong prec = 2 + n_randint(state, 200);
         slong mag_bits = n_randint(state, 4);
 
         acb_mat_init(tau, g, g);

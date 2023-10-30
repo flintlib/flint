@@ -36,7 +36,7 @@ int main(void)
 
         if (iter % 20 == 0)
         {
-            prec += 1000;
+            prec += 10000; /* necessary for full test coverage */
         }
 
         acb_mat_init(tau, g, g);

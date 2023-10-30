@@ -25,7 +25,7 @@ slong acb_theta_dist_addprec(const arb_t d2)
     {
         res = arf_get_si(arb_midref(x), prec);
     }
-    else
+    else /* should never happen */
     {
         res = 0;
     }

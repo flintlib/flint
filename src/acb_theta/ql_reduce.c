@@ -74,13 +74,9 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong* n1, acb_srcptr
         {
             s = -1;
         }
-        else if (acb_theta_eld_nb_pts(E) > 1)
-        {
-            flint_printf("(ql_reduce) Error: several points\n");
-            flint_abort();
-        }
         else
         {
+            /* at most one point */
             acb_theta_eld_points(n1, E);
 
             /* Update new_z and c */

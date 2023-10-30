@@ -40,9 +40,13 @@ int main(void)
         test = _acb_vec_init(nb * n2);
 
         acb_siegel_randtest_reduced(tau, state, prec, bits);
+        if (iter % 10 == 0)
+        {
+            bits = 100;
+        }
         for (k = 0; k < g; k++)
         {
-            acb_urandom(&z[k], state, prec);
+            acb_randtest(&z[k], state, prec, bits);
         }
 
         acb_theta_jet_naive_00(dth, z, tau, ord, prec);

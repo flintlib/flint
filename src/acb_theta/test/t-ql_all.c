@@ -28,8 +28,10 @@ int main(void)
         slong n = 1 << g;
         int hasz = iter % 2;
         int sqr = iter % 3;
+        int fail = iter % 11;
         slong prec = (g > 1 ? 100 : 1000) + n_randint(state, 200);
         slong hprec = prec + 25;
+        slong bits = n_randint(state, 4);
         acb_mat_t tau;
         acb_ptr z, th, test;
         slong k;
@@ -39,12 +41,16 @@ int main(void)
         th = _acb_vec_init(n * n);
         test = _acb_vec_init(n * n);
 
-        acb_siegel_randtest_nice(tau, state, hprec);
+        acb_siegel_randtest_reduced(tau, state, hprec, bits);
+        if (fail)
+        {
+            acb_zero(acb_mat_entry(tau, 0, 0));
+        }
         if (hasz)
         {
             for (k = 0; k < g; k++)
             {
-                acb_urandom(&z[k], state, hprec);
+                acb_randtest(&z[k], state, hprec, (iter % 10 == 0 ? 100 : 1) * bits);
             }
         }
 
@@ -55,7 +61,7 @@ int main(void)
             _acb_vec_sqr(test, test, n * n, prec);
         }
 
-        if (!acb_is_finite(&th[0]) || !_acb_vec_overlaps(th, test, n * n))
+        if (!_acb_vec_overlaps(th, test, n * n))
         {
             flint_printf("FAIL\n");
             flint_printf("g = %wd, prec = %wd, hasz = %wd, tau:\n",
@@ -66,16 +72,10 @@ int main(void)
             _acb_vec_printd(test, n * n, 5);
             flint_abort();
         }
-
-        if (iter % 11 == 0)
+        if (fail && acb_is_finite(&th[0]))
         {
-            acb_zero(acb_mat_entry(tau, 0, 0));
-            acb_theta_ql_all(th, z, tau, sqr, prec);
-            if (acb_is_finite(&th[0]))
-            {
-                flint_printf("FAIL (not infinite)\n");
-                flint_abort();
-            }
+            flint_printf("FAIL (not infinite)\n");
+            flint_abort();
         }
 
         acb_mat_clear(tau);

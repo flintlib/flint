@@ -178,12 +178,6 @@ acb_theta_ql_a0_split(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d,
     slong a, j, k;
     int res = 1;
 
-    if (s <= 0 || s >= g)
-    {
-        flint_printf("ql_a0_split: Error (must have 1 < s < g)\n");
-        flint_abort();
-    }
-
     arb_mat_init(C, g, g);
     arb_mat_init(C1, g - s, g - s);
     arb_mat_init(Yinv, g, g);

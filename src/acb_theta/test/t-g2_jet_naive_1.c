@@ -27,7 +27,7 @@ int main(void)
         slong g = 2;
         slong n = 1 << (2 * g);
         slong nb = acb_theta_jet_nb(1, g + 1);
-        slong prec = 100 + n_randint(state, 1000);
+        slong prec = 100 + n_randint(state, 3000);
         slong bits = n_randint(state, 4);
         acb_mat_t tau;
         acb_ptr z, dth, test;
@@ -40,6 +40,10 @@ int main(void)
         test = _acb_vec_init(n * nb);
 
         acb_siegel_randtest_reduced(tau, state, prec, bits);
+        if (iter % 10 == 0)
+        {
+            acb_zero(acb_mat_entry(tau, 0, 0));
+        }
 
         acb_theta_g2_jet_naive_1(dth, tau, prec);
         acb_theta_jet_naive_all(test, z, tau, 1, prec);

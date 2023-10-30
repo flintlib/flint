@@ -21,16 +21,20 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: return 1 on various kinds of symplectic matrices */
+    /* Test: return 1 on various kinds of symplectic matrices; return 0 on
+       non-square of even size */
     for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 10);
-        fmpz_mat_t a, b, m;
+        fmpz_mat_t a, b, m, n;
+        slong r = n_randint(state, 10);
+        slong c = n_randint(state, 10);
         slong bits = n_randint(state, 100);
 
         fmpz_mat_init(a, g, g);
         fmpz_mat_init(b, g, g);
         fmpz_mat_init(m, 2 * g, 2 * g);
+        fmpz_mat_init(n, r, c);
 
         if (iter == 0)
         {
@@ -56,15 +60,25 @@ int main(void)
 
         if (!sp2gz_is_correct(m))
         {
-            flint_printf("FAIL\n\n");
+            flint_printf("FAIL\n");
             fmpz_mat_print_pretty(m);
-            flint_printf("\n\n");
+            flint_printf("\n");
+            flint_abort();
+        }
+
+        fmpz_mat_one(n);
+        if ((r != c || r % 2 == 1) && sp2gz_is_correct(n))
+        {
+            flint_printf("FAIL\n");
+            fmpz_mat_print_pretty(n);
+            flint_printf("\n");
             flint_abort();
         }
 
         fmpz_mat_clear(a);
         fmpz_mat_clear(b);
         fmpz_mat_clear(m);
+        fmpz_mat_clear(n);
     }
 
     flint_randclear(state);

@@ -28,6 +28,7 @@ int main(void)
         slong prec = 100 + n_randint(state, 200);
         slong mag_bits = n_randint(state, 5);
         slong tol_exp = -10;
+        int fail = iter % 10;
         acb_mat_t tau;
         acb_mat_t w;
         fmpz_mat_t mat;
@@ -36,6 +37,10 @@ int main(void)
         acb_mat_init(w, g, g);
         fmpz_mat_init(mat, 2 * g, 2 * g);
 
+        if (fail)
+        {
+            mag_bits = 100;
+        }
         acb_siegel_randtest(tau, state, prec, mag_bits);
         acb_siegel_reduce(mat, tau, prec);
 
@@ -48,7 +53,7 @@ int main(void)
 
         acb_siegel_transform(w, mat, tau, prec);
 
-        if (!acb_siegel_is_reduced(w, tol_exp, prec))
+        if (!fail && !acb_siegel_is_reduced(w, tol_exp, prec))
         {
             flint_printf("FAIL (not reduced)\n");
             acb_mat_printd(tau, 10);

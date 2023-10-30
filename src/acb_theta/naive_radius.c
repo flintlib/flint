@@ -31,27 +31,16 @@ invert_lin_plus_log(arf_t R2, slong a, const arb_t b, slong prec)
         arb_get_ubound_arf(R2, b, prec);
         goto exit;
     }
-    if (!arb_is_finite(b))
-    {
-        arf_nan(R2);
-        goto exit;
-    }
 
-    /* Now a>0 and b finite; minimum is at x=a/2 */
+    /* minimum is at x=a/2 */
     arb_set_si(x, a);
     arb_div_si(x, x, 2, prec);
     arb_log(y, x, prec);
     arb_mul(y, y, x, prec);
     arb_sub(y, x, y, prec);
 
-    if (arb_lt(b, y))
-    {
-        arf_zero(R2);
-        goto exit;
-    }
-
-    /* Otherwise, x = max(a, 2*(b - min) + a log 2) is always large enough;
-       then iterate function a few times */
+    /* x = max(a, 2*(b - min) + a log 2) is always large enough; then iterate
+       function a few times */
     arb_sub(y, b, y, prec);
     arb_const_log2(t, prec);
     arb_mul_2exp_si(t, t, -1);

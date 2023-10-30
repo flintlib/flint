@@ -11,6 +11,13 @@
 
 #include "acb_theta.h"
 
+static int
+worker_fail(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
+    arb_srcptr d, const acb_mat_t tau, slong guard, slong prec)
+{
+    return 0;
+}
+
 int main(void)
 {
     slong iter;
@@ -60,7 +67,7 @@ int main(void)
         acb_theta_dist_a0(d, z, tau, lp);
 
         res = acb_theta_ql_a0_split(r, t, z, d, tau, s, guard, prec,
-            &acb_theta_ql_a0_naive);
+            (iter % 10 == 0 ? &worker_fail : &acb_theta_ql_a0_naive));
         acb_theta_ql_a0_naive(test, t, z, d0, d, tau, guard, hprec);
 
         if (!_acb_vec_is_zero(z, g))
