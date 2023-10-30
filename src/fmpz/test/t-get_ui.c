@@ -29,7 +29,7 @@ TEST_FUNCTION_START(fmpz_get_ui, state)
         fmpz_set_ui(a, b);
         c = fmpz_get_ui(a);
 
-        result = (b == c);
+        result = (b == c) && _fmpz_is_canonical(a);
 
         if (!result)
         {

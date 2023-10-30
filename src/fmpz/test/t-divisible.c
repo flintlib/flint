@@ -17,7 +17,7 @@ TEST_FUNCTION_START(fmpz_divisible, state)
 {
     int i, result;
 
-    /* Compare with MPIR:  random */
+    /* Compare with GMP:  random */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;
@@ -53,7 +53,7 @@ TEST_FUNCTION_START(fmpz_divisible, state)
         mpz_clear(d);
     }
 
-    /* Compare with MPIR:  b a multiple of a */
+    /* Compare with GMP:  b a multiple of a */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;

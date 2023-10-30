@@ -35,7 +35,7 @@ TEST_FUNCTION_START(fmpz_set_ui_smod, state)
 
         fmpz_set_ui_smod(b, r, m);
 
-        if (!fmpz_equal(a, b))
+        if (!fmpz_equal(a, b) || !_fmpz_is_canonical(b))
         {
             flint_printf("FAIL:\n");
             flint_printf("a: "); fmpz_print(a); flint_printf("\n");

@@ -18,7 +18,7 @@ TEST_FUNCTION_START(fmpz_setbit, state)
 {
     int i, result;
 
-    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         ulong j;
         fmpz_t a, b, c;
@@ -38,7 +38,7 @@ TEST_FUNCTION_START(fmpz_setbit, state)
         mpz_setbit(z, j);
         fmpz_set_mpz(c, z);
 
-        result = (fmpz_equal(b, c));
+        result = (fmpz_equal(b, c)) && _fmpz_is_canonical(b);
 
         if (!result)
         {

@@ -21,6 +21,7 @@ TEST_FUNCTION_START(fmpz_addmul, state)
     {
         fmpz_t a, b, c;
         mpz_t d, e, f, g;
+        int aliasing;
 
         fmpz_init(a);
         fmpz_init(b);
@@ -42,20 +43,36 @@ TEST_FUNCTION_START(fmpz_addmul, state)
         fmpz_get_mpz(e, b);
         fmpz_get_mpz(f, c);
 
-        fmpz_addmul(c, a, b);
+        aliasing = n_randint(state, 4);
+
+        if (aliasing == 0)
+        {
+            fmpz_addmul(c, a, b);
+        }
+        else if (aliasing == 1)
+        {
+            fmpz_set(a, b);
+            mpz_set(d, e);
+            fmpz_addmul(c, a, a);
+        }
+        else if (aliasing == 2)
+        {
+            fmpz_set(c, a);
+            mpz_set(f, d);
+            fmpz_addmul(c, c, b);
+        }
+        else
+        {
+            fmpz_set(c, b);
+            mpz_set(f, e);
+            fmpz_addmul(c, a, c);
+        }
+
         mpz_addmul(f, d, e);
 
         fmpz_get_mpz(g, c);
 
-        result = (mpz_cmp(f, g) == 0);
-
-        if (COEFF_IS_MPZ(*c))
-        {
-            fmpz x = *c;
-            _fmpz_demote_val(c);
-            if (*c != x)
-                result = 0;
-        }
+        result = (mpz_cmp(f, g) == 0) && _fmpz_is_canonical(c);
 
         if (!result)
         {

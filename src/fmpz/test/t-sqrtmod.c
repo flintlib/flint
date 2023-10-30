@@ -39,7 +39,7 @@ TEST_FUNCTION_START(fmpz_sqrtmod, state)
         fmpz_mul(c, b, b);
         fmpz_mod(c, c, p);
 
-        result = (ans == 0 || fmpz_equal(a, c));
+        result = (ans == 0 || fmpz_equal(a, c)) && _fmpz_is_canonical(b);
         if (!result)
         {
             flint_printf("FAIL (random):\n");
@@ -92,7 +92,7 @@ TEST_FUNCTION_START(fmpz_sqrtmod, state)
         fmpz_mul(d, c, c);
         fmpz_mod(d, d, p);
 
-        result = (ans && fmpz_equal(a, d));
+        result = (ans && fmpz_equal(a, d)) && _fmpz_is_canonical(c);
         if (!result)
         {
             flint_printf("FAIL (squares):\n");

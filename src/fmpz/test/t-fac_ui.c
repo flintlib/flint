@@ -32,7 +32,7 @@ TEST_FUNCTION_START(fmpz_fac_ui, state)
         {
             fmpz_fac_ui(x, i);
             fmpz_mul_ui(y, y, FLINT_MAX(1, i));
-            if (!fmpz_equal(x, y))
+            if (!fmpz_equal(x, y) || !_fmpz_is_canonical(x))
             {
                 flint_printf("FAIL: %wd\n", i);
                 fmpz_print(x);

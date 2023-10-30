@@ -119,6 +119,8 @@ void flint_mpz_clear_readonly(mpz_t z);
 void _fmpz_clear_readonly_mpz(mpz_t);
 void fmpz_clear_readonly(fmpz_t f);
 
+int _fmpz_is_canonical(const fmpz_t x);
+
 /* Randomisation *************************************************************/
 
 void fmpz_randbits(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits);
@@ -621,7 +623,7 @@ void fmpz_fib_ui(fmpz_t f, ulong n);
 
 void _fmpz_CRT_ui_precomp(fmpz_t out, const fmpz_t r1, const fmpz_t m1, ulong r2, ulong m2, mp_limb_t m2inv, const fmpz_t m1m2, mp_limb_t c, int sign);
 void fmpz_CRT_ui(fmpz_t out, const fmpz_t r1, const fmpz_t m1, ulong r2, ulong m2, int sign);
-void fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1, fmpz_t r2, fmpz_t m2, int sign);
+void fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1, const fmpz_t r2, const fmpz_t m2, int sign);
 
 /* multi CRT *****************************************************************/
 

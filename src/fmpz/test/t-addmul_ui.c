@@ -38,20 +38,22 @@ TEST_FUNCTION_START(fmpz_addmul_ui, state)
         fmpz_get_mpz(e, b);
         x = n_randtest(state);
 
-        fmpz_addmul_ui(b, a, x);
+        if (n_randint(state, 2))
+        {
+            fmpz_addmul_ui(b, a, x);
+        }
+        else  /* test aliasing */
+        {
+            fmpz_set(b, a);
+            mpz_set(e, d);
+            fmpz_addmul_ui(b, b, x);
+        }
+
         flint_mpz_addmul_ui(e, d, x);
 
         fmpz_get_mpz(f, b);
 
-        result = (mpz_cmp(e, f) == 0);
-
-        if (COEFF_IS_MPZ(*b))
-        {
-            fmpz c = *b;
-            _fmpz_demote_val(b);
-            if (*b != c)
-                result = 0;
-        }
+        result = (mpz_cmp(e, f) == 0) && _fmpz_is_canonical(b);
 
         if (!result)
         {

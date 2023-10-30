@@ -34,7 +34,7 @@ TEST_FUNCTION_START(fmpz_fib_ui, state)
             fmpz_fib_ui(z, i+2);
             fmpz_add(w, x, y);
 
-            if (!fmpz_equal(w, z))
+            if (!fmpz_equal(w, z) || !_fmpz_is_canonical(x))
             {
                 flint_printf("FAIL: %wd\n", i);
                 fmpz_print(x);

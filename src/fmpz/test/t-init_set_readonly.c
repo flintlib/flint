@@ -76,7 +76,7 @@ TEST_FUNCTION_START(fmpz_init_set_readonly, state)
             fmpz_init(h);
             fmpz_set_mpz(h, z);
 
-            if (!fmpz_equal(g, h))
+            if (!fmpz_equal(g, h) || !_fmpz_is_canonical(h))
             {
                 flint_printf("FAIL:\n\n");
                 flint_printf("g = "), fmpz_print(g), flint_printf("\n");

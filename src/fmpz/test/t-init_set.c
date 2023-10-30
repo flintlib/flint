@@ -26,7 +26,7 @@ TEST_FUNCTION_START(fmpz_init_set, state)
         fmpz_randtest(a, state, SMALL_FMPZ_BITCOUNT_MAX);
         fmpz_init_set(b, a);
 
-        result = fmpz_equal(a, b);
+        result = fmpz_equal(a, b) && _fmpz_is_canonical(b);
         if (!result)
         {
             flint_printf("FAIL:\n\n");
@@ -49,7 +49,7 @@ TEST_FUNCTION_START(fmpz_init_set, state)
         fmpz_randtest(a, state, 2 * FLINT_BITS);
         fmpz_init_set(b, a);
 
-        result = fmpz_equal(a, b);
+        result = fmpz_equal(a, b) && _fmpz_is_canonical(b);
         if (!result)
         {
             flint_printf("FAIL:\n\n");

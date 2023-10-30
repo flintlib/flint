@@ -34,7 +34,7 @@ TEST_FUNCTION_START(fmpz_bin_uiui, state)
         flint_mpz_bin_uiui(z, n, k);
         fmpz_set_mpz(y, z);
 
-        if (!fmpz_equal(x, y))
+        if (!fmpz_equal(x, y) || !_fmpz_is_canonical(x))
         {
             flint_printf("FAIL: n,k = %wu,%wu\n", n, k);
             fflush(stdout);

@@ -122,7 +122,7 @@ TEST_FUNCTION_START(fmpz_print_read, state)
                     flint_abort();
                 }
 
-                result = fmpz_equal(t, a + i);
+                result = fmpz_equal(t, a + i) && _fmpz_is_canonical(t);
                 if (!result)
                 {
                     flint_printf("FAIL:\n");
@@ -220,7 +220,7 @@ TEST_FUNCTION_START(fmpz_print_read, state)
             while (!feof(in))
             {
                 r = fmpz_fread(in, t);
-                if (r > 0)
+                if (r > 0 || !_fmpz_is_canonical(t))
                 {
                     flint_printf("FAIL:\n");
                     flint_printf("r = %d\n", r);

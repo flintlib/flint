@@ -32,7 +32,7 @@ TEST_FUNCTION_START(fmpz_neg_ui, state)
 
         fmpz_neg_ui(b, c);
 
-        result = fmpz_equal(a, b);
+        result = fmpz_equal(a, b) && _fmpz_is_canonical(b);
         if (!result)
         {
             flint_printf("FAIL:\n");

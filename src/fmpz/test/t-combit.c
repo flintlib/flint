@@ -36,7 +36,7 @@ TEST_FUNCTION_START(fmpz_combit, state)
         mpz_combit(b, j);
         fmpz_get_mpz(c, a);
 
-        result = (mpz_cmp(b, c) == 0);
+        result = (mpz_cmp(b, c) == 0) && _fmpz_is_canonical(a);
 
         if (!result)
         {

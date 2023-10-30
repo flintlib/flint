@@ -140,7 +140,7 @@ TEST_FUNCTION_START(fmpz_stress, state)
             fmpz_set_ui(check, n);
             fmpz_mul_ui(check, check, n - 1);
             fmpz_mul_2exp(check, check, 99);
-            if (!fmpz_equal(total, check))
+            if (!fmpz_equal(total, check) || !_fmpz_is_canonical(total))
             {
                 flint_printf("FAIL:\n");
                 flint_printf("total: "); fmpz_print(total); flint_printf("\n");

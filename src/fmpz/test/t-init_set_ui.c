@@ -26,7 +26,7 @@ TEST_FUNCTION_START(fmpz_init_set_ui, state)
         fmpz_set_ui(a, x);
         fmpz_init_set_ui(b, x);
 
-        result = fmpz_equal(a, b);
+        result = fmpz_equal(a, b) && _fmpz_is_canonical(b);
         if (!result)
         {
             flint_printf("FAIL:\n\n");

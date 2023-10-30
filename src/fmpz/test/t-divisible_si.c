@@ -19,7 +19,7 @@ TEST_FUNCTION_START(fmpz_divisible_si, state)
 {
     int i, result;
 
-    /* Compare with MPIR:  random */
+    /* Compare with GMP:  random */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         slong a;
@@ -51,7 +51,7 @@ TEST_FUNCTION_START(fmpz_divisible_si, state)
         mpz_clear(d);
     }
 
-    /* Compare with MPIR:  b a multiple of a */
+    /* Compare with GMP:  b a multiple of a */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         slong a;

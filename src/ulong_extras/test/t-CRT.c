@@ -33,9 +33,7 @@ TEST_FUNCTION_START(n_CRT, state)
         fmpz_randtest_not_zero(m1, state, b1);
         fmpz_randtest_not_zero(m2, state, b2);
         fmpz_abs(m1, m1);
-        fmpz_add_ui(m1, m1, 1);
         fmpz_abs(m2, m2);
-        fmpz_add_ui(m2, m2, 1);
         fmpz_mul(m1m2, m1, m2);
 
         fmpz_gcd(r, m1, m2);

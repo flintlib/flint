@@ -43,7 +43,7 @@ TEST_FUNCTION_START(fmpz_rfac_uiui, state)
 
         fmpz_mul(r1r2, r1, r2);
 
-        result = fmpz_equal(r1r2, r3);
+        result = fmpz_equal(r1r2, r3) && _fmpz_is_canonical(r1) && _fmpz_is_canonical(r2) && _fmpz_is_canonical(r3);
 
         if (!result)
         {

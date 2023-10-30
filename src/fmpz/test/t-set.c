@@ -41,7 +41,7 @@ TEST_FUNCTION_START(fmpz_set, state)
         fmpz_set(b, a);
         fmpz_get_mpz(d, b);
 
-        result = (mpz_cmp(c, d) == 0);
+        result = (mpz_cmp(c, d) == 0) && _fmpz_is_canonical(b);
         if (!result)
         {
             flint_printf("FAIL:\n");

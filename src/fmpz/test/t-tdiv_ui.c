@@ -35,7 +35,7 @@ TEST_FUNCTION_START(fmpz_tdiv_ui, state)
         r1 = fmpz_tdiv_ui(a, x);
         r2 = flint_mpz_tdiv_ui(b, x);
 
-        result = (r1 == r2);
+        result = (r1 == r2) && _fmpz_is_canonical(a);
         if (!result)
         {
             flint_printf("FAIL:\n");

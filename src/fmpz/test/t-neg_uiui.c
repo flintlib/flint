@@ -35,7 +35,7 @@ TEST_FUNCTION_START(fmpz_neg_uiui, state)
 
         fmpz_neg_uiui(b, hi, lo);
 
-        result = fmpz_equal(a, b);
+        result = fmpz_equal(a, b) && _fmpz_is_canonical(b);
         if (!result)
         {
             flint_printf("FAIL:\n");

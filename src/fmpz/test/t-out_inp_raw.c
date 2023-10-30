@@ -111,7 +111,7 @@ TEST_FUNCTION_START(fmpz_out_inp_raw, state)
             i = 0;
             while ( (r = fmpz_inp_raw(t, in)) != 0 )
             {
-                result = fmpz_equal(t, a + i);
+                result = fmpz_equal(t, a + i) && _fmpz_is_canonical(t);
                 if (!result)
                 {
                     printf("FAIL:\n");

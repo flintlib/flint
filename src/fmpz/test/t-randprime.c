@@ -28,7 +28,7 @@ TEST_FUNCTION_START(fmpz_randprime, state)
 
             fmpz_randprime(p, state, bits, 1);
 
-            if (fmpz_bits(p) != bits)
+            if (fmpz_bits(p) != bits || !_fmpz_is_canonical(p))
             {
                 flint_printf("FAIL: not %wu bits\n", bits);
                 fmpz_print(p); flint_printf("\n");
@@ -66,7 +66,7 @@ TEST_FUNCTION_START(fmpz_randprime, state)
             {
                 fmpz_randprime(p+j, state, bits, 0);
 
-                if (fmpz_bits(p+j) != bits)
+                if (fmpz_bits(p+j) != bits || !_fmpz_is_canonical(p+j))
                 {
                     flint_printf("FAIL: not %wu bits\n", bits);
                     fmpz_print(p+j); flint_printf("\n");
