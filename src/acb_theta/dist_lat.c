@@ -76,7 +76,7 @@ acb_theta_dist_ubound(arf_t u, arb_srcptr v, const arb_mat_t C, slong prec)
         {
             for (j = 0; j < g; j++)
             {
-                pt[j] = approx[2 * j + (k & (1 << j))];
+                pt[j] = approx[2 * j + (k & (1 << j) ? 0 : 1)];
             }
             acb_theta_dist_pt(d, v, C, pt, prec);
             arb_get_ubound_arf(b, d, prec);

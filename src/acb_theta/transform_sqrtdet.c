@@ -92,10 +92,10 @@ void acb_theta_transform_sqrtdet(acb_t res, const acb_mat_t tau, slong prec)
         /* Get reverse of charpoly */
         acb_mat_charpoly(h, C, prec);
         acb_poly_zero(pol);
-        for (k = 0; k <= g; k++)
+        for (j = 0; j <= g; j++)
         {
-            acb_poly_get_coeff_acb(z, h, k);
-            acb_poly_set_coeff_acb(pol, g - k, z);
+            acb_poly_get_coeff_acb(z, h, j);
+            acb_poly_set_coeff_acb(pol, g - j, z);
         }
         acb_poly_one(h);
         acb_poly_set_coeff_si(h, 1, 1);
@@ -105,11 +105,11 @@ void acb_theta_transform_sqrtdet(acb_t res, const acb_mat_t tau, slong prec)
         success = (acb_poly_find_roots(rts, pol, NULL, 0, prec) == g);
 
         /* Check that no root intersects the [-1,1] segment */
-        for (k = 0; (k < g) && success; k++)
+        for (j = 0; (j < g) && success; j++)
         {
-            if (arb_contains_zero(acb_imagref(&rts[k])))
+            if (arb_contains_zero(acb_imagref(&rts[j])))
             {
-                arb_abs(x, acb_realref(&rts[k]));
+                arb_abs(x, acb_realref(&rts[j]));
                 arb_sub_si(x, x, 1, prec);
                 success = arb_is_positive(x);
             }
