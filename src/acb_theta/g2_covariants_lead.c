@@ -74,11 +74,10 @@ acb_theta_g2_transvectants(acb_ptr res, const acb_poly_t f, slong prec)
 void
 acb_theta_g2_covariants_lead(acb_ptr res, const acb_poly_t f, slong prec)
 {
-    char cofactors[ACB_THETA_G2_COV_NB][20] = {"1", "60", "75", "90", "2250",
-        "2250", "450", "540", "11250", "67500", "13500", "13500", "168750",
-        "67500", "405000", "10125000", "2025000", "2700000", "151875000",
-        "60750000", "15187500", "9112500000", "227812500000", "13668750000",
-        "8201250000000", "384433593750"};
+    double cofactors[ACB_THETA_G2_COV_NB] = {1, 60, 75, 90, 2250, 2250, 450,
+        540, 11250, 67500, 13500, 13500, 168750, 67500, 405000, 10125000,
+        2025000, 2700000, 151875000, 60750000, 15187500, 9112500000,
+        227812500000, 13668750000, 8201250000000, 384433593750};
     fmpz_t m;
     slong k;
 
@@ -87,7 +86,7 @@ acb_theta_g2_covariants_lead(acb_ptr res, const acb_poly_t f, slong prec)
     acb_theta_g2_transvectants(res, f, prec);
     for (k = 0; k < ACB_THETA_G2_COV_NB; k++)
     {
-        fmpz_set_str(m, cofactors[k], 10);
+        fmpz_set_d(m, cofactors[k]);
         acb_mul_fmpz(&res[k], &res[k], m, prec);
     }
 
