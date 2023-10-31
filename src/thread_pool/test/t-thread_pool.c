@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "thread_pool.h"
 #include "fmpz.h"
 
@@ -155,14 +156,9 @@ void test2(fmpz_t x, ulong n)
     test2_helper(x, 0, n);
 }
 
-int
-main(void)
+TEST_FUNCTION_START(qsieve_thread_pool, state)
 {
     slong i, j;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("thread_pool....");
-    fflush(stdout);
 
     for (i = 0; i < 10*flint_test_multiplier(); i++)
     {
@@ -205,8 +201,5 @@ main(void)
         fmpz_clear(x);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
