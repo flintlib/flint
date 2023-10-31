@@ -17,24 +17,29 @@ acb_theta_jet_ql_radius(arf_t eps, arf_t err, const arb_t c, const arb_t rho,
 {
     slong lp = ACB_THETA_LOW_PREC;
     slong b = ord + 1;
-    arb_t t, x;
+    arb_t x, y;
 
-    arb_init(t);
     arb_init(x);
+    arb_init(y);
 
-    /* Set x to minimum of (1/2g)^(1/b)*rho, (2^(-prec-1)/cg)^(1/b)*rho */
-    arb_mul_2exp_si(x, c, -prec);
-    arb_div(x, x, c, lp);
-    arb_set_si(t, 1);
-    arb_min(x, x, t, lp);
-    arb_div_si(x, x, 2 * g, lp);
+    /* Set x to min of (1/2g)^(1/b)*rho, (2^(-prec)/2cg)^(1/b)*rho^(2b-1)/b */
+    arb_set_si(x, 2 * g);
+    arb_inv(x, x, lp);
     arb_root_ui(x, x, b, lp);
     arb_mul(x, x, rho, lp);
 
+    arb_pow_ui(y, rho, 2 * b - 1, prec);
+    arb_mul_2exp_si(y, y, -prec);
+    arb_div(y, y, c, lp);
+    arb_div_si(y, y, 2 * g, lp);
+    arb_root_ui(y, y, b, lp);
+
+    arb_min(x, x, y, lp);
     arb_get_lbound_arf(eps, x, lp);
+
     arf_one(err);
     arf_mul_2exp_si(err, err, -prec);
 
-    arb_clear(t);
     arb_clear(x);
+    arb_clear(y);
 }

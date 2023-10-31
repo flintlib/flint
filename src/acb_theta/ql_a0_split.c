@@ -13,7 +13,7 @@
 
 static int
 acb_theta_ql_a0_eld_points(slong** pts, slong* nb_pts, arb_ptr v,
-    slong* fullprec, arf_t eps, arb_srcptr d, ulong a, arb_srcptr nctr,
+    slong* fullprec, arf_t eps, arb_srcptr d, ulong a, arb_srcptr w,
     const arb_mat_t C, const arb_mat_t C1, slong prec)
 {
     slong g = arb_mat_nrows(C);
@@ -33,7 +33,7 @@ acb_theta_ql_a0_eld_points(slong** pts, slong* nb_pts, arb_ptr v,
 
     /* Get offset */
     acb_theta_char_get_arb(v, a, g - s);
-    _arb_vec_add(v, v, nctr + s, g - s, prec);
+    _arb_vec_add(v, v, w + s, g - s, prec);
     arb_mat_vector_mul_col(v, C1, v, prec);
 
     /* Get R2 */
@@ -55,6 +55,7 @@ acb_theta_ql_a0_eld_points(slong** pts, slong* nb_pts, arb_ptr v,
     }
     else
     {
+        *nb_pts = 0;
         *pts = flint_malloc(0);
     }
 
@@ -140,6 +141,7 @@ acb_theta_ql_a0_split_term(acb_ptr th, slong* pt, ulong a, acb_srcptr t, acb_src
         acb_exp_pi_i(c, c, prec);
         _acb_vec_scalar_mul(new_th + k * nbth, new_th + k * nbth,
             nbth, c, prec);
+
         for (j = 0; j < nbth; j++)
         {
             acb_add(&th[k * n + j * nba + a], &th[k * n + j * nba + a],
@@ -179,7 +181,6 @@ acb_theta_ql_a0_split(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d,
     int res = 1;
 
     arb_mat_init(C, g, g);
-    arb_mat_init(C1, g - s, g - s);
     arb_mat_init(Yinv, g, g);
     acb_mat_window_init(tau0, tau, 0, 0, s ,s);
     acb_mat_window_init(star, tau, 0, s, s, g);
@@ -191,13 +192,8 @@ acb_theta_ql_a0_split(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d,
 
     acb_siegel_yinv(Yinv, tau, prec);
     acb_siegel_cho(C, tau, prec);
-    for (j = 0; j < g - s; j++)
-    {
-        for (k = j; k < g - s; k++)
-        {
-            arb_set(arb_mat_entry(C1, j, k), arb_mat_entry(C, j, k));
-        }
-    }
+    arb_mat_window_init(C1, C, s, s, g, g);
+
     acb_theta_dist_a0(new_d0, z, tau0, lp);
     _acb_vec_get_imag(w, z, g);
     arb_mat_vector_mul_col(w, Yinv, w, prec);
@@ -229,7 +225,7 @@ acb_theta_ql_a0_split(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d,
     }
 
     arb_mat_clear(C);
-    arb_mat_clear(C1);
+    arb_mat_window_clear(C1);
     arb_mat_clear(Yinv);
     acb_mat_window_clear(tau0);
     acb_mat_window_clear(star);

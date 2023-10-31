@@ -51,6 +51,7 @@ acb_theta_jet_ql_ci(arb_t c0, arb_t c1, arb_t c2, acb_srcptr z, const acb_mat_t 
     arb_mat_scalar_mul_arb(Yinv, Yinv, t, lp);
     arb_mat_vector_mul_col(w, Yinv, y, lp);
     arb_dot(c1, NULL, 0, y, 1, w, 1, g, lp);
+    arb_nonnegative_part(c1, c1);
     arb_sqrt(c1, c1, lp);
 
     /* c2 is sqrt(max of \pi x Y^{-1} x where |x| \leq 1) */
@@ -68,6 +69,7 @@ acb_theta_jet_ql_ci(arb_t c0, arb_t c1, arb_t c2, acb_srcptr z, const acb_mat_t 
         arb_sqr(s, s, lp);
         arb_add(c2, c2, s, lp);
     }
+    arb_nonnegative_part(c2, c2);
     arb_sqrt(c2, c2, lp);
 
     arb_mat_clear(Yinv);

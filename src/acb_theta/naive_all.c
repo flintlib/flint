@@ -11,8 +11,8 @@
 
 #include "acb_theta.h"
 
-void
-acb_theta_naive_all(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
+static void
+acb_theta_naive_all_gen(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
@@ -67,3 +67,25 @@ acb_theta_naive_all(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, sl
     _acb_vec_clear(v, g);
     acb_clear(c);
 }
+
+void
+acb_theta_naive_all(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
+{
+    slong g = acb_mat_nrows(tau);
+    slong k;
+
+    if (g == 1)
+    {
+        for (k = 0; k < nb; k++)
+        {
+            acb_modular_theta(&th[4 * k + 3], &th[4 * k + 2], &th[4 * k],
+                &th[4 * k + 1], zs + k * g, acb_mat_entry(tau, 0, 0), prec);
+            acb_neg(&th[4 * k + 3], &th[4 * k + 3]);
+        }
+    }
+    else
+    {
+        acb_theta_naive_all_gen(th, zs, nb, tau, prec);
+    }
+}
+

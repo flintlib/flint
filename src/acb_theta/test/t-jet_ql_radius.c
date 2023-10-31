@@ -28,17 +28,18 @@ int main(void)
         slong mag_bits = n_randint(state, 10);
         slong ord = n_randint(state, 10);
         slong g = n_randint(state, 10);
-        arb_t c, rho, t;
+        arb_t c, rho, t, u;
         arf_t eps, err;
 
         arb_init(c);
         arb_init(rho);
         arb_init(t);
+        arb_init(u);
         arf_init(eps);
         arf_init(err);
 
         arb_randtest_positive(c, state, prec, mag_bits);
-        arb_randtest_positive(c, state, prec, mag_bits);
+        arb_randtest_positive(rho, state, prec, mag_bits);
 
         acb_theta_jet_ql_radius(eps, err, c, rho, ord, g, prec);
 
@@ -60,8 +61,9 @@ int main(void)
         }
 
         arb_set_arf(t, eps);
-        arb_div(t, t, rho, prec);
         arb_pow_ui(t, t, ord + 1, prec);
+        arb_pow_ui(u, rho, 2 * ord + 1, prec);
+        arb_div(t, t, u, prec);
         arb_mul(t, t, c, prec);
         arb_mul_si(t, t, 2 * g, prec);
         arb_sub_arf(t, t, err, prec);
@@ -83,6 +85,7 @@ int main(void)
         arb_clear(c);
         arb_clear(rho);
         arb_clear(t);
+        arb_clear(u);
         arf_clear(eps);
         arf_clear(err);
     }

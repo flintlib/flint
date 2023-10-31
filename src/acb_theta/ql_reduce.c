@@ -74,9 +74,12 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong* n1, acb_srcptr
         {
             s = -1;
         }
-        else
+        else if (acb_theta_eld_nb_pts(E) >= 2)
         {
-            /* at most one point */
+            s = g;
+        }
+        else /* exactly one point */
+        {
             acb_theta_eld_points(n1, E);
 
             /* Update new_z and c */

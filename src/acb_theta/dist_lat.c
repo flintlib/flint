@@ -130,6 +130,7 @@ acb_theta_dist_lat(arb_t d, arb_srcptr v, const arb_mat_t C, slong prec)
     {
         acb_theta_dist_unif(d, C, prec);
     }
+    arb_nonnegative_part(d, d);
 
     acb_theta_eld_clear(E);
     arf_clear(u);

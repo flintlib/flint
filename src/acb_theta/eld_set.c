@@ -11,7 +11,8 @@
 
 #include "acb_theta.h"
 
-#define ACB_THETA_ELD_MAX_PTS n_pow(10, 8)
+#define ACB_THETA_ELD_MAX_PTS n_pow(10, 6)
+#define ACB_THETA_ELD_MAX_ERR 10
 
 static void
 slong_vec_max(slong * r, slong * v1, slong * v2, slong d)
@@ -45,6 +46,7 @@ static int
 acb_theta_eld_interval(slong* min, slong* mid, slong* max, const arb_t ctr, const arf_t rad)
 {
     slong lp = ACB_THETA_LOW_PREC;
+    slong e;
     arb_t y;
     arf_t b;
     int res;
@@ -52,7 +54,14 @@ acb_theta_eld_interval(slong* min, slong* mid, slong* max, const arb_t ctr, cons
     arb_init(y);
     arf_init(b);
 
-    res = arf_get_si_safe(mid, arb_midref(ctr), ARF_RND_NEAR);
+    arf_set_mag(b, arb_radref(ctr));
+    res = arf_get_si_safe(&e, b, ARF_RND_NEAR);
+    if (res)
+    {
+        res = (e <= ACB_THETA_ELD_MAX_ERR);
+    }
+
+    res = res && arf_get_si_safe(mid, arb_midref(ctr), ARF_RND_NEAR);
 
     arb_set_arf(y, rad);
     arb_add(y, ctr, y, lp);

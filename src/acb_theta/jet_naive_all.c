@@ -205,20 +205,12 @@ acb_theta_jet_naive_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
 {
     slong g = acb_mat_nrows(tau);
     slong nb = acb_theta_jet_nb(ord, g);
-    acb_ptr res;
 
     if (g == 1)
     {
-        res = _acb_vec_init(4 * nb);
-
-        acb_modular_theta_jet(res, res + nb, res + 2 * nb, res + 3 * nb,
+        acb_modular_theta_jet(dth + 3 * nb, dth + 2 * nb, dth, dth + nb,
             z, acb_mat_entry(tau, 0, 0), nb, prec);
-        _acb_vec_set(dth, res + 2 * nb, nb);
-        _acb_vec_set(dth + nb, res + 3 * nb, nb);
-        _acb_vec_set(dth + 2 * nb, res + nb, nb);
-        _acb_vec_neg(dth + 3 * nb, res, nb);
-
-        _acb_vec_clear(res, 4 * nb);
+        _acb_vec_neg(dth + 3 * nb, dth + 3 * nb, nb);
     }
     else
     {

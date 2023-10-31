@@ -34,6 +34,25 @@ acb_theta_jet_ql_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, 
     arb_init(t);
     arf_init(eps);
     arf_init(err);
+
+    /* Get bounds and high precision, fail if too large */
+    acb_theta_jet_ql_bounds(c, rho, z, tau, ord);
+    acb_theta_jet_ql_radius(eps, err, c, rho, ord, g, prec);
+    arb_set_arf(t, eps);
+    arb_log_base_ui(t, t, 2, lp);
+    arb_neg(t, t);
+
+    if (!arb_is_finite(t) || (arf_cmpabs_2exp_si(arb_midref(t), 20) > 0))
+    {
+        _acb_vec_indeterminate(dth, n2 * nb);
+        arb_clear(c);
+        arb_clear(rho);
+        arb_clear(t);
+        arf_clear(eps);
+        arf_clear(err);
+        return;
+    }
+
     arf_init(e);
     acb_mat_init(tau_mid, g, g);
     z_mid = _acb_vec_init(g);
@@ -45,12 +64,6 @@ acb_theta_jet_ql_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, 
     dth_low = _acb_vec_init(n2 * nb_low);
     err_vec = _arb_vec_init(nb);
 
-    /* Get bounds and high precision */
-    acb_theta_jet_ql_bounds(c, rho, z, tau, ord);
-    acb_theta_jet_ql_radius(eps, err, c, rho, ord, g, prec);
-    arb_set_arf(t, eps);
-    arb_log_base_ui(t, t, 2, lp);
-    arb_neg(t, t);
     hprec = prec + ord * (arf_get_si(arb_midref(t), ARF_RND_CEIL) + g);
     arf_one(e);
     arf_mul_2exp_si(e, e, -hprec);

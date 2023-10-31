@@ -20,8 +20,10 @@ acb_theta_ql_a0_naive(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
     int hast = !_acb_vec_is_zero(t, g);
     int hasz = !_acb_vec_is_zero(z, g);
     slong nbt = (hast ? 3 : 1);
+    slong nbz = (hasz ? 2 : 1);
     acb_ptr x, aux;
     slong j, k;
+    int res;
 
     x = _acb_vec_init(g * nbt);
     aux = _acb_vec_init(nbt);
@@ -56,8 +58,9 @@ acb_theta_ql_a0_naive(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
             }
         }
     }
+    res = _acb_vec_is_finite(th, n * nbz * nbt);
 
     _acb_vec_clear(x, g * nbt);
     _acb_vec_clear(aux, nbt);
-    return 1;
+    return res;
 }

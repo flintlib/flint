@@ -95,9 +95,14 @@ acb_theta_naive_reduce_one(arb_ptr v, acb_ptr new_z, acb_t c, arb_t u,
     _arb_vec_sub(r, t, a, g, prec);
     arb_mat_vector_mul_col(v, C, r, prec);
 
-    /* new_z is (x - Xa) + iYr; set new_y = Yr and t = Xa */
+    /* new_z is (x - Xa) + iYr; set new_x = x - Xa mod 4, t = Xa */
     arb_mat_vector_mul_col(t, X, a, prec);
     _arb_vec_sub(new_x, x, t, g, prec);
+    _arb_vec_scalar_mul_2exp_si(new_x, new_x, g, -2);
+    acb_theta_naive_round(new_y, new_x, g);
+    _arb_vec_sub(new_x, new_x, new_y, g, prec);
+    _arb_vec_scalar_mul_2exp_si(new_x, new_x, g, 2);
+
     arb_mat_vector_mul_col(new_y, Y, r, prec);
     _acb_vec_set_real_imag(new_z, new_x, new_y, g);
 
