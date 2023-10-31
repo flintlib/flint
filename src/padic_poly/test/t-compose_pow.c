@@ -9,23 +9,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "long_extras.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "padic_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(padic_poly_compose_pow, state)
 {
     int i, result;
 
     padic_ctx_t ctx;
     fmpz_t p;
     slong N;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("compose_pow... ");
-    fflush(stdout);
 
     /* Aliasing */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -119,8 +113,5 @@ main(void)
         fmpz_clear(p);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

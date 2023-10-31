@@ -9,24 +9,19 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpq.h"
 #include "fmpq_poly.h"
 #include "padic_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(padic_poly_evaluate_padic, state)
 {
     int i, result;
 
     padic_ctx_t ctx;
     fmpz_t p;
     slong N;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("evaluate_padic... ");
-    fflush(stdout);
 
     /* Compare with the computation over QQ */
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
@@ -115,8 +110,5 @@ main(void)
         fmpz_clear(p);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
