@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "gr_special.h"
@@ -148,15 +149,9 @@ test_fib_vec(flint_rand_t state)
     return status;
 }
 
-int main(void)
+TEST_FUNCTION_START(gr_special_fib, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("fib....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000; iter++)
         test_fib_fmpz_rec1(state);
@@ -167,8 +162,5 @@ int main(void)
     for (iter = 0; iter < 1000; iter++)
         test_fib_vec(state);
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
