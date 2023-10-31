@@ -15,7 +15,7 @@
 #include "fmpz.h"
 #include "fmpz_factor.h"
 
-TEST_FUNCTION_START(fmpz_factor_factor_pp1, state)
+TEST_FUNCTION_START(fmpz_factor_pp1, state)
 {
    int i, j, result;
    ulong count = UWORD(0);

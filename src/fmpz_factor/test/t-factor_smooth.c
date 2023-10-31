@@ -87,7 +87,7 @@ void randprime(fmpz_t p, flint_rand_t state, slong bits)
 }
 #endif
 
-TEST_FUNCTION_START(fmpz_factor_factor_smooth, state)
+TEST_FUNCTION_START(fmpz_factor_smooth, state)
 {
     int i, j;
     fmpz_t x, y, z, n;

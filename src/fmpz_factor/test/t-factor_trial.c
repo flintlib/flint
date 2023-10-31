@@ -95,7 +95,7 @@ void check(fmpz_t n)
     fmpz_factor_clear(factor2);
 }
 
-TEST_FUNCTION_START(fmpz_factor_factor_trial, state)
+TEST_FUNCTION_START(fmpz_factor_trial, state)
 {
     int i, j;
     fmpz_t x;

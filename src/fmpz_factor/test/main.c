@@ -27,10 +27,10 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(fmpz_factor_ecm),
-    TEST_FUNCTION(fmpz_factor_factor),
-    TEST_FUNCTION(fmpz_factor_factor_pp1),
-    TEST_FUNCTION(fmpz_factor_factor_smooth),
-    TEST_FUNCTION(fmpz_factor_factor_trial),
+    TEST_FUNCTION(fmpz_factor),
+    TEST_FUNCTION(fmpz_factor_pp1),
+    TEST_FUNCTION(fmpz_factor_smooth),
+    TEST_FUNCTION(fmpz_factor_trial),
     TEST_FUNCTION(fmpz_factor_pollard_brent),
     TEST_FUNCTION(fmpz_factor_pollard_brent_single),
     TEST_FUNCTION(fmpz_factor_refine)
