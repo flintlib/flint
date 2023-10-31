@@ -24,32 +24,15 @@ TEST_FUNCTION_START(arb_floor, state)
         fmpz_t y;
         slong prec;
 
-        printf("0\n");
-        fflush(stdout);
-
         arb_init(a);
         arb_init(b);
 
         fmpq_init(x);
         fmpz_init(y);
 
-        printf("1\n");
-        fflush(stdout);
-
         arb_randtest(a, state, 1 + n_randint(state, 200), 10);
-
-        printf("2\n");
-        fflush(stdout);
-
         arb_randtest(b, state, 1 + n_randint(state, 200), 10);
-
-        printf("3\n");
-        fflush(stdout);
-
         prec = 2 + n_randint(state, 200);
-
-        printf("4\n");
-        fflush(stdout);
 
         arb_get_rand_fmpq(x, state, a, 1 + n_randint(state, 200));
 
