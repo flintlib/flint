@@ -10,6 +10,7 @@
 */
 
 #include <string.h>
+#include <stdlib.h>
 
 #include "fmpz_poly.h"
 #include "fmpz_mpoly.h"

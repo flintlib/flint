@@ -10,6 +10,7 @@
 */
 
 #include <string.h>
+#include <stdlib.h>
 #include <mpfr.h>
 
 /* Include functions *********************************************************/

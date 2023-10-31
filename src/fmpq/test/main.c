@@ -10,6 +10,7 @@
 */
 
 #include <string.h>
+#include <stdlib.h>
 
 /* For t-get_mpfr.c */
 #include <stdio.h>
