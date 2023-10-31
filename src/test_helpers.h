@@ -35,7 +35,7 @@ typedef struct
 }
 test_struct;
 
-#define TEST_FUNCTION(label) { CAT(test, label), TEMPLATE_STR(label) }
+#define TEST_FUNCTION(label) { CAT(test, label), #label }
 
 #define TEST_FUNCTION_START(label, state)               \
 int CAT(test, label)(void)                              \
@@ -92,21 +92,33 @@ int TEMPLATE5(test, T, label1, T, label2)(void)         \
 int                                                                         \
 main(int argc, char ** argv)                                                \
 {                                                                           \
-    int ix, jx;                                                             \
+    char numthreads_str[] = "--numthreads=";                                \
+    char thread_str[] = "--thread=";                                        \
+    int numthreads_str_len = sizeof(numthreads_str) / sizeof(char) - 1;     \
+    int thread_str_len = sizeof(thread_str) / sizeof(char) - 1;             \
+    long int numthreads, thread;                                            \
+    int ix, ix_max, numtests;                                               \
                                                                             \
-    /* If no arguments where put in, run them all. Else, check which */     \
-    /* functions should be runned. */                                       \
+    numtests = sizeof(tests) / sizeof(test_struct);                         \
+                                                                            \
+    /* If no arguments was put in, simply run all tests. */                 \
     if (argc < 2)                                                           \
     {                                                                       \
-        for (ix = 0; ix < (sizeof(tests) / sizeof(test_struct)); ix++)      \
+        for (ix = 0; ix < numtests; ix++)                                   \
             if ((tests)[ix].test_function())                                \
                 flint_abort();                                              \
+                                                                            \
+        return 0;                                                           \
     }                                                                       \
-    else                                                                    \
+                                                                            \
+    /* If no options not specified, then run the set of functions specified */\
+    if (argv[1][0] != '-' && argv[1][1] != '-')                             \
     {                                                                       \
+        int jx;                                                             \
+                                                                            \
         for (jx = 1; jx < argc; jx++)                                       \
         {                                                                   \
-            for (ix = 0; ix < (sizeof(tests) / sizeof(test_struct)); ix++)  \
+            for (ix = 0; ix < numtests; ix++)                               \
             {                                                               \
                 /* If argument equals to test name, run it */               \
                 if (strcmp(argv[jx], (tests)[ix].name) == 0)                \
@@ -117,7 +129,7 @@ main(int argc, char ** argv)                                                \
                 }                                                           \
             }                                                               \
                                                                             \
-            if (ix == (sizeof(tests) / sizeof(test_struct)))                \
+            if (ix == numtests)                                             \
             {                                                               \
                 fprintf(stderr,                                             \
                         "Error: Could not find test function for %s\n",     \
@@ -125,7 +137,54 @@ main(int argc, char ** argv)                                                \
                 flint_abort();                                              \
             }                                                               \
         }                                                                   \
+                                                                            \
+        return 0;                                                           \
     }                                                                       \
+                                                                            \
+    /* If the length of first argument is less or equal to the the length of\
+     * "--numthreads=" or that the first argument does not start with       \
+     * "--numthreads=", then exit. */                                       \
+    if (strlen(argv[1]) <= numthreads_str_len                               \
+        || strncmp(argv[1], numthreads_str, numthreads_str_len) != 0)       \
+    {                                                                       \
+        printf("Invalid first option, must be --numthreads=NUM.\n");        \
+        return 1;                                                           \
+    }                                                                       \
+                                                                            \
+    /* Parse the argument. An invalid argument is either returned as LONG_MIN,\
+     * LONG_MAX or 0. Moreover, we require the argument to be strictly positive.\
+     * If the argument is invalid or non-positive, exit. */                 \
+    numthreads = strtol(argv[1] + numthreads_str_len, NULL, 10);            \
+    if (numthreads == LONG_MAX || numthreads <= 0)                          \
+    {                                                                       \
+        printf("Invalid parameter for option --numthreads=NUM.\n");         \
+        return 1;                                                           \
+    }                                                                       \
+                                                                            \
+    /* Same goes here as for the first argument */                          \
+    if (strlen(argv[2]) <= thread_str_len                                   \
+        || strncmp(argv[2], thread_str, thread_str_len) != 0)               \
+    {                                                                       \
+        printf("Invalid second option, must be --thread=NUM.\n");           \
+        return 1;                                                           \
+    }                                                                       \
+                                                                            \
+    /* Same goes here as for the first argument, with the addition that the \
+     * parameter for this option must be less or equal to the previous argument. */\
+    thread = strtol(argv[2] + thread_str_len, NULL, 10);                    \
+    if (thread == LONG_MAX || thread <= 0 || thread > numthreads)           \
+    {                                                                       \
+        printf("Invalid parameter for option --thread=NUM.\n");             \
+        return 1;                                                           \
+    }                                                                       \
+                                                                            \
+    /* We split the tests into `numthreads_par' partitions, and run the     \
+     * `thread_par'-th partition. */                                        \
+    ix = (thread - 1) * ((numtests + numthreads - 1) / numthreads);         \
+    ix_max = FLINT_MIN(thread * ((numtests + numthreads - 1) / numthreads), numtests);\
+    for (; ix < ix_max; ix++)                                               \
+        if ((tests)[ix].test_function())                                    \
+            flint_abort();                                                  \
                                                                             \
     return 0;                                                               \
 }
