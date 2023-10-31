@@ -79,9 +79,12 @@
 #include "t-sinh_cosh.c"
 #include "t-sin_pi.c"
 #include "t-sqrt.c"
+#include "t-sqrts.c"
 #include "t-tan.c"
 #include "t-tanh.c"
 #include "t-tan_pi.c"
+#include "t-urandom.c"
+#include "t-vec_set_real_imag.c"
 #include "t-vec_unit_roots.c"
 #include "t-zeta.c"
 
@@ -155,9 +158,12 @@ test_struct tests[] =
     TEST_FUNCTION(acb_sinh_cosh),
     TEST_FUNCTION(acb_sin_pi),
     TEST_FUNCTION(acb_sqrt),
+    TEST_FUNCTION(acb_sqrts),
     TEST_FUNCTION(acb_tan),
     TEST_FUNCTION(acb_tanh),
     TEST_FUNCTION(acb_tan_pi),
+    TEST_FUNCTION(acb_urandom),
+    TEST_FUNCTION(acb_vec_set_real_imag),
     TEST_FUNCTION(acb_vec_unit_roots),
     TEST_FUNCTION(acb_zeta)
 };

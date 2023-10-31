@@ -9,17 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb.h"
 
-int main(void)
+TEST_FUNCTION_START(acb_sqrts, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("sqrts....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* Test: - acb_sqrts on y = x^2 gives both x and -x
        - acb_sqrts on a precise number does not lose precision */
@@ -80,9 +75,5 @@ int main(void)
         arf_clear(e);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
