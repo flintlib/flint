@@ -22,7 +22,6 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong* n1, acb_srcptr
     arb_ptr v, a;
     acb_t f;
     arf_t R2, eps;
-    arb_t b;
     slong s, k;
     int r = 1;
 
@@ -32,7 +31,6 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong* n1, acb_srcptr
     acb_init(f);
     arf_init(R2);
     arf_init(eps);
-    arb_init(b);
 
     acb_siegel_cho(C, tau, prec);
     acb_theta_naive_radius(R2, eps, C, 0, prec);
@@ -111,6 +109,5 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong* n1, acb_srcptr
     acb_clear(f);
     arf_clear(R2);
     arf_clear(eps);
-    arb_clear(b);
     return s;
 }
