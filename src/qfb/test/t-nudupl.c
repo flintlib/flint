@@ -14,19 +14,14 @@
 
 ******************************************************************************/
 
+#include "test_helpers.h"
 #include "qfb.h"
 
-int main(void)
+TEST_FUNCTION_START(qfb_nudupl, state)
 {
     int result;
-    flint_rand_t state;
     qfb * forms;
     slong i, k, i1, num;
-
-    printf("nudupl....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (i = 1; i < 10000; i++)
     {
@@ -76,9 +71,5 @@ int main(void)
         qfb_array_clear(&forms, num);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-
-    printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
