@@ -16,7 +16,7 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong* n1, acb_srcptr
 {
     slong g = acb_mat_nrows(tau);
     acb_theta_eld_t E;
-    arb_mat_t C, C1;
+    arb_mat_t C, W, C1;
     acb_mat_t tau0, tau1, x;
     acb_ptr t, w;
     arb_ptr v, a;
@@ -24,7 +24,7 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong* n1, acb_srcptr
     arf_t R2, eps;
     arb_t b;
     slong s, k;
-    int r;
+    int r = 1;
 
     arb_mat_init(C, g, g);
     v = _arb_vec_init(g);
@@ -39,70 +39,65 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong* n1, acb_srcptr
     acb_theta_naive_reduce(v, new_z, a, c, u, z, 1, tau, prec);
     arb_mul_arf(u, u, eps, prec);
 
-    arb_set_arf(b, R2);
-    arb_sqrt(b, b, prec);
-    arb_mul_2exp_si(b, b, 1);
-
-    for (s = g; s > 0; s--)
+    for (s = g; (s >= 1) && r; )
     {
-        if (!arb_gt(arb_mat_entry(C, s - 1, s - 1), b))
-        {
-            break;
-        }
-    }
-
-    if (s < g)
-    {
-        /* Construct ellipsoid */
+        s--;
         acb_theta_eld_init(E, g - s, g - s);
-        arb_mat_window_init(C1, C, s, s, g, g);
+        arb_mat_window_init(W, C, s, s, g, g);
+        arb_mat_init(C1, g - s, g - s);
+        arb_mat_set(C1, W);
+
+        arb_mat_scalar_mul_2exp_si(C1, C1, -1);
+        r = acb_theta_eld_set(E, C1, R2, v + s);
+        r = r && (acb_theta_eld_nb_pts(E) <= 1);
+        if (r && (acb_theta_eld_nb_pts(E) == 0))
+        {
+            s = -2;
+        }
+
+        acb_theta_eld_clear(E);
+        arb_mat_window_clear(W);
+        arb_mat_clear(C1);
+    }
+    s++;
+
+    if ((s >= 0) && (s < g))
+    {
+        /* We know E has exactly one point */
+        acb_theta_eld_init(E, g - s, g - s);
+        arb_mat_window_init(W, C, s, s, g, g);
+        arb_mat_init(C1, g - s, g - s);
         acb_mat_window_init(tau0, tau, 0, 0, s, s);
         acb_mat_window_init(tau1, tau, s, s, g, g);
         acb_mat_window_init(x, tau, 0, s, s, g);
         t = _acb_vec_init(g);
         w = _acb_vec_init(g);
 
+        arb_mat_set(C1, W);
         arb_mat_scalar_mul_2exp_si(C1, C1, -1);
-        r = acb_theta_eld_set(E, C1, R2, v + s);
+        acb_theta_eld_set(E, C1, R2, v + s);
+        acb_theta_eld_points(n1, E);
 
-        if (r == 0)
+        /* Update new_z and c */
+        for (k = 0; k < g - s; k++)
         {
-            s = -1;
-            acb_indeterminate(c);
-            arb_pos_inf(u);
+            acb_set_si(&t[k], n1[k]);
         }
-        else if (acb_theta_eld_nb_pts(E) == 0)
-        {
-            s = -1;
-        }
-        else if (acb_theta_eld_nb_pts(E) >= 2)
-        {
-            s = g;
-        }
-        else /* exactly one point */
-        {
-            acb_theta_eld_points(n1, E);
+        _acb_vec_scalar_mul_2exp_si(t, t, g - s, -1);
+        acb_mat_vector_mul_col(w, x, t, prec);
+        _acb_vec_add(new_z, new_z, w, s, prec);
 
-            /* Update new_z and c */
-            for (k = 0; k < g - s; k++)
-            {
-                acb_set_si(&t[k], n1[k]);
-            }
-            _acb_vec_scalar_mul_2exp_si(t, t, g - s, -1);
-            acb_mat_vector_mul_col(w, x, t, prec);
-            _acb_vec_add(new_z, new_z, w, s, prec);
-
-            acb_mat_vector_mul_col(w, tau1, t, prec);
-            _acb_vec_scalar_mul_2exp_si(w, w, g - s, -1);
-            _acb_vec_add(w, w, new_z + s, g - s, prec);
-            _acb_vec_scalar_mul_2exp_si(w, w, g - s, 1);
-            acb_dot(f, NULL, 0, t, 1, w, 1, g - s, prec);
-            acb_exp_pi_i(f, f, prec);
-            acb_mul(c, c, f, prec);
-        }
+        acb_mat_vector_mul_col(w, tau1, t, prec);
+        _acb_vec_scalar_mul_2exp_si(w, w, g - s, -1);
+        _acb_vec_add(w, w, new_z + s, g - s, prec);
+        _acb_vec_scalar_mul_2exp_si(w, w, g - s, 1);
+        acb_dot(f, NULL, 0, t, 1, w, 1, g - s, prec);
+        acb_exp_pi_i(f, f, prec);
+        acb_mul(c, c, f, prec);
 
         acb_theta_eld_clear(E);
-        arb_mat_window_clear(C1);
+        arb_mat_window_clear(W);
+        arb_mat_clear(C1);
         acb_mat_window_clear(tau0);
         acb_mat_window_clear(tau1);
         acb_mat_window_clear(x);

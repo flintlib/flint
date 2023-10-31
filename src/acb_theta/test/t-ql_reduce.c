@@ -27,7 +27,7 @@ int main(void)
         slong g = 2 + n_randint(state, 2);
         slong n = 1 << g;
         slong prec = ACB_THETA_LOW_PREC + n_randint(state, 100);
-        slong bits = n_randint(state, 4);
+        slong bits = 6;
         acb_mat_t tau, tau0;
         arb_mat_t Y;
         acb_ptr z, new_z, th, th0, test;

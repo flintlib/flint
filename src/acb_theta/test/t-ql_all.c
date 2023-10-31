@@ -55,9 +55,10 @@ int main(void)
         if (!_acb_vec_overlaps(th, test, n * n))
         {
             flint_printf("FAIL\n");
-            flint_printf("g = %wd, prec = %wd, hasz = %wd, tau:\n",
+            flint_printf("g = %wd, prec = %wd, hasz = %wd, tau, z:\n",
                 g, prec, hasz);
             acb_mat_printd(tau, 5);
+            _acb_vec_printd(z, g, 5);
             flint_printf("output:\n");
             _acb_vec_printd(th, n * n, 5);
             _acb_vec_printd(test, n * n, 5);
