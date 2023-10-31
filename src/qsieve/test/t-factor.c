@@ -5,12 +5,13 @@
 
     This file is part of FLINT.
 
-      FLINT is free software: you can redistribute it and/or modify it under
-      the terms of the GNU Lesser General Public License (LGPL) as published
-      by the Free Software Foundation; either version 2.1 of the License, or
-      (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_factor.h"
 #include "qsieve.h"
@@ -29,14 +30,13 @@ void randprime(fmpz_t p, flint_rand_t state, slong bits)
        fmpz_add_ui(p, p, 2);
 }
 
-int main(void)
+TEST_FUNCTION_START(qsieve_factor, state)
 {
    slong i;
    fmpz_t n, x, y, z;
    fmpz_factor_t factors;
    slong max_threads = 5;
    slong tmul = 3;
-   FLINT_TEST_INIT(state);
 #ifdef _WIN32
    tmul = 1;
 #endif
@@ -45,9 +45,6 @@ int main(void)
    fmpz_init(y);
    fmpz_init(z);
    fmpz_init(n);
-
-   flint_printf("factor....");
-   fflush(stdout);
 
    /* Test n with large prime factor */
    {
@@ -166,8 +163,5 @@ int main(void)
    fmpz_clear(y);
    fmpz_clear(z);
 
-   FLINT_TEST_CLEANUP(state);
-
-   flint_printf("PASS\n");
-   return 0;
+   TEST_FUNCTION_END(state);
 }
