@@ -18,7 +18,6 @@ TEST_FUNCTION_START(gr_fmpz_mod, state)
     gr_ctx_t ZZn;
     fmpz_t n;
     slong iter;
-    flint_rand_t state;
     int flags = GR_TEST_ALWAYS_ABLE;
 
     fmpz_init(n);
