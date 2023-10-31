@@ -1117,15 +1117,11 @@ probabilistic algorithm where we gradually increase *guard* and first choose `t
 
     This works as follows. We first compute *R2* and *eps* as in
     :func:`acb_theta_naive_radius`, then set *c*, *u* and *new_z* as in
-    :func:`acb_theta_naive_reduce` in dimension `g`. We set `s` such that for
-    each `s\leq j < g`, we have `\gamma_j^2 > 4R^2`, where `\gamma_j` is the
-    `j^{\mathrm{th}}` diagonal coefficient of the Cholesky matrix `C` for
-    `\pi\mathrm{Im}(\tau)`. We may assume that `s< g`, otherwise there is
-    nothing to be done. Then the ellipsoid `E` of radius `R^2` for `C` that we
-    are interested in, when intersected with `\frac12\mathbb{Z}^g`, is either
-    empty or consists of points whose last `g-s` coordinates are fixed. In the
-    latter case, we return `s = -1`. Now assume that `E` is not empty, let
-    `n_1` be the vector of these fixed last `g-s` coordinates, and let `a_1\in
+    :func:`acb_theta_naive_reduce` in dimension `g`. We then set `s` such that
+    the ellipsoid `E` of radius `R^2` that we are interested in is either empty
+    or contains points whose `g-s` last coordinates are fixed.  In the former
+    case, we return `s = -1`. Now assume that `E` is not empty, let `n_1` be
+    the vector of these fixed last `g-s` coordinates, and let `a_1\in
     \{0,1\}^{g-s}` be the corresponding characteristic. We can then write the
     sum defining `\theta_{a,b}` over `E` as
 
@@ -1148,8 +1144,7 @@ probabilistic algorithm where we gradually increase *guard* and first choose `t
 
     After calling :func:`acb_theta_ql_reduce`, we generally use the duplication
     formula on the result of :func:`acb_theta_ql_a0` at `2\tau`. When *sqr* is
-    zero, we either add a final square-root step or call
-    :func:`acb_theta_naive_all` when the precision is low.
+    zero, we add a final square-root step.
 
 Quasi-linear algorithms: derivatives
 -------------------------------------------------------------------------------
@@ -1190,7 +1185,8 @@ centered in `z` for `\lVert\cdot\rVert_\infty`, then the sum is `m^g
         |T|\leq 2c g\,\frac{\varepsilon^{|p|+m}}{\rho^m}.
 
 Since we divide by `\varepsilon^{|p|}` to get `a_p`, we will add an error of
-`2c g (\varepsilon/\rho)^m` to the result of the discrete Fourier transform.
+`2c g \varepsilon^m/\rho^{m+|p|}` to the result of the discrete Fourier
+transform.
 
 .. function:: void acb_theta_jet_ql_bounds(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord)
 
@@ -1219,9 +1215,9 @@ Since we divide by `\varepsilon^{|p|}` to get `a_p`, we will add an error of
 
     One can easily compute an upper bound on `c_2` from the Cholesky
     decomposition of `\pi \mathrm{Im}(\tau)^{-1}`. We then look for a value of
-    `\rho` that minimizes `\exp((c_1 + c_2\rho)^2)/\rho^{m}` where `m =
+    `\rho` that minimizes `\exp((c_1 + c_2\rho)^2)/\rho^{2m-1}` where `m =
     \mathit{ord}+1`, i.e. we set `\rho` to the positive root of `2c_2\rho
-    (c_1 + c_2\rho) = m`.
+    (c_1 + c_2\rho) = 2m-1`.
 
 .. function:: void acb_theta_jet_ql_radius(arf_t eps, arf_t err, const arb_t c, const arb_t rho, slong ord, slong g, slong prec)
 
@@ -1229,11 +1225,9 @@ Since we divide by `\varepsilon^{|p|}` to get `a_p`, we will add an error of
     derivatives up to total order *ord* at precision *prec*, given *c* and
     *rho* as above.
 
-    We want `(2 g)^{1/m} \varepsilon \leq \rho` and `2 c g
-    (\varepsilon/\rho)^{m} \leq 2^{-\mathit{prec}}` where `m = \mathit{ord} +
-    1`, so we set `\varepsilon` to a lower bound for `\rho \cdot
-    (\min\{2^{-\mathit{prec}}/c, 1\}/2g)^{1/m}`. We also set *err* to
-    `2^{-\mathit{prec}}`.
+    We set `varepsilon` such that `(2 g)^{1/m} \varepsilon \leq \rho` and `2 c
+    g \varepsilon^m/\rho^{m+|p|} \leq 2^{-\mathit{prec}}` where `m =
+    \mathit{ord} + 1`. We also set *err* to `2^{-\mathit{prec}}`.
 
 .. function:: void acb_theta_jet_ql_finite_diff(acb_ptr dth, const arf_t eps, const arf_t err, acb_srcptr val, slong ord, slong g, slong prec)
 

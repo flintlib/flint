@@ -178,7 +178,7 @@ acb_theta_g2_jet_naive_1(acb_ptr dth, const acb_mat_t tau, slong prec)
     arb_mat_t C;
     arf_t R2, eps;
     acb_ptr z;
-    arb_ptr v;
+    arb_ptr v, a;
     acb_t c;
     arb_t u;
     slong k;
@@ -191,13 +191,14 @@ acb_theta_g2_jet_naive_1(acb_ptr dth, const acb_mat_t tau, slong prec)
     arf_init(eps);
     z = _acb_vec_init(g);
     v = _arb_vec_init(g);
+    a = _arb_vec_init(g);
     acb_init(c);
     arb_init(u);
 
     acb_mat_scalar_mul_2exp_si(new_tau, tau, -2);
     acb_siegel_cho(C, new_tau, prec);
 
-    acb_theta_naive_reduce_jet(v, u, z, new_tau, prec);
+    acb_theta_naive_reduce(v, z, a, c, u, z, 1, new_tau, prec);
     acb_theta_jet_naive_radius(R2, eps, C, v, ord, prec);
     b = acb_theta_eld_set(E, C, R2, v);
 
@@ -211,6 +212,14 @@ acb_theta_g2_jet_naive_1(acb_ptr dth, const acb_mat_t tau, slong prec)
             acb_add_error_arb(&dth[k], u);
         }
 
+        _arb_vec_scalar_mul_2exp_si(a, a, 2, 1);
+        _arb_vec_neg(a, a, 2);
+        for (k = 0; k < n2; k++)
+        {
+            acb_addmul_arb(&dth[3 * k + 1], &dth[3 * k], &a[0], prec);
+            acb_addmul_arb(&dth[3 * k + 2], &dth[3 * k], &a[1], prec);
+        }
+
         acb_const_pi(c, prec);
         acb_mul_onei(c, c);
         for (k = 0; k < n2; k++)
@@ -218,6 +227,7 @@ acb_theta_g2_jet_naive_1(acb_ptr dth, const acb_mat_t tau, slong prec)
             acb_mul(&dth[3 * k + 1], &dth[3 * k + 1], c, prec);
             acb_mul(&dth[3 * k + 2], &dth[3 * k + 2], c, prec);
         }
+
     }
     else
     {

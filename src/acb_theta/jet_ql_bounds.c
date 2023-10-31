@@ -101,12 +101,12 @@ acb_theta_jet_ql_bounds(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, s
     /* Get ci */
     acb_theta_jet_ql_ci(c0, c1, c2, z, tau);
 
-    /* Set rho to positive root of 2 c_2 rho (c_1 + c_2 rho) = 2 b */
+    /* Set rho to positive root of 2 c_2 rho (c_1 + c_2 rho) = 2 b - 1 */
     arb_mul(t, c1, c2, lp);
     arb_mul_2exp_si(t, t, 1);
     arb_sqr(rho, t, lp);
     arb_sqr(t, c2, lp);
-    arb_mul_si(t, t, 8 * b, lp);
+    arb_mul_si(t, t, 8 * (2 * b - 1), lp);
     arb_add(rho, rho, t, lp);
     arb_sqrt(rho, rho, lp);
     arb_mul(t, c1, c2, lp);

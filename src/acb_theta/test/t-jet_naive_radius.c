@@ -34,9 +34,9 @@ int main(void)
         acb_mat_t tau;
         arb_mat_t C;
         arf_t R2, eps;
-        acb_ptr z;
-        arb_ptr v;
-        acb_t term;
+        acb_ptr z, new_z;
+        arb_ptr v, a;
+        acb_t c, term;
         arb_t u, abs, sum;
         slong nb_pts;
         slong* pts;
@@ -50,9 +50,12 @@ int main(void)
         arf_init(eps);
         acb_theta_eld_init(E, g, g);
         z = _acb_vec_init(g);
+        new_z = _acb_vec_init(g);
         v = _arb_vec_init(g);
-        arb_init(u);
+        a = _arb_vec_init(g);
+        acb_init(c);
         acb_init(term);
+        arb_init(u);
         arb_init(abs);
         arb_init(sum);
         tups = flint_malloc(g * nb * sizeof(slong));
@@ -63,7 +66,7 @@ int main(void)
             acb_randtest_precise(&z[k], state, prec, bits);
         }
         acb_siegel_cho(C, tau, prec);
-        acb_theta_naive_reduce_jet(v, u, z, tau, prec);
+        acb_theta_naive_reduce(v, new_z, a, c, u, z, 1, tau, prec);
 
         acb_theta_jet_naive_radius(R2, eps, C, v, ord, mprec);
         arb_mul_arf(u, u, eps, prec);
@@ -91,6 +94,8 @@ int main(void)
                 arb_add(sum, sum, abs, prec);
             }
 
+            acb_abs(abs, c, prec);
+            arb_mul(sum, sum, abs, prec);
             arb_sub(abs, sum, u, prec);
 
             if (arb_is_positive(abs))
@@ -115,9 +120,12 @@ int main(void)
         arf_clear(eps);
         acb_theta_eld_clear(E);
         _acb_vec_clear(z, g);
+        _acb_vec_clear(new_z, g);
         _arb_vec_clear(v, g);
-        arb_clear(u);
+        _arb_vec_clear(a, g);
+        acb_clear(c);
         acb_clear(term);
+        arb_clear(u);
         arb_clear(abs);
         arb_clear(sum);
         flint_free(pts);

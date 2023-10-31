@@ -31,7 +31,7 @@ int main(void)
         acb_mat_t tau;
         arb_mat_t Y, C;
         acb_ptr z, new_z, c;
-        arb_ptr u, v, w;
+        arb_ptr u, v, w, a;
         acb_t t, x;
         slong *n, *zero;
         slong err_exp = - 10 - n_randint(state, 20);
@@ -47,6 +47,7 @@ int main(void)
         u = _arb_vec_init(nbz);
         v = _arb_vec_init(g);
         w = _arb_vec_init(g * nbz);
+        a = _arb_vec_init(g * nbz);
         acb_init(t);
         acb_init(x);
         n = flint_malloc(g * nbz * sizeof(slong));
@@ -62,7 +63,7 @@ int main(void)
         {
             arb_randtest_precise(acb_realref(&z[k]), state, prec, bits);
         }
-        acb_theta_naive_reduce(v, new_z, c, u, z, nbz, tau, prec);
+        acb_theta_naive_reduce(v, new_z, a, c, u, z, nbz, tau, prec);
 
         res = 1;
         for (k = 0; k < nbz; k++)
@@ -98,7 +99,15 @@ int main(void)
                 arb_sub(acb_imagref(&z[j]), acb_imagref(&z[j]), &w[j], prec);
             }
         }
-        acb_theta_naive_reduce(v, new_z, c, u, z, nbz, tau, prec);
+        acb_theta_naive_reduce(v, new_z, a, c, u, z, nbz, tau, prec);
+
+        if (!_arb_vec_equal(a, w, g * nbz))
+        {
+            flint_printf("FAIL (integral vector)\n");
+            _arb_vec_printd(a, g * nbz, 5);
+            _arb_vec_printd(w, g * nbz, 5);
+            flint_abort();
+        }
 
         for (k = 0; k < nbz; k++)
         {

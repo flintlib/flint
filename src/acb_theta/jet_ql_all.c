@@ -11,8 +11,8 @@
 
 #include "acb_theta.h"
 
-void
-acb_theta_jet_ql_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
+static void
+acb_theta_jet_ql_all_red(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n2 = 1 << (2 * g);
@@ -108,7 +108,7 @@ acb_theta_jet_ql_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, 
         {
             acb_set(&val[j], &all_val[j * n2 + k]);
         }
-        acb_theta_jet_ql_finite_diff(jet, eps, err, val, ord, g, hprec);
+        acb_theta_jet_ql_finite_diff(jet, eps, err, rho, val, ord, g, hprec);
         _acb_vec_set(dth + k * nb, jet, nb);
     }
 
@@ -138,4 +138,38 @@ acb_theta_jet_ql_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, 
     _acb_vec_clear(jet, nb);
     _acb_vec_clear(dth_low, n2 * nb_low);
     _arb_vec_clear(err_vec, nb);
+}
+
+void
+acb_theta_jet_ql_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
+{
+    slong g = acb_mat_nrows(tau);
+    slong n2 = 1 << (2 * g);
+    slong nb = acb_theta_jet_nb(ord, g);
+    acb_ptr aux, new_z;
+    arb_ptr v, a;
+    acb_t c;
+    arb_t u;
+
+    aux = _acb_vec_init(n2 * nb);
+    new_z = _acb_vec_init(g);
+    v = _arb_vec_init(g);
+    a = _arb_vec_init(g);
+    acb_init(c);
+    arb_init(u);
+
+    acb_theta_naive_reduce(v, new_z, a, c, u, z, 1, tau, prec);
+    acb_theta_jet_ql_all_red(dth, new_z, tau, ord, prec);
+
+    _arb_vec_neg(a, a, g);
+    _arb_vec_scalar_mul_2exp_si(a, a, g, 1);
+    acb_theta_jet_exp_pi_i(aux, a, ord, g, prec);
+    acb_theta_jet_mul(dth, dth, aux, ord, g, prec);
+
+    _acb_vec_clear(aux, n2 * nb);
+    _acb_vec_clear(new_z, g);
+    _arb_vec_clear(v, g);
+    _arb_vec_clear(a, g);
+    acb_clear(c);
+    arb_clear(u);
 }

@@ -73,7 +73,7 @@ int main(void)
             acb_mul(x, x, t, 2 * prec);
             acb_exp(&val[k], x, 2 * prec);
         }
-        acb_theta_jet_ql_finite_diff(df, eps, err, val, ord, g, 2 * prec);
+        acb_theta_jet_ql_finite_diff(df, eps, err, rho, val, ord, g, 2 * prec);
 
         /* Fill in test */
         acb_theta_jet_tuples(tups, ord, g);

@@ -68,7 +68,7 @@ acb_theta_naive_0b_gen(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     arb_mat_t C;
     arf_t R2, eps;
     acb_ptr cs;
-    arb_ptr v, us;
+    arb_ptr v, as, us;
     acb_ptr new_zs;
     slong len = 1 << g;
     slong k, l;
@@ -79,13 +79,14 @@ acb_theta_naive_0b_gen(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     arf_init(R2);
     arf_init(eps);
     cs = _acb_vec_init(nb);
+    as = _arb_vec_init(g * nb);
     us = _arb_vec_init(nb);
     v = _arb_vec_init(g);
     new_zs = _acb_vec_init(nb * g);
 
     acb_siegel_cho(C, tau, prec);
     acb_theta_naive_radius(R2, eps, C, 0, prec);
-    acb_theta_naive_reduce(v, new_zs, cs, us, zs, nb, tau, prec);
+    acb_theta_naive_reduce(v, new_zs, as, cs, us, zs, nb, tau, prec);
     b = acb_theta_eld_set(E, C, R2, v);
 
     if (b)
@@ -115,6 +116,7 @@ acb_theta_naive_0b_gen(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     arf_clear(R2);
     arf_clear(eps);
     _acb_vec_clear(cs, nb);
+    _arb_vec_clear(as, g * nb);
     _arb_vec_clear(us, nb);
     _arb_vec_clear(v, g);
     _acb_vec_clear(new_zs, nb * g);

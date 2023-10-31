@@ -118,12 +118,12 @@ acb_theta_jet_naive_all_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
     acb_theta_eld_t E;
     arb_mat_t C;
     arf_t R2, eps;
-    arb_ptr v;
+    acb_ptr aux, new_z;
+    acb_mat_t new_tau;
+    arb_ptr v, a;
     acb_t c;
     arb_t u;
     fmpz_t m, t;
-    acb_mat_t new_tau;
-    acb_ptr new_z;
     slong k, j;
     int b;
 
@@ -132,19 +132,22 @@ acb_theta_jet_naive_all_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
     arb_mat_init(C, g, g);
     arf_init(R2);
     arf_init(eps);
+    aux = _acb_vec_init(n2 * nb);
+    new_z = _acb_vec_init(g);
+    acb_mat_init(new_tau, g, g);
     v = _arb_vec_init(g);
+    a = _arb_vec_init(g);
     acb_init(c);
     arb_init(u);
     fmpz_init(m);
     fmpz_init(t);
-    acb_mat_init(new_tau, g, g);
     new_z = _acb_vec_init(g);
 
     _acb_vec_scalar_mul_2exp_si(new_z, z, g, -1);
     acb_mat_scalar_mul_2exp_si(new_tau, tau, -2);
     acb_siegel_cho(C, new_tau, prec);
 
-    acb_theta_naive_reduce_jet(v, u, new_z, new_tau, prec);
+    acb_theta_naive_reduce(v, new_z, a, c, u, new_z, 1, new_tau, prec);
     acb_theta_jet_naive_radius(R2, eps, C, v, ord, prec);
     b = acb_theta_eld_set(E, C, R2, v);
 
@@ -176,6 +179,8 @@ acb_theta_jet_naive_all_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
                 acb_mul(&dth[j * nb + k], &dth[j * nb + k], c, prec);
             }
         }
+
+        /* Figure out exponential factor... */
     }
     else
     {
@@ -190,13 +195,15 @@ acb_theta_jet_naive_all_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
     arb_mat_clear(C);
     arf_clear(R2);
     arf_clear(eps);
+    _acb_vec_clear(aux, n2 * nb);
+    _acb_vec_clear(new_z, g);
+    acb_mat_clear(new_tau);
     _arb_vec_clear(v, g);
+    _arb_vec_clear(a, g);
     acb_clear(c);
     arb_clear(u);
     fmpz_clear(m);
     fmpz_clear(t);
-    acb_mat_clear(new_tau);
-    _acb_vec_clear(new_z, g);
 }
 
 void

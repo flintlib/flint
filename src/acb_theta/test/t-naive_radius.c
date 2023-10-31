@@ -33,7 +33,7 @@ int main(void)
         arb_mat_t C;
         arf_t R2, eps;
         acb_ptr z, new_z;
-        arb_ptr v;
+        arb_ptr v, a;
         acb_t c, term;
         arb_t u, abs, sum;
         slong nb_pts;
@@ -49,6 +49,7 @@ int main(void)
         z = _acb_vec_init(g);
         new_z = _acb_vec_init(g);
         v = _arb_vec_init(g);
+        a = _arb_vec_init(g);
         acb_init(c);
         arb_init(u);
         acb_init(term);
@@ -61,7 +62,7 @@ int main(void)
             acb_randtest_precise(&z[k], state, prec, bits);
         }
         acb_siegel_cho(C, tau, prec);
-        acb_theta_naive_reduce(v, new_z, c, u, z, 1, tau, prec);
+        acb_theta_naive_reduce(v, new_z, a, c, u, z, 1, tau, prec);
 
         acb_theta_naive_radius(R2, eps, C, 0, mprec);
         arb_mul_arf(u, u, eps, prec);
@@ -116,6 +117,7 @@ int main(void)
         _acb_vec_clear(z, g);
         _acb_vec_clear(new_z, g);
         _arb_vec_clear(v, g);
+        _arb_vec_clear(a, g);
         acb_clear(c);
         arb_clear(u);
         acb_clear(term);

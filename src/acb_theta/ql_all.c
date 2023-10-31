@@ -13,18 +13,6 @@
 
 #define ACB_THETA_QL_TRY 100
 
-int acb_theta_ql_all_use_naive(slong g, slong prec)
-{
-    if (g <= 2)
-    {
-        return (prec <= 1500);
-    }
-    else
-    {
-        return 0;
-    }
-}
-
 static void
 acb_theta_ql_dupl(acb_ptr th2, acb_srcptr th0, acb_srcptr th,
     arb_srcptr d0, arb_srcptr d, slong g, slong prec)
@@ -338,11 +326,7 @@ acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong p
 
         if (acb_is_finite(c))
         {
-            if (s > 0 && !sqr && acb_theta_ql_all_use_naive(g, prec))
-            {
-                acb_theta_naive_all(aux, new_z, 1, tau0, prec);
-            }
-            else if (s > 0 && !sqr)
+            if (s > 0 && !sqr)
             {
                 acb_theta_ql_all_red(aux, new_z, tau0, prec);
             }

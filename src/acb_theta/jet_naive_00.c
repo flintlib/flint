@@ -79,7 +79,8 @@ acb_theta_jet_naive_00_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
     acb_theta_eld_t E;
     arb_mat_t C;
     arf_t R2, eps;
-    arb_ptr v;
+    acb_ptr new_z, aux;
+    arb_ptr v, a;
     acb_t c;
     arb_t u;
     fmpz_t m, t;
@@ -91,6 +92,9 @@ acb_theta_jet_naive_00_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
     arb_mat_init(C, g, g);
     arf_init(R2);
     arf_init(eps);
+    new_z = _acb_vec_init(g);
+    aux = _acb_vec_init(nb);
+    a = _arb_vec_init(g);
     v = _arb_vec_init(g);
     acb_init(c);
     arb_init(u);
@@ -98,13 +102,13 @@ acb_theta_jet_naive_00_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
     fmpz_init(t);
 
     acb_siegel_cho(C, tau, prec);
-    acb_theta_naive_reduce_jet(v, u, z, tau, prec);
+    acb_theta_naive_reduce(v, new_z, a, c, u, z, 1, tau, prec);
     acb_theta_jet_naive_radius(R2, eps, C, v, ord, prec);
     b = acb_theta_eld_set(E, C, R2, v);
 
     if (b)
     {
-        acb_theta_naive_worker(dth, nb, z, 1, tau, E, ord, prec, worker);
+        acb_theta_naive_worker(dth, nb, new_z, 1, tau, E, ord, prec, worker);
 
         arb_mul_arf(u, u, eps, prec);
         for (k = 0; k < nb; k++)
@@ -128,6 +132,11 @@ acb_theta_jet_naive_00_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
             acb_div_fmpz(c, c, m, prec);
             acb_mul(&dth[k], &dth[k], c, prec);
         }
+
+        _arb_vec_neg(a, a, g);
+        _arb_vec_scalar_mul_2exp_si(a, a, g, 1);
+        acb_theta_jet_exp_pi_i(aux, a, ord, g, prec);
+        acb_theta_jet_mul(dth, dth, aux, ord, g, prec);
     }
     else
     {
@@ -142,7 +151,9 @@ acb_theta_jet_naive_00_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
     arb_mat_clear(C);
     arf_clear(R2);
     arf_clear(eps);
+    _acb_vec_clear(new_z, g);
     _arb_vec_clear(v, g);
+    _arb_vec_clear(a, g);
     acb_clear(c);
     arb_clear(u);
     fmpz_clear(m);

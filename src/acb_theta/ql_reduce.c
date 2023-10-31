@@ -19,7 +19,7 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong* n1, acb_srcptr
     arb_mat_t C, C1;
     acb_mat_t tau0, tau1, x;
     acb_ptr t, w;
-    arb_ptr v;
+    arb_ptr v, a;
     acb_t f;
     arf_t R2, eps;
     arb_t b;
@@ -28,6 +28,7 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong* n1, acb_srcptr
 
     arb_mat_init(C, g, g);
     v = _arb_vec_init(g);
+    a = _arb_vec_init(g);
     acb_init(f);
     arf_init(R2);
     arf_init(eps);
@@ -35,7 +36,7 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong* n1, acb_srcptr
 
     acb_siegel_cho(C, tau, prec);
     acb_theta_naive_radius(R2, eps, C, 0, prec);
-    acb_theta_naive_reduce(v, new_z, c, u, z, 1, tau, prec);
+    acb_theta_naive_reduce(v, new_z, a, c, u, z, 1, tau, prec);
     arb_mul_arf(u, u, eps, prec);
 
     arb_set_arf(b, R2);
@@ -111,6 +112,7 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong* n1, acb_srcptr
 
     arb_mat_clear(C);
     _arb_vec_clear(v, g);
+    _arb_vec_clear(a, g);
     acb_clear(f);
     arf_clear(R2);
     arf_clear(eps);

@@ -17,11 +17,12 @@
 
 void
 acb_theta_jet_ql_finite_diff(acb_ptr dth, const arf_t eps, const arf_t err,
-    acb_srcptr val, slong ord, slong g, slong prec)
+    const arb_t rho, acb_srcptr val, slong ord, slong g, slong prec)
 {
-    acb_ptr aux;
-    arb_t t;
     slong nb = acb_theta_jet_nb(ord, g);
+    slong lp = ACB_THETA_LOW_PREC;
+    acb_ptr aux;
+    arb_t t, e;
     slong b = ord + 1;
     slong* tups;
     slong* cyc;
@@ -30,6 +31,7 @@ acb_theta_jet_ql_finite_diff(acb_ptr dth, const arf_t eps, const arf_t err,
 
     aux = _acb_vec_init(n_pow(b, g));
     arb_init(t);
+    arb_init(e);
     tups = flint_malloc(g * nb * sizeof(slong));
     cyc = flint_malloc(g * sizeof(slong));
 
@@ -41,10 +43,12 @@ acb_theta_jet_ql_finite_diff(acb_ptr dth, const arf_t eps, const arf_t err,
     arb_set_si(t, n_pow(b, g));
     _acb_vec_scalar_div_arb(aux, aux, n_pow(b, g), t, prec);
 
-    /* Get Taylor coefficients, divide by eps^k */
+    /* Get Taylor coefficients, divide by eps^k, add error */
     acb_theta_jet_tuples(tups, ord, g);
     k = 0;
     arb_one(t);
+    arb_pow_ui(e, rho, ord, lp);
+    arb_mul_arf(e, e, err, lp);
     for (j = 0; j < nb; j++)
     {
         l = 0;
@@ -59,13 +63,16 @@ acb_theta_jet_ql_finite_diff(acb_ptr dth, const arf_t eps, const arf_t err,
         {
             k++;
             arb_mul_arf(t, t, eps, prec);
+            arb_pow_ui(e, rho, ord - k, lp);
+            arb_mul_arf(e, e, err, lp);
         }
         acb_div_arb(&dth[j], &dth[j], t, prec);
-        acb_add_error_arf(&dth[j], err);
+        acb_add_error_arb(&dth[j], e);
     }
 
     _acb_vec_clear(aux, n_pow(b, g));
     arb_clear(t);
+    arb_clear(e);
     flint_free(tups);
     flint_free(cyc);
 }

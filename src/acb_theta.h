@@ -136,10 +136,8 @@ void acb_theta_eld_print(const acb_theta_eld_t E);
 /* Naive algorithms */
 
 void acb_theta_naive_radius(arf_t R2, arf_t eps, const arb_mat_t C, slong ord, slong prec);
-void acb_theta_naive_reduce(arb_ptr v, acb_ptr new_zs, acb_ptr cs, arb_ptr us,
+void acb_theta_naive_reduce(arb_ptr v, acb_ptr new_zs, arb_ptr as, acb_ptr cs, arb_ptr us,
     acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec);
-void acb_theta_naive_reduce_jet(arb_ptr v, arb_t u, acb_srcptr z,
-    const acb_mat_t tau, slong prec);
 void acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong* tup,
     slong* n, slong prec);
 
@@ -170,6 +168,7 @@ void acb_theta_jet_mul(acb_ptr res, acb_srcptr v1, acb_srcptr v2, slong ord,
     slong g, slong prec);
 void acb_theta_jet_compose(acb_ptr res, acb_srcptr v, const acb_mat_t N,
     slong ord, slong prec);
+void acb_theta_jet_exp_pi_i(acb_ptr res, arb_srcptr a, slong ord, slong g, slong prec);
 
 void acb_theta_jet_naive_radius(arf_t R2, arf_t eps, const arb_mat_t C, arb_srcptr v,
     slong ord, slong prec);
@@ -221,7 +220,7 @@ void acb_theta_jet_ql_bounds(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t t
 void acb_theta_jet_ql_radius(arf_t eps, arf_t err, const arb_t c, const arb_t rho,
     slong ord, slong g, slong prec);
 void acb_theta_jet_ql_finite_diff(acb_ptr dth, const arf_t eps, const arf_t err,
-    acb_srcptr val, slong ord, slong g, slong prec);
+    const arb_t rho, acb_srcptr val, slong ord, slong g, slong prec);
 
 void acb_theta_jet_ql_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec);
 

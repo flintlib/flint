@@ -48,25 +48,15 @@ _arb_vec_union(arb_ptr res, arb_srcptr v1, arb_srcptr v2, slong len, slong prec)
 }
 
 static void
-acb_theta_naive_reduce_one(arb_ptr v, acb_ptr new_z, acb_t c, arb_t u,
+acb_theta_naive_reduce_one(arb_ptr v, acb_ptr new_z, arb_ptr a, acb_t c, arb_t u,
     acb_srcptr z, const arb_mat_t X, const arb_mat_t Y,  const arb_mat_t Yinv,
     const arb_mat_t C, slong prec)
 {
     slong g = arb_mat_nrows(X);
-    arb_ptr x, y, a, t, r, new_x, new_y;
-
-    if (!arb_mat_is_finite(C))
-    {
-        acb_indeterminate(c);
-        arb_pos_inf(u);
-        _arb_vec_indeterminate(v, g);
-        _acb_vec_indeterminate(new_z, g);
-        return;
-    }
+    arb_ptr x, y, t, r, new_x, new_y;
 
     x = _arb_vec_init(g);
     y = _arb_vec_init(g);
-    a = _arb_vec_init(g);
     t = _arb_vec_init(g);
     r = _arb_vec_init(g);
     new_x = _arb_vec_init(g);
@@ -116,7 +106,6 @@ acb_theta_naive_reduce_one(arb_ptr v, acb_ptr new_z, acb_t c, arb_t u,
 
     _arb_vec_clear(x, g);
     _arb_vec_clear(y, g);
-    _arb_vec_clear(a, g);
     _arb_vec_clear(t, g);
     _arb_vec_clear(r, g);
     _arb_vec_clear(new_x, g);
@@ -124,8 +113,8 @@ acb_theta_naive_reduce_one(arb_ptr v, acb_ptr new_z, acb_t c, arb_t u,
 }
 
 void
-acb_theta_naive_reduce(arb_ptr v, acb_ptr new_zs, acb_ptr cs, arb_ptr us,
-    acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
+acb_theta_naive_reduce(arb_ptr v, acb_ptr new_zs, arb_ptr as, acb_ptr cs,
+    arb_ptr us, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     arb_mat_t X, Y, C, Yinv;
@@ -145,7 +134,7 @@ acb_theta_naive_reduce(arb_ptr v, acb_ptr new_zs, acb_ptr cs, arb_ptr us,
 
     for (k = 0; k < nb; k++)
     {
-        acb_theta_naive_reduce_one(v1, new_zs + k * g, &cs[k], &us[k],
+        acb_theta_naive_reduce_one(v1, new_zs + k * g, as + k * g, &cs[k], &us[k],
             zs + k * g, X, Y, Yinv, C, prec);
         if (k == 0)
         {

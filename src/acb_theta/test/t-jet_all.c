@@ -22,7 +22,7 @@ int main(void)
     flint_randinit(state);
 
     /* Test: agrees with jet_naive_all */
-    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 400 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 2);
         slong ord = n_randint(state, 3);
