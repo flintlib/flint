@@ -9,9 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "gr_poly.h"
 
+/* Defined in t-pow_series_fmpq.c, t-pow_series_ui.c and t-pow_ui.c */
+#define test test_pow_ui
 int
 test(flint_rand_t state, int which)
 {
@@ -76,23 +79,15 @@ test(flint_rand_t state, int which)
     return status;
 }
 
-int main(void)
+TEST_FUNCTION_START(gr_poly_pow_ui, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("pow_ui....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000; iter++)
     {
         test(state, n_randint(state, 2));
     }
 
-    flint_randclear(state);
-    flint_cleanup_master();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
+#undef test

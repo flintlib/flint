@@ -11,6 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
@@ -37,14 +38,9 @@ do {                                                            \
     }                                                           \
 } while (0)
 
-int main(void)
+TEST_FUNCTION_START(gr_poly_hgcd, state)
 {
     int i, result;
-    flint_rand_t state;
-    flint_randinit(state);
-
-    flint_printf("hgcd....");
-    fflush(stdout);
 
     /*
        Find coprime polys, multiply by another poly
@@ -193,8 +189,5 @@ int main(void)
         gr_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup_master();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
