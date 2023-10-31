@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "nmod_poly_mat.h"
 
 /* Check a << shift >> shift == a */
@@ -78,14 +79,9 @@ void test_with_dimensions2(ulong rdim, ulong cdim, flint_rand_t state)
     nmod_poly_mat_clear(c);
 }
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_mat_shift_left_right, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("shift_left_right....");
-    fflush(stdout);
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -100,8 +96,5 @@ main(void)
         test_with_dimensions2(5,2,state);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

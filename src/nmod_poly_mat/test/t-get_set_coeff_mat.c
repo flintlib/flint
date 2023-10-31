@@ -9,19 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
-#include "nmod_poly_mat.h"
+#include "test_helpers.h"
 #include "nmod_mat.h"
+#include "nmod_poly_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_mat_get_set_coeff_mat, state)
 {
     int i, result;
     ulong j;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("get/set_coeff_mat....");
-    fflush(stdout);
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -86,8 +81,5 @@ main(void)
         nmod_mat_clear(cmat2);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
