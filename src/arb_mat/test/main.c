@@ -14,6 +14,7 @@
 /* Include functions *********************************************************/
 
 #include "t-addmul_rad_mag_fast.c"
+#include "t-bilinear_form.c"
 #include "t-charpoly.c"
 #include "t-cho.c"
 #include "t-companion.c"
@@ -42,18 +43,22 @@
 #include "t-solve_precond.c"
 #include "t-solve_tril.c"
 #include "t-solve_triu.c"
+#include "t-spd_get_fmpz_mat.c"
 #include "t-spd_inv.c"
+#include "t-spd_lll_reduce.c"
 #include "t-spd_solve.c"
 #include "t-sqr.c"
 #include "t-stirling.c"
 #include "t-trace.c"
 #include "t-transpose.c"
+#include "t-vector_mul.c"
 
 /* Array of test functions ***************************************************/
 
 test_struct tests[] =
 {
     TEST_FUNCTION(arb_mat_addmul_rad_mag_fast),
+    TEST_FUNCTION(arb_mat_bilinear_form),
     TEST_FUNCTION(arb_mat_charpoly),
     TEST_FUNCTION(arb_mat_cho),
     TEST_FUNCTION(arb_mat_companion),
@@ -82,12 +87,15 @@ test_struct tests[] =
     TEST_FUNCTION(arb_mat_solve_precond),
     TEST_FUNCTION(arb_mat_solve_tril),
     TEST_FUNCTION(arb_mat_solve_triu),
+    TEST_FUNCTION(arb_mat_spd_get_fmpz_mat),
     TEST_FUNCTION(arb_mat_spd_inv),
+    TEST_FUNCTION(arb_mat_spd_lll_reduce),
     TEST_FUNCTION(arb_mat_spd_solve),
     TEST_FUNCTION(arb_mat_sqr),
     TEST_FUNCTION(arb_mat_stirling),
     TEST_FUNCTION(arb_mat_trace),
-    TEST_FUNCTION(arb_mat_transpose)
+    TEST_FUNCTION(arb_mat_transpose),
+    TEST_FUNCTION(arb_mat_vector_mul)
 };
 
 /* main function *************************************************************/
