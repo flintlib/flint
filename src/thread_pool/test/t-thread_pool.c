@@ -156,7 +156,7 @@ void test2(fmpz_t x, ulong n)
     test2_helper(x, 0, n);
 }
 
-TEST_FUNCTION_START(qsieve_thread_pool, state)
+TEST_FUNCTION_START(thread_pool, state)
 {
     slong i, j;
 
