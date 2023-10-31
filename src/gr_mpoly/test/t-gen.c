@@ -10,16 +10,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "gr_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(gr_mpoly_gen, state)
 {
     slong iter;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("gen....");
-    fflush(stdout);
 
     for (iter = 0; iter < 100; iter++)
     {
@@ -109,8 +105,5 @@ main(void)
         gr_ctx_clear(cctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

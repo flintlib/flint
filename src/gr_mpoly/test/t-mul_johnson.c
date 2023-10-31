@@ -9,16 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "gr_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(gr_mpoly_mul_johnson, state)
 {
     slong i, j;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("mul_johnson....");
-    fflush(stdout);
 
     /* Check f*(g + h) = f*g + f*h */
     for (i = 0; i < 100; i++)
@@ -108,8 +104,5 @@ main(void)
         gr_ctx_clear(cctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
