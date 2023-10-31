@@ -13,20 +13,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 #include "nmod_poly_factor.h"
 
 #define MAX_DEG 7
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_factor_distinct_deg, state)
 {
     int iter;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("factor_distinct_deg....");
-    fflush(stdout);
 
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
@@ -129,8 +125,5 @@ main(void)
         nmod_poly_factor_clear(res);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
