@@ -9,7 +9,6 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
 #include "test_helpers.h"
 #include "nmod_poly.h"
 #include "fmpq.h"
@@ -19,7 +18,6 @@
 TEST_FUNCTION_START(bernoulli_fmpq_vec, state)
 {
     slong iter;
-    flint_rand_t state;
     slong n, bound;
     mp_limb_t p, pinv, m1, m2;
     nmod_poly_t A;
