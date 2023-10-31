@@ -16,7 +16,6 @@
 TEST_FUNCTION_START(arb_poly_shift_left_right, state)
 {
     int i, result;
-    flint_rand_t state;
 
     /* Check aliasing of a and b for left shift */
     for (i = 0; i < 1000; i++)

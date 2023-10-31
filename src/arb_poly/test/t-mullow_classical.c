@@ -16,7 +16,6 @@
 TEST_FUNCTION_START(arb_poly_mullow_classical, state)
 {
     slong iter;
-    flint_rand_t state;
 
     /* compare with fmpq_poly */
     for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)

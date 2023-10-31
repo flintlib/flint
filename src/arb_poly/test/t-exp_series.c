@@ -18,7 +18,6 @@ FLINT_DLL extern slong arb_poly_newton_exp_cutoff;
 TEST_FUNCTION_START(arb_poly_exp_series, state)
 {
     slong iter;
-    flint_rand_t state;
 
     /* compare with fmpq_poly */
     for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)

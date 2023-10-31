@@ -17,7 +17,6 @@
 TEST_FUNCTION_START(arb_poly_swinnerton_dyer_ui, state)
 {
     slong iter;
-    flint_rand_t state;
 
     for (iter = 0; iter < 50 * 0.1 * flint_test_multiplier(); iter++)
     {

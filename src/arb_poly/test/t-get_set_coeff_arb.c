@@ -16,7 +16,6 @@
 TEST_FUNCTION_START(arb_poly_get_set_coeff_arb, state)
 {
     int i, j, result;
-    flint_rand_t state;
 
     for (i = 0; i < 100; i++)
     {

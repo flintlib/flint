@@ -15,7 +15,6 @@
 TEST_FUNCTION_START(arb_poly_add_si, state)
 {
     slong iter;
-    flint_rand_t state;
 
     for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {

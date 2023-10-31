@@ -15,7 +15,6 @@
 TEST_FUNCTION_START(arb_poly_graeffe_transform, state)
 {
     slong iter;
-    flint_rand_t state;
     arb_poly_t a, b, c;
     arb_ptr roots;
     arb_t leading;

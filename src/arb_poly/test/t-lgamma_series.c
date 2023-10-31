@@ -16,7 +16,6 @@
 TEST_FUNCTION_START(arb_poly_lgamma_series, state)
 {
     slong iter;
-    flint_rand_t state;
 
     for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {

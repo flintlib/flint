@@ -31,7 +31,6 @@ fmpq_poly_randtest_small(fmpq_poly_t A, flint_rand_t state, slong len, slong bit
 TEST_FUNCTION_START(arb_poly_exp_series_basecase, state)
 {
     slong iter;
-    flint_rand_t state;
 
     /* compare with fmpq_poly */
     for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)

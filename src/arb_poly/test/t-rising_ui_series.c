@@ -15,7 +15,6 @@
 TEST_FUNCTION_START(arb_poly_rising_ui_series, state)
 {
     slong iter;
-    flint_rand_t state;
 
     /* check rf(f, a) * rf(f + a, b) = rf(f, a + b) */
     for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)

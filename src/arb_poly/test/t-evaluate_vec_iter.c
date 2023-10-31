@@ -18,7 +18,6 @@
 TEST_FUNCTION_START(arb_poly_evaluate_vec_iter, state)
 {
     slong iter;
-    flint_rand_t state;
 
     for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {

@@ -15,7 +15,6 @@
 TEST_FUNCTION_START(arb_poly_riemann_siegel_theta_series, state)
 {
     slong iter;
-    flint_rand_t state;
 
     for (iter = 0; iter < 300 * 0.1 * flint_test_multiplier(); iter++)
     {

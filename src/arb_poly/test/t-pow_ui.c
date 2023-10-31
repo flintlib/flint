@@ -16,7 +16,6 @@
 TEST_FUNCTION_START(arb_poly_pow_ui, state)
 {
     slong iter;
-    flint_rand_t state;
 
     /* compare with fmpz_poly */
     for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
