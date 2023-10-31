@@ -9,17 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "gr_mat.h"
 
-int main(void)
+TEST_FUNCTION_START(gr_mat_concat_horizontal, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("concat_horizontal....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 100; iter++)
     {
@@ -68,8 +63,5 @@ int main(void)
         gr_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

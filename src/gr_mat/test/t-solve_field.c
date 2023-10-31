@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2010,2011 Fredrik Johansson
+    Copyright (C) 2010, 2011 Fredrik Johansson
     Copyright (C) 2013 Mike Hansen
     Copyright (C) 2018 Tommy Hofmann
     Copyright (C) 2020 William Hart
@@ -12,23 +12,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "gr_mat.h"
 
 #include "fq_nmod_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(gr_mat_solve_field, state)
 {
-    flint_rand_t state;
     gr_ctx_t ctx;
     gr_mat_t A, X, X2, B, AX;
     slong i, k, m, n;
     int status;
-
-    flint_printf("solve_field...");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* test random systems */
     for (i = 0; i < 1000; i++)
@@ -172,8 +166,5 @@ main(void)
         gr_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -1,7 +1,21 @@
+/*
+    Copyright (C) 2022 Fredrik Johansson
 
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
+
+#include "test_helpers.h"
 #include "fmpz_mat.h"
 #include "gr_mat.h"
 
+/* Defined in t-lu.c, t-lu_classical.c, t-lu_recursive.c */
+#ifndef perm
+#define perm perm
 void perm(gr_mat_t A, slong * P)
 {
     slong i;
@@ -17,7 +31,11 @@ void perm(gr_mat_t A, slong * P)
 
     flint_free(tmp);
 }
+#endif
 
+/* Defined in t-lu.c, t-lu_classical.c, t-lu_recursive.c */
+#ifndef check
+#define check check
 void check(slong * P, gr_mat_t LU, const gr_mat_t A, slong rank, gr_ctx_t ctx)
 {
     gr_mat_t B, L, U;
@@ -75,7 +93,11 @@ void check(slong * P, gr_mat_t LU, const gr_mat_t A, slong rank, gr_ctx_t ctx)
     gr_mat_clear(L, ctx);
     gr_mat_clear(U, ctx);
 }
+#endif
 
+/* Defined in t-lu.c, t-lu_classical.c, t-lu_recursive.c */
+#ifndef _gr_mat_randrank
+#define _gr_mat_randrank _gr_mat_randrank
 void
 _gr_mat_randrank(gr_mat_t mat, flint_rand_t state, slong rank, slong bits, gr_ctx_t ctx)
 {
@@ -85,16 +107,11 @@ _gr_mat_randrank(gr_mat_t mat, flint_rand_t state, slong rank, slong bits, gr_ct
     GR_MUST_SUCCEED(gr_mat_set_fmpz_mat(mat, A, ctx));
     fmpz_mat_clear(A);
 }
+#endif
 
-int main(void)
+TEST_FUNCTION_START(gr_mat_lu, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("lu...");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000; iter++)
     {
@@ -267,8 +284,5 @@ int main(void)
         gr_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

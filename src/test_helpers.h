@@ -44,6 +44,14 @@ int CAT(test, label)(void)                              \
     printf(#label "....");                              \
     fflush(stdout);                                     \
 
+#define TEST_GR_FUNCTION_START(label, state, count_success, count_domain, count_unable)\
+int CAT(test, label)(void)                              \
+{                                                       \
+    slong count_success = 0, count_unable = 0, count_domain = 0;\
+    FLINT_TEST_INIT(state);                             \
+    printf(#label "....");                              \
+    fflush(stdout);                                     \
+
 #define TEST_TEMPLATE_FUNCTION_START(T, label, state)   \
 int TEMPLATE3(test, T, label)(void)                     \
 {                                                       \
@@ -62,6 +70,15 @@ int TEMPLATE5(test, T, label1, T, label2)(void)         \
 #define TEST_FUNCTION_END(state)                        \
     FLINT_TEST_CLEANUP(state);                          \
     printf("PASS\n");                                   \
+    return 0;                                           \
+}
+
+#define TEST_GR_FUNCTION_END(state, count_success, count_domain, count_unable)\
+    FLINT_TEST_CLEANUP(state);                          \
+    printf(" [" WORD_FMT "d success, "                  \
+                WORD_FMT "d domain, "                   \
+                WORD_FMT "d unable] PASS\n",            \
+                count_success, count_domain, count_unable);\
     return 0;                                           \
 }
 

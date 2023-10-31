@@ -1,16 +1,20 @@
+/*
+    Copyright (C) 2022 Fredrik Johansson
 
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
+
+#include "test_helpers.h"
 #include "gr_mat.h"
 
-int main(void)
+TEST_GR_FUNCTION_START(gr_mat_rank, state, count_success, count_unable, count_domain)
 {
     slong iter;
-    slong count_success = 0, count_unable = 0, count_domain = 0;
-    flint_rand_t state;
-
-    flint_printf("rank...");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* Check that random row/column operations preserve rank */
     for (iter = 0; iter < 10000; iter++)
@@ -62,8 +66,5 @@ int main(void)
         gr_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf(" [%wd success, %wd domain, %wd unable] PASS\n", count_success, count_domain, count_unable);
-    return 0;
+    TEST_GR_FUNCTION_END(state, count_success, count_unable, count_domain);
 }
