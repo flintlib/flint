@@ -9,11 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "mpn_extras.h"
-#include "ulong_extras.h"
 
-int main(void)
+TEST_FUNCTION_START(flint_mpn_mulmod_preinv1, state)
 {
     int i, result;
     mpz_t a, b, d, r1, r2;
@@ -21,11 +20,6 @@ int main(void)
     mp_limb_t d1, d2, dinv;
     mp_size_t size;
     flint_bitcnt_t norm;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("mulmod_preinv1....");
-    fflush(stdout);
 
     mpz_init(a);
     mpz_init(b);
@@ -94,8 +88,6 @@ int main(void)
     /* don't init r2 */
 
     gmp_randclear(st);
-    FLINT_TEST_CLEANUP(state);
 
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
