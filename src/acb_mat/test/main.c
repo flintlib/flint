@@ -33,6 +33,7 @@
 #include "t-mul_entrywise.c"
 #include "t-mul_reorder.c"
 #include "t-mul_threaded.c"
+#include "t-set_real_imag.c"
 #include "t-solve.c"
 #include "t-solve_lu.c"
 #include "t-solve_precond.c"
@@ -41,6 +42,7 @@
 #include "t-sqr.c"
 #include "t-trace.c"
 #include "t-transpose.c"
+#include "t-vector_mul.c"
 
 /* Array of test functions ***************************************************/
 
@@ -66,6 +68,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_mat_mul_entrywise),
     TEST_FUNCTION(acb_mat_mul_reorder),
     TEST_FUNCTION(acb_mat_mul_threaded),
+    TEST_FUNCTION(acb_mat_set_real_imag),
     TEST_FUNCTION(acb_mat_solve),
     TEST_FUNCTION(acb_mat_solve_lu),
     TEST_FUNCTION(acb_mat_solve_precond),
@@ -73,7 +76,8 @@ test_struct tests[] =
     TEST_FUNCTION(acb_mat_solve_triu),
     TEST_FUNCTION(acb_mat_sqr),
     TEST_FUNCTION(acb_mat_trace),
-    TEST_FUNCTION(acb_mat_transpose)
+    TEST_FUNCTION(acb_mat_transpose),
+    TEST_FUNCTION(acb_mat_vector_mul)
 };
 
 /* main function *************************************************************/
