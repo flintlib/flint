@@ -9,17 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "padic.h"
 
-int
-main(void)
+TEST_FUNCTION_START(padic_val_fac, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("padic_val_fac... ");
-    fflush(stdout);
 
     /* Check aliasing for padic_val_fac() */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -169,8 +165,5 @@ main(void)
         fmpz_clear(z);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
