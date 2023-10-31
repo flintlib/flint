@@ -30,7 +30,6 @@ int main(void)
         acb_mat_t tau1, w, tau2;
         acb_ptr z1, r, z2;
         fmpz_mat_t m;
-        slong k;
 
         acb_mat_init(tau1, g, g);
         acb_mat_init(w, g, g);
@@ -41,10 +40,7 @@ int main(void)
         fmpz_mat_init(m, 2 * g, 2 * g);
 
         acb_siegel_randtest(tau1, state, prec, bits);
-        for (k = 0; k < g; k++)
-        {
-            acb_randtest_precise(&z1[k], state, prec, bits);
-        }
+        acb_siegel_randtest_vec(z1, state, g, prec);
 
         sp2gz_randtest(m, state, bits);
         acb_siegel_transform_z(r, w, m, z1, tau1, prec);

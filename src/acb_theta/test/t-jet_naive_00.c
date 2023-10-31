@@ -32,7 +32,6 @@ int main(void)
         slong nb = acb_theta_jet_nb(ord, g);
         acb_mat_t tau;
         acb_ptr z, dth, test;
-        slong k;
 
         acb_mat_init(tau, g, g);
         z = _acb_vec_init(g);
@@ -40,14 +39,7 @@ int main(void)
         test = _acb_vec_init(nb * n2);
 
         acb_siegel_randtest_reduced(tau, state, prec, bits);
-        if (iter % 10 == 0)
-        {
-            bits = 100;
-        }
-        for (k = 0; k < g; k++)
-        {
-            acb_randtest(&z[k], state, prec, bits);
-        }
+        acb_siegel_randtest_vec(z, state, g, prec);
 
         acb_theta_jet_naive_00(dth, z, tau, ord, prec);
         acb_theta_jet_naive_all(test, z, tau, ord, prec);

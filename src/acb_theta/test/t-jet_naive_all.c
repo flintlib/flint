@@ -51,8 +51,8 @@ int main(void)
         {
             acb_siegel_randtest_reduced(tau11, state, prec, bits);
             acb_set(acb_mat_entry(tau, k, k), acb_mat_entry(tau11, 0, 0));
-            acb_urandom(&z[k], state, prec);
         }
+        acb_siegel_randtest_vec(z, state, g, prec);
 
         acb_theta_jet_naive_all(dth, z, tau, ord, mprec);
         for (k = 0; k < g; k++)

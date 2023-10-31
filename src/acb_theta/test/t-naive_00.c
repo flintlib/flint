@@ -30,9 +30,9 @@ int main(void)
         acb_ptr z;
         slong nbz = 1 + n_randint(state, 4);
         acb_ptr th, th_0b, test;
-        slong prec1 = 100 + n_randint(state, 500);
+        slong prec1 = 100 + n_randint(state, 200);
         slong prec = prec1 + n_randint(state, 200);
-        slong mag_bits = n_randint(state, 2);
+        slong mag_bits = n_randint(state, 10);
         slong k;
 
         acb_mat_init(tau, g, g);
@@ -42,14 +42,7 @@ int main(void)
         test = _acb_vec_init(nbz);
 
         acb_siegel_randtest_reduced(tau, state, prec, mag_bits);
-        if (iter % 10 == 0)
-        {
-            mag_bits = 100;
-        }
-        for (k = 0; k < g * nbz; k++)
-        {
-            acb_randtest(&z[k], state, prec, mag_bits);
-        }
+        acb_siegel_randtest_vec(z, state, g * nbz, prec);
 
         acb_theta_naive_00(th, z, nbz, tau, prec1);
         acb_theta_naive_0b(th_0b, z, nbz, tau, prec);

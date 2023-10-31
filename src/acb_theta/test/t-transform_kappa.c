@@ -25,7 +25,7 @@ int main(void)
     for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
-        slong bits = n_randint(state, 10);
+        slong bits = n_randint(state, 4);
         slong prec = 200;
         fmpz_mat_t mat;
         fmpz_mat_t x;
@@ -39,7 +39,7 @@ int main(void)
         acb_init(sqrtdet);
 
         sp2gz_randtest(mat, state, bits);
-        acb_siegel_randtest_nice(tau, state, prec);
+        acb_siegel_randtest_reduced(tau, state, prec, bits);
 
         kappa = acb_theta_transform_kappa(sqrtdet, mat, tau, prec);
         kappa2 = acb_theta_transform_kappa2(mat);

@@ -33,12 +33,7 @@ transform_kappa2_g1(const fmpz_mat_t mat, const fmpz_mat_t x)
     acb_modular_theta_transform(R, S, &C, y);
 
     /* find out where theta_00 is going */
-    if (S[2] == 0) /* -theta_3 */
-    {
-        ab = (1 << (2 * g - 1)) + (1 << (g - 1));
-        res += 4;
-    }
-    else if (S[2] == 1) /* theta_2 */
+    if (S[2] == 1) /* theta_2 */
     {
         ab = 1 << (2 * g - 1);
     }
@@ -46,7 +41,7 @@ transform_kappa2_g1(const fmpz_mat_t mat, const fmpz_mat_t x)
     {
         ab = 0;
     }
-    else /* theta_1 */
+    else /* theta_1, since -theta_3 cannot happen (odd) */
     {
         ab = 1 << (g - 1);
     }

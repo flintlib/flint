@@ -15,15 +15,34 @@ void
 acb_siegel_randtest_reduced(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits)
 {
     slong g = acb_mat_nrows(tau);
+    slong s = n_randint(state, g + 1);
+    slong n = n_randint(state, FLINT_MAX(1, mag_bits));
     fmpz_mat_t mat;
     arb_t test;
+    int r = 0;
+    slong j, k;
 
     fmpz_mat_init(mat, 2 * g, 2 * g);
     arb_init(test);
 
-    acb_siegel_randtest(tau, state, prec, mag_bits);
-    acb_siegel_reduce(mat, tau, prec);
-    acb_siegel_transform(tau, mat, tau, prec);
+    while (!r)
+    {
+        acb_siegel_randtest(tau, state, prec, 2);
+        acb_siegel_reduce(mat, tau, prec);
+        acb_siegel_transform(tau, mat, tau, prec);
+        r = acb_siegel_is_reduced(tau, -1, prec);
+    }
+
+    for (j = s; j < g; j++)
+    {
+        for (k = 0; k < g; k++)
+        {
+            arb_mul_2exp_si(acb_imagref(acb_mat_entry(tau, j, k)),
+                acb_imagref(acb_mat_entry(tau, j, k)), n);
+            arb_mul_2exp_si(acb_imagref(acb_mat_entry(tau, k, j)),
+                acb_imagref(acb_mat_entry(tau, k, j)), n);
+        }
+    }
 
     fmpz_mat_clear(mat);
     arb_clear(test);

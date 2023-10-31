@@ -317,15 +317,18 @@ We continue to denote by `\alpha,\beta,\gamma,\delta` the `g\times g` blocks of
 
 .. function:: void acb_siegel_randtest_reduced(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits)
 
-    Sets *tau* to a random reduced matrix in `\mathbb{H}_g` by calling
-    :func:`acb_siegel_reduce` on a random matrix. The reduction may fail at low
-    precisions for a given choice of *g* and *mag_bits*, in which case the
-    output will be similar to :func:`acb_siegel_randtest`.
+    Sets *tau* to a random reduced matrix in `\mathbb{H}_g` that is likely to
+    trigger corner cases for several functions in this module.
 
 .. function:: void acb_siegel_randtest_nice(acb_mat_t tau, flint_rand_t state, slong prec)
 
     Sets *tau* to a random matrix that is well within the reduced domain in
     `\mathbb{H}_g`.
+
+.. function:: void acb_siegel_randtest_vec(acb_ptr z, flint_rand_t state, slong g, slong prec)
+
+    Sets *z* to a random vector of length *g* that is likely to trigger corner
+    cases for several functions in this module.
 
 Theta characteristics
 -------------------------------------------------------------------------------
@@ -1018,7 +1021,7 @@ domain, however `\mathrm{Im}(\tau)` may have large eigenvalues.
 
     Follows the specifications of a function of type
     :type:`acb_theta_ql_worker_t` using the naive algorithm only. The return
-    value is always `1`.
+    value is `1` iff the output vector *th* contains finite values.
 
 .. function:: int acb_theta_ql_a0_split(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d, const acb_mat_t tau, slong s, slong guard, slong prec, acb_theta_ql_worker_t worker)
 

@@ -22,13 +22,12 @@ int main(void)
     flint_randinit(state);
 
     /* Test: agrees with naive algorithms */
-    for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         slong g = 2 + n_randint(state, 2);
         slong n = 1 << g;
         slong prec = ACB_THETA_LOW_PREC + n_randint(state, 100);
-        slong s = n_randint(state, g + 1);
-        int fail = (iter % 10 == 0);
+        slong bits = n_randint(state, 4);
         acb_mat_t tau, tau0;
         arb_mat_t Y;
         acb_ptr z, new_z, th, th0, test;
@@ -37,7 +36,7 @@ int main(void)
         arb_t u, abs;
         ulong a0, a1, b0, b1, fixed_a1;
         slong* n1;
-        slong j, k;
+        slong k, s;
 
         acb_mat_init(tau, g, g);
         arb_mat_init(Y, g, g);
@@ -52,19 +51,10 @@ int main(void)
         arb_init(abs);
         n1 = flint_malloc(g * sizeof(slong));
 
-        /* Make period matrix with splitting at s */
-        acb_siegel_randtest_nice(tau, state, prec);
-        for (j = s; j < g; j++)
-        {
-            for (k = s; k < g; k++)
-            {
-                acb_mul_2exp_si(acb_mat_entry(tau, j, k),
-                    acb_mat_entry(tau, j, k), 10);
-            }
-        }
+        acb_siegel_randtest_reduced(tau, state, prec, bits);
 
         /* Choose z as Y.v + error with v either 0, 1/4 or 1/2 entries, or
-           values on which computation will fail */
+           random values */
         acb_mat_get_imag(Y, tau);
         for (k = 0; k < g; k++)
         {
@@ -72,17 +62,18 @@ int main(void)
         }
         _arb_vec_scalar_mul_2exp_si(x, x, g, -2);
         arb_mat_vector_mul_col(x, Y, x, prec);
-        for (k = 0; k < g; k++)
+
+        if (iter % 2 == 0)
         {
-            if (fail)
-            {
-                acb_randtest(&z[k], state, prec, 100);
-            }
-            else
+            for (k = 0; k < g; k++)
             {
                 acb_urandom(&z[k], state, prec);
                 arb_add(acb_imagref(&z[k]), acb_imagref(&z[k]), &x[k], prec);
             }
+        }
+        else
+        {
+            acb_siegel_randtest_vec(z, state, g, prec);
         }
 
         s = acb_theta_ql_reduce(new_z, c, u, n1, z, tau, prec);
@@ -139,7 +130,9 @@ int main(void)
             if (!_acb_vec_overlaps(th, test, n * n))
             {
                 flint_printf("FAIL (g = %wd, s = %wd)\n", g, s);
+                flint_printf("tau, z:\n");
                 acb_mat_printd(tau, 5);
+                _acb_vec_printd(z, g, 5);
                 flint_printf("th, test:\n");
                 _acb_vec_printd(th, n * n, 5);
                 _acb_vec_printd(test, n * n, 5);

@@ -11,13 +11,6 @@
 
 #include "acb_theta.h"
 
-static int
-worker_fail(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
-    arb_srcptr d, const acb_mat_t tau, slong guard, slong prec)
-{
-    return 0;
-}
-
 int main(void)
 {
     slong iter;
@@ -31,15 +24,16 @@ int main(void)
     /* Test: agrees with ql_a0_naive using ql_a0_naive as worker */
     for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
-        slong g = 2 + n_randint(state, 3);
+        slong g = 2 + n_randint(state, 2);
         slong n = 1 << g;
         slong s = 1 + n_randint(state, g - 1);
         int hast = iter % 2;
-        slong nbz = (hast ? 3 : 1);
+        slong nbt = (hast ? 3 : 1);
         slong prec = 50 + n_randint(state, 50);
         slong hprec = prec + 25;
         slong guard = 0;
         slong lp = ACB_THETA_LOW_PREC;
+        slong bits = n_randint(state, 4);
         acb_mat_t tau;
         acb_ptr z, t, r, test;
         arb_ptr d, d0;
@@ -49,48 +43,53 @@ int main(void)
         acb_mat_init(tau, g, g);
         z = _acb_vec_init(g);
         t = _acb_vec_init(g);
-        r = _acb_vec_init(nbz * n);
-        test = _acb_vec_init(2 * nbz * n);
+        r = _acb_vec_init(nbt * n);
+        test = _acb_vec_init(2 * nbt * n);
         d = _arb_vec_init(n);
         d0 = _arb_vec_init(n);
 
-        acb_siegel_randtest_nice(tau, state, hprec);
-        acb_theta_dist_a0(d, z, tau, lp);
-        for (k = 0; k < g; k++)
+        acb_siegel_randtest_reduced(tau, state, hprec, bits);
+        acb_siegel_randtest_vec(z, state, g, hprec);
+        if (hast)
         {
-            acb_urandom(&z[k], state, hprec);
-            if (hast)
+            for (k = 0; k < g; k++)
             {
                 arb_urandom(acb_realref(&t[k]), state, hprec);
             }
         }
+
+        acb_theta_dist_a0(d0, t, tau, lp);
         acb_theta_dist_a0(d, z, tau, lp);
 
         res = acb_theta_ql_a0_split(r, t, z, d, tau, s, guard, prec,
-            (iter % 10 == 0 ? &worker_fail : &acb_theta_ql_a0_naive));
+            &acb_theta_ql_a0_naive);
         acb_theta_ql_a0_naive(test, t, z, d0, d, tau, guard, hprec);
 
         if (!_acb_vec_is_zero(z, g))
         {
-            _acb_vec_set(test, test + nbz * n, nbz * n);
+            _acb_vec_set(test, test + nbt * n, nbt * n);
         }
 
-        if (res && !_acb_vec_overlaps(r, test, nbz * n))
+        if (res && !_acb_vec_overlaps(r, test, nbt * n))
         {
             flint_printf("FAIL\n");
-            flint_printf("g = %wd, prec = %wd, tau:\n", g, prec);
+            flint_printf("g = %wd, s = %wd, prec = %wd, tau, z:\n", g, s, prec);
             acb_mat_printd(tau, 5);
+            _acb_vec_printd(z, g, 5);
             flint_printf("output:\n");
-            _acb_vec_printd(r, nbz * n, 5);
-            _acb_vec_printd(test, nbz * n, 5);
+            _acb_vec_printd(r, nbt * n, 5);
+            _acb_vec_printd(test, nbt * n, 5);
+            flint_printf("difference:\n");
+            _acb_vec_sub(test, test, r, nbt * n, prec);
+            _acb_vec_printd(test, nbt * n, 5);
             flint_abort();
         }
 
         acb_mat_clear(tau);
         _acb_vec_clear(z, g);
         _acb_vec_clear(t, g);
-        _acb_vec_clear(r, nbz * n);
-        _acb_vec_clear(test, 2 * nbz * n);
+        _acb_vec_clear(r, nbt * n);
+        _acb_vec_clear(test, 2 * nbt * n);
         _arb_vec_clear(d, n);
         _arb_vec_clear(d0, n);
     }

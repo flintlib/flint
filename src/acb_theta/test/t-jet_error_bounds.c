@@ -54,10 +54,7 @@ int main(void)
         acb_init(x);
 
         acb_siegel_randtest_reduced(tau1, state, hprec, bits);
-        for (j = 0; j < g; j++)
-        {
-            acb_urandom(&z1[j], state, hprec);
-        }
+        acb_siegel_randtest_vec(z1, state, g, hprec);
 
         for (j = 0; j < g; j++)
         {

@@ -66,7 +66,7 @@ int main(void)
         acb_init(psi4);
         acb_init(test);
 
-        acb_siegel_randtest_nice(tau, state, prec);
+        acb_siegel_randtest_reduced(tau, state, prec, bits);
         sp2gz_randtest(mat, state, bits);
 
         acb_theta_all(th2, z, tau, 1, prec);

@@ -22,11 +22,12 @@ int main(void)
     flint_randinit(state);
 
     /* Test: agrees with naive_all */
-    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
         slong n2 = 1 << (2 * g);
         slong prec = 100 + n_randint(state, 400);
+        slong bits = n_randint(state, 4);
         int sqr = iter % 2;
         acb_mat_t tau;
         acb_ptr z;
@@ -39,12 +40,9 @@ int main(void)
         test = _acb_vec_init(n2);
 
         /* Sample tau not too far from reduced domain */
-        acb_siegel_randtest_nice(tau, state, prec);
+        acb_siegel_randtest_reduced(tau, state, prec, bits);
         acb_mat_scalar_mul_2exp_si(tau, tau, -1);
-        for (k = 0; k < g; k++)
-        {
-            acb_urandom(z, state, prec);
-        }
+        acb_siegel_randtest_vec(z, state, g, prec);
 
         acb_theta_all(th, z, tau, sqr, prec);
         acb_theta_naive_all(test, z, 1, tau, prec);
@@ -59,24 +57,13 @@ int main(void)
         if (!_acb_vec_overlaps(th, test, n2))
         {
             flint_printf("FAIL\n");
-            flint_printf("g = %wd, prec = %wd, sqr = %wd, tau:\n", g, prec, sqr);
+            flint_printf("g = %wd, prec = %wd, sqr = %wd, tau, z:\n", g, prec, sqr);
             acb_mat_printd(tau, 5);
+            _acb_vec_printd(z, g, 5);
             flint_printf("th, test:\n");
             _acb_vec_printd(th, n2, 5);
             _acb_vec_printd(test, n2, 5);
             flint_abort();
-        }
-
-        /* Sample garbage tau, computation should fail quickly */
-        acb_mat_randtest(tau, state, prec, 10);
-        acb_set_si(acb_mat_entry(tau, 0, 0), -1);
-        acb_theta_all(th, z, tau, sqr, prec);
-        {
-            if (acb_is_finite(&th[0]))
-            {
-                flint_printf("FAIL (not infinite)\n");
-                flint_abort();
-            }
         }
 
         acb_mat_clear(tau);

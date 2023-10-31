@@ -71,6 +71,10 @@ int main(void)
         if (!res)
         {
             flint_printf("FAIL (ellipsoid)\n");
+            acb_mat_printd(tau, 5);
+            arb_mat_printd(C, 5);
+            _acb_vec_printd(z, g, 5);
+            _arb_vec_printd(v, g, 5);
             flint_abort();
         }
 

@@ -26,7 +26,8 @@ int main(void)
     {
         slong g = 1 + n_randint(state, 4);
         slong n = 1 << g;
-        slong prec = 100 + n_randint(state, 500);
+        slong mprec = 50 + n_randint(state, 500);
+        slong prec = mprec + 50;
         slong bits = n_randint(state, 3);
         slong delta = 25;
         acb_mat_t tau;
@@ -49,7 +50,7 @@ int main(void)
         arf_init(eps);
 
         /* Generate distances, not too crazy */
-        acb_siegel_randtest_nice(tau, state, prec);
+        acb_siegel_randtest_reduced(tau, state, prec, bits);
         acb_theta_dist_a0(d0, z, tau, prec);
         for (k = 0; k < g; k++)
         {
@@ -71,7 +72,7 @@ int main(void)
             acb_mul_arb(&th0[k], &th0[k], x, prec);
         }
 
-        acb_theta_agm_mul_tight(r, th0, th, d0, d, g, prec);
+        acb_theta_agm_mul_tight(r, th0, th, d0, d, g, mprec);
 
         for (k = 0; k < n; k++)
         {
@@ -96,7 +97,7 @@ int main(void)
 
             acb_get_rad_ubound_arf(eps, &r[k], prec);
             arb_set_arf(x, eps);
-            arb_mul_2exp_si(t, t, -prec + delta);
+            arb_mul_2exp_si(t, t, -mprec + delta);
             if (arb_gt(x, t))
             {
                 flint_printf("FAIL (precision loss, k = %wd)\n", k);
@@ -110,6 +111,11 @@ int main(void)
                 _acb_vec_printd(th, n, 5);
                 flint_printf("result:\n");
                 _acb_vec_printd(r, n, 5);
+                flint_printf("x, t:\n");
+                arb_printd(x, 5);
+                flint_printf("\n");
+                arb_printd(t, 5);
+                flint_printf("\n");
                 flint_abort();
             }
         }

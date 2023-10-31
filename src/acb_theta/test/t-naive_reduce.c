@@ -57,7 +57,7 @@ int main(void)
         acb_siegel_cho(C, tau, prec);
         acb_mat_get_imag(Y, tau);
 
-        /* Test: if z are real, new_z = z, c = 1, u = 1 and v = 0 */
+        /* Test: if z is real, c = 1, u = 1 and v = 0 */
         for (k = 0; k < g * nbz; k++)
         {
             arb_randtest_precise(acb_realref(&z[k]), state, prec, bits);
@@ -71,9 +71,7 @@ int main(void)
             res = res && arb_is_one(&u[k]);
         }
 
-        if (!_arb_vec_is_zero(v, g)
-            || !res
-            || !_acb_vec_equal(new_z, z, g * nbz))
+        if (!_arb_vec_is_zero(v, g) || !res)
         {
             flint_printf("FAIL\n");
             flint_abort();

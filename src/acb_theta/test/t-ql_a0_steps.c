@@ -28,6 +28,7 @@ int main(void)
         slong n = 1 << g;
         slong s = 1 + n_randint(state, g - 1);
         slong nb_steps = n_randint(state, 5);
+        slong bits = n_randint(state, 4);
         int hast = iter % 2;
         int hasz = (iter % 4) / 2;
         slong nbt = (hast ? 3 : 1);
@@ -37,42 +38,34 @@ int main(void)
         slong guard = ACB_THETA_LOW_PREC;
         slong lp = ACB_THETA_LOW_PREC;
         acb_mat_t tau;
-        acb_ptr z, zero, t, r, test;
+        acb_ptr z, t, r, test;
         arb_ptr d, d0;
-        slong j, k;
+        slong k;
         int res;
 
         acb_mat_init(tau, g, g);
         z = _acb_vec_init(g);
-        zero = _acb_vec_init(g);
         t = _acb_vec_init(g);
         r = _acb_vec_init(nbz * nbt * n);
         test = _acb_vec_init(nbz * nbt * n);
         d = _arb_vec_init(n);
         d0 = _arb_vec_init(n);
 
-        acb_siegel_randtest_nice(tau, state, hprec);
-        for (k = s; k < g; k++)
+        acb_siegel_randtest_reduced(tau, state, hprec, bits);
+        if (hast)
         {
-            for (j = s; j < g; j++)
-            {
-                acb_mul_2exp_si(acb_mat_entry(tau, j, k),
-                    acb_mat_entry(tau, j, k), 6);
-            }
-        }
-        for (k = 0; k < g; k++)
-        {
-            if (hasz)
-            {
-                acb_urandom(&z[k], state, hprec);
-            }
-            if (hast)
+            for (k = 0; k < g; k++)
             {
                 arb_urandom(acb_realref(&t[k]), state, hprec);
             }
         }
+        if (hasz)
+        {
+            acb_siegel_randtest_vec(z, state, g, prec);
+        }
+
+        acb_theta_dist_a0(d0, t, tau, lp);
         acb_theta_dist_a0(d, z, tau, lp);
-        acb_theta_dist_a0(d0, zero, tau, lp);
 
         res = acb_theta_ql_a0_steps(r, t, z, d0, d, tau, nb_steps, s,
             guard, prec, &acb_theta_ql_a0_naive);
@@ -92,7 +85,6 @@ int main(void)
 
         acb_mat_clear(tau);
         _acb_vec_clear(z, g);
-        _acb_vec_clear(zero, g);
         _acb_vec_clear(t, g);
         _acb_vec_clear(r, nbz * nbt * n);
         _acb_vec_clear(test, nbz * nbt * n);

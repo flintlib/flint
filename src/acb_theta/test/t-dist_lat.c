@@ -30,6 +30,7 @@ int main(void)
         slong bits = n_randint(state, 5);
         acb_mat_t tau;
         arb_mat_t C;
+        acb_ptr z;
         arb_ptr v, y;
         arb_t d, test, x, s;
         arf_t R2;
@@ -40,6 +41,7 @@ int main(void)
 
         acb_mat_init(tau, g, g);
         arb_mat_init(C, g, g);
+        z = _acb_vec_init(g);
         v = _arb_vec_init(g);
         y = _arb_vec_init(g);
         arb_init(d);
@@ -51,15 +53,10 @@ int main(void)
 
         /* Get reduced C */
         acb_siegel_randtest_reduced(tau, state, hprec, bits);
+        acb_siegel_randtest_vec(z, state, g, prec);
+
+        _acb_vec_get_imag(v, z, g);
         acb_siegel_cho(C, tau, prec);
-        if (iter % 10 == 0)
-        {
-            bits = 100;
-        }
-        for (k = 0; k < g; k++)
-        {
-            arb_randtest_precise(&v[k], state, prec, bits);
-        }
 
         acb_theta_dist_lat(d, v, C, prec);
         arb_get_ubound_arf(R2, d, prec);
@@ -112,6 +109,7 @@ int main(void)
 
         acb_mat_clear(tau);
         arb_mat_clear(C);
+        _acb_vec_clear(z, g);
         _arb_vec_clear(v, g);
         _arb_vec_clear(y, g);
         arb_clear(d);

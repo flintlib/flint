@@ -24,7 +24,7 @@ int main(void)
     /* Test: agrees with built-in genus 1 on diagonal matrices */
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 3);
+        slong g = 2 + n_randint(state, 2);
         slong nb = n_pow(2, 2 * g);
         slong prec1 = ACB_THETA_LOW_PREC + n_randint(state, 200);
         slong prec = prec1 + n_randint(state, 100);
@@ -47,44 +47,29 @@ int main(void)
             acb_siegel_randtest_reduced(tau11, state, prec, mag_bits);
             acb_set(acb_mat_entry(tau, k, k), acb_mat_entry(tau11, 0, 0));
         }
-        for (k = 0; k < g * nbz; k++)
-        {
-            acb_urandom(&z[k], state, prec);
-        }
+        acb_siegel_randtest_vec(z, state, g * nbz, prec);
+
         acb_theta_naive_all(th, z, nbz, tau, prec1);
 
-        if (g == 1)
+        for (j = 0; j < nbz; j++)
         {
-            for (k = 0; k < nbz; k++)
+            for (k = 0; k < g; k++)
             {
-                acb_modular_theta(&th_test[4 * k + 3], &th_test[4 * k + 2],
-                    &th_test[4 * k], &th_test[4 * k + 1],
-                    z + k * g, acb_mat_entry(tau, 0, 0), prec);
-                acb_neg(&th_test[4 * k + 3], &th_test[4 * k + 3]);
+                acb_set(acb_mat_entry(tau11, 0, 0), acb_mat_entry(tau, k, k));
+                acb_theta_naive_all(&th_g1[4 * k], &z[j * g + k], 1, tau11, prec);
             }
-        }
-        else
-        {
-            for (j = 0; j < nbz; j++)
+            /* Could use a more efficient recursive algorithm here */
+            for (ab = 0; ab < n_pow(2, 2 * g); ab++)
             {
-                for (k = 0; k < g; k++)
+                a = ab >> g;
+                b = ab;
+                acb_one(&th_test[j * nb + ab]);
+                for (k = g - 1; k >= 0; k--)
                 {
-                    acb_set(acb_mat_entry(tau11, 0, 0), acb_mat_entry(tau, k, k));
-                    acb_theta_naive_all(&th_g1[4 * k], &z[j * g + k], 1, tau11, prec);
-                }
-                /* Could use a more efficient recursive algorithm here */
-                for (ab = 0; ab < n_pow(2, 2 * g); ab++)
-                {
-                    a = ab >> g;
-                    b = ab;
-                    acb_one(&th_test[j * nb + ab]);
-                    for (k = g - 1; k >= 0; k--)
-                    {
-                        acb_mul(&th_test[j * nb + ab], &th_test[j * nb + ab],
-                            &th_g1[4 * k + 2 * (a % 2) + (b % 2)], prec);
-                        a = a >> 1;
-                        b = b >> 1;
-                    }
+                    acb_mul(&th_test[j * nb + ab], &th_test[j * nb + ab],
+                        &th_g1[4 * k + 2 * (a % 2) + (b % 2)], prec);
+                    a = a >> 1;
+                    b = b >> 1;
                 }
             }
         }

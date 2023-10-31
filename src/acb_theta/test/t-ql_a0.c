@@ -59,17 +59,18 @@ int main(void)
             res = arb_is_negative(y);
         }
 
-        acb_theta_dist_a0(d0, z, tau, lp);
-        for (k = 0; k < g; k++)
+        if (hast)
         {
-            if (hasz)
-            {
-                acb_urandom(&z[k], state, hprec);
-            }
-            if (hast)
+            for (k = 0; k < g; k++)
             {
                 arb_urandom(acb_realref(&t[k]), state, hprec);
             }
+        }
+
+        acb_theta_dist_a0(d0, z, tau, lp);
+        if (hasz)
+        {
+            acb_siegel_randtest_vec(z, state, g, prec);
         }
         acb_theta_dist_a0(d, z, tau, lp);
 
