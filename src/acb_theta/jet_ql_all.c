@@ -150,8 +150,9 @@ acb_theta_jet_ql_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, 
     arb_ptr v, a;
     acb_t c;
     arb_t u;
+    slong k;
 
-    aux = _acb_vec_init(n2 * nb);
+    aux = _acb_vec_init(nb);
     new_z = _acb_vec_init(g);
     v = _arb_vec_init(g);
     a = _arb_vec_init(g);
@@ -161,12 +162,16 @@ acb_theta_jet_ql_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, 
     acb_theta_naive_reduce(v, new_z, a, c, u, z, 1, tau, prec);
     acb_theta_jet_ql_all_red(dth, new_z, tau, ord, prec);
 
+    _acb_vec_scalar_mul(dth, dth, n2 * nb, c, prec);
     _arb_vec_neg(a, a, g);
     _arb_vec_scalar_mul_2exp_si(a, a, g, 1);
     acb_theta_jet_exp_pi_i(aux, a, ord, g, prec);
-    acb_theta_jet_mul(dth, dth, aux, ord, g, prec);
+    for (k = 0; k < n2; k++)
+    {
+        acb_theta_jet_mul(dth + k * nb, dth + k * nb, aux, ord, g, prec);
+    }
 
-    _acb_vec_clear(aux, n2 * nb);
+    _acb_vec_clear(aux, nb);
     _acb_vec_clear(new_z, g);
     _arb_vec_clear(v, g);
     _arb_vec_clear(a, g);

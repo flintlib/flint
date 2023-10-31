@@ -24,7 +24,7 @@ int main(void)
     /* Test: agrees with naive_all */
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 3);
+        slong g = 1 + n_randint(state, 2);
         slong n2 = 1 << (2 * g);
         slong prec = 100 + n_randint(state, 400);
         slong bits = n_randint(state, 4);

@@ -89,7 +89,7 @@ int main(void)
             arb_zero(sum);
             for (k = 0; k < nb_pts; k++)
             {
-                acb_theta_naive_term(term, z, tau, tups + j * g, pts + k * g, prec);
+                acb_theta_naive_term(term, new_z, tau, tups + j * g, pts + k * g, prec);
                 acb_abs(abs, term, prec);
                 arb_add(sum, sum, abs, prec);
             }

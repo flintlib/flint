@@ -141,7 +141,6 @@ acb_theta_jet_naive_all_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
     arb_init(u);
     fmpz_init(m);
     fmpz_init(t);
-    new_z = _acb_vec_init(g);
 
     _acb_vec_scalar_mul_2exp_si(new_z, z, g, -1);
     acb_mat_scalar_mul_2exp_si(new_tau, tau, -2);
@@ -154,10 +153,10 @@ acb_theta_jet_naive_all_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
     if (b)
     {
         acb_theta_naive_worker(dth, nb * n2, new_z, 1, new_tau, E, ord, prec, worker);
-
         arb_mul_arf(u, u, eps, prec);
         for (k = 0; k < nb * n2; k++)
         {
+            acb_mul(&dth[k], &dth[k], c, prec);
             acb_add_error_arb(&dth[k], u);
         }
 
@@ -180,7 +179,23 @@ acb_theta_jet_naive_all_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
             }
         }
 
-        /* Figure out exponential factor... */
+        _arb_vec_neg(a, a, g);
+        acb_theta_jet_exp_pi_i(aux, a, ord, g, prec);
+        for (k = 0; k < n2; k++)
+        {
+            acb_theta_jet_mul(dth + k * nb, dth + k * nb, aux, ord, g, prec);
+            arb_zero(u);
+            for (j = 0; j < g; j++)
+            {
+                if ((k >> (g - 1 - j)) % 2 == 1)
+                {
+                    arb_add(u, u, &a[j], prec);
+                }
+            }
+            acb_onei(c);
+            acb_pow_arb(c, c, u, prec);
+            _acb_vec_scalar_mul(dth + k * nb, dth + k * nb, nb, c, prec);
+        }
     }
     else
     {

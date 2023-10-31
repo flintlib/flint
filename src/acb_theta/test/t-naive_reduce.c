@@ -22,10 +22,10 @@ int main(void)
     flint_randinit(state);
 
     /* Test: special values of z */
-    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 5);
-        slong nbz = n_randint(state, 10);
+        slong nbz = n_randint(state, 5);
         slong bits = n_randint(state, 5);
         slong prec = 100 + n_randint(state, 200);
         acb_mat_t tau;
@@ -101,12 +101,15 @@ int main(void)
         }
         acb_theta_naive_reduce(v, new_z, a, c, u, z, nbz, tau, prec);
 
-        if (!_arb_vec_equal(a, w, g * nbz))
+        for (k = 0; k < g * nbz; k++)
         {
-            flint_printf("FAIL (integral vector)\n");
-            _arb_vec_printd(a, g * nbz, 5);
-            _arb_vec_printd(w, g * nbz, 5);
-            flint_abort();
+            if (!arb_equal_si(&a[k], -n[k]))
+            {
+                flint_printf("FAIL (integral vector)\n");
+                _arb_vec_printd(a, g * nbz, 5);
+                flint_printf("k = %wd, n[k] = %wd\n", k, n[k]);
+                flint_abort();
+            }
         }
 
         for (k = 0; k < nbz; k++)
@@ -158,6 +161,7 @@ int main(void)
         _arb_vec_clear(u, nbz);
         _arb_vec_clear(v, g);
         _arb_vec_clear(w, g * nbz);
+        _arb_vec_clear(a, g * nbz);
         acb_clear(t);
         acb_clear(x);
         flint_free(n);

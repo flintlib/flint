@@ -34,6 +34,7 @@ acb_theta_jet_naive_fixed_ab(acb_ptr dth, ulong ab, acb_srcptr z, const acb_mat_
     acb_theta_char_get_acb(v, a, g);
     acb_theta_char_get_acb(w, b, g);
     acb_theta_char_get_arb(u, a, g);
+    _arb_vec_scalar_mul_2exp_si(u, u, g, 1);
 
     /* Get jet at new_z */
     acb_mat_vector_mul_col(new_z, tau, v, prec);

@@ -75,7 +75,7 @@ acb_theta_naive_reduce_one(arb_ptr v, acb_ptr new_z, arb_ptr a, acb_t c, arb_t u
     arb_neg(u, u);
     arb_exp(u, u, prec);
 
-    /* Round to nearest even integer vector a to not mess with characteristics */
+    /* Round to nearest vector a = 0 mod 2 to not mess with characteristics */
     _arb_vec_scalar_mul_2exp_si(t, t, g, -1);
     acb_theta_naive_round(a, t, g);
     _arb_vec_scalar_mul_2exp_si(a, a, g, 1);
@@ -101,6 +101,7 @@ acb_theta_naive_reduce_one(arb_ptr v, acb_ptr new_z, arb_ptr a, acb_t c, arb_t u
     _arb_vec_scalar_mul_2exp_si(a, a, g, 1);
     arb_dot(acb_realref(c), acb_realref(c), 1, a, 1, x, 1, g, prec);
     arb_dot(acb_imagref(c), acb_imagref(c), 0, r, 1, new_y, 1, g, prec);
+    _arb_vec_scalar_mul_2exp_si(a, a, g, -1);
 
     acb_exp_pi_i(c, c, prec);
 

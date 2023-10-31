@@ -113,6 +113,7 @@ acb_theta_jet_naive_00_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
         arb_mul_arf(u, u, eps, prec);
         for (k = 0; k < nb; k++)
         {
+            acb_mul(&dth[k], &dth[k], c, prec);
             acb_add_error_arb(&dth[k], u);
         }
 
@@ -152,6 +153,7 @@ acb_theta_jet_naive_00_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
     arf_clear(R2);
     arf_clear(eps);
     _acb_vec_clear(new_z, g);
+    _acb_vec_clear(aux, nb);
     _arb_vec_clear(v, g);
     _arb_vec_clear(a, g);
     acb_clear(c);
