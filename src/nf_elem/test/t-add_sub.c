@@ -15,19 +15,12 @@
 
 ******************************************************************************/
 
-#include "nf.h"
+#include "test_helpers.h"
 #include "nf_elem.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nf_elem_add_sub, state)
 {
     int i, result;
-    flint_rand_t state;
-
-    flint_printf("add/sub....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* test b + c - c = b */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -178,8 +171,5 @@ main(void)
         nf_clear(nf);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
