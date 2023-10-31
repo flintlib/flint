@@ -10,19 +10,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
+#include "test_helpers.h"
 #include "nmod_mat.h"
 #include "nmod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_mat_charpoly, state)
 {
     slong m, n, rep, i;
     ulong mod;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("charpoly....");
-    fflush(stdout);
 
     for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
     {
@@ -107,8 +102,5 @@ main(void)
         nmod_poly_clear(g);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

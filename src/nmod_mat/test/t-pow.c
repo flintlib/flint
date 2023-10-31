@@ -9,17 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
+#include "test_helpers.h"
 #include "nmod_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_mat_pow, state)
 {
     slong i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("pow....");
-    fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -63,8 +58,5 @@ main(void)
         nmod_mat_clear(D);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

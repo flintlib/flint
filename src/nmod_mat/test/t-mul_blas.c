@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "nmod_mat.h"
 
@@ -28,14 +29,9 @@ void nmod_mat_randfull_half(nmod_mat_t mat, flint_rand_t state)
     }
 }
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_mat_mul_blas, state)
 {
     slong i, max_threads = 5;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("mul_blas....");
-    fflush(stdout);
 
     for (i = 0; i < 1 * flint_test_multiplier(); i++)
     {
@@ -108,8 +104,5 @@ main(void)
         nmod_mat_clear(D);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
