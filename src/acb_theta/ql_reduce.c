@@ -103,6 +103,13 @@ slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong* n1, acb_srcptr
         _acb_vec_clear(w, g);
     }
 
+    if (!arb_mat_is_finite(C)) /* early abort in ql_all */
+    {
+        acb_indeterminate(c);
+        arb_pos_inf(u);
+        s = -1;
+    }
+
     arb_mat_clear(C);
     _arb_vec_clear(v, g);
     _arb_vec_clear(a, g);

@@ -44,6 +44,13 @@ int main(void)
         acb_mat_scalar_mul_2exp_si(tau, tau, -1);
         acb_siegel_randtest_vec(z, state, g, prec);
 
+        /* Sometimes phony input too */
+        if (n_randint(state, 20) == 0)
+        {
+            k = n_randint(state, g);
+            arb_zero(acb_imagref(acb_mat_entry(tau, k, k)));
+        }
+
         acb_theta_all(th, z, tau, sqr, prec);
         acb_theta_naive_all(test, z, 1, tau, prec);
         if (sqr)

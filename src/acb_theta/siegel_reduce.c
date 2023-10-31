@@ -11,7 +11,7 @@
 
 #include "acb_theta.h"
 
-#define ACB_SIEGEL_REDUCE_MAG_BOUND 1000000000
+#define ACB_SIEGEL_REDUCE_MAG_BOUND n_pow(10, 6)
 
 static void
 fmpz_mat_bound_inf_norm(mag_t b, const fmpz_mat_t mat)
@@ -49,12 +49,6 @@ acb_siegel_reduce_real(fmpz_mat_t mat, const acb_mat_t tau)
     slong j, k;
     fmpz_t c;
 
-    if (!acb_mat_is_finite(tau))
-    {
-        fmpz_mat_zero(mat);
-        return;
-    }
-
     fmpz_init(c);
 
     fmpz_mat_one(mat);
@@ -62,6 +56,7 @@ acb_siegel_reduce_real(fmpz_mat_t mat, const acb_mat_t tau)
     {
         for (k = j; k < g; k++)
         {
+            /* this must succeed given the bounds on ndet and ntau */
             arf_get_fmpz(c, arb_midref(acb_realref(acb_mat_entry(tau, j, k))),
                          ARF_RND_NEAR);
             fmpz_neg(fmpz_mat_entry(mat, j, k + g), c);
@@ -160,10 +155,16 @@ acb_siegel_reduce(fmpz_mat_t mat, const acb_mat_t tau, slong prec)
         acb_siegel_reduce_imag(m, w, lp);
         fmpz_mat_mul(mat, m, mat);
 
-        /* Choose precision, reduce real part */
+        /* Choose precision, check transform is reduced, reduce real part */
         fmpz_mat_bound_inf_norm(nmat, mat);
         lp = acb_siegel_reduce_real_lowprec(ntau, nmat, g, prec);
         acb_siegel_transform(w, m, w, lp);
+        acb_mat_get_imag(im, w);
+        if (!arb_mat_spd_is_lll_reduced(im, -10, lp))
+        {
+            stop = 1;
+            break;
+        }
         acb_siegel_reduce_real(m, w);
         fmpz_mat_mul(mat, m, mat);
 

@@ -106,6 +106,7 @@ void acb_theta_jet_error_bounds(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
     arb_mat_clear(tau_err);
     _arb_vec_clear(z_err, g);
     arb_clear(e);
+    arb_clear(f);
     flint_free(tups);
     flint_free(new_tups);
 }

@@ -30,7 +30,7 @@ int main(void)
         int sqr = iter % 3;
         slong prec = (g > 1 ? 100 : 1000) + n_randint(state, 200);
         slong hprec = prec + 25;
-        slong bits = n_randint(state, 4);
+        slong bits = 6;
         acb_mat_t tau;
         acb_ptr z, th, test;
 

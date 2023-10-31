@@ -300,7 +300,7 @@ acb_theta_eld_set_rec(acb_theta_eld_t E, const arb_mat_t C,
         res = acb_theta_eld_set_rec(acb_theta_eld_lchild(E, k), C, next_R2,
             next_v, next_coords);
 
-        if (res)
+        if (res) /* we expect this always holds */
         {
             acb_theta_eld_nb_pts(E) += acb_theta_eld_nb_pts(acb_theta_eld_lchild(E, k));
             acb_theta_eld_nb_border(E) += acb_theta_eld_nb_border(acb_theta_eld_lchild(E, k));

@@ -32,6 +32,7 @@ int main(void)
         slong bits = n_randint(state, 4);
         acb_mat_t tau;
         acb_ptr z, dth, test;
+        slong k;
 
         acb_mat_init(tau, g, g);
         z = _acb_vec_init(g);
@@ -42,6 +43,13 @@ int main(void)
         acb_siegel_randtest_reduced(tau, state, prec, bits);
         acb_mat_scalar_mul_2exp_si(tau, tau, -1);
         acb_siegel_randtest_vec(z, state, g, prec);
+
+        /* Sometimes phony input too */
+        if (n_randint(state, 20) == 0)
+        {
+            k = n_randint(state, g);
+            arb_zero(acb_imagref(acb_mat_entry(tau, k, k)));
+        }
 
         acb_theta_jet_all(dth, z, tau, ord, prec);
         acb_theta_jet_naive_all(test, z, tau, ord, prec);

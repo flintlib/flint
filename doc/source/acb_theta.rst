@@ -86,7 +86,7 @@ Main user functions
 Example of usage
 -------------------------------------------------------------------------------
 
-The following code snippet constructs the period matrix `tau = iI_2` for `g =
+The following code snippet constructs the period matrix `\tau = iI_2` for `g =
 2`, computes the associated theta values at `z = 0` at 10000 bits of precision
 in roughly 0.1s, and prints them.
 
@@ -320,11 +320,6 @@ We continue to denote by `\alpha,\beta,\gamma,\delta` the `g\times g` blocks of
     Sets *tau* to a random reduced matrix in `\mathbb{H}_g` that is likely to
     trigger corner cases for several functions in this module.
 
-.. function:: void acb_siegel_randtest_nice(acb_mat_t tau, flint_rand_t state, slong prec)
-
-    Sets *tau* to a random matrix that is well within the reduced domain in
-    `\mathbb{H}_g`.
-
 .. function:: void acb_siegel_randtest_vec(acb_ptr z, flint_rand_t state, slong g, slong prec)
 
     Sets *z* to a random vector of length *g* that is likely to trigger corner
@@ -533,7 +528,7 @@ common compact domain and use only one ellipsoid, following [DHBHS2004]_.
     `2^{-\mathit{prec}}` if no cancellations occur in the sum, i.e.
     `\mathit{eps} \simeq 2^{-\mathit{prec}} \prod_{j=0}^{g-1} (1 + \gamma_j^{-1})`.
 
-.. function:: void acb_theta_naive_reduce(arb_ptr v, acb_ptr new_zs, acb_ptr cs, arb_ptr us, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
+.. function:: void acb_theta_naive_reduce(arb_ptr v, acb_ptr new_zs, arb_ptr as, acb_ptr cs, arb_ptr us, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 
     Given *zs*, a concatenation of *nb* vectors of length `g`, performs the
     simultaneous reduction of these vectors with respect to the matrix
@@ -556,8 +551,9 @@ common compact domain and use only one ellipsoid, following [DHBHS2004]_.
 
     The reduction of `z` is defined as `(x - Xa) + i Y r`, which has a bounded
     imaginary part, and this vector is stored as the `k^{\mathrm{th}}` vector
-    of *new_zs*. The quantity `u = \exp(\pi y^T Y^{-1} y)` is a multiplicative
-    factor for the error bound, and is stored as the `k^{\mathrm{th}}` entry of
+    of *new_zs*. The vector `a` is stored as the `k^{\mathrm{th}}` vector of
+    *as*. The quantity `u = \exp(\pi y^T Y^{-1} y)` is a multiplicative factor
+    for the error bound, and is stored as the `k^{\mathrm{th}}` entry of
     *us*. The quantity
 
         .. math ::
@@ -568,12 +564,6 @@ common compact domain and use only one ellipsoid, following [DHBHS2004]_.
     `k^{\mathrm{th}}` entry of *cs*. The offset for the corresponding ellipsoid
     is `v^{(k)} = C r` which is also bounded independently of `k`, and *v* is
     set to the :func:`acb_union` of the `v^{(k)}` for `0\leq k< \mathit{nb}`.
-
-.. function:: void acb_theta_naive_reduce_jet(arb_ptr v, arb_t u, acb_srcptr z, const acb_mat_t tau, slong prec)
-
-    Sets *v* and *u* as in :func:`acb_theta_naive_reduce` for `a = 0` and a
-    single vector *z*. This version is used when computing derivatives of theta
-    functions with the naive algorithm.
 
 .. function:: void acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong* tup, slong* n, slong prec)
 
@@ -703,12 +693,10 @@ corresponds to the differential operator
 
         \frac{1}{k_0!}\cdots\frac{1}{k_{g-1}!} \cdot \frac{\partial^{|k|}}{\partial z_0^{k_0}\cdots \partial z_{g-1}^{k_{g-1}}},
 
-where `|k|:=\sum k_i`.
-
-We always consider all derivation tuples up to a total order *ord*, and order
-them first by their total order, then reverse-lexicographically. For example,
-in the case `g=2`, the sequence of orders is `(0,0)`, `(1,0)`, `(0,1)`,
-`(2,0)`, `(1,1)`, etc.
+where `|k|:=\sum k_i`. We always consider all derivation tuples up to a total
+order *ord*, and order them first by their total order, then
+reverse-lexicographically. For example, in the case `g=2`, the sequence of
+orders is `(0,0)`, `(1,0)`, `(0,1)`, `(2,0)`, `(1,1)`, etc.
 
 The naive algorithms for derivatives will evaluate a partial sum of the
 differentiated series:
@@ -745,6 +733,12 @@ differentiated series:
 
     Sets *res* to the vector of derivatives of the composition `f(Nz)`,
     assuming that *v* contains the derivatives of *f* at the point `Nz`.
+
+.. function:: void acb_theta_jet_exp_pi_i(acb_ptr res, arb_srcptr a, slong ord, slong g, slong prec)
+
+    Sets *res* to the vector of derivatives of the function `\exp(\pi i (a_0
+    z_1 + \cdots + a_{g-1} z_{g-1}))` at `z = 0`, where `a_0,\ldots a_{g-1}` are
+    the entries of *a*.
 
 .. function:: void acb_theta_jet_naive_radius(arf_t R2, arf_t eps, arb_srcptr v, const arb_mat_t C, slong ord, slong prec)
 
@@ -1150,10 +1144,7 @@ Quasi-linear algorithms: derivatives
 -------------------------------------------------------------------------------
 
 We implement an algorithm for derivatives of theta functions on the reduced
-domain based on finite differences. It is quasi-linear in terms of the
-precision and the number of derivatives to be computed.
-
-Consider the Taylor expansion:
+domain based on finite differences. Consider the Taylor expansion:
 
     .. math ::
 
@@ -1248,7 +1239,7 @@ transform.
     \{0,1\}^g` at `(z,\tau)`, as a concatenation of `2^{2g}` vectors of length
     `N`, the total number of derivation tuples of total order at most
     *ord*. This algorithm runs in quasi-linear time in `\mathit{prec}\cdot
-    \mathit{ord}^{\,g}` for any fixed `g`.
+    \mathit{ord}^{\,g}` for any fixed `g` provided that `(z,\tau)` is reduced.
 
     We first compute *c*, *rho*, *err* and *eps* as above, then compute theta
     values `\theta_{a,b}(z + h_n,\tau)` at a higher precision at the midpoints
