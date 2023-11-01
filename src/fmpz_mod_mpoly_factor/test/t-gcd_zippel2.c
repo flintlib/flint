@@ -182,7 +182,8 @@ void gcd_check(
     fmpz_mod_mpoly_ctx_t ctx,
     slong i,
     slong j,
-    const char * name)
+    const char * name,
+    int (* compute_gcd_fun)(fmpz_mod_mpoly_t, const fmpz_mod_mpoly_t, const fmpz_mod_mpoly_t, const fmpz_mod_mpoly_ctx_t))
 {
     int res;
     fmpz_mod_mpoly_t ca, cb, cg;
@@ -191,7 +192,7 @@ void gcd_check(
     fmpz_mod_mpoly_init(cb, ctx);
     fmpz_mod_mpoly_init(cg, ctx);
 
-    res = compute_gcd(g, a, b, ctx);
+    res = compute_gcd_fun(g, a, b, ctx);
 
     fmpz_mod_mpoly_assert_canonical(g, ctx);
 
@@ -248,7 +249,7 @@ void gcd_check(
         flint_abort();
     }
 
-    res = compute_gcd(cg, ca, cb, ctx);
+    res = compute_gcd_fun(cg, ca, cb, ctx);
     fmpz_mod_mpoly_assert_canonical(cg, ctx);
 
     if (!res)
@@ -304,7 +305,7 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_factor_gcd_zippel2, state)
         fmpz_mod_mpoly_mul(a, a, t, ctx);
         fmpz_mod_mpoly_mul(b, b, t, ctx);
 
-        gcd_check(g, a, b, t, ctx, -2, 1, "example");
+        gcd_check(g, a, b, t, ctx, -2, 1, "example", compute_gcd);
 
         fmpz_mod_mpoly_clear(a, ctx);
         fmpz_mod_mpoly_clear(b, ctx);
@@ -415,7 +416,7 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_factor_gcd_zippel2, state)
             fmpz_mod_mpoly_mul(g, g, d, ctx);
 
             fmpz_mod_mpoly_randtest_bits(r, state, 10, FLINT_BITS, ctx);
-            gcd_check(r, f, g, d, ctx, -1, i, "example");
+            gcd_check(r, f, g, d, ctx, -1, i, "example", compute_gcd);
 
             fmpz_mod_mpoly_clear(r, ctx);
             fmpz_mod_mpoly_clear(d, ctx);
@@ -456,7 +457,7 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_factor_gcd_zippel2, state)
             fmpz_mod_mpoly_mul(a, a, t, ctx);
             fmpz_mod_mpoly_mul(b, b, t, ctx);
             fmpz_mod_mpoly_randtest_bits(g, state, len, FLINT_BITS, ctx);
-            gcd_check(g, a, b, t, ctx, i, j, "sparse");
+            gcd_check(g, a, b, t, ctx, i, j, "sparse", compute_gcd);
         }
 
         fmpz_mod_mpoly_clear(g, ctx);
