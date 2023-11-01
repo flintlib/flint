@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j --output-sync=target"
+      MAKE: "make -j"
       CC: "gcc"
       TESTCFLAGS: "-Wall -O1"
       FLINT_TEST_MULTIPLIER: "10"
@@ -83,7 +83,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j --output-sync=target"
+      MAKE: "make -j"
       CC: "gcc"
       CFLAGS: "-Wall -Werror=implicit-function-declaration"
       FLINT_TEST_MULTIPLIER: "2"
@@ -135,7 +135,7 @@ jobs:
     runs-on: macos-latest
 
     env:
-      MAKE: "gmake -j -l 10 --output-sync=target"
+      MAKE: "gmake -j -l 10"
       CFLAGS: "-Wall"
       EXTRA_OPTIONS: "--disable-static --enable-shared"
       CC: "gcc"
@@ -287,7 +287,7 @@ jobs:
         shell: C:\cygwin64\bin\bash.exe --login -o igncr '{0}'
 
     env:
-      MAKE: "make -j --output-sync=target"
+      MAKE: "make -j"
       REPO: /cygdrive/d/a/flint/flint # FIXME: De-hardcode this
       CFLAGS: "-Wall"
       EXTRA_OPTIONS: "--enable-shared --disable-static"
@@ -347,7 +347,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j --output-sync=target"
+      MAKE: "make -j"
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: "-Wall"
@@ -402,7 +402,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j --output-sync=target"
+      MAKE: "make -j"
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: "-Wall"
@@ -451,7 +451,7 @@ jobs:
         shell: msys2 {0}
 
     env:
-      MAKE: "make -j --output-sync=target"
+      MAKE: "make -j"
       CFLAGS: "-Wall"
       EXTRA_OPTIONS: "--enable-shared --disable-static"
       CC: "gcc"
@@ -562,7 +562,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j --output-sync=target"
+      MAKE: "make -j"
       LOCAL: ${{ github.workspace }}/local
       CFLAGS: ""
       EXTRA_OPTIONS: "--disable-static --enable-shared"
