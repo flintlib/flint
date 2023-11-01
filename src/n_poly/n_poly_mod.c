@@ -460,7 +460,7 @@ int n_poly_mod_invmod(n_poly_t A, const n_poly_t B, const n_poly_t P, nmod_t ctx
     int ans;
 
     if (lenP < 2)
-        flint_throw(FLINT_ERROR, "lenP < 2 in %s\n", __FUNCTION__);
+        flint_throw(FLINT_ERROR, "lenP < 2 in %s\n", __func__);
 
     if (lenB == 0)
     {
