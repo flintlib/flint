@@ -24,7 +24,6 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j$$(expr $$(nproc) + 1) --output-sync=target"
       CC: "gcc"
       FLINT_TEST_MULTIPLIER: "10"
 
@@ -42,6 +41,7 @@ jobs:
           make --version
           autoconf --version
           libtool --version
+          echo 'MAKE="make -j$(expr $(nproc) + 1) --output-sync=target"' >> $GITHUB_ENV
 
       - name: "Configure"
         run: |
@@ -82,7 +82,6 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j$$(expr $$(nproc) + 1) --output-sync=target"
       CC: "gcc"
       CFLAGS: "-Wall -Werror=implicit-function-declaration"
       FLINT_TEST_MULTIPLIER: "2"
@@ -100,6 +99,7 @@ jobs:
           make --version
           autoconf --version
           libtool --version
+          echo 'MAKE="make -j$(expr $(nproc) + 1) --output-sync=target"' >> $GITHUB_ENV
 
       - name: "Configure"
         run: |
@@ -134,7 +134,6 @@ jobs:
     runs-on: macos-latest
 
     env:
-      MAKE: "gmake -j$$(expr $$(nproc) + 1) -l 10 --output-sync=target"
       CFLAGS: "-Wall"
       EXTRA_OPTIONS: "--disable-static --enable-shared"
       CC: "gcc"
@@ -156,6 +155,7 @@ jobs:
           gcc --version
           gmake --version
           autoconf --version
+          echo 'MAKE="gmake -j$(expr $(nproc) + 1) -l 10 --output-sync=target"' >> $GITHUB_ENV
 
       - name: "Configure"
         run: |
@@ -286,7 +286,6 @@ jobs:
         shell: C:\cygwin64\bin\bash.exe --login -o igncr '{0}'
 
     env:
-      MAKE: "make -j$$(expr $$(nproc) + 1) --output-sync=target"
       REPO: /cygdrive/d/a/flint/flint # FIXME: De-hardcode this
       CFLAGS: "-Wall"
       EXTRA_OPTIONS: "--enable-shared --disable-static"
@@ -307,6 +306,7 @@ jobs:
           make --version
           autoconf --version
           libtool --version
+          echo 'MAKE="make -j$(expr $(nproc) + 1) --output-sync=target"' >> $GITHUB_ENV
 
       - name: "Configure"
         run: |
@@ -346,7 +346,6 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j$$(expr $$(nproc) + 1) --output-sync=target"
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: "-Wall"
@@ -367,6 +366,7 @@ jobs:
           make --version
           autoconf --version
           libtool --version
+          echo 'MAKE="make -j$(expr $(nproc) + 1) --output-sync=target"' >> $GITHUB_ENV
 
       - name: "Configure"
         run: |
@@ -401,7 +401,6 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j$$(expr $$(nproc) + 1) --output-sync=target"
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: "-Wall"
@@ -417,6 +416,7 @@ jobs:
           gcc --version
           make --version
           cmake --version
+          echo 'MAKE="make -j$(expr $(nproc) + 1) --output-sync=target"' >> $GITHUB_ENV
 
       - name: "Configure"
         run: |
@@ -450,7 +450,6 @@ jobs:
         shell: msys2 {0}
 
     env:
-      MAKE: "make -j$$(expr $$(nproc) + 1) --output-sync=target"
       CFLAGS: "-Wall"
       EXTRA_OPTIONS: "--enable-shared --disable-static"
       CC: "gcc"
@@ -472,6 +471,7 @@ jobs:
           make --version
           autoconf --version
           libtool --version
+          echo 'MAKE="make -j$(expr $(nproc) + 1) --output-sync=target"' >> $GITHUB_ENV
 
       - name: "Configure"
         run: |
@@ -536,7 +536,7 @@ jobs:
       - name: "Build"
         run: |
           cd build
-          cmake --build . -- -j8
+          cmake --build . -- -j3
 
         # FIXME: Preferably drop support of CMake and native Windows, or fix so
         # that we can include the test again.
@@ -544,7 +544,7 @@ jobs:
         run: |
           cd build
           set "FLINT_TEST_MULTIPLIER=1"
-          ctest -j8 --output-on-failure --timeout 450 -E "src-ca_mat-test-t-exp"
+          ctest -j3 --output-on-failure --timeout 450 -E "src-ca_mat-test-t-exp"
 
       - if: failure()
         name: "If failure, stop all other jobs"
@@ -561,7 +561,6 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j$$(expr $$(nproc) + 1) --output-sync=target"
       LOCAL: ${{ github.workspace }}/local
       CFLAGS: ""
       EXTRA_OPTIONS: "--disable-static --enable-shared"
@@ -581,6 +580,7 @@ jobs:
           libtool --version
           julia --version
           julia -e 'println(Base.BinaryPlatforms.HostPlatform())'
+          echo 'MAKE="make -j$(expr $(nproc) + 1) --output-sync=target"' >> $GITHUB_ENV
 
       - name: "Configure"
         run: |
