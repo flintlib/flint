@@ -73,7 +73,7 @@ void fmpz_poly_randtest_no_real_root(fmpz_poly_t p, flint_rand_t state, slong le
 {
 
     if (len <= 0)
-        flint_throw(FLINT_ERROR, "got non-positive length in %s\n", __FUNCTION__);
+        flint_throw(FLINT_ERROR, "got non-positive length in %s\n", __func__);
     else if (len < 3)
     {
         fmpz_poly_one(p);

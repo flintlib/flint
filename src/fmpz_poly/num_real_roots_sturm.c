@@ -141,7 +141,7 @@ slong fmpz_poly_num_real_roots_sturm(const fmpz_poly_t pol)
     slong n_pos = 0;
 
     if (fmpz_poly_is_zero(pol))
-        flint_throw(FLINT_ERROR, "Zero polynomial in %s\n", __FUNCTION__);
+        flint_throw(FLINT_ERROR, "Zero polynomial in %s\n", __func__);
 
     for (i = 0; (i < pol->length) && fmpz_is_zero(pol->coeffs + i); i++);
     len = pol->length - i;

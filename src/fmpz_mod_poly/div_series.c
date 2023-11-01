@@ -32,7 +32,7 @@ _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
        fmpz_gcdinv(d, u, B + 0, fmpz_mod_ctx_modulus(ctx));
 
        if (!fmpz_is_one(d)) /* check for invertibility */
-           flint_throw(FLINT_ERROR, "Impossible inverse in %s\n", __FUNCTION__);
+           flint_throw(FLINT_ERROR, "Impossible inverse in %s\n", __func__);
     }
     else
        fmpz_one(u);
@@ -96,7 +96,7 @@ void fmpz_mod_poly_div_series(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
     slong Blen = FLINT_MIN(B->length, n);
 
     if (Blen == 0)
-        flint_throw(FLINT_ERROR, "Division by zero in %s\n", __FUNCTION__);
+        flint_throw(FLINT_ERROR, "Division by zero in %s\n", __func__);
 
     if (Alen == 0)
     {

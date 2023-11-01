@@ -72,7 +72,7 @@ acb_mat_mul_threaded(acb_mat_t C, const acb_mat_t A, const acb_mat_t B, slong pr
     bc = acb_mat_ncols(B);
 
     if (ac != br || ar != acb_mat_nrows(C) || bc != acb_mat_ncols(C))
-        flint_throw(FLINT_DOMERR, "incompatible dimensions in %s\n", __FUNCTION__);
+        flint_throw(FLINT_DOMERR, "incompatible dimensions in %s\n", __func__);
 
     if (br == 0)
     {

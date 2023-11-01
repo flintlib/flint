@@ -21,7 +21,7 @@ void fmpz_mod_mat_randrank(fmpz_mod_mat_t mat, flint_rand_t state, slong rank)
     fmpz * diag;
 
     if (rank < 0 || rank > fmpz_mod_mat_nrows(mat) || rank > fmpz_mod_mat_ncols(mat))
-        flint_throw(FLINT_ERROR, "Impossible rank in %s\n", __FUNCTION__);
+        flint_throw(FLINT_ERROR, "Impossible rank in %s\n", __func__);
 
     diag = _fmpz_vec_init(rank);
 

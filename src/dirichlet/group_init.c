@@ -25,7 +25,7 @@ primitive_root_p_and_p2(ulong p)
         return 7;
 
     if (p > UWORD(10000000000000000))
-        flint_throw(FLINT_ERROR, "p > 10^16 not implemented in %s\n", __FUNCTION__);
+        flint_throw(FLINT_ERROR, "p > 10^16 not implemented in %s\n", __func__);
 #endif
 
     return n_primitive_root_prime(p);
