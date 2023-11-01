@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j$(expr $(nproc) + 1) --output-sync=target"
+      MAKE: "make -j$$(expr $$(nproc) + 1) --output-sync=target"
       CC: "gcc"
       FLINT_TEST_MULTIPLIER: "10"
 
@@ -82,7 +82,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j$(expr $(nproc) + 1) --output-sync=target"
+      MAKE: "make -j$$(expr $$(nproc) + 1) --output-sync=target"
       CC: "gcc"
       CFLAGS: "-Wall -Werror=implicit-function-declaration"
       FLINT_TEST_MULTIPLIER: "2"
@@ -134,7 +134,7 @@ jobs:
     runs-on: macos-latest
 
     env:
-      MAKE: "gmake -j$(expr $(nproc) + 1) -l 10 --output-sync=target"
+      MAKE: "gmake -j$$(expr $$(nproc) + 1) -l 10 --output-sync=target"
       CFLAGS: "-Wall"
       EXTRA_OPTIONS: "--disable-static --enable-shared"
       CC: "gcc"
@@ -286,7 +286,7 @@ jobs:
         shell: C:\cygwin64\bin\bash.exe --login -o igncr '{0}'
 
     env:
-      MAKE: "make -j$(expr $(nproc) + 1) --output-sync=target"
+      MAKE: "make -j$$(expr $$(nproc) + 1) --output-sync=target"
       REPO: /cygdrive/d/a/flint/flint # FIXME: De-hardcode this
       CFLAGS: "-Wall"
       EXTRA_OPTIONS: "--enable-shared --disable-static"
@@ -346,7 +346,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j$(expr $(nproc) + 1) --output-sync=target"
+      MAKE: "make -j$$(expr $$(nproc) + 1) --output-sync=target"
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: "-Wall"
@@ -401,7 +401,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j$(expr $(nproc) + 1) --output-sync=target"
+      MAKE: "make -j$$(expr $$(nproc) + 1) --output-sync=target"
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CFLAGS: "-Wall"
@@ -450,7 +450,7 @@ jobs:
         shell: msys2 {0}
 
     env:
-      MAKE: "make -j$(expr $(nproc) + 1) --output-sync=target"
+      MAKE: "make -j$$(expr $$(nproc) + 1) --output-sync=target"
       CFLAGS: "-Wall"
       EXTRA_OPTIONS: "--enable-shared --disable-static"
       CC: "gcc"
@@ -561,7 +561,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j$(expr $(nproc) + 1) --output-sync=target"
+      MAKE: "make -j$$(expr $$(nproc) + 1) --output-sync=target"
       LOCAL: ${{ github.workspace }}/local
       CFLAGS: ""
       EXTRA_OPTIONS: "--disable-static --enable-shared"
