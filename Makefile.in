@@ -725,7 +725,7 @@ endif
 
 ifneq ($(COVERAGE), 0)
 coverage: | $(BUILD_DIR)/coverage
-	lcov --capture --exclude "*test/t-*.c" --exclude "/usr/*" --directory $(BUILD_DIR) --output-file $(BUILD_DIR)/coverage/coverage.info
+	lcov --capture --exclude "*test/t-*.c" --exclude "*test/main.c" --exclude "/usr/*" --directory $(BUILD_DIR) --output-file $(BUILD_DIR)/coverage/coverage.info
 	genhtml $(BUILD_DIR)/coverage/coverage.info --output-directory $(BUILD_DIR)/coverage
 endif
 
