@@ -16,34 +16,6 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod_mat.h"
 
-void
-fmpz_mod_mat_randrank(fmpz_mod_mat_t mat, flint_rand_t state, slong rank)
-{
-    slong i;
-    fmpz * diag;
-
-    if (rank < 0 || rank > mat->mat->r || rank > mat->mat->c)
-    {
-        flint_printf("Exception (fmpz_mod_mat_randrank). Impossible rank.\n");
-        fflush(stdout);
-        flint_abort();
-    }
-
-    diag = _fmpz_vec_init(rank);
-    for (i = 0; i < rank; i++)
-    {
-        fmpz_randtest_mod(&diag[i], state, mat->mod);
-        while (fmpz_is_zero(&diag[i]))
-        {
-            fmpz_randtest_mod(&diag[i], state, mat->mod);
-        }
-    }
-
-    fmpz_mat_randpermdiag(mat->mat, state, diag, rank);
-
-    _fmpz_vec_clear(diag, rank);
-}
-
 static void
 check_rref(fmpz_mod_mat_t A)
 {
