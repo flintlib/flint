@@ -553,6 +553,72 @@ jobs:
 
 
   ##############################################################################
+  # alpine linux 32-bit
+  ##############################################################################
+  alpine-32bit:
+    name: Alpine Linux, 32-bit (x1)
+
+    runs-on: ubuntu-latest
+
+    env:
+      CC: "gcc"
+      FLINT_TEST_MULTIPLIER: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Setup latest Alpine Linux"
+        uses: jirutka/setup-alpine@v1
+        with:
+          arch: x86
+          branch: edge
+          packages: >
+            gmp-dev
+            mpfr-dev
+            gcc
+            musl-dev
+            make
+            autoconf
+            automake
+            libtool
+
+      - name: "Setup"
+        run: |
+          gcc --version
+          make --version
+          autoconf --version
+          libtool --version
+          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
+        shell: alpine.sh {0}
+
+      - name: "Configure"
+        run: |
+          ./bootstrap.sh
+          ./configure CC=${CC} --disable-static --enable-assert
+        shell: alpine.sh {0}
+
+      - name: "Compile library"
+        run: |
+          $MAKE
+        shell: alpine.sh {0}
+
+      - name: "Compile tests"
+        run: |
+          $MAKE tests
+        shell: alpine.sh {0}
+
+      - name: "Check"
+        run: |
+          $MAKE check
+        shell: alpine.sh {0}
+
+      - if: failure()
+        name: "If failure, stop all other jobs"
+        uses: andymckay/cancel-action@0.3
+
+
+
+  ##############################################################################
   # nemo
   ##############################################################################
   nemo:
