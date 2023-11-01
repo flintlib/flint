@@ -22,12 +22,17 @@ for instructions using CMake), FLINT can be built and installed as follows:
 
     ./bootstrap.sh
     ./configure --disable-static
-    make -j
+    make -j N
     make install
 
-We also recommend that you run ``make check`` before installing.
+where ``N`` is the number of jobs number allowed to run parallel. Typically, the
+fastest way to build is to let ``N`` be the number of threads your CPU plus one,
+which can be obtained in Bash through ``$(expr $(nproc) + 1)``.
 
-For a complete list of build settings, write
+We also recommend that you check that the library works as it should through
+``make check``, or ``make -j N check`` for a parallel check, before installing.
+
+For a complete list of build settings, type
 
 .. code-block:: bash
 
@@ -79,6 +84,11 @@ or in parallel on a multicore system using
 
     make -j check
 
+Here, ``make -j N check`` is typically the fastest way to build when ``N``
+equals to the number of threads your system's CPU has plus one, that is,
+``make -j $(expr $(nproc) + 1) check`` typically is the fastest way to check
+FLINT.
+
 Number of test iterations
 ...............................................................................
 
@@ -101,7 +111,21 @@ If you wish to simply check a single module of FLINT you can pass the option
 .. code-block:: bash
 
     make check MOD=ulong_extras
-    make check MOD="fft fmpz_mat"
+    make -j N check MOD="fft fmpz_mat"
+
+Testing single functions
+...............................................................................
+
+Testing a single function is also possible, although one cannot utilize ``make``
+all the way through for this. For example, if you would like to test the
+function ``fmpz_add`` and ``fmpz_sub`` in the module ``fmpz``, you run
+
+.. code-block:: bash
+
+    # Build all tests
+    make tests
+    # Run the test executable for `fmpz' with `fmpz_add' and `fmpz_sub' as inputs
+    ./build/fmpz/test/main fmpz_add fmpz_sub
 
 Test coverage
 ...............................................................................
@@ -112,7 +136,7 @@ FLINT with ``--enable-coverage``. Then run:
 
 .. code-block:: bash
 
-    make -j check
+    make -j N check
     make coverage
 
 This will place a coverage report in ``build/coverage``.
@@ -143,15 +167,15 @@ reentrancy is required on systems that do not support this, one can pass
 modern systems support thread local storage, it is not recommended to build
 FLINT without TLS.
 
-There are two modes in which FLINT may installed: the default ``single`` mode,
+There are two modes in which FLINT may installed: the default "single" mode,
 which is faster, but makes use of thread local storage for its memory manager
-and to handle threading, and a slower but less complicated ``reentrant`` mode.
+and to handle threading, and a slower but less complicated "reentrant" mode.
 The later is useful when debugging a program where tracing allocations is
 important.
 
-If you wish to select the single mode, pass the ``--single`` option to
-configure, though note that this is the default. The reentrant mode is selected
-by passing the option ``--reentrant`` to configure.
+If you wish to select the single mode, pass the ``--disable-reentrant`` option
+to configure, though note that this is the default. The reentrant mode is
+selected by passing the option ``--enable-reentrant`` to configure.
 
 ABI and architecture support
 -------------------------------------------------------------------------------
@@ -164,16 +188,9 @@ configure.
 To build on MinGW64 it is necessary to pass ``ABI=64`` to configure, as FLINT
 is otherwise unable to distinguish it from MinGW32.
 
-In some cases, it is necessary to override the CPU/OS defaults. This can be
-done by passing ``--build=cpu-os`` to configure.
-
-The available choices for CPU include ``x86_64``, ``x86``, ``ia64``, ``sparc``,
-``sparc64``, ``ppc``, ``ppc64``. Other CPU types are unrecognised and FLINT
-will build with generic code on those machines.
-
-The choices for OS include ``Linux``, ``MINGW32``, ``MINGW64``, ``CYGWIN32``,
-``CYGWIN64``, ``Darwin``, ``FreeBSD``, ``SunOS`` and numerous other operating
-systems.
+In some cases, it is necessary to override the CPU/OS defaults. This can be done
+by specifying the build system triplet to ``configure`` via
+``--build=arch-vendor-os``.
 
 It is also possible to override the default CC, AR and CFLAGS used by FLINT by
 passing ``CC=full_path_to_compiler``, etc., to FLINT's configure.
@@ -258,22 +275,3 @@ The output of the example program should be something like the following::
 
     [3.1415926535897932384626433832795028841971693993751 +/- 4.43e-50]
     Computed with flint-3.0.0
-
-Header file conflicts
--------------------------------------------------------------------------------
-
-If you have any difficulties with conflicts with system headers on your
-machine, you can do the following in your code:
-
-.. code-block:: C
-
-    #undef ulong
-    #define ulong ulongxx
-    #include <stdio.h>
-    // other system headers
-    #undef ulong
-    #define ulong mp_limb_t
-
-This prevents FLINT's definition of ``ulong`` interfering with your system
-headers.
-
