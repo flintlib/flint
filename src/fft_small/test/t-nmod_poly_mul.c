@@ -80,9 +80,6 @@ TEST_FUNCTION_START(_nmod_poly_mul_mid_mpn_ctx, state)
         ulong * a, *b, * c, * d;
         ulong an, zn, zl, zh, sz, i, reps;
 
-        flint_printf("sqr nbits: %02wu", nbits);
-        fflush(stdout);
-
         for (reps = 0; reps < 100; reps++)
         {
             flint_set_num_threads(1 + n_randint(state, 10));
@@ -125,19 +122,12 @@ TEST_FUNCTION_START(_nmod_poly_mul_mid_mpn_ctx, state)
             flint_free(c);
             flint_free(d);
         }
-
-        for (i = 0; i < 13; i++)
-            flint_printf("%c", '\b');
-        fflush(stdout);
     }
 
     for (nbits = 1; nbits <= FLINT_BITS; nbits ++)
     {
         ulong * a, * b, * c, * d;
         ulong an, bn, zn, zl, zh, sz, i, reps;
-
-        flint_printf("mul nbits: %02wu", nbits);
-        fflush(stdout);
 
         for (reps = 0; reps < 100; reps++)
         {
@@ -185,10 +175,6 @@ TEST_FUNCTION_START(_nmod_poly_mul_mid_mpn_ctx, state)
             flint_free(c);
             flint_free(d);
         }
-
-        for (i = 0; i < 13; i++)
-            flint_printf("%c", '\b');
-        fflush(stdout);
     }
 
     for (nbits = 2; nbits <= FLINT_BITS; nbits++)
@@ -196,9 +182,6 @@ TEST_FUNCTION_START(_nmod_poly_mul_mid_mpn_ctx, state)
         ulong * a, * b, * q1, * q2, * q3, * r1, * r2, * r3;
         ulong an, bn, qn, i, reps;
         nmod_poly_divrem_precomp_struct M[1];
-
-        flint_printf("divrem nbits: %02wu", nbits);
-        fflush(stdout);
 
         for (reps = 0; reps < 100; reps++)
         {
@@ -267,10 +250,6 @@ TEST_FUNCTION_START(_nmod_poly_mul_mid_mpn_ctx, state)
             flint_free(r1);
             flint_free(r2);
         }
-
-        for (i = 0; i < 16; i++)
-            flint_printf("%c", '\b');
-        fflush(stdout);
     }
 
     mpn_ctx_clear(R);

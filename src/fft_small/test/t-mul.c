@@ -14,49 +14,12 @@
 #include "fft_small.h"
 #include "machine_vectors.h"
 
-/* Defined in t-mul.c and t-sd_fft.c */
-#ifndef flint_print_d_fixed
-#define flint_print_d_fixed flint_print_d_fixed
-void flint_print_d_fixed(double x, ulong l)
-{
-    ulong i;
-    TMP_INIT;
-    TMP_START;
-    char* s = TMP_ARRAY_ALLOC(l + 1, char);
-
-    for (i = 0; i < l; i++)
-        s[i] = ' ';
-    s[l] = 0;
-
-    ulong y = fabs(rint(x));
-    while (l > 0)
-    {
-        s[--l] = '0' + (y%10);
-        y = y/10;
-        if (y == 0)
-            break;
-    }
-
-    printf("%s", s);
-
-    TMP_END;
-}
-#endif
-
 void test_mul(mpn_ctx_t R, ulong minsize, ulong maxsize, ulong nreps, flint_rand_t state)
 {
     ulong* a = FLINT_ARRAY_ALLOC(maxsize, ulong);
     ulong* b = FLINT_ARRAY_ALLOC(maxsize, ulong);
     ulong* c = FLINT_ARRAY_ALLOC(maxsize, ulong);
     ulong* d = FLINT_ARRAY_ALLOC(maxsize, ulong);
-
-    ulong dgs = n_sizeinbase(nreps, 10);
-
-    flint_printf(" mul ");
-    flint_print_d_fixed(0, dgs);
-    flint_printf("/");
-    flint_print_d_fixed(nreps, dgs);
-    fflush(stdout);
 
     minsize = n_max(10, minsize);
     maxsize = n_max(minsize, maxsize);
@@ -72,16 +35,6 @@ void test_mul(mpn_ctx_t R, ulong minsize, ulong maxsize, ulong nreps, flint_rand
             c[i] = n_randlimb(state);
             d[i] = n_randlimb(state);
         }
-
-        for (ulong ii = 0; ii < 2*dgs + 6; ii++)
-            flint_printf("%c", '\b');
-        fflush(stdout);
-
-        flint_printf(" mul ");
-        flint_print_d_fixed(1+rep, dgs);
-        flint_printf("/");
-        flint_print_d_fixed(nreps, dgs);
-        fflush(stdout);
 
         mpn_ctx_mpn_mul(R, d, a, an, b, bn);
         mpn_mul(c, a, an, b, bn);
@@ -118,10 +71,6 @@ void test_mul(mpn_ctx_t R, ulong minsize, ulong maxsize, ulong nreps, flint_rand
     flint_free(b);
     flint_free(c);
     flint_free(d);
-
-    for (ulong ii = 0; ii < 2*dgs + 6; ii++)
-        flint_printf("%c", '\b');
-    fflush(stdout);
 }
 
 TEST_FUNCTION_START(mpn_ctx_mpn_mul, state)

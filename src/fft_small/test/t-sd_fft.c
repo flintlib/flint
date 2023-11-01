@@ -23,52 +23,10 @@ vec1d vec1d_eval_poly_mod(const vec1d* a, ulong an, const vec1d b, const vec1d n
     return vec1d_reduce_to_pm1n(x, n, ninv);
 }
 
-/* Defined in t-mul.c and t-sd_fft.c */
-#ifndef flint_print_d_fixed
-#define flint_print_d_fixed flint_print_d_fixed
-void flint_print_d_fixed(double x, ulong l)
-{
-    ulong i;
-    TMP_INIT;
-    TMP_START;
-    char* s = TMP_ARRAY_ALLOC(l + 1, char);
-
-    for (i = 0; i < l; i++)
-        s[i] = ' ';
-    s[l] = 0;
-
-    ulong y = fabs(rint(x));
-    while (l > 0)
-    {
-        s[--l] = '0' + (y%10);
-        y = y/10;
-        if (y == 0)
-            break;
-    }
-
-    printf("%s", s);
-
-    TMP_END;
-}
-#endif
-
 void test_v2_fft(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flint_rand_t state)
 {
     ulong irepmul = 10;
     minL = n_max(minL, LG_BLK_SZ);
-
-    ulong dgs1 = n_sizeinbase(maxL, 10);
-    ulong dgs2 = n_sizeinbase(ireps + irepmul*maxL, 10);
-
-    flint_printf(" fft ");
-    flint_print_d_fixed(0, dgs1);
-    flint_printf(".");
-    flint_print_d_fixed(0, dgs2);
-    flint_printf("/");
-    flint_print_d_fixed(maxL, dgs1);
-    flint_printf(".");
-    flint_print_d_fixed(0, dgs2);
-    fflush(stdout);
 
     for (ulong L = minL; L <= maxL; L++)
     {
@@ -81,19 +39,6 @@ void test_v2_fft(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flint_rand
         ulong nreps = ireps + irepmul*L;
         for (ulong rep = 0; rep < nreps; rep++)
         {
-            for (ulong ii = 0; ii < 2*(dgs1 + dgs2) + 8; ii++)
-                flint_printf("%c", '\b');
-
-            flint_printf(" fft ");
-            flint_print_d_fixed(L, dgs1);
-            flint_printf(".");
-            flint_print_d_fixed(1+rep, dgs2);
-            flint_printf("/");
-            flint_print_d_fixed(maxL, dgs1);
-            flint_printf(".");
-            flint_print_d_fixed(nreps, dgs2);
-            fflush(stdout);
-
             // randomize input data
             for (i = 0; i < Xn; i++)
                 X[i] = i + 1;
@@ -147,10 +92,6 @@ void test_v2_fft(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flint_rand
         flint_aligned_free(data);
         flint_free(X);
     }
-
-    for (ulong ii = 0; ii < 2*(dgs1 + dgs2) + 8; ii++)
-        flint_printf("%c", '\b');
-    fflush(stdout);
 }
 
 TEST_FUNCTION_START(sd_fft, state)
