@@ -41,7 +41,7 @@ jobs:
           make --version
           autoconf --version
           libtool --version
-          echo 'MAKE=make -j$(expr $(nproc) + 1) --output-sync=target' >> $GITHUB_ENV
+          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
 
       - name: "Configure"
         run: |
@@ -99,7 +99,7 @@ jobs:
           make --version
           autoconf --version
           libtool --version
-          echo 'MAKE=make -j$(expr $(nproc) + 1) --output-sync=target' >> $GITHUB_ENV
+          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
 
       - name: "Configure"
         run: |
@@ -155,7 +155,7 @@ jobs:
           gcc --version
           gmake --version
           autoconf --version
-          echo 'MAKE=gmake -j$(expr $(nproc) + 1) -l 10 --output-sync=target' >> $GITHUB_ENV
+          echo "MAKE=gmake -j$(expr $(nproc) + 1) -l 10 --output-sync=target" >> $GITHUB_ENV
 
       - name: "Configure"
         run: |
@@ -306,7 +306,7 @@ jobs:
           make --version
           autoconf --version
           libtool --version
-          echo 'MAKE=make -j$(expr $(nproc) + 1) --output-sync=target' >> $GITHUB_ENV
+          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
 
       - name: "Configure"
         run: |
@@ -366,7 +366,7 @@ jobs:
           make --version
           autoconf --version
           libtool --version
-          echo 'MAKE=make -j$(expr $(nproc) + 1) --output-sync=target' >> $GITHUB_ENV
+          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
 
       - name: "Configure"
         run: |
@@ -416,7 +416,7 @@ jobs:
           gcc --version
           make --version
           cmake --version
-          echo 'MAKE=make -j$(expr $(nproc) + 1) --output-sync=target' >> $GITHUB_ENV
+          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
 
       - name: "Configure"
         run: |
@@ -471,7 +471,7 @@ jobs:
           make --version
           autoconf --version
           libtool --version
-          echo 'MAKE=make -j$(expr $(nproc) + 1) --output-sync=target' >> $GITHUB_ENV
+          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
 
       - name: "Configure"
         run: |
@@ -580,7 +580,7 @@ jobs:
           libtool --version
           julia --version
           julia -e 'println(Base.BinaryPlatforms.HostPlatform())'
-          echo 'MAKE=make -j$(expr $(nproc) + 1) --output-sync=target' >> $GITHUB_ENV
+          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
 
       - name: "Configure"
         run: |
