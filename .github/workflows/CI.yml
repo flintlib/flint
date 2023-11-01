@@ -537,7 +537,7 @@ jobs:
       - name: "Build"
         run: |
           cd build
-          cmake --build . -- -j4
+          cmake --build . -- -j8
 
         # FIXME: Preferably drop support of CMake and native Windows, or fix so
         # that we can include the test again.
@@ -545,7 +545,7 @@ jobs:
         run: |
           cd build
           set "FLINT_TEST_MULTIPLIER=1"
-          ctest -j4 --output-on-failure --timeout 180 -E "src-ca_mat-test-t-exp"
+          ctest -j8 --output-on-failure --timeout 450 -E "src-ca_mat-test-t-exp"
 
       - if: failure()
         name: "If failure, stop all other jobs"
