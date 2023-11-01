@@ -9,17 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq_mpoly.h"
-#include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_mpoly_equal_is_fmpq, state)
 {
     int result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("equal_is_fmpq....");
-    fflush(stdout);
 
     {
         fmpq_mpoly_ctx_t ctx;
@@ -36,7 +31,6 @@ main(void)
         fmpq_init(r);
         fmpz_init(a);
         fmpz_init(b);
-
 
         result = 1;
 
@@ -69,7 +63,6 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-
 
         result = 1;
 
@@ -106,7 +99,6 @@ main(void)
             flint_abort();
         }
 
-
         result = 1;
 
         fmpq_mpoly_set_str_pretty(f, "2/3", vars, ctx);
@@ -139,7 +131,6 @@ main(void)
             flint_abort();
         }
 
-
         result = 1;
 
         fmpq_mpoly_set_str_pretty(f, "x", vars, ctx);
@@ -169,7 +160,6 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-
 
         result = 1;
 
@@ -211,7 +201,6 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-
 
         result = 1;
 
@@ -305,9 +294,5 @@ main(void)
         fmpq_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

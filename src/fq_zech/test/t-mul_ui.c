@@ -9,19 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "long_extras.h"
 #include "fq_nmod.h"
 #include "fq_zech.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fq_zech_mul_ui, state)
 {
     int j, i, result;
     fq_zech_ctx_t ctx;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("mul_ui... ");
-    fflush(stdout);
 
     for (j = 0; j < 50; j++)
     {
@@ -119,8 +115,5 @@ main(void)
         fq_zech_ctx_clear(ctx);
     }
 
-
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

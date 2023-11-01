@@ -10,18 +10,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_mpoly.h"
 #include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mpoly_get_set_term_exp_fmpz, state)
 {
     slong i, j, k;
     int result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("get/set_term_exp_fmpz....");
-    fflush(stdout);
 
     /* check fmpz */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -95,8 +91,5 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

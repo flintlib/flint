@@ -9,28 +9,20 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fq_default.h"
 
-#include "flint.h"
-#include "nmod_poly.h"
-#include "ulong_extras.h"
-
-int
-main(void)
+TEST_FUNCTION_START(fq_default_ctx_modulus, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("ctx_modulus....");
-    fflush(stdout);
 
     /* fq_zech range */
     for (i = 0; i < 1 * flint_test_multiplier(); i++)
     {
         fq_default_ctx_t ctx;
-	fmpz_mod_ctx_t mod_ctx;
+        fmpz_mod_ctx_t mod_ctx;
         fmpz_mod_poly_t mod;
-	fmpz_t p;
+        fmpz_t p;
 
         fmpz_init(p);
 
@@ -38,8 +30,8 @@ main(void)
 
         fq_default_ctx_init(ctx, p, 3, "x");
 
-	fmpz_mod_ctx_init(mod_ctx, p);
-	fmpz_mod_poly_init(mod, mod_ctx);
+        fmpz_mod_ctx_init(mod_ctx, p);
+        fmpz_mod_poly_init(mod, mod_ctx);
 
         fq_default_ctx_modulus(mod, ctx);
 
@@ -53,7 +45,7 @@ main(void)
         }
 
         fmpz_mod_poly_clear(mod, mod_ctx);
-	fmpz_mod_ctx_clear(mod_ctx);
+        fmpz_mod_ctx_clear(mod_ctx);
 
         fq_default_ctx_clear(ctx);
     }
@@ -63,7 +55,7 @@ main(void)
     {
         fq_default_ctx_t ctx;
         fmpz_mod_ctx_t mod_ctx;
-	fmpz_mod_poly_t mod;
+        fmpz_mod_poly_t mod;
         fmpz_t p;
 
         fmpz_init(p);
@@ -99,14 +91,14 @@ main(void)
     {
         fq_default_ctx_t ctx;
         fmpz_mod_ctx_t mod_ctx;
-	fmpz_mod_poly_t mod;
+        fmpz_mod_poly_t mod;
         fmpz_t p;
 
         fmpz_init(p);
 
         fmpz_set_str(p, "73786976294838206473", 10);
 
-	fq_default_ctx_init(ctx, p, 1, "x");
+        fq_default_ctx_init(ctx, p, 1, "x");
 
         fmpz_mod_ctx_init(mod_ctx, p);
         fmpz_mod_poly_init(mod, mod_ctx);
@@ -130,8 +122,5 @@ main(void)
         fmpz_clear(p);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-        return 0;
+    TEST_FUNCTION_END(state);
 }

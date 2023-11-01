@@ -9,21 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "thread_pool.h"
+#include "test_helpers.h"
 #include "nmod_mpoly.h"
-#include "fmpz_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_mpoly_divides_heap_threaded, state)
 {
     int i, j, result, result2, max_threads = 5, tmul = 30;
-    FLINT_TEST_INIT(state);
 #ifdef _WIN32
     tmul = 1;
 #endif
-
-    flint_printf("divides_heap_threaded....");
-    fflush(stdout);
 
     {
         nmod_mpoly_ctx_t ctx;
@@ -432,8 +426,5 @@ main(void)
         nmod_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

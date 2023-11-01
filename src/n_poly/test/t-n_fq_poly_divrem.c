@@ -9,16 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "n_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(n_fq_poly_divrem, state)
 {
     slong i, j;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("n_fq_poly_divrem....");
-    fflush(stdout);
 
     for (i = 0; i < 2000 * flint_test_multiplier(); i++)
     {
@@ -85,8 +81,5 @@ main(void)
         fq_nmod_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

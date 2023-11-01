@@ -9,18 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_poly.h"
 #include "fmpz_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mpoly_resultant_discriminant, state)
 {
     slong i, j;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("resultant_discriminant....");
-    fflush(stdout);
 
     /* Check quadratic polynomial */
     {
@@ -179,7 +174,6 @@ main(void)
         fmpz_mpoly_clear(p, ctx);
     }
 
-
     /* Check disc(a*b) = disc(a)*disc(b)*res(a,b)^2 */
     for (i = 0; i < 30 * flint_test_multiplier(); i++)
     {
@@ -252,9 +246,5 @@ main(void)
         fmpz_mpoly_clear(p, ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

@@ -9,17 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "nmod_mpoly.h"
 #include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_mpoly_get_coeff_vars_ui, state)
 {
     slong i, j1, j2;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("get_coeff_vars_ui....");
-    fflush(stdout);
 
     /* check simple example */
     {
@@ -188,8 +184,5 @@ main(void)
         nmod_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include <float.h>
 #include <mpfr.h>
 #include "ulong_extras.h"
@@ -16,19 +17,11 @@
 
 #define ONE_OVER_E ldexp(6627126856707895.0, -54)
 
-int
-main(void)
+TEST_FUNCTION_START(d_lambertw, state)
 {
     double x, w, tol;
     slong iter, prec = 70;
     mpfr_t xx, ww, wnew, t, u, v, p, q, max_err;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("lambertw....");
-    fflush(stdout);
-
-
 
     mpfr_init2(xx, prec);
     mpfr_init2(ww, prec);
@@ -138,8 +131,6 @@ main(void)
     mpfr_clear(max_err);
 
     mpfr_free_cache();
-    FLINT_TEST_CLEANUP(state);
 
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

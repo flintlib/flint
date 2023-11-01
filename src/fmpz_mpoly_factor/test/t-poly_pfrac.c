@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_poly.h"
 #include "fmpz_mpoly_factor.h"
 #include "fmpq_poly.h"
@@ -162,14 +163,9 @@ cleanup:
     fmpq_poly_clear(S);
 }
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_poly_pfrac, state)
 {
     slong i, j, k, tmul = 10;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("fmpz_poly_pfrac....");
-    fflush(stdout);
 
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
@@ -209,9 +205,5 @@ main(void)
         fmpz_poly_pfrac_clear(I);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

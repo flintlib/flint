@@ -9,9 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "arf.h"
 #include "mag.h"
 
+/* Defined in t-binpow_uiui.c, t-exp_tail.c, t-geom_series.c, t-pow_ui.c and
+ * t-pow_fmpz.c */
+#ifndef arf_pow_binexp_fmpz
+#define arf_pow_binexp_fmpz arf_pow_binexp_fmpz
 void
 arf_pow_binexp_fmpz(arf_t y, const arf_t b, const fmpz_t e,
     slong prec, arf_rnd_t rnd)
@@ -59,7 +64,12 @@ arf_pow_binexp_fmpz(arf_t y, const arf_t b, const fmpz_t e,
             arf_mul(y, y, b, wp, rnd);
     }
 }
+#endif
 
+/* Defined in t-binpow_uiui.c, t-exp_tail.c, t-geom_series.c, t-pow_ui.c and
+ * t-pow_fmpz.c */
+#ifndef arf_pow_binexp_ui
+#define arf_pow_binexp_ui arf_pow_binexp_ui
 void
 arf_pow_binexp_ui(arf_t y, const arf_t b, ulong e, slong prec, arf_rnd_t rnd)
 {
@@ -68,7 +78,12 @@ arf_pow_binexp_ui(arf_t y, const arf_t b, ulong e, slong prec, arf_rnd_t rnd)
     arf_pow_binexp_fmpz(y, b, f, prec, rnd);
     fmpz_clear(f);
 }
+#endif
 
+/* Defined in t-binpow_uiui.c, t-exp_tail.c, t-geom_series.c, t-pow_ui.c and
+ * t-pow_fmpz.c */
+#ifndef arf_pow_binexp_si
+#define arf_pow_binexp_si arf_pow_binexp_si
 void
 arf_pow_binexp_si(arf_t y, const arf_t b, slong e, slong prec, arf_rnd_t rnd)
 {
@@ -78,16 +93,11 @@ arf_pow_binexp_si(arf_t y, const arf_t b, slong e, slong prec, arf_rnd_t rnd)
     arf_pow_binexp_fmpz(y, b, f, prec, rnd);
     fmpz_clear(f);
 }
+#endif
 
-int main(void)
+TEST_FUNCTION_START(mag_pow_fmpz, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("pow_fmpz....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -209,9 +219,5 @@ int main(void)
         mag_clear(yb);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

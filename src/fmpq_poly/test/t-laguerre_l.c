@@ -9,17 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq_poly.h"
 
-int main(void)
+TEST_FUNCTION_START(fmpq_poly_laguerre_l, state)
 {
     fmpq_poly_t T0, T1, T2, t, tt;
     slong n;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("laguerre_l....");
-    fflush(stdout);
 
     fmpq_poly_init(T0);
     fmpq_poly_init(T1);
@@ -62,7 +58,5 @@ int main(void)
     fmpq_poly_clear(t);
     fmpq_poly_clear(tt);
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -11,21 +11,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include <string.h>
-#include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
 char * fmpz_get_str_bsplit_threaded(char * s, const fmpz_t f);
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_get_str, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("get_str....");
-    fflush(stdout);
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
@@ -101,8 +96,5 @@ main(void)
         mpz_clear(b);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

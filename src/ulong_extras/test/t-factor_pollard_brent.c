@@ -9,20 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 
-int main(void)
+TEST_FUNCTION_START(n_factor_pollard_brent, state)
 {
     mp_limb_t prime1, prime2, primeprod, fac, modval;
     int i, j, k, l, fails;
 
-    FLINT_TEST_INIT(state);
-
     fails = 0;
-
-    flint_printf("factor_pollard_brent....");
-    fflush(stdout);
 
     for (l = 5; l < 26; l += 5)
     {
@@ -67,8 +62,5 @@ int main(void)
         flint_abort();
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

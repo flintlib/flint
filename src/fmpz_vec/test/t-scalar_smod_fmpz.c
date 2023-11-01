@@ -9,21 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
-#include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_vec_scalar_smod_fmpz, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("scalar_smod_fmpz....");
-    fflush(stdout);
-
-
 
     /* Check aliasing of a and b */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -115,8 +107,5 @@ main(void)
         fmpz_clear(hi);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

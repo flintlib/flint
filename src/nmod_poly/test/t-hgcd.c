@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "mpn_extras.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
@@ -31,15 +32,9 @@ do {                                                            \
     }                                                           \
 } while (0)
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_hgcd, state)
 {
     slong i, j, result;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("hgcd....");
-    fflush(stdout);
 
     /* check that [c1,d1] := M^{-1} [a,b] assuming that deg(M) = sgnM */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -230,11 +225,7 @@ main(void)
         nmod_poly_clear(t);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
 
 #undef __mul
-

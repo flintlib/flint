@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fq_nmod_mpoly_factor.h"
-
 
 int compute_gcd(
     fq_nmod_mpoly_t G,
@@ -92,7 +92,6 @@ cleanup:
 
     return success;
 }
-
 
 void gcd_check(
     fq_nmod_mpoly_t g,
@@ -191,15 +190,9 @@ cleanup:
     fq_nmod_mpoly_clear(cg, ctx);
 }
 
-
-int
-main(void)
+TEST_FUNCTION_START(fq_nmod_mpoly_factor_gcd_subresultant, state)
 {
     slong i, j, tmul = 15;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("gcd_subresultant....");
-    fflush(stdout);
 
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
@@ -246,9 +239,5 @@ main(void)
         fq_nmod_mpoly_ctx_clear(ctx);
     }
 
-    flint_printf("PASS\n");
-    FLINT_TEST_CLEANUP(state);
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

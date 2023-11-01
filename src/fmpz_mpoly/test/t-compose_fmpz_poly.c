@@ -9,17 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_poly.h"
 #include "fmpz_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mpoly_compose_fmpz_poly, state)
 {
     slong i, v;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("compose_fmpz_poly....");
-    fflush(stdout);
 
     {
         fmpz_poly_t A;
@@ -308,7 +304,6 @@ main(void)
 
         fmpz_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits, ctx1);
 
-
         vals3 = (fmpz **) flint_malloc(nvars1*sizeof(fmpz *));
         for (v = 0; v < nvars1; v++)
         {
@@ -373,9 +368,5 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx1);
     }
 
-
-    printf("PASS\n");
-    FLINT_TEST_CLEANUP(state);
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }

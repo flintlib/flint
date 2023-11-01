@@ -2291,7 +2291,7 @@ gr_test_pow_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flags)
     GR_MUST_SUCCEED(gr_randtest_small(b, state, R));
 
     status = GR_SUCCESS;
-    
+
     status |= gr_add(ab, a, b, R);
     status |= gr_pow(xa, x, a, R);
     status |= gr_pow(xb, x, b, R);

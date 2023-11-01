@@ -9,20 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "mpn_extras.h"
 #include "fmpz.h"
 
-int main(void)
+TEST_FUNCTION_START(flint_mpn_fmms1, state)
 {
     slong i, j;
     fmpz_t X1, X2, Y, T;
     mp_limb_t * y, a1, * x1, a2, * x2;
     mp_size_t yn, n;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("fmms1....");
-    fflush(stdout);
 
     fmpz_init(X1);
     fmpz_init(X2);
@@ -94,8 +90,5 @@ int main(void)
     fmpz_clear(Y);
     fmpz_clear(T);
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

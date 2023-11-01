@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
@@ -56,18 +57,13 @@ void factor_poly(const char * file_str, const char * name)
 }
 #endif
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_poly_factor, state)
 {
     int i, result;
     int tmul = 100;
 #ifdef _WIN32
     tmul = 1;
 #endif
-    FLINT_TEST_INIT(state);
-
-    flint_printf("factor....");
-    fflush(stdout);
 
 #if TEST_HARD
 #define MY_DIR "/home/wbhart/.julia/v0.5/Nemo/deps/flint2/fmpz_poly_factor/test/"
@@ -207,8 +203,5 @@ main(void)
         fmpz_poly_clear(a);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

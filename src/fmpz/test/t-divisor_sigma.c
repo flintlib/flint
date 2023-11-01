@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "fmpz_poly.h"
 #include "fmpz.h"
 #include "fmpz.h"
@@ -38,16 +38,10 @@ void fmpz_sigma_naive(fmpz_t x, ulong k, ulong n)
     fmpz_clear(t);
     fmpz_poly_clear(p);
 }
-
-int main(void)
+TEST_FUNCTION_START(fmpz_divisor_sigma, state)
 {
     fmpz_t m, a, b;
     slong n, k;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("divisor_sigma....");
-    fflush(stdout);
 
     fmpz_init(a);
     fmpz_init(b);
@@ -74,8 +68,5 @@ int main(void)
     fmpz_clear(b);
     fmpz_clear(m);
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

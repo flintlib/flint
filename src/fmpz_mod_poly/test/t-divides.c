@@ -9,32 +9,28 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mod_poly_divides, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("divides....");
-    fflush(stdout);
 
     /* Random polynomials */
     for (i = 0; i < 500 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t a, b, q, prod;
         fmpz_mod_ctx_t ctx;
-	int divides;
+        int divides;
         fmpz_t n;
 
-	fmpz_init(n);
+        fmpz_init(n);
 
         do fmpz_randtest_unsigned(n, state, 2 * FLINT_BITS);
         while (!fmpz_is_probabprime(n));
-	fmpz_mod_ctx_init(ctx, n);
+        fmpz_mod_ctx_init(ctx, n);
 
         fmpz_mod_poly_init(a, ctx);
         fmpz_mod_poly_init(b, ctx);
@@ -48,15 +44,15 @@ main(void)
         fmpz_mod_poly_mul(prod, q, b, ctx);
 
         result = ((divides && fmpz_mod_poly_equal(a, prod, ctx)) ||
-		 (!divides && fmpz_mod_poly_is_zero(q, ctx) &&
-		  !fmpz_mod_poly_equal(prod, a, ctx)));
+                (!divides && fmpz_mod_poly_is_zero(q, ctx) &&
+                 !fmpz_mod_poly_equal(prod, a, ctx)));
         if (!result)
         {
             flint_printf("FAIL:\n");
-	    flint_printf("divides = %d\n", divides);
+            flint_printf("divides = %d\n", divides);
             fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
             fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
-	    fmpz_mod_poly_print(prod, ctx), flint_printf("\n\n");
+            fmpz_mod_poly_print(prod, ctx), flint_printf("\n\n");
             fmpz_mod_poly_print(q, ctx), flint_printf("\n\n");
             flint_printf("n = %wd\n", n);
             fflush(stdout);
@@ -64,8 +60,8 @@ main(void)
         }
 
         fmpz_clear(n);
-	fmpz_mod_ctx_clear(ctx);
-	fmpz_mod_poly_clear(a, ctx);
+        fmpz_mod_ctx_clear(ctx);
+        fmpz_mod_poly_clear(a, ctx);
         fmpz_mod_poly_clear(b, ctx);
         fmpz_mod_poly_clear(q, ctx);
         fmpz_mod_poly_clear(prod, ctx);
@@ -76,10 +72,10 @@ main(void)
     {
         fmpz_mod_poly_t a, b, q, prod;
         fmpz_mod_ctx_t ctx;
-	int divides;
+        int divides;
         fmpz_t n;
 
-	fmpz_init(n);
+        fmpz_init(n);
 
         do fmpz_randtest_unsigned(n, state, 2 * FLINT_BITS);
         while (!fmpz_is_probabprime(n));
@@ -101,10 +97,10 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
-	    flint_printf("divides = %d\n", divides);
+            flint_printf("divides = %d\n", divides);
             fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
             fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
-	    fmpz_mod_poly_print(prod, ctx), flint_printf("\n\n");
+            fmpz_mod_poly_print(prod, ctx), flint_printf("\n\n");
             fmpz_mod_poly_print(q, ctx), flint_printf("\n\n");
             flint_printf("n = %wd\n", n);
             fflush(stdout);
@@ -112,8 +108,8 @@ main(void)
         }
 
         fmpz_clear(n);
-	fmpz_mod_ctx_clear(ctx);
-	fmpz_mod_poly_clear(a, ctx);
+        fmpz_mod_ctx_clear(ctx);
+        fmpz_mod_poly_clear(a, ctx);
         fmpz_mod_poly_clear(b, ctx);
         fmpz_mod_poly_clear(q, ctx);
         fmpz_mod_poly_clear(prod, ctx);
@@ -124,7 +120,7 @@ main(void)
     {
         fmpz_mod_poly_t a, b, q;
         fmpz_mod_ctx_t ctx;
-	int divides1, divides2;
+        int divides1, divides2;
         fmpz_t n;
 
         fmpz_init(n);
@@ -147,7 +143,7 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
-	    flint_printf("divides1 = %d, divides2 = %d\n", divides1, divides2);
+            flint_printf("divides1 = %d, divides2 = %d\n", divides1, divides2);
             fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
             fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
             fmpz_mod_poly_print(q, ctx), flint_printf("\n\n");
@@ -157,8 +153,8 @@ main(void)
         }
 
         fmpz_clear(n);
-	fmpz_mod_ctx_clear(ctx);
-	fmpz_mod_poly_clear(a, ctx);
+        fmpz_mod_ctx_clear(ctx);
+        fmpz_mod_poly_clear(a, ctx);
         fmpz_mod_poly_clear(b, ctx);
         fmpz_mod_poly_clear(q, ctx);
     }
@@ -168,10 +164,10 @@ main(void)
     {
         fmpz_mod_poly_t a, b, q;
         fmpz_mod_ctx_t ctx;
-	int divides1, divides2;
+        int divides1, divides2;
         fmpz_t n;
 
-	fmpz_init(n);
+        fmpz_init(n);
 
         do fmpz_randtest_unsigned(n, state, 2 * FLINT_BITS);
         while (!fmpz_is_probabprime(n));
@@ -191,7 +187,7 @@ main(void)
         if (!result)
         {
             flint_printf("FAIL:\n");
-	    flint_printf("divides1 = %d, divides2 = %d\n", divides1, divides2);
+            flint_printf("divides1 = %d, divides2 = %d\n", divides1, divides2);
             fmpz_mod_poly_print(a, ctx), flint_printf("\n\n");
             fmpz_mod_poly_print(b, ctx), flint_printf("\n\n");
             fmpz_mod_poly_print(q, ctx), flint_printf("\n\n");
@@ -201,14 +197,11 @@ main(void)
         }
 
         fmpz_clear(n);
-	fmpz_mod_ctx_clear(ctx);
-	fmpz_mod_poly_clear(a, ctx);
+        fmpz_mod_ctx_clear(ctx);
+        fmpz_mod_poly_clear(a, ctx);
         fmpz_mod_poly_clear(b, ctx);
         fmpz_mod_poly_clear(q, ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

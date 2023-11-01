@@ -1,13 +1,22 @@
+/*
+    Copyright (C) 2023 Fredrik Johansson
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
+
+#include "test_helpers.h"
 #include "gr.h"
 
-int main(void)
+TEST_FUNCTION_START(gr_matrix_arb, state)
 {
     gr_ctx_t RR, MatRR;
     slong n;
     int flags = 0;
-
-    flint_printf("matrix_arb....");
-    fflush(stdout);
 
     gr_ctx_init_real_arb(RR, 64);
 
@@ -20,7 +29,5 @@ int main(void)
 
     gr_ctx_clear(RR);
 
-    flint_cleanup();
-    flint_printf(" PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

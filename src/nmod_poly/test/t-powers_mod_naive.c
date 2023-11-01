@@ -9,24 +9,20 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_powers_mod_naive, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("powers_mod_naive....");
-    fflush(stdout);
 
     /* Compare with powmod */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t f, g, pow;
         nmod_poly_struct * res;
-	mp_limb_t n;
+        mp_limb_t n;
         ulong exp;
         slong j;
 
@@ -37,9 +33,9 @@ main(void)
         nmod_poly_init(g, n);
         nmod_poly_init(pow, n);
 
-	res = (nmod_poly_struct *) flint_malloc(exp*sizeof(nmod_poly_struct));
+        res = (nmod_poly_struct *) flint_malloc(exp*sizeof(nmod_poly_struct));
 
-	for (j = 0; j < exp; j++)
+        for (j = 0; j < exp; j++)
             nmod_poly_init(res + j, n);
 
         nmod_poly_randtest(f, state, n_randint(state, 50));
@@ -49,22 +45,22 @@ main(void)
 
         nmod_poly_powers_mod_naive(res, f, exp, g);
 
-	result = 1;
+        result = 1;
         j = 0;
 
         if (exp > 0)
-	{
-           nmod_poly_one(pow);
-	   result = nmod_poly_equal(res + 0, pow);
-	}
+        {
+            nmod_poly_one(pow);
+            result = nmod_poly_equal(res + 0, pow);
+        }
 
         for (j = 1 ; j < exp && result; j++)
-	{
-	    nmod_poly_mulmod(pow, pow, f, g);
-	    result &= nmod_poly_equal(res + j, pow);
-	}
+        {
+            nmod_poly_mulmod(pow, pow, f, g);
+            result &= nmod_poly_equal(res + j, pow);
+        }
 
-	j--;
+        j--;
 
         if (!result)
         {
@@ -74,7 +70,7 @@ main(void)
             flint_printf("g:\n"); nmod_poly_print(g), flint_printf("\n\n");
             flint_printf("j: %w\n", j);
             flint_printf("pow:\n"); nmod_poly_print(pow), flint_printf("\n\n");
-	    flint_printf("res[%w]:\n", j); nmod_poly_print(res + j), flint_printf("\n\n");
+            flint_printf("res[%w]:\n", j); nmod_poly_print(res + j), flint_printf("\n\n");
             fflush(stdout);
             flint_abort();
         }
@@ -83,14 +79,11 @@ main(void)
         nmod_poly_clear(g);
         nmod_poly_clear(pow);
 
-	for (j = 0; j < exp; j++)
-	    nmod_poly_clear(res + j);
+        for (j = 0; j < exp; j++)
+            nmod_poly_clear(res + j);
 
-	flint_free(res);
+        flint_free(res);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

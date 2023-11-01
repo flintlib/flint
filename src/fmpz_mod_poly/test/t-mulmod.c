@@ -1,7 +1,7 @@
 /*
-    Copyright (C) 2012 Lina Kulakova
-    Copyright (C) 2011, 2010 Sebastian Pancratz
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010, 2011 Sebastian Pancratz
+    Copyright (C) 2012 Lina Kulakova
 
     This file is part of FLINT.
 
@@ -11,20 +11,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mod_poly_mulmod, state)
 {
     int i, result;
     fmpz_mod_ctx_t ctx;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("mulmod....");
-    fflush(stdout);
 
     fmpz_mod_ctx_init_ui(ctx, 2);
 
@@ -199,8 +195,6 @@ main(void)
     }
 
     fmpz_mod_ctx_clear(ctx);
-    FLINT_TEST_CLEANUP(state);
 
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

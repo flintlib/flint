@@ -10,18 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_mod_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mod_mat_get_set_fmpz_mat, state)
 {
     slong m, n, rep;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("get/set_fmpz_mat....");
-    fflush(stdout);
-
 
     for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
     {
@@ -45,7 +40,7 @@ main(void)
         fmpz_mod_mat_randtest(A, state);
 
         fmpz_mod_mat_get_fmpz_mat(C, A);
-	fmpz_mod_mat_set_fmpz_mat(B, C);
+        fmpz_mod_mat_set_fmpz_mat(B, C);
 
         if (!fmpz_mod_mat_equal(A, B))
         {
@@ -56,13 +51,10 @@ main(void)
 
         fmpz_mat_clear(C);
 
-	fmpz_mod_mat_clear(A);
+        fmpz_mod_mat_clear(A);
         fmpz_mod_mat_clear(B);
-	fmpz_clear(mod);
+        fmpz_clear(mod);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

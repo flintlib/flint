@@ -9,18 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq.h"
 #include "qqbar.h"
 
-int main(void)
+TEST_FUNCTION_START(qqbar_pow_fmpq, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("pow_fmpq....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* Check x^m x^n = x^(m+n) */
     for (iter = 0; iter < 100 * 0.1 * flint_test_multiplier(); iter++)
@@ -84,9 +79,5 @@ int main(void)
         fmpq_clear(mn);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

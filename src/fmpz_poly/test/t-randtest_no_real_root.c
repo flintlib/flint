@@ -9,15 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
-
-int main(void)
+TEST_FUNCTION_START(fmpz_poly_randtest_no_real_root, state)
 {
     int iter;
-    FLINT_TEST_INIT(state);
-
-    printf("randtest_no_real_root....");
 
     for (iter = 0; iter < 5000 * flint_test_multiplier(); iter++)
     {
@@ -71,8 +68,5 @@ int main(void)
         fmpz_poly_clear(p);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

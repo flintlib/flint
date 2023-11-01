@@ -11,18 +11,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 #include "fmpz.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_powmod_fmpz_binexp_preinv, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("powmod_fmpz_binexp_preinv....");
-    fflush(stdout);
 
     /* Aliasing of res and a */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
@@ -31,7 +27,7 @@ main(void)
         mp_limb_t n;
         fmpz_t exp;
 
-	fmpz_init(exp);
+        fmpz_init(exp);
 
         n = n_randtest_prime(state, 0);
         fmpz_randtest_unsigned(exp, state, n_randint(state, 100) + 1);
@@ -66,7 +62,7 @@ main(void)
         }
 
         fmpz_clear(exp);
-	nmod_poly_clear(a);
+        nmod_poly_clear(a);
         nmod_poly_clear(f);
         nmod_poly_clear(finv);
         nmod_poly_clear(res1);
@@ -179,7 +175,7 @@ main(void)
         mp_limb_t n;
         fmpz_t exp;
 
-	fmpz_init(exp);
+        fmpz_init(exp);
 
         n = n_randtest_prime(state, 0);
         fmpz_randtest_unsigned(exp, state, n_randint(state, 100) + 1);;
@@ -225,8 +221,5 @@ main(void)
         nmod_poly_clear(t);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

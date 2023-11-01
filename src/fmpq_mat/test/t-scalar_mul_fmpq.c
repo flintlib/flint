@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2011 Sebastian Pancratz, 2018 Martin Raum
+    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2018 Martin Raum
 
     This file is part of FLINT.
 
@@ -9,18 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq.h"
 #include "fmpq_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_mat_scalar_mul_fmpq, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("scalar_mul_fmpq....");
-    fflush(stdout);
 
     /* Aliasing */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -107,9 +103,5 @@ main(void)
         fmpq_clear(x);
     }
 
-
-
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

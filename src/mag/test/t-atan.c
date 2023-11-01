@@ -9,7 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "mpfr.h"
+#include "test_helpers.h"
+#include <mpfr.h>
 #include "arf.h"
 #include "mag.h"
 
@@ -19,15 +20,9 @@ arf_atan(arf_t y, const arf_t x, slong prec, arf_rnd_t rnd)
     _arf_call_mpfr_func(y, NULL, (int (*)(void)) mpfr_atan, x, NULL, prec, rnd);
 }
 
-int main(void)
+TEST_FUNCTION_START(mag_atan, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("atan....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* check atan */
     for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
@@ -141,9 +136,5 @@ int main(void)
         mag_clear(yb);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

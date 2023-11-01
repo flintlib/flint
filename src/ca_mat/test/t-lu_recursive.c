@@ -9,9 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_mat.h"
 #include "ca_mat.h"
 
+/* Defined in t-lu.c, t-lu_classical.c and t-lu_recursive.c */
+#ifndef perm
+#define perm perm
 void perm(ca_mat_t A, slong * P)
 {
     slong i;
@@ -27,7 +31,11 @@ void perm(ca_mat_t A, slong * P)
 
     flint_free(tmp);
 }
+#endif
 
+/* Defined in t-lu.c, t-lu_classical.c and t-lu_recursive.c */
+#ifndef check
+#define check check
 void check(slong * P, ca_mat_t LU, const ca_mat_t A, slong rank, ca_ctx_t ctx)
 {
     ca_mat_t B, L, U;
@@ -83,7 +91,11 @@ void check(slong * P, ca_mat_t LU, const ca_mat_t A, slong rank, ca_ctx_t ctx)
     ca_mat_clear(L, ctx);
     ca_mat_clear(U, ctx);
 }
+#endif
 
+/* Defined in t-lu.c, t-lu_classical.c and t-lu_recursive.c */
+#ifndef ca_mat_randrank
+#define ca_mat_randrank ca_mat_randrank
 void
 ca_mat_randrank(ca_mat_t mat, flint_rand_t state, slong rank, slong bits, ca_ctx_t ctx)
 {
@@ -93,16 +105,11 @@ ca_mat_randrank(ca_mat_t mat, flint_rand_t state, slong rank, slong bits, ca_ctx
     ca_mat_set_fmpz_mat(mat, A, ctx);
     fmpz_mat_clear(A);
 }
+#endif
 
-int main(void)
+TEST_FUNCTION_START(ca_mat_lu_recursive, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("lu_recursive...");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -158,8 +165,5 @@ int main(void)
         ca_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

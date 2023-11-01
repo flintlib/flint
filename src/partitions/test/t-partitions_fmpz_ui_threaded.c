@@ -9,11 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "arith.h"
 #include "partitions.h"
 
+/* Defined in t-partitions_fmpz_ui.c and t-partitions_fmpz_ui_threaded.c */
+#define testdata testdata_fmpz_ui_threaded
 /* Values mod 10^9 */
 static const ulong testdata[][2] =
 {
@@ -90,15 +93,9 @@ static const ulong testdata[][2] =
 
 #define NUM 5000
 
-int main(void)
+TEST_FUNCTION_START(partitions_fmpz_ui_threaded, state)
 {
-    flint_rand_t state;
     slong i;
-
-    flint_printf("partitions_fmpz_ui_threaded....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     flint_set_num_threads(2);
 
@@ -144,9 +141,6 @@ int main(void)
         fmpz_clear(p);
     }
 
-    flint_randclear(state);
-    flint_cleanup_master();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
+#undef testdata

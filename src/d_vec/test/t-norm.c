@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "d_vec.h"
 #include "ulong_extras.h"
 
@@ -21,14 +21,9 @@
 
 #define D_VEC_NORM_EPS (1e-14)
 
-int
-main(void)
+TEST_FUNCTION_START(d_vec_norm, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("norm....");
-    fflush(stdout);
 
     /* check sum of norms of parts of a vector is equal to the
        norm of the vector */
@@ -59,8 +54,5 @@ main(void)
         _d_vec_clear(a);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -9,21 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "mpoly.h"
-#include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(mpoly_max_degrees_tight, state)
 {
     slong k, i, j, length, nfields, bits1, bits2;
     slong * bases, * max, * max2, * prods;
     ulong * a, * b, * c, * t;
     ulong max_length, max_fields;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("max_degrees_tight....");
-    fflush(stdout);
 
     max_length = 100;
     max_fields = FLINT_BITS/8;  /* exponents should fit in one word */
@@ -65,7 +59,6 @@ main(void)
                     max[j] = FLINT_MAX(max[j], a[i + j]);
                 }
 
-
             mpoly_pack_vec_ui(b, a, bits1, nfields, length);
             mpoly_pack_monomials_tight(t, b, length, bases, nfields, bits1);
             mpoly_unpack_monomials_tight(c, t, length, bases, nfields, bits2);
@@ -91,9 +84,5 @@ main(void)
     flint_free(b);
     flint_free(a);
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

@@ -9,20 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
+#include "test_helpers.h"
 #include "fmpz_mpoly.h"
-#include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mpoly_divides_monagan_pearce, state)
 {
     int i, j, result, ok1, ok2;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("divides_monagan_pearce....");
-    fflush(stdout);
-
 
     /*
         A bad case is hit when testing with multiplier 50. The following
@@ -30,28 +22,27 @@ main(void)
         ORD_DEGLEX
     */
 
-{
-    fmpz_mpoly_ctx_t ctx;
-    fmpz_mpoly_t f, g, q, r;
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t f, g, q, r;
 
-    fmpz_mpoly_ctx_init(ctx, 2, ORD_LEX);
-    fmpz_mpoly_init(f, ctx);
-    fmpz_mpoly_init(g, ctx);
-    fmpz_mpoly_init(q, ctx);
-    fmpz_mpoly_init(r, ctx);
+        fmpz_mpoly_ctx_init(ctx, 2, ORD_LEX);
+        fmpz_mpoly_init(f, ctx);
+        fmpz_mpoly_init(g, ctx);
+        fmpz_mpoly_init(q, ctx);
+        fmpz_mpoly_init(r, ctx);
 
-    fmpz_mpoly_set_str_pretty(f, "-x1^1918*x2^1075-x1^1891*x2^2001",NULL, ctx);
-    fmpz_mpoly_set_str_pretty(g, "x1^22*x2^3-x1^19*x2^21-x1^16*x2^10-2*x1^14*x2^17-x1^14*x2^11-x1*x2^15-2*x2^17", NULL, ctx);
+        fmpz_mpoly_set_str_pretty(f, "-x1^1918*x2^1075-x1^1891*x2^2001",NULL, ctx);
+        fmpz_mpoly_set_str_pretty(g, "x1^22*x2^3-x1^19*x2^21-x1^16*x2^10-2*x1^14*x2^17-x1^14*x2^11-x1*x2^15-2*x2^17", NULL, ctx);
 
-    ok1 = fmpz_mpoly_divides_monagan_pearce(q, f, g, ctx);
+        ok1 = fmpz_mpoly_divides_monagan_pearce(q, f, g, ctx);
 
-    fmpz_mpoly_clear(f, ctx);
-    fmpz_mpoly_clear(g, ctx);
-    fmpz_mpoly_clear(q, ctx);
-    fmpz_mpoly_clear(r, ctx);
-    fmpz_mpoly_ctx_clear(ctx);
-}
-
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_clear(g, ctx);
+        fmpz_mpoly_clear(q, ctx);
+        fmpz_mpoly_clear(r, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
 
     /* Check f*g/g = f */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -422,9 +413,5 @@ main(void)
        fmpz_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

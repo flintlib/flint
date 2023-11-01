@@ -11,20 +11,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "gmpcompat.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
 #include "mpf_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(mpf_mat_set_fmpz_mat, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("set_fmpz_mat....");
-    fflush(stdout);
 
     /* set entries of an fmpz_mat, convert to mpf_mat and then check that
        the entries remain same */
@@ -68,9 +63,5 @@ main(void)
         mpf_mat_clear(B);
     }
 
-
-
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

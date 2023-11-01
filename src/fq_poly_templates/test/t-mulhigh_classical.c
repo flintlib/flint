@@ -12,16 +12,12 @@
 
 #ifdef T
 
+#include "test_helpers.h"
 #include "templates.h"
 
-int
-main(void)
+TEST_TEMPLATE_FUNCTION_START(T, poly_mulhigh_classical, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("mulhigh_classical....");
-    fflush(stdout);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
@@ -167,11 +163,6 @@ main(void)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
-
 #endif

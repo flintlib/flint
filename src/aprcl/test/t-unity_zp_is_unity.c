@@ -9,16 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "aprcl.h"
 
-int main(void)
+TEST_FUNCTION_START(aprcl_unity_zp_is_unity, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("unity_zp_is_unity....");
-    fflush(stdout);
 
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
@@ -54,9 +51,5 @@ int main(void)
         unity_zp_clear(f);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

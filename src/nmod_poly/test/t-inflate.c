@@ -9,18 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_inflate, state)
 {
     int iter;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("inflate....");
-    fflush(stdout);
 
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
@@ -69,8 +64,5 @@ main(void)
         nmod_poly_clear(xp);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

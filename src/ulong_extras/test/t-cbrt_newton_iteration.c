@@ -10,17 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-int main(void)
+TEST_FUNCTION_START(n_cbrt_newton_iteration, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("cbrt_newton_iteration....");
-    fflush(stdout);
 
     /* random n */
 
@@ -146,7 +142,5 @@ int main(void)
         mpz_clear(mpz_val);
     }
 
-   FLINT_TEST_CLEANUP(state);
-   flint_printf("PASS\n");
-   return 0;
+    TEST_FUNCTION_END(state);
 }

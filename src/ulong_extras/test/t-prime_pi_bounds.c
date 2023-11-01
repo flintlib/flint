@@ -9,10 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 
-void check(mp_limb_t n, ulong ans)
+void check_prime_pi_bound(mp_limb_t n, ulong ans)
 {
     int ok, reasonable;
     ulong lo, hi;
@@ -30,40 +30,34 @@ void check(mp_limb_t n, ulong ans)
     flint_abort();
 }
 
-int main(void)
+TEST_FUNCTION_START(n_prime_pi_bounds, state)
 {
     int n;
 
-    FLINT_TEST_INIT(state);
-    flint_printf("prime_pi_bounds....");
-    fflush(stdout);
-
     for (n=17; n<10000 * FLINT_MIN(10, flint_test_multiplier()); n++)
     {
-        check(n, n_prime_pi(n));
+        check_prime_pi_bound(n, n_prime_pi(n));
     }
 
-    check(UWORD(10), UWORD(4));
-    check(UWORD(100), UWORD(25));
-    check(UWORD(1000), UWORD(168));
-    check(UWORD(10000), UWORD(1229));
-    check(UWORD(100000), UWORD(9592));
-    check(UWORD(1000000), UWORD(78498));
-    check(UWORD(10000000), UWORD(664579));
-    check(UWORD(100000000), UWORD(5761455));
-    check(UWORD(1000000000), UWORD(50847534));
+    check_prime_pi_bound(UWORD(10), UWORD(4));
+    check_prime_pi_bound(UWORD(100), UWORD(25));
+    check_prime_pi_bound(UWORD(1000), UWORD(168));
+    check_prime_pi_bound(UWORD(10000), UWORD(1229));
+    check_prime_pi_bound(UWORD(100000), UWORD(9592));
+    check_prime_pi_bound(UWORD(1000000), UWORD(78498));
+    check_prime_pi_bound(UWORD(10000000), UWORD(664579));
+    check_prime_pi_bound(UWORD(100000000), UWORD(5761455));
+    check_prime_pi_bound(UWORD(1000000000), UWORD(50847534));
 #if FLINT64
-    check(UWORD(10000000000), UWORD(455052511));
-    check(UWORD(100000000000), UWORD(4118054813));
-    check(UWORD(1000000000000), UWORD(37607912018));
-    check(UWORD(10000000000000), UWORD(346065536839));
-    check(UWORD(100000000000000), UWORD(3204941750802));
-    check(UWORD(1000000000000000), UWORD(29844570422669));
-    check(UWORD(10000000000000000), UWORD(279238341033925));
-    check(UWORD(100000000000000000), UWORD(2623557157654233));
+    check_prime_pi_bound(UWORD(10000000000), UWORD(455052511));
+    check_prime_pi_bound(UWORD(100000000000), UWORD(4118054813));
+    check_prime_pi_bound(UWORD(1000000000000), UWORD(37607912018));
+    check_prime_pi_bound(UWORD(10000000000000), UWORD(346065536839));
+    check_prime_pi_bound(UWORD(100000000000000), UWORD(3204941750802));
+    check_prime_pi_bound(UWORD(1000000000000000), UWORD(29844570422669));
+    check_prime_pi_bound(UWORD(10000000000000000), UWORD(279238341033925));
+    check_prime_pi_bound(UWORD(100000000000000000), UWORD(2623557157654233));
 #endif
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

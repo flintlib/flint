@@ -12,18 +12,12 @@
 #ifdef T
 #ifdef B
 
+#include "test_helpers.h"
 #include "templates.h"
 
-
-int
-main(void)
+TEST_TEMPLATE_FUNCTION_START(T, embed_matrices, state)
 {
-  int i, j;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("embed matrices... ");
-    fflush(stdout);
+    int i, j;
 
     /* Check that isomorphism to self gives identity matrices */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -80,8 +74,8 @@ main(void)
             slong m, n;
 
             while (TEMPLATE(T, ctx_randtest)(ctx1, state),
-                   m = TEMPLATE(T, ctx_degree)(ctx1),
-                   m == 1)
+                    m = TEMPLATE(T, ctx_degree)(ctx1),
+                    m == 1)
             {
                 TEMPLATE(T, ctx_clear)(ctx1);
             }
@@ -133,11 +127,7 @@ main(void)
         }
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
-
 #endif
 #endif

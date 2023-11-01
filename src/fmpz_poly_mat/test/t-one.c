@@ -9,21 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mat.h"
-#include "fmpz_poly.h"
+#include "test_helpers.h"
 #include "fmpz_poly_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_poly_mat_one, state)
 {
     int iter;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("one/is_one....");
-    fflush(stdout);
 
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
@@ -69,8 +60,5 @@ main(void)
         fmpz_poly_mat_clear(A);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

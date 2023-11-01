@@ -9,20 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "gr_poly.h"
 
 FLINT_DLL extern gr_static_method_table _ca_methods;
 
-int main(void)
+TEST_FUNCTION_START(gr_poly_compose, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("compose....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000; iter++)
     {
@@ -90,8 +85,5 @@ int main(void)
         gr_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

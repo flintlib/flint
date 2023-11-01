@@ -9,12 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
 #include "arith.h"
 
-int main(void)
+TEST_FUNCTION_START(arith_stirling, state)
 {
     fmpz_mat_t mat, mat2, mat3;
     fmpz * row;
@@ -24,10 +25,6 @@ int main(void)
 
     const slong maxn = 40;
 
-    FLINT_TEST_INIT(state);
-
-    flint_printf("stirling....");
-    fflush(stdout);
 
     fmpz_init(s);
 
@@ -113,7 +110,6 @@ int main(void)
 
             _fmpz_vec_clear(row, k + 1);
         }
-
 
         for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
         {
@@ -308,7 +304,5 @@ int main(void)
 
     fmpz_clear(s);
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

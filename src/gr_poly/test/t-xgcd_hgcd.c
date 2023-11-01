@@ -12,17 +12,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "gr_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(gr_poly_xgcd_hgcd, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("xgcd_hgcd....");
-    fflush(stdout);
 
     /* Compare with result from GCD and check correctness */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -153,7 +149,5 @@ main(void)
         gr_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

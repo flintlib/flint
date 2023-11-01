@@ -9,16 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "nmod_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_mpoly_compose_nmod_poly, state)
 {
     slong i, v;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("compose_nmod_poly....");
-    fflush(stdout);
 
     {
         nmod_poly_t A;
@@ -166,8 +162,6 @@ main(void)
 
         nmod_mpoly_ctx_clear(ctx1);
     }
-    printf("PASS\n");
-    FLINT_TEST_CLEANUP(state);
 
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -9,16 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mat_hnf_xgcd, state)
 {
     slong iter;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("hnf_xgcd....");
-    fflush(stdout);
 
     for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
     {
@@ -90,9 +86,5 @@ main(void)
         fmpz_mat_clear(A);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

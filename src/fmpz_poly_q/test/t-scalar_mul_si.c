@@ -1,7 +1,7 @@
 /*
+    Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2013 Fredrik Johansson
     Copyright (C) 2013 William Hart
-    Copyright (C) 2011 Sebastian Pancratz
 
     This file is part of FLINT.
 
@@ -11,21 +11,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-
-#include "fmpz_poly_q.h"
+#include "test_helpers.h"
 #include "long_extras.h"
-#include "ulong_extras.h"
+#include "fmpz_poly_q.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_poly_q_scalar_mul_si, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("scalar_mul_si... ");
-    fflush(stdout);
-
-
 
     /* Check aliasing of a and b */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -95,8 +87,5 @@ main(void)
         fmpz_poly_q_clear(d);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

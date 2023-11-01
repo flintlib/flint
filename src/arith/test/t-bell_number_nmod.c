@@ -9,18 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "arith.h"
 
-int main(void)
+TEST_FUNCTION_START(arith_bell_number_nmod, state)
 {
     slong i, j, iter;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("bell_number_nmod....");
-    fflush(stdout);
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -56,8 +52,5 @@ int main(void)
         _nmod_vec_clear(b);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

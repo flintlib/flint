@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_poly_factor.h"
 
@@ -49,7 +50,6 @@ next:
     return 1;
 }
 
-
 /* length of s is r */
 static void my_subset_print(slong * s, slong r)
 {
@@ -66,16 +66,12 @@ static void my_subset_print(slong * s, slong r)
     }
 }
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_poly_factor_zassenhaus_subset, state)
 {
     fmpz_t f;
     slong i, j, k, r;
     slong * s, * s1, * s2;
     int res1, res2;
-
-    flint_printf("zassenhaus_subset....");
-    fflush(stdout);
 
     fmpz_init(f);
 
@@ -185,8 +181,5 @@ main(void)
 
     fmpz_clear(f);
 
-    flint_cleanup_master();
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
@@ -20,20 +20,18 @@
     result of a GCD operation, that is, whether it's leading
     coefficient is non-negative.
  */
+#ifndef _t_gcd_is_canonical
+#define _t_gcd_is_canonical _t_gcd_is_canonical
 static
 int _t_gcd_is_canonical(const fmpz_poly_t poly)
 {
     return fmpz_poly_is_zero(poly) || (fmpz_sgn(fmpz_poly_lead(poly)) > 0);
 }
+#endif
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_poly_gcd_heuristic, state)
 {
     int i, result, d1, d2;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("gcd_heuristic....");
-    fflush(stdout);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -314,8 +312,5 @@ main(void)
         fmpz_poly_clear(g);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+  TEST_FUNCTION_END(state);
 }

@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
@@ -32,16 +32,9 @@ taylor_simple(fmpz_poly_t g, const fmpz_poly_t f, const fmpz_t c)
     _taylor_simple(g->coeffs, c, g->length);
 }
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_poly_taylor_shift_horner, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("taylor_shift_horner....");
-    fflush(stdout);
-
-
 
     /* Check aliasing */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -129,7 +122,6 @@ main(void)
 
         fmpz_init(c);
 
-
         if (n_randint(state, 30))
             fmpz_poly_randtest(f, state, 1 + n_randint(state, 100),
                                          1 + n_randint(state, 10000));
@@ -158,8 +150,5 @@ main(void)
         fmpz_clear(c);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fq_nmod_mpoly.h"
 
 /* fq_nmod_poly_resultant is missing */
@@ -64,14 +65,8 @@ void test_resultant(
 }
 #endif
 
-int
-main(void)
+TEST_FUNCTION_START(fq_nmod_mpoly_univar_resultant, state)
 {
-    FLINT_TEST_INIT(state);
-
-    flint_printf("univar_resultant....");
-    fflush(stdout);
-
     {
         fq_nmod_mpoly_ctx_t ctx;
         fq_nmod_mpoly_t t, s;
@@ -180,9 +175,5 @@ main(void)
     }
 #endif
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

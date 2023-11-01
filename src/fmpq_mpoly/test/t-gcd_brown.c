@@ -9,11 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
+#include "test_helpers.h"
 #include "fmpq_mpoly.h"
-#include "ulong_extras.h"
 
+/* Defined in t-gcd.c, t-gcd_brown.c, t-gcd_cofactors.c, t-gcd_hensel.c,
+ * t-gcd_subresultant.c, t-gcd_zippel2.c */
+#define gcd_check gcd_check_gcd_brown
 void gcd_check(
     fmpq_mpoly_t g,
     fmpq_mpoly_t a,
@@ -103,16 +104,10 @@ cleanup:
     fmpq_mpoly_clear(cg, ctx);
 }
 
-
-int
-main(void)
+TEST_FUNCTION_START(fmpq_mpoly_gcd_brown, state)
 {
     slong tmul = 10;
     slong i, j;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("gcd_brown....");
-    fflush(stdout);
 
     {
         fmpq_mpoly_ctx_t ctx;
@@ -180,9 +175,6 @@ main(void)
         fmpq_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
+#undef gcd_check

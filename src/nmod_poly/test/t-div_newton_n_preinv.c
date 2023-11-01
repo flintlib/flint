@@ -10,18 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_div_newton_n_preinv, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("div_newton_n_preinv....");
-    fflush(stdout);
 
     /* Check result of divrem */
     for (i = 0; i < 500 * flint_test_multiplier(); i++)
@@ -205,8 +200,5 @@ main(void)
         nmod_poly_clear(q);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

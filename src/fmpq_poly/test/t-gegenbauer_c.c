@@ -9,24 +9,20 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq.h"
 #include "fmpq_vec.h"
 #include "fmpq_poly.h"
 
 #define NRATS 20
 
-int main(void)
+TEST_FUNCTION_START(fmpq_poly_gegenbauer_c, state)
 {
     fmpq_poly_t T0, T1, T2, t, tt;
     fmpq_t a, rat;
     fmpq *rats;
     slong n, d;
     flint_rand_t rand_state;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("gegenbauer_c....");
-    fflush(stdout);
 
     fmpq_poly_init(T0);
     fmpq_poly_init(T1);
@@ -94,7 +90,5 @@ int main(void)
     fmpq_clear(a);
     fmpq_clear(rat);
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

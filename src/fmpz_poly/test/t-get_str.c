@@ -10,23 +10,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include <string.h>
-#include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_poly_get_str, state)
 {
     int result;
     char *str;
     fmpz_poly_t a;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("get_str....");
-    fflush(stdout);
 
     fmpz_poly_init(a);
 
@@ -66,9 +60,9 @@ main(void)
         fflush(stdout);
         flint_abort();
     }
+
     flint_free(str);
     fmpz_poly_clear(a);
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+
+    TEST_FUNCTION_END(state);
 }

@@ -9,16 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mpoly_scalar_fmma, state)
 {
     slong i, j;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("scalar_fmma....");
-    fflush(stdout);
 
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
@@ -116,9 +112,5 @@ main(void)
         fmpz_clear(b);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "nmod.h"
 #include "dlog.h"
 
@@ -18,14 +19,9 @@
 #define LIM UWORD(1000000000)
 #endif
 
-int main(void)
+TEST_FUNCTION_START(dlog_modpe, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("modpe....");
-    fflush(stdout);
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000; iter++)
     {
@@ -81,8 +77,5 @@ int main(void)
         }
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

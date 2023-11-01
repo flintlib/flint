@@ -9,18 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_mod_mpoly.h"
 #include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mod_mpoly_get_set_term_exp_si, state)
 {
     slong i, j, k;
     int result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("get_set_term_exp_si....");
-    fflush(stdout);
 
     /* check set and get match */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -88,8 +84,5 @@ main(void)
         fmpz_mod_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

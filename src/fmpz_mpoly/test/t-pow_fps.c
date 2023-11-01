@@ -10,10 +10,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
+#include "test_helpers.h"
 #include "fmpz_mpoly_factor.h"
 
-
+/* Defined in t-pow_fps.c and t-pow_ui.c */
+#ifndef fmpz_mpoly_pow_naive
+#define fmpz_mpoly_pow_naive fmpz_mpoly_pow_naive
 void fmpz_mpoly_pow_naive(fmpz_mpoly_t res, fmpz_mpoly_t f,
                                                  slong n, fmpz_mpoly_ctx_t ctx)
 {
@@ -39,15 +41,11 @@ void fmpz_mpoly_pow_naive(fmpz_mpoly_t res, fmpz_mpoly_t f,
       fmpz_mpoly_clear(pow, ctx);
    }
 }
+#endif
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mpoly_pow_fps, state)
 {
     slong i, j, tmul = 5;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("pow_fps....");
-    fflush(stdout);
 
     /* Check pow_fps against pow_naive */
     for (i = 0; i < 10*tmul*flint_test_multiplier(); i++)
@@ -155,9 +153,5 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

@@ -10,20 +10,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_poly_scalar_mul_ui, state)
 {
     int i, result;
     ulong cflags = UWORD(0);
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("scalar_mul_ui....");
-    fflush(stdout);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -132,8 +127,5 @@ main(void)
         fmpq_poly_clear(c);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

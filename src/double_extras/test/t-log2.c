@@ -10,20 +10,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include <float.h>
 #include "ulong_extras.h"
 #include "double_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(d_log2, state)
 {
     double x, res1, res2;
     slong iter;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("log2....");
-    fflush(stdout);
 
     /* check change of base identity */
     for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
@@ -42,8 +37,5 @@ main(void)
         }
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

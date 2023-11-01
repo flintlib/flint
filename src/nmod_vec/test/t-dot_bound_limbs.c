@@ -9,19 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "gmpcompat.h"
 #include "nmod.h"
 #include "nmod_vec.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_vec_dot_bound_limbs, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("dot_bound_limbs....");
-    fflush(stdout);
 
     for (i = 0; i < 100000 * flint_test_multiplier(); i++)
     {
@@ -59,8 +54,5 @@ main(void)
         mpz_clear(t);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

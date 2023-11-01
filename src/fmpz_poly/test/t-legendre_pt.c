@@ -9,17 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_poly.h"
-
-int main(void)
+TEST_FUNCTION_START(fmpz_poly_legendre_pt, state)
 {
     fmpz_poly_t T0, T1, T2, t, tt;
     slong n;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("legendre_pt....");
-    fflush(stdout);
 
     fmpz_poly_init(T0);
     fmpz_poly_init(T1);
@@ -63,7 +58,5 @@ int main(void)
     fmpz_poly_clear(t);
     fmpz_poly_clear(tt);
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

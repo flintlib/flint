@@ -9,10 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 
-void check(ulong n, mp_limb_t ans)
+void check_prime_bounds(ulong n, mp_limb_t ans)
 {
     int ok, reasonable;
     mp_limb_t lo, hi;
@@ -30,42 +30,35 @@ void check(ulong n, mp_limb_t ans)
     flint_abort();
 }
 
-int main(void)
+TEST_FUNCTION_START(n_nth_prime_bounds, state)
 {
     int n;
 
-    FLINT_TEST_INIT(state);
-
-    flint_printf("nth_prime_bounds....");
-    fflush(stdout);
-
     for (n=6; n<7500 * FLINT_MIN(10, flint_test_multiplier()); n++)
     {
-        check(n, n_nth_prime(n));
+        check_prime_bounds(n, n_nth_prime(n));
     }
 
     /* Some known large primes */
-    check(UWORD(10), UWORD(29));
-    check(UWORD(100), UWORD(541));
-    check(UWORD(1000), UWORD(7919));
-    check(UWORD(10000), UWORD(104729));
-    check(UWORD(100000), UWORD(1299709));
-    check(UWORD(1000000), UWORD(15485863));
-    check(UWORD(10000000), UWORD(179424673));
-    check(UWORD(100000000), UWORD(2038074743));
+    check_prime_bounds(UWORD(10), UWORD(29));
+    check_prime_bounds(UWORD(100), UWORD(541));
+    check_prime_bounds(UWORD(1000), UWORD(7919));
+    check_prime_bounds(UWORD(10000), UWORD(104729));
+    check_prime_bounds(UWORD(100000), UWORD(1299709));
+    check_prime_bounds(UWORD(1000000), UWORD(15485863));
+    check_prime_bounds(UWORD(10000000), UWORD(179424673));
+    check_prime_bounds(UWORD(100000000), UWORD(2038074743));
 #if FLINT64
-    check(UWORD(1000000000), UWORD(22801763489));
-    check(UWORD(10000000000), UWORD(252097800623));
-    check(UWORD(100000000000), UWORD(2760727302517));
-    check(UWORD(1000000000000), UWORD(29996224275833));
-    check(UWORD(10000000000000), UWORD(323780508946331));
-    check(UWORD(100000000000000), UWORD(3475385758524527));
-    check(UWORD(1000000000000000), UWORD(37124508045065437));
-    check(UWORD(10000000000000000), UWORD(394906913903735329));
-    check(UWORD(100000000000000000), UWORD(4185296581467695669));
+    check_prime_bounds(UWORD(1000000000), UWORD(22801763489));
+    check_prime_bounds(UWORD(10000000000), UWORD(252097800623));
+    check_prime_bounds(UWORD(100000000000), UWORD(2760727302517));
+    check_prime_bounds(UWORD(1000000000000), UWORD(29996224275833));
+    check_prime_bounds(UWORD(10000000000000), UWORD(323780508946331));
+    check_prime_bounds(UWORD(100000000000000), UWORD(3475385758524527));
+    check_prime_bounds(UWORD(1000000000000000), UWORD(37124508045065437));
+    check_prime_bounds(UWORD(10000000000000000), UWORD(394906913903735329));
+    check_prime_bounds(UWORD(100000000000000000), UWORD(4185296581467695669));
 #endif
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

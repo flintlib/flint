@@ -10,21 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "long_extras.h"
-#include "ulong_extras.h"
 #include "fmpq.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_pow_si, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("pow_si....");
-    fflush(stdout);
-
-
 
     /* Check aliasing of a and b */
     for (i = 0; i < 100000; i++)
@@ -41,8 +33,8 @@ main(void)
 
         e = z_randint(state, 20);
 
-	if (fmpq_is_zero(b) && e < 0)
-	   e = -e;
+        if (fmpq_is_zero(b) && e < 0)
+            e = -e;
 
         fmpq_pow_si(c, b, e);
         fmpq_pow_si(b, b, e);
@@ -78,8 +70,8 @@ main(void)
 
         e = z_randint(state, 20);
 
-	if (fmpq_is_zero(a) &&  e < 0)
-	   e = -e;
+        if (fmpq_is_zero(a) &&  e < 0)
+            e = -e;
 
         fmpq_pow_si(b, a, e);
 
@@ -106,8 +98,5 @@ main(void)
         fmpq_clear(c);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

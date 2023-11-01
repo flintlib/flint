@@ -9,21 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#ifdef T
+#ifdef B
+
+#include "test_helpers.h"
 #include "templates.h"
 
-
-#include "ulong_extras.h"
-#include "long_extras.h"
-
-int
-main(void)
+TEST_TEMPLATE_FUNCTION_START(T, embed_composition_matrix, state)
 {
     int i;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("composition_matrix... ");
-    fflush(stdout);
 
     /* Check that Mat(a^p) = Mat(x^p) * Mat(a) for random a */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -62,7 +56,8 @@ main(void)
         TEMPLATE(T, pow)(a, a, TEMPLATE(T, ctx_prime)(ctx), ctx);
         TEMPLATE(T, embed_composition_matrix)(mat_aq, a, ctx);
 
-        if (!TEMPLATE(B, mat_equal)(res, mat_aq)) {
+        if (!TEMPLATE(B, mat_equal)(res, mat_aq))
+        {
             flint_printf("FAIL:\n\n");
             flint_printf("CTX\n"), TEMPLATE(T, ctx_print)(ctx), flint_printf("\n");
             flint_printf("x^q: "), TEMPLATE(T, print_pretty)(frob, ctx), flint_printf("\n");
@@ -85,7 +80,7 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
+#endif
+#endif

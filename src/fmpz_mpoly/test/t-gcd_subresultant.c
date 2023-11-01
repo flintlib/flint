@@ -9,8 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_mpoly.h"
 
+/* Defined in t-gcd.c, t-gcd_brown.c, t-gcd_cofactors.c, t-gcd_hensel.c,
+ * t-gcd_subresultant.c, t-gcd_zippel2.c */
+#define gcd_check gcd_check_gcd_subresultant
 void gcd_check(
     fmpz_mpoly_t g,
     fmpz_mpoly_t a,
@@ -99,16 +103,10 @@ cleanup:
     fmpz_mpoly_clear(cg, ctx);
 }
 
-
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mpoly_gcd_subresultant, state)
 {
     slong i, j;
     slong tmul = 10;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("gcd_subresultant....");
-    fflush(stdout);
 
     {
         fmpz_mpoly_ctx_t ctx;
@@ -182,9 +180,6 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
-    flint_printf("PASS\n");
-    FLINT_TEST_CLEANUP(state);
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
+#undef gcd_check

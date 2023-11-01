@@ -9,16 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "nmod_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_multi_crt, state)
 {
     slong i, j, k;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("crt....");
-    fflush(stdout);
 
     /* test internal interface */
     {
@@ -429,8 +425,5 @@ main(void)
         nmod_poly_clear(output);
     }
 
-    printf("PASS\n");
-    FLINT_TEST_CLEANUP(state);
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }

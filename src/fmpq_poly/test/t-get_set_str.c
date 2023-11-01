@@ -1,7 +1,7 @@
 /*
-    Copyright (C) 2018 Vincent Delecroix
-    Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2018 Vincent Delecroix
 
     This file is part of FLINT.
 
@@ -11,6 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq_poly.h"
 
 void check_invalid(char * s)
@@ -30,17 +31,10 @@ void check_invalid(char * s)
     fmpq_poly_clear(p);
 }
 
-
-int
-main(void)
+TEST_FUNCTION_START(fmpq_poly_get_set_str, state)
 {
     int i, result;
     ulong cflags = UWORD(0);
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("get_set_str....");
-    fflush(stdout);
 
     /* badly formatted input */
     check_invalid("");
@@ -95,8 +89,5 @@ main(void)
         flint_free(str);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

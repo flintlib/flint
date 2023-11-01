@@ -9,17 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
-
-int main(void)
+TEST_FUNCTION_START(fmpz_gcdinv, state)
 {
    int i, result;
-   FLINT_TEST_INIT(state);
-
-   flint_printf("gcdinv....");
-   fflush(stdout);
 
    /* Test a f == d mod g (specifically d > 1) */
    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -94,8 +89,5 @@ int main(void)
       fmpz_clear(x);
    }
 
-   FLINT_TEST_CLEANUP(state);
-
-   flint_printf("PASS\n");
-   return 0;
+   TEST_FUNCTION_END(state);
 }

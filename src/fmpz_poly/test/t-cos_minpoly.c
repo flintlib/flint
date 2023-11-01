@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "fmpz_poly.h"
-
 
 /*
 Generated with Mathematica:
@@ -51,16 +50,10 @@ static const short testdata[] = {
     -1
 };
 
-
-int main(void)
+TEST_FUNCTION_START(fmpz_poly_cos_minpoly, state)
 {
     fmpz_poly_t p;
     slong n;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("cos_minpoly....");
-    fflush(stdout);
 
     fmpz_poly_init(p);
 
@@ -86,7 +79,5 @@ int main(void)
 
     fmpz_poly_clear(p);
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

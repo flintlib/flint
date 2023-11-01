@@ -11,19 +11,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "d_mat.h"
 #include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(d_mat_entry, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("entry....");
-    fflush(stdout);
 
     /* check if entries are accessed correctly by setting their values
        and then comparing them */
@@ -60,9 +54,5 @@ main(void)
         d_mat_clear(A);
     }
 
-
-
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

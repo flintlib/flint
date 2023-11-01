@@ -9,16 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fq_nmod_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fq_nmod_mpoly_add_sub_fq_nmod, state)
 {
     int i, j, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("add/sub_fq_nmod....");
-    fflush(stdout);
 
     /* Check (f + a) - a = f */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -134,9 +130,5 @@ main(void)
         fq_nmod_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

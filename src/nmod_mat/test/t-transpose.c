@@ -9,18 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
+#include "test_helpers.h"
 #include "nmod_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_mat_transpose, state)
 {
     slong m, n, mod, mod2, rep;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("transpose....");
-    fflush(stdout);
 
     /* Rectangular transpose, same modulus */
     for (rep = 0; rep < 100 * flint_test_multiplier(); rep++)
@@ -121,8 +115,5 @@ main(void)
         nmod_mat_clear(B);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 
 ulong
@@ -27,14 +27,9 @@ n_revbin_naive(ulong n, ulong b)
     return r;
 }
 
-int
-main(void)
+TEST_FUNCTION_START(n_revbin, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("revbin....");
-    fflush(stdout);
 
     /* 0 bits */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -127,8 +122,5 @@ main(void)
         }
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

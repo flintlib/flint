@@ -9,19 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 
-int main(void)
+TEST_FUNCTION_START(n_primes, state)
 {
     slong n;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("primes....");
-    fflush(stdout);
-
-    _flint_rand_init_gmp(state);
 
     /* compare with n_nextprime */
     {
@@ -76,8 +69,5 @@ int main(void)
         n_primes_clear(iter);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

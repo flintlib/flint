@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "arf.h"
 
 int
@@ -27,15 +28,9 @@ arf_addmul_fmpz_naive(arf_t z, const arf_t x, const fmpz_t y, slong prec, arf_rn
     return inexact;
 }
 
-int main(void)
+TEST_FUNCTION_START(arf_addmul_fmpz, state)
 {
     slong iter, iter2;
-    flint_rand_t state;
-
-    flint_printf("addmul_fmpz....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -115,8 +110,5 @@ int main(void)
         arf_clear(v);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

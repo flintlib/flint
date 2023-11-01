@@ -371,9 +371,9 @@ set_target_properties(flint
 
 if(BUILD_TESTING)
     enable_testing()
-    foreach (build_dir IN LISTS BUILD_DIRS CMAKE_CURRENT_SOURCE_DIR)
-        file(GLOB TEST_FILES "${build_dir}/test/*.c*")
-        foreach(test_file IN LISTS TEST_FILES)
+    foreach(build_dir IN LISTS BUILD_DIRS CMAKE_CURRENT_SOURCE_DIR)
+        file(GLOB test_file "${build_dir}/test/main.c")
+        if(test_file)
             file(RELATIVE_PATH test_name ${CMAKE_CURRENT_SOURCE_DIR} ${test_file})
             string(REPLACE "/" "-" test_name ${test_name})
             get_filename_component(test_name ${test_name} NAME_WE)
@@ -391,7 +391,7 @@ if(BUILD_TESTING)
                 LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
                 RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin"
             )
-        endforeach()
+        endif()
     endforeach ()
 
     if(WITH_NTL)

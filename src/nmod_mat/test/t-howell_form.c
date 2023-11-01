@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "perm.h"
 #include "nmod.h"
 #include "nmod_vec.h"
@@ -50,7 +51,6 @@ nmod_mat_is_in_howell_form(const nmod_mat_t A)
     {
         prevrowzero = 1;
     }
-
 
     for (i = 1; i < A->r; i++)
     {
@@ -143,14 +143,9 @@ nmod_mat_is_in_howell_form(const nmod_mat_t A)
     return 1;
 }
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_mat_howell_form, state)
 {
     slong i;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("howell_form....");
 
     for (i = 0; i < 10000*flint_test_multiplier(); i++)
     {
@@ -176,7 +171,6 @@ main(void)
 
         r1 = nmod_mat_howell_form(B);
 
-
         if (!nmod_mat_is_in_howell_form(B))
         {
             flint_printf("FAIL (malformed Howell form)\n");
@@ -185,7 +179,6 @@ main(void)
             fflush(stdout);
             flint_abort();
         }
-
 
         _perm_randtest(perm, 2 * m, state);
 
@@ -240,9 +233,5 @@ main(void)
         nmod_mat_clear(D);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

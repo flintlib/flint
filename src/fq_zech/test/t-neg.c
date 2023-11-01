@@ -9,17 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fq_zech.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fq_zech_neg, state)
 {
     int i, j, result;
     fq_zech_ctx_t ctx;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("neg... ");
-    fflush(stdout);
 
     for (j = 0; j < 10; j++)
     {
@@ -98,7 +94,5 @@ main(void)
         fq_zech_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

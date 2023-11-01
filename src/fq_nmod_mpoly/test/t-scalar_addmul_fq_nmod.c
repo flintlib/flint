@@ -9,16 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fq_nmod_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fq_nmod_mpoly_scalar_addmul_fq_nmod, state)
 {
     slong i, j;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("scalar_addmul_fq_nmod....");
-    fflush(stdout);
 
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
@@ -97,9 +93,5 @@ main(void)
         fq_nmod_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

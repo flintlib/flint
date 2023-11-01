@@ -9,20 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
+#include "test_helpers.h"
 #include "fmpq.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_next_minimal, state)
 {
     slong i;
     fmpq_t r, ans;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("next_minimal....");
-    fflush(stdout);
 
     fmpq_init(r);
     fmpq_init(ans);
@@ -58,7 +51,6 @@ main(void)
         fflush(stdout);
         flint_abort();
     }
-
 
     fmpz_set_str(fmpq_numref(r), "36893488147419102231", 10);
     fmpz_set_str(fmpq_denref(r), "36893488147419103232", 10);
@@ -96,11 +88,8 @@ main(void)
         flint_abort();
     }
 
-
     fmpq_clear(r);
     fmpq_clear(ans);
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

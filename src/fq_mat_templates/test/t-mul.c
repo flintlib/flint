@@ -13,17 +13,12 @@
 
 #ifdef T
 
+#include "test_helpers.h"
 #include "templates.h"
 
-
-int
-main(void)
+TEST_TEMPLATE_FUNCTION_START(T, mat_mul, state)
 {
     slong i;
-    FLINT_TEST_INIT(state);
-
-    printf("mul....");
-    fflush(stdout);
 
     /* Check aliasing C and A */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -133,7 +128,7 @@ main(void)
 
         TEMPLATE(T, ctx_randtest) (ctx, state);
 
-	TEMPLATE(T, mat_init)(A, 2, 2, ctx);
+        TEMPLATE(T, mat_init)(A, 2, 2, ctx);
         TEMPLATE(T, mat_init)(B, 2, 2, ctx);
 
         TEMPLATE(T, mat_window_init)(A_window, A, 0, 0, 2, 2, ctx);
@@ -160,10 +155,6 @@ main(void)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
-
 #endif

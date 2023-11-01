@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "calcium.h"
 #include "fexpr.h"
 #include "fexpr_builtin.h"
@@ -19,15 +20,8 @@
 # include <string.h>
 #endif
 
-int main(void)
+TEST_FUNCTION_START(fexpr_builtins, state)
 {
-    flint_rand_t state;
-
-    flint_printf("builtins...");
-    fflush(stdout);
-
-    flint_randinit(state);
-
     {
         slong i, j;
 
@@ -67,8 +61,5 @@ int main(void)
         flint_abort();
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

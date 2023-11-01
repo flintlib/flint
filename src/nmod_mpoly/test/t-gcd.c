@@ -9,10 +9,20 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "nmod_mpoly.h"
 
-void gcd_check(nmod_mpoly_t g, nmod_mpoly_t a, nmod_mpoly_t b,
-                     nmod_mpoly_ctx_t ctx, slong i, slong j, const char * name)
+/* Defined in t-gcd.c, t-gcd_brown.c, t-gcd_cofactors.c, t-gcd_hensel.c,
+ * t-gcd_zippel2.c and t-gcd_zippel.c */
+#define gcd_check gcd_check_gcd
+void gcd_check(
+    nmod_mpoly_t g,
+    nmod_mpoly_t a,
+    nmod_mpoly_t b,
+    nmod_mpoly_ctx_t ctx,
+    slong i,
+    slong j,
+    const char * name)
 {
     nmod_mpoly_t ca, cb, cg;
 
@@ -110,15 +120,10 @@ cleanup:
     nmod_mpoly_clear(cg, ctx);
 }
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_mpoly_gcd, state)
 {
     const slong max_threads = 5;
     slong i, j, k, tmul = 5;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("gcd....");
-    fflush(stdout);
 
     {
         nmod_mpoly_ctx_t ctx;
@@ -856,8 +861,6 @@ main(void)
         nmod_mpoly_ctx_clear(ctx);
     }
 
-    printf("PASS\n");
-    FLINT_TEST_CLEANUP(state);
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }
+#undef gcd_check

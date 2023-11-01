@@ -9,21 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_powers_mod_bsgs, state)
 {
 #if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     int i, result, max_threads = 5;
-#endif
-    FLINT_TEST_INIT(state);
 
-    flint_printf("powers_mod_bsgs....");
-    fflush(stdout);
-
-#if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     /* Compare with powmod */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -94,14 +88,8 @@ main(void)
 	flint_free(res);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
+    TEST_FUNCTION_END(state);
 #else
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("SKIPPED\n");
+    TEST_FUNCTION_END_SKIPPED(state);
 #endif
-
-    return 0;
 }

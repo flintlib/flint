@@ -9,18 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_mat.h"
 
 #define FMPZ_MAT_CHOL_EPS (1.0E-9)
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mat_chol_d, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("chol_d....");
-    fflush(stdout);
 
     /* check RR^T = A */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -72,8 +68,5 @@ main(void)
         d_mat_clear(Btmp);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_vec.h"
 #include "fmpq.h"
 
@@ -71,16 +72,11 @@ static const slong testdata[][4] =
     {0, 0, 0, 0}
 };
 
-int main(void)
+TEST_FUNCTION_START(fmpq_dedekind_sum, state)
 {
     fmpz_t hh, kk;
     fmpq_t s1, s2;
     slong i, h, k;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("dedekind_sum....");
-    fflush(stdout);
 
     fmpz_init(hh);
     fmpz_init(kk);
@@ -152,7 +148,6 @@ int main(void)
         fflush(stdout);
         flint_abort();
     }
-
 
     /* check reciprocity law  12*b*c(S(b,c) + S(c,b)) = (b - c)^2 - b*c + 1 */
     for (i = 0; i < 500*flint_test_multiplier(); i++)
@@ -242,8 +237,5 @@ int main(void)
     fmpq_clear(s1);
     fmpq_clear(s2);
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

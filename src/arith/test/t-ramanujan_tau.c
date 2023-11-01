@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "arith.h"
@@ -75,12 +76,8 @@ void consistency_check(slong n)
     fmpz_poly_clear(p);
 }
 
-int main(void)
+TEST_FUNCTION_START(arith_ramanujan_tau, state)
 {
-    FLINT_TEST_INIT(state);
-
-    flint_printf("ramanujan_tau....");
-    fflush(stdout);
 
     check_value(0, "0");
     check_value(1, "1");
@@ -153,7 +150,5 @@ int main(void)
     consistency_check(11);
     consistency_check(100);
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

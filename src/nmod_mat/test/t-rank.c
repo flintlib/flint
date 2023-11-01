@@ -9,20 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "nmod_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_mat_rank, state)
 {
     nmod_mat_t A;
     slong i, m, n, d, r;
     mp_limb_t mod;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("rank....");
-    fflush(stdout);
 
     /* Maximally sparse matrices of given rank */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -75,8 +70,5 @@ main(void)
         }
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

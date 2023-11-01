@@ -9,19 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq.h"
 #include "fmpq_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_mat_trace, state)
 {
     slong i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("trace....");
-    fflush(stdout);
-
-
 
     /* Test trace(AB) = trace(BA) */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -71,8 +65,5 @@ main(void)
         fmpq_clear(trba);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

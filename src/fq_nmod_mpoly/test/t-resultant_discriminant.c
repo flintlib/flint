@@ -9,17 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fq_nmod_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fq_nmod_mpoly_resultant_discriminant, state)
 {
     slong i, j;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("resultant_discriminant....");
-    fflush(stdout);
 
     /* Check quadratic polynomial */
     {
@@ -247,9 +242,5 @@ main(void)
         fq_nmod_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

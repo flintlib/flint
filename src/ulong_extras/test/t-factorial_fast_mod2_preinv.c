@@ -9,10 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 
-
+#ifndef n_factorial_mod2_foolproof
+#define n_factorial_mod2_foolproof n_factorial_mod2_foolproof
 static mp_limb_t
 n_factorial_mod2_foolproof(ulong n, mp_limb_t p, mp_limb_t pinv)
 {
@@ -26,16 +27,12 @@ n_factorial_mod2_foolproof(ulong n, mp_limb_t p, mp_limb_t pinv)
 
     return prod;
 }
+#endif
 
-int main(void)
+TEST_FUNCTION_START(n_factorial_fast_mod2_preinv, state)
 {
     mp_limb_t n;
     int j;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("factorial_fast_mod2_preinv....");
-    fflush(stdout);
 
     for (n = 0; n < 100 * flint_test_multiplier(); n++)
     {
@@ -58,8 +55,5 @@ int main(void)
         }
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

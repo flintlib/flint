@@ -14,18 +14,13 @@
 
 ******************************************************************************/
 
+#include "test_helpers.h"
 #include "qfb.h"
 
-int main(void)
+TEST_FUNCTION_START(qfb_inverse, state)
 {
     int result;
-    flint_rand_t state;
     slong i;
-
-    printf("inverse....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (i = 1; i < 100000; i++)
     {
@@ -73,8 +68,5 @@ int main(void)
         qfb_clear(t);
     }
 
-    flint_randclear(state);
-    _fmpz_cleanup();
-    printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

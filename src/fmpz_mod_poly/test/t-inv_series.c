@@ -10,18 +10,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mod_poly_inv_series, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("inv_series_newton....");
-    fflush(stdout);
 
     /* Check Q^{-1} * Q is congruent 1 mod t^n */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -80,9 +76,5 @@ main(void)
         fmpz_mod_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

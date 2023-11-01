@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
@@ -52,19 +53,12 @@ check_rref(fmpz_mat_t A)
     }
 }
 
-
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mat_rref_mod, state)
 {
     fmpz_mat_t A;
     fmpz_t p;
     slong i, j, k, m, n, b, d, r, rank;
     slong *perm;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("rref_mod....");
-    fflush(stdout);
 
     /* Maximally sparse matrices of given rank */
     for (i = 0; i < 10000; i++)
@@ -150,8 +144,5 @@ main(void)
         flint_free(perm);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

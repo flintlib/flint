@@ -10,24 +10,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "thread_support.h"
-#include "ulong_extras.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "nmod_poly_factor.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_factor_interval_threaded, state)
 {
 #if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     int iter;
-#endif
-    FLINT_TEST_INIT(state);
 
-    flint_printf("interval_threaded....");
-    fflush(stdout);
-
-#if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     for (iter = 0; iter < 20*flint_test_multiplier(); iter++)
     {
         nmod_poly_t a, b, c, cinv, d;
@@ -153,15 +146,8 @@ main(void)
         flint_free(args1);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
+    TEST_FUNCTION_END(state);
 #else
-   FLINT_TEST_CLEANUP(state);
-
-   flint_printf("SKIPPED\n");
+    TEST_FUNCTION_END_SKIPPED(state);
 #endif
-
-   return 0;
 }
-

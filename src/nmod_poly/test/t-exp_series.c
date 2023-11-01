@@ -10,18 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_exp_series, state)
 {
     int i, result = 1;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("exp_series....");
-    fflush(stdout);
 
     /* Check exp(A+B) = exp(A) * exp(B) */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -129,8 +124,5 @@ main(void)
         nmod_poly_clear(B);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

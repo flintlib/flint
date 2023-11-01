@@ -9,21 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
+#include "test_helpers.h"
 #include "arb.h"
 
-int main(void)
+TEST_FUNCTION_START(mag_dump_file, state)
 {
-    flint_rand_t state;
     slong iter;
-
-    flint_printf("dump_file/load_file....");
-    fflush(stdout);
-    flint_randinit(state);
 
 /* assume tmpfile() is broken on windows */
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
-
     /* just test no crashing... */
     for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -88,11 +82,7 @@ int main(void)
         mag_clear(y);
         mag_clear(z);
     }
-
 #endif
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -9,17 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_poly.h"
 #include "fmpq.h"
 #include "fmpq_vec.h"
 
-int main(void)
+TEST_FUNCTION_START(fmpz_poly_num_real_roots_sturm, state)
 {
     int iter;
-
-    FLINT_TEST_INIT(state);
-
-    printf("num_real_roots_sturm....");
 
     /* call with random nonzero polynomials */
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
@@ -95,8 +92,5 @@ int main(void)
         fmpz_poly_clear(q);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

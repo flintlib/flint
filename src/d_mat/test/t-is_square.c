@@ -10,19 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "d_mat.h"
 #include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(d_mat_is_square, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("is_square....");
-    fflush(stdout);
 
     /* check if a non-zero value is returned for non-square matrices */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -42,9 +36,5 @@ main(void)
         d_mat_clear(A);
     }
 
-
-
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

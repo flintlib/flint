@@ -9,17 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "arf.h"
 
-int main(void)
+TEST_FUNCTION_START(arf_set_fmpz_2exp, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("set_fmpz_2exp....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* test exact roundtrip R -> Q -> R */
     for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
@@ -58,8 +53,5 @@ int main(void)
         fmpz_clear(e);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

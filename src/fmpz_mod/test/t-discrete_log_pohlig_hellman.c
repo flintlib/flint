@@ -9,20 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_mod.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mod_discrete_log_pohlig_hellman, state)
 {
     slong i, j, k;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("discrete_log_pohlig_hellman....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* check random word-sized primes */
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
@@ -155,8 +149,5 @@ main(void)
         fmpz_mod_discrete_log_pohlig_hellman_clear(L);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

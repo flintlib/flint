@@ -9,18 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "nmod.h"
 #include "nmod_vec.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_vec_scalar_mul_nmod, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("scalar_mul_nmod....");
-    fflush(stdout);
 
     {
         nmod_t mod;
@@ -66,8 +61,5 @@ main(void)
         _nmod_vec_clear(vec3);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

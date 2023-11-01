@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "thread_support.h"
 #include "fmpz.h"
 
@@ -81,14 +82,9 @@ bsplit_product(fmpz_t r, mp_srcptr factors, slong len, slong thread_limit, int f
     *r = res.r;
 }
 
-int
-main(void)
+TEST_FUNCTION_START(thread_support_parallel_binary_splitting, state)
 {
     slong iter;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("parallel_binary_splitting....");
-    fflush(stdout);
 
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
@@ -131,9 +127,5 @@ main(void)
         fmpz_clear(s);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

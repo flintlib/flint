@@ -9,28 +9,24 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "d_vec.h"
-#include "fmpz_vec.h"
-#include "fmpz_mat.h"
-#include "fmpz_lll.h"
-
 #ifdef __GNUC__
 # define fabs __builtin_fabs
 #else
 # include <math.h>
 #endif
 
+#include "test_helpers.h"
+#include "d_vec.h"
+#include "fmpz_vec.h"
+#include "fmpz_mat.h"
+#include "fmpz_lll.h"
+
 #define FMPZ_LLL_HD_EPS (1.0E-9)
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_lll_heuristic_dot, state)
 {
     int i;
     fmpz_mat_t B;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("heuristic_dot....");
-    fflush(stdout);
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -80,8 +76,5 @@ main(void)
         fmpz_mat_clear(B);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -10,19 +10,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
 #include "fmpq_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_mat_solve_fmpz_mat_dixon, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("solve_fmpz_mat_dixon....");
-    fflush(stdout);
 
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
@@ -116,9 +111,5 @@ main(void)
         fmpq_mat_clear(X);
     }
 
-
-
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

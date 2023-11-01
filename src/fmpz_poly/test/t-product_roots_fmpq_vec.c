@@ -9,17 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_poly.h"
 #include "fmpq.h"
 #include "fmpq_vec.h"
 
-int main(void)
+TEST_FUNCTION_START(fmpz_poly_product_roots_fmpq_vec, state)
 {
     slong iter;
-
-    FLINT_TEST_INIT(state);
-
-    printf("product_roots_fmpq_vec....");
 
     for (iter = 0; iter < 100; iter++)
     {
@@ -69,8 +66,5 @@ int main(void)
         fmpz_poly_clear(p);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_poly.h"
 #include "fmpz_mpoly.h"
 
@@ -64,14 +65,9 @@ void test_resultant(
     fmpz_clear(r);
 }
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mpoly_univar_resultant, state)
 {
     slong i, j;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("univar_resultant....");
-    fflush(stdout);
 
     {
         fmpz_mpoly_ctx_t ctx;
@@ -178,9 +174,5 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

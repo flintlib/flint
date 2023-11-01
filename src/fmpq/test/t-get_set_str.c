@@ -12,9 +12,7 @@
 */
 
 #include <string.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
+#include "test_helpers.h"
 #include "fmpq.h"
 
 void check_invalid(char * s, int b)
@@ -34,14 +32,9 @@ void check_invalid(char * s, int b)
     fmpq_clear(r);
 }
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_get_set_str, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("get_str....");
-    fflush(stdout);
 
     check_invalid("x5/3", 6);
     check_invalid("5x/3", 6);
@@ -95,9 +88,5 @@ main(void)
         mpq_clear(b);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

@@ -9,21 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_poly_power_sums, state)
 {
     int i, j, k, l, result;
     fmpz_t il, jl, kl, tot;
     slong n;
     fmpz_poly_t a, b, c, d, e, f;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("power_sums....");
 
     /* Check that it is valid in degree 3 with integer roots, ie */
     /* for polynomials of the form (x-i)(x-j)(x-k)               */
@@ -210,8 +205,5 @@ main(void)
         fmpz_poly_clear(f);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

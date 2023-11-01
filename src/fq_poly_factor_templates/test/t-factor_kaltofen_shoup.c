@@ -16,17 +16,12 @@
 
 #ifdef T
 
+#include "test_helpers.h"
 #include "templates.h"
 
-#include "ulong_extras.h"
-int
-main(void)
+TEST_TEMPLATE_FUNCTION_START(T, poly_factor_kaltofen_shoup, state)
 {
     int iter;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("factor_kaltofen_shoup....");
-    fflush(stdout);
 
     for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
@@ -137,10 +132,6 @@ main(void)
         TEMPLATE(T, poly_factor_clear) (res, ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
-
 #endif

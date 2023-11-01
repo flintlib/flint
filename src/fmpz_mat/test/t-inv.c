@@ -9,21 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mat_inv, state)
 {
     fmpz_mat_t A, B, C, I;
     fmpz_t den;
     slong i, j, m, r;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("inv....");
-    fflush(stdout);
 
     {
         fmpz_t d;
@@ -145,8 +140,5 @@ main(void)
         fmpz_clear(den);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

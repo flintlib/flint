@@ -12,20 +12,12 @@
 
 #ifdef T
 
+#include "test_helpers.h"
 #include "templates.h"
 
-#include "flint.h"
-#include "fmpz.h"
-#include "ulong_extras.h"
-
-int
-main(void)
+TEST_TEMPLATE_FUNCTION_START(T, mat_equal, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-    printf("equal....");
-    fflush(stdout);
 
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
@@ -89,10 +81,6 @@ main(void)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
-
 #endif

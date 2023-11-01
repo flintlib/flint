@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2011, 2010 Sebastian Pancratz
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010, 2011 Sebastian Pancratz
 
     This file is part of FLINT.
 
@@ -10,20 +10,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mod_poly_evaluate_fmpz, state)
 {
     int i, result;
     fmpz_mod_ctx_t ctx;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("evaluate_fmpz....");
-    fflush(stdout);
 
     fmpz_mod_ctx_init_ui(ctx, 2);
 
@@ -111,9 +107,6 @@ main(void)
     }
 
     fmpz_mod_ctx_clear(ctx);
-    FLINT_TEST_CLEANUP(state);
 
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

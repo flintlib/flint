@@ -9,18 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "nmod_mpoly.h"
 
-
-int
-main(void)
+TEST_FUNCTION_START(nmod_mpoly_inflate_deflate, state)
 {
     int i, j, success;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("inflate_deflate....");
-    fflush(stdout);
 
     /* Check deflate undoes inflate */
     for (i = 0; i < 40 * flint_test_multiplier(); i++)
@@ -206,9 +200,5 @@ main(void)
         nmod_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

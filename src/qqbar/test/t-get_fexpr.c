@@ -9,18 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fexpr.h"
 #include "qqbar.h"
 
-int main(void)
+TEST_FUNCTION_START(qqbar_get_fexpr, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("get_fexpr....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -83,15 +78,10 @@ int main(void)
             flint_abort();
         }
 
-
         qqbar_clear(x);
         qqbar_clear(y);
         fexpr_clear(e);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

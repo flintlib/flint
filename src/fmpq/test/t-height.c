@@ -9,18 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
+#include "test_helpers.h"
 #include "fmpq.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_height, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("height....");
-    fflush(stdout);
 
     for (i = 0; i < 10000; i++)
     {
@@ -49,7 +43,5 @@ main(void)
         fmpz_clear(h);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

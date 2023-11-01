@@ -9,15 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_poly.h"
-
-int main(void)
+TEST_FUNCTION_START(fmpz_poly_remove_content_2exp, state)
 {
     int iter;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("remove_content_2exp....");
-    fflush(stdout);
 
     for (iter = 0; iter < 1000; iter++)
     {
@@ -58,8 +54,5 @@ int main(void)
         fmpz_poly_clear(g3);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -9,16 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "nmod_vec.h"
 #include "aprcl.h"
 
-int main(void)
+TEST_FUNCTION_START(aprcl_f_table, state)
 {
     int i, j;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("f_table....");
-    fflush(stdout);
 
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
@@ -52,9 +49,5 @@ int main(void)
         _nmod_vec_clear(table);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

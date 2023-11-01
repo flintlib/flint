@@ -9,19 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "long_extras.h"
 #include "fmpz.h"
 
-int main(void)
+TEST_FUNCTION_START(fmpz_init_set_readonly, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("init_set_readonly....");
-    fflush(stdout);
-
-
 
     /* Create some small fmpz integers, clear the mpz_t */
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
@@ -98,8 +92,5 @@ int main(void)
         mpz_clear(z);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

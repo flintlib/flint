@@ -10,19 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq.h"
 #include "fmpq_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_poly_evaluate_fmpq, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("evaluate_fmpq....");
-    fflush(stdout);
-
-
 
     /* Check aliasing */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -158,8 +152,5 @@ main(void)
         fmpq_poly_clear(g);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

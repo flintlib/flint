@@ -9,10 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "gmpcompat.h"
 #include "fmpz.h"
 #include "fmpz_factor.h"
 
+/* Defined in t-factor.c and t-factor_trial.c */
+#define check check_factor_trial
 void check(fmpz_t n)
 {
     fmpz_factor_t factor, factor2;
@@ -92,15 +95,11 @@ void check(fmpz_t n)
     fmpz_factor_clear(factor2);
 }
 
-int main(void)
+TEST_FUNCTION_START(fmpz_factor_trial, state)
 {
     int i, j;
     fmpz_t x;
     mpz_t y1;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("factor_trial....");
-    fflush(stdout);
 
     fmpz_init(x);
     mpz_init(y1);
@@ -179,11 +178,8 @@ int main(void)
         fmpz_factor_clear(fac);
     }
 
-
     fmpz_clear(x);
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
+#undef check

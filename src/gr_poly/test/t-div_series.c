@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "gr_poly.h"
 
@@ -103,7 +104,6 @@ test_div_series(flint_rand_t state, int which)
             status |= gr_poly_div_series_divconquer(C, A, C, n, n_randint(state, 20), ctx);
             break;
 
-
         default:
             flint_abort();
     }
@@ -138,23 +138,14 @@ test_div_series(flint_rand_t state, int which)
     return status;
 }
 
-int main(void)
+TEST_FUNCTION_START(gr_poly_div_series, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("div_series....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 10000; iter++)
     {
         test_div_series(state, n_randint(state, 15));
     }
 
-    flint_randclear(state);
-    flint_cleanup_master();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -9,33 +9,24 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "padic.h"
 
+/* Defined in t-log.c, t-log_balanced.c, t-log_rectangular.c, t-log_satoh.c */
+#ifndef __rand_prec
+#define __rand_prec __rand_prec
 /*
     Set-up.  Currently we only test the logarithm for positive values of N.
     This is important as for negative N, exp(0) is 1, which is 0 mod p^N,
     and then log(0) does not converge.
  */
-static slong __rand_prec(flint_rand_t state, slong i)
-{
-    slong N;
+static slong __rand_prec(flint_rand_t state, slong i) { return n_randint(state, PADIC_TEST_PREC_MAX) + 1; }
+#endif
 
-    N = n_randint(state, PADIC_TEST_PREC_MAX) + 1;
-
-    return N;
-}
-
-int
-main(void)
+TEST_FUNCTION_START(padic_log_rectangular, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("log_rectangular... ");
-    fflush(stdout);
-
-
 
 /** p == 2 *******************************************************************/
 
@@ -343,9 +334,5 @@ main(void)
         padic_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

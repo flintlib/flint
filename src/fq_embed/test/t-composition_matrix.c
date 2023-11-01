@@ -9,19 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_mod_mat.h"
 #include "fq.h"
 #include "fq_embed.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fq_embed_composition_matrix, state)
 {
     int i;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("composition_matrix... ");
-    fflush(stdout);
 
     /* Check that Mat(a^p) = Mat(x^p) * Mat(a) for random a */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -81,8 +76,5 @@ main(void)
         fq_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

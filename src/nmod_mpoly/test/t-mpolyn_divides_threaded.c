@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "thread_support.h"
 #include "nmod_mpoly.h"
 
@@ -126,18 +127,12 @@ cleanup:
     flint_free(stride);
 }
 
-
-int
-main(void)
+TEST_FUNCTION_START(nmod_mpoly_mpolyn_divides_threaded, state)
 {
     slong i, j, max_threads = 5, tmul = 50;
-    FLINT_TEST_INIT(state);
 #ifdef _WIN32
     tmul = 2;
 #endif
-
-    flint_printf("mpolyn_divides_threaded....");
-    fflush(stdout);
 
     /* Check (a*b)/b = a */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
@@ -226,9 +221,5 @@ main(void)
         nmod_mpoly_ctx_clear(ctx);
     }
 
-    printf("PASS\n");
-    FLINT_TEST_CLEANUP(state);
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

@@ -9,22 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpq.h"
-#include "fmpz_vec.h"
-#include "ulong_extras.h"
+#include "test_helpers.h"
 #include "long_extras.h"
+#include "fmpq.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_set_si, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("set_si....");
-    fflush(stdout);
 
     for (i = 0; i < 10000; i++)
     {
@@ -63,9 +54,5 @@ main(void)
         fmpz_clear(q);
     }
 
-
-
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

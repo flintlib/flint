@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2009 William Hart
-    Copyright (C) 2011, 2010 Sebastian Pancratz
+    Copyright (C) 2010, 2011 Sebastian Pancratz
     Copyright (C) 2012 Lina Kulakova
     Copyright (C) 2013 Mike Hansen
 
@@ -14,19 +14,12 @@
 
 #ifdef T
 
+#include "test_helpers.h"
 #include "templates.h"
 
-#include "flint.h"
-#include "fmpz.h"
-#include "ulong_extras.h"
-int
-main(void)
+TEST_TEMPLATE_FUNCTION_START(T, poly_mulmod, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("mulmod....");
-    fflush(stdout);
 
     /* Check aliasing of res and a */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -215,10 +208,6 @@ main(void)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
-
 #endif

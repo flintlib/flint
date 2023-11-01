@@ -9,18 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_multi_CRT_multi_mod, state)
 {
     slong i, j, k;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("multi_CRT/multi_mod....");
-    fflush(stdout);
 
     /* test internal interface */
     {
@@ -318,8 +314,5 @@ main(void)
         fmpz_clear(output);
     }
 
-    printf("PASS\n");
-    FLINT_TEST_CLEANUP(state);
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }

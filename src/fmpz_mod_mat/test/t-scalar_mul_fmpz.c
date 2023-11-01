@@ -9,19 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_mod_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mod_mat_scalar_mul_fmpz, state)
 {
     slong m, n, rep;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("scalar_mul_fmpz....");
-    fflush(stdout);
 
     for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
     {
@@ -31,10 +25,10 @@ main(void)
         m = n_randint(state, 20);
         n = n_randint(state, 20);
 
-	fmpz_init(c);
-	fmpz_init(c1);
-	fmpz_init(mod);
-	fmpz_randtest_not_zero(mod, state, 200);
+        fmpz_init(c);
+        fmpz_init(c1);
+        fmpz_init(mod);
+        fmpz_randtest_not_zero(mod, state, 200);
         fmpz_abs(mod, mod);
 
         fmpz_randtest(c, state, 200);
@@ -48,8 +42,8 @@ main(void)
         fmpz_mod_mat_randtest(B, state);
 
         fmpz_mod_mat_scalar_mul_fmpz(C, A, c);
-	fmpz_set(c1, c);
-	fmpz_sub_ui(c1, c1, 1);
+        fmpz_set(c1, c);
+        fmpz_sub_ui(c1, c1, 1);
         fmpz_mod_mat_scalar_mul_fmpz(D, A, c1);
 
         /* c*A - (c-1)*A == A */
@@ -77,13 +71,10 @@ main(void)
         fmpz_mod_mat_clear(B);
         fmpz_mod_mat_clear(C);
         fmpz_mod_mat_clear(D);
-	fmpz_clear(mod);
-	fmpz_clear(c1);
-	fmpz_clear(c);
+        fmpz_clear(mod);
+        fmpz_clear(c1);
+        fmpz_clear(c);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

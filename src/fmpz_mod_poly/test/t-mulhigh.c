@@ -14,13 +14,9 @@
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 
-int main(void)
+TEST_FUNCTION_START(fmpz_mod_poly_mulhigh, state)
 {
     slong i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("mulhigh....");
-    fflush(stdout);
 
     /* Compare with left truncated product of a and b */
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
@@ -59,9 +55,5 @@ int main(void)
         fmpz_mod_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

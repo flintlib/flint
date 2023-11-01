@@ -9,16 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_default_mat.h"
 #include "test_helpers.h"
+#include "fq_default_mat.h"
 
-int main(void)
+TEST_FUNCTION_START(fq_default_mat_inlines, state)
 {
     slong i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("inlines....");
-    fflush(stdout);
 
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
@@ -77,8 +73,5 @@ int main(void)
         fmpz_clear(p);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-        return 0;
+    TEST_FUNCTION_END(state);
 }

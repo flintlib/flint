@@ -9,19 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_sqrt, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("sqrt... ");
-    fflush(stdout);
-
-
 
     /* Test aliasing */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
@@ -139,8 +133,5 @@ main(void)
         nmod_poly_clear(c);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -9,10 +9,20 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "nmod_mpoly_factor.h"
 
+/* Defined in t-factor.c, t-factor_wang.c, t-factor_zassenhaus.c and
+ * t-factor_zippel.c */
+#ifndef check_omega
+#define check_omega check_omega
 /* check total number of factors with multiplicity is between lower and upper */
-void check_omega(slong lower, slong upper, const nmod_mpoly_t p, const nmod_mpoly_ctx_t ctx)
+void check_omega(
+    slong lower,
+    slong upper,
+    const nmod_mpoly_t p,
+    const nmod_mpoly_ctx_t ctx,
+    int (* factor_fun)(nmod_mpoly_factor_t, const nmod_mpoly_t, const nmod_mpoly_ctx_t))
 {
     slong i;
     nmod_mpoly_t q;
@@ -24,18 +34,21 @@ void check_omega(slong lower, slong upper, const nmod_mpoly_t p, const nmod_mpol
     nmod_mpoly_factor_init(h, ctx);
     nmod_mpoly_init(q, ctx);
 
-    if (!nmod_mpoly_factor_zippel(g, p, ctx))
+    if (!factor_fun(g, p, ctx))
     {
-        flint_printf("FAIL:\nfactorization could be computed\n");
+        flint_printf("FAIL:\nfactorization 1 could be computed\n");
         fflush(stdout);
         flint_abort();
     }
 
-    if (!nmod_mpoly_factor(h, p, ctx))
+    if (factor_fun != nmod_mpoly_factor)
     {
-        flint_printf("FAIL:\nfactorization 2 could be computed\n");
-        fflush(stdout);
-        flint_abort();
+        if (!nmod_mpoly_factor(h, p, ctx))
+        {
+            flint_printf("FAIL:\nfactorization 2 could be computed\n");
+            fflush(stdout);
+            flint_abort();
+        }
     }
 
     for (i = 0; i < g->num; i++)
@@ -67,13 +80,16 @@ void check_omega(slong lower, slong upper, const nmod_mpoly_t p, const nmod_mpol
         flint_abort();
     }
 
-    nmod_mpoly_factor_sort(g, ctx);
-    nmod_mpoly_factor_sort(h, ctx);
-    if (nmod_mpoly_factor_cmp(g, h, ctx) != 0)
+    if (factor_fun != nmod_mpoly_factor)
     {
-        flint_printf("FAIL:\nfactorizations do not match\n");
-        fflush(stdout);
-        flint_abort();
+        nmod_mpoly_factor_sort(g, ctx);
+        nmod_mpoly_factor_sort(h, ctx);
+        if (nmod_mpoly_factor_cmp(g, h, ctx) != 0)
+        {
+            flint_printf("FAIL:\nfactorizations do not match\n");
+            fflush(stdout);
+            flint_abort();
+        }
     }
 
     for (i = 0; i < g->num; i++)
@@ -92,16 +108,11 @@ void check_omega(slong lower, slong upper, const nmod_mpoly_t p, const nmod_mpol
     nmod_mpoly_factor_clear(h, ctx);
     fmpz_clear(omega);
 }
+#endif
 
-
-int
-main(void)
+TEST_FUNCTION_START(nmod_mpoly_factor_zippel, state)
 {
     slong i, j, tmul = 30;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("factor_zippel....");
-    fflush(stdout);
 
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
@@ -142,15 +153,12 @@ main(void)
             nmod_mpoly_mul(a, a, t, ctx);
         }
 
-        check_omega(lower, WORD_MAX, a, ctx);
+        check_omega(lower, WORD_MAX, a, ctx, nmod_mpoly_factor_zippel);
 
         nmod_mpoly_clear(t, ctx);
         nmod_mpoly_clear(a, ctx);
         nmod_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

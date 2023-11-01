@@ -14,19 +14,13 @@
 
 ******************************************************************************/
 
+#include "test_helpers.h"
 #include "nf.h"
 #include "nf_elem.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nf_elem_norm_div, state)
 {
     int i, result;
-    flint_rand_t state;
-
-    flint_printf("norm_div....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
@@ -111,7 +105,5 @@ main(void)
         fmpz_poly_clear(pol2);
     }
 
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

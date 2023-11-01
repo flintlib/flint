@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
     This file is part of FLINT.
 
@@ -10,18 +10,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_poly_init_realloc_clear, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("init/init2/realloc/clear....");
-    fflush(stdout);
-
-
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -49,8 +43,5 @@ main(void)
         fmpq_poly_clear(a);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

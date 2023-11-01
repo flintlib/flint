@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "thread_pool.h"
 #include "fmpz.h"
 
@@ -87,7 +88,6 @@ void test1(fmpz_t x, ulong n)
     flint_free(handles);
 }
 
-
 /******************************************************************************
     test2 - calculate x = n! by recursively splitting the work when necessary
 *******************************************************************************/
@@ -108,7 +108,6 @@ void worker2(void * varg)
 
     test2_helper(arg->ans, arg->min, arg->max);
 }
-
 
 /* set x = product of numbers in (min, max] */
 void test2_helper(fmpz_t x, ulong min, ulong max)
@@ -157,15 +156,9 @@ void test2(fmpz_t x, ulong n)
     test2_helper(x, 0, n);
 }
 
-
-int
-main(void)
+TEST_FUNCTION_START(thread_pool, state)
 {
     slong i, j;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("thread_pool....");
-    fflush(stdout);
 
     for (i = 0; i < 10*flint_test_multiplier(); i++)
     {
@@ -208,9 +201,5 @@ main(void)
         fmpz_clear(x);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

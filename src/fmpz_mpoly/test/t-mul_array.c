@@ -10,17 +10,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_mpoly.h"
-#include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mpoly_mul_array, state)
 {
     int i, j, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("mul_array....");
-    fflush(stdout);
 
     /* Check mul_array matches mul_johnson */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
@@ -189,9 +184,5 @@ main(void)
         fmpz_mpoly_clear(h, ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

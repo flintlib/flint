@@ -9,19 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fq_nmod_mpoly.h"
 
-
-int
-main(void)
+TEST_FUNCTION_START(fq_nmod_mpoly_repack_bits, state)
 {
     slong i, j;
     int success;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("repack_bits....");
-    fflush(stdout);
 
     /* Check packing up */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
@@ -197,9 +191,5 @@ main(void)
         fq_nmod_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

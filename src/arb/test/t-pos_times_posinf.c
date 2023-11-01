@@ -1,4 +1,5 @@
 #include <math.h>
+#include "test_helpers.h"
 #include "arb.h"
 
 #define PRINT_PRECISION 20
@@ -111,14 +112,11 @@ void print_arf_and_type(arf_t x, const char *s, const value_type t)
     flint_printf(" of type: %d\n", t);
 }
 
-int main(void)
+TEST_FUNCTION_START(arb_pos_times_posinf, state)
 {
     slong i, j, k, prec;
     arb_t t, u, v, w;
     arf_t x;
-
-    flint_printf("pos_times_posinf....");
-    fflush(stdout);
 
     arb_init(t);
     arb_init(u);
@@ -277,7 +275,5 @@ int main(void)
     arb_clear(u);
     arb_clear(t);
 
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

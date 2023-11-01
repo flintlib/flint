@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -51,16 +52,10 @@ void cyclotomic_naive(fmpz_poly_t poly, ulong n)
 
     fmpz_poly_clear(t);
 }
-
-int main(void)
+TEST_FUNCTION_START(fmpz_poly_cyclotomic, state)
 {
     fmpz_poly_t A, B;
     slong n;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("cyclotomic....");
-    fflush(stdout);
 
     for (n = 0; n <= 1000; n++)
     {
@@ -122,7 +117,5 @@ int main(void)
         fmpz_clear(ref);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

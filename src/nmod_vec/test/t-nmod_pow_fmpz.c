@@ -9,18 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "fmpz.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_vec_nmod_pow_fmpz, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("nmod_pow_fmpz....");
-    fflush(stdout);
 
     /* check nmod_pow_fmpz matches nmod_pow_ui */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -85,9 +81,5 @@ main(void)
         fmpz_clear(exp1);
     }
 
-
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

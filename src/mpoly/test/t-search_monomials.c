@@ -9,22 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
+#include "test_helpers.h"
 #include "mpoly.h"
 #include "fmpz_mpoly.h"
-#include "profiler.h"
-#include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(mpoly_search_monomials, state)
 {
     int i, j, k;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("search_monomial....");
-    fflush(stdout);
 
     /* get two random polys and test output of search */
     for (k = 0; k < 1000*flint_test_multiplier(); k++)
@@ -61,7 +52,6 @@ main(void)
         N = mpoly_words_per_exp(fg_bits, ctx->minfo);
         cmpmask = (ulong*) flint_malloc(N*sizeof(ulong));
         mpoly_get_cmpmask(cmpmask, N, fg_bits, ctx->minfo);
-
 
         fexp = (ulong *) flint_malloc(f->length*N*sizeof(ulong));
         gexp = (ulong *) flint_malloc(g->length*N*sizeof(ulong));
@@ -183,11 +173,5 @@ main(void)
         fmpz_mpoly_clear(g, ctx);
     }
 
-    flint_printf("PASS\n");
-
-    FLINT_TEST_CLEANUP(state);
-
-    return 0;
-
+    TEST_FUNCTION_END(state);
 }
-

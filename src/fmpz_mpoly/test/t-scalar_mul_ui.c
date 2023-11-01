@@ -10,17 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mpoly_scalar_mul_ui, state)
 {
     int i, j, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("scalar_mul_ui....");
-    fflush(stdout);
 
     /* Check (f*a)*b = f*(a*b) */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -123,9 +119,5 @@ main(void)
        fmpz_mpoly_clear(h, ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

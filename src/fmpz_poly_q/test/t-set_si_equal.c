@@ -11,21 +11,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-
-#include "fmpz_poly_q.h"
+#include "test_helpers.h"
 #include "long_extras.h"
-#include "ulong_extras.h"
+#include "fmpz_poly_q.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_poly_q_set_si_equal, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("set_si_equal... ");
-    fflush(stdout);
-
-
 
     /* Equal polynomials */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -86,8 +78,5 @@ main(void)
         fmpz_poly_q_clear(b);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

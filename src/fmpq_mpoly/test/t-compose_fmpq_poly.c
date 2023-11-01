@@ -9,17 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq_poly.h"
 #include "fmpq_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_mpoly_compose_fmpq_poly, state)
 {
     slong i, v;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("compose_fmpq_poly....");
-    fflush(stdout);
 
     /* Check composition and evalall commute */
     for (i = 0; i < 50*flint_test_multiplier(); i++)
@@ -146,7 +142,6 @@ main(void)
         coeff_bits = n_randint(state, 100) + 1;
 
         fmpq_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx1);
-
 
         vals3 = (fmpq **) flint_malloc(nvars1*sizeof(fmpq *));
         for (v = 0; v < nvars1; v++)
@@ -301,8 +296,5 @@ main(void)
         fmpq_mpoly_ctx_clear(ctx1);
     }
 
-    printf("PASS\n");
-    FLINT_TEST_CLEANUP(state);
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }

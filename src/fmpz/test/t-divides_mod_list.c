@@ -9,20 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-
-int
-main(void)
+TEST_FUNCTION_START(fmpz_divides_mod_list, state)
 {
     slong i, j;
     int result1, result2;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("divides_mod_list....");
-    fflush(stdout);
 
     for (i = 0; i < 2000 * flint_test_multiplier(); i++)
     {
@@ -170,8 +164,5 @@ main(void)
         fmpz_clear(x);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

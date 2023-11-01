@@ -9,20 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_set_signed_ui_array, state)
 {
     int i;
     slong max_limbs = 20;
     ulong * limbs;
     fmpz_t a, b, c;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("set_signed_ui_array....");
-    fflush(stdout);
 
     fmpz_init(a);
     fmpz_init(b);
@@ -85,9 +81,5 @@ main(void)
     fmpz_clear(c);
     flint_free(limbs);
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

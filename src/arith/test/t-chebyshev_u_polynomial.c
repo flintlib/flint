@@ -9,19 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_poly.h"
 #include "arith.h"
 
-int main(void)
+TEST_FUNCTION_START(arith_chebyshev_u_polynomial, state)
 {
     fmpz_poly_t T, U;
 
     slong n;
 
-    FLINT_TEST_INIT(state);
-
-    flint_printf("chebyshev_u_polynomial....");
-    fflush(stdout);
 
     fmpz_poly_init(T);
     fmpz_poly_init(U);
@@ -47,7 +44,5 @@ int main(void)
     fmpz_poly_clear(T);
     fmpz_poly_clear(U);
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

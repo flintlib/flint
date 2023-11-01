@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fq_nmod_mpoly.h"
 
 void _test_root(
@@ -67,14 +68,9 @@ void _test_root(
     fq_nmod_mpoly_clear(t, ctx);
 }
 
-int
-main(void)
+TEST_FUNCTION_START(fq_nmod_mpoly_quadratic_root, state)
 {
     slong i, j, tmul = 20;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("quadratic_root....");
-    fflush(stdout);
 
     /* Check sqrt(f^2) = +-f */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
@@ -119,9 +115,5 @@ main(void)
         fq_nmod_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

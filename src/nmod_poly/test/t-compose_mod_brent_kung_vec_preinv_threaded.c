@@ -11,23 +11,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "thread_support.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_vec_preinv_threaded, state)
 {
 #if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     int i;
     slong max_threads = 5;
-#endif
-    FLINT_TEST_INIT(state);
-
-    flint_printf("compose_mod_brent_kung_vec_preinv_threaded....");
-    fflush(stdout);
-
-#if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
 
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
@@ -61,13 +54,13 @@ main(void)
             nmod_poly_rem(pow + j, pow + j, a);
         }
 
-	for (j = 0; j < k; j++)
-	    nmod_poly_init(res + j, m);
+        for (j = 0; j < k; j++)
+            nmod_poly_init(res + j, m);
 
         nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(res, pow, l, k,
-                                                                   b, a, ainv);
+                b, a, ainv);
 
-	for (j = 0; j < k; j++)
+        for (j = 0; j < k; j++)
         {
             nmod_poly_compose_mod(c, pow + j, b, a);
             if (!nmod_poly_equal(res + j, c))
@@ -92,20 +85,14 @@ main(void)
         for (j = 0; j < l; j++)
             nmod_poly_clear(pow + j);
 
-	for (j = 0; j < k; j++)
+        for (j = 0; j < k; j++)
             nmod_poly_clear(res + j);
 
-	flint_free(pow);
+        flint_free(pow);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
+    TEST_FUNCTION_END(state);
 #else
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
+    TEST_FUNCTION_END_SKIPPED(state);
 #endif
-
-    return 0;
 }

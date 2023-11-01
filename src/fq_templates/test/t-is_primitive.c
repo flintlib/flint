@@ -11,17 +11,13 @@
 
 #ifdef T
 
+#include "test_helpers.h"
 #include "templates.h"
 #include "fmpz.h"
 
-int
-main(void)
+TEST_TEMPLATE_FUNCTION_START(T, is_primitive, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("is_primitive... ");
-    fflush(stdout);
 
     /* Test that is_primitive gives consistent answers with multiplicative_order */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -57,11 +53,7 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
-
 
 #endif

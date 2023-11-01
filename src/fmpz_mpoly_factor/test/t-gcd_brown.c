@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2021 Daniel Schultz
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,9 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_poly.h"
 #include "fmpz_mpoly_factor.h"
 
+/* Defined in t-gcd_brown.c, t-gcd_brown_threaded.c, t-gcd_subresultant.c,
+ * t-gcd_zippel.c, t-gcd_zippel2.c */
+#define compute_gcd compute_gcd_brown
 int compute_gcd(
     fmpz_mpoly_t G,
     const fmpz_mpoly_t A,
@@ -129,7 +134,10 @@ cleanup1:
     return success;
 }
 
-
+/* Defined in t-gcd_brown.c, t-gcd_brown_threaded.c, t-gcd_subresultant.c,
+ * t-gcd_zippel.c, t-gcd_zippel2.c */
+#ifndef gcd_check
+#define gcd_check gcd_check
 void gcd_check(
     fmpz_mpoly_t g,
     fmpz_mpoly_t a,
@@ -138,7 +146,8 @@ void gcd_check(
     fmpz_mpoly_ctx_t ctx,
     slong i,
     slong j,
-    const char * name)
+    const char * name,
+    int compute_gcd_fun(fmpz_mpoly_t, const fmpz_mpoly_t, const fmpz_mpoly_t, const fmpz_mpoly_ctx_t))
 {
     int res;
     fmpz_mpoly_t ca, cb, cg;
@@ -147,7 +156,7 @@ void gcd_check(
     fmpz_mpoly_init(cb, ctx);
     fmpz_mpoly_init(cg, ctx);
 
-    res = compute_gcd(g, a, b, ctx);
+    res = compute_gcd_fun(g, a, b, ctx);
 
     fmpz_mpoly_assert_canonical(g, ctx);
 
@@ -201,7 +210,7 @@ void gcd_check(
         flint_abort();
     }
 
-    res = compute_gcd(cg, ca, cb, ctx);
+    res = compute_gcd_fun(cg, ca, cb, ctx);
     fmpz_mpoly_assert_canonical(cg, ctx);
 
     if (!res)
@@ -226,16 +235,11 @@ cleanup:
     fmpz_mpoly_clear(cb, ctx);
     fmpz_mpoly_clear(cg, ctx);
 }
+#endif
 
-
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mpoly_factor_gcd_brown, state)
 {
     slong i, j, tmul = 15;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("gcd_brown....");
-    fflush(stdout);
 
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
@@ -277,7 +281,7 @@ main(void)
             fmpz_mpoly_scalar_mul_ui(a, a, n_randint(state, 10) + 1, ctx);
             fmpz_mpoly_scalar_mul_ui(b, b, n_randint(state, 10) + 1, ctx);
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, FLINT_BITS, ctx);
-            gcd_check(g, a, b, t, ctx, i, j, "random dense");
+            gcd_check(g, a, b, t, ctx, i, j, "random dense", compute_gcd);
         }
 
         fmpz_mpoly_clear(g, ctx);
@@ -287,9 +291,6 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
-    flint_printf("PASS\n");
-    FLINT_TEST_CLEANUP(state);
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
+#undef compute_gcd

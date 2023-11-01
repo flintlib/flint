@@ -9,16 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_mpoly_divrem, state)
 {
     int i, j, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("divrem....");
-    fflush(stdout);
 
     /* Check f*g/g = f */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -274,7 +270,6 @@ main(void)
        fmpq_mpoly_clear(r, ctx);
     }
 
-
     /* Check f = g*q + r for random polys, alias remainder and denominator */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
@@ -405,9 +400,5 @@ main(void)
        fmpq_mpoly_clear(r, ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

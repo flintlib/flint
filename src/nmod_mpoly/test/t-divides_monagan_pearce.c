@@ -9,16 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "nmod_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_mpoly_divides_monagan_pearce, state)
 {
     int i, j, result, ok1, ok2;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("divides_monagan_pearce....");
-    fflush(stdout);
 
     /* Check f*g/g = f */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -388,9 +384,5 @@ main(void)
         nmod_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
