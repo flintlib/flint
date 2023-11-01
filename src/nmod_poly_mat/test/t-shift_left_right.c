@@ -81,19 +81,19 @@ void test_with_dimensions2(ulong rdim, ulong cdim, flint_rand_t state)
 
 TEST_FUNCTION_START(nmod_poly_mat_shift_left_right, state)
 {
-    int i, result;
+    int i;
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        test_with_dimensions1(2,5,state);
-        test_with_dimensions1(3,3,state);
-        test_with_dimensions1(5,2,state);
+        test_with_dimensions1(2, 5, state);
+        test_with_dimensions1(3, 3, state);
+        test_with_dimensions1(5, 2, state);
     }
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        test_with_dimensions2(2,5,state);
-        test_with_dimensions2(3,3,state);
-        test_with_dimensions2(5,2,state);
+        test_with_dimensions2(2, 5, state);
+        test_with_dimensions2(3, 3, state);
+        test_with_dimensions2(5, 2, state);
     }
 
     TEST_FUNCTION_END(state);

@@ -15,8 +15,7 @@
 
 TEST_FUNCTION_START(nmod_poly_mat_get_set_coeff_mat, state)
 {
-    int i, result;
-    ulong j;
+    int i;
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -26,6 +25,7 @@ TEST_FUNCTION_START(nmod_poly_mat_get_set_coeff_mat, state)
         nmod_mat_t cmat2;
         mp_limb_t mod;
         slong m, n, deg;
+        int jx;
 
         mod = n_randtest_prime(state, 0);
         m = n_randint(state, 20);
@@ -41,7 +41,7 @@ TEST_FUNCTION_START(nmod_poly_mat_get_set_coeff_mat, state)
         nmod_mat_randtest(cmat1, state);
         nmod_poly_mat_set_coeff_mat(pmat1, cmat1, deg-1);
         nmod_poly_mat_get_coeff_mat(cmat2, pmat1, deg-1);
-        if (! nmod_mat_equal(cmat1, cmat2))
+        if (!nmod_mat_equal(cmat1, cmat2))
         {
             flint_printf("FAIL (set then get):\n");
             flint_printf("pmat1:\n");
@@ -57,13 +57,13 @@ TEST_FUNCTION_START(nmod_poly_mat_get_set_coeff_mat, state)
 
         // test 2: copying via repeated get-set works
         nmod_poly_mat_randtest(pmat1, state, deg);
-        for (int d=0; d<nmod_poly_mat_max_length(pmat1); d++)
+        for (jx = 0; jx < nmod_poly_mat_max_length(pmat1); jx++)
         {
-            nmod_poly_mat_get_coeff_mat(cmat1, pmat1, d);
-            nmod_poly_mat_set_coeff_mat(pmat2, cmat1, d);
+            nmod_poly_mat_get_coeff_mat(cmat1, pmat1, jx);
+            nmod_poly_mat_set_coeff_mat(pmat2, cmat1, jx);
         }
 
-        if (! nmod_poly_mat_equal(pmat1, pmat2))
+        if (!nmod_poly_mat_equal(pmat1, pmat2))
         {
             flint_printf("FAIL (simulate copy):\n");
             flint_printf("pmat1:\n");
