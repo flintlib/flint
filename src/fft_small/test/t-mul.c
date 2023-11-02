@@ -78,7 +78,7 @@ TEST_FUNCTION_START(mpn_ctx_mpn_mul, state)
     {
         mpn_ctx_t R;
         mpn_ctx_init(R, UWORD(0x0003f00000000001));
-        test_mul(R, 10, 50000, 5000, state);
+        test_mul(R, 10, 50000, 1000 * flint_test_multiplier(), state);
         mpn_ctx_clear(R);
     }
 

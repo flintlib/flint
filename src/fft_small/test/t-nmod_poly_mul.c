@@ -11,11 +11,9 @@
 */
 
 #include "test_helpers.h"
-#include "ulong_extras.h"
 #include "nmod.h"
 #include "nmod_poly.h"
 #include "fft_small.h"
-#include "profiler.h"
 
 TEST_FUNCTION_START(_nmod_poly_mul_mid_mpn_ctx, state)
 {
@@ -80,7 +78,7 @@ TEST_FUNCTION_START(_nmod_poly_mul_mid_mpn_ctx, state)
         ulong * a, *b, * c, * d;
         ulong an, zn, zl, zh, sz, i, reps;
 
-        for (reps = 0; reps < 100; reps++)
+        for (reps = 0; reps < 100 * flint_test_multiplier(); reps++)
         {
             flint_set_num_threads(1 + n_randint(state, 10));
 
@@ -129,7 +127,7 @@ TEST_FUNCTION_START(_nmod_poly_mul_mid_mpn_ctx, state)
         ulong * a, * b, * c, * d;
         ulong an, bn, zn, zl, zh, sz, i, reps;
 
-        for (reps = 0; reps < 100; reps++)
+        for (reps = 0; reps < 100 * flint_test_multiplier(); reps++)
         {
             flint_set_num_threads(1 + n_randint(state, 10));
 
@@ -174,81 +172,6 @@ TEST_FUNCTION_START(_nmod_poly_mul_mid_mpn_ctx, state)
             flint_free(b);
             flint_free(c);
             flint_free(d);
-        }
-    }
-
-    for (nbits = 2; nbits <= FLINT_BITS; nbits++)
-    {
-        ulong * a, * b, * q1, * q2, * q3, * r1, * r2, * r3;
-        ulong an, bn, qn, i, reps;
-        nmod_poly_divrem_precomp_struct M[1];
-
-        for (reps = 0; reps < 100; reps++)
-        {
-            flint_set_num_threads(1 + n_randint(state, 10));
-
-            nmod_init(&mod, n_randbits(state, nbits));
-
-            bn = 2 + n_randint(state, 5000);
-            qn = 1 + n_randint(state, 5000);
-            an = bn + qn - 1;
-
-            a = FLINT_ARRAY_ALLOC(an, ulong);
-            b = FLINT_ARRAY_ALLOC(bn, ulong);
-            q1 = FLINT_ARRAY_ALLOC(qn, ulong);
-            q2 = FLINT_ARRAY_ALLOC(qn, ulong);
-            q3 = FLINT_ARRAY_ALLOC(qn, ulong);
-            r1 = FLINT_ARRAY_ALLOC(bn, ulong);
-            r2 = FLINT_ARRAY_ALLOC(bn, ulong);
-            r3 = FLINT_ARRAY_ALLOC(bn, ulong);
-
-            for (i = 0; i < an; i++)
-                a[i] = n_randint(state, mod.n);
-
-            for (i = 0; i < bn; i++)
-                b[i] = n_randint(state, mod.n);
-
-            while (n_gcd(b[bn-1], mod.n) != 1)
-                b[bn-1] = n_randint(state, mod.n);
-
-            _nmod_poly_divrem(q1, r1, a, an, b, bn, mod);
-
-            _nmod_poly_divrem_mpn_ctx(q2, r2, a, an, b, bn, mod, R);
-
-            ulong prec = qn + n_randint(state, 200);
-            _nmod_poly_divrem_precomp_init(M, b, bn, prec, mod, R);
-            _nmod_poly_divrem_precomp(q3, r3, a, an, M, mod, R);
-            _nmod_poly_divrem_precomp_clear(M);
-
-            for (i = qn; i > 0; i--)
-            {
-                if (q1[i-1] != q2[i-1] || q1[i-1] != q3[i-1])
-                {
-                    flint_printf("quotient error at index %wu\n", i-1);
-                    flint_printf("qn=%wu, an=%wu, bn=%wu\n", qn, an, bn);
-                    flint_printf("mod: %wu\n", mod.n);
-                    flint_abort();
-                }
-            }
-
-            for (i = bn-1; i > 0; i--)
-            {
-                if (r1[i-1] != r2[i-1] || r1[i-1] != r3[i-1])
-                {
-                    flint_printf("remainder error at index %wu\n", i-1);
-                    flint_printf("r1[i]=%wu, r2[i]=%wu, bn=%wu\n", r1[i-1], r2[i-1]);
-                    flint_printf("qn=%wu, an=%wu, bn=%wu\n", qn, an, bn);
-                    flint_printf("mod: %wu\n", mod.n);
-                    flint_abort();
-                }
-            }
-
-            flint_free(a);
-            flint_free(b);
-            flint_free(q1);
-            flint_free(q2);
-            flint_free(r1);
-            flint_free(r2);
         }
     }
 

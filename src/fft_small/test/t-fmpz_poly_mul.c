@@ -25,8 +25,6 @@ TEST_FUNCTION_START(_fmpz_poly_mul_mid_mpn_ctx, state)
         fmpz * a, * c, * d;
         ulong an, zn, zl, zh, sz, i, reps, abits;
 
-        fflush(stdout);
-
         for (reps = 0; reps < 1000 * flint_test_multiplier(); reps++)
         {
             flint_set_num_threads(1 + n_randint(state, 10));
@@ -76,8 +74,6 @@ TEST_FUNCTION_START(_fmpz_poly_mul_mid_mpn_ctx, state)
     {
         fmpz * a, * b, * c, * d;
         ulong an, bn, zn, zl, zh, sz, i, reps, abits, bbits;
-
-        fflush(stdout);
 
         for (reps = 0; reps < 1000 * flint_test_multiplier(); reps++)
         {
