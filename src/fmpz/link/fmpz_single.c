@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 William Hart
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -10,29 +11,34 @@
 */
 
 #ifdef __unix__
-#include <unistd.h> /* sysconf */
+# include <unistd.h> /* sysconf */
 #endif
 
 #if defined(_WIN32) || defined(WIN32)
-#include <windows.h> /* GetSytemInfo */
+# include <windows.h> /* GetSystemInfo */
 #endif
 
-#if defined(_MSC_VER) && FLINT_USES_PTHREAD
-#include <atomic.h>
-#endif
-
-#include "flint.h"
 #include "gmpcompat.h"
 #include "fmpz.h"
 
+#if FLINT_USES_PTHREAD
+# include <stdatomic.h>
+#endif
+
+#if FLINT_USES_PTHREAD
+typedef struct
+{
+   _Atomic(int) count;
+   pthread_t thread;
+   void * address;
+} fmpz_block_header_s;
+#else
 typedef struct
 {
    int count;
-#if FLINT_USES_PTHREAD
-   pthread_t thread;
-#endif
    void * address;
 } fmpz_block_header_s;
+#endif
 
 /* Always free larger mpz's to avoid wasting too much heap space */
 #define FLINT_MPZ_MAX_CACHE_LIMBS 64
@@ -150,10 +156,8 @@ void _fmpz_clear_mpz(fmpz f)
 
         mpz_clear(ptr);
 
-#if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8)) && FLINT_USES_PTHREAD
-       new_count = __atomic_add_fetch(&(header_ptr->count), 1, __ATOMIC_SEQ_CST);
-#elif defined(_MSC_VER) && FLINT_USES_PTHREAD
-       new_count = atomic_add_fetch(&(header_ptr->count), 1);
+#if FLINT_USES_PTHREAD
+       new_count = atomic_fetch_add(&(header_ptr->count), 1);
 #else
        new_count = ++header_ptr->count;
 #endif
@@ -191,11 +195,9 @@ void _fmpz_cleanup_mpz_content(void)
 
        ptr = (fmpz_block_header_s *) ptr->address;
 
-#if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 8)) && FLINT_USES_PTHREAD
-       new_count = __atomic_add_fetch(&(ptr->count), 1, __ATOMIC_SEQ_CST);
-#elif defined(_MSC_VER) && FLINT_USES_PTHREAD
-       new_count = atomic_add_fetch(&(ptr->count), 1);
-#else /* may be a very small leak with pthreads */
+#if FLINT_USES_PTHREAD
+       new_count = atomic_fetch_add(&(ptr->count), 1);
+#else
        new_count = ++ptr->count;
 #endif
        if (new_count == flint_mpz_structs_per_block)

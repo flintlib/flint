@@ -524,6 +524,8 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1.12.1
         with:
           arch: x86_64
+          toolset: 14.37.32822
+          vsversion: 17.6.0
 
       - name: "Configure"
         run: |
@@ -531,7 +533,8 @@ jobs:
           cd build
           set "LIB=C:\Miniconda3\Library\lib;%LIB%"
           set "CPATH=C:\Miniconda3\Library\include;%CPATH%"
-          cmake -G "Ninja" -DCMAKE_C_FLAGS="/wd4018 /wd4146 /wd4244 /wd4267 /wd4305 /wd4996 /DFLINT_NO_CA_MAT_EXP_TEST" -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
+          # For single build, we need atomics
+          cmake -G "Ninja" -DCMAKE_C_FLAGS="/wd4018 /wd4146 /wd4244 /wd4267 /wd4305 /wd4996 /DFLINT_NO_CA_MAT_EXP_TEST /std:c11 /experimental:c11atomics" -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
 
       - name: "Build"
         run: |
