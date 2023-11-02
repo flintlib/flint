@@ -10,12 +10,10 @@
 */
 
 #include "test_helpers.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fft_small.h"
-#include "profiler.h"
 
 TEST_FUNCTION_START(_fmpz_poly_mul_mid_mpn_ctx, state)
 {

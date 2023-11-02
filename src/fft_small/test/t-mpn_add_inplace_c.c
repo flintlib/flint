@@ -10,7 +10,6 @@
 */
 
 #include "test_helpers.h"
-#include "ulong_extras.h"
 #include "mpn_extras.h"
 #include "fft_small.h"
 #include "crt_helpers.h"
