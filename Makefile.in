@@ -226,9 +226,8 @@ endif
 ################################################################################
 
 SINGLE_HEADERS :=                                                           \
-        flint.h         longlong.h      exception.h    gmpcompat.h          \
-        hashmap.h       profiler.h      templates.h    flint-config.h       \
-        fft_tuning.h                                                        \
+        flint.h         longlong.h      exception.h     gmpcompat.h         \
+        profiler.h      templates.h     flint-config.h  fft_tuning.h        \
         crt_helpers.h                   machine_vectors.h                   \
                                                                             \
         fq_zech_vec.h                                                       \
