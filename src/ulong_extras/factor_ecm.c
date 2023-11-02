@@ -337,6 +337,7 @@ n_factor_ecm_select_curve(mp_limb_t *f, mp_limb_t sig, mp_limb_t n, n_ecm_t n_ec
 {
     mp_limb_t u, v, w, t, hi, lo;
     mp_ptr a;
+    int ret = 0;
     TMP_INIT;
 
     TMP_START;
@@ -351,7 +352,7 @@ n_factor_ecm_select_curve(mp_limb_t *f, mp_limb_t sig, mp_limb_t n, n_ecm_t n_ec
     /* w = sig ^ 2 */
     w = n_mulmod_preinv(u, u, n, n_ecm_inf->ninv, n_ecm_inf->normbits);
 
-    u = w - (UWORD(5) << n_ecm_inf->normbits);  /* u = sig^2 - 5 */
+    u = n_submod(w, UWORD(5) << n_ecm_inf->normbits, n);  /* u = sig^2 - 5 */
 
     /* w = u * u */
     w = n_mulmod_preinv(u, u, n, n_ecm_inf->ninv, n_ecm_inf->normbits);
@@ -382,9 +383,14 @@ n_factor_ecm_select_curve(mp_limb_t *f, mp_limb_t sig, mp_limb_t n, n_ecm_t n_ec
     *f = n_gcdinv(&u, v, n);
 
     if (*f == n)
-        return 0;
+    {
+        goto cleanup;
+    }
     else if (*f > n_ecm_inf->one)
-        return 1;
+    {
+        ret = 1;
+        goto cleanup;
+    }
 
     a[1] = UWORD(0);
     a[0] = u;
@@ -405,9 +411,10 @@ n_factor_ecm_select_curve(mp_limb_t *f, mp_limb_t sig, mp_limb_t n, n_ecm_t n_ec
     n_ecm_inf->a24 <<= n_ecm_inf->normbits;
     n_ecm_inf->z = n_ecm_inf->one;
 
+cleanup:
     TMP_END;
 
-    return 0;
+    return ret;
 }
 
 int
