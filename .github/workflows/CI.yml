@@ -556,13 +556,13 @@ jobs:
   # alpine linux 32-bit
   ##############################################################################
   alpine-32bit:
-    name: Alpine Linux, 32-bit (x1)
+    name: Alpine Linux, musl, 32-bit (x1.5)
 
     runs-on: ubuntu-latest
 
     env:
       CC: "gcc"
-      FLINT_TEST_MULTIPLIER: "1"
+      FLINT_TEST_MULTIPLIER: "1.5"
 
     steps:
       - uses: actions/checkout@v4
