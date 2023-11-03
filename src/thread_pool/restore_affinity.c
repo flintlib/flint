@@ -14,6 +14,10 @@
 
 #include "thread_pool.h"
 
+#if FLINT_USES_PTHREAD && defined(HAVE_PTHREAD_NP_H)
+# include <pthread_np.h>
+#endif
+
 int thread_pool_restore_affinity(thread_pool_t T)
 {
 #if FLINT_USES_CPUSET && FLINT_USES_PTHREAD

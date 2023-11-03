@@ -176,17 +176,6 @@ yes|no)
 esac],
 enable_assert="no")
 
-AC_ARG_ENABLE(debug,
-[AS_HELP_STRING([--enable-debug],[Compile FLINT with debug information [default=yes]])],
-[case $enableval in
-yes|no)
-    ;;
-*)
-    AC_MSG_ERROR([Bad value $enableval for --enable-debug. Need yes or no.])
-    ;;
-esac],
-enable_debug="yes")
-
 AC_ARG_ENABLE(coverage,
 [AS_HELP_STRING([--enable-coverage],[Enable test coverage [default=no]])],
 [case $enableval in
@@ -198,6 +187,20 @@ yes|no)
 esac],
 enable_coverage="no")
 
+AC_ARG_ENABLE(debug,
+[AS_HELP_STRING([--enable-debug],[Compile FLINT with debug information [default=yes]])],
+[case $enableval in
+yes|no)
+    if test "$enableval" = "no" && test "$enable_coverage" = "yes";
+    then
+        AC_MSG_ERROR([Debug information is required by coverage.])
+    fi
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-debug. Need yes or no.])
+    ;;
+esac],
+enable_debug="yes")
 
 AC_ARG_ENABLE(dependency-tracking,
 [AS_HELP_STRING([--enable-dependency-tracking],[Enable GCC automated dependency tracking [default=yes]])],
@@ -614,7 +617,7 @@ AC_CHECK_HEADERS([stdarg.h math.h float.h errno.h gmp.h mpfr.h],,
 # Optional headers
 # The following headers are checked previously:
 #   unistd.h
-AC_CHECK_HEADERS([fenv.h alloca.h malloc.h sys/param.h windows.h arm_neon.h x86intrin.h immintrin.h])
+AC_CHECK_HEADERS([fenv.h alloca.h malloc.h sys/param.h windows.h arm_neon.h x86intrin.h immintrin.h pthread_np.h])
 
 if test "$enable_pthread" = "yes";
 then
@@ -863,7 +866,7 @@ then
     LDFLAGS="--coverage $LDFLAGS"
 fi
 
-if test "$enable_debug" = "yes" || test "$enable_coverage" = "yes";
+if test "$enable_debug" = "yes";
 then
     if test "$ac_cv_prog_cc_g" = "yes";
     then
