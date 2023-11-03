@@ -23,6 +23,8 @@
 #include "t-gcd_euclidean.c"
 #include "t-gcd_euclidean_improved.c"
 #include "t-gcd_shortest.c"
+#include "t-is_prime.c"
+#include "t-is_probabprime.c"
 #include "t-mul.c"
 #include "t-pow_ui.c"
 #include "t-remove_one_plus_i.c"
@@ -40,6 +42,8 @@ test_struct tests[] =
     TEST_FUNCTION(fmpzi_gcd_euclidean),
     TEST_FUNCTION(fmpzi_gcd_euclidean_improved),
     TEST_FUNCTION(fmpzi_gcd_shortest),
+    TEST_FUNCTION(fmpzi_is_prime),
+    TEST_FUNCTION(fmpzi_is_probabprime),
     TEST_FUNCTION(fmpzi_mul),
     TEST_FUNCTION(fmpzi_pow_ui),
     TEST_FUNCTION(fmpzi_remove_one_plus_i)

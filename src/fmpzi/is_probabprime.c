@@ -14,28 +14,29 @@
 int
 fmpzi_is_probabprime(const fmpzi_t n)
 {
-    fmpz a, b, t;
+    fmpz_t t;
+    const fmpz *a, *b;
     
     int res = 0;
     
-    fmpz_init(&t);
+    fmpz_init(t);
     
-    a = *fmpzi_realref(n);
-    b = *fmpzi_imagref(n);
+    a = fmpzi_realref(n);
+    b = fmpzi_imagref(n);
     
-    if (fmpz_is_zero(&b)) {
-        if (fmpz_tdiv_ui(&a, 4) == 3)
-            fmpz_abs(&t, &a);
-    } else if (fmpz_is_zero(&a)) {
-        if (fmpz_tdiv_ui(&b, 4) == 3)
-            fmpz_abs(&t, &b);
+    if (fmpz_is_zero(b)) {
+        if (fmpz_tdiv_ui(a, 4) == 3)
+            fmpz_abs(t, a);
+    } else if (fmpz_is_zero(a)) {
+        if (fmpz_tdiv_ui(b, 4) == 3)
+            fmpz_abs(t, b);
     } else {
-        fmpzi_norm(&t, n);
+        fmpzi_norm(t, n);
     }
     
-    res = fmpz_is_probabprime(&t);
+    res = fmpz_is_probabprime(t);
     
-    fmpz_clear(&t);
+    fmpz_clear(t);
     
     return res;
 }
