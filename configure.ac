@@ -617,7 +617,7 @@ AC_CHECK_HEADERS([stdarg.h math.h float.h errno.h gmp.h mpfr.h],,
 # Optional headers
 # The following headers are checked previously:
 #   unistd.h
-AC_CHECK_HEADERS([fenv.h alloca.h malloc.h sys/param.h windows.h arm_neon.h x86intrin.h immintrin.h])
+AC_CHECK_HEADERS([fenv.h alloca.h malloc.h sys/param.h windows.h arm_neon.h x86intrin.h immintrin.h pthread_np.h])
 
 if test "$enable_pthread" = "yes";
 then

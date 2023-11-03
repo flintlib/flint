@@ -14,6 +14,10 @@
 
 #include "thread_pool.h"
 
+#if FLINT_USES_PTHREAD && defined(HAVE_PTHREAD_NP_H)
+# include <pthread_np.h>
+#endif
+
 thread_pool_t global_thread_pool;
 int global_thread_pool_initialized = 0;
 
