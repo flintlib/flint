@@ -226,9 +226,11 @@ jobs:
               --disable-static \
               --disable-debug
             touch _is_configured
-            gmake -j$(expr $(nproc) + 1)
-            touch _is_built
-            gmake -j$(expr $(nproc) + 1) check
+            gmake -j$(expr $(sysctl -n hw.ncpu) + 1)
+            touch _is_library_built
+            gmake -j$(expr $(sysctl -n hw.ncpu) + 1) tests
+            touch _is_tests_built
+            gmake -j$(expr $(sysctl -n hw.ncpu) + 1) check
             touch _is_checked
 
         # Sometimes the FreeBSD runner cannot exit properly. We created files
@@ -248,14 +250,18 @@ jobs:
           then
             echo "Configuration failed!"
             exit 3
-          elif test ! -f _is_built;
+          elif test ! -f _is_library_built;
           then
-            echo "Building failed!"
+            echo "Building library failed!"
             exit 4
+          elif test ! -f _is_tests_built;
+          then
+            echo "Building tests failed!"
+            exit 5
           elif test ! -f _is_checked;
           then
             echo "Check failed!"
-            exit 5
+            exit 6
           fi
           echo "All good!"
 
