@@ -40,7 +40,7 @@ TEST_FUNCTION_START(flint_mpn_add_inplace_c, state)
 
     _flint_rand_init_gmp(state);
 
-    for (iter = 0; iter < 1000; iter++)
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         mp_limb_t a[10], b[10], c[10];
         mp_size_t an, bn;
@@ -66,7 +66,7 @@ TEST_FUNCTION_START(flint_mpn_add_inplace_c, state)
         }
     }
 
-    for (iter = 0; iter < 1000; iter++)
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         mp_limb_t a[8], b[8], c[8], d[8];
 

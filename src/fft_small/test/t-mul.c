@@ -14,15 +14,15 @@
 #include "fft_small.h"
 #include "machine_vectors.h"
 
-void test_mul(mpn_ctx_t R, ulong minsize, ulong maxsize, ulong nreps, flint_rand_t state)
+void test_mul(mpn_ctx_t R, ulong maxsize, ulong nreps, flint_rand_t state)
 {
-    ulong* a = FLINT_ARRAY_ALLOC(maxsize, ulong);
-    ulong* b = FLINT_ARRAY_ALLOC(maxsize, ulong);
-    ulong* c = FLINT_ARRAY_ALLOC(maxsize, ulong);
-    ulong* d = FLINT_ARRAY_ALLOC(maxsize, ulong);
+    ulong * a, * b, * c, *d;
 
-    minsize = n_max(10, minsize);
-    maxsize = n_max(minsize, maxsize);
+    a = FLINT_ARRAY_ALLOC(maxsize, ulong);
+    b = FLINT_ARRAY_ALLOC(maxsize, ulong);
+    c = FLINT_ARRAY_ALLOC(maxsize, ulong);
+    d = FLINT_ARRAY_ALLOC(maxsize, ulong);
+
     for (ulong rep = 0; rep < nreps; rep++)
     {
         ulong an = 2 + n_randint(state, maxsize - 4);
@@ -78,7 +78,8 @@ TEST_FUNCTION_START(mpn_ctx_mpn_mul, state)
     {
         mpn_ctx_t R;
         mpn_ctx_init(R, UWORD(0x0003f00000000001));
-        test_mul(R, 10, 50000, 5000, state);
+        test_mul(R, 10000, 1000 * flint_test_multiplier(), state);
+        test_mul(R, 50000, 100 * flint_test_multiplier(), state);
         mpn_ctx_clear(R);
     }
 
