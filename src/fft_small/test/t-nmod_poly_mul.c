@@ -73,15 +73,17 @@ TEST_FUNCTION_START(_nmod_poly_mul_mid_mpn_ctx, state)
     }
 #endif
 
-    for (nbits = 1; nbits <= FLINT_BITS; nbits ++)
+    /* Check squaring */
     {
         ulong * a, *b, * c, * d;
         ulong an, zn, zl, zh, sz, i, reps;
 
-        for (reps = 0; reps < 100 * flint_test_multiplier(); reps++)
+        for (reps = 0; reps < 1000 * flint_test_multiplier(); reps++)
         {
             flint_set_num_threads(1 + n_randint(state, 10));
 
+            /* 1 <= nbits <= FLINT_BITS */
+            nbits = 1 + n_randint(state, FLINT_BITS);
             nmod_init(&mod, n_randbits(state, nbits));
 
             an = 1 + n_randint(state, 7000);
@@ -122,15 +124,17 @@ TEST_FUNCTION_START(_nmod_poly_mul_mid_mpn_ctx, state)
         }
     }
 
-    for (nbits = 1; nbits <= FLINT_BITS; nbits ++)
+    /* Check multiplication */
     {
         ulong * a, * b, * c, * d;
         ulong an, bn, zn, zl, zh, sz, i, reps;
 
-        for (reps = 0; reps < 100 * flint_test_multiplier(); reps++)
+        for (reps = 0; reps < 1000 * flint_test_multiplier(); reps++)
         {
             flint_set_num_threads(1 + n_randint(state, 10));
 
+            /* 1 <= nbits <= FLINT_BITS */
+            nbits = 1 + n_randint(state, FLINT_BITS);
             nmod_init(&mod, n_randbits(state, nbits));
 
             an = 1 + n_randint(state, 7000);
