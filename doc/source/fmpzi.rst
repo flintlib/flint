@@ -139,3 +139,14 @@ GCD
     GCD algorithm for integers [Wei2000]_.
     The *shortest* version finds the GCD as the shortest vector in a lattice.
     The default version chooses an algorithm automatically.
+
+Primality testing
+--------------------------------------------------------------------------------
+
+.. function:: int fmpzi_is_prime(const fmpzi_t n)
+
+    Check whether `n` is a Gaussian prime.
+
+.. function:: int fmpzi_is_probabprime(const fmpzi_t n)
+
+    Check whether `n` is a probable Gaussian prime.
