@@ -195,6 +195,10 @@ void fmpzi_gcd_binary(fmpzi_t res, const fmpzi_t x, const fmpzi_t y);
 void fmpzi_gcd_shortest(fmpzi_t g, const fmpzi_t x, const fmpzi_t y);
 void fmpzi_gcd(fmpzi_t g, const fmpzi_t x, const fmpzi_t y);
 
+/* Primality check */
+int fmpzi_is_prime(const fmpzi_t n);
+int fmpzi_is_probabprime(const fmpzi_t n);
+
 #ifdef __cplusplus
 }
 #endif
