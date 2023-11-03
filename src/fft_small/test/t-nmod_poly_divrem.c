@@ -23,16 +23,17 @@ TEST_FUNCTION_START(_nmod_poly_divrem_mpn_ctx, state)
 
     mpn_ctx_init(R, UWORD(0x0003f00000000001));
 
-    for (nbits = 2; nbits <= FLINT_BITS; nbits++)
     {
         ulong * a, * b, * q1, * q2, * q3, * r1, * r2, * r3;
         ulong an, bn, qn, i, reps;
         nmod_poly_divrem_precomp_struct M[1];
 
-        for (reps = 0; reps < 100 * flint_test_multiplier(); reps++)
+        for (reps = 0; reps < 1000 * flint_test_multiplier(); reps++)
         {
             flint_set_num_threads(1 + n_randint(state, 10));
 
+            /* 2 <= nbits <= FLINT_BITS */
+            nbits = 2 + n_randint(state, FLINT_BITS - 1);
             nmod_init(&mod, n_randbits(state, nbits));
 
             bn = 2 + n_randint(state, 5000);
