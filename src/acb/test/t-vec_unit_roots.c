@@ -15,62 +15,62 @@
 
 TEST_FUNCTION_START(acb_vec_unit_roots, state)
 {
-    slong len;
+    slong iter;
 
-    for (len = 0; len < 100; len++)
+    for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
     {
-        slong iter;
+        slong len, prec, order, k;
+        acb_ptr vec;
+        fmpq_t q;
+        acb_t t;
 
-        for (iter = 0; iter < 6; iter++)
+        len = n_randint(state, 100);
+        prec = 10 + n_randint(state, 200);
+
+        switch (n_randint(state, 5))
         {
-            acb_ptr vec;
-            fmpq_t q;
-            acb_t t;
-            slong k;
-            slong prec = 53;
-            slong order;
-
-            if (iter == 0)
-                order = len;
-            else if (iter == 1)
-                order = -len;
-            else if (iter == 2)
-                order = 2 * len;
-            else if (iter == 3)
-                order = - 4 * len;
-            else if (iter == 4)
-                order = -1 - n_randint(state, 3 * len);
-            else
-                order = 1 + n_randint(state, 3 * len);
-
-            vec = _acb_vec_init(len);
-            acb_init(t);
-            fmpq_init(q);
-
-            _acb_vec_unit_roots(vec, order, len, prec);
-
-            for (k = 0; k < len; k++)
-            {
-                if (order < 0)
-                    fmpq_set_si(q, -2 * k, -order);
-                else
-                    fmpq_set_si(q, 2 * k, order);
-                arb_sin_cos_pi_fmpq(acb_imagref(t), acb_realref(t), q, prec);
-
-                if (!acb_overlaps(vec + k, t))
-                {
-                    flint_printf("FAIL: overlap\n\n");
-                    flint_printf("n = %wu  order = %wd k = %wd\n\n", len, order, k);
-                    flint_printf("vec = "); acb_printn(vec + k, 30, 0); flint_printf("\n\n");
-                    flint_printf("t = "); acb_printn(t, 30, 0); flint_printf("\n\n");
-                    flint_abort();
-                }
-            }
-
-            _acb_vec_clear(vec, len);
-            acb_clear(t);
-            fmpq_clear(q);
+            case 0:
+                order = 1 + len * n_randint(state, 6);
+                break;
+            case 1:
+                order = 1 + n_randint(state, 4 * len);
+                break;
+            default:
+                order = 1 + n_randint(state, len);
+                break;
         }
+
+        if (n_randint(state, 2))
+            order = -order;
+
+        vec = _acb_vec_init(len);
+        acb_init(t);
+        fmpq_init(q);
+
+        _acb_vec_unit_roots(vec, order, len, prec);
+
+        for (k = 0; k < len; k++)
+        {
+            if (order < 0)
+                fmpq_set_si(q, -2 * k, -order);
+            else
+                fmpq_set_si(q, 2 * k, order);
+
+            arb_sin_cos_pi_fmpq(acb_imagref(t), acb_realref(t), q, prec);
+
+            if (!acb_overlaps(vec + k, t))
+            {
+                flint_printf("FAIL: overlap\n\n");
+                flint_printf("n = %wu, order = %wd, k = %wd, prec = %wd\n\n", len, order, k, prec);
+                flint_printf("vec = "); acb_printn(vec + k, 30, 0); flint_printf("\n\n");
+                flint_printf("t = "); acb_printn(t, 30, 0); flint_printf("\n\n");
+                flint_abort();
+            }
+        }
+
+        _acb_vec_clear(vec, len);
+        acb_clear(t);
+        fmpq_clear(q);
     }
 
     TEST_FUNCTION_END(state);
