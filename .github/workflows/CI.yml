@@ -265,11 +265,6 @@ jobs:
           fi
           echo "All good!"
 
-      - if: failure()
-        name: "Print config.log"
-        run: |
-          cat config.log
-
 
 
   ##############################################################################
