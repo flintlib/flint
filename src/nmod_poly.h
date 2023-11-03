@@ -367,10 +367,10 @@ void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1);
 /* Scalar multiplication and division  ***************************************/
 
 void nmod_poly_scalar_mul_nmod(nmod_poly_t res,
-                                         const nmod_poly_t poly1, mp_limb_t c);
+                               const nmod_poly_t poly, mp_limb_t c);
 
-void nmod_poly_scalar_addmul_nmod(nmod_poly_t A, const nmod_poly_t B,
-                                                                      ulong x);
+void nmod_poly_scalar_addmul_nmod(nmod_poly_t res,
+                                  const nmod_poly_t poly, ulong c);
 
 void _nmod_poly_make_monic(mp_ptr output,
                                    mp_srcptr input, slong len, nmod_t mod);

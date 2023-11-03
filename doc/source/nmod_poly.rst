@@ -506,8 +506,13 @@ Scalar multiplication and division
 
 .. function:: void nmod_poly_scalar_mul_nmod(nmod_poly_t res, const nmod_poly_t poly, ulong c)
 
-    Sets ``res`` to ``(poly, len)`` multiplied by `c`,
-    where `c` is reduced modulo the modulus of ``poly``.
+    Sets ``res`` to ``poly`` multiplied by `c`. The element `c` is assumed
+    to be less than the modulus of ``poly``.
+
+.. function:: void nmod_poly_scalar_addmul_nmod(nmod_poly_t res, const nmod_poly_t poly, ulong c)
+
+    Adds ``poly`` multiplied by `c` to ``res``. The element `c` is assumed
+    to be less than the modulus of ``poly``.
 
 .. function:: void _nmod_poly_make_monic(mp_ptr output, mp_srcptr input, slong len, nmod_t mod)
 
