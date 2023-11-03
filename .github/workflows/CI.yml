@@ -253,6 +253,7 @@ jobs:
             echo "Building failed!"
             exit 4
           elif test ! -f _is_checked;
+          then
             echo "Check failed!"
             exit 5
           fi
