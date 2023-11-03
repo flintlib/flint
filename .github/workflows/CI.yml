@@ -200,7 +200,7 @@ jobs:
         continue-on-error: true
         with:
           operating_system: freebsd
-          version: '13.1'
+          version: '13.2'
           shell: bash
           run: |
             yes | sudo pkg install pkgconf
@@ -264,6 +264,11 @@ jobs:
             exit 6
           fi
           echo "All good!"
+
+      - if: failure()
+        name: "Print config.log"
+        run: |
+          cat config.log
 
 
 
