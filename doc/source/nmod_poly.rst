@@ -509,7 +509,7 @@ Scalar multiplication and division
     Sets ``res`` to ``poly`` multiplied by `c`. The element `c` is assumed
     to be less than the modulus of ``poly``.
 
-.. function:: void nmod_poly_scalar_addmul_nmod(nmod_poly_t res, const nmod_poly_t poly, ulong c);
+.. function:: void nmod_poly_scalar_addmul_nmod(nmod_poly_t res, const nmod_poly_t poly, ulong c)
 
     Adds ``poly`` multiplied by `c` to ``res``. The element `c` is assumed
     to be less than the modulus of ``poly``.
