@@ -15,17 +15,6 @@
 #include "fmpq_poly.h"
 #include "arith.h"
 
-static slong
-poly_pow_length(slong poly_len, ulong exp, slong trunc)
-{
-    mp_limb_t hi, lo;
-    umul_ppmm(hi, lo, poly_len - 1, exp);
-    add_ssaaaa(hi, lo, hi, lo, 0, 1);
-    if (hi != 0 || lo > (mp_limb_t) WORD_MAX)
-        return trunc;
-    return FLINT_MIN((slong) lo, trunc);
-}
-
 /* compute single coefficient in polynomial product */
 static void
 _fmpz_poly_mulmid_single(fmpz_t res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong i)
@@ -109,13 +98,17 @@ stirling_1u_ogf_bsplit(fmpz * res, ulong a, ulong b, slong len, int which, int f
         slong len1, len2;
         slong m = a + (b - a) / 2;
 
-        len1 = poly_pow_length(2, m - a, len);
-        len2 = poly_pow_length(2, b - m, len);
+        len1 = FLINT_MIN(m - a + 1, len);
+        len2 = FLINT_MIN(b - m + 1, len);
 
         L = _fmpz_vec_init(len1 + len2);
         R = L + len1;
 
         stirling_1u_ogf_bsplit(L, a, m, len, which, 0);
+        /* Remark: R can be computed from L using a Taylor shift. In theory,
+           this improves the complexity from O(M(n) log n) to O(M(n)).
+           In practice, the Taylor shift is rarely much faster than computing
+           R from scratch, and sometimes slower, so we do not bother. */
         stirling_1u_ogf_bsplit(R, m, b, len, which, 0);
 
         if (final)
