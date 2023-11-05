@@ -76,11 +76,7 @@ void fmpz_poly_hensel_build_tree(slong *link, fmpz_poly_t *v, fmpz_poly_t *w,
         }
 
         nmod_poly_swap(V[j + 1], V[minp]);
-
-        /* Swap link[j+1] and V[minp] */
-        tmp = link[j + 1];
-        link[j+1] = link[minp];
-        link[minp] = tmp;
+        FLINT_SWAP(slong, link[j + 1], link[minp]);
 
         nmod_poly_mul(V[i], V[j], V[j+1]);
         link[i] = j;

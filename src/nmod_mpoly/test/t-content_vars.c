@@ -82,7 +82,7 @@ TEST_FUNCTION_START(nmod_mpoly_content_vars, state)
         {
             slong k1 = n_randint(state, nvars);
             slong k2 = n_randint(state, nvars);
-            SLONG_SWAP(vars[k1], vars[k2]);
+            FLINT_SWAP(slong, vars[k1], vars[k2]);
         }
 
         num_vars = 1 + n_randint(state, nvars);

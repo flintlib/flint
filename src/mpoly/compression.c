@@ -212,7 +212,7 @@ done:
         tmp[i] = i;
     for (i = 1; i < n; i++)
         for (j = i; j > 0 && deg[tmp[j]] < deg[tmp[j - 1]]; j--)
-            SLONG_SWAP(tmp[j], tmp[j - 1]);
+            FLINT_SWAP(slong, tmp[j], tmp[j - 1]);
     m = 1;
     while (m < n && deg[tmp[n - (m + 1)]] > 1)
         m++;

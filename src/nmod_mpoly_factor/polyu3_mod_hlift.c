@@ -40,8 +40,8 @@ static void n_polyu_sort_terms(n_polyu_t A)
     for (i = 1; i < A->length; i++)
     for (j = i; j > 0 && A->exps[j - 1] < A->exps[j]; j--)
     {
-        MP_LIMB_SWAP(A->coeffs[j - 1], A->coeffs[j]);
-        ULONG_SWAP(A->exps[j - 1], A->exps[j]);
+        FLINT_SWAP(mp_limb_t, A->coeffs[j - 1], A->coeffs[j]);
+        FLINT_SWAP(ulong, A->exps[j - 1], A->exps[j]);
     }
     return;
 }

@@ -44,7 +44,7 @@ static void n_fq_polyu_sort_terms(
     for (i = 1; i < A->length; i++)
     for (j = i; j > 0 && A->exps[j - 1] < A->exps[j]; j--)
     {
-        ULONG_SWAP(A->exps[j - 1], A->exps[j]);
+        FLINT_SWAP(ulong, A->exps[j - 1], A->exps[j]);
         _n_fq_swap(A->coeffs + d*(j - 1), A->coeffs + d*(j), d);
     }
     return;

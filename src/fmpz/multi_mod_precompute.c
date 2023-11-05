@@ -50,7 +50,7 @@ static int _fill_sort(slong * link, fmpz * v, slong j)
         if (cmp > 0)
         {
             fmpz_swap(v + j, v + j + 1);
-            SLONG_SWAP(link[j], link[j + 1]);
+            FLINT_SWAP(slong, link[j], link[j + 1]);
         }
 
         if (!_fill_sort(link, v, link[j + 0]))
@@ -183,7 +183,7 @@ int fmpz_multi_mod_precompute(
             }
         }
         fmpz_swap(v + j, v + minp);
-        SLONG_SWAP(link[j], link[minp]);
+        FLINT_SWAP(slong, link[j], link[minp]);
 
         minp = j + 1;
         mind = v + j + 1;
@@ -196,7 +196,7 @@ int fmpz_multi_mod_precompute(
             }
         }
         fmpz_swap(v + j + 1, v + minp);
-        SLONG_SWAP(link[j + 1], link[minp]);
+        FLINT_SWAP(slong, link[j + 1], link[minp]);
 
         fmpz_mul(v + i, v + j, v + j + 1);
         link[i] = j;

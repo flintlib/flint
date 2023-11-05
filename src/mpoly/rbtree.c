@@ -209,7 +209,7 @@ Case4B:
     nodes[r11].up = r8;
 
 Case4Done:
-    SLONG_SWAP(rdx, r8);
+    FLINT_SWAP(slong, rdx, r8);
 
 Case5:
 
@@ -451,7 +451,7 @@ Case4B:
     nodes[r11].up = r8;
 
 Case4Done:
-    SLONG_SWAP(rdx, r8);
+    FLINT_SWAP(slong, rdx, r8);
 
 Case5:
 

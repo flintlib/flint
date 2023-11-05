@@ -14,12 +14,5 @@
 
 void padic_mat_swap(padic_mat_t A, padic_mat_t B)
 {
-    slong t;
-
-    fmpz_mat_swap(padic_mat(A), padic_mat(B));
-
-    t         = A->val;
-    A->val = B->val;
-    B->val = t;
+    FLINT_SWAP(padic_mat_struct, *A, *B);
 }
-

@@ -14,9 +14,6 @@
 void
 ca_swap(ca_t x, ca_t y, ca_ctx_t ctx)
 {
-    ca_t tmp;
-    *tmp = *x;
-    *x = *y;
-    *y = *tmp;
+    FLINT_SWAP(ca_struct, *x, *y);
 }
 

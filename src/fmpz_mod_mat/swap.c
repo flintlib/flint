@@ -15,14 +15,7 @@
 void
 fmpz_mod_mat_swap(fmpz_mod_mat_t mat1, fmpz_mod_mat_t mat2)
 {
-    if (mat1 != mat2)
-    {
-        fmpz_mod_mat_struct tmp;
-
-        tmp = *mat1;
-        *mat1 = *mat2;
-        *mat2 = tmp;
-    }
+    FLINT_SWAP(fmpz_mod_mat_struct, *mat1, *mat2);
 }
 
 void

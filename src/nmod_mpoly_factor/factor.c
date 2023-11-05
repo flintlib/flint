@@ -316,7 +316,7 @@ static int _factor_irred_compressed(
     {
         if (strides[i] == 1)
         {
-            SLONG_SWAP(perm[0], perm[i]);
+            FLINT_SWAP(slong, perm[0], perm[i]);
             break;
         }
     }

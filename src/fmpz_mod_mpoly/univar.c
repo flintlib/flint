@@ -602,7 +602,7 @@ static void mpoly_univar_swap_fmpz_mod_mpoly_univar(
         fmpz_mod_mpoly_swap(COEFF(A, i), B->coeffs + i, ctx);
     }
 
-    SLONG_SWAP(A->length, B->length);
+    FLINT_SWAP(slong, A->length, B->length);
 }
 
 int fmpz_mod_mpoly_univar_pseudo_gcd(

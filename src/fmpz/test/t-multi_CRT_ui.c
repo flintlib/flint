@@ -45,7 +45,7 @@ try_again:
         bits1 = n_randint(state, FLINT_BITS*3/4) + FLINT_BITS/4;
         bits2 = n_randint(state, FLINT_BITS*3/4) + FLINT_BITS/4;
         if (bits1 > bits2)
-            ULONG_SWAP(bits1, bits2);
+            FLINT_SWAP(ulong, bits1, bits2);
 
         fmpz_one(prod);
         for (j = 0; j < num_primes; j++)

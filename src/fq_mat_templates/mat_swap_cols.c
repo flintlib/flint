@@ -21,17 +21,11 @@ TEMPLATE(T, mat_swap_cols)(TEMPLATE(T, mat_t) mat, slong * perm, slong r, slong 
     {
         slong t;
 
-        if (perm)
-        {
-            t = perm[s];
-            perm[s] = perm[r];
-            perm[r] = t;
-        }
+        if (perm != NULL)
+            FLINT_SWAP(slong, perm[r], perm[s]);
 
-       for (t = 0; t < mat->r; t++)
-       {
-           TEMPLATE(T, swap)(TEMPLATE(T, mat_entry)(mat, t, r), TEMPLATE(T, mat_entry)(mat, t, s), ctx);
-       }
+        for (t = 0; t < mat->r; t++)
+            TEMPLATE(T, swap)(TEMPLATE(T, mat_entry)(mat, t, r), TEMPLATE(T, mat_entry)(mat, t, s), ctx);
     }
 }
 

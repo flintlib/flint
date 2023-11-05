@@ -79,10 +79,7 @@ fmpzi_conj(fmpzi_t res, const fmpzi_t x)
 FMPZI_INLINE void
 fmpzi_swap(fmpzi_t x, fmpzi_t y)
 {
-    fmpzi_struct t;
-    t = *x;
-    *x = *y;
-    *y = t;
+    FLINT_SWAP(fmpzi_struct, *x, *y);
 }
 
 FMPZI_INLINE void

@@ -28,9 +28,8 @@ arf_mul_rnd_any(arf_ptr z, arf_srcptr x, arf_srcptr y,
 
     if (yn > xn)
     {
-        arf_srcptr __t; mp_size_t __u;
-        __t = x; x = y; y = __t;
-        __u = xn; xn = yn; yn = __u;
+        FLINT_SWAP(arf_srcptr, x, y);
+        FLINT_SWAP(mp_size_t, xn, yn);
     }
 
     /* Either operand is a special value. */

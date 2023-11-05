@@ -52,7 +52,7 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_evaluate, state)
         {
             slong a = n_randint(state, nvars);
             slong b = n_randint(state, nvars);
-            SLONG_SWAP(perm[a], perm[b]);
+            FLINT_SWAP(slong, perm[a], perm[b]);
         }
 
         for (j = 0; j < 4; j++)

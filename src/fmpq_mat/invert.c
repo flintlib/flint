@@ -24,27 +24,16 @@ void fmpq_mat_invert_cols(fmpq_mat_t mat, slong * perm)
 {
     if (!fmpq_mat_is_empty(mat))
     {
-        slong t;
-        slong i;
+        slong t, i;
         slong c = mat->c;
         slong k = mat->c/2;
 
-        if (perm)
-        {
+        if (perm != NULL)
             for (i = 0; i < k; i++)
-            {
-                t = perm[i];
-                perm[i] = perm[c - i - 1];
-                perm[c - i - 1] = t;
-            }
-        }
+                FLINT_SWAP(slong, perm[i], perm[c - i - 1]);
 
         for (t = 0; t < mat->r; t++)
-        {
             for (i = 0; i < k; i++)
-            {
                 fmpq_swap(fmpq_mat_entry(mat, t, i), fmpq_mat_entry(mat, t, c - i - 1));
-            }
-        }
     }
 }

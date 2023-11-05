@@ -78,7 +78,7 @@ d_mat_swap_entrywise(d_mat_t mat1, d_mat_t mat2)
        double * row1 = mat1->rows[i];
        double * row2 = mat2->rows[i];
        for (j = 0; j < d_mat_ncols(mat1); j++)
-          DOUBLE_SWAP(row1[j], row2[j]);
+          FLINT_SWAP(double, row1[j], row2[j]);
     }
 }
 
@@ -135,11 +135,7 @@ void d_mat_swap_rows(d_mat_t mat, slong r, slong s)
 {
     if (r != s)
     {
-        double * u;
-
-        u = mat->rows[s];
-        mat->rows[s] = mat->rows[r];
-        mat->rows[r] = u;
+        FLINT_SWAP(double *, mat->rows[r], mat->rows[s]);
     }
 }
 

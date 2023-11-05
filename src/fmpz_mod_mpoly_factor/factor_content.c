@@ -53,7 +53,7 @@ FLINT_ASSERT(fmpz_mod_mpoly_is_canonical(a, ctx));
     /* sort vars by decreasing length */
     for (i = 1; i < mvars; i++)
         for (j = i; j > 0 && u[vars[j]].length > u[vars[j - 1]].length; j--)
-            SLONG_SWAP(vars[j], vars[j - 1]);
+            FLINT_SWAP(slong, vars[j], vars[j - 1]);
 
     for (i = 0; i < mvars; i++)
     {

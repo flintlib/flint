@@ -198,9 +198,7 @@ FMPZ_MPOLY_INLINE
 void fmpz_mpoly_swap(fmpz_mpoly_t A,
                                 fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 {
-   fmpz_mpoly_struct t = *A;
-   *A = *B;
-   *B = t;
+    FLINT_SWAP(fmpz_mpoly_struct, *A, *B);
 }
 
 FMPZ_MPOLY_INLINE
@@ -994,9 +992,7 @@ FMPZ_MPOLY_INLINE
 void fmpz_mpoly_univar_swap(fmpz_mpoly_univar_t A, fmpz_mpoly_univar_t B,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
-   fmpz_mpoly_univar_struct t = *A;
-   *A = *B;
-   *B = t;
+    FLINT_SWAP(fmpz_mpoly_univar_struct, *A, *B);
 }
 
 FMPZ_MPOLY_INLINE

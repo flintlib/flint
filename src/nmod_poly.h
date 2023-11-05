@@ -177,20 +177,7 @@ void nmod_poly_set(nmod_poly_t a, const nmod_poly_t b)
 NMOD_POLY_INLINE
 void nmod_poly_swap(nmod_poly_t poly1, nmod_poly_t poly2)
 {
-    slong t;
-    mp_ptr tp;
-
-    t = poly1->alloc;
-    poly1->alloc = poly2->alloc;
-    poly2->alloc = t;
-
-    t = poly1->length;
-    poly1->length = poly2->length;
-    poly2->length = t;
-
-    tp = poly1->coeffs;
-    poly1->coeffs = poly2->coeffs;
-    poly2->coeffs = tp;
+    FLINT_SWAP(nmod_poly_struct, *poly1, *poly2);
 }
 
 NMOD_POLY_INLINE

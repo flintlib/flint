@@ -15,21 +15,5 @@
 
 void fmpq_poly_swap(fmpq_poly_t poly1, fmpq_poly_t poly2)
 {
-    slong t;
-    fmpz * tptr;
-
-    t             = poly1->length;
-    poly1->length = poly2->length;
-    poly2->length = t;
-
-    t             = poly1->alloc;
-    poly1->alloc  = poly2->alloc;
-    poly2->alloc  = t;
-
-    tptr          = poly1->coeffs;
-    poly1->coeffs = poly2->coeffs;
-    poly2->coeffs = tptr;
-
-    fmpz_swap(poly1->den, poly2->den);
+    FLINT_SWAP(fmpq_poly_struct, *poly1, *poly2);
 }
-

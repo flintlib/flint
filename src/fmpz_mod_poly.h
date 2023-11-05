@@ -189,9 +189,7 @@ FMPZ_MOD_POLY_INLINE
 void fmpz_mod_poly_swap(fmpz_mod_poly_t poly1,
                                fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t ctx)
 {
-    fmpz_mod_poly_struct t = *poly2;
-    *poly2 = *poly1;
-    *poly1 = t;
+    FLINT_SWAP(fmpz_mod_poly_struct, *poly1, *poly2);
 }
 
 void _fmpz_mod_poly_reverse(fmpz * res, const fmpz * poly, slong len, slong n);

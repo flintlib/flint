@@ -52,7 +52,7 @@ void _gr_mpoly_radix_sort1(
                                                    Aexps[j - 1], cmpmask); j--)
                 {
                     swap(GR_ENTRY(Acoeffs, j, sz), GR_ENTRY(Acoeffs, j - 1, sz), cctx);
-                    ULONG_SWAP(Aexps[j], Aexps[j - 1]);
+                    FLINT_SWAP(ulong, Aexps[j], Aexps[j - 1]);
                 }
             }
 
@@ -76,7 +76,7 @@ void _gr_mpoly_radix_sort1(
             if ((Aexps[cur] & mask) != cmp)
             {
                 swap(GR_ENTRY(Acoeffs, cur, sz), GR_ENTRY(Acoeffs, mid, sz), cctx);
-                ULONG_SWAP(Aexps[cur], Aexps[mid]);
+                FLINT_SWAP(ulong, Aexps[cur], Aexps[mid]);
                 mid++;
             }
         }

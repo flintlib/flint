@@ -75,7 +75,7 @@ nmod_mat_swap_entrywise(nmod_mat_t mat1, nmod_mat_t mat2)
        mp_limb_t * row1 = mat1->rows[i];
        mp_limb_t * row2 = mat2->rows[i];
        for (j = 0; j < nmod_mat_ncols(mat1); j++)
-          MP_LIMB_SWAP(row1[j], row2[j]);
+          FLINT_SWAP(mp_limb_t, row1[j], row2[j]);
     }
 }
 
@@ -216,19 +216,10 @@ void nmod_mat_swap_rows(nmod_mat_t mat, slong * perm, slong r, slong s)
 {
     if (r != s && !nmod_mat_is_empty(mat))
     {
-        mp_limb_t * u;
-        slong t;
-
         if (perm)
-        {
-            t = perm[s];
-            perm[s] = perm[r];
-            perm[r] = t;
-        }
+            FLINT_SWAP(slong, perm[r], perm[s]);
 
-        u = mat->rows[s];
-        mat->rows[s] = mat->rows[r];
-        mat->rows[r] = u;
+        FLINT_SWAP(mp_ptr, mat->rows[r], mat->rows[s]);
     }
 }
 
@@ -246,54 +237,32 @@ void nmod_mat_swap_cols(nmod_mat_t mat, slong * perm, slong r, slong s)
 {
     if (r != s && !nmod_mat_is_empty(mat))
     {
-        slong t;
+        slong i;
 
-        if (perm)
-        {
-            t = perm[s];
-            perm[s] = perm[r];
-            perm[r] = t;
-        }
+        if (perm != NULL)
+            FLINT_SWAP(slong, perm[r], perm[s]);
 
-        for (t = 0; t < mat->r; t++)
-        {
-            mp_limb_t c = mat->rows[t][r];
-            mat->rows[t][r] = mat->rows[t][s];
-            mat->rows[t][s] = c;
-        }
+        for (i = 0; i < mat->r; i++)
+            FLINT_SWAP(mp_limb_t, mat->rows[i][r], mat->rows[i][s]);
     }
 }
 
 NMOD_MAT_INLINE
 void nmod_mat_invert_cols(nmod_mat_t mat, slong * perm)
 {
-    if (!(nmod_mat_is_empty(mat)))
+    if (!nmod_mat_is_empty(mat))
     {
-        slong t;
-        slong i;
+        slong t, i;
         slong c = mat->c;
         slong k = mat->c/2;
-        mp_limb_t e;
 
-        if (perm)
-        {
+        if (perm != NULL)
             for (i = 0; i < k; i++)
-            {
-                t = perm[i];
-                perm[i] = perm[c - i - 1];
-                perm[c - i - 1] = t;
-            }
-        }
+                FLINT_SWAP(slong, perm[i], perm[c - i - 1]);
 
         for (t = 0; t < mat->r; t++)
-        {
             for (i = 0; i < k; i++)
-            {
-                e = mat->rows[t][i];
-                mat->rows[t][i] = mat->rows[t][c - i - 1];
-                mat->rows[t][c - i - 1] = e;
-            }
-        }
+                FLINT_SWAP(mp_limb_t, mat->rows[t][i], mat->rows[t][c - i - 1]);
     }
 }
 

@@ -44,9 +44,7 @@ void arb_mat_clear(arb_mat_t mat);
 ARB_MAT_INLINE void
 arb_mat_swap(arb_mat_t mat1, arb_mat_t mat2)
 {
-    arb_mat_struct t = *mat1;
-    *mat1 = *mat2;
-    *mat2 = t;
+    FLINT_SWAP(arb_mat_struct, *mat1, *mat2);
 }
 
 ARB_MAT_INLINE void
@@ -332,19 +330,10 @@ arb_mat_swap_rows(arb_mat_t mat, slong * perm, slong r, slong s)
 {
     if (r != s)
     {
-        arb_ptr u;
-        slong t;
-
         if (perm != NULL)
-        {
-            t = perm[s];
-            perm[s] = perm[r];
-            perm[r] = t;
-        }
+            FLINT_SWAP(slong, perm[r], perm[s]);
 
-        u = mat->rows[s];
-        mat->rows[s] = mat->rows[r];
-        mat->rows[r] = u;
+        FLINT_SWAP(arb_ptr, mat->rows[r], mat->rows[s]);
     }
 }
 

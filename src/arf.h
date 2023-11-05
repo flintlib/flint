@@ -323,12 +323,7 @@ int arf_cmp_d(const arf_t x, double y);
 ARF_INLINE void
 arf_swap(arf_t y, arf_t x)
 {
-    if (x != y)
-    {
-        arf_struct t = *x;
-        *x = *y;
-        *y = t;
-    }
+    FLINT_SWAP(arf_struct, *x, *y);
 }
 
 void arf_set(arf_t y, const arf_t x);

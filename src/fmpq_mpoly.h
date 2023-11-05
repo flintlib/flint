@@ -206,9 +206,7 @@ FMPQ_MPOLY_INLINE
 void fmpq_mpoly_swap(fmpq_mpoly_t A,
                                 fmpq_mpoly_t B, const fmpq_mpoly_ctx_t ctx)
 {
-    fmpq_mpoly_struct t = *A;
-    *A = *B;
-    *B = t;
+    FLINT_SWAP(fmpq_mpoly_struct, *A, *B);
 }
 
 
@@ -827,9 +825,7 @@ FMPQ_MPOLY_INLINE
 void fmpq_mpoly_univar_swap(fmpq_mpoly_univar_t A, fmpq_mpoly_univar_t B,
                                                     const fmpq_mpoly_ctx_t ctx)
 {
-   fmpq_mpoly_univar_struct t = *A;
-   *A = *B;
-   *B = t;
+    FLINT_SWAP(fmpq_mpoly_univar_struct, *A, *B);
 }
 
 FMPQ_MPOLY_INLINE
