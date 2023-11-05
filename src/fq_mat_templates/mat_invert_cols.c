@@ -19,28 +19,17 @@ TEMPLATE(T, mat_invert_cols)(TEMPLATE(T, mat_t) mat, slong * perm, const TEMPLAT
 {
     if (!TEMPLATE(T, mat_is_empty)(mat, ctx))
     {
-        slong t;
-        slong i;
+        slong t, i;
         slong c = mat->c;
         slong k = mat->c/2;
 
-        if (perm)
-        {
+        if (perm != NULL)
             for (i = 0; i < k; i++)
-            {
-                t = perm[i];
-                perm[i] = perm[c - i - 1];
-                perm[c - i - 1] = t;
-            }
-        }
+                FLINT_SWAP(slong, perm[i], perm[c - i - 1]);
 
         for (t = 0; t < mat->r; t++)
-        {
             for (i = 0; i < k; i++)
-            {
                 TEMPLATE(T, swap)(TEMPLATE(T, mat_entry)(mat, t, i), TEMPLATE(T, mat_entry)(mat, t, c - i - 1), ctx);
-            }
-        }
     }
 }
 

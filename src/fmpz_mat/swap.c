@@ -35,7 +35,7 @@ fmpz_mat_swap_cols(fmpz_mat_t mat, slong * perm, slong r, slong s)
     {
         slong i;
 
-        if (perm)
+        if (perm != NULL)
             FLINT_SWAP(slong, perm[r], perm[s]);
 
        for (i = 0; i < mat->r; i++)

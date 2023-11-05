@@ -239,7 +239,7 @@ void nmod_mat_swap_cols(nmod_mat_t mat, slong * perm, slong r, slong s)
     {
         slong i;
 
-        if (perm)
+        if (perm != NULL)
             FLINT_SWAP(slong, perm[r], perm[s]);
 
         for (i = 0; i < mat->r; i++)
@@ -256,7 +256,7 @@ void nmod_mat_invert_cols(nmod_mat_t mat, slong * perm)
         slong c = mat->c;
         slong k = mat->c/2;
 
-        if (perm)
+        if (perm != NULL)
             for (i = 0; i < k; i++)
                 FLINT_SWAP(slong, perm[i], perm[c - i - 1]);
 
