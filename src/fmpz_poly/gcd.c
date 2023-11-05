@@ -17,6 +17,33 @@ void
 _fmpz_poly_gcd(fmpz * res, const fmpz * poly1, slong len1,
                const fmpz * poly2, slong len2)
 {
+    FLINT_ASSERT(len2 >= 1);
+    FLINT_ASSERT(len1 >= len2);
+
+    /* remove powers of x */
+    {
+        slong val1 = 0, val2 = 0, d, rlen;
+
+        while (val1 < len1 - 1 && fmpz_is_zero(poly1 + val1))
+            val1++;
+        while (val2 < len2 - 1 && fmpz_is_zero(poly2 + val2))
+            val2++;
+
+        if (val1 != 0 || val2 != 0)
+        {
+            d = FLINT_MIN(val1, val2);
+            rlen = FLINT_MIN(len1 - val1, len2 - val2);
+
+            if (len1 - val1 >= len2 - val2)
+                _fmpz_poly_gcd(res + d, poly1 + val1, len1 - val1, poly2 + val2, len2 - val2);
+            else
+                _fmpz_poly_gcd(res + d, poly2 + val2, len2 - val2, poly1 + val1, len1 - val1);
+
+            _fmpz_vec_zero(res, d);
+            _fmpz_vec_zero(res + d + rlen, len2 - rlen - d);
+            return;
+        }
+    }
 
     if (len1 < 6)
     {
@@ -79,4 +106,3 @@ fmpz_poly_gcd(fmpz_poly_t res, const fmpz_poly_t poly1,
         }
     }
 }
-
