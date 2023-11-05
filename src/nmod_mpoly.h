@@ -420,9 +420,7 @@ int nmod_mpoly_equal(const nmod_mpoly_t A, const nmod_mpoly_t B,
 NMOD_MPOLY_INLINE
 void nmod_mpoly_swap(nmod_mpoly_t A, nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
 {
-   nmod_mpoly_struct t = *A;
-   *A = *B;
-   *B = t;
+    FLINT_SWAP(nmod_mpoly_struct, *A, *B);
 }
 
 /* Constants *****************************************************************/

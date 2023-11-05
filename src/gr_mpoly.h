@@ -113,9 +113,7 @@ void _gr_mpoly_set_length(gr_mpoly_t A, slong newlen,
 GR_MPOLY_INLINE
 void gr_mpoly_swap(gr_mpoly_t A, gr_mpoly_t B, const mpoly_ctx_t mctx, gr_ctx_t cctx)
 {
-    gr_mpoly_struct t = *A;
-    *A = *B;
-    *B = t;
+    FLINT_SWAP(gr_mpoly_struct, *A, *B);
 }
 
 WARN_UNUSED_RESULT int gr_mpoly_set(gr_mpoly_t A, const gr_mpoly_t B, const mpoly_ctx_t mctx, gr_ctx_t cctx);

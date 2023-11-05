@@ -18,14 +18,7 @@ void
 TEMPLATE(T, mat_swap) (TEMPLATE(T, mat_t) mat1, TEMPLATE(T, mat_t) mat2,
                        const TEMPLATE(T, ctx_t) ctx)
 {
-    if (mat1 != mat2)
-    {
-        TEMPLATE(T, mat_struct) tmp;
-
-        tmp = *mat1;
-        *mat1 = *mat2;
-        *mat2 = tmp;
-    }
+    FLINT_SWAP(TEMPLATE(T, mat_struct), *mat1, *mat2);
 }
 
 

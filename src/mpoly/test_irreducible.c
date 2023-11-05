@@ -436,7 +436,7 @@ again:
 
     if (Alen < Blen)
     {
-        SLONG_SWAP(Alen, Blen);
+        FLINT_SWAP(slong, Alen, Blen);
         {
             point2d * T = Apoints;
             Apoints = Bpoints;

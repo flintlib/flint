@@ -70,7 +70,7 @@ static int _fill_pfrac(
         if (cmp > 0)
         {
             fmpz_swap(v + j, v + j + 1);
-            SLONG_SWAP(link[j], link[j + 1]);
+            FLINT_SWAP(slong, link[j], link[j + 1]);
         }
 
         fmpz_gcdinv(g, s, v + j + 0, v + j + 1);
@@ -223,7 +223,7 @@ int fmpz_multi_CRT_precompute(
             }
         }
         fmpz_swap(v + j, v + minp);
-        SLONG_SWAP(link[j], link[minp]);
+        FLINT_SWAP(slong, link[j], link[minp]);
 
         minp = j + 1;
         mind = v + j + 1;
@@ -236,7 +236,7 @@ int fmpz_multi_CRT_precompute(
             }
         }
         fmpz_swap(v + j + 1, v + minp);
-        SLONG_SWAP(link[j + 1], link[minp]);
+        FLINT_SWAP(slong, link[j + 1], link[minp]);
 
         fmpz_mul(v + i, v + j, v + j + 1);
         link[i] = j;

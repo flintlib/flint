@@ -138,9 +138,7 @@ void arb_set(arb_t x, const arb_t y);
 ARB_INLINE void
 arb_swap(arb_t x, arb_t y)
 {
-    arb_struct t = *x;
-    *x = *y;
-    *y = t;
+    FLINT_SWAP(arb_struct, *x, *y);
 }
 
 void arb_set_round(arb_t z, const arb_t x, slong prec);

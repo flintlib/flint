@@ -577,8 +577,8 @@ its_ok:
 
     _fmpq_cfrac_list_append_ui(s, s_temp, written);
 
-    FLINT_MPZ_PTR_SWAP(xn, yn);
-    FLINT_MPZ_PTR_SWAP(xd, yd);
+    FLINT_SWAP(mpz_ptr, xn, yn);
+    FLINT_SWAP(mpz_ptr, xd, yd);
 
     goto again;
 
@@ -765,10 +765,10 @@ again:
     /* already checked that s will fit new terms */
     _fmpq_cfrac_list_append_ui(s, s_temp, written);
 
-    FLINT_MPZ_PTR_SWAP(xln, yln);
-    FLINT_MPZ_PTR_SWAP(xld, yld);
-    FLINT_MPZ_PTR_SWAP(xrn, yrn);
-    FLINT_MPZ_PTR_SWAP(xrd, yrd);
+    FLINT_SWAP(mpz_ptr, xln, yln);
+    FLINT_SWAP(mpz_ptr, xld, yld);
+    FLINT_SWAP(mpz_ptr, xrn, yrn);
+    FLINT_SWAP(mpz_ptr, xrd, yrd);
 
     goto again;
 

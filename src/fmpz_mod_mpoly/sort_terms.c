@@ -49,7 +49,7 @@ void _fmpz_mod_mpoly_radix_sort1(
                                                    Aexps[j - 1], cmpmask); j--)
                 {
                     fmpz_swap(Acoeffs + j, Acoeffs + j - 1);
-                    ULONG_SWAP(Aexps[j], Aexps[j - 1]);
+                    FLINT_SWAP(ulong, Aexps[j], Aexps[j - 1]);
                 }
             }
 
@@ -73,7 +73,7 @@ void _fmpz_mod_mpoly_radix_sort1(
             if ((Aexps[cur] & mask) != cmp)
             {
                 fmpz_swap(Acoeffs + cur, Acoeffs + mid);
-                ULONG_SWAP(Aexps[cur], Aexps[mid]);
+                FLINT_SWAP(ulong, Aexps[cur], Aexps[mid]);
                 mid++;
             }
         }

@@ -168,7 +168,7 @@ static void _make_bases_coprime(
             continue;
         A->num--;
         fmpz_poly_swap(A->p + i, A->p + A->num);
-        SLONG_SWAP(A->exp[i], A->exp[A->num]);
+        FLINT_SWAP(slong, A->exp[i], A->exp[A->num]);
         i--;
     }
 
@@ -178,7 +178,7 @@ static void _make_bases_coprime(
             continue;
         B->num--;
         fmpz_poly_swap(B->p + i, B->p + B->num);
-        SLONG_SWAP(B->exp[i], B->exp[B->num]);
+        FLINT_SWAP(slong, B->exp[i], B->exp[B->num]);
         i--;
     }
 

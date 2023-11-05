@@ -323,49 +323,7 @@ ulong n_randtest_not_zero(flint_rand_t);
 #define FLINT_ABS(x) ((slong)(x) < 0 ? (-(x)) : (x))
 #define FLINT_SIGN_EXT(x) (-(ulong)((slong)(x) < 0))
 #define FLINT_SGN(x) ((0 < (slong)(x)) - ((slong)(x) < 0))
-
-#define MP_PTR_SWAP(x, y) \
-    do { \
-        mp_limb_t * __txxx; \
-        __txxx = x; \
-        x = y; \
-        y = __txxx; \
-    } while (0)
-
-#define SLONG_SWAP(A, B)    \
-    do {                    \
-        slong __t_m_p_ = A; \
-        A = B;              \
-        B = __t_m_p_;       \
-    } while (0)
-
-#define ULONG_SWAP(A, B)    \
-    do {                    \
-        ulong __t_m_p_ = A; \
-        A = B;              \
-        B = __t_m_p_;       \
-    } while (0)
-
-#define MP_LIMB_SWAP(A, B)      \
-    do {                        \
-        mp_limb_t __t_m_p_ = A; \
-        A = B;                  \
-        B = __t_m_p_;           \
-    } while (0)
-
-#define DOUBLE_SWAP(A, B)    \
-    do {                     \
-        double __t_m_p_ = A; \
-        A = B;               \
-        B = __t_m_p_;        \
-    } while (0)
-
-#define PTR_SWAP(T, A, B)    \
-    do {                    \
-        T* __t_m_p_ = A; \
-        A = B;              \
-        B = __t_m_p_;       \
-    } while (0)
+#define FLINT_SWAP(T, x, y) do { T _swap_t = (x); (x) = (y); (y) = _swap_t; } while(0)
 
 #define r_shift(in, shift) \
     ((shift == FLINT_BITS) ? WORD(0) : ((in) >> (shift)))

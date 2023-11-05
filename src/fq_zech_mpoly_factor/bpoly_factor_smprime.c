@@ -111,7 +111,7 @@ static void _hensel_build_tree(
             }
         }
         fq_zech_poly_swap(V + j, V + minp, ctx);
-        SLONG_SWAP(link[j], link[minp]);
+        FLINT_SWAP(slong, link[j], link[minp]);
 
         minp = j + 1;
         mind = fq_zech_poly_degree(V + j + 1, ctx);
@@ -124,7 +124,7 @@ static void _hensel_build_tree(
             }
         }
         fq_zech_poly_swap(V + j + 1, V + minp, ctx);
-        SLONG_SWAP(link[j + 1], link[minp]);
+        FLINT_SWAP(slong, link[j + 1], link[minp]);
 
         fq_zech_poly_mul(V + i, V + j, V + j + 1, ctx);
         link[i] = j;

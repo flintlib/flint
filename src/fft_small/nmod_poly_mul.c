@@ -1365,8 +1365,8 @@ void _nmod_poly_mul_mid(
 
     if (an < bn)
     {
-        PTR_SWAP(const ulong, a, b);
-        ULONG_SWAP(an, bn);
+        FLINT_SWAP(const ulong *, a, b);
+        FLINT_SWAP(ulong, an, bn);
     }
 
     if (zl > bn - 1)

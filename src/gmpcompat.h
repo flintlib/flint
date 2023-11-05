@@ -19,13 +19,6 @@
         ? (mp_ptr) _mpz_realloc(z, len) \
         : ((z)->_mp_d))
 
-#define FLINT_MPZ_PTR_SWAP(a, b)    \
-  do {                              \
-    mpz_ptr __tmp = (a);            \
-    (a) = (b);                      \
-    (b) = __tmp;                    \
-  } while (0)
-
 static __inline__
 void flint_mpz_add_uiui(mpz_ptr a, mpz_srcptr b, ulong c1, ulong c0)
 {

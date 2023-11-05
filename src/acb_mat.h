@@ -376,19 +376,10 @@ acb_mat_swap_rows(acb_mat_t mat, slong * perm, slong r, slong s)
 {
     if (r != s)
     {
-        acb_ptr u;
-        slong t;
-
         if (perm != NULL)
-        {
-            t = perm[s];
-            perm[s] = perm[r];
-            perm[r] = t;
-        }
+            FLINT_SWAP(slong, perm[r], perm[s]);
 
-        u = mat->rows[s];
-        mat->rows[s] = mat->rows[r];
-        mat->rows[r] = u;
+        FLINT_SWAP(acb_ptr, mat->rows[r], mat->rows[s]);
     }
 }
 

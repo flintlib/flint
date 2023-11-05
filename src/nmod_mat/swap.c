@@ -14,8 +14,5 @@
 void
 nmod_mat_swap(nmod_mat_t mat1, nmod_mat_t mat2)
 {
-    nmod_mat_t temp;
-    *temp = *mat1;
-    *mat1 = *mat2;
-    *mat2 = *temp;
+    FLINT_SWAP(nmod_mat_struct, *mat1, *mat2);
 }

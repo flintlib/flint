@@ -165,7 +165,7 @@ void fq_nmod_mpolyu_degrees_si(
     mpoly_unpack_vec_ui((ulong *) degs, pmax, bits, ctx->minfo->nvars, 1);
 
     for (i = 0; i < ctx->minfo->nvars/2; i++)
-        SLONG_SWAP(degs[i], degs[ctx->minfo->nvars - i - 1]);
+        FLINT_SWAP(slong, degs[i], degs[ctx->minfo->nvars - i - 1]);
 
     TMP_END;
 }

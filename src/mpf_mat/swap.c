@@ -15,12 +15,5 @@
 void
 mpf_mat_swap(mpf_mat_t mat1, mpf_mat_t mat2)
 {
-    if (mat1 != mat2)
-    {
-        mpf_mat_struct tmp;
-
-        tmp = *mat1;
-        *mat1 = *mat2;
-        *mat2 = tmp;
-    }
+    FLINT_SWAP(mpf_mat_struct, *mat1, *mat2);
 }

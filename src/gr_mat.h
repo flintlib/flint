@@ -70,13 +70,7 @@ void gr_mat_clear(gr_mat_t mat, gr_ctx_t ctx);
 GR_MAT_INLINE void
 gr_mat_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t ctx)
 {
-    if (mat1 != mat2)
-    {
-        gr_mat_t tmp;
-        *tmp = *mat1;
-        *mat1 = *mat2;
-        *mat2 = *tmp;
-    }
+    FLINT_SWAP(gr_mat_struct, *mat1, *mat2);
 }
 
 WARN_UNUSED_RESULT int gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx);

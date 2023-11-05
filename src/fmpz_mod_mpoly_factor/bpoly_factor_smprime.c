@@ -391,7 +391,7 @@ static void _fmpz_mod_bpoly_lift_build_tree(
             }
         }
         fmpz_mod_bpoly_swap(v + j, v + minp, ctx);
-        SLONG_SWAP(link[j], link[minp]);
+        FLINT_SWAP(slong, link[j], link[minp]);
 
         minp = j + 1;
         mind = fmpz_mod_bpoly_degree0(v + j + 1, ctx);
@@ -404,7 +404,7 @@ static void _fmpz_mod_bpoly_lift_build_tree(
             }
         }
         fmpz_mod_bpoly_swap(v + j + 1, v + minp, ctx);
-        SLONG_SWAP(link[j + 1], link[minp]);
+        FLINT_SWAP(slong, link[j + 1], link[minp]);
 
         fmpz_mod_bpoly_mul_series(v + i, v + j, v + j + 1, L->fac_lift_order, ctx);
         link[i] = j;

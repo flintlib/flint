@@ -42,7 +42,7 @@ static void fmpz_mod_polyu_sort_terms(fmpz_mod_polyu_t A)
     for (j = i; j > 0 && A->exps[j - 1] < A->exps[j]; j--)
     {
         fmpz_swap(A->coeffs + j - 1, A->coeffs + j);
-        ULONG_SWAP(A->exps[j - 1], A->exps[j]);
+        FLINT_SWAP(ulong, A->exps[j - 1], A->exps[j]);
     }
     return;
 }

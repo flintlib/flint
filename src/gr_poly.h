@@ -55,9 +55,7 @@ GR_POLY_INLINE slong gr_poly_length(const gr_poly_t poly, gr_ctx_t ctx)
 GR_POLY_INLINE void
 gr_poly_swap(gr_poly_t poly1, gr_poly_t poly2, gr_ctx_t ctx)
 {
-    gr_poly_struct t = *poly1;
-    *poly1 = *poly2;
-    *poly2 = t;
+    FLINT_SWAP(gr_poly_struct, *poly1, *poly2);
 }
 
 void gr_poly_fit_length(gr_poly_t poly, slong len, gr_ctx_t ctx);

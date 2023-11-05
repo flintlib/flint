@@ -256,9 +256,7 @@ FQ_ZECH_MPOLY_INLINE
 void fq_zech_mpoly_swap(fq_zech_mpoly_t A, fq_zech_mpoly_t B,
                                                  const fq_zech_mpoly_ctx_t ctx)
 {
-   fq_zech_mpoly_struct t = *A;
-   *A = *B;
-   *B = t;
+    FLINT_SWAP(fq_zech_mpoly_struct, *A, *B);
 }
 
 
@@ -734,9 +732,7 @@ FQ_ZECH_MPOLY_INLINE
 void fq_zech_mpoly_univar_swap(fq_zech_mpoly_univar_t A,
                        fq_zech_mpoly_univar_t B, const fq_zech_mpoly_ctx_t ctx)
 {
-   fq_zech_mpoly_univar_struct t = *A;
-   *A = *B;
-   *B = t;
+    FLINT_SWAP(fq_zech_mpoly_univar_struct, *A, *B);
 }
 
 FQ_ZECH_MPOLY_INLINE
