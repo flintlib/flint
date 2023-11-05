@@ -10,67 +10,13 @@
 */
 
 #include "arb_mat.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 void
 arb_mat_pascal(arb_mat_t mat, int triangular, slong prec)
 {
-    slong R, C, i, j;
-
-    R = arb_mat_nrows(mat);
-    C = arb_mat_ncols(mat);
-
-    if (R == 0 || C == 0)
-        return;
-
-    if (triangular == 1)
-    {
-        for (i = 1; i < R; i++)
-            for (j = 0; j < i && j < C; j++)
-                arb_zero(arb_mat_entry(mat, i, j));
-
-        for (j = 0; j < C; j++)
-            arb_one(arb_mat_entry(mat, 0, j));
-
-        for (i = 1; i < R && i < C; i++)
-            arb_one(arb_mat_entry(mat, i, i));
-
-        for (i = 1; i < R; i++)
-            for (j = i + 1; j < C; j++)
-                arb_add(arb_mat_entry(mat, i, j),
-                    arb_mat_entry(mat, i, j - 1),
-                    arb_mat_entry(mat, i - 1, j - 1), prec);
-    }
-    else if (triangular == -1)
-    {
-        for (i = 0; i < R; i++)
-            for (j = i + 1; j < C; j++)
-                arb_zero(arb_mat_entry(mat, i, j));
-
-        for (i = 0; i < R; i++)
-            arb_one(arb_mat_entry(mat, i, 0));
-
-        for (i = 1; i < R && i < C; i++)
-            arb_one(arb_mat_entry(mat, i, i));
-
-        for (i = 2; i < R; i++)
-            for (j = 1; j < i && j < C; j++)
-                arb_add(arb_mat_entry(mat, i, j),
-                    arb_mat_entry(mat, i - 1, j - 1),
-                    arb_mat_entry(mat, i - 1, j), prec);
-    }
-    else
-    {
-        for (j = 0; j < C; j++)
-            arb_one(arb_mat_entry(mat, 0, j));
-
-        for (i = 1; i < R; i++)
-            arb_one(arb_mat_entry(mat, i, 0));
-
-        for (i = 1; i < R; i++)
-            for (j = 1; j < C; j++)
-                arb_add(arb_mat_entry(mat, i, j),
-                    arb_mat_entry(mat, i, j - 1),
-                    arb_mat_entry(mat, i - 1, j), prec);
-    }
+    gr_ctx_t ctx;
+    gr_ctx_init_real_arb(ctx, prec);
+    GR_MUST_SUCCEED(gr_mat_pascal((gr_mat_struct *) mat, triangular, ctx));
 }
-

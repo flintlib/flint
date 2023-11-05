@@ -10,108 +10,13 @@
 */
 
 #include "arb_mat.h"
-
-static void _stirling_number_1u_vec_next(arb_ptr row,
-    arb_srcptr prev, slong n, slong klen, slong prec)
-{
-    slong k;
-
-    if (klen > n) arb_one(row + n);
-    if (n != 0 && klen != 0) arb_zero(row);
-
-    for (k = FLINT_MIN(n, klen) - 1; k >= 1; k--)
-    {
-        arb_mul_ui(row + k, prev + k, n - 1, prec);
-        arb_add(row + k, prev + k - 1, row + k, prec);
-    }
-
-    for (k = n + 1; k < klen; k++)
-        arb_zero(row + k);
-}
-
-static void _stirling_number_1_vec_next(arb_ptr row,
-    arb_srcptr prev, slong n, slong klen, slong prec)
-{
-    slong k;
-
-    if (klen > n) arb_one(row + n);
-    if (n != 0 && klen != 0) arb_zero(row);
-
-    for (k = FLINT_MIN(n, klen) - 1; k >= 1; k--)
-    {
-        arb_mul_ui(row + k, prev + k, n - 1, prec);
-        arb_sub(row + k, prev + k - 1, row + k, prec);
-    }
-
-    for (k = n + 1; k < klen; k++)
-        arb_zero(row + k);
-}
-
-static void _stirling_number_2_vec_next(arb_ptr row,
-    arb_srcptr prev, slong n, slong klen, slong prec)
-{
-    slong k;
-
-    if (klen > n) arb_one(row + n);
-    if (n != 0 && klen != 0) arb_zero(row);
-
-    for (k = FLINT_MIN(n, klen) - 1; k >= 1; k--)
-    {
-        arb_mul_ui(row + k, prev + k, k, prec);
-        arb_add(row + k, prev + k - 1, row + k, prec);
-    }
-
-    for (k = n + 1; k < klen; k++)
-        arb_zero(row + k);
-}
-
-static void
-_stirling_matrix_1u(arb_mat_t mat, slong prec)
-{
-    slong n;
-
-    if (arb_mat_is_empty(mat))
-        return;
-
-    for (n = 0; n < mat->r; n++)
-        _stirling_number_1u_vec_next(mat->rows[n],
-            mat->rows[n - (n != 0)], n, mat->c, prec);
-}
-
-static void
-_stirling_matrix_1(arb_mat_t mat, slong prec)
-{
-    slong n;
-
-    if (arb_mat_is_empty(mat))
-        return;
-
-    for (n = 0; n < mat->r; n++)
-        _stirling_number_1_vec_next(mat->rows[n],
-            mat->rows[n - (n != 0)], n, mat->c, prec);
-}
-
-static void
-_stirling_matrix_2(arb_mat_t mat, slong prec)
-{
-    slong n;
-
-    if (arb_mat_is_empty(mat))
-        return;
-
-    for (n = 0; n < mat->r; n++)
-        _stirling_number_2_vec_next(mat->rows[n],
-            mat->rows[n - (n != 0)], n, mat->c, prec);
-}
+#include "gr.h"
+#include "gr_mat.h"
 
 void
 arb_mat_stirling(arb_mat_t mat, int kind, slong prec)
 {
-    if (kind == 0)
-        _stirling_matrix_1u(mat, prec);
-    else if (kind == 1)
-        _stirling_matrix_1(mat, prec);
-    else
-        _stirling_matrix_2(mat, prec);
+    gr_ctx_t ctx;
+    gr_ctx_init_real_arb(ctx, prec);
+    GR_MUST_SUCCEED(gr_mat_stirling((gr_mat_struct *) mat, kind, ctx));
 }
-
