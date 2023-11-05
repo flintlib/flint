@@ -15,6 +15,7 @@
 #include "gr_poly.h"
 
 /* todo: over appropriate domains, make_monic -> extract content; unit */
+/* todo: extract powers of x (see fmpz_poly_gcd) */
 
 /* assumes lenA >= lenB >= 1, and both A and B have nonzero leading
    coefficient */
