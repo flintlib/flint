@@ -129,6 +129,52 @@ fexpr_get_acb_raw(acb_t res, const fexpr_t expr, slong prec)
             return 1;
         }
 
+        if (op == FEXPR_TribonacciConstant)
+        {
+            /* Subexpressions */
+            arb_t r33, r33p, r33m;
+
+            /* Init */
+            arb_init(r33);
+            arb_init(r33p);
+            arb_init(r33m);
+
+            /* r33 := 3*sqrt(33) */
+            arb_sqrt_ui(r33, 33, prec);
+            arb_mul_ui(r33, r33, 3, prec);
+
+            /* r33p := cbrt(19 + r33) */
+            arb_add_ui(r33p, r33, 19, prec);
+            arb_root_ui(r33p, r33p, 3, prec);
+
+            /* r33m := cbrt(19 - r33) */
+            arb_sub_si(r33m, r33, 19, prec);
+            arb_neg(r33m, r33m);
+            arb_root_ui(r33m, r33m, 3, prec);
+
+            /* res := 1 */
+            arb_one(acb_realref(res));
+
+            /* res += r33p */
+            arb_add(acb_realref(res), acb_realref(res), r33p, prec);
+
+            /* res += r33m */
+            arb_add(acb_realref(res), acb_realref(res), r33m, prec);
+
+            /* res /= 3 */
+            arb_div_ui(acb_realref(res), acb_realref(res), 3, prec);
+
+            /* zero imag part */
+            arb_zero(acb_imagref(res));
+
+            /* Free */
+            arb_clear(r33);
+            arb_clear(r33p);
+            arb_clear(r33m);
+
+            return 1;
+        }
+
         acb_indeterminate(res);
         return 0;
     }

@@ -415,6 +415,7 @@ const fexpr_symbol_info fexpr_builtin_table[FEXPR_BUILTIN_LENGTH] = {
     { FEXPR_Tanh, "Tanh", "\\tanh", NULL, },
     { FEXPR_Theta, "Theta", "\\Theta", NULL },
     { FEXPR_Theta_, "Theta_", "\\Theta", fexpr_write_latex_subscript },
+    { FEXPR_TribonacciConstant, "TribonacciConstant", "T_c", NULL, },
     { FEXPR_True, "True", "\\operatorname{True}", NULL, },
     { FEXPR_Tuple, "Tuple", "", fexpr_write_latex_collection, },
     { FEXPR_Tuples, "Tuples", "", NULL, },

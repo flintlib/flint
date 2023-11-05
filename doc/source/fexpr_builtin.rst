@@ -326,6 +326,10 @@ Particular numbers
 
     ``GoldenRatio`` is the golden ratio `\varphi`.
 
+.. macro:: TribonacciConstant
+
+    ``TribonacciConstant`` is the Tribonacci constant `T_c`.
+
 .. macro:: Euler
 
     ``Euler`` is Euler's constant `\gamma`.
