@@ -150,9 +150,6 @@
 #include "t-resultant_modular_div.c"
 #include "t-reverse.c"
 #include "t-revert_series.c"
-#include "t-revert_series_lagrange.c"
-#include "t-revert_series_lagrange_fast.c"
-#include "t-revert_series_newton.c"
 #include "t-scalar_abs.c"
 #include "t-scalar_addmul_fmpz.c"
 #include "t-scalar_addmul_si.c"
@@ -330,9 +327,6 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_poly_resultant_modular_div),
     TEST_FUNCTION(fmpz_poly_reverse),
     TEST_FUNCTION(fmpz_poly_revert_series),
-    TEST_FUNCTION(fmpz_poly_revert_series_lagrange),
-    TEST_FUNCTION(fmpz_poly_revert_series_lagrange_fast),
-    TEST_FUNCTION(fmpz_poly_revert_series_newton),
     TEST_FUNCTION(fmpz_poly_scalar_abs),
     TEST_FUNCTION(fmpz_poly_scalar_addmul_fmpz),
     TEST_FUNCTION(fmpz_poly_scalar_addmul_si),

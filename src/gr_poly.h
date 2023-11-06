@@ -310,6 +310,15 @@ WARN_UNUSED_RESULT int gr_poly_compose_series_divconquer(gr_poly_t res, const gr
 WARN_UNUSED_RESULT int _gr_poly_compose_series(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_compose_series(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int _gr_poly_revert_series_lagrange(gr_ptr res, gr_srcptr f, slong flen, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_revert_series_lagrange(gr_poly_t res, const gr_poly_t f, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_revert_series_lagrange_fast(gr_ptr res, gr_srcptr f, slong flen, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_revert_series_lagrange_fast(gr_poly_t res, const gr_poly_t f, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_revert_series_newton(gr_ptr res, gr_srcptr f, slong flen, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_revert_series_newton(gr_poly_t res, const gr_poly_t f, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_revert_series(gr_ptr res, gr_srcptr f, slong flen, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_revert_series(gr_poly_t res, const gr_poly_t f, slong n, gr_ctx_t ctx);
+
 WARN_UNUSED_RESULT int _gr_poly_derivative(gr_ptr res, gr_srcptr poly, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_derivative(gr_poly_t res, const gr_poly_t poly, gr_ctx_t ctx);
 

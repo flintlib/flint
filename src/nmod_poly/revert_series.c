@@ -13,22 +13,22 @@
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "gr.h"
+#include "gr_poly.h"
 
 void
-_nmod_poly_revert_series(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
+_nmod_poly_revert_series(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
 {
-    _nmod_poly_revert_series_lagrange_fast(Qinv, Q, n, mod);
+    gr_ctx_t ctx;
+    _gr_ctx_init_nmod(ctx, &mod);
+    GR_MUST_SUCCEED(_gr_poly_revert_series(Qinv, Q, Qlen, n, ctx));
 }
 
 void
 nmod_poly_revert_series(nmod_poly_t Qinv,
                                  const nmod_poly_t Q, slong n)
 {
-    mp_ptr Qinv_coeffs, Q_coeffs;
-    nmod_poly_t t1;
-    slong Qlen;
-
-    Qlen = Q->length;
+    slong Qlen = Q->length;
 
     if (Qlen < 2 || Q->coeffs[0] != 0 || Q->coeffs[1] == 0)
     {
@@ -37,38 +37,20 @@ nmod_poly_revert_series(nmod_poly_t Qinv,
         flint_abort();
     }
 
-    if (Qlen < n)
-    {
-        Q_coeffs = _nmod_vec_init(n);
-        flint_mpn_copyi(Q_coeffs, Q->coeffs, Qlen);
-        flint_mpn_zero(Q_coeffs + Qlen, n - Qlen);
-    }
-    else
-        Q_coeffs = Q->coeffs;
-
-    if (Q == Qinv && Qlen >= n)
-    {
-        nmod_poly_init2(t1, Q->mod.n, n);
-        Qinv_coeffs = t1->coeffs;
-    }
-    else
+    if (Qinv != Q)
     {
         nmod_poly_fit_length(Qinv, n);
-        Qinv_coeffs = Qinv->coeffs;
+        _nmod_poly_revert_series(Qinv->coeffs, Q->coeffs, Q->length, n, Q->mod);
     }
-
-    _nmod_poly_revert_series(Qinv_coeffs, Q_coeffs, n, Q->mod);
-
-    if (Q == Qinv && Qlen >= n)
+    else
     {
-        nmod_poly_swap(Qinv, t1);
-        nmod_poly_clear(t1);
+        nmod_poly_t t;
+        nmod_poly_init2(t, Q->mod.n, n);
+        _nmod_poly_revert_series(t->coeffs, Q->coeffs, Q->length, n, Q->mod);
+        nmod_poly_swap(Qinv, t);
+        nmod_poly_clear(t);
     }
 
-    Qinv->length = n;
-
-    if (Qlen < n)
-        _nmod_vec_clear(Q_coeffs);
-
+    _nmod_poly_set_length(Qinv, n);
     _nmod_poly_normalise(Qinv);
 }

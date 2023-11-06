@@ -71,9 +71,6 @@
 #include "t-pow_ui_trunc_binexp.c"
 #include "t-product_roots.c"
 #include "t-revert_series.c"
-#include "t-revert_series_lagrange.c"
-#include "t-revert_series_lagrange_fast.c"
-#include "t-revert_series_newton.c"
 #include "t-rgamma_series.c"
 #include "t-rising_ui_series.c"
 #include "t-root_bound_fujiwara.c"
@@ -156,9 +153,6 @@ test_struct tests[] =
     TEST_FUNCTION(acb_poly_pow_ui_trunc_binexp),
     TEST_FUNCTION(acb_poly_product_roots),
     TEST_FUNCTION(acb_poly_revert_series),
-    TEST_FUNCTION(acb_poly_revert_series_lagrange),
-    TEST_FUNCTION(acb_poly_revert_series_lagrange_fast),
-    TEST_FUNCTION(acb_poly_revert_series_newton),
     TEST_FUNCTION(acb_poly_rgamma_series),
     TEST_FUNCTION(acb_poly_rising_ui_series),
     TEST_FUNCTION(acb_poly_root_bound_fujiwara),

@@ -55,6 +55,7 @@
 #include "t-resultant_euclidean.c"
 #include "t-resultant_hgcd.c"
 #include "t-resultant_sylvester.c"
+#include "t-revert_series.c"
 #include "t-roots.c"
 #include "t-roots_other.c"
 #include "t-rsqrt_series.c"
@@ -113,6 +114,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_resultant_euclidean),
     TEST_FUNCTION(gr_poly_resultant_hgcd),
     TEST_FUNCTION(gr_poly_resultant_sylvester),
+    TEST_FUNCTION(gr_poly_revert_series),
     TEST_FUNCTION(gr_poly_roots),
     TEST_FUNCTION(gr_poly_roots_other),
     TEST_FUNCTION(gr_poly_rsqrt_series),

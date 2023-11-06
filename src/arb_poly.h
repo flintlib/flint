@@ -350,15 +350,6 @@ void arb_poly_compose_series(arb_poly_t res,
 
 /* Reversion */
 
-void _arb_poly_revert_series_lagrange(arb_ptr Qinv, arb_srcptr Q, slong Qlen, slong n, slong prec);
-void arb_poly_revert_series_lagrange(arb_poly_t Qinv, const arb_poly_t Q, slong n, slong prec);
-
-void _arb_poly_revert_series_newton(arb_ptr Qinv, arb_srcptr Q, slong Qlen, slong n, slong prec);
-void arb_poly_revert_series_newton(arb_poly_t Qinv, const arb_poly_t Q, slong n, slong prec);
-
-void _arb_poly_revert_series_lagrange_fast(arb_ptr Qinv, arb_srcptr Q, slong Qlen, slong n, slong prec);
-void arb_poly_revert_series_lagrange_fast(arb_poly_t Qinv, const arb_poly_t Q, slong n, slong prec);
-
 void _arb_poly_revert_series(arb_ptr Qinv, arb_srcptr Q, slong Qlen, slong n, slong prec);
 void arb_poly_revert_series(arb_poly_t Qinv, const arb_poly_t Q, slong n, slong prec);
 
