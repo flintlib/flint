@@ -9,13 +9,17 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "gr_poly.h"
 #include "arb_poly.h"
 
 void
 _arb_poly_revert_series(arb_ptr Qinv,
     arb_srcptr Q, slong Qlen, slong n, slong prec)
 {
-    _arb_poly_revert_series_lagrange_fast(Qinv, Q, Qlen, n, prec);
+    gr_ctx_t ctx;
+    gr_ctx_init_real_arb(ctx, prec);
+    if (_gr_poly_revert_series(Qinv, Q, Qlen, n, ctx) != GR_SUCCESS)
+        _arb_vec_indeterminate(Qinv, n);
 }
 
 void

@@ -2002,20 +2002,8 @@ Power series composition
 Power series reversion
 --------------------------------------------------------------------------------
 
-
-.. function:: void _nmod_poly_revert_series_lagrange(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
-
-    Sets ``Qinv`` to the compositional inverse or reversion of ``Q``
-    as a power series, i.e. computes `Q^{-1}` such that
-    `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`. The arguments must
-    both have length ``n`` and may not be aliased.
-
-    It is required that `Q_0 = 0` and that `Q_1` as well as the integers
-    `1, 2, \ldots, n-1` are invertible modulo the modulus.
-
-    This implementation uses the Lagrange inversion formula.
-
-.. function:: void nmod_poly_revert_series_lagrange(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
+.. function:: void _nmod_poly_revert_series(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
+              void nmod_poly_revert_series(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
 
     Sets ``Qinv`` to the compositional inverse or reversion of ``Q``
     as a power series, i.e. computes `Q^{-1}` such that
@@ -2024,83 +2012,8 @@ Power series reversion
     It is required that `Q_0 = 0` and that `Q_1` as well as the integers
     `1, 2, \ldots, n-1` are invertible modulo the modulus.
 
-    This implementation uses the Lagrange inversion formula.
-
-.. function:: void _nmod_poly_revert_series_lagrange_fast(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
-
-    Sets ``Qinv`` to the compositional inverse or reversion of ``Q``
-    as a power series, i.e. computes `Q^{-1}` such that
-    `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`. The arguments must
-    both have length ``n`` and may not be aliased.
-
-    It is required that `Q_0 = 0` and that `Q_1` as well as the integers
-    `1, 2, \ldots, n-1` are invertible modulo the modulus.
-
-    This implementation uses a reduced-complexity implementation
-    of the Lagrange inversion formula.
-
-.. function:: void nmod_poly_revert_series_lagrange_fast(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
-
-    Sets ``Qinv`` to the compositional inverse or reversion of ``Q``
-    as a power series, i.e. computes `Q^{-1}` such that
-    `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`.
-
-    It is required that `Q_0 = 0` and that `Q_1` as well as the integers
-    `1, 2, \ldots, n-1` are invertible modulo the modulus.
-
-    This implementation uses a reduced-complexity implementation
-    of the Lagrange inversion formula.
-
-.. function:: void _nmod_poly_revert_series_newton(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
-
-    Sets ``Qinv`` to the compositional inverse or reversion of ``Q``
-    as a power series, i.e. computes `Q^{-1}` such that
-    `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`. The arguments must
-    both have length ``n`` and may not be aliased.
-
-    It is required that `Q_0 = 0` and that `Q_1` as well as the integers
-    `1, 2, \ldots, n-1` are invertible modulo the modulus.
-
-    This implementation uses Newton iteration [BrentKung1978]_.
-
-.. function:: void nmod_poly_revert_series_newton(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
-
-    Sets ``Qinv`` to the compositional inverse or reversion of ``Q``
-    as a power series, i.e. computes `Q^{-1}` such that
-    `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`.
-
-    It is required that `Q_0 = 0` and that `Q_1` as well as the integers
-    `1, 2, \ldots, n-1` are invertible modulo the modulus.
-
-    This implementation uses Newton iteration [BrentKung1978]_.
-
-.. function:: void _nmod_poly_revert_series(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod)
-
-    Sets ``Qinv`` to the compositional inverse or reversion of ``Q``
-    as a power series, i.e. computes `Q^{-1}` such that
-    `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`. The arguments must
-    both have length ``n`` and may not be aliased.
-
-    It is required that `Q_0 = 0` and that `Q_1` as well as the integers
-    `1, 2, \ldots, n-1` are invertible modulo the modulus.
-
-    This implementation automatically chooses between the Lagrange
-    inversion formula and Newton iteration based on the size of the
-    input.
-
-.. function:: void nmod_poly_revert_series(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
-
-    Sets ``Qinv`` to the compositional inverse or reversion of ``Q``
-    as a power series, i.e. computes `Q^{-1}` such that
-    `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`.
-
-    It is required that `Q_0 = 0` and that `Q_1` as well as the integers
-    `1, 2, \ldots, n-1` are invertible modulo the modulus.
-
-    This implementation automatically chooses between the Lagrange
-    inversion formula and Newton iteration based on the size of the
-    input.
-
+    Wraps :func:`_gr_poly_revert_series` which chooses automatically
+    between various algorithms.
 
 Square roots
 --------------------------------------------------------------------------------

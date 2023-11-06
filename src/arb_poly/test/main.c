@@ -67,9 +67,6 @@
 #include "t-product_roots.c"
 #include "t-product_roots_complex.c"
 #include "t-revert_series.c"
-#include "t-revert_series_lagrange.c"
-#include "t-revert_series_lagrange_fast.c"
-#include "t-revert_series_newton.c"
 #include "t-rgamma_series.c"
 #include "t-riemann_siegel_theta_series.c"
 #include "t-riemann_siegel_z_series.c"
@@ -150,9 +147,6 @@ test_struct tests[] =
     TEST_FUNCTION(arb_poly_product_roots),
     TEST_FUNCTION(arb_poly_product_roots_complex),
     TEST_FUNCTION(arb_poly_revert_series),
-    TEST_FUNCTION(arb_poly_revert_series_lagrange),
-    TEST_FUNCTION(arb_poly_revert_series_lagrange_fast),
-    TEST_FUNCTION(arb_poly_revert_series_newton),
     TEST_FUNCTION(arb_poly_rgamma_series),
     TEST_FUNCTION(arb_poly_riemann_siegel_theta_series),
     TEST_FUNCTION(arb_poly_riemann_siegel_z_series),

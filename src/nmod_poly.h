@@ -912,26 +912,8 @@ void _nmod_poly_compose_series(mp_ptr res, mp_srcptr poly1, slong len1,
 void nmod_poly_compose_series(nmod_poly_t res,
                     const nmod_poly_t poly1, const nmod_poly_t poly2, slong n);
 
-void _nmod_poly_revert_series_lagrange(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod);
-
-void nmod_poly_revert_series_lagrange(nmod_poly_t Qinv,
-                                 const nmod_poly_t Q, slong n);
-
-void _nmod_poly_revert_series_lagrange_fast(mp_ptr Qinv, mp_srcptr Q,
-    slong n, nmod_t mod);
-
-void nmod_poly_revert_series_lagrange_fast(nmod_poly_t Qinv,
-                                 const nmod_poly_t Q, slong n);
-
-void _nmod_poly_revert_series_newton(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod);
-
-void nmod_poly_revert_series_newton(nmod_poly_t Qinv,
-                                 const nmod_poly_t Q, slong n);
-
-void _nmod_poly_revert_series(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod);
-
-void nmod_poly_revert_series(nmod_poly_t Qinv,
-                                 const nmod_poly_t Q, slong n);
+void _nmod_poly_revert_series(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod);
+void nmod_poly_revert_series(nmod_poly_t Qinv, const nmod_poly_t Q, slong n);
 
 /* norms *********************************************************************/
 

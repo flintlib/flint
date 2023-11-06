@@ -2571,87 +2571,16 @@ Power series composition
 Power series reversion
 --------------------------------------------------------------------------------
 
-
-.. function:: void _fmpz_poly_revert_series_lagrange(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
-
-    Sets ``Qinv`` to the compositional inverse or reversion of
-    ``(Q, Qlen)`` as a power series, i.e. computes `Q^{-1}` such that
-    `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`. The arguments may not be
-    aliased, and ``Qlen`` must be at least 2.
-    It is required that `Q_0 = 0` and `Q_1 = \pm 1`.
-
-    This implementation uses the Lagrange inversion formula.
-
-.. function:: void fmpz_poly_revert_series_lagrange(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
-
-    Sets ``Qinv`` to the compositional inverse or reversion of ``Q``
-    as a power series, i.e. computes `Q^{-1}` such that
-    `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`.
-    It is required that `Q_0 = 0` and `Q_1 = \pm 1`.
-
-    This implementation uses the Lagrange inversion formula.
-
-.. function:: void _fmpz_poly_revert_series_lagrange_fast(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
-
-    Sets ``Qinv`` to the compositional inverse or reversion of
-    ``(Q, Qlen)``
-    as a power series, i.e. computes `Q^{-1}` such that
-    `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`. The arguments may not be
-    aliased, and ``Qlen`` must be at least 2.
-    It is required that `Q_0 = 0` and `Q_1 = \pm 1`.
-
-    This implementation uses a reduced-complexity implementation
-    of the Lagrange inversion formula.
-
-.. function:: void fmpz_poly_revert_series_lagrange_fast(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
-
-    Sets ``Qinv`` to the compositional inverse or reversion of ``Q``
-    as a power series, i.e. computes `Q^{-1}` such that
-    `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`.
-    It is required that `Q_0 = 0` and `Q_1 = \pm 1`.
-
-    This implementation uses a reduced-complexity implementation
-    of the Lagrange inversion formula.
-
-.. function:: void _fmpz_poly_revert_series_newton(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
-
-    Sets ``Qinv`` to the compositional inverse or reversion of ``Q``
-    as a power series, i.e. computes `Q^{-1}` such that
-    `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`. The arguments may not be
-    aliased, and ``Qlen`` must be at least 2.
-    It is required that `Q_0 = 0` and `Q_1 = \pm 1`.
-
-    This implementation uses Newton iteration [BrentKung1978]_.
-
-.. function:: void fmpz_poly_revert_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
-
-    Sets ``Qinv`` to the compositional inverse or reversion of ``Q``
-    as a power series, i.e. computes `Q^{-1}` such that
-    `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`.
-    It is required that `Q_0 = 0` and `Q_1 = \pm 1`.
-
-    This implementation uses Newton iteration [BrentKung1978]_.
-
 .. function:: void _fmpz_poly_revert_series(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
-
-    Sets ``Qinv`` to the compositional inverse or reversion of ``Q``
-    as a power series, i.e. computes `Q^{-1}` such that
-    `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`. The arguments may not be
-    aliased, and ``Qlen`` must be at least 2.
-    It is required that `Q_0 = 0` and `Q_1 = \pm 1`.
-
-    This implementation defaults to the fast version of
-    Lagrange interpolation.
-
-.. function:: void fmpz_poly_revert_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
+              void fmpz_poly_revert_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
 
     Sets ``Qinv`` to the compositional inverse or reversion of ``Q``
     as a power series, i.e. computes `Q^{-1}` such that
     `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`.
     It is required that `Q_0 = 0` and `Q_1 = \pm 1`.
 
-    This implementation defaults to the fast version of
-    Lagrange interpolation.
+    Wraps :func:`_gr_poly_revert_series` which chooses automatically
+    between various algorithms.
 
 
 Square root

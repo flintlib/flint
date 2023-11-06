@@ -414,30 +414,17 @@ Composition
     The underscore method does not support aliasing of the output
     with either input polynomial.
 
-.. function:: void _acb_poly_revert_series_lagrange(acb_ptr h, acb_srcptr f, slong flen, slong n, slong prec)
-
-.. function:: void acb_poly_revert_series_lagrange(acb_poly_t h, const acb_poly_t f, slong n, slong prec)
-
-.. function:: void _acb_poly_revert_series_newton(acb_ptr h, acb_srcptr f, slong flen, slong n, slong prec)
-
-.. function:: void acb_poly_revert_series_newton(acb_poly_t h, const acb_poly_t f, slong n, slong prec)
-
-.. function:: void _acb_poly_revert_series_lagrange_fast(acb_ptr h, acb_srcptr f, slong flen, slong n, slong prec)
-
-.. function:: void acb_poly_revert_series_lagrange_fast(acb_poly_t h, const acb_poly_t f, slong n, slong prec)
-
 .. function:: void _acb_poly_revert_series(acb_ptr h, acb_srcptr f, slong flen, slong n, slong prec)
-
-.. function:: void acb_poly_revert_series(acb_poly_t h, const acb_poly_t f, slong n, slong prec)
+              void acb_poly_revert_series(acb_poly_t h, const acb_poly_t f, slong n, slong prec)
 
     Sets `h` to the power series reversion of `f`, i.e. the expansion
     of the compositional inverse function `f^{-1}(x)`,
-    truncated to order `O(x^n)`, using respectively
-    Lagrange inversion, Newton iteration, fast Lagrange inversion,
-    and a default algorithm choice.
+    truncated to order `O(x^n)`.
+    Wraps :func:`_gr_poly_revert_series` which chooses automatically
+    between various algorithms.
 
     We require that the constant term in `f` is exactly zero and that the
-    linear term is nonzero. The underscore methods assume that *flen*
+    linear term is nonzero. The underscore method assumes that *flen*
     is at least 2, and do not support aliasing.
 
 Evaluation

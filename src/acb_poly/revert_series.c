@@ -9,13 +9,17 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "gr_poly.h"
 #include "acb_poly.h"
 
 void
 _acb_poly_revert_series(acb_ptr Qinv,
     acb_srcptr Q, slong Qlen, slong n, slong prec)
 {
-    _acb_poly_revert_series_lagrange_fast(Qinv, Q, Qlen, n, prec);
+    gr_ctx_t ctx;
+    gr_ctx_init_complex_acb(ctx, prec);
+    if (_gr_poly_revert_series(Qinv, Q, Qlen, n, ctx) != GR_SUCCESS)
+        _acb_vec_indeterminate(Qinv, n);
 }
 
 void
@@ -49,4 +53,3 @@ acb_poly_revert_series(acb_poly_t Qinv,
     _acb_poly_set_length(Qinv, n);
     _acb_poly_normalise(Qinv);
 }
-

@@ -112,9 +112,6 @@
 #include "t-resultant_hgcd.c"
 #include "t-reverse.c"
 #include "t-revert_series.c"
-#include "t-revert_series_lagrange.c"
-#include "t-revert_series_lagrange_fast.c"
-#include "t-revert_series_newton.c"
 #include "t-scalar_addmul_nmod.c"
 #include "t-scalar_mul_nmod.c"
 #include "t-set_trunc.c"
@@ -236,9 +233,6 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_resultant_hgcd),
     TEST_FUNCTION(nmod_poly_reverse),
     TEST_FUNCTION(nmod_poly_revert_series),
-    TEST_FUNCTION(nmod_poly_revert_series_lagrange),
-    TEST_FUNCTION(nmod_poly_revert_series_lagrange_fast),
-    TEST_FUNCTION(nmod_poly_revert_series_newton),
     TEST_FUNCTION(nmod_poly_scalar_addmul_nmod),
     TEST_FUNCTION(nmod_poly_scalar_mul_nmod),
     TEST_FUNCTION(nmod_poly_set_trunc),
