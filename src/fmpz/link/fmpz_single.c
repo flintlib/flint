@@ -157,7 +157,7 @@ void _fmpz_clear_mpz(fmpz f)
         mpz_clear(ptr);
 
 #if FLINT_USES_PTHREAD
-       new_count = atomic_fetch_add(&(header_ptr->count), 1);
+       new_count = atomic_fetch_add(&(header_ptr->count), 1) + 1;
 #else
        new_count = ++header_ptr->count;
 #endif
@@ -196,7 +196,7 @@ void _fmpz_cleanup_mpz_content(void)
        ptr = (fmpz_block_header_s *) ptr->address;
 
 #if FLINT_USES_PTHREAD
-       new_count = atomic_fetch_add(&(ptr->count), 1);
+       new_count = atomic_fetch_add(&(ptr->count), 1) + 1;
 #else
        new_count = ++ptr->count;
 #endif
