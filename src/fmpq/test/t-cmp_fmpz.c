@@ -17,7 +17,7 @@ TEST_FUNCTION_START(fmpq_cmp_fmpz, state)
 {
     int i;
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpq_t x, y;
         mpq_t X, Y;
