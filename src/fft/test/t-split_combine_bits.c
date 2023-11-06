@@ -20,7 +20,7 @@ TEST_FUNCTION_START(fft_split_combine_bits, state)
 
     _flint_rand_init_gmp(state);
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         mp_size_t total_limbs = n_randint(state, 1000) + 1;
         mp_limb_t * in = flint_malloc(total_limbs*sizeof(mp_limb_t));

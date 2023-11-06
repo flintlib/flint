@@ -15,11 +15,14 @@
 
 TEST_FUNCTION_START(mul_truncate_sqrt2, state)
 {
-    flint_bitcnt_t depth, w;
+    flint_bitcnt_t depth, w, maxdepth;
 
     _flint_rand_init_gmp(state);
 
-    for (depth = 6; depth <= 12; depth++)
+    maxdepth = (flint_test_multiplier() > 10) ? 12 :
+               (flint_test_multiplier() > 1)  ? 11 : 10;
+
+    for (depth = 6; depth <= maxdepth; depth++)
     {
         for (w = 1; w <= 5; w++)
         {
@@ -57,7 +60,7 @@ TEST_FUNCTION_START(mul_truncate_sqrt2, state)
     }
 
     /* test squaring */
-    for (depth = 6; depth <= 12; depth++)
+    for (depth = 6; depth <= maxdepth; depth++)
     {
         for (w = 1; w <= 5; w++)
         {

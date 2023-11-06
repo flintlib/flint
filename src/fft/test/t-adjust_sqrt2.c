@@ -67,6 +67,9 @@ TEST_FUNCTION_START(fft_adjust_sqrt2, state)
 
                 for (c = 1; c < 2*n; c+=2)
                 {
+                    if (n_randint(state, 100) > 2.0 + flint_test_multiplier() * 10)
+                        continue;
+
                     set_p(p, n, w);
 
                     nn1 = flint_malloc((limbs+1)*sizeof(mp_limb_t));

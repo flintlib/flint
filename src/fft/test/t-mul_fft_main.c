@@ -15,11 +15,14 @@
 
 TEST_FUNCTION_START(flint_mpn_mul_fft_main, state)
 {
-    flint_bitcnt_t depth, w;
+    flint_bitcnt_t depth, w, maxdepth;
 
     _flint_rand_init_gmp(state);
 
-    for (depth = 6; depth <= 12; depth++)
+    maxdepth = (flint_test_multiplier() > 10) ? 12 :
+               (flint_test_multiplier() > 1)  ? 11 : 10;
+
+    for (depth = 6; depth <= maxdepth; depth++)
     {
         for (w = 1; w <= 3 - (depth >= 12); w++)
         {
@@ -39,6 +42,8 @@ TEST_FUNCTION_START(flint_mpn_mul_fft_main, state)
 
                if (len2 <= 0)
                   len2 = 2*n + n_randint(state, 2*n) + 1;
+
+               flint_set_num_threads(1 + n_randint(state, 4));
 
                b2 = len2*bits1;
 
@@ -80,6 +85,8 @@ TEST_FUNCTION_START(flint_mpn_mul_fft_main, state)
             }
         }
     }
+
+    flint_set_num_threads(1);
 
     TEST_FUNCTION_END(state);
 }

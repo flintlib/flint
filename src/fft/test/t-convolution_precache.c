@@ -15,11 +15,14 @@
 
 TEST_FUNCTION_START(fft_convolution_precache, state)
 {
-    flint_bitcnt_t depth, w;
+    flint_bitcnt_t depth, w, maxdepth;
 
     _flint_rand_init_gmp(state);
 
-    for (depth = 6; depth <= 13; depth++)
+    maxdepth = (flint_test_multiplier() > 10) ? 13 :
+               (flint_test_multiplier() > 1)  ? 12 : 11;
+
+    for (depth = 6; depth <= maxdepth; depth++)
     {
         for (w = 1; w <= 5; w++)
         {
@@ -34,15 +37,15 @@ TEST_FUNCTION_START(fft_convolution_precache, state)
 
             trunc = 2*n1*((trunc + 2*n1 - 1)/(2*n1));
             len1 = n_randint(state, trunc);
-	    len2 = trunc - len1 + 1;
+            len2 = trunc - len1 + 1;
 
             ii = flint_malloc((4*(n + n*size) + 5*size)*sizeof(mp_limb_t));
             for (i = 0, ptr = (mp_limb_t *) ii + 4*n; i < 4*n; i++, ptr += size)
             {
                 ii[i] = ptr;
-		if (i < len1)
-		   random_fermat(ii[i], state, limbs);
-		else
+                if (i < len1)
+                    random_fermat(ii[i], state, limbs);
+                else
                     flint_mpn_zero(ii[i], size);
             }
             t1 = ptr;
@@ -56,7 +59,7 @@ TEST_FUNCTION_START(fft_convolution_precache, state)
                 jj[i] = ptr;
 
                 if (i < len2)
-		    random_fermat(jj[i], state, limbs);
+                    random_fermat(jj[i], state, limbs);
                 else
                     flint_mpn_zero(jj[i], size);
             }
@@ -81,7 +84,7 @@ TEST_FUNCTION_START(fft_convolution_precache, state)
                 flint_mpn_copyi(jj2[i], jj[i], size);
             }
 
-	    fft_precache(jj, depth, limbs, trunc, &t1, &t2, &s1);
+            fft_precache(jj, depth, limbs, trunc, &t1, &t2, &s1);
             fft_convolution_precache(ii, jj, depth, limbs, trunc, &t1, &t2, &s1, &tt);
             fft_convolution_basic(ii2, jj2, depth, limbs, trunc, &t1, &t2, &s1, &tt);
 

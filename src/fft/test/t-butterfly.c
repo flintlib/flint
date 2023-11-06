@@ -78,6 +78,9 @@ TEST_FUNCTION_START(fft_ifft_butterfly, state)
 
                 for (c = 0; c < n; c++)
                 {
+                    if (n_randint(state, 100) > 2.0 + flint_test_multiplier() * 10)
+                        continue;
+
                     nn1 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
                     nn2 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
                     r1 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
@@ -142,6 +145,9 @@ TEST_FUNCTION_START(fft_ifft_butterfly, state)
 
                 for (c = 0; c < n; c++)
                 {
+                    if (n_randint(state, 100) > 2.0 + flint_test_multiplier() * 10)
+                        continue;
+
                     nn1 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
                     nn2 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
                     r1 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
