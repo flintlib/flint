@@ -37,7 +37,7 @@ FLINT 2 and following should compile on any machine with GCC and a standard
 GNU toolchain, though GCC 4.8 and following are recommended.
 
 Flint is specially optimised for x86 (32 and 64 bit) machines. There is also
-limited optimisation for ARM and ia64 machines.
+limited optimisation for ARM machines.
 
 As of version 2.0, FLINT required GCC version 2.96 or later, either MPIR
 (2.6.0 or later) or GMP (5.1.1 or later), and MPFR 3.0.0 or later.
