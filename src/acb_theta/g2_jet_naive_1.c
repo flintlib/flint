@@ -244,6 +244,7 @@ acb_theta_g2_jet_naive_1(acb_ptr dth, const acb_mat_t tau, slong prec)
     arf_clear(eps);
     _acb_vec_clear(z, g);
     _arb_vec_clear(v, g);
+    _arb_vec_clear(a, g);
     acb_clear(c);
     arb_clear(u);
 }
