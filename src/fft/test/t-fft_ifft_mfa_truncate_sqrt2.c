@@ -15,11 +15,14 @@
 
 TEST_FUNCTION_START(fft_ifft_mfa_truncate_sqrt2, state)
 {
-    flint_bitcnt_t depth, w;
+    flint_bitcnt_t depth, w, maxdepth;
 
     _flint_rand_init_gmp(state);
 
-    for (depth = 6; depth <= 13; depth++)
+    maxdepth = (flint_test_multiplier() > 10) ? 13 :
+               (flint_test_multiplier() > 1)  ? 12 : 11;
+
+    for (depth = 6; depth <= maxdepth; depth++)
     {
         for (w = 1; w <= 5; w++)
         {

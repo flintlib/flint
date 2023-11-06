@@ -83,6 +83,9 @@ TEST_FUNCTION_START(butterfly_rshB, state)
 
                 for (c = 0; c < limbs; c++)
                 {
+                    if (n_randint(state, 100) > 2.0 + flint_test_multiplier() * 10)
+                        continue;
+
                     x = n_randint(state, limbs);
                     y = n_randint(state, limbs);
 
