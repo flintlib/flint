@@ -462,6 +462,24 @@ Power series composition and reversion
               int _gr_poly_revert_series(gr_ptr res, gr_srcptr f, slong flen, slong n, gr_ctx_t ctx)
               int gr_poly_revert_series(gr_poly_t res, const gr_poly_t f, slong n, gr_ctx_t ctx)
 
+    Sets *res* to the power series reversion `f^{-1}(x)` which satisfies
+    `f^{-1}(f(x)) = f(f^{-1}(x)) = x` mod `x^n`.
+    For the series reversion to exist, we require that the constant term
+    in `f` is zero and that the linear coefficient is invertible.
+    The flag ``GR_DOMAIN`` is returned otherwise.
+
+    The *lagrange* and *lagrange_fast* algorithms require the ability
+    to divide by `2, 3, \ldots, n-1` and will return
+    the ``GR_UNABLE`` flag in too small characteristic.
+
+    The underscore methods do not support aliasing of the output
+    with the input.
+
+    The Newton method is described in [BrentKung1978]_; the
+    *lagrange* algorithm implements the Lagrange inversion formula,
+    while the *lagrange_fast* algorithm implements the baby-step
+    giant-step algorithm described in [Joh2015b]_.
+
 Derivative and integral
 -------------------------------------------------------------------------------
 

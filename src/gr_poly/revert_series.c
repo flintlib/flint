@@ -47,9 +47,12 @@ _gr_poly_revert_series_lagrange(gr_ptr res,
     T = GR_ENTRY(S, n - 1, sz);
 
     status |= gr_zero(res, ctx);
-    status |= gr_inv(GR_ENTRY(res, 1, sz), GR_ENTRY(f, 1, sz), ctx);
-
     status |= _gr_poly_inv_series(R, GR_ENTRY(f, 1, sz), FLINT_MIN(flen, n) - 1, n - 1, ctx);
+    /* Inverting leading coefficient failed => domain error */
+    if (status != GR_SUCCESS)
+        goto cleanup;
+
+    status |= gr_set(GR_ENTRY(res, 1, sz), GR_ENTRY(R, 0, sz), ctx);
     status |= _gr_vec_set(S, R, n - 1, ctx);
 
     for (i = 2; i < n; i++)
@@ -59,6 +62,11 @@ _gr_poly_revert_series_lagrange(gr_ptr res,
         FLINT_SWAP(gr_ptr, S, T);
     }
 
+    /* Dividing by i failed in finite characteristic */
+    if (status != GR_SUCCESS)
+        status = GR_UNABLE;
+
+cleanup:
     GR_TMP_CLEAR_VEC(R, 3 * (n - 1), ctx);
     return status;
 }
@@ -85,14 +93,16 @@ _gr_poly_revert_series_lagrange_fast(gr_ptr res, gr_srcptr f, slong flen, slong 
     t = GR_ENTRY(T, n - 1, sz);
 
     status |= gr_zero(res, ctx);
-    status |= gr_inv(GR_ENTRY(res, 1, sz), GR_ENTRY(f, 1, sz), ctx);
-
     status |= _gr_poly_inv_series(Ri(1), GR_ENTRY(f, 1, sz), FLINT_MIN(flen, n) - 1, n - 1, ctx);
+    /* Inverting leading coefficient failed => domain error */
+    if (status != GR_SUCCESS)
+        goto cleanup;
 
     /* TODO: when do we prefer squaring for powers? (see also compose_series_brent_kung) */
     for (i = 2; i <= m; i++)
         status |= _gr_poly_mullow(Ri(i), Ri((i + 1) / 2), n - 1, Ri(i / 2), n - 1, n - 1, ctx);
 
+    status |= gr_set(GR_ENTRY(res, 1, sz), Ri(1), ctx);
     for (i = 2; i < m; i++)
         status |= gr_div_ui(GR_ENTRY(res, i, sz), GR_ENTRY(Ri(i), i - 1, sz), i, ctx);
 
@@ -115,12 +125,18 @@ _gr_poly_revert_series_lagrange_fast(gr_ptr res, gr_srcptr f, slong flen, slong 
         }
     }
 
-    GR_TMP_CLEAR_VEC(R, (n - 1) * (m + 2) + 1, ctx);
+    /* Dividing by i failed in finite characteristic */
+    if (status != GR_SUCCESS)
+        status = GR_UNABLE;
 
+cleanup:
+    GR_TMP_CLEAR_VEC(R, (n - 1) * (m + 2) + 1, ctx);
     return status;
 }
 
-#define NEWTON_CUTOFF 5
+/* Currently, we choose this so that the basecase succeeds in
+   small characteristic. */
+#define NEWTON_CUTOFF 2
 
 int
 _gr_poly_revert_series_newton(gr_ptr res, gr_srcptr f, slong flen, slong n, gr_ctx_t ctx)
@@ -140,10 +156,13 @@ _gr_poly_revert_series_newton(gr_ptr res, gr_srcptr f, slong flen, slong n, gr_c
     k = n;
     for (i = 1; (WORD(1) << i) < k; i++);
     a[i = 0] = k;
-    while (k >= NEWTON_CUTOFF)
+    while (k > NEWTON_CUTOFF)
         a[++i] = (k = (k + 1) / 2);
 
     status |= _gr_poly_revert_series_lagrange(res, f, flen, k, ctx);
+    if (status != GR_SUCCESS)
+        goto cleanup;
+
     status |= _gr_vec_zero(GR_ENTRY(res, k, sz), n - k, ctx);
 
     for (i--; i >= 0; i--)
@@ -159,6 +178,7 @@ _gr_poly_revert_series_newton(gr_ptr res, gr_srcptr f, slong flen, slong n, gr_c
         status |= _gr_vec_sub(res, res, U, k, ctx);
     }
 
+cleanup:
     GR_TMP_CLEAR_VEC(T, 3 * n, ctx);
 
     return status;
@@ -167,7 +187,15 @@ _gr_poly_revert_series_newton(gr_ptr res, gr_srcptr f, slong flen, slong n, gr_c
 int
 _gr_poly_revert_series(gr_ptr res, gr_srcptr f, slong flen, slong n, gr_ctx_t ctx)
 {
-    return _gr_poly_revert_series_lagrange_fast(res, f, flen, n, ctx);
+    int status;
+
+    status = _gr_poly_revert_series_lagrange_fast(res, f, flen, n, ctx);
+
+    /* Newton may succeed where Lagrange fails in finite characteristic */
+    if (status == GR_UNABLE)
+        status = _gr_poly_revert_series_newton(res, f, flen, n, ctx);
+
+    return status;
 }
 
 int
