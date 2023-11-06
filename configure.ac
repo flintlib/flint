@@ -564,7 +564,7 @@ Windows-type systems."])
 esac
 
 case "$host_cpu" in
-    x86_64|ia64|sparc64|powerpc64*)
+    x86_64|sparc64|powerpc64*)
         fft_tuning_in="src/fft_tuning64.in"
         ;;
     *)
