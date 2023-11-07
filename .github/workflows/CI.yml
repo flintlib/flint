@@ -74,6 +74,98 @@ jobs:
 
 
   ##############################################################################
+  # ubuntu, gcc, arm neon through qemu
+  ##############################################################################
+  arm-neon-qemu:
+    name: ARM NEON, qemu (subset of tests, x10)
+
+    runs-on: ubuntu-latest
+
+    env:
+      FLINT_TEST_MULTIPLIER: "10"
+      CC: "aarch64-linux-gnu-gcc-12"
+      HOST: "aarch64-linux-gnu"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Setup"
+        run: |
+          sudo apt-get install -y \
+            autoconf \
+            libtool-bin \
+            gcc-12-aarch64-linux-gnu \
+            qemu-user
+
+          ${CC} --version
+          make --version
+          autoconf --version
+          libtool --version
+          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
+
+      - name: "Install GMP and MPFR"
+        run: |
+          mkdir pkg
+          cd pkg
+          wget https://anaconda.org/conda-forge/gmp/6.2.1/download/linux-aarch64/gmp-6.2.1-h7fd3ca4_0.tar.bz2
+          tar -xf gmp-6.2.1-h7fd3ca4_0.tar.bz2
+          wget https://anaconda.org/conda-forge/mpfr/4.1.0/download/linux-aarch64/mpfr-4.1.0-h719063d_1.tar.bz2
+          tar -xf mpfr-4.1.0-h719063d_1.tar.bz2
+
+      - name: "Configure"
+        run: |
+          ./bootstrap.sh
+          ./configure \
+            --host=${HOST} \
+            --with-gmp=${GITHUB_WORKSPACE}/pkg \
+            --with-mpfr=${GITHUB_WORKSPACE}/pkg \
+            --enable-assert \
+            --disable-static \
+            --disable-debug
+
+          grep -q "define FLINT_HAVE_FFT_SMALL 1" src/config.h
+
+      - name: "Compile library"
+        run: |
+          $MAKE
+
+      - name: "Compile tests"
+        run: |
+          # Specifically test longlong.h and fft_small as they contain most of
+          # the architecture specific code, but include some other tests as
+          # well.
+          $MAKE \
+            build/test/main \
+            build/fft_small/test/main \
+            build/ulong_extras/test/main \
+            build/double_extras/test/main \
+            build/fmpz/test/main \
+            build/fmpz_poly/test/main \
+            build/fmpz_factor/test/main \
+            build/qsieve/test/main \
+            build/aprcl/test/main \
+            build/fmpz_lll/test/main \
+            build/arb/test/main
+
+      - name: "Check"
+        run: |
+          # We want to run qemu-aarch64 when running the tests
+          sed -i 's/@\$</@qemu-aarch64 -L \/usr\/aarch64-linux-gnu \$</' Makefile
+
+          # We want to run tests in parallel without partitioning the tests, so
+          # we simply set JOBS to nothing
+          sed -i 's/JOBS:=\$(filter -j%,\$(MAKEFLAGS))/JOBS:=/' Makefile
+
+          # FIXME: Special case. Probably should be fixed in the Makefile instead by
+          # pushing src/test to src/generic_files/test.
+          qemu-aarch64 -L /usr/aarch64-linux-gnu ./build/test/main
+
+          # Check all the other
+          $MAKE check MOD="fft_small ulong_extras double_extras fmpz fmpz_poly fmpz_factor qsieve aprcl fmpz_lll arb"
+
+
+
+  ##############################################################################
   # ubuntu, gcc, assert
   ##############################################################################
   ubuntu-gcc-assert:
