@@ -18,7 +18,7 @@ TEST_FUNCTION_START(fmpq_cfrac_bound, state)
 {
     int i;
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpq_t x, r;
         fmpz * c;
