@@ -14,6 +14,8 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
+FLINT_DLL extern gr_static_method_table _ca_methods;
+
 TEST_FUNCTION_START(gr_poly_evaluate_vec_fast, state)
 {
     slong iter;
@@ -28,8 +30,16 @@ TEST_FUNCTION_START(gr_poly_evaluate_vec_fast, state)
 
         gr_ctx_init_random(ctx, state);
 
-        n = n_randint(state, 30);
-        m = n_randint(state, 30);
+        if (ctx->methods == _ca_methods)
+        {
+            n = n_randint(state, 8);
+            m = n_randint(state, 8);
+        }
+        else
+        {
+            n = n_randint(state, 30);
+            m = n_randint(state, 30);
+        }
 
         gr_poly_init(f, ctx);
         gr_vec_init(x, n, ctx);

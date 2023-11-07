@@ -97,6 +97,7 @@ TEST_FUNCTION_START(gr_poly_divexact, state)
                     || (ctx->which_ring == GR_CTX_FMPZ && status != GR_SUCCESS)))
             {
                 flint_printf("FAIL\n\n");
+                flint_printf("%d\n", status);
                 gr_ctx_println(ctx);
                 flint_printf("A = "); gr_poly_print(A, ctx); flint_printf("\n");
                 flint_printf("B = "); gr_poly_print(B, ctx); flint_printf("\n");
