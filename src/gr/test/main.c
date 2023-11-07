@@ -56,6 +56,13 @@
 #include "t-series_fmpq.c"
 #include "t-series_fmpz.c"
 #include "t-series_nmod8.c"
+#include "t-vector_acb.c"
+#include "t-vector_arb.c"
+#include "t-vector_fmpz.c"
+#include "t-vector_fmpq.c"
+#include "t-vector_nmod.c"
+#include "t-vector_nmod8.c"
+#include "t-vector_nmod32.c"
 
 /* Array of test functions ***************************************************/
 
@@ -98,7 +105,14 @@ test_struct tests[] =
     TEST_FUNCTION(gr_series_arb),
     TEST_FUNCTION(gr_series_fmpq),
     TEST_FUNCTION(gr_series_fmpz),
-    TEST_FUNCTION(gr_series_nmod8)
+    TEST_FUNCTION(gr_series_nmod8),
+    TEST_FUNCTION(gr_vector_acb),
+    TEST_FUNCTION(gr_vector_arb),
+    TEST_FUNCTION(gr_vector_fmpz),
+    TEST_FUNCTION(gr_vector_fmpq),
+    TEST_FUNCTION(gr_vector_nmod),
+    TEST_FUNCTION(gr_vector_nmod8),
+    TEST_FUNCTION(gr_vector_nmod32),
 };
 
 /* main function *************************************************************/
