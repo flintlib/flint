@@ -82,7 +82,8 @@ Base rings and fields
 .. function:: void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)
 
     Initializes *ctx* to a random ring. This will currently
-    only generate base rings.
+    only generate base rings and composite rings over certain
+    simple base rings.
 
 .. function:: void gr_ctx_init_fmpz(gr_ctx_t ctx)
 

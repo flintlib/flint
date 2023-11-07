@@ -14,17 +14,17 @@
 
 FLINT_DLL extern gr_static_method_table _ca_methods;
 
-TEST_FUNCTION_START(gr_mpoly_mul_johnson, state)
+TEST_FUNCTION_START(gr_mpoly_mul_monomial, state)
 {
     slong i, j;
 
     /* Check f*(g + h) = f*g + f*h */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         gr_ctx_t cctx;
         mpoly_ctx_t mctx;
         gr_mpoly_t f, g, h, k1, k2, t;
-        slong len, len1, len2;
+        slong len, len1;
         flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
         int status;
 
@@ -42,30 +42,31 @@ TEST_FUNCTION_START(gr_mpoly_mul_johnson, state)
         {
             len = n_randint(state, 10);
             len1 = n_randint(state, 10);
-            len2 = n_randint(state, 10);
         }
         else
         {
             len = n_randint(state, 100);
             len1 = n_randint(state, 100);
-            len2 = n_randint(state, 100);
         }
 
         exp_bits = n_randint(state, 200) + 2;
         exp_bits1 = n_randint(state, 200) + 2;
         exp_bits2 = n_randint(state, 200) + 2;
 
-        /* todo: assert_canonical */
+        /* todo: aliasing tests */
 
         for (j = 0; j < 10; j++)
         {
             status = GR_SUCCESS;
 
             status |= gr_mpoly_randtest_bits(f, state, len1, exp_bits1, mctx, cctx);
-            status |= gr_mpoly_randtest_bits(g, state, len2, exp_bits2, mctx, cctx);
-            status |= gr_mpoly_randtest_bits(h, state, len, exp_bits, mctx, cctx);
+            status |= gr_mpoly_randtest_bits(g, state, 1, exp_bits2, mctx, cctx);
+            status |= gr_mpoly_randtest_bits(h, state, 1, exp_bits, mctx, cctx);
             status |= gr_mpoly_randtest_bits(k1, state, len, exp_bits, mctx, cctx);
             status |= gr_mpoly_randtest_bits(k2, state, len, exp_bits, mctx, cctx);
+
+            if (g->length != 1 || h->length != 1)
+                continue;
 
             status |= gr_mpoly_add(k1, g, h, mctx, cctx);
 
@@ -77,12 +78,12 @@ TEST_FUNCTION_START(gr_mpoly_mul_johnson, state)
             if (status == GR_SUCCESS)
                 gr_mpoly_assert_canonical(k1, mctx, cctx);
 
-            status |= gr_mpoly_mul_johnson(k2, f, g, mctx, cctx);
+            status |= gr_mpoly_mul_monomial(k2, f, g, mctx, cctx);
 
             if (status == GR_SUCCESS)
                 gr_mpoly_assert_canonical(k2, mctx, cctx);
 
-            status |= gr_mpoly_mul_johnson(t, f, h, mctx, cctx);
+            status |= gr_mpoly_mul_monomial(t, f, h, mctx, cctx);
 
             if (status == GR_SUCCESS)
                 gr_mpoly_assert_canonical(t, mctx, cctx);
