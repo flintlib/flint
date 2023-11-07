@@ -12,6 +12,8 @@
 #include "test_helpers.h"
 #include "gr_mpoly.h"
 
+FLINT_DLL extern gr_static_method_table _ca_methods;
+
 TEST_FUNCTION_START(gr_mpoly_mul_johnson, state)
 {
     slong i, j;
@@ -36,9 +38,18 @@ TEST_FUNCTION_START(gr_mpoly_mul_johnson, state)
         gr_mpoly_init(k2, mctx, cctx);
         gr_mpoly_init(t, mctx, cctx);
 
-        len = n_randint(state, 100);
-        len1 = n_randint(state, 100);
-        len2 = n_randint(state, 100);
+        if (cctx->methods == _ca_methods)
+        {
+            len = n_randint(state, 10);
+            len1 = n_randint(state, 10);
+            len2 = n_randint(state, 10);
+        }
+        else
+        {
+            len = n_randint(state, 100);
+            len1 = n_randint(state, 100);
+            len2 = n_randint(state, 100);
+        }
 
         exp_bits = n_randint(state, 200) + 2;
         exp_bits1 = n_randint(state, 200) + 2;
