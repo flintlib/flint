@@ -116,9 +116,20 @@ vector_gr_vec_randtest(gr_vec_t res, flint_rand_t state, gr_ctx_t ctx)
 }
 
 truth_t
+gr_generic_vec_equal(gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx);
+
+truth_t
 vector_gr_vec_equal(const gr_vec_t vec1, const gr_vec_t vec2, gr_ctx_t ctx)
 {
-    return gr_poly_equal((gr_poly_struct *) vec1, (gr_poly_struct *) vec2, ENTRY_CTX(ctx));
+    slong len1, len2;
+
+    len1 = vec1->length;
+    len2 = vec2->length;
+
+    if (len1 != len2)
+        return T_FALSE;
+
+    return _gr_vec_equal(vec1->entries, vec2->entries, len1, ENTRY_CTX(ctx));
 }
 
 int
@@ -415,6 +426,7 @@ vector_gr_vec_ ## op(gr_vec_t res, const gr_vec_t x, gr_ctx_t ctx) \
     return _gr_vec_apply_unary(res->entries, f, x->entries, xlen, ENTRY_CTX(ctx)); \
 } \
 
+DEF_UNARY_OP_FROM_ENTRY_OP(inv, INV)
 DEF_UNARY_OP_FROM_ENTRY_OP(sqrt, SQRT)
 DEF_UNARY_OP_FROM_ENTRY_OP(rsqrt, RSQRT)
 DEF_UNARY_OP_FROM_ENTRY_OP(floor, FLOOR)
@@ -649,6 +661,8 @@ gr_method_tab_input _gr_vec_methods_input[] =
     {GR_METHOD_MUL_FMPQ,    (gr_funcptr) vector_gr_vec_mul_fmpq},
     {GR_METHOD_MUL_OTHER,   (gr_funcptr) vector_gr_vec_mul_other},
     {GR_METHOD_OTHER_MUL,   (gr_funcptr) vector_gr_vec_other_mul},
+
+    {GR_METHOD_INV,         (gr_funcptr) vector_gr_vec_inv},
 
     {GR_METHOD_DIV,         (gr_funcptr) vector_gr_vec_div},
     {GR_METHOD_DIV_UI,      (gr_funcptr) vector_gr_vec_div_ui},
