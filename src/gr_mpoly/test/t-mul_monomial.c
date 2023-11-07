@@ -65,6 +65,9 @@ TEST_FUNCTION_START(gr_mpoly_mul_monomial, state)
             status |= gr_mpoly_randtest_bits(k1, state, len, exp_bits, mctx, cctx);
             status |= gr_mpoly_randtest_bits(k2, state, len, exp_bits, mctx, cctx);
 
+            if (g->length != 1 || h->length != 1)
+                continue;
+
             status |= gr_mpoly_add(k1, g, h, mctx, cctx);
 
             if (n_randint(state, 2))
