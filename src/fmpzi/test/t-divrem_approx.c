@@ -47,7 +47,6 @@ TEST_FUNCTION_START(fmpzi_divrem_approx, state)
         }
 
         aliasing = n_randint(state, 7);
-        aliasing = 0;
         switch (aliasing)
         {
             case 0:
