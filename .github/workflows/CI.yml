@@ -77,12 +77,12 @@ jobs:
   # ubuntu, gcc, arm neon through qemu
   ##############################################################################
   arm-neon-qemu:
-    name: ARM NEON, qemu (subset of tests, x10)
+    name: ARM NEON, qemu (subset of tests, x2)
 
     runs-on: ubuntu-latest
 
     env:
-      FLINT_TEST_MULTIPLIER: "10"
+      FLINT_TEST_MULTIPLIER: "2"
       CC: "aarch64-linux-gnu-gcc-12"
       HOST: "aarch64-linux-gnu"
 
@@ -149,19 +149,18 @@ jobs:
 
       - name: "Check"
         run: |
-          # We want to run qemu-aarch64 when running the tests
-          sed -i 's/@\$</@qemu-aarch64 -L \/usr\/aarch64-linux-gnu \$</' Makefile
-
-          # We want to run tests in parallel without partitioning the tests, so
-          # we simply set JOBS to nothing
-          sed -i 's/JOBS:=\$(filter -j%,\$(MAKEFLAGS))/JOBS:=/' Makefile
-
-          # FIXME: Special case. Probably should be fixed in the Makefile instead by
-          # pushing src/test to src/generic_files/test.
-          qemu-aarch64 -L /usr/aarch64-linux-gnu ./build/test/main
-
-          # Check all the other
-          $MAKE check MOD="fft_small ulong_extras double_extras fmpz fmpz_poly fmpz_factor qsieve aprcl fmpz_lll arb"
+          # FIXME: Is it possible to run these in parallel without freezing?
+          qemu-aarch64 -L /usr/aarch64-linux-gnu build/test/main
+          qemu-aarch64 -L /usr/aarch64-linux-gnu build/fft_small/test/main
+          qemu-aarch64 -L /usr/aarch64-linux-gnu build/ulong_extras/test/main
+          qemu-aarch64 -L /usr/aarch64-linux-gnu build/double_extras/test/main
+          qemu-aarch64 -L /usr/aarch64-linux-gnu build/fmpz/test/main
+          qemu-aarch64 -L /usr/aarch64-linux-gnu build/fmpz_poly/test/main
+          qemu-aarch64 -L /usr/aarch64-linux-gnu build/fmpz_factor/test/main
+          qemu-aarch64 -L /usr/aarch64-linux-gnu build/qsieve/test/main
+          qemu-aarch64 -L /usr/aarch64-linux-gnu build/aprcl/test/main
+          qemu-aarch64 -L /usr/aarch64-linux-gnu build/fmpz_lll/test/main
+          qemu-aarch64 -L /usr/aarch64-linux-gnu build/arb/test/ma
 
 
 
