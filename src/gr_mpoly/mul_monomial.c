@@ -102,11 +102,12 @@ int gr_mpoly_mul_monomial(
         ulong * newAexps;
         flint_bitcnt_t newAbits = mpoly_fix_bits(Abits + 1, mctx);
         N = mpoly_words_per_exp(newAbits, mctx);
-        newAexps = FLINT_ARRAY_ALLOC(N*A->exps_alloc, ulong);
+        newAexps = FLINT_ARRAY_ALLOC(N*A->coeffs_alloc, ulong);
         mpoly_repack_monomials(newAexps, newAbits, A->exps, Abits, Blen, mctx);
         flint_free(A->exps);
         A->exps = newAexps;
         A->bits = newAbits;
+        A->exps_alloc = N*A->coeffs_alloc;
     }
 
 /* todo: when we can verify (quickly) that C is invertible */
