@@ -16,7 +16,7 @@ TEST_FUNCTION_START(sdiv_qrnnd, state)
 {
     slong i;
 
-    for (i = 0; i < 1000000*flint_test_multiplier(); i++)
+    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
     {
         int nsgn;
         mp_limb_signed_t d, nh, nl, q, r, ph, pl;

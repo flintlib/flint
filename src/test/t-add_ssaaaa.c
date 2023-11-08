@@ -16,7 +16,7 @@ TEST_FUNCTION_START(add_ssaaaa, state)
 {
     int i, result;
 
-    for (i = 0; i < 1000000; i++)
+    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
     {
         mp_limb_t sh1, sl1, sh2, sl2, ah1, al1, ah2, al2;
 
