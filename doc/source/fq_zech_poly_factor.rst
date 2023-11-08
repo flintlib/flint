@@ -46,7 +46,7 @@ Basic Operations
 
     Sets ``res`` to the same factorisation as ``fac``.
 
-.. function:: void fq_zech_poly_factor_print_pretty(const fq_zech_poly_factor_t fac, const char *var, const fq_zech_ctx_t ctx)
+.. function:: void fq_zech_poly_factor_print_pretty(const fq_zech_poly_factor_t fac, const char * var, const fq_zech_ctx_t ctx)
 
     Pretty-prints the entries of ``fac`` to standard output.
 
@@ -137,7 +137,7 @@ Factorisation
     linear factor of ``input`` and places it in ``linfactor``.
     Requires that ``input`` be monic and non-constant.
 
-.. function:: void fq_zech_poly_factor_distinct_deg(fq_zech_poly_factor_t res, const fq_zech_poly_t poly, slong * const *degs, const fq_zech_ctx_t ctx)
+.. function:: void fq_zech_poly_factor_distinct_deg(fq_zech_poly_factor_t res, const fq_zech_poly_t poly, slong * const * degs, const fq_zech_ctx_t ctx)
 
     Factorises a monic non-constant squarefree polynomial ``poly``
     of degree `n` into factors `f[d]` such that for `1 \leq d \leq n`
@@ -211,7 +211,7 @@ Factorisation
     performs a square-free factorisation, and finally runs
     Kaltofen-Shoup on all the individual square-free factors.
 
-.. function:: void fq_zech_poly_iterated_frobenius_preinv(fq_zech_poly_t *rop, slong n, const fq_zech_poly_t v, const fq_zech_poly_t vinv, const fq_zech_ctx_t ctx)
+.. function:: void fq_zech_poly_iterated_frobenius_preinv(fq_zech_poly_t * rop, slong n, const fq_zech_poly_t v, const fq_zech_poly_t vinv, const fq_zech_ctx_t ctx)
 
     Sets ``rop[i]`` to be `x^{q^i} \bmod v` for `0 \le i < n`.
 

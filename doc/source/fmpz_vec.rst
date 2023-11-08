@@ -372,11 +372,11 @@ Reduction mod `p`
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fmpz_vec_scalar_mod_fmpz(fmpz *res, const fmpz *vec, slong len, const fmpz_t p)
+.. function:: void _fmpz_vec_scalar_mod_fmpz(fmpz * res, const fmpz * vec, slong len, const fmpz_t p)
 
     Reduces all entries in ``(vec, len)`` modulo `p > 0`.
 
-.. function:: void _fmpz_vec_scalar_smod_fmpz(fmpz *res, const fmpz *vec, slong len, const fmpz_t p)
+.. function:: void _fmpz_vec_scalar_smod_fmpz(fmpz * res, const fmpz * vec, slong len, const fmpz_t p)
 
     Reduces all entries in ``(vec, len)`` modulo `p > 0`, choosing
     the unique representative in `(-p/2, p/2]`.

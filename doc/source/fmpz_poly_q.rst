@@ -47,7 +47,7 @@ prints the result:
    #include "fmpz_poly_q.h"
    int main()
    {
-       char *str, *strf, *strg;
+       char * str, * strf, * strg;
        fmpz_poly_q_t f, g;
        fmpz_poly_q_init(f);
        fmpz_poly_q_init(g);
@@ -308,7 +308,7 @@ Note that currently these functions are not optimised for performance and
 are intended to be used only for debugging purposes or one-off input and
 output, rather than as a low-level parser.
 
-.. function:: int fmpz_poly_q_set_str(fmpz_poly_q_t rop, const char *s)
+.. function:: int fmpz_poly_q_set_str(fmpz_poly_q_t rop, const char * s)
 
     Sets ``rop`` to the rational function given
     by the string ``s``.
@@ -318,7 +318,7 @@ output, rather than as a low-level parser.
     Returns the string representation of
     the rational function ``op``.
 
-.. function:: char * fmpz_poly_q_get_str_pretty(const fmpz_poly_q_t op, const char *x)
+.. function:: char * fmpz_poly_q_get_str_pretty(const fmpz_poly_q_t op, const char * x)
 
     Returns the pretty string representation of
     the rational function ``op``.
@@ -328,7 +328,7 @@ output, rather than as a low-level parser.
     Prints the representation of the rational
     function ``op`` to ``stdout``.
 
-.. function:: int fmpz_poly_q_print_pretty(const fmpz_poly_q_t op, const char *x)
+.. function:: int fmpz_poly_q_print_pretty(const fmpz_poly_q_t op, const char * x)
 
     Prints the pretty representation of the rational
     function ``op`` to ``stdout``.

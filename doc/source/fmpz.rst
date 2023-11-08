@@ -108,54 +108,54 @@ Types, macros and constants
 
 .. macro:: COEFF_MAX
 
-   the largest (positive) value an ``fmpz`` can be if just an ``slong``.
+   The largest (positive) value an ``fmpz`` can be if just an ``slong``.
 
 .. macro:: COEFF_MIN
 
-   the smallest (negative) value an ``fmpz`` can be if just an ``slong``.
+   The smallest (negative) value an ``fmpz`` can be if just an ``slong``.
 
 .. function:: fmpz PTR_TO_COEFF(__mpz_struct * ptr)
 
-   a macro to convert an ``mpz_t`` (or more generally any ``__mpz_struct *``)
+   A macro to convert an ``mpz_t`` (or more generally any ``__mpz_struct *``)
    to an ``fmpz`` (shifts the pointer right by `2` and sets the second most
    significant bit).
 
 .. function:: __mpz_struct * COEFF_TO_PTR(fmpz f)
 
-   a macro to convert an ``fmpz`` which represents a pointer into an actual
+   A macro to convert an ``fmpz`` which represents a pointer into an actual
    pointer to an ``__mpz_struct`` (i.e. to an ``mpz_t``).
 
 .. function:: int COEFF_IS_MPZ(fmpz f)
 
-   a macro which returns `1` if `f` represents an ``mpz_t``, otherwise `0` is
+   A macro which returns `1` if `f` represents an ``mpz_t``, otherwise `0` is
    returned.
 
 .. function:: __mpz_struct * _fmpz_new_mpz(void)
 
-   initialises a new ``mpz_t`` and returns a pointer to it. This is only used
+   Initialises a new ``mpz_t`` and returns a pointer to it. This is only used
    internally.
 
 .. function:: void _fmpz_clear_mpz(fmpz f)
 
-   clears the ``mpz_t`` "pointed to" by the ``fmpz`` `f`. This is only used
+   Clears the ``mpz_t`` "pointed to" by the ``fmpz`` `f`. This is only used
    internally.
 
 .. function:: void _fmpz_cleanup_mpz_content()
 
-   this function does nothing in the reentrant version of ``fmpz``.
+   This function does nothing in the reentrant version of ``fmpz``.
 
 .. function:: void _fmpz_cleanup()
 
-   this function does nothing in the reentrant version of ``fmpz``.
+   This function does nothing in the reentrant version of ``fmpz``.
 
 .. function:: __mpz_struct * _fmpz_promote(fmpz_t f)
 
-   if `f` doesn't represent an ``mpz_t``, initialise one and associate it to
+   If `f` doesn't represent an ``mpz_t``, initialise one and associate it to
    `f`.
 
 .. function:: __mpz_struct * _fmpz_promote_val(fmpz_t f)
 
-   if `f` doesn't represent an ``mpz_t``, initialise one and associate it to
+   If `f` doesn't represent an ``mpz_t``, initialise one and associate it to
    `f`, but preserve the value of `f`.
 
    This function is for internal use. The resulting ``fmpz`` will be backed by
@@ -165,12 +165,12 @@ Types, macros and constants
 
 .. function:: void _fmpz_demote(fmpz_t f)
 
-   if `f` represents an ``mpz_t`` clear it and make `f` just represent an
+   If `f` represents an ``mpz_t`` clear it and make `f` just represent an
    ``slong``.
 
 .. function:: void _fmpz_demote_val(fmpz_t f)
 
-   if `f` represents an ``mpz_t`` and its value will fit in an ``slong``,
+   If `f` represents an ``mpz_t`` and its value will fit in an ``slong``,
    preserve the value in `f` which we make to represent an ``slong``, and
    clear the ``mpz_t``.
 
@@ -332,7 +332,7 @@ Conversion
 
     Sets the ``mpz_t`` `x` to the same value as `f`.
 
-.. function:: int fmpz_get_mpn(mp_ptr *n, fmpz_t n_in)
+.. function:: int fmpz_get_mpn(mp_ptr * n, fmpz_t n_in)
 
     Sets the ``mp_ptr`` `n` to the same value as `n_{in}`. Returned
     integer is number of limbs allocated to `n`, minimum number of limbs
@@ -579,7 +579,7 @@ Input and output
     ``flint_printf`` from the standard library and ``mpz_out_str``
     from MPIR.
 
-.. function:: size_t fmpz_out_raw(FILE *fout, const fmpz_t x )
+.. function:: size_t fmpz_out_raw(FILE * fout, const fmpz_t x )
 
     Writes the value `x` to ``file``.
     The value is written in raw binary format. The integer is written in

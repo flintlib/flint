@@ -68,7 +68,7 @@ The various Babai's
 --------------------------------------------------------------------------------
 
 
-.. function:: int fmpz_lll_check_babai(int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s, d_mat_t appB, int *expo, fmpz_gram_t A, int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
+.. function:: int fmpz_lll_check_babai(int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double * s, d_mat_t appB, int * expo, fmpz_gram_t A, int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
 
     Performs floating point size reductions of the ``kappa``-th row of
     ``B`` by all of the previous rows, uses d_mats ``mu`` and ``r``
@@ -89,19 +89,19 @@ The various Babai's
     (usually due to insufficient precision) or 0 if everything was successful.
     These descriptions will be true for the future Babai procedures as well.
 
-.. function:: int fmpz_lll_check_babai_heuristic_d(int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s, d_mat_t appB, int *expo, fmpz_gram_t A, int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
+.. function:: int fmpz_lll_check_babai_heuristic_d(int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double * s, d_mat_t appB, int * expo, fmpz_gram_t A, int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
 
     Same as :func:`fmpz_lll_check_babai` but using the heuristic inner product
     rather than a purely floating point inner product. The heuristic will
     compute at full precision when there is cancellation.
 
-.. function:: int fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U, mpf_mat_t mu, mpf_mat_t r, mpf *s, mpf_mat_t appB, fmpz_gram_t A, int a, int zeros, int kappamax, int n, mpf_t tmp, mpf_t rtmp, flint_bitcnt_t prec, const fmpz_lll_t fl)
+.. function:: int fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U, mpf_mat_t mu, mpf_mat_t r, mpf * s, mpf_mat_t appB, fmpz_gram_t A, int a, int zeros, int kappamax, int n, mpf_t tmp, mpf_t rtmp, flint_bitcnt_t prec, const fmpz_lll_t fl)
 
     This function is like the ``mpf`` version of
     :func:`fmpz_lll_check_babai_heuristic_d`. However, it also inherits some
     temporary ``mpf_t`` variables ``tmp`` and ``rtmp``.
 
-.. function:: int fmpz_lll_advance_check_babai(int cur_kappa, int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s, d_mat_t appB, int *expo, fmpz_gram_t A, int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
+.. function:: int fmpz_lll_advance_check_babai(int cur_kappa, int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double * s, d_mat_t appB, int * expo, fmpz_gram_t A, int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
 
     This is a Babai procedure which is used when size reducing a vector beyond
     an index which LLL has reached. ``cur_kappa`` is the index behind which
@@ -109,7 +109,7 @@ The various Babai's
     be reduced. This procedure only size reduces the ``kappa``-th row by
     vectors up to ``cur_kappa``, **not** ``kappa - 1``.
 
-.. function:: int fmpz_lll_advance_check_babai_heuristic_d(int cur_kappa, int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s, d_mat_t appB, int *expo, fmpz_gram_t A, int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
+.. function:: int fmpz_lll_advance_check_babai_heuristic_d(int cur_kappa, int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double * s, d_mat_t appB, int * expo, fmpz_gram_t A, int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
 
     Same as :func:`fmpz_lll_advance_check_babai` but using the heuristic inner
     product rather than a purely floating point inner product. The heuristic

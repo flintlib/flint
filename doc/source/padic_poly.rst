@@ -75,7 +75,7 @@ Memory management
     If all coefficients are zero, the length is set to zero.  This function 
     is mainly used internally, as all functions guarantee normalisation.
 
-.. function:: void _padic_poly_canonicalise(fmpz *poly, slong *v, slong len, const fmpz_t p)
+.. function:: void _padic_poly_canonicalise(fmpz * poly, slong * v, slong len, const fmpz_t p)
               void padic_poly_canonicalise(padic_poly_t poly, const fmpz_t p)
 
     Brings the polynomial ``poly`` into canonical form, 
@@ -265,7 +265,7 @@ Addition and subtraction
 --------------------------------------------------------------------------------
 
 
-.. function:: void _padic_poly_add(fmpz *rop, slong *rval, slong N, const fmpz *op1, slong val1, slong len1, slong N1, const fmpz *op2, slong val2, slong len2, slong N2, const padic_ctx_t ctx)
+.. function:: void _padic_poly_add(fmpz * rop, slong * rval, slong N, const fmpz * op1, slong val1, slong len1, slong N1, const fmpz * op2, slong val2, slong len2, slong N2, const padic_ctx_t ctx)
 
     Sets ``(rop, *val, FLINT_MAX(len1, len2)`` to the sum of 
     ``(op1, val1, len1)`` and ``(op2, val2, len2)``.
@@ -281,7 +281,7 @@ Addition and subtraction
 
     Sets `f` to the sum `g + h`.
 
-.. function:: void _padic_poly_sub(fmpz *rop, slong *rval, slong N, const fmpz *op1, slong val1, slong len1, slong N1, const fmpz *op2, slong val2, slong len2, slong N2, const padic_ctx_t ctx)
+.. function:: void _padic_poly_sub(fmpz * rop, slong * rval, slong N, const fmpz * op1, slong val1, slong len1, slong N1, const fmpz * op2, slong val2, slong len2, slong N2, const padic_ctx_t ctx)
 
     Sets ``(rop, *val, FLINT_MAX(len1, len2)`` to the difference of 
     ``(op1, val1, len1)`` and ``(op2, val2, len2)``.
@@ -306,7 +306,7 @@ Scalar multiplication
 --------------------------------------------------------------------------------
 
 
-.. function:: void _padic_poly_scalar_mul_padic(fmpz *rop, slong *rval, slong N, const fmpz *op, slong val, slong len, const padic_t c, const padic_ctx_t ctx)
+.. function:: void _padic_poly_scalar_mul_padic(fmpz * rop, slong * rval, slong N, const fmpz * op, slong val, slong len, const padic_t c, const padic_ctx_t ctx)
 
     Sets ``(rop, *rval, len)`` to ``(op, val, len)`` multiplied 
     by the scalar `c`.
@@ -326,7 +326,7 @@ Multiplication
 --------------------------------------------------------------------------------
 
 
-.. function:: void _padic_poly_mul(fmpz *rop, slong *rval, slong N, const fmpz *op1, slong val1, slong len1, const fmpz *op2, slong val2, slong len2, const padic_ctx_t ctx)
+.. function:: void _padic_poly_mul(fmpz * rop, slong * rval, slong N, const fmpz * op1, slong val1, slong len1, const fmpz * op2, slong val2, slong len2, const padic_ctx_t ctx)
 
     Sets ``(rop, *rval, len1 + len2 - 1)`` to the product of 
     ``(op1, val1, len1)`` and ``(op2, val2, len2)``.
@@ -347,7 +347,7 @@ Powering
 --------------------------------------------------------------------------------
 
 
-.. function:: void _padic_poly_pow(fmpz *rop, slong *rval, slong N, const fmpz *op, slong val, slong len, ulong e, const padic_ctx_t ctx)
+.. function:: void _padic_poly_pow(fmpz * rop, slong * rval, slong N, const fmpz * op, slong val, slong len, ulong e, const padic_ctx_t ctx)
 
     Sets the polynomial ``(rop, *rval, e (len - 1) + 1)`` to the 
     polynomial ``(op, val, len)`` raised to the power~`e`.
@@ -399,7 +399,7 @@ Derivative
 --------------------------------------------------------------------------------
 
 
-.. function:: void _padic_poly_derivative(fmpz *rop, slong *rval, slong N, const fmpz *op, slong val, slong len, const padic_ctx_t ctx)
+.. function:: void _padic_poly_derivative(fmpz * rop, slong * rval, slong N, const fmpz * op, slong val, slong len, const padic_ctx_t ctx)
 
     Sets ``(rop, rval)`` to the derivative of ``(op, val)`` reduced 
     modulo `p^N`.
@@ -432,7 +432,7 @@ Evaluation
 --------------------------------------------------------------------------------
 
 
-.. function:: void _padic_poly_evaluate_padic(fmpz_t u, slong *v, slong N, const fmpz *poly, slong val, slong len, const fmpz_t a, slong b, const padic_ctx_t ctx)
+.. function:: void _padic_poly_evaluate_padic(fmpz_t u, slong * v, slong N, const fmpz * poly, slong val, slong len, const fmpz_t a, slong b, const padic_ctx_t ctx)
               void padic_poly_evaluate_padic(padic_t y, const padic_poly_t poly, const padic_t a, const padic_ctx_t ctx)
 
     Sets the `p`-adic number ``y`` to ``poly`` evaluated at `a`, 
@@ -451,7 +451,7 @@ Composition
 --------------------------------------------------------------------------------
 
 
-.. function:: void _padic_poly_compose(fmpz *rop, slong *rval, slong N, const fmpz *op1, slong val1, slong len1, const fmpz *op2, slong val2, slong len2, const padic_ctx_t ctx)
+.. function:: void _padic_poly_compose(fmpz * rop, slong * rval, slong N, const fmpz * op1, slong val1, slong len1, const fmpz * op2, slong val2, slong len2, const padic_ctx_t ctx)
 
     Sets ``(rop, *rval, (len1-1)*(len2-1)+1)`` to the composition 
     of the two input polynomials, reducing the result modulo `p^N`.
@@ -469,7 +469,7 @@ Composition
     denote the polynomials ``op1`` and ``op2``, respectively. 
     Then ``rop`` is set to `f(g(X))`.
 
-.. function:: void _padic_poly_compose_pow(fmpz *rop, slong *rval, slong N, const fmpz *op, slong val, slong len, slong k, const padic_ctx_t ctx)
+.. function:: void _padic_poly_compose_pow(fmpz * rop, slong * rval, slong N, const fmpz * op, slong val, slong len, slong k, const padic_ctx_t ctx)
 
     Sets ``(rop, *rval, (len - 1)*k + 1)`` to the composition of 
     ``(op, val, len)`` and the monomial `x^k`, where `k \geq 1`.
@@ -497,8 +497,8 @@ Input and output
 
     In the current implementation, always returns `1`.
 
-.. function:: int _padic_poly_fprint(FILE *file, const fmpz *poly, slong val, slong len, const padic_ctx_t ctx)
-              int padic_poly_fprint(FILE *file, const padic_poly_t poly, const padic_ctx_t ctx)
+.. function:: int _padic_poly_fprint(FILE * file, const fmpz * poly, slong val, slong len, const padic_ctx_t ctx)
+              int padic_poly_fprint(FILE * file, const padic_poly_t poly, const padic_ctx_t ctx)
 
     Prints a simple representation of the polynomial ``poly`` 
     to the stream ``file``.
@@ -520,7 +520,7 @@ Input and output
 
     In the current implementation, always returns `1`.
 
-.. function:: int _padic_poly_print(const fmpz *poly, slong val, slong len, const padic_ctx_t ctx)
+.. function:: int _padic_poly_print(const fmpz * poly, slong val, slong len, const padic_ctx_t ctx)
               int padic_poly_print(const padic_poly_t poly, const padic_ctx_t ctx)
 
     Prints a simple representation of the polynomial ``poly`` 
@@ -528,18 +528,18 @@ Input and output
 
     In the current implementation, always returns `1`.
 
-.. function:: int _padic_poly_fprint_pretty(FILE *file, const fmpz *poly, slong val, slong len, const char *var, const padic_ctx_t ctx)
-              int padic_poly_fprint_pretty(FILE *file, const padic_poly_t poly, const char *var, const padic_ctx_t ctx)
-              int _padic_poly_print_pretty(const fmpz *poly, slong val, slong len, const char *var, const padic_ctx_t ctx)
-              int padic_poly_print_pretty(const padic_poly_t poly, const char *var, const padic_ctx_t ctx)
+.. function:: int _padic_poly_fprint_pretty(FILE * file, const fmpz * poly, slong val, slong len, const char * var, const padic_ctx_t ctx)
+              int padic_poly_fprint_pretty(FILE * file, const padic_poly_t poly, const char * var, const padic_ctx_t ctx)
+              int _padic_poly_print_pretty(const fmpz * poly, slong val, slong len, const char * var, const padic_ctx_t ctx)
+              int padic_poly_print_pretty(const padic_poly_t poly, const char * var, const padic_ctx_t ctx)
 
 
 Testing
 --------------------------------------------------------------------------------
 
 
-.. function:: int _padic_poly_is_canonical(const fmpz *op, slong val, slong len, const padic_ctx_t ctx)
+.. function:: int _padic_poly_is_canonical(const fmpz * op, slong val, slong len, const padic_ctx_t ctx)
               int padic_poly_is_canonical(const padic_poly_t op, const padic_ctx_t ctx)
-              int _padic_poly_is_reduced(const fmpz *op, slong val, slong len, slong N, const padic_ctx_t ctx)
+              int _padic_poly_is_reduced(const fmpz * op, slong val, slong len, slong N, const padic_ctx_t ctx)
               int padic_poly_is_reduced(const padic_poly_t op, const padic_ctx_t ctx)
 

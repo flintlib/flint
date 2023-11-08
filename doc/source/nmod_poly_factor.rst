@@ -114,7 +114,7 @@ Factorisation
     degree ``d``, finds all those factors and places them in factors.
     Requires that ``pol`` be monic, non-constant and squarefree.
 
-.. function:: void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res, const nmod_poly_t poly, slong * const *degs)
+.. function:: void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res, const nmod_poly_t poly, slong * const * degs)
 
     Factorises a monic non-constant squarefree polynomial ``poly``
     of degree n into factors `f[d]` such that for `1 \leq d \leq n`
@@ -125,7 +125,7 @@ Factorisation
 
     Requires that ``degs`` has enough space for ``(n/2)+1 * sizeof(slong)``.
 
-.. function:: void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res, const nmod_poly_t poly, slong * const *degs)
+.. function:: void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res, const nmod_poly_t poly, slong * const * degs)
 
     Multithreaded version of :func:`nmod_poly_factor_distinct_deg`.
 
@@ -194,7 +194,7 @@ Factorisation
     Currently Cantor-Zassenhaus is used by default unless the modulus is 2, in
     which case Berlekamp is used.
 
-.. function:: void _nmod_poly_interval_poly_worker(void* arg_ptr)
+.. function:: void _nmod_poly_interval_poly_worker(void * arg_ptr)
 
     Worker function to compute interval polynomials in distinct degree
     factorisation. Input/output is stored in

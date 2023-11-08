@@ -240,7 +240,7 @@ Output
 --------------------------------------------------------------------------------
 
 
-.. function:: int fq_default_fprint_pretty(FILE *file, const fq_default_t op, const fq_default_ctx_t ctx)
+.. function:: int fq_default_fprint_pretty(FILE * file, const fq_default_t op, const fq_default_ctx_t ctx)
 
     Prints a pretty representation of ``op`` to ``file``.
 

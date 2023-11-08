@@ -36,7 +36,7 @@ Context Management
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_zech_ctx_init(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var)
+.. function:: void fq_zech_ctx_init(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char * var)
 
     Initialises the context for prime `p` and extension degree `d`,
     with name ``var`` for the generator.  By default, it will try
@@ -48,7 +48,7 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
-.. function:: int _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var)
+.. function:: int _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char * var)
 
     Attempts to initialise the context for prime `p` and extension
     degree `d`, with name ``var`` for the generator using a Conway
@@ -63,7 +63,7 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
-.. function:: void fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var)
+.. function:: void fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char * var)
 
     Initialises the context for prime `p` and extension degree `d`,
     with name ``var`` for the generator using a Conway polynomial
@@ -74,7 +74,7 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
-.. function:: void fq_zech_ctx_init_random(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var)
+.. function:: void fq_zech_ctx_init_random(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char * var)
 
     Initialises the context for prime `p` and extension degree `d`,
     with name ``var`` for the generator using a random primitive
@@ -85,7 +85,7 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
-.. function:: void fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx, const nmod_poly_t modulus, const char *var)
+.. function:: void fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx, const nmod_poly_t modulus, const char * var)
 
     Initialises the context for given ``modulus`` with name
     ``var`` for the generator.
@@ -97,7 +97,7 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
-.. function:: int fq_zech_ctx_init_modulus_check(fq_zech_ctx_t ctx, const nmod_poly_t modulus, const char *var)
+.. function:: int fq_zech_ctx_init_modulus_check(fq_zech_ctx_t ctx, const nmod_poly_t modulus, const char * var)
 
     As per the previous function, but returns `0` if the modulus was not
     primitive and `1` if the context was successfully initialised with the
@@ -250,7 +250,7 @@ Basic arithmetic
     Sets ``rop`` to the quotient of ``op1`` and ``op2``,
     reducing the output in the given context.
 
-.. function:: void _fq_zech_inv(mp_ptr *rop, mp_srcptr *op, slong len, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_inv(mp_ptr * rop, mp_srcptr * op, slong len, const fq_zech_ctx_t ctx)
 
     Sets ``(rop, d)`` to the inverse of the non-zero element
     ``(op, len)``.
@@ -265,7 +265,7 @@ Basic arithmetic
      of ``ctx`` and sets ``f`` to one.  Since the modulus for
      ``ctx`` is always irreducible, ``op`` is always invertible.
 
-.. function:: void _fq_zech_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e, const fmpz * a, const slong *j, slong lena, const fmpz_t p)
+.. function:: void _fq_zech_pow(fmpz * rop, const fmpz * op, slong len, const fmpz_t e, const fmpz * a, const slong * j, slong lena, const fmpz_t p)
 
     Sets ``(rop, 2*d-1)`` to ``(op,len)`` raised to the power `e`,
     reduced modulo `f(X)`, the modulus of ``ctx``.
@@ -320,7 +320,7 @@ Output
 --------------------------------------------------------------------------------
 
 
-.. function:: int fq_zech_fprint_pretty(FILE *file, const fq_zech_t op, const fq_zech_ctx_t ctx)
+.. function:: int fq_zech_fprint_pretty(FILE * file, const fq_zech_t op, const fq_zech_ctx_t ctx)
 
     Prints a pretty representation of ``op`` to ``file``.
 
