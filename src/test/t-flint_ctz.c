@@ -16,7 +16,7 @@ TEST_FUNCTION_START(flint_ctz, state)
 {
    int i, result;
 
-   for (i = 0; i < 1000000; i++)
+   for (i = 0; i < 100000 * flint_test_multiplier(); i++)
    {
       mp_limb_t n;
       unsigned int count = 0;

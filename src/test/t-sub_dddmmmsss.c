@@ -17,7 +17,7 @@ TEST_FUNCTION_START(sub_dddmmmsss, state)
 {
     int i, j, result;
 
-    for (i = 0; i < 1000000; i++)
+    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
     {
         mp_limb_t s[3], t[3], a[3], b[3];
 

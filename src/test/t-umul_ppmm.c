@@ -16,7 +16,7 @@ TEST_FUNCTION_START(umul_ppmm, state)
 {
    int i, j, result;
 
-   for (i = 0; i < 1000000; i++)
+   for (i = 0; i < 100000 * flint_test_multiplier(); i++)
    {
       mp_limb_t ph1, pl1, ph2, pl2, pl2old, m1, m2, bit;
 
