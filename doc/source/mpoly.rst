@@ -227,7 +227,7 @@ Basic manipulation
     could be inserted to preserve the ordering. The index can be in the range
     ``[0, len]``.
 
-.. function:: void mpoly_search_monomials(slong ** e_ind, ulong * e, slong * e_score, slong * t1, slong * t2, slong *t3, slong lower, slong upper, const ulong * a, slong a_len, const ulong * b, slong b_len, slong N, const ulong * cmpmask)
+.. function:: void mpoly_search_monomials(slong ** e_ind, ulong * e, slong * e_score, slong * t1, slong * t2, slong * t3, slong lower, slong upper, const ulong * a, slong a_len, const ulong * b, slong b_len, slong N, const ulong * cmpmask)
 
     Given packed exponent vectors ``a`` and ``b``, compute a packed
     exponent ``e`` such that the number of monomials in the cross product

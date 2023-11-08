@@ -765,7 +765,7 @@ Internal Functions
     ``fmpz_mpoly_div_monagan_pearce`` below may be much faster if the
     quotient is known to be exact.
 
-.. function:: slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1, slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, slong len3, ulong bits, slong N, const mp_limb_t *cmpmask)
+.. function:: slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1, slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, slong len3, ulong bits, slong N, const mp_limb_t * cmpmask)
 
     Set ``(poly1, exp1, alloc)`` to ``(poly2, exp3, len2)`` divided by
     ``(poly3, exp3, len3)`` and return 1 if the quotient is exact. Otherwise
@@ -787,7 +787,7 @@ Internal Functions
 
     The threaded version takes an upper limit on the number of threads to use, while the first version always uses one thread.
 
-.. function:: slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq, ulong ** expq, slong * allocq, const fmpz * poly2, const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, slong len3, slong bits, slong N, const mp_limb_t *cmpmask)
+.. function:: slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq, ulong ** expq, slong * allocq, const fmpz * poly2, const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, slong len3, slong bits, slong N, const mp_limb_t * cmpmask)
 
     Set ``(polyq, expq, allocq)`` to the quotient of
     ``(poly2, exp2, len2)`` by ``(poly3, exp3, len3)`` discarding
@@ -809,7 +809,7 @@ Internal Functions
     Monagan and Roman Pearce. This function is exceptionally efficient if the
     division is known to be exact.
 
-.. function:: slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr, fmpz ** polyq, ulong ** expq, slong * allocq, fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2, const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, slong len3, slong bits, slong N, const mp_limb_t *cmpmask)
+.. function:: slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr, fmpz ** polyq, ulong ** expq, slong * allocq, fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2, const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, slong len3, slong bits, slong N, const mp_limb_t * cmpmask)
 
     Set ``(polyq, expq, allocq)`` and ``(polyr, expr, allocr)`` to the
     quotient and remainder of ``(poly2, exp2, len2)`` by
@@ -862,7 +862,7 @@ Internal Functions
     ``poly3`` is zero or if an exponent overflow occurs.
 
 
-.. function:: slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq, fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2, const ulong * exp2, slong len2, fmpz_mpoly_struct * const * poly3, ulong * const * exp3, slong len, slong N, slong bits, const fmpz_mpoly_ctx_t ctx, const mp_limb_t *cmpmask)
+.. function:: slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq, fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2, const ulong * exp2, slong len2, fmpz_mpoly_struct * const * poly3, ulong * const * exp3, slong len, slong N, slong bits, const fmpz_mpoly_ctx_t ctx, const mp_limb_t * cmpmask)
 
     This function is as per ``_fmpz_mpoly_divrem_monagan_pearce`` except
     that it takes an array of divisor polynomials ``poly3`` and an array of

@@ -270,7 +270,7 @@ Arithmetic operations
 --------------------------------------------------------------------------------
 
 
-.. function:: slong * _padic_lifts_exps(slong *n, slong N)
+.. function:: slong * _padic_lifts_exps(slong * n, slong N)
 
     Given a positive integer `N` define the sequence 
     `a_0 = N, a_1 = \lceil a_0/2\rceil, \dotsc, a_{n-1} = \lceil a_{n-2}/2\rceil = 1`.
@@ -278,7 +278,7 @@ Arithmetic operations
 
     This function sets `n` and allocates and returns the array `a`.
 
-.. function:: void _padic_lifts_pows(fmpz *pow, const slong *a, slong n, const fmpz_t p)
+.. function:: void _padic_lifts_pows(fmpz * pow, const slong * a, slong n, const fmpz_t p)
 
     Given an array `a` as computed above, this function 
     computes the corresponding powers of `p`, that is, 

@@ -1670,7 +1670,7 @@ Greatest common divisor
     polynomial `P` is defined to be `P`. Except in the case where
     the GCD is zero, the GCD `G` is made monic.
 
-.. function:: slong _nmod_poly_hgcd(mp_ptr *M, slong *lenM, mp_ptr A, slong *lenA, mp_ptr B, slong *lenB, mp_srcptr a, slong lena, mp_srcptr b, slong lenb, nmod_t mod)
+.. function:: slong _nmod_poly_hgcd(mp_ptr * M, slong * lenM, mp_ptr A, slong * lenA, mp_ptr B, slong * lenB, mp_srcptr a, slong lena, mp_srcptr b, slong lenb, nmod_t mod)
 
     Computes the HGCD of `a` and `b`, that is, a matrix `M`, a sign `\sigma`
     and two polynomials `A` and `B` such that
@@ -1912,7 +1912,7 @@ Greatest common divisor
     For convenience, we define the resultant to be equal to zero if either
     of the two polynomials is zero.
 
-.. function:: slong _nmod_poly_gcdinv(mp_limb_t *G, mp_limb_t *S, const mp_limb_t *A, slong lenA, const mp_limb_t *B, slong lenB, const nmod_t mod)
+.. function:: slong _nmod_poly_gcdinv(mp_limb_t * G, mp_limb_t * S, const mp_limb_t * A, slong lenA, const mp_limb_t * B, slong lenB, const nmod_t mod)
 
     Computes ``(G, lenA)``, ``(S, lenB-1)`` such that
     `G \cong S A \pmod{B}`, returning the actual length of `G`.
@@ -1927,7 +1927,7 @@ Greatest common divisor
 
     In the case that `A = 0 \pmod{B}`, returns `G = S = 0`.
 
-.. function:: int _nmod_poly_invmod(mp_limb_t *A, const mp_limb_t *B, slong lenB, const mp_limb_t *P, slong lenP, const nmod_t mod)
+.. function:: int _nmod_poly_invmod(mp_limb_t * A, const mp_limb_t * B, slong lenB, const mp_limb_t * P, slong lenP, const nmod_t mod)
 
     Attempts to set ``(A, lenP-1)`` to the inverse of ``(B, lenB)``
     modulo the polynomial ``(P, lenP)``.  Returns `1` if ``(B, lenB)``

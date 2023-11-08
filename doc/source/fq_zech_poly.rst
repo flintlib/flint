@@ -80,7 +80,7 @@ Memory management
     zero.  This function is mainly used internally, as all functions
     guarantee normalisation.
 
-.. function:: void _fq_zech_poly_normalise2(const fq_zech_struct *poly, slong *length, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_normalise2(const fq_zech_struct * poly, slong * length, const fq_zech_ctx_t ctx)
 
     Sets the length ``length`` of ``(poly,length)`` so that the
     top coefficient is non-zero. If all coefficients are zero, the
@@ -160,7 +160,7 @@ Assignment and basic manipulation
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fq_zech_poly_set(fq_zech_struct *rop, const fq_zech_struct *op, slong len, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_set(fq_zech_struct * rop, const fq_zech_struct * op, slong len, const fq_zech_ctx_t ctx)
 
     Sets ``(rop, len``) to ``(op, len)``.
 
@@ -184,7 +184,7 @@ Assignment and basic manipulation
 
     Swaps the two polynomials ``op1`` and ``op2``.
 
-.. function:: void _fq_zech_poly_zero(fq_zech_struct *rop, slong len, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_zero(fq_zech_struct * rop, slong len, const fq_zech_ctx_t ctx)
 
     Sets ``(rop, len)`` to the zero polynomial.
 
@@ -204,7 +204,7 @@ Assignment and basic manipulation
 
      Sets ``rop`` to ``op``, normed to have leading coefficient 1.
 
-.. function:: void _fq_zech_poly_make_monic(fq_zech_struct *rop, const fq_zech_struct *op, slong length, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_make_monic(fq_zech_struct * rop, const fq_zech_struct * op, slong length, const fq_zech_ctx_t ctx)
 
      Sets ``rop`` to ``(op,length)``, normed to have leading coefficient 1.
      Assumes that ``rop`` has enough space for the polynomial, assumes that
@@ -272,7 +272,7 @@ Addition and subtraction
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fq_zech_poly_add(fq_zech_struct *res, const fq_zech_struct *poly1, slong len1, const fq_zech_struct *poly2, slong len2, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_add(fq_zech_struct * res, const fq_zech_struct * poly1, slong len1, const fq_zech_struct * poly2, slong len2, const fq_zech_ctx_t ctx)
 
     Sets ``res`` to the sum of ``(poly1,len1)`` and ``(poly2,len2)``.
 
@@ -289,7 +289,7 @@ Addition and subtraction
     Notionally truncate ``poly1`` and ``poly2`` to length ``n`` and set
     ``res`` to the sum.
 
-.. function:: void _fq_zech_poly_sub(fq_zech_struct *res, const fq_zech_struct *poly1, slong len1, const fq_zech_struct *poly2, slong len2, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_sub(fq_zech_struct * res, const fq_zech_struct * poly1, slong len1, const fq_zech_struct * poly2, slong len2, const fq_zech_ctx_t ctx)
 
     Sets ``res`` to the difference of ``(poly1,len1)`` and
     ``(poly2,len2)``.
@@ -303,7 +303,7 @@ Addition and subtraction
     Notionally truncate ``poly1`` and ``poly2`` to length ``n`` and set
     ``res`` to the difference.
 
-.. function:: void _fq_zech_poly_neg(fq_zech_struct *rop, const fq_zech_struct *op, slong len, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_neg(fq_zech_struct * rop, const fq_zech_struct * op, slong len, const fq_zech_ctx_t ctx)
 
     Sets ``rop`` to the additive inverse of ``(op,len)``.
 
@@ -316,7 +316,7 @@ Scalar multiplication and division
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fq_zech_poly_scalar_mul_fq_zech(fq_zech_struct *rop, const fq_zech_struct *op, slong len, const fq_zech_t x, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_scalar_mul_fq_zech(fq_zech_struct * rop, const fq_zech_struct * op, slong len, const fq_zech_t x, const fq_zech_ctx_t ctx)
 
     Sets ``(rop,len)`` to the product of ``(op,len)`` by the
     scalar ``x``, in the context defined by ``ctx``.
@@ -326,7 +326,7 @@ Scalar multiplication and division
     Sets ``rop`` to the product of ``op`` by the scalar ``x``, in the context
     defined by ``ctx``.
 
-.. function:: void _fq_zech_poly_scalar_addmul_fq_zech(fq_zech_struct *rop, const fq_zech_struct *op, slong len, const fq_zech_t x, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_scalar_addmul_fq_zech(fq_zech_struct * rop, const fq_zech_struct * op, slong len, const fq_zech_t x, const fq_zech_ctx_t ctx)
 
     Adds to ``(rop,len)`` the product of ``(op,len)`` by the
     scalar ``x``, in the context defined by ``ctx``.
@@ -338,7 +338,7 @@ Scalar multiplication and division
     Adds to ``rop`` the product of ``op`` by the
     scalar ``x``, in the context defined by ``ctx``.
 
-.. function:: void _fq_zech_poly_scalar_submul_fq_zech(fq_zech_struct *rop, const fq_zech_struct *op, slong len, const fq_zech_t x, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_scalar_submul_fq_zech(fq_zech_struct * rop, const fq_zech_struct * op, slong len, const fq_zech_t x, const fq_zech_ctx_t ctx)
 
     Subtracts from ``(rop,len)`` the product of ``(op,len)`` by the
     scalar ``x``, in the context defined by ``ctx``.
@@ -350,7 +350,7 @@ Scalar multiplication and division
     Subtracts from ``rop`` the product of ``op`` by the
     scalar ``x``, in the context defined by ``ctx``.
 
-.. function:: void _fq_zech_poly_scalar_div_fq_zech(fq_zech_struct *rop, const fq_zech_struct *op, slong len, const fq_zech_t x, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_scalar_div_fq_zech(fq_zech_struct * rop, const fq_zech_struct * op, slong len, const fq_zech_t x, const fq_zech_ctx_t ctx)
 
     Sets ``(rop,len)`` to the quotient of ``(op,len)`` by the
     scalar ``x``, in the context defined by ``ctx``. An exception is raised
@@ -365,7 +365,7 @@ Multiplication
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fq_zech_poly_mul_classical(fq_zech_struct *rop, const fq_zech_struct *op1, slong len1, const fq_zech_struct *op2, slong len2, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_mul_classical(fq_zech_struct * rop, const fq_zech_struct * op1, slong len1, const fq_zech_struct * op2, slong len2, const fq_zech_ctx_t ctx)
 
     Sets ``(rop, len1 + len2 - 1)`` to the product of ``(op1, len1)``
     and ``(op2, len2)``, assuming that ``len1`` is at least ``len2``
@@ -379,7 +379,7 @@ Multiplication
     Sets ``rop`` to the product of ``op1`` and ``op2``
     using classical polynomial multiplication.
 
-.. function:: void _fq_zech_poly_mul_reorder(fq_zech_struct *rop, const fq_zech_struct *op1, slong len1, const fq_zech_struct *op2, slong len2, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_mul_reorder(fq_zech_struct * rop, const fq_zech_struct * op1, slong len1, const fq_zech_struct * op2, slong len2, const fq_zech_ctx_t ctx)
 
     Sets ``(rop, len1 + len2 - 1)`` to the product of ``(op1, len1)``
     and ``(op2, len2)``, assuming that ``len1`` and ``len2`` are
@@ -415,7 +415,7 @@ Multiplication
     multiplication routines in the `Y`-direction where the polynomial
     degree `n` is large.
 
-.. function:: void _fq_zech_poly_mul_KS(fq_zech_struct *rop, const fq_zech_struct *op1, slong len1, const fq_zech_struct *op2, slong len2, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_mul_KS(fq_zech_struct * rop, const fq_zech_struct * op1, slong len1, const fq_zech_struct * op2, slong len2, const fq_zech_ctx_t ctx)
 
     Sets ``(rop, len1 + len2 - 1)`` to the product of ``(op1, len1)``
     and ``(op2, len2)``.
@@ -430,7 +430,7 @@ Multiplication
     coefficient in `\mathbf{F}_{q}` as an integer and reducing
     this problem to multiplying two polynomials over the integers.
 
-.. function:: void _fq_zech_poly_mul(fq_zech_struct *rop, const fq_zech_struct *op1, slong len1, const fq_zech_struct *op2, slong len2, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_mul(fq_zech_struct * rop, const fq_zech_struct * op1, slong len1, const fq_zech_struct * op2, slong len2, const fq_zech_ctx_t ctx)
 
     Sets ``(rop, len1 + len2 - 1)`` to the product of ``(op1, len1)``
     and ``(op2, len2)``, choosing an appropriate algorithm.
@@ -442,7 +442,7 @@ Multiplication
     Sets ``rop`` to the product of ``op1`` and ``op2``,
     choosing an appropriate algorithm.
 
-.. function:: void _fq_zech_poly_mullow_classical(fq_zech_struct *rop, const fq_zech_struct *op1, slong len1, const fq_zech_struct *op2, slong len2, slong n, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_mullow_classical(fq_zech_struct * rop, const fq_zech_struct * op1, slong len1, const fq_zech_struct * op2, slong len2, slong n, const fq_zech_ctx_t ctx)
 
     Sets ``(rop, n)`` to the first `n` coefficients of
     ``(op1, len1)`` multiplied by ``(op2, len2)``.
@@ -455,7 +455,7 @@ Multiplication
     Sets ``rop`` to the product of ``op1`` and ``op2``,
     computed using the classical or schoolbook method.
 
-.. function:: void _fq_zech_poly_mullow_KS(fq_zech_struct *rop, const fq_zech_struct *op1, slong len1, const fq_zech_struct *op2, slong len2, slong n, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_mullow_KS(fq_zech_struct * rop, const fq_zech_struct * op1, slong len1, const fq_zech_struct * op2, slong len2, slong n, const fq_zech_ctx_t ctx)
 
     Sets ``(rop, n)`` to the lowest `n` coefficients of the product of
     ``(op1, len1)`` and ``(op2, len2)``.
@@ -469,7 +469,7 @@ Multiplication
 
     Sets ``rop`` to the product of ``op1`` and ``op2``.
 
-.. function:: void _fq_zech_poly_mullow(fq_zech_struct *rop, const fq_zech_struct *op1, slong len1, const fq_zech_struct *op2, slong len2, slong n, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_mullow(fq_zech_struct * rop, const fq_zech_struct * op1, slong len1, const fq_zech_struct * op2, slong len2, slong n, const fq_zech_ctx_t ctx)
 
     Sets ``(rop, n)`` to the lowest `n` coefficients of the product of
     ``(op1, len1)`` and ``(op2, len2)``.
@@ -482,7 +482,7 @@ Multiplication
     Sets ``rop`` to the lowest `n` coefficients of the product of
     ``op1`` and ``op2``.
 
-.. function:: void _fq_zech_poly_mulhigh_classical(fq_zech_struct *res, const fq_zech_struct *poly1, slong len1, const fq_zech_struct *poly2, slong len2, slong start, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_mulhigh_classical(fq_zech_struct * res, const fq_zech_struct * poly1, slong len1, const fq_zech_struct * poly2, slong len2, slong start, const fq_zech_ctx_t ctx)
 
     Computes the product of ``(poly1, len1)`` and ``(poly2, len2)``
     and writes the coefficients from ``start`` onwards into the high
@@ -497,7 +497,7 @@ Multiplication
     ``res``, the remaining coefficients being arbitrary but reduced.
     Algorithm is classical multiplication.
 
-.. function:: void _fq_zech_poly_mulhigh(fq_zech_struct *res, const fq_zech_struct *poly1, slong len1, const fq_zech_struct *poly2, slong len2, slong start, fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_mulhigh(fq_zech_struct * res, const fq_zech_struct * poly1, slong len1, const fq_zech_struct * poly2, slong len2, slong start, fq_zech_ctx_t ctx)
 
     Computes the product of ``(poly1, len1)`` and ``(poly2, len2)``
     and writes the coefficients from ``start`` onwards into the high
@@ -548,7 +548,7 @@ Squaring
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fq_zech_poly_sqr_classical(fq_zech_struct *rop, const fq_zech_struct *op, slong len, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_sqr_classical(fq_zech_struct * rop, const fq_zech_struct * op, slong len, const fq_zech_ctx_t ctx)
 
     Sets ``(rop, 2*len - 1)`` to the square of ``(op, len)``,
     assuming that ``(op,len)`` is not zero and using classical
@@ -563,7 +563,7 @@ Squaring
     polynomial multiplication.
 
 
-.. function:: void _fq_zech_poly_sqr_KS(fq_zech_struct *rop, const fq_zech_struct *op, slong len, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_sqr_KS(fq_zech_struct * rop, const fq_zech_struct * op, slong len, const fq_zech_ctx_t ctx)
 
     Sets ``(rop, 2*len - 1)`` to the square of ``(op, len)``.
 
@@ -576,7 +576,7 @@ Squaring
     that is, by encoding each coefficient in `\mathbf{F}_{q}` as an integer
     and reducing this problem to multiplying two polynomials over the integers.
 
-.. function:: void _fq_zech_poly_sqr(fq_zech_struct *rop, const fq_zech_struct *op, slong len, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_sqr(fq_zech_struct * rop, const fq_zech_struct * op, slong len, const fq_zech_ctx_t ctx)
 
     Sets ``(rop, 2* len - 1)`` to the square of ``(op, len)``,
     choosing an appropriate algorithm.
@@ -594,7 +594,7 @@ Powering
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fq_zech_poly_pow(fq_zech_struct *rop, const fq_zech_struct *op, slong len, ulong e, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_pow(fq_zech_struct * rop, const fq_zech_struct * op, slong len, ulong e, const fq_zech_ctx_t ctx)
 
     Sets ``rop = op^e``, assuming that ``e, len > 0`` and that
     ``res`` has space for ``e*(len - 1) + 1`` coefficients.  Does
@@ -745,7 +745,7 @@ Shifting
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fq_zech_poly_shift_left(fq_zech_struct *rop, const fq_zech_struct *op, slong len, slong n, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_shift_left(fq_zech_struct * rop, const fq_zech_struct * op, slong len, slong n, const fq_zech_ctx_t ctx)
 
     Sets ``(rop, len + n)`` to ``(op, len)`` shifted left by
     `n` coefficients.
@@ -760,7 +760,7 @@ Shifting
     Sets ``rop`` to ``op`` shifted left by `n` coeffs.  Zero
     coefficients are inserted.
 
-.. function:: void _fq_zech_poly_shift_right(fq_zech_struct *rop, const fq_zech_struct *op, slong len, slong n, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_shift_right(fq_zech_struct * rop, const fq_zech_struct * op, slong len, slong n, const fq_zech_ctx_t ctx)
 
     Sets ``(rop, len - n)`` to ``(op, len)`` shifted right by
     `n` coefficients.
@@ -781,7 +781,7 @@ Norms
 --------------------------------------------------------------------------------
 
 
-.. function:: slong _fq_zech_poly_hamming_weight(const fq_zech_struct *op, slong len, const fq_zech_ctx_t ctx)
+.. function:: slong _fq_zech_poly_hamming_weight(const fq_zech_struct * op, slong len, const fq_zech_ctx_t ctx)
 
     Returns the number of non-zero entries in ``(op, len)``.
 
@@ -794,7 +794,7 @@ Euclidean division
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fq_zech_poly_divrem(fq_zech_struct *Q, fq_zech_struct *R, const fq_zech_struct *A, slong lenA, const fq_zech_struct *B, slong lenB, const fq_zech_t invB, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_divrem(fq_zech_struct * Q, fq_zech_struct * R, const fq_zech_struct * A, slong lenA, const fq_zech_struct * B, slong lenB, const fq_zech_t invB, const fq_zech_ctx_t ctx)
 
     Computes ``(Q, lenA - lenB + 1)``, ``(R, lenA)`` such that
     `A = B Q + R` with `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
@@ -828,7 +828,7 @@ Euclidean division
 
     Assumes that `B` is non-zero.
 
-.. function:: void _fq_zech_poly_rem(fq_zech_struct *R, const fq_zech_struct *A, slong lenA, const fq_zech_struct *B, slong lenB, const fq_zech_t invB, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_rem(fq_zech_struct * R, const fq_zech_struct * A, slong lenA, const fq_zech_struct * B, slong lenB, const fq_zech_t invB, const fq_zech_ctx_t ctx)
 
     Sets ``R`` to the remainder of the division of ``(A,lenA)`` by
     ``(B,lenB)``. Assumes that the leading coefficient of ``(B,lenB)``
@@ -839,7 +839,7 @@ Euclidean division
     Sets ``R`` to the remainder of the division of ``A`` by
     ``B`` in the context described by ``ctx``.
 
-.. function:: void _fq_zech_poly_div(fq_zech_struct *Q, const fq_zech_struct *A, slong lenA, const fq_zech_struct *B, slong lenB, const fq_zech_t invB, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_div(fq_zech_struct * Q, const fq_zech_struct * A, slong lenA, const fq_zech_struct * B, slong lenB, const fq_zech_t invB, const fq_zech_ctx_t ctx)
 
     Notationally, computes `Q`, `R` such that `A = B Q + R` with `0
     \leq \operatorname{len}(R) < \operatorname{len}(B)` but only sets ``(Q, lenA - lenB + 1)``.
@@ -966,7 +966,7 @@ Greatest common divisor
     made to make the GCD monic. It is required that `G` have space for
     ``lenB`` coefficients.
 
-.. function:: slong _fq_zech_poly_gcd_euclidean_f(fq_zech_t f, fq_zech_struct *G, const fq_zech_struct *A, slong lenA, const fq_zech_struct *B, slong lenB, const fq_zech_ctx_t ctx)
+.. function:: slong _fq_zech_poly_gcd_euclidean_f(fq_zech_t f, fq_zech_struct * G, const fq_zech_struct * A, slong lenA, const fq_zech_struct * B, slong lenB, const fq_zech_ctx_t ctx)
 
     Either sets `f = 1` and `G` to the greatest common divisor of
     `(A,\operatorname{len}(A))` and `(B, \operatorname{len}(B))` and returns its length, or sets
@@ -981,7 +981,7 @@ Greatest common divisor
     Either sets `f = 1` and `G` to the greatest common divisor of `A`
     and `B` or sets `f` to a factor of the modulus of ``ctx``.
 
-.. function:: slong _fq_zech_poly_xgcd(fq_zech_struct *G, fq_zech_struct *S, fq_zech_struct *T, const fq_zech_struct *A, slong lenA, const fq_zech_struct *B, slong lenB, const fq_zech_ctx_t ctx)
+.. function:: slong _fq_zech_poly_xgcd(fq_zech_struct * G, fq_zech_struct * S, fq_zech_struct * T, const fq_zech_struct * A, slong lenA, const fq_zech_struct * B, slong lenB, const fq_zech_ctx_t ctx)
 
     Computes the GCD of `A` and `B` together with cofactors `S` and `T`
     such that `S A + T B = G`.  Returns the length of `G`.
@@ -1009,7 +1009,7 @@ Greatest common divisor
     ``S*A + T*B = G``. The length of ``S`` will be at most
     ``lenB`` and the length of ``T`` will be at most ``lenA``.
 
-.. function:: slong _fq_zech_poly_xgcd_euclidean_f(fq_zech_t f, fq_zech_struct *G, fq_zech_struct *S, fq_zech_struct *T, const fq_zech_struct *A, slong lenA, const fq_zech_struct *B, slong lenB, const fq_zech_ctx_t ctx)
+.. function:: slong _fq_zech_poly_xgcd_euclidean_f(fq_zech_t f, fq_zech_struct * G, fq_zech_struct * S, fq_zech_struct * T, const fq_zech_struct * A, slong lenA, const fq_zech_struct * B, slong lenB, const fq_zech_ctx_t ctx)
 
     Either sets `f = 1` and computes the GCD of `A` and `B` together
     with cofactors `S` and `T` such that `S A + T B = G`; otherwise,
@@ -1048,7 +1048,7 @@ Divisibility testing
 --------------------------------------------------------------------------------
 
 
-.. function:: int _fq_zech_poly_divides(fq_zech_struct *Q, const fq_zech_struct *A, slong lenA, const fq_zech_struct *B, slong lenB, const fq_zech_t invB, const fq_zech_ctx_t ctx)
+.. function:: int _fq_zech_poly_divides(fq_zech_struct * Q, const fq_zech_struct * A, slong lenA, const fq_zech_struct * B, slong lenB, const fq_zech_t invB, const fq_zech_ctx_t ctx)
 
     Returns `1` if ``(B, lenB)`` divides ``(A, lenA)`` exactly and
     sets `Q` to the quotient, otherwise returns `0`.
@@ -1075,7 +1075,7 @@ Derivative
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fq_zech_poly_derivative(fq_zech_struct *rop, const fq_zech_struct *op, slong len, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_derivative(fq_zech_struct * rop, const fq_zech_struct * op, slong len, const fq_zech_ctx_t ctx)
 
     Sets ``(rop, len - 1)`` to the derivative of ``(op, len)``.
     Also handles the cases where ``len`` is `0` or `1` correctly.
@@ -1127,7 +1127,7 @@ Evaluation
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fq_zech_poly_evaluate_fq_zech(fq_zech_t rop, const fq_zech_struct *op, slong len, const fq_zech_t a, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_evaluate_fq_zech(fq_zech_t rop, const fq_zech_struct * op, slong len, const fq_zech_t a, const fq_zech_ctx_t ctx)
 
     Sets ``rop`` to ``(op, len)`` evaluated at `a`.
 
@@ -1146,7 +1146,7 @@ Composition
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fq_zech_poly_compose(fq_zech_struct *rop, const fq_zech_struct *op1, slong len1, const fq_zech_struct *op2, slong len2, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_poly_compose(fq_zech_struct * rop, const fq_zech_struct * op1, slong len1, const fq_zech_struct * op2, slong len2, const fq_zech_ctx_t ctx)
 
     Sets ``rop`` to the composition of ``(op1, len1)`` and
     ``(op2, len2)``.
@@ -1314,7 +1314,7 @@ Output
 --------------------------------------------------------------------------------
 
 
-.. function:: int _fq_zech_poly_fprint_pretty(FILE *file, const fq_zech_struct *poly, slong len, const char *x, const fq_zech_ctx_t ctx)
+.. function:: int _fq_zech_poly_fprint_pretty(FILE * file, const fq_zech_struct * poly, slong len, const char * x, const fq_zech_ctx_t ctx)
 
     Prints the pretty representation of ``(poly, len)`` to the stream
     ``file``, using the string ``x`` to represent the indeterminate.
@@ -1322,7 +1322,7 @@ Output
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
-.. function:: int fq_zech_poly_fprint_pretty(FILE * file, const fq_zech_poly_t poly, const char *x, const fq_zech_ctx_t ctx)
+.. function:: int fq_zech_poly_fprint_pretty(FILE * file, const fq_zech_poly_t poly, const char * x, const fq_zech_ctx_t ctx)
 
     Prints the pretty representation of ``poly`` to the stream
     ``file``, using the string ``x`` to represent the indeterminate.
@@ -1331,7 +1331,7 @@ Output
     returns a non-positive value.
 
 
-.. function:: int _fq_zech_poly_print_pretty(const fq_zech_struct *poly, slong len, const char *x, const fq_zech_ctx_t ctx)
+.. function:: int _fq_zech_poly_print_pretty(const fq_zech_struct * poly, slong len, const char * x, const fq_zech_ctx_t ctx)
 
     Prints the pretty representation of ``(poly, len)`` to ``stdout``,
     using the string ``x`` to represent the indeterminate.
@@ -1340,7 +1340,7 @@ Output
     returns a non-positive value.
 
 
-.. function:: int fq_zech_poly_print_pretty(const fq_zech_poly_t poly, const char *x, const fq_zech_ctx_t ctx)
+.. function:: int fq_zech_poly_print_pretty(const fq_zech_poly_t poly, const char * x, const fq_zech_ctx_t ctx)
 
     Prints the pretty representation of ``poly`` to ``stdout``,
     using the string ``x`` to represent the indeterminate.
@@ -1348,7 +1348,7 @@ Output
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
-.. function:: int _fq_zech_poly_fprint(FILE *file, const fq_zech_struct *poly, slong len, const fq_zech_ctx_t ctx)
+.. function:: int _fq_zech_poly_fprint(FILE * file, const fq_zech_struct * poly, slong len, const fq_zech_ctx_t ctx)
 
     Prints the pretty representation of ``(poly, len)`` to the stream
     ``file``.
@@ -1365,7 +1365,7 @@ Output
     returns a non-positive value.
 
 
-.. function:: int _fq_zech_poly_print(const fq_zech_struct *poly, slong len, const fq_zech_ctx_t ctx)
+.. function:: int _fq_zech_poly_print(const fq_zech_struct * poly, slong len, const fq_zech_ctx_t ctx)
 
     Prints the pretty representation of ``(poly, len)`` to ``stdout``.
 

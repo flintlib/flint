@@ -63,7 +63,7 @@ Framework for repeatedly sampling a single target
 --------------------------------------------------------------------------------
 
 
-.. function:: void prof_repeat(double *min, double *max, profile_target_t target, void *arg)
+.. function:: void prof_repeat(double * min, double * max, profile_target_t target, void * arg)
 
     Allows one to automatically time a given function. Here is a sample usage:
 

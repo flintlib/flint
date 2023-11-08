@@ -263,7 +263,7 @@ Factoring of ``fmpz`` integers using ECM
     The curve selected is of Montgomery form, the points selected satisfy the
     curve and are projective coordinates.
 
-.. function:: int fmpz_factor_ecm_stage_I(mp_ptr f, const mp_limb_t *prime_array, mp_limb_t num, mp_limb_t B1, mp_ptr n, ecm_t ecm_inf)
+.. function:: int fmpz_factor_ecm_stage_I(mp_ptr f, const mp_limb_t * prime_array, mp_limb_t num, mp_limb_t B1, mp_ptr n, ecm_t ecm_inf)
 
     Stage I implementation of the ECM algorithm.
 

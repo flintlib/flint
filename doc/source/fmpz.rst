@@ -332,7 +332,7 @@ Conversion
 
     Sets the ``mpz_t`` `x` to the same value as `f`.
 
-.. function:: int fmpz_get_mpn(mp_ptr *n, fmpz_t n_in)
+.. function:: int fmpz_get_mpn(mp_ptr * n, fmpz_t n_in)
 
     Sets the ``mp_ptr`` `n` to the same value as `n_{in}`. Returned
     integer is number of limbs allocated to `n`, minimum number of limbs
@@ -579,7 +579,7 @@ Input and output
     ``flint_printf`` from the standard library and ``mpz_out_str``
     from MPIR.
 
-.. function:: size_t fmpz_out_raw(FILE *fout, const fmpz_t x )
+.. function:: size_t fmpz_out_raw(FILE * fout, const fmpz_t x )
 
     Writes the value `x` to ``file``.
     The value is written in raw binary format. The integer is written in
