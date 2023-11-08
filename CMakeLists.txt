@@ -294,8 +294,6 @@ if(BUILD_SHARED_LIBS AND MSVC)
     set_target_properties(flint PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
     # Export flint's global data that are marked manually
     target_compile_definitions(flint PRIVATE "FLINT_BUILD_DLL")
-    # Use MPIR's dll import functions
-    target_compile_definitions(flint PUBLIC "MSC_USE_DLL")
 endif()
 
 if (HAS_FLAG_MPOPCNT)
