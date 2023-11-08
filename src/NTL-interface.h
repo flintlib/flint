@@ -14,21 +14,12 @@
 #ifndef FLINT_NTL_INT_H
 #define FLINT_NTL_INT_H
 
-#include <NTL/ZZ.h>
 #include <NTL/ZZX.h>
-#include <NTL/ZZ_p.h>
-#include <NTL/ZZ_pX.h>
 #include <NTL/ZZ_pXFactoring.h>
-#include <NTL/ZZ_pE.h>
 #include <NTL/ZZ_pEX.h>
-#include <NTL/lzz_p.h>
-#include <NTL/lzz_pX.h>
 #include <NTL/lzz_pXFactoring.h>
-#include <NTL/lzz_pE.h>
 #include <NTL/lzz_pEX.h>
-#include <NTL/vec_ZZ.h>
 
-#include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
