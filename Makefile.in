@@ -329,10 +329,10 @@ define xxx_TESTS
 $(1)_TESTS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$($(1)_TEST_SOURCES))
 endef
 _TESTS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$(_TEST_SOURCES))
+$(foreach dir, $(DIRS), $(eval $(call xxx_TESTS,$(dir))))
 ifneq ($(WANT_NTL), 0)
 interfaces_TESTS := $(BUILD_DIR)/interfaces/test/t-NTL-interface$(EXEEXT)
 endif
-$(foreach dir, $(DIRS), $(eval $(call xxx_TESTS,$(dir))))
 TESTS := $(foreach dir,$(DIRS),$($(dir)_TESTS)) $(_TESTS) $(interfaces_TESTS)
 
 define xxx_TUNES

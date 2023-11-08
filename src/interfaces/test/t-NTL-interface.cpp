@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2011 William Hart
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -10,38 +11,23 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <NTL/ZZ.h>
-#include <NTL/ZZX.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mod.h"
-#include "fmpz_poly.h"
-#include "fmpz_mod_poly.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
+#include "fmpz_mod.h"
 #include "NTL-interface.h"
 
 NTL_CLIENT
 
-int test_ZZ_to_fmpz()
+TEST_FUNCTION_START(ZZ_to_fmpz, state)
 {
     int i, result;
     mp_bitcnt_t bits, randbits;
     fmpz_t int1, int2;
 
     ZZ z;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("ZZ_to_fmpz....");
-    fflush(stdout);
-
-
 
     /* Check conversion */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         bits = n_randint(state, 1000) + 1;
         randbits = n_randint(state, bits);
@@ -60,34 +46,25 @@ int test_ZZ_to_fmpz()
            flint_printf("FAIL:\n");
            flint_printf("int1 = %wd  ", *int1); fmpz_print(int1); flint_printf("\n");
            flint_printf("int2 = %wd  ", *int2); fmpz_print(int2); flint_printf("\n");
-           return 0;
+           flint_abort();
         }
 
         fmpz_clear(int1);
         fmpz_clear(int2);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    return 1;
+    TEST_FUNCTION_END(state);
 }
 
-int test_ZZX_to_fmpz_poly()
+TEST_FUNCTION_START(ZZX_to_fmpz_poly, state)
 {
     fmpz_poly_t f_poly1, f_poly2;
     slong length;
     mp_bitcnt_t bits;
     int i, result;
 
-    FLINT_TEST_INIT(state);
-
-    flint_printf("ZZX_to_fmpz_poly....");
-    fflush(stdout);
-
-
-
     /* Check aliasing of a and c */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         bits = n_randint(state, 1000) + 1;
         length = n_randint(state, 1000);
@@ -108,19 +85,17 @@ int test_ZZX_to_fmpz_poly()
            flint_printf("FAIL:\n");
            flint_printf("f_poly1 = "); fmpz_poly_print(f_poly1); flint_printf("\n");
            flint_printf("f_poly2 = "); fmpz_poly_print(f_poly2); flint_printf("\n");
-           return 0;
+           flint_abort();
         }
 
         fmpz_poly_clear(f_poly1);
         fmpz_poly_clear(f_poly2);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    return 1;
+    TEST_FUNCTION_END(state);
 }
 
-int test_ZZ_pX_to_fmpz_mod_poly()
+TEST_FUNCTION_START(ZZ_pX_to_fmpz_mod_poly, state)
 {
     fmpz_t p;
     fmpz_mod_poly_t f_poly1, f_poly2;
@@ -128,15 +103,10 @@ int test_ZZ_pX_to_fmpz_mod_poly()
     slong length;
     int i, result;
 
-    FLINT_TEST_INIT(state);
-
-    flint_printf("ZZ_pX_to_fmpz_mod_poly....");
-    fflush(stdout);
-
     fmpz_mod_ctx_init_ui(ctx, 2);
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         ZZ_pX ZZ_pX_poly;
         ZZ mod;
@@ -165,7 +135,7 @@ int test_ZZ_pX_to_fmpz_mod_poly()
            flint_printf("FAIL:\n");
            flint_printf("f_poly1 = "); fmpz_mod_poly_print(f_poly1, ctx); flint_printf("\n");
            flint_printf("f_poly2 = "); fmpz_mod_poly_print(f_poly2, ctx); flint_printf("\n");
-           return 0;
+           flint_abort();
         }
 
         fmpz_clear(p);
@@ -175,27 +145,20 @@ int test_ZZ_pX_to_fmpz_mod_poly()
 
     fmpz_mod_ctx_clear(ctx);
 
-    FLINT_TEST_CLEANUP(state);
-
-    return 1;
+    TEST_FUNCTION_END(state);
 }
 
-int test_zz_pX_to_fmpz_mod_poly()
+TEST_FUNCTION_START(zz_pX_to_fmpz_mod_poly, state)
 {
     fmpz_mod_poly_t f_poly1, f_poly2;
     fmpz_mod_ctx_t ctx;
     slong length;
     int i, result;
 
-    FLINT_TEST_INIT(state);
-
-    flint_printf("zz_pX_to_fmpz_mod_poly....");
-    fflush(stdout);
-
     fmpz_mod_ctx_init_ui(ctx, 2);
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         zz_pX zz_pX_poly;
 
@@ -219,7 +182,7 @@ int test_zz_pX_to_fmpz_mod_poly()
            flint_printf("FAIL:\n");
            flint_printf("f_poly1 = "); fmpz_mod_poly_print(f_poly1, ctx); flint_printf("\n");
            flint_printf("f_poly2 = "); fmpz_mod_poly_print(f_poly2, ctx); flint_printf("\n");
-           return 0;
+           flint_abort();
         }
 
         fmpz_mod_poly_clear(f_poly1, ctx);
@@ -228,27 +191,20 @@ int test_zz_pX_to_fmpz_mod_poly()
 
     fmpz_mod_ctx_clear(ctx);
 
-    FLINT_TEST_CLEANUP(state);
-
-    return 1;
+    TEST_FUNCTION_END(state);
 }
 
-int test_ZZ_pE_to_fq()
+TEST_FUNCTION_START(ZZ_pE_to_fq, state)
 {
     fq_t f1, f2;
     int i, result;
     fmpz_mod_ctx_t ctxp;
     fq_ctx_t ctx;
 
-    FLINT_TEST_INIT(state);
-
-    flint_printf("ZZ_pE_to_fq....");
-    fflush(stdout);
-
     fmpz_mod_ctx_init_ui(ctxp, 2);
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t fmod;
         slong d;
@@ -289,7 +245,7 @@ int test_ZZ_pE_to_fq()
            flint_printf("f1 = "); fq_print_pretty(f1, ctx); flint_printf(" - %wd", f1->length); flint_printf("\n");
            flint_printf("zzpe:"); cout << zzpe; flint_printf("\n");
            flint_printf("f2 = "); fq_print_pretty(f2, ctx); flint_printf(" - %wd", f2->length); flint_printf("\n");
-           return 0;
+           flint_abort();
         }
 
         fq_clear(f1, ctx);
@@ -301,12 +257,10 @@ int test_ZZ_pE_to_fq()
 
     fmpz_mod_ctx_clear(ctxp);
 
-    FLINT_TEST_CLEANUP(state);
-
-    return 1;
+    TEST_FUNCTION_END(state);
 }
 
-int test_ZZ_pEX_to_fq_poly()
+TEST_FUNCTION_START(ZZ_pEX_to_fq_poly, state)
 {
     fq_poly_t f1, f2;
     slong length;
@@ -314,14 +268,9 @@ int test_ZZ_pEX_to_fq_poly()
     fmpz_mod_ctx_t ctxp;
     fq_ctx_t ctx;
 
-    FLINT_TEST_INIT(state);
-
-    flint_printf("ZZ_pEX_to_fq_poly....");
-    fflush(stdout);
-
     fmpz_mod_ctx_init_ui(ctxp, 2);
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t fmod;
         slong d;
@@ -364,7 +313,7 @@ int test_ZZ_pEX_to_fq_poly()
            flint_printf("f1 = "); fq_poly_print_pretty(f1, "x", ctx); flint_printf("\n");
            flint_printf("zzpex:"); cout << zzpex; flint_printf("\n");
            flint_printf("f2 = "); fq_poly_print_pretty(f2, "x", ctx); flint_printf("\n");
-           return 0;
+           flint_abort();
         }
 
         fq_poly_clear(f1, ctx);
@@ -376,27 +325,20 @@ int test_ZZ_pEX_to_fq_poly()
 
     fmpz_mod_ctx_clear(ctxp);
 
-    FLINT_TEST_CLEANUP(state);
-
-    return 1;
+    TEST_FUNCTION_END(state);
 }
 
-int test_zz_pE_to_fq()
+TEST_FUNCTION_START(zz_pE_to_fq, state)
 {
     fq_t f1, f2;
     int i, result;
     fmpz_mod_ctx_t ctxp;
     fq_ctx_t ctx;
 
-    FLINT_TEST_INIT(state);
-
-    flint_printf("zz_pE_to_fq....");
-    fflush(stdout);
-
     fmpz_mod_ctx_init_ui(ctxp, 2);
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t fmod;
         slong d;
@@ -435,7 +377,7 @@ int test_zz_pE_to_fq()
            flint_printf("f1 = "); fq_print_pretty(f1, ctx); flint_printf(" - %wd", f1->length); flint_printf("\n");
            flint_printf("zzpe:"); cout << zzpe; flint_printf("\n");
            flint_printf("f2 = "); fq_print_pretty(f2, ctx); flint_printf(" - %wd", f2->length); flint_printf("\n");
-           return 0;
+           flint_abort();
         }
 
         fq_clear(f1, ctx);
@@ -447,12 +389,10 @@ int test_zz_pE_to_fq()
 
     fmpz_mod_ctx_clear(ctxp);
 
-    FLINT_TEST_CLEANUP(state);
-
-    return 1;
+    TEST_FUNCTION_END(state);
 }
 
-int test_zz_pEX_to_fq_poly()
+TEST_FUNCTION_START(zz_pEX_to_fq_poly, state)
 {
     fq_poly_t f1, f2;
     slong length;
@@ -460,14 +400,9 @@ int test_zz_pEX_to_fq_poly()
     fmpz_mod_ctx_t ctxp;
     fq_ctx_t ctx;
 
-    FLINT_TEST_INIT(state);
-
-    flint_printf("zz_pEX_to_fq_poly....");
-    fflush(stdout);
-
     fmpz_mod_ctx_init_ui(ctxp, 2);
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_mod_poly_t fmod;
         slong d;
@@ -508,7 +443,7 @@ int test_zz_pEX_to_fq_poly()
            flint_printf("f1 = "); fq_poly_print_pretty(f1, "x", ctx); flint_printf("\n");
            flint_printf("zzpex:"); cout << zzpex; flint_printf("\n");
            flint_printf("f2 = "); fq_poly_print_pretty(f2, "x", ctx); flint_printf("\n");
-           return 0;
+           flint_abort();
         }
 
         fq_poly_clear(f1, ctx);
@@ -520,27 +455,29 @@ int test_zz_pEX_to_fq_poly()
 
     fmpz_mod_ctx_clear(ctxp);
 
-    FLINT_TEST_CLEANUP(state);
-
-    return 1;
+    TEST_FUNCTION_END(state);
 }
 
+/* ISO C++ forbids converting a string constant to char* */
+char str1[] = "ZZ_to_fmpz";
+char str2[] = "ZZX_to_fmpz_poly";
+char str3[] = "ZZ_pX_to_fmpz_mod_poly";
+char str4[] = "zz_pX_to_fmpz_mod_poly";
+char str5[] = "ZZ_pE_to_fq";
+char str6[] = "ZZ_pEX_to_fq_poly";
+char str7[] = "zz_pE_to_fq";
+char str8[] = "zz_pEX_to_fq_poly";
 
-int
-main(void)
+test_struct tests[] =
 {
-    int r = 1;
+    { CAT(test, ZZ_to_fmpz), str1 },
+    { CAT(test, ZZX_to_fmpz_poly), str2 },
+    { CAT(test, ZZ_pX_to_fmpz_mod_poly), str3 },
+    { CAT(test, zz_pX_to_fmpz_mod_poly), str4 },
+    { CAT(test, ZZ_pE_to_fq), str5 },
+    { CAT(test, ZZ_pEX_to_fq_poly), str6 },
+    { CAT(test, zz_pE_to_fq), str7 },
+    { CAT(test, zz_pEX_to_fq_poly), str8 }
+};
 
-    if ((r &= test_ZZ_to_fmpz())) flint_printf("PASS\n");
-    if ((r &= test_ZZX_to_fmpz_poly())) flint_printf("PASS\n");
-    if ((r &= test_ZZ_pX_to_fmpz_mod_poly())) flint_printf("PASS\n");
-    if ((r &= test_ZZ_pE_to_fq())) flint_printf("PASS\n");
-    if ((r &= test_ZZ_pEX_to_fq_poly())) flint_printf("PASS\n");
-    if ((r &= test_zz_pX_to_fmpz_mod_poly())) flint_printf("PASS\n");
-    if ((r &= test_zz_pE_to_fq())) flint_printf("PASS\n");
-    if ((r &= test_zz_pEX_to_fq_poly())) flint_printf("PASS\n");
-
-    if (!r) abort();
-
-    return 0;
-}
+TEST_MAIN(tests)
