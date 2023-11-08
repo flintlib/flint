@@ -95,7 +95,7 @@ Memory management
 
     Sets ``poly1`` to ``poly2`` truncated to length `n`.
 
-.. function:: void _fq_nmod_poly_reverse(fq_nmod_struct* output, const fq_nmod_struct* input, slong len, slong m, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_poly_reverse(fq_nmod_struct * output, const fq_nmod_struct * input, slong len, slong m, const fq_nmod_ctx_t ctx)
 
     Sets ``output`` to the reverse of ``input``, which is of
     length ``len``, but thinking of it as a polynomial of
@@ -542,7 +542,7 @@ Multiplication
     coefficients from ``start`` onwards into the high coefficients of
     ``res``, the remaining coefficients being arbitrary but reduced.
 
-.. function:: void _fq_nmod_poly_mulmod(fq_nmod_struct* res, const fq_nmod_struct* poly1, slong len1, const fq_nmod_struct* poly2, slong len2, const fq_nmod_struct* f, slong lenf, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_poly_mulmod(fq_nmod_struct * res, const fq_nmod_struct * poly1, slong len1, const fq_nmod_struct * poly2, slong len2, const fq_nmod_struct * f, slong lenf, const fq_nmod_ctx_t ctx)
 
     Sets ``res`` to the remainder of the product of ``poly1``
     and ``poly2`` upon polynomial division by ``f``.
@@ -558,7 +558,7 @@ Multiplication
     Sets ``res`` to the remainder of the product of ``poly1``
     and ``poly2`` upon polynomial division by ``f``.
 
-.. function:: void _fq_nmod_poly_mulmod_preinv(fq_nmod_struct* res, const fq_nmod_struct* poly1, slong len1, const fq_nmod_struct* poly2, slong len2, const fq_nmod_struct* f, slong lenf, const fq_nmod_struct* finv, slong lenfinv, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_poly_mulmod_preinv(fq_nmod_struct * res, const fq_nmod_struct * poly1, slong len1, const fq_nmod_struct * poly2, slong len2, const fq_nmod_struct * f, slong lenf, const fq_nmod_struct * finv, slong lenfinv, const fq_nmod_ctx_t ctx)
 
     Sets ``res`` to the remainder of the product of ``poly1``
     and ``poly2`` upon polynomial division by ``f``.
@@ -609,7 +609,7 @@ Squaring
 
 .. function:: void _fq_nmod_poly_sqr(fq_nmod_struct * rop, const fq_nmod_struct * op, slong len, const fq_nmod_ctx_t ctx)
 
-    Sets ``(rop, 2* len - 1)`` to the square of ``(op, len)``,
+    Sets ``(rop, 2 * len - 1)`` to the square of ``(op, len)``,
     choosing an appropriate algorithm.
 
     Permits zero padding.  Does not support aliasing.
@@ -636,7 +636,7 @@ Powering
     Computes ``rop = op^e``.  If `e` is zero, returns one,
     so that in particular ``0^0 = 1``.
 
-.. function:: void _fq_nmod_poly_powmod_ui_binexp(fq_nmod_struct* res, const fq_nmod_struct* poly, ulong e, const fq_nmod_struct* f, slong lenf, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_poly_powmod_ui_binexp(fq_nmod_struct * res, const fq_nmod_struct * poly, ulong e, const fq_nmod_struct * f, slong lenf, const fq_nmod_ctx_t ctx)
 
     Sets ``res`` to ``poly`` raised to the power ``e`` modulo
     ``f``, using binary exponentiation. We require ``e > 0``.
@@ -651,7 +651,7 @@ Powering
     Sets ``res`` to ``poly`` raised to the power ``e`` modulo
     ``f``, using binary exponentiation. We require ``e >= 0``.
 
-.. function:: void _fq_nmod_poly_powmod_ui_binexp_preinv(fq_nmod_struct* res, const fq_nmod_struct* poly, ulong e, const fq_nmod_struct* f, slong lenf, const fq_nmod_struct* finv, slong lenfinv, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_poly_powmod_ui_binexp_preinv(fq_nmod_struct * res, const fq_nmod_struct * poly, ulong e, const fq_nmod_struct * f, slong lenf, const fq_nmod_struct * finv, slong lenfinv, const fq_nmod_ctx_t ctx)
 
     Sets ``res`` to ``poly`` raised to the power ``e`` modulo
     ``f``, using binary exponentiation. We require ``e > 0``.
@@ -670,7 +670,7 @@ Powering
     We require ``finv`` to be the inverse of the reverse of
     ``f``.
 
-.. function:: void _fq_nmod_poly_powmod_fmpz_binexp(fq_nmod_struct* res, const fq_nmod_struct* poly, const fmpz_t e, const fq_nmod_struct* f, slong lenf, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_poly_powmod_fmpz_binexp(fq_nmod_struct * res, const fq_nmod_struct * poly, const fmpz_t e, const fq_nmod_struct * f, slong lenf, const fq_nmod_ctx_t ctx)
 
     Sets ``res`` to ``poly`` raised to the power ``e`` modulo
     ``f``, using binary exponentiation. We require ``e > 0``.
@@ -685,7 +685,7 @@ Powering
     Sets ``res`` to ``poly`` raised to the power ``e`` modulo
     ``f``, using binary exponentiation. We require ``e >= 0``.
 
-.. function:: void _fq_nmod_poly_powmod_fmpz_binexp_preinv(fq_nmod_struct* res, const fq_nmod_struct* poly, const fmpz_t e, const fq_nmod_struct* f, slong lenf, const fq_nmod_struct* finv, slong lenfinv, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_poly_powmod_fmpz_binexp_preinv(fq_nmod_struct * res, const fq_nmod_struct * poly, const fmpz_t e, const fq_nmod_struct * f, slong lenf, const fq_nmod_struct * finv, slong lenfinv, const fq_nmod_ctx_t ctx)
 
     Sets ``res`` to ``poly`` raised to the power ``e`` modulo
     ``f``, using binary exponentiation. We require ``e > 0``.
@@ -704,7 +704,7 @@ Powering
     We require ``finv`` to be the inverse of the reverse of
     ``f``.
 
-.. function:: void _fq_nmod_poly_powmod_fmpz_sliding_preinv(fq_nmod_struct* res, const fq_nmod_struct* poly, const fmpz_t e, ulong k, const fq_nmod_struct* f, slong lenf, const fq_nmod_struct* finv, slong lenfinv, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_poly_powmod_fmpz_sliding_preinv(fq_nmod_struct * res, const fq_nmod_struct * poly, const fmpz_t e, ulong k, const fq_nmod_struct * f, slong lenf, const fq_nmod_struct * finv, slong lenfinv, const fq_nmod_ctx_t ctx)
 
     Sets ``res`` to ``poly`` raised to the power ``e`` modulo
     ``f``, using sliding-window exponentiation with window size
@@ -887,7 +887,7 @@ Euclidean division
     `\operatorname{len}(R) < \operatorname{len}(B)`, but returns only ``Q``. If `\operatorname{len}(B) = 0` an
     exception is raised.
 
-.. function:: void _fq_nmod_poly_div_newton_n_preinv(fq_nmod_struct* Q, const fq_nmod_struct* A, slong lenA, const fq_nmod_struct* B, slong lenB, const fq_nmod_struct* Binv, slong lenBinv, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_poly_div_newton_n_preinv(fq_nmod_struct * Q, const fq_nmod_struct * A, slong lenA, const fq_nmod_struct * B, slong lenB, const fq_nmod_struct * Binv, slong lenBinv, const fq_nmod_ctx_t ctx)
 
     Notionally computes polynomials `Q` and `R` such that `A = BQ + R` with
     `\operatorname{len}(R)` less than ``lenB``, where ``A`` is of length ``lenA``
@@ -914,7 +914,7 @@ Euclidean division
     The algorithm used is to reverse the polynomials and divide the
     resulting power series, then reverse the result.
 
-.. function:: void _fq_nmod_poly_divrem_newton_n_preinv(fq_nmod_struct* Q, fq_nmod_struct* R, const fq_nmod_struct* A, slong lenA, const fq_nmod_struct* B, slong lenB, const fq_nmod_struct* Binv, slong lenBinv, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_poly_divrem_newton_n_preinv(fq_nmod_struct * Q, fq_nmod_struct * R, const fq_nmod_struct * A, slong lenA, const fq_nmod_struct * B, slong lenB, const fq_nmod_struct * Binv, slong lenBinv, const fq_nmod_ctx_t ctx)
 
     Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R)` less
     than ``lenB``, where `A` is of length ``lenA`` and `B` is of
@@ -936,7 +936,7 @@ Euclidean division
     The algorithm used is to call :func:`div_newton` and then
     multiply out and compute the remainder.
 
-.. function:: void _fq_nmod_poly_inv_series_newton(fq_nmod_struct* Qinv, const fq_nmod_struct* Q, slong n, const fq_nmod_t cinv, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_poly_inv_series_newton(fq_nmod_struct * Qinv, const fq_nmod_struct * Q, slong n, const fq_nmod_t cinv, const fq_nmod_ctx_t ctx)
 
     Given ``Q`` of length ``n`` whose constant coefficient is
     invertible modulo the given modulus, find a polynomial ``Qinv``
@@ -952,7 +952,7 @@ Euclidean division
     raised if this is not the case or if ``n = 0``. This function
     can be viewed as inverting a power series via Newton iteration.
 
-.. function:: void _fq_nmod_poly_inv_series(fq_nmod_struct* Qinv, const fq_nmod_struct* Q, slong n, const fq_nmod_t cinv, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_poly_inv_series(fq_nmod_struct * Qinv, const fq_nmod_struct * Q, slong n, const fq_nmod_t cinv, const fq_nmod_ctx_t ctx)
 
     Given ``Q`` of length ``n`` whose constant coefficient is
     invertible modulo the given modulus, find a polynomial ``Qinv``
@@ -992,7 +992,7 @@ Greatest common divisor
     `P`. Except in the case where the GCD is zero, the GCD `G` is made
     monic.
 
-.. function:: slong _fq_nmod_poly_gcd(fq_nmod_struct* G, const fq_nmod_struct* A, slong lenA, const fq_nmod_struct* B, slong lenB, const fq_nmod_ctx_t ctx)
+.. function:: slong _fq_nmod_poly_gcd(fq_nmod_struct * G, const fq_nmod_struct * A, slong lenA, const fq_nmod_struct * B, slong lenB, const fq_nmod_ctx_t ctx)
 
     Computes the GCD of `A` of length ``lenA`` and `B` of length
     ``lenB``, where ``lenA >= lenB > 0`` and sets `G` to it. The
@@ -1304,7 +1304,7 @@ Composition
     `f` for `i=1,\ldots,\sqrt{\deg(f)}`. We require `B` to be at least
     a `\sqrt{\deg(f)}\times \deg(f)` matrix and `f` to be nonzero.
 
-.. function:: void _fq_nmod_poly_precompute_matrix (fq_nmod_mat_t A, const fq_nmod_struct* f, const fq_nmod_struct* g, slong leng, const fq_nmod_struct* ginv, slong lenginv, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_poly_precompute_matrix (fq_nmod_mat_t A, const fq_nmod_struct * f, const fq_nmod_struct * g, slong leng, const fq_nmod_struct * ginv, slong lenginv, const fq_nmod_ctx_t ctx)
 
     Sets the ith row of ``A`` to `f^i` modulo `g` for
     `i=1,\ldots,\sqrt{\deg(g)}`. We require `A` to be a
@@ -1319,7 +1319,7 @@ Composition
     be the inverse of the reverse of ``g``.
 
 
-.. function:: void _fq_nmod_poly_compose_mod_brent_kung_precomp_preinv(fq_nmod_struct* res, const fq_nmod_struct* f, slong lenf, const fq_nmod_mat_t A, const fq_nmod_struct* h, slong lenh, const fq_nmod_struct* hinv, slong lenhinv, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_poly_compose_mod_brent_kung_precomp_preinv(fq_nmod_struct * res, const fq_nmod_struct * f, slong lenf, const fq_nmod_mat_t A, const fq_nmod_struct * h, slong lenh, const fq_nmod_struct * hinv, slong lenhinv, const fq_nmod_ctx_t ctx)
 
     Sets ``res`` to the composition `f(g)` modulo `h`. We require
     that `h` is nonzero. We require that the ith row of `A` contains

@@ -1018,7 +1018,7 @@ Square root and perfect power testing
     `1` are considered squares. No guarantees are made about `r` or `k`
     being the minimum possible value.
 
-.. function:: ulong n_rootrem(ulong* remainder, ulong n, ulong root)
+.. function:: ulong n_rootrem(ulong * remainder, ulong n, ulong root)
 
     This function uses the Newton iteration method to calculate the nth root of
     a number.
@@ -1062,7 +1062,7 @@ Square root and perfect power testing
     https://mpmath.org, using the function chebyfit. x is multiplied
     by ``2^exp`` and the cube root of 1, 2 or 4 (according to ``exp%3``).
 
-.. function:: ulong n_cbrtrem(ulong* remainder, ulong n)
+.. function:: ulong n_cbrtrem(ulong * remainder, ulong n)
 
     This function returns the integer truncation of the cube root of `n`.
     Remainder is set as `n` minus the cube of the value returned.

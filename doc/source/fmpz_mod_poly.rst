@@ -519,7 +519,7 @@ Multiplication
     Sets ``res`` to the remainder of the product of ``poly1`` and
     ``poly2`` upon polynomial division by ``f``.
 
-.. function:: void _fmpz_mod_poly_mulmod_preinv(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, const fmpz * f, slong lenf, const fmpz* finv, slong lenfinv, const fmpz_mod_ctx_t ctx)
+.. function:: void _fmpz_mod_poly_mulmod_preinv(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, const fmpz * f, slong lenf, const fmpz * finv, slong lenfinv, const fmpz_mod_ctx_t ctx)
 
     Sets ``res, len1 + len2 - 1`` to the remainder of the product of
     ``poly1`` and ``poly2`` upon polynomial division by ``f``.
@@ -661,7 +661,7 @@ Powering
     Sets ``res`` to ``poly`` raised to the power ``e``
     modulo ``f``, using binary exponentiation. We require ``e >= 0``.
 
-.. function:: void _fmpz_mod_poly_powmod_fmpz_binexp_preinv(fmpz * res, const fmpz * poly, const fmpz_t e, const fmpz * f, slong lenf, const fmpz* finv, slong lenfinv, const fmpz_mod_ctx_t ctx)
+.. function:: void _fmpz_mod_poly_powmod_fmpz_binexp_preinv(fmpz * res, const fmpz * poly, const fmpz_t e, const fmpz * f, slong lenf, const fmpz * finv, slong lenfinv, const fmpz_mod_ctx_t ctx)
 
     Sets ``res`` to ``poly`` raised to the power ``e``
     modulo ``f``, using binary exponentiation. We require ``e > 0``.
@@ -678,7 +678,7 @@ Powering
     modulo ``f``, using binary exponentiation. We require ``e >= 0``.
     We require ``finv`` to be the inverse of the reverse of ``f``.
 
-.. function:: void _fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz * res, const fmpz_t e, const fmpz * f, slong lenf, const fmpz* finv, slong lenfinv, const fmpz_mod_ctx_t ctx)
+.. function:: void _fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz * res, const fmpz_t e, const fmpz * f, slong lenf, const fmpz * finv, slong lenfinv, const fmpz_mod_ctx_t ctx)
 
     Sets ``res`` to ``x`` raised to the power ``e`` modulo ``f``,
     using sliding window exponentiation. We require ``e > 0``.
@@ -788,7 +788,7 @@ Division
     Assumes that the leading coefficient of `B` is invertible
     modulo `p`.
 
-.. function:: void _fmpz_mod_poly_divrem_newton_n_preinv (fmpz* Q, fmpz* R, const fmpz* A, slong lenA, const fmpz* B, slong lenB, const fmpz* Binv, slong lenBinv, const fmpz_mod_ctx_t ctx)
+.. function:: void _fmpz_mod_poly_divrem_newton_n_preinv (fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz * Binv, slong lenBinv, const fmpz_mod_ctx_t ctx)
 
     Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R)` less than
     ``lenB``, where `A` is of length ``lenA`` and `B` is of length
@@ -809,7 +809,7 @@ Division
     The algorithm used is to call :func:`div_newton_n` and then multiply out
     and compute the remainder.
 
-.. function:: void _fmpz_mod_poly_div_newton_n_preinv (fmpz* Q, const fmpz* A, slong lenA, const fmpz* B, slong lenB, const fmpz* Binv, slong lenBinv, const fmpz_mod_ctx_t ctx)
+.. function:: void _fmpz_mod_poly_div_newton_n_preinv (fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz * Binv, slong lenBinv, const fmpz_mod_ctx_t ctx)
 
     Notionally computes polynomials `Q` and `R` such that `A = BQ + R` with
     `\operatorname{len}(R)` less than ``lenB``, where ``A`` is of length ``lenA``
@@ -1239,7 +1239,7 @@ Minpoly
 --------------------------------------------------------------------------------
 
 
-.. function:: slong _fmpz_mod_poly_minpoly_bm(fmpz* poly, const fmpz* seq, slong len, const fmpz_mod_ctx_t ctx)
+.. function:: slong _fmpz_mod_poly_minpoly_bm(fmpz * poly, const fmpz * seq, slong len, const fmpz_mod_ctx_t ctx)
 
     Sets ``poly`` to the coefficients of a minimal generating
     polynomial for sequence ``(seq, len)`` modulo `p`.
@@ -1250,7 +1250,7 @@ Minpoly
     `len+1` coefficients. No aliasing between inputs and outputs is
     allowed.
 
-.. function:: void fmpz_mod_poly_minpoly_bm(fmpz_mod_poly_t poly, const fmpz* seq, slong len, const fmpz_mod_ctx_t ctx)
+.. function:: void fmpz_mod_poly_minpoly_bm(fmpz_mod_poly_t poly, const fmpz * seq, slong len, const fmpz_mod_ctx_t ctx)
 
     Sets ``poly`` to a minimal generating polynomial for sequence
     ``seq`` of length ``len``.
@@ -1260,7 +1260,7 @@ Minpoly
     This version uses the Berlekamp-Massey algorithm, whose running time
     is proportional to ``len`` times the size of the minimal generator.
 
-.. function:: slong _fmpz_mod_poly_minpoly_hgcd(fmpz* poly, const fmpz* seq, slong len, const fmpz_mod_ctx_t ctx)
+.. function:: slong _fmpz_mod_poly_minpoly_hgcd(fmpz * poly, const fmpz * seq, slong len, const fmpz_mod_ctx_t ctx)
 
     Sets ``poly`` to the coefficients of a minimal generating
     polynomial for sequence ``(seq, len)`` modulo `p`.
@@ -1271,7 +1271,7 @@ Minpoly
     `len+1` coefficients. No aliasing between inputs and outputs is
     allowed.
 
-.. function:: void fmpz_mod_poly_minpoly_hgcd(fmpz_mod_poly_t poly, const fmpz* seq, slong len, const fmpz_mod_ctx_t ctx)
+.. function:: void fmpz_mod_poly_minpoly_hgcd(fmpz_mod_poly_t poly, const fmpz * seq, slong len, const fmpz_mod_ctx_t ctx)
 
     Sets ``poly`` to a minimal generating polynomial for sequence
     ``seq`` of length ``len``.
@@ -1282,7 +1282,7 @@ Minpoly
     `O(n \log^2 n)` field operations, regardless of the actual size of
     the minimal generator.
 
-.. function:: slong _fmpz_mod_poly_minpoly(fmpz* poly, const fmpz* seq, slong len, const fmpz_mod_ctx_t ctx)
+.. function:: slong _fmpz_mod_poly_minpoly(fmpz * poly, const fmpz * seq, slong len, const fmpz_mod_ctx_t ctx)
 
     Sets ``poly`` to the coefficients of a minimal generating
     polynomial for sequence ``(seq, len)`` modulo `p`.
@@ -1293,7 +1293,7 @@ Minpoly
     `len+1` coefficients. No aliasing between inputs and outputs is
     allowed.
 
-.. function:: void fmpz_mod_poly_minpoly(fmpz_mod_poly_t poly, const fmpz* seq, slong len, const fmpz_mod_ctx_t ctx)
+.. function:: void fmpz_mod_poly_minpoly(fmpz_mod_poly_t poly, const fmpz * seq, slong len, const fmpz_mod_ctx_t ctx)
 
     Sets ``poly`` to a minimal generating polynomial for sequence
     ``seq`` of length ``len``.
