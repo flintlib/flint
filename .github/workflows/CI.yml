@@ -195,28 +195,24 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: "Run tests on FreeBSD"
-        uses: cross-platform-actions/action@v0.19.1
-        timeout-minutes: 25
+        uses: cross-platform-actions/action@v0.21.1
+        timeout-minutes: 30
         continue-on-error: true
         with:
           operating_system: freebsd
           version: '13.2'
           shell: bash
           run: |
-            yes | sudo pkg install pkgconf
-            yes | sudo pkg install gmake
-            yes | sudo pkg install gmp
-            yes | sudo pkg install mpfr
-            yes | sudo pkg install autoconf
-            yes | sudo pkg install libtool
-            yes | sudo pkg install automake
+            sudo pkg install -y pkgconf gmake gmp mpfr autoconf libtool automake
             gmake --version
             clang --version
             autoconf --version
             libtool --version
             touch _is_setup
+
             ./bootstrap.sh
             touch _is_bootstrapped
+
             ./configure \
               CC=clang \
               --with-gmp-include=$(pkgconf --variable=includedir gmp) \
@@ -226,10 +222,13 @@ jobs:
               --disable-static \
               --disable-debug
             touch _is_configured
+
             gmake -j$(expr $(sysctl -n hw.ncpu) + 1)
             touch _is_library_built
+
             gmake -j$(expr $(sysctl -n hw.ncpu) + 1) tests
             touch _is_tests_built
+
             gmake -j$(expr $(sysctl -n hw.ncpu) + 1) check
             touch _is_checked
 
