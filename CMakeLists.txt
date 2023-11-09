@@ -218,6 +218,14 @@ else()
 	set(FLINT_REENTRANT OFF)
 endif()
 
+# gmpcompat.h configuration
+set(CMAKE_REQUIRED_INCLUDES ${GMP_INCLUDE_DIRS})
+check_c_source_compiles([[#include <gmp.h>
+  #ifndef _LONG_LONG_LIMB
+  # error mp_limb_t != unsigned long long limb
+  #endif
+  void main(){};]] LONG_LONG_LIMB)
+
 # Populate headers
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/CMake/cmake_config.h.in
@@ -232,6 +240,19 @@ configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/src/fmpz/fmpz.c
     COPYONLY
 )
+if(LONG_LONG_LIMB)
+    configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gmpcompat-longlong.h.in
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gmpcompat.h
+        COPYONLY
+    )
+else()
+    configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gmpcompat.h.in
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gmpcompat.h
+        COPYONLY
+    )
+endif()
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     configure_file(
