@@ -153,10 +153,6 @@ set(_TEMPLATE_DIRS
 )
 string(REGEX REPLACE "([A-Za-z0-9_-]+;|[A-Za-z0-9_-]+$)" "src/\\1" TEMPLATE_DIRS "${_TEMPLATE_DIRS}")
 
-if (WITH_NTL)
-    list(APPEND BUILD_DIRS src/interfaces)
-endif()
-
 set(_HEADERS
     NTL-interface.h flint.h longlong.h flint-config.h gmpcompat.h fft_tuning.h
     profiler.h templates.h exception.h
@@ -265,8 +261,7 @@ list(APPEND HEADERS ${TEMP})
 
 add_library(flint ${SOURCES})
 target_link_libraries(flint PUBLIC
-    ${NTL_LIBRARY} ${MPFR_LIBRARIES} ${GMP_LIBRARIES} ${PThreads_LIBRARIES}
-)
+    ${MPFR_LIBRARIES} ${GMP_LIBRARIES} ${PThreads_LIBRARIES})
 
 if(FLINT_USES_BLAS)
     target_link_libraries(flint PUBLIC ${CBLAS_LIBRARIES})
@@ -276,9 +271,7 @@ endif()
 
 target_include_directories(flint PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}/src ${GMP_INCLUDE_DIRS} ${MPFR_INCLUDE_DIRS}
-    ${CMAKE_CURRENT_BINARY_DIR} ${PThreads_INCLUDE_DIRS}
-    ${NTL_INCLUDE_DIR}
-)
+    ${CMAKE_CURRENT_BINARY_DIR} ${PThreads_INCLUDE_DIRS})
 
 if(FLINT_USES_BLAS)
     target_include_directories(flint PUBLIC ${CBLAS_INCLUDE_DIRS})
@@ -364,8 +357,8 @@ set_target_properties(flint
 
 if(BUILD_TESTING)
     enable_testing()
-    foreach(build_dir IN LISTS BUILD_DIRS CMAKE_CURRENT_SOURCE_DIR)
-        file(GLOB test_file "${build_dir}/test/main.c")
+    foreach(dir IN LISTS BUILD_DIRS CMAKE_CURRENT_SOURCE_DIR)
+        file(GLOB test_file "${dir}/test/main.c")
         if(test_file)
             file(RELATIVE_PATH test_name ${CMAKE_CURRENT_SOURCE_DIR} ${test_file})
             string(REPLACE "/" "-" test_name ${test_name})
@@ -373,23 +366,32 @@ if(BUILD_TESTING)
             add_executable(${test_name} ${test_file})
             target_link_libraries(${test_name} flint)
 
-            add_test(
-                NAME ${test_name}
-                COMMAND $<TARGET_FILE:${test_name}>
-            )
+            add_test(NAME ${test_name} COMMAND $<TARGET_FILE:${test_name}>)
 
             set_target_properties(${test_name}
                 PROPERTIES
                 ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
                 LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
-                RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin"
-            )
+                RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin")
         endif()
     endforeach ()
 
     if(WITH_NTL)
-      target_link_libraries(src-interfaces-test-t-NTL-interface ${NTL_LIBRARY})
-      target_include_directories(src-interfaces-test-t-NTL-interface PUBLIC ${NTL_INCLUDE_DIR})
+        file(GLOB test_file "src/interfaces/test/t-NTL-interface.cpp")
+        file(RELATIVE_PATH test_name ${CMAKE_CURRENT_SOURCE_DIR} ${test_file})
+        string(REPLACE "/" "-" test_name ${test_name})
+        get_filename_component(test_name ${test_name} NAME_WE)
+        add_executable(${test_name} ${test_file})
+        target_link_libraries(${test_name} flint ${NTL_LIBRARY})
+        target_include_directories(${test_name} PUBLIC ${NTL_INCLUDE_DIR})
+
+        add_test(NAME ${test_name} COMMAND $<TARGET_FILE:${test_name}>)
+
+        set_target_properties(${test_name}
+            PROPERTIES
+            ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
+            LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin")
     endif()
 endif()
 
