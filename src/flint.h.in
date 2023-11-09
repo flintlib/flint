@@ -89,7 +89,7 @@
 extern "C" {
 #endif
 
-/* flint version number */
+/* FLINT version number */
 
 #define __FLINT_VERSION @FLINT_MAJOR@
 #define __FLINT_VERSION_MINOR @FLINT_MINOR@
@@ -97,10 +97,6 @@ extern "C" {
 #define FLINT_VERSION "@FLINT_VERSION_FULL@"
 #define __FLINT_RELEASE_NUM(a,b,c) ((a)*10000 + (b)*100 + (c))
 #define __FLINT_RELEASE __FLINT_RELEASE_NUM(__FLINT_VERSION, __FLINT_VERSION_MINOR, __FLINT_VERSION_PATCHLEVEL)
-
-#if __GNU_MP_VERSION < 5
-#error GMP 5.0.0 or MPIR 2.6.0 or later are required
-#endif
 
 FLINT_DLL extern char flint_version[];
 
@@ -413,15 +409,6 @@ mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
       flint_free(__tmp_root->block); \
       __tmp_root = __tmp_root->next; \
    }
-
-/* compatibility between gmp and mpir */
-#ifndef mpn_com_n
-#define mpn_com_n mpn_com
-#endif
-
-#ifndef mpn_neg_n
-#define mpn_neg_n mpn_neg
-#endif
 
 int parse_fmt(int * floating, const char * fmt);
 

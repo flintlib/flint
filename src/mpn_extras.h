@@ -183,8 +183,6 @@ flint_mpn_divisible_1_odd(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
 
 #endif
 
-#ifndef mpn_tdiv_q
-/* substitute for mpir's mpn_tdiv_q */
 static __inline__ void
 mpn_tdiv_q(mp_ptr qp, mp_srcptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn)
 {
@@ -195,8 +193,6 @@ mpn_tdiv_q(mp_ptr qp, mp_srcptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn)
     mpn_tdiv_qr(qp, _scratch, 0, np, nn, dp, dn);
     TMP_END;
 }
-#endif
-
 
 MPN_EXTRAS_INLINE
 int flint_mpn_zero_p(mp_srcptr x, mp_size_t xsize)

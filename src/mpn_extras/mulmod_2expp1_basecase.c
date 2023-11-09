@@ -81,7 +81,7 @@ flint_mpn_mulmod_2expp1_basecase (mp_ptr xp, mp_srcptr yp, mp_srcptr zp, int c,
         }
         else
         {
-            c = mpn_neg_n(xp, yp, n);
+            c = mpn_neg(xp, yp, n);
             c = mpn_add_1 (xp, xp, n, c);
             xp[n - 1] &= GMP_NUMB_MASK >> k;
         }
@@ -90,7 +90,7 @@ flint_mpn_mulmod_2expp1_basecase (mp_ptr xp, mp_srcptr yp, mp_srcptr zp, int c,
     {
         if (cz == 0)
 	     {
-            c = mpn_neg_n(xp, zp, n);
+            c = mpn_neg(xp, zp, n);
             c = mpn_add_1(xp, xp, n, c);
             xp[n - 1] &= GMP_NUMB_MASK >> k;
         }

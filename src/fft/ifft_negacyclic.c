@@ -30,11 +30,11 @@ void ifft_negacyclic(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w,
           SWAP_PTRS(ii[n+i], *t2);
 
           fft_adjust(*t1, ii[i], n - i/2, limbs, w);
-          mpn_neg_n(*t1, *t1, limbs + 1);
+          mpn_neg(*t1, *t1, limbs + 1);
           SWAP_PTRS(ii[i], *t1);
 
           fft_adjust(*t2, ii[n+i], n - (n+i)/2, limbs, w);
-          mpn_neg_n(*t2, *t2, limbs + 1);
+          mpn_neg(*t2, *t2, limbs + 1);
           SWAP_PTRS(ii[n+i], *t2);
 
           i++;
@@ -44,11 +44,11 @@ void ifft_negacyclic(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w,
           SWAP_PTRS(ii[n+i], *t2);
 
           fft_adjust_sqrt2(*t1, ii[i], 2*n-i, limbs, w, *temp);
-          mpn_neg_n(*t1, *t1, limbs + 1);
+          mpn_neg(*t1, *t1, limbs + 1);
           SWAP_PTRS(ii[i], *t1);
 
           fft_adjust_sqrt2(*t2, ii[n+i], n-i, limbs, w, *temp);
-          mpn_neg_n(*t2, *t2, limbs + 1);
+          mpn_neg(*t2, *t2, limbs + 1);
           SWAP_PTRS(ii[n+i], *t2);
        }
    } else
@@ -60,11 +60,11 @@ void ifft_negacyclic(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w,
           SWAP_PTRS(ii[n+i], *t2);
 
           fft_adjust(*t1, ii[i], 2*n-i, limbs, w/2);
-          mpn_neg_n(*t1, *t1, limbs + 1);
+          mpn_neg(*t1, *t1, limbs + 1);
           SWAP_PTRS(ii[i], *t1);
 
           fft_adjust(*t2, ii[n+i], n-i, limbs, w/2);
-          mpn_neg_n(*t2, *t2, limbs + 1);
+          mpn_neg(*t2, *t2, limbs + 1);
           SWAP_PTRS(ii[n+i], *t2);
        }
    }

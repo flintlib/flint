@@ -79,7 +79,7 @@ void flint_mpz_add_signed_uiuiui(mpz_ptr a, mpz_srcptr b,
     mpz_add(a, b, c);
 }
 
-#if WORD_MAX != LONG_MAX && !defined(__MPIR_VERSION)
+#if WORD_MAX != LONG_MAX
 
 #define FLINT_MOCK_MPZ_UI(xxx, yyy) \
    __mpz_struct (xxx)[1] = {{ 1, 0, NULL }}; \
@@ -913,11 +913,6 @@ You should have received a copy of the GNU Lesser General Public License
 along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
 the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA. */
-
-/*
-  This function is only required for MPIR >= 3.0.0 and for GMP, but we include
-  unconditionally when sizeof(ulong) != sizeof(unsigned long)
-*/
 
 static __inline__
 double flint_mpf_get_d_2exp(slong * exp2, mpf_srcptr src)

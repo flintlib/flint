@@ -76,8 +76,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       FLINT_VERSION: ${{ needs.make-archive.outputs.get-version }}
-      MAKE: "make -j --output-sync=target"
-      TESTCFLAGS: "-Wall -O1"
     steps:
       - name: "Download archive from previous job"
         uses: actions/download-artifact@v3
@@ -86,12 +84,12 @@ jobs:
 
       - name: "Setup"
         run: |
-          sudo apt-get install -y libgmp-dev
-          sudo apt-get install -y libmpfr-dev
+          sudo apt-get install -y libgmp-dev libmpfr-dev
           # now *remove* autotools to verify we can build with out it
           sudo apt-get remove -y autoconf
           sudo apt-get remove -y automake
           sudo apt-get remove -y libtool-bin
+          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
 
       - name: "Extract"
         run: |

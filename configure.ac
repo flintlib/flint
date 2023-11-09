@@ -611,8 +611,38 @@ AC_SUBST(LDCONFIG)
 # Mandatory headers
 # The following headers are checked previously:
 #   stdio.h stdlib.h stdint.h string.h
-AC_CHECK_HEADERS([stdarg.h math.h float.h errno.h gmp.h mpfr.h],,
+AC_CHECK_HEADERS([stdarg.h math.h float.h errno.h mpfr.h gmp.h],,
                  AC_MSG_ERROR([Could not find a mandatory header!]))
+
+# Check that GMP >= 6.2.1
+AC_MSG_CHECKING([if version of GMP is greater than 6.2.1])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM(
+        [#include <gmp.h>],
+        [#if (__GNU_MP_VERSION < 6) \
+          || (__GNU_MP_VERSION == 6 && __GNU_MP_VERSION_MINOR < 2) \
+          || (__GNU_MP_VERSION == 6 && __GNU_MP_VERSION_MINOR == 2 && __GNU_MP_VERSION_PATCHLEVEL < 1)
+         # error GMP version 6.2.1 or later is required
+         #endif]
+    )],
+    AC_MSG_RESULT([yes]),
+    AC_MSG_RESULT([no])
+    AC_MSG_ERROR(["FLINT requires GMP version 6.2.1 or later."]))
+
+# Check that MPFR >= 4.1.0
+AC_MSG_CHECKING([if version of MPFR is greater than 4.1.0])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM(
+        [#include <mpfr.h>],
+        [#if (MPFR_VERSION_MAJOR < 4) \
+          || (MPFR_VERSION_MAJOR == 4 && MPFR_VERSION_MINOR < 1) \
+          || (MPFR_VERSION_MAJOR == 4 && MPFR_VERSION_MINOR == 1 && MPFR_VERSION_PATCHLEVEL < 0)
+         # error MPFR version 4.1.0 or later is required
+         #endif]
+    )],
+    AC_MSG_RESULT([yes]),
+    AC_MSG_RESULT([no])
+    AC_MSG_ERROR(["FLINT requires MPFR version 4.2.0 or later."]))
 
 # Optional headers
 # The following headers are checked previously:

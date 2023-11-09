@@ -22,10 +22,7 @@
 #include "t-det.c"
 #include "t-dft.c"
 #include "t-diagonalization.c"
-/* NOTE: The following test can trigger a bug in MPIR */
-#ifndef FLINT_NO_CA_MAT_EXP_TEST
 #include "t-exp.c"
-#endif
 #include "t-inv.c"
 #include "t-jordan_blocks.c"
 #include "t-jordan_form.c"
@@ -58,9 +55,7 @@ test_struct tests[] =
     TEST_FUNCTION(ca_mat_det),
     TEST_FUNCTION(ca_mat_dft),
     TEST_FUNCTION(ca_mat_diagonalization),
-#ifndef FLINT_NO_CA_MAT_EXP_TEST
     TEST_FUNCTION(ca_mat_exp),
-#endif
     TEST_FUNCTION(ca_mat_inv),
     TEST_FUNCTION(ca_mat_jordan_blocks),
     TEST_FUNCTION(ca_mat_jordan_form),

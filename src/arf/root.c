@@ -71,11 +71,7 @@ arf_root(arf_ptr z, arf_srcptr x, ulong k, slong prec, arf_rnd_t rnd)
     xf->_mpfr_sign = 1;
     xf->_mpfr_exp = fmpz_get_ui(r);
 
-#if MPFR_VERSION_MAJOR >= 4
     inexact = mpfr_rootn_ui(zf, xf, k, arf_rnd_to_mpfr(rnd));
-#else
-    inexact = mpfr_root(zf, xf, k, arf_rnd_to_mpfr(rnd));
-#endif
     inexact = (inexact != 0);
 
     val = 0;
