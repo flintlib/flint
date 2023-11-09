@@ -38,7 +38,7 @@ void butterfly_rshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1,
       cy = fft_sumdiff(t, u, i1 + x, i2, limbs - x);
       cy1 = (cy>>1);
       cy2 = -(cy&1);
-      cy3 = mpn_neg_n(i1, i1, x);
+      cy3 = mpn_neg(i1, i1, x);
       cy = fft_sumdiff(t + limbs - x, u + limbs - x, i1, i2 + limbs - x, x);
       u[limbs] = -cy3 - (cy&1) - i2[limbs];
       t[limbs] = -cy3 + i2[limbs] + (cy>>1);
@@ -50,7 +50,7 @@ void butterfly_rshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1,
       cy1 = (cy>>1);
       cy2 = -(cy&1);
       cy = fft_sumdiff(t + limbs - x, u + limbs - x, i2, i1, x);
-      cy3 = mpn_neg_n(t + limbs - x, t + limbs - x, x);
+      cy3 = mpn_neg(t + limbs - x, t + limbs - x, x);
       u[limbs] = -(cy&1);
       t[limbs] = -(cy>>1) - cy3;
       mpn_addmod_2expp1_1(t + limbs - x, x, cy1 + i1[limbs] + i2[limbs]);
@@ -58,10 +58,10 @@ void butterfly_rshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1,
    } else if (x > y)
    {
       cy = fft_sumdiff(t + limbs - y, u + limbs - y, i2, i1 + x - y, y);
-      cy3 = mpn_neg_n(t + limbs - y, t + limbs - y, y);
+      cy3 = mpn_neg(t + limbs - y, t + limbs - y, y);
       t[limbs] = -(cy>>1) - cy3;
       u[limbs] = -(cy&1);
-      cy3 = mpn_neg_n(i1, i1, x - y);
+      cy3 = mpn_neg(i1, i1, x - y);
       cy = fft_sumdiff(t + limbs - x, u + limbs - x, i1, i2 + limbs - x + y, x - y);
       mpn_addmod_2expp1_1(t + limbs - y, y, (cy>>1) + i2[limbs] - cy3);
       mpn_addmod_2expp1_1(u + limbs - y, y, -(cy&1) - i2[limbs] - cy3);
@@ -71,10 +71,10 @@ void butterfly_rshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1,
    } else /* x < y */
    {
       cy = fft_sumdiff(t + limbs - x, u + limbs - x, i2 + y - x, i1, x);
-      cy3 = mpn_neg_n(t + limbs - x, t + limbs - x, x);
+      cy3 = mpn_neg(t + limbs - x, t + limbs - x, x);
       t[limbs] = -(cy>>1) - cy3;
       u[limbs] = -(cy&1);
-      cy3 = mpn_neg_n(i2, i2, y - x);
+      cy3 = mpn_neg(i2, i2, y - x);
       cy = fft_sumdiff(t + limbs - y, u + limbs - y, i1 + limbs - y + x, i2, y - x);
       mpn_addmod_2expp1_1(t + limbs - x, x, (cy>>1) + i1[limbs] - cy3);
       mpn_addmod_2expp1_1(u + limbs - x, x, -(cy&1) + i1[limbs] + cy3);

@@ -4,7 +4,7 @@ FFT Integer Multiplication code
 License: BSD
 
 (Note the FLINT library of which this is a part is overall LGPL v2.1+ and the
-latest version of GMP/MPIR on which this currently depends is LGPL v3+. But
+latest version of GMP on which this currently depends is LGPL v3+. But
 the files in this implementation of the FFT are individually licensed BSD.)
 
 Introduction
@@ -18,7 +18,7 @@ other problems.
 
 Here we introduce fast FFT code for multiplication of huge integers.
 
-Currently the code depends on GMP/MPIR, however, any sufficiently well
+Currently the code depends on GMP, however, any sufficiently well
 developed bignum library should have equivalent primitives for bignums. (There
 is also a dependence on the flint function n_revbin, which is found in the
 ulong_extras directory of flint -- I hereby license it under the BSD
@@ -127,7 +127,7 @@ The FFT butterfly step is:
 
 [a{i}, b{i}] => [a{i}+b{i}, z^i*(a{i}-b{i})]
 
-We use MPIR's sumdiff to simultaneously perform the addition and subtraction. The multiplication by z^i is a shift by iw bits which we decompose into a shift by b bits and x limbs. The output is written in a location with an offset of x limbs. To handle the wraparound we split the operation into two parts. Finally we shift by the remaining b bits. An additional negation needs to occur when i >= n as nw = -1 mod p.
+We use sumdiff to simultaneously perform the addition and subtraction. The multiplication by z^i is a shift by iw bits which we decompose into a shift by b bits and x limbs. The output is written in a location with an offset of x limbs. To handle the wraparound we split the operation into two parts. Finally we shift by the remaining b bits. An additional negation needs to occur when i >= n as nw = -1 mod p.
 
 The IFFT butterfly is:
 

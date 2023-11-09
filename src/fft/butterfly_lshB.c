@@ -40,7 +40,7 @@ void butterfly_lshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1,
       t[limbs] = cy>>1;
       cy1 = cy&1;
       cy = fft_sumdiff(t, u + limbs - x, i1 + limbs - x, i2 + limbs - x, x);
-      cy2 = mpn_neg_n(t, t, x);
+      cy2 = mpn_neg(t, t, x);
       u[limbs] = -(cy&1);
       mpn_sub_1(u + limbs - x, u + limbs - x, x + 1, cy1);
       cy1 = -(cy>>1) - cy2;
@@ -54,12 +54,12 @@ void butterfly_lshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1,
       t[limbs] = cy>>1;
       cy1 = cy&1;
       cy = fft_sumdiff(t, u + y + limbs - x, i1 + limbs - x, i2 + limbs - x, x - y);
-      cy2 = mpn_neg_n(t, t, x - y);
+      cy2 = mpn_neg(t, t, x - y);
       u[limbs] = -(cy&1);
       mpn_sub_1(u + y + limbs - x, u + y + limbs - x, x - y + 1, cy1);
       cy1 = (cy>>1) + cy2;
       cy = fft_sumdiff(t + x - y, u, i2 + limbs - y, i1 + limbs - y, y);
-      cy2 = mpn_neg_n(t + x - y, t + x - y, y);
+      cy2 = mpn_neg(t + x - y, t + x - y, y);
       cy1 = -(cy>>1) - mpn_sub_1(t + x - y, t + x - y, y, cy1) - cy2;
       cy1 -= (i1[limbs] + i2[limbs]);
       mpn_addmod_2expp1_1(t + x, limbs - x, cy1);
@@ -78,7 +78,7 @@ void butterfly_lshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1,
       cy1 = -(cy&1) - mpn_sub_1(u + y - x, u + y - x, x, cy1);
       cy1 += (i2[limbs] - i1[limbs]);
       mpn_addmod_2expp1_1(u + y, limbs - y, cy1);
-      cy2 = mpn_neg_n(t, t, x);
+      cy2 = mpn_neg(t, t, x);
       cy1 = -(cy>>1) - (i1[limbs] + i2[limbs]) - cy2;
       mpn_addmod_2expp1_1(t + x, limbs - x, cy1);
    } else /* x == y */
@@ -87,7 +87,7 @@ void butterfly_lshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1,
       t[limbs] = cy>>1;
       u[limbs] = -(cy&1);
       cy = fft_sumdiff(t, u, i2 + limbs - x, i1 + limbs - x, x);
-      cy2 = mpn_neg_n(t, t, x);
+      cy2 = mpn_neg(t, t, x);
       cy1 = -(cy>>1) - (i1[limbs] + i2[limbs]) - cy2;
       mpn_addmod_2expp1_1(t + x, limbs - x, cy1);
       cy1 = -(cy&1) + i2[limbs] - i1[limbs];

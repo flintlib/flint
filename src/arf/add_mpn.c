@@ -159,7 +159,7 @@ _arf_add_mpn(arf_t z, mp_srcptr xp, mp_size_t xn, int xsgnbit, const fmpz_t xexp
 
             if (cy)
             {
-                mpn_neg_n(t, t, 4);
+                mpn_neg(t, t, 4);
                 xsgnbit = ysgnbit;
             }
 
@@ -343,7 +343,7 @@ _arf_add_mpn(arf_t z, mp_srcptr xp, mp_size_t xn, int xsgnbit, const fmpz_t xexp
                     mpn_sub_n(tmp + wbase, tmp + wbase, xp + wbase, wn);
                     if (wbase != 0)
                     {
-                        cy = mpn_neg_n(tmp, xp, wbase);
+                        cy = mpn_neg(tmp, xp, wbase);
                         mpn_sub_1(tmp + wbase, tmp + wbase, wn, cy);
                     }
                 }

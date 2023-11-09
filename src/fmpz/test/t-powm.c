@@ -83,7 +83,7 @@ TEST_FUNCTION_START(fmpz_powm, state)
         result = (mpz_cmp(e, f) == 0) && _fmpz_is_canonical(b);
         if (!result)
         {
-            flint_printf("FAIL (cmp f with MPIR e := d^y mod m):\n");
+            flint_printf("FAIL (cmp f with GMP e := d^y mod m):\n");
             gmp_printf("d = %Zd, e = %Zd, f = %Zd, y = %Zd, m = %Zd\n", d, e, f, y, m);
             fflush(stdout);
             flint_abort();
