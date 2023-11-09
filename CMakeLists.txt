@@ -66,7 +66,14 @@ endif()
 # pthread configuration
 
 if(MSVC)
-    find_package(PThreads REQUIRED)
+    # Prefer vcpkg's pthreads
+    find_package(PThreads4W)
+    if(PThreads4W_FOUND)
+        set(PThreads_LIBRARIES PThreads4W::PThreads4W)
+        set(PThreads_INCLUDE_DIRS ${PThreads4W_INCLUDE_DIRS})
+    else()
+        find_package(PThreads REQUIRED)
+    endif()
     set(FLINT_USES_PTHREAD ON CACHE BOOL "Use POSIX Threads.")
 else()
     option(CMAKE_THREAD_PREFER_PTHREAD "Prefer pthreads" yes)
