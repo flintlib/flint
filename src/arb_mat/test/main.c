@@ -15,7 +15,6 @@
 /* Include functions *********************************************************/
 
 #include "t-addmul_rad_mag_fast.c"
-#include "t-bilinear_form.c"
 #include "t-charpoly.c"
 #include "t-cho.c"
 #include "t-companion.c"
@@ -59,7 +58,6 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(arb_mat_addmul_rad_mag_fast),
-    TEST_FUNCTION(arb_mat_bilinear_form),
     TEST_FUNCTION(arb_mat_charpoly),
     TEST_FUNCTION(arb_mat_cho),
     TEST_FUNCTION(arb_mat_companion),
