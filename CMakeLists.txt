@@ -44,7 +44,7 @@ endif()
 
 # Build options
 option(BUILD_SHARED_LIBS "Build shared libs" on)
-option(WITH_NTL "Build with NTL or not" off)
+option(WITH_NTL "Build tests for NTL interface or not" off)
 
 # Find dependencies
 find_package(GMP REQUIRED)
