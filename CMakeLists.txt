@@ -9,7 +9,7 @@
 # (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 #
 
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.22)
 
 include(CheckCCompilerFlag)
 include(CheckCSourceRuns)
