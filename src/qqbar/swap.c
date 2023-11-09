@@ -15,7 +15,5 @@
 void
 qqbar_swap(qqbar_t x, qqbar_t y)
 {
-    fmpz_poly_swap(QQBAR_POLY(x), QQBAR_POLY(y));
-    acb_swap(QQBAR_ENCLOSURE(x), QQBAR_ENCLOSURE(y));
+    FLINT_SWAP(qqbar_struct, *x, *y);
 }
-

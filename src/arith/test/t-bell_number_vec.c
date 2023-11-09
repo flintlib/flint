@@ -9,10 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_vec.h"
 #include "arith.h"
 
-int main(void)
+TEST_FUNCTION_START(arith_bell_number_vec, state)
 {
     fmpz * b1;
     fmpz * b2;
@@ -20,10 +21,6 @@ int main(void)
 
     const slong maxn = 1000;
 
-    FLINT_TEST_INIT(state);
-
-    flint_printf("bell_number_vec....");
-    fflush(stdout);
 
     b1 = _fmpz_vec_init(maxn);
     b2 = _fmpz_vec_init(maxn);
@@ -45,7 +42,5 @@ int main(void)
     _fmpz_vec_clear(b1, maxn);
     _fmpz_vec_clear(b2, maxn);
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

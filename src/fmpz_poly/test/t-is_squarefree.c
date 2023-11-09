@@ -10,21 +10,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_poly_is_squarefree, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("is_squarefree....");
-    fflush(stdout);
-
-
 
     /* Check that polynomials of degree <= 1 are square-free */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
@@ -114,8 +107,5 @@ main(void)
         fmpz_clear(N);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

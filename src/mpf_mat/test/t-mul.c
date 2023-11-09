@@ -10,23 +10,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "mpf_mat.h"
-#include "ulong_extras.h"
 
 #define MPF_MAT_MUL_BITS (40)
 
-int
-main(void)
+TEST_FUNCTION_START(mpf_mat_mul, state)
 {
     mpf_mat_t A, B, C, D, E, F, G;
     slong i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("mul....");
-    fflush(stdout);
-
-
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -84,8 +76,5 @@ main(void)
         mpf_mat_clear(G);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

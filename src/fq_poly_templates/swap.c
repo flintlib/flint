@@ -19,23 +19,7 @@ void
 TEMPLATE(T, poly_swap) (TEMPLATE(T, poly_t) op1, TEMPLATE(T, poly_t) op2,
                         const TEMPLATE(T, ctx_t) ctx)
 {
-    if (op1 != op2)
-    {
-        slong temp;
-        TEMPLATE(T, struct) * temp_c;
-
-        temp = op1->length;
-        op1->length = op2->length;
-        op2->length = temp;
-
-        temp = op1->alloc;
-        op1->alloc = op2->alloc;
-        op2->alloc = temp;
-
-        temp_c = op1->coeffs;
-        op1->coeffs = op2->coeffs;
-        op2->coeffs = temp_c;
-    }
+     FLINT_SWAP(TEMPLATE(T, poly_struct), *op1, *op2);
 }
 
 

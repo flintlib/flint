@@ -9,20 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
+#include "test_helpers.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_mul_2exp, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("mul_2exp....");
-    fflush(stdout);
 
     /* x = y * 2^exp */
     for (i = 0; i < 10000; i++)
@@ -133,9 +125,5 @@ main(void)
         fmpq_clear(y);
     }
 
-
-
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

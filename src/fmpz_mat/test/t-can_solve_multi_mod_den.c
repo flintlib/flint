@@ -10,21 +10,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mat_can_solve_multi_mod_den, state)
 {
     fmpz_mat_t A, X, B, AX;
     fmpz_t den;
     slong i, m, n, k;
     int success;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("can_solve_multi_mod_den....");
-    fflush(stdout);
 
     /* test random systems (likely not soluble) */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -127,9 +122,5 @@ main(void)
         fmpz_clear(den);
     }
 
-
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

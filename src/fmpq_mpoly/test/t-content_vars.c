@@ -9,16 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_mpoly_content_vars, state)
 {
     slong i, j;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("content_vars....");
-    fflush(stdout);
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -55,7 +51,7 @@ main(void)
         {
             slong k1 = n_randint(state, nvars);
             slong k2 = n_randint(state, nvars);
-            SLONG_SWAP(vars[k1], vars[k2]);
+            FLINT_SWAP(slong, vars[k1], vars[k2]);
         }
 
         num_vars = 1 + n_randint(state, nvars);
@@ -140,8 +136,5 @@ main(void)
         fmpq_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

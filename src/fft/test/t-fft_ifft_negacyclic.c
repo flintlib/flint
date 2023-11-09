@@ -9,24 +9,20 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "mpn_extras.h"
 #include "fft.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fft_ifft_negacyclic, state)
 {
-    flint_bitcnt_t depth, w;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("fft/ifft_negacyclic....");
-    fflush(stdout);
-
+    flint_bitcnt_t depth, w, maxdepth;
 
     _flint_rand_init_gmp(state);
 
-    for (depth = 6; depth <= 12; depth++)
-    {
+    maxdepth = (flint_test_multiplier() > 10) ? 12 :
+               (flint_test_multiplier() > 1)  ? 11 : 10;
+
+    for (depth = 6; depth <= maxdepth; depth++)    {
         for (w = 1; w <= 5; w++)
         {
             mp_size_t n = (UWORD(1)<<depth);
@@ -80,8 +76,5 @@ main(void)
         }
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -9,18 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "perm.h"
 #include "nmod_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_mat_permute_rows, state)
 {
     slong m, n, mod, rep;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("permute_rows....");
-    fflush(stdout);
 
     for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
     {
@@ -85,8 +80,5 @@ main(void)
         _perm_clear(perm_store);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

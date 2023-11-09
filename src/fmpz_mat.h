@@ -260,19 +260,10 @@ void fmpz_mat_swap_rows(fmpz_mat_t mat, slong * perm, slong r, slong s)
 {
     if (r != s && !fmpz_mat_is_empty(mat))
     {
-        fmpz * u;
-        slong t;
+        if (perm != NULL)
+            FLINT_SWAP(slong, perm[r], perm[s]);
 
-        if (perm)
-        {
-            t = perm[s];
-            perm[s] = perm[r];
-            perm[r] = t;
-        }
-
-        u = mat->rows[s];
-        mat->rows[s] = mat->rows[r];
-        mat->rows[r] = u;
+        FLINT_SWAP(fmpz *, mat->rows[r], mat->rows[s]);
     }
 }
 

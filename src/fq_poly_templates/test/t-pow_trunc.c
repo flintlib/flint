@@ -11,20 +11,12 @@
 
 #ifdef T
 
+#include "test_helpers.h"
 #include "templates.h"
 
-
-#include "ulong_extras.h"
-#include "long_extras.h"
-
-int
-main(void)
+TEST_TEMPLATE_FUNCTION_START(T, poly_pow_trunc, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("pow_trunc....");
-    fflush(stdout);
 
     /* Check powering against naive method */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -32,12 +24,12 @@ main(void)
         TEMPLATE(T, poly_t) a, b, c;
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) d;
-	slong e, trunc;
+        slong e, trunc;
 
-	TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_randtest) (ctx, state);
 
         TEMPLATE(T, init) (d, ctx);
-	TEMPLATE(T, poly_init) (a, ctx);
+        TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);
         TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 30), ctx);
@@ -51,12 +43,12 @@ main(void)
 
         TEMPLATE(T, poly_get_coeff) (d, c, 0, ctx);
         result = (TEMPLATE(T, poly_equal) (b, c, ctx)
-            || (a->length == 0 && e == 0 && c->length == 1 && TEMPLATE(T, is_one) (d, ctx)));
+                || (a->length == 0 && e == 0 && c->length == 1 && TEMPLATE(T, is_one) (d, ctx)));
         if (!result)
         {
             flint_printf("FAIL:\n");
             flint_printf("a->length = %wd, exp = %wd, trunc = %wd\n",
-                a->length, e, trunc);
+                    a->length, e, trunc);
             TEMPLATE(T, poly_print) (a, ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print) (b, ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print) (c, ctx), flint_printf("\n\n");
@@ -76,7 +68,7 @@ main(void)
     {
         TEMPLATE(T, poly_t) a, b, c;
         TEMPLATE(T, ctx_t) ctx;
-	slong e, trunc;
+        slong e, trunc;
 
         TEMPLATE(T, ctx_randtest) (ctx, state);
 
@@ -97,7 +89,7 @@ main(void)
         {
             flint_printf("FAIL:\n");
             flint_printf("a->length = %wd, exp = %wd, trunc = %wd\n",
-                a->length, e, trunc);
+                    a->length, e, trunc);
             TEMPLATE(T, poly_print) (a, ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print) (b, ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print) (c, ctx), flint_printf("\n\n");
@@ -111,11 +103,6 @@ main(void)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
 #endif
-

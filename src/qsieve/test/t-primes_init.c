@@ -9,23 +9,19 @@
      (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "qsieve.h"
 
-int main(void)
+TEST_FUNCTION_START(qsieve_primes_init, state)
 {
    int i;
    slong j, k;
    mp_limb_t small_factor, pmod;
    qs_t qs_inf;
    fmpz_t n, x, y;
-
-   FLINT_TEST_INIT(state);
-
-   flint_printf("primes_init....");
-   fflush(stdout);
 
    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
    {
@@ -243,9 +239,5 @@ cleanup2:
        fmpz_clear(y);
    }
 
-   FLINT_TEST_CLEANUP(state);
-
-   flint_printf("PASS\n");
-   return 0;
+   TEST_FUNCTION_END(state);
 }
-

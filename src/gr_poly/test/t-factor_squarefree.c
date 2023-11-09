@@ -9,21 +9,16 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
 
 FLINT_DLL extern gr_static_method_table _ca_methods;
 
-int main(void)
+TEST_FUNCTION_START(gr_poly_factor_squarefree, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("factor_squarefree...");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000; iter++)
     {
@@ -37,6 +32,7 @@ int main(void)
         gr_vec_t exp;
         slong i, j;
         int status = GR_SUCCESS;
+        int attempts = 0;
 
         gr_ctx_init_random(ctx, state);
 
@@ -63,8 +59,12 @@ int main(void)
 
         c = gr_heap_init(ctx);
 
+        attempts = 0;
+
         do
         {
+            attempts++;
+
             if (ctx->methods == _ca_methods)
             {
                 ea = 1 + n_randint(state, 2);
@@ -86,6 +86,11 @@ int main(void)
                 status |= gr_poly_randtest(C, state, 3, ctx);
             }
 
+            if (ctx->which_ring != GR_CTX_FMPQ && attempts > 4)
+            {
+                status = GR_UNABLE;
+                break;
+            }
         }
         while (A->length < 2 || B->length < 2 || C->length < 2 ||
                gr_poly_gcd(G1, A, B, ctx) != GR_SUCCESS || (gr_poly_is_one(G1, ctx) != T_TRUE) ||
@@ -106,6 +111,7 @@ int main(void)
         {
             flint_printf("FAIL (unexpected failure)\n\n");
             flint_printf("P = "); gr_poly_print(P, ctx); flint_printf("\n");
+            flint_abort();
         }
 
         if (status == GR_SUCCESS)
@@ -170,8 +176,5 @@ int main(void)
         gr_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

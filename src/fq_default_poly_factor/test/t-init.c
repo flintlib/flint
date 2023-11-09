@@ -9,20 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fq_default_poly_factor.h"
 
-#include "flint.h"
-#include "nmod_poly.h"
-#include "ulong_extras.h"
-
-int
-main(void)
+TEST_FUNCTION_START(fq_default_poly_factor_init, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("init/clear....");
-    fflush(stdout);
 
     for (i = 0; i < 30 * flint_test_multiplier(); i++)
     {
@@ -42,12 +34,12 @@ main(void)
 
         fq_default_poly_init(poly, ctx);
 
-	fq_default_init(c, ctx);
+        fq_default_init(c, ctx);
 
         while (fq_default_poly_is_zero(poly, ctx))
             fq_default_poly_randtest(poly, state, n_randint(state, 10), ctx);
 
-	fq_default_poly_factor(fq_poly_fac, c, poly, ctx);
+        fq_default_poly_factor(fq_poly_fac, c, poly, ctx);
 
         fq_default_clear(c, ctx);
 
@@ -99,8 +91,5 @@ main(void)
 
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-        return 0;
+    TEST_FUNCTION_END(state);
 }

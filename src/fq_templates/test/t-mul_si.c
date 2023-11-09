@@ -13,18 +13,14 @@
 
 #ifdef T
 
+#include "test_helpers.h"
 #include "templates.h"
 #include "long_extras.h"
 #include "fmpz_poly.h"
 
-int
-main(void)
+TEST_TEMPLATE_FUNCTION_START(T, mul_si, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("mul_si....");
-    fflush(stdout);
 
     /* Check aliasing of a, b */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
@@ -49,7 +45,7 @@ main(void)
             flint_printf("FAIL:\n\n");
             flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
             flint_printf("b = "), TEMPLATE(T, print_pretty)(b, ctx), flint_printf("\n");
-	    flint_printf("x = %wd\n",x);
+            flint_printf("x = %wd\n",x);
             fflush(stdout);
             flint_abort();
         }
@@ -66,20 +62,19 @@ main(void)
         TEMPLATE(T, ctx_t) ctx;
         slong x;
         TEMPLATE(T, t) a, c;
-	fmpz_poly_t b;
+        fmpz_poly_t b;
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
 
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(c, ctx);
-	fmpz_poly_init(b);
+        fmpz_poly_init(b);
 
         TEMPLATE(T, randtest)(a, state, ctx);
         x = z_randtest(state);
         TEMPLATE(T, mul_si)(c, a, x, ctx);
         fmpz_poly_scalar_mul_si(b,a,x);
-	TEMPLATE(T, reduce)(b,ctx);
-
+        TEMPLATE(T, reduce)(b,ctx);
 
         result = (TEMPLATE(T, equal)(c, b, ctx));
         if (!result)
@@ -87,7 +82,7 @@ main(void)
             flint_printf("FAIL:\n\n");
             flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
             flint_printf("b = "), TEMPLATE(T, print_pretty)(b, ctx), flint_printf("\n");
-	    flint_printf("x = %wd\n",x);
+            flint_printf("x = %wd\n",x);
             fflush(stdout);
             flint_abort();
         }
@@ -98,10 +93,6 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
-
 #endif

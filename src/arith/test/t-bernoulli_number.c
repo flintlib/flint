@@ -9,12 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpq.h"
 #include "arith.h"
 
-int main(void)
+TEST_FUNCTION_START(arith_bernoulli_number, state)
 {
     fmpz * num1;
     fmpz * den1;
@@ -22,10 +23,6 @@ int main(void)
     fmpz_t den2;
     slong n, N;
 
-    FLINT_TEST_INIT(state);
-
-    flint_printf("bernoulli_number....");
-    fflush(stdout);
 
     N = 4000;
 
@@ -96,7 +93,5 @@ int main(void)
     fmpz_clear(num2);
     fmpz_clear(den2);
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

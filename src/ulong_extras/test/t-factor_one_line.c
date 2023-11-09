@@ -9,18 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 
-int main(void)
+TEST_FUNCTION_START(n_factor_one_line, state)
 {
    int i, result;
    slong num_iter;
    ulong count = UWORD(0);
-   FLINT_TEST_INIT(state);
-
-   flint_printf("factor_one_line....");
-   fflush(stdout);
 
    num_iter = 500 * FLINT_MAX(1, flint_test_multiplier());
 
@@ -63,8 +59,5 @@ int main(void)
       flint_abort();
    }
 
-   FLINT_TEST_CLEANUP(state);
-
-   flint_printf("PASS\n");
-   return 0;
+   TEST_FUNCTION_END(state);
 }

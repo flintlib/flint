@@ -9,12 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
 /* Composite strong pseudoprimes from https://oeis.org/A014233 */
-static const char * composites[] = {
+static const char * composites_is_strong_probabprime[] = {
     "2047",
     "1373653",
     "25326001",
@@ -31,25 +31,20 @@ static const char * composites[] = {
     NULL,
 };
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_is_strong_probabprime, state)
 {
     int i, result, count = 0;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("is_strong_probabprime....");
-    fflush(stdout);
 
     /* test table */
     {
-        for (i = 0; composites[i] != NULL; i++)
+        for (i = 0; composites_is_strong_probabprime[i] != NULL; i++)
         {
             int j;
             fmpz_t n, a;
             fmpz_init(n);
             fmpz_init(a);
 
-            fmpz_set_str(n, composites[i], 10);
+            fmpz_set_str(n, composites_is_strong_probabprime[i], 10);
 
             for (j = 0; j <= i; j++)
             {
@@ -159,8 +154,5 @@ main(void)
         flint_abort();
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

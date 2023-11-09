@@ -9,17 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "aprcl.h"
 
-int main(void)
+TEST_FUNCTION_START(aprcl_unity_zp_sqr3, state)
 {
     int i, j;
     fmpz_t * t;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("unity_zp_sqr3....");
-    fflush(stdout);
 
     t = (fmpz_t*) flint_malloc(sizeof(fmpz_t) * (SQUARING_SPACE));
     for (i = 0; i < SQUARING_SPACE; i++)
@@ -132,9 +129,5 @@ int main(void)
         fmpz_clear(t[i]);
     flint_free(t);
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

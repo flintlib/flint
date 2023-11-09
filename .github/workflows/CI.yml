@@ -16,17 +16,15 @@ concurrency:
 
 jobs:
   ##############################################################################
-  # ubuntu with gcc
+  # ubuntu, gcc, avx2, code coverage
   ##############################################################################
-  ubuntu-gcc:
-    name: Ubuntu GCC, default flags with AVX2, Code Coverage (x10)
+  ubuntu-avx2-codecoverage:
+    name: Ubuntu GCC, AVX2, Code Coverage (x10)
 
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j --output-sync=target"
       CC: "gcc"
-      TESTCFLAGS: "-Wall -O1"
       FLINT_TEST_MULTIPLIER: "10"
 
     steps:
@@ -43,11 +41,16 @@ jobs:
           make --version
           autoconf --version
           libtool --version
+          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
 
       - name: "Configure"
         run: |
           ./bootstrap.sh
-          ./configure CC=${CC} --enable-avx2 TESTCFLAGS="${TESTCFLAGS}" --disable-static --enable-coverage
+          ./configure \
+            CC=${CC} \
+            --enable-avx2 \
+            --disable-static \
+            --enable-coverage
 
       - name: "Compile library"
         run: |
@@ -68,24 +71,18 @@ jobs:
       - name: "Upload coverage data"
         uses: codecov/codecov-action@v3.1.1
 
-      - if: failure()
-        name: "If failure, stop all other jobs"
-        uses: andymckay/cancel-action@0.3
-
 
 
   ##############################################################################
-  # ubuntu with gcc (assert)
+  # ubuntu, gcc, assert
   ##############################################################################
   ubuntu-gcc-assert:
-    name: Ubuntu GCC (assert, x2)
+    name: Ubuntu GCC with NTL (assert, x2)
 
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j --output-sync=target"
       CC: "gcc"
-      CFLAGS: "-Wall -Werror=implicit-function-declaration"
       FLINT_TEST_MULTIPLIER: "2"
 
     steps:
@@ -93,19 +90,24 @@ jobs:
 
       - name: "Setup"
         run: |
-          sudo apt-get install -y libgmp-dev
-          sudo apt-get install -y libmpfr-dev
-          sudo apt-get install -y autoconf
-          sudo apt-get install -y libtool-bin
+          sudo apt-get install -y libgmp-dev libmpfr-dev libntl-dev autoconf libtool-bin
           gcc --version
           make --version
           autoconf --version
           libtool --version
+          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
 
       - name: "Configure"
         run: |
           ./bootstrap.sh
-          ./configure CC=${CC} CFLAGS="${CFLAGS}" --with-gmp=/usr --with-mpfr=/usr --enable-assert --disable-static
+          ./configure \
+            CC=${CC} \
+            --with-gmp=/usr \
+            --with-mpfr=/usr \
+            --with-ntl=/usr \
+            --enable-assert \
+            --disable-static \
+            --disable-debug
 
       - name: "Compile library"
         run: |
@@ -120,10 +122,6 @@ jobs:
         run: |
           $MAKE check
 
-      - if: failure()
-        name: "If failure, stop all other jobs"
-        uses: andymckay/cancel-action@0.3
-
 
 
   ##############################################################################
@@ -135,9 +133,6 @@ jobs:
     runs-on: macos-latest
 
     env:
-      MAKE: "gmake -j -l 10 --output-sync=target"
-      CFLAGS: "-Wall"
-      EXTRA_OPTIONS: "--disable-static --enable-shared"
       CC: "gcc"
       FLINT_TEST_MULTIPLIER: "3"
 
@@ -157,15 +152,18 @@ jobs:
           gcc --version
           gmake --version
           autoconf --version
+          echo "MAKE=gmake -j$(expr $(nproc) + 1) -l 10 --output-sync=target" >> $GITHUB_ENV
 
       - name: "Configure"
         run: |
           ./bootstrap.sh
-          ./configure CC=${CC} CFLAGS="${CFLAGS}" \
-              --with-gmp=$(brew --prefix) \
-              --with-mpfr=$(brew --prefix) \
-              --with-blas=$(brew --prefix)/opt/openblas \
-              ${EXTRA_OPTIONS}
+          ./configure \
+            CC=${CC} \
+            --with-gmp=$(brew --prefix) \
+            --with-mpfr=$(brew --prefix) \
+            --with-blas=$(brew --prefix)/opt/openblas \
+            --disable-static \
+            --disable-debug
 
       - name: "Compile library"
         run: |
@@ -178,10 +176,6 @@ jobs:
       - name: "Check"
         run: |
           $MAKE check
-
-      - if: failure()
-        name: "If failure, stop all other jobs"
-        uses: andymckay/cancel-action@0.3
 
 
 
@@ -199,78 +193,74 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: "Run tests on FreeBSD"
-        uses: cross-platform-actions/action@v0.19.1
-        timeout-minutes: 25
+        uses: cross-platform-actions/action@v0.21.1
+        timeout-minutes: 30
         continue-on-error: true
         with:
           operating_system: freebsd
-          version: '13.1'
+          version: '13.2'
           shell: bash
           run: |
-            yes | sudo pkg install pkgconf
-            yes | sudo pkg install gmake
-            yes | sudo pkg install gmp
-            yes | sudo pkg install mpfr
-            yes | sudo pkg install autoconf
-            yes | sudo pkg install libtool
-            yes | sudo pkg install automake
+            sudo pkg install -y pkgconf gmake gmp mpfr autoconf libtool automake
             gmake --version
             clang --version
             autoconf --version
             libtool --version
-            touch _is_installed
+            touch _is_setup
+
             ./bootstrap.sh
             touch _is_bootstrapped
-            ./configure CC=clang CFLAGS="-Wall" --disable-static --enable-shared  \
-                --with-gmp-include=$(pkgconf --variable=includedir gmp)           \
-                --with-gmp-lib=$(pkgconf --variable=libdir gmp)                   \
-                --with-mpfr-include=$(pkgconf --variable=includedir mpfr)         \
-                --with-mpfr-lib=$(pkgconf --variable=libdir mpfr)
+
+            ./configure \
+              CC=clang \
+              --with-gmp-include=$(pkgconf --variable=includedir gmp) \
+              --with-gmp-lib=$(pkgconf --variable=libdir gmp) \
+              --with-mpfr-include=$(pkgconf --variable=includedir mpfr) \
+              --with-mpfr-lib=$(pkgconf --variable=libdir mpfr) \
+              --disable-static \
+              --disable-debug
             touch _is_configured
-            gmake -j
-            touch _is_built
-            gmake -j check
+
+            gmake -j$(expr $(sysctl -n hw.ncpu) + 1)
+            touch _is_library_built
+
+            gmake -j$(expr $(sysctl -n hw.ncpu) + 1) tests
+            touch _is_tests_built
+
+            gmake -j$(expr $(sysctl -n hw.ncpu) + 1) check
             touch _is_checked
 
         # Sometimes the FreeBSD runner cannot exit properly. We created files
         # for each step to show that it was able to run the tests.
-      - name: "Check that everything was okay"
+      - if: always()
+        name: "Check that everything was okay"
         run: |
-          if test -e _is_installed;
+          if test ! -f _is_setup;
           then
-            if test -e _is_bootstrapped;
-            then
-              if test -e _is_configured;
-              then
-                if test -e _is_built;
-                then
-                  if test -e _is_checked;
-                  then
-                    echo "All good!"
-                  else
-                    echo "Check failed!"
-                    exit 5
-                  fi
-                else
-                  echo "Building failed!"
-                  exit 4
-                fi
-              else
-                echo "Configuration failed!"
-                exit 3
-              fi
-            else
-              echo "Bootstrap failed!"
-              exit 2
-            fi
-          else
-            echo "Installation failed!"
+            echo "Setup failed!"
             exit 1
+          elif test ! -f _is_bootstrapped;
+          then
+            echo "Bootstrap failed!"
+            exit 2
+          elif test ! -f _is_configured;
+          then
+            echo "Configuration failed!"
+            exit 3
+          elif test ! -f _is_library_built;
+          then
+            echo "Building library failed!"
+            exit 4
+          elif test ! -f _is_tests_built;
+          then
+            echo "Building tests failed!"
+            exit 5
+          elif test ! -f _is_checked;
+          then
+            echo "Check failed!"
+            exit 6
           fi
-
-      # - if: failure()
-      #   name: "If failure, stop all other jobs"
-      #   uses: andymckay/cancel-action@0.3
+          echo "All good!"
 
 
 
@@ -287,10 +277,7 @@ jobs:
         shell: C:\cygwin64\bin\bash.exe --login -o igncr '{0}'
 
     env:
-      MAKE: "make -j --output-sync=target"
       REPO: /cygdrive/d/a/flint/flint # FIXME: De-hardcode this
-      CFLAGS: "-Wall"
-      EXTRA_OPTIONS: "--enable-shared --disable-static"
       CC: "gcc"
       FLINT_TEST_MULTIPLIER: "0.5"
 
@@ -308,6 +295,7 @@ jobs:
           make --version
           autoconf --version
           libtool --version
+          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
 
       - name: "Configure"
         run: |
@@ -315,7 +303,10 @@ jobs:
           dos2unix configure
           dos2unix bootstrap.sh
           ./bootstrap.sh
-          ./configure CC=${CC} CFLAGS="${CFLAGS}" ${EXTRA_OPTIONS}
+          ./configure \
+            CC=${CC} \
+            --disable-static \
+            --disable-debug
 
       - name: "Compile library"
         run: |
@@ -332,10 +323,6 @@ jobs:
           cd ${REPO}
           $MAKE check
 
-      - if: failure()
-        name: "If failure, stop all other jobs"
-        uses: andymckay/cancel-action@0.3
-
 
 
   #############################################################################
@@ -347,12 +334,9 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j --output-sync=target"
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
-      CFLAGS: "-Wall"
       CC: "clang"
-      EXTRA_OPTIONS: "--disable-static --enable-shared"
       FLINT_TEST_MULTIPLIER: "5"
 
     steps:
@@ -368,11 +352,15 @@ jobs:
           make --version
           autoconf --version
           libtool --version
+          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
 
       - name: "Configure"
         run: |
           ./bootstrap.sh
-          ./configure CC=${CC} CFLAGS="${CFLAGS}" ${EXTRA_OPTIONS}
+          ./configure \
+            CC=${CC} \
+            --disable-static \
+            --disable-debug
 
       - name: "Compile library"
         run: |
@@ -387,25 +375,19 @@ jobs:
         run: |
           $MAKE check
 
-      - if: failure()
-        name: "If failure, stop all other jobs"
-        uses: andymckay/cancel-action@0.3
-
 
 
   #############################################################################
   # ubuntu with gcc and cmake (no checks)
   #############################################################################
   ubuntu-cmake-gcc:
-    name: Ubuntu GCC via CMake (no check)
+    name: Ubuntu GCC, CMake (no checks)
 
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j --output-sync=target"
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
-      CFLAGS: "-Wall"
 
     steps:
       - uses: actions/checkout@v4
@@ -418,6 +400,7 @@ jobs:
           gcc --version
           make --version
           cmake --version
+          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
 
       - name: "Configure"
         run: |
@@ -431,10 +414,6 @@ jobs:
           cd build
           $MAKE
           ldd lib/libflint.so
-
-      - if: failure()
-        name: "If failure, stop all other jobs"
-        uses: andymckay/cancel-action@0.3
 
 
 
@@ -451,9 +430,6 @@ jobs:
         shell: msys2 {0}
 
     env:
-      MAKE: "make -j --output-sync=target"
-      CFLAGS: "-Wall"
-      EXTRA_OPTIONS: "--enable-shared --disable-static"
       CC: "gcc"
       FLINT_TEST_MULTIPLIER: "0.5"
 
@@ -473,11 +449,15 @@ jobs:
           make --version
           autoconf --version
           libtool --version
+          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
 
       - name: "Configure"
         run: |
           ./bootstrap.sh
-          ./configure CC=${CC} CFLAGS="${CFLAGS}" ${EXTRA_OPTIONS}
+          ./configure \
+            CC=${CC} \
+            --disable-static \
+            --disable-debug
 
       - name: "Compile library"
         run: |
@@ -490,10 +470,6 @@ jobs:
       - name: "Check"
         run: |
           ${MAKE} check
-
-      - if: failure()
-        name: "If failure, stop all other jobs"
-        uses: andymckay/cancel-action@0.3
 
 
 
@@ -525,6 +501,8 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1.12.1
         with:
           arch: x86_64
+          toolset: 14.37.32822
+          vsversion: 17.6.0
 
       - name: "Configure"
         run: |
@@ -532,12 +510,13 @@ jobs:
           cd build
           set "LIB=C:\Miniconda3\Library\lib;%LIB%"
           set "CPATH=C:\Miniconda3\Library\include;%CPATH%"
-          cmake -G "Ninja" -DCMAKE_C_FLAGS="/wd4018 /wd4146 /wd4244 /wd4267 /wd4305 /wd4996" -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
+          # For single build, we need atomics
+          cmake -G "Ninja" -DCMAKE_C_FLAGS="/wd4018 /wd4146 /wd4244 /wd4267 /wd4305 /wd4996 /DFLINT_NO_CA_MAT_EXP_TEST /std:c11 /experimental:c11atomics" -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
 
       - name: "Build"
         run: |
           cd build
-          cmake --build . -- -j4
+          cmake --build . -- -j3
 
         # FIXME: Preferably drop support of CMake and native Windows, or fix so
         # that we can include the test again.
@@ -545,11 +524,73 @@ jobs:
         run: |
           cd build
           set "FLINT_TEST_MULTIPLIER=1"
-          ctest -j4 --output-on-failure --timeout 180 -E "src-ca_mat-test-t-exp"
+          ctest -j3 --output-on-failure --timeout 450
 
-      - if: failure()
-        name: "If failure, stop all other jobs"
-        uses: andymckay/cancel-action@0.3
+
+
+  ##############################################################################
+  # alpine linux, musl, 32-bit (assert)
+  ##############################################################################
+  alpine-32bit:
+    name: Alpine Linux, musl, 32-bit (assert, x1.5)
+
+    runs-on: ubuntu-latest
+
+    env:
+      CC: "gcc"
+      FLINT_TEST_MULTIPLIER: "1.5"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Setup latest Alpine Linux"
+        uses: jirutka/setup-alpine@v1
+        with:
+          arch: x86
+          branch: edge
+          packages: >
+            gmp-dev
+            mpfr-dev
+            gcc
+            musl-dev
+            make
+            autoconf
+            automake
+            libtool
+
+      - name: "Setup"
+        run: |
+          gcc --version
+          make --version
+          autoconf --version
+          libtool --version
+          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
+        shell: alpine.sh {0}
+
+      - name: "Configure"
+        run: |
+          ./bootstrap.sh
+          ./configure \
+            CC=${CC} \
+            --enable-assert \
+            --disable-static \
+            --disable-debug
+        shell: alpine.sh {0}
+
+      - name: "Compile library"
+        run: |
+          $MAKE
+        shell: alpine.sh {0}
+
+      - name: "Compile tests"
+        run: |
+          $MAKE tests
+        shell: alpine.sh {0}
+
+      - name: "Check"
+        run: |
+          $MAKE check
+        shell: alpine.sh {0}
 
 
 
@@ -557,15 +598,12 @@ jobs:
   # nemo
   ##############################################################################
   nemo:
-    name: Nemo.jl
+    name: Nemo.jl (temporary branch)
 
     runs-on: ubuntu-latest
 
     env:
-      MAKE: "make -j --output-sync=target"
       LOCAL: ${{ github.workspace }}/local
-      CFLAGS: ""
-      EXTRA_OPTIONS: "--disable-static --enable-shared"
       CC: "gcc"
 
     steps:
@@ -582,6 +620,7 @@ jobs:
           libtool --version
           julia --version
           julia -e 'println(Base.BinaryPlatforms.HostPlatform())'
+          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
 
       - name: "Configure"
         run: |
@@ -608,7 +647,14 @@ jobs:
           # configure-script. Hence, we also omit the check for finding MPFR.
           # FIXME: Probably want to fix this.
           ./bootstrap.sh
-          ./configure CC=${CC} CFLAGS="${CFLAGS}" --prefix=${LOCAL} ${EXTRA_OPTIONS} --with-gmp=${gmp_path} --with-mpfr=${mpfr_path} --disable-mpfr-check
+          ./configure \
+            CC=${CC} \
+            --prefix=${LOCAL} \
+            --with-gmp=${gmp_path} \
+            --with-mpfr=${mpfr_path} \
+            --disable-mpfr-check \
+            --disable-static \
+            --disable-debug
 
       - name: "Compile and install"
         run: |
@@ -618,7 +664,11 @@ jobs:
       - name: "Set up Nemo.jl"
         run: |
           # Override FLINT_jll's libflint with ours
-          git clone https://github.com/Nemocas/Nemo.jl.git
+
+          # NOTE: Reverse me when Nemo uses FLINT v3.
+          # git clone https://github.com/Nemocas/Nemo.jl.git
+          git clone https://github.com/albinahlback/Nemo.jl.git && cd Nemo.jl && git checkout flint3 && cd ..
+
           julia -e "import Pkg; Pkg.develop(path=\"./Nemo.jl\");"
           echo -e "[e134572f-a0d5-539d-bddf-3cad8db41a82]\nFLINT = \"${LOCAL}\"" > ~/.julia/artifacts/Overrides.toml
           touch Nemo.jl/src/Nemo.jl
@@ -627,7 +677,3 @@ jobs:
       - name: "Check Nemo.jl"
         run: |
           julia -e "import Pkg; Pkg.test(\"Nemo\")"
-
-      # - if: failure()
-      #   name: "If failure, stop all other jobs"
-      #   uses: andymckay/cancel-action@0.3

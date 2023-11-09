@@ -9,9 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz_mod_mpoly.h"
 
+/* Defined in t-gcd_brown.c, t-gcd_cofactors.c, t-gcd_hensel.c,
+ * t-gcd_subresultant.c, t-gcd_zippel.c, t-gcd_zippel2.c */
+#define gcd_check gcd_check_gcd_cofactors
 void gcd_check(
     fmpz_mod_mpoly_t g,
     fmpz_mod_mpoly_t abar,
@@ -203,7 +207,6 @@ void gcd_check(
         flint_abort();
     }
 
-
     res = fmpz_mod_mpoly_gcd_cofactors(cg, ca, cb, abar, bbar, ctx);
     fmpz_mod_mpoly_assert_canonical(cg, ctx);
 
@@ -252,16 +255,11 @@ cleanup:
     fmpz_mod_mpoly_clear(w, ctx);
 }
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mod_mpoly_gcd_cofactors, state)
 {
     const slong max_threads = 5;
     slong i, j, k, tmul = 2;
     fmpz_t p;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("gcd_cofactors....");
-    fflush(stdout);
 
     fmpz_init_set_ui(p, 1);
     fmpz_mul_2exp(p, p, 100);
@@ -1018,9 +1016,6 @@ main(void)
 
     fmpz_clear(p);
 
-    FLINT_TEST_CLEANUP(state);
-
-    printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
+#undef gcd_check

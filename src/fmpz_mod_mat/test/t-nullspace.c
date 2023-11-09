@@ -16,14 +16,9 @@
 #include "fmpz_mod.h"
 #include "fmpz_mod_mat.h"
 
-int main(void)
+TEST_FUNCTION_START(fmpz_mod_mat_nullspace, state)
 {
     slong i;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("nullspace....");
-    fflush(stdout);
 
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
@@ -64,9 +59,5 @@ int main(void)
         }
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

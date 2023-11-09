@@ -15,15 +15,11 @@
 #include "fmpz_mod.h"
 #include "fmpz_mod_mat.h"
 
-int main(void)
+TEST_FUNCTION_START(fmpz_mod_mat_rank, state)
 {
     fmpz_mod_ctx_t ctx;
     fmpz_mod_mat_t A;
     slong i, m, n, d, r;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("rank....");
-    fflush(stdout);
 
     /* Maximally sparse matrices of given rank */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -62,9 +58,5 @@ int main(void)
         fmpz_mod_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

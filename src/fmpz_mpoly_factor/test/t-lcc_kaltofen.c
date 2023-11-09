@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_poly.h"
 #include "fmpz_mpoly_factor.h"
 
@@ -117,15 +118,9 @@ cleanup:
     return success;
 }
 
-
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mpoly_factor_lcc_kaltofen, state)
 {
     slong i, j, k, l;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("lcc_kaltofen....");
-    fflush(stdout);
 
     for (i = 0; i < 10*flint_test_multiplier(); i++)
     {
@@ -153,7 +148,6 @@ main(void)
         fmpz_init(g1);
         fmpz_init(g2);
         fmpz_init(g3);
-
 
         bounds = FLINT_ARRAY_ALLOC(nvars, ulong);
         alphas = _fmpz_vec_init(nvars - 1);
@@ -311,9 +305,5 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

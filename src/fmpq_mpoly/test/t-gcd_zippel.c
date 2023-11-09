@@ -9,17 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_mpoly_gcd_zippel, state)
 {
     slong i, j;
     slong tmul = 10;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("gcd_zippel....");
-    fflush(stdout);
 
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
@@ -137,9 +133,5 @@ main(void)
         fmpq_mpoly_ctx_clear(ctx);
     }
 
-
-    printf("PASS\n");
-    FLINT_TEST_CLEANUP(state);
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -10,23 +10,17 @@
 */
 
 #include <string.h>
-#include "flint.h"
+#include "test_helpers.h"
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-int main(void)
+TEST_FUNCTION_START(n_sizeinbase, state)
 {
     mp_limb_t n;
     int base, size1, size2;
     slong rep;
     mpz_t t;
     char * str;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("sizeinbase....");
-    fflush(stdout);
-
 
     mpz_init(t);
     str = flint_malloc((FLINT_BITS + 1) * sizeof(char));
@@ -55,8 +49,5 @@ int main(void)
     flint_free(str);
     mpz_clear(t);
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

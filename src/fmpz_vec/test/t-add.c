@@ -9,21 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
+#include "test_helpers.h"
 #include "fmpz_vec.h"
-#include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_vec_add, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("add....");
-    fflush(stdout);
-
-
 
     /* Check aliasing of a and c */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -85,8 +76,5 @@ main(void)
         _fmpz_vec_clear(c, len);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

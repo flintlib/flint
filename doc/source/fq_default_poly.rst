@@ -489,7 +489,7 @@ Output
 --------------------------------------------------------------------------------
 
 
-.. function:: int fq_default_poly_fprint_pretty(FILE * file, const fq_default_poly_t poly, const char *x, const fq_default_ctx_t ctx)
+.. function:: int fq_default_poly_fprint_pretty(FILE * file, const fq_default_poly_t poly, const char * x, const fq_default_ctx_t ctx)
 
     Prints the pretty representation of ``poly`` to the stream
     ``file``, using the string ``x`` to represent the indeterminate.
@@ -498,7 +498,7 @@ Output
     returns a non-positive value.
 
 
-.. function:: int fq_default_poly_print_pretty(const fq_default_poly_t poly, const char *x, const fq_default_ctx_t ctx)
+.. function:: int fq_default_poly_print_pretty(const fq_default_poly_t poly, const char * x, const fq_default_ctx_t ctx)
 
     Prints the pretty representation of ``poly`` to ``stdout``,
     using the string ``x`` to represent the indeterminate.

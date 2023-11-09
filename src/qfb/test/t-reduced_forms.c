@@ -14,20 +14,15 @@
 
 ******************************************************************************/
 
+#include "test_helpers.h"
 #include "qfb.h"
 
-int main(void)
+TEST_FUNCTION_START(qfb_reduced_forms, state)
 {
     int result;
-    flint_rand_t state;
     qfb * forms;
     qfb * forms2;
     slong i, j, k, num, num2;
-
-    printf("reduced_forms....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (i = 1; i < 30000; i++)
     {
@@ -66,9 +61,5 @@ int main(void)
         qfb_array_clear(&forms2, num2);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-
-    printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

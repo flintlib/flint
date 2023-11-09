@@ -9,12 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "ulong_extras.h"
 
-
-int main(void)
+TEST_FUNCTION_START(fmpz_CRT_ui, state)
 {
     slong i, j;
     int sign;
@@ -26,17 +25,11 @@ int main(void)
     fmpz_t mprod;
     ulong r2, m2;
 
-    FLINT_TEST_INIT(state);
-
-    flint_printf("CRT_ui....");
-    fflush(stdout);
-
     fmpz_init(input);
     fmpz_init(result);
     fmpz_init(r1);
     fmpz_init(m1);
     fmpz_init(mprod);
-
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -93,9 +86,5 @@ int main(void)
     fmpz_clear(m1);
     fmpz_clear(mprod);
 
-
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -9,18 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "perm.h"
-#include "ulong_extras.h"
 
-int main(void)
+TEST_FUNCTION_START(perm_inv, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("inv....");
-    fflush(stdout);
 
     /* check inv(inv(a)) == a */
     for (i = 0; i < 10000; i++)
@@ -81,8 +75,5 @@ int main(void)
         _perm_clear(b);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

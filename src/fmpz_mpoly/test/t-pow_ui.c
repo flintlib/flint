@@ -10,13 +10,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_mpoly.h"
 
+/* Defined in t-pow_fps.c and t-pow_ui.c */
+#ifndef fmpz_mpoly_pow_naive
+#define fmpz_mpoly_pow_naive fmpz_mpoly_pow_naive
 void fmpz_mpoly_pow_naive(fmpz_mpoly_t res, fmpz_mpoly_t f,
                                                  slong n, fmpz_mpoly_ctx_t ctx)
 {
    if (n == 0)
-      fmpz_mpoly_set_ui(res, 1, ctx);
+      fmpz_mpoly_one(res, ctx);
    else if (f->length == 0)
       fmpz_mpoly_zero(res, ctx);
    else if (n == 1)
@@ -37,15 +41,11 @@ void fmpz_mpoly_pow_naive(fmpz_mpoly_t res, fmpz_mpoly_t f,
       fmpz_mpoly_clear(pow, ctx);
    }
 }
+#endif
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mpoly_pow_ui, state)
 {
     slong i, j, tmul = 20;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("pow_ui....");
-    fflush(stdout);
 
     /* Check pow_ui against pow_naive */
     for (i = 0; i < 10 * tmul * flint_test_multiplier(); i++)
@@ -147,9 +147,5 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

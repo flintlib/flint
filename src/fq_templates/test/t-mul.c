@@ -13,20 +13,12 @@
 
 #ifdef T
 
+#include "test_helpers.h"
 #include "templates.h"
 
-
-#include "ulong_extras.h"
-#include "long_extras.h"
-
-int
-main(void)
+TEST_TEMPLATE_FUNCTION_START(T, mul, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("mul... ");
-    fflush(stdout);
 
     /* Check aliasing: a = a * b */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
@@ -218,11 +210,6 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
-
-
 #endif

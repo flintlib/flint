@@ -9,20 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_product_roots_nmod_vec, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("product_roots_nmod_vec....");
-    fflush(stdout);
-
-
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -68,8 +62,5 @@ main(void)
         _nmod_vec_clear(x);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

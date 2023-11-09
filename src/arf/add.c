@@ -63,8 +63,7 @@ arf_add(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd)
 
     if (shift < 0)
     {
-        arf_srcptr __t;
-        __t = x; x = y; y = __t;
+        FLINT_SWAP(arf_srcptr, x, y);
         shift = -shift;
     }
 

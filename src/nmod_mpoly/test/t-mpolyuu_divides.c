@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "nmod_mpoly.h"
 
 void univar_divides_check(
@@ -120,15 +121,9 @@ cleanup:
     flint_free(stride);
 }
 
-
-int
-main(void)
+TEST_FUNCTION_START(nmod_mpoly_mpolyuu_divides, state)
 {
     slong i, j, tmul = 50;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("mpolyuu_divides....");
-    fflush(stdout);
 
     /* Check (a*b)/b = a */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
@@ -207,8 +202,5 @@ main(void)
         nmod_mpoly_ctx_clear(ctx);
     }
 
-    printf("PASS\n");
-    FLINT_TEST_CLEANUP(state);
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }

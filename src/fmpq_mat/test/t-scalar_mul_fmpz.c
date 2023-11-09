@@ -9,18 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpq_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_mat_scalar_mul_fmpz, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("scalar_mul_fmpz....");
-    fflush(stdout);
 
     /* Aliasing */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -107,9 +102,5 @@ main(void)
         fmpz_clear(x);
     }
 
-
-
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

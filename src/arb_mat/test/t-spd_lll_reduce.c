@@ -9,18 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_mat.h"
 #include "arb_mat.h"
 
-int main(void)
+TEST_FUNCTION_START(arb_mat_spd_lll_reduce, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("spd_lll_reduce....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* Test: result satisfies arb_mat_spd_is_lll_reduced; U is I if starting
        matrix was reduced */
@@ -73,8 +68,5 @@ int main(void)
         fmpz_mat_clear(U);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

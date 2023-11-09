@@ -10,9 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "nmod.h"
 #include "nmod_mat.h"
 
+/* Defined in t-mul.c and t-mul_classical_threaded.c */
+#ifndef nmod_mat_mul_check
+#define nmod_mat_mul_check nmod_mat_mul_check
 void
 nmod_mat_mul_check(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {
@@ -39,15 +43,11 @@ nmod_mat_mul_check(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
         }
     }
 }
+#endif
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_mat_mul, state)
 {
     slong i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("mul....");
-    fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -155,8 +155,5 @@ main(void)
         nmod_mat_clear(B);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

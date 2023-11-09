@@ -11,33 +11,29 @@
 
 /* try to get fdopen declared */
 #if defined __STRICT_ANSI__
-#undef __STRICT_ANSI__
+# undef __STRICT_ANSI__
 #endif
 
-#include <sys/types.h>
 #if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER)
-#include <unistd.h>
+# include <stdlib.h>
+# include <sys/wait.h>
+# include <unistd.h>
 #endif
 #include <string.h>
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
 #if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER)
 
-int main(void)
+TEST_FUNCTION_START(fmpz_poly_print_read_pretty, state)
 {
     int i, j, n = 1000, result;
 
     FILE *in, *out;
     int fd[2];
     pid_t childpid;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("print/ read_pretty....");
-    fflush(stdout);
 
     /* Randomise n polynomials, write to and read from a pipe */
     {
@@ -100,7 +96,7 @@ int main(void)
             for (i = 0; i < n; ++i)
                 fmpz_poly_clear(a[i]);
             flint_free(a);
-            return 0;
+            exit(0);
         }
         else  /* Parent process */
         {
@@ -150,6 +146,7 @@ int main(void)
 
             fmpz_poly_clear(t);
             fclose(in);
+            waitpid(childpid, NULL, 0);
         }
 
         if (i != n)
@@ -209,7 +206,7 @@ int main(void)
             }
 
             fclose(out);
-            return 0;
+            exit(0);
         }
         else  /* Parent process */
         {
@@ -251,23 +248,18 @@ int main(void)
 
             fmpz_poly_clear(t);
             fclose(in);
+            waitpid(childpid, NULL, 0);
         }
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
 
 #else
 
-int main(void)
+TEST_FUNCTION_START(fmpz_poly_print_read_pretty, state)
 {
-    flint_printf("print/ read....");
-    fflush(stdout);
-    flint_printf("SKIPPED\n");
-    return 0;
+    TEST_FUNCTION_END_SKIPPED(state);
 }
 
 #endif

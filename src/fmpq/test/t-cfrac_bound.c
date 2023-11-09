@@ -9,23 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpq.h"
-#include "fmpz_vec.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
+#include "fmpz_vec.h"
+#include "fmpq.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_cfrac_bound, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
 
-
-    flint_printf("cfrac_bound....");
-    fflush(stdout);
-
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpq_t x, r;
         fmpz * c;
@@ -62,9 +55,5 @@ main(void)
         fmpq_clear(r);
     }
 
-
-
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

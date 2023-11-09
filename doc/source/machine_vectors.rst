@@ -34,32 +34,32 @@ Printing
 Access and conversions
 -------------------------------------------------------------------------------
 
-.. function:: vec1d vec1d_load(const double* a)
-              vec4d vec4d_load(const double* a)
-              vec8d vec8d_load(const double* a)
+.. function:: vec1d vec1d_load(const double * a)
+              vec4d vec4d_load(const double * a)
+              vec8d vec8d_load(const double * a)
 
-.. function:: vec1d vec1d_load_aligned(const double* a)
-              vec4d vec4d_load_aligned(const double* a)
-              vec8d vec8d_load_aligned(const double* a)
+.. function:: vec1d vec1d_load_aligned(const double * a)
+              vec4d vec4d_load_aligned(const double * a)
+              vec8d vec8d_load_aligned(const double * a)
 
-.. function:: vec1d vec1d_load_unaligned(const double* a)
-              vec4d vec4d_load_unaligned(const double* a)
-              vec8d vec8d_load_unaligned(const double* a)
-              vec4n vec4n_load_unaligned(const ulong* a)
-              vec8n vec8n_load_unaligned(const ulong* a)
+.. function:: vec1d vec1d_load_unaligned(const double * a)
+              vec4d vec4d_load_unaligned(const double * a)
+              vec8d vec8d_load_unaligned(const double * a)
+              vec4n vec4n_load_unaligned(const ulong * a)
+              vec8n vec8n_load_unaligned(const ulong * a)
 
-.. function:: void vec1d_store(double* z, vec1d a)
-              void vec4d_store(double* z, vec4d a)
-              void vec8d_store(double* z, vec8d a)
+.. function:: void vec1d_store(double * z, vec1d a)
+              void vec4d_store(double * z, vec4d a)
+              void vec8d_store(double * z, vec8d a)
 
-.. function:: void vec1d_store_aligned(double* z, vec1d a)
-              void vec4d_store_aligned(double* z, vec4d a)
-              void vec8d_store_aligned(double* z, vec8d a)
+.. function:: void vec1d_store_aligned(double * z, vec1d a)
+              void vec4d_store_aligned(double * z, vec4d a)
+              void vec8d_store_aligned(double * z, vec8d a)
 
-.. function:: void vec1d_store_unaligned(double* z, vec1d a)
-              void vec4d_store_unaligned(double* z, vec4d a)
-              void vec4n_store_unaligned(ulong* z, vec4n a)
-              void vec8d_store_unaligned(double* z, vec8d a)
+.. function:: void vec1d_store_unaligned(double * z, vec1d a)
+              void vec4d_store_unaligned(double * z, vec4d a)
+              void vec4n_store_unaligned(ulong * z, vec4n a)
+              void vec8d_store_unaligned(double * z, vec8d a)
 
 .. function:: double vec4d_get_index(vec4d a, const int i)
               double vec8d_get_index(vec8d a, int i)

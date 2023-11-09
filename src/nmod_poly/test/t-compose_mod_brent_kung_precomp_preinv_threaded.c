@@ -11,24 +11,18 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "thread_support.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 #include "nmod_mat.h"
 #include "nmod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_precomp_preinv_threaded, state)
 {
 #if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     int i;
-#endif
-    FLINT_TEST_INIT(state);
 
-    flint_printf("compose_mod_brent_kung_precomp_preinv_threaded....");
-    fflush(stdout);
-
-#if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     /* check precomputation */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -245,19 +239,9 @@ main(void)
         flint_free(args1);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 
 #else
-
-   FLINT_TEST_CLEANUP(state);
-
-   flint_printf("SKIPPED\n");
-   return 0;
-
+    TEST_FUNCTION_END_SKIPPED(state);
 #endif
-
 }
-

@@ -10,20 +10,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "gmpcompat.h"
 #include "long_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_divisible_si, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("divisible_si....");
-    fflush(stdout);
-
-
 
     /* Compare with GMP:  random */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -90,8 +84,5 @@ main(void)
         mpz_clear(d);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

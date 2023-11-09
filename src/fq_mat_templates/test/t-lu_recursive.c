@@ -12,10 +12,12 @@
 
 #ifdef T
 
+#include "test_helpers.h"
 #include "templates.h"
 
-#include "ulong_extras.h"
-
+/* Defined in t-lu_classical.c and t-lu_recursive.c */
+#ifndef perm
+#define perm perm
 void
 perm(TEMPLATE(T, mat_t) A, slong * P)
 {
@@ -34,8 +36,11 @@ perm(TEMPLATE(T, mat_t) A, slong * P)
 
     flint_free(tmp);
 }
+#endif
 
-
+/* Defined in t-lu_classical.c and t-lu_recursive.c */
+#ifndef check
+#define check check
 void
 check(slong * P, TEMPLATE(T, mat_t) LU, const TEMPLATE(T, mat_t) A, slong rank,
       const TEMPLATE(T, ctx_t) ctx)
@@ -99,16 +104,11 @@ check(slong * P, TEMPLATE(T, mat_t) LU, const TEMPLATE(T, mat_t) A, slong rank,
     TEMPLATE(T, mat_clear) (L, ctx);
     TEMPLATE(T, mat_clear) (U, ctx);
 }
+#endif
 
-
-int
-main(void)
+TEST_TEMPLATE_FUNCTION_START(T, mat_lu_recursive, state)
 {
     slong i;
-    FLINT_TEST_INIT(state);
-
-    printf("lu_recursive....");
-    fflush(stdout);
 
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
@@ -161,10 +161,6 @@ main(void)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
-
 #endif

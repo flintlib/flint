@@ -11,19 +11,15 @@
 
 #ifdef T
 
+#include "test_helpers.h"
 #include "templates.h"
 
-int
-main(void)
+TEST_TEMPLATE_FUNCTION_START(T, poly_get_str, state)
 {
     int i, len;
     char *str;
     TEMPLATE(T, poly_t) a;
     TEMPLATE(T, ctx_t) ctx;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("get_str....");
-    fflush(stdout);
 
     TEMPLATE(T, ctx_randtest) (ctx, state);
 
@@ -42,10 +38,6 @@ main(void)
     TEMPLATE(T, poly_clear) (a, ctx);
     TEMPLATE(T, ctx_clear) (ctx);
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
-
 #endif

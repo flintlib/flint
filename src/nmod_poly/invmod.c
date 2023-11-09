@@ -49,7 +49,7 @@ int nmod_poly_invmod(nmod_poly_t A,
     int ans;
 
     if (lenP < 2)
-        flint_throw(FLINT_ERROR, "lenP < 2 in %s\n", __FUNCTION__);
+        flint_throw(FLINT_ERROR, "lenP < 2 in %s\n", __func__);
 
     if (lenB == 0)
     {

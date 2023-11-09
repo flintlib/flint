@@ -13,18 +13,12 @@
 
 #ifdef T
 
+#include "test_helpers.h"
 #include "templates.h"
 
-#include "flint.h"
-#include "ulong_extras.h"
-int
-main(void)
+TEST_TEMPLATE_FUNCTION_START(T, poly_compose_mod_horner, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("compose_mod_horner....");
-    fflush(stdout);
 
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
@@ -223,10 +217,6 @@ main(void)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
-
 #endif

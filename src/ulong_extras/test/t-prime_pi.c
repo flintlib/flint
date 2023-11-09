@@ -9,17 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 
-int main(void)
+TEST_FUNCTION_START(n_prime_pi, state)
 {
     int n;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("prime_pi....");
-    fflush(stdout);
 
     for (n=1; n<10000 * FLINT_MIN(10, flint_test_multiplier()); n++)
     {
@@ -43,7 +38,5 @@ int main(void)
         }
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

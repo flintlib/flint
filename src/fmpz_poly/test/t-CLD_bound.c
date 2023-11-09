@@ -10,19 +10,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_poly_CLD_bound, state)
 {
     int i, result = 1;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("CLD_bound....");
-    fflush(stdout);
 
     /*
        test that CLD_bound is between the absolute value of the n-th
@@ -176,8 +171,5 @@ main(void)
         fmpz_clear(bound);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

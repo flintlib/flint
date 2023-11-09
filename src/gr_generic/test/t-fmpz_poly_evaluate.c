@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_poly.h"
 #include "gr.h"
 #include "gr_vec.h"
@@ -47,16 +48,10 @@ evaluate(flint_rand_t state, gr_ptr res, const fmpz_poly_t f, gr_srcptr x, gr_ct
     return status;
 }
 
-int main(void)
+TEST_FUNCTION_START(gr_generic_fmpz_poly_evaluate, state)
 {
     slong iter;
     slong count_success = 0, count_unable = 0, count_domain = 0;
-    flint_rand_t state;
-
-    flint_printf("fmpz_poly_evaluate....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 10000; iter++)
     {
@@ -120,8 +115,5 @@ int main(void)
         gr_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf(" [%wd success, %wd domain, %wd unable] PASS\n", count_success, count_domain, count_unable);
-    return 0;
+    TEST_FUNCTION_END(state);
 }

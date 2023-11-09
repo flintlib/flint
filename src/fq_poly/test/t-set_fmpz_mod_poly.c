@@ -9,19 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_mod_poly.h"
 #include "fq.h"
 #include "fq_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fq_poly_set_fmpz_mod_poly, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("set_fmpz_poly... ");
-    fflush(stdout);
 
     /* Check litfed polynomials by evaluating at random points */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -70,8 +66,5 @@ main(void)
         fq_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

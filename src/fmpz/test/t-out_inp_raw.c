@@ -15,29 +15,24 @@
 #undef __STRICT_ANSI__
 #endif
 
-#include <sys/types.h>
 #if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER)
-#include <unistd.h>
+# include <stdlib.h>
+# include <sys/wait.h>
+# include <unistd.h>
 #endif
 
-
-#include "flint.h"
+#include "test_helpers.h"
 #include "fmpz.h"
 
 #if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER)
 
-int main(void)
+TEST_FUNCTION_START(fmpz_out_inp_raw, state)
 {
     int i, j, n = 10000, result;
 
     FILE *in, *out;
     int fd[2];
     pid_t childpid;
-
-    FLINT_TEST_INIT(state);
-
-    printf("out_raw/inp_raw....");
-    fflush(stdout);
 
     /* Randomise n integers, write to and read from a pipe */
     {
@@ -94,7 +89,7 @@ int main(void)
             for (i = 0; i < n; ++i)
                 fmpz_clear(a + i);
             flint_free(a);
-            return 0;
+            exit(0);
         }
         else  /* Parent process */
         {
@@ -131,6 +126,7 @@ int main(void)
 
             fmpz_clear(t);
             fclose(in);
+            waitpid(childpid, NULL, 0);
         }
 
         if (i != n)
@@ -149,20 +145,14 @@ int main(void)
     /* Write bad data to a pipe and read it */
     /* Not necessary */
 
-    FLINT_TEST_CLEANUP(state);
-
-    printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
 
 #else
 
-int main(void)
+TEST_FUNCTION_START(fmpz_out_inp_raw, state)
 {
-    printf("out_raw/ inp_raw....");
-    fflush(stdout);
-    printf("SKIPPED\n");
-    return 0;
+    TEST_FUNCTION_END_SKIPPED(state);
 }
 
 #endif

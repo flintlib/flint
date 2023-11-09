@@ -9,19 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
+#include "test_helpers.h"
 #include "fmpz_mpoly.h"
-#include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mpoly_reverse, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("reverse....");
-    fflush(stdout);
 
     /* Check rev(rev(a)) == a */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -99,8 +92,5 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

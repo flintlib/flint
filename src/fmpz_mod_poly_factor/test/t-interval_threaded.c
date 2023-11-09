@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "thread_support.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -18,19 +19,11 @@
 #include "fmpz_mod_poly.h"
 #include "fmpz_mod_poly_factor.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mod_poly_factor_interval_threaded, state)
 {
 #if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     int i;
     fmpz_mod_ctx_t ctx;
-#endif
-    FLINT_TEST_INIT(state);
-
-    flint_printf("interval_threaded....");
-    fflush(stdout);
-
-#if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
 
     fmpz_mod_ctx_init_ui(ctx, 2);
 
@@ -167,19 +160,9 @@ main(void)
     }
 
     fmpz_mod_ctx_clear(ctx);
-    FLINT_TEST_CLEANUP(state);
 
-    flint_printf("PASS\n");
-    return 0;
-
+    TEST_FUNCTION_END(state);
 #else
-
-   FLINT_TEST_CLEANUP(state);
-
-   flint_printf("SKIPPED\n");
-   return 0;
-
+    TEST_FUNCTION_END_SKIPPED(state);
 #endif
-
 }
-

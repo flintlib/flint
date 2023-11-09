@@ -15,20 +15,12 @@
 
 ******************************************************************************/
 
-#include "flint.h"
-#include "fmpq_poly.h"
-#include "nf.h"
+#include "test_helpers.h"
 #include "nf_elem.h"
 
-int main(void)
+TEST_FUNCTION_START(nf_elem_set_equal_si_ui, state)
 {
     int i;
-    flint_rand_t state;
-
-    flint_printf("set_si_ui...");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -135,8 +127,5 @@ int main(void)
         nf_clear(nf);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

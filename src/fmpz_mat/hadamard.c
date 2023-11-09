@@ -79,7 +79,7 @@ fmpz_mat_jacobsthal(fmpz_mat_t Q)
     q = fmpz_mat_nrows(Q);
 
     if (!(d = n_is_prime_power(&p, q)) || q % 2 == 0)
-        flint_throw(FLINT_ERROR, "Not an odd prime power in %s\n", __FUNCTION__);
+        flint_throw(FLINT_ERROR, "Not an odd prime power in %s\n", __func__);
 
     fmpz_init_set_ui(pp, p);
     fq_nmod_ctx_init(ctx, pp, d, "x");

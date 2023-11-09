@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
@@ -70,15 +71,10 @@ static void check_factorization(
     fmpz_poly_clear(t);
 }
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_poly_factor_cubic, state)
 {
     flint_bitcnt_t max_bits = 2000;
     slong i, tmul = 500;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("factor_cubic....");
-    fflush(stdout);
 
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
@@ -150,8 +146,5 @@ main(void)
         fmpz_poly_factor_clear(fac);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

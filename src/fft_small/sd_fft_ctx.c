@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2022 Daniel Schultz
 
     This file is part of FLINT.
@@ -22,7 +22,7 @@ void * flint_aligned_alloc(ulong alignment, ulong size)
     p = aligned_alloc(alignment, size);
 
     if (p == NULL)
-        flint_throw(FLINT_ERROR, "Unable to allocate %wu bytes with alignment %wu in %s\n", size, alignment, __FUNCTION__);
+        flint_throw(FLINT_ERROR, "Unable to allocate %wu bytes with alignment %wu in %s\n", size, alignment, __func__);
 
     return p;
 }

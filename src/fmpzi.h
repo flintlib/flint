@@ -79,10 +79,7 @@ fmpzi_conj(fmpzi_t res, const fmpzi_t x)
 FMPZI_INLINE void
 fmpzi_swap(fmpzi_t x, fmpzi_t y)
 {
-    fmpzi_struct t;
-    t = *x;
-    *x = *y;
-    *y = t;
+    FLINT_SWAP(fmpzi_struct, *x, *y);
 }
 
 FMPZI_INLINE void
@@ -194,6 +191,10 @@ void fmpzi_gcd_euclidean_improved(fmpzi_t res, const fmpzi_t x, const fmpzi_t y)
 void fmpzi_gcd_binary(fmpzi_t res, const fmpzi_t x, const fmpzi_t y);
 void fmpzi_gcd_shortest(fmpzi_t g, const fmpzi_t x, const fmpzi_t y);
 void fmpzi_gcd(fmpzi_t g, const fmpzi_t x, const fmpzi_t y);
+
+/* Primality check */
+int fmpzi_is_prime(const fmpzi_t n);
+int fmpzi_is_probabprime(const fmpzi_t n);
 
 #ifdef __cplusplus
 }

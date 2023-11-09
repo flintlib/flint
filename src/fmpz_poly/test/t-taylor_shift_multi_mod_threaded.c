@@ -9,21 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_poly_taylor_shift_multi_mod_threaded, state)
 {
 #if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     int i;
 #endif
-    FLINT_TEST_INIT(state);
-
-    flint_printf("taylor_shift_multi_mod....");
-    fflush(stdout);
 
 #if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
 
@@ -104,16 +99,8 @@ main(void)
         fmpz_clear(c);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
-
+    TEST_FUNCTION_END(state);
 #else
-   FLINT_TEST_CLEANUP(state);
-
-   flint_printf("SKIPPED\n");
-   return 0;
+    TEST_FUNCTION_END_SKIPPED(state);
 #endif
-
 }
-

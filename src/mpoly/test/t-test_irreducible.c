@@ -9,20 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
+#include "test_helpers.h"
 #include "mpoly.h"
 #include "fmpz_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(mpoly_test_irreducible, state)
 {
     slong i;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("test_irreducible....");
-    fflush(stdout);
 
     {
         fmpz_mpoly_ctx_t ctx;
@@ -120,10 +113,5 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
-    flint_printf("PASS\n");
-
-    FLINT_TEST_CLEANUP(state);
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

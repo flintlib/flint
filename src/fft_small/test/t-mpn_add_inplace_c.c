@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2023 Fredrik Johansson
 
     This file is part of FLINT.
@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
+#include "test_helpers.h"
 #include "mpn_extras.h"
 #include "fft_small.h"
 #include "crt_helpers.h"
@@ -34,18 +34,13 @@
             flint_abort(); \
         }
 
-
-int main(void)
+TEST_FUNCTION_START(flint_mpn_add_inplace_c, state)
 {
-    FLINT_TEST_INIT(state);
     slong iter;
-
-    flint_printf("mpn_add_inplace_c....");
-    fflush(stdout);
 
     _flint_rand_init_gmp(state);
 
-    for (iter = 0; iter < 1000; iter++)
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         mp_limb_t a[10], b[10], c[10];
         mp_size_t an, bn;
@@ -71,7 +66,7 @@ int main(void)
         }
     }
 
-    for (iter = 0; iter < 1000; iter++)
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         mp_limb_t a[8], b[8], c[8], d[8];
 
@@ -99,8 +94,5 @@ int main(void)
         TEST_SUB(8)
     }
 
-    FLINT_TEST_CLEANUP(state);
-    
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

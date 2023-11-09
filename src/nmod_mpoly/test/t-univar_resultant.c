@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "nmod_mpoly.h"
 
 void test_resultant(
@@ -59,14 +60,9 @@ void test_resultant(
     nmod_mpoly_clear(R, ctx);
 }
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_mpoly_univar_resultant, state)
 {
     slong i, j;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("univar_resultant....");
-    fflush(stdout);
 
     {
         nmod_mpoly_ctx_t ctx;
@@ -174,9 +170,5 @@ main(void)
         nmod_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

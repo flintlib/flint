@@ -15,20 +15,13 @@
 
 ******************************************************************************/
 
-#include "nmod.h"
+#include "test_helpers.h"
 #include "nmod_poly.h"
 #include "nf_elem.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nf_elem_get_nmod_poly, state)
 {
     int i, result;
-    flint_rand_t state;
-
-    flint_printf("get_nmod_poly....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -125,8 +118,5 @@ main(void)
         nf_clear(nf);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

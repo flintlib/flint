@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2009 William Hart
+    Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2013 Martin Lee
 
     This file is part of FLINT.
@@ -11,20 +11,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mod_poly_div_newton_n_preinv, state)
 {
     int i, result;
     fmpz_mod_ctx_t ctx;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("div_newton_n_preinv....");
-    fflush(stdout);
 
     fmpz_mod_ctx_init_ui(ctx, 2);
 
@@ -211,7 +206,6 @@ main(void)
         fmpz_clear(p);
     }
 
-
     /* Alias binv and q */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
@@ -274,8 +268,6 @@ main(void)
     }
 
     fmpz_mod_ctx_clear(ctx);
-    FLINT_TEST_CLEANUP(state);
 
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

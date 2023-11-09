@@ -9,21 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "ulong_extras.h"
 
-
-int main(void)
+TEST_FUNCTION_START(fmpz_primorial, state)
 {
     ulong k;
     fmpz_t x;
     fmpz_t y;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("primorial....");
-    fflush(stdout);
 
     fmpz_init(x);
     fmpz_init(y);
@@ -48,7 +42,5 @@ int main(void)
     fmpz_clear(x);
     fmpz_clear(y);
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

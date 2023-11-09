@@ -12,19 +12,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
+#include "test_helpers.h"
 #include "nmod_poly.h"
 #include "nmod_poly_factor.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_factor, state)
 {
     int iter;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("factor....");
-    fflush(stdout);
 
     /* Default algorithm */
     for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
@@ -246,8 +240,5 @@ main(void)
         nmod_poly_factor_clear(res2);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

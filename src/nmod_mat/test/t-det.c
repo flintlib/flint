@@ -9,19 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "nmod_mat.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_mat_det, state)
 {
     slong m, mod, rep;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("det....");
-    fflush(stdout);
 
     for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
     {
@@ -75,7 +70,5 @@ main(void)
         fmpz_clear(Bdet);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

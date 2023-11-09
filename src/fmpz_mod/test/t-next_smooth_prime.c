@@ -9,22 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_mod.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mod_next_smooth_prime, state)
 {
     slong i;
     fmpz_t p;
     int success;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("next_smooth_prime....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     fmpz_init_set_ui(p, 2);
 
@@ -46,8 +39,5 @@ main(void)
 
     fmpz_clear(p);
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

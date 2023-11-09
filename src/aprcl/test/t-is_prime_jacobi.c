@@ -9,16 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "aprcl.h"
 
-int main(void)
+TEST_FUNCTION_START(aprcl_is_prime_jacobi, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("is_prime_jacobi....");
-    fflush(stdout);
 
     /* Test _aprcl_is_prime_jacobi_check_pk() */
     {
@@ -105,7 +102,6 @@ int main(void)
         fmpz_clear(n);
         fmpz_clear(u);
     }
-
 
     /* Test _aprcl_is_prime_jacobi_check_2k() */
     {
@@ -232,8 +228,5 @@ int main(void)
         }
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -15,14 +15,7 @@
 void
 fmpz_mat_swap(fmpz_mat_t mat1, fmpz_mat_t mat2)
 {
-    if (mat1 != mat2)
-    {
-        fmpz_mat_struct tmp;
-
-        tmp = *mat1;
-        *mat1 = *mat2;
-        *mat2 = tmp;
-    }
+    FLINT_SWAP(fmpz_mat_struct, *mat1, *mat2);
 }
 
 void
@@ -40,18 +33,12 @@ fmpz_mat_swap_cols(fmpz_mat_t mat, slong * perm, slong r, slong s)
 {
     if (r != s && !fmpz_mat_is_empty(mat))
     {
-        slong t;
+        slong i;
 
-        if (perm)
-        {
-            t = perm[s];
-            perm[s] = perm[r];
-            perm[r] = t;
-        }
+        if (perm != NULL)
+            FLINT_SWAP(slong, perm[r], perm[s]);
 
-       for (t = 0; t < mat->r; t++)
-       {
-           fmpz_swap(fmpz_mat_entry(mat, t, r), fmpz_mat_entry(mat, t, s));
-       }
+       for (i = 0; i < mat->r; i++)
+           fmpz_swap(fmpz_mat_entry(mat, i, r), fmpz_mat_entry(mat, i, s));
     }
 }

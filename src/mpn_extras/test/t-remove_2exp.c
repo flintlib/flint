@@ -9,22 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "gmpcompat.h"
 #include "mpn_extras.h"
-#include "ulong_extras.h"
 
-int main(void)
+TEST_FUNCTION_START(flint_mpn_remove_2exp, state)
 {
     int zero, nonzero;
     flint_bitcnt_t check;
     mpz_t a;
     mpz_t b;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("remove_2exp....");
-    fflush(stdout);
 
     mpz_init(a);
     mpz_init(b);
@@ -49,7 +43,6 @@ int main(void)
 
     mpz_clear(a);
     mpz_clear(b);
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+
+    TEST_FUNCTION_END(state);
 }

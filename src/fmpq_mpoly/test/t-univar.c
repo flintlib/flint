@@ -9,17 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_mpoly_univar, state)
 {
     slong i, j, k;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("univar....");
-    fflush(stdout);
 
     /* Check mpoly -> mpoly_univar -> mpoly */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
@@ -104,9 +99,5 @@ main(void)
         fmpq_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

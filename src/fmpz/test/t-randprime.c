@@ -9,18 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "ulong_extras.h"
 
-int main(void)
+TEST_FUNCTION_START(fmpz_randprime, state)
 {
     int i;
     flint_bitcnt_t bits;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("randprime....");
-    fflush(stdout);
 
     for (bits=2; bits < 36; ++bits)
     {
@@ -101,8 +97,5 @@ int main(void)
         }
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

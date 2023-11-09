@@ -9,26 +9,21 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_xgcd_canonical_bezout, state)
 {
     int ix, result;
     fmpz_t maxval;
     fmpz_t nd, na, nb, nf, ng;
 
-    FLINT_TEST_INIT(state);
     fmpz_init(maxval);
 
     /* For uniformly random distributions,
      * about half the numbers should be represented as slongs */
     fmpz_set_d_2exp(maxval, 1.0, FLINT_BITS - 1);
-
-    flint_printf("xgcd_canonical_bezout....");
-    fflush(stdout);
 
     fmpz_init(nd);
     fmpz_init(na);
@@ -380,8 +375,5 @@ main(void)
     fmpz_clear(nf);
     fmpz_clear(ng);
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

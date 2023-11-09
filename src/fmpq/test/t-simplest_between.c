@@ -9,18 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_vec.h"
-#include "fmpz_poly.h"
 #include "fmpq.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_simplest_between, state)
 {
     slong i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("simplest_between....");
-    fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -148,8 +143,5 @@ main(void)
         fmpq_clear(r1);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

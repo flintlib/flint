@@ -14,6 +14,10 @@
 
 #include "thread_pool.h"
 
+#if FLINT_USES_PTHREAD && defined(HAVE_PTHREAD_NP_H)
+# include <pthread_np.h>
+#endif
+
 /*
     cpus[0] is cpu number for main thread
     cpus[1], ..., cpus[length - 1] are cpu numbers for elements of pool

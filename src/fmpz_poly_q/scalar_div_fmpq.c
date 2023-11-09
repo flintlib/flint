@@ -19,7 +19,7 @@ fmpz_poly_q_scalar_div_fmpq(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const fmp
     fmpz_t num, den;
 
     if (fmpz_sgn(fmpq_numref(x)) == 0)
-        flint_throw(FLINT_ERROR, "Division by zero in %s\n", __FUNCTION__);
+        flint_throw(FLINT_ERROR, "Division by zero in %s\n", __func__);
 
     fmpz_init(num);
     fmpz_init(den);

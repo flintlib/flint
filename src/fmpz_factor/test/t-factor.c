@@ -9,11 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "gmpcompat.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_factor.h"
 
+/* Defined in t-factor.c and t-factor_trial.c */
+#define check check_factor
 void check(fmpz_t n)
 {
     fmpz_factor_t factor;
@@ -89,6 +91,9 @@ void check(fmpz_t n)
     fmpz_factor_clear(factor);
 }
 
+/* Defined in t-factor.c and t-factor_smooth.c */
+#ifndef randprime
+#define randprime randprime
 void randprime(fmpz_t p, flint_rand_t state, slong bits)
 {
     fmpz_randbits(p, state, bits);
@@ -102,17 +107,14 @@ void randprime(fmpz_t p, flint_rand_t state, slong bits)
     while (!fmpz_is_probabprime(p))
        fmpz_add_ui(p, p, 2);
 }
+#endif
 
-int main(void)
+TEST_FUNCTION_START(fmpz_factor, state)
 {
     int i, j, k;
     fmpz_t x, y, z, n;
     fmpz_factor_t factors;
     mpz_t y1;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("factor....");
-    fflush(stdout);
 
     fmpz_init(x);
     mpz_init(y1);
@@ -373,8 +375,6 @@ int main(void)
     fmpz_clear(y);
     fmpz_clear(z);
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
+#undef check

@@ -9,31 +9,23 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fq_default_mat.h"
 
-#include "flint.h"
-#include "ulong_extras.h"
-
-int
-main(void)
+TEST_FUNCTION_START(fq_default_mat_set_fmpz_mat, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("set_fmpz_mat....");
-    fflush(stdout);
 
     for (i = 0; i < 1 * flint_test_multiplier(); i++)
     {
         fq_default_ctx_t ctx;
         fq_default_mat_t fq_mat1, fq_mat2;
-	fmpz_mat_t mat;
+        fmpz_mat_t mat;
         fmpz_t p;
         slong rows, cols;
 
-	rows = n_randint(state, 20);
-	cols = n_randint(state, 20);
+        rows = n_randint(state, 20);
+        cols = n_randint(state, 20);
 
         fmpz_init(p);
 
@@ -41,28 +33,28 @@ main(void)
 
         fq_default_ctx_init(ctx, p, 3, "x");
 
-	fmpz_mat_init(mat, rows, cols);
-	fmpz_mat_one(mat);
+        fmpz_mat_init(mat, rows, cols);
+        fmpz_mat_one(mat);
 
         fq_default_mat_init(fq_mat1, rows, cols, ctx);
-	fq_default_mat_init(fq_mat2, rows, cols, ctx);
+        fq_default_mat_init(fq_mat2, rows, cols, ctx);
 
         fq_default_mat_set_fmpz_mat(fq_mat1, mat, ctx);
 
-	fq_default_mat_one(fq_mat2, ctx);
+        fq_default_mat_one(fq_mat2, ctx);
 
-	result = fq_default_mat_equal(fq_mat1, fq_mat2, ctx);
+        result = fq_default_mat_equal(fq_mat1, fq_mat2, ctx);
         if (!result)
         {
-           flint_printf("FAIL: matrices not equal\n");
-	   fflush(stdout);
-	   flint_abort();
+            flint_printf("FAIL: matrices not equal\n");
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_mat_clear(mat);
 
         fq_default_mat_clear(fq_mat1, ctx);
-	fq_default_mat_clear(fq_mat2, ctx);
+        fq_default_mat_clear(fq_mat2, ctx);
 
         fq_default_ctx_clear(ctx);
 
@@ -99,9 +91,9 @@ main(void)
         result = fq_default_mat_equal(fq_mat1, fq_mat2, ctx);
         if (!result)
         {
-           flint_printf("FAIL: matrices not equal\n");
-           fflush(stdout);
-           flint_abort();
+            flint_printf("FAIL: matrices not equal\n");
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_mat_clear(mat);
@@ -144,9 +136,9 @@ main(void)
         result = fq_default_mat_equal(fq_mat1, fq_mat2, ctx);
         if (!result)
         {
-           flint_printf("FAIL: matrices not equal\n");
-           fflush(stdout);
-           flint_abort();
+            flint_printf("FAIL: matrices not equal\n");
+            fflush(stdout);
+            flint_abort();
         }
 
         fmpz_mat_clear(mat);
@@ -159,8 +151,5 @@ main(void)
         fmpz_clear(p);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-        return 0;
+    TEST_FUNCTION_END(state);
 }

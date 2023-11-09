@@ -9,12 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_poly_power_sums, state)
 {
     int i, j, k, l, den, result;
     fmpz_t il, jl, kl, dl;
@@ -22,10 +22,6 @@ main(void)
     fmpq_t tmp;
     fmpq_poly_t a, b, c, d;
     fmpz_poly_t az, bz;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("power_sums....");
 
     /* Check that it is valid in degree 3 with rational roots, ie */
     /* for polynomials of the form (dx-i)(dx-j)(dx-k)             */
@@ -141,7 +137,6 @@ main(void)
         fmpz_poly_clear(bz);
     }
 
-
     /* Check that the product of polynomials correspond to the sum of Power sums series */
     /* (and aliasing of fmpq_poly_power_sums)                                           */
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
@@ -180,8 +175,5 @@ main(void)
         fmpq_poly_clear(d);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

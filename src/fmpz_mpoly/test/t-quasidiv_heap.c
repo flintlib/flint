@@ -9,18 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_mpoly.h"
 
-
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mpoly_quasidiv_heap, state)
 {
     int result;
     slong i, j, tmul = 10;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("quasidiv_heap....");
-    fflush(stdout);
 
     /* Check f*g/g = f */
     for (i = 0; i < 10 * tmul * flint_test_multiplier(); i++)
@@ -370,9 +365,5 @@ main(void)
         fmpz_clear(s2);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

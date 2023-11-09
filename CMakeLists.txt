@@ -164,7 +164,7 @@ endif()
 
 set(_HEADERS
     NTL-interface.h flint.h longlong.h flint-config.h gmpcompat.h fft_tuning.h
-    profiler.h templates.h exception.h hashmap.h
+    profiler.h templates.h exception.h
 )
 string(REGEX REPLACE "([A-Za-z0-9_-]+\.h;|[A-Za-z0-9_-]+\.h$)" "src/\\1" HEADERS "${_HEADERS}")
 
@@ -208,7 +208,7 @@ if(cxx_thread_local IN_LIST CMAKE_CXX_COMPILE_FEATURES)
 endif()
 
 # Memory manager configuration
-set(MEMORY_MANAGER "reentrant" CACHE STRING "The FLINT memory manager.")
+set(MEMORY_MANAGER "single" CACHE STRING "The FLINT memory manager.")
 set_property(CACHE MEMORY_MANAGER PROPERTY STRINGS single reentrant gc)
 message(STATUS "Using FLINT memory manager: ${MEMORY_MANAGER}")
 
@@ -371,9 +371,9 @@ set_target_properties(flint
 
 if(BUILD_TESTING)
     enable_testing()
-    foreach (build_dir IN LISTS BUILD_DIRS CMAKE_CURRENT_SOURCE_DIR)
-        file(GLOB TEST_FILES "${build_dir}/test/*.c*")
-        foreach(test_file IN LISTS TEST_FILES)
+    foreach(build_dir IN LISTS BUILD_DIRS CMAKE_CURRENT_SOURCE_DIR)
+        file(GLOB test_file "${build_dir}/test/main.c")
+        if(test_file)
             file(RELATIVE_PATH test_name ${CMAKE_CURRENT_SOURCE_DIR} ${test_file})
             string(REPLACE "/" "-" test_name ${test_name})
             get_filename_component(test_name ${test_name} NAME_WE)
@@ -391,7 +391,7 @@ if(BUILD_TESTING)
                 LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
                 RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin"
             )
-        endforeach()
+        endif()
     endforeach ()
 
     if(WITH_NTL)

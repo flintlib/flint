@@ -13,17 +13,13 @@
 
 #ifdef T
 
+#include "test_helpers.h"
 #include "templates.h"
 #include "fmpz.h"
 
-int
-main(void)
+TEST_TEMPLATE_FUNCTION_START(T, poly_factor_is_squarefree, state)
 {
     int iter;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("is_squarefree....");
-    fflush(stdout);
 
     for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
     {
@@ -95,10 +91,6 @@ main(void)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
-
 #endif

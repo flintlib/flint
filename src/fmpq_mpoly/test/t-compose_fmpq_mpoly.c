@@ -9,16 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_mpoly_compose_fmpq_mpoly, state)
 {
     slong i, j, v;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("compose_fmpq_mpoly....");
-    fflush(stdout);
 
     {
         fmpq_mpoly_t A, A1, A2, B;
@@ -344,8 +340,5 @@ main(void)
         fmpq_clear(ge);
     }
 
-    printf("PASS\n");
-    FLINT_TEST_CLEANUP(state);
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }

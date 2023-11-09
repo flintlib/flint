@@ -9,20 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-
-#include "qadic.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
+#include "qadic.h"
 
-int
-main(void)
+TEST_FUNCTION_START(qadic_exp_balanced, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("exp_balanced... ");
-    fflush(stdout);
-
-
 
     /* Check aliasing */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -130,9 +123,5 @@ main(void)
         qadic_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

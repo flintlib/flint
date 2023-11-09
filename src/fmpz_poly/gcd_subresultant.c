@@ -64,11 +64,9 @@ _fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1, slong len1,
             if (lenA <= 1)
                 break;
 
-            {                       /* Swap A and B */
-                fmpz *T;
-                slong len;
-                T = A, A = B, B = T, len = lenA, lenA = lenB, lenB = len;
-            }
+            /* Swap A and B */
+            FLINT_SWAP(fmpz *, A, B);
+            FLINT_SWAP(slong, lenA, lenB);
 
             if (delta == 1)
             {

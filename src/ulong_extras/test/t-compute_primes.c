@@ -10,20 +10,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 
-int main(void)
+TEST_FUNCTION_START(compute_primes, state)
 {
     slong i, lim = 1000000;
     n_primes_t pg;
     mp_limb_t * ref_primes;
     double * ref_inverses;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("compute_primes....");
-    fflush(stdout);
-
 
     ref_primes = flint_malloc(sizeof(mp_limb_t) * lim);
     ref_inverses = flint_malloc(sizeof(double) * lim);
@@ -64,9 +59,6 @@ int main(void)
 
     flint_free(ref_primes);
     flint_free(ref_inverses);
-    FLINT_TEST_CLEANUP(state);
 
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

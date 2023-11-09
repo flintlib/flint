@@ -9,133 +9,75 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
+#include "test_helpers.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_div_2exp, state)
 {
-    int i;
-    FLINT_TEST_INIT(state);
+    int i, result;
 
-
-    flint_printf("div_2exp....");
-    fflush(stdout);
-
-    /* x = y * 2^exp */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        fmpq_t x, y;
-        mpq_t X, Y;
-        flint_bitcnt_t c;
+        fmpq_t a, b;
+        mpq_t c, d, e;
+        flint_bitcnt_t exp;
+        int aliasing;
 
-        fmpq_init(x);
-        fmpq_init(y);
-        mpq_init(X);
-        mpq_init(Y);
+        fmpq_init(a);
+        fmpq_init(b);
 
-        fmpq_randtest(x, state, 200);
-        fmpq_randtest(y, state, 200);
+        mpq_init(c);
+        mpq_init(d);
+        mpq_init(e);
 
-        if (n_randint(state, 5) == 0)
-            fmpz_mul_2exp(fmpq_numref(y), fmpq_numref(y), n_randint(state, 200));
-        else if (n_randint(state, 5) == 0)
-            fmpz_mul_2exp(fmpq_denref(y), fmpq_denref(y), n_randint(state, 200));
-        fmpq_canonicalise(y);
-
-        c = n_randint(state, 200);
-        fmpq_div_2exp(x, y, c);
-
-        if (!fmpq_is_canonical(x))
+        fmpq_randtest(a, state, 200);
+        switch (n_randint(state, 5))
         {
-            flint_printf("FAIL: result not canonical!\n");
-            flint_printf("x = ");
-            fmpq_print(x);
-            flint_printf("\ny = ");
-            fmpq_print(y);
-            flint_printf("\nc = %wu\n", c);
+            case 0:
+                fmpz_mul_2exp(fmpq_numref(a), fmpq_numref(a), n_randint(state, 200));
+                fmpq_canonicalise(a);
+                break;
+            case 1:
+                fmpz_mul_2exp(fmpq_denref(a), fmpq_denref(a), n_randint(state, 200));
+                fmpq_canonicalise(a);
+                break;
+        }
+        fmpq_get_mpq(c, a);
+
+        exp = n_randint(state, 200);
+
+        aliasing = n_randint(state, 2);
+
+        if (aliasing == 0)
+        {
+            fmpq_div_2exp(b, a, exp);
+        }
+        else
+        {
+            fmpq_set(b, a);
+            fmpq_div_2exp(b, b, exp);
+        }
+
+        mpq_div_2exp(d, c, exp);
+
+        fmpq_get_mpq(e, b);
+
+        result = (mpq_cmp(d, e) == 0) && fmpq_is_canonical(b);
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            gmp_printf("c = %Qd, d = %Qd, e = %Qd, exp = %Md\n", c, d, e, exp);
             fflush(stdout);
             flint_abort();
         }
 
-        fmpq_get_mpq(X, x);
-        fmpq_get_mpq(Y, y);
-        mpq_div_2exp(X, Y, c);
-        fmpq_get_mpq(Y, x);
+        fmpq_clear(a);
+        fmpq_clear(b);
 
-        if (!mpq_equal(X, Y))
-        {
-            flint_printf("FAIL: fmpq_div_2exp(x,y,c) != mpq_div_2exp(X,Y,c)\n");
-            flint_printf("x = ");
-            fmpq_print(x);
-            flint_printf("\ny = ");
-            fmpq_print(y);
-            flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpq_clear(x);
-        fmpq_clear(y);
-        mpq_clear(X);
-        mpq_clear(Y);
+        mpq_clear(c);
+        mpq_clear(d);
+        mpq_clear(e);
     }
 
-    /* y = y * 2^exp */
-    for (i = 0; i < 10000; i++)
-    {
-        fmpq_t x, y;
-        flint_bitcnt_t c;
-
-        fmpq_init(x);
-        fmpq_init(y);
-
-        fmpq_randtest(x, state, 200);
-        fmpq_randtest(y, state, 200);
-
-        if (n_randint(state, 5) == 0)
-            fmpz_mul_2exp(fmpq_numref(y), fmpq_numref(y), n_randint(state, 200));
-        else if (n_randint(state, 5) == 0)
-            fmpz_mul_2exp(fmpq_denref(y), fmpq_denref(y), n_randint(state, 200));
-        fmpq_canonicalise(y);
-
-        c = n_randint(state, 200);
-        fmpq_div_2exp(x, y, c);
-        fmpq_div_2exp(y, y, c);
-
-        if (!fmpq_is_canonical(y))
-        {
-            flint_printf("FAIL: result not canonical!\n");
-            flint_printf("x = ");
-            fmpq_print(x);
-            flint_printf("\ny = ");
-            fmpq_print(y);
-            flint_printf("\nc = %wu\n", c);
-            fflush(stdout);
-            flint_abort();
-        }
-
-        if (!fmpq_equal(x, y))
-        {
-            flint_printf("FAIL: fmpq_div_2exp(x,y,c) != fmpq_div_2exp(y,y,c)\n");
-            flint_printf("x = ");
-            fmpq_print(x);
-            flint_printf("\ny = ");
-            fmpq_print(y);
-            flint_printf("\nc = %wu\n", c);
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpq_clear(x);
-        fmpq_clear(y);
-    }
-
-
-
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

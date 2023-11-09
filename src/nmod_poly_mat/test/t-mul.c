@@ -9,19 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
+#include "test_helpers.h"
 #include "nmod_mat.h"
 #include "nmod_poly_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_mat_mul, state)
 {
     slong i;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("mul....");
-    fflush(stdout);
 
     /* Check evaluation homomorphism */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -167,8 +161,5 @@ main(void)
         nmod_poly_mat_clear(C);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

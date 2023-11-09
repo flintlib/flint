@@ -9,19 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_ndiv_qr, state)
 {
     slong i;
     int result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("ndiv_qr....");
-    fflush(stdout);
 
     /* Check that a = b * nquo + nrem, and that nrem is smallest */
     for (i = 0; i < 30000 * flint_test_multiplier(); i++)
@@ -171,8 +166,5 @@ main(void)
         fmpz_clear(trem);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

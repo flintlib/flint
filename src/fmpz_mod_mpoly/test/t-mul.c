@@ -9,18 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_mod_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mod_mpoly_mul, state)
 {
     slong i, j, max_threads = 5;
     slong tmul = 10;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("mul....");
-    fflush(stdout);
 
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
@@ -163,9 +158,5 @@ main(void)
         fmpz_mod_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

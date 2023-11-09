@@ -9,20 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-int main(void)
+TEST_FUNCTION_START(n_is_prime_pseudosquare, state)
 {
    int i, result;
    mp_limb_t d;
    mpz_t d_m;
-   FLINT_TEST_INIT(state);
-
-
-   flint_printf("is_prime_pseudosquare....");
-   fflush(stdout);
 
    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test that primes pass the test */
    {
@@ -71,8 +66,5 @@ int main(void)
       mpz_clear(d_m);
    }
 
-   FLINT_TEST_CLEANUP(state);
-
-   flint_printf("PASS\n");
-   return 0;
+   TEST_FUNCTION_END(state);
 }

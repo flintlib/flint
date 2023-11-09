@@ -686,12 +686,12 @@ _gr_fmpq_vec_is_zero(const fmpq * vec, slong len, gr_ctx_t ctx)
 }
 
 int
-_gr_fmpq_vec_equal(const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
+_gr_fmpq_vec_equal(const fmpq * vec1, const fmpq * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
 
     for (i = 0; i < len; i++)
-        if (!fmpz_equal(vec1 + i, vec2 + i))
+        if (!fmpq_equal(vec1 + i, vec2 + i))
             return T_FALSE;
 
     return T_TRUE;

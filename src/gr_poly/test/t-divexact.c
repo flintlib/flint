@@ -9,18 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "gr_poly.h"
 
-int main(void)
+TEST_FUNCTION_START(gr_poly_divexact, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("divexact....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000; iter++)
     {
@@ -102,6 +97,7 @@ int main(void)
                     || (ctx->which_ring == GR_CTX_FMPZ && status != GR_SUCCESS)))
             {
                 flint_printf("FAIL\n\n");
+                flint_printf("%d\n", status);
                 gr_ctx_println(ctx);
                 flint_printf("A = "); gr_poly_print(A, ctx); flint_printf("\n");
                 flint_printf("B = "); gr_poly_print(B, ctx); flint_printf("\n");
@@ -119,8 +115,5 @@ int main(void)
         gr_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

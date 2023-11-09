@@ -9,16 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_vec.h"
 #include "fmpq.h"
 #include "fmpq_vec.h"
 
-int main(void)
+TEST_FUNCTION_START(fmpq_vec_get_set_fmpz_vec, state)
 {
     int iter;
-    FLINT_TEST_INIT(state);
-
-    printf("get_set_fmpz_vec....");
 
     for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
     {
@@ -58,8 +56,5 @@ int main(void)
         fmpz_clear(d);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

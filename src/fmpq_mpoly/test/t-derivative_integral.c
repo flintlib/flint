@@ -9,17 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_mpoly_derivative_integral, state)
 {
     int i, j, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("derivative/integral....");
-    fflush(stdout);
-
 
     /* Check d(f*g) = df*g + f*dg */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -103,7 +98,6 @@ main(void)
         fmpq_mpoly_clear(t1, ctx);
         fmpq_mpoly_clear(t2, ctx);
     }
-
 
     /* Check d(f*g) = df*g + f*dg with aliasing */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -247,9 +241,5 @@ main(void)
         fmpq_mpoly_clear(f1, ctx);
     }
 
-
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

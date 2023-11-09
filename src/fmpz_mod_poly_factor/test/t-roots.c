@@ -9,12 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 #include "fmpz_mod_poly_factor.h"
 
+/* Defined in t-roots.c and t-roots_factored.c */
+#define test_poly test_poly_roots
 void test_poly(
     fmpz_mod_poly_factor_t roots,
     const fmpz_mod_poly_t f,
@@ -83,16 +85,10 @@ void test_poly(
     fmpz_mod_poly_clear(r, ctx);
 }
 
-
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mod_poly_factor_roots, state)
 {
     slong i, j, k, l;
     fmpz_mod_ctx_t ctx;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("roots....");
-    fflush(stdout);
 
     fmpz_mod_ctx_init_ui(ctx, 2);
 
@@ -148,8 +144,7 @@ main(void)
     }
 
     fmpz_mod_ctx_clear(ctx);
-    FLINT_TEST_CLEANUP(state);
 
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
+#undef test_poly

@@ -68,7 +68,7 @@ static ulong crt_data_find_bn_bound(const crt_data_t C, ulong bits)
     }
 
     TMP_END;
-    return bound;    
+    return bound;
 }
 
 /*

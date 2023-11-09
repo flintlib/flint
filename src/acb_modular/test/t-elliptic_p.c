@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb.h"
 #include "acb_modular.h"
 
@@ -38,15 +39,9 @@ acb_set_dddd(acb_t z, double a, double ar, double b, double br)
     mag_set_d(arb_radref(acb_imagref(z)), br);
 }
 
-int main(void)
+TEST_FUNCTION_START(acb_modular_elliptic_p, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("elliptic_p....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* check test values */
     for (iter = 0; iter < 100 * 0.1 * flint_test_multiplier(); iter++)
@@ -163,9 +158,7 @@ int main(void)
         acb_clear(p2);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
+#undef NUM_TESTS
+#undef EPS

@@ -177,20 +177,7 @@ void nmod_poly_set(nmod_poly_t a, const nmod_poly_t b)
 NMOD_POLY_INLINE
 void nmod_poly_swap(nmod_poly_t poly1, nmod_poly_t poly2)
 {
-    slong t;
-    mp_ptr tp;
-
-    t = poly1->alloc;
-    poly1->alloc = poly2->alloc;
-    poly2->alloc = t;
-
-    t = poly1->length;
-    poly1->length = poly2->length;
-    poly2->length = t;
-
-    tp = poly1->coeffs;
-    poly1->coeffs = poly2->coeffs;
-    poly2->coeffs = tp;
+    FLINT_SWAP(nmod_poly_struct, *poly1, *poly2);
 }
 
 NMOD_POLY_INLINE
@@ -367,10 +354,10 @@ void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1);
 /* Scalar multiplication and division  ***************************************/
 
 void nmod_poly_scalar_mul_nmod(nmod_poly_t res,
-                                         const nmod_poly_t poly1, mp_limb_t c);
+                               const nmod_poly_t poly, mp_limb_t c);
 
-void nmod_poly_scalar_addmul_nmod(nmod_poly_t A, const nmod_poly_t B,
-                                                                      ulong x);
+void nmod_poly_scalar_addmul_nmod(nmod_poly_t res,
+                                  const nmod_poly_t poly, ulong c);
 
 void _nmod_poly_make_monic(mp_ptr output,
                                    mp_srcptr input, slong len, nmod_t mod);
@@ -925,26 +912,8 @@ void _nmod_poly_compose_series(mp_ptr res, mp_srcptr poly1, slong len1,
 void nmod_poly_compose_series(nmod_poly_t res,
                     const nmod_poly_t poly1, const nmod_poly_t poly2, slong n);
 
-void _nmod_poly_revert_series_lagrange(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod);
-
-void nmod_poly_revert_series_lagrange(nmod_poly_t Qinv,
-                                 const nmod_poly_t Q, slong n);
-
-void _nmod_poly_revert_series_lagrange_fast(mp_ptr Qinv, mp_srcptr Q,
-    slong n, nmod_t mod);
-
-void nmod_poly_revert_series_lagrange_fast(nmod_poly_t Qinv,
-                                 const nmod_poly_t Q, slong n);
-
-void _nmod_poly_revert_series_newton(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod);
-
-void nmod_poly_revert_series_newton(nmod_poly_t Qinv,
-                                 const nmod_poly_t Q, slong n);
-
-void _nmod_poly_revert_series(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod);
-
-void nmod_poly_revert_series(nmod_poly_t Qinv,
-                                 const nmod_poly_t Q, slong n);
+void _nmod_poly_revert_series(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod);
+void nmod_poly_revert_series(nmod_poly_t Qinv, const nmod_poly_t Q, slong n);
 
 /* norms *********************************************************************/
 

@@ -523,6 +523,10 @@ int nmod_mpolyn_interp_crt_sm_bpoly(
 
 /*****************************************************************************/
 
+/* The following functions are currently undocumented, unused. */
+
+#if 0
+
 /*
     E = A(x_var = alpha)
     A is in Fp[x_0, ..., x_(var-2), x_(var-1)][x_var]
@@ -639,7 +643,6 @@ void nmod_mpolyn_interp_lift_sm_mpolyn(
     }
     A->length = Ai;
 }
-
 
 /*
     T = F + modulus*(A - F(x_var = alpha))
@@ -787,6 +790,8 @@ int nmod_mpolyn_interp_crt_sm_mpolyn(
     *lastdeg_ = FLINT_MAX(*lastdeg_, lastdeg);
     return changed;
 }
+
+#endif
 
 
 /****************************************************************************/

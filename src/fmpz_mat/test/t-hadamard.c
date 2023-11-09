@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_mat.h"
 
 int should_have_hadamard(int n)
@@ -26,14 +27,9 @@ int should_have_hadamard(int n)
     return 0;
 }
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mat_hadamard, state)
 {
     int n;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("hadamard....");
-    fflush(stdout);
 
     for (n = 0; n <= 300; n++)
     {
@@ -64,7 +60,5 @@ main(void)
         fmpz_mat_clear(h);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

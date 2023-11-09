@@ -9,26 +9,22 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "mpn_extras.h"
 #include "fft.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fft_mulmod_2expp1, state)
 {
-    flint_bitcnt_t depth, w;
+    flint_bitcnt_t depth, w, maxdepth;
     int iters;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("mulmod_2expp1....");
-    fflush(stdout);
-
 
     _flint_rand_init_gmp(state);
 
+    maxdepth = (flint_test_multiplier() > 10) ? 18 : 15;
+
     for (iters = 0; iters < 100; iters++)
     {
-        for (depth = 6; depth <= 18; depth++)
+        for (depth = 6; depth <= maxdepth; depth++)
         {
             for (w = 1; w <= 2; w++)
             {
@@ -78,7 +74,7 @@ main(void)
     /* test squaring */
     for (iters = 0; iters < 100; iters++)
     {
-        for (depth = 6; depth <= 18; depth++)
+        for (depth = 6; depth <= maxdepth; depth++)
         {
             for (w = 1; w <= 2; w++)
             {
@@ -122,8 +118,5 @@ main(void)
         }
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

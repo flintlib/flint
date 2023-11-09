@@ -56,9 +56,7 @@ void ca_mat_clear(ca_mat_t mat, ca_ctx_t ctx);
 CA_MAT_INLINE void
 ca_mat_swap(ca_mat_t mat1, ca_mat_t mat2, ca_ctx_t ctx)
 {
-    ca_mat_struct t = *mat1;
-    *mat1 = *mat2;
-    *mat2 = t;
+    FLINT_SWAP(ca_mat_struct, *mat1, *mat2);
 }
 
 /* Window matrices */
@@ -249,19 +247,10 @@ _ca_mat_swap_rows(ca_mat_t mat, slong * perm, slong r, slong s)
 {
     if (r != s)
     {
-        ca_ptr u;
-        slong t;
-
         if (perm != NULL)
-        {
-            t = perm[s];
-            perm[s] = perm[r];
-            perm[r] = t;
-        }
+            FLINT_SWAP(slong, perm[r], perm[s]);
 
-        u = mat->rows[s];
-        mat->rows[s] = mat->rows[r];
-        mat->rows[r] = u;
+        FLINT_SWAP(ca_ptr, mat->rows[r], mat->rows[s]);
     }
 }
 

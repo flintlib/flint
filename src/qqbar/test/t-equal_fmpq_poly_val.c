@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq_poly.h"
 #include "qqbar.h"
 
@@ -24,15 +25,9 @@ qqbar_equal_fmpq_poly_val2(const qqbar_t x, const fmpq_poly_t f, const qqbar_t y
     return found;
 }
 
-int main(void)
+TEST_FUNCTION_START(qqbar_equal_fmpq_poly_val, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("equal_fmpq_poly_val....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -89,8 +84,5 @@ int main(void)
         fmpq_poly_clear(f);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

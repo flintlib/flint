@@ -130,7 +130,7 @@ Factorisation
     degree ``d``, finds all those factors and places them in factors.
     Requires that ``pol`` be monic, non-constant and squarefree.
 
-.. function:: void fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_t poly, slong * const *degs, const fmpz_mod_ctx_t ctx)
+.. function:: void fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_t poly, slong * const * degs, const fmpz_mod_ctx_t ctx)
 
     Factorises a monic non-constant squarefree polynomial ``poly``
     of degree `n` into factors `f[d]` such that for `1 \leq d \leq n`
@@ -141,7 +141,7 @@ Factorisation
 
     Requires that ``degs`` has enough space for `(n/2)+1 * sizeof(slong)`.
 
-.. function:: void fmpz_mod_poly_factor_distinct_deg_threaded(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_t poly, slong * const *degs, const fmpz_mod_ctx_t ctx)
+.. function:: void fmpz_mod_poly_factor_distinct_deg_threaded(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_t poly, slong * const * degs, const fmpz_mod_ctx_t ctx)
 
     Multithreaded version of :func:`fmpz_mod_poly_factor_distinct_deg`.
 
@@ -174,7 +174,7 @@ Factorisation
     Factorises a non-constant polynomial ``f`` into monic irreducible
     factors using the Berlekamp algorithm.
 
-.. function:: void _fmpz_mod_poly_interval_poly_worker(void* arg_ptr)
+.. function:: void _fmpz_mod_poly_interval_poly_worker(void * arg_ptr)
 
     Worker function to compute interval polynomials in distinct degree
     factorisation. Input/output is stored in

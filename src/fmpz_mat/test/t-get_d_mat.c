@@ -11,18 +11,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mat_get_d_mat, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("get_d_mat....");
-    fflush(stdout);
 
     /* set entries of an fmpz_mat, convert to d_mat and then check that
        the entries remain same */
@@ -66,9 +61,5 @@ main(void)
         d_mat_clear(B);
     }
 
-
-
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -9,20 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-int main(void)
+TEST_FUNCTION_START(fmpz_poly_eulerian_polynomial, state)
 {
     ulong n, ix, mx;
     fmpz_t sum, fac;
     fmpz_poly_t poly;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("eulerian_polynomial....");
-    fflush(stdout);
 
     fmpz_poly_init(poly);
     fmpz_init(sum);
@@ -87,8 +82,5 @@ int main(void)
     fmpz_clear(sum);
     fmpz_clear(fac);
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

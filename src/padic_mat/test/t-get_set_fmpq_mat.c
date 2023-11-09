@@ -9,12 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpq_mat.h"
 #include "padic_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(padic_mat_get_set_fmpq_mat, state)
 {
     int i, result;
 
@@ -22,11 +22,6 @@ main(void)
     slong N;
     padic_ctx_t ctx;
     slong m, n;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("get/ set_fmpq_mat... ");
-    fflush(stdout);
 
     /* Qp -> QQ -> Qp */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -70,9 +65,5 @@ main(void)
         padic_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

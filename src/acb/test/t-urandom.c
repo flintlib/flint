@@ -9,25 +9,21 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb.h"
 
 #define N 10000
 
 /* same as t-urandom in arb/, but ignore variance */
-int main(void)
+TEST_FUNCTION_START(acb_urandom, state)
 {
     slong iter;
     slong prec;
-    flint_rand_t state;
     acb_ptr rand;
     acb_t m; /* mean */
     acb_t mp;
     arb_t tol;
 
-    flint_printf("urandom....");
-    fflush(stdout);
-
-    flint_randinit(state);
     acb_init(m);
     acb_init(mp);
     arb_init(tol);
@@ -57,8 +53,7 @@ int main(void)
     acb_clear(m);
     acb_clear(mp);
     arb_clear(tol);
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+
+    TEST_FUNCTION_END(state);
 }
+#undef N

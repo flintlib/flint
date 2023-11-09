@@ -9,10 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz_poly_mat.h"
+#include "test_helpers.h"
 #include "perm.h"
-#include "ulong_extras.h"
+#include "fmpz_poly_mat.h"
 
 /* checks that the rref has the right form */
 int check_rref(const fmpz_poly_mat_t A, const fmpz_poly_t den, slong rank)
@@ -55,16 +54,9 @@ int check_rref(const fmpz_poly_mat_t A, const fmpz_poly_t den, slong rank)
     return 1;
 }
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_poly_mat_rref, state)
 {
     slong iter;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("rref....");
-    fflush(stdout);
-
-
 
     for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
     {
@@ -155,9 +147,5 @@ main(void)
         fmpz_poly_mat_clear(R2);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

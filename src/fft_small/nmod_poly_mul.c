@@ -90,7 +90,7 @@ static void _mod_red(
             {
                 vec8n t = vec8n_load_unaligned(a + i + j);
                 vec8d_store_aligned(aI + j, vec8n_convert_limited_vec8d(t));
-            }            
+            }
         }
 
         vec8d n = vec8d_set_d(fft->p);
@@ -1275,7 +1275,7 @@ P2 = A1*B1
 P1 = (A0 + A1)*(B0 + B1)
 P0 = A0*B0
 
-then 
+then
 
 # P = P0 + (P1 - P2 - P0)*x^k + P2*x^2k
 */
@@ -1365,8 +1365,8 @@ void _nmod_poly_mul_mid(
 
     if (an < bn)
     {
-        PTR_SWAP(const ulong, a, b);
-        ULONG_SWAP(an, bn);
+        FLINT_SWAP(const ulong *, a, b);
+        FLINT_SWAP(ulong, an, bn);
     }
 
     if (zl > bn - 1)
@@ -1419,7 +1419,7 @@ void _nmod_poly_mul_mid(
         else if (0)
         {
             /*
-                two pieces 
+                two pieces
                 +----------------+
                 |             |\ |
                 |             | \|
@@ -1432,7 +1432,7 @@ void _nmod_poly_mul_mid(
         else
         {
             /*
-                two pieces 
+                two pieces
                 +----------------+
                 |           \    |
                 |            \   |

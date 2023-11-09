@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "gr_poly.h"
 
@@ -91,15 +92,9 @@ test_inv_series(flint_rand_t state, int which)
     return status;
 }
 
-int main(void)
+TEST_FUNCTION_START(gr_poly_inv_series, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("inv_series....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000; iter++)
     {
@@ -111,8 +106,5 @@ int main(void)
         test_inv_series(state, 5);
     }
 
-    flint_randclear(state);
-    flint_cleanup_master();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

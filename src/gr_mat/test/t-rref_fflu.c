@@ -1,6 +1,20 @@
+/*
+    Copyright (C) 2022 Fredrik Johansson
 
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
+
+#include "test_helpers.h"
 #include "gr_mat.h"
 
+/* Defined in t-rref_den_fflu.c, t-rref_fflu.c and t-rref_lu.c */
+#ifndef gr_mat_randrowops
+#define gr_mat_randrowops gr_mat_randrowops
 /* todo: make a function */
 int
 gr_mat_randrowops(gr_mat_t mat, flint_rand_t state, slong count, gr_ctx_t ctx)
@@ -28,17 +42,11 @@ gr_mat_randrowops(gr_mat_t mat, flint_rand_t state, slong count, gr_ctx_t ctx)
 
     return status;
 }
+#endif
 
-int main(void)
+TEST_GR_FUNCTION_START(gr_mat_rref_fflu, state, count_success, count_unable, count_domain)
 {
     slong iter;
-    slong count_success = 0, count_unable = 0, count_domain = 0;
-    flint_rand_t state;
-
-    flint_printf("rref_fflu...");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* Check that random row/column operations preserve rank */
     for (iter = 0; iter < 10000; iter++)
@@ -96,8 +104,5 @@ int main(void)
         gr_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf(" [%wd success, %wd domain, %wd unable] PASS\n", count_success, count_domain, count_unable);
-    return 0;
+    TEST_GR_FUNCTION_END(state, count_success, count_unable, count_domain);
 }

@@ -10,13 +10,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gr_poly.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
 void
 _fmpz_poly_revert_series(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
 {
-    _fmpz_poly_revert_series_lagrange_fast(Qinv, Q, Qlen, n);
+    gr_ctx_t ctx;
+    gr_ctx_init_fmpz(ctx);
+    GR_MUST_SUCCEED(_gr_poly_revert_series(Qinv, Q, Qlen, n, ctx));
 }
 
 void

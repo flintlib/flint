@@ -708,7 +708,7 @@ static void fq_nmod_polyu3_add_zip_limit1(
             for (j = Z->length; j > Zi; j--)
             {
                 n_poly_swap(Zcoeffs + j, Zcoeffs + j - 1);
-                ULONG_SWAP(Zexps[j], Zexps[j - 1]);
+                FLINT_SWAP(ulong, Zexps[j], Zexps[j - 1]);
             }
 
             Z->length++;

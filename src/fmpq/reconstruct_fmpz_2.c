@@ -769,8 +769,8 @@ again:
     /* a = s; b = t */
     s->_mp_size = s_len;
     t->_mp_size = t_len;
-    FLINT_MPZ_PTR_SWAP(a, s);
-    FLINT_MPZ_PTR_SWAP(b, t);
+    FLINT_SWAP(mpz_ptr, a, s);
+    FLINT_SWAP(mpz_ptr, b, t);
 
     /* so a > n. see if further a > n >= b. */
     if (t_len < n_len || (t_len == n_len && mpn_cmp(t_ptr, n_ptr, n_len) <= 0))

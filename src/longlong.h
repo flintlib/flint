@@ -243,46 +243,6 @@ static __inline__ flint_bitcnt_t flint_ctz(mp_limb_t x)
 
 #endif /* x86 */
 
-/* Itanium */
-#if (GMP_LIMB_BITS == 64 && defined (__ia64))
-
-/* This form encourages gcc (pre-release 3.4 at least) to emit predicated
-   "sub r=r,r" and "sub r=r,r,1", giving a 2 cycle latency.  The generic
-   code using "al<bl" arithmetically comes out making an actual 0 or 1 in a
-   register, which takes an extra cycle.  */
-#define sub_ddmmss(sh, sl, ah, al, bh, bl)      \
-  do {                                          \
-    mp_limb_t __x;                              \
-    __x = (al) - (bl);                          \
-    if ((mp_limb_t) (al) < (mp_limb_t) (bl))    \
-      (sh) = (ah) - (bh) - 1;                   \
-    else                                        \
-      (sh) = (ah) - (bh);                       \
-    (sl) = __x;                                 \
-  } while (0)
-
-#ifndef FLINT_HAS_CTZ
-# define flint_ctz(x)                       \
-({                                          \
-    mp_limb_t __ctz_x = (x);                \
-    mp_limb_t count;                        \
-    __asm__ ("popcnt %0 = %1"               \
-            : "=r" (count)                  \
-            : "r" ((__ctz_x-1) & ~__ctz_x));\
-    count;                                  \
-})
-#endif
-
-/* Do both product parts in assembly, since that gives better code with
-   all gcc versions.  Some callers will just use the upper part, and in
-   that situation we waste an instruction, but not any cycles.  */
-#define umul_ppmm(ph, pl, m0, m1)                                 \
-    __asm__ ("xma.hu %0 = %2, %3, f0\n\txma.l %1 = %2, %3, f0"		\
-	     : "=&f" (ph), "=f" (pl)				                       	\
-	     : "f" (m0), "f" (m1))
-
-#endif /* Itanium */
-
 /* ARM */
 #if (GMP_LIMB_BITS == 32 && defined (__arm__))
 
@@ -416,7 +376,6 @@ static __inline__ flint_bitcnt_t flint_ctz(mp_limb_t x)
 #endif
 
 #if !(GMP_LIMB_BITS == 32 && defined (__arm__))
-#if !(GMP_LIMB_BITS == 64 && defined (__ia64))
 #if !defined(__arm64__)
 
 #define umul_ppmm(w1, w0, u, v)				 \
@@ -444,7 +403,6 @@ static __inline__ flint_bitcnt_t flint_ctz(mp_limb_t x)
     (w0) = (__x1 << GMP_LIMB_BITS/2) + __ll_lowpart (__x0);		\
   } while (0)
 
-#endif
 #endif
 #endif
 
@@ -483,8 +441,7 @@ static __inline__ flint_bitcnt_t flint_ctz(mp_limb_t x)
 #endif
 
 
-#if !((GMP_LIMB_BITS == 64 && defined (__ia64)) ||      \
-      (GMP_LIMB_BITS == 32 && defined (__arm__)))
+#if !(GMP_LIMB_BITS == 32 && defined (__arm__))
 #if !defined(__arm64__)
 
 #define sub_ddmmss(sh, sl, ah, al, bh, bl) \
@@ -571,16 +528,14 @@ static __inline__ flint_bitcnt_t flint_clz(mp_limb_t x)
 }
 #endif
 
-#if !(GMP_LIMB_BITS == 64 && defined (__ia64))
-# ifndef flint_ctz
-#  define flint_ctz flint_ctz
+#ifndef flint_ctz
+# define flint_ctz flint_ctz
 static __inline__ flint_bitcnt_t flint_ctz(mp_limb_t x)
 {
     mp_limb_t __ctz_x = (x);
     FLINT_ASSERT (__ctz_x != 0);
     return GMP_LIMB_BITS - 1 - flint_clz(__ctz_x & -__ctz_x);
 }
-# endif
 #endif
 
 #define udiv_qrnnd(q, r, n1, n0, d)                  \
@@ -648,7 +603,7 @@ static __inline__ flint_bitcnt_t flint_ctz(mp_limb_t x)
 
 #endif /* non x86 fallback code */
 
-/* smul_ppm is defined previously for 32bit arm and for all x86 */
+/* smul_ppmm is defined previously for 32bit arm and for all x86 */
 #if !( (GMP_LIMB_BITS == 32 && defined (__arm__))                              \
        || defined (__i386__) || defined (__i486__) || defined(__amd64__))
 

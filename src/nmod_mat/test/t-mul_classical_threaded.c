@@ -10,13 +10,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
+#include "nmod.h"
+#include "nmod_mat.h"
+
 #if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
 # include "thread_support.h"
 #endif
 
-#include "nmod.h"
-#include "nmod_mat.h"
-
+/* Defined in t-mul.c and t-mul_classical_threaded.c */
+#ifndef nmod_mat_mul_check
+#define nmod_mat_mul_check nmod_mat_mul_check
 void
 nmod_mat_mul_check(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {
@@ -43,19 +47,13 @@ nmod_mat_mul_check(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
         }
     }
 }
+#endif
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_mat_mul_classical_threaded, state)
 {
 #if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     slong i, max_threads = 5;
-#endif
-    FLINT_TEST_INIT(state);
 
-    flint_printf("mul_classical_threaded....");
-    fflush(stdout);
-
-#if FLINT_USES_PTHREAD && (FLINT_USES_TLS || FLINT_REENTRANT)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_mat_t A, B, C, D;
@@ -122,13 +120,8 @@ main(void)
         nmod_mat_clear(D);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
+    TEST_FUNCTION_END(state);
 #else
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("SKIPPED\n");
+    TEST_FUNCTION_END_SKIPPED(state);
 #endif
-    return 0;
 }

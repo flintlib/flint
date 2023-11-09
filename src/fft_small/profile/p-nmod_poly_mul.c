@@ -135,7 +135,7 @@ int main(void)
             bn = 1 + zn - an;
 
             if (an < bn)
-                ULONG_SWAP(an, bn);
+                FLINT_SWAP(ulong, an, bn);
 
             nreps = 1 + 100000000/(zn*n_nbits(zn));
 
@@ -182,7 +182,7 @@ int main(void)
 
     mpn_ctx_clear(R);
     flint_randclear(state);
-    
+
     return 0;
 }
 

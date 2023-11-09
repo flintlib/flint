@@ -11,20 +11,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-int main(void)
+TEST_FUNCTION_START(n_nextprime, state)
 {
     mp_limb_t n;
     mp_limb_t res1, res2;
     slong rep;
     mpz_t mpz_n;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("nextprime....");
-    fflush(stdout);
 
     if (n_nextprime(0, 0) != 2)
     {
@@ -86,8 +82,5 @@ int main(void)
 
     mpz_clear(mpz_n);
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

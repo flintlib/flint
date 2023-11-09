@@ -16,14 +16,7 @@
 void
 fmpq_mat_swap(fmpq_mat_t mat1, fmpq_mat_t mat2)
 {
-    if (mat1 != mat2)
-    {
-        fmpq_mat_struct tmp;
-
-        tmp = *mat1;
-        *mat1 = *mat2;
-        *mat2 = tmp;
-    }
+    FLINT_SWAP(fmpq_mat_struct, *mat1, *mat2);
 }
 
 void
@@ -41,19 +34,13 @@ fmpq_mat_swap_cols(fmpq_mat_t mat, slong * perm, slong r, slong s)
 {
     if (r != s && !fmpq_mat_is_empty(mat))
     {
-        slong t;
+        slong i;
 
         if (perm)
-        {
-            t = perm[s];
-            perm[s] = perm[r];
-            perm[r] = t;
-        }
+            FLINT_SWAP(slong, perm[r], perm[s]);
 
-       for (t = 0; t < mat->r; t++)
-       {
-           fmpq_swap(fmpq_mat_entry(mat, t, r), fmpq_mat_entry(mat, t, s));
-       }
+        for (i = 0; i < mat->r; i++)
+            fmpq_swap(fmpq_mat_entry(mat, i, r), fmpq_mat_entry(mat, i, s));
     }
 }
 
@@ -62,18 +49,9 @@ fmpq_mat_swap_rows(fmpq_mat_t mat, slong * perm, slong r, slong s)
 {
     if (r != s && !fmpq_mat_is_empty(mat))
     {
-        fmpq * u;
-        slong t;
-
         if (perm)
-        {
-            t = perm[s];
-            perm[s] = perm[r];
-            perm[r] = t;
-        }
+            FLINT_SWAP(slong, perm[r], perm[s]);
 
-        u = mat->rows[s];
-        mat->rows[s] = mat->rows[r];
-        mat->rows[r] = u;
+        FLINT_SWAP(fmpq *, mat->rows[r], mat->rows[s]);
     }
 }

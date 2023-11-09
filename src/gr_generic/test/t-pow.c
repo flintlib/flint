@@ -1,3 +1,15 @@
+/*
+    Copyright (C) 2022 Fredrik Johansson
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
+
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "ulong_extras.h"
 #include "gr.h"
@@ -10,18 +22,12 @@ int gr_test_pow_ui_base_multiplication(gr_ctx_t R, flint_rand_t state, int test_
 int gr_test_pow_ui_aliasing(gr_ctx_t R, flint_rand_t state, int test_flags);
 int gr_test_pow_fmpz_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flags);
 
-int main(void)
+TEST_FUNCTION_START(gr_generic_pow, state)
 {
     gr_ctx_t ZZn;
     ulong n;
     fmpz_t m;
     int status = GR_SUCCESS;
-
-    flint_rand_t state;
-    flint_randinit(state);
-
-    flint_printf("pow....");
-    fflush(stdout);
 
     for (n = 0; n < 1000 * flint_test_multiplier(); n++)
     {
@@ -59,9 +65,5 @@ int main(void)
         fmpz_clear(m);
     }
 
-    flint_randclear(state);
-
-    flint_cleanup();
-    flint_printf(" PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -10,10 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
-#include "ulong_extras.h"
 
 static slong
 refimpl(const fmpz * v, slong len)
@@ -27,16 +26,9 @@ refimpl(const fmpz * v, slong len)
     return max;
 }
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_vec_height_index, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("height_index....");
-    fflush(stdout);
-
-
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -64,8 +56,5 @@ main(void)
         _fmpz_vec_clear(a, len);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

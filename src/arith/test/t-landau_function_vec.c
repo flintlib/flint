@@ -9,10 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "arith.h"
 
+/* Defined in t-landau_function_vec.c and t-sum_of_squares.c */
+#define known known_landau_function_vec
 static const mp_limb_t known[] = {
     1, 1, 2, 3, 4, 6, 6, 12, 15, 20, 30, 30, 60, 60, 84, 105, 140, 210,
     210, 420, 420, 420, 420, 840, 840, 1260, 1260, 1540, 2310, 2520,
@@ -20,15 +23,11 @@ static const mp_limb_t known[] = {
     27720, 30030, 32760, 60060, 60060, 60060, 60060, 120120
 };
 
-int main(void)
+TEST_FUNCTION_START(arith_landau_function_vec, state)
 {
     fmpz * res;
     slong k, n;
 
-    FLINT_TEST_INIT(state);
-
-    flint_printf("landau_function_vec....");
-    fflush(stdout);
 
     n = 45;
     res = _fmpz_vec_init(n);
@@ -48,7 +47,6 @@ int main(void)
 
     _fmpz_vec_clear(res, n);
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
+#undef known

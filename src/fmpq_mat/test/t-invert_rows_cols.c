@@ -9,17 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq.h"
 #include "fmpq_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_mat_invert_rows_cols, state)
 {
     slong n, rep;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("invert_rows/cols....");
-    fflush(stdout);
 
     /* Rectangular inversion of rows and cols */
     for (rep = 0; rep < 100 * flint_test_multiplier(); rep++)
@@ -59,8 +55,5 @@ main(void)
         fmpq_mat_clear(B);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

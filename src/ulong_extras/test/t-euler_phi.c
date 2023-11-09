@@ -9,17 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 
-int main(void)
+TEST_FUNCTION_START(n_euler_phi, state)
 {
     int n, k, t;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("euler_phi....");
-    fflush(stdout);
 
     for (n = 0; n < 20 * flint_test_multiplier(); n++)
     {
@@ -35,7 +30,5 @@ int main(void)
         }
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

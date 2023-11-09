@@ -9,20 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 #include "fmpz.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_derivative, state)
 {
     int i, j, result = 1;
     fmpz_t t;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("derivative....");
-    fflush(stdout);
 
     fmpz_init(t);
 
@@ -95,8 +90,5 @@ main(void)
         nmod_poly_clear(b);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -10,21 +10,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq.h"
 #include "fmpq_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_poly_get_set_coeff_fmpz, state)
 {
     int i, j, result;
     ulong cflags = UWORD(0);
 
     fmpq_t n1, n2;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("get/set_coeff_fmpz....");
-    fflush(stdout);
 
     fmpq_init(n1);
     fmpq_init(n2);
@@ -73,8 +68,5 @@ main(void)
     fmpq_clear(n1);
     fmpq_clear(n2);
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

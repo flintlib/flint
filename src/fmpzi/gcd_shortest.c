@@ -312,8 +312,8 @@ void _fmpzi_gcd_shortest(
         slong by_size = fmpz_size(by);
         if (FLINT_MAX(ax_size, ay_size) > FLINT_MAX(bx_size, by_size))
         {
-            PTR_SWAP(const fmpz, ax, bx);
-            PTR_SWAP(const fmpz, ay, by);
+            FLINT_SWAP(const fmpz *, ax, bx);
+            FLINT_SWAP(const fmpz *, ay, by);
         }
     }
 

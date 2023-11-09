@@ -9,18 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_mulhigh, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("mulhigh....");
-    fflush(stdout);
 
     /* Compare with left truncated product of a and b */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
@@ -64,8 +59,5 @@ main(void)
         nmod_poly_clear(c);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

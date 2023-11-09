@@ -9,20 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "mpn_extras.h"
-#include "ulong_extras.h"
 
-int main(void)
+TEST_FUNCTION_START(flint_mpn_divides, state)
 {
     int i, result;
     mpz_t a, b, c, g, s;
     mp_ptr temp;
     gmp_randstate_t st;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("divides....");
-    fflush(stdout);
 
     mpz_init(a);
     mpz_init(b);
@@ -30,7 +25,6 @@ int main(void)
     mpz_init(s);
     /* don't init g */
     gmp_randinit_default(st);
-
 
     /* check if b divides a*b */
     for (i = 0; i < 10000; i++)
@@ -114,8 +108,6 @@ int main(void)
     mpz_clear(s);
     /* don't clear g */
     gmp_randclear(st);
-    FLINT_TEST_CLEANUP(state);
 
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

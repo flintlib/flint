@@ -14,17 +14,13 @@
 
 #ifdef T
 
+#include "test_helpers.h"
 #include "templates.h"
 #include "fmpz_mod_mat.h"
 
-int
-main(void)
+TEST_TEMPLATE_FUNCTION_START(T, mat_set_fmpz_mod_mat, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("set_fmpz_mod_mat... ");
-    fflush(stdout);
 
     /* Check conversion of identity matrix */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
@@ -37,14 +33,14 @@ main(void)
         TEMPLATE(T, ctx_randtest)(ctx, state);
 
         r = n_randint(state, 10);
-	c = n_randint(state, 10);
-	TEMPLATE(T, mat_init)(a, r, c, ctx);
+        c = n_randint(state, 10);
+        TEMPLATE(T, mat_init)(a, r, c, ctx);
 
         TEMPLATE(T, mat_randtest)(a, state, ctx);
 
         fmpz_mod_mat_init(m, r, c, TEMPLATE(T, ctx_prime)(ctx));
 
-	fmpz_mod_mat_one(m);
+        fmpz_mod_mat_one(m);
 
         TEMPLATE(T, mat_set_fmpz_mod_mat)(a, m, ctx);
 
@@ -64,11 +60,6 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
-
-
 #endif

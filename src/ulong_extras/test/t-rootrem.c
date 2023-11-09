@@ -9,19 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-int main(void)
+TEST_FUNCTION_START(n_rootrem, state)
 {
    int i, result;
    mp_limb_t upper_limit;
-
-   FLINT_TEST_INIT(state);
-
-   flint_printf("n_rootrem....");
-   fflush(stdout);
 
 #if FLINT64
    upper_limit = 2642245;
@@ -43,7 +38,6 @@ int main(void)
 
         c = n_randint(state, 0);    /*number */
         flint_mpz_set_ui(g, c);
-
 
         d = n_randint(state, 0);   /*root */
         flint_mpz_set_ui(h, d);
@@ -175,7 +169,5 @@ int main(void)
         mpz_clear(h);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

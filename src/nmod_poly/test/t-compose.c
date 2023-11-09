@@ -9,18 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_compose, state)
 {
     int i, result = 1;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("compose....");
-    fflush(stdout);
 
     /* Check (f(x-1))(x+1) == f */
     for (i = 0; i < 500 * flint_test_multiplier(); i++)
@@ -162,8 +157,5 @@ main(void)
         nmod_poly_clear(r1);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

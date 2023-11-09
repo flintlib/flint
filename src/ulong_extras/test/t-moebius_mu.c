@@ -9,30 +9,27 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 
-
-void check(mp_limb_t n, int mu1, int mu2)
+#ifndef check
+#define check check
+void check(mp_limb_t n, int s1, int s2)
 {
-    if (mu1 != mu2)
+    if (s1 != s2)
     {
         flint_printf("FAIL:\n");
-        flint_printf("mu(%wu): %d != %d\n", n, mu1, mu2);
+        flint_printf("%wu: got %d instead of %d\n", n, s1, s2);
         fflush(stdout);
         flint_abort();
     }
 }
+#endif
 
-int main(void)
+TEST_FUNCTION_START(n_moebius_mu, state)
 {
     int n, k, s;
     int * mu;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("moebius_mu....");
-    fflush(stdout);
 
     check(0, n_moebius_mu(0), 0);
     check(1, n_moebius_mu(1), 1);
@@ -76,7 +73,5 @@ int main(void)
         flint_abort();
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

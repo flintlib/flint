@@ -81,13 +81,13 @@ Divisibility
 
     Divides `x` once by a known single-limb divisor, returns the new size.
 
-.. function:: mp_size_t flint_mpn_remove_2exp(mp_ptr x, mp_size_t xsize, flint_bitcnt_t *bits)
+.. function:: mp_size_t flint_mpn_remove_2exp(mp_ptr x, mp_size_t xsize, flint_bitcnt_t * bits)
 
     Divides ``(x, xsize)`` by `2^n` where `n` is the number of trailing 
     zero bits in `x`. The new size of `x` is returned, and `n` is stored in 
     the bits argument. `x` may not be zero.
 
-.. function:: mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize, mp_ptr p, mp_size_t psize, ulong *exp)
+.. function:: mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize, mp_ptr p, mp_size_t psize, ulong * exp)
 
     Divides ``(x, xsize)`` by the largest power `n` of ``(p, psize)`` 
     that is an exact divisor of `x`. The new size of `x` is returned, and 
@@ -243,7 +243,7 @@ Random Number Generation
 --------------------------------------------------------------------------------
 
 
-.. function:: void flint_mpn_rrandom(mp_limb_t *rp, gmp_randstate_t state, mp_size_t n)
+.. function:: void flint_mpn_rrandom(mp_limb_t * rp, gmp_randstate_t state, mp_size_t n)
 
     Generates a random number with ``n`` limbs and stores 
     it on ``rp``. The number it generates will tend to have
@@ -253,7 +253,7 @@ Random Number Generation
     numbers have proven to be more likely to trigger corner-case bugs.
     
 
-.. function:: void flint_mpn_urandomb(mp_limb_t *rp, gmp_randstate_t state, flint_bitcnt_t n)
+.. function:: void flint_mpn_urandomb(mp_limb_t * rp, gmp_randstate_t state, flint_bitcnt_t n)
 
     Generates a uniform random number of ``n`` bits and stores 
     it on ``rp``.

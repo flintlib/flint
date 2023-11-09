@@ -9,19 +9,16 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
 
-int main(void)
+FLINT_DLL extern gr_static_method_table _ca_methods;
+
+TEST_FUNCTION_START(gr_poly_evaluate_vec_fast, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("evaluate_vec_fast....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 1000; iter++)
     {
@@ -33,8 +30,16 @@ int main(void)
 
         gr_ctx_init_random(ctx, state);
 
-        n = n_randint(state, 30);
-        m = n_randint(state, 30);
+        if (ctx->methods == _ca_methods)
+        {
+            n = n_randint(state, 8);
+            m = n_randint(state, 8);
+        }
+        else
+        {
+            n = n_randint(state, 30);
+            m = n_randint(state, 30);
+        }
 
         gr_poly_init(f, ctx);
         gr_vec_init(x, n, ctx);
@@ -66,8 +71,5 @@ int main(void)
         gr_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

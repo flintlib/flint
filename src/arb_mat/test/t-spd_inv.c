@@ -9,9 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq_mat.h"
 #include "arb_mat.h"
 
+/* Defined in t-cho.c, t-inv_cho_precomp.c, t-inv_ldl_precomp.c, t-ldl.c,
+   t-solve_cho_precomp.c, t-solve_ldl_precomp.c, t-spd_inv.c, t-spd_solve.c */
+#ifndef _fmpq_mat_randtest_positive_semidefinite
+#define _fmpq_mat_randtest_positive_semidefinite _fmpq_mat_randtest_positive_semidefinite
 void
 _fmpq_mat_randtest_positive_semidefinite(fmpq_mat_t mat, flint_rand_t state, flint_bitcnt_t bits)
 {
@@ -27,16 +32,11 @@ _fmpq_mat_randtest_positive_semidefinite(fmpq_mat_t mat, flint_rand_t state, fli
     fmpq_mat_clear(R);
     fmpq_mat_clear(RT);
 }
+#endif
 
-int main(void)
+TEST_FUNCTION_START(arb_mat_spd_inv, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("spd_inv....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -131,8 +131,5 @@ int main(void)
         arb_mat_clear(Ainv);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

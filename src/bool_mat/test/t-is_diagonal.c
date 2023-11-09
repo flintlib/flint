@@ -9,17 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "bool_mat.h"
 
-int main(void)
+TEST_FUNCTION_START(bool_mat_is_diagonal, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("is_diagonal....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* all zero matrices are diagonal */
     {
@@ -100,8 +95,5 @@ int main(void)
         bool_mat_clear(A);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

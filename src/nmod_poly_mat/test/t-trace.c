@@ -9,22 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
+#include "test_helpers.h"
 #include "nmod_poly.h"
 #include "nmod_poly_mat.h"
-#include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_mat_trace, state)
 {
     slong i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("trace....");
-    fflush(stdout);
-
-
 
     /* Test trace(AB) = trace(BA) */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -76,8 +67,5 @@ main(void)
         nmod_poly_clear(trba);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

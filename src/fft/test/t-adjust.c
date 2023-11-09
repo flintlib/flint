@@ -9,10 +9,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "gmpcompat.h"
 #include "mpn_extras.h"
 #include "fft.h"
 
+/* Defined in t-adjust.c, t-adjust_sqrt2.c, t-butterfly.c, t-butterfly_lshB.c,
+ * t-butterfly_rshB.c, t-butterfly_sqrt2.c, t-butterfly_twiddle.c,
+ * t-div_2expmod_2expp1.c, t-mul_2expmod_2expp1.c, t-negmod_2expp1.c,
+ * t-normmod_2expp1.c */
+#ifndef set_p
+#define set_p set_p
 /* set p = 2^wn + 1 */
 void set_p(mpz_t p, mp_size_t n, flint_bitcnt_t w)
 {
@@ -20,6 +27,7 @@ void set_p(mpz_t p, mp_size_t n, flint_bitcnt_t w)
    mpz_mul_2exp(p, p, n*w);
    flint_mpz_add_ui(p, p, 1);
 }
+#endif
 
 void ref_adjust(mpz_t r, mpz_t i1, mpz_t p, mp_size_t i, mp_size_t w)
 {
@@ -27,18 +35,11 @@ void ref_adjust(mpz_t r, mpz_t i1, mpz_t p, mp_size_t i, mp_size_t w)
    mpz_mod(r, r, p);
 }
 
-int
-main(void)
+TEST_FUNCTION_START(fft_adjust, state)
 {
     mp_size_t c, bits, j, k, n, w, limbs;
     mpz_t p, m2a, m2b, mn1;
     mp_limb_t * nn1, * r1;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("adjust....");
-    fflush(stdout);
-
 
     _flint_rand_init_gmp(state);
 
@@ -60,6 +61,9 @@ main(void)
 
                 for (c = 0; c < n; c++)
                 {
+                    if (n_randint(state, 100) > 2.0 + flint_test_multiplier() * 10)
+                        continue;
+
                     set_p(p, n, w);
 
                     nn1 = flint_malloc((limbs+1)*sizeof(mp_limb_t));
@@ -99,8 +103,5 @@ main(void)
     mpz_clear(m2b);
     mpz_clear(mn1);
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

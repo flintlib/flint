@@ -11,17 +11,13 @@
 
 #ifdef T
 
+#include "test_helpers.h"
 #include "templates.h"
 #include "fmpz.h"
 
-int
-main(void)
+TEST_TEMPLATE_FUNCTION_START(T, poly_factor_iterated_frobenius_preinv, state)
 {
     int i, j;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("iterated_frobenius_preinv....");
-    fflush(stdout);
 
     for (j = 0; j < 20 * flint_test_multiplier(); j++)
     {
@@ -70,7 +66,6 @@ main(void)
         for (i = 0; i < n; i++)
             result = result && TEMPLATE(T, poly_equal) (h1[i], h2[i], ctx);
 
-
         if (!result)
         {
             flint_printf("FAIL (composition):\n");
@@ -92,11 +87,6 @@ main(void)
         fmpz_clear(q);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
-
-
 #endif

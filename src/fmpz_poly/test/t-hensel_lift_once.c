@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 #include "nmod_poly_factor.h"
@@ -17,14 +18,9 @@
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_poly_hensel_lift_once, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("hensel_lift_once....");
-    fflush(stdout);
 
     /* We check that lifting local factors of F yields factors */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -109,9 +105,5 @@ main(void)
         fmpz_poly_clear(R);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

@@ -773,7 +773,7 @@ uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 	dim0 = 0;
 	dim1 = 64;
 	mask1 = (uint64_t)(-1);
-	
+
 #if QS_DEBUG
 	slong iter = 0;
 #endif

@@ -2571,87 +2571,16 @@ Power series composition
 Power series reversion
 --------------------------------------------------------------------------------
 
-
-.. function:: void _fmpz_poly_revert_series_lagrange(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
-
-    Sets ``Qinv`` to the compositional inverse or reversion of
-    ``(Q, Qlen)`` as a power series, i.e. computes `Q^{-1}` such that
-    `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`. The arguments may not be
-    aliased, and ``Qlen`` must be at least 2.
-    It is required that `Q_0 = 0` and `Q_1 = \pm 1`.
-
-    This implementation uses the Lagrange inversion formula.
-
-.. function:: void fmpz_poly_revert_series_lagrange(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
-
-    Sets ``Qinv`` to the compositional inverse or reversion of ``Q``
-    as a power series, i.e. computes `Q^{-1}` such that
-    `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`.
-    It is required that `Q_0 = 0` and `Q_1 = \pm 1`.
-
-    This implementation uses the Lagrange inversion formula.
-
-.. function:: void _fmpz_poly_revert_series_lagrange_fast(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
-
-    Sets ``Qinv`` to the compositional inverse or reversion of
-    ``(Q, Qlen)``
-    as a power series, i.e. computes `Q^{-1}` such that
-    `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`. The arguments may not be
-    aliased, and ``Qlen`` must be at least 2.
-    It is required that `Q_0 = 0` and `Q_1 = \pm 1`.
-
-    This implementation uses a reduced-complexity implementation
-    of the Lagrange inversion formula.
-
-.. function:: void fmpz_poly_revert_series_lagrange_fast(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
-
-    Sets ``Qinv`` to the compositional inverse or reversion of ``Q``
-    as a power series, i.e. computes `Q^{-1}` such that
-    `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`.
-    It is required that `Q_0 = 0` and `Q_1 = \pm 1`.
-
-    This implementation uses a reduced-complexity implementation
-    of the Lagrange inversion formula.
-
-.. function:: void _fmpz_poly_revert_series_newton(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
-
-    Sets ``Qinv`` to the compositional inverse or reversion of ``Q``
-    as a power series, i.e. computes `Q^{-1}` such that
-    `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`. The arguments may not be
-    aliased, and ``Qlen`` must be at least 2.
-    It is required that `Q_0 = 0` and `Q_1 = \pm 1`.
-
-    This implementation uses Newton iteration [BrentKung1978]_.
-
-.. function:: void fmpz_poly_revert_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
-
-    Sets ``Qinv`` to the compositional inverse or reversion of ``Q``
-    as a power series, i.e. computes `Q^{-1}` such that
-    `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`.
-    It is required that `Q_0 = 0` and `Q_1 = \pm 1`.
-
-    This implementation uses Newton iteration [BrentKung1978]_.
-
 .. function:: void _fmpz_poly_revert_series(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
-
-    Sets ``Qinv`` to the compositional inverse or reversion of ``Q``
-    as a power series, i.e. computes `Q^{-1}` such that
-    `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`. The arguments may not be
-    aliased, and ``Qlen`` must be at least 2.
-    It is required that `Q_0 = 0` and `Q_1 = \pm 1`.
-
-    This implementation defaults to the fast version of
-    Lagrange interpolation.
-
-.. function:: void fmpz_poly_revert_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
+              void fmpz_poly_revert_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
 
     Sets ``Qinv`` to the compositional inverse or reversion of ``Q``
     as a power series, i.e. computes `Q^{-1}` such that
     `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`.
     It is required that `Q_0 = 0` and `Q_1 = \pm 1`.
 
-    This implementation defaults to the fast version of
-    Lagrange interpolation.
+    Wraps :func:`_gr_poly_revert_series` which chooses automatically
+    between various algorithms.
 
 
 Square root
@@ -2837,7 +2766,7 @@ Hensel lifting
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpz_poly_hensel_build_tree(slong * link, fmpz_poly_t *v, fmpz_poly_t *w, const nmod_poly_factor_t fac)
+.. function:: void fmpz_poly_hensel_build_tree(slong * link, fmpz_poly_t * v, fmpz_poly_t * w, const nmod_poly_factor_t fac)
 
     Initialises and builds a Hensel tree consisting of two arrays `v`, `w`
     of polynomials and an array of links, called ``link``.
@@ -2913,7 +2842,7 @@ Hensel lifting
 
     See :func:`fmpz_poly_hensel_lift`.
 
-.. function:: void fmpz_poly_hensel_lift_tree_recursive(slong *link, fmpz_poly_t *v, fmpz_poly_t *w, fmpz_poly_t f, slong j, slong inv, const fmpz_t p0, const fmpz_t p1)
+.. function:: void fmpz_poly_hensel_lift_tree_recursive(slong * link, fmpz_poly_t * v, fmpz_poly_t * w, fmpz_poly_t f, slong j, slong inv, const fmpz_t p0, const fmpz_t p1)
 
     Takes a current Hensel tree ``(link, v, w)`` and a pair `(j,j+1)`
     of entries in the tree and lifts the tree from mod `p_0` to
@@ -2930,7 +2859,7 @@ Hensel lifting
     the lists `v` and `w`.  But the polynomials in these two lists
     are not allowed to be aliases of each other.
 
-.. function:: void fmpz_poly_hensel_lift_tree(slong *link, fmpz_poly_t *v, fmpz_poly_t *w, fmpz_poly_t f, slong r, const fmpz_t p, slong e0, slong e1, slong inv)
+.. function:: void fmpz_poly_hensel_lift_tree(slong * link, fmpz_poly_t * v, fmpz_poly_t * w, fmpz_poly_t f, slong r, const fmpz_t p, slong e0, slong e1, slong inv)
 
     Computes `p_0 = p^{e_0}` and `p_1 = p^{e_1 - e_0}` for a small prime `p`
     and `P = p^{e_1}`.
@@ -2951,7 +2880,7 @@ Hensel lifting
 
     Assumes that `1 < p_1 \leq p_0`, that is, `0 < e_1 \leq e_0`.
 
-.. function:: slong _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, slong *link, fmpz_poly_t *v, fmpz_poly_t *w, const fmpz_poly_t f, const nmod_poly_factor_t local_fac, slong N)
+.. function:: slong _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, slong * link, fmpz_poly_t * v, fmpz_poly_t * w, const fmpz_poly_t f, const nmod_poly_factor_t local_fac, slong N)
 
     This function takes the local factors in ``local_fac``
     and Hensel lifts them until they are known mod `p^N`, where
@@ -2973,7 +2902,7 @@ Hensel lifting
     over the local factors and convert them to polynomials over
     `\mathbf{Z}`.
 
-.. function:: slong _fmpz_poly_hensel_continue_lift(fmpz_poly_factor_t lifted_fac, slong *link, fmpz_poly_t *v, fmpz_poly_t *w, const fmpz_poly_t f, slong prev, slong curr, slong N, const fmpz_t p)
+.. function:: slong _fmpz_poly_hensel_continue_lift(fmpz_poly_factor_t lifted_fac, slong * link, fmpz_poly_t * v, fmpz_poly_t * w, const fmpz_poly_t f, slong prev, slong curr, slong N, const fmpz_t p)
 
     This function restarts a stopped Hensel lift.
 
@@ -3123,7 +3052,7 @@ Some examples of the ``_pretty`` representation are::
     In case of success, returns a positive number.  In case of failure,
     returns a non-positive value.
 
-.. function:: int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
+.. function:: int fmpz_poly_fread_pretty(FILE * file, fmpz_poly_t poly, char **x)
 
     Reads a polynomial from the file ``file`` and sets ``poly``
     to this polynomial.  The string ``*x`` is set to the variable

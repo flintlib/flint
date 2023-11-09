@@ -9,17 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_default.h"
 #include "test_helpers.h"
+#include "fq_default.h"
 
-
-int main(void)
+TEST_FUNCTION_START(fq_default_get_set_fmpz, state)
 {
     slong i, j;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("get_set_fmpz....");
-    fflush(stdout);
 
     for (i = 0; i < 30*flint_test_multiplier(); i++)
     {
@@ -65,7 +60,5 @@ int main(void)
         fmpz_clear(p);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

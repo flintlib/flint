@@ -9,24 +9,18 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "mpn_extras.h"
 #include "fft.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fft_split_combine_bits, state)
 {
     int i;
     mp_size_t j;
 
-    FLINT_TEST_INIT(state);
-
-    flint_printf("split/combine_bits....");
-    fflush(stdout);
-
-
     _flint_rand_init_gmp(state);
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         mp_size_t total_limbs = n_randint(state, 1000) + 1;
         mp_limb_t * in = flint_malloc(total_limbs*sizeof(mp_limb_t));
@@ -66,8 +60,5 @@ main(void)
         flint_free(poly);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

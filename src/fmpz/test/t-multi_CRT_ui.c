@@ -10,13 +10,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-
-int main(void)
+TEST_FUNCTION_START(fmpz_multi_CRT_ui, state)
 {
     fmpz_t input, temp, prod;
     mp_limb_t * output;
@@ -27,11 +26,6 @@ int main(void)
     slong num_primes;
     fmpz_comb_t comb;
     fmpz_comb_temp_t comb_temp;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("multi_CRT_ui....");
-    fflush(stdout);
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -51,7 +45,7 @@ try_again:
         bits1 = n_randint(state, FLINT_BITS*3/4) + FLINT_BITS/4;
         bits2 = n_randint(state, FLINT_BITS*3/4) + FLINT_BITS/4;
         if (bits1 > bits2)
-            ULONG_SWAP(bits1, bits2);
+            FLINT_SWAP(ulong, bits1, bits2);
 
         fmpz_one(prod);
         for (j = 0; j < num_primes; j++)
@@ -115,8 +109,5 @@ try_again:
         _fmpz_vec_clear(primes2, num_primes);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

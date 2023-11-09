@@ -10,20 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpq.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
+#include "fmpq.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_sub_ui, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("sub_ui....");
-    fflush(stdout);
 
     /* x = y + z */
     for (i = 0; i < 10000; i++)
@@ -124,7 +117,5 @@ main(void)
         fmpq_clear(Y);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

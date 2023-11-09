@@ -13,21 +13,16 @@
 
 #ifdef T
 
+#include "test_helpers.h"
 #include "templates.h"
 
-int
-main(void)
+TEST_TEMPLATE_FUNCTION_START(T, poly_make_monic, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("make_monic....");
-    fflush(stdout);
 
     /* test aliasing */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-
         slong len;
         TEMPLATE(T, ctx_t) ctx;
 
@@ -55,8 +50,6 @@ main(void)
         TEMPLATE(T, poly_clear) (b, ctx);
         TEMPLATE(T, ctx_clear) (ctx);
     }
-
-
 
     /* Check new leading coeff = 1 */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -89,13 +82,8 @@ main(void)
 
         TEMPLATE(T, poly_clear) (a, ctx);
         TEMPLATE(T, ctx_clear) (ctx);
-
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
-
 #endif

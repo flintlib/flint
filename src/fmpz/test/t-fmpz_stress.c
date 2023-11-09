@@ -9,10 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "thread_support.h"
-
 
 typedef struct
 {
@@ -40,7 +40,6 @@ void worker1(void * varg)
         fmpz_mul_2exp(vec + i, vec + i, 100);
     }
 }
-
 
 void worker2(void * varg)
 {
@@ -74,19 +73,13 @@ void worker3(void * varg)
     }
 }
 
-
-int
-main(void)
+TEST_FUNCTION_START(fmpz_stress, state)
 {
     slong i, j, k;
     slong max_num_threads = 5;
     thread_pool_handle * handles;
     slong num_handles;
     worker_arg_struct * wargs;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("fmpz_stress....");
-    fflush(stdout);
 
     wargs = (worker_arg_struct *) flint_malloc(max_num_threads*
                                                     sizeof(worker_arg_struct));
@@ -165,9 +158,5 @@ main(void)
 
     flint_free(wargs);
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

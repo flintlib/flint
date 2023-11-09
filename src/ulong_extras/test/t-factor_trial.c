@@ -9,17 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 
-int main(void)
+TEST_FUNCTION_START(n_factor_trial, state)
 {
    int i, j, result;
-   FLINT_TEST_INIT(state);
-
-
-   flint_printf("factor_trial....");
-   fflush(stdout);
 
    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random numbers */
    {
@@ -46,8 +41,5 @@ int main(void)
       }
    }
 
-   FLINT_TEST_CLEANUP(state);
-
-   flint_printf("PASS\n");
-   return 0;
+   TEST_FUNCTION_END(state);
 }

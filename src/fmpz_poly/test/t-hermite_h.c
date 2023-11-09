@@ -9,18 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_poly_hermite_h, state)
 {
     fmpz_poly_t T0, T1, t1, t2;
     slong n;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("hermite_h....");
-    fflush(stdout);
 
     fmpz_poly_init(T0);
     fmpz_poly_init(T1);
@@ -61,7 +56,5 @@ main(void)
     fmpz_poly_clear(t1);
     fmpz_poly_clear(t2);
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

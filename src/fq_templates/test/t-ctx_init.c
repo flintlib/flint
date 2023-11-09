@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2012 Sebastian Pancratz
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -12,23 +13,17 @@
 
 #ifdef T
 
+#include "test_helpers.h"
 #include "templates.h"
-
-
-#include "fmpz_mod_poly.h"
+#include "fmpz.h"
 #include "ulong_extras.h"
-#include "long_extras.h"
 
-int
-main(void)
+TEST_TEMPLATE_FUNCTION_START(T, ctx_init, state)
 {
     int i, k, result;
-    FLINT_TEST_INIT(state);
 
-    flint_printf("ctx_init... ");
-    fflush(stdout);
-
-    for (i = 0; i < 3 * flint_test_multiplier(); i++) {
+    for (i = 0; i < 3 * flint_test_multiplier(); i++)
+    {
         fmpz_t p;
         slong d;
         TEMPLATE(T, ctx_t) ctx;
@@ -42,7 +37,8 @@ main(void)
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
-    for (i = 0; i < 3 * flint_test_multiplier(); i++) {
+    for (i = 0; i < 3 * flint_test_multiplier(); i++)
+    {
         fmpz_t p;
         slong d;
         TEMPLATE(T, ctx_t) ctx_conway, ctx_mod;
@@ -54,7 +50,11 @@ main(void)
         d = n_randint(state, 10) + 1;
         TEMPLATE(T, ctx_init_conway)(ctx_conway, p, d, "a");
 
+#ifdef FQ_H
+        TEMPLATE(T, ctx_init_modulus)(ctx_mod, ctx_conway->modulus, ctx_conway->ctxp, "a");
+#else
         TEMPLATE(T, ctx_init_modulus)(ctx_mod, ctx_conway->modulus, "a");
+#endif
 
         TEMPLATE(T, init)(a, ctx_conway);
         TEMPLATE(T, init)(b, ctx_mod);
@@ -63,7 +63,6 @@ main(void)
 
         for (k = 0; k < 30; k++)
         {
-
             TEMPLATE(T, randtest)(a, state, ctx_conway);
             TEMPLATE(T, set)(b, a, ctx_mod);
 
@@ -91,14 +90,8 @@ main(void)
 
         TEMPLATE(T, ctx_clear)(ctx_conway);
         TEMPLATE(T, ctx_clear)(ctx_mod);
-
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
-
 #endif

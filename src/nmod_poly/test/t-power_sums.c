@@ -9,16 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_power_sums, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("power_sums....");
 
     /* Check that the different version coincide and aliasing in nmod_poly_power_sums */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -85,8 +82,5 @@ main(void)
         nmod_poly_clear(e);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

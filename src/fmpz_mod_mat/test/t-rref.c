@@ -10,38 +10,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mod_mat.h"
-
-void
-fmpz_mod_mat_randrank(fmpz_mod_mat_t mat, flint_rand_t state, slong rank)
-{
-    slong i;
-    fmpz * diag;
-
-    if (rank < 0 || rank > mat->mat->r || rank > mat->mat->c)
-    {
-        flint_printf("Exception (fmpz_mod_mat_randrank). Impossible rank.\n");
-        fflush(stdout);
-        flint_abort();
-    }
-
-    diag = _fmpz_vec_init(rank);
-    for (i = 0; i < rank; i++)
-    {
-        fmpz_randtest_mod(&diag[i], state, mat->mod);
-        while (fmpz_is_zero(&diag[i]))
-        {
-            fmpz_randtest_mod(&diag[i], state, mat->mod);
-        }
-    }
-
-    fmpz_mat_randpermdiag(mat->mat, state, diag, rank);
-
-    _fmpz_vec_clear(diag, rank);
-}
 
 static void
 check_rref(fmpz_mod_mat_t A)
@@ -81,19 +54,12 @@ check_rref(fmpz_mod_mat_t A)
     }
 }
 
-
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mod_mat_rref, state)
 {
     fmpz_mod_mat_t A;
     fmpz_t p;
     slong i, m, n, d, r, rank;
     slong *perm;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("rref....");
-    fflush(stdout);
 
     /* Maximally sparse matrices of given rank */
     for (i = 0; i < 10000; i++)
@@ -169,8 +135,5 @@ main(void)
         flint_free(perm);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

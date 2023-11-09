@@ -11,18 +11,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "gr_poly.h"
 
-int main(void)
+FLINT_DLL extern gr_static_method_table _ca_methods;
+
+TEST_FUNCTION_START(gr_poly_resultant_sylvester, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("resultant_sylvester....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* Check res(f, g) == (-1)^(deg f deg g) res(g, f) */
     /* Also compare with euclidean */
@@ -36,7 +33,7 @@ int main(void)
 
         gr_ctx_init_random(ctx, state);
 
-        if (ctx->which_ring == GR_CTX_CC_CA || ctx->which_ring == GR_CTX_RR_CA)
+        if (ctx->methods == _ca_methods)
             n = n_randint(state, 3);
         else
             n = n_randint(state, 6);
@@ -109,7 +106,7 @@ int main(void)
 
         gr_ctx_init_random(ctx, state);
 
-        if (ctx->which_ring == GR_CTX_CC_CA || ctx->which_ring == GR_CTX_RR_CA)
+        if (ctx->methods == _ca_methods)
             n = n_randint(state, 3);
         else
             n = n_randint(state, 6);
@@ -173,8 +170,5 @@ int main(void)
         gr_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

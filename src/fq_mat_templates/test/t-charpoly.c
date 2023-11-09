@@ -13,19 +13,15 @@
 
 #ifdef T
 
+#include "test_helpers.h"
 #include "templates.h"
 
-int
-main(void)
+TEST_TEMPLATE_FUNCTION_START(T, mat_charpoly, state)
 {
     TEMPLATE(T, ctx_t) ctx;
     TEMPLATE(T, mat_t) A, B, C;
     TEMPLATE(T, poly_t) p1, p2;
     slong i, m, n;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("charpoly....");
-    fflush(stdout);
 
     /* charpoly(AB) == charpoly(BA) */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -65,11 +61,6 @@ main(void)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
-
 #endif

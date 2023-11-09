@@ -9,9 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_poly.h"
 #include "acb_hypgeom.h"
 
+/* Conflicting types in t-rising_ui.c and t-rising_ui_jet.c */
+#define rising_algorithm rising_algorithm1
 void
 rising_algorithm(acb_ptr res, const acb_t x, ulong n, ulong m, slong len, slong prec, int alg)
 {
@@ -25,15 +28,9 @@ rising_algorithm(acb_ptr res, const acb_t x, ulong n, ulong m, slong len, slong 
         acb_hypgeom_rising_ui_jet(res, x, n, len, prec);
 }
 
-int main(void)
+TEST_FUNCTION_START(acb_hypgeom_rising_ui_jet, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("rising_ui_jet....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -89,8 +86,6 @@ int main(void)
         _acb_vec_clear(yayb, len);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
+#undef rising_algorithm

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "gmpcompat.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -106,14 +107,9 @@ _fmpz_factor_equal(const fmpz_factor_t x, const fmpz_factor_t y)
     return 1;
 }
 
-
-int main(void)
+TEST_FUNCTION_START(fmpz_factor_refine, state)
 {
     int iter;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("refine....");
-    fflush(stdout);
 
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
@@ -342,8 +338,5 @@ int main(void)
         }
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -9,10 +9,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "gmpcompat.h"
 #include "mpn_extras.h"
 #include "fft.h"
 
+/* Defined in t-adjust.c, t-adjust_sqrt2.c, t-butterfly.c, t-butterfly_lshB.c,
+ * t-butterfly_rshB.c, t-butterfly_sqrt2.c, t-butterfly_twiddle.c,
+ * t-div_2expmod_2expp1.c, t-mul_2expmod_2expp1.c, t-negmod_2expp1.c,
+ * t-normmod_2expp1.c */
+#ifndef set_p
+#define set_p set_p
 /* set p = 2^wn + 1 */
 void set_p(mpz_t p, mp_size_t n, flint_bitcnt_t w)
 {
@@ -20,20 +27,14 @@ void set_p(mpz_t p, mp_size_t n, flint_bitcnt_t w)
    mpz_mul_2exp(p, p, n*w);
    flint_mpz_add_ui(p, p, 1);
 }
+#endif
 
-int
-main(void)
+TEST_FUNCTION_START(mpn_mul_2expmod_2expp1, state)
 {
     flint_bitcnt_t bits;
     mp_size_t j, k, n, w, limbs, d;
     mp_limb_t * nn, * r;
     mpz_t p, m1, m2, mn1, mn2;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("mul_2expmod_2expp1....");
-    fflush(stdout);
-
 
     _flint_rand_init_gmp(state);
 
@@ -93,8 +94,5 @@ main(void)
     mpz_clear(m1);
     mpz_clear(p);
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

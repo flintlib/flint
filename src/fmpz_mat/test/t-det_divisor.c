@@ -9,19 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mat_det_divisor, state)
 {
     slong i;
     int result;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("det_divisor....");
-    fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -79,8 +74,5 @@ main(void)
         fmpz_clear(r);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

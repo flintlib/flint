@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2010,2011 Fredrik Johansson
+    Copyright (C) 2010, 2011 Fredrik Johansson
     Copyright (C) 2013 Mike Hansen
     Copyright (C) 2018 Tommy Hofmann
     Copyright (C) 2020 William Hart
@@ -14,21 +14,15 @@
 
 #ifdef T
 
+#include "test_helpers.h"
 #include "templates.h"
 
-#include <limits.h>
-
-int
-main(void)
+TEST_TEMPLATE_FUNCTION_START(T, mat_can_solve, state)
 {
     TEMPLATE(T, ctx_t) ctx;
     TEMPLATE(T, mat_t) A, X, X2, B, AX;
     slong i, k, m, n;
     int solved;
-
-    FLINT_TEST_INIT(state);
-    printf("solve....");
-    fflush(stdout);
 
     /* test random systems */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
@@ -130,10 +124,6 @@ main(void)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
-
 #endif

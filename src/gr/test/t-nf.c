@@ -1,21 +1,26 @@
-#include "long_extras.h"
+/*
+    Copyright (C) 2023 Fredrik Johansson
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
+
+#include "test_helpers.h"
+#include "fmpz_poly.h"
 #include "fmpq_poly.h"
 #include "gr.h"
-#include "nf.h"
 
-int main(void)
+TEST_FUNCTION_START(gr_nf, state)
 {
     gr_ctx_t QQa;
     fmpq_poly_t f;
     fmpz_poly_t g;
     slong iter;
-    flint_rand_t state;
     int flags = GR_TEST_ALWAYS_ABLE;
-
-    flint_printf("nf....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     fmpq_poly_init(f);
     fmpz_poly_init(g);
@@ -38,9 +43,5 @@ int main(void)
     fmpq_poly_clear(f);
     fmpz_poly_clear(g);
 
-    flint_randclear(state);
-
-    flint_cleanup_master();
-    flint_printf(" PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

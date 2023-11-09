@@ -9,19 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 #include "fmpz.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_bit_pack, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("bit_pack/bit_unpack....");
-    fflush(stdout);
 
     /* Check aliasing of a and c */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -114,8 +109,5 @@ main(void)
         nmod_poly_clear(B);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

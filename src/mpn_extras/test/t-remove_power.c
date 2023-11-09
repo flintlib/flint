@@ -9,10 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "gmpcompat.h"
 #include "mpn_extras.h"
-#include "ulong_extras.h"
 
 void test_exact(int d)
 {
@@ -52,19 +51,11 @@ void test_exact(int d)
     mpz_clear(c);
 }
 
-
-int main(void)
+TEST_FUNCTION_START(flint_mpn_remove_power, state)
 {
-    FLINT_TEST_INIT(state);
-
-    flint_printf("remove_power....");
-    fflush(stdout);
-
     test_exact(3);
     test_exact(10);
     test_exact(7429);
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

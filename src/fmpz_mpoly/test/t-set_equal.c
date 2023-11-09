@@ -10,16 +10,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mpoly_set_equal, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("set/equal....");
-    fflush(stdout);
 
     /* Set b = a and check a == b */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -135,9 +131,5 @@ main(void)
        fmpz_mpoly_clear(g, ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

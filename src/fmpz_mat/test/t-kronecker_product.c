@@ -9,21 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mat_kronecker_product, state)
 {
     int r, result;
     fmpz_mat_t A, B, C;
     fmpz_mat_t window1, window2;
     slong m, n, k, l, i, j;
     slong bits;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("kronecker_product....");
-    fflush(stdout);
 
     for (r = 0; r < 100 * flint_test_multiplier(); r++)
     {
@@ -80,8 +75,5 @@ main(void)
         fmpz_mat_clear(C);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

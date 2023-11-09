@@ -10,13 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
 /* Composite strong pseudoprimes from
    https://oeis.org/A014233 and https://doi.org/10.1090/mcom/3134 */
-static const char * composites[] = {
+static const char * composites_is_prime[] = {
     "2047",
     "1373653",
     "25326001",
@@ -38,21 +38,16 @@ static const char * composites[] = {
     NULL,
 };
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_is_prime, state)
 {
     int i, result, r1;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("is_prime....");
-    fflush(stdout);
 
     /* test table of composites */
-    for (i = 0; composites[i] != NULL; i++)
+    for (i = 0; composites_is_prime[i] != NULL; i++)
     {
         fmpz_t n;
         fmpz_init(n);
-        fmpz_set_str(n, composites[i], 10);
+        fmpz_set_str(n, composites_is_prime[i], 10);
 
         r1 = fmpz_is_prime(n);
         if (r1 != 0)
@@ -75,8 +70,8 @@ main(void)
         fmpz_init(F);
 
         do {
-           fmpz_randbits(p, state, n_randint(state, 160) + 2);
-           fmpz_abs(p, p);
+            fmpz_randbits(p, state, n_randint(state, 160) + 2);
+            fmpz_abs(p, p);
         } while (!fmpz_is_probabprime(p));
 
         r1 = fmpz_is_prime(p);
@@ -104,10 +99,10 @@ main(void)
         fmpz_init(F);
 
         do {
-           fmpz_randbits(p, state, n_randint(state, 80) + 2);
+            fmpz_randbits(p, state, n_randint(state, 80) + 2);
         } while (fmpz_cmp_ui(p, 2) < 0);
         do {
-           fmpz_randbits(a, state, n_randint(state, 80) + 2);
+            fmpz_randbits(a, state, n_randint(state, 80) + 2);
         } while (fmpz_cmp_ui(a, 2) < 0);
 
         fmpz_mul(p, p, a);
@@ -149,22 +144,19 @@ main(void)
     /* regression test */
     {
         fmpz_t p;
-	fmpz_init_set_ui(p, 13567);
-	fmpz_pow_ui(p, p, 145);
+        fmpz_init_set_ui(p, 13567);
+        fmpz_pow_ui(p, p, 145);
         result = fmpz_is_prime(p);
         if (result)
         {
             printf("FAIL\n");
             fmpz_print(p);
             printf("\n");
-	    fflush(stdout);
-	    flint_abort();
+            fflush(stdout);
+            flint_abort();
         }
         fmpz_clear(p);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

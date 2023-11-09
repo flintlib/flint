@@ -9,17 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq_mpoly.h"
-#include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_mpoly_gen, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("gen/is_gen....");
-    fflush(stdout);
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -79,14 +74,9 @@ main(void)
             flint_abort();
         }
 
-
         fmpq_mpoly_clear(f1, ctx);
         fmpq_mpoly_clear(f2, ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

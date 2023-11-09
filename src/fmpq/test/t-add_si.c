@@ -10,121 +10,65 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpq.h"
+#include "test_helpers.h"
 #include "long_extras.h"
+#include "fmpq.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_add_si, state)
 {
-    int i;
-    FLINT_TEST_INIT(state);
+    int i, result;
 
-
-    flint_printf("add_si....");
-    fflush(stdout);
-
-    /* x = y + z */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        fmpq_t x, y;
-        slong z;
-        fmpq_t X, Y, Z;
+        fmpq_t a;
+        slong b;
+        fmpq_t c, d, e, f;
+        int aliasing;
 
-        fmpq_init(x);
-        fmpq_init(y);
-        fmpq_init(X);
-        fmpq_init(Y);
-        fmpq_init(Z);
+        fmpq_init(a);
+        fmpq_init(c);
+        fmpq_init(d);
+        fmpq_init(e);
+        fmpq_init(f);
 
-        fmpq_randtest(x, state, 200);
-        fmpq_randtest(y, state, 200);
-        z = z_randtest(state);
+        fmpq_randtest(a, state, 200);
+        b = z_randtest(state);
 
-        fmpq_set(X, x);
-        fmpq_set(Y, y);
-        fmpq_set_si(Z, z, 1);
+        fmpq_set(d, a);
+        fmpq_set_si(e, b, 1);
 
-        fmpq_add_si(x, y, z);
+        aliasing = n_randint(state, 2);
 
-        if (!fmpq_is_canonical(x))
+        if (aliasing == 0)
         {
-            flint_printf("FAIL: result not canonical!\n");
+            fmpq_add_si(c, a, b);
+        }
+        else
+        {
+            fmpq_set(c, a);
+            fmpq_add_si(c, c, b);
+        }
+
+        fmpq_add(f, d, e);
+
+        result = (fmpq_cmp(f, c) == 0) && fmpq_is_canonical(c);
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
+            printf("c = "); fmpq_print(c);
+            printf(", d = "); fmpq_print(d);
+            printf(", e = "); fmpq_print(e);
+            printf(", f = "); fmpq_print(f); printf("\n");
             fflush(stdout);
             flint_abort();
         }
 
-        fmpq_add(X, Y, Z);
-
-        if (!fmpq_equal(X, x))
-        {
-            flint_printf("FAIL: fmpq_add(x,y,z) != mpq_add(X,Y,Z)\n");
-            flint_printf("x = ");
-            fmpq_print(x);
-            flint_printf("\ny = ");
-            fmpq_print(y);
-            flint_printf("\nz = ");
-            flint_printf("%wd", z);
-            flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpq_clear(x);
-        fmpq_clear(y);
-
-        fmpq_clear(X);
-        fmpq_clear(Y);
-        fmpq_clear(Z);
+        fmpq_clear(a);
+        fmpq_clear(c);
+        fmpq_clear(d);
+        fmpq_clear(e);
+        fmpq_clear(f);
     }
 
-    /* x = x + y */
-    for (i = 0; i < 10000; i++)
-    {
-        fmpq_t x;
-        slong y;
-        fmpq_t X, Y;
-
-        fmpq_init(x);
-        fmpq_init(X);
-        fmpq_init(Y);
-
-        fmpq_randtest(x, state, 200);
-        y = z_randtest(state);
-
-        fmpq_set(X, x);
-        fmpq_set_si(Y, y, 1);
-
-        fmpq_add_si(x, x, y);
-        fmpq_add(X, X, Y);
-
-        if (!fmpq_is_canonical(x))
-        {
-            flint_printf("FAIL: result not canonical!\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        if (!fmpq_equal(X, x))
-        {
-            flint_printf("FAIL: fmpq_add(x,x,y) != mpq_add(X,X,Y)\n");
-            flint_printf("x = ");
-            fmpq_print(x);
-            flint_printf("\ny = ");
-            flint_printf("%wd", y);
-            flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpq_clear(x);
-
-        fmpq_clear(X);
-        fmpq_clear(Y);
-    }
-
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

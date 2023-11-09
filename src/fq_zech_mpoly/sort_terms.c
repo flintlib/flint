@@ -45,7 +45,7 @@ void _fq_zech_mpoly_radix_sort1(fq_zech_mpoly_t A, slong left, slong right,
                                                  A->exps[j - 1], cmpmask); j--)
                 {
                     fq_zech_swap(A->coeffs + j, A->coeffs + j - 1, NULL);
-                    ULONG_SWAP(A->exps[j], A->exps[j - 1]);
+                    FLINT_SWAP(ulong, A->exps[j], A->exps[j - 1]);
                 }
             }
 
@@ -69,7 +69,7 @@ void _fq_zech_mpoly_radix_sort1(fq_zech_mpoly_t A, slong left, slong right,
             if ((A->exps[cur] & mask) != cmp)
             {
                 fq_zech_swap(A->coeffs + cur, A->coeffs + mid, NULL);
-                ULONG_SWAP(A->exps[cur], A->exps[mid]);
+                FLINT_SWAP(ulong, A->exps[cur], A->exps[mid]);
                 mid++;
             }
         }

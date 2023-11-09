@@ -9,16 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_mpoly_evaluate, state)
 {
     slong i, j, v;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("evaluate....");
-    fflush(stdout);
 
     /* Check repeated evalone matches evalall */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
@@ -244,7 +240,6 @@ main(void)
             fmpq_mpoly_randtest_bound(g, state, len2, coeff_bits, exp_bound2, ctx);
             fmpq_mpoly_add(fg, f, g, ctx);
 
-
             if (!fmpq_mpoly_evaluate_all_fmpq(fe, f, vals, ctx) ||
                 !fmpq_mpoly_evaluate_all_fmpq(ge, g, vals, ctx) ||
                 !fmpq_mpoly_evaluate_all_fmpq(fge, fg, vals, ctx))
@@ -282,9 +277,5 @@ main(void)
         fmpq_clear(t);
     }
 
-    printf("PASS\n");
-    FLINT_TEST_CLEANUP(state);
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

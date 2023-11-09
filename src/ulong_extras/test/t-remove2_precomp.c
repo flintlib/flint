@@ -9,20 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-int main(void)
+TEST_FUNCTION_START(n_remove2_precomp, state)
 {
    int i, result;
    const mp_limb_t * primes;
    const double * inverses;
-
-   FLINT_TEST_INIT(state);
-
-   flint_printf("remove2_precomp....");
-   fflush(stdout);
 
    primes = n_primes_arr_readonly(10000);
    inverses = n_prime_inverses_arr_readonly(10000);
@@ -105,8 +100,5 @@ int main(void)
       mpz_clear(d_p);
    }
 
-   FLINT_TEST_CLEANUP(state);
-
-   flint_printf("PASS\n");
-   return 0;
+   TEST_FUNCTION_END(state);
 }

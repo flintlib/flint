@@ -9,22 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "mpn_extras.h"
-#include "ulong_extras.h"
 
-int main(void)
+TEST_FUNCTION_START(flint_mpn_divrem_preinv1, state)
 {
     int i, result;
     mpz_t a, a2, b, q, r, q2;
     gmp_randstate_t st;
     mp_limb_t d1, d2, inv;
     slong s1, s2;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("divrem_preinv1....");
-    fflush(stdout);
 
     mpz_init(a);
     mpz_init(a2);
@@ -95,8 +89,6 @@ int main(void)
     mpz_clear(r);
     /* don't clear g */
     gmp_randclear(st);
-    FLINT_TEST_CLEANUP(state);
 
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

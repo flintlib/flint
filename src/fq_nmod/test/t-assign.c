@@ -11,7 +11,6 @@
 
 #include "fq_nmod.h"
 
-
 #ifdef T
 #undef T
 #endif

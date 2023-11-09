@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "d_vec.h"
 #include "ulong_extras.h"
 
@@ -21,14 +21,9 @@
 
 #define D_VEC_SP_EPS (1e-14)
 
-int
-main(void)
+TEST_FUNCTION_START(d_vec_dot, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("dot....");
-    fflush(stdout);
 
     /* check sum of scalar products of parts of vectors is equal to the
        scalar product of vectors */
@@ -62,8 +57,5 @@ main(void)
         _d_vec_clear(b);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

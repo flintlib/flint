@@ -92,19 +92,10 @@ TEMPLATE(T, mat_swap_rows)(TEMPLATE(T, mat_t) mat, slong * perm, slong r, slong 
 {
     if (r != s && !TEMPLATE(T, mat_is_empty)(mat, ctx))
     {
-        TEMPLATE(T, struct) * u;
-        slong t;
+        if (perm != NULL)
+            FLINT_SWAP(slong, perm[r], perm[s]);
 
-        if (perm)
-        {
-            t = perm[s];
-            perm[s] = perm[r];
-            perm[r] = t;
-        }
-
-        u = mat->rows[s];
-        mat->rows[s] = mat->rows[r];
-        mat->rows[r] = u;
+        FLINT_SWAP(TEMPLATE(T, struct) *, mat->rows[r], mat->rows[s]);
     }
 }
 

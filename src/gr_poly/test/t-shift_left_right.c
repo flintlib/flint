@@ -9,19 +9,13 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "gr_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(gr_poly_shift_left_right, state)
 {
     int i;
-    flint_rand_t state;
-
-    flint_printf("shift_left/right....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* Check aliasing of a and b for left shift */
     for (i = 0; i < 100; i++)
@@ -117,9 +111,5 @@ main(void)
         gr_ctx_clear(ctx);
     }
 
-    flint_randclear(state);
-    flint_cleanup_master();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

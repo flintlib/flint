@@ -9,8 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "nmod_mpoly.h"
 
+/* Defined in t-pow_ui.c and t-pow_rmul.c */
+#ifndef nmod_mpoly_pow_naive
+#define nmod_mpoly_pow_naive nmod_mpoly_pow_naive
 void nmod_mpoly_pow_naive(nmod_mpoly_t res, nmod_mpoly_t f,
                                                  slong n, nmod_mpoly_ctx_t ctx)
 {
@@ -36,15 +40,11 @@ void nmod_mpoly_pow_naive(nmod_mpoly_t res, nmod_mpoly_t f,
       nmod_mpoly_clear(pow, ctx);
    }
 }
+#endif
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_mpoly_pow_rmul, state)
 {
     slong i, j;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("pow_rmul....");
-    fflush(stdout);
 
     {
         nmod_mpoly_ctx_t ctx;
@@ -138,9 +138,5 @@ main(void)
         nmod_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

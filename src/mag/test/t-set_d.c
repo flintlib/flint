@@ -9,10 +9,15 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "arf.h"
 #include "double_extras.h"
 #include "mag.h"
 
+/* Defined in t-d_log_lower_bound.c, t-d_log_upper_bound.c, t-set_d_2exp_fmpz.c
+ * and t-set_d.c */
+#ifndef d_randtest2
+#define d_randtest2 d_randtest2
 /* XXX: d_randtest is not good enough */
 
 #define EXP_MINUS_32 2.3283064365386962891e-10
@@ -41,16 +46,11 @@ d_randtest2(flint_rand_t state)
 
     return t;
 }
+#endif
 
-int main(void)
+TEST_FUNCTION_START(mag_set_d, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("set_d....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -115,9 +115,5 @@ int main(void)
         mag_clear(m);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

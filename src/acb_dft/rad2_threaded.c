@@ -109,7 +109,7 @@ acb_dft_rad2_precomp_inplace_threaded(acb_ptr v, const acb_dft_rad2_t rad2, slon
         }
 
         if (i != t)
-            flint_throw(FLINT_ERROR, "unequal i=%wd, t=%wd in %s\n", i, t, __FUNCTION__);
+            flint_throw(FLINT_ERROR, "unequal i=%wd, t=%wd in %s\n", i, t, __func__);
 
         for (i = 0; i < num_workers; i++)
             thread_pool_wait(global_thread_pool, handles[i]);

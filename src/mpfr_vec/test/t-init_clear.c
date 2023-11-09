@@ -9,20 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include <mpfr.h>
-#include "flint.h"
 #include "mpfr_vec.h"
-#include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(mpfr_vec_init_clear, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("init/clear....");
-    fflush(stdout);
 
     for (i = 0; i < 10000; i++)
     {
@@ -38,8 +31,5 @@ main(void)
         _mpfr_vec_clear(a, length);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

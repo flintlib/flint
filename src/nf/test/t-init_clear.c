@@ -15,18 +15,12 @@
 
 ******************************************************************************/
 
+#include "test_helpers.h"
 #include "nf.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nf_init_clear, state)
 {
     int i;
-    flint_rand_t state;
-
-    flint_printf("init/clear....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* not necessarily monic */
     for (i = 0; i < 500 * flint_test_multiplier(); i++)
@@ -88,7 +82,5 @@ main(void)
         nf_clear(nf);
     }
 
-    flint_randclear(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

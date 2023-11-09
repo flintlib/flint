@@ -10,22 +10,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz_poly.h"
+#include "test_helpers.h"
 #include "fmpz_poly_mat.h"
-#include "ulong_extras.h"
 
-int main(void)
+TEST_FUNCTION_START(fmpz_poly_mat_concat_vertical, state)
 {
     fmpz_poly_mat_t A, B, C;
     fmpz_poly_mat_t window1, window2;
     slong i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("concat_vertical....");
-    fflush(stdout);
-
-
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
@@ -50,7 +42,6 @@ int main(void)
         fmpz_poly_mat_window_init(window1, C, 0, 0, r1, c1);
         fmpz_poly_mat_window_init(window2, C, r1, 0, (r1 + r2), c1);
 
-
         if (!(fmpz_poly_mat_equal(window1, A) && fmpz_poly_mat_equal(window2, B)))
         {
             flint_printf("FAIL: results not equal\n");
@@ -66,8 +57,5 @@ int main(void)
         fmpz_poly_mat_window_clear(window2);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

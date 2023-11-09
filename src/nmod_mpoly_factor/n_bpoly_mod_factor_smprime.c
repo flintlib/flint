@@ -361,7 +361,7 @@ static void _n_bpoly_mod_lift_build_tree(
             }
         }
         n_bpoly_swap(v + j, v + minp);
-        SLONG_SWAP(link[j], link[minp]);
+        FLINT_SWAP(slong, link[j], link[minp]);
 
         minp = j + 1;
         mind = n_bpoly_degree0(v + j + 1);
@@ -374,7 +374,7 @@ static void _n_bpoly_mod_lift_build_tree(
             }
         }
         n_bpoly_swap(v + j + 1, v + minp);
-        SLONG_SWAP(link[j + 1], link[minp]);
+        FLINT_SWAP(slong, link[j + 1], link[minp]);
 
         n_bpoly_mod_mul_series(v + i, v + j, v + j + 1, L->fac_lift_order, ctx);
         link[i] = j;

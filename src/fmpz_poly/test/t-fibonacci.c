@@ -9,20 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-int main(void)
+TEST_FUNCTION_START(fmpz_poly_fibonacci, state)
 {
     fmpz_poly_t Pn, Pn1, Pn2, R;
 
     slong n;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("fibonacci....");
-    fflush(stdout);
 
     fmpz_poly_init(Pn);
     fmpz_poly_init(Pn1);
@@ -57,7 +52,5 @@ int main(void)
     fmpz_poly_clear(Pn2);
     fmpz_poly_clear(R);
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

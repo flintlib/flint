@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
+#include "test_helpers.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
 
 void numerical_test(fmpq_t res, slong n, double ans)
 {
@@ -64,17 +62,11 @@ mpq_harmonic_balanced(mpq_t res, slong a, slong b)
     mpq_clear(t);
 }
 
-
-int main(void)
+TEST_FUNCTION_START(fmpq_harmonic_ui, state)
 {
     ulong i;
     mpq_t x, y;
     fmpq_t t;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("harmonic_ui....");
-    fflush(stdout);
 
     fmpq_init(t);
     mpq_init(x);
@@ -129,7 +121,5 @@ int main(void)
     mpq_clear(y);
     fmpq_clear(t);
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -9,18 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-int main(void)
+TEST_FUNCTION_START(fmpz_mat_is_spd, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("is_spd....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* Test:
        - fails for non-square matrices
@@ -78,8 +73,5 @@ int main(void)
         fmpz_mat_clear(C);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

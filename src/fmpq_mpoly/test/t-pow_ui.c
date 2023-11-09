@@ -9,17 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpq_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_mpoly_pow_ui, state)
 {
     int i, j, k, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("pow_ui....");
-    fflush(stdout);
 
     /* Check against rmul */
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -73,7 +69,6 @@ main(void)
         fmpq_mpoly_clear(h, ctx);
         fmpq_mpoly_ctx_clear(ctx);
     }
-
 
     /* Check monomials against pow_fmpz */
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
@@ -138,9 +133,5 @@ main(void)
         fmpq_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

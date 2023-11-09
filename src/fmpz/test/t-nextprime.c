@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "fmpz.h"
 
 const char * const manual_tests[] = {
@@ -35,13 +35,9 @@ const char * const manual_tests[] = {
     "\0"
 };
 
-int main(void)
+TEST_FUNCTION_START(fmpz_nextprime, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("nextprime....");
-    fflush(stdout);
 
     for (i=0; manual_tests[i][0]; i += 2)
     {
@@ -96,8 +92,5 @@ int main(void)
         fmpz_clear(iter);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

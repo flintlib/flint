@@ -9,17 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_mat_transpose, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("transpose....");
-    fflush(stdout);
 
     /* Aliasing, B = B^t */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -98,10 +93,5 @@ main(void)
         fmpq_mat_clear(B);
     }
 
-
-
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

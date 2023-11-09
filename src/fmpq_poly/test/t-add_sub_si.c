@@ -10,17 +10,12 @@
      (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpq_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_poly_add_sub_si, state)
 {
     int i;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("add_sub_si....");
-    fflush(stdout);
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
@@ -86,9 +81,5 @@ main(void)
         fmpq_poly_clear(t);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }

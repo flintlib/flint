@@ -16,12 +16,5 @@
 void
 fmpz_poly_mat_swap(fmpz_poly_mat_t A, fmpz_poly_mat_t B)
 {
-    if (A != B)
-    {
-        fmpz_poly_mat_struct tmp;
-
-        tmp = *A;
-        *A = *B;
-        *B = tmp;
-    }
+    FLINT_SWAP(fmpz_poly_mat_struct, *A, *B);
 }

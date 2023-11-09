@@ -9,19 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-int main(void)
+TEST_FUNCTION_START(fmpz_is_perfect_power, state)
 {
    int i, result;
    ulong bits, exp;
    fmpz_t root, d, n, n2, pow;
-   FLINT_TEST_INIT(state);
-
-   flint_printf("is_perfect_power....");
-   fflush(stdout);
 
    fmpz_init(d);
    fmpz_init(n);
@@ -144,9 +140,5 @@ int main(void)
    fmpz_clear(pow);
    fmpz_clear(root);
 
-   FLINT_TEST_CLEANUP(state);
-
-   flint_printf("PASS\n");
-
-   return 0;
+   TEST_FUNCTION_END(state);
 }

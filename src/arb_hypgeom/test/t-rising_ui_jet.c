@@ -9,9 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "arb_poly.h"
 #include "arb_hypgeom.h"
 
+/* Also defined in t-rising_ui.c */
+#define rising_algorithm rising_jet_algorithm
 void
 rising_algorithm(arb_ptr res, const arb_t x, ulong n, ulong m, slong len, slong prec, int alg)
 {
@@ -25,15 +28,9 @@ rising_algorithm(arb_ptr res, const arb_t x, ulong n, ulong m, slong len, slong 
         arb_hypgeom_rising_ui_jet(res, x, n, len, prec);
 }
 
-int main(void)
+TEST_FUNCTION_START(arb_hypgeom_rising_ui_jet, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("rising_ui_jet....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -89,8 +86,6 @@ int main(void)
         _arb_vec_clear(yayb, len);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
+#undef rising_algorithm

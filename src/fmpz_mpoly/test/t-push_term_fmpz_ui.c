@@ -9,17 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mpoly_push_term_fmpz_ui, state)
 {
     slong i, j, k;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("push_term_fmpz_ui....");
-    fflush(stdout);
 
     /* Check pushback matches add */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -110,9 +106,5 @@ main(void)
         flint_free(exp);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

@@ -14,16 +14,12 @@
 
 ******************************************************************************/
 
-#include "nf.h"
+#include "test_helpers.h"
 #include "nf_elem.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nf_elem_mul_div_fmpq, state)
 {
     int i, result;
-    flint_rand_t state;
-
-    flint_randinit(state);
 
     /* test b + c - c = b */
     for (i = 0; i < 100; i++)
@@ -103,8 +99,5 @@ main(void)
         nf_clear(nf);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }

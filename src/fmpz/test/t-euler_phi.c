@@ -9,27 +9,19 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <limits.h>
-#include "flint.h"
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "ulong_extras.h"
-#include "profiler.h"
 
-
-int main(void)
+TEST_FUNCTION_START(fmpz_euler_phi, state)
 {
     slong i;
     ulong n;
     fmpz_t x, y, z;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("euler_phi....");
-    fflush(stdout);
 
     fmpz_init(x);
     fmpz_init(y);
     fmpz_init(z);
-
 
     for (i = 0; i < 100; i++)
     {
@@ -92,13 +84,9 @@ int main(void)
         flint_abort();
     }
 
-
-
     fmpz_clear(x);
     fmpz_clear(y);
     fmpz_clear(z);
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

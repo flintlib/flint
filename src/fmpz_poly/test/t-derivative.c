@@ -10,21 +10,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_poly_derivative, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("derivative....");
-    fflush(stdout);
-
-
 
     /* Check aliasing */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -117,8 +110,5 @@ main(void)
         fmpz_poly_clear(rhs);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

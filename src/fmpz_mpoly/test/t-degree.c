@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_mpoly.h"
 
 /* check various degree operations */
@@ -92,15 +93,10 @@ void _check_degrees(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
     flint_free(degs);
 }
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mpoly_degree, state)
 {
     int i, j;
 
-    FLINT_TEST_INIT(state);
-
-    flint_printf("degree....");
-    fflush(stdout);
 
     /* Check degree does not go up under addition */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -226,9 +222,5 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

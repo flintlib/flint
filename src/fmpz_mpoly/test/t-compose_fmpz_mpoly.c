@@ -9,16 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mpoly_compose_fmpz_mpoly, state)
 {
     slong i, j, v;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("compose_fmpz_mpoly....");
-    fflush(stdout);
 
     {
         fmpz_mpoly_t A, A1, A2, B;
@@ -391,9 +387,5 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx2);
     }
 
-    printf("PASS\n");
-    FLINT_TEST_CLEANUP(state);
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

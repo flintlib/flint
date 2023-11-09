@@ -28,7 +28,7 @@ void nmod_mpoly_reverse(nmod_mpoly_t A,
     else
     {
         for (i = 0; i < Blen/2; i++)
-            MP_LIMB_SWAP(A->coeffs[i], A->coeffs[Blen - i - 1]);
+            FLINT_SWAP(mp_limb_t, A->coeffs[i], A->coeffs[Blen - i - 1]);
     }
 
     mpoly_reverse(A->exps, B->exps, Blen, N);

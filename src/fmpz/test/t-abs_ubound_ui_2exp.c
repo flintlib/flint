@@ -9,21 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_abs_ubound_ui_2exp, state)
 {
     slong iter;
     int result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("abs_ubound_ui_2exp....");
-    fflush(stdout);
-
-
 
     for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
     {
@@ -117,8 +110,5 @@ main(void)
         fmpz_clear(y);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -9,12 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fq_nmod.h"
 #include "fq_zech.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fq_zech_ctx_init, state)
 {
     slong primes[10] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29 };
     slong exponents[10] = { 16, 10, 6, 5, 4, 4, 3, 3, 3, 3 };
@@ -24,11 +24,6 @@ main(void)
     fq_nmod_ctx_struct *fq_nmod_ctx;
     fq_nmod_t lhs, rhs, one;
     fq_zech_ctx_t ctx;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("ctx_init... ");
-
-    fflush(stdout);
 
     fmpz_init(p);
     fmpz_init(e);
@@ -51,7 +46,6 @@ main(void)
                 fq_nmod_init(one, fq_nmod_ctx);
 
                 fq_nmod_one(one, fq_nmod_ctx);
-
 
                 for (j = 0; j < ctx->qm1; j++)
                 {
@@ -103,8 +97,6 @@ main(void)
 
     fmpz_clear(p);
     fmpz_clear(e);
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
 
-    return 0;
+    TEST_FUNCTION_END(state);
 }

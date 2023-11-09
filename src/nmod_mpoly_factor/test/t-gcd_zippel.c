@@ -9,8 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "nmod_mpoly_factor.h"
 
+/* Defined in t-gcd_subresultant.c and t-gcd_zippel.c */
+#define compute_gcd compute_gcd_zippel
 int compute_gcd(
     nmod_mpoly_t G,
     const nmod_mpoly_t A,
@@ -142,7 +145,8 @@ cleanup:
     return success;
 }
 
-
+/* Defined in t-gcd_subresultant.c and t-gcd_zippel.c */
+#define gcd_check gcd_check_gcd_zippel
 void gcd_check(
     nmod_mpoly_t g,
     nmod_mpoly_t a,
@@ -245,15 +249,9 @@ cleanup:
     nmod_mpoly_clear(cg, ctx);
 }
 
-
-int
-main(void)
+TEST_FUNCTION_START(nmod_mpoly_factor_gcd_zippel, state)
 {
     slong i, j, tmul = 20;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("gcd_zippel....");
-    fflush(stdout);
 
     {
         nmod_mpoly_ctx_t ctx;
@@ -464,9 +462,7 @@ main(void)
         nmod_mpoly_ctx_clear(ctx);
     }
 
-    flint_printf("PASS\n");
-    FLINT_TEST_CLEANUP(state);
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
+#undef compute_gcd
+#undef gcd_check

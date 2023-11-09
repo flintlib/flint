@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "thread_support.h"
 #include "fmpz.h"
 
@@ -26,14 +27,9 @@ f(slong i, void * param)
     p->res[i] = i * i;
 }
 
-int
-main(void)
+TEST_FUNCTION_START(thread_support_parallel_do, state)
 {
     slong iter;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("parallel_do....");
-    fflush(stdout);
 
     for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
@@ -69,9 +65,5 @@ main(void)
         flint_free(resy);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

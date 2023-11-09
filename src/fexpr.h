@@ -147,11 +147,8 @@ fexpr_set(fexpr_t res, const fexpr_t expr)
 FEXPR_INLINE void
 fexpr_swap(fexpr_t a, fexpr_t b)
 {
-    fexpr_struct tmp = *a;
-    *a = *b;
-    *b = tmp;
+    FLINT_SWAP(fexpr_struct, *a, *b);
 }
-
 
 FEXPR_INLINE int
 _mpn_equal(mp_srcptr a, mp_srcptr b, slong len)

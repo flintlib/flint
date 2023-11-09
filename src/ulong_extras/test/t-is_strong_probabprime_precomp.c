@@ -9,19 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-int main(void)
+TEST_FUNCTION_START(n_is_strong_probabprime_precomp, state)
 {
    int i, j, result;
    ulong count = UWORD(0);
    slong test_multiplier;
-   FLINT_TEST_INIT(state);
-
-   flint_printf("is_strong_probabprime_precomp....");
-   fflush(stdout);
 
    test_multiplier = FLINT_MAX(1, flint_test_multiplier());
 
@@ -102,8 +98,5 @@ int main(void)
       flint_abort();
    }
 
-   FLINT_TEST_CLEANUP(state);
-
-   flint_printf("PASS\n");
-   return 0;
+   TEST_FUNCTION_END(state);
 }

@@ -9,17 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_poly_make_monic, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("make_monic....");
-    fflush(stdout);
 
     /* Check new leading coeff = gcd old leading coeff and modulus */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -88,8 +84,5 @@ main(void)
         nmod_poly_clear(a);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

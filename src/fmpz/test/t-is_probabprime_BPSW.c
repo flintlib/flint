@@ -9,18 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_is_probabprime_BPSW, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("is_probabprime_BPSW....");
-    fflush(stdout);
 
     /* test primes always pass */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -80,8 +75,5 @@ main(void)
         fmpz_clear(F);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

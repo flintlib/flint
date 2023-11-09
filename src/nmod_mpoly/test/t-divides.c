@@ -9,16 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "nmod_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_mpoly_divides, state)
 {
     int i, j, result, ret, max_threads = 5, tmul = 25;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("divides....");
-    fflush(stdout);
 
     /* Check f*g/g = f sparse */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
@@ -418,9 +414,5 @@ main(void)
         nmod_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

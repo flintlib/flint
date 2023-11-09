@@ -9,23 +9,18 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
 #include "fmpz_lll.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_lll_with_removal, state)
 {
     int i, result = 1, newd;
     fmpz_mat_t mat, mat2, U;
     fmpz_t bound;
     fmpz_lll_t fl;
     flint_bitcnt_t bits;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("lll_with_removal....");
-    fflush(stdout);
 
     /* test using NTRU like matrices */
     for (i = 0; i < 1 * flint_test_multiplier(); i++)
@@ -437,8 +432,5 @@ main(void)
         fmpz_clear(bound);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

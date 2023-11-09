@@ -9,16 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mpoly_evaluate, state)
 {
     slong i, j, v;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("evaluate_one_fmpz/all_fmpz....");
-    fflush(stdout);
 
     {
         fmpz_t A1;
@@ -97,7 +93,6 @@ main(void)
 
         fmpz_mpoly_ctx_clear(ctx);
     }
-
 
     /* Check repeated evalone matches evalall */
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
@@ -441,12 +436,7 @@ main(void)
         fmpz_clear(ge);
         fmpz_clear(fge);
         fmpz_clear(t);
-
     }
 
-    printf("PASS\n");
-    FLINT_TEST_CLEANUP(state);
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

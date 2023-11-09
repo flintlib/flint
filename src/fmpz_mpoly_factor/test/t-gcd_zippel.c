@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2021 Daniel Schultz
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,8 +10,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_mpoly_factor.h"
 
+/* Defined in t-gcd_brown.c, t-gcd_brown_threaded.c, t-gcd_subresultant.c,
+ * t-gcd_zippel.c, t-gcd_zippel2.c */
+#define compute_gcd compute_gcd_zippel
 int compute_gcd(
     fmpz_mpoly_t G,
     const fmpz_mpoly_t A,
@@ -155,7 +160,10 @@ cleanup:
     return success;
 }
 
-
+/* Defined in t-gcd_brown.c, t-gcd_brown_threaded.c, t-gcd_subresultant.c,
+ * t-gcd_zippel.c, t-gcd_zippel2.c */
+#ifndef gcd_check
+#define gcd_check gcd_check
 void gcd_check(
     fmpz_mpoly_t g,
     fmpz_mpoly_t a,
@@ -164,7 +172,8 @@ void gcd_check(
     fmpz_mpoly_ctx_t ctx,
     slong i,
     slong j,
-    const char * name)
+    const char * name,
+    int compute_gcd_fun(fmpz_mpoly_t, const fmpz_mpoly_t, const fmpz_mpoly_t, const fmpz_mpoly_ctx_t))
 {
     int res;
     fmpz_mpoly_t ca, cb, cg;
@@ -173,7 +182,7 @@ void gcd_check(
     fmpz_mpoly_init(cb, ctx);
     fmpz_mpoly_init(cg, ctx);
 
-    res = compute_gcd(g, a, b, ctx);
+    res = compute_gcd_fun(g, a, b, ctx);
 
     fmpz_mpoly_assert_canonical(g, ctx);
 
@@ -216,8 +225,9 @@ void gcd_check(
         flint_abort();
     }
 
-    res = fmpz_mpoly_divides(ca, a, g, ctx) &&
-          fmpz_mpoly_divides(cb, b, g, ctx);
+    res = 1;
+    res = res && fmpz_mpoly_divides(ca, a, g, ctx);
+    res = res && fmpz_mpoly_divides(cb, b, g, ctx);
     if (!res)
     {
         flint_printf("FAIL: Check divisibility\n");
@@ -226,7 +236,7 @@ void gcd_check(
         flint_abort();
     }
 
-    res = compute_gcd(cg, ca, cb, ctx);
+    res = compute_gcd_fun(cg, ca, cb, ctx);
     fmpz_mpoly_assert_canonical(cg, ctx);
 
     if (!res)
@@ -251,16 +261,11 @@ cleanup:
     fmpz_mpoly_clear(cb, ctx);
     fmpz_mpoly_clear(cg, ctx);
 }
+#endif
 
-
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mpoly_factor_gcd_zippel, state)
 {
     slong i, j, tmul = 25;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("gcd_zippel....");
-    fflush(stdout);
 
     /* examples from Zippel's 1979 paper */
     {
@@ -349,7 +354,6 @@ main(void)
                                                     " + x4^2*x5^2*x6^2*x7*x9^2"
         }};
 
-
         for (i = 1; i <= 10; i++)
         {
             fmpz_mpoly_ctx_init(ctx, i, ORD_DEGREVLEX);
@@ -364,7 +368,7 @@ main(void)
             fmpz_mpoly_mul(g, g, d, ctx);
 
             fmpz_mpoly_randtest_bits(r, state, 10, 100, FLINT_BITS, ctx);
-            gcd_check(r, f, g, d, ctx, -2, i, "example");
+            gcd_check(r, f, g, d, ctx, -2, i, "example", compute_gcd);
 
             fmpz_mpoly_clear(r, ctx);
             fmpz_mpoly_clear(d, ctx);
@@ -391,7 +395,7 @@ main(void)
         fmpz_mpoly_mul(a, a, c, ctx);
         fmpz_mpoly_mul(b, b, c, ctx);
 
-        gcd_check(g, a, b, c, ctx, -1, 1, "example");
+        gcd_check(g, a, b, c, ctx, -1, 1, "example", compute_gcd);
 
         /*
             Main variable is t and c has content wrt t mod first chosen prime.
@@ -404,7 +408,7 @@ main(void)
         fmpz_mpoly_mul(a, a, c, ctx);
         fmpz_mpoly_mul(b, b, c, ctx);
 
-        gcd_check(g, a, b, c, ctx, -1, 1, "bug check");
+        gcd_check(g, a, b, c, ctx, -1, 1, "bug check", compute_gcd);
 
         fmpz_mpoly_clear(a, ctx);
         fmpz_mpoly_clear(b, ctx);
@@ -452,7 +456,7 @@ main(void)
             fmpz_mpoly_mul(a, a, t, ctx);
             fmpz_mpoly_mul(b, b, t, ctx);
             fmpz_mpoly_randtest_bits(g, state, len, coeff_bits, FLINT_BITS, ctx);
-            gcd_check(g, a, b, t, ctx, i, j, "sparse");
+            gcd_check(g, a, b, t, ctx, i, j, "sparse", compute_gcd);
         }
 
         fmpz_mpoly_clear(g, ctx);
@@ -462,9 +466,6 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
-    flint_printf("PASS\n");
-    FLINT_TEST_CLEANUP(state);
-
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
+#undef compute_gcd

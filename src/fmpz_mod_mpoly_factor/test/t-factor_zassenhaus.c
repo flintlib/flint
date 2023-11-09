@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2020 Daniel Schultz
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,10 +10,19 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_mod_mpoly_factor.h"
 
+/* Defined in t-factor.c, t-factor_wang.c, t-factor_zassenhaus.c, t-factor_zippel.c */
+#ifndef check_omega
+#define check_omega check_omega
 /* check total number of factors with multiplicity is between lower and upper */
-void check_omega(slong lower, slong upper, const fmpz_mod_mpoly_t p, const fmpz_mod_mpoly_ctx_t ctx)
+void check_omega(
+    slong lower,
+    slong upper,
+    const fmpz_mod_mpoly_t p,
+    const fmpz_mod_mpoly_ctx_t ctx,
+    int factor_fun(fmpz_mod_mpoly_factor_t, const fmpz_mod_mpoly_t, const fmpz_mod_mpoly_ctx_t))
 {
     slong i;
     fmpz_mod_mpoly_t q;
@@ -24,23 +34,24 @@ void check_omega(slong lower, slong upper, const fmpz_mod_mpoly_t p, const fmpz_
     fmpz_mod_mpoly_factor_init(h, ctx);
     fmpz_mod_mpoly_init(q, ctx);
 
-    if (!fmpz_mod_mpoly_factor_zassenhaus(g, p, ctx))
+    if (!factor_fun(g, p, ctx))
     {
-        flint_printf("FAIL:\ncheck factorization 1 could be computed\n");
+        flint_printf("FAIL:\nfactorization 1 could be computed\n");
         fflush(stdout);
         flint_abort();
     }
 
-    if (!fmpz_mod_mpoly_factor(h, p, ctx))
-    {
-        flint_printf("check factorization 2 could be computed\n");
-        fflush(stdout);
-        flint_abort();
-    }
+    if (factor_fun != fmpz_mod_mpoly_factor)
+        if (!fmpz_mod_mpoly_factor(h, p, ctx))
+        {
+            flint_printf("FAIL:\nfactorization 2 could be computed\n");
+            fflush(stdout);
+            flint_abort();
+        }
 
     for (i = 0; i < g->num; i++)
     {
-        if (g->poly[i].length < 1 || g->poly[i].coeffs[0] != 1)
+        if (g->poly[i].length < 1 || !fmpz_is_one(g->poly[i].coeffs + 0))
         {
             flint_printf("FAIL:\nfactorization is not unit normal\n");
             fflush(stdout);
@@ -67,13 +78,16 @@ void check_omega(slong lower, slong upper, const fmpz_mod_mpoly_t p, const fmpz_
         flint_abort();
     }
 
-    fmpz_mod_mpoly_factor_sort(g, ctx);
-    fmpz_mod_mpoly_factor_sort(h, ctx);
-    if (fmpz_mod_mpoly_factor_cmp(g, h, ctx) != 0)
+    if (factor_fun != fmpz_mod_mpoly_factor)
     {
-        flint_printf("factorizations do not match\n");
-        fflush(stdout);
-        flint_abort();
+        fmpz_mod_mpoly_factor_sort(g, ctx);
+        fmpz_mod_mpoly_factor_sort(h, ctx);
+        if (fmpz_mod_mpoly_factor_cmp(g, h, ctx) != 0)
+        {
+            flint_printf("FAIL:\nfactorizations do not match\n");
+            fflush(stdout);
+            flint_abort();
+        }
     }
 
     for (i = 0; i < g->num; i++)
@@ -92,16 +106,11 @@ void check_omega(slong lower, slong upper, const fmpz_mod_mpoly_t p, const fmpz_
     fmpz_mod_mpoly_factor_clear(h, ctx);
     fmpz_clear(omega);
 }
+#endif
 
-
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mod_mpoly_factor_zassenhaus, state)
 {
     slong i, j, tmul = 30;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("factor_zassenhaus....");
-    fflush(stdout);
 
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
@@ -137,15 +146,12 @@ main(void)
             fmpz_mod_mpoly_mul(a, a, t, ctx);
         }
 
-        check_omega(lower, WORD_MAX, a, ctx);
+        check_omega(lower, WORD_MAX, a, ctx, fmpz_mod_mpoly_factor_zassenhaus);
 
         fmpz_mod_mpoly_clear(t, ctx);
         fmpz_mod_mpoly_clear(a, ctx);
         fmpz_mod_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

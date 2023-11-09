@@ -53,7 +53,7 @@ Conversions
 
     Sets ``(res, len)`` to ``(vec, len)``.
 
-.. function:: void _fmpq_vec_get_fmpz_vec_fmpz(fmpz* num, fmpz_t den, const fmpq * a, slong len)
+.. function:: void _fmpq_vec_get_fmpz_vec_fmpz(fmpz * num, fmpz_t den, const fmpq * a, slong len)
 
     Find a common denominator ``den`` of the entries of ``a`` and set ``(num, len)`` to the corresponding numerators.
 

@@ -9,21 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-
-#include "qadic.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "long_extras.h"
+#include "qadic.h"
 
-int
-main(void)
+TEST_FUNCTION_START(qadic_norm_analytic, state)
 {
     int i, result;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("norm_analytic... ");
-    fflush(stdout);
-
-
 
     /* Compare with product of Galois conjugates */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
@@ -91,9 +84,5 @@ main(void)
         qadic_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

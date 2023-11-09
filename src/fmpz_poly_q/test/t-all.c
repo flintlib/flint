@@ -1,7 +1,7 @@
 /*
+    Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2013 Fredrik Johansson
     Copyright (C) 2013 William Hart
-    Copyright (C) 2011 Sebastian Pancratz
 
     This file is part of FLINT.
 
@@ -12,6 +12,7 @@
 */
 
 #include <string.h>
+#include "test_helpers.h"
 #include "fmpq.h"
 #include "fmpz_poly_q.h"
 
@@ -1132,7 +1133,7 @@ void test_submul(char * in1, char * in2, char * in3, char * out)
     flint_free(res);
 }
 
-int main(int argc, char *argv[])
+TEST_FUNCTION_START(fmpz_poly_q_all, state)
 {
     int ans;
     char *str, *strout;
@@ -1143,10 +1144,6 @@ int main(int argc, char *argv[])
     fmpz_t fmpzzero, fmpzone, fmpztwo;
     fmpq_t fmpqzero, fmpqone, fmpqtwo, fmpqtwoinv;
 
-    FLINT_TEST_INIT(state);
-
-    flint_printf("all... ");
-    fflush(stdout);
 
     /* Accessing numerator and denominator ***********************************/
 
@@ -1595,8 +1592,5 @@ int main(int argc, char *argv[])
     test_get_str_pretty("2  1 1/1  2", "(t+1)/2");
     test_get_str_pretty("1  1/1  2", "1/2");
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

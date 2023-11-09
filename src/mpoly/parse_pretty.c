@@ -141,8 +141,8 @@ void mpoly_parse_add_terminal(mpoly_parse_t E, const char * s, const void * val)
 
     while (n > 0 && E->terminal_strings[n-1].str_len < E->terminal_strings[n].str_len)
     {
-        PTR_SWAP(char, E->terminal_strings[n-1].str, E->terminal_strings[n].str);
-        SLONG_SWAP(E->terminal_strings[n-1].str_len, E->terminal_strings[n].str_len);
+        FLINT_SWAP(char *, E->terminal_strings[n-1].str, E->terminal_strings[n].str);
+        FLINT_SWAP(slong, E->terminal_strings[n-1].str_len, E->terminal_strings[n].str_len);
         E->R->swap(E->terminal_values + E->R->elem_size*(n-1), E->terminal_values + E->R->elem_size*n, E->R->ctx);
         n--;
     }
@@ -267,7 +267,7 @@ again:
 
             if (l1 > l3)
             {
-                SLONG_SWAP(l3, l1);
+                FLINT_SWAP(slong, l3, l1);
                 E->R->swap(E->estore + E->R->elem_size*n3, E->estore + E->R->elem_size*n1, E->R->ctx);
             }
 

@@ -42,7 +42,7 @@ static void fq_zech_polyu_sort_terms(
     for (i = 1; i < A->length; i++)
     for (j = i; j > 0 && A->exps[j - 1] < A->exps[j]; j--)
     {
-        ULONG_SWAP(A->exps[j - 1], A->exps[j]);
+        FLINT_SWAP(ulong, A->exps[j - 1], A->exps[j]);
         fq_zech_swap(A->coeffs + j - 1, A->coeffs + j, ctx);
     }
     return;

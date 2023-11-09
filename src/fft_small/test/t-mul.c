@@ -1,4 +1,4 @@
-/* 
+/*
     Copyright (C) 2022 Daniel Schultz
 
     This file is part of FLINT.
@@ -9,52 +9,20 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fft_small.h"
 #include "machine_vectors.h"
 
-void flint_print_d_fixed(double x, ulong l)
+void test_mul(mpn_ctx_t R, ulong maxsize, ulong nreps, flint_rand_t state)
 {
-    ulong i;
-    TMP_INIT;
-    TMP_START;
-    char* s = TMP_ARRAY_ALLOC(l + 1, char);
+    ulong * a, * b, * c, *d;
 
-    for (i = 0; i < l; i++)
-        s[i] = ' ';
-    s[l] = 0;
+    a = FLINT_ARRAY_ALLOC(maxsize, ulong);
+    b = FLINT_ARRAY_ALLOC(maxsize, ulong);
+    c = FLINT_ARRAY_ALLOC(maxsize, ulong);
+    d = FLINT_ARRAY_ALLOC(maxsize, ulong);
 
-    ulong y = fabs(rint(x));
-    while (l > 0)
-    {
-        s[--l] = '0' + (y%10);
-        y = y/10;
-        if (y == 0)
-            break;
-    }
-
-    printf("%s", s);
-
-    TMP_END;
-}
-
-void test_mul(mpn_ctx_t R, ulong minsize, ulong maxsize, ulong nreps, flint_rand_t state)
-{
-    ulong* a = FLINT_ARRAY_ALLOC(maxsize, ulong);
-    ulong* b = FLINT_ARRAY_ALLOC(maxsize, ulong);
-    ulong* c = FLINT_ARRAY_ALLOC(maxsize, ulong);
-    ulong* d = FLINT_ARRAY_ALLOC(maxsize, ulong);
-
-    ulong dgs = n_sizeinbase(nreps, 10);
-
-    flint_printf(" mul ");
-    flint_print_d_fixed(0, dgs);
-    flint_printf("/");
-    flint_print_d_fixed(nreps, dgs);
-    fflush(stdout);
-
-    minsize = n_max(10, minsize);
-    maxsize = n_max(minsize, maxsize);
     for (ulong rep = 0; rep < nreps; rep++)
     {
         ulong an = 2 + n_randint(state, maxsize - 4);
@@ -67,16 +35,6 @@ void test_mul(mpn_ctx_t R, ulong minsize, ulong maxsize, ulong nreps, flint_rand
             c[i] = n_randlimb(state);
             d[i] = n_randlimb(state);
         }
-
-        for (ulong ii = 0; ii < 2*dgs + 6; ii++)
-            flint_printf("%c", '\b');
-        fflush(stdout);
-
-        flint_printf(" mul ");
-        flint_print_d_fixed(1+rep, dgs);
-        flint_printf("/");
-        flint_print_d_fixed(nreps, dgs);
-        fflush(stdout);
 
         mpn_ctx_mpn_mul(R, d, a, an, b, bn);
         mpn_mul(c, a, an, b, bn);
@@ -113,29 +71,17 @@ void test_mul(mpn_ctx_t R, ulong minsize, ulong maxsize, ulong nreps, flint_rand
     flint_free(b);
     flint_free(c);
     flint_free(d);
-
-    for (ulong ii = 0; ii < 2*dgs + 6; ii++)
-        flint_printf("%c", '\b');
-    fflush(stdout);
 }
 
-
-int main(void)
+TEST_FUNCTION_START(mpn_ctx_mpn_mul, state)
 {
-    FLINT_TEST_INIT(state);
-
-    flint_printf("mpn_mul....");
-    fflush(stdout);
-
     {
         mpn_ctx_t R;
         mpn_ctx_init(R, UWORD(0x0003f00000000001));
-        test_mul(R, 10, 50000, 5000, state);
+        test_mul(R, 10000, 1000 * flint_test_multiplier(), state);
+        test_mul(R, 50000, 100 * flint_test_multiplier(), state);
         mpn_ctx_clear(R);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

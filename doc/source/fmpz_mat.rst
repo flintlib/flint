@@ -315,7 +315,7 @@ Input and output
     Prints the given matrix to ``stdout``.  For further details,
     see :func:`fmpz_mat_fprint_pretty`.
 
-.. function:: int fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
+.. function:: int fmpz_mat_fread(FILE * file, fmpz_mat_t mat)
 
     Reads a matrix from the stream ``file``, storing the result
     in ``mat``.  The expected format is the number of rows, a

@@ -17,19 +17,10 @@ int gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
 
     if (r != s && gr_mat_is_empty(mat, ctx) == T_FALSE)
     {
-        gr_ptr * u;
-        slong t;
-
         if (perm != NULL)
-        {
-            t = perm[s];
-            perm[s] = perm[r];
-            perm[r] = t;
-        }
+            FLINT_SWAP(slong, perm[r], perm[s]);
 
-        u = mat->rows[s];
-        mat->rows[s] = mat->rows[r];
-        mat->rows[r] = u;
+        FLINT_SWAP(gr_ptr, mat->rows[r], mat->rows[s]);
     }
 
     return GR_SUCCESS;

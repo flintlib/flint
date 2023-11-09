@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_mod_mpoly.h"
-
 
 /* foolproof way to check totdeg_check is correct */
 void _check_total_degree(const fmpz_t totdeg_check, const fmpz_mod_mpoly_t A,
@@ -24,16 +24,9 @@ void _check_total_degree(const fmpz_t totdeg_check, const fmpz_mod_mpoly_t A,
     fmpz_clear(totdeg);
 }
 
-
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mod_mpoly_total_degree, state)
 {
     slong i, j;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("total_degree....");
-    fflush(stdout);
 
     /* Check total_degree does not go up under addition */
     for (i = 0; i < 40 * flint_test_multiplier(); i++)
@@ -158,9 +151,5 @@ main(void)
         fmpz_mod_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

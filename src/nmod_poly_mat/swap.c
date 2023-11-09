@@ -16,12 +16,5 @@
 void
 nmod_poly_mat_swap(nmod_poly_mat_t A, nmod_poly_mat_t B)
 {
-    if (A != B)
-    {
-        nmod_poly_mat_struct tmp;
-
-        tmp = *A;
-        *A = *B;
-        *B = tmp;
-    }
+    FLINT_SWAP(nmod_poly_mat_struct, *A, *B);
 }

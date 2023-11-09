@@ -435,7 +435,7 @@ static void _hensel_build_tree(
             }
         }
         n_poly_swap(V + j, V + minp);
-        SLONG_SWAP(link[j], link[minp]);
+        FLINT_SWAP(slong, link[j], link[minp]);
 
         minp = j + 1;
         mind = n_poly_degree(V + j + 1);
@@ -448,7 +448,7 @@ static void _hensel_build_tree(
             }
         }
         n_poly_swap(V + j + 1, V + minp);
-        SLONG_SWAP(link[j + 1], link[minp]);
+        FLINT_SWAP(slong, link[j + 1], link[minp]);
 
         n_fq_poly_mul(V + i, V + j, V + j + 1, emb->lgctx);
         link[i] = j;

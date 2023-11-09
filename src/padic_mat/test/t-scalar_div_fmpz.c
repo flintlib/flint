@@ -9,14 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "test_helpers.h"
 #include "ulong_extras.h"
-#include "long_extras.h"
-#include "padic.h"
 #include "padic_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(padic_mat_scalar_div_fmpz, state)
 {
     int i, result;
 
@@ -24,11 +21,6 @@ main(void)
     slong N;
     padic_ctx_t ctx;
     slong m, n;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("scalar_div_fmpz... ");
-    fflush(stdout);
 
     /* Check aliasing */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -73,9 +65,5 @@ main(void)
         padic_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

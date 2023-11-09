@@ -9,22 +9,19 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_factor.h"
 
-int main(void)
+TEST_FUNCTION_START(fmpz_factor_pp1, state)
 {
    int i, j, result;
    ulong count = UWORD(0);
    gmp_randstate_t st;
-   FLINT_TEST_INIT(state);
+
    gmp_randinit_default(st);
-
-
-   flint_printf("factor_pp1....");
-   fflush(stdout);
 
    for (i = 0; i < 50 * flint_test_multiplier(); i++) /* Test random numbers */
    {
@@ -89,9 +86,7 @@ int main(void)
       flint_abort();
    }
 
-
    gmp_randclear(st);
-   FLINT_TEST_CLEANUP(state);
-   flint_printf("PASS\n");
-   return 0;
+
+   TEST_FUNCTION_END(state);
 }

@@ -9,8 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
+#include "test_helpers.h"
 #include "fmpq.h"
 
 void mpq_submul(mpq_t x, mpq_t y, mpq_t z)
@@ -22,15 +21,9 @@ void mpq_submul(mpq_t x, mpq_t y, mpq_t z)
     mpq_clear(t);
 }
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_submul, state)
 {
     int i;
-    FLINT_TEST_INIT(state);
-
-
-    flint_printf("submul....");
-    fflush(stdout);
 
     /* x -= y * z */
     for (i = 0; i < 10000; i++)
@@ -184,9 +177,5 @@ main(void)
         mpq_clear(Y);
     }
 
-
-
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

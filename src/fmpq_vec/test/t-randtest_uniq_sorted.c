@@ -9,16 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
+#include "test_helpers.h"
 #include "fmpq.h"
 #include "fmpq_vec.h"
 
-int main(void)
+TEST_FUNCTION_START(fmpq_vec_randtest_uniq_sorted, state)
 {
     int iter;
-    FLINT_TEST_INIT(state);
-
-    printf("randtest_uniq_sorted....");
 
     for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
     {
@@ -68,8 +65,5 @@ int main(void)
         _fmpq_vec_clear(vec, n);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

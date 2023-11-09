@@ -222,9 +222,7 @@ void n_poly_set(n_poly_t A, const n_poly_t B)
 N_POLY_INLINE
 void n_poly_swap(n_poly_t A, n_poly_t B)
 {
-    n_poly_struct t = *B;
-    *B = *A;
-    *A = t;
+    FLINT_SWAP(n_poly_struct, *A, *B);
 }
 
 N_POLY_INLINE
@@ -700,7 +698,7 @@ void _n_fq_swap(
 {
     slong i = 0;
     do {
-        MP_LIMB_SWAP(a[i], b[i]);
+        FLINT_SWAP(mp_limb_t, a[i], b[i]);
         i++;
     } while (i < d);
 }

@@ -12,16 +12,12 @@
 
 #ifdef T
 
+#include "test_helpers.h"
 #include "templates.h"
 
-int
-main(void)
+TEST_TEMPLATE_FUNCTION_START(T, poly_inflate, state)
 {
     int iter;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("inflate....");
-    fflush(stdout);
 
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
@@ -86,10 +82,6 @@ main(void)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
-
 #endif

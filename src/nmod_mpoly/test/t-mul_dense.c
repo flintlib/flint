@@ -9,16 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "nmod_mpoly.h"
 
-int
-main(void)
+TEST_FUNCTION_START(nmod_mpoly_mul_dense, state)
 {
     int i, j, result, success;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("mul_dense....");
-    fflush(stdout);
 
     /* Check mul_dense matches mul_johnson */
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
@@ -199,9 +195,6 @@ main(void)
         nmod_mpoly_clear(h, ctx);
         nmod_mpoly_ctx_clear(ctx);
     }
-    FLINT_TEST_CLEANUP(state);
 
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

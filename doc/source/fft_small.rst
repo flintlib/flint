@@ -69,15 +69,15 @@ Preconditioned polynomial arithmetic
 
     Represents ``(b, bn)`` in transformed form for preconditioned multiplication.
 
-.. function:: int _nmod_poly_mul_mid_precomp(ulong* z, ulong zl, ulong zh, const ulong* a, ulong an, mul_precomp_struct* M, nmod_t mod, mpn_ctx_t R)
+.. function:: int _nmod_poly_mul_mid_precomp(ulong * z, ulong zl, ulong zh, const ulong * a, ulong an, mul_precomp_struct * M, nmod_t mod, mpn_ctx_t R)
 
     Polynomial multiplication given a precomputed transform ``M``.
     Returns 1 if successful, 0 if the precomputed transform is too short.
 
 .. type:: nmod_poly_divrem_precomp_struct
 
-.. function:: void _nmod_poly_divrem_precomp_init(nmod_poly_divrem_precomp_struct * M, const ulong* b, ulong bn, ulong Bn, nmod_t mod, mpn_ctx_t R)
-              void _nmod_poly_divrem_precomp_clear(nmod_poly_divrem_precomp_struct* M)
+.. function:: void _nmod_poly_divrem_precomp_init(nmod_poly_divrem_precomp_struct * M, const ulong * b, ulong bn, ulong Bn, nmod_t mod, mpn_ctx_t R)
+              void _nmod_poly_divrem_precomp_clear(nmod_poly_divrem_precomp_struct * M)
 
     Represents ``(b, bn)`` and its inverse in transformed form for preconditioned multiplication.
 

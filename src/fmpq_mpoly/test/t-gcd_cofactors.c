@@ -9,9 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpq_mpoly.h"
 
+/* Defined in t-gcd.c, t-gcd_brown.c, t-gcd_cofactors.c, t-gcd_hensel.c,
+ * t-gcd_subresultant.c, t-gcd_zippel2.c */
+#define gcd_check gcd_check_gcd_cofactors
 void gcd_check(
     fmpq_mpoly_t g,
     fmpq_mpoly_t abar,
@@ -242,7 +246,6 @@ void gcd_check(
         flint_abort();
     }
 
-
     res = fmpq_mpoly_gcd_cofactors(cg, ca, cb, abar, bbar, ctx);
     fmpq_mpoly_assert_canonical(cg, ctx);
 
@@ -295,18 +298,10 @@ cleanup:
     fmpq_mpoly_clear(w, ctx);
 }
 
-int
-main(void)
+TEST_FUNCTION_START(fmpq_mpoly_gcd_cofactors, state)
 {
     const slong max_threads = 5;
     slong i, j, k, tmul = 3;
-    FLINT_TEST_INIT(state);
-#ifdef _WIN32
-    tmul = 1;
-#endif
-
-    flint_printf("gcd_cofactors....");
-    fflush(stdout);
 
     {
         int success;
@@ -977,9 +972,6 @@ main(void)
         fmpq_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
+#undef gcd_check

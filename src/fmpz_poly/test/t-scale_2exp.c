@@ -9,16 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
-
-int main(void)
+TEST_FUNCTION_START(fmpz_poly_scale_2exp, state)
 {
     int iter;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("scale_2exp....");
-    fflush(stdout);
 
     /* Check that scale(k) followed by scale(-k) is identity */
     for (iter = 0; iter < 1000; iter++)
@@ -118,9 +114,5 @@ int main(void)
         fmpz_clear(res2);
     }
 
-
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -17,16 +17,12 @@
 #include "fmpz_mod.h"
 #include "fmpz_mod_mat.h"
 
-int main(void)
+TEST_FUNCTION_START(fmpz_mod_mat_can_solve, state)
 {
     fmpz_mod_ctx_t ctx;
     fmpz_mod_mat_t A, X, X2, B, AX;
     slong i, k, m, n;
     int solved;
-
-    FLINT_TEST_INIT(state);
-    flint_printf("can_solve....");
-    fflush(stdout);
 
     /* test random systems */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
@@ -93,8 +89,5 @@ int main(void)
         fmpz_mod_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

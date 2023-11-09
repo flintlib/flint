@@ -9,21 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mat_solve_cramer, state)
 {
     fmpz_mat_t A, X, B, AX;
     fmpz_t den;
     slong i, m, n, r;
     int success;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("solve_cramer....");
-    fflush(stdout);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -105,8 +100,5 @@ main(void)
         fmpz_clear(den);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_poly.h"
 
 static const mp_limb_t known_values[] =
@@ -26,16 +27,11 @@ static const mp_limb_t known_values[] =
     UWORD(394942914)
 };
 
-int main(void)
+TEST_FUNCTION_START(fmpz_poly_swinnerton_dyer, state)
 {
     fmpz_poly_t S;
     mp_limb_t r;
     slong n;
-
-    FLINT_TEST_INIT(state);
-
-    flint_printf("swinnerton_dyer....");
-    fflush(stdout);
 
     for (n = 0; n <= 10; n++)
     {
@@ -53,8 +49,5 @@ int main(void)
         fmpz_poly_clear(S);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_mpoly_factor.h"
-
 
 void check_content(const fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx)
 {
@@ -86,15 +86,9 @@ void check_content(const fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx)
     fmpz_clear(deg);
 }
 
-
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mpoly_factor_content, state)
 {
     slong i, j, k, tmul = 30;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("factor_content....");
-    fflush(stdout);
 
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
@@ -143,8 +137,5 @@ main(void)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

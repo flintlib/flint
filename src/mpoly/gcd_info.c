@@ -655,7 +655,7 @@ void mpoly_gcd_info_measure_zippel2(
 
     for (i = 1; i < m; i++)
         for (j = i; j > 0 && NEEDS_SWAP; j--)
-            SLONG_SWAP(perm[j], perm[j - 1]);
+            FLINT_SWAP(slong, perm[j], perm[j - 1]);
 
 
 #define NEEDS_SWAP2                                                           \
@@ -664,7 +664,7 @@ void mpoly_gcd_info_measure_zippel2(
 
     for (i = 3; i < m; i++)
         for (j = i; j > 2 && NEEDS_SWAP; j--)
-            SLONG_SWAP(perm[j], perm[j - 1]);
+            FLINT_SWAP(slong, perm[j], perm[j - 1]);
 
 
     max_main_degree = 0;

@@ -9,20 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
+#include "test_helpers.h"
 #include "fmpz_mpoly.h"
-#include "ulong_extras.h"
 
-int
-main(void)
+TEST_FUNCTION_START(fmpz_mpoly_divrem_ideal_monagan_pearce, state)
 {
     int i, j, w, result;
     slong tmul = 10;
-    FLINT_TEST_INIT(state);
-
-    flint_printf("divrem_ideal_monagan_pearce....");
-    fflush(stdout);
 
     /* Check f*g/g = f */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
@@ -294,9 +287,5 @@ main(void)
        flint_free(q);
     }
 
-    FLINT_TEST_CLEANUP(state);
-
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-

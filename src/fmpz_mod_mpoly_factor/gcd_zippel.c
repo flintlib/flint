@@ -736,7 +736,7 @@ outer_loop:
 
     for (i = 1; i < Gmarks->length; i++)
         for (j = i; j > 0 && length(perm[j-1]) > length(perm[j]); j--)
-            SLONG_SWAP(perm[j-1], perm[j]);
+            FLINT_SWAP(slong, perm[j-1], perm[j]);
 
     req_zip_images = Gmarks->length - 2;
     j = 0;

@@ -12,18 +12,12 @@
 
 #ifdef T
 
+#include "test_helpers.h"
 #include "templates.h"
 
-#include "ulong_extras.h"
-
-int
-main(void)
+TEST_TEMPLATE_FUNCTION_START(T, mat_invert_rows_cols, state)
 {
     slong m, n, rep, i, j;
-    FLINT_TEST_INIT(state);
-
-    printf("invert_cols/rows....");
-    fflush(stdout);
 
     for (rep = 0; rep < 50 * flint_test_multiplier(); rep++)
     {
@@ -70,10 +64,6 @@ main(void)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
-    FLINT_TEST_CLEANUP(state);
-    printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
-
-
 #endif
