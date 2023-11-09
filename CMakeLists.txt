@@ -11,14 +11,9 @@
 
 cmake_minimum_required(VERSION 3.10)
 
-include(CheckIPOSupported)
-include(CheckIncludeFiles)
-include(CheckFunctionExists)
-include(CheckPrototypeDefinition)
 include(CheckCCompilerFlag)
 include(CheckCSourceRuns)
-include(CheckLibraryExists)
-include(TestBigEndian)
+include(CheckIPOSupported)
 
 # Source of truth for project version
 file(STRINGS VERSION FLINT_VERSION_FULL)
