@@ -5,11 +5,11 @@
 
 By default, an :type:`fmpz_t` is implemented as an array of
 :type:`fmpz`'s of length one to allow passing by reference as one can
-do with GMP/ MPIR's :type:`mpz_t` type. The :type:`fmpz_t` type is
+do with GMP's :type:`mpz_t` type. The :type:`fmpz_t` type is
 simply a single limb, though the user does not need to be aware of
 this except in one specific case outlined below.
 
-In all respects, :type:`fmpz_t`'s act precisely like GMP/ MPIR's
+In all respects, :type:`fmpz_t`'s act precisely like GMP's
 ``mpz_t``'s, with automatic memory management, however, in the first
 place only one limb is used to implement them. Once an :type:`fmpz_t`
 overflows a limb then a multiprecision integer is automatically
@@ -525,7 +525,7 @@ Input and output
 
     This convention is adopted in light of the return values of
     ``scanf`` from the standard library and ``mpz_inp_str``
-    from MPIR.
+    from GMP.
 
 .. function:: int fmpz_fread(FILE * file, fmpz_t f)
 
@@ -538,9 +538,9 @@ Input and output
 
     This convention is adopted in light of the return values of
     ``scanf`` from the standard library and ``mpz_inp_str``
-    from MPIR.
+    from GMP.
 
-.. function:: size_t fmpz_inp_raw(fmpz_t x, FILE *fin )
+.. function:: size_t fmpz_inp_raw(fmpz_t x, FILE * fin)
 
     Reads a multiprecision integer from the stream ``file``.  The
     format is raw binary format write by :func:`fmpz_out_raw`.
@@ -563,7 +563,7 @@ Input and output
 
     This convention is adopted in light of the return values of
     ``flint_printf`` from the standard library and ``mpz_out_str``
-    from MPIR.
+    from GMP.
 
 .. function:: int fmpz_fprint(FILE * file, const fmpz_t x)
 
@@ -577,7 +577,7 @@ Input and output
 
     This convention is adopted in light of the return values of
     ``flint_printf`` from the standard library and ``mpz_out_str``
-    from MPIR.
+    from GMP.
 
 .. function:: size_t fmpz_out_raw(FILE * fout, const fmpz_t x )
 

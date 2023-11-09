@@ -11,7 +11,7 @@ The module includes functions for square roots, factorisation and
 primality testing. Almost all the functions in this module are highly
 developed and extremely well optimised.
 
-The basic type is the ``mp_limb_t`` as defined by MPIR. Functions
+The basic type is the ``mp_limb_t`` as defined by GMP. Functions
 which take a precomputed inverse either have the suffix ``preinv`` and
 take an ``mp_limb_t`` precomputed inverse as computed by
 ``n_preinvert_limb`` or have the suffix ``_precomp`` and accept a

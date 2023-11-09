@@ -202,11 +202,11 @@ reduced to the precision of ``rop``.
 
 .. function:: void padic_set_mpz(padic_t rop, const mpz_t op, const padic_ctx_t ctx)
 
-    Sets the `p`-adic number ``rop`` to the MPIR integer ``op``.
+    Sets the `p`-adic number ``rop`` to the GMP integer ``op``.
 
 .. function:: void padic_set_mpq(padic_t rop, const mpq_t op, const padic_ctx_t ctx)
 
-    Sets ``rop`` to the MPIR rational ``op``.
+    Sets ``rop`` to the GMP rational ``op``.
 
 .. function:: void padic_get_fmpz(fmpz_t rop, const padic_t op, const padic_ctx_t ctx)
 
@@ -220,13 +220,13 @@ reduced to the precision of ``rop``.
 
 .. function:: void padic_get_mpz(mpz_t rop, const padic_t op, const padic_ctx_t ctx)
 
-    Sets the MPIR integer ``rop`` to the `p`-adic integer ``op``.
+    Sets the GMP integer ``rop`` to the `p`-adic integer ``op``.
 
     If ``op`` is not a `p`-adic integer, raises an ``abort`` signal.
 
 .. function:: void padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx)
 
-    Sets the MPIR rational ``rop`` to the value of ``op``.
+    Sets the GMP rational ``rop`` to the value of ``op``.
 
 .. function:: void padic_swap(padic_t op1, padic_t op2)
 
