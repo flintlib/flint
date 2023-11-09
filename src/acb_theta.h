@@ -57,7 +57,7 @@ int sp2gz_is_trig(const fmpz_mat_t mat);
 int sp2gz_is_embedded(fmpz_mat_t res, const fmpz_mat_t mat);
 
 void sp2gz_inv(fmpz_mat_t inv, const fmpz_mat_t mat);
-fmpz_mat_struct* sp2gz_decompose(slong* nb, const fmpz_mat_t mat);
+fmpz_mat_struct * sp2gz_decompose(slong * nb, const fmpz_mat_t mat);
 
 void sp2gz_randtest(fmpz_mat_t mat, flint_rand_t state, slong bits);
 
@@ -82,13 +82,13 @@ void acb_siegel_randtest_vec(acb_ptr z, flint_rand_t state, slong g, slong prec)
 
 /* Theta characteristics */
 
-void acb_theta_char_get_slong(slong* n, ulong a, slong g);
-ulong acb_theta_char_get_a(const slong* n, slong g);
+void acb_theta_char_get_slong(slong * n, ulong a, slong g);
+ulong acb_theta_char_get_a(const slong * n, slong g);
 void acb_theta_char_get_arb(arb_ptr v, ulong a, slong g);
 void acb_theta_char_get_acb(acb_ptr v, ulong a, slong g);
 
 slong acb_theta_char_dot(ulong a, ulong b, slong g);
-slong acb_theta_char_dot_slong(ulong a, const slong* n, slong g);
+slong acb_theta_char_dot_slong(ulong a, const slong * n, slong g);
 void acb_theta_char_dot_acb(acb_t x, ulong a, acb_srcptr z, slong g, slong prec);
 
 int acb_theta_char_is_even(ulong ab, slong g);
@@ -100,12 +100,12 @@ int acb_theta_char_is_syzygous(ulong ch1, ulong ch2, ulong ch3, slong g);
 struct acb_theta_eld_struct
 {
     slong dim, ambient_dim;
-    slong* last_coords;
+    slong * last_coords;
     slong min, mid, max, nr, nl;
-    struct acb_theta_eld_struct* rchildren;
-    struct acb_theta_eld_struct* lchildren;
+    struct acb_theta_eld_struct * rchildren;
+    struct acb_theta_eld_struct * lchildren;
     slong nb_pts, nb_border;
-    slong* box;
+    slong * box;
 };
 
 typedef struct acb_theta_eld_struct acb_theta_eld_t[1];
@@ -128,9 +128,9 @@ void acb_theta_eld_init(acb_theta_eld_t E, slong d, slong g);
 void acb_theta_eld_clear(acb_theta_eld_t E);
 
 int acb_theta_eld_set(acb_theta_eld_t E, const arb_mat_t C, const arf_t R2, arb_srcptr v);
-void acb_theta_eld_points(slong* pts, const acb_theta_eld_t E);
-void acb_theta_eld_border(slong* pts, const acb_theta_eld_t E);
-int acb_theta_eld_contains(const acb_theta_eld_t E, slong* pt);
+void acb_theta_eld_points(slong * pts, const acb_theta_eld_t E);
+void acb_theta_eld_border(slong * pts, const acb_theta_eld_t E);
+int acb_theta_eld_contains(const acb_theta_eld_t E, slong * pt);
 void acb_theta_eld_print(const acb_theta_eld_t E);
 
 /* Naive algorithms */
@@ -138,11 +138,11 @@ void acb_theta_eld_print(const acb_theta_eld_t E);
 void acb_theta_naive_radius(arf_t R2, arf_t eps, const arb_mat_t C, slong ord, slong prec);
 void acb_theta_naive_reduce(arb_ptr v, acb_ptr new_zs, arb_ptr as, acb_ptr cs, arb_ptr us,
     acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec);
-void acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong* tup,
-    slong* n, slong prec);
+void acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong * tup,
+    slong * n, slong prec);
 
-typedef void (*acb_theta_naive_worker_t)(acb_ptr, acb_srcptr, acb_srcptr, const slong*,
-    slong, const acb_t, const slong*, slong, slong, slong, slong);
+typedef void * acb_theta_naive_worker_t(acb_ptr, acb_srcptr, acb_srcptr, const slong *,
+    slong, const acb_t, const slong *, slong, slong, slong, slong);
 
 void acb_theta_naive_worker(acb_ptr th, slong len, acb_srcptr zs, slong nb,
     const acb_mat_t tau, const acb_theta_eld_t E, slong ord, slong prec,
@@ -160,9 +160,9 @@ void acb_theta_naive_all(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t ta
 /* Naive algorithms for derivatives */
 
 slong acb_theta_jet_nb(slong ord, slong g);
-slong acb_theta_jet_total_order(const slong* tup, slong g);
-void acb_theta_jet_tuples(slong* tups, slong ord, slong g);
-slong acb_theta_jet_index(const slong* tup, slong g);
+slong acb_theta_jet_total_order(const slong * tup, slong g);
+void acb_theta_jet_tuples(slong * tups, slong ord, slong g);
+slong acb_theta_jet_index(const slong * tup, slong g);
 
 void acb_theta_jet_mul(acb_ptr res, acb_srcptr v1, acb_srcptr v2, slong ord,
     slong g, slong prec);
@@ -185,7 +185,7 @@ void acb_theta_jet_error_bounds(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
 
 /* Quasi-linear algorithms on the reduced domain */
 
-void acb_theta_dist_pt(arb_t d, arb_srcptr v, const arb_mat_t C, slong* n, slong prec);
+void acb_theta_dist_pt(arb_t d, arb_srcptr v, const arb_mat_t C, slong * n, slong prec);
 void acb_theta_dist_lat(arb_t d, arb_srcptr v, const arb_mat_t C, slong prec);
 void acb_theta_dist_a0(arb_ptr d, acb_srcptr z, const acb_mat_t tau, slong prec);
 slong acb_theta_dist_addprec(const arb_t d);
@@ -196,7 +196,7 @@ void acb_theta_agm_mul(acb_ptr res, acb_srcptr a1, acb_srcptr a2, slong g, slong
 void acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
     arb_srcptr d0, arb_srcptr d, slong g, slong prec);
 
-typedef int (*acb_theta_ql_worker_t)(acb_ptr, acb_srcptr, acb_srcptr,
+typedef int * acb_theta_ql_worker_t(acb_ptr, acb_srcptr, acb_srcptr,
     arb_srcptr, arb_srcptr, const acb_mat_t, slong, slong);
 
 int acb_theta_ql_a0_naive(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
@@ -209,7 +209,7 @@ int acb_theta_ql_a0_steps(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
 int acb_theta_ql_a0(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
     arb_srcptr d, const acb_mat_t tau, slong guard, slong prec);
 
-slong acb_theta_ql_reduce(acb_ptr x, acb_t c, arb_t u, slong* n1, acb_srcptr z,
+slong acb_theta_ql_reduce(acb_ptr x, acb_t c, arb_t u, slong * n1, acb_srcptr z,
     const acb_mat_t tau, slong prec);
 
 void acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec);
@@ -226,7 +226,7 @@ void acb_theta_jet_ql_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong 
 
 /* Transformation formulas */
 
-ulong acb_theta_transform_char(slong* e, const fmpz_mat_t mat, ulong ab);
+ulong acb_theta_transform_char(slong * e, const fmpz_mat_t mat, ulong ab);
 void acb_theta_transform_sqrtdet(acb_t res, const acb_mat_t tau, slong prec);
 slong acb_theta_transform_kappa(acb_t sqrtdet, const fmpz_mat_t mat,
     const acb_mat_t tau, slong prec);
@@ -261,7 +261,7 @@ void acb_theta_g2_chi3_6(acb_poly_t res, acb_srcptr dth, slong prec);
 
 void acb_theta_g2_sextic(acb_poly_t res, const acb_mat_t tau, slong prec);
 void acb_theta_g2_sextic_chi5(acb_poly_t res, acb_t chi5, const acb_mat_t tau, slong prec);
-void acb_theta_g2_covariants(acb_poly_struct* res, const acb_poly_t f, slong prec);
+void acb_theta_g2_covariants(acb_poly_struct * res, const acb_poly_t f, slong prec);
 void acb_theta_g2_covariants_lead(acb_ptr res, const acb_poly_t f, slong prec);
 
 #ifdef __cplusplus
