@@ -9,17 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_theta.h"
 
-int main(void)
+TEST_FUNCTION_START(acb_theta_naive_term, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("naive_term....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* Test: agrees with genus 1 */
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
@@ -66,8 +61,5 @@ int main(void)
         fmpz_clear(m);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

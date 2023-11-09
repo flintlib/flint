@@ -9,21 +9,16 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "fmpz_poly.h"
 #include "acb_theta.h"
 
 #define ACB_THETA_G2_COV_K {1,2,2,2,3,3,3,3,4,4,4,4,5,5,5,6,6,6,7,7,8,9,10,10,12,15}
 #define ACB_THETA_G2_COV_J {6,0,4,8,2,6,8,12,0,4,6,10,2,4,8,0,6,6,2,4,2,4,0,2,2,0}
 
-int main(void)
+TEST_FUNCTION_START(acb_theta_g2_covariants, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("g2_covariants....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* Test:
        - agrees with g2_psi4 using psi4 = -(Co20 - 3*Co40)/20
@@ -162,8 +157,5 @@ int main(void)
         acb_clear(test);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

@@ -9,17 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_theta.h"
 
-int main(void)
+TEST_FUNCTION_START(acb_theta_transform_kappa, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("transform_kappa....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* Test: kappa and kappa2 agree */
     for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
@@ -62,9 +57,6 @@ int main(void)
         acb_clear(sqrtdet);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
 

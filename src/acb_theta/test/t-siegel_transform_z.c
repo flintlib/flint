@@ -9,17 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_theta.h"
 
-int main(void)
+TEST_FUNCTION_START(acb_theta_siegel_transform_z, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("siegel_transform_z....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* Test: matches siegel_transform, inverse matrix gives inverse transformation */
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
@@ -83,8 +78,5 @@ int main(void)
         fmpz_mat_clear(m);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

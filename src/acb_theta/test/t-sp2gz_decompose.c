@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_theta.h"
 
 static int
@@ -85,15 +86,9 @@ sp2gz_is_allowed_in_dec(const fmpz_mat_t mat)
     return res;
 }
 
-int main(void)
+TEST_FUNCTION_START(acb_theta_sp2gz_decompose, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("sp2gz_decompose....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* Test: decomposition consists of elementary matrices and product is the
        original matrix */
@@ -152,9 +147,6 @@ int main(void)
         flint_free(dec);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
 

@@ -9,19 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_theta.h"
 
 #define ACB_THETA_G2_COV_J {6,0,4,8,2,6,8,12,0,4,6,10,2,4,8,0,6,6,2,4,2,4,0,2,2,0}
 
-int main(void)
+TEST_FUNCTION_START(acb_theta_g2_covariants_lead, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("g2_covariants_lead....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* Test: agrees with g2_covariants */
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
@@ -77,8 +72,5 @@ int main(void)
         _acb_vec_clear(test, nb);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

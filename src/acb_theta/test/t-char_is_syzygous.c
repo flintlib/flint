@@ -9,17 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_theta.h"
 
-int main(void)
+TEST_FUNCTION_START(acb_theta_char_is_syzygous, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("char_is_syzygous....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* Test: there are 60 syzygous triples for g = 2 */
     for (iter = 0; iter < 1; iter++)
@@ -50,8 +45,5 @@ int main(void)
         }
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

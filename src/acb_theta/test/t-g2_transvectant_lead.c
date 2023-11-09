@@ -9,17 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_theta.h"
 
-int main(void)
+TEST_FUNCTION_START(acb_theta_g2_transvectant_lead, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("g2_transvectant_lead....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* Test: matches leading coefficient of g2_transvectant */
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
@@ -68,8 +63,5 @@ int main(void)
         acb_clear(t);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

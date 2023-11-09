@@ -9,17 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_theta.h"
 
-int main(void)
+TEST_FUNCTION_START(acb_theta_naive_00, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("naive_00....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* Test: agrees with first entry of naive_0b */
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
@@ -72,8 +67,5 @@ int main(void)
         _acb_vec_clear(test, nbz);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

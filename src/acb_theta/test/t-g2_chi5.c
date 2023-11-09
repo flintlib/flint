@@ -9,17 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_theta.h"
 
-int main(void)
+TEST_FUNCTION_START(acb_theta_g2_chi5, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("g2_chi5....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* Test: square is chi10 */
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
@@ -61,8 +56,5 @@ int main(void)
         acb_clear(s);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

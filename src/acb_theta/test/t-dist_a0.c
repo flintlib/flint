@@ -9,17 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_theta.h"
 
-int main(void)
+TEST_FUNCTION_START(acb_theta_dist_a0, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("dist_a0....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* Test: find zero value when z = tau a/2 + real stuff */
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
@@ -68,8 +63,5 @@ int main(void)
         arb_clear(c);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

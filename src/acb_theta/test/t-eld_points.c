@@ -9,17 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_theta.h"
 
-int main(void)
+TEST_FUNCTION_START(acb_theta_eld_points, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("eld_points....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* Test: all ellipsoid points must be within the box
        Then, generate random points:
@@ -190,8 +185,5 @@ int main(void)
         arb_clear(sum);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

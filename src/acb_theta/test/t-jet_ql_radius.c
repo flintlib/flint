@@ -9,17 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_theta.h"
 
-int main(void)
+TEST_FUNCTION_START(acb_theta_jet_ql_radius, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("jet_ql_radius....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* Test: inequalities are satisfied */
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
@@ -90,8 +85,5 @@ int main(void)
         arf_clear(err);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }

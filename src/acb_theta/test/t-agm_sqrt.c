@@ -9,17 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "test_helpers.h"
 #include "acb_theta.h"
 
-int main(void)
+TEST_FUNCTION_START(acb_theta_agm_sqrt, state)
 {
     slong iter;
-    flint_rand_t state;
-
-    flint_printf("agm_sqrt....");
-    fflush(stdout);
-
-    flint_randinit(state);
 
     /* Test:
        - if nonzero, value of square root should agree; precision remains high
@@ -97,8 +92,5 @@ int main(void)
         arf_clear(err);
     }
 
-    flint_randclear(state);
-    flint_cleanup();
-    flint_printf("PASS\n");
-    return 0;
+    TEST_FUNCTION_END(state);
 }
