@@ -39,7 +39,7 @@ GNU toolchain, though GCC 4.8 and following are recommended.
 Flint is specially optimised for x86 (32 and 64 bit) machines. There is also
 limited optimisation for ARM machines.
 
-As of version 3.0, FLINT requires GMP 6.2.1 or later, and MPFR 4.2.0 or later.
+As of version 3.0, FLINT requires GMP 6.2.1 or later, and MPFR 4.1.0 or later.
 Note that earlier, MPIR, a fork of GMP, was supported. However, as of FLINT 3.0,
 this support has been dropped.
 

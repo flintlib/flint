@@ -50,7 +50,7 @@ option(WITH_NTL "Build tests for NTL interface or not" off)
 # Find dependencies
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GMP REQUIRED IMPORTED_TARGET gmp>=6.2.1)
-pkg_check_modules(MPFR REQUIRED IMPORTED_TARGET mpfr>=4.2.0)
+pkg_check_modules(MPFR REQUIRED IMPORTED_TARGET mpfr>=4.1.0)
 if (WITH_NTL)
     find_package(NTL REQUIRED)
 endif()

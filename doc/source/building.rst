@@ -9,7 +9,7 @@ Quick start
 Building FLINT requires:
 
 * GMP, at least version 6.2.1 (https://gmplib.org/)
-* MPFR, at least version 4.2.0 (https://mpfr.org/)
+* MPFR, at least version 4.1.0 (https://mpfr.org/)
 * Either of the following build systems:
 
   * GNU Make together with GNU Autotools

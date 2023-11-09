@@ -17,5 +17,5 @@ complied/installed, the versions of GMP and MPFR as well as precise details of
 how to replicate the bug.
 
 Note that FLINT needs to be linked against version 6.2.1 or later of GMP,
-version 4.2.0 or later of MPFR. Version 4.8 or later of GCC is recommended for
+version 4.1.0 or later of MPFR. Version 4.8 or later of GCC is recommended for
 parallel builds.

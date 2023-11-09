@@ -629,15 +629,15 @@ AC_COMPILE_IFELSE(
     AC_MSG_RESULT([no])
     AC_MSG_ERROR(["FLINT requires GMP version 6.2.1 or later."]))
 
-# Check that MPFR >= 4.2.0
-AC_MSG_CHECKING([if version of MPFR is greater than 4.2.0])
+# Check that MPFR >= 4.1.0
+AC_MSG_CHECKING([if version of MPFR is greater than 4.1.0])
 AC_COMPILE_IFELSE(
     [AC_LANG_PROGRAM(
         [#include <mpfr.h>],
         [#if (MPFR_VERSION_MAJOR < 4) \
-          || (MPFR_VERSION_MAJOR == 4 && MPFR_VERSION_MINOR < 2) \
-          || (MPFR_VERSION_MAJOR == 4 && MPFR_VERSION_MINOR == 2 && MPFR_VERSION_PATCHLEVEL < 0)
-         # error MPFR version 4.2.0 or later is required
+          || (MPFR_VERSION_MAJOR == 4 && MPFR_VERSION_MINOR < 1) \
+          || (MPFR_VERSION_MAJOR == 4 && MPFR_VERSION_MINOR == 1 && MPFR_VERSION_PATCHLEVEL < 0)
+         # error MPFR version 4.1.0 or later is required
          #endif]
     )],
     AC_MSG_RESULT([yes]),
