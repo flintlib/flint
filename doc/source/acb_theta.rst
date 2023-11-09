@@ -1406,6 +1406,12 @@ correspondence between modular forms and covariants.
     Sets *res* to the leading coefficient of `(g,h)_k` in `x_1`, with the same
     conventions as in :func:`acb_theta_g2_transvectant`.
 
+.. function:: slong acb_theta_g2_character(const fmpz_mat_t mat)
+
+    Returns the value in `\mathbb{Z}/2\mathbb{Z}` (0 or 1) of the unique
+    nontrivial character of `\mathrm{Sp}_4(\mathbb{Z})` at *mat*, following
+    [CFG2019]_, §12.
+
 .. function:: void acb_theta_g2_psi4(acb_t res, acb_srcptr th2, slong prec)
 
 .. function:: void acb_theta_g2_psi6(acb_t res, acb_srcptr th2, slong prec)
@@ -1443,7 +1449,7 @@ correspondence between modular forms and covariants.
 
     Sets *res* to the value of `\chi_5 = - 2^{-6} \prod_{(a,b)\text{ even}}
     \theta_{a,b}` corresponding to the given theta values *th*. The form
-    `\chi_5` is a Siegel cusp form with character: see [CFG2017]_ for more
+    `\chi_5` is a Siegel cusp form with character: see [CFG2019]_ for more
     details.
 
 .. function:: void acb_theta_g2_chi35(acb_t res, acb_srcptr th, slong prec)
@@ -1482,6 +1488,11 @@ correspondence between modular forms and covariants.
     theta gradients, depending on *prec*. Under the correspondence between
     Siegel modular functions and covariants of binary sextics, `\chi_{-2,6}`
     corresponds to the binary sextic itself, hence the name.
+
+.. function:: void acb_theta_g2_sextic_chi5(acb_poly_t res, acb_t chi5, const acb_mat_t tau, slong prec)
+
+    Sets *res* and *chi5* to the values of `\chi_{-2,6}` and `\chi_5` at
+    `\tau`. Theta values are computed only once.
 
 .. function:: void acb_theta_g2_covariants(acb_poly_struct* res, const acb_poly_t f, slong prec)
 

@@ -21,7 +21,7 @@ int main(void)
 
     flint_randinit(state);
 
-    /* Test: matches combination of transform_kappa and transform_sqrtdet */
+    /* Test: kappa and kappa2 agree */
     for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
