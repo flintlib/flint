@@ -14,6 +14,7 @@ cmake_minimum_required(VERSION 3.22)
 include(CheckCCompilerFlag)
 include(CheckCSourceRuns)
 include(CheckIPOSupported)
+include(FindPkgConfig)
 
 # Source of truth for project version
 file(STRINGS VERSION FLINT_VERSION_FULL)
@@ -47,8 +48,9 @@ option(BUILD_SHARED_LIBS "Build shared libs" on)
 option(WITH_NTL "Build tests for NTL interface or not" off)
 
 # Find dependencies
-find_package(GMP REQUIRED)
-find_package(MPFR REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GMP REQUIRED IMPORTED_TARGET gmp)
+pkg_check_modules(MPFR REQUIRED IMPORTED_TARGET mpfr)
 if (WITH_NTL)
     find_package(NTL REQUIRED)
 endif()
@@ -261,7 +263,7 @@ list(APPEND HEADERS ${TEMP})
 
 add_library(flint ${SOURCES})
 target_link_libraries(flint PUBLIC
-    ${MPFR_LIBRARIES} ${GMP_LIBRARIES} ${PThreads_LIBRARIES})
+    PkgConfig::GMP PkgConfig::MPFR ${PThreads_LIBRARIES})
 
 if(FLINT_USES_BLAS)
     target_link_libraries(flint PUBLIC ${CBLAS_LIBRARIES})
