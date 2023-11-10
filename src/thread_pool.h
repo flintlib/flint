@@ -63,36 +63,24 @@ FLINT_DLL extern int global_thread_pool_initialized;
 void * thread_pool_idle_loop(void * varg);
 
 void thread_pool_init(thread_pool_t T, slong l);
+void thread_pool_clear(thread_pool_t T);
 
-int thread_pool_set_affinity(thread_pool_t T,
-                                                     int * cpus, slong length);
-
+int thread_pool_set_affinity(thread_pool_t T, int * cpus, slong length);
 int thread_pool_restore_affinity(thread_pool_t T);
 
 slong thread_pool_get_size(thread_pool_t T);
-
 int thread_pool_set_size(thread_pool_t T, slong new_size);
 
-slong thread_pool_request(thread_pool_t T,
-                                    thread_pool_handle * out, slong requested);
-
-void thread_pool_wake(thread_pool_t T, thread_pool_handle i,
-                                  int max_workers, void (*f)(void*), void * a);
-
+slong thread_pool_request(thread_pool_t T, thread_pool_handle * out, slong requested);
+void thread_pool_wake(thread_pool_t T, thread_pool_handle i, int max_workers, void (*f)(void*), void * a);
 void thread_pool_wait(thread_pool_t T, thread_pool_handle i);
-
 void thread_pool_give_back(thread_pool_t T, thread_pool_handle i);
-
-void thread_pool_clear(thread_pool_t T);
 
 /* misc internal helpers *****************************************************/
 
-void _thread_pool_distribute_work_2(slong start, slong stop,
-                                    slong * Astart, slong * Astop, slong Alen,
-                                    slong * Bstart, slong * Bstop, slong Blen);
+void _thread_pool_distribute_work_2(slong start, slong stop, slong * Astart, slong * Astop, slong Alen, slong * Bstart, slong * Bstop, slong Blen);
 
-ulong _thread_pool_find_work_2(ulong a, ulong alpha,
-                                      ulong b, ulong beta, ulong yn, ulong yd);
+ulong _thread_pool_find_work_2(ulong a, ulong alpha, ulong b, ulong beta, ulong yn, ulong yd);
 
 #ifdef __cplusplus
 }
