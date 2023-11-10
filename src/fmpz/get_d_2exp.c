@@ -14,20 +14,23 @@
 #include "fmpz.h"
 
 double
-fmpz_get_d_2exp(slong *exp, const fmpz_t f)
+fmpz_get_d_2exp(slong * exp, const fmpz_t f)
 {
     fmpz d = *f;
 
     if (!COEFF_IS_MPZ(d))
     {
         ulong d_abs;
+
         if (d == WORD(0))
         {
             (*exp) = WORD(0);
             return 0.0;
         }
+
         d_abs = FLINT_ABS(d);
-        (*exp) = FLINT_BIT_COUNT(d_abs);
+        *exp = FLINT_BIT_COUNT(d_abs);
+
         if (d < WORD(0))
             return flint_mpn_get_d((mp_limb_t *) &d_abs, WORD(1), WORD(-1), -*exp);
         else
@@ -35,17 +38,9 @@ fmpz_get_d_2exp(slong *exp, const fmpz_t f)
     }
     else
     {
-#if defined(__MPIR_VERSION) && __MPIR_VERSION <= 2
-       return mpz_get_d_2exp(exp, COEFF_TO_PTR(d));
-#elif defined(__MPIR_RELEASE) && __MPIR_RELEASE > 30000
-       double m;
-       *exp = mpz_get_2exp_d(&m, COEFF_TO_PTR(d));
-       return m;
-#else
        long exp2;
        double m = mpz_get_d_2exp(&exp2, COEFF_TO_PTR(d));
        *exp = exp2;
        return m;
-#endif
     }
 }

@@ -10,20 +10,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "gmpcompat.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
 
 void
 fmpz_set_mpf(fmpz_t f, const mpf_t x)
 {
     int check;
-#if defined(__MPIR_VERSION)
-    check = mpf_fits_si_p(x);
-#else
+
     check = flint_mpf_fits_slong_p(x);
-#endif
+
     if (check)
     {
         slong cx = flint_mpf_get_si(x);

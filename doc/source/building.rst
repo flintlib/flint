@@ -8,8 +8,8 @@ Quick start
 
 Building FLINT requires:
 
-* GMP (https://gmplib.org/)
-* MPFR (https://mpfr.org/)
+* GMP, at least version 6.2.1 (https://gmplib.org/)
+* MPFR, at least version 4.1.0 (https://mpfr.org/)
 * Either of the following build systems:
 
   * GNU Make together with GNU Autotools
@@ -218,7 +218,7 @@ To uninstall FLINT with GNU make, type:
 
 Now to use FLINT, simply include the appropriate header files for the FLINT
 modules you wish to use in your C program.  Then compile your program,
-linking against the FLINT library, GMP/MPIR, MPFR and pthreads with the
+linking against the FLINT library, GMP, MPFR and pthreads with the
 options ``-lflint -lmpfr -lgmp -lpthread``.
 
 To clean up the local build files, use:

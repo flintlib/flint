@@ -9,16 +9,12 @@
 # (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 #
 
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.22)
 
-include(CheckIPOSupported)
-include(CheckIncludeFiles)
-include(CheckFunctionExists)
-include(CheckPrototypeDefinition)
 include(CheckCCompilerFlag)
 include(CheckCSourceRuns)
-include(CheckLibraryExists)
-include(TestBigEndian)
+include(CheckIPOSupported)
+include(FindPkgConfig)
 
 # Source of truth for project version
 file(STRINGS VERSION FLINT_VERSION_FULL)
@@ -49,11 +45,12 @@ endif()
 
 # Build options
 option(BUILD_SHARED_LIBS "Build shared libs" on)
-option(WITH_NTL "Build with NTL or not" off)
+option(WITH_NTL "Build tests for NTL interface or not" off)
 
 # Find dependencies
-find_package(GMP REQUIRED)
-find_package(MPFR REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GMP REQUIRED IMPORTED_TARGET gmp>=6.2.1)
+pkg_check_modules(MPFR REQUIRED IMPORTED_TARGET mpfr>=4.1.0)
 if (WITH_NTL)
     find_package(NTL REQUIRED)
 endif()
@@ -69,7 +66,14 @@ endif()
 # pthread configuration
 
 if(MSVC)
-    find_package(PThreads REQUIRED)
+    # Prefer vcpkg's pthreads
+    find_package(PThreads4W)
+    if(PThreads4W_FOUND)
+        set(PThreads_LIBRARIES PThreads4W::PThreads4W)
+        set(PThreads_INCLUDE_DIRS ${PThreads4W_INCLUDE_DIRS})
+    else()
+        find_package(PThreads REQUIRED)
+    endif()
     set(FLINT_USES_PTHREAD ON CACHE BOOL "Use POSIX Threads.")
 else()
     option(CMAKE_THREAD_PREFER_PTHREAD "Prefer pthreads" yes)
@@ -158,10 +162,6 @@ set(_TEMPLATE_DIRS
 )
 string(REGEX REPLACE "([A-Za-z0-9_-]+;|[A-Za-z0-9_-]+$)" "src/\\1" TEMPLATE_DIRS "${_TEMPLATE_DIRS}")
 
-if (WITH_NTL)
-    list(APPEND BUILD_DIRS src/interfaces)
-endif()
-
 set(_HEADERS
     NTL-interface.h flint.h longlong.h flint-config.h gmpcompat.h fft_tuning.h
     profiler.h templates.h exception.h
@@ -218,6 +218,14 @@ else()
 	set(FLINT_REENTRANT OFF)
 endif()
 
+# gmpcompat.h configuration
+set(CMAKE_REQUIRED_INCLUDES ${GMP_INCLUDE_DIRS})
+check_c_source_compiles([[#include <gmp.h>
+  #ifndef _LONG_LONG_LIMB
+  # error mp_limb_t != unsigned long long limb
+  #endif
+  void main(){};]] LONG_LONG_LIMB)
+
 # Populate headers
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/CMake/cmake_config.h.in
@@ -232,6 +240,19 @@ configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/src/fmpz/fmpz.c
     COPYONLY
 )
+if(LONG_LONG_LIMB)
+    configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gmpcompat-longlong.h.in
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gmpcompat.h
+        COPYONLY
+    )
+else()
+    configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gmpcompat.h.in
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/gmpcompat.h
+        COPYONLY
+    )
+endif()
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     configure_file(
@@ -270,8 +291,7 @@ list(APPEND HEADERS ${TEMP})
 
 add_library(flint ${SOURCES})
 target_link_libraries(flint PUBLIC
-    ${NTL_LIBRARY} ${MPFR_LIBRARIES} ${GMP_LIBRARIES} ${PThreads_LIBRARIES}
-)
+    PkgConfig::GMP PkgConfig::MPFR ${PThreads_LIBRARIES})
 
 if(FLINT_USES_BLAS)
     target_link_libraries(flint PUBLIC ${CBLAS_LIBRARIES})
@@ -281,9 +301,7 @@ endif()
 
 target_include_directories(flint PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}/src ${GMP_INCLUDE_DIRS} ${MPFR_INCLUDE_DIRS}
-    ${CMAKE_CURRENT_BINARY_DIR} ${PThreads_INCLUDE_DIRS}
-    ${NTL_INCLUDE_DIR}
-)
+    ${CMAKE_CURRENT_BINARY_DIR} ${PThreads_INCLUDE_DIRS})
 
 if(FLINT_USES_BLAS)
     target_include_directories(flint PUBLIC ${CBLAS_INCLUDE_DIRS})
@@ -294,8 +312,6 @@ if(BUILD_SHARED_LIBS AND MSVC)
     set_target_properties(flint PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
     # Export flint's global data that are marked manually
     target_compile_definitions(flint PRIVATE "FLINT_BUILD_DLL")
-    # Use MPIR's dll import functions
-    target_compile_definitions(flint PUBLIC "MSC_USE_DLL")
 endif()
 
 if (HAS_FLAG_MPOPCNT)
@@ -371,8 +387,8 @@ set_target_properties(flint
 
 if(BUILD_TESTING)
     enable_testing()
-    foreach(build_dir IN LISTS BUILD_DIRS CMAKE_CURRENT_SOURCE_DIR)
-        file(GLOB test_file "${build_dir}/test/main.c")
+    foreach(dir IN LISTS BUILD_DIRS CMAKE_CURRENT_SOURCE_DIR)
+        file(GLOB test_file "${dir}/test/main.c")
         if(test_file)
             file(RELATIVE_PATH test_name ${CMAKE_CURRENT_SOURCE_DIR} ${test_file})
             string(REPLACE "/" "-" test_name ${test_name})
@@ -380,23 +396,32 @@ if(BUILD_TESTING)
             add_executable(${test_name} ${test_file})
             target_link_libraries(${test_name} flint)
 
-            add_test(
-                NAME ${test_name}
-                COMMAND $<TARGET_FILE:${test_name}>
-            )
+            add_test(NAME ${test_name} COMMAND $<TARGET_FILE:${test_name}>)
 
             set_target_properties(${test_name}
                 PROPERTIES
                 ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
                 LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
-                RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin"
-            )
+                RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin")
         endif()
     endforeach ()
 
     if(WITH_NTL)
-      target_link_libraries(src-interfaces-test-t-NTL-interface ${NTL_LIBRARY})
-      target_include_directories(src-interfaces-test-t-NTL-interface PUBLIC ${NTL_INCLUDE_DIR})
+        file(GLOB test_file "src/interfaces/test/t-NTL-interface.cpp")
+        file(RELATIVE_PATH test_name ${CMAKE_CURRENT_SOURCE_DIR} ${test_file})
+        string(REPLACE "/" "-" test_name ${test_name})
+        get_filename_component(test_name ${test_name} NAME_WE)
+        add_executable(${test_name} ${test_file})
+        target_link_libraries(${test_name} flint ${NTL_LIBRARY})
+        target_include_directories(${test_name} PUBLIC ${NTL_INCLUDE_DIR})
+
+        add_test(NAME ${test_name} COMMAND $<TARGET_FILE:${test_name}>)
+
+        set_target_properties(${test_name}
+            PROPERTIES
+            ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
+            LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin")
     endif()
 endif()
 

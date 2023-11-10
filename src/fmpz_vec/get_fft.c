@@ -51,7 +51,7 @@ static void _fmpz_vec_get_fft_coeff(mp_limb_t ** coeffs_f,
 
     if (signed_c) /* write out FFT coefficient, ensuring sign is correct */
     {
-        mpn_neg_n(coeffs_f[i], coeff, size_j);
+        mpn_neg(coeffs_f[i], coeff, size_j);
         flint_mpn_store(coeffs_f[i] + size_j, size_f - size_j, WORD(-1));
     }
     else

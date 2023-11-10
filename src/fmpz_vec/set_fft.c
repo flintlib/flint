@@ -33,7 +33,7 @@ static void _fmpz_vec_set_fft_coeff(fmpz * coeffs_m, slong i,
 
 			if ((coeffs_f[i][limbs - 1] > halflimb) || coeffs_f[i][limbs])
             {
-                mpn_neg_n(data, coeffs_f[i], limbs);
+                mpn_neg(data, coeffs_f[i], limbs);
                 mpn_add_1(data, data, limbs, WORD(1));
                 size = limbs;
                 while ((size) && (data[size - 1] == 0)) size--; /* normalise */

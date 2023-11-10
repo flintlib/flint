@@ -9,8 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <mpfr.h>
 #include "test_helpers.h"
-#include "mpfr.h"
 #include "arf.h"
 
 int
@@ -41,11 +41,7 @@ arf_root_naive(arf_t z, const arf_t x, int k, slong prec, arf_rnd_t rnd)
 
     arf_get_mpfr(u, z, MPFR_RNDD);
 
-#if MPFR_VERSION_MAJOR >= 4
     res = (mpfr_rootn_ui(v, u, k, arf_rnd_to_mpfr(rnd)) != 0);
-#else
-    res = (mpfr_root(v, u, k, arf_rnd_to_mpfr(rnd)) != 0);
-#endif
     arf_set_mpfr(z, v);
 
     fmpz_neg(t, t);

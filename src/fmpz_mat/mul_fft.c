@@ -160,7 +160,7 @@ static void fft_combine_bits_fmpz(
     {
         if (fft_combine_bits_signed(d, poly, length, bits, limbs, total_limbs))
         {
-            mpn_neg_n(d, d, total_limbs);
+            mpn_neg(d, d, total_limbs);
             MPN_NORM(d, total_limbs);
             /* total_limbs should have started high enough to prevent d = 0 here */
             FLINT_ASSERT(total_limbs > 0);

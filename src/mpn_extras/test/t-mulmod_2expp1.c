@@ -36,7 +36,7 @@ TEST_FUNCTION_START(flint_mpn_mulmod_2expp1, state)
           tb=1;
 
        mpn_zero(dp, xn);
-       mpn_com_n(dp, dp, xn);
+       mpn_com(dp, dp, xn);
        dp[xn-1] &= GMP_NUMB_MASK >> k; /* dp is 2^b-1 */
        dn = xn;
        dp[xn] = mpn_add_1(dp, dp, xn, 2);
@@ -85,7 +85,7 @@ TEST_FUNCTION_START(flint_mpn_mulmod_2expp1, state)
           tb = 1;
 
        mpn_zero(dp, xn);
-       mpn_com_n(dp, dp, xn);
+       mpn_com(dp, dp, xn);
        dp[xn-1] &= GMP_NUMB_MASK >> k; /* dp is 2^b-1 */
        dn = xn;
        dp[xn] = mpn_add_1(dp, dp, xn, 2);
@@ -143,7 +143,7 @@ TEST_FUNCTION_START(flint_mpn_mulmod_2expp1, state)
           tb = 1;
 
        mpn_zero(dp, xn);
-       mpn_com_n(dp, dp, xn);
+       mpn_com(dp, dp, xn);
        dp[xn-1] &= GMP_NUMB_MASK >> k; /* dp is 2^b-1 */
        dn = xn;
        dp[xn] = mpn_add_1(dp, dp, xn, 2);
@@ -202,7 +202,7 @@ TEST_FUNCTION_START(flint_mpn_mulmod_2expp1, state)
           tb = 1;
 
        mpn_zero(dp, xn);
-       mpn_com_n(dp, dp, xn);
+       mpn_com(dp, dp, xn);
        dp[xn-1] &= GMP_NUMB_MASK >> k; /* dp is 2^b-1 */
        dn = xn;
        dp[xn] = mpn_add_1(dp, dp, xn, 2);

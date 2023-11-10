@@ -9,8 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "test_helpers.h"
 #include <mpfr.h>
+#include "test_helpers.h"
 #include "arb.h"
 
 TEST_FUNCTION_START(arb_can_round_mpfr, state)
@@ -49,11 +49,7 @@ TEST_FUNCTION_START(arb_can_round_mpfr, state)
 
         if (arb_can_round_mpfr(t, prec, rnd))
         {
-#if MPFR_VERSION_MAJOR >= 4
             r1 = mpfr_rootn_ui(y1, x, 4, rnd);
-#else
-            r1 = mpfr_root(y1, x, 4, rnd);
-#endif
             r2 = arf_get_mpfr(y2, arb_midref(t), rnd);
 
             if (r1 != r2 || !mpfr_equal_p(y1, y2))

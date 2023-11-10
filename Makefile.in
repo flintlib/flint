@@ -117,7 +117,8 @@ CFG_FILES :=                                                                \
         $(FLINT_DIR)/config.h           $(SRC_DIR)/flint-config.h           \
         $(FLINT_DIR)/config.log         $(SRC_DIR)/flint.h                  \
         $(SRC_DIR)/fft_tuning.h         $(FLINT_DIR)/flint.pc               \
-        $(FLINT_DIR)/Makefile           $(SRC_DIR)/fmpz/fmpz.c
+        $(FLINT_DIR)/Makefile           $(SRC_DIR)/fmpz/fmpz.c              \
+        $(SRC_DIR)/gmpcompat.h
 
 ################################################################################
 # directories

@@ -37,9 +37,9 @@ void ifft_butterfly_twiddle(mp_limb_t * u, mp_limb_t * v,
    y  = b2/FLINT_BITS;
    b2 = b2%FLINT_BITS;
 
-   if (negate1) mpn_neg_n(s, s, limbs + 1);
+   if (negate1) mpn_neg(s, s, limbs + 1);
    mpn_div_2expmod_2expp1(s, s, limbs, b1);
-   if (negate2) mpn_neg_n(t, t, limbs + 1);
+   if (negate2) mpn_neg(t, t, limbs + 1);
    mpn_div_2expmod_2expp1(t, t, limbs, b2);
    butterfly_rshB(u, v, s, t, limbs, x, y);
 }

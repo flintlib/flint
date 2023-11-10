@@ -484,18 +484,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: "Setup Conda"
-        uses: conda-incubator/setup-miniconda@v2.2.0
+      - name: "Setup cache for dependencies"
+        uses: actions/github-script@v6
         with:
-          miniconda-version: "latest"
-          channels: conda-forge
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
 
       - name: "Install dependencies"
         run: |
-          conda install --yes -c conda-forge mpfr
-          conda install --yes -c conda-forge pthreads-win32
-          conda info
-          conda list
+          vcpkg install gmp mpfr pthreads --binarysource="clear;x-gha,readwrite"
 
       - name: "Setup MSVC"
         uses: ilammy/msvc-dev-cmd@v1.12.1
@@ -508,19 +506,15 @@ jobs:
         run: |
           mkdir build
           cd build
-          set "LIB=C:\Miniconda3\Library\lib;%LIB%"
-          set "CPATH=C:\Miniconda3\Library\include;%CPATH%"
           # For single build, we need atomics
-          cmake -G "Ninja" -DCMAKE_C_FLAGS="/wd4018 /wd4146 /wd4244 /wd4267 /wd4305 /wd4996 /DFLINT_NO_CA_MAT_EXP_TEST /std:c11 /experimental:c11atomics" -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
+          cmake -G "Ninja" -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_C_FLAGS="/wd4018 /wd4146 /wd4244 /wd4267 /wd4305 /wd4996 /std:c11 /experimental:c11atomics" -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Release ..
 
       - name: "Build"
         run: |
           cd build
           cmake --build . -- -j3
 
-        # FIXME: Preferably drop support of CMake and native Windows, or fix so
-        # that we can include the test again.
-      - name: "Test everything except where MPIR fails"
+      - name: "Check"
         run: |
           cd build
           set "FLINT_TEST_MULTIPLIER=1"

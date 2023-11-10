@@ -24,16 +24,6 @@
  extern "C" {
 #endif
 
-#if defined(__MPIR_VERSION)
-
-#if !defined(__MPIR_RELEASE ) || __MPIR_RELEASE < 20600
-#define mpn_sumdiff_n __MPN(sumdiff_n)
-FLINT_DLL extern
-mp_limb_t mpn_sumdiff_n(mp_ptr, mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
-#endif
-
-#else
-
 FFT_INLINE
 mp_limb_t mpn_sumdiff_n(mp_ptr s, mp_ptr d, mp_srcptr x, mp_srcptr y, mp_size_t n)
 {
@@ -64,8 +54,6 @@ mp_limb_t mpn_sumdiff_n(mp_ptr s, mp_ptr d, mp_srcptr x, mp_srcptr y, mp_size_t 
     ret += mpn_sub_n(d, x, y, n);
     return ret;
 }
-
-#endif
 
 #define fft_sumdiff(t, u, r, s, n) \
    (n == 0 ? 0 : mpn_sumdiff_n(t, u, r, s, n))

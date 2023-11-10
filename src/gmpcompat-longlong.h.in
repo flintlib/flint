@@ -79,8 +79,6 @@ void flint_mpz_add_signed_uiuiui(mpz_ptr a, mpz_srcptr b,
     mpz_add(a, b, c);
 }
 
-#if WORD_MAX != LONG_MAX && !defined(__MPIR_VERSION)
-
 #define FLINT_MOCK_MPZ_UI(xxx, yyy) \
    __mpz_struct (xxx)[1] = {{ 1, 0, NULL }}; \
    do { \
@@ -831,64 +829,6 @@ int flint_mpf_fits_slong_p(mpf_srcptr f)
   return fl <= (fs >= 0 ? (mp_limb_t) WORD_MAX : - (mp_limb_t) WORD_MIN);
 }
 
-#else
-
-#define flint_mpz_get_si mpz_get_si
-#define flint_mpz_get_ui mpz_get_ui
-#define flint_mpz_set_si mpz_set_si
-#define flint_mpz_set_ui mpz_set_ui
-#define flint_mpz_init_set_si mpz_init_set_si
-#define flint_mpz_init_set_ui mpz_init_set_ui
-#define flint_mpz_add_ui mpz_add_ui
-#define flint_mpz_sub_ui mpz_sub_ui
-#define flint_mpz_mul_si mpz_mul_si
-#define flint_mpz_mul_ui mpz_mul_ui
-#define flint_mpz_addmul_ui mpz_addmul_ui
-#define flint_mpz_submul_ui mpz_submul_ui
-#define flint_mpz_ui_sub mpz_ui_sub
-#define flint_mpz_ui_pow_ui mpz_ui_pow_ui
-#define flint_mpz_cdiv_q_ui mpz_cdiv_q_ui
-#define flint_mpz_cdiv_r_ui mpz_cdiv_r_ui
-#define flint_mpz_cdiv_qr_ui mpz_cdiv_qr_ui
-#define flint_mpz_cdiv_ui mpz_cdiv_ui
-#define flint_mpz_fdiv_q_ui mpz_fdiv_q_ui
-#define flint_mpz_fdiv_r_ui mpz_fdiv_r_ui
-#define flint_mpz_fdiv_qr_ui mpz_fdiv_qr_ui
-#define flint_mpz_fdiv_ui mpz_fdiv_ui
-#define flint_mpz_tdiv_q_ui mpz_tdiv_q_ui
-#define flint_mpz_tdiv_r_ui mpz_tdiv_r_ui
-#define flint_mpz_tdiv_qr_ui mpz_tdiv_qr_ui
-#define flint_mpz_tdiv_ui mpz_tdiv_ui
-#define flint_mpz_mod_ui mpz_mod_ui
-#define flint_mpz_divexact_ui mpz_divexact_ui
-#define flint_mpz_divisible_ui_p mpz_divisible_ui_p
-#define flint_mpz_congruent_ui_p mpz_congruent_ui_p
-#define flint_mpz_powm_ui mpz_powm_ui
-#define flint_mpz_pow_ui mpz_pow_ui
-#define flint_mpz_fac_ui mpz_fac_ui
-#define flint_mpz_bin_uiui mpz_bin_uiui
-#define flint_mpz_fib_ui mpz_fib_ui
-#define flint_mpz_cmp_si mpz_cmp_si
-#define flint_mpz_cmp_ui mpz_cmp_ui
-#define flint_mpq_cmp_si mpq_cmp_si
-#define flint_mpq_cmp_ui mpq_cmp_ui
-#define flint_mpq_set_si mpq_set_si
-#define flint_mpq_set_ui mpq_set_ui
-
-#define flint_mpf_set_si mpf_set_si
-#define flint_mpf_set_ui mpf_set_ui
-#define flint_mpf_get_si mpf_get_si
-#define flint_mpf_cmp_ui mpf_cmp_ui
-#define flint_mpf_fits_slong_p mpf_fits_slong_p
-
-#endif
-
-#if WORD_MAX == LONG_MAX
-
-#define flint_mpf_get_d_2exp mpf_get_d_2exp
-
-#else
-
 /* defined in mpn_extras.h and used by flint_mpf_get_d_2exp below */
 double
 flint_mpn_get_d(mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp);
@@ -913,11 +853,6 @@ You should have received a copy of the GNU Lesser General Public License
 along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
 the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA. */
-
-/*
-  This function is only required for MPIR >= 3.0.0 and for GMP, but we include
-  unconditionally when sizeof(ulong) != sizeof(unsigned long)
-*/
 
 static __inline__
 double flint_mpf_get_d_2exp(slong * exp2, mpf_srcptr src)
@@ -944,7 +879,5 @@ double flint_mpf_get_d_2exp(slong * exp2, mpf_srcptr src)
   return flint_mpn_get_d (ptr, abs_size, size,
                     (long) - (abs_size * FLINT_BITS - cnt));
 }
-
-#endif
 
 #endif

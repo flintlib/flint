@@ -611,8 +611,51 @@ AC_SUBST(LDCONFIG)
 # Mandatory headers
 # The following headers are checked previously:
 #   stdio.h stdlib.h stdint.h string.h
-AC_CHECK_HEADERS([stdarg.h math.h float.h errno.h gmp.h mpfr.h],,
+AC_CHECK_HEADERS([stdarg.h math.h float.h errno.h mpfr.h gmp.h],,
                  AC_MSG_ERROR([Could not find a mandatory header!]))
+
+# Check that GMP >= 6.2.1
+AC_MSG_CHECKING([if version of GMP is greater than 6.2.1])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM(
+        [#include <gmp.h>],
+        [#if (__GNU_MP_VERSION < 6) \
+          || (__GNU_MP_VERSION == 6 && __GNU_MP_VERSION_MINOR < 2) \
+          || (__GNU_MP_VERSION == 6 && __GNU_MP_VERSION_MINOR == 2 && __GNU_MP_VERSION_PATCHLEVEL < 1)
+         # error GMP version 6.2.1 or later is required
+         #endif]
+    )],
+    AC_MSG_RESULT([yes]),
+    AC_MSG_RESULT([no])
+    AC_MSG_ERROR(["FLINT requires GMP version 6.2.1 or later."]))
+
+AC_MSG_CHECKING([if GMP defines mp_limb_t as unsigned long long int])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM(
+        [#include <gmp.h>],
+        [#if !defined(_LONG_LONG_LIMB)
+         # error mp_limb_t != unsigned long long int
+         #endif]
+    )],
+    AC_MSG_RESULT([yes])
+    gmpcompat_h_in="gmpcompat-longlong.h.in",
+    AC_MSG_RESULT([no])
+    gmpcompat_h_in="gmpcompat.h.in")
+
+# Check that MPFR >= 4.1.0
+AC_MSG_CHECKING([if version of MPFR is greater than 4.1.0])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM(
+        [#include <mpfr.h>],
+        [#if (MPFR_VERSION_MAJOR < 4) \
+          || (MPFR_VERSION_MAJOR == 4 && MPFR_VERSION_MINOR < 1) \
+          || (MPFR_VERSION_MAJOR == 4 && MPFR_VERSION_MINOR == 1 && MPFR_VERSION_PATCHLEVEL < 0)
+         # error MPFR version 4.1.0 or later is required
+         #endif]
+    )],
+    AC_MSG_RESULT([yes]),
+    AC_MSG_RESULT([no])
+    AC_MSG_ERROR(["FLINT requires MPFR version 4.2.0 or later."]))
 
 # Optional headers
 # The following headers are checked previously:
@@ -1125,7 +1168,7 @@ fi
 # epilog
 ################################################################################
 
-AC_CONFIG_FILES([Makefile flint.pc src/flint.h])
+AC_CONFIG_FILES([Makefile flint.pc src/flint.h src/gmpcompat.h:src/${gmpcompat_h_in}])
 AC_OUTPUT
 
 dnl Shorten the original help message
