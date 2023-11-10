@@ -72,10 +72,10 @@ nmod_mat_swap_entrywise(nmod_mat_t mat1, nmod_mat_t mat2)
     slong i, j;
     for (i = 0; i < nmod_mat_nrows(mat1); i++)
     {
-       mp_limb_t * row1 = mat1->rows[i];
-       mp_limb_t * row2 = mat2->rows[i];
-       for (j = 0; j < nmod_mat_ncols(mat1); j++)
-          FLINT_SWAP(mp_limb_t, row1[j], row2[j]);
+        mp_limb_t * row1 = mat1->rows[i];
+        mp_limb_t * row2 = mat2->rows[i];
+        for (j = 0; j < nmod_mat_ncols(mat1); j++)
+            FLINT_SWAP(mp_limb_t, row1[j], row2[j]);
     }
 }
 
@@ -84,16 +84,13 @@ nmod_mat_swap_entrywise(nmod_mat_t mat1, nmod_mat_t mat2)
 void nmod_mat_window_init(nmod_mat_t window, const nmod_mat_t mat, slong r1, slong c1, slong r2, slong c2);
 void nmod_mat_window_clear(nmod_mat_t window);
 
-void nmod_mat_concat_horizontal(nmod_mat_t res,
-                           const nmod_mat_t mat1,  const nmod_mat_t mat2);
-void nmod_mat_concat_vertical(nmod_mat_t res,
-                           const nmod_mat_t mat1,  const nmod_mat_t mat2);
+void nmod_mat_concat_horizontal(nmod_mat_t res, const nmod_mat_t mat1, const nmod_mat_t mat2);
+void nmod_mat_concat_vertical(nmod_mat_t res, const nmod_mat_t mat1, const nmod_mat_t mat2);
 
 /* Random matrix generation */
 void nmod_mat_randtest(nmod_mat_t mat, flint_rand_t state);
 void nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state);
-int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state,
-                 mp_srcptr diag, slong n);
+int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state, mp_srcptr diag, slong n);
 void nmod_mat_randrank(nmod_mat_t, flint_rand_t state, slong rank);
 void nmod_mat_randops(nmod_mat_t mat, slong count, flint_rand_t state);
 void nmod_mat_randtril(nmod_mat_t mat, flint_rand_t state, int unit);
@@ -107,10 +104,9 @@ int nmod_mat_fprint(FILE* f, const nmod_mat_t mat);
 void nmod_mat_print_pretty(const nmod_mat_t mat);
 int nmod_mat_print(const nmod_mat_t mat);
 
-int nmod_mat_equal(const nmod_mat_t mat1, const nmod_mat_t mat2);
-
 void nmod_mat_zero(nmod_mat_t mat);
 
+int nmod_mat_equal(const nmod_mat_t mat1, const nmod_mat_t mat2);
 int nmod_mat_is_zero(const nmod_mat_t mat);
 int nmod_mat_is_one(const nmod_mat_t mat);
 int nmod_mat_is_zero_row(const nmod_mat_t mat, slong i);
@@ -127,7 +123,6 @@ int nmod_mat_is_square(const nmod_mat_t mat)
     return (mat->r == mat->c);
 }
 
-
 void nmod_mat_set(nmod_mat_t B, const nmod_mat_t A);
 void nmod_mat_transpose(nmod_mat_t B, const nmod_mat_t A);
 
@@ -140,18 +135,13 @@ void nmod_mat_neg(nmod_mat_t B, const nmod_mat_t A);
 /* Matrix-scalar arithmetic */
 
 void nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, mp_limb_t c);
-void nmod_mat_scalar_addmul_ui(nmod_mat_t dest,
-                       const nmod_mat_t X, const nmod_mat_t Y, const mp_limb_t b);
-
-
+void nmod_mat_scalar_addmul_ui(nmod_mat_t dest, const nmod_mat_t X, const nmod_mat_t Y, const mp_limb_t b);
 void nmod_mat_scalar_mul_fmpz(nmod_mat_t res, const nmod_mat_t M, const fmpz_t c);
 
 /* Matrix multiplication */
 
 void nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
-
 int nmod_mat_mul_blas(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
-
 void nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 
 void
@@ -159,30 +149,18 @@ _nmod_mat_mul_classical_threaded_pool_op(nmod_mat_t D, const nmod_mat_t C,
 		            const nmod_mat_t A, const nmod_mat_t B, int op,
 			      thread_pool_handle * threads, slong num_threads);
 
-void nmod_mat_mul_classical_threaded(nmod_mat_t C,
-		                       const nmod_mat_t A, const nmod_mat_t B);
+void nmod_mat_mul_classical_threaded(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 void nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+void _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, int op);
 
-void _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C,
-                                const nmod_mat_t A, const nmod_mat_t B, int op);
+void nmod_mat_addmul(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+void nmod_mat_submul(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 
-void nmod_mat_addmul(nmod_mat_t D, const nmod_mat_t C,
-                                const nmod_mat_t A, const nmod_mat_t B);
+void nmod_mat_mul_nmod_vec(mp_limb_t * c, const nmod_mat_t A, const mp_limb_t * b, slong blen);
+void nmod_mat_mul_nmod_vec_ptr(mp_limb_t * const * c, const nmod_mat_t A, const mp_limb_t * const * b, slong blen);
 
-void nmod_mat_submul(nmod_mat_t D, const nmod_mat_t C,
-                                const nmod_mat_t A, const nmod_mat_t B);
-
-void nmod_mat_mul_nmod_vec(mp_limb_t * c, const nmod_mat_t A,
-                                              const mp_limb_t * b, slong blen);
-
-void nmod_mat_mul_nmod_vec_ptr(mp_limb_t * const * c,
-                  const nmod_mat_t A, const mp_limb_t * const * b, slong blen);
-
-void nmod_mat_nmod_vec_mul(mp_limb_t * c, const mp_limb_t * a,
-                                               slong alen, const nmod_mat_t B);
-
-void nmod_mat_nmod_vec_mul_ptr(mp_limb_t * const * c,
-                  const mp_limb_t * const * a, slong alen, const nmod_mat_t B);
+void nmod_mat_nmod_vec_mul(mp_limb_t * c, const mp_limb_t * a, slong alen, const nmod_mat_t B);
+void nmod_mat_nmod_vec_mul_ptr(mp_limb_t * const * c, const mp_limb_t * const * a, slong alen, const nmod_mat_t B);
 
 /* Exponent */
 
