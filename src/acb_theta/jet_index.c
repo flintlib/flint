@@ -11,7 +11,8 @@
 
 #include "acb_theta.h"
 
-slong acb_theta_jet_index(const slong * tup, slong g)
+slong
+acb_theta_jet_index(const slong * tup, slong g)
 {
     slong ord, res, k;
     slong j;

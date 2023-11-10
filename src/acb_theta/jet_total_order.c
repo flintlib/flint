@@ -11,7 +11,8 @@
 
 #include "acb_theta.h"
 
-slong acb_theta_jet_total_order(const slong * tup, slong g)
+slong
+acb_theta_jet_total_order(const slong * tup, slong g)
 {
     slong k;
     slong res = 0;

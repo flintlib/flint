@@ -84,7 +84,8 @@ g2_character_switch(slong * a, slong * b, slong * c, slong * d, int twice)
     return 1 - g2_character_switch(a, b, c, d, 1);
 }
 
-slong acb_theta_g2_character(const fmpz_mat_t mat)
+slong
+acb_theta_g2_character(const fmpz_mat_t mat)
 {
     fmpz_mat_t w;
     slong coeffs[16];

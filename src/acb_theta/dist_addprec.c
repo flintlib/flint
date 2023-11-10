@@ -12,7 +12,8 @@
 #include "arb.h"
 #include "acb_theta.h"
 
-slong acb_theta_dist_addprec(const arb_t d2)
+slong
+acb_theta_dist_addprec(const arb_t d2)
 {
     arb_t x;
     slong prec = ACB_THETA_LOW_PREC;

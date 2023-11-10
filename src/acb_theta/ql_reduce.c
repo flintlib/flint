@@ -13,7 +13,8 @@
 #include "acb_mat.h"
 #include "acb_theta.h"
 
-slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong * n1, acb_srcptr z,
+slong
+acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong * n1, acb_srcptr z,
     const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);

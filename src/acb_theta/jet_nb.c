@@ -12,7 +12,8 @@
 #include "fmpz.h"
 #include "acb_theta.h"
 
-slong acb_theta_jet_nb(slong ord, slong g)
+slong
+acb_theta_jet_nb(slong ord, slong g)
 {
     fmpz_t x;
     slong res;

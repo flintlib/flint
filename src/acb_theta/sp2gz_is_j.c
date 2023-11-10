@@ -11,7 +11,8 @@
 
 #include "acb_theta.h"
 
-int sp2gz_is_j(const fmpz_mat_t mat)
+int
+sp2gz_is_j(const fmpz_mat_t mat)
 {
     slong g = sp2gz_dim(mat);
     fmpz_mat_t block;
