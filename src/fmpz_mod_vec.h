@@ -25,35 +25,20 @@
 extern "C" {
 #endif
 
-void _fmpz_mod_vec_set_fmpz_vec(fmpz * A, const fmpz * B, slong len,
-                                                     const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_vec_set_fmpz_vec(fmpz * A, const fmpz * B, slong len, const fmpz_mod_ctx_t ctx);
 
-void _fmpz_mod_vec_neg(fmpz * A, const fmpz * B, slong len,
-                                                     const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_vec_add(fmpz * a, const fmpz * b, const fmpz * c, slong n, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_vec_sub(fmpz * a, const fmpz * b, const fmpz * c, slong n, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_vec_neg(fmpz * A, const fmpz * B, slong len, const fmpz_mod_ctx_t ctx);
 
-void _fmpz_mod_vec_add(fmpz * a, const fmpz * b, const fmpz * c,
-                                            slong n, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_vec_mul(fmpz * A, const fmpz * B, const fmpz * C, slong len, const fmpz_mod_ctx_t ctx);
 
-void _fmpz_mod_vec_sub(fmpz * a, const fmpz * b, const fmpz * c,
-                                            slong n, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_vec_scalar_mul_fmpz_mod(fmpz * A, const fmpz * B, slong len, const fmpz_t c, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_vec_scalar_addmul_fmpz_mod(fmpz * A, const fmpz * B, slong len, const fmpz_t c, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_vec_scalar_div_fmpz_mod(fmpz * A, const fmpz * B, slong len, const fmpz_t c, const fmpz_mod_ctx_t ctx);
 
-void _fmpz_mod_vec_scalar_mul_fmpz_mod(fmpz * A, const fmpz * B,
-                          slong len, const fmpz_t c, const fmpz_mod_ctx_t ctx);
-
-void _fmpz_mod_vec_scalar_addmul_fmpz_mod(fmpz * A, const fmpz * B,
-                          slong len, const fmpz_t c, const fmpz_mod_ctx_t ctx);
-
-void _fmpz_mod_vec_mul(fmpz * A, const fmpz * B, const fmpz * C,
-                                          slong len, const fmpz_mod_ctx_t ctx);
-
-void _fmpz_mod_vec_scalar_div_fmpz_mod(fmpz * A, const fmpz * B,
-                          slong len, const fmpz_t c, const fmpz_mod_ctx_t ctx);
-
-void _fmpz_mod_vec_dot(fmpz_t d, const fmpz * A, const fmpz * B,
-                                          slong len, const fmpz_mod_ctx_t ctx);
-
-void _fmpz_mod_vec_dot_rev(fmpz_t r, const fmpz * a,
-		          const fmpz * b, slong len, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_vec_dot(fmpz_t d, const fmpz * A, const fmpz * B, slong len, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_vec_dot_rev(fmpz_t r, const fmpz * a, const fmpz * b, slong len, const fmpz_mod_ctx_t ctx);
 
 #ifdef __cplusplus
 }
