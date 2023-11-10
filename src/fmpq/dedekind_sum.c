@@ -11,6 +11,7 @@
 */
 
 #include "fmpq.h"
+#include "fmpq_extras.h"
 
 #define _UI_MAT22_RMUL_ELEM(m11, m12, m21, m22, q) \
   do {                                             \

@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq.h"
+#include "fmpz.h"
+#include "fmpq_extras.h"
 
 /*
     after initialization one may:
@@ -31,7 +32,6 @@ void _fmpq_cfrac_list_init(_fmpq_cfrac_list_t v)
     fmpz_init(v->alt_sum);
 }
 
-
 void _fmpq_cfrac_list_clear(_fmpq_cfrac_list_t v)
 {
     slong i;
@@ -44,7 +44,6 @@ void _fmpq_cfrac_list_clear(_fmpq_cfrac_list_t v)
 
     fmpz_clear(v->alt_sum);
 }
-
 
 void _fmpq_cfrac_list_fit_length(_fmpq_cfrac_list_t v, slong len)
 {
@@ -67,7 +66,6 @@ void _fmpq_cfrac_list_fit_length(_fmpq_cfrac_list_t v, slong len)
     v->alloc = len;
 }
 
-
 void _fmpq_cfrac_list_push_back(_fmpq_cfrac_list_t v, const fmpz_t a)
 {
     if (v->want_alt_sum)
@@ -88,7 +86,6 @@ void _fmpq_cfrac_list_push_back(_fmpq_cfrac_list_t v, const fmpz_t a)
     FLINT_ASSERT(v->length <= v->limit);
 }
 
-
 void _fmpq_cfrac_list_push_back_zero(_fmpq_cfrac_list_t v)
 {
     v->want_alt_sum *= -1;
@@ -101,7 +98,6 @@ void _fmpq_cfrac_list_push_back_zero(_fmpq_cfrac_list_t v)
     v->length++;
     FLINT_ASSERT(v->length <= v->limit);
 }
-
 
 void _fmpq_cfrac_list_append_ui(_fmpq_cfrac_list_t v, const ulong * a, slong n)
 {
@@ -161,3 +157,9 @@ void _fmpq_cfrac_list_append_ui(_fmpq_cfrac_list_t v, const ulong * a, slong n)
     FLINT_ASSERT(v->length <= v->limit);
 }
 
+void _fmpq_cfrac_list_swap(_fmpq_cfrac_list_t a, _fmpq_cfrac_list_t b)
+{
+    _fmpq_cfrac_list_struct t = *a;
+    *a = *b;
+    *b = t;
+}

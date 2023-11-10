@@ -11,8 +11,32 @@
 
 #include "gmpcompat.h"
 #include "mpn_extras.h"
-#include "fmpq.h"
-#include "fmpz_poly.h"
+#include "fmpz.h"
+#include "fmpq_extras.h"
+
+void _fmpq_ball_init(_fmpq_ball_t x)
+{
+    fmpz_init(x->left_num);
+    fmpz_init(x->left_den);
+    fmpz_init(x->right_num);
+    fmpz_init(x->right_den);
+    x->exact = 0;
+}
+
+void _fmpq_ball_clear(_fmpq_ball_t x)
+{
+    fmpz_clear(x->left_num);
+    fmpz_clear(x->left_den);
+    fmpz_clear(x->right_num);
+    fmpz_clear(x->right_den);
+}
+
+void _fmpq_ball_swap(_fmpq_ball_t x, _fmpq_ball_t y)
+{
+   _fmpq_ball_struct t = *x;
+   *x = *y;
+   *y = t;
+}
 
 /* enable for debug printing of various types */
 #if 0

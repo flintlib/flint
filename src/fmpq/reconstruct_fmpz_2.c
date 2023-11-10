@@ -13,6 +13,7 @@
 #include "gmpcompat.h"
 #include "mpn_extras.h"
 #include "fmpq.h"
+#include "fmpq_extras.h"
 
 #define FMPQ_RECONSTRUCT_ARRAY_LIMIT 12
 #define FMPQ_RECONSTRUCT_HGCD_CUTOFF 500

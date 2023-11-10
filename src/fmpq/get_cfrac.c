@@ -11,7 +11,7 @@
 */
 
 #include "fmpq.h"
-
+#include "fmpq_extras.h"
 
 slong fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t f, slong limit)
 {
@@ -118,7 +118,6 @@ slong fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t f, slong limit)
 
     return i;
 }
-
 
 slong fmpq_get_cfrac_naive(fmpz * c, fmpq_t rem, const fmpq_t x, slong n)
 {

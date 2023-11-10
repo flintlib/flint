@@ -171,7 +171,7 @@ HEADER_DIRS :=                                                              \
         nf              nf_elem         qfb                                 \
                                                                             \
         double_interval dlog                                                \
-        fmpz_extras     fmpzi                                               \
+        fmpz_extras     fmpq_extras     fmpzi                               \
         bool_mat        partitions                                          \
         mag                                                                 \
         arf             acf             arb             acb                 \

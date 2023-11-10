@@ -10,7 +10,7 @@
 */
 
 #include "fmpq.h"
-
+#include "fmpq_extras.h"
 
 void _fmpq_simplest_between(fmpz_t mid_num, fmpz_t mid_den,
                                         const fmpz_t l_num, const fmpz_t l_den,

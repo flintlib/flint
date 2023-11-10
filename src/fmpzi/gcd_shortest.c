@@ -9,8 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpq_extras.h"
 #include "fmpzi.h"
-#include "fmpq.h"
 
 /*
 return with (u1,u2) = t1*(c,b) + t2*(0,a)
