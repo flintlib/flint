@@ -31,11 +31,8 @@ void _fmpq_vec_clear(fmpq * vec, slong len);
 
 /*  Randomisation  ***********************************************************/
 
-void _fmpq_vec_randtest(fmpq * f, flint_rand_t state,
-                        slong len, flint_bitcnt_t bits);
-
-void _fmpq_vec_randtest_uniq_sorted(fmpq * vec,
-                        flint_rand_t state, slong len, flint_bitcnt_t bits);
+void _fmpq_vec_randtest(fmpq * f, flint_rand_t state, slong len, flint_bitcnt_t bits);
+void _fmpq_vec_randtest_uniq_sorted(fmpq * vec, flint_rand_t state, slong len, flint_bitcnt_t bits);
 
 /* Sorting  ******************************************************************/
 
@@ -44,12 +41,7 @@ void _fmpq_vec_sort(fmpq * vec, slong len);
 /*  Conversions  *************************************************************/
 
 void _fmpq_vec_set_fmpz_vec(fmpq * res, const fmpz * vec, slong len);
-
-void _fmpq_vec_get_fmpz_vec_fmpz(fmpz* num, fmpz_t den,
-                                                    const fmpq * a, slong len);
-
-void _fmpq_vec_get_fmpz_vec_fmpz(fmpz* num, fmpz_t den,
-                                                    const fmpq * a, slong len);
+void _fmpq_vec_get_fmpz_vec_fmpz(fmpz* num, fmpz_t den, const fmpq * a, slong len);
 
 /*  Dot product  **************************************************/
 
