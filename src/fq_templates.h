@@ -13,31 +13,19 @@
 
 #include "templates.h"
 
-void TEMPLATE(T, gcdinv)(TEMPLATE(T, t) rop, TEMPLATE(T, t) inv,
-                    const TEMPLATE(T, t) op,
-                    const TEMPLATE(T, ctx_t) ctx);
+void TEMPLATE(T, gcdinv)(TEMPLATE(T, t) rop, TEMPLATE(T, t) inv, const TEMPLATE(T, t) op, const TEMPLATE(T, ctx_t) ctx);
 
-int TEMPLATE(T, is_invertible)(const TEMPLATE(T, t) op,
-                           const TEMPLATE(T, ctx_t) ctx);
+int TEMPLATE(T, is_invertible)(const TEMPLATE(T, t) op, const TEMPLATE(T, ctx_t) ctx);
+int TEMPLATE(T, is_invertible_f)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op, const TEMPLATE(T, ctx_t) ctx);
 
-int TEMPLATE(T, is_invertible_f)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op,
-                             const TEMPLATE(T, ctx_t) ctx);
+void TEMPLATE(T, div)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op1, const TEMPLATE(T, t) op2, const TEMPLATE(T, ctx_t) ctx);
 
-void TEMPLATE(T, div)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op1,
-                 const TEMPLATE(T, t) op2, const TEMPLATE(T, ctx_t) ctx);
-
-int TEMPLATE(T, multiplicative_order)(fmpz * ord, const TEMPLATE(T, t) op,
-                             const TEMPLATE(T, ctx_t) ctx);
+int TEMPLATE(T, multiplicative_order)(fmpz * ord, const TEMPLATE(T, t) op, const TEMPLATE(T, ctx_t) ctx);
 
 #ifdef B
-void TEMPLATE4(T, get, B, mat)(TEMPLATE(B, mat_t) col,
-                                         const TEMPLATE(T, t) a,
-                                         const TEMPLATE(T, ctx_t) ctx);
-void TEMPLATE4(T, set, B, mat)(TEMPLATE(T, t) a,
-                                         const TEMPLATE(B, mat_t) col,
-                                         const TEMPLATE(T, ctx_t) ctx);
+void TEMPLATE4(T, get, B, mat)(TEMPLATE(B, mat_t) col, const TEMPLATE(T, t) a, const TEMPLATE(T, ctx_t) ctx);
+void TEMPLATE4(T, set, B, mat)(TEMPLATE(T, t) a, const TEMPLATE(B, mat_t) col, const TEMPLATE(T, ctx_t) ctx);
 #endif
-
 
 FQ_TEMPLATES_INLINE
 int TEMPLATE(T, is_primitive)(const TEMPLATE(T, t) op, const TEMPLATE(T, ctx_t) ctx)
