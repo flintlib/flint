@@ -19,7 +19,7 @@ TEST_FUNCTION_START(acb_theta_char_get_a, state)
     /* Test: inverse of char_get_slong */
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
-        slong g = n_randint(state, 10);
+        slong g = 1 + n_randint(state, 10);
         slong * n;
         ulong a, t;
 

@@ -20,7 +20,7 @@ TEST_FUNCTION_START(acb_theta_char_dot, state)
     /* Test: various dots are the same */
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
-        slong g = n_randint(state, 10);
+        slong g = 1 + n_randint(state, 10);
         slong prec = 100;
         ulong a, b;
         slong * n;
