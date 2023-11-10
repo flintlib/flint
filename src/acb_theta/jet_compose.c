@@ -20,8 +20,8 @@ acb_theta_jet_compose(acb_ptr res, acb_srcptr v, const acb_mat_t N,
     acb_ptr aux;
     acb_t x;
     fmpz_t m, p;
-    slong* tups;
-    slong* term;
+    slong * tups;
+    slong * term;
     slong n, k, j, i, l, t;
 
     tups = flint_malloc(nb * g * sizeof(slong));

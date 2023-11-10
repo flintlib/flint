@@ -12,8 +12,8 @@
 #include "acb_theta.h"
 
 static int
-acb_theta_ql_a0_eld_points(slong** pts, slong* nb_pts, arb_ptr v,
-    slong* fullprec, arf_t eps, arb_srcptr d, ulong a, arb_srcptr w,
+acb_theta_ql_a0_eld_points(slong ** pts, slong * nb_pts, arb_ptr v,
+    slong * fullprec, arf_t eps, arb_srcptr d, ulong a, arb_srcptr w,
     const arb_mat_t C, const arb_mat_t C1, slong prec)
 {
     slong g = arb_mat_nrows(C);
@@ -66,7 +66,7 @@ acb_theta_ql_a0_eld_points(slong** pts, slong* nb_pts, arb_ptr v,
 }
 
 static int
-acb_theta_ql_a0_split_term(acb_ptr th, slong* pt, ulong a, acb_srcptr t, acb_srcptr z,
+acb_theta_ql_a0_split_term(acb_ptr th, slong * pt, ulong a, acb_srcptr t, acb_srcptr z,
     arb_srcptr v, arb_srcptr d, arb_srcptr new_d0, const acb_mat_t tau0,
     const acb_mat_t star, const acb_mat_t tau1, const arb_mat_t C1, slong guard,
     slong prec, slong fullprec, acb_theta_ql_worker_t worker)
@@ -175,7 +175,7 @@ acb_theta_ql_a0_split(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d,
     acb_mat_t tau0, star, tau1;
     arb_ptr v, w, new_d0;
     arf_t eps;
-    slong* pts;
+    slong * pts;
     slong fullprec, nb_pts;
     slong a, j, k;
     int res = 1;

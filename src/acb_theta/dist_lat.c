@@ -40,8 +40,8 @@ acb_theta_dist_ubound(arf_t u, arb_srcptr v, const arb_mat_t C, slong prec)
     slong nb = 1 << g;
     arb_mat_t Cinv;
     arb_ptr x;
-    slong* approx;
-    slong* pt;
+    slong * approx;
+    slong * pt;
     arb_t d;
     arf_t b;
     slong j, k;
@@ -98,7 +98,7 @@ acb_theta_dist_lat(arb_t d, arb_srcptr v, const arb_mat_t C, slong prec)
     slong g = arb_mat_nrows(C);
     acb_theta_eld_t E;
     slong nb;
-    slong* pts;
+    slong * pts;
     arf_t u;
     arb_t x;
     slong k;

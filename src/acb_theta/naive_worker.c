@@ -32,7 +32,7 @@ acb_theta_naive_newprec(slong prec, slong coord, slong dist, slong max_dist, slo
 /* Call worker in dimension 1: make vectors to use in acb_dot  */
 
 static void
-acb_theta_naive_call_dim1(acb_ptr th, acb_ptr v1, acb_ptr v2, slong* precs,
+acb_theta_naive_call_dim1(acb_ptr th, acb_ptr v1, acb_ptr v2, slong * precs,
     const acb_t lin, const acb_t lin_inv, const acb_t cf, acb_srcptr sqr_pow,
     const acb_theta_eld_t E, slong ord, slong prec, slong fullprec,
     acb_theta_naive_worker_t worker)
@@ -96,10 +96,10 @@ acb_theta_naive_call_dim1(acb_ptr th, acb_ptr v1, acb_ptr v2, slong* precs,
 /* Recursive call to smaller dimension; fall back to dim1 when appropriate */
 
 static void
-acb_theta_naive_worker_rec(acb_ptr th, acb_ptr v1, acb_ptr v2, slong* precs,
+acb_theta_naive_worker_rec(acb_ptr th, acb_ptr v1, acb_ptr v2, slong * precs,
     acb_mat_t lin_pow, acb_mat_t lin_pow_inv, const acb_t cf, acb_srcptr exp_z,
     acb_srcptr exp_z_inv, const acb_mat_t exp_tau, const acb_mat_t exp_tau_inv,
-    const acb_ptr* sqr_pow, const acb_theta_eld_t E, slong ord, slong prec,
+    const acb_ptr * sqr_pow, const acb_theta_eld_t E, slong ord, slong prec,
     slong fullprec, acb_theta_naive_worker_t worker)
 {
     slong d = acb_theta_eld_dim(E);
@@ -252,7 +252,7 @@ acb_theta_naive_worker_rec(acb_ptr th, acb_ptr v1, acb_ptr v2, slong* precs,
 
 static void
 acb_theta_naive_precompute(acb_mat_t exp_tau, acb_mat_t exp_tau_inv,
-    acb_ptr* sqr_pow, const acb_mat_t tau, const acb_theta_eld_t E, slong prec)
+    acb_ptr * sqr_pow, const acb_mat_t tau, const acb_theta_eld_t E, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     acb_t c, dc, ddc;
@@ -306,9 +306,9 @@ acb_theta_naive_worker(acb_ptr th, slong len, acb_srcptr zs, slong nb,
     slong fullprec = acb_theta_naive_fullprec(E, prec);
     slong width = 0;
     acb_mat_t exp_tau, exp_tau_inv, lin_pow, lin_pow_inv;
-    acb_ptr* sqr_pow;
+    acb_ptr * sqr_pow;
     acb_ptr v1, v2, exp_z, exp_z_inv, res;
-    slong* precs;
+    slong * precs;
     acb_t cf;
     slong j, k;
 

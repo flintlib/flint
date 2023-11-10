@@ -12,10 +12,10 @@
 #include "acb_theta.h"
 
 void
-acb_theta_jet_tuples(slong* tups, slong ord, slong g)
+acb_theta_jet_tuples(slong * tups, slong ord, slong g)
 {
     slong k, j, l, nb_rec, ind;
-    slong* rec;
+    slong * rec;
 
     if (g == 1)
     {

@@ -229,7 +229,7 @@ where `\alpha,\beta,\gamma,\delta` are `g\times g` blocks.
 
     Sets *inv* to the inverse of the symplectic matrix *mat*.
 
-.. function:: fmpz_mat_struct* sp2gz_decompose(slong* nb, const fmpz_mat_t mat)
+.. function:: fmpz_mat_struct * sp2gz_decompose(slong * nb, const fmpz_mat_t mat)
 
     Returns a vector *res* of symplectic matrices and store its length in *nb*
     such that the following holds: *mat* is the product of the elements of
@@ -328,11 +328,11 @@ We continue to denote by `\alpha,\beta,\gamma,\delta` the `g\times g` blocks of
 Theta characteristics
 -------------------------------------------------------------------------------
 
-.. function:: void acb_theta_char_get_slong(slong* n, ulong a, slong g)
+.. function:: void acb_theta_char_get_slong(slong * n, ulong a, slong g)
 
     Sets each entry of *n* to the corresponding bit of *a*.
 
-.. function:: ulong acb_theta_char_get_a(const slong* n, slong g)
+.. function:: ulong acb_theta_char_get_a(const slong * n, slong g)
 
     Returns the unique characteristic *a* such that `n\in 2\mathbb{Z}^g + a`.
 
@@ -349,7 +349,7 @@ Theta characteristics
     where `a_i, b_i` for `0\leq i < g` denote the bits of `a` and `b`
     respectively.
 
-.. function:: slong acb_theta_char_dot_slong(ulong a, const slong* n, slong g)
+.. function:: slong acb_theta_char_dot_slong(ulong a, const slong * n, slong g)
 
     Returns `\sum_{i=0}^{g-1} a_i n_i` modulo 4 as an integer between 0 and 3.
 
@@ -484,16 +484,16 @@ Ellipsoids: memory management and computations
 The following functions are available after :func:`acb_theta_eld_set` has been
 called successfully.
 
-.. function:: void acb_theta_eld_points(slong* pts, const acb_theta_eld_t E)
+.. function:: void acb_theta_eld_points(slong * pts, const acb_theta_eld_t E)
 
     Sets *pts* to the list of all the points in `E`, as a concatenation of
     vectors of length *g*.
 
-.. function:: void acb_theta_eld_border(slong* pts, const acb_theta_eld_t E)
+.. function:: void acb_theta_eld_border(slong * pts, const acb_theta_eld_t E)
 
     Sets *pts* to the list of all the points in the border of `E`.
 
-.. function:: int acb_theta_eld_contains(const acb_theta_eld_t E, slong* pt)
+.. function:: int acb_theta_eld_contains(const acb_theta_eld_t E, slong * pt)
 
     Returns true (nonzero) iff *pt* is contained in `E`. The vector *pt* must
     be of length *g*.
@@ -565,7 +565,7 @@ common compact domain and use only one ellipsoid, following [DHBHS2004]_.
     is `v^{(k)} = C r` which is also bounded independently of `k`, and *v* is
     set to the :func:`acb_union` of the `v^{(k)}` for `0\leq k< \mathit{nb}`.
 
-.. function:: void acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong* tup, slong* n, slong prec)
+.. function:: void acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong * tup, slong * n, slong prec)
 
     Sets *res* to `n_0^{k_0} \cdots n_{g-1}^{k_{g-1}}\exp(\pi i(n^T\tau n + 2
     n^Tz))`, where the `k_j` and `n_j` denotes the `j^{\mathrm{th}}` entry in
@@ -615,7 +615,7 @@ directly.
     A function pointer type. A function *worker* of this type has the
     following signature:
 
-    .. function:: void worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong len, const acb_t c, const slong* coords, slong ord, slong g, slong prec, slong fullprec)
+    .. function:: void worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2, const slong * precs, slong len, const acb_t c, const slong * coords, slong ord, slong g, slong prec, slong fullprec)
 
     where:
 
@@ -710,16 +710,16 @@ differentiated series:
 
     Returns the number of derivation tuples with total order at most *ord*.
 
-.. function:: slong acb_theta_jet_total_order(const slong* tup, slong g)
+.. function:: slong acb_theta_jet_total_order(const slong * tup, slong g)
 
     Returns the total derivation order for the given tuple *tup* of length *g*.
 
-.. function:: void acb_theta_jet_tuples(slong* tups, slong ord, slong g)
+.. function:: void acb_theta_jet_tuples(slong * tups, slong ord, slong g)
 
     Sets *tups* to the concatenation of all derivation tuples up to total order
     *ord*.
 
-.. function:: slong acb_theta_jet_index(const slong* tup, slong g)
+.. function:: slong acb_theta_jet_index(const slong * tup, slong g)
 
     Returns *n* such that *tup* is the `n^{\mathrm{th}}` derivation tuple of
     length *g*.
@@ -896,7 +896,7 @@ well as for theta values at `z\neq 0`:
 Quasi-linear algorithms: distances
 -------------------------------------------------------------------------------
 
-.. function:: void acb_theta_dist_pt(arb_t d, arb_srcptr v, const arb_mat_t C, slong* n, slong prec)
+.. function:: void acb_theta_dist_pt(arb_t d, arb_srcptr v, const arb_mat_t C, slong * n, slong prec)
 
     Sets *d* to `\lVert v + Cn\rVert^2` for the usual Euclidean norm.
 
@@ -1084,7 +1084,7 @@ auxiliary vector `t` or when *guard* is too small. Thus, we implement a
 probabilistic algorithm where we gradually increase *guard* and first choose `t
 = 0`, then make a random choice of `t` at each step.
 
-.. function:: slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong* n1, acb_srcptr z, const acb_mat_t tau, slong prec)
+.. function:: slong acb_theta_ql_reduce(acb_ptr new_z, acb_t c, arb_t u, slong * n1, acb_srcptr z, const acb_mat_t tau, slong prec)
 
     Sets *new_z*, *c*, *u*, *n1* and returns `-1\leq s\leq g` such that the
     following holds. If `s\geq 0` is returned, then `z'` = *new_z* is a vector
@@ -1271,7 +1271,7 @@ where
   sign unless we choose a particular branch of `\det(\gamma\tau +
   \delta)^{1/2}` on `\mathbb{H}_g`.
 
-.. function:: ulong acb_theta_transform_char(slong* e, const fmpz_mat_t mat, ulong ab)
+.. function:: ulong acb_theta_transform_char(slong * e, const fmpz_mat_t mat, ulong ab)
 
     Returns the theta characteristic `(a',b')` and sets *e* to `e(\mathit{mat},a,b)`.
 
@@ -1494,7 +1494,7 @@ correspondence between modular forms and covariants.
     Sets *res* and *chi5* to the values of `\chi_{-2,6}` and `\chi_5` at
     `\tau`. Theta values are computed only once.
 
-.. function:: void acb_theta_g2_covariants(acb_poly_struct* res, const acb_poly_t f, slong prec)
+.. function:: void acb_theta_g2_covariants(acb_poly_struct * res, const acb_poly_t f, slong prec)
 
     Sets *res* to the vector of 26 generators of the ring of covariants
     evaluated at the sextic *f* (any terms of degree `>6` are ignored), in the

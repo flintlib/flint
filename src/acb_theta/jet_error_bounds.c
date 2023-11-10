@@ -21,8 +21,8 @@ void acb_theta_jet_error_bounds(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
     arb_t e, f;
     slong nb = acb_theta_jet_nb(ord, g);
     slong nb_dth = acb_theta_jet_nb(ord + 2, g);
-    slong* tups;
-    slong* new_tups;
+    slong * tups;
+    slong * new_tups;
     slong j, l, m, i;
 
     abs_der = _arb_vec_init(nb_dth);

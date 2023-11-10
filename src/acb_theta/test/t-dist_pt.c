@@ -25,8 +25,8 @@ TEST_FUNCTION_START(acb_theta_dist_pt, state)
         arb_mat_t C;
         arb_ptr v;
         arb_t d1, d2;
-        slong* pt1;
-        slong* pt2;
+        slong * pt1;
+        slong * pt2;
         slong k;
 
         arb_mat_init(C, g, g);

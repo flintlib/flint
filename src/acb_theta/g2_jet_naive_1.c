@@ -14,14 +14,14 @@
 #define ACB_THETA_G2_JET_NAIVE_1_THRESHOLD 100
 
 static void
-worker(acb_ptr dth, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong len,
-    const acb_t cofactor, const slong* coords, slong ord, slong g, slong prec, slong fullprec)
+worker(acb_ptr dth, acb_srcptr v1, acb_srcptr v2, const slong * precs, slong len,
+    const acb_t cofactor, const slong * coords, slong ord, slong g, slong prec, slong fullprec)
 {
     slong n = 1 << g;
     acb_ptr v3, aux, sums_1, sums_2, diffs;
     acb_t x;
     slong a0, a1, b;
-    slong* dots;
+    slong * dots;
     slong i, ind0, ind1;
 
     v3 = _acb_vec_init(len);

@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 static int
-acb_theta_jet_le(const slong* tup1, const slong* tup2, slong g)
+acb_theta_jet_le(const slong * tup1, const slong * tup2, slong g)
 {
     slong k;
 
@@ -31,8 +31,8 @@ acb_theta_jet_mul(acb_ptr res, acb_srcptr v1, acb_srcptr v2, slong ord, slong g,
 {
     slong nb = acb_theta_jet_nb(ord, g);
     acb_ptr aux;
-    slong* tups;
-    slong* diff;
+    slong * tups;
+    slong * diff;
     slong j, k, l;
 
     aux = _acb_vec_init(nb);

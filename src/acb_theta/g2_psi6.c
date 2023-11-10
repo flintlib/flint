@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 static void
-g2_psi6_bits(int* b1, int* b2, int* b3, int* b4, ulong b)
+g2_psi6_bits(int * b1, int * b2, int * b3, int * b4, ulong b)
 {
     *b4 = b % 2;
     b = b >> 1;

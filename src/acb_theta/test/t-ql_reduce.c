@@ -30,7 +30,7 @@ TEST_FUNCTION_START(acb_theta_ql_reduce, state)
         acb_t c;
         arb_t u, abs;
         ulong a0, a1, b0, b1, fixed_a1;
-        slong* n1;
+        slong * n1;
         slong k, s;
 
         acb_mat_init(tau, g, g);

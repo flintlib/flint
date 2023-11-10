@@ -35,8 +35,8 @@ TEST_FUNCTION_START(acb_theta_g2_covariants, state)
         fmpz_mat_t mat;
         acb_mat_t tau, w, c;
         acb_ptr z, th2;
-        acb_poly_struct* cov1;
-        acb_poly_struct* cov2;
+        acb_poly_struct * cov1;
+        acb_poly_struct * cov2;
         acb_poly_t u, v;
         fmpz_poly_t pol;
         acb_t psi4, test;

@@ -25,7 +25,7 @@ TEST_FUNCTION_START(acb_theta_g2_covariants_lead, state)
         slong bits = 2;
         slong nb = ACB_THETA_G2_COV_NB;
         slong jlist[] = ACB_THETA_G2_COV_J;
-        acb_poly_struct* cov;
+        acb_poly_struct * cov;
         acb_ptr res, test;
         acb_poly_t r;
         slong k;

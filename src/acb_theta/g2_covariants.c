@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 static void
-acb_theta_g2_transvectants(acb_poly_struct* res, const acb_poly_t f, slong prec)
+acb_theta_g2_transvectants(acb_poly_struct * res, const acb_poly_t f, slong prec)
 {
     acb_poly_t s;
 
@@ -52,7 +52,7 @@ acb_theta_g2_transvectants(acb_poly_struct* res, const acb_poly_t f, slong prec)
 }
 
 void
-acb_theta_g2_covariants(acb_poly_struct* res, const acb_poly_t f, slong prec)
+acb_theta_g2_covariants(acb_poly_struct * res, const acb_poly_t f, slong prec)
 {
     double cofactors[ACB_THETA_G2_COV_NB] = {1, 60, 75, 90, 2250, 2250, 450,
         540, 11250, 67500, 13500, 13500, 168750, 67500, 405000, 10125000,

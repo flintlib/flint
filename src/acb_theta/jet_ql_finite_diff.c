@@ -24,8 +24,8 @@ acb_theta_jet_ql_finite_diff(acb_ptr dth, const arf_t eps, const arf_t err,
     acb_ptr aux;
     arb_t t, e;
     slong b = ord + 1;
-    slong* tups;
-    slong* cyc;
+    slong * tups;
+    slong * cyc;
     slong j, i, l;
     slong k;
 

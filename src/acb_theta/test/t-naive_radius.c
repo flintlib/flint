@@ -32,7 +32,7 @@ TEST_FUNCTION_START(acb_theta_naive_radius, state)
         acb_t c, term;
         arb_t u, abs, sum;
         slong nb_pts;
-        slong* pts;
+        slong * pts;
         slong k;
         int res;
 

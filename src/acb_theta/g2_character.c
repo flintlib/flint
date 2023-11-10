@@ -15,7 +15,7 @@
    forms of degree 2 with character", §12 */
 
 static void
-g2_block_coeffs_mod_2(slong* coeffs, const fmpz_mat_t w)
+g2_block_coeffs_mod_2(slong * coeffs, const fmpz_mat_t w)
 {
     fmpz_t x;
 
@@ -28,13 +28,13 @@ g2_block_coeffs_mod_2(slong* coeffs, const fmpz_mat_t w)
 }
 
 static slong
-g2_block_det_mod_2(slong* coeffs)
+g2_block_det_mod_2(slong * coeffs)
 {
     return (coeffs[0] * coeffs[3] + coeffs[1] * coeffs[2]) % 2;
 }
 
 static slong
-g2_character_formula(slong* a, slong* b, slong* c, slong* d)
+g2_character_formula(slong * a, slong * b, slong * c, slong * d)
 {
     return (a[0] * c[0] + a[1] * c[0] + a[1] * c[1] + a[2] * c[2] + a[3] * c[2]
         + a[3] * c[3] + c[0] * c[1] + c[1] * c[2] + c[2] * c[3] + c[0] * d[3]
@@ -42,7 +42,7 @@ g2_character_formula(slong* a, slong* b, slong* c, slong* d)
 }
 
 static slong
-g2_character_switch(slong* a, slong* b, slong* c, slong* d, int twice)
+g2_character_switch(slong * a, slong * b, slong * c, slong * d, int twice)
 {
     slong row[4];
 

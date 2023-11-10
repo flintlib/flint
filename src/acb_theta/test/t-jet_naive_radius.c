@@ -34,8 +34,8 @@ TEST_FUNCTION_START(acb_theta_jet_naive_radius, state)
         acb_t c, term;
         arb_t u, abs, sum;
         slong nb_pts;
-        slong* pts;
-        slong* tups;
+        slong * pts;
+        slong * tups;
         slong j, k;
         int res;
 

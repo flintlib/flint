@@ -98,7 +98,7 @@ acb_theta_transform_kappa(acb_t sqrtdet, const fmpz_mat_t mat,
     const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
-    fmpz_mat_struct* dec;
+    fmpz_mat_struct * dec;
     fmpz_mat_t delta;
     fmpz_t det;
     slong nb_dec;

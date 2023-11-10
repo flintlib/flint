@@ -24,7 +24,7 @@ TEST_FUNCTION_START(acb_theta_jet_mul, state)
         slong ord = n_randint(state, 10);
         slong nb = acb_theta_jet_nb(ord, g);
         slong prec = 100;
-        slong* tups;
+        slong * tups;
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t p1, p2, p3;
         fmpz_t c;
@@ -48,11 +48,11 @@ TEST_FUNCTION_START(acb_theta_jet_mul, state)
         {
             t = n_randint(state, 100);
             acb_set_si(&v1[k], t);
-            fmpz_mpoly_set_coeff_si_ui(p1, t, (ulong*) tups + k * g, ctx);
+            fmpz_mpoly_set_coeff_si_ui(p1, t, (ulong *) tups + k * g, ctx);
 
             t = n_randint(state, 100);
             acb_set_si(&v2[k], t);
-            fmpz_mpoly_set_coeff_si_ui(p2, t, (ulong*) tups + k * g, ctx);
+            fmpz_mpoly_set_coeff_si_ui(p2, t, (ulong *) tups + k * g, ctx);
         }
 
         acb_theta_jet_mul(v3, v1, v2, ord, g, prec);
@@ -60,7 +60,7 @@ TEST_FUNCTION_START(acb_theta_jet_mul, state)
 
         for (k = 0; k < nb; k++)
         {
-            fmpz_mpoly_get_coeff_fmpz_ui(c, p3, (ulong*) tups + k * g, ctx);
+            fmpz_mpoly_get_coeff_fmpz_ui(c, p3, (ulong *) tups + k * g, ctx);
             acb_set_fmpz(x, c);
             if (!acb_eq(x, &v3[k]))
             {

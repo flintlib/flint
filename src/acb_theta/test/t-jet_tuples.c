@@ -22,7 +22,7 @@ TEST_FUNCTION_START(acb_theta_jet_tuples, state)
         slong g = 1 + n_randint(state, 6);
         slong ord = n_randint(state, 6);
         slong nb = acb_theta_jet_nb(ord, g);
-        slong* tups;
+        slong * tups;
         slong i = n_randint(state, nb);
         slong test;
         slong j, k;

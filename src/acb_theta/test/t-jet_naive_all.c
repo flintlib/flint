@@ -29,7 +29,7 @@ TEST_FUNCTION_START(acb_theta_jet_naive_all, state)
         acb_mat_t tau, tau11;
         acb_ptr z, dth, dth_g1, test;
         acb_t prod, t;
-        slong* tups;
+        slong * tups;
         slong k, j, l, ab;
 
         acb_mat_init(tau, g, g);

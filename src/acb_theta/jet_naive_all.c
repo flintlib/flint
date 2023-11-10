@@ -15,14 +15,14 @@
    introduces powers of i in worker */
 
 static void
-worker(acb_ptr dth, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong len,
-    const acb_t cofactor, const slong* coords, slong ord, slong g, slong prec, slong fullprec)
+worker(acb_ptr dth, acb_srcptr v1, acb_srcptr v2, const slong * precs, slong len,
+    const acb_t cofactor, const slong * coords, slong ord, slong g, slong prec, slong fullprec)
 {
     slong n = 1 << g;
     slong nb = acb_theta_jet_nb(ord, g);
-    slong* tups;
+    slong * tups;
     slong a0, a1;
-    slong* dots;
+    slong * dots;
     acb_ptr v3, aux;
     acb_t x, y;
     fmpz_t num, t;
@@ -114,7 +114,7 @@ acb_theta_jet_naive_all_gen(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
     slong g = acb_mat_nrows(tau);
     slong n2 = 1 << (2 * g);
     slong nb = acb_theta_jet_nb(ord, g);
-    slong* tups;
+    slong * tups;
     acb_theta_eld_t E;
     arb_mat_t C;
     arf_t R2, eps;

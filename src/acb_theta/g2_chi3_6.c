@@ -19,7 +19,7 @@ acb_theta_g2_chi3_6(acb_poly_t res, acb_srcptr dth, slong prec)
     slong orders[2] = {1, 0};
     slong i1 = acb_theta_jet_index(orders, g) - 1; /* 0 or 1 */
     slong nb = acb_theta_jet_nb(1, g);
-    acb_poly_struct* aux;
+    acb_poly_struct * aux;
     acb_poly_t s;
     acb_t den;
     ulong ab;

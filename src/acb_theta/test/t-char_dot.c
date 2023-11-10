@@ -22,7 +22,7 @@ TEST_FUNCTION_START(acb_theta_char_dot, state)
         slong g = n_randint(state, 10);
         slong prec = 100;
         ulong a, b;
-        slong* n;
+        slong * n;
         acb_ptr v, w;
         fmpz_t m;
         slong x1, x2;

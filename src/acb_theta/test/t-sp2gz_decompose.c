@@ -97,7 +97,7 @@ TEST_FUNCTION_START(acb_theta_sp2gz_decompose, state)
         slong g = 2 + n_randint(state, 5);
         slong bits = n_randint(state, 20);
         fmpz_mat_t m, x;
-        fmpz_mat_struct* dec = NULL;
+        fmpz_mat_struct * dec = NULL;
         slong nb_dec = 0;
         slong k;
 

@@ -113,10 +113,10 @@ fmpz_mat_snf_transform(fmpz_mat_t S, fmpz_mat_t U, fmpz_mat_t V, const fmpz_mat_
     fmpz_clear(q);
 }
 
-static fmpz_mat_struct*
-sp2gz_decompose_g1(slong* nb, const fmpz_mat_t mat)
+static fmpz_mat_struct *
+sp2gz_decompose_g1(slong * nb, const fmpz_mat_t mat)
 {
-    fmpz_mat_struct* res;
+    fmpz_mat_struct * res;
 
     res = flint_malloc(1 * sizeof(fmpz_mat_struct));
     fmpz_mat_init(res, 2, 2);
@@ -125,17 +125,17 @@ sp2gz_decompose_g1(slong* nb, const fmpz_mat_t mat)
     return res;
 }
 
-static fmpz_mat_struct*
-sp2gz_decompose_nonsimplified(slong* nb, const fmpz_mat_t mat)
+static fmpz_mat_struct *
+sp2gz_decompose_nonsimplified(slong * nb, const fmpz_mat_t mat)
 {
     slong g = sp2gz_dim(mat);
     fmpz_mat_t gamma, delta, last;
     fmpz_mat_t u, v, d;
     fmpz_mat_t cur, left, right, m;
     fmpz_mat_t w;
-    fmpz_mat_struct* vec;
-    fmpz_mat_struct* rec = NULL;
-    fmpz_mat_struct* res;
+    fmpz_mat_struct * vec;
+    fmpz_mat_struct * rec = NULL;
+    fmpz_mat_struct * res;
     fmpz_t a;
     slong nb_rec = 0;
     slong nb_max;
@@ -308,12 +308,12 @@ sp2gz_decompose_nonsimplified(slong* nb, const fmpz_mat_t mat)
     return res;
 }
 
-fmpz_mat_struct* sp2gz_decompose(slong* nb, const fmpz_mat_t mat)
+fmpz_mat_struct * sp2gz_decompose(slong * nb, const fmpz_mat_t mat)
 {
     slong g = sp2gz_dim(mat);
-    fmpz_mat_struct* rec;
+    fmpz_mat_struct * rec;
     slong nb_rec;
-    fmpz_mat_struct* res;
+    fmpz_mat_struct * res;
     fmpz_mat_t u, beta, delta;
     slong k, next_k, j;
 

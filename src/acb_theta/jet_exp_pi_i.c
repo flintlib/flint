@@ -15,7 +15,7 @@ void
 acb_theta_jet_exp_pi_i(acb_ptr res, arb_srcptr a, slong ord, slong g, slong prec)
 {
     slong nb = acb_theta_jet_nb(ord, g);
-    slong* tups;
+    slong * tups;
     acb_t c;
     arb_t t;
     fmpz_t den, m;

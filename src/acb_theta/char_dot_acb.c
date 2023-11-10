@@ -14,7 +14,7 @@
 void
 acb_theta_char_dot_acb(acb_t x, ulong a, acb_srcptr z, slong g, slong prec)
 {
-    slong* v;
+    slong * v;
 
     v = flint_malloc(g * sizeof(slong));
 

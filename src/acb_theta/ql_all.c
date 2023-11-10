@@ -293,7 +293,7 @@ acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong p
     arb_t u, v;
     arf_t b;
     slong s;
-    slong* n1;
+    slong * n1;
     ulong ab, a0, a1, b0, b1, fixed_a1;
 
     acb_init(c);

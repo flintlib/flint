@@ -84,7 +84,7 @@ slong
 acb_theta_transform_kappa2(const fmpz_mat_t mat)
 {
     slong g = sp2gz_dim(mat);
-    fmpz_mat_struct* dec;
+    fmpz_mat_struct * dec;
     fmpz_mat_t delta;
     fmpz_t det;
     slong nb_dec;

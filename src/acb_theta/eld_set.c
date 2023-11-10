@@ -25,7 +25,7 @@ slong_vec_max(slong * r, slong * v1, slong * v2, slong d)
 }
 
 static int
-arf_get_si_safe(slong* m, const arf_t x, arf_rnd_t rnd)
+arf_get_si_safe(slong * m, const arf_t x, arf_rnd_t rnd)
 {
     if (!arf_is_finite(x))
     {
@@ -43,7 +43,7 @@ arf_get_si_safe(slong* m, const arf_t x, arf_rnd_t rnd)
 }
 
 static int
-acb_theta_eld_interval(slong* min, slong* mid, slong* max, const arb_t ctr, const arf_t rad)
+acb_theta_eld_interval(slong * min, slong * mid, slong * max, const arb_t ctr, const arf_t rad)
 {
     slong lp = ACB_THETA_LOW_PREC;
     slong e;
@@ -129,7 +129,7 @@ acb_theta_eld_init_children(acb_theta_eld_t E, slong nr, slong nl)
 
 static int
 acb_theta_eld_init_interval(acb_theta_eld_t E, const arb_mat_t C,
-    const arf_t R2, arb_srcptr v, slong* last_coords)
+    const arf_t R2, arb_srcptr v, slong * last_coords)
 {
     slong min, mid, max;
     slong d = acb_theta_eld_dim(E);
@@ -182,7 +182,7 @@ acb_theta_eld_init_interval(acb_theta_eld_t E, const arb_mat_t C,
 
 static int
 acb_theta_eld_set_rec(acb_theta_eld_t E, const arb_mat_t C,
-    const arf_t R2, arb_srcptr v, slong* last_coords)
+    const arf_t R2, arb_srcptr v, slong * last_coords)
 {
     slong d = acb_theta_eld_dim(E);
     slong g = acb_theta_eld_ambient_dim(E);

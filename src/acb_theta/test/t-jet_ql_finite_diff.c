@@ -25,7 +25,7 @@ TEST_FUNCTION_START(acb_theta_jet_ql_finite_diff, state)
         slong b = ord + 1;
         slong nb_val = n_pow(b, g);
         slong nb_fd = acb_theta_jet_nb(ord, g);
-        slong* tups;
+        slong * tups;
         arb_t c, rho;
         arf_t eps, err;
         acb_ptr val, df, test;

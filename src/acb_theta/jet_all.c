@@ -22,7 +22,7 @@ acb_theta_jet_exp_qf(acb_ptr res, acb_srcptr z, const acb_mat_t N, slong ord, sl
     acb_ptr aux;
     acb_ptr y;
     acb_t c;
-    slong* tup;
+    slong * tup;
     slong j, k, l, i;
 
     acb_mat_init(tp, g, g);

@@ -12,8 +12,8 @@
 #include "acb_theta.h"
 
 static void
-worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2, const slong* precs, slong len,
-    const acb_t cofactor, const slong* coords, slong ord, slong g, slong prec, slong fullprec)
+worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2, const slong * precs, slong len,
+    const acb_t cofactor, const slong * coords, slong ord, slong g, slong prec, slong fullprec)
 {
     slong n = 1 << g;
     acb_t s0, s1, add, sub;
