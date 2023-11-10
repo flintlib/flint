@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include "fmpz_mat.h"
 #include "fmpz_mod_mat.h"
 
 int fmpz_mod_mat_fprint(FILE * file, const fmpz_mod_mat_t mat) { return fmpz_mat_fprint(file, mat->mat); }

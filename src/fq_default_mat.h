@@ -20,6 +20,7 @@
 #endif
 
 #include "nmod_mat.h"
+#include "fmpz_mat.h"
 #include "fmpz_mod_mat.h"
 #include "fq_mat.h"
 #include "fq_nmod_mat.h"

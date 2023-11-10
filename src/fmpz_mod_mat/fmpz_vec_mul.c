@@ -10,6 +10,7 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_mat.h"
 #include "fmpz_mod_mat.h"
 
 void fmpz_mod_mat_fmpz_vec_mul(fmpz * c, const fmpz * a, slong alen,

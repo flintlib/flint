@@ -10,6 +10,7 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_mat.h"
 #include "fmpz_mod_mat.h"
 
 void fmpz_mod_mat_trace(fmpz_t trace, const fmpz_mod_mat_t mat)

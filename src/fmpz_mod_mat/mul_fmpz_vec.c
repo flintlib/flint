@@ -10,6 +10,7 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_mat.h"
 #include "fmpz_mod_mat.h"
 
 void fmpz_mod_mat_mul_fmpz_vec(fmpz* c, const fmpz_mod_mat_t A,

@@ -11,6 +11,7 @@
 
 #include "fmpz.h"
 #include "fmpz_factor.h"
+#include "fmpz_mat.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_mat.h"
 #include "fmpz_mod_poly.h"

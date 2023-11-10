@@ -20,7 +20,7 @@
 #endif
 
 #include "thread_pool.h"
-#include "fmpz_mat.h"
+#include "nmod_types.h"
 #include "fmpz_mod_types.h"
 
 #ifdef __cplusplus
@@ -34,11 +34,9 @@
 
 /* Element access  ***********************************************************/
 
-FMPZ_MOD_MAT_INLINE
-fmpz * fmpz_mod_mat_entry(const fmpz_mod_mat_t mat, slong i, slong j)
-{
-    return fmpz_mat_entry(mat->mat, i, j);
-}
+FMPZ_MOD_MAT_INLINE fmpz * fmpz_mod_mat_entry(const fmpz_mod_mat_t mat, slong i, slong j) { return mat->mat->rows[i] + j; }
+FMPZ_MOD_MAT_INLINE slong fmpz_mod_mat_nrows(const fmpz_mod_mat_t mat) { return mat->mat->r; }
+FMPZ_MOD_MAT_INLINE slong fmpz_mod_mat_ncols(const fmpz_mod_mat_t mat) { return mat->mat->c; }
 
 void fmpz_mod_mat_set_entry(fmpz_mod_mat_t mat, slong i, slong j, const fmpz_t val);
 void fmpz_mod_mat_get_entry(fmpz_t x, const fmpz_mod_mat_t mat, slong i, slong j);
@@ -51,42 +49,21 @@ void fmpz_mod_mat_clear(fmpz_mod_mat_t mat);
 
 /* Basic manipulation  *******************************************************/
 
-FMPZ_MOD_MAT_INLINE
-slong fmpz_mod_mat_nrows(const fmpz_mod_mat_t mat)
-{
-    return fmpz_mat_nrows(mat->mat);
-}
-
-FMPZ_MOD_MAT_INLINE
-slong fmpz_mod_mat_ncols(const fmpz_mod_mat_t mat)
-{
-    return fmpz_mat_ncols(mat->mat);
-}
-
 void _fmpz_mod_mat_set_mod(fmpz_mod_mat_t mat, const fmpz_t n);
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_one(fmpz_mod_mat_t mat)
-{
-    fmpz_mat_one(mat->mat);
-}
-
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_zero(fmpz_mod_mat_t mat)
-{
-    fmpz_mat_zero(mat->mat);
-}
+void fmpz_mod_mat_one(fmpz_mod_mat_t mat);
+void fmpz_mod_mat_zero(fmpz_mod_mat_t mat);
 
 FMPZ_MOD_MAT_INLINE
 int fmpz_mod_mat_is_empty(const fmpz_mod_mat_t mat)
 {
-    return fmpz_mat_is_empty(mat->mat);
+    return fmpz_mod_mat_nrows(mat) == 0 || fmpz_mod_mat_ncols(mat) == 0;
 }
 
 FMPZ_MOD_MAT_INLINE
 int fmpz_mod_mat_is_square(const fmpz_mod_mat_t mat)
 {
-    return fmpz_mat_is_square(mat->mat);
+    return fmpz_mod_mat_nrows(mat) == fmpz_mod_mat_ncols(mat);
 }
 
 void fmpz_mod_mat_swap(fmpz_mod_mat_t mat1, fmpz_mod_mat_t mat2);
@@ -105,29 +82,15 @@ void fmpz_mod_mat_randrank(fmpz_mod_mat_t mat, flint_rand_t state, slong rank);
 void fmpz_mod_mat_randtril(fmpz_mod_mat_t mat, flint_rand_t state, int unit);
 void fmpz_mod_mat_randtriu(fmpz_mod_mat_t mat, flint_rand_t state, int unit);
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_randops(fmpz_mod_mat_t mat, slong count, flint_rand_t state)
-{
-    fmpz_mat_randops(mat->mat, state, count);
-    _fmpz_mod_mat_reduce(mat);
-}
+void fmpz_mod_mat_randops(fmpz_mod_mat_t mat, slong count, flint_rand_t state);
 
 /* Windows and concatenation *************************************************/
 
 void fmpz_mod_mat_window_init(fmpz_mod_mat_t window, const fmpz_mod_mat_t mat, slong r1, slong c1, slong r2, slong c2);
 void fmpz_mod_mat_window_clear(fmpz_mod_mat_t window);
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_concat_horizontal(fmpz_mod_mat_t res, const fmpz_mod_mat_t mat1, const fmpz_mod_mat_t mat2)
-{
-    fmpz_mat_concat_horizontal(res->mat, mat1->mat, mat2->mat);
-}
-
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_concat_vertical(fmpz_mod_mat_t res, const fmpz_mod_mat_t mat1, const fmpz_mod_mat_t mat2)
-{
-    fmpz_mat_concat_vertical(res->mat, mat1->mat, mat2->mat);
-}
+void fmpz_mod_mat_concat_horizontal(fmpz_mod_mat_t res, const fmpz_mod_mat_t mat1, const fmpz_mod_mat_t mat2);
+void fmpz_mod_mat_concat_vertical(fmpz_mod_mat_t res, const fmpz_mod_mat_t mat1, const fmpz_mod_mat_t mat2);
 
 /* I/O ***********************************************************************/
 
@@ -147,19 +110,11 @@ int fmpz_mod_mat_is_one(const fmpz_mod_mat_t mat);
 
 /* Transpose *****************************************************************/
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_transpose(fmpz_mod_mat_t B, const fmpz_mod_mat_t A)
-{
-    fmpz_mat_transpose(B->mat, A->mat);
-}
+void fmpz_mod_mat_transpose(fmpz_mod_mat_t B, const fmpz_mod_mat_t A);
 
 /* Conversions ***************************************************************/
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_set_nmod_mat(fmpz_mod_mat_t A, const nmod_mat_t B)
-{
-    fmpz_mat_set_nmod_mat_unsigned(A->mat, B);
-}
+void fmpz_mod_mat_set_nmod_mat(fmpz_mod_mat_t A, const nmod_mat_t B);
 
 void fmpz_mod_mat_set_fmpz_mat(fmpz_mod_mat_t A, const fmpz_mat_t B);
 void fmpz_mod_mat_get_fmpz_mat(fmpz_mat_t A, const fmpz_mod_mat_t B);
@@ -237,29 +192,11 @@ void fmpz_mod_mat_similarity(fmpz_mod_mat_t A, slong r, fmpz_t d);
 
 /* Permutations **************************************************************/
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_swap_rows(fmpz_mod_mat_t mat, slong * perm, slong r, slong s)
-{
-    fmpz_mat_swap_rows(mat->mat, perm, r, s);
-}
+void fmpz_mod_mat_swap_rows(fmpz_mod_mat_t mat, slong * perm, slong r, slong s);
+void fmpz_mod_mat_swap_cols(fmpz_mod_mat_t mat, slong * perm, slong r, slong s);
 
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_invert_rows(fmpz_mod_mat_t mat, slong * perm)
-{
-    fmpz_mat_invert_rows(mat->mat, perm);
-}
-
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_swap_cols(fmpz_mod_mat_t mat, slong * perm, slong r, slong s)
-{
-    fmpz_mat_swap_cols(mat->mat, perm, r, s);
-}
-
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_invert_cols(fmpz_mod_mat_t mat, slong * perm)
-{
-    fmpz_mat_invert_cols(mat->mat, perm);
-}
+void fmpz_mod_mat_invert_rows(fmpz_mod_mat_t mat, slong * perm);
+void fmpz_mod_mat_invert_cols(fmpz_mod_mat_t mat, slong * perm);
 
 #ifdef __cplusplus
 }

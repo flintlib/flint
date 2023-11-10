@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Luca De Feo
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -12,9 +12,12 @@
 #include "fmpz_mat.h"
 #include "fmpz_mod_mat.h"
 
-void fmpz_mod_mat_mul(fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B)
+void fmpz_mod_mat_concat_horizontal(fmpz_mod_mat_t res, const fmpz_mod_mat_t mat1, const fmpz_mod_mat_t mat2)
 {
-    /* N.B. don't call classical_threaded, instead, thread fmpz_mat_mul */
-    fmpz_mat_mul(C->mat, A->mat, B->mat);
-    _fmpz_mod_mat_reduce(C);
+    fmpz_mat_concat_horizontal(res->mat, mat1->mat, mat2->mat);
+}
+
+void fmpz_mod_mat_concat_vertical(fmpz_mod_mat_t res, const fmpz_mod_mat_t mat1, const fmpz_mod_mat_t mat2)
+{
+    fmpz_mat_concat_vertical(res->mat, mat1->mat, mat2->mat);
 }

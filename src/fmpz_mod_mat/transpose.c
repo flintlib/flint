@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Luca De Feo
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,11 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_mat.h"
 #include "fmpz_mod_mat.h"
 
-void fmpz_mod_mat_randtest(fmpz_mod_mat_t mat, flint_rand_t state)
+void fmpz_mod_mat_transpose(fmpz_mod_mat_t B, const fmpz_mod_mat_t A)
 {
-    fmpz_mat_randtest(mat->mat, state, fmpz_bits(mat->mod));
-    _fmpz_mod_mat_reduce(mat);
+    fmpz_mat_transpose(B->mat, A->mat);
 }

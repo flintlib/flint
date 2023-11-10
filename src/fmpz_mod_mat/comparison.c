@@ -10,6 +10,7 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_mat.h"
 #include "fmpz_mod_mat.h"
 
 int fmpz_mod_mat_equal(const fmpz_mod_mat_t mat1, const fmpz_mod_mat_t mat2)

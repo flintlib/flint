@@ -10,6 +10,7 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_mat.h"
 #include "fmpz_mod_mat.h"
 
 /* Setters ********************************************************************/
@@ -23,6 +24,11 @@ void fmpz_mod_mat_set_fmpz_mat(fmpz_mod_mat_t A, const fmpz_mat_t B)
 {
     fmpz_mat_set(A->mat, B);
     _fmpz_mod_mat_reduce(A);
+}
+
+void fmpz_mod_mat_set_nmod_mat(fmpz_mod_mat_t A, const nmod_mat_t B)
+{
+    fmpz_mat_set_nmod_mat_unsigned(A->mat, B);
 }
 
 void _fmpz_mod_mat_set_mod(fmpz_mod_mat_t mat, const fmpz_t n)
