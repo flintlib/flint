@@ -4,7 +4,7 @@
 ===============================================================================
 
 This module provides methods for the numerical evaluation of theta functions in
-any dimension `g`. The algorithms will be detailed in the forthcoming paper
+any dimension `g\geq 1`. The algorithms will be detailed in the forthcoming paper
 [EK2023]_. In the case `g=1`, we rely on, but also improve on functionality
 from :ref:`acb_modular.h <acb-modular>`.
 
@@ -144,24 +144,24 @@ where `\alpha,\beta,\gamma,\delta` are `g\times g` blocks.
 
 .. function:: void sp2gz_set_blocks(fmpz_mat_t mat, const fmpz_mat_t alpha, const fmpz_mat_t beta, const fmpz_mat_t gamma, const fmpz_mat_t delta)
 
-    Sets *mat* to `\left(\begin{smallmatrix} \alpha&\beta\\ \gamma&\delta
-    \end{smallmatrix}\right)`. The dimensions must match.
+    Sets *mat* to `\bigl(\begin{smallmatrix} \alpha&\beta\\ \gamma&\delta
+    \end{smallmatrix}\bigr)`. The dimensions must match.
 
 .. function:: void sp2gz_j(fmpz_mat_t mat)
 
-    Sets *mat* to the symplectic matrix `J = \left(\begin{smallmatrix}
-    0&I_g\\-I_g&0 \end{smallmatrix}\right)`.
+    Sets *mat* to the symplectic matrix `J = \Bigl(\begin{smallmatrix}
+    0&I_g\\-I_g&0 \end{smallmatrix}\Bigr)`.
 
 .. function:: void sp2gz_block_diag(fmpz_mat_t mat, const fmpz_mat_t U)
 
-    Sets *mat* to the symplectic matrix `\left(\begin{smallmatrix}
-    U&0\\0&U^{-T} \end{smallmatrix}\right)`. We require that `U\in
+    Sets *mat* to the symplectic matrix `\Bigl(\begin{smallmatrix}
+    U&0\\0&U^{-T} \end{smallmatrix}\Bigr)`. We require that `U\in
     \operatorname{GL}_g(\mathbb{Z})`.
 
 .. function:: void sp2gz_trig(fmpz_mat_t mat, const fmpz_mat_t S)
 
-    Sets *mat* to `\left(\begin{smallmatrix} I_g&S\\0&I_g
-    \end{smallmatrix}\right)`, where *S* is a symmetric `g\times g` matrix.
+    Sets *mat* to `\Bigl(\begin{smallmatrix} I_g&S\\0&I_g
+    \end{smallmatrix}\Bigr)`, where *S* is a symmetric `g\times g` matrix.
 
 .. function:: void sp2gz_embed(fmpz_mat_t res, const fmpz_mat_t mat)
 
@@ -927,8 +927,8 @@ Quasi-linear algorithms: AGM steps
 
 .. function:: void acb_theta_agm_hadamard(acb_ptr res, acb_srcptr a, slong g, slong prec)
 
-    Sets *res* to the product of the Hadamard matrix `\left(\begin{smallmatrix}
-    1 & 1 \\ 1 & -1\end{smallmatrix}\right)^{\otimes g}` and the vector
+    Sets *res* to the product of the Hadamard matrix `\bigl(\begin{smallmatrix}
+    1 & 1 \\ 1 & -1\end{smallmatrix}\bigr)^{\otimes g}` and the vector
     `a`. Both *res* and `a` must be vectors of length `2^g`. In other words,
     for each `k\in \{0,1\}^g`, this sets the `k^{\mathrm{th}}` entry of *res*
     to `\sum_{j\in \{0,1\}^g} (-1)^{k^T j} a_j`.
@@ -1040,12 +1040,12 @@ domain, however `\mathrm{Im}(\tau)` may have large eigenvalues.
 
         .. math ::
 
-            e^{\pi i ((n_1 + \tfrac{a_1}{2})\tau_1 (n_1 + \tfrac{a_1}{2}) + 2 (n_1
-            + \tfrac{a_1}{2}) z_1)}
+            e^{\pi i \bigl((n_1 + \tfrac{a_1}{2})\tau_1 (n_1 + \tfrac{a_1}{2}) + 2 (n_1
+            + \tfrac{a_1}{2}) z_1\bigr)}
             \theta_{a_0,0}(z_0 + x (n_1 + \tfrac{a_1}{2}), \tau_0).
 
-    where `\tau = (\begin{smallmatrix} \tau_0 & x\\x^T &
-    \tau_1\end{smallmatrix})` and `z = (z_0,z_1)`. When calling *worker*, we
+    where `\tau = \Bigl(\begin{smallmatrix} \tau_0 & x\\x^T &
+    \tau_1\end{smallmatrix}\Bigr)` and `z = (z_0,z_1)`. When calling *worker*, we
     adjust the shifted absolute precision according to the distance between
     `n_1` and the center of `E_1`.
 
@@ -1345,25 +1345,26 @@ at most `j`) such that for any `\tau\in \mathbb{H}_g` and
         \delta)^k\cdot \mathrm{Sym}^j(\gamma\tau + \delta)(f(\tau)).
 
 Here `\alpha,\beta,\gamma,\delta` are the `g\times g` blocks of `m`, and the
-notation `\mathrm{Sym}^j(r)` where `r = (\begin{smallmatrix} a & b\\ c &
-d\end{smallmatrix})\in \mathrm{GL}_2(\mathbb{C})` stands for the map
+notation `\mathrm{Sym}^j(r)` where `r = \bigl(\begin{smallmatrix} a & b\\ c &
+d\end{smallmatrix}\bigr)\in \mathrm{GL}_2(\mathbb{C})` stands for the map
 
     .. math ::
 
-        P(X) \mapsto (b X + d)^j P(\tfrac{a X + c}{b X + d}).
+        P(X) \mapsto (b X + d)^j P\bigl(\tfrac{a X + c}{b X + d}\bigr).
 
 For a nonzero `f` to exist, `j` must be even.
 
 Siegel modular forms generate a bi-graded ring which is not finitely
 generated. However, if we relax the definition of a Siegel modular form and
 allow them to have a pole along the diagonal `\mathbb{H}_1^2 =
-\{(\begin{smallmatrix} \tau_1 & 0 \\ 0 & \tau_2\end{smallmatrix})\}\subset
-\mathbb{H}_2` of a certain order (depending on the weight), we indeed find a
-finitely generated ring corresponding to classical "covariants" of a binary
-sextic. Historically, covariants are classified in terms of their degree `k`
-and index `j`, corresponding to Siegel modular functions of weight `\det^{k -
-j/2}\otimes \mathrm{Sym}^j`. See [CFG2017]_ for more details on the
-correspondence between modular forms and covariants.
+\bigl\{\bigl(\begin{smallmatrix} \tau_1 & 0 \\ 0 &
+\tau_2\end{smallmatrix}\bigr)\bigr\}\subset \mathbb{H}_2` of a certain order
+(depending on the weight), we indeed find a finitely generated ring
+corresponding to classical "covariants" of a binary sextic. Historically,
+covariants are classified in terms of their degree `k` and index `j`,
+corresponding to Siegel modular functions of weight `\det^{k - j/2}\otimes
+\mathrm{Sym}^j`. See [CFG2017]_ for more details on the correspondence between
+modular forms and covariants.
 
 .. macro:: ACB_THETA_G2_COV_NB
 
@@ -1433,9 +1434,9 @@ correspondence between modular forms and covariants.
 
     We warn that `\chi_{10}` and `\chi_{12}` differ from the classical notation
     of Igusa [Igu1979]_ by scalar factors. Writing `\tau =
-    (\begin{smallmatrix} \tau_1 & \tau_2 \\ \tau_2 & \tau_3\end{smallmatrix})`
-    and `q_j = \exp(2\pi i \tau_j)`, the Fourier expansions of these modular
-    forms begin as follows:
+    \bigl(\begin{smallmatrix} \tau_1 & \tau_2 \\ \tau_2 &
+    \tau_3\end{smallmatrix}\bigr)` and `q_j = \exp(2\pi i \tau_j)`, the Fourier
+    expansions of these modular forms begin as follows:
 
         .. math ::
 
