@@ -16,6 +16,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include "d_mat.h" /* To declare d_mat functions in fmpz_mat module */
 
 /* Include functions *********************************************************/
 

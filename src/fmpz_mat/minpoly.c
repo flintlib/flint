@@ -11,7 +11,6 @@
 */
 
 #include <math.h>
-
 #include "ulong_extras.h"
 #include "nmod_mat.h"
 #include "nmod_poly.h"
@@ -48,65 +47,65 @@ slong _fmpz_mat_minpoly_small(fmpz * rop, const fmpz_mat_t op)
 
 void _fmpz_mat_bound_ovals_of_cassini(fmpz_t b, const fmpz_mat_t op)
 {
-   slong n = op->r, i, j;
-   fmpz * v1;
-   fmpz_t t, q, r1, r2;
+    slong n = op->r, i, j;
+    fmpz * v1;
+    fmpz_t t, q, r1, r2;
 
-   fmpz_init(t);
-   fmpz_init(q);
-   fmpz_init(r1);
-   fmpz_init(r2);
+    fmpz_init(t);
+    fmpz_init(q);
+    fmpz_init(r1);
+    fmpz_init(r2);
 
-   v1 = _fmpz_vec_init(n);
+    v1 = _fmpz_vec_init(n);
 
-   /* |A| [1,1,...,1]^T */
-   for (i = 0; i < n; i++)
-   {
-      for (j = 0; j < n; j++)
-      {
-         if (fmpz_sgn(fmpz_mat_entry(op, i, j)) >= 0)
-            fmpz_add(v1 + i, v1 + i, fmpz_mat_entry(op, i, j));
-         else
-            fmpz_sub(v1 + i, v1 + i, fmpz_mat_entry(op, i, j));
-      }
-   }
+    /* |A| [1,1,...,1]^T */
+    for (i = 0; i < n; i++)
+    {
+        for (j = 0; j < n; j++)
+        {
+            if (fmpz_sgn(fmpz_mat_entry(op, i, j)) >= 0)
+                fmpz_add(v1 + i, v1 + i, fmpz_mat_entry(op, i, j));
+            else
+                fmpz_sub(v1 + i, v1 + i, fmpz_mat_entry(op, i, j));
+        }
+    }
 
-   for (i = 0; i < n; i++)
-   {
-      fmpz_zero(t);
+    for (i = 0; i < n; i++)
+    {
+        fmpz_zero(t);
 
-      /* q_i */
-      fmpz_abs(t, fmpz_mat_entry(op, i, i));
+        /* q_i */
+        fmpz_abs(t, fmpz_mat_entry(op, i, i));
 
-      if (fmpz_cmp(t, q) > 0)
-         fmpz_set(q, t);
+        if (fmpz_cmp(t, q) > 0)
+            fmpz_set(q, t);
 
-      /* r_i */
-      fmpz_sub(t, v1 + i, t);
+        /* r_i */
+        fmpz_sub(t, v1 + i, t);
 
-      if (fmpz_cmp(t, r2) > 0)
-      {
-         fmpz_swap(t, r2);
+        if (fmpz_cmp(t, r2) > 0)
+        {
+            fmpz_swap(t, r2);
 
-         if (fmpz_cmp(r2, r1) > 0)
-            fmpz_swap(r2, r1);
-      }
-   }
+            if (fmpz_cmp(r2, r1) > 0)
+                fmpz_swap(r2, r1);
+        }
+    }
 
-   fmpz_mul(r1, r1, r2);
+    fmpz_mul(r1, r1, r2);
 
-   fmpz_sqrtrem(b, r2, r1);
+    fmpz_sqrtrem(b, r2, r1);
 
-   if (!fmpz_is_zero(r2))
-      fmpz_add_ui(b, b, 1);
+    if (!fmpz_is_zero(r2))
+        fmpz_add_ui(b, b, 1);
 
-   fmpz_add(b, b, q);
+    fmpz_add(b, b, q);
 
-   _fmpz_vec_clear(v1, n);
-   fmpz_clear(r1);
-   fmpz_clear(r2);
-   fmpz_clear(t);
-   fmpz_clear(q);
+    _fmpz_vec_clear(v1, n);
+    fmpz_clear(r1);
+    fmpz_clear(r2);
+    fmpz_clear(t);
+    fmpz_clear(q);
 }
 
 slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
@@ -311,3 +310,20 @@ void fmpz_mat_minpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat)
 
     _fmpz_poly_set_length(cp, len);
 }
+
+slong _fmpz_mat_minpoly(fmpz * cp, const fmpz_mat_t mat)
+{
+   return _fmpz_mat_minpoly_modular(cp, mat);
+}
+
+void fmpz_mat_minpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
+{
+   if (mat->r != mat->c)
+   {
+       flint_printf("Exception (fmpz_mat_minpoly).  Non-square matrix.\n");
+       flint_abort();
+   }
+
+   fmpz_mat_minpoly_modular(cp, mat);
+}
+

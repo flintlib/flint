@@ -1393,17 +1393,23 @@ Conversions
 
 .. function:: int fmpz_mat_get_d_mat(d_mat_t B, const fmpz_mat_t A)
 
-    Sets the entries of ``B`` as doubles corresponding to the entries of
-    ``A``, rounding down towards zero if the latter cannot be represented
-    exactly. The return value is -1 if any entry of ``A`` is too large to
-    fit in the normal range of a double, and 0 otherwise.
+    Sets the entries of ``B`` as doubles corresponding to the entries of ``A``,
+    rounding down towards zero if the latter cannot be represented exactly. The
+    return value is -1 if any entry of ``A`` is too large to fit in the normal
+    range of a double, and 0 otherwise.
+
+    **Note:** Requires that ``d_mat.h`` has been included before ``fmpz_mat.h``
+    is included.
 
 .. function:: int fmpz_mat_get_d_mat_transpose(d_mat_t B, const fmpz_mat_t A)
 
-    Sets the entries of ``B`` as doubles corresponding to the entries of
-    the transpose of ``A``, rounding down towards zero if the latter cannot
-    be represented exactly. The return value is -1 if any entry of ``A`` is
-    too large to fit in the normal range of a double, and 0 otherwise.
+    Sets the entries of ``B`` as doubles corresponding to the entries of the
+    transpose of ``A``, rounding down towards zero if the latter cannot be
+    represented exactly. The return value is -1 if any entry of ``A`` is too
+    large to fit in the normal range of a double, and 0 otherwise.
+
+    **Note:** Requires that ``d_mat.h`` has been included before ``fmpz_mat.h``
+    is included.
 
 
 Cholesky Decomposition
@@ -1421,9 +1427,12 @@ Cholesky Decomposition
 
 .. function:: void fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A)
 
-    Computes ``R``, the Cholesky factor of a symmetric, positive definite
-    matrix ``A`` using the Cholesky decomposition process. (Sets ``R``
-    such that `A = RR^{T}` where ``R`` is a lower triangular matrix.)
+    Computes ``R``, the Cholesky factor of a symmetric, positive definite matrix
+    ``A`` using the Cholesky decomposition process. (Sets ``R`` such that `A =
+    RR^{T}` where ``R`` is a lower triangular matrix.)
+
+    **Note:** Requires that ``d_mat.h`` has been included before ``fmpz_mat.h``
+    is included.
 
 
 LLL

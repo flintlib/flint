@@ -10,11 +10,12 @@
 */
 
 #include "d_vec.h"
+#include "d_mat.h"
 #include "fmpz_mat.h"
 #include "fmpz_lll.h"
 
 #if HAVE_FENV_H
-#include <fenv.h>
+# include <fenv.h>
 #endif
 
 #ifdef __GNUC__
