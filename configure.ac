@@ -70,7 +70,7 @@ AC_LANG(C)
 # NOTE: This must be after AC_INIT
 FLINT_MAJOR_SO=18
 FLINT_MINOR_SO=0
-FLINT_PATCH_SO=0
+FLINT_PATCH_SO=1
 
 # Make sure that we are in the right directory
 AC_CONFIG_SRCDIR(src/fmpz/link/fmpz_reentrant.c)
