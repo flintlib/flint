@@ -13,10 +13,6 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void
-_fmpz_poly_mullow_kara_recursive(fmpz * out, const fmpz * pol1,
-                                 const fmpz * pol2, fmpz * temp, slong len);
-
 /*
    Multiplication using truncated karatsuba.
 
