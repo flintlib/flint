@@ -14,6 +14,8 @@
 void
 acb_theta_eld_init(acb_theta_eld_t E, slong d, slong g)
 {
+    FLINT_ASSERT(d >= 1 && d <= g);
+
     acb_theta_eld_dim(E) = d;
     acb_theta_eld_ambient_dim(E) = g;
     E->last_coords = flint_malloc((g - d) * sizeof(slong));

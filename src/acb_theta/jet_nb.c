@@ -18,6 +18,8 @@ acb_theta_jet_nb(slong ord, slong g)
     fmpz_t x;
     slong res;
 
+    FLINT_ASSERT(g >= 1 && ord >= 0);
+
     fmpz_init(x);
     fmpz_bin_uiui(x, g + ord, g);
     res = fmpz_get_si(x);

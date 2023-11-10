@@ -182,9 +182,11 @@ acb_theta_ql_a0_split(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d,
     slong a, j, k;
     int res = 1;
 
+    FLINT_ASSERT(s >= 1 && s < g);
+
     arb_mat_init(C, g, g);
     arb_mat_init(Yinv, g, g);
-    acb_mat_window_init(tau0, tau, 0, 0, s ,s);
+    acb_mat_window_init(tau0, tau, 0, 0, s, s);
     acb_mat_window_init(star, tau, 0, s, s, g);
     acb_mat_window_init(tau1, tau, s, s, g, g);
     v = _arb_vec_init(g - s);

@@ -45,7 +45,8 @@ of theta functions when `g=2`.
 The numerical functions in this module compute certified error bounds: for
 instance, if `\tau` is represented by an :type:`acb_mat_t` which is not
 certainly positive definite at the chosen working precision, the output will
-have an infinite radius.
+have an infinite radius. Throughout, `g` must be at least 1 (this is not
+checked.)
 
 Main user functions
 -------------------------------------------------------------------------------
@@ -467,7 +468,8 @@ Ellipsoids: memory management and computations
 
 .. function:: void acb_theta_eld_init(acb_theta_eld_t E, slong d, slong g)
 
-    Initializes *E* as a *d*-dimensional ellipsoid in ambient dimension *g*.
+    Initializes *E* as a *d*-dimensional ellipsoid in ambient dimension *g*. We
+    require `1\leq d\leq g`.
 
 .. function:: void acb_theta_eld_clear(acb_theta_eld_t E)
 
@@ -708,7 +710,8 @@ differentiated series:
 
 .. function:: slong acb_theta_jet_nb(slong ord, slong g)
 
-    Returns the number of derivation tuples with total order at most *ord*.
+    Returns the number of derivation tuples with total order at most *ord*. We
+    require that *ord* is nonnegative and *g* is at least 1.
 
 .. function:: slong acb_theta_jet_total_order(const slong * tup, slong g)
 
