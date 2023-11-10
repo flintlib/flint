@@ -11,5 +11,4 @@
 
 #define D_MAT_INLINES_C
 
-#include "flint.h"
 #include "d_mat.h"

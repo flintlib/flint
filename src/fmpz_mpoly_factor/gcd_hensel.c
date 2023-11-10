@@ -9,7 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "fmpz_mpoly_factor.h"
+#include "fmpq.h"
 
 int fmpz_mpolyl_gcd_hensel(
     fmpz_mpoly_t G, slong Gdeg, /* upperbound on deg_X(G) */

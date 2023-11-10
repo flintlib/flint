@@ -11,7 +11,6 @@
 
 #include "mpoly.h"
 
-
 void mpoly_main_variable_split_LEX(slong * ind, ulong * pexp, const ulong * Aexp,
              slong l1, slong Alen, const ulong * mults, slong num, slong Abits)
 {

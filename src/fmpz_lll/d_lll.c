@@ -11,6 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "fmpz_lll.h"
 
 #if defined(FUNC_HEAD) && defined(CALL_BABAI) && defined(TYPE)

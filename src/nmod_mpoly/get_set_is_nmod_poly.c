@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "n_poly.h"
 #include "nmod_mpoly.h"
 
 int nmod_mpoly_is_nmod_poly(

@@ -10,6 +10,7 @@
 */
 
 #include "nmod_mpoly.h"
+#include "fq_nmod.h"
 #include "fq_nmod_mpoly.h"
 
 int nmod_mpolyu_gcdm_zippel_bivar(

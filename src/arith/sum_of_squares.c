@@ -54,13 +54,13 @@ sum_of_four_squares(fmpz_t r, const fmpz_t n)
 
     if (v == 0)
     {
-        arith_divisor_sigma(r, 1, n);
+        fmpz_divisor_sigma(r, 1, n);
         fmpz_mul_ui(r, r, 8);
     }
     else
     {
         fmpz_tdiv_q_2exp(r, n, v);
-        arith_divisor_sigma(r, 1, r);
+        fmpz_divisor_sigma(r, 1, r);
         fmpz_mul_ui(r, r, 24);
     }
 }

@@ -10,6 +10,7 @@
 */
 
 #include "thread_pool.h"
+#include "n_poly.h"
 #include "nmod_mpoly.h"
 #include "fmpz_mpoly.h"
 

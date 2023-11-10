@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod.h"
 #include "fmpz_mod_mpoly_factor.h"
 
 int fmpz_mod_bpoly_hlift2(

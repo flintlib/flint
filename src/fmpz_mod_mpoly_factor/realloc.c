@@ -11,7 +11,6 @@
 
 #include "fmpz_mod_mpoly_factor.h"
 
-
 void fmpz_mod_mpoly_factor_realloc(
     fmpz_mod_mpoly_factor_t f,
     slong alloc,

@@ -11,7 +11,6 @@
 
 #include "mpoly.h"
 
-
 void mpoly_monomials_shift_right_ui(ulong * Aexps, flint_bitcnt_t Abits,
                 slong Alength, const ulong * user_exps, const mpoly_ctx_t mctx)
 {

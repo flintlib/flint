@@ -11,7 +11,6 @@
 
 #include "nmod_mpoly.h"
 
-
 void nmod_mpoly_fit_length_reset_bits(
     nmod_mpoly_t A,
     slong len,

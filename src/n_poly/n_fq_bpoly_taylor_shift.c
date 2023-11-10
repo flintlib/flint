@@ -10,7 +10,7 @@
 */
 
 #include "n_poly.h"
-
+#include "fq_nmod.h"
 
 static void _n_fq_poly_taylor_shift_horner_n_fq(
     mp_limb_t * poly,

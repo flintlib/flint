@@ -11,7 +11,6 @@
 
 #include "fmpz_mod_mpoly.h"
 
-
 void fmpz_mod_mpoly_geobucket_init(
     fmpz_mod_mpoly_geobucket_t B,
     const fmpz_mod_mpoly_ctx_t ctx)

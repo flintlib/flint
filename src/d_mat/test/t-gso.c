@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include <math.h>
 #include "double_extras.h"
 #include "d_mat.h"
 #include "ulong_extras.h"

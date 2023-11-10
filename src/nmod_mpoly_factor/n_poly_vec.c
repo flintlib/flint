@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "n_poly.h"
 #include "nmod_mpoly_factor.h"
-
 
 slong _n_poly_vec_max_degree(const n_poly_struct * A, slong Alen)
 {

@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include "long_extras.h"
+#include "nmod.h"
 #include "nmod_poly.h"
 #include "fmpz.h"
 #include "fq_nmod.h"

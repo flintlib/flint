@@ -11,7 +11,6 @@
 
 #include "fmpz_mod_mpoly.h"
 
-
 void fmpz_mod_mpoly_fit_length(
     fmpz_mod_mpoly_t A,
     slong len,

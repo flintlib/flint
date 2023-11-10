@@ -12,6 +12,7 @@
 
 #include "test_helpers.h"
 #include "fmpz.h"
+#include "fmpz_mat.h"
 #include "fmpz_mod_mat.h"
 
 TEST_FUNCTION_START(fmpz_mod_mat_get_set_fmpz_mat, state)

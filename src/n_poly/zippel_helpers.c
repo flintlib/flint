@@ -10,7 +10,8 @@
 */
 
 #include "n_poly.h"
-
+#include "fq_nmod.h"
+#include "fq_nmod_poly.h"
 
 /**************** product of roots *******************************************/
 

@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_vec.h"
 #include "nmod_mpoly.h"
-
 
 int nmod_mpoly_gcd_cofactors(
     nmod_mpoly_t G,

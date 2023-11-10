@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "arith.h"
 #include "double_extras.h"
 #include "arb.h"

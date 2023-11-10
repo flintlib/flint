@@ -11,7 +11,6 @@
 
 #include "nmod_mpoly.h"
 
-
 void nmod_mpoly_get_coeff_vars_ui(nmod_mpoly_t C, const nmod_mpoly_t A,
                          const slong * vars, const ulong * exps, slong length,
                                                     const nmod_mpoly_ctx_t ctx)

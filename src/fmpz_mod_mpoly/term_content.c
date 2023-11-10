@@ -11,7 +11,6 @@
 
 #include "fmpz_mod_mpoly.h"
 
-
 void fmpz_mod_mpoly_term_content(
     fmpz_mod_mpoly_t M,
     const fmpz_mod_mpoly_t A,

@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_mat.h"
+#include "fq_nmod.h"
 #include "fq_nmod_mpoly.h"
 
 /* evaluate B(xbar) at xbar = C */

@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_mpoly.h"
 
 TEST_FUNCTION_START(fmpz_mod_mpoly_evaluate, state)

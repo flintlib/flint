@@ -47,7 +47,7 @@ void arith_bernoulli_polynomial(fmpq_poly_t poly, ulong n)
     }
 
     /* Convert to common denominator */
-    arith_primorial(poly->den, n + 2);
+    fmpz_primorial(poly->den, n + 2);
     for (k = 0; k <= n; k++)
     {
         fmpz_mul(poly->coeffs + k, poly->coeffs+k, poly->den);

@@ -10,8 +10,9 @@
 */
 
 #include "test_helpers.h"
+#include <math.h>
+#include <mpfr.h>
 #include "double_extras.h"
-#include "mpfr.h"
 #include "mag.h"
 
 /* Defined in t-d_log_lower_bound.c, t-d_log_upper_bound.c, t-set_d_2exp_fmpz.c

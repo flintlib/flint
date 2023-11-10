@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "double_extras.h"
 #include "arb_hypgeom.h"
 

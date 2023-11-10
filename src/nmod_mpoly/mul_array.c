@@ -16,8 +16,6 @@
 #define MAX_ARRAY_SIZE (WORD(300000))
 #define MAX_LEX_SIZE (WORD(300))
 
-
-
 void _nmod_mpoly_addmul_array1_ulong1(ulong * poly1,
                            const ulong * poly2, const ulong * exp2, slong len2,
                            const ulong * poly3, const ulong * exp3, slong len3)

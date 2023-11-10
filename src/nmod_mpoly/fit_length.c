@@ -11,7 +11,6 @@
 
 #include "nmod_mpoly.h"
 
-
 void nmod_mpoly_fit_length(
     nmod_mpoly_t A,
     slong len,

@@ -13,7 +13,6 @@
 
 /* this file does not need to change with new orderings */
 
-
 slong mpoly_monomial_index1_nomask(ulong * Aexps, slong Alen, ulong e)
 {
     slong start = 0, i, stop = Alen;

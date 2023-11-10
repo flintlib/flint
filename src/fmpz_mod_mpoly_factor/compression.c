@@ -11,7 +11,6 @@
 
 #include "fmpz_mod_mpoly_factor.h"
 
-
 void fmpz_mod_mpoly_compression_do(
     fmpz_mod_mpoly_t L,
     const fmpz_mod_mpoly_ctx_t Lctx,

@@ -9,10 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly.h"
+#include "n_poly.h"
 #include "nmod_poly_factor.h"
-#include "fmpz_mpoly_factor.h"
 #include "nmod_mpoly_factor.h"
+#include "fmpz_poly.h"
+#include "fmpz_mpoly_factor.h"
 
 static void nmod_mpoly_get_eval_helper2(
     n_polyun_t EH,

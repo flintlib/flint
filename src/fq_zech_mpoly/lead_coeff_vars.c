@@ -11,7 +11,6 @@
 
 #include "fq_zech.h"
 #include "fq_zech_mpoly.h"
-#include "fq_zech_mpoly_factor.h"
 
 /*
     leading coefficient wrt gen(0), ..., gen(num_vars-1)

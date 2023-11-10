@@ -17,7 +17,6 @@
 #define MAX_ARRAY_SIZE (WORD(300000))
 #define MAX_LEX_SIZE (WORD(300))
 
-
 typedef struct
 {
     slong idx;
@@ -26,7 +25,6 @@ typedef struct
     nmod_mpoly_t poly;
 }
 _chunk_struct;
-
 
 typedef struct
 {

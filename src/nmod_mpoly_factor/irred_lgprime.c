@@ -10,8 +10,8 @@
 */
 
 #include "nmod_mpoly_factor.h"
+#include "fq_nmod.h"
 #include "fq_nmod_mpoly_factor.h"
-
 
 static void _fq_nmod_mpoly_set_nmod_mpoly(
     fq_nmod_mpoly_t A,

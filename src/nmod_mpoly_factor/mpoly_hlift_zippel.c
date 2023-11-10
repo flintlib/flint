@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "n_poly.h"
 #include "nmod_mpoly_factor.h"
-
 
 static void _delete_duplicates(
     nmod_mpoly_t A,

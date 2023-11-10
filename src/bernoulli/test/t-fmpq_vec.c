@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "ulong_extras.h"
 #include "nmod_poly.h"
 #include "fmpq.h"
 #include "fmpq_vec.h"

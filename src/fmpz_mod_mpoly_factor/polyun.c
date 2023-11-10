@@ -10,8 +10,6 @@
 */
 
 #include "fmpz_mod_mpoly_factor.h"
-#include "mpn_extras.h"
-#include "fmpz_vec.h"
 
 int fmpz_mod_polyun_is_canonical(
     const fmpz_mod_polyun_t A,

@@ -23,6 +23,9 @@
 #include "nmod.h" /* For nmod_init */
 #include "fmpz.h" /* For fmpz_fits_si and fmpz_get_si */
 #include "mpoly.h"
+#ifdef FLINT_WANT_ASSERT
+# include "n_poly.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {

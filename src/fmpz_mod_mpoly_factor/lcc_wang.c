@@ -9,9 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "n_poly.h"
 #include "fmpz_mod_mpoly_factor.h"
-
 
 int fmpz_mod_mpoly_factor_lcc_wang(
     fmpz_mod_mpoly_struct * lc_divs,

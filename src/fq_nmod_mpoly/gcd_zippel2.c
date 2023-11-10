@@ -9,9 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_mpoly.h"
+#include "fq_nmod.h"
+#ifdef FLINT_WANT_ASSERT
+# include "fq_nmod_poly.h"
+#endif
 #include "fq_nmod_mpoly.h"
 #include "fq_nmod_mpoly_factor.h"
-
 
 void _fq_nmod_mpoly_monomial_evals_cache(
     n_fq_poly_t E,

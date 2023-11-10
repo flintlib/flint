@@ -9,12 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly_factor.h"
-#include "fmpz_mod_mpoly_factor.h"
-#include "fmpz_mod_vec.h"
+#include "ulong_extras.h"
 #include "n_poly.h"
 #include "nmod_mpoly_factor.h"
-#include "ulong_extras.h"
+#include "fmpz_mpoly_factor.h"
+#include "fmpz_mod.h"
+#include "fmpz_mod_vec.h"
+#include "fmpz_mod_mpoly_factor.h"
 
 typedef struct {
     nmod_berlekamp_massey_struct * coeffs;

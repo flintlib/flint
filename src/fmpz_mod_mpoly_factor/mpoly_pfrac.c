@@ -11,7 +11,6 @@
 
 #include "fmpz_mod_mpoly_factor.h"
 
-
 int fmpz_mod_mpoly_pfrac_init(
     fmpz_mod_mpoly_pfrac_t I,
     flint_bitcnt_t bits,

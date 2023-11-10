@@ -11,7 +11,6 @@
 
 #include "nmod_mpoly.h"
 
-
 void nmod_mpoly_term_content(nmod_mpoly_t M, const nmod_mpoly_t A,
                                                     const nmod_mpoly_ctx_t ctx)
 {

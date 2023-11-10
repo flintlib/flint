@@ -11,7 +11,6 @@
 
 #include "nmod_mpoly.h"
 
-
 static slong _nmod_mpoly_derivative(
     mp_limb_t * coeff1, ulong * exp1,
     const mp_limb_t * coeff2, const ulong * exp2, slong len2,

@@ -11,6 +11,7 @@
 */
 
 #include <stdio.h>
+#include "fmpz.h"
 #include "gr_mpoly.h"
 
 static char * _gr_mpoly_default_vars[8] = {

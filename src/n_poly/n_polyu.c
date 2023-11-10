@@ -10,8 +10,6 @@
 */
 
 #include "n_poly.h"
-#include "mpn_extras.h"
-#include "nmod_vec.h"
 #include "mpoly.h"
 
 void n_polyu_clear(n_polyu_t A)

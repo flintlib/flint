@@ -11,9 +11,7 @@
 
 #include "fmpz_mod_mpoly.h"
 
-
 /** 0 variables *************************************/
-
 
 void fmpz_mod_mpoly_to_mpolyl_perm_deflate(
     fmpz_mod_mpoly_t A,

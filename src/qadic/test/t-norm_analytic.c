@@ -12,6 +12,7 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 #include "long_extras.h"
+#include "padic.h"
 #include "qadic.h"
 
 TEST_FUNCTION_START(qadic_norm_analytic, state)

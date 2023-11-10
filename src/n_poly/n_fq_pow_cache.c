@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
 #include "n_poly.h"
+#include "fmpz.h"
+#include "fq_nmod.h"
 
 /* hold positive and negative powers of b */
 void n_fq_pow_cache_start_n_fq(

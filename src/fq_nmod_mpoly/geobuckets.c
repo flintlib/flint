@@ -11,7 +11,6 @@
 
 #include "fq_nmod_mpoly.h"
 
-
 void fq_nmod_mpoly_geobucket_init(fq_nmod_mpoly_geobucket_t B,
                                                  const fq_nmod_mpoly_ctx_t ctx)
 {

@@ -10,8 +10,6 @@
 */
 
 #include "n_poly.h"
-#include "mpn_extras.h"
-#include "nmod_vec.h"
 
 int n_poly_is_canonical(const n_poly_t A)
 {

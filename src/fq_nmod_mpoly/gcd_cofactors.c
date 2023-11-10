@@ -11,7 +11,6 @@
 
 #include "fq_nmod_mpoly.h"
 
-
 int fq_nmod_mpoly_gcd_cofactors(
     fq_nmod_mpoly_t G,
     fq_nmod_mpoly_t Abar,

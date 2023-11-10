@@ -10,6 +10,8 @@
 */
 
 #include "test_helpers.h"
+#include "fq_default.h"
+#include "fq_default_poly.h"
 #include "fq_default_poly_factor.h"
 
 TEST_FUNCTION_START(fq_default_poly_factor_init, state)

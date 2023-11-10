@@ -11,7 +11,6 @@
 
 #include "mpoly.h"
 
-
 int mpoly_monomials_inorder_test(ulong * exps, slong len,
                                    flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {

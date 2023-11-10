@@ -11,7 +11,6 @@
 
 #include "mpoly.h"
 
-
 void mpoly_reverse(ulong * Aexp, const ulong * Bexp, slong len, slong N)
 {
     slong i;

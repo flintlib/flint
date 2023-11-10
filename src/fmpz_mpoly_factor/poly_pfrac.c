@@ -9,11 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "fmpz_poly.h"
+#include "fmpz_mpoly_factor.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_vec.h"
 #include "fmpz_mod_poly.h"
-#include "fmpz_mpoly_factor.h"
 
 /* return n with ||a||_2 < 2^n */
 static flint_bitcnt_t fmpz_poly_norm2_bits(const fmpz_poly_t a)

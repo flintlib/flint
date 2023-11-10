@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "mpoly.h"
 
 int mpoly_monomial_exists1(slong * index, const ulong * poly_exps,

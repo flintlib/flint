@@ -9,10 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_vec.h"
-#include "nmod_mpoly.h"
-#include "fmpz_mod_mpoly_factor.h"
 #include "n_poly.h"
+#include "nmod_mpoly.h"
+#include "fmpz_vec.h"
+#include "fmpz_mod.h"
+#include "fmpz_mod_mpoly_factor.h"
 
 void fmpz_mod_mpolyn_interp_lift_sm_polyu1n(
     fmpz_mod_mpolyn_t F,

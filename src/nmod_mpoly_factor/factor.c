@@ -10,6 +10,8 @@
 */
 
 #include "long_extras.h"
+#include "n_poly.h"
+#include "nmod_poly.h"
 #include "nmod_poly_factor.h"
 #include "nmod_mpoly_factor.h"
 

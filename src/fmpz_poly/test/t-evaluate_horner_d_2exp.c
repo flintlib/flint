@@ -10,7 +10,8 @@
 */
 
 #include "test_helpers.h"
-#include "mpfr.h"
+#include <math.h>
+#include <mpfr.h>
 #include "double_extras.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"

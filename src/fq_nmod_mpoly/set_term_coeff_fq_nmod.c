@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_nmod.h"
 #include "fq_nmod_mpoly.h"
 
 void fq_nmod_mpoly_set_term_coeff_fq_nmod(fq_nmod_mpoly_t A,

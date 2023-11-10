@@ -11,7 +11,6 @@
 
 #include "fmpz_mod_mpoly_factor.h"
 
-
 void _fmpz_mod_mpoly_get_lead0(
     fmpz_mod_mpoly_t c,
     const fmpz_mod_mpoly_t A,

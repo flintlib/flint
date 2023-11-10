@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpoly.h"
 #include "long_extras.h"
+#include "fmpz.h"
+#include "mpoly.h"
 
 /*
     input is S and the sizes n, l

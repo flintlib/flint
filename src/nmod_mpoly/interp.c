@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "n_poly.h"
 #include "nmod_mpoly.h"
 
 /*
@@ -17,7 +18,6 @@
     interp_crt:    update element of Fp[x] with a new image in Fp[x]/poly(x)
     interp_mcrt:   same as interp_crt, but monomial match, thus easier
 */
-
 
 void _nmod_poly_eval2_pow(
     mp_limb_t * vp,

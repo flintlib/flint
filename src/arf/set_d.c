@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "flint.h"
 
 #if FLINT_BITS != 64

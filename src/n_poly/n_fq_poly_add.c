@@ -10,7 +10,7 @@
 */
 
 #include "n_poly.h"
-
+#include "fq_nmod.h"
 
 void n_fq_poly_add(
     n_fq_poly_t A,

@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "mpoly.h"
-
 
 int mpoly_monomials_valid_test(ulong * exps, slong len,
                                    flint_bitcnt_t bits, const mpoly_ctx_t mctx)

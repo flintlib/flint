@@ -11,6 +11,7 @@
 */
 
 #include "test_helpers.h"
+#include <math.h>
 #include <float.h>
 #include "ulong_extras.h"
 #include "double_extras.h"

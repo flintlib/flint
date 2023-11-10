@@ -10,7 +10,10 @@
 */
 
 #include "n_poly.h"
-
+#include "fq_nmod.h"
+#ifdef FLINT_WANT_ASSERT
+# include "fq_nmod_poly.h"
+#endif
 
 void _n_fq_poly_mullow_(
     mp_limb_t * rop,

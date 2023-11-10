@@ -10,6 +10,7 @@
 */
 
 #include "n_poly.h"
+#include "fq_nmod.h"
 
 /*
     conversion between polynomials in coefficient form and point-value form

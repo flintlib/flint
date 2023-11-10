@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "n_poly.h"
 #include "nmod_mpoly_factor.h"
-
 
 int nmod_mpoly_pfrac_init(
     nmod_mpoly_pfrac_t I,

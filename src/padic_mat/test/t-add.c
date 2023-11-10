@@ -11,6 +11,8 @@
 
 #include "test_helpers.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
+#include "padic.h"
 #include "padic_mat.h"
 
 TEST_FUNCTION_START(padic_mat_add, state)

@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "fq_default.h"
 #include "fq_default_mat.h"
 
 TEST_FUNCTION_START(fq_default_mat_init, state)

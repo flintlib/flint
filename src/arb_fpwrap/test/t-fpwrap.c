@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include <mpfr.h>
+#include <math.h>
 #include "double_extras.h"
 #include "arb.h"
 #include "arb_fpwrap.h"

@@ -10,7 +10,8 @@
 */
 
 #include "n_poly.h"
-
+#include "fq_nmod.h"
+#include "fq_nmod_poly.h"
 
 slong _n_fq_poly_gcd_euclidean_inplace_(
     mp_limb_t * A, slong Alen,

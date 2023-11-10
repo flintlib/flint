@@ -12,6 +12,7 @@
 #include "gmpcompat.h"
 #include "mpn_extras.h"
 #include "fmpz.h"
+#include "fmpq.h"
 #include "fmpq_extras.h"
 
 void _fmpq_ball_init(_fmpq_ball_t x)
