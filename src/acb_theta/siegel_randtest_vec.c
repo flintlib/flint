@@ -12,7 +12,8 @@
 #include "acb.h"
 #include "acb_theta.h"
 
-void acb_siegel_randtest_vec(acb_ptr z, flint_rand_t state, slong g, slong prec)
+void
+acb_siegel_randtest_vec(acb_ptr z, flint_rand_t state, slong g, slong prec)
 {
     slong mag_bits = n_randint(state, 4);
     slong k;

@@ -13,7 +13,8 @@
 #include "acb_mat.h"
 #include "acb_theta.h"
 
-void acb_siegel_cho(arb_mat_t C, const acb_mat_t tau, slong prec)
+void
+acb_siegel_cho(arb_mat_t C, const acb_mat_t tau, slong prec)
 {
     arb_t pi;
     int res;

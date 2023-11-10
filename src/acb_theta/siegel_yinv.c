@@ -13,7 +13,8 @@
 #include "acb_mat.h"
 #include "acb_theta.h"
 
-void acb_siegel_yinv(arb_mat_t Yinv, const acb_mat_t tau, slong prec)
+void
+acb_siegel_yinv(arb_mat_t Yinv, const acb_mat_t tau, slong prec)
 {
     int res;
 
