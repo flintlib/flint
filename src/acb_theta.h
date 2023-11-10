@@ -120,7 +120,7 @@ void acb_theta_eld_clear(acb_theta_eld_t E);
 int acb_theta_eld_set(acb_theta_eld_t E, const arb_mat_t C, const arf_t R2, arb_srcptr v);
 void acb_theta_eld_points(slong * pts, const acb_theta_eld_t E);
 void acb_theta_eld_border(slong * pts, const acb_theta_eld_t E);
-int acb_theta_eld_contains(const acb_theta_eld_t E, slong * pt);
+int acb_theta_eld_contains(const acb_theta_eld_t E, const slong * pt);
 void acb_theta_eld_print(const acb_theta_eld_t E);
 
 /* Naive algorithms */
@@ -128,8 +128,8 @@ void acb_theta_eld_print(const acb_theta_eld_t E);
 void acb_theta_naive_radius(arf_t R2, arf_t eps, const arb_mat_t C, slong ord, slong prec);
 void acb_theta_naive_reduce(arb_ptr v, acb_ptr new_zs, arb_ptr as, acb_ptr cs, arb_ptr us,
     acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec);
-void acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong * tup,
-    slong * n, slong prec);
+void acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, const slong * tup,
+    const slong * n, slong prec);
 
 typedef void (*acb_theta_naive_worker_t)(acb_ptr, acb_srcptr, acb_srcptr, const slong *,
     slong, const acb_t, const slong *, slong, slong, slong, slong);
@@ -175,7 +175,7 @@ void acb_theta_jet_error_bounds(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
 
 /* Quasi-linear algorithms on the reduced domain */
 
-void acb_theta_dist_pt(arb_t d, arb_srcptr v, const arb_mat_t C, slong * n, slong prec);
+void acb_theta_dist_pt(arb_t d, arb_srcptr v, const arb_mat_t C, const slong * n, slong prec);
 void acb_theta_dist_lat(arb_t d, arb_srcptr v, const arb_mat_t C, slong prec);
 void acb_theta_dist_a0(arb_ptr d, acb_srcptr z, const acb_mat_t tau, slong prec);
 slong acb_theta_dist_addprec(const arb_t d);

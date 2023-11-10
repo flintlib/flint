@@ -12,7 +12,7 @@
 #include "acb_theta.h"
 
 static int
-acb_theta_eld_contains_rec(const acb_theta_eld_t E, slong * pt)
+acb_theta_eld_contains_rec(const acb_theta_eld_t E, const slong * pt)
 {
     slong d = acb_theta_eld_dim(E);
     slong c = pt[d - 1];
@@ -40,7 +40,7 @@ acb_theta_eld_contains_rec(const acb_theta_eld_t E, slong * pt)
 }
 
 int
-acb_theta_eld_contains(const acb_theta_eld_t E, slong * pt)
+acb_theta_eld_contains(const acb_theta_eld_t E, const slong * pt)
 {
     slong g = acb_theta_eld_ambient_dim(E);
     slong d = acb_theta_eld_dim(E);

@@ -10,12 +10,13 @@
 */
 
 #include <stdlib.h>
-#include "acb_theta.h"
 #include "profiler.h"
+#include "acb_mat.h"
+#include "acb_theta.h"
 
 static int usage(char *argv[])
 {
-    printf("usage: %s g pstep pmax dstep dmax\n", argv[0]);
+    flint_printf("usage: %s g pstep pmax dstep dmax\n", argv[0]);
     return 1;
 }
 
@@ -47,7 +48,7 @@ int main(int argc, char *argv[])
     arb_init(r);
     fmpz_mat_init(mat, 2 * g, 2 * g);
 
-    acb_siegel_randtest_nice(tau, state, pmax);
+    acb_siegel_randtest_reduced(tau, state, pmax, 2);
     flint_printf("Starting matrix:\n");
     acb_mat_printd(tau, 5);
 

@@ -9,8 +9,10 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
-#include "acb_theta.h"
 #include "profiler.h"
+#include "ulong_extras.h"
+#include "acb_mat.h"
+#include "acb_theta.h"
 
 int main(void)
 {

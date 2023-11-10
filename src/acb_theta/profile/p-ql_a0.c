@@ -10,12 +10,14 @@
 */
 
 #include <stdlib.h>
-#include "acb_theta.h"
+#include <math.h>
 #include "profiler.h"
+#include "acb_mat.h"
+#include "acb_theta.h"
 
 static int usage(char *argv[])
 {
-    printf("usage: %s g pstep pmax\n", argv[0]);
+    flint_printf("usage: %s g pstep pmax\n", argv[0]);
     return 1;
 }
 
