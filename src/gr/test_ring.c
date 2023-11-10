@@ -614,6 +614,63 @@ gr_test_get_set_fexpr(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
+int
+gr_test_set_other(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status = GR_SUCCESS;
+    gr_ptr x, y, z, xy, x2, y2, z2, t2;
+    gr_ctx_t R2;
+
+    gr_ctx_init_random(R2, state);
+
+    GR_TMP_INIT4(x, y, z, xy, R);
+    GR_TMP_INIT4(x2, y2, z2, t2, R2);
+
+    status |= gr_randtest(x2, state, R2);
+    status |= gr_randtest(y2, state, R2);
+    status |= gr_add(z2, x2, y2, R2);
+
+    status |= gr_set_other(x, x2, R2, R);
+    status |= gr_set_other(y, y2, R2, R);
+    status |= gr_set_other(z, z2, R2, R);
+
+    status |= gr_add(xy, x, y, R);
+
+    /* check that the conversion is homomorphic */
+    if (status == GR_SUCCESS && gr_equal(xy, z, R) == T_FALSE)
+        status = GR_TEST_FAIL;
+
+    /* test the reverse conversions */
+    if (status == GR_SUCCESS && gr_set_other(t2, x, R, R2) == GR_SUCCESS && gr_equal(x2, t2, R2) == T_FALSE)
+        status = GR_TEST_FAIL;
+    if (status == GR_SUCCESS && gr_set_other(t2, y, R, R2) == GR_SUCCESS && gr_equal(y2, t2, R2) == T_FALSE)
+        status = GR_TEST_FAIL;
+    if (status == GR_SUCCESS && gr_set_other(t2, xy, R, R2) == GR_SUCCESS && gr_equal(z2, t2, R2) == T_FALSE)
+        status = GR_TEST_FAIL;
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        flint_printf("gr_test_set_other\n");
+        gr_ctx_println(R);
+        gr_ctx_println(R2);
+        flint_printf("x2 = \n"); gr_println(x2, R2);
+        flint_printf("y2 = \n"); gr_println(y2, R2);
+        flint_printf("z2 = \n"); gr_println(z2, R2);
+        flint_printf("x = \n"); gr_println(x, R);
+        flint_printf("y = \n"); gr_println(y, R);
+        flint_printf("z = \n"); gr_println(z, R);
+        flint_printf("xy = \n"); gr_println(xy, R);
+        flint_printf("t2 = \n"); gr_println(t2, R2);
+        flint_printf("\n");
+    }
+
+    GR_TMP_CLEAR4(x, y, z, xy, R);
+    GR_TMP_CLEAR4(x2, y2, z2, t2, R2);
+
+    gr_ctx_clear(R2);
+
+    return status;
+}
 
 int
 gr_test_mul_2exp_si(gr_ctx_t R, flint_rand_t state, int test_flags)
@@ -3198,6 +3255,7 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
     gr_test_iter(R, state, "set_si", gr_test_set_si, iters, test_flags);
     gr_test_iter(R, state, "set_fmpz", gr_test_set_fmpz, iters, test_flags);
     gr_test_iter(R, state, "set_fmpq", gr_test_set_fmpq, iters, test_flags);
+    gr_test_iter(R, state, "set_other", gr_test_set_other, iters, test_flags);
 
     gr_test_iter(R, state, "get_ui", gr_test_get_ui, iters, test_flags);
     gr_test_iter(R, state, "get_si", gr_test_get_si, iters, test_flags);
