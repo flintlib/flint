@@ -1068,6 +1068,14 @@ domain, however `\mathrm{Im}(\tau)` may have large eigenvalues.
     `2^{\mathit{nb\_steps}}\mathrm{Im}(\tau)` are not too large when calling
     this function.
 
+.. function:: slong acb_theta_ql_a0_nb_steps(const arb_mat_t C, slong s, slong prec)
+
+    Returns an integer `n` such that `2^n \gamma_s^2 \simeq \mathit{prec}`
+    where `\gamma_0,\ldots,\gamma_{g-1}` denote the diagonal coefficients of
+    `C`. This `n` is meant to be the number of AGM steps to use in
+    :func:`acb_theta_ql_a0_steps`, and its precise value is chosen to optimize
+    performance. We require `0\leq s < g`.
+
 .. function:: int acb_theta_ql_a0(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0, arb_srcptr d, const acb_mat_t tau, slong guard, slong prec)
 
     Follows the specifications of a function of type

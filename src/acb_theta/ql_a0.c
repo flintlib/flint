@@ -36,51 +36,6 @@ acb_theta_ql_split(const arb_mat_t cho)
     return k;
 }
 
-static slong
-acb_theta_ql_nb_steps(const arb_mat_t C, slong s, slong prec)
-{
-    slong g = arb_mat_nrows(C);
-    slong lp = ACB_THETA_LOW_PREC;
-    arb_t x, t;
-    slong res;
-
-    arb_init(x);
-    arb_init(t);
-
-    arb_sqr(x, arb_mat_entry(C, s, s), lp);
-    arb_const_log2(t, lp);
-    arb_div(x, x, t, lp);
-    arb_div_si(x, x, prec, lp);
-    arb_log(x, x, lp);
-    arb_div(x, x, t, lp);
-
-    res =  -arf_get_si(arb_midref(x), ARF_RND_NEAR);
-    if (s == 0)
-    {
-        if (g == 1)
-        {
-            res -= 7;
-        }
-        else if (g == 2)
-        {
-            res -= 3;
-        }
-        else if (g <= 5)
-        {
-            res -= 1;
-        }
-    }
-    else
-    {
-        res += 1;
-    }
-    res = FLINT_MAX(0, res);
-
-    arb_clear(x);
-    arb_clear(t);
-    return res;
-}
-
 int
 acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
     arb_srcptr dist, const acb_mat_t tau, slong guard, slong prec)
@@ -111,7 +66,7 @@ acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
 
     acb_siegel_cho(cho, tau, ACB_THETA_LOW_PREC);
     split = acb_theta_ql_split(cho);
-    nb_steps = acb_theta_ql_nb_steps(cho, split, prec);
+    nb_steps = acb_theta_ql_a0_nb_steps(cho, split, prec);
     padding = nb_steps * (guard + g);
     arf_one(e);
     arf_mul_2exp_si(e, e, -prec - padding);

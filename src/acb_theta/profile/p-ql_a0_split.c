@@ -14,52 +14,6 @@
 #include "acb_mat.h"
 #include "acb_theta.h"
 
-/* Copy-pasted from src/acb_theta/ql_a0.c */
-static slong
-acb_theta_ql_nb_steps(const arb_mat_t C, slong s, slong prec)
-{
-    slong g = arb_mat_nrows(C);
-    slong lp = ACB_THETA_LOW_PREC;
-    arb_t x, t;
-    slong res;
-
-    arb_init(x);
-    arb_init(t);
-
-    arb_sqr(x, arb_mat_entry(C, s, s), lp);
-    arb_const_log2(t, lp);
-    arb_div(x, x, t, lp);
-    arb_div_si(x, x, prec, lp);
-    arb_log(x, x, lp);
-    arb_div(x, x, t, lp);
-
-    res =  -arf_get_si(arb_midref(x), ARF_RND_NEAR);
-    if (s == 0)
-    {
-        if (g == 1)
-        {
-            res -= 7;
-        }
-        else if (g == 2)
-        {
-            res -= 3;
-        }
-        else if (g <= 5)
-        {
-            res -= 1;
-        }
-    }
-    else
-    {
-        res += 1;
-    }
-    res = FLINT_MAX(0, res);
-
-    arb_clear(x);
-    arb_clear(t);
-    return res;
-}
-
 static int usage(char *argv[])
 {
     flint_printf("usage: %s g prec cstep cmax\n", argv[0]);
@@ -133,8 +87,8 @@ int main(int argc, char *argv[])
 
             acb_theta_dist_a0(dist0, t, tau1, lp);
             acb_siegel_cho(cho, tau1, lp);
-            nb_steps_1 = acb_theta_ql_nb_steps(cho, split, prec);
-            nb_steps_2 = acb_theta_ql_nb_steps(cho, 0, prec);
+            nb_steps_1 = acb_theta_ql_a0_nb_steps(cho, split, prec);
+            nb_steps_2 = acb_theta_ql_a0_nb_steps(cho, 0, prec);
 
             flint_printf("time for split (nb_steps = %wd):\n", nb_steps_1);
             TIMEIT_START;

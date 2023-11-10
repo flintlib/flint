@@ -15,52 +15,6 @@
 #include "acb_mat.h"
 #include "acb_theta.h"
 
-/* Copy-pasted from src/acb_theta/ql_a0.c */
-static slong
-acb_theta_ql_nb_steps(const arb_mat_t C, slong s, slong prec)
-{
-    slong g = arb_mat_nrows(C);
-    slong lp = ACB_THETA_LOW_PREC;
-    arb_t x, t;
-    slong res;
-
-    arb_init(x);
-    arb_init(t);
-
-    arb_sqr(x, arb_mat_entry(C, s, s), lp);
-    arb_const_log2(t, lp);
-    arb_div(x, x, t, lp);
-    arb_div_si(x, x, prec, lp);
-    arb_log(x, x, lp);
-    arb_div(x, x, t, lp);
-
-    res =  -arf_get_si(arb_midref(x), ARF_RND_NEAR);
-    if (s == 0)
-    {
-        if (g == 1)
-        {
-            res -= 7;
-        }
-        else if (g == 2)
-        {
-            res -= 3;
-        }
-        else if (g <= 5)
-        {
-            res -= 1;
-        }
-    }
-    else
-    {
-        res += 1;
-    }
-    res = FLINT_MAX(0, res);
-
-    arb_clear(x);
-    arb_clear(t);
-    return res;
-}
-
 static int usage(char *argv[])
 {
     flint_printf("usage: %s g pstep pmax\n", argv[0]);
@@ -136,7 +90,7 @@ int main(int argc, char *argv[])
         acb_theta_dist_a0(dist0, t, tau, lp);
 
         split = 0;
-        nb_steps = acb_theta_ql_nb_steps(cho, 0, prec);
+        nb_steps = acb_theta_ql_a0_nb_steps(cho, 0, prec);
 
         flint_printf("(g = %wd, prec = %wd, hast = %wd, hasz = %wd) ideal nb_steps: %wd, tau:\n",
             g, prec, hast, hasz, nb_steps);
