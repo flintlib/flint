@@ -6,7 +6,31 @@ History and changes
 FLINT version history
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-2023-10-20 -- FLINT 3.0
+2023-11-10 -- FLINT 3.0.1
+-------------------------------------------------------------------------------
+
+* Build issues
+
+  * Fix LIBS2 order for static linking (Tomás Oliveira e Silva).
+  * Fix substitution of version number for older autotools (Albin Ahlbäck).
+  * Fix use of AC_SEARCH_LIBS to find cblas_dgemm (Gonzalo Tornaría).
+  * Add FlexiBLAS as a cblas option (Mahrud Sayrafi).
+  * Don't use deprecated PythonInterp in CMake build (Mahrud Sayrafi).
+  * Fix setting version numbers and strings in CMake build (Mahrud Sayrafi).
+  * Only link with NTL for the tests on CMake (Mahrud Sayrafi).
+
+* Bugs
+
+  * Fix bug in nmod32 on 32-bit systems.
+  * Fix missing modulus assignment in nmod_poly_mat_window_init (Vincent Neiger).
+  * Fix tmp allocation size in _fmpz_set_str_basecase.
+  * Fix rare arithmetic bug and memory leak in n_factor_ecm_select_curve.
+
+* Other
+
+  * Some corrections to the documentation.
+
+2023-10-20 -- FLINT 3.0.0
 -------------------------------------------------------------------------------
 
 Merged libraries and reorganisation
