@@ -629,6 +629,19 @@ AC_COMPILE_IFELSE(
     AC_MSG_RESULT([no])
     AC_MSG_ERROR(["FLINT requires GMP version 6.2.1 or later."]))
 
+AC_MSG_CHECKING([if GMP defines mp_limb_t as unsigned long long int])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM(
+        [#include <gmp.h>],
+        [#if !defined(_LONG_LONG_LIMB)
+         # error mp_limb_t != unsigned long long int
+         #endif]
+    )],
+    AC_MSG_RESULT([yes])
+    gmpcompat_h_in="gmpcompat-longlong.h.in",
+    AC_MSG_RESULT([no])
+    gmpcompat_h_in="gmpcompat.h.in")
+
 # Check that MPFR >= 4.1.0
 AC_MSG_CHECKING([if version of MPFR is greater than 4.1.0])
 AC_COMPILE_IFELSE(
@@ -1155,7 +1168,7 @@ fi
 # epilog
 ################################################################################
 
-AC_CONFIG_FILES([Makefile flint.pc src/flint.h])
+AC_CONFIG_FILES([Makefile flint.pc src/flint.h src/gmpcompat.h:src/${gmpcompat_h_in}])
 AC_OUTPUT
 
 dnl Shorten the original help message
