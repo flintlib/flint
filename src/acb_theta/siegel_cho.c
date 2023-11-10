@@ -9,6 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "arb_mat.h"
+#include "acb_mat.h"
 #include "acb_theta.h"
 
 void acb_siegel_cho(arb_mat_t C, const acb_mat_t tau, slong prec)

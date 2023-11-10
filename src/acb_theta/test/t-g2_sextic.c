@@ -10,6 +10,8 @@
 */
 
 #include "test_helpers.h"
+#include "acb_poly.h"
+#include "acb_mat.h"
 #include "acb_theta.h"
 
 TEST_FUNCTION_START(acb_theta_g2_sextic, state)

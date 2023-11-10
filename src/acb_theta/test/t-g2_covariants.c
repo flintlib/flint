@@ -11,6 +11,8 @@
 
 #include "test_helpers.h"
 #include "fmpz_poly.h"
+#include "acb_poly.h"
+#include "acb_mat.h"
 #include "acb_theta.h"
 
 #define ACB_THETA_G2_COV_K {1,2,2,2,3,3,3,3,4,4,4,4,5,5,5,6,6,6,7,7,8,9,10,10,12,15}

@@ -9,10 +9,11 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "arb_mat.h"
 #include "acb_theta.h"
 
-#define ACB_THETA_ELD_MAX_PTS n_pow(10, 6)
-#define ACB_THETA_ELD_MAX_ERR 10
+#define ACB_THETA_ELD_MAX_PTS 1000000
+#define ACB_THETA_ELD_MAX_ERR 100
 
 static void
 slong_vec_max(slong * r, slong * v1, slong * v2, slong d)

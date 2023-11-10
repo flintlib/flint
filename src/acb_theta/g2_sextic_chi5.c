@@ -9,11 +9,14 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "acb_poly.h"
+#include "acb_mat.h"
 #include "acb_theta.h"
 
 #define ACB_THETA_G2_JET_NAIVE_THRESHOLD 10000
 
-void acb_theta_g2_sextic_chi5(acb_poly_t res, acb_t chi5, const acb_mat_t tau, slong prec)
+void
+acb_theta_g2_sextic_chi5(acb_poly_t res, acb_t chi5, const acb_mat_t tau, slong prec)
 {
     slong g = 2;
     slong n2 = 1 << (2 * g);

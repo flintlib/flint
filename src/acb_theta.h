@@ -12,18 +12,8 @@
 #ifndef ACB_THETA_H
 #define ACB_THETA_H
 
-#include <stdio.h>
-#include <math.h>
-#include "ulong_extras.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
-#include "fmpz_lll.h"
-#include "arb.h"
-#include "acb.h"
-#include "acb_poly.h"
-#include "arb_mat.h"
-#include "acb_mat.h"
-#include "acb_modular.h"
+#include "acb_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -141,7 +131,7 @@ void acb_theta_naive_reduce(arb_ptr v, acb_ptr new_zs, arb_ptr as, acb_ptr cs, a
 void acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong * tup,
     slong * n, slong prec);
 
-typedef void * acb_theta_naive_worker_t(acb_ptr, acb_srcptr, acb_srcptr, const slong *,
+typedef void (*acb_theta_naive_worker_t)(acb_ptr, acb_srcptr, acb_srcptr, const slong *,
     slong, const acb_t, const slong *, slong, slong, slong, slong);
 
 void acb_theta_naive_worker(acb_ptr th, slong len, acb_srcptr zs, slong nb,
@@ -196,7 +186,7 @@ void acb_theta_agm_mul(acb_ptr res, acb_srcptr a1, acb_srcptr a2, slong g, slong
 void acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
     arb_srcptr d0, arb_srcptr d, slong g, slong prec);
 
-typedef int * acb_theta_ql_worker_t(acb_ptr, acb_srcptr, acb_srcptr,
+typedef int (*acb_theta_ql_worker_t)(acb_ptr, acb_srcptr, acb_srcptr,
     arb_srcptr, arb_srcptr, const acb_mat_t, slong, slong);
 
 int acb_theta_ql_a0_naive(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,

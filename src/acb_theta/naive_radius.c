@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "arb_mat.h"
 #include "acb_theta.h"
 
 /* Assuming a >= 0, return R2 such that x - (a/2)*log(x)\geq b for all

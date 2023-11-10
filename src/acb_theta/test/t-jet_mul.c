@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include "fmpz_mpoly.h"
+#include "acb.h"
 #include "acb_theta.h"
 
 TEST_FUNCTION_START(acb_theta_jet_mul, state)

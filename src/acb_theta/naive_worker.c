@@ -9,6 +9,9 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
+#include "ulong_extras.h"
+#include "acb_mat.h"
 #include "acb_theta.h"
 
 static slong

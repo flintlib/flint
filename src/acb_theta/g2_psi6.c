@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "acb.h"
 #include "acb_theta.h"
 
 static void
@@ -33,10 +34,11 @@ g2_psi6_sgn(ulong b, ulong c, ulong d)
     g2_psi6_bits(&c1, &c2, &c3, &c4, c);
     g2_psi6_bits(&d1, &d2, &d3, &d4, d);
 
-    sgn = b1 + b2 + c1 + c2 + d1 + d2 + b1*c1 + b2*c2 + b4*c2 + b1*c3 - b2*c4 +
-        b1*d1 - b3*d1 + c1*d1 + b2*d2 + c2*d2 + c4*d2 + c1*d3 - b2*b3*c1 -
-        b2*b4*c2 - b1*b2*c3 - b2*b3*d1 - b3*c1*d1 - b1*c3*d1 - b2*c3*d1
-        - b2*b4*d2 - b4*c2*d2 - b1*b2*d3 - b1*c1*d3 - b2*c1*d3;
+    sgn = b1 + b2 + c1 + c2 + d1 + d2 + b1 * c1 + b2 * c2 + b4 * c2 + b1 * c3
+        - b2 * c4 + b1 * d1 - b3 * d1 + c1 * d1 + b2 * d2 + c2 * d2 + c4 * d2
+        + c1 * d3 - b2 * b3 * c1 - b2 * b4 * c2 - b1 * b2 * c3 - b2 * b3 * d1
+        - b3 * c1 * d1 - b1 * c3 * d1 - b2 * c3 * d1 - b2 * b4 * d2
+        - b4 * c2 * d2 - b1 * b2 * d3 - b1 * c1 * d3 - b2 * c1 * d3;
     sgn = (sgn % 2 == 1 ? -1 : 1);
 
     return sgn;

@@ -9,9 +9,12 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "acb_poly.h"
+#include "acb_mat.h"
 #include "acb_theta.h"
 
-void acb_theta_g2_detk_symj(acb_poly_t res, const acb_mat_t m, const acb_poly_t f,
+void
+acb_theta_g2_detk_symj(acb_poly_t res, const acb_mat_t m, const acb_poly_t f,
     slong k, slong j, slong prec)
 {
     acb_poly_t x, y, t, u, aux;

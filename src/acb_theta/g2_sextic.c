@@ -9,9 +9,11 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "acb.h"
 #include "acb_theta.h"
 
-void acb_theta_g2_sextic(acb_poly_t res, const acb_mat_t tau, slong prec)
+void
+acb_theta_g2_sextic(acb_poly_t res, const acb_mat_t tau, slong prec)
 {
     acb_t chi5;
 

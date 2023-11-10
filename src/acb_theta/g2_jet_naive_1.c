@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "acb_mat.h"
 #include "acb_theta.h"
 
 #define ACB_THETA_G2_JET_NAIVE_1_THRESHOLD 100

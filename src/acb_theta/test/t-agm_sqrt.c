@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "acb.h"
 #include "acb_theta.h"
 
 TEST_FUNCTION_START(acb_theta_agm_sqrt, state)
@@ -24,10 +25,9 @@ TEST_FUNCTION_START(acb_theta_agm_sqrt, state)
         slong prec = 100 + n_randint(state, 1000);
         slong mag_bits = n_randint(state, 4);
         slong lowprec = 10 + n_randint(state, 10);
-        slong delta = n_pow(2, mag_bits) + 10;
+        slong delta = (1 << mag_bits) + 10;
         acb_t rt, x, rt_low, t;
         arf_t err;
-
 
         acb_init(rt);
         acb_init(x);

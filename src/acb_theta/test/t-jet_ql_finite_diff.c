@@ -10,6 +10,8 @@
 */
 
 #include "test_helpers.h"
+#include "ulong_extras.h"
+#include "acb.h"
 #include "acb_theta.h"
 
 TEST_FUNCTION_START(acb_theta_jet_ql_finite_diff, state)

@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "arb.h"
 #include "acb_theta.h"
 
 TEST_FUNCTION_START(acb_theta_jet_ql_radius, state)

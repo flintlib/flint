@@ -9,9 +9,11 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "arb_mat.h"
+#include "acb_mat.h"
 #include "acb_theta.h"
 
-#define ACB_SIEGEL_REDUCE_MAG_BOUND n_pow(10, 6)
+#define ACB_SIEGEL_REDUCE_MAG_BOUND 1000000
 
 static void
 fmpz_mat_bound_inf_norm(mag_t b, const fmpz_mat_t mat)

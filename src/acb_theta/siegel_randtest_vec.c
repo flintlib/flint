@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "acb.h"
 #include "acb_theta.h"
 
 void acb_siegel_randtest_vec(acb_ptr z, flint_rand_t state, slong g, slong prec)

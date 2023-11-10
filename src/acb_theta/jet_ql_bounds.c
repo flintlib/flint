@@ -9,6 +9,8 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "arb_mat.h"
+#include "acb_mat.h"
 #include "acb_theta.h"
 
 /* Compute c0, c1, c2 such that |theta_{a,b}(z,tau)| on a ball of radius rho

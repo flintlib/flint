@@ -9,9 +9,11 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "acb_poly.h"
 #include "acb_theta.h"
 
-void acb_theta_g2_transvectant(acb_poly_t res, const acb_poly_t g, const acb_poly_t h,
+void
+acb_theta_g2_transvectant(acb_poly_t res, const acb_poly_t g, const acb_poly_t h,
     slong m, slong n, slong k, slong prec)
 {
     acb_poly_t aux, s, t;

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "acb_theta.h"
 
 /* See Cléry, Faber, van der Geer, "Covariants of binary sextics and modular
