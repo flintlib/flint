@@ -710,8 +710,8 @@ differentiated series:
 
 .. function:: slong acb_theta_jet_nb(slong ord, slong g)
 
-    Returns the number of derivation tuples with total order at most *ord*. We
-    require that *ord* is nonnegative and *g* is at least 1.
+    Returns the number of derivation tuples with total order at most *ord*. The
+    result will be zero if *ord* is negative.
 
 .. function:: slong acb_theta_jet_total_order(const slong * tup, slong g)
 
