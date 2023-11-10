@@ -18,41 +18,21 @@
 #define PERM_INLINE static __inline__
 #endif
 
-
 #include "flint.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Memory management *********************************************************/
 
-PERM_INLINE slong * _perm_init(slong n)
-{
-    slong i, *vec;
-
-    vec = (slong *) flint_malloc(n * sizeof(slong));
-
-    if (!vec)
-    {
-        flint_printf("ERROR (_perm_init).\n\n");
-        flint_abort();
-    }
-
-    for (i = 0; i < n; i++)
-        vec[i] = i;
-
-    return vec;
-}
-
-PERM_INLINE void _perm_clear(slong * vec)
-{
-    flint_free(vec);
-}
+slong * _perm_init(slong n);
+void _perm_clear(slong * vec);
 
 /* Assignment ****************************************************************/
 
-PERM_INLINE slong _perm_equal(const slong *vec1, const slong *vec2, slong n)
+PERM_INLINE
+slong _perm_equal(const slong * vec1, const slong * vec2, slong n)
 {
     slong i;
 
@@ -63,7 +43,8 @@ PERM_INLINE slong _perm_equal(const slong *vec1, const slong *vec2, slong n)
     return 1;
 }
 
-PERM_INLINE void _perm_set(slong *res, const slong *vec, slong n)
+PERM_INLINE
+void _perm_set(slong * res, const slong * vec, slong n)
 {
     slong i;
 
@@ -71,7 +52,8 @@ PERM_INLINE void _perm_set(slong *res, const slong *vec, slong n)
         res[i] = vec[i];
 }
 
-PERM_INLINE void _perm_set_one(slong *vec, slong n)
+PERM_INLINE
+void _perm_set_one(slong * vec, slong n)
 {
     slong i;
 
@@ -79,59 +61,11 @@ PERM_INLINE void _perm_set_one(slong *vec, slong n)
         vec[i] = i;
 }
 
-PERM_INLINE void
- _perm_inv(slong *res, const slong *vec, slong n)
-{
-    slong i;
-
-    if (res == vec)
-    {
-        slong *t = (slong *) flint_malloc(n * sizeof(slong));
-
-        if (!t)
-        {
-            flint_printf("ERROR (_perm_inv).\n\n");
-            flint_abort();
-        }
-
-        for (i = 0; i < n; i++)
-            t[i] = vec[i];
-        for (i = 0; i < n; i++)
-            res[t[i]] = i;
-
-        flint_free(t);
-    }
-    else
-    {
-        for (i = 0; i < n; i++)
-            res[vec[i]] = i;
-    }
-}
+void _perm_inv(slong * res, const slong * vec, slong n);
 
 /* Composition ***************************************************************/
 
-PERM_INLINE void
-_perm_compose(slong *res, const slong *vec1, const slong *vec2, slong n)
-{
-    slong i;
-
-    if (res == vec1)
-    {
-        slong *t = (slong *) flint_malloc(n * sizeof(slong));
-
-        for (i = 0; i < n; i++)
-            t[i] = vec1[i];
-        for (i = 0; i < n; i++)
-            res[i] = t[vec2[i]];
-
-        flint_free(t);
-    }
-    else
-    {
-        for (i = 0; i < n; i++)
-            res[i] = vec1[vec2[i]];
-    }
-}
+void _perm_compose(slong * res, const slong * vec1, const slong * vec2, slong n);
 
 /* Randomisation *************************************************************/
 
@@ -143,35 +77,7 @@ int _perm_parity(const slong * vec, slong n);
 
 /* Input and output **********************************************************/
 
-PERM_INLINE  int _long_vec_print(const slong * vec, slong len)
-{
-    slong i;
-
-    flint_printf("%wd", len);
-    if (len > 0)
-    {
-        flint_printf(" ");
-        for (i = 0; i < len; i++)
-            flint_printf(" %wd", vec[i]);
-    }
-
-    return 1;
-}
-
-PERM_INLINE int _perm_print(const slong * vec, slong n)
-{
-    slong i;
-
-    flint_printf("%wd", n);
-    if (n > 0)
-    {
-        flint_printf(" ");
-        for (i = 0; i < n; i++)
-            flint_printf(" %wd", vec[i]);
-    }
-
-    return 1;
-}
+int _perm_print(const slong * vec, slong n);
 
 #ifdef __cplusplus
 }
