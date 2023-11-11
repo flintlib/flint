@@ -30,35 +30,19 @@ extern "C" {
 
 /* Context ********************************************************************/
 
-void fq_nmod_ctx_init(fq_nmod_ctx_t ctx,
-                      const fmpz_t p, slong d, const char *var);
-
-int _fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx,
-                             const fmpz_t p, slong d, const char *var);
-
-void fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx,
-                             const fmpz_t p, slong d, const char *var);
-
-void fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx,
-                              const nmod_poly_t modulus,
-                              const char *var);
-
-void fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx, flint_rand_t state);
-
-void fq_nmod_ctx_randtest_reducible(fq_nmod_ctx_t ctx, flint_rand_t state);
-
+void fq_nmod_ctx_init(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const char * var);
 void fq_nmod_ctx_clear(fq_nmod_ctx_t ctx);
 
-FQ_NMOD_INLINE const nmod_poly_struct* fq_nmod_ctx_modulus(const fq_nmod_ctx_t ctx)
-{
-    return ctx->modulus;
-}
+int _fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const char * var);
+void fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const char * var);
 
-FQ_NMOD_INLINE slong fq_nmod_ctx_degree(const fq_nmod_ctx_t ctx)
-{
-    return ctx->modulus->length - 1;
-}
+void fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus, const char * var);
 
+void fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx, flint_rand_t state);
+void fq_nmod_ctx_randtest_reducible(fq_nmod_ctx_t ctx, flint_rand_t state);
+
+FQ_NMOD_INLINE const nmod_poly_struct * fq_nmod_ctx_modulus(const fq_nmod_ctx_t ctx) { return ctx->modulus; }
+FQ_NMOD_INLINE slong fq_nmod_ctx_degree(const fq_nmod_ctx_t ctx) { return ctx->modulus->length - 1; }
 void fq_nmod_ctx_order(fmpz_t f, const fq_nmod_ctx_t ctx);
 
 #ifdef FLINT_HAVE_FILE
@@ -71,55 +55,37 @@ void fq_nmod_ctx_print(const fq_nmod_ctx_t ctx);
 
 void fq_nmod_init(fq_nmod_t rop, const fq_nmod_ctx_t ctx);
 void fq_nmod_init2(fq_nmod_t rop, const fq_nmod_ctx_t ctx);
-
 void fq_nmod_clear(fq_nmod_t rop, const fq_nmod_ctx_t ctx);
 
-void _fq_nmod_sparse_reduce(mp_limb_t *R, slong lenR, const fq_nmod_ctx_t ctx);
-void _fq_nmod_dense_reduce(mp_limb_t* R, slong lenR, const fq_nmod_ctx_t ctx);
-void _fq_nmod_reduce(mp_limb_t* R, slong lenR, const fq_nmod_ctx_t ctx);
+void _fq_nmod_sparse_reduce(mp_limb_t * R, slong lenR, const fq_nmod_ctx_t ctx);
+void _fq_nmod_dense_reduce(mp_limb_t * R, slong lenR, const fq_nmod_ctx_t ctx);
+void _fq_nmod_reduce(mp_limb_t * R, slong lenR, const fq_nmod_ctx_t ctx);
 void fq_nmod_reduce(fq_nmod_t rop, const fq_nmod_ctx_t ctx);
 
 /* Basic arithmetic **********************************************************/
 
-void fq_nmod_add(fq_nmod_t rop, const fq_nmod_t op1,
-                                 const fq_nmod_t op2, const fq_nmod_ctx_t ctx);
-
-void fq_nmod_sub(fq_nmod_t rop, const fq_nmod_t op1,
-                                 const fq_nmod_t op2, const fq_nmod_ctx_t ctx);
+void fq_nmod_add(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_t op2, const fq_nmod_ctx_t ctx);
+void fq_nmod_sub(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_t op2, const fq_nmod_ctx_t ctx);
+void fq_nmod_neg(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
 
 void fq_nmod_sub_one(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
 
-void fq_nmod_neg(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
-
-void fq_nmod_mul(fq_nmod_t rop,
-            const fq_nmod_t op1, const fq_nmod_t op2, const fq_nmod_ctx_t ctx);
-
-void fq_nmod_mul_fmpz(fq_nmod_t rop,
-                  const fq_nmod_t op, const fmpz_t x, const fq_nmod_ctx_t ctx);
-
-void fq_nmod_mul_si(fq_nmod_t rop,
-                         const fq_nmod_t op, slong x, const fq_nmod_ctx_t ctx);
-
-void fq_nmod_mul_ui(fq_nmod_t rop,
-                         const fq_nmod_t op, ulong x, const fq_nmod_ctx_t ctx);
+void fq_nmod_mul_si(fq_nmod_t rop, const fq_nmod_t op, slong x, const fq_nmod_ctx_t ctx);
+void fq_nmod_mul_ui(fq_nmod_t rop, const fq_nmod_t op, ulong x, const fq_nmod_ctx_t ctx);
+void fq_nmod_mul_fmpz(fq_nmod_t rop, const fq_nmod_t op, const fmpz_t x, const fq_nmod_ctx_t ctx);
+void fq_nmod_mul(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_t op2, const fq_nmod_ctx_t ctx);
 
 void fq_nmod_sqr(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
 void fq_nmod_inv(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
 
-void _fq_nmod_pow(mp_limb_t *rop, const mp_limb_t *op,
-                           slong len, const fmpz_t e, const fq_nmod_ctx_t ctx);
-
-void fq_nmod_pow(fq_nmod_t rop, const fq_nmod_t op1,
-                                      const fmpz_t e, const fq_nmod_ctx_t ctx);
-
-void fq_nmod_pow_ui(fq_nmod_t rop,
-                  const fq_nmod_t op1, const ulong e, const fq_nmod_ctx_t ctx);
+void fq_nmod_pow_ui(fq_nmod_t rop, const fq_nmod_t op1, const ulong e, const fq_nmod_ctx_t ctx);
+void _fq_nmod_pow(mp_limb_t * rop, const mp_limb_t * op, slong len, const fmpz_t e, const fq_nmod_ctx_t ctx);
+void fq_nmod_pow(fq_nmod_t rop, const fq_nmod_t op1, const fmpz_t e, const fq_nmod_ctx_t ctx);
 
 /* Roots ********************************************************************/
 
 int fq_nmod_sqrt(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
-
 void fq_nmod_pth_root(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
 
 int fq_nmod_is_square(const fq_nmod_t op, const fq_nmod_ctx_t ctx);
@@ -127,15 +93,11 @@ int fq_nmod_is_square(const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 /* Randomisation *************************************************************/
 
 void fq_nmod_randtest(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx);
-
 void fq_nmod_randtest_dense(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx);
-
 void fq_nmod_randtest_not_zero(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx);
 
 void fq_nmod_rand(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx);
-
 void fq_nmod_rand_not_zero(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_t ctx);
-
 
 /* Comparison ****************************************************************/
 
@@ -177,28 +139,19 @@ char * fq_nmod_get_str_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
 /* Special functions *********************************************************/
 
-void _fq_nmod_trace(fmpz_t rop, const mp_limb_t *op, slong len,
-                    const fq_nmod_ctx_t ctx);
-
+void _fq_nmod_trace(fmpz_t rop, const mp_limb_t * op, slong len, const fq_nmod_ctx_t ctx);
 void fq_nmod_trace(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
-void _fq_nmod_frobenius(mp_limb_t *rop, const mp_limb_t *op, slong len, slong e,
-                        const fq_nmod_ctx_t ctx);
-
+void _fq_nmod_frobenius(mp_limb_t * rop, const mp_limb_t * op, slong len, slong e, const fq_nmod_ctx_t ctx);
 void fq_nmod_frobenius(fq_nmod_t rop, const fq_nmod_t op, slong e, const fq_nmod_ctx_t ctx);
 
-void _fq_nmod_norm(fmpz_t rop, const mp_limb_t *op, slong len,
-                   const fq_nmod_ctx_t ctx);
-
+void _fq_nmod_norm(fmpz_t rop, const mp_limb_t * op, slong len, const fq_nmod_ctx_t ctx);
 void fq_nmod_norm(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
 /* Bit packing ******************************************************/
 
-void fq_nmod_bit_pack(fmpz_t f, const fq_nmod_t op, flint_bitcnt_t bit_size,
-                 const fq_nmod_ctx_t ctx);
-
-void fq_nmod_bit_unpack(fq_nmod_t rop, const fmpz_t f, flint_bitcnt_t bit_size,
-                   const fq_nmod_ctx_t ctx);
+void fq_nmod_bit_pack(fmpz_t f, const fq_nmod_t op, flint_bitcnt_t bit_size, const fq_nmod_ctx_t ctx);
+void fq_nmod_bit_unpack(fq_nmod_t rop, const fmpz_t f, flint_bitcnt_t bit_size, const fq_nmod_ctx_t ctx);
 
 /* Inlines *******************************************************************/
 
@@ -221,4 +174,3 @@ void __fq_nmod_ctx_prime(fmpz_t p, fq_nmod_ctx_t ctx);
 #endif
 
 #endif
-
