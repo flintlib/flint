@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "nmod_poly.h"
 #include "nmod_poly_mat.h"
-#include "perm.h"
 
 #define XX(ii,jj) nmod_poly_mat_entry(X,(ii),(jj))
 #define BB(ii,jj) nmod_poly_mat_entry(B,(ii),(jj))

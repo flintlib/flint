@@ -9,7 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_vec.h" /* for nmod_vec_set */
+#include "nmod_vec.h"
+#include "nmod_poly.h"
 #include "nmod_poly_mat.h"
 
 void nmod_poly_mat_set_trunc(nmod_poly_mat_t res, const nmod_poly_mat_t pmat, long len)

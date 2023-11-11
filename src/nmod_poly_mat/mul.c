@@ -10,7 +10,6 @@
 */
 
 #include "ulong_extras.h"
-#include "nmod_poly.h"
 #include "nmod_poly_mat.h"
 
 #define KS_MIN_DIM 10

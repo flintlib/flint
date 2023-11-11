@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "nmod_poly.h"
 #include "nmod_poly_mat.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
 
 void
